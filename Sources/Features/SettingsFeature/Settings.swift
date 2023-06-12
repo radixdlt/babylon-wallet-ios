@@ -11,6 +11,7 @@ import ProfileBackupsFeature
 
 #if DEBUG
 import DebugInspectProfileFeature
+import SecurityStructureConfigurationListFeature
 #endif // DEBUG
 
 // MARK: - AppSettings
@@ -55,6 +56,7 @@ public struct AppSettings: Sendable, FeatureReducer {
 		case importFromOlympiaWalletButtonTapped
 		case factorSourcesButtonTapped
 		case debugInspectProfileButtonTapped
+		case securityStructureConfigsButtonTapped
 		#endif
 	}
 
@@ -89,6 +91,7 @@ public struct AppSettings: Sendable, FeatureReducer {
 			case importOlympiaWalletCoordinator(ImportOlympiaWalletCoordinator.State)
 			case debugInspectProfile(DebugInspectProfile.State)
 			case debugManageFactorSources(ManageFactorSources.State)
+			case securityStructureConfigs(SecurityStructureConfigurationListCoordinator.State)
 			#endif
 		}
 
@@ -106,6 +109,7 @@ public struct AppSettings: Sendable, FeatureReducer {
 			case importOlympiaWalletCoordinator(ImportOlympiaWalletCoordinator.Action)
 			case debugInspectProfile(DebugInspectProfile.Action)
 			case debugManageFactorSources(ManageFactorSources.Action)
+			case securityStructureConfigs(SecurityStructureConfigurationListCoordinator.Action)
 			#endif
 		}
 
@@ -144,6 +148,9 @@ public struct AppSettings: Sendable, FeatureReducer {
 			}
 			Scope(state: /State.debugManageFactorSources, action: /Action.debugManageFactorSources) {
 				ManageFactorSources()
+			}
+			Scope(state: /State.securityStructureConfigs, action: /Action.securityStructureConfigs) {
+				SecurityStructureConfigurationListCoordinator()
 			}
 			#endif
 		}
@@ -218,6 +225,10 @@ public struct AppSettings: Sendable, FeatureReducer {
 				guard let profile = try? Profile(snapshot: snapshot) else { return }
 				await send(.internal(.profileToDebugLoaded(profile)))
 			}
+
+		case .securityStructureConfigsButtonTapped:
+			state.destination = .securityStructureConfigs(.init())
+			return .none
 
 		#endif
 		}

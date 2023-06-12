@@ -82,6 +82,11 @@ public struct SecurityStructureConfigurationListCoordinator: Sendable, FeatureRe
 			state.destination = .securityStructureConfigDetails(.init(config: config))
 			return .none
 
+		case let .destination(.presented(.createSecurityStructureConfig(.delegate(.done(.success(config)))))):
+			state.configList.configs.append(.init(config: config))
+			state.destination = nil
+			return .none
+
 		default:
 			return .none
 		}
