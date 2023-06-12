@@ -95,7 +95,7 @@ public struct AssetsView: Sendable, FeatureReducer {
 					guard !Task.isCancelled else {
 						return
 					}
-					await send(.internal(.portfolioUpdated(portfolio)))
+					await send(.internal(.portfolioUpdated(portfolio.nonEmptyVaults)))
 				}
 			}
 		case let .didSelectList(kind):
