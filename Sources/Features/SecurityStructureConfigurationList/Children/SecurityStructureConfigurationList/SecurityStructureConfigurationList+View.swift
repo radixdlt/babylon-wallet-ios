@@ -66,7 +66,7 @@ public struct SecurityStructureConfigListCoreView: View {
 					action: { .child(.config(id: $0, action: $1)) }
 				)
 			) {
-				EditSecurityStructureConfiguration.View(store: $0)
+				SecurityStructureConfigurationRow.View(store: $0)
 					.padding(.horizontal, .medium3)
 			}
 		}

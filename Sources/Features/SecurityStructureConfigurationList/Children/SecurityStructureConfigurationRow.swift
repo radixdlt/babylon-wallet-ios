@@ -1,7 +1,7 @@
 import FeaturePrelude
 
-// MARK: - EditSecurityStructureConfiguration
-public struct EditSecurityStructureConfiguration: Sendable, FeatureReducer {
+// MARK: - SecurityStructureConfigurationRow
+public struct SecurityStructureConfigurationRow: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable, Identifiable {
 		public typealias ID = SecurityStructureConfiguration
 		public var id: ID { config }
@@ -12,15 +12,19 @@ public struct EditSecurityStructureConfiguration: Sendable, FeatureReducer {
 	}
 
 	public enum ViewAction: Sendable, Equatable {
-		case appeared
+		case displayDetails
+	}
+
+	public enum DelegateAction: Sendable, Equatable {
+		case displayDetails
 	}
 
 	public init() {}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
-		case .appeared:
-			return .none
+		case .displayDetails:
+			return .send(.delegate(.displayDetails))
 		}
 	}
 }

@@ -20,10 +20,6 @@ public struct SecurityStructureConfigurationListCoordinator: Sendable, FeatureRe
 		case appeared
 	}
 
-	public enum InternalAction: Sendable, Equatable {
-		//        case loadedSecurityStructureConfigDetails(SecurityStructureConfigDetails.State)
-	}
-
 	public enum ChildAction: Sendable, Equatable {
 		case configList(SecurityStructureConfigurationList.Action)
 		case destination(PresentationAction<Destination.Action>)
@@ -34,21 +30,21 @@ public struct SecurityStructureConfigurationListCoordinator: Sendable, FeatureRe
 	public struct Destination: ReducerProtocol {
 		public enum State: Equatable, Hashable {
 			case createSecurityStructureConfig(CreateSecurityStructureCoordinator.State)
-			//            case securityStructureConfigDetails(SecurityStructureConfigDetails.State)
+			case securityStructureConfigDetails(SecurityStructureConfigDetails.State)
 		}
 
 		public enum Action: Equatable {
 			case createSecurityStructureConfig(CreateSecurityStructureCoordinator.Action)
-			//            case securityStructureConfigDetails(SecurityStructureConfigDetails.Action)
+			case securityStructureConfigDetails(SecurityStructureConfigDetails.Action)
 		}
 
 		public var body: some ReducerProtocolOf<Self> {
 			Scope(state: /State.createSecurityStructureConfig, action: /Action.createSecurityStructureConfig) {
 				CreateSecurityStructureCoordinator()
 			}
-			//            Scope(state: /State.securityStructureConfigDetails, action: /Action.securityStructureConfigDetails) {
-			//                SecurityStructureConfigDetails()
-			//            }
+			Scope(state: /State.securityStructureConfigDetails, action: /Action.securityStructureConfigDetails) {
+				SecurityStructureConfigDetails()
+			}
 		}
 	}
 
@@ -81,6 +77,11 @@ public struct SecurityStructureConfigurationListCoordinator: Sendable, FeatureRe
 		case .configList(.delegate(.createNewStructure)):
 			state.destination = .createSecurityStructureConfig(.init())
 			return .none
+
+		case let .configList(.delegate(.displayDetails(config))):
+			state.destination = .securityStructureConfigDetails(.init(config: config))
+			return .none
+
 		default:
 			return .none
 		}
