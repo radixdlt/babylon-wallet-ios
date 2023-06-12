@@ -86,9 +86,9 @@ extension Home {
 						}
 					)
 				}
-				#if os(iOS)
-				.navigationTransition(.default, interactivity: .pan)
-				#endif
+//				#if os(iOS)
+//				.navigationTransition(.default, interactivity: .pan)
+//				#endif
 			}
 		}
 

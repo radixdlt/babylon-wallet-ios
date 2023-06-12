@@ -62,10 +62,10 @@ extension NameAccount {
 							text: nameBinding,
 							hint: .info(L10n.CreateEntity.NameNewEntity.explanation)
 						)
-						#if os(iOS)
-						.textFieldCharacterLimit(Profile.Network.Account.nameMaxLength, forText: nameBinding)
-						#endif
-						.keyboardType(.asciiCapable)
+//						#if os(iOS)
+//						.textFieldCharacterLimit(Profile.Network.Account.nameMaxLength, forText: nameBinding)
+//						#endif
+//						.keyboardType(.asciiCapable)
 						.autocorrectionDisabled()
 						.padding(.bottom, .medium3)
 

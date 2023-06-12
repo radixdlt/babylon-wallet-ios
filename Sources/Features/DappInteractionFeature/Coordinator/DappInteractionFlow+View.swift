@@ -29,7 +29,7 @@ extension DappInteractionFlow {
 					#endif
 				}
 				// This is required to disable the animation of internal components during transition
-				.transaction { $0.animation = nil }
+//				.transaction { $0.animation = nil }
 			} destination: {
 				destination(for: $0)
 				#if os(iOS)
@@ -43,9 +43,9 @@ extension DappInteractionFlow {
 					}
 				#endif
 			}
-			#if os(iOS)
-			.navigationTransition(.slide, interactivity: .disabled)
-			#endif
+//			#if os(iOS)
+//			.navigationTransition(.slide, interactivity: .disabled)
+//			#endif
 			.onAppear { ViewStore(store.stateless).send(.view(.appeared)) }
 			.alert(
 				store: store.scope(

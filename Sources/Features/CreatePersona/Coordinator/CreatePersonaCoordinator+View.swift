@@ -42,13 +42,13 @@ extension CreatePersonaCoordinator {
 						#endif
 					}
 					// This is required to disable the animation of internal components during transition
-					.transaction { $0.animation = nil }
+//					.transaction { $0.animation = nil }
 				} destination: {
 					destination(for: $0, shouldDisplayNavBar: viewStore.shouldDisplayNavBar)
 				}
-				#if os(iOS)
-				.navigationTransition(.slide, interactivity: .disabled)
-				#endif // iOS
+//				#if os(iOS)
+//				.navigationTransition(.slide, interactivity: .disabled)
+//				#endif // iOS
 			}
 		}
 

@@ -33,8 +33,7 @@ extension DappInteractor {
 						then: { DappInteractionCoordinator.View(store: $0.relay()) }
 					)
 					.transition(.move(edge: .bottom))
-					.animation(.linear, value: viewStore.currentModal)
-					.zIndex(1)
+//					.animation(.linear, value: viewStore.currentModal)
 				}
 				.sheet(
 					store: store.scope(state: \.$currentModal, action: { .child(.modal($0)) }),
