@@ -44,16 +44,16 @@ extension TransactionClient {
 			let analyzed = try engineToolkitClient.analyzeManifest(.init(manifest: manifest, networkID: networkID))
 			let allAccounts = try await accountsClient.getAccountsOnNetwork(networkID)
 
-			func accountFromComponentAddress(_ componentAddress: ComponentAddress) -> Profile.Network.Account? {
+			func accountFromComponentAddress(_ componentAddress: AccountAddress) -> Profile.Network.Account? {
 				allAccounts.first(where: { $0.address.address == componentAddress.address })
 			}
-			func identityFromComponentAddress(_ componentAddress: ComponentAddress) async throws -> Profile.Network.Persona {
-				try await personasClient.getPersona(id: IdentityAddress(address: componentAddress.address))
+			func identityFromComponentAddress(_ componentAddress: IdentityAddress) async throws -> Profile.Network.Persona {
+				try await personasClient.getPersona(id: IdentityAddress(validatingAddress: componentAddress.address))
 			}
-			func mapAccount(_ keyPath: KeyPath<ExtractAddressesFromManifestResponse, [ComponentAddress]>) throws -> OrderedSet<Profile.Network.Account> {
+			func mapAccount(_ keyPath: KeyPath<ExtractAddressesFromManifestResponse, [AccountAddress]>) throws -> OrderedSet<Profile.Network.Account> {
 				try .init(validating: analyzed[keyPath: keyPath].compactMap(accountFromComponentAddress))
 			}
-			func mapIdentity(_ keyPath: KeyPath<ExtractAddressesFromManifestResponse, [ComponentAddress]>) async throws -> OrderedSet<Profile.Network.Persona> {
+			func mapIdentity(_ keyPath: KeyPath<ExtractAddressesFromManifestResponse, [IdentityAddress]>) async throws -> OrderedSet<Profile.Network.Persona> {
 				try await .init(validating: analyzed[keyPath: keyPath].asyncMap(identityFromComponentAddress))
 			}
 
@@ -144,8 +144,8 @@ extension TransactionClient {
 
 			loggerGlobal.debug("Setting fee payer to: \(addressOfPayer.address)")
 
-			let lockFeeCallMethodInstruction = engineToolkitClient.lockFeeCallMethod(
-				address: ComponentAddress(address: addressOfPayer.address),
+			let lockFeeCallMethodInstruction = try engineToolkitClient.lockFeeCallMethod(
+				address: ComponentAddress(validatingAddress: addressOfPayer.address),
 				fee: feeToAdd.description
 			).embed()
 

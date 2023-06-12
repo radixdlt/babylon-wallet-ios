@@ -55,12 +55,12 @@ public struct EncounteredAddresses: Sendable, Decodable, Hashable {
 
 // MARK: - EncounteredComponents
 public struct EncounteredComponents: Sendable, Decodable, Hashable {
-	public let accessController: Set<ComponentAddress>
-	public let accounts: Set<ComponentAddress>
-	public let consensusManagers: Set<ComponentAddress>
-	public let identities: Set<ComponentAddress>
+	public let accessController: Set<AccessControllerAddress>
+	public let accounts: Set<AccountAddress>
+	public let consensusManagers: Set<ConsensusManagerAddress>
+	public let identities: Set<IdentityAddress>
 	public let userApplications: Set<ComponentAddress>
-	public let validators: Set<ComponentAddress>
+	public let validators: Set<ValidatorAddress>
 
 	enum CodingKeys: String, CodingKey {
 		case accessController = "access_controller"

@@ -34,10 +34,10 @@ extension DeriveVirtualAccountAddressRequest {
 
 // MARK: - DeriveVirtualAccountAddressResponse
 public struct DeriveVirtualAccountAddressResponse: Sendable, Codable, Hashable {
-	public let virtualAccountAddress: ComponentAddress
+	public let virtualAccountAddress: AccountAddress
 
 	public init(
-		virtualAccountAddress: ComponentAddress
+		virtualAccountAddress: AccountAddress
 	) {
 		self.virtualAccountAddress = virtualAccountAddress
 	}

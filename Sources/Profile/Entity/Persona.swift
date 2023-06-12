@@ -1,4 +1,3 @@
-import EngineToolkit
 import Prelude
 
 // MARK: - Profile.Network.Persona
@@ -176,7 +175,7 @@ extension Profile.Network.Persona {
 			)
 		).get()
 
-		return try EntityAddress(address: response.virtualIdentityAddress.address)
+		return response.virtualIdentityAddress
 	}
 }
 

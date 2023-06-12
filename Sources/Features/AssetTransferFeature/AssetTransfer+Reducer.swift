@@ -144,8 +144,8 @@ extension AssetTransfer {
 
 	private func createManifest(_ state: State) throws -> TransactionManifest {
 		let involvedFungibleResources = extractInvolvedFungibleResources(state.accounts.receivingAccounts)
-		let fungiblesTransferInstruction = involvedFungibleResources.flatMap {
-			fungibleResourceTransferInstruction(witdhrawAccount: state.accounts.fromAccount.address, $0)
+		let fungiblesTransferInstruction = try involvedFungibleResources.flatMap {
+			try fungibleResourceTransferInstruction(witdhrawAccount: state.accounts.fromAccount.address, $0)
 		}
 
 		let involvedNonFungibles = extractInvolvedNonFungibleResource(state.accounts.receivingAccounts)
@@ -225,13 +225,13 @@ extension AssetTransfer {
 	private func fungibleResourceTransferInstruction(
 		witdhrawAccount: AccountAddress,
 		_ resource: InvolvedFungibleResource
-	) -> [any InstructionProtocol] {
+	) throws -> [any InstructionProtocol] {
 		let accountWithdrawals: [any InstructionProtocol] = [
 			CallMethod(
-				receiver: .init(address: witdhrawAccount.address),
+				receiver: witdhrawAccount,
 				methodName: "withdraw",
 				arguments: [
-					.address(.init(address: resource.address.address)),
+					.address(resource.address.asGeneral()),
 					.decimal(.init(value: resource.totalTransferAmount.toString())),
 				]
 			),
@@ -243,12 +243,12 @@ extension AssetTransfer {
 			let instructions: [any InstructionProtocol] = [
 				TakeFromWorktopByAmount(
 					amount: .init(value: account.amount.toString()),
-					resourceAddress: .init(address: resource.address.address),
+					resourceAddress: resource.address,
 					bucket: .init(identifier: bucket)
 				),
 
 				CallMethod(
-					receiver: .init(address: account.id.address),
+					receiver: account.id,
 					methodName: "deposit",
 					arguments: [.bucket(.init(identifier: bucket))]
 				),
@@ -266,10 +266,10 @@ extension AssetTransfer {
 	) throws -> [any InstructionProtocol] {
 		let accountWithdrawals: [any InstructionProtocol] = try [
 			CallMethod(
-				receiver: .init(address: witdhrawAccount.address),
+				receiver: witdhrawAccount,
 				methodName: "withdraw_non_fungibles",
 				arguments: [
-					.address(.init(address: resource.address.address)),
+					.address(resource.address.asGeneral()),
 					.array(.init(
 						elementKind: .nonFungibleLocalId,
 						elements: resource.allTokens.map {
@@ -286,12 +286,12 @@ extension AssetTransfer {
 			let instructions: [any InstructionProtocol] = try [
 				TakeFromWorktopByIds(
 					Set(account.tokens.map { try $0.id.toRETLocalID() }),
-					resourceAddress: .init(address: resource.address.address),
+					resourceAddress: resource.address,
 					bucket: .init(identifier: bucket)
 				),
 
 				CallMethod(
-					receiver: .init(address: account.id.address),
+					receiver: account.id,
 					methodName: "deposit",
 					arguments: [.bucket(.init(identifier: bucket))]
 				),

@@ -43,22 +43,22 @@ public struct ExtractAddressesFromManifestResponse: Sendable, Decodable, Hashabl
 	public let componentAddresses: [ComponentAddress]
 
 	/// A set of all of the account component addresses seen in the manifest.
-	public let accountAddresses: [AccountAddress_]
+	public let accountAddresses: [AccountAddress]
 
 	/// A set of all of the identity component addresses seen in the manifest.
-	public let identityAddresses: [IdentityAddress_]
+	public let identityAddresses: [IdentityAddress]
 
 	/// A set of all of the account component addresses in the manifest which had methods invoked on them that would typically require auth (or a signature) to be called successfully.
-	public let accountsRequiringAuth: [AccountAddress_]
+	public let accountsRequiringAuth: [AccountAddress]
 
 	/// A set of all of the identity component addresses in the manifest which had methods invoked on them that would typically require auth (or a signature) to be called successfully.
-	public let identitiesRequiringAuth: [IdentityAddress_]
+	public let identitiesRequiringAuth: [IdentityAddress]
 
 	/// A set of all of the account component addresses in the manifest which were deposited into. This is a subset of the addresses seen in `accountsRequiringAuth`.
-	public let accountsWithdrawnFrom: [AccountAddress_]
+	public let accountsWithdrawnFrom: [AccountAddress]
 
 	/// A set of all of the account component addresses in the manifest which were withdrawn from. This is a subset of the addresses seen in `accountAddresses`
-	public let accountsDepositedInto: [AccountAddress_]
+	public let accountsDepositedInto: [AccountAddress]
 
 	// MARK: CodingKeys
 

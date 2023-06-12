@@ -111,9 +111,3 @@ extension TransactionManifest: CustomDumpStringConvertible {
 		description
 	}
 }
-
-extension AccountAddress {
-	public init(componentAddress: ComponentAddress) throws {
-		try self.init(address: componentAddress.address)
-	}
-}

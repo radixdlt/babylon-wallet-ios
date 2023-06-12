@@ -6,7 +6,7 @@ extension Profile.Network.Account {
 	public static let previewValue0: Self = try! Self(
 		networkID: .nebunet,
 		address: .init(
-			address: "account_tdx_c_1px9r7zkwfrve4cv3xlehwz8k29vp2q2dp6jhdx2mlkxsh4kqke"
+			validatingAddress: "account_tdx_c_1px9r7zkwfrve4cv3xlehwz8k29vp2q2dp6jhdx2mlkxsh4kqke"
 		),
 		securityState: .unsecured(.init(
 			transactionSigning: .init(
@@ -25,7 +25,7 @@ extension Profile.Network.Account {
 	public static let previewValue1: Self = try! Self(
 		networkID: .nebunet,
 		address: .init(
-			address: "account_tdx_a_1qvlrgnqrvk6tzmg8z6lusprl3weupfkmu52gkfhmncjsnhn0kp"
+			validatingAddress: "account_tdx_a_1qvlrgnqrvk6tzmg8z6lusprl3weupfkmu52gkfhmncjsnhn0kp"
 		),
 		securityState: .unsecured(.init(
 			transactionSigning: .init(

@@ -10,12 +10,12 @@ public struct RemoveMetadata: InstructionProtocol {
 
 	// MARK: Stored properties
 
-	public let entityAddress: EntityAddress
+	public let entityAddress: Address
 	public let key: String
 
 	// MARK: Init
 
-	public init(entityAddress: EntityAddress, key: String) {
+	public init(entityAddress: Address, key: String) {
 		self.entityAddress = entityAddress
 		self.key = key
 	}
@@ -49,7 +49,7 @@ extension RemoveMetadata {
 		}
 
 		try self.init(
-			entityAddress: container.decode(EntityAddress.self, forKey: .entityAddress),
+			entityAddress: container.decode(Address.self, forKey: .entityAddress),
 			key: container.decode(String.ProxyDecodable.self, forKey: .key).decoded
 		)
 	}

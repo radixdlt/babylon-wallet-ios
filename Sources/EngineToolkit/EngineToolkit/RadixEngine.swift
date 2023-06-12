@@ -154,7 +154,7 @@ extension RadixEngine {
 
 	public func encodeAddressRequest(
 		request: EncodeAddressRequest
-	) -> Result<EntityAddress, Error> {
+	) -> Result<Address, Error> {
 		callLibraryFunction(
 			request: request,
 			function: encode_address

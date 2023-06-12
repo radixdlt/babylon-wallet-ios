@@ -1,7 +1,6 @@
 import ClientPrelude
 import Cryptography
 @preconcurrency import EngineToolkit
-import struct Profile.AccountAddress
 
 extension EngineToolkitClient {
 	public static let liveValue: Self = {

@@ -123,7 +123,7 @@ extension Profile.Network.Account {
 			)
 		).get()
 
-		return try EntityAddress(address: response.virtualAccountAddress.address)
+		return response.virtualAccountAddress
 	}
 
 	public var isOlympiaAccount: Bool {

@@ -78,15 +78,15 @@ public struct KnownEntityAddressesResponse: Sendable, Codable, Hashable {
 extension KnownEntityAddressesResponse {
 	public static let previewValue = Self.nebunet
 	public static let nebunet = Self(
-		faucetComponentAddress: "component_tdx_b_1qftacppvmr9ezmekxqpq58en0nk954x0a7jv2zz0hc7qdxyth4",
-		faucetPackageAddress: "unknown",
-		accountPackageAddress: "package_tdx_b_1qy4hrp8a9apxldp5cazvxgwdj80cxad4u8cpkaqqnhlssf7lg2",
-		xrdResourceAddress: "resource_tdx_b_1qzkcyv5dwq3r6kawy6pxpvcythx8rh8ntum6ws62p95s9hhz9x",
-		systemTokenResourceAddress: "unknown",
-		ecdsaSecp256k1TokenResourceAddress: "resource_tdx_b_1qzu3wdlw3fx7t82fmt2qme2kpet4g3n2epx02sew49wsp8mlue",
-		eddsaEd25519TokenResourceAddress: "resource_tdx_b_1qq8cays25704xdyap2vhgmshkkfyr023uxdtk59ddd4q4zaqlf",
-		packageTokenResourceAddress: "unknown",
-		epochManagerSystemAddress: "system_tdx_b_1qne8qu4seyvzfgd94p3z8rjcdl3v0nfhv84judpum2lq328939"
+		faucetComponentAddress: try! .init(validatingAddress: "component_tdx_b_1qftacppvmr9ezmekxqpq58en0nk954x0a7jv2zz0hc7qdxyth4"),
+		faucetPackageAddress: try! .init(validatingAddress: "unknown"),
+		accountPackageAddress: try! .init(validatingAddress: "package_tdx_b_1qy4hrp8a9apxldp5cazvxgwdj80cxad4u8cpkaqqnhlssf7lg2"),
+		xrdResourceAddress: try! .init(validatingAddress: "resource_tdx_b_1qzkcyv5dwq3r6kawy6pxpvcythx8rh8ntum6ws62p95s9hhz9x"),
+		systemTokenResourceAddress: try! .init(validatingAddress: "unknown"),
+		ecdsaSecp256k1TokenResourceAddress: try! .init(validatingAddress: "resource_tdx_b_1qzu3wdlw3fx7t82fmt2qme2kpet4g3n2epx02sew49wsp8mlue"),
+		eddsaEd25519TokenResourceAddress: try! .init(validatingAddress: "resource_tdx_b_1qq8cays25704xdyap2vhgmshkkfyr023uxdtk59ddd4q4zaqlf"),
+		packageTokenResourceAddress: try! .init(validatingAddress: "unknown"),
+		epochManagerSystemAddress: try! .init(validatingAddress: "system_tdx_b_1qne8qu4seyvzfgd94p3z8rjcdl3v0nfhv84judpum2lq328939")
 	)
 }
 #endif // DEBUG

@@ -1,3 +1,4 @@
+import EngineToolkit
 import Prelude
 
 // MARK: - AccountPortfolio
@@ -130,7 +131,7 @@ extension AccountPortfolio.NonFungibleResource {
 
 extension ResourceAddress {
 	public func nftGlobalId(_ localID: AccountPortfolio.NonFungibleResource.NonFungibleToken.LocalID) -> ResourceAddress {
-		ResourceAddress(address: address + ":" + localID.rawValue)
+		try! ResourceAddress(validatingAddress: address + ":" + localID.rawValue)
 	}
 }
 

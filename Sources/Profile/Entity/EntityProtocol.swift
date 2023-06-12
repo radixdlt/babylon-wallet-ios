@@ -39,7 +39,7 @@ extension EntityBaseProtocol {
 /// An `Account` or a `Persona`
 public protocol EntityProtocol: EntityBaseProtocol, Sendable, Equatable, Identifiable where ID == EntityAddress {
 	/// The type of address of entity.
-	associatedtype EntityAddress: AddressKindProtocol & Hashable
+	associatedtype EntityAddress: AddressProtocol & Hashable
 	associatedtype ExtraProperties: Sendable
 
 	static var entityKind: EntityKind { get }

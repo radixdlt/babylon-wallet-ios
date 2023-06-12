@@ -26,6 +26,16 @@ public struct CallMethod: InstructionProtocol {
 	}
 
 	public init(
+		receiver: AccountAddress,
+		methodName: String,
+		arguments: [ManifestASTValue] = []
+	) {
+		self.receiver = receiver.asComponentAddress
+		self.methodName = methodName
+		self.arguments = arguments
+	}
+
+	public init(
 		receiver: ComponentAddress,
 		methodName: String,
 		@ValuesBuilder buildValues: () throws -> [any ValueProtocol]

@@ -31,7 +31,7 @@ extension EngineToolkitClient {
 		try manifestForFaucet(
 			includeLockFeeInstruction: includeLockFeeInstruction,
 			networkID: networkID,
-			componentAddress: .init(address: accountAddress.address)
+			componentAddress: accountAddress.asComponentAddress
 		)
 	}
 
@@ -158,7 +158,7 @@ extension EngineToolkitClient {
 			lockFeeCallMethod(address: faucetAddress),
 		] + tokens +
 			[
-				CallMethod(receiver: .init(address: accountAddress.address), methodName: "deposit_batch") {
+				CallMethod(receiver: accountAddress.asComponentAddress, methodName: "deposit_batch") {
 					Expression(stringLiteral: "ENTIRE_WORKTOP")
 				},
 			]
@@ -203,7 +203,7 @@ extension EngineToolkitClient {
 				initialSupply: .decimal(.init(value: initialSupply))
 			),
 
-			CallMethod(receiver: .init(address: accountAddress.address), methodName: "deposit_batch") {
+			CallMethod(receiver: accountAddress.asComponentAddress, methodName: "deposit_batch") {
 				Expression(stringLiteral: "ENTIRE_WORKTOP")
 			},
 		]
@@ -257,7 +257,7 @@ extension EngineToolkitClient {
 				)
 			),
 
-			CallMethod(receiver: .init(address: accountAddress.address), methodName: "deposit_batch") {
+			CallMethod(receiver: accountAddress.asComponentAddress, methodName: "deposit_batch") {
 				Expression(stringLiteral: "ENTIRE_WORKTOP")
 			},
 		]
@@ -321,7 +321,7 @@ extension EngineToolkitClient {
 			)
 		}
 
-		let instructions: [any InstructionProtocol] = [lockFeeCallMethod(address: faucetAddress)] + tokens + [CallMethod(receiver: .init(address: accountAddress.address), methodName: "deposit_batch") {
+		let instructions: [any InstructionProtocol] = [lockFeeCallMethod(address: faucetAddress)] + tokens + [CallMethod(receiver: accountAddress.asComponentAddress, methodName: "deposit_batch") {
 			Expression(stringLiteral: "ENTIRE_WORKTOP")
 		}]
 

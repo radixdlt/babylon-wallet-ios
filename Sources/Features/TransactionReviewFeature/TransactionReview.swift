@@ -489,7 +489,7 @@ extension TransactionReview {
 
 	private func extractUserAccounts(_ manifest: AnalyzeTransactionExecutionResponse) async throws -> [Account] {
 		let userAccounts = try await accountsClient.getAccountsOnCurrentNetwork()
-		return try manifest
+		return manifest
 			.encounteredAddresses
 			.componentAddresses
 			.accounts
@@ -500,7 +500,7 @@ extension TransactionReview {
 				if let userAccount {
 					return .user(.init(address: userAccount.address, label: userAccount.displayName, appearanceID: userAccount.appearanceID))
 				} else {
-					return try .external(.init(componentAddress: encounteredAccount), approved: false)
+					return .external(encounteredAccount, approved: false)
 				}
 			}
 	}
@@ -635,7 +635,7 @@ extension TransactionReview {
 				return try await gatewayAPIClient.getEntityMetadata(address)
 			}
 
-			let addressKind = try engineToolkitClient.decodeAddress(resourceAddress.address).entityType
+			// let addressKind = try engineToolkitClient.decodeAddress(resourceAddress.address).entityType
 
 			let metadata = try? await getMetadata(address: resourceAddress.address)
 
@@ -649,7 +649,7 @@ extension TransactionReview {
 			let resourceMetadata = ResourceMetadata(
 				name: metadata?.symbol ?? metadata?.name ?? L10n.TransactionReview.unknown,
 				thumbnail: metadata?.iconURL,
-				type: addressKind.resourceType
+				type: resourceAddress.resourceType
 			)
 
 			let transfer = try TransactionReview.Transfer(
@@ -813,37 +813,12 @@ extension Collection where Element: Equatable {
 	}
 }
 
-extension EngineToolkit.AddressKind {
-	var resourceType: TransactionReview.ResourceType? {
-		switch self {
-		case .fungibleResource:
+extension ResourceAddress {
+	var resourceType: TransactionReview.ResourceType {
+		// Resource address is on of [.globalFungibleResourceManager, .globalNonFungibleResourceManager]
+		if self.decodedKind == .globalFungibleResourceManager {
 			return .fungible
-		case .nonFungibleResource:
-			return .nonFungible
-		case .package:
-			return nil
-		case .accountComponent:
-			return nil
-		case .normalComponent:
-			return nil
-		case .secp256k1VirtualAccountComponent:
-			return nil
-		case .ed25519VirtualAccountComponent:
-			return nil
-		case .secp256k1VirtualIdentityComponent:
-			return nil
-		case .ed25519VirtualIdentityComponent:
-			return nil
-		case .identityComponent:
-			return nil
-		case .epochManager:
-			return nil
-		case .validator:
-			return nil
-		case .clock:
-			return nil
-		case .accessControllerComponent:
-			return nil
 		}
+		return .nonFungible
 	}
 }
