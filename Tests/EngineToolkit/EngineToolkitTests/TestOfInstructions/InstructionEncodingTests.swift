@@ -29,24 +29,30 @@ final class InstructionEncodingTests: TestCase {
 			try Array_(elementKind: .string, elements: [])
 		}
 
+		let packageAddress = try PackageAddress(validatingAddress: "package_rdx1qyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqpqqzrhqe8")
+		let componentAddress = try ComponentAddress(validatingAddress: "component_rdx1qtkryz5scup945usk39qjc2yjh6l5zsyuh8t7v5pk0tsrdcazt")
+		let resourceAddress = try ResourceAddress(validatingAddress: "resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqy99qqm")
+		let resourceAddress2 = try ResourceAddress(validatingAddress: "resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqz8qety")
+
 		// Arrange
 		let testVectors: [(value: Instruction, jsonRepresentation: String)] = [
 			(
 				value: .callFunction(.init(
-					packageAddress: "package_rdx1qyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqpqqzrhqe8",
+					packageAddress: packageAddress,
 					blueprintName: "Faucet",
 					functionName: "new",
 					arguments: [
 						.decimal(.init(value: "1")),
 					]
 				)),
-				jsonRepresentation: """
-				{"arguments":[{"type":"Decimal","value":"1"}],"blueprint_name":{"type":"String","value":"Faucet"},"function_name":{"type":"String","value":"new"},"instruction":"CALL_FUNCTION","package_address":{"address":"package_rdx1qyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqpqqzrhqe8","type":"Address"}}
+				jsonRepresentation:
+				"""
+				        {"arguments":[{"type":"Decimal","value":"1"}],"blueprint_name":{"type":"String","value":"Faucet"},"function_name":{"type":"String","value":"new"},"instruction":"CALL_FUNCTION","package_address":{"address":"\(packageAddress.address)","type":"Address"}}
 				"""
 			),
 			(
 				value: .callMethod(.init(
-					receiver: "component_rdx1qtkryz5scup945usk39qjc2yjh6l5zsyuh8t7v5pk0tsrdcazt",
+					receiver: componentAddress,
 					methodName: "free",
 					arguments: [
 						.decimal(.init(value: "1")),
@@ -58,7 +64,7 @@ final class InstructionEncodingTests: TestCase {
 			),
 			(
 				value: .callMethod(.init(
-					receiver: "component_rdx1qtkryz5scup945usk39qjc2yjh6l5zsyuh8t7v5pk0tsrdcazt",
+					receiver: componentAddress,
 					methodName: "free"
 				)),
 				jsonRepresentation: """
@@ -67,7 +73,7 @@ final class InstructionEncodingTests: TestCase {
 			),
 			(
 				value: .callMethod(.init(
-					receiver: "component_rdx1qtkryz5scup945usk39qjc2yjh6l5zsyuh8t7v5pk0tsrdcazt",
+					receiver: componentAddress,
 					methodName: "free"
 				)),
 				jsonRepresentation: """
@@ -76,7 +82,7 @@ final class InstructionEncodingTests: TestCase {
 			),
 			(
 				value: .takeFromWorktop(.init(
-					resourceAddress: "resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqy99qqm",
+					resourceAddress: resourceAddress,
 					bucket: .init(stringLiteral: "ident")
 				)),
 				jsonRepresentation: """
@@ -85,7 +91,7 @@ final class InstructionEncodingTests: TestCase {
 			),
 			(
 				value: .takeFromWorktop(.init(
-					resourceAddress: "resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqy99qqm",
+					resourceAddress: resourceAddress,
 					bucket: .init(stringLiteral: "ident")
 				)),
 				jsonRepresentation: """
@@ -95,7 +101,7 @@ final class InstructionEncodingTests: TestCase {
 			(
 				value: .takeFromWorktopByAmount(.init(
 					amount: .init(value: "1"),
-					resourceAddress: "resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqy99qqm",
+					resourceAddress: resourceAddress,
 					bucket: .init(stringLiteral: "ident")
 				)),
 				jsonRepresentation: """
@@ -105,7 +111,7 @@ final class InstructionEncodingTests: TestCase {
 			(
 				value: .takeFromWorktopByAmount(.init(
 					amount: .init(value: "1"),
-					resourceAddress: "resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqy99qqm",
+					resourceAddress: resourceAddress,
 					bucket: .init(stringLiteral: "ident")
 				)),
 				jsonRepresentation: """
@@ -114,8 +120,8 @@ final class InstructionEncodingTests: TestCase {
 			),
 			(
 				value: .takeFromWorktopByIds(.init(
-					[.integer(1)],
-					resourceAddress: "resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqy99qqm",
+					["1"],
+					resourceAddress: resourceAddress,
 					bucket: .init(stringLiteral: "ident")
 				)),
 				jsonRepresentation: """
@@ -124,8 +130,8 @@ final class InstructionEncodingTests: TestCase {
 			),
 			(
 				value: .takeFromWorktopByIds(.init(
-					[.integer(1)],
-					resourceAddress: "resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqy99qqm",
+					["1"],
+					resourceAddress: resourceAddress,
 					bucket: .init(stringLiteral: "ident")
 				)),
 				jsonRepresentation: """
@@ -142,7 +148,7 @@ final class InstructionEncodingTests: TestCase {
 			),
 			(
 				value: .assertWorktopContains(.init(
-					resourceAddress: "resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqy99qqm"
+					resourceAddress: resourceAddress
 				)),
 				jsonRepresentation: """
 				{"instruction":"ASSERT_WORKTOP_CONTAINS","resource_address":{"address":"resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqy99qqm","type":"Address"}}
@@ -150,7 +156,7 @@ final class InstructionEncodingTests: TestCase {
 			),
 			(
 				value: .assertWorktopContains(.init(
-					resourceAddress: "resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqy99qqm"
+					resourceAddress: resourceAddress
 				)),
 				jsonRepresentation: """
 				{"instruction":"ASSERT_WORKTOP_CONTAINS","resource_address":{"address":"resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqy99qqm","type":"Address"}}
@@ -159,7 +165,7 @@ final class InstructionEncodingTests: TestCase {
 			(
 				value: .assertWorktopContainsByAmount(.init(
 					amount: .init(value: "1"),
-					resourceAddress: "resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqy99qqm"
+					resourceAddress: resourceAddress
 				)),
 				jsonRepresentation: """
 				{"amount":{"type":"Decimal","value":"1"},"instruction":"ASSERT_WORKTOP_CONTAINS_BY_AMOUNT","resource_address":{"address":"resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqy99qqm","type":"Address"}}
@@ -168,7 +174,7 @@ final class InstructionEncodingTests: TestCase {
 			(
 				value: .assertWorktopContainsByAmount(.init(
 					amount: .init(value: "1"),
-					resourceAddress: "resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqy99qqm"
+					resourceAddress: resourceAddress
 				)),
 				jsonRepresentation: """
 				{"amount":{"type":"Decimal","value":"1"},"instruction":"ASSERT_WORKTOP_CONTAINS_BY_AMOUNT","resource_address":{"address":"resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqy99qqm","type":"Address"}}
@@ -176,8 +182,8 @@ final class InstructionEncodingTests: TestCase {
 			),
 			(
 				value: .assertWorktopContainsByIds(.init(
-					resourceAddress: "resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqy99qqm",
-					ids: [.integer(1)]
+					resourceAddress: resourceAddress,
+					ids: ["1"]
 				)),
 				jsonRepresentation: """
 				{"ids":[{"type":"NonFungibleLocalId","value":{"type":"Integer","value":"1"}}],"instruction":"ASSERT_WORKTOP_CONTAINS_BY_IDS","resource_address":{"address":"resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqy99qqm","type":"Address"}}
@@ -185,8 +191,8 @@ final class InstructionEncodingTests: TestCase {
 			),
 			(
 				value: .assertWorktopContainsByIds(.init(
-					resourceAddress: "resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqy99qqm",
-					ids: [.integer(1)]
+					resourceAddress: resourceAddress,
+					ids: ["1"]
 				)),
 				jsonRepresentation: """
 				{"ids":[{"type":"NonFungibleLocalId","value":{"type":"Integer","value":"1"}}],"instruction":"ASSERT_WORKTOP_CONTAINS_BY_IDS","resource_address":{"address":"resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqy99qqm","type":"Address"}}
@@ -212,7 +218,7 @@ final class InstructionEncodingTests: TestCase {
 			),
 			(
 				value: .createProofFromAuthZone(.init(
-					resourceAddress: "resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqy99qqm",
+					resourceAddress: resourceAddress,
 					intoProof: .init(stringLiteral: "ident")
 				)),
 				jsonRepresentation: """
@@ -221,7 +227,7 @@ final class InstructionEncodingTests: TestCase {
 			),
 			(
 				value: .createProofFromAuthZone(.init(
-					resourceAddress: "resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqy99qqm",
+					resourceAddress: resourceAddress,
 					intoProof: .init(stringLiteral: "ident")
 				)),
 				jsonRepresentation: """
@@ -230,7 +236,7 @@ final class InstructionEncodingTests: TestCase {
 			),
 			(
 				value: .createProofFromAuthZoneByAmount(.init(
-					resourceAddress: "resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqy99qqm",
+					resourceAddress: resourceAddress,
 					amount: .init(value: "1"),
 					intoProof: .init(stringLiteral: "ident")
 				)),
@@ -240,7 +246,7 @@ final class InstructionEncodingTests: TestCase {
 			),
 			(
 				value: .createProofFromAuthZoneByAmount(.init(
-					resourceAddress: "resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqy99qqm",
+					resourceAddress: resourceAddress,
 					amount: .init(value: "1"),
 					intoProof: .init(stringLiteral: "ident")
 				)),
@@ -250,8 +256,8 @@ final class InstructionEncodingTests: TestCase {
 			),
 			(
 				value: .createProofFromAuthZoneByIds(.init(
-					resourceAddress: "resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqy99qqm",
-					ids: [.integer(1)],
+					resourceAddress: resourceAddress,
+					ids: ["1"],
 					intoProof: .init(stringLiteral: "ident")
 				)),
 				jsonRepresentation: """
@@ -260,8 +266,8 @@ final class InstructionEncodingTests: TestCase {
 			),
 			(
 				value: .createProofFromAuthZoneByIds(.init(
-					resourceAddress: "resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqy99qqm",
-					ids: [.integer(1)],
+					resourceAddress: resourceAddress,
+					ids: ["1"],
 					intoProof: .init(stringLiteral: "ident")
 				)),
 				jsonRepresentation: """
@@ -323,7 +329,7 @@ final class InstructionEncodingTests: TestCase {
 			),
 			(
 				value: .setMetadata(.init(
-					entityAddress: "component_rdx1qtkryz5scup945usk39qjc2yjh6l5zsyuh8t7v5pk0tsrdcazt",
+					entityAddress: componentAddress.asGeneral(),
 					key: "name",
 					value: Enum(.u8(0), fields: [.enum(.init(.u8(0), fields: [.string("deadbeef")]))])
 				)),
@@ -333,7 +339,7 @@ final class InstructionEncodingTests: TestCase {
 			),
 			(
 				value: .removeMetadata(.init(
-					entityAddress: "component_rdx1qtkryz5scup945usk39qjc2yjh6l5zsyuh8t7v5pk0tsrdcazt",
+					entityAddress: componentAddress.asGeneral(),
 					key: "name"
 				)),
 				jsonRepresentation: """
@@ -342,7 +348,7 @@ final class InstructionEncodingTests: TestCase {
 			),
 			(
 				value: .setPackageRoyaltyConfig(.init(
-					packageAddress: "package_rdx1qyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqpqqzrhqe8",
+					packageAddress: packageAddress,
 					royaltyConfig: Map_(
 						keyValueKind: .string,
 						valueValueKind: .tuple,
@@ -355,7 +361,7 @@ final class InstructionEncodingTests: TestCase {
 			),
 			(
 				value: .setComponentRoyaltyConfig(.init(
-					componentAddress: "component_rdx1qtkryz5scup945usk39qjc2yjh6l5zsyuh8t7v5pk0tsrdcazt",
+					componentAddress: componentAddress,
 					royaltyConfig: .tuple(.init(values: [
 						.map(.init(
 							keyValueKind: .string,
@@ -370,20 +376,20 @@ final class InstructionEncodingTests: TestCase {
 				"""
 			),
 			(
-				value: .claimPackageRoyalty(.init(packageAddress: "package_rdx1qyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqpqqzrhqe8")),
+				value: .claimPackageRoyalty(.init(packageAddress: packageAddress)),
 				jsonRepresentation: """
 				{"instruction":"CLAIM_PACKAGE_ROYALTY","package_address":{"address":"package_rdx1qyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqpqqzrhqe8","type":"Address"}}
 				"""
 			),
 			(
-				value: .claimComponentRoyalty(.init(componentAddress: "component_rdx1qtkryz5scup945usk39qjc2yjh6l5zsyuh8t7v5pk0tsrdcazt")),
+				value: .claimComponentRoyalty(.init(componentAddress: componentAddress)),
 				jsonRepresentation: """
 				{"component_address":{"address":"component_rdx1qtkryz5scup945usk39qjc2yjh6l5zsyuh8t7v5pk0tsrdcazt","type":"Address"},"instruction":"CLAIM_COMPONENT_ROYALTY"}
 				"""
 			),
 			(
 				value: .setMethodAccessRule(.init(
-					entityAddress: "component_rdx1qtkryz5scup945usk39qjc2yjh6l5zsyuh8t7v5pk0tsrdcazt",
+					entityAddress: componentAddress.asGeneral(),
 					key: Tuple(values: [.enum(.init(.u8(0))), .string("free")]),
 					rule: Enum(.u8(0), fields: [])
 				)),
@@ -393,7 +399,7 @@ final class InstructionEncodingTests: TestCase {
 			),
 			(
 				value: .mintFungible(.init(
-					resourceAddress: "resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqz8qety",
+					resourceAddress: resourceAddress2,
 					amount: .init(value: "1")
 				)),
 				jsonRepresentation: """
@@ -402,7 +408,7 @@ final class InstructionEncodingTests: TestCase {
 			),
 			(
 				value: .mintNonFungible(.init(
-					resourceAddress: "resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqz8qety",
+					resourceAddress: resourceAddress2,
 					entries: .map(.init(
 						keyValueKind: .nonFungibleLocalId,
 						valueValueKind: .tuple,
@@ -415,7 +421,7 @@ final class InstructionEncodingTests: TestCase {
 			),
 			try (
 				value: .mintUuidNonFungible(.init(
-					resourceAddress: "resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqz8qety",
+					resourceAddress: resourceAddress2,
 					entries: .array(.init(elementKind: .tuple,
 					                      elements: [
 					                      	.tuple(.init([Tuple([]), Tuple([])])),

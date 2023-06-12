@@ -18,7 +18,6 @@ final class EncodeDecodeAddressRequestTests: TestCase {
 			address: "account_sim1qspjlnwx4gdcazhral74rjgzgysrslf8ngrfmprecrrss3p9md"
 		)
 		let decodeResponse = try sut.decodeAddressRequest(request: decodeRequest).get()
-		XCTAssertEqual(decodeResponse.hrp, "account_sim")
 		XCTAssertEqual(decodeResponse.data.hex, "04032fcdc6aa1b8e8ae3effd51c9024120387d279a069d8479c0c7")
 	}
 
