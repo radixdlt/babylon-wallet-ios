@@ -38,7 +38,7 @@ extension AnswerSecurityQuestionsCoordinator.State.Purpose.AnswersResult: Encoda
 @main
 struct AnswerSecurityQuestionsApp_: SwiftUI.App {
 	var body: some Scene {
-		FeaturesPreviewer<AnswerSecurityQuestionsCoordinator>.scene {
+		FeaturesPreviewer<AnswerSecurityQuestionsCoordinator>.delegateAction {
 			guard case let .done(taskResult) = $0 else { return nil }
 			return taskResult
 		} withReducer: {

@@ -8,6 +8,11 @@ public struct SecurityStructureConfigurationList: Sendable, FeatureReducer {
 
 	public enum ViewAction: Sendable, Equatable {
 		case appeared
+		case createNewStructure
+	}
+
+	public enum DelegateAction: Sendable, Equatable {
+		case createNewStructure
 	}
 
 	public init() {}
@@ -16,6 +21,8 @@ public struct SecurityStructureConfigurationList: Sendable, FeatureReducer {
 		switch viewAction {
 		case .appeared:
 			return .none
+		case .createNewStructure:
+			return .send(.delegate(.createNewStructure))
 		}
 	}
 }

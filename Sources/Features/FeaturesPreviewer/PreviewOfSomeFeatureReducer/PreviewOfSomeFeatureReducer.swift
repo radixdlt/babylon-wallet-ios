@@ -23,10 +23,10 @@ public struct PreviewOfSomeFeatureReducer<Feature>: FeatureReducer where Feature
 		case previewResult(PreviewResult<Feature.ResultFromFeature>.Action)
 	}
 
-	public let resultFromAction: (Feature.DelegateAction) -> TaskResult<Feature.ResultFromFeature>?
+	public let resultFromAction: (Feature.Action) -> TaskResult<Feature.ResultFromFeature>?
 
 	public init(
-		resultFrom resultFromAction: @escaping (Feature.DelegateAction) -> TaskResult<Feature.ResultFromFeature>?
+		resultFromAction: @escaping (Feature.Action) -> TaskResult<Feature.ResultFromFeature>?
 	) {
 		self.resultFromAction = resultFromAction
 	}
@@ -44,8 +44,8 @@ public struct PreviewOfSomeFeatureReducer<Feature>: FeatureReducer where Feature
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
-		case let .previewOf(.delegate(previewDelegate)):
-			if let result = resultFromAction(previewDelegate) {
+		case let .previewOf(action):
+			if let result = resultFromAction(action) {
 				state = .previewResult(.init(previewResult: result))
 			}
 			return .none

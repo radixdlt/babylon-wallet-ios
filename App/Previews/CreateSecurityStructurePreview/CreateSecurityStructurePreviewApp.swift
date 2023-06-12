@@ -19,7 +19,7 @@ extension CreateSecurityStructureCoordinator: PreviewedFeature {
 @main
 struct CreateSecurityStructurePreviewApp: SwiftUI.App {
 	var body: some Scene {
-		FeaturesPreviewer<CreateSecurityStructureCoordinator>.scene {
+		FeaturesPreviewer<CreateSecurityStructureCoordinator>.delegateAction {
 			guard case let .done(secStructureConfig) = $0 else { return nil }
 			return secStructureConfig
 		} withReducer: {

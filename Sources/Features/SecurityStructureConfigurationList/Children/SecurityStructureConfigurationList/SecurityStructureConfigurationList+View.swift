@@ -22,11 +22,13 @@ extension SecurityStructureConfigurationList {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-				// TODO: implement
-				Text("Implement: SecurityStructureConfigurationList")
-					.background(Color.yellow)
-					.foregroundColor(.red)
-					.onAppear { viewStore.send(.appeared) }
+				VStack {
+					Button("Create new") {
+						viewStore.send(.createNewStructure)
+					}
+					.buttonStyle(.primaryRectangular)
+				}
+				.onAppear { viewStore.send(.appeared) }
 			}
 		}
 	}

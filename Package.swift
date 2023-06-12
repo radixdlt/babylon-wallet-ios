@@ -375,6 +375,7 @@ package.addModules([
 		featureSuffixDroppedFromFolderName: true,
 		dependencies: [
 			"AppPreferencesClient",
+			"CreateSecurityStructureFeature",
 		],
 		tests: .no
 	),
