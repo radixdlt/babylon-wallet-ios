@@ -70,6 +70,11 @@ extension P2PLinksFeature {
 					action: P2PLinksFeature.Destinations.Action.newConnection,
 					content: { NewConnection.View(store: $0) }
 				)
+				.alert(
+					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+					state: /P2PLinksFeature.Destinations.State.removeConnection,
+					action: P2PLinksFeature.Destinations.Action.removeConnection
+				)
 			}
 		}
 	}

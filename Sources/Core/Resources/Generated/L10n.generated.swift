@@ -1226,8 +1226,10 @@ public enum L10n {
       public static let title = L10n.tr("Localizable", "linkedConnectors_newConnection_title", fallback: "Link New Connector")
     }
     public enum RemoveConnectionAlert {
-      /// Your Radix Wallet will no longer automatically connect to this Radix Connector.
-      public static let message = L10n.tr("Localizable", "linkedConnectors_removeConnectionAlert_message", fallback: "Your Radix Wallet will no longer automatically connect to this Radix Connector.")
+      /// You will no longer be able to connect your wallet to this device and browser combination.
+      public static let message = L10n.tr("Localizable", "linkedConnectors_removeConnectionAlert_message", fallback: "You will no longer be able to connect your wallet to this device and browser combination.")
+      /// Remove
+      public static let removeButtonTitle = L10n.tr("Localizable", "linkedConnectors_removeConnectionAlert_removeButtonTitle", fallback: "Remove")
       /// Remove Connection
       public static let title = L10n.tr("Localizable", "linkedConnectors_removeConnectionAlert_title", fallback: "Remove Connection")
     }

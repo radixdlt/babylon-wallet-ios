@@ -119,7 +119,8 @@
 "linkedConnectors_nameNewConnector_textFieldHint" = "Give a name to this Radix Connector";
 "linkedConnectors_nameNewConnector_saveLinkButtonTitle" = "Save Link and Continue";
 "linkedConnectors_removeConnectionAlert_title" = "Remove Connection";
-"linkedConnectors_removeConnectionAlert_message" = "Your Radix Wallet will no longer automatically connect to this Radix Connector.";
+"linkedConnectors_removeConnectionAlert_message" = "You will no longer be able to connect your wallet to this device and browser combination.";
+"linkedConnectors_removeConnectionAlert_removeButtonTitle" = "Remove";
 "linkedConnectors_cameraPermissionDeniedAlert_title" = "Access Required";
 "linkedConnectors_cameraPermissionDeniedAlert_message" = "Camera access is required to link to a Connector.";
 "linkedConnectors_localNetworkPermissionDeniedAlert_title" = "Access Required";
