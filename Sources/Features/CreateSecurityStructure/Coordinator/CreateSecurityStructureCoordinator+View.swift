@@ -17,13 +17,10 @@ extension CreateSecurityStructureCoordinator {
 			NavigationStackStore(
 				store.scope(state: \.path, action: { .child(.path($0)) })
 			) {
-				IfLetStore(
-					store.scope(state: \.root, action: { .child(.root($0)) })
-				) {
-					path(for: $0)
-				}
-				// This is required to disable the animation of internal components during transition
-				.transaction { $0.animation = nil }
+				path(for: store.scope(state: \.root, action: { .child(.root($0)) }))
+
+					// This is required to disable the animation of internal components during transition
+					.transaction { $0.animation = nil }
 			} destination: {
 				path(for: $0)
 			}

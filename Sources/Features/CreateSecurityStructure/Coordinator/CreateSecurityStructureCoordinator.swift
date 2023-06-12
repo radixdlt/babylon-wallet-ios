@@ -6,7 +6,7 @@ import Profile
 // MARK: - CreateSecurityStructureCoordinator
 public struct CreateSecurityStructureCoordinator: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
-		var root: Path.State?
+		var root: Path.State
 		var path: StackState<Path.State> = []
 
 		public init() {
@@ -64,10 +64,11 @@ public struct CreateSecurityStructureCoordinator: Sendable, FeatureReducer {
 	public init() {}
 
 	public var body: some ReducerProtocolOf<Self> {
+		Scope(state: \.root, action: /Action.child .. ChildAction.root) {
+			Path()
+		}
+
 		Reduce(core)
-			.ifLet(\.root, action: /Action.child .. ChildAction.root) {
-				Path()
-			}
 			.forEach(\.path, action: /Action.child .. ChildAction.path) {
 				Path()
 			}
