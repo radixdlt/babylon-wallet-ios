@@ -2,7 +2,7 @@ import Foundation
 
 extension StringProtocol {
 	public var isBlank: Bool {
-		trimWhitespacesAndNewLines().isEmpty
+		trimmingWhitespacesAndNewlines().isEmpty
 	}
 
 	/// Trims whitespaces
