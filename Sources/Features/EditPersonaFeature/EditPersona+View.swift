@@ -16,7 +16,7 @@ extension EditPersona.State {
 			output: { () -> EditPersona.Output? in
 				guard
 					let personaLabelInput = labelField.input,
-					let personaLabelOutput = NonEmptyString(rawValue: personaLabelInput.trimmed())
+					let personaLabelOutput = NonEmptyString(rawValue: personaLabelInput.trimmingWhitespace())
 				else {
 					return nil
 				}
@@ -24,7 +24,7 @@ extension EditPersona.State {
 				for field in dynamicFields {
 					guard
 						let fieldInput = field.input,
-						let fieldOutput = NonEmptyString(rawValue: fieldInput.trimmed())
+						let fieldOutput = NonEmptyString(rawValue: fieldInput.trimmingWhitespace())
 					else {
 						if field.kind == .dynamic(isRequiredByDapp: true) {
 							return nil
