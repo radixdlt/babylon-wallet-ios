@@ -43,15 +43,11 @@ extension SimpleCreateSecurityStructureFlow {
 					ScrollView {
 						SecurityStructureTutorialHeader()
 
-						FactorForRoleView<ConfirmationRoleTag, SecurityQuestionsFactorSource>(
-							factorSet: viewStore.newPhoneConfirmer
-						) {
+						NewPhoneConfirmer(factorSet: viewStore.newPhoneConfirmer) {
 							viewStore.send(.selectNewPhoneConfirmer)
 						}
 
-						FactorForRoleView<RecoveryRoleTag, TrustedContactFactorSource>(
-							factorSet: viewStore.lostPhoneHelper
-						) {
+						LostPhoneHelper(factorSet: viewStore.lostPhoneHelper) {
 							viewStore.send(.selectLostPhoneHelper)
 						}
 					}
@@ -72,6 +68,9 @@ extension SimpleCreateSecurityStructureFlow {
 				}
 			}
 		}
+
+		typealias NewPhoneConfirmer = FactorForRoleView<ConfirmationRoleTag, SecurityQuestionsFactorSource>
+		typealias LostPhoneHelper = FactorForRoleView<RecoveryRoleTag, TrustedContactFactorSource>
 	}
 }
 
