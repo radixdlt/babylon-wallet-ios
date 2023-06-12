@@ -371,6 +371,14 @@ package.addModules([
 		tests: .no
 	),
 	.feature(
+		name: "SecurityStructureConfigurationListFeature",
+		featureSuffixDroppedFromFolderName: true,
+		dependencies: [
+			"AppPreferencesClient",
+		],
+		tests: .no
+	),
+	.feature(
 		name: "SettingsFeature",
 		dependencies: [
 			"AccountsClient",
@@ -390,6 +398,7 @@ package.addModules([
 			"PersonasFeature",
 			"RadixConnectClient",
 			"ScanQRFeature",
+			"SecurityStructureConfigurationListFeature",
 			"EditPersonaFeature",
 			"ProfileBackupsFeature",
 		],
