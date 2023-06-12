@@ -1,5 +1,10 @@
 import FeaturePrelude
 
+// MARK: - EmptyInitializable
+public protocol EmptyInitializable {
+	init()
+}
+
 // MARK: - PreviewOfSomeFeatureReducer
 public struct PreviewOfSomeFeatureReducer<Feature>: FeatureReducer where Feature: PreviewedFeature {
 	public typealias F = Self

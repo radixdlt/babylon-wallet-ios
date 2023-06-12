@@ -14,6 +14,10 @@ extension ChooseQuestions {
 			self.availableQuestions = state.availableQuestions.elements
 			self.selectionRequirement = selectionRequirement
 			self.selectedQuestions = state.selectedQuestions
+			self.securityQuestionsToUse = {
+				guard let selected = selectedQuestions else { return nil }
+				return NonEmpty(rawValue: .init(uncheckedUniqueElements: selected))
+			}()
 		}
 	}
 
@@ -53,10 +57,7 @@ extension ChooseQuestions {
 				.navigationTitle("Choose Questions") // FIXME: Strings
 				.footer {
 					WithControlRequirements(
-						{
-							guard let selected = selection.wrappedValue else { return nil }
-							return NonEmpty<OrderedSet>.init(rawValue: .init(uncheckedUniqueElements: selected))
-						}(),
+						viewStore.securityQuestionsToUse,
 						forAction: { viewStore.send(.confirmedSelectedQuestions($0)) }
 					) { action in
 						// FIXME:

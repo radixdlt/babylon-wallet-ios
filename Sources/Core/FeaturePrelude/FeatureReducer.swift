@@ -1,11 +1,6 @@
 import ComposableArchitecture
 import SwiftUI
 
-// MARK: - EmptyInitializable
-public protocol EmptyInitializable {
-	init()
-}
-
 // MARK: - FeatureView
 public protocol FeatureView: SwiftUI.View where Feature.View == Self {
 	associatedtype Feature: FeatureReducer

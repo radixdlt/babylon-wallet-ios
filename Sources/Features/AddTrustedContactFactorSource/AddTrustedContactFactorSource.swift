@@ -64,6 +64,9 @@ public struct AddTrustedContactFactorSource: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
 		case let .destination(.presented(.scanAccountAddress(.delegate(.scanned(addressStringScanned))))):
+			var addressStringScanned = addressStringScanned
+			QR.removeAddressPrefixIfNeeded(from: &addressStringScanned)
+
 			state.radixAddress = addressStringScanned
 			state.destination = nil
 			return .none

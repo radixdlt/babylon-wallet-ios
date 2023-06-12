@@ -20,14 +20,45 @@ extension AddTrustedContactFactorSource {
 			name: NonEmptyString
 		)? {
 			guard
-				let accountAddress = try? AccountAddress(address: radixAddress),
-				let nonEmptyEmail = NonEmptyString(rawValue: self.emailAddress),
-				let emailAddress = try? EmailAddress(validating: nonEmptyEmail),
+				let address,
+				let email,
 				let nameNonEmpty = NonEmptyString(rawValue: name)
 			else {
 				return nil
 			}
-			return (accountAddress, email: emailAddress, name: nameNonEmpty)
+			return (accountAddress: address, email: email, name: nameNonEmpty)
+		}
+
+		var address: AccountAddress? {
+			try? AccountAddress(address: radixAddress)
+		}
+
+		var addressHint: Hint? {
+			guard
+				!radixAddress.isEmpty,
+				address == nil
+			else { return nil }
+			// FIXME: Strings
+			return .error("Invalid address")
+		}
+
+		var email: EmailAddress? {
+			guard
+				let nonEmptyEmail = NonEmptyString(rawValue: self.emailAddress),
+				let emailAddress = try? EmailAddress(validating: nonEmptyEmail)
+			else {
+				return nil
+			}
+			return emailAddress
+		}
+
+		var emailHint: Hint? {
+			guard
+				!emailAddress.isEmpty,
+				email == nil
+			else { return nil }
+			// FIXME: Strings
+			return .error("Invalid email")
 		}
 	}
 
@@ -79,7 +110,7 @@ extension AddTrustedContactFactorSource {
 					get: \.radixAddress,
 					send: { .radixAddressChanged($0) }
 				),
-				hint: nil,
+				hint: viewStore.addressHint,
 				showClearButton: true,
 				innerAccessory: {
 					Button {
@@ -104,7 +135,7 @@ extension AddTrustedContactFactorSource {
 					get: \.emailAddress,
 					send: { .emailAddressChanged($0) }
 				),
-				hint: nil,
+				hint: viewStore.emailHint,
 				showClearButton: true
 			)
 			.autocorrectionDisabled()
