@@ -183,10 +183,17 @@ extension FactorSourceID {
 }
 
 #if DEBUG
+extension FactorSourceID.FromHash {
+	public static let previewValue = Self.preview(.device)
+	public static func preview(_ factorSourceKind: FactorSourceKind) -> Self {
+		.init(kind: factorSourceKind, body: .deadbeef)
+	}
+}
+
 extension FactorSourceID {
 	public static let previewValue = Self.preview(.device)
 	public static func preview(_ factorSourceKind: FactorSourceKind) -> Self {
-		.hash(.init(kind: factorSourceKind, body: .deadbeef))
+		.hash(.preview(factorSourceKind))
 	}
 }
 #endif // DEBUG

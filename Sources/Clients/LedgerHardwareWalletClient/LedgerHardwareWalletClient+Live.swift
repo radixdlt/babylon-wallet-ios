@@ -86,7 +86,7 @@ extension LedgerHardwareWalletClient: DependencyKey {
 					let entitySignature = SignatureOfEntity(
 						signerEntity: requiredSigner.entity,
 						derivationPath: signature.derivationPath,
-						factorSourceID: requiredSigningFactor.factorSourceID,
+						factorSourceID: requiredSigningFactor.factorSourceID.embed(),
 						signatureWithPublicKey: signature.signature
 					)
 
@@ -175,9 +175,10 @@ extension LedgerHardwareWalletFactorSource {
 		guard let model = P2P.LedgerHardwareWallet.Model(rawValue: hint.model.rawValue) else {
 			throw UnrecognizedLedgerModel(model: hint.model.rawValue)
 		}
+
 		return P2P.LedgerHardwareWallet.LedgerDevice(
 			name: NonEmptyString(maybeString: hint.name),
-			id: Data(id.hexCodable.data.dropFirst()).hex, // Connector Extension only cares about the hash not the factor source ID prefix.
+			id: id.body.data.data.hex,
 			model: model
 		)
 	}

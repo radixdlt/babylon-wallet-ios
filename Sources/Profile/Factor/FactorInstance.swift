@@ -242,13 +242,25 @@ public struct HierarchicalDeterministicFactorInstance: Sendable, Hashable, Codab
 	}
 
 	public init(
-		factorSourceID: FactorSourceID.FromHash,
+		id: FactorSourceID.FromHash,
 		publicKey: SLIP10.PublicKey,
 		derivationPath: DerivationPath
 	) {
-		self.factorSourceID = factorSourceID
+		self.factorSourceID = id
 		self.publicKey = publicKey
 		self.derivationPath = derivationPath
+	}
+
+	public init(
+		factorSourceID: FactorSourceID,
+		publicKey: SLIP10.PublicKey,
+		derivationPath: DerivationPath
+	) throws {
+		try self.init(
+			id: factorSourceID.extract(as: FactorSourceID.FromHash.self),
+			publicKey: publicKey,
+			derivationPath: derivationPath
+		)
 	}
 
 	public init(factorInstance: FactorInstance) throws {
@@ -256,7 +268,7 @@ public struct HierarchicalDeterministicFactorInstance: Sendable, Hashable, Codab
 			throw BadgeIsNotVirtualHierarchicalDeterministic()
 		}
 		try self.init(
-			factorSourceID: factorInstance.factorSourceID.extract(),
+			factorSourceID: factorInstance.factorSourceID,
 			publicKey: badge.publicKey,
 			derivationPath: badge.derivationPath
 		)

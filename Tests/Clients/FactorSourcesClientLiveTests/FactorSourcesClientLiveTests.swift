@@ -99,8 +99,8 @@ extension FactorSource {
 			$0.date = .constant(.init(timeIntervalSince1970: 0))
 		} operation: {
 			let device = try! DeviceFactorSource(
+				id: .device(hash: Data.random(byteCount: 32)),
 				common: .init(
-					id: .init(factorSourceKind: .device, hash: .random(byteCount: 32)),
 					cryptoParameters: olympiaCompat ? .olympiaBackwardsCompatible : .babylon
 				),
 				hint: .init(name: name, model: "")
@@ -114,8 +114,8 @@ extension FactorSource {
 			$0.date = .constant(.init(timeIntervalSince1970: 0))
 		} operation: {
 			let ledger = try! LedgerHardwareWalletFactorSource(
+				id: .init(kind: .ledgerHQHardwareWallet, hash: Data.random(byteCount: 32)),
 				common: .init(
-					id: .init(factorSourceKind: .ledgerHQHardwareWallet, hash: .random(byteCount: 32)),
 					cryptoParameters: olympiaCompat ? .olympiaBackwardsCompatible : .babylon
 				),
 				hint: .init(name: .init(name), model: .nanoS),
@@ -136,7 +136,7 @@ extension Profile.Network.Account {
 		try! .init(
 			networkID: .simulator,
 			factorInstance: .init(
-				factorSourceID: factorSource.id,
+				factorSourceID: factorSource.id.extract(as: FactorSourceID.FromHash.self),
 				publicKey: .eddsaEd25519(Curve25519.Signing.PrivateKey().publicKey),
 				derivationPath: AccountDerivationPath.babylon(.init(
 					networkID: .simulator,

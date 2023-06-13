@@ -138,7 +138,7 @@ internal func signingFactors(
 			}()
 
 			let id = factorInstance.factorSourceID
-			guard let factorSource = allFactorSources[id: id] else {
+			guard let factorSource = allFactorSources[id: id.embed()] else {
 				assertionFailure("Bad! factor source not found")
 				throw FactorSourceNotFound()
 			}

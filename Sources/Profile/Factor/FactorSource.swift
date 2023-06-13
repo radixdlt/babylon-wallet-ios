@@ -20,9 +20,17 @@ extension FactorSource {
 		}
 	}
 
+	// Compiler crash if we try to use `private func property<Property>(_ keyPath: KeyPath<any FactorSourceProtocol, Property>) -> Property {
+	// and use `property(\.id).embed()
+	// :/
 	public var id: ID {
-		//       switch self
-		fatalError()
+		switch self {
+		case let .device(factorSource): return factorSource.id.embed()
+		case let .ledger(factorSource): return factorSource.id.embed()
+		case let .offDeviceMnemonic(factorSource): return factorSource.id.embed()
+		case let .securityQuestions(factorSource): return factorSource.id.embed()
+		case let .trustedContact(factorSource): return factorSource.id.embed()
+		}
 	}
 
 	public var kind: FactorSourceKind {
