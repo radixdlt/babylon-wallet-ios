@@ -33,6 +33,8 @@ public struct RadixEngine {
 		jsonStringFromJSONData: @escaping JSONStringFromJSONData = { String(data: $0, encoding: .utf8) },
 		jsonDataFromJSONString: @escaping JSONDataFromJSONString = { $0.data(using: .utf8) }
 	) {
+		jsonEncoder.userInfo[.retCoding] = true
+		jsonDecoder.userInfo[.retCoding] = true
 		self.jsonEncoder = jsonEncoder
 		self.jsonDecoder = jsonDecoder
 		self.jsonStringFromJSONData = jsonStringFromJSONData
@@ -429,7 +431,7 @@ func prettyPrint<FailedDecodable: Decodable>(
 /// using old Cocoa APIs
 func prettyPrint(jsonString: String, label: String?) {
 	guard
-		RadixEngine._debugPrint,
+		// RadixEngine._debugPrint,
 		let data = jsonString.data(using: .utf8),
 		let pretty = data.prettyPrintedJSONString
 	else {

@@ -36,11 +36,11 @@ final class ManifestToStringTests: TestCase {
 		]
 
 		let accessRules = Tuple {
-			Map_(keyValueKind: .tuple, valueValueKind: .enum, entries: [])
-			Map_(keyValueKind: .string, valueValueKind: .enum, entries: [])
+			Map_(keyKind: .tuple, valueKind: .enum, entries: [])
+			Map_(keyKind: .string, valueKind: .enum, entries: [])
 			Enum(.u8(0), fields: [])
-			Map_(keyValueKind: .tuple, valueValueKind: .enum, entries: [])
-			Map_(keyValueKind: .string, valueValueKind: .enum, entries: [])
+			Map_(keyKind: .tuple, valueKind: .enum, entries: [])
+			Map_(keyKind: .string, valueKind: .enum, entries: [])
 			Enum(.u8(0), fields: [])
 		}
 
@@ -54,8 +54,8 @@ final class ManifestToStringTests: TestCase {
 				try PublishPackage(
 					code: Blob(data: blake2b(data: package.code)),
 					schema: Blob(data: blake2b(data: package.schema)),
-					royaltyConfig: Map_(keyValueKind: .string, valueValueKind: .tuple, entries: []),
-					metadata: Map_(keyValueKind: .string, valueValueKind: .string, entries: []),
+					royaltyConfig: Map_(keyKind: .string, valueKind: .tuple, entries: []),
+					metadata: Map_(keyKind: .string, valueKind: .string, entries: []),
 					accessRules: accessRules
 				)
 			}.instructions

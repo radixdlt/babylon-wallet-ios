@@ -30,7 +30,6 @@ public indirect enum ManifestASTValue: Sendable, Codable, Hashable {
 	case u64(UInt64)
 	case u128(U128)
 
-	case integer(Int)
 	case string(String)
 
 	case `enum`(Enum)
@@ -150,8 +149,6 @@ extension ManifestASTValue {
 			return .expression
 		case .bytes:
 			return .bytes
-		case .integer:
-			return .integer
 		}
 	}
 }
@@ -261,8 +258,6 @@ extension ManifestASTValue {
 			try value.encode(to: encoder)
 		case let .bytes(value):
 			try value.encode(to: encoder)
-		case let .integer(value):
-			try value.encode(to: encoder)
 		}
 	}
 
@@ -368,8 +363,6 @@ extension ManifestASTValue {
 
 		case .bytes:
 			self = try .bytes(.init(from: decoder))
-		case .integer:
-			self = try .integer(.init(from: decoder))
 		}
 	}
 }

@@ -17,7 +17,7 @@ extension Int16: ValueProtocol, ProxyCodable {
 // Coding Keys Definition
 // =======================
 private enum ProxyCodableIntCodingKeys: String, CodingKey {
-	case value, type
+	case value, kind
 }
 
 // MARK: - ProxyEncodableInt
@@ -30,7 +30,7 @@ public struct ProxyEncodableInt<I: FixedWidthInteger & Codable & ValueProtocol>:
 
 	public func encode(to encoder: Encoder) throws {
 		var container = encoder.container(keyedBy: ProxyCodableIntCodingKeys.self)
-		try container.encode(ToEncode.kind, forKey: .type)
+		try container.encode(ToEncode.kind, forKey: .kind)
 		try container.encode(String(toEncode), forKey: .value)
 	}
 }
@@ -42,7 +42,7 @@ public struct ProxyDecodableInt<I: FixedWidthInteger & Codable & ValueProtocol>:
 	public init(from decoder: Decoder) throws {
 		// Checking for type discriminator
 		let container = try decoder.container(keyedBy: ProxyCodableIntCodingKeys.self)
-		let kind: ManifestASTValueKind = try container.decode(ManifestASTValueKind.self, forKey: .type)
+		let kind: ManifestASTValueKind = try container.decode(ManifestASTValueKind.self, forKey: .kind)
 		if kind != Decoded.kind {
 			throw InternalDecodingFailure.valueTypeDiscriminatorMismatch(expected: Decoded.kind, butGot: kind)
 		}

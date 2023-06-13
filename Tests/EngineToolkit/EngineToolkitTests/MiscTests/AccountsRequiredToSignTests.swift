@@ -2,8 +2,8 @@
 import Prelude
 
 final class AccountsRequiredToSignTests: TestCase {
-	let account = try! AccountAddress(validatingAddress: "account_sim1qspjlnwx4gdcazhral74rjgzgysrslf8ngrfmprecrrss3p9md")
-	let genericAddress = try! Address(validatingAddress: "component_sim1q0kryz5scup945usk39qjc2yjh6l5zsyuh8t7v5pk0tshjs68x")
+	let account = try! AccountAddress(validatingAddress: "account_sim1cyvgx33089ukm2pl97pv4max0x40ruvfy4lt60yvya744cve475w0q")
+	let genericAddress = try! Address(validatingAddress: "component_sim1cqvgx33089ukm2pl97pv4max0x40ruvfy4lt60yvya744cvemygpmu")
 
 	override func setUp() {
 		debugPrint = false
@@ -19,13 +19,13 @@ final class AccountsRequiredToSignTests: TestCase {
 			SetMetadata(
 				accountAddress: account,
 				key: "name",
-				value: Enum(.string("Radix Dashboard"))
+				value: .init(.option_Some)
 			)
 
 			SetMetadata(
 				entityAddress: genericAddress,
 				key: "name",
-				value: Enum(.string("Radix Dashboard"))
+				value: .init(.option_Some)
 			)
 		}
 		let analyzed = try analyze(manifest: transactionManifest)

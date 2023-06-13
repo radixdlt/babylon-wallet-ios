@@ -11,11 +11,11 @@ final class InstructionEncodingTests: TestCase {
 
 	func test_value_encoding_and_decoding() throws {
 		let accessRules = Tuple {
-			Map_(keyValueKind: .tuple, valueValueKind: .enum, entries: [])
-			Map_(keyValueKind: .string, valueValueKind: .enum, entries: [])
+			Map_(keyKind: .tuple, valueKind: .enum, entries: [])
+			Map_(keyKind: .string, valueKind: .enum, entries: [])
 			Enum(.u8(0), fields: [])
-			Map_(keyValueKind: .tuple, valueValueKind: .enum, entries: [])
-			Map_(keyValueKind: .string, valueValueKind: .enum, entries: [])
+			Map_(keyKind: .tuple, valueKind: .enum, entries: [])
+			Map_(keyKind: .string, valueKind: .enum, entries: [])
 			Enum(.u8(0), fields: [])
 		}
 
@@ -83,7 +83,7 @@ final class InstructionEncodingTests: TestCase {
 			(
 				value: .takeFromWorktop(.init(
 					resourceAddress: resourceAddress,
-					bucket: .init(stringLiteral: "ident")
+					bucket: .init(value: "ident")
 				)),
 				jsonRepresentation: """
 				{"instruction":"TAKE_FROM_WORKTOP","into_bucket":{"identifier":{"type":"String","value":"ident"},"type":"Bucket"},"resource_address":{"address":"resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqy99qqm","type":"Address"}}
@@ -92,7 +92,7 @@ final class InstructionEncodingTests: TestCase {
 			(
 				value: .takeFromWorktop(.init(
 					resourceAddress: resourceAddress,
-					bucket: .init(stringLiteral: "ident")
+					bucket: .init(value: "ident")
 				)),
 				jsonRepresentation: """
 				{"instruction":"TAKE_FROM_WORKTOP","into_bucket":{"identifier":{"type":"String","value":"ident"},"type":"Bucket"},"resource_address":{"address":"resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqy99qqm","type":"Address"}}
@@ -102,7 +102,7 @@ final class InstructionEncodingTests: TestCase {
 				value: .takeFromWorktopByAmount(.init(
 					amount: .init(value: "1"),
 					resourceAddress: resourceAddress,
-					bucket: .init(stringLiteral: "ident")
+					bucket: .init(value: "ident")
 				)),
 				jsonRepresentation: """
 				{"amount":{"type":"Decimal","value":"1"},"instruction":"TAKE_FROM_WORKTOP_BY_AMOUNT","into_bucket":{"identifier":{"type":"String","value":"ident"},"type":"Bucket"},"resource_address":{"address":"resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqy99qqm","type":"Address"}}
@@ -112,7 +112,7 @@ final class InstructionEncodingTests: TestCase {
 				value: .takeFromWorktopByAmount(.init(
 					amount: .init(value: "1"),
 					resourceAddress: resourceAddress,
-					bucket: .init(stringLiteral: "ident")
+					bucket: .init(value: "ident")
 				)),
 				jsonRepresentation: """
 				{"amount":{"type":"Decimal","value":"1"},"instruction":"TAKE_FROM_WORKTOP_BY_AMOUNT","into_bucket":{"identifier":{"type":"String","value":"ident"},"type":"Bucket"},"resource_address":{"address":"resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqy99qqm","type":"Address"}}
@@ -122,7 +122,7 @@ final class InstructionEncodingTests: TestCase {
 				value: .takeFromWorktopByIds(.init(
 					["1"],
 					resourceAddress: resourceAddress,
-					bucket: .init(stringLiteral: "ident")
+					bucket: .init(value: "ident")
 				)),
 				jsonRepresentation: """
 				{"ids":[{"type":"NonFungibleLocalId","value":{"type":"Integer","value":"1"}}],"instruction":"TAKE_FROM_WORKTOP_BY_IDS","into_bucket":{"identifier":{"type":"String","value":"ident"},"type":"Bucket"},"resource_address":{"address":"resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqy99qqm","type":"Address"}}
@@ -132,7 +132,7 @@ final class InstructionEncodingTests: TestCase {
 				value: .takeFromWorktopByIds(.init(
 					["1"],
 					resourceAddress: resourceAddress,
-					bucket: .init(stringLiteral: "ident")
+					bucket: .init(value: "ident")
 				)),
 				jsonRepresentation: """
 				{"ids":[{"type":"NonFungibleLocalId","value":{"type":"Integer","value":"1"}}],"instruction":"TAKE_FROM_WORKTOP_BY_IDS","into_bucket":{"identifier":{"type":"String","value":"ident"},"type":"Bucket"},"resource_address":{"address":"resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqy99qqm","type":"Address"}}
@@ -140,7 +140,7 @@ final class InstructionEncodingTests: TestCase {
 			),
 			(
 				value: .returnToWorktop(.init(
-					bucket: .init(stringLiteral: "ident")
+					bucket: .init(value: "ident")
 				)),
 				jsonRepresentation: """
 				{"bucket":{"identifier":{"type":"String","value":"ident"},"type":"Bucket"},"instruction":"RETURN_TO_WORKTOP"}
@@ -276,7 +276,7 @@ final class InstructionEncodingTests: TestCase {
 			),
 			(
 				value: .createProofFromBucket(.init(
-					bucket: Bucket(.string("bucket")),
+					bucket: Bucket(value: "bucket"),
 					proof: Proof(.string("Proof"))
 				)),
 				jsonRepresentation: """
@@ -294,7 +294,7 @@ final class InstructionEncodingTests: TestCase {
 			),
 			(
 				value: .burnResource(.init(
-					bucket: .init(stringLiteral: "ident")
+					bucket: .init(value: "ident")
 				)),
 				jsonRepresentation: """
 				{"bucket":{"identifier":{"type":"String","value":"ident"},"type":"Bucket"},"instruction":"BURN_RESOURCE"}
@@ -310,8 +310,8 @@ final class InstructionEncodingTests: TestCase {
 				value: .publishPackage(.init(
 					code: Blob(hex: "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"),
 					schema: Blob(hex: "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"),
-					royaltyConfig: Map_(keyValueKind: .string, valueValueKind: .tuple, entries: []),
-					metadata: Map_(keyValueKind: .string, valueValueKind: .string, entries: []),
+					royaltyConfig: Map_(keyKind: .string, valueKind: .tuple, entries: []),
+					metadata: Map_(keyKind: .string, valueKind: .string, entries: []),
 					accessRules: accessRules
 				)),
 				jsonRepresentation: """
@@ -350,8 +350,8 @@ final class InstructionEncodingTests: TestCase {
 				value: .setPackageRoyaltyConfig(.init(
 					packageAddress: packageAddress,
 					royaltyConfig: Map_(
-						keyValueKind: .string,
-						valueValueKind: .tuple,
+						keyKind: .string,
+						valueKind: .tuple,
 						entries: []
 					)
 				)),
@@ -364,8 +364,8 @@ final class InstructionEncodingTests: TestCase {
 					componentAddress: componentAddress,
 					royaltyConfig: .tuple(.init(values: [
 						.map(.init(
-							keyValueKind: .string,
-							valueValueKind: .u32,
+							keyKind: .string,
+							valueKind: .u32,
 							entries: []
 						)),
 						.u32(1),
@@ -410,8 +410,8 @@ final class InstructionEncodingTests: TestCase {
 				value: .mintNonFungible(.init(
 					resourceAddress: resourceAddress2,
 					entries: .map(.init(
-						keyValueKind: .nonFungibleLocalId,
-						valueValueKind: .tuple,
+						keyKind: .nonFungibleLocalId,
+						valueKind: .tuple,
 						entries: []
 					))
 				)),
@@ -435,8 +435,8 @@ final class InstructionEncodingTests: TestCase {
 			(
 				value: .createFungibleResource(.init(
 					divisibility: 18,
-					metadata: .init(keyValueKind: .string, valueValueKind: .string, entries: []),
-					accessRules: .init(keyValueKind: .enum, valueValueKind: .tuple, entries: [])
+					metadata: .init(keyKind: .string, valueKind: .string, entries: []),
+					accessRules: .init(keyKind: .enum, valueKind: .tuple, entries: [])
 				)),
 				jsonRepresentation: """
 				{"access_rules":{"entries":[],"key_value_kind":"Enum","type":"Map","value_value_kind":"Tuple"},"divisibility":{"type":"U8","value":"18"},"instruction":"CREATE_FUNGIBLE_RESOURCE","metadata":{"entries":[],"key_value_kind":"String","type":"Map","value_value_kind":"String"}}
@@ -445,8 +445,8 @@ final class InstructionEncodingTests: TestCase {
 			(
 				value: .createFungibleResourceWithInitialSupply(.init(
 					divisibility: 18,
-					metadata: .init(keyValueKind: .string, valueValueKind: .string, entries: []),
-					accessRules: .init(keyValueKind: .enum, valueValueKind: .tuple, entries: []),
+					metadata: .init(keyKind: .string, valueKind: .string, entries: []),
+					accessRules: .init(keyKind: .enum, valueKind: .tuple, entries: []),
 					initialSupply: .decimal(.init(value: "1"))
 				)),
 				jsonRepresentation: """
@@ -457,8 +457,8 @@ final class InstructionEncodingTests: TestCase {
 				value: .createNonFungibleResource(.init(
 					idType: Enum(.u8(0), fields: []),
 					schema: schema,
-					metadata: Map_(keyValueKind: .string, valueValueKind: .string, entries: []),
-					accessRules: Map_(keyValueKind: .enum, valueValueKind: .tuple, entries: [])
+					metadata: Map_(keyKind: .string, valueKind: .string, entries: []),
+					accessRules: Map_(keyKind: .enum, valueKind: .tuple, entries: [])
 				)),
 				jsonRepresentation: """
 				{"access_rules":{"entries":[],"key_value_kind":"Enum","type":"Map","value_value_kind":"Tuple"},"id_type":{"type":"Enum","variant":{"discriminator":"0","type":"U8"}},"instruction":"CREATE_NON_FUNGIBLE_RESOURCE","metadata":{"entries":[],"key_value_kind":"String","type":"Map","value_value_kind":"String"},"schema":{"elements":[{"elements":[{"element_kind":"Enum","elements":[],"type":"Array"},{"element_kind":"Tuple","elements":[],"type":"Array"},{"element_kind":"Enum","elements":[],"type":"Array"}],"type":"Tuple"},{"fields":[{"type":"U8","value":"64"}],"type":"Enum","variant":{"discriminator":"0","type":"U8"}},{"element_kind":"String","elements":[],"type":"Array"}],"type":"Tuple"}}
@@ -468,8 +468,8 @@ final class InstructionEncodingTests: TestCase {
 				value: .createNonFungibleResourceWithInitialSupply(.init(
 					idType: Enum(.u8(0), fields: []),
 					schema: schema,
-					metadata: Map_(keyValueKind: .string, valueValueKind: .string, entries: []),
-					accessRules: Map_(keyValueKind: .enum, valueValueKind: .tuple, entries: []),
+					metadata: Map_(keyKind: .string, valueKind: .string, entries: []),
+					accessRules: Map_(keyKind: .enum, valueKind: .tuple, entries: []),
 					initialSupply: .decimal(.init(value: "1"))
 				)),
 				jsonRepresentation: """
@@ -478,7 +478,7 @@ final class InstructionEncodingTests: TestCase {
 			),
 			(
 				value: .createAccessController(.init(
-					controlledAsset: .init(identifier: .string("ident")),
+					controlledAsset: .init(value: "ident"),
 					ruleSet: .init(values: [
 						.enum(.init(.u8(0))),
 						.enum(.init(.u8(0))),

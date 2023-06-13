@@ -5,9 +5,8 @@ import TransactionClient
 
 // MARK: - FaucetClientTests
 final class FaucetClientTests: TestCase {
-	let acco0 = try! AccountAddress(address: "account_tdx_b_1pq53vs3xmykn9xx7a80ewt228fszw2cp440u6f69lpyqkrh82f")
-	let acco1 = try! AccountAddress(address: "account_tdx_b_1ppvvvxm3mpk2cja05fwhpmev0ylsznqfqhlewnrxg5gqmpswhu")
-	let acco2 = try! AccountAddress(address: "account_tdx_b_1pr2q677ep9d5wxnhkkay9c6gvqln6hg3ul006w0a54tshau0z6")
+	let acco0 = try! AccountAddress(validatingAddress: "account_sim1cyvgx33089ukm2pl97pv4max0x40ruvfy4lt60yvya744cve475w0q")
+	let acco1 = try! AccountAddress(validatingAddress: "account_sim1cyzfj6p254jy6lhr237s7pcp8qqz6c8ahq9mn6nkdjxxxat5syrgz9")
 
 	func test_json_encoding_of_EpochForWhenLastUsedByAccountAddress() throws {
 		var epochs = EpochForWhenLastUsedByAccountAddress()
@@ -20,11 +19,11 @@ final class FaucetClientTests: TestCase {
 				"epochForAccounts": [
 					[
 						"epoch": 2,
-						"accountAddress": "account_tdx_b_1pq53vs3xmykn9xx7a80ewt228fszw2cp440u6f69lpyqkrh82f",
+						"accountAddress": "account_sim1cyvgx33089ukm2pl97pv4max0x40ruvfy4lt60yvya744cve475w0q",
 					],
 					[
 						"epoch": 5,
-						"accountAddress": "account_tdx_b_1ppvvvxm3mpk2cja05fwhpmev0ylsznqfqhlewnrxg5gqmpswhu",
+						"accountAddress": "account_sim1cyzfj6p254jy6lhr237s7pcp8qqz6c8ahq9mn6nkdjxxxat5syrgz9",
 					],
 				],
 			]
@@ -36,11 +35,11 @@ final class FaucetClientTests: TestCase {
 			"epochForAccounts": [
 				[
 					"epoch": 2,
-					"accountAddress": "account_tdx_b_1pq53vs3xmykn9xx7a80ewt228fszw2cp440u6f69lpyqkrh82f",
+					"accountAddress": "account_sim1cyvgx33089ukm2pl97pv4max0x40ruvfy4lt60yvya744cve475w0q",
 				],
 				[
 					"epoch": 5,
-					"accountAddress": "account_tdx_b_1ppvvvxm3mpk2cja05fwhpmev0ylsznqfqhlewnrxg5gqmpswhu",
+					"accountAddress": "account_sim1cyzfj6p254jy6lhr237s7pcp8qqz6c8ahq9mn6nkdjxxxat5syrgz9",
 				],
 			],
 		]
@@ -124,7 +123,7 @@ final class FaucetClientTests: TestCase {
 				],
 				[
 					"epoch": 5,
-					"accountAddress": "account_tdx_b_1ppvvvxm3mpk2cja05fwhpmev0ylsznqfqhlewnrxg5gqmpswhu",
+					"accountAddress": "account_sim1cyzfj6p254jy6lhr237s7pcp8qqz6c8ahq9mn6nkdjxxxat5syrgz9",
 				],
 			],
 		]
@@ -147,7 +146,7 @@ final class FaucetClientTests: TestCase {
 				],
 				[
 					"epoch": 5,
-					"accountAddress": "account_tdx_b_1ppvvvxm3mpk2cja05fwhpmev0ylsznqfqhlewnrxg5gqmpswhu",
+					"accountAddress": "account_sim1cyzfj6p254jy6lhr237s7pcp8qqz6c8ahq9mn6nkdjxxxat5syrgz9",
 				],
 			],
 		]

@@ -124,14 +124,14 @@ extension EngineToolkitClient {
 			)
 
 			let metdata = Map_(
-				keyValueKind: .string,
-				valueValueKind: .string,
+				keyKind: .string,
+				valueKind: .string,
 				entries: metdataEntries
 			)
 
 			let accessRules = Map_(
-				keyValueKind: .enum,
-				valueValueKind: .tuple,
+				keyKind: .enum,
+				valueKind: .tuple,
 				entries: [
 					[.enum(.init(.string("ResourceMethodAuthKey::Withdraw"))), .tuple(.init(arrayLiteral: .enum(.init(.string("AccessRule::AllowAll"))), .enum(.init(.string("AccessRule::DenyAll")))))],
 					[.enum(.init(.string("ResourceMethodAuthKey::Deposit"))), .tuple(.init(arrayLiteral: .enum(.init(.string("AccessRule::AllowAll"))), .enum(.init(.string("AccessRule::DenyAll")))))],
@@ -182,8 +182,8 @@ extension EngineToolkitClient {
 			CreateFungibleResourceWithInitialSupply(
 				divisibility: tokenDivisivility,
 				metadata: Map_(
-					keyValueKind: .string,
-					valueValueKind: .string,
+					keyKind: .string,
+					valueKind: .string,
 					entries: [
 						[.string("name"), .string(tokenName)],
 						[.string("symbol"), .string(tokenSymbol)],
@@ -193,8 +193,8 @@ extension EngineToolkitClient {
 				),
 
 				accessRules: .init(
-					keyValueKind: .enum,
-					valueValueKind: .tuple,
+					keyKind: .enum,
+					valueKind: .tuple,
 					entries: [
 						[.enum(.init(.string("ResourceMethodAuthKey::Withdraw"))), .tuple(.init(arrayLiteral: .enum(.init(.string("AccessRule::AllowAll"))), .enum(.init(.string("AccessRule::DenyAll")))))],
 						[.enum(.init(.string("ResourceMethodAuthKey::Deposit"))), .tuple(.init(arrayLiteral: .enum(.init(.string("AccessRule::AllowAll"))), .enum(.init(.string("AccessRule::DenyAll")))))],
@@ -233,23 +233,23 @@ extension EngineToolkitClient {
 					.array(.init(elementKind: .string, elements: [])),
 				],
 				metadata: Map_(
-					keyValueKind: .string,
-					valueValueKind: .string,
+					keyKind: .string,
+					valueKind: .string,
 					entries: [
 						[.string("name"), .string(nftName)],
 						[.string("description"), .string(nftDescription)],
 					]
 				),
 				accessRules: .init(
-					keyValueKind: .enum,
-					valueValueKind: .tuple,
+					keyKind: .enum,
+					valueKind: .tuple,
 					entries: [
 						[.enum(.init(.string("ResourceMethodAuthKey::Withdraw"))), .tuple(.init(arrayLiteral: .enum(.init(.string("AccessRule::AllowAll"))), .enum(.init(.string("AccessRule::DenyAll")))))],
 						[.enum(.init(.string("ResourceMethodAuthKey::Deposit"))), .tuple(.init(arrayLiteral: .enum(.init(.string("AccessRule::AllowAll"))), .enum(.init(.string("AccessRule::DenyAll")))))],
 					]
 				),
 				initialSupply: .map(
-					.init(keyValueKind: .nonFungibleLocalId, valueValueKind: .tuple, entries: [
+					.init(keyKind: .nonFungibleLocalId, valueKind: .tuple, entries: [
 						[.nonFungibleLocalId("#1#"), .tuple([.tuple(
 							[.string("Hello World"), .decimal(.init(value: "12"))]
 						)])],
@@ -303,20 +303,20 @@ extension EngineToolkitClient {
 					.array(.init(elementKind: .string, elements: [])),
 				],
 				metadata: Map_(
-					keyValueKind: .string,
-					valueValueKind: .string,
+					keyKind: .string,
+					valueKind: .string,
 					entries: metadataEntries
 				),
 				accessRules: .init(
-					keyValueKind: .enum,
-					valueValueKind: .tuple,
+					keyKind: .enum,
+					valueKind: .tuple,
 					entries: [
 						[.enum(.init(.string("ResourceMethodAuthKey::Withdraw"))), .tuple(.init(arrayLiteral: .enum(.init(.string("AccessRule::AllowAll"))), .enum(.init(.string("AccessRule::DenyAll")))))],
 						[.enum(.init(.string("ResourceMethodAuthKey::Deposit"))), .tuple(.init(arrayLiteral: .enum(.init(.string("AccessRule::AllowAll"))), .enum(.init(.string("AccessRule::DenyAll")))))],
 					]
 				),
 				initialSupply: .map(
-					.init(keyValueKind: .nonFungibleLocalId, valueValueKind: .tuple, entries: nftIds)
+					.init(keyKind: .nonFungibleLocalId, valueKind: .tuple, entries: nftIds)
 				)
 			)
 		}

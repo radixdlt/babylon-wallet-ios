@@ -305,7 +305,7 @@ final class ProfileTests: TestCase {
 		let authorizedDapp = try profile.addAuthorizedDapp(
 			.init(
 				networkID: networkID,
-				dAppDefinitionAddress: .init(address: "account_tdx_c_1px0jul7a44s65568d32f82f0lkssjwx6f5t5e44yl6csqurxw3"),
+				dAppDefinitionAddress: .init(validatingAddress: "account_tdx_c_1px0jul7a44s65568d32f82f0lkssjwx6f5t5e44yl6csqurxw3"),
 				displayName: "RadiSwap",
 				referencesToAuthorizedPersonas:
 				.init(arrayLiteral:

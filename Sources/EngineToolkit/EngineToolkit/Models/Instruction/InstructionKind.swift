@@ -3,6 +3,7 @@ import Foundation
 public enum InstructionKind: String, Codable, Sendable, Hashable {
 	case callFunction = "CALL_FUNCTION"
 	case callMethod = "CALL_METHOD"
+	case callRoyaltyMethod = "CALL_ROYALTY_METHOD"
 
 	case takeFromWorktop = "TAKE_FROM_WORKTOP"
 	case takeFromWorktopByAmount = "TAKE_FROM_WORKTOP_BY_AMOUNT"

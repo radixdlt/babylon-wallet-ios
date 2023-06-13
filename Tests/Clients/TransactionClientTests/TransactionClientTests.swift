@@ -39,13 +39,13 @@ final class TransactionClientTests: TestCase {
 			$0.gatewaysClient.getCurrentGateway = { Radix.Gateway.hammunet }
 			$0.engineToolkitClient.analyzeManifest = { try EngineToolkitClient.liveValue.analyzeManifest($0) }
 			$0.accountsClient.getAccountsOnNetwork = { _ in Profile.Network.Accounts(rawValue: .init(uncheckedUniqueElements: [expectedAccount]))! }
-			$0.accountPortfoliosClient.fetchAccountPortfolios = { addresses, _ in addresses.map {
-				.init(
+			$0.accountPortfoliosClient.fetchAccountPortfolios = { addresses, _ in try addresses.map {
+				try .init(
 					owner: $0,
 					isDappDefintionAccountType: false,
 					fungibleResources: .init(
 						xrdResource: .init(
-							resourceAddress: "resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzqu57yag",
+							resourceAddress: .init(validatingAddress: "resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzqu57yag"),
 							amount: 11
 						)
 					),
@@ -70,7 +70,7 @@ extension Profile.Network.Account {
 	static func new(address: String) -> Self {
 		try! .init(
 			networkID: .simulator,
-			address: AccountAddress(address: address),
+			address: AccountAddress(validatingAddress: address),
 			factorInstance: .init(
 				factorSourceID: .previewValue,
 				publicKey: .eddsaEd25519(Curve25519.Signing.PrivateKey().publicKey),

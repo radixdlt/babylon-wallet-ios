@@ -13,7 +13,7 @@ extension Bool: ValueProtocol {
 extension Bool: ProxyCodable {
 	// MARK: CodingKeys
 	private enum CodingKeys: String, CodingKey {
-		case value, type
+		case value, kind
 	}
 
 	public struct ProxyDecodable: DecodableProxy {
@@ -21,7 +21,7 @@ extension Bool: ProxyCodable {
 		public let decoded: Decoded
 		public init(from decoder: Decoder) throws {
 			let container = try decoder.container(keyedBy: CodingKeys.self)
-			let kind: ManifestASTValueKind = try container.decode(ManifestASTValueKind.self, forKey: .type)
+			let kind: ManifestASTValueKind = try container.decode(ManifestASTValueKind.self, forKey: .kind)
 			if kind != Decoded.kind {
 				throw InternalDecodingFailure.valueTypeDiscriminatorMismatch(expected: Decoded.kind, butGot: kind)
 			}
@@ -40,7 +40,7 @@ extension Bool: ProxyCodable {
 
 		public func encode(to encoder: Encoder) throws {
 			var container = encoder.container(keyedBy: CodingKeys.self)
-			try container.encode(ToEncode.kind, forKey: .type)
+			try container.encode(ToEncode.kind, forKey: .kind)
 			try container.encode(toEncode, forKey: .value)
 		}
 	}

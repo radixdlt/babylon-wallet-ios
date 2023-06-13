@@ -29,6 +29,37 @@ extension KnownEntityAddressesRequest {
 
 // MARK: - KnownEntityAddressesResponse
 public struct KnownEntityAddressesResponse: Sendable, Codable, Hashable {
+	/*
+	 {
+	   "xrd": "resource_tdx_22_1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxmaesev",
+	   "secp256k1_signature_virtual_badge": "resource_tdx_22_1nfxxxxxxxxxxsecpsgxxxxxxxxx004638826440xxxxxxxxxgevh2f",
+	   "ed25519_signature_virtual_badge": "resource_tdx_22_1nfxxxxxxxxxxed25sgxxxxxxxxx002236757237xxxxxxxxxpd7z2f",
+	   "package_of_direct_caller_virtual_badge": "resource_tdx_22_1nfxxxxxxxxxxpkcllrxxxxxxxxx003652646977xxxxxxxxxekvf9z",
+	   "global_caller_virtual_badge": "resource_tdx_22_1nfxxxxxxxxxxglcllrxxxxxxxxx002350006550xxxxxxxxxslvf9z",
+	   "system_transaction_badge": "resource_tdx_22_1nfxxxxxxxxxxsystxnxxxxxxxxx002683325037xxxxxxxxxgyyauj",
+	   "package_owner_badge": "resource_tdx_22_1nfxxxxxxxxxxpkgwnrxxxxxxxxx002558553505xxxxxxxxxekucfz",
+	   "validator_owner_badge": "resource_tdx_22_1nfxxxxxxxxxxvdrwnrxxxxxxxxx004365253834xxxxxxxxx5dhcfz",
+	   "account_owner_badge": "resource_tdx_22_1nfxxxxxxxxxxaccwnrxxxxxxxxx006664022062xxxxxxxxx9cvcfz",
+	   "identity_owner_badge": "resource_tdx_22_1nfxxxxxxxxxxdntwnrxxxxxxxxx002876444928xxxxxxxxx4nlcfz",
+	   "package_package": "package_tdx_22_1pkgxxxxxxxxxpackgexxxxxxxxx000726633226xxxxxxxxx5y6wwp",
+	   "resource_package": "package_tdx_22_1pkgxxxxxxxxxresrcexxxxxxxxx000538436477xxxxxxxxxkqjm7p",
+	   "account_package": "package_tdx_22_1pkgxxxxxxxxxaccntxxxxxxxxxx000929625493xxxxxxxxxgp6td7",
+	   "identity_package": "package_tdx_22_1pkgxxxxxxxxxdntyxxxxxxxxxxx008560783089xxxxxxxxxc2fuq7",
+	   "epoch_manager_package": "package_tdx_22_1pkgxxxxxxxxxepchmgxxxxxxxxx000797223725xxxxxxxxxvc60as",
+	   "clock_package": "package_tdx_22_1pkgxxxxxxxxxclckxxxxxxxxxxx000577344478xxxxxxxxxdx6wq7",
+	   "access_controller_package": "package_tdx_22_1pkgxxxxxxxxxcntrlrxxxxxxxxx000648572295xxxxxxxxxd2fmem",
+	   "transaction_processor_package": "package_tdx_22_1pkgxxxxxxxxxtxnpxrxxxxxxxxx002962227406xxxxxxxxx7l3eqm",
+	   "metadata_module_package": "package_tdx_22_1pkgxxxxxxxxxmtdataxxxxxxxxx005246577269xxxxxxxxxwj09d9",
+	   "royalty_module_package": "package_tdx_22_1pkgxxxxxxxxxryaltyxxxxxxxxx003849573396xxxxxxxxxkal8du",
+	   "access_rules_package": "package_tdx_22_1pkgxxxxxxxxxarulesxxxxxxxxx002304462983xxxxxxxxxg678lg",
+	   "genesis_helper_package": "package_tdx_22_1pkgxxxxxxxxxgenssxxxxxxxxxx004372642773xxxxxxxxxaq3gk7",
+	   "faucet_package": "package_tdx_22_1pkgxxxxxxxxxfaucetxxxxxxxxx000034355863xxxxxxxxxuy7qln",
+	   "epoch_manager": "epochmanager_tdx_22_1sexxxxxxxxxxephmgrxxxxxxxxx009352500589xxxxxxxxx9j68zk",
+	   "clock": "clock_tdx_22_1skxxxxxxxxxxclckxxxxxxxxxxx002253583992xxxxxxxxxutwtm5",
+	   "genesis_helper": "component_tdx_22_1cptxxxxxxxxxgenssxxxxxxxxxx000977302539xxxxxxxxxzuwffc",
+	   "faucet": "component_tdx_22_1cptxxxxxxxxxfaucetxxxxxxxxx000527798379xxxxxxxxxrcppq4"
+	 }
+	 */
 	public let faucetComponentAddress: ComponentAddress
 	public let faucetPackageAddress: PackageAddress
 	public let accountPackageAddress: PackageAddress
@@ -36,7 +67,7 @@ public struct KnownEntityAddressesResponse: Sendable, Codable, Hashable {
 	public let systemTokenResourceAddress: ResourceAddress
 	public let ecdsaSecp256k1TokenResourceAddress: ResourceAddress
 	public let eddsaEd25519TokenResourceAddress: ResourceAddress
-	public let packageTokenResourceAddress: ResourceAddress
+	public let packageTokenResourceAddress: PackageAddress
 	public let epochManagerSystemAddress: ComponentAddress
 
 	public init(
@@ -47,7 +78,7 @@ public struct KnownEntityAddressesResponse: Sendable, Codable, Hashable {
 		systemTokenResourceAddress: ResourceAddress,
 		ecdsaSecp256k1TokenResourceAddress: ResourceAddress,
 		eddsaEd25519TokenResourceAddress: ResourceAddress,
-		packageTokenResourceAddress: ResourceAddress,
+		packageTokenResourceAddress: PackageAddress,
 		epochManagerSystemAddress: ComponentAddress
 	) {
 		self.faucetComponentAddress = faucetComponentAddress
@@ -78,15 +109,15 @@ public struct KnownEntityAddressesResponse: Sendable, Codable, Hashable {
 extension KnownEntityAddressesResponse {
 	public static let previewValue = Self.nebunet
 	public static let nebunet = Self(
-		faucetComponentAddress: try! .init(validatingAddress: "component_tdx_b_1qftacppvmr9ezmekxqpq58en0nk954x0a7jv2zz0hc7qdxyth4"),
-		faucetPackageAddress: try! .init(validatingAddress: "unknown"),
-		accountPackageAddress: try! .init(validatingAddress: "package_tdx_b_1qy4hrp8a9apxldp5cazvxgwdj80cxad4u8cpkaqqnhlssf7lg2"),
-		xrdResourceAddress: try! .init(validatingAddress: "resource_tdx_b_1qzkcyv5dwq3r6kawy6pxpvcythx8rh8ntum6ws62p95s9hhz9x"),
-		systemTokenResourceAddress: try! .init(validatingAddress: "unknown"),
-		ecdsaSecp256k1TokenResourceAddress: try! .init(validatingAddress: "resource_tdx_b_1qzu3wdlw3fx7t82fmt2qme2kpet4g3n2epx02sew49wsp8mlue"),
-		eddsaEd25519TokenResourceAddress: try! .init(validatingAddress: "resource_tdx_b_1qq8cays25704xdyap2vhgmshkkfyr023uxdtk59ddd4q4zaqlf"),
-		packageTokenResourceAddress: try! .init(validatingAddress: "unknown"),
-		epochManagerSystemAddress: try! .init(validatingAddress: "system_tdx_b_1qne8qu4seyvzfgd94p3z8rjcdl3v0nfhv84judpum2lq328939")
+		faucetComponentAddress: try! .init(validatingAddress: "component_tdx_22_1cptxxxxxxxxxfaucetxxxxxxxxx000527798379xxxxxxxxxrcppq4"),
+		faucetPackageAddress: try! .init(validatingAddress: "package_tdx_22_1pkgxxxxxxxxxfaucetxxxxxxxxx000034355863xxxxxxxxxuy7qln"),
+		accountPackageAddress: try! .init(validatingAddress: "package_tdx_22_1pkgxxxxxxxxxaccntxxxxxxxxxx000929625493xxxxxxxxxgp6td7"),
+		xrdResourceAddress: try! .init(validatingAddress: "resource_tdx_22_1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxmaesev"),
+		systemTokenResourceAddress: try! .init(validatingAddress: "resource_tdx_22_1nfxxxxxxxxxxsystxnxxxxxxxxx002683325037xxxxxxxxxgyyauj"),
+		ecdsaSecp256k1TokenResourceAddress: try! .init(validatingAddress: "resource_tdx_22_1nfxxxxxxxxxxed25sgxxxxxxxxx002236757237xxxxxxxxxpd7z2f"),
+		eddsaEd25519TokenResourceAddress: try! .init(validatingAddress: "resource_tdx_22_1nfxxxxxxxxxxsecpsgxxxxxxxxx004638826440xxxxxxxxxgevh2f"),
+		packageTokenResourceAddress: try! .init(validatingAddress: "package_tdx_22_1pkgxxxxxxxxxresrcexxxxxxxxx000538436477xxxxxxxxxkqjm7p"),
+		epochManagerSystemAddress: try! .init(validatingAddress: "component_tdx_22_1cptxxxxxxxxxfaucetxxxxxxxxx000527798379xxxxxxxxxrcppq4")
 	)
 }
 #endif // DEBUG
