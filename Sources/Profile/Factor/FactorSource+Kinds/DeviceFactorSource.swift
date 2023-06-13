@@ -14,7 +14,7 @@ public struct DeviceFactorSource: FactorSourceProtocol {
 		hint: Hint,
 		nextDerivationIndicesPerNetwork: NextDerivationIndicesPerNetwork? = nil
 	) {
-		precondition(common.id.factorSourceKind == Self.kind)
+		precondition(common.id.kind == Self.kind)
 		self.common = common
 		self.hint = hint
 		self.nextDerivationIndicesPerNetwork = nextDerivationIndicesPerNetwork

@@ -13,7 +13,7 @@ public struct OffDeviceMnemonicFactorSource: FactorSourceProtocol {
 		hint: Hint,
 		bip39Parameters: BIP39Parameters
 	) {
-		precondition(common.id.factorSourceKind == Self.kind)
+		precondition(common.id.kind == Self.kind)
 		self.common = common
 		self.hint = hint
 		self.bip39Parameters = bip39Parameters

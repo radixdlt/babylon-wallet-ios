@@ -42,7 +42,7 @@ public struct FactorInstance: Sendable, Hashable, Codable, Identifiable {
 				// FIXME: THIS IS COMPLETELY WRONG, placeholder only
 				let payload = k1PubKey.compressedRepresentation.prefix(26)
 				return .init(
-					factorSourceKind: factorSourceID.factorSourceKind,
+					factorSourceKind: factorSourceID.kind,
 					badgeAddress: .virtual(.init(
 						resourceAddress: .init(
 							// FIXME: This is wrong! should be fetched from gateway or from RET... and depends on the network.
@@ -56,7 +56,7 @@ public struct FactorInstance: Sendable, Hashable, Codable, Identifiable {
 				// FIXME: THIS IS COMPLETELY WRONG, placeholder only
 				let payload = curve25519PubKey.compressedRepresentation.prefix(26)
 				return .init(
-					factorSourceKind: factorSourceID.factorSourceKind,
+					factorSourceKind: factorSourceID.kind,
 					badgeAddress: .virtual(.init(
 						resourceAddress: .init(
 							// FIXME: This is wrong! should be fetched from gateway or from RET... and depends on the network.

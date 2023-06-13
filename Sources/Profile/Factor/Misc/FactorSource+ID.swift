@@ -8,7 +8,11 @@ extension FactorSource {
 		factorSourceKind: FactorSourceKind
 	) throws -> FactorSourceID {
 		let hash = try blake2b(data: publicKey.compressedRepresentation)
-		return try FactorSourceID(factorSourceKind: factorSourceKind, hash: hash)
+		return try .hash(.init(
+			kind: factorSourceKind,
+			body: .init(data: hash)
+		)
+		)
 	}
 
 	public static func id(

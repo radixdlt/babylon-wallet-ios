@@ -11,7 +11,7 @@ public struct SecurityQuestionsFactorSource: FactorSourceProtocol {
 		common: FactorSource.Common,
 		sealedMnemonic: SealedMnemonic
 	) {
-		precondition(common.id.factorSourceKind == Self.kind)
+		precondition(common.id.kind == Self.kind)
 		self.common = common
 		self.sealedMnemonic = sealedMnemonic
 	}

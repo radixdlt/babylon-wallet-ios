@@ -18,16 +18,24 @@ extension FactorSourceIDProtocol {
 	}
 }
 
-// MARK: - FactorSourceID_
-public enum FactorSourceID_: BaseFactorSourceIDProtocol, Sendable, Hashable, CustomStringConvertible {
+// MARK: - FactorSourceID
+public enum FactorSourceID: BaseFactorSourceIDProtocol, Sendable, Hashable, CustomStringConvertible, Codable {
 	case hash(FromHash)
 	case address(FromAddress)
 }
 
-extension FactorSourceID_ {
+extension FactorSourceID {
 	public struct FromHash: FactorSourceIDProtocol {
 		public let kind: FactorSourceKind
 		public let body: HexCodable32Bytes
+
+		public init(
+			kind: FactorSourceKind,
+			body: HexCodable32Bytes
+		) {
+			self.kind = kind
+			self.body = body
+		}
 	}
 
 	public struct FromAddress: FactorSourceIDProtocol {
@@ -36,7 +44,35 @@ extension FactorSourceID_ {
 	}
 }
 
-extension FactorSourceID_ {
+extension FactorSourceID.FromHash {
+	public init(kind: FactorSourceKind, hash: some DataProtocol) throws {
+		try self.init(kind: kind, body: .init(data: Data(hash)))
+	}
+
+	public static func device(hash: some DataProtocol) throws -> Self {
+		try self.init(kind: .device, hash: hash)
+	}
+}
+
+extension FactorSourceID {
+	public init(kind: FactorSourceKind, hash: some DataProtocol) throws {
+		self = try .hash(.init(kind: kind, hash: hash))
+	}
+
+	public static func device(hash: some DataProtocol) throws -> Self {
+		try .hash(.device(hash: hash))
+	}
+}
+
+#if DEBUG
+extension FactorSourceID {
+	public static func device(hash: String) throws -> Self {
+		try .hash(.device(hash: Data(hex: hash)))
+	}
+}
+#endif
+
+extension FactorSourceID {
 	private func property<Property>(
 		_ keyPath: KeyPath<any FactorSourceIDProtocol, Property>
 	) -> Property {
@@ -57,7 +93,7 @@ extension FactorSourceID_ {
 	}
 }
 
-extension FactorSourceID_ {
+extension FactorSourceID {
 	public enum Discriminator: String, Codable {
 		case fromHash
 		case fromAddress
@@ -102,60 +138,11 @@ extension FactorSourceID_ {
 	}
 }
 
-// MARK: - FactorSourceID
-/// FactorSourceKind concatenated with hash of publicKey, in case of HD it is the Hash of the public key derived
-/// using CAP26 derivationPath: m/44'/1022'/365'
-public struct FactorSourceID: Sendable, Hashable, CodableViaHexCodable, CustomStringConvertible {
-	public enum Error: String, Swift.Error, Hashable {
-		case invalidByteCount
-	}
-
-	public var factorSourceKind: FactorSourceKind {
-		let factorSourceKindRawValue = hexCodable[0]
-		guard let factorSourceKind = FactorSourceKind(rawValue: factorSourceKindRawValue) else {
-			fatalError("Invalid state, unknown factor source kind, value: \(factorSourceKindRawValue)")
-		}
-		return factorSourceKind
-	}
-
-	/// 33 bytes, consisting of `FactorSourceKind(1) || Hash(32)`
-	public let hexCodable: HexCodable
-
-	public init(hexCodable: HexCodable) throws {
-		guard hexCodable.data.count == 33 else {
-			throw Error.invalidByteCount
-		}
-		let factorSourceKindRawValue = hexCodable[0]
-		guard let _ = FactorSourceKind(rawValue: factorSourceKindRawValue) else {
-			throw UnknownFactorSourceKind(unknownValue: factorSourceKindRawValue)
-		}
-		self.hexCodable = hexCodable
-	}
-
-	public init(factorSourceKind: FactorSourceKind, hash: Data) throws {
-		guard hash.count == 32 else {
-			throw Error.invalidByteCount
-		}
-		self.hexCodable = .init(data: Data([factorSourceKind.rawValue]) + hash)
-	}
-}
-
-// MARK: - UnknownFactorSourceKind
-struct UnknownFactorSourceKind: Swift.Error {
-	public let unknownValue: FactorSourceKind.RawValue
-}
-
-extension FactorSourceID {
-	public var description: String {
-		hexCodable.hex()
-	}
-}
-
 #if DEBUG
 extension FactorSourceID {
 	public static let previewValue = Self.preview(.device)
 	public static func preview(_ factorSourceKind: FactorSourceKind) -> Self {
-		try! Self(factorSourceKind: factorSourceKind, hash: .deadbeef32Bytes)
+		.hash(.init(kind: factorSourceKind, body: .deadbeef))
 	}
 }
 #endif // DEBUG

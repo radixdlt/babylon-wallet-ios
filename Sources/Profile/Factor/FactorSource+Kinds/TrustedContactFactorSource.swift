@@ -43,7 +43,7 @@ public struct TrustedContactFactorSource: FactorSourceProtocol {
 		emailAddress: EmailAddress,
 		name: NonEmptyString
 	) {
-		precondition(common.id.factorSourceKind == Self.kind)
+		precondition(common.id.kind == Self.kind)
 		self.common = common
 		self.emailAddress = emailAddress
 		self.name = name
@@ -62,18 +62,14 @@ extension TrustedContactFactorSource {
 		name: NonEmptyString,
 		addedOn: Date? = nil,
 		lastUsedOn: Date? = nil
-	) throws -> Self {
+	) -> Self {
 		@Dependency(\.date) var date
-
-		let hashInput = try Data(EngineToolkit().decodeAddressRequest(request: .init(address: radixAddress.address)).get().data)
-		let hash = try blake2b(data: hashInput) // FIXME: or what? change FactorSourceID to be an enum?
-
-		return try Self(
+		return Self(
 			common: .init(
-				id: .init(
-					factorSourceKind: .trustedContact,
-					hash: hash
-				),
+				id: .address(.init(
+					kind: .trustedContact,
+					body: radixAddress
+				)),
 				addedOn: addedOn ?? date(),
 				lastUsedOn: lastUsedOn ?? date()
 			),

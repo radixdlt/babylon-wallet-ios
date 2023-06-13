@@ -18,7 +18,11 @@ extension FactorSourceProtocol {
 	public var kind: FactorSourceKind { Self.kind }
 	public var casePath: CasePath<FactorSource, Self> { Self.casePath }
 	public static func id(hash: some DataProtocol) throws -> ID {
-		try .init(factorSourceKind: kind, hash: Data(hash))
+		try .hash(.init(
+			kind: kind,
+			body: .init(data: Data(hash))
+		)
+		)
 	}
 
 	public static func common(

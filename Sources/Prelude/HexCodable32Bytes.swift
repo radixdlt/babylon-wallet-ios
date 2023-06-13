@@ -1,3 +1,4 @@
+// MARK: - HexCodable32Bytes
 public struct HexCodable32Bytes: Sendable, Codable, Hashable, CustomStringConvertible {
 	struct IncorretByteCountError: Swift.Error {
 		let got: Int
@@ -36,3 +37,9 @@ public struct HexCodable32Bytes: Sendable, Codable, Hashable, CustomStringConver
 		data.hex()
 	}
 }
+
+#if DEBUG
+extension HexCodable32Bytes {
+	public static let deadbeef = try! Self(data: .deadbeef32Bytes)
+}
+#endif // DEBUG

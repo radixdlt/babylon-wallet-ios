@@ -89,23 +89,17 @@ final class FactorSourcesCodableTests: TestCase {
 			}
 
 			let babylon = try factorSources[0].extract(as: DeviceFactorSource.self)
-			XCTAssertEqual(babylon.id.factorSourceKind, .device)
+			XCTAssertEqual(babylon.id.kind, .device)
 
 			let olympia: DeviceFactorSource = try factorSources[1].extract()
-			XCTAssertEqual(olympia.id.factorSourceKind, .device)
+			XCTAssertEqual(olympia.id.kind, .device)
 
 			let ledger = try factorSources[2].extract(as: LedgerHardwareWalletFactorSource.self)
-			XCTAssertEqual(ledger.id.factorSourceKind, .ledgerHQHardwareWallet)
+			XCTAssertEqual(ledger.id.kind, .ledgerHQHardwareWallet)
 
 			let offDeviceMnemonic = try factorSources[3].extract(as: OffDeviceMnemonicFactorSource.self)
-			XCTAssertEqual(offDeviceMnemonic.id.factorSourceKind, .offDeviceMnemonic)
+			XCTAssertEqual(offDeviceMnemonic.id.kind, .offDeviceMnemonic)
 		}
-	}
-}
-
-extension FactorSourceID {
-	static func from(_ byte: UInt8, sourceKind: FactorSourceKind) -> Self {
-		try! .init(factorSourceKind: sourceKind, hash: .from(byte))
 	}
 }
 
