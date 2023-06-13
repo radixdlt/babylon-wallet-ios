@@ -12,7 +12,7 @@ extension ImportLegacyWalletClient: DependencyKey {
 		@Dependency(\.accountsClient) var accountsClient
 
 		@Sendable func migrate(
-			accounts: Set<OlympiaAccountToMigrate>,
+			accounts: NonEmpty<Set<OlympiaAccountToMigrate>>,
 			factorSouceID: FactorSourceID
 		) async throws -> (accounts: NonEmpty<OrderedSet<MigratedAccount>>, networkID: NetworkID) {
 			let sortedOlympia = accounts.sorted(by: \.addressIndex)
@@ -41,7 +41,9 @@ extension ImportLegacyWalletClient: DependencyKey {
 				accountsSet.append(migrated)
 			}
 
-			let accounts = NonEmpty<OrderedSet<MigratedAccount>>(rawValue: accountsSet)!
+			guard let accounts = NonEmpty<OrderedSet<MigratedAccount>>(rawValue: accountsSet) else {
+				throw NoValidatedAccountsError()
+			}
 
 			// Save all accounts
 			for account in accounts {
@@ -81,8 +83,12 @@ extension ImportLegacyWalletClient: DependencyKey {
 				let olympiaFactorSource = request.olympiaFactorSource
 				let factorSource = olympiaFactorSource?.factorSource
 
+				guard let olympiaAccounts = NonEmpty<Set>(request.olympiaAccounts) else {
+					throw NoValidatedAccountsError()
+				}
+
 				let (accounts, networkID) = try await migrate(
-					accounts: request.olympiaAccounts,
+					accounts: olympiaAccounts,
 					factorSouceID: request.olympiaFactorSouceID
 				)
 
@@ -137,6 +143,8 @@ extension ImportLegacyWalletClient: DependencyKey {
 			}
 		)
 	}()
+
+	struct NoValidatedAccountsError: Error {}
 }
 
 func convert(
