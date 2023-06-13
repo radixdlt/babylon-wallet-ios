@@ -26,7 +26,7 @@ extension DebugInspectProfile {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-				ZStack {
+				Group {
 					if let json = viewStore.json, viewStore.mode == .rawJSON {
 						JSONView(jsonString: json)
 					} else {
