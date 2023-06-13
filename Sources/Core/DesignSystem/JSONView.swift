@@ -15,6 +15,7 @@ public struct JSONView: SwiftUI.View {
 	public var body: some View {
 		#if canImport(UIKit)
 		UIKitJSONView(jsonString: jsonString)
+			.padding([.leading], -60) // we hide the "line number" view on the left which eats up precious widdth,zoo
 		#else
 		Text("`\(jsonString)`")
 		#endif
@@ -27,8 +28,7 @@ struct UIKitJSONView: UIViewRepresentable {
 	let jsonPreview: JSONPreview
 	init(jsonString: String) {
 		let jsonPreview = JSONPreview()
-		var style = HighlightStyle.default
-		jsonPreview.preview(jsonString, style: style)
+		jsonPreview.preview(jsonString, style: .default)
 		self.jsonPreview = jsonPreview
 	}
 

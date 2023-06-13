@@ -31,6 +31,7 @@ extension SecurityStructureConfigurationRow {
 								.textStyle(.secondaryHeader)
 								.padding(.bottom, .small1)
 
+							// FIXME: Strings
 							LabelledDate(label: "Created", date: viewStore.createdOn)
 								.padding(.bottom, .small3)
 						}
