@@ -43,11 +43,13 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 		let interactionItems: NonEmpty<OrderedSet<AnyInteractionItem>>
 		var responseItems: OrderedDictionary<AnyInteractionItem, AnyInteractionResponseItem> = [:]
 
+		var interactionItem: AnyInteractionItem? = nil
+
 		@PresentationState
 		var personaNotFoundErrorAlert: AlertState<ViewAction.PersonaNotFoundErrorAlertAction>? = nil
 
-		var root: Destinations.State?
-		var path: StackState<Destinations.State> = .init()
+		var root: Path.State? = nil
+		var path: StackState<Path.State> = .init()
 
 		init?(
 			dappMetadata: DappMetadata,
@@ -58,7 +60,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 
 			if let interactionItems = NonEmpty(rawValue: OrderedSet<AnyInteractionItem>(for: remoteInteraction.erasedItems)) {
 				self.interactionItems = interactionItems
-				self.root = Destinations.State(
+				self.root = Path.State(
 					for: interactionItems.first,
 					interaction: remoteInteraction,
 					dappMetadata: dappMetadata,
@@ -110,8 +112,8 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 	}
 
 	enum ChildAction: Sendable, Equatable {
-		case root(Destinations.Action)
-		case path(StackActionOf<Destinations>)
+		case root(Path.Action)
+		case path(StackActionOf<Path>)
 	}
 
 	enum DelegateAction: Sendable, Equatable {
@@ -121,11 +123,8 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 		case dismiss
 	}
 
-	struct Destinations: Sendable, ReducerProtocol {
-		typealias State = RelayState<DappInteractionFlow.State.AnyInteractionItem, MainState>
-		typealias Action = RelayAction<DappInteractionFlow.State.AnyInteractionItem, MainAction>
-
-		enum MainState: Sendable, Hashable {
+	struct Path: Sendable, ReducerProtocol {
+		enum State: Sendable, Hashable {
 			case login(Login.State)
 			case accountPermission(AccountPermission.State)
 			case chooseAccounts(AccountPermissionChooseAccounts.State)
@@ -134,7 +133,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			case reviewTransaction(TransactionReview.State)
 		}
 
-		enum MainAction: Sendable, Equatable {
+		enum Action: Sendable, Equatable {
 			case login(Login.Action)
 			case accountPermission(AccountPermission.Action)
 			case chooseAccounts(AccountPermissionChooseAccounts.Action)
@@ -144,26 +143,23 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 		}
 
 		var body: some ReducerProtocolOf<Self> {
-			Relay {
-				EmptyReducer()
-					.ifCaseLet(/MainState.login, action: /MainAction.login) {
-						Login()
-					}
-					.ifCaseLet(/MainState.accountPermission, action: /MainAction.accountPermission) {
-						AccountPermission()
-					}
-					.ifCaseLet(/MainState.chooseAccounts, action: /MainAction.chooseAccounts) {
-						AccountPermissionChooseAccounts()
-					}
-					.ifCaseLet(/MainState.personaDataPermission, action: /MainAction.personaDataPermission) {
-						PersonaDataPermission()
-					}
-					.ifCaseLet(/MainState.oneTimePersonaData, action: /MainAction.oneTimePersonaData) {
-						OneTimePersonaData()
-					}
-					.ifCaseLet(/MainState.reviewTransaction, action: /MainAction.reviewTransaction) {
-						TransactionReview()
-					}
+			Scope(state: /State.login, action: /Action.login) {
+				Login()
+			}
+			Scope(state: /State.accountPermission, action: /Action.accountPermission) {
+				AccountPermission()
+			}
+			Scope(state: /State.chooseAccounts, action: /Action.chooseAccounts) {
+				AccountPermissionChooseAccounts()
+			}
+			Scope(state: /State.personaDataPermission, action: /Action.personaDataPermission) {
+				PersonaDataPermission()
+			}
+			Scope(state: /State.oneTimePersonaData, action: /Action.oneTimePersonaData) {
+				OneTimePersonaData()
+			}
+			Scope(state: /State.reviewTransaction, action: /Action.reviewTransaction) {
+				TransactionReview()
 			}
 		}
 	}
@@ -550,7 +546,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 	func continueEffect(for state: inout State) -> EffectTask<Action> {
 		if
 			let nextRequest = state.interactionItems.first(where: { state.responseItems[$0] == nil }),
-			let destination = Destinations.State(
+			let destination = Path.State(
 				for: nextRequest,
 				interaction: state.remoteInteraction,
 				dappMetadata: state.dappMetadata,
@@ -718,7 +714,7 @@ extension DappInteractionFlow.ChildAction {
 	}
 }
 
-extension DappInteractionFlow.Destinations.State {
+extension DappInteractionFlow.Path.State {
 	init?(
 		for anyItem: DappInteractionFlow.State.AnyInteractionItem,
 		interaction: DappInteractionFlow.State.RemoteInteraction,
