@@ -4,6 +4,8 @@ public enum InstructionKind: String, Codable, Sendable, Hashable {
 	case callFunction = "CALL_FUNCTION"
 	case callMethod = "CALL_METHOD"
 	case callRoyaltyMethod = "CALL_ROYALTY_METHOD"
+	case callMetadataMethod = "CALL_METADATA_METHOD"
+	case callAccessRulesMethod = "CALL_ACCESSRULES_METHOD"
 
 	case takeFromWorktop = "TAKE_FROM_WORKTOP"
 	case takeFromWorktopByAmount = "TAKE_FROM_WORKTOP_BY_AMOUNT"

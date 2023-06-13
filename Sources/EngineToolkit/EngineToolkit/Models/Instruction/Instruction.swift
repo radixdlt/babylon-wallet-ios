@@ -12,6 +12,8 @@ public indirect enum Instruction: Sendable, Codable, Hashable {
 	case callFunction(CallFunction)
 	case callMethod(CallMethod)
 	case callRoyaltyMethod(CallRoyaltyMethod)
+	case callMetadataMethod(CallMetadataMethod)
+	case callAccessRulesMethod(CallAccessRulesMethod)
 
 	case takeFromWorktop(TakeFromWorktop)
 	case takeFromWorktopByAmount(TakeFromWorktopByAmount)
@@ -82,6 +84,10 @@ extension Instruction {
 			return .callMethod
 		case .callRoyaltyMethod:
 			return .callRoyaltyMethod
+		case .callMetadataMethod:
+			return .callMetadataMethod
+		case .callAccessRulesMethod:
+			return .callAccessRulesMethod
 
 		case .takeFromWorktop:
 			return .takeFromWorktop
@@ -202,6 +208,10 @@ extension Instruction {
 			try instruction.encode(to: encoder)
 		case let .callRoyaltyMethod(instruction):
 			try instruction.encode(to: encoder)
+		case let .callMetadataMethod(instruction):
+			try instruction.encode(to: encoder)
+		case let .callAccessRulesMethod(instruction):
+			try instruction.encode(to: encoder)
 
 		case let .takeFromWorktop(instruction):
 			try instruction.encode(to: encoder)
@@ -316,6 +326,10 @@ extension Instruction {
 			self = try .callMethod(.init(from: decoder))
 		case .callRoyaltyMethod:
 			self = try .callRoyaltyMethod(.init(from: decoder))
+		case .callMetadataMethod:
+			self = try .callMetadataMethod(.init(from: decoder))
+		case .callAccessRulesMethod:
+			self = try .callAccessRulesMethod(.init(from: decoder))
 
 		case .takeFromWorktop:
 			self = try .takeFromWorktop(.init(from: decoder))

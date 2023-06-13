@@ -1,11 +1,11 @@
 import Foundation
 
-// MARK: - CallAccessRulesMethod
-public struct CallAccessRulesMethod: InstructionProtocol {
+// MARK: - CallMetadataMethod
+public struct CallMetadataMethod: InstructionProtocol {
 	// Type name, used as a discriminator
-	public static let kind: InstructionKind = .callAccessRulesMethod
+	public static let kind: InstructionKind = .callMetadataMethod
 	public func embed() -> Instruction {
-		.callAccessRulesMethod(self)
+		.callMetadataMethod(self)
 	}
 
 	// MARK: Stored properties
@@ -75,7 +75,7 @@ public struct CallAccessRulesMethod: InstructionProtocol {
 	#endif
 }
 
-extension CallAccessRulesMethod {
+extension CallMetadataMethod {
 	// MARK: CodingKeys
 	private enum CodingKeys: String, CodingKey {
 		case type = "instruction"
