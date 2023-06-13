@@ -15,7 +15,7 @@ public struct JSONView: SwiftUI.View {
 	public var body: some View {
 		#if canImport(UIKit)
 		UIKitJSONView(jsonString: jsonString)
-			.padding([.leading], -60) // we hide the "line number" view on the left which eats up precious widdth,zoo
+			.padding(.leading, -60) // we hide the "line number" view on the left which eats up precious widdth,zoo
 		#else
 		Text("`\(jsonString)`")
 		#endif
