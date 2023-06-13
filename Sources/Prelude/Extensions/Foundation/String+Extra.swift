@@ -2,14 +2,21 @@ import Foundation
 
 extension StringProtocol {
 	public var isBlank: Bool {
-		trimWhitespacesAndNewLines().isEmpty
+		trimmingWhitespacesAndNewlines().isEmpty
 	}
 
-	public func trimmed() -> String {
+	/// Trims whitespaces
+	public func trimmingWhitespace() -> String {
 		trimmingCharacters(in: .whitespaces)
 	}
 
-	public func trimWhitespacesAndNewLines() -> String {
+	/// Trims newlines
+	public func trimmingNewlines() -> String {
+		trimmingCharacters(in: .newlines)
+	}
+
+	/// Trims whitespaces and newlines
+	public func trimmingWhitespacesAndNewlines() -> String {
 		trimmingCharacters(in: .whitespacesAndNewlines)
 	}
 

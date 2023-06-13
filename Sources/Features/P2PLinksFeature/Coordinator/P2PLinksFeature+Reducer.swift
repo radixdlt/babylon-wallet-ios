@@ -2,8 +2,10 @@ import FeaturePrelude
 import NewConnectionFeature
 import RadixConnectClient
 
-// MARK: - P2PLinks
+// MARK: - P2PLinksFeature
 public struct P2PLinksFeature: Sendable, FeatureReducer {
+	// MARK: State
+
 	public struct State: Sendable, Hashable {
 		public var links: IdentifiedArrayOf<P2PLinkRow.State>
 
@@ -18,6 +20,8 @@ public struct P2PLinksFeature: Sendable, FeatureReducer {
 			self.destination = destination
 		}
 	}
+
+	// MARK: Action
 
 	public enum ViewAction: Sendable, Equatable {
 		case task
@@ -35,13 +39,21 @@ public struct P2PLinksFeature: Sendable, FeatureReducer {
 		case connection(id: ConnectionPassword, action: P2PLinkRow.Action)
 	}
 
+	// MARK: Destinations
+
 	public struct Destinations: Sendable, ReducerProtocol {
 		public enum State: Sendable, Hashable {
 			case newConnection(NewConnection.State)
+			case removeConnection(AlertState<Action.RemoveConnection>)
 		}
 
 		public enum Action: Sendable, Equatable {
 			case newConnection(NewConnection.Action)
+			case removeConnection(RemoveConnection)
+
+			public enum RemoveConnection: Sendable, Hashable {
+				case removeTapped(ConnectionPassword)
+			}
 		}
 
 		public var body: some ReducerProtocolOf<Self> {
@@ -50,6 +62,8 @@ public struct P2PLinksFeature: Sendable, FeatureReducer {
 			}
 		}
 	}
+
+	// MARK: Reducer
 
 	@Dependency(\.radixConnectClient) var radixConnectClient
 	@Dependency(\.errorQueue) var errorQueue
@@ -69,12 +83,9 @@ public struct P2PLinksFeature: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .task:
-			return .run { send in
-				await send(.internal(.loadLinksResult(
-					TaskResult {
-						try await radixConnectClient.getP2PLinks()
-					}
-				)))
+			return .task {
+				let result = await TaskResult { try await radixConnectClient.getP2PLinks() }
+				return .internal(.loadLinksResult(result))
 			}
 
 		case .addNewConnectionButtonTapped:
@@ -118,13 +129,8 @@ public struct P2PLinksFeature: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
 		case let .connection(id, .delegate(.deleteConnection)):
-			return .task {
-				let result = await TaskResult {
-					try await radixConnectClient.deleteP2PLinkByPassword(id)
-					return id
-				}
-				return .internal(.deleteConnectionResult(result))
-			}
+			state.destination = .removeConnection(.confirmRemoval(id: id))
+			return .none
 
 		case let .destination(.presented(.newConnection(.delegate(.newConnection(connectedClient))))):
 			state.destination = nil
@@ -141,8 +147,34 @@ public struct P2PLinksFeature: Sendable, FeatureReducer {
 			state.destination = nil
 			return .none
 
+		case let .destination(.presented(.removeConnection(.removeTapped(id)))):
+			return .task {
+				let result = await TaskResult {
+					try await radixConnectClient.deleteP2PLinkByPassword(id)
+					return id
+				}
+				return .internal(.deleteConnectionResult(result))
+			}
+
 		default:
 			return .none
+		}
+	}
+}
+
+extension AlertState<P2PLinksFeature.Destinations.Action.RemoveConnection> {
+	static func confirmRemoval(id: ConnectionPassword) -> AlertState {
+		AlertState {
+			TextState(L10n.LinkedConnectors.RemoveConnectionAlert.title)
+		} actions: {
+			ButtonState(role: .destructive, action: .removeTapped(id)) {
+				TextState(L10n.LinkedConnectors.RemoveConnectionAlert.removeButtonTitle)
+			}
+			ButtonState(role: .cancel) {
+				TextState(L10n.Common.cancel)
+			}
+		} message: {
+			TextState(L10n.LinkedConnectors.RemoveConnectionAlert.message)
 		}
 	}
 }
