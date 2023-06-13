@@ -1,14 +1,14 @@
 import FeaturePrelude
 
 extension SecurityStructureConfigurationRow.State {
-	var viewStore: SecurityStructureConfigurationRow.viewStore {
+	var viewState: SecurityStructureConfigurationRow.ViewState {
 		.init(label: config.label.rawValue, createdOn: config.created)
 	}
 }
 
 // MARK: - SecurityStructureConfigurationRow.View
 extension SecurityStructureConfigurationRow {
-	public struct viewStore: Equatable {
+	public struct ViewState: Equatable {
 		let label: String
 		let createdOn: Date
 	}
@@ -22,7 +22,7 @@ extension SecurityStructureConfigurationRow {
 		}
 
 		public var body: some SwiftUI.View {
-			WithViewStore(store, observe: \.viewStore, send: { .view($0) }) { viewStore in
+			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				Card(.app.gray5, action: { viewStore.send(.displayDetails) }) {
 					HStack {
 						VStack(alignment: .leading, spacing: 0) {

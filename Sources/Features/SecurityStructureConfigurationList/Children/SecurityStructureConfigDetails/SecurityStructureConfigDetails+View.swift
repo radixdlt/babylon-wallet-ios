@@ -23,7 +23,7 @@ extension SecurityStructureConfigDetails {
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				VStack {
-					Text("\(viewStore.label)")
+					Text(viewStore.label)
 						.font(.app.sheetTitle)
 						.background(Color.yellow)
 						.foregroundColor(.red)

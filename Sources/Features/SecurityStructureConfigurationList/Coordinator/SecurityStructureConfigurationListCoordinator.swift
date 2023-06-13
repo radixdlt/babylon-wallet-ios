@@ -16,10 +16,6 @@ public struct SecurityStructureConfigurationListCoordinator: Sendable, FeatureRe
 		}
 	}
 
-	public enum ViewAction: Sendable, Equatable {
-		case appeared
-	}
-
 	public enum ChildAction: Sendable, Equatable {
 		case configList(SecurityStructureConfigurationList.Action)
 		case destination(PresentationAction<Destination.Action>)
@@ -63,13 +59,6 @@ public struct SecurityStructureConfigurationListCoordinator: Sendable, FeatureRe
 			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
 				Destination()
 			}
-	}
-
-	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
-		switch viewAction {
-		case .appeared:
-			return .none
-		}
 	}
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {

@@ -18,7 +18,6 @@ extension SecurityStructureConfigurationListCoordinator {
 					action: { .child(.configList($0)) }
 				)
 			)
-			.onAppear { ViewStore(store.stateless).send(.view(.appeared)) }
 			.destination(store: store)
 		}
 	}

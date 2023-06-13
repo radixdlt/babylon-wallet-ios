@@ -49,9 +49,9 @@ public struct SecurityStructureConfigurationList: Sendable, FeatureReducer {
 		case .task:
 			return .task {
 				let configs = await appPreferencesClient.getPreferences().security.structureConfigurations
-				return .internal(.configsLoaded(.init(uncheckedUniqueElements: configs.map {
-					.init(config: $0)
-				})))
+				return .internal(.configsLoaded(.init(
+					uncheckedUniqueElements: configs.map(SecurityStructureConfigurationRow.State.init))
+				))
 			}
 		case .createNewStructure:
 			return .send(.delegate(.createNewStructure))
