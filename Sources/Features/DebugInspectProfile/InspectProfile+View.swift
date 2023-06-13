@@ -193,7 +193,7 @@ extension FactorSourceView {
 			}
 		}
 		.background {
-			Color.randomDark(seed: factorSource.id.hexCodable.data)
+			Color.randomDark(seed: factorSource.id.description.data(using: .utf8)!)
 		}
 		.foregroundColor(.white)
 		.padding(.leading, leadingPadding)

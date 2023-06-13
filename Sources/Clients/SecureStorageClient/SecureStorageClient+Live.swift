@@ -307,5 +307,5 @@ extension ProfileSnapshot.Header.ID {
 }
 
 private func key(factorSourceID: FactorSource.ID) -> KeychainClient.Key {
-	.init(rawValue: .init(rawValue: factorSourceID.hexCodable.hex())!)
+	.init(rawValue: .init(rawValue: factorSourceID.description)!)
 }
