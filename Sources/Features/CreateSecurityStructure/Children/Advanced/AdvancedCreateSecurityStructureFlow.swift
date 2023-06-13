@@ -4,7 +4,7 @@ import FeaturePrelude
 public struct AdvancedCreateSecurityStructureFlow: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public enum Mode: Sendable, Hashable {
-			case existing(SecurityStructureConfiguration)
+			case existing(SecurityStructureConfiguration, isEditing: Bool = false)
 			case new(New)
 
 			public struct New: Sendable, Hashable {}

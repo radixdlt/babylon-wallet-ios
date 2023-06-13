@@ -14,7 +14,7 @@ public struct SimpleUnnamedSecurityStructureConfig: Sendable, Hashable {
 public struct SimpleCreateSecurityStructureFlow: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public enum Mode: Sendable, Hashable {
-			case existing(SecurityStructureConfiguration)
+			case existing(SecurityStructureConfiguration, isEditing: Bool = false)
 			case new(New)
 
 			public struct New: Sendable, Hashable {
@@ -44,6 +44,7 @@ public struct SimpleCreateSecurityStructureFlow: Sendable, FeatureReducer {
 	}
 
 	public enum ViewAction: Sendable, Equatable {
+		case editChanged
 		case selectNewPhoneConfirmer
 		case selectLostPhoneHelper
 		case finishSelectingFactors(RecoveryAndConfirmationFactors)
@@ -98,10 +99,10 @@ public struct SimpleCreateSecurityStructureFlow: Sendable, FeatureReducer {
 			case var .new(new):
 				new.lostPhoneHelper = lostPhoneHelper
 				state.mode = .new(new)
-			case var .existing(existing):
+			case .existing(var existing, let isEditing):
 				// FIXME: Error handling
 				try! existing.configuration.recoveryRole.changeFactorSource(to: lostPhoneHelper)
-				state.mode = .existing(existing)
+				state.mode = .existing(existing, isEditing: isEditing)
 			}
 			state.modalDestinations = nil
 			return .none
@@ -117,10 +118,10 @@ public struct SimpleCreateSecurityStructureFlow: Sendable, FeatureReducer {
 			case var .new(new):
 				new.newPhoneConfirmer = newPhoneConfirmer
 				state.mode = .new(new)
-			case var .existing(existing):
+			case .existing(var existing, let isEditing):
 				// FIXME: Error handling
 				try! existing.configuration.confirmationRole.changeFactorSource(to: newPhoneConfirmer)
-				state.mode = .existing(existing)
+				state.mode = .existing(existing, isEditing: isEditing)
 			}
 			state.modalDestinations = nil
 			return .none
@@ -142,6 +143,19 @@ public struct SimpleCreateSecurityStructureFlow: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
+		case .editChanged:
+			switch state.mode {
+			case .new:
+				preconditionFailure("should not have been able to toggle Edit mode during creation of a new security config")
+			case let .existing(existing, wasEditing):
+				if wasEditing {
+					fatalError("save now?")
+				} else {
+					state.mode = .existing(existing, isEditing: true)
+				}
+			}
+			return .none
+
 		case .selectNewPhoneConfirmer:
 			state.modalDestinations = .simpleNewPhoneConfirmer(.init(purpose: .encrypt))
 			return .none
@@ -173,7 +187,7 @@ public struct SimpleCreateSecurityStructureFlow: Sendable, FeatureReducer {
 					return .delegate(.createSecurityStructure(taskResult))
 				}
 
-			case let .existing(configToUpdate):
+			case let .existing(configToUpdate, _):
 				return .send(.delegate(.updateExisting(configToUpdate)))
 			}
 		}

@@ -18,6 +18,25 @@ public struct RecoveryAndConfirmationFactors: Sendable, Hashable {
 // MARK: - SimpleCreateSecurityStructureFlow.View
 extension SimpleCreateSecurityStructureFlow {
 	public struct ViewState: Equatable {
+		public enum Mode: Equatable {
+			case new
+			case existing(isEditing: Bool)
+			var isExisting: Bool {
+				guard case .existing = self else {
+					return false
+				}
+				return true
+			}
+
+			var isEditing: Bool {
+				guard case let .existing(isEditing) = self else {
+					return false
+				}
+				return isEditing
+			}
+		}
+
+		let mode: Mode
 		let newPhoneConfirmer: SecurityQuestionsFactorSource?
 		let lostPhoneHelper: TrustedContactFactorSource?
 		var simpleSecurityStructure: RecoveryAndConfirmationFactors? {
@@ -30,15 +49,20 @@ extension SimpleCreateSecurityStructureFlow {
 			)
 		}
 
+		let isDisabled: Bool
 		init(state: SimpleCreateSecurityStructureFlow.State) {
 			switch state.mode {
-			case let .existing(existing):
+			case let .existing(existing, isEditing):
 				precondition(existing.isSimple)
 				self.newPhoneConfirmer = try! existing.configuration.confirmationRole.thresholdFactors[0].extract(as: SecurityQuestionsFactorSource.self)
 				self.lostPhoneHelper = try! existing.configuration.recoveryRole.thresholdFactors[0].extract(as: TrustedContactFactorSource.self)
+				self.mode = .existing(isEditing: isEditing)
+				self.isDisabled = !isEditing
 			case let .new(new):
 				self.newPhoneConfirmer = new.newPhoneConfirmer
 				self.lostPhoneHelper = new.lostPhoneHelper
+				self.mode = .new
+				self.isDisabled = false
 			}
 		}
 	}
@@ -66,7 +90,17 @@ extension SimpleCreateSecurityStructureFlow {
 						}
 					}
 				}
+				.disabled(viewStore.isDisabled)
 				.navigationTitle("Multi-Factor Setup") // FIXME: Strings
+				.toolbar {
+					if viewStore.mode.isExisting {
+						ToolbarItem(placement: .navigationBarTrailing) {
+							Button(viewStore.mode.isEditing ? "Done" : "Edit") {
+								viewStore.send(.editChanged)
+							}
+						}
+					}
+				}
 				.footer {
 					WithControlRequirements(
 						viewStore.simpleSecurityStructure,
