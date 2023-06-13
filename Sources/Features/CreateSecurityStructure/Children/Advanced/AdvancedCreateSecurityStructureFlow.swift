@@ -3,7 +3,18 @@ import FeaturePrelude
 // MARK: - AdvancedCreateSecurityStructureFlow
 public struct AdvancedCreateSecurityStructureFlow: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
-		public init() {}
+		public enum Mode: Sendable, Hashable {
+			case existing(SecurityStructureConfiguration)
+			case new(New)
+
+			public struct New: Sendable, Hashable {}
+		}
+
+		public var mode: Mode
+
+		public init(mode: Mode) {
+			self.mode = mode
+		}
 	}
 
 	public enum ViewAction: Sendable, Equatable {

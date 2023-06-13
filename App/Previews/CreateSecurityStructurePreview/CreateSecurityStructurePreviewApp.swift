@@ -3,7 +3,11 @@ import Cryptography
 import FeaturesPreviewerFeature
 
 // MARK: - CreateSecurityStructureCoordinator.State + EmptyInitializable
-extension CreateSecurityStructureCoordinator.State: EmptyInitializable {}
+extension CreateSecurityStructureCoordinator.State: EmptyInitializable {
+	public init() {
+		self.init(mode: .new)
+	}
+}
 
 // MARK: - CreateSecurityStructureCoordinator.View + FeatureView
 extension CreateSecurityStructureCoordinator.View: FeatureView {

@@ -13,21 +13,33 @@ public struct SimpleUnnamedSecurityStructureConfig: Sendable, Hashable {
 // MARK: - SimpleCreateSecurityStructureFlow
 public struct SimpleCreateSecurityStructureFlow: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
-		/// Confirmation role
-		public var newPhoneConfirmer: SecurityQuestionsFactorSource?
+		public enum Mode: Sendable, Hashable {
+			case existing(SecurityStructureConfiguration)
+			case new(New)
 
-		/// Recovery role
-		public var lostPhoneHelper: TrustedContactFactorSource?
+			public struct New: Sendable, Hashable {
+				public var lostPhoneHelper: TrustedContactFactorSource?
+				public var newPhoneConfirmer: SecurityQuestionsFactorSource?
+
+				public init(
+					lostPhoneHelper: TrustedContactFactorSource? = nil,
+					newPhoneConfirmer: SecurityQuestionsFactorSource? = nil
+				) {
+					self.lostPhoneHelper = lostPhoneHelper
+					self.newPhoneConfirmer = newPhoneConfirmer
+				}
+			}
+		}
+
+		public var mode: Mode
 
 		@PresentationState
 		public var modalDestinations: ModalDestinations.State?
 
 		public init(
-			newPhoneConfirmer: SecurityQuestionsFactorSource? = nil,
-			lostPhoneHelper: TrustedContactFactorSource? = nil
+			mode: Mode = .new(.init())
 		) {
-			self.newPhoneConfirmer = newPhoneConfirmer
-			self.lostPhoneHelper = lostPhoneHelper
+			self.mode = mode
 		}
 	}
 
@@ -39,6 +51,7 @@ public struct SimpleCreateSecurityStructureFlow: Sendable, FeatureReducer {
 
 	public enum DelegateAction: Sendable, Equatable {
 		case createSecurityStructure(TaskResult<SimpleUnnamedSecurityStructureConfig>)
+		case updateExisting(SecurityStructureConfiguration)
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -81,7 +94,15 @@ public struct SimpleCreateSecurityStructureFlow: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
 		case let .modalDestinations(.presented(.simpleLostPhoneHelper(.delegate(.done(.success(lostPhoneHelper)))))):
-			state.lostPhoneHelper = lostPhoneHelper
+			switch state.mode {
+			case var .new(new):
+				new.lostPhoneHelper = lostPhoneHelper
+				state.mode = .new(new)
+			case var .existing(existing):
+				// FIXME: Error handling
+				try! existing.configuration.recoveryRole.changeFactorSource(to: lostPhoneHelper)
+				state.mode = .existing(existing)
+			}
 			state.modalDestinations = nil
 			return .none
 
@@ -92,7 +113,15 @@ public struct SimpleCreateSecurityStructureFlow: Sendable, FeatureReducer {
 			return .none
 
 		case let .modalDestinations(.presented(.simpleNewPhoneConfirmer(.delegate(.done(.success(.encrypted(newPhoneConfirmer))))))):
-			state.newPhoneConfirmer = newPhoneConfirmer
+			switch state.mode {
+			case var .new(new):
+				new.newPhoneConfirmer = newPhoneConfirmer
+				state.mode = .new(new)
+			case var .existing(existing):
+				// FIXME: Error handling
+				try! existing.configuration.confirmationRole.changeFactorSource(to: newPhoneConfirmer)
+				state.mode = .existing(existing)
+			}
 			state.modalDestinations = nil
 			return .none
 
@@ -120,22 +149,32 @@ public struct SimpleCreateSecurityStructureFlow: Sendable, FeatureReducer {
 		case .selectLostPhoneHelper:
 			state.modalDestinations = .simpleLostPhoneHelper(.init())
 			return .none
+
 		case let .finishSelectingFactors(simpleFactorConfig):
-			return .task {
-				let taskResult = await TaskResult {
-					let primary = try await factorSourcesClient.getFactorSources(type: DeviceFactorSource.self).filter {
-						!$0.supportsOlympia
-					}.first!
 
-					let simpleUnnamed = SimpleUnnamedSecurityStructureConfig(
-						singlePrimaryFactor: primary,
-						singleRecoveryFactor: simpleFactorConfig.singleRecoveryFactor,
-						singleConfirmationFactor: simpleFactorConfig.singleConfirmationFactor
-					)
+			switch state.mode {
+			case let .new(new):
+				precondition(new.lostPhoneHelper == simpleFactorConfig.singleRecoveryFactor)
+				precondition(new.newPhoneConfirmer == simpleFactorConfig.singleConfirmationFactor)
+				return .task {
+					let taskResult = await TaskResult {
+						let primary = try await factorSourcesClient.getFactorSources(type: DeviceFactorSource.self).filter {
+							!$0.supportsOlympia
+						}.first!
 
-					return simpleUnnamed
+						let simpleUnnamed = SimpleUnnamedSecurityStructureConfig(
+							singlePrimaryFactor: primary,
+							singleRecoveryFactor: simpleFactorConfig.singleRecoveryFactor,
+							singleConfirmationFactor: simpleFactorConfig.singleConfirmationFactor
+						)
+
+						return simpleUnnamed
+					}
+					return .delegate(.createSecurityStructure(taskResult))
 				}
-				return .delegate(.createSecurityStructure(taskResult))
+
+			case let .existing(configToUpdate):
+				return .send(.delegate(.updateExisting(configToUpdate)))
 			}
 		}
 	}

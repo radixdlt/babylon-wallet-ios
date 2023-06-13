@@ -5,7 +5,7 @@ import Logging
 
 extension SimpleCreateSecurityStructureFlow.State {
 	var viewState: SimpleCreateSecurityStructureFlow.ViewState {
-		.init(newPhoneConfirmer: newPhoneConfirmer, lostPhoneHelper: lostPhoneHelper)
+		.init(state: self)
 	}
 }
 
@@ -28,6 +28,18 @@ extension SimpleCreateSecurityStructureFlow {
 				singleRecoveryFactor: lostPhoneHelper,
 				singleConfirmationFactor: newPhoneConfirmer
 			)
+		}
+
+		init(state: SimpleCreateSecurityStructureFlow.State) {
+			switch state.mode {
+			case let .existing(existing):
+				precondition(existing.isSimple)
+				self.newPhoneConfirmer = try! existing.configuration.confirmationRole.thresholdFactors[0].extract(as: SecurityQuestionsFactorSource.self)
+				self.lostPhoneHelper = try! existing.configuration.recoveryRole.thresholdFactors[0].extract(as: TrustedContactFactorSource.self)
+			case let .new(new):
+				self.newPhoneConfirmer = new.newPhoneConfirmer
+				self.lostPhoneHelper = new.lostPhoneHelper
+			}
 		}
 	}
 
@@ -110,25 +122,25 @@ extension View {
 	}
 }
 
-#if DEBUG
-import SwiftUI // NB: necessary for previews to appear
-
-// MARK: - SimpleCreateSecurityStructureFlow_Preview
-struct SimpleCreateSecurityStructureFlow_Preview: PreviewProvider {
-	static var previews: some View {
-		SimpleCreateSecurityStructureFlow.View(
-			store: .init(
-				initialState: .previewValue,
-				reducer: SimpleCreateSecurityStructureFlow()
-			)
-		)
-	}
-}
-
-extension SimpleCreateSecurityStructureFlow.State {
-	public static let previewValue = Self(
-		newPhoneConfirmer: nil,
-		lostPhoneHelper: nil
-	)
-}
-#endif
+// #if DEBUG
+// import SwiftUI // NB: necessary for previews to appear
+//
+//// MARK: - SimpleCreateSecurityStructureFlow_Preview
+// struct SimpleCreateSecurityStructureFlow_Preview: PreviewProvider {
+//	static var previews: some View {
+//		SimpleCreateSecurityStructureFlow.View(
+//			store: .init(
+//				initialState: .previewValue,
+//				reducer: SimpleCreateSecurityStructureFlow()
+//			)
+//		)
+//	}
+// }
+//
+// extension SimpleCreateSecurityStructureFlow.State {
+//	public static let previewValue = Self(
+//		newPhoneConfirmer: nil,
+//		lostPhoneHelper: nil
+//	)
+// }
+// #endif

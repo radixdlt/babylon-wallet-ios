@@ -11,14 +11,14 @@ public struct RoleOfTier<Role, AbstractFactor>:
 
 	/// Factors which are used in combination with other instances, amounting to at
 	/// least `threshold` many instances to perform some function with this role.
-	public let thresholdFactors: OrderedSet<AbstractFactor>
+	public var thresholdFactors: OrderedSet<AbstractFactor>
 
 	/// How many threshold factors that must be used to perform some function with this role.
-	public let threshold: UInt
+	public var threshold: UInt
 
 	/// "sudo" factors, any **single** factor which can perform some function with this role,
 	/// disregarding of `threshold`.
-	public let superAdminFactors: OrderedSet<AbstractFactor>
+	public var superAdminFactors: OrderedSet<AbstractFactor>
 
 	public init(
 		thresholdFactors: OrderedSet<AbstractFactor>,
@@ -84,9 +84,9 @@ public struct AbstractSecurityStructure<AbstractFactor>:
 	public typealias Primary = PrimaryRole<AbstractFactor>
 	public typealias Recovery = RecoveryRole<AbstractFactor>
 	public typealias Confirmation = ConfirmationRole<AbstractFactor>
-	public let primaryRole: Primary
-	public let recoveryRole: Recovery
-	public let confirmationRole: Confirmation
+	public var primaryRole: Primary
+	public var recoveryRole: Recovery
+	public var confirmationRole: Confirmation
 
 	public init(
 		primaryRole: Primary,
@@ -106,7 +106,10 @@ public struct AbstractSecurityStructureConfiguration<AbstractFactor>:
 {
 	public typealias Configuration = AbstractSecurityStructure<AbstractFactor>
 	public let label: NonEmptyString
-	public let configuration: Configuration
+
+	// Mutable so that we can update
+	public var configuration: Configuration
+
 	public let created: Date
 
 	public init(
@@ -128,6 +131,49 @@ extension ProfileSnapshot {
 }
 
 public typealias SecurityStructureConfiguration = AbstractSecurityStructureConfiguration<FactorSource>
+
+extension SecurityStructureConfiguration {
+	public var isSimple: Bool {
+		configuration.isSimple
+	}
+}
+
+extension SecurityStructureConfiguration.Configuration {
+	public var isSimple: Bool {
+		primaryRole.hasSingleFactorSourceOf(kind: .device) &&
+			recoveryRole.hasSingleFactorSourceOf(kind: .trustedContact) &&
+			confirmationRole.hasSingleFactorSourceOf(kind: .securityQuestions)
+	}
+}
+
+extension RoleOfTier {
+	public var isSimple: Bool {
+		superAdminFactors.isEmpty && threshold == 1 && thresholdFactors.count == 1
+	}
+}
+
+extension RoleOfTier where AbstractFactor == FactorSource {
+	public func hasSingleFactorSourceOf(kind expectedKind: FactorSourceKind) -> Bool {
+		guard isSimple, let singleFactor = thresholdFactors.first else {
+			return false
+		}
+		return singleFactor.kind == expectedKind
+	}
+
+	public mutating func changeFactorSource(to newFactorSource: any FactorSourceProtocol) throws {
+		try changeFactorSource(to: newFactorSource.embed())
+	}
+
+	public mutating func changeFactorSource(to newFactorSource: FactorSource) throws {
+		guard isSimple else {
+			throw UnableToChangeFactorSourceOfAdvancedSecurityStructureUsingSingleFactorSourceInput()
+		}
+		self.thresholdFactors = [newFactorSource]
+	}
+}
+
+// MARK: - UnableToChangeFactorSourceOfAdvancedSecurityStructureUsingSingleFactorSourceInput
+struct UnableToChangeFactorSourceOfAdvancedSecurityStructureUsingSingleFactorSourceInput: Swift.Error {}
 
 public typealias AppliedSecurityStructure = AbstractSecurityStructure<FactorInstance>
 

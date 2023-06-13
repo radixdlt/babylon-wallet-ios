@@ -1,16 +1,30 @@
-
-import FactorSourcesClient
+import AppPreferencesClient
 import FeaturePrelude
 import Profile
 
 // MARK: - CreateSecurityStructureCoordinator
 public struct CreateSecurityStructureCoordinator: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
-		var root: Path.State
-		var path: StackState<Path.State> = []
+		public var mode: Mode
+		public var root: Path.State
+		public var path: StackState<Path.State> = []
 
-		public init() {
-			root = .start(.init())
+		public enum Mode: Sendable, Hashable {
+			case existing(SecurityStructureConfiguration)
+			case new
+		}
+
+		public init(mode: Mode = .new) {
+			self.mode = mode
+			switch mode {
+			case let .existing(config) where config.isSimple:
+				self.root = .simpleSetupFlow(.init(mode: .existing(config)))
+			case let .existing(config) where !config.isSimple:
+				self.root = .advancedSetupFlow(.init(mode: .existing(config)))
+			case .existing: preconditionFailure("Already handled above")
+			case .new:
+				self.root = .start(.init())
+			}
 		}
 	}
 
@@ -60,7 +74,7 @@ public struct CreateSecurityStructureCoordinator: Sendable, FeatureReducer {
 	}
 
 	@Dependency(\.errorQueue) var errorQueue
-	@Dependency(\.factorSourcesClient) var factorSourcesClient
+	@Dependency(\.appPreferencesClient) var appPreferencesClient
 	public init() {}
 
 	public var body: some ReducerProtocolOf<Self> {
@@ -80,7 +94,7 @@ public struct CreateSecurityStructureCoordinator: Sendable, FeatureReducer {
 			state.path.append(.simpleSetupFlow(.init()))
 			return .none
 		case .root(.start(.delegate(.advancedFlow))):
-			state.path.append(.advancedSetupFlow(.init()))
+			state.path.append(.advancedSetupFlow(.init(mode: .new(.init()))))
 			return .none
 
 		case let .path(.element(_, action: .simpleSetupFlow(.delegate(.createSecurityStructure(simpleFlowResult))))):
@@ -95,6 +109,18 @@ public struct CreateSecurityStructureCoordinator: Sendable, FeatureReducer {
 			}
 
 			return .none
+
+		case let .path(.element(_, action: .simpleSetupFlow(.delegate(.updateExisting(updated))))):
+			return .task {
+				let taskResult = await TaskResult {
+					try await appPreferencesClient.updating { preferences in
+						let wasUpdated = preferences.security.structureConfigurations.updateOrAppend(updated) != nil
+						assert(wasUpdated)
+						return updated
+					}
+				}
+				return .delegate(.done(taskResult))
+			}
 
 		case let .path(.element(_, action: .nameNewStructure(.delegate(.securityStructureCreationResult(result))))):
 			return .send(.delegate(.done(result)))
