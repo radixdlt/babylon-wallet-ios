@@ -3,6 +3,8 @@ import Prelude
 
 // MARK: - LedgerHardwareWalletFactorSource
 public struct LedgerHardwareWalletFactorSource: FactorSourceProtocol {
+	public typealias ID = FactorSourceID.FromHash
+	public let id: ID
 	public var common: FactorSource.Common // We update `lastUsed`
 	public let hint: Hint
 
@@ -10,11 +12,13 @@ public struct LedgerHardwareWalletFactorSource: FactorSourceProtocol {
 	public var nextDerivationIndicesPerNetwork: NextDerivationIndicesPerNetwork?
 
 	internal init(
+		id: ID,
 		common: FactorSource.Common,
 		hint: Hint,
 		nextDerivationIndicesPerNetwork: NextDerivationIndicesPerNetwork?
 	) {
-		precondition(common.id.kind == Self.kind)
+		precondition(id.kind == Self.kind)
+		self.id = id
 		self.common = common
 		self.hint = hint
 		self.nextDerivationIndicesPerNetwork = nextDerivationIndicesPerNetwork
@@ -72,7 +76,8 @@ extension LedgerHardwareWalletFactorSource {
 		deviceID: HexCodable32Bytes
 	) throws -> Self {
 		try .init(
-			common: Self.common(hashForID: deviceID.data),
+			id: ID(kind: .ledgerHQHardwareWallet, body: deviceID),
+			common: Self.common(isOlympiaCompatible: true),
 			hint: .init(name: name, model: model),
 			nextDerivationIndicesPerNetwork: .init()
 		)

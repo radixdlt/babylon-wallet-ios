@@ -3,6 +3,9 @@ import Prelude
 
 // MARK: - DeviceFactorSource
 public struct DeviceFactorSource: FactorSourceProtocol {
+	public typealias ID = FactorSourceID.FromHash
+
+	public let id: ID
 	public var common: FactorSource.Common // We update `lastUsed`
 
 	public var hint: Hint // We update "name"
@@ -10,11 +13,13 @@ public struct DeviceFactorSource: FactorSourceProtocol {
 	public var nextDerivationIndicesPerNetwork: NextDerivationIndicesPerNetwork? // nil for olympia
 
 	internal init(
+		id: ID,
 		common: FactorSource.Common,
 		hint: Hint,
 		nextDerivationIndicesPerNetwork: NextDerivationIndicesPerNetwork? = nil
 	) {
-		precondition(common.id.kind == Self.kind)
+		precondition(id.kind == Self.kind)
+		self.id = id
 		self.common = common
 		self.hint = hint
 		self.nextDerivationIndicesPerNetwork = nextDerivationIndicesPerNetwork
@@ -51,9 +56,8 @@ extension DeviceFactorSource {
 	) throws -> Self {
 		@Dependency(\.date) var date
 		return try Self(
+			id: .init(kind: .device, mnemonicWithPassphrase: mnemonicWithPassphrase),
 			common: .from(
-				factorSourceKind: Self.kind,
-				mnemonicWithPassphrase: mnemonicWithPassphrase,
 				cryptoParameters: isOlympiaCompatible ? .olympiaBackwardsCompatible : .babylon,
 				addedOn: addedOn ?? date(),
 				lastUsedOn: lastUsedOn ?? date()

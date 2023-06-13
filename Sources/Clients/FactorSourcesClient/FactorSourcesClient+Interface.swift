@@ -123,11 +123,11 @@ extension FactorSourcesClient {
 
 // MARK: - UpdateFactorSourceLastUsedRequest
 public struct UpdateFactorSourceLastUsedRequest: Sendable, Hashable {
-	public let factorSourceIDs: [FactorSource.ID]
+	public let factorSourceIDs: [FactorSourceID]
 	public let lastUsedOn: Date
 	public let usagePurpose: SigningPurpose
 	public init(
-		factorSourceIDs: [FactorSource.ID],
+		factorSourceIDs: [FactorSourceID],
 		usagePurpose: SigningPurpose,
 		lastUsedOn: Date = .init()
 	) {
@@ -150,7 +150,7 @@ public enum MnemonicBasedFactorSourceKind: Sendable, Hashable {
 
 // MARK: - SigningFactor
 public struct SigningFactor: Sendable, Hashable, Identifiable {
-	public typealias ID = FactorSource.ID
+	public typealias ID = FactorSourceID
 	public var id: ID { factorSource.id }
 	public let factorSource: FactorSource
 	public typealias Signers = NonEmpty<IdentifiedArrayOf<Signer>>

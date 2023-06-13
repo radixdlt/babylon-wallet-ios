@@ -29,7 +29,7 @@ public struct FactorInstance: Sendable, Hashable, Codable, Identifiable {
 	/// factor instance. We will lookup the `FactorSource` in the
 	/// `Profile` and can present user with instruction to re-access
 	/// this factor source in order control the `badge`.
-	public let factorSourceID: FactorSource.ID
+	public let factorSourceID: FactorSourceID
 
 	// FIXME: CHANGE TO STORED PROPERTY, COMPLETELY incorrectly implemented, MUST be sent in probably, because Profile cannot
 	// use EngineToolkit which we must, to do Blake hash.
@@ -76,7 +76,7 @@ public struct FactorInstance: Sendable, Hashable, Codable, Identifiable {
 	public let badge: Badge
 
 	public init(
-		factorSourceID: FactorSource.ID,
+		factorSourceID: FactorSourceID,
 		badge: Badge
 	) {
 		self.factorSourceID = factorSourceID
@@ -225,7 +225,7 @@ public struct HierarchicalDeterministicPublicKey: Sendable, Hashable, Codable {
 // MARK: - HierarchicalDeterministicFactorInstance
 /// A virtual hierarchical deterministic `FactorInstance`
 public struct HierarchicalDeterministicFactorInstance: Sendable, Hashable, Codable {
-	public let factorSourceID: FactorSource.ID
+	public let factorSourceID: FactorSourceID
 	public let publicKey: SLIP10.PublicKey
 	public let derivationPath: DerivationPath
 
@@ -242,7 +242,7 @@ public struct HierarchicalDeterministicFactorInstance: Sendable, Hashable, Codab
 	}
 
 	public init(
-		factorSourceID: FactorSource.ID,
+		factorSourceID: FactorSourceID,
 		publicKey: SLIP10.PublicKey,
 		derivationPath: DerivationPath
 	) {

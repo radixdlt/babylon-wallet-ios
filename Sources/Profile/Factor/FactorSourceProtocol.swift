@@ -7,31 +7,21 @@ public protocol FactorSourceProtocol:
 	Sendable,
 	Hashable,
 	Codable,
-	Identifiable where ID == FactorSourceID
+	Identifiable where ID: FactorSourceIDProtocol
 {
 	static var kind: FactorSourceKind { get }
 	static var casePath: CasePath<FactorSource, Self> { get }
 }
 
 extension FactorSourceProtocol {
-	public var id: ID { common.id }
 	public var kind: FactorSourceKind { Self.kind }
 	public var casePath: CasePath<FactorSource, Self> { Self.casePath }
-	public static func id(hash: some DataProtocol) throws -> ID {
-		try .hash(.init(
-			kind: kind,
-			body: .init(data: Data(hash))
-		)
-		)
-	}
 
 	public static func common(
-		hashForID: some DataProtocol,
 		isOlympiaCompatible: Bool = false
 	) throws -> FactorSource.Common {
 		@Dependency(\.date) var date
-		return try .init(
-			id: Self.id(hash: hashForID),
+		return .init(
 			cryptoParameters: isOlympiaCompatible ? .olympiaBackwardsCompatible : .babylon,
 			addedOn: date(),
 			lastUsedOn: date()

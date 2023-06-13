@@ -1,3 +1,4 @@
+import CasePaths
 import Foundation
 import Prelude
 
@@ -10,6 +11,18 @@ public protocol BaseFactorSourceIDProtocol {
 public protocol FactorSourceIDProtocol: BaseFactorSourceIDProtocol, Sendable, Hashable, CustomStringConvertible, Codable {
 	associatedtype Body: Sendable & Hashable & CustomStringConvertible
 	var body: Body { get }
+	static var casePath: CasePath<FactorSourceID, Self> { get }
+}
+
+extension FactorSourceIDProtocol {
+	public var casePath: CasePath<FactorSourceID, Self> { Self.casePath }
+	public func embed() -> FactorSourceID {
+		casePath.embed(self)
+	}
+
+	public static func extract(from factorSourceID: FactorSourceID) -> Self? {
+		casePath.extract(from: factorSourceID)
+	}
 }
 
 extension FactorSourceIDProtocol {
@@ -25,7 +38,26 @@ public enum FactorSourceID: BaseFactorSourceIDProtocol, Sendable, Hashable, Cust
 }
 
 extension FactorSourceID {
+	public func extract<F>(_ type: F.Type = F.self) -> F? where F: FactorSourceIDProtocol {
+		F.extract(from: self)
+	}
+
+	public func extract<F>(as _: F.Type = F.self) throws -> F where F: FactorSourceIDProtocol {
+		guard let extracted = extract(F.self) else {
+			throw IncorrectFactorSourceIDType(actual: self.discriminator)
+		}
+		return extracted
+	}
+}
+
+// MARK: - IncorrectFactorSourceIDType
+public struct IncorrectFactorSourceIDType: Swift.Error {
+	public let actual: FactorSourceID.Discriminator
+}
+
+extension FactorSourceID {
 	public struct FromHash: FactorSourceIDProtocol {
+		public static let casePath: CasePath<FactorSourceID, Self> = /FactorSourceID.hash
 		public let kind: FactorSourceKind
 		public let body: HexCodable32Bytes
 
@@ -39,6 +71,7 @@ extension FactorSourceID {
 	}
 
 	public struct FromAddress: FactorSourceIDProtocol {
+		public static let casePath: CasePath<FactorSourceID, Self> = /FactorSourceID.address
 		public let kind: FactorSourceKind
 		public let body: AccountAddress
 	}
@@ -47,6 +80,10 @@ extension FactorSourceID {
 extension FactorSourceID.FromHash {
 	public init(kind: FactorSourceKind, hash: some DataProtocol) throws {
 		try self.init(kind: kind, body: .init(data: Data(hash)))
+	}
+
+	public init(kind: FactorSourceKind, mnemonicWithPassphrase: MnemonicWithPassphrase) throws {
+		self = try FactorSource.id(fromRoot: mnemonicWithPassphrase.hdRoot(), factorSourceKind: kind)
 	}
 
 	public static func device(hash: some DataProtocol) throws -> Self {
@@ -94,12 +131,12 @@ extension FactorSourceID {
 }
 
 extension FactorSourceID {
-	public enum Discriminator: String, Codable {
+	public enum Discriminator: String, Sendable, Hashable, Codable {
 		case fromHash
 		case fromAddress
 	}
 
-	private var discriminator: Discriminator {
+	public var discriminator: Discriminator {
 		switch self {
 		case .hash: return .fromHash
 		case .address: return .fromAddress

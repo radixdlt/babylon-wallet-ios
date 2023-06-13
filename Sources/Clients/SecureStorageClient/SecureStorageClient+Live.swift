@@ -306,6 +306,6 @@ extension ProfileSnapshot.Header.ID {
 	}
 }
 
-private func key(factorSourceID: FactorSource.ID) -> KeychainClient.Key {
+private func key(factorSourceID: FactorSourceID) -> KeychainClient.Key {
 	.init(rawValue: .init(rawValue: factorSourceID.description)!)
 }

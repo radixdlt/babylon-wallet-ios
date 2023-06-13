@@ -2,6 +2,55 @@ import CasePaths
 import EngineToolkit
 import Prelude
 
+// MARK: - TrustedContactFactorSource
+public struct TrustedContactFactorSource: FactorSourceProtocol {
+	public typealias ID = FactorSourceID.FromAddress
+
+	public let id: ID
+	public var common: FactorSource.Common
+	public let emailAddress: EmailAddress
+	public let name: NonEmptyString
+
+	internal init(
+		id: ID,
+		common: FactorSource.Common,
+		emailAddress: EmailAddress,
+		name: NonEmptyString
+	) {
+		precondition(id.kind == Self.kind)
+		self.id = id
+		self.common = common
+		self.emailAddress = emailAddress
+		self.name = name
+	}
+}
+
+extension TrustedContactFactorSource {
+	public static let kind: FactorSourceKind = .trustedContact
+	public static var casePath: CasePath<FactorSource, Self> = /FactorSource.trustedContact
+}
+
+extension TrustedContactFactorSource {
+	public static func from(
+		radixAddress: AccountAddress,
+		emailAddress: EmailAddress,
+		name: NonEmptyString,
+		addedOn: Date? = nil,
+		lastUsedOn: Date? = nil
+	) -> Self {
+		@Dependency(\.date) var date
+		return Self(
+			id: .init(kind: .trustedContact, body: radixAddress),
+			common: .init(
+				addedOn: addedOn ?? date(),
+				lastUsedOn: lastUsedOn ?? date()
+			),
+			emailAddress: emailAddress,
+			name: name
+		)
+	}
+}
+
 // MARK: - EmailAddress
 public struct EmailAddress: Sendable, Hashable, Codable {
 	public let email: NonEmptyString
@@ -29,52 +78,5 @@ public struct EmailAddress: Sendable, Hashable, Codable {
 			throw InvalidEmailAddressCannotBeEmpty()
 		}
 		try self.init(validating: nonEmpty)
-	}
-}
-
-// MARK: - TrustedContactFactorSource
-public struct TrustedContactFactorSource: FactorSourceProtocol {
-	public var common: FactorSource.Common
-	public let emailAddress: EmailAddress
-	public let name: NonEmptyString
-
-	internal init(
-		common: FactorSource.Common,
-		emailAddress: EmailAddress,
-		name: NonEmptyString
-	) {
-		precondition(common.id.kind == Self.kind)
-		self.common = common
-		self.emailAddress = emailAddress
-		self.name = name
-	}
-}
-
-extension TrustedContactFactorSource {
-	public static let kind: FactorSourceKind = .trustedContact
-	public static var casePath: CasePath<FactorSource, Self> = /FactorSource.trustedContact
-}
-
-extension TrustedContactFactorSource {
-	public static func from(
-		radixAddress: AccountAddress,
-		emailAddress: EmailAddress,
-		name: NonEmptyString,
-		addedOn: Date? = nil,
-		lastUsedOn: Date? = nil
-	) -> Self {
-		@Dependency(\.date) var date
-		return Self(
-			common: .init(
-				id: .address(.init(
-					kind: .trustedContact,
-					body: radixAddress
-				)),
-				addedOn: addedOn ?? date(),
-				lastUsedOn: lastUsedOn ?? date()
-			),
-			emailAddress: emailAddress,
-			name: name
-		)
 	}
 }

@@ -53,7 +53,7 @@ public struct LedgerHardwareDevices: Sendable, FeatureReducer {
 
 	public enum ViewAction: Sendable, Equatable {
 		case onFirstTask
-		case selectedLedger(id: FactorSource.ID?)
+		case selectedLedger(id: FactorSourceID?)
 		case addNewLedgerButtonTapped
 		case confirmedLedger(LedgerHardwareWalletFactorSource)
 		case whatIsALedgerButtonTapped

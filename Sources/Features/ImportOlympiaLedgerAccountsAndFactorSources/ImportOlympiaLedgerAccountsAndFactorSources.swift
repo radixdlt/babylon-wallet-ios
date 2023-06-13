@@ -24,7 +24,7 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 			}
 		}
 
-		public let id: FactorSource.ID
+		public let id: FactorSourceID
 		public let migratedAccounts: NonEmpty<OrderedSet<MigratedAccount>>
 	}
 
