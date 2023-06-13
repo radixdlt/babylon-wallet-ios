@@ -185,7 +185,7 @@ extension SecureStorageClient: DependencyKey {
 				let mnemonicWithPassphrase = privateFactorSource.mnemonicWithPassphrase
 				let data = try jsonEncoder().encode(mnemonicWithPassphrase)
 				let mostSecureAccesibilityAndAuthenticationPolicy = try await queryMostSecureAccesibilityAndAuthenticationPolicy()
-				let key = key(factorSourceID: factorSource.id)
+				let key = key(factorSourceID: factorSource.id.embed())
 
 				try await keychainClient.setDataWithAuthenticationPolicyIfAble(
 					data: data,

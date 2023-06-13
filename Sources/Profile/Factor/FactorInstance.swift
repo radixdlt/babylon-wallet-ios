@@ -225,13 +225,13 @@ public struct HierarchicalDeterministicPublicKey: Sendable, Hashable, Codable {
 // MARK: - HierarchicalDeterministicFactorInstance
 /// A virtual hierarchical deterministic `FactorInstance`
 public struct HierarchicalDeterministicFactorInstance: Sendable, Hashable, Codable {
-	public let factorSourceID: FactorSourceID
+	public let factorSourceID: FactorSourceID.FromHash
 	public let publicKey: SLIP10.PublicKey
 	public let derivationPath: DerivationPath
 
 	public var factorInstance: FactorInstance {
 		.init(
-			factorSourceID: factorSourceID,
+			factorSourceID: factorSourceID.embed(),
 			badge: .virtual(
 				.hierarchicalDeterministic(.init(
 					publicKey: publicKey,
@@ -242,7 +242,7 @@ public struct HierarchicalDeterministicFactorInstance: Sendable, Hashable, Codab
 	}
 
 	public init(
-		factorSourceID: FactorSourceID,
+		factorSourceID: FactorSourceID.FromHash,
 		publicKey: SLIP10.PublicKey,
 		derivationPath: DerivationPath
 	) {
@@ -255,8 +255,8 @@ public struct HierarchicalDeterministicFactorInstance: Sendable, Hashable, Codab
 		guard case let .virtual(.hierarchicalDeterministic(badge)) = factorInstance.badge else {
 			throw BadgeIsNotVirtualHierarchicalDeterministic()
 		}
-		self.init(
-			factorSourceID: factorInstance.factorSourceID,
+		try self.init(
+			factorSourceID: factorInstance.factorSourceID.extract(),
 			publicKey: badge.publicKey,
 			derivationPath: badge.derivationPath
 		)

@@ -115,9 +115,11 @@ extension SecurityQuestionsFactorSource {
 		)
 
 		return try Self(
+			id: .init(
+				kind: .securityQuestions,
+				mnemonicWithPassphrase: .init(mnemonic: mnemonic)
+			),
 			common: .from(
-				factorSourceKind: Self.kind,
-				hdRoot: mnemonic.hdRoot(),
 				addedOn: addedOn ?? date(),
 				lastUsedOn: lastUsedOn ?? date()
 			),

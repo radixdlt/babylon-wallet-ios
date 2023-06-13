@@ -12,6 +12,7 @@ public protocol FactorSourceIDProtocol: BaseFactorSourceIDProtocol, Sendable, Ha
 	associatedtype Body: Sendable & Hashable & CustomStringConvertible
 	var body: Body { get }
 	static var casePath: CasePath<FactorSourceID, Self> { get }
+	func embed() -> FactorSourceID
 }
 
 extension FactorSourceIDProtocol {
@@ -102,9 +103,15 @@ extension FactorSourceID {
 }
 
 #if DEBUG
+extension FactorSourceID.FromHash {
+	public static func device(hash: String) throws -> Self {
+		try .device(hash: Data(hex: hash))
+	}
+}
+
 extension FactorSourceID {
 	public static func device(hash: String) throws -> Self {
-		try .hash(.device(hash: Data(hex: hash)))
+		try .hash(.device(hash: hash))
 	}
 }
 #endif

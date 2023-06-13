@@ -4,6 +4,7 @@ import Prelude
 
 // MARK: - FactorSource
 public enum FactorSource: BaseFactorSourceProtocol, Sendable, Hashable, Codable, Identifiable {
+	public typealias ID = FactorSourceID
 	case device(DeviceFactorSource)
 	case ledger(LedgerHardwareWalletFactorSource)
 	case offDeviceMnemonic(OffDeviceMnemonicFactorSource)
@@ -17,6 +18,11 @@ extension FactorSource {
 		set {
 			update(\.common, to: newValue)
 		}
+	}
+
+	public var id: ID {
+		//       switch self
+		fatalError()
 	}
 
 	public var kind: FactorSourceKind {

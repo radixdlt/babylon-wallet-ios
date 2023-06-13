@@ -421,12 +421,12 @@ final class ProfileTests: TestCase {
 
 		XCTAssertEqual(
 			profile.factorSources.first.id,
-			try FactorSource.id(fromRoot: curve25519FactorSourceMnemonic.hdRoot(), factorSourceKind: .device)
+			try FactorSource.id(fromRoot: curve25519FactorSourceMnemonic.hdRoot(), factorSourceKind: .device).embed()
 		)
 
 		XCTAssertEqual(
 			profile.factorSources.first(where: { $0.supportsOlympia })!.id,
-			try FactorSource.id(fromRoot: secp256K1FactorMnemonic.hdRoot(), factorSourceKind: .device)
+			try FactorSource.id(fromRoot: secp256K1FactorMnemonic.hdRoot(), factorSourceKind: .device).embed()
 		)
 
 		// Account 0
