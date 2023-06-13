@@ -204,7 +204,6 @@ extension FactorSourceView {
 public struct FactorSourceCommonView: View {
 	public let common: FactorSource.Common
 	public var body: some View {
-		Labeled("ID", value: common.id)
 		Labeled("Added On", value: common.addedOn.ISO8601Format())
 		Labeled("LastUsed On", value: common.lastUsedOn.ISO8601Format())
 		Labeled("Supported Curves", value: common.cryptoParameters.supportedCurves.map { String(describing: $0) }.joined())
