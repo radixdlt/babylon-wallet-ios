@@ -1,4 +1,4 @@
-public struct HexCodable32Bytes: Sendable, Codable, Equatable, Hashable {
+public struct HexCodable32Bytes: Sendable, Codable, Hashable, CustomStringConvertible {
 	struct IncorretByteCountError: Swift.Error {
 		let got: Int
 		let expected: Int
@@ -30,5 +30,9 @@ public struct HexCodable32Bytes: Sendable, Codable, Equatable, Hashable {
 	public init(from decoder: Decoder) throws {
 		let container = try decoder.singleValueContainer()
 		try self.init(container.decode(HexCodable.self))
+	}
+
+	public var description: String {
+		data.hex()
 	}
 }
