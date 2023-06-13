@@ -22,7 +22,7 @@ extension ImportMnemonic: PreviewedFeature {
 @main
 struct ImportMnemonicPreviewApp: SwiftUI.App {
 	var body: some Scene {
-		FeaturesPreviewer<ImportMnemonic>.scene {
+		FeaturesPreviewer<ImportMnemonic>.delegateAction {
 			guard case let .notSavedInProfile(mnemonic) = $0 else { return nil }
 			return .success(mnemonic)
 		}

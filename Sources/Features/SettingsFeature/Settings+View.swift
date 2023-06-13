@@ -12,6 +12,7 @@ import DebugInspectProfileFeature
 import EngineToolkit // read RET commit hash
 import RadixConnectModels // read signaling client url
 import SecureStorageClient
+import SecurityStructureConfigurationListFeature
 #endif
 
 // MARK: - AppSettings.View
@@ -98,6 +99,7 @@ extension View {
 			.importFromOlympiaLegacyWallet(with: destinationStore)
 			.factorSources(with: destinationStore)
 			.debugInspectProfile(with: destinationStore)
+			.securityStructureConfigs(with: destinationStore)
 		#endif // DEBUG
 	}
 
@@ -220,6 +222,18 @@ extension View {
 			destination: { DebugInspectProfile.View(store: $0) }
 		)
 	}
+
+	@MainActor
+	private func securityStructureConfigs(
+		with destinationStore: PresentationStoreOf<AppSettings.Destinations>
+	) -> some View {
+		navigationDestination(
+			store: destinationStore,
+			state: /AppSettings.Destinations.State.securityStructureConfigs,
+			action: AppSettings.Destinations.Action.securityStructureConfigs,
+			destination: { SecurityStructureConfigurationListCoordinator.View(store: $0) }
+		)
+	}
 	#endif
 }
 
@@ -328,6 +342,12 @@ extension AppSettings.View {
 				title: L10n.Settings.importFromLegacyWallet,
 				icon: .asset(AssetResource.generalSettings),
 				action: .importFromOlympiaWalletButtonTapped
+			),
+			.init(
+				// FIXME: Strings
+				title: "Multi-Factor Setups",
+				icon: .systemImage("lock.square.stack.fill"),
+				action: .securityStructureConfigsButtonTapped
 			),
 			.init( // ONLY DEBUG EVER
 				title: L10n.Settings.Debug.factorSources,

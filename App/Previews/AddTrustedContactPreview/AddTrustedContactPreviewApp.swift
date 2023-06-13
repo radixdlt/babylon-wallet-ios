@@ -18,7 +18,7 @@ extension AddTrustedContactFactorSource: PreviewedFeature {
 @main
 struct AddTrustedContactPreviewApp: SwiftUI.App {
 	var body: some Scene {
-		FeaturesPreviewer<AddTrustedContactFactorSource>.scene {
+		FeaturesPreviewer<AddTrustedContactFactorSource>.delegateAction {
 			guard case let .done(trustedContactFS) = $0 else { return nil }
 			return trustedContactFS
 		} withReducer: {
