@@ -49,9 +49,9 @@ public struct SecurityStructureConfigurationList: Sendable, FeatureReducer {
 		case .task:
 			return .task {
 				let configs = await appPreferencesClient.getPreferences().security.structureConfigurations
-				return .internal(.configsLoaded(.init(uncheckedUniqueElements: configs.map {
-					.init(config: $0)
-				})))
+				return .internal(.configsLoaded(.init(
+					uncheckedUniqueElements: configs.map(SecurityStructureConfigurationRow.State.init))
+				))
 			}
 		case .createNewStructure:
 			return .send(.delegate(.createNewStructure))
@@ -60,11 +60,7 @@ public struct SecurityStructureConfigurationList: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
-		case let .config(id, action: .delegate(.displayDetails)):
-			guard let config = state.configs[id: id]?.config else {
-				assertionFailure("Failed to find config. bad!")
-				return .none
-			}
+		case let .config(config, action: .delegate(.displayDetails)):
 			return .send(.delegate(.displayDetails(config)))
 		default: return .none
 		}

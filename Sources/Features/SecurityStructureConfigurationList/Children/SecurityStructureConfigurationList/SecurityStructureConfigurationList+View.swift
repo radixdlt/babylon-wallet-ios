@@ -1,17 +1,7 @@
 import FeaturePrelude
 
-extension SecurityStructureConfigurationList.State {
-	var viewState: SecurityStructureConfigurationList.ViewState {
-		.init()
-	}
-}
-
 // MARK: - SecurityStructureConfigurationList.View
 extension SecurityStructureConfigurationList {
-	public struct ViewState: Equatable {
-		// TODO: declare some properties
-	}
-
 	@MainActor
 	public struct View: SwiftUI.View {
 		private let store: StoreOf<SecurityStructureConfigurationList>
@@ -33,10 +23,10 @@ extension SecurityStructureConfigurationList {
 						Separator()
 							.padding(.bottom, .small2)
 
-						SecurityStructureConfigListCoreView(store: store)
+						list(store: store)
 					}
 
-					// FIXME: String
+					// FIXME: Strings
 					Button("New Config") {
 						viewStore.send(.createNewStructure)
 					}
@@ -44,34 +34,26 @@ extension SecurityStructureConfigurationList {
 					.padding(.horizontal, .medium3)
 					.padding(.vertical, .large1)
 				}
+				.task { @MainActor in
+					await viewStore.send(.task).finish()
+				}
+				// FIXME: Strings
 				.navigationTitle("Mult-Factor Setups")
 			}
 		}
-	}
-}
 
-// MARK: - SecurityStructureConfigListCoreView
-public struct SecurityStructureConfigListCoreView: View {
-	private let store: StoreOf<SecurityStructureConfigurationList>
-
-	public init(store: StoreOf<SecurityStructureConfigurationList>) {
-		self.store = store
-	}
-
-	public var body: some View {
-		VStack(spacing: .medium3) {
-			ForEachStore(
-				store.scope(
-					state: \.configs,
-					action: { .child(.config(id: $0, action: $1)) }
-				)
-			) {
-				SecurityStructureConfigurationRow.View(store: $0)
-					.padding(.horizontal, .medium3)
+		func list(store: StoreOf<SecurityStructureConfigurationList>) -> some SwiftUI.View {
+			VStack(spacing: .medium3) {
+				ForEachStore(
+					store.scope(
+						state: \.configs,
+						action: { .child(.config(id: $0, action: $1)) }
+					)
+				) {
+					SecurityStructureConfigurationRow.View(store: $0)
+						.padding(.horizontal, .medium3)
+				}
 			}
-		}
-		.task {
-			ViewStore(store).send(.view(.task))
 		}
 	}
 }
