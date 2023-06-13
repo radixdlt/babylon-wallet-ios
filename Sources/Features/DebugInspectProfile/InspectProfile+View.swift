@@ -740,7 +740,7 @@ extension HierarchicalDeterministicFactorInstanceView {
 			Labeled("Derivation Scheme", value: factorInstance.derivationPath.scheme.rawValue)
 			Labeled("Public Key", value: factorInstance.publicKey.compressedRepresentation.hex)
 			Labeled("Curve", value: factorInstance.publicKey.curve.rawValue)
-			Labeled("Factor Source ID", value: String(factorInstance.factorSourceID.hexCodable.hex().mask(showLast: 6)))
+			Labeled("Factor Source ID", value: String(factorInstance.factorSourceID.description.mask(showLast: 6)))
 		}
 		.padding(.leading, leadingPadding)
 	}
