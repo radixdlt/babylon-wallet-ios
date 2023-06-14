@@ -13,7 +13,7 @@ extension ImportLegacyWalletClient: DependencyKey {
 
 		@Sendable func migrate(
 			accounts: NonEmpty<Set<OlympiaAccountToMigrate>>,
-			factorSouceID: FactorSourceID
+			factorSouceID: FactorSourceID.FromHash
 		) async throws -> (accounts: NonEmpty<OrderedSet<MigratedAccount>>, networkID: NetworkID) {
 			let sortedOlympia = accounts.sorted(by: \.addressIndex)
 			let networkID = Radix.Gateway.default.network.id // we import to the default network, not the current.
@@ -23,7 +23,7 @@ extension ImportLegacyWalletClient: DependencyKey {
 			for olympiaAccount in sortedOlympia {
 				let publicKey = SLIP10.PublicKey.ecdsaSecp256k1(olympiaAccount.publicKey)
 				let factorInstance = HierarchicalDeterministicFactorInstance(
-					factorSourceID: factorSouceID,
+					id: factorSouceID,
 					publicKey: publicKey,
 					derivationPath: olympiaAccount.path.wrapAsDerivationPath()
 				)

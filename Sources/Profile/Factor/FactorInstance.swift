@@ -29,7 +29,7 @@ public struct FactorInstance: Sendable, Hashable, Codable, Identifiable {
 	/// factor instance. We will lookup the `FactorSource` in the
 	/// `Profile` and can present user with instruction to re-access
 	/// this factor source in order control the `badge`.
-	public let factorSourceID: FactorSource.ID
+	public let factorSourceID: FactorSourceID
 
 	// FIXME: CHANGE TO STORED PROPERTY, COMPLETELY incorrectly implemented, MUST be sent in probably, because Profile cannot
 	// use EngineToolkit which we must, to do Blake hash.
@@ -42,7 +42,7 @@ public struct FactorInstance: Sendable, Hashable, Codable, Identifiable {
 				// FIXME: THIS IS COMPLETELY WRONG, placeholder only
 				let payload = k1PubKey.compressedRepresentation.prefix(26)
 				return .init(
-					factorSourceKind: factorSourceID.factorSourceKind,
+					factorSourceKind: factorSourceID.kind,
 					badgeAddress: .virtual(.init(
 						resourceAddress: .init(
 							// FIXME: This is wrong! should be fetched from gateway or from RET... and depends on the network.
@@ -56,7 +56,7 @@ public struct FactorInstance: Sendable, Hashable, Codable, Identifiable {
 				// FIXME: THIS IS COMPLETELY WRONG, placeholder only
 				let payload = curve25519PubKey.compressedRepresentation.prefix(26)
 				return .init(
-					factorSourceKind: factorSourceID.factorSourceKind,
+					factorSourceKind: factorSourceID.kind,
 					badgeAddress: .virtual(.init(
 						resourceAddress: .init(
 							// FIXME: This is wrong! should be fetched from gateway or from RET... and depends on the network.
@@ -76,7 +76,7 @@ public struct FactorInstance: Sendable, Hashable, Codable, Identifiable {
 	public let badge: Badge
 
 	public init(
-		factorSourceID: FactorSource.ID,
+		factorSourceID: FactorSourceID,
 		badge: Badge
 	) {
 		self.factorSourceID = factorSourceID
@@ -225,13 +225,13 @@ public struct HierarchicalDeterministicPublicKey: Sendable, Hashable, Codable {
 // MARK: - HierarchicalDeterministicFactorInstance
 /// A virtual hierarchical deterministic `FactorInstance`
 public struct HierarchicalDeterministicFactorInstance: Sendable, Hashable, Codable {
-	public let factorSourceID: FactorSource.ID
+	public let factorSourceID: FactorSourceID.FromHash
 	public let publicKey: SLIP10.PublicKey
 	public let derivationPath: DerivationPath
 
 	public var factorInstance: FactorInstance {
 		.init(
-			factorSourceID: factorSourceID,
+			factorSourceID: factorSourceID.embed(),
 			badge: .virtual(
 				.hierarchicalDeterministic(.init(
 					publicKey: publicKey,
@@ -242,20 +242,32 @@ public struct HierarchicalDeterministicFactorInstance: Sendable, Hashable, Codab
 	}
 
 	public init(
-		factorSourceID: FactorSource.ID,
+		id: FactorSourceID.FromHash,
 		publicKey: SLIP10.PublicKey,
 		derivationPath: DerivationPath
 	) {
-		self.factorSourceID = factorSourceID
+		self.factorSourceID = id
 		self.publicKey = publicKey
 		self.derivationPath = derivationPath
+	}
+
+	public init(
+		factorSourceID: FactorSourceID,
+		publicKey: SLIP10.PublicKey,
+		derivationPath: DerivationPath
+	) throws {
+		try self.init(
+			id: factorSourceID.extract(as: FactorSourceID.FromHash.self),
+			publicKey: publicKey,
+			derivationPath: derivationPath
+		)
 	}
 
 	public init(factorInstance: FactorInstance) throws {
 		guard case let .virtual(.hierarchicalDeterministic(badge)) = factorInstance.badge else {
 			throw BadgeIsNotVirtualHierarchicalDeterministic()
 		}
-		self.init(
+		try self.init(
 			factorSourceID: factorInstance.factorSourceID,
 			publicKey: badge.publicKey,
 			derivationPath: badge.derivationPath

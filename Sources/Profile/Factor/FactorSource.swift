@@ -4,6 +4,7 @@ import Prelude
 
 // MARK: - FactorSource
 public enum FactorSource: BaseFactorSourceProtocol, Sendable, Hashable, Codable, Identifiable {
+	public typealias ID = FactorSourceID
 	case device(DeviceFactorSource)
 	case ledger(LedgerHardwareWalletFactorSource)
 	case offDeviceMnemonic(OffDeviceMnemonicFactorSource)
@@ -16,6 +17,19 @@ extension FactorSource {
 		get { property(\.common) }
 		set {
 			update(\.common, to: newValue)
+		}
+	}
+
+	// Compiler crash if we try to use `private func property<Property>(_ keyPath: KeyPath<any FactorSourceProtocol, Property>) -> Property {
+	// and use `property(\.id).embed()
+	// :/
+	public var id: ID {
+		switch self {
+		case let .device(factorSource): return factorSource.id.embed()
+		case let .ledger(factorSource): return factorSource.id.embed()
+		case let .offDeviceMnemonic(factorSource): return factorSource.id.embed()
+		case let .securityQuestions(factorSource): return factorSource.id.embed()
+		case let .trustedContact(factorSource): return factorSource.id.embed()
 		}
 	}
 
@@ -68,7 +82,7 @@ extension FactorSource {
 
 	public func encode(to encoder: Encoder) throws {
 		var keyedContainer = encoder.container(keyedBy: CodingKeys.self)
-		try keyedContainer.encode(kind.discriminator, forKey: .discriminator)
+		try keyedContainer.encode(kind, forKey: .discriminator)
 		switch self {
 		case let .device(device):
 			try keyedContainer.encode(device, forKey: .device)
@@ -85,7 +99,7 @@ extension FactorSource {
 
 	public init(from decoder: Decoder) throws {
 		let keyedContainer = try decoder.container(keyedBy: CodingKeys.self)
-		let discriminator = try keyedContainer.decode(FactorSourceKind.Discriminator.self, forKey: .discriminator)
+		let discriminator = try keyedContainer.decode(FactorSourceKind.self, forKey: .discriminator)
 
 		switch discriminator {
 		case .device:

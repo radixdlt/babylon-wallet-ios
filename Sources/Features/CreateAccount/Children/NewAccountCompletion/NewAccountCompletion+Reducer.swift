@@ -41,7 +41,11 @@ public struct NewAccountCompletion: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .goToDestination:
-			return .send(.delegate(.completed))
+			return .run { send in
+				await MainActor.run {
+					send(.delegate(.completed))
+				}
+			}
 		}
 	}
 }

@@ -4,14 +4,18 @@ import Prelude
 
 // MARK: - SecurityQuestionsFactorSource
 public struct SecurityQuestionsFactorSource: FactorSourceProtocol {
+	public typealias ID = FactorSourceID.FromHash
+	public let id: ID
 	public var common: FactorSource.Common // We update `lastUsed`
 	public let sealedMnemonic: SealedMnemonic
 
 	internal init(
+		id: ID,
 		common: FactorSource.Common,
 		sealedMnemonic: SealedMnemonic
 	) {
-		precondition(common.id.factorSourceKind == Self.kind)
+		precondition(id.kind == Self.kind)
+		self.id = id
 		self.common = common
 		self.sealedMnemonic = sealedMnemonic
 	}
@@ -111,9 +115,11 @@ extension SecurityQuestionsFactorSource {
 		)
 
 		return try Self(
+			id: .init(
+				kind: .securityQuestions,
+				mnemonicWithPassphrase: .init(mnemonic: mnemonic)
+			),
 			common: .from(
-				factorSourceKind: Self.kind,
-				hdRoot: mnemonic.hdRoot(),
 				addedOn: addedOn ?? date(),
 				lastUsedOn: lastUsedOn ?? date()
 			),

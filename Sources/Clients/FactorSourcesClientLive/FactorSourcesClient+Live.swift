@@ -58,7 +58,7 @@ extension FactorSourcesClient: DependencyKey {
 
 				return factorSourceID
 			},
-			checkIfHasOlympiaFactorSourceForAccounts: { softwareAccounts -> FactorSourceID? in
+			checkIfHasOlympiaFactorSourceForAccounts: { softwareAccounts -> FactorSourceID.FromHash? in
 				guard softwareAccounts.allSatisfy({ $0.accountType == .software }) else {
 					assertionFailure("Unexpectedly received hardware account, unable to verify.")
 					return nil
@@ -79,7 +79,7 @@ extension FactorSourcesClient: DependencyKey {
 						}
 						// YES Managed to validate all software accounts against existing factor source
 						loggerGlobal.debug("Existing factor source found for selected Olympia software accounts.")
-						return factorSourceID
+						return factorSourceID.extract(FactorSourceID.FromHash.self)
 					}
 
 					return nil // Did not find any Olympia `.device` factor sources
@@ -138,7 +138,7 @@ internal func signingFactors(
 			}()
 
 			let id = factorInstance.factorSourceID
-			guard let factorSource = allFactorSources[id: id] else {
+			guard let factorSource = allFactorSources[id: id.embed()] else {
 				assertionFailure("Bad! factor source not found")
 				throw FactorSourceNotFound()
 			}

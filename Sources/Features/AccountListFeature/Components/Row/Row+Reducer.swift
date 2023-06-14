@@ -27,7 +27,7 @@ extension AccountList {
 				self.isLedgerAccount = {
 					switch account.securityState {
 					case let .unsecured(unsecuredEntityControl):
-						return unsecuredEntityControl.transactionSigning.factorInstance.factorSourceID.factorSourceKind == .ledgerHQHardwareWallet
+						return unsecuredEntityControl.transactionSigning.factorInstance.factorSourceID.kind == .ledgerHQHardwareWallet
 					}
 				}()
 			}
@@ -91,7 +91,7 @@ extension AccountList {
 
 				switch state.account.securityState {
 				case let .unsecured(unsecuredEntityControl):
-					if unsecuredEntityControl.transactionSigning.factorSourceID.factorSourceKind == .device {
+					if unsecuredEntityControl.transactionSigning.factorSourceID.kind == .device {
 						return .send(.internal(.displaySecurityPrompting))
 					} else {
 						return .none

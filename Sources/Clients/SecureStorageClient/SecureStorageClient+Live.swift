@@ -185,7 +185,7 @@ extension SecureStorageClient: DependencyKey {
 				let mnemonicWithPassphrase = privateFactorSource.mnemonicWithPassphrase
 				let data = try jsonEncoder().encode(mnemonicWithPassphrase)
 				let mostSecureAccesibilityAndAuthenticationPolicy = try await queryMostSecureAccesibilityAndAuthenticationPolicy()
-				let key = key(factorSourceID: factorSource.id)
+				let key = key(factorSourceID: factorSource.id.embed())
 
 				try await keychainClient.setDataWithAuthenticationPolicyIfAble(
 					data: data,
@@ -306,6 +306,6 @@ extension ProfileSnapshot.Header.ID {
 	}
 }
 
-private func key(factorSourceID: FactorSource.ID) -> KeychainClient.Key {
-	.init(rawValue: .init(rawValue: factorSourceID.hexCodable.hex())!)
+private func key(factorSourceID: FactorSourceID) -> KeychainClient.Key {
+	.init(rawValue: .init(rawValue: factorSourceID.description)!)
 }

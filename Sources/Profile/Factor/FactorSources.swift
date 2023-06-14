@@ -12,6 +12,13 @@ extension FactorSources {
 struct FactorSourceWithIDNotFound: Swift.Error {}
 extension FactorSources {
 	public mutating func updateFactorSource(
+		id: some FactorSourceIDProtocol,
+		_ mutate: @escaping (inout FactorSource) throws -> Void
+	) throws {
+		try updateFactorSource(id: id.embed(), mutate)
+	}
+
+	public mutating func updateFactorSource(
 		id: FactorSourceID,
 		_ mutate: (inout FactorSource) throws -> Void
 	) throws {

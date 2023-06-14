@@ -124,7 +124,7 @@ public struct AbstractSecurityStructureConfiguration<AbstractFactor>:
 }
 
 extension ProfileSnapshot {
-	public typealias SecurityStructureConfiguration = AbstractSecurityStructureConfiguration<FactorSource.ID>
+	public typealias SecurityStructureConfiguration = AbstractSecurityStructureConfiguration<FactorSourceID>
 
 	/// A version of `AppliedSecurityStructure` which only contains IDs of factor sources, suitable for storage in Profile Snapshot.
 	public typealias AppliedSecurityStructure = AbstractSecurityStructure<FactorInstance.ID>

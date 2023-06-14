@@ -7,7 +7,7 @@ import SecureStorageClient
 // MARK: - AccountsForDeviceFactorSource
 public struct AccountsForDeviceFactorSource: Sendable, Hashable, Identifiable {
 	public typealias ID = FactorSourceID
-	public var id: ID { deviceFactorSource.id }
+	public var id: ID { deviceFactorSource.id.embed() }
 	public let accounts: [Profile.Network.Account]
 	public let deviceFactorSource: DeviceFactorSource
 }
