@@ -24,7 +24,7 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 			}
 		}
 
-		public let id: FactorSourceID
+		public let id: FactorSourceID.FromHash
 		public let migratedAccounts: NonEmpty<OrderedSet<MigratedAccount>>
 	}
 
@@ -155,7 +155,7 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 
 		case let .derivePublicKeys(.presented(.delegate(.derivedPublicKeys(publicKeys, factorSourceID, _)))):
 			state.derivePublicKeys = nil
-			guard let ledger = state.chooseLedger.ledgers?[id: factorSourceID] else {
+			guard let id = factorSourceID.extract(FactorSourceID.FromHash.self), let ledger = state.chooseLedger.ledgers?[id: id] else {
 				loggerGlobal.error("Failed to find ledger with factor sourceID in local state: \(factorSourceID)")
 				return .none
 			}
