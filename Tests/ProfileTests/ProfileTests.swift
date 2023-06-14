@@ -161,7 +161,7 @@ final class ProfileTests: TestCase {
 		XCTAssertEqual(profile.appPreferences.gateways.current.network, gateway.network)
 		profile.factorSources.append(olympiaFactorSource)
 
-		let (trustedContactFactorSource, offDeviceMnemonicFactorSource) = try withDependencies {
+		let (trustedContactFactorSource, offDeviceMnemonicFactorSource, ledgerFactorSource) = try withDependencies {
 			$0.date = .constant(stableDate)
 		} operation: {
 			let trustedContactFactorSource = TrustedContactFactorSource.from(
@@ -170,10 +170,18 @@ final class ProfileTests: TestCase {
 				name: "My friend"
 			)
 			let offDeviceMnemonicFactorSource = try OffDeviceMnemonicFactorSource.from(mnemonicWithPassphrase: .init(mnemonic: offDeviceMnemonic), label: "Zoo")
-			return (trustedContactFactorSource, offDeviceMnemonicFactorSource)
+
+			let ledgerFactorSource = try LedgerHardwareWalletFactorSource.model(
+				.nanoSPlus,
+				name: "Orange",
+				deviceID: .deadbeef
+			)
+
+			return (trustedContactFactorSource, offDeviceMnemonicFactorSource, ledgerFactorSource)
 		}
 		profile.factorSources.append(trustedContactFactorSource)
 		profile.factorSources.append(offDeviceMnemonicFactorSource)
+		profile.factorSources.append(ledgerFactorSource)
 
 		func addNewAccount(_ name: NonEmptyString) throws -> Profile.Network.Account {
 			let index = try profile.factorSources.babylonDevice.nextDerivationIndex(
@@ -409,7 +417,8 @@ final class ProfileTests: TestCase {
 
 		XCTAssertNoDifference(profile.header, header)
 
-		XCTAssertEqual(profile.factorSources.count, 2)
+		XCTAssertEqual(profile.factorSources.count, 5)
+		XCTAssertEqual(Set(profile.factorSources.map(\.kind)), Set([FactorSourceKind.device, .ledgerHQHardwareWallet, .offDeviceMnemonic, .trustedContact]))
 		for factorSource in profile.factorSources.compactMap({ $0.extract(DeviceFactorSource.self) }) {
 			XCTAssertEqual(factorSource.hint.name, deviceFactorName)
 			XCTAssertEqual(factorSource.hint.model, deviceFactorModel)

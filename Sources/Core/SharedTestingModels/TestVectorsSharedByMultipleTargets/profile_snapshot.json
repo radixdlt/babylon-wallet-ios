@@ -149,6 +149,36 @@
           "kind" : "offDeviceMnemonic"
         }
       }
+    },
+    {
+      "discriminator" : "ledgerHQHardwareWallet",
+      "ledgerHQHardwareWallet" : {
+        "common" : {
+          "addedOn" : "1970-01-01T00:00:00Z",
+          "cryptoParameters" : {
+            "supportedCurves" : [
+              "curve25519",
+              "secp256k1"
+            ],
+            "supportedDerivationPathSchemes" : [
+              "cap26",
+              "bip44Olympia"
+            ]
+          },
+          "lastUsedOn" : "1970-01-01T00:00:00Z"
+        },
+        "hint" : {
+          "model" : "nanoS+",
+          "name" : "Orange"
+        },
+        "id" : {
+          "body" : "deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef",
+          "kind" : "ledgerHQHardwareWallet"
+        },
+        "nextDerivationIndicesPerNetwork" : [
+
+        ]
+      }
     }
   ],
   "header" : {
