@@ -4,10 +4,29 @@ import FeaturePrelude
 // MARK: - NameSecurityStructure
 public struct NameSecurityStructure: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
-		public let configuration: SecurityStructureConfiguration.Configuration
-		public var name = ""
-		public init(configuration: SecurityStructureConfiguration.Configuration) {
-			self.configuration = configuration
+		public let config: SecurityStructureConfiguration.Configuration
+		public var name: String
+		public let createdOn: Date
+		public let isUpdatingExisting: Bool
+		public init(config: SecurityStructureConfiguration.Configuration, name: String, createdOn: Date, isUpdatingExisting: Bool) {
+			self.config = config
+			self.name = name
+			self.createdOn = createdOn
+			self.isUpdatingExisting = isUpdatingExisting
+		}
+
+		public static func name(new config: SecurityStructureConfiguration.Configuration) -> Self {
+			@Dependency(\.date) var date
+			return Self(config: config, name: "", createdOn: date(), isUpdatingExisting: false)
+		}
+
+		public static func updateName(of structure: SecurityStructureConfiguration) -> Self {
+			Self(
+				config: structure.configuration,
+				name: structure.label.rawValue,
+				createdOn: structure.createdOn,
+				isUpdatingExisting: true
+			)
 		}
 	}
 
@@ -17,7 +36,7 @@ public struct NameSecurityStructure: Sendable, FeatureReducer {
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
-		case securityStructureCreationResult(TaskResult<SecurityStructureConfiguration>)
+		case securityStructureUpdatedOrCreatedResult(TaskResult<SecurityStructureConfiguration>)
 	}
 
 	@Dependency(\.appPreferencesClient) var appPreferencesClient
@@ -31,17 +50,18 @@ public struct NameSecurityStructure: Sendable, FeatureReducer {
 		case let .confirmedName(name):
 			let config = SecurityStructureConfiguration(
 				label: name,
-				configuration: state.configuration
+				configuration: state.config,
+				createdOn: state.createdOn
 			)
-			return .task {
+			return .task { [isUpdatingExisting = state.isUpdatingExisting] in
 				let taskResult = await TaskResult {
 					try await appPreferencesClient.updating { preferences in
-						let (wasInserted, _) = preferences.security.structureConfigurations.append(config)
-						assert(wasInserted)
+						let didUpdateExisting = preferences.security.structureConfigurations.updateOrAppend(config) != nil
+						assert(didUpdateExisting == isUpdatingExisting)
 					}
 					return config
 				}
-				return .delegate(.securityStructureCreationResult(taskResult))
+				return .delegate(.securityStructureUpdatedOrCreatedResult(taskResult))
 			}
 		}
 	}

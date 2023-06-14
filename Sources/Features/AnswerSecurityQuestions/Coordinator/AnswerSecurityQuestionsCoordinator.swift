@@ -8,7 +8,10 @@ public struct AnswerSecurityQuestionsCoordinator: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public enum Purpose: Sendable, Hashable {
 			case decrypt(SecurityQuestionsFactorSource)
-			case encrypt
+			case encrypt(editingQuestions: [SecurityQuestion]? = nil)
+			public static func editing(factorSource: SecurityQuestionsFactorSource) -> Self {
+				.encrypt(editingQuestions: factorSource.sealedMnemonic.securityQuestions.elements)
+			}
 
 			public enum AnswersResult: Sendable, Hashable {
 				case decrypted(Mnemonic)
@@ -25,9 +28,9 @@ public struct AnswerSecurityQuestionsCoordinator: Sendable, FeatureReducer {
 		public init(purpose: Purpose) {
 			self.purpose = purpose
 			switch purpose {
-			case .encrypt:
+			case let .encrypt(editingQuestions):
 				self.questions = []
-				self.root = .chooseQuestions(.init())
+				self.root = .chooseQuestions(.init(selectedQuestions: editingQuestions))
 
 			case let .decrypt(factorSource):
 				let questions = factorSource.sealedMnemonic.securityQuestions

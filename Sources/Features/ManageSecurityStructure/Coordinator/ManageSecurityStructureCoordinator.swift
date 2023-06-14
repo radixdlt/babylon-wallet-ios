@@ -33,7 +33,7 @@ public struct ManageSecurityStructureCoordinator: Sendable, FeatureReducer {
 			case start(ManageSecurityStructureStart.State)
 			case simpleSetupFlow(SimpleManageSecurityStructureFlow.State)
 			case advancedSetupFlow(AdvancedManageSecurityStructureFlow.State)
-			case nameNewStructure(NameSecurityStructure.State)
+			case nameStructure(NameSecurityStructure.State)
 
 			var simpleSetupFlow: SimpleManageSecurityStructureFlow.State? {
 				guard case let .simpleSetupFlow(simpleSetupFlow) = self else { return nil }
@@ -45,7 +45,7 @@ public struct ManageSecurityStructureCoordinator: Sendable, FeatureReducer {
 			case start(ManageSecurityStructureStart.Action)
 			case simpleSetupFlow(SimpleManageSecurityStructureFlow.Action)
 			case advancedSetupFlow(AdvancedManageSecurityStructureFlow.Action)
-			case nameNewStructure(NameSecurityStructure.Action)
+			case nameStructure(NameSecurityStructure.Action)
 		}
 
 		public var body: some ReducerProtocolOf<Self> {
@@ -58,7 +58,7 @@ public struct ManageSecurityStructureCoordinator: Sendable, FeatureReducer {
 			Scope(state: /State.advancedSetupFlow, action: /Action.advancedSetupFlow) {
 				AdvancedManageSecurityStructureFlow()
 			}
-			Scope(state: /State.nameNewStructure, action: /Action.nameNewStructure) {
+			Scope(state: /State.nameStructure, action: /Action.nameStructure) {
 				NameSecurityStructure()
 			}
 		}
@@ -97,12 +97,16 @@ public struct ManageSecurityStructureCoordinator: Sendable, FeatureReducer {
 			state.path.append(.advancedSetupFlow(.init(mode: .new(.init()))))
 			return .none
 
-		case let .path(.element(_, action: .simpleSetupFlow(.delegate(.createSecurityStructure(simpleFlowResult))))):
+		case let .path(.element(_, action: .simpleSetupFlow(.delegate(.updatedOrCreatedSecurityStructure(simpleFlowResult))))):
 
 			switch simpleFlowResult {
-			case let .success(simple):
-				let config = SecurityStructureConfiguration.Configuration(from: simple)
-				state.path.append(.nameNewStructure(.init(configuration: config)))
+			case let .success(product):
+				switch product {
+				case let .creatingNew(newConfig):
+					state.path.append(.nameStructure(.name(new: newConfig)))
+				case let .updating(existingStructure):
+					state.path.append(.nameStructure(.updateName(of: existingStructure)))
+				}
 			case let .failure(error):
 				loggerGlobal.error("Failed to create simple security structure, error: \(error)")
 				errorQueue.schedule(error)
@@ -110,32 +114,10 @@ public struct ManageSecurityStructureCoordinator: Sendable, FeatureReducer {
 
 			return .none
 
-		case let .path(.element(_, action: .simpleSetupFlow(.delegate(.updateExisting(updated))))):
-			return .task {
-				let taskResult = await TaskResult {
-					try await appPreferencesClient.updating { preferences in
-						let wasUpdated = preferences.security.structureConfigurations.updateOrAppend(updated) != nil
-						assert(wasUpdated)
-						return updated
-					}
-				}
-				return .delegate(.done(taskResult))
-			}
-
-		case let .path(.element(_, action: .nameNewStructure(.delegate(.securityStructureCreationResult(result))))):
+		case let .path(.element(_, action: .nameStructure(.delegate(.securityStructureUpdatedOrCreatedResult(result))))):
 			return .send(.delegate(.done(result)))
 
 		default: return .none
 		}
-	}
-}
-
-extension SecurityStructureConfiguration.Configuration {
-	init(from simple: SimpleUnnamedSecurityStructureConfig) {
-		self.init(
-			primaryRole: .single(simple.singlePrimaryFactor),
-			recoveryRole: .single(simple.singleRecoveryFactor),
-			confirmationRole: .single(simple.singleConfirmationFactor)
-		)
 	}
 }

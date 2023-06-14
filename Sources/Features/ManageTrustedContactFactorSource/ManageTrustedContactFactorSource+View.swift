@@ -3,17 +3,17 @@ import ScanQRFeature
 
 extension ManageTrustedContactFactorSource.State {
 	var viewState: ManageTrustedContactFactorSource.ViewState {
-		.init(radixAddress: radixAddress, emailAddress: emailAddress, name: name)
+		.init(isCreatingNew: mode == .new, radixAddress: radixAddress, emailAddress: emailAddress, name: name)
 	}
 }
 
 // MARK: - ManageTrustedContactFactorSource.View
 extension ManageTrustedContactFactorSource {
 	public struct ViewState: Equatable {
+		let isCreatingNew: Bool
 		let radixAddress: String
 		let emailAddress: String
 		let name: String
-
 		var info: (
 			accountAddress: AccountAddress,
 			email: EmailAddress,
@@ -85,7 +85,7 @@ extension ManageTrustedContactFactorSource {
 					continueButton(viewStore)
 				}
 				// FIXME: Strings
-				.navigationTitle("Add Trusted Contact")
+				.navigationTitle(viewStore.isCreatingNew ? "Add Trusted Contact" : "Edit Trusted Contact")
 				.sheet(
 					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
 					state: /ManageTrustedContactFactorSource.Destinations.State.scanAccountAddress,

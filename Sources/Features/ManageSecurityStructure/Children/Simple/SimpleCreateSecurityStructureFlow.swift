@@ -51,8 +51,12 @@ public struct SimpleManageSecurityStructureFlow: Sendable, FeatureReducer {
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
-		case createSecurityStructure(TaskResult<SimpleUnnamedSecurityStructureConfig>)
-		case updateExisting(SecurityStructureConfiguration)
+		public enum Product: Sendable, Equatable {
+			case updating(structure: SecurityStructureConfiguration)
+			case creatingNew(config: SecurityStructureConfiguration.Configuration)
+		}
+
+		case updatedOrCreatedSecurityStructure(TaskResult<Product>)
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -154,7 +158,18 @@ public struct SimpleManageSecurityStructureFlow: Sendable, FeatureReducer {
 			return .none
 
 		case .selectNewPhoneConfirmer:
-			state.modalDestinations = .simpleNewPhoneConfirmer(.init(purpose: .encrypt))
+			let purpose: AnswerSecurityQuestionsCoordinator.State.Purpose = {
+				switch state.mode {
+				case let .existing(structure, _):
+					guard structure.isSimple, let factorSource = structure.configuration.confirmationRole.thresholdFactors[0].extract(SecurityQuestionsFactorSource.self) else {
+						return .encrypt()
+					}
+					return .editing(factorSource: factorSource)
+				case .new:
+					return .encrypt()
+				}
+			}()
+			state.modalDestinations = .simpleNewPhoneConfirmer(.init(purpose: purpose))
 			return .none
 
 		case .selectLostPhoneHelper:
@@ -167,6 +182,7 @@ public struct SimpleManageSecurityStructureFlow: Sendable, FeatureReducer {
 			case let .new(new):
 				precondition(new.lostPhoneHelper == simpleFactorConfig.singleRecoveryFactor)
 				precondition(new.newPhoneConfirmer == simpleFactorConfig.singleConfirmationFactor)
+
 				return .task {
 					let taskResult = await TaskResult {
 						let primary = try await factorSourcesClient.getFactorSources(type: DeviceFactorSource.self).filter {
@@ -178,15 +194,25 @@ public struct SimpleManageSecurityStructureFlow: Sendable, FeatureReducer {
 							singleRecoveryFactor: simpleFactorConfig.singleRecoveryFactor,
 							singleConfirmationFactor: simpleFactorConfig.singleConfirmationFactor
 						)
-
-						return simpleUnnamed
+						let config = SecurityStructureConfiguration.Configuration(from: simpleUnnamed)
+						return Self.DelegateAction.Product.creatingNew(config: config)
 					}
-					return .delegate(.createSecurityStructure(taskResult))
+					return .delegate(.updatedOrCreatedSecurityStructure(taskResult))
 				}
 
-			case let .existing(configToUpdate, _):
-				return .send(.delegate(.updateExisting(configToUpdate)))
+			case let .existing(structureToUpdate, _):
+				return .send(.delegate(.updatedOrCreatedSecurityStructure(.success(.updating(structure: structureToUpdate)))))
 			}
 		}
+	}
+}
+
+extension SecurityStructureConfiguration.Configuration {
+	init(from simple: SimpleUnnamedSecurityStructureConfig) {
+		self.init(
+			primaryRole: .single(simple.singlePrimaryFactor),
+			recoveryRole: .single(simple.singleRecoveryFactor),
+			confirmationRole: .single(simple.singleConfirmationFactor)
+		)
 	}
 }

@@ -46,8 +46,8 @@ extension ManageSecurityStructureCoordinator {
 					then: { AdvancedManageSecurityStructureFlow.View(store: $0) }
 				)
 				CaseLet(
-					state: /ManageSecurityStructureCoordinator.Path.State.nameNewStructure,
-					action: ManageSecurityStructureCoordinator.Path.Action.nameNewStructure,
+					state: /ManageSecurityStructureCoordinator.Path.State.nameStructure,
+					action: ManageSecurityStructureCoordinator.Path.Action.nameStructure,
 					then: { NameSecurityStructure.View(store: $0) }
 				)
 			}

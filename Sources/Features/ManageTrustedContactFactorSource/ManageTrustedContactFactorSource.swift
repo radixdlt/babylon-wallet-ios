@@ -5,9 +5,9 @@ import ScanQRFeature
 // MARK: - ManageTrustedContactFactorSource
 public struct ManageTrustedContactFactorSource: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
-		public var radixAddress: String = ""
-		public var emailAddress: String = ""
-		public var name: String = ""
+		public var radixAddress: String
+		public var emailAddress: String
+		public var name: String
 
 		public enum Mode: Sendable, Hashable {
 			case existing(TrustedContactFactorSource)
@@ -23,11 +23,16 @@ public struct ManageTrustedContactFactorSource: Sendable, FeatureReducer {
 			mode: Mode = .new
 		) {
 			self.mode = mode
-			//            switch mode {
-			//            case let .existing(existing):
-			////                self.radixAddress = existing.id
-			//                fatalError()
-			//            }
+			switch mode {
+			case let .existing(existing):
+				self.radixAddress = existing.id.body.address
+				self.emailAddress = existing.contact.email.email.rawValue
+				self.name = existing.contact.name.rawValue
+			case .new:
+				self.radixAddress = ""
+				self.emailAddress = ""
+				self.name = ""
+			}
 		}
 	}
 

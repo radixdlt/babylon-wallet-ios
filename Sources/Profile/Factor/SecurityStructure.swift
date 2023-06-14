@@ -105,20 +105,28 @@ public struct AbstractSecurityStructureConfiguration<AbstractFactor>:
 	where AbstractFactor: Sendable & Hashable & Codable
 {
 	public typealias Configuration = AbstractSecurityStructure<AbstractFactor>
-	public let label: NonEmptyString
+
+	/// can be renamed
+	public var label: NonEmptyString
 
 	// Mutable so that we can update
 	public var configuration: Configuration
 
-	public let created: Date
+	public let createdOn: Date
+
+	// should update date when any changes occur
+	public var lastUpdatedOn: Date
 
 	public init(
 		label: NonEmptyString,
 		configuration: Configuration,
-		created: Date = .now
+		createdOn: Date? = nil,
+		lastUpdatedOn: Date? = nil
 	) {
+		@Dependency(\.date) var date
 		self.label = label
-		self.created = created
+		self.createdOn = createdOn ?? date()
+		self.lastUpdatedOn = lastUpdatedOn ?? date()
 		self.configuration = configuration
 	}
 }
