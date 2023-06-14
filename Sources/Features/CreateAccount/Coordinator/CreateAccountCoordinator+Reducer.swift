@@ -6,21 +6,16 @@ import FeaturePrelude
 // MARK: - CreateAccountCoordinator
 public struct CreateAccountCoordinator: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
-		var root: Destinations.State?
-		var path: StackState<Destinations.State> = .init()
+		var root: Path.State
+		var path: StackState<Path.State> = .init()
 
 		public let config: CreateAccountConfig
 
 		public init(
-			root: Destinations.State? = nil,
 			config: CreateAccountConfig
 		) {
 			self.config = config
-			if let root {
-				self.root = root
-			} else {
-				self.root = .step1_nameAccount(.init(config: config))
-			}
+			self.root = .step1_nameAccount(.init(config: config))
 		}
 
 		var shouldDisplayNavBar: Bool {
@@ -40,11 +35,8 @@ public struct CreateAccountCoordinator: Sendable, FeatureReducer {
 		}
 	}
 
-	public struct Destinations: Sendable, ReducerProtocol {
+	public struct Path: Sendable, ReducerProtocol {
 		public enum State: Sendable, Hashable {
-			case step_first
-			case step_last
-
 			case step1_nameAccount(NameAccount.State)
 			case step2_creationOfAccount(CreationOfAccount.State)
 			case step3_completion(NewAccountCompletion.State)
@@ -74,8 +66,8 @@ public struct CreateAccountCoordinator: Sendable, FeatureReducer {
 	}
 
 	public enum ChildAction: Sendable, Equatable {
-		case root(Destinations.Action)
-		case path(StackActionOf<Destinations>)
+		case root(Path.Action)
+		case path(StackActionOf<Path>)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -91,12 +83,12 @@ public struct CreateAccountCoordinator: Sendable, FeatureReducer {
 	public init() {}
 
 	public var body: some ReducerProtocolOf<Self> {
+		Scope(state: \.root, action: /Action.child .. ChildAction.root) {
+			Path()
+		}
 		Reduce(core)
-			.ifLet(\.root, action: /Action.child .. ChildAction.root) {
-				Destinations()
-			}
 			.forEach(\.path, action: /Action.child .. ChildAction.path) {
-				Destinations()
+				Path()
 			}
 	}
 }
