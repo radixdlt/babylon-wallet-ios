@@ -10,23 +10,29 @@ public struct SimpleUnnamedSecurityStructureConfig: Sendable, Hashable {
 	let singleConfirmationFactor: SecurityQuestionsFactorSource
 }
 
+// MARK: - ConfirmerOfNewPhone
+public struct ConfirmerOfNewPhone: Sendable, Hashable {
+	public let factorSource: SecurityQuestionsFactorSource
+	public let answersToQuestions: NonEmpty<OrderedSet<AnswerToSecurityQuestion>>
+}
+
 // MARK: - SimpleManageSecurityStructureFlow
 public struct SimpleManageSecurityStructureFlow: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public enum Mode: Sendable, Hashable {
-			case existing(SecurityStructureConfiguration, isEditing: Bool = false)
+			case existing(SecurityStructureConfiguration)
 			case new(New)
 
 			public struct New: Sendable, Hashable {
 				public var lostPhoneHelper: TrustedContactFactorSource?
-				public var newPhoneConfirmer: SecurityQuestionsFactorSource?
+				public var confirmerOfNewPhone: ConfirmerOfNewPhone?
 
 				public init(
 					lostPhoneHelper: TrustedContactFactorSource? = nil,
-					newPhoneConfirmer: SecurityQuestionsFactorSource? = nil
+					confirmerOfNewPhone: ConfirmerOfNewPhone? = nil
 				) {
 					self.lostPhoneHelper = lostPhoneHelper
-					self.newPhoneConfirmer = newPhoneConfirmer
+					self.confirmerOfNewPhone = confirmerOfNewPhone
 				}
 			}
 		}
@@ -44,9 +50,8 @@ public struct SimpleManageSecurityStructureFlow: Sendable, FeatureReducer {
 	}
 
 	public enum ViewAction: Sendable, Equatable {
-		case editChanged
-		case selectNewPhoneConfirmer
-		case selectLostPhoneHelper
+		case confirmerOfNewPhoneButtonTapped
+		case lostPhoneHelperButtonTapped
 		case finished(RecoveryAndConfirmationFactors)
 	}
 
@@ -103,10 +108,10 @@ public struct SimpleManageSecurityStructureFlow: Sendable, FeatureReducer {
 			case var .new(new):
 				new.lostPhoneHelper = lostPhoneHelper
 				state.mode = .new(new)
-			case .existing(var existing, let isEditing):
+			case var .existing(existing):
 				// FIXME: Error handling
 				try! existing.configuration.recoveryRole.changeFactorSource(to: lostPhoneHelper)
-				state.mode = .existing(existing, isEditing: isEditing)
+				state.mode = .existing(existing)
 			}
 			state.modalDestinations = nil
 			return .none
@@ -117,15 +122,15 @@ public struct SimpleManageSecurityStructureFlow: Sendable, FeatureReducer {
 			loggerGlobal.error("Failed to create lost phone helper, error: \(error)")
 			return .none
 
-		case let .modalDestinations(.presented(.simpleNewPhoneConfirmer(.delegate(.done(.success(.encrypted(newPhoneConfirmer))))))):
+		case let .modalDestinations(.presented(.simpleNewPhoneConfirmer(.delegate(.done(.success(.encrypted(factorSource, answersToQuestions))))))):
 			switch state.mode {
 			case var .new(new):
-				new.newPhoneConfirmer = newPhoneConfirmer
+				new.confirmerOfNewPhone = .init(factorSource: factorSource, answersToQuestions: answersToQuestions)
 				state.mode = .new(new)
-			case .existing(var existing, let isEditing):
+			case var .existing(existing):
 				// FIXME: Error handling
-				try! existing.configuration.confirmationRole.changeFactorSource(to: newPhoneConfirmer)
-				state.mode = .existing(existing, isEditing: isEditing)
+				try! existing.configuration.confirmationRole.changeFactorSource(to: factorSource)
+				state.mode = .existing(existing)
 			}
 			state.modalDestinations = nil
 			return .none
@@ -147,26 +152,17 @@ public struct SimpleManageSecurityStructureFlow: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
-		case .editChanged:
-			switch state.mode {
-			case .new:
-				preconditionFailure("should not have been able to toggle Edit mode during creation of a new security config")
-			case let .existing(existing, wasEditing):
-				// do not save yet, user have to press button in footer for that
-				state.mode = .existing(existing, isEditing: !wasEditing)
-			}
-			return .none
-
-		case .selectNewPhoneConfirmer:
+		case .confirmerOfNewPhoneButtonTapped:
 			let purpose: AnswerSecurityQuestionsCoordinator.State.Purpose = {
 				switch state.mode {
-				case let .existing(structure, _):
-					guard structure.isSimple, let factorSource = structure.configuration.confirmationRole.thresholdFactors[0].extract(SecurityQuestionsFactorSource.self) else {
-						return .encrypt()
-					}
-					return .editing(factorSource: factorSource)
+				case let .existing(structure):
+//					guard structure.isSimple, let factorSource = structure.configuration.confirmationRole.thresholdFactors[0].extract(SecurityQuestionsFactorSource.self) else {
+//						return .encrypt()
+//					}
+//					return .editing(factorSource: factorSource)
+					return .encrypt()
 				case let .new(new):
-					if let unsavedSecurityQuestions = new.newPhoneConfirmer {
+					if let unsavedSecurityQuestions = new.confirmerOfNewPhone {
 						return .editing(factorSource: unsavedSecurityQuestions)
 					} else {
 						return .encrypt()
@@ -176,10 +172,10 @@ public struct SimpleManageSecurityStructureFlow: Sendable, FeatureReducer {
 			state.modalDestinations = .simpleNewPhoneConfirmer(.init(purpose: purpose))
 			return .none
 
-		case .selectLostPhoneHelper:
+		case .lostPhoneHelperButtonTapped:
 			let mode: ManageTrustedContactFactorSource.State.Mode = {
 				switch state.mode {
-				case let .existing(structure, _):
+				case let .existing(structure):
 					guard structure.isSimple, let factorSource = structure.configuration.recoveryRole.thresholdFactors[0].extract(TrustedContactFactorSource.self) else {
 						return .new
 					}
@@ -219,7 +215,7 @@ public struct SimpleManageSecurityStructureFlow: Sendable, FeatureReducer {
 					return .delegate(.updatedOrCreatedSecurityStructure(taskResult))
 				}
 
-			case let .existing(structureToUpdate, _):
+			case let .existing(structureToUpdate):
 				return .send(.delegate(.updatedOrCreatedSecurityStructure(.success(.updating(structure: structureToUpdate)))))
 			}
 		}

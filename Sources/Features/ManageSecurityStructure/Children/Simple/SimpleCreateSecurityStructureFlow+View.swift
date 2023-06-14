@@ -20,49 +20,39 @@ extension SimpleManageSecurityStructureFlow {
 	public struct ViewState: Equatable {
 		public enum Mode: Equatable {
 			case new
-			case existing(isEditing: Bool)
+			case existing
 			var isExisting: Bool {
 				guard case .existing = self else {
 					return false
 				}
 				return true
 			}
-
-			var isEditing: Bool {
-				guard case let .existing(isEditing) = self else {
-					return false
-				}
-				return isEditing
-			}
 		}
 
 		let mode: Mode
-		let newPhoneConfirmer: SecurityQuestionsFactorSource?
+		let confirmerOfNewPhone: SecurityQuestionsFactorSource?
 		let lostPhoneHelper: TrustedContactFactorSource?
 		var simpleSecurityStructure: RecoveryAndConfirmationFactors? {
-			guard let lostPhoneHelper, let newPhoneConfirmer else {
+			guard let lostPhoneHelper, let confirmerOfNewPhone else {
 				return nil
 			}
 			return .init(
 				singleRecoveryFactor: lostPhoneHelper,
-				singleConfirmationFactor: newPhoneConfirmer
+				singleConfirmationFactor: confirmerOfNewPhone
 			)
 		}
 
-		let isDisabled: Bool
 		init(state: SimpleManageSecurityStructureFlow.State) {
 			switch state.mode {
-			case let .existing(existing, isEditing):
+			case let .existing(existing):
 				precondition(existing.isSimple)
-				self.newPhoneConfirmer = try! existing.configuration.confirmationRole.thresholdFactors[0].extract(as: SecurityQuestionsFactorSource.self)
+				self.confirmerOfNewPhone = try! existing.configuration.confirmationRole.thresholdFactors[0].extract(as: SecurityQuestionsFactorSource.self)
 				self.lostPhoneHelper = try! existing.configuration.recoveryRole.thresholdFactors[0].extract(as: TrustedContactFactorSource.self)
-				self.mode = .existing(isEditing: isEditing)
-				self.isDisabled = !isEditing
+				self.mode = .existing
 			case let .new(new):
-				self.newPhoneConfirmer = new.newPhoneConfirmer
+				self.confirmerOfNewPhone = new.confirmerOfNewPhone?.factorSource
 				self.lostPhoneHelper = new.lostPhoneHelper
 				self.mode = .new
-				self.isDisabled = false
 			}
 		}
 	}
@@ -81,27 +71,16 @@ extension SimpleManageSecurityStructureFlow {
 					ScrollView {
 						SecurityStructureTutorialHeader()
 
-						NewPhoneConfirmer(factorSet: viewStore.newPhoneConfirmer) {
-							viewStore.send(.selectNewPhoneConfirmer)
+						NewPhoneConfirmer(factorSet: viewStore.confirmerOfNewPhone) {
+							viewStore.send(.confirmerOfNewPhoneButtonTapped)
 						}
-						.disabled(viewStore.isDisabled)
 
 						LostPhoneHelper(factorSet: viewStore.lostPhoneHelper) {
-							viewStore.send(.selectLostPhoneHelper)
+							viewStore.send(.lostPhoneHelperButtonTapped)
 						}
-						.disabled(viewStore.isDisabled)
 					}
 				}
 				.navigationTitle("Multi-Factor Setup") // FIXME: Strings
-				.toolbar {
-					if viewStore.mode.isExisting {
-						ToolbarItem(placement: .navigationBarTrailing) {
-							Button(viewStore.mode.isEditing ? "Done" : "Edit") {
-								viewStore.send(.editChanged)
-							}
-						}
-					}
-				}
 				.footer {
 					WithControlRequirements(
 						viewStore.simpleSecurityStructure,

@@ -14,8 +14,13 @@ public struct AnswerSecurityQuestionFreeform: Sendable, FeatureReducer {
 
 		public var answerToQuestion: AnswerToSecurityQuestion?
 
-		public init(question: SecurityQuestion, isLast: Bool) {
+		public init(
+			question: SecurityQuestion,
+			answer: NonEmptyString? = nil,
+			isLast: Bool
+		) {
 			self.question = question
+			self.answer = answer
 			self.isLast = isLast
 		}
 	}
