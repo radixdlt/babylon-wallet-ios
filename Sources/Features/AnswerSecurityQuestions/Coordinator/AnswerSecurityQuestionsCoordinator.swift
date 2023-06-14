@@ -20,7 +20,7 @@ public struct AnswerSecurityQuestionsCoordinator: Sendable, FeatureReducer {
 
 		public let purpose: Purpose
 		var root: Path.State
-		var path: StackState<Path.State> = []
+		var path: StackState<Path.State> = .init()
 
 		public init(purpose: Purpose) {
 			self.purpose = purpose
@@ -52,7 +52,7 @@ public struct AnswerSecurityQuestionsCoordinator: Sendable, FeatureReducer {
 
 	public enum ChildAction: Sendable, Equatable {
 		case root(Path.Action)
-		case path(StackAction<Path.Action>)
+		case path(StackActionOf<Path>)
 	}
 
 	public struct Path: Sendable, ReducerProtocol {

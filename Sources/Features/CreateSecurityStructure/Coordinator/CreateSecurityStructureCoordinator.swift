@@ -7,7 +7,7 @@ import Profile
 public struct CreateSecurityStructureCoordinator: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		var root: Path.State
-		var path: StackState<Path.State> = []
+		var path: StackState<Path.State> = .init()
 
 		public init() {
 			root = .start(.init())
@@ -52,7 +52,7 @@ public struct CreateSecurityStructureCoordinator: Sendable, FeatureReducer {
 
 	public enum ChildAction: Sendable, Equatable {
 		case root(Path.Action)
-		case path(StackAction<Path.Action>)
+		case path(StackActionOf<Path>)
 	}
 
 	public enum DelegateAction: Sendable, Hashable {

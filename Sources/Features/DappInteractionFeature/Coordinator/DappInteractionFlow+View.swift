@@ -56,37 +56,37 @@ extension DappInteractionFlow {
 		}
 
 		func destination(
-			for store: StoreOf<DappInteractionFlow.Destinations>
+			for store: StoreOf<DappInteractionFlow.Path>
 		) -> some SwiftUI.View {
-			SwitchStore(store.relay()) {
+			SwitchStore(store) {
 				CaseLet(
-					state: /DappInteractionFlow.Destinations.MainState.login,
-					action: DappInteractionFlow.Destinations.MainAction.login,
+					state: /DappInteractionFlow.Path.State.login,
+					action: DappInteractionFlow.Path.Action.login,
 					then: { Login.View(store: $0) }
 				)
 				CaseLet(
-					state: /DappInteractionFlow.Destinations.MainState.accountPermission,
-					action: DappInteractionFlow.Destinations.MainAction.accountPermission,
+					state: /DappInteractionFlow.Path.State.accountPermission,
+					action: DappInteractionFlow.Path.Action.accountPermission,
 					then: { AccountPermission.View(store: $0) }
 				)
 				CaseLet(
-					state: /DappInteractionFlow.Destinations.MainState.chooseAccounts,
-					action: DappInteractionFlow.Destinations.MainAction.chooseAccounts,
+					state: /DappInteractionFlow.Path.State.chooseAccounts,
+					action: DappInteractionFlow.Path.Action.chooseAccounts,
 					then: { AccountPermissionChooseAccounts.View(store: $0) }
 				)
 				CaseLet(
-					state: /DappInteractionFlow.Destinations.MainState.personaDataPermission,
-					action: DappInteractionFlow.Destinations.MainAction.personaDataPermission,
+					state: /DappInteractionFlow.Path.State.personaDataPermission,
+					action: DappInteractionFlow.Path.Action.personaDataPermission,
 					then: { PersonaDataPermission.View(store: $0) }
 				)
 				CaseLet(
-					state: /DappInteractionFlow.Destinations.MainState.oneTimePersonaData,
-					action: DappInteractionFlow.Destinations.MainAction.oneTimePersonaData,
+					state: /DappInteractionFlow.Path.State.oneTimePersonaData,
+					action: DappInteractionFlow.Path.Action.oneTimePersonaData,
 					then: { OneTimePersonaData.View(store: $0) }
 				)
 				CaseLet(
-					state: /DappInteractionFlow.Destinations.MainState.reviewTransaction,
-					action: DappInteractionFlow.Destinations.MainAction.reviewTransaction,
+					state: /DappInteractionFlow.Path.State.reviewTransaction,
+					action: DappInteractionFlow.Path.Action.reviewTransaction,
 					then: { TransactionReview.View(store: $0) }
 				)
 			}
