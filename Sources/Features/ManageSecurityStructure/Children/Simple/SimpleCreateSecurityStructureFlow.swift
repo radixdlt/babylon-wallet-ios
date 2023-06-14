@@ -156,11 +156,7 @@ public struct SimpleManageSecurityStructureFlow: Sendable, FeatureReducer {
 			let purpose: AnswerSecurityQuestionsCoordinator.State.Purpose = {
 				switch state.mode {
 				case let .existing(structure):
-//					guard structure.isSimple, let factorSource = structure.configuration.confirmationRole.thresholdFactors[0].extract(SecurityQuestionsFactorSource.self) else {
-//						return .encrypt()
-//					}
-//					return .editing(factorSource: factorSource)
-					return .encrypt()
+					fatalError("We should display a list of SecurityQuestionFactorSource's and a picker and a 'create new' button...")
 				case let .new(new):
 					if let confirmerOfNewPhone = new.confirmerOfNewPhone {
 						return .editing(editingAnswersToQuestions: confirmerOfNewPhone.answersToQuestions)
@@ -179,10 +175,10 @@ public struct SimpleManageSecurityStructureFlow: Sendable, FeatureReducer {
 					guard structure.isSimple, let factorSource = structure.configuration.recoveryRole.thresholdFactors[0].extract(TrustedContactFactorSource.self) else {
 						return .new
 					}
-					return .existing(factorSource)
+					return .existing(factorSource, isFactorSourceSavedInProfile: true)
 				case let .new(new):
 					if let unsavedTrustedContact = new.lostPhoneHelper {
-						return .existing(unsavedTrustedContact)
+						return .existing(unsavedTrustedContact, isFactorSourceSavedInProfile: false)
 					} else {
 						return .new
 					}

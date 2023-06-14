@@ -3,14 +3,15 @@ import ScanQRFeature
 
 extension ManageTrustedContactFactorSource.State {
 	var viewState: ManageTrustedContactFactorSource.ViewState {
-		.init(isCreatingNew: mode == .new, radixAddress: radixAddress, emailAddress: emailAddress, name: name)
+		.init(canEditRadixAddress: canEditRadixAddress, isCreatingNewFromScratch: mode == .new, radixAddress: radixAddress, emailAddress: emailAddress, name: name)
 	}
 }
 
 // MARK: - ManageTrustedContactFactorSource.View
 extension ManageTrustedContactFactorSource {
 	public struct ViewState: Equatable {
-		let isCreatingNew: Bool
+		let canEditRadixAddress: Bool
+		let isCreatingNewFromScratch: Bool
 		let radixAddress: String
 		let emailAddress: String
 		let name: String
@@ -34,7 +35,7 @@ extension ManageTrustedContactFactorSource {
 		}
 
 		var addressHint: Hint? {
-			if isCreatingNew {
+			if canEditRadixAddress {
 				guard
 					!radixAddress.isEmpty,
 					address == nil
@@ -82,7 +83,7 @@ extension ManageTrustedContactFactorSource {
 					Text("Your phone is your only access to your wallet. If you lose it, you’ll need someone you trust to lock your old phone and process a new one.")
 
 					addressField(with: viewStore)
-						.disabled(!viewStore.isCreatingNew) // do not allow edit of address
+						.disabled(!viewStore.canEditRadixAddress) // do not allow edit of address
 
 					emailField(with: viewStore)
 					nameField(with: viewStore)
@@ -92,7 +93,7 @@ extension ManageTrustedContactFactorSource {
 					continueButton(viewStore)
 				}
 				// FIXME: Strings
-				.navigationTitle(viewStore.isCreatingNew ? "Add Trusted Contact" : "Edit Trusted Contact")
+				.navigationTitle(viewStore.isCreatingNewFromScratch ? "Add Trusted Contact" : "Edit Trusted Contact")
 				.sheet(
 					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
 					state: /ManageTrustedContactFactorSource.Destinations.State.scanAccountAddress,
@@ -118,9 +119,9 @@ extension ManageTrustedContactFactorSource {
 					send: { .radixAddressChanged($0) }
 				),
 				hint: viewStore.addressHint,
-				showClearButton: viewStore.isCreatingNew,
+				showClearButton: viewStore.canEditRadixAddress,
 				innerAccessory: {
-					if viewStore.isCreatingNew {
+					if viewStore.canEditRadixAddress {
 						Button {
 							viewStore.send(.scanQRCode)
 						} label: {
