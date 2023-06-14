@@ -3,8 +3,8 @@ import FeaturePrelude
 // MARK: - SecurityStructureConfigurationRow
 public struct SecurityStructureConfigurationRow: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable, Identifiable {
-		public typealias ID = SecurityStructureConfiguration
-		public var id: ID { config }
+		public typealias ID = SecurityStructureConfiguration.ID
+		public var id: ID { config.id }
 		public let config: SecurityStructureConfiguration
 		public init(config: SecurityStructureConfiguration) {
 			self.config = config

@@ -9,12 +9,12 @@ extension AppPreferences {
 		CustomStringConvertible,
 		CustomDumpReflectable
 	{
-		public var structureConfigurations: OrderedSet<SecurityStructureConfiguration>
+		public var structureConfigurations: IdentifiedArrayOf<SecurityStructureConfiguration>
 		public var isCloudProfileSyncEnabled: Bool
 		public var isDeveloperModeEnabled: Bool
 
 		public init(
-			structureConfigurations: OrderedSet<SecurityStructureConfiguration> = [],
+			structureConfigurations: IdentifiedArrayOf<SecurityStructureConfiguration> = [],
 			isCloudProfileSyncEnabled: Bool = true,
 			isDeveloperModeEnabled: Bool = true
 		) {

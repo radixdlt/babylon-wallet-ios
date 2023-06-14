@@ -72,6 +72,7 @@ extension AppPreferencesClient {
 
 let bestFriend = """
 {
+	"id": "E621E1F8-C36C-495A-93FC-0C247A3E6E5F",
 	"configuration":
 	{
 		"confirmationRole":
@@ -240,6 +241,7 @@ let bestFriend = """
 
 let instabridge = """
 {
+	"id": "A621E1F8-C36C-495A-93FC-0C247A3E6E5F",
 	"configuration":
 	{
 		"confirmationRole":
@@ -408,6 +410,7 @@ let instabridge = """
 
 let colleague = """
 {
+	"id": "0621E1F8-C36C-495A-93FC-0C247A3E6E5A",
 	"configuration":
 	{
 		"confirmationRole":

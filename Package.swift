@@ -243,6 +243,7 @@ package.addModules([
 	.feature(
 		name: "GeneralSettings",
 		dependencies: [
+			"CacheClient",
 			"AppPreferencesClient",
 			"FactorSourcesClient", // check if has any ledgers
 		],

@@ -27,26 +27,15 @@ extension View {
 	@MainActor
 	fileprivate func destination(store: StoreOf<SecurityStructureConfigurationListCoordinator>) -> some View {
 		let destinationStore = store.scope(state: \.$destination, action: { .child(.destination($0)) })
-		return createSecurityStructureCoordinator(with: destinationStore)
-			.details(with: destinationStore)
+		return manageSecurityStructureCoordinator(with: destinationStore)
 	}
 
 	@MainActor
-	private func createSecurityStructureCoordinator(with destinationStore: PresentationStoreOf<SecurityStructureConfigurationListCoordinator.Destination>) -> some View {
+	private func manageSecurityStructureCoordinator(with destinationStore: PresentationStoreOf<SecurityStructureConfigurationListCoordinator.Destination>) -> some View {
 		sheet(
 			store: destinationStore,
-			state: /SecurityStructureConfigurationListCoordinator.Destination.State.createSecurityStructureConfig,
-			action: SecurityStructureConfigurationListCoordinator.Destination.Action.createSecurityStructureConfig,
-			content: { ManageSecurityStructureCoordinator.View(store: $0) }
-		)
-	}
-
-	@MainActor
-	private func details(with destinationStore: PresentationStoreOf<SecurityStructureConfigurationListCoordinator.Destination>) -> some View {
-		sheet(
-			store: destinationStore,
-			state: /SecurityStructureConfigurationListCoordinator.Destination.State.securityStructureConfigDetails,
-			action: SecurityStructureConfigurationListCoordinator.Destination.Action.securityStructureConfigDetails,
+			state: /SecurityStructureConfigurationListCoordinator.Destination.State.manageSecurityStructureCoordinator,
+			action: SecurityStructureConfigurationListCoordinator.Destination.Action.manageSecurityStructureCoordinator,
 			content: { ManageSecurityStructureCoordinator.View(store: $0) }
 		)
 	}

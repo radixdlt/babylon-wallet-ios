@@ -60,8 +60,12 @@ public struct SecurityStructureConfigurationList: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
-		case let .config(config, action: .delegate(.displayDetails)):
-			return .send(.delegate(.displayDetails(config)))
+		case let .config(id, action: .delegate(.displayDetails)):
+			guard let configState = state.configs[id: id] else {
+				assertionFailure("did not find config")
+				return .none
+			}
+			return .send(.delegate(.displayDetails(configState.config)))
 		default: return .none
 		}
 	}

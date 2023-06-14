@@ -25,20 +25,18 @@ public struct SecurityStructureConfigurationListCoordinator: Sendable, FeatureRe
 
 	public struct Destination: ReducerProtocol {
 		public enum State: Equatable, Hashable {
-			case createSecurityStructureConfig(ManageSecurityStructureCoordinator.State)
-			case securityStructureConfigDetails(ManageSecurityStructureCoordinator.State)
+			case manageSecurityStructureCoordinator(ManageSecurityStructureCoordinator.State)
 		}
 
 		public enum Action: Equatable {
-			case createSecurityStructureConfig(ManageSecurityStructureCoordinator.Action)
-			case securityStructureConfigDetails(ManageSecurityStructureCoordinator.Action)
+			case manageSecurityStructureCoordinator(ManageSecurityStructureCoordinator.Action)
 		}
 
 		public var body: some ReducerProtocolOf<Self> {
-			Scope(state: /State.createSecurityStructureConfig, action: /Action.createSecurityStructureConfig) {
-				ManageSecurityStructureCoordinator()
-			}
-			Scope(state: /State.securityStructureConfigDetails, action: /Action.securityStructureConfigDetails) {
+			Scope(
+				state: /State.manageSecurityStructureCoordinator,
+				action: /Action.manageSecurityStructureCoordinator
+			) {
 				ManageSecurityStructureCoordinator()
 			}
 		}
@@ -64,14 +62,14 @@ public struct SecurityStructureConfigurationListCoordinator: Sendable, FeatureRe
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
 		case .configList(.delegate(.createNewStructure)):
-			state.destination = .createSecurityStructureConfig(.init())
+			state.destination = .manageSecurityStructureCoordinator(.init())
 			return .none
 
 		case let .configList(.delegate(.displayDetails(config))):
-			state.destination = .securityStructureConfigDetails(.init(mode: .existing(config)))
+			state.destination = .manageSecurityStructureCoordinator(.init(mode: .existing(config)))
 			return .none
 
-		case let .destination(.presented(.createSecurityStructureConfig(.delegate(.done(.success(config)))))):
+		case let .destination(.presented(.manageSecurityStructureCoordinator(.delegate(.done(.success(config)))))):
 			state.configList.configs.append(.init(config: config))
 			state.destination = nil
 			return .none

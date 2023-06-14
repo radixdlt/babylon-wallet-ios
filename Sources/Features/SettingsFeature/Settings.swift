@@ -151,6 +151,7 @@ public struct AppSettings: Sendable, FeatureReducer {
 			}
 			Scope(state: /State.securityStructureConfigs, action: /Action.securityStructureConfigs) {
 				SecurityStructureConfigurationListCoordinator()
+					._printChanges()
 			}
 			#endif
 		}
@@ -190,7 +191,6 @@ public struct AppSettings: Sendable, FeatureReducer {
 			return .none
 
 		case .personasButtonTapped:
-			// TODO: implement
 			state.destination = .personas(.init())
 			return .none
 

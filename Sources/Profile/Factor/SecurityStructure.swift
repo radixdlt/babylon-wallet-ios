@@ -101,10 +101,13 @@ public struct AbstractSecurityStructure<AbstractFactor>:
 
 // MARK: - AbstractSecurityStructureConfiguration
 public struct AbstractSecurityStructureConfiguration<AbstractFactor>:
-	Sendable, Hashable, Codable
+	Sendable, Hashable, Codable, Identifiable
 	where AbstractFactor: Sendable & Hashable & Codable
 {
+	public typealias ID = UUID
 	public typealias Configuration = AbstractSecurityStructure<AbstractFactor>
+
+	public let id: ID
 
 	/// can be renamed
 	public var label: NonEmptyString
@@ -118,12 +121,15 @@ public struct AbstractSecurityStructureConfiguration<AbstractFactor>:
 	public var lastUpdatedOn: Date
 
 	public init(
+		id: ID? = nil,
 		label: NonEmptyString,
 		configuration: Configuration,
 		createdOn: Date? = nil,
 		lastUpdatedOn: Date? = nil
 	) {
 		@Dependency(\.date) var date
+		@Dependency(\.uuid) var uuid
+		self.id = id ?? uuid()
 		self.label = label
 		self.createdOn = createdOn ?? date()
 		self.lastUpdatedOn = lastUpdatedOn ?? date()
