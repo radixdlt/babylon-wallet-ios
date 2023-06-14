@@ -103,7 +103,12 @@ final class ProfileTests: TestCase {
 			$0.uuid = .constant(stableUUID)
 		} operation: {
 			XCTAssertNoThrow(
-				try DeviceFactorSource.olympia(mnemonic: mnemonic, model: deviceFactorModel, name: deviceFactorName)
+				try DeviceFactorSource.olympia(
+					mnemonic: mnemonic,
+					model: deviceFactorModel,
+					name: deviceFactorName,
+					addedOn: stableDate
+				)
 			)
 		}
 	}
@@ -113,6 +118,11 @@ final class ProfileTests: TestCase {
 
 		let curve25519FactorSourceMnemonic = try Mnemonic(
 			phrase: "bright club bacon dinner achieve pull grid save ramp cereal blush woman humble limb repeat video sudden possible story mask neutral prize goose mandate",
+			language: .english
+		)
+
+		let offDeviceMnemonic = try Mnemonic(
+			phrase: "zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo vote",
 			language: .english
 		)
 		let secp256K1FactorMnemonic = try Mnemonic(
@@ -128,12 +138,14 @@ final class ProfileTests: TestCase {
 			let babylonFactorSource = try DeviceFactorSource.babylon(
 				mnemonic: curve25519FactorSourceMnemonic,
 				model: deviceFactorModel,
-				name: deviceFactorName
+				name: deviceFactorName,
+				addedOn: stableDate
 			)
 			let olympiaFactorSource = try DeviceFactorSource.olympia(
 				mnemonic: secp256K1FactorMnemonic,
 				model: deviceFactorModel,
-				name: deviceFactorName
+				name: deviceFactorName,
+				addedOn: stableDate
 			)
 
 			let profile = Profile(
@@ -148,6 +160,20 @@ final class ProfileTests: TestCase {
 		var profile = _profile
 		XCTAssertEqual(profile.appPreferences.gateways.current.network, gateway.network)
 		profile.factorSources.append(olympiaFactorSource)
+
+		let (trustedContactFactorSource, offDeviceMnemonicFactorSource) = try withDependencies {
+			$0.date = .constant(stableDate)
+		} operation: {
+			let trustedContactFactorSource = TrustedContactFactorSource.from(
+				radixAddress: "account_tdx_c_1px0jul7a44s65568d32f82f0lkssjwx6f5t5e44yl6csqurxw3",
+				emailAddress: "hi@rdx.works",
+				name: "My friend"
+			)
+			let offDeviceMnemonicFactorSource = try OffDeviceMnemonicFactorSource.from(mnemonicWithPassphrase: .init(mnemonic: offDeviceMnemonic), label: "Zoo")
+			return (trustedContactFactorSource, offDeviceMnemonicFactorSource)
+		}
+		profile.factorSources.append(trustedContactFactorSource)
+		profile.factorSources.append(offDeviceMnemonicFactorSource)
 
 		func addNewAccount(_ name: NonEmptyString) throws -> Profile.Network.Account {
 			let index = try profile.factorSources.babylonDevice.nextDerivationIndex(
@@ -585,19 +611,32 @@ extension DeviceFactorSource {
 		mnemonic: Mnemonic,
 		model: Hint.Model,
 		name: String,
-		addedOn: Date = .now,
-		lastUsedOn: Date = .now
+		addedOn: Date
 	) throws -> Self {
-		try Self.babylon(mnemonicWithPassphrase: .init(mnemonic: mnemonic), model: model, name: name, addedOn: addedOn, lastUsedOn: lastUsedOn)
+		try Self.babylon(mnemonicWithPassphrase: .init(mnemonic: mnemonic), model: model, name: name, addedOn: addedOn, lastUsedOn: addedOn)
 	}
 
 	public static func olympia(
 		mnemonic: Mnemonic,
 		model: Hint.Model,
 		name: String,
-		addedOn: Date = .now,
-		lastUsedOn: Date = .now
+		addedOn: Date
 	) throws -> Self {
-		try Self.olympia(mnemonicWithPassphrase: .init(mnemonic: mnemonic), model: model, name: name, addedOn: addedOn, lastUsedOn: lastUsedOn)
+		try Self.olympia(mnemonicWithPassphrase: .init(mnemonic: mnemonic), model: model, name: name, addedOn: addedOn, lastUsedOn: addedOn)
+	}
+}
+
+// MARK: - EmailAddress + ExpressibleByStringLiteral
+extension EmailAddress: ExpressibleByStringLiteral {
+	public init(stringLiteral value: String) {
+		let nonEmpty = NonEmptyString(rawValue: value)!
+		try! self.init(validating: nonEmpty)
+	}
+}
+
+// MARK: - AccountAddress + ExpressibleByStringLiteral
+extension AccountAddress: ExpressibleByStringLiteral {
+	public init(stringLiteral value: String) {
+		try! self.init(address: value)
 	}
 }

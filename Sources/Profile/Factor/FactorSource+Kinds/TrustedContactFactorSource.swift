@@ -8,26 +8,35 @@ public struct TrustedContactFactorSource: FactorSourceProtocol {
 
 	public let id: ID
 	public var common: FactorSource.Common
-	public let emailAddress: EmailAddress
-	public let name: NonEmptyString
+	public let contact: Contact
 
 	internal init(
 		id: ID,
 		common: FactorSource.Common,
-		emailAddress: EmailAddress,
-		name: NonEmptyString
+		contact: Contact
 	) {
 		precondition(id.kind == Self.kind)
 		self.id = id
 		self.common = common
-		self.emailAddress = emailAddress
-		self.name = name
+		self.contact = contact
 	}
 }
 
 extension TrustedContactFactorSource {
 	public static let kind: FactorSourceKind = .trustedContact
 	public static var casePath: CasePath<FactorSource, Self> = /FactorSource.trustedContact
+}
+
+// MARK: TrustedContactFactorSource.Contact
+extension TrustedContactFactorSource {
+	public struct Contact: Sendable, Hashable, Codable {
+		public let name: NonEmptyString
+		public let email: EmailAddress
+		public init(name: NonEmptyString, email: EmailAddress) {
+			self.name = name
+			self.email = email
+		}
+	}
 }
 
 extension TrustedContactFactorSource {
@@ -45,38 +54,7 @@ extension TrustedContactFactorSource {
 				addedOn: addedOn ?? date(),
 				lastUsedOn: lastUsedOn ?? date()
 			),
-			emailAddress: emailAddress,
-			name: name
+			contact: .init(name: name, email: emailAddress)
 		)
-	}
-}
-
-// MARK: - EmailAddress
-public struct EmailAddress: Sendable, Hashable, Codable {
-	public let email: NonEmptyString
-	public init(validating email: NonEmptyString) throws {
-		guard email.rawValue.isEmailAddress else {
-			throw InvalidEmailAddress(invalid: email.rawValue)
-		}
-		self.email = email
-	}
-
-	struct InvalidEmailAddress: Swift.Error {
-		let invalid: String
-	}
-
-	public func encode(to encoder: Encoder) throws {
-		var container = encoder.singleValueContainer()
-		try container.encode(email.rawValue)
-	}
-
-	public init(from decoder: Decoder) throws {
-		let container = try decoder.singleValueContainer()
-		let emailMaybeEmpty = try container.decode(String.self)
-		guard let nonEmpty = NonEmptyString(rawValue: emailMaybeEmpty) else {
-			struct InvalidEmailAddressCannotBeEmpty: Swift.Error {}
-			throw InvalidEmailAddressCannotBeEmpty()
-		}
-		try self.init(validating: nonEmpty)
 	}
 }
