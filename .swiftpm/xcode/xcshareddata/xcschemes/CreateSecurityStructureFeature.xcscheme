@@ -14,9 +14,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "CreateSecurityStructureFeature"
-               BuildableName = "CreateSecurityStructureFeature"
-               BlueprintName = "CreateSecurityStructureFeature"
+               BlueprintIdentifier = "ManageSecurityStructureFeature"
+               BuildableName = "ManageSecurityStructureFeature"
+               BlueprintName = "ManageSecurityStructureFeature"
                ReferencedContainer = "container:">
             </BuildableReference>
          </BuildActionEntry>
@@ -49,9 +49,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "CreateSecurityStructureFeature"
-            BuildableName = "CreateSecurityStructureFeature"
-            BlueprintName = "CreateSecurityStructureFeature"
+            BlueprintIdentifier = "ManageSecurityStructureFeature"
+            BuildableName = "ManageSecurityStructureFeature"
+            BlueprintName = "ManageSecurityStructureFeature"
             ReferencedContainer = "container:">
          </BuildableReference>
       </MacroExpansion>

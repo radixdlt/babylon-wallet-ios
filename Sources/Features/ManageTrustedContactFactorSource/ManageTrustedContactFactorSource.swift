@@ -2,17 +2,33 @@ import FactorSourcesClient
 import FeaturePrelude
 import ScanQRFeature
 
-// MARK: - AddTrustedContactFactorSource
-public struct AddTrustedContactFactorSource: Sendable, FeatureReducer {
+// MARK: - ManageTrustedContactFactorSource
+public struct ManageTrustedContactFactorSource: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public var radixAddress: String = ""
 		public var emailAddress: String = ""
 		public var name: String = ""
 
+		public enum Mode: Sendable, Hashable {
+			case existing(TrustedContactFactorSource)
+			case new
+		}
+
+		public var mode: Mode
+
 		@PresentationState
 		var destination: Destinations.State? = nil
 
-		public init() {}
+		public init(
+			mode: Mode = .new
+		) {
+			self.mode = mode
+			//            switch mode {
+			//            case let .existing(existing):
+			////                self.radixAddress = existing.id
+			//                fatalError()
+			//            }
+		}
 	}
 
 	public struct Destinations: Sendable, ReducerProtocol {

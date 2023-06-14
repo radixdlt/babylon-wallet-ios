@@ -1,5 +1,5 @@
-import CreateSecurityStructureFeature
 import FeaturePrelude
+import ManageSecurityStructureFeature
 
 // MARK: - SecurityStructureConfigurationListCoordinator.View
 extension SecurityStructureConfigurationListCoordinator {
@@ -37,7 +37,7 @@ extension View {
 			store: destinationStore,
 			state: /SecurityStructureConfigurationListCoordinator.Destination.State.createSecurityStructureConfig,
 			action: SecurityStructureConfigurationListCoordinator.Destination.Action.createSecurityStructureConfig,
-			content: { CreateSecurityStructureCoordinator.View(store: $0) }
+			content: { ManageSecurityStructureCoordinator.View(store: $0) }
 		)
 	}
 
@@ -47,7 +47,7 @@ extension View {
 			store: destinationStore,
 			state: /SecurityStructureConfigurationListCoordinator.Destination.State.securityStructureConfigDetails,
 			action: SecurityStructureConfigurationListCoordinator.Destination.Action.securityStructureConfigDetails,
-			content: { SecurityStructureConfigDetails.View(store: $0) }
+			content: { ManageSecurityStructureCoordinator.View(store: $0) }
 		)
 	}
 }

@@ -1,22 +1,22 @@
 import FeaturePrelude
 
-extension CreateSecurityStructureStart.State {
-	var viewState: CreateSecurityStructureStart.ViewState {
+extension ManageSecurityStructureStart.State {
+	var viewState: ManageSecurityStructureStart.ViewState {
 		.init()
 	}
 }
 
-// MARK: - CreateSecurityStructureStart.View
-extension CreateSecurityStructureStart {
+// MARK: - ManageSecurityStructureStart.View
+extension ManageSecurityStructureStart {
 	public struct ViewState: Equatable {
 		// TODO: declare some properties
 	}
 
 	@MainActor
 	public struct View: SwiftUI.View {
-		private let store: StoreOf<CreateSecurityStructureStart>
+		private let store: StoreOf<ManageSecurityStructureStart>
 
-		public init(store: StoreOf<CreateSecurityStructureStart>) {
+		public init(store: StoreOf<ManageSecurityStructureStart>) {
 			self.store = store
 		}
 
@@ -50,7 +50,7 @@ extension CreateSecurityStructureStart {
 			}
 		}
 
-		private func footerView(_ viewStore: ViewStoreOf<CreateSecurityStructureStart>) -> some SwiftUI.View {
+		private func footerView(_ viewStore: ViewStoreOf<ManageSecurityStructureStart>) -> some SwiftUI.View {
 			VStack(spacing: .medium1) {
 				Text("Used Metamask or other crypto wallets? You may prefer:")
 					.font(.app.body1Header)
@@ -69,19 +69,19 @@ extension CreateSecurityStructureStart {
 #if DEBUG
 import SwiftUI // NB: necessary for previews to appear
 
-// MARK: - CreateSecurityStructureStart_Preview
-struct CreateSecurityStructureStart_Preview: PreviewProvider {
+// MARK: - ManageSecurityStructureStart_Preview
+struct ManageSecurityStructureStart_Preview: PreviewProvider {
 	static var previews: some View {
-		CreateSecurityStructureStart.View(
+		ManageSecurityStructureStart.View(
 			store: .init(
 				initialState: .previewValue,
-				reducer: CreateSecurityStructureStart()
+				reducer: ManageSecurityStructureStart()
 			)
 		)
 	}
 }
 
-extension CreateSecurityStructureStart.State {
+extension ManageSecurityStructureStart.State {
 	public static let previewValue = Self()
 }
 #endif

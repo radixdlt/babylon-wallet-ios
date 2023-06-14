@@ -55,7 +55,7 @@ package.addModules([
 		tests: .no
 	),
 	.feature(
-		name: "AddTrustedContactFactorSourceFeature",
+		name: "ManageTrustedContactFactorSourceFeature",
 		featureSuffixDroppedFromFolderName: true,
 		dependencies: [
 			"FactorSourcesClient",
@@ -167,12 +167,12 @@ package.addModules([
 		tests: .no
 	),
 	.feature(
-		name: "CreateSecurityStructureFeature",
+		name: "ManageSecurityStructureFeature",
 		featureSuffixDroppedFromFolderName: true,
 		dependencies: [
 			"Profile",
 			"AnswerSecurityQuestionsFeature",
-			"AddTrustedContactFactorSourceFeature",
+			"ManageTrustedContactFactorSourceFeature",
 			"AppPreferencesClient", // Save SecurityStructureConfig
 		],
 		tests: .no
@@ -367,7 +367,7 @@ package.addModules([
 		featureSuffixDroppedFromFolderName: true,
 		dependencies: [
 			"AppPreferencesClient",
-			"CreateSecurityStructureFeature",
+			"ManageSecurityStructureFeature",
 		],
 		tests: .no
 	),

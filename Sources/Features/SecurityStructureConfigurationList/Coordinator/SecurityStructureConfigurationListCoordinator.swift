@@ -1,5 +1,5 @@
-import CreateSecurityStructureFeature
 import FeaturePrelude
+import ManageSecurityStructureFeature
 
 // MARK: - SecurityStructureConfigurationListCoordinator
 public struct SecurityStructureConfigurationListCoordinator: Sendable, FeatureReducer {
@@ -25,21 +25,21 @@ public struct SecurityStructureConfigurationListCoordinator: Sendable, FeatureRe
 
 	public struct Destination: ReducerProtocol {
 		public enum State: Equatable, Hashable {
-			case createSecurityStructureConfig(CreateSecurityStructureCoordinator.State)
-			case securityStructureConfigDetails(SecurityStructureConfigDetails.State)
+			case createSecurityStructureConfig(ManageSecurityStructureCoordinator.State)
+			case securityStructureConfigDetails(ManageSecurityStructureCoordinator.State)
 		}
 
 		public enum Action: Equatable {
-			case createSecurityStructureConfig(CreateSecurityStructureCoordinator.Action)
-			case securityStructureConfigDetails(SecurityStructureConfigDetails.Action)
+			case createSecurityStructureConfig(ManageSecurityStructureCoordinator.Action)
+			case securityStructureConfigDetails(ManageSecurityStructureCoordinator.Action)
 		}
 
 		public var body: some ReducerProtocolOf<Self> {
 			Scope(state: /State.createSecurityStructureConfig, action: /Action.createSecurityStructureConfig) {
-				CreateSecurityStructureCoordinator()
+				ManageSecurityStructureCoordinator()
 			}
 			Scope(state: /State.securityStructureConfigDetails, action: /Action.securityStructureConfigDetails) {
-				SecurityStructureConfigDetails()
+				ManageSecurityStructureCoordinator()
 			}
 		}
 	}
@@ -68,7 +68,7 @@ public struct SecurityStructureConfigurationListCoordinator: Sendable, FeatureRe
 			return .none
 
 		case let .configList(.delegate(.displayDetails(config))):
-			state.destination = .securityStructureConfigDetails(.init(config: config))
+			state.destination = .securityStructureConfigDetails(.init(mode: .existing(config)))
 			return .none
 
 		case let .destination(.presented(.createSecurityStructureConfig(.delegate(.done(.success(config)))))):

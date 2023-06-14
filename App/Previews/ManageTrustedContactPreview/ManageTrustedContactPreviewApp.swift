@@ -1,16 +1,16 @@
-import AddTrustedContactFactorSourceFeature
 import FeaturesPreviewerFeature
+import ManageTrustedContactFactorSourceFeature
 
-// MARK: - AddTrustedContactFactorSource.State + EmptyInitializable
-extension AddTrustedContactFactorSource.State: EmptyInitializable {}
+// MARK: - ManageTrustedContactFactorSource.State + EmptyInitializable
+extension ManageTrustedContactFactorSource.State: EmptyInitializable {}
 
-// MARK: - AddTrustedContactFactorSource.View + FeatureView
-extension AddTrustedContactFactorSource.View: FeatureView {
-	public typealias Feature = AddTrustedContactFactorSource
+// MARK: - ManageTrustedContactFactorSource.View + FeatureView
+extension ManageTrustedContactFactorSource.View: FeatureView {
+	public typealias Feature = ManageTrustedContactFactorSource
 }
 
-// MARK: - AddTrustedContactFactorSource + PreviewedFeature
-extension AddTrustedContactFactorSource: PreviewedFeature {
+// MARK: - ManageTrustedContactFactorSource + PreviewedFeature
+extension ManageTrustedContactFactorSource: PreviewedFeature {
 	public typealias ResultFromFeature = TrustedContactFactorSource
 }
 
@@ -18,7 +18,7 @@ extension AddTrustedContactFactorSource: PreviewedFeature {
 @main
 struct AddTrustedContactPreviewApp: SwiftUI.App {
 	var body: some Scene {
-		FeaturesPreviewer<AddTrustedContactFactorSource>.delegateAction {
+		FeaturesPreviewer<ManageTrustedContactFactorSource>.delegateAction {
 			guard case let .done(trustedContactFS) = $0 else { return nil }
 			return trustedContactFS
 		} withReducer: {

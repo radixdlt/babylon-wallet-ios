@@ -1,8 +1,8 @@
 import AppPreferencesClient
 import FeaturePrelude
 
-// MARK: - NameNewSecurityStructure
-public struct NameNewSecurityStructure: Sendable, FeatureReducer {
+// MARK: - NameSecurityStructure
+public struct NameSecurityStructure: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public let configuration: SecurityStructureConfiguration.Configuration
 		public var name = ""

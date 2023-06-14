@@ -1,10 +1,10 @@
-import AddTrustedContactFactorSourceFeature
 import AnswerSecurityQuestionsFeature
 import FeaturePrelude
 import Logging
+import ManageTrustedContactFactorSourceFeature
 
-extension SimpleCreateSecurityStructureFlow.State {
-	var viewState: SimpleCreateSecurityStructureFlow.ViewState {
+extension SimpleManageSecurityStructureFlow.State {
+	var viewState: SimpleManageSecurityStructureFlow.ViewState {
 		.init(state: self)
 	}
 }
@@ -15,8 +15,8 @@ public struct RecoveryAndConfirmationFactors: Sendable, Hashable {
 	let singleConfirmationFactor: SecurityQuestionsFactorSource
 }
 
-// MARK: - SimpleCreateSecurityStructureFlow.View
-extension SimpleCreateSecurityStructureFlow {
+// MARK: - SimpleManageSecurityStructureFlow.View
+extension SimpleManageSecurityStructureFlow {
 	public struct ViewState: Equatable {
 		public enum Mode: Equatable {
 			case new
@@ -50,7 +50,7 @@ extension SimpleCreateSecurityStructureFlow {
 		}
 
 		let isDisabled: Bool
-		init(state: SimpleCreateSecurityStructureFlow.State) {
+		init(state: SimpleManageSecurityStructureFlow.State) {
 			switch state.mode {
 			case let .existing(existing, isEditing):
 				precondition(existing.isSimple)
@@ -69,9 +69,9 @@ extension SimpleCreateSecurityStructureFlow {
 
 	@MainActor
 	public struct View: SwiftUI.View {
-		private let store: StoreOf<SimpleCreateSecurityStructureFlow>
+		private let store: StoreOf<SimpleManageSecurityStructureFlow>
 
-		public init(store: StoreOf<SimpleCreateSecurityStructureFlow>) {
+		public init(store: StoreOf<SimpleManageSecurityStructureFlow>) {
 			self.store = store
 		}
 
@@ -84,13 +84,14 @@ extension SimpleCreateSecurityStructureFlow {
 						NewPhoneConfirmer(factorSet: viewStore.newPhoneConfirmer) {
 							viewStore.send(.selectNewPhoneConfirmer)
 						}
+						.disabled(viewStore.isDisabled)
 
 						LostPhoneHelper(factorSet: viewStore.lostPhoneHelper) {
 							viewStore.send(.selectLostPhoneHelper)
 						}
+						.disabled(viewStore.isDisabled)
 					}
 				}
-				.disabled(viewStore.isDisabled)
 				.navigationTitle("Multi-Factor Setup") // FIXME: Strings
 				.toolbar {
 					if viewStore.mode.isExisting {
@@ -105,11 +106,12 @@ extension SimpleCreateSecurityStructureFlow {
 					WithControlRequirements(
 						viewStore.simpleSecurityStructure,
 						forAction: { simpleStructure in
-							viewStore.send(.finishSelectingFactors(simpleStructure))
+							viewStore.send(.finished(simpleStructure))
 						},
 						control: { action in
 							// FIXME: Strings
-							Button("Confirm Multifactor Settings", action: action)
+							let title = viewStore.mode.isExisting ? "Update setup" : "Create new setup"
+							Button(title, action: action)
 								.buttonStyle(.primaryRectangular)
 						}
 					)
@@ -125,31 +127,31 @@ extension SimpleCreateSecurityStructureFlow {
 
 extension View {
 	@MainActor
-	fileprivate func modalDestination(store: StoreOf<SimpleCreateSecurityStructureFlow>) -> some View {
+	fileprivate func modalDestination(store: StoreOf<SimpleManageSecurityStructureFlow>) -> some View {
 		let destinationStore = store.scope(state: \.$modalDestinations, action: { .child(.modalDestinations($0)) })
 		return lostPhoneHelper(with: destinationStore)
 			.newPhoneConfirmer(with: destinationStore)
 	}
 
 	@MainActor
-	private func newPhoneConfirmer(with destinationStore: PresentationStoreOf<SimpleCreateSecurityStructureFlow.ModalDestinations>) -> some View {
+	private func newPhoneConfirmer(with destinationStore: PresentationStoreOf<SimpleManageSecurityStructureFlow.ModalDestinations>) -> some View {
 		sheet(
 			store: destinationStore,
-			state: /SimpleCreateSecurityStructureFlow.ModalDestinations.State.simpleNewPhoneConfirmer,
-			action: SimpleCreateSecurityStructureFlow.ModalDestinations.Action.simpleNewPhoneConfirmer,
+			state: /SimpleManageSecurityStructureFlow.ModalDestinations.State.simpleNewPhoneConfirmer,
+			action: SimpleManageSecurityStructureFlow.ModalDestinations.Action.simpleNewPhoneConfirmer,
 			content: { AnswerSecurityQuestionsCoordinator.View(store: $0) }
 		)
 	}
 
 	@MainActor
-	private func lostPhoneHelper(with destinationStore: PresentationStoreOf<SimpleCreateSecurityStructureFlow.ModalDestinations>) -> some View {
+	private func lostPhoneHelper(with destinationStore: PresentationStoreOf<SimpleManageSecurityStructureFlow.ModalDestinations>) -> some View {
 		sheet(
 			store: destinationStore,
-			state: /SimpleCreateSecurityStructureFlow.ModalDestinations.State.simpleLostPhoneHelper,
-			action: SimpleCreateSecurityStructureFlow.ModalDestinations.Action.simpleLostPhoneHelper,
+			state: /SimpleManageSecurityStructureFlow.ModalDestinations.State.simpleLostPhoneHelper,
+			action: SimpleManageSecurityStructureFlow.ModalDestinations.Action.simpleLostPhoneHelper,
 			content: { store in
 				NavigationStack {
-					AddTrustedContactFactorSource.View(store: store)
+					ManageTrustedContactFactorSource.View(store: store)
 				}
 			}
 		)
@@ -159,19 +161,19 @@ extension View {
 // #if DEBUG
 // import SwiftUI // NB: necessary for previews to appear
 //
-//// MARK: - SimpleCreateSecurityStructureFlow_Preview
-// struct SimpleCreateSecurityStructureFlow_Preview: PreviewProvider {
+//// MARK: - SimpleManageSecurityStructureFlow_Preview
+// struct SimpleManageSecurityStructureFlow_Preview: PreviewProvider {
 //	static var previews: some View {
-//		SimpleCreateSecurityStructureFlow.View(
+//		SimpleManageSecurityStructureFlow.View(
 //			store: .init(
 //				initialState: .previewValue,
-//				reducer: SimpleCreateSecurityStructureFlow()
+//				reducer: SimpleManageSecurityStructureFlow()
 //			)
 //		)
 //	}
 // }
 //
-// extension SimpleCreateSecurityStructureFlow.State {
+// extension SimpleManageSecurityStructureFlow.State {
 //	public static let previewValue = Self(
 //		newPhoneConfirmer: nil,
 //		lostPhoneHelper: nil

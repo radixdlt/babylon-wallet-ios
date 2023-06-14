@@ -1,7 +1,7 @@
 import FeaturePrelude
 
-// MARK: - AdvancedCreateSecurityStructureFlow
-public struct AdvancedCreateSecurityStructureFlow: Sendable, FeatureReducer {
+// MARK: - AdvancedManageSecurityStructureFlow
+public struct AdvancedManageSecurityStructureFlow: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public enum Mode: Sendable, Hashable {
 			case existing(SecurityStructureConfiguration, isEditing: Bool = false)

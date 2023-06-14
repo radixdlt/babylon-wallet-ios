@@ -1,14 +1,14 @@
 import FeaturePrelude
 import ScanQRFeature
 
-extension AddTrustedContactFactorSource.State {
-	var viewState: AddTrustedContactFactorSource.ViewState {
+extension ManageTrustedContactFactorSource.State {
+	var viewState: ManageTrustedContactFactorSource.ViewState {
 		.init(radixAddress: radixAddress, emailAddress: emailAddress, name: name)
 	}
 }
 
-// MARK: - AddTrustedContactFactorSource.View
-extension AddTrustedContactFactorSource {
+// MARK: - ManageTrustedContactFactorSource.View
+extension ManageTrustedContactFactorSource {
 	public struct ViewState: Equatable {
 		let radixAddress: String
 		let emailAddress: String
@@ -64,9 +64,9 @@ extension AddTrustedContactFactorSource {
 
 	@MainActor
 	public struct View: SwiftUI.View {
-		private let store: StoreOf<AddTrustedContactFactorSource>
+		private let store: StoreOf<ManageTrustedContactFactorSource>
 
-		public init(store: StoreOf<AddTrustedContactFactorSource>) {
+		public init(store: StoreOf<ManageTrustedContactFactorSource>) {
 			self.store = store
 		}
 
@@ -88,8 +88,8 @@ extension AddTrustedContactFactorSource {
 				.navigationTitle("Add Trusted Contact")
 				.sheet(
 					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-					state: /AddTrustedContactFactorSource.Destinations.State.scanAccountAddress,
-					action: AddTrustedContactFactorSource.Destinations.Action.scanAccountAddress,
+					state: /ManageTrustedContactFactorSource.Destinations.State.scanAccountAddress,
+					action: ManageTrustedContactFactorSource.Destinations.Action.scanAccountAddress,
 					content: {
 						ScanQRCoordinator.View(store: $0)
 							// FIXME: Strings
@@ -100,7 +100,7 @@ extension AddTrustedContactFactorSource {
 		}
 
 		private func addressField(
-			with viewStore: ViewStoreOf<AddTrustedContactFactorSource>
+			with viewStore: ViewStoreOf<ManageTrustedContactFactorSource>
 		) -> some SwiftUI.View {
 			// FIXME: Strings
 			AppTextField(
@@ -125,7 +125,7 @@ extension AddTrustedContactFactorSource {
 		}
 
 		private func emailField(
-			with viewStore: ViewStoreOf<AddTrustedContactFactorSource>
+			with viewStore: ViewStoreOf<ManageTrustedContactFactorSource>
 		) -> some SwiftUI.View {
 			// FIXME: Strings
 			AppTextField(
@@ -143,7 +143,7 @@ extension AddTrustedContactFactorSource {
 		}
 
 		private func nameField(
-			with viewStore: ViewStoreOf<AddTrustedContactFactorSource>
+			with viewStore: ViewStoreOf<ManageTrustedContactFactorSource>
 		) -> some SwiftUI.View {
 			// FIXME: Strings
 			AppTextField(
@@ -159,7 +159,7 @@ extension AddTrustedContactFactorSource {
 			.keyboardType(.alphabet)
 		}
 
-		private func continueButton(_ viewStore: ViewStoreOf<AddTrustedContactFactorSource>) -> some SwiftUI.View {
+		private func continueButton(_ viewStore: ViewStoreOf<ManageTrustedContactFactorSource>) -> some SwiftUI.View {
 			WithControlRequirements(
 				viewStore.info,
 				forAction: { result in
@@ -182,19 +182,19 @@ extension AddTrustedContactFactorSource {
 #if DEBUG
 import SwiftUI // NB: necessary for previews to appear
 
-// MARK: - AddTrustedContactFactorSource_Preview
-struct AddTrustedContactFactorSource_Preview: PreviewProvider {
+// MARK: - ManageTrustedContactFactorSource_Preview
+struct ManageTrustedContactFactorSource_Preview: PreviewProvider {
 	static var previews: some View {
-		AddTrustedContactFactorSource.View(
+		ManageTrustedContactFactorSource.View(
 			store: .init(
 				initialState: .previewValue,
-				reducer: AddTrustedContactFactorSource()
+				reducer: ManageTrustedContactFactorSource()
 			)
 		)
 	}
 }
 
-extension AddTrustedContactFactorSource.State {
+extension ManageTrustedContactFactorSource.State {
 	public static let previewValue = Self()
 }
 #endif

@@ -2,8 +2,8 @@ import AppPreferencesClient
 import FeaturePrelude
 import Profile
 
-// MARK: - CreateSecurityStructureCoordinator
-public struct CreateSecurityStructureCoordinator: Sendable, FeatureReducer {
+// MARK: - ManageSecurityStructureCoordinator
+public struct ManageSecurityStructureCoordinator: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public var mode: Mode
 		public var root: Path.State
@@ -30,36 +30,36 @@ public struct CreateSecurityStructureCoordinator: Sendable, FeatureReducer {
 
 	public struct Path: Sendable, Hashable, ReducerProtocol {
 		public enum State: Sendable, Hashable {
-			case start(CreateSecurityStructureStart.State)
-			case simpleSetupFlow(SimpleCreateSecurityStructureFlow.State)
-			case advancedSetupFlow(AdvancedCreateSecurityStructureFlow.State)
-			case nameNewStructure(NameNewSecurityStructure.State)
+			case start(ManageSecurityStructureStart.State)
+			case simpleSetupFlow(SimpleManageSecurityStructureFlow.State)
+			case advancedSetupFlow(AdvancedManageSecurityStructureFlow.State)
+			case nameNewStructure(NameSecurityStructure.State)
 
-			var simpleSetupFlow: SimpleCreateSecurityStructureFlow.State? {
+			var simpleSetupFlow: SimpleManageSecurityStructureFlow.State? {
 				guard case let .simpleSetupFlow(simpleSetupFlow) = self else { return nil }
 				return simpleSetupFlow
 			}
 		}
 
 		public enum Action: Sendable, Equatable {
-			case start(CreateSecurityStructureStart.Action)
-			case simpleSetupFlow(SimpleCreateSecurityStructureFlow.Action)
-			case advancedSetupFlow(AdvancedCreateSecurityStructureFlow.Action)
-			case nameNewStructure(NameNewSecurityStructure.Action)
+			case start(ManageSecurityStructureStart.Action)
+			case simpleSetupFlow(SimpleManageSecurityStructureFlow.Action)
+			case advancedSetupFlow(AdvancedManageSecurityStructureFlow.Action)
+			case nameNewStructure(NameSecurityStructure.Action)
 		}
 
 		public var body: some ReducerProtocolOf<Self> {
 			Scope(state: /State.start, action: /Action.start) {
-				CreateSecurityStructureStart()
+				ManageSecurityStructureStart()
 			}
 			Scope(state: /State.simpleSetupFlow, action: /Action.simpleSetupFlow) {
-				SimpleCreateSecurityStructureFlow()
+				SimpleManageSecurityStructureFlow()
 			}
 			Scope(state: /State.advancedSetupFlow, action: /Action.advancedSetupFlow) {
-				AdvancedCreateSecurityStructureFlow()
+				AdvancedManageSecurityStructureFlow()
 			}
 			Scope(state: /State.nameNewStructure, action: /Action.nameNewStructure) {
-				NameNewSecurityStructure()
+				NameSecurityStructure()
 			}
 		}
 	}

@@ -1,7 +1,7 @@
 import FeaturePrelude
 
-// MARK: - CreateSecurityStructureStart
-public struct CreateSecurityStructureStart: Sendable, FeatureReducer {
+// MARK: - ManageSecurityStructureStart
+public struct ManageSecurityStructureStart: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public init() {}
 	}

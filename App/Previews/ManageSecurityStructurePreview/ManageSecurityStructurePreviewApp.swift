@@ -1,29 +1,29 @@
-import CreateSecurityStructureFeature
 import Cryptography
 import FeaturesPreviewerFeature
+import ManageSecurityStructureFeature
 
-// MARK: - CreateSecurityStructureCoordinator.State + EmptyInitializable
-extension CreateSecurityStructureCoordinator.State: EmptyInitializable {
+// MARK: - ManageSecurityStructureCoordinator.State + EmptyInitializable
+extension ManageSecurityStructureCoordinator.State: EmptyInitializable {
 	public init() {
 		self.init(mode: .existing(existingStructure))
 	}
 }
 
-// MARK: - CreateSecurityStructureCoordinator.View + FeatureView
-extension CreateSecurityStructureCoordinator.View: FeatureView {
-	public typealias Feature = CreateSecurityStructureCoordinator
+// MARK: - ManageSecurityStructureCoordinator.View + FeatureView
+extension ManageSecurityStructureCoordinator.View: FeatureView {
+	public typealias Feature = ManageSecurityStructureCoordinator
 }
 
-// MARK: - CreateSecurityStructureCoordinator + PreviewedFeature
-extension CreateSecurityStructureCoordinator: PreviewedFeature {
+// MARK: - ManageSecurityStructureCoordinator + PreviewedFeature
+extension ManageSecurityStructureCoordinator: PreviewedFeature {
 	public typealias ResultFromFeature = SecurityStructureConfiguration
 }
 
-// MARK: - CreateSecurityStructurePreviewApp
+// MARK: - ManageSecurityStructurePreviewApp
 @main
-struct CreateSecurityStructurePreviewApp: SwiftUI.App {
+struct ManageSecurityStructurePreviewApp: SwiftUI.App {
 	var body: some Scene {
-		FeaturesPreviewer<CreateSecurityStructureCoordinator>.delegateAction {
+		FeaturesPreviewer<ManageSecurityStructureCoordinator>.delegateAction {
 			guard case let .done(secStructureConfig) = $0 else { return nil }
 			return secStructureConfig
 		} withReducer: {

@@ -1,7 +1,7 @@
-import AddTrustedContactFactorSourceFeature
 import AnswerSecurityQuestionsFeature
 import FactorSourcesClient
 import FeaturePrelude
+import ManageTrustedContactFactorSourceFeature
 
 // MARK: - SimpleUnnamedSecurityStructureConfig
 public struct SimpleUnnamedSecurityStructureConfig: Sendable, Hashable {
@@ -10,8 +10,8 @@ public struct SimpleUnnamedSecurityStructureConfig: Sendable, Hashable {
 	let singleConfirmationFactor: SecurityQuestionsFactorSource
 }
 
-// MARK: - SimpleCreateSecurityStructureFlow
-public struct SimpleCreateSecurityStructureFlow: Sendable, FeatureReducer {
+// MARK: - SimpleManageSecurityStructureFlow
+public struct SimpleManageSecurityStructureFlow: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public enum Mode: Sendable, Hashable {
 			case existing(SecurityStructureConfiguration, isEditing: Bool = false)
@@ -47,7 +47,7 @@ public struct SimpleCreateSecurityStructureFlow: Sendable, FeatureReducer {
 		case editChanged
 		case selectNewPhoneConfirmer
 		case selectLostPhoneHelper
-		case finishSelectingFactors(RecoveryAndConfirmationFactors)
+		case finished(RecoveryAndConfirmationFactors)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -62,12 +62,12 @@ public struct SimpleCreateSecurityStructureFlow: Sendable, FeatureReducer {
 	public struct ModalDestinations: Sendable, ReducerProtocol {
 		public enum State: Sendable, Hashable {
 			case simpleNewPhoneConfirmer(AnswerSecurityQuestionsCoordinator.State)
-			case simpleLostPhoneHelper(AddTrustedContactFactorSource.State)
+			case simpleLostPhoneHelper(ManageTrustedContactFactorSource.State)
 		}
 
 		public enum Action: Sendable, Equatable {
 			case simpleNewPhoneConfirmer(AnswerSecurityQuestionsCoordinator.Action)
-			case simpleLostPhoneHelper(AddTrustedContactFactorSource.Action)
+			case simpleLostPhoneHelper(ManageTrustedContactFactorSource.Action)
 		}
 
 		public var body: some ReducerProtocolOf<Self> {
@@ -75,7 +75,7 @@ public struct SimpleCreateSecurityStructureFlow: Sendable, FeatureReducer {
 				AnswerSecurityQuestionsCoordinator()
 			}
 			Scope(state: /State.simpleLostPhoneHelper, action: /Action.simpleLostPhoneHelper) {
-				AddTrustedContactFactorSource()
+				ManageTrustedContactFactorSource()
 			}
 		}
 	}
@@ -148,11 +148,8 @@ public struct SimpleCreateSecurityStructureFlow: Sendable, FeatureReducer {
 			case .new:
 				preconditionFailure("should not have been able to toggle Edit mode during creation of a new security config")
 			case let .existing(existing, wasEditing):
-				if wasEditing {
-					fatalError("save now?")
-				} else {
-					state.mode = .existing(existing, isEditing: true)
-				}
+				// do not save yet, user have to press button in footer for that
+				state.mode = .existing(existing, isEditing: !wasEditing)
 			}
 			return .none
 
@@ -164,7 +161,7 @@ public struct SimpleCreateSecurityStructureFlow: Sendable, FeatureReducer {
 			state.modalDestinations = .simpleLostPhoneHelper(.init())
 			return .none
 
-		case let .finishSelectingFactors(simpleFactorConfig):
+		case let .finished(simpleFactorConfig):
 
 			switch state.mode {
 			case let .new(new):

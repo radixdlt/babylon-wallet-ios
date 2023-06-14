@@ -1,13 +1,13 @@
 import FeaturePrelude
 
-extension NameNewSecurityStructure.State {
-	var viewState: NameNewSecurityStructure.ViewState {
+extension NameSecurityStructure.State {
+	var viewState: NameSecurityStructure.ViewState {
 		.init(name: name)
 	}
 }
 
-// MARK: - NameNewSecurityStructure.View
-extension NameNewSecurityStructure {
+// MARK: - NameSecurityStructure.View
+extension NameSecurityStructure {
 	public struct ViewState: Equatable {
 		public let name: String
 		public var nonEmptyName: NonEmptyString? {
@@ -17,9 +17,9 @@ extension NameNewSecurityStructure {
 
 	@MainActor
 	public struct View: SwiftUI.View {
-		private let store: StoreOf<NameNewSecurityStructure>
+		private let store: StoreOf<NameSecurityStructure>
 
-		public init(store: StoreOf<NameNewSecurityStructure>) {
+		public init(store: StoreOf<NameSecurityStructure>) {
 			self.store = store
 		}
 
@@ -57,16 +57,16 @@ extension NameNewSecurityStructure {
 //// MARK: - NameNewSecurityStructure_Preview
 // struct NameNewSecurityStructure_Preview: PreviewProvider {
 //	static var previews: some View {
-//		NameNewSecurityStructure.View(
+//		NameSecurityStructure.View(
 //			store: .init(
 //				initialState: .previewValue,
-//				reducer: NameNewSecurityStructure()
+//				reducer: NameSecurityStructure()
 //			)
 //		)
 //	}
 // }
 //
-// extension NameNewSecurityStructure.State {
+// extension NameSecurityStructure.State {
 //	public static let previewValue = Self()
 // }
 // #endif

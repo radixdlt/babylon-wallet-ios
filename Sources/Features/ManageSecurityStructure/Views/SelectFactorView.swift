@@ -2,6 +2,7 @@ import FeaturePrelude
 
 // MARK: - SelectFactorView
 public struct SelectFactorView: SwiftUI.View {
+	@Environment(\.isEnabled) private var isEnabled
 	public let title: String
 	public let subtitle: String
 	public let factorSet: BaseFactorSourceProtocol?
@@ -34,7 +35,7 @@ public struct SelectFactorView: SwiftUI.View {
 					// FIXME: Strings
 					Text(factorSet?.selectedFactorDisplay ?? "None set")
 						.font(.app.body1Header)
-						.foregroundColor(factorSet == nil ? .app.gray3 : .app.gray1)
+						.foregroundColor(factorSet == nil || !isEnabled ? .app.gray3 : .app.gray1)
 
 					Spacer(minLength: 0)
 

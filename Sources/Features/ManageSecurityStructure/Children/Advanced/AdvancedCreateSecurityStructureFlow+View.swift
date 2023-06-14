@@ -1,22 +1,22 @@
 import FeaturePrelude
 
-extension AdvancedCreateSecurityStructureFlow.State {
-	var viewState: AdvancedCreateSecurityStructureFlow.ViewState {
+extension AdvancedManageSecurityStructureFlow.State {
+	var viewState: AdvancedManageSecurityStructureFlow.ViewState {
 		.init()
 	}
 }
 
-// MARK: - AdvancedCreateSecurityStructureFlow.View
-extension AdvancedCreateSecurityStructureFlow {
+// MARK: - AdvancedManageSecurityStructureFlow.View
+extension AdvancedManageSecurityStructureFlow {
 	public struct ViewState: Equatable {
 		// TODO: declare some properties
 	}
 
 	@MainActor
 	public struct View: SwiftUI.View {
-		private let store: StoreOf<AdvancedCreateSecurityStructureFlow>
+		private let store: StoreOf<AdvancedManageSecurityStructureFlow>
 
-		public init(store: StoreOf<AdvancedCreateSecurityStructureFlow>) {
+		public init(store: StoreOf<AdvancedManageSecurityStructureFlow>) {
 			self.store = store
 		}
 
@@ -35,19 +35,19 @@ extension AdvancedCreateSecurityStructureFlow {
 // #if DEBUG
 // import SwiftUI // NB: necessary for previews to appear
 //
-//// MARK: - AdvancedCreateSecurityStructureFlow_Preview
-// struct AdvancedCreateSecurityStructureFlow_Preview: PreviewProvider {
+//// MARK: - AdvancedManageSecurityStructureFlow_Preview
+// struct AdvancedManageSecurityStructureFlow_Preview: PreviewProvider {
 //	static var previews: some View {
-//		AdvancedCreateSecurityStructureFlow.View(
+//		AdvancedManageSecurityStructureFlow.View(
 //			store: .init(
 //				initialState: .previewValue,
-//				reducer: AdvancedCreateSecurityStructureFlow()
+//				reducer: AdvancedManageSecurityStructureFlow()
 //			)
 //		)
 //	}
 // }
 //
-// extension AdvancedCreateSecurityStructureFlow.State {
+// extension AdvancedManageSecurityStructureFlow.State {
 //	public static let previewValue = Self()
 // }
 // #endif
