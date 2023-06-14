@@ -5,7 +5,7 @@ import TestingPrelude
 
 // MARK: - FactorSourcesCodableTests
 final class FactorSourcesCodableTests: TestCase {
-	func omit_test_generate_vector() throws {
+	func test_generate_vector() throws {
 		let networkID = NetworkID.kisharnet
 
 		let factorSources: [FactorSource] = try withDependencies {
@@ -68,6 +68,14 @@ final class FactorSourcesCodableTests: TestCase {
 				)
 			)
 
+			anyFactorSources.append(
+				TrustedContactFactorSource.from(
+					radixAddress: "account_tdx_c_1px0jul7a44s65568d32f82f0lkssjwx6f5t5e44yl6csqurxw3",
+					emailAddress: "hi@rdx.works",
+					name: "My friend"
+				)
+			)
+
 			return anyFactorSources.map { $0.embed() }
 		}
 
@@ -83,7 +91,7 @@ final class FactorSourcesCodableTests: TestCase {
 			bundle: .module,
 			jsonName: "factor_sources"
 		) { (factorSources: [FactorSource]) in
-			guard factorSources.count == 4 else {
+			guard factorSources.count == 5 else {
 				XCTFail("wrong length")
 				return
 			}
@@ -99,6 +107,9 @@ final class FactorSourcesCodableTests: TestCase {
 
 			let offDeviceMnemonic = try factorSources[3].extract(as: OffDeviceMnemonicFactorSource.self)
 			XCTAssertEqual(offDeviceMnemonic.id.kind, .offDeviceMnemonic)
+
+			let trustedContact = try factorSources[4].extract(as: TrustedContactFactorSource.self)
+			XCTAssertEqual(trustedContact.id.kind, .trustedContact)
 		}
 	}
 }
