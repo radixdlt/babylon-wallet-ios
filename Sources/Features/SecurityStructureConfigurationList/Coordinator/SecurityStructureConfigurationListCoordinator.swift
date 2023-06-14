@@ -70,7 +70,7 @@ public struct SecurityStructureConfigurationListCoordinator: Sendable, FeatureRe
 			return .none
 
 		case let .destination(.presented(.manageSecurityStructureCoordinator(.delegate(.done(.success(config)))))):
-			state.configList.configs.append(.init(config: config))
+			state.configList.configs[id: config.id] = .init(config: config)
 			state.destination = nil
 			return .none
 
