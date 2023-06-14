@@ -27,11 +27,11 @@ public struct MigrateOlympiaSoftwareAccountsToBabylonRequest: Sendable, Hashable
 
 // MARK: - MigrateOlympiaHardwareAccountsToBabylonRequest
 public struct MigrateOlympiaHardwareAccountsToBabylonRequest: Sendable, Hashable {
-	public let olympiaAccounts: Set<OlympiaAccountToMigrate>
+	public let olympiaAccounts: NonEmpty<Set<OlympiaAccountToMigrate>>
 	public let ledgerFactorSourceID: FactorSourceID
 
 	public init(
-		olympiaAccounts: Set<OlympiaAccountToMigrate>,
+		olympiaAccounts: NonEmpty<Set<OlympiaAccountToMigrate>>,
 		ledgerFactorSourceID: FactorSourceID
 	) {
 		self.olympiaAccounts = olympiaAccounts
