@@ -60,7 +60,7 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 
 	public enum InternalAction: Sendable, Equatable {
 		/// Validated public keys against expected, then migrate...
-		case validatedAccounts(Set<OlympiaAccountToMigrate>, LedgerHardwareWalletFactorSource)
+		case validatedAccounts(NonEmpty<Set<OlympiaAccountToMigrate>>, LedgerHardwareWalletFactorSource)
 
 		/// migrated accounts of validated public keys
 		case migratedOlympiaHardwareAccounts(LedgerWithAccounts)
@@ -148,7 +148,7 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 			)
 			return .none
 
-		case let .derivePublicKeys(.presented(.delegate(.failedToDerivePublicKey))):
+		case .derivePublicKeys(.presented(.delegate(.failedToDerivePublicKey))):
 			loggerGlobal.error("ImportOlympiaAccountsAndFactorSource - child derivePublicKeys failed to derive public key")
 			state.derivePublicKeys = nil
 			return .none
@@ -173,7 +173,10 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 		.run { [olympiaAccountsToValidate = state.unmigrated.unvalidated] send in
 			do {
 				let validation = try await validate(derivedPublicKeys: derivedPublicKeys, olympiaAccountsToValidate: olympiaAccountsToValidate)
-				await send(.internal(.validatedAccounts(validation.validated, ledger)))
+				guard let validated = NonEmpty<Set>(validation.validated) else {
+					throw NoValidatedAccountsError()
+				}
+				await send(.internal(.validatedAccounts(validated, ledger)))
 			} catch {
 				loggerGlobal.error("Failed to validate accounts, error: \(error)")
 				errorQueue.schedule(error)
@@ -183,7 +186,7 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 
 	private func convertHardwareAccountsToBabylon(
 		ledger: LedgerHardwareWalletFactorSource,
-		validatedAccountsToMigrate olympiaAccounts: Set<OlympiaAccountToMigrate>,
+		validatedAccountsToMigrate olympiaAccounts: NonEmpty<Set<OlympiaAccountToMigrate>>,
 		_ state: State
 	) -> EffectTask<Action> {
 		loggerGlobal.notice("Converting hardware accounts to babylon...")
@@ -195,7 +198,7 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 			// Migrates and saved all accounts to Profile
 			let migrated = try await importLegacyWalletClient.migrateOlympiaHardwareAccountsToBabylon(
 				.init(
-					olympiaAccounts: Set(olympiaAccounts),
+					olympiaAccounts: olympiaAccounts,
 					ledgerFactorSourceID: ledger.id
 				)
 			)
@@ -274,6 +277,8 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 			unvalidated: olympiaAccountsToValidate
 		)
 	}
+
+	struct NoValidatedAccountsError: Error {}
 }
 
 extension LedgerHardwareWalletFactorSource.DeviceModel {
