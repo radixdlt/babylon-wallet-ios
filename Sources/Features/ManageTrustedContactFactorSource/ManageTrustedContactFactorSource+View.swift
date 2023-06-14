@@ -34,12 +34,17 @@ extension ManageTrustedContactFactorSource {
 		}
 
 		var addressHint: Hint? {
-			guard
-				!radixAddress.isEmpty,
-				address == nil
-			else { return nil }
-			// FIXME: Strings
-			return .error("Invalid address")
+			if isCreatingNew {
+				guard
+					!radixAddress.isEmpty,
+					address == nil
+				else { return nil }
+				// FIXME: Strings
+				return .error("Invalid address")
+			} else {
+				// FIXME: Strings
+				return .info("Cannot edit. Add new contact instead.")
+			}
 		}
 
 		var email: EmailAddress? {
@@ -77,6 +82,8 @@ extension ManageTrustedContactFactorSource {
 					Text("Your phone is your only access to your wallet. If you lose it, you’ll need someone you trust to lock your old phone and process a new one.")
 
 					addressField(with: viewStore)
+						.disabled(!viewStore.isCreatingNew) // do not allow edit of address
+
 					emailField(with: viewStore)
 					nameField(with: viewStore)
 				}
@@ -111,12 +118,14 @@ extension ManageTrustedContactFactorSource {
 					send: { .radixAddressChanged($0) }
 				),
 				hint: viewStore.addressHint,
-				showClearButton: true,
+				showClearButton: viewStore.isCreatingNew,
 				innerAccessory: {
-					Button {
-						viewStore.send(.scanQRCode)
-					} label: {
-						Image(asset: AssetResource.qrCodeScanner)
+					if viewStore.isCreatingNew {
+						Button {
+							viewStore.send(.scanQRCode)
+						} label: {
+							Image(asset: AssetResource.qrCodeScanner)
+						}
 					}
 				}
 			)

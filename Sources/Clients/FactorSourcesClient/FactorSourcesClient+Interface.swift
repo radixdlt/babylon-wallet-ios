@@ -9,6 +9,7 @@ public struct FactorSourcesClient: Sendable {
 	public var addPrivateHDFactorSource: AddPrivateHDFactorSource
 	public var checkIfHasOlympiaFactorSourceForAccounts: CheckIfHasOlympiaFactorSourceForAccounts
 	public var saveFactorSource: SaveFactorSource
+	public var updateFactorSource: UpdateFactorSource
 	public var getSigningFactors: GetSigningFactors
 	public var updateLastUsed: UpdateLastUsed
 
@@ -19,6 +20,7 @@ public struct FactorSourcesClient: Sendable {
 		addPrivateHDFactorSource: @escaping AddPrivateHDFactorSource,
 		checkIfHasOlympiaFactorSourceForAccounts: @escaping CheckIfHasOlympiaFactorSourceForAccounts,
 		saveFactorSource: @escaping SaveFactorSource,
+		updateFactorSource: @escaping UpdateFactorSource,
 		getSigningFactors: @escaping GetSigningFactors,
 		updateLastUsed: @escaping UpdateLastUsed
 	) {
@@ -28,6 +30,7 @@ public struct FactorSourcesClient: Sendable {
 		self.addPrivateHDFactorSource = addPrivateHDFactorSource
 		self.checkIfHasOlympiaFactorSourceForAccounts = checkIfHasOlympiaFactorSourceForAccounts
 		self.saveFactorSource = saveFactorSource
+		self.updateFactorSource = updateFactorSource
 		self.getSigningFactors = getSigningFactors
 		self.updateLastUsed = updateLastUsed
 	}
@@ -41,6 +44,7 @@ extension FactorSourcesClient {
 	public typealias AddPrivateHDFactorSource = @Sendable (AddPrivateHDFactorSourceRequest) async throws -> FactorSourceID
 	public typealias CheckIfHasOlympiaFactorSourceForAccounts = @Sendable (NonEmpty<OrderedSet<OlympiaAccountToMigrate>>) async -> FactorSourceID.FromHash?
 	public typealias SaveFactorSource = @Sendable (FactorSource) async throws -> Void
+	public typealias UpdateFactorSource = @Sendable (FactorSource) async throws -> Void
 	public typealias GetSigningFactors = @Sendable (GetSigningFactorsRequest) async throws -> SigningFactors
 	public typealias UpdateLastUsed = @Sendable (UpdateFactorSourceLastUsedRequest) async throws -> Void
 }

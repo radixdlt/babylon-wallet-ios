@@ -117,14 +117,18 @@ public struct ManageTrustedContactFactorSource: Sendable, FeatureReducer {
 			return .none
 
 		case let .continueButtonTapped(accountAddress, emailAddress, name):
-			return .task {
+			return .task { [isCreatingNew = state.mode == .new] in
 				let taskResult = await TaskResult {
-					let contact = try TrustedContactFactorSource.from(
+					let contact = TrustedContactFactorSource.from(
 						radixAddress: accountAddress,
 						emailAddress: emailAddress,
 						name: name
 					)
-					try await factorSourcesClient.saveFactorSource(contact.embed())
+					if isCreatingNew {
+						try await factorSourcesClient.saveFactorSource(contact.embed())
+					} else {
+						try await factorSourcesClient.updateFactorSource(contact.embed())
+					}
 					return contact
 				}
 				return .delegate(.done(taskResult))
