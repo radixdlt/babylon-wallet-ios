@@ -1,11 +1,11 @@
 import Foundation
 
-// MARK: - PublishPackage
-public struct PublishPackage: InstructionProtocol {
+// MARK: - PublishPackageAdvanced
+public struct PublishPackageAdvanced: InstructionProtocol {
 	// Type name, used as a discriminator
-	public static let kind: InstructionKind = .publishPackage
+	public static let kind: InstructionKind = .publishPackageAdvanced
 	public func embed() -> Instruction {
-		.publishPackage(self)
+		.publishPackageAdvanced(self)
 	}
 
 	// MARK: Stored properties
@@ -14,24 +14,27 @@ public struct PublishPackage: InstructionProtocol {
 	public let schema: Bytes
 	public let royaltyConfig: Map_
 	public let metadata: Map_
+	public let authorityRules: Tuple
 
 	// MARK: Init
 
-	public init(code: Blob, schema: Bytes, royaltyConfig: Map_, metadata: Map_) {
+	public init(code: Blob, schema: Bytes, royaltyConfig: Map_, metadata: Map_, authorityRules: Tuple) {
 		self.code = code
 		self.schema = schema
 		self.royaltyConfig = royaltyConfig
 		self.metadata = metadata
+		self.authorityRules = authorityRules
 	}
 }
 
-extension PublishPackage {
+extension PublishPackageAdvanced {
 	// MARK: CodingKeys
 
 	private enum CodingKeys: String, CodingKey {
 		case type = "instruction"
 		case royaltyConfig = "royalty_config"
 		case metadata
+		case authorityRules = "authority_rules"
 		case code
 		case schema
 	}
@@ -45,6 +48,7 @@ extension PublishPackage {
 		try container.encode(code, forKey: .code)
 		try container.encode(schema, forKey: .schema)
 		try container.encode(metadata, forKey: .metadata)
+		try container.encode(authorityRules, forKey: .authorityRules)
 		try container.encode(royaltyConfig, forKey: .royaltyConfig)
 	}
 
@@ -60,7 +64,8 @@ extension PublishPackage {
 			code: container.decode(Blob.self, forKey: .code),
 			schema: container.decode(Bytes.self, forKey: .schema),
 			royaltyConfig: container.decode(Map_.self, forKey: .royaltyConfig),
-			metadata: container.decode(Map_.self, forKey: .metadata)
+			metadata: container.decode(Map_.self, forKey: .metadata),
+			authorityRules: container.decode(Tuple.self, forKey: .authorityRules)
 		)
 	}
 }

@@ -8,17 +8,9 @@ public struct CreateIdentity: InstructionProtocol {
 		.createIdentity(self)
 	}
 
-	// MARK: Stored properties
-
-	public let accessRule: Enum
-
 	// MARK: Init
 
-	public init(
-		accessRule: Enum
-	) {
-		self.accessRule = accessRule
-	}
+	public init() {}
 }
 
 extension CreateIdentity {
@@ -26,7 +18,6 @@ extension CreateIdentity {
 
 	private enum CodingKeys: String, CodingKey {
 		case type = "instruction"
-		case accessRule = "access_rule"
 	}
 
 	// MARK: Codable
@@ -34,8 +25,6 @@ extension CreateIdentity {
 	public func encode(to encoder: Encoder) throws {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		try container.encode(Self.kind, forKey: .type)
-
-		try container.encode(accessRule, forKey: .accessRule)
 	}
 
 	public init(from decoder: Decoder) throws {
@@ -45,9 +34,5 @@ extension CreateIdentity {
 		if kind != Self.kind {
 			throw InternalDecodingFailure.instructionTypeDiscriminatorMismatch(expected: Self.kind, butGot: kind)
 		}
-
-		try self.init(
-			accessRule: container.decode(Enum.self, forKey: .accessRule)
-		)
 	}
 }

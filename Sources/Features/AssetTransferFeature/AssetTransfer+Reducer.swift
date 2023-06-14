@@ -241,7 +241,7 @@ extension AssetTransfer {
 			let bucket = UUID().uuidString
 
 			let instructions: [any InstructionProtocol] = [
-				TakeFromWorktopByAmount(
+				TakeFromWorktop(
 					amount: .init(value: account.amount.toString()),
 					resourceAddress: resource.address,
 					bucket: .init(identifier: bucket)

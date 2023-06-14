@@ -1,39 +1,40 @@
 import Foundation
 
-// MARK: - CreateValidator
-public struct CreateValidator: InstructionProtocol {
+// MARK: - CreateProofFromAuthZoneOfAll
+public struct CreateProofFromAuthZoneOfAll: InstructionProtocol {
 	// Type name, used as a discriminator
-	public static let kind: InstructionKind = .createValidator
+	public static let kind: InstructionKind = .createProofFromAuthZoneOfAll
 	public func embed() -> Instruction {
-		.createValidator(self)
+		.createProofFromAuthZoneOfAll(self)
 	}
 
 	// MARK: Stored properties
-
-	public let key: Bytes
+	public let resourceAddress: ResourceAddress
+	public let intoProof: Proof
 
 	// MARK: Init
 
-	public init(key: Bytes) {
-		self.key = key
+	public init(resourceAddress: ResourceAddress, intoProof: Proof) {
+		self.resourceAddress = resourceAddress
+		self.intoProof = intoProof
 	}
 }
 
-extension CreateValidator {
+extension CreateProofFromAuthZoneOfAll {
 	// MARK: CodingKeys
-
 	private enum CodingKeys: String, CodingKey {
 		case type = "instruction"
-		case key
+		case resourceAddress = "resource_address"
+		case intoProof = "into_proof"
 	}
 
 	// MARK: Codable
-
 	public func encode(to encoder: Encoder) throws {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		try container.encode(Self.kind, forKey: .type)
 
-		try container.encode(key, forKey: .key)
+		try container.encode(resourceAddress, forKey: .resourceAddress)
+		try container.encode(intoProof, forKey: .intoProof)
 	}
 
 	public init(from decoder: Decoder) throws {
@@ -45,7 +46,8 @@ extension CreateValidator {
 		}
 
 		try self.init(
-			key: container.decode(Bytes.self, forKey: .key)
+			resourceAddress: container.decode(ResourceAddress.self, forKey: .resourceAddress),
+			intoProof: container.decode(Proof.self, forKey: .intoProof)
 		)
 	}
 }

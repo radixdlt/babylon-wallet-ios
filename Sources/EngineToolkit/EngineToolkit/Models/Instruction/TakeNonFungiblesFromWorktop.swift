@@ -1,48 +1,50 @@
 import Foundation
 
-// MARK: - TakeFromWorktopByAmount
-public struct TakeFromWorktopByAmount: InstructionProtocol {
+// MARK: - TakeNonFungiblesFromWorktop
+public struct TakeNonFungiblesFromWorktop: InstructionProtocol {
 	// Type name, used as a discriminator
-	public static let kind: InstructionKind = .takeFromWorktopByAmount
+	public static let kind: InstructionKind = .takeNonFungiblesFromWorktop
 	public func embed() -> Instruction {
-		.takeFromWorktopByAmount(self)
+		.takeNonFungiblesFromWorktop(self)
 	}
 
 	// MARK: Stored properties
-	public let amount: Decimal_
 	public let resourceAddress: ResourceAddress
+	public let ids: Set<NonFungibleLocalId>
 	public let bucket: Bucket
 
 	// MARK: Init
 
-	// Using same order as Scrypto uses, AMOUNT, ADDRESS, BUCKET
+	// Same order as scrypto: IDS, Address, Bucket
 	public init(
-		amount: Decimal_,
+		_ ids: Set<NonFungibleLocalId>,
 		resourceAddress: ResourceAddress,
 		bucket: Bucket
 	) {
-		self.amount = amount
 		self.resourceAddress = resourceAddress
+		self.ids = ids
 		self.bucket = bucket
 	}
 }
 
-extension TakeFromWorktopByAmount {
+extension TakeNonFungiblesFromWorktop {
 	// MARK: CodingKeys
+
 	private enum CodingKeys: String, CodingKey {
 		case type = "instruction"
-		case amount
+		case ids
 		case resourceAddress = "resource_address"
 		case intoBucket = "into_bucket"
 	}
 
 	// MARK: Codable
+
 	public func encode(to encoder: Encoder) throws {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		try container.encode(Self.kind, forKey: .type)
 
 		try container.encode(resourceAddress, forKey: .resourceAddress)
-		try container.encode(amount, forKey: .amount)
+		try container.encode(ids, forKey: .ids)
 		try container.encode(bucket, forKey: .intoBucket)
 	}
 
@@ -55,7 +57,7 @@ extension TakeFromWorktopByAmount {
 		}
 
 		try self.init(
-			amount: container.decode(Decimal_.self, forKey: .amount),
+			container.decode(Set<NonFungibleLocalId>.self, forKey: .ids),
 			resourceAddress: container.decode(ResourceAddress.self, forKey: .resourceAddress),
 			bucket: container.decode(Bucket.self, forKey: .intoBucket)
 		)

@@ -1,30 +1,30 @@
 import Foundation
 
-// MARK: - CreateValidator
-public struct CreateValidator: InstructionProtocol {
+// MARK: - CreateAccountAdvanced
+public struct CreateAccountAdvanced: InstructionProtocol {
 	// Type name, used as a discriminator
-	public static let kind: InstructionKind = .createValidator
+	public static let kind: InstructionKind = .createAccountAdvanced
 	public func embed() -> Instruction {
-		.createValidator(self)
+		.createAccountAdvanced(self)
 	}
 
 	// MARK: Stored properties
 
-	public let key: Bytes
+	public let config: Tuple
 
 	// MARK: Init
 
-	public init(key: Bytes) {
-		self.key = key
+	public init(config: Tuple) {
+		self.config = config
 	}
 }
 
-extension CreateValidator {
+extension CreateAccountAdvanced {
 	// MARK: CodingKeys
 
 	private enum CodingKeys: String, CodingKey {
 		case type = "instruction"
-		case key
+		case config
 	}
 
 	// MARK: Codable
@@ -33,7 +33,7 @@ extension CreateValidator {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		try container.encode(Self.kind, forKey: .type)
 
-		try container.encode(key, forKey: .key)
+		try container.encode(config, forKey: .config)
 	}
 
 	public init(from decoder: Decoder) throws {
@@ -45,7 +45,7 @@ extension CreateValidator {
 		}
 
 		try self.init(
-			key: container.decode(Bytes.self, forKey: .key)
+			config: container.decode(Tuple.self, forKey: .config)
 		)
 	}
 }

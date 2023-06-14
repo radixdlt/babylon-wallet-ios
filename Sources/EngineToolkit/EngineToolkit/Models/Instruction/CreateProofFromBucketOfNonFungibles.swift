@@ -1,40 +1,51 @@
 import Foundation
 
-// MARK: - AssertWorktopContainsByIds
-public struct AssertWorktopContainsByIds: InstructionProtocol {
+// MARK: - CreateProofFromBucketOfNonFungibles
+public struct CreateProofFromBucketOfNonFungibles: InstructionProtocol {
 	// Type name, used as a discriminator
-	public static let kind: InstructionKind = .assertWorktopContainsByIds
+	public static let kind: InstructionKind = .createProofFromBucketOfNonFungibles
 	public func embed() -> Instruction {
-		.assertWorktopContainsByIds(self)
+		.createProofFromBucketOfNonFungibles(self)
 	}
 
 	// MARK: Stored properties
-	public let resourceAddress: ResourceAddress
+
+	public let bucket: Bucket
 	public let ids: Set<NonFungibleLocalId>
+	public let proof: Proof
 
 	// MARK: Init
 
-	public init(resourceAddress: ResourceAddress, ids: Set<NonFungibleLocalId>) {
-		self.resourceAddress = resourceAddress
+	public init(
+		bucket: Bucket,
+		ids: Set<NonFungibleLocalId>,
+		proof: Proof
+	) {
+		self.bucket = bucket
 		self.ids = ids
+		self.proof = proof
 	}
 }
 
-extension AssertWorktopContainsByIds {
+extension CreateProofFromBucketOfNonFungibles {
 	// MARK: CodingKeys
+
 	private enum CodingKeys: String, CodingKey {
 		case type = "instruction"
+		case bucket
 		case ids
-		case resourceAddress = "resource_address"
+		case intoProof = "into_proof"
 	}
 
 	// MARK: Codable
+
 	public func encode(to encoder: Encoder) throws {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		try container.encode(Self.kind, forKey: .type)
 
-		try container.encode(resourceAddress, forKey: .resourceAddress)
+		try container.encode(bucket, forKey: .bucket)
 		try container.encode(ids, forKey: .ids)
+		try container.encode(proof, forKey: .intoProof)
 	}
 
 	public init(from decoder: Decoder) throws {
@@ -46,8 +57,9 @@ extension AssertWorktopContainsByIds {
 		}
 
 		try self.init(
-			resourceAddress: container.decode(ResourceAddress.self, forKey: .resourceAddress),
-			ids: container.decode(Set<NonFungibleLocalId>.self, forKey: .ids)
+			bucket: container.decode(Bucket.self, forKey: .bucket),
+			ids: container.decode(Set<NonFungibleLocalId>.self, forKey: .ids),
+			proof: container.decode(Proof.self, forKey: .intoProof)
 		)
 	}
 }

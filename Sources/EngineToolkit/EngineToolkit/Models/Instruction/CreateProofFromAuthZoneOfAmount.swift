@@ -1,36 +1,36 @@
 import Foundation
 
-// MARK: - CreateProofFromAuthZoneByIds
-public struct CreateProofFromAuthZoneByIds: InstructionProtocol {
+// MARK: - CreateProofFromAuthZoneOfAmount
+public struct CreateProofFromAuthZoneOfAmount: InstructionProtocol {
 	// Type name, used as a discriminator
-	public static let kind: InstructionKind = .createProofFromAuthZoneByIds
+	public static let kind: InstructionKind = .createProofFromAuthZoneOfAmount
 	public func embed() -> Instruction {
-		.createProofFromAuthZoneByIds(self)
+		.createProofFromAuthZoneOfAmount(self)
 	}
 
 	// MARK: Stored properties
 	public let resourceAddress: ResourceAddress
-	public let ids: Set<NonFungibleLocalId>
+	public let amount: Decimal_
 	public let intoProof: Proof
 
 	// MARK: Init
 
 	public init(
 		resourceAddress: ResourceAddress,
-		ids: Set<NonFungibleLocalId>,
+		amount: Decimal_,
 		intoProof: Proof
 	) {
 		self.resourceAddress = resourceAddress
-		self.ids = ids
+		self.amount = amount
 		self.intoProof = intoProof
 	}
 }
 
-extension CreateProofFromAuthZoneByIds {
+extension CreateProofFromAuthZoneOfAmount {
 	// MARK: CodingKeys
 	private enum CodingKeys: String, CodingKey {
 		case type = "instruction"
-		case ids
+		case amount
 		case resourceAddress = "resource_address"
 		case intoProof = "into_proof"
 	}
@@ -41,7 +41,7 @@ extension CreateProofFromAuthZoneByIds {
 		try container.encode(Self.kind, forKey: .type)
 
 		try container.encode(resourceAddress, forKey: .resourceAddress)
-		try container.encode(ids, forKey: .ids)
+		try container.encode(amount, forKey: .amount)
 		try container.encode(intoProof, forKey: .intoProof)
 	}
 
@@ -55,7 +55,7 @@ extension CreateProofFromAuthZoneByIds {
 
 		try self.init(
 			resourceAddress: container.decode(ResourceAddress.self, forKey: .resourceAddress),
-			ids: container.decode(Set<NonFungibleLocalId>.self, forKey: .ids),
+			amount: container.decode(Decimal_.self, forKey: .amount),
 			intoProof: container.decode(Proof.self, forKey: .intoProof)
 		)
 	}

@@ -1,36 +1,36 @@
 import Foundation
 
-// MARK: - CreateProofFromAuthZoneByAmount
-public struct CreateProofFromAuthZoneByAmount: InstructionProtocol {
+// MARK: - CreateProofFromAuthZoneOfNonFungibles
+public struct CreateProofFromAuthZoneOfNonFungibles: InstructionProtocol {
 	// Type name, used as a discriminator
-	public static let kind: InstructionKind = .createProofFromAuthZoneByAmount
+	public static let kind: InstructionKind = .createProofFromAuthZoneOfNonFungibles
 	public func embed() -> Instruction {
-		.createProofFromAuthZoneByAmount(self)
+		.createProofFromAuthZoneOfNonFungibles(self)
 	}
 
 	// MARK: Stored properties
 	public let resourceAddress: ResourceAddress
-	public let amount: Decimal_
+	public let ids: Set<NonFungibleLocalId>
 	public let intoProof: Proof
 
 	// MARK: Init
 
 	public init(
 		resourceAddress: ResourceAddress,
-		amount: Decimal_,
+		ids: Set<NonFungibleLocalId>,
 		intoProof: Proof
 	) {
 		self.resourceAddress = resourceAddress
-		self.amount = amount
+		self.ids = ids
 		self.intoProof = intoProof
 	}
 }
 
-extension CreateProofFromAuthZoneByAmount {
+extension CreateProofFromAuthZoneOfNonFungibles {
 	// MARK: CodingKeys
 	private enum CodingKeys: String, CodingKey {
 		case type = "instruction"
-		case amount
+		case ids
 		case resourceAddress = "resource_address"
 		case intoProof = "into_proof"
 	}
@@ -41,7 +41,7 @@ extension CreateProofFromAuthZoneByAmount {
 		try container.encode(Self.kind, forKey: .type)
 
 		try container.encode(resourceAddress, forKey: .resourceAddress)
-		try container.encode(amount, forKey: .amount)
+		try container.encode(ids, forKey: .ids)
 		try container.encode(intoProof, forKey: .intoProof)
 	}
 
@@ -55,7 +55,7 @@ extension CreateProofFromAuthZoneByAmount {
 
 		try self.init(
 			resourceAddress: container.decode(ResourceAddress.self, forKey: .resourceAddress),
-			amount: container.decode(Decimal_.self, forKey: .amount),
+			ids: container.decode(Set<NonFungibleLocalId>.self, forKey: .ids),
 			intoProof: container.decode(Proof.self, forKey: .intoProof)
 		)
 	}

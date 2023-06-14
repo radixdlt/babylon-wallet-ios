@@ -1,50 +1,48 @@
 import Foundation
 
-// MARK: - TakeFromWorktopByIds
-public struct TakeFromWorktopByIds: InstructionProtocol {
+// MARK: - TakeFromWorktop
+public struct TakeFromWorktop: InstructionProtocol {
 	// Type name, used as a discriminator
-	public static let kind: InstructionKind = .takeFromWorktopByIds
+	public static let kind: InstructionKind = .takeFromWorktop
 	public func embed() -> Instruction {
-		.takeFromWorktopByIds(self)
+		.takeFromWorktop(self)
 	}
 
 	// MARK: Stored properties
+	public let amount: Decimal_
 	public let resourceAddress: ResourceAddress
-	public let ids: Set<NonFungibleLocalId>
 	public let bucket: Bucket
 
 	// MARK: Init
 
-	// Same order as scrypto: IDS, Address, Bucket
+	// Using same order as Scrypto uses, AMOUNT, ADDRESS, BUCKET
 	public init(
-		_ ids: Set<NonFungibleLocalId>,
+		amount: Decimal_,
 		resourceAddress: ResourceAddress,
 		bucket: Bucket
 	) {
+		self.amount = amount
 		self.resourceAddress = resourceAddress
-		self.ids = ids
 		self.bucket = bucket
 	}
 }
 
-extension TakeFromWorktopByIds {
+extension TakeFromWorktop {
 	// MARK: CodingKeys
-
 	private enum CodingKeys: String, CodingKey {
 		case type = "instruction"
-		case ids
+		case amount
 		case resourceAddress = "resource_address"
 		case intoBucket = "into_bucket"
 	}
 
 	// MARK: Codable
-
 	public func encode(to encoder: Encoder) throws {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		try container.encode(Self.kind, forKey: .type)
 
 		try container.encode(resourceAddress, forKey: .resourceAddress)
-		try container.encode(ids, forKey: .ids)
+		try container.encode(amount, forKey: .amount)
 		try container.encode(bucket, forKey: .intoBucket)
 	}
 
@@ -57,7 +55,7 @@ extension TakeFromWorktopByIds {
 		}
 
 		try self.init(
-			container.decode(Set<NonFungibleLocalId>.self, forKey: .ids),
+			amount: container.decode(Decimal_.self, forKey: .amount),
 			resourceAddress: container.decode(ResourceAddress.self, forKey: .resourceAddress),
 			bucket: container.decode(Bucket.self, forKey: .intoBucket)
 		)

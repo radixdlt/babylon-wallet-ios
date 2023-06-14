@@ -1,39 +1,40 @@
 import Foundation
 
-// MARK: - CreateValidator
-public struct CreateValidator: InstructionProtocol {
+// MARK: - AssertWorktopContainsNonFungibles
+public struct AssertWorktopContainsNonFungibles: InstructionProtocol {
 	// Type name, used as a discriminator
-	public static let kind: InstructionKind = .createValidator
+	public static let kind: InstructionKind = .assertWorktopContainsNonFungibles
 	public func embed() -> Instruction {
-		.createValidator(self)
+		.assertWorktopContainsNonFungibles(self)
 	}
 
 	// MARK: Stored properties
-
-	public let key: Bytes
+	public let resourceAddress: ResourceAddress
+	public let ids: Set<NonFungibleLocalId>
 
 	// MARK: Init
 
-	public init(key: Bytes) {
-		self.key = key
+	public init(resourceAddress: ResourceAddress, ids: Set<NonFungibleLocalId>) {
+		self.resourceAddress = resourceAddress
+		self.ids = ids
 	}
 }
 
-extension CreateValidator {
+extension AssertWorktopContainsNonFungibles {
 	// MARK: CodingKeys
-
 	private enum CodingKeys: String, CodingKey {
 		case type = "instruction"
-		case key
+		case ids
+		case resourceAddress = "resource_address"
 	}
 
 	// MARK: Codable
-
 	public func encode(to encoder: Encoder) throws {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		try container.encode(Self.kind, forKey: .type)
 
-		try container.encode(key, forKey: .key)
+		try container.encode(resourceAddress, forKey: .resourceAddress)
+		try container.encode(ids, forKey: .ids)
 	}
 
 	public init(from decoder: Decoder) throws {
@@ -45,7 +46,8 @@ extension CreateValidator {
 		}
 
 		try self.init(
-			key: container.decode(Bytes.self, forKey: .key)
+			resourceAddress: container.decode(ResourceAddress.self, forKey: .resourceAddress),
+			ids: container.decode(Set<NonFungibleLocalId>.self, forKey: .ids)
 		)
 	}
 }

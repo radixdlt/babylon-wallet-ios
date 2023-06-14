@@ -1,30 +1,33 @@
 import Foundation
 
-// MARK: - CreateValidator
-public struct CreateValidator: InstructionProtocol {
+// MARK: - CreateProofFromBucketAll
+public struct CreateProofFromBucketAll: InstructionProtocol {
 	// Type name, used as a discriminator
-	public static let kind: InstructionKind = .createValidator
+	public static let kind: InstructionKind = .createProofFromBucketAll
 	public func embed() -> Instruction {
-		.createValidator(self)
+		.createProofFromBucketAll(self)
 	}
 
 	// MARK: Stored properties
 
-	public let key: Bytes
+	public let bucket: Bucket
+	public let proof: Proof
 
 	// MARK: Init
 
-	public init(key: Bytes) {
-		self.key = key
+	public init(bucket: Bucket, proof: Proof) {
+		self.bucket = bucket
+		self.proof = proof
 	}
 }
 
-extension CreateValidator {
+extension CreateProofFromBucketAll {
 	// MARK: CodingKeys
 
 	private enum CodingKeys: String, CodingKey {
 		case type = "instruction"
-		case key
+		case bucket
+		case intoProof = "into_proof"
 	}
 
 	// MARK: Codable
@@ -33,7 +36,8 @@ extension CreateValidator {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		try container.encode(Self.kind, forKey: .type)
 
-		try container.encode(key, forKey: .key)
+		try container.encode(bucket, forKey: .bucket)
+		try container.encode(proof, forKey: .intoProof)
 	}
 
 	public init(from decoder: Decoder) throws {
@@ -45,7 +49,8 @@ extension CreateValidator {
 		}
 
 		try self.init(
-			key: container.decode(Bytes.self, forKey: .key)
+			bucket: container.decode(Bucket.self, forKey: .bucket),
+			proof: container.decode(Proof.self, forKey: .intoProof)
 		)
 	}
 }
