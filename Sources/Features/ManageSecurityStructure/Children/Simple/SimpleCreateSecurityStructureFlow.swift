@@ -13,7 +13,7 @@ public struct SimpleUnnamedSecurityStructureConfig: Sendable, Hashable {
 // MARK: - ConfirmerOfNewPhone
 public struct ConfirmerOfNewPhone: Sendable, Hashable {
 	public let factorSource: SecurityQuestionsFactorSource
-	public let answersToQuestions: NonEmpty<OrderedSet<AnswerToSecurityQuestion>>
+	public let answersToQuestions: NonEmpty<OrderedSet<AbstractAnswerToSecurityQuestion<NonEmptyString>>>
 }
 
 // MARK: - SimpleManageSecurityStructureFlow
@@ -162,8 +162,8 @@ public struct SimpleManageSecurityStructureFlow: Sendable, FeatureReducer {
 //					return .editing(factorSource: factorSource)
 					return .encrypt()
 				case let .new(new):
-					if let unsavedSecurityQuestions = new.confirmerOfNewPhone {
-						return .editing(factorSource: unsavedSecurityQuestions)
+					if let confirmerOfNewPhone = new.confirmerOfNewPhone {
+						return .editing(editingAnswersToQuestions: confirmerOfNewPhone.answersToQuestions)
 					} else {
 						return .encrypt()
 					}
@@ -196,7 +196,7 @@ public struct SimpleManageSecurityStructureFlow: Sendable, FeatureReducer {
 			switch state.mode {
 			case let .new(new):
 				precondition(new.lostPhoneHelper == simpleFactorConfig.singleRecoveryFactor)
-				precondition(new.newPhoneConfirmer == simpleFactorConfig.singleConfirmationFactor)
+				precondition(new.confirmerOfNewPhone?.factorSource == simpleFactorConfig.singleConfirmationFactor)
 
 				return .task {
 					let taskResult = await TaskResult {

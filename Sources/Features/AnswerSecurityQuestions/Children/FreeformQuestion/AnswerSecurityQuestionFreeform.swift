@@ -13,6 +13,12 @@ public struct AnswerSecurityQuestionFreeform: Sendable, FeatureReducer {
 		public let isLast: Bool
 
 		public var answerToQuestion: AnswerToSecurityQuestion?
+		public var rawAnswerToQuestion: AbstractAnswerToSecurityQuestion<NonEmptyString>? {
+			guard let nonEmptyAnswer = answer else {
+				return nil
+			}
+			return .init(answer: nonEmptyAnswer, to: question)
+		}
 
 		public init(
 			question: SecurityQuestion,
@@ -26,7 +32,7 @@ public struct AnswerSecurityQuestionFreeform: Sendable, FeatureReducer {
 	}
 
 	public enum ViewAction: Sendable, Hashable {
-		case submitAnswer(AnswerToSecurityQuestion.Answer)
+		case submitAnswer(SecurityQuestionAnswerAsEntropy)
 		case answerChanged(String)
 	}
 
