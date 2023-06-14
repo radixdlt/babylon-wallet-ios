@@ -66,7 +66,7 @@ extension ExpressibleByRadixEngineValues {
 	}
 
 	public init(@SpecificValuesBuilder buildValue: () throws -> ManifestASTValue) rethrows {
-		self.init(values: [try buildValue()])
+		try self.init(values: [buildValue()])
 	}
 
 	#endif
