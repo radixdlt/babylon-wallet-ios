@@ -24,23 +24,21 @@ extension CreateAccountCoordinator {
 				NavigationStackStore(
 					store.scope(state: \.path, action: { .child(.path($0)) })
 				) {
-					destination(
-						for: store.scope(state: \.root, action: { .child(.root($0)) }),
-						shouldDisplayNavBar: viewStore.shouldDisplayNavBar
-					)
+					let nameAccountStore = store.scope(state: \.root, action: { .child(.root($0)) })
+					NameAccount.View(store: nameAccountStore)
 					#if os(iOS)
-					.toolbar {
-						if viewStore.shouldDisplayNavBar {
-							ToolbarItem(placement: .primaryAction) {
-								CloseButton {
-									ViewStore(store.stateless).send(.view(.closeButtonTapped))
+						.toolbar {
+							if viewStore.shouldDisplayNavBar {
+								ToolbarItem(placement: .primaryAction) {
+									CloseButton {
+										ViewStore(store.stateless).send(.view(.closeButtonTapped))
+									}
 								}
 							}
 						}
-					}
 					#endif
-					// This is required to disable the animation of internal components during transition
-					.transaction { $0.animation = nil }
+						// This is required to disable the animation of internal components during transition
+						.transaction { $0.animation = nil }
 				} destination: {
 					destination(for: $0, shouldDisplayNavBar: viewStore.shouldDisplayNavBar)
 				}
@@ -56,12 +54,6 @@ extension CreateAccountCoordinator {
 		) -> some SwiftUI.View {
 			SwitchStore(store) { state in
 				switch state {
-				case .step1_nameAccount:
-					CaseLet(
-						state: /CreateAccountCoordinator.Path.State.step1_nameAccount,
-						action: CreateAccountCoordinator.Path.Action.step1_nameAccount,
-						then: { NameAccount.View(store: $0) }
-					)
 				case .step2_creationOfAccount:
 					CaseLet(
 						state: /CreateAccountCoordinator.Path.State.step2_creationOfAccount,
