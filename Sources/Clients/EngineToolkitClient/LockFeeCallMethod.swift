@@ -218,10 +218,10 @@ extension EngineToolkitClient {
 		nftDescription: String = "Artsy cool unique NFT"
 	) throws -> TransactionManifest {
 		let faucetAddress = try faucetAddress(for: networkID)
-		let instructions: [any InstructionProtocol] = [
+		let instructions: [any InstructionProtocol] = try [
 			lockFeeCallMethod(address: faucetAddress),
 
-			try CreateNonFungibleResourceWithInitialSupply(
+			CreateNonFungibleResourceWithInitialSupply(
 				idType: .init(.string("NonFungibleIdType::Integer")),
 				schema: [
 					.tuple([

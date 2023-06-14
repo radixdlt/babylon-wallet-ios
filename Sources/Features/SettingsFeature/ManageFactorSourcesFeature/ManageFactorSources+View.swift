@@ -89,7 +89,7 @@ extension FactorSourceView {
 		VStack(alignment: .leading, spacing: 0) {
 			VPair(heading: "Kind", item: factorSource.kind)
 			VPair(heading: "Added on", item: factorSource.addedOn.ISO8601Format())
-			VPair(heading: "ID", item: String(factorSource.id.hexCodable.hex().mask(showLast: 6)))
+			VPair(heading: "ID", item: String(factorSource.id.description.mask(showLast: 6)))
 		}
 		.border(Color.app.gray1, width: 2)
 	}

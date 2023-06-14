@@ -39,7 +39,7 @@ final class ProfileTests: TestCase {
 
 		XCTAssertEqual(key.publicKey.rawRepresentation.hex, "3b4fc51ce164be26723264f0a78b7e5ab44a143520c77e0e82bfbb9642e9cfd4")
 		let factorSourceID = try FactorSource.id(fromRoot: root, factorSourceKind: .device)
-		XCTAssertEqual(factorSourceID.hex(), "de6facb00a836864511fdf8f181382209e64e83ad462288ea1bc7868f236fb8033")
+		XCTAssertEqual(factorSourceID.description, "device:6facb00a836864511fdf8f181382209e64e83ad462288ea1bc7868f236fb8033")
 	}
 
 	func test_blake_hash() throws {
@@ -61,13 +61,13 @@ final class ProfileTests: TestCase {
 
 		XCTAssertEqual(key.publicKey.rawRepresentation.hex, "e358493920c6f967dc16eff9943fcd5765ab8f42b338ee6769d8ba7f1b9e097f")
 		let factorSourceID = try FactorSource.id(fromRoot: root, factorSourceKind: .device)
-		XCTAssertEqual(factorSourceID.hex(), "de41ac202687326a4fc6cb677e9fd92d08b91ce46c669950d58790d4d5e583adc0")
+		XCTAssertEqual(factorSourceID.description, "device:41ac202687326a4fc6cb677e9fd92d08b91ce46c669950d58790d4d5e583adc0")
 	}
 
 	func test_factorSourceID_zoo_zoo__wrong() throws {
 		let mnemonic = try Mnemonic(phrase: "zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo wrong", language: .english)
-		XCTAssertEqual(try FactorSource.id(fromRoot: mnemonic.hdRoot(), factorSourceKind: .device).hex(), "de09a501e4fafc7389202a82a3237a405ed191cdb8a4010124ff8e2c9259af1327")
-		XCTAssertEqual(try FactorSource.id(fromRoot: mnemonic.hdRoot(passphrase: "foo"), factorSourceKind: .device).hex(), "de537b56b9881258f08994392e9858962825d92361b6b4775a3bdfeb4eecc0d069")
+		XCTAssertEqual(try FactorSource.id(fromRoot: mnemonic.hdRoot(), factorSourceKind: .device).description, "device:09a501e4fafc7389202a82a3237a405ed191cdb8a4010124ff8e2c9259af1327")
+		XCTAssertEqual(try FactorSource.id(fromRoot: mnemonic.hdRoot(passphrase: "foo"), factorSourceKind: .device).description, "device:537b56b9881258f08994392e9858962825d92361b6b4775a3bdfeb4eecc0d069")
 	}
 
 	func test_factor_source_id_cap33() async throws {
@@ -90,7 +90,7 @@ final class ProfileTests: TestCase {
 
 		XCTAssertEqual(key.publicKey.rawRepresentation.hex, "156220ef37c5cd3e6da10cdfdba8a0d87ddc4411b4829f60155db3f6bbafc9f8")
 		let factorSourceID = try FactorSource.id(fromRoot: root, factorSourceKind: .device)
-		XCTAssertEqual(factorSourceID.hex(), "de56ee829c02d24487cbe98993f668ff646146e7c9bd02d1815118908c5355d750")
+		XCTAssertEqual(factorSourceID.description, "device:56ee829c02d24487cbe98993f668ff646146e7c9bd02d1815118908c5355d750")
 	}
 
 	func test_hdOnDeviceFactorSource() throws {
@@ -103,7 +103,12 @@ final class ProfileTests: TestCase {
 			$0.uuid = .constant(stableUUID)
 		} operation: {
 			XCTAssertNoThrow(
-				try DeviceFactorSource.olympia(mnemonic: mnemonic, model: deviceFactorModel, name: deviceFactorName)
+				try DeviceFactorSource.olympia(
+					mnemonic: mnemonic,
+					model: deviceFactorModel,
+					name: deviceFactorName,
+					addedOn: stableDate
+				)
 			)
 		}
 	}
@@ -113,6 +118,11 @@ final class ProfileTests: TestCase {
 
 		let curve25519FactorSourceMnemonic = try Mnemonic(
 			phrase: "bright club bacon dinner achieve pull grid save ramp cereal blush woman humble limb repeat video sudden possible story mask neutral prize goose mandate",
+			language: .english
+		)
+
+		let offDeviceMnemonic = try Mnemonic(
+			phrase: "zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo vote",
 			language: .english
 		)
 		let secp256K1FactorMnemonic = try Mnemonic(
@@ -128,12 +138,14 @@ final class ProfileTests: TestCase {
 			let babylonFactorSource = try DeviceFactorSource.babylon(
 				mnemonic: curve25519FactorSourceMnemonic,
 				model: deviceFactorModel,
-				name: deviceFactorName
+				name: deviceFactorName,
+				addedOn: stableDate
 			)
 			let olympiaFactorSource = try DeviceFactorSource.olympia(
 				mnemonic: secp256K1FactorMnemonic,
 				model: deviceFactorModel,
-				name: deviceFactorName
+				name: deviceFactorName,
+				addedOn: stableDate
 			)
 
 			let profile = Profile(
@@ -148,6 +160,28 @@ final class ProfileTests: TestCase {
 		var profile = _profile
 		XCTAssertEqual(profile.appPreferences.gateways.current.network, gateway.network)
 		profile.factorSources.append(olympiaFactorSource)
+
+		let (trustedContactFactorSource, offDeviceMnemonicFactorSource, ledgerFactorSource) = try withDependencies {
+			$0.date = .constant(stableDate)
+		} operation: {
+			let trustedContactFactorSource = TrustedContactFactorSource.from(
+				radixAddress: "account_tdx_c_1px0jul7a44s65568d32f82f0lkssjwx6f5t5e44yl6csqurxw3",
+				emailAddress: "hi@rdx.works",
+				name: "My friend"
+			)
+			let offDeviceMnemonicFactorSource = try OffDeviceMnemonicFactorSource.from(mnemonicWithPassphrase: .init(mnemonic: offDeviceMnemonic), label: "Zoo")
+
+			let ledgerFactorSource = try LedgerHardwareWalletFactorSource.model(
+				.nanoSPlus,
+				name: "Orange",
+				deviceID: .deadbeef
+			)
+
+			return (trustedContactFactorSource, offDeviceMnemonicFactorSource, ledgerFactorSource)
+		}
+		profile.factorSources.append(trustedContactFactorSource)
+		profile.factorSources.append(offDeviceMnemonicFactorSource)
+		profile.factorSources.append(ledgerFactorSource)
 
 		func addNewAccount(_ name: NonEmptyString) throws -> Profile.Network.Account {
 			let index = try profile.factorSources.babylonDevice.nextDerivationIndex(
@@ -171,7 +205,7 @@ final class ProfileTests: TestCase {
 			)
 
 			let factorInstance = HierarchicalDeterministicFactorInstance(
-				factorSourceID: babylonFactorSource.id,
+				id: babylonFactorSource.id,
 				publicKey: publicKey,
 				derivationPath: derivationPath.wrapAsDerivationPath()
 			)
@@ -194,7 +228,7 @@ final class ProfileTests: TestCase {
 				)
 
 				control.authenticationSigning = HierarchicalDeterministicFactorInstance(
-					factorSourceID: babylonFactorSource.id,
+					id: babylonFactorSource.id,
 					publicKey: authPublicKey,
 					derivationPath: path.wrapAsDerivationPath()
 				)
@@ -225,7 +259,7 @@ final class ProfileTests: TestCase {
 			)
 
 			let factorInstance = HierarchicalDeterministicFactorInstance(
-				factorSourceID: babylonFactorSource.id,
+				id: babylonFactorSource.id,
 				publicKey: publicKey,
 				derivationPath: derivationPath
 			)
@@ -243,7 +277,7 @@ final class ProfileTests: TestCase {
 				)
 
 				control.authenticationSigning = HierarchicalDeterministicFactorInstance(
-					factorSourceID: babylonFactorSource.id,
+					id: babylonFactorSource.id,
 					publicKey: authPublicKey,
 					derivationPath: path.wrapAsDerivationPath()
 				)
@@ -383,7 +417,8 @@ final class ProfileTests: TestCase {
 
 		XCTAssertNoDifference(profile.header, header)
 
-		XCTAssertEqual(profile.factorSources.count, 2)
+		XCTAssertEqual(profile.factorSources.count, 5)
+		XCTAssertEqual(Set(profile.factorSources.map(\.kind)), Set([FactorSourceKind.device, .ledgerHQHardwareWallet, .offDeviceMnemonic, .trustedContact]))
 		for factorSource in profile.factorSources.compactMap({ $0.extract(DeviceFactorSource.self) }) {
 			XCTAssertEqual(factorSource.hint.name, deviceFactorName)
 			XCTAssertEqual(factorSource.hint.model, deviceFactorModel)
@@ -421,12 +456,12 @@ final class ProfileTests: TestCase {
 
 		XCTAssertEqual(
 			profile.factorSources.first.id,
-			try FactorSource.id(fromRoot: curve25519FactorSourceMnemonic.hdRoot(), factorSourceKind: .device)
+			try FactorSource.id(fromRoot: curve25519FactorSourceMnemonic.hdRoot(), factorSourceKind: .device).embed()
 		)
 
 		XCTAssertEqual(
 			profile.factorSources.first(where: { $0.supportsOlympia })!.id,
-			try FactorSource.id(fromRoot: secp256K1FactorMnemonic.hdRoot(), factorSourceKind: .device)
+			try FactorSource.id(fromRoot: secp256K1FactorMnemonic.hdRoot(), factorSourceKind: .device).embed()
 		)
 
 		// Account 0
@@ -585,19 +620,32 @@ extension DeviceFactorSource {
 		mnemonic: Mnemonic,
 		model: Hint.Model,
 		name: String,
-		addedOn: Date = .now,
-		lastUsedOn: Date = .now
+		addedOn: Date
 	) throws -> Self {
-		try Self.babylon(mnemonicWithPassphrase: .init(mnemonic: mnemonic), model: model, name: name, addedOn: addedOn, lastUsedOn: lastUsedOn)
+		try Self.babylon(mnemonicWithPassphrase: .init(mnemonic: mnemonic), model: model, name: name, addedOn: addedOn, lastUsedOn: addedOn)
 	}
 
 	public static func olympia(
 		mnemonic: Mnemonic,
 		model: Hint.Model,
 		name: String,
-		addedOn: Date = .now,
-		lastUsedOn: Date = .now
+		addedOn: Date
 	) throws -> Self {
-		try Self.olympia(mnemonicWithPassphrase: .init(mnemonic: mnemonic), model: model, name: name, addedOn: addedOn, lastUsedOn: lastUsedOn)
+		try Self.olympia(mnemonicWithPassphrase: .init(mnemonic: mnemonic), model: model, name: name, addedOn: addedOn, lastUsedOn: addedOn)
+	}
+}
+
+// MARK: - EmailAddress + ExpressibleByStringLiteral
+extension EmailAddress: ExpressibleByStringLiteral {
+	public init(stringLiteral value: String) {
+		let nonEmpty = NonEmptyString(rawValue: value)!
+		try! self.init(validating: nonEmpty)
+	}
+}
+
+// MARK: - AccountAddress + ExpressibleByStringLiteral
+extension AccountAddress: ExpressibleByStringLiteral {
+	public init(stringLiteral value: String) {
+		try! self.init(address: value)
 	}
 }

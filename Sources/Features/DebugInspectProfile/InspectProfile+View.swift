@@ -193,7 +193,7 @@ extension FactorSourceView {
 			}
 		}
 		.background {
-			Color.randomDark(seed: factorSource.id.hexCodable.data)
+			Color.randomDark(seed: factorSource.id.description.data(using: .utf8)!)
 		}
 		.foregroundColor(.white)
 		.padding(.leading, leadingPadding)
@@ -204,7 +204,6 @@ extension FactorSourceView {
 public struct FactorSourceCommonView: View {
 	public let common: FactorSource.Common
 	public var body: some View {
-		Labeled("ID", value: common.id)
 		Labeled("Added On", value: common.addedOn.ISO8601Format())
 		Labeled("LastUsed On", value: common.lastUsedOn.ISO8601Format())
 		Labeled("Supported Curves", value: common.cryptoParameters.supportedCurves.map { String(describing: $0) }.joined())
@@ -740,7 +739,7 @@ extension HierarchicalDeterministicFactorInstanceView {
 			Labeled("Derivation Scheme", value: factorInstance.derivationPath.scheme.rawValue)
 			Labeled("Public Key", value: factorInstance.publicKey.compressedRepresentation.hex)
 			Labeled("Curve", value: factorInstance.publicKey.curve.rawValue)
-			Labeled("Factor Source ID", value: String(factorInstance.factorSourceID.hexCodable.hex().mask(showLast: 6)))
+			Labeled("Factor Source ID", value: String(factorInstance.factorSourceID.description.mask(showLast: 6)))
 		}
 		.padding(.leading, leadingPadding)
 	}

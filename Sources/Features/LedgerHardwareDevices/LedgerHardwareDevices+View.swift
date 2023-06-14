@@ -15,7 +15,7 @@ extension LedgerHardwareDevices {
 		let allowSelection: Bool
 		let showHeaders: Bool
 		let ledgers: Loadable<IdentifiedArrayOf<LedgerHardwareWalletFactorSource>>
-		let selectedLedgerID: FactorSourceID?
+		let selectedLedgerID: FactorSourceID.FromHash?
 		let selectedLedgerControlRequirements: SelectedLedgerControlRequirements?
 		let context: State.Context
 

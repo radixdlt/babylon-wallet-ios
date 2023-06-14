@@ -72,7 +72,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 			scanned: NonEmpty<OrderedSet<OlympiaAccountToMigrate>>,
 			alreadyImported: Set<OlympiaAccountToMigrate.ID>
 		)
-		case checkedIfOlympiaFactorSourceAlreadyExists(FactorSourceID?)
+		case checkedIfOlympiaFactorSourceAlreadyExists(FactorSourceID.FromHash?)
 
 		case migrateHardwareAccounts(NonEmpty<OrderedSet<OlympiaAccountToMigrate>>, NetworkID)
 		case validatedOlympiaSoftwareAccounts(
@@ -286,7 +286,7 @@ extension ImportOlympiaWalletCoordinator {
 
 	private func convertSoftwareAccountsToBabylon(
 		_ olympiaAccounts: NonEmpty<OrderedSet<OlympiaAccountToMigrate>>,
-		factorSourceID: FactorSourceID,
+		factorSourceID: FactorSourceID.FromHash,
 		factorSource: PrivateHDFactorSource?
 	) -> EffectTask<Action> {
 		.run { send in
@@ -316,7 +316,7 @@ extension ImportOlympiaWalletCoordinator {
 
 				} catch {
 					// Check if we have already imported this Mnemonic
-					if let existing = try await factorSourcesClient.getFactorSource(id: factorSourceToSave.id) {
+					if let existing = try await factorSourcesClient.getFactorSource(id: factorSourceToSave.id.embed()) {
 						if existing.kind == .device, existing.supportsOlympia {
 							// all good, we had already imported it.
 							loggerGlobal.notice("We had already imported this factor source (mnemonic) before.")

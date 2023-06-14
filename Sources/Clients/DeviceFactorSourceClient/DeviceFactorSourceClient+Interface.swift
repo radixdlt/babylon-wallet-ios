@@ -132,7 +132,7 @@ extension DeviceFactorSourceClient {
 		let factorSourceID = deviceFactorSource.id
 
 		guard
-			let loadedMnemonicWithPassphrase = try await secureStorageClient.loadMnemonicByFactorSourceID(factorSourceID, purpose.loadMnemonicPurpose)
+			let loadedMnemonicWithPassphrase = try await secureStorageClient.loadMnemonicByFactorSourceID(factorSourceID.embed(), purpose.loadMnemonicPurpose)
 		else {
 			throw FailedToDeviceFactorSourceForSigning()
 		}
@@ -174,7 +174,7 @@ extension DeviceFactorSourceClient {
 				let entitySignature = SignatureOfEntity(
 					signerEntity: entity,
 					derivationPath: derivationPath,
-					factorSourceID: factorSourceID,
+					factorSourceID: factorSourceID.embed(),
 					signatureWithPublicKey: signatureWithPublicKey
 				)
 

@@ -62,7 +62,7 @@ public struct GetAuthKeyDerivationPath: Sendable, FeatureReducer {
 					}
 
 					loggerGlobal.notice("Entity: \(entity) is about to create an authenticationSigning, publicKey of transactionSigning factor instance: \(unsecuredEntityControl.transactionSigning.publicKey)")
-					factorSourceID = unsecuredEntityControl.transactionSigning.factorSourceID
+					factorSourceID = unsecuredEntityControl.transactionSigning.factorSourceID.embed()
 					let hdPath = unsecuredEntityControl.transactionSigning.derivationPath
 					switch entity {
 					case .account:
@@ -204,7 +204,7 @@ public struct CreateAuthKey: Sendable, FeatureReducer {
 			return .run { [entity = state.entity] send in
 				let manifest = try await rolaClient.manifestForAuthKeyCreation(.init(entity: entity, newPublicKey: hdKey.publicKey))
 
-				let authenticationSigningFactorInstance = HierarchicalDeterministicFactorInstance(
+				let authenticationSigningFactorInstance = try HierarchicalDeterministicFactorInstance(
 					factorSourceID: factorSourceID,
 					publicKey: hdKey.publicKey,
 					derivationPath: hdKey.derivationPath

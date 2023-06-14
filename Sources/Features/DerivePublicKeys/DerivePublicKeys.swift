@@ -178,7 +178,7 @@ extension DerivePublicKeys {
 				))
 				return .delegate(.derivedPublicKeys(
 					hdKeys,
-					factorSourceID: deviceFactorSource.id,
+					factorSourceID: deviceFactorSource.id.embed(),
 					networkID: networkID
 				))
 			} catch {
@@ -202,7 +202,7 @@ extension DerivePublicKeys {
 
 				return .delegate(.derivedPublicKeys(
 					hdKeys,
-					factorSourceID: ledger.id,
+					factorSourceID: ledger.id.embed(),
 					networkID: networkID
 				))
 			} catch {

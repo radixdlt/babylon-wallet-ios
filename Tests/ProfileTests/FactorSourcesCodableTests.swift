@@ -5,7 +5,7 @@ import TestingPrelude
 
 // MARK: - FactorSourcesCodableTests
 final class FactorSourcesCodableTests: TestCase {
-	func omit_test_generate_vector() throws {
+	func test_generate_vector() throws {
 		let networkID = NetworkID.kisharnet
 
 		let factorSources: [FactorSource] = try withDependencies {
@@ -68,6 +68,14 @@ final class FactorSourcesCodableTests: TestCase {
 				)
 			)
 
+			anyFactorSources.append(
+				TrustedContactFactorSource.from(
+					radixAddress: "account_tdx_c_1px0jul7a44s65568d32f82f0lkssjwx6f5t5e44yl6csqurxw3",
+					emailAddress: "hi@rdx.works",
+					name: "My friend"
+				)
+			)
+
 			return anyFactorSources.map { $0.embed() }
 		}
 
@@ -83,29 +91,26 @@ final class FactorSourcesCodableTests: TestCase {
 			bundle: .module,
 			jsonName: "factor_sources"
 		) { (factorSources: [FactorSource]) in
-			guard factorSources.count == 4 else {
+			guard factorSources.count == 5 else {
 				XCTFail("wrong length")
 				return
 			}
 
 			let babylon = try factorSources[0].extract(as: DeviceFactorSource.self)
-			XCTAssertEqual(babylon.id.factorSourceKind, .device)
+			XCTAssertEqual(babylon.id.kind, .device)
 
 			let olympia: DeviceFactorSource = try factorSources[1].extract()
-			XCTAssertEqual(olympia.id.factorSourceKind, .device)
+			XCTAssertEqual(olympia.id.kind, .device)
 
 			let ledger = try factorSources[2].extract(as: LedgerHardwareWalletFactorSource.self)
-			XCTAssertEqual(ledger.id.factorSourceKind, .ledgerHQHardwareWallet)
+			XCTAssertEqual(ledger.id.kind, .ledgerHQHardwareWallet)
 
 			let offDeviceMnemonic = try factorSources[3].extract(as: OffDeviceMnemonicFactorSource.self)
-			XCTAssertEqual(offDeviceMnemonic.id.factorSourceKind, .offDeviceMnemonic)
-		}
-	}
-}
+			XCTAssertEqual(offDeviceMnemonic.id.kind, .offDeviceMnemonic)
 
-extension FactorSourceID {
-	static func from(_ byte: UInt8, sourceKind: FactorSourceKind) -> Self {
-		try! .init(factorSourceKind: sourceKind, hash: .from(byte))
+			let trustedContact = try factorSources[4].extract(as: TrustedContactFactorSource.self)
+			XCTAssertEqual(trustedContact.id.kind, .trustedContact)
+		}
 	}
 }
 
