@@ -136,7 +136,7 @@ extension Profile.Network.Account {
 		try! .init(
 			networkID: .simulator,
 			factorInstance: .init(
-				factorSourceID: factorSource.id.extract(as: FactorSourceID.FromHash.self),
+				factorSourceID: factorSource.id,
 				publicKey: .eddsaEd25519(Curve25519.Signing.PrivateKey().publicKey),
 				derivationPath: AccountDerivationPath.babylon(.init(
 					networkID: .simulator,
