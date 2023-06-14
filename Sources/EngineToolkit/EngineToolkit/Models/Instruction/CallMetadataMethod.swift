@@ -1,11 +1,11 @@
 import Foundation
 
-// MARK: - CallRoyaltyMethod
-public struct CallRoyaltyMethod: InstructionProtocol {
+// MARK: - CallMetadataMethod
+public struct CallMetadataMethod: InstructionProtocol {
 	// Type name, used as a discriminator
-	public static let kind: InstructionKind = .callRoyaltyMethod
+	public static let kind: InstructionKind = .callMetadataMethod
 	public func embed() -> Instruction {
-		.callRoyaltyMethod(self)
+		.callMetadataMethod(self)
 	}
 
 	// MARK: Stored properties
@@ -75,7 +75,7 @@ public struct CallRoyaltyMethod: InstructionProtocol {
 	#endif
 }
 
-extension CallRoyaltyMethod {
+extension CallMetadataMethod {
 	// MARK: CodingKeys
 	private enum CodingKeys: String, CodingKey {
 		case type = "instruction"
