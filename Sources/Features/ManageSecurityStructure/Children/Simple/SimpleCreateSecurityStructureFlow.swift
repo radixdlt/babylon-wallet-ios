@@ -165,15 +165,34 @@ public struct SimpleManageSecurityStructureFlow: Sendable, FeatureReducer {
 						return .encrypt()
 					}
 					return .editing(factorSource: factorSource)
-				case .new:
-					return .encrypt()
+				case let .new(new):
+					if let unsavedSecurityQuestions = new.newPhoneConfirmer {
+						return .editing(factorSource: unsavedSecurityQuestions)
+					} else {
+						return .encrypt()
+					}
 				}
 			}()
 			state.modalDestinations = .simpleNewPhoneConfirmer(.init(purpose: purpose))
 			return .none
 
 		case .selectLostPhoneHelper:
-			state.modalDestinations = .simpleLostPhoneHelper(.init())
+			let mode: ManageTrustedContactFactorSource.State.Mode = {
+				switch state.mode {
+				case let .existing(structure, _):
+					guard structure.isSimple, let factorSource = structure.configuration.recoveryRole.thresholdFactors[0].extract(TrustedContactFactorSource.self) else {
+						return .new
+					}
+					return .existing(factorSource)
+				case let .new(new):
+					if let unsavedTrustedContact = new.lostPhoneHelper {
+						return .existing(unsavedTrustedContact)
+					} else {
+						return .new
+					}
+				}
+			}()
+			state.modalDestinations = .simpleLostPhoneHelper(.init(mode: mode))
 			return .none
 
 		case let .finished(simpleFactorConfig):
