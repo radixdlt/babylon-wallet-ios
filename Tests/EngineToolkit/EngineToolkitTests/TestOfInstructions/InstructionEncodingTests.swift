@@ -81,7 +81,7 @@ final class InstructionEncodingTests: TestCase {
 				"""
 			),
 			(
-				value: .takeFromWorktop(.init(
+				value: .takeAllFromWorktop(.init(
 					resourceAddress: resourceAddress,
 					bucket: .init(value: "ident")
 				)),
@@ -90,7 +90,7 @@ final class InstructionEncodingTests: TestCase {
 				"""
 			),
 			(
-				value: .takeFromWorktop(.init(
+				value: .takeAllFromWorktop(.init(
 					resourceAddress: resourceAddress,
 					bucket: .init(value: "ident")
 				)),
@@ -199,13 +199,13 @@ final class InstructionEncodingTests: TestCase {
 				"""
 			),
 			(
-				value: .popFromAuthZone(.init(proof: .init(stringLiteral: "ident"))),
+				value: .popFromAuthZone(.init(proof: .init(identifier: "ident"))),
 				jsonRepresentation: """
 				{"instruction":"POP_FROM_AUTH_ZONE","into_proof":{"identifier":{"type":"String","value":"ident"},"type":"Proof"}}
 				"""
 			),
 			(
-				value: .pushToAuthZone(.init(proof: .init(stringLiteral: "ident"))),
+				value: .pushToAuthZone(.init(proof: .init(identifier: "ident"))),
 				jsonRepresentation: """
 				{"instruction":"PUSH_TO_AUTH_ZONE","proof":{"identifier":{"type":"String","value":"ident"},"type":"Proof"}}
 				"""
@@ -219,7 +219,7 @@ final class InstructionEncodingTests: TestCase {
 			(
 				value: .createProofFromAuthZone(.init(
 					resourceAddress: resourceAddress,
-					intoProof: .init(stringLiteral: "ident")
+					intoProof: .init(identifier: "ident")
 				)),
 				jsonRepresentation: """
 				{"instruction":"CREATE_PROOF_FROM_AUTH_ZONE","into_proof":{"identifier":{"type":"String","value":"ident"},"type":"Proof"},"resource_address":{"address":"resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqy99qqm","type":"Address"}}
@@ -228,7 +228,7 @@ final class InstructionEncodingTests: TestCase {
 			(
 				value: .createProofFromAuthZone(.init(
 					resourceAddress: resourceAddress,
-					intoProof: .init(stringLiteral: "ident")
+					intoProof: .init(identifier: "ident")
 				)),
 				jsonRepresentation: """
 				{"instruction":"CREATE_PROOF_FROM_AUTH_ZONE","into_proof":{"identifier":{"type":"String","value":"ident"},"type":"Proof"},"resource_address":{"address":"resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqy99qqm","type":"Address"}}
@@ -238,7 +238,7 @@ final class InstructionEncodingTests: TestCase {
 				value: .createProofFromAuthZoneByAmount(.init(
 					resourceAddress: resourceAddress,
 					amount: .init(value: "1"),
-					intoProof: .init(stringLiteral: "ident")
+					intoProof: .init(identifier: "ident")
 				)),
 				jsonRepresentation: """
 				{"amount":{"type":"Decimal","value":"1"},"instruction":"CREATE_PROOF_FROM_AUTH_ZONE_BY_AMOUNT","into_proof":{"identifier":{"type":"String","value":"ident"},"type":"Proof"},"resource_address":{"address":"resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqy99qqm","type":"Address"}}
@@ -248,7 +248,7 @@ final class InstructionEncodingTests: TestCase {
 				value: .createProofFromAuthZoneByAmount(.init(
 					resourceAddress: resourceAddress,
 					amount: .init(value: "1"),
-					intoProof: .init(stringLiteral: "ident")
+					intoProof: .init(identifier: "ident")
 				)),
 				jsonRepresentation: """
 				{"amount":{"type":"Decimal","value":"1"},"instruction":"CREATE_PROOF_FROM_AUTH_ZONE_BY_AMOUNT","into_proof":{"identifier":{"type":"String","value":"ident"},"type":"Proof"},"resource_address":{"address":"resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqy99qqm","type":"Address"}}
@@ -258,7 +258,7 @@ final class InstructionEncodingTests: TestCase {
 				value: .createProofFromAuthZoneByIds(.init(
 					resourceAddress: resourceAddress,
 					ids: ["1"],
-					intoProof: .init(stringLiteral: "ident")
+					intoProof: .init(identifier: "ident")
 				)),
 				jsonRepresentation: """
 				{"ids":[{"type":"NonFungibleLocalId","value":{"type":"Integer","value":"1"}}],"instruction":"CREATE_PROOF_FROM_AUTH_ZONE_BY_IDS","into_proof":{"identifier":{"type":"String","value":"ident"},"type":"Proof"},"resource_address":{"address":"resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqy99qqm","type":"Address"}}
@@ -268,7 +268,7 @@ final class InstructionEncodingTests: TestCase {
 				value: .createProofFromAuthZoneByIds(.init(
 					resourceAddress: resourceAddress,
 					ids: ["1"],
-					intoProof: .init(stringLiteral: "ident")
+					intoProof: .init(identifier: "ident")
 				)),
 				jsonRepresentation: """
 				{"ids":[{"type":"NonFungibleLocalId","value":{"type":"Integer","value":"1"}}],"instruction":"CREATE_PROOF_FROM_AUTH_ZONE_BY_IDS","into_proof":{"identifier":{"type":"String","value":"ident"},"type":"Proof"},"resource_address":{"address":"resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqy99qqm","type":"Address"}}
@@ -277,7 +277,7 @@ final class InstructionEncodingTests: TestCase {
 			(
 				value: .createProofFromBucket(.init(
 					bucket: Bucket(value: "bucket"),
-					proof: Proof(.string("Proof"))
+					proof: Proof(identifier: "Proof")
 				)),
 				jsonRepresentation: """
 				{"bucket":{"identifier":{"type":"String","value":"bucket"},"type":"Bucket"},"instruction":"CREATE_PROOF_FROM_BUCKET","into_proof":{"identifier":{"type":"String","value":"Proof"},"type":"Proof"}}
@@ -285,8 +285,8 @@ final class InstructionEncodingTests: TestCase {
 			),
 			(
 				value: .cloneProof(.init(
-					from: .init(stringLiteral: "ident"),
-					to: .init(stringLiteral: "ident2")
+					from: .init(identifier: "ident"),
+					to: .init(identifier: "ident2")
 				)),
 				jsonRepresentation: """
 				{"instruction":"CLONE_PROOF","into_proof":{"identifier":{"type":"String","value":"ident2"},"type":"Proof"},"proof":{"identifier":{"type":"String","value":"ident"},"type":"Proof"}}

@@ -1,11 +1,11 @@
 import Foundation
 
-// MARK: - TakeFromWorktop
-public struct TakeFromWorktop: InstructionProtocol {
+// MARK: - TakeAllFromWorktop
+public struct TakeAllFromWorktop: InstructionProtocol {
 	// Type name, used as a discriminator
-	public static let kind: InstructionKind = .takeFromWorktop
+	public static let kind: InstructionKind = .takeAllFromWorktop
 	public func embed() -> Instruction {
-		.takeFromWorktop(self)
+		.takeAllFromWorktop(self)
 	}
 
 	// MARK: Stored properties
@@ -20,7 +20,7 @@ public struct TakeFromWorktop: InstructionProtocol {
 	}
 }
 
-extension TakeFromWorktop {
+extension TakeAllFromWorktop {
 	// MARK: CodingKeys
 	private enum CodingKeys: String, CodingKey {
 		case type = "instruction"

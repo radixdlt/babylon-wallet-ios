@@ -157,7 +157,7 @@ extension ManifestASTValue {
 	// MARK: CodingKeys
 
 	private enum CodingKeys: String, CodingKey {
-		case type
+		case kind
 	}
 
 	// MARK: Codable
@@ -264,7 +264,7 @@ extension ManifestASTValue {
 	public init(from decoder: Decoder) throws {
 		// Checking for type discriminator
 		let container = try decoder.container(keyedBy: CodingKeys.self)
-		let kind: ManifestASTValueKind = try container.decode(ManifestASTValueKind.self, forKey: .type)
+		let kind: ManifestASTValueKind = try container.decode(ManifestASTValueKind.self, forKey: .kind)
 
 		switch kind {
 		case .bool:

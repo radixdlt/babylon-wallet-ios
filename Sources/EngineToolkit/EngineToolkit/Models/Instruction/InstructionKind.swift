@@ -7,7 +7,7 @@ public enum InstructionKind: String, Codable, Sendable, Hashable {
 	case callMetadataMethod = "CALL_METADATA_METHOD"
 	case callAccessRulesMethod = "CALL_ACCESSRULES_METHOD"
 
-	case takeFromWorktop = "TAKE_FROM_WORKTOP"
+	case takeAllFromWorktop = "TAKE_ALL_FROM_WORKTOP"
 	case takeFromWorktopByAmount = "TAKE_FROM_WORKTOP_BY_AMOUNT"
 	case takeFromWorktopByIds = "TAKE_FROM_WORKTOP_BY_IDS"
 
