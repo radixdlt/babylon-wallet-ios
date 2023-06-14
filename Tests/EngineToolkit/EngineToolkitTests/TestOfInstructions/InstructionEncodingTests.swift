@@ -18,6 +18,9 @@ final class InstructionEncodingTests: TestCase {
 		let encoder = JSONEncoder()
 		encoder.userInfo[.retCoding] = true
 
+		//                let manifest = TransactionManifest(instructions: .parsed([.createAccountAdvanced(.init(config: .init(values: [.map(.init(keyKind: <#T##ManifestASTValueKind#>, valueKind: <#T##ManifestASTValueKind#>, entries: <#T##Map_.Entries#>))])))]))
+		//                let str = try RadixEngine.instance.convertManifest(request: .init(manifest: manifest, outputFormat: .string, networkId: .simulator)).get()
+
 		// round trip encode/decoded
 		let encoded = try encoder.encode(instructions)
 		let decoded = try decoder.decode([Instruction].self, from: encoded)

@@ -19,7 +19,7 @@ public struct Expression: ValueProtocol, Sendable, Codable, Hashable {
 
 	// MARK: Init
 
-	public init(value: ManifestExpression) {
+	public init(_ value: ManifestExpression) {
 		self.value = value
 	}
 }
@@ -47,6 +47,6 @@ extension Expression {
 		}
 
 		// Decoding `value`
-		try self.init(value: container.decode(ManifestExpression.self, forKey: .value))
+		try self.init(container.decode(ManifestExpression.self, forKey: .value))
 	}
 }

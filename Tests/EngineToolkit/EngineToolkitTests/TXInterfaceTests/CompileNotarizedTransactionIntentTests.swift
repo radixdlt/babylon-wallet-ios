@@ -23,14 +23,12 @@ final class CompileNotarizedTransactionIntentTests: TestCase {
 			let notaryPrivateKey = Engine.PrivateKey.secp256k1(K1.PrivateKey())
 			let notarizedTransaction = try TransactionManifest(instructions: .string(testVector.manifest), blobs: testVector.blobs.map { [UInt8]($0) })
 				.header(TransactionHeader(
-					version: 0x01,
 					networkId: 0xF2,
 					startEpochInclusive: 0,
 					endEpochExclusive: 10,
 					nonce: 0,
 					publicKey: notaryPrivateKey.publicKey(),
-					notaryAsSignatory: true,
-					costUnitLimit: 10_000_000,
+					notaryIsSignatory: true,
 					tipPercentage: 0
 				))
 				.notarize(notaryPrivateKey)

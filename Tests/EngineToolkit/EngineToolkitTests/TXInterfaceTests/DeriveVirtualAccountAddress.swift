@@ -42,7 +42,7 @@ enum DeriveVirtualAccountAddressTestVectors {
 	static let vectors: [Vector] = [
 		(
 			publicKey: try! .eddsaEd25519(.init(hex: "1262bc6d5408a3c4e025aa0c15e64f69197cdb38911be5ad344a949779df3da6")),
-			virtualAccountComponentAddress: try! .init(validatingAddress: "account_sim1py4zv7pqlfq8tqqns9qqreegtct6r3n8kcq0ag3q7v7suy0f5r")
+			virtualAccountComponentAddress: try! .init(validatingAddress: "account_sim1cyzfj6p254jy6lhr237s7pcp8qqz6c8ahq9mn6nkdjxxxat5syrgz9")
 		),
 	]
 }

@@ -18,8 +18,8 @@ final class ConvertManifestTests: TestCase {
 	func test__convertManifest_on_common_manifests_to_parsed_then_to_string_does_not_throw() throws {
 		for testVector in try manifestTestVectors() {
 			let manifest = TransactionManifest(instructions: .string(testVector.manifest), blobs: testVector.blobs.map { [UInt8]($0) })
-			let convertedManifest = try sut.convertManifest(request: .init(manifest: manifest, outputFormat: .parsed, networkId: 0xF2)).get()
-			XCTAssertNoThrow(try sut.convertManifest(request: .init(manifest: convertedManifest, outputFormat: .string, networkId: 0xF2)).get())
+			let convertedManifest = try sut.convertManifest(request: .init(manifest: manifest, outputFormat: .parsed, networkId: .simulator)).get()
+			XCTAssertNoThrow(try sut.convertManifest(request: .init(manifest: convertedManifest, outputFormat: .string, networkId: .simulator)).get())
 		}
 	}
 }

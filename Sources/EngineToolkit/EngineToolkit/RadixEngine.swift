@@ -64,6 +64,15 @@ extension RadixEngine {
 		)
 	}
 
+	public func analyzeTransactionExecution(
+		request: AnalyzeTransactionExecutionRequest
+	) -> Result<AnalyzeTransactionExecutionResponse, Error> {
+		callLibraryFunction(
+			request: request,
+			function: analyze_transaction_execution
+		)
+	}
+
 	public func convertManifest(
 		request: ConvertManifestRequest
 	) -> Result<ConvertManifestResponse, Error> {
@@ -196,15 +205,6 @@ extension RadixEngine {
 		callLibraryFunction(
 			request: request,
 			function: known_entity_addresses
-		)
-	}
-
-	public func analyzeTransactionExecution(
-		request: AnalyzeTransactionExecutionRequest
-	) -> Result<AnalyzeTransactionExecutionResponse, Error> {
-		callLibraryFunction(
-			request: request,
-			function: analyze_transaction_execution
 		)
 	}
 

@@ -64,7 +64,7 @@ extension EngineToolkitClient {
 				receiver: componentAddress,
 				methodName: "deposit_batch"
 			) {
-				Expression("ENTIRE_WORKTOP")
+				Expression(.entireWorktop)
 			},
 		]
 
@@ -133,8 +133,8 @@ extension EngineToolkitClient {
 				keyKind: .enum,
 				valueKind: .tuple,
 				entries: [
-					[.enum(.init(.string("ResourceMethodAuthKey::Withdraw"))), .tuple(.init(arrayLiteral: .enum(.init(.string("AccessRule::AllowAll"))), .enum(.init(.string("AccessRule::DenyAll")))))],
-					[.enum(.init(.string("ResourceMethodAuthKey::Deposit"))), .tuple(.init(arrayLiteral: .enum(.init(.string("AccessRule::AllowAll"))), .enum(.init(.string("AccessRule::DenyAll")))))],
+					[.enum(.init(.string(.resourceMethodAuthKey_Withdraw))), .tuple(.init(arrayLiteral: .enum(.init(.string(.accessRule_AllowAll))), .enum(.init(.string(.accessRule_DenyAll)))))],
+					[.enum(.init(.string(.resourceMethodAuthKey_Deposit))), .tuple(.init(arrayLiteral: .enum(.init(.string(.accessRule_AllowAll))), .enum(.init(.string(.accessRule_DenyAll)))))],
 				]
 			)
 
@@ -159,7 +159,7 @@ extension EngineToolkitClient {
 		] + tokens +
 			[
 				CallMethod(receiver: accountAddress.asComponentAddress, methodName: "deposit_batch") {
-					Expression(stringLiteral: "ENTIRE_WORKTOP")
+					Expression(.entireWorktop)
 				},
 			]
 
@@ -196,15 +196,15 @@ extension EngineToolkitClient {
 					keyKind: .enum,
 					valueKind: .tuple,
 					entries: [
-						[.enum(.init(.string("ResourceMethodAuthKey::Withdraw"))), .tuple(.init(arrayLiteral: .enum(.init(.string("AccessRule::AllowAll"))), .enum(.init(.string("AccessRule::DenyAll")))))],
-						[.enum(.init(.string("ResourceMethodAuthKey::Deposit"))), .tuple(.init(arrayLiteral: .enum(.init(.string("AccessRule::AllowAll"))), .enum(.init(.string("AccessRule::DenyAll")))))],
+						[.enum(.init(.string(.resourceMethodAuthKey_Withdraw))), .tuple(.init(arrayLiteral: .enum(.init(.string(.accessRule_AllowAll))), .enum(.init(.string(.accessRule_DenyAll)))))],
+						[.enum(.init(.string(.resourceMethodAuthKey_Deposit))), .tuple(.init(arrayLiteral: .enum(.init(.string(.accessRule_AllowAll))), .enum(.init(.string(.accessRule_DenyAll)))))],
 					]
 				),
 				initialSupply: .decimal(.init(value: initialSupply))
 			),
 
 			CallMethod(receiver: accountAddress.asComponentAddress, methodName: "deposit_batch") {
-				Expression(stringLiteral: "ENTIRE_WORKTOP")
+				Expression(.entireWorktop)
 			},
 		]
 
@@ -222,7 +222,7 @@ extension EngineToolkitClient {
 			lockFeeCallMethod(address: faucetAddress),
 
 			try CreateNonFungibleResourceWithInitialSupply(
-				idType: .init(.string("NonFungibleIdType::Integer")),
+				idType: .init(.string(.nonFungibleIdType_Integer)),
 				schema: [
 					.tuple([
 						.array(.init(elementKind: .enum, elements: [])),
@@ -244,8 +244,8 @@ extension EngineToolkitClient {
 					keyKind: .enum,
 					valueKind: .tuple,
 					entries: [
-						[.enum(.init(.string("ResourceMethodAuthKey::Withdraw"))), .tuple(.init(arrayLiteral: .enum(.init(.string("AccessRule::AllowAll"))), .enum(.init(.string("AccessRule::DenyAll")))))],
-						[.enum(.init(.string("ResourceMethodAuthKey::Deposit"))), .tuple(.init(arrayLiteral: .enum(.init(.string("AccessRule::AllowAll"))), .enum(.init(.string("AccessRule::DenyAll")))))],
+						[.enum(.init(.string(.resourceMethodAuthKey_Withdraw))), .tuple(.init(arrayLiteral: .enum(.init(.string(.accessRule_AllowAll))), .enum(.init(.string(.accessRule_DenyAll)))))],
+						[.enum(.init(.string(.resourceMethodAuthKey_Deposit))), .tuple(.init(arrayLiteral: .enum(.init(.string(.accessRule_AllowAll))), .enum(.init(.string(.accessRule_DenyAll)))))],
 					]
 				),
 				initialSupply: .map(
@@ -258,7 +258,7 @@ extension EngineToolkitClient {
 			),
 
 			CallMethod(receiver: accountAddress.asComponentAddress, methodName: "deposit_batch") {
-				Expression(stringLiteral: "ENTIRE_WORKTOP")
+				Expression(.entireWorktop)
 			},
 		]
 
@@ -292,7 +292,7 @@ extension EngineToolkitClient {
 			}
 
 			return try CreateNonFungibleResourceWithInitialSupply(
-				idType: .init(.string("NonFungibleIdType::Integer")),
+				idType: .init(.string(.nonFungibleIdType_Integer)),
 				schema: [
 					.tuple([
 						.array(.init(elementKind: .enum, elements: [])),
@@ -311,8 +311,8 @@ extension EngineToolkitClient {
 					keyKind: .enum,
 					valueKind: .tuple,
 					entries: [
-						[.enum(.init(.string("ResourceMethodAuthKey::Withdraw"))), .tuple(.init(arrayLiteral: .enum(.init(.string("AccessRule::AllowAll"))), .enum(.init(.string("AccessRule::DenyAll")))))],
-						[.enum(.init(.string("ResourceMethodAuthKey::Deposit"))), .tuple(.init(arrayLiteral: .enum(.init(.string("AccessRule::AllowAll"))), .enum(.init(.string("AccessRule::DenyAll")))))],
+						[.enum(.init(.string(.resourceMethodAuthKey_Withdraw))), .tuple(.init(arrayLiteral: .enum(.init(.string(.accessRule_AllowAll))), .enum(.init(.string(.accessRule_DenyAll)))))],
+						[.enum(.init(.string(.resourceMethodAuthKey_Deposit))), .tuple(.init(arrayLiteral: .enum(.init(.string(.accessRule_AllowAll))), .enum(.init(.string(.accessRule_DenyAll)))))],
 					]
 				),
 				initialSupply: .map(
@@ -322,7 +322,7 @@ extension EngineToolkitClient {
 		}
 
 		let instructions: [any InstructionProtocol] = [lockFeeCallMethod(address: faucetAddress)] + tokens + [CallMethod(receiver: accountAddress.asComponentAddress, methodName: "deposit_batch") {
-			Expression(stringLiteral: "ENTIRE_WORKTOP")
+			Expression(.entireWorktop)
 		}]
 
 		return TransactionManifest(instructions: .parsed(instructions.map { $0.embed() }))

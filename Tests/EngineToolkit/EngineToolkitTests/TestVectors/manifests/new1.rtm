@@ -1,2 +1,3 @@
-CREATE_ACCOUNT
-    Enum(0u8);
+CREATE_ACCOUNT_ADVANCED
+    Tuple();                  # Authority Rules
+#CREATE_ACCOUNT;

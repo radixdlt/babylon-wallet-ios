@@ -244,13 +244,13 @@ extension AssetTransfer {
 				TakeFromWorktop(
 					amount: .init(value: account.amount.toString()),
 					resourceAddress: resource.address,
-					bucket: .init(identifier: bucket)
+					bucket: .init(value: bucket)
 				),
 
 				CallMethod(
 					receiver: account.id,
 					methodName: "deposit",
-					arguments: [.bucket(.init(identifier: bucket))]
+					arguments: [.bucket(.init(value: bucket))]
 				),
 			]
 
@@ -284,16 +284,16 @@ extension AssetTransfer {
 			let bucket = UUID().uuidString
 
 			let instructions: [any InstructionProtocol] = try [
-				TakeFromWorktopByIds(
+				TakeNonFungiblesFromWorktop(
 					Set(account.tokens.map { try $0.id.toRETLocalID() }),
 					resourceAddress: resource.address,
-					bucket: .init(identifier: bucket)
+					bucket: .init(value: bucket)
 				),
 
 				CallMethod(
 					receiver: account.id,
 					methodName: "deposit",
-					arguments: [.bucket(.init(identifier: bucket))]
+					arguments: [.bucket(.init(value: bucket))]
 				),
 			]
 

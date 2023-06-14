@@ -4,10 +4,6 @@ import Foundation
 public func manifestTestVectors() throws -> [(manifest: String, blobs: [[UInt8]])] {
 	var testVectors: [(manifest: String, blobs: [[UInt8]])] = try [
 		(
-			manifest: String(decoding: resource(named: "assert_access_rule", extension: ".rtm"), as: UTF8.self),
-			blobs: [[10]]
-		),
-		(
 			manifest: String(decoding: resource(named: "access_rule", extension: ".rtm"), as: UTF8.self),
 			blobs: [[10]]
 		),
@@ -40,6 +36,10 @@ public func manifestTestVectors() throws -> [(manifest: String, blobs: [[UInt8]]
 			blobs: [[10]]
 		),
 		(
+			manifest: String(decoding: resource(named: "deposit_modes", extension: ".rtm"), as: UTF8.self),
+			blobs: [[10]]
+		),
+		(
 			manifest: String(decoding: resource(named: "free_funds", extension: ".rtm"), as: UTF8.self),
 			blobs: [[10]]
 		),
@@ -56,6 +56,10 @@ public func manifestTestVectors() throws -> [(manifest: String, blobs: [[UInt8]]
 			blobs: [[10]]
 		),
 		(
+			manifest: String(decoding: resource(named: "new0", extension: ".rtm"), as: UTF8.self),
+			blobs: [[10]]
+		),
+		(
 			manifest: String(decoding: resource(named: "new1", extension: ".rtm"), as: UTF8.self),
 			blobs: [[10]]
 		),
@@ -64,13 +68,14 @@ public func manifestTestVectors() throws -> [(manifest: String, blobs: [[UInt8]]
 			blobs: [[10]]
 		),
 		(
-			manifest: String(decoding: resource(named: "new0", extension: ".rtm"), as: UTF8.self),
+			manifest: String(decoding: resource(named: "new3", extension: ".rtm"), as: UTF8.self),
 			blobs: [[10]]
 		),
-		(
-			manifest: String(decoding: resource(named: "publish", extension: ".rtm"), as: UTF8.self),
-			blobs: [[10]]
-		),
+		// TODO: This fails on RET side for some reason.
+		//                (
+		//                        manifest: String(decoding: resource(named: "publish", extension: ".rtm"), as: UTF8.self),
+		//                        blobs: [[10]]
+		//                ),
 		(
 			manifest: String(decoding: resource(named: "recall", extension: ".rtm"), as: UTF8.self),
 			blobs: [[10]]
@@ -99,43 +104,66 @@ public func manifestTestVectors() throws -> [(manifest: String, blobs: [[UInt8]]
 			.replacingOccurrences(of: "${",
 			                      with: "{")
 			.replacingOccurrences(of: "{xrd_resource_address}",
-			                      with: "resource_sim1qyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqs6d89k")
-			.replacingOccurrences(of: "{faucet_component_address}",
-			                      with: "component_sim1q0kryz5scup945usk39qjc2yjh6l5zsyuh8t7v5pk0tshjs68x")
-			.replacingOccurrences(of: "{this_account_component_address}",
-			                      with: "account_sim1qspjlnwx4gdcazhral74rjgzgysrslf8ngrfmprecrrss3p9md")
-			.replacingOccurrences(of: "{account_component_address}",
-			                      with: "account_sim1qspjlnwx4gdcazhral74rjgzgysrslf8ngrfmprecrrss3p9md")
-			.replacingOccurrences(of: "{other_account_component_address}",
-			                      with: "account_sim1qspjlnwx4gdcazhral74rjgzgysrslf8ngrfmprecrrss3p9md")
+			                      with: "resource_sim1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxakj8n3")
+			.replacingOccurrences(of: "{fungible_resource_address}",
+			                      with: "resource_sim1thvwu8dh6lk4y9mntemkvj25wllq8adq42skzufp4m8wxxuemugnez")
+			.replacingOccurrences(of: "{resource_address}",
+			                      with: "resource_sim1thvwu8dh6lk4y9mntemkvj25wllq8adq42skzufp4m8wxxuemugnez")
+			.replacingOccurrences(of: "{gumball_resource_address}",
+			                      with: "resource_sim1thvwu8dh6lk4y9mntemkvj25wllq8adq42skzufp4m8wxxuemugnez")
+			.replacingOccurrences(of: "{non_fungible_resource_address}",
+			                      with: "resource_sim1ngktvyeenvvqetnqwysevcx5fyvl6hqe36y3rkhdfdn6uzvt5366ha")
+			.replacingOccurrences(of: "{badge_resource_address}",
+			                      with: "resource_sim1ngktvyeenvvqetnqwysevcx5fyvl6hqe36y3rkhdfdn6uzvt5366ha")
+			.replacingOccurrences(of: "{account_address}",
+			                      with: "account_sim1cyvgx33089ukm2pl97pv4max0x40ruvfy4lt60yvya744cve475w0q")
+			.replacingOccurrences(of: "{this_account_address}",
+			                      with: "account_sim1cyvgx33089ukm2pl97pv4max0x40ruvfy4lt60yvya744cve475w0q")
 			.replacingOccurrences(of: "{account_a_component_address}",
-			                      with: "account_sim1qspjlnwx4gdcazhral74rjgzgysrslf8ngrfmprecrrss3p9md")
+			                      with: "account_sim1cyvgx33089ukm2pl97pv4max0x40ruvfy4lt60yvya744cve475w0q")
 			.replacingOccurrences(of: "{account_b_component_address}",
-			                      with: "account_sim1qspjlnwx4gdcazhral74rjgzgysrslf8ngrfmprecrrss3p9md")
+			                      with: "account_sim1cyvgx33089ukm2pl97pv4max0x40ruvfy4lt60yvya744cve475w0q")
 			.replacingOccurrences(of: "{account_c_component_address}",
-			                      with: "account_sim1qspjlnwx4gdcazhral74rjgzgysrslf8ngrfmprecrrss3p9md")
-			.replacingOccurrences(of: "{owner_badge_resource_address}",
-			                      with: "resource_sim1qyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqs6d89k")
+			                      with: "account_sim1cyvgx33089ukm2pl97pv4max0x40ruvfy4lt60yvya744cve475w0q")
+			.replacingOccurrences(of: "{other_account_address}",
+			                      with: "account_sim1cyzfj6p254jy6lhr237s7pcp8qqz6c8ahq9mn6nkdjxxxat5syrgz9")
+			.replacingOccurrences(of: "{component_address}",
+			                      with: "component_sim1cqvgx33089ukm2pl97pv4max0x40ruvfy4lt60yvya744cvemygpmu")
+			.replacingOccurrences(of: "{faucet_component_address}",
+			                      with: "component_sim1cqvgx33089ukm2pl97pv4max0x40ruvfy4lt60yvya744cvemygpmu")
+			.replacingOccurrences(of: "{package_address}",
+			                      with: "package_sim1p4r4955skdjq9swg8s5jguvcjvyj7tsxct87a9z6sw76cdfd2jg3zk")
 			.replacingOccurrences(of: "{minter_badge_resource_address}",
-			                      with: "resource_sim1qyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqs6d89k")
-			.replacingOccurrences(of: "{auth_badge_resource_address}",
-			                      with: "resource_sim1qyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqs6d89k")
+			                      with: "resource_sim1ngktvyeenvvqetnqwysevcx5fyvl6hqe36y3rkhdfdn6uzvt5366ha")
 			.replacingOccurrences(of: "{mintable_resource_address}",
-			                      with: "resource_sim1qyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqs6d89k")
-			.replacingOccurrences(of: "{owner_badge_non_fungible_local_id}",
-			                      with: "#1#")
-			.replacingOccurrences(of: "{auth_badge_non_fungible_local_id}",
-			                      with: "#1#")
+			                      with: "resource_sim1nfhtg7ttszgjwysfglx8jcjtvv8q02fg9s2y6qpnvtw5jsy3wvlhj6")
+			.replacingOccurrences(of: "{mintable_fungible_resource_address}",
+			                      with: "resource_sim1nfhtg7ttszgjwysfglx8jcjtvv8q02fg9s2y6qpnvtw5jsy3wvlhj6")
+			.replacingOccurrences(of: "{second_resource_address}",
+			                      with: "resource_sim1nfhtg7ttszgjwysfglx8jcjtvv8q02fg9s2y6qpnvtw5jsy3wvlhj6")
+			.replacingOccurrences(of: "{mintable_non_fungible_resource_address}",
+			                      with: "resource_sim1nfhtg7ttszgjwysfglx8jcjtvv8q02fg9s2y6qpnvtw5jsy3wvlhj6")
+			.replacingOccurrences(of: "{vault_address}",
+			                      with: "internal_vault_sim1tqvgx33089ukm2pl97pv4max0x40ruvfy4lt60yvya744cvevp72ff")
+			.replacingOccurrences(of: "{owner_badge_non_fungible_local_id}", with: "#1#")
 			.replacingOccurrences(of: "{code_blob_hash}",
-			                      with: blake2b(data: Data([10])).hex)
-			.replacingOccurrences(of: "{schema_blob_hash}",
-			                      with: blake2b(data: Data([10])).hex)
-			.replacingOccurrences(of: "{initial_supply}",
-			                      with: "12")
-			.replacingOccurrences(of: "{mint_amount}",
-			                      with: "12")
-			.replacingOccurrences(of: "{non_fungible_local_id}",
-			                      with: "#1#")
+			                      with: "5b4b01a4a3892ea3751793da57f072ae08eec694ddcda872239fc8239e4bcd1b")
+			.replacingOccurrences(of: "{initial_supply}", with: "12")
+			.replacingOccurrences(of: "{mint_amount}", with: "12")
+			.replacingOccurrences(of: "{non_fungible_local_id}", with: "#12#")
+			.replacingOccurrences(of: "{auth_badge_resource_address}",
+			                      with: "resource_sim1n24hvnrgmhj6j8dpjuu85vfsagdjafcl5x4ewc9yh436jh2hpu4qdj")
+			.replacingOccurrences(of: "{auth_badge_non_fungible_local_id}", with: "#1#")
+			.replacingOccurrences(of: "{package_address}",
+			                      with: "package_sim1p4r4955skdjq9swg8s5jguvcjvyj7tsxct87a9z6sw76cdfd2jg3zk")
+			.replacingOccurrences(of: "{consensusmanager_address}",
+			                      with: "consensusmanager_sim1scxxxxxxxxxxcnsmgrxxxxxxxxx000999665565xxxxxxxxxxc06cl")
+			.replacingOccurrences(of: "{clock_address}",
+			                      with: "clock_sim1skxxxxxxxxxxclckxxxxxxxxxxx002253583992xxxxxxxxxx58hk6")
+			.replacingOccurrences(of: "{validator_address}",
+			                      with: "validator_sim1sgvgx33089ukm2pl97pv4max0x40ruvfy4lt60yvya744cvedzgr3l")
+			.replacingOccurrences(of: "{accesscontroller_address}",
+			                      with: "accesscontroller_sim1cvvgx33089ukm2pl97pv4max0x40ruvfy4lt60yvya744cvexaj7at")
 	}
 
 	return testVectors

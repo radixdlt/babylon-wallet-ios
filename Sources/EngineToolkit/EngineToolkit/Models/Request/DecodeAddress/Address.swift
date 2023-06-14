@@ -149,41 +149,15 @@ extension CodingUserInfoKey {
 
 // MARK: - SpecificAddress + Codable
 extension SpecificAddress: Codable {
-	// MARK: CodingKeys
-	private enum CodingKeys: String, CodingKey {
-		case value, kind
-	}
-
 	// MARK: Codable
 	public func encode(to encoder: Encoder) throws {
-		if encoder.userInfo[.retCoding] != nil {
-			var container = encoder.container(keyedBy: CodingKeys.self)
-			try container.encode(Self.kind, forKey: .kind)
-			try container.encode(address, forKey: .value)
-		} else {
-			var container = encoder.singleValueContainer()
-			try container.encode(address)
-		}
+		var container = encoder.singleValueContainer()
+		try container.encode(address)
 	}
 
 	public init(from decoder: Decoder) throws {
-		if decoder.userInfo[.retCoding] != nil {
-			// Checking for type discriminator
-			let container = try decoder.container(keyedBy: CodingKeys.self)
-			let kind: ManifestASTValueKind = try container.decode(ManifestASTValueKind.self, forKey: .kind)
-			if kind != Self.kind {
-				throw InternalDecodingFailure.valueTypeDiscriminatorMismatch(expected: Self.kind, butGot: kind)
-			}
-			// Decoding `address`
-			try self.init(
-				validatingAddress: container.decode(String.self, forKey: .value)
-			)
-		} else {
-			let container = try decoder.singleValueContainer()
-			try self.init(
-				validatingAddress: container.decode(String.self)
-			)
-		}
+		let container = try decoder.singleValueContainer()
+		try self.init(validatingAddress: container.decode(String.self))
 	}
 }
 
