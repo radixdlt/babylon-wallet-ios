@@ -155,17 +155,7 @@ public struct SimpleManageSecurityStructureFlow: Sendable, FeatureReducer {
 			return .none
 
 		case let .modalDestinations(.presented(.firstConfirmerOfPhone(.delegate(.done(.success(.encrypted(factorSource, answersToQuestions))))))):
-			switch state.mode {
-			case var .new(new):
-				new.confirmerOfNewPhone = .init(factorSource: factorSource, answersToQuestions: answersToQuestions)
-				state.mode = .new(new)
-			case var .existing(existing):
-				// FIXME: Error handling
-				try! existing.configuration.confirmationRole.changeFactorSource(to: factorSource)
-				state.mode = .existing(existing)
-			}
-			state.modalDestinations = nil
-			return .none
+			return choseConfirmerOfPhone(.draft(factorSource, answersToQuestions), &state)
 
 		case .modalDestinations(.presented(.firstConfirmerOfPhone(.delegate(.done(.success(.decrypted)))))):
 			state.modalDestinations = nil
@@ -180,8 +170,7 @@ public struct SimpleManageSecurityStructureFlow: Sendable, FeatureReducer {
 
 		case let .modalDestinations(.presented(.listConfirmerOfPhone(.delegate(.choseFactorSource(savedOrDraftFactorSource))))):
 
-			state.modalDestinations = nil
-			return .none
+			return choseConfirmerOfPhone(savedOrDraftFactorSource, &state)
 
 		default: return .none
 		}

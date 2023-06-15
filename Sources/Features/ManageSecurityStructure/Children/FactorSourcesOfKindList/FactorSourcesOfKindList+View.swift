@@ -31,23 +31,11 @@ public extension FactorSourcesOfKindList {
 		var factorsArray: [Factor]? { factorSources.elements }
 
 		var navigationTitle: String {
-			if allowSelection {
-				// FIXME: Strings
-				return "Select Factor"
-			} else {
-				// FIXME: Strings
-				return "Factors"
+			let title = FactorSourceOfKind.kind.selectedFactorDisplay
+			guard allowSelection else {
+				return title
 			}
-		}
-
-		var subtitle: String? {
-			if allowSelection {
-				// FIXME: Strings
-				return "Select factor"
-			} else {
-				// FIXME: Strings
-				return "Factors"
-			}
+			return "Select \(title)"
 		}
 	}
 
@@ -79,14 +67,6 @@ public extension FactorSourcesOfKindList {
 								Text(viewStore.navigationTitle)
 									.textStyle(.sheetTitle)
 									.foregroundColor(.app.gray1)
-									.padding(.bottom, .medium1)
-							}
-
-							if let subtitle = viewStore.subtitle {
-								Text(subtitle)
-									.foregroundColor(.app.gray1)
-									.textStyle(.secondaryHeader)
-									.padding(.horizontal, .medium1)
 									.padding(.bottom, .medium1)
 							}
 						}

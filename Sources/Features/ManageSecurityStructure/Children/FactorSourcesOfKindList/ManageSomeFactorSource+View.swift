@@ -1,4 +1,6 @@
+import AnswerSecurityQuestionsFeature
 import FeaturePrelude
+import ManageTrustedContactFactorSourceFeature
 
 extension ManageSomeFactorSource.State {
 	var viewState: ManageSomeFactorSource.ViewState {
@@ -21,12 +23,21 @@ extension ManageSomeFactorSource {
 		}
 
 		public var body: some SwiftUI.View {
-			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-				// TODO: implement
-				Text("Implement: ManageSomeFactorSource")
-					.background(Color.yellow)
-					.foregroundColor(.red)
-					.onAppear { viewStore.send(.appeared) }
+			SwitchStore(store) {
+				CaseLet(
+					state: /ManageSomeFactorSource.State.manageSecurityQuestions,
+					action: { ManageSomeFactorSource.Action.child(.manageSecurityQuestions($0)) },
+					then: {
+						AnswerSecurityQuestionsCoordinator.View(store: $0)
+					}
+				)
+				CaseLet(
+					state: /ManageSomeFactorSource.State.manageTrustedContact,
+					action: { ManageSomeFactorSource.Action.child(.manageTrustedContact($0)) },
+					then: {
+						ManageTrustedContactFactorSource.View(store: $0)
+					}
+				)
 			}
 		}
 	}
