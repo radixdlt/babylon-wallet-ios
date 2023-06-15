@@ -2,6 +2,8 @@ import FeaturePrelude
 
 // MARK: - ManageSomeFactorSource
 public struct ManageSomeFactorSource<FactorSourceOfKind: FactorSourceProtocol, Extra: Sendable & Hashable>: Sendable, FeatureReducer {
+	public typealias Factor = SavedOrDraftFactorSource<FactorSourceOfKind, Extra>
+
 	public struct State: Sendable, Hashable {
 		public init() {}
 	}
@@ -11,7 +13,7 @@ public struct ManageSomeFactorSource<FactorSourceOfKind: FactorSourceProtocol, E
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
-		case done(TaskResult<SavedOrDraftFactorSource<FactorSourceOfKind, Extra>>)
+		case done(TaskResult<Factor>)
 	}
 
 	public init() {}

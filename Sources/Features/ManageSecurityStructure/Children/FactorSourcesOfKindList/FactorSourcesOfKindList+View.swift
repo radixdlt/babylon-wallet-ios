@@ -10,9 +10,9 @@ extension FactorSourcesOfKindList.State {
 public extension FactorSourcesOfKindList {
 	struct ViewState: Equatable {
 		let allowSelection: Bool
-		let factorSources: IdentifiedArrayOf<SavedOrDraftFactorSource<FactorSourceOfKind, Extra>>
+		let factorSources: IdentifiedArrayOf<Factor>
 		let selectedFactorSourceID: FactorSourceID?
-		let selectedFactorSource: SavedOrDraftFactorSource<FactorSourceOfKind, Extra>?
+		let selectedFactorSource: Factor?
 		let mode: State.Mode
 
 		init(state: FactorSourcesOfKindList.State) {
@@ -28,7 +28,7 @@ public extension FactorSourcesOfKindList {
 			}
 		}
 
-		var factorsArray: [SavedOrDraftFactorSource<FactorSourceOfKind, Extra>]? { factorSources.elements }
+		var factorsArray: [Factor]? { factorSources.elements }
 
 		var navigationTitle: String {
 			if allowSelection {

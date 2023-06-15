@@ -16,19 +16,20 @@ public enum SavedOrDraftFactorSource<Factor: FactorSourceProtocol, Extra: Sendab
 		}
 	}
 
+	public var factor: Factor {
+		switch self {
+		case let .draft(factor, _): return factor
+		case let .saved(factor): return factor
+		}
+	}
+
 	case draft(Factor, Extra)
 	case saved(Factor)
 }
 
 extension SavedOrDraftFactorSource where Extra == EquatableVoid {
 	public static func draft(_ factor: Factor) -> Self {
-		//        Self.draft(factor, EquatableVoid())
-		fatalError()
-	}
-
-	public static func saved(_ factor: Factor) -> Self {
-		//        Self.saved(factor, EquatableVoid())
-		fatalError()
+		Self.draft(factor, Extra())
 	}
 }
 
@@ -50,14 +51,14 @@ public struct FactorSourcesOfKindList<FactorSourceOfKind, Extra: Sendable & Hash
 
 		public var selectedFactorSourceID: FactorSourceID? = nil
 
-		let selectedFactorSourceControlRequirements: SavedOrDraftFactorSource<FactorSourceOfKind, Extra>? = nil
+		let selectedFactorSourceControlRequirements: Factor? = nil
 
 		@PresentationState
 		public var destination: Destinations.State? = nil
 
 		public init(
 			mode: Mode,
-			factorSources: IdentifiedArrayOf<SavedOrDraftFactorSource<FactorSourceOfKind, Extra>>?
+			factorSources: IdentifiedArrayOf<Factor>?
 		) {
 			self.mode = mode
 			if let factorSources {
@@ -69,7 +70,7 @@ public struct FactorSourcesOfKindList<FactorSourceOfKind, Extra: Sendable & Hash
 
 		public init(
 			mode: Mode,
-			factorSource: SavedOrDraftFactorSource<FactorSourceOfKind, Extra>
+			factorSource: Factor
 		) {
 			self.init(mode: mode, factorSources: [factorSource])
 		}
@@ -81,12 +82,12 @@ public struct FactorSourcesOfKindList<FactorSourceOfKind, Extra: Sendable & Hash
 		case onFirstTask
 		case selectedFactorSource(id: FactorSourceID?)
 		case addNewFactorSourceButtonTapped
-		case confirmedFactorSource(SavedOrDraftFactorSource<FactorSourceOfKind, Extra>)
+		case confirmedFactorSource(Factor)
 		case whatIsAFactorSourceButtonTapped
 	}
 
 	public enum InternalAction: Sendable, Equatable {
-		case loadedFactorSources(TaskResult<IdentifiedArrayOf<SavedOrDraftFactorSource<FactorSourceOfKind, Extra>>>)
+		case loadedFactorSources(TaskResult<IdentifiedArrayOf<Factor>>)
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -94,7 +95,7 @@ public struct FactorSourcesOfKindList<FactorSourceOfKind, Extra: Sendable & Hash
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
-		case choseFactorSource(SavedOrDraftFactorSource<FactorSourceOfKind, Extra>)
+		case choseFactorSource(Factor)
 	}
 
 	// MARK: - Destination
@@ -186,7 +187,7 @@ public struct FactorSourcesOfKindList<FactorSourceOfKind, Extra: Sendable & Hash
 		.task {
 			let result = await TaskResult {
 				let factorSources = try await factorSourcesClient.getFactorSources(type: FactorSourceOfKind.self)
-				return IdentifiedArray(uniqueElements: factorSources.map(SavedOrDraftFactorSource<FactorSourceOfKind, Extra>.saved))
+				return IdentifiedArray(uniqueElements: factorSources.map(Factor.saved))
 			}
 			return .internal(.loadedFactorSources(result))
 		}

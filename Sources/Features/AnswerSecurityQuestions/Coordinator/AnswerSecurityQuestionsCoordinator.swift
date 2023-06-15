@@ -9,9 +9,6 @@ public struct AnswerSecurityQuestionsCoordinator: Sendable, FeatureReducer {
 		public enum Purpose: Sendable, Hashable {
 			case decrypt(SecurityQuestionsFactorSource)
 			case encrypt(editingAnswersToQuestions: NonEmpty<OrderedSet<AbstractAnswerToSecurityQuestion<NonEmptyString>>>? = nil)
-			public static func editing(editingAnswersToQuestions: NonEmpty<OrderedSet<AbstractAnswerToSecurityQuestion<NonEmptyString>>>) -> Self {
-				.encrypt(editingAnswersToQuestions: editingAnswersToQuestions)
-			}
 
 			public enum AnswersResult: Sendable, Hashable {
 				case decrypted(Mnemonic, answersToQuestions: NonEmpty<OrderedSet<AbstractAnswerToSecurityQuestion<NonEmptyString>>>)

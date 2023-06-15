@@ -13,10 +13,10 @@ public struct SimpleUnnamedSecurityStructureConfig: Sendable, Hashable {
 // MARK: - ConfirmerOfNewPhone
 public struct ConfirmerOfNewPhone: Sendable, Hashable {
 	public let factorSource: SecurityQuestionsFactorSource
-	public let answersToQuestions: NonEmpty<OrderedSet<AbstractAnswerToSecurityQuestion<NonEmptyString>>>
+	public let answersToQuestions: NonEmpty<OrderedSet<AbstractAnswerToSecurityQuestion<NonEmptyString>>>?
 }
 
-public typealias ListConfirmerOfPhone = FactorSourcesOfKindList<SecurityQuestionsFactorSource, AbstractAnswerToSecurityQuestion<NonEmptyString>>
+public typealias ListConfirmerOfPhone = FactorSourcesOfKindList<SecurityQuestionsFactorSource, NonEmpty<OrderedSet<AbstractAnswerToSecurityQuestion<NonEmptyString>>>>
 public typealias ListLostPhoneHelper = FactorSourcesOfKindList<TrustedContactFactorSource, EquatableVoid>
 
 // MARK: - SimpleManageSecurityStructureFlow
@@ -118,16 +118,21 @@ public struct SimpleManageSecurityStructureFlow: Sendable, FeatureReducer {
 	}
 
 	private func choseConfirmerOfPhone(
-		_ factorSource: SavedOrDraftFactorSource<SecurityQuestionsFactorSource, Extra>,
+		_ factor: ListConfirmerOfPhone.Factor,
 		_ state: inout State
 	) -> EffectTask<Action> {
 		switch state.mode {
 		case var .new(new):
-			new.confirmerOfNewPhone = .init(factorSource: factorSource, answersToQuestions: answersToQuestions)
+			switch factor {
+			case let .draft(_, answersToQuestions):
+				new.confirmerOfNewPhone = .init(factorSource: factor.factor, answersToQuestions: answersToQuestions)
+			case .saved:
+				new.confirmerOfNewPhone = .init(factorSource: factor.factor, answersToQuestions: nil)
+			}
 			state.mode = .new(new)
 		case var .existing(existing):
 			// FIXME: Error handling
-			try! existing.configuration.confirmationRole.changeFactorSource(to: factorSource)
+			try! existing.configuration.confirmationRole.changeFactorSource(to: factor.factorSource)
 			state.mode = .existing(existing)
 		}
 		state.modalDestinations = nil
@@ -190,12 +195,12 @@ public struct SimpleManageSecurityStructureFlow: Sendable, FeatureReducer {
 				precondition(structure.isSimple)
 				state.modalDestinations = .listConfirmerOfPhone(.init(
 					mode: .selection,
-					draftFactorSource: structure.configuration.confirmationRole.thresholdFactors[0].extract(SecurityQuestionsFactorSource.self)!
+					factorSource: .saved(structure.securityQuestionsFactorSource)
 				))
 			case let .new(new):
 				if let confirmerOfNewPhone = new.confirmerOfNewPhone {
 					state.modalDestinations = .firstConfirmerOfPhone(.init(
-						purpose: .editing(editingAnswersToQuestions: confirmerOfNewPhone.answersToQuestions)
+						purpose: .encrypt(editingAnswersToQuestions: confirmerOfNewPhone.answersToQuestions)
 					))
 				} else {
 					state.modalDestinations = .firstConfirmerOfPhone(.init(
@@ -262,5 +267,12 @@ extension SecurityStructureConfiguration.Configuration {
 			recoveryRole: .single(simple.singleRecoveryFactor),
 			confirmationRole: .single(simple.singleConfirmationFactor)
 		)
+	}
+}
+
+extension SecurityStructureConfiguration {
+	var securityQuestionsFactorSource: SecurityQuestionsFactorSource {
+		precondition(isSimple)
+		return configuration.confirmationRole.thresholdFactors[0].extract(SecurityQuestionsFactorSource.self)!
 	}
 }
