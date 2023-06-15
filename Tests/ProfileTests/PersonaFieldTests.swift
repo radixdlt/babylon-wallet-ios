@@ -42,6 +42,45 @@ public struct Persona: Sendable, Hashable, Codable {
 	}
 }
 
+// MARK: - Persona.PersonaData.FieldCollectionOf + RandomAccessCollection
+extension Persona.PersonaData.FieldCollectionOf: RandomAccessCollection {
+	public typealias Element = PersonaFieldOfKind<Value>
+
+	public typealias Index = IdentifiedArrayOf<PersonaFieldOfKind<Value>>.Index
+
+	public typealias SubSequence = IdentifiedArrayOf<PersonaFieldOfKind<Value>>.SubSequence
+
+	public typealias Indices = IdentifiedArrayOf<PersonaFieldOfKind<Value>>.Indices
+
+	public var startIndex: Index {
+		collection.startIndex
+	}
+
+	public var indices: Indices {
+		collection.indices
+	}
+
+	public var endIndex: Index {
+		collection.endIndex
+	}
+
+	public func formIndex(after index: inout Index) {
+		collection.formIndex(after: &index)
+	}
+
+	public func formIndex(before index: inout Index) {
+		collection.formIndex(before: &index)
+	}
+
+	public subscript(bounds: Range<Index>) -> SubSequence {
+		collection[bounds]
+	}
+
+	public subscript(position: Index) -> Element {
+		collection[position]
+	}
+}
+
 extension Persona.PersonaData {
 	public var all: OrderedSet<PersonaField> {
 		.init(uncheckedUniqueElements: [
@@ -291,7 +330,14 @@ final class PersonaFieldTests: TestCase {
 		}
 
 		let emails = try dappRequest(values: \.emailAddresses, from: persona)
-		XCTAssertEqual(emails.collection.map(\.value), ["hi@rdx.works", "bye@rdx.works"])
+		XCTAssertEqual(emails.map(\.value), ["hi@rdx.works", "bye@rdx.works"])
+	}
+
+	func test_assert_personaData_fieldCollectionOf_cannot_contain_duplicated_values() {
+		XCTAssertThrowsError(try Persona.PersonaData.FieldCollectionOf<PersonaFieldValue.EmailAddress>.init(collection: [
+			.init(id: .init(uuidString: "BBBBBBBB-0000-1111-2222-BBBBBBBBBBBB"), value: "hi@rdx.works"),
+			.init(id: .init(uuidString: "AAAAAAAA-9999-8888-7777-AAAAAAAAAAAA"), value: "hi@rdx.works"), // same value cannot be used twice, even though UUID differs!
+		]))
 	}
 
 	func dappRequest<Kind: PersonaFieldValueProtocol>(
