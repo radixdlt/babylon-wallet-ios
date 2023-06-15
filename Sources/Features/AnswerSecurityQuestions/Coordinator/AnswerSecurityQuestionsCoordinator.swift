@@ -184,8 +184,6 @@ public struct AnswerSecurityQuestionsCoordinator: Sendable, FeatureReducer {
 							answersToQuestions: answers
 						)
 
-						try await factorSourcesClient.saveFactorSource(factorSource.embed())
-
 						return State.Purpose.AnswersResult.encrypted(factorSource, answersToQuestions: rawAnswers)
 					}
 				}

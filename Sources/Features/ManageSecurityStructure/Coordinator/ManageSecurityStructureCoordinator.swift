@@ -116,8 +116,18 @@ public struct ManageSecurityStructureCoordinator: Sendable, FeatureReducer {
 
 			return .none
 
-		case let .path(.element(_, action: .nameStructure(.delegate(.securityStructureUpdatedOrCreatedResult(result))))):
-			return .send(.delegate(.done(result)))
+		case let .path(.element(_, action: .nameStructure(.delegate(.updateOrCreateSecurityStructure(structure))))):
+
+			return .task { [isUpdatingExisting = state.mode == .new] in
+				let taskResult = await TaskResult {
+					try await appPreferencesClient.updating { preferences in
+						let didUpdateExisting = preferences.security.structureConfigurations.updateOrAppend(structure) != nil
+						assert(didUpdateExisting == isUpdatingExisting)
+					}
+					return structure
+				}
+				return .delegate(.done(taskResult))
+			}
 
 		default: return .none
 		}

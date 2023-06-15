@@ -103,7 +103,7 @@ public struct SimpleManageSecurityStructureFlow: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
-		case let .modalDestinations(.presented(.simpleLostPhoneHelper(.delegate(.done(.success(lostPhoneHelper)))))):
+		case let .modalDestinations(.presented(.simpleLostPhoneHelper(.delegate(.done(lostPhoneHelper))))):
 			switch state.mode {
 			case var .new(new):
 				new.lostPhoneHelper = lostPhoneHelper
@@ -114,12 +114,6 @@ public struct SimpleManageSecurityStructureFlow: Sendable, FeatureReducer {
 				state.mode = .existing(existing)
 			}
 			state.modalDestinations = nil
-			return .none
-
-		case let .modalDestinations(.presented(.simpleLostPhoneHelper(.delegate(.done(.failure(error)))))):
-			state.modalDestinations = nil
-			errorQueue.schedule(error)
-			loggerGlobal.error("Failed to create lost phone helper, error: \(error)")
 			return .none
 
 		case let .modalDestinations(.presented(.simpleNewPhoneConfirmer(.delegate(.done(.success(.encrypted(factorSource, answersToQuestions))))))):

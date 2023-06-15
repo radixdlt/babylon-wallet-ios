@@ -55,7 +55,7 @@ public struct NameSecurityStructure: Sendable, FeatureReducer {
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
-		case securityStructureUpdatedOrCreatedResult(TaskResult<SecurityStructureConfiguration>)
+		case updateOrCreateSecurityStructure(SecurityStructureConfiguration)
 	}
 
 	@Dependency(\.date) var date
@@ -68,23 +68,15 @@ public struct NameSecurityStructure: Sendable, FeatureReducer {
 			state.name = name
 			return .none
 		case let .confirmedName(name):
-			let config = SecurityStructureConfiguration(
+			let structure = SecurityStructureConfiguration(
 				id: state.id,
 				label: name,
 				configuration: state.config,
 				createdOn: state.createdOn,
 				lastUpdatedOn: date()
 			)
-			return .task { [isUpdatingExisting = state.isUpdatingExisting] in
-				let taskResult = await TaskResult {
-					try await appPreferencesClient.updating { preferences in
-						let didUpdateExisting = preferences.security.structureConfigurations.updateOrAppend(config) != nil
-						assert(didUpdateExisting == isUpdatingExisting)
-					}
-					return config
-				}
-				return .delegate(.securityStructureUpdatedOrCreatedResult(taskResult))
-			}
+
+			return .send(.delegate(.updateOrCreateSecurityStructure(structure)))
 		}
 	}
 }

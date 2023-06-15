@@ -9,7 +9,6 @@ public struct ManageTrustedContactFactorSource: Sendable, FeatureReducer {
 		public var emailAddress: String
 		public var name: String
 		public let canEditRadixAddress: Bool
-		public let shouldPersist: Bool
 		public enum Mode: Sendable, Hashable {
 			case existing(TrustedContactFactorSource, isFactorSourceSavedInProfile: Bool)
 			case new
@@ -60,7 +59,7 @@ public struct ManageTrustedContactFactorSource: Sendable, FeatureReducer {
 	}
 
 	public enum DelegateAction: Sendable, Hashable {
-		case done(TaskResult<TrustedContactFactorSource>)
+		case done(TrustedContactFactorSource)
 	}
 
 	public enum ViewAction: Sendable, Equatable {
@@ -120,25 +119,11 @@ public struct ManageTrustedContactFactorSource: Sendable, FeatureReducer {
 			return .none
 
 		case let .continueButtonTapped(accountAddress, emailAddress, name):
-			guard shouldPersist else {
-				return .delegate(.doneWithoutPersisting)
-			}
-			return .task { [isCreatingNew = state.mode == .new] in
-				let taskResult = await TaskResult {
-					let contact = TrustedContactFactorSource.from(
-						radixAddress: accountAddress,
-						emailAddress: emailAddress,
-						name: name
-					)
-					if isCreatingNew {
-						try await factorSourcesClient.saveFactorSource(contact.embed())
-					} else {
-						try await factorSourcesClient.updateFactorSource(contact.embed())
-					}
-					return contact
-				}
-				return .delegate(.done(taskResult))
-			}
+			return .send(.delegate(.done(TrustedContactFactorSource.from(
+				radixAddress: accountAddress,
+				emailAddress: emailAddress,
+				name: name
+			))))
 		}
 	}
 }
