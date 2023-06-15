@@ -9,6 +9,11 @@ public protocol FeatureView: SwiftUI.View where Feature.View == Self {
 	init(store: StoreOf<Feature>)
 }
 
+// MARK: - EmptyInitializable
+public protocol EmptyInitializable {
+	init()
+}
+
 // MARK: - FeatureReducer
 public protocol FeatureReducer: ReducerProtocol where State: Sendable & Hashable, Action == FeatureAction<Self> {
 	associatedtype ViewAction: Sendable & Equatable = Never

@@ -1,6 +1,4 @@
-import AddFactorSourceFactorSourceFeature
 import FeaturePrelude
-import NewConnectionFeature
 import Profile
 
 extension FactorSourcesOfKindList.State {
@@ -16,14 +14,14 @@ public extension FactorSourcesOfKindList {
 		let factorSources: Loadable<IdentifiedArrayOf<FactorSourceOfKind>>
 		let selectedFactorSourceID: FactorSourceID.FromHash?
 		let selectedFactorSourceControlRequirements: SelectedFactorSourceControlRequirements?
-		let context: State.Context
+		let mode: State.Context
 
 		init(state: FactorSourcesOfKindList.State) {
 			allowSelection = state.allowSelection
 			showHeaders = state.showHeaders
 			factorSources = state.$factorSources
 			selectedFactorSourceID = state.selectedFactorSourceID
-			context = state.context
+			mode = state.mode
 
 			if let id = state.selectedFactorSourceID, let selectedFactorSource = state.factorSources?[id: id] {
 				selectedFactorSourceControlRequirements = .init(selectedFactorSource: selectedFactorSource)
@@ -73,13 +71,15 @@ public extension FactorSourcesOfKindList {
 				ScrollView {
 					VStack(spacing: 0) {
 						Group {
-							if viewStore.context == .settings {
-								Text(L10n.FactorSourcesOfKindList.subtitleAllFactorSources)
+							if viewStore.mode == .onlyPresentList {
+								// FIXME: Strings
+								Text("Factors")
 									.textStyle(.body1HighImportance)
 									.foregroundColor(.app.gray2)
 									.padding(.vertical, .medium1)
 							} else {
-								Image(asset: AssetResource.iconHardwareFactorSource)
+								// FIXME: Icon
+								Image(systemName: "lock.square.stack.fill")
 									.frame(.medium)
 									.padding(.vertical, .medium2)
 
@@ -89,26 +89,17 @@ public extension FactorSourcesOfKindList {
 									.padding(.bottom, .medium1)
 							}
 
-							if viewStore.showHeaders {
-								if let subtitle = viewStore.subtitle {
-									Text(subtitle)
-										.foregroundColor(.app.gray1)
-										.textStyle(.secondaryHeader)
-										.padding(.horizontal, .medium1)
-										.padding(.bottom, .medium1)
-								}
-
-								//        FIXME: Uncomment and implement
-								//        Button(L10n.FactorSourcesOfKindList.ledgerFactorSourceInfoCaption) {
-								//                viewStore.send(.whatIsAFactorSourceButtonTapped)
-								//        }
-								//        .buttonStyle(.info)
-								//        .flushedLeft
+							if viewStore.showHeaders, let subtitle = viewStore.subtitle {
+								Text(subtitle)
+									.foregroundColor(.app.gray1)
+									.textStyle(.secondaryHeader)
+									.padding(.horizontal, .medium1)
+									.padding(.bottom, .medium1)
 							}
 						}
 						.multilineTextAlignment(.center)
 
-						ledgerList(viewStore: viewStore)
+						factorList(viewStore: viewStore)
 							.padding(.bottom, .medium1)
 
 						Button(L10n.FactorSourcesOfKindList.addNewFactorSource) {
@@ -141,14 +132,15 @@ public extension FactorSourcesOfKindList {
 		}
 
 		@ViewBuilder
-		private func ledgerList(viewStore: ViewStoreOf<FactorSourcesOfKindList>) -> some SwiftUI.View {
+		private func factorList(viewStore: ViewStoreOf<FactorSourcesOfKindList>) -> some SwiftUI.View {
 			switch viewStore.factorSources {
 			case .idle, .loading, .failure,
 			     // We are already showing `subtitleNoFactorSources` in the header
 			     .success([]) where viewStore.showHeaders:
 				EmptyView()
 			case .success([]):
-				Text(L10n.FactorSourcesOfKindList.subtitleNoFactorSources)
+				// FIXME: Strings
+				Text("No factors")
 					.foregroundColor(.app.gray1)
 					.textStyle(.secondaryHeader)
 					.multilineTextAlignment(.center)
@@ -186,8 +178,6 @@ extension View {
 	fileprivate func destinations(with store: StoreOf<FactorSourcesOfKindList>) -> some View {
 		let destinationStore = store.scope(state: \.$destination, action: { .child(.destination($0)) })
 		return addNewFactorSourceSheet(with: destinationStore)
-			.addNewP2PLinkSheet(with: destinationStore)
-			.noP2PLinkAlert(with: destinationStore)
 	}
 
 	@MainActor
@@ -199,23 +189,68 @@ extension View {
 			content: { AddFactorSourceFactorSource.View(store: $0) }
 		)
 	}
+}
 
-	@MainActor
-	private func addNewP2PLinkSheet(with destinationStore: PresentationStoreOf<FactorSourcesOfKindList.Destinations>) -> some View {
-		sheet(
-			store: destinationStore,
-			state: /FactorSourcesOfKindList.Destinations.State.addNewP2PLink,
-			action: FactorSourcesOfKindList.Destinations.Action.addNewP2PLink,
-			content: { NewConnection.View(store: $0) }
-		)
+// MARK: - FactorSourceRowView
+@MainActor
+public struct FactorSourceRowView: View {
+	public struct ViewState: Equatable {
+		let description: String
+		let addedOn: Date
+		let lastUsedOn: Date
+
+		public init(factorSource: FactorSource, describe: (FactorSource) -> String) {
+			self.description = describe(factorSource)
+			self.addedOn = factorSource.addedOn
+			self.lastUsedOn = factorSource.lastUsedOn
+		}
 	}
 
-	@MainActor
-	private func noP2PLinkAlert(with destinationStore: PresentationStoreOf<FactorSourcesOfKindList.Destinations>) -> some View {
-		alert(
-			store: destinationStore,
-			state: /FactorSourcesOfKindList.Destinations.State.noP2PLink,
-			action: FactorSourcesOfKindList.Destinations.Action.noP2PLink
-		)
+	private let viewState: ViewState
+	private let isSelected: Bool?
+	private let action: (() -> Void)?
+
+	/// Creates a tappable card. If `isSelected` is non-nil, the card will have a radio button.
+	public init(viewState: ViewState, isSelected: Bool? = nil, action: @escaping () -> Void) {
+		self.viewState = viewState
+		self.isSelected = isSelected
+		self.action = action
+	}
+
+	/// Creates an inert card, with no selection indication.
+	public init(viewState: ViewState) {
+		self.viewState = viewState
+		self.isSelected = nil
+		self.action = nil
+	}
+
+	public var body: some View {
+		Card(.app.gray5, action: action) {
+			HStack(spacing: 0) {
+				VStack(alignment: .leading, spacing: 0) {
+					Text(viewState.description)
+						.foregroundColor(.app.gray1)
+						.textStyle(.secondaryHeader)
+						.padding(.bottom, .small1)
+
+					LabelledDate(label: "Last used", date: viewState.lastUsedOn)
+						.padding(.bottom, .small3)
+
+					LabelledDate(label: "Added on", date: viewState.addedOn)
+				}
+
+				Spacer(minLength: 0)
+
+				if let isSelected {
+					RadioButton(
+						appearance: .light,
+						state: isSelected ? .selected : .unselected
+					)
+				}
+			}
+			.foregroundColor(.app.gray1)
+			.padding(.horizontal, .large3)
+			.padding(.vertical, .medium1)
+		}
 	}
 }
