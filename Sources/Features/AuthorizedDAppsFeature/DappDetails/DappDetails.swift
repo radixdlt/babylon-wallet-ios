@@ -267,7 +267,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 	/// Loads any fungible and non-fungible resources associated with the dApp
 	private func loadResources(
 		metadata: GatewayAPI.EntityMetadataCollection,
-		validated dappDefinitionAddress: DappDefinitionAddress
+		validated dAppDefinitionAddress: DappDefinitionAddress
 	) async -> Loadable<DappDetails.State.Resources> {
 		guard let claimedEntities = metadata.claimedEntities, !claimedEntities.isEmpty else {
 			return .idle
@@ -276,8 +276,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 		let result = await TaskResult {
 			let allResourceItems = try await gatewayAPIClient.fetchResourceDetails(claimedEntities)
 				.items
-				// FIXME: Uncomment this when when we can rely on dApps conforming to the standards
-				// .filter { $0.metadata.dappDefinition == dAppDefinitionAddress.address }
+				.filter { $0.metadata.dappDefinition == dAppDefinitionAddress.address }
 				.compactMap(\.resourceDetails)
 
 			return State.Resources(fungible: allResourceItems.filter { $0.fungibility == .fungible },
