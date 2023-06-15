@@ -105,7 +105,6 @@ public struct DappDetails: Sendable, FeatureReducer {
 		case resourcesLoaded(Loadable<State.Resources>)
 		case associatedDappsLoaded(Loadable<[State.AssociatedDapp]>)
 		case dAppUpdated(Profile.Network.AuthorizedDappDetailed)
-		case dAppForgotten
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -206,7 +205,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 				return update(dAppID: dAppID, dismissPersonaDetails: false)
 
 			case .confirmDisconnectAlert(.confirmTapped):
-				return disconnectDappEffect(state: state)
+				return disconnectDappEffect(dApp: state.dApp)
 
 			default:
 				return .none
@@ -250,17 +249,12 @@ public struct DappDetails: Sendable, FeatureReducer {
 		case let .dAppUpdated(dApp):
 			assert(dApp.dAppDefinitionAddress == state.dApp.dAppDefinitionAddress, "dAppUpdated called with wrong dApp")
 			guard !dApp.detailedAuthorizedPersonas.isEmpty else {
-				return disconnectDappEffect(state: state)
+				// FIXME: Without this delay, the screen is never dismissed
+				return disconnectDappEffect(dApp: state.dApp, delay: .milliseconds(500))
 			}
 			state.dApp = dApp
 
 			return .none
-
-		case .dAppForgotten:
-			return .task {
-				await dismiss()
-				return .delegate(.dAppForgotten)
-			}
 		}
 	}
 
@@ -330,11 +324,14 @@ public struct DappDetails: Sendable, FeatureReducer {
 		}
 	}
 
-	private func disconnectDappEffect(state: State) -> EffectTask<Action> {
-		let (dAppID, networkID) = (state.dApp.dAppDefinitionAddress, state.dApp.networkID)
+	private func disconnectDappEffect(dApp: Profile.Network.AuthorizedDappDetailed, delay: Duration? = .zero) -> EffectTask<Action> {
+		let (dAppID, networkID) = (dApp.dAppDefinitionAddress, dApp.networkID)
 		return .run { send in
+			if let delay {
+				try await Task.sleep(for: delay)
+			}
 			try await authorizedDappsClient.forgetAuthorizedDapp(dAppID, networkID)
-			await send(.internal(.dAppForgotten))
+			await send(.delegate(.dAppForgotten))
 		} catch: { error, _ in
 			errorQueue.schedule(error)
 		}
