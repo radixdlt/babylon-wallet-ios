@@ -9,6 +9,14 @@ import TestingPrelude
 // MARK: - DuplicateValuesFound
 struct DuplicateValuesFound: Swift.Error {}
 
+// MARK: - DuplicateIDOfValueFound
+struct DuplicateIDOfValueFound: Swift.Error {}
+
+// MARK: - PersonaFieldCollectionValueWithIDNotFound
+struct PersonaFieldCollectionValueWithIDNotFound: Swift.Error {
+	let id: UUID
+}
+
 // MARK: - Persona
 public struct Persona: Sendable, Hashable, Codable {
 	public let label: String
@@ -18,19 +26,36 @@ public struct Persona: Sendable, Hashable, Codable {
 		public typealias Name = PersonaFieldOfKind<PersonaFieldValue.Name>
 
 		public struct FieldCollectionOf<Value: Sendable & Hashable & Codable & BasePersonaFieldValueProtocol>: Sendable, Hashable, Codable {
-			public var collection: IdentifiedArrayOf<PersonaFieldOfKind<Value>>
+			public private(set) var collection: IdentifiedArrayOf<PersonaFieldOfKind<Value>>
 			public init(collection: IdentifiedArrayOf<PersonaFieldOfKind<Value>> = .init()) throws {
 				guard Set(collection.map(\.value)).count == collection.count else {
 					throw DuplicateValuesFound()
 				}
 				self.collection = collection
 			}
+
+			public mutating func add(_ field: PersonaFieldOfKind<Value>) throws {
+				guard !contains(where: { $0.value == field.value }) else {
+					throw DuplicateValuesFound()
+				}
+				let (wasInserted, _) = self.collection.append(field)
+				guard wasInserted else {
+					throw DuplicateIDOfValueFound()
+				}
+			}
+
+			public mutating func update(_ updated: PersonaFieldOfKind<Value>) throws {
+				guard contains(where: { $0.id == updated.id }) else {
+					throw PersonaFieldCollectionValueWithIDNotFound(id: updated.id)
+				}
+				self.collection[id: updated.id] = updated
+			}
 		}
 
 		public typealias EmailAddresses = FieldCollectionOf<PersonaFieldValue.EmailAddress>
 
-		public let name: Name?
-		public let emailAddresses: EmailAddresses
+		public var name: Name?
+		public var emailAddresses: EmailAddresses
 
 		public init(
 			name: Name? = nil,
@@ -198,7 +223,7 @@ public enum PersonaFieldValue: Sendable, Hashable, Codable, BasePersonaFieldValu
 /// * Birthday
 public struct PersonaFieldOfKind<Value>: Sendable, Hashable, Codable, Identifiable where Value: Sendable & Hashable & Codable & BasePersonaFieldValueProtocol {
 	public let id: UUID
-	public let value: Value
+	public var value: Value
 
 	public init(
 		id: UUID? = nil,
@@ -334,10 +359,79 @@ final class PersonaFieldTests: TestCase {
 	}
 
 	func test_assert_personaData_fieldCollectionOf_cannot_contain_duplicated_values() {
-		XCTAssertThrowsError(try Persona.PersonaData.FieldCollectionOf<PersonaFieldValue.EmailAddress>.init(collection: [
-			.init(id: .init(uuidString: "BBBBBBBB-0000-1111-2222-BBBBBBBBBBBB"), value: "hi@rdx.works"),
-			.init(id: .init(uuidString: "AAAAAAAA-9999-8888-7777-AAAAAAAAAAAA"), value: "hi@rdx.works"), // same value cannot be used twice, even though UUID differs!
-		]))
+		XCTAssertThrowsError(
+			try Persona.PersonaData.EmailAddresses(
+				collection: [
+					.init(id: .init(uuidString: "BBBBBBBB-0000-1111-2222-BBBBBBBBBBBB"), value: "hi@rdx.works"),
+					.init(id: .init(uuidString: "AAAAAAAA-9999-8888-7777-AAAAAAAAAAAA"), value: "hi@rdx.works"), // same value cannot be used twice, even though UUID differs!
+				]
+			)
+		)
+	}
+
+	func test_assert_personaData_fieldCollectionOf_cannot_add_duplicate_value() throws {
+		var fieldCollection = try Persona.PersonaData.EmailAddresses(
+			collection: [
+				.init(id: .init(uuidString: "BBBBBBBB-0000-1111-2222-BBBBBBBBBBBB"), value: "hi@rdx.works"),
+			]
+		)
+		XCTAssertThrowsError(
+			try fieldCollection.add(
+				.init(id: .init(uuidString: "AAAAAAAA-9999-8888-7777-AAAAAAAAAAAA"), value: "hi@rdx.works")
+			)
+		)
+	}
+
+	func test_assert_personaData_fieldCollectionOf_cannot_add_duplicate_id() throws {
+		var fieldCollection = try Persona.PersonaData.EmailAddresses(
+			collection: [
+				.init(id: .init(uuidString: "BBBBBBBB-0000-1111-2222-BBBBBBBBBBBB"), value: "hi@rdx.works"),
+			]
+		)
+		XCTAssertThrowsError(
+			try fieldCollection.add(
+				.init(id: .init(uuidString: "BBBBBBBB-0000-1111-2222-BBBBBBBBBBBB"), value: "bye@rdx.works")
+			)
+		)
+	}
+
+	func test_assert_personaData_fieldCollectionOf_can_add_another_value() throws {
+		var fieldCollection = try Persona.PersonaData.EmailAddresses(
+			collection: [
+				.init(id: .init(uuidString: "BBBBBBBB-0000-1111-2222-BBBBBBBBBBBB"), value: "hi@rdx.works"),
+			]
+		)
+		try fieldCollection.add(
+			.init(id: .init(uuidString: "AAAAAAAA-9999-8888-7777-AAAAAAAAAAAA"), value: "bye@rdx.works")
+		)
+		XCTAssertEqual(fieldCollection.map(\.value), ["hi@rdx.works", "bye@rdx.works"])
+	}
+
+	func test_update_emails() throws {
+		var email = Persona.PersonaData.EmailAddresses.Element(
+			id: .init(uuidString: "BBBBBBBB-0000-1111-2222-BBBBBBBBBBBB"),
+			value: "hi@rdx.works"
+		)
+		var fieldCollection = try Persona.PersonaData.EmailAddresses(
+			collection: [
+				email,
+			]
+		)
+		email.value = "bye@rdx.works"
+		XCTAssertNoThrow(try fieldCollection.update(email))
+		XCTAssertEqual(fieldCollection[0].value, "bye@rdx.works")
+	}
+
+	func test_assert_update_unknown_id_throws() throws {
+		var fieldCollection = try Persona.PersonaData.EmailAddresses(
+			collection: [
+				.init(id: .init(uuidString: "AAAAAAAA-9999-8888-7777-AAAAAAAAAAAA"), value: "hi@rdx.works"),
+			]
+		)
+		XCTAssertThrowsError(try fieldCollection.update(.init(
+			id: .init(uuidString: "BBBBBBBB-0000-1111-2222-BBBBBBBBBBBB"),
+			value: "bye@rdx.works"
+		)))
 	}
 
 	func dappRequest<Kind: PersonaFieldValueProtocol>(
