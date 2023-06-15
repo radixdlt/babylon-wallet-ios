@@ -70,21 +70,34 @@ public struct SimpleManageSecurityStructureFlow: Sendable, FeatureReducer {
 
 	public struct ModalDestinations: Sendable, ReducerProtocol {
 		public enum State: Sendable, Hashable {
-			case simpleNewPhoneConfirmer(AnswerSecurityQuestionsCoordinator.State)
-			case simpleLostPhoneHelper(ManageTrustedContactFactorSource.State)
+			case firstConfirmerOfPhone(AnswerSecurityQuestionsCoordinator.State)
+			case listConfirmerOfPhone(FactorSourcesOfKindList<SecurityQuestionsFactorSource>.State)
+
+			case firstLostPhoneHelper(ManageTrustedContactFactorSource.State)
+			case listLostPhoneHelper(FactorSourcesOfKindList<TrustedContactFactorSource>.State)
 		}
 
 		public enum Action: Sendable, Equatable {
-			case simpleNewPhoneConfirmer(AnswerSecurityQuestionsCoordinator.Action)
-			case simpleLostPhoneHelper(ManageTrustedContactFactorSource.Action)
+			case firstConfirmerOfPhone(AnswerSecurityQuestionsCoordinator.Action)
+			case listConfirmerOfPhone(FactorSourcesOfKindList<SecurityQuestionsFactorSource>.Action)
+
+			case firstLostPhoneHelper(ManageTrustedContactFactorSource.Action)
+			case listLostPhoneHelper(FactorSourcesOfKindList<TrustedContactFactorSource>.Action)
 		}
 
 		public var body: some ReducerProtocolOf<Self> {
-			Scope(state: /State.simpleNewPhoneConfirmer, action: /Action.simpleNewPhoneConfirmer) {
+			Scope(state: /State.firstConfirmerOfPhone, action: /Action.firstConfirmerOfPhone) {
 				AnswerSecurityQuestionsCoordinator()
 			}
-			Scope(state: /State.simpleLostPhoneHelper, action: /Action.simpleLostPhoneHelper) {
+			Scope(state: /State.listConfirmerOfPhone, action: /Action.listConfirmerOfPhone) {
+				FactorSourcesOfKindList<SecurityQuestionsFactorSource>()
+			}
+
+			Scope(state: /State.firstLostPhoneHelper, action: /Action.firstLostPhoneHelper) {
 				ManageTrustedContactFactorSource()
+			}
+			Scope(state: /State.listLostPhoneHelper, action: /Action.listLostPhoneHelper) {
+				FactorSourcesOfKindList<TrustedContactFactorSource>()
 			}
 		}
 	}
@@ -103,7 +116,7 @@ public struct SimpleManageSecurityStructureFlow: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
-		case let .modalDestinations(.presented(.simpleLostPhoneHelper(.delegate(.done(lostPhoneHelper))))):
+		case let .modalDestinations(.presented(.firstLostPhoneHelper(.delegate(.done(lostPhoneHelper))))):
 			switch state.mode {
 			case var .new(new):
 				new.lostPhoneHelper = lostPhoneHelper
@@ -116,7 +129,7 @@ public struct SimpleManageSecurityStructureFlow: Sendable, FeatureReducer {
 			state.modalDestinations = nil
 			return .none
 
-		case let .modalDestinations(.presented(.simpleNewPhoneConfirmer(.delegate(.done(.success(.encrypted(factorSource, answersToQuestions))))))):
+		case let .modalDestinations(.presented(.firstConfirmerOfPhone(.delegate(.done(.success(.encrypted(factorSource, answersToQuestions))))))):
 			switch state.mode {
 			case var .new(new):
 				new.confirmerOfNewPhone = .init(factorSource: factorSource, answersToQuestions: answersToQuestions)
@@ -129,12 +142,12 @@ public struct SimpleManageSecurityStructureFlow: Sendable, FeatureReducer {
 			state.modalDestinations = nil
 			return .none
 
-		case .modalDestinations(.presented(.simpleNewPhoneConfirmer(.delegate(.done(.success(.decrypted)))))):
+		case .modalDestinations(.presented(.firstConfirmerOfPhone(.delegate(.done(.success(.decrypted)))))):
 			state.modalDestinations = nil
 			assertionFailure("Expected to encrypt, not decrypt.")
 			return .none
 
-		case let .modalDestinations(.presented(.simpleNewPhoneConfirmer(.delegate(.done(.failure(error)))))):
+		case let .modalDestinations(.presented(.firstConfirmerOfPhone(.delegate(.done(.failure(error)))))):
 			state.modalDestinations = nil
 			errorQueue.schedule(error)
 			loggerGlobal.error("Failed to create new phone confirmer, error: \(error)")
@@ -147,19 +160,24 @@ public struct SimpleManageSecurityStructureFlow: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .confirmerOfNewPhoneButtonTapped:
-			let purpose: AnswerSecurityQuestionsCoordinator.State.Purpose = {
-				switch state.mode {
-				case let .existing(structure):
-					fatalError("We should display a list of SecurityQuestionFactorSource's and a picker and a 'create new' button...")
-				case let .new(new):
-					if let confirmerOfNewPhone = new.confirmerOfNewPhone {
-						return .editing(editingAnswersToQuestions: confirmerOfNewPhone.answersToQuestions)
-					} else {
-						return .encrypt()
-					}
+			switch state.mode {
+			case let .existing(structure):
+				precondition(structure.isSimple)
+				state.modalDestinations = .listConfirmerOfPhone(.init(
+					mode: .selection,
+					draftFactorSource: structure.configuration.confirmationRole.thresholdFactors[0].extract(SecurityQuestionsFactorSource.self)!
+				))
+			case let .new(new):
+				if let confirmerOfNewPhone = new.confirmerOfNewPhone {
+					state.modalDestinations = .firstConfirmerOfPhone(.init(
+						purpose: .editing(editingAnswersToQuestions: confirmerOfNewPhone.answersToQuestions)
+					))
+				} else {
+					state.modalDestinations = .firstConfirmerOfPhone(.init(
+						purpose: .encrypt()
+					))
 				}
-			}()
-			state.modalDestinations = .simpleNewPhoneConfirmer(.init(purpose: purpose))
+			}
 			return .none
 
 		case .lostPhoneHelperButtonTapped:
@@ -178,7 +196,7 @@ public struct SimpleManageSecurityStructureFlow: Sendable, FeatureReducer {
 					}
 				}
 			}()
-			state.modalDestinations = .simpleLostPhoneHelper(.init(mode: mode))
+			state.modalDestinations = .firstLostPhoneHelper(.init(mode: mode))
 			return .none
 
 		case let .finished(simpleFactorConfig):

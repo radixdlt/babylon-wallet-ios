@@ -10,27 +10,25 @@ extension FactorSourcesOfKindList.State {
 public extension FactorSourcesOfKindList {
 	struct ViewState: Equatable {
 		let allowSelection: Bool
-		let showHeaders: Bool
-		let factorSources: Loadable<IdentifiedArrayOf<SavedOrDraftFactorSource<FactorSourceOfKind>>>
+		let factorSources: IdentifiedArrayOf<SavedOrDraftFactorSource<FactorSourceOfKind>>
 		let selectedFactorSourceID: FactorSourceID?
 		let selectedFactorSource: SavedOrDraftFactorSource<FactorSourceOfKind>?
 		let mode: State.Mode
 
 		init(state: FactorSourcesOfKindList.State) {
-			allowSelection = state.allowSelection
-			showHeaders = state.showHeaders
-			factorSources = state.$factorSources
+			allowSelection = state.mode == .selection
+			factorSources = state.factorSources
 			selectedFactorSourceID = state.selectedFactorSourceID
 			mode = state.mode
 
-			if let id = state.selectedFactorSourceID, let selectedFactorSource = state.factorSources?[id: id] {
+			if let id = state.selectedFactorSourceID, let selectedFactorSource = state.factorSources[id: id] {
 				self.selectedFactorSource = selectedFactorSource
 			} else {
 				self.selectedFactorSource = nil
 			}
 		}
 
-		var factorsArray: [SavedOrDraftFactorSource<FactorSourceOfKind>]? { .init(factorSources.wrappedValue ?? []) }
+		var factorsArray: [SavedOrDraftFactorSource<FactorSourceOfKind>]? { factorSources.elements }
 
 		var navigationTitle: String {
 			if allowSelection {
@@ -43,23 +41,12 @@ public extension FactorSourcesOfKindList {
 		}
 
 		var subtitle: String? {
-			switch factorSources {
-			case .idle, .loading:
-				return nil
-			case .failure:
+			if allowSelection {
 				// FIXME: Strings
-				return "Failed to load factors"
-			case .success([]):
+				return "Select factor"
+			} else {
 				// FIXME: Strings
-				return "No factors"
-			case .success:
-				if allowSelection {
-					// FIXME: Strings
-					return "Select factor"
-				} else {
-					// FIXME: Strings
-					return "Factors"
-				}
+				return "Factors"
 			}
 		}
 	}
@@ -95,7 +82,7 @@ public extension FactorSourcesOfKindList {
 									.padding(.bottom, .medium1)
 							}
 
-							if viewStore.showHeaders, let subtitle = viewStore.subtitle {
+							if let subtitle = viewStore.subtitle {
 								Text(subtitle)
 									.foregroundColor(.app.gray1)
 									.textStyle(.secondaryHeader)
@@ -141,39 +128,25 @@ public extension FactorSourcesOfKindList {
 
 		@ViewBuilder
 		private func factorList(viewStore: ViewStoreOf<FactorSourcesOfKindList>) -> some SwiftUI.View {
-			switch viewStore.factorSources {
-			case .idle, .loading, .failure,
-			     // We are already showing `subtitleNoFactorSources` in the header
-			     .success([]) where viewStore.showHeaders:
-				EmptyView()
-			case .success([]):
-				// FIXME: Strings
-				Text("No factors")
-					.foregroundColor(.app.gray1)
-					.textStyle(.secondaryHeader)
-					.multilineTextAlignment(.center)
-
-			case let .success(factorSources):
-				VStack(spacing: .medium1) {
-					if viewStore.allowSelection {
-						Selection(
-							viewStore.binding(
-								get: \.factorsArray,
-								send: { .selectedFactorSource(id: $0?.first?.id) }
-							),
-							from: factorSources,
-							requiring: .exactly(1)
-						) { item in
-							FactorSourceRowView(
-								viewState: .init(factorSource: item.value.factorSource, describe: { $0.generalHint }),
-								isSelected: item.isSelected,
-								action: item.action
-							)
-						}
-					} else {
-						ForEach(factorSources) { factorSource in
-							FactorSourceRowView(viewState: .init(factorSource: factorSource.factorSource, describe: { $0.generalHint }))
-						}
+			VStack(spacing: .medium1) {
+				if viewStore.allowSelection {
+					Selection(
+						viewStore.binding(
+							get: \.factorsArray,
+							send: { .selectedFactorSource(id: $0?.first?.id) }
+						),
+						from: viewStore.factorSources,
+						requiring: .exactly(1)
+					) { item in
+						FactorSourceRowView(
+							viewState: .init(factorSource: item.value.factorSource, describe: { $0.generalHint }),
+							isSelected: item.isSelected,
+							action: item.action
+						)
+					}
+				} else {
+					ForEach(viewStore.factorSources) { factorSource in
+						FactorSourceRowView(viewState: .init(factorSource: factorSource.factorSource, describe: { $0.generalHint }))
 					}
 				}
 			}
@@ -195,18 +168,18 @@ extension FactorSource {
 
 extension View {
 	@MainActor
-	fileprivate func destinations<F>(with store: StoreOf<FactorSourcesOfKindList<F>>) -> some View {
+	fileprivate func destinations<F>(with store: StoreOf<FactorSourcesOfKindList<F>>) -> some SwiftUI.View where F: FactorSourceProtocol {
 		let destinationStore = store.scope(state: \.$destination, action: { .child(.destination($0)) })
 		return addNewFactorSourceSheet(with: destinationStore)
 	}
 
 	@MainActor
-	private func addNewFactorSourceSheet<F>(with destinationStore: PresentationStoreOf<FactorSourcesOfKindList<F>.Destinations>) -> some View {
+	private func addNewFactorSourceSheet<F>(with destinationStore: PresentationStoreOf<FactorSourcesOfKindList<F>.Destinations>) -> some SwiftUI.View where F: FactorSourceProtocol {
 		sheet(
 			store: destinationStore,
 			state: /FactorSourcesOfKindList.Destinations.State.addNewFactorSource,
 			action: FactorSourcesOfKindList.Destinations.Action.addNewFactorSource,
-			content: { F.FeatureForAddingNew.View(store: $0) }
+			content: { ManageSomeFactorSource<F>.View(store: $0) }
 		)
 	}
 }

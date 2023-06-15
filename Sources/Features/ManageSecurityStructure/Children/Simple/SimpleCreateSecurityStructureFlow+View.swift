@@ -108,31 +108,53 @@ extension View {
 	@MainActor
 	fileprivate func modalDestination(store: StoreOf<SimpleManageSecurityStructureFlow>) -> some View {
 		let destinationStore = store.scope(state: \.$modalDestinations, action: { .child(.modalDestinations($0)) })
-		return lostPhoneHelper(with: destinationStore)
-			.newPhoneConfirmer(with: destinationStore)
+		return firstConfirmerOfPhone(with: destinationStore)
+			.listConfirmerOfPhone(with: destinationStore)
+			.firstLostPhoneHelper(with: destinationStore)
+			.listLostPhoneHelper(with: destinationStore)
 	}
 
 	@MainActor
-	private func newPhoneConfirmer(with destinationStore: PresentationStoreOf<SimpleManageSecurityStructureFlow.ModalDestinations>) -> some View {
+	private func firstConfirmerOfPhone(with destinationStore: PresentationStoreOf<SimpleManageSecurityStructureFlow.ModalDestinations>) -> some View {
 		sheet(
 			store: destinationStore,
-			state: /SimpleManageSecurityStructureFlow.ModalDestinations.State.simpleNewPhoneConfirmer,
-			action: SimpleManageSecurityStructureFlow.ModalDestinations.Action.simpleNewPhoneConfirmer,
+			state: /SimpleManageSecurityStructureFlow.ModalDestinations.State.firstConfirmerOfPhone,
+			action: SimpleManageSecurityStructureFlow.ModalDestinations.Action.firstConfirmerOfPhone,
 			content: { AnswerSecurityQuestionsCoordinator.View(store: $0) }
 		)
 	}
 
 	@MainActor
-	private func lostPhoneHelper(with destinationStore: PresentationStoreOf<SimpleManageSecurityStructureFlow.ModalDestinations>) -> some View {
+	private func listConfirmerOfPhone(with destinationStore: PresentationStoreOf<SimpleManageSecurityStructureFlow.ModalDestinations>) -> some View {
 		sheet(
 			store: destinationStore,
-			state: /SimpleManageSecurityStructureFlow.ModalDestinations.State.simpleLostPhoneHelper,
-			action: SimpleManageSecurityStructureFlow.ModalDestinations.Action.simpleLostPhoneHelper,
+			state: /SimpleManageSecurityStructureFlow.ModalDestinations.State.listConfirmerOfPhone,
+			action: SimpleManageSecurityStructureFlow.ModalDestinations.Action.listConfirmerOfPhone,
+			content: { FactorSourcesOfKindList<SecurityQuestionsFactorSource>.View(store: $0) }
+		)
+	}
+
+	@MainActor
+	private func firstLostPhoneHelper(with destinationStore: PresentationStoreOf<SimpleManageSecurityStructureFlow.ModalDestinations>) -> some View {
+		sheet(
+			store: destinationStore,
+			state: /SimpleManageSecurityStructureFlow.ModalDestinations.State.firstLostPhoneHelper,
+			action: SimpleManageSecurityStructureFlow.ModalDestinations.Action.firstLostPhoneHelper,
 			content: { store in
 				NavigationStack {
 					ManageTrustedContactFactorSource.View(store: store)
 				}
 			}
+		)
+	}
+
+	@MainActor
+	private func listLostPhoneHelper(with destinationStore: PresentationStoreOf<SimpleManageSecurityStructureFlow.ModalDestinations>) -> some View {
+		sheet(
+			store: destinationStore,
+			state: /SimpleManageSecurityStructureFlow.ModalDestinations.State.listLostPhoneHelper,
+			action: SimpleManageSecurityStructureFlow.ModalDestinations.Action.listLostPhoneHelper,
+			content: { FactorSourcesOfKindList<TrustedContactFactorSource>.View(store: $0) }
 		)
 	}
 }
