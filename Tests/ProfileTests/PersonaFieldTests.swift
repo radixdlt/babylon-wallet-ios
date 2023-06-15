@@ -6,23 +6,53 @@ import RadixConnectModels
 import SharedTestingModels
 import TestingPrelude
 
+// MARK: - DuplicateValuesFound
+struct DuplicateValuesFound: Swift.Error {}
+
 // MARK: - Persona
 public struct Persona: Sendable, Hashable, Codable {
 	public let label: String
 	public let personaData: PersonaData
 
+	public struct PersonaData: Sendable, Hashable, Codable {
+		public typealias Name = PersonaFieldOfKind<PersonaFieldValue.Name>
+
+		public struct FieldCollectionOf<Value: Sendable & Hashable & Codable & BasePersonaFieldValueProtocol>: Sendable, Hashable, Codable {
+			public var collection: IdentifiedArrayOf<PersonaFieldOfKind<Value>>
+			public init(collection: IdentifiedArrayOf<PersonaFieldOfKind<Value>> = .init()) throws {
+				guard Set(collection.map(\.value)).count == collection.count else {
+					throw DuplicateValuesFound()
+				}
+				self.collection = collection
+			}
+		}
+
+		public typealias EmailAddresses = FieldCollectionOf<PersonaFieldValue.EmailAddress>
+
+		public let name: Name?
+		public let emailAddresses: EmailAddresses
+
+		public init(
+			name: Name? = nil,
+			emailAddresses: EmailAddresses = []
+		) {
+			self.name = name
+			self.emailAddresses = emailAddresses
+		}
+	}
+}
+
+extension Persona.PersonaData {
+	public var all: OrderedSet<PersonaField> {
+		.init(uncheckedUniqueElements: [
+			name?.embed(),
+		].compactMap { $0 })
+	}
+}
+
+extension Persona {
 	public var fields: OrderedSet<PersonaField> {
 		personaData.all
-	}
-
-	public struct PersonaData: Sendable, Hashable, Codable {
-		public let name: PersonaFieldOfKind<PersonaFieldValue.Name>?
-
-		public var all: OrderedSet<PersonaField> {
-			.init(uncheckedUniqueElements: [
-				name?.embed(),
-			].compactMap { $0 })
-		}
 	}
 }
 
@@ -127,7 +157,7 @@ public enum PersonaFieldValue: Sendable, Hashable, Codable, BasePersonaFieldValu
 /// * URL Addresses
 /// * Telephone numbers
 /// * Birthday
-public struct PersonaFieldOfKind<Value>: Sendable, Hashable, Codable where Value: Sendable & Hashable & Codable & BasePersonaFieldValueProtocol {
+public struct PersonaFieldOfKind<Value>: Sendable, Hashable, Codable, Identifiable where Value: Sendable & Hashable & Codable & BasePersonaFieldValueProtocol {
 	public let id: UUID
 	public let value: Value
 
@@ -185,6 +215,20 @@ extension PersonaFieldValue.Name {
 	}
 }
 
+// MARK: - PersonaFieldValue.EmailAddress + ExpressibleByStringLiteral
+extension PersonaFieldValue.EmailAddress: ExpressibleByStringLiteral {
+	public init(stringLiteral value: String) {
+		try! self.init(validating: value)
+	}
+}
+
+// MARK: - Persona.PersonaData.FieldCollectionOf + ExpressibleByArrayLiteral
+extension Persona.PersonaData.FieldCollectionOf: ExpressibleByArrayLiteral {
+	public init(arrayLiteral elements: PersonaFieldOfKind<Value>...) {
+		try! self.init(collection: .init(uncheckedUniqueElements: elements))
+	}
+}
+
 // MARK: - PersonaFieldTests
 final class PersonaFieldTests: TestCase {
 	func test_name_western() throws {
@@ -206,7 +250,7 @@ final class PersonaFieldTests: TestCase {
 			)
 		}
 
-		let aName = try dappRequest(read: PersonaFieldValue.Name.self, from: persona)
+		let aName = try dappRequest(value: \.name, from: persona)
 		XCTAssertEqual(aName.value.valueForDapp, "John Fitzgerald Kennedy")
 	}
 
@@ -227,31 +271,44 @@ final class PersonaFieldTests: TestCase {
 				)
 			)
 		}
-		let aName = try dappRequest(read: PersonaFieldValue.Name.self, from: persona)
+		let aName = try dappRequest(value: \.name, from: persona)
 		XCTAssertEqual(aName.value.valueForDapp, "Park Chan-wook")
 	}
 
-	func dappRequest<Kind: PersonaFieldValueProtocol>(
-		read kind: Kind.Type = Kind.self,
-		from persona: Persona
-	) throws -> PersonaFieldOfKind<Kind> {
-		guard let field = dappRequest(read: kind, amongst: persona.fields) else {
-			throw NoSuchField()
+	func test_email_addresses() throws {
+		let persona = withDependencies {
+			$0.uuid = .incrementing
+		} operation: {
+			Persona(
+				label: "Dr Email",
+				personaData: .init(
+					emailAddresses: [
+						.init(value: "hi@rdx.works"),
+						.init(value: "bye@rdx.works"),
+					]
+				)
+			)
 		}
-		return field
+
+		let emails = try dappRequest(values: \.emailAddresses, from: persona)
+		XCTAssertEqual(emails.collection.map(\.value), ["hi@rdx.works", "bye@rdx.works"])
 	}
 
 	func dappRequest<Kind: PersonaFieldValueProtocol>(
-		read kind: Kind.Type = Kind.self,
-		amongst fields: OrderedSet<PersonaField>
-	) -> PersonaFieldOfKind<Kind>? {
-		fields.compactMap { (field: PersonaField) -> PersonaFieldOfKind<Kind>? in
-			guard let value = field.value.extract(Kind.self) else {
-				return nil
-			}
-			return PersonaFieldOfKind<Kind>(id: field.id, value: value)
+		values keyPath: KeyPath<Persona.PersonaData, Persona.PersonaData.FieldCollectionOf<Kind>>,
+		from persona: Persona
+	) throws -> Persona.PersonaData.FieldCollectionOf<Kind> {
+		persona.personaData[keyPath: keyPath]
+	}
+
+	func dappRequest<Kind: PersonaFieldValueProtocol>(
+		value keyPath: KeyPath<Persona.PersonaData, PersonaFieldOfKind<Kind>?>,
+		from persona: Persona
+	) throws -> PersonaFieldOfKind<Kind> {
+		guard let field = persona.personaData[keyPath: keyPath] else {
+			throw NoSuchField()
 		}
-		.first
+		return field
 	}
 }
 
