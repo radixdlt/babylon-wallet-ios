@@ -22,7 +22,7 @@ public struct OnboardingCoordinator: Sendable, FeatureReducer {
 	}
 
 	public enum InternalAction: Sendable, Equatable {
-		case commitEphemeralResult(TaskResult<EquatableVoid>)
+		case commitEphemeralResult(TaskResult<EquatableHashable>)
 	}
 
 	@Dependency(\.onboardingClient) var onboardingClient
@@ -69,7 +69,7 @@ public struct OnboardingCoordinator: Sendable, FeatureReducer {
 
 		case .createAccountCoordinator(.delegate(.completed)):
 			return .task {
-				let result = await TaskResult<EquatableVoid> {
+				let result = await TaskResult<EquatableHashable> {
 					try await onboardingClient.commitEphemeral()
 				}
 				return .internal(.commitEphemeralResult(result))

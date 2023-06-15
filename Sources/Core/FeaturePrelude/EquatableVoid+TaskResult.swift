@@ -1,10 +1,10 @@
 import Prelude
 
-extension TaskResult where Success == EquatableVoid {
+extension TaskResult where Success == EquatableHashable {
 	public init(catching body: @Sendable () async throws -> Void) async {
 		do {
 			try await body()
-			self = .success(EquatableVoid())
+			self = .success(EquatableHashable())
 		} catch {
 			self = .failure(error)
 		}

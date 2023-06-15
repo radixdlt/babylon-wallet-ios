@@ -9,21 +9,40 @@ import TestingPrelude
 // MARK: - Persona
 public struct Persona: Sendable, Hashable, Codable {
 	public let label: String
-	public let fields: OrderedSet<PersonaField>
+	public let personaData: PersonaData
+
+	public var fields: OrderedSet<PersonaField> {
+		personaData.all
+	}
+
+	public struct PersonaData: Sendable, Hashable, Codable {
+		public let name: PersonaFieldOfKind<PersonaFieldValue.Name>?
+
+		public var all: OrderedSet<PersonaField> {
+			.init(uncheckedUniqueElements: [
+				name?.embed(),
+			].compactMap { $0 })
+		}
+	}
+}
+
+// MARK: - BasePersonaFieldValueProtocol
+public protocol BasePersonaFieldValueProtocol {
+	func embed() -> PersonaFieldValue
 }
 
 // MARK: - PersonaFieldValueProtocol
-public protocol PersonaFieldValueProtocol {
+public protocol PersonaFieldValueProtocol: BasePersonaFieldValueProtocol {
 	static var casePath: CasePath<PersonaFieldValue, Self> { get }
-	var valueForDapp: String { get }
 	static var kind: PersonaFieldKind { get }
 }
 
 public typealias PersonaField = PersonaFieldOfKind<PersonaFieldValue>
 
-// MARK: - PersonaFieldLabel
-public enum PersonaFieldLabel: Sendable, Hashable, Codable {
-	case string(String)
+extension PersonaFieldOfKind {
+	public func embed() -> PersonaField {
+		.init(id: id, value: value.embed())
+	}
 }
 
 // MARK: - PersonaFieldKind
@@ -33,11 +52,18 @@ public enum PersonaFieldKind: Sendable, Hashable, Codable {
 }
 
 // MARK: - PersonaFieldValue
-public enum PersonaFieldValue: Sendable, Hashable, Codable {
+public enum PersonaFieldValue: Sendable, Hashable, Codable, BasePersonaFieldValueProtocol {
 	public var discriminator: PersonaFieldKind {
 		switch self {
 		case .name: return .name
 		case .emailAddress: return .emailAddress
+		}
+	}
+
+	public func embed() -> PersonaFieldValue {
+		switch self {
+		case let .name(value): return value.embed()
+		case let .emailAddress(value): return value.embed()
 		}
 	}
 
@@ -70,15 +96,6 @@ public enum PersonaFieldValue: Sendable, Hashable, Codable {
 		}
 
 		public let variant: Variant
-		public var valueForDapp: String {
-			let components: [String?] = {
-				switch variant {
-				case .western: return [given, middle, family]
-				case .eastern: return [family, middle, given]
-				}
-			}()
-			return components.compactMap { $0 }.joined(separator: " ")
-		}
 	}
 
 	public struct EmailAddress: Sendable, Hashable, Codable, PersonaFieldValueProtocol {
@@ -86,7 +103,6 @@ public enum PersonaFieldValue: Sendable, Hashable, Codable {
 		public static var kind = PersonaFieldKind.emailAddress
 
 		public let email: String
-		public var valueForDapp: String { email }
 
 		public init(validating email: String) throws {
 			guard email.isEmailAddress else {
@@ -111,13 +127,17 @@ public enum PersonaFieldValue: Sendable, Hashable, Codable {
 /// * URL Addresses
 /// * Telephone numbers
 /// * Birthday
-public struct PersonaFieldOfKind<Value>: Sendable, Hashable, Codable where Value: Sendable & Hashable & Codable {
+public struct PersonaFieldOfKind<Value>: Sendable, Hashable, Codable where Value: Sendable & Hashable & Codable & BasePersonaFieldValueProtocol {
+	public let id: UUID
 	public let value: Value
-	public let label: PersonaFieldLabel?
 
-	public init(value: Value, label: PersonaFieldLabel? = nil) {
+	public init(
+		id: UUID? = nil,
+		value: Value
+	) {
+		@Dependency(\.uuid) var uuid
+		self.id = id ?? uuid()
 		self.value = value
-		self.label = label
 	}
 }
 
@@ -153,41 +173,60 @@ public struct IncorrectPersonaFieldType: Swift.Error {
 	public let actualKind: PersonaFieldKind
 }
 
+extension PersonaFieldValue.Name {
+	public var valueForDapp: String {
+		let components: [String?] = {
+			switch variant {
+			case .western: return [given, middle, family]
+			case .eastern: return [family, middle, given]
+			}
+		}()
+		return components.compactMap { $0 }.joined(separator: " ")
+	}
+}
+
 // MARK: - PersonaFieldTests
 final class PersonaFieldTests: TestCase {
 	func test_name_western() throws {
-		let persona = Persona(
-			label: "Mr President",
-			fields: [
-				.init(
-					value: .name(.init(
-						given: "John",
-						middle: "Fitzgerald",
-						family: "Kennedy",
-						variant: .western
+		let persona = withDependencies {
+			$0.uuid = .incrementing
+		} operation: {
+			Persona(
+				label: "Mr President",
+				personaData: .init(
+					name: .init(
+						value: .init(
+							given: "John",
+							middle: "Fitzgerald",
+							family: "Kennedy",
+							variant: .western
+						)
 					)
-					)
-				),
-			]
-		)
+				)
+			)
+		}
+
 		let aName = try dappRequest(read: PersonaFieldValue.Name.self, from: persona)
 		XCTAssertEqual(aName.value.valueForDapp, "John Fitzgerald Kennedy")
 	}
 
 	func test_name_eastern() throws {
-		let persona = Persona(
-			label: "Best Director",
-			fields: [
-				.init(
-					value: .name(.init(
-						given: "Chan-wook",
-						family: "Park",
-						variant: .eastern
+		let persona = withDependencies {
+			$0.uuid = .incrementing
+		} operation: {
+			Persona(
+				label: "Best Director",
+				personaData: .init(
+					name: .init(
+						value: .init(
+							given: "Chan-wook",
+							family: "Park",
+							variant: .eastern
+						)
 					)
-					)
-				),
-			]
-		)
+				)
+			)
+		}
 		let aName = try dappRequest(read: PersonaFieldValue.Name.self, from: persona)
 		XCTAssertEqual(aName.value.valueForDapp, "Park Chan-wook")
 	}
@@ -206,11 +245,11 @@ final class PersonaFieldTests: TestCase {
 		read kind: Kind.Type = Kind.self,
 		amongst fields: OrderedSet<PersonaField>
 	) -> PersonaFieldOfKind<Kind>? {
-		fields.compactMap {
-			guard let value = $0.value.extract(Kind.self) else {
+		fields.compactMap { (field: PersonaField) -> PersonaFieldOfKind<Kind>? in
+			guard let value = field.value.extract(Kind.self) else {
 				return nil
 			}
-			return PersonaFieldOfKind<Kind>.init(value: value, label: $0.label)
+			return PersonaFieldOfKind<Kind>(id: field.id, value: value)
 		}
 		.first
 	}
