@@ -11,10 +11,10 @@ public extension FactorSourcesOfKindList {
 	struct ViewState: Equatable {
 		let allowSelection: Bool
 		let showHeaders: Bool
-		let factorSources: Loadable<IdentifiedArrayOf<FactorSourceOfKind>>
-		let selectedFactorSourceID: FactorSourceID.FromHash?
-		let selectedFactorSourceControlRequirements: SelectedFactorSourceControlRequirements?
-		let mode: State.Context
+		let factorSources: Loadable<IdentifiedArrayOf<SavedOrDraftFactorSource<FactorSourceOfKind>>>
+		let selectedFactorSourceID: FactorSourceID?
+		let selectedFactorSource: SavedOrDraftFactorSource<FactorSourceOfKind>?
+		let mode: State.Mode
 
 		init(state: FactorSourcesOfKindList.State) {
 			allowSelection = state.allowSelection
@@ -24,19 +24,21 @@ public extension FactorSourcesOfKindList {
 			mode = state.mode
 
 			if let id = state.selectedFactorSourceID, let selectedFactorSource = state.factorSources?[id: id] {
-				selectedFactorSourceControlRequirements = .init(selectedFactorSource: selectedFactorSource)
+				self.selectedFactorSource = selectedFactorSource
 			} else {
-				selectedFactorSourceControlRequirements = nil
+				self.selectedFactorSource = nil
 			}
 		}
 
-		var ledgersArray: [FactorSourceOfKind]? { .init(factorSources.wrappedValue ?? []) }
+		var factorsArray: [SavedOrDraftFactorSource<FactorSourceOfKind>]? { .init(factorSources.wrappedValue ?? []) }
 
 		var navigationTitle: String {
 			if allowSelection {
-				return L10n.FactorSourcesOfKindList.navigationTitleAllowSelection
+				// FIXME: Strings
+				return "Select Factor"
 			} else {
-				return L10n.FactorSourcesOfKindList.navigationTitleGeneral
+				// FIXME: Strings
+				return "Factors"
 			}
 		}
 
@@ -45,14 +47,18 @@ public extension FactorSourcesOfKindList {
 			case .idle, .loading:
 				return nil
 			case .failure:
-				return L10n.FactorSourcesOfKindList.subtitleFailure
+				// FIXME: Strings
+				return "Failed to load factors"
 			case .success([]):
-				return L10n.FactorSourcesOfKindList.subtitleNoFactorSources
+				// FIXME: Strings
+				return "No factors"
 			case .success:
 				if allowSelection {
-					return L10n.FactorSourcesOfKindList.subtitleSelectFactorSource
+					// FIXME: Strings
+					return "Select factor"
 				} else {
-					return L10n.FactorSourcesOfKindList.subtitleAllFactorSources
+					// FIXME: Strings
+					return "Factors"
 				}
 			}
 		}
@@ -102,7 +108,8 @@ public extension FactorSourcesOfKindList {
 						factorList(viewStore: viewStore)
 							.padding(.bottom, .medium1)
 
-						Button(L10n.FactorSourcesOfKindList.addNewFactorSource) {
+						// FIXME: Strings
+						Button("Add new factor") {
 							viewStore.send(.addNewFactorSourceButtonTapped)
 						}
 						.buttonStyle(.secondaryRectangular(shouldExpand: false))
@@ -116,10 +123,11 @@ public extension FactorSourcesOfKindList {
 				)
 				.footer(visible: viewStore.allowSelection) {
 					WithControlRequirements(
-						viewStore.selectedFactorSourceControlRequirements,
-						forAction: { viewStore.send(.confirmedFactorSource($0.selectedFactorSource)) }
+						viewStore.selectedFactorSource,
+						forAction: { viewStore.send(.confirmedFactorSource($0)) }
 					) { action in
-						Button(L10n.FactorSourcesOfKindList.continueWithFactorSource, action: action)
+						// FIXME: Strings
+						Button("Continue", action: action)
 							.buttonStyle(.primaryRectangular)
 							.padding(.bottom, .medium1)
 					}
@@ -150,21 +158,21 @@ public extension FactorSourcesOfKindList {
 					if viewStore.allowSelection {
 						Selection(
 							viewStore.binding(
-								get: \.ledgersArray,
+								get: \.factorsArray,
 								send: { .selectedFactorSource(id: $0?.first?.id) }
 							),
 							from: factorSources,
 							requiring: .exactly(1)
 						) { item in
 							FactorSourceRowView(
-								viewState: .init(factorSource: item.value),
+								viewState: .init(factorSource: item.value.factorSource, describe: { $0.generalHint }),
 								isSelected: item.isSelected,
 								action: item.action
 							)
 						}
 					} else {
 						ForEach(factorSources) { factorSource in
-							FactorSourceRowView(viewState: .init(factorSource: factorSource))
+							FactorSourceRowView(viewState: .init(factorSource: factorSource.factorSource, describe: { $0.generalHint }))
 						}
 					}
 				}
@@ -173,20 +181,32 @@ public extension FactorSourcesOfKindList {
 	}
 }
 
+extension FactorSource {
+	var generalHint: String {
+		switch self {
+		case let .device(factor): return factor.hint.name
+		case let .ledger(factor): return factor.hint.name
+		case let .offDeviceMnemonic(factor): return factor.hint.label.rawValue
+		case let .trustedContact(factor): return factor.contact.name.rawValue
+		case let .securityQuestions(factor): return "'\(factor.sealedMnemonic.securityQuestions.first.question.rawValue)' +\(factor.sealedMnemonic.securityQuestions.count - 1) more questions."
+		}
+	}
+}
+
 extension View {
 	@MainActor
-	fileprivate func destinations(with store: StoreOf<FactorSourcesOfKindList>) -> some View {
+	fileprivate func destinations<F>(with store: StoreOf<FactorSourcesOfKindList<F>>) -> some View {
 		let destinationStore = store.scope(state: \.$destination, action: { .child(.destination($0)) })
 		return addNewFactorSourceSheet(with: destinationStore)
 	}
 
 	@MainActor
-	private func addNewFactorSourceSheet(with destinationStore: PresentationStoreOf<FactorSourcesOfKindList.Destinations>) -> some View {
+	private func addNewFactorSourceSheet<F>(with destinationStore: PresentationStoreOf<FactorSourcesOfKindList<F>.Destinations>) -> some View {
 		sheet(
 			store: destinationStore,
 			state: /FactorSourcesOfKindList.Destinations.State.addNewFactorSource,
 			action: FactorSourcesOfKindList.Destinations.Action.addNewFactorSource,
-			content: { AddFactorSourceFactorSource.View(store: $0) }
+			content: { F.FeatureForAddingNew.View(store: $0) }
 		)
 	}
 }

@@ -6,9 +6,13 @@ import Profile
 public enum SavedOrDraftFactorSource<Factor: FactorSourceProtocol>: Sendable, Hashable, Identifiable {
 	public typealias ID = FactorSourceID
 	public var id: ID {
+		factorSource.id
+	}
+
+	public var factorSource: FactorSource {
 		switch self {
-		case let .draft(factor): return factor.id.embed()
-		case let .saved(factor): return factor.id.embed()
+		case let .draft(factor): return factor.embed()
+		case let .saved(factor): return factor.embed()
 		}
 	}
 
@@ -30,7 +34,9 @@ public enum NewFactorSourceDelegateAction<FactorSourceOfKind: FactorSourceProtoc
 public protocol AddableFactorSourceProtocol: FactorSourceProtocol
 	where
 	FeatureForAddingNew.State: NewFactorSourceStateProtocol,
-	FeatureForAddingNew.DelegateAction == NewFactorSourceDelegateAction<Self>
+	FeatureForAddingNew.DelegateAction == NewFactorSourceDelegateAction<Self>,
+	FeatureForAddingNew.View: FeatureView,
+	FeatureForAddingNew == FeatureForAddingNew.View.Feature
 {
 	associatedtype FeatureForAddingNew: FeatureReducer & EmptyInitializable
 }
