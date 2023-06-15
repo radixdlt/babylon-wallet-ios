@@ -35,7 +35,7 @@ extension CreateIdentityAdvanced {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		try container.encode(Self.kind, forKey: .type)
 
-		try container.encode(config, forKey: .config)
+		try container.encodeValue(config, forKey: .config)
 	}
 
 	public init(from decoder: Decoder) throws {
@@ -47,7 +47,7 @@ extension CreateIdentityAdvanced {
 		}
 
 		try self.init(
-			config: container.decode(Tuple.self, forKey: .config)
+			config: container.decodeValue(forKey: .config)
 		)
 	}
 }

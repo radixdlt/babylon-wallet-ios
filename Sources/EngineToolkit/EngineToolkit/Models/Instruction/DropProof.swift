@@ -18,7 +18,7 @@ public struct DropProof: InstructionProtocol, ExpressibleByStringLiteral {
 	}
 
 	public init(stringLiteral value: StringLiteralType) {
-		self.init(Proof(identifier: value))
+		self.init(Proof(value))
 	}
 }
 
@@ -34,7 +34,7 @@ extension DropProof {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		try container.encode(Self.kind, forKey: .type)
 
-		try container.encode(proof, forKey: .proof)
+		try container.encodeValue(proof, forKey: .proof)
 	}
 
 	public init(from decoder: Decoder) throws {
@@ -46,7 +46,7 @@ extension DropProof {
 		}
 
 		try self.init(
-			container.decode(Proof.self, forKey: .proof)
+			container.decodeValue(forKey: .proof)
 		)
 	}
 }

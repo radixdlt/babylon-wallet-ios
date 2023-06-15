@@ -33,7 +33,7 @@ extension ClaimPackageRoyalty {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		try container.encode(Self.kind, forKey: .type)
 
-		try container.encode(packageAddress, forKey: .packageAddress)
+		try container.encodeValue(packageAddress, forKey: .packageAddress)
 	}
 
 	public init(from decoder: Decoder) throws {
@@ -45,7 +45,7 @@ extension ClaimPackageRoyalty {
 		}
 
 		try self.init(
-			packageAddress: container.decode(PackageAddress.self, forKey: .packageAddress)
+			packageAddress: container.decodeValue(forKey: .packageAddress)
 		)
 	}
 }

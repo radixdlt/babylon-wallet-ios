@@ -33,8 +33,8 @@ extension AssertWorktopContainsNonFungibles {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		try container.encode(Self.kind, forKey: .type)
 
-		try container.encode(resourceAddress, forKey: .resourceAddress)
-		try container.encode(ids, forKey: .ids)
+		try container.encodeValue(resourceAddress, forKey: .resourceAddress)
+		try container.encodeValue(ids, forKey: .ids)
 	}
 
 	public init(from decoder: Decoder) throws {
@@ -46,8 +46,8 @@ extension AssertWorktopContainsNonFungibles {
 		}
 
 		try self.init(
-			resourceAddress: container.decode(ResourceAddress.self, forKey: .resourceAddress),
-			ids: container.decode(Set<NonFungibleLocalId>.self, forKey: .ids)
+			resourceAddress: container.decodeValue(forKey: .resourceAddress),
+			ids: container.decodeValue(forKey: .ids)
 		)
 	}
 }

@@ -1,12 +1,11 @@
+import CasePaths
 import Foundation
 
 // MARK: - Enum
 public struct Enum: ValueProtocol, Sendable, Codable, Hashable {
 	// Type name, used as a discriminator
 	public static let kind: ManifestASTValueKind = .enum
-	public func embedValue() -> ManifestASTValue {
-		.enum(self)
-	}
+	public static var casePath: CasePath<ManifestASTValue, Self> = /ManifestASTValue.enum
 
 	// MARK: Stored properties
 
@@ -43,7 +42,7 @@ public struct Enum: ValueProtocol, Sendable, Codable, Hashable {
 
 	public init(
 		_ variant: EnumDiscriminator,
-		@ValuesBuilder fields: () throws -> [ValueProtocol]
+		@ValuesBuilder fields: () throws -> [any ValueProtocol]
 	) rethrows {
 		try self.init(variant, fields: fields().map { $0.embedValue() })
 	}
@@ -63,7 +62,6 @@ extension Enum {
 
 	private enum CodingKeys: String, CodingKey {
 		case variant
-		case kind
 		case fields
 	}
 
@@ -71,8 +69,6 @@ extension Enum {
 
 	public func encode(to encoder: Encoder) throws {
 		var container = encoder.container(keyedBy: CodingKeys.self)
-		try container.encode(Self.kind, forKey: .kind)
-
 		try container.encode(variant, forKey: .variant)
 		try container.encode(fields, forKey: .fields)
 	}
@@ -80,11 +76,6 @@ extension Enum {
 	public init(from decoder: Decoder) throws {
 		// Checking for type discriminator
 		let container = try decoder.container(keyedBy: CodingKeys.self)
-		let kind: ManifestASTValueKind = try container.decode(ManifestASTValueKind.self, forKey: .kind)
-		if kind != Self.kind {
-			throw InternalDecodingFailure.valueTypeDiscriminatorMismatch(expected: Self.kind, butGot: kind)
-		}
-
 		try self.init(
 			container.decode(EnumDiscriminator.self, forKey: .variant),
 			fields: container.decodeIfPresent([ManifestASTValue].self, forKey: .fields) ?? []

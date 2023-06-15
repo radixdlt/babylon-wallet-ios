@@ -39,9 +39,9 @@ extension CreateProofFromBucketOfAmount {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		try container.encode(Self.kind, forKey: .type)
 
-		try container.encode(bucket, forKey: .bucket)
-		try container.encode(amount, forKey: .amount)
-		try container.encode(proof, forKey: .intoProof)
+		try container.encodeValue(bucket, forKey: .bucket)
+		try container.encodeValue(amount, forKey: .amount)
+		try container.encodeValue(proof, forKey: .intoProof)
 	}
 
 	public init(from decoder: Decoder) throws {
@@ -53,9 +53,9 @@ extension CreateProofFromBucketOfAmount {
 		}
 
 		try self.init(
-			bucket: container.decode(Bucket.self, forKey: .bucket),
-			amount: container.decode(Decimal_.self, forKey: .amount),
-			proof: container.decode(Proof.self, forKey: .intoProof)
+			bucket: container.decodeValue(forKey: .bucket),
+			amount: container.decodeValue(forKey: .amount),
+			proof: container.decodeValue(forKey: .intoProof)
 		)
 	}
 }

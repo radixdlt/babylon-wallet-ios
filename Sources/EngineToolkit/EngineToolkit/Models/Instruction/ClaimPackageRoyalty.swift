@@ -33,7 +33,7 @@ extension ClaimComponentRoyalty {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		try container.encode(Self.kind, forKey: .type)
 
-		try container.encode(componentAddress, forKey: .componentAddress)
+		try container.encodeValue(componentAddress, forKey: .componentAddress)
 	}
 
 	public init(from decoder: Decoder) throws {
@@ -45,7 +45,7 @@ extension ClaimComponentRoyalty {
 		}
 
 		try self.init(
-			componentAddress: container.decode(ComponentAddress.self, forKey: .componentAddress)
+			componentAddress: container.decodeValue(forKey: .componentAddress)
 		)
 	}
 }

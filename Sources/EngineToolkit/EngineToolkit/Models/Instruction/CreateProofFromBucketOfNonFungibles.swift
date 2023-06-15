@@ -43,9 +43,9 @@ extension CreateProofFromBucketOfNonFungibles {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		try container.encode(Self.kind, forKey: .type)
 
-		try container.encode(bucket, forKey: .bucket)
-		try container.encode(ids, forKey: .ids)
-		try container.encode(proof, forKey: .intoProof)
+		try container.encodeValue(bucket, forKey: .bucket)
+		try container.encodeValue(ids, forKey: .ids)
+		try container.encodeValue(proof, forKey: .intoProof)
 	}
 
 	public init(from decoder: Decoder) throws {
@@ -57,9 +57,9 @@ extension CreateProofFromBucketOfNonFungibles {
 		}
 
 		try self.init(
-			bucket: container.decode(Bucket.self, forKey: .bucket),
-			ids: container.decode(Set<NonFungibleLocalId>.self, forKey: .ids),
-			proof: container.decode(Proof.self, forKey: .intoProof)
+			bucket: container.decodeValue(forKey: .bucket),
+			ids: container.decodeValue(forKey: .ids),
+			proof: container.decodeValue(forKey: .intoProof)
 		)
 	}
 }

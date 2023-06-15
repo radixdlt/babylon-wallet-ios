@@ -89,8 +89,8 @@ extension CallAccessRulesMethod {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		try container.encode(Self.kind, forKey: .type)
 
-		try container.encode(receiver, forKey: .receiver)
-		try container.encode(methodName.proxyEncodable, forKey: .methodName)
+		try container.encodeValue(receiver, forKey: .receiver)
+		try container.encodeValue(methodName, forKey: .methodName)
 		try container.encode(arguments, forKey: .arguments)
 	}
 
@@ -102,9 +102,10 @@ extension CallAccessRulesMethod {
 			throw InternalDecodingFailure.instructionTypeDiscriminatorMismatch(expected: Self.kind, butGot: kind)
 		}
 
+		let componentAddress: ComponentAddress = try container.decodeValue(forKey: .receiver)
 		try self.init(
-			receiver: container.decode(ComponentAddress.self, forKey: .receiver),
-			methodName: container.decode(String.ProxyDecodable.self, forKey: .methodName).decoded,
+			receiver: componentAddress,
+			methodName: container.decodeValue(forKey: .methodName),
 			arguments: container.decodeIfPresent([ManifestASTValue].self, forKey: .arguments) ?? []
 		)
 	}

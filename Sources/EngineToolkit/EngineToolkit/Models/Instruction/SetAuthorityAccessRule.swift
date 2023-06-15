@@ -42,10 +42,10 @@ extension SetAuthorityAccessRule {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		try container.encode(Self.kind, forKey: .type)
 
-		try container.encode(entityAddress, forKey: .entityAddress)
-		try container.encode(objectKey, forKey: .objectKey)
-		try container.encode(authorityKey, forKey: .authorityKey)
-		try container.encode(rule, forKey: .rule)
+		try container.encodeValue(entityAddress, forKey: .entityAddress)
+		try container.encodeValue(objectKey, forKey: .objectKey)
+		try container.encodeValue(authorityKey, forKey: .authorityKey)
+		try container.encodeValue(rule, forKey: .rule)
 	}
 
 	public init(from decoder: Decoder) throws {
@@ -57,10 +57,10 @@ extension SetAuthorityAccessRule {
 		}
 
 		try self.init(
-			entityAddress: container.decode(Address.self, forKey: .entityAddress),
-			objectKey: container.decode(Enum.self, forKey: .objectKey),
-			authorityKey: container.decode(Enum.self, forKey: .authorityKey),
-			rule: container.decode(Enum.self, forKey: .rule)
+			entityAddress: container.decodeValue(forKey: .entityAddress),
+			objectKey: container.decodeValue(forKey: .objectKey),
+			authorityKey: container.decodeValue(forKey: .authorityKey),
+			rule: container.decodeValue(forKey: .rule)
 		)
 	}
 }

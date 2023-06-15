@@ -36,8 +36,8 @@ extension SetPackageRoyaltyConfig {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		try container.encode(Self.kind, forKey: .type)
 
-		try container.encode(packageAddress, forKey: .packageAddress)
-		try container.encode(royaltyConfig, forKey: .royaltyConfig)
+		try container.encodeValue(packageAddress, forKey: .packageAddress)
+		try container.encodeValue(royaltyConfig, forKey: .royaltyConfig)
 	}
 
 	public init(from decoder: Decoder) throws {
@@ -49,8 +49,8 @@ extension SetPackageRoyaltyConfig {
 		}
 
 		try self.init(
-			packageAddress: container.decode(PackageAddress.self, forKey: .packageAddress),
-			royaltyConfig: container.decode(Map_.self, forKey: .royaltyConfig)
+			packageAddress: container.decodeValue(forKey: .packageAddress),
+			royaltyConfig: container.decodeValue(forKey: .royaltyConfig)
 		)
 	}
 }

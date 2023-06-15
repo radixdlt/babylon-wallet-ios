@@ -36,7 +36,7 @@ extension SetComponentRoyaltyConfig {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		try container.encode(Self.kind, forKey: .type)
 
-		try container.encode(componentAddress, forKey: .componentAddress)
+		try container.encodeValue(componentAddress, forKey: .componentAddress)
 		try container.encode(royaltyConfig, forKey: .royaltyConfig)
 	}
 
@@ -49,7 +49,7 @@ extension SetComponentRoyaltyConfig {
 		}
 
 		try self.init(
-			componentAddress: container.decode(ComponentAddress.self, forKey: .componentAddress),
+			componentAddress: container.decodeValue(forKey: .componentAddress),
 			royaltyConfig: container.decode(ManifestASTValue.self, forKey: .royaltyConfig)
 		)
 	}

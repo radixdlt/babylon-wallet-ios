@@ -1,13 +1,28 @@
+import CasePaths
 import Foundation
 
 // MARK: - ValueProtocol
 public protocol ValueProtocol {
 	static var kind: ManifestASTValueKind { get }
-	func embedValue() -> ManifestASTValue
+	static var casePath: CasePath<ManifestASTValue, Self> { get }
 }
 
 extension ValueProtocol {
 	public var kind: ManifestASTValueKind { Self.kind }
+	public var casePath: CasePath<ManifestASTValue, Self> { Self.casePath }
+}
+
+extension ValueProtocol {
+	public func embedValue() -> ManifestASTValue {
+		casePath.embed(self)
+	}
+
+	public static func extractValue(from value: ManifestASTValue) throws -> Self {
+		guard let extracted = casePath.extract(from: value) else {
+			throw InternalDecodingFailure.valueTypeDiscriminatorMismatch(expected: Self.kind, butGot: value.kind)
+		}
+		return extracted
+	}
 }
 
 // MARK: - ManifestASTValue
@@ -57,8 +72,35 @@ public indirect enum ManifestASTValue: Sendable, Codable, Hashable {
 	case nonFungibleGlobalId(NonFungibleGlobalId)
 
 	case blob(Blob)
-	case expression(Expression)
+	case expression(ManifestExpression)
 	case bytes(Bytes)
+
+	func uint8() throws -> UInt8 {
+		guard case let .u8(uInt8) = self else {
+			throw InternalDecodingFailure.valueTypeDiscriminatorMismatch(
+				expected: UInt8.kind,
+				butGot: kind
+			)
+		}
+
+		return uInt8
+	}
+
+	func map() throws -> Map_ {
+		guard case let .map(map) = self else {
+			throw InternalDecodingFailure.valueTypeDiscriminatorMismatch(
+				expected: Map_.kind,
+				butGot: kind
+			)
+		}
+
+		return map
+	}
+}
+
+// MARK: - ModelValueKind
+public protocol ModelValueKind: Sendable {
+	static var kind: ManifestASTValueKind { get }
 }
 
 extension ManifestASTValue {
@@ -163,63 +205,65 @@ extension ManifestASTValue {
 	// MARK: Codable
 
 	public func encode(to encoder: Encoder) throws {
+		var container = encoder.container(keyedBy: CodingKeys.self)
+		try container.encode(kind, forKey: .kind)
+
 		switch self {
 		case let .boolean(value):
-			// `Bool` is already `Codable` so we have to go through its proxy type for JSON coding.
-			try value.proxyEncodable.encode(to: encoder)
+			try ValueCodable(value).encode(to: encoder)
 
 		case let .i8(value):
-			// `Int8` is already `Codable` so we have to go through its proxy type for JSON coding.
-			try value.proxyEncodable.encode(to: encoder)
+			try IntegerCodable(value).encode(to: encoder)
 
 		case let .i16(value):
 			// `Int16` is already `Codable` so we have to go through its proxy type for JSON coding.
-			try value.proxyEncodable.encode(to: encoder)
+			try IntegerCodable(value).encode(to: encoder)
 
 		case let .i32(value):
 			// `Int32` is already `Codable` so we have to go through its proxy type for JSON coding.
-			try value.proxyEncodable.encode(to: encoder)
+			try IntegerCodable(value).encode(to: encoder)
 
 		case let .i64(value):
 			// `Int64` is already `Codable` so we have to go through its proxy type for JSON coding.
-			try value.proxyEncodable.encode(to: encoder)
+			try IntegerCodable(value).encode(to: encoder)
 
 		case let .i128(value):
-			try value.encode(to: encoder)
+			try ValueCodable(value).encode(to: encoder)
 
 		case let .u8(value):
 			// `UInt8` is already `Codable` so we have to go through its proxy type for JSON coding.
-			try value.proxyEncodable.encode(to: encoder)
+			try IntegerCodable(value).encode(to: encoder)
 
 		case let .u16(value):
 			// `UInt16` is already `Codable` so we have to go through its proxy type for JSON coding.
-			try value.proxyEncodable.encode(to: encoder)
+			try IntegerCodable(value).encode(to: encoder)
 
 		case let .u32(value):
 			// `UInt32` is already `Codable` so we have to go through its proxy type for JSON coding.
-			try value.proxyEncodable.encode(to: encoder)
+			try IntegerCodable(value).encode(to: encoder)
 
 		case let .u64(value):
 			// `UInt64` is already `Codable` so we have to go through its proxy type for JSON coding.
-			try value.proxyEncodable.encode(to: encoder)
+			try IntegerCodable(value).encode(to: encoder)
 
 		case let .u128(value):
-			try value.encode(to: encoder)
+			try ValueCodable(value).encode(to: encoder)
 
 		case let .string(value):
 			// `String` is already `Codable` so we have to go through its proxy type for JSON coding.
-			try value.proxyEncodable.encode(to: encoder)
+			try ValueCodable(value).encode(to: encoder)
 
 		case let .enum(value):
 			try value.encode(to: encoder)
+
 		case let .some(value):
-			try value.encode(to: encoder)
+			try ValueCodable(value).encode(to: encoder)
 		case .none:
-			try None().encode(to: encoder)
+			break
 		case let .ok(value):
-			try value.encode(to: encoder)
+			try ValueCodable(value).encode(to: encoder)
 		case let .err(value):
-			try value.encode(to: encoder)
+			try ValueCodable(value).encode(to: encoder)
 
 		case let .array(value):
 			try value.encode(to: encoder)
@@ -231,31 +275,31 @@ extension ManifestASTValue {
 			try value.encode(to: encoder)
 
 		case let .decimal(value):
-			try value.encode(to: encoder)
+			try ValueCodable(value).encode(to: encoder)
 
 		case let .preciseDecimal(value):
-			try value.encode(to: encoder)
+			try ValueCodable(value).encode(to: encoder)
 
 		case let .address(value):
-			try value.encode(to: encoder)
+			try ValueCodable(value).encode(to: encoder)
 
 		case let .bucket(value):
-			try value.encode(to: encoder)
+			try ValueCodable(value).encode(to: encoder)
 
 		case let .proof(value):
-			try value.encode(to: encoder)
+			try ValueCodable(value).encode(to: encoder)
 
 		case let .nonFungibleLocalId(value):
-			try value.encode(to: encoder)
+			try ValueCodable(value).encode(to: encoder)
 
 		case let .nonFungibleGlobalId(value):
 			try value.encode(to: encoder)
 
 		case let .blob(value):
-			try value.encode(to: encoder)
+			try ValueCodable(value).encode(to: encoder)
 
 		case let .expression(value):
-			try value.encode(to: encoder)
+			try ValueCodable(value).encode(to: encoder)
 		case let .bytes(value):
 			try value.encode(to: encoder)
 		}
@@ -268,62 +312,60 @@ extension ManifestASTValue {
 
 		switch kind {
 		case .bool:
-			// `Bool` is already `Codable` so we have to go through its proxy type for JSON coding.
-			self = try .boolean(Bool.ProxyDecodable(from: decoder).decoded)
+			self = try .boolean(ValueCodable(from: decoder).value)
 
 		case .i8:
-			// `Int8` is already `Codable` so we have to go through its proxy type for JSON coding.
-			self = try .i8(Int8.ProxyDecodable(from: decoder).decoded)
+			self = try .i8(IntegerCodable(from: decoder).value)
 
 		case .i16:
 			// `Int16` is already `Codable` so we have to go through its proxy type for JSON coding.
-			self = try .i16(Int16.ProxyDecodable(from: decoder).decoded)
+			self = try .i16(IntegerCodable(from: decoder).value)
 
 		case .i32:
 			// `Int32` is already `Codable` so we have to go through its proxy type for JSON coding.
-			self = try .i32(Int32.ProxyDecodable(from: decoder).decoded)
+			self = try .i32(IntegerCodable(from: decoder).value)
 
 		case .i64:
 			// `Int64` is already `Codable` so we have to go through its proxy type for JSON coding.
-			self = try .i64(Int64.ProxyDecodable(from: decoder).decoded)
+			self = try .i64(IntegerCodable(from: decoder).value)
 
 		case .i128:
-			self = try .i128(.init(from: decoder))
+			self = try .i128(ValueCodable(from: decoder).value)
 
 		case .u8:
 			// `UInt8` is already `Codable` so we have to go through its proxy type for JSON coding.
-			self = try .u8(UInt8.ProxyDecodable(from: decoder).decoded)
+			self = try .u8(IntegerCodable(from: decoder).value)
 
 		case .u16:
 			// `UInt16` is already `Codable` so we have to go through its proxy type for JSON coding.
-			self = try .u16(UInt16.ProxyDecodable(from: decoder).decoded)
+			self = try .u16(IntegerCodable(from: decoder).value)
 
 		case .u32:
 			// `UInt32` is already `Codable` so we have to go through its proxy type for JSON coding.
-			self = try .u32(UInt32.ProxyDecodable(from: decoder).decoded)
+			self = try .u32(IntegerCodable(from: decoder).value)
 
 		case .u64:
 			// `UInt64` is already `Codable` so we have to go through its proxy type for JSON coding.
-			self = try .u64(UInt64.ProxyDecodable(from: decoder).decoded)
+			self = try .u64(IntegerCodable(from: decoder).value)
 
 		case .u128:
-			self = try .u128(.init(from: decoder))
+			self = try .u128(ValueCodable(from: decoder).value)
 
 		case .string:
 			// `String` is already `Codable` so we have to go through its proxy type for JSON coding.
-			self = try .string(String.ProxyDecodable(from: decoder).decoded)
+			self = try .string(ValueCodable(from: decoder).value)
 
 		case .enum:
 			self = try .enum(.init(from: decoder))
 
 		case .some:
-			self = try .some(.init(from: decoder))
+			self = try .some(ValueCodable(from: decoder).value)
 		case .none:
 			self = .none
 		case .ok:
-			self = try .ok(.init(from: decoder))
+			self = try .ok(ValueCodable(from: decoder).value)
 		case .err:
-			self = try .err(.init(from: decoder))
+			self = try .err(ValueCodable(from: decoder).value)
 
 		case .array:
 			self = try .array(.init(from: decoder))
@@ -335,31 +377,31 @@ extension ManifestASTValue {
 			self = try .map(.init(from: decoder))
 
 		case .decimal:
-			self = try .decimal(.init(from: decoder))
+			self = try .decimal(ValueCodable(from: decoder).value)
 
 		case .preciseDecimal:
-			self = try .preciseDecimal(.init(from: decoder))
+			self = try .preciseDecimal(ValueCodable(from: decoder).value)
 
 		case .address:
-			self = try .address(.init(from: decoder))
+			self = try .address(ValueCodable(from: decoder).value)
 
 		case .bucket:
-			self = try .bucket(.init(from: decoder))
+			self = try .bucket(ValueCodable(from: decoder).value)
 
 		case .proof:
-			self = try .proof(.init(from: decoder))
+			self = try .proof(ValueCodable(from: decoder).value)
 
 		case .nonFungibleLocalId:
-			self = try .nonFungibleLocalId(.init(from: decoder))
+			self = try .nonFungibleLocalId(ValueCodable(from: decoder).value)
 
 		case .nonFungibleGlobalId:
 			self = try .nonFungibleGlobalId(.init(from: decoder))
 
 		case .blob:
-			self = try .blob(.init(from: decoder))
+			self = try .blob(ValueCodable(from: decoder).value)
 
 		case .expression:
-			self = try .expression(.init(from: decoder))
+			self = try .expression(ValueCodable(from: decoder).value)
 
 		case .bytes:
 			self = try .bytes(.init(from: decoder))

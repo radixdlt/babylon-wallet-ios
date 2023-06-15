@@ -36,8 +36,8 @@ extension RemoveMetadata {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		try container.encode(Self.kind, forKey: .type)
 
-		try container.encode(entityAddress, forKey: .entityAddress)
-		try container.encode(key.proxyEncodable, forKey: .key)
+		try container.encodeValue(entityAddress, forKey: .entityAddress)
+		try container.encodeValue(key, forKey: .key)
 	}
 
 	public init(from decoder: Decoder) throws {
@@ -49,8 +49,8 @@ extension RemoveMetadata {
 		}
 
 		try self.init(
-			entityAddress: container.decode(Address.self, forKey: .entityAddress),
-			key: container.decode(String.ProxyDecodable.self, forKey: .key).decoded
+			entityAddress: container.decodeValue(forKey: .entityAddress),
+			key: container.decodeValue(forKey: .key)
 		)
 	}
 }

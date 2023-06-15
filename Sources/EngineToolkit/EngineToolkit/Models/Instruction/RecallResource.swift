@@ -36,8 +36,8 @@ extension RecallResource {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		try container.encode(Self.kind, forKey: .type)
 
-		try container.encode(vault_id, forKey: .vaultId)
-		try container.encode(amount, forKey: .amount)
+		try container.encodeValue(vault_id, forKey: .vaultId)
+		try container.encodeValue(amount, forKey: .amount)
 	}
 
 	public init(from decoder: Decoder) throws {
@@ -49,8 +49,8 @@ extension RecallResource {
 		}
 
 		try self.init(
-			vault_id: container.decode(Address.self, forKey: .vaultId),
-			amount: container.decode(Decimal_.self, forKey: .amount)
+			vault_id: container.decodeValue(forKey: .vaultId),
+			amount: container.decodeValue(forKey: .amount)
 		)
 	}
 }

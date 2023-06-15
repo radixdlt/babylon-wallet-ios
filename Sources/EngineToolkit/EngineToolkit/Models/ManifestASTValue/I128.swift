@@ -1,12 +1,11 @@
+import CasePaths
 import Foundation
 
 // MARK: - I128
 public struct I128: ValueProtocol, Sendable, Codable, Hashable, ExpressibleByStringLiteral {
 	// Type name, used as a discriminator
 	public static let kind: ManifestASTValueKind = .i128
-	public func embedValue() -> ManifestASTValue {
-		.i128(self)
-	}
+	public static var casePath: CasePath<ManifestASTValue, Self> = /ManifestASTValue.i128
 
 	// MARK: Stored properties
 	// TODO: Swift does not have any 128-bit types, so, we store this as a string. We need a better solution to this.
@@ -24,29 +23,17 @@ public struct I128: ValueProtocol, Sendable, Codable, Hashable, ExpressibleByStr
 }
 
 extension I128 {
-	// MARK: CodingKeys
-	private enum CodingKeys: String, CodingKey {
-		case value, kind
-	}
-
 	// MARK: Codable
 	public func encode(to encoder: Encoder) throws {
-		var container = encoder.container(keyedBy: CodingKeys.self)
-		try container.encode(Self.kind, forKey: .kind)
-
-		try container.encode(String(value), forKey: .value)
+		var container = encoder.singleValueContainer()
+		try container.encode(value)
 	}
 
 	public init(from decoder: Decoder) throws {
 		// Checking for type discriminator
-		let container = try decoder.container(keyedBy: CodingKeys.self)
-		let kind: ManifestASTValueKind = try container.decode(ManifestASTValueKind.self, forKey: .kind)
-		if kind != Self.kind {
-			throw InternalDecodingFailure.valueTypeDiscriminatorMismatch(expected: Self.kind, butGot: kind)
-		}
-
+		let container = try decoder.singleValueContainer()
 		// Decoding `value`
 		// TODO: Validation is needed here to ensure that this numeric and in the range of a Signed 128 bit number
-		try self.init(value: container.decode(String.self, forKey: .value))
+		try self.init(value: container.decode(String.self))
 	}
 }

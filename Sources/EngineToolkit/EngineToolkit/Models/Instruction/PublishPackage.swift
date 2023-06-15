@@ -42,10 +42,10 @@ extension PublishPackage {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		try container.encode(Self.kind, forKey: .type)
 
-		try container.encode(code, forKey: .code)
-		try container.encode(schema, forKey: .schema)
-		try container.encode(metadata, forKey: .metadata)
-		try container.encode(royaltyConfig, forKey: .royaltyConfig)
+		try container.encodeValue(code, forKey: .code)
+		try container.encodeValue(schema, forKey: .schema)
+		try container.encodeValue(metadata, forKey: .metadata)
+		try container.encodeValue(royaltyConfig, forKey: .royaltyConfig)
 	}
 
 	public init(from decoder: Decoder) throws {
@@ -57,10 +57,10 @@ extension PublishPackage {
 		}
 
 		try self.init(
-			code: container.decode(Blob.self, forKey: .code),
-			schema: container.decode(Bytes.self, forKey: .schema),
-			royaltyConfig: container.decode(Map_.self, forKey: .royaltyConfig),
-			metadata: container.decode(Map_.self, forKey: .metadata)
+			code: container.decodeValue(forKey: .code),
+			schema: container.decodeValue(forKey: .schema),
+			royaltyConfig: container.decodeValue(forKey: .royaltyConfig),
+			metadata: container.decodeValue(forKey: .metadata)
 		)
 	}
 }

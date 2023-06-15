@@ -1,12 +1,11 @@
+import CasePaths
 import Foundation
 
 // MARK: - Bytes
 public struct Bytes: ValueProtocol, Sendable, Codable, Hashable {
 	// Type name, used as a discriminator
 	public static let kind: ManifestASTValueKind = .bytes
-	public func embedValue() -> ManifestASTValue {
-		.bytes(self)
-	}
+	public static var casePath: CasePath<ManifestASTValue, Self> = /ManifestASTValue.bytes
 
 	// MARK: Stored properties
 	public let bytes: [UInt8]
@@ -26,25 +25,18 @@ public struct Bytes: ValueProtocol, Sendable, Codable, Hashable {
 extension Bytes {
 	// MARK: CodingKeys
 	private enum CodingKeys: String, CodingKey {
-		case hex, kind
+		case hex
 	}
 
 	// MARK: Codable
 	public func encode(to encoder: Encoder) throws {
 		var container = encoder.container(keyedBy: CodingKeys.self)
-		try container.encode(Self.kind, forKey: .kind)
-
 		try container.encode(bytes.hex(), forKey: .hex)
 	}
 
 	public init(from decoder: Decoder) throws {
 		// Checking for type discriminator
 		let container = try decoder.container(keyedBy: CodingKeys.self)
-		let kind: ManifestASTValueKind = try container.decode(ManifestASTValueKind.self, forKey: .kind)
-		if kind != Self.kind {
-			throw InternalDecodingFailure.valueTypeDiscriminatorMismatch(expected: Self.kind, butGot: kind)
-		}
-
 		// Decoding `value`
 		try self.init(hex: container.decode(String.self, forKey: .hex))
 	}

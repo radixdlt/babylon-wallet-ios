@@ -40,9 +40,9 @@ extension CreateProofFromAuthZoneOfNonFungibles {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		try container.encode(Self.kind, forKey: .type)
 
-		try container.encode(resourceAddress, forKey: .resourceAddress)
-		try container.encode(ids, forKey: .ids)
-		try container.encode(intoProof, forKey: .intoProof)
+		try container.encodeValue(resourceAddress, forKey: .resourceAddress)
+		try container.encodeValue(ids, forKey: .ids)
+		try container.encodeValue(intoProof, forKey: .intoProof)
 	}
 
 	public init(from decoder: Decoder) throws {
@@ -54,9 +54,9 @@ extension CreateProofFromAuthZoneOfNonFungibles {
 		}
 
 		try self.init(
-			resourceAddress: container.decode(ResourceAddress.self, forKey: .resourceAddress),
-			ids: container.decode(Set<NonFungibleLocalId>.self, forKey: .ids),
-			intoProof: container.decode(Proof.self, forKey: .intoProof)
+			resourceAddress: container.decodeValue(forKey: .resourceAddress),
+			ids: container.decodeValue(forKey: .ids),
+			intoProof: container.decodeValue(forKey: .intoProof)
 		)
 	}
 }

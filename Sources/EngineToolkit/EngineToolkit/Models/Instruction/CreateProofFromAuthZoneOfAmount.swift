@@ -40,9 +40,9 @@ extension CreateProofFromAuthZoneOfAmount {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		try container.encode(Self.kind, forKey: .type)
 
-		try container.encode(resourceAddress, forKey: .resourceAddress)
-		try container.encode(amount, forKey: .amount)
-		try container.encode(intoProof, forKey: .intoProof)
+		try container.encodeValue(resourceAddress, forKey: .resourceAddress)
+		try container.encodeValue(amount, forKey: .amount)
+		try container.encodeValue(intoProof, forKey: .intoProof)
 	}
 
 	public init(from decoder: Decoder) throws {
@@ -54,9 +54,9 @@ extension CreateProofFromAuthZoneOfAmount {
 		}
 
 		try self.init(
-			resourceAddress: container.decode(ResourceAddress.self, forKey: .resourceAddress),
-			amount: container.decode(Decimal_.self, forKey: .amount),
-			intoProof: container.decode(Proof.self, forKey: .intoProof)
+			resourceAddress: container.decodeValue(forKey: .resourceAddress),
+			amount: container.decodeValue(forKey: .amount),
+			intoProof: container.decodeValue(forKey: .intoProof)
 		)
 	}
 }

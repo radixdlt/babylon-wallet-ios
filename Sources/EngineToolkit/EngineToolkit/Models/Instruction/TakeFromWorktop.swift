@@ -41,9 +41,9 @@ extension TakeFromWorktop {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		try container.encode(Self.kind, forKey: .type)
 
-		try container.encode(resourceAddress, forKey: .resourceAddress)
-		try container.encode(amount, forKey: .amount)
-		try container.encode(bucket, forKey: .intoBucket)
+		try container.encodeValue(resourceAddress, forKey: .resourceAddress)
+		try container.encodeValue(amount, forKey: .amount)
+		try container.encodeValue(bucket, forKey: .intoBucket)
 	}
 
 	public init(from decoder: Decoder) throws {
@@ -55,9 +55,9 @@ extension TakeFromWorktop {
 		}
 
 		try self.init(
-			amount: container.decode(Decimal_.self, forKey: .amount),
-			resourceAddress: container.decode(ResourceAddress.self, forKey: .resourceAddress),
-			bucket: container.decode(Bucket.self, forKey: .intoBucket)
+			amount: container.decodeValue(forKey: .amount),
+			resourceAddress: container.decodeValue(forKey: .resourceAddress),
+			bucket: container.decodeValue(forKey: .intoBucket)
 		)
 	}
 }

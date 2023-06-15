@@ -33,8 +33,8 @@ extension TakeAllFromWorktop {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		try container.encode(Self.kind, forKey: .type)
 
-		try container.encode(resourceAddress, forKey: .resourceAddress)
-		try container.encode(bucket, forKey: .intoBucket)
+		try container.encodeValue(resourceAddress, forKey: .resourceAddress)
+		try container.encodeValue(bucket, forKey: .intoBucket)
 	}
 
 	public init(from decoder: Decoder) throws {
@@ -46,8 +46,8 @@ extension TakeAllFromWorktop {
 		}
 
 		try self.init(
-			resourceAddress: container.decode(ResourceAddress.self, forKey: .resourceAddress),
-			bucket: container.decode(Bucket.self, forKey: .intoBucket)
+			resourceAddress: container.decodeValue(forKey: .resourceAddress),
+			bucket: container.decodeValue(forKey: .intoBucket)
 		)
 	}
 }

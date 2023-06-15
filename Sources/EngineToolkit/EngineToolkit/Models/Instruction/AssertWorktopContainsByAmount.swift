@@ -37,8 +37,8 @@ extension AssertWorktopContainsByAmount {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		try container.encode(Self.kind, forKey: .type)
 
-		try container.encode(resourceAddress, forKey: .resourceAddress)
-		try container.encode(amount, forKey: .amount)
+		try container.encodeValue(resourceAddress, forKey: .resourceAddress)
+		try container.encodeValue(amount, forKey: .amount)
 	}
 
 	public init(from decoder: Decoder) throws {
@@ -50,8 +50,8 @@ extension AssertWorktopContainsByAmount {
 		}
 
 		try self.init(
-			amount: container.decode(Decimal_.self, forKey: .amount),
-			resourceAddress: container.decode(ResourceAddress.self, forKey: .resourceAddress)
+			amount: container.decodeValue(forKey: .amount),
+			resourceAddress: container.decodeValue(forKey: .resourceAddress)
 		)
 	}
 }

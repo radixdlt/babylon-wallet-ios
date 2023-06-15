@@ -39,9 +39,9 @@ extension SetMethodAccessRule {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		try container.encode(Self.kind, forKey: .type)
 
-		try container.encode(entityAddress, forKey: .entityAddress)
-		try container.encode(key, forKey: .key)
-		try container.encode(rule, forKey: .rule)
+		try container.encodeValue(entityAddress, forKey: .entityAddress)
+		try container.encodeValue(key, forKey: .key)
+		try container.encodeValue(rule, forKey: .rule)
 	}
 
 	public init(from decoder: Decoder) throws {
@@ -53,9 +53,9 @@ extension SetMethodAccessRule {
 		}
 
 		try self.init(
-			entityAddress: container.decode(Address.self, forKey: .entityAddress),
-			key: container.decode(Tuple.self, forKey: .key),
-			rule: container.decode(Enum.self, forKey: .rule)
+			entityAddress: container.decodeValue(forKey: .entityAddress),
+			key: container.decodeValue(forKey: .key),
+			rule: container.decodeValue(forKey: .rule)
 		)
 	}
 }

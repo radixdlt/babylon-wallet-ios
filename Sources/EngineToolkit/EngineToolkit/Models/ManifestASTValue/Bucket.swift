@@ -1,12 +1,11 @@
+import CasePaths
 import Foundation
 
 // MARK: - Bucket
 public struct Bucket: ValueProtocol, Sendable, Codable, Hashable {
 	// Type name, used as a discriminator
 	public static let kind: ManifestASTValueKind = .bucket
-	public func embedValue() -> ManifestASTValue {
-		.bucket(self)
-	}
+	public static var casePath: CasePath<ManifestASTValue, Self> = /ManifestASTValue.bucket
 
 	// MARK: Stored properties
 	public let value: String
@@ -19,30 +18,19 @@ public struct Bucket: ValueProtocol, Sendable, Codable, Hashable {
 }
 
 extension Bucket {
-	// MARK: CodingKeys
-	private enum CodingKeys: String, CodingKey {
-		case value, kind
-	}
-
 	// MARK: Codable
 	public func encode(to encoder: Encoder) throws {
-		var container = encoder.container(keyedBy: CodingKeys.self)
-		try container.encode(Self.kind, forKey: .kind)
-
-		try container.encode(value, forKey: .value)
+		var container = encoder.singleValueContainer()
+		try container.encode(value)
 	}
 
 	public init(from decoder: Decoder) throws {
 		// Checking for type discriminator
-		let container = try decoder.container(keyedBy: CodingKeys.self)
-		let kind: ManifestASTValueKind = try container.decode(ManifestASTValueKind.self, forKey: .kind)
-		if kind != Self.kind {
-			throw InternalDecodingFailure.valueTypeDiscriminatorMismatch(expected: Self.kind, butGot: kind)
-		}
+		let container = try decoder.singleValueContainer()
 
 		// Decoding `identifier`
 		try self.init(
-			value: container.decode(String.self, forKey: .value)
+			value: container.decode(String.self)
 		)
 	}
 }

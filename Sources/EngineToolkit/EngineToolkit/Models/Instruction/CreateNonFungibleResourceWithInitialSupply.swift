@@ -51,10 +51,10 @@ extension CreateNonFungibleResourceWithInitialSupply {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		try container.encode(Self.kind, forKey: .type)
 
-		try container.encode(idType, forKey: .idType)
-		try container.encode(schema, forKey: .schema)
-		try container.encode(metadata, forKey: .metadata)
-		try container.encode(accessRules, forKey: .accessRules)
+		try container.encodeValue(idType, forKey: .idType)
+		try container.encodeValue(schema, forKey: .schema)
+		try container.encodeValue(metadata, forKey: .metadata)
+		try container.encodeValue(accessRules, forKey: .accessRules)
 		try container.encode(initialSupply, forKey: .initialSupply)
 	}
 
@@ -67,10 +67,10 @@ extension CreateNonFungibleResourceWithInitialSupply {
 		}
 
 		try self.init(
-			idType: container.decode(Enum.self, forKey: .idType),
-			schema: container.decode(Tuple.self, forKey: .schema),
-			metadata: container.decode(Map_.self, forKey: .metadata),
-			accessRules: container.decode(Map_.self, forKey: .accessRules),
+			idType: container.decodeValue(forKey: .idType),
+			schema: container.decodeValue(forKey: .schema),
+			metadata: container.decodeValue(forKey: .metadata),
+			accessRules: container.decodeValue(forKey: .accessRules),
 			initialSupply: container.decode(ManifestASTValue.self, forKey: .initialSupply)
 		)
 	}

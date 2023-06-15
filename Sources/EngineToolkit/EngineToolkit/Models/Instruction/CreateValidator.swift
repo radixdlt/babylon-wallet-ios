@@ -33,7 +33,7 @@ extension CreateValidator {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		try container.encode(Self.kind, forKey: .type)
 
-		try container.encode(key, forKey: .key)
+		try container.encodeValue(key, forKey: .key)
 	}
 
 	public init(from decoder: Decoder) throws {
@@ -45,7 +45,7 @@ extension CreateValidator {
 		}
 
 		try self.init(
-			key: container.decode(Bytes.self, forKey: .key)
+			key: container.decodeValue(forKey: .key)
 		)
 	}
 }

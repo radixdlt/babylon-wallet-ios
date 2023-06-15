@@ -878,6 +878,7 @@ package.addModules([
 		dependencies: [
 			"Cryptography",
 			"RadixEngineToolkit",
+			.product(name: "ComposableArchitecture", package: "swift-composable-architecture"), // actually just CasePaths
 		],
 		tests: .yes(
 			dependencies: [],

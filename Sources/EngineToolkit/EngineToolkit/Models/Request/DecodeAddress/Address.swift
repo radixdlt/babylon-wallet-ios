@@ -1,3 +1,4 @@
+import CasePaths
 import Foundation
 
 public typealias Address = SpecificAddress<GeneralAddressKind>
@@ -138,8 +139,16 @@ public struct SpecificAddress<Kind: SpecificAddressKind>: Sendable, Hashable, Id
 // MARK: ValueProtocol
 extension SpecificAddress: ValueProtocol {
 	public static var kind: ManifestASTValueKind { .address }
-	public func embedValue() -> ManifestASTValue {
-		.address(self.asGeneral())
+	public static var casePath: CasePath<ManifestASTValue, SpecificAddress<Kind>> {
+		.init {
+			.address($0.asGeneral())
+		} extract: {
+			guard case let .address(address) = $0 else {
+				return nil
+			}
+
+			return try? SpecificAddress<Kind>.init(validatingAddress: address.address)
+		}
 	}
 }
 
