@@ -36,7 +36,6 @@ public struct SubmitTransaction: Sendable, FeatureReducer {
 
 	public enum ViewAction: Sendable, Equatable {
 		case appeared
-		case willDisappear
 		case closeButtonTapped
 	}
 
@@ -67,7 +66,7 @@ public struct SubmitTransaction: Sendable, FeatureReducer {
 					}
 				))
 			}
-		case .willDisappear, .closeButtonTapped:
+		case .closeButtonTapped:
 			return .send(.delegate(.dismiss))
 		}
 	}
