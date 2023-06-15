@@ -155,13 +155,13 @@ public extension FactorSourcesOfKindList {
 }
 
 extension FactorSource {
-	var generalHint: String {
+	var generalHint: LocalizedStringKey {
 		switch self {
-		case let .device(factor): return factor.hint.name
-		case let .ledger(factor): return factor.hint.name
-		case let .offDeviceMnemonic(factor): return factor.hint.label.rawValue
-		case let .trustedContact(factor): return factor.contact.name.rawValue
-		case let .securityQuestions(factor): return "'\(factor.sealedMnemonic.securityQuestions.first.question.rawValue)' +\(factor.sealedMnemonic.securityQuestions.count - 1) more questions."
+		case let .device(factor): return .init(factor.hint.name)
+		case let .ledger(factor): return .init(factor.hint.name)
+		case let .offDeviceMnemonic(factor): return .init(factor.hint.label.rawValue)
+		case let .trustedContact(factor): return .init(factor.contact.name.rawValue)
+		case let .securityQuestions(factor): return .init(stringLiteral: "*`\"\(factor.sealedMnemonic.securityQuestions.first.question.rawValue)?\"`* **+\(factor.sealedMnemonic.securityQuestions.count - 1) more questions**.")
 		}
 	}
 }
@@ -188,11 +188,11 @@ extension View {
 @MainActor
 public struct FactorSourceRowView: View {
 	public struct ViewState: Equatable {
-		let description: String
+		let description: LocalizedStringKey
 		let addedOn: Date
 		let lastUsedOn: Date
 
-		public init(factorSource: FactorSource, describe: (FactorSource) -> String) {
+		public init(factorSource: FactorSource, describe: (FactorSource) -> LocalizedStringKey) {
 			self.description = describe(factorSource)
 			self.addedOn = factorSource.addedOn
 			self.lastUsedOn = factorSource.lastUsedOn
@@ -223,7 +223,6 @@ public struct FactorSourceRowView: View {
 				VStack(alignment: .leading, spacing: 0) {
 					Text(viewState.description)
 						.foregroundColor(.app.gray1)
-						.textStyle(.secondaryHeader)
 						.padding(.bottom, .small1)
 
 					LabelledDate(label: "Last used", date: viewState.lastUsedOn)
