@@ -10,9 +10,9 @@ extension FactorSourcesOfKindList.State {
 public extension FactorSourcesOfKindList {
 	struct ViewState: Equatable {
 		let allowSelection: Bool
-		let factorSources: IdentifiedArrayOf<SavedOrDraftFactorSource<FactorSourceOfKind>>
+		let factorSources: IdentifiedArrayOf<SavedOrDraftFactorSource<FactorSourceOfKind, Extra>>
 		let selectedFactorSourceID: FactorSourceID?
-		let selectedFactorSource: SavedOrDraftFactorSource<FactorSourceOfKind>?
+		let selectedFactorSource: SavedOrDraftFactorSource<FactorSourceOfKind, Extra>?
 		let mode: State.Mode
 
 		init(state: FactorSourcesOfKindList.State) {
@@ -28,7 +28,7 @@ public extension FactorSourcesOfKindList {
 			}
 		}
 
-		var factorsArray: [SavedOrDraftFactorSource<FactorSourceOfKind>]? { factorSources.elements }
+		var factorsArray: [SavedOrDraftFactorSource<FactorSourceOfKind, Extra>]? { factorSources.elements }
 
 		var navigationTitle: String {
 			if allowSelection {
@@ -168,18 +168,18 @@ extension FactorSource {
 
 extension View {
 	@MainActor
-	fileprivate func destinations<F>(with store: StoreOf<FactorSourcesOfKindList<F>>) -> some SwiftUI.View where F: FactorSourceProtocol {
+	fileprivate func destinations<F, E>(with store: StoreOf<FactorSourcesOfKindList<F, E>>) -> some SwiftUI.View where F: FactorSourceProtocol, E: Sendable & Hashable {
 		let destinationStore = store.scope(state: \.$destination, action: { .child(.destination($0)) })
 		return addNewFactorSourceSheet(with: destinationStore)
 	}
 
 	@MainActor
-	private func addNewFactorSourceSheet<F>(with destinationStore: PresentationStoreOf<FactorSourcesOfKindList<F>.Destinations>) -> some SwiftUI.View where F: FactorSourceProtocol {
+	private func addNewFactorSourceSheet<F, E>(with destinationStore: PresentationStoreOf<FactorSourcesOfKindList<F, E>.Destinations>) -> some SwiftUI.View where F: FactorSourceProtocol, E: Sendable & Hashable {
 		sheet(
 			store: destinationStore,
 			state: /FactorSourcesOfKindList.Destinations.State.addNewFactorSource,
 			action: FactorSourcesOfKindList.Destinations.Action.addNewFactorSource,
-			content: { ManageSomeFactorSource<F>.View(store: $0) }
+			content: { ManageSomeFactorSource<F, E>.View(store: $0) }
 		)
 	}
 }

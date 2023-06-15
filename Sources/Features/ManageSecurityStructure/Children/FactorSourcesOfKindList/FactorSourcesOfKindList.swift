@@ -3,7 +3,7 @@ import FeaturePrelude
 import Profile
 
 // MARK: - SavedOrDraftFactorSource
-public enum SavedOrDraftFactorSource<Factor: FactorSourceProtocol>: Sendable, Hashable, Identifiable {
+public enum SavedOrDraftFactorSource<Factor: FactorSourceProtocol, Extra: Sendable & Hashable>: Sendable, Hashable, Identifiable {
 	public typealias ID = FactorSourceID
 	public var id: ID {
 		factorSource.id
@@ -11,18 +11,32 @@ public enum SavedOrDraftFactorSource<Factor: FactorSourceProtocol>: Sendable, Ha
 
 	public var factorSource: FactorSource {
 		switch self {
-		case let .draft(factor): return factor.embed()
+		case let .draft(factor, _): return factor.embed()
 		case let .saved(factor): return factor.embed()
 		}
 	}
 
-	case draft(Factor)
+	case draft(Factor, Extra)
 	case saved(Factor)
 }
 
+extension SavedOrDraftFactorSource where Extra == EquatableVoid {
+	public static func draft(_ factor: Factor) -> Self {
+		//        Self.draft(factor, EquatableVoid())
+		fatalError()
+	}
+
+	public static func saved(_ factor: Factor) -> Self {
+		//        Self.saved(factor, EquatableVoid())
+		fatalError()
+	}
+}
+
 // MARK: - FactorSourcesOfKindList
-public struct FactorSourcesOfKindList<FactorSourceOfKind>: Sendable, FeatureReducer where FactorSourceOfKind: FactorSourceProtocol {
+public struct FactorSourcesOfKindList<FactorSourceOfKind, Extra: Sendable & Hashable>: Sendable, FeatureReducer where FactorSourceOfKind: FactorSourceProtocol {
 	// MARK: - State
+
+	public typealias Factor = SavedOrDraftFactorSource<FactorSourceOfKind, Extra>
 
 	public struct State: Sendable, Hashable {
 		public enum Mode {
@@ -32,24 +46,22 @@ public struct FactorSourcesOfKindList<FactorSourceOfKind>: Sendable, FeatureRedu
 
 		public let mode: Mode
 
-		public var factorSources: IdentifiedArrayOf<SavedOrDraftFactorSource<FactorSourceOfKind>>
+		public var factorSources: IdentifiedArrayOf<Factor>
 
 		public var selectedFactorSourceID: FactorSourceID? = nil
 
-		let selectedFactorSourceControlRequirements: SavedOrDraftFactorSource<FactorSourceOfKind>? = nil
+		let selectedFactorSourceControlRequirements: SavedOrDraftFactorSource<FactorSourceOfKind, Extra>? = nil
 
 		@PresentationState
 		public var destination: Destinations.State? = nil
 
-		var pendingAction: ActionRequiringP2P? = nil
-
 		public init(
 			mode: Mode,
-			draftFactorSources: IdentifiedArrayOf<FactorSourceOfKind>?
+			factorSources: IdentifiedArrayOf<SavedOrDraftFactorSource<FactorSourceOfKind, Extra>>?
 		) {
 			self.mode = mode
-			if let draftFactorSources {
-				self.factorSources = .init(uncheckedUniqueElements: draftFactorSources.map { SavedOrDraftFactorSource<FactorSourceOfKind>.draft($0) })
+			if let factorSources {
+				self.factorSources = factorSources
 			} else {
 				self.factorSources = []
 			}
@@ -57,15 +69,10 @@ public struct FactorSourcesOfKindList<FactorSourceOfKind>: Sendable, FeatureRedu
 
 		public init(
 			mode: Mode,
-			draftFactorSource: FactorSourceOfKind
+			factorSource: SavedOrDraftFactorSource<FactorSourceOfKind, Extra>
 		) {
-			self.init(mode: mode, draftFactorSources: [draftFactorSource])
+			self.init(mode: mode, factorSources: [factorSource])
 		}
-	}
-
-	public enum ActionRequiringP2P: Sendable, Hashable {
-		case addFactorSource
-		case selectFactorSource(SavedOrDraftFactorSource<FactorSourceOfKind>)
 	}
 
 	// MARK: - Action
@@ -74,12 +81,12 @@ public struct FactorSourcesOfKindList<FactorSourceOfKind>: Sendable, FeatureRedu
 		case onFirstTask
 		case selectedFactorSource(id: FactorSourceID?)
 		case addNewFactorSourceButtonTapped
-		case confirmedFactorSource(SavedOrDraftFactorSource<FactorSourceOfKind>)
+		case confirmedFactorSource(SavedOrDraftFactorSource<FactorSourceOfKind, Extra>)
 		case whatIsAFactorSourceButtonTapped
 	}
 
 	public enum InternalAction: Sendable, Equatable {
-		case loadedFactorSources(TaskResult<IdentifiedArrayOf<SavedOrDraftFactorSource<FactorSourceOfKind>>>)
+		case loadedFactorSources(TaskResult<IdentifiedArrayOf<SavedOrDraftFactorSource<FactorSourceOfKind, Extra>>>)
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -87,25 +94,25 @@ public struct FactorSourcesOfKindList<FactorSourceOfKind>: Sendable, FeatureRedu
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
-		case choseFactorSource(SavedOrDraftFactorSource<FactorSourceOfKind>)
+		case choseFactorSource(SavedOrDraftFactorSource<FactorSourceOfKind, Extra>)
 	}
 
 	// MARK: - Destination
 
 	public struct Destinations: Sendable, ReducerProtocol {
 		public enum State: Sendable, Hashable {
-			case addNewFactorSource(ManageSomeFactorSource<FactorSourceOfKind>.State)
+			case addNewFactorSource(ManageSomeFactorSource<FactorSourceOfKind, Extra>.State)
 		}
 
 		public enum Action: Sendable, Equatable {
-			case addNewFactorSource(ManageSomeFactorSource<FactorSourceOfKind>.Action)
+			case addNewFactorSource(ManageSomeFactorSource<FactorSourceOfKind, Extra>.Action)
 		}
 
 		public init() {}
 
 		public var body: some ReducerProtocolOf<Self> {
 			Scope(state: /State.addNewFactorSource, action: /Action.addNewFactorSource) {
-				ManageSomeFactorSource<FactorSourceOfKind>()
+				ManageSomeFactorSource<FactorSourceOfKind, Extra>()
 			}
 		}
 	}
@@ -179,7 +186,7 @@ public struct FactorSourcesOfKindList<FactorSourceOfKind>: Sendable, FeatureRedu
 		.task {
 			let result = await TaskResult {
 				let factorSources = try await factorSourcesClient.getFactorSources(type: FactorSourceOfKind.self)
-				return IdentifiedArray(uniqueElements: factorSources.map(SavedOrDraftFactorSource.saved))
+				return IdentifiedArray(uniqueElements: factorSources.map(SavedOrDraftFactorSource<FactorSourceOfKind, Extra>.saved))
 			}
 			return .internal(.loadedFactorSources(result))
 		}

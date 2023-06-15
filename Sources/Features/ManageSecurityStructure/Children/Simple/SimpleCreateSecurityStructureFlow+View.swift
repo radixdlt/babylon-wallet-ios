@@ -130,7 +130,7 @@ extension View {
 			store: destinationStore,
 			state: /SimpleManageSecurityStructureFlow.ModalDestinations.State.listConfirmerOfPhone,
 			action: SimpleManageSecurityStructureFlow.ModalDestinations.Action.listConfirmerOfPhone,
-			content: { FactorSourcesOfKindList<SecurityQuestionsFactorSource>.View(store: $0) }
+			content: { ListConfirmerOfPhone.View(store: $0) }
 		)
 	}
 
@@ -154,7 +154,7 @@ extension View {
 			store: destinationStore,
 			state: /SimpleManageSecurityStructureFlow.ModalDestinations.State.listLostPhoneHelper,
 			action: SimpleManageSecurityStructureFlow.ModalDestinations.Action.listLostPhoneHelper,
-			content: { FactorSourcesOfKindList<TrustedContactFactorSource>.View(store: $0) }
+			content: { ListLostPhoneHelper.View(store: $0) }
 		)
 	}
 }
