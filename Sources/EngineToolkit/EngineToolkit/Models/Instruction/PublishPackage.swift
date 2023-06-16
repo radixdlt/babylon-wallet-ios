@@ -11,19 +11,17 @@ public struct PublishPackage: InstructionProtocol {
 	// MARK: Stored properties
 
 	public let code: Blob
-	public let schema: Blob
+	public let schema: Bytes
 	public let royaltyConfig: Map_
 	public let metadata: Map_
-	public let accessRules: Tuple
 
 	// MARK: Init
 
-	public init(code: Blob, schema: Blob, royaltyConfig: Map_, metadata: Map_, accessRules: Tuple) {
+	public init(code: Blob, schema: Bytes, royaltyConfig: Map_, metadata: Map_) {
 		self.code = code
 		self.schema = schema
 		self.royaltyConfig = royaltyConfig
 		self.metadata = metadata
-		self.accessRules = accessRules
 	}
 }
 
@@ -34,7 +32,6 @@ extension PublishPackage {
 		case type = "instruction"
 		case royaltyConfig = "royalty_config"
 		case metadata
-		case accessRules = "access_rules"
 		case code
 		case schema
 	}
@@ -45,11 +42,10 @@ extension PublishPackage {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		try container.encode(Self.kind, forKey: .type)
 
-		try container.encode(code, forKey: .code)
-		try container.encode(schema, forKey: .schema)
-		try container.encode(metadata, forKey: .metadata)
-		try container.encode(accessRules, forKey: .accessRules)
-		try container.encode(royaltyConfig, forKey: .royaltyConfig)
+		try container.encodeValue(code, forKey: .code)
+		try container.encodeValue(schema, forKey: .schema)
+		try container.encodeValue(metadata, forKey: .metadata)
+		try container.encodeValue(royaltyConfig, forKey: .royaltyConfig)
 	}
 
 	public init(from decoder: Decoder) throws {
@@ -61,11 +57,10 @@ extension PublishPackage {
 		}
 
 		try self.init(
-			code: container.decode(Blob.self, forKey: .code),
-			schema: container.decode(Blob.self, forKey: .schema),
-			royaltyConfig: container.decode(Map_.self, forKey: .royaltyConfig),
-			metadata: container.decode(Map_.self, forKey: .metadata),
-			accessRules: container.decode(Tuple.self, forKey: .accessRules)
+			code: container.decodeValue(forKey: .code),
+			schema: container.decodeValue(forKey: .schema),
+			royaltyConfig: container.decodeValue(forKey: .royaltyConfig),
+			metadata: container.decodeValue(forKey: .metadata)
 		)
 	}
 }

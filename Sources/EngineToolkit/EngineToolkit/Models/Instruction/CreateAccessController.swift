@@ -43,8 +43,8 @@ extension CreateAccessController {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		try container.encode(Self.kind, forKey: .type)
 
-		try container.encode(controlledAsset, forKey: .controlledAsset)
-		try container.encode(ruleSet, forKey: .ruleSet)
+		try container.encodeValue(controlledAsset, forKey: .controlledAsset)
+		try container.encodeValue(ruleSet, forKey: .ruleSet)
 		try container.encode(timedRecoveryDelayInMinutes, forKey: .timedRecoveryDelayInMinutes)
 	}
 
@@ -56,14 +56,10 @@ extension CreateAccessController {
 			throw InternalDecodingFailure.instructionTypeDiscriminatorMismatch(expected: Self.kind, butGot: kind)
 		}
 
-		let controlledAsset = try container.decode(Bucket.self, forKey: .controlledAsset)
-		let ruleSet = try container.decode(Tuple.self, forKey: .ruleSet)
-		let timedRecoveryDelayInMinutes = try container.decode(ManifestASTValue.self, forKey: .timedRecoveryDelayInMinutes).self
-
-		self.init(
-			controlledAsset: controlledAsset,
-			ruleSet: ruleSet,
-			timedRecoveryDelayInMinutes: timedRecoveryDelayInMinutes
+		try self.init(
+			controlledAsset: container.decodeValue(forKey: .controlledAsset),
+			ruleSet: container.decodeValue(forKey: .ruleSet),
+			timedRecoveryDelayInMinutes: container.decode(ManifestASTValue.self, forKey: .timedRecoveryDelayInMinutes)
 		)
 	}
 }

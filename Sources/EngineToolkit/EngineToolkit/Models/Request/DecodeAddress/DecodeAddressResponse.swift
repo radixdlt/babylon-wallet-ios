@@ -8,20 +8,17 @@ public struct DecodeAddressResponse: Sendable, Codable, Hashable {
 	public let networkName: String
 	public let entityType: AddressKind
 	public let data: [UInt8]
-	public let hrp: String
 
 	public init(
 		networkName: String,
 		entityType: AddressKind,
 		data: [UInt8],
-		hrp: String,
 		networkId: NetworkID
 	) {
 		self.networkId = networkId
 		self.networkName = networkName
 		self.entityType = entityType
 		self.data = data
-		self.hrp = hrp
 	}
 }
 
@@ -35,7 +32,6 @@ extension DecodeAddressResponse {
 		case networkName = "network_name"
 		case entityType = "entity_type"
 		case data
-		case hrp
 	}
 
 	// MARK: Codable
@@ -47,7 +43,6 @@ extension DecodeAddressResponse {
 		try container.encode(networkName, forKey: .networkName)
 		try container.encode(entityType, forKey: .entityType)
 		try container.encode(data.hex(), forKey: .data)
-		try container.encode(hrp, forKey: .hrp)
 	}
 
 	public init(from decoder: Decoder) throws {
@@ -58,7 +53,6 @@ extension DecodeAddressResponse {
 			networkName: container.decode(String.self, forKey: .networkName),
 			entityType: container.decode(AddressKind.self, forKey: .entityType),
 			data: [UInt8](hex: container.decode(String.self, forKey: .data)),
-			hrp: container.decode(String.self, forKey: .hrp),
 			networkId: NetworkID(decodeAndConvertToNumericType(container: container, key: .networkId))
 		)
 	}

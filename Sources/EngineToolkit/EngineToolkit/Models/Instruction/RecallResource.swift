@@ -10,13 +10,13 @@ public struct RecallResource: InstructionProtocol {
 
 	// MARK: Stored properties
 
-	public let vault_id: Bytes
+	public let vaultID: VaultAddress
 	public let amount: Decimal_
 
 	// MARK: Init
 
-	public init(vault_id: Bytes, amount: Decimal_) {
-		self.vault_id = vault_id
+	public init(vaultID: VaultAddress, amount: Decimal_) {
+		self.vaultID = vaultID
 		self.amount = amount
 	}
 }
@@ -36,8 +36,8 @@ extension RecallResource {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		try container.encode(Self.kind, forKey: .type)
 
-		try container.encode(vault_id, forKey: .vaultId)
-		try container.encode(amount, forKey: .amount)
+		try container.encodeValue(vaultID, forKey: .vaultId)
+		try container.encodeValue(amount, forKey: .amount)
 	}
 
 	public init(from decoder: Decoder) throws {
@@ -49,8 +49,8 @@ extension RecallResource {
 		}
 
 		try self.init(
-			vault_id: container.decode(Bytes.self, forKey: .vaultId),
-			amount: container.decode(Decimal_.self, forKey: .amount)
+			vaultID: container.decodeValue(forKey: .vaultId),
+			amount: container.decodeValue(forKey: .amount)
 		)
 	}
 }

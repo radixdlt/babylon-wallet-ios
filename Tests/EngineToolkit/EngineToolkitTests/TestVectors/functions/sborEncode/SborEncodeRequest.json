@@ -1,0 +1,20 @@
+{
+  "type": "ScryptoSbor",
+  "value": {
+    "kind": "Tuple",
+    "fields": [
+      {
+        "kind": "Decimal",
+        "value": "10"
+      },
+      {
+        "kind": "PreciseDecimal",
+        "value": "10"
+      },
+      {
+        "kind": "String",
+        "value": "Hello World!"
+      }
+    ]
+  }
+}

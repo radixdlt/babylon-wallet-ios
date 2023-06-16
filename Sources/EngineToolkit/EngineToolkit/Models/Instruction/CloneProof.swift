@@ -33,8 +33,8 @@ extension CloneProof {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		try container.encode(Self.kind, forKey: .type)
 
-		try container.encode(source, forKey: .proof)
-		try container.encode(target, forKey: .intoProof)
+		try container.encodeValue(source, forKey: .proof)
+		try container.encodeValue(target, forKey: .intoProof)
 	}
 
 	public init(from decoder: Decoder) throws {
@@ -46,8 +46,8 @@ extension CloneProof {
 		}
 
 		try self.init(
-			from: container.decode(Proof.self, forKey: .proof),
-			to: container.decode(Proof.self, forKey: .intoProof)
+			from: container.decodeValue(forKey: .proof),
+			to: container.decodeValue(forKey: .intoProof)
 		)
 	}
 }

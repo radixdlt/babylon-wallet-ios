@@ -29,15 +29,15 @@ extension ROLAClient {
 				}
 			}()
 
-			let entityAddress: String = {
+			let entityAddress: Address = {
 				switch entity {
 				case let .account(account):
-					return account.address.address
+					return account.address.asGeneral()
 				case let .persona(persona):
-					return persona.address.address
+					return persona.address.asGeneral()
 				}
 			}()
-			let metadata = try await gatewayAPIClient.getEntityMetadata(entityAddress)
+			let metadata = try await gatewayAPIClient.getEntityMetadata(entityAddress.address)
 			var ownerKeys = try metadata.ownerKeys() ?? []
 			loggerGlobal.debug("ownerKeys: \(ownerKeys)")
 			ownerKeys.append(newPublicKey)
@@ -65,7 +65,7 @@ extension ROLAClient {
 			// # Set List Metadata on Resource
 			// https://github.com/radixdlt/radixdlt-scrypto/blob/main/transaction/examples/metadata/metadata.rtm#L97-L101
 			let setMetadataInstruction = try SetMetadata(
-				entityAddress: .init(address: entityAddress),
+				entityAddress: entityAddress,
 				key: SetMetadata.ownerKeysKey,
 				value: Enum(
 					.metadataEntry,

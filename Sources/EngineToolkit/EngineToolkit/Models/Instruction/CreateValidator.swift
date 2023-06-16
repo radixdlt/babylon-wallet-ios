@@ -11,16 +11,11 @@ public struct CreateValidator: InstructionProtocol {
 	// MARK: Stored properties
 
 	public let key: Bytes
-	public let ownerAccessRule: Enum
 
 	// MARK: Init
 
-	public init(
-		key: Bytes,
-		ownerAccessRule: Enum
-	) {
+	public init(key: Bytes) {
 		self.key = key
-		self.ownerAccessRule = ownerAccessRule
 	}
 }
 
@@ -30,7 +25,6 @@ extension CreateValidator {
 	private enum CodingKeys: String, CodingKey {
 		case type = "instruction"
 		case key
-		case ownerAccessRule = "owner_access_rule"
 	}
 
 	// MARK: Codable
@@ -39,8 +33,7 @@ extension CreateValidator {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		try container.encode(Self.kind, forKey: .type)
 
-		try container.encode(key, forKey: .key)
-		try container.encode(ownerAccessRule, forKey: .ownerAccessRule)
+		try container.encodeValue(key, forKey: .key)
 	}
 
 	public init(from decoder: Decoder) throws {
@@ -52,8 +45,7 @@ extension CreateValidator {
 		}
 
 		try self.init(
-			key: container.decode(Bytes.self, forKey: .key),
-			ownerAccessRule: container.decode(Enum.self, forKey: .ownerAccessRule)
+			key: container.decodeValue(forKey: .key)
 		)
 	}
 }

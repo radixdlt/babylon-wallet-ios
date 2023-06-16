@@ -1,6 +1,6 @@
 import Foundation
 
-public enum ManifestASTValueKind: String, Codable, Sendable, Hashable {
+public enum ManifestASTValueKind: String, Codable, Sendable, Hashable, CaseIterable {
 	case bool = "Bool"
 
 	case u8 = "U8"
@@ -14,8 +14,6 @@ public enum ManifestASTValueKind: String, Codable, Sendable, Hashable {
 	case i32 = "I32"
 	case i64 = "I64"
 	case i128 = "I128"
-
-	case integer = "Integer"
 
 	case string = "String"
 

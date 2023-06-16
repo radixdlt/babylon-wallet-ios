@@ -35,7 +35,7 @@ extension AssertAccessRule {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		try container.encode(Self.kind, forKey: .type)
 
-		try container.encode(accessRule, forKey: .accessRule)
+		try container.encodeValue(accessRule, forKey: .accessRule)
 	}
 
 	public init(from decoder: Decoder) throws {
@@ -46,10 +46,8 @@ extension AssertAccessRule {
 			throw InternalDecodingFailure.instructionTypeDiscriminatorMismatch(expected: Self.kind, butGot: kind)
 		}
 
-		let accessRule = try container.decode(Enum.self, forKey: .accessRule)
-
-		self.init(
-			accessRule: accessRule
+		try self.init(
+			accessRule: container.decodeValue(forKey: .accessRule)
 		)
 	}
 }

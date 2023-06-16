@@ -59,14 +59,12 @@ private func _testTransaction(
 
 	let transactionManifest = TransactionManifest(instructions: .string(complexManifestString))
 	let transactionHeader = try TransactionHeader(
-		version: 0x01,
 		networkId: 0xF2,
 		startEpochInclusive: 0,
 		endEpochExclusive: 10,
 		nonce: 0,
 		publicKey: notaryPrivateKey.publicKey(),
-		notaryAsSignatory: notaryAsSignatory,
-		costUnitLimit: 10_000_000,
+		notaryIsSignatory: notaryAsSignatory,
 		tipPercentage: 0
 	)
 
@@ -83,4 +81,14 @@ private func _testTransaction(
 		compiledSignedTransactionIntent: signedTXContext.compileSignedTransactionIntentResponse.compiledIntent,
 		compiledNotarizedTransactionIntent: compiledNotarizedTransactionIntent
 	)
+}
+
+import Foundation
+
+public func resource(
+	named fileName: String,
+	extension fileExtension: String
+) throws -> Data {
+	let fileURL = Bundle.module.url(forResource: fileName, withExtension: fileExtension)
+	return try Data(contentsOf: fileURL!)
 }

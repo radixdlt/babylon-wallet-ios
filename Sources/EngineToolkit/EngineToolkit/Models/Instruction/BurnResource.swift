@@ -33,7 +33,7 @@ extension BurnResource {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		try container.encode(Self.kind, forKey: .type)
 
-		try container.encode(bucket, forKey: .bucket)
+		try container.encodeValue(bucket, forKey: .bucket)
 	}
 
 	public init(from decoder: Decoder) throws {
@@ -45,7 +45,7 @@ extension BurnResource {
 		}
 
 		try self.init(
-			bucket: container.decode(Bucket.self, forKey: .bucket)
+			bucket: container.decodeValue(forKey: .bucket)
 		)
 	}
 }

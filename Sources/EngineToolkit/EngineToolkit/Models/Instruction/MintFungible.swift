@@ -9,7 +9,7 @@ public struct MintFungible: InstructionProtocol {
 	}
 
 	// MARK: Stored properties
-	public let resourceAddress: Address_
+	public let resourceAddress: ResourceAddress
 	public let amount: Decimal_
 
 	// MARK: Init
@@ -18,7 +18,7 @@ public struct MintFungible: InstructionProtocol {
 		resourceAddress: ResourceAddress,
 		amount: Decimal_
 	) {
-		self.resourceAddress = resourceAddress.asGeneral
+		self.resourceAddress = resourceAddress
 		self.amount = amount
 	}
 }
@@ -36,8 +36,8 @@ extension MintFungible {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		try container.encode(Self.kind, forKey: .type)
 
-		try container.encode(resourceAddress, forKey: .resourceAddress)
-		try container.encode(amount, forKey: .amount)
+		try container.encodeValue(resourceAddress, forKey: .resourceAddress)
+		try container.encodeValue(amount, forKey: .amount)
 	}
 
 	public init(from decoder: Decoder) throws {
@@ -49,8 +49,8 @@ extension MintFungible {
 		}
 
 		try self.init(
-			resourceAddress: container.decode(Address_.self, forKey: .resourceAddress).asSpecific(),
-			amount: container.decode(Decimal_.self, forKey: .amount)
+			resourceAddress: container.decodeValue(forKey: .resourceAddress),
+			amount: container.decodeValue(forKey: .amount)
 		)
 	}
 }

@@ -47,9 +47,9 @@ extension CreateFungibleResourceWithInitialSupply {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		try container.encode(Self.kind, forKey: .type)
 
-		try container.encode(divisibility.proxyEncodable, forKey: .divisibility)
-		try container.encode(metadata, forKey: .metadata)
-		try container.encode(accessRules, forKey: .accessRules)
+		try container.encodeValue(divisibility, forKey: .divisibility)
+		try container.encodeValue(metadata, forKey: .metadata)
+		try container.encodeValue(accessRules, forKey: .accessRules)
 		try container.encode(initialSupply, forKey: .initialSupply)
 	}
 
@@ -62,9 +62,9 @@ extension CreateFungibleResourceWithInitialSupply {
 		}
 
 		try self.init(
-			divisibility: container.decode(UInt8.ProxyDecodable.self, forKey: .divisibility).decoded,
-			metadata: container.decode(Map_.self, forKey: .metadata),
-			accessRules: container.decode(Map_.self, forKey: .accessRules),
+			divisibility: container.decodeValue(forKey: .divisibility),
+			metadata: container.decodeValue(forKey: .metadata),
+			accessRules: container.decodeValue(forKey: .accessRules),
 			initialSupply: container.decode(ManifestASTValue.self, forKey: .initialSupply)
 		)
 	}

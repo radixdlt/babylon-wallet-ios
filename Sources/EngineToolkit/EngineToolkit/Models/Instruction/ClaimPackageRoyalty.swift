@@ -10,12 +10,12 @@ public struct ClaimComponentRoyalty: InstructionProtocol {
 
 	// MARK: Stored properties
 
-	public let componentAddress: Address_
+	public let componentAddress: ComponentAddress
 
 	// MARK: Init
 
 	public init(componentAddress: ComponentAddress) {
-		self.componentAddress = componentAddress.asGeneral
+		self.componentAddress = componentAddress
 	}
 }
 
@@ -33,7 +33,7 @@ extension ClaimComponentRoyalty {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		try container.encode(Self.kind, forKey: .type)
 
-		try container.encode(componentAddress, forKey: .componentAddress)
+		try container.encodeValue(componentAddress, forKey: .componentAddress)
 	}
 
 	public init(from decoder: Decoder) throws {
@@ -45,7 +45,7 @@ extension ClaimComponentRoyalty {
 		}
 
 		try self.init(
-			componentAddress: container.decode(Address_.self, forKey: .componentAddress).asSpecific()
+			componentAddress: container.decodeValue(forKey: .componentAddress)
 		)
 	}
 }

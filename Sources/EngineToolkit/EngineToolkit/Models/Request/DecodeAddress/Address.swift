@@ -1,174 +1,182 @@
+import CasePaths
 import Foundation
+
+public typealias Address = SpecificAddress<GeneralAddressKind>
+
+// public typealias EntityAddress = SpecificAddress<EntityAddressKind>
 
 public typealias PackageAddress = SpecificAddress<PackageAddressKind>
 public typealias ResourceAddress = SpecificAddress<ResourceAddressKind>
+
 public typealias ComponentAddress = SpecificAddress<ComponentAddressKind>
+public typealias AccountAddress = SpecificAddress<AccountAddressKind>
+public typealias IdentityAddress = SpecificAddress<IdentityAddressKind>
+public typealias AccessControllerAddress = SpecificAddress<AccessControllerAddressKind>
+public typealias ConsensusManagerAddress = SpecificAddress<ConsensusManagerAddressKind>
+public typealias GenericComponentAddress = SpecificAddress<GenericComponentAddressKind>
+public typealias VaultAddress = SpecificAddress<VaultAddressKind>
+public typealias ValidatorAddress = SpecificAddress<ValidatorAddressKind>
+public typealias KeyValueStoreAddress = SpecificAddress<KeyValueStoreAddressKind>
 
-// MARK: - SpecificAddressKind
-public protocol SpecificAddressKind: Sendable {
-	static func validate(address: String) throws
-	static var type: AddressDiscriminator { get }
-}
-
-// MARK: - AddressDiscriminator
-public enum AddressDiscriminator: String, Sendable, Hashable, Codable {
-	case packageAddress = "PackageAddress"
-	case resourceAddress = "ResourceAddress"
-	case componentAddress = "ComponentAddress"
-}
-
-// MARK: - PackageAddressKind
-public enum PackageAddressKind: SpecificAddressKind {
-	public static func validate(address: String) throws {}
-	public static let type: AddressDiscriminator = .packageAddress
+// MARK: - GeneralAddressKind
+public enum GeneralAddressKind: SpecificAddressKind {
+	public static let addressSpace: Set<AddressKind> = Set(AddressKind.allCases)
 }
 
 // MARK: - ResourceAddressKind
 public enum ResourceAddressKind: SpecificAddressKind {
-	public static func validate(address: String) throws {}
-	public static let type: AddressDiscriminator = .resourceAddress
+	public static let addressSpace: Set<AddressKind> = [.globalFungibleResourceManager, .globalNonFungibleResourceManager]
+}
+
+// MARK: - PackageAddressKind
+public enum PackageAddressKind: SpecificAddressKind {
+	public static let addressSpace: Set<AddressKind> = [.globalPackage]
 }
 
 // MARK: - ComponentAddressKind
 public enum ComponentAddressKind: SpecificAddressKind {
-	public static func validate(address: String) throws {}
-	public static let type: AddressDiscriminator = .componentAddress
+	public static let addressSpace: Set<AddressKind> = AccountAddressKind.addressSpace
+		.union(IdentityAddressKind.addressSpace)
+		.union(AccessControllerAddressKind.addressSpace)
+		.union(ConsensusManagerAddressKind.addressSpace)
+		.union(GenericComponentAddressKind.addressSpace)
+		.union(VaultAddressKind.addressSpace)
+		.union(ValidatorAddressKind.addressSpace)
+		.union(KeyValueStoreAddressKind.addressSpace)
 }
 
-extension SpecificAddress {
-	public init(validatingAddress address: String) throws {
-		try Kind.validate(address: address)
-		self.init(address: address)
-	}
+// MARK: - EntityAddressKind
+public enum EntityAddressKind: SpecificAddressKind {
+	public static let addressSpace: Set<AddressKind> = AccountAddressKind.addressSpace.union(IdentityAddressKind.addressSpace)
+}
+
+// MARK: - AccountAddressKind
+public enum AccountAddressKind: SpecificAddressKind {
+	public static let addressSpace: Set<AddressKind> = [.globalAccount, .internalAccount, .globalVirtualEd25519Account, .globalVirtualSecp256k1Account]
+}
+
+// MARK: - IdentityAddressKind
+public enum IdentityAddressKind: SpecificAddressKind {
+	public static let addressSpace: Set<AddressKind> = [.globalIdentity, .globalVirtualEd25519Identity, .globalVirtualSecp256k1Identity]
+}
+
+// MARK: - AccessControllerAddressKind
+public enum AccessControllerAddressKind: SpecificAddressKind {
+	public static let addressSpace: Set<AddressKind> = [.globalAccessController]
+}
+
+// MARK: - ConsensusManagerAddressKind
+public enum ConsensusManagerAddressKind: SpecificAddressKind {
+	public static let addressSpace: Set<AddressKind> = [.globalConsensusManager]
+}
+
+// MARK: - GenericComponentAddressKind
+public enum GenericComponentAddressKind: SpecificAddressKind {
+	public static let addressSpace: Set<AddressKind> = [.globalGenericComponent, .internalGenericComponent]
+}
+
+// MARK: - VaultAddressKind
+public enum VaultAddressKind: SpecificAddressKind {
+	public static let addressSpace: Set<AddressKind> = [.internalFungibleVault, .internalNonFungibleVault]
+}
+
+// MARK: - ValidatorAddressKind
+public enum ValidatorAddressKind: SpecificAddressKind {
+	public static let addressSpace: Set<AddressKind> = [.globalValidator]
+}
+
+// MARK: - KeyValueStoreAddressKind
+public enum KeyValueStoreAddressKind: SpecificAddressKind {
+	public static let addressSpace: Set<AddressKind> = [.internalKeyValueStore]
+}
+
+// MARK: - SpecificAddressKind
+public protocol SpecificAddressKind: Sendable {
+	/// The valid address space that can match a given kind of addresses
+	static var addressSpace: Set<AddressKind> { get }
 }
 
 // MARK: - SpecificAddress
-public struct SpecificAddress<Kind: SpecificAddressKind>: AddressProtocol, Sendable, Codable, Hashable {
-	// MARK: Stored properties
-	public let type: AddressDiscriminator = Kind.type
+public struct SpecificAddress<Kind: SpecificAddressKind>: Sendable, Hashable, Identifiable {
+	public struct InvalidAddress: Error, LocalizedError {
+		let decodedKind: AddressKind
+		let addressSpace: Set<AddressKind>
+
+		public var errorDescription: String? {
+			"Decoded AddressKind -> \(decodedKind), not found in the expected address space \(addressSpace)"
+		}
+	}
+
+	public var id: String {
+		address
+	}
+
 	public let address: String
+	public let decodedKind: AddressKind
 
-	// MARK: Init
-
-	public init(address: String) {
-		// TODO: Perform some simple Bech32m validation.
+	init(address: String, decodedKind: AddressKind) {
 		self.address = address
+		self.decodedKind = decodedKind
 	}
 
-	// MARK: CodingKeys
-	private enum CodingKeys: String, CodingKey {
-		case address, type
+	public init(validatingAddress address: String) throws {
+		let decodedAddress = try RadixEngine.instance.decodeAddressRequest(request: .init(address: address)).get()
+		guard Kind.addressSpace.contains(decodedAddress.entityType) else {
+			throw InvalidAddress(decodedKind: decodedAddress.entityType, addressSpace: Kind.addressSpace)
+		}
+		self.init(address: address, decodedKind: decodedAddress.entityType)
 	}
+}
 
+// MARK: ValueProtocol
+extension SpecificAddress: ValueProtocol {
+	public static var kind: ManifestASTValueKind { .address }
+	public static var casePath: CasePath<ManifestASTValue, SpecificAddress<Kind>> {
+		.init {
+			.address($0.asGeneral())
+		} extract: {
+			guard case let .address(address) = $0 else {
+				return nil
+			}
+
+			return try? SpecificAddress<Kind>.init(validatingAddress: address.address)
+		}
+	}
+}
+
+extension CodingUserInfoKey {
+	static let retCoding = CodingUserInfoKey(rawValue: "RETCoding")!
+}
+
+// MARK: - SpecificAddress + Codable
+extension SpecificAddress: Codable {
 	// MARK: Codable
 	public func encode(to encoder: Encoder) throws {
-		var container = encoder.container(keyedBy: CodingKeys.self)
-		try container.encode(Kind.type, forKey: .type)
-		try container.encode(address, forKey: .address)
+		var container = encoder.singleValueContainer()
+		try container.encode(address)
 	}
 
 	public init(from decoder: Decoder) throws {
-		// Checking for type discriminator
-		let container = try decoder.container(keyedBy: CodingKeys.self)
-		let type = try container.decode(AddressDiscriminator.self, forKey: .type)
-		if type != Kind.type {
-			throw InternalDecodingFailure.addressDiscriminatorMismatch(expected: Kind.type, butGot: type)
-		}
+		let container = try decoder.singleValueContainer()
+		try self.init(validatingAddress: container.decode(String.self))
+	}
+}
 
-		try self.init(
-			address: container.decode(String.self, forKey: .address)
-		)
+// MARK: - SpecificAddress + CustomStringConvertible
+extension SpecificAddress: CustomStringConvertible {
+	public var description: String {
+		address
 	}
 }
 
 extension SpecificAddress {
-	public var asGeneral: Address_ {
-		.init(address: address)
+	public func asGeneral() -> Address {
+		.init(address: address, decodedKind: decodedKind)
 	}
 }
 
-extension Address_ {
-	public func asSpecific<Kind: SpecificAddressKind>() throws -> SpecificAddress<Kind> {
-		do {
-			return try .init(validatingAddress: address)
-		} catch {
-			throw ConversionError.failedCreating(kind: Kind.self)
-		}
-	}
-
-	public func isKind(_ kind: SpecificAddressKind.Type) -> Bool {
-		(try? kind.validate(address: address)) != nil
-	}
-
-	public enum ConversionError: Error {
-		case failedCreating(kind: SpecificAddressKind.Type)
-		case addressKindMismatch(desired: SpecificAddressKind.Type, actual: SpecificAddressKind.Type)
-	}
-}
-
-// MARK: - AddressStringConvertible
-public protocol AddressStringConvertible {
-	var address: String { get }
-}
-
-// MARK: - AddressProtocol
-public protocol AddressProtocol: AddressStringConvertible, ExpressibleByStringLiteral {
-	init(address: String)
-}
-
-extension AddressProtocol {
-	public init(stringLiteral value: String) {
-		self.init(address: value)
-	}
-}
-
-// MARK: - PolymorphicAddress
-public enum PolymorphicAddress: Sendable, Codable, Hashable, AddressStringConvertible {
-	case packageAddress(PackageAddress)
-	case componentAddress(ComponentAddress)
-	case resourceAddress(ResourceAddress)
-}
-
-// MARK: Codable
-extension PolymorphicAddress {
-	private enum CodingKeys: String, CodingKey {
-		case type
-	}
-
-	public init(from decoder: Decoder) throws {
-		let container = try decoder.container(keyedBy: CodingKeys.self)
-		let discriminator = try container.decode(AddressDiscriminator.self, forKey: .type)
-
-		let singleValueContainer = try decoder.singleValueContainer()
-		switch discriminator {
-		case .packageAddress:
-			self = try .packageAddress(singleValueContainer.decode(PackageAddress.self))
-		case .componentAddress:
-			self = try .componentAddress(singleValueContainer.decode(ComponentAddress.self))
-		case .resourceAddress:
-			self = try .resourceAddress(singleValueContainer.decode(ResourceAddress.self))
-		}
-	}
-
-	public func encode(to encoder: Encoder) throws {
-		var singleValueContainer = encoder.singleValueContainer()
-		switch self {
-		case let .packageAddress(encodable):
-			try singleValueContainer.encode(encodable)
-		case let .componentAddress(encodable):
-			try singleValueContainer.encode(encodable)
-		case let .resourceAddress(encodable):
-			try singleValueContainer.encode(encodable)
-		}
-	}
-}
-
-extension PolymorphicAddress {
-	public var address: String {
-		switch self {
-		case let .packageAddress(address): return address.address
-		case let .componentAddress(address): return address.address
-		case let .resourceAddress(address): return address.address
-		}
+extension AccountAddress {
+	public var asComponentAddress: ComponentAddress {
+		.init(address: address, decodedKind: decodedKind)
 	}
 }

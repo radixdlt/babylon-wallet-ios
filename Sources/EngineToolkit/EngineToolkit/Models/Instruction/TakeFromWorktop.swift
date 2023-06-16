@@ -9,13 +9,20 @@ public struct TakeFromWorktop: InstructionProtocol {
 	}
 
 	// MARK: Stored properties
-	public let resourceAddress: Address_
+	public let amount: Decimal_
+	public let resourceAddress: ResourceAddress
 	public let bucket: Bucket
 
 	// MARK: Init
 
-	public init(resourceAddress: ResourceAddress, bucket: Bucket) {
-		self.resourceAddress = resourceAddress.asGeneral
+	// Using same order as Scrypto uses, AMOUNT, ADDRESS, BUCKET
+	public init(
+		amount: Decimal_,
+		resourceAddress: ResourceAddress,
+		bucket: Bucket
+	) {
+		self.amount = amount
+		self.resourceAddress = resourceAddress
 		self.bucket = bucket
 	}
 }
@@ -24,6 +31,7 @@ extension TakeFromWorktop {
 	// MARK: CodingKeys
 	private enum CodingKeys: String, CodingKey {
 		case type = "instruction"
+		case amount
 		case resourceAddress = "resource_address"
 		case intoBucket = "into_bucket"
 	}
@@ -33,8 +41,9 @@ extension TakeFromWorktop {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		try container.encode(Self.kind, forKey: .type)
 
-		try container.encode(resourceAddress, forKey: .resourceAddress)
-		try container.encode(bucket, forKey: .intoBucket)
+		try container.encodeValue(resourceAddress, forKey: .resourceAddress)
+		try container.encodeValue(amount, forKey: .amount)
+		try container.encodeValue(bucket, forKey: .intoBucket)
 	}
 
 	public init(from decoder: Decoder) throws {
@@ -46,8 +55,9 @@ extension TakeFromWorktop {
 		}
 
 		try self.init(
-			resourceAddress: container.decode(Address_.self, forKey: .resourceAddress).asSpecific(),
-			bucket: container.decode(Bucket.self, forKey: .intoBucket)
+			amount: container.decodeValue(forKey: .amount),
+			resourceAddress: container.decodeValue(forKey: .resourceAddress),
+			bucket: container.decodeValue(forKey: .intoBucket)
 		)
 	}
 }

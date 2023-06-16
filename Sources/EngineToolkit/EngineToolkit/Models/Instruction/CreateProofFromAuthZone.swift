@@ -9,13 +9,13 @@ public struct CreateProofFromAuthZone: InstructionProtocol {
 	}
 
 	// MARK: Stored properties
-	public let resourceAddress: Address_
+	public let resourceAddress: ResourceAddress
 	public let intoProof: Proof
 
 	// MARK: Init
 
 	public init(resourceAddress: ResourceAddress, intoProof: Proof) {
-		self.resourceAddress = resourceAddress.asGeneral
+		self.resourceAddress = resourceAddress
 		self.intoProof = intoProof
 	}
 }
@@ -33,8 +33,8 @@ extension CreateProofFromAuthZone {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		try container.encode(Self.kind, forKey: .type)
 
-		try container.encode(resourceAddress, forKey: .resourceAddress)
-		try container.encode(intoProof, forKey: .intoProof)
+		try container.encodeValue(resourceAddress, forKey: .resourceAddress)
+		try container.encodeValue(intoProof, forKey: .intoProof)
 	}
 
 	public init(from decoder: Decoder) throws {
@@ -46,8 +46,8 @@ extension CreateProofFromAuthZone {
 		}
 
 		try self.init(
-			resourceAddress: container.decode(Address_.self, forKey: .resourceAddress).asSpecific(),
-			intoProof: container.decode(Proof.self, forKey: .intoProof)
+			resourceAddress: container.decodeValue(forKey: .resourceAddress),
+			intoProof: container.decodeValue(forKey: .intoProof)
 		)
 	}
 }

@@ -1,0 +1,10 @@
+{
+  "network_id": "242",
+  "manifest": {
+    "instructions": {
+      "type": "String",
+      "value": "DROP_ALL_PROOFS;\n"
+    },
+    "blobs": []
+  }
+}
