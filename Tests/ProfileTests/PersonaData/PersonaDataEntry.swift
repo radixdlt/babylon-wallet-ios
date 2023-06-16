@@ -3,6 +3,12 @@ import Prelude
 
 // MARK: - PersonaDataEntry
 public enum PersonaDataEntry: Sendable, Hashable, Codable, BasePersonaFieldValueProtocol {
+	case name(Name)
+	case emailAddress(EmailAddress)
+	case postalAddress(PostalAddress)
+}
+
+extension PersonaDataEntry {
 	public var discriminator: PersonaFieldKind {
 		switch self {
 		case .name: return .name
@@ -18,28 +24,6 @@ public enum PersonaDataEntry: Sendable, Hashable, Codable, BasePersonaFieldValue
 		case let .postalAddress(value): return value.embed()
 		}
 	}
-
-	public struct EmailAddress: Sendable, Hashable, Codable, PersonaFieldValueProtocol {
-		public static var casePath: CasePath<PersonaDataEntry, Self> = /PersonaDataEntry.emailAddress
-		public static var kind = PersonaFieldKind.emailAddress
-
-		public let email: String
-
-		public init(validating email: String) throws {
-			guard email.isEmailAddress else {
-				throw InvalidEmailAddress(invalid: email)
-			}
-			self.email = email
-		}
-
-		struct InvalidEmailAddress: Swift.Error {
-			let invalid: String
-		}
-	}
-
-	case name(Name)
-	case emailAddress(EmailAddress)
-	case postalAddress(PostalAddress)
 }
 
 // MARK: - DuplicateValuesFound
