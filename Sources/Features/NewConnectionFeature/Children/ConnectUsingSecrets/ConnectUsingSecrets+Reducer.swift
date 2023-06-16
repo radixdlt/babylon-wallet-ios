@@ -7,21 +7,20 @@ public struct ConnectUsingSecrets: Sendable, FeatureReducer {
 		public var connectionPassword: ConnectionPassword
 		public var isConnecting: Bool
 		public var nameOfConnection: String
-		public var isNameValid: Bool
 		public var focusedField: Field?
+
+		public var isNameValid: Bool { !nameOfConnection.isEmpty }
 
 		public init(
 			connectionPassword: ConnectionPassword,
 			isConnecting: Bool = false,
 			focusedField: Field? = nil,
-			nameOfConnection: String = "",
-			isNameValid: Bool = false
+			nameOfConnection: String = ""
 		) {
 			self.focusedField = focusedField
 			self.connectionPassword = connectionPassword
 			self.isConnecting = isConnecting
 			self.nameOfConnection = nameOfConnection
-			self.isNameValid = isNameValid
 		}
 	}
 
@@ -54,10 +53,7 @@ public struct ConnectUsingSecrets: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .appeared:
-			return .task {
-				.view(.textFieldFocused(.connectionName))
-			}
-			.cancellable(id: FocusFieldID.self)
+			return .send(.view(.textFieldFocused(.connectionName)))
 
 		case let .textFieldFocused(focus):
 			return .run { send in
@@ -73,8 +69,7 @@ public struct ConnectUsingSecrets: Sendable, FeatureReducer {
 			.cancellable(id: FocusFieldID.self)
 
 		case let .nameOfConnectionChanged(connectionName):
-			state.nameOfConnection = connectionName.trimmed()
-			state.isNameValid = !connectionName.trimmed().isEmpty
+			state.nameOfConnection = connectionName.trimmingNewlines()
 			return .none
 
 		case .confirmNameButtonTapped:

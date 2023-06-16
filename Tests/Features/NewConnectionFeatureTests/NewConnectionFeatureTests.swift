@@ -80,11 +80,10 @@ final class NewConnectionTests: TestCase {
 			await addP2PWithPassword.setValue(password)
 		}
 		let connectionName = "Foobar"
-		await store.send(.child(.connectUsingSecrets(.view(.nameOfConnectionChanged(connectionName + " "))))) {
+		await store.send(.child(.connectUsingSecrets(.view(.nameOfConnectionChanged(connectionName + "\n"))))) {
 			$0 = .connectUsingSecrets(.init(
 				connectionPassword: password,
-				nameOfConnection: connectionName,
-				isNameValid: true
+				nameOfConnection: connectionName
 			))
 		}
 
@@ -92,8 +91,7 @@ final class NewConnectionTests: TestCase {
 			$0 = .connectUsingSecrets(.init(
 				connectionPassword: password,
 				isConnecting: true,
-				nameOfConnection: connectionName,
-				isNameValid: true
+				nameOfConnection: connectionName
 			))
 		}
 
@@ -105,8 +103,7 @@ final class NewConnectionTests: TestCase {
 			$0 = .connectUsingSecrets(.init(
 				connectionPassword: password,
 				isConnecting: false,
-				nameOfConnection: connectionName,
-				isNameValid: true
+				nameOfConnection: connectionName
 			))
 		}
 		await store.receive(.child(.connectUsingSecrets(.internal(.cancelOngoingEffects))))

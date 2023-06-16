@@ -12,8 +12,8 @@ extension ImportLegacyWalletClient: DependencyKey {
 		@Dependency(\.accountsClient) var accountsClient
 
 		@Sendable func migrate(
-			accounts: Set<OlympiaAccountToMigrate>,
-			factorSouceID: FactorSourceID
+			accounts: NonEmpty<Set<OlympiaAccountToMigrate>>,
+			factorSouceID: FactorSourceID.FromHash
 		) async throws -> (accounts: NonEmpty<OrderedSet<MigratedAccount>>, networkID: NetworkID) {
 			let sortedOlympia = accounts.sorted(by: \.addressIndex)
 			let networkID = Radix.Gateway.default.network.id // we import to the default network, not the current.
@@ -23,7 +23,7 @@ extension ImportLegacyWalletClient: DependencyKey {
 			for olympiaAccount in sortedOlympia {
 				let publicKey = SLIP10.PublicKey.ecdsaSecp256k1(olympiaAccount.publicKey)
 				let factorInstance = HierarchicalDeterministicFactorInstance(
-					factorSourceID: factorSouceID,
+					id: factorSouceID,
 					publicKey: publicKey,
 					derivationPath: olympiaAccount.path.wrapAsDerivationPath()
 				)
@@ -41,7 +41,9 @@ extension ImportLegacyWalletClient: DependencyKey {
 				accountsSet.append(migrated)
 			}
 
-			let accounts = NonEmpty<OrderedSet<MigratedAccount>>(rawValue: accountsSet)!
+			guard let accounts = NonEmpty<OrderedSet<MigratedAccount>>(rawValue: accountsSet) else {
+				throw NoValidatedAccountsError()
+			}
 
 			// Save all accounts
 			for account in accounts {
@@ -81,8 +83,12 @@ extension ImportLegacyWalletClient: DependencyKey {
 				let olympiaFactorSource = request.olympiaFactorSource
 				let factorSource = olympiaFactorSource?.factorSource
 
+				guard let olympiaAccounts = NonEmpty<Set>(request.olympiaAccounts) else {
+					throw NoValidatedAccountsError()
+				}
+
 				let (accounts, networkID) = try await migrate(
-					accounts: request.olympiaAccounts,
+					accounts: olympiaAccounts,
 					factorSouceID: request.olympiaFactorSouceID
 				)
 
@@ -137,6 +143,8 @@ extension ImportLegacyWalletClient: DependencyKey {
 			}
 		)
 	}()
+
+	struct NoValidatedAccountsError: Error {}
 }
 
 func convert(

@@ -169,7 +169,7 @@ public struct AccountAddressQRCodePanel: View {
 			if let closeAction {
 				CloseButtonBar(action: closeAction)
 			}
-			QRCodeView(Self.prefix + address.address, size: Self.qrImageSize)
+			QRCodeView(QR.addressPrefix + address.address, size: Self.qrImageSize)
 				.padding([.horizontal, .bottom], .large3)
 				.padding(.top, topPadding)
 		}
@@ -181,7 +181,6 @@ public struct AccountAddressQRCodePanel: View {
 		closeAction == nil ? .large3 : 0
 	}
 
-	private static let prefix: String = "radix:"
 	private static let qrImageSize: CGFloat = 300
 }
 

@@ -11,12 +11,15 @@
             "cap26"
           ]
         },
-        "id" : "dee4d51786ca0fcd53af9e5b719e9bbb4dc3636df505748843e16e1138fb65ef0b",
         "lastUsedOn" : "2023-07-31T11:11:11Z"
       },
       "hint" : {
         "model" : "iPhone 16",
         "name" : "New phone"
+      },
+      "id" : {
+        "body" : "e4d51786ca0fcd53af9e5b719e9bbb4dc3636df505748843e16e1138fb65ef0b",
+        "kind" : "device"
       },
       "nextDerivationIndicesPerNetwork" : [
         {
@@ -42,12 +45,15 @@
             "bip44Olympia"
           ]
         },
-        "id" : "dee4d51786ca0fcd53af9e5b719e9bbb4dc3636df505748843e16e1138fb65ef0b",
         "lastUsedOn" : "2023-07-31T11:11:11Z"
       },
       "hint" : {
         "model" : "iPhone 14 Pro Max",
         "name" : "Old phone"
+      },
+      "id" : {
+        "body" : "e4d51786ca0fcd53af9e5b719e9bbb4dc3636df505748843e16e1138fb65ef0b",
+        "kind" : "device"
       }
     },
     "discriminator" : "device"
@@ -59,18 +65,23 @@
         "addedOn" : "2023-07-31T11:11:11Z",
         "cryptoParameters" : {
           "supportedCurves" : [
-            "curve25519"
+            "curve25519",
+            "secp256k1"
           ],
           "supportedDerivationPathSchemes" : [
-            "cap26"
+            "cap26",
+            "bip44Olympia"
           ]
         },
-        "id" : "1edeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef",
         "lastUsedOn" : "2023-07-31T11:11:11Z"
       },
       "hint" : {
         "model" : "nanoS",
         "name" : "Orange"
+      },
+      "id" : {
+        "body" : "deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef",
+        "kind" : "ledgerHQHardwareWallet"
       },
       "nextDerivationIndicesPerNetwork" : [
         {
@@ -99,11 +110,39 @@
             "cap26"
           ]
         },
-        "id" : "0fe4d51786ca0fcd53af9e5b719e9bbb4dc3636df505748843e16e1138fb65ef0b",
         "lastUsedOn" : "2023-07-31T11:11:11Z"
       },
       "hint" : {
         "label" : "Test"
+      },
+      "id" : {
+        "body" : "e4d51786ca0fcd53af9e5b719e9bbb4dc3636df505748843e16e1138fb65ef0b",
+        "kind" : "offDeviceMnemonic"
+      }
+    }
+  },
+  {
+    "discriminator" : "trustedContact",
+    "trustedContact" : {
+      "common" : {
+        "addedOn" : "2023-07-31T11:11:11Z",
+        "cryptoParameters" : {
+          "supportedCurves" : [
+            "curve25519"
+          ],
+          "supportedDerivationPathSchemes" : [
+            "cap26"
+          ]
+        },
+        "lastUsedOn" : "2023-07-31T11:11:11Z"
+      },
+      "contact" : {
+        "email" : "hi@rdx.works",
+        "name" : "My friend"
+      },
+      "id" : {
+        "body" : "account_tdx_c_1px0jul7a44s65568d32f82f0lkssjwx6f5t5e44yl6csqurxw3",
+        "kind" : "trustedContact"
       }
     }
   }

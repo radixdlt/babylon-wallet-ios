@@ -4,18 +4,88 @@ import Prelude
 
 // MARK: - FactorInstance
 /// An factor instance created from a FactorSource.
-public struct FactorInstance: Sendable, Hashable, Codable {
+public struct FactorInstance: Sendable, Hashable, Codable, Identifiable {
+	// FIXME: COMPLETELY incorrectly implemented, MUST be sent in probably, because Profile cannot
+	// use EngineToolkit which we must, to do Blake hash.
+	/// A string uniquely identifying this Factor Source, on format:
+	/// `FactorSourceKind(1) || "#" || BadgeAddress(String)` e.g.
+	/// `de#resource_sim1qgqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqs64j5z6:[9f58abcbc2ebd2da349acb10773ffbc37b6af91fa8df2486c9ea]"`
+	public struct ID: Sendable, Hashable, Codable {
+		public let factorSourceKind: FactorSourceKind
+		public let badgeAddress: BadgeAddress
+
+		/// FIXME: Update to whatever is the exact correct representation which
+		/// becomes clear once we start integrating with the network (/ledger/node/gateway)
+		public enum BadgeAddress: Sendable, Hashable, Codable {
+			/// "virtual"/"non fungible"
+			case virtual(NonFungibleGlobalId)
+
+			/// "physical"/"real"/"fungible"
+			case resourceAddress(ResourceAddress)
+		}
+	}
+
 	/// The ID of the `FactorSource` that was used to produce this
 	/// factor instance. We will lookup the `FactorSource` in the
 	/// `Profile` and can present user with instruction to re-access
 	/// this factor source in order control the `badge`.
-	public let factorSourceID: FactorSource.ID
+	public let factorSourceID: FactorSourceID
+
+	// FIXME: CHANGE TO STORED PROPERTY, COMPLETELY incorrectly implemented, MUST be sent in probably, because Profile cannot
+	// use EngineToolkit which we must, to do Blake hash.
+	/// FactorInstanceID is a referenced by security structure
+	public var id: ID {
+		switch badge {
+		case let .virtual(.hierarchicalDeterministic(hdPubKey)):
+			switch hdPubKey.publicKey {
+			case let .ecdsaSecp256k1(k1PubKey):
+				// FIXME: THIS IS COMPLETELY WRONG, placeholder only
+				let payload = k1PubKey.compressedRepresentation.prefix(26)
+				return .init(
+					factorSourceKind: factorSourceID.kind,
+					badgeAddress: .virtual(.init(
+						resourceAddress: .init(
+							// FIXME: This is wrong! should be fetched from gateway or from RET... and depends on the network.
+							address: "resource_sim1qgqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq056vhf"
+						),
+						nonFungibleLocalId: .bytes(Array(payload))
+					)
+					)
+				)
+			case let .eddsaEd25519(curve25519PubKey):
+				// FIXME: THIS IS COMPLETELY WRONG, placeholder only
+				let payload = curve25519PubKey.compressedRepresentation.prefix(26)
+				return .init(
+					factorSourceKind: factorSourceID.kind,
+					badgeAddress: .virtual(.init(
+						resourceAddress: .init(
+							// FIXME: This is wrong! should be fetched from gateway or from RET... and depends on the network.
+							address: "resource_sim1qgqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqs64j5z6"
+						),
+						nonFungibleLocalId: .bytes(Array(payload))
+					)
+					)
+				)
+			}
+		}
+	}
 
 	/// Either a "physical" badge (NFT) or some source for recreation of a producer
 	/// of a virtual badge (signature), e.g. a HD derivation path, from which a private key
 	/// is derived which produces virtual badges (signatures).
 	public let badge: Badge
 
+	public init(
+		factorSourceID: FactorSourceID,
+		badge: Badge
+	) {
+		self.factorSourceID = factorSourceID
+		self.badge = badge
+	}
+}
+
+// MARK: FactorInstance.Badge
+extension FactorInstance {
 	/// Either a "physical" badge (NFT) or some source for recreation of a producer
 	/// of a virtual badge (signature), e.g. a HD derivation path, from which a private key
 	/// is derived which produces virtual badges (signatures).
@@ -37,7 +107,9 @@ public struct FactorInstance: Sendable, Hashable, Codable {
 		/// The `.trustedEntity` `FactorSource` produces `FactorInstance`s with this kind if badge source.
 		// case physical(ResourceAddress) // Will soon be added
 	}
+}
 
+extension FactorInstance {
 	/// Tries to unwrap this factor instance's badge as virtual hierarchical deterministic one.
 	public func virtualHierarchicalDeterministic() throws -> HierarchicalDeterministicFactorInstance {
 		try .init(factorInstance: self)
@@ -152,14 +224,14 @@ public struct HierarchicalDeterministicPublicKey: Sendable, Hashable, Codable {
 
 // MARK: - HierarchicalDeterministicFactorInstance
 /// A virtual hierarchical deterministic `FactorInstance`
-public struct HierarchicalDeterministicFactorInstance: Sendable, Hashable {
-	public let factorSourceID: FactorSource.ID
+public struct HierarchicalDeterministicFactorInstance: Sendable, Hashable, Codable {
+	public let factorSourceID: FactorSourceID.FromHash
 	public let publicKey: SLIP10.PublicKey
 	public let derivationPath: DerivationPath
 
 	public var factorInstance: FactorInstance {
 		.init(
-			factorSourceID: factorSourceID,
+			factorSourceID: factorSourceID.embed(),
 			badge: .virtual(
 				.hierarchicalDeterministic(.init(
 					publicKey: publicKey,
@@ -170,24 +242,46 @@ public struct HierarchicalDeterministicFactorInstance: Sendable, Hashable {
 	}
 
 	public init(
-		factorSourceID: FactorSource.ID,
+		id: FactorSourceID.FromHash,
 		publicKey: SLIP10.PublicKey,
 		derivationPath: DerivationPath
 	) {
-		self.factorSourceID = factorSourceID
+		self.factorSourceID = id
 		self.publicKey = publicKey
 		self.derivationPath = derivationPath
+	}
+
+	public init(
+		factorSourceID: FactorSourceID,
+		publicKey: SLIP10.PublicKey,
+		derivationPath: DerivationPath
+	) throws {
+		try self.init(
+			id: factorSourceID.extract(as: FactorSourceID.FromHash.self),
+			publicKey: publicKey,
+			derivationPath: derivationPath
+		)
 	}
 
 	public init(factorInstance: FactorInstance) throws {
 		guard case let .virtual(.hierarchicalDeterministic(badge)) = factorInstance.badge else {
 			throw BadgeIsNotVirtualHierarchicalDeterministic()
 		}
-		self.init(
+		try self.init(
 			factorSourceID: factorInstance.factorSourceID,
 			publicKey: badge.publicKey,
 			derivationPath: badge.derivationPath
 		)
+	}
+
+	public init(from decoder: Decoder) throws {
+		let container = try decoder.singleValueContainer()
+		self = try container.decode(FactorInstance.self).virtualHierarchicalDeterministic()
+	}
+
+	public func encode(to encoder: Encoder) throws {
+		var container = encoder.singleValueContainer()
+		try container.encode(factorInstance)
 	}
 }
 

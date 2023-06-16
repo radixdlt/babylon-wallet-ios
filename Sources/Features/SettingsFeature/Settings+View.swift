@@ -12,6 +12,7 @@ import DebugInspectProfileFeature
 import EngineToolkit // read RET commit hash
 import RadixConnectModels // read signaling client url
 import SecureStorageClient
+import SecurityStructureConfigurationListFeature
 #endif
 
 // MARK: - AppSettings.View
@@ -98,6 +99,7 @@ extension View {
 			.importFromOlympiaLegacyWallet(with: destinationStore)
 			.factorSources(with: destinationStore)
 			.debugInspectProfile(with: destinationStore)
+			.securityStructureConfigs(with: destinationStore)
 		#endif // DEBUG
 	}
 
@@ -167,7 +169,12 @@ extension View {
 			store: destinationStore,
 			state: /AppSettings.Destinations.State.ledgerHardwareWallets,
 			action: AppSettings.Destinations.Action.ledgerHardwareWallets,
-			destination: { LedgerHardwareDevices.View(store: $0) }
+			destination: {
+				LedgerHardwareDevices.View(store: $0)
+					.background(.app.gray5)
+					.navigationTitle(L10n.Settings.ledgerHardwareWallets)
+					.toolbarBackground(.visible, for: .navigationBar)
+			}
 		)
 	}
 
@@ -213,6 +220,18 @@ extension View {
 			state: /AppSettings.Destinations.State.debugInspectProfile,
 			action: AppSettings.Destinations.Action.debugInspectProfile,
 			destination: { DebugInspectProfile.View(store: $0) }
+		)
+	}
+
+	@MainActor
+	private func securityStructureConfigs(
+		with destinationStore: PresentationStoreOf<AppSettings.Destinations>
+	) -> some View {
+		navigationDestination(
+			store: destinationStore,
+			state: /AppSettings.Destinations.State.securityStructureConfigs,
+			action: AppSettings.Destinations.Action.securityStructureConfigs,
+			destination: { SecurityStructureConfigurationListCoordinator.View(store: $0) }
 		)
 	}
 	#endif
@@ -310,6 +329,11 @@ extension AppSettings.View {
 				icon: .asset(AssetResource.ledger),
 				action: .ledgerHardwareWalletsButtonTapped
 			),
+			.init(
+				title: L10n.SeedPhrases.title,
+				icon: .asset(AssetResource.ellipsis),
+				action: .mnemonicsButtonTapped
+			),
 		]
 
 		#if DEBUG
@@ -318,6 +342,12 @@ extension AppSettings.View {
 				title: L10n.Settings.importFromLegacyWallet,
 				icon: .asset(AssetResource.generalSettings),
 				action: .importFromOlympiaWalletButtonTapped
+			),
+			.init(
+				// FIXME: Strings
+				title: "Multi-Factor Setups",
+				icon: .systemImage("lock.square.stack.fill"),
+				action: .securityStructureConfigsButtonTapped
 			),
 			.init( // ONLY DEBUG EVER
 				title: L10n.Settings.Debug.factorSources,
@@ -328,11 +358,6 @@ extension AppSettings.View {
 				title: L10n.Settings.Debug.inspectProfile,
 				icon: .systemImage("wallet.pass"),
 				action: .debugInspectProfileButtonTapped
-			),
-			.init(
-				title: L10n.DisplayMnemonics.seedPhrases,
-				icon: .asset(AssetResource.ellipsis),
-				action: .mnemonicsButtonTapped
 			),
 		])
 		#endif

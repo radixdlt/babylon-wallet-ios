@@ -15,14 +15,14 @@ extension ScanQR {
 	public struct ViewState: Equatable {
 		public let scanMode: QRScanMode
 		#if os(macOS) || (os(iOS) && targetEnvironment(simulator))
-		public var connectionPassword: String
+		public var manualQRContent: String
 		#endif // macOS
 		public let instructions: String
 		init(state: ScanQR.State) {
 			self.scanMode = state.scanMode
 			self.instructions = state.scanInstructions
 			#if os(macOS) || (os(iOS) && targetEnvironment(simulator))
-			self.connectionPassword = state.manualQRContent
+			self.manualQRContent = state.manualQRContent
 			#endif // macOS
 		}
 	}
@@ -116,18 +116,18 @@ extension ScanQR.View {
 	) -> some View {
 		#if os(macOS) || (os(iOS) && targetEnvironment(simulator))
 		VStack(alignment: .center) {
-			Text("Manually input connection password which you can see if you right click and inspect the browser window.")
+			Text("Manually input QR string content")
 			TextField(
-				"Connection password",
+				"QR String content",
 				text: viewStore.binding(
-					get: \.connectionPassword,
+					get: \.manualQRContent,
 					send: { .macInputQRContentChanged($0) }
 				)
 			)
 			.textFieldStyle(.roundedBorder)
-			Button("Connect") {
+			Button("Emulate QR scan") {
 				viewStore.send(.macConnectButtonTapped)
-			}
+			}.buttonStyle(.primaryRectangular)
 		}
 		#else
 		EmptyView()

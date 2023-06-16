@@ -27,7 +27,7 @@ public struct CreationOfAccount: Sendable, FeatureReducer {
 			self.isCreatingLedgerAccount = isCreatingLedgerAccount
 
 			if isCreatingLedgerAccount {
-				self.step = .step0_chooseLedger(.init(allowSelection: true))
+				self.step = .step0_chooseLedger(.init(allowSelection: true, context: .ledgerSelection))
 			} else {
 				self.step = .step1_derivePublicKeys(
 					.init(

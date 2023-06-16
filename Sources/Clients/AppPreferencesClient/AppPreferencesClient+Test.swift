@@ -14,7 +14,7 @@ extension AppPreferencesClient: TestDependencyKey {
 }
 
 extension AppPreferencesClient {
-	static let noop = Self(
+	public static let noop = Self(
 		getPreferences: { .default },
 		updatePreferences: { _ in },
 		extractProfileSnapshot: { fatalError() },

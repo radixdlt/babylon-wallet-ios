@@ -51,15 +51,17 @@ extension AccountList.Row {
 			self.shouldShowSecurityPrompt = false // state.shouldShowSecurityPrompt
 
 			// Resources
-			self.nonFungibleResourcesCount = state.portfolio.wrappedValue?.nonFungibleResources.filter { !$0.tokens.isEmpty }.count ?? 0
+			self.nonFungibleResourcesCount = state.portfolio.wrappedValue?.nonFungibleResources.count ?? 0
 
 			self.fungibleResourceIcons = {
 				guard let fungibleResources = state.portfolio.wrappedValue?.fungibleResources else {
 					return .init(icons: [], additionalItemsText: nil)
 				}
 
-				let xrdIcon: [TokenThumbnail.Content] = fungibleResources.xrdResource.map { _ in [.xrd] } ?? []
-				let otherIcons: [TokenThumbnail.Content] = fungibleResources.nonXrdResources.map { .known($0.iconURL) }
+				let xrdIcon: [TokenThumbnail.Content] = fungibleResources.xrdResource != nil ? [.xrd] : []
+
+				let otherIcons: [TokenThumbnail.Content] = fungibleResources.nonXrdResources
+					.map { .known($0.iconURL) }
 				let icons = xrdIcon + otherIcons
 				let hiddenCount = max(icons.count - FungibleResources.maxNumberOfIcons, 0)
 				let additionalItems = hiddenCount > 0 ? "+\(hiddenCount)" : nil

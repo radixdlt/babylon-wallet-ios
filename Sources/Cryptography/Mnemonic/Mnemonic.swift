@@ -1,7 +1,7 @@
 import Prelude
 
 // MARK: - Mnemonic
-public struct Mnemonic: Sendable, Hashable {
+public struct Mnemonic: Sendable, Hashable, CustomDebugStringConvertible {
 	public let words: NonEmptyArray<BIP39.Word>
 	public let wordCount: BIP39.WordCount
 	public let language: BIP39.Language
@@ -20,7 +20,9 @@ public struct Mnemonic: Sendable, Hashable {
 		}
 		try self.init(words: words, language: maybeKnownLanguage, requireChecksum: requireChecksum)
 	}
+}
 
+extension Mnemonic {
 	public init(
 		words wordStrings: [NonEmptyString],
 		language maybeKnownLanguage: BIP39.Language?,
@@ -91,6 +93,10 @@ extension Mnemonic {
 			fatalError("Expected phrase to never be empty, was `words` empty?")
 		}
 		return phrase
+	}
+
+	public var debugDescription: String {
+		phrase.rawValue
 	}
 }
 

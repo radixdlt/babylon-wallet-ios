@@ -119,7 +119,8 @@
 "linkedConnectors_nameNewConnector_textFieldHint" = "Give a name to this Radix Connector";
 "linkedConnectors_nameNewConnector_saveLinkButtonTitle" = "Save Link and Continue";
 "linkedConnectors_removeConnectionAlert_title" = "Remove Connection";
-"linkedConnectors_removeConnectionAlert_message" = "Your Radix Wallet will no longer automatically connect to this Radix Connector.";
+"linkedConnectors_removeConnectionAlert_message" = "You will no longer be able to connect your wallet to this device and browser combination.";
+"linkedConnectors_removeConnectionAlert_removeButtonTitle" = "Remove";
 "linkedConnectors_cameraPermissionDeniedAlert_title" = "Access Required";
 "linkedConnectors_cameraPermissionDeniedAlert_message" = "Camera access is required to link to a Connector.";
 "linkedConnectors_localNetworkPermissionDeniedAlert_title" = "Access Required";
@@ -554,14 +555,16 @@ Install the Connector extension, open it to see the linking QR code, and tap con
 "ledgerHardwareDevices_subtitleSelectLedger" = "Choose a Ledger device to use";
 "ledgerHardwareDevices_subtitleAllLedgers" = "Here are all the Ledger devices you have added.";
 "ledgerHardwareDevices_subtitleFailure" = "Could not find Ledger devices";
-"displayMnemonics_cautionAlert_title" = "Use Caution";
-"displayMnemonics_cautionAlert_revealButtonLabel" = "Reveal Seed Phrase";
-"displayMnemonics_cautionAlert_message" = "A seed phrase provides full control of its Accounts. Do not view in a public area. Back up the seed phrase words securely. Screenshots are disabled.";
-"displayMnemonics_labelSeedPhraseKindOlympia" = "Legacy Seed Phrase";
-"displayMnemonics_labelSeedPhraseKind" = "Main Seed Phrase";
-"displayMnemonics_labelDateOlympia" = "Imported on";
-"displayMnemonics_labelDate" = "Generated on";
-"displayMnemonics_seedPhrases" = "Seed Phrases";
+
+"seedPhrases_title" = "Seed Phrases";
+"seedPhrases_message" = "A Seed Phrase provides full access to your accounts and funds. When viewing, ensure you’re in a safe environment and no one is looking at your screen.";
+"seedPhrases_warning" = "You are responsible for the security of your Seed Phrase";
+"seedPhrases_seedPhrase_reveal" = "Reveal Seed Phrase";
+"seedPhrases_seedPhrase_oneConnectedAccount" = "Connected to 1 account";
+"seedPhrases_seedPhrase_multipleConnectedAccounts" = "Connected to %d accounts";
+
+"revealSeedPhrase_warning" = "For your safety, make sure no one is looking at your screen. Taking a screen shot has been disabled.";
+"revealSeedPhrase_title" = "Reveal Seed Phrase";
 
 "generalSettings_resetWallet_title" = "Reset Wallet";
 "generalSettings_resetWallet_subtitle" = "Clear all data in this Wallet";

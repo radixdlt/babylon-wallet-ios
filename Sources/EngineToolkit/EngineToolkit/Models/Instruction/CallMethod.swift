@@ -65,10 +65,10 @@ public struct CallMethod: InstructionProtocol {
 		methodName: String,
 		@SpecificValuesBuilder buildValue: () throws -> ManifestASTValue
 	) rethrows {
-		self.init(
+		try self.init(
 			receiver: receiver,
 			methodName: methodName,
-			arguments: [try buildValue()]
+			arguments: [buildValue()]
 		)
 	}
 

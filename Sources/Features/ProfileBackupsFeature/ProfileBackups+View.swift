@@ -82,7 +82,7 @@ extension ProfileBackups.View {
 				Separator()
 
 				HStack {
-					Text("Cloud Backup Wallet data: ") // FIXME: strings
+					Text("Wallet backups in your iCloud account:") // FIXME: strings
 						.textStyle(.body1Header)
 					Spacer()
 				}

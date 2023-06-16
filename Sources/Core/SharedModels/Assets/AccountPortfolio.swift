@@ -154,3 +154,31 @@ extension AccountPortfolio.NonFungibleResource.NonFungibleToken {
 		return String(rawValue.dropLast().dropFirst())
 	}
 }
+
+extension AccountPortfolio {
+	/// Returns an instance with all empty vaults filtered out
+	public var nonEmptyVaults: Self {
+		.init(
+			owner: owner,
+			isDappDefintionAccountType: isDappDefintionAccountType,
+			fungibleResources: .init(
+				xrdResource: fungibleResources.xrdResource?.nonEmpty,
+				nonXrdResources: fungibleResources.nonXrdResources.compactMap(\.nonEmpty)
+			),
+			nonFungibleResources: nonFungibleResources.compactMap(\.nonEmpty)
+		)
+	}
+}
+
+extension AccountPortfolio.FungibleResource {
+	/// Returns nil
+	public var nonEmpty: Self? {
+		amount == 0 ? nil : self
+	}
+}
+
+extension AccountPortfolio.NonFungibleResource {
+	public var nonEmpty: Self? {
+		tokens.isEmpty ? nil : self
+	}
+}

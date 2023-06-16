@@ -313,7 +313,7 @@ extension AccountPortfoliosClient {
 	}
 }
 
-// Temporary hack to extract the key_image_url, until we have a proper schema
+// FIXME: Temporary hack to extract the key_image_url, until we have a proper schema
 private extension GatewayAPI.StateNonFungibleDetailsResponseItem {
 	var keyImageURL: URL? {
 		guard let dictionary = mutableData.rawJson.value as? [String: Any] else { return nil }

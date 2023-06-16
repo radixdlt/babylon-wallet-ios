@@ -28,7 +28,7 @@ extension HD.Path.Full {
 	/// Special purpose derivation path component uesd by factor sources as identifier,
 	/// according to [CAP-26][cap26], the format is:
 	///
-	///     `m/44'/1022'/365'
+	///     `m/44'/1022'/365'`
 	///
 	/// Where `'` denotes hardened path, which is **required** as per [SLIP-10][slip10],
 	/// where `365` is ASCII sum of `"GETID"`, i.e. `"GETID".map{ $0.asciiValue! }.reduce(0, +)`

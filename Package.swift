@@ -55,6 +55,25 @@ package.addModules([
 		tests: .no
 	),
 	.feature(
+		name: "AddTrustedContactFactorSourceFeature",
+		featureSuffixDroppedFromFolderName: true,
+		dependencies: [
+			"FactorSourcesClient",
+			"ScanQRFeature",
+		],
+		tests: .no
+	),
+	.feature(
+		name: "AnswerSecurityQuestionsFeature",
+		featureSuffixDroppedFromFolderName: true,
+		dependencies: [
+			"Profile",
+			"MnemonicClient",
+			"FactorSourcesClient",
+		],
+		tests: .no
+	),
+	.feature(
 		name: "AppFeature",
 		dependencies: [
 			"AppPreferencesClient",
@@ -148,6 +167,17 @@ package.addModules([
 		tests: .no
 	),
 	.feature(
+		name: "CreateSecurityStructureFeature",
+		featureSuffixDroppedFromFolderName: true,
+		dependencies: [
+			"Profile",
+			"AnswerSecurityQuestionsFeature",
+			"AddTrustedContactFactorSourceFeature",
+			"AppPreferencesClient", // Save SecurityStructureConfig
+		],
+		tests: .no
+	),
+	.feature(
 		name: "DappInteractionFeature",
 		dependencies: [
 			"AppPreferencesClient",
@@ -193,6 +223,12 @@ package.addModules([
 			"PersonasClient",
 			"Profile",
 		],
+		tests: .no
+	),
+	.feature(
+		name: "FeaturesPreviewerFeature",
+		featureSuffixDroppedFromFolderName: true,
+		dependencies: [],
 		tests: .no
 	),
 	.feature(
@@ -316,9 +352,22 @@ package.addModules([
 		featureSuffixDroppedFromFolderName: true,
 		dependencies: [
 			"CameraPermissionClient",
-			.product(name: "CodeScanner", package: "CodeScanner", condition: .when(platforms: [.iOS])) {
+			.product(
+				name: "CodeScanner",
+				package: "CodeScanner",
+				condition: .when(platforms: [.iOS])
+			) {
 				.package(url: "https://github.com/twostraws/CodeScanner", from: "2.2.1")
 			},
+		],
+		tests: .no
+	),
+	.feature(
+		name: "SecurityStructureConfigurationListFeature",
+		featureSuffixDroppedFromFolderName: true,
+		dependencies: [
+			"AppPreferencesClient",
+			"CreateSecurityStructureFeature",
 		],
 		tests: .no
 	),
@@ -342,6 +391,7 @@ package.addModules([
 			"PersonasFeature",
 			"RadixConnectClient",
 			"ScanQRFeature",
+			"SecurityStructureConfigurationListFeature",
 			"EditPersonaFeature",
 			"ProfileBackupsFeature",
 		],
@@ -810,6 +860,13 @@ package.addModules([
 			},
 			.product(name: "TextBuilder", package: "TextBuilder") {
 				.package(url: "https://github.com/davdroman/TextBuilder", from: "2.2.0")
+			},
+			.product(
+				name: "JSONPreview",
+				package: "JSONPreview",
+				condition: .when(platforms: [.iOS])
+			) {
+				.package(url: "https://github.com/rakuyoMo/JSONPreview.git", from: "2.0.0")
 			},
 		],
 		tests: .no

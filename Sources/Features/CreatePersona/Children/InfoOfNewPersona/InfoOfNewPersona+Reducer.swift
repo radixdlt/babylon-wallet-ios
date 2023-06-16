@@ -80,7 +80,7 @@ public struct NewPersonaInfo: Sendable, FeatureReducer {
 
 		case let .textFieldChanged(inputtedName):
 			state.inputtedName = inputtedName
-			state.sanitizedName = NonEmpty(rawValue: state.inputtedName.trimmed())
+			state.sanitizedName = NonEmpty(rawValue: state.inputtedName.trimmingWhitespace())
 			return .none
 		}
 	}

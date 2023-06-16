@@ -58,6 +58,7 @@ public enum AssetResource {
   public static let homeAggregatedValueHidden = ImageAsset(name: "home-aggregatedValue-hidden")
   public static let homeAggregatedValueShown = ImageAsset(name: "home-aggregatedValue-shown")
   public static let homeHeaderSettings = ImageAsset(name: "home-header-settings")
+  public static let placeholderSecurityStructure = ImageAsset(name: "PLACEHOLDER_SecurityStructure")
   public static let nft = ImageAsset(name: "nft")
   public static let persona = ImageAsset(name: "persona")
   public static let token = ImageAsset(name: "token")
