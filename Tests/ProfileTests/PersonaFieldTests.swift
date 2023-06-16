@@ -370,6 +370,14 @@ public enum PersonaFieldValue: Sendable, Hashable, Codable, BasePersonaFieldValu
 						[.country],
 					]
 
+				case .singapore:
+					return [
+						[.streetLine0],
+						[.streetLine1],
+						[.city, .postalCodeNumber],
+						[.country],
+					]
+
 				case .sweden:
 					return [
 						[.streetLine0],
