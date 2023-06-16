@@ -22,16 +22,18 @@ extension PersonaFieldValue.PostalAddress {
 		case armenia
 		case australia
 		case austria
-		case bangladesh
 		case azerbaijan
+		case bangladesh
 		case belarus
 		case belgium
+		case bolivia
 		case bosniaAndHerzegovinia
 		case bulgaria
 		case brazil
 		case bruneiDarussalam
 		case canada
 		case cameroon
+		case chile
 		case china
 		case colombia
 		case croatia
@@ -39,15 +41,18 @@ extension PersonaFieldValue.PostalAddress {
 		case czechRepublic
 		case democraticRepublicOfTheCongo
 		case denmark
+		case ecuador
 		case egypt
 		case estonia
 		case ethiopia
 		case finland
 		case france
+		case frenchGuiana
 		case georgia
 		case germany
 		case ghana
 		case greece
+		case guyana
 		case hongKong
 		case hungary
 		case iceland
@@ -80,14 +85,15 @@ extension PersonaFieldValue.PostalAddress {
 		case nepal
 		case netherlands
 		case niger
+		case nigeria
 		case northKorea
 		case northMacedonia
 		case norway
-		case nigeria
 		case pakistan
+		case paraguay
+		case peru
 		case philippines
 		case poland
-		case peru
 		case qatar
 		case romania
 		case russia
@@ -101,6 +107,7 @@ extension PersonaFieldValue.PostalAddress {
 		case southAfrica
 		case spain
 		case sudan
+		case suriname
 		case sweden
 		case switzerland
 		case taiwan
@@ -113,6 +120,7 @@ extension PersonaFieldValue.PostalAddress {
 		case unitedArabEmirates
 		case unitedKingdom
 		case unitedStates
+		case uruguay
 		case uzbekistan
 		case vaticanCity
 		case venzuela

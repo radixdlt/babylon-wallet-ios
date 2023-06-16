@@ -106,6 +106,14 @@ extension PersonaFieldValue.PostalAddress.Country {
 				[.country],
 			]
 
+		case .bolivia:
+			return [
+				[.streetLine0],
+				[.streetLine1],
+				[.city],
+				[.country],
+			]
+
 		case .bosniaAndHerzegovinia:
 			return [
 				[.streetLine0],
@@ -154,6 +162,14 @@ extension PersonaFieldValue.PostalAddress.Country {
 				[.streetLine1],
 				[.city],
 				[.province, .postalCodeString],
+				[.country],
+			]
+
+		case .chile:
+			return [
+				[.streetLine0],
+				[.streetLine1],
+				[.postalCodeNumber, .city],
 				[.country],
 			]
 
@@ -216,6 +232,15 @@ extension PersonaFieldValue.PostalAddress.Country {
 				[.country],
 			]
 
+		case .ecuador:
+			return [
+				[.streetLine0],
+				[.streetLine1],
+				[.postalCodeNumber],
+				[.city],
+				[.country],
+			]
+
 		case .egypt:
 			return [
 				[.streetLine0],
@@ -257,6 +282,14 @@ extension PersonaFieldValue.PostalAddress.Country {
 				[.country],
 			]
 
+		case .frenchGuiana:
+			return [
+				[.streetLine0],
+				[.streetLine1],
+				[.postalCodeNumber, .city],
+				[.country],
+			]
+
 		case .georgia:
 			return [
 				[.streetLine0],
@@ -285,6 +318,14 @@ extension PersonaFieldValue.PostalAddress.Country {
 				[.streetLine0],
 				[.streetLine1],
 				[.postalCodeNumber, .city],
+				[.country],
+			]
+
+		case .guyana:
+			return [
+				[.streetLine0],
+				[.streetLine1],
+				[.city],
 				[.country],
 			]
 
@@ -593,6 +634,14 @@ extension PersonaFieldValue.PostalAddress.Country {
 				[.country],
 			]
 
+		case .paraguay:
+			return [
+				[.streetLine0],
+				[.streetLine1],
+				[.postalCodeNumber, .city],
+				[.country],
+			]
+
 		case .philippines:
 			return [
 				[.streetLine0],
@@ -743,6 +792,15 @@ extension PersonaFieldValue.PostalAddress.Country {
 				[.country],
 			]
 
+		case .suriname:
+			return [
+				[.streetLine0],
+				[.streetLine1],
+				[.city],
+				[.districtString],
+				[.country],
+			]
+
 		case .taiwan:
 			return [
 				[.country],
@@ -819,6 +877,15 @@ extension PersonaFieldValue.PostalAddress.Country {
 				[.city],
 				[.county],
 				[.postcodeString],
+				[.country],
+			]
+
+		case .uruguay:
+			return [
+				[.streetLine0],
+				[.streetLine1],
+				[.postalCodeNumber, .city],
+				[.department],
 				[.country],
 			]
 
