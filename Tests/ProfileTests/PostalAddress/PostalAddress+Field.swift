@@ -2,10 +2,15 @@ import Foundation
 
 // MARK: - PersonaFieldValue.PostalAddress.Field
 extension PersonaFieldValue.PostalAddress {
-	public enum Field: Sendable, Hashable, Codable {
+	public enum Field: Sendable, Hashable, Codable, Identifiable {
+		public typealias ID = Discriminator
+		public var id: ID {
+			discriminator
+		}
+
 		case country(Country)
 		case streetLine0(String)
-		case streetLine1(String)
+		case streetLine1(String = "")
 
 		case postalCodeString(String)
 

@@ -443,6 +443,57 @@ final class PersonaFieldTests: TestCase {
 		)))
 	}
 
+	func test_postalAddress_sweden() throws {
+		let persona = withDependencies {
+			$0.uuid = .incrementing
+		} operation: {
+			Persona(
+				label: "Olof Palme",
+				personaData: .init(
+					name: .init(
+						value: .init(
+							given: "Olof",
+							family: "Palme",
+							variant: .western
+						)
+					),
+					postalAddresses: [[
+						.zipNumber(11129),
+						.city("Stockholm"),
+						.streetLine0("Västerlånggatan 31"),
+						.streetLine1(""),
+						.country(.sweden),
+					]]
+				)
+			)
+		}
+
+		let addresses = try dappRequest(values: \.postalAddresses, from: persona)
+		XCTAssertEqual(addresses[0], [
+			.zipNumber(11129),
+			.city("Stockholm"),
+			.streetLine0("Västerlånggatan 31"),
+			.streetLine1(""),
+			.country(.sweden),
+		])
+	}
+}
+
+// MARK: - PersonaFieldValue.PostalAddress + ExpressibleByArrayLiteral
+extension PersonaFieldValue.PostalAddress: ExpressibleByArrayLiteral {
+	public init(arrayLiteral elements: PersonaFieldValue.PostalAddress.Field...) {
+		self.init(unchecked: .init(uncheckedUniqueElements: elements))
+	}
+}
+
+// MARK: - PersonaFieldOfKind + ExpressibleByArrayLiteral
+extension PersonaFieldOfKind<PersonaFieldValue.PostalAddress>: ExpressibleByArrayLiteral {
+	public init(arrayLiteral elements: PersonaFieldValue.PostalAddress.Field...) {
+		self.init(value: .init(unchecked: .init(uncheckedUniqueElements: elements)))
+	}
+}
+
+private extension PersonaFieldTests {
 	func dappRequest<Kind: PersonaFieldValueProtocol>(
 		values keyPath: KeyPath<Persona.PersonaData, Persona.PersonaData.FieldCollectionOf<Kind>>,
 		from persona: Persona
