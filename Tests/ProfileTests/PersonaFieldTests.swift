@@ -271,6 +271,7 @@ public enum PersonaFieldValue: Sendable, Hashable, Codable, BasePersonaFieldValu
 				case prefectureLevelCity
 				case country
 				case region
+				case subjectOfTheFederation
 				case area
 
 				public var display: String {
@@ -291,6 +292,7 @@ public enum PersonaFieldValue: Sendable, Hashable, Codable, BasePersonaFieldValu
 					case .province: return "Country"
 					case .region: return "Region"
 					case .area: return "Area"
+					case .subjectOfTheFederation: return "Subject of the Federation"
 					}
 				}
 			}
@@ -334,6 +336,9 @@ public enum PersonaFieldValue: Sendable, Hashable, Codable, BasePersonaFieldValu
 			/// China
 			case prefectureLevelCity(String)
 
+			/// Russia
+			case subjectOfTheFederation(String)
+
 			public var keyboardType: UIKeyboardType {
 				switch self {
 				case .zipNumber, .postalCodeNumber, .postcodeNumber: return .numbersAndPunctuation
@@ -369,6 +374,7 @@ public enum PersonaFieldValue: Sendable, Hashable, Codable, BasePersonaFieldValu
 				case .province: return .province
 				case .region: return .region
 				case .area: return .area
+				case .subjectOfTheFederation: return .subjectOfTheFederation
 				}
 			}
 		}
@@ -395,6 +401,7 @@ public enum PersonaFieldValue: Sendable, Hashable, Codable, BasePersonaFieldValu
 			case indonesia
 			case nigeria
 			case pakistan
+			case russia
 			case singapore
 			case sweden
 			case taiwan
@@ -493,6 +500,16 @@ public enum PersonaFieldValue: Sendable, Hashable, Codable, BasePersonaFieldValu
 						[.streetLine1],
 						[.city, .postalCodeNumber],
 						[.country],
+					]
+
+				case .russia:
+					return [
+						[.streetLine0],
+						[.streetLine1],
+						[.city],
+						[.subjectOfTheFederation],
+						[.country],
+						[.postalCodeNumber],
 					]
 
 				case .singapore:
