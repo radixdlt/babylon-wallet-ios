@@ -41,34 +41,6 @@ public struct CallFunction: InstructionProtocol {
 			arguments: buildValues().map { $0.embedValue() }
 		)
 	}
-
-	public init(
-		packageAddress: PackageAddress,
-		blueprintName: String,
-		functionName: String,
-		@SpecificValuesBuilder buildValues: () throws -> [ManifestASTValue]
-	) rethrows {
-		try self.init(
-			packageAddress: packageAddress,
-			blueprintName: blueprintName,
-			functionName: functionName,
-			arguments: buildValues()
-		)
-	}
-
-	public init(
-		packageAddress: PackageAddress,
-		blueprintName: String,
-		functionName: String,
-		@SpecificValuesBuilder buildValue: () throws -> ManifestASTValue
-	) rethrows {
-		try self.init(
-			packageAddress: packageAddress,
-			blueprintName: blueprintName,
-			functionName: functionName,
-			arguments: [buildValue()]
-		)
-	}
 }
 
 extension CallFunction {
