@@ -61,10 +61,12 @@ public struct Persona: Sendable, Hashable, Codable {
 
 		public init(
 			name: Name? = nil,
-			emailAddresses: EmailAddresses = []
+			emailAddresses: EmailAddresses = [],
+			postalAddresses: PostalAddresses = []
 		) {
 			self.name = name
 			self.emailAddresses = emailAddresses
+			self.postalAddresses = postalAddresses
 		}
 	}
 }
@@ -162,6 +164,7 @@ public enum PersonaFieldValue: Sendable, Hashable, Codable, BasePersonaFieldValu
 		switch self {
 		case let .name(value): return value.embed()
 		case let .emailAddress(value): return value.embed()
+		case let .postalAddress(value): return value.embed()
 		}
 	}
 
@@ -219,20 +222,81 @@ public enum PersonaFieldValue: Sendable, Hashable, Codable, BasePersonaFieldValu
 		public static var kind = PersonaFieldKind.postalAddress
 
 		public enum Field: Sendable, Hashable, Codable {
-			enum Discriminator: String, Sendable, Hashable, Codable
+			public enum Discriminator: String, Sendable, Hashable, Codable {
+				case streetLine0
+				case streetLine1
+				case postalCodeString
+				case postalCodeUInt
+				case city
+				case neighbourhood
+				case suburb
+				case state
+			}
+
 			case streetLine0(String)
 			case streetLine1(String)
+
 			case postalCodeString(String)
+			/// Sweden
 			case postalCodeUInt(UInt)
+
 			case city(String)
+			case state(String)
+
+			/// Australia
+			case suburb
+
+			/// Brazil
+			case neighbourhood
+
+			public var discriminator: Discriminator {
+				switch self {
+				case .streetLine0: return .streetLine0
+				case .streetLine1: return .streetLine1
+				case .postalCodeString: return .postalCodeString
+				case .postalCodeUInt: return .postalCodeUInt
+				case .city: return .city
+				case .state: return .state
+				case .neighbourhood: return .neighbourhood
+				case .suburb: return .suburb
+				}
+			}
 		}
 
+		/// The research house found that the top destination for crypto adoption is (in order):
+		/// Australia,
+		/// US
+		/// Brazil,
+		/// United Arab Emirates (UAE),
+		/// Hong Kong
+		/// Taiwan
+		/// India,
+		/// Canada
+		/// Turkey
+		/// Singapore
 		public enum Country: String, Sendable, Hashable, Codable {
+			case australia
+			case brazil
+			case canada
+			case hongKong
+			case india
+			case singapore
 			case sweden
-			var fields: [PostalAddress.Field] {
+			case taiwan
+			case turkey
+			case unitedArabEmirates
+			case unitedStates
+
+			var fields: [PostalAddress.Field.Discriminator] {
 				switch self {
+				case .australia:
+					return [.streetLine0, .streetLine1, .suburb, .state, .postalCodeUInt]
+				case .brazil:
+					return [.streetLine0, .streetLine1, .neighbourhood, .city, .state, .postalCodeUInt]
 				case .sweden:
-					return [.po]
+					return [.streetLine0, .streetLine1, .postalCodeUInt, .city]
+				default:
+					return [.streetLine0, .streetLine1, .postalCodeUInt, .city]
 				}
 			}
 		}
