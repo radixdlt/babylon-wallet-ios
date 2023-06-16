@@ -444,10 +444,10 @@ final class PersonaFieldTests: TestCase {
 	}
 
 	func test_postalAddress_sweden() throws {
-		let persona = withDependencies {
-			$0.uuid = .incrementing
+		try withDependencies {
+			$0.uuid = .constant(.init())
 		} operation: {
-			Persona(
+			let persona = Persona(
 				label: "Olof Palme",
 				personaData: .init(
 					name: .init(
@@ -466,16 +466,16 @@ final class PersonaFieldTests: TestCase {
 					]]
 				)
 			)
-		}
 
-		let addresses = try dappRequest(values: \.postalAddresses, from: persona)
-		XCTAssertEqual(addresses[0], [
-			.zipNumber(11129),
-			.city("Stockholm"),
-			.streetLine0("Västerlånggatan 31"),
-			.streetLine1(""),
-			.country(.sweden),
-		])
+			let addresses = try dappRequest(values: \.postalAddresses, from: persona)
+			XCTAssertEqual(addresses[0], [
+				.zipNumber(11129),
+				.city("Stockholm"),
+				.streetLine0("Västerlånggatan 31"),
+				.streetLine1(""),
+				.country(.sweden),
+			])
+		}
 	}
 }
 
