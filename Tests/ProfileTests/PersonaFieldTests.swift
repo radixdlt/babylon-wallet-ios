@@ -261,6 +261,10 @@ public enum PersonaFieldValue: Sendable, Hashable, Codable, BasePersonaFieldValu
 				case postalCodeString
 				case postalCodeNumber
 				case postcodeNumber
+
+				/// UK
+				case postcodeString
+
 				case zipNumber
 				case city
 				case district
@@ -278,29 +282,32 @@ public enum PersonaFieldValue: Sendable, Hashable, Codable, BasePersonaFieldValu
 				case county
 				case furtherDivisionsLine0
 				case furtherDivisionsLine1
+				case township
 
 				public var display: String {
 					switch self {
-					case .country: return "Street"
+					case .country: return "Country"
 					case .streetLine0: return "Street"
-					case .streetLine1: return "Postal code"
+					case .streetLine1: return "Street"
 					case .postalCodeString: return "Postal code"
-					case .postalCodeNumber: return "Postcode"
-					case .postcodeNumber: return "ZIP"
-					case .zipNumber: return "City"
-					case .prefectureLevelCity: return "District"
-					case .city: return "Neighbourhood"
-					case .state: return "Suburb"
+					case .postalCodeNumber: return "Postal code"
+					case .postcodeString: return "Postcode"
+					case .postcodeNumber: return "Postcode"
+					case .zipNumber: return "ZIP"
+					case .prefectureLevelCity: return "Prefecture-level City"
+					case .city: return "City"
+					case .state: return "State"
 					case .governorate: return "Governorate"
-					case .district: return "State"
-					case .neighbourhood: return "Province"
-					case .suburb: return "Prefecture-level City"
-					case .province: return "Country"
+					case .district: return "District"
+					case .neighbourhood: return "Neighbourhood"
+					case .suburb: return "Suburb"
+					case .province: return "Province"
 					case .region: return "Region"
 					case .area: return "Area"
 					case .subjectOfTheFederation: return "Subject of the Federation"
 					case .prefecture: return "Prefecture"
 					case .county: return "County"
+					case .township: return "Township"
 					case .furtherDivisionsLine0: return "Further Divisions"
 					case .furtherDivisionsLine1: return "Further Divisions"
 					}
@@ -318,6 +325,9 @@ public enum PersonaFieldValue: Sendable, Hashable, Codable, BasePersonaFieldValu
 
 			/// "Postcode" e.g.: `India`
 			case postcodeNumber(Int)
+
+			/// "Postcode" .e.g. UK
+			case postcodeString(String)
 
 			/// US
 			case zipNumber(Int)
@@ -362,6 +372,9 @@ public enum PersonaFieldValue: Sendable, Hashable, Codable, BasePersonaFieldValu
 			/// Japan
 			case furtherDivisionsLine1(String)
 
+			/// Taiwan
+			case township(String)
+
 			public var keyboardType: UIKeyboardType {
 				switch self {
 				case .zipNumber, .postalCodeNumber, .postcodeNumber: return .numbersAndPunctuation
@@ -385,6 +398,7 @@ public enum PersonaFieldValue: Sendable, Hashable, Codable, BasePersonaFieldValu
 				case .postalCodeString: return .postalCodeString
 				case .postalCodeNumber: return .postalCodeNumber
 				case .postcodeNumber: return .postcodeNumber
+				case .postcodeString: return .postcodeString
 				case .zipNumber: return .zipNumber
 
 				case .prefectureLevelCity: return .prefectureLevelCity
@@ -398,6 +412,7 @@ public enum PersonaFieldValue: Sendable, Hashable, Codable, BasePersonaFieldValu
 				case .region: return .region
 				case .area: return .area
 				case .subjectOfTheFederation: return .subjectOfTheFederation
+				case .township: return .township
 
 				case .prefecture: return .prefecture
 				case .county: return .county
@@ -428,8 +443,12 @@ public enum PersonaFieldValue: Sendable, Hashable, Codable, BasePersonaFieldValu
 			case democraticRepublicOfTheCongo
 			case ethiopia
 			case egypt
+			case germany
+			case france
 			case hongKong
 			case india
+			case iran
+			case italy
 			case indonesia
 			case japan
 			case nigeria
@@ -437,12 +456,16 @@ public enum PersonaFieldValue: Sendable, Hashable, Codable, BasePersonaFieldValu
 			case philippines
 			case russia
 			case singapore
+			case southAfrica
 			case sweden
 			case taiwan
+			case tanzania
+			case thailand
 			case turkey
 			case vietnam
 			case mexico
 			case unitedArabEmirates
+			case unitedKingdom
 			case unitedStates
 
 			var fields: [[PostalAddress.Field.Discriminator]] {
@@ -520,6 +543,22 @@ public enum PersonaFieldValue: Sendable, Hashable, Codable, BasePersonaFieldValu
 						[.country],
 					]
 
+				case .france:
+					return [
+						[.streetLine0],
+						[.streetLine1],
+						[.postalCodeNumber, .city]
+						[.country],
+					]
+
+				case .germany:
+					return [
+						[.streetLine0],
+						[.streetLine1],
+						[.postalCodeNumber, .city],
+						[.country],
+					]
+
 				case .hongKong:
 					return [
 						[.country],
@@ -535,6 +574,22 @@ public enum PersonaFieldValue: Sendable, Hashable, Codable, BasePersonaFieldValu
 						[.city, .postcodeNumber],
 						[.state],
 						[.country],
+					]
+
+				case .iran:
+					return [
+						[.streetLine0],
+						[.streetLine1],
+						[.postalCodeNumber, .city],
+						[.country],
+					]
+
+				case .italy:
+					return [
+						[.streetLine0],
+						[.streetLine1],
+						[.postalCodeNumber, .city],
+						[.province, .country],
 					]
 
 				case .japan:
@@ -607,11 +662,39 @@ public enum PersonaFieldValue: Sendable, Hashable, Codable, BasePersonaFieldValu
 						[.country],
 					]
 
+				case .southAfrica:
+					return [
+						[.streetLine0],
+						[.streetLine1],
+						[.city],
+						[.province],
+						[.postalCodeNumber],
+						[.country],
+					]
+
 				case .sweden:
 					return [
 						[.streetLine0],
 						[.streetLine1],
 						[.postalCodeNumber, .city],
+						[.country],
+					]
+
+				case .taiwan:
+					return [
+						[.country],
+						[.zipNumber, .county],
+						[.township],
+						[.streetLine0],
+						[.streetLine1],
+					]
+
+				case .thailand:
+					return [
+						[.streetLine0],
+						[.streetLine1],
+						[.district],
+						[.province, .postalCodeNumber],
 						[.country],
 					]
 
@@ -630,6 +713,16 @@ public enum PersonaFieldValue: Sendable, Hashable, Codable, BasePersonaFieldValu
 						[.streetLine1],
 						[.area],
 						[.city],
+						[.country],
+					]
+
+				case .unitedKingdom:
+					return [
+						[.streetLine0],
+						[.streetLine1],
+						[.city],
+						[.county],
+						[.postcodeString]
 						[.country],
 					]
 
