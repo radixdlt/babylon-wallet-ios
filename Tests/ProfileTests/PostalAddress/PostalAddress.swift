@@ -1,18 +1,19 @@
 import CasePaths
 import Prelude
 
-// MARK: - PersonaFieldValue.PostalAddress
-extension PersonaFieldValue {
+// MARK: - PersonaDataEntry.PostalAddress
+extension PersonaDataEntry {
 	public struct PostalAddress: Sendable, Hashable, Codable, PersonaFieldValueProtocol {
-		public static var casePath: CasePath<PersonaFieldValue, Self> = /PersonaFieldValue.postalAddress
+		public static var casePath: CasePath<PersonaDataEntry, Self> = /PersonaDataEntry.postalAddress
 		public static var kind = PersonaFieldKind.postalAddress
 
-		public var fields: IdentifiedArrayOf<PersonaFieldValue.PostalAddress.Field>
-		public init(unchecked fields: IdentifiedArrayOf<PersonaFieldValue.PostalAddress.Field>) {
+		public var fields: IdentifiedArrayOf<PersonaDataEntry.PostalAddress.Field>
+
+		public init(unchecked fields: IdentifiedArrayOf<PersonaDataEntry.PostalAddress.Field>) {
 			self.fields = fields
 		}
 
-		public init(validating fields: IdentifiedArrayOf<PersonaFieldValue.PostalAddress.Field>) throws {
+		public init(validating fields: IdentifiedArrayOf<PersonaDataEntry.PostalAddress.Field>) throws {
 			guard let country = fields.compactMap(\.country).first else {
 				throw Error.noCountry
 			}
@@ -30,10 +31,10 @@ extension PersonaFieldValue {
 	}
 }
 
-extension PersonaFieldValue.PostalAddress.Field {
-	var country: PersonaFieldValue.PostalAddress.Country? {
+extension PersonaDataEntry.PostalAddress.Field {
+	var country: PersonaDataEntry.PostalAddress.Country? {
 		switch self {
-		case let .county(countryString): return .init(rawValue: countryString)
+		case let .country(country): return country
 		default: return nil
 		}
 	}

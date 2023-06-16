@@ -1,7 +1,7 @@
 import Foundation
 
-// MARK: - PersonaFieldValue.PostalAddress.Field
-extension PersonaFieldValue.PostalAddress {
+// MARK: - PersonaDataEntry.PostalAddress.Field
+extension PersonaDataEntry.PostalAddress {
 	public enum Field: Sendable, Hashable, Codable, Identifiable {
 		public typealias ID = Discriminator
 		public var id: ID {
@@ -39,7 +39,7 @@ extension PersonaFieldValue.PostalAddress {
 		case province(String)
 
 		/// Egypt
-		case governorate
+		case governorate(String)
 
 		/// Hong Kong
 		case districtString(String)
@@ -80,8 +80,8 @@ extension PersonaFieldValue.PostalAddress {
 	}
 }
 
-// MARK: - PersonaFieldValue.PostalAddress.Field.Discriminator
-extension PersonaFieldValue.PostalAddress.Field {
+// MARK: - PersonaDataEntry.PostalAddress.Field.Discriminator
+extension PersonaDataEntry.PostalAddress.Field {
 	public enum Discriminator: String, Sendable, Hashable, Codable {
 		case streetLine0
 		case streetLine1
@@ -149,7 +149,7 @@ extension PersonaFieldValue.PostalAddress.Field {
 }
 
 // MARK: Discriminators
-extension PersonaFieldValue.PostalAddress.Field {
+extension PersonaDataEntry.PostalAddress.Field {
 	public var discriminator: Discriminator {
 		switch self {
 		case .country: return .country
@@ -189,7 +189,7 @@ extension PersonaFieldValue.PostalAddress.Field {
 #if canImport(UIKit)
 import UIKit
 #endif // canImport(UIKit)
-extension PersonaFieldValue.PostalAddress.Field {
+extension PersonaDataEntry.PostalAddress.Field {
 	#if canImport(UIKit)
 	public var keyboardType: UIKeyboardType {
 		switch self {
@@ -200,11 +200,11 @@ extension PersonaFieldValue.PostalAddress.Field {
 	#endif // canImport(UIKit)
 }
 
-extension PersonaFieldValue.PostalAddress.Field {
+extension PersonaDataEntry.PostalAddress.Field {
 	public var valueType: any InitializableFromInputString.Type {
 		switch self {
 		case .zipNumber, .postalCodeNumber, .postcodeNumber, .districtNumber: return Int.self
-		case .country: return PersonaFieldValue.PostalAddress.Country.self
+		case .country: return PersonaDataEntry.PostalAddress.Country.self
 		default: return String.self
 		}
 	}

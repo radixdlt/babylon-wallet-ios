@@ -24,18 +24,18 @@ public struct Persona: Sendable, Hashable, Codable {
 	public let personaData: PersonaData
 
 	public struct PersonaData: Sendable, Hashable, Codable {
-		public typealias Name = PersonaFieldOfKind<PersonaFieldValue.Name>
+		public typealias Name = PersonaDataEntryOfKind<PersonaDataEntry.Name>
 
-		public struct FieldCollectionOf<Value: Sendable & Hashable & Codable & BasePersonaFieldValueProtocol>: Sendable, Hashable, Codable {
-			public private(set) var collection: IdentifiedArrayOf<PersonaFieldOfKind<Value>>
-			public init(collection: IdentifiedArrayOf<PersonaFieldOfKind<Value>> = .init()) throws {
+		public struct EntryCollectionOf<Value: Sendable & Hashable & Codable & BasePersonaFieldValueProtocol>: Sendable, Hashable, Codable {
+			public private(set) var collection: IdentifiedArrayOf<PersonaDataEntryOfKind<Value>>
+			public init(collection: IdentifiedArrayOf<PersonaDataEntryOfKind<Value>> = .init()) throws {
 				guard Set(collection.map(\.value)).count == collection.count else {
 					throw DuplicateValuesFound()
 				}
 				self.collection = collection
 			}
 
-			public mutating func add(_ field: PersonaFieldOfKind<Value>) throws {
+			public mutating func add(_ field: PersonaDataEntryOfKind<Value>) throws {
 				guard !contains(where: { $0.value == field.value }) else {
 					throw DuplicateValuesFound()
 				}
@@ -45,7 +45,7 @@ public struct Persona: Sendable, Hashable, Codable {
 				}
 			}
 
-			public mutating func update(_ updated: PersonaFieldOfKind<Value>) throws {
+			public mutating func update(_ updated: PersonaDataEntryOfKind<Value>) throws {
 				guard contains(where: { $0.id == updated.id }) else {
 					throw PersonaFieldCollectionValueWithIDNotFound(id: updated.id)
 				}
@@ -53,8 +53,8 @@ public struct Persona: Sendable, Hashable, Codable {
 			}
 		}
 
-		public typealias EmailAddresses = FieldCollectionOf<PersonaFieldValue.EmailAddress>
-		public typealias PostalAddresses = FieldCollectionOf<PersonaFieldValue.PostalAddress>
+		public typealias EmailAddresses = EntryCollectionOf<PersonaDataEntry.EmailAddress>
+		public typealias PostalAddresses = EntryCollectionOf<PersonaDataEntry.PostalAddress>
 
 		public var name: Name?
 		public var emailAddresses: EmailAddresses
@@ -72,15 +72,15 @@ public struct Persona: Sendable, Hashable, Codable {
 	}
 }
 
-// MARK: - Persona.PersonaData.FieldCollectionOf + RandomAccessCollection
-extension Persona.PersonaData.FieldCollectionOf: RandomAccessCollection {
-	public typealias Element = PersonaFieldOfKind<Value>
+// MARK: - Persona.PersonaData.EntryCollectionOf + RandomAccessCollection
+extension Persona.PersonaData.EntryCollectionOf: RandomAccessCollection {
+	public typealias Element = PersonaDataEntryOfKind<Value>
 
-	public typealias Index = IdentifiedArrayOf<PersonaFieldOfKind<Value>>.Index
+	public typealias Index = IdentifiedArrayOf<PersonaDataEntryOfKind<Value>>.Index
 
-	public typealias SubSequence = IdentifiedArrayOf<PersonaFieldOfKind<Value>>.SubSequence
+	public typealias SubSequence = IdentifiedArrayOf<PersonaDataEntryOfKind<Value>>.SubSequence
 
-	public typealias Indices = IdentifiedArrayOf<PersonaFieldOfKind<Value>>.Indices
+	public typealias Indices = IdentifiedArrayOf<PersonaDataEntryOfKind<Value>>.Indices
 
 	public var startIndex: Index {
 		collection.startIndex
@@ -127,18 +127,18 @@ extension Persona {
 
 // MARK: - BasePersonaFieldValueProtocol
 public protocol BasePersonaFieldValueProtocol {
-	func embed() -> PersonaFieldValue
+	func embed() -> PersonaDataEntry
 }
 
 // MARK: - PersonaFieldValueProtocol
 public protocol PersonaFieldValueProtocol: BasePersonaFieldValueProtocol {
-	static var casePath: CasePath<PersonaFieldValue, Self> { get }
+	static var casePath: CasePath<PersonaDataEntry, Self> { get }
 	static var kind: PersonaFieldKind { get }
 }
 
-public typealias PersonaField = PersonaFieldOfKind<PersonaFieldValue>
+public typealias PersonaField = PersonaDataEntryOfKind<PersonaDataEntry>
 
-extension PersonaFieldOfKind {
+extension PersonaDataEntryOfKind {
 	public func embed() -> PersonaField {
 		.init(id: id, value: value.embed())
 	}
@@ -151,8 +151,8 @@ public enum PersonaFieldKind: String, Sendable, Hashable, Codable {
 	case postalAddress
 }
 
-// MARK: - PersonaFieldValue
-public enum PersonaFieldValue: Sendable, Hashable, Codable, BasePersonaFieldValueProtocol {
+// MARK: - PersonaDataEntry
+public enum PersonaDataEntry: Sendable, Hashable, Codable, BasePersonaFieldValueProtocol {
 	public var discriminator: PersonaFieldKind {
 		switch self {
 		case .name: return .name
@@ -161,7 +161,7 @@ public enum PersonaFieldValue: Sendable, Hashable, Codable, BasePersonaFieldValu
 		}
 	}
 
-	public func embed() -> PersonaFieldValue {
+	public func embed() -> PersonaDataEntry {
 		switch self {
 		case let .name(value): return value.embed()
 		case let .emailAddress(value): return value.embed()
@@ -170,7 +170,7 @@ public enum PersonaFieldValue: Sendable, Hashable, Codable, BasePersonaFieldValu
 	}
 
 	public struct Name: Sendable, Hashable, Codable, PersonaFieldValueProtocol {
-		public static var casePath: CasePath<PersonaFieldValue, Self> = /PersonaFieldValue.name
+		public static var casePath: CasePath<PersonaDataEntry, Self> = /PersonaDataEntry.name
 		public static var kind = PersonaFieldKind.name
 
 		/// First/Given/Fore-name, .e.g. `"John"`
@@ -201,7 +201,7 @@ public enum PersonaFieldValue: Sendable, Hashable, Codable, BasePersonaFieldValu
 	}
 
 	public struct EmailAddress: Sendable, Hashable, Codable, PersonaFieldValueProtocol {
-		public static var casePath: CasePath<PersonaFieldValue, Self> = /PersonaFieldValue.emailAddress
+		public static var casePath: CasePath<PersonaDataEntry, Self> = /PersonaDataEntry.emailAddress
 		public static var kind = PersonaFieldKind.emailAddress
 
 		public let email: String
@@ -223,14 +223,14 @@ public enum PersonaFieldValue: Sendable, Hashable, Codable, BasePersonaFieldValu
 	case postalAddress(PostalAddress)
 }
 
-// MARK: - PersonaFieldOfKind
+// MARK: - PersonaDataEntryOfKind
 /// * Names
 /// * Postal Addresses
 /// * Email Addresses
 /// * URL Addresses
 /// * Telephone numbers
 /// * Birthday
-public struct PersonaFieldOfKind<Value>: Sendable, Hashable, Codable, Identifiable where Value: Sendable & Hashable & Codable & BasePersonaFieldValueProtocol {
+public struct PersonaDataEntryOfKind<Value>: Sendable, Hashable, Codable, Identifiable where Value: Sendable & Hashable & Codable & BasePersonaFieldValueProtocol {
 	public let id: UUID
 	public var value: Value
 
@@ -246,18 +246,18 @@ public struct PersonaFieldOfKind<Value>: Sendable, Hashable, Codable, Identifiab
 
 extension PersonaFieldValueProtocol {
 	public var kind: PersonaFieldKind { Self.kind }
-	public var casePath: CasePath<PersonaFieldValue, Self> { Self.casePath }
+	public var casePath: CasePath<PersonaDataEntry, Self> { Self.casePath }
 
-	public func embed() -> PersonaFieldValue {
+	public func embed() -> PersonaDataEntry {
 		casePath.embed(self)
 	}
 
-	public static func extract(from fieldValue: PersonaFieldValue) -> Self? {
+	public static func extract(from fieldValue: PersonaDataEntry) -> Self? {
 		casePath.extract(from: fieldValue)
 	}
 }
 
-extension PersonaFieldValue {
+extension PersonaDataEntry {
 	public func extract<F>(_ type: F.Type = F.self) -> F? where F: PersonaFieldValueProtocol {
 		F.extract(from: self)
 	}
@@ -276,7 +276,7 @@ public struct IncorrectPersonaFieldType: Swift.Error {
 	public let actualKind: PersonaFieldKind
 }
 
-extension PersonaFieldValue.Name {
+extension PersonaDataEntry.Name {
 	public var valueForDapp: String {
 		let components: [String?] = {
 			switch variant {
@@ -288,16 +288,16 @@ extension PersonaFieldValue.Name {
 	}
 }
 
-// MARK: - PersonaFieldValue.EmailAddress + ExpressibleByStringLiteral
-extension PersonaFieldValue.EmailAddress: ExpressibleByStringLiteral {
+// MARK: - PersonaDataEntry.EmailAddress + ExpressibleByStringLiteral
+extension PersonaDataEntry.EmailAddress: ExpressibleByStringLiteral {
 	public init(stringLiteral value: String) {
 		try! self.init(validating: value)
 	}
 }
 
-// MARK: - Persona.PersonaData.FieldCollectionOf + ExpressibleByArrayLiteral
-extension Persona.PersonaData.FieldCollectionOf: ExpressibleByArrayLiteral {
-	public init(arrayLiteral elements: PersonaFieldOfKind<Value>...) {
+// MARK: - Persona.PersonaData.EntryCollectionOf + ExpressibleByArrayLiteral
+extension Persona.PersonaData.EntryCollectionOf: ExpressibleByArrayLiteral {
+	public init(arrayLiteral elements: PersonaDataEntryOfKind<Value>...) {
 		try! self.init(collection: .init(uncheckedUniqueElements: elements))
 	}
 }
@@ -458,7 +458,7 @@ final class PersonaFieldTests: TestCase {
 						)
 					),
 					postalAddresses: [[
-						.zipNumber(11129),
+						.postalCodeNumber(11129),
 						.city("Stockholm"),
 						.streetLine0("Västerlånggatan 31"),
 						.streetLine1(""),
@@ -469,7 +469,7 @@ final class PersonaFieldTests: TestCase {
 
 			let addresses = try dappRequest(values: \.postalAddresses, from: persona)
 			XCTAssertEqual(addresses[0], [
-				.zipNumber(11129),
+				.postalCodeNumber(11129),
 				.city("Stockholm"),
 				.streetLine0("Västerlånggatan 31"),
 				.streetLine1(""),
@@ -479,32 +479,32 @@ final class PersonaFieldTests: TestCase {
 	}
 }
 
-// MARK: - PersonaFieldValue.PostalAddress + ExpressibleByArrayLiteral
-extension PersonaFieldValue.PostalAddress: ExpressibleByArrayLiteral {
-	public init(arrayLiteral elements: PersonaFieldValue.PostalAddress.Field...) {
-		self.init(unchecked: .init(uncheckedUniqueElements: elements))
+// MARK: - PersonaDataEntry.PostalAddress + ExpressibleByArrayLiteral
+extension PersonaDataEntry.PostalAddress: ExpressibleByArrayLiteral {
+	public init(arrayLiteral elements: PersonaDataEntry.PostalAddress.Field...) {
+		try! self.init(validating: .init(uncheckedUniqueElements: elements))
 	}
 }
 
-// MARK: - PersonaFieldOfKind + ExpressibleByArrayLiteral
-extension PersonaFieldOfKind<PersonaFieldValue.PostalAddress>: ExpressibleByArrayLiteral {
-	public init(arrayLiteral elements: PersonaFieldValue.PostalAddress.Field...) {
-		self.init(value: .init(unchecked: .init(uncheckedUniqueElements: elements)))
+// MARK: - PersonaDataEntryOfKind + ExpressibleByArrayLiteral
+extension PersonaDataEntryOfKind<PersonaDataEntry.PostalAddress>: ExpressibleByArrayLiteral {
+	public init(arrayLiteral elements: PersonaDataEntry.PostalAddress.Field...) {
+		try! self.init(value: .init(validating: .init(uncheckedUniqueElements: elements)))
 	}
 }
 
 private extension PersonaFieldTests {
 	func dappRequest<Kind: PersonaFieldValueProtocol>(
-		values keyPath: KeyPath<Persona.PersonaData, Persona.PersonaData.FieldCollectionOf<Kind>>,
+		values keyPath: KeyPath<Persona.PersonaData, Persona.PersonaData.EntryCollectionOf<Kind>>,
 		from persona: Persona
-	) throws -> Persona.PersonaData.FieldCollectionOf<Kind> {
+	) throws -> Persona.PersonaData.EntryCollectionOf<Kind> {
 		persona.personaData[keyPath: keyPath]
 	}
 
 	func dappRequest<Kind: PersonaFieldValueProtocol>(
-		value keyPath: KeyPath<Persona.PersonaData, PersonaFieldOfKind<Kind>?>,
+		value keyPath: KeyPath<Persona.PersonaData, PersonaDataEntryOfKind<Kind>?>,
 		from persona: Persona
-	) throws -> PersonaFieldOfKind<Kind> {
+	) throws -> PersonaDataEntryOfKind<Kind> {
 		guard let field = persona.personaData[keyPath: keyPath] else {
 			throw NoSuchField()
 		}

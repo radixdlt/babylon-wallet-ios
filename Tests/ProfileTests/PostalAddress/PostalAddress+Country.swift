@@ -1,6 +1,6 @@
 import Foundation
 
-extension PersonaFieldValue.PostalAddress {
+extension PersonaDataEntry.PostalAddress {
 	public enum Country: String, Sendable, Hashable, Codable {
 		case afghanistan
 		case argentina
