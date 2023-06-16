@@ -267,7 +267,8 @@ public enum PersonaFieldValue: Sendable, Hashable, Codable, BasePersonaFieldValu
 
 				case zipNumber
 				case city
-				case district
+				case districtNumber
+				case districtString
 				case neighbourhood
 
 				/// Colombia
@@ -291,18 +292,15 @@ public enum PersonaFieldValue: Sendable, Hashable, Codable, BasePersonaFieldValu
 				public var display: String {
 					switch self {
 					case .country: return "Country"
-					case .streetLine0: return "Street"
-					case .streetLine1: return "Street"
-					case .postalCodeString: return "Postal code"
-					case .postalCodeNumber: return "Postal code"
-					case .postcodeString: return "Postcode"
-					case .postcodeNumber: return "Postcode"
+					case .streetLine0, .streetLine1: return "Street"
+					case .postalCodeString, .postalCodeNumber: return "Postal code"
+					case .postcodeString, .postcodeNumber: return "Postcode"
 					case .zipNumber: return "ZIP"
 					case .prefectureLevelCity: return "Prefecture-level City"
 					case .city: return "City"
 					case .state: return "State"
 					case .governorate: return "Governorate"
-					case .district: return "District"
+					case .districtString, .districtNumber: return "District"
 					case .neighbourhood: return "Neighbourhood"
 					case .suburb: return "Suburb"
 					case .province: return "Province"
@@ -313,8 +311,7 @@ public enum PersonaFieldValue: Sendable, Hashable, Codable, BasePersonaFieldValu
 					case .prefecture: return "Prefecture"
 					case .county: return "County"
 					case .township: return "Township"
-					case .furtherDivisionsLine0: return "Further Divisions"
-					case .furtherDivisionsLine1: return "Further Divisions"
+					case .furtherDivisionsLine0, .furtherDivisionsLine1: return "Further Divisions"
 					}
 				}
 			}
@@ -353,7 +350,10 @@ public enum PersonaFieldValue: Sendable, Hashable, Codable, BasePersonaFieldValu
 			case governorate
 
 			/// Hong Kong
-			case district(String)
+			case districtString(String)
+
+			/// Macao
+			case districtNumber(Int)
 
 			/// Hong Kong
 			case region(String)
@@ -385,14 +385,14 @@ public enum PersonaFieldValue: Sendable, Hashable, Codable, BasePersonaFieldValu
 
 			public var keyboardType: UIKeyboardType {
 				switch self {
-				case .zipNumber, .postalCodeNumber, .postcodeNumber: return .numbersAndPunctuation
+				case .zipNumber, .postalCodeNumber, .postcodeNumber, .districtNumber: return .numbersAndPunctuation
 				default: return .default
 				}
 			}
 
 			public var valueType: any InitializableFromInputString.Type {
 				switch self {
-				case .zipNumber, .postalCodeNumber, .postcodeNumber: return Int.self
+				case .zipNumber, .postalCodeNumber, .postcodeNumber, .districtNumber: return Int.self
 				case .country: return Country.self
 				default: return String.self
 				}
@@ -413,7 +413,8 @@ public enum PersonaFieldValue: Sendable, Hashable, Codable, BasePersonaFieldValu
 
 				case .city: return .city
 				case .state: return .state
-				case .district: return .district
+				case .districtNumber: return .districtNumber
+				case .districtString: return .districtString
 				case .neighbourhood: return .neighbourhood
 				case .suburb: return .suburb
 				case .province: return .province
@@ -460,6 +461,7 @@ public enum PersonaFieldValue: Sendable, Hashable, Codable, BasePersonaFieldValu
 			case bosniaAndHerzegovinia
 			case bulgaria
 			case brazil
+			case bruneiDarussalam
 			case canada
 			case cameroon
 			case china
@@ -491,10 +493,12 @@ public enum PersonaFieldValue: Sendable, Hashable, Codable, BasePersonaFieldValu
 			case japan
 			case kazakhstan
 			case kenya
+			case kuwait
 			case latvia
 			case liechtenstein
 			case lithuania
 			case luxembourg
+			case macao
 			case madagascar
 			case malaysia
 			case malta
@@ -516,6 +520,7 @@ public enum PersonaFieldValue: Sendable, Hashable, Codable, BasePersonaFieldValu
 			case philippines
 			case poland
 			case peru
+			case qatar
 			case romania
 			case russia
 			case saudiArabia
@@ -669,6 +674,14 @@ public enum PersonaFieldValue: Sendable, Hashable, Codable, BasePersonaFieldValu
 						[.country],
 					]
 
+				case .bruneiDarussalam:
+					return [
+						[.streetLine0],
+						[.streetLine1],
+						[.city, .postalCodeNumber],
+						[.country],
+					]
+
 				case .bulgaria:
 					return [
 						[.streetLine0],
@@ -698,7 +711,7 @@ public enum PersonaFieldValue: Sendable, Hashable, Codable, BasePersonaFieldValu
 						[.country],
 						[.province],
 						[.prefectureLevelCity],
-						[.district],
+						[.districtString],
 						[.streetLine0],
 						[.streetLine1],
 						[.postalCodeNumber],
@@ -756,7 +769,7 @@ public enum PersonaFieldValue: Sendable, Hashable, Codable, BasePersonaFieldValu
 					return [
 						[.streetLine0],
 						[.streetLine1],
-						[.district],
+						[.districtString],
 						[.governorate],
 						[.country],
 					]
@@ -827,7 +840,7 @@ public enum PersonaFieldValue: Sendable, Hashable, Codable, BasePersonaFieldValu
 				case .hongKong:
 					return [
 						[.country],
-						[.region, .district],
+						[.region, .districtString],
 						[.streetLine0],
 						[.streetLine1],
 					]
@@ -921,7 +934,7 @@ public enum PersonaFieldValue: Sendable, Hashable, Codable, BasePersonaFieldValu
 						[.streetLine0],
 						[.streetLine1],
 						[.city],
-						[.district],
+						[.districtString],
 						[.region],
 						[.country],
 						[.postalCodeNumber],
@@ -932,6 +945,15 @@ public enum PersonaFieldValue: Sendable, Hashable, Codable, BasePersonaFieldValu
 						[.streetLine1],
 						[.city],
 						[.postalCodeNumber],
+						[.country],
+					]
+
+				case .kuwait:
+					return [
+						[.streetLine0],
+						[.streetLine1],
+						[.postalCodeNumber, .city],
+						[.province],
 						[.country],
 					]
 
@@ -962,6 +984,14 @@ public enum PersonaFieldValue: Sendable, Hashable, Codable, BasePersonaFieldValu
 						[.streetLine1],
 						[.postalCodeNumber, .city],
 						[.country],
+					]
+
+				case .macao:
+					return [
+						[.country],
+						[.districtNumber, .city],
+						[.streetLine0],
+						[.streetLine1],
 					]
 
 				case .madagascar:
@@ -1116,7 +1146,7 @@ public enum PersonaFieldValue: Sendable, Hashable, Codable, BasePersonaFieldValu
 					return [
 						[.streetLine0],
 						[.streetLine1],
-						[.district, .postalCodeNumber],
+						[.districtString, .postalCodeNumber],
 						[.city, .country],
 					]
 
@@ -1129,6 +1159,14 @@ public enum PersonaFieldValue: Sendable, Hashable, Codable, BasePersonaFieldValu
 					]
 
 				case .poland:
+					return [
+						[.streetLine0],
+						[.streetLine1],
+						[.postalCodeNumber, .city],
+						[.country],
+					]
+
+				case .qatar:
 					return [
 						[.streetLine0],
 						[.streetLine1],
@@ -1166,7 +1204,7 @@ public enum PersonaFieldValue: Sendable, Hashable, Codable, BasePersonaFieldValu
 					return [
 						[.streetLine0],
 						[.streetLine1],
-						[.district],
+						[.districtString],
 						[.city, .postalCodeNumber],
 						[.country],
 					]
@@ -1275,7 +1313,7 @@ public enum PersonaFieldValue: Sendable, Hashable, Codable, BasePersonaFieldValu
 					return [
 						[.streetLine0],
 						[.streetLine1],
-						[.district],
+						[.districtString],
 						[.province, .postalCodeNumber],
 						[.country],
 					]
@@ -1284,7 +1322,7 @@ public enum PersonaFieldValue: Sendable, Hashable, Codable, BasePersonaFieldValu
 					return [
 						[.streetLine0],
 						[.streetLine1],
-						[.postalCodeNumber, .district],
+						[.postalCodeNumber, .districtString],
 						[.city, .country],
 					]
 
