@@ -111,6 +111,38 @@ extension Persona.PersonaData.FieldCollectionOf: RandomAccessCollection {
 	}
 }
 
+// MARK: - InitializableFromInputString
+public protocol InitializableFromInputString: Sendable, Codable, Hashable {
+	init?(_ input: String)
+}
+
+// MARK: - String + InitializableFromInputString
+extension String: InitializableFromInputString {
+	public init?(_ input: String) {
+		self = input
+	}
+}
+
+// MARK: - Int + InitializableFromInputString
+extension Int: InitializableFromInputString {
+	public init?(_ input: String) {
+		guard let int = Self(input) else {
+			return nil
+		}
+		self = int
+	}
+}
+
+// MARK: - PersonaFieldValue.PostalAddress.Country + InitializableFromInputString
+extension PersonaFieldValue.PostalAddress.Country: InitializableFromInputString {
+	public init?(_ input: String) {
+		guard let country = Self(rawValue: input) else {
+			return nil
+		}
+		self = country
+	}
+}
+
 extension Persona.PersonaData {
 	public var all: OrderedSet<PersonaField> {
 		.init(uncheckedUniqueElements: [
@@ -302,10 +334,18 @@ public enum PersonaFieldValue: Sendable, Hashable, Codable, BasePersonaFieldValu
 			/// China
 			case prefectureLevelCity(String)
 
-			public var valueType: UIKeyboardType {
+			public var keyboardType: UIKeyboardType {
 				switch self {
 				case .zipNumber, .postalCodeNumber, .postcodeNumber: return .numbersAndPunctuation
 				default: return .default
+				}
+			}
+
+			public var valueType: any InitializableFromInputString.Type {
+				switch self {
+				case .zipNumber, .postalCodeNumber, .postcodeNumber: return Int.self
+				case .country: return Country.self
+				default: return String.self
 				}
 			}
 
