@@ -170,6 +170,13 @@ extension SpecificAddress: Codable {
 	}
 }
 
+// MARK: - SpecificAddress + CustomStringConvertible
+extension SpecificAddress: CustomStringConvertible {
+	public var description: String {
+		address
+	}
+}
+
 extension SpecificAddress {
 	public func asGeneral() -> Address {
 		.init(address: address, decodedKind: decodedKind)

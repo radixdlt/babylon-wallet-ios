@@ -82,3 +82,13 @@ private func _testTransaction(
 		compiledNotarizedTransactionIntent: compiledNotarizedTransactionIntent
 	)
 }
+
+import Foundation
+
+public func resource(
+	named fileName: String,
+	extension fileExtension: String
+) throws -> Data {
+	let fileURL = Bundle.module.url(forResource: fileName, withExtension: fileExtension)
+	return try Data(contentsOf: fileURL!)
+}
