@@ -165,6 +165,7 @@ extension PersonaFieldValue.PostalAddress {
 		case sanMarino
 		case senegal
 		case serbia
+		case seychelles
 		case singapore
 		case sierraLeone
 		case slovakia

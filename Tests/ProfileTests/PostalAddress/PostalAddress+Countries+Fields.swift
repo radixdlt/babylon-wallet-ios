@@ -1206,6 +1206,15 @@ extension PersonaFieldValue.PostalAddress.Country {
 				[.postalCodeNumber, .city],
 				[.country],
 			]
+
+		case .seychelles:
+			return [
+				[.streetLine0],
+				[.streetLine1],
+				[.city],
+				[.country],
+			]
+
 		case .singapore:
 			return [
 				[.streetLine0],
