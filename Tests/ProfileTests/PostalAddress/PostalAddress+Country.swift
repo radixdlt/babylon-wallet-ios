@@ -1,17 +1,6 @@
 import Foundation
 
 extension PersonaFieldValue.PostalAddress {
-	/// The research house found that the top destination for crypto adoption is (in order):
-	/// Australia,
-	/// US
-	/// Brazil,
-	/// United Arab Emirates (UAE),
-	/// Hong Kong
-	/// Taiwan
-	/// India,
-	/// Canada
-	/// Turkey
-	/// Singapore
 	public enum Country: String, Sendable, Hashable, Codable {
 		case afghanistan
 		case argentina
