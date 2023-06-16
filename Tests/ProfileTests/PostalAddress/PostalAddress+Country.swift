@@ -32,6 +32,7 @@ extension PersonaFieldValue.PostalAddress {
 		case brazil
 		case bruneiDarussalam
 		case canada
+		case cambodia
 		case cameroon
 		case chile
 		case china

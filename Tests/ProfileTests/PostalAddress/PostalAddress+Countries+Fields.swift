@@ -149,6 +149,14 @@ extension PersonaFieldValue.PostalAddress.Country {
 				[.country],
 			]
 
+		case .cambodia:
+			return [
+				[.streetLine0],
+				[.streetLine1],
+				[.city, .postcodeNumber],
+				[.country],
+			]
+
 		case .cameroon:
 			return [
 				[.streetLine0],
