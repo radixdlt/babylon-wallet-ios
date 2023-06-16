@@ -1,4 +1,5 @@
-import Foundation
+import CasePaths
+import Prelude
 
 extension PersonaDataEntry {
 	public struct EmailAddress: Sendable, Hashable, Codable, PersonaFieldValueProtocol {
