@@ -159,7 +159,7 @@ extension Profile.Network.Persona {
 import Cryptography
 import EngineToolkit
 extension Profile.Network.Persona {
-	public static func deriveAddress(
+	public static func deriveVirtualAddress(
 		networkID: NetworkID,
 		factorInstance: HierarchicalDeterministicFactorInstance
 	) throws -> EntityAddress {

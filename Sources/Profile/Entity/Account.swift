@@ -111,7 +111,7 @@ extension Profile.Network.Account {
 
 	public static let nameMaxLength = 30
 
-	public static func deriveAddress(
+	public static func deriveVirtualAddress(
 		networkID: NetworkID,
 		factorInstance: HierarchicalDeterministicFactorInstance
 	) throws -> EntityAddress {

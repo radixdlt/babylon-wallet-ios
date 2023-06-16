@@ -25,7 +25,6 @@ public enum GeneralAddressKind: SpecificAddressKind {
 
 // MARK: - ResourceAddressKind
 public enum ResourceAddressKind: SpecificAddressKind {
-	// Is this valid? to check
 	public static let addressSpace: Set<AddressKind> = [.globalFungibleResourceManager, .globalNonFungibleResourceManager]
 }
 

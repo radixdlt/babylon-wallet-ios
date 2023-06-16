@@ -26,48 +26,10 @@ extension ValuesBuilder {
 	public static func buildBlock(_ value: any ValueProtocol) -> [any ValueProtocol] {
 		[value]
 	}
-
-	#if swift(<5.8)
-	public static func buildBlock(_ value: any ValueProtocol) -> any ValueProtocol {
-		value
-	}
-	#endif
 }
-
-#if swift(<5.8)
-
-// MARK: - SpecificValuesBuilder
-@resultBuilder
-public struct SpecificValuesBuilder {}
-extension SpecificValuesBuilder {
-	public static func buildBlock(_ values: ManifestASTValue...) -> [ManifestASTValue] {
-		values
-	}
-
-	public static func buildBlock(_ value: ManifestASTValue) -> [ManifestASTValue] {
-		[value]
-	}
-
-	public static func buildBlock(_ value: ManifestASTValue) -> ManifestASTValue {
-		value
-	}
-}
-
-#endif
 
 extension ExpressibleByRadixEngineValues {
 	public init(@ValuesBuilder buildValues: () throws -> [any ValueProtocol]) rethrows {
 		try self.init(buildValues())
 	}
-
-	#if swift(<5.8)
-	public init(@SpecificValuesBuilder buildValues: () throws -> [ManifestASTValue]) rethrows {
-		try self.init(values: buildValues())
-	}
-
-	public init(@SpecificValuesBuilder buildValue: () throws -> ManifestASTValue) rethrows {
-		try self.init(values: [buildValue()])
-	}
-
-	#endif
 }

@@ -46,15 +46,6 @@ public struct Enum: ValueProtocol, Sendable, Codable, Hashable {
 	) rethrows {
 		try self.init(variant, fields: fields().map { $0.embedValue() })
 	}
-
-	#if swift(<5.8)
-	public init(
-		_ variant: EnumDiscriminator,
-		@SpecificValuesBuilder fields: () throws -> [ManifestASTValue]
-	) rethrows {
-		try self.init(variant, fields: fields())
-	}
-	#endif
 }
 
 extension Enum {

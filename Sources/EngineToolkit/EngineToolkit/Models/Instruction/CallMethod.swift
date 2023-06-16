@@ -46,33 +46,6 @@ public struct CallMethod: InstructionProtocol {
 			arguments: buildValues().map { $0.embedValue() }
 		)
 	}
-
-	#if swift(<5.8)
-	public init(
-		receiver: ComponentAddress,
-		methodName: String,
-		@SpecificValuesBuilder buildValues: () throws -> [ManifestASTValue]
-	) rethrows {
-		try self.init(
-			receiver: receiver,
-			methodName: methodName,
-			arguments: buildValues()
-		)
-	}
-
-	public init(
-		receiver: ComponentAddress,
-		methodName: String,
-		@SpecificValuesBuilder buildValue: () throws -> ManifestASTValue
-	) rethrows {
-		try self.init(
-			receiver: receiver,
-			methodName: methodName,
-			arguments: [buildValue()]
-		)
-	}
-
-	#endif
 }
 
 extension CallMethod {

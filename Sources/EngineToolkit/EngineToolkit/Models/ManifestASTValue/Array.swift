@@ -31,18 +31,6 @@ public struct Array_: ValueProtocol, Sendable, Codable, Hashable {
 			elements: buildValues().map { $0.embedValue() }
 		)
 	}
-
-	#if swift(<5.8)
-	public init(
-		elementKind: ManifestASTValueKind,
-		@SpecificValuesBuilder buildValues: () throws -> [ManifestASTValue]
-	) throws {
-		try self.init(
-			elementKind: elementKind,
-			elements: buildValues()
-		)
-	}
-	#endif
 }
 
 // MARK: Array_.Error
