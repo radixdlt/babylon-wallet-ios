@@ -106,6 +106,14 @@ extension PersonaFieldValue.PostalAddress.Country {
 				[.country],
 			]
 
+		case .benin:
+			return [
+				[.streetLine0],
+				[.streetLine1],
+				[.city],
+				[.country],
+			]
+
 		case .bolivia:
 			return [
 				[.streetLine0],
@@ -119,6 +127,14 @@ extension PersonaFieldValue.PostalAddress.Country {
 				[.streetLine0],
 				[.streetLine1],
 				[.postalCodeNumber, .city],
+				[.country],
+			]
+
+		case .botswana:
+			return [
+				[.streetLine0],
+				[.streetLine1],
+				[.city],
 				[.country],
 			]
 
@@ -149,6 +165,22 @@ extension PersonaFieldValue.PostalAddress.Country {
 				[.country],
 			]
 
+		case .burkinaFaso:
+			return [
+				[.streetLine0],
+				[.streetLine1],
+				[.city, .postalCodeNumber],
+				[.country],
+			]
+
+		case .burundi:
+			return [
+				[.streetLine0],
+				[.streetLine1],
+				[.city],
+				[.country],
+			]
+
 		case .cambodia:
 			return [
 				[.streetLine0],
@@ -170,6 +202,30 @@ extension PersonaFieldValue.PostalAddress.Country {
 				[.streetLine1],
 				[.city],
 				[.province, .postalCodeString],
+				[.country],
+			]
+
+		case .capeVerde:
+			return [
+				[.streetLine0],
+				[.streetLine1],
+				[.postalCodeNumber, .city],
+				[.country],
+			]
+
+		case .centralAfricanRepublic:
+			return [
+				[.streetLine0],
+				[.streetLine1],
+				[.city],
+				[.country],
+			]
+
+		case .chad:
+			return [
+				[.streetLine0],
+				[.streetLine1],
+				[.city],
 				[.country],
 			]
 
@@ -198,6 +254,14 @@ extension PersonaFieldValue.PostalAddress.Country {
 				[.streetLine1],
 				[.city, .postalCodeNumber],
 				[.department],
+				[.country],
+			]
+
+		case .comoros:
+			return [
+				[.streetLine0],
+				[.streetLine1],
+				[.city],
 				[.country],
 			]
 
@@ -240,6 +304,14 @@ extension PersonaFieldValue.PostalAddress.Country {
 				[.country],
 			]
 
+		case .djibouti:
+			return [
+				[.streetLine0],
+				[.streetLine1],
+				[.city],
+				[.country],
+			]
+
 		case .ecuador:
 			return [
 				[.streetLine0],
@@ -258,11 +330,36 @@ extension PersonaFieldValue.PostalAddress.Country {
 				[.country],
 			]
 
+		case .equatorialGuinea:
+			return [
+				[.streetLine0],
+				[.streetLine1],
+				[.city],
+				[.country],
+			]
+
+		case .eritrea:
+			return [
+				[.streetLine0],
+				[.streetLine1],
+				[.city],
+				[.country],
+			]
+
 		case .estonia:
 			return [
 				[.streetLine0],
 				[.streetLine1],
 				[.postalCodeNumber, .city],
+				[.country],
+			]
+
+		case .eswatini:
+			return [
+				[.streetLine0],
+				[.streetLine1],
+				[.city],
+				[.postalCodeNumber],
 				[.country],
 			]
 
@@ -298,6 +395,22 @@ extension PersonaFieldValue.PostalAddress.Country {
 				[.country],
 			]
 
+		case .gabon:
+			return [
+				[.streetLine0],
+				[.streetLine1],
+				[.postalCodeNumber, .city],
+				[.country],
+			]
+
+		case .gambia:
+			return [
+				[.streetLine0],
+				[.streetLine1],
+				[.city],
+				[.country],
+			]
+
 		case .georgia:
 			return [
 				[.streetLine0],
@@ -322,6 +435,22 @@ extension PersonaFieldValue.PostalAddress.Country {
 			]
 
 		case .greece:
+			return [
+				[.streetLine0],
+				[.streetLine1],
+				[.postalCodeNumber, .city],
+				[.country],
+			]
+
+		case .guinea:
+			return [
+				[.streetLine0],
+				[.streetLine1],
+				[.postalCodeNumber, .city],
+				[.country],
+			]
+
+		case .guineaBissau:
 			return [
 				[.streetLine0],
 				[.streetLine1],
@@ -498,6 +627,30 @@ extension PersonaFieldValue.PostalAddress.Country {
 				[.country],
 			]
 
+		case .lesotho:
+			return [
+				[.streetLine0],
+				[.streetLine1],
+				[.city, .postalCodeNumber],
+				[.country],
+			]
+
+		case .liberia:
+			return [
+				[.streetLine0],
+				[.streetLine1],
+				[.postalCodeNumber, .city],
+				[.country],
+			]
+
+		case .libya:
+			return [
+				[.streetLine0],
+				[.streetLine1],
+				[.city],
+				[.country],
+			]
+
 		case .liechtenstein:
 			return [
 				[.streetLine0],
@@ -535,6 +688,15 @@ extension PersonaFieldValue.PostalAddress.Country {
 				[.postalCodeNumber, .city],
 				[.country],
 			]
+
+		case .malawi:
+			return [
+				[.streetLine0],
+				[.streetLine1],
+				[.city, .postalCodeNumber],
+				[.country],
+			]
+
 		case .malaysia:
 			return [
 				[.streetLine0],
@@ -544,12 +706,37 @@ extension PersonaFieldValue.PostalAddress.Country {
 				[.country],
 			]
 
+		case .mali:
+			return [
+				[.streetLine0],
+				[.streetLine1],
+				[.city],
+				[.country],
+			]
+
 		case .malta:
 			return [
 				[.streetLine0],
 				[.streetLine1],
 				[.city],
 				[.postalCodeNumber],
+				[.country],
+			]
+
+		case .mauritania:
+			return [
+				[.streetLine0],
+				[.streetLine1],
+				[.city],
+				[.country],
+			]
+
+		case .mauritius:
+			return [
+				[.streetLine0],
+				[.streetLine1],
+				[.postalCodeNumber],
+				[.city],
 				[.country],
 			]
 
@@ -623,6 +810,14 @@ extension PersonaFieldValue.PostalAddress.Country {
 				[.streetLine0],
 				[.streetLine1],
 				[.city, .postalCodeNumber],
+				[.country],
+			]
+
+		case .namibia:
+			return [
+				[.streetLine0],
+				[.streetLine1],
+				[.city],
 				[.country],
 			]
 
@@ -760,6 +955,14 @@ extension PersonaFieldValue.PostalAddress.Country {
 				[.country],
 			]
 
+		case .republicOfCongo:
+			return [
+				[.streetLine0],
+				[.streetLine1],
+				[.city],
+				[.country],
+			]
+
 		case .romania:
 			return [
 				[.streetLine0],
@@ -767,6 +970,7 @@ extension PersonaFieldValue.PostalAddress.Country {
 				[.postalCodeNumber, .city],
 				[.country],
 			]
+
 		case .russia:
 			return [
 				[.streetLine0],
@@ -777,12 +981,36 @@ extension PersonaFieldValue.PostalAddress.Country {
 				[.postalCodeNumber],
 			]
 
+		case .reunion:
+			return [
+				[.streetLine0],
+				[.streetLine1],
+				[.postalCodeNumber, .city],
+				[.country],
+			]
+
+		case .rwanda:
+			return [
+				[.streetLine0],
+				[.streetLine1],
+				[.city],
+				[.country],
+			]
+
 		case .sanMarino:
 			return [
 				[.streetLine0],
 				[.streetLine1],
 				[.postalCodeNumber, .city],
 				[.province],
+				[.country],
+			]
+
+		case .senegal:
+			return [
+				[.streetLine0],
+				[.streetLine1],
+				[.postalCodeNumber, .city],
 				[.country],
 			]
 
@@ -810,6 +1038,14 @@ extension PersonaFieldValue.PostalAddress.Country {
 				[.country],
 			]
 
+		case .sierraLeone:
+			return [
+				[.streetLine0],
+				[.streetLine1],
+				[.city],
+				[.country],
+			]
+
 		case .slovakia:
 			return [
 				[.streetLine0],
@@ -822,6 +1058,15 @@ extension PersonaFieldValue.PostalAddress.Country {
 				[.streetLine0],
 				[.streetLine1],
 				[.postalCodeNumber, .city],
+				[.country],
+			]
+
+		case .somalia:
+			return [
+				[.streetLine0],
+				[.streetLine1],
+				[.city],
+				[.region, .postalCodeNumber],
 				[.country],
 			]
 
@@ -843,6 +1088,15 @@ extension PersonaFieldValue.PostalAddress.Country {
 				[.streetLine0],
 				[.streetLine1],
 				[.postalCodeNumber],
+			]
+
+		case .southSudan:
+			return [
+				[.streetLine0],
+				[.streetLine1],
+				[.postalCodeNumber],
+				[.city],
+				[.country],
 			]
 
 		case .spain:
@@ -927,6 +1181,22 @@ extension PersonaFieldValue.PostalAddress.Country {
 				[.streetLine1],
 				[.districtString],
 				[.province, .postalCodeNumber],
+				[.country],
+			]
+
+		case .togo:
+			return [
+				[.streetLine0],
+				[.streetLine1],
+				[.city],
+				[.country],
+			]
+
+		case .tunisia:
+			return [
+				[.streetLine0],
+				[.streetLine1],
+				[.postalCodeNumber, .city],
 				[.country],
 			]
 
@@ -1038,6 +1308,21 @@ extension PersonaFieldValue.PostalAddress.Country {
 				[.streetLine0],
 				[.streetLine1],
 				[.postalCodeNumber, .city],
+				[.country],
+			]
+
+		case .zambia:
+			return [
+				[.streetLine0],
+				[.streetLine1],
+				[.postalCodeNumber, .city],
+				[.country],
+			]
+		case .zimbabwe:
+			return [
+				[.streetLine0],
+				[.streetLine1],
+				[.city],
 				[.country],
 			]
 		}

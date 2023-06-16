@@ -42,7 +42,7 @@ extension PersonaFieldValue.PostalAddress {
 		/// Macao
 		case districtNumber(Int)
 
-		/// Hong Kong
+		/// Hong Kong, Somalia
 		case region(String)
 
 		/// United Arab Emirates
