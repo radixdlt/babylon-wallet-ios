@@ -426,6 +426,7 @@ public enum PersonaFieldValue: Sendable, Hashable, Codable, BasePersonaFieldValu
 			case japan
 			case nigeria
 			case pakistan
+			case philippines
 			case russia
 			case singapore
 			case sweden
@@ -552,6 +553,14 @@ public enum PersonaFieldValue: Sendable, Hashable, Codable, BasePersonaFieldValu
 						[.streetLine1],
 						[.city, .postalCodeNumber],
 						[.country],
+					]
+
+				case .philippines:
+					return [
+						[.streetLine0],
+						[.streetLine1],
+						[.district, .postalCodeNumber],
+						[.city, .country],
 					]
 
 				case .russia:
