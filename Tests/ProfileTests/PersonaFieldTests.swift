@@ -235,6 +235,7 @@ public enum PersonaFieldValue: Sendable, Hashable, Codable, BasePersonaFieldValu
 				case province
 				case country
 				case region
+				case area
 			}
 
 			case country(Country)
@@ -263,6 +264,9 @@ public enum PersonaFieldValue: Sendable, Hashable, Codable, BasePersonaFieldValu
 			/// Hong Kong
 			case region(String)
 
+			/// United Arab Emirates
+			case area
+
 			public var discriminator: Discriminator {
 				switch self {
 				case .country: return .country
@@ -277,6 +281,7 @@ public enum PersonaFieldValue: Sendable, Hashable, Codable, BasePersonaFieldValu
 				case .suburb: return .suburb
 				case .province: return .province
 				case .region: return .region
+				case .area: return .area
 				}
 			}
 		}
@@ -321,6 +326,12 @@ public enum PersonaFieldValue: Sendable, Hashable, Codable, BasePersonaFieldValu
 
 				case .sweden:
 					return [.streetLine0, .streetLine1, .postalCodeUInt, .city, .country]
+
+				case .unitedStates:
+					return [.streetLine0, .streetLine1, .city, .state, .postalCodeUInt, .country]
+
+				case .unitedArabEmirates:
+					return [.streetLine0, .streetLine1, .area, .city, .country]
 
 				default:
 					return [.streetLine0, .streetLine1, .postalCodeUInt, .city, .state, .country]
