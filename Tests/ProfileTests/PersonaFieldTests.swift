@@ -386,6 +386,7 @@ public enum PersonaFieldValue: Sendable, Hashable, Codable, BasePersonaFieldValu
 		/// Singapore
 		public enum Country: String, Sendable, Hashable, Codable {
 			case australia
+			case bangladesh
 			case brazil
 			case canada
 			case china
@@ -409,6 +410,14 @@ public enum PersonaFieldValue: Sendable, Hashable, Codable, BasePersonaFieldValu
 						[.streetLine1],
 						[.suburb],
 						[.state, .postalCodeNumber],
+						[.country],
+					]
+
+				case .bangladesh:
+					return [
+						[.streetLine0],
+						[.streetLine1],
+						[.city, .postalCodeNumber],
 						[.country],
 					]
 
