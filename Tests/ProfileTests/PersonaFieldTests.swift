@@ -227,17 +227,39 @@ public enum PersonaFieldValue: Sendable, Hashable, Codable, BasePersonaFieldValu
 				case streetLine1
 				case postalCodeString
 				case postalCodeNumber
-				case postcodeNumber // India
-				case zipNumber // US
+				case postcodeNumber
+				case zipNumber
 				case city
 				case district
 				case neighbourhood
 				case suburb
 				case state
 				case province
+				case prefectureLevelCity
 				case country
 				case region
 				case area
+
+				public var display: String {
+					switch self {
+					case .country: return "Street line 1"
+					case .streetLine0: return "Street line 2"
+					case .streetLine1: return "Postal code"
+					case .postalCodeString: return "Postal code"
+					case .postalCodeNumber: return "Postcode"
+					case .postcodeNumber: return "ZIP"
+					case .zipNumber: return "City"
+					case .prefectureLevelCity: return "District"
+					case .city: return "Neighbourhood"
+					case .state: return "Suburb"
+					case .district: return "State"
+					case .neighbourhood: return "Province"
+					case .suburb: return "Prefecture-level City"
+					case .province: return "Country"
+					case .region: return "Region"
+					case .area: return "Area"
+					}
+				}
 			}
 
 			case country(Country)
@@ -276,6 +298,9 @@ public enum PersonaFieldValue: Sendable, Hashable, Codable, BasePersonaFieldValu
 			/// United Arab Emirates
 			case area
 
+			/// China
+			case prefectureLevelCity(String)
+
 			public var discriminator: Discriminator {
 				switch self {
 				case .country: return .country
@@ -285,6 +310,8 @@ public enum PersonaFieldValue: Sendable, Hashable, Codable, BasePersonaFieldValu
 				case .postalCodeNumber: return .postalCodeNumber
 				case .postcodeNumber: return .postcodeNumber
 				case .zipNumber: return .zipNumber
+
+				case .prefectureLevelCity: return .prefectureLevelCity
 
 				case .city: return .city
 				case .state: return .state
@@ -313,6 +340,7 @@ public enum PersonaFieldValue: Sendable, Hashable, Codable, BasePersonaFieldValu
 			case australia
 			case brazil
 			case canada
+			case china
 			case hongKong
 			case india
 			case singapore
@@ -351,6 +379,17 @@ public enum PersonaFieldValue: Sendable, Hashable, Codable, BasePersonaFieldValu
 						[.city],
 						[.province, .postalCodeString],
 						[.country],
+					]
+
+				case .china:
+					return [
+						[.country],
+						[.province],
+						[.prefectureLevelCity],
+						[.district],
+						[.streetLine0],
+						[.streetLine1],
+						[.postalCodeNumber],
 					]
 
 				case .hongKong:
