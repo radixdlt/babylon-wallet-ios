@@ -584,6 +584,15 @@ extension PersonaFieldValue.PostalAddress.Country {
 				[.country],
 			]
 
+		case .newZealand:
+			return [
+				[.streetLine0],
+				[.streetLine1],
+				[.suburb],
+				[.city, .postcodeNumber],
+				[.country],
+			]
+
 		case .niger:
 			return [
 				[.streetLine0],

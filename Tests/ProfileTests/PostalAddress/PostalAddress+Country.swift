@@ -84,6 +84,7 @@ extension PersonaFieldValue.PostalAddress {
 		case myanmar
 		case nepal
 		case netherlands
+		case newZealand
 		case niger
 		case nigeria
 		case northKorea
