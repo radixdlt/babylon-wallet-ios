@@ -231,6 +231,7 @@ public enum PersonaFieldValue: Sendable, Hashable, Codable, BasePersonaFieldValu
 				case neighbourhood
 				case suburb
 				case state
+				case province
 			}
 
 			case streetLine0(String)
@@ -244,10 +245,13 @@ public enum PersonaFieldValue: Sendable, Hashable, Codable, BasePersonaFieldValu
 			case state(String)
 
 			/// Australia
-			case suburb
+			case suburb(String)
 
 			/// Brazil
-			case neighbourhood
+			case neighbourhood(String)
+
+			/// Canada
+			case province(String)
 
 			public var discriminator: Discriminator {
 				switch self {
@@ -259,6 +263,7 @@ public enum PersonaFieldValue: Sendable, Hashable, Codable, BasePersonaFieldValu
 				case .state: return .state
 				case .neighbourhood: return .neighbourhood
 				case .suburb: return .suburb
+				case .province: return .province
 				}
 			}
 		}
@@ -291,10 +296,16 @@ public enum PersonaFieldValue: Sendable, Hashable, Codable, BasePersonaFieldValu
 				switch self {
 				case .australia:
 					return [.streetLine0, .streetLine1, .suburb, .state, .postalCodeUInt]
+
 				case .brazil:
 					return [.streetLine0, .streetLine1, .neighbourhood, .city, .state, .postalCodeUInt]
+
+				case .canada:
+					return [.streetLine0, .streetLine1, .city, .province, .postalCodeString]
+
 				case .sweden:
 					return [.streetLine0, .streetLine1, .postalCodeUInt, .city]
+
 				default:
 					return [.streetLine0, .streetLine1, .postalCodeUInt, .city]
 				}
