@@ -45,7 +45,7 @@ public struct SubmitTransaction: Sendable, FeatureReducer {
 		case submittedButNotCompleted(TXID)
 		case submittedTransactionFailed
 		case committedSuccessfully(TXID)
-		case dismiss
+		case manuallyDismiss
 	}
 
 	@Dependency(\.submitTXClient) var submitTXClient
@@ -67,7 +67,8 @@ public struct SubmitTransaction: Sendable, FeatureReducer {
 				))
 			}
 		case .closeButtonTapped:
-			return .send(.delegate(.dismiss))
+			// FIXME: For some reason, the dismiss dependency does not work here
+			return .send(.delegate(.manuallyDismiss))
 		}
 	}
 
