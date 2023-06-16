@@ -16,15 +16,20 @@ extension PersonaFieldValue.PostalAddress {
 		case afghanistan
 		case argentina
 		case angola
+		case antiguaAndBarbuda
 		case algeria
 		case albania
 		case andorra
 		case armenia
+		case aruba
 		case australia
 		case austria
 		case azerbaijan
+		case bahrain
+		case barbados
 		case bangladesh
 		case belarus
+		case belize
 		case belgium
 		case benin
 		case bolivia
@@ -40,22 +45,28 @@ extension PersonaFieldValue.PostalAddress {
 		case cameroon
 		case capeVerde
 		case centralAfricanRepublic
+		case czechRepublic
 		case chad
 		case chile
 		case china
 		case colombia
 		case comoros
+		case costaRica
 		case croatia
+		case cuba
+		case curacao
 		case cyprus
-		case czechRepublic
 
 		/// aka "Congo-Kinshasa" aka "DRC" (formerly known as "Zaire")
 		case democraticRepublicOfTheCongo
 
 		case denmark
 		case djibouti
+		case dominicanRepublic
+		case dominica
 		case ecuador
 		case egypt
+		case elSalvador
 		case eritrea
 		case equatorialGuinea
 		case estonia
@@ -70,9 +81,14 @@ extension PersonaFieldValue.PostalAddress {
 		case germany
 		case ghana
 		case greece
+		case greenland
+		case grenada
+		case guatemala
 		case guyana
 		case guinea
 		case guineaBissau
+		case haiti
+		case honduras
 		case hongKong
 		case hungary
 		case iceland
@@ -84,6 +100,7 @@ extension PersonaFieldValue.PostalAddress {
 		case italy
 		case ivoryCoast; public static let côteDIvoire: Self = .ivoryCoast
 		case indonesia
+		case jamaica
 		case japan
 		case jordan
 		case kazakhstan
@@ -101,6 +118,7 @@ extension PersonaFieldValue.PostalAddress {
 		case macao
 		case madagascar
 		case malaysia
+		case martinique
 		case mali
 		case malawi
 		case malta
@@ -115,15 +133,17 @@ extension PersonaFieldValue.PostalAddress {
 		case morocco
 		case myanmar
 		case namibia
-		case oman
 		case nepal
 		case netherlands
 		case newZealand
+		case nicaragua
 		case niger
 		case nigeria
 		case northKorea
 		case northMacedonia
 		case norway
+		case oman
+		case panama
 		case papuaNewGuinea
 		case pakistan
 		case palestinianTerritories
@@ -131,6 +151,7 @@ extension PersonaFieldValue.PostalAddress {
 		case peru
 		case philippines
 		case poland
+		case puertoRico
 		case qatar
 
 		/// aka "Congo-Brazzaville" or simply "Congo"
@@ -163,6 +184,7 @@ extension PersonaFieldValue.PostalAddress {
 		case tanzania
 		case thailand
 		case togo
+		case trinidadAndTobago
 		case tunisia
 		case turkey
 		case turkmenistan
