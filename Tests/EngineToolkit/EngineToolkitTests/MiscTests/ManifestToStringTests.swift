@@ -10,8 +10,8 @@ final class ManifestToStringTests: TestCase {
 		debugPrint = false
 		super.setUp()
 	}
-
-	func test_transactionManifest_toString_on_multiple_packages() throws {
+//
+//	func test_transactionManifest_toString_on_multiple_packages() throws {
 //		let packages = [
 //			try (
 //				code: resource(named: "hello", extension: "code"),
@@ -47,16 +47,15 @@ final class ManifestToStringTests: TestCase {
 //		for package in packages {
 //			let manifestInstructions = try TransactionManifest {
 //				try CallMethod(
-//					receiver: .init(validatingAddress: "account_sim1qspjlnwx4gdcazhral74rjgzgysrslf8ngrfmprecrrss3p9md"),
+//					receiver: .init(validatingAddress: "account_sim1cyvgx33089ukm2pl97pv4max0x40ruvfy4lt60yvya744cve475w0q"),
 //					methodName: "lock_fee"
 //				) { Decimal_(value: "100") }
 //
 //				try PublishPackage(
 //					code: Blob(data: blake2b(data: package.code)),
-//					schema: Bytes(data: blake2b(data: package.schema)),
+//					schema: Bytes(bytes: blake2b(data: package.schema).bytes),
 //					royaltyConfig: Map_(keyKind: .string, valueKind: .tuple, entries: []),
-//					metadata: Map_(keyKind: .string, valueKind: .string, entries: []),
-//					accessRules: accessRules
+//					metadata: Map_(keyKind: .string, valueKind: .string, entries: [])
 //				)
 //			}.instructions
 //
@@ -72,11 +71,11 @@ final class ManifestToStringTests: TestCase {
 //				XCTAssertNoThrow(try sut.convertManifest(request: ConvertManifestRequest(
 //					manifest: transactionManifest,
 //					outputFormat: outputInstructionKind,
-//					networkId: 0xF2
-//				)).get().toString(networkID: 0xF2))
+//					networkId: .simulator
+//				)).get().toString(networkID: .simulator))
 //			}
 //		}
-	}
+//	}
 }
 
 public func resource(

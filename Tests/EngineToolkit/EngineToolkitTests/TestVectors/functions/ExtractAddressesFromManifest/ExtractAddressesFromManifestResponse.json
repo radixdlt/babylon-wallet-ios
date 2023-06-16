@@ -1,0 +1,11 @@
+{
+  "package_addresses": [],
+  "component_addresses": [],
+  "resource_addresses": [],
+  "account_addresses": [],
+  "accounts_requiring_auth": [],
+  "accounts_withdrawn_from": [],
+  "accounts_deposited_into": [],
+  "identity_addresses": [],
+  "identities_requiring_auth": []
+}

@@ -74,28 +74,6 @@ public indirect enum ManifestASTValue: Sendable, Codable, Hashable {
 	case blob(Blob)
 	case expression(ManifestExpression)
 	case bytes(Bytes)
-
-	func uint8() throws -> UInt8 {
-		guard case let .u8(uInt8) = self else {
-			throw InternalDecodingFailure.valueTypeDiscriminatorMismatch(
-				expected: UInt8.kind,
-				butGot: kind
-			)
-		}
-
-		return uInt8
-	}
-
-	func map() throws -> Map_ {
-		guard case let .map(map) = self else {
-			throw InternalDecodingFailure.valueTypeDiscriminatorMismatch(
-				expected: Map_.kind,
-				butGot: kind
-			)
-		}
-
-		return map
-	}
 }
 
 // MARK: - ModelValueKind

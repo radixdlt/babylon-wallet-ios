@@ -64,6 +64,13 @@ extension Radix.Gateway {
 			url: URL(string: "https://mardunet-gateway.radixdlt.com")!
 		)
 	}
+
+	public static var simulator: Self {
+		.init(
+			network: .simulator,
+			url: URL(string: "https://mardunet-gateway.radixdlt.com")!
+		)
+	}
 }
 
 extension Radix.Gateway {

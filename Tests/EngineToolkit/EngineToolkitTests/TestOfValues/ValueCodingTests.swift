@@ -13,11 +13,13 @@ final class ValueEncodingTests: TestCase {
 		// load all manifests
 		let decoder = JSONDecoder()
 		let encoder = JSONEncoder()
-		let testValues = try decoder.decode([ManifestASTValue].self, from: resource(named: "ManifestAstValue", extension: "json"))
+		let testValues = try decoder.decode(
+			[ManifestASTValue].self,
+			from: resource(named: "ManifestAstValue", extension: "json")
+		)
 
 		// roundtrip encode/decode
 		let encoded = try encoder.encode(testValues)
-		let str = String(data: encoded, encoding: .utf8)
 		let decoded = try decoder.decode([ManifestASTValue].self, from: encoded)
 
 		XCTAssertEqual(testValues, decoded)

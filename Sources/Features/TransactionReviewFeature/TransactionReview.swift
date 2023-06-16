@@ -621,14 +621,14 @@ extension TransactionReview {
 		componentAddress: ComponentAddress,
 		resourcesQuantifer: ResourceQuantifier,
 		userAccounts: [Account],
-		createdEntities: CreatedEntitities?,
+		createdEntities: NewlyCreated?,
 		container: inout [Account: [Transfer]],
 		networkID: NetworkID,
 		type: TransferType
 	) async throws {
 		let account = userAccounts.first { $0.address.address == componentAddress.address }! // TODO: Handle
 		func addTransfer(_ resourceAddress: ResourceAddress, amount: BigDecimal) async throws {
-			let isNewResources = createdEntities?.resourceAddresses.contains(resourceAddress) ?? false
+			let isNewResources = false // createdEntities?.resourceAddresses.contains(resourceAddress) ?? false
 
 			func getMetadata(address: String) async throws -> GatewayAPI.EntityMetadataCollection? {
 				guard !isNewResources else { return nil }

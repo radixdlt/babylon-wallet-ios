@@ -64,7 +64,7 @@ extension EngineToolkitClient {
 				receiver: componentAddress,
 				methodName: "deposit_batch"
 			) {
-				Expression(.entireWorktop)
+				ManifestExpression.entireWorktop
 			},
 		]
 
@@ -159,7 +159,7 @@ extension EngineToolkitClient {
 		] + tokens +
 			[
 				CallMethod(receiver: accountAddress.asComponentAddress, methodName: "deposit_batch") {
-					Expression(.entireWorktop)
+					ManifestExpression.entireWorktop
 				},
 			]
 
@@ -204,7 +204,7 @@ extension EngineToolkitClient {
 			),
 
 			CallMethod(receiver: accountAddress.asComponentAddress, methodName: "deposit_batch") {
-				Expression(.entireWorktop)
+				ManifestExpression.entireWorktop
 			},
 		]
 
@@ -258,7 +258,7 @@ extension EngineToolkitClient {
 			),
 
 			CallMethod(receiver: accountAddress.asComponentAddress, methodName: "deposit_batch") {
-				Expression(.entireWorktop)
+				ManifestExpression.entireWorktop
 			},
 		]
 
@@ -322,7 +322,7 @@ extension EngineToolkitClient {
 		}
 
 		let instructions: [any InstructionProtocol] = [lockFeeCallMethod(address: faucetAddress)] + tokens + [CallMethod(receiver: accountAddress.asComponentAddress, methodName: "deposit_batch") {
-			Expression(.entireWorktop)
+			ManifestExpression.entireWorktop
 		}]
 
 		return TransactionManifest(instructions: .parsed(instructions.map { $0.embed() }))

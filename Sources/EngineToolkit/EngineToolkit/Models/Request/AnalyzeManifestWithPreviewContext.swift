@@ -28,7 +28,7 @@ public struct AnalyzeTransactionExecutionResponse: Sendable, Decodable, Hashable
 	public let accountProofResources: Set<ResourceAddress>
 	public let accountWithdraws: [AccountWithdraw]
 	public let accountDeposits: [AccountDeposit]
-	public let newlyCreated: CreatedEntitities?
+	public let newlyCreated: NewlyCreated?
 
 	enum CodingKeys: String, CodingKey {
 		case encounteredAddresses = "encountered_addresses"
@@ -103,17 +103,19 @@ public enum AccountDeposit: Sendable, Decodable, Hashable {
 	}
 }
 
-// MARK: - CreatedEntitities
-public struct CreatedEntitities: Sendable, Decodable, Hashable {
-	public let componentAddresses: Set<ComponentAddress>
-	public let resourceAddresses: Set<ResourceAddress>
-	public let packageAddresses: Set<PackageAddress>
+// MARK: - NewlyCreated
+public struct NewlyCreated: Sendable, Decodable, Hashable {
+	public var resources: [NewlyCreatedResources]
+}
 
-	enum CodingKeys: String, CodingKey {
-		case componentAddresses = "component_addresses"
-		case resourceAddresses = "resource_addresses"
-		case packageAddresses = "package_addresses"
+// MARK: - NewlyCreatedResources
+public struct NewlyCreatedResources: Sendable, Decodable, Hashable {
+	public struct MetadataKeyValue: Sendable, Decodable, Hashable {
+		public let key: String
+		public let value: MetadataValue
 	}
+
+	public var metadata: [MetadataKeyValue]
 }
 
 // MARK: - ResourceQuantifier

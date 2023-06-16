@@ -235,14 +235,12 @@ extension TransactionClient {
 			let transactionSigners = try await getTransactionSigners(request)
 
 			let header = TransactionHeader(
-				version: engineToolkitClient.getTransactionVersion(),
 				networkId: request.networkID,
 				startEpochInclusive: epoch,
 				endEpochExclusive: epoch + request.makeTransactionHeaderInput.epochWindow,
 				nonce: request.nonce,
 				publicKey: SLIP10.PublicKey.eddsaEd25519(transactionSigners.notaryPublicKey).intoEngine(),
-				notaryAsSignatory: transactionSigners.notaryAsSignatory,
-				costUnitLimit: request.makeTransactionHeaderInput.costUnitLimit,
+				notaryIsSignatory: transactionSigners.notaryAsSignatory,
 				tipPercentage: request.makeTransactionHeaderInput.tipPercentage
 			)
 

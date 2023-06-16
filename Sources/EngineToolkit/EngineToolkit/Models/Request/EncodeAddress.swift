@@ -20,6 +20,11 @@ public struct EncodeAddressRequest: Sendable, Codable, Hashable {
 	}
 }
 
+// MARK: - EncodeAddressResponse
+public struct EncodeAddressResponse: Sendable, Codable, Hashable {
+	public var address: Address
+}
+
 extension EncodeAddressRequest {
 	// MARK: CodingKeys
 

@@ -101,13 +101,13 @@ public struct TransferAccountList: Sendable, FeatureReducer {
 			case .delegate(.remove):
 				let account = state.receivingAccounts.remove(id: id)
 				account?.assets.compactMap(/ResourceAsset.State.fungibleAsset).forEach {
-					updateTotalSum(&state, resourceAddress: $0.resource.resourceAddress)
+					updateTotalSum(&state, resourceId: $0.id)
 				}
 				return .none
 
 			case let .child(.row(resourceAddress, child: .delegate(.fungibleAsset(.amountChanged)))),
 			     let .child(.row(resourceAddress, child: .delegate(.removed))):
-				updateTotalSum(&state, resourceAddress: resourceAddress)
+				updateTotalSum(&state, resourceId: resourceAddress)
 				return .none
 
 			case .delegate(.chooseAccount):
@@ -149,21 +149,21 @@ public struct TransferAccountList: Sendable, FeatureReducer {
 }
 
 extension TransferAccountList {
-	private func updateTotalSum(_ state: inout State, resourceAddress: ResourceAddress) {
+	private func updateTotalSum(_ state: inout State, resourceId: String) {
 		let totalSum = state.receivingAccounts
 			.flatMap(\.assets)
 			.compactMap(/ResourceAsset.State.fungibleAsset)
-			.filter { $0.resource.resourceAddress == resourceAddress }
+			.filter { $0.id == resourceId }
 			.compactMap(\.transferAmount)
 			.reduce(0, +)
 
 		for account in state.receivingAccounts {
-			guard case var .fungibleAsset(asset) = state.receivingAccounts[id: account.id]?.assets[id: resourceAddress] else {
+			guard case var .fungibleAsset(asset) = state.receivingAccounts[id: account.id]?.assets[id: resourceId] else {
 				continue
 			}
 
 			asset.totalTransferSum = totalSum
-			state.receivingAccounts[id: account.id]?.assets[id: resourceAddress] = .fungibleAsset(asset)
+			state.receivingAccounts[id: account.id]?.assets[id: resourceId] = .fungibleAsset(asset)
 		}
 	}
 

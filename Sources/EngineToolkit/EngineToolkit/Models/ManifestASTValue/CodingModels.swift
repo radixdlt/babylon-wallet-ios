@@ -1,15 +1,7 @@
 import CasePaths
 
 // MARK: - ValueCodable
-public struct ValueCodable<Value: Codable & ValueProtocol>: Codable, ValueProtocol {
-	public static var kind: ManifestASTValueKind { Value.kind }
-	public static var casePath: CasePath<ManifestASTValue, ValueCodable<Value>> {
-		.init(
-			embed: { Value.casePath.embed($0.value) },
-			extract: { Value.casePath.extract(from: $0).map(ValueCodable.init) }
-		)
-	}
-
+public struct ValueCodable<Value: Codable>: Codable {
 	public let value: Value
 
 	enum CodingKeys: CodingKey {
@@ -32,16 +24,7 @@ public struct ValueCodable<Value: Codable & ValueProtocol>: Codable, ValueProtoc
 }
 
 // MARK: - IntegerCodable
-struct IntegerCodable<I: FixedWidthInteger & Codable & ValueProtocol>: Codable, ValueProtocol {
-	static var casePath: CasePaths.CasePath<ManifestASTValue, IntegerCodable<I>> {
-		.init(
-			embed: { I.casePath.embed($0.value) },
-			extract: { I.casePath.extract(from: $0).map(IntegerCodable.init) }
-		)
-	}
-
-	static var kind: ManifestASTValueKind { I.kind }
-
+struct IntegerCodable<I: FixedWidthInteger & Codable>: Codable {
 	let value: I
 
 	init(_ value: I) {
@@ -61,3 +44,48 @@ struct IntegerCodable<I: FixedWidthInteger & Codable & ValueProtocol>: Codable, 
 		try ValueCodable(String(value)).encode(to: encoder)
 	}
 }
+
+// MARK: - IntFromStringCodable
+struct IntFromStringCodable<I: FixedWidthInteger & Codable>: Codable {
+	let value: I
+
+	init(_ value: I) {
+		self.value = value
+	}
+
+	init(from decoder: Decoder) throws {
+		let container = try decoder.singleValueContainer()
+
+		if let value = try I(container.decode(String.self)) {
+			self.value = value
+		} else {
+			throw InternalDecodingFailure.parsingError
+		}
+	}
+
+	func encode(to encoder: Encoder) throws {
+		var container = encoder.singleValueContainer()
+		try container.encode(String(value))
+	}
+}
+
+// struct IntegerArrayCodable<I: FixedWidthInteger & Codable>: Codable {
+//        let value: [I]
+//
+//        init(_ value: [I]) {
+//                self.value = value
+//        }
+//
+//        init(from decoder: Decoder) throws {
+//                let str: String = try ValueCodable(from: decoder).value
+//                if let value = I(str) {
+//                        self.value = value
+//                } else {
+//                        throw InternalDecodingFailure.parsingError
+//                }
+//        }
+//
+//        func encode(to encoder: Encoder) throws {
+//                try ValueCodable(String(value)).encode(to: encoder)
+//        }
+// }

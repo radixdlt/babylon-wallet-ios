@@ -6,7 +6,7 @@ public struct NonFungibleLocalId: ValueProtocol, Sendable, Codable, Hashable, Ex
 	public static let kind: ManifestASTValueKind = .nonFungibleLocalId
 	public static var casePath: CasePath<ManifestASTValue, Self> = /ManifestASTValue.nonFungibleLocalId
 
-	let value: String
+	public let value: String
 
 	public init(value: String) {
 		self.value = value

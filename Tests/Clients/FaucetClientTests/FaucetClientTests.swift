@@ -204,14 +204,12 @@ extension Engine.EddsaEd25519PublicKey {
 
 extension TransactionHeader {
 	static let previewValue = Self(
-		version: .default,
 		networkId: .kisharnet,
 		startEpochInclusive: 0,
 		endEpochExclusive: 1,
 		nonce: 0,
 		publicKey: .eddsaEd25519(.previewValue),
-		notaryAsSignatory: true,
-		costUnitLimit: 0,
+		notaryIsSignatory: true,
 		tipPercentage: 0
 	)
 }

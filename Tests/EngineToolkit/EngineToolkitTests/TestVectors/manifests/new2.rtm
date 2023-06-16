@@ -1,3 +1,0 @@
-CREATE_IDENTITY_ADVANCED
-    Tuple();                  # Authority Rules
-CREATE_IDENTITY;

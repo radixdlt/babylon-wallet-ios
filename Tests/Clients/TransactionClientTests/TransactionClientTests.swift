@@ -12,31 +12,30 @@ final class TransactionClientTests: TestCase {
 	func test_accountsSuitableToPayTXFee_CREATE_FUNGIBLE_RESOURCE_then_deposit_batch() async throws {
 		let transactionManifest = TransactionManifest(instructions: .string(
 			"""
-			CREATE_FUNGIBLE_RESOURCE
-			    18u8
-			    Map<String, String>(
-			        "name", "OwlToken",
-			        "symbol", "OWL",
-			        "description", "My Own Token if you smart - buy. If youre very smart, buy & keep"
-			    )
-			    Map<Enum, Tuple>(
+			                           CREATE_FUNGIBLE_RESOURCE
+			                           18u8
+			                           Map<String, Enum>(
+			                             "name" =>  Enum<Metadata::String>("MyResource"),                                        # Resource Name
+			                             "symbol" => Enum<Metadata::String>("RSRC"),                                            # Resource Symbol
+			                             "description" => Enum<Metadata::String>("A very innovative and important resource")    # Resource Description
+			                           )
+			                           Map<Enum, Tuple>(
+			                            Enum<ResourceMethodAuthKey::Withdraw>() => Tuple(Enum<AccessRule::AllowAll>(), Enum<AccessRule::DenyAll>()),
+			                            Enum<ResourceMethodAuthKey::Deposit>() => Tuple(Enum<AccessRule::AllowAll>(), Enum<AccessRule::DenyAll>())
+			                           );
 
-			        Enum("ResourceMethodAuthKey::Withdraw"), Tuple(Enum("AccessRule::AllowAll"), Enum("AccessRule::DenyAll")),
-			        Enum("ResourceMethodAuthKey::Deposit"), Tuple(Enum("AccessRule::AllowAll"), Enum("AccessRule::DenyAll"))
-			    );
 
-
-			CALL_METHOD
-			    Address("account_tdx_22_1pz8jpmse7hv0uueppwcksp2h60hkcdsfefm40cye9f3qlqau64")
-			    "deposit_batch"
-			    Expression("ENTIRE_WORKTOP");
+			                           CALL_METHOD
+			                               Address("account_sim1cyvgx33089ukm2pl97pv4max0x40ruvfy4lt60yvya744cve475w0q")
+			                               "deposit_batch"
+			                               Expression("ENTIRE_WORKTOP");
 			"""
 		))
 
 		let sut = TransactionClient.liveValue
-		let expectedAccount = Profile.Network.Account.new(address: "account_tdx_22_1pz8jpmse7hv0uueppwcksp2h60hkcdsfefm40cye9f3qlqau64")
+		let expectedAccount = Profile.Network.Account.new(address: "account_sim1cyvgx33089ukm2pl97pv4max0x40ruvfy4lt60yvya744cve475w0q")
 		try await withDependencies({
-			$0.gatewaysClient.getCurrentGateway = { Radix.Gateway.hammunet }
+			$0.gatewaysClient.getCurrentGateway = { Radix.Gateway.simulator }
 			$0.engineToolkitClient.analyzeManifest = { try EngineToolkitClient.liveValue.analyzeManifest($0) }
 			$0.accountsClient.getAccountsOnNetwork = { _ in Profile.Network.Accounts(rawValue: .init(uncheckedUniqueElements: [expectedAccount]))! }
 			$0.accountPortfoliosClient.fetchAccountPortfolios = { addresses, _ in try addresses.map {
@@ -45,7 +44,7 @@ final class TransactionClientTests: TestCase {
 					isDappDefintionAccountType: false,
 					fungibleResources: .init(
 						xrdResource: .init(
-							resourceAddress: .init(validatingAddress: "resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzqu57yag"),
+							resourceAddress: .init(validatingAddress: "resource_sim1thvwu8dh6lk4y9mntemkvj25wllq8adq42skzufp4m8wxxuemugnez"),
 							amount: 11
 						)
 					),

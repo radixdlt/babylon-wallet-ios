@@ -63,6 +63,12 @@ extension Radix.Network {
 		id: .mardunet,
 		displayDescription: "Mardunet (Test Network)"
 	)
+
+	public static let simulator = Self(
+		name: "simulator",
+		id: .simulator,
+		displayDescription: "Simulator (Test Network)"
+	)
 }
 
 extension Radix.Network {

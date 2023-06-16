@@ -58,7 +58,7 @@ extension GatewayAPI.TransactionPreviewRequest {
 			endEpochExclusive: .init(header.endEpochExclusive.rawValue),
 			notaryPublicKey: GatewayAPI.PublicKey(from: header.publicKey),
 			notaryAsSignatory: notaryAsSignatory,
-			costUnitLimit: .init(header.costUnitLimit),
+			costUnitLimit: .zero, // Should go away once GW is also updated
 			tipPercentage: .init(header.tipPercentage),
 			nonce: .init(header.nonce.rawValue),
 			signerPublicKeys: transactionSigners.signerPublicKeys.map(GatewayAPI.PublicKey.init(from:)),
