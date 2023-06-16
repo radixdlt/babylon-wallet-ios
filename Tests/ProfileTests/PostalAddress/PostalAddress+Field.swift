@@ -69,6 +69,9 @@ extension PersonaFieldValue.PostalAddress {
 
 		/// Colombia
 		case department(String)
+
+		/// Jordan
+		case postalDistrict(String)
 	}
 }
 
@@ -80,6 +83,9 @@ extension PersonaFieldValue.PostalAddress.Field {
 		case postalCodeString
 		case postalCodeNumber
 		case postcodeNumber
+
+		/// Jordan (String)
+		case postalDistrict
 
 		/// UK
 		case postcodeString
@@ -114,6 +120,7 @@ extension PersonaFieldValue.PostalAddress.Field {
 			case .streetLine0, .streetLine1: return "Street"
 			case .postalCodeString, .postalCodeNumber: return "Postal code"
 			case .postcodeString, .postcodeNumber: return "Postcode"
+			case .postalDistrict: return "Postal District"
 			case .zipNumber: return "ZIP"
 			case .prefectureLevelCity: return "Prefecture-level City"
 			case .city: return "City"
@@ -147,6 +154,7 @@ extension PersonaFieldValue.PostalAddress.Field {
 		case .postalCodeNumber: return .postalCodeNumber
 		case .postcodeNumber: return .postcodeNumber
 		case .postcodeString: return .postcodeString
+		case .postalDistrict: return .postalDistrict
 		case .zipNumber: return .zipNumber
 
 		case .prefectureLevelCity: return .prefectureLevelCity

@@ -61,15 +61,18 @@ extension PersonaFieldValue.PostalAddress {
 		case iran
 		case iraq
 		case ireland
+		case isreal
 		case italy
 		case ivoryCoast; public static let côteDIvoire: Self = .ivoryCoast
 		case indonesia
 		case japan
+		case jordan
 		case kazakhstan
 		case kenya
 		case kuwait
 		case laos
 		case latvia
+		case lebanon
 		case liechtenstein
 		case lithuania
 		case luxembourg
@@ -81,9 +84,11 @@ extension PersonaFieldValue.PostalAddress {
 		case moldova
 		case monaco
 		case mozambique
+		case mongolia
 		case montenegro
 		case morocco
 		case myanmar
+		case oman
 		case nepal
 		case netherlands
 		case newZealand
@@ -94,6 +99,7 @@ extension PersonaFieldValue.PostalAddress {
 		case norway
 		case papuaNewGuinea
 		case pakistan
+		case palestinianTerritories
 		case paraguay
 		case peru
 		case philippines
@@ -110,14 +116,17 @@ extension PersonaFieldValue.PostalAddress {
 		case southKorea
 		case southAfrica
 		case spain
+		case sriLanka
 		case sudan
 		case suriname
 		case sweden
 		case switzerland
 		case taiwan
+		case tajikistan
 		case tanzania
 		case thailand
 		case turkey
+		case turkmenistan
 		case vietnam
 		case uganda
 		case ukraine

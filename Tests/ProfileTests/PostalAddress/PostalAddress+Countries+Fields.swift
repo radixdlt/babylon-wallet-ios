@@ -404,6 +404,14 @@ extension PersonaFieldValue.PostalAddress.Country {
 				[.country],
 			]
 
+		case .isreal:
+			return [
+				[.streetLine0],
+				[.streetLine1],
+				[.postalCodeNumber, .city],
+				[.province, .country],
+			]
+
 		case .italy:
 			return [
 				[.streetLine0],
@@ -426,6 +434,15 @@ extension PersonaFieldValue.PostalAddress.Country {
 				[.prefecture, .county],
 				[.furtherDivisionsLine0],
 				[.furtherDivisionsLine1],
+				[.country],
+			]
+
+		case .jordan:
+			return [
+				[.postalDistrict],
+				[.streetLine0],
+				[.streetLine1],
+				[.city, .postalCodeNumber],
 				[.country],
 			]
 
@@ -472,6 +489,15 @@ extension PersonaFieldValue.PostalAddress.Country {
 				[.city, .postalCodeNumber],
 				[.country],
 			]
+
+		case .lebanon:
+			return [
+				[.streetLine0],
+				[.streetLine1],
+				[.city, .postalCodeNumber],
+				[.country],
+			]
+
 		case .liechtenstein:
 			return [
 				[.streetLine0],
@@ -549,6 +575,14 @@ extension PersonaFieldValue.PostalAddress.Country {
 				[.streetLine0],
 				[.streetLine1],
 				[.postalCodeNumber, .city],
+				[.country],
+			]
+
+		case .mongolia:
+			return [
+				[.streetLine0],
+				[.streetLine1],
+				[.city, .postalCodeNumber],
 				[.country],
 			]
 
@@ -651,11 +685,29 @@ extension PersonaFieldValue.PostalAddress.Country {
 				[.country],
 			]
 
+		case .oman:
+			return [
+				[.streetLine0],
+				[.streetLine1],
+				[.postalCodeNumber],
+				[.city],
+				[.province],
+				[.country],
+			]
+
 		case .pakistan:
 			return [
 				[.streetLine0],
 				[.streetLine1],
 				[.city, .postalCodeNumber],
+				[.country],
+			]
+
+		case .palestinianTerritories:
+			return [
+				[.streetLine0],
+				[.streetLine1],
+				[.postalCodeNumber, .city],
 				[.country],
 			]
 
@@ -801,6 +853,15 @@ extension PersonaFieldValue.PostalAddress.Country {
 				[.province, .country],
 			]
 
+		case .sriLanka:
+			return [
+				[.streetLine0],
+				[.streetLine1],
+				[.city],
+				[.postalCodeNumber],
+				[.country],
+			]
+
 		case .sweden:
 			return [
 				[.streetLine0],
@@ -844,6 +905,14 @@ extension PersonaFieldValue.PostalAddress.Country {
 				[.streetLine1],
 			]
 
+		case .tajikistan:
+			return [
+				[.streetLine0],
+				[.streetLine1],
+				[.postalCodeNumber, .city],
+				[.country],
+			]
+
 		case .tanzania:
 			return [
 				[.streetLine0],
@@ -867,6 +936,14 @@ extension PersonaFieldValue.PostalAddress.Country {
 				[.streetLine1],
 				[.postalCodeNumber, .districtString],
 				[.city, .country],
+			]
+
+		case .turkmenistan:
+			return [
+				[.streetLine0],
+				[.streetLine1],
+				[.postalCodeNumber, .city],
+				[.country],
 			]
 
 		case .uganda:
