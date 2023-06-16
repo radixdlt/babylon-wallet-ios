@@ -643,6 +643,15 @@ extension PersonaFieldValue.PostalAddress.Country {
 				[.country],
 			]
 
+		case .papuaNewGuinea:
+			return [
+				[.streetLine0],
+				[.streetLine1],
+				[.city, .postalCodeNumber],
+				[.province],
+				[.country],
+			]
+
 		case .paraguay:
 			return [
 				[.streetLine0],

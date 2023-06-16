@@ -90,6 +90,7 @@ extension PersonaFieldValue.PostalAddress {
 		case northKorea
 		case northMacedonia
 		case norway
+		case papuaNewGuinea
 		case pakistan
 		case paraguay
 		case peru
