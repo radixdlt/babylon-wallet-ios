@@ -157,7 +157,7 @@ extension FactorSourcesView {
 				)
 			}
 		}
-		.padding([.leading], leadingPadding)
+		.padding(.leading, leadingPadding)
 	}
 }
 
@@ -184,13 +184,19 @@ extension FactorSourceView {
 				LedgerFactorSourceView(ledgerFactorSource: ledgerFactorSource)
 			case let .offDeviceMnemonic(offDeviceMnemonicFactorSource):
 				OffDeviceMnemonicFactorSourceView(offDeviceMnemonicFactorSource: offDeviceMnemonicFactorSource)
+			case let .securityQuestions(questionsFactorSource):
+				// FIXME: impl me
+				Text("\(String(describing: questionsFactorSource))")
+			case let .trustedContact(trustedContact):
+				// FIXME: impl me
+				Text("\(String(describing: trustedContact))")
 			}
 		}
 		.background {
-			Color.randomDark(seed: factorSource.id.hexCodable.data)
+			Color.randomDark(seed: factorSource.id.description.data(using: .utf8)!)
 		}
 		.foregroundColor(.white)
-		.padding([.leading], leadingPadding)
+		.padding(.leading, leadingPadding)
 	}
 }
 
@@ -198,7 +204,6 @@ extension FactorSourceView {
 public struct FactorSourceCommonView: View {
 	public let common: FactorSource.Common
 	public var body: some View {
-		Labeled("ID", value: common.id)
 		Labeled("Added On", value: common.addedOn.ISO8601Format())
 		Labeled("LastUsed On", value: common.lastUsedOn.ISO8601Format())
 		Labeled("Supported Curves", value: common.cryptoParameters.supportedCurves.map { String(describing: $0) }.joined())
@@ -309,7 +314,7 @@ extension AppPreferencesView {
 				indentation: inOneLevel
 			)
 		}
-		.padding([.leading], leadingPadding)
+		.padding(.leading, leadingPadding)
 	}
 }
 
@@ -330,7 +335,7 @@ extension GatewaysView {
 				)
 			}
 		}
-		.padding([.leading], leadingPadding)
+		.padding(.leading, leadingPadding)
 	}
 }
 
@@ -356,7 +361,7 @@ extension GatewayView {
 			}
 			Labeled("Gateway API Base URL", value: gateway.url.absoluteString)
 		}
-		.padding([.leading], leadingPadding)
+		.padding(.leading, leadingPadding)
 	}
 }
 
@@ -377,7 +382,7 @@ extension DisplayView {
 			Labeled("Ledger Signing Display Mode", value: display.ledgerHQHardwareWalletSigningDisplayMode.rawValue)
 			Labeled("Currency", value: display.fiatCurrencyPriceTarget.rawValue)
 		}
-		.padding([.leading], leadingPadding)
+		.padding(.leading, leadingPadding)
 	}
 }
 
@@ -398,7 +403,7 @@ extension AppSecurityView {
 			Labeled("isCloudProfileSyncEnabled", value: String(describing: security.isCloudProfileSyncEnabled))
 			Labeled("isDeveloperModeEnabled", value: String(describing: security.isDeveloperModeEnabled))
 		}
-		.padding([.leading], leadingPadding)
+		.padding(.leading, leadingPadding)
 	}
 }
 
@@ -427,7 +432,7 @@ extension P2PLinksView {
 				}
 			}
 		}
-		.padding([.leading], leadingPadding)
+		.padding(.leading, leadingPadding)
 	}
 }
 
@@ -458,7 +463,7 @@ extension AuthorizedDappsView {
 				}
 			}
 		}
-		.padding([.leading], leadingPadding)
+		.padding(.leading, leadingPadding)
 	}
 }
 
@@ -481,7 +486,7 @@ extension AuthorizedDappView {
 				)
 			}
 		}
-		.padding([.leading], leadingPadding)
+		.padding(.leading, leadingPadding)
 	}
 }
 
@@ -525,7 +530,7 @@ public struct DappAuthorizedPersonaView: IndentedView {
 				Text("Never requested")
 			}
 		}
-		.padding([.leading], leadingPadding)
+		.padding(.leading, leadingPadding)
 	}
 }
 
@@ -546,7 +551,7 @@ extension P2PLinkView {
 			Labeled("ID", value: String(p2pLinks.id.data.hex().mask(showLast: 6)))
 			Labeled("Client Name", value: p2pLinks.displayName)
 		}
-		.padding([.leading], leadingPadding)
+		.padding(.leading, leadingPadding)
 	}
 }
 
@@ -572,7 +577,7 @@ extension PerNetworkView {
 				)
 			}
 		}
-		.padding([.leading], leadingPadding)
+		.padding(.leading, leadingPadding)
 	}
 }
 
@@ -610,7 +615,7 @@ extension ProfileNetworkView {
 				try! network.detailsForAuthorizedDapp($0)
 			}
 		}
-		.padding([.leading], leadingPadding)
+		.padding(.leading, leadingPadding)
 	}
 }
 
@@ -642,7 +647,7 @@ extension EntitiesView {
 				}
 			}
 		}
-		.padding([.leading], leadingPadding)
+		.padding(.leading, leadingPadding)
 	}
 }
 
@@ -672,14 +677,14 @@ extension EntityView {
 					ForEach(persona.fields) { field in
 						Labeled(field.id.rawValue, value: field.value.rawValue)
 					}
-				}.padding([.leading], indentation.inOneLevel.leadingPadding)
+				}.padding(.leading, indentation.inOneLevel.leadingPadding)
 			}
 			if let account = self.entity as? Profile.Network.Account {
 				Labeled("Account Appearance ID", value: account.appearanceID.description)
 			}
 		}
 		.foregroundColor(entity.kind == .account ? .white : .black)
-		.padding([.leading], leadingPadding)
+		.padding(.leading, leadingPadding)
 		.background {
 			if let account = entity as? Profile.Network.Account {
 				account.appearanceID.gradient
@@ -734,9 +739,9 @@ extension HierarchicalDeterministicFactorInstanceView {
 			Labeled("Derivation Scheme", value: factorInstance.derivationPath.scheme.rawValue)
 			Labeled("Public Key", value: factorInstance.publicKey.compressedRepresentation.hex)
 			Labeled("Curve", value: factorInstance.publicKey.curve.rawValue)
-			Labeled("Factor Source ID", value: String(factorInstance.factorSourceID.hexCodable.hex().mask(showLast: 6)))
+			Labeled("Factor Source ID", value: String(factorInstance.factorSourceID.description.mask(showLast: 6)))
 		}
-		.padding([.leading], leadingPadding)
+		.padding(.leading, leadingPadding)
 	}
 }
 

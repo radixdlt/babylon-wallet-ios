@@ -94,7 +94,7 @@ extension GeneralSettings {
 						.foregroundColor(.app.gray1)
 						.textStyle(.body1HighImportance)
 
-					Text("Export the Wallet development logs")
+					Text("Export and save debugging logs")
 						.foregroundColor(.app.gray2)
 						.textStyle(.body2Regular)
 						.fixedSize()

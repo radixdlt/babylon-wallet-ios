@@ -44,10 +44,10 @@ public struct LedgerRowView: View {
 						.textStyle(.secondaryHeader)
 						.padding(.bottom, .small1)
 
-					LedgerDatePair(label: L10n.LedgerHardwareDevices.usedHeading, date: viewState.lastUsedOn)
+					LabelledDate(label: L10n.LedgerHardwareDevices.usedHeading, date: viewState.lastUsedOn)
 						.padding(.bottom, .small3)
 
-					LedgerDatePair(label: L10n.LedgerHardwareDevices.addedHeading, date: viewState.addedOn)
+					LabelledDate(label: L10n.LedgerHardwareDevices.addedHeading, date: viewState.addedOn)
 				}
 
 				Spacer(minLength: 0)
@@ -64,24 +64,4 @@ public struct LedgerRowView: View {
 			.padding(.vertical, .medium1)
 		}
 	}
-}
-
-// MARK: - LedgerDatePair
-struct LedgerDatePair: View {
-	let label: String
-	let date: Date
-
-	var body: some View {
-		HStack(spacing: .small3) {
-			Text(label)
-				.textStyle(.body2Header)
-
-			Text(date.formatted(dateFormat))
-				.textStyle(.body2Regular)
-				.frame(maxWidth: .infinity, alignment: .leading)
-		}
-		.foregroundColor(.app.gray2)
-	}
-
-	private let dateFormat: Date.FormatStyle = .dateTime.day().month(.wide).year()
 }

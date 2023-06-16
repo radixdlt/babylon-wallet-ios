@@ -4,16 +4,20 @@ import Prelude
 
 // MARK: - OffDeviceMnemonicFactorSource
 public struct OffDeviceMnemonicFactorSource: FactorSourceProtocol {
+	public typealias ID = FactorSourceID.FromHash
+	public let id: ID
 	public var common: FactorSource.Common // We update `lastUsed`
 	public let hint: Hint
 	public let bip39Parameters: BIP39Parameters
 
 	internal init(
+		id: ID,
 		common: FactorSource.Common,
 		hint: Hint,
 		bip39Parameters: BIP39Parameters
 	) {
-		precondition(common.id.factorSourceKind == Self.kind)
+		precondition(id.kind == Self.kind)
+		self.id = id
 		self.common = common
 		self.hint = hint
 		self.bip39Parameters = bip39Parameters
@@ -79,9 +83,8 @@ extension OffDeviceMnemonicFactorSource {
 	) throws -> Self {
 		@Dependency(\.date) var date
 		return try Self(
+			id: .init(kind: .offDeviceMnemonic, mnemonicWithPassphrase: mnemonicWithPassphrase),
 			common: .from(
-				factorSourceKind: Self.kind,
-				mnemonicWithPassphrase: mnemonicWithPassphrase,
 				cryptoParameters: .babylon,
 				addedOn: addedOn ?? date(),
 				lastUsedOn: lastUsedOn ?? date()

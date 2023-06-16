@@ -20,7 +20,7 @@ extension DeviceFactorSourceClient: DependencyKey {
 
 				guard
 					let mnemonicWithPassphrase = try await secureStorageClient
-					.loadMnemonicByFactorSourceID(factorSourceID, request.loadMnemonicPurpose)
+					.loadMnemonicByFactorSourceID(factorSourceID.embed(), request.loadMnemonicPurpose)
 				else {
 					loggerGlobal.critical("Failed to find factor source with ID: '\(factorSourceID)'")
 					throw FailedToFindFactorSource()
@@ -53,7 +53,7 @@ extension DeviceFactorSourceClient: DependencyKey {
 
 					guard let deviceFactorSource,
 					      let mnemonicWithPassphrase = try await secureStorageClient.loadMnemonicByFactorSourceID(
-					      	deviceFactorSource.id,
+					      	deviceFactorSource.id.embed(),
 					      	.checkingAccounts
 					      )
 					else {

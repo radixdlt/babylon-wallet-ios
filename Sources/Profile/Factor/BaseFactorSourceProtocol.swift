@@ -7,11 +7,6 @@ public protocol BaseFactorSourceProtocol {
 }
 
 extension BaseFactorSourceProtocol {
-	public typealias ID = FactorSourceID
-	public var id: FactorSourceID {
-		common.id
-	}
-
 	public var cryptoParameters: FactorSource.CryptoParameters {
 		common.cryptoParameters
 	}

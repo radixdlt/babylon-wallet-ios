@@ -11,12 +11,12 @@ public struct ScannedParsedOlympiaWalletToMigrate: Sendable, Hashable {
 // MARK: - MigrateOlympiaSoftwareAccountsToBabylonRequest
 public struct MigrateOlympiaSoftwareAccountsToBabylonRequest: Sendable, Hashable {
 	public let olympiaAccounts: Set<OlympiaAccountToMigrate>
-	public let olympiaFactorSouceID: FactorSourceID
+	public let olympiaFactorSouceID: FactorSourceID.FromHash
 	public let olympiaFactorSource: PrivateHDFactorSource?
 
 	public init(
 		olympiaAccounts: Set<OlympiaAccountToMigrate>,
-		olympiaFactorSouceID: FactorSourceID,
+		olympiaFactorSouceID: FactorSourceID.FromHash,
 		olympiaFactorSource: PrivateHDFactorSource?
 	) {
 		self.olympiaAccounts = olympiaAccounts
@@ -27,12 +27,12 @@ public struct MigrateOlympiaSoftwareAccountsToBabylonRequest: Sendable, Hashable
 
 // MARK: - MigrateOlympiaHardwareAccountsToBabylonRequest
 public struct MigrateOlympiaHardwareAccountsToBabylonRequest: Sendable, Hashable {
-	public let olympiaAccounts: Set<OlympiaAccountToMigrate>
-	public let ledgerFactorSourceID: FactorSourceID
+	public let olympiaAccounts: NonEmpty<Set<OlympiaAccountToMigrate>>
+	public let ledgerFactorSourceID: FactorSourceID.FromHash
 
 	public init(
-		olympiaAccounts: Set<OlympiaAccountToMigrate>,
-		ledgerFactorSourceID: FactorSourceID
+		olympiaAccounts: NonEmpty<Set<OlympiaAccountToMigrate>>,
+		ledgerFactorSourceID: FactorSourceID.FromHash
 	) {
 		self.olympiaAccounts = olympiaAccounts
 		self.ledgerFactorSourceID = ledgerFactorSourceID

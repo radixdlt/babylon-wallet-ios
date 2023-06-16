@@ -13,20 +13,20 @@ public struct PersonaList: Sendable, FeatureReducer {
 		public let strategy: ReloadingStrategy
 
 		public init(
+			personas: IdentifiedArrayOf<Persona.State> = [],
+			strategy: ReloadingStrategy = .all
+		) {
+			self.personas = personas
+			self.strategy = strategy
+		}
+
+		public init(
 			dApp: Profile.Network.AuthorizedDappDetailed
 		) {
 			self.init(
 				personas: .init(uniqueElements: dApp.detailedAuthorizedPersonas.map(Persona.State.init)),
 				strategy: .dApp(dApp.dAppDefinitionAddress)
 			)
-		}
-
-		public init(
-			personas: IdentifiedArrayOf<Persona.State> = [],
-			strategy: ReloadingStrategy = .all
-		) {
-			self.personas = personas
-			self.strategy = strategy
 		}
 
 		public enum ReloadingStrategy: Sendable, Hashable {

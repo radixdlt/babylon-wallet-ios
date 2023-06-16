@@ -4,8 +4,7 @@ import ImportMnemonicFeature
 extension DisplayMnemonic.State {
 	var viewState: DisplayMnemonic.ViewState {
 		.init(
-			isLoading: importMnemonic == nil,
-			navigationTitle: deviceFactorSource.labelSeedPhraseKind
+			isLoading: importMnemonic == nil
 		)
 	}
 }
@@ -14,7 +13,6 @@ extension DisplayMnemonic.State {
 extension DisplayMnemonic {
 	public struct ViewState: Equatable {
 		let isLoading: Bool
-		let navigationTitle: String
 	}
 
 	@MainActor
@@ -40,14 +38,18 @@ extension DisplayMnemonic {
 							action: { .child(.importMnemonic($0)) }
 						)
 					) { importMnemonicViewStore in
-						// We must have a NavigationView in order to display navigationTitle
-						NavigationView {
+						VStack(alignment: .leading, spacing: .medium2) {
+							WarningView(text: L10n.RevealSeedPhrase.warning)
+								.padding(.horizontal, .medium3)
+
 							ImportMnemonic.View(store: importMnemonicViewStore)
-								.navigationTitle(viewStore.navigationTitle)
 						}
+						.padding(.top, .medium3)
 					}
 				}
 			}
+			.navigationTitle(L10n.RevealSeedPhrase.title)
+			.navigationBarTitleDisplayMode(.inline)
 		}
 	}
 }

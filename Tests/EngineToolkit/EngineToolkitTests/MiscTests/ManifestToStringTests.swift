@@ -12,24 +12,24 @@ final class ManifestToStringTests: TestCase {
 	}
 
 	func test_transactionManifest_toString_on_multiple_packages() throws {
-		let packages = [
-			try (
+		let packages = try [
+			(
 				code: resource(named: "hello", extension: "code"),
 				schema: resource(named: "hello", extension: "schema")
 			),
-			try (
+			(
 				code: resource(named: "hello_world", extension: "code"),
 				schema: resource(named: "hello_world", extension: "schema")
 			),
-			try (
+			(
 				code: resource(named: "RaDEX", extension: "code"),
 				schema: resource(named: "RaDEX", extension: "schema")
 			),
-			try (
+			(
 				code: resource(named: "account", extension: "code"),
 				schema: resource(named: "account", extension: "schema")
 			),
-			try (
+			(
 				code: resource(named: "faucet", extension: "code"),
 				schema: resource(named: "faucet", extension: "schema")
 			),
