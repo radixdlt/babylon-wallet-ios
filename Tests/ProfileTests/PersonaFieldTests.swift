@@ -53,9 +53,11 @@ public struct Persona: Sendable, Hashable, Codable {
 		}
 
 		public typealias EmailAddresses = FieldCollectionOf<PersonaFieldValue.EmailAddress>
+		public typealias PostalAddresses = FieldCollectionOf<PersonaFieldValue.PostalAddress>
 
 		public var name: Name?
 		public var emailAddresses: EmailAddresses
+		public var postalAddresses: PostalAddresses
 
 		public init(
 			name: Name? = nil,
@@ -140,9 +142,10 @@ extension PersonaFieldOfKind {
 }
 
 // MARK: - PersonaFieldKind
-public enum PersonaFieldKind: Sendable, Hashable, Codable {
+public enum PersonaFieldKind: String, Sendable, Hashable, Codable {
 	case name
 	case emailAddress
+	case postalAddress
 }
 
 // MARK: - PersonaFieldValue
@@ -151,6 +154,7 @@ public enum PersonaFieldValue: Sendable, Hashable, Codable, BasePersonaFieldValu
 		switch self {
 		case .name: return .name
 		case .emailAddress: return .emailAddress
+		case .postalAddress: return .postalAddress
 		}
 	}
 
@@ -210,8 +214,35 @@ public enum PersonaFieldValue: Sendable, Hashable, Codable, BasePersonaFieldValu
 		}
 	}
 
+	public struct PostalAddress: Sendable, Hashable, Codable, PersonaFieldValueProtocol {
+		public static var casePath: CasePath<PersonaFieldValue, Self> = /PersonaFieldValue.postalAddress
+		public static var kind = PersonaFieldKind.postalAddress
+
+		public enum Field: Sendable, Hashable, Codable {
+			enum Discriminator: String, Sendable, Hashable, Codable
+			case streetLine0(String)
+			case streetLine1(String)
+			case postalCodeString(String)
+			case postalCodeUInt(UInt)
+			case city(String)
+		}
+
+		public enum Country: String, Sendable, Hashable, Codable {
+			case sweden
+			var fields: [PostalAddress.Field] {
+				switch self {
+				case .sweden:
+					return [.po]
+				}
+			}
+		}
+
+		public let country: Country
+	}
+
 	case name(Name)
 	case emailAddress(EmailAddress)
+	case postalAddress(PostalAddress)
 }
 
 // MARK: - PersonaFieldOfKind
