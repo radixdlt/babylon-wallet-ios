@@ -267,6 +267,7 @@ public enum PersonaFieldValue: Sendable, Hashable, Codable, BasePersonaFieldValu
 				case neighbourhood
 				case suburb
 				case state
+				case governorate
 				case province
 				case prefectureLevelCity
 				case country
@@ -290,6 +291,7 @@ public enum PersonaFieldValue: Sendable, Hashable, Codable, BasePersonaFieldValu
 					case .prefectureLevelCity: return "District"
 					case .city: return "Neighbourhood"
 					case .state: return "Suburb"
+					case .governorate: return "Governorate"
 					case .district: return "State"
 					case .neighbourhood: return "Province"
 					case .suburb: return "Prefecture-level City"
@@ -331,6 +333,9 @@ public enum PersonaFieldValue: Sendable, Hashable, Codable, BasePersonaFieldValu
 
 			/// Canada
 			case province(String)
+
+			/// Egypt
+			case governorate
 
 			/// Hong Kong
 			case district(String)
@@ -398,6 +403,7 @@ public enum PersonaFieldValue: Sendable, Hashable, Codable, BasePersonaFieldValu
 				case .county: return .county
 				case .furtherDivisionsLine0: return .furtherDivisionsLine0
 				case .furtherDivisionsLine1: return .furtherDivisionsLine1
+				case .governorate: return .governorate
 				}
 			}
 		}
@@ -420,6 +426,7 @@ public enum PersonaFieldValue: Sendable, Hashable, Codable, BasePersonaFieldValu
 			case canada
 			case china
 			case ethiopia
+			case egypt
 			case hongKong
 			case india
 			case indonesia
@@ -491,6 +498,15 @@ public enum PersonaFieldValue: Sendable, Hashable, Codable, BasePersonaFieldValu
 						[.streetLine0],
 						[.streetLine1],
 						[.postalCodeNumber, .city],
+						[.country],
+					]
+
+				case .egypt:
+					return [
+						[.streetLine0],
+						[.streetLine1],
+						[.district],
+						[.governorate],
 						[.country],
 					]
 
