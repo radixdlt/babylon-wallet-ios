@@ -1,9 +1,18 @@
 public struct TransferNFTView: View {
-	let name: String?
+	let resourceName: String?
+	let id: String
+	let idName: String?
 	let thumbnail: URL?
 
-	public init(name: String?, thumbnail: URL?) {
-		self.name = name
+	public init(
+		resourceName: String?,
+		id: String,
+		idName: String?,
+		thumbnail: URL?
+	) {
+		self.resourceName = resourceName
+		self.id = id
+		self.idName = idName
 		self.thumbnail = thumbnail
 	}
 
@@ -12,8 +21,14 @@ public struct TransferNFTView: View {
 			NFTThumbnail(thumbnail, size: .small)
 				.padding(.vertical, .small1)
 
-			if let name {
-				Text(name)
+			VStack(alignment: .leading, spacing: 0) {
+				if let resourceName {
+					Text(resourceName)
+						.textStyle(.body2Regular)
+						.foregroundColor(.app.gray2)
+				}
+
+				Text(subtitle)
 					.textStyle(.body1HighImportance)
 					.foregroundColor(.app.gray1)
 			}
@@ -21,5 +36,10 @@ public struct TransferNFTView: View {
 			Spacer(minLength: 0)
 		}
 		.padding(.horizontal, .medium3)
+	}
+
+	private var subtitle: String {
+		guard let idName else { return id }
+		return "\(id): \(idName)"
 	}
 }

@@ -164,6 +164,7 @@ extension AssetsView.State {
 
 				return Mode.SelectedAssets.NonFungibleTokensPerResource(
 					resourceAddress: $0.resource.resourceAddress,
+					resourceName: $0.resource.name,
 					tokens: selected
 				)
 			}
@@ -204,13 +205,16 @@ extension AssetsView.State {
 				}
 
 				public let resourceAddress: ResourceAddress
+				public let resourceName: String?
 				public var tokens: IdentifiedArrayOf<AccountPortfolio.NonFungibleResource.NonFungibleToken>
 
 				public init(
 					resourceAddress: ResourceAddress,
+					resourceName: String?,
 					tokens: IdentifiedArrayOf<AccountPortfolio.NonFungibleResource.NonFungibleToken>
 				) {
 					self.resourceAddress = resourceAddress
+					self.resourceName = resourceName
 					self.tokens = tokens
 				}
 			}
