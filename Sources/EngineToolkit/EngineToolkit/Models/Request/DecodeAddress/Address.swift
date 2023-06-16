@@ -115,17 +115,10 @@ public struct SpecificAddress<Kind: SpecificAddressKind>: Sendable, Hashable, Id
 	public let address: String
 	public let decodedKind: AddressKind
 
-	//        #if DEBUG
 	init(address: String, decodedKind: AddressKind) {
 		self.address = address
 		self.decodedKind = decodedKind
 	}
-
-//
-	//        public init(stringLiteral value: String) {
-	//                self.init(address: value)
-	//        }
-	//        #endif
 
 	public init(validatingAddress address: String) throws {
 		let decodedAddress = try RadixEngine.instance.decodeAddressRequest(request: .init(address: address)).get()

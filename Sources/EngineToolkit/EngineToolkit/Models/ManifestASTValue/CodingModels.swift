@@ -68,24 +68,3 @@ struct IntFromStringCodable<I: FixedWidthInteger & Codable>: Codable {
 		try container.encode(String(value))
 	}
 }
-
-// struct IntegerArrayCodable<I: FixedWidthInteger & Codable>: Codable {
-//        let value: [I]
-//
-//        init(_ value: [I]) {
-//                self.value = value
-//        }
-//
-//        init(from decoder: Decoder) throws {
-//                let str: String = try ValueCodable(from: decoder).value
-//                if let value = I(str) {
-//                        self.value = value
-//                } else {
-//                        throw InternalDecodingFailure.parsingError
-//                }
-//        }
-//
-//        func encode(to encoder: Encoder) throws {
-//                try ValueCodable(String(value)).encode(to: encoder)
-//        }
-// }

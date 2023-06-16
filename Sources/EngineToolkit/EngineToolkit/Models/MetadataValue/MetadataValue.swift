@@ -1,9 +1,3 @@
-//
-//  File.swift
-//
-//
-//  Created by Ghenadie Vasiliev-Pusca on 15.06.2023.
-//
 import CasePaths
 import Foundation
 
@@ -334,30 +328,6 @@ extension MetadataValue {
 extension KeyedDecodingContainer {
 	func decode<V: Decodable>(forKey key: KeyedDecodingContainer<K>.Key) throws -> V {
 		try decode(V.self, forKey: key)
-	}
-}
-
-// MARK: - MetadataValueProtocol
-public protocol MetadataValueProtocol {
-	static var kind: MetadataValueKind { get }
-	static var casePath: CasePath<MetadataValue, Self> { get }
-}
-
-extension MetadataValueProtocol {
-	public var kind: MetadataValueKind { Self.kind }
-	public var casePath: CasePath<MetadataValue, Self> { Self.casePath }
-}
-
-extension MetadataValueProtocol {
-	public func embedValue() -> MetadataValue {
-		casePath.embed(self)
-	}
-
-	public static func extractValue(from value: MetadataValue) throws -> Self {
-		guard let extracted = casePath.extract(from: value) else {
-			throw InternalDecodingFailure.metadataValueTypeDiscriminatorMismatch(expected: Self.kind, butGot: value.kind)
-		}
-		return extracted
 	}
 }
 
