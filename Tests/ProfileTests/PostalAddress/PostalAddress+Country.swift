@@ -26,34 +26,53 @@ extension PersonaFieldValue.PostalAddress {
 		case bangladesh
 		case belarus
 		case belgium
+		case benin
 		case bolivia
 		case bosniaAndHerzegovinia
-		case bulgaria
+		case botswana
 		case brazil
 		case bruneiDarussalam
+		case bulgaria
+		case burkinaFaso
+		case burundi
 		case canada
 		case cambodia
 		case cameroon
+		case capeVerde
+		case centralAfricanRepublic
+		case chad
 		case chile
 		case china
 		case colombia
+		case comoros
 		case croatia
 		case cyprus
 		case czechRepublic
+
+		/// aka "Congo-Kinshasa" aka "DRC" (formerly known as "Zaire")
 		case democraticRepublicOfTheCongo
+
 		case denmark
+		case djibouti
 		case ecuador
 		case egypt
+		case eritrea
+		case equatorialGuinea
 		case estonia
 		case ethiopia
+		case eswatini
 		case finland
 		case france
 		case frenchGuiana
+		case gabon
+		case gambia
 		case georgia
 		case germany
 		case ghana
 		case greece
 		case guyana
+		case guinea
+		case guineaBissau
 		case hongKong
 		case hungary
 		case iceland
@@ -73,13 +92,20 @@ extension PersonaFieldValue.PostalAddress {
 		case laos
 		case latvia
 		case lebanon
+		case lesotho
+		case liberia
+		case libya
 		case liechtenstein
 		case lithuania
 		case luxembourg
 		case macao
 		case madagascar
 		case malaysia
+		case mali
+		case malawi
 		case malta
+		case mauritania
+		case mauritius
 		case mexico
 		case moldova
 		case monaco
@@ -88,6 +114,7 @@ extension PersonaFieldValue.PostalAddress {
 		case montenegro
 		case morocco
 		case myanmar
+		case namibia
 		case oman
 		case nepal
 		case netherlands
@@ -105,16 +132,26 @@ extension PersonaFieldValue.PostalAddress {
 		case philippines
 		case poland
 		case qatar
+
+		/// aka "Congo-Brazzaville" or simply "Congo"
+		case republicOfCongo
+
+		case reunion
 		case romania
+		case rwanda
 		case russia
 		case saudiArabia
 		case sanMarino
+		case senegal
 		case serbia
 		case singapore
+		case sierraLeone
 		case slovakia
 		case slovenia
+		case somalia
 		case southKorea
 		case southAfrica
+		case southSudan
 		case spain
 		case sriLanka
 		case sudan
@@ -125,6 +162,8 @@ extension PersonaFieldValue.PostalAddress {
 		case tajikistan
 		case tanzania
 		case thailand
+		case togo
+		case tunisia
 		case turkey
 		case turkmenistan
 		case vietnam
@@ -138,5 +177,7 @@ extension PersonaFieldValue.PostalAddress {
 		case vaticanCity
 		case venzuela
 		case yemen
+		case zambia
+		case zimbabwe
 	}
 }
