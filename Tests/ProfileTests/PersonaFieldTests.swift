@@ -448,61 +448,100 @@ public enum PersonaFieldValue: Sendable, Hashable, Codable, BasePersonaFieldValu
 			case argentina
 			case angola
 			case algeria
+			case albania
+			case andorra
+			case armenia
 			case australia
+			case austria
 			case bangladesh
+			case azerbaijan
+			case belarus
+			case belgium
+			case bosniaAndHerzegovinia
+			case bulgaria
 			case brazil
 			case canada
-			case colombia
 			case cameroon
 			case china
+			case colombia
+			case croatia
+			case cyprus
+			case czechRepublic
 			case democraticRepublicOfTheCongo
-			case ethiopia
+			case denmark
 			case egypt
-			case ghana
-			case germany
+			case estonia
+			case ethiopia
+			case finland
 			case france
+			case georgia
+			case germany
+			case ghana
+			case greece
 			case hongKong
+			case hungary
+			case iceland
 			case india
 			case iran
 			case iraq
+			case ireland
 			case italy
 			case ivoryCoast; public static let côteDIvoire: Self = .ivoryCoast
 			case indonesia
+			case japan
+			case kazakhstan
 			case kenya
+			case latvia
+			case liechtenstein
+			case lithuania
+			case luxembourg
 			case madagascar
 			case malaysia
+			case malta
+			case mexico
+			case moldova
+			case monaco
+			case mozambique
+			case montenegro
 			case morocco
+			case myanmar
 			case nepal
+			case netherlands
 			case niger
-			case japan
+			case northKorea
+			case northMacedonia
+			case norway
 			case nigeria
 			case pakistan
 			case philippines
 			case poland
 			case peru
+			case romania
 			case russia
+			case saudiArabia
+			case sanMarino
+			case serbia
 			case singapore
+			case slovakia
+			case slovenia
+			case southKorea
 			case southAfrica
+			case spain
+			case sudan
 			case sweden
+			case switzerland
 			case taiwan
 			case tanzania
 			case thailand
 			case turkey
 			case vietnam
-			case mexico
-			case myanmar
-			case mozambique
-			case northKorea
-			case southKorea
-			case saudiArabia
-			case spain
-			case sudan
 			case uganda
 			case ukraine
 			case unitedArabEmirates
 			case unitedKingdom
 			case unitedStates
 			case uzbekistan
+			case vaticanCity
 			case venzuela
 			case yemen
 
@@ -1021,6 +1060,286 @@ public enum PersonaFieldValue: Sendable, Hashable, Codable, BasePersonaFieldValu
 					]
 
 				case .yemen:
+					return [
+						[.streetLine0],
+						[.streetLine1],
+						[.postalCodeNumber, .city],
+						[.country],
+					]
+				case .albania:
+					return [
+						[.streetLine0],
+						[.streetLine1],
+						[.city],
+						[.country],
+					]
+				case .andorra:
+					return [
+						[.streetLine0],
+						[.streetLine1],
+						[.postalCodeNumber, .city],
+						[.country],
+					]
+				case .armenia:
+					return [
+						[.streetLine0],
+						[.streetLine1],
+						[.postalCodeNumber, .city],
+						[.country],
+					]
+				case .austria:
+					return [
+						[.streetLine0],
+						[.streetLine1],
+						[.postalCodeNumber, .city],
+						[.country],
+					]
+				case .azerbaijan:
+					return [
+						[.streetLine0],
+						[.streetLine1],
+						[.postalCodeNumber, .city],
+						[.country],
+					]
+				case .belarus:
+					return [
+						[.streetLine0],
+						[.streetLine1],
+						[.postalCodeNumber, .city],
+						[.province],
+						[.country],
+					]
+				case .belgium:
+					return [
+						[.streetLine0],
+						[.streetLine1],
+						[.postalCodeNumber, .city],
+						[.country],
+					]
+				case .bosniaAndHerzegovinia:
+					return [
+						[.streetLine0],
+						[.streetLine1],
+						[.postalCodeNumber, .city],
+						[.country],
+					]
+				case .bulgaria:
+					return [
+						[.streetLine0],
+						[.streetLine1],
+						[.postalCodeNumber, .city],
+						[.country],
+					]
+				case .croatia:
+					return [
+						[.streetLine0],
+						[.streetLine1],
+						[.postalCodeNumber, .city],
+						[.country],
+					]
+				case .cyprus:
+					return [
+						[.streetLine0],
+						[.streetLine1],
+						[.postalCodeNumber, .city],
+						[.country],
+					]
+				case .czechRepublic:
+					return [
+						[.streetLine0],
+						[.streetLine1],
+						[.postalCodeNumber, .city],
+						[.country],
+					]
+				case .denmark:
+					return [
+						[.streetLine0],
+						[.streetLine1],
+						[.postalCodeNumber, .city],
+						[.country],
+					]
+				case .estonia:
+					return [
+						[.streetLine0],
+						[.streetLine1],
+						[.postalCodeNumber, .city],
+						[.country],
+					]
+				case .finland:
+					return [
+						[.streetLine0],
+						[.streetLine1],
+						[.postalCodeNumber, .city],
+						[.country],
+					]
+				case .georgia:
+					return [
+						[.streetLine0],
+						[.streetLine1],
+						[.postalCodeNumber, .city],
+						[.country],
+					]
+				case .greece:
+					return [
+						[.streetLine0],
+						[.streetLine1],
+						[.postalCodeNumber, .city],
+						[.country],
+					]
+				case .hungary:
+					return [
+						[.postalCodeNumber, .city],
+						[.streetLine0],
+						[.streetLine1],
+						[.country],
+					]
+				case .iceland:
+					return [
+						[.streetLine0],
+						[.streetLine1],
+						[.postalCodeNumber, .city],
+						[.country],
+					]
+				case .ireland:
+					return [
+						[.streetLine0],
+						[.streetLine1],
+						[.city],
+						[.county, .postcodeNumber],
+						[.country],
+					]
+				case .kazakhstan:
+					return [
+						[.streetLine0],
+						[.streetLine1],
+						[.city],
+						[.district],
+						[.region],
+						[.country],
+						[.postalCodeNumber],
+					]
+				case .latvia:
+					return [
+						[.streetLine0],
+						[.streetLine1],
+						[.city, .postalCodeNumber],
+						[.country],
+					]
+				case .liechtenstein:
+					return [
+						[.streetLine0],
+						[.streetLine1],
+						[.postalCodeNumber, .city],
+						[.country],
+					]
+				case .lithuania:
+					return [
+						[.streetLine0],
+						[.streetLine1],
+						[.postalCodeNumber, .city],
+						[.country],
+					]
+				case .luxembourg:
+					return [
+						[.streetLine0],
+						[.streetLine1],
+						[.postalCodeNumber, .city],
+						[.country],
+					]
+				case .malta:
+					return [
+						[.streetLine0],
+						[.streetLine1],
+						[.city],
+						[.postalCodeNumber],
+						[.country],
+					]
+				case .moldova:
+					return [
+						[.streetLine0],
+						[.streetLine1],
+						[.postalCodeNumber, .city],
+						[.country],
+					]
+				case .monaco:
+					return [
+						[.streetLine0],
+						[.streetLine1],
+						[.postalCodeNumber, .city],
+						[.country],
+					]
+				case .montenegro:
+					return [
+						[.streetLine0],
+						[.streetLine1],
+						[.postalCodeNumber, .city],
+						[.country],
+					]
+				case .netherlands:
+					return [
+						[.streetLine0],
+						[.streetLine1],
+						[.postalCodeNumber, .city],
+						[.country],
+					]
+				case .northMacedonia:
+					return [
+						[.streetLine0],
+						[.streetLine1],
+						[.postalCodeNumber, .city],
+						[.country],
+					]
+				case .norway:
+					return [
+						[.streetLine0],
+						[.streetLine1],
+						[.postalCodeNumber, .city],
+						[.country],
+					]
+				case .romania:
+					return [
+						[.streetLine0],
+						[.streetLine1],
+						[.postalCodeNumber, .city],
+						[.country],
+					]
+				case .sanMarino:
+					return [
+						[.streetLine0],
+						[.streetLine1],
+						[.postalCodeNumber, .city],
+						[.province],
+						[.country],
+					]
+				case .serbia:
+					return [
+						[.streetLine0],
+						[.streetLine1],
+						[.postalCodeNumber, .city],
+						[.country],
+					]
+				case .slovakia:
+					return [
+						[.streetLine0],
+						[.streetLine1],
+						[.postalCodeNumber, .city],
+						[.country],
+					]
+				case .slovenia:
+					return [
+						[.streetLine0],
+						[.streetLine1],
+						[.postalCodeNumber, .city],
+						[.country],
+					]
+				case .switzerland:
+					return [
+						[.streetLine0],
+						[.streetLine1],
+						[.postalCodeNumber, .city],
+						[.country],
+					]
+				case .vaticanCity:
 					return [
 						[.streetLine0],
 						[.streetLine1],
