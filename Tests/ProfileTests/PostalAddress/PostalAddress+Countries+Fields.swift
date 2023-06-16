@@ -457,6 +457,14 @@ extension PersonaFieldValue.PostalAddress.Country {
 				[.country],
 			]
 
+		case .laos:
+			return [
+				[.streetLine0],
+				[.streetLine1],
+				[.postalCodeNumber, .city],
+				[.country],
+			]
+
 		case .latvia:
 			return [
 				[.streetLine0],

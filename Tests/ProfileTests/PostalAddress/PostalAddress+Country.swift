@@ -68,6 +68,7 @@ extension PersonaFieldValue.PostalAddress {
 		case kazakhstan
 		case kenya
 		case kuwait
+		case laos
 		case latvia
 		case liechtenstein
 		case lithuania
