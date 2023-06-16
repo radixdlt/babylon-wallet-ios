@@ -226,7 +226,8 @@ public enum PersonaFieldValue: Sendable, Hashable, Codable, BasePersonaFieldValu
 				case streetLine0
 				case streetLine1
 				case postalCodeString
-				case postalCodeUInt
+				case postalCodeNumber
+				case zipNumber
 				case city
 				case district
 				case neighbourhood
@@ -243,8 +244,11 @@ public enum PersonaFieldValue: Sendable, Hashable, Codable, BasePersonaFieldValu
 			case streetLine1(String)
 
 			case postalCodeString(String)
+
 			/// Sweden
-			case postalCodeUInt(UInt)
+			case postalCodeNumber(Int)
+			/// US
+			case zipNumber(Int)
 
 			case city(String)
 			case state(String)
@@ -273,7 +277,9 @@ public enum PersonaFieldValue: Sendable, Hashable, Codable, BasePersonaFieldValu
 				case .streetLine0: return .streetLine0
 				case .streetLine1: return .streetLine1
 				case .postalCodeString: return .postalCodeString
-				case .postalCodeUInt: return .postalCodeUInt
+				case .postalCodeNumber: return .postalCodeNumber
+				case .zipNumber: return .zipNumber
+
 				case .city: return .city
 				case .state: return .state
 				case .district: return .district
@@ -310,31 +316,86 @@ public enum PersonaFieldValue: Sendable, Hashable, Codable, BasePersonaFieldValu
 			case unitedArabEmirates
 			case unitedStates
 
-			var fields: [PostalAddress.Field.Discriminator] {
+			var fields: [[PostalAddress.Field.Discriminator]] {
 				switch self {
 				case .australia:
-					return [.streetLine0, .streetLine1, .suburb, .state, .postalCodeUInt, .country]
+					return [
+						[.streetLine0],
+						[.streetLine1],
+						[.suburb],
+						[.state, .postalCodeNumber],
+						[.country],
+					]
 
 				case .brazil:
-					return [.streetLine0, .streetLine1, .neighbourhood, .city, .state, .postalCodeUInt, .country]
+					return [
+						[.streetLine0],
+						[.streetLine1],
+						[.neighbourhood],
+						[.city],
+						[.state],
+						[.postalCodeNumber],
+						[.country],
+					]
 
 				case .canada:
-					return [.streetLine0, .streetLine1, .city, .province, .postalCodeString, .country]
+					return [
+						[.streetLine0],
+						[.streetLine1],
+						[.city],
+						[.province, .postalCodeString],
+						[.country],
+					]
 
 				case .hongKong:
-					return [.country, .region, .district, .streetLine0, .streetLine1]
+					return [
+						[.country],
+						[.region, .district],
+						[.streetLine0],
+						[.streetLine1],
+					]
 
 				case .sweden:
-					return [.streetLine0, .streetLine1, .postalCodeUInt, .city, .country]
+					return [
+						[.streetLine0],
+						[.streetLine1],
+						[.postalCodeNumber, .city],
+						[.country],
+					]
 
 				case .unitedStates:
-					return [.streetLine0, .streetLine1, .city, .state, .postalCodeUInt, .country]
+					return [
+						[.streetLine0],
+						[.streetLine1],
+						[.city],
+						[.state, .zipNumber],
+						[.country],
+					]
 
 				case .unitedArabEmirates:
-					return [.streetLine0, .streetLine1, .area, .city, .country]
+					return [
+						[.streetLine0],
+						[.streetLine1],
+						[.area],
+						[.city],
+						[.country],
+					]
+
+				case .turkey:
+					return [
+						[.streetLine0],
+						[.streetLine1],
+						[.postalCodeNumber, .district],
+						[.city, .country],
+					]
 
 				default:
-					return [.streetLine0, .streetLine1, .postalCodeUInt, .city, .state, .country]
+					return [
+						[.streetLine0],
+						[.streetLine1],
+						[.postalCodeNumber, .city],
+						[.state, .country],
+					]
 				}
 			}
 		}
