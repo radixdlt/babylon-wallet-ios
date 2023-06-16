@@ -227,7 +227,8 @@ public enum PersonaFieldValue: Sendable, Hashable, Codable, BasePersonaFieldValu
 				case streetLine1
 				case postalCodeString
 				case postalCodeNumber
-				case zipNumber
+				case postcodeNumber // India
+				case zipNumber // US
 				case city
 				case district
 				case neighbourhood
@@ -247,6 +248,10 @@ public enum PersonaFieldValue: Sendable, Hashable, Codable, BasePersonaFieldValu
 
 			/// Sweden
 			case postalCodeNumber(Int)
+
+			/// "Postcode" e.g.: `India`
+			case postcodeNumber(Int)
+
 			/// US
 			case zipNumber(Int)
 
@@ -278,6 +283,7 @@ public enum PersonaFieldValue: Sendable, Hashable, Codable, BasePersonaFieldValu
 				case .streetLine1: return .streetLine1
 				case .postalCodeString: return .postalCodeString
 				case .postalCodeNumber: return .postalCodeNumber
+				case .postcodeNumber: return .postcodeNumber
 				case .zipNumber: return .zipNumber
 
 				case .city: return .city
@@ -353,6 +359,15 @@ public enum PersonaFieldValue: Sendable, Hashable, Codable, BasePersonaFieldValu
 						[.region, .district],
 						[.streetLine0],
 						[.streetLine1],
+					]
+
+				case .india:
+					return [
+						[.streetLine0],
+						[.streetLine1],
+						[.city, .postcodeNumber],
+						[.state],
+						[.country],
 					]
 
 				case .sweden:
