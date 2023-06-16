@@ -4,6 +4,7 @@ import EngineToolkit
 @testable import Profile
 import RadixConnectModels
 import SharedTestingModels
+import SwiftUI
 import TestingPrelude
 
 // MARK: - DuplicateValuesFound
@@ -296,10 +297,17 @@ public enum PersonaFieldValue: Sendable, Hashable, Codable, BasePersonaFieldValu
 			case region(String)
 
 			/// United Arab Emirates
-			case area
+			case area(String)
 
 			/// China
 			case prefectureLevelCity(String)
+
+			public var valueType: UIKeyboardType {
+				switch self {
+				case .zipNumber, .postalCodeNumber, .postcodeNumber: return .numbersAndPunctuation
+				default: return .default
+				}
+			}
 
 			public var discriminator: Discriminator {
 				switch self {
@@ -344,6 +352,7 @@ public enum PersonaFieldValue: Sendable, Hashable, Codable, BasePersonaFieldValu
 			case hongKong
 			case india
 			case indonesia
+			case nigeria
 			case pakistan
 			case singapore
 			case sweden
@@ -417,6 +426,15 @@ public enum PersonaFieldValue: Sendable, Hashable, Codable, BasePersonaFieldValu
 						[.streetLine1],
 						[.city],
 						[.province, .postalCodeNumber],
+						[.country],
+					]
+
+				case .nigeria:
+					return [
+						[.streetLine0],
+						[.streetLine1],
+						[.city, .postalCodeNumber],
+						[.state],
 						[.country],
 					]
 
