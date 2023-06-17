@@ -51,6 +51,18 @@ extension Persona.PersonaData {
 			}
 			self.collection[id: updated.id] = updated
 		}
+
+		public func encode(to encoder: Encoder) throws {
+			var container = encoder.singleValueContainer()
+			try container.encode(collection.elements)
+		}
+
+		public init(from decoder: Decoder) throws {
+			var container = try decoder.singleValueContainer()
+			try self.init(
+				collection: container.decode(IdentifiedArrayOf<PersonaDataEntryOfKind<Value>>.self)
+			)
+		}
 	}
 }
 

@@ -32,6 +32,16 @@ extension PersonaDataEntry {
 			case noCountry
 			case missingRequiredField
 		}
+
+		public init(from decoder: Decoder) throws {
+			var container = try decoder.singleValueContainer()
+			try self.init(validating: container.decode(IdentifiedArrayOf<PersonaDataEntry.PostalAddress.Field>.self))
+		}
+
+		public func encode(to encoder: Encoder) throws {
+			var container = encoder.singleValueContainer()
+			try container.encode(fields.elements)
+		}
 	}
 }
 

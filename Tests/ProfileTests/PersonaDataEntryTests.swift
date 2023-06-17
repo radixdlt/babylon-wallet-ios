@@ -1,6 +1,7 @@
 import CasePaths
 import Cryptography
 import EngineToolkit
+import JSONTesting
 @testable import Profile
 import RadixConnectModels
 import SharedTestingModels
@@ -222,6 +223,177 @@ final class PersonaFieldTests: TestCase {
 
 		let addresses = try dappRequest(values: \.postalAddresses, from: persona)
 		XCTAssertEqual(addresses.compactMap(\.value.country), [.sweden, .sweden, .france, .unitedKingdom])
+	}
+
+	func test_json_encoding_test() throws {
+		let persona = withDependencies {
+			$0.uuid = .incrementing
+		} operation: {
+			Persona(
+				label: "Stadsministern",
+				personaData: .init(
+					name: .init(
+						value: .init(
+							given: "Olof",
+							family: "Palme",
+							variant: .western
+						)
+					),
+					emailAddresses: [
+						"palme@stadsminister.se",
+					],
+					postalAddresses: [
+						[
+							.streetLine0("Västerlånggatan 31"),
+							.streetLine1(""),
+							.postalCodeNumber(11129), .city("Stockholm"),
+							.country(.sweden),
+						],
+					]
+				)
+			)
+		}
+
+		let json: JSON = [
+			"label": "Stadsministern",
+			"personaData": [
+				"name": [
+					"id": "00000000-0000-0000-0000-000000000000",
+					"value": [
+						"family": "Palme",
+						"given": "Olof",
+						"variant": "western",
+					],
+				],
+				"emailAddresses": [
+					[
+						"id": "00000000-0000-0000-0000-000000000001",
+						"value": "palme@stadsminister.se",
+					],
+				],
+				"postalAddresses": [
+					[
+						"id": "00000000-0000-0000-0000-000000000002",
+						"value": [
+							[
+								"discriminator": "streetLine0",
+								"value": "Västerlånggatan 31",
+							],
+							[
+								"discriminator": "streetLine1",
+								"value": "",
+							],
+							[
+								"discriminator": "postalCodeNumber",
+								"value": 11129,
+							],
+							[
+								"discriminator": "city",
+								"value": "Stockholm",
+							],
+							[
+								"discriminator": "country",
+								"value": "sweden",
+							],
+						],
+					],
+				],
+			],
+		]
+
+		try XCTAssertJSONEncoding(
+			persona,
+			json
+		)
+	}
+
+	func test_json_decoding_test() throws {
+		let persona = withDependencies {
+			$0.uuid = .incrementing
+		} operation: {
+			Persona(
+				label: "Stadsministern",
+				personaData: .init(
+					name: .init(
+						value: .init(
+							given: "Olof",
+							family: "Palme",
+							variant: .western
+						)
+					),
+					emailAddresses: [
+						"palme@stadsminister.se",
+					],
+					postalAddresses: [
+						[
+							.streetLine0("Västerlånggatan 31"),
+							.streetLine1(""),
+							.postalCodeNumber(11129), .city("Stockholm"),
+							.country(.sweden),
+						],
+					]
+				)
+			)
+		}
+
+		let json: JSON = [
+			"label": "Stadsministern",
+			"personaData": [
+				"name": [
+					"id": "00000000-0000-0000-0000-000000000000",
+					"value": [
+						"family": "Palme",
+						"given": "Olof",
+						"variant": "western",
+					],
+				],
+				"emailAddresses": [
+					[
+						"id": "00000000-0000-0000-0000-000000000001",
+						"value": "palme@stadsminister.se",
+					],
+				],
+				"postalAddresses": [
+					[
+						"id": "00000000-0000-0000-0000-000000000002",
+						"value": [
+							[
+								"discriminator": "streetLine0",
+								"value": "Västerlånggatan 31",
+							],
+							[
+								"discriminator": "streetLine1",
+								"value": "",
+							],
+							[
+								"discriminator": "postalCodeNumber",
+								"value": 11129,
+							],
+							[
+								"discriminator": "city",
+								"value": "Stockholm",
+							],
+							[
+								"discriminator": "country",
+								"value": "sweden",
+							],
+						],
+					],
+				],
+			],
+		]
+
+		try XCTAssertJSONDecoding(
+			json,
+			persona
+		)
+	}
+}
+
+// MARK: - PersonaDataEntryOfKind + ExpressibleByStringLiteral, ExpressibleByUnicodeScalarLiteral, ExpressibleByExtendedGraphemeClusterLiteral
+extension PersonaDataEntryOfKind<PersonaDataEntry.EmailAddress>: ExpressibleByStringLiteral, ExpressibleByUnicodeScalarLiteral, ExpressibleByExtendedGraphemeClusterLiteral {
+	public init(stringLiteral value: String) {
+		try! self.init(value: .init(validating: value))
 	}
 }
 

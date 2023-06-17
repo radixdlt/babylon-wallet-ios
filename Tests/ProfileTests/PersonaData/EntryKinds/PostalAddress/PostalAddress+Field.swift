@@ -80,6 +80,134 @@ extension PersonaDataEntry.PostalAddress {
 	}
 }
 
+extension PersonaDataEntry.PostalAddress.Field {
+	private enum CodingKeys: String, CodingKey {
+		case value, discriminator
+	}
+
+	public init(from decoder: Decoder) throws {
+		var container = try decoder.container(keyedBy: CodingKeys.self)
+		let discriminator = try container.decode(Discriminator.self, forKey: .discriminator)
+		switch discriminator {
+		case .area:
+			self = try .area(container.decode(String.self, forKey: .value))
+		case .streetLine0:
+			self = try .streetLine0(container.decode(String.self, forKey: .value))
+		case .streetLine1:
+			self = try .streetLine1(container.decode(String.self, forKey: .value))
+		case .postalCodeString:
+			self = try .postalCodeString(container.decode(String.self, forKey: .value))
+		case .postalCodeNumber:
+			self = try .postalCodeNumber(container.decode(Int.self, forKey: .value))
+		case .postcodeNumber:
+			self = try .postcodeNumber(container.decode(Int.self, forKey: .value))
+		case .postalDistrict:
+			self = try .postalDistrict(container.decode(String.self, forKey: .value))
+		case .postcodeString:
+			self = try .postcodeString(container.decode(String.self, forKey: .value))
+		case .zipNumber:
+			self = try .zipNumber(container.decode(Int.self, forKey: .value))
+		case .city:
+			self = try .city(container.decode(String.self, forKey: .value))
+		case .districtNumber:
+			self = try .districtNumber(container.decode(Int.self, forKey: .value))
+		case .districtString:
+			self = try .districtString(container.decode(String.self, forKey: .value))
+		case .neighbourhood:
+			self = try .neighbourhood(container.decode(String.self, forKey: .value))
+		case .department:
+			self = try .department(container.decode(String.self, forKey: .value))
+		case .suburb:
+			self = try .suburb(container.decode(String.self, forKey: .value))
+		case .state:
+			self = try .state(container.decode(String.self, forKey: .value))
+		case .governorate:
+			self = try .governorate(container.decode(String.self, forKey: .value))
+		case .province:
+			self = try .province(container.decode(String.self, forKey: .value))
+		case .prefectureLevelCity:
+			self = try .prefectureLevelCity(container.decode(String.self, forKey: .value))
+		case .country:
+			self = try .country(container.decode(PersonaDataEntry.PostalAddress.Country.self, forKey: .value))
+		case .region:
+			self = try .region(container.decode(String.self, forKey: .value))
+		case .subjectOfTheFederation:
+			self = try .subjectOfTheFederation(container.decode(String.self, forKey: .value))
+		case .prefecture:
+			self = try .prefecture(container.decode(String.self, forKey: .value))
+		case .county:
+			self = try .county(container.decode(String.self, forKey: .value))
+		case .furtherDivisionsLine0:
+			self = try .furtherDivisionsLine0(container.decode(String.self, forKey: .value))
+		case .furtherDivisionsLine1:
+			self = try .furtherDivisionsLine1(container.decode(String.self, forKey: .value))
+		case .township:
+			self = try .township(container.decode(String.self, forKey: .value))
+		}
+	}
+
+	public func encode(to encoder: Encoder) throws {
+		var container = encoder.container(keyedBy: CodingKeys.self)
+		try container.encode(discriminator, forKey: .discriminator)
+		switch self {
+		case let .area(value):
+			try container.encode(value, forKey: .value)
+		case let .country(value):
+			try container.encode(value, forKey: .value)
+		case let .streetLine0(value):
+			try container.encode(value, forKey: .value)
+		case let .streetLine1(value):
+			try container.encode(value, forKey: .value)
+		case let .postalCodeString(value):
+			try container.encode(value, forKey: .value)
+		case let .postalCodeNumber(value):
+			try container.encode(value, forKey: .value)
+		case let .postcodeNumber(value):
+			try container.encode(value, forKey: .value)
+		case let .postcodeString(value):
+			try container.encode(value, forKey: .value)
+		case let .zipNumber(value):
+			try container.encode(value, forKey: .value)
+		case let .city(value):
+			try container.encode(value, forKey: .value)
+		case let .state(value):
+			try container.encode(value, forKey: .value)
+		case let .suburb(value):
+			try container.encode(value, forKey: .value)
+		case let .neighbourhood(value):
+			try container.encode(value, forKey: .value)
+		case let .province(value):
+			try container.encode(value, forKey: .value)
+		case let .governorate(value):
+			try container.encode(value, forKey: .value)
+		case let .districtString(value):
+			try container.encode(value, forKey: .value)
+		case let .districtNumber(value):
+			try container.encode(value, forKey: .value)
+		case let .region(value):
+			try container.encode(value, forKey: .value)
+		case let .prefectureLevelCity(value):
+			try container.encode(value, forKey: .value)
+		case let .subjectOfTheFederation(value):
+			try container.encode(value, forKey: .value)
+		case let .prefecture(value):
+			try container.encode(value, forKey: .value)
+		case let .county(value):
+			try container.encode(value, forKey: .value)
+		case let .furtherDivisionsLine0(value):
+			try container.encode(value, forKey: .value)
+		case let .furtherDivisionsLine1(value):
+			try container.encode(value, forKey: .value)
+		case let .township(value):
+			try container.encode(value, forKey: .value)
+		case let .department(value):
+			try container.encode(value, forKey: .value)
+		case let .postalDistrict(value):
+			try container.encode(value, forKey: .value)
+		}
+	}
+}
+
 // MARK: - PersonaDataEntry.PostalAddress.Field.Discriminator
 extension PersonaDataEntry.PostalAddress.Field {
 	public enum Discriminator: String, Sendable, Hashable, Codable {

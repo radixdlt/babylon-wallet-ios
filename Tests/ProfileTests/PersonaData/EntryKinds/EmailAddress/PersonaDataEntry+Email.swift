@@ -18,5 +18,15 @@ extension PersonaDataEntry {
 		struct InvalidEmailAddress: Swift.Error {
 			let invalid: String
 		}
+
+		public func encode(to encoder: Encoder) throws {
+			var container = encoder.singleValueContainer()
+			try container.encode(email)
+		}
+
+		public init(from decoder: Decoder) throws {
+			let container = try decoder.singleValueContainer()
+			try self.init(validating: container.decode(String.self))
+		}
 	}
 }
