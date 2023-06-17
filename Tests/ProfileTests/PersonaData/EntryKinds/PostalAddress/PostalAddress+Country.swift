@@ -1,7 +1,8 @@
 import Foundation
 
+// MARK: - PersonaDataEntry.PostalAddress.Country
 extension PersonaDataEntry.PostalAddress {
-	public enum Country: String, Sendable, Hashable, Codable {
+	public enum Country: String, Sendable, Hashable, Codable, CaseIterable, Identifiable {
 		case afghanistan
 		case argentina
 		case angola
@@ -41,6 +42,7 @@ extension PersonaDataEntry.PostalAddress {
 		case colombia
 		case comoros
 		case costaRica
+		public static let côteDIvoire: Self = .ivoryCoast
 		case croatia
 		case cuba
 		case curacao
@@ -87,7 +89,7 @@ extension PersonaDataEntry.PostalAddress {
 		case ireland
 		case isreal
 		case italy
-		case ivoryCoast; public static let côteDIvoire: Self = .ivoryCoast
+		case ivoryCoast
 		case indonesia
 		case jamaica
 		case japan
@@ -187,9 +189,14 @@ extension PersonaDataEntry.PostalAddress {
 		case uruguay
 		case uzbekistan
 		case vaticanCity
-		case venzuela
+		case venezuela
 		case yemen
 		case zambia
 		case zimbabwe
 	}
+}
+
+extension PersonaDataEntry.PostalAddress.Country {
+	public typealias ID = RawValue
+	public var id: ID { rawValue }
 }

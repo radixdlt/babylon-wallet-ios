@@ -13,6 +13,10 @@ extension PersonaDataEntry {
 			self.fields = fields
 		}
 
+		var country: Country? {
+			fields.compactMap(\.country).first
+		}
+
 		public init(validating fields: IdentifiedArrayOf<PersonaDataEntry.PostalAddress.Field>) throws {
 			guard let country = fields.compactMap(\.country).first else {
 				throw Error.noCountry

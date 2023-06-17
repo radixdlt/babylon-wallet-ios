@@ -7,32 +7,6 @@ import SharedTestingModels
 import SwiftUI
 import TestingPrelude
 
-extension PersonaDataEntry.Name {
-	public var valueForDapp: String {
-		let components: [String?] = {
-			switch variant {
-			case .western: return [given, middle, family]
-			case .eastern: return [family, middle, given]
-			}
-		}()
-		return components.compactMap { $0 }.joined(separator: " ")
-	}
-}
-
-// MARK: - PersonaDataEntry.EmailAddress + ExpressibleByStringLiteral
-extension PersonaDataEntry.EmailAddress: ExpressibleByStringLiteral {
-	public init(stringLiteral value: String) {
-		try! self.init(validating: value)
-	}
-}
-
-// MARK: - Persona.PersonaData.EntryCollectionOf + ExpressibleByArrayLiteral
-extension Persona.PersonaData.EntryCollectionOf: ExpressibleByArrayLiteral {
-	public init(arrayLiteral elements: PersonaDataEntryOfKind<Value>...) {
-		try! self.init(collection: .init(uncheckedUniqueElements: elements))
-	}
-}
-
 // MARK: - PersonaFieldTests
 final class PersonaFieldTests: TestCase {
 	func test_name_western() throws {
@@ -189,10 +163,9 @@ final class PersonaFieldTests: TestCase {
 						)
 					),
 					postalAddresses: [[
-						.postalCodeNumber(11129),
-						.city("Stockholm"),
 						.streetLine0("Västerlånggatan 31"),
 						.streetLine1(""),
+						.postalCodeNumber(11129), .city("Stockholm"),
 						.country(.sweden),
 					]]
 				)
@@ -200,10 +173,9 @@ final class PersonaFieldTests: TestCase {
 
 			let addresses = try dappRequest(values: \.postalAddresses, from: persona)
 			XCTAssertEqual(addresses[0], [
-				.postalCodeNumber(11129),
-				.city("Stockholm"),
 				.streetLine0("Västerlånggatan 31"),
 				.streetLine1(""),
+				.postalCodeNumber(11129), .city("Stockholm"),
 				.country(.sweden),
 			])
 		}
@@ -245,3 +217,29 @@ private extension PersonaFieldTests {
 
 // MARK: - NoSuchField
 struct NoSuchField: Error {}
+
+extension PersonaDataEntry.Name {
+	public var valueForDapp: String {
+		let components: [String?] = {
+			switch variant {
+			case .western: return [given, middle, family]
+			case .eastern: return [family, middle, given]
+			}
+		}()
+		return components.compactMap { $0 }.joined(separator: " ")
+	}
+}
+
+// MARK: - PersonaDataEntry.EmailAddress + ExpressibleByStringLiteral
+extension PersonaDataEntry.EmailAddress: ExpressibleByStringLiteral {
+	public init(stringLiteral value: String) {
+		try! self.init(validating: value)
+	}
+}
+
+// MARK: - Persona.PersonaData.EntryCollectionOf + ExpressibleByArrayLiteral
+extension Persona.PersonaData.EntryCollectionOf: ExpressibleByArrayLiteral {
+	public init(arrayLiteral elements: PersonaDataEntryOfKind<Value>...) {
+		try! self.init(collection: .init(uncheckedUniqueElements: elements))
+	}
+}

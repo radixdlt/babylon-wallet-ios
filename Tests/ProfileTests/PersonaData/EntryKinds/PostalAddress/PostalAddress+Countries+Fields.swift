@@ -1479,7 +1479,7 @@ extension PersonaDataEntry.PostalAddress.Country {
 				[.postalCodeNumber, .city],
 				[.country],
 			]
-		case .venzuela:
+		case .venezuela:
 			return [
 				[.streetLine0],
 				[.streetLine1],
