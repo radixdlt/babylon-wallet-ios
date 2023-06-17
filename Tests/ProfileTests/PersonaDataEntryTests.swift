@@ -180,6 +180,49 @@ final class PersonaFieldTests: TestCase {
 			])
 		}
 	}
+
+	func test_multiple_postalAddresses_multiple() throws {
+		let persona = withDependencies {
+			$0.uuid = .incrementing
+		} operation: {
+			Persona(
+				label: "Fake",
+				personaData: .init(
+					postalAddresses: [
+						[
+							.streetLine0("Östantorp Vinö 52"),
+							.streetLine1(),
+							.postalCodeNumber(36030), .city("Lammhult"),
+							.country(.sweden),
+						],
+						[
+							.streetLine0("Föreningsgatan 41"),
+							.streetLine1(),
+							.postalCodeNumber(86033), .city("Bergeforsen"),
+							.country(.sweden),
+						],
+						[
+							.streetLine0("93 rue de la Mare aux Carats"),
+							.streetLine1(),
+							.postalCodeNumber(34080), .city("Montpellier"),
+							.country(.france),
+						],
+						[
+							.streetLine0("34 St Thomas's Rd"),
+							.streetLine1(),
+							.city("Gosport"),
+							.county("Hampshire"),
+							.postcodeString("PO12 4JX"),
+							.country(.unitedKingdom),
+						],
+					]
+				)
+			)
+		}
+
+		let addresses = try dappRequest(values: \.postalAddresses, from: persona)
+		XCTAssertEqual(addresses.compactMap(\.value.country), [.sweden, .sweden, .france, .unitedKingdom])
+	}
 }
 
 // MARK: - PersonaDataEntry.PostalAddress + ExpressibleByArrayLiteral
