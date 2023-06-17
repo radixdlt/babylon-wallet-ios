@@ -7,7 +7,7 @@ extension PersonaDataEntry {
 		public static var casePath: CasePath<PersonaDataEntry, Self> = /PersonaDataEntry.postalAddress
 		public static var kind = PersonaFieldKind.postalAddress
 
-		public var fields: IdentifiedArrayOf<PersonaDataEntry.PostalAddress.Field>
+		public let fields: IdentifiedArrayOf<PersonaDataEntry.PostalAddress.Field>
 
 		public init(unchecked fields: IdentifiedArrayOf<PersonaDataEntry.PostalAddress.Field>) {
 			self.fields = fields
