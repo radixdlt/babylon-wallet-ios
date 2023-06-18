@@ -229,7 +229,7 @@ final class PersonaFieldTests: TestCase {
 		let persona = withDependencies {
 			$0.uuid = .incrementing
 		} operation: {
-			Persona(
+			try! Persona(
 				label: "Stadsministern",
 				personaData: .init(
 					name: .init(
@@ -239,6 +239,7 @@ final class PersonaFieldTests: TestCase {
 							variant: .western
 						)
 					),
+					dateOfBirth: .init(value: .init(year: 1927, month: 01, day: 30)),
 					emailAddresses: [
 						"palme@stadsminister.se",
 					],
@@ -265,15 +266,19 @@ final class PersonaFieldTests: TestCase {
 						"variant": "western",
 					],
 				],
+				"dateOfBirth": [
+					"id": "00000000-0000-0000-0000-000000000001",
+					"value": "1927-01-30T12:00:00Z",
+				],
 				"emailAddresses": [
 					[
-						"id": "00000000-0000-0000-0000-000000000001",
+						"id": "00000000-0000-0000-0000-000000000002",
 						"value": "palme@stadsminister.se",
 					],
 				],
 				"postalAddresses": [
 					[
-						"id": "00000000-0000-0000-0000-000000000002",
+						"id": "00000000-0000-0000-0000-000000000003",
 						"value": [
 							[
 								"discriminator": "streetLine0",
@@ -311,7 +316,7 @@ final class PersonaFieldTests: TestCase {
 		let persona = withDependencies {
 			$0.uuid = .incrementing
 		} operation: {
-			Persona(
+			try! Persona(
 				label: "Stadsministern",
 				personaData: .init(
 					name: .init(
@@ -321,6 +326,7 @@ final class PersonaFieldTests: TestCase {
 							variant: .western
 						)
 					),
+					dateOfBirth: .init(value: .init(year: 1927, month: 01, day: 30)),
 					emailAddresses: [
 						"palme@stadsminister.se",
 					],
@@ -347,15 +353,19 @@ final class PersonaFieldTests: TestCase {
 						"variant": "western",
 					],
 				],
+				"dateOfBirth": [
+					"id": "00000000-0000-0000-0000-000000000001",
+					"value": "1927-01-30T12:00:00Z",
+				],
 				"emailAddresses": [
 					[
-						"id": "00000000-0000-0000-0000-000000000001",
+						"id": "00000000-0000-0000-0000-000000000002",
 						"value": "palme@stadsminister.se",
 					],
 				],
 				"postalAddresses": [
 					[
-						"id": "00000000-0000-0000-0000-000000000002",
+						"id": "00000000-0000-0000-0000-000000000003",
 						"value": [
 							[
 								"discriminator": "streetLine0",
