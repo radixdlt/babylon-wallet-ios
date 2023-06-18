@@ -4,20 +4,24 @@ import Prelude
 extension Persona {
 	public struct PersonaData: Sendable, Hashable, Codable {
 		public typealias Name = PersonaDataEntryOfKind<PersonaDataEntry.Name>
+		public typealias DateOfBirth = PersonaDataEntryOfKind<PersonaDataEntry.DateOfBirth>
 
 		public typealias EmailAddresses = EntryCollectionOf<PersonaDataEntry.EmailAddress>
 		public typealias PostalAddresses = EntryCollectionOf<PersonaDataEntry.PostalAddress>
 
 		public var name: Name?
+		public var dateOfBirth: DateOfBirth?
 		public var emailAddresses: EmailAddresses
 		public var postalAddresses: PostalAddresses
 
 		public init(
 			name: Name? = nil,
+			dateOfBirth: DateOfBirth? = nil,
 			emailAddresses: EmailAddresses = [],
 			postalAddresses: PostalAddresses = []
 		) {
 			self.name = name
+			self.dateOfBirth = dateOfBirth
 			self.emailAddresses = emailAddresses
 			self.postalAddresses = postalAddresses
 		}
