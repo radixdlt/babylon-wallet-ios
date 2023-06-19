@@ -84,27 +84,21 @@ struct PersonaFieldCollectionValueWithIDNotFound: Swift.Error {
 	let id: UUID
 }
 
-// MARK: - Persona
-public struct Persona: Sendable, Hashable, Codable {
-	public let label: String
-	public let personaData: PersonaData
-}
-
-extension Persona.PersonaData {
-	public var all: OrderedSet<PersonaField> {
-		.init(uncheckedUniqueElements: [
-			name?.embed(),
-		].compactMap { $0 })
-	}
-}
-
-extension Persona {
-	public var fields: OrderedSet<PersonaField> {
-		personaData.all
-	}
-}
-
 // MARK: - BasePersonaFieldValueProtocol
+// extension PersonaData {
+//	public var all: OrderedSet<PersonaField> {
+//		.init(uncheckedUniqueElements: [
+//			name?.embed(),
+//		].compactMap { $0 })
+//	}
+// }
+//
+// extension Persona {
+//	public var fields: OrderedSet<PersonaField> {
+//		personaData.all
+//	}
+// }
+
 public protocol BasePersonaFieldValueProtocol {
 	func embed() -> PersonaDataEntry
 }
