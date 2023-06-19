@@ -377,7 +377,7 @@ final class ProfileTests: TestCase {
 //							],
 //							forRequest: .exactly(1)
 //						)
-						listOfSharedPersonaDataEntriesForKind: nil
+						sharedPersonaData: .init()
 					),
 					.init(
 						identityAddress: secondPersona.address,
@@ -394,7 +394,7 @@ final class ProfileTests: TestCase {
 //							],
 //							forRequest: .exactly(1)
 //						)
-						listOfSharedPersonaDataEntriesForKind: nil
+						sharedPersonaData: .init()
 					))
 			)
 		)
@@ -576,10 +576,12 @@ final class ProfileTests: TestCase {
 
 		XCTAssertEqual(network.authorizedDapps.count, 1)
 		XCTAssertEqual(network.authorizedDapps[0].referencesToAuthorizedPersonas.count, 2)
-		XCTAssertEqual(network.authorizedDapps[0].referencesToAuthorizedPersonas[0].listOfSharedPersonaDataEntriesForKind![0].ids.count, 2)
+
+		XCTAssertNotNil(network.authorizedDapps[0].referencesToAuthorizedPersonas[0].sharedPersonaData.name)
+
 		XCTAssertEqual(network.authorizedDapps[0].referencesToAuthorizedPersonas[0].sharedAccounts?.request.quantifier, .exactly)
 		XCTAssertEqual(network.authorizedDapps[0].referencesToAuthorizedPersonas[0].sharedAccounts?.request.quantity, 2)
-		XCTAssertEqual(network.authorizedDapps[0].referencesToAuthorizedPersonas[0].sharedAccounts?.infoSet.map(\.address), ["account_tdx_c_1p82arz264ntf727q2s7f7cm6pqucgqzuru3z7mgeg3gqua0wlj", "account_tdx_c_1pygfwtlv7l90rcsge6t0f0jwn3cuzp05y8geek45qw7s98msmw"])
+		XCTAssertEqual(network.authorizedDapps[0].referencesToAuthorizedPersonas[0].sharedAccounts?.ids.map(\.address), ["account_tdx_c_1p82arz264ntf727q2s7f7cm6pqucgqzuru3z7mgeg3gqua0wlj", "account_tdx_c_1pygfwtlv7l90rcsge6t0f0jwn3cuzp05y8geek45qw7s98msmw"])
 	}
 
 	func test_version_compatibility_check_too_low() throws {

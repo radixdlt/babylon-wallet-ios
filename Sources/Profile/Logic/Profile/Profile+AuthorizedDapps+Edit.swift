@@ -74,7 +74,7 @@ extension Profile {
 				throw AuthorizedDappReferencesUnknownPersonas()
 			}
 
-			let fieldIDNeedles: Set<PersonaDataEntryID> = Set(personaNeedle.listOfSharedPersonaDataEntriesForKind?.flatMap(\.ids) ?? [])
+			let fieldIDNeedles: Set<PersonaDataEntryID> = personaNeedle.sharedPersonaData.entryIDs
 			let fieldIDHaystack: Set<PersonaDataEntryID> = Set(persona.personaData.entries.map(\.id))
 			guard fieldIDHaystack.isSuperset(of: fieldIDNeedles) else {
 				throw AuthorizedDappReferencesUnknownPersonaField()

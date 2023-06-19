@@ -131,27 +131,61 @@ extension Profile.Network.AuthorizedDapp {
 		/// Date of last login for this persona.
 		public var lastLogin: Date
 
+		public typealias SharedAccounts = Shared<AccountAddress>
 		/// List of "ongoing accountAddresses" that user given the dApp access to.
 		public var sharedAccounts: SharedAccounts?
-
-		public var sharedPersonaData: SharedPersonaData
 
 		public struct SharedPersonaData:
 			Sendable,
 			Hashable,
-			Codable {}
+			Codable
+		{
+			public let name: PersonaDataEntryID?
+			public let dateOfBirth: PersonaDataEntryID?
+			public typealias SharedCollection = Shared<PersonaDataEntryID>
 
-		public struct SharedAccounts:
+			public let postalAddresses: SharedCollection?
+			public let emailAddresses: SharedCollection?
+			public let phoneNumbers: SharedCollection?
+
+			public var entryIDs: Set<PersonaDataEntryID> {
+				var ids: [PersonaDataEntryID] = [
+					name, dateOfBirth,
+				].compactMap { $0 }
+				ids.append(contentsOf: postalAddresses?.ids ?? [])
+				ids.append(contentsOf: emailAddresses?.ids ?? [])
+				ids.append(contentsOf: phoneNumbers?.ids ?? [])
+				return Set(ids)
+			}
+
+			public init(
+				name: PersonaDataEntryID? = nil,
+				dateOfBirth: PersonaDataEntryID? = nil,
+				postalAddresses: SharedCollection? = nil,
+				emailAddresses: SharedCollection? = nil,
+				phoneNumbers: SharedCollection? = nil
+			) {
+				self.name = name
+				self.dateOfBirth = dateOfBirth
+				self.postalAddresses = postalAddresses
+				self.emailAddresses = emailAddresses
+				self.phoneNumbers = phoneNumbers
+			}
+		}
+
+		public var sharedPersonaData: SharedPersonaData
+
+		public struct Shared<ID>:
 			Sendable,
 			Hashable,
-			Codable
+			Codable where ID: Sendable & Hashable & Codable
 		{
 			public typealias Number = RequestedNumber
 			public let request: Number
-			public private(set) var ids: OrderedSet<AccountAddress>
+			public private(set) var ids: OrderedSet<ID>
 
 			public init(
-				ids: OrderedSet<AccountAddress>,
+				ids: OrderedSet<ID>,
 				forRequest request: Number
 			) throws {
 				try Self.validate(ids: ids, forRequest: request)
@@ -180,9 +214,9 @@ struct NotEnoughEntiresProvided: Swift.Error {}
 // MARK: - InvalidNumberOfEntries
 struct InvalidNumberOfEntries: Swift.Error {}
 
-extension Profile.Network.AuthorizedDapp.AuthorizedPersonaSimple.SharedAccounts {
+extension Profile.Network.AuthorizedDapp.AuthorizedPersonaSimple.Shared {
 	public static func validate(
-		ids: OrderedSet<AccountAddress>,
+		ids: OrderedSet<ID>,
 		forRequest request: Number
 	) throws {
 		switch request.quantifier {
@@ -199,7 +233,7 @@ extension Profile.Network.AuthorizedDapp.AuthorizedPersonaSimple.SharedAccounts 
 		}
 	}
 
-	public mutating func update(_ new: OrderedSet<AccountAddress>) throws {
+	public mutating func update(_ new: OrderedSet<ID>) throws {
 		try Self.validate(ids: new, forRequest: self.request)
 		self.ids = new
 	}

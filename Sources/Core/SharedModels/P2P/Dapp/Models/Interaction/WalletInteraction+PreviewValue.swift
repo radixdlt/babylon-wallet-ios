@@ -53,16 +53,7 @@ extension P2P.Dapp.Request.AccountsRequestItem {
 }
 
 extension P2P.Dapp.Request.PersonaDataRequestItem {
-	public static let previewValue = try! Self(listOfSharedPersonaDataEntriesForKind: [
-		.init(
-			ids: [
-				.init(uuidString: "E621E1F8-C36C-495A-93FC-0C247A3E6E5F")!,
-				.init(uuidString: "A121E1F8-C36C-495A-93FC-0C247A3E6E5F")!,
-			],
-			kind: .postalAddress,
-			forRequest: .atLeast(2)
-		),
-	])
+	public static let previewValue = Self(isRequestingName: true)
 }
 
 extension P2P.Dapp.Request.SendTransactionItem {
