@@ -54,7 +54,7 @@ extension P2P.Dapp.Request.AccountsRequestItem {
 
 extension P2P.Dapp.Request.PersonaDataRequestItem {
 	public static let previewValue: Self = .init(
-		fields: [.givenName, .familyName, .emailAddress]
+		fields: [.init(uuidString: "E621E1F8-C36C-495A-93FC-0C247A3E6E5F")!]
 	)
 }
 

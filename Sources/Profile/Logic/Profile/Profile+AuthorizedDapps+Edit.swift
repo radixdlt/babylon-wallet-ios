@@ -73,8 +73,9 @@ extension Profile {
 			guard let persona = network.personas.first(where: { $0.address == personaNeedle.identityAddress }) else {
 				throw AuthorizedDappReferencesUnknownPersonas()
 			}
-			let fieldIDNeedles = personaNeedle.sharedFieldIDs ?? []
-			let fieldIDHaystack = Set(persona.fields.map(\.id))
+
+			let fieldIDNeedles = personaNeedle.sharedPersonaData?.infoSet ?? []
+			let fieldIDHaystack = Set(persona.personaData.entries.map(\.id))
 			guard fieldIDHaystack.isSuperset(of: fieldIDNeedles) else {
 				throw AuthorizedDappReferencesUnknownPersonaField()
 			}
@@ -83,7 +84,7 @@ extension Profile {
 		// Validate that all Accounts are known
 		let accountAddressNeedles: Set<AccountAddress> = Set(
 			authorizedDapp.referencesToAuthorizedPersonas.flatMap {
-				$0.sharedAccounts?.accountsReferencedByAddress ?? []
+				$0.sharedAccounts?.infoSet ?? []
 			}
 		)
 		let accountAddressHaystack = Set(network.accounts.map(\.address))

@@ -1,11 +1,12 @@
 import Prelude
+import Profile
 
 extension P2P.Dapp.Response.WalletInteractionSuccessResponse {
 	public struct PersonaDataRequestResponseItem: Sendable, Hashable, Encodable {
-		public let fields: [P2P.Dapp.Response.PersonaData]
+		public let fields: [PersonaDataEntryOfKind<PersonaDataEntry>]
 
 		public init(
-			fields: [P2P.Dapp.Response.PersonaData]
+			fields: [PersonaDataEntryOfKind<PersonaDataEntry>]
 		) {
 			self.fields = fields
 		}

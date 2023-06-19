@@ -1,11 +1,12 @@
 import Prelude
+import Profile
 
 extension P2P.Dapp.Request {
 	public struct PersonaDataRequestItem: Sendable, Hashable, Decodable {
-		public let fields: Set<P2P.Dapp.Request.PersonaDataField>
+		public let fields: Set<PersonaDataEntryID>
 
 		public init(
-			fields: Set<P2P.Dapp.Request.PersonaDataField>
+			fields: Set<PersonaDataEntryID>
 		) {
 			self.fields = fields
 		}

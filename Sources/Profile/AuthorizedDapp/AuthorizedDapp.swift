@@ -95,17 +95,20 @@ extension Profile.Network.AuthorizedDapp {
 		/// Date of last login for this persona.
 		public var lastLogin: Date
 
+		public typealias SharedAccounts = Shared<AccountAddress>
+		public typealias SharedPersonaDataEntries = Shared<PersonaDataEntryID>
+
 		/// List of "ongoing accountAddresses" that user given the dApp access to.
 		public var sharedAccounts: SharedAccounts?
 
-		/// List of "ongoing personaData" (identified by Profile.Network.Persona.Field.ID) that user has given the Dapp access to.
-		/// mutable so that we can mutate the fields
-		public var sharedFieldIDs: Set<Profile.Network.Persona.Field.ID>?
+		/// List of "ongoing personaData" that user given the dApp access to.
+		public var sharedPersonaData: SharedPersonaDataEntries?
 
-		public struct SharedAccounts:
+		public struct Shared<Info>:
 			Sendable,
 			Hashable,
 			Codable
+			where Info: Sendable & Hashable & Codable
 		{
 			// TODO: evolve this into an enum mirroring `SelectionRequirement` in `Selection.swift` to enable case switching.
 			//
@@ -113,7 +116,7 @@ extension Profile.Network.AuthorizedDapp {
 			//
 			// - It will require a custom Codable implementation to make up for the move from struct(ured) to enum. Make sure implementation matches CAP-21's spec by writing some XCTAssertJSON tests beforehand.
 			// - Don't just typealias NumberOfAccounts = SelectionRequirement, as they're not the same conceptually and should be allowed to evolve independently!
-			public struct NumberOfAccounts: Sendable, Hashable, Codable {
+			public struct Number: Sendable, Hashable, Codable {
 				public enum Quantifier: String, Sendable, Hashable, Codable {
 					case exactly
 					case atLeast
@@ -142,16 +145,16 @@ extension Profile.Network.AuthorizedDapp {
 				}
 			}
 
-			public let request: NumberOfAccounts
-			public private(set) var accountsReferencedByAddress: OrderedSet<AccountAddress>
+			public let request: Number
+			public private(set) var infoSet: OrderedSet<Info>
 
 			public init(
-				accountsReferencedByAddress: OrderedSet<AccountAddress>,
-				forRequest request: NumberOfAccounts
+				infoSet: OrderedSet<Info>,
+				forRequest request: Number
 			) throws {
-				try Self.validate(accountsReferencedByAddress: accountsReferencedByAddress, forRequest: request)
+				try Self.validate(infoSet: infoSet, forRequest: request)
 				self.request = request
-				self.accountsReferencedByAddress = accountsReferencedByAddress
+				self.infoSet = infoSet
 			}
 		}
 
@@ -159,40 +162,44 @@ extension Profile.Network.AuthorizedDapp {
 			identityAddress: IdentityAddress,
 			lastLogin: Date,
 			sharedAccounts: SharedAccounts?,
-			sharedFieldIDs: Set<Profile.Network.Persona.Field.ID>?
+			sharedPersonaData: SharedPersonaDataEntries?
 		) {
 			self.identityAddress = identityAddress
 			self.lastLogin = lastLogin
 			self.sharedAccounts = sharedAccounts
-			self.sharedFieldIDs = sharedFieldIDs
+			self.sharedPersonaData = sharedPersonaData
 		}
 	}
 }
 
-extension Profile.Network.AuthorizedDapp.AuthorizedPersonaSimple.SharedAccounts {
+// MARK: - NotEnoughEntiresProvided
+struct NotEnoughEntiresProvided: Swift.Error {}
+
+// MARK: - InvalidNumberOfEntries
+struct InvalidNumberOfEntries: Swift.Error {}
+
+extension Profile.Network.AuthorizedDapp.AuthorizedPersonaSimple.Shared {
 	public static func validate(
-		accountsReferencedByAddress: OrderedSet<AccountAddress>,
-		forRequest request: NumberOfAccounts
+		infoSet: OrderedSet<Info>,
+		forRequest request: Number
 	) throws {
 		switch request.quantifier {
 		case .atLeast:
-			guard accountsReferencedByAddress.count >= request.quantity else {
-				struct NotEnoughAccountsProvided: Swift.Error {}
-				throw NotEnoughAccountsProvided()
+			guard infoSet.count >= request.quantity else {
+				throw NotEnoughEntiresProvided()
 			}
 		// all good
 		case .exactly:
-			guard accountsReferencedByAddress.count == request.quantity else {
-				struct InvalidNumberOfAccounts: Swift.Error {}
-				throw InvalidNumberOfAccounts()
+			guard infoSet.count == request.quantity else {
+				throw InvalidNumberOfEntries()
 			}
 			// all good
 		}
 	}
 
-	public mutating func updateAccounts(_ new: OrderedSet<AccountAddress>) throws {
-		try Self.validate(accountsReferencedByAddress: new, forRequest: self.request)
-		self.accountsReferencedByAddress = new
+	public mutating func update(_ new: OrderedSet<Info>) throws {
+		try Self.validate(infoSet: new, forRequest: self.request)
+		self.infoSet = new
 	}
 }
 

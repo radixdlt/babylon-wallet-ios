@@ -33,9 +33,8 @@ extension Profile.Network {
 		/// being the tripple `(accountAddress, displayName, appearanceID)`
 		public let simpleAccounts: OrderedSet<AccountForDisplay>?
 
-		/// The persona data that the user has given the Dapp access to,
-		/// being the trippple: `(id, kind, value)`
-		public let sharedFields: IdentifiedArrayOf<Profile.Network.Persona.Field>?
+		/// The persona data that the user has given the Dapp access to
+		public let sharedPersonaDataEntries: IdentifiedArrayOf<PersonaDataEntryOfKind<PersonaDataEntry>>?
 
 		/// If this persona has an auth sign key created
 		public let hasAuthenticationSigningKey: Bool
@@ -69,7 +68,7 @@ extension Profile.Network {
 				displayName: persona.displayName,
 				simpleAccounts: {
 					if let sharedAccounts = simple.sharedAccounts {
-						return try .init(sharedAccounts.accountsReferencedByAddress.map { accountAddress in
+						return try .init(sharedAccounts.infoSet.map { accountAddress in
 							guard
 								let account = self.accounts.first(where: { $0.address == accountAddress })
 							else {
@@ -85,13 +84,15 @@ extension Profile.Network {
 						return nil
 					}
 				}(),
-				sharedFields: {
-					guard let sharedFieldIDs = simple.sharedFieldIDs else { return nil }
-					let presentFields = sharedFieldIDs.compactMap { fieldID in
-						persona.fields.first { $0.id == fieldID }
+				sharedPersonaDataEntries: {
+					guard let sharedFieldIDs = simple.sharedPersonaData?.infoSet else { return nil }
+
+					let presentFields = sharedFieldIDs.compactMap { id in
+						persona.personaData.entries.first(where: { $0.id == id })
 					}
 					return .init(uniqueElements: presentFields)
-				}(), hasAuthenticationSigningKey: persona.hasAuthenticationSigningKey
+				}(),
+				hasAuthenticationSigningKey: persona.hasAuthenticationSigningKey
 			)
 		})
 

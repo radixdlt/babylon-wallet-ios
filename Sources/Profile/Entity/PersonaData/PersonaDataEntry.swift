@@ -126,6 +126,8 @@ public enum PersonaFieldKind: String, Sendable, Hashable, Codable {
 	case phoneNumber
 }
 
+public typealias PersonaDataEntryID = UUID
+
 // MARK: - PersonaDataEntryOfKind
 /// * Names
 /// * Postal Addresses
@@ -134,11 +136,12 @@ public enum PersonaFieldKind: String, Sendable, Hashable, Codable {
 /// * Telephone numbers
 /// * Birthday
 public struct PersonaDataEntryOfKind<Value>: Sendable, Hashable, Codable, Identifiable where Value: Sendable & Hashable & Codable & BasePersonaFieldValueProtocol {
-	public let id: UUID
+	public typealias ID = PersonaDataEntryID
+	public let id: ID
 	public var value: Value
 
 	public init(
-		id: UUID? = nil,
+		id: ID? = nil,
 		value: Value
 	) {
 		@Dependency(\.uuid) var uuid

@@ -243,7 +243,10 @@ final class ProfileTests: TestCase {
 			return account
 		}
 
-		func addNewPersona(_ name: NonEmptyString, fields: IdentifiedArrayOf<Profile.Network.Persona.Field>) throws -> Profile.Network.Persona {
+		func addNewPersona(
+			_ name: NonEmptyString,
+			personaData: PersonaData
+		) throws -> Profile.Network.Persona {
 			let derivationPath = try profile.factorSources.babylonDevice.derivationPath(
 				forNext: .identity,
 				networkID: profile.networkID
@@ -264,7 +267,12 @@ final class ProfileTests: TestCase {
 				derivationPath: derivationPath
 			)
 
-			var persona = try Profile.Network.Persona(networkID: networkID, factorInstance: factorInstance, displayName: name, extraProperties: .init(fields: fields))
+			var persona = try Profile.Network.Persona(
+				networkID: networkID,
+				factorInstance: factorInstance,
+				displayName: name,
+				extraProperties: .init(personaData: personaData)
+			)
 
 			if case var .unsecured(control) = persona.securityState {
 				let path = try derivationPath.asIdentityPath().switching(keyKind: .authenticationSigning)
@@ -302,14 +310,24 @@ final class ProfileTests: TestCase {
 
 		let thirdAccount = try addNewAccount("Third")
 
-		let firstPersona = try addNewPersona("Mrs Incognito", fields: [
-			.init(id: .givenName, value: "Jane"),
-			.init(id: .familyName, value: "Incognitoson"),
-		])
-		let secondPersona = try addNewPersona("Mrs Public", fields: [
-			.init(id: .givenName, value: "Maria"),
-			.init(id: .familyName, value: "Publicson"),
-		])
+		let firstPersona = try addNewPersona(
+			"Mrs Incognito",
+			personaData: .init(
+				name: .init(
+					id: .init(uuidString: "00000000-0000-0000-0000-000000000000"),
+					value: .init(given: "Jane", family: "Incognitoson", variant: .western)
+				)
+			)
+		)
+		let secondPersona = try addNewPersona(
+			"Mrs Public",
+			personaData: .init(
+				name: .init(
+					id: .init(uuidString: "00000000-0000-0000-0000-000000000001"),
+					value: .init(given: "Maria", family: "Publicson", variant: .western)
+				)
+			)
+		)
 
 		XCTAssertTrue(profile.appPreferences.security.isCloudProfileSyncEnabled, "iCloud sync should be opt-out.")
 
@@ -347,38 +365,48 @@ final class ProfileTests: TestCase {
 						identityAddress: firstPersona.address,
 						lastLogin: Date(timeIntervalSinceReferenceDate: 0),
 						sharedAccounts: .init(
-							accountsReferencedByAddress: [
+							infoSet: [
 								secondAccount.address,
 								thirdAccount.address,
 							],
 							forRequest: .exactly(2)
 						),
-						sharedFieldIDs: .init(firstPersona.fields.map(\.id))
+						sharedPersonaData: .init(
+							infoSet: [
+								firstPersona.personaData.entries[0].id,
+							],
+							forRequest: .exactly(1)
+						)
 					),
 					.init(
 						identityAddress: secondPersona.address,
 						lastLogin: Date(timeIntervalSinceReferenceDate: 0),
 						sharedAccounts: .init(
-							accountsReferencedByAddress: [
+							infoSet: [
 								secondAccount.address,
 							],
 							forRequest: .atLeast(1)
 						),
-						sharedFieldIDs: .init(secondPersona.fields.map(\.id))
+						sharedPersonaData: .init(
+							infoSet: [
+								secondPersona.personaData.entries[0].id,
+							],
+							forRequest: .exactly(1)
+						)
 					))
 			)
 		)
 		let authorizedPersona0 = authorizedDapp.referencesToAuthorizedPersonas[0]
 		var authorizedPersona0SharedAccounts = try XCTUnwrap(authorizedPersona0.sharedAccounts)
 		XCTAssertThrowsError(
-			try authorizedPersona0SharedAccounts.updateAccounts([secondAccount.address]),
+			try authorizedPersona0SharedAccounts.update([secondAccount.address]),
 			"Should not be able to specify another number of accounts if `exactly` was specified."
 		)
 
 		let authorizedPersona1 = authorizedDapp.referencesToAuthorizedPersonas[1]
 		var authorizedPersona1SharedAccounts = try XCTUnwrap(authorizedPersona1.sharedAccounts)
 		XCTAssertNoThrow(
-			try authorizedPersona1SharedAccounts.updateAccounts([
+			try authorizedPersona1SharedAccounts.update([
 				secondAccount.address,
 				thirdAccount.address,
 			]), "Should be able to specify more accounts if `atLeast` was specified."
@@ -546,10 +574,10 @@ final class ProfileTests: TestCase {
 
 		XCTAssertEqual(network.authorizedDapps.count, 1)
 		XCTAssertEqual(network.authorizedDapps[0].referencesToAuthorizedPersonas.count, 2)
-		XCTAssertEqual(network.authorizedDapps[0].referencesToAuthorizedPersonas[0].sharedFieldIDs?.count, 2)
+		XCTAssertEqual(network.authorizedDapps[0].referencesToAuthorizedPersonas[0].sharedPersonaData?.infoSet.count, 2)
 		XCTAssertEqual(network.authorizedDapps[0].referencesToAuthorizedPersonas[0].sharedAccounts?.request.quantifier, .exactly)
 		XCTAssertEqual(network.authorizedDapps[0].referencesToAuthorizedPersonas[0].sharedAccounts?.request.quantity, 2)
-		XCTAssertEqual(network.authorizedDapps[0].referencesToAuthorizedPersonas[0].sharedAccounts?.accountsReferencedByAddress.map(\.address), ["account_tdx_c_1p82arz264ntf727q2s7f7cm6pqucgqzuru3z7mgeg3gqua0wlj", "account_tdx_c_1pygfwtlv7l90rcsge6t0f0jwn3cuzp05y8geek45qw7s98msmw"])
+		XCTAssertEqual(network.authorizedDapps[0].referencesToAuthorizedPersonas[0].sharedAccounts?.infoSet.map(\.address), ["account_tdx_c_1p82arz264ntf727q2s7f7cm6pqucgqzuru3z7mgeg3gqua0wlj", "account_tdx_c_1pygfwtlv7l90rcsge6t0f0jwn3cuzp05y8geek45qw7s98msmw"])
 	}
 
 	func test_version_compatibility_check_too_low() throws {

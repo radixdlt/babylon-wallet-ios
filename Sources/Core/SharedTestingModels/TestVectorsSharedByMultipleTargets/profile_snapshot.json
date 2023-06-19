@@ -199,7 +199,7 @@
       "description" : "computer unit test",
       "id" : "BABE1442-3C98-41FF-AFB0-D0F5829B020D"
     },
-    "snapshotVersion" : 37
+    "snapshotVersion" : 38
   },
   "networks" : [
     {
@@ -398,7 +398,7 @@
               "identityAddress" : "identity_tdx_c_1pntzwn92848tkaatj4psmgtuvsn83lnknku6av34alxqdrsvjv",
               "lastLogin" : "2001-01-01T00:00:00Z",
               "sharedAccounts" : {
-                "accountsReferencedByAddress" : [
+                "infoSet" : [
                   "account_tdx_c_1p82arz264ntf727q2s7f7cm6pqucgqzuru3z7mgeg3gqua0wlj",
                   "account_tdx_c_1pygfwtlv7l90rcsge6t0f0jwn3cuzp05y8geek45qw7s98msmw"
                 ],
@@ -407,16 +407,21 @@
                   "quantity" : 2
                 }
               },
-              "sharedFieldIDs" : [
-                "givenName",
-                "familyName"
-              ]
+              "sharedPersonaData" : {
+                "infoSet" : [
+                  "00000000-0000-0000-0000-000000000000"
+                ],
+                "request" : {
+                  "quantifier" : "exactly",
+                  "quantity" : 1
+                }
+              }
             },
             {
               "identityAddress" : "identity_tdx_c_1p30wtkl76qpyenu88sverfdh0qwf70gulgu29k72myqq2hqg0r",
               "lastLogin" : "2001-01-01T00:00:00Z",
               "sharedAccounts" : {
-                "accountsReferencedByAddress" : [
+                "infoSet" : [
                   "account_tdx_c_1p82arz264ntf727q2s7f7cm6pqucgqzuru3z7mgeg3gqua0wlj"
                 ],
                 "request" : {
@@ -424,10 +429,15 @@
                   "quantity" : 1
                 }
               },
-              "sharedFieldIDs" : [
-                "familyName",
-                "givenName"
-              ]
+              "sharedPersonaData" : {
+                "infoSet" : [
+                  "00000000-0000-0000-0000-000000000001"
+                ],
+                "request" : {
+                  "quantifier" : "exactly",
+                  "quantity" : 1
+                }
+              }
             }
           ]
         }
@@ -437,17 +447,26 @@
         {
           "address" : "identity_tdx_c_1pntzwn92848tkaatj4psmgtuvsn83lnknku6av34alxqdrsvjv",
           "displayName" : "Mrs Incognito",
-          "fields" : [
-            {
-              "id" : "givenName",
-              "value" : "Jane"
-            },
-            {
-              "id" : "familyName",
-              "value" : "Incognitoson"
-            }
-          ],
           "networkID" : 12,
+          "personaData" : {
+            "emailAddresses" : [
+
+            ],
+            "name" : {
+              "id" : "00000000-0000-0000-0000-000000000000",
+              "value" : {
+                "family" : "Incognitoson",
+                "given" : "Jane",
+                "variant" : "western"
+              }
+            },
+            "phoneNumbers" : [
+
+            ],
+            "postalAddresses" : [
+
+            ]
+          },
           "securityState" : {
             "discriminator" : "unsecured",
             "unsecuredEntityControl" : {
@@ -507,17 +526,26 @@
         {
           "address" : "identity_tdx_c_1p30wtkl76qpyenu88sverfdh0qwf70gulgu29k72myqq2hqg0r",
           "displayName" : "Mrs Public",
-          "fields" : [
-            {
-              "id" : "givenName",
-              "value" : "Maria"
-            },
-            {
-              "id" : "familyName",
-              "value" : "Publicson"
-            }
-          ],
           "networkID" : 12,
+          "personaData" : {
+            "emailAddresses" : [
+
+            ],
+            "name" : {
+              "id" : "00000000-0000-0000-0000-000000000001",
+              "value" : {
+                "family" : "Publicson",
+                "given" : "Maria",
+                "variant" : "western"
+              }
+            },
+            "phoneNumbers" : [
+
+            ],
+            "postalAddresses" : [
+
+            ]
+          },
           "securityState" : {
             "discriminator" : "unsecured",
             "unsecuredEntityControl" : {
