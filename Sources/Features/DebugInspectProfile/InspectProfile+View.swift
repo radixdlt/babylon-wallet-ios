@@ -500,41 +500,44 @@ public struct DappAuthorizedPersonaView: IndentedView {
 			Labeled("Name", value: detailedAuthorizedPersona.displayName.rawValue)
 
 			Text("Shared Fields")
-			let sharedPersonaData = detailedAuthorizedPersona.sharedPersonaData
+			Group {
+				let sharedPersonaData = detailedAuthorizedPersona.sharedPersonaData
 
-			if let name = sharedPersonaData.name {
-				Text("Name")
-				Labeled("Given", value: name.value.given)
-				if let middle = name.value.middle {
-					Labeled("Middle", value: middle)
+				if let name = sharedPersonaData.name {
+					Text("Name")
+					Labeled("Given", value: name.value.given)
+					if let middle = name.value.middle {
+						Labeled("Middle", value: middle)
+					}
+					Labeled("Family", value: name.value.family)
+					Labeled("id", value: name.id)
 				}
-				Labeled("Family", value: name.value.family)
-				Labeled("id", value: name.id)
-			}
 
-			if let dateOfBirth = sharedPersonaData.dateOfBirth {
-				Text("Date of birth")
-				Labeled("id", value: dateOfBirth.id)
-				Labeled("value", value: dateOfBirth.value.date.ISO8601Format())
-			}
+				if let dateOfBirth = sharedPersonaData.dateOfBirth {
+					Text("Date of birth")
+					Labeled("id", value: dateOfBirth.id)
+					Labeled("value", value: dateOfBirth.value.date.ISO8601Format())
+				}
 
-			Text("Emails")
-			ForEach(sharedPersonaData.emailAddresses) { email in
-				Labeled("Value", value: email.value.email)
-				Labeled("id", value: email.id)
-			}
+				Text("Emails")
+				ForEach(sharedPersonaData.emailAddresses) { email in
+					Labeled("Value", value: email.value.email)
+					Labeled("id", value: email.id)
+				}
 
-			Text("Phonen umbers")
-			ForEach(sharedPersonaData.phoneNumbers) { phone in
-				Labeled("Value", value: phone.value.number)
-				Labeled("id", value: phone.id)
-			}
-
-			Text("Postal addresses")
-			ForEach(sharedPersonaData.postalAddresses) { postalAddress in
-				Labeled("id", value: postalAddress.id)
-				ForEach(postalAddress.value.fields) { field in
-					Labeled("Value", value: String(describing: field))
+				Text("Phonen umbers")
+				ForEach(sharedPersonaData.phoneNumbers) { phone in
+					Labeled("Value", value: phone.value.number)
+					Labeled("id", value: phone.id)
+				}
+				Group {
+					Text("Postal addresses")
+					ForEach(sharedPersonaData.postalAddresses) { postalAddress in
+						Labeled("id", value: postalAddress.id)
+						ForEach(postalAddress.value.fields) { field in
+							Labeled("Value", value: String(describing: field))
+						}
+					}
 				}
 			}
 
@@ -694,14 +697,14 @@ extension EntityView {
 				)
 			}
 
-			if let persona = self.entity as? Profile.Network.Persona {
-				Group {
-					Text("Persona fields")
-					ForEach(persona.fields) { field in
-						Labeled(field.id.rawValue, value: field.value.rawValue)
-					}
-				}.padding(.leading, indentation.inOneLevel.leadingPadding)
-			}
+//			if let persona = self.entity as? Profile.Network.Persona {
+//				Group {
+//					Text("Persona fields")
+//					ForEach(persona.personaData.entries) { entry in
+//						Labeled(entry.id, value: String(describing: entry.value))
+//					}
+//				}.padding(.leading, indentation.inOneLevel.leadingPadding)
+//			}
 			if let account = self.entity as? Profile.Network.Account {
 				Labeled("Account Appearance ID", value: account.appearanceID.description)
 			}

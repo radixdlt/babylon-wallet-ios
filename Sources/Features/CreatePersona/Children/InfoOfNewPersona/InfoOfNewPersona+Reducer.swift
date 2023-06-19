@@ -10,21 +10,23 @@ public struct NewPersonaInfo: Sendable, FeatureReducer {
 		public var isFirstPersona: Bool
 		public var inputtedName: String
 		public var sanitizedName: NonEmptyString?
-		public var personaInfoFields: IdentifiedArrayOf<Profile.Network.Persona.Field>
+
+		// FIXME: Build support for input of persona "fields"/"entries"!
+		public var personaData: PersonaData
 		public var focusedInputField: InputField?
 
 		public init(
 			isFirstPersona: Bool,
 			inputtedEntityName: String = "",
 			sanitizedName: NonEmptyString? = nil,
-			personaInfoFields: IdentifiedArrayOf<Profile.Network.Persona.Field> = [],
+			personaData: PersonaData = .init(),
 			focusedInputField: InputField? = nil
 		) {
 			self.inputtedName = inputtedEntityName
 			self.focusedInputField = focusedInputField
 			self.sanitizedName = sanitizedName
 			self.isFirstPersona = isFirstPersona
-			self.personaInfoFields = personaInfoFields
+			self.personaData = personaData
 		}
 
 		public init(config: CreatePersonaConfig) {
@@ -34,7 +36,7 @@ public struct NewPersonaInfo: Sendable, FeatureReducer {
 
 	public enum ViewAction: Sendable, Equatable {
 		case appeared
-		case confirmNameButtonTapped(NonEmptyString, IdentifiedArrayOf<Profile.Network.Persona.Field>)
+		case confirmNameButtonTapped(NonEmptyString)
 		case textFieldFocused(State.InputField?)
 		case textFieldChanged(String)
 	}
@@ -46,7 +48,7 @@ public struct NewPersonaInfo: Sendable, FeatureReducer {
 	public enum DelegateAction: Sendable, Equatable {
 		case proceed(
 			personaName: NonEmptyString,
-			personaInfoFields: IdentifiedArrayOf<Profile.Network.Persona.Field>
+			personaData: PersonaData
 		)
 	}
 
@@ -63,12 +65,12 @@ public struct NewPersonaInfo: Sendable, FeatureReducer {
 				await send(.internal(.focusTextField(.personaName)))
 			}
 
-		case let .confirmNameButtonTapped(sanitizedName, personaInfoFields):
+		case let .confirmNameButtonTapped(sanitizedName):
 			state.focusedInputField = nil
-			return .run { send in
+			return .run { [personaData = state.personaData] send in
 				await send(.delegate(.proceed(
 					personaName: sanitizedName,
-					personaInfoFields: personaInfoFields
+					personaData: personaData
 				)))
 			}
 

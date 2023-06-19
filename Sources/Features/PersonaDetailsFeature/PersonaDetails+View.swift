@@ -88,12 +88,12 @@ extension PersonaDetails.View {
 			action: PersonaDetails.Destination.Action.dAppDetails,
 			destination: { SimpleDappDetails.View(store: $0) }
 		)
-		.sheet(
-			store: store.destination,
-			state: /PersonaDetails.Destination.State.editPersona,
-			action: PersonaDetails.Destination.Action.editPersona,
-			content: { EditPersona.View(store: $0) }
-		)
+//		.sheet(
+//			store: store.destination,
+//			state: /PersonaDetails.Destination.State.editPersona,
+//			action: PersonaDetails.Destination.Action.editPersona,
+//			content: { EditPersona.View(store: $0) }
+//		)
 		.sheet(
 			store: store.destination,
 			state: /PersonaDetails.Destination.State.createAuthKey,
@@ -262,41 +262,48 @@ extension PersonaDetails.View {
 
 private extension PersonaDetails.State {
 	var infoSectionViewState: PersonaDetails.View.InfoSection.ViewState {
-		switch mode {
-		case let .dApp(_, persona: persona):
-			return .init(
-				dAppInfo: dAppInfo,
-				personaName: personaName,
-				fields: persona.sharedFields ?? []
-			)
-		case let .general(persona, _):
-			return .init(
-				dAppInfo: nil,
-				personaName: personaName,
-				fields: persona.fields
-			)
-		}
+//		switch mode {
+//		case let .dApp(_, persona: persona):
+//			return .init(
+//				dAppInfo: dAppInfo,
+//				personaName: personaName,
+//				fields: persona.sharedFields ?? []
+//			)
+//		case let .general(persona, _):
+//			return .init(
+//				dAppInfo: nil,
+//				personaName: personaName,
+//				fields: persona.fields
+//			)
+//		}
+		fatalError()
 	}
 
 	var dAppInfo: PersonaDetails.View.InfoSection.ViewState.DappInfo? {
-		guard case let .dApp(dApp, persona) = mode else { return nil }
-		return .init(
-			name: dApp.displayName?.rawValue ?? L10n.DAppRequest.Metadata.unknownName,
-			isSharingNothing: persona.sharedFields.isNilOrEmpty
-		)
+//		guard case let .dApp(dApp, persona) = mode else { return nil }
+//		return .init(
+//			name: dApp.displayName?.rawValue ?? L10n.DAppRequest.Metadata.unknownName,
+//			isSharingNothing: persona.sharedFields.isNilOrEmpty
+//		)
+		fatalError()
 	}
 }
 
 private extension PersonaDetails.View.InfoSection.ViewState {
-	init(dAppInfo: DappInfo?, personaName: String, fields: IdentifiedArrayOf<Profile.Network.Persona.Field>) {
-		self.init(
-			dAppInfo: dAppInfo,
-			personaName: personaName,
-			firstName: fields[id: .givenName]?.value.rawValue,
-			lastName: fields[id: .familyName]?.value.rawValue,
-			emailAddress: fields[id: .emailAddress]?.value.rawValue,
-			phoneNumber: fields[id: .phoneNumber]?.value.rawValue
-		)
+	init(
+		dAppInfo: DappInfo?,
+		personaName: String
+//		fields: IdentifiedArrayOf<Profile.Network.Persona.Field>
+	) {
+//		self.init(
+//			dAppInfo: dAppInfo,
+//			personaName: personaName,
+//			firstName: fields[id: .givenName]?.value.rawValue,
+//			lastName: fields[id: .familyName]?.value.rawValue,
+//			emailAddress: fields[id: .emailAddress]?.value.rawValue,
+//			phoneNumber: fields[id: .phoneNumber]?.value.rawValue
+//		)
+		fatalError()
 	}
 }
 

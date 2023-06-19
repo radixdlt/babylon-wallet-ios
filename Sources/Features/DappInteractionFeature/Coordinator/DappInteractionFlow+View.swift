@@ -74,16 +74,16 @@ extension DappInteractionFlow {
 					action: DappInteractionFlow.Destinations.MainAction.chooseAccounts,
 					then: { AccountPermissionChooseAccounts.View(store: $0) }
 				)
-				CaseLet(
-					state: /DappInteractionFlow.Destinations.MainState.personaDataPermission,
-					action: DappInteractionFlow.Destinations.MainAction.personaDataPermission,
-					then: { PersonaDataPermission.View(store: $0) }
-				)
-				CaseLet(
-					state: /DappInteractionFlow.Destinations.MainState.oneTimePersonaData,
-					action: DappInteractionFlow.Destinations.MainAction.oneTimePersonaData,
-					then: { OneTimePersonaData.View(store: $0) }
-				)
+//				CaseLet(
+//					state: /DappInteractionFlow.Destinations.MainState.personaDataPermission,
+//					action: DappInteractionFlow.Destinations.MainAction.personaDataPermission,
+//					then: { PersonaDataPermission.View(store: $0) }
+//				)
+//				CaseLet(
+//					state: /DappInteractionFlow.Destinations.MainState.oneTimePersonaData,
+//					action: DappInteractionFlow.Destinations.MainAction.oneTimePersonaData,
+//					then: { OneTimePersonaData.View(store: $0) }
+//				)
 				CaseLet(
 					state: /DappInteractionFlow.Destinations.MainState.reviewTransaction,
 					action: DappInteractionFlow.Destinations.MainAction.reviewTransaction,
@@ -108,7 +108,7 @@ struct DappInteraction_Preview: PreviewProvider {
 				)!,
 				reducer: DappInteractionFlow()
 					.dependency(\.accountsClient, .previewValueTwoAccounts())
-					.dependency(\.authorizedDappsClient, .previewValueOnePersona())
+//					.dependency(\.authorizedDappsClient, .previewValueOnePersona())
 					.dependency(\.personasClient, .previewValueTwoPersonas(existing: true))
 					.dependency(\.personasClient, .previewValueTwoPersonas(existing: false))
 			)
@@ -126,31 +126,31 @@ extension AccountsClient {
 	}
 }
 
-extension AuthorizedDappsClient {
-	static func previewValueOnePersona() -> Self {
-		with(noop) {
-			$0.getAuthorizedDapps = {
-				var dapp = Profile.Network.AuthorizedDapp(
-					networkID: .nebunet,
-					dAppDefinitionAddress: try! .init(address: "account_tdx_b_1qlujhx6yh6tuctgw6nl68fr2dwg3y5k7h7mc6l04zsfsg7yeqh"),
-					displayName: .init(rawValue: "something")!
-				)
-				dapp.referencesToAuthorizedPersonas = [
-					.init(
-						identityAddress: Profile.Network.Persona.previewValue1.address,
-						lastLogin: .now,
-						sharedAccounts: try! .init(
-							accountsReferencedByAddress: [try! AccountAddress(address: "account_tdx_b_1qlujhx6yh6tuctgw6nl68fr2dwg3y5k7h7mc6l04zsfsg7yeqh")],
-							forRequest: .exactly(1)
-						),
-						sharedFieldIDs: nil
-					),
-				]
-				return [dapp]
-			}
-		}
-	}
-}
+// extension AuthorizedDappsClient {
+//	static func previewValueOnePersona() -> Self {
+//		with(noop) {
+//			$0.getAuthorizedDapps = {
+//				var dapp = Profile.Network.AuthorizedDapp(
+//					networkID: .nebunet,
+//					dAppDefinitionAddress: try! .init(address: "account_tdx_b_1qlujhx6yh6tuctgw6nl68fr2dwg3y5k7h7mc6l04zsfsg7yeqh"),
+//					displayName: .init(rawValue: "something")!
+//				)
+//				dapp.referencesToAuthorizedPersonas = [
+//					.init(
+//						identityAddress: Profile.Network.Persona.previewValue1.address,
+//						lastLogin: .now,
+//						sharedAccounts: try! .init(
+//							accountsReferencedByAddress: [try! AccountAddress(address: "account_tdx_b_1qlujhx6yh6tuctgw6nl68fr2dwg3y5k7h7mc6l04zsfsg7yeqh")],
+//							forRequest: .exactly(1)
+//						),
+//						sharedFieldIDs: nil
+//					),
+//				]
+//				return [dapp]
+//			}
+//		}
+//	}
+// }
 
 extension PersonasClient {
 	static func previewValueTwoPersonas(existing: Bool) -> Self {

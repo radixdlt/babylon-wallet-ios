@@ -16,8 +16,8 @@ extension NewPersonaInfo {
 		public let focusedInputField: State.InputField?
 
 		public struct SanitizedNameRequirement: Equatable {
+			// FIXME: Allow input of `PersonaData`!
 			public let sanitizedName: NonEmptyString
-			public let personaInfoFields: IdentifiedArrayOf<Profile.Network.Persona.Field>
 		}
 
 		init(state: State) {
@@ -26,7 +26,9 @@ extension NewPersonaInfo {
 			self.subtitleText = L10n.CreatePersona.NameNewPersona.subtitle
 			self.entityName = state.inputtedName
 			if let sanitizedName = state.sanitizedName {
-				self.sanitizedNameRequirement = .init(sanitizedName: sanitizedName, personaInfoFields: state.personaInfoFields)
+				self.sanitizedNameRequirement = .init(
+					sanitizedName: sanitizedName
+				)
 			} else {
 				self.sanitizedNameRequirement = nil
 			}
@@ -85,7 +87,7 @@ extension NewPersonaInfo {
 					.footer {
 						WithControlRequirements(
 							viewStore.sanitizedNameRequirement,
-							forAction: { viewStore.send(.confirmNameButtonTapped($0.sanitizedName, $0.personaInfoFields)) }
+							forAction: { viewStore.send(.confirmNameButtonTapped($0.sanitizedName)) }
 						) { action in
 							Button(L10n.CreatePersona.NameNewPersona.continue, action: action)
 								.buttonStyle(.primaryRectangular)
