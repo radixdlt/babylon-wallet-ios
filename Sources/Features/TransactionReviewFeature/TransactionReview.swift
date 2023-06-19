@@ -560,15 +560,16 @@ extension TransactionReview {
 		var withdrawals: [Account: [Transfer]] = [:]
 
 		for withdrawal in manifest.accountWithdraws {
-			try await collectTransferInfo(
-				componentAddress: withdrawal.componentAddress,
+			let account = try userAccounts.account(for: withdrawal.componentAddress)
+
+			let transfers = try await transferInfo(
 				resourceSpecifier: withdrawal.resourceSpecifier,
-				userAccounts: userAccounts,
 				createdEntities: manifest.createdEntities,
-				container: &withdrawals,
 				networkID: networkID,
 				type: .exact
 			)
+
+			withdrawals[account, default: []].append(contentsOf: transfers)
 		}
 
 		guard !withdrawals.isEmpty else { return nil }
@@ -587,15 +588,16 @@ extension TransactionReview {
 		var deposits: [Account: [Transfer]] = [:]
 
 		for deposit in manifest.accountDeposits {
-			try await collectTransferInfo(
-				componentAddress: deposit.componentAddress,
+			let account = try userAccounts.account(for: deposit.componentAddress)
+
+			let transfers = try await transferInfo(
 				resourceSpecifier: deposit.resourceSpecifier,
-				userAccounts: userAccounts,
 				createdEntities: manifest.createdEntities,
-				container: &deposits,
 				networkID: networkID,
 				type: deposit.transferType
 			)
+
+			deposits[account, default: []].append(contentsOf: transfers)
 		}
 
 		let reviewAccounts = deposits
@@ -611,88 +613,63 @@ extension TransactionReview {
 		return .init(accounts: .init(uniqueElements: reviewAccounts), showCustomizeGuarantees: requiresGuarantees)
 	}
 
-	func collectTransferInfo(
-		componentAddress: ComponentAddress,
+	func transferInfo(
 		resourceSpecifier: ResourceSpecifier,
-		userAccounts: [Account],
 		createdEntities: CreatedEntitities?,
-		container: inout [Account: [Transfer]],
 		networkID: NetworkID,
 		type: TransferType
-	) async throws {
-		guard let account = userAccounts.first(where: { $0.address.address == componentAddress.address }) else {
-			// TODO: Handle
-			loggerGlobal.error("Can't find component address that was specified for adding transfer")
-			return
-		}
+	) async throws -> [Transfer] {
+		let resourceAddress = resourceSpecifier.resourceAddress
+		let isNew = createdEntities?.resourceAddresses.contains(resourceAddress) == true
+		let metadata = isNew ? nil : try? await gatewayAPIClient.getEntityMetadata(resourceAddress.address)
+		let addressKind = try engineToolkitClient.decodeAddress(resourceAddress.address).entityType
 
-		func isNewResources(resourceAddress: ResourceAddress) -> Bool {
-			createdEntities?.resourceAddresses.contains(resourceAddress) ?? false
-		}
+		switch (resourceSpecifier, addressKind) {
+		case (let .amount(_, decimalAmount), .fungibleResource):
+			let amount = try BigDecimal(fromString: decimalAmount.value)
 
-		func getTransfers() async throws -> [Transfer] {
-			switch resourceSpecifier {
-			case let .amount(resourceAddress, decimalAmount):
-				let amount = try BigDecimal(fromString: decimalAmount.value)
-
-				func guarantee() -> TransactionClient.Guarantee? {
-					guard case let .estimated(instructionIndex) = type else { return nil }
-					return .init(amount: amount, instructionIndex: instructionIndex, resourceAddress: resourceAddress)
-				}
-
-				func isXRD() -> Bool {
-					(try? engineToolkitClient.isXRD(resource: resourceAddress, on: networkID)) ?? false
-				}
-
-				let addressKind = try engineToolkitClient.decodeAddress(resourceAddress.address).entityType
-				guard case .fungibleResource = addressKind else { return [] }
-				let isNew = isNewResources(resourceAddress: resourceAddress)
-				let metadata = isNew ? nil : try? await gatewayAPIClient.getEntityMetadata(resourceAddress.address)
-
-				return [.fungible(.init(
-					amount: amount,
-					name: metadata?.name,
-					symbol: metadata?.symbol,
-					thumbnail: metadata?.iconURL,
-					isXRD: isXRD(),
-					guarantee: guarantee()
-				))]
-
-			case let .ids(resourceAddress, ids):
-				let addressKind = try engineToolkitClient.decodeAddress(resourceAddress.address).entityType
-				guard case .nonFungibleResource = addressKind else { return [] }
-				let isNew = isNewResources(resourceAddress: resourceAddress)
-				let metadata = isNew ? nil : try? await gatewayAPIClient.getEntityMetadata(resourceAddress.address)
-
-				// https://rdxworks.slack.com/archives/C02MTV9602H/p1681155601557349
-				let maximumNFTIDChunkSize = 29
-
-				let nftIDs = try ids.map { try $0.toString() }
-
-				var result: [Transfer] = []
-				for nftIDChunk in nftIDs.chunks(ofCount: maximumNFTIDChunkSize) {
-					let tokens = try await gatewayAPIClient.getNonFungibleData(.init(
-						resourceAddress: resourceAddress.address,
-						nonFungibleIds: Array(nftIDChunk)
-					))
-					.nonFungibleIds
-					.map {
-						Transfer.nonFungible(.init(
-							resourceName: metadata?.name,
-							tokenID: $0.nonFungibleId.userFacingNonFungibleLocalID,
-							tokenName: nil,
-							thumbnail: $0.keyImageURL
-						))
-					}
-
-					result.append(contentsOf: tokens)
-				}
-
-				return result
+			func guarantee() -> TransactionClient.Guarantee? {
+				guard !isNew, case let .estimated(instructionIndex) = type else { return nil }
+				return .init(amount: amount, instructionIndex: instructionIndex, resourceAddress: resourceAddress)
 			}
-		}
 
-		try await container[account, default: []].append(contentsOf: getTransfers())
+			return [.fungible(.init(
+				amount: amount,
+				name: metadata?.name,
+				symbol: metadata?.symbol,
+				thumbnail: metadata?.iconURL,
+				isXRD: (try? engineToolkitClient.isXRD(resource: resourceAddress, on: networkID)) ?? false,
+				guarantee: guarantee()
+			))]
+
+		case (let .ids(_, ids), .nonFungibleResource):
+			// https://rdxworks.slack.com/archives/C02MTV9602H/p1681155601557349
+			let maximumNFTIDChunkSize = 29
+
+			var result: [Transfer] = []
+			for idChunk in ids.chunks(ofCount: maximumNFTIDChunkSize) {
+				let tokens = try await gatewayAPIClient.getNonFungibleData(.init(
+					resourceAddress: resourceAddress.address,
+					nonFungibleIds: idChunk.map { try $0.toString() }
+				))
+				.nonFungibleIds
+				.map {
+					Transfer.nonFungible(.init(
+						resourceName: metadata?.name,
+						tokenID: $0.nonFungibleId.userFacingNonFungibleLocalID,
+						tokenName: nil,
+						thumbnail: $0.keyImageURL
+					))
+				}
+
+				result.append(contentsOf: tokens)
+			}
+
+			return result
+
+		default:
+			return []
+		}
 	}
 }
 
@@ -823,6 +800,21 @@ extension TransactionReview.State {
 	}
 }
 
+// MARK: Helpers
+
+extension [TransactionReview.Account] {
+	struct MissingUserAccountError: Error {}
+
+	func account(for componentAddress: ComponentAddress) throws -> TransactionReview.Account {
+		guard let account = first(where: { $0.address.address == componentAddress.address }) else {
+			loggerGlobal.error("Can't find component address that was specified for transfer")
+			throw MissingUserAccountError()
+		}
+
+		return account
+	}
+}
+
 extension Collection where Element: Equatable {
 	public func count(of element: Element) -> Int {
 		var count = 0
@@ -854,6 +846,15 @@ extension AccountDeposit {
 			return .exact
 		case let .estimate(index, _, _):
 			return .estimated(instructionIndex: index)
+		}
+	}
+}
+
+extension ResourceSpecifier {
+	var resourceAddress: ResourceAddress {
+		switch self {
+		case let .amount(resourceAddress, _), let .ids(resourceAddress, _):
+			return resourceAddress
 		}
 	}
 }
