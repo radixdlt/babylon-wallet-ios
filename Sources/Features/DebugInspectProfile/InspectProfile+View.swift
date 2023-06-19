@@ -500,19 +500,42 @@ public struct DappAuthorizedPersonaView: IndentedView {
 			Labeled("Name", value: detailedAuthorizedPersona.displayName.rawValue)
 
 			Text("Shared Fields")
-			if let sharedFields = detailedAuthorizedPersona.sharedFields {
-				if !sharedFields.isEmpty {
-					ForEach(sharedFields) { field in
-						VStack {
-							Labeled("id", value: field.id.description)
-							Labeled("value", value: field.value.rawValue)
-						}
-					}
-				} else {
-					Text("None yet")
+			let sharedPersonaData = detailedAuthorizedPersona.sharedPersonaData
+
+			if let name = sharedPersonaData.name {
+				Text("Name")
+				Labeled("Given", value: name.value.given)
+				if let middle = name.value.middle {
+					Labeled("Middle", value: middle)
 				}
-			} else {
-				Text("Never requested")
+				Labeled("Family", value: name.value.family)
+				Labeled("id", value: name.id)
+			}
+
+			if let dateOfBirth = sharedPersonaData.dateOfBirth {
+				Text("Date of birth")
+				Labeled("id", value: dateOfBirth.id)
+				Labeled("value", value: dateOfBirth.value.date.ISO8601Format())
+			}
+
+			Text("Emails")
+			ForEach(sharedPersonaData.emailAddresses) { email in
+				Labeled("Value", value: email.value.email)
+				Labeled("id", value: email.id)
+			}
+
+			Text("Phonen umbers")
+			ForEach(sharedPersonaData.phoneNumbers) { phone in
+				Labeled("Value", value: phone.value.number)
+				Labeled("id", value: phone.id)
+			}
+
+			Text("Postal addresses")
+			ForEach(sharedPersonaData.postalAddresses) { postalAddress in
+				Labeled("id", value: postalAddress.id)
+				ForEach(postalAddress.value.fields) { field in
+					Labeled("Value", value: String(describing: field))
+				}
 			}
 
 			Text("Shared Accounts")
