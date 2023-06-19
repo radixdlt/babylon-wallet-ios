@@ -220,10 +220,10 @@ extension GatewayAPI.EntityMetadataCollection {
 			return nil
 		}
 
-		// Element is String `"EddsaEd25519PublicKey("56d656000d5f67f5308951a394c7891c54b54dd633b42d1d21af372f80e6bc43")"`
-		// or String `"EcdsaSecp256k1PublicKey("0256d656000d5f67f5308951a394c7891c54b54dd633b42d1d21af372f80e6bc43")"`
-		let curve25519Prefix = "EddsaEd25519PublicKey"
-		let secp256k1Prefix = "EcdsaSecp256k1PublicKey"
+		// Element is String `"EddsaEd25519PublicKeyHash("56d656000d5f67f5308951a394c7891c54b54dd633b42d1d21af372f80e6bc43")"`
+		// or String `"EcdsaSecp256k1PublicKeyHash("0256d656000d5f67f5308951a394c7891c54b54dd633b42d1d21af372f80e6bc43")"`
+		let curve25519Prefix = "EddsaEd25519PublicKeyHash"
+		let secp256k1Prefix = "EcdsaSecp256k1PublicKeyHash"
 		let lengthCurve25519Prefix = curve25519Prefix.count
 		let lengthSecp256k1Prefix = secp256k1Prefix.count
 		let lengthQuoteAndParenthesis = 2

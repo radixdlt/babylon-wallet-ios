@@ -36,8 +36,8 @@ public struct KnownEntityAddressesResponse: Sendable, Codable, Hashable {
 	public let systemTokenResourceAddress: ResourceAddress
 	public let ecdsaSecp256k1TokenResourceAddress: ResourceAddress
 	public let eddsaEd25519TokenResourceAddress: ResourceAddress
-	public let packageTokenResourceAddress: PackageAddress
-	public let epochManagerSystemAddress: ComponentAddress
+	public let packageTokenResourceAddress: ResourceAddress
+	public let consensusManagerComponentAddress: ComponentAddress
 
 	public init(
 		faucetComponentAddress: ComponentAddress,
@@ -47,8 +47,8 @@ public struct KnownEntityAddressesResponse: Sendable, Codable, Hashable {
 		systemTokenResourceAddress: ResourceAddress,
 		ecdsaSecp256k1TokenResourceAddress: ResourceAddress,
 		eddsaEd25519TokenResourceAddress: ResourceAddress,
-		packageTokenResourceAddress: PackageAddress,
-		epochManagerSystemAddress: ComponentAddress
+		packageTokenResourceAddress: ResourceAddress,
+		consensusManagerComponentAddress: ComponentAddress
 	) {
 		self.faucetComponentAddress = faucetComponentAddress
 		self.faucetPackageAddress = faucetPackageAddress
@@ -58,7 +58,7 @@ public struct KnownEntityAddressesResponse: Sendable, Codable, Hashable {
 		self.ecdsaSecp256k1TokenResourceAddress = ecdsaSecp256k1TokenResourceAddress
 		self.eddsaEd25519TokenResourceAddress = eddsaEd25519TokenResourceAddress
 		self.packageTokenResourceAddress = packageTokenResourceAddress
-		self.epochManagerSystemAddress = epochManagerSystemAddress
+		self.consensusManagerComponentAddress = consensusManagerComponentAddress
 	}
 
 	private enum CodingKeys: String, CodingKey {
@@ -70,7 +70,7 @@ public struct KnownEntityAddressesResponse: Sendable, Codable, Hashable {
 		case ecdsaSecp256k1TokenResourceAddress = "ecdsa_secp256k1_token_resource_address"
 		case eddsaEd25519TokenResourceAddress = "eddsa_ed25519_token_resource_address"
 		case packageTokenResourceAddress = "package_token_resource_address"
-		case epochManagerSystemAddress = "epoch_manager_system_address"
+		case consensusManagerComponentAddress = "consensus_manager_component_address"
 	}
 }
 
@@ -86,7 +86,7 @@ extension KnownEntityAddressesResponse {
 		ecdsaSecp256k1TokenResourceAddress: try! .init(validatingAddress: "resource_tdx_22_1nfxxxxxxxxxxed25sgxxxxxxxxx002236757237xxxxxxxxxpd7z2f"),
 		eddsaEd25519TokenResourceAddress: try! .init(validatingAddress: "resource_tdx_22_1nfxxxxxxxxxxsecpsgxxxxxxxxx004638826440xxxxxxxxxgevh2f"),
 		packageTokenResourceAddress: try! .init(validatingAddress: "package_tdx_22_1pkgxxxxxxxxxresrcexxxxxxxxx000538436477xxxxxxxxxkqjm7p"),
-		epochManagerSystemAddress: try! .init(validatingAddress: "component_tdx_22_1cptxxxxxxxxxfaucetxxxxxxxxx000527798379xxxxxxxxxrcppq4")
+		consensusManagerComponentAddress: try! .init(validatingAddress: "component_tdx_22_1cptxxxxxxxxxfaucetxxxxxxxxx000527798379xxxxxxxxxrcppq4")
 	)
 }
 #endif // DEBUG

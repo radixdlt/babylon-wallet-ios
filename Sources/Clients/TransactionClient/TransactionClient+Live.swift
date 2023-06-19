@@ -240,7 +240,7 @@ extension TransactionClient {
 				endEpochExclusive: epoch + request.makeTransactionHeaderInput.epochWindow,
 				nonce: request.nonce,
 				publicKey: SLIP10.PublicKey.eddsaEd25519(transactionSigners.notaryPublicKey).intoEngine(),
-				notaryIsSignatory: transactionSigners.notaryAsSignatory,
+				notaryIsSignatory: true, // transactionSigners.notaryAsSignatory,
 				tipPercentage: request.makeTransactionHeaderInput.tipPercentage
 			)
 

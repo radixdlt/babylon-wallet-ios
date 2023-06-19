@@ -1092,10 +1092,6 @@ package.targets.append(
 	)
 )
 
-package.dependencies.append(
-	.package(url: "https://github.com/apple/swift-openapi-generator", .upToNextMinor(from: "0.1.0"))
-)
-
 // MARK: - Unit Tests
 
 package.addModules([

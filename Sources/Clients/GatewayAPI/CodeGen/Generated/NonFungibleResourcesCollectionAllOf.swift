@@ -17,9 +17,9 @@ extension GatewayAPI {
 
 public struct NonFungibleResourcesCollectionAllOf: Codable, Hashable {
 
-    public private(set) var items: [NonFungibleResourcesCollectionItemAggregated]
+    public private(set) var items: [NonFungibleResourcesCollectionItem]
 
-    public init(items: [NonFungibleResourcesCollectionItemAggregated]) {
+    public init(items: [NonFungibleResourcesCollectionItem]) {
         self.items = items
     }
 

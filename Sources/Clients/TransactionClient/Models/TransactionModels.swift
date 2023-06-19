@@ -95,9 +95,9 @@ extension GatewayAPI.PublicKey {
 	init(from engine: Engine.PublicKey) {
 		switch engine {
 		case let .ecdsaSecp256k1(key):
-			self = .typePublicKeyEcdsaSecp256k1(.init(keyHex: key.bytes.hex))
+			self = .ecdsaSecp256k1(.init(keyType: .ecdsaSecp256k1, keyHex: key.bytes.hex))
 		case let .eddsaEd25519(key):
-			self = .typePublicKeyEddsaEd25519(.init(keyHex: key.bytes.hex))
+			self = .eddsaEd25519(.init(keyType: .eddsaEd25519, keyHex: key.bytes.hex))
 		}
 	}
 }
@@ -106,9 +106,9 @@ extension GatewayAPI.PublicKey {
 	init(from slip10: SLIP10.PublicKey) {
 		switch slip10 {
 		case let .eddsaEd25519(pubKey):
-			self = .typePublicKeyEcdsaSecp256k1(.init(keyHex: pubKey.rawRepresentation.hex))
+			self = .eddsaEd25519(.init(keyType: .ecdsaSecp256k1, keyHex: pubKey.rawRepresentation.hex))
 		case let .ecdsaSecp256k1(pubKey):
-			self = .typePublicKeyEddsaEd25519(.init(keyHex: pubKey.compressedRepresentation.hex))
+			self = .ecdsaSecp256k1(.init(keyType: .eddsaEd25519, keyHex: pubKey.compressedRepresentation.hex))
 		}
 	}
 }

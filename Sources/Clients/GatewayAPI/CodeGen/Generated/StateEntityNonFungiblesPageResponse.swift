@@ -24,11 +24,11 @@ public struct StateEntityNonFungiblesPageResponse: Codable, Hashable {
     public private(set) var previousCursor: String?
     /** If specified, contains a cursor to query next page of the `items` collection. */
     public private(set) var nextCursor: String?
-    public private(set) var items: [NonFungibleResourcesCollectionItemAggregated]
+    public private(set) var items: [NonFungibleResourcesCollectionItem]
     /** Bech32m-encoded human readable version of the address. */
     public private(set) var address: String
 
-    public init(ledgerState: LedgerState, totalCount: Int64? = nil, previousCursor: String? = nil, nextCursor: String? = nil, items: [NonFungibleResourcesCollectionItemAggregated], address: String) {
+    public init(ledgerState: LedgerState, totalCount: Int64? = nil, previousCursor: String? = nil, nextCursor: String? = nil, items: [NonFungibleResourcesCollectionItem], address: String) {
         self.ledgerState = ledgerState
         self.totalCount = totalCount
         self.previousCursor = previousCursor

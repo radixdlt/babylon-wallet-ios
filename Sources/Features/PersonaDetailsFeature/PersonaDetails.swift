@@ -566,9 +566,9 @@ extension GatewayAPI.StateEntityDetailsResponseItem {
 	private var fungibility: SimpleDappDetails.State.Resources.ResourceDetails.Fungibility? {
 		guard let details else { return nil }
 		switch details {
-		case .typeStateEntityDetailsResponseFungibleResourceDetails:
+		case .fungibleResource:
 			return .fungible
-		case .typeStateEntityDetailsResponseNonFungibleResourceDetails:
+		case .nonFungibleResource:
 			return .nonFungible
 		default:
 			return nil

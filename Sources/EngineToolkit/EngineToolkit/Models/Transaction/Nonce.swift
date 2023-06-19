@@ -2,7 +2,7 @@ import Prelude
 
 extension Nonce {
 	public static func secureRandom() -> Self {
-		let byteCount = RawValue.bitWidth / 8
+		let byteCount = RawValue.bitWidth / 4
 		var data = Data(repeating: 0, count: byteCount)
 		data.withUnsafeMutableBytes {
 			assert($0.count == byteCount)
@@ -16,5 +16,5 @@ extension Nonce {
 // MARK: - NonceTag
 public enum NonceTag: Sendable {}
 
-/// Secure random unique 8 bytes.
-public typealias Nonce = Tagged<NonceTag, UInt64>
+/// Secure random unique 4 bytes.
+public typealias Nonce = Tagged<NonceTag, UInt32>

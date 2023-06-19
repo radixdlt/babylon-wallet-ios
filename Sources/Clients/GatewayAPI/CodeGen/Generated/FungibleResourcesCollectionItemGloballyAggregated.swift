@@ -17,6 +17,7 @@ extension GatewayAPI {
 
 public struct FungibleResourcesCollectionItemGloballyAggregated: Codable, Hashable {
 
+    public private(set) var aggregationLevel: ResourceAggregationLevel
     /** Bech32m-encoded human readable version of the address. */
     public private(set) var resourceAddress: String
     public private(set) var explicitMetadata: EntityMetadataCollection?
@@ -25,7 +26,8 @@ public struct FungibleResourcesCollectionItemGloballyAggregated: Codable, Hashab
     /** TBD */
     public private(set) var lastUpdatedAtStateVersion: Int64
 
-    public init(resourceAddress: String, explicitMetadata: EntityMetadataCollection? = nil, amount: String, lastUpdatedAtStateVersion: Int64) {
+    public init(aggregationLevel: ResourceAggregationLevel, resourceAddress: String, explicitMetadata: EntityMetadataCollection? = nil, amount: String, lastUpdatedAtStateVersion: Int64) {
+        self.aggregationLevel = aggregationLevel
         self.resourceAddress = resourceAddress
         self.explicitMetadata = explicitMetadata
         self.amount = amount
@@ -33,6 +35,7 @@ public struct FungibleResourcesCollectionItemGloballyAggregated: Codable, Hashab
     }
 
     public enum CodingKeys: String, CodingKey, CaseIterable {
+        case aggregationLevel = "aggregation_level"
         case resourceAddress = "resource_address"
         case explicitMetadata = "explicit_metadata"
         case amount
@@ -43,6 +46,7 @@ public struct FungibleResourcesCollectionItemGloballyAggregated: Codable, Hashab
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(aggregationLevel, forKey: .aggregationLevel)
         try container.encode(resourceAddress, forKey: .resourceAddress)
         try container.encodeIfPresent(explicitMetadata, forKey: .explicitMetadata)
         try container.encode(amount, forKey: .amount)

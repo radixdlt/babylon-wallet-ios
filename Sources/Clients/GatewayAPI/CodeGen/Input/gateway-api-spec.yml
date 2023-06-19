@@ -618,31 +618,44 @@ components:
     # Keys
     #
 
+    PublicKeyType:
+      type: string
+      enum:
+        - EcdsaSecp256k1
+        - EddsaEd25519
+
     PublicKey:
-      oneOf:
-        - $ref: '#/components/schemas/PublicKeyEcdsaSecp256k1'
-        - $ref: '#/components/schemas/PublicKeyEddsaEd25519'
+      type: object
+      required:
+        - key_type
+      properties:
+        key_type:
+          $ref: "#/components/schemas/PublicKeyType"
       discriminator:
         propertyName: key_type
         mapping:
+          # NOTE: These need to match PublicKeyType
           EcdsaSecp256k1: "#/components/schemas/PublicKeyEcdsaSecp256k1"
           EddsaEd25519: "#/components/schemas/PublicKeyEddsaEd25519"
-
     PublicKeyEcdsaSecp256k1:
-      type: object
-      required:
+      allOf:
+        - $ref: "#/components/schemas/PublicKey"
+        - type: object
+          required:
             - key_hex
-      properties:
+          properties:
             key_hex:
               type: string
               minLength: 66
               maxLength: 66
               description: The hex-encoded compressed ECDSA Secp256k1 public key (33 bytes)
     PublicKeyEddsaEd25519:
-      type: object
-      required:
+      allOf:
+        - $ref: "#/components/schemas/PublicKey"
+        - type: object
+          required:
             - key_hex
-      properties:
+          properties:
             key_hex:
               type: string
               minLength: 64
@@ -830,24 +843,15 @@ components:
             items:
               type: array
               items:
-                $ref: "#/components/schemas/FungibleResourcesCollectionItemAggregated"
-
-    FungibleResourcesCollectionItemAggregated:
-      oneOf:
-        - $ref: '#/components/schemas/FungibleResourcesCollectionItemGloballyAggregated'
-        - $ref: '#/components/schemas/FungibleResourcesCollectionItemVaultAggregated'
-      discriminator:
-        propertyName: aggregation_level
-        mapping:
-          # NOTE: These need to match ResourceAggregationLevel
-          Global: '#/components/schemas/FungibleResourcesCollectionItemGloballyAggregated'
-          Vault: '#/components/schemas/FungibleResourcesCollectionItemVaultAggregated'
-
+                $ref: "#/components/schemas/FungibleResourcesCollectionItem"
     FungibleResourcesCollectionItem:
       type: object
       required:
+        - aggregation_level
         - resource_address
       properties:
+        aggregation_level:
+          $ref: "#/components/schemas/ResourceAggregationLevel"
         resource_address:
           $ref: "#/components/schemas/Address"
         explicit_metadata:
@@ -858,7 +862,6 @@ components:
           # NOTE: These need to match ResourceAggregationLevel
           Global: '#/components/schemas/FungibleResourcesCollectionItemGloballyAggregated'
           Vault: '#/components/schemas/FungibleResourcesCollectionItemVaultAggregated'
-
     FungibleResourcesCollectionItemGloballyAggregated:
       allOf:
         - $ref: "#/components/schemas/FungibleResourcesCollectionItem"
@@ -916,28 +919,25 @@ components:
             items:
               type: array
               items:
-                $ref: "#/components/schemas/NonFungibleResourcesCollectionItemAggregated"
-    NonFungibleResourcesCollectionItemAggregated:
-      oneOf:
-        - $ref: '#/components/schemas/NonFungibleResourcesCollectionItemGloballyAggregated'
-        - $ref: '#/components/schemas/NonFungibleResourcesCollectionItemVaultAggregated'
+                $ref: "#/components/schemas/NonFungibleResourcesCollectionItem"
+    NonFungibleResourcesCollectionItem:
+      type: object
+      required:
+        - aggregation_level
+        - resource_address
+      properties:
+        aggregation_level:
+          $ref: "#/components/schemas/ResourceAggregationLevel"
+        resource_address:
+          $ref: "#/components/schemas/Address"
+        explicit_metadata:
+          $ref: "#/components/schemas/EntityMetadataCollection"
       discriminator:
         propertyName: aggregation_level
         mapping:
           # NOTE: These need to match ResourceAggregationLevel
           Global: '#/components/schemas/NonFungibleResourcesCollectionItemGloballyAggregated'
           Vault: '#/components/schemas/NonFungibleResourcesCollectionItemVaultAggregated'
-
-    NonFungibleResourcesCollectionItem:
-      type: object
-      required:
-        - resource_address
-      properties:
-        resource_address:
-          $ref: "#/components/schemas/Address"
-        explicit_metadata:
-          $ref: "#/components/schemas/EntityMetadataCollection"
-
     NonFungibleResourcesCollectionItemGloballyAggregated:
       allOf:
         - $ref: "#/components/schemas/NonFungibleResourcesCollectionItem"
@@ -988,6 +988,7 @@ components:
               format: int64
             last_updated_at_state_version:
               $ref: "#/components/schemas/LastUpdatedAtStateVersion"
+
 
     OptionalNonFungibleIdsCollection:
       description: Non-fungible resource IDs collection.
@@ -1614,6 +1615,15 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/StateEntityDetailsResponseItem"
+    StateEntityDetailsResponseItemAncestorIdentities:
+      type: object
+      properties:
+        parent_address:
+          $ref: "#/components/schemas/Address"
+        owner_address:
+          $ref: "#/components/schemas/Address"
+        global_address:
+          $ref: "#/components/schemas/Address"
     StateEntityDetailsResponseItem:
       type: object
       required:
@@ -1634,15 +1644,6 @@ components:
           $ref: "#/components/schemas/EntityMetadataCollection"
         details:
           $ref: "#/components/schemas/StateEntityDetailsResponseItemDetails"
-    StateEntityDetailsResponseItemAncestorIdentities:
-      type: object
-      properties:
-        parent_address:
-          $ref: "#/components/schemas/Address"
-        owner_address:
-          $ref: "#/components/schemas/Address"
-        global_address:
-          $ref: "#/components/schemas/Address"
     StateEntityDetailsResponseItemDetailsType:
       type: string
       enum:
@@ -1653,13 +1654,12 @@ components:
         - Package
         - Component
     StateEntityDetailsResponseItemDetails:
-      oneOf:
-        - $ref: "#/components/schemas/StateEntityDetailsResponseFungibleResourceDetails"
-        - $ref: "#/components/schemas/StateEntityDetailsResponseNonFungibleResourceDetails"
-        - $ref: "#/components/schemas/StateEntityDetailsResponseFungibleVaultDetails"
-        - $ref: "#/components/schemas/StateEntityDetailsResponseNonFungibleVaultDetails"
-        - $ref: "#/components/schemas/StateEntityDetailsResponsePackageDetails"
-        - $ref: "#/components/schemas/StateEntityDetailsResponseComponentDetails"
+      type: object
+      required:
+        - type
+      properties:
+        type:
+          $ref: "#/components/schemas/StateEntityDetailsResponseItemDetailsType"
       discriminator:
         propertyName: type
         mapping:
@@ -1670,9 +1670,10 @@ components:
           NonFungibleVault: "#/components/schemas/StateEntityDetailsResponseNonFungibleVaultDetails"
           Package: "#/components/schemas/StateEntityDetailsResponsePackageDetails"
           Component: "#/components/schemas/StateEntityDetailsResponseComponentDetails"
-
     StateEntityDetailsResponseFungibleResourceDetails:
-          type: object
+      allOf:
+        - $ref: "#/components/schemas/StateEntityDetailsResponseItemDetails"
+        - type: object
           required:
             - access_rules_chain
             - vault_access_rules_chain
@@ -1682,9 +1683,9 @@ components:
             - total_burned
           properties:
             access_rules_chain:
-              type: object # FIXME: use actual object
+              type: object
             vault_access_rules_chain:
-              type: object # FIXME: use actual object
+              type: object
             divisibility:
               type: integer
               minimum: 0
@@ -1695,7 +1696,9 @@ components:
             total_burned:
               $ref: "#/components/schemas/BigDecimal"
     StateEntityDetailsResponseNonFungibleResourceDetails:
-          type: object
+      allOf:
+        - $ref: "#/components/schemas/StateEntityDetailsResponseItemDetails"
+        - type: object
           required:
             - access_rules_chain
             - vault_access_rules_chain
@@ -1705,9 +1708,9 @@ components:
             - total_burned
           properties:
             access_rules_chain:
-              type: object # FIXME: use actual object
+              type: object
             vault_access_rules_chain:
-              type: object # FIXME: use actual object
+              type: object
             non_fungible_id_type:
               $ref: "#/components/schemas/NonFungibleIdType"
             total_supply:
@@ -1717,18 +1720,26 @@ components:
             total_burned:
               $ref: "#/components/schemas/BigDecimal"
     StateEntityDetailsResponseFungibleVaultDetails:
-        type: object
+      allOf:
+        - $ref: "#/components/schemas/StateEntityDetailsResponseItemDetails"
+        - type: object
     StateEntityDetailsResponseNonFungibleVaultDetails:
-        type: object
+      allOf:
+        - $ref: "#/components/schemas/StateEntityDetailsResponseItemDetails"
+        - type: object
     StateEntityDetailsResponsePackageDetails:
-          type: object
+      allOf:
+        - $ref: "#/components/schemas/StateEntityDetailsResponseItemDetails"
+        - type: object
           properties:
             code_hex:
               $ref: "#/components/schemas/HexString"
             royalty_vault_balance:
               $ref: "#/components/schemas/BigDecimal"
     StateEntityDetailsResponseComponentDetails:
-          type: object
+      allOf:
+        - $ref: "#/components/schemas/StateEntityDetailsResponseItemDetails"
+        - type: object
           required:
             - blueprint_name
             - access_rules_chain
@@ -1740,10 +1751,9 @@ components:
             state:
               type: object
             access_rules_chain:
-              type: object # FIXME: use actual object
+              type: object
             royalty_vault_balance:
               $ref: "#/components/schemas/BigDecimal"
-
     StateEntityMetadataPageRequest:
       allOf:
         - $ref: "#/components/schemas/AtLedgerStateMixin"

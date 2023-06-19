@@ -135,7 +135,7 @@ extension AccountPortfoliosClient {
 		// Fetch all fungible resources by requesting additional pages if available
 		let fetchAllFungibleResources = {
 			guard let firstPage = rawAccountDetails.fungibleResources else {
-				return [GatewayAPI.FungibleResourcesCollectionItemAggregated]()
+				return [GatewayAPI.FungibleResourcesCollectionItem]()
 			}
 
 			guard let nextPageCursor = firstPage.nextCursor else {
@@ -153,7 +153,7 @@ extension AccountPortfoliosClient {
 		// Fetch all non-fungible resources by requesting additional pages if available
 		let fetchAllNonFungibleResources = {
 			guard let firstPage = rawAccountDetails.nonFungibleResources else {
-				return [GatewayAPI.NonFungibleResourcesCollectionItemAggregated]()
+				return [GatewayAPI.NonFungibleResourcesCollectionItem]()
 			}
 
 			guard let nextPageCursor = firstPage.nextCursor else {
@@ -186,7 +186,7 @@ extension AccountPortfoliosClient {
 
 	@Sendable
 	static func createFungibleResources(
-		rawItems: [GatewayAPI.FungibleResourcesCollectionItemAggregated]
+		rawItems: [GatewayAPI.FungibleResourcesCollectionItem]
 	) async throws -> AccountPortfolio.FungibleResources {
 		// We are interested in vault aggregated items
 		let rawItems = rawItems.compactMap(\.vault)
@@ -237,7 +237,7 @@ extension AccountPortfoliosClient {
 	@Sendable
 	static func createNonFungibleResources(
 		_ accountAddress: String,
-		rawItems: [GatewayAPI.NonFungibleResourcesCollectionItemAggregated]
+		rawItems: [GatewayAPI.NonFungibleResourcesCollectionItem]
 	) async throws -> AccountPortfolio.NonFungibleResources {
 		// We are interested in vault aggregated items
 		let vaultItems = rawItems.compactMap(\.vault)
@@ -334,7 +334,7 @@ private extension GatewayAPI.StateNonFungibleDetailsResponseItem {
 extension AccountPortfoliosClient {
 	static func fetchAccountFungibleResourcePage(
 		_ accountAddress: String
-	) -> @Sendable (PageCursor?) async throws -> PaginatedResourceResponse<GatewayAPI.FungibleResourcesCollectionItemAggregated> {
+	) -> @Sendable (PageCursor?) async throws -> PaginatedResourceResponse<GatewayAPI.FungibleResourcesCollectionItem> {
 		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
 
 		return { pageCursor in
@@ -358,7 +358,7 @@ extension AccountPortfoliosClient {
 
 	static func fetchNonFungibleResourcePage(
 		_ accountAddress: String
-	) -> @Sendable (PageCursor?) async throws -> PaginatedResourceResponse<GatewayAPI.NonFungibleResourcesCollectionItemAggregated> {
+	) -> @Sendable (PageCursor?) async throws -> PaginatedResourceResponse<GatewayAPI.NonFungibleResourcesCollectionItem> {
 		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
 
 		return { pageCursor in

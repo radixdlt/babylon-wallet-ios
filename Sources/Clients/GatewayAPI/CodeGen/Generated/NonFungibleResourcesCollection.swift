@@ -24,9 +24,9 @@ public struct NonFungibleResourcesCollection: Codable, Hashable {
     public private(set) var previousCursor: String?
     /** If specified, contains a cursor to query next page of the `items` collection. */
     public private(set) var nextCursor: String?
-    public private(set) var items: [NonFungibleResourcesCollectionItemAggregated]
+    public private(set) var items: [NonFungibleResourcesCollectionItem]
 
-    public init(totalCount: Int64? = nil, previousCursor: String? = nil, nextCursor: String? = nil, items: [NonFungibleResourcesCollectionItemAggregated]) {
+    public init(totalCount: Int64? = nil, previousCursor: String? = nil, nextCursor: String? = nil, items: [NonFungibleResourcesCollectionItem]) {
         self.totalCount = totalCount
         self.previousCursor = previousCursor
         self.nextCursor = nextCursor
