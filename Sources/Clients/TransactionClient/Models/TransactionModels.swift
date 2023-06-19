@@ -57,8 +57,7 @@ extension GatewayAPI.TransactionPreviewRequest {
 			startEpochInclusive: .init(header.startEpochInclusive.rawValue),
 			endEpochExclusive: .init(header.endEpochExclusive.rawValue),
 			notaryPublicKey: GatewayAPI.PublicKey(from: header.publicKey),
-			notaryAsSignatory: notaryAsSignatory,
-			costUnitLimit: .init(header.costUnitLimit),
+			notaryIsSignatory: notaryAsSignatory,
 			tipPercentage: .init(header.tipPercentage),
 			nonce: .init(header.nonce.rawValue),
 			signerPublicKeys: transactionSigners.signerPublicKeys.map(GatewayAPI.PublicKey.init(from:)),
@@ -96,9 +95,9 @@ extension GatewayAPI.PublicKey {
 	init(from engine: Engine.PublicKey) {
 		switch engine {
 		case let .ecdsaSecp256k1(key):
-			self = .ecdsaSecp256k1(.init(keyType: .ecdsaSecp256k1, keyHex: key.bytes.hex))
+			self = .typePublicKeyEcdsaSecp256k1(.init(keyHex: key.bytes.hex))
 		case let .eddsaEd25519(key):
-			self = .eddsaEd25519(.init(keyType: .eddsaEd25519, keyHex: key.bytes.hex))
+			self = .typePublicKeyEddsaEd25519(.init(keyHex: key.bytes.hex))
 		}
 	}
 }
@@ -107,9 +106,9 @@ extension GatewayAPI.PublicKey {
 	init(from slip10: SLIP10.PublicKey) {
 		switch slip10 {
 		case let .eddsaEd25519(pubKey):
-			self = .eddsaEd25519(.init(keyType: .eddsaEd25519, keyHex: pubKey.rawRepresentation.hex))
+			self = .typePublicKeyEcdsaSecp256k1(.init(keyHex: pubKey.rawRepresentation.hex))
 		case let .ecdsaSecp256k1(pubKey):
-			self = .ecdsaSecp256k1(.init(keyType: .ecdsaSecp256k1, keyHex: pubKey.compressedRepresentation.hex))
+			self = .typePublicKeyEddsaEd25519(.init(keyHex: pubKey.compressedRepresentation.hex))
 		}
 	}
 }

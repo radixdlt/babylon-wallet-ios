@@ -135,7 +135,7 @@ extension AccountPortfoliosClient {
 		// Fetch all fungible resources by requesting additional pages if available
 		let fetchAllFungibleResources = {
 			guard let firstPage = rawAccountDetails.fungibleResources else {
-				return [GatewayAPI.FungibleResourcesCollectionItem]()
+				return [GatewayAPI.FungibleResourcesCollectionItemAggregated]()
 			}
 
 			guard let nextPageCursor = firstPage.nextCursor else {
@@ -153,7 +153,7 @@ extension AccountPortfoliosClient {
 		// Fetch all non-fungible resources by requesting additional pages if available
 		let fetchAllNonFungibleResources = {
 			guard let firstPage = rawAccountDetails.nonFungibleResources else {
-				return [GatewayAPI.NonFungibleResourcesCollectionItem]()
+				return [GatewayAPI.NonFungibleResourcesCollectionItemAggregated]()
 			}
 
 			guard let nextPageCursor = firstPage.nextCursor else {
@@ -186,7 +186,7 @@ extension AccountPortfoliosClient {
 
 	@Sendable
 	static func createFungibleResources(
-		rawItems: [GatewayAPI.FungibleResourcesCollectionItem]
+		rawItems: [GatewayAPI.FungibleResourcesCollectionItemAggregated]
 	) async throws -> AccountPortfolio.FungibleResources {
 		// We are interested in vault aggregated items
 		let rawItems = rawItems.compactMap(\.vault)
@@ -237,7 +237,7 @@ extension AccountPortfoliosClient {
 	@Sendable
 	static func createNonFungibleResources(
 		_ accountAddress: String,
-		rawItems: [GatewayAPI.NonFungibleResourcesCollectionItem]
+		rawItems: [GatewayAPI.NonFungibleResourcesCollectionItemAggregated]
 	) async throws -> AccountPortfolio.NonFungibleResources {
 		// We are interested in vault aggregated items
 		let vaultItems = rawItems.compactMap(\.vault)
@@ -264,7 +264,6 @@ extension AccountPortfoliosClient {
 					vaultAddress: vault.vaultAddress
 				)
 			)
-			.map(\.nonFungibleId)
 
 			// https://rdxworks.slack.com/archives/C02MTV9602H/p1681155601557349
 			let maximumNFTIDChunkSize = 29
@@ -316,7 +315,7 @@ extension AccountPortfoliosClient {
 // FIXME: Temporary hack to extract the key_image_url, until we have a proper schema
 private extension GatewayAPI.StateNonFungibleDetailsResponseItem {
 	var keyImageURL: URL? {
-		guard let dictionary = mutableData.rawJson.value as? [String: Any] else { return nil }
+		guard let dictionary = data.rawJson.value as? [String: Any] else { return nil }
 		guard let elements = dictionary["elements"] as? [[String: Any]] else { return nil }
 		let values = elements.filter { $0["type"] as? String == "String" }.compactMap { $0["value"] as? String }
 		let extensions = ["jpg", "jpeg", "png", "pdf", "svg", "gif"]
@@ -335,7 +334,7 @@ private extension GatewayAPI.StateNonFungibleDetailsResponseItem {
 extension AccountPortfoliosClient {
 	static func fetchAccountFungibleResourcePage(
 		_ accountAddress: String
-	) -> @Sendable (PageCursor?) async throws -> PaginatedResourceResponse<GatewayAPI.FungibleResourcesCollectionItem> {
+	) -> @Sendable (PageCursor?) async throws -> PaginatedResourceResponse<GatewayAPI.FungibleResourcesCollectionItemAggregated> {
 		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
 
 		return { pageCursor in
@@ -359,7 +358,7 @@ extension AccountPortfoliosClient {
 
 	static func fetchNonFungibleResourcePage(
 		_ accountAddress: String
-	) -> @Sendable (PageCursor?) async throws -> PaginatedResourceResponse<GatewayAPI.NonFungibleResourcesCollectionItem> {
+	) -> @Sendable (PageCursor?) async throws -> PaginatedResourceResponse<GatewayAPI.NonFungibleResourcesCollectionItemAggregated> {
 		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
 
 		return { pageCursor in
@@ -385,7 +384,7 @@ extension AccountPortfoliosClient {
 		_ accountAddress: String,
 		resourceAddress: String,
 		vaultAddress: String
-	) -> @Sendable (PageCursor?) async throws -> PaginatedResourceResponse<GatewayAPI.NonFungibleIdsCollectionItem> {
+	) -> @Sendable (PageCursor?) async throws -> PaginatedResourceResponse<String> {
 		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
 
 		return { pageCursor in

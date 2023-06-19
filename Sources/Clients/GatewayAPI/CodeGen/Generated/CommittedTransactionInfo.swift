@@ -13,50 +13,83 @@ import AnyCodable
 @available(*, deprecated, renamed: "GatewayAPI.CommittedTransactionInfo")
 public typealias CommittedTransactionInfo = GatewayAPI.CommittedTransactionInfo
 
-// MARK: - GatewayAPI.CommittedTransactionInfo
 extension GatewayAPI {
-	public struct CommittedTransactionInfo: Codable, Hashable {
-		public private(set) var stateVersion: Int64?
-		public private(set) var transactionStatus: TransactionStatus
-		/** Hex-encoded SHA-256 hash. */
-		public private(set) var payloadHashHex: String?
-		/** Hex-encoded SHA-256 hash. */
-		public private(set) var intentHashHex: String?
-		public private(set) var feePaid: TokenAmount?
-		public private(set) var confirmedAt: Date?
-		public private(set) var errorMessage: String?
 
-		public init(stateVersion: Int64?, transactionStatus: TransactionStatus, payloadHashHex: String? = nil, intentHashHex: String? = nil, feePaid: TokenAmount? = nil, confirmedAt: Date? = nil, errorMessage: String? = nil) {
-			self.stateVersion = stateVersion
-			self.transactionStatus = transactionStatus
-			self.payloadHashHex = payloadHashHex
-			self.intentHashHex = intentHashHex
-			self.feePaid = feePaid
-			self.confirmedAt = confirmedAt
-			self.errorMessage = errorMessage
-		}
+public struct CommittedTransactionInfo: Codable, Hashable {
 
-		public enum CodingKeys: String, CodingKey, CaseIterable {
-			case stateVersion = "state_version"
-			case transactionStatus = "transaction_status"
-			case payloadHashHex = "payload_hash_hex"
-			case intentHashHex = "intent_hash_hex"
-			case feePaid = "fee_paid"
-			case confirmedAt = "confirmed_at"
-			case errorMessage = "error_message"
-		}
+    public private(set) var stateVersion: Int64
+    public private(set) var epoch: Int64
+    public private(set) var round: Int64
+    public private(set) var roundTimestamp: String
+    public private(set) var transactionStatus: TransactionStatus
+    /** Hex-encoded SHA-256 hash. */
+    public private(set) var payloadHashHex: String?
+    /** Hex-encoded SHA-256 hash. */
+    public private(set) var intentHashHex: String?
+    /** String-encoded decimal representing the amount of a related fungible resource. */
+    public private(set) var feePaid: String?
+    public private(set) var affectedGlobalEntities: [String]?
+    public private(set) var confirmedAt: Date?
+    public private(set) var errorMessage: String?
+    /** Hex-encoded binary blob. */
+    public private(set) var rawHex: String?
+    public private(set) var receipt: TransactionReceipt?
+    /** Hex-encoded binary blob. */
+    public private(set) var messageHex: String?
 
-		// Encodable protocol methods
+    public init(stateVersion: Int64, epoch: Int64, round: Int64, roundTimestamp: String, transactionStatus: TransactionStatus, payloadHashHex: String? = nil, intentHashHex: String? = nil, feePaid: String? = nil, affectedGlobalEntities: [String]? = nil, confirmedAt: Date? = nil, errorMessage: String? = nil, rawHex: String? = nil, receipt: TransactionReceipt? = nil, messageHex: String? = nil) {
+        self.stateVersion = stateVersion
+        self.epoch = epoch
+        self.round = round
+        self.roundTimestamp = roundTimestamp
+        self.transactionStatus = transactionStatus
+        self.payloadHashHex = payloadHashHex
+        self.intentHashHex = intentHashHex
+        self.feePaid = feePaid
+        self.affectedGlobalEntities = affectedGlobalEntities
+        self.confirmedAt = confirmedAt
+        self.errorMessage = errorMessage
+        self.rawHex = rawHex
+        self.receipt = receipt
+        self.messageHex = messageHex
+    }
 
-		public func encode(to encoder: Encoder) throws {
-			var container = encoder.container(keyedBy: CodingKeys.self)
-			try container.encode(stateVersion, forKey: .stateVersion)
-			try container.encode(transactionStatus, forKey: .transactionStatus)
-			try container.encodeIfPresent(payloadHashHex, forKey: .payloadHashHex)
-			try container.encodeIfPresent(intentHashHex, forKey: .intentHashHex)
-			try container.encodeIfPresent(feePaid, forKey: .feePaid)
-			try container.encodeIfPresent(confirmedAt, forKey: .confirmedAt)
-			try container.encodeIfPresent(errorMessage, forKey: .errorMessage)
-		}
-	}
+    public enum CodingKeys: String, CodingKey, CaseIterable {
+        case stateVersion = "state_version"
+        case epoch
+        case round
+        case roundTimestamp = "round_timestamp"
+        case transactionStatus = "transaction_status"
+        case payloadHashHex = "payload_hash_hex"
+        case intentHashHex = "intent_hash_hex"
+        case feePaid = "fee_paid"
+        case affectedGlobalEntities = "affected_global_entities"
+        case confirmedAt = "confirmed_at"
+        case errorMessage = "error_message"
+        case rawHex = "raw_hex"
+        case receipt
+        case messageHex = "message_hex"
+    }
+
+    // Encodable protocol methods
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(stateVersion, forKey: .stateVersion)
+        try container.encode(epoch, forKey: .epoch)
+        try container.encode(round, forKey: .round)
+        try container.encode(roundTimestamp, forKey: .roundTimestamp)
+        try container.encode(transactionStatus, forKey: .transactionStatus)
+        try container.encodeIfPresent(payloadHashHex, forKey: .payloadHashHex)
+        try container.encodeIfPresent(intentHashHex, forKey: .intentHashHex)
+        try container.encodeIfPresent(feePaid, forKey: .feePaid)
+        try container.encodeIfPresent(affectedGlobalEntities, forKey: .affectedGlobalEntities)
+        try container.encodeIfPresent(confirmedAt, forKey: .confirmedAt)
+        try container.encodeIfPresent(errorMessage, forKey: .errorMessage)
+        try container.encodeIfPresent(rawHex, forKey: .rawHex)
+        try container.encodeIfPresent(receipt, forKey: .receipt)
+        try container.encodeIfPresent(messageHex, forKey: .messageHex)
+    }
+}
+
 }

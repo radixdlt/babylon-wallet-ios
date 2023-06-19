@@ -356,11 +356,11 @@ extension GatewayAPI.StateEntityDetailsResponseItem {
 	private var fungibility: DappDetails.State.Resources.ResourceDetails.Fungibility? {
 		guard let details else { return nil }
 		switch details {
-		case .fungibleResource:
+		case .typeStateEntityDetailsResponseFungibleResourceDetails:
 			return .fungible
-		case .nonFungibleResource:
+		case .typeStateEntityDetailsResponseNonFungibleResourceDetails:
 			return .nonFungible
-		case .fungibleVault, .nonFungibleVault, .package, .component:
+		default:
 			return nil
 		}
 	}

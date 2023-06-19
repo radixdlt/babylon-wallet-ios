@@ -4,9 +4,6 @@ import Foundation
 // MARK: - GatewayAPI.StateEntityDetailsResponse + Sendable
 extension GatewayAPI.StateEntityDetailsResponse: @unchecked Sendable {}
 
-// MARK: - GatewayAPI.NonFungibleIdsCollectionItem + Sendable
-extension GatewayAPI.NonFungibleIdsCollectionItem: @unchecked Sendable {}
-
 // MARK: - GatewayAPI.NonFungibleResourcesCollectionItemVaultAggregatedVaultItem + Sendable
 extension GatewayAPI.NonFungibleResourcesCollectionItemVaultAggregatedVaultItem: @unchecked Sendable {}
 
@@ -33,17 +30,67 @@ extension GatewayAPI.NonFungibleResourcesCollectionItemVaultAggregated: @uncheck
 
 extension GatewayAPI.StateEntityDetailsResponseItemDetails {
 	public var fungible: GatewayAPI.StateEntityDetailsResponseFungibleResourceDetails? {
-		if case let .fungibleResource(details) = self {
+		if case let .typeStateEntityDetailsResponseFungibleResourceDetails(details) = self {
 			return details
 		}
 		return nil
 	}
 
 	public var nonFungible: GatewayAPI.StateEntityDetailsResponseNonFungibleResourceDetails? {
-		if case let .nonFungibleResource(details) = self {
+		if case let .typeStateEntityDetailsResponseNonFungibleResourceDetails(details) = self {
 			return details
 		}
 		return nil
+	}
+}
+
+extension GatewayAPI.FungibleResourcesCollectionItemAggregated {
+	public var vault: GatewayAPI.FungibleResourcesCollectionItemVaultAggregated? {
+		if case let .typeFungibleResourcesCollectionItemVaultAggregated(vault) = self {
+			return vault
+		}
+		return nil
+	}
+
+	public var global: GatewayAPI.FungibleResourcesCollectionItemGloballyAggregated? {
+		if case let .typeFungibleResourcesCollectionItemGloballyAggregated(global) = self {
+			return global
+		}
+		return nil
+	}
+
+	public var resourceAddress: String {
+		switch self {
+		case let .typeFungibleResourcesCollectionItemGloballyAggregated(item):
+			return item.resourceAddress
+		case let .typeFungibleResourcesCollectionItemVaultAggregated(item):
+			return item.resourceAddress
+		}
+	}
+}
+
+extension GatewayAPI.NonFungibleResourcesCollectionItemAggregated {
+	public var vault: GatewayAPI.NonFungibleResourcesCollectionItemVaultAggregated? {
+		if case let .typeNonFungibleResourcesCollectionItemVaultAggregated(vault) = self {
+			return vault
+		}
+		return nil
+	}
+
+	public var global: GatewayAPI.NonFungibleResourcesCollectionItemGloballyAggregated? {
+		if case let .typeNonFungibleResourcesCollectionItemGloballyAggregated(global) = self {
+			return global
+		}
+		return nil
+	}
+
+	public var resourceAddress: String {
+		switch self {
+		case let .typeNonFungibleResourcesCollectionItemGloballyAggregated(item):
+			return item.resourceAddress
+		case let .typeNonFungibleResourcesCollectionItemVaultAggregated(item):
+			return item.resourceAddress
+		}
 	}
 }
 
@@ -143,7 +190,7 @@ extension [GatewayAPI.EntityMetadataItem] {
 
 extension GatewayAPI.StateNonFungibleDataResponse {
 	public func nonFungibleData(for nonFungibleId: String) -> AnyCodable? {
-		nonFungibleIds.first { $0.nonFungibleId == nonFungibleId }?.mutableData.rawJson
+		nonFungibleIds.first { $0.nonFungibleId == nonFungibleId }?.data.rawJson
 	}
 }
 

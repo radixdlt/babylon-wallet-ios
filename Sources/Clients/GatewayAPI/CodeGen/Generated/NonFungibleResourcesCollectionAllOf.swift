@@ -13,24 +13,26 @@ import AnyCodable
 @available(*, deprecated, renamed: "GatewayAPI.NonFungibleResourcesCollectionAllOf")
 public typealias NonFungibleResourcesCollectionAllOf = GatewayAPI.NonFungibleResourcesCollectionAllOf
 
-// MARK: - GatewayAPI.NonFungibleResourcesCollectionAllOf
 extension GatewayAPI {
-	public struct NonFungibleResourcesCollectionAllOf: Codable, Hashable {
-		public private(set) var items: [NonFungibleResourcesCollectionItem]
 
-		public init(items: [NonFungibleResourcesCollectionItem]) {
-			self.items = items
-		}
+public struct NonFungibleResourcesCollectionAllOf: Codable, Hashable {
 
-		public enum CodingKeys: String, CodingKey, CaseIterable {
-			case items
-		}
+    public private(set) var items: [NonFungibleResourcesCollectionItemAggregated]
 
-		// Encodable protocol methods
+    public init(items: [NonFungibleResourcesCollectionItemAggregated]) {
+        self.items = items
+    }
 
-		public func encode(to encoder: Encoder) throws {
-			var container = encoder.container(keyedBy: CodingKeys.self)
-			try container.encode(items, forKey: .items)
-		}
-	}
+    public enum CodingKeys: String, CodingKey, CaseIterable {
+        case items
+    }
+
+    // Encodable protocol methods
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(items, forKey: .items)
+    }
+}
+
 }
