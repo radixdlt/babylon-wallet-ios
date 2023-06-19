@@ -17,38 +17,28 @@ extension Completion {
 		let store: StoreOf<Completion>
 
 		var body: some SwiftUI.View {
-			WithViewStore(
-				store,
-				observe: Completion.ViewState.init,
-				send: { .view($0) }
-			) { viewStore in
-				VStack(spacing: .medium2) {
-					Image(asset: AssetResource.successCheckmark)
+			WithViewStore(store, observe: ViewState.init, send: { .view($0) }) { viewStore in
+				WithNavigationBar {
+					viewStore.send(.closeButtonTapped)
+				} content: {
+					VStack(spacing: .medium2) {
+						Image(asset: AssetResource.successCheckmark)
 
-					Text(viewStore.title)
-						.foregroundColor(.app.gray1)
-						.textStyle(.sheetTitle)
+						Text(viewStore.title)
+							.foregroundColor(.app.gray1)
+							.textStyle(.sheetTitle)
 
-					Text(viewStore.subtitle)
-						.foregroundColor(.app.gray1)
-						.textStyle(.body1Regular)
-						.multilineTextAlignment(.center)
+						Text(viewStore.subtitle)
+							.foregroundColor(.app.gray1)
+							.textStyle(.body1Regular)
+							.multilineTextAlignment(.center)
+					}
+					.padding(.horizontal, .medium2)
+					.padding(.bottom, .medium3)
 				}
-				.padding(.horizontal, .small2)
-				.padding(.bottom, .medium3)
-				#if os(iOS)
-					.onWillDisappear {
-						viewStore.send(.willDisappear)
-					}
-				#endif
-					.frame(maxWidth: .infinity)
-					.safeAreaInset(edge: .top, alignment: .leading, spacing: 0) {
-						CloseButton { viewStore.send(.closeButtonTapped) }
-							.padding([.top, .leading], .small2)
-					}
 			}
 			.presentationDragIndicator(.visible)
-			.presentationDetentIntrinsicHeight()
+			.presentationDetents([.height(.smallDetent)])
 			#if os(iOS)
 				.presentationBackground(.blur)
 			#endif

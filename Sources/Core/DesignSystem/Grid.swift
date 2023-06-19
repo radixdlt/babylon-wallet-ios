@@ -62,4 +62,7 @@ extension CGFloat {
 
 	/// 75
 	public static let largeButtonHeight: Self = 75
+
+	/// 275
+	public static let smallDetent: Self = 275
 }

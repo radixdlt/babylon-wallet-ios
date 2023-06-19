@@ -301,16 +301,20 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			state.destination = nil
 			return delayedEffect(for: .delegate(.transactionCompleted(txID)))
 
-		case .destination(.presented(.submitting(.delegate(.dismiss)))):
+		case .destination(.presented(.submitting(.delegate(.manuallyDismiss)))):
+			// This is used when the close button is pressed, we have to manually
 			state.destination = nil
 			return delayedEffect(for: .delegate(.userDismissedTransactionStatus))
 
 		case .destination(.dismiss):
 			if case .signing = state.destination {
 				return cancelSigningEffect(state: &state)
-			} else {
-				return .none
+			} else if case .submitting = state.destination {
+				// This is used when tapping outside the Submitting sheet, no need to set destination to nil
+				return delayedEffect(for: .delegate(.userDismissedTransactionStatus))
 			}
+
+			return .none
 
 		default:
 			return .none
