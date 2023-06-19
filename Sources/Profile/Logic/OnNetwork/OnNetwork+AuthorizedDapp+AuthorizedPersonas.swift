@@ -34,7 +34,7 @@ extension Profile.Network {
 		public let simpleAccounts: OrderedSet<AccountForDisplay>?
 
 		/// The persona data that the user has given the Dapp access to
-		public let sharedPersonaDataEntries: IdentifiedArrayOf<PersonaDataEntryOfKind<PersonaDataEntry>>?
+		public let sharedPersonaData: PersonaData
 
 		/// If this persona has an auth sign key created
 		public let hasAuthenticationSigningKey: Bool
@@ -84,14 +84,25 @@ extension Profile.Network {
 						return nil
 					}
 				}(),
-				sharedPersonaDataEntries: {
-//					guard let sharedFieldIDs = simple.sharedPersonaData?.infoSet else { return nil }
-//
-//					let presentFields = sharedFieldIDs.compactMap { id in
-//						persona.personaData.entries.first(where: { $0.id == id })
-//					}
-//					return .init(uniqueElements: presentFields)
-					fatalError()
+				sharedPersonaData: {
+					let full = persona.personaData
+					let shared = simple.sharedPersonaData
+					guard
+						Set(full.entries.map(\.id))
+						.isSuperset(of: shared.entryIDs)
+					else {
+						throw AuthorizedDappReferencesFieldIDThatDoesNotExist()
+					}
+					return try PersonaData(
+						name: shared.name == full.name?.id ? persona.personaData.name : nil,
+						dateOfBirth: shared.dateOfBirth == full.dateOfBirth?.id ? persona.personaData.dateOfBirth : nil,
+						postalAddresses: .init(
+							collection: .init(uncheckedUniqueElements: full.postalAddresses.filter { address in
+								guard let sharedPostal = shared.postalAddresses else { return false }
+								return sharedPostal.ids.contains(address.id)
+							})
+						)
+					)
 				}(),
 				hasAuthenticationSigningKey: persona.hasAuthenticationSigningKey
 			)

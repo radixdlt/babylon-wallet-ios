@@ -314,16 +314,38 @@ final class ProfileTests: TestCase {
 			"Mrs Incognito",
 			personaData: .init(
 				name: .init(
-					id: .init(uuidString: "00000000-0000-0000-0000-000000000000"),
+					id: .init(uuidString: "00000000-0000-0000-0000-000000000000")!,
 					value: .init(given: "Jane", family: "Incognitoson", variant: .western)
-				)
+				),
+				postalAddresses: .init(collection: [
+					.init(
+						id: .init(uuidString: "00000000-AAAA-AAAA-AAAA-000000000000")!,
+						value: .init(validating: [
+							.streetLine0("Bragatan 1"),
+							.streetLine1(""),
+							.postalCodeNumber(12345),
+							.city("Stockholm"),
+							.country(.sweden),
+						])
+					),
+					.init(
+						id: .init(uuidString: "00000000-BBBB-BBBB-BBBB-000000000000")!,
+						value: .init(validating: [
+							.streetLine0("Toppengatan 3"),
+							.streetLine1(""),
+							.postalCodeNumber(54321),
+							.city("Karlstad"),
+							.country(.sweden),
+						])
+					),
+				])
 			)
 		)
 		let secondPersona = try addNewPersona(
 			"Mrs Public",
 			personaData: .init(
 				name: .init(
-					id: .init(uuidString: "00000000-0000-0000-0000-000000000001"),
+					id: .init(uuidString: "00000000-0000-0000-0000-000000000001")!,
 					value: .init(given: "Maria", family: "Publicson", variant: .western)
 				)
 			)
@@ -371,13 +393,13 @@ final class ProfileTests: TestCase {
 							],
 							forRequest: .exactly(2)
 						),
-//						sharedPersonaData: .init(
-//							infoSet: [
-//								firstPersona.personaData.entries[0].id,
-//							],
-//							forRequest: .exactly(1)
-//						)
-						sharedPersonaData: .init()
+						sharedPersonaData: .init(
+							name: firstPersona.personaData.name?.id,
+							postalAddresses: .init(
+								ids: .init(validating: firstPersona.personaData.postalAddresses.map(\.id)),
+								forRequest: .atLeast(1)
+							)
+						)
 					),
 					.init(
 						identityAddress: secondPersona.address,
@@ -388,13 +410,9 @@ final class ProfileTests: TestCase {
 							],
 							forRequest: .atLeast(1)
 						),
-//						sharedPersonaData: .init(
-//							infoSet: [
-//								secondPersona.personaData.entries[0].id,
-//							],
-//							forRequest: .exactly(1)
-//						)
-						sharedPersonaData: .init()
+						sharedPersonaData: .init(
+							name: secondPersona.personaData.name?.id
+						)
 					))
 			)
 		)
@@ -578,6 +596,13 @@ final class ProfileTests: TestCase {
 		XCTAssertEqual(network.authorizedDapps[0].referencesToAuthorizedPersonas.count, 2)
 
 		XCTAssertNotNil(network.authorizedDapps[0].referencesToAuthorizedPersonas[0].sharedPersonaData.name)
+		XCTAssertEqual(network.authorizedDapps[0].referencesToAuthorizedPersonas[0].sharedPersonaData.postalAddresses?.ids, [
+			.init(uuidString: "00000000-AAAA-AAAA-AAAA-000000000000")!,
+			.init(uuidString: "00000000-BBBB-BBBB-BBBB-000000000000")!,
+		])
+
+		let sharedPostalAddresses = try network.detailsForAuthorizedDapp(network.authorizedDapps[0]).detailedAuthorizedPersonas[0].sharedPersonaData.postalAddresses
+		XCTAssertEqual(sharedPostalAddresses[0].value.country, .sweden)
 
 		XCTAssertEqual(network.authorizedDapps[0].referencesToAuthorizedPersonas[0].sharedAccounts?.request.quantifier, .exactly)
 		XCTAssertEqual(network.authorizedDapps[0].referencesToAuthorizedPersonas[0].sharedAccounts?.request.quantity, 2)

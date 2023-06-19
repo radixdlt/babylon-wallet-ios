@@ -398,7 +398,7 @@
               "identityAddress" : "identity_tdx_c_1pntzwn92848tkaatj4psmgtuvsn83lnknku6av34alxqdrsvjv",
               "lastLogin" : "2001-01-01T00:00:00Z",
               "sharedAccounts" : {
-                "infoSet" : [
+                "ids" : [
                   "account_tdx_c_1p82arz264ntf727q2s7f7cm6pqucgqzuru3z7mgeg3gqua0wlj",
                   "account_tdx_c_1pygfwtlv7l90rcsge6t0f0jwn3cuzp05y8geek45qw7s98msmw"
                 ],
@@ -408,12 +408,16 @@
                 }
               },
               "sharedPersonaData" : {
-                "infoSet" : [
-                  "00000000-0000-0000-0000-000000000000"
-                ],
-                "request" : {
-                  "quantifier" : "exactly",
-                  "quantity" : 1
+                "name" : "00000000-0000-0000-0000-000000000000",
+                "postalAddresses" : {
+                  "ids" : [
+                    "00000000-AAAA-AAAA-AAAA-000000000000",
+                    "00000000-BBBB-BBBB-BBBB-000000000000"
+                  ],
+                  "request" : {
+                    "quantifier" : "atLeast",
+                    "quantity" : 1
+                  }
                 }
               }
             },
@@ -421,7 +425,7 @@
               "identityAddress" : "identity_tdx_c_1p30wtkl76qpyenu88sverfdh0qwf70gulgu29k72myqq2hqg0r",
               "lastLogin" : "2001-01-01T00:00:00Z",
               "sharedAccounts" : {
-                "infoSet" : [
+                "ids" : [
                   "account_tdx_c_1p82arz264ntf727q2s7f7cm6pqucgqzuru3z7mgeg3gqua0wlj"
                 ],
                 "request" : {
@@ -430,13 +434,7 @@
                 }
               },
               "sharedPersonaData" : {
-                "infoSet" : [
-                  "00000000-0000-0000-0000-000000000001"
-                ],
-                "request" : {
-                  "quantifier" : "exactly",
-                  "quantity" : 1
-                }
+                "name" : "00000000-0000-0000-0000-000000000001"
               }
             }
           ]
@@ -464,7 +462,56 @@
 
             ],
             "postalAddresses" : [
-
+              {
+                "id" : "00000000-AAAA-AAAA-AAAA-000000000000",
+                "value" : [
+                  {
+                    "discriminator" : "streetLine0",
+                    "value" : "Bragatan 1"
+                  },
+                  {
+                    "discriminator" : "streetLine1",
+                    "value" : ""
+                  },
+                  {
+                    "discriminator" : "postalCodeNumber",
+                    "value" : 12345
+                  },
+                  {
+                    "discriminator" : "city",
+                    "value" : "Stockholm"
+                  },
+                  {
+                    "discriminator" : "country",
+                    "value" : "sweden"
+                  }
+                ]
+              },
+              {
+                "id" : "00000000-BBBB-BBBB-BBBB-000000000000",
+                "value" : [
+                  {
+                    "discriminator" : "streetLine0",
+                    "value" : "Toppengatan 3"
+                  },
+                  {
+                    "discriminator" : "streetLine1",
+                    "value" : ""
+                  },
+                  {
+                    "discriminator" : "postalCodeNumber",
+                    "value" : 54321
+                  },
+                  {
+                    "discriminator" : "city",
+                    "value" : "Karlstad"
+                  },
+                  {
+                    "discriminator" : "country",
+                    "value" : "sweden"
+                  }
+                ]
+              }
             ]
           },
           "securityState" : {
