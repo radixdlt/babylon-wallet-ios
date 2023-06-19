@@ -225,11 +225,11 @@ final class PersonaFieldTests: TestCase {
 		XCTAssertEqual(addresses.compactMap(\.value.country), [.sweden, .sweden, .france, .unitedKingdom])
 	}
 
-	func test_json_encoding_test() throws {
-		let persona = withDependencies {
+	func test_json_coding_persona_and_cap21() throws {
+		let persona = try withDependencies {
 			$0.uuid = .incrementing
 		} operation: {
-			try! Persona(
+			try Persona(
 				label: "Stadsministern",
 				personaData: .init(
 					name: .init(
@@ -242,6 +242,7 @@ final class PersonaFieldTests: TestCase {
 					dateOfBirth: .init(value: .init(year: 1927, month: 01, day: 30)),
 					emailAddresses: [
 						"palme@stadsminister.se",
+						"olof@boss.se",
 					],
 					postalAddresses: [
 						[
@@ -250,15 +251,22 @@ final class PersonaFieldTests: TestCase {
 							.postalCodeNumber(11129), .city("Stockholm"),
 							.country(.sweden),
 						],
+						[
+							.streetLine0("Strömgatan 18"),
+							.streetLine1("Sagerska Huset"),
+							.postalCodeNumber(11152), .city("Stockholm"),
+							.country(.sweden),
+						],
 					],
 					phoneNumbers: [
 						.init(value: .init(number: "+468-1234567")),
+						.init(value: .init(number: "+468-9876543")),
 					]
 				)
 			)
 		}
 
-		let json: JSON = [
+		let personaJSON: JSON = [
 			"label": "Stadsministern",
 			"personaData": [
 				"name": [
@@ -278,10 +286,14 @@ final class PersonaFieldTests: TestCase {
 						"id": "00000000-0000-0000-0000-000000000002",
 						"value": "palme@stadsminister.se",
 					],
+					[
+						"id": "00000000-0000-0000-0000-000000000003",
+						"value": "olof@boss.se",
+					],
 				],
 				"postalAddresses": [
 					[
-						"id": "00000000-0000-0000-0000-000000000003",
+						"id": "00000000-0000-0000-0000-000000000004",
 						"value": [
 							[
 								"discriminator": "streetLine0",
@@ -305,11 +317,40 @@ final class PersonaFieldTests: TestCase {
 							],
 						],
 					],
+					[
+						"id": "00000000-0000-0000-0000-000000000005",
+						"value": [
+							[
+								"discriminator": "streetLine0",
+								"value": "Strömgatan 18",
+							],
+							[
+								"discriminator": "streetLine1",
+								"value": "Sagerska Huset",
+							],
+							[
+								"discriminator": "postalCodeNumber",
+								"value": 11152,
+							],
+							[
+								"discriminator": "city",
+								"value": "Stockholm",
+							],
+							[
+								"discriminator": "country",
+								"value": "sweden",
+							],
+						],
+					],
 				],
 				"phoneNumbers": [
 					[
-						"id": "00000000-0000-0000-0000-000000000004",
+						"id": "00000000-0000-0000-0000-000000000006",
 						"value": "+468-1234567",
+					],
+					[
+						"id": "00000000-0000-0000-0000-000000000007",
+						"value": "+468-9876543",
 					],
 				],
 			],
@@ -317,102 +358,11 @@ final class PersonaFieldTests: TestCase {
 
 		try XCTAssertJSONEncoding(
 			persona,
-			json
+			personaJSON
 		)
-	}
-
-	func test_json_decoding_test() throws {
-		let persona = withDependencies {
-			$0.uuid = .incrementing
-		} operation: {
-			try! Persona(
-				label: "Stadsministern",
-				personaData: .init(
-					name: .init(
-						value: .init(
-							given: "Olof",
-							family: "Palme",
-							variant: .western
-						)
-					),
-					dateOfBirth: .init(value: .init(year: 1927, month: 01, day: 30)),
-					emailAddresses: [
-						"palme@stadsminister.se",
-					],
-					postalAddresses: [
-						[
-							.streetLine0("Västerlånggatan 31"),
-							.streetLine1(""),
-							.postalCodeNumber(11129), .city("Stockholm"),
-							.country(.sweden),
-						],
-					],
-					phoneNumbers: [
-						.init(value: .init(number: "+468-1234567")),
-					]
-				)
-			)
-		}
-
-		let json: JSON = [
-			"label": "Stadsministern",
-			"personaData": [
-				"name": [
-					"id": "00000000-0000-0000-0000-000000000000",
-					"value": [
-						"family": "Palme",
-						"given": "Olof",
-						"variant": "western",
-					],
-				],
-				"dateOfBirth": [
-					"id": "00000000-0000-0000-0000-000000000001",
-					"value": "1927-01-30T12:00:00Z",
-				],
-				"emailAddresses": [
-					[
-						"id": "00000000-0000-0000-0000-000000000002",
-						"value": "palme@stadsminister.se",
-					],
-				],
-				"postalAddresses": [
-					[
-						"id": "00000000-0000-0000-0000-000000000003",
-						"value": [
-							[
-								"discriminator": "streetLine0",
-								"value": "Västerlånggatan 31",
-							],
-							[
-								"discriminator": "streetLine1",
-								"value": "",
-							],
-							[
-								"discriminator": "postalCodeNumber",
-								"value": 11129,
-							],
-							[
-								"discriminator": "city",
-								"value": "Stockholm",
-							],
-							[
-								"discriminator": "country",
-								"value": "sweden",
-							],
-						],
-					],
-				],
-				"phoneNumbers": [
-					[
-						"id": "00000000-0000-0000-0000-000000000004",
-						"value": "+468-1234567",
-					],
-				],
-			],
-		]
 
 		try XCTAssertJSONDecoding(
-			json,
+			personaJSON,
 			persona
 		)
 	}
