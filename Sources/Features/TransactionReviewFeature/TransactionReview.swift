@@ -225,7 +225,8 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			let guarantees = deposits.accounts
 				.flatMap { account -> [TransactionReviewGuarantee.State] in
 					account.transfers
-						.filter { $0.metadata.type == .fungible && $0.guarantee != nil }
+						.compactMap(\.fungible)
+						.filter { $0.guarantee != nil }
 						.compactMap { .init(account: account.account, transfer: $0) }
 				}
 
@@ -582,28 +583,15 @@ extension TransactionReview {
 		var deposits: [Account: [Transfer]] = [:]
 
 		for deposit in manifest.accountDeposits {
-			switch deposit {
-			case let .exact(componentAddress, resourceSpecifier):
-				try await collectTransferInfo(
-					componentAddress: componentAddress,
-					resourceSpecifier: resourceSpecifier,
-					userAccounts: userAccounts,
-					createdEntities: manifest.createdEntities,
-					container: &deposits,
-					networkID: networkID,
-					type: .exact
-				)
-			case let .estimate(index, componentAddress, resourceSpecifier):
-				try await collectTransferInfo(
-					componentAddress: componentAddress,
-					resourceSpecifier: resourceSpecifier,
-					userAccounts: userAccounts,
-					createdEntities: manifest.createdEntities,
-					container: &deposits,
-					networkID: networkID,
-					type: .estimated(instructionIndex: index)
-				)
-			}
+			try await collectTransferInfo(
+				componentAddress: deposit.componentAddress,
+				resourceSpecifier: deposit.resourceSpecifier,
+				userAccounts: userAccounts,
+				createdEntities: manifest.createdEntities,
+				container: &deposits,
+				networkID: networkID,
+				type: deposit.transferType
+			)
 		}
 
 		let reviewAccounts = deposits
@@ -613,9 +601,7 @@ extension TransactionReview {
 		guard !reviewAccounts.isEmpty else { return nil }
 
 		let requiresGuarantees = reviewAccounts.contains { reviewAccount in
-			reviewAccount.transfers.contains { transfer in
-				transfer.guarantee != nil
-			}
+			reviewAccount.transfers.contains { $0.fungible?.guarantee != nil }
 		}
 
 		return .init(accounts: .init(uniqueElements: reviewAccounts), showCustomizeGuarantees: requiresGuarantees)
@@ -630,49 +616,62 @@ extension TransactionReview {
 		networkID: NetworkID,
 		type: TransferType
 	) async throws {
-		let account = userAccounts.first { $0.address.address == componentAddress.address }! // TODO: Handle
-		func addTransfer(_ resourceAddress: ResourceAddress, amount: BigDecimal) async throws {
-			let isNewResources = createdEntities?.resourceAddresses.contains(resourceAddress) ?? false
+		guard let account = userAccounts.first(where: { $0.address.address == componentAddress.address }) else {
+			// TODO: Handle
+			loggerGlobal.error("Can't find component address that was specified for adding transfer")
+			return
+		}
 
-			func getMetadata(address: String) async throws -> GatewayAPI.EntityMetadataCollection? {
-				guard !isNewResources else { return nil }
-				return try await gatewayAPIClient.getEntityMetadata(address)
-			}
+		func isNewResources(resourceAddress: ResourceAddress) -> Bool {
+			createdEntities?.resourceAddresses.contains(resourceAddress) ?? false
+		}
 
-			let addressKind = try engineToolkitClient.decodeAddress(resourceAddress.address).entityType
+		func getTransfers() async throws -> [Transfer] {
+			switch resourceSpecifier {
+			case let .amount(resourceAddress, decimalAmount):
+				let amount = try BigDecimal(fromString: decimalAmount.value)
 
-			let metadata = try? await getMetadata(address: resourceAddress.address)
-
-			let guarantee: TransactionClient.Guarantee? = {
-				if case let .estimated(instructionIndex) = type, !isNewResources {
+				func guarantee() -> TransactionClient.Guarantee? {
+					guard case let .estimated(instructionIndex) = type else { return nil }
 					return .init(amount: amount, instructionIndex: instructionIndex, resourceAddress: resourceAddress)
 				}
-				return nil
-			}()
 
-			let resourceMetadata = ResourceMetadata(
-				name: metadata?.symbol ?? metadata?.name ?? L10n.TransactionReview.unknown,
-				thumbnail: metadata?.iconURL,
-				type: addressKind.resourceType
-			)
+				func isXRD() -> Bool {
+					(try? engineToolkitClient.isXRD(resource: resourceAddress, on: networkID)) ?? false
+				}
 
-			let transfer = try TransactionReview.Transfer(
-				amount: amount,
-				resourceAddress: resourceAddress,
-				isXRD: engineToolkitClient.isXRD(resource: resourceAddress, on: networkID),
-				guarantee: guarantee,
-				metadata: resourceMetadata
-			)
+				let addressKind = try engineToolkitClient.decodeAddress(resourceAddress.address).entityType
+				guard case .fungibleResource = addressKind else { return [] }
+				let isNew = isNewResources(resourceAddress: resourceAddress)
+				let metadata = isNew ? nil : try? await gatewayAPIClient.getEntityMetadata(resourceAddress.address)
 
-			container[account, default: []].append(transfer)
+				return [.fungible(.init(
+					amount: amount,
+					name: metadata?.name,
+					symbol: metadata?.symbol,
+					thumbnail: metadata?.iconURL,
+					isXRD: isXRD(),
+					guarantee: guarantee()
+				))]
+
+			case let .ids(resourceAddress, ids):
+				let addressKind = try engineToolkitClient.decodeAddress(resourceAddress.address).entityType
+				guard case .nonFungibleResource = addressKind else { return [] }
+				let isNew = isNewResources(resourceAddress: resourceAddress)
+				let metadata = isNew ? nil : try? await gatewayAPIClient.getEntityMetadata(resourceAddress.address)
+
+				return ids.map { id in
+					.nonFungible(.init(
+						resourceName: metadata?.name,
+						tokenID: "\(id)",
+						tokenName: "tokenName",
+						thumbnail: nil
+					))
+				}
+			}
 		}
 
-		switch resourceSpecifier {
-		case let .amount(resourceAddress, amount):
-			try await addTransfer(resourceAddress, amount: .init(fromString: amount.value))
-		case let .ids(resourceAddress, ids):
-			try await addTransfer(resourceAddress, amount: BigDecimal(ids.count))
-		}
+		try await container[account, default: []].append(contentsOf: getTransfers())
 	}
 }
 
@@ -701,11 +700,6 @@ extension TransactionReview {
 		}
 	}
 
-	public enum ResourceType: Sendable, Hashable {
-		case fungible
-		case nonFungible
-	}
-
 	public enum Account: Sendable, Hashable {
 		case user(Profile.Network.AccountForDisplay)
 		case external(AccountAddress, approved: Bool)
@@ -729,68 +723,71 @@ extension TransactionReview {
 		}
 	}
 
-	public struct Transfer: Sendable, Identifiable, Hashable {
-		public let id: UUID = .init()
+	public enum Transfer: Sendable, Identifiable, Hashable {
+		public typealias ID = Tagged<Self, UUID>
 
-		public let amount: BigDecimal
-		public let resourceAddress: ResourceAddress
-		public let isXRD: Bool
+		case fungible(FungibleTransfer)
+		case nonFungible(NonFungibleTransfer)
 
-		public var guarantee: TransactionClient.Guarantee?
-		public var metadata: ResourceMetadata
-
-		public var thumbnail: TokenThumbnail.Content {
-			isXRD ? .xrd : .known(metadata.thumbnail)
+		public var id: ID {
+			switch self {
+			case let .fungible(details):
+				return details.id
+			case let .nonFungible(details):
+				return details.id
+			}
 		}
 
-		public init(
-			amount: BigDecimal,
-			resourceAddress: ResourceAddress,
-			isXRD: Bool,
-			guarantee: TransactionClient.Guarantee? = nil,
-			metadata: ResourceMetadata
-		) {
-			self.amount = amount
-			self.resourceAddress = resourceAddress
-			self.isXRD = isXRD
-			self.guarantee = guarantee
-			self.metadata = metadata
+		public var fungible: FungibleTransfer? {
+			get {
+				guard case let .fungible(details) = self else { return nil }
+				return details
+			}
+			set {
+				guard case .fungible = self, let newValue else { return }
+				self = .fungible(newValue)
+			}
+		}
+
+		public var nonFungible: NonFungibleTransfer? {
+			get {
+				guard case let .nonFungible(details) = self else { return nil }
+				return details
+			}
+			set {
+				guard case .nonFungible = self, let newValue else { return }
+				self = .nonFungible(newValue)
+			}
 		}
 	}
 
-	public struct ResourceMetadata: Sendable, Hashable {
+	public struct FungibleTransfer: Sendable, Hashable {
+		public let id = Transfer.ID()
+		public let amount: BigDecimal
 		public let name: String?
+		public let symbol: String?
 		public let thumbnail: URL?
-		public var type: ResourceType?
-		public var fiatAmount: BigDecimal?
+		public let isXRD: Bool
+		public var guarantee: TransactionClient.Guarantee?
+	}
 
-		public init(
-			name: String?,
-			thumbnail: URL?,
-			type: ResourceType? = nil,
-			fiatAmount: BigDecimal? = nil
-		) {
-			self.name = name
-			self.thumbnail = thumbnail
-			self.type = type
-			self.fiatAmount = fiatAmount
-		}
+	public struct NonFungibleTransfer: Sendable, Hashable {
+		public let id = Transfer.ID()
+		public let resourceName: String?
+		public let tokenID: String
+		public let tokenName: String?
+		public let thumbnail: URL?
 	}
 }
 
 extension TransactionReview.State {
 	public var allGuarantees: [TransactionClient.Guarantee] {
-		deposits?.accounts.flatMap { $0.transfers.compactMap(\.guarantee) } ?? []
+		deposits?.accounts.flatMap { $0.transfers.compactMap(\.fungible?.guarantee) } ?? []
 	}
 
 	public mutating func applyGuarantee(_ updated: TransactionClient.Guarantee, transferID: TransactionReview.Transfer.ID) {
 		guard let accountID = accountID(for: transferID) else { return }
-
-		deposits?
-			.accounts[id: accountID]?
-			.transfers[id: transferID]?
-			.guarantee?
-			.amount = updated.amount
+		deposits?.accounts[id: accountID]?.transfers[id: transferID]?.fungible?.guarantee = updated
 	}
 
 	private func accountID(for transferID: TransactionReview.Transfer.ID) -> AccountAddress.ID? {
@@ -815,37 +812,27 @@ extension Collection where Element: Equatable {
 	}
 }
 
-extension EngineToolkitModels.AddressKind {
-	var resourceType: TransactionReview.ResourceType? {
+extension AccountDeposit {
+	public var componentAddress: ComponentAddress {
 		switch self {
-		case .fungibleResource:
-			return .fungible
-		case .nonFungibleResource:
-			return .nonFungible
-		case .package:
-			return nil
-		case .accountComponent:
-			return nil
-		case .normalComponent:
-			return nil
-		case .secp256k1VirtualAccountComponent:
-			return nil
-		case .ed25519VirtualAccountComponent:
-			return nil
-		case .secp256k1VirtualIdentityComponent:
-			return nil
-		case .ed25519VirtualIdentityComponent:
-			return nil
-		case .identityComponent:
-			return nil
-		case .epochManager:
-			return nil
-		case .validator:
-			return nil
-		case .clock:
-			return nil
-		case .accessControllerComponent:
-			return nil
+		case let .exact(componentAddress, _), let .estimate(_, componentAddress, _):
+			return componentAddress
+		}
+	}
+
+	public var resourceSpecifier: ResourceSpecifier {
+		switch self {
+		case let .exact(_, resourceSpecifier), let .estimate(_, _, resourceSpecifier):
+			return resourceSpecifier
+		}
+	}
+
+	var transferType: TransactionReview.TransferType {
+		switch self {
+		case .exact:
+			return .exact
+		case let .estimate(index, _, _):
+			return .estimated(instructionIndex: index)
 		}
 	}
 }

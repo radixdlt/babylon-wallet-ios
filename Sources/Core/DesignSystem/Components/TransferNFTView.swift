@@ -1,28 +1,18 @@
+// MARK: - TransferNFTView
 public struct TransferNFTView: View {
-	let resourceName: String?
-	let id: String
-	let idName: String?
-	let thumbnail: URL?
+	public let viewState: ViewState
 
-	public init(
-		resourceName: String?,
-		id: String,
-		idName: String?,
-		thumbnail: URL?
-	) {
-		self.resourceName = resourceName
-		self.id = id
-		self.idName = idName
-		self.thumbnail = thumbnail
+	public init(viewState: ViewState) {
+		self.viewState = viewState
 	}
 
 	public var body: some View {
 		HStack(spacing: .small1) {
-			NFTThumbnail(thumbnail, size: .small)
+			NFTThumbnail(viewState.thumbnail, size: .small)
 				.padding(.vertical, .small1)
 
 			VStack(alignment: .leading, spacing: 0) {
-				if let resourceName {
+				if let resourceName = viewState.resourceName {
 					Text(resourceName)
 						.textStyle(.body2Regular)
 						.foregroundColor(.app.gray2)
@@ -39,7 +29,24 @@ public struct TransferNFTView: View {
 	}
 
 	private var subtitle: String {
-		guard let idName else { return id }
-		return "\(id): \(idName)"
+		guard let tokenName = viewState.tokenName else { return viewState.tokenID }
+		return "\(viewState.tokenID): \(tokenName)"
+	}
+}
+
+// MARK: TransferNFTView.ViewState
+extension TransferNFTView {
+	public struct ViewState: Equatable {
+		public let resourceName: String?
+		public let tokenID: String
+		public let tokenName: String?
+		public let thumbnail: URL?
+
+		public init(resourceName: String?, tokenID: String, tokenName: String?, thumbnail: URL?) {
+			self.resourceName = resourceName
+			self.tokenID = tokenID
+			self.tokenName = tokenName
+			self.thumbnail = thumbnail
+		}
 	}
 }
