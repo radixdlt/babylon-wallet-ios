@@ -250,6 +250,9 @@ final class PersonaFieldTests: TestCase {
 							.postalCodeNumber(11129), .city("Stockholm"),
 							.country(.sweden),
 						],
+					],
+					phoneNumbers: [
+						.init(value: .init(number: "+468-1234567")),
 					]
 				)
 			)
@@ -301,6 +304,12 @@ final class PersonaFieldTests: TestCase {
 								"value": "sweden",
 							],
 						],
+					],
+				],
+				"phoneNumbers": [
+					[
+						"id": "00000000-0000-0000-0000-000000000004",
+						"value": "+468-1234567",
 					],
 				],
 			],
@@ -337,6 +346,9 @@ final class PersonaFieldTests: TestCase {
 							.postalCodeNumber(11129), .city("Stockholm"),
 							.country(.sweden),
 						],
+					],
+					phoneNumbers: [
+						.init(value: .init(number: "+468-1234567")),
 					]
 				)
 			)
@@ -388,6 +400,12 @@ final class PersonaFieldTests: TestCase {
 								"value": "sweden",
 							],
 						],
+					],
+				],
+				"phoneNumbers": [
+					[
+						"id": "00000000-0000-0000-0000-000000000004",
+						"value": "+468-1234567",
 					],
 				],
 			],

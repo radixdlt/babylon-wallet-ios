@@ -8,22 +8,36 @@ extension Persona {
 
 		public typealias EmailAddresses = EntryCollectionOf<PersonaDataEntry.EmailAddress>
 		public typealias PostalAddresses = EntryCollectionOf<PersonaDataEntry.PostalAddress>
+		public typealias PhoneNumbers = EntryCollectionOf<PersonaDataEntry.PhoneNumber>
 
 		public var name: Name?
 		public var dateOfBirth: DateOfBirth?
 		public var emailAddresses: EmailAddresses
 		public var postalAddresses: PostalAddresses
+		public var phoneNumbers: PhoneNumbers
+
+		public var entries: [PersonaDataEntryOfKind<PersonaDataEntry>] {
+			var sequence: [PersonaDataEntryOfKind<PersonaDataEntry>?] = []
+			sequence.append(name?.embed())
+			sequence.append(dateOfBirth?.embed())
+			sequence.append(contentsOf: emailAddresses.map { $0.embed() })
+			sequence.append(contentsOf: postalAddresses.map { $0.embed() })
+			sequence.append(contentsOf: phoneNumbers.map { $0.embed() })
+			return sequence.compactMap { $0 }
+		}
 
 		public init(
 			name: Name? = nil,
 			dateOfBirth: DateOfBirth? = nil,
 			emailAddresses: EmailAddresses = [],
-			postalAddresses: PostalAddresses = []
+			postalAddresses: PostalAddresses = [],
+			phoneNumbers: PhoneNumbers = []
 		) {
 			self.name = name
 			self.dateOfBirth = dateOfBirth
 			self.emailAddresses = emailAddresses
 			self.postalAddresses = postalAddresses
+			self.phoneNumbers = phoneNumbers
 		}
 	}
 }
@@ -62,7 +76,7 @@ extension Persona.PersonaData {
 		}
 
 		public init(from decoder: Decoder) throws {
-			var container = try decoder.singleValueContainer()
+			let container = try decoder.singleValueContainer()
 			try self.init(
 				collection: container.decode(IdentifiedArrayOf<PersonaDataEntryOfKind<Value>>.self)
 			)

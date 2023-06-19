@@ -4,6 +4,7 @@ import Prelude
 // MARK: - PersonaDataEntry
 public enum PersonaDataEntry: Sendable, Hashable, Codable, BasePersonaFieldValueProtocol {
 	case name(Name)
+	case phoneNumber(PhoneNumber)
 	case emailAddress(EmailAddress)
 	case dateOfBirth(DateOfBirth)
 	case postalAddress(PostalAddress)
@@ -14,6 +15,7 @@ extension PersonaDataEntry {
 		switch self {
 		case .name: return .name
 		case .emailAddress: return .emailAddress
+		case .phoneNumber: return .phoneNumber
 		case .dateOfBirth: return .dateOfBirth
 		case .postalAddress: return .postalAddress
 		}
@@ -24,6 +26,7 @@ extension PersonaDataEntry {
 		case let .name(value): return value.embed()
 		case let .emailAddress(value): return value.embed()
 		case let .postalAddress(value): return value.embed()
+		case let .phoneNumber(value): return value.embed()
 		case let .dateOfBirth(value): return value.embed()
 		}
 	}
@@ -85,6 +88,7 @@ public enum PersonaFieldKind: String, Sendable, Hashable, Codable {
 	case emailAddress
 	case dateOfBirth
 	case postalAddress
+	case phoneNumber
 }
 
 // MARK: - PersonaDataEntryOfKind
