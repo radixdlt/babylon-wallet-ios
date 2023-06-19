@@ -75,6 +75,7 @@ public struct AssetsView: Sendable, FeatureReducer {
 	}
 
 	@Dependency(\.accountPortfoliosClient) var accountPortfoliosClient
+
 	public init() {}
 
 	public var body: some ReducerProtocolOf<Self> {

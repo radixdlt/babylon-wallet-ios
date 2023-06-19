@@ -525,9 +525,11 @@ extension TransactionReview {
 
 		return LedgerEntity(
 			id: dAppDefinitionAddress.id,
-			metadata: .init(name: metadata?.name ?? L10n.TransactionReview.unknown,
-			                thumbnail: metadata?.iconURL,
-			                description: metadata?.description)
+			metadata: .init(
+				name: metadata?.name ?? L10n.TransactionReview.unknown,
+				thumbnail: metadata?.iconURL,
+				description: metadata?.description
+			)
 		)
 	}
 
@@ -542,9 +544,11 @@ extension TransactionReview {
 		let metadata = try? await gatewayAPIClient.getEntityMetadata(address)
 		return LedgerEntity(
 			id: address,
-			metadata: .init(name: metadata?.name ?? L10n.TransactionReview.unknown,
-			                thumbnail: metadata?.iconURL,
-			                description: metadata?.description)
+			metadata: .init(
+				name: metadata?.name ?? L10n.TransactionReview.unknown,
+				thumbnail: metadata?.iconURL,
+				description: metadata?.description
+			)
 		)
 	}
 
@@ -660,14 +664,31 @@ extension TransactionReview {
 				let isNew = isNewResources(resourceAddress: resourceAddress)
 				let metadata = isNew ? nil : try? await gatewayAPIClient.getEntityMetadata(resourceAddress.address)
 
-				return ids.map { id in
-					.nonFungible(.init(
-						resourceName: metadata?.name,
-						tokenID: "\(id)",
-						tokenName: "tokenName",
-						thumbnail: nil
+				// https://rdxworks.slack.com/archives/C02MTV9602H/p1681155601557349
+				let maximumNFTIDChunkSize = 29
+
+				let nftIDs = try ids.map { try $0.toString() }
+
+				var result: [Transfer] = []
+				for nftIDChunk in nftIDs.chunks(ofCount: maximumNFTIDChunkSize) {
+					let tokens = try await gatewayAPIClient.getNonFungibleData(.init(
+						resourceAddress: resourceAddress.address,
+						nonFungibleIds: Array(nftIDChunk)
 					))
+					.nonFungibleIds
+					.map {
+						Transfer.nonFungible(.init(
+							resourceName: metadata?.name,
+							tokenID: $0.nonFungibleId.userFacingNonFungibleLocalID,
+							tokenName: nil,
+							thumbnail: $0.keyImageURL
+						))
+					}
+
+					result.append(contentsOf: tokens)
 				}
+
+				return result
 			}
 		}
 
@@ -833,6 +854,27 @@ extension AccountDeposit {
 			return .exact
 		case let .estimate(index, _, _):
 			return .estimated(instructionIndex: index)
+		}
+	}
+}
+
+// TODO: Remove once RET is migrated to `ash`, this is meant to be temporary
+extension NonFungibleLocalIdInternal {
+	struct InvalidLocalID: Error {}
+
+	public func toString() throws -> String {
+		switch self {
+		case let .integer(value):
+			return "#\(value)#"
+		case .uuid:
+			throw InvalidLocalID()
+		case let .string(value):
+			return "<\(value)>"
+		case let .bytes(value):
+			guard let string = String(data: value.data, encoding: .utf8) else {
+				throw InvalidLocalID()
+			}
+			return "[\(string)]"
 		}
 	}
 }

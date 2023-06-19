@@ -76,10 +76,10 @@ extension TransactionReviewAccount {
 
 					ForEach(viewStore.transfers) { transfer in
 						switch transfer {
-						case let .fungible(fungibleTransfer):
-							TransactionReviewTokenView(transfer: fungibleTransfer)
-						case let .nonFungible(nonFungibleTransfer):
-							TransferNFTView(transfer: nonFungibleTransfer)
+						case let .fungible(fungible):
+							TransactionReviewTokenView(viewState: .init(transfer: fungible))
+						case let .nonFungible(nonFungible):
+							TransferNFTView(viewState: .init(transfer: nonFungible))
 						}
 					}
 					.background(.app.gray5)
@@ -89,42 +89,28 @@ extension TransactionReviewAccount {
 	}
 }
 
-extension TransactionReviewTokenView {
+extension TransactionReviewTokenView.ViewState {
 	init(transfer: TransactionReview.FungibleTransfer) {
-		self.init(viewState: .init(
-			name: transfer.symbol ?? transfer.name,
+		self.init(
+			name: transfer.symbol ?? transfer.name ?? L10n.TransactionReview.unknown,
 			thumbnail: transfer.isXRD ? .xrd : .known(transfer.thumbnail),
 			amount: transfer.amount,
 			guaranteedAmount: transfer.guarantee?.amount,
 			fiatAmount: nil
-		))
+		)
 	}
 }
 
-extension TransferNFTView {
+extension TransferNFTView.ViewState {
 	init(transfer: TransactionReview.NonFungibleTransfer) {
-		self.init(viewState: .init(
+		self.init(
 			resourceName: transfer.resourceName,
 			tokenID: transfer.tokenID,
 			tokenName: transfer.tokenName,
 			thumbnail: transfer.thumbnail
-		))
+		)
 	}
 }
-
-//			let resourceMetadata = ResourceMetadata(
-//				name: metadata?.symbol ?? metadata?.name ?? L10n.TransactionReview.unknown,
-//				thumbnail: metadata?.iconURL,
-//				type: addressKind.resourceType
-//			)
-
-// TransactionReviewTokenView(viewState: .init(
-//	name: viewState.metadata.name,
-//	thumbnail: viewState.thumbnail,
-//	amount: viewState.amount,
-//	guaranteedAmount: viewState.guarantee?.amount,
-//	fiatAmount: viewState.metadata.fiatAmount
-// ))
 
 extension SmallAccountCard where Accessory == EmptyView {
 	public init(account: TransactionReview.Account) {

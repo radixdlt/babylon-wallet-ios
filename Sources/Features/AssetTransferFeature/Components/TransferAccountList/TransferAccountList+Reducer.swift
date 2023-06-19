@@ -9,13 +9,9 @@ public struct TransferAccountList: Sendable, FeatureReducer {
 			didSet {
 				if receivingAccounts.count > 1, receivingAccounts[0].canBeRemoved == false {
 					receivingAccounts[0].canBeRemoved = true
-				}
-
-				if receivingAccounts.count == 1, receivingAccounts[0].canBeRemoved == true {
+				} else if receivingAccounts.count == 1, receivingAccounts[0].canBeRemoved == true {
 					receivingAccounts[0].canBeRemoved = false
-				}
-
-				if receivingAccounts.isEmpty {
+				} else if receivingAccounts.isEmpty {
 					receivingAccounts.append(.empty(canBeRemovedWhenEmpty: false))
 				}
 			}
