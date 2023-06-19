@@ -4,7 +4,7 @@ import TestingPrelude
 // MARK: - ToDappResponseTests
 final class ToDappResponseTests: TestCase {
 	func test_encode_response() throws {
-		let sut = P2P.Dapp.Response.success(.init(
+		let sut = try P2P.Dapp.Response.success(.init(
 			interactionId: "an_id",
 			items: .request(
 				.unauthorized(.init(
@@ -15,12 +15,11 @@ final class ToDappResponseTests: TestCase {
 							appearanceId: .fromIndex(0)
 						),
 					]),
-					oneTimePersonaData: .init(fields: [
-						.init(field: .givenName, value: NonEmptyString(rawValue: "Percy")!),
-						.init(field: .familyName, value: NonEmptyString(rawValue: "Jackson")!),
-						.init(field: .emailAddress, value: NonEmptyString(rawValue: "lightningthief@olympus.lol")!),
-						.init(field: .phoneNumber, value: NonEmptyString(rawValue: "555 5555")!),
-					])
+					oneTimePersonaData: .init(
+						name: .init(given: "Percy", family: "Jackson", variant: .western),
+						emailAddresses: [.init(validating: "lightningthief@olympus.lol")],
+						phoneNumbers: [.init(number: "555 5555")]
+					)
 
 				))
 			)
@@ -43,11 +42,10 @@ final class ToDappResponseTests: TestCase {
 						],
 					],
 					"oneTimePersonaData": [
-						"fields": [
-							["field": "givenName", "value": "Percy"],
-							["field": "familyName", "value": "Jackson"],
-							["field": "emailAddress", "value": "lightningthief@olympus.lol"],
-							["field": "phoneNumber", "value": "555 5555"],
+						"name": [
+							"given": "Percy",
+							"family": "Jackson",
+							"variant": "western",
 						],
 					],
 				],
@@ -68,7 +66,15 @@ final class ToDappResponseTests: TestCase {
 					"challenge": "deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef",
 				],
 				"oneTimePersonaData": [
-					"fields": ["givenName", "familyName", "emailAddress", "phoneNumber"],
+					"isRequestingName": true,
+					"emailAddressesRequested": [
+						"quantifier": "atLeast",
+						"quantity": 1,
+					],
+					"phoneNumbersAddressesRequested": [
+						"quantifier": "exactly",
+						"quantity": 1,
+					],
 				],
 			],
 			"metadata": [
@@ -89,7 +95,9 @@ final class ToDappResponseTests: TestCase {
 							challenge: .init(rawValue: .init(data: .deadbeef32Bytes))
 						),
 						oneTimePersonaData: .init(
-							fields: [.givenName, .familyName, .emailAddress, .phoneNumber]
+							isRequestingName: true,
+							emailAddressesRequested: .atLeast(1),
+							phoneNumbersAddressesRequested: .exactly(1)
 						)
 					))
 				),
