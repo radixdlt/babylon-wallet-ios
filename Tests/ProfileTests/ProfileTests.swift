@@ -365,34 +365,36 @@ final class ProfileTests: TestCase {
 						identityAddress: firstPersona.address,
 						lastLogin: Date(timeIntervalSinceReferenceDate: 0),
 						sharedAccounts: .init(
-							infoSet: [
+							ids: [
 								secondAccount.address,
 								thirdAccount.address,
 							],
 							forRequest: .exactly(2)
 						),
-						sharedPersonaData: .init(
-							infoSet: [
-								firstPersona.personaData.entries[0].id,
-							],
-							forRequest: .exactly(1)
-						)
+//						sharedPersonaData: .init(
+//							infoSet: [
+//								firstPersona.personaData.entries[0].id,
+//							],
+//							forRequest: .exactly(1)
+//						)
+						listOfSharedPersonaDataEntriesForKind: nil
 					),
 					.init(
 						identityAddress: secondPersona.address,
 						lastLogin: Date(timeIntervalSinceReferenceDate: 0),
 						sharedAccounts: .init(
-							infoSet: [
+							ids: [
 								secondAccount.address,
 							],
 							forRequest: .atLeast(1)
 						),
-						sharedPersonaData: .init(
-							infoSet: [
-								secondPersona.personaData.entries[0].id,
-							],
-							forRequest: .exactly(1)
-						)
+//						sharedPersonaData: .init(
+//							infoSet: [
+//								secondPersona.personaData.entries[0].id,
+//							],
+//							forRequest: .exactly(1)
+//						)
+						listOfSharedPersonaDataEntriesForKind: nil
 					))
 			)
 		)
@@ -574,7 +576,7 @@ final class ProfileTests: TestCase {
 
 		XCTAssertEqual(network.authorizedDapps.count, 1)
 		XCTAssertEqual(network.authorizedDapps[0].referencesToAuthorizedPersonas.count, 2)
-		XCTAssertEqual(network.authorizedDapps[0].referencesToAuthorizedPersonas[0].sharedPersonaData?.infoSet.count, 2)
+		XCTAssertEqual(network.authorizedDapps[0].referencesToAuthorizedPersonas[0].listOfSharedPersonaDataEntriesForKind![0].ids.count, 2)
 		XCTAssertEqual(network.authorizedDapps[0].referencesToAuthorizedPersonas[0].sharedAccounts?.request.quantifier, .exactly)
 		XCTAssertEqual(network.authorizedDapps[0].referencesToAuthorizedPersonas[0].sharedAccounts?.request.quantity, 2)
 		XCTAssertEqual(network.authorizedDapps[0].referencesToAuthorizedPersonas[0].sharedAccounts?.infoSet.map(\.address), ["account_tdx_c_1p82arz264ntf727q2s7f7cm6pqucgqzuru3z7mgeg3gqua0wlj", "account_tdx_c_1pygfwtlv7l90rcsge6t0f0jwn3cuzp05y8geek45qw7s98msmw"])

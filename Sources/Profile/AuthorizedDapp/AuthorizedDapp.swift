@@ -79,6 +79,42 @@ public struct DappOrigin: Sendable, Hashable, Codable {
 	}
 }
 
+// MARK: - RequestedNumber
+// TODO: evolve this into an enum mirroring `SelectionRequirement` in `Selection.swift` to enable case switching.
+//
+// Things to keep in mind:
+//
+// - It will require a custom Codable implementation to make up for the move from struct(ured) to enum. Make sure implementation matches CAP-21's spec by writing some XCTAssertJSON tests beforehand.
+// - Don't just typealias NumberOfAccounts = SelectionRequirement, as they're not the same conceptually and should be allowed to evolve independently!
+public struct RequestedNumber: Sendable, Hashable, Codable {
+	public enum Quantifier: String, Sendable, Hashable, Codable {
+		case exactly
+		case atLeast
+	}
+
+	public let quantifier: Quantifier
+	public let quantity: Int
+
+	public var isValid: Bool {
+		switch (quantifier, quantity) {
+		case (.exactly, 0):
+			return false
+		case (_, ..<0):
+			return false
+		default:
+			return true
+		}
+	}
+
+	public static func exactly(_ quantity: Int) -> Self {
+		.init(quantifier: .exactly, quantity: quantity)
+	}
+
+	public static func atLeast(_ quantity: Int) -> Self {
+		.init(quantifier: .atLeast, quantity: quantity)
+	}
+}
+
 // MARK: - Profile.Network.AuthorizedDapp.AuthorizedPersonaSimple
 extension Profile.Network.AuthorizedDapp {
 	public struct AuthorizedPersonaSimple:
@@ -95,66 +131,32 @@ extension Profile.Network.AuthorizedDapp {
 		/// Date of last login for this persona.
 		public var lastLogin: Date
 
-		public typealias SharedAccounts = Shared<AccountAddress>
-		public typealias SharedPersonaDataEntries = Shared<PersonaDataEntryID>
-
 		/// List of "ongoing accountAddresses" that user given the dApp access to.
 		public var sharedAccounts: SharedAccounts?
 
-		/// List of "ongoing personaData" that user given the dApp access to.
-		public var sharedPersonaData: SharedPersonaDataEntries?
+		public var sharedPersonaData: SharedPersonaData
 
-		public struct Shared<Info>:
+		public struct SharedPersonaData:
+			Sendable,
+			Hashable,
+			Codable {}
+
+		public struct SharedAccounts:
 			Sendable,
 			Hashable,
 			Codable
-			where Info: Sendable & Hashable & Codable
 		{
-			// TODO: evolve this into an enum mirroring `SelectionRequirement` in `Selection.swift` to enable case switching.
-			//
-			// Things to keep in mind:
-			//
-			// - It will require a custom Codable implementation to make up for the move from struct(ured) to enum. Make sure implementation matches CAP-21's spec by writing some XCTAssertJSON tests beforehand.
-			// - Don't just typealias NumberOfAccounts = SelectionRequirement, as they're not the same conceptually and should be allowed to evolve independently!
-			public struct Number: Sendable, Hashable, Codable {
-				public enum Quantifier: String, Sendable, Hashable, Codable {
-					case exactly
-					case atLeast
-				}
-
-				public let quantifier: Quantifier
-				public let quantity: Int
-
-				public var isValid: Bool {
-					switch (quantifier, quantity) {
-					case (.exactly, 0):
-						return false
-					case (_, ..<0):
-						return false
-					default:
-						return true
-					}
-				}
-
-				public static func exactly(_ quantity: Int) -> Self {
-					.init(quantifier: .exactly, quantity: quantity)
-				}
-
-				public static func atLeast(_ quantity: Int) -> Self {
-					.init(quantifier: .atLeast, quantity: quantity)
-				}
-			}
-
+			public typealias Number = RequestedNumber
 			public let request: Number
-			public private(set) var infoSet: OrderedSet<Info>
+			public private(set) var ids: OrderedSet<AccountAddress>
 
 			public init(
-				infoSet: OrderedSet<Info>,
+				ids: OrderedSet<AccountAddress>,
 				forRequest request: Number
 			) throws {
-				try Self.validate(infoSet: infoSet, forRequest: request)
+				try Self.validate(ids: ids, forRequest: request)
 				self.request = request
-				self.infoSet = infoSet
+				self.ids = ids
 			}
 		}
 
@@ -162,7 +164,7 @@ extension Profile.Network.AuthorizedDapp {
 			identityAddress: IdentityAddress,
 			lastLogin: Date,
 			sharedAccounts: SharedAccounts?,
-			sharedPersonaData: SharedPersonaDataEntries?
+			sharedPersonaData: SharedPersonaData
 		) {
 			self.identityAddress = identityAddress
 			self.lastLogin = lastLogin
@@ -178,28 +180,28 @@ struct NotEnoughEntiresProvided: Swift.Error {}
 // MARK: - InvalidNumberOfEntries
 struct InvalidNumberOfEntries: Swift.Error {}
 
-extension Profile.Network.AuthorizedDapp.AuthorizedPersonaSimple.Shared {
+extension Profile.Network.AuthorizedDapp.AuthorizedPersonaSimple.SharedAccounts {
 	public static func validate(
-		infoSet: OrderedSet<Info>,
+		ids: OrderedSet<AccountAddress>,
 		forRequest request: Number
 	) throws {
 		switch request.quantifier {
 		case .atLeast:
-			guard infoSet.count >= request.quantity else {
+			guard ids.count >= request.quantity else {
 				throw NotEnoughEntiresProvided()
 			}
 		// all good
 		case .exactly:
-			guard infoSet.count == request.quantity else {
+			guard ids.count == request.quantity else {
 				throw InvalidNumberOfEntries()
 			}
 			// all good
 		}
 	}
 
-	public mutating func update(_ new: OrderedSet<Info>) throws {
-		try Self.validate(infoSet: new, forRequest: self.request)
-		self.infoSet = new
+	public mutating func update(_ new: OrderedSet<AccountAddress>) throws {
+		try Self.validate(ids: new, forRequest: self.request)
+		self.ids = new
 	}
 }
 

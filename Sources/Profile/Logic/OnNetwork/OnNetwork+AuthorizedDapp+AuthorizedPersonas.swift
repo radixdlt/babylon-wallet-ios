@@ -68,7 +68,7 @@ extension Profile.Network {
 				displayName: persona.displayName,
 				simpleAccounts: {
 					if let sharedAccounts = simple.sharedAccounts {
-						return try .init(sharedAccounts.infoSet.map { accountAddress in
+						return try .init(sharedAccounts.ids.map { accountAddress in
 							guard
 								let account = self.accounts.first(where: { $0.address == accountAddress })
 							else {
@@ -85,12 +85,13 @@ extension Profile.Network {
 					}
 				}(),
 				sharedPersonaDataEntries: {
-					guard let sharedFieldIDs = simple.sharedPersonaData?.infoSet else { return nil }
-
-					let presentFields = sharedFieldIDs.compactMap { id in
-						persona.personaData.entries.first(where: { $0.id == id })
-					}
-					return .init(uniqueElements: presentFields)
+//					guard let sharedFieldIDs = simple.sharedPersonaData?.infoSet else { return nil }
+//
+//					let presentFields = sharedFieldIDs.compactMap { id in
+//						persona.personaData.entries.first(where: { $0.id == id })
+//					}
+//					return .init(uniqueElements: presentFields)
+					fatalError()
 				}(),
 				hasAuthenticationSigningKey: persona.hasAuthenticationSigningKey
 			)
