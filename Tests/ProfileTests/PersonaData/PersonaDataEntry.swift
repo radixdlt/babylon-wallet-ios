@@ -4,10 +4,51 @@ import Prelude
 // MARK: - PersonaDataEntry
 public enum PersonaDataEntry: Sendable, Hashable, Codable, BasePersonaFieldValueProtocol {
 	case name(Name)
-	case phoneNumber(PhoneNumber)
-	case emailAddress(EmailAddress)
 	case dateOfBirth(DateOfBirth)
+	case emailAddress(EmailAddress)
 	case postalAddress(PostalAddress)
+	case phoneNumber(PhoneNumber)
+}
+
+extension PersonaDataEntry {
+	private enum CodingKeys: String, CodingKey {
+		case discriminator
+		case name, dateOfBirth, postalAddress, emailAddress, phoneNumber
+	}
+
+	public func encode(to encoder: Encoder) throws {
+		var container = encoder.container(keyedBy: CodingKeys.self)
+		try container.encode(discriminator, forKey: .discriminator)
+		switch self {
+		case let .name(value):
+			try container.encode(value, forKey: .name)
+		case let .dateOfBirth(value):
+			try container.encode(value, forKey: .dateOfBirth)
+		case let .emailAddress(value):
+			try container.encode(value, forKey: .emailAddress)
+		case let .postalAddress(value):
+			try container.encode(value, forKey: .postalAddress)
+		case let .phoneNumber(value):
+			try container.encode(value, forKey: .phoneNumber)
+		}
+	}
+
+	public init(from decoder: Decoder) throws {
+		let container = try decoder.container(keyedBy: CodingKeys.self)
+		let discriminator = try container.decode(PersonaFieldKind.self, forKey: .discriminator)
+		switch discriminator {
+		case .name:
+			self = try .name(container.decode(Name.self, forKey: .name))
+		case .dateOfBirth:
+			self = try .dateOfBirth(container.decode(DateOfBirth.self, forKey: .dateOfBirth))
+		case .emailAddress:
+			self = try .emailAddress(container.decode(EmailAddress.self, forKey: .emailAddress))
+		case .postalAddress:
+			self = try .postalAddress(container.decode(PostalAddress.self, forKey: .postalAddress))
+		case .phoneNumber:
+			self = try .phoneNumber(container.decode(PhoneNumber.self, forKey: .phoneNumber))
+		}
+	}
 }
 
 extension PersonaDataEntry {
