@@ -1,12 +1,11 @@
+import CasePaths
 import Foundation
 
 // MARK: - PreciseDecimal
 public struct PreciseDecimal: ValueProtocol, Sendable, Codable, Hashable, ExpressibleByStringLiteral, ExpressibleByFloatLiteral, ExpressibleByIntegerLiteral {
 	// Type name, used as a discriminator
 	public static let kind: ManifestASTValueKind = .preciseDecimal
-	public func embedValue() -> ManifestASTValue {
-		.preciseDecimal(self)
-	}
+	public static var casePath: CasePath<ManifestASTValue, Self> = /ManifestASTValue.preciseDecimal
 
 	// MARK: Stored properties
 	// TODO: Convert this to a better numerical type
@@ -34,28 +33,16 @@ public struct PreciseDecimal: ValueProtocol, Sendable, Codable, Hashable, Expres
 }
 
 extension PreciseDecimal {
-	// MARK: CodingKeys
-	private enum CodingKeys: String, CodingKey {
-		case value, type
-	}
-
 	// MARK: Codable
 	public func encode(to encoder: Encoder) throws {
-		var container = encoder.container(keyedBy: CodingKeys.self)
-		try container.encode(Self.kind, forKey: .type)
-
-		try container.encode(String(value), forKey: .value)
+		var container = encoder.singleValueContainer()
+		try container.encode(String(value))
 	}
 
 	public init(from decoder: Decoder) throws {
 		// Checking for type discriminator
-		let container = try decoder.container(keyedBy: CodingKeys.self)
-		let kind: ManifestASTValueKind = try container.decode(ManifestASTValueKind.self, forKey: .type)
-		if kind != Self.kind {
-			throw InternalDecodingFailure.valueTypeDiscriminatorMismatch(expected: Self.kind, butGot: kind)
-		}
-
+		let container = try decoder.singleValueContainer()
 		// Decoding `value`
-		try self.init(value: container.decode(String.self, forKey: .value))
+		try self.init(value: container.decode(String.self))
 	}
 }

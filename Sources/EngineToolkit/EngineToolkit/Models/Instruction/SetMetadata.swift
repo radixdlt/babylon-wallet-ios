@@ -10,14 +10,20 @@ public struct SetMetadata: InstructionProtocol {
 
 	// MARK: Stored properties
 
-	public let entityAddress: Address_
+	public let entityAddress: Address
 	public let key: String
 	public let value: Enum
 
 	// MARK: Init
 
-	public init(entityAddress: Address_, key: String, value: Enum) {
+	public init(entityAddress: Address, key: String, value: Enum) {
 		self.entityAddress = entityAddress
+		self.key = key
+		self.value = value
+	}
+
+	public init(accountAddress: AccountAddress, key: String, value: Enum) {
+		self.entityAddress = accountAddress.asGeneral()
 		self.key = key
 		self.value = value
 	}
@@ -39,9 +45,9 @@ extension SetMetadata {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		try container.encode(Self.kind, forKey: .type)
 
-		try container.encode(entityAddress, forKey: .entityAddress)
-		try container.encode(key.proxyEncodable, forKey: .key)
-		try container.encode(value, forKey: .value)
+		try container.encodeValue(entityAddress, forKey: .entityAddress)
+		try container.encodeValue(key, forKey: .key)
+		try container.encodeValue(value, forKey: .value)
 	}
 
 	public init(from decoder: Decoder) throws {
@@ -53,9 +59,31 @@ extension SetMetadata {
 		}
 
 		try self.init(
-			entityAddress: container.decode(Address_.self, forKey: .entityAddress),
-			key: container.decode(String.ProxyDecodable.self, forKey: .key).decoded,
-			value: container.decode(Enum.self, forKey: .value)
+			entityAddress: container.decodeValue(forKey: .entityAddress),
+			key: container.decodeValue(forKey: .key),
+			value: container.decodeValue(forKey: .value)
 		)
+	}
+}
+
+extension KeyedDecodingContainer {
+	func decodeValue<V: ValueProtocol>(forKey key: KeyedDecodingContainer<K>.Key) throws -> V {
+		try .extractValue(from: decode(ManifestASTValue.self, forKey: key))
+	}
+
+	func decodeValue<V: ValueProtocol>(forKey key: KeyedDecodingContainer<K>.Key) throws -> Set<V> {
+		try Set(decode(Set<ManifestASTValue>.self, forKey: key).map {
+			try V.extractValue(from: $0)
+		})
+	}
+}
+
+extension KeyedEncodingContainer {
+	mutating func encodeValue<V: ValueProtocol>(_ value: V, forKey key: KeyedEncodingContainer<K>.Key) throws {
+		try encode(value.embedValue(), forKey: key)
+	}
+
+	mutating func encodeValue<V: ValueProtocol>(_ value: any Collection<V>, forKey key: KeyedEncodingContainer<K>.Key) throws {
+		try encode(value.map { $0.embedValue() }, forKey: key)
 	}
 }

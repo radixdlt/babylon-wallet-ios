@@ -1,4 +1,3 @@
-import EngineToolkit
 import Prelude
 
 // MARK: - Profile.Network.Persona
@@ -160,7 +159,7 @@ extension Profile.Network.Persona {
 import Cryptography
 import EngineToolkit
 extension Profile.Network.Persona {
-	public static func deriveAddress(
+	public static func deriveVirtualAddress(
 		networkID: NetworkID,
 		factorInstance: HierarchicalDeterministicFactorInstance
 	) throws -> EntityAddress {
@@ -176,7 +175,7 @@ extension Profile.Network.Persona {
 			)
 		).get()
 
-		return try EntityAddress(address: response.virtualIdentityAddress.address)
+		return response.virtualIdentityAddress
 	}
 }
 

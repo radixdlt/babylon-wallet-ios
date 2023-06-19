@@ -10,13 +10,13 @@ public struct SetPackageRoyaltyConfig: InstructionProtocol {
 
 	// MARK: Stored properties
 
-	public let packageAddress: Address_
+	public let packageAddress: PackageAddress
 	public let royaltyConfig: Map_
 
 	// MARK: Init
 
 	public init(packageAddress: PackageAddress, royaltyConfig: Map_) {
-		self.packageAddress = packageAddress.asGeneral
+		self.packageAddress = packageAddress
 		self.royaltyConfig = royaltyConfig
 	}
 }
@@ -36,8 +36,8 @@ extension SetPackageRoyaltyConfig {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		try container.encode(Self.kind, forKey: .type)
 
-		try container.encode(packageAddress, forKey: .packageAddress)
-		try container.encode(royaltyConfig, forKey: .royaltyConfig)
+		try container.encodeValue(packageAddress, forKey: .packageAddress)
+		try container.encodeValue(royaltyConfig, forKey: .royaltyConfig)
 	}
 
 	public init(from decoder: Decoder) throws {
@@ -49,8 +49,8 @@ extension SetPackageRoyaltyConfig {
 		}
 
 		try self.init(
-			packageAddress: container.decode(Address_.self, forKey: .packageAddress).asSpecific(),
-			royaltyConfig: container.decode(Map_.self, forKey: .royaltyConfig)
+			packageAddress: container.decodeValue(forKey: .packageAddress),
+			royaltyConfig: container.decodeValue(forKey: .royaltyConfig)
 		)
 	}
 }

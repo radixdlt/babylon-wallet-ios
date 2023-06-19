@@ -38,14 +38,12 @@ extension TransactionHeader {
 		lookupNetworkName: ((NetworkID) -> String?)?
 	) -> String {
 		"""
-		version: \(String(describing: version)),
 		networkId: \(String(describing: networkId))\(lookupNetworkName.map { f in f(networkId).map { " (\($0))" } ?? "" } ?? ""),
 		startEpochInclusive: \(String(describing: startEpochInclusive)),
 		endEpochExclusive: \(String(describing: endEpochExclusive)),
 		nonce: \(String(describing: nonce)),
 		publicKey: \(publicKey.uncompressedRepresentation.hex),
-		notaryAsSignatory: \(String(describing: notaryAsSignatory)),
-		costUnitLimit: \(String(describing: costUnitLimit)),
+		notaryIsSignatory: \(String(describing: notaryIsSignatory)),
 		tipPercentage: \(String(describing: tipPercentage)),
 		"""
 	}

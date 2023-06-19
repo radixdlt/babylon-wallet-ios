@@ -1,5 +1,5 @@
-// MARK: - AnalyzeManifestRequest
-public struct AnalyzeManifestRequest: Sendable, Codable, Hashable {
+// MARK: - ExtractAddressesFromManifestRequest
+public struct ExtractAddressesFromManifestRequest: Sendable, Codable, Hashable {
 	public let networkId: NetworkID
 	public let manifest: TransactionManifest
 
@@ -12,7 +12,7 @@ public struct AnalyzeManifestRequest: Sendable, Codable, Hashable {
 	}
 }
 
-extension AnalyzeManifestRequest {
+extension ExtractAddressesFromManifestRequest {
 	private enum CodingKeys: String, CodingKey {
 		case networkId = "network_id"
 		case manifest
@@ -34,8 +34,8 @@ extension AnalyzeManifestRequest {
 	}
 }
 
-// MARK: - AnalyzeManifestResponse
-public struct AnalyzeManifestResponse: Sendable, Codable, Hashable {
+// MARK: - ExtractAddressesFromManifestResponse
+public struct ExtractAddressesFromManifestResponse: Sendable, Decodable, Hashable {
 	// MARK: Stored properties
 
 	public let packageAddresses: [PackageAddress]
@@ -43,22 +43,22 @@ public struct AnalyzeManifestResponse: Sendable, Codable, Hashable {
 	public let componentAddresses: [ComponentAddress]
 
 	/// A set of all of the account component addresses seen in the manifest.
-	public let accountAddresses: [ComponentAddress]
+	public let accountAddresses: [AccountAddress]
 
 	/// A set of all of the identity component addresses seen in the manifest.
-	public let identityAddresses: [ComponentAddress]
+	public let identityAddresses: [IdentityAddress]
 
 	/// A set of all of the account component addresses in the manifest which had methods invoked on them that would typically require auth (or a signature) to be called successfully.
-	public let accountsRequiringAuth: [ComponentAddress]
+	public let accountsRequiringAuth: [AccountAddress]
 
 	/// A set of all of the identity component addresses in the manifest which had methods invoked on them that would typically require auth (or a signature) to be called successfully.
-	public let identitiesRequiringAuth: [ComponentAddress]
+	public let identitiesRequiringAuth: [IdentityAddress]
 
 	/// A set of all of the account component addresses in the manifest which were deposited into. This is a subset of the addresses seen in `accountsRequiringAuth`.
-	public let accountsWithdrawnFrom: [ComponentAddress]
+	public let accountsWithdrawnFrom: [AccountAddress]
 
 	/// A set of all of the account component addresses in the manifest which were withdrawn from. This is a subset of the addresses seen in `accountAddresses`
-	public let accountsDepositedInto: [ComponentAddress]
+	public let accountsDepositedInto: [AccountAddress]
 
 	// MARK: CodingKeys
 

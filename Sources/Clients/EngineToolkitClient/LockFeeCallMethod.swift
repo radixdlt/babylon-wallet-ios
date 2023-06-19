@@ -31,7 +31,7 @@ extension EngineToolkitClient {
 		try manifestForFaucet(
 			includeLockFeeInstruction: includeLockFeeInstruction,
 			networkID: networkID,
-			componentAddress: .init(address: accountAddress.address)
+			componentAddress: accountAddress.asComponentAddress
 		)
 	}
 
@@ -64,7 +64,7 @@ extension EngineToolkitClient {
 				receiver: componentAddress,
 				methodName: "deposit_batch"
 			) {
-				Expression("ENTIRE_WORKTOP")
+				ManifestExpression.entireWorktop
 			},
 		]
 
@@ -124,17 +124,17 @@ extension EngineToolkitClient {
 			)
 
 			let metdata = Map_(
-				keyValueKind: .string,
-				valueValueKind: .string,
+				keyKind: .string,
+				valueKind: .string,
 				entries: metdataEntries
 			)
 
 			let accessRules = Map_(
-				keyValueKind: .enum,
-				valueValueKind: .tuple,
+				keyKind: .enum,
+				valueKind: .tuple,
 				entries: [
-					[.enum(.init(.string("ResourceMethodAuthKey::Withdraw"))), .tuple(.init(arrayLiteral: .enum(.init(.string("AccessRule::AllowAll"))), .enum(.init(.string("AccessRule::DenyAll")))))],
-					[.enum(.init(.string("ResourceMethodAuthKey::Deposit"))), .tuple(.init(arrayLiteral: .enum(.init(.string("AccessRule::AllowAll"))), .enum(.init(.string("AccessRule::DenyAll")))))],
+					[.enum(.init(.string(.resourceMethodAuthKey_Withdraw))), .tuple(.init(arrayLiteral: .enum(.init(.string(.accessRule_AllowAll))), .enum(.init(.string(.accessRule_DenyAll)))))],
+					[.enum(.init(.string(.resourceMethodAuthKey_Deposit))), .tuple(.init(arrayLiteral: .enum(.init(.string(.accessRule_AllowAll))), .enum(.init(.string(.accessRule_DenyAll)))))],
 				]
 			)
 
@@ -158,8 +158,8 @@ extension EngineToolkitClient {
 			lockFeeCallMethod(address: faucetAddress),
 		] + tokens +
 			[
-				CallMethod(receiver: .init(address: accountAddress.address), methodName: "deposit_batch") {
-					Expression(stringLiteral: "ENTIRE_WORKTOP")
+				CallMethod(receiver: accountAddress.asComponentAddress, methodName: "deposit_batch") {
+					ManifestExpression.entireWorktop
 				},
 			]
 
@@ -182,8 +182,8 @@ extension EngineToolkitClient {
 			CreateFungibleResourceWithInitialSupply(
 				divisibility: tokenDivisivility,
 				metadata: Map_(
-					keyValueKind: .string,
-					valueValueKind: .string,
+					keyKind: .string,
+					valueKind: .string,
 					entries: [
 						[.string("name"), .string(tokenName)],
 						[.string("symbol"), .string(tokenSymbol)],
@@ -193,18 +193,18 @@ extension EngineToolkitClient {
 				),
 
 				accessRules: .init(
-					keyValueKind: .enum,
-					valueValueKind: .tuple,
+					keyKind: .enum,
+					valueKind: .tuple,
 					entries: [
-						[.enum(.init(.string("ResourceMethodAuthKey::Withdraw"))), .tuple(.init(arrayLiteral: .enum(.init(.string("AccessRule::AllowAll"))), .enum(.init(.string("AccessRule::DenyAll")))))],
-						[.enum(.init(.string("ResourceMethodAuthKey::Deposit"))), .tuple(.init(arrayLiteral: .enum(.init(.string("AccessRule::AllowAll"))), .enum(.init(.string("AccessRule::DenyAll")))))],
+						[.enum(.init(.string(.resourceMethodAuthKey_Withdraw))), .tuple(.init(arrayLiteral: .enum(.init(.string(.accessRule_AllowAll))), .enum(.init(.string(.accessRule_DenyAll)))))],
+						[.enum(.init(.string(.resourceMethodAuthKey_Deposit))), .tuple(.init(arrayLiteral: .enum(.init(.string(.accessRule_AllowAll))), .enum(.init(.string(.accessRule_DenyAll)))))],
 					]
 				),
 				initialSupply: .decimal(.init(value: initialSupply))
 			),
 
-			CallMethod(receiver: .init(address: accountAddress.address), methodName: "deposit_batch") {
-				Expression(stringLiteral: "ENTIRE_WORKTOP")
+			CallMethod(receiver: accountAddress.asComponentAddress, methodName: "deposit_batch") {
+				ManifestExpression.entireWorktop
 			},
 		]
 
@@ -222,7 +222,7 @@ extension EngineToolkitClient {
 			lockFeeCallMethod(address: faucetAddress),
 
 			CreateNonFungibleResourceWithInitialSupply(
-				idType: .init(.string("NonFungibleIdType::Integer")),
+				idType: .init(.string(.nonFungibleIdType_Integer)),
 				schema: [
 					.tuple([
 						.array(.init(elementKind: .enum, elements: [])),
@@ -233,32 +233,32 @@ extension EngineToolkitClient {
 					.array(.init(elementKind: .string, elements: [])),
 				],
 				metadata: Map_(
-					keyValueKind: .string,
-					valueValueKind: .string,
+					keyKind: .string,
+					valueKind: .string,
 					entries: [
 						[.string("name"), .string(nftName)],
 						[.string("description"), .string(nftDescription)],
 					]
 				),
 				accessRules: .init(
-					keyValueKind: .enum,
-					valueValueKind: .tuple,
+					keyKind: .enum,
+					valueKind: .tuple,
 					entries: [
-						[.enum(.init(.string("ResourceMethodAuthKey::Withdraw"))), .tuple(.init(arrayLiteral: .enum(.init(.string("AccessRule::AllowAll"))), .enum(.init(.string("AccessRule::DenyAll")))))],
-						[.enum(.init(.string("ResourceMethodAuthKey::Deposit"))), .tuple(.init(arrayLiteral: .enum(.init(.string("AccessRule::AllowAll"))), .enum(.init(.string("AccessRule::DenyAll")))))],
+						[.enum(.init(.string(.resourceMethodAuthKey_Withdraw))), .tuple(.init(arrayLiteral: .enum(.init(.string(.accessRule_AllowAll))), .enum(.init(.string(.accessRule_DenyAll)))))],
+						[.enum(.init(.string(.resourceMethodAuthKey_Deposit))), .tuple(.init(arrayLiteral: .enum(.init(.string(.accessRule_AllowAll))), .enum(.init(.string(.accessRule_DenyAll)))))],
 					]
 				),
 				initialSupply: .map(
-					.init(keyValueKind: .nonFungibleLocalId, valueValueKind: .tuple, entries: [
-						[.nonFungibleLocalId(.integer(1)), .tuple([.tuple(
+					.init(keyKind: .nonFungibleLocalId, valueKind: .tuple, entries: [
+						[.nonFungibleLocalId("#1#"), .tuple([.tuple(
 							[.string("Hello World"), .decimal(.init(value: "12"))]
 						)])],
 					])
 				)
 			),
 
-			CallMethod(receiver: .init(address: accountAddress.address), methodName: "deposit_batch") {
-				Expression(stringLiteral: "ENTIRE_WORKTOP")
+			CallMethod(receiver: accountAddress.asComponentAddress, methodName: "deposit_batch") {
+				ManifestExpression.entireWorktop
 			},
 		]
 
@@ -286,13 +286,13 @@ extension EngineToolkitClient {
 			)
 
 			let nftIds = stride(from: 0, to: idsCount, by: 1).map {
-				[ManifestASTValue.nonFungibleLocalId(.integer(UInt64($0))), .tuple([.tuple(
+				[ManifestASTValue.nonFungibleLocalId(.init(value: "#\($0)#")), .tuple([.tuple(
 					[.string("Hello World \($0)"), .decimal(.init(value: "\($0)"))]
 				)])]
 			}
 
 			return try CreateNonFungibleResourceWithInitialSupply(
-				idType: .init(.string("NonFungibleIdType::Integer")),
+				idType: .init(.string(.nonFungibleIdType_Integer)),
 				schema: [
 					.tuple([
 						.array(.init(elementKind: .enum, elements: [])),
@@ -303,26 +303,26 @@ extension EngineToolkitClient {
 					.array(.init(elementKind: .string, elements: [])),
 				],
 				metadata: Map_(
-					keyValueKind: .string,
-					valueValueKind: .string,
+					keyKind: .string,
+					valueKind: .string,
 					entries: metadataEntries
 				),
 				accessRules: .init(
-					keyValueKind: .enum,
-					valueValueKind: .tuple,
+					keyKind: .enum,
+					valueKind: .tuple,
 					entries: [
-						[.enum(.init(.string("ResourceMethodAuthKey::Withdraw"))), .tuple(.init(arrayLiteral: .enum(.init(.string("AccessRule::AllowAll"))), .enum(.init(.string("AccessRule::DenyAll")))))],
-						[.enum(.init(.string("ResourceMethodAuthKey::Deposit"))), .tuple(.init(arrayLiteral: .enum(.init(.string("AccessRule::AllowAll"))), .enum(.init(.string("AccessRule::DenyAll")))))],
+						[.enum(.init(.string(.resourceMethodAuthKey_Withdraw))), .tuple(.init(arrayLiteral: .enum(.init(.string(.accessRule_AllowAll))), .enum(.init(.string(.accessRule_DenyAll)))))],
+						[.enum(.init(.string(.resourceMethodAuthKey_Deposit))), .tuple(.init(arrayLiteral: .enum(.init(.string(.accessRule_AllowAll))), .enum(.init(.string(.accessRule_DenyAll)))))],
 					]
 				),
 				initialSupply: .map(
-					.init(keyValueKind: .nonFungibleLocalId, valueValueKind: .tuple, entries: nftIds)
+					.init(keyKind: .nonFungibleLocalId, valueKind: .tuple, entries: nftIds)
 				)
 			)
 		}
 
-		let instructions: [any InstructionProtocol] = [lockFeeCallMethod(address: faucetAddress)] + tokens + [CallMethod(receiver: .init(address: accountAddress.address), methodName: "deposit_batch") {
-			Expression(stringLiteral: "ENTIRE_WORKTOP")
+		let instructions: [any InstructionProtocol] = [lockFeeCallMethod(address: faucetAddress)] + tokens + [CallMethod(receiver: accountAddress.asComponentAddress, methodName: "deposit_batch") {
+			ManifestExpression.entireWorktop
 		}]
 
 		return TransactionManifest(instructions: .parsed(instructions.map { $0.embed() }))

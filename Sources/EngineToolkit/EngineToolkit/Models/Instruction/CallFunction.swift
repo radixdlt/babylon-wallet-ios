@@ -9,7 +9,7 @@ public struct CallFunction: InstructionProtocol {
 	}
 
 	// MARK: Stored properties
-	public let packageAddress: Address_
+	public let packageAddress: PackageAddress
 	public let blueprintName: String
 	public let functionName: String
 	public let arguments: [ManifestASTValue]
@@ -22,7 +22,7 @@ public struct CallFunction: InstructionProtocol {
 		functionName: String,
 		arguments: [ManifestASTValue] = []
 	) {
-		self.packageAddress = packageAddress.asGeneral
+		self.packageAddress = packageAddress
 		self.blueprintName = blueprintName
 		self.functionName = functionName
 		self.arguments = arguments
@@ -41,36 +41,6 @@ public struct CallFunction: InstructionProtocol {
 			arguments: buildValues().map { $0.embedValue() }
 		)
 	}
-
-	#if swift(<5.8)
-	public init(
-		packageAddress: PackageAddress,
-		blueprintName: String,
-		functionName: String,
-		@SpecificValuesBuilder buildValues: () throws -> [ManifestASTValue]
-	) rethrows {
-		try self.init(
-			packageAddress: packageAddress,
-			blueprintName: blueprintName,
-			functionName: functionName,
-			arguments: buildValues()
-		)
-	}
-
-	public init(
-		packageAddress: PackageAddress,
-		blueprintName: String,
-		functionName: String,
-		@SpecificValuesBuilder buildValue: () throws -> ManifestASTValue
-	) rethrows {
-		try self.init(
-			packageAddress: packageAddress,
-			blueprintName: blueprintName,
-			functionName: functionName,
-			arguments: [buildValue()]
-		)
-	}
-	#endif
 }
 
 extension CallFunction {
@@ -88,9 +58,9 @@ extension CallFunction {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		try container.encode(Self.kind, forKey: .type)
 
-		try container.encode(packageAddress, forKey: .packageAddress)
-		try container.encode(blueprintName.proxyEncodable, forKey: .blueprintName)
-		try container.encode(functionName.proxyEncodable, forKey: .functionName)
+		try container.encodeValue(packageAddress, forKey: .packageAddress)
+		try container.encodeValue(blueprintName, forKey: .blueprintName)
+		try container.encodeValue(functionName, forKey: .functionName)
 		try container.encode(arguments, forKey: .arguments)
 	}
 
@@ -103,9 +73,9 @@ extension CallFunction {
 		}
 
 		try self.init(
-			packageAddress: container.decode(Address_.self, forKey: .packageAddress).asSpecific(),
-			blueprintName: container.decode(String.ProxyDecodable.self, forKey: .blueprintName).decoded,
-			functionName: container.decode(String.ProxyDecodable.self, forKey: .functionName).decoded,
+			packageAddress: container.decodeValue(forKey: .packageAddress),
+			blueprintName: container.decodeValue(forKey: .blueprintName),
+			functionName: container.decodeValue(forKey: .functionName),
 			arguments: container.decodeIfPresent([ManifestASTValue].self, forKey: .arguments) ?? []
 		)
 	}

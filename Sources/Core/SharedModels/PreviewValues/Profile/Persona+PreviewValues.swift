@@ -7,7 +7,7 @@ extension Profile.Network.Persona {
 		try! Self(
 			networkID: .nebunet,
 			address: .init(
-				address: "identity_tdx_a_1qwv0unmwmxschqj8sntg6n9eejkrr6yr6fa4ekxazdzqhm6wy5"
+				validatingAddress: "identity_tdx_a_1qwv0unmwmxschqj8sntg6n9eejkrr6yr6fa4ekxazdzqhm6wy5"
 			),
 			securityState: .unsecured(.init(
 				transactionSigning: .init(
@@ -31,7 +31,7 @@ extension Profile.Network.Persona {
 		try! Self(
 			networkID: .nebunet,
 			address: .init(
-				address: "identity_tdx_a_1qvlrgnqrvk6tzmg8z6lusprl3weupfkmu52gkfhmncjsnhn0kp"
+				validatingAddress: "identity_tdx_a_1qvlrgnqrvk6tzmg8z6lusprl3weupfkmu52gkfhmncjsnhn0kp"
 			),
 			securityState: .unsecured(.init(
 				transactionSigning: .init(

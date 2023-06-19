@@ -10,7 +10,7 @@ public struct MintUuidNonFungible: InstructionProtocol {
 
 	// MARK: Stored properties
 
-	public let resourceAddress: Address_
+	public let resourceAddress: ResourceAddress
 	public let entries: ManifestASTValue
 
 	// MARK: Init
@@ -19,7 +19,7 @@ public struct MintUuidNonFungible: InstructionProtocol {
 		resourceAddress: ResourceAddress,
 		entries: ManifestASTValue
 	) {
-		self.resourceAddress = resourceAddress.asGeneral
+		self.resourceAddress = resourceAddress
 		self.entries = entries
 	}
 }
@@ -39,7 +39,7 @@ extension MintUuidNonFungible {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		try container.encode(Self.kind, forKey: .type)
 
-		try container.encode(resourceAddress, forKey: .resourceAddress)
+		try container.encodeValue(resourceAddress, forKey: .resourceAddress)
 		try container.encode(entries, forKey: .entries)
 	}
 
@@ -52,7 +52,7 @@ extension MintUuidNonFungible {
 		}
 
 		try self.init(
-			resourceAddress: container.decode(Address_.self, forKey: .resourceAddress).asSpecific(),
+			resourceAddress: container.decodeValue(forKey: .resourceAddress),
 			entries: container.decode(ManifestASTValue.self, forKey: .entries)
 		)
 	}

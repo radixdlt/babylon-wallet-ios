@@ -30,7 +30,7 @@ extension PopFromAuthZone {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		try container.encode(Self.kind, forKey: .type)
 
-		try container.encode(proof, forKey: .intoProof)
+		try container.encodeValue(proof, forKey: .intoProof)
 	}
 
 	public init(from decoder: Decoder) throws {
@@ -42,7 +42,7 @@ extension PopFromAuthZone {
 		}
 
 		try self.init(
-			proof: container.decode(Proof.self, forKey: .intoProof)
+			proof: container.decodeValue(forKey: .intoProof)
 		)
 	}
 }

@@ -41,28 +41,28 @@ public struct FactorInstance: Sendable, Hashable, Codable, Identifiable {
 			case let .ecdsaSecp256k1(k1PubKey):
 				// FIXME: THIS IS COMPLETELY WRONG, placeholder only
 				let payload = k1PubKey.compressedRepresentation.prefix(26)
-				return .init(
+				return try! .init(
 					factorSourceKind: factorSourceID.kind,
 					badgeAddress: .virtual(.init(
 						resourceAddress: .init(
 							// FIXME: This is wrong! should be fetched from gateway or from RET... and depends on the network.
-							address: "resource_sim1qgqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq056vhf"
+							validatingAddress: "resource_sim1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxakj8n3"
 						),
-						nonFungibleLocalId: .bytes(Array(payload))
+						nonFungibleLocalId: "#1#"
 					)
 					)
 				)
 			case let .eddsaEd25519(curve25519PubKey):
 				// FIXME: THIS IS COMPLETELY WRONG, placeholder only
 				let payload = curve25519PubKey.compressedRepresentation.prefix(26)
-				return .init(
+				return try! .init(
 					factorSourceKind: factorSourceID.kind,
 					badgeAddress: .virtual(.init(
 						resourceAddress: .init(
 							// FIXME: This is wrong! should be fetched from gateway or from RET... and depends on the network.
-							address: "resource_sim1qgqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqs64j5z6"
+							validatingAddress: "resource_sim1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxakj8n3"
 						),
-						nonFungibleLocalId: .bytes(Array(payload))
+						nonFungibleLocalId: "#1#"
 					)
 					)
 				)

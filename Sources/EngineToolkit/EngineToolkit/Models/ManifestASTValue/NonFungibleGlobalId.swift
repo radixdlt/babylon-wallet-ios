@@ -1,21 +1,20 @@
+import CasePaths
 import Foundation
 
 // MARK: - NonFungibleGlobalId
 public struct NonFungibleGlobalId: ValueProtocol, Sendable, Codable, Hashable {
 	// Type name, used as a discriminator
 	public static let kind: ManifestASTValueKind = .nonFungibleGlobalId
-	public func embedValue() -> ManifestASTValue {
-		.nonFungibleGlobalId(self)
-	}
+	public static var casePath: CasePath<ManifestASTValue, Self> = /ManifestASTValue.nonFungibleGlobalId
 
 	// MARK: Stored properties
-	public let resourceAddress: Address_
+	public let resourceAddress: ResourceAddress
 	public let nonFungibleLocalId: NonFungibleLocalId
 
 	// MARK: Init
 
 	public init(resourceAddress: ResourceAddress, nonFungibleLocalId: NonFungibleLocalId) {
-		self.resourceAddress = resourceAddress.asGeneral
+		self.resourceAddress = resourceAddress
 		self.nonFungibleLocalId = nonFungibleLocalId
 	}
 }
@@ -23,7 +22,6 @@ public struct NonFungibleGlobalId: ValueProtocol, Sendable, Codable, Hashable {
 extension NonFungibleGlobalId {
 	// MARK: CodingKeys
 	private enum CodingKeys: String, CodingKey {
-		case type
 		case resourceAddress = "resource_address"
 		case nonFungibleLocalId = "non_fungible_local_id"
 	}
@@ -31,22 +29,18 @@ extension NonFungibleGlobalId {
 	// MARK: Codable
 	public func encode(to encoder: Encoder) throws {
 		var container = encoder.container(keyedBy: CodingKeys.self)
-		try container.encode(Self.kind, forKey: .type)
-		try container.encode(resourceAddress, forKey: .resourceAddress)
-		try container.encode(nonFungibleLocalId, forKey: .nonFungibleLocalId)
+		try container.encodeValue(resourceAddress, forKey: .resourceAddress)
+		try container.encodeValue(nonFungibleLocalId, forKey: .nonFungibleLocalId)
 	}
 
 	public init(from decoder: Decoder) throws {
 		// Checking for type discriminator
 		let container = try decoder.container(keyedBy: CodingKeys.self)
-		let kind: ManifestASTValueKind = try container.decode(ManifestASTValueKind.self, forKey: .type)
-		if kind != Self.kind {
-			throw InternalDecodingFailure.valueTypeDiscriminatorMismatch(expected: Self.kind, butGot: kind)
-		}
 
+		// Extract address?
 		try self.init(
-			resourceAddress: container.decode(Address_.self, forKey: .resourceAddress).asSpecific(),
-			nonFungibleLocalId: container.decode(NonFungibleLocalId.self, forKey: .nonFungibleLocalId)
+			resourceAddress: container.decodeValue(forKey: .resourceAddress),
+			nonFungibleLocalId: container.decodeValue(forKey: .nonFungibleLocalId)
 		)
 	}
 }

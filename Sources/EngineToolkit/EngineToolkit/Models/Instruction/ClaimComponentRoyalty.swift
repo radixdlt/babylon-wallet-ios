@@ -10,12 +10,12 @@ public struct ClaimPackageRoyalty: InstructionProtocol {
 
 	// MARK: Stored properties
 
-	public let packageAddress: Address_
+	public let packageAddress: PackageAddress
 
 	// MARK: Init
 
 	public init(packageAddress: PackageAddress) {
-		self.packageAddress = packageAddress.asGeneral
+		self.packageAddress = packageAddress
 	}
 }
 
@@ -33,7 +33,7 @@ extension ClaimPackageRoyalty {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		try container.encode(Self.kind, forKey: .type)
 
-		try container.encode(packageAddress, forKey: .packageAddress)
+		try container.encodeValue(packageAddress, forKey: .packageAddress)
 	}
 
 	public init(from decoder: Decoder) throws {
@@ -45,7 +45,7 @@ extension ClaimPackageRoyalty {
 		}
 
 		try self.init(
-			packageAddress: container.decode(Address_.self, forKey: .packageAddress).asSpecific()
+			packageAddress: container.decodeValue(forKey: .packageAddress)
 		)
 	}
 }

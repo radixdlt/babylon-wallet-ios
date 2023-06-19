@@ -70,7 +70,7 @@ final class FactorSourcesCodableTests: TestCase {
 
 			anyFactorSources.append(
 				TrustedContactFactorSource.from(
-					radixAddress: "account_tdx_c_1px0jul7a44s65568d32f82f0lkssjwx6f5t5e44yl6csqurxw3",
+					radixAddress: "account_rdx1283u6e8r2jnz4a3jwv0hnrqfr5aq50yc9ts523sd96hzfjxqqcs89q",
 					emailAddress: "hi@rdx.works",
 					name: "My friend"
 				)

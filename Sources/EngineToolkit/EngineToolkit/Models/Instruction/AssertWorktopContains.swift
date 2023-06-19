@@ -9,12 +9,12 @@ public struct AssertWorktopContains: InstructionProtocol {
 	}
 
 	// MARK: Stored properties
-	public let resourceAddress: Address_
+	public let resourceAddress: ResourceAddress
 
 	// MARK: Init
 
 	public init(resourceAddress: ResourceAddress) {
-		self.resourceAddress = resourceAddress.asGeneral
+		self.resourceAddress = resourceAddress
 	}
 }
 
@@ -30,7 +30,7 @@ extension AssertWorktopContains {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		try container.encode(Self.kind, forKey: .type)
 
-		try container.encode(resourceAddress, forKey: .resourceAddress)
+		try container.encodeValue(resourceAddress, forKey: .resourceAddress)
 	}
 
 	public init(from decoder: Decoder) throws {
@@ -42,7 +42,7 @@ extension AssertWorktopContains {
 		}
 
 		try self.init(
-			resourceAddress: container.decode(Address_.self, forKey: .resourceAddress).asSpecific()
+			resourceAddress: container.decodeValue(forKey: .resourceAddress)
 		)
 	}
 }

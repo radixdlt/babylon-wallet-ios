@@ -69,7 +69,7 @@ extension GatewayAPIClient {
 			throw GatewayAPI.EntityMetadataCollection.MetadataError.missingDappDefinition
 		}
 
-		return try DappDefinitionAddress(address: dappDefinitionAddressString)
+		return try DappDefinitionAddress(validatingAddress: dappDefinitionAddressString)
 	}
 
 	/// Fetches the metadata for a dApp. If the component address is supplied, it validates that it is contained in `claimed_entities`

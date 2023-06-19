@@ -1,0 +1,103 @@
+[
+ {"instruction":"CALL_FUNCTION","package_address":{"kind":"Address","value":"package_rdx1pkgxxxxxxxxxfaucetxxxxxxxxx000034355863xxxxxxxxxfaucet"},"blueprint_name":{"kind":"String","value":"Faucet"},"function_name":{"kind":"String","value":"new"},"arguments":[{"kind":"Decimal","value":"1"}]},
+ 
+ {"instruction":"CALL_METHOD","component_address":{"kind":"Address","value":"component_rdx1cqvgx33089ukm2pl97pv4max0x40ruvfy4lt60yvya744cve90hqtq"},"method_name":{"kind":"String","value":"free"},"arguments":[{"kind":"Decimal","value":"1"}]},
+ 
+ {"instruction":"CALL_METHOD","component_address":{"kind":"Address","value":"component_rdx1cqvgx33089ukm2pl97pv4max0x40ruvfy4lt60yvya744cve90hqtq"},"method_name":{"kind":"String","value":"free"},"arguments":[]},
+ 
+ {"instruction":"CALL_ROYALTY_METHOD","component_address":{"kind":"Address","value":"component_rdx1cqvgx33089ukm2pl97pv4max0x40ruvfy4lt60yvya744cve90hqtq"},"method_name":{"kind":"String","value":"free"},"arguments":[]},
+ 
+ {"instruction":"CALL_METADATA_METHOD","component_address":{"kind":"Address","value":"component_rdx1cqvgx33089ukm2pl97pv4max0x40ruvfy4lt60yvya744cve90hqtq"},"method_name":{"kind":"String","value":"free"},"arguments":[]},
+ 
+ {"instruction":"CALL_ACCESS_RULES_METHOD","component_address":{"kind":"Address","value":"component_rdx1cqvgx33089ukm2pl97pv4max0x40ruvfy4lt60yvya744cve90hqtq"},"method_name":{"kind":"String","value":"free"},"arguments":[]},
+ 
+ {"instruction":"TAKE_ALL_FROM_WORKTOP","resource_address":{"kind":"Address","value":"resource_rdx1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxradxrd"},"into_bucket":{"kind":"Bucket","value":"bucket1"}},
+ 
+ {"instruction":"TAKE_FROM_WORKTOP","resource_address":{"kind":"Address","value":"resource_rdx1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxradxrd"},"amount":{"kind":"Decimal","value":"1"},"into_bucket":{"kind":"Bucket","value":"bucket1"}},
+ 
+ {"instruction":"TAKE_NON_FUNGIBLES_FROM_WORKTOP","resource_address":{"kind":"Address","value":"resource_rdx1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxradxrd"},"ids":[{"kind":"NonFungibleLocalId","value":"#1#"}],"into_bucket":{"kind":"Bucket","value":"bucket1"}},
+ 
+ {"instruction":"RETURN_TO_WORKTOP","bucket":{"kind":"Bucket","value":"bucket1"}},
+ 
+ {"instruction":"ASSERT_WORKTOP_CONTAINS","resource_address":{"kind":"Address","value":"resource_rdx1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxradxrd"},"amount":{"kind":"Decimal","value":"1"}},
+ 
+ {"instruction":"ASSERT_WORKTOP_CONTAINS_NON_FUNGIBLES","resource_address":{"kind":"Address","value":"resource_rdx1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxradxrd"},"ids":[{"kind":"NonFungibleLocalId","value":"#1#"}]},
+ 
+ {"instruction":"POP_FROM_AUTH_ZONE","into_proof":{"kind":"Proof","value":"proof1"}},
+ 
+ {"instruction":"PUSH_TO_AUTH_ZONE","proof":{"kind":"Proof","value":"proof1"}},
+ 
+ {"instruction":"CLEAR_AUTH_ZONE"},
+ 
+ {"instruction":"CREATE_PROOF_FROM_AUTH_ZONE","resource_address":{"kind":"Address","value":"resource_rdx1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxradxrd"},"into_proof":{"kind":"Proof","value":"proof1"}},
+ 
+ {"instruction":"CREATE_PROOF_FROM_AUTH_ZONE_OF_AMOUNT","resource_address":{"kind":"Address","value":"resource_rdx1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxradxrd"},"amount":{"kind":"Decimal","value":"1"},"into_proof":{"kind":"Proof","value":"proof1"}},
+ 
+ {"instruction":"CREATE_PROOF_FROM_AUTH_ZONE_OF_NON_FUNGIBLES","resource_address":{"kind":"Address","value":"resource_rdx1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxradxrd"},"ids":[{"kind":"NonFungibleLocalId","value":"#1#"}],"into_proof":{"kind":"Proof","value":"proof1"}},
+ 
+ {"instruction":"CREATE_PROOF_FROM_AUTH_ZONE_OF_ALL","resource_address":{"kind":"Address","value":"resource_rdx1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxradxrd"},"into_proof":{"kind":"Proof","value":"proof1"}},
+ 
+ {"instruction":"CREATE_PROOF_FROM_BUCKET","bucket":{"kind":"Bucket","value":"bucket"},"into_proof":{"kind":"Proof","value":"proof1"}},
+ 
+ {"instruction":"CREATE_PROOF_FROM_BUCKET_OF_AMOUNT","bucket":{"kind":"Bucket","value":"bucket"},"amount":{"kind":"Decimal","value":"1"},"into_proof":{"kind":"Proof","value":"proof1"}},
+ 
+ {"instruction":"CREATE_PROOF_FROM_BUCKET_OF_NON_FUNGIBLES","bucket":{"kind":"Bucket","value":"bucket1"},"ids":[{"kind":"NonFungibleLocalId","value":"#1#"}],"into_proof":{"kind":"Proof","value":"ident"}},
+ 
+ {"instruction":"CREATE_PROOF_FROM_BUCKET_OF_ALL","bucket":{"kind":"Bucket","value":"bucket"},"into_proof":{"kind":"Proof","value":"proof1"}},
+ 
+ {"instruction":"CLONE_PROOF","proof":{"kind":"Proof","value":"ident"},"into_proof":{"kind":"Proof","value":"proof1"}},
+ 
+ {"instruction":"PUBLISH_PACKAGE","code":{"kind":"Blob","value":"01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"},"schema":{"kind":"Bytes","hex":"4d2101230c2100"},"royalty_config":{"kind":"Map","key_kind":"String","value_kind":"Tuple","entries":[]},"metadata":{"kind":"Map","key_kind":"String","value_kind":"String","entries":[]}},
+ 
+ {"instruction":"PUBLISH_PACKAGE_ADVANCED","code":{"kind":"Blob","value":"01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"},"schema":{"kind":"Bytes","hex":"4d2101230c2100"},"royalty_config":{"kind":"Map","key_kind":"String","value_kind":"Tuple","entries":[]},"metadata":{"kind":"Map","key_kind":"String","value_kind":"String","entries":[]},"authority_rules":{"kind":"Tuple","fields":[{"kind":"Map","key_kind":"Tuple","value_kind":"Enum","entries":[]},{"kind":"Map","key_kind":"Tuple","value_kind":"Enum","entries":[]},{"kind":"Map","key_kind":"String","value_kind":"Enum","entries":[]},{"kind":"Enum","variant":{"type":"U8","discriminator":"0"},"fields":[{"kind":"Enum","variant":{"type":"U8","discriminator":"0"},"fields":[]}]},{"kind":"Map","key_kind":"Tuple","value_kind":"Enum","entries":[]},{"kind":"Map","key_kind":"String","value_kind":"Enum","entries":[]},{"kind":"Enum","variant":{"type":"U8","discriminator":"0"},"fields":[{"kind":"Enum","variant":{"type":"U8","discriminator":"0"},"fields":[]}]}]}},
+ 
+ {"instruction":"BURN_RESOURCE","bucket":{"kind":"Bucket","value":"ident"}},
+ 
+ {"instruction":"DROP_ALL_PROOFS"},
+ 
+ {"instruction":"DROP_PROOF","proof":{"kind":"Proof","value":"proof"}},
+ 
+ {"instruction":"RECALL_RESOURCE","vault_id":{"kind":"Address","value":"internal_vault_sim1tqvgx33089ukm2pl97pv4max0x40ruvfy4lt60yvya744cvevp72ff"},"amount":{"kind":"Decimal","value":"1"}},
+ 
+ {"instruction":"SET_METADATA","entity_address":{"kind":"Address","value":"component_rdx1cqvgx33089ukm2pl97pv4max0x40ruvfy4lt60yvya744cve90hqtq"},"key":{"kind":"String","value":"name"},"value":{"kind":"Enum","variant":{"type":"U8","discriminator":"0"},"fields":[{"kind":"Enum","variant":{"type":"U8","discriminator":"0"},"fields":[{"kind":"String","value":"deadbeef"}]}]}},
+ 
+ {"instruction":"REMOVE_METADATA","entity_address":{"kind":"Address","value":"component_rdx1cqvgx33089ukm2pl97pv4max0x40ruvfy4lt60yvya744cve90hqtq"},"key":{"kind":"String","value":"name"}},
+ 
+ {"instruction":"SET_PACKAGE_ROYALTY_CONFIG","package_address":{"kind":"Address","value":"package_rdx1pkgxxxxxxxxxfaucetxxxxxxxxx000034355863xxxxxxxxxfaucet"},"royalty_config":{"kind":"Map","key_kind":"String","value_kind":"Tuple","entries":[]}},
+ 
+ {"instruction":"SET_COMPONENT_ROYALTY_CONFIG","component_address":{"kind":"Address","value":"component_rdx1cqvgx33089ukm2pl97pv4max0x40ruvfy4lt60yvya744cve90hqtq"},"royalty_config":{"kind":"Tuple","fields":[{"kind":"Map","key_kind":"String","value_kind":"U32","entries":[]},{"kind":"U32","value":"1"}]}},
+ 
+ {"instruction":"CLAIM_PACKAGE_ROYALTY","package_address":{"kind":"Address","value":"package_rdx1pkgxxxxxxxxxfaucetxxxxxxxxx000034355863xxxxxxxxxfaucet"}},
+ 
+ {"instruction":"CLAIM_COMPONENT_ROYALTY","component_address":{"kind":"Address","value":"component_rdx1cqvgx33089ukm2pl97pv4max0x40ruvfy4lt60yvya744cve90hqtq"}},
+ 
+ {"instruction":"SET_AUTHORITY_ACCESS_RULE","entity_address":{"kind":"Address","value":"component_rdx1cqvgx33089ukm2pl97pv4max0x40ruvfy4lt60yvya744cve90hqtq"},"object_key":{"kind":"Enum","variant":{"type":"U8","discriminator":"0"},"fields":[]},"authority_key":{"kind":"Enum","variant":{"type":"U8","discriminator":"0"},"fields":[]},"rule":{"kind":"Enum","variant":{"type":"U8","discriminator":"0"},"fields":[]}},
+ 
+ {"instruction":"SET_AUTHORITY_MUTABILITY","entity_address":{"kind":"Address","value":"component_rdx1cqvgx33089ukm2pl97pv4max0x40ruvfy4lt60yvya744cve90hqtq"},"object_key":{"kind":"Enum","variant":{"type":"U8","discriminator":"0"},"fields":[]},"authority_key":{"kind":"Enum","variant":{"type":"U8","discriminator":"0"},"fields":[]},"mutability":{"kind":"Enum","variant":{"type":"U8","discriminator":"0"},"fields":[]}},
+ 
+ {"instruction":"MINT_FUNGIBLE","resource_address":{"kind":"Address","value":"resource_rdx1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxradxrd"},"amount":{"kind":"Decimal","value":"1"}},
+ 
+ {"instruction":"MINT_NON_FUNGIBLE","resource_address":{"kind":"Address","value":"resource_rdx1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxradxrd"},"entries":{"kind":"Map","key_kind":"NonFungibleLocalId","value_kind":"Tuple","entries":[]}},
+ 
+ {"instruction":"MINT_UUID_NON_FUNGIBLE","resource_address":{"kind":"Address","value":"resource_rdx1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxradxrd"},"entries":{"kind":"Array","element_kind":"Tuple","elements":[{"kind":"Tuple","fields":[{"kind":"Tuple","fields":[]},{"kind":"Tuple","fields":[]}]},{"kind":"Tuple","fields":[{"kind":"Tuple","fields":[]},{"kind":"Tuple","fields":[]}]}]}},
+ 
+ {"instruction":"CREATE_FUNGIBLE_RESOURCE","divisibility":{"kind":"U8","value":"18"},"metadata":{"kind":"Map","key_kind":"String","value_kind":"String","entries":[]},"access_rules":{"kind":"Map","key_kind":"Enum","value_kind":"Tuple","entries":[]}},
+ 
+ {"instruction":"CREATE_FUNGIBLE_RESOURCE_WITH_INITIAL_SUPPLY","divisibility":{"kind":"U8","value":"18"},"metadata":{"kind":"Map","key_kind":"String","value_kind":"String","entries":[]},"access_rules":{"kind":"Map","key_kind":"Enum","value_kind":"Tuple","entries":[]},"initial_supply":{"kind":"Decimal","value":"1"}},
+ 
+ {"instruction":"CREATE_NON_FUNGIBLE_RESOURCE","id_type":{"kind":"Enum","variant":{"type":"U8","discriminator":"0"},"fields":[]},"schema":{"kind":"Tuple","fields":[{"kind":"Tuple","fields":[{"kind":"Array","element_kind":"Enum","elements":[]},{"kind":"Array","element_kind":"Tuple","elements":[]},{"kind":"Array","element_kind":"Enum","elements":[]}]},{"kind":"Enum","variant":{"type":"U8","discriminator":"0"},"fields":[{"kind":"U8","value":"64"}]},{"kind":"Array","element_kind":"String","elements":[]}]},"metadata":{"kind":"Map","key_kind":"String","value_kind":"String","entries":[]},"access_rules":{"kind":"Map","key_kind":"Enum","value_kind":"Tuple","entries":[]}},
+ 
+ {"instruction":"CREATE_ACCESS_CONTROLLER","controlled_asset":{"kind":"Bucket","value":"ident"},"rule_set":{"kind":"Tuple","fields":[{"kind":"Enum","variant":{"type":"U8","discriminator":"0"},"fields":[]},{"kind":"Enum","variant":{"type":"U8","discriminator":"0"},"fields":[]},{"kind":"Enum","variant":{"type":"U8","discriminator":"0"},"fields":[]}]},"timed_recovery_delay_in_minutes":{"kind":"Some","value":{"kind":"U32","value":"1"}}},
+ 
+ {"instruction":"CREATE_IDENTITY"},
+ 
+ {"instruction":"CREATE_IDENTITY_ADVANCED","config":{"kind":"Tuple","fields":[{"kind":"Map","key_kind":"Tuple","value_kind":"Enum","entries":[]},{"kind":"Map","key_kind":"Tuple","value_kind":"Enum","entries":[]},{"kind":"Map","key_kind":"String","value_kind":"Enum","entries":[]},{"kind":"Enum","variant":{"type":"U8","discriminator":"0"},"fields":[{"kind":"Enum","variant":{"type":"U8","discriminator":"0"},"fields":[]}]},{"kind":"Map","key_kind":"Tuple","value_kind":"Enum","entries":[]},{"kind":"Map","key_kind":"String","value_kind":"Enum","entries":[]},{"kind":"Enum","variant":{"type":"U8","discriminator":"0"},"fields":[{"kind":"Enum","variant":{"type":"U8","discriminator":"0"},"fields":[]}]}]}},
+ 
+ {"instruction":"CREATE_ACCOUNT"},
+ 
+ {"instruction":"CREATE_ACCOUNT_ADVANCED","config":{"kind":"Tuple","fields":[{"kind":"Map","key_kind":"Tuple","value_kind":"Enum","entries":[]},{"kind":"Map","key_kind":"Tuple","value_kind":"Enum","entries":[]},{"kind":"Map","key_kind":"String","value_kind":"Enum","entries":[]},{"kind":"Enum","variant":{"type":"U8","discriminator":"0"},"fields":[{"kind":"Enum","variant":{"type":"U8","discriminator":"0"},"fields":[]}]},{"kind":"Map","key_kind":"Tuple","value_kind":"Enum","entries":[]},{"kind":"Map","key_kind":"String","value_kind":"Enum","entries":[]},{"kind":"Enum","variant":{"type":"U8","discriminator":"0"},"fields":[{"kind":"Enum","variant":{"type":"U8","discriminator":"0"},"fields":[]}]}]}},
+ 
+ {"instruction":"CREATE_VALIDATOR","key":{"kind":"Bytes","hex":"0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798"}},
+ 
+ {"instruction":"CLEAR_SIGNATURE_PROOFS"},
+ ]

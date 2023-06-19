@@ -1,7 +1,7 @@
 import Foundation
 
 // MARK: - DropProof
-public struct DropProof: InstructionProtocol, ExpressibleByStringLiteral, ExpressibleByIntegerLiteral {
+public struct DropProof: InstructionProtocol, ExpressibleByStringLiteral {
 	// Type name, used as a discriminator
 	public static let kind: InstructionKind = .dropProof
 	public func embed() -> Instruction {
@@ -17,12 +17,8 @@ public struct DropProof: InstructionProtocol, ExpressibleByStringLiteral, Expres
 		self.proof = proof
 	}
 
-	public init(integerLiteral value: Proof.IntegerLiteralType) {
-		self.init(Proof(integerLiteral: value))
-	}
-
-	public init(stringLiteral value: Proof.StringLiteralType) {
-		self.init(Proof(stringLiteral: value))
+	public init(stringLiteral value: StringLiteralType) {
+		self.init(Proof(value))
 	}
 }
 
@@ -38,7 +34,7 @@ extension DropProof {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		try container.encode(Self.kind, forKey: .type)
 
-		try container.encode(proof, forKey: .proof)
+		try container.encodeValue(proof, forKey: .proof)
 	}
 
 	public init(from decoder: Decoder) throws {
@@ -50,7 +46,7 @@ extension DropProof {
 		}
 
 		try self.init(
-			container.decode(Proof.self, forKey: .proof)
+			container.decodeValue(forKey: .proof)
 		)
 	}
 }

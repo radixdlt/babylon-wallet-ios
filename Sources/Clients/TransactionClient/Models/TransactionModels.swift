@@ -44,7 +44,7 @@ extension GatewayAPI.TransactionPreviewRequest {
 		)
 
 		struct NotaryAsSignatoryDiscrepancy: Swift.Error {}
-		guard transactionSigners.notaryAsSignatory == header.notaryAsSignatory else {
+		guard transactionSigners.notaryAsSignatory == header.notaryIsSignatory else {
 			loggerGlobal.error("Preview incorrectly implemented, found discrepancy in `notaryAsSignatory` and `transactionSigners`.")
 			assertionFailure("discrepancy")
 			throw NotaryAsSignatoryDiscrepancy()
@@ -250,7 +250,7 @@ public struct AddFeeToManifestOutcomeExcludesLockFee: Sendable, Equatable {
 
 // MARK: - TransactionToReview
 public struct TransactionToReview: Sendable, Equatable {
-	public let analyzedManifestToReview: AnalyzeManifestWithPreviewContextResponse
+	public let analyzedManifestToReview: AnalyzeTransactionExecutionResponse
 	public let addFeeToManifestOutcome: AddFeeToManifestOutcome
 	public let networkID: NetworkID
 }

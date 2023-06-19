@@ -30,7 +30,7 @@ extension PushToAuthZone {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		try container.encode(Self.kind, forKey: .type)
 
-		try container.encode(proof, forKey: .proof)
+		try container.encodeValue(proof, forKey: .proof)
 	}
 
 	public init(from decoder: Decoder) throws {
@@ -42,7 +42,7 @@ extension PushToAuthZone {
 		}
 
 		try self.init(
-			proof: container.decode(Proof.self, forKey: .proof)
+			proof: container.decodeValue(forKey: .proof)
 		)
 	}
 }

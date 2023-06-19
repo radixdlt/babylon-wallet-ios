@@ -9,7 +9,7 @@ public struct CallMethod: InstructionProtocol {
 	}
 
 	// MARK: Stored properties
-	public let receiver: Address_
+	public let receiver: ComponentAddress
 	public let methodName: String
 	public let arguments: [ManifestASTValue]
 
@@ -20,7 +20,17 @@ public struct CallMethod: InstructionProtocol {
 		methodName: String,
 		arguments: [ManifestASTValue] = []
 	) {
-		self.receiver = receiver.asGeneral
+		self.receiver = receiver
+		self.methodName = methodName
+		self.arguments = arguments
+	}
+
+	public init(
+		receiver: AccountAddress,
+		methodName: String,
+		arguments: [ManifestASTValue] = []
+	) {
+		self.receiver = receiver.asComponentAddress
 		self.methodName = methodName
 		self.arguments = arguments
 	}
@@ -36,33 +46,6 @@ public struct CallMethod: InstructionProtocol {
 			arguments: buildValues().map { $0.embedValue() }
 		)
 	}
-
-	#if swift(<5.8)
-	public init(
-		receiver: ComponentAddress,
-		methodName: String,
-		@SpecificValuesBuilder buildValues: () throws -> [ManifestASTValue]
-	) rethrows {
-		try self.init(
-			receiver: receiver,
-			methodName: methodName,
-			arguments: buildValues()
-		)
-	}
-
-	public init(
-		receiver: ComponentAddress,
-		methodName: String,
-		@SpecificValuesBuilder buildValue: () throws -> ManifestASTValue
-	) rethrows {
-		try self.init(
-			receiver: receiver,
-			methodName: methodName,
-			arguments: [buildValue()]
-		)
-	}
-
-	#endif
 }
 
 extension CallMethod {
@@ -79,8 +62,8 @@ extension CallMethod {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		try container.encode(Self.kind, forKey: .type)
 
-		try container.encode(receiver, forKey: .receiver)
-		try container.encode(methodName.proxyEncodable, forKey: .methodName)
+		try container.encodeValue(receiver, forKey: .receiver)
+		try container.encodeValue(methodName, forKey: .methodName)
 		try container.encode(arguments, forKey: .arguments)
 	}
 
@@ -92,9 +75,10 @@ extension CallMethod {
 			throw InternalDecodingFailure.instructionTypeDiscriminatorMismatch(expected: Self.kind, butGot: kind)
 		}
 
+		let componentAddress: ComponentAddress = try container.decodeValue(forKey: .receiver)
 		try self.init(
-			receiver: container.decode(Address_.self, forKey: .receiver).asSpecific(),
-			methodName: container.decode(String.ProxyDecodable.self, forKey: .methodName).decoded,
+			receiver: componentAddress,
+			methodName: container.decodeValue(forKey: .methodName),
 			arguments: container.decodeIfPresent([ManifestASTValue].self, forKey: .arguments) ?? []
 		)
 	}

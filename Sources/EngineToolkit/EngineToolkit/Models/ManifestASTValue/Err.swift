@@ -1,9 +1,9 @@
+import CasePaths
+
 // MARK: - Err
 public struct Err: ValueProtocol, Sendable, Codable, Hashable {
 	public static let kind: ManifestASTValueKind = .err
-	public func embedValue() -> ManifestASTValue {
-		.err(self)
-	}
+	public static var casePath: CasePath<ManifestASTValue, Self> = /ManifestASTValue.err
 
 	// MARK: Stored properties
 
@@ -15,28 +15,16 @@ public struct Err: ValueProtocol, Sendable, Codable, Hashable {
 }
 
 extension Err {
-	// MARK: CodingKeys
-
-	private enum CodingKeys: String, CodingKey {
-		case type, value
-	}
-
 	// MARK: Codable
 
 	public func encode(to encoder: Encoder) throws {
-		var container = encoder.container(keyedBy: CodingKeys.self)
-		try container.encode(Self.kind, forKey: .type)
-		try container.encode(value, forKey: .value)
+		var container = encoder.singleValueContainer()
+		try container.encode(value)
 	}
 
 	public init(from decoder: Decoder) throws {
 		// Checking for type discriminator
-		let container = try decoder.container(keyedBy: CodingKeys.self)
-		let kind: ManifestASTValueKind = try container.decode(ManifestASTValueKind.self, forKey: .type)
-		if kind != Self.kind {
-			throw InternalDecodingFailure.valueTypeDiscriminatorMismatch(expected: Self.kind, butGot: kind)
-		}
-
-		try self.init(container.decode(ManifestASTValue.self, forKey: .value))
+		let container = try decoder.singleValueContainer()
+		try self.init(container.decode(ManifestASTValue.self))
 	}
 }

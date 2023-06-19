@@ -43,14 +43,12 @@ extension TransactionHeader {
 		notaryPrivateKey: Engine.PrivateKey
 	) throws -> Self {
 		try Self(
-			version: 0x01,
 			networkId: 0xF2,
 			startEpochInclusive: 0,
 			endEpochExclusive: 10,
 			nonce: 0,
 			publicKey: notaryPrivateKey.publicKey(),
-			notaryAsSignatory: true,
-			costUnitLimit: 10_000_000,
+			notaryIsSignatory: true,
 			tipPercentage: 0
 		)
 	}

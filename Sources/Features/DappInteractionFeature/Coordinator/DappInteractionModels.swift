@@ -83,7 +83,7 @@ extension DappMetadata {
 extension DappMetadata {
 	static let previewValue: Self = try! .ledger(.init(
 		origin: .init(string: "https://radfi.com"),
-		dAppDefinintionAddress: .init(address: "account_tdx_b_1p95nal0nmrqyl5r4phcspg8ahwnamaduzdd3kaklw3vqeavrwa"),
+		dAppDefinintionAddress: .init(validatingAddress: "account_tdx_b_1p95nal0nmrqyl5r4phcspg8ahwnamaduzdd3kaklw3vqeavrwa"),
 		name: "Collabo.Fi",
 		description: "A very collaby finance dapp",
 		thumbnail: nil

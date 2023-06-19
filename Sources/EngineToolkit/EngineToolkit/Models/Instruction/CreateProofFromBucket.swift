@@ -36,8 +36,8 @@ extension CreateProofFromBucket {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		try container.encode(Self.kind, forKey: .type)
 
-		try container.encode(bucket, forKey: .bucket)
-		try container.encode(proof, forKey: .intoProof)
+		try container.encodeValue(bucket, forKey: .bucket)
+		try container.encodeValue(proof, forKey: .intoProof)
 	}
 
 	public init(from decoder: Decoder) throws {
@@ -49,8 +49,8 @@ extension CreateProofFromBucket {
 		}
 
 		try self.init(
-			bucket: container.decode(Bucket.self, forKey: .bucket),
-			proof: container.decode(Proof.self, forKey: .intoProof)
+			bucket: container.decodeValue(forKey: .bucket),
+			proof: container.decodeValue(forKey: .intoProof)
 		)
 	}
 }

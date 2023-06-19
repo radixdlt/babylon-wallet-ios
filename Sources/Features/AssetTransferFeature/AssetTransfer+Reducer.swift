@@ -144,8 +144,8 @@ extension AssetTransfer {
 
 	private func createManifest(_ state: State) throws -> TransactionManifest {
 		let involvedFungibleResources = extractInvolvedFungibleResources(state.accounts.receivingAccounts)
-		let fungiblesTransferInstruction = involvedFungibleResources.flatMap {
-			fungibleResourceTransferInstruction(witdhrawAccount: state.accounts.fromAccount.address, $0)
+		let fungiblesTransferInstruction = try involvedFungibleResources.flatMap {
+			try fungibleResourceTransferInstruction(witdhrawAccount: state.accounts.fromAccount.address, $0)
 		}
 
 		let involvedNonFungibles = extractInvolvedNonFungibleResource(state.accounts.receivingAccounts)
@@ -225,13 +225,13 @@ extension AssetTransfer {
 	private func fungibleResourceTransferInstruction(
 		witdhrawAccount: AccountAddress,
 		_ resource: InvolvedFungibleResource
-	) -> [any InstructionProtocol] {
+	) throws -> [any InstructionProtocol] {
 		let accountWithdrawals: [any InstructionProtocol] = [
 			CallMethod(
-				receiver: .init(address: witdhrawAccount.address),
+				receiver: witdhrawAccount,
 				methodName: "withdraw",
 				arguments: [
-					.address(.init(address: resource.address.address)),
+					.address(resource.address.asGeneral()),
 					.decimal(.init(value: resource.totalTransferAmount.toString())),
 				]
 			),
@@ -241,16 +241,16 @@ extension AssetTransfer {
 			let bucket = UUID().uuidString
 
 			let instructions: [any InstructionProtocol] = [
-				TakeFromWorktopByAmount(
+				TakeFromWorktop(
 					amount: .init(value: account.amount.toString()),
-					resourceAddress: .init(address: resource.address.address),
-					bucket: .init(identifier: bucket)
+					resourceAddress: resource.address,
+					bucket: .init(value: bucket)
 				),
 
 				CallMethod(
-					receiver: .init(address: account.id.address),
+					receiver: account.id,
 					methodName: "deposit",
-					arguments: [.bucket(.init(identifier: bucket))]
+					arguments: [.bucket(.init(value: bucket))]
 				),
 			]
 
@@ -266,10 +266,10 @@ extension AssetTransfer {
 	) throws -> [any InstructionProtocol] {
 		let accountWithdrawals: [any InstructionProtocol] = try [
 			CallMethod(
-				receiver: .init(address: witdhrawAccount.address),
+				receiver: witdhrawAccount,
 				methodName: "withdraw_non_fungibles",
 				arguments: [
-					.address(.init(address: resource.address.address)),
+					.address(resource.address.asGeneral()),
 					.array(.init(
 						elementKind: .nonFungibleLocalId,
 						elements: resource.allTokens.map {
@@ -284,16 +284,16 @@ extension AssetTransfer {
 			let bucket = UUID().uuidString
 
 			let instructions: [any InstructionProtocol] = try [
-				TakeFromWorktopByIds(
+				TakeNonFungiblesFromWorktop(
 					Set(account.tokens.map { try $0.id.toRETLocalID() }),
-					resourceAddress: .init(address: resource.address.address),
-					bucket: .init(identifier: bucket)
+					resourceAddress: resource.address,
+					bucket: .init(value: bucket)
 				),
 
 				CallMethod(
-					receiver: .init(address: account.id.address),
+					receiver: account.id,
 					methodName: "deposit",
-					arguments: [.bucket(.init(identifier: bucket))]
+					arguments: [.bucket(.init(value: bucket))]
 				),
 			]
 
@@ -312,22 +312,7 @@ extension AccountPortfolio.NonFungibleResource.NonFungibleToken.LocalID {
 		guard rawValue.count >= 3 else {
 			throw InvalidLocalID()
 		}
-		let prefix = rawValue.prefix(1)
 		let value = String(self.rawValue.dropLast().dropFirst())
-
-		switch prefix {
-		case "#":
-			return .integer(UInt64(value)!)
-		case "<":
-			return .string(value)
-		case "[":
-			guard let bytes = value.data(using: .utf8)?.bytes else {
-				throw InvalidLocalID()
-			}
-			return .bytes(bytes)
-		default:
-			// UUID local id is not working properly in current version of RET
-			throw InvalidLocalID()
-		}
+		return .init(value: value)
 	}
 }
