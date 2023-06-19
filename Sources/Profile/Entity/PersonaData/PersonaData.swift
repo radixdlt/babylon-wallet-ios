@@ -29,9 +29,9 @@ extension Persona {
 		public init(
 			name: Name? = nil,
 			dateOfBirth: DateOfBirth? = nil,
-			emailAddresses: EmailAddresses = [],
-			postalAddresses: PostalAddresses = [],
-			phoneNumbers: PhoneNumbers = []
+			emailAddresses: EmailAddresses = .init(),
+			postalAddresses: PostalAddresses = .init(),
+			phoneNumbers: PhoneNumbers = .init()
 		) {
 			self.name = name
 			self.dateOfBirth = dateOfBirth
@@ -46,6 +46,11 @@ extension Persona {
 extension Persona.PersonaData {
 	public struct EntryCollectionOf<Value: Sendable & Hashable & Codable & BasePersonaFieldValueProtocol>: Sendable, Hashable, Codable {
 		public private(set) var collection: IdentifiedArrayOf<PersonaDataEntryOfKind<Value>>
+
+		public init() {
+			self.collection = []
+		}
+
 		public init(collection: IdentifiedArrayOf<PersonaDataEntryOfKind<Value>> = .init()) throws {
 			guard Set(collection.map(\.value)).count == collection.count else {
 				throw DuplicateValuesFound()
