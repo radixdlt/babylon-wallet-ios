@@ -225,6 +225,20 @@ final class PersonaFieldTests: TestCase {
 		XCTAssertEqual(addresses.compactMap(\.value.country), [.sweden, .sweden, .france, .unitedKingdom])
 	}
 
+	func test_invalid_postalAddress_japan() throws {
+		XCTAssertThrowsError(
+			try PersonaDataEntry.PostalAddress(
+				validating: [
+					.country(.japan),
+					.streetLine0("Should not use 'streetLine'"),
+					.streetLine1("Should not use 'streetLine'"),
+					.postalCodeNumber(123),
+					.city("Tokyo"),
+				]
+			)
+		)
+	}
+
 	func test_json_coding_persona_and_cap21() throws {
 		let persona = try withDependencies {
 			$0.uuid = .incrementing
