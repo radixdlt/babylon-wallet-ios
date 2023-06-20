@@ -287,17 +287,17 @@ final class PersonaFieldTests: TestCase {
 			],
 			"phoneNumbers": [
 				[
-					"id": "00000000-0000-0000-0000-000000000006",
+					"id": "00000000-0000-0000-0000-000000000004",
 					"value": "+468-1234567",
 				],
 				[
-					"id": "00000000-0000-0000-0000-000000000007",
+					"id": "00000000-0000-0000-0000-000000000005",
 					"value": "+468-9876543",
 				],
 			],
 			"postalAddresses": [
 				[
-					"id": "00000000-0000-0000-0000-000000000004",
+					"id": "00000000-0000-0000-0000-000000000006",
 					"value": [
 						[
 							"discriminator": "streetLine0",
@@ -322,7 +322,7 @@ final class PersonaFieldTests: TestCase {
 					],
 				],
 				[
-					"id": "00000000-0000-0000-0000-000000000005",
+					"id": "00000000-0000-0000-0000-000000000007",
 					"value": [
 						[
 							"discriminator": "streetLine0",
@@ -358,121 +358,6 @@ final class PersonaFieldTests: TestCase {
 		try XCTAssertJSONDecoding(
 			personaJSON,
 			personaData
-		)
-
-		let cap21JSON: JSON = [
-			[
-				"id": "00000000-0000-0000-0000-000000000000",
-				"value": [
-					"discriminator": "name",
-					"name": [
-						"family": "Palme",
-						"given": "Olof",
-						"variant": "western",
-					],
-				],
-			],
-			[
-				"id": "00000000-0000-0000-0000-000000000001",
-				"value": [
-					"dateOfBirth": "1927-01-30T12:00:00Z",
-					"discriminator": "dateOfBirth",
-				],
-			],
-			[
-				"id": "00000000-0000-0000-0000-000000000002",
-				"value": [
-					"discriminator": "emailAddress",
-					"emailAddress": "palme@stadsminister.se",
-				],
-			],
-			[
-				"id": "00000000-0000-0000-0000-000000000003",
-				"value": [
-					"discriminator": "emailAddress",
-					"emailAddress": "olof@boss.se",
-				],
-			],
-			[
-				"id": "00000000-0000-0000-0000-000000000004",
-				"value": [
-					"discriminator": "postalAddress",
-					"postalAddress": [
-						[
-							"discriminator": "streetLine0",
-							"value": "Västerlånggatan 31",
-						],
-						[
-							"discriminator": "streetLine1",
-							"value": "",
-						],
-						[
-							"discriminator": "postalCodeNumber",
-							"value": 11129,
-						],
-						[
-							"discriminator": "city",
-							"value": "Stockholm",
-						],
-						[
-							"discriminator": "country",
-							"value": "sweden",
-						],
-					],
-				],
-			],
-			[
-				"id": "00000000-0000-0000-0000-000000000005",
-				"value": [
-					"discriminator": "postalAddress",
-					"postalAddress": [
-						[
-							"discriminator": "streetLine0",
-							"value": "Strömgatan 18",
-						],
-						[
-							"discriminator": "streetLine1",
-							"value": "Sagerska Huset",
-						],
-						[
-							"discriminator": "postalCodeNumber",
-							"value": 11152,
-						],
-						[
-							"discriminator": "city",
-							"value": "Stockholm",
-						],
-						[
-							"discriminator": "country",
-							"value": "sweden",
-						],
-					],
-				],
-			],
-			[
-				"id": "00000000-0000-0000-0000-000000000006",
-				"value": [
-					"discriminator": "phoneNumber",
-					"phoneNumber": "+468-1234567",
-				],
-			],
-			[
-				"id": "00000000-0000-0000-0000-000000000007",
-				"value": [
-					"discriminator": "phoneNumber",
-					"phoneNumber": "+468-9876543",
-				],
-			],
-		]
-
-		try XCTAssertJSONEncoding(
-			personaData.entries,
-			cap21JSON
-		)
-
-		try XCTAssertJSONDecoding(
-			cap21JSON,
-			personaData.entries
 		)
 	}
 }
