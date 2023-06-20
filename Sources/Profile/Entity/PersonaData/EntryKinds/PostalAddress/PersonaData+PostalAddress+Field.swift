@@ -81,12 +81,73 @@ extension PersonaData.PostalAddress {
 }
 
 extension PersonaData.PostalAddress.Field {
+	public var valueAsString: String {
+		switch self {
+		case let .area(value):
+			return value
+		case let .country(value):
+			return value.rawValue
+		case let .streetLine0(value):
+			return value
+		case let .streetLine1(value):
+			return value
+		case let .postalCodeString(value):
+			return value
+		case let .postalCodeNumber(value):
+			return value.description
+		case let .postcodeNumber(value):
+			return value.description
+		case let .postcodeString(value):
+			return value
+		case let .zipNumber(value):
+			return value.description
+		case let .city(value):
+			return value
+		case let .state(value):
+			return value
+		case let .suburb(value):
+			return value
+		case let .neighbourhood(value):
+			return value
+		case let .province(value):
+			return value
+		case let .governorate(value):
+			return value
+		case let .districtString(value):
+			return value
+		case let .districtNumber(value):
+			return value.description
+		case let .region(value):
+			return value
+		case let .prefectureLevelCity(value):
+			return value
+		case let .subjectOfTheFederation(value):
+			return value
+		case let .prefecture(value):
+			return value
+		case let .county(value):
+			return value
+		case let .furtherDivisionsLine0(value):
+			return value
+		case let .furtherDivisionsLine1(value):
+			return value
+		case let .township(value):
+			return value
+		case let .department(value):
+			return value
+		case let .postalDistrict(value):
+			return value
+		}
+	}
+}
+
+extension PersonaData.PostalAddress.Field {
 	private enum CodingKeys: String, CodingKey {
 		case value, discriminator
 	}
 
 	public init(from decoder: Decoder) throws {
-		var container = try decoder.container(keyedBy: CodingKeys.self)
+		let container = try decoder.container(keyedBy: CodingKeys.self)
 		let discriminator = try container.decode(Discriminator.self, forKey: .discriminator)
 		switch discriminator {
 		case .area:

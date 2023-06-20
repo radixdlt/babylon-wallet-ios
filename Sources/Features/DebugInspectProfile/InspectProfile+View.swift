@@ -703,9 +703,9 @@ extension EntityView {
 //					ForEach(persona.personaData.entries) { entry in
 //						Labeled(entry.id, value: String(describing: entry.value))
 //					}
-					ForEach(persona.personaData.entries) { entry in
-						Labeled("\(entry.id)", value: "TODO")
-					}
+//					ForEach(persona.personaData.entries) { entry in
+//
+//					}
 				}.padding(.leading, indentation.inOneLevel.leadingPadding)
 			}
 			if let account = self.entity as? Profile.Network.Account {
