@@ -820,9 +820,8 @@ public enum L10n {
     /// You are responsible for the security of your Seed Phrase
     public static let seedPhraseSecurityInfo = L10n.tr("Localizable", "displayMnemonics_seedPhraseSecurityInfo", fallback: "You are responsible for the security of your Seed Phrase")
     public enum CautionAlert {
-      /// A seed phrase provides full control of its Accounts. Do not view in a public area. Back
-      ///  up the seed phrase words securely. Screenshots are disabled.
-      public static let message = L10n.tr("Localizable", "displayMnemonics_cautionAlert_message", fallback: "A seed phrase provides full control of its Accounts. Do not view in a public area. Back\n up the seed phrase words securely. Screenshots are disabled.")
+      /// A seed phrase provides full control of its Accounts. Do not view in a public area. Back up the seed phrase words securely. Screenshots are disabled.
+      public static let message = L10n.tr("Localizable", "displayMnemonics_cautionAlert_message", fallback: "A seed phrase provides full control of its Accounts. Do not view in a public area. Back up the seed phrase words securely. Screenshots are disabled.")
       /// Reveal Seed Phrase
       public static let revealButtonLabel = L10n.tr("Localizable", "displayMnemonics_cautionAlert_revealButtonLabel", fallback: "Reveal Seed Phrase")
       /// Use Caution
