@@ -1,10 +1,10 @@
 import CasePaths
 import Prelude
 
-extension PersonaDataEntry {
-	public struct DateOfBirth: Sendable, Hashable, Codable, PersonaFieldValueProtocol {
-		public static let casePath: CasePath<PersonaDataEntry, Self> = /PersonaDataEntry.dateOfBirth
-		public static let kind = PersonaFieldKind.dateOfBirth
+extension PersonaData {
+	public struct DateOfBirth: Sendable, Hashable, Codable, PersonaDataEntryProtocol {
+		public static let casePath: CasePath<PersonaData.Entry, Self> = /PersonaData.Entry.dateOfBirth
+		public static let kind = PersonaData.Entry.Kind.dateOfBirth
 
 		public let date: Date
 

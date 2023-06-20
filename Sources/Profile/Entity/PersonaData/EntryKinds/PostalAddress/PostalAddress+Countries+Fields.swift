@@ -1,7 +1,7 @@
 import Foundation
 
-extension PersonaDataEntry.PostalAddress.Country {
-	var fields: [[PersonaDataEntry.PostalAddress.Field.Discriminator]] {
+extension PersonaData.PostalAddress.Country {
+	var fields: [[PersonaData.PostalAddress.Field.Discriminator]] {
 		switch self {
 		case .afghanistan:
 			return [

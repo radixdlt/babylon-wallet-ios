@@ -1,10 +1,10 @@
 import CasePaths
 import Prelude
 
-extension PersonaDataEntry {
-	public struct Name: Sendable, Hashable, Codable, PersonaFieldValueProtocol {
-		public static var casePath: CasePath<PersonaDataEntry, Self> = /PersonaDataEntry.name
-		public static var kind = PersonaFieldKind.name
+extension PersonaData {
+	public struct Name: Sendable, Hashable, Codable, PersonaDataEntryProtocol {
+		public static var casePath: CasePath<PersonaData.Entry, Self> = /PersonaData.Entry.name
+		public static var kind = PersonaData.Entry.Kind.name
 
 		public enum Variant: String, Sendable, Hashable, Codable {
 			/// order: `given middle family`

@@ -1,10 +1,10 @@
 import CasePaths
 import Prelude
 
-extension PersonaDataEntry {
-	public struct PhoneNumber: Sendable, Hashable, Codable, PersonaFieldValueProtocol {
-		public static var casePath: CasePath<PersonaDataEntry, Self> = /PersonaDataEntry.phoneNumber
-		public static var kind = PersonaFieldKind.phoneNumber
+extension PersonaData {
+	public struct PhoneNumber: Sendable, Hashable, Codable, PersonaDataEntryProtocol {
+		public static var casePath: CasePath<PersonaData.Entry, Self> = /PersonaData.Entry.phoneNumber
+		public static var kind = PersonaData.Entry.Kind.phoneNumber
 
 		public let number: String
 

@@ -1,7 +1,7 @@
 import Foundation
 
-// MARK: - PersonaDataEntry.PostalAddress.Country
-extension PersonaDataEntry.PostalAddress {
+// MARK: - PersonaData.PostalAddress.Country
+extension PersonaData.PostalAddress {
 	public enum Country: String, Sendable, Hashable, Codable, CaseIterable, Identifiable {
 		case afghanistan
 		case argentina
@@ -196,7 +196,7 @@ extension PersonaDataEntry.PostalAddress {
 	}
 }
 
-extension PersonaDataEntry.PostalAddress.Country {
+extension PersonaData.PostalAddress.Country {
 	public typealias ID = RawValue
 	public var id: ID { rawValue }
 }

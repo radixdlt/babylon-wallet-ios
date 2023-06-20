@@ -1,7 +1,7 @@
 import Foundation
 
-// MARK: - PersonaDataEntry.PostalAddress.Field
-extension PersonaDataEntry.PostalAddress {
+// MARK: - PersonaData.PostalAddress.Field
+extension PersonaData.PostalAddress {
 	public enum Field: Sendable, Hashable, Codable, Identifiable {
 		public typealias ID = Discriminator
 		public var id: ID {
@@ -80,7 +80,7 @@ extension PersonaDataEntry.PostalAddress {
 	}
 }
 
-extension PersonaDataEntry.PostalAddress.Field {
+extension PersonaData.PostalAddress.Field {
 	private enum CodingKeys: String, CodingKey {
 		case value, discriminator
 	}
@@ -128,7 +128,7 @@ extension PersonaDataEntry.PostalAddress.Field {
 		case .prefectureLevelCity:
 			self = try .prefectureLevelCity(container.decode(String.self, forKey: .value))
 		case .country:
-			self = try .country(container.decode(PersonaDataEntry.PostalAddress.Country.self, forKey: .value))
+			self = try .country(container.decode(PersonaData.PostalAddress.Country.self, forKey: .value))
 		case .region:
 			self = try .region(container.decode(String.self, forKey: .value))
 		case .subjectOfTheFederation:
@@ -208,8 +208,8 @@ extension PersonaDataEntry.PostalAddress.Field {
 	}
 }
 
-// MARK: - PersonaDataEntry.PostalAddress.Field.Discriminator
-extension PersonaDataEntry.PostalAddress.Field {
+// MARK: - PersonaData.PostalAddress.Field.Discriminator
+extension PersonaData.PostalAddress.Field {
 	public enum Discriminator: String, Sendable, Hashable, Codable {
 		case streetLine0
 		case streetLine1
@@ -277,7 +277,7 @@ extension PersonaDataEntry.PostalAddress.Field {
 }
 
 // MARK: Discriminators
-extension PersonaDataEntry.PostalAddress.Field {
+extension PersonaData.PostalAddress.Field {
 	public var discriminator: Discriminator {
 		switch self {
 		case .country: return .country
@@ -317,7 +317,7 @@ extension PersonaDataEntry.PostalAddress.Field {
 #if canImport(UIKit)
 import UIKit
 #endif // canImport(UIKit)
-extension PersonaDataEntry.PostalAddress.Field {
+extension PersonaData.PostalAddress.Field {
 	#if canImport(UIKit)
 	public var keyboardType: UIKeyboardType {
 		switch self {
@@ -328,11 +328,11 @@ extension PersonaDataEntry.PostalAddress.Field {
 	#endif // canImport(UIKit)
 }
 
-extension PersonaDataEntry.PostalAddress.Field {
+extension PersonaData.PostalAddress.Field {
 	public var valueType: any InitializableFromInputString.Type {
 		switch self {
 		case .zipNumber, .postalCodeNumber, .postcodeNumber, .districtNumber: return Int.self
-		case .country: return PersonaDataEntry.PostalAddress.Country.self
+		case .country: return PersonaData.PostalAddress.Country.self
 		default: return String.self
 		}
 	}

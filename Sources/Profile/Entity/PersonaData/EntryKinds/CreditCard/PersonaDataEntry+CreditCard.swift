@@ -1,10 +1,10 @@
 import CasePaths
 import Prelude
 
-extension PersonaDataEntry {
-	public struct CreditCard: Sendable, Hashable, Codable, PersonaFieldValueProtocol {
-		public static var casePath: CasePath<PersonaDataEntry, Self> = /PersonaDataEntry.creditCard
-		public static var kind = PersonaFieldKind.creditCard
+extension PersonaData {
+	public struct CreditCard: Sendable, Hashable, Codable, PersonaDataEntryProtocol {
+		public static var casePath: CasePath<PersonaData.Entry, Self> = /PersonaData.Entry.creditCard
+		public static var kind = PersonaData.Entry.Kind.creditCard
 
 		public struct Expiry: Sendable, Hashable, Codable {
 			public let year: Int

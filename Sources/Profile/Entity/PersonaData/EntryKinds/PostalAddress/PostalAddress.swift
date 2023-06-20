@@ -1,15 +1,15 @@
 import CasePaths
 import Prelude
 
-// MARK: - PersonaDataEntry.PostalAddress
-extension PersonaDataEntry {
-	public struct PostalAddress: Sendable, Hashable, Codable, PersonaFieldValueProtocol {
-		public static var casePath: CasePath<PersonaDataEntry, Self> = /PersonaDataEntry.postalAddress
-		public static var kind = PersonaFieldKind.postalAddress
+// MARK: - PersonaData.PostalAddress
+extension PersonaData {
+	public struct PostalAddress: Sendable, Hashable, Codable, PersonaDataEntryProtocol {
+		public static var casePath: CasePath<PersonaData.Entry, Self> = /PersonaData.Entry.postalAddress
+		public static var kind = PersonaData.Entry.Kind.postalAddress
 
-		public let fields: IdentifiedArrayOf<PersonaDataEntry.PostalAddress.Field>
+		public let fields: IdentifiedArrayOf<PersonaData.PostalAddress.Field>
 
-		public init(unchecked fields: IdentifiedArrayOf<PersonaDataEntry.PostalAddress.Field>) {
+		public init(unchecked fields: IdentifiedArrayOf<PersonaData.PostalAddress.Field>) {
 			self.fields = fields
 		}
 
@@ -17,7 +17,7 @@ extension PersonaDataEntry {
 			fields.compactMap(\.country).first
 		}
 
-		public init(validating fields: IdentifiedArrayOf<PersonaDataEntry.PostalAddress.Field>) throws {
+		public init(validating fields: IdentifiedArrayOf<PersonaData.PostalAddress.Field>) throws {
 			guard let country = fields.compactMap(\.country).first else {
 				throw Error.noCountry
 			}
@@ -35,7 +35,7 @@ extension PersonaDataEntry {
 
 		public init(from decoder: Decoder) throws {
 			var container = try decoder.singleValueContainer()
-			try self.init(validating: container.decode(IdentifiedArrayOf<PersonaDataEntry.PostalAddress.Field>.self))
+			try self.init(validating: container.decode(IdentifiedArrayOf<PersonaData.PostalAddress.Field>.self))
 		}
 
 		public func encode(to encoder: Encoder) throws {
@@ -45,8 +45,8 @@ extension PersonaDataEntry {
 	}
 }
 
-extension PersonaDataEntry.PostalAddress.Field {
-	var country: PersonaDataEntry.PostalAddress.Country? {
+extension PersonaData.PostalAddress.Field {
+	var country: PersonaData.PostalAddress.Country? {
 		switch self {
 		case let .country(country): return country
 		default: return nil

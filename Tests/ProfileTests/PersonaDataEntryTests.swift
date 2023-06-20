@@ -66,7 +66,7 @@ final class PersonaFieldTests: TestCase {
 
 	func test_assert_personaData_fieldCollectionOf_cannot_contain_duplicated_values() {
 		XCTAssertThrowsError(
-			try PersonaData.EmailAddresses(
+			try PersonaData.IdentifiedEmailAddresses(
 				collection: [
 					.init(id: .init(uuidString: "BBBBBBBB-0000-1111-2222-BBBBBBBBBBBB"), value: "hi@rdx.works"),
 					.init(id: .init(uuidString: "AAAAAAAA-9999-8888-7777-AAAAAAAAAAAA"), value: "hi@rdx.works"), // same value cannot be used twice, even though UUID differs!
@@ -76,7 +76,7 @@ final class PersonaFieldTests: TestCase {
 	}
 
 	func test_assert_personaData_fieldCollectionOf_cannot_add_duplicate_value() throws {
-		var fieldCollection = try PersonaData.EmailAddresses(
+		var fieldCollection = try PersonaData.IdentifiedEmailAddresses(
 			collection: [
 				.init(id: .init(uuidString: "BBBBBBBB-0000-1111-2222-BBBBBBBBBBBB"), value: "hi@rdx.works"),
 			]
@@ -89,7 +89,7 @@ final class PersonaFieldTests: TestCase {
 	}
 
 	func test_assert_personaData_fieldCollectionOf_cannot_add_duplicate_id() throws {
-		var fieldCollection = try PersonaData.EmailAddresses(
+		var fieldCollection = try PersonaData.IdentifiedEmailAddresses(
 			collection: [
 				.init(id: .init(uuidString: "BBBBBBBB-0000-1111-2222-BBBBBBBBBBBB"), value: "hi@rdx.works"),
 			]
@@ -102,7 +102,7 @@ final class PersonaFieldTests: TestCase {
 	}
 
 	func test_assert_personaData_fieldCollectionOf_can_add_another_value() throws {
-		var fieldCollection = try PersonaData.EmailAddresses(
+		var fieldCollection = try PersonaData.IdentifiedEmailAddresses(
 			collection: [
 				.init(id: .init(uuidString: "BBBBBBBB-0000-1111-2222-BBBBBBBBBBBB"), value: "hi@rdx.works"),
 			]
@@ -114,11 +114,11 @@ final class PersonaFieldTests: TestCase {
 	}
 
 	func test_update_emails() throws {
-		var email = PersonaData.EmailAddresses.Element(
+		var email = PersonaData.IdentifiedEmailAddresses.Element(
 			id: .init(uuidString: "BBBBBBBB-0000-1111-2222-BBBBBBBBBBBB"),
 			value: "hi@rdx.works"
 		)
-		var fieldCollection = try PersonaData.EmailAddresses(
+		var fieldCollection = try PersonaData.IdentifiedEmailAddresses(
 			collection: [
 				email,
 			]
@@ -129,7 +129,7 @@ final class PersonaFieldTests: TestCase {
 	}
 
 	func test_assert_update_unknown_id_throws() throws {
-		var fieldCollection = try PersonaData.EmailAddresses(
+		var fieldCollection = try PersonaData.IdentifiedEmailAddresses(
 			collection: [
 				.init(id: .init(uuidString: "AAAAAAAA-9999-8888-7777-AAAAAAAAAAAA"), value: "hi@rdx.works"),
 			]
@@ -212,7 +212,7 @@ final class PersonaFieldTests: TestCase {
 
 	func test_invalid_postalAddress_japan() throws {
 		XCTAssertThrowsError(
-			try PersonaDataEntry.PostalAddress(
+			try PersonaData.PostalAddress(
 				validating: [
 					.country(.japan),
 					.streetLine0("Should not use 'streetLine'"),
@@ -347,6 +347,7 @@ final class PersonaFieldTests: TestCase {
 					"value": "+468-9876543",
 				],
 			],
+			"creditCards": [],
 		]
 
 		try XCTAssertJSONEncoding(
@@ -476,39 +477,39 @@ final class PersonaFieldTests: TestCase {
 	}
 }
 
-// MARK: - PersonaDataEntryOfKind + ExpressibleByStringLiteral, ExpressibleByUnicodeScalarLiteral, ExpressibleByExtendedGraphemeClusterLiteral
-extension PersonaDataEntryOfKind<PersonaDataEntry.EmailAddress>: ExpressibleByStringLiteral, ExpressibleByUnicodeScalarLiteral, ExpressibleByExtendedGraphemeClusterLiteral {
+// MARK: - PersonaData.IdentifiedEntry + ExpressibleByStringLiteral, ExpressibleByUnicodeScalarLiteral, ExpressibleByExtendedGraphemeClusterLiteral
+extension PersonaData.IdentifiedEntry<PersonaData.EmailAddress>: ExpressibleByStringLiteral, ExpressibleByUnicodeScalarLiteral, ExpressibleByExtendedGraphemeClusterLiteral {
 	public init(stringLiteral value: String) {
 		try! self.init(value: .init(validating: value))
 	}
 }
 
-// MARK: - PersonaDataEntry.PostalAddress + ExpressibleByArrayLiteral
-extension PersonaDataEntry.PostalAddress: ExpressibleByArrayLiteral {
-	public init(arrayLiteral elements: PersonaDataEntry.PostalAddress.Field...) {
+// MARK: - PersonaData.PostalAddress + ExpressibleByArrayLiteral
+extension PersonaData.PostalAddress: ExpressibleByArrayLiteral {
+	public init(arrayLiteral elements: PersonaData.PostalAddress.Field...) {
 		try! self.init(validating: .init(uncheckedUniqueElements: elements))
 	}
 }
 
-// MARK: - PersonaDataEntryOfKind + ExpressibleByArrayLiteral
-extension PersonaDataEntryOfKind<PersonaDataEntry.PostalAddress>: ExpressibleByArrayLiteral {
-	public init(arrayLiteral elements: PersonaDataEntry.PostalAddress.Field...) {
+// MARK: - PersonaData.IdentifiedEntry + ExpressibleByArrayLiteral
+extension PersonaData.IdentifiedEntry<PersonaData.PostalAddress>: ExpressibleByArrayLiteral {
+	public init(arrayLiteral elements: PersonaData.PostalAddress.Field...) {
 		try! self.init(value: .init(validating: .init(uncheckedUniqueElements: elements)))
 	}
 }
 
 private extension PersonaFieldTests {
-	func dappRequest<Kind: PersonaFieldValueProtocol>(
-		values keyPath: KeyPath<PersonaData, PersonaData.EntryCollectionOf<Kind>>,
+	func dappRequest<Kind: PersonaDataEntryProtocol>(
+		values keyPath: KeyPath<PersonaData, PersonaData.CollectionOfIdentifiedEntries<Kind>>,
 		from personaData: PersonaData
-	) throws -> PersonaData.EntryCollectionOf<Kind> {
+	) throws -> PersonaData.CollectionOfIdentifiedEntries<Kind> {
 		personaData[keyPath: keyPath]
 	}
 
-	func dappRequest<Kind: PersonaFieldValueProtocol>(
-		value keyPath: KeyPath<PersonaData, PersonaDataEntryOfKind<Kind>?>,
+	func dappRequest<Kind: PersonaDataEntryProtocol>(
+		value keyPath: KeyPath<PersonaData, PersonaData.IdentifiedEntry<Kind>?>,
 		from personaData: PersonaData
-	) throws -> PersonaDataEntryOfKind<Kind> {
+	) throws -> PersonaData.IdentifiedEntry<Kind> {
 		guard let field = personaData[keyPath: keyPath] else {
 			throw NoSuchField()
 		}
@@ -519,7 +520,7 @@ private extension PersonaFieldTests {
 // MARK: - NoSuchField
 struct NoSuchField: Error {}
 
-extension PersonaDataEntry.Name {
+extension PersonaData.Name {
 	public var valueForDapp: String {
 		let components: [String?] = {
 			switch variant {
@@ -531,16 +532,16 @@ extension PersonaDataEntry.Name {
 	}
 }
 
-// MARK: - PersonaDataEntry.EmailAddress + ExpressibleByStringLiteral
-extension PersonaDataEntry.EmailAddress: ExpressibleByStringLiteral {
+// MARK: - PersonaData.EmailAddress + ExpressibleByStringLiteral
+extension PersonaData.EmailAddress: ExpressibleByStringLiteral {
 	public init(stringLiteral value: String) {
 		try! self.init(validating: value)
 	}
 }
 
-// MARK: - PersonaData.EntryCollectionOf + ExpressibleByArrayLiteral
-extension PersonaData.EntryCollectionOf: ExpressibleByArrayLiteral {
-	public init(arrayLiteral elements: PersonaDataEntryOfKind<Value>...) {
+// MARK: - PersonaData.CollectionOfIdentifiedEntries + ExpressibleByArrayLiteral
+extension PersonaData.CollectionOfIdentifiedEntries: ExpressibleByArrayLiteral {
+	public init(arrayLiteral elements: PersonaData.IdentifiedEntry<Value>...) {
 		try! self.init(collection: .init(uncheckedUniqueElements: elements))
 	}
 }

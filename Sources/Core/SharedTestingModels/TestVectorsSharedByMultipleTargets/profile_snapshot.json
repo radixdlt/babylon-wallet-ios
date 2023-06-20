@@ -461,6 +461,9 @@
             "phoneNumbers" : [
 
             ],
+			"creditCards" : [
+
+			],
             "postalAddresses" : [
               {
                 "id" : "00000000-AAAA-AAAA-AAAA-000000000000",
@@ -578,6 +581,9 @@
             "emailAddresses" : [
 
             ],
+			"creditCards" : [
+
+			],
             "name" : {
               "id" : "00000000-0000-0000-0000-000000000001",
               "value" : {

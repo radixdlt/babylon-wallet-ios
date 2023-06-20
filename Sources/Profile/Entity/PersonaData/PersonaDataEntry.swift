@@ -1,17 +1,19 @@
 import CasePaths
 import Prelude
 
-// MARK: - PersonaDataEntry
-public enum PersonaDataEntry: Sendable, Hashable, Codable, BasePersonaFieldValueProtocol {
-	case name(Name)
-	case dateOfBirth(DateOfBirth)
-	case emailAddress(EmailAddress)
-	case postalAddress(PostalAddress)
-	case phoneNumber(PhoneNumber)
-	case creditCard(CreditCard)
+// MARK: - PersonaData.Entry
+extension PersonaData {
+	public enum Entry: Sendable, Hashable, Codable, BasePersonaDataEntryProtocol {
+		case name(Name)
+		case dateOfBirth(DateOfBirth)
+		case emailAddress(EmailAddress)
+		case postalAddress(PostalAddress)
+		case phoneNumber(PhoneNumber)
+		case creditCard(CreditCard)
+	}
 }
 
-extension PersonaDataEntry {
+extension PersonaData.Entry {
 	private enum CodingKeys: String, CodingKey {
 		case discriminator
 		case name, dateOfBirth, postalAddress, emailAddress, phoneNumber, creditCard
@@ -38,26 +40,26 @@ extension PersonaDataEntry {
 
 	public init(from decoder: Decoder) throws {
 		let container = try decoder.container(keyedBy: CodingKeys.self)
-		let discriminator = try container.decode(PersonaFieldKind.self, forKey: .discriminator)
+		let discriminator = try container.decode(PersonaData.Entry.Kind.self, forKey: .discriminator)
 		switch discriminator {
 		case .name:
-			self = try .name(container.decode(Name.self, forKey: .name))
+			self = try .name(container.decode(PersonaData.Name.self, forKey: .name))
 		case .dateOfBirth:
-			self = try .dateOfBirth(container.decode(DateOfBirth.self, forKey: .dateOfBirth))
+			self = try .dateOfBirth(container.decode(PersonaData.DateOfBirth.self, forKey: .dateOfBirth))
 		case .emailAddress:
-			self = try .emailAddress(container.decode(EmailAddress.self, forKey: .emailAddress))
+			self = try .emailAddress(container.decode(PersonaData.EmailAddress.self, forKey: .emailAddress))
 		case .postalAddress:
-			self = try .postalAddress(container.decode(PostalAddress.self, forKey: .postalAddress))
+			self = try .postalAddress(container.decode(PersonaData.PostalAddress.self, forKey: .postalAddress))
 		case .phoneNumber:
-			self = try .phoneNumber(container.decode(PhoneNumber.self, forKey: .phoneNumber))
+			self = try .phoneNumber(container.decode(PersonaData.PhoneNumber.self, forKey: .phoneNumber))
 		case .creditCard:
-			self = try .creditCard(container.decode(CreditCard.self, forKey: .creditCard))
+			self = try .creditCard(container.decode(PersonaData.CreditCard.self, forKey: .creditCard))
 		}
 	}
 }
 
-extension PersonaDataEntry {
-	public var discriminator: PersonaFieldKind {
+extension PersonaData.Entry {
+	public var discriminator: PersonaData.Entry.Kind {
 		switch self {
 		case .name: return .name
 		case .emailAddress: return .emailAddress
@@ -68,7 +70,7 @@ extension PersonaDataEntry {
 		}
 	}
 
-	public func embed() -> PersonaDataEntry {
+	public func embed() -> PersonaData.Entry {
 		switch self {
 		case let .name(value): return value.embed()
 		case let .emailAddress(value): return value.embed()
@@ -91,78 +93,76 @@ struct PersonaFieldCollectionValueWithIDNotFound: Swift.Error {
 	let id: UUID
 }
 
-// MARK: - BasePersonaFieldValueProtocol
-public protocol BasePersonaFieldValueProtocol {
-	func embed() -> PersonaDataEntry
+// MARK: - BasePersonaDataEntryProtocol
+public protocol BasePersonaDataEntryProtocol {
+	func embed() -> PersonaData.Entry
 }
 
-// MARK: - PersonaFieldValueProtocol
-public protocol PersonaFieldValueProtocol: BasePersonaFieldValueProtocol {
-	static var casePath: CasePath<PersonaDataEntry, Self> { get }
-	static var kind: PersonaFieldKind { get }
+// MARK: - PersonaDataEntryProtocol
+public protocol PersonaDataEntryProtocol: BasePersonaDataEntryProtocol {
+	static var casePath: CasePath<PersonaData.Entry, Self> { get }
+	static var kind: PersonaData.Entry.Kind { get }
 }
 
-public typealias PersonaField = PersonaDataEntryOfKind<PersonaDataEntry>
-
-extension PersonaDataEntryOfKind {
-	public func embed() -> PersonaField {
-		.init(id: id, value: value.embed())
+// MARK: - PersonaData.Entry.Kind
+extension PersonaData.Entry {
+	public enum Kind: String, Sendable, Hashable, Codable {
+		case name
+		case emailAddress
+		case dateOfBirth
+		case postalAddress
+		case phoneNumber
+		case creditCard
 	}
-}
-
-// MARK: - PersonaFieldKind
-public enum PersonaFieldKind: String, Sendable, Hashable, Codable {
-	case name
-	case emailAddress
-	case dateOfBirth
-	case postalAddress
-	case phoneNumber
-	case creditCard
 }
 
 public typealias PersonaDataEntryID = UUID
 
-// MARK: - PersonaDataEntryOfKind
-/// * Names
-/// * Postal Addresses
-/// * Email Addresses
-/// * URL Addresses
-/// * Telephone numbers
-/// * Birthday
-public struct PersonaDataEntryOfKind<Value>: Sendable, Hashable, Codable, Identifiable where Value: Sendable & Hashable & Codable & BasePersonaFieldValueProtocol {
-	public typealias ID = PersonaDataEntryID
-	public let id: ID
-	public var value: Value
+public typealias AnyIdentifiedPersonaEntry = PersonaData.IdentifiedEntry<PersonaData.Entry>
 
-	public init(
-		id: ID? = nil,
-		value: Value
-	) {
-		@Dependency(\.uuid) var uuid
-		self.id = id ?? uuid()
-		self.value = value
+extension PersonaData.IdentifiedEntry {
+	public func embed() -> AnyIdentifiedPersonaEntry {
+		.init(id: id, value: value.embed())
 	}
 }
 
-extension PersonaFieldValueProtocol {
-	public var kind: PersonaFieldKind { Self.kind }
-	public var casePath: CasePath<PersonaDataEntry, Self> { Self.casePath }
+// MARK: - PersonaData.IdentifiedEntry
+extension PersonaData {
+	public struct IdentifiedEntry<Kind>: Sendable, Hashable, Codable, Identifiable where Kind: Sendable & Hashable & Codable & BasePersonaDataEntryProtocol {
+		public typealias ID = PersonaDataEntryID
+		public let id: ID
+		public var value: Kind
 
-	public func embed() -> PersonaDataEntry {
+		public init(
+			id: ID? = nil,
+			value: Kind
+		) {
+			@Dependency(\.uuid) var uuid
+			self.id = id ?? uuid()
+			self.value = value
+		}
+	}
+}
+
+extension PersonaDataEntryProtocol {
+	public var kind: PersonaData.Entry.Kind { Self.kind }
+	public var casePath: CasePath<PersonaData.Entry, Self> { Self.casePath }
+
+	public func embed() -> PersonaData.Entry {
 		casePath.embed(self)
 	}
 
-	public static func extract(from fieldValue: PersonaDataEntry) -> Self? {
+	public static func extract(from fieldValue: PersonaData.Entry) -> Self? {
 		casePath.extract(from: fieldValue)
 	}
 }
 
-extension PersonaDataEntry {
-	public func extract<F>(_ type: F.Type = F.self) -> F? where F: PersonaFieldValueProtocol {
+extension PersonaData.Entry {
+	public func extract<F>(_ type: F.Type = F.self) -> F? where F: PersonaDataEntryProtocol {
 		F.extract(from: self)
 	}
 
-	public func extract<F>(as _: F.Type = F.self) throws -> F where F: PersonaFieldValueProtocol {
+	public func extract<F>(as _: F.Type = F.self) throws -> F where F: PersonaDataEntryProtocol {
 		guard let extracted = extract(F.self) else {
 			throw IncorrectPersonaFieldType(expectedKind: F.kind, actualKind: discriminator)
 		}
@@ -172,6 +172,6 @@ extension PersonaDataEntry {
 
 // MARK: - IncorrectPersonaFieldType
 public struct IncorrectPersonaFieldType: Swift.Error {
-	public let expectedKind: PersonaFieldKind
-	public let actualKind: PersonaFieldKind
+	public let expectedKind: PersonaData.Entry.Kind
+	public let actualKind: PersonaData.Entry.Kind
 }

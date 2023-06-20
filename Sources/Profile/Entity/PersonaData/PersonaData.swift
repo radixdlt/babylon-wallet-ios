@@ -2,23 +2,23 @@ import Prelude
 
 // MARK: - PersonaData
 public struct PersonaData: Sendable, Hashable, Codable {
-	public typealias Name = PersonaDataEntryOfKind<PersonaDataEntry.Name>
-	public typealias DateOfBirth = PersonaDataEntryOfKind<PersonaDataEntry.DateOfBirth>
+	public typealias IdentifiedName = IdentifiedEntry<Name>
+	public typealias IdentifiedDateOfBirth = IdentifiedEntry<DateOfBirth>
 
-	public typealias EmailAddresses = EntryCollectionOf<PersonaDataEntry.EmailAddress>
-	public typealias PostalAddresses = EntryCollectionOf<PersonaDataEntry.PostalAddress>
-	public typealias PhoneNumbers = EntryCollectionOf<PersonaDataEntry.PhoneNumber>
-	public typealias CreditCards = EntryCollectionOf<PersonaDataEntry.CreditCard>
+	public typealias IdentifiedEmailAddresses = CollectionOfIdentifiedEntries<EmailAddress>
+	public typealias IdentifiedPostalAddresses = CollectionOfIdentifiedEntries<PostalAddress>
+	public typealias IdentifiedPhoneNumbers = CollectionOfIdentifiedEntries<PhoneNumber>
+	public typealias IdentifiedCreditCards = CollectionOfIdentifiedEntries<CreditCard>
 
-	public var name: Name?
-	public var dateOfBirth: DateOfBirth?
-	public var emailAddresses: EmailAddresses
-	public var postalAddresses: PostalAddresses
-	public var phoneNumbers: PhoneNumbers
-	public var creditCards: CreditCards
+	public var name: IdentifiedName?
+	public var dateOfBirth: IdentifiedDateOfBirth?
+	public var emailAddresses: IdentifiedEmailAddresses
+	public var postalAddresses: IdentifiedPostalAddresses
+	public var phoneNumbers: IdentifiedPhoneNumbers
+	public var creditCards: IdentifiedCreditCards
 
-	public var entries: [PersonaDataEntryOfKind<PersonaDataEntry>] {
-		var sequence: [PersonaDataEntryOfKind<PersonaDataEntry>?] = []
+	public var entries: [IdentifiedEntry<PersonaData.Entry>] {
+		var sequence: [IdentifiedEntry<PersonaData.Entry>?] = []
 		sequence.append(name?.embed())
 		sequence.append(dateOfBirth?.embed())
 		sequence.append(contentsOf: emailAddresses.map { $0.embed() })
@@ -29,12 +29,12 @@ public struct PersonaData: Sendable, Hashable, Codable {
 	}
 
 	public init(
-		name: Name? = nil,
-		dateOfBirth: DateOfBirth? = nil,
-		emailAddresses: EmailAddresses = .init(),
-		postalAddresses: PostalAddresses = .init(),
-		phoneNumbers: PhoneNumbers = .init(),
-		creditCards: CreditCards = .init()
+		name: IdentifiedName? = nil,
+		dateOfBirth: IdentifiedDateOfBirth? = nil,
+		emailAddresses: IdentifiedEmailAddresses = .init(),
+		postalAddresses: IdentifiedPostalAddresses = .init(),
+		phoneNumbers: IdentifiedPhoneNumbers = .init(),
+		creditCards: IdentifiedCreditCards = .init()
 	) {
 		self.name = name
 		self.dateOfBirth = dateOfBirth
@@ -45,23 +45,23 @@ public struct PersonaData: Sendable, Hashable, Codable {
 	}
 }
 
-// MARK: PersonaData.EntryCollectionOf
+// MARK: PersonaData.CollectionOfIdentifiedEntries
 extension PersonaData {
-	public struct EntryCollectionOf<Value: Sendable & Hashable & Codable & BasePersonaFieldValueProtocol>: Sendable, Hashable, Codable {
-		public private(set) var collection: IdentifiedArrayOf<PersonaDataEntryOfKind<Value>>
+	public struct CollectionOfIdentifiedEntries<Value: Sendable & Hashable & Codable & BasePersonaDataEntryProtocol>: Sendable, Hashable, Codable {
+		public private(set) var collection: IdentifiedArrayOf<PersonaData.IdentifiedEntry<Value>>
 
 		public init() {
 			self.collection = []
 		}
 
-		public init(collection: IdentifiedArrayOf<PersonaDataEntryOfKind<Value>> = .init()) throws {
+		public init(collection: IdentifiedArrayOf<PersonaData.IdentifiedEntry<Value>> = .init()) throws {
 			guard Set(collection.map(\.value)).count == collection.count else {
 				throw DuplicateValuesFound()
 			}
 			self.collection = collection
 		}
 
-		public mutating func add(_ field: PersonaDataEntryOfKind<Value>) throws {
+		public mutating func add(_ field: PersonaData.IdentifiedEntry<Value>) throws {
 			guard !contains(where: { $0.value == field.value }) else {
 				throw DuplicateValuesFound()
 			}
@@ -71,7 +71,7 @@ extension PersonaData {
 			}
 		}
 
-		public mutating func update(_ updated: PersonaDataEntryOfKind<Value>) throws {
+		public mutating func update(_ updated: PersonaData.IdentifiedEntry<Value>) throws {
 			guard contains(where: { $0.id == updated.id }) else {
 				throw PersonaFieldCollectionValueWithIDNotFound(id: updated.id)
 			}
@@ -86,21 +86,21 @@ extension PersonaData {
 		public init(from decoder: Decoder) throws {
 			let container = try decoder.singleValueContainer()
 			try self.init(
-				collection: container.decode(IdentifiedArrayOf<PersonaDataEntryOfKind<Value>>.self)
+				collection: container.decode(IdentifiedArrayOf<PersonaData.IdentifiedEntry<Value>>.self)
 			)
 		}
 	}
 }
 
-// MARK: - PersonaData.EntryCollectionOf + RandomAccessCollection
-extension PersonaData.EntryCollectionOf: RandomAccessCollection {
-	public typealias Element = PersonaDataEntryOfKind<Value>
+// MARK: - PersonaData.CollectionOfIdentifiedEntries + RandomAccessCollection
+extension PersonaData.CollectionOfIdentifiedEntries: RandomAccessCollection {
+	public typealias Element = PersonaData.IdentifiedEntry<Value>
 
-	public typealias Index = IdentifiedArrayOf<PersonaDataEntryOfKind<Value>>.Index
+	public typealias Index = IdentifiedArrayOf<PersonaData.IdentifiedEntry<Value>>.Index
 
-	public typealias SubSequence = IdentifiedArrayOf<PersonaDataEntryOfKind<Value>>.SubSequence
+	public typealias SubSequence = IdentifiedArrayOf<PersonaData.IdentifiedEntry<Value>>.SubSequence
 
-	public typealias Indices = IdentifiedArrayOf<PersonaDataEntryOfKind<Value>>.Indices
+	public typealias Indices = IdentifiedArrayOf<PersonaData.IdentifiedEntry<Value>>.Indices
 
 	public var startIndex: Index {
 		collection.startIndex
