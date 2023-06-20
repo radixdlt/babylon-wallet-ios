@@ -47,6 +47,12 @@ final class ToDappResponseTests: TestCase {
 							"family": "Jackson",
 							"variant": "western",
 						],
+						"emailAddresses": [
+							"lightningthief@olympus.lol",
+						],
+						"phoneNumbers": [
+							"555 5555",
+						],
 					],
 				],
 			]

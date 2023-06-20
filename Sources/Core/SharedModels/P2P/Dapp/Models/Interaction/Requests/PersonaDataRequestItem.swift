@@ -3,15 +3,15 @@ import Profile
 
 extension P2P.Dapp.Request {
 	public struct PersonaDataRequestItem: Sendable, Hashable, Decodable {
-		public let isRequestingName: Bool
-		public let isRequestingDateOfBirth: Bool
+		public let isRequestingName: Bool?
+		public let isRequestingDateOfBirth: Bool?
 		public let postalAddressesRequested: RequestedNumber?
 		public let emailAddressesRequested: RequestedNumber?
 		public let phoneNumbersAddressesRequested: RequestedNumber?
 
 		public init(
-			isRequestingName: Bool = false,
-			isRequestingDateOfBirth: Bool = false,
+			isRequestingName: Bool? = nil,
+			isRequestingDateOfBirth: Bool? = nil,
 			postalAddressesRequested: RequestedNumber? = nil,
 			emailAddressesRequested: RequestedNumber? = nil,
 			phoneNumbersAddressesRequested: RequestedNumber? = nil
