@@ -417,7 +417,7 @@ extension PersonaDetails.View {
 						Text("Addresses").font(.app.sectionHeader)
 						ForEach(postalAddresses, id: \.self) { postalAddress in
 							ForEach(postalAddress.fields) { field in
-								HPair(label: field.discriminator.rawValue, item: String(describing: field))
+								HPair(label: field.discriminator.rawValue, item: field.valueAsString)
 							}
 						}
 					}
