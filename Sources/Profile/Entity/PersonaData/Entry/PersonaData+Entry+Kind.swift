@@ -9,5 +9,6 @@ extension PersonaData.Entry {
 		case postalAddress
 		case phoneNumber
 		case creditCard
+		case companyName
 	}
 }

@@ -5,6 +5,7 @@ extension P2P.Dapp.Response.WalletInteractionSuccessResponse {
 	public struct PersonaDataRequestResponseItem: Sendable, Hashable, Encodable {
 		public let name: PersonaData.Name?
 		public let dateOfBirth: PersonaData.DateOfBirth?
+		public let companyName: PersonaData.CompanyName?
 		public let emailAddresses: OrderedSet<PersonaData.EmailAddress>?
 		public let postalAddresses: OrderedSet<PersonaData.PostalAddress>?
 		public let phoneNumbers: OrderedSet<PersonaData.PhoneNumber>?
@@ -13,6 +14,7 @@ extension P2P.Dapp.Response.WalletInteractionSuccessResponse {
 		public init(
 			name: PersonaData.Name? = nil,
 			dateOfBirth: PersonaData.DateOfBirth? = nil,
+			companyName: PersonaData.CompanyName? = nil,
 			emailAddresses: OrderedSet<PersonaData.EmailAddress>? = nil,
 			postalAddresses: OrderedSet<PersonaData.PostalAddress>? = nil,
 			phoneNumbers: OrderedSet<PersonaData.PhoneNumber>? = nil,
@@ -20,6 +22,7 @@ extension P2P.Dapp.Response.WalletInteractionSuccessResponse {
 		) {
 			self.name = name
 			self.dateOfBirth = dateOfBirth
+			self.companyName = companyName
 			self.emailAddresses = emailAddresses
 			self.postalAddresses = postalAddresses
 			self.phoneNumbers = phoneNumbers

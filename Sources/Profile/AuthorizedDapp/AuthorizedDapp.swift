@@ -140,36 +140,44 @@ extension Profile.Network.AuthorizedDapp {
 			Hashable,
 			Codable
 		{
+			public typealias SharedCollection = Shared<PersonaDataEntryID>
+
 			public let name: PersonaDataEntryID?
 			public let dateOfBirth: PersonaDataEntryID?
-			public typealias SharedCollection = Shared<PersonaDataEntryID>
+			public let companyName: PersonaDataEntryID?
 
 			public let postalAddresses: SharedCollection?
 			public let emailAddresses: SharedCollection?
 			public let phoneNumbers: SharedCollection?
+			public let creditCards: SharedCollection?
 
 			public var entryIDs: Set<PersonaDataEntryID> {
 				var ids: [PersonaDataEntryID] = [
-					name, dateOfBirth,
+					name, dateOfBirth, companyName,
 				].compactMap { $0 }
 				ids.append(contentsOf: postalAddresses?.ids ?? [])
 				ids.append(contentsOf: emailAddresses?.ids ?? [])
 				ids.append(contentsOf: phoneNumbers?.ids ?? [])
+				ids.append(contentsOf: creditCards?.ids ?? [])
 				return Set(ids)
 			}
 
 			public init(
 				name: PersonaDataEntryID? = nil,
 				dateOfBirth: PersonaDataEntryID? = nil,
+				companyName: PersonaDataEntryID? = nil,
 				postalAddresses: SharedCollection? = nil,
 				emailAddresses: SharedCollection? = nil,
-				phoneNumbers: SharedCollection? = nil
+				phoneNumbers: SharedCollection? = nil,
+				creditCards: SharedCollection? = nil
 			) {
 				self.name = name
 				self.dateOfBirth = dateOfBirth
+				self.companyName = companyName
 				self.postalAddresses = postalAddresses
 				self.emailAddresses = emailAddresses
 				self.phoneNumbers = phoneNumbers
+				self.creditCards = creditCards
 			}
 		}
 

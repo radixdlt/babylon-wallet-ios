@@ -3,7 +3,7 @@ import Foundation
 extension PersonaData.Entry {
 	private enum CodingKeys: String, CodingKey {
 		case discriminator
-		case name, dateOfBirth, postalAddress, emailAddress, phoneNumber, creditCard
+		case name, dateOfBirth, postalAddress, emailAddress, phoneNumber, creditCard, companyName
 	}
 
 	public func encode(to encoder: Encoder) throws {
@@ -22,6 +22,8 @@ extension PersonaData.Entry {
 			try container.encode(value, forKey: .phoneNumber)
 		case let .creditCard(value):
 			try container.encode(value, forKey: .creditCard)
+		case let .companyName(value):
+			try container.encode(value, forKey: .companyName)
 		}
 	}
 
@@ -41,6 +43,8 @@ extension PersonaData.Entry {
 			self = try .phoneNumber(container.decode(PersonaData.PhoneNumber.self, forKey: .phoneNumber))
 		case .creditCard:
 			self = try .creditCard(container.decode(PersonaData.CreditCard.self, forKey: .creditCard))
+		case .companyName:
+			self = try .companyName(container.decode(PersonaData.CompanyName.self, forKey: .companyName))
 		}
 	}
 }

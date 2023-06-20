@@ -10,6 +10,7 @@ extension PersonaData {
 		case postalAddress(PostalAddress)
 		case phoneNumber(PhoneNumber)
 		case creditCard(CreditCard)
+		case companyName(CompanyName)
 	}
 }
 
@@ -22,6 +23,7 @@ extension PersonaData.Entry {
 		case .dateOfBirth: return .dateOfBirth
 		case .postalAddress: return .postalAddress
 		case .creditCard: return .creditCard
+		case .companyName: return .companyName
 		}
 	}
 
@@ -33,6 +35,7 @@ extension PersonaData.Entry {
 		case let .phoneNumber(value): return value.embed()
 		case let .dateOfBirth(value): return value.embed()
 		case let .creditCard(value): return value.embed()
+		case let .companyName(value): return value.embed()
 		}
 	}
 }
