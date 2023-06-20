@@ -4,6 +4,7 @@ import Prelude
 public struct PersonaData: Sendable, Hashable, Codable {
 	public typealias IdentifiedName = IdentifiedEntry<Name>
 	public typealias IdentifiedDateOfBirth = IdentifiedEntry<DateOfBirth>
+	public typealias IdentifiedCompanyName = IdentifiedEntry<CompanyName>
 
 	public typealias IdentifiedEmailAddresses = CollectionOfIdentifiedEntries<EmailAddress>
 	public typealias IdentifiedPostalAddresses = CollectionOfIdentifiedEntries<PostalAddress>
@@ -12,6 +13,7 @@ public struct PersonaData: Sendable, Hashable, Codable {
 
 	public var name: IdentifiedName?
 	public var dateOfBirth: IdentifiedDateOfBirth?
+	public var companyName: IdentifiedCompanyName?
 	public var emailAddresses: IdentifiedEmailAddresses
 	public var postalAddresses: IdentifiedPostalAddresses
 	public var phoneNumbers: IdentifiedPhoneNumbers
@@ -20,6 +22,7 @@ public struct PersonaData: Sendable, Hashable, Codable {
 	public init(
 		name: IdentifiedName? = nil,
 		dateOfBirth: IdentifiedDateOfBirth? = nil,
+		companyName: IdentifiedCompanyName? = nil,
 		emailAddresses: IdentifiedEmailAddresses = .init(),
 		postalAddresses: IdentifiedPostalAddresses = .init(),
 		phoneNumbers: IdentifiedPhoneNumbers = .init(),
@@ -27,6 +30,7 @@ public struct PersonaData: Sendable, Hashable, Codable {
 	) {
 		self.name = name
 		self.dateOfBirth = dateOfBirth
+		self.companyName = companyName
 		self.emailAddresses = emailAddresses
 		self.postalAddresses = postalAddresses
 		self.phoneNumbers = phoneNumbers
@@ -35,10 +39,11 @@ public struct PersonaData: Sendable, Hashable, Codable {
 }
 
 extension PersonaData {
-	public var entries: [IdentifiedEntry<PersonaData.Entry>] {
-		var sequence: [IdentifiedEntry<PersonaData.Entry>?] = []
+	public var entries: [AnyIdentifiedPersonaEntry] {
+		var sequence: [AnyIdentifiedPersonaEntry?] = []
 		sequence.append(name?.embed())
 		sequence.append(dateOfBirth?.embed())
+		sequence.append(companyName?.embed())
 		sequence.append(contentsOf: emailAddresses.map { $0.embed() })
 		sequence.append(contentsOf: postalAddresses.map { $0.embed() })
 		sequence.append(contentsOf: phoneNumbers.map { $0.embed() })

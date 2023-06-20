@@ -10,14 +10,14 @@ extension PersonaData.IdentifiedEntry {
 
 // MARK: - PersonaData.IdentifiedEntry
 extension PersonaData {
-	public struct IdentifiedEntry<Kind>: Sendable, Hashable, Codable, Identifiable where Kind: Sendable & Hashable & Codable & BasePersonaDataEntryProtocol {
+	public struct IdentifiedEntry<Value>: Sendable, Hashable, Codable, Identifiable where Value: Sendable & Hashable & Codable & BasePersonaDataEntryProtocol {
 		public typealias ID = PersonaDataEntryID
 		public let id: ID
-		public var value: Kind
+		public var value: Value
 
 		public init(
 			id: ID? = nil,
-			value: Kind
+			value: Value
 		) {
 			@Dependency(\.uuid) var uuid
 			self.id = id ?? uuid()
