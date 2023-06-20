@@ -8,12 +8,13 @@ public enum PersonaDataEntry: Sendable, Hashable, Codable, BasePersonaFieldValue
 	case emailAddress(EmailAddress)
 	case postalAddress(PostalAddress)
 	case phoneNumber(PhoneNumber)
+	case creditCard(CreditCard)
 }
 
 extension PersonaDataEntry {
 	private enum CodingKeys: String, CodingKey {
 		case discriminator
-		case name, dateOfBirth, postalAddress, emailAddress, phoneNumber
+		case name, dateOfBirth, postalAddress, emailAddress, phoneNumber, creditCard
 	}
 
 	public func encode(to encoder: Encoder) throws {
@@ -30,6 +31,8 @@ extension PersonaDataEntry {
 			try container.encode(value, forKey: .postalAddress)
 		case let .phoneNumber(value):
 			try container.encode(value, forKey: .phoneNumber)
+		case let .creditCard(value):
+			try container.encode(value, forKey: .creditCard)
 		}
 	}
 
@@ -47,6 +50,8 @@ extension PersonaDataEntry {
 			self = try .postalAddress(container.decode(PostalAddress.self, forKey: .postalAddress))
 		case .phoneNumber:
 			self = try .phoneNumber(container.decode(PhoneNumber.self, forKey: .phoneNumber))
+		case .creditCard:
+			self = try .creditCard(container.decode(CreditCard.self, forKey: .creditCard))
 		}
 	}
 }
@@ -59,6 +64,7 @@ extension PersonaDataEntry {
 		case .phoneNumber: return .phoneNumber
 		case .dateOfBirth: return .dateOfBirth
 		case .postalAddress: return .postalAddress
+		case .creditCard: return .creditCard
 		}
 	}
 
@@ -69,6 +75,7 @@ extension PersonaDataEntry {
 		case let .postalAddress(value): return value.embed()
 		case let .phoneNumber(value): return value.embed()
 		case let .dateOfBirth(value): return value.embed()
+		case let .creditCard(value): return value.embed()
 		}
 	}
 }
@@ -85,20 +92,6 @@ struct PersonaFieldCollectionValueWithIDNotFound: Swift.Error {
 }
 
 // MARK: - BasePersonaFieldValueProtocol
-// extension PersonaData {
-//	public var all: OrderedSet<PersonaField> {
-//		.init(uncheckedUniqueElements: [
-//			name?.embed(),
-//		].compactMap { $0 })
-//	}
-// }
-//
-// extension Persona {
-//	public var fields: OrderedSet<PersonaField> {
-//		personaData.all
-//	}
-// }
-
 public protocol BasePersonaFieldValueProtocol {
 	func embed() -> PersonaDataEntry
 }
@@ -124,6 +117,7 @@ public enum PersonaFieldKind: String, Sendable, Hashable, Codable {
 	case dateOfBirth
 	case postalAddress
 	case phoneNumber
+	case creditCard
 }
 
 public typealias PersonaDataEntryID = UUID

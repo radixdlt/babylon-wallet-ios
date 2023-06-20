@@ -8,12 +8,14 @@ public struct PersonaData: Sendable, Hashable, Codable {
 	public typealias EmailAddresses = EntryCollectionOf<PersonaDataEntry.EmailAddress>
 	public typealias PostalAddresses = EntryCollectionOf<PersonaDataEntry.PostalAddress>
 	public typealias PhoneNumbers = EntryCollectionOf<PersonaDataEntry.PhoneNumber>
+	public typealias CreditCards = EntryCollectionOf<PersonaDataEntry.CreditCard>
 
 	public var name: Name?
 	public var dateOfBirth: DateOfBirth?
 	public var emailAddresses: EmailAddresses
 	public var postalAddresses: PostalAddresses
 	public var phoneNumbers: PhoneNumbers
+	public var creditCards: CreditCards
 
 	public var entries: [PersonaDataEntryOfKind<PersonaDataEntry>] {
 		var sequence: [PersonaDataEntryOfKind<PersonaDataEntry>?] = []
@@ -22,6 +24,7 @@ public struct PersonaData: Sendable, Hashable, Codable {
 		sequence.append(contentsOf: emailAddresses.map { $0.embed() })
 		sequence.append(contentsOf: postalAddresses.map { $0.embed() })
 		sequence.append(contentsOf: phoneNumbers.map { $0.embed() })
+		sequence.append(contentsOf: creditCards.map { $0.embed() })
 		return sequence.compactMap { $0 }
 	}
 
@@ -30,13 +33,15 @@ public struct PersonaData: Sendable, Hashable, Codable {
 		dateOfBirth: DateOfBirth? = nil,
 		emailAddresses: EmailAddresses = .init(),
 		postalAddresses: PostalAddresses = .init(),
-		phoneNumbers: PhoneNumbers = .init()
+		phoneNumbers: PhoneNumbers = .init(),
+		creditCards: CreditCards = .init()
 	) {
 		self.name = name
 		self.dateOfBirth = dateOfBirth
 		self.emailAddresses = emailAddresses
 		self.postalAddresses = postalAddresses
 		self.phoneNumbers = phoneNumbers
+		self.creditCards = creditCards
 	}
 }
 
