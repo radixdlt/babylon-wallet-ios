@@ -99,14 +99,15 @@
 "settings_backups" = "Backups";
 "settings_importFromLegacyWallet" = "Import from a Legacy Wallet";
 "settings_ledgerHardwareWallets" = "Ledger Hardware Wallets";
-"settings_multiFactor" = "Multi-Factor Setup";
 "settings_appVersion" = "Version: %@ build #%@";
 "settings_deleteWalletData" = "Delete Wallet Data";
+"settings_inspectProfile" = "Inspect Profile";
 "settings_noProfileText" = "No Wallet Data Found";
 "settings_linkToConnectorHeader_title" = "Link your Wallet to a Desktop Browser";
 "settings_linkToConnectorHeader_subtitle" = "Scan the QR code in the Radix Wallet Connector extension";
 "settings_linkToConnectorHeader_linkToConnector" = "Link to Connector";
-
+"settings_debug_factorSources" = "Factor sources";
+"settings_debug_inspectProfile" = "Inspect profile";
 "linkedConnectors_title" = "Linked Connectors";
 "linkedConnectors_subtitle" = "Connect your Radix Wallet to desktop web browsers by linking to the Radix Connector browser extension. Here are your linked Connectors.";
 "linkedConnectors_lastConnected" = "Last connected %@";
@@ -206,6 +207,9 @@
 "importLegacyWallet_selectAccountsToImport_olympiaAddress" = "Olympia Address";
 "importLegacyWallet_selectAccountsToImport_selectAllNonImported" = "Select all non imported";
 "importLegacyWallet_selectAccountsToImport_unnamed" = "Unnamed";
+"importLegacyWallet_completion_titleNoAccounts" = "No accounts imported.";
+"importLegacyWallet_completion_titleOneAccount" = "Imported 1 account.";
+"importLegacyWallet_completion_titleManyAccounts" = "Imported #%d accounts.";
 "importLegacyWallet_hardwareImport_skipButton" = "Skip remaining accounts";
 "importLegacyWallet_scanQRCode_title" = "Import Legacy Olympia Accounts";
 "importLegacyWallet_accountsToImport_title" = "Import Accounts";
@@ -216,9 +220,6 @@
 "importLegacyWallet_accountsToImport_ledgerAccount" = "Ledger (Legacy)";
 "importLegacyWallet_accountsToImport_newAddress" = "New Address";
 "importLegacyWallet_completion_title" = "Congratulations";
-"importLegacyWallet_completion_titleNoAccounts" = "No accounts imported.";
-"importLegacyWallet_completion_titleOneAccount" = "Imported 1 account.";
-"importLegacyWallet_completion_titleManyAccounts" = "Imported #%d accounts.";
 "importLegacyWallet_completion_subtitle" = "You\'ve imported your accounts.";
 "importLegacyWallet_completion_footer" = "They will live on the Radix Network and you can access them anytime in your Wallet.";
 "importLegacyWallet_hardwareImport_title" = "%d of your Olympia accounts are controlled by Ledger hardware wallets.";
@@ -574,7 +575,6 @@
 "signing_signatureRequest_instructions" = "Review and sign the transaction on the Ledger device to continue.";
 "signing_signatureSuccessful_title" = "Signed";
 "signing_signatureSuccessful_body" = "Signature successful";
-
 "ledgerHardwareDevices_linkConnectorAlert_title" = "Link a Connector";
 "ledgerHardwareDevices_linkConnectorAlert_message" = "To use a Ledger hardware wallet device, it must be connected to a computer running the Radix Connector browser extension.
 
@@ -600,7 +600,7 @@ Install the Connector extension, open it to see the linking QR code, and tap con
 "displayMnemonics_seedPhraseSecurityInfo" = "You are responsible for the security of your Seed Phrase";
 "displayMnemonics_backUpWarning" = "Back up this Seed Phrase";
 "revealSeedPhrase_title" = "Reveal Seed Phrase";
-"revealSeedPhrase_warning" = "For your safety, make sure no one is looking at your screen. Taking a screen shot has been disabled.";
+"revealSeedPhrase_subtitle" = "For your safety, make sure no one is looking at your screen. Taking a screen shot has been disabled.";
 "revealSeedPhrase_wordLabel" = "Word %d";
 "revealSeedPhrase_passphrase" = "Passphrase";
 "revealSeedPhrase_warningDialog_title" = "Use Caution";
