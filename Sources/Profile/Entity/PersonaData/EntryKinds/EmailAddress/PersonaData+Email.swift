@@ -2,7 +2,7 @@ import CasePaths
 import Prelude
 
 extension PersonaData {
-	public struct EmailAddress: Sendable, Hashable, Codable, PersonaDataEntryProtocol {
+	public struct EmailAddress: Sendable, Hashable, Codable, PersonaDataEntryProtocol, CustomStringConvertible {
 		public static var casePath: CasePath<PersonaData.Entry, Self> = /PersonaData.Entry.emailAddress
 		public static var kind = PersonaData.Entry.Kind.emailAddress
 
@@ -27,6 +27,10 @@ extension PersonaData {
 		public init(from decoder: Decoder) throws {
 			let container = try decoder.singleValueContainer()
 			try self.init(validating: container.decode(String.self))
+		}
+
+		public var description: String {
+			email
 		}
 	}
 }

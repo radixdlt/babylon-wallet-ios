@@ -2,7 +2,7 @@ import CasePaths
 import Prelude
 
 extension PersonaData {
-	public struct DateOfBirth: Sendable, Hashable, Codable, PersonaDataEntryProtocol {
+	public struct DateOfBirth: Sendable, Hashable, Codable, PersonaDataEntryProtocol, CustomStringConvertible {
 		public static let casePath: CasePath<PersonaData.Entry, Self> = /PersonaData.Entry.dateOfBirth
 		public static let kind = PersonaData.Entry.Kind.dateOfBirth
 
@@ -50,6 +50,10 @@ extension PersonaData {
 				throw InvalidDateFromString()
 			}
 			self.init(date: date)
+		}
+
+		public var description: String {
+			date.ISO8601Format()
 		}
 	}
 }

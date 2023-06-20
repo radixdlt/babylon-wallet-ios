@@ -697,17 +697,16 @@ extension EntityView {
 				)
 			}
 
-			if let persona = self.entity as? Profile.Network.Persona {
-				Group {
+			Group {
+				if let persona = self.entity as? Profile.Network.Persona {
 					Text("Persona fields")
-//					ForEach(persona.personaData.entries) { entry in
-//						Labeled(entry.id, value: String(describing: entry.value))
-//					}
-//					ForEach(persona.personaData.entries) { entry in
-//
-//					}
-				}.padding(.leading, indentation.inOneLevel.leadingPadding)
+					ForEach(persona.personaData.entries, id: \.self) { entry in
+						Labeled("id:\(entry.id)", value: String(describing: entry.value))
+					}
+				}
 			}
+			.padding(.leading, indentation.inOneLevel.leadingPadding)
+
 			if let account = self.entity as? Profile.Network.Account {
 				Labeled("Account Appearance ID", value: account.appearanceID.description)
 			}

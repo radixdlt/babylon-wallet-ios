@@ -2,7 +2,7 @@ import CasePaths
 import Prelude
 
 extension PersonaData {
-	public struct CreditCard: Sendable, Hashable, Codable, PersonaDataEntryProtocol {
+	public struct CreditCard: Sendable, Hashable, Codable, PersonaDataEntryProtocol, CustomStringConvertible {
 		public static var casePath: CasePath<PersonaData.Entry, Self> = /PersonaData.Entry.creditCard
 		public static var kind = PersonaData.Entry.Kind.creditCard
 
@@ -32,6 +32,15 @@ extension PersonaData {
 			self.holder = holder
 			self.number = number
 			self.cvc = cvc
+		}
+
+		public var description: String {
+			"""
+			holder: \(holder)
+			number: \(number)
+			cvc: \(cvc)
+			expiry: \(expiry.year)/\(expiry.month)
+			"""
 		}
 	}
 }

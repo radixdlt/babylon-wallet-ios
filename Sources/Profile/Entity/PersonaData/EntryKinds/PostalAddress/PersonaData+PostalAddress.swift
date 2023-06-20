@@ -42,6 +42,10 @@ extension PersonaData {
 			var container = encoder.singleValueContainer()
 			try container.encode(fields.elements)
 		}
+
+		public var description: String {
+			fields.map(\.valueAsString).joined(separator: ", ")
+		}
 	}
 }
 

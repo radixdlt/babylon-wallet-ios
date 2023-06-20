@@ -2,7 +2,7 @@ import CasePaths
 import Prelude
 
 extension PersonaData {
-	public struct CompanyName: Sendable, Hashable, Codable, PersonaDataEntryProtocol {
+	public struct CompanyName: Sendable, Hashable, Codable, PersonaDataEntryProtocol, CustomStringConvertible {
 		public static var casePath: CasePath<PersonaData.Entry, Self> = /PersonaData.Entry.companyName
 		public static var kind = PersonaData.Entry.Kind.companyName
 
@@ -22,6 +22,10 @@ extension PersonaData {
 			try self.init(
 				name: container.decode(String.self)
 			)
+		}
+
+		public var description: String {
+			name
 		}
 	}
 }

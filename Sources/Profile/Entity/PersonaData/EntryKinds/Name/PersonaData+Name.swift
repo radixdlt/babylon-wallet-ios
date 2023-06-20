@@ -2,7 +2,7 @@ import CasePaths
 import Prelude
 
 extension PersonaData {
-	public struct Name: Sendable, Hashable, Codable, PersonaDataEntryProtocol {
+	public struct Name: Sendable, Hashable, Codable, PersonaDataEntryProtocol, CustomStringConvertible {
 		public static var casePath: CasePath<PersonaData.Entry, Self> = /PersonaData.Entry.name
 		public static var kind = PersonaData.Entry.Kind.name
 
@@ -30,6 +30,16 @@ extension PersonaData {
 			self.middle = middle
 			self.family = family
 			self.variant = variant
+		}
+
+		public var description: String {
+			let components: [String?] = {
+				switch variant {
+				case .western: return [given, middle, family]
+				case .eastern: return [family, middle, given]
+				}
+			}()
+			return components.compactMap { $0 }.joined(separator: " ")
 		}
 	}
 }

@@ -522,13 +522,7 @@ struct NoSuchField: Error {}
 
 extension PersonaData.Name {
 	public var valueForDapp: String {
-		let components: [String?] = {
-			switch variant {
-			case .western: return [given, middle, family]
-			case .eastern: return [family, middle, given]
-			}
-		}()
-		return components.compactMap { $0 }.joined(separator: " ")
+		description
 	}
 }
 
