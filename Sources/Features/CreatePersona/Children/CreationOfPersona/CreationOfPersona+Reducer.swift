@@ -28,6 +28,10 @@ public struct CreationOfPersona: Sendable, FeatureReducer {
 					.init(value: .init(validating: "satoshi@nakamoto.bitcoin")),
 					.init(value: .init(validating: "be.your@own.bank")),
 				]),
+				phoneNumbers: .init(collection: [
+					.init(value: .init(number: "21000000")),
+					.init(value: .init(number: "123456789")),
+				]),
 				postalAddresses: .init(collection: [
 					.init(value: .init(validating: [
 						.postalCodeNumber(21_000_000),
@@ -44,10 +48,6 @@ public struct CreationOfPersona: Sendable, FeatureReducer {
 						.postcodeString("ST5 1UE"),
 						.country(.unitedKingdom),
 					])),
-				]),
-				phoneNumbers: .init(collection: [
-					.init(value: .init(number: "21000000")),
-					.init(value: .init(number: "123456789")),
 				]),
 				creditCards: .init(collection: [
 					.init(value: .init(
