@@ -656,9 +656,9 @@ extension TransactionReview {
 				.map {
 					Transfer.nonFungible(.init(
 						resourceName: metadata?.name,
+						resourceImage: metadata?.iconURL,
 						tokenID: $0.nonFungibleId.userFacingNonFungibleLocalID,
-						tokenName: nil,
-						thumbnail: $0.keyImageURL
+						tokenName: nil
 					))
 				}
 
@@ -772,9 +772,9 @@ extension TransactionReview {
 	public struct NonFungibleTransfer: Sendable, Hashable {
 		public let id = Transfer.ID()
 		public let resourceName: String?
+		public let resourceImage: URL?
 		public let tokenID: String
 		public let tokenName: String?
-		public let thumbnail: URL?
 	}
 }
 

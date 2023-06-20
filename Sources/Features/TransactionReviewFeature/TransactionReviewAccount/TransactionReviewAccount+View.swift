@@ -104,10 +104,9 @@ extension TransactionReviewTokenView.ViewState {
 extension TransferNFTView.ViewState {
 	init(transfer: TransactionReview.NonFungibleTransfer) {
 		self.init(
-			resourceName: transfer.resourceName,
 			tokenID: transfer.tokenID,
 			tokenName: transfer.tokenName,
-			thumbnail: transfer.thumbnail
+			thumbnail: transfer.resourceImage
 		)
 	}
 }

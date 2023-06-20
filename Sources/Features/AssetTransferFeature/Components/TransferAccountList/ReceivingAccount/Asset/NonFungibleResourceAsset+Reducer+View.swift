@@ -8,6 +8,7 @@ public struct NonFungibleResourceAsset: Sendable, FeatureReducer {
 			resourceAddress.nftGlobalId(nftToken.id)
 		}
 
+		public let resourceImage: URL?
 		public let resourceName: String?
 		public let resourceAddress: ResourceAddress
 		public let nftToken: AccountPortfolio.NonFungibleResource.NonFungibleToken
@@ -29,10 +30,9 @@ extension NonFungibleResourceAsset {
 extension NonFungibleResourceAsset.State {
 	var viewState: NonFungibleResourceAsset.ViewState {
 		.init(
-			resourceName: resourceName,
 			tokenID: nftToken.id.rawValue.userFacingNonFungibleLocalID,
 			tokenName: nftToken.name,
-			thumbnail: nftToken.keyImageURL
+			thumbnail: resourceImage
 		)
 	}
 }
