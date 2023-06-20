@@ -6,9 +6,10 @@ extension P2P.Dapp.Response.WalletInteractionSuccessResponse {
 		public let name: PersonaData.Name?
 		public let dateOfBirth: PersonaData.DateOfBirth?
 		public let companyName: PersonaData.CompanyName?
+
 		public let emailAddresses: OrderedSet<PersonaData.EmailAddress>?
-		public let postalAddresses: OrderedSet<PersonaData.PostalAddress>?
 		public let phoneNumbers: OrderedSet<PersonaData.PhoneNumber>?
+		public let postalAddresses: OrderedSet<PersonaData.PostalAddress>?
 		public let creditCards: OrderedSet<PersonaData.CreditCard>?
 
 		public init(
@@ -16,17 +17,23 @@ extension P2P.Dapp.Response.WalletInteractionSuccessResponse {
 			dateOfBirth: PersonaData.DateOfBirth? = nil,
 			companyName: PersonaData.CompanyName? = nil,
 			emailAddresses: OrderedSet<PersonaData.EmailAddress>? = nil,
-			postalAddresses: OrderedSet<PersonaData.PostalAddress>? = nil,
 			phoneNumbers: OrderedSet<PersonaData.PhoneNumber>? = nil,
+			postalAddresses: OrderedSet<PersonaData.PostalAddress>? = nil,
 			creditCards: OrderedSet<PersonaData.CreditCard>? = nil
 		) {
 			self.name = name
 			self.dateOfBirth = dateOfBirth
 			self.companyName = companyName
 			self.emailAddresses = emailAddresses
-			self.postalAddresses = postalAddresses
 			self.phoneNumbers = phoneNumbers
+			self.postalAddresses = postalAddresses
 			self.creditCards = creditCards
+
+			// The only purpose of this switch is to make sure we get a compilation error when we add a new PersonaData.Entry kind, so
+			// we do not forget to handle it here.
+			switch PersonaData.Entry.Kind.name {
+			case .name, .dateOfBirth, .companyName, .emailAddress, .phoneNumber, .postalAddress, .creditCard: break
+			}
 		}
 	}
 }

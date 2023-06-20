@@ -93,16 +93,50 @@ extension Profile.Network {
 					else {
 						throw AuthorizedDappReferencesFieldIDThatDoesNotExist()
 					}
-					return try PersonaData(
-						name: shared.name == full.name?.id ? persona.personaData.name : nil,
-						dateOfBirth: shared.dateOfBirth == full.dateOfBirth?.id ? persona.personaData.dateOfBirth : nil,
-						postalAddresses: .init(
-							collection: .init(uncheckedUniqueElements: full.postalAddresses.filter { address in
-								guard let sharedPostal = shared.postalAddresses else { return false }
-								return sharedPostal.ids.contains(address.id)
+
+					func pick<T>(
+						from fullKeyPath: KeyPath<PersonaData, PersonaData.IdentifiedEntry<T>?>,
+						using sharedKeyPath: KeyPath<Profile.Network.AuthorizedDapp.AuthorizedPersonaSimple.SharedPersonaData,
+							PersonaDataEntryID?>
+					) -> PersonaData.IdentifiedEntry<T>? {
+						guard
+							let identifiedEntry = full[keyPath: fullKeyPath],
+							shared[keyPath: sharedKeyPath] == identifiedEntry.id
+						else {
+							return nil
+						}
+						return identifiedEntry
+					}
+
+					func filter<T>(
+						from fullKeyPath: KeyPath<PersonaData, PersonaData.CollectionOfIdentifiedEntries<T>>,
+						using sharedKeyPath: KeyPath<Profile.Network.AuthorizedDapp.AuthorizedPersonaSimple.SharedPersonaData, Profile.Network.AuthorizedDapp.AuthorizedPersonaSimple.SharedPersonaData.SharedCollection?>
+					) throws -> PersonaData.CollectionOfIdentifiedEntries<T> {
+						try .init(
+							collection: .init(uncheckedUniqueElements: full[keyPath: fullKeyPath].filter { value in
+								guard let sharedCollection = shared[keyPath: sharedKeyPath] else { return false }
+								return sharedCollection.ids.contains(value.id)
 							})
 						)
+					}
+
+					let personaData = try PersonaData(
+						name: pick(from: \.name, using: \.name),
+						dateOfBirth: pick(from: \.dateOfBirth, using: \.dateOfBirth),
+						companyName: pick(from: \.companyName, using: \.companyName),
+						emailAddresses: filter(from: \.emailAddresses, using: \.emailAddresses),
+						phoneNumbers: filter(from: \.phoneNumbers, using: \.phoneNumbers),
+						postalAddresses: filter(from: \.postalAddresses, using: \.postalAddresses),
+						creditCards: filter(from: \.creditCards, using: \.creditCards)
 					)
+
+					// The only purpose of this switch is to make sure we get a compilation error when we add a new PersonaData.Entry kind, so
+					// we do not forget to handle it here.
+					switch PersonaData.Entry.Kind.name {
+					case .name, .dateOfBirth, .companyName, .emailAddress, .phoneNumber, .postalAddress, .creditCard: break
+					}
+
+					return personaData
 				}(),
 				hasAuthenticationSigningKey: persona.hasAuthenticationSigningKey
 			)

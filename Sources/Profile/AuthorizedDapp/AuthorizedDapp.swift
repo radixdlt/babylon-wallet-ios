@@ -146,19 +146,26 @@ extension Profile.Network.AuthorizedDapp {
 			public let dateOfBirth: PersonaDataEntryID?
 			public let companyName: PersonaDataEntryID?
 
-			public let postalAddresses: SharedCollection?
 			public let emailAddresses: SharedCollection?
 			public let phoneNumbers: SharedCollection?
+			public let postalAddresses: SharedCollection?
 			public let creditCards: SharedCollection?
 
 			public var entryIDs: Set<PersonaDataEntryID> {
 				var ids: [PersonaDataEntryID] = [
 					name, dateOfBirth, companyName,
 				].compactMap { $0 }
-				ids.append(contentsOf: postalAddresses?.ids ?? [])
 				ids.append(contentsOf: emailAddresses?.ids ?? [])
 				ids.append(contentsOf: phoneNumbers?.ids ?? [])
+				ids.append(contentsOf: postalAddresses?.ids ?? [])
 				ids.append(contentsOf: creditCards?.ids ?? [])
+
+				// The only purpose of this switch is to make sure we get a compilation error when we add a new PersonaData.Entry kind, so
+				// we do not forget to handle it here.
+				switch PersonaData.Entry.Kind.name {
+				case .name, .dateOfBirth, .companyName, .emailAddress, .phoneNumber, .postalAddress, .creditCard: break
+				}
+
 				return Set(ids)
 			}
 
@@ -174,10 +181,17 @@ extension Profile.Network.AuthorizedDapp {
 				self.name = name
 				self.dateOfBirth = dateOfBirth
 				self.companyName = companyName
-				self.postalAddresses = postalAddresses
+
 				self.emailAddresses = emailAddresses
 				self.phoneNumbers = phoneNumbers
+				self.postalAddresses = postalAddresses
 				self.creditCards = creditCards
+
+				// The only purpose of this switch is to make sure we get a compilation error when we add a new PersonaData.Entry kind, so
+				// we do not forget to handle it here.
+				switch PersonaData.Entry.Kind.name {
+				case .name, .dateOfBirth, .companyName, .emailAddress, .phoneNumber, .postalAddress, .creditCard: break
+				}
 			}
 		}
 

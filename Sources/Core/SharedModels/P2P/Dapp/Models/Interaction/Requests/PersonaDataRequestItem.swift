@@ -27,6 +27,12 @@ extension P2P.Dapp.Request {
 			self.emailAddressesRequested = emailAddressesRequested
 			self.phoneNumbersAddressesRequested = phoneNumbersAddressesRequested
 			self.creditCardsRequested = creditCardsRequested
+
+			// The only purpose of this switch is to make sure we get a compilation error when we add a new PersonaData.Entry kind, so
+			// we do not forget to handle it here.
+			switch PersonaData.Entry.Kind.name {
+			case .companyName, .creditCard, .name, .emailAddress, .postalAddress, .phoneNumber, .dateOfBirth: break
+			}
 		}
 	}
 }

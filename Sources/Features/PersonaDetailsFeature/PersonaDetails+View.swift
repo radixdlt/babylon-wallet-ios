@@ -344,6 +344,12 @@ extension PersonaDetails.View {
 				self.phoneNumbers = personaData?.phoneNumbers.map(\.value.number)
 				self.postalAddresses = personaData?.postalAddresses.map(\.value)
 				self.creditCards = personaData?.creditCards.map(\.value)
+
+				// The only purpose of this switch is to make sure we get a compilation error when we add a new PersonaData.Entry kind, so
+				// we do not forget to handle it here.
+				switch PersonaData.Entry.Kind.name {
+				case .name, .dateOfBirth, .companyName, .emailAddress, .phoneNumber, .postalAddress, .creditCard: break
+				}
 			}
 		}
 
