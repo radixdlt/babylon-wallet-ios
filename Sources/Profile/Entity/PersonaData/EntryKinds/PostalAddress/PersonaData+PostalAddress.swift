@@ -13,7 +13,7 @@ extension PersonaData {
 			self.fields = fields
 		}
 
-		var country: Country? {
+		public var country: Country? {
 			fields.compactMap(\.country).first
 		}
 
@@ -34,7 +34,7 @@ extension PersonaData {
 		}
 
 		public init(from decoder: Decoder) throws {
-			var container = try decoder.singleValueContainer()
+			let container = try decoder.singleValueContainer()
 			try self.init(validating: container.decode(IdentifiedArrayOf<PersonaData.PostalAddress.Field>.self))
 		}
 

@@ -19,6 +19,7 @@ public struct CreationOfPersona: Sendable, FeatureReducer {
 			self.personaData = try! .init(
 				name: .init(value: .init(
 					given: "Satoshi",
+					middle: "Creator of Bitcoin",
 					family: "Nakamoto", variant: .eastern
 				)),
 				dateOfBirth: .init(value: .init(year: 2009, month: 1, day: 3)),

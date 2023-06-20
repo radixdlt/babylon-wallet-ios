@@ -313,10 +313,15 @@ extension PersonaDetails.View {
 		struct ViewState: Equatable {
 			let dAppInfo: DappInfo?
 			let personaName: String
+			let companyName: String?
 			let firstName: String?
+			let middleName: String?
 			let lastName: String?
+			let dateOfBirth: Date?
 			let emailAddresses: [String]?
 			let phoneNumbers: [String]?
+			let postalAddresses: [PersonaData.PostalAddress]?
+			let creditCards: [PersonaData.CreditCard]?
 
 			struct DappInfo: Equatable {
 				let name: String
@@ -330,10 +335,15 @@ extension PersonaDetails.View {
 			) {
 				self.dAppInfo = dAppInfo
 				self.personaName = personaName
+				self.dateOfBirth = personaData?.dateOfBirth?.value.date
+				self.companyName = personaData?.companyName?.value.name
 				self.firstName = personaData?.name?.value.given
+				self.middleName = personaData?.name?.value.middle
 				self.lastName = personaData?.name?.value.family
 				self.emailAddresses = personaData?.emailAddresses.map(\.value.email)
 				self.phoneNumbers = personaData?.phoneNumbers.map(\.value.number)
+				self.postalAddresses = personaData?.postalAddresses.map(\.value)
+				self.creditCards = personaData?.creditCards.map(\.value)
 			}
 		}
 
@@ -356,23 +366,59 @@ extension PersonaDetails.View {
 						}
 					}
 
-					if let firstName = viewStore.firstName {
-						VPair(heading: L10n.AuthorizedDapps.PersonaDetails.firstName, item: firstName)
-					}
+					Group {
+						if let firstName = viewStore.firstName {
+							VPair(heading: L10n.AuthorizedDapps.PersonaDetails.firstName, item: firstName)
+						}
 
-					if let lastName = viewStore.lastName {
-						VPair(heading: L10n.AuthorizedDapps.PersonaDetails.lastName, item: lastName)
+						if let middleName = viewStore.middleName {
+							// FIXME: YES Localize, but... the WHOLE design of this WHOLE view have to change...
+							VPair(heading: "Middle", item: middleName)
+						}
+
+						if let lastName = viewStore.lastName {
+							VPair(heading: L10n.AuthorizedDapps.PersonaDetails.lastName, item: lastName)
+						}
+
+						if let dateOfBirth = viewStore.dateOfBirth {
+							VPair(heading: "Date of birth", item: dateOfBirth.ISO8601Format())
+						}
+
+						if let companyName = viewStore.companyName {
+							VPair(heading: "Company", item: companyName)
+						}
 					}
 
 					if let emailAddresses = viewStore.emailAddresses {
+						Text("Emails").font(.app.sectionHeader)
 						ForEach(emailAddresses, id: \.self) { emailAddress in
 							VPair(heading: L10n.AuthorizedDapps.PersonaDetails.emailAddress, item: emailAddress)
 						}
 					}
 
 					if let phoneNumbers = viewStore.phoneNumbers {
+						Text("Phone numbers").font(.app.sectionHeader)
 						ForEach(phoneNumbers, id: \.self) { phoneNumber in
 							VPair(heading: L10n.AuthorizedDapps.PersonaDetails.phoneNumber, item: phoneNumber)
+						}
+					}
+
+					if let creditCards = viewStore.creditCards {
+						Text("Credit cards").font(.app.sectionHeader)
+						ForEach(creditCards, id: \.self) { creditCard in
+							VPair(heading: "Card Holder", item: creditCard.holder)
+							VPair(heading: "Card Number", item: creditCard.number)
+							VPair(heading: "Card Expiry", item: "\(creditCard.expiry.year)/\(creditCard.expiry.month)")
+							VPair(heading: "Card CVC", item: creditCard.cvc)
+						}
+					}
+
+					if let postalAddresses = viewStore.postalAddresses {
+						Text("Addresses").font(.app.sectionHeader)
+						ForEach(postalAddresses, id: \.self) { postalAddress in
+							ForEach(postalAddress.fields) { field in
+								HPair(label: field.discriminator.rawValue, item: String(describing: field))
+							}
 						}
 					}
 				}
