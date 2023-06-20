@@ -11,10 +11,56 @@ public struct CreationOfPersona: Sendable, FeatureReducer {
 
 		public init(
 			name: NonEmptyString,
-			personaData: PersonaData = .init()
+			personaData: PersonaData? = nil
 		) {
 			self.name = name
-			self.personaData = personaData
+			#if DEBUG
+			// FIXME: REMOVE THIS TEMPORARY SETTING OF PERSONA DATA!
+			self.personaData = try! .init(
+				name: .init(value: .init(
+					given: "Satoshi",
+					family: "Nakamoto", variant: .eastern
+				)),
+				dateOfBirth: .init(value: .init(year: 2009, month: 1, day: 3)),
+				companyName: .init(value: .init(name: "Bitcoin")),
+				emailAddresses: .init(collection: [
+					.init(value: .init(validating: "satoshi@nakamoto.bitcoin")),
+					.init(value: .init(validating: "be.your@own.bank")),
+				]),
+				postalAddresses: .init(collection: [
+					.init(value: .init(validating: [
+						.postalCodeNumber(21_000_000),
+						.prefecture("SHA256"), .county("Hashtown"),
+						.furtherDivisionsLine0("Sound money street"),
+						.furtherDivisionsLine1(""),
+						.country(.japan),
+					])),
+					.init(value: .init(validating: [
+						.streetLine0("Copthall House"),
+						.streetLine1("King street"),
+						.city("Newcastle-under-Lyme"),
+						.county("Newcastle"),
+						.postcodeString("ST5 1UE"),
+						.country(.unitedKingdom),
+					])),
+				]),
+				phoneNumbers: .init(collection: [
+					.init(value: .init(number: "21000000")),
+					.init(value: .init(number: "123456789")),
+				]),
+				creditCards: .init(collection: [
+					.init(value: .init(
+						expiry: .init(year: 2142, month: 12),
+						holder: "Satoshi Nakamoto",
+						number: "0000 0000 2100 0000",
+						cvc: 512
+					)
+					),
+				])
+			)
+			#else
+			self.personaData = .init()
+			#endif
 			self.derivePublicKeys = .init(
 				derivationPathOption: .nextBasedOnFactorSource(
 					networkOption: .useCurrent,

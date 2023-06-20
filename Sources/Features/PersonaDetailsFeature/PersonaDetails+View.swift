@@ -262,21 +262,20 @@ extension PersonaDetails.View {
 
 private extension PersonaDetails.State {
 	var infoSectionViewState: PersonaDetails.View.InfoSection.ViewState {
-//		switch mode {
-//		case let .dApp(_, persona: persona):
-//			return .init(
-//				dAppInfo: dAppInfo,
-//				personaName: personaName,
-//				fields: persona.sharedFields ?? []
-//			)
-//		case let .general(persona, _):
-//			return .init(
-//				dAppInfo: nil,
-//				personaName: personaName,
-//				fields: persona.fields
-//			)
-//		}
-		fatalError()
+		switch mode {
+		case let .dApp(_, persona: persona):
+			return .init(
+				dAppInfo: dAppInfo,
+				personaName: persona.displayName.rawValue,
+				personaData: nil
+			)
+		case let .general(persona, _):
+			return .init(
+				dAppInfo: nil,
+				personaName: persona.displayName.rawValue,
+				personaData: persona.personaData
+			)
+		}
 	}
 
 	var dAppInfo: PersonaDetails.View.InfoSection.ViewState.DappInfo? {
@@ -316,12 +315,25 @@ extension PersonaDetails.View {
 			let personaName: String
 			let firstName: String?
 			let lastName: String?
-			let emailAddress: String?
-			let phoneNumber: String?
+			let emailAddresses: [String]?
+			let phoneNumbers: [String]?
 
 			struct DappInfo: Equatable {
 				let name: String
 				let isSharingNothing: Bool
+			}
+
+			init(
+				dAppInfo: DappInfo?,
+				personaName: String,
+				personaData: PersonaData?
+			) {
+				self.dAppInfo = dAppInfo
+				self.personaName = personaName
+				self.firstName = personaData?.name?.value.given
+				self.lastName = personaData?.name?.value.family
+				self.emailAddresses = personaData?.emailAddresses.map(\.value.email)
+				self.phoneNumbers = personaData?.phoneNumbers.map(\.value.number)
 			}
 		}
 
@@ -352,12 +364,16 @@ extension PersonaDetails.View {
 						VPair(heading: L10n.AuthorizedDapps.PersonaDetails.lastName, item: lastName)
 					}
 
-					if let emailAddress = viewStore.emailAddress {
-						VPair(heading: L10n.AuthorizedDapps.PersonaDetails.emailAddress, item: emailAddress)
+					if let emailAddresses = viewStore.emailAddresses {
+						ForEach(emailAddresses, id: \.self) { emailAddress in
+							VPair(heading: L10n.AuthorizedDapps.PersonaDetails.emailAddress, item: emailAddress)
+						}
 					}
 
-					if let phoneNumber = viewStore.phoneNumber {
-						VPair(heading: L10n.AuthorizedDapps.PersonaDetails.phoneNumber, item: phoneNumber)
+					if let phoneNumbers = viewStore.phoneNumbers {
+						ForEach(phoneNumbers, id: \.self) { phoneNumber in
+							VPair(heading: L10n.AuthorizedDapps.PersonaDetails.phoneNumber, item: phoneNumber)
+						}
 					}
 				}
 				.padding(.horizontal, .medium1)
