@@ -1,4 +1,4 @@
-import Foundation
+import Prelude
 
 public typealias AnyIdentifiedPersonaEntry = PersonaData.IdentifiedEntry<PersonaData.Entry>
 
