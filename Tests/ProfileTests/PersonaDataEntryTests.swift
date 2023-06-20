@@ -241,6 +241,10 @@ final class PersonaFieldTests: TestCase {
 					"palme@stadsminister.se",
 					"olof@boss.se",
 				],
+				phoneNumbers: [
+					.init(value: .init(number: "+468-1234567")),
+					.init(value: .init(number: "+468-9876543")),
+				],
 				postalAddresses: [
 					[
 						.streetLine0("Västerlånggatan 31"),
@@ -254,10 +258,6 @@ final class PersonaFieldTests: TestCase {
 						.postalCodeNumber(11152), .city("Stockholm"),
 						.country(.sweden),
 					],
-				],
-				phoneNumbers: [
-					.init(value: .init(number: "+468-1234567")),
-					.init(value: .init(number: "+468-9876543")),
 				]
 			)
 		}
@@ -283,6 +283,16 @@ final class PersonaFieldTests: TestCase {
 				[
 					"id": "00000000-0000-0000-0000-000000000003",
 					"value": "olof@boss.se",
+				],
+			],
+			"phoneNumbers": [
+				[
+					"id": "00000000-0000-0000-0000-000000000006",
+					"value": "+468-1234567",
+				],
+				[
+					"id": "00000000-0000-0000-0000-000000000007",
+					"value": "+468-9876543",
 				],
 			],
 			"postalAddresses": [
@@ -335,16 +345,6 @@ final class PersonaFieldTests: TestCase {
 							"value": "sweden",
 						],
 					],
-				],
-			],
-			"phoneNumbers": [
-				[
-					"id": "00000000-0000-0000-0000-000000000006",
-					"value": "+468-1234567",
-				],
-				[
-					"id": "00000000-0000-0000-0000-000000000007",
-					"value": "+468-9876543",
 				],
 			],
 			"creditCards": [],
