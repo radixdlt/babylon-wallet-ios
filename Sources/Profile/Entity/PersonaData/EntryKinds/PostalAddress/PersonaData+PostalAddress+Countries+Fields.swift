@@ -116,6 +116,14 @@ extension PersonaData.PostalAddress.CountryOrRegion {
 				[.countryOrRegion],
 			]
 
+		case .bangladesh:
+			return [
+				[.streetLine0],
+				[.streetLine1],
+				[.city, .postalCodeNumber],
+				[.countryOrRegion],
+			]
+
 		case .barbados:
 			return [
 				[.streetLine0],
@@ -124,11 +132,20 @@ extension PersonaData.PostalAddress.CountryOrRegion {
 				[.countryOrRegion],
 			]
 
-		case .bangladesh:
+		case .belarus:
 			return [
 				[.streetLine0],
 				[.streetLine1],
-				[.city, .postalCodeNumber],
+				[.postalCodeNumber, .city],
+				[.province],
+				[.countryOrRegion],
+			]
+
+		case .belgium:
+			return [
+				[.streetLine0],
+				[.streetLine1],
+				[.postalCodeNumber, .city],
 				[.countryOrRegion],
 			]
 
@@ -141,22 +158,6 @@ extension PersonaData.PostalAddress.CountryOrRegion {
 				[.countryOrRegion],
 			]
 
-		case .belarus:
-			return [
-				[.streetLine0],
-				[.streetLine1],
-				[.postalCodeNumber, .city],
-				[.province],
-				[.countryOrRegion],
-			]
-		case .belgium:
-			return [
-				[.streetLine0],
-				[.streetLine1],
-				[.postalCodeNumber, .city],
-				[.countryOrRegion],
-			]
-
 		case .benin:
 			return [
 				[.streetLine0],
@@ -164,6 +165,7 @@ extension PersonaData.PostalAddress.CountryOrRegion {
 				[.city],
 				[.countryOrRegion],
 			]
+
 		case .bermuda:
 			return [
 				[.streetLine0],
@@ -365,6 +367,14 @@ extension PersonaData.PostalAddress.CountryOrRegion {
 				[.countryOrRegion],
 			]
 
+		case .costaRica:
+			return [
+				[.streetLine0],
+				[.streetLine1],
+				[.postalCodeNumber, .city],
+				[.countryOrRegion],
+			]
+
 		case .coteDIvoire:
 			return [
 				[.streetLine0],
@@ -397,14 +407,6 @@ extension PersonaData.PostalAddress.CountryOrRegion {
 				[.countryOrRegion],
 			]
 
-		case .costaRica:
-			return [
-				[.streetLine0],
-				[.streetLine1],
-				[.postalCodeNumber, .city],
-				[.countryOrRegion],
-			]
-
 		case .cyprus:
 			return [
 				[.streetLine0],
@@ -412,6 +414,7 @@ extension PersonaData.PostalAddress.CountryOrRegion {
 				[.postalCodeNumber, .city],
 				[.countryOrRegion],
 			]
+
 		case .czechRepublic:
 			return [
 				[.streetLine0],
@@ -421,19 +424,19 @@ extension PersonaData.PostalAddress.CountryOrRegion {
 			]
 
 		// MARK: D
-		case .denmark:
-			return [
-				[.streetLine0],
-				[.streetLine1],
-				[.postalCodeNumber, .city],
-				[.countryOrRegion],
-			]
-
 		case .democraticRepublicOfTheCongo:
 			return [
 				[.streetLine0],
 				[.streetLine1],
 				[.city, .postalCodeNumber],
+				[.countryOrRegion],
+			]
+
+		case .denmark:
+			return [
+				[.streetLine0],
+				[.streetLine1],
+				[.postalCodeNumber, .city],
 				[.countryOrRegion],
 			]
 
@@ -583,21 +586,21 @@ extension PersonaData.PostalAddress.CountryOrRegion {
 				[.countryOrRegion],
 			]
 
-		// MARK: G
-		case .gabon:
-			return [
-				[.streetLine0],
-				[.streetLine1],
-				[.postalCodeNumber, .city],
-				[.countryOrRegion],
-			]
-
 		case .frenchPolynesia:
 			return [
 				[.streetLine0],
 				[.streetLine1],
 				[.postalCodeNumber, .city],
 				[.islandName],
+				[.countryOrRegion],
+			]
+
+		// MARK: G
+		case .gabon:
+			return [
+				[.streetLine0],
+				[.streetLine1],
+				[.postalCodeNumber, .city],
 				[.countryOrRegion],
 			]
 
@@ -608,6 +611,7 @@ extension PersonaData.PostalAddress.CountryOrRegion {
 				[.postalCodeNumber, .city],
 				[.countryOrRegion],
 			]
+
 		case .germany:
 			return [
 				[.streetLine0],
@@ -739,12 +743,22 @@ extension PersonaData.PostalAddress.CountryOrRegion {
 				[.postalCodeNumber, .city],
 				[.countryOrRegion],
 			]
+
 		case .india:
 			return [
 				[.streetLine0],
 				[.streetLine1],
 				[.city, .postcodeNumber],
 				[.state],
+				[.countryOrRegion],
+			]
+
+		case .indonesia:
+			return [
+				[.streetLine0],
+				[.streetLine1],
+				[.city],
+				[.province, .postalCodeNumber],
 				[.countryOrRegion],
 			]
 
@@ -771,15 +785,6 @@ extension PersonaData.PostalAddress.CountryOrRegion {
 				[.streetLine1],
 				[.city],
 				[.county, .postcodeNumber],
-				[.countryOrRegion],
-			]
-
-		case .indonesia:
-			return [
-				[.streetLine0],
-				[.streetLine1],
-				[.city],
-				[.province, .postalCodeNumber],
 				[.countryOrRegion],
 			]
 
@@ -937,6 +942,7 @@ extension PersonaData.PostalAddress.CountryOrRegion {
 				[.postalCodeNumber, .city],
 				[.countryOrRegion],
 			]
+
 		case .lithuania:
 			return [
 				[.streetLine0],
@@ -944,6 +950,7 @@ extension PersonaData.PostalAddress.CountryOrRegion {
 				[.postalCodeNumber, .city],
 				[.countryOrRegion],
 			]
+
 		case .luxembourg:
 			return [
 				[.streetLine0],
@@ -1136,14 +1143,6 @@ extension PersonaData.PostalAddress.CountryOrRegion {
 			]
 
 		// MARK: N
-		case .nepal:
-			return [
-				[.streetLine0],
-				[.streetLine1],
-				[.city, .postalCodeNumber],
-				[.countryOrRegion],
-			]
-
 		case .namibia:
 			return [
 				[.streetLine0],
@@ -1157,6 +1156,14 @@ extension PersonaData.PostalAddress.CountryOrRegion {
 				[.streetLine0],
 				[.streetLine1],
 				[.districtString],
+				[.countryOrRegion],
+			]
+
+		case .nepal:
+			return [
+				[.streetLine0],
+				[.streetLine1],
+				[.city, .postalCodeNumber],
 				[.countryOrRegion],
 			]
 
@@ -1301,20 +1308,20 @@ extension PersonaData.PostalAddress.CountryOrRegion {
 				[.countryOrRegion],
 			]
 
-		case .philippines:
-			return [
-				[.streetLine0],
-				[.streetLine1],
-				[.districtString, .postalCodeNumber],
-				[.city, .countryOrRegion],
-			]
-
 		case .peru:
 			return [
 				[.streetLine0],
 				[.streetLine1],
 				[.city, .postalCodeNumber],
 				[.countryOrRegion],
+			]
+
+		case .philippines:
+			return [
+				[.streetLine0],
+				[.streetLine1],
+				[.districtString, .postalCodeNumber],
+				[.city, .countryOrRegion],
 			]
 
 		case .poland:
@@ -1360,6 +1367,14 @@ extension PersonaData.PostalAddress.CountryOrRegion {
 				[.countryOrRegion],
 			]
 
+		case .reunion:
+			return [
+				[.streetLine0],
+				[.streetLine1],
+				[.postalCodeNumber, .city],
+				[.countryOrRegion],
+			]
+
 		case .romania:
 			return [
 				[.streetLine0],
@@ -1376,14 +1391,6 @@ extension PersonaData.PostalAddress.CountryOrRegion {
 				[.subjectOfTheFederation],
 				[.countryOrRegion],
 				[.postalCodeNumber],
-			]
-
-		case .reunion:
-			return [
-				[.streetLine0],
-				[.streetLine1],
-				[.postalCodeNumber, .city],
-				[.countryOrRegion],
 			]
 
 		case .rwanda:
@@ -1470,20 +1477,20 @@ extension PersonaData.PostalAddress.CountryOrRegion {
 				[.countryOrRegion],
 			]
 
-		case .senegal:
-			return [
-				[.streetLine0],
-				[.streetLine1],
-				[.postalCodeNumber, .city],
-				[.countryOrRegion],
-			]
-
 		case .saudiArabia:
 			return [
 				[.streetLine0],
 				[.streetLine1],
 				[.districtString],
 				[.city, .postalCodeNumber],
+				[.countryOrRegion],
+			]
+
+		case .senegal:
+			return [
+				[.streetLine0],
+				[.streetLine1],
+				[.postalCodeNumber, .city],
 				[.countryOrRegion],
 			]
 
@@ -1503,19 +1510,19 @@ extension PersonaData.PostalAddress.CountryOrRegion {
 				[.countryOrRegion],
 			]
 
-		case .singapore:
-			return [
-				[.streetLine0],
-				[.streetLine1],
-				[.city, .postalCodeNumber],
-				[.countryOrRegion],
-			]
-
 		case .sierraLeone:
 			return [
 				[.streetLine0],
 				[.streetLine1],
 				[.city],
+				[.countryOrRegion],
+			]
+
+		case .singapore:
+			return [
+				[.streetLine0],
+				[.streetLine1],
+				[.city, .postalCodeNumber],
 				[.countryOrRegion],
 			]
 
@@ -1534,6 +1541,7 @@ extension PersonaData.PostalAddress.CountryOrRegion {
 				[.postalCodeNumber, .city],
 				[.countryOrRegion],
 			]
+
 		case .slovenia:
 			return [
 				[.streetLine0],
@@ -1569,6 +1577,15 @@ extension PersonaData.PostalAddress.CountryOrRegion {
 				[.countryOrRegion],
 			]
 
+		case .southGeorgiaAndSouthSandwichIslands:
+			return [
+				[.streetLine0],
+				[.streetLine1],
+				[.city],
+				[.postalCodeNumber],
+				[.countryOrRegion],
+			]
+
 		case .southKorea:
 			return [
 				[.countryOrRegion],
@@ -1577,15 +1594,6 @@ extension PersonaData.PostalAddress.CountryOrRegion {
 				[.streetLine0],
 				[.streetLine1],
 				[.postalCodeNumber],
-			]
-
-		case .southGeorgiaAndSouthSandwichIslands:
-			return [
-				[.streetLine0],
-				[.streetLine1],
-				[.city],
-				[.postalCodeNumber],
-				[.countryOrRegion],
 			]
 
 		case .southSudan:
@@ -1614,22 +1622,6 @@ extension PersonaData.PostalAddress.CountryOrRegion {
 				[.countryOrRegion],
 			]
 
-		case .sweden:
-			return [
-				[.streetLine0],
-				[.streetLine1],
-				[.postalCodeNumber, .city],
-				[.countryOrRegion],
-			]
-
-		case .switzerland:
-			return [
-				[.streetLine0],
-				[.streetLine1],
-				[.postalCodeNumber, .city],
-				[.countryOrRegion],
-			]
-
 		case .sudan:
 			return [
 				[.streetLine0],
@@ -1648,6 +1640,22 @@ extension PersonaData.PostalAddress.CountryOrRegion {
 				[.countryOrRegion],
 			]
 
+		case .sweden:
+			return [
+				[.streetLine0],
+				[.streetLine1],
+				[.postalCodeNumber, .city],
+				[.countryOrRegion],
+			]
+
+		case .switzerland:
+			return [
+				[.streetLine0],
+				[.streetLine1],
+				[.postalCodeNumber, .city],
+				[.countryOrRegion],
+			]
+
 		case .syria:
 			return [
 				[.streetLine0],
@@ -1656,6 +1664,7 @@ extension PersonaData.PostalAddress.CountryOrRegion {
 				[.countryOrRegion],
 			]
 
+		// MARK: T
 		case .taiwan:
 			return [
 				[.countryOrRegion],
@@ -1690,20 +1699,20 @@ extension PersonaData.PostalAddress.CountryOrRegion {
 				[.countryOrRegion],
 			]
 
-		case .theGambia:
-			return [
-				[.streetLine0],
-				[.streetLine1],
-				[.city],
-				[.countryOrRegion],
-			]
-
 		case .theBahamas:
 			return [
 				[.streetLine0],
 				[.streetLine1],
 				[.city],
 				[.islandName],
+				[.countryOrRegion],
+			]
+
+		case .theGambia:
+			return [
+				[.streetLine0],
+				[.streetLine1],
+				[.city],
 				[.countryOrRegion],
 			]
 
@@ -1796,6 +1805,7 @@ extension PersonaData.PostalAddress.CountryOrRegion {
 				[.city],
 				[.countryOrRegion],
 			]
+
 		case .ukraine:
 			return [
 				[.streetLine0],
@@ -1803,15 +1813,6 @@ extension PersonaData.PostalAddress.CountryOrRegion {
 				[.city],
 				[.province],
 				[.postalCodeNumber],
-				[.countryOrRegion],
-			]
-
-		case .unitedStates:
-			return [
-				[.streetLine0],
-				[.streetLine1],
-				[.city],
-				[.state, .zipNumber],
 				[.countryOrRegion],
 			]
 
@@ -1831,6 +1832,15 @@ extension PersonaData.PostalAddress.CountryOrRegion {
 				[.city],
 				[.county],
 				[.postcodeString],
+				[.countryOrRegion],
+			]
+
+		case .unitedStates:
+			return [
+				[.streetLine0],
+				[.streetLine1],
+				[.city],
+				[.state, .zipNumber],
 				[.countryOrRegion],
 			]
 
@@ -1868,6 +1878,7 @@ extension PersonaData.PostalAddress.CountryOrRegion {
 				[.postalCodeNumber, .city],
 				[.countryOrRegion],
 			]
+
 		case .venezuela:
 			return [
 				[.streetLine0],
@@ -1876,6 +1887,7 @@ extension PersonaData.PostalAddress.CountryOrRegion {
 				[.state],
 				[.countryOrRegion],
 			]
+
 		case .vietnam:
 			return [
 				[.streetLine0],
@@ -1900,6 +1912,7 @@ extension PersonaData.PostalAddress.CountryOrRegion {
 				[.postalCodeNumber, .city],
 				[.countryOrRegion],
 			]
+
 		case .zimbabwe:
 			return [
 				[.streetLine0],
