@@ -9,16 +9,16 @@ extension AppPreferences {
 		CustomStringConvertible,
 		CustomDumpReflectable
 	{
-		public var structureConfigurations: IdentifiedArrayOf<SecurityStructureConfiguration>
+		public var structureConfigurationReferences: IdentifiedArrayOf<SecurityStructureConfigurationReference>
 		public var isCloudProfileSyncEnabled: Bool
 		public var isDeveloperModeEnabled: Bool
 
 		public init(
-			structureConfigurations: IdentifiedArrayOf<SecurityStructureConfiguration> = [],
+			structureConfigurationReferences: IdentifiedArrayOf<SecurityStructureConfigurationReference> = [],
 			isCloudProfileSyncEnabled: Bool = true,
 			isDeveloperModeEnabled: Bool = true
 		) {
-			self.structureConfigurations = structureConfigurations
+			self.structureConfigurationReferences = structureConfigurationReferences
 			self.isCloudProfileSyncEnabled = isCloudProfileSyncEnabled
 			self.isDeveloperModeEnabled = isDeveloperModeEnabled
 		}
@@ -34,7 +34,7 @@ extension AppPreferences.Security {
 		.init(
 			self,
 			children: [
-				"structureConfigurations": structureConfigurations,
+				"structureConfigurationReferences": structureConfigurationReferences,
 				"isCloudProfileSyncEnabled": isCloudProfileSyncEnabled,
 				"isDeveloperModeEnabled": isDeveloperModeEnabled,
 			],
@@ -44,7 +44,7 @@ extension AppPreferences.Security {
 
 	public var description: String {
 		"""
-		structureConfigurations: \(structureConfigurations),
+		structureConfigurationReferences: \(structureConfigurationReferences),
 		isCloudProfileSyncEnabled: \(isCloudProfileSyncEnabled),
 		isDeveloperModeEnabled: \(isDeveloperModeEnabled)
 		"""

@@ -137,26 +137,59 @@ public struct AbstractSecurityStructureConfiguration<AbstractFactor>:
 	}
 }
 
+// MARK: - ProfileSnapshot.AppliedSecurityStructure
 extension ProfileSnapshot {
-	public typealias SecurityStructureConfiguration = AbstractSecurityStructureConfiguration<FactorSourceID>
-
 	/// A version of `AppliedSecurityStructure` which only contains IDs of factor sources, suitable for storage in Profile Snapshot.
 	public typealias AppliedSecurityStructure = AbstractSecurityStructure<FactorInstance.ID>
 }
 
-public typealias SecurityStructureConfiguration = AbstractSecurityStructureConfiguration<FactorSource>
+public typealias SecurityStructureConfigurationReference = AbstractSecurityStructureConfiguration<FactorSourceID>
 
-extension SecurityStructureConfiguration {
+public typealias SecurityStructureConfigurationDetailed = AbstractSecurityStructureConfiguration<FactorSource>
+
+extension SecurityStructureConfigurationReference {
 	public var isSimple: Bool {
 		configuration.isSimple
 	}
 }
 
-extension SecurityStructureConfiguration.Configuration {
+extension SecurityStructureConfigurationReference.Configuration {
 	public var isSimple: Bool {
 		primaryRole.hasSingleFactorSourceOf(kind: .device) &&
 			recoveryRole.hasSingleFactorSourceOf(kind: .trustedContact) &&
 			confirmationRole.hasSingleFactorSourceOf(kind: .securityQuestions)
+	}
+}
+
+extension SecurityStructureConfigurationDetailed {
+	public func asReference() -> SecurityStructureConfigurationReference {
+		.init(
+			id: id,
+			label: label,
+			configuration: configuration.asReference(),
+			createdOn: createdOn,
+			lastUpdatedOn: lastUpdatedOn
+		)
+	}
+}
+
+extension Profile {
+	func detailedSecurityStructureConfiguration(
+		reference: SecurityStructureConfigurationReference
+	) throws -> SecurityStructureConfigurationDetailed {}
+}
+
+extension SecurityStructureConfigurationDetailed.Configuration {
+	public func asReference() -> SecurityStructureConfigurationReference.Configuration {
+		.init(
+			primaryRole: primaryRole.asReference(),
+			recoveryRole: recoveryRole.asReference(),
+			confirmationRole: confirmationRole.asReference()
+		)
+	}
+
+	public var isSimple: Bool {
+		asReference().isSimple
 	}
 }
 
@@ -166,19 +199,33 @@ extension RoleOfTier {
 	}
 }
 
-extension RoleOfTier where AbstractFactor == FactorSource {
+extension RoleOfTier where AbstractFactor == FactorSourceID {
 	public func hasSingleFactorSourceOf(kind expectedKind: FactorSourceKind) -> Bool {
 		guard isSimple, let singleFactor = thresholdFactors.first else {
 			return false
 		}
 		return singleFactor.kind == expectedKind
 	}
+}
 
-	public mutating func changeFactorSource(to newFactorSource: any FactorSourceProtocol) throws {
+extension RoleOfTier where AbstractFactor == FactorSource {
+	public func asReference() -> RoleOfTier<Role, FactorSourceID> {
+		try! .init(
+			thresholdFactors: .init(validating: thresholdFactors.map(\.id)),
+			threshold: threshold,
+			superAdminFactors: .init(validating: superAdminFactors.map(\.id))
+		)
+	}
+
+	public mutating func changeFactorSource(
+		to newFactorSource: any FactorSourceProtocol
+	) throws {
 		try changeFactorSource(to: newFactorSource.embed())
 	}
 
-	public mutating func changeFactorSource(to newFactorSource: FactorSource) throws {
+	public mutating func changeFactorSource(
+		to newFactorSource: FactorSource
+	) throws {
 		guard isSimple else {
 			throw UnableToChangeFactorSourceOfAdvancedSecurityStructureUsingSingleFactorSourceInput()
 		}
@@ -190,38 +237,6 @@ extension RoleOfTier where AbstractFactor == FactorSource {
 struct UnableToChangeFactorSourceOfAdvancedSecurityStructureUsingSingleFactorSourceInput: Swift.Error {}
 
 public typealias AppliedSecurityStructure = AbstractSecurityStructure<FactorInstance>
-
-// MARK: - TemplateFactorSourceKindPlaceholder
-public struct TemplateFactorSourceKindPlaceholder: Sendable, Hashable, Codable {
-	/// The factor source kind we wanna use for some role.
-	public let factorSourceKind: FactorSourceKind
-
-	/// Only serves as a semi hacky workaround the fact that we use `OrderedSet` (and wanna keep it) in Role structure,
-	/// but with a`SecurityStructureConfigurationTemplate` we wanna be able to express "use two `device` Factor Sources for primaryRole"
-	/// the `placeholderID` make sure two can put two `device` in the same `OrderedSet` wrapped in `TemplateFactorSourceKindPlaceholder`.
-	public let placeholderID: UUID
-
-	public init(
-		_ factorSourceKind: FactorSourceKind,
-		placeholderID: UUID = .init()
-	) {
-		self.placeholderID = placeholderID
-		self.factorSourceKind = factorSourceKind
-	}
-}
-
-public typealias SecurityStructureConfigurationTemplate = AbstractSecurityStructureConfiguration<TemplateFactorSourceKindPlaceholder>
-
-extension SecurityStructureConfigurationTemplate {
-	public static let `default`: Self = .init(
-		label: "Recommended security structure",
-		configuration: .init(
-			primaryRole: .single(.init(.device)),
-			recoveryRole: .single(.init(.trustedContact)),
-			confirmationRole: .single(.init(.securityQuestions))
-		)
-	)
-}
 
 // MARK: - AccessController
 public struct AccessController: Sendable, Hashable, Codable {
