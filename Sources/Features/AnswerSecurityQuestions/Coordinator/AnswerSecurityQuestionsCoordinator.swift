@@ -8,11 +8,11 @@ public struct AnswerSecurityQuestionsCoordinator: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public enum Purpose: Sendable, Hashable {
 			case decrypt(SecurityQuestionsFactorSource)
-			case encrypt(editingAnswersToQuestions: NonEmpty<OrderedSet<AbstractAnswerToSecurityQuestion<NonEmptyString>>>? = nil)
+			case encrypt
 
 			public enum AnswersResult: Sendable, Hashable {
-				case decrypted(Mnemonic, answersToQuestions: NonEmpty<OrderedSet<AbstractAnswerToSecurityQuestion<NonEmptyString>>>)
-				case encrypted(SecurityQuestionsFactorSource, answersToQuestions: NonEmpty<OrderedSet<AbstractAnswerToSecurityQuestion<NonEmptyString>>>)
+				case decrypted(Mnemonic)
+				case encrypted(SecurityQuestionsFactorSource)
 			}
 		}
 
@@ -25,9 +25,9 @@ public struct AnswerSecurityQuestionsCoordinator: Sendable, FeatureReducer {
 		public init(purpose: Purpose) {
 			self.purpose = purpose
 			switch purpose {
-			case let .encrypt(answersToQuestions):
+			case .encrypt:
 				self.questions = []
-				self.root = .chooseQuestions(.init(selectedQuestions: answersToQuestions?.elements.map(\.question)))
+				self.root = .chooseQuestions(.init())
 
 			case let .decrypt(factorSource):
 				let questions = factorSource.sealedMnemonic.securityQuestions
@@ -137,13 +137,6 @@ public struct AnswerSecurityQuestionsCoordinator: Sendable, FeatureReducer {
 		if let nextQuestion = unansweredQuestions.first {
 			state.path.append(.answerQuestion(.init(
 				question: nextQuestion,
-				answer: {
-					switch state.purpose {
-					case .decrypt: return nil
-					case let .encrypt(answers):
-						return answers?.elements.first(where: { $0.question == nextQuestion })?.answer
-					}
-				}(),
 				isLast: unansweredQuestions.count == 1
 			)))
 
@@ -156,12 +149,6 @@ public struct AnswerSecurityQuestionsCoordinator: Sendable, FeatureReducer {
 			)!
 			precondition(answers.count == state.questions.count)
 
-			let rawAnswersArray = ([state.root] + state.path).compactMap(\.rawAnswerToQuestion)
-			precondition(rawAnswersArray.count == answers.count)
-			let rawAnswers = NonEmpty<OrderedSet<AbstractAnswerToSecurityQuestion<NonEmptyString>>>(
-				rawValue: .init(uncheckedUniqueElements: rawAnswersArray)
-			)!
-
 			return .task { [purpose = state.purpose] in
 				let taskResult = await TaskResult {
 					switch purpose {
@@ -170,7 +157,7 @@ public struct AnswerSecurityQuestionsCoordinator: Sendable, FeatureReducer {
 
 						let mnemonic = try factorSource.decrypt(answersToQuestions: answers)
 
-						return State.Purpose.AnswersResult.decrypted(mnemonic, answersToQuestions: rawAnswers)
+						return State.Purpose.AnswersResult.decrypted(mnemonic)
 
 					case .encrypt:
 						let mnemonic = try mnemonicClient.generate(.twentyFour, .english)
@@ -181,7 +168,7 @@ public struct AnswerSecurityQuestionsCoordinator: Sendable, FeatureReducer {
 							answersToQuestions: answers
 						)
 
-						return State.Purpose.AnswersResult.encrypted(factorSource, answersToQuestions: rawAnswers)
+						return State.Purpose.AnswersResult.encrypted(factorSource)
 					}
 				}
 				return .delegate(.done(taskResult))

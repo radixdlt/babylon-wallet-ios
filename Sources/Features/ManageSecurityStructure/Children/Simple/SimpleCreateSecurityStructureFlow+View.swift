@@ -50,7 +50,7 @@ extension SimpleManageSecurityStructureFlow {
 				self.lostPhoneHelper = try! existing.configuration.recoveryRole.thresholdFactors[0].extract(as: TrustedContactFactorSource.self)
 				self.mode = .existing
 			case let .new(new):
-				self.confirmerOfNewPhone = new.confirmerOfNewPhone?.factorSource
+				self.confirmerOfNewPhone = new.confirmerOfNewPhone
 				self.lostPhoneHelper = new.lostPhoneHelper
 				self.mode = .new
 			}

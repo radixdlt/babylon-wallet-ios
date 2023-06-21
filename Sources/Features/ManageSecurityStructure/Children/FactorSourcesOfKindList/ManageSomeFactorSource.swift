@@ -3,9 +3,7 @@ import FeaturePrelude
 import ManageTrustedContactFactorSourceFeature
 
 // MARK: - ManageSomeFactorSource
-public struct ManageSomeFactorSource<FactorSourceOfKind: FactorSourceProtocol, Extra: Sendable & Hashable>: Sendable, FeatureReducer {
-	public typealias Factor = SavedOrDraftFactorSource<FactorSourceOfKind, Extra>
-
+public struct ManageSomeFactorSource<FactorSourceOfKind: FactorSourceProtocol>: Sendable, FeatureReducer {
 	public enum State: Sendable, Hashable {
 		case manageSecurityQuestions(AnswerSecurityQuestionsCoordinator.State)
 		case manageTrustedContact(ManageTrustedContactFactorSource.State)
@@ -13,7 +11,7 @@ public struct ManageSomeFactorSource<FactorSourceOfKind: FactorSourceProtocol, E
 			switch FactorSourceOfKind.kind {
 			case .device, .ledgerHQHardwareWallet, .offDeviceMnemonic: fatalError("Unsupported")
 			case .securityQuestions:
-				self = .manageSecurityQuestions(.init(purpose: .encrypt()))
+				self = .manageSecurityQuestions(.init(purpose: .encrypt))
 			case .trustedContact:
 				self = .manageTrustedContact(.init(mode: .new))
 			}
@@ -30,7 +28,7 @@ public struct ManageSomeFactorSource<FactorSourceOfKind: FactorSourceProtocol, E
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
-		case done(TaskResult<Factor>)
+		case done(TaskResult<FactorSourceOfKind>)
 	}
 
 	public init() {}

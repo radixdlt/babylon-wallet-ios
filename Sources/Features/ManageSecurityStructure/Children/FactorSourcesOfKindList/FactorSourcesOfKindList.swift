@@ -2,42 +2,9 @@ import FactorSourcesClient
 import FeaturePrelude
 import Profile
 
-// MARK: - SavedOrDraftFactorSource
-public enum SavedOrDraftFactorSource<Factor: FactorSourceProtocol, Extra: Sendable & Hashable>: Sendable, Hashable, Identifiable {
-	public typealias ID = FactorSourceID
-	public var id: ID {
-		factorSource.id
-	}
-
-	public var factorSource: FactorSource {
-		switch self {
-		case let .draft(factor, _): return factor.embed()
-		case let .saved(factor): return factor.embed()
-		}
-	}
-
-	public var factor: Factor {
-		switch self {
-		case let .draft(factor, _): return factor
-		case let .saved(factor): return factor
-		}
-	}
-
-	case draft(Factor, Extra)
-	case saved(Factor)
-}
-
-extension SavedOrDraftFactorSource where Extra == EquatableVoid {
-	public static func draft(_ factor: Factor) -> Self {
-		Self.draft(factor, Extra())
-	}
-}
-
 // MARK: - FactorSourcesOfKindList
-public struct FactorSourcesOfKindList<FactorSourceOfKind, Extra: Sendable & Hashable>: Sendable, FeatureReducer where FactorSourceOfKind: FactorSourceProtocol {
+public struct FactorSourcesOfKindList<FactorSourceOfKind: Sendable & Hashable>: Sendable, FeatureReducer where FactorSourceOfKind: FactorSourceProtocol {
 	// MARK: - State
-
-	public typealias Factor = SavedOrDraftFactorSource<FactorSourceOfKind, Extra>
 
 	public struct State: Sendable, Hashable {
 		public enum Mode {
@@ -47,18 +14,18 @@ public struct FactorSourcesOfKindList<FactorSourceOfKind, Extra: Sendable & Hash
 
 		public let mode: Mode
 
-		public var factorSources: IdentifiedArrayOf<Factor>
+		public var factorSources: IdentifiedArrayOf<FactorSourceOfKind>
 
-		public var selectedFactorSourceID: FactorSourceID? = nil
+		public var selectedFactorSourceID: FactorSourceOfKind.ID? = nil
 
-		let selectedFactorSourceControlRequirements: Factor? = nil
+		let selectedFactorSourceControlRequirements: FactorSourceOfKind? = nil
 
 		@PresentationState
 		public var destination: Destinations.State? = nil
 
 		public init(
 			mode: Mode,
-			factorSources: IdentifiedArrayOf<Factor>?
+			factorSources: IdentifiedArrayOf<FactorSourceOfKind>?
 		) {
 			self.mode = mode
 			if let factorSources {
@@ -70,7 +37,7 @@ public struct FactorSourcesOfKindList<FactorSourceOfKind, Extra: Sendable & Hash
 
 		public init(
 			mode: Mode,
-			factorSource: Factor
+			factorSource: FactorSourceOfKind
 		) {
 			self.init(mode: mode, factorSources: [factorSource])
 		}
@@ -80,14 +47,14 @@ public struct FactorSourcesOfKindList<FactorSourceOfKind, Extra: Sendable & Hash
 
 	public enum ViewAction: Sendable, Equatable {
 		case onFirstTask
-		case selectedFactorSource(id: FactorSourceID?)
+		case selectedFactorSource(id: FactorSourceOfKind.ID?)
 		case addNewFactorSourceButtonTapped
-		case confirmedFactorSource(Factor)
+		case confirmedFactorSource(FactorSourceOfKind)
 		case whatIsAFactorSourceButtonTapped
 	}
 
 	public enum InternalAction: Sendable, Equatable {
-		case loadedFactorSources(TaskResult<IdentifiedArrayOf<Factor>>)
+		case loadedFactorSources(TaskResult<IdentifiedArrayOf<FactorSourceOfKind>>)
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -95,25 +62,25 @@ public struct FactorSourcesOfKindList<FactorSourceOfKind, Extra: Sendable & Hash
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
-		case choseFactorSource(Factor)
+		case choseFactorSource(FactorSourceOfKind)
 	}
 
 	// MARK: - Destination
 
 	public struct Destinations: Sendable, ReducerProtocol {
 		public enum State: Sendable, Hashable {
-			case addNewFactorSource(ManageSomeFactorSource<FactorSourceOfKind, Extra>.State)
+			case addNewFactorSource(ManageSomeFactorSource<FactorSourceOfKind>.State)
 		}
 
 		public enum Action: Sendable, Equatable {
-			case addNewFactorSource(ManageSomeFactorSource<FactorSourceOfKind, Extra>.Action)
+			case addNewFactorSource(ManageSomeFactorSource<FactorSourceOfKind>.Action)
 		}
 
 		public init() {}
 
 		public var body: some ReducerProtocolOf<Self> {
 			Scope(state: /State.addNewFactorSource, action: /Action.addNewFactorSource) {
-				ManageSomeFactorSource<FactorSourceOfKind, Extra>()
+				ManageSomeFactorSource<FactorSourceOfKind>()
 			}
 		}
 	}
@@ -169,9 +136,9 @@ public struct FactorSourcesOfKindList<FactorSourceOfKind, Extra: Sendable & Hash
 		switch childAction {
 		case let .destination(.presented(.addNewFactorSource(.delegate(newFactorSourceAction)))):
 			switch newFactorSourceAction {
-			case let .done(.success(savedOrDraftFactorSource)):
+			case let .done(.success(factorSource)):
 				state.destination = nil
-				state.selectedFactorSourceID = savedOrDraftFactorSource.id
+				state.selectedFactorSourceID = factorSource.id
 				return updateFactorSourcesEffect(state: &state)
 			case let .done(.failure(error)):
 				state.destination = nil
@@ -186,8 +153,7 @@ public struct FactorSourcesOfKindList<FactorSourceOfKind, Extra: Sendable & Hash
 	private func updateFactorSourcesEffect(state: inout State) -> EffectTask<Action> {
 		.task {
 			let result = await TaskResult {
-				let factorSources = try await factorSourcesClient.getFactorSources(type: FactorSourceOfKind.self)
-				return IdentifiedArray(uniqueElements: factorSources.map(Factor.saved))
+				try await factorSourcesClient.getFactorSources(type: FactorSourceOfKind.self)
 			}
 			return .internal(.loadedFactorSources(result))
 		}

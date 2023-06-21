@@ -34,17 +34,10 @@ public struct ChooseQuestions: Sendable, FeatureReducer {
 		public var selectedQuestions: [SecurityQuestion]?
 
 		public init(
-			availableQuestions: NonEmpty<OrderedSet<SecurityQuestion>> = SecurityQuestionsFactorSource.defaultQuestions,
-			selectedQuestions: [SecurityQuestion]? = nil
+			availableQuestions: NonEmpty<OrderedSet<SecurityQuestion>> = SecurityQuestionsFactorSource.defaultQuestions
 		) {
 			self.availableQuestions = availableQuestions
-			if let selectedQuestions {
-				self.selectedQuestions = selectedQuestions.filter { selected in
-					availableQuestions.elements.contains(selected)
-				}
-			} else {
-				self.selectedQuestions = nil
-			}
+			self.selectedQuestions = nil
 		}
 	}
 

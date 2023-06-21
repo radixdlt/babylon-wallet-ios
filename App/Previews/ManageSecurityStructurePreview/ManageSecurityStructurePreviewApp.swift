@@ -5,7 +5,8 @@ import ManageSecurityStructureFeature
 // MARK: - ManageSecurityStructureCoordinator.State + EmptyInitializable
 extension ManageSecurityStructureCoordinator.State: EmptyInitializable {
 	public init() {
-		self.init(mode: .existing(existingStructure))
+//		self.init(mode: .existing(existingStructure))
+		self.init(mode: .new)
 	}
 }
 
@@ -88,6 +89,7 @@ let instabridge = """
 						},
 						"common":
 						{
+							"flags": [],
 							"addedOn": "2023-06-12T13:39:09Z",
 							"cryptoParameters":
 							{
@@ -160,6 +162,7 @@ let instabridge = """
 						},
 						"common":
 						{
+							"flags": [],
 							"addedOn": "2023-06-12T13:39:09Z",
 							"cryptoParameters":
 							{
@@ -204,6 +207,7 @@ let instabridge = """
 						},
 						"common":
 						{
+							"flags": [],
 							"addedOn": "2023-06-12T13:39:09Z",
 							"cryptoParameters":
 							{

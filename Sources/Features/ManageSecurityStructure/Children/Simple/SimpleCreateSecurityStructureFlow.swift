@@ -10,14 +10,8 @@ public struct SimpleUnnamedSecurityStructureConfig: Sendable, Hashable {
 	let singleConfirmationFactor: SecurityQuestionsFactorSource
 }
 
-// MARK: - ConfirmerOfNewPhone
-public struct ConfirmerOfNewPhone: Sendable, Hashable {
-	public let factorSource: SecurityQuestionsFactorSource
-	public let answersToQuestions: NonEmpty<OrderedSet<AbstractAnswerToSecurityQuestion<NonEmptyString>>>?
-}
-
-public typealias ListConfirmerOfPhone = FactorSourcesOfKindList<SecurityQuestionsFactorSource, NonEmpty<OrderedSet<AbstractAnswerToSecurityQuestion<NonEmptyString>>>>
-public typealias ListLostPhoneHelper = FactorSourcesOfKindList<TrustedContactFactorSource, EquatableVoid>
+public typealias ListConfirmerOfPhone = FactorSourcesOfKindList<SecurityQuestionsFactorSource>
+public typealias ListLostPhoneHelper = FactorSourcesOfKindList<TrustedContactFactorSource>
 
 // MARK: - SimpleManageSecurityStructureFlow
 public struct SimpleManageSecurityStructureFlow: Sendable, FeatureReducer {
@@ -28,11 +22,11 @@ public struct SimpleManageSecurityStructureFlow: Sendable, FeatureReducer {
 
 			public struct New: Sendable, Hashable {
 				public var lostPhoneHelper: TrustedContactFactorSource?
-				public var confirmerOfNewPhone: ConfirmerOfNewPhone?
+				public var confirmerOfNewPhone: SecurityQuestionsFactorSource?
 
 				public init(
 					lostPhoneHelper: TrustedContactFactorSource? = nil,
-					confirmerOfNewPhone: ConfirmerOfNewPhone? = nil
+					confirmerOfNewPhone: SecurityQuestionsFactorSource? = nil
 				) {
 					self.lostPhoneHelper = lostPhoneHelper
 					self.confirmerOfNewPhone = confirmerOfNewPhone
@@ -118,21 +112,16 @@ public struct SimpleManageSecurityStructureFlow: Sendable, FeatureReducer {
 	}
 
 	private func choseConfirmerOfPhone(
-		_ factor: ListConfirmerOfPhone.Factor,
+		_ factorSource: SecurityQuestionsFactorSource,
 		_ state: inout State
 	) -> EffectTask<Action> {
 		switch state.mode {
 		case var .new(new):
-			switch factor {
-			case let .draft(_, answersToQuestions):
-				new.confirmerOfNewPhone = .init(factorSource: factor.factor, answersToQuestions: answersToQuestions)
-			case .saved:
-				new.confirmerOfNewPhone = .init(factorSource: factor.factor, answersToQuestions: nil)
-			}
+			new.confirmerOfNewPhone = factorSource
 			state.mode = .new(new)
 		case var .existing(existing):
 			// FIXME: Error handling
-			try! existing.configuration.confirmationRole.changeFactorSource(to: factor.factorSource)
+			try! existing.configuration.confirmationRole.changeFactorSource(to: factorSource)
 			state.mode = .existing(existing)
 		}
 		state.modalDestinations = nil
@@ -154,8 +143,8 @@ public struct SimpleManageSecurityStructureFlow: Sendable, FeatureReducer {
 			state.modalDestinations = nil
 			return .none
 
-		case let .modalDestinations(.presented(.firstConfirmerOfPhone(.delegate(.done(.success(.encrypted(factorSource, answersToQuestions))))))):
-			return choseConfirmerOfPhone(.draft(factorSource, answersToQuestions), &state)
+		case let .modalDestinations(.presented(.firstConfirmerOfPhone(.delegate(.done(.success(.encrypted(factorSource))))))):
+			return choseConfirmerOfPhone(factorSource, &state)
 
 		case .modalDestinations(.presented(.firstConfirmerOfPhone(.delegate(.done(.success(.decrypted)))))):
 			state.modalDestinations = nil
@@ -184,18 +173,12 @@ public struct SimpleManageSecurityStructureFlow: Sendable, FeatureReducer {
 				precondition(structure.isSimple)
 				state.modalDestinations = .listConfirmerOfPhone(.init(
 					mode: .selection,
-					factorSource: .saved(structure.securityQuestionsFactorSource)
+					factorSource: structure.securityQuestionsFactorSource
 				))
-			case let .new(new):
-				if let confirmerOfNewPhone = new.confirmerOfNewPhone {
-					state.modalDestinations = .firstConfirmerOfPhone(.init(
-						purpose: .encrypt(editingAnswersToQuestions: confirmerOfNewPhone.answersToQuestions)
-					))
-				} else {
-					state.modalDestinations = .firstConfirmerOfPhone(.init(
-						purpose: .encrypt()
-					))
-				}
+			case .new:
+				state.modalDestinations = .firstConfirmerOfPhone(.init(
+					purpose: .encrypt
+				))
 			}
 			return .none
 
@@ -223,7 +206,7 @@ public struct SimpleManageSecurityStructureFlow: Sendable, FeatureReducer {
 			switch state.mode {
 			case let .new(new):
 				precondition(new.lostPhoneHelper == simpleFactorConfig.singleRecoveryFactor)
-				precondition(new.confirmerOfNewPhone?.factorSource == simpleFactorConfig.singleConfirmationFactor)
+				precondition(new.confirmerOfNewPhone == simpleFactorConfig.singleConfirmationFactor)
 
 				return .task {
 					let taskResult = await TaskResult {

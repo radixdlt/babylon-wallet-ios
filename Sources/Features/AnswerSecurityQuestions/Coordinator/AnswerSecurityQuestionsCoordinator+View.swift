@@ -79,6 +79,6 @@ struct AnswerSecurityQuestionsCoordinator_Preview: PreviewProvider {
 }
 
 extension AnswerSecurityQuestionsCoordinator.State {
-	public static let previewValue = Self(purpose: .encrypt())
+	public static let previewValue = Self(purpose: .encrypt)
 }
 #endif
