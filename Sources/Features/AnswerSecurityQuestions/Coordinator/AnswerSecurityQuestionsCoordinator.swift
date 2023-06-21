@@ -150,25 +150,27 @@ public struct AnswerSecurityQuestionsCoordinator: Sendable, FeatureReducer {
 			precondition(answers.count == state.questions.count)
 
 			return .task { [purpose = state.purpose] in
-				let taskResult = await TaskResult {
+				let taskResult = await TaskResult { () -> State.Purpose.AnswersResult in
 					switch purpose {
 					case let .decrypt(factorSource):
 						precondition(factorSource.sealedMnemonic.securityQuestions.elements == answers.elements.map(\.question))
 
 						let mnemonic = try factorSource.decrypt(answersToQuestions: answers)
 
-						return State.Purpose.AnswersResult.decrypted(mnemonic)
+						return .decrypted(mnemonic)
 
 					case .encrypt:
 						let mnemonic = try mnemonicClient.generate(.twentyFour, .english)
 						loggerGlobal.debug("mnemonic: \(mnemonic.phrase)")
 
-						let factorSource = try SecurityQuestionsFactorSource.from(
+						let securityQuestionsFactorSource = try SecurityQuestionsFactorSource.from(
 							mnemonic: mnemonic,
 							answersToQuestions: answers
 						)
 
-						return State.Purpose.AnswersResult.encrypted(factorSource)
+						try await factorSourcesClient.saveFactorSource(securityQuestionsFactorSource.embed())
+
+						return .encrypted(securityQuestionsFactorSource)
 					}
 				}
 				return .delegate(.done(taskResult))
