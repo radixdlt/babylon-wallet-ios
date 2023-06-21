@@ -18,7 +18,7 @@ import Prelude
 public typealias NetworkID = Tagged<(network: (), id: ()), UInt8>
 
 extension NetworkID {
-	public static let `default` = kisharnet
+	public static let `default` = enkinet
 }
 
 extension NetworkID {
