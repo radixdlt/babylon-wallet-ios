@@ -42,7 +42,7 @@ public struct CreationOfPersona: Sendable, FeatureReducer {
 						.prefecture("SHA256"), .county("Hashtown"),
 						.furtherDivisionsLine0("Sound money street"),
 						.furtherDivisionsLine1(""),
-						.country(.japan),
+						.countryOrRegion(.japan),
 					])),
 					.init(value: .init(validating: [
 						.streetLine0("Copthall House"),
@@ -50,7 +50,7 @@ public struct CreationOfPersona: Sendable, FeatureReducer {
 						.city("Newcastle-under-Lyme"),
 						.county("Newcastle"),
 						.postcodeString("ST5 1UE"),
-						.country(.unitedKingdom),
+						.countryOrRegion(.unitedKingdom),
 					])),
 				]),
 				creditCards: .init(collection: [

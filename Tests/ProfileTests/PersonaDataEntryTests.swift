@@ -156,7 +156,7 @@ final class PersonaFieldTests: TestCase {
 					.streetLine0("Västerlånggatan 31"),
 					.streetLine1(""),
 					.postalCodeNumber(11129), .city("Stockholm"),
-					.country(.sweden),
+					.countryOrRegion(.sweden),
 				]]
 			)
 
@@ -165,7 +165,7 @@ final class PersonaFieldTests: TestCase {
 				.streetLine0("Västerlånggatan 31"),
 				.streetLine1(""),
 				.postalCodeNumber(11129), .city("Stockholm"),
-				.country(.sweden),
+				.countryOrRegion(.sweden),
 			])
 		}
 	}
@@ -180,19 +180,19 @@ final class PersonaFieldTests: TestCase {
 						.streetLine0("Östantorp Vinö 52"),
 						.streetLine1(),
 						.postalCodeNumber(36030), .city("Lammhult"),
-						.country(.sweden),
+						.countryOrRegion(.sweden),
 					],
 					[
 						.streetLine0("Föreningsgatan 41"),
 						.streetLine1(),
 						.postalCodeNumber(86033), .city("Bergeforsen"),
-						.country(.sweden),
+						.countryOrRegion(.sweden),
 					],
 					[
 						.streetLine0("93 rue de la Mare aux Carats"),
 						.streetLine1(),
 						.postalCodeNumber(34080), .city("Montpellier"),
-						.country(.france),
+						.countryOrRegion(.france),
 					],
 					[
 						.streetLine0("34 St Thomas's Rd"),
@@ -200,21 +200,21 @@ final class PersonaFieldTests: TestCase {
 						.city("Gosport"),
 						.county("Hampshire"),
 						.postcodeString("PO12 4JX"),
-						.country(.unitedKingdom),
+						.countryOrRegion(.unitedKingdom),
 					],
 				]
 			)
 		}
 
 		let addresses = try dappRequest(values: \.postalAddresses, from: personaData)
-		XCTAssertEqual(addresses.compactMap(\.value.country), [.sweden, .sweden, .france, .unitedKingdom])
+		XCTAssertEqual(addresses.compactMap(\.value.countryOrRegion), [.sweden, .sweden, .france, .unitedKingdom])
 	}
 
 	func test_invalid_postalAddress_japan() throws {
 		XCTAssertThrowsError(
 			try PersonaData.PostalAddress(
 				validating: [
-					.country(.japan),
+					.countryOrRegion(.japan),
 					.streetLine0("Should not use 'streetLine'"),
 					.streetLine1("Should not use 'streetLine'"),
 					.postalCodeNumber(123),
@@ -254,7 +254,7 @@ final class PersonaFieldTests: TestCase {
 						.prefecture("SHA256"), .county("Hashtown"),
 						.furtherDivisionsLine0("Sound money street"),
 						.furtherDivisionsLine1(""),
-						.country(.japan),
+						.countryOrRegion(.japan),
 					])),
 					.init(value: .init(validating: [
 						.streetLine0("Copthall House"),
@@ -262,7 +262,7 @@ final class PersonaFieldTests: TestCase {
 						.city("Newcastle-under-Lyme"),
 						.county("Newcastle"),
 						.postcodeString("ST5 1UE"),
-						.country(.unitedKingdom),
+						.countryOrRegion(.unitedKingdom),
 					])),
 				]),
 				creditCards: .init(collection: [
@@ -353,7 +353,7 @@ final class PersonaFieldTests: TestCase {
 							"value": "",
 						],
 						[
-							"discriminator": "country",
+							"discriminator": "countryOrRegion",
 							"value": "japan",
 						],
 					],
@@ -382,7 +382,7 @@ final class PersonaFieldTests: TestCase {
 							"value": "ST5 1UE",
 						],
 						[
-							"discriminator": "country",
+							"discriminator": "countryOrRegion",
 							"value": "unitedKingdom",
 						],
 					],

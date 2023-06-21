@@ -325,7 +325,7 @@ final class ProfileTests: TestCase {
 							.streetLine1(""),
 							.postalCodeNumber(12345),
 							.city("Stockholm"),
-							.country(.sweden),
+							.countryOrRegion(.sweden),
 						])
 					),
 					.init(
@@ -335,7 +335,7 @@ final class ProfileTests: TestCase {
 							.streetLine1(""),
 							.postalCodeNumber(54321),
 							.city("Karlstad"),
-							.country(.sweden),
+							.countryOrRegion(.sweden),
 						])
 					),
 				])
@@ -602,7 +602,7 @@ final class ProfileTests: TestCase {
 		])
 
 		let sharedPostalAddresses = try network.detailsForAuthorizedDapp(network.authorizedDapps[0]).detailedAuthorizedPersonas[0].sharedPersonaData.postalAddresses
-		XCTAssertEqual(sharedPostalAddresses[0].value.country, .sweden)
+		XCTAssertEqual(sharedPostalAddresses[0].value.countryOrRegion, .sweden)
 
 		XCTAssertEqual(network.authorizedDapps[0].referencesToAuthorizedPersonas[0].sharedAccounts?.request.quantifier, .exactly)
 		XCTAssertEqual(network.authorizedDapps[0].referencesToAuthorizedPersonas[0].sharedAccounts?.request.quantity, 2)

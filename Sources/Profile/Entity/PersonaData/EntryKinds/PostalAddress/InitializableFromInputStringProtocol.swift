@@ -20,8 +20,8 @@ extension Int: InitializableFromInputString {
 	}
 }
 
-// MARK: - PersonaData.PostalAddress.Country + InitializableFromInputString
-extension PersonaData.PostalAddress.Country: InitializableFromInputString {
+// MARK: - PersonaData.PostalAddress.CountryOrRegion + InitializableFromInputString
+extension PersonaData.PostalAddress.CountryOrRegion: InitializableFromInputString {
 	public init?(_ input: String) {
 		guard let country = Self(rawValue: input) else {
 			return nil

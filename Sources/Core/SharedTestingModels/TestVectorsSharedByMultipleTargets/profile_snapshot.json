@@ -485,7 +485,7 @@
                     "value" : "Stockholm"
                   },
                   {
-                    "discriminator" : "country",
+                    "discriminator" : "countryOrRegion",
                     "value" : "sweden"
                   }
                 ]
@@ -510,7 +510,7 @@
                     "value" : "Karlstad"
                   },
                   {
-                    "discriminator" : "country",
+                    "discriminator" : "countryOrRegion",
                     "value" : "sweden"
                   }
                 ]

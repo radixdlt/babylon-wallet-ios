@@ -8,7 +8,7 @@ extension PersonaData.PostalAddress {
 			discriminator
 		}
 
-		case country(Country)
+		case countryOrRegion(CountryOrRegion)
 		case streetLine0(String)
 		case streetLine1(String = "")
 
@@ -88,7 +88,7 @@ extension PersonaData.PostalAddress.Field {
 		switch self {
 		case let .area(value):
 			return value
-		case let .country(value):
+		case let .countryOrRegion(value):
 			return value.rawValue
 		case let .streetLine0(value):
 			return value
@@ -195,8 +195,8 @@ extension PersonaData.PostalAddress.Field {
 			self = try .province(container.decode(String.self, forKey: .value))
 		case .prefectureLevelCity:
 			self = try .prefectureLevelCity(container.decode(String.self, forKey: .value))
-		case .country:
-			self = try .country(container.decode(PersonaData.PostalAddress.Country.self, forKey: .value))
+		case .countryOrRegion:
+			self = try .countryOrRegion(container.decode(PersonaData.PostalAddress.CountryOrRegion.self, forKey: .value))
 		case .region:
 			self = try .region(container.decode(String.self, forKey: .value))
 		case .subjectOfTheFederation:
@@ -221,7 +221,7 @@ extension PersonaData.PostalAddress.Field {
 		switch self {
 		case let .area(value):
 			try container.encode(value, forKey: .value)
-		case let .country(value):
+		case let .countryOrRegion(value):
 			try container.encode(value, forKey: .value)
 		case let .streetLine0(value):
 			try container.encode(value, forKey: .value)
@@ -311,7 +311,7 @@ extension PersonaData.PostalAddress.Field {
 		case governorate
 		case province
 		case prefectureLevelCity
-		case country
+		case countryOrRegion
 		case region
 		case subjectOfTheFederation
 		case area
@@ -324,7 +324,7 @@ extension PersonaData.PostalAddress.Field {
 		// FIXME: Strings localize this
 		public var display: String {
 			switch self {
-			case .country: return "Country"
+			case .countryOrRegion: return "Country"
 			case .streetLine0, .streetLine1: return "Street"
 			case .postalCodeString, .postalCodeNumber: return "Postal code"
 			case .postcodeString, .postcodeNumber: return "Postcode"
@@ -356,7 +356,7 @@ extension PersonaData.PostalAddress.Field {
 extension PersonaData.PostalAddress.Field {
 	public var discriminator: Discriminator {
 		switch self {
-		case .country: return .country
+		case .countryOrRegion: return .countryOrRegion
 		case .streetLine0: return .streetLine0
 		case .streetLine1: return .streetLine1
 		case .postalCodeString: return .postalCodeString
@@ -409,7 +409,7 @@ extension PersonaData.PostalAddress.Field {
 	public var valueType: any InitializableFromInputString.Type {
 		switch self {
 		case .zipNumber, .postalCodeNumber, .postcodeNumber, .districtNumber: return Int.self
-		case .country: return PersonaData.PostalAddress.Country.self
+		case .countryOrRegion: return PersonaData.PostalAddress.CountryOrRegion.self
 		default: return String.self
 		}
 	}

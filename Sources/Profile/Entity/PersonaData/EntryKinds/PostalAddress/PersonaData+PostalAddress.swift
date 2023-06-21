@@ -13,16 +13,16 @@ extension PersonaData {
 			self.fields = fields
 		}
 
-		public var country: Country? {
-			fields.compactMap(\.country).first
+		public var countryOrRegion: CountryOrRegion? {
+			fields.compactMap(\.countryOrRegion).first
 		}
 
 		public init(validating fields: IdentifiedArrayOf<PersonaData.PostalAddress.Field>) throws {
-			guard let country = fields.compactMap(\.country).first else {
+			guard let countryOrRegion = fields.compactMap(\.countryOrRegion).first else {
 				throw Error.noCountry
 			}
 			let discriminators = fields.map(\.discriminator)
-			guard Set(discriminators) == Set(country.fields.flatMap { $0 }) else {
+			guard Set(discriminators) == Set(countryOrRegion.fields.flatMap { $0 }) else {
 				throw Error.missingRequiredField
 			}
 			self.init(unchecked: fields)
@@ -50,9 +50,9 @@ extension PersonaData {
 }
 
 extension PersonaData.PostalAddress.Field {
-	var country: PersonaData.PostalAddress.Country? {
+	var countryOrRegion: PersonaData.PostalAddress.CountryOrRegion? {
 		switch self {
-		case let .country(country): return country
+		case let .countryOrRegion(countryOrRegion): return countryOrRegion
 		default: return nil
 		}
 	}
