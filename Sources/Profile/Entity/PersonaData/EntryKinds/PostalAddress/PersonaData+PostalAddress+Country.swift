@@ -47,7 +47,6 @@ extension PersonaData.PostalAddress {
 		case carribeanNetherlands
 		case caymanIslands
 		case centralAfricanRepublic
-
 		case chad
 		case chile
 		case chinaMainland
@@ -75,8 +74,8 @@ extension PersonaData.PostalAddress {
 
 		case denmark
 		case djibouti
-		case dominicanRepublic
 		case dominica
+		case dominicanRepublic
 
 		// MARK: E
 		case ecuador
@@ -216,12 +215,16 @@ extension PersonaData.PostalAddress {
 		/// aka "Congo-Brazzaville" or simply "Congo"
 		case republicOfTheCongo
 
+		/// Réunion
 		case reunion
+
 		case romania
 		case russia
 		case rwanda
 
 		// MARK: S
+
+		/// Saint Berthélemy
 		case saintBarthelemy
 		case saintHelena
 		case saintKittsAndNevis
@@ -262,7 +265,7 @@ extension PersonaData.PostalAddress {
 		case theBahamas
 		case theGambia
 
-		/// Timor-Lests
+		/// Timor-Leste
 		case timorLeste
 
 		case togo
@@ -275,6 +278,8 @@ extension PersonaData.PostalAddress {
 		case tuvalu
 
 		// MARK: U
+
+		/// U.S. Virgin islands
 		case usVirginIslands
 		case uganda
 		case ukraine
@@ -286,9 +291,9 @@ extension PersonaData.PostalAddress {
 
 		// MARK: V
 		case vanuatu
-		case vietnam
-		case vaticanCity
+		case vatican
 		case venezuela
+		case vietnam
 
 		// MARK: Y
 		case yemen

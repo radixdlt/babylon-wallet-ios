@@ -1861,7 +1861,7 @@ extension PersonaData.PostalAddress.CountryOrRegion {
 				[.countryOrRegion],
 			]
 
-		case .vaticanCity:
+		case .vatican:
 			return [
 				[.streetLine0],
 				[.streetLine1],
