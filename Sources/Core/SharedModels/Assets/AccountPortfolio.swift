@@ -141,17 +141,16 @@ extension ResourceAddress {
 	}
 }
 
-extension AccountPortfolio.NonFungibleResource.NonFungibleToken {
-	public var userFacingID: String {
-		let rawValue = id.rawValue
-
+extension String {
+	/// Creates a user facing string for a  local non fungible ID
+	public var userFacingNonFungibleLocalID: String {
 		// Just a safety guard. Each NFT Id should be of format <prefix>value<suffix>
-		guard rawValue.count >= 3 else {
-			loggerGlobal.warning("Invalid nft id: \(rawValue)")
-			return rawValue
+		guard count >= 3 else {
+			loggerGlobal.warning("Invalid nft id: \(self)")
+			return self
 		}
 		// Nothing fancy, just remove the prefix and suffix.
-		return String(rawValue.dropLast().dropFirst())
+		return String(dropLast().dropFirst())
 	}
 }
 

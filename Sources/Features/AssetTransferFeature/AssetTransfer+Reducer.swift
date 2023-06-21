@@ -36,10 +36,9 @@ public struct AssetTransfer: Sendable, FeatureReducer {
 	}
 
 	public var body: some ReducerProtocolOf<Self> {
-		Scope(state: \.accounts,
-		      action: /Action.child .. ChildAction.accounts,
-		      child: { TransferAccountList() })
-
+		Scope(state: \.accounts, action: /Action.child .. ChildAction.accounts) {
+			TransferAccountList()
+		}
 		Reduce(core)
 			.ifLet(\.message, action: /Action.child .. ChildAction.message) {
 				AssetTransferMessage()
