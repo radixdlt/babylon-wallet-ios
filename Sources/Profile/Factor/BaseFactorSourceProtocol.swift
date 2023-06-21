@@ -23,3 +23,9 @@ extension BaseFactorSourceProtocol {
 		cryptoParameters.supportsOlympia
 	}
 }
+
+extension BaseFactorSourceProtocol {
+	public mutating func flag(_ flag: FactorSourceFlag) {
+		common.flags.append(flag)
+	}
+}
