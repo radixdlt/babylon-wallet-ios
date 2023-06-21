@@ -172,7 +172,7 @@ extension PersonaData.PostalAddress.CountryOrRegion {
 			return [
 				[.streetLine0],
 				[.streetLine1],
-				[.city, .postcodeNumber],
+				[.city, .postalCodeNumber],
 				[.countryOrRegion],
 			]
 
@@ -264,7 +264,7 @@ extension PersonaData.PostalAddress.CountryOrRegion {
 			return [
 				[.streetLine0],
 				[.streetLine1],
-				[.city, .postcodeNumber],
+				[.city, .postalCodeNumber],
 				[.countryOrRegion],
 			]
 
@@ -786,7 +786,7 @@ extension PersonaData.PostalAddress.CountryOrRegion {
 				[.streetLine0],
 				[.streetLine1],
 				[.city],
-				[.county, .postcodeNumber],
+				[.county, .postalCodeNumber],
 				[.countryOrRegion],
 			]
 
@@ -1000,7 +1000,7 @@ extension PersonaData.PostalAddress.CountryOrRegion {
 			return [
 				[.streetLine0],
 				[.streetLine1],
-				[.city, .postcodeNumber],
+				[.city, .postalCodeNumber],
 				[.countryOrRegion],
 			]
 
