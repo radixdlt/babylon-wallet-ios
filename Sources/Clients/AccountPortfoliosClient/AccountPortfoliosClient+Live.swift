@@ -194,6 +194,10 @@ extension AccountPortfoliosClient {
 			return .init()
 		}
 		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
+		// Fetch all the detailed information for the loaded resources.
+		// TODO: This will become obsolete with next version of GW, the details would be embeded in GatewayAPI.FungibleResourcesCollectionItem itself.
+		let allResourceDetails = try await gatewayAPIClient.fetchResourceDetails(rawItems.map(\.resourceAddress)).items
+
 		let fungibleresources = try rawItems.map { resource in
 			let amount: BigDecimal = {
 				// Resources of an account always have one single vault which stores the value.
@@ -214,17 +218,20 @@ extension AccountPortfoliosClient {
 
 			let resourceAddress = try ResourceAddress(validatingAddress: resource.resourceAddress)
 
+			// TODO: This lookup will be obsolete once the metadata is present in GatewayAPI.FungibleResourcesCollectionItem
+			let metadata = allResourceDetails.first { $0.address == resource.resourceAddress }?.metadata
+
 			return AccountPortfolio.FungibleResource(
 				resourceAddress: resourceAddress,
 				amount: amount,
-				name: resource.explicitMetadata?.name,
-				symbol: resource.explicitMetadata?.symbol,
-				description: resource.explicitMetadata?.description,
-				iconURL: resource.explicitMetadata?.iconURL
+				name: metadata?.name,
+				symbol: metadata?.symbol,
+				description: metadata?.description,
+				iconURL: metadata?.iconURL
 			)
 		}
 
-		return await fungibleresources.sorted()
+		return fungibleresources.sorted()
 	}
 
 	@Sendable
@@ -257,6 +264,7 @@ extension AccountPortfoliosClient {
 					vaultAddress: vault.vaultAddress
 				)
 			)
+			.map(\.nonFungibleId)
 
 			// https://rdxworks.slack.com/archives/C02MTV9602H/p1681155601557349
 			let maximumNFTIDChunkSize = 29
@@ -266,8 +274,7 @@ extension AccountPortfoliosClient {
 				let tokens = try await gatewayAPIClient.getNonFungibleData(.init(
 					resourceAddress: resource.resourceAddress,
 					nonFungibleIds: Array(nftIDChunk)
-				)
-				)
+				))
 				.nonFungibleIds
 				.map {
 					AccountPortfolio.NonFungibleResource.NonFungibleToken(
@@ -302,24 +309,6 @@ extension AccountPortfoliosClient {
 		}
 
 		return nonFungibleResources.sorted()
-	}
-}
-
-// FIXME: Temporary hack to extract the key_image_url, until we have a proper schema
-private extension GatewayAPI.StateNonFungibleDetailsResponseItem {
-	var keyImageURL: URL? {
-		guard let dictionary = data.rawJson.value as? [String: Any] else { return nil }
-		guard let elements = dictionary["elements"] as? [[String: Any]] else { return nil }
-		let values = elements.filter { $0["type"] as? String == "String" }.compactMap { $0["value"] as? String }
-		let extensions = ["jpg", "jpeg", "png", "pdf", "svg", "gif"]
-		for value in values {
-			for ext in extensions {
-				if value.lowercased().hasSuffix(ext) {
-					return .init(string: value)
-				}
-			}
-		}
-		return nil
 	}
 }
 
@@ -377,7 +366,7 @@ extension AccountPortfoliosClient {
 		_ accountAddress: String,
 		resourceAddress: String,
 		vaultAddress: String
-	) -> @Sendable (PageCursor?) async throws -> PaginatedResourceResponse<String> {
+	) -> @Sendable (PageCursor?) async throws -> PaginatedResourceResponse<GatewayAPI.NonFungibleIdsCollectionItem> {
 		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
 
 		return { pageCursor in
@@ -460,17 +449,14 @@ extension AccountPortfoliosClient {
 }
 
 extension Array where Element == AccountPortfolio.FungibleResource {
-	func sorted() async -> AccountPortfolio.FungibleResources {
+	func sorted() -> AccountPortfolio.FungibleResources {
 		@Dependency(\.engineToolkitClient) var engineToolkitClient
-		@Dependency(\.gatewaysClient) var gatewaysClient
-
-		let networkID = await gatewaysClient.getCurrentNetworkID()
 
 		var xrdResource: AccountPortfolio.FungibleResource?
 		var nonXrdResources: [AccountPortfolio.FungibleResource] = []
 
 		for resource in self {
-			let isXRD = try? engineToolkitClient.isXRD(resource: resource.resourceAddress, on: networkID)
+			let isXRD = try? engineToolkitClient.isXRD(resource: resource.resourceAddress, on: Radix.Network.default.id)
 			if isXRD == true {
 				xrdResource = resource
 			} else {

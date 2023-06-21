@@ -75,6 +75,7 @@ public struct AssetsView: Sendable, FeatureReducer {
 	}
 
 	@Dependency(\.accountPortfoliosClient) var accountPortfoliosClient
+
 	public init() {}
 
 	public var body: some ReducerProtocolOf<Self> {
@@ -159,11 +160,12 @@ extension AssetsView.State {
 
 		let nonFungibleResources = nonFungibleTokenList.rows.compactMap {
 			if let selectedAssets = $0.selectedAssets, !selectedAssets.isEmpty {
-				let selected = $0.resource.tokens.filter { token in selectedAssets.contains(token.id)
-				}
+				let selected = $0.resource.tokens.filter { token in selectedAssets.contains(token.id) }
 
 				return Mode.SelectedAssets.NonFungibleTokensPerResource(
 					resourceAddress: $0.resource.resourceAddress,
+					resourceImage: $0.resource.iconURL,
+					resourceName: $0.resource.name,
 					tokens: selected
 				)
 			}
@@ -204,13 +206,19 @@ extension AssetsView.State {
 				}
 
 				public let resourceAddress: ResourceAddress
+				public let resourceImage: URL?
+				public let resourceName: String?
 				public var tokens: IdentifiedArrayOf<AccountPortfolio.NonFungibleResource.NonFungibleToken>
 
 				public init(
 					resourceAddress: ResourceAddress,
+					resourceImage: URL?,
+					resourceName: String?,
 					tokens: IdentifiedArrayOf<AccountPortfolio.NonFungibleResource.NonFungibleToken>
 				) {
 					self.resourceAddress = resourceAddress
+					self.resourceImage = resourceImage
+					self.resourceName = resourceName
 					self.tokens = tokens
 				}
 			}

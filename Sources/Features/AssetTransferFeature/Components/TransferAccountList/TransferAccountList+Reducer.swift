@@ -9,13 +9,9 @@ public struct TransferAccountList: Sendable, FeatureReducer {
 			didSet {
 				if receivingAccounts.count > 1, receivingAccounts[0].canBeRemoved == false {
 					receivingAccounts[0].canBeRemoved = true
-				}
-
-				if receivingAccounts.count == 1, receivingAccounts[0].canBeRemoved == true {
+				} else if receivingAccounts.count == 1, receivingAccounts[0].canBeRemoved == true {
 					receivingAccounts[0].canBeRemoved = false
-				}
-
-				if receivingAccounts.isEmpty {
+				} else if receivingAccounts.isEmpty {
 					receivingAccounts.append(.empty(canBeRemovedWhenEmpty: false))
 				}
 			}
@@ -188,7 +184,12 @@ extension TransferAccountList {
 
 		assets += selectedAssets.nonFungibleResources.flatMap { resource in
 			resource.tokens.map {
-				ResourceAsset.State.nonFungibleAsset(.init(resourceAddress: resource.resourceAddress, nftToken: $0))
+				ResourceAsset.State.nonFungibleAsset(.init(
+					resourceImage: resource.resourceImage,
+					resourceName: resource.resourceName,
+					resourceAddress: resource.resourceAddress,
+					nftToken: $0
+				))
 			}
 		}
 
@@ -236,6 +237,8 @@ extension TransferAccountList {
 			.reduce(into: IdentifiedArrayOf<AssetsView.State.Mode.SelectedAssets.NonFungibleTokensPerResource>()) { partialResult, asset in
 				var resource = partialResult[id: asset.resourceAddress] ?? .init(
 					resourceAddress: asset.resourceAddress,
+					resourceImage: asset.resourceImage,
+					resourceName: asset.resourceName,
 					tokens: []
 				)
 				resource.tokens.append(asset.nftToken)

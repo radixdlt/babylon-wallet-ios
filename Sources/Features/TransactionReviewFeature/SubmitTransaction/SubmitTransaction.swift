@@ -36,7 +36,6 @@ public struct SubmitTransaction: Sendable, FeatureReducer {
 
 	public enum ViewAction: Sendable, Equatable {
 		case appeared
-		case willDisappear
 		case closeButtonTapped
 	}
 
@@ -46,7 +45,7 @@ public struct SubmitTransaction: Sendable, FeatureReducer {
 		case submittedButNotCompleted(TXID)
 		case submittedTransactionFailed
 		case committedSuccessfully(TXID)
-		case dismiss
+		case manuallyDismiss
 	}
 
 	@Dependency(\.submitTXClient) var submitTXClient
@@ -67,8 +66,9 @@ public struct SubmitTransaction: Sendable, FeatureReducer {
 					}
 				))
 			}
-		case .willDisappear, .closeButtonTapped:
-			return .send(.delegate(.dismiss))
+		case .closeButtonTapped:
+			// FIXME: For some reason, the dismiss dependency does not work here
+			return .send(.delegate(.manuallyDismiss))
 		}
 	}
 

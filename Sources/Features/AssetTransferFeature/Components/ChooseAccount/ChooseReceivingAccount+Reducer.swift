@@ -1,5 +1,4 @@
 import ChooseAccountsFeature
-import EngineToolkitClient
 import FeaturePrelude
 import ScanQRFeature
 
@@ -63,8 +62,6 @@ public struct ChooseReceivingAccount: Sendable, FeatureReducer {
 			}
 		}
 	}
-
-	@Dependency(\.engineToolkitClient) var engineToolkitClient
 
 	public init() {}
 

@@ -14,17 +14,16 @@ struct Completion: Sendable, FeatureReducer {
 
 	enum ViewAction: Sendable, Equatable {
 		case closeButtonTapped
-		case willDisappear
 	}
 
-	enum DelegateAction: Sendable, Equatable {
-		case dismiss
-	}
+	@Dependency(\.dismiss) var dismiss
 
 	func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
-		case .closeButtonTapped, .willDisappear:
-			return .send(.delegate(.dismiss))
+		case .closeButtonTapped:
+			return .fireAndForget {
+				await dismiss()
+			}
 		}
 	}
 }
