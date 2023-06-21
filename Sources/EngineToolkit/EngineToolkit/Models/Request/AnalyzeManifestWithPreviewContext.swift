@@ -1,4 +1,5 @@
 import CasePaths
+import Foundation
 
 // MARK: - AnalyzeTransactionExecutionRequest
 public struct AnalyzeTransactionExecutionRequest: Encodable {
@@ -125,6 +126,14 @@ public struct NewlyCreatedResources: Sendable, Decodable, Hashable {
 
 	public var description: String? {
 		metadata["description"]?.string
+	}
+
+	public var symbol: String? {
+		metadata["symbol"]?.string
+	}
+
+	public var iconURL: URL? {
+		metadata["icon_url"]?.string.flatMap(URL.init)
 	}
 }
 

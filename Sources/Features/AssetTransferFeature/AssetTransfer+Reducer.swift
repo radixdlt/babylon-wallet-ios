@@ -305,14 +305,7 @@ extension AssetTransfer {
 }
 
 extension AccountPortfolio.NonFungibleResource.NonFungibleToken.LocalID {
-	struct InvalidLocalID: Error {}
-
-	// TODO: Remove once RET is migrated to `ash`, this is meant to be temporary
-	func toRETLocalID() throws -> NonFungibleLocalId {
-		guard rawValue.count >= 3 else {
-			throw InvalidLocalID()
-		}
-		let value = String(self.rawValue.dropLast().dropFirst())
-		return .init(value: value)
+	func toRETLocalID() -> NonFungibleLocalId {
+		.init(value: rawValue)
 	}
 }

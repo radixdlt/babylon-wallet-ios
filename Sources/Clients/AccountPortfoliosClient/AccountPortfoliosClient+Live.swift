@@ -193,10 +193,6 @@ extension AccountPortfoliosClient {
 		guard !rawItems.isEmpty else {
 			return .init()
 		}
-		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
-		// Fetch all the detailed information for the loaded resources.
-		// TODO: This will become obsolete with next version of GW, the details would be embeded in GatewayAPI.FungibleResourcesCollectionItem itself.
-		let allResourceDetails = try await gatewayAPIClient.fetchResourceDetails(rawItems.map(\.resourceAddress)).items
 
 		let fungibleresources = try rawItems.map { resource in
 			let amount: BigDecimal = {
@@ -219,7 +215,7 @@ extension AccountPortfoliosClient {
 			let resourceAddress = try ResourceAddress(validatingAddress: resource.resourceAddress)
 
 			// TODO: This lookup will be obsolete once the metadata is present in GatewayAPI.FungibleResourcesCollectionItem
-			let metadata = allResourceDetails.first { $0.address == resource.resourceAddress }?.metadata
+			let metadata = resource.explicitMetadata
 
 			return AccountPortfolio.FungibleResource(
 				resourceAddress: resourceAddress,
@@ -231,7 +227,7 @@ extension AccountPortfoliosClient {
 			)
 		}
 
-		return fungibleresources.sorted()
+		return await fungibleresources.sorted()
 	}
 
 	@Sendable
@@ -247,9 +243,6 @@ extension AccountPortfoliosClient {
 
 		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
 
-		// TODO: This will become obsolete with next version of GW, the details would be embeded in GatewayAPI.NonFungibleResourcesCollectionItem
-		let allResourceDetails = try await gatewayAPIClient.fetchResourceDetails(rawItems.map(\.resourceAddress)).items
-
 		@Sendable
 		func tokens(
 			resource: GatewayAPI.NonFungibleResourcesCollectionItemVaultAggregated
@@ -264,7 +257,6 @@ extension AccountPortfoliosClient {
 					vaultAddress: vault.vaultAddress
 				)
 			)
-			.map(\.nonFungibleId)
 
 			// https://rdxworks.slack.com/archives/C02MTV9602H/p1681155601557349
 			let maximumNFTIDChunkSize = 29
@@ -295,9 +287,7 @@ extension AccountPortfoliosClient {
 		let nonFungibleResources = try await vaultItems.parallelMap { resource in
 			// Load the nftIds from the resource vault
 			let tokens = try await tokens(resource: resource)
-
-			// TODO: This lookup will be obsolete once the metadata is present in GatewayAPI.NonFungibleResourcesCollectionItem
-			let metadata = allResourceDetails.first { $0.address == resource.resourceAddress }?.metadata
+			let metadata = resource.explicitMetadata
 
 			return try AccountPortfolio.NonFungibleResource(
 				resourceAddress: .init(validatingAddress: resource.resourceAddress),
@@ -366,7 +356,7 @@ extension AccountPortfoliosClient {
 		_ accountAddress: String,
 		resourceAddress: String,
 		vaultAddress: String
-	) -> @Sendable (PageCursor?) async throws -> PaginatedResourceResponse<GatewayAPI.NonFungibleIdsCollectionItem> {
+	) -> @Sendable (PageCursor?) async throws -> PaginatedResourceResponse<String> {
 		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
 
 		return { pageCursor in
@@ -449,14 +439,17 @@ extension AccountPortfoliosClient {
 }
 
 extension Array where Element == AccountPortfolio.FungibleResource {
-	func sorted() -> AccountPortfolio.FungibleResources {
+	func sorted() async -> AccountPortfolio.FungibleResources {
 		@Dependency(\.engineToolkitClient) var engineToolkitClient
+		@Dependency(\.gatewaysClient) var gatewaysClient
 
 		var xrdResource: AccountPortfolio.FungibleResource?
 		var nonXrdResources: [AccountPortfolio.FungibleResource] = []
 
+		let networkId = await gatewaysClient.getCurrentNetworkID()
+
 		for resource in self {
-			let isXRD = try? engineToolkitClient.isXRD(resource: resource.resourceAddress, on: Radix.Network.default.id)
+			let isXRD = try? engineToolkitClient.isXRD(resource: resource.resourceAddress, on: networkId)
 			if isXRD == true {
 				xrdResource = resource
 			} else {

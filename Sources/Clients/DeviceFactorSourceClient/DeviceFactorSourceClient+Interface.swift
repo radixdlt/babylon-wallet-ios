@@ -59,7 +59,7 @@ public struct SignatureFromOnDeviceHDRequest: Sendable, Hashable {
 	public let derivationPath: DerivationPath
 	public let curve: SLIP10.Curve
 
-	/// The data to hash and sign
+	/// The data to sign
 	public let unhashedData: Data
 
 	public init(

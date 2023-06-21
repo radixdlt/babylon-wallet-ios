@@ -378,15 +378,7 @@ extension EngineToolkitClient {
 		let setMetadataInstruction = SetMetadata(
 			accountAddress: account.address,
 			key: EntityMetadataKey.accountType.rawValue,
-			value: Enum(
-				.u8(0), // what is this?
-				fields: [
-					.enum(.init(
-						.u8(0), // what is this?
-						fields: [.string(GatewayAPI.EntityMetadataCollection.AccountType.dappDefinition.rawValue)]
-					)),
-				]
-			)
+			value: Enum(.metadata_String, fields: [.string(GatewayAPI.EntityMetadataCollection.AccountType.dappDefinition.rawValue)])
 		)
 
 		let manifestParsed = TransactionManifest(
