@@ -66,5 +66,5 @@ public struct PollStrategy: Sendable, Hashable {
 		self.sleepDuration = sleepDuration
 	}
 
-	public static let `default` = Self(maxPollTries: 20, sleepDuration: 2)
+	public static let `default` = Self(maxPollTries: 50, sleepDuration: 5)
 }

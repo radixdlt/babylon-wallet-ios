@@ -61,9 +61,8 @@ extension EngineToolkitClient {
 				.olympiaAccountAddress
 			},
 			generateTXID: { transactionIntent in
-				let compiledTransactionIntent = try compileTransactionIntent(transactionIntent)
-				let hash = try blake2b(data: compiledTransactionIntent.compiledIntent)
-				return TXID(rawValue: hash.hex)
+				let hash = try RadixEngine.instance.hashTransactionItent(transactionIntent).get().hash
+				return TXID(rawValue: hash)
 			},
 			knownEntityAddresses: { networkID throws -> KnownEntityAddressesResponse in
 				try RadixEngine.instance.knownEntityAddresses(request: .init(networkId: networkID)).get()

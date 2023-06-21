@@ -73,7 +73,7 @@ extension TransactionIntent {
 			).get()
 		let compiledTransactionIntent = compiledTransactionIntentResponse.compiledIntent
 
-		let transactionIntentHash = try blake2b(data: compiledTransactionIntent)
+		let transactionIntentHash = try Data(hex: RadixEngine.instance.hashTransactionItent(self).get().hash)
 		let intentSignatures = try privateKeys.map {
 			try $0.sign(hashOfMessage: transactionIntentHash)
 		}
@@ -106,11 +106,7 @@ extension NotarizedNonNotarySignedButIntentSignedTransctionContext {
 	}
 
 	public func sign(with privateKey: Engine.PrivateKey) throws -> NotarizedNonNotarySignedButIntentSignedTransctionContext {
-		let compiledSignedTransactionIntent = try RadixEngine.instance.compileSignedTransactionIntentRequest(
-			request: self.signedTransactionIntent
-		).get().compiledIntent
-
-		let hashOfTransactionIntent = try blake2b(data: compiledSignedTransactionIntent)
+		let hashOfTransactionIntent = try Data(hex: RadixEngine.instance.hashSignedTransactionItent(self.signedTransactionIntent).get().hash)
 		let signature = try privateKey.sign(hashOfMessage: hashOfTransactionIntent)
 
 		let signedTransactionIntent = SignedTransactionIntent(
@@ -141,9 +137,7 @@ extension NotarizedNonNotarySignedButIntentSignedTransctionContext {
 			request: signedTransactionIntent
 		).get()
 
-		let compiledSignedTransactionIntent = compileSignedTransactionIntentResponse.compiledIntent
-
-		let hashOfTransactionIntent = try blake2b(data: compiledSignedTransactionIntent)
+		let hashOfTransactionIntent = try Data(hex: RadixEngine.instance.hashSignedTransactionItent(signedTransactionIntent).get().hash)
 
 		// Notarize the signed intent to create a notarized transaction
 		let notarySignature = try notaryPrivateKey

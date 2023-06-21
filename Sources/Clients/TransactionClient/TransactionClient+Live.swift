@@ -240,7 +240,7 @@ extension TransactionClient {
 				endEpochExclusive: epoch + request.makeTransactionHeaderInput.epochWindow,
 				nonce: request.nonce,
 				publicKey: SLIP10.PublicKey.eddsaEd25519(transactionSigners.notaryPublicKey).intoEngine(),
-				notaryIsSignatory: true, // transactionSigners.notaryAsSignatory,
+				notaryIsSignatory: transactionSigners.notaryAsSignatory,
 				tipPercentage: request.makeTransactionHeaderInput.tipPercentage
 			)
 
@@ -254,23 +254,17 @@ extension TransactionClient {
 		}
 
 		let notarizeTransaction: NotarizeTransaction = { request in
-
-			let intent = try engineToolkitClient.decompileTransactionIntent(.init(
-				compiledIntent: request.compileTransactionIntent.compiledIntent,
-				instructionsOutputKind: .parsed
-			))
-
 			let signedTransactionIntent = SignedTransactionIntent(
-				intent: intent,
+				intent: request.transactionIntent,
 				intentSignatures: Array(request.intentSignatures)
 			)
-			let txID = try engineToolkitClient.generateTXID(intent)
-			let compiledSignedIntent = try engineToolkitClient.compileSignedTransactionIntent(
-				signedTransactionIntent
-			)
+
+			let txID = try engineToolkitClient.generateTXID(request.transactionIntent)
+			let hash = try RadixEngine.instance.hashSignedTransactionItent(signedTransactionIntent).get().hash
+			let data = try Data(hex: hash)
 
 			let notarySignature = try request.notary.sign(
-				hashOfMessage: blake2b(data: compiledSignedIntent.compiledIntent)
+				hashOfMessage: data
 			)
 
 			let uncompiledNotarized = try NotarizedTransaction(
@@ -293,7 +287,7 @@ extension TransactionClient {
 
 			let transactionPreviewRequest = try await createTransactionPreviewRequest(for: request, networkID: networkID)
 			let transactionPreviewResponse = try await gatewayAPIClient.transactionPreview(transactionPreviewRequest)
-			guard transactionPreviewResponse.receipt.status == .committedSuccess else {
+			guard transactionPreviewResponse.receipt.status == .succeeded else {
 				throw TransactionFailure.failedToPrepareTXReview(
 					.failedToRetrieveTXReceipt(transactionPreviewResponse.receipt.errorMessage ?? "Unknown reason")
 				)
@@ -392,8 +386,6 @@ extension TransactionClient {
 				rawValue: Set(Array(transactionIntentWithSigners.transactionSigners.intentSignerEntitiesOrEmpty()) + [.account(request.feePayer)])
 			)!
 
-			let compiledIntent = try engineToolkitClient.compileTransactionIntent(transactionIntentWithSigners.intent)
-
 			let signingFactors = try await factorSourcesClient.getSigningFactors(.init(
 				networkID: request.networkID,
 				signers: entities,
@@ -418,7 +410,7 @@ extension TransactionClient {
 			}
 			printSigners()
 
-			return .init(compiledIntent: compiledIntent, signingFactors: signingFactors)
+			return .init(intent: transactionIntentWithSigners.intent, signingFactors: signingFactors)
 		}
 
 		let myInvolvedEntities: MyInvolvedEntities = { manifest in

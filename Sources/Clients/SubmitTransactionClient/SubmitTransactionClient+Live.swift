@@ -45,6 +45,7 @@ extension SubmitTransactionClient: DependencyKey {
 					}
 					try? await clock.sleep(for: .seconds(pollStrategy.sleepDuration))
 					let status = try await pollTransactionStatus()
+					print("TX status: ==== \(status)")
 					statusSubject.send(.init(txID: txID, result: .success(status)))
 				}
 			}

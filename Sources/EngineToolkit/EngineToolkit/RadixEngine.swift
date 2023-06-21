@@ -216,6 +216,112 @@ extension RadixEngine {
 			function: extract_addresses_from_manifest
 		)
 	}
+
+	public func staticallyValidateTransaction(_ request: StaticallyValidateTransactionRequest) -> Result<StaticallyValidateTransactionResponse, Error> {
+		callLibraryFunction(
+			request: request,
+			function: statically_validate_transaction
+		)
+	}
+
+	public func hashTransactionItent(_ request: TransactionIntent) -> Result<HashTransactionIntentResponse, Error> {
+		callLibraryFunction(request: request, function: hash_transaction_intent)
+	}
+
+	public func hashNotarizeTransaction(_ request: NotarizedTransaction) -> Result<HashNotarizedTransactionResponse, Error> {
+		callLibraryFunction(request: request, function: hash_notarized_transaction)
+	}
+
+	public func hashSignedTransactionItent(_ request: SignedTransactionIntent) -> Result<HashSignedTransactionItentResponse, Error> {
+		callLibraryFunction(request: request, function: hash_signed_transaction_intent)
+	}
+}
+
+// MARK: - HashTransactionIntentResponse
+public struct HashTransactionIntentResponse: Codable, Equatable {
+	public let hash: String
+}
+
+// MARK: - HashNotarizedTransactionResponse
+public struct HashNotarizedTransactionResponse: Codable, Equatable {
+	public let hash: String
+}
+
+// MARK: - HashSignedTransactionItentResponse
+public struct HashSignedTransactionItentResponse: Codable, Equatable {
+	public let hash: String
+}
+
+// MARK: - StaticallyValidateTransactionRequest
+public struct StaticallyValidateTransactionRequest: Codable, Equatable {
+	public struct Config: Codable, Equatable {
+		public let maxCostUnitLimit: String
+		public let maxEpochRange: String
+		public let maxNotarizedPayloadSize: String
+		public let maxTipPercentage: String
+		public let minCostUnitLimit: String
+		public let minTipPercentage: String
+		public let networkId: String
+
+		private enum CodingKeys: String, CodingKey {
+			case maxCostUnitLimit = "max_cost_unit_limit"
+			case maxEpochRange = "max_epoch_range"
+			case maxNotarizedPayloadSize = "max_notarized_payload_size"
+			case maxTipPercentage = "max_tip_percentage"
+			case minCostUnitLimit = "min_cost_unit_limit"
+			case minTipPercentage = "min_tip_percentage"
+			case networkId = "network_id"
+		}
+	}
+
+	public let compiledNotarizedIntent: String
+	public let validationConfig: Config
+
+	private enum CodingKeys: String, CodingKey {
+		case compiledNotarizedIntent = "compiled_notarized_intent"
+		case validationConfig = "validation_config"
+	}
+}
+
+// MARK: - StaticallyValidateTransactionResponse
+public enum StaticallyValidateTransactionResponse: Codable, Equatable {
+	case valid
+	case invalid(String)
+
+	private enum CodingKeys: String, CodingKey {
+		case validity
+		case error
+	}
+
+	enum Validity: String, Codable {
+		case valid = "Valid"
+		case invalid = "Invalid"
+	}
+
+	public init(from decoder: Decoder) throws {
+		let container = try decoder.container(keyedBy: CodingKeys.self)
+		let validity: Validity = try container.decode(forKey: .validity)
+
+		switch validity {
+		case .valid:
+			self = .valid
+		case .invalid:
+			let error: String = try container.decode(forKey: .error)
+			self = .invalid(error)
+		}
+	}
+
+	public func encode(to encoder: Encoder) throws {
+		var container = encoder.container(keyedBy: CodingKeys.self)
+
+		switch self {
+		case .valid:
+			try container.encode(Validity.valid, forKey: .validity)
+		case let .invalid(error):
+			try container.encode(Validity.invalid, forKey: .validity)
+			try container.encode(error, forKey: .error)
+		}
+	}
 }
 
 // MARK: Private (But Internal For Tests)

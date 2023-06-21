@@ -62,7 +62,7 @@ extension EngineToolkitClient {
 
 			CallMethod(
 				receiver: componentAddress,
-				methodName: "deposit_batch"
+				methodName: "try_deposit_batch_or_abort"
 			) {
 				ManifestExpression.entireWorktop
 			},
@@ -160,7 +160,7 @@ extension EngineToolkitClient {
 			lockFeeCallMethod(address: faucetAddress),
 		] + tokens +
 			[
-				CallMethod(receiver: accountAddress.asComponentAddress, methodName: "deposit_batch") {
+				CallMethod(receiver: accountAddress.asComponentAddress, methodName: "try_deposit_batch_or_abort") {
 					ManifestExpression.entireWorktop
 				},
 			]
@@ -205,7 +205,7 @@ extension EngineToolkitClient {
 				initialSupply: .decimal(.init(value: initialSupply))
 			),
 
-			CallMethod(receiver: accountAddress.asComponentAddress, methodName: "deposit_batch") {
+			CallMethod(receiver: accountAddress.asComponentAddress, methodName: "try_deposit_batch_or_abort") {
 				ManifestExpression.entireWorktop
 			},
 		]
@@ -259,7 +259,7 @@ extension EngineToolkitClient {
 				)
 			),
 
-			CallMethod(receiver: accountAddress.asComponentAddress, methodName: "deposit_batch") {
+			CallMethod(receiver: accountAddress.asComponentAddress, methodName: "try_deposit_batch_or_abort") {
 				ManifestExpression.entireWorktop
 			},
 		]
@@ -323,7 +323,7 @@ extension EngineToolkitClient {
 			)
 		}
 
-		let instructions: [any InstructionProtocol] = [lockFeeCallMethod(address: faucetAddress)] + tokens + [CallMethod(receiver: accountAddress.asComponentAddress, methodName: "deposit_batch") {
+		let instructions: [any InstructionProtocol] = [lockFeeCallMethod(address: faucetAddress)] + tokens + [CallMethod(receiver: accountAddress.asComponentAddress, methodName: "try_deposit_batch_or_abort") {
 			ManifestExpression.entireWorktop
 		}]
 

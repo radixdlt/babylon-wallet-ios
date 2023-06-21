@@ -442,7 +442,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 				factorsLeftToSignWith: response.signingFactors,
 				signingPurposeWithPayload: .signTransaction(
 					ephemeralNotaryPrivateKey: state.ephemeralNotaryPrivateKey,
-					response.compiledIntent,
+					response.intent,
 					origin: state.signTransactionPurpose
 				)
 			))
@@ -627,17 +627,32 @@ extension TransactionReview {
 		type: TransferType
 	) async throws {
 		let account = userAccounts.first { $0.address.address == componentAddress.address }! // TODO: Handle
-		func addTransfer(_ resourceAddress: ResourceAddress, amount: BigDecimal) async throws {
-			let isNewResources = false // createdEntities?.resourceAddresses.contains(resourceAddress) ?? false
+		func addTransfer(_ resourceSpecifier: ResourceManagerSpecifier, amount: BigDecimal) async throws {
+			let resourceAddress = resourceSpecifier.existing!
+			let isNewResources = false /// resourceSpecifier.
 
-			func getMetadata(address: String) async throws -> GatewayAPI.EntityMetadataCollection? {
-				guard !isNewResources else { return nil }
-				return try await gatewayAPIClient.getEntityMetadata(address)
+			func getMetadata() async throws -> ResourceMetadata {
+				switch resourceSpecifier {
+				case let .existing(resourceAddress):
+					let metadata = try await gatewayAPIClient.getEntityMetadata(resourceAddress.address)
+					return ResourceMetadata(
+						name: metadata.symbol ?? metadata.name ?? L10n.TransactionReview.unknown,
+						thumbnail: metadata.iconURL,
+						type: resourceAddress.resourceType
+					)
+
+				case let .newlyCreated(index):
+					return ResourceMetadata(
+						name: L10n.TransactionReview.unknown,
+						thumbnail: nil,
+						type: nil
+					)
+				}
 			}
 
 			// let addressKind = try engineToolkitClient.decodeAddress(resourceAddress.address).entityType
 
-			let metadata = try? await getMetadata(address: resourceAddress.address)
+			let resourceMetadata = try await getMetadata()
 
 			let guarantee: TransactionClient.Guarantee? = {
 				if case let .estimated(instructionIndex) = type, !isNewResources {
@@ -645,12 +660,6 @@ extension TransactionReview {
 				}
 				return nil
 			}()
-
-			let resourceMetadata = ResourceMetadata(
-				name: metadata?.symbol ?? metadata?.name ?? L10n.TransactionReview.unknown,
-				thumbnail: metadata?.iconURL,
-				type: resourceAddress.resourceType
-			)
 
 			let transfer = try TransactionReview.Transfer(
 				amount: amount,
@@ -665,8 +674,7 @@ extension TransactionReview {
 
 		switch resourcesQuantifer {
 		case let .amount(resourceAddress, amount):
-			fatalError()
-		// try await addTransfer(resourceAddress, amount: .init(fromString: amount.value))
+			try await addTransfer(resourceAddress, amount: .init(fromString: amount.value))
 		case let .ids(resourceAddress, ids):
 			fatalError()
 			// try await addTransfer(resourceAddress, amount: BigDecimal(ids.count))

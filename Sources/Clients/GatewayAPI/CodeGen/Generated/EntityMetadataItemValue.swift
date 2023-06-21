@@ -9,6 +9,7 @@ import Foundation
 #if canImport(AnyCodable)
 import AnyCodable
 #endif
+import Prelude
 
 @available(*, deprecated, renamed: "GatewayAPI.EntityMetadataItemValue")
 public typealias EntityMetadataItemValue = GatewayAPI.EntityMetadataItemValue
@@ -18,11 +19,11 @@ extension GatewayAPI {
 public struct EntityMetadataItemValue: Codable, Hashable {
 
     public private(set) var rawHex: String
-    public private(set) var rawJson: AnyCodable
+    public private(set) var rawJson: JSONValue
     public private(set) var asString: String?
     public private(set) var asStringCollection: [String]?
 
-    public init(rawHex: String, rawJson: AnyCodable, asString: String? = nil, asStringCollection: [String]? = nil) {
+    public init(rawHex: String, rawJson: JSONValue, asString: String? = nil, asStringCollection: [String]? = nil) {
         self.rawHex = rawHex
         self.rawJson = rawJson
         self.asString = asString

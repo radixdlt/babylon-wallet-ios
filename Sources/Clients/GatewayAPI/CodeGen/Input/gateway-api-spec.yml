@@ -1078,7 +1078,7 @@ components:
         - state_updates
       properties:
         status:
-          $ref: "#/components/schemas/TransactionStatus"
+          $ref: "#/components/schemas/TransactionReceiptStatus"
         fee_summary:
           description: Only present if the `status` is not `Rejected`.
           $ref: "#/components/schemas/FeeSummary"
@@ -1096,6 +1096,14 @@ components:
         error_message:
           type: string
           description: Error message (only present if status is `Failed` or `Rejected`)
+
+    TransactionReceiptStatus:
+      type: string
+      enum:
+        - Succeeded
+        - Failed
+        - Rejected
+      description: The status of the transaction
 
     NonFungibleIdType:
       type: string

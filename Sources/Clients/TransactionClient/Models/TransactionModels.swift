@@ -106,9 +106,9 @@ extension GatewayAPI.PublicKey {
 	init(from slip10: SLIP10.PublicKey) {
 		switch slip10 {
 		case let .eddsaEd25519(pubKey):
-			self = .eddsaEd25519(.init(keyType: .ecdsaSecp256k1, keyHex: pubKey.rawRepresentation.hex))
+			self = .eddsaEd25519(.init(keyType: .eddsaEd25519, keyHex: pubKey.rawRepresentation.hex))
 		case let .ecdsaSecp256k1(pubKey):
-			self = .ecdsaSecp256k1(.init(keyType: .eddsaEd25519, keyHex: pubKey.compressedRepresentation.hex))
+			self = .ecdsaSecp256k1(.init(keyType: .ecdsaSecp256k1, keyHex: pubKey.compressedRepresentation.hex))
 		}
 	}
 }
@@ -116,15 +116,15 @@ extension GatewayAPI.PublicKey {
 // MARK: - NotarizeTransactionRequest
 public struct NotarizeTransactionRequest: Sendable, Hashable {
 	public let intentSignatures: Set<Engine.SignatureWithPublicKey>
-	public let compileTransactionIntent: CompileTransactionIntentResponse
+	public let transactionIntent: TransactionIntent
 	public let notary: SLIP10.PrivateKey
 	public init(
 		intentSignatures: Set<Engine.SignatureWithPublicKey>,
-		compileTransactionIntent: CompileTransactionIntentResponse,
+		transactionIntent: TransactionIntent,
 		notary: SLIP10.PrivateKey
 	) {
 		self.intentSignatures = intentSignatures
-		self.compileTransactionIntent = compileTransactionIntent
+		self.transactionIntent = transactionIntent
 		self.notary = notary
 	}
 }

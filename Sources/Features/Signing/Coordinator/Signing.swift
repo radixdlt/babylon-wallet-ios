@@ -35,7 +35,7 @@ public enum SigningPurposeWithPayload: Sendable, Hashable {
 
 	case signTransaction(
 		ephemeralNotaryPrivateKey: Curve25519.Signing.PrivateKey,
-		CompileTransactionIntentResponse,
+		TransactionIntent,
 		origin: SigningPurpose.SignTransactionPurpose
 	)
 
@@ -46,10 +46,10 @@ public enum SigningPurposeWithPayload: Sendable, Hashable {
 		}
 	}
 
-	var dataToSign: Data {
+	func dataToSign() throws -> Data {
 		switch self {
 		case let .signAuth(auth): return auth.payloadToHashAndSign
-		case let .signTransaction(_, compiledIntent, _): return Data(compiledIntent.compiledIntent)
+		case let .signTransaction(_, intent, _): return try Data(hex: RadixEngine.instance.hashTransactionItent(intent).get().hash)
 		}
 	}
 }
@@ -150,7 +150,7 @@ public struct Signing: Sendable, FeatureReducer {
 			case let .signAuth(authData):
 				let response = SignedAuthChallenge(challenge: authData.input.challenge, entitySignatures: Set(state.signatures))
 				return .send(.delegate(.finishedSigning(.signAuth(response))))
-			case let .signTransaction(ephemeralNotaryPrivateKey, compiledIntent, _):
+			case let .signTransaction(ephemeralNotaryPrivateKey, intent, _):
 				let notaryKey: SLIP10.PrivateKey = .curve25519(ephemeralNotaryPrivateKey)
 
 				return .run { [signatures = state.signatures] send in
@@ -160,7 +160,7 @@ public struct Signing: Sendable, FeatureReducer {
 						})
 						return try await transactionClient.notarizeTransaction(.init(
 							intentSignatures: intentSignatures,
-							compileTransactionIntent: compiledIntent,
+							transactionIntent: intent,
 							notary: notaryKey
 						))
 					})))

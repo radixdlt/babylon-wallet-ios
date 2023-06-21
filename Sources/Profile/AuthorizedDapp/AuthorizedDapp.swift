@@ -6,7 +6,7 @@ public typealias DappDefinitionAddress = AccountAddress
 
 extension DappDefinitionAddress {
 	/// This address is just a placeholder for now to be compatible with DappInteractor flow
-	public static let wallet: Self = try! .init(validatingAddress: "account_tdx_b_1p8ahenyznrqy2w0tyg00r82rwuxys6z8kmrhh37c7maqpydx7p")
+	public static let wallet: Self = try! .init(validatingAddress: "account_tdx_21_128jk8476rq97wjv90nzjvr2nslpj04dcex7lh8tv80qvv8yfx59faw")
 }
 
 // MARK: - Profile.Network.AuthorizedDapp

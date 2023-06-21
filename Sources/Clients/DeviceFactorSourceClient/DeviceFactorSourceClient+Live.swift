@@ -40,8 +40,8 @@ extension DeviceFactorSourceClient: DependencyKey {
 					path: request.derivationPath,
 					curve: request.curve
 				)
-				let hashedData = try blake2b(data: request.unhashedData)
-				return try privateKey.sign(hashOfMessage: hashedData)
+				// let hashedData = try blake2b(data: request.unhashedData)
+				return try privateKey.sign(hashOfMessage: request.unhashedData)
 			},
 			isAccountRecoveryNeeded: {
 				@Dependency(\.accountsClient) var accountsClient

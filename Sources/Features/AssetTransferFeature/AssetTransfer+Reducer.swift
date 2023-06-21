@@ -17,6 +17,7 @@ public struct AssetTransfer: Sendable, FeatureReducer {
 	@Dependency(\.dappInteractionClient) var dappInteractionClient
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.engineToolkitClient) var engineToolkitClient
+	@Dependency(\.gatewaysClient) var gatewaysClient
 
 	public init() {}
 
@@ -53,22 +54,21 @@ public struct AssetTransfer: Sendable, FeatureReducer {
 			return .none
 
 		case .sendTransferTapped:
-			do {
-				let manifest = try createManifest(state)
+			return .run { [accounts = state.accounts, message = state.message?.message] send in
+				let manifest = try await createManifest(accounts)
 				dappInteractionClient.addWalletInteraction(
 					.transaction(.init(
 						send: .init(
 							version: .default,
 							transactionManifest: manifest,
-							message: state.message?.message
+							message: message
 						)
 					))
 				)
-			} catch {
+				await send(.delegate(.dismissed))
+			} catch: { error, _ in
 				errorQueue.schedule(error)
-				return .none
 			}
-			return .send(.delegate(.dismissed))
 
 		case .closeButtonTapped:
 			return .send(.delegate(.dismissed))
@@ -142,23 +142,24 @@ extension AssetTransfer {
 		}
 	}
 
-	private func createManifest(_ state: State) throws -> TransactionManifest {
-		let involvedFungibleResources = extractInvolvedFungibleResources(state.accounts.receivingAccounts)
+	private func createManifest(_ accounts: TransferAccountList.State) async throws -> TransactionManifest {
+		let involvedFungibleResources = extractInvolvedFungibleResources(accounts.receivingAccounts)
 		let fungiblesTransferInstruction = try involvedFungibleResources.flatMap {
-			try fungibleResourceTransferInstruction(witdhrawAccount: state.accounts.fromAccount.address, $0)
+			try fungibleResourceTransferInstruction(witdhrawAccount: accounts.fromAccount.address, $0)
 		}
 
-		let involvedNonFungibles = extractInvolvedNonFungibleResource(state.accounts.receivingAccounts)
+		let involvedNonFungibles = extractInvolvedNonFungibleResource(accounts.receivingAccounts)
 		let nonFungiblesTransferInstruction = try involvedNonFungibles.flatMap {
-			try nonFungibleResourceTransferInstruction(witdhrawAccount: state.accounts.fromAccount.address, $0)
+			try nonFungibleResourceTransferInstruction(witdhrawAccount: accounts.fromAccount.address, $0)
 		}
 
 		let allInstructions = fungiblesTransferInstruction + nonFungiblesTransferInstruction
 		let manifest = TransactionManifest(instructions: .parsed(allInstructions.map { $0.embed() }))
 
+		let networkID = await gatewaysClient.getCurrentNetworkID()
 		return try engineToolkitClient.convertManifestToString(.init(
 			version: .default,
-			networkID: .default,
+			networkID: networkID,
 			manifest: manifest
 		))
 	}
@@ -249,7 +250,7 @@ extension AssetTransfer {
 
 				CallMethod(
 					receiver: account.id,
-					methodName: "deposit",
+					methodName: "try_deposit_or_abort",
 					arguments: [.bucket(.init(value: bucket))]
 				),
 			]
@@ -292,7 +293,7 @@ extension AssetTransfer {
 
 				CallMethod(
 					receiver: account.id,
-					methodName: "deposit",
+					methodName: "try_deposit_or_abort",
 					arguments: [.bucket(.init(value: bucket))]
 				),
 			]

@@ -18,7 +18,7 @@ extension GatewayAPI {
 /** The transaction execution receipt */
 public struct TransactionReceipt: Codable, Hashable {
 
-    public private(set) var status: TransactionStatus
+    public private(set) var status: TransactionReceiptStatus
     public private(set) var feeSummary: FeeSummary?
     public private(set) var stateUpdates: AnyCodable
     public private(set) var events: AnyCodable?
@@ -28,7 +28,7 @@ public struct TransactionReceipt: Codable, Hashable {
     /** Error message (only present if status is `Failed` or `Rejected`) */
     public private(set) var errorMessage: String?
 
-    public init(status: TransactionStatus, feeSummary: FeeSummary? = nil, stateUpdates: AnyCodable, events: AnyCodable? = nil, nextEpoch: AnyCodable? = nil, output: [SborData]? = nil, errorMessage: String? = nil) {
+    public init(status: TransactionReceiptStatus, feeSummary: FeeSummary? = nil, stateUpdates: AnyCodable, events: AnyCodable? = nil, nextEpoch: AnyCodable? = nil, output: [SborData]? = nil, errorMessage: String? = nil) {
         self.status = status
         self.feeSummary = feeSummary
         self.stateUpdates = stateUpdates

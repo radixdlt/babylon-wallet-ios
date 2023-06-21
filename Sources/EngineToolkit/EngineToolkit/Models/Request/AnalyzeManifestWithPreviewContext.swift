@@ -136,6 +136,13 @@ public enum ResourceManagerSpecifier: Sendable, Decodable, Hashable {
 	case existing(ResourceAddress)
 	case newlyCreated(index: Int)
 
+	public var existing: ResourceAddress? {
+		guard case let .existing(resourceAddress) = self else {
+			return nil
+		}
+		return resourceAddress
+	}
+
 	enum CodingKeys: String, CodingKey {
 		case type
 		case address

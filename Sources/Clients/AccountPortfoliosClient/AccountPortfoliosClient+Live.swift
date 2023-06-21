@@ -194,10 +194,6 @@ extension AccountPortfoliosClient {
 			return .init()
 		}
 		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
-		// Fetch all the detailed information for the loaded resources.
-		// TODO: This will become obsolete with next version of GW, the details would be embeded in GatewayAPI.FungibleResourcesCollectionItem itself.
-		let allResourceDetails = try await gatewayAPIClient.fetchResourceDetails(rawItems.map(\.resourceAddress)).items
-
 		let fungibleresources = try rawItems.map { resource in
 			let amount: BigDecimal = {
 				// Resources of an account always have one single vault which stores the value.
@@ -218,20 +214,17 @@ extension AccountPortfoliosClient {
 
 			let resourceAddress = try ResourceAddress(validatingAddress: resource.resourceAddress)
 
-			// TODO: This lookup will be obsolete once the metadata is present in GatewayAPI.FungibleResourcesCollectionItem
-			let metadata = allResourceDetails.first { $0.address == resource.resourceAddress }?.metadata
-
 			return AccountPortfolio.FungibleResource(
 				resourceAddress: resourceAddress,
 				amount: amount,
-				name: metadata?.name,
-				symbol: metadata?.symbol,
-				description: metadata?.description,
-				iconURL: metadata?.iconURL
+				name: resource.explicitMetadata?.name,
+				symbol: resource.explicitMetadata?.symbol,
+				description: resource.explicitMetadata?.description,
+				iconURL: resource.explicitMetadata?.iconURL
 			)
 		}
 
-		return fungibleresources.sorted()
+		return await fungibleresources.sorted()
 	}
 
 	@Sendable
@@ -467,14 +460,17 @@ extension AccountPortfoliosClient {
 }
 
 extension Array where Element == AccountPortfolio.FungibleResource {
-	func sorted() -> AccountPortfolio.FungibleResources {
+	func sorted() async -> AccountPortfolio.FungibleResources {
 		@Dependency(\.engineToolkitClient) var engineToolkitClient
+		@Dependency(\.gatewaysClient) var gatewaysClient
+
+		let networkID = await gatewaysClient.getCurrentNetworkID()
 
 		var xrdResource: AccountPortfolio.FungibleResource?
 		var nonXrdResources: [AccountPortfolio.FungibleResource] = []
 
 		for resource in self {
-			let isXRD = try? engineToolkitClient.isXRD(resource: resource.resourceAddress, on: Radix.Network.default.id)
+			let isXRD = try? engineToolkitClient.isXRD(resource: resource.resourceAddress, on: networkID)
 			if isXRD == true {
 				xrdResource = resource
 			} else {

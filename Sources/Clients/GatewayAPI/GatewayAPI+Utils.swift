@@ -46,15 +46,15 @@ extension GatewayAPI.StateEntityDetailsResponseItemDetails {
 
 extension GatewayAPI.EntityMetadataCollection {
 	public var name: String? {
-		items[.name]?.asString
+		items[.name]?.rawJson.dictionary?["fields"]?.array?.first?.dictionary?["value"]?.string
 	}
 
 	public var symbol: String? {
-		items[.symbol]?.asString
+		items[.symbol]?.rawJson.dictionary?["fields"]?.array?.first?.dictionary?["value"]?.string
 	}
 
 	public var description: String? {
-		items[.description]?.asString
+		items[.description]?.rawJson.dictionary?["fields"]?.array?.first?.dictionary?["value"]?.string
 	}
 
 	public var iconURL: URL? {
@@ -113,7 +113,7 @@ extension GatewayAPI.EntityMetadataCollection {
 }
 
 // MARK: - EntityMetadataKey
-public enum EntityMetadataKey: String {
+public enum EntityMetadataKey: String, CaseIterable {
 	case name
 	case symbol
 	case description
