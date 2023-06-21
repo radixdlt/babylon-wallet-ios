@@ -50,6 +50,13 @@ public indirect enum MetadataValue: Sendable, Codable, Hashable {
 	case nonFungibleLocalIdArray([NonFungibleLocalId])
 	case publicKeyArray([Engine.PublicKey])
 	case publicKeyHashArray([PublicKeyHash])
+
+	public var string: String? {
+		guard case let .string(string) = self else {
+			return nil
+		}
+		return string
+	}
 }
 
 // MARK: - MetadataValueKind

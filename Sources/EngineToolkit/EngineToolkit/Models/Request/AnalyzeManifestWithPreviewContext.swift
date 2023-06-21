@@ -1,3 +1,5 @@
+import CasePaths
+
 // MARK: - AnalyzeTransactionExecutionRequest
 public struct AnalyzeTransactionExecutionRequest: Encodable {
 	public let networkId: NetworkID
@@ -116,6 +118,20 @@ public struct NewlyCreatedResources: Sendable, Decodable, Hashable {
 	}
 
 	public var metadata: [MetadataKeyValue]
+
+	public var name: String? {
+		metadata["name"]?.string
+	}
+
+	public var description: String? {
+		metadata["description"]?.string
+	}
+}
+
+extension [NewlyCreatedResources.MetadataKeyValue] {
+	public subscript(_ key: String) -> MetadataValue? {
+		first { $0.key == key }?.value
+	}
 }
 
 // MARK: - ResourceQuantifier

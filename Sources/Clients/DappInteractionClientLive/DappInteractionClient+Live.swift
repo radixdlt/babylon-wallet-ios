@@ -80,9 +80,7 @@ extension DappInteractionClient {
 
 			let dappDefinitionAddress: DappDefinitionAddress
 			do {
-				dappDefinitionAddress = try DappDefinitionAddress(
-					address: nonValidated.metadata.dAppDefinitionAddress, decodedKind: .globalAccount
-				)
+				dappDefinitionAddress = DappDefinitionAddress.wallet
 			} catch {
 				return .invalid(.invalidDappDefinitionAddress(gotStringWhichIsAnInvalidAccountAddress: nonvalidatedMeta.dAppDefinitionAddress))
 			}
