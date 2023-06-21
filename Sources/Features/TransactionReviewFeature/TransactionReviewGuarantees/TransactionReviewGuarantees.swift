@@ -75,12 +75,12 @@ public struct TransactionReviewGuarantee: Sendable, FeatureReducer {
 		public var id: TransactionReview.Transfer.ID { transfer.id }
 		public let account: TransactionReview.Account
 
-		public var transfer: TransactionReview.Transfer
+		public var transfer: TransactionReview.FungibleTransfer
 		public var percentageStepper: MinimumPercentageStepper.State
 
 		public init?(
 			account: TransactionReview.Account,
-			transfer: TransactionReview.Transfer
+			transfer: TransactionReview.FungibleTransfer
 		) {
 			self.account = account
 			self.transfer = transfer
