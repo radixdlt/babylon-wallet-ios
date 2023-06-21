@@ -3,50 +3,71 @@ import Foundation
 // MARK: - PersonaData.PostalAddress.Country
 extension PersonaData.PostalAddress {
 	public enum Country: String, Sendable, Hashable, Codable, CaseIterable, Identifiable {
+		// MARK: A
 		case afghanistan
-		case argentina
-		case angola
-		case antiguaAndBarbuda
-		case algeria
 		case albania
+		case algeria
 		case andorra
+		case angola
+		case anguilla
+		case antiguaAndBarbuda
+		case argentina
 		case armenia
 		case aruba
 		case australia
 		case austria
 		case azerbaijan
+
+		// MARK: B
 		case bahrain
-		case barbados
 		case bangladesh
+		case barbados
 		case belarus
-		case belize
 		case belgium
+		case belize
 		case benin
+		case bermuda
+		case bhutan
 		case bolivia
 		case bosniaAndHerzegovinia
 		case botswana
 		case brazil
+		case britishVirginIslands
 		case bruneiDarussalam
 		case bulgaria
 		case burkinaFaso
 		case burundi
-		case canada
+
+		// MARK: C
 		case cambodia
 		case cameroon
+		case canada
 		case capeVerde
+		case carribeanNetherlands
+		case caymanIslands
 		case centralAfricanRepublic
-		case czechRepublic
+
 		case chad
 		case chile
-		case china
+		case chinaMainland
 		case colombia
 		case comoros
+		case cookIslands
 		case costaRica
-		public static let côteDIvoire: Self = .ivoryCoast
+
+		/// Côte d'Ivoire
+		case coteDIvoire
+
 		case croatia
 		case cuba
+
+		/// Curaçao
 		case curacao
+
 		case cyprus
+		case czechRepublic
+
+		// MARK: D
 
 		/// aka "Congo-Kinshasa" aka "DRC" (formerly known as "Zaire")
 		case democraticRepublicOfTheCongo
@@ -55,48 +76,73 @@ extension PersonaData.PostalAddress {
 		case djibouti
 		case dominicanRepublic
 		case dominica
+
+		// MARK: E
 		case ecuador
 		case egypt
 		case elSalvador
-		case eritrea
 		case equatorialGuinea
+		case eritrea
 		case estonia
-		case ethiopia
 		case eswatini
+		case ethiopia
+
+		// MARK: F
+		case falklandIslands
+		case faroeIslands
+		case fiji
 		case finland
 		case france
 		case frenchGuiana
+		case frenchPolynesia
+
+		// MARK: G
 		case gabon
-		case gambia
 		case georgia
+		public static let gambia = Self.theGambia
 		case germany
 		case ghana
+		case gibraltar
 		case greece
 		case greenland
 		case grenada
+		case guadeloupe
 		case guatemala
-		case guyana
 		case guinea
 		case guineaBissau
+		case guyana
+
+		// MARK: H
 		case haiti
 		case honduras
 		case hongKong
 		case hungary
+
+		// MARK: I
 		case iceland
 		case india
+		case indonesia
 		case iran
 		case iraq
 		case ireland
+		case isleOfMan
 		case isreal
 		case italy
-		case ivoryCoast
-		case indonesia
+		public static let ivoryCoast = Self.coteDIvoire
+
+		// MARK: J
 		case jamaica
 		case japan
 		case jordan
+
+		// MARK: K
 		case kazakhstan
 		case kenya
+		case kiribati
 		case kuwait
+		case kyrgyzstan
+
+		// MARK: L
 		case laos
 		case latvia
 		case lebanon
@@ -106,26 +152,37 @@ extension PersonaData.PostalAddress {
 		case liechtenstein
 		case lithuania
 		case luxembourg
+
+		// MARK: M
 		case macao
 		case madagascar
-		case malaysia
-		case martinique
-		case mali
 		case malawi
+		case malaysia
+		case maldives
+		case mali
 		case malta
+		case marshallIslands
+		case martinique
 		case mauritania
 		case mauritius
+		case mayotte
 		case mexico
+		case micronesia
 		case moldova
 		case monaco
-		case mozambique
 		case mongolia
 		case montenegro
+		case montserrat
 		case morocco
+		case mozambique
 		case myanmar
+
+		// MARK: N
 		case namibia
+		case nauru
 		case nepal
 		case netherlands
+		case newCaledonia
 		case newZealand
 		case nicaragua
 		case niger
@@ -133,37 +190,60 @@ extension PersonaData.PostalAddress {
 		case northKorea
 		case northMacedonia
 		case norway
+
+		// MARK: O
 		case oman
+
+		// MARK: P
+		case pakistan
+		case palau
+		case palestinianTerritories
 		case panama
 		case papuaNewGuinea
-		case pakistan
-		case palestinianTerritories
 		case paraguay
 		case peru
 		case philippines
 		case poland
+		case portugal
 		case puertoRico
+
+		// MARK: Q
 		case qatar
 
+		// MARK: R
+
 		/// aka "Congo-Brazzaville" or simply "Congo"
-		case republicOfCongo
+		case republicOfTheCongo
 
 		case reunion
 		case romania
-		case rwanda
 		case russia
-		case saudiArabia
+		case rwanda
+
+		// MARK: S
+		case saintBarthelemy
+		case saintHelena
+		case saintKittsAndNevis
+		case saintLucia
+		case saintMartin
+		case saintVincentAndTheGrenadines
+		case samoa
 		case sanMarino
+		case saoTomeAndPrincipe
+		case saudiArabia
 		case senegal
 		case serbia
 		case seychelles
-		case singapore
 		case sierraLeone
+		case singapore
+		case sintMaarten
 		case slovakia
 		case slovenia
+		case solomonIslands
 		case somalia
-		case southKorea
 		case southAfrica
+		case southGeorgiaAndSouthSandwichIslands
+		case southKorea
 		case southSudan
 		case spain
 		case sriLanka
@@ -171,15 +251,21 @@ extension PersonaData.PostalAddress {
 		case suriname
 		case sweden
 		case switzerland
+		case syria
+
+		// MARK: T
 		case taiwan
 		case tajikistan
 		case tanzania
 		case thailand
+		case theGambia
 		case togo
 		case trinidadAndTobago
 		case tunisia
 		case turkey
 		case turkmenistan
+
+		// MARK: V
 		case vietnam
 		case uganda
 		case ukraine

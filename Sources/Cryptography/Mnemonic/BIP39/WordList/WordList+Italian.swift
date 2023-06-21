@@ -352,7 +352,7 @@ extension BIP39.WordList {
 			chicca
 			chiedere
 			chimera
-			china
+			chinaMainland
 			chirurgo
 			chitarra
 			ciao

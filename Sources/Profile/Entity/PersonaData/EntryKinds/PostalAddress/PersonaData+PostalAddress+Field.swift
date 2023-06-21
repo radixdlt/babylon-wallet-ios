@@ -53,6 +53,9 @@ extension PersonaData.PostalAddress {
 		/// United Arab Emirates
 		case area(String)
 
+		/// Carribean Netherlands
+		case islandName(String)
+
 		/// China
 		case prefectureLevelCity(String)
 
@@ -127,6 +130,8 @@ extension PersonaData.PostalAddress.Field {
 			return value
 		case let .county(value):
 			return value
+		case let .islandName(value):
+			return value
 		case let .furtherDivisionsLine0(value):
 			return value
 		case let .furtherDivisionsLine1(value):
@@ -166,6 +171,8 @@ extension PersonaData.PostalAddress.Field {
 			self = try .postalDistrict(container.decode(String.self, forKey: .value))
 		case .postcodeString:
 			self = try .postcodeString(container.decode(String.self, forKey: .value))
+		case .islandName:
+			self = try .islandName(container.decode(String.self, forKey: .value))
 		case .zipNumber:
 			self = try .zipNumber(container.decode(Int.self, forKey: .value))
 		case .city:
@@ -210,6 +217,7 @@ extension PersonaData.PostalAddress.Field {
 	public func encode(to encoder: Encoder) throws {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		try container.encode(discriminator, forKey: .discriminator)
+		// YES we could use `valueAsString` computed property here and remove the switch... but maybe we wanna use different formatting...?
 		switch self {
 		case let .area(value):
 			try container.encode(value, forKey: .value)
@@ -232,6 +240,8 @@ extension PersonaData.PostalAddress.Field {
 		case let .city(value):
 			try container.encode(value, forKey: .value)
 		case let .state(value):
+			try container.encode(value, forKey: .value)
+		case let .islandName(value):
 			try container.encode(value, forKey: .value)
 		case let .suburb(value):
 			try container.encode(value, forKey: .value)
@@ -290,6 +300,9 @@ extension PersonaData.PostalAddress.Field {
 		case districtString
 		case neighbourhood
 
+		/// Carribean Netherlands
+		case islandName
+
 		/// Colombia
 		case department
 
@@ -308,6 +321,7 @@ extension PersonaData.PostalAddress.Field {
 		case furtherDivisionsLine1
 		case township
 
+		// FIXME: Strings localize this
 		public var display: String {
 			switch self {
 			case .country: return "Country"
@@ -326,6 +340,7 @@ extension PersonaData.PostalAddress.Field {
 			case .province: return "Province"
 			case .region: return "Region"
 			case .area: return "Area"
+			case .islandName: return "Carribean Netherlands"
 			case .department: return "Department"
 			case .subjectOfTheFederation: return "Subject of the Federation"
 			case .prefecture: return "Prefecture"
@@ -364,6 +379,7 @@ extension PersonaData.PostalAddress.Field {
 		case .area: return .area
 		case .subjectOfTheFederation: return .subjectOfTheFederation
 		case .township: return .township
+		case .islandName: return .islandName
 
 		case .prefecture: return .prefecture
 		case .county: return .county
