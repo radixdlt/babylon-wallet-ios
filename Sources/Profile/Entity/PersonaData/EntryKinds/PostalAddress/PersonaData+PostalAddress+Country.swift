@@ -20,6 +20,7 @@ extension PersonaData.PostalAddress {
 
 		// MARK: B
 		case bahrain
+		public static let bahamas = Self.theBahamas
 		case bangladesh
 		case barbados
 		case belarus
@@ -258,12 +259,20 @@ extension PersonaData.PostalAddress {
 		case tajikistan
 		case tanzania
 		case thailand
+		case theBahamas
 		case theGambia
+
+		/// Timor-Lests
+		case timorLeste
+
 		case togo
+		case tonga
 		case trinidadAndTobago
 		case tunisia
 		case turkey
 		case turkmenistan
+		case turksAndCaicosIslans
+		case tuvalu
 
 		// MARK: V
 		case vietnam

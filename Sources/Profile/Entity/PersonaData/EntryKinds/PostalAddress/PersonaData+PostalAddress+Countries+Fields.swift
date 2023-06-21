@@ -1698,7 +1698,32 @@ extension PersonaData.PostalAddress.Country {
 				[.country],
 			]
 
+		case .theBahamas:
+			return [
+				[.streetLine0],
+				[.streetLine1],
+				[.city],
+				[.islandName],
+				[.country],
+			]
+
+		case .timorLeste:
+			return [
+				[.streetLine0],
+				[.streetLine1],
+				[.city],
+				[.country],
+			]
+
 		case .togo:
+			return [
+				[.streetLine0],
+				[.streetLine1],
+				[.city],
+				[.country],
+			]
+
+		case .tonga:
 			return [
 				[.streetLine0],
 				[.streetLine1],
@@ -1735,6 +1760,22 @@ extension PersonaData.PostalAddress.Country {
 				[.streetLine0],
 				[.streetLine1],
 				[.postalCodeNumber, .city],
+				[.country],
+			]
+
+		case .turksAndCaicosIslans:
+			return [
+				[.streetLine0],
+				[.streetLine1],
+				[.islandName],
+				[.country],
+			]
+
+		case .tuvalu:
+			return [
+				[.streetLine0],
+				[.streetLine1],
+				[.city],
 				[.country],
 			]
 
