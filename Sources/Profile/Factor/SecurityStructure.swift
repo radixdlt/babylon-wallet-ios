@@ -174,9 +174,44 @@ extension SecurityStructureConfigurationDetailed {
 }
 
 extension Profile {
-	func detailedSecurityStructureConfiguration(
+	public func detailedSecurityStructureConfiguration(
 		reference: SecurityStructureConfigurationReference
-	) throws -> SecurityStructureConfigurationDetailed {}
+	) throws -> SecurityStructureConfigurationDetailed {
+		try .init(
+			id: reference.id,
+			label: reference.label,
+			configuration: detailedSecurityStructureConfiguration(referenceConfiguration: reference.configuration),
+			createdOn: reference.createdOn,
+			lastUpdatedOn: reference.lastUpdatedOn
+		)
+	}
+
+	func detailedSecurityStructureConfiguration(
+		referenceConfiguration reference: SecurityStructureConfigurationReference.Configuration
+	) throws -> SecurityStructureConfigurationDetailed.Configuration {
+		try .init(
+			primaryRole: detailedSecurityStructureRole(referenceRole: reference.primaryRole),
+			recoveryRole: detailedSecurityStructureRole(referenceRole: reference.recoveryRole),
+			confirmationRole: detailedSecurityStructureRole(referenceRole: reference.confirmationRole)
+		)
+	}
+
+	func detailedSecurityStructureRole<Role>(
+		referenceRole reference: RoleOfTier<Role, FactorSourceID>
+	) throws -> RoleOfTier<Role, FactorSource> {
+		func lookup(id: FactorSourceID) throws -> FactorSource {
+			guard let factorSource = factorSources.first(where: { $0.id == id }) else {
+				throw FactorSourceWithIDNotFound()
+			}
+			return factorSource
+		}
+
+		return try .init(
+			thresholdFactors: .init(validating: reference.thresholdFactors.map(lookup(id:))),
+			threshold: reference.threshold,
+			superAdminFactors: .init(validating: reference.superAdminFactors.map(lookup(id:)))
+		)
+	}
 }
 
 extension SecurityStructureConfigurationDetailed.Configuration {
