@@ -2,7 +2,7 @@ import Foundation
 
 // MARK: - PersonaData.PostalAddress.Field
 extension PersonaData.PostalAddress {
-	public enum Field: Sendable, Hashable, Codable, Identifiable {
+	public enum Field: Sendable, Hashable, Codable, Identifiable, CustomStringConvertible {
 		public typealias ID = Discriminator
 		public var id: ID {
 			discriminator
@@ -143,6 +143,10 @@ extension PersonaData.PostalAddress.Field {
 		case let .postalDistrict(value):
 			return value
 		}
+	}
+
+	public var description: String {
+		".\(discriminator.rawValue)(\(valueAsString))"
 	}
 }
 

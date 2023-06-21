@@ -3,7 +3,7 @@ import Prelude
 
 // MARK: - PersonaData.PostalAddress
 extension PersonaData {
-	public struct PostalAddress: Sendable, Hashable, Codable, PersonaDataEntryProtocol {
+	public struct PostalAddress: Sendable, Hashable, Codable, PersonaDataEntryProtocol, CustomStringConvertible {
 		public static var casePath: CasePath<PersonaData.Entry, Self> = /PersonaData.Entry.postalAddress
 		public static var kind = PersonaData.Entry.Kind.postalAddress
 

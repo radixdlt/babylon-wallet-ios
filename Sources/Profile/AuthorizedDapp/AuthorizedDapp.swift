@@ -175,10 +175,10 @@ extension Profile.Network.AuthorizedDapp {
 				name: PersonaDataEntryID? = nil,
 				dateOfBirth: PersonaDataEntryID? = nil,
 				companyName: PersonaDataEntryID? = nil,
-				postalAddresses: SharedCollection? = nil,
-				urls: SharedCollection? = nil,
 				emailAddresses: SharedCollection? = nil,
 				phoneNumbers: SharedCollection? = nil,
+				urls: SharedCollection? = nil,
+				postalAddresses: SharedCollection? = nil,
 				creditCards: SharedCollection? = nil
 			) {
 				self.name = name

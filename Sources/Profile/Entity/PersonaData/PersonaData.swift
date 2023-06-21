@@ -1,7 +1,7 @@
 import Prelude
 
 // MARK: - PersonaData
-public struct PersonaData: Sendable, Hashable, Codable {
+public struct PersonaData: Sendable, Hashable, Codable, CustomStringConvertible {
 	public typealias IdentifiedName = IdentifiedEntry<Name>
 	public typealias IdentifiedDateOfBirth = IdentifiedEntry<DateOfBirth>
 	public typealias IdentifiedCompanyName = IdentifiedEntry<CompanyName>
@@ -71,6 +71,10 @@ extension PersonaData {
 		}
 
 		return sequence.compactMap { $0 }
+	}
+
+	public var description: String {
+		entries.map(\.description).joined(separator: "\n")
 	}
 }
 

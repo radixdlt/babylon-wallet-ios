@@ -100,7 +100,11 @@ extension Profile.Network {
 							PersonaDataEntryID?>
 					) -> PersonaData.IdentifiedEntry<T>? {
 						guard
-							let identifiedEntry = full[keyPath: fullKeyPath],
+							let identifiedEntry = full[keyPath: fullKeyPath]
+						else {
+							return nil
+						}
+						guard
 							shared[keyPath: sharedKeyPath] == identifiedEntry.id
 						else {
 							return nil
@@ -114,8 +118,13 @@ extension Profile.Network {
 					) throws -> PersonaData.CollectionOfIdentifiedEntries<T> {
 						try .init(
 							collection: .init(uncheckedUniqueElements: full[keyPath: fullKeyPath].filter { value in
-								guard let sharedCollection = shared[keyPath: sharedKeyPath] else { return false }
-								return sharedCollection.ids.contains(value.id)
+								guard let sharedCollection = shared[keyPath: sharedKeyPath] else {
+									return false
+								}
+								guard sharedCollection.ids.contains(value.id) else {
+									return false
+								}
+								return true
 							})
 						)
 					}

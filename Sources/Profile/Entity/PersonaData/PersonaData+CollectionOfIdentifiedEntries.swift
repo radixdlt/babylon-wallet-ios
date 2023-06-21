@@ -2,7 +2,7 @@ import Prelude
 
 // MARK: - PersonaData.CollectionOfIdentifiedEntries
 extension PersonaData {
-	public struct CollectionOfIdentifiedEntries<Value: Sendable & Hashable & Codable & BasePersonaDataEntryProtocol>: Sendable, Hashable, Codable {
+	public struct CollectionOfIdentifiedEntries<Value: Sendable & Hashable & Codable & BasePersonaDataEntryProtocol>: Sendable, Hashable, Codable, CustomStringConvertible {
 		public private(set) var collection: IdentifiedArrayOf<PersonaData.IdentifiedEntry<Value>>
 
 		public init() {
@@ -43,6 +43,10 @@ extension PersonaData {
 			try self.init(
 				collection: container.decode(IdentifiedArrayOf<PersonaData.IdentifiedEntry<Value>>.self)
 			)
+		}
+
+		public var description: String {
+			collection.map(\.description).joined(separator: ", ")
 		}
 	}
 }

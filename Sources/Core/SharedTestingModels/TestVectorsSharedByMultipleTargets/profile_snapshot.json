@@ -408,11 +408,52 @@
                 }
               },
               "sharedPersonaData" : {
+                "companyName" : "00000000-0000-0000-0000-000000000002",
+                "creditCards" : {
+                  "ids" : [
+                    "00000000-0000-0000-0000-00000000000B"
+                  ],
+                  "request" : {
+                    "quantifier" : "atLeast",
+                    "quantity" : 1
+                  }
+                },
+                "dateOfBirth" : "00000000-0000-0000-0000-000000000001",
+                "emailAddresses" : {
+                  "ids" : [
+                    "00000000-0000-0000-0000-000000000003",
+                    "00000000-0000-0000-0000-000000000004"
+                  ],
+                  "request" : {
+                    "quantifier" : "atLeast",
+                    "quantity" : 1
+                  }
+                },
                 "name" : "00000000-0000-0000-0000-000000000000",
+                "phoneNumbers" : {
+                  "ids" : [
+                    "00000000-0000-0000-0000-000000000005",
+                    "00000000-0000-0000-0000-000000000006"
+                  ],
+                  "request" : {
+                    "quantifier" : "atLeast",
+                    "quantity" : 1
+                  }
+                },
                 "postalAddresses" : {
                   "ids" : [
-                    "00000000-AAAA-AAAA-AAAA-000000000000",
-                    "00000000-BBBB-BBBB-BBBB-000000000000"
+                    "00000000-0000-0000-0000-000000000009",
+                    "00000000-0000-0000-0000-00000000000A"
+                  ],
+                  "request" : {
+                    "quantifier" : "atLeast",
+                    "quantity" : 1
+                  }
+                },
+                "urls" : {
+                  "ids" : [
+                    "00000000-0000-0000-0000-000000000007",
+                    "00000000-0000-0000-0000-000000000008"
                   ],
                   "request" : {
                     "quantifier" : "atLeast",
@@ -434,7 +475,7 @@
                 }
               },
               "sharedPersonaData" : {
-                "name" : "00000000-0000-0000-0000-000000000001"
+                "name" : "00000000-0000-0000-0000-0000000000FF"
               }
             }
           ]
@@ -444,76 +485,128 @@
       "personas" : [
         {
           "address" : "identity_tdx_c_1pntzwn92848tkaatj4psmgtuvsn83lnknku6av34alxqdrsvjv",
-          "displayName" : "Mrs Incognito",
+          "displayName" : "Satoshi",
           "networkID" : 12,
           "personaData" : {
+            "companyName" : {
+              "id" : "00000000-0000-0000-0000-000000000002",
+              "value" : "Bitcoin"
+            },
+            "creditCards" : [
+              {
+                "id" : "00000000-0000-0000-0000-00000000000B",
+                "value" : {
+                  "cvc" : 512,
+                  "expiry" : {
+                    "month" : 12,
+                    "year" : 2142
+                  },
+                  "holder" : "Satoshi Nakamoto",
+                  "number" : "0000 0000 2100 0000"
+                }
+              }
+            ],
+            "dateOfBirth" : {
+              "id" : "00000000-0000-0000-0000-000000000001",
+              "value" : "2009-01-03T12:00:00Z"
+            },
             "emailAddresses" : [
-
+              {
+                "id" : "00000000-0000-0000-0000-000000000003",
+                "value" : "satoshi@nakamoto.bitcoin"
+              },
+              {
+                "id" : "00000000-0000-0000-0000-000000000004",
+                "value" : "be.your@own.bank"
+              }
             ],
             "name" : {
               "id" : "00000000-0000-0000-0000-000000000000",
               "value" : {
-                "family" : "Incognitoson",
-                "given" : "Jane",
-                "variant" : "western"
+                "family" : "Nakamoto",
+                "given" : "Satoshi",
+                "middle" : "Creator of Bitcoin",
+                "variant" : "eastern"
               }
             },
             "phoneNumbers" : [
-
+              {
+                "id" : "00000000-0000-0000-0000-000000000005",
+                "value" : "21000000"
+              },
+              {
+                "id" : "00000000-0000-0000-0000-000000000006",
+                "value" : "123456789"
+              }
             ],
-			"creditCards" : [
-
-			],
             "postalAddresses" : [
               {
-                "id" : "00000000-AAAA-AAAA-AAAA-000000000000",
+                "id" : "00000000-0000-0000-0000-000000000009",
                 "value" : [
                   {
-                    "discriminator" : "streetLine0",
-                    "value" : "Bragatan 1"
+                    "discriminator" : "postalCodeNumber",
+                    "value" : 21000000
                   },
                   {
-                    "discriminator" : "streetLine1",
+                    "discriminator" : "prefecture",
+                    "value" : "SHA256"
+                  },
+                  {
+                    "discriminator" : "county",
+                    "value" : "Hashtown"
+                  },
+                  {
+                    "discriminator" : "furtherDivisionsLine0",
+                    "value" : "Sound money street"
+                  },
+                  {
+                    "discriminator" : "furtherDivisionsLine1",
                     "value" : ""
                   },
                   {
-                    "discriminator" : "postalCodeNumber",
-                    "value" : 12345
-                  },
-                  {
-                    "discriminator" : "city",
-                    "value" : "Stockholm"
-                  },
-                  {
                     "discriminator" : "countryOrRegion",
-                    "value" : "sweden"
+                    "value" : "japan"
                   }
                 ]
               },
               {
-                "id" : "00000000-BBBB-BBBB-BBBB-000000000000",
+                "id" : "00000000-0000-0000-0000-00000000000A",
                 "value" : [
                   {
                     "discriminator" : "streetLine0",
-                    "value" : "Toppengatan 3"
+                    "value" : "Copthall House"
                   },
                   {
                     "discriminator" : "streetLine1",
-                    "value" : ""
-                  },
-                  {
-                    "discriminator" : "postalCodeNumber",
-                    "value" : 54321
+                    "value" : "King street"
                   },
                   {
                     "discriminator" : "city",
-                    "value" : "Karlstad"
+                    "value" : "Newcastle-under-Lyme"
+                  },
+                  {
+                    "discriminator" : "county",
+                    "value" : "Newcastle"
+                  },
+                  {
+                    "discriminator" : "postcodeString",
+                    "value" : "ST5 1UE"
                   },
                   {
                     "discriminator" : "countryOrRegion",
-                    "value" : "sweden"
+                    "value" : "unitedKingdom"
                   }
                 ]
+              }
+            ],
+            "urls" : [
+              {
+                "id" : "00000000-0000-0000-0000-000000000007",
+                "value" : "bitcoin.org"
+              },
+              {
+                "id" : "00000000-0000-0000-0000-000000000008",
+                "value" : "https://github.com/bitcoin-core/secp256k1"
               }
             ]
           },
@@ -578,14 +671,14 @@
           "displayName" : "Mrs Public",
           "networkID" : 12,
           "personaData" : {
+            "creditCards" : [
+
+            ],
             "emailAddresses" : [
 
             ],
-			"creditCards" : [
-
-			],
             "name" : {
-              "id" : "00000000-0000-0000-0000-000000000001",
+              "id" : "00000000-0000-0000-0000-0000000000FF",
               "value" : {
                 "family" : "Publicson",
                 "given" : "Maria",
@@ -596,6 +689,9 @@
 
             ],
             "postalAddresses" : [
+
+            ],
+            "urls" : [
 
             ]
           },

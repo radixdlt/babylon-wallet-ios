@@ -310,42 +310,20 @@ final class ProfileTests: TestCase {
 
 		let thirdAccount = try addNewAccount("Third")
 
-		let firstPersona = try addNewPersona(
-			"Mrs Incognito",
-			personaData: .init(
-				name: .init(
-					id: .init(uuidString: "00000000-0000-0000-0000-000000000000")!,
-					value: .init(given: "Jane", family: "Incognitoson", variant: .western)
-				),
-				postalAddresses: .init(collection: [
-					.init(
-						id: .init(uuidString: "00000000-AAAA-AAAA-AAAA-000000000000")!,
-						value: .init(validating: [
-							.streetLine0("Bragatan 1"),
-							.streetLine1(""),
-							.postalCodeNumber(12345),
-							.city("Stockholm"),
-							.countryOrRegion(.sweden),
-						])
-					),
-					.init(
-						id: .init(uuidString: "00000000-BBBB-BBBB-BBBB-000000000000")!,
-						value: .init(validating: [
-							.streetLine0("Toppengatan 3"),
-							.streetLine1(""),
-							.postalCodeNumber(54321),
-							.city("Karlstad"),
-							.countryOrRegion(.sweden),
-						])
-					),
-				])
+		let firstPersona = try withDependencies {
+			$0.uuid = .incrementing
+		} operation: {
+			try addNewPersona(
+				"Satoshi",
+				personaData: .previewValue
 			)
-		)
+		}
+
 		let secondPersona = try addNewPersona(
 			"Mrs Public",
 			personaData: .init(
 				name: .init(
-					id: .init(uuidString: "00000000-0000-0000-0000-000000000001")!,
+					id: .init(uuidString: "00000000-0000-0000-0000-0000000000FF")!,
 					value: .init(given: "Maria", family: "Publicson", variant: .western)
 				)
 			)
@@ -393,13 +371,7 @@ final class ProfileTests: TestCase {
 							],
 							forRequest: .exactly(2)
 						),
-						sharedPersonaData: .init(
-							name: firstPersona.personaData.name?.id,
-							postalAddresses: .init(
-								ids: .init(validating: firstPersona.personaData.postalAddresses.map(\.id)),
-								forRequest: .atLeast(1)
-							)
-						)
+						sharedPersonaData: .init(personaData: firstPersona.personaData)
 					),
 					.init(
 						identityAddress: secondPersona.address,
@@ -485,7 +457,14 @@ final class ProfileTests: TestCase {
 		XCTAssertEqual(network.accounts[1].displayName, "Second")
 		XCTAssertEqual(network.accounts[2].displayName, "Third")
 		XCTAssertEqual(network.personas[0].networkID, networkID)
-		XCTAssertEqual(network.personas[0].displayName, "Mrs Incognito")
+		XCTAssertEqual(network.personas[0].displayName, "Satoshi")
+
+		withDependencies {
+			$0.uuid = .incrementing
+		} operation: {
+			XCTAssertEqual(network.personas[0].personaData, .previewValue)
+		}
+
 		XCTAssertEqual(network.personas[1].displayName, "Mrs Public")
 		XCTAssertEqual(network.personas.count, 2)
 		XCTAssertEqual(network.networkID, networkID)
@@ -596,13 +575,15 @@ final class ProfileTests: TestCase {
 		XCTAssertEqual(network.authorizedDapps[0].referencesToAuthorizedPersonas.count, 2)
 
 		XCTAssertNotNil(network.authorizedDapps[0].referencesToAuthorizedPersonas[0].sharedPersonaData.name)
-		XCTAssertEqual(network.authorizedDapps[0].referencesToAuthorizedPersonas[0].sharedPersonaData.postalAddresses?.ids, [
-			.init(uuidString: "00000000-AAAA-AAAA-AAAA-000000000000")!,
-			.init(uuidString: "00000000-BBBB-BBBB-BBBB-000000000000")!,
-		])
 
-		let sharedPostalAddresses = try network.detailsForAuthorizedDapp(network.authorizedDapps[0]).detailedAuthorizedPersonas[0].sharedPersonaData.postalAddresses
-		XCTAssertEqual(sharedPostalAddresses[0].value.countryOrRegion, .sweden)
+		let reconstructedSharedPersonaData = try network.detailsForAuthorizedDapp(network.authorizedDapps[0]).detailedAuthorizedPersonas[0].sharedPersonaData
+
+		withDependencies {
+			$0.uuid = .incrementing
+		} operation: {
+			let expectedPersonaData = PersonaData.previewValue
+			XCTAssertEqual(reconstructedSharedPersonaData, expectedPersonaData)
+		}
 
 		XCTAssertEqual(network.authorizedDapps[0].referencesToAuthorizedPersonas[0].sharedAccounts?.request.quantifier, .exactly)
 		XCTAssertEqual(network.authorizedDapps[0].referencesToAuthorizedPersonas[0].sharedAccounts?.request.quantity, 2)
@@ -704,5 +685,25 @@ extension EmailAddress: ExpressibleByStringLiteral {
 extension AccountAddress: ExpressibleByStringLiteral {
 	public init(stringLiteral value: String) {
 		try! self.init(address: value)
+	}
+}
+
+extension Profile.Network.AuthorizedDapp.AuthorizedPersonaSimple.SharedPersonaData {
+	init(personaData: PersonaData) throws {
+		try self.init(
+			name: personaData.name?.id,
+			dateOfBirth: personaData.dateOfBirth?.id,
+			companyName: personaData.companyName?.id,
+			emailAddresses: .init(ids: .init(validating: personaData.emailAddresses.map(\.id)), forRequest: .atLeast(1)),
+			phoneNumbers: .init(ids: .init(validating: personaData.phoneNumbers.map(\.id)), forRequest: .atLeast(1)),
+			urls: .init(ids: .init(validating: personaData.urls.map(\.id)), forRequest: .atLeast(1)),
+			postalAddresses: .init(ids: .init(validating: personaData.postalAddresses.map(\.id)), forRequest: .atLeast(1)),
+			creditCards: .init(ids: .init(validating: personaData.creditCards.map(\.id)), forRequest: .atLeast(1))
+		)
+		// The only purpose of this switch is to make sure we get a compilation error when we add a new PersonaData.Entry kind, so
+		// we do not forget to handle it here.
+		switch PersonaData.Entry.Kind.name {
+		case .name, .dateOfBirth, .companyName, .emailAddress, .phoneNumber, .url, .postalAddress, .creditCard: break
+		}
 	}
 }

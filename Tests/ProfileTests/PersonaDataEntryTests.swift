@@ -224,7 +224,7 @@ final class PersonaFieldTests: TestCase {
 		)
 	}
 
-	func test_json_coding_persona() throws {
+	func test_json_coding_personaData() throws {
 		let personaData = withDependencies {
 			$0.uuid = .incrementing
 		} operation: {
