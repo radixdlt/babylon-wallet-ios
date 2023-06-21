@@ -225,55 +225,10 @@ final class PersonaFieldTests: TestCase {
 	}
 
 	func test_json_coding_persona() throws {
-		let personaData = try withDependencies {
+		let personaData = withDependencies {
 			$0.uuid = .incrementing
 		} operation: {
-			try PersonaData(
-				name: .init(value: .init(
-					given: "Satoshi",
-					middle: "Creator of Bitcoin",
-					family: "Nakamoto", variant: .eastern
-				)),
-				dateOfBirth: .init(value: .init(year: 2009, month: 1, day: 3)),
-				companyName: .init(value: .init(name: "Bitcoin")),
-				emailAddresses: .init(collection: [
-					.init(value: .init(validating: "satoshi@nakamoto.bitcoin")),
-					.init(value: .init(validating: "be.your@own.bank")),
-				]),
-				phoneNumbers: .init(collection: [
-					.init(value: .init(number: "21000000")),
-					.init(value: .init(number: "123456789")),
-				]),
-				urls: .init(collection: [
-					.init(value: .init(validating: "bitcoin.org")),
-					.init(value: .init(validating: "https://github.com/bitcoin-core/secp256k1")),
-				]),
-				postalAddresses: .init(collection: [
-					.init(value: .init(validating: [
-						.postalCodeNumber(21_000_000),
-						.prefecture("SHA256"), .county("Hashtown"),
-						.furtherDivisionsLine0("Sound money street"),
-						.furtherDivisionsLine1(""),
-						.countryOrRegion(.japan),
-					])),
-					.init(value: .init(validating: [
-						.streetLine0("Copthall House"),
-						.streetLine1("King street"),
-						.city("Newcastle-under-Lyme"),
-						.county("Newcastle"),
-						.postcodeString("ST5 1UE"),
-						.countryOrRegion(.unitedKingdom),
-					])),
-				]),
-				creditCards: .init(collection: [
-					.init(value: .init(
-						expiry: .init(year: 2142, month: 12),
-						holder: "Satoshi Nakamoto",
-						number: "0000 0000 2100 0000",
-						cvc: 512
-					)),
-				])
-			)
+			PersonaData.previewValue
 		}
 
 		let personaJSON: JSON = [
