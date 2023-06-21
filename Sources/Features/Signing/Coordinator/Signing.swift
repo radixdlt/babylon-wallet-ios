@@ -48,7 +48,7 @@ public enum SigningPurposeWithPayload: Sendable, Hashable {
 
 	func dataToSign() throws -> Data {
 		switch self {
-		case let .signAuth(auth): return auth.payloadToHashAndSign
+		case let .signAuth(auth): return try blake2b(data: auth.payloadToHashAndSign)
 		case let .signTransaction(_, intent, _): return try Data(hex: RadixEngine.instance.hashTransactionItent(intent).get().hash)
 		}
 	}

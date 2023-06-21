@@ -103,8 +103,8 @@ extension SubmitTransactionClient: DependencyKey {
 
 			do {
 				let decompiledNotarized = try engineToolkitClient.decompileNotarizedTransactionIntent(.init(
-					compiledNotarizedIntent: Array(request.compiledNotarizedTXIntent.compiledIntent),
-					instructionsOutputKind: .parsed
+					compiledNotarizedIntent: request.compiledNotarizedTXIntent.compiledIntent,
+					instructionsOutputKind: .string
 				))
 				debugPrintTX(decompiledNotarized)
 
@@ -120,7 +120,7 @@ extension SubmitTransactionClient: DependencyKey {
 			}
 
 			let submitTransactionRequest = GatewayAPI.TransactionSubmitRequest(
-				notarizedTransactionHex: Data(request.compiledNotarizedTXIntent.compiledIntent).hex
+				notarizedTransactionHex: request.compiledNotarizedTXIntent.compiledIntent.hex
 			)
 
 			let response = try await gatewayAPIClient.submitTransaction(submitTransactionRequest)

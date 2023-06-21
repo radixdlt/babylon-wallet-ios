@@ -272,10 +272,33 @@ public struct StaticallyValidateTransactionRequest: Codable, Equatable {
 			case minTipPercentage = "min_tip_percentage"
 			case networkId = "network_id"
 		}
+
+		public init(
+			maxCostUnitLimit: String = "100000000",
+			maxEpochRange: String = "100",
+			maxNotarizedPayloadSize: String = "1048576",
+			maxTipPercentage: String = "65535",
+			minCostUnitLimit: String = "1000000",
+			minTipPercentage: String = "0",
+			networkId: String = "\(NetworkID.enkinet.rawValue)"
+		) {
+			self.maxCostUnitLimit = maxCostUnitLimit
+			self.maxEpochRange = maxEpochRange
+			self.maxNotarizedPayloadSize = maxNotarizedPayloadSize
+			self.maxTipPercentage = maxTipPercentage
+			self.minCostUnitLimit = minCostUnitLimit
+			self.minTipPercentage = minTipPercentage
+			self.networkId = networkId
+		}
 	}
 
 	public let compiledNotarizedIntent: String
 	public let validationConfig: Config
+
+	public init(compiledNotarizedIntent: String, validationConfig: Config) {
+		self.compiledNotarizedIntent = compiledNotarizedIntent
+		self.validationConfig = validationConfig
+	}
 
 	private enum CodingKeys: String, CodingKey {
 		case compiledNotarizedIntent = "compiled_notarized_intent"
@@ -537,7 +560,7 @@ func prettyPrint<FailedDecodable: Decodable>(
 /// using old Cocoa APIs
 func prettyPrint(jsonString: String, label: String?) {
 	guard
-		// RadixEngine._debugPrint,
+		RadixEngine._debugPrint,
 		let data = jsonString.data(using: .utf8),
 		let pretty = data.prettyPrintedJSONString
 	else {

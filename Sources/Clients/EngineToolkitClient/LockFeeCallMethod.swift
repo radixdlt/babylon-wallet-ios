@@ -178,6 +178,7 @@ extension EngineToolkitClient {
 		initialSupply: String = "21000000"
 	) throws -> TransactionManifest {
 		let faucetAddress = try faucetAddress(for: networkID)
+		let iconURL = "https://c4.wallpaperflare.com/wallpaper/817/534/563/ave-bosque-fantasia-fenix-wallpaper-preview.jpg"
 		let instructions: [any InstructionProtocol] = [
 			lockFeeCallMethod(address: faucetAddress),
 
@@ -185,12 +186,12 @@ extension EngineToolkitClient {
 				divisibility: tokenDivisivility,
 				metadata: Map_(
 					keyKind: .string,
-					valueKind: .string,
+					valueKind: .enum,
 					entries: [
-						[.string("name"), .string(tokenName)],
-						[.string("symbol"), .string(tokenSymbol)],
-						[.string("description"), .string(description)],
-						[.string("icon_url"), .string("https://c4.wallpaperflare.com/wallpaper/817/534/563/ave-bosque-fantasia-fenix-wallpaper-preview.jpg")],
+						[.string("name"), .enum(.init(.metadata_String, fields: [.string(tokenName)]))],
+						[.string("symbol"), .enum(.init(.metadata_String, fields: [.string(tokenSymbol)]))],
+						[.string("description"), .enum(.init(.metadata_String, fields: [.string(description)]))],
+						[.string("icon_url"), .enum(.init(.metadata_String, fields: [.string(iconURL)]))],
 					]
 				),
 
