@@ -133,8 +133,10 @@ public struct FactorSourcesOfKindList<FactorSourceOfKind: Sendable & Hashable>: 
 			switch newFactorSourceAction {
 			case let .done(.success(factorSource)):
 				state.destination = nil
+				state.factorSources.append(factorSource)
 				state.selectedFactorSourceID = factorSource.id
-				return updateFactorSourcesEffect(state: &state)
+				return .none
+
 			case let .done(.failure(error)):
 				state.destination = nil
 				return .none
