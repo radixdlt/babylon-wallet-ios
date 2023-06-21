@@ -67,6 +67,7 @@ extension PersonaData.PostalAddress.CountryOrRegion {
 				[.province],
 				[.countryOrRegion],
 			]
+
 		case .armenia:
 			return [
 				[.streetLine0],
@@ -82,6 +83,7 @@ extension PersonaData.PostalAddress.CountryOrRegion {
 				[.city],
 				[.countryOrRegion],
 			]
+
 		case .australia:
 			return [
 				[.streetLine0],
@@ -851,6 +853,7 @@ extension PersonaData.PostalAddress.CountryOrRegion {
 				[.countryOrRegion],
 				[.postalCodeNumber],
 			]
+
 		case .kenya:
 			return [
 				[.streetLine0],
@@ -1188,7 +1191,7 @@ extension PersonaData.PostalAddress.CountryOrRegion {
 				[.streetLine0],
 				[.streetLine1],
 				[.suburb],
-				[.city, .postcodeNumber],
+				[.city, .postalCodeNumber],
 				[.countryOrRegion],
 			]
 
