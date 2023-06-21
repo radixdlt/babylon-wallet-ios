@@ -8,6 +8,7 @@ public struct PersonaData: Sendable, Hashable, Codable {
 
 	public typealias IdentifiedEmailAddresses = CollectionOfIdentifiedEntries<EmailAddress>
 	public typealias IdentifiedPhoneNumbers = CollectionOfIdentifiedEntries<PhoneNumber>
+	public typealias IdentifiedURLs = CollectionOfIdentifiedEntries<AssociatedURL>
 	public typealias IdentifiedPostalAddresses = CollectionOfIdentifiedEntries<PostalAddress>
 	public typealias IdentifiedCreditCards = CollectionOfIdentifiedEntries<CreditCard>
 
@@ -17,6 +18,7 @@ public struct PersonaData: Sendable, Hashable, Codable {
 
 	public var emailAddresses: IdentifiedEmailAddresses
 	public var phoneNumbers: IdentifiedPhoneNumbers
+	public var urls: IdentifiedURLs
 	public var postalAddresses: IdentifiedPostalAddresses
 	public var creditCards: IdentifiedCreditCards
 
@@ -26,13 +28,14 @@ public struct PersonaData: Sendable, Hashable, Codable {
 		companyName: IdentifiedCompanyName? = nil,
 		emailAddresses: IdentifiedEmailAddresses = .init(),
 		phoneNumbers: IdentifiedPhoneNumbers = .init(),
+		urls: IdentifiedURLs = .init(),
 		postalAddresses: IdentifiedPostalAddresses = .init(),
 		creditCards: IdentifiedCreditCards = .init()
 	) {
 		// The only purpose of this switch is to make sure we get a compilation error when we add a new PersonaData.Entry kind, so
 		// we do not forget to handle it here.
 		switch PersonaData.Entry.Kind.name {
-		case .name, .dateOfBirth, .companyName, .emailAddress, .phoneNumber, .postalAddress, .creditCard: break
+		case .name, .dateOfBirth, .companyName, .emailAddress, .phoneNumber, .url, .postalAddress, .creditCard: break
 		}
 
 		self.name = name
@@ -41,6 +44,7 @@ public struct PersonaData: Sendable, Hashable, Codable {
 
 		self.emailAddresses = emailAddresses
 		self.phoneNumbers = phoneNumbers
+		self.urls = urls
 		self.postalAddresses = postalAddresses
 		self.creditCards = creditCards
 	}
@@ -56,13 +60,14 @@ extension PersonaData {
 
 		sequence.append(contentsOf: emailAddresses.map { $0.embed() })
 		sequence.append(contentsOf: phoneNumbers.map { $0.embed() })
+		sequence.append(contentsOf: urls.map { $0.embed() })
 		sequence.append(contentsOf: postalAddresses.map { $0.embed() })
 		sequence.append(contentsOf: creditCards.map { $0.embed() })
 
 		// The only purpose of this switch is to make sure we get a compilation error when we add a new PersonaData.Entry kind, so
 		// we do not forget to handle it here.
 		switch PersonaData.Entry.Kind.name {
-		case .name, .dateOfBirth, .companyName, .emailAddress, .phoneNumber, .postalAddress, .creditCard: break
+		case .name, .dateOfBirth, .companyName, .emailAddress, .phoneNumber, .url, .postalAddress, .creditCard: break
 		}
 
 		return sequence.compactMap { $0 }

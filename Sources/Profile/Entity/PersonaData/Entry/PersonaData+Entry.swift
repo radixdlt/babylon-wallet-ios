@@ -6,11 +6,13 @@ extension PersonaData {
 	public enum Entry: Sendable, Hashable, Codable, BasePersonaDataEntryProtocol {
 		case name(Name)
 		case dateOfBirth(DateOfBirth)
-		case emailAddress(EmailAddress)
-		case postalAddress(PostalAddress)
-		case phoneNumber(PhoneNumber)
-		case creditCard(CreditCard)
 		case companyName(CompanyName)
+
+		case emailAddress(EmailAddress)
+		case phoneNumber(PhoneNumber)
+		case url(AssociatedURL)
+		case postalAddress(PostalAddress)
+		case creditCard(CreditCard)
 	}
 }
 
@@ -18,24 +20,28 @@ extension PersonaData.Entry {
 	public var discriminator: PersonaData.Entry.Kind {
 		switch self {
 		case .name: return .name
+		case .dateOfBirth: return .dateOfBirth
+		case .companyName: return .companyName
+
 		case .emailAddress: return .emailAddress
 		case .phoneNumber: return .phoneNumber
-		case .dateOfBirth: return .dateOfBirth
+		case .url: return .url
 		case .postalAddress: return .postalAddress
 		case .creditCard: return .creditCard
-		case .companyName: return .companyName
 		}
 	}
 
 	public func embed() -> PersonaData.Entry {
 		switch self {
 		case let .name(value): return value.embed()
-		case let .emailAddress(value): return value.embed()
-		case let .postalAddress(value): return value.embed()
-		case let .phoneNumber(value): return value.embed()
 		case let .dateOfBirth(value): return value.embed()
-		case let .creditCard(value): return value.embed()
 		case let .companyName(value): return value.embed()
+
+		case let .emailAddress(value): return value.embed()
+		case let .phoneNumber(value): return value.embed()
+		case let .url(value): return value.embed()
+		case let .postalAddress(value): return value.embed()
+		case let .creditCard(value): return value.embed()
 		}
 	}
 }

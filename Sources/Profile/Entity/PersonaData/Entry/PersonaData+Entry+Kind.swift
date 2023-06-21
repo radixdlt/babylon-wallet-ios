@@ -4,11 +4,13 @@ import Foundation
 extension PersonaData.Entry {
 	public enum Kind: String, Sendable, Hashable, Codable {
 		case name
-		case emailAddress
 		case dateOfBirth
-		case postalAddress
-		case phoneNumber
-		case creditCard
 		case companyName
+
+		case emailAddress
+		case url
+		case phoneNumber
+		case postalAddress
+		case creditCard
 	}
 }

@@ -32,6 +32,10 @@ public struct CreationOfPersona: Sendable, FeatureReducer {
 					.init(value: .init(number: "21000000")),
 					.init(value: .init(number: "123456789")),
 				]),
+				urls: .init(collection: [
+					.init(value: .init(validating: "bitcoin.org")),
+					.init(value: .init(validating: "https://github.com/bitcoin-core/secp256k1")),
+				]),
 				postalAddresses: .init(collection: [
 					.init(value: .init(validating: [
 						.postalCodeNumber(21_000_000),

@@ -320,6 +320,7 @@ extension PersonaDetails.View {
 			let dateOfBirth: Date?
 			let emailAddresses: [String]?
 			let phoneNumbers: [String]?
+			let urls: [String]?
 			let postalAddresses: [PersonaData.PostalAddress]?
 			let creditCards: [PersonaData.CreditCard]?
 
@@ -342,13 +343,14 @@ extension PersonaDetails.View {
 				self.lastName = personaData?.name?.value.family
 				self.emailAddresses = personaData?.emailAddresses.map(\.value.email)
 				self.phoneNumbers = personaData?.phoneNumbers.map(\.value.number)
+				self.urls = personaData?.urls.map(\.value.url.absoluteString)
 				self.postalAddresses = personaData?.postalAddresses.map(\.value)
 				self.creditCards = personaData?.creditCards.map(\.value)
 
 				// The only purpose of this switch is to make sure we get a compilation error when we add a new PersonaData.Entry kind, so
 				// we do not forget to handle it here.
 				switch PersonaData.Entry.Kind.name {
-				case .name, .dateOfBirth, .companyName, .emailAddress, .phoneNumber, .postalAddress, .creditCard: break
+				case .name, .dateOfBirth, .companyName, .emailAddress, .phoneNumber, .url, .postalAddress, .creditCard: break
 				}
 			}
 		}
@@ -406,6 +408,13 @@ extension PersonaDetails.View {
 						Text("Phone numbers").font(.app.sectionHeader)
 						ForEach(phoneNumbers, id: \.self) { phoneNumber in
 							VPair(heading: L10n.AuthorizedDapps.PersonaDetails.phoneNumber, item: phoneNumber)
+						}
+					}
+
+					if let urls = viewStore.urls {
+						Text("URLs").font(.app.sectionHeader)
+						ForEach(urls, id: \.self) { url in
+							VPair(heading: "URL", item: url)
 						}
 					}
 

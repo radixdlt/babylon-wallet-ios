@@ -229,36 +229,51 @@ final class PersonaFieldTests: TestCase {
 			$0.uuid = .incrementing
 		} operation: {
 			try PersonaData(
-				name: .init(
-					value: .init(
-						given: "Olof",
-						family: "Palme",
-						variant: .western
+				name: .init(value: .init(
+					given: "Satoshi",
+					middle: "Creator of Bitcoin",
+					family: "Nakamoto", variant: .eastern
+				)),
+				dateOfBirth: .init(value: .init(year: 2009, month: 1, day: 3)),
+				companyName: .init(value: .init(name: "Bitcoin")),
+				emailAddresses: .init(collection: [
+					.init(value: .init(validating: "satoshi@nakamoto.bitcoin")),
+					.init(value: .init(validating: "be.your@own.bank")),
+				]),
+				phoneNumbers: .init(collection: [
+					.init(value: .init(number: "21000000")),
+					.init(value: .init(number: "123456789")),
+				]),
+				urls: .init(collection: [
+					.init(value: .init(validating: "bitcoin.org")),
+					.init(value: .init(validating: "https://github.com/bitcoin-core/secp256k1")),
+				]),
+				postalAddresses: .init(collection: [
+					.init(value: .init(validating: [
+						.postalCodeNumber(21_000_000),
+						.prefecture("SHA256"), .county("Hashtown"),
+						.furtherDivisionsLine0("Sound money street"),
+						.furtherDivisionsLine1(""),
+						.country(.japan),
+					])),
+					.init(value: .init(validating: [
+						.streetLine0("Copthall House"),
+						.streetLine1("King street"),
+						.city("Newcastle-under-Lyme"),
+						.county("Newcastle"),
+						.postcodeString("ST5 1UE"),
+						.country(.unitedKingdom),
+					])),
+				]),
+				creditCards: .init(collection: [
+					.init(value: .init(
+						expiry: .init(year: 2142, month: 12),
+						holder: "Satoshi Nakamoto",
+						number: "0000 0000 2100 0000",
+						cvc: 512
 					)
-				),
-				dateOfBirth: .init(value: .init(year: 1927, month: 01, day: 30)),
-				emailAddresses: [
-					"palme@stadsminister.se",
-					"olof@boss.se",
-				],
-				phoneNumbers: [
-					.init(value: .init(number: "+468-1234567")),
-					.init(value: .init(number: "+468-9876543")),
-				],
-				postalAddresses: [
-					[
-						.streetLine0("Västerlånggatan 31"),
-						.streetLine1(""),
-						.postalCodeNumber(11129), .city("Stockholm"),
-						.country(.sweden),
-					],
-					[
-						.streetLine0("Strömgatan 18"),
-						.streetLine1("Sagerska Huset"),
-						.postalCodeNumber(11152), .city("Stockholm"),
-						.country(.sweden),
-					],
-				]
+					),
+				])
 			)
 		}
 

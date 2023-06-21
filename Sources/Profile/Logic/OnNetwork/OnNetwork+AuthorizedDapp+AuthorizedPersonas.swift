@@ -126,6 +126,7 @@ extension Profile.Network {
 						companyName: pick(from: \.companyName, using: \.companyName),
 						emailAddresses: filter(from: \.emailAddresses, using: \.emailAddresses),
 						phoneNumbers: filter(from: \.phoneNumbers, using: \.phoneNumbers),
+						urls: filter(from: \.urls, using: \.urls),
 						postalAddresses: filter(from: \.postalAddresses, using: \.postalAddresses),
 						creditCards: filter(from: \.creditCards, using: \.creditCards)
 					)
@@ -133,7 +134,7 @@ extension Profile.Network {
 					// The only purpose of this switch is to make sure we get a compilation error when we add a new PersonaData.Entry kind, so
 					// we do not forget to handle it here.
 					switch PersonaData.Entry.Kind.name {
-					case .name, .dateOfBirth, .companyName, .emailAddress, .phoneNumber, .postalAddress, .creditCard: break
+					case .name, .dateOfBirth, .companyName, .emailAddress, .phoneNumber, .url, .postalAddress, .creditCard: break
 					}
 
 					return personaData

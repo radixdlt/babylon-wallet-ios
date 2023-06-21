@@ -148,6 +148,7 @@ extension Profile.Network.AuthorizedDapp {
 
 			public let emailAddresses: SharedCollection?
 			public let phoneNumbers: SharedCollection?
+			public let urls: SharedCollection?
 			public let postalAddresses: SharedCollection?
 			public let creditCards: SharedCollection?
 
@@ -157,13 +158,14 @@ extension Profile.Network.AuthorizedDapp {
 				].compactMap { $0 }
 				ids.append(contentsOf: emailAddresses?.ids ?? [])
 				ids.append(contentsOf: phoneNumbers?.ids ?? [])
+				ids.append(contentsOf: urls?.ids ?? [])
 				ids.append(contentsOf: postalAddresses?.ids ?? [])
 				ids.append(contentsOf: creditCards?.ids ?? [])
 
 				// The only purpose of this switch is to make sure we get a compilation error when we add a new PersonaData.Entry kind, so
 				// we do not forget to handle it here.
 				switch PersonaData.Entry.Kind.name {
-				case .name, .dateOfBirth, .companyName, .emailAddress, .phoneNumber, .postalAddress, .creditCard: break
+				case .name, .dateOfBirth, .companyName, .emailAddress, .phoneNumber, .url, .postalAddress, .creditCard: break
 				}
 
 				return Set(ids)
@@ -174,6 +176,7 @@ extension Profile.Network.AuthorizedDapp {
 				dateOfBirth: PersonaDataEntryID? = nil,
 				companyName: PersonaDataEntryID? = nil,
 				postalAddresses: SharedCollection? = nil,
+				urls: SharedCollection? = nil,
 				emailAddresses: SharedCollection? = nil,
 				phoneNumbers: SharedCollection? = nil,
 				creditCards: SharedCollection? = nil
@@ -184,13 +187,14 @@ extension Profile.Network.AuthorizedDapp {
 
 				self.emailAddresses = emailAddresses
 				self.phoneNumbers = phoneNumbers
+				self.urls = urls
 				self.postalAddresses = postalAddresses
 				self.creditCards = creditCards
 
 				// The only purpose of this switch is to make sure we get a compilation error when we add a new PersonaData.Entry kind, so
 				// we do not forget to handle it here.
 				switch PersonaData.Entry.Kind.name {
-				case .name, .dateOfBirth, .companyName, .emailAddress, .phoneNumber, .postalAddress, .creditCard: break
+				case .name, .dateOfBirth, .companyName, .emailAddress, .phoneNumber, .url, .postalAddress, .creditCard: break
 				}
 			}
 		}
