@@ -274,8 +274,8 @@ extension PersonaData.PostalAddress {
 		case turksAndCaicosIslans
 		case tuvalu
 
-		// MARK: V
-		case vietnam
+		// MARK: U
+		case usVirginIslands
 		case uganda
 		case ukraine
 		case unitedArabEmirates
@@ -283,9 +283,17 @@ extension PersonaData.PostalAddress {
 		case unitedStates
 		case uruguay
 		case uzbekistan
+
+		// MARK: V
+		case vanuatu
+		case vietnam
 		case vaticanCity
 		case venezuela
+
+		// MARK: Y
 		case yemen
+
+		// MARK: Z
 		case zambia
 		case zimbabwe
 	}

@@ -1779,6 +1779,16 @@ extension PersonaData.PostalAddress.Country {
 				[.country],
 			]
 
+		// MARK: U
+		case .usVirginIslands:
+			return [
+				[.streetLine0],
+				[.streetLine1],
+				[.city],
+				[.state, .zipNumber],
+				[.country],
+			]
+
 		case .uganda:
 			return [
 				[.streetLine0],
@@ -1840,6 +1850,15 @@ extension PersonaData.PostalAddress.Country {
 				[.city],
 				[.country],
 				[.postalCodeNumber],
+			]
+
+		// MARK: V
+		case .vanuatu:
+			return [
+				[.streetLine0],
+				[.streetLine1],
+				[.city],
+				[.country],
 			]
 
 		case .vaticanCity:
