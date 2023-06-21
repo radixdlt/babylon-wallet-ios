@@ -271,14 +271,138 @@ final class PersonaFieldTests: TestCase {
 						holder: "Satoshi Nakamoto",
 						number: "0000 0000 2100 0000",
 						cvc: 512
-					)
-					),
+					)),
 				])
 			)
 		}
 
 		let personaJSON: JSON = [
-			"test": "fail",
+			"address": "identity_tdx_c_1ps4edl7jjs0ahz6yacngmtf0w9p2s4p7kapjrlnpy9asvx5p22",
+			"displayName": "Satoshi",
+			"networkID": 12,
+			"personaData": [
+				"name": [
+					"id": "00000000-0000-0000-0000-000000000000",
+					"value": [
+						"family": "Nakamoto",
+						"given": "Satoshi",
+						"middle": "Creator of Bitcoin",
+						"variant": "eastern",
+					],
+				],
+				"dateOfBirth": [
+					"id": "00000000-0000-0000-0000-000000000001",
+					"value": "2009-01-03T12:00:00Z",
+				],
+				"companyName": [
+					"id": "00000000-0000-0000-0000-000000000002",
+					"value": "Bitcoin",
+				],
+				"emailAddresses": [
+					[
+						"id": "00000000-0000-0000-0000-000000000003",
+						"value": "satoshi@nakamoto.bitcoin",
+					],
+					[
+						"id": "00000000-0000-0000-0000-000000000004",
+						"value": "be.your@own.bank",
+					],
+				],
+				"phoneNumbers": [
+					[
+						"id": "00000000-0000-0000-0000-000000000005",
+						"value": "21000000",
+					],
+					[
+						"id": "00000000-0000-0000-0000-000000000006",
+						"value": "123456789",
+					],
+				],
+				"urls": [
+					[
+						"id": "00000000-0000-0000-0000-000000000007",
+						"value": "bitcoin.org",
+					],
+					[
+						"id": "00000000-0000-0000-0000-000000000008",
+						"value": "https://github.com/bitcoin-core/secp256k1",
+					],
+				],
+				"postalAddresses": [
+					[
+						"id": "00000000-0000-0000-0000-000000000009",
+						"value": [
+							[
+								"discriminator": "postalCodeNumber",
+								"value": 21_000_000,
+							],
+							[
+								"discriminator": "prefecture",
+								"value": "SHA256",
+							],
+							[
+								"discriminator": "county",
+								"value": "Hashtown",
+							],
+							[
+								"discriminator": "furtherDivisionsLine0",
+								"value": "Sound money street",
+							],
+							[
+								"discriminator": "furtherDivisionsLine1",
+								"value": "",
+							],
+							[
+								"discriminator": "country",
+								"value": "japan",
+							],
+						],
+					],
+					[
+						"id": "00000000-0000-0000-0000-000000000010",
+						"value": [
+							[
+								"discriminator": "streetLine0",
+								"value": "Copthall House",
+							],
+							[
+								"discriminator": "streetLine1",
+								"value": "King street",
+							],
+							[
+								"discriminator": "city",
+								"value": "Newcastle-under-Lyme",
+							],
+							[
+								"discriminator": "county",
+								"value": "Newcastle",
+							],
+							[
+								"discriminator": "postcodeString",
+								"value": "ST5 1UE",
+							],
+							[
+								"discriminator": "country",
+								"value": "unitedKingdom",
+							],
+						],
+					],
+				],
+				"creditCards": [
+					[
+						"id": "00000000-0000-0000-0000-000000000011",
+						"value": [
+							"cvc": 512,
+							"expiry": [
+								"month": 12,
+								"year": 2142,
+							],
+							"holder": "Satoshi Nakamoto",
+							"number": "0000 0000 2100 0000",
+						],
+					],
+				],
+			],
 		]
 
 		try XCTAssertJSONEncoding(
