@@ -2,7 +2,11 @@ import FeaturePrelude
 
 extension SecurityStructureConfigurationRow.State {
 	var viewState: SecurityStructureConfigurationRow.ViewState {
-		.init(label: config.label.rawValue, createdOn: config.createdOn, lastUpdatedOn: config.lastUpdatedOn)
+		.init(
+			label: configReference.label.rawValue,
+			createdOn: configReference.createdOn,
+			lastUpdatedOn: configReference.lastUpdatedOn
+		)
 	}
 }
 

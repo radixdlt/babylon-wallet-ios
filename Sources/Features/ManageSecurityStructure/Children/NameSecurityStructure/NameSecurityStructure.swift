@@ -4,15 +4,15 @@ import FeaturePrelude
 // MARK: - NameSecurityStructure
 public struct NameSecurityStructure: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
-		public let id: SecurityStructureConfiguration.ID
-		public let config: SecurityStructureConfiguration.Configuration
+		public let id: SecurityStructureConfigurationDetailed.ID
+		public let config: SecurityStructureConfigurationDetailed.Configuration
 		public var name: String
 		public let createdOn: Date
 		public let isUpdatingExisting: Bool
 
 		public init(
-			id: SecurityStructureConfiguration.ID,
-			config: SecurityStructureConfiguration.Configuration,
+			id: SecurityStructureConfigurationDetailed.ID,
+			config: SecurityStructureConfigurationDetailed.Configuration,
 			name: String,
 			createdOn: Date,
 			isUpdatingExisting: Bool
@@ -25,7 +25,7 @@ public struct NameSecurityStructure: Sendable, FeatureReducer {
 		}
 
 		public static func name(
-			new config: SecurityStructureConfiguration.Configuration
+			new config: SecurityStructureConfigurationDetailed.Configuration
 		) -> Self {
 			@Dependency(\.uuid) var uuid
 			@Dependency(\.date) var date
@@ -38,7 +38,7 @@ public struct NameSecurityStructure: Sendable, FeatureReducer {
 			)
 		}
 
-		public static func updateName(of structure: SecurityStructureConfiguration) -> Self {
+		public static func updateName(of structure: SecurityStructureConfigurationDetailed) -> Self {
 			Self(
 				id: structure.id,
 				config: structure.configuration,
@@ -55,7 +55,7 @@ public struct NameSecurityStructure: Sendable, FeatureReducer {
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
-		case updateOrCreateSecurityStructure(SecurityStructureConfiguration)
+		case updateOrCreateSecurityStructure(SecurityStructureConfigurationDetailed)
 	}
 
 	@Dependency(\.date) var date
@@ -68,7 +68,7 @@ public struct NameSecurityStructure: Sendable, FeatureReducer {
 			state.name = name
 			return .none
 		case let .confirmedName(name):
-			let structure = SecurityStructureConfiguration(
+			let structure = SecurityStructureConfigurationDetailed(
 				id: state.id,
 				label: name,
 				configuration: state.config,

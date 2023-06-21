@@ -171,6 +171,10 @@ extension SecurityStructureConfigurationDetailed {
 			lastUpdatedOn: lastUpdatedOn
 		)
 	}
+
+	public var isSimple: Bool {
+		asReference().isSimple
+	}
 }
 
 extension Profile {

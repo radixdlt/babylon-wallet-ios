@@ -23,7 +23,7 @@ public struct SecurityStructureConfigurationList: Sendable, FeatureReducer {
 
 	public enum DelegateAction: Sendable, Equatable {
 		case createNewStructure
-		case displayDetails(SecurityStructureConfiguration)
+		case displayDetails(SecurityStructureConfigurationReference)
 	}
 
 	@Dependency(\.appPreferencesClient) var appPreferencesClient
@@ -48,7 +48,7 @@ public struct SecurityStructureConfigurationList: Sendable, FeatureReducer {
 		switch viewAction {
 		case .task:
 			return .task {
-				let configs = await appPreferencesClient.getPreferences().security.structureConfigurations
+				let configs = await appPreferencesClient.getPreferences().security.structureConfigurationReferences
 				return .internal(.configsLoaded(.init(
 					uncheckedUniqueElements: configs.map(SecurityStructureConfigurationRow.State.init))
 				))
@@ -62,10 +62,10 @@ public struct SecurityStructureConfigurationList: Sendable, FeatureReducer {
 		switch childAction {
 		case let .config(id, action: .delegate(.displayDetails)):
 			guard let configState = state.configs[id: id] else {
-				assertionFailure("did not find config")
+				assertionFailure("did not find config state")
 				return .none
 			}
-			return .send(.delegate(.displayDetails(configState.config)))
+			return .send(.delegate(.displayDetails(configState.configReference)))
 		default: return .none
 		}
 	}

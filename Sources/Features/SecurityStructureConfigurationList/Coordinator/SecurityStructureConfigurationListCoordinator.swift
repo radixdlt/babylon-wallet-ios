@@ -16,6 +16,10 @@ public struct SecurityStructureConfigurationListCoordinator: Sendable, FeatureRe
 		}
 	}
 
+	public enum InternalAction: Sendable, Equatable {
+		case loadDetailsForSecurityStructureResult(TaskResult<SecurityStructureConfigurationDetailed>)
+	}
+
 	public enum ChildAction: Sendable, Equatable {
 		case configList(SecurityStructureConfigurationList.Action)
 		case destination(PresentationAction<Destination.Action>)
@@ -59,18 +63,36 @@ public struct SecurityStructureConfigurationListCoordinator: Sendable, FeatureRe
 			}
 	}
 
+	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
+		switch internalAction {
+		case let .loadDetailsForSecurityStructureResult(.success(config)):
+			state.destination = .manageSecurityStructureCoordinator(.init(mode: .existing(config)))
+			return .none
+		case let .loadDetailsForSecurityStructureResult(.failure(error)):
+			loggerGlobal.error("Failed to load details for security structure config reference, error: \(error)")
+			errorQueue.schedule(error)
+			return .none
+		}
+	}
+
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
 		case .configList(.delegate(.createNewStructure)):
 			state.destination = .manageSecurityStructureCoordinator(.init())
 			return .none
 
-		case let .configList(.delegate(.displayDetails(config))):
-			state.destination = .manageSecurityStructureCoordinator(.init(mode: .existing(config)))
-			return .none
+		case let .configList(.delegate(.displayDetails(configReference))):
+
+			return .task {
+				let taskResult = await TaskResult {
+					try await appPreferencesClient.getDetailsOfSecurityStructure(configReference)
+				}
+				return .internal(.loadDetailsForSecurityStructureResult(taskResult))
+			}
 
 		case let .destination(.presented(.manageSecurityStructureCoordinator(.delegate(.done(.success(config)))))):
-			state.configList.configs[id: config.id] = .init(config: config)
+			let configReference = config.asReference()
+			state.configList.configs[id: configReference.id] = .init(configReference: configReference)
 			state.destination = nil
 			return .none
 

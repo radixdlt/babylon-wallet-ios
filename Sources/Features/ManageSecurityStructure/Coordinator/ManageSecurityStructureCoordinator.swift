@@ -10,7 +10,7 @@ public struct ManageSecurityStructureCoordinator: Sendable, FeatureReducer {
 		public var path: StackState<Path.State> = []
 
 		public enum Mode: Sendable, Hashable {
-			case existing(SecurityStructureConfiguration)
+			case existing(SecurityStructureConfigurationDetailed)
 			case new
 		}
 
@@ -70,7 +70,7 @@ public struct ManageSecurityStructureCoordinator: Sendable, FeatureReducer {
 	}
 
 	public enum DelegateAction: Sendable, Hashable {
-		case done(TaskResult<SecurityStructureConfiguration>)
+		case done(TaskResult<SecurityStructureConfigurationDetailed>)
 	}
 
 	@Dependency(\.errorQueue) var errorQueue
@@ -120,8 +120,9 @@ public struct ManageSecurityStructureCoordinator: Sendable, FeatureReducer {
 
 			return .task { [isUpdatingExisting = state.mode == .new] in
 				let taskResult = await TaskResult {
+					let configReference = structure.asReference()
 					try await appPreferencesClient.updating { preferences in
-						let didUpdateExisting = preferences.security.structureConfigurations.updateOrAppend(structure) != nil
+						let didUpdateExisting = preferences.security.structureConfigurationReferences.updateOrAppend(configReference) != nil
 						assert(didUpdateExisting == isUpdatingExisting)
 					}
 					return structure

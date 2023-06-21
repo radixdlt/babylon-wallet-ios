@@ -17,7 +17,7 @@ public typealias ListLostPhoneHelper = FactorSourcesOfKindList<TrustedContactFac
 public struct SimpleManageSecurityStructureFlow: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public enum Mode: Sendable, Hashable {
-			case existing(SecurityStructureConfiguration)
+			case existing(SecurityStructureConfigurationDetailed)
 			case new(New)
 
 			public struct New: Sendable, Hashable {
@@ -54,8 +54,8 @@ public struct SimpleManageSecurityStructureFlow: Sendable, FeatureReducer {
 
 	public enum DelegateAction: Sendable, Equatable {
 		public enum Product: Sendable, Equatable {
-			case updating(structure: SecurityStructureConfiguration)
-			case creatingNew(config: SecurityStructureConfiguration.Configuration)
+			case updating(structure: SecurityStructureConfigurationDetailed)
+			case creatingNew(config: SecurityStructureConfigurationDetailed.Configuration)
 		}
 
 		case updatedOrCreatedSecurityStructure(TaskResult<Product>)
@@ -195,7 +195,7 @@ public struct SimpleManageSecurityStructureFlow: Sendable, FeatureReducer {
 							singleRecoveryFactor: simpleFactorConfig.singleRecoveryFactor,
 							singleConfirmationFactor: simpleFactorConfig.singleConfirmationFactor
 						)
-						let config = SecurityStructureConfiguration.Configuration(from: simpleUnnamed)
+						let config = SecurityStructureConfigurationDetailed.Configuration(from: simpleUnnamed)
 						return Self.DelegateAction.Product.creatingNew(config: config)
 					}
 					return .delegate(.updatedOrCreatedSecurityStructure(taskResult))
@@ -208,7 +208,7 @@ public struct SimpleManageSecurityStructureFlow: Sendable, FeatureReducer {
 	}
 }
 
-extension SecurityStructureConfiguration.Configuration {
+extension SecurityStructureConfigurationDetailed.Configuration {
 	init(from simple: SimpleUnnamedSecurityStructureConfig) {
 		self.init(
 			primaryRole: .single(simple.singlePrimaryFactor),
@@ -218,14 +218,14 @@ extension SecurityStructureConfiguration.Configuration {
 	}
 }
 
-extension SecurityStructureConfiguration {
+extension SecurityStructureConfigurationDetailed {
 	var securityQuestionsFactorSource: SecurityQuestionsFactorSource {
 		precondition(isSimple)
 		return configuration.confirmationRole.thresholdFactors[0].extract(SecurityQuestionsFactorSource.self)!
 	}
 }
 
-extension SecurityStructureConfiguration {
+extension SecurityStructureConfigurationDetailed {
 	var trustedContactFactorSource: TrustedContactFactorSource {
 		precondition(isSimple)
 		return configuration.recoveryRole.thresholdFactors[0].extract(TrustedContactFactorSource.self)!
