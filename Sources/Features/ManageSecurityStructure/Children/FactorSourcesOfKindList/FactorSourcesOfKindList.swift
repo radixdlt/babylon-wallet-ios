@@ -14,32 +14,22 @@ public struct FactorSourcesOfKindList<FactorSourceOfKind: Sendable & Hashable>: 
 
 		public let mode: Mode
 
-		public var factorSources: IdentifiedArrayOf<FactorSourceOfKind>
+		public var factorSources: IdentifiedArrayOf<FactorSourceOfKind> = []
 
-		public var selectedFactorSourceID: FactorSourceOfKind.ID? = nil
-
-		let selectedFactorSourceControlRequirements: FactorSourceOfKind? = nil
+		public var selectedFactorSourceID: FactorSourceOfKind.ID?
 
 		@PresentationState
 		public var destination: Destinations.State? = nil
 
 		public init(
 			mode: Mode,
-			factorSources: IdentifiedArrayOf<FactorSourceOfKind>?
+			selectedFactorSource: FactorSourceOfKind? = nil
 		) {
 			self.mode = mode
-			if let factorSources {
-				self.factorSources = factorSources
-			} else {
-				self.factorSources = []
+			if let selectedFactorSource {
+				self.selectedFactorSourceID = selectedFactorSource.id
+				self.factorSources = [selectedFactorSource]
 			}
-		}
-
-		public init(
-			mode: Mode,
-			factorSource: FactorSourceOfKind
-		) {
-			self.init(mode: mode, factorSources: [factorSource])
 		}
 	}
 
@@ -123,7 +113,12 @@ public struct FactorSourcesOfKindList<FactorSourceOfKind: Sendable & Hashable>: 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
 		case let .loadedFactorSources(.success(loadedFactors)):
-			state.factorSources.append(contentsOf: loadedFactors)
+			if let existing = state.factorSources.first {
+				if !loadedFactors.contains(where: { $0.id == existing.id }) {
+					assertionFailure("BAD loaded factor sources from profile does not contain pre-selected factor source.")
+				}
+			}
+			state.factorSources = loadedFactors
 			return .none
 		case let .loadedFactorSources(.failure(error)):
 			errorQueue.schedule(error)

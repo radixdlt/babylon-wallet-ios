@@ -57,9 +57,38 @@ public struct ManageSomeFactorSource<FactorSourceOfKind: FactorSourceProtocol>: 
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
+		case let .manageTrustedContact(.delegate(.saveFactorSourceResult(.failure(error)))):
+			return .send(.delegate(.done(.failure(error))))
+
+		case let .manageTrustedContact(.delegate(.saveFactorSourceResult(.success(trustedContactFactorSource)))):
+			return delegateDone(factorSource: trustedContactFactorSource)
+
+		case let .manageSecurityQuestions(.delegate(.done(.success(result)))):
+			switch result {
+			case .decrypted:
+				assertionFailure("Discrepancy! Expected to encrypt security questions creating a new factor source, not decrypt it...")
+				return .send(.delegate(.done(.failure(DiscrepancyExpectedToCreateSecurityQuestionsNotDecryptIt()))))
+			case let .encrypted(securityQuestionsFactorSource):
+				return delegateDone(factorSource: securityQuestionsFactorSource)
+			}
+
 		case let .manageSecurityQuestions(.delegate(.done(.failure(error)))):
 			return .send(.delegate(.done(.failure(error))))
+
 		default: return .none
 		}
 	}
+
+	func delegateDone(factorSource: some FactorSourceProtocol) -> EffectTask<Action> {
+		guard let factorSourceOfKind = factorSource as? FactorSourceOfKind else {
+			let errorMessage = "Critical error, wrong factor source kind produced!"
+			loggerGlobal.critical(.init(stringLiteral: errorMessage))
+			assertionFailure(errorMessage)
+			return .none
+		}
+		return .send(.delegate(.done(.success(factorSourceOfKind))))
+	}
 }
+
+// MARK: - DiscrepancyExpectedToCreateSecurityQuestionsNotDecryptIt
+struct DiscrepancyExpectedToCreateSecurityQuestionsNotDecryptIt: Swift.Error {}

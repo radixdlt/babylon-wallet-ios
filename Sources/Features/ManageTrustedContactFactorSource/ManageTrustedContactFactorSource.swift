@@ -10,7 +10,7 @@ public struct ManageTrustedContactFactorSource: Sendable, FeatureReducer {
 		public var name: String
 		public let canEditRadixAddress: Bool
 		public enum Mode: Sendable, Hashable {
-			case existing(TrustedContactFactorSource, isFactorSourceSavedInProfile: Bool)
+			case existing(TrustedContactFactorSource)
 			case new
 		}
 
@@ -24,17 +24,23 @@ public struct ManageTrustedContactFactorSource: Sendable, FeatureReducer {
 		) {
 			self.mode = mode
 			switch mode {
-			case let .existing(existing, isFactorSourceSavedInProfile):
+			case let .existing(existing):
+				self.canEditRadixAddress = false
 				self.radixAddress = existing.id.body.address
 				self.emailAddress = existing.contact.email.email.rawValue
 				self.name = existing.contact.name.rawValue
-				self.canEditRadixAddress = !isFactorSourceSavedInProfile
 			case .new:
 				self.canEditRadixAddress = true
 				self.radixAddress = ""
 				self.emailAddress = ""
 				self.name = ""
 			}
+
+			#if DEBUG
+			self.radixAddress = "account_tdx_c_1p82arz264ntf727q2s7f7cm6pqucgqzuru3z7mgeg3gqua0wlj"
+			self.emailAddress = "satoshi@nakamoto.btc"
+			self.name = "Satoshi Nakamoto"
+			#endif
 		}
 	}
 
@@ -59,7 +65,7 @@ public struct ManageTrustedContactFactorSource: Sendable, FeatureReducer {
 	}
 
 	public enum DelegateAction: Sendable, Hashable {
-		case done(TrustedContactFactorSource)
+		case saveFactorSourceResult(TaskResult<TrustedContactFactorSource>)
 	}
 
 	public enum ViewAction: Sendable, Equatable {
@@ -119,11 +125,19 @@ public struct ManageTrustedContactFactorSource: Sendable, FeatureReducer {
 			return .none
 
 		case let .continueButtonTapped(accountAddress, emailAddress, name):
-			return .send(.delegate(.done(TrustedContactFactorSource.from(
-				radixAddress: accountAddress,
-				emailAddress: emailAddress,
-				name: name
-			))))
+//			return .send(.delegate(.done()))
+			return .task {
+				let result = await TaskResult {
+					let factorSource = TrustedContactFactorSource.from(
+						radixAddress: accountAddress,
+						emailAddress: emailAddress,
+						name: name
+					)
+					try await factorSourcesClient.saveFactorSource(factorSource.embed())
+					return factorSource
+				}
+				return .delegate(.saveFactorSourceResult(result))
+			}
 		}
 	}
 }

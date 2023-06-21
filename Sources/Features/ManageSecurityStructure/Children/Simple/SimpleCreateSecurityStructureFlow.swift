@@ -10,7 +10,7 @@ public struct SimpleUnnamedSecurityStructureConfig: Sendable, Hashable {
 	let singleConfirmationFactor: SecurityQuestionsFactorSource
 }
 
-public typealias ListConfirmerOfPhone = FactorSourcesOfKindList<SecurityQuestionsFactorSource>
+public typealias ListConfirmerOfNewPhone = FactorSourcesOfKindList<SecurityQuestionsFactorSource>
 public typealias ListLostPhoneHelper = FactorSourcesOfKindList<TrustedContactFactorSource>
 
 // MARK: - SimpleManageSecurityStructureFlow
@@ -67,31 +67,18 @@ public struct SimpleManageSecurityStructureFlow: Sendable, FeatureReducer {
 
 	public struct ModalDestinations: Sendable, ReducerProtocol {
 		public enum State: Sendable, Hashable {
-			case firstConfirmerOfPhone(AnswerSecurityQuestionsCoordinator.State)
-			case listConfirmerOfPhone(ListConfirmerOfPhone.State)
-
-			case firstLostPhoneHelper(ManageTrustedContactFactorSource.State)
+			case listConfirmerOfNewPhone(ListConfirmerOfNewPhone.State)
 			case listLostPhoneHelper(ListLostPhoneHelper.State)
 		}
 
 		public enum Action: Sendable, Equatable {
-			case firstConfirmerOfPhone(AnswerSecurityQuestionsCoordinator.Action)
-			case listConfirmerOfPhone(ListConfirmerOfPhone.Action)
-
-			case firstLostPhoneHelper(ManageTrustedContactFactorSource.Action)
+			case listConfirmerOfNewPhone(ListConfirmerOfNewPhone.Action)
 			case listLostPhoneHelper(ListLostPhoneHelper.Action)
 		}
 
 		public var body: some ReducerProtocolOf<Self> {
-			Scope(state: /State.firstConfirmerOfPhone, action: /Action.firstConfirmerOfPhone) {
-				AnswerSecurityQuestionsCoordinator()
-			}
-			Scope(state: /State.listConfirmerOfPhone, action: /Action.listConfirmerOfPhone) {
-				ListConfirmerOfPhone()
-			}
-
-			Scope(state: /State.firstLostPhoneHelper, action: /Action.firstLostPhoneHelper) {
-				ManageTrustedContactFactorSource()
+			Scope(state: /State.listConfirmerOfNewPhone, action: /Action.listConfirmerOfNewPhone) {
+				ListConfirmerOfNewPhone()
 			}
 			Scope(state: /State.listLostPhoneHelper, action: /Action.listLostPhoneHelper) {
 				ListLostPhoneHelper()
@@ -111,7 +98,7 @@ public struct SimpleManageSecurityStructureFlow: Sendable, FeatureReducer {
 			}
 	}
 
-	private func choseConfirmerOfPhone(
+	private func choseConfirmerOfNewPhone(
 		_ factorSource: SecurityQuestionsFactorSource,
 		_ state: inout State
 	) -> EffectTask<Action> {
@@ -128,38 +115,30 @@ public struct SimpleManageSecurityStructureFlow: Sendable, FeatureReducer {
 		return .none
 	}
 
+	private func choseLostPhoneHelper(
+		_ factorSource: TrustedContactFactorSource,
+		_ state: inout State
+	) -> EffectTask<Action> {
+		switch state.mode {
+		case var .new(new):
+			new.lostPhoneHelper = factorSource
+			state.mode = .new(new)
+		case var .existing(existing):
+			// FIXME: Error handling
+			try! existing.configuration.recoveryRole.changeFactorSource(to: factorSource)
+			state.mode = .existing(existing)
+		}
+		state.modalDestinations = nil
+		return .none
+	}
+
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
-		case let .modalDestinations(.presented(.firstLostPhoneHelper(.delegate(.done(lostPhoneHelper))))):
-			switch state.mode {
-			case var .new(new):
-				new.lostPhoneHelper = lostPhoneHelper
-				state.mode = .new(new)
-			case var .existing(existing):
-				// FIXME: Error handling
-				try! existing.configuration.recoveryRole.changeFactorSource(to: lostPhoneHelper)
-				state.mode = .existing(existing)
-			}
-			state.modalDestinations = nil
-			return .none
+		case let .modalDestinations(.presented(.listConfirmerOfNewPhone(.delegate(.choseFactorSource(secQFS))))):
+			return choseConfirmerOfNewPhone(secQFS, &state)
 
-		case let .modalDestinations(.presented(.firstConfirmerOfPhone(.delegate(.done(.success(.encrypted(factorSource))))))):
-			return choseConfirmerOfPhone(factorSource, &state)
-
-		case .modalDestinations(.presented(.firstConfirmerOfPhone(.delegate(.done(.success(.decrypted)))))):
-			state.modalDestinations = nil
-			assertionFailure("Expected to encrypt, not decrypt.")
-			return .none
-
-		case let .modalDestinations(.presented(.firstConfirmerOfPhone(.delegate(.done(.failure(error)))))):
-			state.modalDestinations = nil
-			errorQueue.schedule(error)
-			loggerGlobal.error("Failed to create new phone confirmer, error: \(error)")
-			return .none
-
-		case let .modalDestinations(.presented(.listConfirmerOfPhone(.delegate(.choseFactorSource(savedOrDraftFactorSource))))):
-
-			return choseConfirmerOfPhone(savedOrDraftFactorSource, &state)
+		case let .modalDestinations(.presented(.listLostPhoneHelper(.delegate(.choseFactorSource(trustedContactFS))))):
+			return choseLostPhoneHelper(trustedContactFS, &state)
 
 		default: return .none
 		}
@@ -171,34 +150,31 @@ public struct SimpleManageSecurityStructureFlow: Sendable, FeatureReducer {
 			switch state.mode {
 			case let .existing(structure):
 				precondition(structure.isSimple)
-				state.modalDestinations = .listConfirmerOfPhone(.init(
+				state.modalDestinations = .listConfirmerOfNewPhone(.init(
 					mode: .selection,
-					factorSource: structure.securityQuestionsFactorSource
+					selectedFactorSource: structure.securityQuestionsFactorSource
 				))
 			case .new:
-				state.modalDestinations = .firstConfirmerOfPhone(.init(
-					purpose: .encrypt
+				state.modalDestinations = .listConfirmerOfNewPhone(.init(
+					mode: .selection
 				))
 			}
 			return .none
 
 		case .lostPhoneHelperButtonTapped:
-			let mode: ManageTrustedContactFactorSource.State.Mode = {
-				switch state.mode {
-				case let .existing(structure):
-					guard structure.isSimple, let factorSource = structure.configuration.recoveryRole.thresholdFactors[0].extract(TrustedContactFactorSource.self) else {
-						return .new
-					}
-					return .existing(factorSource, isFactorSourceSavedInProfile: true)
-				case let .new(new):
-					if let unsavedTrustedContact = new.lostPhoneHelper {
-						return .existing(unsavedTrustedContact, isFactorSourceSavedInProfile: false)
-					} else {
-						return .new
-					}
-				}
-			}()
-			state.modalDestinations = .firstLostPhoneHelper(.init(mode: mode))
+			switch state.mode {
+			case let .existing(structure):
+				precondition(structure.isSimple)
+				state.modalDestinations = .listLostPhoneHelper(.init(
+					mode: .selection,
+					selectedFactorSource: structure.trustedContactFactorSource
+				))
+			case .new:
+				state.modalDestinations = .listLostPhoneHelper(.init(
+					mode: .selection
+				))
+			}
+
 			return .none
 
 		case let .finished(simpleFactorConfig):
@@ -246,5 +222,12 @@ extension SecurityStructureConfiguration {
 	var securityQuestionsFactorSource: SecurityQuestionsFactorSource {
 		precondition(isSimple)
 		return configuration.confirmationRole.thresholdFactors[0].extract(SecurityQuestionsFactorSource.self)!
+	}
+}
+
+extension SecurityStructureConfiguration {
+	var trustedContactFactorSource: TrustedContactFactorSource {
+		precondition(isSimple)
+		return configuration.recoveryRole.thresholdFactors[0].extract(TrustedContactFactorSource.self)!
 	}
 }
