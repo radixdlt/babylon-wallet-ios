@@ -64,13 +64,19 @@ extension PersonaData.PostalAddress {
 		case furtherDivisionsLine1(String)
 
 		/// Taiwan
-		case township(String)
+		case townshipSlashDistrict(String)
 
 		/// Colombia
 		case department(String)
 
+		/// UK
+		case townSlashCity(String)
+
 		/// Jordan
 		case postalDistrict(String)
+
+		/// Philippines
+		case districtSlashSubdivision(String)
 	}
 }
 
@@ -88,6 +94,8 @@ extension PersonaData.PostalAddress.Field {
 		case let .postalCode(value):
 			return value
 		case let .postcode(value):
+			return value
+		case let .townSlashCity(value):
 			return value
 		case let .zip(value):
 			return value
@@ -123,11 +131,13 @@ extension PersonaData.PostalAddress.Field {
 			return value
 		case let .furtherDivisionsLine1(value):
 			return value
-		case let .township(value):
+		case let .townshipSlashDistrict(value):
 			return value
 		case let .department(value):
 			return value
 		case let .postalDistrict(value):
+			return value
+		case let .districtSlashSubdivision(value):
 			return value
 		}
 	}
@@ -148,6 +158,8 @@ extension PersonaData.PostalAddress.Field {
 		switch discriminator {
 		case .area:
 			self = try .area(container.decode(String.self, forKey: .value))
+		case .townSlashCity:
+			self = try .townSlashCity(container.decode(String.self, forKey: .value))
 		case .streetLine0:
 			self = try .streetLine0(container.decode(String.self, forKey: .value))
 		case .streetLine1:
@@ -196,8 +208,10 @@ extension PersonaData.PostalAddress.Field {
 			self = try .furtherDivisionsLine0(container.decode(String.self, forKey: .value))
 		case .furtherDivisionsLine1:
 			self = try .furtherDivisionsLine1(container.decode(String.self, forKey: .value))
-		case .township:
-			self = try .township(container.decode(String.self, forKey: .value))
+		case .townshipSlashDistrict:
+			self = try .townshipSlashDistrict(container.decode(String.self, forKey: .value))
+		case .districtSlashSubdivision:
+			self = try .districtSlashSubdivision(container.decode(String.self, forKey: .value))
 		}
 	}
 
@@ -213,6 +227,8 @@ extension PersonaData.PostalAddress.Field {
 		case let .streetLine0(value):
 			try container.encode(value, forKey: .value)
 		case let .streetLine1(value):
+			try container.encode(value, forKey: .value)
+		case let .districtSlashSubdivision(value):
 			try container.encode(value, forKey: .value)
 		case let .postalCode(value):
 			try container.encode(value, forKey: .value)
@@ -246,13 +262,15 @@ extension PersonaData.PostalAddress.Field {
 			try container.encode(value, forKey: .value)
 		case let .county(value):
 			try container.encode(value, forKey: .value)
+		case let .townSlashCity(value):
+			try container.encode(value, forKey: .value)
 		case let .countySlashCity(value):
 			try container.encode(value, forKey: .value)
 		case let .furtherDivisionsLine0(value):
 			try container.encode(value, forKey: .value)
 		case let .furtherDivisionsLine1(value):
 			try container.encode(value, forKey: .value)
-		case let .township(value):
+		case let .townshipSlashDistrict(value):
 			try container.encode(value, forKey: .value)
 		case let .department(value):
 			try container.encode(value, forKey: .value)
@@ -295,12 +313,18 @@ extension PersonaData.PostalAddress.Field {
 		case area
 		case prefecture
 
+		// UK
+		case townSlashCity
+
 		case county
 		case countySlashCity
 
 		case furtherDivisionsLine0
 		case furtherDivisionsLine1
-		case township
+		case townshipSlashDistrict
+
+		/// Philippines
+		case districtSlashSubdivision
 	}
 }
 
@@ -308,6 +332,7 @@ extension PersonaData.PostalAddress.Field {
 	// FIXME: Strings localize this
 	public var display: String {
 		switch self {
+		case .districtSlashSubdivision: return "District/Subdivision"
 		case .countryOrRegion: return "Country or Region"
 		case .streetLine0, .streetLine1: return "Street"
 		case .postalCode: return "Postal code"
@@ -318,6 +343,7 @@ extension PersonaData.PostalAddress.Field {
 		case .prefectureLevelCity: return "Prefecture-level City"
 		case .city: return "City"
 		case .state: return "State"
+		case .townSlashCity: return "Town/City"
 		case .governorate: return "Governorate"
 		case .district: return "District"
 		case .neighbourhood: return "Neighbourhood"
@@ -330,7 +356,7 @@ extension PersonaData.PostalAddress.Field {
 		case .subjectOfTheFederation: return "Subject of the Federation"
 		case .prefecture: return "Prefecture"
 		case .county: return "County"
-		case .township: return "Township"
+		case .townshipSlashDistrict: return "Township/District"
 		case .furtherDivisionsLine0, .furtherDivisionsLine1: return "Further Divisions"
 		}
 	}
@@ -354,10 +380,12 @@ extension PersonaData.PostalAddress.Field {
 		case .neighbourhood: return .neighbourhood
 		case .suburb: return .suburb
 		case .province: return .province
+		case .townSlashCity: return .townSlashCity
 		case .region: return .region
 		case .area: return .area
+		case .districtSlashSubdivision: return .districtSlashSubdivision
 		case .subjectOfTheFederation: return .subjectOfTheFederation
-		case .township: return .township
+		case .townshipSlashDistrict: return .townshipSlashDistrict
 		case .islandName: return .islandName
 		case .prefecture: return .prefecture
 		case .county: return .county

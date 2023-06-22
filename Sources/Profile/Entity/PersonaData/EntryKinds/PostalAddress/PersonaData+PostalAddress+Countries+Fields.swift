@@ -1323,7 +1323,7 @@ extension PersonaData.PostalAddress.CountryOrRegion {
 			return [
 				[.streetLine0],
 				[.streetLine1],
-				[.district, .postalCode],
+				[.districtSlashSubdivision, .postalCode],
 				[.city, .countryOrRegion],
 			]
 
@@ -1671,8 +1671,8 @@ extension PersonaData.PostalAddress.CountryOrRegion {
 		case .taiwan:
 			return [
 				[.countryOrRegion],
-				[.zip, .county],
-				[.township],
+				[.zip, .countySlashCity],
+				[.townshipSlashDistrict],
 				[.streetLine0],
 				[.streetLine1],
 			]
@@ -1697,7 +1697,7 @@ extension PersonaData.PostalAddress.CountryOrRegion {
 			return [
 				[.streetLine0],
 				[.streetLine1],
-				[.district],
+				[.districtSlashSubdivision],
 				[.province, .postalCode],
 				[.countryOrRegion],
 			]
@@ -1832,7 +1832,7 @@ extension PersonaData.PostalAddress.CountryOrRegion {
 			return [
 				[.streetLine0],
 				[.streetLine1],
-				[.city],
+				[.townSlashCity],
 				[.county],
 				[.postcode],
 				[.countryOrRegion],
