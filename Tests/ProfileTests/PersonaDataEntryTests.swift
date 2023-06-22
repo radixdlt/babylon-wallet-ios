@@ -296,7 +296,7 @@ final class PersonaFieldTests: TestCase {
 							"value": "SHA256",
 						],
 						[
-							"discriminator": "county",
+							"discriminator": "countySlashCity",
 							"value": "Hashtown",
 						],
 						[

@@ -51,11 +51,12 @@ extension PersonaData.PostalAddress {
 
 		/// Russia
 		case subjectOfTheFederation(String)
+		case county(String)
 
 		/// Japan
 		case prefecture(String)
 		/// Japan
-		case county(String)
+		case countySlashCity(String)
 		/// Japan
 		case furtherDivisionsLine0(String)
 
@@ -113,6 +114,8 @@ extension PersonaData.PostalAddress.Field {
 		case let .prefecture(value):
 			return value
 		case let .county(value):
+			return value
+		case let .countySlashCity(value):
 			return value
 		case let .islandName(value):
 			return value
@@ -181,6 +184,8 @@ extension PersonaData.PostalAddress.Field {
 			self = try .countryOrRegion(container.decode(PersonaData.PostalAddress.CountryOrRegion.self, forKey: .value))
 		case .region:
 			self = try .region(container.decode(String.self, forKey: .value))
+		case .countySlashCity:
+			self = try .countySlashCity(container.decode(String.self, forKey: .value))
 		case .subjectOfTheFederation:
 			self = try .subjectOfTheFederation(container.decode(String.self, forKey: .value))
 		case .prefecture:
@@ -241,6 +246,8 @@ extension PersonaData.PostalAddress.Field {
 			try container.encode(value, forKey: .value)
 		case let .county(value):
 			try container.encode(value, forKey: .value)
+		case let .countySlashCity(value):
+			try container.encode(value, forKey: .value)
 		case let .furtherDivisionsLine0(value):
 			try container.encode(value, forKey: .value)
 		case let .furtherDivisionsLine1(value):
@@ -287,7 +294,10 @@ extension PersonaData.PostalAddress.Field {
 		case subjectOfTheFederation
 		case area
 		case prefecture
+
 		case county
+		case countySlashCity
+
 		case furtherDivisionsLine0
 		case furtherDivisionsLine1
 		case township
@@ -298,12 +308,13 @@ extension PersonaData.PostalAddress.Field {
 	// FIXME: Strings localize this
 	public var display: String {
 		switch self {
-		case .countryOrRegion: return "Country"
+		case .countryOrRegion: return "Country or Region"
 		case .streetLine0, .streetLine1: return "Street"
 		case .postalCode: return "Postal code"
 		case .postcode: return "Postcode"
 		case .postalDistrict: return "Postal District"
 		case .zip: return "ZIP"
+		case .countySlashCity: return "County/City"
 		case .prefectureLevelCity: return "Prefecture-level City"
 		case .city: return "City"
 		case .state: return "State"
@@ -354,6 +365,7 @@ extension PersonaData.PostalAddress.Field {
 		case .furtherDivisionsLine1: return .furtherDivisionsLine1
 		case .governorate: return .governorate
 		case .department: return .department
+		case .countySlashCity: return .countySlashCity
 		}
 	}
 }

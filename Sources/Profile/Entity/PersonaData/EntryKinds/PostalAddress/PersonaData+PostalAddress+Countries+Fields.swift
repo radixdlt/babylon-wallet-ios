@@ -827,7 +827,7 @@ extension PersonaData.PostalAddress.CountryOrRegion {
 		case .japan:
 			return [
 				[.postalCode],
-				[.prefecture, .county],
+				[.prefecture, .countySlashCity],
 				[.furtherDivisionsLine0],
 				[.furtherDivisionsLine1],
 				[.countryOrRegion],

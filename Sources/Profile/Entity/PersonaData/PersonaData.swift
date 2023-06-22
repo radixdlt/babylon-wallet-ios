@@ -102,7 +102,7 @@ extension PersonaData {
 		postalAddresses: .init(collection: [
 			.init(value: .init(validating: [
 				.postalCode("21 000 000"),
-				.prefecture("SHA256"), .county("Hashtown"),
+				.prefecture("SHA256"), .countySlashCity("Hashtown"),
 				.furtherDivisionsLine0("Sound money street"),
 				.furtherDivisionsLine1(""),
 				.countryOrRegion(.japan),

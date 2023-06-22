@@ -552,7 +552,7 @@
                     "value" : "SHA256"
                   },
                   {
-                    "discriminator" : "county",
+                    "discriminator" : "countySlashCity",
                     "value" : "Hashtown"
                   },
                   {
