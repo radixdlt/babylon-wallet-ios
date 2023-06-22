@@ -124,8 +124,6 @@ public struct FactorSourcesOfKindList<FactorSourceOfKind: Sendable & Hashable>: 
 
 		case .addNewFactorSourceButtonTapped:
 			if canOnlyHaveOneFactorSourceOfKind, let existing = state.factorSources.last {
-				assert(state.factorSources.count == 1, "Expected to only have one factor source")
-				assert(!existing.isFlaggedForDeletion)
 				state.destination = .existingFactorSourceWillBeDeletedConfirmationDialog(.deletion(of: existing))
 			} else {
 				state.destination = .addNewFactorSource(.init())
@@ -195,10 +193,15 @@ public struct FactorSourcesOfKindList<FactorSourceOfKind: Sendable & Hashable>: 
 	}
 
 	private func updateFactorSourcesEffect(state: inout State) -> EffectTask<Action> {
-		.task {
+		.task { [selectedID = state.selectedFactorSourceID] in
 			let result = await TaskResult {
 				let all = try await factorSourcesClient.getFactorSources(type: FactorSourceOfKind.self)
-				return all.filter { !$0.isFlaggedForDeletion }
+				return all.filter { factorSource in
+					if factorSource.id == selectedID {
+						return true
+					}
+					return !factorSource.isFlaggedForDeletion
+				}
 			}
 			return .internal(.loadedFactorSources(result))
 		}

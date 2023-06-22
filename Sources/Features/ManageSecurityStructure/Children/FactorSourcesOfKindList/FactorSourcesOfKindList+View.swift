@@ -180,11 +180,16 @@ public struct FactorSourceRowView: View {
 		let description: LocalizedStringKey
 		let addedOn: Date
 		let lastUsedOn: Date
+		let isFlaggedForDeletion: Bool
 
-		public init(factorSource: FactorSource, describe: (FactorSource) -> LocalizedStringKey) {
+		public init(
+			factorSource: FactorSource,
+			describe: (FactorSource) -> LocalizedStringKey
+		) {
 			self.description = describe(factorSource)
 			self.addedOn = factorSource.addedOn
 			self.lastUsedOn = factorSource.lastUsedOn
+			self.isFlaggedForDeletion = factorSource.isFlaggedForDeletion
 		}
 	}
 
@@ -193,7 +198,11 @@ public struct FactorSourceRowView: View {
 	private let action: (() -> Void)?
 
 	/// Creates a tappable card. If `isSelected` is non-nil, the card will have a radio button.
-	public init(viewState: ViewState, isSelected: Bool? = nil, action: @escaping () -> Void) {
+	public init(
+		viewState: ViewState,
+		isSelected: Bool? = nil,
+		action: @escaping () -> Void
+	) {
 		self.viewState = viewState
 		self.isSelected = isSelected
 		self.action = action
@@ -218,6 +227,11 @@ public struct FactorSourceRowView: View {
 						.padding(.bottom, .small3)
 
 					LabelledDate(label: "Added on", date: viewState.addedOn)
+
+					if viewState.isFlaggedForDeletion {
+						Text("Deleted")
+							.foregroundColor(.app.red1)
+					}
 				}
 
 				Spacer(minLength: 0)
@@ -233,5 +247,6 @@ public struct FactorSourceRowView: View {
 			.padding(.horizontal, .large3)
 			.padding(.vertical, .medium1)
 		}
+		.disabled(viewState.isFlaggedForDeletion)
 	}
 }
