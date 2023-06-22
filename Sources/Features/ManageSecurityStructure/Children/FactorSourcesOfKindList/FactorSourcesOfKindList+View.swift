@@ -104,6 +104,11 @@ public extension FactorSourcesOfKindList {
 				}
 			}
 			.destinations(with: store)
+			.confirmationDialog(
+				store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+				state: /FactorSourcesOfKindList.Destinations.State.existingFactorSourceWillBeDeletedConfirmationDialog,
+				action: FactorSourcesOfKindList.Destinations.Action.existingFactorSourceWillBeDeletedConfirmationDialog
+			)
 		}
 
 		@ViewBuilder
