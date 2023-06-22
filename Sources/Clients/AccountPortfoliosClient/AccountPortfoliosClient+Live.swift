@@ -172,7 +172,11 @@ extension AccountPortfoliosClient {
 
 		// Build up the resources from the raw items.
 		async let fungibleResources = createFungibleResources(rawItems: rawFungibleResources)
-		async let nonFungibleResources = createNonFungibleResources(rawAccountDetails.address, rawItems: rawNonFungibleResources)
+		async let nonFungibleResources = createNonFungibleResources(
+			rawAccountDetails.address,
+			rawItems: rawNonFungibleResources,
+			ledgerState: ledgerState
+		)
 
 		let isDappDefintionAccountType = rawAccountDetails.metadata.accountType == .dappDefinition
 
@@ -213,8 +217,6 @@ extension AccountPortfoliosClient {
 			}()
 
 			let resourceAddress = try ResourceAddress(validatingAddress: resource.resourceAddress)
-
-			// TODO: This lookup will be obsolete once the metadata is present in GatewayAPI.FungibleResourcesCollectionItem
 			let metadata = resource.explicitMetadata
 
 			return AccountPortfolio.FungibleResource(
@@ -233,7 +235,8 @@ extension AccountPortfoliosClient {
 	@Sendable
 	static func createNonFungibleResources(
 		_ accountAddress: String,
-		rawItems: [GatewayAPI.NonFungibleResourcesCollectionItem]
+		rawItems: [GatewayAPI.NonFungibleResourcesCollectionItem],
+		ledgerState: GatewayAPI.LedgerState
 	) async throws -> AccountPortfolio.NonFungibleResources {
 		// We are interested in vault aggregated items
 		let vaultItems = rawItems.compactMap(\.vault)
@@ -244,19 +247,33 @@ extension AccountPortfoliosClient {
 		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
 
 		@Sendable
-		func tokens(
+		func getAllTokens(
 			resource: GatewayAPI.NonFungibleResourcesCollectionItemVaultAggregated
-		) async throws -> IdentifiedArrayOf<AccountPortfolio.NonFungibleResource.NonFungibleToken> {
+		) async throws -> [String] {
 			guard let vault = resource.vaults.items.first else { return [] }
+			let firstPageItems = vault.items ?? []
 
-			let nftIDs = try await fetchAllPaginatedItems(
-				cursor: nil,
+			guard let nextPageCursor = vault.nextCursor else {
+				return firstPageItems
+			}
+
+			let additionalItems = try await fetchAllPaginatedItems(
+				cursor: PageCursor(ledgerState: ledgerState, nextPageCursor: nextPageCursor),
 				fetchEntityNonFungibleResourceIdsPage(
 					accountAddress,
 					resourceAddress: resource.resourceAddress,
 					vaultAddress: vault.vaultAddress
 				)
 			)
+
+			return firstPageItems + additionalItems
+		}
+
+		@Sendable
+		func tokens(
+			resource: GatewayAPI.NonFungibleResourcesCollectionItemVaultAggregated
+		) async throws -> IdentifiedArrayOf<AccountPortfolio.NonFungibleResource.NonFungibleToken> {
+			let nftIDs = try await getAllTokens(resource: resource)
 
 			// https://rdxworks.slack.com/archives/C02MTV9602H/p1681155601557349
 			let maximumNFTIDChunkSize = 29

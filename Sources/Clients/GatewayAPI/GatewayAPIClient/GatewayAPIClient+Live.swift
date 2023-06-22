@@ -72,8 +72,6 @@ extension GatewayAPIClient {
 				throw BadHTTPResponseCode(got: httpURLResponse.statusCode)
 			}
 
-			let resp = String(data: data, encoding: .utf8)
-			print("backend response: \n \(dump(resp))")
 			let response = try jsonDecoder.decode(Response.self, from: data)
 
 			return response
@@ -127,16 +125,19 @@ extension GatewayAPIClient {
 			jsonEncoder.outputFormatting = [.prettyPrinted, .sortedKeys, .withoutEscapingSlashes]
 			let httpBody = try jsonEncoder.encode(request)
 
-			let str = String(data: httpBody, encoding: .utf8)
-
 			return try await makeRequest(httpBodyData: httpBody, urlFromBase: urlFromBase)
 		}
 
 		@Sendable
 		func getEntityDetails(_ addresses: [String]) async throws -> GatewayAPI.StateEntityDetailsResponse {
 			try await post(
-				request: GatewayAPI.StateEntityDetailsRequest(optIns: .init(explicitMetadata: EntityMetadataKey.allCases.map(\.rawValue)), addresses: addresses, aggregationLevel: .vault)
-			) { @Sendable base in base.appendingPathComponent("state/entity/details") }
+				request: GatewayAPI.StateEntityDetailsRequest(
+					optIns: .init(
+						nonFungibleIncludeNfids: true,
+						explicitMetadata: EntityMetadataKey.allCases.map(\.rawValue)
+					),
+					addresses: addresses, aggregationLevel: .vault
+				)) { @Sendable base in base.appendingPathComponent("state/entity/details") }
 		}
 
 		@Sendable

@@ -78,9 +78,7 @@ extension EngineToolkitClient {
 	}
 
 	private func faucetAddress(for networkID: NetworkID) throws -> ComponentAddress {
-		let knownAddress = try knownEntityAddresses(networkID)
-
-		return knownAddress.faucetComponentAddress
+		try knownEntityAddresses(networkID).faucetComponentAddress
 	}
 }
 
