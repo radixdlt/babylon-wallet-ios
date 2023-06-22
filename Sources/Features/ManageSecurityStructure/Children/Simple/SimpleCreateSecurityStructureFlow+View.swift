@@ -9,7 +9,6 @@ extension FactorSourceKind {
 		case .device, .ledgerHQHardwareWallet, .offDeviceMnemonic:
 			return true
 		case .trustedContact:
-			// FIXME: Check with Matt/Russ, but I think we dont want to...
 			return false
 		case .securityQuestions:
 			// This factor source kind is too cryptographically weak to be allowed for primary.
@@ -33,13 +32,11 @@ extension FactorSourceKind {
 	public var isConfirmationRoleSupported: Bool {
 		switch self {
 		case .device:
-			// If a user has lost her phone, how can she use it to confirm recovery...she cant!
-			return false
+			return true
 		case .ledgerHQHardwareWallet, .offDeviceMnemonic:
 			return true
 		case .trustedContact:
-			// FIXME: check with Russ/Matt.. CAN we use `trustedContact` for `confirmation`?? I think so
-			return true
+			return false
 		case .securityQuestions:
 			return true
 		}
