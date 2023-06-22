@@ -50,7 +50,7 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 			let accountsValidation = OlympiaAccountsValidation(validated: [], unvalidated: Set(hardwareAccounts.elements))
 			self.networkID = networkID
 			self.unmigrated = accountsValidation
-			self.chooseLedger = .init(allowSelection: true, context: .ledgerSelection, showHeaders: false)
+			self.chooseLedger = .init(context: .importOlympia)
 		}
 	}
 
