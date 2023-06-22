@@ -4,10 +4,18 @@ import FeaturePrelude
 public struct AdvancedManageSecurityStructureFlow: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public enum Mode: Sendable, Hashable {
-			case existing(SecurityStructureConfigurationDetailed, isEditing: Bool = false)
-			case new(New)
+			case existing(SecurityStructureConfigurationDetailed)
+			case new(New = .init())
 
-			public struct New: Sendable, Hashable {}
+			public struct New: Sendable, Hashable {
+				public var confirmationRole: SecurityStructureConfigurationDetailed.Configuration.Confirmation
+
+				public init(
+					confirmationRole: SecurityStructureConfigurationDetailed.Configuration.Confirmation = .init()
+				) {
+					self.confirmationRole = confirmationRole
+				}
+			}
 		}
 
 		public var mode: Mode
@@ -18,15 +26,25 @@ public struct AdvancedManageSecurityStructureFlow: Sendable, FeatureReducer {
 	}
 
 	public enum ViewAction: Sendable, Equatable {
-		case appeared
+		case confirmationRoleFactorsButtonTapped
 	}
 
 	public init() {}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
-		case .appeared:
+		case .confirmationRoleFactorsButtonTapped:
 			return .none
 		}
+	}
+}
+
+extension RoleOfTier {
+	public init() {
+		self.init(
+			thresholdFactors: .init(),
+			threshold: 0,
+			superAdminFactors: .init()
+		)
 	}
 }
