@@ -31,7 +31,7 @@ extension SimpleManageSecurityStructureFlow {
 
 		let mode: Mode
 		let confirmerOfNewPhone: SecurityQuestionsFactorSource?
-		let numberOfDaysUntilAutoConfirmation: RecoveryAutoConfirmDelayInDays
+		let numberOfDaysUntilAutoConfirmation: String
 		let lostPhoneHelper: TrustedContactFactorSource?
 		var simpleSecurityStructure: RecoveryAndConfirmationFactors? {
 			guard let lostPhoneHelper, let confirmerOfNewPhone else {
@@ -43,6 +43,13 @@ extension SimpleManageSecurityStructureFlow {
 			)
 		}
 
+		var numberOfDaysUntilAutoConfirmationHint: Hint? {
+			guard let raw = RecoveryAutoConfirmDelayInDays.RawValue(numberOfDaysUntilAutoConfirmation) else {
+				return .error("Not an integer")
+			}
+			return .info("The phone confirmer is only needed if you want to skip waiting the number of specified days.")
+		}
+
 		init(state: SimpleManageSecurityStructureFlow.State) {
 			switch state.mode {
 			case let .existing(existing):
@@ -50,12 +57,12 @@ extension SimpleManageSecurityStructureFlow {
 				self.confirmerOfNewPhone = try! existing.configuration.confirmationRole.thresholdFactors[0].extract(as: SecurityQuestionsFactorSource.self)
 				self.lostPhoneHelper = try! existing.configuration.recoveryRole.thresholdFactors[0].extract(as: TrustedContactFactorSource.self)
 				self.mode = .existing
-				self.numberOfDaysUntilAutoConfirmation = existing.configuration.numberOfDaysUntilAutoConfirmation
+				self.numberOfDaysUntilAutoConfirmation = existing.configuration.numberOfDaysUntilAutoConfirmation.description
 			case let .new(new):
 				self.confirmerOfNewPhone = new.confirmerOfNewPhone
 				self.lostPhoneHelper = new.lostPhoneHelper
 				self.mode = .new
-				self.numberOfDaysUntilAutoConfirmation = new.numberOfDaysUntilAutoConfirmation
+				self.numberOfDaysUntilAutoConfirmation = new.numberOfDaysUntilAutoConfirmation.description
 			}
 		}
 	}
@@ -78,15 +85,19 @@ extension SimpleManageSecurityStructureFlow {
 							viewStore.send(.confirmerOfNewPhoneButtonTapped)
 						}
 
-						Picker(
-							"Number of days you have to wait until recovery automatically gets confirmed",
-							selection: viewStore.binding(
+						AppTextField(
+							primaryHeading: "Days until auto confirm",
+							secondaryHeading: "Integer",
+							placeholder: "Days until auto confirm",
+							text: viewStore.binding(
 								get: \.numberOfDaysUntilAutoConfirmation,
 								send: { .changedNumberOfDaysUntilAutoConfirmation($0) }
-							)
-						) {
-							Text("")
-						}
+							),
+							hint: viewStore.numberOfDaysUntilAutoConfirmationHint,
+							showClearButton: false
+						)
+						.keyboardType(.numberPad)
+						.padding()
 
 						LostPhoneHelper(factorSet: viewStore.lostPhoneHelper) {
 							viewStore.send(.lostPhoneHelperButtonTapped)

@@ -44,7 +44,7 @@ public struct SimpleManageSecurityStructureFlow: Sendable, FeatureReducer {
 		case confirmerOfNewPhoneButtonTapped
 		case lostPhoneHelperButtonTapped
 		case finished(RecoveryAndConfirmationFactors)
-		case changedNumberOfDaysUntilAutoConfirmation(RecoveryAutoConfirmDelayInDays)
+		case changedNumberOfDaysUntilAutoConfirmation(String)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -141,7 +141,15 @@ public struct SimpleManageSecurityStructureFlow: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
-		case let .changedNumberOfDaysUntilAutoConfirmation(delay):
+		case let .changedNumberOfDaysUntilAutoConfirmation(delayAsString):
+
+			guard
+				let raw = RecoveryAutoConfirmDelayInDays.RawValue(delayAsString)
+			else {
+				return .none
+			}
+			let delay = RecoveryAutoConfirmDelayInDays(rawValue: raw)
+
 			switch state.mode {
 			case var .existing(existing):
 				precondition(existing.isSimple)
