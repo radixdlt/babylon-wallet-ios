@@ -28,7 +28,7 @@ public struct AddNewGateway: Sendable, FeatureReducer {
 	public enum InternalAction: Sendable, Equatable {
 		case focusTextField(State.Field?)
 		case gatewayValidationResult(TaskResult<Radix.Gateway?>)
-		case addGatewayResult(TaskResult<Unit>)
+		case addGatewayResult(TaskResult<Prelude.Unit>)
 		case showDuplicateURLError
 		case validateNewGateway(URL)
 	}
