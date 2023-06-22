@@ -7,7 +7,7 @@ public struct ManageSecurityStructureCoordinator: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public var mode: Mode
 		public var root: Path.State
-		public var path: StackState<Path.State> = []
+		public var path: StackState<Path.State> = .init()
 
 		public enum Mode: Sendable, Hashable {
 			case existing(SecurityStructureConfigurationDetailed)
@@ -66,7 +66,7 @@ public struct ManageSecurityStructureCoordinator: Sendable, FeatureReducer {
 
 	public enum ChildAction: Sendable, Equatable {
 		case root(Path.Action)
-		case path(StackAction<Path.Action>)
+		case path(StackActionOf<Path>)
 	}
 
 	public enum DelegateAction: Sendable, Hashable {

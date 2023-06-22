@@ -82,9 +82,9 @@ extension SimpleManageSecurityStructureFlow {
 							"Number of days you have to wait until recovery automatically gets confirmed",
 							selection: viewStore.binding(
 								get: \.numberOfDaysUntilAutoConfirmation,
-								send: { viewStore.send(.changedNumberOfDaysUntilAutoConfirmation($0)) }
-							),
-						) { _ in
+								send: { .changedNumberOfDaysUntilAutoConfirmation($0) }
+							)
+						) {
 							Text("")
 						}
 

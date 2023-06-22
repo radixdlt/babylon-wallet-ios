@@ -206,6 +206,7 @@ extension Profile {
 		referenceConfiguration reference: SecurityStructureConfigurationReference.Configuration
 	) throws -> SecurityStructureConfigurationDetailed.Configuration {
 		try .init(
+			numberOfDaysUntilAutoConfirmation: reference.numberOfDaysUntilAutoConfirmation,
 			primaryRole: detailedSecurityStructureRole(referenceRole: reference.primaryRole),
 			recoveryRole: detailedSecurityStructureRole(referenceRole: reference.recoveryRole),
 			confirmationRole: detailedSecurityStructureRole(referenceRole: reference.confirmationRole)
@@ -233,6 +234,7 @@ extension Profile {
 extension SecurityStructureConfigurationDetailed.Configuration {
 	public func asReference() -> SecurityStructureConfigurationReference.Configuration {
 		.init(
+			numberOfDaysUntilAutoConfirmation: numberOfDaysUntilAutoConfirmation,
 			primaryRole: primaryRole.asReference(),
 			recoveryRole: recoveryRole.asReference(),
 			confirmationRole: confirmationRole.asReference()
@@ -340,6 +342,7 @@ public struct Securified: Sendable, Hashable, Codable {
 		}
 
 		return .init(
+			numberOfDaysUntilAutoConfirmation: accessController.securityStructure.numberOfDaysUntilAutoConfirmation,
 			primaryRole: decorate(\.primaryRole),
 			recoveryRole: decorate(\.recoveryRole),
 			confirmationRole: decorate(\.confirmationRole)

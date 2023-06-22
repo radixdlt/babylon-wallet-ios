@@ -5,6 +5,7 @@ import ManageTrustedContactFactorSourceFeature
 
 // MARK: - SimpleUnnamedSecurityStructureConfig
 public struct SimpleUnnamedSecurityStructureConfig: Sendable, Hashable {
+	let numberOfDaysUntilAutoConfirmation: RecoveryAutoConfirmDelayInDays
 	let singlePrimaryFactor: DeviceFactorSource
 	let singleRecoveryFactor: TrustedContactFactorSource
 	let singleConfirmationFactor: SecurityQuestionsFactorSource
@@ -148,6 +149,18 @@ public struct SimpleManageSecurityStructureFlow: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
+		case let .changedNumberOfDaysUntilAutoConfirmation(delay):
+			switch state.mode {
+			case var .existing(existing):
+				precondition(existing.isSimple)
+				existing.configuration.numberOfDaysUntilAutoConfirmation = delay
+				state.mode = .existing(existing)
+			case var .new(new):
+				new.numberOfDaysUntilAutoConfirmation = delay
+				state.mode = .new(new)
+			}
+			return .none
+
 		case .confirmerOfNewPhoneButtonTapped:
 			switch state.mode {
 			case let .existing(structure):
@@ -193,6 +206,7 @@ public struct SimpleManageSecurityStructureFlow: Sendable, FeatureReducer {
 						}.first!
 
 						let simpleUnnamed = SimpleUnnamedSecurityStructureConfig(
+							numberOfDaysUntilAutoConfirmation: new.numberOfDaysUntilAutoConfirmation,
 							singlePrimaryFactor: primary,
 							singleRecoveryFactor: simpleFactorConfig.singleRecoveryFactor,
 							singleConfirmationFactor: simpleFactorConfig.singleConfirmationFactor
@@ -213,6 +227,7 @@ public struct SimpleManageSecurityStructureFlow: Sendable, FeatureReducer {
 extension SecurityStructureConfigurationDetailed.Configuration {
 	init(from simple: SimpleUnnamedSecurityStructureConfig) {
 		self.init(
+			numberOfDaysUntilAutoConfirmation: simple.numberOfDaysUntilAutoConfirmation,
 			primaryRole: .single(simple.singlePrimaryFactor),
 			recoveryRole: .single(simple.singleRecoveryFactor),
 			confirmationRole: .single(simple.singleConfirmationFactor)
