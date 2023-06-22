@@ -291,34 +291,36 @@ extension PersonaData.PostalAddress.Field {
 		case furtherDivisionsLine0
 		case furtherDivisionsLine1
 		case township
+	}
+}
 
-		// FIXME: Strings localize this
-		public var display: String {
-			switch self {
-			case .countryOrRegion: return "Country"
-			case .streetLine0, .streetLine1: return "Street"
-			case .postalCode: return "Postal code"
-			case .postcode: return "Postcode"
-			case .postalDistrict: return "Postal District"
-			case .zip: return "ZIP"
-			case .prefectureLevelCity: return "Prefecture-level City"
-			case .city: return "City"
-			case .state: return "State"
-			case .governorate: return "Governorate"
-			case .district: return "District"
-			case .neighbourhood: return "Neighbourhood"
-			case .suburb: return "Suburb"
-			case .province: return "Province"
-			case .region: return "Region"
-			case .area: return "Area"
-			case .islandName: return "Carribean Netherlands"
-			case .department: return "Department"
-			case .subjectOfTheFederation: return "Subject of the Federation"
-			case .prefecture: return "Prefecture"
-			case .county: return "County"
-			case .township: return "Township"
-			case .furtherDivisionsLine0, .furtherDivisionsLine1: return "Further Divisions"
-			}
+extension PersonaData.PostalAddress.Field {
+	// FIXME: Strings localize this
+	public var display: String {
+		switch self {
+		case .countryOrRegion: return "Country"
+		case .streetLine0, .streetLine1: return "Street"
+		case .postalCode: return "Postal code"
+		case .postcode: return "Postcode"
+		case .postalDistrict: return "Postal District"
+		case .zip: return "ZIP"
+		case .prefectureLevelCity: return "Prefecture-level City"
+		case .city: return "City"
+		case .state: return "State"
+		case .governorate: return "Governorate"
+		case .district: return "District"
+		case .neighbourhood: return "Neighbourhood"
+		case .suburb: return "Suburb"
+		case .province: return "Province"
+		case .region: return "Region"
+		case .area: return "Area"
+		case .islandName: return "Carribean Netherlands"
+		case .department: return "Department"
+		case .subjectOfTheFederation: return "Subject of the Federation"
+		case .prefecture: return "Prefecture"
+		case .county: return "County"
+		case .township: return "Township"
+		case .furtherDivisionsLine0, .furtherDivisionsLine1: return "Further Divisions"
 		}
 	}
 }
@@ -334,9 +336,7 @@ extension PersonaData.PostalAddress.Field {
 		case .postcode: return .postcode
 		case .postalDistrict: return .postalDistrict
 		case .zip: return .zip
-
 		case .prefectureLevelCity: return .prefectureLevelCity
-
 		case .city: return .city
 		case .state: return .state
 		case .district: return .district
@@ -348,7 +348,6 @@ extension PersonaData.PostalAddress.Field {
 		case .subjectOfTheFederation: return .subjectOfTheFederation
 		case .township: return .township
 		case .islandName: return .islandName
-
 		case .prefecture: return .prefecture
 		case .county: return .county
 		case .furtherDivisionsLine0: return .furtherDivisionsLine0
