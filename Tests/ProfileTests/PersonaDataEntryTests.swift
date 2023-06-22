@@ -374,7 +374,7 @@ final class PersonaFieldTests: TestCase {
 // MARK: - PersonaData.IdentifiedEntry + ExpressibleByStringLiteral, ExpressibleByUnicodeScalarLiteral, ExpressibleByExtendedGraphemeClusterLiteral
 extension PersonaData.IdentifiedEntry<PersonaData.EmailAddress>: ExpressibleByStringLiteral, ExpressibleByUnicodeScalarLiteral, ExpressibleByExtendedGraphemeClusterLiteral {
 	public init(stringLiteral value: String) {
-		try! self.init(value: .init(validating: value))
+		self.init(value: .init(email: value))
 	}
 }
 
@@ -423,7 +423,7 @@ extension PersonaData.Name {
 // MARK: - PersonaData.EmailAddress + ExpressibleByStringLiteral
 extension PersonaData.EmailAddress: ExpressibleByStringLiteral {
 	public init(stringLiteral value: String) {
-		try! self.init(validating: value)
+		self.init(email: value)
 	}
 }
 

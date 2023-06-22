@@ -8,15 +8,8 @@ extension PersonaData {
 
 		public let email: String
 
-		public init(validating email: String) throws {
-			guard email.isEmailAddress else {
-				throw InvalidEmailAddress(invalid: email)
-			}
+		public init(email: String) {
 			self.email = email
-		}
-
-		struct InvalidEmailAddress: Swift.Error {
-			let invalid: String
 		}
 
 		public func encode(to encoder: Encoder) throws {
@@ -26,7 +19,8 @@ extension PersonaData {
 
 		public init(from decoder: Decoder) throws {
 			let container = try decoder.singleValueContainer()
-			try self.init(validating: container.decode(String.self))
+			let email = try container.decode(String.self)
+			self.init(email: email)
 		}
 
 		public var description: String {

@@ -4,7 +4,7 @@ import TestingPrelude
 // MARK: - ToDappResponseTests
 final class ToDappResponseTests: TestCase {
 	func test_encode_response() throws {
-		let sut = try P2P.Dapp.Response.success(.init(
+		let sut = P2P.Dapp.Response.success(.init(
 			interactionId: "an_id",
 			items: .request(
 				.unauthorized(.init(
@@ -17,7 +17,7 @@ final class ToDappResponseTests: TestCase {
 					]),
 					oneTimePersonaData: .init(
 						name: .init(given: "Percy", family: "Jackson", variant: .western),
-						emailAddresses: [.init(validating: "lightningthief@olympus.lol")],
+						emailAddresses: [.init(email: "lightningthief@olympus.lol")],
 						phoneNumbers: [.init(number: "555 5555")]
 					)
 

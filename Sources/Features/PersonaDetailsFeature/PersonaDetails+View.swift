@@ -343,7 +343,7 @@ extension PersonaDetails.View {
 				self.lastName = personaData?.name?.value.family
 				self.emailAddresses = personaData?.emailAddresses.map(\.value.email)
 				self.phoneNumbers = personaData?.phoneNumbers.map(\.value.number)
-				self.urls = personaData?.urls.map(\.value.url.absoluteString)
+				self.urls = personaData?.urls.map(\.value.url)
 				self.postalAddresses = personaData?.postalAddresses.map(\.value)
 				self.creditCards = personaData?.creditCards.map(\.value)
 

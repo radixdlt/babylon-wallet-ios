@@ -88,16 +88,16 @@ extension PersonaData {
 		dateOfBirth: .init(value: .init(year: 2009, month: 1, day: 3)),
 		companyName: .init(value: .init(name: "Bitcoin")),
 		emailAddresses: .init(collection: [
-			.init(value: .init(validating: "satoshi@nakamoto.bitcoin")),
-			.init(value: .init(validating: "be.your@own.bank")),
+			.init(value: .init(email: "satoshi@nakamoto.bitcoin")),
+			.init(value: .init(email: "be.your@own.bank")),
 		]),
 		phoneNumbers: .init(collection: [
 			.init(value: .init(number: "21000000")),
 			.init(value: .init(number: "123456789")),
 		]),
 		urls: .init(collection: [
-			.init(value: .init(validating: "bitcoin.org")),
-			.init(value: .init(validating: "https://github.com/bitcoin-core/secp256k1")),
+			.init(value: .init(url: "bitcoin.org")),
+			.init(value: .init(url: "https://github.com/bitcoin-core/secp256k1")),
 		]),
 		postalAddresses: .init(collection: [
 			.init(value: .init(validating: [

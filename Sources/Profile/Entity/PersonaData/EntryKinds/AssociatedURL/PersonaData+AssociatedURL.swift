@@ -6,17 +6,10 @@ extension PersonaData {
 		public static var casePath: CasePath<PersonaData.Entry, Self> = /PersonaData.Entry.url
 		public static var kind = PersonaData.Entry.Kind.url
 
-		public let url: URL
+		public let url: String
 
-		public init(validating urlString: String) throws {
-			guard let url = URL(string: urlString) else {
-				throw InvalidURL(invalid: urlString)
-			}
+		public init(url: String) {
 			self.url = url
-		}
-
-		struct InvalidURL: Swift.Error {
-			let invalid: String
 		}
 
 		public func encode(to encoder: Encoder) throws {
@@ -26,11 +19,11 @@ extension PersonaData {
 
 		public init(from decoder: Decoder) throws {
 			let container = try decoder.singleValueContainer()
-			try self.init(validating: container.decode(String.self))
+			try self.init(url: container.decode(String.self))
 		}
 
 		public var description: String {
-			url.absoluteString
+			url
 		}
 	}
 }
