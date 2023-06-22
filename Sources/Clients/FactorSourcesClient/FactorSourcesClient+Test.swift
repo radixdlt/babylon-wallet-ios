@@ -19,7 +19,8 @@ extension FactorSourcesClient: TestDependencyKey {
 		saveFactorSource: unimplemented("\(Self.self).saveFactorSource"),
 		updateFactorSource: unimplemented("\(Self.self).updateFactorSource"),
 		getSigningFactors: unimplemented("\(Self.self).getSigningFactors"),
-		updateLastUsed: unimplemented("\(Self.self).updateLastUsed")
+		updateLastUsed: unimplemented("\(Self.self).updateLastUsed"),
+		flagFactorSourceForDeletion: unimplemented("\(Self.self).flagFactorSourceForDeletion")
 	)
 
 	public static let noop = Self(
@@ -31,6 +32,7 @@ extension FactorSourcesClient: TestDependencyKey {
 		saveFactorSource: { _ in },
 		updateFactorSource: { _ in },
 		getSigningFactors: { _ in throw NoopError() },
-		updateLastUsed: { _ in }
+		updateLastUsed: { _ in },
+		flagFactorSourceForDeletion: { _ in }
 	)
 }

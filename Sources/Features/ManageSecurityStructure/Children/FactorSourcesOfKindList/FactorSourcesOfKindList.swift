@@ -2,6 +2,12 @@ import FactorSourcesClient
 import FeaturePrelude
 import Profile
 
+// MARK: - DeleteExistingFactorSourceConfirmationDialogAction
+public enum DeleteExistingFactorSourceConfirmationDialogAction: Sendable, Hashable {
+	case deleteExistingFactorSource(FactorSourceID)
+	case cancel
+}
+
 // MARK: - FactorSourcesOfKindList
 public struct FactorSourcesOfKindList<FactorSourceOfKind: Sendable & Hashable>: Sendable, FeatureReducer where FactorSourceOfKind: FactorSourceProtocol {
 	// MARK: - State
@@ -15,6 +21,7 @@ public struct FactorSourcesOfKindList<FactorSourceOfKind: Sendable & Hashable>: 
 		public let mode: Mode
 
 		public var factorSources: IdentifiedArrayOf<FactorSourceOfKind> = []
+		public var idOfFactorSourceToFlagForDeletionUponSuccessfulCreationOfNew: FactorSourceID?
 
 		public var selectedFactorSourceID: FactorSourceOfKind.ID?
 
@@ -60,10 +67,12 @@ public struct FactorSourcesOfKindList<FactorSourceOfKind: Sendable & Hashable>: 
 	public struct Destinations: Sendable, ReducerProtocol {
 		public enum State: Sendable, Hashable {
 			case addNewFactorSource(ManageSomeFactorSource<FactorSourceOfKind>.State)
+			case existingFactorSourceWillBeDeletedConfirmationDialog(ConfirmationDialogState<DeleteExistingFactorSourceConfirmationDialogAction>)
 		}
 
 		public enum Action: Sendable, Equatable {
 			case addNewFactorSource(ManageSomeFactorSource<FactorSourceOfKind>.Action)
+			case existingFactorSourceWillBeDeletedConfirmationDialog(DeleteExistingFactorSourceConfirmationDialogAction)
 		}
 
 		public init() {}
@@ -89,6 +98,18 @@ public struct FactorSourcesOfKindList<FactorSourceOfKind: Sendable & Hashable>: 
 			}
 	}
 
+	var canOnlyHaveOneFactorSourceOfKind: Bool {
+		switch FactorSourceOfKind.kind {
+		case .ledgerHQHardwareWallet, .offDeviceMnemonic, .trustedContact: return false
+		case .securityQuestions:
+			return true
+		case .device:
+			// Well... it is complicated, we don't allow users to manually create more Babylon device
+			// factor sources. But user can import as many legacy/olympia device factor source they want.
+			return true
+		}
+	}
+
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .onFirstTask:
@@ -102,7 +123,13 @@ public struct FactorSourcesOfKindList<FactorSourceOfKind: Sendable & Hashable>: 
 			return .send(.delegate(.choseFactorSource(factorSource)))
 
 		case .addNewFactorSourceButtonTapped:
-			state.destination = .addNewFactorSource(.init())
+			if canOnlyHaveOneFactorSourceOfKind, let existing = state.factorSources.last {
+				assert(state.factorSources.count == 1, "Expected to only have one factor source")
+				assert(!existing.isFlaggedForDeletion)
+				state.destination = .existingFactorSourceWillBeDeletedConfirmationDialog(.deletion(of: existing))
+			} else {
+				state.destination = .addNewFactorSource(.init())
+			}
 			return .none
 
 		case .whatIsAFactorSourceButtonTapped:
@@ -135,10 +162,29 @@ public struct FactorSourcesOfKindList<FactorSourceOfKind: Sendable & Hashable>: 
 				state.destination = nil
 				state.factorSources.append(factorSource)
 				state.selectedFactorSourceID = factorSource.id
-				return .none
+				guard let idOfFactorSourceToFlagForDeletionUponSuccessfulCreationOfNew = state.idOfFactorSourceToFlagForDeletionUponSuccessfulCreationOfNew else {
+					return .none
+				}
+				state.idOfFactorSourceToFlagForDeletionUponSuccessfulCreationOfNew = nil
+				return .fireAndForget {
+					try await factorSourcesClient.flagFactorSourceForDeletion(
+						idOfFactorSourceToFlagForDeletionUponSuccessfulCreationOfNew
+					)
+				}
 
 			case let .done(.failure(error)):
 				state.destination = nil
+				return .none
+			}
+
+		case let .destination(.presented(.existingFactorSourceWillBeDeletedConfirmationDialog(confirmationAction))):
+			switch confirmationAction {
+			case .cancel:
+				state.destination = nil
+				return .none
+			case let .deleteExistingFactorSource(id):
+				state.idOfFactorSourceToFlagForDeletionUponSuccessfulCreationOfNew = id
+				state.destination = .addNewFactorSource(.init())
 				return .none
 			}
 
@@ -150,9 +196,35 @@ public struct FactorSourcesOfKindList<FactorSourceOfKind: Sendable & Hashable>: 
 	private func updateFactorSourcesEffect(state: inout State) -> EffectTask<Action> {
 		.task {
 			let result = await TaskResult {
-				try await factorSourcesClient.getFactorSources(type: FactorSourceOfKind.self)
+				let all = try await factorSourcesClient.getFactorSources(type: FactorSourceOfKind.self)
+				return all.filter { !$0.isFlaggedForDeletion }
 			}
 			return .internal(.loadedFactorSources(result))
 		}
+	}
+}
+
+extension ConfirmationDialogState<DeleteExistingFactorSourceConfirmationDialogAction> {
+	static func deletion(
+		of factorSource: some FactorSourceProtocol
+	) -> ConfirmationDialogState {
+		.init(
+			// FIXME: strings
+			title: { TextState("Can only have one") },
+			actions: {
+				ButtonState(role: .destructive, action: .deleteExistingFactorSource(factorSource.id.embed())) {
+					// FIXME: strings
+					TextState("Replace existing with new")
+				}
+				ButtonState(role: .cancel, action: .cancel) {
+					// FIXME: strings
+					TextState("Keep existing")
+				}
+			},
+			message: {
+				// FIXME: strings
+				TextState("You can only have one \(factorSource.factorSourceID.kind), the new you create will replace the old one.")
+			}
+		)
 	}
 }

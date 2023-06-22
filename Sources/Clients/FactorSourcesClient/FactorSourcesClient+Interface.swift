@@ -12,6 +12,7 @@ public struct FactorSourcesClient: Sendable {
 	public var updateFactorSource: UpdateFactorSource
 	public var getSigningFactors: GetSigningFactors
 	public var updateLastUsed: UpdateLastUsed
+	public var flagFactorSourceForDeletion: FlagFactorSourceForDeletion
 
 	public init(
 		getCurrentNetworkID: @escaping GetCurrentNetworkID,
@@ -22,7 +23,8 @@ public struct FactorSourcesClient: Sendable {
 		saveFactorSource: @escaping SaveFactorSource,
 		updateFactorSource: @escaping UpdateFactorSource,
 		getSigningFactors: @escaping GetSigningFactors,
-		updateLastUsed: @escaping UpdateLastUsed
+		updateLastUsed: @escaping UpdateLastUsed,
+		flagFactorSourceForDeletion: @escaping FlagFactorSourceForDeletion
 	) {
 		self.getCurrentNetworkID = getCurrentNetworkID
 		self.getFactorSources = getFactorSources
@@ -33,6 +35,7 @@ public struct FactorSourcesClient: Sendable {
 		self.updateFactorSource = updateFactorSource
 		self.getSigningFactors = getSigningFactors
 		self.updateLastUsed = updateLastUsed
+		self.flagFactorSourceForDeletion = flagFactorSourceForDeletion
 	}
 }
 
@@ -47,6 +50,7 @@ extension FactorSourcesClient {
 	public typealias UpdateFactorSource = @Sendable (FactorSource) async throws -> Void
 	public typealias GetSigningFactors = @Sendable (GetSigningFactorsRequest) async throws -> SigningFactors
 	public typealias UpdateLastUsed = @Sendable (UpdateFactorSourceLastUsedRequest) async throws -> Void
+	public typealias FlagFactorSourceForDeletion = @Sendable (FactorSourceID) async throws -> Void
 }
 
 // MARK: - AddPrivateHDFactorSourceRequest

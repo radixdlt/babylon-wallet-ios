@@ -28,4 +28,8 @@ extension BaseFactorSourceProtocol {
 	public mutating func flag(_ flag: FactorSourceFlag) {
 		common.flags.append(flag)
 	}
+
+	public var isFlaggedForDeletion: Bool {
+		common.flags.contains(.deletedByUser)
+	}
 }

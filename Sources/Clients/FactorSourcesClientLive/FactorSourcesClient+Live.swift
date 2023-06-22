@@ -119,6 +119,14 @@ extension FactorSourcesClient: DependencyKey {
 					}
 					profile.factorSources = .init(rawValue: factorSources)!
 				}
+			},
+			flagFactorSourceForDeletion: { id in
+				let factorSources = try await getFactorSources()
+				guard var factorSource = factorSources.rawValue[id: id] else {
+					throw FactorSourceNotFound()
+				}
+				factorSource.flag(.deletedByUser)
+				try await updateFactorSource(factorSource)
 			}
 		)
 	}
