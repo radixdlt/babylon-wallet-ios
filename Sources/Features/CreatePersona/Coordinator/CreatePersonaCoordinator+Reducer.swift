@@ -7,7 +7,7 @@ import FeaturePrelude
 public struct CreatePersonaCoordinator: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		var root: Destinations.State?
-		var path: StackState<Destinations.State> = []
+		var path: StackState<Destinations.State> = .init()
 
 		public let config: CreatePersonaConfig
 
@@ -78,7 +78,7 @@ public struct CreatePersonaCoordinator: Sendable, FeatureReducer {
 
 	public enum ChildAction: Sendable, Equatable {
 		case root(Destinations.Action)
-		case path(StackAction<Destinations.Action>)
+		case path(StackActionOf<Destinations>)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {

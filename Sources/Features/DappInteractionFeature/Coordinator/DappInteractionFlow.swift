@@ -47,7 +47,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 		var personaNotFoundErrorAlert: AlertState<ViewAction.PersonaNotFoundErrorAlertAction>? = nil
 
 		var root: Destinations.State?
-		var path: StackState<Destinations.State> = []
+		var path: StackState<Destinations.State> = .init()
 
 		init?(
 			dappMetadata: DappMetadata,
@@ -111,7 +111,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 
 	enum ChildAction: Sendable, Equatable {
 		case root(Destinations.Action)
-		case path(StackAction<Destinations.Action>)
+		case path(StackActionOf<Destinations>)
 	}
 
 	enum DelegateAction: Sendable, Equatable {
@@ -713,7 +713,7 @@ extension DappInteractionFlow.ChildAction {
 		case let .root(.relay(item, action)), let .path(.element(_, .relay(item, action))):
 			return (item, action)
 
-		case .path(.popFrom):
+		case .path(.popFrom), .path(.push):
 			return nil
 		}
 	}

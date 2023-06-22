@@ -88,16 +88,6 @@ extension TransactionReviewGuarantees {
 	}
 }
 
-extension TransactionReviewTokenView.ViewState {
-	init(transfer: TransactionReview.Transfer) {
-		self.init(name: transfer.metadata.name,
-		          thumbnail: transfer.thumbnail,
-		          amount: transfer.amount,
-		          guaranteedAmount: transfer.guarantee?.amount,
-		          fiatAmount: transfer.metadata.fiatAmount)
-	}
-}
-
 extension TransactionReviewGuarantee.State {
 	var viewState: TransactionReviewGuarantee.ViewState {
 		.init(

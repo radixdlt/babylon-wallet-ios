@@ -49,7 +49,7 @@ extension TransactionReviewAccounts {
 
 extension TransactionReviewAccount.State {
 	var viewState: TransactionReviewAccount.ViewState {
-		.init(account: account, details: transfers.elements, showApprovedMark: account.isApproved)
+		.init(account: account, transfers: transfers.elements, showApprovedMark: account.isApproved)
 	}
 }
 
@@ -57,7 +57,7 @@ extension TransactionReviewAccount.State {
 extension TransactionReviewAccount {
 	public struct ViewState: Equatable {
 		let account: TransactionReview.Account
-		let details: [TransactionDetailsView.ViewState]
+		let transfers: [TransactionReview.Transfer]
 		let showApprovedMark: Bool
 	}
 
@@ -74,8 +74,13 @@ extension TransactionReviewAccount {
 				InnerCard {
 					SmallAccountCard(account: viewStore.account)
 
-					ForEach(viewStore.details) { details in
-						TransactionDetailsView(viewState: details)
+					ForEach(viewStore.transfers) { transfer in
+						switch transfer {
+						case let .fungible(fungible):
+							TransactionReviewTokenView(viewState: .init(transfer: fungible))
+						case let .nonFungible(nonFungible):
+							TransferNFTView(viewState: .init(transfer: nonFungible))
+						}
 					}
 					.background(.app.gray5)
 				}
@@ -84,28 +89,25 @@ extension TransactionReviewAccount {
 	}
 }
 
-// MARK: - TransactionDetailsView
-public struct TransactionDetailsView: View {
-	public typealias ViewState = TransactionReview.Transfer
+extension TransactionReviewTokenView.ViewState {
+	init(transfer: TransactionReview.FungibleTransfer) {
+		self.init(
+			name: transfer.symbol ?? transfer.name ?? L10n.TransactionReview.unknown,
+			thumbnail: transfer.isXRD ? .xrd : .known(transfer.thumbnail),
+			amount: transfer.amount,
+			guaranteedAmount: transfer.guarantee?.amount,
+			fiatAmount: nil
+		)
+	}
+}
 
-	public let viewState: ViewState
-
-	public var body: some View {
-		switch viewState.metadata.type {
-		case .nonFungible:
-			TransferNFTView(name: viewState.metadata.name,
-			                thumbnail: viewState.metadata.thumbnail)
-		case .fungible:
-			TransactionReviewTokenView(viewState: .init(
-				name: viewState.metadata.name,
-				thumbnail: viewState.thumbnail,
-				amount: viewState.amount,
-				guaranteedAmount: viewState.guarantee?.amount,
-				fiatAmount: viewState.metadata.fiatAmount
-			))
-		case .none:
-			EmptyView()
-		}
+extension TransferNFTView.ViewState {
+	init(transfer: TransactionReview.NonFungibleTransfer) {
+		self.init(
+			tokenID: transfer.tokenID,
+			tokenName: transfer.tokenName,
+			thumbnail: transfer.resourceImage
+		)
 	}
 }
 
