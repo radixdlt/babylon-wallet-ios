@@ -31,6 +31,7 @@ extension SimpleManageSecurityStructureFlow {
 
 		let mode: Mode
 		let confirmerOfNewPhone: SecurityQuestionsFactorSource?
+		let numberOfDaysUntilAutoConfirmation: RecoveryAutoConfirmDelayInDays
 		let lostPhoneHelper: TrustedContactFactorSource?
 		var simpleSecurityStructure: RecoveryAndConfirmationFactors? {
 			guard let lostPhoneHelper, let confirmerOfNewPhone else {
@@ -49,10 +50,12 @@ extension SimpleManageSecurityStructureFlow {
 				self.confirmerOfNewPhone = try! existing.configuration.confirmationRole.thresholdFactors[0].extract(as: SecurityQuestionsFactorSource.self)
 				self.lostPhoneHelper = try! existing.configuration.recoveryRole.thresholdFactors[0].extract(as: TrustedContactFactorSource.self)
 				self.mode = .existing
+				self.numberOfDaysUntilAutoConfirmation = existing.configuration.numberOfDaysUntilAutoConfirmation
 			case let .new(new):
 				self.confirmerOfNewPhone = new.confirmerOfNewPhone
 				self.lostPhoneHelper = new.lostPhoneHelper
 				self.mode = .new
+				self.numberOfDaysUntilAutoConfirmation = new.numberOfDaysUntilAutoConfirmation
 			}
 		}
 	}
@@ -73,6 +76,16 @@ extension SimpleManageSecurityStructureFlow {
 
 						NewPhoneConfirmer(factorSet: viewStore.confirmerOfNewPhone) {
 							viewStore.send(.confirmerOfNewPhoneButtonTapped)
+						}
+
+						Picker(
+							"Number of days you have to wait until recovery automatically gets confirmed",
+							selection: viewStore.binding(
+								get: \.numberOfDaysUntilAutoConfirmation,
+								send: { viewStore.send(.changedNumberOfDaysUntilAutoConfirmation($0)) }
+							),
+						) { _ in
+							Text("")
 						}
 
 						LostPhoneHelper(factorSet: viewStore.lostPhoneHelper) {

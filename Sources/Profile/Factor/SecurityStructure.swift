@@ -76,6 +76,10 @@ public typealias PrimaryRole<AbstractFactor> = RoleOfTier<PrimaryRoleTag, Abstra
 public typealias RecoveryRole<AbstractFactor> = RoleOfTier<RecoveryRoleTag, AbstractFactor> where AbstractFactor: Sendable & Hashable & Codable
 public typealias ConfirmationRole<AbstractFactor> = RoleOfTier<ConfirmationRoleTag, AbstractFactor> where AbstractFactor: Sendable & Hashable & Codable
 
+// MARK: - RecoveryAutoConfirmDelayInDaysTag
+public enum RecoveryAutoConfirmDelayInDaysTag {}
+public typealias RecoveryAutoConfirmDelayInDays = Tagged<RecoveryAutoConfirmDelayInDaysTag, UInt>
+
 // MARK: - AbstractSecurityStructure
 public struct AbstractSecurityStructure<AbstractFactor>:
 	Sendable, Hashable, Codable
@@ -88,11 +92,15 @@ public struct AbstractSecurityStructure<AbstractFactor>:
 	public var recoveryRole: Recovery
 	public var confirmationRole: Confirmation
 
+	public var numberOfDaysUntilAutoConfirmation: RecoveryAutoConfirmDelayInDays
+
 	public init(
+		numberOfDaysUntilAutoConfirmation: RecoveryAutoConfirmDelayInDays,
 		primaryRole: Primary,
 		recoveryRole: Recovery,
 		confirmationRole: Confirmation
 	) {
+		self.numberOfDaysUntilAutoConfirmation = numberOfDaysUntilAutoConfirmation
 		self.primaryRole = primaryRole
 		self.recoveryRole = recoveryRole
 		self.confirmationRole = confirmationRole
@@ -144,6 +152,10 @@ extension ProfileSnapshot {
 }
 
 public typealias SecurityStructureConfigurationReference = AbstractSecurityStructureConfiguration<FactorSourceID>
+
+extension SecurityStructureConfigurationReference.Configuration.Recovery {
+	public static let defaultNumberOfDaysUntilAutoConfirmation: RecoveryAutoConfirmDelayInDays = .init(14)
+}
 
 public typealias SecurityStructureConfigurationDetailed = AbstractSecurityStructureConfiguration<FactorSource>
 

@@ -23,6 +23,7 @@ public struct SimpleManageSecurityStructureFlow: Sendable, FeatureReducer {
 			public struct New: Sendable, Hashable {
 				public var lostPhoneHelper: TrustedContactFactorSource?
 				public var confirmerOfNewPhone: SecurityQuestionsFactorSource?
+				public var numberOfDaysUntilAutoConfirmation: RecoveryAutoConfirmDelayInDays = SecurityStructureConfigurationReference.Configuration.Recovery.defaultNumberOfDaysUntilAutoConfirmation
 
 				public init(
 					lostPhoneHelper: TrustedContactFactorSource? = nil,
@@ -50,6 +51,7 @@ public struct SimpleManageSecurityStructureFlow: Sendable, FeatureReducer {
 		case confirmerOfNewPhoneButtonTapped
 		case lostPhoneHelperButtonTapped
 		case finished(RecoveryAndConfirmationFactors)
+		case changedNumberOfDaysUntilAutoConfirmation(RecoveryAutoConfirmDelayInDays)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
