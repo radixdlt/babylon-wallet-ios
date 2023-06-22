@@ -3,6 +3,49 @@ import FeaturePrelude
 import Logging
 import ManageTrustedContactFactorSourceFeature
 
+extension FactorSourceKind {
+	public var isPrimaryRoleSupported: Bool {
+		switch self {
+		case .device, .ledgerHQHardwareWallet, .offDeviceMnemonic:
+			return true
+		case .trustedContact:
+			// FIXME: Check with Matt/Russ, but I think we dont want to...
+			return false
+		case .securityQuestions:
+			// This factor source kind is too cryptographically weak to be allowed for primary.
+			return false
+		}
+	}
+
+	public var isRecoveryRoleSupported: Bool {
+		switch self {
+		case .device:
+			// If a user has lost her phone, how can she use it to perform recovery...she cant!
+			return false
+		case .ledgerHQHardwareWallet, .offDeviceMnemonic, .trustedContact:
+			return true
+		case .securityQuestions:
+			// This factor source kind is too cryptographically weak to be allowed for recovery
+			return false
+		}
+	}
+
+	public var isConfirmationRoleSupported: Bool {
+		switch self {
+		case .device:
+			// If a user has lost her phone, how can she use it to confirm recovery...she cant!
+			return false
+		case .ledgerHQHardwareWallet, .offDeviceMnemonic:
+			return true
+		case .trustedContact:
+			// FIXME: check with Russ/Matt.. CAN we use `trustedContact` for `confirmation`?? I think so
+			return true
+		case .securityQuestions:
+			return true
+		}
+	}
+}
+
 extension SimpleManageSecurityStructureFlow.State {
 	var viewState: SimpleManageSecurityStructureFlow.ViewState {
 		.init(state: self)
