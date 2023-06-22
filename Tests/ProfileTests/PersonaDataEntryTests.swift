@@ -325,7 +325,7 @@ final class PersonaFieldTests: TestCase {
 							"value": "King street",
 						],
 						[
-							"discriminator": "city",
+							"discriminator": "townSlashCity",
 							"value": "Newcastle-under-Lyme",
 						],
 						[

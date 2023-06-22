@@ -110,7 +110,7 @@ extension PersonaData {
 			.init(value: .init(validating: [
 				.streetLine0("Copthall House"),
 				.streetLine1("King street"),
-				.city("Newcastle-under-Lyme"),
+				.townSlashCity("Newcastle-under-Lyme"),
 				.county("Newcastle"),
 				.postcode("ST5 1UE"),
 				.countryOrRegion(.unitedKingdom),
