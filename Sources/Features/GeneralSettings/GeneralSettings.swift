@@ -169,18 +169,18 @@ public struct GeneralSettings: Sendable, FeatureReducer {
 
 extension ConfirmationDialogState<GeneralSettings.Destinations.Action.DeleteProfileConfirmationDialogAction> {
 	static let deleteProfileConfirmationDialog = ConfirmationDialogState {
-		TextState(L10n.GeneralSettings.ResetWalletDialog.title)
+		TextState(L10n.AppSettings.ResetWalletDialog.title)
 	} actions: {
 		ButtonState(role: .destructive, action: .deleteProfileLocalKeepInICloudIfPresent) {
-			TextState(L10n.GeneralSettings.ResetWalletDialog.resetButtonTitle)
+			TextState(L10n.AppSettings.ResetWalletDialog.resetButtonTitle)
 		}
 		ButtonState(role: .destructive, action: .deleteProfile) {
-			TextState(L10n.GeneralSettings.ResetWalletDialog.resetAndDeleteBackupButtonTitle)
+			TextState(L10n.AppSettings.ResetWalletDialog.resetAndDeleteBackupButtonTitle)
 		}
 		ButtonState(role: .cancel, action: .cancel) {
 			TextState(L10n.Common.cancel)
 		}
 	} message: {
-		TextState(L10n.GeneralSettings.ResetWalletDialog.message)
+		TextState(L10n.AppSettings.ResetWalletDialog.message)
 	}
 }
