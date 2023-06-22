@@ -276,8 +276,6 @@ extension TransactionClient {
 				uncompiledNotarized
 			)
 
-			let validated = try RadixEngine.instance.staticallyValidateTransaction(.init(compiledNotarizedIntent: compiledNotarizedTXIntent.compiledIntent.hex, validationConfig: .init())).get()
-
 			return .init(
 				notarized: compiledNotarizedTXIntent,
 				txID: txID

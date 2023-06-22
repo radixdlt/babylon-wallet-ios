@@ -106,28 +106,32 @@ extension EngineToolkitClient {
 				// compose name from two strings
 				let name = [BIP39.WordList.english.randomElement()?.capitalized ?? "Unknown", BIP39.WordList.english.randomElement() ?? "Unknown"].joined(separator: " ")
 				// add Name
-				metdataEntries.append([.string("name"), .string(name)])
+				metdataEntries.append([.string("name"), .enum(.init(.metadata_String, fields: [.string(name)]))])
 			}
 
 			if addSymbol {
+				let symbol = BIP39.WordList.english.randomElement()?.capitalized ?? "Unknown"
 				// add symbol
-				metdataEntries.append([.string("symbol"), .string(BIP39.WordList.english.randomElement()?.capitalized ?? "Unknown")])
+				metdataEntries.append(
+					[.string("symbol"), .enum(.init(.metadata_String, fields: [.string(symbol)]))]
+				)
 			}
 
 			if addIcon {
-				metdataEntries.append([
-					.string("icon_url"),
-					.string("https://c4.wallpaperflare.com/wallpaper/817/534/563/ave-bosque-fantasia-fenix-wallpaper-preview.jpg"),
-				])
+				let url = "https://c4.wallpaperflare.com/wallpaper/817/534/563/ave-bosque-fantasia-fenix-wallpaper-preview.jpg"
+
+				metdataEntries.append(
+					[.string("icon_url"), .enum(.init(.metadata_String, fields: [.string(url)]))]
+				)
 			}
 
 			metdataEntries.append(
-				[.string("description"), .string(description)]
+				[.string("description"), .enum(.init(.metadata_String, fields: [.string(description)]))]
 			)
 
 			let metdata = Map_(
 				keyKind: .string,
-				valueKind: .string,
+				valueKind: .enum,
 				entries: metdataEntries
 			)
 
@@ -237,10 +241,11 @@ extension EngineToolkitClient {
 				],
 				metadata: Map_(
 					keyKind: .string,
-					valueKind: .string,
+					valueKind: .enum,
 					entries: [
-						[.string("name"), .string(nftName)],
-						[.string("description"), .string(nftDescription)],
+						[.string("name"), .enum(.init(.metadata_String, fields: [.string(nftName)]))],
+						[.string("description"), .enum(.init(.metadata_String, fields: [.string(nftDescription)]))],
+						[.string("icon_url"), .enum(.init(.metadata_String, fields: [.string("https://i.imgur.com/9YQ9Z0x.png")]))],
 					]
 				),
 				accessRules: .init(
@@ -280,12 +285,12 @@ extension EngineToolkitClient {
 			let shouldAddName = Bool.random()
 			if shouldAddName {
 				metadataEntries.append(
-					[.string("name"), .string(BIP39.randomPhrase(maxSize: 5))]
+					[.string("name"), .enum(.init(.metadata_String, fields: [.string(BIP39.randomPhrase(maxSize: 5))]))]
 				)
 			}
 
 			metadataEntries.append(
-				[.string("description"), .string(BIP39.randomPhrase(maxSize: 20))]
+				[.string("description"), .enum(.init(.metadata_String, fields: [.string(BIP39.randomPhrase(maxSize: 20))]))]
 			)
 
 			let nftIds = stride(from: 0, to: idsCount, by: 1).map {
@@ -307,7 +312,7 @@ extension EngineToolkitClient {
 				],
 				metadata: Map_(
 					keyKind: .string,
-					valueKind: .string,
+					valueKind: .enum,
 					entries: metadataEntries
 				),
 				accessRules: .init(

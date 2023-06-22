@@ -563,7 +563,7 @@ extension TransactionReview {
 			let account = try userAccounts.account(for: withdrawal.componentAddress)
 
 			let transfers = try await transferInfo(
-				resourceSpecifier: withdrawal.resourceQuantifier,
+				resourceQuantifier: withdrawal.resourceQuantifier,
 				createdEntities: manifest.newlyCreated,
 				networkID: networkID,
 				type: .exact
@@ -591,7 +591,7 @@ extension TransactionReview {
 			let account = try userAccounts.account(for: deposit.componentAddress)
 
 			let transfers = try await transferInfo(
-				resourceSpecifier: deposit.resourceSpecifier,
+				resourceQuantifier: deposit.resourceSpecifier,
 				createdEntities: manifest.newlyCreated,
 				networkID: networkID,
 				type: deposit.transferType
@@ -614,19 +614,18 @@ extension TransactionReview {
 	}
 
 	func transferInfo(
-		resourceSpecifier: ResourceQuantifier,
+		resourceQuantifier: ResourceQuantifier,
 		createdEntities: NewlyCreated?,
 		networkID: NetworkID,
 		type: TransferType
 	) async throws -> [Transfer] {
-		switch resourceSpecifier.resourceManagerSpecifier {
-		case let .existing(resourceAddress):
-			let metadata = try? await gatewayAPIClient.getEntityMetadata(resourceAddress.address)
-			let addressKind = try engineToolkitClient.decodeAddress(resourceAddress.address).entityType
-			switch (resourceSpecifier, addressKind) {
-			case (let .amount(_, decimalAmount), .globalFungibleResourceManager):
-				let amount = try BigDecimal(fromString: decimalAmount.value)
+		switch resourceQuantifier {
+		case let .amount(resourceManagerSpecifier, amount):
+			let amount = try BigDecimal(fromString: amount.value)
 
+			switch resourceManagerSpecifier {
+			case let .existing(resourceAddress):
+				let metadata = try? await gatewayAPIClient.getEntityMetadata(resourceAddress.address)
 				func guarantee() -> TransactionClient.Guarantee? {
 					guard case let .estimated(instructionIndex) = type else { return nil }
 					return .init(amount: amount, instructionIndex: instructionIndex, resourceAddress: resourceAddress)
@@ -641,8 +640,27 @@ extension TransactionReview {
 					guarantee: guarantee()
 				))]
 
-			case (let .ids(_, ids), .globalNonFungibleResourceManager):
-				// https://rdxworks.slack.com/archives/C02MTV9602H/p1681155601557349
+			case let .newlyCreated(index):
+				guard let newResources = createdEntities?.resources, !newResources.isEmpty, index < newResources.count else {
+					return []
+				}
+
+				let resource = newResources[index]
+
+				return [
+					.fungible(.init(
+						amount: amount,
+						name: resource.name,
+						symbol: resource.symbol,
+						thumbnail: resource.iconURL,
+						isXRD: false
+					)),
+				]
+			}
+		case let .ids(resourceManagerSpecifier, ids):
+			switch resourceManagerSpecifier {
+			case let .existing(resourceAddress):
+				let metadata = try? await gatewayAPIClient.getEntityMetadata(resourceAddress.address)
 				let maximumNFTIDChunkSize = 29
 
 				var result: [Transfer] = []
@@ -665,28 +683,9 @@ extension TransactionReview {
 				}
 
 				return result
-
-			default:
+			case let .newlyCreated(index):
 				return []
 			}
-
-		case let .newlyCreated(index):
-			guard let newResources = createdEntities?.resources, !newResources.isEmpty, index < newResources.count else {
-				return []
-			}
-
-			let resource = newResources[index]
-
-			// FIXME: For now display newly created entity as fungible transfer. To be updated when we have the clear design on how to handle this.
-			return [
-				.fungible(.init(
-					amount: .one,
-					name: resource.name,
-					symbol: resource.symbol,
-					thumbnail: resource.iconURL,
-					isXRD: false
-				)),
-			]
 		}
 	}
 }

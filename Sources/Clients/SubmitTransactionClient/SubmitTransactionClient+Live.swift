@@ -100,12 +100,12 @@ extension SubmitTransactionClient: DependencyKey {
 			@Dependency(\.accountPortfoliosClient) var accountPortfoliosClient
 
 			let changedAccounts: [Profile.Network.Account.EntityAddress]?
+			let decompiledNotarized = try engineToolkitClient.decompileNotarizedTransactionIntent(.init(
+				compiledNotarizedIntent: request.compiledNotarizedTXIntent.compiledIntent,
+				instructionsOutputKind: .string
+			))
 
 			do {
-				let decompiledNotarized = try engineToolkitClient.decompileNotarizedTransactionIntent(.init(
-					compiledNotarizedIntent: request.compiledNotarizedTXIntent.compiledIntent,
-					instructionsOutputKind: .string
-				))
 				debugPrintTX(decompiledNotarized)
 
 				let manifest = decompiledNotarized.signedIntent.intent.manifest
@@ -117,6 +117,16 @@ extension SubmitTransactionClient: DependencyKey {
 			} catch {
 				loggerGlobal.warning("Could get transactionClient.myInvolvedEntities: \(error.localizedDescription)")
 				changedAccounts = nil
+			}
+
+			let validated = try RadixEngine.instance.staticallyValidateTransaction(.init(
+				compiledNotarizedIntent: request.compiledNotarizedTXIntent.compiledIntent.hex,
+				validationConfig: .init()
+			)
+			).get()
+
+			if case let .invalid(error) = validated {
+				throw NSError(domain: "sd''", code: 1)
 			}
 
 			let submitTransactionRequest = GatewayAPI.TransactionSubmitRequest(
