@@ -1,9 +1,9 @@
 import Foundation
 
-// MARK: - HashableVoid
+// MARK: - Unit
 /// Useful when writing features where actions semantically have associated value
 /// `TaskResult<Void>` which does not compile since `Void` is not `Equatable`. We
-/// can now use `TaskResult<HashableVoid>`.
-public struct HashableVoid: Sendable, Hashable, Codable {
+/// can now use `TaskResult<Unit>`.
+public struct Unit: Sendable, Hashable, Codable {
 	public init() {}
 }
