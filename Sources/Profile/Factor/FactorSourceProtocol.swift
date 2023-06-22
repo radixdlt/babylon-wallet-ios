@@ -11,6 +11,7 @@ public protocol FactorSourceProtocol:
 {
 	static var kind: FactorSourceKind { get }
 	static var casePath: CasePath<FactorSource, Self> { get }
+	var id: ID { get }
 }
 
 extension FactorSourceProtocol {

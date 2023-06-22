@@ -223,7 +223,7 @@ extension ConfirmationDialogState<DeleteExistingFactorSourceConfirmationDialogAc
 			},
 			message: {
 				// FIXME: strings
-				TextState("You can only have one \(factorSource.factorSourceID.kind), the new you create will replace the old one.")
+				TextState("You can only have one \(factorSource.kind.rawValue), the new you create will replace the old one.")
 			}
 		)
 	}
