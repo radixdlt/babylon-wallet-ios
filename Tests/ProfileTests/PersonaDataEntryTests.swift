@@ -197,7 +197,7 @@ final class PersonaFieldTests: TestCase {
 					[
 						.streetLine0("34 St Thomas's Rd"),
 						.streetLine1(),
-						.city("Gosport"),
+						.townSlashCity("Gosport"),
 						.county("Hampshire"),
 						.postcode("PO12 4JX"),
 						.countryOrRegion(.unitedKingdom),
