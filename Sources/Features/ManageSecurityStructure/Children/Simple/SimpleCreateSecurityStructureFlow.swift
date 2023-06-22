@@ -3,14 +3,6 @@ import FactorSourcesClient
 import FeaturePrelude
 import ManageTrustedContactFactorSourceFeature
 
-// MARK: - SimpleUnnamedSecurityStructureConfig
-public struct SimpleUnnamedSecurityStructureConfig: Sendable, Hashable {
-	let numberOfDaysUntilAutoConfirmation: RecoveryAutoConfirmDelayInDays
-	let singlePrimaryFactor: DeviceFactorSource
-	let singleRecoveryFactor: TrustedContactFactorSource
-	let singleConfirmationFactor: SecurityQuestionsFactorSource
-}
-
 public typealias ListConfirmerOfNewPhone = FactorSourcesOfKindList<SecurityQuestionsFactorSource>
 public typealias ListLostPhoneHelper = FactorSourcesOfKindList<TrustedContactFactorSource>
 
@@ -205,13 +197,12 @@ public struct SimpleManageSecurityStructureFlow: Sendable, FeatureReducer {
 							!$0.supportsOlympia
 						}.first!
 
-						let simpleUnnamed = SimpleUnnamedSecurityStructureConfig(
+						let config = SecurityStructureConfigurationDetailed.Configuration(
 							numberOfDaysUntilAutoConfirmation: new.numberOfDaysUntilAutoConfirmation,
-							singlePrimaryFactor: primary,
-							singleRecoveryFactor: simpleFactorConfig.singleRecoveryFactor,
-							singleConfirmationFactor: simpleFactorConfig.singleConfirmationFactor
+							primaryRole: .single(primary),
+							recoveryRole: .single(simpleFactorConfig.singleRecoveryFactor),
+							confirmationRole: .single(simpleFactorConfig.singleConfirmationFactor)
 						)
-						let config = SecurityStructureConfigurationDetailed.Configuration(from: simpleUnnamed)
 						return Self.DelegateAction.Product.creatingNew(config: config)
 					}
 					return .delegate(.updatedOrCreatedSecurityStructure(taskResult))
@@ -221,17 +212,6 @@ public struct SimpleManageSecurityStructureFlow: Sendable, FeatureReducer {
 				return .send(.delegate(.updatedOrCreatedSecurityStructure(.success(.updating(structure: structureToUpdate)))))
 			}
 		}
-	}
-}
-
-extension SecurityStructureConfigurationDetailed.Configuration {
-	init(from simple: SimpleUnnamedSecurityStructureConfig) {
-		self.init(
-			numberOfDaysUntilAutoConfirmation: simple.numberOfDaysUntilAutoConfirmation,
-			primaryRole: .single(simple.singlePrimaryFactor),
-			recoveryRole: .single(simple.singleRecoveryFactor),
-			confirmationRole: .single(simple.singleConfirmationFactor)
-		)
 	}
 }
 
