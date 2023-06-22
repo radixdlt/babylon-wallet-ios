@@ -44,12 +44,9 @@ extension PersonaData {
 
 		public init(from decoder: Decoder) throws {
 			let container = try decoder.singleValueContainer()
-			let dateFormatter = ISO8601DateFormatter()
-			guard let date = try dateFormatter.date(from: container.decode(String.self)) else {
-				struct InvalidDateFromString: Swift.Error {}
-				throw InvalidDateFromString()
-			}
-			self.init(date: date)
+			try self.init(
+				date: Date(container.decode(String.self), strategy: .iso8601)
+			)
 		}
 
 		public var description: String {
