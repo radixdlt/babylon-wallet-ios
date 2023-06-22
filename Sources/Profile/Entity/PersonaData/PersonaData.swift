@@ -101,7 +101,7 @@ extension PersonaData {
 		]),
 		postalAddresses: .init(collection: [
 			.init(value: .init(validating: [
-				.postalCodeNumber(21_000_000),
+				.postalCode("21 000 000"),
 				.prefecture("SHA256"), .county("Hashtown"),
 				.furtherDivisionsLine0("Sound money street"),
 				.furtherDivisionsLine1(""),
@@ -112,7 +112,7 @@ extension PersonaData {
 				.streetLine1("King street"),
 				.city("Newcastle-under-Lyme"),
 				.county("Newcastle"),
-				.postcodeString("ST5 1UE"),
+				.postcode("ST5 1UE"),
 				.countryOrRegion(.unitedKingdom),
 			])),
 		]),

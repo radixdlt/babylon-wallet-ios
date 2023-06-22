@@ -155,7 +155,7 @@ final class PersonaFieldTests: TestCase {
 				postalAddresses: [[
 					.streetLine0("Västerlånggatan 31"),
 					.streetLine1(""),
-					.postalCodeNumber(11129), .city("Stockholm"),
+					.postalCode("11129"), .city("Stockholm"),
 					.countryOrRegion(.sweden),
 				]]
 			)
@@ -164,7 +164,7 @@ final class PersonaFieldTests: TestCase {
 			XCTAssertEqual(addresses[0], [
 				.streetLine0("Västerlånggatan 31"),
 				.streetLine1(""),
-				.postalCodeNumber(11129), .city("Stockholm"),
+				.postalCode("11129"), .city("Stockholm"),
 				.countryOrRegion(.sweden),
 			])
 		}
@@ -179,19 +179,19 @@ final class PersonaFieldTests: TestCase {
 					[
 						.streetLine0("Östantorp Vinö 52"),
 						.streetLine1(),
-						.postalCodeNumber(36030), .city("Lammhult"),
+						.postalCode("36030"), .city("Lammhult"),
 						.countryOrRegion(.sweden),
 					],
 					[
 						.streetLine0("Föreningsgatan 41"),
 						.streetLine1(),
-						.postalCodeNumber(86033), .city("Bergeforsen"),
+						.postalCode("86033"), .city("Bergeforsen"),
 						.countryOrRegion(.sweden),
 					],
 					[
 						.streetLine0("93 rue de la Mare aux Carats"),
 						.streetLine1(),
-						.postalCodeNumber(34080), .city("Montpellier"),
+						.postalCode("34080"), .city("Montpellier"),
 						.countryOrRegion(.france),
 					],
 					[
@@ -199,7 +199,7 @@ final class PersonaFieldTests: TestCase {
 						.streetLine1(),
 						.city("Gosport"),
 						.county("Hampshire"),
-						.postcodeString("PO12 4JX"),
+						.postcode("PO12 4JX"),
 						.countryOrRegion(.unitedKingdom),
 					],
 				]
@@ -217,7 +217,7 @@ final class PersonaFieldTests: TestCase {
 					.countryOrRegion(.japan),
 					.streetLine0("Should not use 'streetLine'"),
 					.streetLine1("Should not use 'streetLine'"),
-					.postalCodeNumber(123),
+					.postalCode("123"),
 					.city("Tokyo"),
 				]
 			)
@@ -288,8 +288,8 @@ final class PersonaFieldTests: TestCase {
 					"id": "00000000-0000-0000-0000-000000000009",
 					"value": [
 						[
-							"discriminator": "postalCodeNumber",
-							"value": 21_000_000,
+							"discriminator": "postalCode",
+							"value": "21 000 000",
 						],
 						[
 							"discriminator": "prefecture",
@@ -333,7 +333,7 @@ final class PersonaFieldTests: TestCase {
 							"value": "Newcastle",
 						],
 						[
-							"discriminator": "postcodeString",
+							"discriminator": "postcode",
 							"value": "ST5 1UE",
 						],
 						[

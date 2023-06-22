@@ -12,19 +12,12 @@ extension PersonaData.PostalAddress {
 		case streetLine0(String)
 		case streetLine1(String = "")
 
-		case postalCodeString(String)
+		case postalCode(String)
 
-		/// Sweden
-		case postalCodeNumber(Int)
-
-		/// "Postcode" e.g.: `India`
-		case postcodeNumber(Int)
-
-		/// "Postcode" .e.g. UK
-		case postcodeString(String)
+		case postcode(String)
 
 		/// US
-		case zipNumber(Int)
+		case zip(String)
 
 		case city(String)
 		case state(String)
@@ -42,10 +35,7 @@ extension PersonaData.PostalAddress {
 		case governorate(String)
 
 		/// Hong Kong
-		case districtString(String)
-
-		/// Macao
-		case districtNumber(Int)
+		case district(String)
 
 		/// Hong Kong, Somalia
 		case region(String)
@@ -94,16 +84,12 @@ extension PersonaData.PostalAddress.Field {
 			return value
 		case let .streetLine1(value):
 			return value
-		case let .postalCodeString(value):
+		case let .postalCode(value):
 			return value
-		case let .postalCodeNumber(value):
-			return value.description
-		case let .postcodeNumber(value):
-			return value.description
-		case let .postcodeString(value):
+		case let .postcode(value):
 			return value
-		case let .zipNumber(value):
-			return value.description
+		case let .zip(value):
+			return value
 		case let .city(value):
 			return value
 		case let .state(value):
@@ -116,10 +102,8 @@ extension PersonaData.PostalAddress.Field {
 			return value
 		case let .governorate(value):
 			return value
-		case let .districtString(value):
+		case let .district(value):
 			return value
-		case let .districtNumber(value):
-			return value.description
 		case let .region(value):
 			return value
 		case let .prefectureLevelCity(value):
@@ -165,26 +149,20 @@ extension PersonaData.PostalAddress.Field {
 			self = try .streetLine0(container.decode(String.self, forKey: .value))
 		case .streetLine1:
 			self = try .streetLine1(container.decode(String.self, forKey: .value))
-		case .postalCodeString:
-			self = try .postalCodeString(container.decode(String.self, forKey: .value))
-		case .postalCodeNumber:
-			self = try .postalCodeNumber(container.decode(Int.self, forKey: .value))
-		case .postcodeNumber:
-			self = try .postcodeNumber(container.decode(Int.self, forKey: .value))
+		case .postalCode:
+			self = try .postalCode(container.decode(String.self, forKey: .value))
 		case .postalDistrict:
 			self = try .postalDistrict(container.decode(String.self, forKey: .value))
-		case .postcodeString:
-			self = try .postcodeString(container.decode(String.self, forKey: .value))
+		case .postcode:
+			self = try .postcode(container.decode(String.self, forKey: .value))
 		case .islandName:
 			self = try .islandName(container.decode(String.self, forKey: .value))
-		case .zipNumber:
-			self = try .zipNumber(container.decode(Int.self, forKey: .value))
+		case .zip:
+			self = try .zip(container.decode(String.self, forKey: .value))
 		case .city:
 			self = try .city(container.decode(String.self, forKey: .value))
-		case .districtNumber:
-			self = try .districtNumber(container.decode(Int.self, forKey: .value))
-		case .districtString:
-			self = try .districtString(container.decode(String.self, forKey: .value))
+		case .district:
+			self = try .district(container.decode(String.self, forKey: .value))
 		case .neighbourhood:
 			self = try .neighbourhood(container.decode(String.self, forKey: .value))
 		case .department:
@@ -231,15 +209,11 @@ extension PersonaData.PostalAddress.Field {
 			try container.encode(value, forKey: .value)
 		case let .streetLine1(value):
 			try container.encode(value, forKey: .value)
-		case let .postalCodeString(value):
+		case let .postalCode(value):
 			try container.encode(value, forKey: .value)
-		case let .postalCodeNumber(value):
+		case let .postcode(value):
 			try container.encode(value, forKey: .value)
-		case let .postcodeNumber(value):
-			try container.encode(value, forKey: .value)
-		case let .postcodeString(value):
-			try container.encode(value, forKey: .value)
-		case let .zipNumber(value):
+		case let .zip(value):
 			try container.encode(value, forKey: .value)
 		case let .city(value):
 			try container.encode(value, forKey: .value)
@@ -255,9 +229,7 @@ extension PersonaData.PostalAddress.Field {
 			try container.encode(value, forKey: .value)
 		case let .governorate(value):
 			try container.encode(value, forKey: .value)
-		case let .districtString(value):
-			try container.encode(value, forKey: .value)
-		case let .districtNumber(value):
+		case let .district(value):
 			try container.encode(value, forKey: .value)
 		case let .region(value):
 			try container.encode(value, forKey: .value)
@@ -288,20 +260,15 @@ extension PersonaData.PostalAddress.Field {
 	public enum Discriminator: String, Sendable, Hashable, Codable {
 		case streetLine0
 		case streetLine1
-		case postalCodeString
-		case postalCodeNumber
-		case postcodeNumber
+		case postalCode
+		case postcode
 
 		/// Jordan (String)
 		case postalDistrict
 
-		/// UK
-		case postcodeString
-
-		case zipNumber
+		case zip
 		case city
-		case districtNumber
-		case districtString
+		case district
 		case neighbourhood
 
 		/// Carribean Netherlands
@@ -330,15 +297,15 @@ extension PersonaData.PostalAddress.Field {
 			switch self {
 			case .countryOrRegion: return "Country"
 			case .streetLine0, .streetLine1: return "Street"
-			case .postalCodeString, .postalCodeNumber: return "Postal code"
-			case .postcodeString, .postcodeNumber: return "Postcode"
+			case .postalCode: return "Postal code"
+			case .postcode: return "Postcode"
 			case .postalDistrict: return "Postal District"
-			case .zipNumber: return "ZIP"
+			case .zip: return "ZIP"
 			case .prefectureLevelCity: return "Prefecture-level City"
 			case .city: return "City"
 			case .state: return "State"
 			case .governorate: return "Governorate"
-			case .districtString, .districtNumber: return "District"
+			case .district: return "District"
 			case .neighbourhood: return "Neighbourhood"
 			case .suburb: return "Suburb"
 			case .province: return "Province"
@@ -363,19 +330,16 @@ extension PersonaData.PostalAddress.Field {
 		case .countryOrRegion: return .countryOrRegion
 		case .streetLine0: return .streetLine0
 		case .streetLine1: return .streetLine1
-		case .postalCodeString: return .postalCodeString
-		case .postalCodeNumber: return .postalCodeNumber
-		case .postcodeNumber: return .postcodeNumber
-		case .postcodeString: return .postcodeString
+		case .postalCode: return .postalCode
+		case .postcode: return .postcode
 		case .postalDistrict: return .postalDistrict
-		case .zipNumber: return .zipNumber
+		case .zip: return .zip
 
 		case .prefectureLevelCity: return .prefectureLevelCity
 
 		case .city: return .city
 		case .state: return .state
-		case .districtNumber: return .districtNumber
-		case .districtString: return .districtString
+		case .district: return .district
 		case .neighbourhood: return .neighbourhood
 		case .suburb: return .suburb
 		case .province: return .province
@@ -391,30 +355,6 @@ extension PersonaData.PostalAddress.Field {
 		case .furtherDivisionsLine1: return .furtherDivisionsLine1
 		case .governorate: return .governorate
 		case .department: return .department
-		}
-	}
-}
-
-#if canImport(UIKit)
-import UIKit
-#endif // canImport(UIKit)
-extension PersonaData.PostalAddress.Field {
-	#if canImport(UIKit)
-	public var keyboardType: UIKeyboardType {
-		switch self {
-		case .zipNumber, .postalCodeNumber, .postcodeNumber, .districtNumber: return .numbersAndPunctuation
-		default: return .default
-		}
-	}
-	#endif // canImport(UIKit)
-}
-
-extension PersonaData.PostalAddress.Field {
-	public var valueType: any InitializableFromInputString.Type {
-		switch self {
-		case .zipNumber, .postalCodeNumber, .postcodeNumber, .districtNumber: return Int.self
-		case .countryOrRegion: return PersonaData.PostalAddress.CountryOrRegion.self
-		default: return String.self
 		}
 	}
 }

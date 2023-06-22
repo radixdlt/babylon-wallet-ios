@@ -544,8 +544,8 @@
                 "id" : "00000000-0000-0000-0000-000000000009",
                 "value" : [
                   {
-                    "discriminator" : "postalCodeNumber",
-                    "value" : 21000000
+                    "discriminator" : "postalCode",
+                    "value" : "21 000 000"
                   },
                   {
                     "discriminator" : "prefecture",
@@ -589,7 +589,7 @@
                     "value" : "Newcastle"
                   },
                   {
-                    "discriminator" : "postcodeString",
+                    "discriminator" : "postcode",
                     "value" : "ST5 1UE"
                   },
                   {
