@@ -51,7 +51,7 @@ public struct SignWithFactorSourcesOfKindDevice: SignWithFactorSourcesOfKindRedu
 		try await deviceFactorSourceClient.signUsingDeviceFactorSource(
 			deviceFactorSource: deviceFactorSource,
 			signerEntities: Set(signers.map(\.entity)),
-			unhashedDataToSign: state.signingPurposeWithPayload.dataToSign(),
+			hashedDataToSign: state.signingPurposeWithPayload.dataToSign(),
 			purpose: .signTransaction(.manifestFromDapp)
 		)
 	}

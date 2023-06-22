@@ -108,7 +108,7 @@ struct Login: Sendable, FeatureReducer {
 
 				let signature = try await deviceFactorSourceClient.signUsingDeviceFactorSource(
 					signerEntity: .persona(persona),
-					unhashedDataToSign: authToSignResponse.payloadToHashAndSign,
+					hashedDataToSign: authToSignResponse.payloadToHashAndSign,
 					purpose: .signAuth
 				)
 				let signedAuthChallenge = SignedAuthChallenge(challenge: challenge, entitySignatures: Set([signature]))

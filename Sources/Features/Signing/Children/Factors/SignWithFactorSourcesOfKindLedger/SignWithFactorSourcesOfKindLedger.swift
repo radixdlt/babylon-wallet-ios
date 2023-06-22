@@ -57,28 +57,16 @@ public struct SignWithFactorSourcesOfKindLedger: SignWithFactorSourcesOfKindRedu
 		switch state.signingPurposeWithPayload {
 		case let .signTransaction(_, intent, _):
 			let hash = try RadixEngine.instance.hashTransactionItent(intent).get().hash
-			do {
-				loggerGlobal.notice("\n\nExpected TX hash: \(hash)\n\n")
-			} catch {
-				loggerGlobal.critical("Failed to hash: \(error)")
-			}
 			let ledgerTXDisplayMode: LedgerHardwareWalletFactorSource.SigningDisplayMode = await appPreferencesClient.getPreferences().display.ledgerHQHardwareWalletSigningDisplayMode
 
 			return try await ledgerHardwareWalletClient.signTransaction(.init(
 				ledger: ledger,
 				signers: signers,
-				unhashedDataToSign: Data(hex: hash),
+				hashedDataToSign: Data(hex: hash),
 				ledgerTXDisplayMode: ledgerTXDisplayMode.mode,
 				displayHashOnLedgerDisplay: false
 			))
 		case let .signAuth(authToSign):
-			do {
-				let expectedHash = try blake2b(data: authToSign.payloadToHashAndSign)
-				loggerGlobal.notice("\n\nExpected TX hash: \(expectedHash.hex)\n\n")
-			} catch {
-				loggerGlobal.critical("Failed to hash: \(error)")
-			}
-
 			return try await ledgerHardwareWalletClient.signAuthChallenge(.init(
 				ledger: ledger,
 				signers: signers,
