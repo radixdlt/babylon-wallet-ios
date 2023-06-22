@@ -1,4 +1,4 @@
-"homePage_applySecuritySettings" = "Apply Security Settings";
+"homePage_applySecuritySettings" = "Backup your seed phrase";
 "homePage_backedUpMnemonicHeading" = "I have backed up this seed phrase";
 "homePage_createNewAccount" = "Create a New Account";
 "homePage_legacyAccountHeading" = "Legacy";
@@ -99,14 +99,13 @@
 "settings_backups" = "Backups";
 "settings_importFromLegacyWallet" = "Import from a Legacy Wallet";
 "settings_ledgerHardwareWallets" = "Ledger Hardware Wallets";
+"settings_multiFactor" = "Multi-Factor Setup";
 "settings_appVersion" = "Version: %@ build #%@";
-"settings_inspectProfile" = "Inspect Profile";
+"settings_deleteWalletData" = "Delete Wallet Data";
 "settings_noProfileText" = "No Wallet Data Found";
 "settings_linkToConnectorHeader_title" = "Link your Wallet to a Desktop Browser";
 "settings_linkToConnectorHeader_subtitle" = "Scan the QR code in the Radix Wallet Connector extension";
 "settings_linkToConnectorHeader_linkToConnector" = "Link to Connector";
-"settings_debug_factorSources" = "Factor sources";
-"settings_debug_inspectProfile" = "Inspect profile";
 "linkedConnectors_title" = "Linked Connectors";
 "linkedConnectors_subtitle" = "Connect your Radix Wallet to desktop web browsers by linking to the Radix Connector browser extension. Here are your linked Connectors.";
 "linkedConnectors_lastConnected" = "Last connected %@";
@@ -206,9 +205,33 @@
 "importLegacyWallet_selectAccountsToImport_olympiaAddress" = "Olympia Address";
 "importLegacyWallet_selectAccountsToImport_selectAllNonImported" = "Select all non imported";
 "importLegacyWallet_selectAccountsToImport_unnamed" = "Unnamed";
+"importLegacyWallet_hardwareImport_skipButton" = "Skip remaining accounts";
+"importLegacyWallet_scanQRCode_title" = "Import Legacy Olympia Accounts";
+"importLegacyWallet_accountsToImport_title" = "Import Accounts";
+"importLegacyWallet_accountsToImport_subtitle" = "The following accounts will be imported to your new wallet.";
+"importLegacyWallet_accountsToImport_emptyState" = "No accounts found to import.";
+"importLegacyWallet_accountsToImport_button" = "Import %d Accounts";
+"importLegacyWallet_accountsToImport_legacyAccount" = "Legacy Account";
+"importLegacyWallet_accountsToImport_ledgerAccount" = "Ledger (Legacy)";
+"importLegacyWallet_accountsToImport_newAddress" = "New Address";
+"importLegacyWallet_completion_title" = "Congratulations";
 "importLegacyWallet_completion_titleNoAccounts" = "No accounts imported.";
 "importLegacyWallet_completion_titleOneAccount" = "Imported 1 account.";
 "importLegacyWallet_completion_titleManyAccounts" = "Imported #%d accounts.";
+"importLegacyWallet_completion_subtitle" = "You\'ve imported your accounts.";
+"importLegacyWallet_completion_footer" = "They will live on the Radix Network and you can access them anytime in your Wallet.";
+"importLegacyWallet_hardwareImport_title" = "%d of your Olympia accounts are controlled by Ledger hardware wallets.";
+"importLegacyWallet_hardwareImport_noLedgers" = "None";
+"importLegacyWallet_hardwareImport_subtitle" = "Currently known Ledgers:";
+"importLegacyWallet_hardwareImport_footer" = "%d more accounts are controlled by other devices. Connect a Ledger hardware wallet device and tap Continue.";
+"importLegacyWallet_seedPhrase_title" = "Verify With Your Seed Phrase";
+"importLegacyWallet_seedPhrase_subtitle" = "To complete importing your accounts, please view your seed phrase in the Radix Desktop Wallet and enter the words here.";
+"importLegacyWallet_seedPhrase_warning" = "This is a one-time process to import your accounts. Never give your seed phrase to anyone for any reason.";
+"importLegacyWallet_seedPhrase_wordLabel" = "Word %d";
+"importLegacyWallet_seedPhrase_regularMode" = "Regular Mode";
+"importLegacyWallet_seedPhrase_advancedMode" = "Advanced Mode";
+"importLegacyWallet_seedPhrase_passphraseHint" = "Optional BIP39 Passphrase. This is not your wallet password, and the Radix Desktop Wallet did not use a BIP39 passphrase. This is only to support import from other wallets that may have used one.";
+"importLegacyWallet_seedPhrase_passphraseLabel" = "Passphrase";
 "createAccount_completion_explanation" = "Your Account lives on the Radix Network and you can access it any time in your Radix Wallet.";
 "createAccount_completion_subtitleFirst" = "You’ve created your first Account!";
 "createAccount_completion_subtitleNotFirst" = "Your Account has been created.";
@@ -354,6 +377,7 @@
 "transaction_status_success_title" = "Success";
 "transaction_status_success_text" = "Your transaction was successful";
 "transaction_status_failure_title" = "Something went wrong";
+"transaction_status_dismiss_dialog_message" = "Stop waiting for transaction result? The transaction will not be canceled.";
 "addressAction_copyAddress" = "Copy Address";
 "addressAction_copiedToClipboard" = "Copied to Clipboard";
 "addressAction_copyNftId" = "Copy NFT ID";
@@ -458,6 +482,7 @@
 "addLedger_addDevice_continue" = "Continue";
 "addLedger_nameLedger_title" = "Name Your Ledger";
 "addLedger_nameLedger_body" = "Enter a label for this Ledger device";
+"addLedger_nameLedger_detectedType" = "Detected type: %@";
 "addLedger_nameLedger_namePlaceholder" = "Green Ledger Nano S+";
 "addLedger_nameLedger_continueButtonTitle" = "Save and Continue";
 "importMnemonic_wordHeading" = "word #%d";
@@ -490,6 +515,13 @@
 "generalSettings_verboseLedgerMode_title" = "Verbose Ledger transaction signing";
 "generalSettings_verboseLedgerMode_subtitle" = "When signing with your Ledger hardware wallet, should all instructions be displayed?";
 "generalSettings_confirmCloudSyncDisableAlert_title" = "Disabling iCloud sync will delete the iCloud backup data, are you sure you want to disable iCloud sync?";
+"generalSettings_resetWallet_title" = "Reset Wallet";
+"generalSettings_resetWallet_subtitle" = "Clear all data in this Wallet";
+"generalSettings_resetWallet_buttonTitle" = "Reset";
+"generalSettings_resetWalletDialog_title" = "Reset Wallet?";
+"generalSettings_resetWalletDialog_resetButtonTitle" = "Reset Wallet";
+"generalSettings_resetWalletDialog_resetAndDeleteBackupButtonTitle" = "Reset and Delete iCloud Backup";
+"generalSettings_resetWalletDialog_message" = "WARNING. This will clear all contents of your Wallet. If you have no backup, you will lose access to your Accounts and Personas permanently.";
 "assetTransfer_transactionMessage" = "Message";
 "assetTransfer_qrScanInstructions" = "Scan a QR code of a Radix Account address from another wallet or an exchange.";
 "assetTransfer_sendTransferButton" = "Continue";
@@ -539,6 +571,8 @@
 "signing_signatureRequest_title" = "Signature Request";
 "signing_signatureRequest_body" = "Make sure the following **Ledger hardware wallet device** is connected to a computer with a linked Radix Connector browser extension, and the Radix Babylon app is launched on the device.";
 "signing_signatureRequest_instructions" = "Review and sign the transaction on the Ledger device to continue.";
+"signing_signatureSuccessful_title" = "Signed";
+"signing_signatureSuccessful_body" = "Signature successful";
 "ledgerHardwareDevices_linkConnectorAlert_title" = "Link a Connector";
 "ledgerHardwareDevices_linkConnectorAlert_message" = "To use a Ledger hardware wallet device, it must be connected to a computer running the Radix Connector browser extension.
 
@@ -555,22 +589,24 @@ Install the Connector extension, open it to see the linking QR code, and tap con
 "ledgerHardwareDevices_subtitleSelectLedger" = "Choose a Ledger device to use";
 "ledgerHardwareDevices_subtitleAllLedgers" = "Here are all the Ledger devices you have added.";
 "ledgerHardwareDevices_subtitleFailure" = "Could not find Ledger devices";
-
+"displayMnemonics_cautionAlert_title" = "Use Caution";
+"displayMnemonics_cautionAlert_revealButtonLabel" = "Reveal Seed Phrase";
+"displayMnemonics_cautionAlert_message" = "A seed phrase provides full control of its Accounts. Do not view in a public area. Back up the seed phrase words securely. Screenshots are disabled.";
+"displayMnemonics_seedPhrases" = "Seed Phrases";
+"displayMnemonics_connectedAccountsLabel_one" = "Connected to %d account";
+"displayMnemonics_connectedAccountsLabel_many" = "Connected to %d accounts";
+"displayMnemonics_seedPhraseSecurityInfo" = "You are responsible for the security of your Seed Phrase";
+"displayMnemonics_backUpWarning" = "Back up this Seed Phrase";
+"revealSeedPhrase_title" = "Reveal Seed Phrase";
+"revealSeedPhrase_warning" = "For your safety, make sure no one is looking at your screen. Taking a screen shot has been disabled.";
+"revealSeedPhrase_wordLabel" = "Word %d";
+"revealSeedPhrase_passphrase" = "Passphrase";
+"revealSeedPhrase_warningDialog_title" = "Use Caution";
+"revealSeedPhrase_warningDialog_subtitle" = "Are you sure you have backed up your seed phrase?";
+"revealSeedPhrase_warningDialog_confirmButton" = "I have backed up this seed phrase";
 "seedPhrases_title" = "Seed Phrases";
 "seedPhrases_message" = "A Seed Phrase provides full access to your accounts and funds. When viewing, ensure you’re in a safe environment and no one is looking at your screen.";
 "seedPhrases_warning" = "You are responsible for the security of your Seed Phrase";
 "seedPhrases_seedPhrase_reveal" = "Reveal Seed Phrase";
 "seedPhrases_seedPhrase_oneConnectedAccount" = "Connected to 1 account";
 "seedPhrases_seedPhrase_multipleConnectedAccounts" = "Connected to %d accounts";
-
-"revealSeedPhrase_warning" = "For your safety, make sure no one is looking at your screen. Taking a screen shot has been disabled.";
-"revealSeedPhrase_title" = "Reveal Seed Phrase";
-
-"generalSettings_resetWallet_title" = "Reset Wallet";
-"generalSettings_resetWallet_subtitle" = "Clear all data in this Wallet";
-"generalSettings_resetWallet_buttonTitle" = "Reset";
-
-"generalSettings_resetWalletDialog_title" = "Reset Wallet?";
-"generalSettings_resetWalletDialog_resetButtonTitle" = "Reset Wallet";
-"generalSettings_resetWalletDialog_resetAndDeleteBackupButtonTitle" = "Reset and Delete iCloud Backup";
-"generalSettings_resetWalletDialog_message" = "WARNING. This will clear all contents of your Wallet. If you have no backup, you will lose access to your Accounts and Personas permanently.";

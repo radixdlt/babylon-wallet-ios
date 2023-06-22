@@ -344,18 +344,17 @@ extension AppSettings.View {
 				action: .importFromOlympiaWalletButtonTapped
 			),
 			.init(
-				// FIXME: Strings
-				title: "Multi-Factor Setups",
+				title: L10n.Settings.multiFactor,
 				icon: .systemImage("lock.square.stack.fill"),
 				action: .securityStructureConfigsButtonTapped
 			),
 			.init( // ONLY DEBUG EVER
-				title: L10n.Settings.Debug.factorSources,
+				title: "Factor sources",
 				icon: .systemImage("person.badge.key"),
 				action: .factorSourcesButtonTapped
 			),
 			.init( // ONLY DEBUG EVER
-				title: L10n.Settings.Debug.inspectProfile,
+				title: "Inspect profile",
 				icon: .systemImage("wallet.pass"),
 				action: .debugInspectProfileButtonTapped
 			),

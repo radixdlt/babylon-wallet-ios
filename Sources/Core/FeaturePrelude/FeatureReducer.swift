@@ -74,3 +74,5 @@ public typealias AlertPresentationStore<AlertAction> = Store<PresentationState<A
 public typealias PresentationStoreOf<R: ReducerProtocol> = Store<PresentationState<R.State>, PresentationAction<R.Action>>
 
 public typealias ViewStoreOf<Feature: FeatureReducer> = ViewStore<Feature.ViewState, Feature.ViewAction>
+
+public typealias StackActionOf<R: ReducerProtocol> = StackAction<R.State, R.Action>
