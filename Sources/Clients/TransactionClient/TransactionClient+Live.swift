@@ -265,7 +265,7 @@ extension TransactionClient {
 				.hash
 
 			let notarySignature = try request.notary.sign(
-				hashOfMessage: Data(hex: signedIntentHash)
+				hashOfMessage: signedIntentHash
 			)
 
 			let uncompiledNotarized = try NotarizedTransaction(

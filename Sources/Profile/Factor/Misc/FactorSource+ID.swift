@@ -10,7 +10,7 @@ extension FactorSource {
 		let hash = try blake2b(data: publicKey.compressedRepresentation)
 		return try .init(
 			kind: factorSourceKind,
-			body: .init(data: hash)
+			body: .init(data: hash.data)
 		)
 	}
 

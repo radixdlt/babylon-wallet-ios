@@ -60,13 +60,13 @@ public struct SignatureFromOnDeviceHDRequest: Sendable, Hashable {
 	public let curve: SLIP10.Curve
 
 	/// The data to sign
-	public let hashedData: Data
+	public let hashedData: HashedData
 
 	public init(
 		hdRoot: HD.Root,
 		derivationPath: DerivationPath,
 		curve: SLIP10.Curve,
-		hashedData: Data
+		hashedData: HashedData
 	) {
 		self.hdRoot = hdRoot
 		self.derivationPath = derivationPath
@@ -83,7 +83,7 @@ struct IncorrectSignatureCountExpectedExactlyOne: Swift.Error {}
 extension DeviceFactorSourceClient {
 	public func signUsingDeviceFactorSource(
 		signerEntity: EntityPotentiallyVirtual,
-		hashedDataToSign: some DataProtocol,
+		hashedDataToSign: HashedData,
 		purpose: SigningPurpose
 	) async throws -> SignatureOfEntity {
 		@Dependency(\.factorSourcesClient) var factorSourcesClient
@@ -123,7 +123,7 @@ extension DeviceFactorSourceClient {
 	public func signUsingDeviceFactorSource(
 		deviceFactorSource: DeviceFactorSource,
 		signerEntities: Set<EntityPotentiallyVirtual>,
-		hashedDataToSign: some DataProtocol,
+		hashedDataToSign: HashedData,
 		purpose: SigningPurpose
 	) async throws -> Set<SignatureOfEntity> {
 		@Dependency(\.factorSourcesClient) var factorSourcesClient
@@ -168,7 +168,7 @@ extension DeviceFactorSourceClient {
 					hdRoot: hdRoot,
 					derivationPath: derivationPath,
 					curve: curve,
-					hashedData: Data(hashedDataToSign)
+					hashedData: hashedDataToSign
 				))
 
 				let entitySignature = SignatureOfEntity(

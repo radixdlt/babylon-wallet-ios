@@ -61,7 +61,7 @@ extension LedgerHardwareWalletClient: DependencyKey {
 
 		@Sendable func sign(
 			signers: NonEmpty<IdentifiedArrayOf<Signer>>,
-			expectedHashedMessage: Data,
+			expectedHashedMessage: HashedData,
 			signOnLedgerRequest: () async throws -> [P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.SignatureOfSigner]
 		) async throws -> Set<SignatureOfEntity> {
 			let signaturesRaw = try await signOnLedgerRequest()
@@ -133,7 +133,7 @@ extension LedgerHardwareWalletClient: DependencyKey {
 						.signTransaction(.init(
 							signers: request.signers.flatMap(\.keyParams),
 							ledgerDevice: request.ledger.device(),
-							compiledTransactionIntent: .init(data: request.hashedDataToSign),
+							compiledTransactionIntent: .init(data: request.hashedDataToSign.data),
 							displayHash: request.displayHashOnLedgerDisplay,
 							mode: request.ledgerTXDisplayMode
 						)),
@@ -152,7 +152,7 @@ extension LedgerHardwareWalletClient: DependencyKey {
 				let hash = rolaPayload.payloadToHashAndSign
 				return try await sign(
 					signers: request.signers,
-					expectedHashedMessage: hash
+					expectedHashedMessage: blake2b(data: hash)
 				) {
 					try await makeRequest(
 						.signChallenge(.init(
@@ -256,7 +256,7 @@ extension P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.Signature
 		public let derivationPath: DerivationPath
 	}
 
-	func validate(hashed: Data) throws -> Validated {
+	func validate(hashed: HashedData) throws -> Validated {
 		let hdPubKey = try self.derivedPublicKey.hdPubKey()
 		let signatureWithPublicKey: SignatureWithPublicKey
 		switch hdPubKey.publicKey {
@@ -272,7 +272,7 @@ extension P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.Signature
 			)
 		}
 
-		guard signatureWithPublicKey.isValidSignature(for: hashed) else {
+		guard signatureWithPublicKey.isValidSignature(for: hashed.data) else {
 			loggerGlobal.error("Signature invalid for hashed msg: \(hashed.hex), signatureWithPublicKey: \(signatureWithPublicKey)")
 			throw InvalidSignature()
 		}

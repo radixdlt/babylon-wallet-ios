@@ -31,7 +31,7 @@ final class TransactionBuildingTests: TestCase {
 			.publicKey()
 			.isValidSignature(
 				txContext.notarizedTransaction.notarySignature,
-				hashed: Data(hex: signedIntentHash)
+				hashed: signedIntentHash
 			)
 
 		XCTAssertTrue(isValid)

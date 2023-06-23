@@ -68,9 +68,8 @@ extension EngineToolkitClient {
 				.get()
 				.olympiaAccountAddress
 			},
-
 			generateTXID: { transactionIntent in
-				let hash = try hashTransactionItent(transactionIntent).hash
+				let hash = try hashTransactionItent(transactionIntent).hash.hex
 				return TXID(rawValue: hash)
 			},
 			knownEntityAddresses: { networkID throws -> KnownEntityAddressesResponse in
