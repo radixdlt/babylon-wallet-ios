@@ -41,7 +41,7 @@ extension ROLAClient {
 			//                                        return control.transactionSigning.publicKey
 			//                                }
 			//                        }()
-                        //
+			//
 			//                        loggerGlobal.debug("ownerKeys: \(ownerKeys)")
 			//                        ownerKeys.append(newPublicKey)
 			//                        if !ownerKeys.contains(transactionSigningKey) {

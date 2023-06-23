@@ -80,12 +80,12 @@ extension DappInteractionClient {
 
 			let dappDefinitionAddress: DappDefinitionAddress
 			do {
-				// FIXME: Temporary untill the dashboard has the proper dapp address
-				dappDefinitionAddress = DappDefinitionAddress.wallet
+//				// FIXME: Temporary untill the dashboard has the proper dapp address
+//				dappDefinitionAddress = DappDefinitionAddress.wallet
 
-				//                                dappDefinitionAddress = try DappDefinitionAddress(
-				//                                                                        validatingAddress: nonValidated.metadata.dAppDefinitionAddress
-				//                                                                )
+				dappDefinitionAddress = try DappDefinitionAddress(
+					validatingAddress: nonValidated.metadata.dAppDefinitionAddress
+				)
 			} catch {
 				return .invalid(.invalidDappDefinitionAddress(gotStringWhichIsAnInvalidAccountAddress: nonvalidatedMeta.dAppDefinitionAddress))
 			}
