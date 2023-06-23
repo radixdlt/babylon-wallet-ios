@@ -56,7 +56,6 @@ extension ImportOlympiaLedgerAccountsAndFactorSources {
 						)
 					)
 				}
-
 				.sheet(
 					store: store.scope(
 						state: \.$derivePublicKeys,
@@ -66,7 +65,6 @@ extension ImportOlympiaLedgerAccountsAndFactorSources {
 						DerivePublicKeys.View(store: $0)
 					}
 				)
-
 				.padding(.horizontal, .medium3)
 			}
 		}
