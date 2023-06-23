@@ -85,7 +85,7 @@ extension KnownEntityAddressesResponse {
 		systemTokenResourceAddress: try! .init(validatingAddress: "resource_tdx_22_1nfxxxxxxxxxxsystxnxxxxxxxxx002683325037xxxxxxxxxgyyauj"),
 		ecdsaSecp256k1TokenResourceAddress: try! .init(validatingAddress: "resource_tdx_22_1nfxxxxxxxxxxed25sgxxxxxxxxx002236757237xxxxxxxxxpd7z2f"),
 		eddsaEd25519TokenResourceAddress: try! .init(validatingAddress: "resource_tdx_22_1nfxxxxxxxxxxsecpsgxxxxxxxxx004638826440xxxxxxxxxgevh2f"),
-		packageTokenResourceAddress: try! .init(validatingAddress: "package_tdx_22_1pkgxxxxxxxxxresrcexxxxxxxxx000538436477xxxxxxxxxkqjm7p"),
+		packageTokenResourceAddress: try! .init(validatingAddress: "resource_tdx_22_1nfxxxxxxxxxxsystxnxxxxxxxxx002683325037xxxxxxxxxgyyauj"),
 		consensusManagerComponentAddress: try! .init(validatingAddress: "component_tdx_22_1cptxxxxxxxxxfaucetxxxxxxxxx000527798379xxxxxxxxxrcppq4")
 	)
 }
