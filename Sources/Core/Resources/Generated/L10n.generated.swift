@@ -190,6 +190,46 @@ public enum L10n {
       public static let qrCodeLabel = L10n.tr("Localizable", "addressAction_qrCodeView_qrCodeLabel", fallback: "QR code for an account")
     }
   }
+  public enum AppSettings {
+    /// Customize your Radix Wallet
+    public static let subtitle = L10n.tr("Localizable", "appSettings_subtitle", fallback: "Customize your Radix Wallet")
+    /// App Settings
+    public static let title = L10n.tr("Localizable", "appSettings_title", fallback: "App Settings")
+    public enum ConfirmCloudSyncDisableAlert {
+      /// Disabling iCloud sync will delete the iCloud backup data, are you sure you want to disable iCloud sync?
+      public static let title = L10n.tr("Localizable", "appSettings_confirmCloudSyncDisableAlert_title", fallback: "Disabling iCloud sync will delete the iCloud backup data, are you sure you want to disable iCloud sync?")
+    }
+    public enum DeveloperMode {
+      /// Warning: Disables website validity checks
+      public static let subtitle = L10n.tr("Localizable", "appSettings_developerMode_subtitle", fallback: "Warning: Disables website validity checks")
+      /// Developer Mode
+      public static let title = L10n.tr("Localizable", "appSettings_developerMode_title", fallback: "Developer Mode")
+    }
+    public enum ResetWallet {
+      /// Reset
+      public static let buttonTitle = L10n.tr("Localizable", "appSettings_resetWallet_buttonTitle", fallback: "Reset")
+      /// Clear all data in this Wallet
+      public static let subtitle = L10n.tr("Localizable", "appSettings_resetWallet_subtitle", fallback: "Clear all data in this Wallet")
+      /// Reset Wallet
+      public static let title = L10n.tr("Localizable", "appSettings_resetWallet_title", fallback: "Reset Wallet")
+    }
+    public enum ResetWalletDialog {
+      /// WARNING. This will clear all contents of your Wallet. If you have no backup, you will lose access to your Accounts and Personas permanently.
+      public static let message = L10n.tr("Localizable", "appSettings_resetWalletDialog_message", fallback: "WARNING. This will clear all contents of your Wallet. If you have no backup, you will lose access to your Accounts and Personas permanently.")
+      /// Reset and Delete iCloud Backup
+      public static let resetAndDeleteBackupButtonTitle = L10n.tr("Localizable", "appSettings_resetWalletDialog_resetAndDeleteBackupButtonTitle", fallback: "Reset and Delete iCloud Backup")
+      /// Reset Wallet
+      public static let resetButtonTitle = L10n.tr("Localizable", "appSettings_resetWalletDialog_resetButtonTitle", fallback: "Reset Wallet")
+      /// Reset Wallet?
+      public static let title = L10n.tr("Localizable", "appSettings_resetWalletDialog_title", fallback: "Reset Wallet?")
+    }
+    public enum VerboseLedgerMode {
+      /// When signing with your Ledger hardware wallet, should all instructions be displayed?
+      public static let subtitle = L10n.tr("Localizable", "appSettings_verboseLedgerMode_subtitle", fallback: "When signing with your Ledger hardware wallet, should all instructions be displayed?")
+      /// Verbose Ledger transaction signing
+      public static let title = L10n.tr("Localizable", "appSettings_verboseLedgerMode_title", fallback: "Verbose Ledger transaction signing")
+    }
+  }
   public enum AssetDetails {
     /// Associated dApps
     public static let associatedDapps = L10n.tr("Localizable", "assetDetails_associatedDapps", fallback: "Associated dApps")
@@ -400,24 +440,6 @@ public enum L10n {
       public static let message = L10n.tr("Localizable", "authorizedDapps_removeAuthorizationAlert_message", fallback: "This dApp will no longer have authorization to see data associated with this Persona, unless you choose to login with it again in the future.")
       /// Remove Authorization
       public static let title = L10n.tr("Localizable", "authorizedDapps_removeAuthorizationAlert_title", fallback: "Remove Authorization")
-    }
-  }
-  public enum Backup {
-    /// Back up is turned off
-    public static let disabledText = L10n.tr("Localizable", "backup_disabledText", fallback: "Back up is turned off")
-    /// Last Backed up: %@
-    public static func lastBackedUp(_ p1: Any) -> String {
-      return L10n.tr("Localizable", "backup_lastBackedUp", String(describing: p1), fallback: "Last Backed up: %@")
-    }
-    /// Not Backed up yet
-    public static let noLastBackUp = L10n.tr("Localizable", "backup_noLastBackUp", fallback: "Not Backed up yet")
-    /// Open System Backup Settings
-    public static let openSystemBackupSettings = L10n.tr("Localizable", "backup_openSystemBackupSettings", fallback: "Open System Backup Settings")
-    public enum BackupWalletData {
-      /// Warning: If disabled you might lose access to your Accounts and Personas.
-      public static let message = L10n.tr("Localizable", "backup_backupWalletData_message", fallback: "Warning: If disabled you might lose access to your Accounts and Personas.")
-      /// Backup Wallet Data
-      public static let title = L10n.tr("Localizable", "backup_backupWalletData_title", fallback: "Backup Wallet Data")
     }
   }
   public enum Biometrics {
@@ -948,52 +970,6 @@ public enum L10n {
       public static let title = L10n.tr("Localizable", "gateways_removeGatewayAlert_title", fallback: "Remove Gateway")
     }
   }
-  public enum GeneralSettings {
-    /// Customize your Radix Wallet
-    public static let subtitle = L10n.tr("Localizable", "generalSettings_subtitle", fallback: "Customize your Radix Wallet")
-    /// App Settings
-    public static let title = L10n.tr("Localizable", "generalSettings_title", fallback: "App Settings")
-    public enum ConfirmCloudSyncDisableAlert {
-      /// Disabling iCloud sync will delete the iCloud backup data, are you sure you want to disable iCloud sync?
-      public static let title = L10n.tr("Localizable", "generalSettings_confirmCloudSyncDisableAlert_title", fallback: "Disabling iCloud sync will delete the iCloud backup data, are you sure you want to disable iCloud sync?")
-    }
-    public enum DeveloperMode {
-      /// Warning: Disables website validity checks
-      public static let subtitle = L10n.tr("Localizable", "generalSettings_developerMode_subtitle", fallback: "Warning: Disables website validity checks")
-      /// Developer Mode
-      public static let title = L10n.tr("Localizable", "generalSettings_developerMode_title", fallback: "Developer Mode")
-    }
-    public enum ProfileSync {
-      /// Warning: If disabled you might lose access to your Accounts and Personas.
-      public static let subtitle = L10n.tr("Localizable", "generalSettings_profileSync_subtitle", fallback: "Warning: If disabled you might lose access to your Accounts and Personas.")
-      /// Sync Wallet Data to iCloud
-      public static let title = L10n.tr("Localizable", "generalSettings_profileSync_title", fallback: "Sync Wallet Data to iCloud")
-    }
-    public enum ResetWallet {
-      /// Reset
-      public static let buttonTitle = L10n.tr("Localizable", "generalSettings_resetWallet_buttonTitle", fallback: "Reset")
-      /// Clear all data in this Wallet
-      public static let subtitle = L10n.tr("Localizable", "generalSettings_resetWallet_subtitle", fallback: "Clear all data in this Wallet")
-      /// Reset Wallet
-      public static let title = L10n.tr("Localizable", "generalSettings_resetWallet_title", fallback: "Reset Wallet")
-    }
-    public enum ResetWalletDialog {
-      /// WARNING. This will clear all contents of your Wallet. If you have no backup, you will lose access to your Accounts and Personas permanently.
-      public static let message = L10n.tr("Localizable", "generalSettings_resetWalletDialog_message", fallback: "WARNING. This will clear all contents of your Wallet. If you have no backup, you will lose access to your Accounts and Personas permanently.")
-      /// Reset and Delete iCloud Backup
-      public static let resetAndDeleteBackupButtonTitle = L10n.tr("Localizable", "generalSettings_resetWalletDialog_resetAndDeleteBackupButtonTitle", fallback: "Reset and Delete iCloud Backup")
-      /// Reset Wallet
-      public static let resetButtonTitle = L10n.tr("Localizable", "generalSettings_resetWalletDialog_resetButtonTitle", fallback: "Reset Wallet")
-      /// Reset Wallet?
-      public static let title = L10n.tr("Localizable", "generalSettings_resetWalletDialog_title", fallback: "Reset Wallet?")
-    }
-    public enum VerboseLedgerMode {
-      /// When signing with your Ledger hardware wallet, should all instructions be displayed?
-      public static let subtitle = L10n.tr("Localizable", "generalSettings_verboseLedgerMode_subtitle", fallback: "When signing with your Ledger hardware wallet, should all instructions be displayed?")
-      /// Verbose Ledger transaction signing
-      public static let title = L10n.tr("Localizable", "generalSettings_verboseLedgerMode_title", fallback: "Verbose Ledger transaction signing")
-    }
-  }
   public enum HomePage {
     /// Backup your seed phrase
     public static let applySecuritySettings = L10n.tr("Localizable", "homePage_applySecuritySettings", fallback: "Backup your seed phrase")
@@ -1024,6 +1000,56 @@ public enum L10n {
       public static let subtitle = L10n.tr("Localizable", "homePage_visitDashboard_subtitle", fallback: "Ready to get started using the Radix Network and your Wallet?")
       /// Visit the Radix Dashboard
       public static let title = L10n.tr("Localizable", "homePage_visitDashboard_title", fallback: "Visit the Radix Dashboard")
+    }
+  }
+  public enum IOSProfileBackup {
+    /// Wallet backups in your iCloud account:
+    public static let cloudBackupWallet = L10n.tr("Localizable", "iOSProfileBackup_cloudBackupWallet", fallback: "Wallet backups in your iCloud account:")
+    /// Backup created by: %@
+    public static func creatingDevice(_ p1: Any) -> String {
+      return L10n.tr("Localizable", "iOSProfileBackup_creatingDevice", String(describing: p1), fallback: "Backup created by: %@")
+    }
+    /// Creation date: %@
+    public static func creationDateLabel(_ p1: Any) -> String {
+      return L10n.tr("Localizable", "iOSProfileBackup_creationDateLabel", String(describing: p1), fallback: "Creation date: %@")
+    }
+    /// Import Backup Wallet data
+    public static let importBackupWallet = L10n.tr("Localizable", "iOSProfileBackup_importBackupWallet", fallback: "Import Backup Wallet data")
+    /// Incompatible Wallet data
+    public static let incompatibleWalletDataLabel = L10n.tr("Localizable", "iOSProfileBackup_incompatibleWalletDataLabel", fallback: "Incompatible Wallet data")
+    /// Last modified date: %@
+    public static func lastModifedDateLabel(_ p1: Any) -> String {
+      return L10n.tr("Localizable", "iOSProfileBackup_lastModifedDateLabel", String(describing: p1), fallback: "Last modified date: %@")
+    }
+    /// Last used on device: %@
+    public static func lastUsedOnDeviceLabel(_ p1: Any) -> String {
+      return L10n.tr("Localizable", "iOSProfileBackup_lastUsedOnDeviceLabel", String(describing: p1), fallback: "Last used on device: %@")
+    }
+    /// Wallet Data Backup
+    public static let navigationTitle = L10n.tr("Localizable", "iOSProfileBackup_navigationTitle", fallback: "Wallet Data Backup")
+    /// No backups found in iCloud
+    public static let noCloudBackup = L10n.tr("Localizable", "iOSProfileBackup_noCloudBackup", fallback: "No backups found in iCloud")
+    /// Number of networks: %d
+    public static func numberOfNetworksLabel(_ p1: Int) -> String {
+      return L10n.tr("Localizable", "iOSProfileBackup_numberOfNetworksLabel", p1, fallback: "Number of networks: %d")
+    }
+    /// This Device
+    public static let thisDevice = L10n.tr("Localizable", "iOSProfileBackup_thisDevice", fallback: "This Device")
+    /// Number of Accounts: %d
+    public static func totalAccountsNumberLabel(_ p1: Int) -> String {
+      return L10n.tr("Localizable", "iOSProfileBackup_totalAccountsNumberLabel", p1, fallback: "Number of Accounts: %d")
+    }
+    /// Number of Personas: %d
+    public static func totalPersonasNumberLabel(_ p1: Int) -> String {
+      return L10n.tr("Localizable", "iOSProfileBackup_totalPersonasNumberLabel", p1, fallback: "Number of Personas: %d")
+    }
+    /// Use iCloud Backup Data
+    public static let useICloudBackup = L10n.tr("Localizable", "iOSProfileBackup_useICloudBackup", fallback: "Use iCloud Backup Data")
+    public enum ProfileSync {
+      /// Warning: If disabled you might lose access to your Accounts and Personas.
+      public static let subtitle = L10n.tr("Localizable", "iOSProfileBackup_profileSync_subtitle", fallback: "Warning: If disabled you might lose access to your Accounts and Personas.")
+      /// Sync Wallet Data to iCloud
+      public static let title = L10n.tr("Localizable", "iOSProfileBackup_profileSync_title", fallback: "Sync Wallet Data to iCloud")
     }
   }
   public enum ImportLegacyWallet {
@@ -1145,6 +1171,8 @@ public enum L10n {
     public static let importSeedPhrase = L10n.tr("Localizable", "importMnemonic_importSeedPhrase", fallback: "Import seed phrase")
     /// More words
     public static let moreWords = L10n.tr("Localizable", "importMnemonic_moreWords", fallback: "More words")
+    /// Import Seed Phrase
+    public static let navigationTitle = L10n.tr("Localizable", "importMnemonic_navigationTitle", fallback: "Import Seed Phrase")
     /// Passphrase
     public static let passphrase = L10n.tr("Localizable", "importMnemonic_passphrase", fallback: "Passphrase")
     /// BIP39 Passphrase is often called a '25th word'.
@@ -1369,50 +1397,6 @@ public enum L10n {
     public static let title = L10n.tr("Localizable", "personas_title", fallback: "Personas")
     /// What is a Persona?
     public static let whatIsPersona = L10n.tr("Localizable", "personas_whatIsPersona", fallback: "What is a Persona?")
-  }
-  public enum RestoreFromBackup {
-    /// Available backups:
-    public static let cloudBackupWallet = L10n.tr("Localizable", "restoreFromBackup_cloudBackupWallet", fallback: "Available backups:")
-    /// Backup created by: %@
-    public static func creatingDevice(_ p1: Any) -> String {
-      return L10n.tr("Localizable", "restoreFromBackup_creatingDevice", String(describing: p1), fallback: "Backup created by: %@")
-    }
-    /// Creation date: %@
-    public static func creationDateLabel(_ p1: Any) -> String {
-      return L10n.tr("Localizable", "restoreFromBackup_creationDateLabel", String(describing: p1), fallback: "Creation date: %@")
-    }
-    /// Import From Backup
-    public static let importBackupWallet = L10n.tr("Localizable", "restoreFromBackup_importBackupWallet", fallback: "Import From Backup")
-    /// Incompatible Wallet data
-    public static let incompatibleWalletDataLabel = L10n.tr("Localizable", "restoreFromBackup_incompatibleWalletDataLabel", fallback: "Incompatible Wallet data")
-    /// Last modified date: %@
-    public static func lastModifedDateLabel(_ p1: Any) -> String {
-      return L10n.tr("Localizable", "restoreFromBackup_lastModifedDateLabel", String(describing: p1), fallback: "Last modified date: %@")
-    }
-    /// Last used on device: %@
-    public static func lastUsedOnDeviceLabel(_ p1: Any) -> String {
-      return L10n.tr("Localizable", "restoreFromBackup_lastUsedOnDeviceLabel", String(describing: p1), fallback: "Last used on device: %@")
-    }
-    /// Wallet Data Backup
-    public static let navigationTitle = L10n.tr("Localizable", "restoreFromBackup_navigationTitle", fallback: "Wallet Data Backup")
-    /// No backups found in iCloud
-    public static let noCloudBackup = L10n.tr("Localizable", "restoreFromBackup_noCloudBackup", fallback: "No backups found in iCloud")
-    /// Number of networks: %d
-    public static func numberOfNetworksLabel(_ p1: Int) -> String {
-      return L10n.tr("Localizable", "restoreFromBackup_numberOfNetworksLabel", p1, fallback: "Number of networks: %d")
-    }
-    /// This Device
-    public static let thisDevice = L10n.tr("Localizable", "restoreFromBackup_thisDevice", fallback: "This Device")
-    /// Number of Accounts: %d
-    public static func totalAccountsNumberLabel(_ p1: Int) -> String {
-      return L10n.tr("Localizable", "restoreFromBackup_totalAccountsNumberLabel", p1, fallback: "Number of Accounts: %d")
-    }
-    /// Number of Personas: %d
-    public static func totalPersonasNumberLabel(_ p1: Int) -> String {
-      return L10n.tr("Localizable", "restoreFromBackup_totalPersonasNumberLabel", p1, fallback: "Number of Personas: %d")
-    }
-    /// Use iCloud Backup Data
-    public static let useICloudBackup = L10n.tr("Localizable", "restoreFromBackup_useICloudBackup", fallback: "Use iCloud Backup Data")
   }
   public enum RevealSeedPhrase {
     /// Passphrase
