@@ -33,6 +33,10 @@ extension EngineToolkitClient {
 			)
 		}
 
+		let hashTransactionItent: HashTransactionIntent = { intent in
+			try RadixEngine.instance.hashTransactionIntent(intent).get()
+		}
+
 		return Self(
 			getTransactionVersion: { TXVersion.default },
 			generateTXNonce: generateTXNonce,
@@ -53,6 +57,10 @@ extension EngineToolkitClient {
 			decompileNotarizedTransactionIntent: {
 				try RadixEngine.instance.decompileNotarizedTransactionIntentRequest(request: $0).get()
 			},
+			hashTransactionIntent: hashTransactionItent,
+			hashSignedTransactionIntent: { intent in
+				try RadixEngine.instance.hashSignedTransactionIntent(intent).get()
+			},
 			deriveOlympiaAdressFromPublicKey: {
 				try RadixEngine.instance.deriveOlympiaAddressFromPublicKeyRequest(
 					request: .init(network: .mainnet, publicKey: $0.intoEngine())
@@ -60,8 +68,9 @@ extension EngineToolkitClient {
 				.get()
 				.olympiaAccountAddress
 			},
+
 			generateTXID: { transactionIntent in
-				let hash = try RadixEngine.instance.hashTransactionItent(transactionIntent).get().hash
+				let hash = try hashTransactionItent(transactionIntent).hash
 				return TXID(rawValue: hash)
 			},
 			knownEntityAddresses: { networkID throws -> KnownEntityAddressesResponse in

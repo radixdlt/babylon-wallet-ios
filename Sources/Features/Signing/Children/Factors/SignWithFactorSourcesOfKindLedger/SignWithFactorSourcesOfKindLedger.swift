@@ -1,5 +1,5 @@
 import AppPreferencesClient
-import EngineToolkit
+import EngineToolkitClient
 import FactorSourcesClient
 import FeaturePrelude
 import LedgerHardwareWalletClient
@@ -25,6 +25,7 @@ public struct SignWithFactorSourcesOfKindLedger: SignWithFactorSourcesOfKindRedu
 
 	@Dependency(\.ledgerHardwareWalletClient) var ledgerHardwareWalletClient
 	@Dependency(\.appPreferencesClient) var appPreferencesClient
+	@Dependency(\.engineToolkitClient) var engineToolkitClient
 
 	public init() {}
 
@@ -56,7 +57,7 @@ public struct SignWithFactorSourcesOfKindLedger: SignWithFactorSourcesOfKindRedu
 	) async throws -> Set<SignatureOfEntity> {
 		switch state.signingPurposeWithPayload {
 		case let .signTransaction(_, intent, _):
-			let hash = try RadixEngine.instance.hashTransactionItent(intent).get().hash
+			let hash = try engineToolkitClient.hashTransactionIntent(intent).hash
 			let ledgerTXDisplayMode: LedgerHardwareWalletFactorSource.SigningDisplayMode = await appPreferencesClient.getPreferences().display.ledgerHQHardwareWalletSigningDisplayMode
 
 			return try await ledgerHardwareWalletClient.signTransaction(.init(

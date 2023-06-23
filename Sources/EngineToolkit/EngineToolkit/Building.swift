@@ -67,13 +67,7 @@ extension TransactionIntent {
 	}
 
 	public func sign(withMany privateKeys: [Engine.PrivateKey]) throws -> NotarizedNonNotarySignedButIntentSignedTransctionContext {
-		let compiledTransactionIntentResponse = try RadixEngine.instance
-			.compileTransactionIntentRequest(
-				request: self
-			).get()
-		let compiledTransactionIntent = compiledTransactionIntentResponse.compiledIntent
-
-		let transactionIntentHash = try Data(hex: RadixEngine.instance.hashTransactionItent(self).get().hash)
+		let transactionIntentHash = try Data(hex: RadixEngine.instance.hashTransactionIntent(self).get().hash)
 		let intentSignatures = try privateKeys.map {
 			try $0.sign(hashOfMessage: transactionIntentHash)
 		}
@@ -82,6 +76,11 @@ extension TransactionIntent {
 			intent: self,
 			intentSignatures: intentSignatures
 		)
+
+		let compiledTransactionIntentResponse = try RadixEngine.instance
+			.compileTransactionIntentRequest(
+				request: self
+			).get()
 
 		return NotarizedNonNotarySignedButIntentSignedTransctionContext(
 			transactionIntent: self,
@@ -106,7 +105,7 @@ extension NotarizedNonNotarySignedButIntentSignedTransctionContext {
 	}
 
 	public func sign(with privateKey: Engine.PrivateKey) throws -> NotarizedNonNotarySignedButIntentSignedTransctionContext {
-		let hashOfTransactionIntent = try Data(hex: RadixEngine.instance.hashSignedTransactionItent(self.signedTransactionIntent).get().hash)
+		let hashOfTransactionIntent = try Data(hex: RadixEngine.instance.hashSignedTransactionIntent(self.signedTransactionIntent).get().hash)
 		let signature = try privateKey.sign(hashOfMessage: hashOfTransactionIntent)
 
 		let signedTransactionIntent = SignedTransactionIntent(
@@ -137,7 +136,7 @@ extension NotarizedNonNotarySignedButIntentSignedTransctionContext {
 			request: signedTransactionIntent
 		).get()
 
-		let hashOfTransactionIntent = try Data(hex: RadixEngine.instance.hashSignedTransactionItent(signedTransactionIntent).get().hash)
+		let hashOfTransactionIntent = try Data(hex: RadixEngine.instance.hashSignedTransactionIntent(signedTransactionIntent).get().hash)
 
 		// Notarize the signed intent to create a notarized transaction
 		let notarySignature = try notaryPrivateKey

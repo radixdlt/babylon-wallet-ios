@@ -260,7 +260,7 @@ extension TransactionClient {
 			)
 
 			let signedIntentHash = try RadixEngine.instance
-				.hashSignedTransactionItent(signedTransactionIntent)
+				.hashSignedTransactionIntent(signedTransactionIntent)
 				.get()
 				.hash
 

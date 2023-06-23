@@ -4,6 +4,7 @@ import Cryptography
 import DeviceFactorSourceClient
 import EngineToolkitClient
 import GatewayAPI
+import RegexBuilder
 
 extension ROLAClient {
 	public static let liveValue: Self = {
@@ -22,13 +23,6 @@ extension ROLAClient {
 			let entity = request.entity
 			let newPublicKey = request.newPublicKey
 
-			let transactionSigningKey: SLIP10.PublicKey = {
-				switch entity.securityState {
-				case let .unsecured(control):
-					return control.transactionSigning.publicKey
-				}
-			}()
-
 			let entityAddress: Address = {
 				switch entity {
 				case let .account(account):
@@ -38,27 +32,28 @@ extension ROLAClient {
 				}
 			}()
 			let metadata = try await gatewayAPIClient.getEntityMetadata(entityAddress.address)
-			var ownerKeys = try metadata.ownerKeys() ?? []
-			loggerGlobal.debug("ownerKeys: \(ownerKeys)")
-			ownerKeys.append(newPublicKey)
-			if !ownerKeys.contains(transactionSigningKey) {
-				loggerGlobal.debug("Did not contain transactionSigningKey, re-adding it: \(transactionSigningKey)")
-				ownerKeys.append(transactionSigningKey)
-			}
+			var ownerKeyHashes = try metadata.ownerKeyHashes() ?? []
 
-			loggerGlobal.notice("Setting ownerKeys to: \(ownerKeys)")
+			// TODO: How to hash public keys?
+			//                        let transactionSigningKey: SLIP10.PublicKey = {
+			//                                switch entity.securityState {
+			//                                case let .unsecured(control):
+			//                                        return control.transactionSigning.publicKey
+			//                                }
+			//                        }()
+                        //
+			//                        loggerGlobal.debug("ownerKeys: \(ownerKeys)")
+			//                        ownerKeys.append(newPublicKey)
+			//                        if !ownerKeys.contains(transactionSigningKey) {
+			//                                loggerGlobal.debug("Did not contain transactionSigningKey, re-adding it: \(transactionSigningKey)")
+			//                                ownerKeys.append(transactionSigningKey)
+			//                        }
 
-			let arrayOfEngineToolkitBytesValues: [ManifestASTValue] = ownerKeys.map { pubKey in
-				ManifestASTValue.enum(
-					.init(
-						.publicKey,
-						fields: [
-							.enum(.init(
-								pubKey.curveKindScryptoDiscriminatorByte,
-								fields: [.bytes(pubKey.bytes)]
-							)),
-						]
-					)
+			loggerGlobal.notice("Setting ownerKeys to: \(ownerKeyHashes)")
+
+			let arrayOfEngineToolkitBytesValues: [ManifestASTValue] = try ownerKeyHashes.map { hash in
+				try ManifestASTValue.enum(
+					.init(hash.curveKindScryptoDiscriminator, fields: [.bytes(hash.bytes())])
 				)
 			}
 
@@ -68,7 +63,7 @@ extension ROLAClient {
 				entityAddress: entityAddress,
 				key: SetMetadata.ownerKeysKey,
 				value: Enum(
-					.metadataEntry,
+					.metadata_PublicKeyHashArray,
 					fields: [.array(.init(
 						elementKind: .enum,
 						elements: arrayOfEngineToolkitBytesValues
@@ -215,70 +210,58 @@ func payloadToHash(
 extension GatewayAPI.EntityMetadataCollection {
 	// FIXME: change to using hashes, which will happen... soon. Which will clean up this
 	// terrible parsing mess.
-	public func ownerKeys() throws -> OrderedSet<SLIP10.PublicKey>? {
+	public func ownerKeyHashes() throws -> [PublicKeyHash]? {
 		guard let response = items[customKey: SetMetadata.ownerKeysKey]?.asStringCollection else {
 			return nil
 		}
 
-		// Element is String `"EddsaEd25519PublicKeyHash("56d656000d5f67f5308951a394c7891c54b54dd633b42d1d21af372f80e6bc43")"`
-		// or String `"EcdsaSecp256k1PublicKeyHash("0256d656000d5f67f5308951a394c7891c54b54dd633b42d1d21af372f80e6bc43")"`
 		let curve25519Prefix = "EddsaEd25519PublicKeyHash"
 		let secp256k1Prefix = "EcdsaSecp256k1PublicKeyHash"
-		let lengthCurve25519Prefix = curve25519Prefix.count
-		let lengthSecp256k1Prefix = secp256k1Prefix.count
-		let lengthQuoteAndParenthesis = 2
-		let lengthQuotesAndTwoParenthesis = 2 * lengthQuoteAndParenthesis
-		let lengthCurve25519PubKeyHex = 32 * 2
-		let lengthSecp256K1PubKeyHex = 33 * 2
-		let keys = try response.compactMap { elem -> Engine.PublicKey? in
-			if elem.starts(with: curve25519Prefix) {
-				guard elem.count == lengthQuotesAndTwoParenthesis + lengthCurve25519Prefix + lengthCurve25519PubKeyHex else {
-					throw FailedToParsePublicKeyFromOwnerKeysBadLength()
-				}
-				var key = elem
-				key.removeFirst(lengthCurve25519Prefix + lengthQuoteAndParenthesis)
-				key.removeLast(lengthQuoteAndParenthesis)
-				guard key.count == lengthCurve25519PubKeyHex else {
-					return nil
-				}
-				return try .eddsaEd25519(.init(hex: key))
 
-			} else if elem.starts(with: secp256k1Prefix) {
-				guard elem.count == lengthQuotesAndTwoParenthesis + lengthSecp256k1Prefix + lengthSecp256K1PubKeyHex else {
-					throw FailedToParsePublicKeyFromOwnerKeysBadLength()
+		let regex = Regex {
+			Capture {
+				ChoiceOf {
+					curve25519Prefix
+					secp256k1Prefix
 				}
-				var key = elem
-				key.removeFirst(lengthSecp256k1Prefix + lengthQuoteAndParenthesis)
-				key.removeLast(lengthQuoteAndParenthesis)
-				guard key.count == lengthSecp256K1PubKeyHex else {
-					return nil
+			}
+			"(\""
+			Capture {
+				OneOrMore {
+					CharacterClass.hexDigit
 				}
-				return try .ecdsaSecp256k1(.init(hex: key))
+			}
+			"\")"
+		}
+
+		return try response.compactMap { elem -> PublicKeyHash? in
+			guard let output = try regex.wholeMatch(in: elem)?.output else {
+				return nil
+			}
+
+			let (_, hashType, hash) = output
+
+			if hashType == curve25519Prefix {
+				return .eddsaEd25519(String(hash))
+			} else if hashType == secp256k1Prefix {
+				return .ecdsaSecp256k1(String(hash))
 			} else {
 				return nil
 			}
 		}
-		let slip10Keys = try keys.map { try SLIP10.PublicKey(engine: $0) }
-
-		return try .init(
-			validating: slip10Keys
-		)
 	}
 }
 
-// MARK: - FailedToParsePublicKeyFromOwnerKeysBadLength
-struct FailedToParsePublicKeyFromOwnerKeysBadLength: Swift.Error {}
-
-extension SLIP10.PublicKey {
+extension PublicKeyHash {
 	/// https://rdxworks.slack.com/archives/C031A0V1A1W/p1683275008777499?thread_ts=1683221252.228129&cid=C031A0V1A1W
-	var curveKindScryptoDiscriminatorByte: EnumDiscriminator {
+	var curveKindScryptoDiscriminator: EnumDiscriminator {
 		switch self {
-		case .ecdsaSecp256k1: return .u8(0x00)
-		case .eddsaEd25519: return .u8(0x01)
+		case .ecdsaSecp256k1: return .string(.publicKeyHash_Secp256k1)
+		case .eddsaEd25519: return .string(.publicKeyHash_Ed25519)
 		}
 	}
 
-	var bytes: Bytes {
-		.init(bytes: Array(self.compressedRepresentation))
+	func bytes() throws -> Bytes {
+		try Bytes(hex: hash)
 	}
 }

@@ -356,7 +356,7 @@ extension GatewayAPI.StateEntityDetailsResponseItem {
 			return .fungible
 		case .nonFungibleResource:
 			return .nonFungible
-		default:
+		case .fungibleVault, .nonFungibleVault, .package, .component:
 			return nil
 		}
 	}

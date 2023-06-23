@@ -403,6 +403,13 @@ public enum PublicKeyHash: Sendable, Codable, Hashable {
 		case publicKeyHash = "public_key_hash"
 	}
 
+	public var hash: String {
+		switch self {
+		case let .ecdsaSecp256k1(hash), let .eddsaEd25519(hash):
+			return hash
+		}
+	}
+
 	internal var discriminator: CurveDiscriminator {
 		switch self {
 		case .ecdsaSecp256k1: return .ecdsaSecp256k1

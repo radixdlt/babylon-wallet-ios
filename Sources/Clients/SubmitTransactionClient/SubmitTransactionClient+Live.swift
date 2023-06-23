@@ -45,7 +45,6 @@ extension SubmitTransactionClient: DependencyKey {
 					}
 					try? await clock.sleep(for: .seconds(pollStrategy.sleepDuration))
 					let status = try await pollTransactionStatus()
-					print("TX status: ==== \(status)")
 					statusSubject.send(.init(txID: txID, result: .success(status)))
 				}
 			}
@@ -103,7 +102,7 @@ extension SubmitTransactionClient: DependencyKey {
 			do {
 				let decompiledNotarized = try engineToolkitClient.decompileNotarizedTransactionIntent(.init(
 					compiledNotarizedIntent: request.compiledNotarizedTXIntent.compiledIntent,
-					instructionsOutputKind: .string
+					instructionsOutputKind: .parsed
 				))
 				debugPrintTX(decompiledNotarized)
 
