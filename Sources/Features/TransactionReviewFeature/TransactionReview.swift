@@ -494,7 +494,7 @@ extension TransactionReview {
 
 	private func extractUserAccounts(_ manifest: AnalyzeTransactionExecutionResponse) async throws -> [Account] {
 		let userAccounts = try await accountsClient.getAccountsOnCurrentNetwork()
-		return try manifest
+		return manifest
 			.encounteredAddresses
 			.componentAddresses
 			.accounts
@@ -505,7 +505,7 @@ extension TransactionReview {
 				if let userAccount {
 					return .user(.init(address: userAccount.address, label: userAccount.displayName, appearanceID: userAccount.appearanceID))
 				} else {
-					return try .external(encounteredAccount, approved: false)
+					return .external(encounteredAccount, approved: false)
 				}
 			}
 	}
@@ -591,7 +591,7 @@ extension TransactionReview {
 			let account = try userAccounts.account(for: deposit.componentAddress)
 
 			let transfers = try await transferInfo(
-				resourceQuantifier: deposit.resourceSpecifier,
+				resourceQuantifier: deposit.resourceQuantifier,
 				createdEntities: manifest.newlyCreated,
 				networkID: networkID,
 				type: deposit.transferType
@@ -619,73 +619,78 @@ extension TransactionReview {
 		networkID: NetworkID,
 		type: TransferType
 	) async throws -> [Transfer] {
-		switch resourceQuantifier {
-		case let .amount(resourceManagerSpecifier, amount):
-			let amount = try BigDecimal(fromString: amount.value)
-
-			switch resourceManagerSpecifier {
-			case let .existing(resourceAddress):
-				let metadata = try? await gatewayAPIClient.getEntityMetadata(resourceAddress.address)
-				func guarantee() -> TransactionClient.Guarantee? {
-					guard case let .estimated(instructionIndex) = type else { return nil }
-					return .init(amount: amount, instructionIndex: instructionIndex, resourceAddress: resourceAddress)
-				}
-
-				return [.fungible(.init(
-					amount: amount,
-					name: metadata?.name,
-					symbol: metadata?.symbol,
-					thumbnail: metadata?.iconURL,
-					isXRD: (try? engineToolkitClient.isXRD(resource: resourceAddress, on: networkID)) ?? false,
-					guarantee: guarantee()
-				))]
-
-			case let .newlyCreated(index):
-				guard let newResources = createdEntities?.resources, !newResources.isEmpty, index < newResources.count else {
-					return []
-				}
-
-				let resource = newResources[index]
-
-				return [
-					.fungible(.init(
-						amount: amount,
-						name: resource.name,
-						symbol: resource.symbol,
-						thumbnail: resource.iconURL,
-						isXRD: false
-					)),
-				]
+		func newResource(at index: Int) -> NewlyCreatedResource? {
+			guard let newResources = createdEntities?.resources, !newResources.isEmpty, index < newResources.count else {
+				return nil
 			}
-		case let .ids(resourceManagerSpecifier, ids):
-			switch resourceManagerSpecifier {
-			case let .existing(resourceAddress):
-				let metadata = try? await gatewayAPIClient.getEntityMetadata(resourceAddress.address)
-				let maximumNFTIDChunkSize = 29
 
-				var result: [Transfer] = []
-				for idChunk in ids.chunks(ofCount: maximumNFTIDChunkSize) {
-					let tokens = try await gatewayAPIClient.getNonFungibleData(.init(
-						resourceAddress: resourceAddress.address,
-						nonFungibleIds: idChunk.map(\.value)
-					))
-					.nonFungibleIds
-					.map {
-						Transfer.nonFungible(.init(
-							resourceName: metadata?.name,
-							resourceImage: metadata?.iconURL,
-							tokenID: $0.nonFungibleId.userFacingNonFungibleLocalID,
-							tokenName: nil
-						))
-					}
+			return newResources[index]
+		}
 
-					result.append(contentsOf: tokens)
-				}
+		switch resourceQuantifier {
+		case let .amount(.existing(resourceAddress), amount):
+			let amount = try BigDecimal(fromString: amount.value)
+			let metadata = try? await gatewayAPIClient.getEntityMetadata(resourceAddress.address)
+			func guarantee() -> TransactionClient.Guarantee? {
+				guard case let .estimated(instructionIndex) = type else { return nil }
+				return .init(amount: amount, instructionIndex: instructionIndex, resourceAddress: resourceAddress)
+			}
 
-				return result
-			case let .newlyCreated(index):
+			return [.fungible(.init(
+				amount: amount,
+				name: metadata?.name,
+				symbol: metadata?.symbol,
+				thumbnail: metadata?.iconURL,
+				isXRD: (try? engineToolkitClient.isXRD(resource: resourceAddress, on: networkID)) ?? false,
+				guarantee: guarantee()
+			))]
+		case let .amount(.newlyCreated(index), amount):
+			let amount = try BigDecimal(fromString: amount.value)
+			guard let resource = newResource(at: index) else {
 				return []
 			}
+
+			return [
+				.fungible(.init(
+					amount: amount,
+					name: resource.name,
+					symbol: resource.symbol,
+					thumbnail: resource.iconURL,
+					isXRD: false
+				)),
+			]
+		case let .ids(.existing(resourceAddress), ids):
+			let metadata = try? await gatewayAPIClient.getEntityMetadata(resourceAddress.address)
+			let maximumNFTIDChunkSize = 29
+
+			var result: [Transfer] = []
+			for idChunk in ids.chunks(ofCount: maximumNFTIDChunkSize) {
+				let tokens = try await gatewayAPIClient.getNonFungibleData(.init(
+					resourceAddress: resourceAddress.address,
+					nonFungibleIds: idChunk.map(\.value)
+				))
+				.nonFungibleIds
+				.map {
+					Transfer.nonFungible(.init(
+						resourceName: metadata?.name,
+						resourceImage: metadata?.iconURL,
+						tokenID: $0.nonFungibleId.userFacingNonFungibleLocalID,
+						tokenName: nil
+					))
+				}
+
+				result.append(contentsOf: tokens)
+			}
+
+			return result
+
+		case let .ids(.newlyCreated(index), ids):
+			guard let resource = newResource(at: index) else {
+				return []
+			}
+
+			return [
+			]
 		}
 	}
 }
@@ -850,7 +855,7 @@ extension AccountDeposit {
 		}
 	}
 
-	public var resourceSpecifier: ResourceQuantifier {
+	public var resourceQuantifier: ResourceQuantifier {
 		switch self {
 		case let .guaranteed(_, resourceSpecifier), let .predicted(_, _, resourceSpecifier):
 			return resourceSpecifier

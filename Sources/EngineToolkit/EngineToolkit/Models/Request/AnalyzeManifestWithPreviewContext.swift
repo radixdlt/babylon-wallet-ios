@@ -108,11 +108,11 @@ public enum AccountDeposit: Sendable, Decodable, Hashable {
 
 // MARK: - NewlyCreated
 public struct NewlyCreated: Sendable, Decodable, Hashable {
-	public var resources: [NewlyCreatedResources]
+	public var resources: [NewlyCreatedResource]
 }
 
-// MARK: - NewlyCreatedResources
-public struct NewlyCreatedResources: Sendable, Decodable, Hashable {
+// MARK: - NewlyCreatedResource
+public struct NewlyCreatedResource: Sendable, Decodable, Hashable {
 	public struct MetadataKeyValue: Sendable, Decodable, Hashable {
 		public let key: String
 		public let value: MetadataValue
@@ -137,7 +137,7 @@ public struct NewlyCreatedResources: Sendable, Decodable, Hashable {
 	}
 }
 
-extension [NewlyCreatedResources.MetadataKeyValue] {
+extension [NewlyCreatedResource.MetadataKeyValue] {
 	public subscript(_ key: String) -> MetadataValue? {
 		first { $0.key == key }?.value
 	}

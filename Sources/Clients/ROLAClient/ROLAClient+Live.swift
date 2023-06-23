@@ -12,12 +12,6 @@ extension ROLAClient {
 		@Dependency(\.cacheClient) var cacheClient
 		@Dependency(\.deviceFactorSourceClient) var deviceFactorSourceClient
 
-		// FIXME: change to using hashes, which will happen... soon. Post Enkinet upgrade and once support in the
-		// whole ecosystem.
-		/// Tries to append a new Publickey to owner_keys
-		// see Russ confluence page:
-		/// https://radixdlt.atlassian.net/wiki/spaces/DevEcosystem/pages/3055026344/Metadata+Standards+for+Provable+Ownership+Encrypted+Messaging
-		/// if it is already present, no change is done
 		let manifestForAuthKeyCreation: ManifestForAuthKeyCreation = { request in
 			@Dependency(\.engineToolkitClient) var engineToolkitClient
 			let entity = request.entity
@@ -34,22 +28,22 @@ extension ROLAClient {
 			let metadata = try await gatewayAPIClient.getEntityMetadata(entityAddress.address)
 			var ownerKeyHashes = try metadata.ownerKeyHashes() ?? []
 
-			// TODO: How to hash public keys?
-			//                        let transactionSigningKey: SLIP10.PublicKey = {
-			//                                switch entity.securityState {
-			//                                case let .unsecured(control):
-			//                                        return control.transactionSigning.publicKey
-			//                                }
-			//                        }()
-			//
-			//                        loggerGlobal.debug("ownerKeys: \(ownerKeys)")
-			//                        ownerKeys.append(newPublicKey)
-			//                        if !ownerKeys.contains(transactionSigningKey) {
-			//                                loggerGlobal.debug("Did not contain transactionSigningKey, re-adding it: \(transactionSigningKey)")
-			//                                ownerKeys.append(transactionSigningKey)
-			//                        }
+			let transactionSigningKeyHash: PublicKeyHash = try {
+				switch entity.securityState {
+				case let .unsecured(control):
+					return try .init(from: control.transactionSigning.publicKey)
+				}
+			}()
 
-			loggerGlobal.notice("Setting ownerKeys to: \(ownerKeyHashes)")
+			loggerGlobal.debug("ownerKeyHashes: \(ownerKeyHashes)")
+			try ownerKeyHashes.append(.init(from: newPublicKey))
+
+			if !ownerKeyHashes.contains(transactionSigningKeyHash) {
+				loggerGlobal.debug("Did not contain transactionSigningKey hash, re-adding it: \(transactionSigningKeyHash)")
+				ownerKeyHashes.append(transactionSigningKeyHash)
+			}
+
+			loggerGlobal.notice("Setting ownerKeyHashes to: \(ownerKeyHashes)")
 
 			let arrayOfEngineToolkitBytesValues: [ManifestASTValue] = try ownerKeyHashes.map { hash in
 				try ManifestASTValue.enum(
@@ -205,6 +199,32 @@ func payloadToHash(
 	let challengeBytes = [UInt8](challenge.data.data)
 	let lengthDappDefinitionAddress = UInt8(dAppDefinitionAddress.count)
 	return Data(challengeBytes + [lengthDappDefinitionAddress] + [UInt8](dAppDefinitionAddress.utf8) + [UInt8](origin.utf8))
+}
+
+extension PublicKeyHash {
+	public struct InvalidPublicKeyHashLength: Error {
+		public let got: Int
+		public let expected: Int
+	}
+
+	static let hashLength = 29
+
+	public init(from publicKey: SLIP10.PublicKey) throws {
+		let hashBytes = try blake2b(data: publicKey.compressedData).suffix(Self.hashLength)
+
+		guard hashBytes.count == Self.hashLength else {
+			throw InvalidPublicKeyHashLength(got: hashBytes.count, expected: Self.hashLength)
+		}
+
+		let hex = String(hashBytes.hex)
+
+		switch publicKey {
+		case .ecdsaSecp256k1:
+			self = .ecdsaSecp256k1(hex)
+		case .eddsaEd25519:
+			self = .eddsaEd25519(hex)
+		}
+	}
 }
 
 extension GatewayAPI.EntityMetadataCollection {
