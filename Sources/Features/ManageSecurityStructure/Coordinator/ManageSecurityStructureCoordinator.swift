@@ -94,7 +94,12 @@ public struct ManageSecurityStructureCoordinator: Sendable, FeatureReducer {
 			state.path.append(.simpleSetupFlow(.init()))
 			return .none
 		case .root(.start(.delegate(.advancedFlow))):
-			state.path.append(.advancedSetupFlow(.init(mode: .new())))
+			switch state.mode {
+			case let .existing(existing):
+				state.path.append(.advancedSetupFlow(.init(mode: .existing(existing))))
+			case .new:
+				state.path.append(.advancedSetupFlow(.init(mode: .new)))
+			}
 			return .none
 
 		case

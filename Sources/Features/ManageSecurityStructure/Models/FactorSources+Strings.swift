@@ -70,9 +70,9 @@ extension SecurityStructureRole {
 		case .primary:
 			return "To Withdraw Assets"
 		case .confirmation:
-			return "To Initiate Recovery"
-		case .recovery:
 			return "To Confirm Recovery"
+		case .recovery:
+			return "To Initiate Recovery"
 		}
 	}
 
