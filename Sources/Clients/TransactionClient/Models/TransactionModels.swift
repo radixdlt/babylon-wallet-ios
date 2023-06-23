@@ -10,7 +10,7 @@ public struct TransactionSigners: Sendable, Hashable {
 	public let intentSigning: IntentSigning
 
 	public enum IntentSigning: Sendable, Hashable {
-		case notaryAsSignatory
+		case notaryIsSignatory
 		case intentSigners(NonEmpty<OrderedSet<EntityPotentiallyVirtual>>)
 	}
 
@@ -43,13 +43,13 @@ extension GatewayAPI.TransactionPreviewRequest {
 			permitInvalidHeaderEpoch: false
 		)
 
-		struct NotaryAsSignatoryDiscrepancy: Swift.Error {}
-		guard transactionSigners.notaryAsSignatory == header.notaryIsSignatory else {
-			loggerGlobal.error("Preview incorrectly implemented, found discrepancy in `notaryAsSignatory` and `transactionSigners`.")
+		struct NotaryIsSignatoryDiscrepancy: Swift.Error {}
+		guard transactionSigners.notaryIsSignatory == header.notaryIsSignatory else {
+			loggerGlobal.error("Preview incorrectly implemented, found discrepancy in `notaryIsSignatory` and `transactionSigners`.")
 			assertionFailure("discrepancy")
-			throw NotaryAsSignatoryDiscrepancy()
+			throw NotaryIsSignatoryDiscrepancy()
 		}
-		let notaryAsSignatory = transactionSigners.notaryAsSignatory
+		let notaryIsSignatory = transactionSigners.notaryIsSignatory
 
 		self.init(
 			manifest: manifestString,
@@ -57,7 +57,7 @@ extension GatewayAPI.TransactionPreviewRequest {
 			startEpochInclusive: .init(header.startEpochInclusive.rawValue),
 			endEpochExclusive: .init(header.endEpochExclusive.rawValue),
 			notaryPublicKey: GatewayAPI.PublicKey(from: header.publicKey),
-			notaryIsSignatory: notaryAsSignatory,
+			notaryIsSignatory: notaryIsSignatory,
 			tipPercentage: .init(header.tipPercentage),
 			nonce: .init(header.nonce.rawValue),
 			signerPublicKeys: transactionSigners.signerPublicKeys.map(GatewayAPI.PublicKey.init(from:)),
@@ -67,10 +67,10 @@ extension GatewayAPI.TransactionPreviewRequest {
 }
 
 extension TransactionSigners {
-	public var notaryAsSignatory: Bool {
+	public var notaryIsSignatory: Bool {
 		switch self.intentSigning {
 		case .intentSigners: return false
-		case .notaryAsSignatory: return true
+		case .notaryIsSignatory: return true
 		}
 	}
 
@@ -78,14 +78,14 @@ extension TransactionSigners {
 		switch intentSigning {
 		case let .intentSigners(signers):
 			return Set(signers.flatMap { $0.virtualHierarchicalDeterministicFactorInstances.map(\.publicKey) })
-		case .notaryAsSignatory:
+		case .notaryIsSignatory:
 			return []
 		}
 	}
 
 	public func intentSignerEntitiesOrEmpty() -> OrderedSet<EntityPotentiallyVirtual> {
 		switch intentSigning {
-		case .notaryAsSignatory: return .init()
+		case .notaryIsSignatory: return .init()
 		case let .intentSigners(signers): return OrderedSet(signers)
 		}
 	}

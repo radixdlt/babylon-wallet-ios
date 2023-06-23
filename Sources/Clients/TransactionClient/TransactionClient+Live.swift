@@ -76,7 +76,7 @@ extension TransactionClient {
 				if let nonEmpty = NonEmpty(rawValue: myInvolvedEntities.entitiesRequiringAuth) {
 					return .intentSigners(nonEmpty)
 				} else {
-					return .notaryAsSignatory
+					return .notaryIsSignatory
 				}
 			}()
 
@@ -240,7 +240,7 @@ extension TransactionClient {
 				endEpochExclusive: epoch + request.makeTransactionHeaderInput.epochWindow,
 				nonce: request.nonce,
 				publicKey: SLIP10.PublicKey.eddsaEd25519(transactionSigners.notaryPublicKey).intoEngine(),
-				notaryIsSignatory: transactionSigners.notaryAsSignatory,
+				notaryIsSignatory: transactionSigners.notaryIsSignatory,
 				tipPercentage: request.makeTransactionHeaderInput.tipPercentage
 			)
 
@@ -259,12 +259,13 @@ extension TransactionClient {
 				intentSignatures: Array(request.intentSignatures)
 			)
 
-			let txID = try engineToolkitClient.generateTXID(request.transactionIntent)
-			let hash = try RadixEngine.instance.hashSignedTransactionItent(signedTransactionIntent).get().hash
-			let data = try Data(hex: hash)
+			let signedIntentHash = try RadixEngine.instance
+				.hashSignedTransactionItent(signedTransactionIntent)
+				.get()
+				.hash
 
 			let notarySignature = try request.notary.sign(
-				hashOfMessage: data
+				hashOfMessage: Data(hex: signedIntentHash)
 			)
 
 			let uncompiledNotarized = try NotarizedTransaction(
@@ -275,6 +276,8 @@ extension TransactionClient {
 			let compiledNotarizedTXIntent = try engineToolkitClient.compileNotarizedTransactionIntent(
 				uncompiledNotarized
 			)
+
+			let txID = try engineToolkitClient.generateTXID(request.transactionIntent)
 
 			return .init(
 				notarized: compiledNotarizedTXIntent,
