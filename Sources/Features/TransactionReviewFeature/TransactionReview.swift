@@ -234,15 +234,37 @@ public struct TransactionReview: Sendable, FeatureReducer {
 
 			return .none
 
-		case let .destination(.presented(.customizeGuarantees(.delegate(.applyGuarantees(guarantees))))):
+		case let .destination(.presented(presentedAction)):
+			return reduce(into: &state, presentedAction: presentedAction)
+
+		case .destination(.dismiss):
+			if case .signing = state.destination {
+				return cancelSigningEffect(state: &state)
+			} else if case .submitting = state.destination {
+				// This is used when tapping outside the Submitting sheet, no need to set destination to nil
+				return delayedEffect(for: .delegate(.userDismissedTransactionStatus))
+			}
+
+			return .none
+
+		default:
+			return .none
+		}
+	}
+
+	public func reduce(into state: inout State, presentedAction: Destinations.Action) -> EffectTask<Action> {
+		switch presentedAction {
+		case let .customizeGuarantees(.delegate(.applyGuarantees(guarantees))):
 			for transfer in guarantees.map(\.transfer) {
 				guard let guarantee = transfer.guarantee else { continue }
 				state.applyGuarantee(guarantee, transferID: transfer.id)
 			}
 
 			return .none
+		case .customizeGuarantees:
+			return .none
 
-		case let .destination(.presented(.selectFeePayer(.delegate(.selected(selected))))):
+		case let .selectFeePayer(.delegate(.selected(selected))):
 			state.feePayerSelectionAmongstCandidates = selected
 			state.destination = nil
 			return .run { [transactionManifest = state.transactionManifest] send in
@@ -258,66 +280,61 @@ public struct TransactionReview: Sendable, FeatureReducer {
 				)))
 			}
 
-		case .destination(.presented(.signing(.delegate(.cancelSigning)))):
+		case .selectFeePayer:
+			return .none
+
+		case .signing(.delegate(.cancelSigning)):
 			state.destination = nil
 			return cancelSigningEffect(state: &state)
 
-		case .destination(.presented(.signing(.delegate(.failedToSign)))):
+		case .signing(.delegate(.failedToSign)):
 			loggerGlobal.error("Failed sign tx")
 			state.destination = nil
 			state.canApproveTX = true
 			return .none
 
-		case let .destination(.presented(.signing(.delegate(.finishedSigning(.signTransaction(notarizedTX, origin: _)))))):
+		case let .signing(.delegate(.finishedSigning(.signTransaction(notarizedTX, origin: _)))):
 			state.destination = .submitting(.init(notarizedTX: notarizedTX))
 			return .none
 
-		case .destination(.presented(.signing(.delegate(.finishedSigning(.signAuth(_)))))):
+		case .signing(.delegate(.finishedSigning(.signAuth(_)))):
 			state.canApproveTX = true
 			assertionFailure("Did not expect to have sign auth data...")
 			return .none
 
-		case let .destination(.presented(.submitting(.delegate(.submittedButNotCompleted(txID))))):
+		case .signing:
+			return .none
+
+		case let .submitting(.delegate(.submittedButNotCompleted(txID))):
 			return .send(.delegate(.signedTXAndSubmittedToGateway(txID)))
 
-		case
-			.destination(.presented(.submitting(.delegate(.failedToSubmit)))):
+		case .submitting(.delegate(.failedToSubmit)):
 			state.destination = nil
 			state.canApproveTX = true
 			loggerGlobal.error("Failed to submit tx")
 			return .none
 
-		case .destination(.presented(.submitting(.delegate(.failedToReceiveStatusUpdate)))):
+		case .submitting(.delegate(.failedToReceiveStatusUpdate)):
 			state.destination = nil
 			loggerGlobal.error("Failed to receive status update")
 			return .none
 
-		case .destination(.presented(.submitting(.delegate(.submittedTransactionFailed)))):
+		case .submitting(.delegate(.submittedTransactionFailed)):
 			state.destination = nil
 			state.canApproveTX = true
 			loggerGlobal.error("Submitted TX failed")
 			return .send(.delegate(.failed(.failedToSubmit)))
 
-		case let .destination(.presented(.submitting(.delegate(.committedSuccessfully(txID))))):
+		case let .submitting(.delegate(.committedSuccessfully(txID))):
 			state.destination = nil
 			return delayedEffect(for: .delegate(.transactionCompleted(txID)))
 
-		case .destination(.presented(.submitting(.delegate(.manuallyDismiss)))):
+		case .submitting(.delegate(.manuallyDismiss)):
 			// This is used when the close button is pressed, we have to manually
 			state.destination = nil
 			return delayedEffect(for: .delegate(.userDismissedTransactionStatus))
 
-		case .destination(.dismiss):
-			if case .signing = state.destination {
-				return cancelSigningEffect(state: &state)
-			} else if case .submitting = state.destination {
-				// This is used when tapping outside the Submitting sheet, no need to set destination to nil
-				return delayedEffect(for: .delegate(.userDismissedTransactionStatus))
-			}
-
-			return .none
-
-		default:
+		case .submitting:
 			return .none
 		}
 	}
