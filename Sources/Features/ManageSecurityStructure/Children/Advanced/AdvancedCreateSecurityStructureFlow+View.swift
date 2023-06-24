@@ -26,6 +26,7 @@ extension AdvancedManageSecurityStructureFlow {
 							viewStore.send(.confirmationRoleButtonTapped)
 						}
 					}
+					.padding()
 					.destinations(store: store)
 				}
 			}

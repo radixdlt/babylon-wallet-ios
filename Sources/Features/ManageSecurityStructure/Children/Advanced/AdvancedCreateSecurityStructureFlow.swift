@@ -68,6 +68,22 @@ public struct AdvancedManageSecurityStructureFlow: Sendable, FeatureReducer {
 				Destinations()
 			}
 	}
+
+	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+		switch viewAction {
+		case .primaryRoleButtonTapped:
+			state.destination = .factorsForRole(.init(role: .primary))
+			return .none
+
+		case .recoveryRoleButtonTapped:
+			state.destination = .factorsForRole(.init(role: .recovery))
+			return .none
+
+		case .confirmationRoleButtonTapped:
+			state.destination = .factorsForRole(.init(role: .confirmation))
+			return .none
+		}
+	}
 }
 
 extension RoleOfTier {

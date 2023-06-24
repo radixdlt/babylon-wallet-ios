@@ -23,7 +23,8 @@ extension FactorsForRole {
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				VStack {
-					Text("IMPL ME")
+					Text("\(viewStore.role.titleAdvancedFlow)")
+						.font(.app.sheetTitle)
 				}
 				.padding()
 				.frame(maxWidth: .infinity)
