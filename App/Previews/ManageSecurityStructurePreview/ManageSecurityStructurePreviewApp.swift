@@ -17,7 +17,7 @@ extension ManageSecurityStructureCoordinator.View: FeatureView {
 
 // MARK: - ManageSecurityStructureCoordinator + PreviewedFeature
 extension ManageSecurityStructureCoordinator: PreviewedFeature {
-	public typealias ResultFromFeature = SecurityStructureConfiguration
+	public typealias ResultFromFeature = SecurityStructureConfigurationDetailed
 }
 
 // MARK: - ManageSecurityStructurePreviewApp
@@ -60,10 +60,10 @@ extension AppPreferencesClient {
 	}
 }
 
-let existingStructure: SecurityStructureConfiguration = try! {
+let existingStructure: SecurityStructureConfigurationDetailed = try! {
 	let json = instabridge.data(using: .utf8)!
 	@Dependency(\.jsonDecoder) var decoder
-	return try decoder().decode(SecurityStructureConfiguration.self, from: json)
+	return try decoder().decode(SecurityStructureConfigurationDetailed.self, from: json)
 }()
 
 let instabridge = """

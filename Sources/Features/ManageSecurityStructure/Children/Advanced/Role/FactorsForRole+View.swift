@@ -2,7 +2,7 @@ import FeaturePrelude
 
 extension FactorsForRole.State {
 	var viewState: FactorsForRole.ViewState {
-		.init(role: role)
+		.init(role: role, threshold: threshold?.description ?? "")
 	}
 }
 
@@ -10,6 +10,12 @@ extension FactorsForRole.State {
 extension FactorsForRole {
 	public struct ViewState: Equatable {
 		let role: SecurityStructureRole
+		let threshold: String
+
+		init(role: SecurityStructureRole, threshold: String) {
+			self.role = role
+			self.threshold = threshold
+		}
 	}
 
 	@MainActor
@@ -25,6 +31,19 @@ extension FactorsForRole {
 				VStack {
 					Text("\(viewStore.role.titleAdvancedFlow)")
 						.font(.app.sheetTitle)
+
+					// FIXME: strings
+					AppTextField(
+						primaryHeading: "Threshold",
+						secondaryHeading: "Greater than zero",
+						placeholder: "Threshold",
+						text: viewStore.binding(
+							get: \.threshold,
+							send: { .thresholdChanged($0) }
+						),
+						hint: nil,
+						showClearButton: false
+					)
 				}
 				.padding()
 				.frame(maxWidth: .infinity)
