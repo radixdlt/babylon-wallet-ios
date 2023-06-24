@@ -3,9 +3,9 @@ import FeaturePrelude
 extension SecurityStructureConfigurationRow.State {
 	var viewState: SecurityStructureConfigurationRow.ViewState {
 		.init(
-			label: configReference.label.rawValue,
-			createdOn: configReference.createdOn,
-			lastUpdatedOn: configReference.lastUpdatedOn
+			label: configReference.metadata.label,
+			createdOn: configReference.metadata.createdOn,
+			lastUpdatedOn: configReference.metadata.lastUpdatedOn
 		)
 	}
 }

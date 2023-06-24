@@ -84,7 +84,7 @@ extension SimpleManageSecurityStructureFlow {
 		}
 
 		var numberOfDaysUntilAutoConfirmationHint: Hint? {
-			guard let raw = RecoveryAutoConfirmDelayInDays.RawValue(numberOfDaysUntilAutoConfirmation) else {
+			guard let _ = RecoveryAutoConfirmDelayInDays.RawValue(numberOfDaysUntilAutoConfirmation) else {
 				return .error("Not an integer")
 			}
 			return .info("The phone confirmer is only needed if you want to skip waiting the number of specified days.")
@@ -175,16 +175,6 @@ extension View {
 		return listConfirmerOfNewPhone(with: destinationStore)
 			.listLostPhoneHelper(with: destinationStore)
 	}
-
-//	@MainActor
-//	private func firstConfirmerOfNewPhone(with destinationStore: PresentationStoreOf<SimpleManageSecurityStructureFlow.ModalDestinations>) -> some View {
-//		sheet(
-//			store: destinationStore,
-//			state: /SimpleManageSecurityStructureFlow.ModalDestinations.State.firstConfirmerOfNewPhone,
-//			action: SimpleManageSecurityStructureFlow.ModalDestinations.Action.firstConfirmerOfNewPhone,
-//			content: { AnswerSecurityQuestionsCoordinator.View(store: $0) }
-//		)
-//	}
 
 	@MainActor
 	private func listConfirmerOfNewPhone(with destinationStore: PresentationStoreOf<SimpleManageSecurityStructureFlow.ModalDestinations>) -> some View {

@@ -107,21 +107,13 @@ public struct AbstractSecurityStructure<AbstractFactor>:
 	}
 }
 
-// MARK: - AbstractSecurityStructureConfiguration
-public struct AbstractSecurityStructureConfiguration<AbstractFactor>:
-	Sendable, Hashable, Codable, Identifiable
-	where AbstractFactor: Sendable & Hashable & Codable
-{
+// MARK: - SecurityStructureMetadata
+public struct SecurityStructureMetadata: Sendable, Hashable, Codable, Identifiable {
 	public typealias ID = UUID
-	public typealias Configuration = AbstractSecurityStructure<AbstractFactor>
-
 	public let id: ID
 
 	/// can be renamed
-	public var label: NonEmptyString
-
-	// Mutable so that we can update
-	public var configuration: Configuration
+	public var label: String
 
 	public let createdOn: Date
 
@@ -130,8 +122,7 @@ public struct AbstractSecurityStructureConfiguration<AbstractFactor>:
 
 	public init(
 		id: ID? = nil,
-		label: NonEmptyString,
-		configuration: Configuration,
+		label: String = "",
 		createdOn: Date? = nil,
 		lastUpdatedOn: Date? = nil
 	) {
@@ -141,7 +132,34 @@ public struct AbstractSecurityStructureConfiguration<AbstractFactor>:
 		self.label = label
 		self.createdOn = createdOn ?? date()
 		self.lastUpdatedOn = lastUpdatedOn ?? date()
+	}
+}
+
+// MARK: - AbstractSecurityStructureConfiguration
+public struct AbstractSecurityStructureConfiguration<AbstractFactor>:
+	Sendable, Hashable, Codable, Identifiable
+	where AbstractFactor: Sendable & Hashable & Codable
+{
+	public typealias Configuration = AbstractSecurityStructure<AbstractFactor>
+	// Mutable so that we can update factor structure
+	public var configuration: Configuration
+
+	// Mutable so we can rename and update date
+	public var metadata: SecurityStructureMetadata
+
+	public init(
+		metadata: SecurityStructureMetadata,
+		configuration: Configuration
+	) {
+		self.metadata = metadata
 		self.configuration = configuration
+	}
+}
+
+extension AbstractSecurityStructureConfiguration {
+	public typealias ID = UUID
+	public var id: ID {
+		metadata.id
 	}
 }
 
@@ -176,11 +194,8 @@ extension SecurityStructureConfigurationReference.Configuration {
 extension SecurityStructureConfigurationDetailed {
 	public func asReference() -> SecurityStructureConfigurationReference {
 		.init(
-			id: id,
-			label: label,
-			configuration: configuration.asReference(),
-			createdOn: createdOn,
-			lastUpdatedOn: lastUpdatedOn
+			metadata: metadata,
+			configuration: configuration.asReference()
 		)
 	}
 
@@ -194,11 +209,8 @@ extension Profile {
 		reference: SecurityStructureConfigurationReference
 	) throws -> SecurityStructureConfigurationDetailed {
 		try .init(
-			id: reference.id,
-			label: reference.label,
-			configuration: detailedSecurityStructureConfiguration(referenceConfiguration: reference.configuration),
-			createdOn: reference.createdOn,
-			lastUpdatedOn: reference.lastUpdatedOn
+			metadata: reference.metadata,
+			configuration: detailedSecurityStructureConfiguration(referenceConfiguration: reference.configuration)
 		)
 	}
 

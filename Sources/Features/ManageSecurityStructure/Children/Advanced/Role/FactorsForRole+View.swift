@@ -9,7 +9,7 @@ extension FactorsForRole.State {
 // MARK: - FactorsForRole.View
 extension FactorsForRole {
 	public struct ViewState: Equatable {
-		let role: FactorsForRole.Role
+		let role: SecurityStructureRole
 	}
 
 	@MainActor
@@ -22,30 +22,8 @@ extension FactorsForRole {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-				VStack(alignment: .leading, spacing: .medium2) {
-					Text(FactorsForRole.Role.role.titleAdvancedFlow)
-						.font(.app.sectionHeader)
-
-					Text(FactorsForRole.Role.role.subtitleAdvancedFlow)
-						.font(.app.body2Header)
-						.foregroundColor(.app.gray3)
-
-					Button(action: { viewStore.send(.setFactorsButtonTapped) }) {
-						HStack {
-							// FIXME: Strings
-							Text("None set")
-								.font(.app.body1Header)
-								.foregroundColor(viewStore.role.isEmpty ? .app.gray3 : .app.gray1)
-
-							Spacer(minLength: 0)
-
-							Image(asset: AssetResource.chevronRight)
-						}
-					}
-					.cornerRadius(.medium2)
-					.frame(maxWidth: .infinity)
-					.padding()
-					.background(.app.gray5)
+				VStack {
+					Text("IMPL ME")
 				}
 				.padding()
 				.frame(maxWidth: .infinity)

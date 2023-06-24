@@ -11,37 +11,90 @@ extension AdvancedManageSecurityStructureFlow {
 		}
 
 		public var body: some SwiftUI.View {
-			ScrollView {
-				VStack {
-					FactorsForRole.View(
-						store: store.scope(
-							state: \.primaryRole,
-							action: { .child(.primaryRole($0)) }
-						)
-					)
+			WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
+				ScrollView {
+					VStack {
+						FactorsForRoleButton(role: .primary) {
+							viewStore.send(.primaryRoleButtonTapped)
+						}
 
-					FactorsForRole.View(
-						store: store.scope(
-							state: \.recoveryRole,
-							action: { .child(.recoveryRole($0)) }
-						)
-					)
+						FactorsForRoleButton(role: .recovery) {
+							viewStore.send(.recoveryRoleButtonTapped)
+						}
 
-					FactorsForRole.View(
-						store: store.scope(
-							state: \.confirmationRole,
-							action: { .child(.confirmationRole($0)) }
-						)
-					)
+						FactorsForRoleButton(role: .confirmation) {
+							viewStore.send(.confirmationRoleButtonTapped)
+						}
+					}
+					.destinations(store: store)
 				}
 			}
 		}
 	}
 }
 
+extension View {
+	@MainActor
+	fileprivate func destinations(store: StoreOf<AdvancedManageSecurityStructureFlow>) -> some View {
+		let destinationStore = store.scope(state: \.$destination, action: { .child(.destination($0)) })
+		return factorsForRoleSheet(with: destinationStore)
+	}
+
+	@MainActor
+	private func factorsForRoleSheet(with destinationStore: PresentationStoreOf<AdvancedManageSecurityStructureFlow.Destinations>) -> some View {
+		sheet(
+			store: destinationStore,
+			state: /AdvancedManageSecurityStructureFlow.Destinations.State.factorsForRole,
+			action: AdvancedManageSecurityStructureFlow.Destinations.Action.factorsForRole,
+			content: { FactorsForRole.View(store: $0) }
+		)
+	}
+}
+
 extension RoleOfTier {
 	var isEmpty: Bool {
 		superAdminFactors.isEmpty && thresholdFactors.isEmpty
+	}
+}
+
+// MARK: - FactorsForRoleButton
+struct FactorsForRoleButton: SwiftUI.View {
+	let role: SecurityStructureRole
+	let action: () -> Void
+
+	init(
+		role: SecurityStructureRole,
+		action: @escaping () -> Void
+	) {
+		self.role = role
+		self.action = action
+	}
+
+	var body: some View {
+		VStack(alignment: .leading, spacing: .medium2) {
+			Text(role.titleAdvancedFlow)
+				.font(.app.sectionHeader)
+
+			Text(role.subtitleAdvancedFlow)
+				.font(.app.body2Header)
+				.foregroundColor(.app.gray3)
+
+			Button(action: action) {
+				HStack {
+					// FIXME: Strings
+					Text("None set")
+						.font(.app.body1Header)
+
+					Spacer(minLength: 0)
+
+					Image(asset: AssetResource.chevronRight)
+				}
+			}
+			.cornerRadius(.medium2)
+			.frame(maxWidth: .infinity)
+			.padding()
+			.background(.app.gray5)
+		}
 	}
 }
 

@@ -4,48 +4,32 @@ import FeaturePrelude
 // MARK: - NameSecurityStructure
 public struct NameSecurityStructure: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
-		public let id: SecurityStructureConfigurationDetailed.ID
 		public let config: SecurityStructureConfigurationDetailed.Configuration
-		public var name: String
-		public let createdOn: Date
+		public var metadata: SecurityStructureMetadata
 		public let isUpdatingExisting: Bool
 
 		public init(
-			id: SecurityStructureConfigurationDetailed.ID,
 			config: SecurityStructureConfigurationDetailed.Configuration,
-			name: String,
-			createdOn: Date,
+			metadata: SecurityStructureMetadata,
 			isUpdatingExisting: Bool
 		) {
-			self.id = id
 			self.config = config
-			self.name = name
-			self.createdOn = createdOn
+			self.metadata = metadata
 			self.isUpdatingExisting = isUpdatingExisting
 		}
 
 		public static func name(
 			new config: SecurityStructureConfigurationDetailed.Configuration
 		) -> Self {
-			@Dependency(\.uuid) var uuid
-			@Dependency(\.date) var date
-			return Self(
-				id: uuid(),
+			Self(
 				config: config,
-				name: "",
-				createdOn: date(),
+				metadata: .init(),
 				isUpdatingExisting: false
 			)
 		}
 
 		public static func updateName(of structure: SecurityStructureConfigurationDetailed) -> Self {
-			Self(
-				id: structure.id,
-				config: structure.configuration,
-				name: structure.label.rawValue,
-				createdOn: structure.createdOn,
-				isUpdatingExisting: true
-			)
+			Self(config: structure.configuration, metadata: structure.metadata, isUpdatingExisting: true)
 		}
 	}
 
@@ -58,24 +42,18 @@ public struct NameSecurityStructure: Sendable, FeatureReducer {
 		case updateOrCreateSecurityStructure(SecurityStructureConfigurationDetailed)
 	}
 
-	@Dependency(\.date) var date
 	@Dependency(\.appPreferencesClient) var appPreferencesClient
 	public init() {}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case let .nameChanged(name):
-			state.name = name
+			state.metadata.label = name
 			return .none
 		case let .confirmedName(name):
-			let structure = SecurityStructureConfigurationDetailed(
-				id: state.id,
-				label: name,
-				configuration: state.config,
-				createdOn: state.createdOn,
-				lastUpdatedOn: date()
-			)
-
+			var structure = SecurityStructureConfigurationDetailed(metadata: state.metadata, configuration: state.config)
+			structure.metadata.label = name.rawValue
+			structure.metadata.lastUpdatedOn = .init()
 			return .send(.delegate(.updateOrCreateSecurityStructure(structure)))
 		}
 	}

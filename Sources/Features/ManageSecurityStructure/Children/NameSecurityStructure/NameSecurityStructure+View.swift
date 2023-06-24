@@ -2,7 +2,7 @@ import FeaturePrelude
 
 extension NameSecurityStructure.State {
 	var viewState: NameSecurityStructure.ViewState {
-		.init(name: name)
+		.init(name: metadata.label)
 	}
 }
 

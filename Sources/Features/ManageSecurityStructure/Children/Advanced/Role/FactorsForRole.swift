@@ -1,12 +1,11 @@
 import FeaturePrelude
 
 // MARK: - FactorsForRole
-public struct FactorsForRole<RoleKind: RoleProtocol>: Sendable, FeatureReducer {
-	public typealias Role = RoleOfTier<RoleKind, FactorSource>
+public struct FactorsForRole: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
-		public var role: Role
+		public var role: SecurityStructureRole
 
-		public init(role: Role) {
+		public init(role: SecurityStructureRole) {
 			self.role = role
 		}
 	}
