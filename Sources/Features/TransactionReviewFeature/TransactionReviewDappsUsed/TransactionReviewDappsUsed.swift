@@ -4,9 +4,9 @@ import FeaturePrelude
 public struct TransactionReviewDappsUsed: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public var isExpanded: Bool
-		public var dApps: IdentifiedArrayOf<TransactionReview.LedgerEntity>
+		public var dApps: IdentifiedArrayOf<TransactionReview.DappEntity>
 
-		public init(isExpanded: Bool, dApps: IdentifiedArrayOf<TransactionReview.LedgerEntity>) {
+		public init(isExpanded: Bool, dApps: IdentifiedArrayOf<TransactionReview.DappEntity>) {
 			self.isExpanded = isExpanded
 			self.dApps = dApps
 		}
@@ -14,11 +14,11 @@ public struct TransactionReviewDappsUsed: Sendable, FeatureReducer {
 
 	public enum ViewAction: Sendable, Equatable {
 		case expandTapped
-		case dappTapped(TransactionReview.LedgerEntity.ID)
+		case dappTapped(TransactionReview.DappEntity.ID)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
-		case openDapp(TransactionReview.LedgerEntity.ID)
+		case openDapp(TransactionReview.DappEntity.ID)
 	}
 
 	public init() {}

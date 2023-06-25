@@ -228,15 +228,13 @@ public struct TransactionReview: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
 		case let .dAppsUsed(.delegate(.openDapp(id))):
-			return .run { _ in
-//				let result = await TaskResult {
-//					try await authorizedDappsClient.getDetailedDapp(id)
-//				}
-//				await send(.internal(.loadedDapp(result)))
+			return .task {
+				await .internal(.loadedDapp(
+					TaskResult {
+						try await authorizedDappsClient.getDetailedDapp(id)
+					}
+				))
 			}
-
-			print("OPEN id", id)
-			return .none
 
 		case .deposits(.delegate(.showCustomizeGuarantees)):
 			guard let deposits = state.deposits else { return .none } // TODO: Handle?
@@ -571,37 +569,28 @@ extension TransactionReview {
 		return TransactionReviewDappsUsed.State(isExpanded: true, dApps: .init(uniqueElements: Set(dApps)))
 	}
 
-	private func extractDappInfo(_ component: ComponentAddress) async throws -> LedgerEntity {
+	private func extractDappInfo(_ component: ComponentAddress) async throws -> DappEntity {
 		let dAppDefinitionAddress = try await gatewayAPIClient.getDappDefinitionAddress(component)
 		let metadata = try? await gatewayAPIClient.getDappMetadata(dAppDefinitionAddress)
 			.validating(dAppComponent: component)
 
-		return LedgerEntity(
-			id: dAppDefinitionAddress.id,
-			metadata: .init(
-				name: metadata?.name ?? L10n.TransactionReview.unknown,
-				thumbnail: metadata?.iconURL,
-				description: metadata?.description
-			)
+		return DappEntity(
+			id: dAppDefinitionAddress,
+			metadata: .init(metadata: metadata)
 		)
 	}
 
-	private func exctractProofs(_ manifest: AnalyzeManifestWithPreviewContextResponse) async throws -> TransactionReviewProofs.State? {
-		let proofs = try await manifest.accountProofResources.map(\.address).asyncMap(extractProofInfo)
+	private func exctractProofs(_ manifest: AnalyzeManifestWithPreviewContextResponse) async -> TransactionReviewProofs.State? {
+		let proofs = await manifest.accountProofResources.asyncMap(extractProofInfo)
 		guard !proofs.isEmpty else { return nil }
 
 		return TransactionReviewProofs.State(proofs: .init(uniqueElements: proofs))
 	}
 
-	private func extractProofInfo(_ address: String) async throws -> LedgerEntity {
-		let metadata = try? await gatewayAPIClient.getEntityMetadata(address)
-		return LedgerEntity(
+	private func extractProofInfo(_ address: ResourceAddress) async -> ProofEntity {
+		await ProofEntity(
 			id: address,
-			metadata: .init(
-				name: metadata?.name ?? L10n.TransactionReview.unknown,
-				thumbnail: metadata?.iconURL,
-				description: metadata?.description
-			)
+			metadata: .init(metadata: try? gatewayAPIClient.getEntityMetadata(address.address))
 		)
 	}
 
@@ -729,25 +718,25 @@ extension TransactionReview {
 // MARK: Useful types
 
 extension TransactionReview {
-	public struct LedgerEntity: Sendable, Identifiable, Hashable {
-		public let id: AccountAddress.ID
-		public let metadata: Metadata?
+	public struct ProofEntity: Sendable, Identifiable, Hashable {
+		public let id: ResourceAddress
+		public let metadata: EntityMetadata
+	}
 
-		init(id: AccountAddress.ID, metadata: Metadata?) {
-			self.id = id
-			self.metadata = metadata
-		}
+	public struct DappEntity: Sendable, Identifiable, Hashable {
+		public let id: DappDefinitionAddress
+		public let metadata: EntityMetadata?
+	}
 
-		public struct Metadata: Sendable, Hashable {
-			public let name: String
-			public let thumbnail: URL?
-			public let description: String?
+	public struct EntityMetadata: Sendable, Hashable {
+		public let name: String?
+		public let thumbnail: URL?
+		public let description: String?
 
-			public init(name: String, thumbnail: URL?, description: String?) {
-				self.name = name
-				self.thumbnail = thumbnail
-				self.description = description
-			}
+		public init(metadata: GatewayAPI.EntityMetadataCollection?) {
+			self.name = metadata?.name
+			self.thumbnail = metadata?.iconURL
+			self.description = metadata?.description
 		}
 	}
 

@@ -3,29 +3,31 @@ import FeaturePrelude
 extension TransactionReviewDappsUsed.State {
 	var viewState: TransactionReviewDappsUsed.ViewState {
 		let knownDapps = dApps.compactMap(\.knownDapp)
-		return .init(knownDapps: knownDapps, unknownDappCount: dApps.count - knownDapps.count)
+		let unknownDappCount = dApps.count - knownDapps.count
+
+		if unknownDappCount == 0 {
+			return .init(rows: knownDapps)
+		} else {
+			return .init(rows: knownDapps + [.unknown(count: unknownDappCount)])
+		}
 	}
 }
 
-extension TransactionReview.LedgerEntity {
-	fileprivate var knownDapp: TransactionReviewDappsUsed.ViewState.KnownDapp? {
+extension TransactionReview.DappEntity {
+	fileprivate var knownDapp: TransactionReviewDappsUsed.View.DappView.ViewState? {
 		guard let metadata else { return nil }
-		return .init(id: id, thumbnail: metadata.thumbnail, name: metadata.name, description: metadata.description)
+		return .known(
+			name: metadata.name ?? L10n.TransactionReview.unknown,
+			thumbnail: metadata.thumbnail,
+			id: id
+		)
 	}
 }
 
 // MARK: - TransactionReviewDappsUsed.View
 extension TransactionReviewDappsUsed {
 	public struct ViewState: Equatable {
-		let knownDapps: [KnownDapp]
-		let unknownDappCount: Int
-
-		struct KnownDapp: Identifiable, Equatable {
-			let id: AccountAddress.ID
-			let thumbnail: URL?
-			let name: String
-			let description: String?
-		}
+		let rows: [View.DappView.ViewState]
 	}
 
 	@MainActor
@@ -40,9 +42,6 @@ extension TransactionReviewDappsUsed {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-				// If this is done in the if statement the compiler faints
-				let showUnknownDapps = viewStore.unknownDappCount > 0
-
 				VStack(alignment: .trailing, spacing: .medium2) {
 					Button {
 						viewStore.send(.expandTapped)
@@ -54,15 +53,10 @@ extension TransactionReviewDappsUsed {
 
 					if isExpanded {
 						VStack(spacing: .small2) {
-							ForEach(viewStore.knownDapps) { dApp in
-								Button {
-									viewStore.send(.dappTapped(dApp.id))
-								} label: {
-									DappView(type: .known(name: dApp.name, thumbnail: dApp.thumbnail, description: dApp.description))
+							ForEach(viewStore.rows, id: \.self) { rowViewState in
+								DappView(viewState: rowViewState) { id in
+									viewStore.send(.dappTapped(id))
 								}
-							}
-							if showUnknownDapps {
-								DappView(type: .unknown(count: viewStore.unknownDappCount))
 							}
 						}
 						.transition(.opacity.combined(with: .scale(scale: 0.95)))
@@ -90,22 +84,31 @@ extension TransactionReviewDappsUsed {
 		struct DappView: SwiftUI.View {
 			private let dAppBoxWidth: CGFloat = 190
 
-			let type: DappType
+			enum ViewState: Hashable {
+				case known(name: String, thumbnail: URL?, id: TransactionReview.DappEntity.ID)
+				case unknown(count: Int)
+			}
+
+			let viewState: ViewState
+			let action: (TransactionReview.DappEntity.ID) -> Void
 
 			var body: some SwiftUI.View {
 				HStack(spacing: 0) {
-					switch type {
-					case let .known(name, url, description):
-						DappThumbnail(.known(url), size: .smaller)
-
-						Text(name)
-							.lineLimit(2)
-							.padding(.leading, .small2)
-
+					switch viewState {
+					case let .known(name, url, id):
+						Button {
+							action(id)
+						} label: {
+							HStack(spacing: 0) {
+								DappThumbnail(.known(url), size: .smaller)
+									.padding(.trailing, .small2)
+								Text(name)
+									.lineLimit(2)
+							}
+						}
 					case let .unknown(count):
 						DappThumbnail(.unknown, size: .smaller)
 							.padding(.trailing, .small2)
-
 						Text(L10n.TransactionReview.unknownComponents(count))
 							.lineLimit(2)
 					}
@@ -121,11 +124,6 @@ extension TransactionReviewDappsUsed {
 					RoundedRectangle(cornerRadius: .small2)
 						.stroke(.app.gray3, style: .transactionReview)
 				}
-			}
-
-			enum DappType: Equatable {
-				case known(name: String, thumbnail: URL?, description: String?)
-				case unknown(count: Int)
 			}
 		}
 	}
