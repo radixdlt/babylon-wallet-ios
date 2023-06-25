@@ -335,6 +335,7 @@ package.addModules([
 			"EditPersonaFeature",
 			"CreateAuthKeyFeature",
 			"GatewayAPI",
+			"TransactionReviewFeature",
 		],
 		tests: .no
 	),
@@ -429,6 +430,7 @@ package.addModules([
 	.feature(
 		name: "TransactionReviewFeature",
 		dependencies: [
+			"AuthorizedDappsClient",
 			"GatewayAPI",
 			"TransactionClient",
 			"SigningFeature",
