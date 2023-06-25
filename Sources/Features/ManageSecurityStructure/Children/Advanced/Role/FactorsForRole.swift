@@ -69,6 +69,9 @@ public struct FactorsForRole: Sendable, FeatureReducer {
 		public var thresholdFactorSources: IdentifiedArrayOf<FactorSource> = []
 		public var adminFactorSources: IdentifiedArrayOf<FactorSource> = []
 
+		@PresentationState
+		public var destination: Destinations.State?
+
 		public init(
 			//			allFactorSources: some Collection<FactorSource>,
 			role: SecurityStructureRole
@@ -87,7 +90,41 @@ public struct FactorsForRole: Sendable, FeatureReducer {
 		case thresholdChanged(String)
 	}
 
+	public enum ChildAction: Sendable, Equatable {
+		case destination(PresentationAction<Destinations.Action>)
+	}
+
+	public struct Destinations: Sendable, ReducerProtocol {
+		public enum State: Sendable, Hashable {
+			case addThresholdFactor(SelectFactorKindThenFactor.State)
+			case addAdminFactor(SelectFactorKindThenFactor.State)
+		}
+
+		public enum Action: Sendable, Equatable {
+			case addThresholdFactor(SelectFactorKindThenFactor.Action)
+			case addAdminFactor(SelectFactorKindThenFactor.Action)
+		}
+
+		public init() {}
+
+		public var body: some ReducerProtocolOf<Self> {
+			Scope(state: /State.addThresholdFactor, action: /Action.addThresholdFactor) {
+				SelectFactorKindThenFactor()
+			}
+			Scope(state: /State.addAdminFactor, action: /Action.addAdminFactor) {
+				SelectFactorKindThenFactor()
+			}
+		}
+	}
+
 	public init() {}
+
+	public var body: some ReducerProtocolOf<Self> {
+		Reduce(core)
+			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
+				Destinations()
+			}
+	}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
@@ -99,7 +136,7 @@ public struct FactorsForRole: Sendable, FeatureReducer {
 			return .none
 
 		case .addThresholdFactor:
-			print("add threshold factor")
+			state.destination = .addThresholdFactor(.init())
 			return .none
 
 		case let .removeAdminFactor(factorSourceID):
@@ -111,7 +148,7 @@ public struct FactorsForRole: Sendable, FeatureReducer {
 			return .none
 
 		case .addAdminFactor:
-			print("add admin factor")
+			state.destination = .addAdminFactor(.init())
 			return .none
 		}
 	}

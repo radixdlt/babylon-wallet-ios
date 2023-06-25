@@ -76,11 +76,41 @@ extension FactorsForRole {
 						}
 					)
 				}
+				.destinations(with: store)
 				.navigationTitle(viewStore.role.titleAdvancedFlow)
 				.padding()
 				.frame(maxWidth: .infinity)
 			}
 		}
+	}
+}
+
+extension View {
+	@MainActor
+	fileprivate func destinations(with store: StoreOf<FactorsForRole>) -> some SwiftUI.View {
+		let destinationStore = store.scope(state: \.$destination, action: { .child(.destination($0)) })
+		return addThresholdFactorSheet(with: destinationStore)
+			.addAdminFactorSheet(with: destinationStore)
+	}
+
+	@MainActor
+	private func addThresholdFactorSheet(with destinationStore: PresentationStoreOf<FactorsForRole.Destinations>) -> some SwiftUI.View {
+		sheet(
+			store: destinationStore,
+			state: /FactorsForRole.Destinations.State.addThresholdFactor,
+			action: FactorsForRole.Destinations.Action.addThresholdFactor,
+			content: { SelectFactorKindThenFactor.View(store: $0) }
+		)
+	}
+
+	@MainActor
+	private func addAdminFactorSheet(with destinationStore: PresentationStoreOf<FactorsForRole.Destinations>) -> some SwiftUI.View {
+		sheet(
+			store: destinationStore,
+			state: /FactorsForRole.Destinations.State.addAdminFactor,
+			action: FactorsForRole.Destinations.Action.addAdminFactor,
+			content: { SelectFactorKindThenFactor.View(store: $0) }
+		)
 	}
 }
 
