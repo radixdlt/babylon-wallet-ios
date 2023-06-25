@@ -2,7 +2,12 @@ import FeaturePrelude
 
 extension FactorsForRole.State {
 	var viewState: FactorsForRole.ViewState {
-		.init(role: role, threshold: threshold?.description ?? "")
+		.init(
+			role: role,
+			threshold: threshold?.description ?? "",
+			thresholdFactors: .init(thresholdFactorSources),
+			adminFactors: .init(adminFactorSources)
+		)
 	}
 }
 
@@ -11,10 +16,19 @@ extension FactorsForRole {
 	public struct ViewState: Equatable {
 		let role: SecurityStructureRole
 		let threshold: String
+		let thresholdFactors: [FactorSource]
+		let adminFactors: [FactorSource]
 
-		init(role: SecurityStructureRole, threshold: String) {
+		init(
+			role: SecurityStructureRole,
+			threshold: String,
+			thresholdFactors: [FactorSource],
+			adminFactors: [FactorSource]
+		) {
 			self.role = role
 			self.threshold = threshold
+			self.thresholdFactors = thresholdFactors
+			self.adminFactors = adminFactors
 		}
 	}
 
@@ -29,9 +43,6 @@ extension FactorsForRole {
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				VStack {
-					Text("\(viewStore.role.titleAdvancedFlow)")
-						.font(.app.sheetTitle)
-
 					// FIXME: strings
 					AppTextField(
 						primaryHeading: "Threshold",
@@ -44,11 +55,61 @@ extension FactorsForRole {
 						hint: nil,
 						showClearButton: false
 					)
+
+					FactorsListView(
+						title: "Threshold",
+						subtitle: "Requires >=\(viewStore.threshold) (threshold) factors to be used together.",
+						factors: viewStore.adminFactors,
+						addFactorAction: { viewStore.send(.addThresholdFactor) },
+						removeFactorAction: {
+							viewStore.send(.removeThresholdFactor($0))
+						}
+					)
+
+					FactorsListView(
+						title: "Admin",
+						subtitle: "Factors which can be used standalone",
+						factors: viewStore.adminFactors,
+						addFactorAction: { viewStore.send(.addAdminFactor) },
+						removeFactorAction: {
+							viewStore.send(.removeAdminFactor($0))
+						}
+					)
 				}
+				.navigationTitle(viewStore.role.titleAdvancedFlow)
 				.padding()
 				.frame(maxWidth: .infinity)
-				.onAppear { viewStore.send(.appeared) }
 			}
+		}
+	}
+}
+
+// MARK: - FactorsListView
+public struct FactorsListView: SwiftUI.View {
+	let title: String
+	let subtitle: String
+	let factors: [FactorSource]
+	let addFactorAction: () -> Void
+	let removeFactorAction: (FactorSourceID) -> Void
+	public var body: some View {
+		VStack {
+			Text(title)
+				.font(.app.sectionHeader)
+
+			Text(subtitle)
+				.font(.app.body2Header)
+
+			ForEach(factors) { factor in
+				VStack {
+					HPair(label: "kind", item: factor.kind.rawValue)
+					HPair(label: "last used", item: factor.lastUsedOn.ISO8601Format())
+					Button("Remove factor", action: { removeFactorAction(factor.id) })
+						.buttonStyle(.secondaryRectangular(isDestructive: true))
+				}
+			}
+
+			Button("Add \(title) factor", action: addFactorAction)
+				.buttonStyle(.borderedProminent)
 		}
 	}
 }

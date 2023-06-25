@@ -67,6 +67,7 @@ public struct FactorsForRole: Sendable, FeatureReducer {
 //		public let supportedFactorSources: IdentifiedArrayOf<FactorSource>
 		public var threshold: UInt? = nil
 		public var thresholdFactorSources: IdentifiedArrayOf<FactorSource> = []
+		public var adminFactorSources: IdentifiedArrayOf<FactorSource> = []
 
 		public init(
 			//			allFactorSources: some Collection<FactorSource>,
@@ -78,18 +79,18 @@ public struct FactorsForRole: Sendable, FeatureReducer {
 	}
 
 	public enum ViewAction: Sendable, Equatable {
-		case appeared
+		case addAdminFactor
+		case removeAdminFactor(FactorSourceID)
+		case addThresholdFactor
+		case removeThresholdFactor(FactorSourceID)
+
 		case thresholdChanged(String)
-		case setFactorsButtonTapped
 	}
 
 	public init() {}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
-		case .appeared:
-			return .none
-
 		case let .thresholdChanged(thresholdString):
 			guard let threshold = UInt(thresholdString) else {
 				return .none
@@ -97,8 +98,20 @@ public struct FactorsForRole: Sendable, FeatureReducer {
 			state.threshold = threshold
 			return .none
 
-		case .setFactorsButtonTapped:
-			debugPrint("Set factors tapped")
+		case .addThresholdFactor:
+			print("add threshold factor")
+			return .none
+
+		case let .removeAdminFactor(factorSourceID):
+			print("factor admin id: \(factorSourceID)")
+			return .none
+
+		case let .removeThresholdFactor(factorSourceID):
+			print("remove threshold factor id: \(factorSourceID)")
+			return .none
+
+		case .addAdminFactor:
+			print("add admin factor")
 			return .none
 		}
 	}
