@@ -17,6 +17,10 @@ public struct TransactionReviewDappsUsed: Sendable, FeatureReducer {
 		case dappTapped(TransactionReview.LedgerEntity.ID)
 	}
 
+	public enum DelegateAction: Sendable, Equatable {
+		case openDapp(TransactionReview.LedgerEntity.ID)
+	}
+
 	public init() {}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
@@ -26,7 +30,7 @@ public struct TransactionReviewDappsUsed: Sendable, FeatureReducer {
 			return .none
 
 		case let .dappTapped(id):
-			return .none
+			return .send(.delegate(.openDapp(id)))
 		}
 	}
 }

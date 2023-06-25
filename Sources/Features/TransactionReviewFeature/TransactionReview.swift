@@ -93,6 +93,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		case rawTransactionCreated(String)
 		case addGuaranteeToManifestResult(TaskResult<TransactionManifest>)
 		case prepareForSigningResult(TaskResult<TransactionClient.PrepareForSiginingResponse>)
+		case loadedDapp(TaskResult<Profile.Network.AuthorizedDappDetailed>)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -138,6 +139,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		}
 	}
 
+	@Dependency(\.authorizedDappsClient) var authorizedDappsClient
 	@Dependency(\.transactionClient) var transactionClient
 	@Dependency(\.gatewayAPIClient) var gatewayAPIClient
 	@Dependency(\.accountsClient) var accountsClient
@@ -226,13 +228,14 @@ public struct TransactionReview: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
 		case let .dAppsUsed(.delegate(.openDapp(id))):
+			return .run { _ in
+//				let result = await TaskResult {
+//					try await authorizedDappsClient.getDetailedDapp(id)
+//				}
+//				await send(.internal(.loadedDapp(result)))
+			}
+
 			print("OPEN id", id)
-			state.destination = .dApp(.init(
-				dApp: { fatalError() }(), // Profile.Network.AuthorizedDappDetailed
-				metadata: nil as GatewayAPI.EntityMetadataCollection?,
-				resources: nil as SimpleDappDetails.State.Resources?,
-				associatedDapps: nil as [SimpleDappDetails.State.AssociatedDapp]?
-			))
 			return .none
 
 		case .deposits(.delegate(.showCustomizeGuarantees)):
@@ -353,7 +356,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		case .submitting:
 			return .none
 
-		case let .dApp(ddd):
+		case .dApp:
 			return .none
 		}
 	}
@@ -490,6 +493,20 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			return .none
 		case let .prepareForSigningResult(.failure(error)):
 			errorQueue.schedule(error)
+			return .none
+
+		case let .loadedDapp(result):
+			switch result {
+			case let .success(dApp):
+				state.destination = .dApp(.init(
+					dApp: dApp,
+					metadata: nil as GatewayAPI.EntityMetadataCollection?,
+					resources: nil as SimpleDappDetails.State.Resources?,
+					associatedDapps: nil as [SimpleDappDetails.State.AssociatedDapp]?
+				))
+			case let .failure(error):
+				break
+			}
 			return .none
 		}
 	}
