@@ -28,7 +28,7 @@ public struct RoleWithFactors: Sendable, Hashable {
 public struct FactorsForRole: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public var role: SecurityStructureRole
-		public var threshold: UInt? = nil
+		public var threshold: UInt? = 0
 		public var thresholdFactorSources: IdentifiedArrayOf<FactorSource> = []
 		public var adminFactorSources: IdentifiedArrayOf<FactorSource> = []
 

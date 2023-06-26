@@ -23,7 +23,7 @@ extension FactorsForRole {
 			if !thresholdFactors.isEmpty {
 				guard
 					let thresholdInt = Int(threshold),
-					thresholdInt >= thresholdFactors.count
+					thresholdInt <= thresholdFactors.count
 				else {
 					return nil
 				}
