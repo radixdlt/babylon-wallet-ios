@@ -56,8 +56,6 @@ public struct RoleOfTier<AbstractFactor>:
 	where
 	AbstractFactor: FactorOfTierProtocol & Sendable & Hashable & Codable
 {
-	public let role: SecurityStructureRole
-
 	/// Factors which are used in combination with other instances, amounting to at
 	/// least `threshold` many instances to perform some function with this role.
 	public var thresholdFactors: OrderedSet<AbstractFactor>
@@ -88,22 +86,27 @@ public struct RoleOfTier<AbstractFactor>:
 			throw RoleOfTierError.factorSharedBetweenThresholdFactorsAndAdminFactors
 		}
 
-		self.role = role
 		self.thresholdFactors = thresholdFactors
 		self.threshold = threshold
 		self.superAdminFactors = superAdminFactors
+	}
+
+	internal init(
+		uncheckedThresholdFactors thresholdFactors: OrderedSet<AbstractFactor>,
+		superAdminFactors: OrderedSet<AbstractFactor>,
+		threshold: UInt
+	) {
+		precondition(threshold <= thresholdFactors.count)
+		self.thresholdFactors = thresholdFactors
+		self.superAdminFactors = superAdminFactors
+		self.threshold = threshold
 	}
 
 	public static func single(
 		_ factor: AbstractFactor,
 		for role: SecurityStructureRole
 	) -> Self {
-		try! .init(
-			role: role,
-			thresholdFactors: [factor],
-			threshold: 1,
-			superAdminFactors: []
-		)
+		self.init(uncheckedThresholdFactors: [factor], superAdminFactors: [], threshold: 1)
 	}
 }
 
@@ -312,10 +315,9 @@ extension Profile {
 		}
 
 		return try .init(
-			role: reference.role,
-			thresholdFactors: .init(validating: reference.thresholdFactors.map(lookup(id:))),
-			threshold: reference.threshold,
-			superAdminFactors: .init(validating: reference.superAdminFactors.map(lookup(id:)))
+			uncheckedThresholdFactors: .init(validating: reference.thresholdFactors.map(lookup(id:))),
+			superAdminFactors: .init(validating: reference.superAdminFactors.map(lookup(id:))),
+			threshold: reference.threshold
 		)
 	}
 }
@@ -353,10 +355,9 @@ extension RoleOfTier where AbstractFactor == FactorSourceID {
 extension RoleOfTier where AbstractFactor == FactorSource {
 	public func asReference() -> RoleOfTier<FactorSourceID> {
 		try! .init(
-			role: role,
-			thresholdFactors: .init(validating: thresholdFactors.map(\.id)),
-			threshold: threshold,
-			superAdminFactors: .init(validating: superAdminFactors.map(\.id))
+			uncheckedThresholdFactors: .init(validating: thresholdFactors.map(\.id)),
+			superAdminFactors: .init(validating: superAdminFactors.map(\.id)),
+			threshold: threshold
 		)
 	}
 
@@ -423,11 +424,10 @@ public struct Securified: Sendable, Hashable, Codable {
 				return factorInstance
 			}
 
-			return try .init(
-				role: roleWithfactorInstanceIDs.role,
-				thresholdFactors: .init(uncheckedUniqueElements: roleWithfactorInstanceIDs.thresholdFactors.map(lookup(id:))),
-				threshold: roleWithfactorInstanceIDs.threshold,
-				superAdminFactors: .init(uncheckedUniqueElements: roleWithfactorInstanceIDs.superAdminFactors.map(lookup(id:)))
+			return .init(
+				uncheckedThresholdFactors: .init(uncheckedUniqueElements: roleWithfactorInstanceIDs.thresholdFactors.map(lookup(id:))),
+				superAdminFactors: .init(uncheckedUniqueElements: roleWithfactorInstanceIDs.superAdminFactors.map(lookup(id:))),
+				threshold: roleWithfactorInstanceIDs.threshold
 			)
 		}
 

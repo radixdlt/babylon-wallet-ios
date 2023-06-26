@@ -19,7 +19,7 @@ extension FactorsForRole {
 		let thresholdFactors: [FactorSource]
 		let adminFactors: [FactorSource]
 
-		var roleWithFactors: RoleOfTier<FactorSource>? {
+		var roleWithFactors: RoleWithFactors? {
 			if !thresholdFactors.isEmpty {
 				guard
 					let thresholdInt = Int(threshold),
@@ -27,19 +27,25 @@ extension FactorsForRole {
 				else {
 					return nil
 				}
-				return try? .init(
+				guard let factors = try? RoleOfTier<FactorSource>(
 					role: role,
 					thresholdFactors: .init(validating: thresholdFactors),
 					threshold: .init(thresholdInt),
 					superAdminFactors: .init(validating: adminFactors)
-				)
+				) else {
+					return nil
+				}
+				return .init(role: role, factors: factors)
 			} else {
-				return try? .init(
+				guard let factors = try? RoleOfTier<FactorSource>(
 					role: role,
 					thresholdFactors: [],
 					threshold: 0,
 					superAdminFactors: .init(validating: adminFactors)
-				)
+				) else {
+					return nil
+				}
+				return .init(role: role, factors: factors)
 			}
 		}
 
@@ -107,7 +113,7 @@ extension FactorsForRole {
 				.footer {
 					WithControlRequirements(
 						viewStore.roleWithFactors,
-						forAction: { viewStore.send(.confirmedFactorsForRole($0)) }
+						forAction: { viewStore.send(.confirmedRoleWithFactors($0)) }
 					) { action in
 						// FIXME: strings
 						Button("Confirm", action: action)

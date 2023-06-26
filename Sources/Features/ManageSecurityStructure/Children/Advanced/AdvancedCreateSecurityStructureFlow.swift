@@ -88,14 +88,14 @@ public struct AdvancedManageSecurityStructureFlow: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
-		case let .destination(.presented(.factorsForRole(.delegate(.confirmedFactorsForRole(factorsForRole))))):
-			switch factorsForRole.role {
+		case let .destination(.presented(.factorsForRole(.delegate(.confirmedRoleWithFactors(roleWithFactors))))):
+			switch roleWithFactors.role {
 			case .confirmation:
-				state.confirmationRole = factorsForRole
+				state.confirmationRole = roleWithFactors.factors
 			case .primary:
-				state.primaryRole = factorsForRole
+				state.primaryRole = roleWithFactors.factors
 			case .recovery:
-				state.recoveryRole = factorsForRole
+				state.recoveryRole = roleWithFactors.factors
 			}
 			state.destination = nil
 			return .none

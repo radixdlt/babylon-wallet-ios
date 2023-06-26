@@ -10,6 +10,20 @@ extension Collection<FactorSource> {
 	}
 }
 
+// MARK: - RoleWithFactors
+public struct RoleWithFactors: Sendable, Hashable {
+	public let role: SecurityStructureRole
+	public let factors: RoleOfTier<FactorSource>
+
+	public init(
+		role: SecurityStructureRole,
+		factors: RoleOfTier<FactorSource>
+	) {
+		self.role = role
+		self.factors = factors
+	}
+}
+
 // MARK: - FactorsForRole
 public struct FactorsForRole: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
@@ -35,7 +49,7 @@ public struct FactorsForRole: Sendable, FeatureReducer {
 		case removeThresholdFactor(FactorSourceID)
 
 		case thresholdChanged(String)
-		case confirmedFactorsForRole(RoleOfTier<FactorSource>)
+		case confirmedRoleWithFactors(RoleWithFactors)
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -43,7 +57,7 @@ public struct FactorsForRole: Sendable, FeatureReducer {
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
-		case confirmedFactorsForRole(RoleOfTier<FactorSource>)
+		case confirmedRoleWithFactors(RoleWithFactors)
 	}
 
 	public struct Destinations: Sendable, ReducerProtocol {
@@ -103,8 +117,8 @@ public struct FactorsForRole: Sendable, FeatureReducer {
 			state.destination = .addAdminFactor(.init())
 			return .none
 
-		case let .confirmedFactorsForRole(roleWithFactors):
-			return .send(.delegate(.confirmedFactorsForRole(roleWithFactors)))
+		case let .confirmedRoleWithFactors(roleWithFactors):
+			return .send(.delegate(.confirmedRoleWithFactors(roleWithFactors)))
 		}
 	}
 
