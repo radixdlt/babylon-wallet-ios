@@ -23,6 +23,9 @@ extension AdvancedManageSecurityStructureFlow {
 		let mode: Mode
 
 		let numberOfDaysUntilAutoConfirmation: String
+		let primaryRole: AdvancedManageSecurityStructureFlow.State.Role?
+		let recoveryRole: AdvancedManageSecurityStructureFlow.State.Role?
+		let confirmationRole: AdvancedManageSecurityStructureFlow.State.Role?
 
 		let config: SecurityStructureConfigurationDetailed.Configuration?
 
@@ -38,6 +41,9 @@ extension AdvancedManageSecurityStructureFlow {
 			self.numberOfDaysUntilAutoConfirmation = state.numberOfDaysUntilAutoConfirmation.description
 			self.mode = state.existing == nil ? .new : .existing
 			self.config = state.config
+			self.primaryRole = state.primaryRole
+			self.recoveryRole = state.recoveryRole
+			self.confirmationRole = state.confirmationRole
 		}
 	}
 
@@ -53,15 +59,24 @@ extension AdvancedManageSecurityStructureFlow {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				ScrollView {
 					VStack {
-						FactorsForRoleButton(role: .primary) {
+						FactorsForRoleButton(
+							role: .primary,
+							roleOfTier: viewStore.primaryRole
+						) {
 							viewStore.send(.primaryRoleButtonTapped)
 						}
 
-						FactorsForRoleButton(role: .recovery) {
+						FactorsForRoleButton(
+							role: .recovery,
+							roleOfTier: viewStore.recoveryRole
+						) {
 							viewStore.send(.recoveryRoleButtonTapped)
 						}
 
-						FactorsForRoleButton(role: .confirmation) {
+						FactorsForRoleButton(
+							role: .confirmation,
+							roleOfTier: viewStore.confirmationRole
+						) {
 							viewStore.send(.confirmationRoleButtonTapped)
 						}
 
@@ -128,14 +143,33 @@ extension RoleOfTier {
 // MARK: - FactorsForRoleButton
 struct FactorsForRoleButton: SwiftUI.View {
 	let role: SecurityStructureRole
+	let roleOfTier: AdvancedManageSecurityStructureFlow.State.Role?
 	let action: () -> Void
 
 	init(
 		role: SecurityStructureRole,
+		roleOfTier: AdvancedManageSecurityStructureFlow.State.Role?,
 		action: @escaping () -> Void
 	) {
 		self.role = role
+		self.roleOfTier = roleOfTier
 		self.action = action
+	}
+
+	var buttonTitle: LocalizedStringKey {
+		let none: LocalizedStringKey = "None set"
+		guard
+			let roleOfTier
+		else {
+			return none
+		}
+
+		switch (roleOfTier.superAdminFactors.isEmpty, roleOfTier.thresholdFactors.isEmpty) {
+		case (true, true): return none
+		case (false, false): return "Threshold & admin factors set"
+		case (true, false): return "\(roleOfTier.thresholdFactors.count) threshold factors set"
+		case (false, true): return "\(roleOfTier.superAdminFactors.count) admin factors set"
+		}
 	}
 
 	var body: some View {
@@ -149,8 +183,7 @@ struct FactorsForRoleButton: SwiftUI.View {
 
 			Button(action: action) {
 				HStack {
-					// FIXME: Strings
-					Text("None set")
+					Text(buttonTitle)
 						.font(.app.body1Header)
 
 					Spacer(minLength: 0)
