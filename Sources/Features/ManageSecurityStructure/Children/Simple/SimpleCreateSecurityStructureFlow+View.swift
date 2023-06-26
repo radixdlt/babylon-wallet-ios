@@ -15,6 +15,12 @@ public struct RecoveryAndConfirmationFactors: Sendable, Hashable {
 	let singleConfirmationFactor: SecurityQuestionsFactorSource
 }
 
+// FIXME: strings
+public let numberOfDaysUntilAutoConfirmationTitlePlaceholder = "Days until auto confirm"
+public let numberOfDaysUntilAutoConfirmationSecondary = "Integer"
+public let numberOfDaysUntilAutoConfirmationErrorNotInt = "Not and integer"
+public let numberOfDaysUntilAutoConfirmationHintInfo = "The phone confirmer is only needed if you want to skip waiting the number of specified days."
+
 // MARK: - SimpleManageSecurityStructureFlow.View
 extension SimpleManageSecurityStructureFlow {
 	public struct ViewState: Equatable {
@@ -44,10 +50,11 @@ extension SimpleManageSecurityStructureFlow {
 		}
 
 		var numberOfDaysUntilAutoConfirmationHint: Hint? {
+			// FIXME: strings
 			guard let _ = RecoveryAutoConfirmDelayInDays.RawValue(numberOfDaysUntilAutoConfirmation) else {
-				return .error("Not an integer")
+				return .error(numberOfDaysUntilAutoConfirmationErrorNotInt)
 			}
-			return .info("The phone confirmer is only needed if you want to skip waiting the number of specified days.")
+			return .info(numberOfDaysUntilAutoConfirmationHintInfo)
 		}
 
 		init(state: SimpleManageSecurityStructureFlow.State) {
@@ -86,9 +93,9 @@ extension SimpleManageSecurityStructureFlow {
 						}
 
 						AppTextField(
-							primaryHeading: "Days until auto confirm",
-							secondaryHeading: "Integer",
-							placeholder: "Days until auto confirm",
+							primaryHeading: .init(text: numberOfDaysUntilAutoConfirmationTitlePlaceholder),
+							secondaryHeading: numberOfDaysUntilAutoConfirmationSecondary,
+							placeholder: numberOfDaysUntilAutoConfirmationTitlePlaceholder,
 							text: viewStore.binding(
 								get: \.numberOfDaysUntilAutoConfirmation,
 								send: { .changedNumberOfDaysUntilAutoConfirmation($0) }

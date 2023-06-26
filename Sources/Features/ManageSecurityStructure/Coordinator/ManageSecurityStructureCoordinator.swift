@@ -2,6 +2,12 @@ import AppPreferencesClient
 import FeaturePrelude
 import Profile
 
+// MARK: - SecurityStructureProduct
+public enum SecurityStructureProduct: Sendable, Equatable {
+	case updating(structure: SecurityStructureConfigurationDetailed)
+	case creatingNew(config: SecurityStructureConfigurationDetailed.Configuration)
+}
+
 // MARK: - ManageSecurityStructureCoordinator
 public struct ManageSecurityStructureCoordinator: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
@@ -106,20 +112,13 @@ public struct ManageSecurityStructureCoordinator: Sendable, FeatureReducer {
 			let .path(.element(_, action: .simpleSetupFlow(.delegate(.updatedOrCreatedSecurityStructure(simpleFlowResult))))),
 			let .root(.simpleSetupFlow(.delegate(.updatedOrCreatedSecurityStructure(simpleFlowResult)))):
 
-			switch simpleFlowResult {
-			case let .success(product):
-				switch product {
-				case let .creatingNew(newConfig):
-					state.path.append(.nameStructure(.name(new: newConfig)))
-				case let .updating(existingStructure):
-					state.path.append(.nameStructure(.updateName(of: existingStructure)))
-				}
-			case let .failure(error):
-				loggerGlobal.error("Failed to create simple security structure, error: \(error)")
-				errorQueue.schedule(error)
-			}
+			return updatedOrCreatedSecurityStructure(result: simpleFlowResult, &state)
 
-			return .none
+		case
+			let .path(.element(_, action: .advancedSetupFlow(.delegate(.updatedOrCreatedSecurityStructure(advancedFlowResult))))),
+			let .root(.advancedSetupFlow(.delegate(.updatedOrCreatedSecurityStructure(advancedFlowResult)))):
+
+			return updatedOrCreatedSecurityStructure(result: advancedFlowResult, &state)
 
 		case let .path(.element(_, action: .nameStructure(.delegate(.updateOrCreateSecurityStructure(structure))))):
 
@@ -137,5 +136,22 @@ public struct ManageSecurityStructureCoordinator: Sendable, FeatureReducer {
 
 		default: return .none
 		}
+	}
+
+	func updatedOrCreatedSecurityStructure(result: TaskResult<SecurityStructureProduct>, _ state: inout State) -> EffectTask<Action> {
+		switch result {
+		case let .success(product):
+			switch product {
+			case let .creatingNew(newConfig):
+				state.path.append(.nameStructure(.name(new: newConfig)))
+			case let .updating(existingStructure):
+				state.path.append(.nameStructure(.updateName(of: existingStructure)))
+			}
+		case let .failure(error):
+			loggerGlobal.error("Failed to create simple security structure, error: \(error)")
+			errorQueue.schedule(error)
+		}
+
+		return .none
 	}
 }

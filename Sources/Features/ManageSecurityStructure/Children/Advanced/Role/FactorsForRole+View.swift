@@ -99,7 +99,6 @@ extension FactorsForRole {
 						// FIXME: strings
 						AppTextField(
 							primaryHeading: "Threshold",
-							secondaryHeading: "Greater than zero",
 							placeholder: "Threshold",
 							text: viewStore.binding(
 								get: \.threshold,

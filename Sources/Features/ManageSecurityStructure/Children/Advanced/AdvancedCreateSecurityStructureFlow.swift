@@ -11,9 +11,12 @@ public struct AdvancedManageSecurityStructureFlow: Sendable, FeatureReducer {
 		public let existing: SecurityStructureConfigurationDetailed?
 
 		public typealias Role = SecurityStructureConfigurationDetailed.Configuration.Role
-		public var primaryRole: Role
-		public var recoveryRole: Role
-		public var confirmationRole: Role
+		public var primaryRole: Role? = nil
+		public var recoveryRole: Role? = nil
+		public var confirmationRole: Role? = nil
+		public var numberOfDaysUntilAutoConfirmation: RecoveryAutoConfirmDelayInDays
+
+		public var config: SecurityStructureConfigurationDetailed.Configuration?
 
 		@PresentationState
 		var destination: Destinations.State? = nil
@@ -26,11 +29,10 @@ public struct AdvancedManageSecurityStructureFlow: Sendable, FeatureReducer {
 				self.primaryRole = config.primaryRole
 				self.recoveryRole = config.recoveryRole
 				self.confirmationRole = config.confirmationRole
+				self.numberOfDaysUntilAutoConfirmation = config.numberOfDaysUntilAutoConfirmation
 			case .new:
 				self.existing = nil
-				self.primaryRole = .init(role: .primary)
-				self.recoveryRole = .init(role: .recovery)
-				self.confirmationRole = .init(role: .confirmation)
+				self.numberOfDaysUntilAutoConfirmation = SecurityStructureConfigurationReference.Configuration.Role.defaultNumberOfDaysUntilAutoConfirmation
 			}
 		}
 	}
@@ -55,10 +57,17 @@ public struct AdvancedManageSecurityStructureFlow: Sendable, FeatureReducer {
 		case primaryRoleButtonTapped
 		case recoveryRoleButtonTapped
 		case confirmationRoleButtonTapped
+
+		case changedNumberOfDaysUntilAutoConfirmation(String)
+		case finished(SecurityStructureConfigurationDetailed.Configuration)
 	}
 
 	public enum ChildAction: Sendable, Equatable {
 		case destination(PresentationAction<Destinations.Action>)
+	}
+
+	public enum DelegateAction: Sendable, Equatable {
+		case updatedOrCreatedSecurityStructure(TaskResult<SecurityStructureProduct>)
 	}
 
 	public init() {}
@@ -72,6 +81,18 @@ public struct AdvancedManageSecurityStructureFlow: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
+		case let .changedNumberOfDaysUntilAutoConfirmation(delayAsString):
+
+			guard
+				let raw = RecoveryAutoConfirmDelayInDays.RawValue(delayAsString)
+			else {
+				return .none
+			}
+			let delay = RecoveryAutoConfirmDelayInDays(rawValue: raw)
+			state.numberOfDaysUntilAutoConfirmation = delay
+			createConfigIfAble(&state)
+			return .none
+
 		case .primaryRoleButtonTapped:
 			state.destination = .factorsForRole(.init(role: .primary))
 			return .none
@@ -83,6 +104,15 @@ public struct AdvancedManageSecurityStructureFlow: Sendable, FeatureReducer {
 		case .confirmationRoleButtonTapped:
 			state.destination = .factorsForRole(.init(role: .confirmation))
 			return .none
+
+		case let .finished(config):
+			assert(config == state.config)
+			if var structureToUpdate = state.existing {
+				structureToUpdate.configuration = config
+				return .send(.delegate(.updatedOrCreatedSecurityStructure(.success(.updating(structure: structureToUpdate)))))
+			} else {
+				return .send(.delegate(.updatedOrCreatedSecurityStructure(.success(.creatingNew(config: config)))))
+			}
 		}
 	}
 
@@ -98,11 +128,29 @@ public struct AdvancedManageSecurityStructureFlow: Sendable, FeatureReducer {
 				state.recoveryRole = roleWithFactors.factors
 			}
 			state.destination = nil
+			createConfigIfAble(&state)
 			return .none
 
 		default:
 			return .none
 		}
+	}
+
+	func createConfigIfAble(_ state: inout State) {
+		guard
+			let primary = state.primaryRole,
+			let recovery = state.recoveryRole,
+			let confirmation = state.confirmationRole
+		else {
+			return
+		}
+
+		state.config = .init(
+			numberOfDaysUntilAutoConfirmation: state.numberOfDaysUntilAutoConfirmation,
+			primaryRole: primary,
+			recoveryRole: recovery,
+			confirmationRole: confirmation
+		)
 	}
 }
 

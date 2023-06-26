@@ -1,7 +1,46 @@
 import FeaturePrelude
 
+extension AdvancedManageSecurityStructureFlow.State {
+	var viewState: AdvancedManageSecurityStructureFlow.ViewState {
+		.init(state: self)
+	}
+}
+
 // MARK: - AdvancedManageSecurityStructureFlow.View
 extension AdvancedManageSecurityStructureFlow {
+	public struct ViewState: Equatable {
+		public enum Mode: Equatable {
+			case new
+			case existing
+			var isExisting: Bool {
+				guard case .existing = self else {
+					return false
+				}
+				return true
+			}
+		}
+
+		let mode: Mode
+
+		let numberOfDaysUntilAutoConfirmation: String
+
+		let config: SecurityStructureConfigurationDetailed.Configuration?
+
+		var numberOfDaysUntilAutoConfirmationHint: Hint? {
+			// FIXME: strings
+			guard let _ = RecoveryAutoConfirmDelayInDays.RawValue(numberOfDaysUntilAutoConfirmation) else {
+				return .error(numberOfDaysUntilAutoConfirmationErrorNotInt)
+			}
+			return .info(numberOfDaysUntilAutoConfirmationHintInfo)
+		}
+
+		init(state: AdvancedManageSecurityStructureFlow.State) {
+			self.numberOfDaysUntilAutoConfirmation = state.numberOfDaysUntilAutoConfirmation.description
+			self.mode = state.existing == nil ? .new : .existing
+			self.config = state.config
+		}
+	}
+
 	@MainActor
 	public struct View: SwiftUI.View {
 		private let store: StoreOf<AdvancedManageSecurityStructureFlow>
@@ -11,7 +50,7 @@ extension AdvancedManageSecurityStructureFlow {
 		}
 
 		public var body: some SwiftUI.View {
-			WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
+			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				ScrollView {
 					VStack {
 						FactorsForRoleButton(role: .primary) {
@@ -25,10 +64,38 @@ extension AdvancedManageSecurityStructureFlow {
 						FactorsForRoleButton(role: .confirmation) {
 							viewStore.send(.confirmationRoleButtonTapped)
 						}
+
+						AppTextField(
+							primaryHeading: .init(text: numberOfDaysUntilAutoConfirmationTitlePlaceholder),
+							secondaryHeading: numberOfDaysUntilAutoConfirmationSecondary,
+							placeholder: numberOfDaysUntilAutoConfirmationTitlePlaceholder,
+							text: viewStore.binding(
+								get: \.numberOfDaysUntilAutoConfirmation,
+								send: { .changedNumberOfDaysUntilAutoConfirmation($0) }
+							),
+							hint: viewStore.numberOfDaysUntilAutoConfirmationHint,
+							showClearButton: false
+						)
+						.keyboardType(.numberPad)
+						.padding()
 					}
 					.padding()
-					.destinations(store: store)
 				}
+				.footer {
+					WithControlRequirements(
+						viewStore.config,
+						forAction: { config in
+							viewStore.send(.finished(config))
+						},
+						control: { action in
+							// FIXME: Strings
+							let title = viewStore.mode.isExisting ? "Update setup" : "Create new setup"
+							Button(title, action: action)
+								.buttonStyle(.primaryRectangular)
+						}
+					)
+				}
+				.destinations(store: store)
 			}
 		}
 	}

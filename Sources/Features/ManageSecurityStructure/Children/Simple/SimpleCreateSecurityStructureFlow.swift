@@ -48,12 +48,7 @@ public struct SimpleManageSecurityStructureFlow: Sendable, FeatureReducer {
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
-		public enum Product: Sendable, Equatable {
-			case updating(structure: SecurityStructureConfigurationDetailed)
-			case creatingNew(config: SecurityStructureConfigurationDetailed.Configuration)
-		}
-
-		case updatedOrCreatedSecurityStructure(TaskResult<Product>)
+		case updatedOrCreatedSecurityStructure(TaskResult<SecurityStructureProduct>)
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -204,7 +199,7 @@ public struct SimpleManageSecurityStructureFlow: Sendable, FeatureReducer {
 				precondition(new.confirmerOfNewPhone == simpleFactorConfig.singleConfirmationFactor)
 
 				return .task {
-					let taskResult = await TaskResult {
+					let taskResult = await TaskResult { () async throws -> SecurityStructureProduct in
 						let primary = try await factorSourcesClient.getFactorSources(type: DeviceFactorSource.self).filter {
 							!$0.supportsOlympia
 						}.first!
@@ -215,7 +210,7 @@ public struct SimpleManageSecurityStructureFlow: Sendable, FeatureReducer {
 							recoveryRole: .single(simpleFactorConfig.singleRecoveryFactor, for: .recovery),
 							confirmationRole: .single(simpleFactorConfig.singleConfirmationFactor, for: .confirmation)
 						)
-						return Self.DelegateAction.Product.creatingNew(config: config)
+						return .creatingNew(config: config)
 					}
 					return .delegate(.updatedOrCreatedSecurityStructure(taskResult))
 				}
