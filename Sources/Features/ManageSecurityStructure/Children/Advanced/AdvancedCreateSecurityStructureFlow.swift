@@ -11,12 +11,10 @@ public struct AdvancedManageSecurityStructureFlow: Sendable, FeatureReducer {
 		public let existing: SecurityStructureConfigurationDetailed?
 
 		public typealias Role = SecurityStructureConfigurationDetailed.Configuration.Role
-		public var primaryRole: Role? = nil
-		public var recoveryRole: Role? = nil
-		public var confirmationRole: Role? = nil
+		public var primaryRole: Role?
+		public var recoveryRole: Role?
+		public var confirmationRole: Role?
 		public var numberOfDaysUntilAutoConfirmation: RecoveryAutoConfirmDelayInDays
-
-		public var config: SecurityStructureConfigurationDetailed.Configuration?
 
 		@PresentationState
 		var destination: Destinations.State? = nil
@@ -33,6 +31,9 @@ public struct AdvancedManageSecurityStructureFlow: Sendable, FeatureReducer {
 			case .new:
 				self.existing = nil
 				self.numberOfDaysUntilAutoConfirmation = SecurityStructureConfigurationReference.Configuration.Role.defaultNumberOfDaysUntilAutoConfirmation
+				self.primaryRole = nil
+				self.recoveryRole = nil
+				self.confirmationRole = nil
 			}
 		}
 	}
@@ -90,7 +91,6 @@ public struct AdvancedManageSecurityStructureFlow: Sendable, FeatureReducer {
 			}
 			let delay = RecoveryAutoConfirmDelayInDays(rawValue: raw)
 			state.numberOfDaysUntilAutoConfirmation = delay
-			createConfigIfAble(&state)
 			return .none
 
 		case .primaryRoleButtonTapped:
@@ -106,7 +106,6 @@ public struct AdvancedManageSecurityStructureFlow: Sendable, FeatureReducer {
 			return .none
 
 		case let .finished(config):
-			assert(config == state.config)
 			if var structureToUpdate = state.existing {
 				structureToUpdate.configuration = config
 				return .send(.delegate(.updatedOrCreatedSecurityStructure(.success(.updating(structure: structureToUpdate)))))
@@ -128,39 +127,10 @@ public struct AdvancedManageSecurityStructureFlow: Sendable, FeatureReducer {
 				state.recoveryRole = roleWithFactors.factors
 			}
 			state.destination = nil
-			createConfigIfAble(&state)
 			return .none
 
 		default:
 			return .none
 		}
-	}
-
-	func createConfigIfAble(_ state: inout State) {
-		guard
-			let primary = state.primaryRole,
-			let recovery = state.recoveryRole,
-			let confirmation = state.confirmationRole
-		else {
-			return
-		}
-
-		state.config = .init(
-			numberOfDaysUntilAutoConfirmation: state.numberOfDaysUntilAutoConfirmation,
-			primaryRole: primary,
-			recoveryRole: recovery,
-			confirmationRole: confirmation
-		)
-	}
-}
-
-extension RoleOfTier {
-	public init(role: SecurityStructureRole) {
-		try! self.init(
-			role: role,
-			thresholdFactors: .init(),
-			threshold: 0,
-			superAdminFactors: .init()
-		)
 	}
 }

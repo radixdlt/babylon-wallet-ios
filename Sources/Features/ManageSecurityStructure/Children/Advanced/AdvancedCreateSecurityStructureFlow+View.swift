@@ -22,28 +22,50 @@ extension AdvancedManageSecurityStructureFlow {
 
 		let mode: Mode
 
-		let numberOfDaysUntilAutoConfirmation: String
+		let numberOfDaysUntilAutoConfirmationString: String
 		let primaryRole: AdvancedManageSecurityStructureFlow.State.Role?
 		let recoveryRole: AdvancedManageSecurityStructureFlow.State.Role?
 		let confirmationRole: AdvancedManageSecurityStructureFlow.State.Role?
 
-		let config: SecurityStructureConfigurationDetailed.Configuration?
-
 		var numberOfDaysUntilAutoConfirmationHint: Hint? {
 			// FIXME: strings
-			guard let _ = RecoveryAutoConfirmDelayInDays.RawValue(numberOfDaysUntilAutoConfirmation) else {
+			guard let _ = numberOfDaysUntilAutoConfirmation else {
 				return .error(numberOfDaysUntilAutoConfirmationErrorNotInt)
 			}
 			return .info(numberOfDaysUntilAutoConfirmationHintInfo)
 		}
 
 		init(state: AdvancedManageSecurityStructureFlow.State) {
-			self.numberOfDaysUntilAutoConfirmation = state.numberOfDaysUntilAutoConfirmation.description
+			self.numberOfDaysUntilAutoConfirmationString = state.numberOfDaysUntilAutoConfirmation.description
 			self.mode = state.existing == nil ? .new : .existing
-			self.config = state.config
 			self.primaryRole = state.primaryRole
 			self.recoveryRole = state.recoveryRole
 			self.confirmationRole = state.confirmationRole
+		}
+
+		var numberOfDaysUntilAutoConfirmation: RecoveryAutoConfirmDelayInDays? {
+			guard let rawValue = RecoveryAutoConfirmDelayInDays.RawValue(numberOfDaysUntilAutoConfirmationString) else {
+				return nil
+			}
+			return .init(rawValue: rawValue)
+		}
+
+		var config: SecurityStructureConfigurationDetailed.Configuration? {
+			guard
+				let primary = primaryRole,
+				let recovery = recoveryRole,
+				let confirmation = confirmationRole,
+				let numberOfDaysUntilAutoConfirmation
+			else {
+				return nil
+			}
+
+			return .init(
+				numberOfDaysUntilAutoConfirmation: numberOfDaysUntilAutoConfirmation,
+				primaryRole: primary,
+				recoveryRole: recovery,
+				confirmationRole: confirmation
+			)
 		}
 	}
 
@@ -85,7 +107,7 @@ extension AdvancedManageSecurityStructureFlow {
 							secondaryHeading: numberOfDaysUntilAutoConfirmationSecondary,
 							placeholder: numberOfDaysUntilAutoConfirmationTitlePlaceholder,
 							text: viewStore.binding(
-								get: \.numberOfDaysUntilAutoConfirmation,
+								get: \.numberOfDaysUntilAutoConfirmationString,
 								send: { .changedNumberOfDaysUntilAutoConfirmation($0) }
 							),
 							hint: viewStore.numberOfDaysUntilAutoConfirmationHint,
