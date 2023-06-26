@@ -335,7 +335,6 @@ package.addModules([
 			"EditPersonaFeature",
 			"CreateAuthKeyFeature",
 			"GatewayAPI",
-			"TransactionReviewFeature",
 		],
 		tests: .no
 	),

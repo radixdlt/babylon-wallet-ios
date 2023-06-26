@@ -220,6 +220,7 @@ extension View {
 	fileprivate func destinations(with store: StoreOf<TransactionReview>) -> some View {
 		let destinationStore = store.scope(state: \.$destination, action: { .child(.destination($0)) })
 		return customizeGuarantees(with: destinationStore)
+			.dApp(with: destinationStore)
 			.selectFeePayer(with: destinationStore)
 			.signing(with: destinationStore)
 			.submitting(with: destinationStore)
@@ -232,6 +233,16 @@ extension View {
 			state: /TransactionReview.Destinations.State.customizeGuarantees,
 			action: TransactionReview.Destinations.Action.customizeGuarantees,
 			content: { TransactionReviewGuarantees.View(store: $0) }
+		)
+	}
+
+	@MainActor
+	private func dApp(with destinationStore: PresentationStoreOf<TransactionReview.Destinations>) -> some View {
+		sheet(
+			store: destinationStore,
+			state: /TransactionReview.Destinations.State.dApp,
+			action: TransactionReview.Destinations.Action.dApp,
+			content: { SimpleDappDetails.View(store: $0) }
 		)
 	}
 
@@ -436,13 +447,6 @@ extension SimpleDappDetails {
 		let fungibles: [State.Resources.ResourceDetails]?
 		let nonFungibles: [State.Resources.ResourceDetails]?
 		let associatedDapps: [State.AssociatedDapp]?
-		let personas: [Persona]
-	}
-
-	public struct Persona: Sendable, Hashable, Identifiable {
-		public let id: Profile.Network.Persona.ID
-		public let thumbnail: URL?
-		public let displayName: String
 	}
 }
 
@@ -461,10 +465,6 @@ extension SimpleDappDetails.View {
 					FungiblesList(store: store)
 
 					NonFungiblesListList(store: store)
-
-					Personas(personas: viewStore.personas)
-						.padding(.bottom, .medium3)
-						.background(.app.gray5)
 				}
 				.onAppear {
 					viewStore.send(.appeared)
@@ -480,17 +480,14 @@ extension SimpleDappDetails.View {
 private extension SimpleDappDetails.State {
 	var viewState: SimpleDappDetails.ViewState {
 		.init(
-			title: dApp.displayName?.rawValue ?? L10n.DAppRequest.Metadata.unknownName,
+			title: metadata?.name ?? L10n.DAppRequest.Metadata.unknownName,
 			description: metadata?.description ?? L10n.AuthorizedDapps.DAppDetails.missingDescription,
 			domain: metadata?.claimedWebsites?.first,
 			thumbnail: metadata?.iconURL,
-			address: dApp.dAppDefinitionAddress,
+			address: dAppID,
 			fungibles: resources?.fungible,
 			nonFungibles: resources?.nonFungible,
-			associatedDapps: associatedDapps,
-			personas: dApp.detailedAuthorizedPersonas.map {
-				.init(id: $0.id, thumbnail: nil, displayName: $0.displayName.rawValue)
-			}
+			associatedDapps: associatedDapps
 		)
 	}
 }
@@ -589,39 +586,6 @@ extension SimpleDappDetails.View {
 					}
 				}
 				.padding(.bottom, .medium1)
-			}
-		}
-	}
-
-	@MainActor
-	struct Personas: View {
-		let personas: [SimpleDappDetails.Persona]
-
-		var body: some View {
-			if personas.isEmpty {
-				Text(L10n.AuthorizedDapps.DAppDetails.noPersonasHeading)
-					.sectionHeading
-					.flushedLeft
-					.padding(.horizontal, .medium1)
-					.padding(.vertical, .small2)
-			} else {
-				Text(L10n.AuthorizedDapps.DAppDetails.personasHeading)
-					.sectionHeading
-					.flushedLeft
-					.padding(.horizontal, .medium1)
-					.padding(.vertical, .small2)
-
-				Separator()
-					.padding(.bottom, .small2)
-
-				ForEach(personas) { persona in
-					Card {
-						PlainListRow(title: persona.displayName, showChevron: false) {
-							PersonaThumbnail(persona.thumbnail)
-						}
-					}
-					.padding(.horizontal, .medium3)
-				}
 			}
 		}
 	}

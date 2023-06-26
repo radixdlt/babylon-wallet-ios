@@ -1,4 +1,3 @@
-import AuthorizedDappsClient
 import ComposableArchitecture
 import CryptoKit
 import FeaturePrelude
@@ -93,7 +92,6 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		case rawTransactionCreated(String)
 		case addGuaranteeToManifestResult(TaskResult<TransactionManifest>)
 		case prepareForSigningResult(TaskResult<TransactionClient.PrepareForSiginingResponse>)
-		case loadedDapp(TaskResult<Profile.Network.AuthorizedDappDetailed>)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -139,7 +137,6 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		}
 	}
 
-	@Dependency(\.authorizedDappsClient) var authorizedDappsClient
 	@Dependency(\.transactionClient) var transactionClient
 	@Dependency(\.gatewayAPIClient) var gatewayAPIClient
 	@Dependency(\.accountsClient) var accountsClient
@@ -226,13 +223,8 @@ public struct TransactionReview: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
 		case let .dAppsUsed(.delegate(.openDapp(id))):
-			return .task {
-				await .internal(.loadedDapp(
-					TaskResult {
-						try await authorizedDappsClient.getDetailedDapp(id)
-					}
-				))
-			}
+			state.destination = .dApp(.init(dAppID: id))
+			return .none
 
 		case .deposits(.delegate(.showCustomizeGuarantees)):
 			guard let deposits = state.deposits else { return .none } // TODO: Handle?
@@ -396,7 +388,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 					userAccounts: userAccounts,
 					networkID: networkID
 				),
-				proofs: try? exctractProofs(manifestPreviewToReview),
+				proofs: exctractProofs(manifestPreviewToReview),
 				networkFee: .init(fee: feeAdded, isCongested: false)
 			)
 			await send(.internal(.createTransactionReview(content)))
@@ -489,15 +481,6 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			return .none
 		case let .prepareForSigningResult(.failure(error)):
 			errorQueue.schedule(error)
-			return .none
-
-		case let .loadedDapp(result):
-			switch result {
-			case let .success(dApp):
-				state.destination = .dApp(.init(dApp: dApp))
-			case let .failure(error):
-				errorQueue.schedule(error)
-			}
 			return .none
 		}
 	}
@@ -922,7 +905,6 @@ public struct SimpleDappDetails: Sendable, FeatureReducer {
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.gatewayAPIClient) var gatewayAPIClient
 	@Dependency(\.openURL) var openURL
-	@Dependency(\.authorizedDappsClient) var authorizedDappsClient
 	@Dependency(\.cacheClient) var cacheClient
 
 	public struct FailedToLoadMetadata: Error, Hashable {}
@@ -932,7 +914,7 @@ public struct SimpleDappDetails: Sendable, FeatureReducer {
 	// MARK: State
 
 	public struct State: Sendable, Hashable {
-		public var dApp: Profile.Network.AuthorizedDappDetailed
+		public var dAppID: DappDefinitionAddress
 
 		@Loadable
 		public var metadata: GatewayAPI.EntityMetadataCollection? = nil
@@ -944,12 +926,12 @@ public struct SimpleDappDetails: Sendable, FeatureReducer {
 		public var associatedDapps: [AssociatedDapp]? = nil
 
 		public init(
-			dApp: Profile.Network.AuthorizedDappDetailed,
+			dAppID: DappDefinitionAddress,
 			metadata: GatewayAPI.EntityMetadataCollection? = nil,
 			resources: Resources? = nil,
 			associatedDapps: [AssociatedDapp]? = nil
 		) {
-			self.dApp = dApp
+			self.dAppID = dAppID
 			self.metadata = metadata
 			self.resources = resources
 			self.associatedDapps = associatedDapps
@@ -1011,8 +993,7 @@ public struct SimpleDappDetails: Sendable, FeatureReducer {
 		case .appeared:
 			state.$metadata = .loading
 			state.$resources = .loading
-			let dAppID = state.dApp.dAppDefinitionAddress
-			return .task {
+			return .task { [dAppID = state.dAppID] in
 				let result = await TaskResult {
 					try await cacheClient.withCaching(
 						cacheEntry: .dAppMetadata(dAppID.address),
@@ -1036,7 +1017,7 @@ public struct SimpleDappDetails: Sendable, FeatureReducer {
 		case let .metadataLoaded(metadata):
 			state.$metadata = metadata
 
-			let dAppDefinitionAddress = state.dApp.dAppDefinitionAddress
+			let dAppDefinitionAddress = state.dAppID
 			return .run { send in
 				let resources = await metadata.flatMap { await loadResources(metadata: $0, validated: dAppDefinitionAddress) }
 				await send(.internal(.resourcesLoaded(resources)))
