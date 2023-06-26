@@ -22,7 +22,6 @@ public indirect enum Instruction: Sendable, Codable, Hashable {
 	case returnToWorktop(ReturnToWorktop)
 
 	case assertWorktopContains(AssertWorktopContains)
-	case assertWorktopContainsByAmount(AssertWorktopContainsByAmount)
 	case assertWorktopContainsNonFungibles(AssertWorktopContainsNonFungibles)
 
 	case popFromAuthZone(PopFromAuthZone)
@@ -110,8 +109,6 @@ extension Instruction {
 
 		case .assertWorktopContains:
 			return .assertWorktopContains
-		case .assertWorktopContainsByAmount:
-			return .assertWorktopContainsByAmount
 		case .assertWorktopContainsNonFungibles:
 			return .assertWorktopContainsNonFungibles
 
@@ -252,8 +249,6 @@ extension Instruction {
 
 		case let .assertWorktopContains(instruction):
 			try instruction.encode(to: encoder)
-		case let .assertWorktopContainsByAmount(instruction):
-			try instruction.encode(to: encoder)
 		case let .assertWorktopContainsNonFungibles(instruction):
 			try instruction.encode(to: encoder)
 
@@ -388,8 +383,6 @@ extension Instruction {
 
 		case .assertWorktopContains:
 			self = try .assertWorktopContains(.init(from: decoder))
-		case .assertWorktopContainsByAmount:
-			self = try .assertWorktopContainsByAmount(.init(from: decoder))
 		case .assertWorktopContainsNonFungibles:
 			self = try .assertWorktopContainsNonFungibles(.init(from: decoder))
 

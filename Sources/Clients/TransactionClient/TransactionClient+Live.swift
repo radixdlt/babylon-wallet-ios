@@ -259,10 +259,7 @@ extension TransactionClient {
 				intentSignatures: Array(request.intentSignatures)
 			)
 
-			let signedIntentHash = try RadixEngine.instance
-				.hashSignedTransactionIntent(signedTransactionIntent)
-				.get()
-				.hash
+			let signedIntentHash = try engineToolkitClient.hashSignedTransactionIntent(signedTransactionIntent).hash
 
 			let notarySignature = try request.notary.sign(
 				hashOfMessage: signedIntentHash
@@ -359,7 +356,7 @@ extension TransactionClient {
 			/// Will be increased with each added guarantee to account for the difference in indexes from the initial manifest.
 			var indexInc = 1 // LockFee was added, start from 1
 			for guarantee in guarantees {
-				let guaranteeInstruction: Instruction = .assertWorktopContainsByAmount(.init(
+				let guaranteeInstruction: Instruction = .assertWorktopContains(.init(
 					amount: .init(
 						value: guarantee.amount.toString()
 					),

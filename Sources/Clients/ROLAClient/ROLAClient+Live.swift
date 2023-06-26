@@ -31,12 +31,12 @@ extension ROLAClient {
 			let transactionSigningKeyHash: PublicKeyHash = try {
 				switch entity.securityState {
 				case let .unsecured(control):
-					return try .init(from: control.transactionSigning.publicKey)
+					return try .init(hashing: control.transactionSigning.publicKey)
 				}
 			}()
 
 			loggerGlobal.debug("ownerKeyHashes: \(ownerKeyHashes)")
-			try ownerKeyHashes.append(.init(from: newPublicKey))
+			try ownerKeyHashes.append(.init(hashing: newPublicKey))
 
 			if !ownerKeyHashes.contains(transactionSigningKeyHash) {
 				loggerGlobal.debug("Did not contain transactionSigningKey hash, re-adding it: \(transactionSigningKeyHash)")
@@ -209,7 +209,7 @@ extension PublicKeyHash {
 
 	static let hashLength = 29
 
-	public init(from publicKey: SLIP10.PublicKey) throws {
+	public init(hashing publicKey: SLIP10.PublicKey) throws {
 		let hashBytes = try blake2b(data: publicKey.compressedData).suffix(Self.hashLength)
 
 		guard hashBytes.count == Self.hashLength else {

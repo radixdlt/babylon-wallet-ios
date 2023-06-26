@@ -2,7 +2,7 @@ import Prelude
 
 extension Nonce {
 	public static func secureRandom() -> Self {
-		let byteCount = RawValue.bitWidth / 4
+		let byteCount = RawValue.bitWidth / 8
 		var data = Data(repeating: 0, count: byteCount)
 		data.withUnsafeMutableBytes {
 			assert($0.count == byteCount)
