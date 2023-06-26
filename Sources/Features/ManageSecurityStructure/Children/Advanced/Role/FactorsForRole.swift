@@ -28,17 +28,22 @@ public struct RoleWithFactors: Sendable, Hashable {
 public struct FactorsForRole: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public var role: SecurityStructureRole
-		public var threshold: UInt? = 0
-		public var thresholdFactorSources: IdentifiedArrayOf<FactorSource> = []
-		public var adminFactorSources: IdentifiedArrayOf<FactorSource> = []
+		public var threshold: UInt?
+		public var thresholdFactorSources: IdentifiedArrayOf<FactorSource>
+		public var adminFactorSources: IdentifiedArrayOf<FactorSource>
 
 		@PresentationState
 		public var destination: Destinations.State?
 
 		public init(
-			role: SecurityStructureRole
+			role: SecurityStructureRole,
+			factors: RoleOfTier<FactorSource>?
 		) {
 			self.role = role
+			if let factors {
+			} else {
+				self.threshold = 0
+			}
 		}
 	}
 
