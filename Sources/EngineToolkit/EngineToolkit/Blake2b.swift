@@ -4,11 +4,11 @@ import Foundation
 public struct Blake2b {
 	private init() {}
 
-	public static func hash(data: Data) throws -> HashedData {
+	public static func hash(data: Data) throws -> Data {
 		let request = HashRequest(payload: data.hex)
 		let response = RadixEngine.instance.hashRequest(request: request)
 		let hex = try response.get().value
-		return try .init(hex: hex)
+		return try Data(hex: hex)
 	}
 
 	#if DEBUG
@@ -21,11 +21,11 @@ public struct Blake2b {
 }
 
 /// Calls `Blake2b.hash`
-public func blake2b(data: some DataProtocol) throws -> HashedData {
+public func blake2b(data: some DataProtocol) throws -> Data {
 	try Blake2b.hash(data: Data(data))
 }
 
-public func blake2b(data: Data) throws -> HashedData {
+public func blake2b(data: Data) throws -> Data {
 	try Blake2b.hash(data: data)
 }
 

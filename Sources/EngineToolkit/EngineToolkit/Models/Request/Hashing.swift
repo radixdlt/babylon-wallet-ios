@@ -18,15 +18,15 @@ public struct HashResponse: Sendable, Codable, Hashable {
 
 // MARK: - HashTransactionIntentResponse
 public struct HashTransactionIntentResponse: Codable, Equatable {
-	public let hash: HashedData
+	public let hash: String
 }
 
 // MARK: - HashNotarizedTransactionResponse
 public struct HashNotarizedTransactionResponse: Codable, Equatable {
-	public let hash: HashedData
+	public let hash: String
 }
 
 // MARK: - HashSignedTransactionItentResponse
 public struct HashSignedTransactionItentResponse: Codable, Equatable {
-	public let hash: HashedData
+	public let hash: String
 }

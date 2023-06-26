@@ -48,13 +48,13 @@ public struct SignWithFactorSourcesOfKindDevice: SignWithFactorSourcesOfKindRedu
 		factor deviceFactorSource: Factor,
 		state: State
 	) async throws -> Set<SignatureOfEntity> {
-		let dataToSign: HashedData = try {
+		let dataToSign: Data = try {
 			switch state.signingPurposeWithPayload {
 			case let .signAuth(auth): return try blake2b(data: auth.payloadToHashAndSign)
 			case let .signTransaction(_, intent, _):
 				@Dependency(\.engineToolkitClient) var engineToolkitClient
 
-				return try engineToolkitClient.hashTransactionIntent(intent).hash
+				return try Data(hex: engineToolkitClient.hashTransactionIntent(intent).hash)
 			}
 		}()
 

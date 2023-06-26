@@ -18,7 +18,7 @@ extension Engine.PrivateKey {
 }
 
 extension Engine.PrivateKey {
-	public func sign(hashOfMessage: HashedData) throws -> Engine.SignatureWithPublicKey {
+	public func sign(hashOfMessage: some DataProtocol) throws -> Engine.SignatureWithPublicKey {
 		try SLIP10.PrivateKey(engine: self)
 			.sign(hashOfMessage: hashOfMessage)
 			.intoEngine()

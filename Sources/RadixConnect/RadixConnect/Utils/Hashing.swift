@@ -4,7 +4,7 @@ import RadixConnectModels
 
 extension Data {
 	func hash() throws -> Data {
-		try blake2b(data: self).data
+		try blake2b(data: self)
 	}
 }
 

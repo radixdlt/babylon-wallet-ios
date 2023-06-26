@@ -1,4 +1,5 @@
 import Cryptography
+import EngineToolkit
 import Prelude
 
 extension TransactionManifest {
@@ -16,14 +17,14 @@ extension TransactionIntent {
 // MARK: - NotarizedNonNotarySignedButIntentSignedTransctionContext
 public struct NotarizedNonNotarySignedButIntentSignedTransctionContext: Hashable {
 	public internal(set) var transactionIntent: TransactionIntent
-	public internal(set) var transactionIntentHash: HashedData
+	public internal(set) var transactionIntentHash: Data
 	public internal(set) var compileTransactionIntentResponse: CompileTransactionIntentResponse
 	public internal(set) var signedTransactionIntent: SignedTransactionIntent
 
 	fileprivate func with(
 		compileSignedTransactionIntentResponse: CompileSignedTransactionIntentResponse,
 		notarizedTransaction: NotarizedTransaction,
-		notarizedTransactionHash: HashedData
+		notarizedTransactionHash: Data
 	) -> NotarizedSignedTransctionContext {
 		.init(
 			transactionIntent: transactionIntent,
@@ -40,11 +41,11 @@ public struct NotarizedNonNotarySignedButIntentSignedTransctionContext: Hashable
 // MARK: - NotarizedSignedTransctionContext
 public struct NotarizedSignedTransctionContext: Hashable {
 	public internal(set) var transactionIntent: TransactionIntent
-	public internal(set) var transactionIntentHash: HashedData
+	public internal(set) var transactionIntentHash: Data
 	public internal(set) var compileTransactionIntentResponse: CompileTransactionIntentResponse
 	public internal(set) var signedTransactionIntent: SignedTransactionIntent
 	public internal(set) var compileSignedTransactionIntentResponse: CompileSignedTransactionIntentResponse
-	public internal(set) var notarizedTransactionHash: HashedData
+	public internal(set) var notarizedTransactionHash: Data
 	public internal(set) var notarizedTransaction: NotarizedTransaction
 }
 
@@ -66,7 +67,7 @@ extension TransactionIntent {
 	}
 
 	public func sign(withMany privateKeys: [Engine.PrivateKey]) throws -> NotarizedNonNotarySignedButIntentSignedTransctionContext {
-		let transactionIntentHash = try RadixEngine.instance.hashTransactionIntent(self).get().hash
+		let transactionIntentHash = try Data(hex: RadixEngine.instance.hashTransactionIntent(self).get().hash)
 		let intentSignatures = try privateKeys.map {
 			try $0.sign(hashOfMessage: transactionIntentHash)
 		}
@@ -104,7 +105,7 @@ extension NotarizedNonNotarySignedButIntentSignedTransctionContext {
 	}
 
 	public func sign(with privateKey: Engine.PrivateKey) throws -> NotarizedNonNotarySignedButIntentSignedTransctionContext {
-		let hashOfTransactionIntent = try RadixEngine.instance.hashSignedTransactionIntent(self.signedTransactionIntent).get().hash
+		let hashOfTransactionIntent = try Data(hex: RadixEngine.instance.hashSignedTransactionIntent(self.signedTransactionIntent).get().hash)
 		let signature = try privateKey.sign(hashOfMessage: hashOfTransactionIntent)
 
 		let signedTransactionIntent = SignedTransactionIntent(
@@ -135,7 +136,7 @@ extension NotarizedNonNotarySignedButIntentSignedTransctionContext {
 			request: signedTransactionIntent
 		).get()
 
-		let hashOfTransactionIntent = try RadixEngine.instance.hashSignedTransactionIntent(signedTransactionIntent).get().hash
+		let hashOfTransactionIntent = try Data(hex: RadixEngine.instance.hashSignedTransactionIntent(signedTransactionIntent).get().hash)
 
 		// Notarize the signed intent to create a notarized transaction
 		let notarySignature = try notaryPrivateKey
