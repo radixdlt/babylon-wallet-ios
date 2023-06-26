@@ -86,7 +86,7 @@ extension PersonaDetails.View {
 			store: store.destination,
 			state: /PersonaDetails.Destination.State.dAppDetails,
 			action: PersonaDetails.Destination.Action.dAppDetails,
-			destination: { SimpleDappDetails.View(store: $0) }
+			destination: { SimpleAuthDappDetails.View(store: $0) }
 		)
 		.sheet(
 			store: store.destination,
@@ -363,7 +363,7 @@ extension PersonaDetails.View {
 
 // MARK: - SimpleDappDetails
 
-extension SimpleDappDetails {
+extension SimpleAuthDappDetails {
 	@MainActor
 	public struct View: SwiftUI.View {
 		let store: Store
@@ -394,7 +394,7 @@ extension SimpleDappDetails {
 
 // MARK: - Body
 
-extension SimpleDappDetails.View {
+extension SimpleAuthDappDetails.View {
 	public var body: some View {
 		WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 			ScrollView {
@@ -422,8 +422,8 @@ extension SimpleDappDetails.View {
 
 // MARK: - Extensions
 
-private extension SimpleDappDetails.State {
-	var viewState: SimpleDappDetails.ViewState {
+private extension SimpleAuthDappDetails.State {
+	var viewState: SimpleAuthDappDetails.ViewState {
 		.init(
 			title: dApp.displayName?.rawValue ?? L10n.DAppRequest.Metadata.unknownName,
 			description: metadata?.description ?? L10n.AuthorizedDapps.DAppDetails.missingDescription,
@@ -442,10 +442,10 @@ private extension SimpleDappDetails.State {
 
 // MARK: Child Views
 
-extension SimpleDappDetails.View {
+extension SimpleAuthDappDetails.View {
 	@MainActor
 	struct InfoBlock: View {
-		let store: StoreOf<SimpleDappDetails>
+		let store: StoreOf<SimpleAuthDappDetails>
 
 		var body: some View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
@@ -486,7 +486,7 @@ extension SimpleDappDetails.View {
 
 	@MainActor
 	struct FungiblesList: View {
-		let store: StoreOf<SimpleDappDetails>
+		let store: StoreOf<SimpleAuthDappDetails>
 
 		var body: some View {
 			WithViewStore(store, observe: \.viewState.fungibles, send: { .view($0) }) { viewStore in
@@ -499,7 +499,7 @@ extension SimpleDappDetails.View {
 
 	@MainActor
 	struct NonFungiblesListList: View {
-		let store: StoreOf<SimpleDappDetails>
+		let store: StoreOf<SimpleAuthDappDetails>
 
 		var body: some View {
 			WithViewStore(store, observe: \.viewState.nonFungibles, send: { .view($0) }) { viewStore in
@@ -540,7 +540,7 @@ extension SimpleDappDetails.View {
 
 	@MainActor
 	struct Personas: View {
-		let personas: [SimpleDappDetails.Persona]
+		let personas: [SimpleAuthDappDetails.Persona]
 
 		var body: some View {
 			if personas.isEmpty {
