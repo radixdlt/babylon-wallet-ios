@@ -14,14 +14,10 @@ import SharedModels
 // MARK: - ImportOlympiaLedgerAccountsAndFactorSources
 public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureReducer {
 	public struct LedgerWithAccounts: Sendable, Hashable {
-		public let name: String?
+		public let name: String
 		public let model: LedgerHardwareWalletFactorSource.DeviceModel
 		public var displayName: String {
-			if let name {
-				return "\(name) (\(model.rawValue))"
-			} else {
-				return model.rawValue
-			}
+			"\(name) (\(model.rawValue))"
 		}
 
 		public let id: FactorSourceID.FromHash

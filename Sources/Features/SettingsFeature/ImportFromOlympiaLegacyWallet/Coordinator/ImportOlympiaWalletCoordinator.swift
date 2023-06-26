@@ -90,6 +90,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 	@Dependency(\.factorSourcesClient) var factorSourcesClient
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.importLegacyWalletClient) var importLegacyWalletClient
+
 	public init() {}
 
 	public var body: some ReducerProtocolOf<Self> {
