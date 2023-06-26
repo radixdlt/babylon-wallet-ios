@@ -3,12 +3,12 @@ import FeaturePrelude
 import ManageTrustedContactFactorSourceFeature
 
 // MARK: - ManageSomeFactorSource
-public struct ManageSomeFactorSource<FactorSourceOfKind: FactorSourceProtocol>: Sendable, FeatureReducer {
+public struct ManageSomeFactorSource<FactorSourceOfKind: BaseFactorSourceProtocol>: Sendable, FeatureReducer {
 	public enum State: Sendable, Hashable {
 		case manageSecurityQuestions(AnswerSecurityQuestionsCoordinator.State)
 		case manageTrustedContact(ManageTrustedContactFactorSource.State)
-		public init() {
-			switch FactorSourceOfKind.kind {
+		public init(kind: FactorSourceKind) {
+			switch kind {
 			case .device, .ledgerHQHardwareWallet, .offDeviceMnemonic: fatalError("Unsupported")
 			case .securityQuestions:
 				self = .manageSecurityQuestions(.init(purpose: .encrypt))
@@ -80,13 +80,16 @@ public struct ManageSomeFactorSource<FactorSourceOfKind: FactorSourceProtocol>: 
 	}
 
 	func delegateDone(factorSource: some FactorSourceProtocol) -> EffectTask<Action> {
-		guard let factorSourceOfKind = factorSource as? FactorSourceOfKind else {
+		if let factorSourceOfKind = factorSource as? FactorSourceOfKind {
+			return .send(.delegate(.done(.success(factorSourceOfKind))))
+		} else if FactorSourceOfKind.self == FactorSource.self {
+			return .send(.delegate(.done(.success(factorSource.embed() as! FactorSourceOfKind))))
+		} else {
 			let errorMessage = "Critical error, wrong factor source kind produced!"
 			loggerGlobal.critical(.init(stringLiteral: errorMessage))
 			assertionFailure(errorMessage)
 			return .none
 		}
-		return .send(.delegate(.done(.success(factorSourceOfKind))))
 	}
 }
 

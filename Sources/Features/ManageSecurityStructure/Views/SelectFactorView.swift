@@ -5,12 +5,12 @@ public struct SelectFactorView: SwiftUI.View {
 	@Environment(\.isEnabled) private var isEnabled
 	public let title: String
 	public let subtitle: String
-	public let factorSet: BaseFactorSourceProtocol?
+	public let factorSet: (any BaseFactorSourceProtocol)?
 	public let action: () -> Void
 	public init(
 		title: String,
 		subtitle: String,
-		factorSet: BaseFactorSourceProtocol? = nil,
+		factorSet: (any BaseFactorSourceProtocol)? = nil,
 		action: (() -> Void)? = nil
 	) {
 		self.title = title

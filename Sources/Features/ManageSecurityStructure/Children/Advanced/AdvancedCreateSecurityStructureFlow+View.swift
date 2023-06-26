@@ -47,7 +47,7 @@ extension View {
 			store: destinationStore,
 			state: /AdvancedManageSecurityStructureFlow.Destinations.State.factorsForRole,
 			action: AdvancedManageSecurityStructureFlow.Destinations.Action.factorsForRole,
-			content: { FactorsForRole.View(store: $0) }
+			content: { store in NavigationView { FactorsForRole.View(store: store) } }
 		)
 	}
 }

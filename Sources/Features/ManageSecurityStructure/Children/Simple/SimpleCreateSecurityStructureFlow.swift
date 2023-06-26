@@ -166,11 +166,13 @@ public struct SimpleManageSecurityStructureFlow: Sendable, FeatureReducer {
 			case let .existing(structure):
 				precondition(structure.isSimple)
 				state.modalDestinations = .listConfirmerOfNewPhone(.init(
+					kind: .securityQuestions,
 					mode: .selection,
 					selectedFactorSource: structure.securityQuestionsFactorSource
 				))
 			case .new:
 				state.modalDestinations = .listConfirmerOfNewPhone(.init(
+					kind: .securityQuestions,
 					mode: .selection
 				))
 			}
@@ -181,11 +183,13 @@ public struct SimpleManageSecurityStructureFlow: Sendable, FeatureReducer {
 			case let .existing(structure):
 				precondition(structure.isSimple)
 				state.modalDestinations = .listLostPhoneHelper(.init(
+					kind: .trustedContact,
 					mode: .selection,
 					selectedFactorSource: structure.trustedContactFactorSource
 				))
 			case .new:
 				state.modalDestinations = .listLostPhoneHelper(.init(
+					kind: .trustedContact,
 					mode: .selection
 				))
 			}

@@ -11,14 +11,14 @@ public extension FactorSourcesOfKindList {
 	struct ViewState: Equatable {
 		let allowSelection: Bool
 		let factorSources: IdentifiedArrayOf<FactorSourceOfKind>
-		let selectedFactorSourceID: FactorSourceOfKind.ID?
+		let selectedFactorSourceID: FactorSourceID?
 		let selectedFactorSource: FactorSourceOfKind?
 		let mode: State.Mode
 
 		init(state: FactorSourcesOfKindList.State) {
 			allowSelection = state.mode == .selection
 			factorSources = state.factorSources
-			selectedFactorSourceID = state.selectedFactorSourceID
+			selectedFactorSourceID = state.selectedFactorSourceID?.embed()
 			mode = state.mode
 
 			if let id = state.selectedFactorSourceID, let selectedFactorSource = state.factorSources[id: id] {
@@ -31,7 +31,10 @@ public extension FactorSourcesOfKindList {
 		var factorsArray: [FactorSourceOfKind]? { factorSources.elements }
 
 		var navigationTitle: String {
-			let title = FactorSourceOfKind.kind.selectedFactorDisplay
+			guard let specificType = FactorSourceOfKind.self as? any FactorSourceProtocol.Type else {
+				return allowSelection ? "Select Factor" : "Factor"
+			}
+			let title = specificType.kind.selectedFactorDisplay
 			guard allowSelection else {
 				return title
 			}
@@ -157,13 +160,13 @@ extension FactorSource {
 
 extension View {
 	@MainActor
-	fileprivate func destinations<F>(with store: StoreOf<FactorSourcesOfKindList<F>>) -> some SwiftUI.View where F: FactorSourceProtocol {
+	fileprivate func destinations<F>(with store: StoreOf<FactorSourcesOfKindList<F>>) -> some SwiftUI.View where F: BaseFactorSourceProtocol {
 		let destinationStore = store.scope(state: \.$destination, action: { .child(.destination($0)) })
 		return addNewFactorSourceSheet(with: destinationStore)
 	}
 
 	@MainActor
-	private func addNewFactorSourceSheet<F>(with destinationStore: PresentationStoreOf<FactorSourcesOfKindList<F>.Destinations>) -> some SwiftUI.View where F: FactorSourceProtocol {
+	private func addNewFactorSourceSheet<F>(with destinationStore: PresentationStoreOf<FactorSourcesOfKindList<F>.Destinations>) -> some SwiftUI.View where F: BaseFactorSourceProtocol {
 		sheet(
 			store: destinationStore,
 			state: /FactorSourcesOfKindList.Destinations.State.addNewFactorSource,
@@ -181,11 +184,13 @@ public struct FactorSourceRowView: View {
 		let addedOn: Date
 		let lastUsedOn: Date
 		let isFlaggedForDeletion: Bool
+		let kind: FactorSourceKind
 
 		public init(
 			factorSource: FactorSource,
 			describe: (FactorSource) -> LocalizedStringKey
 		) {
+			self.kind = factorSource.kind
 			self.description = describe(factorSource)
 			self.addedOn = factorSource.addedOn
 			self.lastUsedOn = factorSource.lastUsedOn
@@ -219,6 +224,8 @@ public struct FactorSourceRowView: View {
 		Card(.app.gray5, action: action) {
 			HStack(spacing: 0) {
 				VStack(alignment: .leading, spacing: 0) {
+					Text("`\(viewState.kind.rawValue)`")
+
 					Text(viewState.description)
 						.foregroundColor(.app.gray1)
 						.padding(.bottom, .small1)

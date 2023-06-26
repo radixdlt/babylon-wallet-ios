@@ -29,7 +29,9 @@ struct ManageSecurityStructurePreviewApp: SwiftUI.App {
 			return secStructureConfig
 		} withReducer: {
 			$0
-				.dependency(\.date, .constant(.now))
+				.dependency(\.date, .init {
+					Date.now
+				})
 				.dependency(\.factorSourcesClient, .previewApp)
 				.dependency(\.appPreferencesClient, .previewApp)
 				._printChanges()

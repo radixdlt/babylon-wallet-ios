@@ -22,11 +22,26 @@ extension SelectFactorKindThenFactor {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-				// TODO: implement
-				Text("Implement: SelectFactorKindThenFactor")
-					.background(Color.yellow)
-					.foregroundColor(.red)
-					.onAppear { viewStore.send(.appeared) }
+				ScrollView {
+					VStack(spacing: .medium1) {
+						Text("Select Factor kind")
+							.font(.app.body1Header)
+
+						ForEach(FactorSourceKind.allCases) { kind in
+							Button(kind.selectedFactorDisplay) {
+								viewStore.send(.selected(kind))
+							}
+							.buttonStyle(.borderedProminent)
+						}
+					}
+				}
+				.sheet(
+					store: store.scope(
+						state: \.$factorSourceOfKind,
+						action: { .child(.factorSourceOfKind($0)) }
+					),
+					content: { FactorSourcesOfKindList<FactorSource>.View(store: $0) }
+				)
 			}
 		}
 	}

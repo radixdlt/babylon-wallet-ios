@@ -64,7 +64,6 @@ extension Collection<FactorSource> {
 public struct FactorsForRole: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public var role: SecurityStructureRole
-//		public let supportedFactorSources: IdentifiedArrayOf<FactorSource>
 		public var threshold: UInt? = nil
 		public var thresholdFactorSources: IdentifiedArrayOf<FactorSource> = []
 		public var adminFactorSources: IdentifiedArrayOf<FactorSource> = []
@@ -73,11 +72,9 @@ public struct FactorsForRole: Sendable, FeatureReducer {
 		public var destination: Destinations.State?
 
 		public init(
-			//			allFactorSources: some Collection<FactorSource>,
 			role: SecurityStructureRole
 		) {
 			self.role = role
-//			self.supportedFactorSources = allFactorSources.filter(supportedByRole: role)
 		}
 	}
 
@@ -140,15 +137,32 @@ public struct FactorsForRole: Sendable, FeatureReducer {
 			return .none
 
 		case let .removeAdminFactor(factorSourceID):
-			print("factor admin id: \(factorSourceID)")
+			state.adminFactorSources[id: factorSourceID] = nil
 			return .none
 
 		case let .removeThresholdFactor(factorSourceID):
-			print("remove threshold factor id: \(factorSourceID)")
+			state.thresholdFactorSources[id: factorSourceID] = nil
 			return .none
 
 		case .addAdminFactor:
 			state.destination = .addAdminFactor(.init())
+			return .none
+		}
+	}
+
+	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+		switch childAction {
+		case let .destination(.presented(.addAdminFactor(.delegate(.selected(adminFactorSource))))):
+			state.adminFactorSources.append(adminFactorSource)
+			state.destination = nil
+			return .none
+
+		case let .destination(.presented(.addThresholdFactor(.delegate(.selected(thresholdFactorSource))))):
+			state.thresholdFactorSources.append(thresholdFactorSource)
+			state.destination = nil
+			return .none
+
+		default:
 			return .none
 		}
 	}

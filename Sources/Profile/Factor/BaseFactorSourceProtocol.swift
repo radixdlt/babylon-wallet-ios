@@ -1,9 +1,10 @@
 import Foundation
 
 // MARK: - BaseFactorSourceProtocol
-public protocol BaseFactorSourceProtocol {
+public protocol BaseFactorSourceProtocol: Identifiable, Hashable where ID: BaseFactorSourceIDProtocol {
 	var kind: FactorSourceKind { get }
 	var common: FactorSource.Common { get set }
+	func embed() -> FactorSource
 }
 
 extension BaseFactorSourceProtocol {

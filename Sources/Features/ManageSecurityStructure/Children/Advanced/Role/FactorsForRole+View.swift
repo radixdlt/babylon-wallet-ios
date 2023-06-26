@@ -42,39 +42,43 @@ extension FactorsForRole {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-				VStack {
-					// FIXME: strings
-					AppTextField(
-						primaryHeading: "Threshold",
-						secondaryHeading: "Greater than zero",
-						placeholder: "Threshold",
-						text: viewStore.binding(
-							get: \.threshold,
-							send: { .thresholdChanged($0) }
-						),
-						hint: nil,
-						showClearButton: false
-					)
+				ScrollView {
+					VStack {
+						// FIXME: strings
+						FactorsListView(
+							title: "Admin",
+							subtitle: "Factors which can be used standalone",
+							factors: viewStore.adminFactors,
+							addFactorAction: { viewStore.send(.addAdminFactor) },
+							removeFactorAction: {
+								viewStore.send(.removeAdminFactor($0))
+							}
+						)
 
-					FactorsListView(
-						title: "Threshold",
-						subtitle: "Requires >=\(viewStore.threshold) (threshold) factors to be used together.",
-						factors: viewStore.adminFactors,
-						addFactorAction: { viewStore.send(.addThresholdFactor) },
-						removeFactorAction: {
-							viewStore.send(.removeThresholdFactor($0))
-						}
-					)
+						// FIXME: strings
+						FactorsListView(
+							title: "Threshold",
+							subtitle: "Requires >=\(viewStore.threshold) (threshold) factors to be used together.",
+							factors: viewStore.thresholdFactors,
+							addFactorAction: { viewStore.send(.addThresholdFactor) },
+							removeFactorAction: {
+								viewStore.send(.removeThresholdFactor($0))
+							}
+						)
 
-					FactorsListView(
-						title: "Admin",
-						subtitle: "Factors which can be used standalone",
-						factors: viewStore.adminFactors,
-						addFactorAction: { viewStore.send(.addAdminFactor) },
-						removeFactorAction: {
-							viewStore.send(.removeAdminFactor($0))
-						}
-					)
+						// FIXME: strings
+						AppTextField(
+							primaryHeading: "Threshold",
+							secondaryHeading: "Greater than zero",
+							placeholder: "Threshold",
+							text: viewStore.binding(
+								get: \.threshold,
+								send: { .thresholdChanged($0) }
+							),
+							hint: nil,
+							showClearButton: false
+						)
+					}
 				}
 				.destinations(with: store)
 				.navigationTitle(viewStore.role.titleAdvancedFlow)
@@ -124,10 +128,10 @@ public struct FactorsListView: SwiftUI.View {
 	public var body: some View {
 		VStack {
 			Text(title)
-				.font(.app.sectionHeader)
+				.font(.app.sheetTitle)
 
 			Text(subtitle)
-				.font(.app.body2Header)
+				.font(.app.body1Regular)
 
 			ForEach(factors) { factor in
 				VStack {

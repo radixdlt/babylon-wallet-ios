@@ -9,7 +9,7 @@ public enum DeleteExistingFactorSourceConfirmationDialogAction: Sendable, Hashab
 }
 
 // MARK: - FactorSourcesOfKindList
-public struct FactorSourcesOfKindList<FactorSourceOfKind: Sendable & Hashable>: Sendable, FeatureReducer where FactorSourceOfKind: FactorSourceProtocol {
+public struct FactorSourcesOfKindList<FactorSourceOfKind: Sendable & Hashable>: Sendable, FeatureReducer where FactorSourceOfKind: BaseFactorSourceProtocol {
 	// MARK: - State
 
 	public struct State: Sendable, Hashable {
@@ -18,6 +18,7 @@ public struct FactorSourcesOfKindList<FactorSourceOfKind: Sendable & Hashable>: 
 			case selection
 		}
 
+		public let kind: FactorSourceKind
 		public let mode: Mode
 
 		public var factorSources: IdentifiedArrayOf<FactorSourceOfKind> = []
@@ -29,9 +30,11 @@ public struct FactorSourcesOfKindList<FactorSourceOfKind: Sendable & Hashable>: 
 		public var destination: Destinations.State? = nil
 
 		public init(
+			kind: FactorSourceKind,
 			mode: Mode,
 			selectedFactorSource: FactorSourceOfKind? = nil
 		) {
+			self.kind = kind
 			self.mode = mode
 			if let selectedFactorSource {
 				self.selectedFactorSourceID = selectedFactorSource.id
@@ -99,7 +102,10 @@ public struct FactorSourcesOfKindList<FactorSourceOfKind: Sendable & Hashable>: 
 	}
 
 	var canOnlyHaveOneFactorSourceOfKind: Bool {
-		switch FactorSourceOfKind.kind {
+		guard let specificType = FactorSourceOfKind.self as? any FactorSourceProtocol.Type else {
+			return false
+		}
+		switch specificType.kind {
 		case .ledgerHQHardwareWallet, .offDeviceMnemonic, .trustedContact: return false
 		case .securityQuestions:
 			return true
@@ -126,7 +132,7 @@ public struct FactorSourcesOfKindList<FactorSourceOfKind: Sendable & Hashable>: 
 			if canOnlyHaveOneFactorSourceOfKind, let existing = state.factorSources.last {
 				state.destination = .existingFactorSourceWillBeDeletedConfirmationDialog(.deletion(of: existing))
 			} else {
-				state.destination = .addNewFactorSource(.init())
+				state.destination = .addNewFactorSource(.init(kind: state.kind))
 			}
 			return .none
 
@@ -183,7 +189,7 @@ public struct FactorSourcesOfKindList<FactorSourceOfKind: Sendable & Hashable>: 
 				return .none
 			case let .deleteExistingFactorSource(id):
 				state.idOfFactorSourceToFlagForDeletionUponSuccessfulCreationOfNew = id
-				state.destination = .addNewFactorSource(.init())
+				state.destination = .addNewFactorSource(.init(kind: state.kind))
 				return .none
 			}
 
@@ -193,15 +199,24 @@ public struct FactorSourcesOfKindList<FactorSourceOfKind: Sendable & Hashable>: 
 	}
 
 	private func updateFactorSourcesEffect(state: inout State) -> EffectTask<Action> {
-		.task { [selectedID = state.selectedFactorSourceID] in
+		.task { [selectedID = state.selectedFactorSourceID, kind = state.kind] in
 			let result = await TaskResult {
-				let all = try await factorSourcesClient.getFactorSources(type: FactorSourceOfKind.self)
-				return all.filter { factorSource in
-					if factorSource.id == selectedID {
+				let all = try await factorSourcesClient.getFactorSources(matching: {
+					$0.kind == kind
+				})
+				let filtered = all.filter { factorSource in
+					if factorSource.id == selectedID?.embed() {
 						return true
 					}
 					return !factorSource.isFlaggedForDeletion
 				}
+				let filteredType = filtered.map {
+					guard let specificType = FactorSourceOfKind.self as? any FactorSourceProtocol.Type else {
+						return $0 as! FactorSourceOfKind
+					}
+					return specificType.extract(from: $0) as! FactorSourceOfKind
+				}
+				return IdentifiedArrayOf<FactorSourceOfKind>.init(uncheckedUniqueElements: filteredType)
 			}
 			return .internal(.loadedFactorSources(result))
 		}
@@ -210,7 +225,7 @@ public struct FactorSourcesOfKindList<FactorSourceOfKind: Sendable & Hashable>: 
 
 extension ConfirmationDialogState<DeleteExistingFactorSourceConfirmationDialogAction> {
 	static func deletion(
-		of factorSource: some FactorSourceProtocol
+		of factorSource: some BaseFactorSourceProtocol
 	) -> ConfirmationDialogState {
 		.init(
 			// FIXME: strings

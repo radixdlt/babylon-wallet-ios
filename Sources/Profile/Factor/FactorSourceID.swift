@@ -5,6 +5,7 @@ import Prelude
 // MARK: - BaseFactorSourceIDProtocol
 public protocol BaseFactorSourceIDProtocol {
 	var kind: FactorSourceKind { get }
+	func embed() -> FactorSourceID
 }
 
 // MARK: - FactorSourceIDProtocol
@@ -39,6 +40,10 @@ public enum FactorSourceID: BaseFactorSourceIDProtocol, Sendable, Hashable, Cust
 }
 
 extension FactorSourceID {
+	public func embed() -> FactorSourceID {
+		self
+	}
+
 	public func extract<F>(_ type: F.Type = F.self) -> F? where F: FactorSourceIDProtocol {
 		F.extract(from: self)
 	}
