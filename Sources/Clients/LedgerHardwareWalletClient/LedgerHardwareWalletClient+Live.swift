@@ -61,7 +61,7 @@ extension LedgerHardwareWalletClient: DependencyKey {
 
 		@Sendable func sign(
 			signers: NonEmpty<IdentifiedArrayOf<Signer>>,
-			expectedHashedMessage: HashedData,
+			expectedHashedMessage: Data,
 			signOnLedgerRequest: () async throws -> [P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.SignatureOfSigner]
 		) async throws -> Set<SignatureOfEntity> {
 			let signaturesRaw = try await signOnLedgerRequest()
@@ -124,16 +124,16 @@ extension LedgerHardwareWalletClient: DependencyKey {
 				})
 			},
 			signTransaction: { request in
-				let hashedMsg = request.hashedDataToSign
+				let hashedMsg = try blake2b(data: request.unhashedDataToSign)
 				return try await sign(
 					signers: request.signers,
-					expectedHashedMessage: hashedMsg
+					expectedHashedMessage: hashedMsg.data
 				) {
 					try await makeRequest(
 						.signTransaction(.init(
 							signers: request.signers.flatMap(\.keyParams),
 							ledgerDevice: request.ledger.device(),
-							compiledTransactionIntent: .init(data: request.hashedDataToSign.data),
+							compiledTransactionIntent: .init(data: request.unhashedDataToSign),
 							displayHash: request.displayHashOnLedgerDisplay,
 							mode: request.ledgerTXDisplayMode
 						)),
@@ -149,10 +149,10 @@ extension LedgerHardwareWalletClient: DependencyKey {
 					origin: request.origin,
 					dAppDefinitionAddress: request.dAppDefinitionAddress
 				))
-				let hash = rolaPayload.payloadToHashAndSign
+				let hash = try blake2b(data: rolaPayload.payloadToHashAndSign)
 				return try await sign(
 					signers: request.signers,
-					expectedHashedMessage: blake2b(data: hash)
+					expectedHashedMessage: hash.data
 				) {
 					try await makeRequest(
 						.signChallenge(.init(
@@ -256,7 +256,7 @@ extension P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.Signature
 		public let derivationPath: DerivationPath
 	}
 
-	func validate(hashed: HashedData) throws -> Validated {
+	func validate(hashed: Data) throws -> Validated {
 		let hdPubKey = try self.derivedPublicKey.hdPubKey()
 		let signatureWithPublicKey: SignatureWithPublicKey
 		switch hdPubKey.publicKey {
@@ -272,7 +272,7 @@ extension P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.Signature
 			)
 		}
 
-		guard signatureWithPublicKey.isValidSignature(for: hashed.data) else {
+		guard signatureWithPublicKey.isValidSignature(for: hashed) else {
 			loggerGlobal.error("Signature invalid for hashed msg: \(hashed.hex), signatureWithPublicKey: \(signatureWithPublicKey)")
 			throw InvalidSignature()
 		}

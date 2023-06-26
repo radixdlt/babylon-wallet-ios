@@ -48,10 +48,20 @@ public struct SignWithFactorSourcesOfKindDevice: SignWithFactorSourcesOfKindRedu
 		factor deviceFactorSource: Factor,
 		state: State
 	) async throws -> Set<SignatureOfEntity> {
-		try await deviceFactorSourceClient.signUsingDeviceFactorSource(
+		let dataToSign: HashedData = try {
+			switch state.signingPurposeWithPayload {
+			case let .signAuth(auth): return try blake2b(data: auth.payloadToHashAndSign)
+			case let .signTransaction(_, intent, _):
+				@Dependency(\.engineToolkitClient) var engineToolkitClient
+
+				return try engineToolkitClient.hashTransactionIntent(intent).hash
+			}
+		}()
+
+		return try await deviceFactorSourceClient.signUsingDeviceFactorSource(
 			deviceFactorSource: deviceFactorSource,
 			signerEntities: Set(signers.map(\.entity)),
-			hashedDataToSign: state.signingPurposeWithPayload.dataToSign(),
+			hashedDataToSign: dataToSign,
 			purpose: .signTransaction(.manifestFromDapp)
 		)
 	}

@@ -45,16 +45,6 @@ public enum SigningPurposeWithPayload: Sendable, Hashable {
 		case let .signTransaction(_, _, purpose): return .signTransaction(purpose)
 		}
 	}
-
-	func dataToSign() throws -> HashedData {
-		switch self {
-		case let .signAuth(auth): return try blake2b(data: auth.payloadToHashAndSign)
-		case let .signTransaction(_, intent, _):
-			@Dependency(\.engineToolkitClient) var engineToolkitClient
-
-			return try engineToolkitClient.hashTransactionIntent(intent).hash
-		}
-	}
 }
 
 // MARK: - SigningResponse

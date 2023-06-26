@@ -24,20 +24,20 @@ extension LedgerHardwareWalletClient {
 public struct SignTransactionWithLedgerRequest: Sendable, Hashable {
 	public let signers: NonEmpty<IdentifiedArrayOf<Signer>>
 	public let ledger: LedgerHardwareWalletFactorSource
-	public let hashedDataToSign: HashedData
+	public let unhashedDataToSign: Data
 	public let ledgerTXDisplayMode: P2P.ConnectorExtension.Request.LedgerHardwareWallet.Request.SignTransaction.Mode
 	public let displayHashOnLedgerDisplay: Bool
 
 	public init(
 		ledger: LedgerHardwareWalletFactorSource,
 		signers: NonEmpty<IdentifiedArrayOf<Signer>>,
-		hashedDataToSign: HashedData,
+		unhashedDataToSign: Data,
 		ledgerTXDisplayMode: P2P.ConnectorExtension.Request.LedgerHardwareWallet.Request.SignTransaction.Mode,
 		displayHashOnLedgerDisplay: Bool
 	) {
 		self.signers = signers
 		self.ledger = ledger
-		self.hashedDataToSign = hashedDataToSign
+		self.unhashedDataToSign = unhashedDataToSign
 		self.ledgerTXDisplayMode = ledgerTXDisplayMode
 		self.displayHashOnLedgerDisplay = displayHashOnLedgerDisplay
 	}

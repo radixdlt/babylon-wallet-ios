@@ -57,13 +57,13 @@ public struct SignWithFactorSourcesOfKindLedger: SignWithFactorSourcesOfKindRedu
 	) async throws -> Set<SignatureOfEntity> {
 		switch state.signingPurposeWithPayload {
 		case let .signTransaction(_, intent, _):
-			let hash = try engineToolkitClient.hashTransactionIntent(intent).hash
+			let intent = try engineToolkitClient.compileTransactionIntent(intent).compiledIntent
 			let ledgerTXDisplayMode: LedgerHardwareWalletFactorSource.SigningDisplayMode = await appPreferencesClient.getPreferences().display.ledgerHQHardwareWalletSigningDisplayMode
 
 			return try await ledgerHardwareWalletClient.signTransaction(.init(
 				ledger: ledger,
 				signers: signers,
-				hashedDataToSign: hash,
+				unhashedDataToSign: Data(intent),
 				ledgerTXDisplayMode: ledgerTXDisplayMode.mode,
 				displayHashOnLedgerDisplay: false
 			))
