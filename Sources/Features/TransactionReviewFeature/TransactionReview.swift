@@ -689,8 +689,14 @@ extension TransactionReview {
 				return []
 			}
 
-			return [
-			]
+			return ids.map { id in
+				.nonFungible(.init(
+					resourceName: resource.name,
+					resourceImage: resource.iconURL,
+					tokenID: id.value,
+					tokenName: nil
+				))
+			}
 		}
 	}
 }
