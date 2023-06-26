@@ -578,12 +578,6 @@ Install the Connector extension, open it to see the linking QR code, and tap con
 "appSettings_resetWalletDialog_resetButtonTitle" = "Reset Wallet";
 "appSettings_resetWalletDialog_resetAndDeleteBackupButtonTitle" = "Reset and Delete iCloud Backup";
 "appSettings_resetWalletDialog_message" = "WARNING. This will clear all contents of your Wallet. If you have no backup, you will lose access to your Accounts and Personas permanently.";
-"seedPhrases_title" = "Seed Phrases";
-"seedPhrases_message" = "A Seed Phrase provides full access to your accounts and funds. When viewing, ensure you’re in a safe environment and no one is looking at your screen.";
-"seedPhrases_warning" = "You are responsible for the security of your Seed Phrase";
-"seedPhrases_seedPhrase_reveal" = "Reveal Seed Phrase";
-"seedPhrases_seedPhrase_oneConnectedAccount" = "Connected to 1 account";
-"seedPhrases_seedPhrase_multipleConnectedAccounts" = "Connected to %d accounts";
 "addLedgerDevice_alreadyAddedAlert_title" = "Ledger Already Added";
 "addLedgerDevice_alreadyAddedAlert_message" = "You have already added this Ledger as: %@";
 "addLedgerDevice_addDevice_title" = "Add Ledger Device";
