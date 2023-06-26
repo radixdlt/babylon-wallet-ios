@@ -1,5 +1,4 @@
 // MARK: - StaticallyValidateTransactionRequest
-
 public struct StaticallyValidateTransactionRequest: Codable, Equatable {
 	public struct Config: Codable, Equatable {
 		public let maxCostUnitLimit: String
