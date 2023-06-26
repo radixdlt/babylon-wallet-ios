@@ -185,6 +185,7 @@ struct FactorsForRoleButton: SwiftUI.View {
 				HStack {
 					Text(buttonTitle)
 						.font(.app.body1Header)
+						.foregroundColor(roleOfTier == nil ? .app.gray3 : .app.gray1)
 
 					Spacer(minLength: 0)
 

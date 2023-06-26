@@ -28,7 +28,7 @@ public extension AnswerSecurityQuestionFreeform {
 			guard let nonEmpty = NonEmptyString(rawValue: answer) else {
 				return nil
 			}
-			return .from(nonEmpty)
+			return try? .from(nonEmpty)
 		}
 	}
 

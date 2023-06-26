@@ -60,8 +60,12 @@ public struct SecurityQuestionAnswerAsEntropy: Sendable, Hashable, Codable {
 		self.entropy = entropy
 	}
 
-	public static func from(_ answer: NonEmptyString) -> Self {
-		.init(
+	public static func from(_ answer: NonEmptyString) throws -> Self {
+		try from(CAP23.trimmedAnswer(freeformAnswer: answer))
+	}
+
+	public static func from(_ answer: CAP23.TrimmedAnswer) throws -> Self {
+		try .init(
 			entropy: CAP23.entropyFrom(freeformAnswer: answer)
 		)
 	}
