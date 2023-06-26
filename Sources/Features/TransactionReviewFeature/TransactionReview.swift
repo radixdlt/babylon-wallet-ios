@@ -210,9 +210,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			guard let transactionWithLockFee = state.transactionWithLockFee else { return .none }
 			state.canApproveTX = false
 
-			let guarantees = state.allGuarantees
-
-			return .task {
+			return .task { [guarantees = state.allGuarantees] in
 				await .internal(.addGuaranteeToManifestResult(
 					TaskResult {
 						try await addingGuarantees(
@@ -496,14 +494,9 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		case let .loadedDapp(result):
 			switch result {
 			case let .success(dApp):
-				state.destination = .dApp(.init(
-					dApp: dApp,
-					metadata: nil as GatewayAPI.EntityMetadataCollection?,
-					resources: nil as SimpleDappDetails.State.Resources?,
-					associatedDapps: nil as [SimpleDappDetails.State.AssociatedDapp]?
-				))
+				state.destination = .dApp(.init(dApp: dApp))
 			case let .failure(error):
-				break
+				errorQueue.schedule(error)
 			}
 			return .none
 		}
