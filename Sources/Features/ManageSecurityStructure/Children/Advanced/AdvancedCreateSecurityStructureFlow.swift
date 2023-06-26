@@ -10,9 +10,10 @@ public struct AdvancedManageSecurityStructureFlow: Sendable, FeatureReducer {
 
 		public let existing: SecurityStructureConfigurationDetailed?
 
-		public var primaryRole: SecurityStructureConfigurationDetailed.Configuration.Primary
-		public var recoveryRole: SecurityStructureConfigurationDetailed.Configuration.Recovery
-		public var confirmationRole: SecurityStructureConfigurationDetailed.Configuration.Confirmation
+		public typealias Role = SecurityStructureConfigurationDetailed.Configuration.Role
+		public var primaryRole: Role
+		public var recoveryRole: Role
+		public var confirmationRole: Role
 
 		@PresentationState
 		var destination: Destinations.State? = nil
@@ -27,9 +28,9 @@ public struct AdvancedManageSecurityStructureFlow: Sendable, FeatureReducer {
 				self.confirmationRole = config.confirmationRole
 			case .new:
 				self.existing = nil
-				self.primaryRole = .init()
-				self.recoveryRole = .init()
-				self.confirmationRole = .init()
+				self.primaryRole = .init(role: .primary)
+				self.recoveryRole = .init(role: .recovery)
+				self.confirmationRole = .init(role: .confirmation)
 			}
 		}
 	}
@@ -84,11 +85,31 @@ public struct AdvancedManageSecurityStructureFlow: Sendable, FeatureReducer {
 			return .none
 		}
 	}
+
+	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+		switch childAction {
+		case let .destination(.presented(.factorsForRole(.delegate(.confirmedFactorsForRole(factorsForRole))))):
+			switch factorsForRole.role {
+			case .confirmation:
+				state.confirmationRole = factorsForRole
+			case .primary:
+				state.primaryRole = factorsForRole
+			case .recovery:
+				state.recoveryRole = factorsForRole
+			}
+			state.destination = nil
+			return .none
+
+		default:
+			return .none
+		}
+	}
 }
 
 extension RoleOfTier {
-	public init() {
-		self.init(
+	public init(role: SecurityStructureRole) {
+		try! self.init(
+			role: role,
 			thresholdFactors: .init(),
 			threshold: 0,
 			superAdminFactors: .init()

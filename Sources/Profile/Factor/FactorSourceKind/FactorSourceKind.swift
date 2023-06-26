@@ -60,10 +60,9 @@ public enum FactorSourceKind:
 	///  * Off device
 	///  * Hierarchical deterministic  (**Encrypted** mnemonic)
 	case securityQuestions
-
-	public typealias ID = RawValue
 }
 
-extension Identifiable where Self: RawRepresentable, RawValue: Hashable, ID == RawValue {
-	public var id: RawValue { rawValue }
+extension FactorSourceKind {
+	public typealias ID = RawValue
+	public var id: ID { rawValue }
 }

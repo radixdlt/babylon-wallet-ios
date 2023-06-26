@@ -19,6 +19,30 @@ extension FactorsForRole {
 		let thresholdFactors: [FactorSource]
 		let adminFactors: [FactorSource]
 
+		var roleWithFactors: RoleOfTier<FactorSource>? {
+			if !thresholdFactors.isEmpty {
+				guard
+					let thresholdInt = Int(threshold),
+					thresholdInt >= thresholdFactors.count
+				else {
+					return nil
+				}
+				return try? .init(
+					role: role,
+					thresholdFactors: .init(validating: thresholdFactors),
+					threshold: .init(thresholdInt),
+					superAdminFactors: .init(validating: adminFactors)
+				)
+			} else {
+				return try? .init(
+					role: role,
+					thresholdFactors: [],
+					threshold: 0,
+					superAdminFactors: .init(validating: adminFactors)
+				)
+			}
+		}
+
 		init(
 			role: SecurityStructureRole,
 			threshold: String,
@@ -78,6 +102,16 @@ extension FactorsForRole {
 							hint: nil,
 							showClearButton: false
 						)
+					}
+				}
+				.footer {
+					WithControlRequirements(
+						viewStore.roleWithFactors,
+						forAction: { viewStore.send(.confirmedFactorsForRole($0)) }
+					) { action in
+						// FIXME: strings
+						Button("Confirm", action: action)
+							.buttonStyle(.primaryRectangular)
 					}
 				}
 				.destinations(with: store)

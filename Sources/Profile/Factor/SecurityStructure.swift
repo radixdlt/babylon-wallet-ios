@@ -1,13 +1,62 @@
 import Prelude
 
+extension FactorSourceKind {
+	public var isPrimaryRoleSupported: Bool {
+		switch self {
+		case .device, .ledgerHQHardwareWallet, .offDeviceMnemonic:
+			return true
+		case .trustedContact:
+			return false
+		case .securityQuestions:
+			// This factor source kind is too cryptographically weak to be allowed for primary.
+			return false
+		}
+	}
+
+	public var isRecoveryRoleSupported: Bool {
+		switch self {
+		case .device:
+			// If a user has lost her phone, how can she use it to perform recovery...she cant!
+			return false
+		case .ledgerHQHardwareWallet, .offDeviceMnemonic, .trustedContact:
+			return true
+		case .securityQuestions:
+			// This factor source kind is too cryptographically weak to be allowed for recovery
+			return false
+		}
+	}
+
+	public var isConfirmationRoleSupported: Bool {
+		switch self {
+		case .device:
+			return true
+		case .ledgerHQHardwareWallet, .offDeviceMnemonic:
+			return true
+		case .trustedContact:
+			return false
+		case .securityQuestions:
+			return true
+		}
+	}
+
+	public func supports(
+		role: SecurityStructureRole
+	) -> Bool {
+		switch role {
+		case .primary: return isPrimaryRoleSupported
+		case .recovery: return isRecoveryRoleSupported
+		case .confirmation: return isConfirmationRoleSupported
+		}
+	}
+}
+
 // MARK: - RoleOfTier
-public struct RoleOfTier<Role, AbstractFactor>:
+public struct RoleOfTier<AbstractFactor>:
 	Sendable, Hashable, Codable
 	where
-	Role: RoleProtocol,
-	AbstractFactor: Sendable & Hashable & Codable
+	AbstractFactor: FactorOfTierProtocol & Sendable & Hashable & Codable
 {
-	public static var role: SecurityStructureRole { Role.role }
+	public let role: SecurityStructureRole
 
 	/// Factors which are used in combination with other instances, amounting to at
 	/// least `threshold` many instances to perform some function with this role.
@@ -21,29 +70,62 @@ public struct RoleOfTier<Role, AbstractFactor>:
 	public var superAdminFactors: OrderedSet<AbstractFactor>
 
 	public init(
+		role: SecurityStructureRole,
 		thresholdFactors: OrderedSet<AbstractFactor>,
 		threshold: UInt,
 		superAdminFactors: OrderedSet<AbstractFactor>
-	) {
-		precondition(threshold <= thresholdFactors.count)
+	) throws {
+		guard threshold <= thresholdFactors.count else {
+			throw RoleOfTierError.thresholdMustBeLessThanOrEqualToLengthOfThresholdFactors
+		}
+		guard thresholdFactors.allSatisfy({ $0.factorSourceKind.supports(role: role) }) else {
+			throw RoleOfTierError.thresholdFactorsSupportsUnsupportedFactorSourceKindForRole
+		}
+		guard superAdminFactors.allSatisfy({ $0.factorSourceKind.supports(role: role) }) else {
+			throw RoleOfTierError.adminFactorsSupportsUnsupportedFactorSourceKindForRole
+		}
+		guard Set(superAdminFactors).intersection(Set(thresholdFactors)).isEmpty else {
+			throw RoleOfTierError.factorSharedBetweenThresholdFactorsAndAdminFactors
+		}
+
+		self.role = role
 		self.thresholdFactors = thresholdFactors
 		self.threshold = threshold
 		self.superAdminFactors = superAdminFactors
 	}
 
-	public static func single(_ factor: AbstractFactor) -> Self {
-		.init(thresholdFactors: [factor], threshold: 1, superAdminFactors: [])
+	public static func single(
+		_ factor: AbstractFactor,
+		for role: SecurityStructureRole
+	) -> Self {
+		try! .init(
+			role: role,
+			thresholdFactors: [factor],
+			threshold: 1,
+			superAdminFactors: []
+		)
 	}
 }
 
+// MARK: - RoleOfTierError
+public enum RoleOfTierError: Swift.Error {
+	case thresholdMustBeLessThanOrEqualToLengthOfThresholdFactors
+	case factorSharedBetweenThresholdFactorsAndAdminFactors
+	case thresholdFactorsSupportsUnsupportedFactorSourceKindForRole
+	case adminFactorsSupportsUnsupportedFactorSourceKindForRole
+}
+
 extension RoleOfTier where AbstractFactor == FactorSource {
-	public static func single(_ factor: any FactorSourceProtocol) -> Self {
-		Self.single(factor.embed())
+	public static func single(
+		_ factor: any FactorSourceProtocol,
+		for role: SecurityStructureRole
+	) -> Self {
+		Self.single(factor.embed(), for: role)
 	}
 }
 
 // MARK: - SecurityStructureRole
-public enum SecurityStructureRole: Sendable, Hashable {
+public enum SecurityStructureRole: Sendable, Hashable, Codable {
 	case primary
 	case recovery
 	case confirmation
@@ -72,10 +154,6 @@ public enum ConfirmationRoleTag: RoleProtocol {
 	public static let role: SecurityStructureRole = .confirmation
 }
 
-public typealias PrimaryRole<AbstractFactor> = RoleOfTier<PrimaryRoleTag, AbstractFactor> where AbstractFactor: Sendable & Hashable & Codable
-public typealias RecoveryRole<AbstractFactor> = RoleOfTier<RecoveryRoleTag, AbstractFactor> where AbstractFactor: Sendable & Hashable & Codable
-public typealias ConfirmationRole<AbstractFactor> = RoleOfTier<ConfirmationRoleTag, AbstractFactor> where AbstractFactor: Sendable & Hashable & Codable
-
 // MARK: - RecoveryAutoConfirmDelayInDaysTag
 public enum RecoveryAutoConfirmDelayInDaysTag {}
 public typealias RecoveryAutoConfirmDelayInDays = Tagged<RecoveryAutoConfirmDelayInDaysTag, UInt>
@@ -83,22 +161,20 @@ public typealias RecoveryAutoConfirmDelayInDays = Tagged<RecoveryAutoConfirmDela
 // MARK: - AbstractSecurityStructure
 public struct AbstractSecurityStructure<AbstractFactor>:
 	Sendable, Hashable, Codable
-	where AbstractFactor: Sendable & Hashable & Codable
+	where AbstractFactor: FactorOfTierProtocol & Sendable & Hashable & Codable
 {
-	public typealias Primary = PrimaryRole<AbstractFactor>
-	public typealias Recovery = RecoveryRole<AbstractFactor>
-	public typealias Confirmation = ConfirmationRole<AbstractFactor>
-	public var primaryRole: Primary
-	public var recoveryRole: Recovery
-	public var confirmationRole: Confirmation
+	public typealias Role = RoleOfTier<AbstractFactor>
+	public var primaryRole: Role
+	public var recoveryRole: Role
+	public var confirmationRole: Role
 
 	public var numberOfDaysUntilAutoConfirmation: RecoveryAutoConfirmDelayInDays
 
 	public init(
 		numberOfDaysUntilAutoConfirmation: RecoveryAutoConfirmDelayInDays,
-		primaryRole: Primary,
-		recoveryRole: Recovery,
-		confirmationRole: Confirmation
+		primaryRole: Role,
+		recoveryRole: Role,
+		confirmationRole: Role
 	) {
 		self.numberOfDaysUntilAutoConfirmation = numberOfDaysUntilAutoConfirmation
 		self.primaryRole = primaryRole
@@ -138,7 +214,7 @@ public struct SecurityStructureMetadata: Sendable, Hashable, Codable, Identifiab
 // MARK: - AbstractSecurityStructureConfiguration
 public struct AbstractSecurityStructureConfiguration<AbstractFactor>:
 	Sendable, Hashable, Codable, Identifiable
-	where AbstractFactor: Sendable & Hashable & Codable
+	where AbstractFactor: FactorOfTierProtocol & Sendable & Hashable & Codable
 {
 	public typealias Configuration = AbstractSecurityStructure<AbstractFactor>
 	// Mutable so that we can update factor structure
@@ -171,7 +247,7 @@ extension ProfileSnapshot {
 
 public typealias SecurityStructureConfigurationReference = AbstractSecurityStructureConfiguration<FactorSourceID>
 
-extension SecurityStructureConfigurationReference.Configuration.Recovery {
+extension SecurityStructureConfigurationReference.Configuration.Role {
 	public static let defaultNumberOfDaysUntilAutoConfirmation: RecoveryAutoConfirmDelayInDays = .init(14)
 }
 
@@ -225,9 +301,9 @@ extension Profile {
 		)
 	}
 
-	func detailedSecurityStructureRole<Role>(
-		referenceRole reference: RoleOfTier<Role, FactorSourceID>
-	) throws -> RoleOfTier<Role, FactorSource> {
+	func detailedSecurityStructureRole(
+		referenceRole reference: RoleOfTier<FactorSourceID>
+	) throws -> RoleOfTier<FactorSource> {
 		func lookup(id: FactorSourceID) throws -> FactorSource {
 			guard let factorSource = factorSources.first(where: { $0.id == id }) else {
 				throw FactorSourceWithIDNotFound()
@@ -236,6 +312,7 @@ extension Profile {
 		}
 
 		return try .init(
+			role: reference.role,
 			thresholdFactors: .init(validating: reference.thresholdFactors.map(lookup(id:))),
 			threshold: reference.threshold,
 			superAdminFactors: .init(validating: reference.superAdminFactors.map(lookup(id:)))
@@ -274,8 +351,9 @@ extension RoleOfTier where AbstractFactor == FactorSourceID {
 }
 
 extension RoleOfTier where AbstractFactor == FactorSource {
-	public func asReference() -> RoleOfTier<Role, FactorSourceID> {
+	public func asReference() -> RoleOfTier<FactorSourceID> {
 		try! .init(
+			role: role,
 			thresholdFactors: .init(validating: thresholdFactors.map(\.id)),
 			threshold: threshold,
 			superAdminFactors: .init(validating: superAdminFactors.map(\.id))
@@ -331,10 +409,9 @@ public struct Securified: Sendable, Hashable, Codable {
 
 	/// Maps from `FactorInstance.ID` to `FactorInstance`, which is what is useful for use through out the wallet.
 	var transactionSigningStructure: AppliedSecurityStructure {
-		func decorate<RoleTag>(
-			tag: RoleTag.Type = RoleTag.self,
-			_ keyPath: KeyPath<ProfileSnapshot.AppliedSecurityStructure, RoleOfTier<RoleTag, FactorInstance.ID>>
-		) -> RoleOfTier<RoleTag, FactorInstance> {
+		func decorate(
+			_ keyPath: KeyPath<ProfileSnapshot.AppliedSecurityStructure, RoleOfTier<FactorInstance.ID>>
+		) throws -> RoleOfTier<FactorInstance> {
 			let roleWithfactorInstanceIDs = accessController.securityStructure[keyPath: keyPath]
 
 			func lookup(id: FactorInstance.ID) -> FactorInstance {
@@ -346,14 +423,15 @@ public struct Securified: Sendable, Hashable, Codable {
 				return factorInstance
 			}
 
-			return .init(
+			return try .init(
+				role: roleWithfactorInstanceIDs.role,
 				thresholdFactors: .init(uncheckedUniqueElements: roleWithfactorInstanceIDs.thresholdFactors.map(lookup(id:))),
 				threshold: roleWithfactorInstanceIDs.threshold,
 				superAdminFactors: .init(uncheckedUniqueElements: roleWithfactorInstanceIDs.superAdminFactors.map(lookup(id:)))
 			)
 		}
 
-		return .init(
+		return try! .init(
 			numberOfDaysUntilAutoConfirmation: accessController.securityStructure.numberOfDaysUntilAutoConfirmation,
 			primaryRole: decorate(\.primaryRole),
 			recoveryRole: decorate(\.recoveryRole),

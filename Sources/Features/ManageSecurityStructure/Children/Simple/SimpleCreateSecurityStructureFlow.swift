@@ -16,7 +16,7 @@ public struct SimpleManageSecurityStructureFlow: Sendable, FeatureReducer {
 			public struct New: Sendable, Hashable {
 				public var lostPhoneHelper: TrustedContactFactorSource?
 				public var confirmerOfNewPhone: SecurityQuestionsFactorSource?
-				public var numberOfDaysUntilAutoConfirmation: RecoveryAutoConfirmDelayInDays = SecurityStructureConfigurationReference.Configuration.Recovery.defaultNumberOfDaysUntilAutoConfirmation
+				public var numberOfDaysUntilAutoConfirmation: RecoveryAutoConfirmDelayInDays = SecurityStructureConfigurationReference.Configuration.Role.defaultNumberOfDaysUntilAutoConfirmation
 
 				public init(
 					lostPhoneHelper: TrustedContactFactorSource? = nil,
@@ -211,9 +211,9 @@ public struct SimpleManageSecurityStructureFlow: Sendable, FeatureReducer {
 
 						let config = SecurityStructureConfigurationDetailed.Configuration(
 							numberOfDaysUntilAutoConfirmation: new.numberOfDaysUntilAutoConfirmation,
-							primaryRole: .single(primary),
-							recoveryRole: .single(simpleFactorConfig.singleRecoveryFactor),
-							confirmationRole: .single(simpleFactorConfig.singleConfirmationFactor)
+							primaryRole: .single(primary, for: .primary),
+							recoveryRole: .single(simpleFactorConfig.singleRecoveryFactor, for: .recovery),
+							confirmationRole: .single(simpleFactorConfig.singleConfirmationFactor, for: .confirmation)
 						)
 						return Self.DelegateAction.Product.creatingNew(config: config)
 					}

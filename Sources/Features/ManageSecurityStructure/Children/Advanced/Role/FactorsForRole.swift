@@ -1,55 +1,5 @@
 import FeaturePrelude
 
-extension FactorSourceKind {
-	public var isPrimaryRoleSupported: Bool {
-		switch self {
-		case .device, .ledgerHQHardwareWallet, .offDeviceMnemonic:
-			return true
-		case .trustedContact:
-			return false
-		case .securityQuestions:
-			// This factor source kind is too cryptographically weak to be allowed for primary.
-			return false
-		}
-	}
-
-	public var isRecoveryRoleSupported: Bool {
-		switch self {
-		case .device:
-			// If a user has lost her phone, how can she use it to perform recovery...she cant!
-			return false
-		case .ledgerHQHardwareWallet, .offDeviceMnemonic, .trustedContact:
-			return true
-		case .securityQuestions:
-			// This factor source kind is too cryptographically weak to be allowed for recovery
-			return false
-		}
-	}
-
-	public var isConfirmationRoleSupported: Bool {
-		switch self {
-		case .device:
-			return true
-		case .ledgerHQHardwareWallet, .offDeviceMnemonic:
-			return true
-		case .trustedContact:
-			return false
-		case .securityQuestions:
-			return true
-		}
-	}
-
-	public func supports(
-		role: SecurityStructureRole
-	) -> Bool {
-		switch role {
-		case .primary: return isPrimaryRoleSupported
-		case .recovery: return isRecoveryRoleSupported
-		case .confirmation: return isConfirmationRoleSupported
-		}
-	}
-}
-
 extension Collection<FactorSource> {
 	func filter(
 		supportedByRole role: SecurityStructureRole
@@ -85,10 +35,15 @@ public struct FactorsForRole: Sendable, FeatureReducer {
 		case removeThresholdFactor(FactorSourceID)
 
 		case thresholdChanged(String)
+		case confirmedFactorsForRole(RoleOfTier<FactorSource>)
 	}
 
 	public enum ChildAction: Sendable, Equatable {
 		case destination(PresentationAction<Destinations.Action>)
+	}
+
+	public enum DelegateAction: Sendable, Equatable {
+		case confirmedFactorsForRole(RoleOfTier<FactorSource>)
 	}
 
 	public struct Destinations: Sendable, ReducerProtocol {
@@ -147,6 +102,9 @@ public struct FactorsForRole: Sendable, FeatureReducer {
 		case .addAdminFactor:
 			state.destination = .addAdminFactor(.init())
 			return .none
+
+		case let .confirmedFactorsForRole(roleWithFactors):
+			return .send(.delegate(.confirmedFactorsForRole(roleWithFactors)))
 		}
 	}
 
