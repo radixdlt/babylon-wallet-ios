@@ -112,7 +112,7 @@ public struct FactorsForRole: Sendable, FeatureReducer {
 			return .none
 
 		case .addThresholdFactor:
-			state.destination = .addThresholdFactor(.init())
+			state.destination = .addThresholdFactor(.init(role: state.role))
 			return .none
 
 		case let .removeAdminFactor(factorSourceID):
@@ -124,7 +124,7 @@ public struct FactorsForRole: Sendable, FeatureReducer {
 			return .none
 
 		case .addAdminFactor:
-			state.destination = .addAdminFactor(.init())
+			state.destination = .addAdminFactor(.init(role: state.role))
 			return .none
 
 		case let .confirmedRoleWithFactors(roleWithFactors):

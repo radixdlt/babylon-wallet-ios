@@ -4,6 +4,8 @@ import LedgerHardwareDevicesFeature
 // MARK: - SelectFactorKindThenFactor
 public struct SelectFactorKindThenFactor: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
+		public let role: SecurityStructureRole
+
 		@PresentationState
 		public var factorSourceOfKind: FactorSourcesOfKindList<FactorSource>.State?
 
@@ -12,7 +14,9 @@ public struct SelectFactorKindThenFactor: Sendable, FeatureReducer {
 		@PresentationState
 		public var selectLedger: LedgerHardwareDevices.State?
 
-		public init() {}
+		public init(role: SecurityStructureRole) {
+			self.role = role
+		}
 	}
 
 	public enum ViewAction: Sendable, Equatable {

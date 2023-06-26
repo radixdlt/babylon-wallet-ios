@@ -3,14 +3,14 @@ import LedgerHardwareDevicesFeature
 
 extension SelectFactorKindThenFactor.State {
 	var viewState: SelectFactorKindThenFactor.ViewState {
-		.init()
+		.init(role: role)
 	}
 }
 
 // MARK: - SelectFactorKindThenFactor.View
 extension SelectFactorKindThenFactor {
 	public struct ViewState: Equatable {
-		// TODO: declare some properties
+		let role: SecurityStructureRole
 	}
 
 	@MainActor
@@ -29,10 +29,17 @@ extension SelectFactorKindThenFactor {
 							.font(.app.body1Header)
 
 						ForEach(FactorSourceKind.allCases) { kind in
-							Button(kind.selectedFactorDisplay) {
-								viewStore.send(.selected(kind))
+							VStack {
+								let isDisabled = kind.supports(role: viewStore.role)
+								Button(kind.selectedFactorDisplay) {
+									viewStore.send(.selected(kind))
+								}
+								.disabled(isDisabled)
+								.buttonStyle(.borderedProminent)
+								if isDisabled {
+									Text("Not supported")
+								}
 							}
-							.buttonStyle(.borderedProminent)
 						}
 					}
 				}
@@ -55,22 +62,22 @@ extension SelectFactorKindThenFactor {
 	}
 }
 
-#if DEBUG
-import SwiftUI // NB: necessary for previews to appear
-
-// MARK: - SelectFactorKindThenFactor_Preview
-struct SelectFactorKindThenFactor_Preview: PreviewProvider {
-	static var previews: some View {
-		SelectFactorKindThenFactor.View(
-			store: .init(
-				initialState: .previewValue,
-				reducer: SelectFactorKindThenFactor()
-			)
-		)
-	}
-}
-
-extension SelectFactorKindThenFactor.State {
-	public static let previewValue = Self()
-}
-#endif
+// #if DEBUG
+// import SwiftUI // NB: necessary for previews to appear
+//
+//// MARK: - SelectFactorKindThenFactor_Preview
+// struct SelectFactorKindThenFactor_Preview: PreviewProvider {
+//	static var previews: some View {
+//		SelectFactorKindThenFactor.View(
+//			store: .init(
+//				initialState: .previewValue,
+//				reducer: SelectFactorKindThenFactor()
+//			)
+//		)
+//	}
+// }
+//
+// extension SelectFactorKindThenFactor.State {
+//	public static let previewValue = Self()
+// }
+// #endif
