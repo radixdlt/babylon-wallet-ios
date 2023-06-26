@@ -24,6 +24,8 @@ public struct FactorSourcesOfKindList<FactorSourceOfKind: Sendable & Hashable>: 
 		public var factorSources: IdentifiedArrayOf<FactorSourceOfKind> = []
 		public var idOfFactorSourceToFlagForDeletionUponSuccessfulCreationOfNew: FactorSourceID?
 
+		public let canAddNew: Bool
+
 		public var selectedFactorSourceID: FactorSourceOfKind.ID?
 
 		@PresentationState
@@ -39,6 +41,13 @@ public struct FactorSourcesOfKindList<FactorSourceOfKind: Sendable & Hashable>: 
 			if let selectedFactorSource {
 				self.selectedFactorSourceID = selectedFactorSource.id
 				self.factorSources = [selectedFactorSource]
+			}
+
+			switch kind {
+			case .device:
+				self.canAddNew = false
+			case .ledgerHQHardwareWallet, .offDeviceMnemonic, .securityQuestions, .trustedContact:
+				self.canAddNew = true
 			}
 		}
 	}
@@ -129,6 +138,7 @@ public struct FactorSourcesOfKindList<FactorSourceOfKind: Sendable & Hashable>: 
 			return .send(.delegate(.choseFactorSource(factorSource)))
 
 		case .addNewFactorSourceButtonTapped:
+			assert(state.canAddNew)
 			if canOnlyHaveOneFactorSourceOfKind, let existing = state.factorSources.last {
 				state.destination = .existingFactorSourceWillBeDeletedConfirmationDialog(.deletion(of: existing))
 			} else {

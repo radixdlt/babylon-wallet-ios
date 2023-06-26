@@ -14,18 +14,21 @@ public extension FactorSourcesOfKindList {
 		let selectedFactorSourceID: FactorSourceID?
 		let selectedFactorSource: FactorSourceOfKind?
 		let mode: State.Mode
+		let canAddNew: Bool
 
 		init(state: FactorSourcesOfKindList.State) {
-			allowSelection = state.mode == .selection
-			factorSources = state.factorSources
-			selectedFactorSourceID = state.selectedFactorSourceID?.embed()
-			mode = state.mode
+			self.allowSelection = state.mode == .selection
+			self.factorSources = state.factorSources
+			self.selectedFactorSourceID = state.selectedFactorSourceID?.embed()
+			self.mode = state.mode
 
 			if let id = state.selectedFactorSourceID, let selectedFactorSource = state.factorSources[id: id] {
 				self.selectedFactorSource = selectedFactorSource
 			} else {
 				self.selectedFactorSource = nil
 			}
+
+			self.canAddNew = state.canAddNew
 		}
 
 		var factorsArray: [FactorSourceOfKind]? { factorSources.elements }
@@ -78,11 +81,13 @@ public extension FactorSourcesOfKindList {
 						factorList(viewStore: viewStore)
 							.padding(.bottom, .medium1)
 
-						// FIXME: Strings
-						Button("Add new factor") {
-							viewStore.send(.addNewFactorSourceButtonTapped)
+						if viewStore.canAddNew {
+							// FIXME: Strings
+							Button("Add new factor") {
+								viewStore.send(.addNewFactorSourceButtonTapped)
+							}
+							.buttonStyle(.secondaryRectangular(shouldExpand: false))
 						}
-						.buttonStyle(.secondaryRectangular(shouldExpand: false))
 
 						Spacer(minLength: 0)
 					}
