@@ -94,15 +94,15 @@ public struct AdvancedManageSecurityStructureFlow: Sendable, FeatureReducer {
 			return .none
 
 		case .primaryRoleButtonTapped:
-			state.destination = .factorsForRole(.init(role: .primary))
+			state.destination = .factorsForRole(.init(role: .primary, factors: state.primaryRole))
 			return .none
 
 		case .recoveryRoleButtonTapped:
-			state.destination = .factorsForRole(.init(role: .recovery))
+			state.destination = .factorsForRole(.init(role: .recovery, factors: state.recoveryRole))
 			return .none
 
 		case .confirmationRoleButtonTapped:
-			state.destination = .factorsForRole(.init(role: .confirmation))
+			state.destination = .factorsForRole(.init(role: .confirmation, factors: state.confirmationRole))
 			return .none
 
 		case let .finished(config):

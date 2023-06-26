@@ -41,8 +41,13 @@ public struct FactorsForRole: Sendable, FeatureReducer {
 		) {
 			self.role = role
 			if let factors {
+				self.threshold = factors.threshold
+				self.thresholdFactorSources = .init(uncheckedUniqueElements: factors.thresholdFactors)
+				self.adminFactorSources = .init(uncheckedUniqueElements: factors.superAdminFactors)
 			} else {
 				self.threshold = 0
+				self.thresholdFactorSources = []
+				self.adminFactorSources = []
 			}
 		}
 	}
