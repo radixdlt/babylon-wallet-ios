@@ -1,5 +1,6 @@
 import AnswerSecurityQuestionsFeature
 import FeaturePrelude
+import ImportMnemonicFeature
 import ManageTrustedContactFactorSourceFeature
 
 // MARK: - ManageSomeFactorSource
@@ -7,11 +8,22 @@ public struct ManageSomeFactorSource<FactorSourceOfKind: BaseFactorSourceProtoco
 	public enum State: Sendable, Hashable {
 		case manageSecurityQuestions(AnswerSecurityQuestionsCoordinator.State)
 		case manageTrustedContact(ManageTrustedContactFactorSource.State)
+		case manageOffDeviceMnemonics(ImportMnemonic.State)
+
 		public init(kind: FactorSourceKind) {
 			switch kind {
-			case .device, .ledgerHQHardwareWallet, .offDeviceMnemonic: fatalError("Unsupported")
+			case .device:
+				fatalError("It is not possible to add another `device` factor source, bad application logic. Please make sure to disable any 'Add new' button if factor source kind is `device`.")
+
+			case .offDeviceMnemonic:
+				self = .manageOffDeviceMnemonics(.init(persistAsMnemonicKind: .offDevice))
+
+			case .ledgerHQHardwareWallet:
+				fatalError("Should have handled Ledger by use of LedgerHardwareDevicesFeature")
+
 			case .securityQuestions:
 				self = .manageSecurityQuestions(.init(purpose: .encrypt))
+
 			case .trustedContact:
 				self = .manageTrustedContact(.init(mode: .new))
 			}
@@ -21,6 +33,7 @@ public struct ManageSomeFactorSource<FactorSourceOfKind: BaseFactorSourceProtoco
 	public enum ChildAction: Sendable, Equatable {
 		case manageSecurityQuestions(AnswerSecurityQuestionsCoordinator.Action)
 		case manageTrustedContact(ManageTrustedContactFactorSource.Action)
+		case manageOffDeviceMnemonics(ImportMnemonic.Action)
 	}
 
 	public enum ViewAction: Sendable, Equatable {
@@ -34,17 +47,26 @@ public struct ManageSomeFactorSource<FactorSourceOfKind: BaseFactorSourceProtoco
 	public init() {}
 	public var body: some ReducerProtocolOf<Self> {
 		Scope(
+			state: /ManageSomeFactorSource.State.manageOffDeviceMnemonics,
+			action: /Action.child .. ChildAction.manageOffDeviceMnemonics
+		) {
+			ImportMnemonic()
+		}
+
+		Scope(
 			state: /ManageSomeFactorSource.State.manageSecurityQuestions,
 			action: /Action.child .. ChildAction.manageSecurityQuestions
 		) {
 			AnswerSecurityQuestionsCoordinator()
 		}
+
 		Scope(
 			state: /ManageSomeFactorSource.State.manageTrustedContact,
 			action: /Action.child .. ChildAction.manageTrustedContact
 		) {
 			ManageTrustedContactFactorSource()
 		}
+
 		Reduce(core)
 	}
 
@@ -57,6 +79,9 @@ public struct ManageSomeFactorSource<FactorSourceOfKind: BaseFactorSourceProtoco
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
+		case let .manageOffDeviceMnemonics(.delegate(.savedInProfile(factorSource))):
+			return delegateDone(factorSource: factorSource.extract(OffDeviceMnemonicFactorSource.self)!)
+
 		case let .manageTrustedContact(.delegate(.saveFactorSourceResult(.failure(error)))):
 			return .send(.delegate(.done(.failure(error))))
 

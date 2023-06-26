@@ -122,14 +122,6 @@ package.addModules([
 		tests: .no
 	),
 	.feature(
-		name: "LedgerHardwareDevicesFeature",
-		featureSuffixDroppedFromFolderName: true,
-		dependencies: [
-			"AddLedgerFactorSourceFeature",
-		],
-		tests: .no
-	),
-	.feature(
 		name: "CreateAuthKeyFeature",
 		featureSuffixDroppedFromFolderName: true,
 		dependencies: [
@@ -163,17 +155,6 @@ package.addModules([
 			"GatewayAPI",
 			"PersonasClient",
 			"DerivePublicKeysFeature",
-		],
-		tests: .no
-	),
-	.feature(
-		name: "ManageSecurityStructureFeature",
-		featureSuffixDroppedFromFolderName: true,
-		dependencies: [
-			"Profile",
-			"AnswerSecurityQuestionsFeature",
-			"ManageTrustedContactFactorSourceFeature",
-			"AppPreferencesClient", // Save SecurityStructureConfig
 		],
 		tests: .no
 	),
@@ -286,6 +267,14 @@ package.addModules([
 		tests: .no
 	),
 	.feature(
+		name: "LedgerHardwareDevicesFeature",
+		featureSuffixDroppedFromFolderName: true,
+		dependencies: [
+			"AddLedgerFactorSourceFeature",
+		],
+		tests: .no
+	),
+	.feature(
 		name: "MainFeature",
 		dependencies: [
 			"AppPreferencesClient",
@@ -294,6 +283,19 @@ package.addModules([
 			"SettingsFeature",
 		],
 		tests: .yes()
+	),
+	.feature(
+		name: "ManageSecurityStructureFeature",
+		featureSuffixDroppedFromFolderName: true,
+		dependencies: [
+			"Profile",
+			"AnswerSecurityQuestionsFeature",
+			"ManageTrustedContactFactorSourceFeature",
+			"LedgerHardwareDevicesFeature",
+			"ImportMnemonicFeature", // Add `offDeviceMnemonic`
+			"AppPreferencesClient", // Save SecurityStructureConfig
+		],
+		tests: .no
 	),
 	.feature(
 		name: "NewConnectionFeature",

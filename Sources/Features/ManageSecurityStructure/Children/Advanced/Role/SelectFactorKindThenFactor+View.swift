@@ -1,4 +1,5 @@
 import FeaturePrelude
+import LedgerHardwareDevicesFeature
 
 extension SelectFactorKindThenFactor.State {
 	var viewState: SelectFactorKindThenFactor.ViewState {
@@ -41,6 +42,13 @@ extension SelectFactorKindThenFactor {
 						action: { .child(.factorSourceOfKind($0)) }
 					),
 					content: { FactorSourcesOfKindList<FactorSource>.View(store: $0) }
+				)
+				.sheet(
+					store: store.scope(
+						state: \.$selectLedger,
+						action: { .child(.selectLedger($0)) }
+					),
+					content: { LedgerHardwareDevices.View(store: $0) }
 				)
 			}
 		}

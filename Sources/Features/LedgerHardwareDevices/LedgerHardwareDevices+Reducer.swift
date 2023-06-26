@@ -18,6 +18,9 @@ public struct LedgerHardwareDevices: Sendable, FeatureReducer {
 		public enum Context {
 			case settings
 			case ledgerSelection
+
+			// FIXME: special handle MFA setup context?
+			public static let setupMFA: Self = .settings
 		}
 
 		public let allowSelection: Bool
@@ -37,7 +40,11 @@ public struct LedgerHardwareDevices: Sendable, FeatureReducer {
 
 		var pendingAction: ActionRequiringP2P? = nil
 
-		public init(allowSelection: Bool, context: Context, showHeaders: Bool = true) {
+		public init(
+			allowSelection: Bool,
+			context: Context,
+			showHeaders: Bool = true
+		) {
 			self.allowSelection = allowSelection
 			self.context = context
 			self.showHeaders = showHeaders

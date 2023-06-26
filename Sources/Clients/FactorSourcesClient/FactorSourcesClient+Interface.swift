@@ -191,34 +191,38 @@ extension FactorSourcesClient {
 	public func addOffDeviceFactorSource(
 		mnemonicWithPassphrase: MnemonicWithPassphrase,
 		label: OffDeviceMnemonicFactorSource.Hint.Label
-	) async throws -> FactorSourceID {
+	) async throws -> FactorSource {
 		let factorSource = try OffDeviceMnemonicFactorSource.from(
 			mnemonicWithPassphrase: mnemonicWithPassphrase,
 			label: label
 		)
 
-		return try await addPrivateHDFactorSource(.init(
+		_ = try await addPrivateHDFactorSource(.init(
 			factorSource: factorSource.embed(),
 			mnemonicWithPasshprase: mnemonicWithPassphrase,
 			saveIntoProfile: true
 		))
+
+		return factorSource.embed()
 	}
 
 	public func addOnDeviceFactorSource(
 		onDeviceMnemonicKind: MnemonicBasedFactorSourceKind.OnDeviceMnemonicKind,
 		mnemonicWithPassphrase: MnemonicWithPassphrase
-	) async throws -> FactorSourceID {
+	) async throws -> FactorSource {
 		let isOlympiaCompatible = onDeviceMnemonicKind == .olympia
 
 		let factorSource: DeviceFactorSource = try isOlympiaCompatible
 			? .olympia(mnemonicWithPassphrase: mnemonicWithPassphrase)
 			: .babylon(mnemonicWithPassphrase: mnemonicWithPassphrase)
 
-		return try await addPrivateHDFactorSource(.init(
+		_ = try await addPrivateHDFactorSource(.init(
 			factorSource: factorSource.embed(),
 			mnemonicWithPasshprase: mnemonicWithPassphrase,
 			saveIntoProfile: isOlympiaCompatible
 		))
+
+		return factorSource.embed()
 	}
 }
 

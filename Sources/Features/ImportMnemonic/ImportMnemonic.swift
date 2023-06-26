@@ -135,7 +135,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 
 	public enum InternalAction: Sendable, Equatable {
 		case focusNext(ImportMnemonicWord.State.ID)
-		case saveFactorSourceResult(TaskResult<FactorSourceID>)
+		case saveFactorSourceResult(TaskResult<FactorSource>)
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -144,7 +144,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
-		case savedInProfile(FactorSourceID)
+		case savedInProfile(FactorSource)
 		case notSavedInProfile(MnemonicWithPassphrase)
 		case doneViewing
 	}

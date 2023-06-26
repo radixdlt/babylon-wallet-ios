@@ -1,5 +1,6 @@
 import AnswerSecurityQuestionsFeature
 import FeaturePrelude
+import ImportMnemonicFeature
 import ManageTrustedContactFactorSourceFeature
 
 extension ManageSomeFactorSource.State {
@@ -36,6 +37,13 @@ extension ManageSomeFactorSource {
 					action: { ManageSomeFactorSource.Action.child(.manageTrustedContact($0)) },
 					then: {
 						ManageTrustedContactFactorSource.View(store: $0)
+					}
+				)
+				CaseLet(
+					state: /ManageSomeFactorSource.State.manageOffDeviceMnemonics,
+					action: { ManageSomeFactorSource.Action.child(.manageOffDeviceMnemonics($0)) },
+					then: {
+						ImportMnemonic.View(store: $0)
 					}
 				)
 			}
