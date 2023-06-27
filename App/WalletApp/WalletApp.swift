@@ -1,5 +1,6 @@
 import AppFeature
 import FeaturePrelude
+import SwiftUI
 
 // MARK: - WalletApp
 @main

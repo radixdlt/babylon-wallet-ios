@@ -108,6 +108,8 @@ public struct App: Sendable, FeatureReducer {
 						// easy to think a test failed if we print this warning during tests.
 						loggerGlobal.error("An error occurred: \(String(describing: error))")
 					}
+                                        @Dependency(\.bannerClient) var bannerClient
+                                        await bannerClient.schedule(.error(error))
 
 					// Maybe instead we should listen here for the Profile.State change,
 					// and when it switches to `.ephemeral` we navigate to onboarding.
@@ -117,7 +119,7 @@ public struct App: Sendable, FeatureReducer {
 						// A slight delay to allow any modal that may be shown to be dismissed.
 						try? await clock.sleep(for: .seconds(0.5))
 					}
-					await send(.internal(.displayErrorAlert(UserFacingError(error))))
+					//await send(.internal(.displayErrorAlert(UserFacingError(error))))
 				}
 			}
 
