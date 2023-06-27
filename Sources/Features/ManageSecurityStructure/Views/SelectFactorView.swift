@@ -33,7 +33,7 @@ public struct SelectFactorView: SwiftUI.View {
 			Button(action: action) {
 				HStack {
 					// FIXME: Strings
-					Text(factorSet?.selectedFactorDisplay ?? "None set")
+					Text(factorSet?.display ?? "None set")
 						.font(.app.body1Header)
 						.foregroundColor(factorSet == nil || !isEnabled ? .app.gray3 : .app.gray1)
 

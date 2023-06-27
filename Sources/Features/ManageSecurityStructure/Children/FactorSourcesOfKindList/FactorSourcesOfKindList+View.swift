@@ -14,6 +14,7 @@ public extension FactorSourcesOfKindList {
 		let selectedFactorSourceID: FactorSourceID?
 		let selectedFactorSource: FactorSourceOfKind?
 		let mode: State.Mode
+		let kind: FactorSourceKind
 		let canAddNew: Bool
 
 		init(state: FactorSourcesOfKindList.State) {
@@ -27,17 +28,14 @@ public extension FactorSourcesOfKindList {
 			} else {
 				self.selectedFactorSource = nil
 			}
-
+			self.kind = state.kind
 			self.canAddNew = state.canAddNew
 		}
 
 		var factorsArray: [FactorSourceOfKind]? { factorSources.elements }
 
 		var navigationTitle: String {
-			guard let specificType = FactorSourceOfKind.self as? any FactorSourceProtocol.Type else {
-				return allowSelection ? "Select Factor" : "Factor"
-			}
-			let title = specificType.kind.selectedFactorDisplay
+			let title = kind.display
 			guard allowSelection else {
 				return title
 			}
@@ -67,6 +65,7 @@ public extension FactorSourcesOfKindList {
 							} else {
 								// FIXME: Icon
 								Image(systemName: "lock.square.stack.fill")
+									.resizable()
 									.frame(.medium)
 									.padding(.vertical, .medium2)
 
@@ -83,7 +82,7 @@ public extension FactorSourcesOfKindList {
 
 						if viewStore.canAddNew {
 							// FIXME: Strings
-							Button("Add new factor") {
+							Button("Add new \(viewStore.kind.display)") {
 								viewStore.send(.addNewFactorSourceButtonTapped)
 							}
 							.buttonStyle(.secondaryRectangular(shouldExpand: false))

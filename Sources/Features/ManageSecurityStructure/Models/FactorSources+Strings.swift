@@ -1,13 +1,13 @@
 import FeaturePrelude
 
 extension BaseFactorSourceProtocol {
-	var selectedFactorDisplay: String {
-		kind.selectedFactorDisplay
+	var display: String {
+		kind.display
 	}
 }
 
 extension FactorSourceKind {
-	var selectedFactorDisplay: String {
+	var display: String {
 		switch self {
 		// FIXME: Strings
 		case .device:

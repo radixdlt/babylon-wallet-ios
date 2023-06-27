@@ -28,7 +28,7 @@ extension SelectFactorKindThenFactor {
 						ForEach(FactorSourceKind.allCases) { kind in
 							VStack(spacing: 0) {
 								let isEnabled = kind.supports(role: viewStore.role)
-								Button(kind.selectedFactorDisplay) {
+								Button(kind.display) {
 									viewStore.send(.selected(kind))
 								}
 								.controlState(isEnabled ? .enabled : .disabled)

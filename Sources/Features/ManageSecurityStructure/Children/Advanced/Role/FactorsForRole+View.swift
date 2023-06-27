@@ -230,7 +230,7 @@ public struct FactorsListView: SwiftUI.View {
 			ForEach(factors) { factor in
 				Card {
 					HStack(spacing: .small3) {
-						Text(factor.kind.selectedFactorDisplay)
+						Text(factor.kind.display)
 							.font(.app.secondaryHeader)
 
 						Spacer(minLength: 0)

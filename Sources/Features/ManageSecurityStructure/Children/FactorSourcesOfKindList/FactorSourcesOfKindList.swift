@@ -36,6 +36,10 @@ public struct FactorSourcesOfKindList<FactorSourceOfKind: Sendable & Hashable>: 
 			mode: Mode,
 			selectedFactorSource: FactorSourceOfKind? = nil
 		) {
+			if let specificType = FactorSourceOfKind.self as? any FactorSourceProtocol.Type {
+				precondition(specificType.kind == kind)
+			}
+
 			self.kind = kind
 			self.mode = mode
 			if let selectedFactorSource {
@@ -48,6 +52,18 @@ public struct FactorSourcesOfKindList<FactorSourceOfKind: Sendable & Hashable>: 
 				self.canAddNew = false
 			case .ledgerHQHardwareWallet, .offDeviceMnemonic, .securityQuestions, .trustedContact:
 				self.canAddNew = true
+			}
+		}
+
+		public var canOnlyHaveOneFactorSourceOfKind: Bool {
+			switch kind {
+			case .ledgerHQHardwareWallet, .offDeviceMnemonic, .trustedContact: return false
+			case .securityQuestions:
+				return true
+			case .device:
+				// Well... it is complicated, we don't allow users to manually create more Babylon device
+				// factor sources. But user can import as many legacy/olympia device factor source they want.
+				return true
 			}
 		}
 	}
@@ -110,21 +126,6 @@ public struct FactorSourcesOfKindList<FactorSourceOfKind: Sendable & Hashable>: 
 			}
 	}
 
-	var canOnlyHaveOneFactorSourceOfKind: Bool {
-		guard let specificType = FactorSourceOfKind.self as? any FactorSourceProtocol.Type else {
-			return false
-		}
-		switch specificType.kind {
-		case .ledgerHQHardwareWallet, .offDeviceMnemonic, .trustedContact: return false
-		case .securityQuestions:
-			return true
-		case .device:
-			// Well... it is complicated, we don't allow users to manually create more Babylon device
-			// factor sources. But user can import as many legacy/olympia device factor source they want.
-			return true
-		}
-	}
-
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .onFirstTask:
@@ -139,9 +140,15 @@ public struct FactorSourcesOfKindList<FactorSourceOfKind: Sendable & Hashable>: 
 
 		case .addNewFactorSourceButtonTapped:
 			assert(state.canAddNew)
-			if canOnlyHaveOneFactorSourceOfKind, let existing = state.factorSources.last {
+
+			if
+				state.canOnlyHaveOneFactorSourceOfKind,
+				let existing = state.factorSources.last
+			{
+				print("displaying Confirmation Dialoge ✅")
 				state.destination = .existingFactorSourceWillBeDeletedConfirmationDialog(.deletion(of: existing))
 			} else {
+				print("displaying Confirmation Dialog NOT 🚩")
 				state.destination = .addNewFactorSource(.init(kind: state.kind))
 			}
 			return .none
