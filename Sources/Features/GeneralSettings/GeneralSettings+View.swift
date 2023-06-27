@@ -35,7 +35,7 @@ extension GeneralSettings {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				ScrollView {
 					coreView(with: viewStore)
-						.navigationTitle(L10n.GeneralSettings.title)
+						.navigationTitle(L10n.AppSettings.title)
 						.onAppear { viewStore.send(.appeared) }
 				}
 			}
@@ -67,8 +67,8 @@ extension GeneralSettings {
 
 		private func isUsingVerboseLedgerMode(with viewStore: ViewStoreOf<GeneralSettings>) -> some SwiftUI.View {
 			ToggleView(
-				title: L10n.GeneralSettings.VerboseLedgerMode.title,
-				subtitle: L10n.GeneralSettings.VerboseLedgerMode.subtitle,
+				title: L10n.AppSettings.VerboseLedgerMode.title,
+				subtitle: L10n.AppSettings.VerboseLedgerMode.subtitle,
 				isOn: viewStore.binding(
 					get: \.useVerboseLedgerDisplayMode,
 					send: { .useVerboseModeToggled($0) }
@@ -78,8 +78,8 @@ extension GeneralSettings {
 
 		private func isDeveloperModeEnabled(with viewStore: ViewStoreOf<GeneralSettings>) -> some SwiftUI.View {
 			ToggleView(
-				title: L10n.GeneralSettings.DeveloperMode.title,
-				subtitle: L10n.GeneralSettings.DeveloperMode.subtitle,
+				title: L10n.AppSettings.DeveloperMode.title,
+				subtitle: L10n.AppSettings.DeveloperMode.subtitle,
 				isOn: viewStore.binding(
 					get: \.isDeveloperModeEnabled,
 					send: { .developerModeToggled(.init($0)) }
@@ -120,11 +120,11 @@ extension GeneralSettings {
 		private func resetWallet(with viewStore: ViewStoreOf<GeneralSettings>) -> some SwiftUI.View {
 			HStack {
 				VStack(alignment: .leading, spacing: 0) {
-					Text(L10n.GeneralSettings.ResetWallet.title)
+					Text(L10n.AppSettings.ResetWallet.title)
 						.foregroundColor(.app.gray1)
 						.textStyle(.body1HighImportance)
 
-					Text(L10n.GeneralSettings.ResetWallet.subtitle)
+					Text(L10n.AppSettings.ResetWallet.subtitle)
 						.foregroundColor(.app.gray2)
 						.textStyle(.body2Regular)
 						.fixedSize()
@@ -132,7 +132,7 @@ extension GeneralSettings {
 
 				Spacer(minLength: 0)
 
-				Button(L10n.GeneralSettings.ResetWallet.buttonTitle) {
+				Button(L10n.AppSettings.ResetWallet.buttonTitle) {
 					viewStore.send(.deleteProfileAndFactorSourcesButtonTapped)
 				}
 				.buttonStyle(.secondaryRectangular(isDestructive: true))
