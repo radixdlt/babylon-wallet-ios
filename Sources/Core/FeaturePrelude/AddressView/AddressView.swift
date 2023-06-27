@@ -101,7 +101,7 @@ extension AddressView {
 
 	private func copyToPasteboard() {
 		pasteboardClient.copyString(identifiable.address)
-                Task { await bannerClient.schedule(.toast("Copied")) }
+                bannerClient.schedule(userInfo: "Copied")
 	}
 
 	private func viewOnRadixDashboard() {

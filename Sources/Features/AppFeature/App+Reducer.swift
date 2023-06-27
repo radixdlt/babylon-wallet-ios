@@ -109,7 +109,9 @@ public struct App: Sendable, FeatureReducer {
 						loggerGlobal.error("An error occurred: \(String(describing: error))")
 					}
                                         @Dependency(\.bannerClient) var bannerClient
-                                        await bannerClient.schedule(.error(error))
+                                        bannerClient.schedule(userError: error)
+
+                                        bannerClient.scheduleAlert(.init(title: "hello", buttons: [.ini]))
 
 					// Maybe instead we should listen here for the Profile.State change,
 					// and when it switches to `.ephemeral` we navigate to onboarding.

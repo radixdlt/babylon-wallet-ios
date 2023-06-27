@@ -8,7 +8,6 @@ import SplashFeature
 extension App {
 	@MainActor
 	public struct View: SwiftUI.View {
-		@EnvironmentObject var sceneDelegate: SceneDelegate
 		@Dependency(\.bannerClient) var bannerClient
 
 		private let store: StoreOf<App>
@@ -39,11 +38,6 @@ extension App {
 					)
 				}
 				.tint(.app.gray1)
-				.onAppear {
-					if let windowScene = sceneDelegate.windowScene {
-						Task { await bannerClient.setWindowScene(windowScene) }
-					}
-				}
 				.alert(
 					store: store.scope(state: \.$alert, action: { .view(.alert($0)) }),
 					state: /App.Alerts.State.userErrorAlert,
