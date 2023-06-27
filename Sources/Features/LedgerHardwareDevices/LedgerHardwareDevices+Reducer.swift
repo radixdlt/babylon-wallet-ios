@@ -19,9 +19,7 @@ public struct LedgerHardwareDevices: Sendable, FeatureReducer {
 			case settings
 			case importOlympia
 			case createHardwareAccount
-
-			// FIXME: special handle MFA setup context?
-			public static let setupMFA: Self = .settings
+			case setupMFA
 		}
 
 		public let context: Context
