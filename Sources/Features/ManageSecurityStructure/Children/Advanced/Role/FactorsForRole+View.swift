@@ -120,6 +120,11 @@ extension FactorsForRole {
 					}
 				}
 				.destinations(with: store)
+				.confirmationDialog(
+					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+					state: /FactorsForRole.Destinations.State.existingRoleMadeLessSafeConfirmationDialog,
+					action: FactorsForRole.Destinations.Action.existingRoleMadeLessSafeConfirmationDialog
+				)
 				.navigationTitle(viewStore.role.titleAdvancedFlow)
 				.padding()
 				.frame(maxWidth: .infinity)
@@ -142,7 +147,7 @@ extension View {
 			store: destinationStore,
 			state: /FactorsForRole.Destinations.State.addThresholdFactor,
 			action: FactorsForRole.Destinations.Action.addThresholdFactor,
-			content: { SelectFactorKindThenFactor.View(store: $0) }
+			content: { store in NavigationView { SelectFactorKindThenFactor.View(store: store) } }
 		)
 	}
 
@@ -152,7 +157,7 @@ extension View {
 			store: destinationStore,
 			state: /FactorsForRole.Destinations.State.addAdminFactor,
 			action: FactorsForRole.Destinations.Action.addAdminFactor,
-			content: { SelectFactorKindThenFactor.View(store: $0) }
+			content: { store in NavigationView { SelectFactorKindThenFactor.View(store: store) } }
 		)
 	}
 }
@@ -164,6 +169,7 @@ public struct FactorsListView: SwiftUI.View {
 	let factors: [FactorSource]
 	let addFactorAction: () -> Void
 	let removeFactorAction: (FactorSourceID) -> Void
+
 	public var body: some View {
 		VStack {
 			Text(title)
