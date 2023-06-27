@@ -34,15 +34,15 @@ public enum ExistingRoleMadeLessSafeConfirmationDialog: Sendable, Hashable {
 extension RoleOfTier<FactorSource> {
 	func isLessSafe(than other: Self) -> Bool {
 		if thresholdFactors.count < other.thresholdFactors.count {
-			// We consider LESS threshold factors LESS safe
+			// We consider FEWER threshold factors LESS safe
 			return true
 		}
 		if threshold < other.threshold {
-			// We consider requiring LESS threshold factors be used LESS safe.
+			// We consider requiring FEWER threshold factors be used LESS safe.
 			return true
 		}
 
-		// We consider MORE admin factors LESS safe if and ONLY if thresholdFactors is empty,
+		// We consider MORE admin factors LESS safe ONLY if thresholdFactors is empty,
 		// since if thresholdFactors is empty, using any admin factor is more safe than no factors at all.
 		if thresholdFactors.isEmpty {
 			return superAdminFactors.count < other.superAdminFactors.count
