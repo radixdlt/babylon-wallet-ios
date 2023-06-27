@@ -126,25 +126,20 @@ public struct AdvancedManageSecurityStructureFlow: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
-//		case let .destination(.presented(.factorsForRole(.delegate(.confirmedRoleWithFactors(roleWithFactors))))):
-//			switch roleWithFactors.role {
-//			case .confirmation:
-//				state.confirmationRole = roleWithFactors.factors
-//			case .primary:
-//				state.primaryRole = roleWithFactors.factors
-//			case .recovery:
-//				state.recoveryRole = roleWithFactors.factors
-//			}
-//			state.destination = nil
-//			return .none
-		case let .destination(.presented(.factorsForPrimaryRole(.delegate(.confirmedRoleWithFactors(roleWithFactors))))):
-			fatalError()
+		case let .destination(.presented(.factorsForPrimaryRole(.delegate(.confirmedRoleWithFactors(primaryRole))))):
+			state.primaryRole = primaryRole
+			state.destination = nil
+			return .none
 
-		case let .destination(.presented(.factorsForRecoveryRole(.delegate(.confirmedRoleWithFactors(roleWithFactors))))):
-			fatalError()
+		case let .destination(.presented(.factorsForRecoveryRole(.delegate(.confirmedRoleWithFactors(recoveryRole))))):
+			state.recoveryRole = recoveryRole
+			state.destination = nil
+			return .none
 
-		case let .destination(.presented(.factorsForConfirmationRole(.delegate(.confirmedRoleWithFactors(roleWithFactors))))):
-			fatalError()
+		case let .destination(.presented(.factorsForConfirmationRole(.delegate(.confirmedRoleWithFactors(confirmationRole))))):
+			state.confirmationRole = confirmationRole
+			state.destination = nil
+			return .none
 
 		default:
 			return .none
