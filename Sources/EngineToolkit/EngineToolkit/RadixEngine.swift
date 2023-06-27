@@ -216,6 +216,25 @@ extension RadixEngine {
 			function: extract_addresses_from_manifest
 		)
 	}
+
+	public func staticallyValidateTransaction(_ request: StaticallyValidateTransactionRequest) -> Result<StaticallyValidateTransactionResponse, Error> {
+		callLibraryFunction(
+			request: request,
+			function: statically_validate_transaction
+		)
+	}
+
+	public func hashTransactionIntent(_ request: TransactionIntent) -> Result<HashTransactionIntentResponse, Error> {
+		callLibraryFunction(request: request, function: hash_transaction_intent)
+	}
+
+	public func hashNotarizeTransaction(_ request: NotarizedTransaction) -> Result<HashNotarizedTransactionResponse, Error> {
+		callLibraryFunction(request: request, function: hash_notarized_transaction)
+	}
+
+	public func hashSignedTransactionIntent(_ request: SignedTransactionIntent) -> Result<HashSignedTransactionItentResponse, Error> {
+		callLibraryFunction(request: request, function: hash_signed_transaction_intent)
+	}
 }
 
 // MARK: Private (But Internal For Tests)
@@ -431,7 +450,7 @@ func prettyPrint<FailedDecodable: Decodable>(
 /// using old Cocoa APIs
 func prettyPrint(jsonString: String, label: String?) {
 	guard
-		// RadixEngine._debugPrint,
+		RadixEngine._debugPrint,
 		let data = jsonString.data(using: .utf8),
 		let pretty = data.prettyPrintedJSONString
 	else {

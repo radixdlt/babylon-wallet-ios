@@ -127,7 +127,7 @@ extension LedgerHardwareWalletClient: DependencyKey {
 				let hashedMsg = try blake2b(data: request.unhashedDataToSign)
 				return try await sign(
 					signers: request.signers,
-					expectedHashedMessage: hashedMsg
+					expectedHashedMessage: hashedMsg.data
 				) {
 					try await makeRequest(
 						.signTransaction(.init(
@@ -152,7 +152,7 @@ extension LedgerHardwareWalletClient: DependencyKey {
 				let hash = try blake2b(data: rolaPayload.payloadToHashAndSign)
 				return try await sign(
 					signers: request.signers,
-					expectedHashedMessage: hash
+					expectedHashedMessage: hash.data
 				) {
 					try await makeRequest(
 						.signChallenge(.init(

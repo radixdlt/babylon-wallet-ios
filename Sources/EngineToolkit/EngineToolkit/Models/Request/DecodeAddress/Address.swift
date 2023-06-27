@@ -114,7 +114,7 @@ public struct SpecificAddress<Kind: SpecificAddressKind>: Sendable, Hashable, Id
 	public let address: String
 	public let decodedKind: AddressKind
 
-	init(address: String, decodedKind: AddressKind) {
+	public init(address: String, decodedKind: AddressKind) {
 		self.address = address
 		self.decodedKind = decodedKind
 	}

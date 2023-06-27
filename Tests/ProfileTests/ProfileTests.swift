@@ -7,7 +7,7 @@ import TestingPrelude
 
 // MARK: - ProfileTests
 final class ProfileTests: TestCase {
-	let gateway = Radix.Gateway.kisharnet
+	let gateway = Radix.Gateway.enkinet
 
 	func test_p2p_client_eq() throws {
 		let pw = try ConnectionPassword(.init(.deadbeef32Bytes))

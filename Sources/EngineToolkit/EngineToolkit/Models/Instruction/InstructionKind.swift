@@ -14,7 +14,6 @@ public enum InstructionKind: String, Codable, Sendable, Hashable {
 	case returnToWorktop = "RETURN_TO_WORKTOP"
 
 	case assertWorktopContains = "ASSERT_WORKTOP_CONTAINS"
-	case assertWorktopContainsByAmount = "ASSERT_WORKTOP_CONTAINS_BY_AMOUNT"
 	case assertWorktopContainsNonFungibles = "ASSERT_WORKTOP_CONTAINS_NON_FUNGIBLES"
 
 	case popFromAuthZone = "POP_FROM_AUTH_ZONE"

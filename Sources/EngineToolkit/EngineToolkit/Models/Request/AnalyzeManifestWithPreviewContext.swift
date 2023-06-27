@@ -1,3 +1,6 @@
+import CasePaths
+import Foundation
+
 // MARK: - AnalyzeTransactionExecutionRequest
 public struct AnalyzeTransactionExecutionRequest: Encodable {
 	public let networkId: NetworkID
@@ -105,17 +108,39 @@ public enum AccountDeposit: Sendable, Decodable, Hashable {
 
 // MARK: - NewlyCreated
 public struct NewlyCreated: Sendable, Decodable, Hashable {
-	public var resources: [NewlyCreatedResources]
+	public var resources: [NewlyCreatedResource]
 }
 
-// MARK: - NewlyCreatedResources
-public struct NewlyCreatedResources: Sendable, Decodable, Hashable {
+// MARK: - NewlyCreatedResource
+public struct NewlyCreatedResource: Sendable, Decodable, Hashable {
 	public struct MetadataKeyValue: Sendable, Decodable, Hashable {
 		public let key: String
 		public let value: MetadataValue
 	}
 
 	public var metadata: [MetadataKeyValue]
+
+	public var name: String? {
+		metadata["name"]?.string
+	}
+
+	public var description: String? {
+		metadata["description"]?.string
+	}
+
+	public var symbol: String? {
+		metadata["symbol"]?.string
+	}
+
+	public var iconURL: URL? {
+		metadata["icon_url"]?.string.flatMap(URL.init)
+	}
+}
+
+extension [NewlyCreatedResource.MetadataKeyValue] {
+	public subscript(_ key: String) -> MetadataValue? {
+		first { $0.key == key }?.value
+	}
 }
 
 // MARK: - ResourceQuantifier
@@ -135,6 +160,13 @@ public enum ResourceQuantifier: Sendable, Decodable, Hashable {
 public enum ResourceManagerSpecifier: Sendable, Decodable, Hashable {
 	case existing(ResourceAddress)
 	case newlyCreated(index: Int)
+
+	public var existing: ResourceAddress? {
+		guard case let .existing(resourceAddress) = self else {
+			return nil
+		}
+		return resourceAddress
+	}
 
 	enum CodingKeys: String, CodingKey {
 		case type

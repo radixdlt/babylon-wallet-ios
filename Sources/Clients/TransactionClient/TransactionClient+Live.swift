@@ -76,7 +76,7 @@ extension TransactionClient {
 				if let nonEmpty = NonEmpty(rawValue: myInvolvedEntities.entitiesRequiringAuth) {
 					return .intentSigners(nonEmpty)
 				} else {
-					return .notaryAsSignatory
+					return .notaryIsSignatory
 				}
 			}()
 
@@ -240,7 +240,7 @@ extension TransactionClient {
 				endEpochExclusive: epoch + request.makeTransactionHeaderInput.epochWindow,
 				nonce: request.nonce,
 				publicKey: SLIP10.PublicKey.eddsaEd25519(transactionSigners.notaryPublicKey).intoEngine(),
-				notaryIsSignatory: transactionSigners.notaryAsSignatory,
+				notaryIsSignatory: transactionSigners.notaryIsSignatory,
 				tipPercentage: request.makeTransactionHeaderInput.tipPercentage
 			)
 
@@ -254,23 +254,15 @@ extension TransactionClient {
 		}
 
 		let notarizeTransaction: NotarizeTransaction = { request in
-
-			let intent = try engineToolkitClient.decompileTransactionIntent(.init(
-				compiledIntent: request.compileTransactionIntent.compiledIntent,
-				instructionsOutputKind: .parsed
-			))
-
 			let signedTransactionIntent = SignedTransactionIntent(
-				intent: intent,
+				intent: request.transactionIntent,
 				intentSignatures: Array(request.intentSignatures)
 			)
-			let txID = try engineToolkitClient.generateTXID(intent)
-			let compiledSignedIntent = try engineToolkitClient.compileSignedTransactionIntent(
-				signedTransactionIntent
-			)
+
+			let signedIntentHash = try engineToolkitClient.hashSignedTransactionIntent(signedTransactionIntent).hash
 
 			let notarySignature = try request.notary.sign(
-				hashOfMessage: blake2b(data: compiledSignedIntent.compiledIntent)
+				hashOfMessage: Data(hex: signedIntentHash)
 			)
 
 			let uncompiledNotarized = try NotarizedTransaction(
@@ -281,6 +273,8 @@ extension TransactionClient {
 			let compiledNotarizedTXIntent = try engineToolkitClient.compileNotarizedTransactionIntent(
 				uncompiledNotarized
 			)
+
+			let txID = try engineToolkitClient.generateTXID(request.transactionIntent)
 
 			return .init(
 				notarized: compiledNotarizedTXIntent,
@@ -362,7 +356,7 @@ extension TransactionClient {
 			/// Will be increased with each added guarantee to account for the difference in indexes from the initial manifest.
 			var indexInc = 1 // LockFee was added, start from 1
 			for guarantee in guarantees {
-				let guaranteeInstruction: Instruction = .assertWorktopContainsByAmount(.init(
+				let guaranteeInstruction: Instruction = .assertWorktopContains(.init(
 					amount: .init(
 						value: guarantee.amount.toString()
 					),
@@ -392,8 +386,6 @@ extension TransactionClient {
 				rawValue: Set(Array(transactionIntentWithSigners.transactionSigners.intentSignerEntitiesOrEmpty()) + [.account(request.feePayer)])
 			)!
 
-			let compiledIntent = try engineToolkitClient.compileTransactionIntent(transactionIntentWithSigners.intent)
-
 			let signingFactors = try await factorSourcesClient.getSigningFactors(.init(
 				networkID: request.networkID,
 				signers: entities,
@@ -418,7 +410,7 @@ extension TransactionClient {
 			}
 			printSigners()
 
-			return .init(compiledIntent: compiledIntent, signingFactors: signingFactors)
+			return .init(intent: transactionIntentWithSigners.intent, signingFactors: signingFactors)
 		}
 
 		let myInvolvedEntities: MyInvolvedEntities = { manifest in

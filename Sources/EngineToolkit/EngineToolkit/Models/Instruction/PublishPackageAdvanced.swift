@@ -14,11 +14,11 @@ public struct PublishPackageAdvanced: InstructionProtocol {
 	public let schema: Bytes
 	public let royaltyConfig: Map_
 	public let metadata: Map_
-	public let authorityRules: Tuple
+	public let authorityRules: Map_
 
 	// MARK: Init
 
-	public init(code: Blob, schema: Bytes, royaltyConfig: Map_, metadata: Map_, authorityRules: Tuple) {
+	public init(code: Blob, schema: Bytes, royaltyConfig: Map_, metadata: Map_, authorityRules: Map_) {
 		self.code = code
 		self.schema = schema
 		self.royaltyConfig = royaltyConfig

@@ -20,7 +20,7 @@ typealias TestTransaction = (
 // the EdDSA Ed25519 curve.
 func testTransactionEd25519(
 	signerCount: UInt,
-	notaryAsSignatory: Bool = true,
+	notaryIsSignatory: Bool = true,
 	file: StaticString = #file,
 	line: UInt = #line
 ) throws -> TestTransaction {
@@ -36,7 +36,7 @@ func testTransactionEd25519(
 // the ECDAS `secp256k1` curve.
 func testTransactionSecp256k1(
 	signerCount: UInt,
-	notaryAsSignatory: Bool = true,
+	notaryIsSignatory: Bool = true,
 	file: StaticString = #file,
 	line: UInt = #line
 ) throws -> TestTransaction {
@@ -50,7 +50,7 @@ func testTransactionSecp256k1(
 private func _testTransaction(
 	notaryPrivateKey: Engine.PrivateKey,
 	signerPrivateKeys: [Engine.PrivateKey],
-	notaryAsSignatory: Bool = true,
+	notaryIsSignatory: Bool = true,
 	file: StaticString = #file,
 	line: UInt = #line
 ) throws -> TestTransaction {
@@ -64,7 +64,7 @@ private func _testTransaction(
 		endEpochExclusive: 10,
 		nonce: 0,
 		publicKey: notaryPrivateKey.publicKey(),
-		notaryIsSignatory: notaryAsSignatory,
+		notaryIsSignatory: notaryIsSignatory,
 		tipPercentage: 0
 	)
 

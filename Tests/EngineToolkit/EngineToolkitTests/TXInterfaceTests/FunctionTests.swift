@@ -5,6 +5,7 @@ final class FunctionCallsTest: TestCase {
 	let decoder = JSONDecoder()
 
 	func test_extractAddressesFromManifest() throws {
+		try test_function(sut.staticallyValidateTransaction)
 		try test_function(sut.extractAddressesFromManifest)
 		// TODO: Add analyzeTransactionExecution
 
@@ -26,7 +27,7 @@ final class FunctionCallsTest: TestCase {
 		try test_function(sut.deriveVirtualIdentityAddressRequest(request:))
 		try test_function(sut.deriveOlympiaAddressFromPublicKeyRequest(request:))
 		try test_function(sut.hashRequest(request:))
-		// try test_function(sut.knownEntityAddresses(request:))
+//		// try test_function(sut.knownEntityAddresses(request:))
 	}
 
 	private func test_function<Request: Decodable, Response: Decodable & Equatable>(_ f: (Request) -> Result<Response, RadixEngine.Error>) throws {

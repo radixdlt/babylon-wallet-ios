@@ -24,7 +24,7 @@ extension Radix {
 }
 
 extension Radix.Gateway {
-	public static let `default` = kisharnet
+	public static let `default` = enkinet
 }
 
 extension Radix.Gateway {

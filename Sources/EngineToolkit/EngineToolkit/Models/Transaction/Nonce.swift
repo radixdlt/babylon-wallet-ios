@@ -16,5 +16,5 @@ extension Nonce {
 // MARK: - NonceTag
 public enum NonceTag: Sendable {}
 
-/// Secure random unique 8 bytes.
-public typealias Nonce = Tagged<NonceTag, UInt64>
+/// Secure random unique 4 bytes.
+public typealias Nonce = Tagged<NonceTag, UInt32>

@@ -50,6 +50,13 @@ public indirect enum MetadataValue: Sendable, Codable, Hashable {
 	case nonFungibleLocalIdArray([NonFungibleLocalId])
 	case publicKeyArray([Engine.PublicKey])
 	case publicKeyHashArray([PublicKeyHash])
+
+	public var string: String? {
+		guard case let .string(string) = self else {
+			return nil
+		}
+		return string
+	}
 }
 
 // MARK: - MetadataValueKind
@@ -394,6 +401,13 @@ public enum PublicKeyHash: Sendable, Codable, Hashable {
 	private enum CodingKeys: String, CodingKey {
 		case discriminator = "curve"
 		case publicKeyHash = "public_key_hash"
+	}
+
+	public var hash: String {
+		switch self {
+		case let .ecdsaSecp256k1(hash), let .eddsaEd25519(hash):
+			return hash
+		}
 	}
 
 	internal var discriminator: CurveDiscriminator {

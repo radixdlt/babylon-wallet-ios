@@ -16,6 +16,9 @@ public struct EngineToolkitClient: Sendable, DependencyKey {
 	public var decompileTransactionIntent: DecompileTransactionIntent
 	public var decompileNotarizedTransactionIntent: DecompileNotarizedTransactionIntent
 
+	public var hashTransactionIntent: HashTransactionIntent
+	public var hashSignedTransactionIntent: HashSignedTransactionIntent
+
 	public var deriveOlympiaAdressFromPublicKey: DeriveOlympiaAdressFromPublicKey
 
 	public var generateTXID: GenerateTXID
@@ -75,6 +78,10 @@ extension EngineToolkitClient {
 	public typealias CompileSignedTransactionIntent = @Sendable (SignedTransactionIntent) throws -> CompileSignedTransactionIntentResponse
 
 	public typealias CompileNotarizedTransactionIntent = @Sendable (NotarizedTransaction) throws -> CompileNotarizedTransactionIntentResponse
+
+	public typealias HashTransactionIntent = @Sendable (TransactionIntent) throws -> HashTransactionIntentResponse
+
+	public typealias HashSignedTransactionIntent = @Sendable (SignedTransactionIntent) throws -> HashSignedTransactionItentResponse
 
 	public typealias DeriveOlympiaAdressFromPublicKey = @Sendable (K1.PublicKey) throws -> String
 
