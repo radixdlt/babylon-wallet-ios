@@ -13,24 +13,15 @@ public struct ScanMultipleOlympiaQRCodes: Sendable, FeatureReducer {
 			public let payloadIndex: Int
 		}
 
-		public enum Step: Sendable, Hashable {
-			case scanQR(ScanQRCoordinator.State)
-
-			public init() {
-				self = .scanQR(.init(scanInstructions: L10n.ImportLegacyWallet.scanQRCodeInstructions))
-			}
-		}
-
-		public var step: Step
+		public var scanQR: ScanQRCoordinator.State
 		public var numberOfPayloadsToScan: Int?
 		public var scannedPayloads: IdentifiedArrayOf<ScannedPayload>
 
 		public init(
-			step: Step = .init(),
 			numberOfPayloadsToScan: Int? = nil,
 			scannedPayloads: IdentifiedArrayOf<ScannedPayload> = []
 		) {
-			self.step = step
+			self.scanQR = .init(scanInstructions: L10n.ImportLegacyWallet.scanQRCodeInstructions)
 			self.numberOfPayloadsToScan = numberOfPayloadsToScan
 			self.scannedPayloads = scannedPayloads
 		}
@@ -58,13 +49,9 @@ public struct ScanMultipleOlympiaQRCodes: Sendable, FeatureReducer {
 	public init() {}
 
 	public var body: some ReducerProtocolOf<Self> {
-		Scope(state: \.step, action: /Action.self) {
-			EmptyReducer()
-				.ifCaseLet(/State.Step.scanQR, action: /Action.child .. ChildAction.scanQR) {
-					ScanQRCoordinator()
-				}
+		Scope(state: \.scanQR, action: /Action.child .. ChildAction.scanQR) {
+			ScanQRCoordinator()
 		}
-
 		Reduce(core)
 	}
 
