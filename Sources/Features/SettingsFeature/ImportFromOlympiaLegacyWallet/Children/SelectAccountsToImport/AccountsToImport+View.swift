@@ -1,8 +1,8 @@
 import FeaturePrelude
 import ImportLegacyWalletClient
 
-extension SelectAccountsToImport.State {
-	var viewState: SelectAccountsToImport.ViewState {
+extension AccountsToImport.State {
+	var viewState: AccountsToImport.ViewState {
 		.init(
 			availableAccounts: availableAccounts.elements,
 			alreadyImported: alreadyImported,
@@ -12,8 +12,8 @@ extension SelectAccountsToImport.State {
 	}
 }
 
-// MARK: - SelectAccountsToImport.View
-extension SelectAccountsToImport {
+// MARK: - AccountsToImport.View
+extension AccountsToImport {
 	public struct ViewState: Equatable {
 		let availableAccounts: [OlympiaAccountToMigrate]
 		let alreadyImported: Set<OlympiaAccountToMigrate.ID>
@@ -23,9 +23,9 @@ extension SelectAccountsToImport {
 
 	@MainActor
 	public struct View: SwiftUI.View {
-		private let store: StoreOf<SelectAccountsToImport>
+		private let store: StoreOf<AccountsToImport>
 
-		public init(store: StoreOf<SelectAccountsToImport>) {
+		public init(store: StoreOf<AccountsToImport>) {
 			self.store = store
 		}
 

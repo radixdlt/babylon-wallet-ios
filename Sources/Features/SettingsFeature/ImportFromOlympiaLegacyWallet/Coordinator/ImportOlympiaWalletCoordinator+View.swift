@@ -53,7 +53,7 @@ extension ImportOlympiaWalletCoordinator.Path {
 					CaseLet(
 						state: /State.selectAccountsToImport,
 						action: Action.selectAccountsToImport,
-						then: { SelectAccountsToImport.View(store: $0) }
+						then: { AccountsToImport.View(store: $0) }
 					)
 				case .importMnemonic:
 					CaseLet(

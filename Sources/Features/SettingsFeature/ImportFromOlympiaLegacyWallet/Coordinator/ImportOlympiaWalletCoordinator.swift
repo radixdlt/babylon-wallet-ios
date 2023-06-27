@@ -22,14 +22,14 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 
 	public struct Path: Sendable, ReducerProtocol {
 		public enum State: Sendable, Hashable {
-			case selectAccountsToImport(SelectAccountsToImport.State)
+			case selectAccountsToImport(AccountsToImport.State)
 			case importMnemonic(ImportMnemonic.State)
 			case importOlympiaLedgerAccountsAndFactorSources(ImportOlympiaLedgerAccountsAndFactorSources.State)
 			case completion(CompletionMigrateOlympiaAccountsToBabylon.State)
 		}
 
 		public enum Action: Sendable, Equatable {
-			case selectAccountsToImport(SelectAccountsToImport.Action)
+			case selectAccountsToImport(AccountsToImport.Action)
 			case importMnemonic(ImportMnemonic.Action)
 			case importOlympiaLedgerAccountsAndFactorSources(ImportOlympiaLedgerAccountsAndFactorSources.Action)
 			case completion(CompletionMigrateOlympiaAccountsToBabylon.Action)
@@ -37,7 +37,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 
 		public var body: some ReducerProtocolOf<Self> {
 			Scope(state: /State.selectAccountsToImport, action: /Action.selectAccountsToImport) {
-				SelectAccountsToImport()
+				AccountsToImport()
 			}
 			Scope(state: /State.importMnemonic, action: /Action.importMnemonic) {
 				ImportMnemonic()
