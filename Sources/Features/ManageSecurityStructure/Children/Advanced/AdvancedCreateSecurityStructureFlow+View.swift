@@ -118,6 +118,7 @@ extension AdvancedManageSecurityStructureFlow {
 					}
 					.padding()
 				}
+				.navigationTitle("Advanced Multifactor")
 				.footer {
 					WithControlRequirements(
 						viewStore.config,

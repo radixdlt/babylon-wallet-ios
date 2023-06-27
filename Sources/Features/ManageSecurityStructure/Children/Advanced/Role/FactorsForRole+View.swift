@@ -114,7 +114,7 @@ extension FactorsForRole {
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				ScrollView {
-					VStack {
+					VStack(alignment: .leading, spacing: .large1) {
 						// FIXME: strings
 						FactorsListView(
 							title: "Admin",
@@ -151,6 +151,7 @@ extension FactorsForRole {
 							showClearButton: false
 						)
 					}
+					.multilineTextAlignment(.leading)
 				}
 				.footer {
 					WithControlRequirements(
@@ -219,7 +220,7 @@ public struct FactorsListView: SwiftUI.View {
 	let removeFactorAction: (FactorSourceID) -> Void
 
 	public var body: some View {
-		VStack {
+		VStack(alignment: .leading) {
 			Text(title)
 				.font(.app.sheetTitle)
 
@@ -227,17 +228,50 @@ public struct FactorsListView: SwiftUI.View {
 				.font(.app.body1Regular)
 
 			ForEach(factors) { factor in
-				VStack {
-					HPair(label: "kind", item: factor.kind.rawValue)
-					HPair(label: "last used", item: factor.lastUsedOn.ISO8601Format())
-					Button("Remove factor", action: { removeFactorAction(factor.id) })
-						.buttonStyle(.secondaryRectangular(isDestructive: true))
+				Card {
+					HStack(spacing: .small3) {
+						Text(factor.kind.selectedFactorDisplay)
+							.font(.app.secondaryHeader)
+
+						Spacer(minLength: 0)
+
+						VStack(alignment: .leading) {
+							// FIXME: strings
+							HPair(
+								label: "Added",
+								item: formatDate(factor.addedOn)
+							)
+
+							// FIXME: strings
+							HPair(
+								label: "Last used",
+								item: formatDate(factor.lastUsedOn)
+							)
+						}
+
+						Button(action: {
+							removeFactorAction(factor.id)
+						}, label: {
+							Image(systemName: "minus.circle.fill")
+								.resizable()
+								.frame(width: .large3, height: .large3)
+								.tint(.app.red1)
+						})
+					}
+					.padding()
 				}
 			}
 
+			// FIXME: strings
 			Button("Add \(title) factor", action: addFactorAction)
-				.buttonStyle(.borderedProminent)
+				.buttonStyle(.primaryRectangular)
 		}
+		.multilineTextAlignment(.leading)
+	}
+
+	@MainActor
+	func formatDate(_ date: Date) -> String {
+		date.ISO8601Format(.iso8601Date(timeZone: .current))
 	}
 }
 
