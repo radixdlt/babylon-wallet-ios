@@ -17,6 +17,9 @@ struct ThresholdNotAnInteger: Swift.Error {}
 // MARK: - ThresholdGreaterThanNumberOfThresholdFactors
 struct ThresholdGreaterThanNumberOfThresholdFactors: Swift.Error {}
 
+// MARK: - ThresholdMustBeGreaterThanZeroIfThresholdFactorsAreSet
+struct ThresholdMustBeGreaterThanZeroIfThresholdFactorsAreSet: Swift.Error {}
+
 // MARK: - FactorsForRole.View
 extension FactorsForRole {
 	public struct ViewState: Equatable {
@@ -31,28 +34,37 @@ extension FactorsForRole {
 
 		var thresholdHint: Hint? {
 			do {
-				guard
-					try thresholdInt() <= thresholdFactors.count
-				else {
-					throw ThresholdGreaterThanNumberOfThresholdFactors()
-				}
+				_ = try validatedThresholdInt()
 				return nil
 			} catch {
 				return .error("\(String(describing: error))")
 			}
 		}
 
-		var thresholdAsInt: Int? {
-			try? thresholdInt()
+		var unvalidatedThresholdAsInt: Int? {
+			try? unvalidatedThresholdInt()
 		}
 
-		func thresholdInt() throws -> Int {
+		func unvalidatedThresholdInt() throws -> Int {
 			guard
 				let thresholdInt = Int(thresholdString)
 			else {
 				throw ThresholdNotAnInteger()
 			}
 			return thresholdInt
+		}
+
+		func validatedThresholdInt() throws -> Int {
+			let thresholdInt_ = try unvalidatedThresholdInt()
+			guard
+				thresholdInt_ <= thresholdFactors.count
+			else {
+				throw ThresholdGreaterThanNumberOfThresholdFactors()
+			}
+			if !thresholdFactors.isEmpty, thresholdInt_ == 0 {
+				throw ThresholdMustBeGreaterThanZeroIfThresholdFactorsAreSet()
+			}
+			return thresholdInt_
 		}
 
 		func createRoleWithFactors() throws -> RoleOfTier<R, FactorSource> {
@@ -64,17 +76,9 @@ extension FactorsForRole {
 				)
 			}
 
-			let thresholdInt_ = try thresholdInt()
-
-			guard
-				thresholdInt_ <= thresholdFactors.count
-			else {
-				throw ThresholdGreaterThanNumberOfThresholdFactors()
-			}
-
 			return try .init(
 				thresholdFactors: .init(validating: thresholdFactors),
-				threshold: .init(thresholdInt_),
+				threshold: .init(validatedThresholdInt()),
 				superAdminFactors: .init(validating: adminFactors)
 			)
 		}
@@ -127,7 +131,7 @@ extension FactorsForRole {
 						// FIXME: strings
 						FactorsListView(
 							title: "Threshold",
-							subtitle: viewStore.thresholdAsInt.map {
+							subtitle: viewStore.unvalidatedThresholdAsInt.map {
 								"Requires >=\($0) (threshold) factors to be used together."
 							} ?? "",
 							factors: viewStore.thresholdFactors,
