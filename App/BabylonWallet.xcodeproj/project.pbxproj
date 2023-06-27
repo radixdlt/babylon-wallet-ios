@@ -12,6 +12,10 @@
 		2D7178D52A4AD852005C89FF /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2D7178D42A4AD852005C89FF /* Preview Assets.xcassets */; };
 		2D889E052A4AE6030023441D /* OnboardingFeature in Frameworks */ = {isa = PBXBuildFile; productRef = 2D889E042A4AE6030023441D /* OnboardingFeature */; };
 		2D889E072A4AF5050023441D /* FeaturesPreviewerFeature in Frameworks */ = {isa = PBXBuildFile; productRef = 2D889E062A4AF5050023441D /* FeaturesPreviewerFeature */; };
+		2D99C8AC2A4B12A200D3782F /* FactorSourcesClientLive in Frameworks */ = {isa = PBXBuildFile; productRef = 2D99C8AB2A4B12A200D3782F /* FactorSourcesClientLive */; };
+		2D99C8AE2A4B137800D3782F /* AccountsClientLive in Frameworks */ = {isa = PBXBuildFile; productRef = 2D99C8AD2A4B137800D3782F /* AccountsClientLive */; };
+		2D99C8B02A4B1E1500D3782F /* OnboardingClientLive in Frameworks */ = {isa = PBXBuildFile; productRef = 2D99C8AF2A4B1E1500D3782F /* OnboardingClientLive */; };
+		2D99C8B22A4B2F8F00D3782F /* AppPreferencesClientLive in Frameworks */ = {isa = PBXBuildFile; productRef = 2D99C8B12A4B2F8F00D3782F /* AppPreferencesClientLive */; };
 		488BBEC62A2B29F30019C723 /* CreateSecurityStructurePreviewApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 488BBEC52A2B29F30019C723 /* CreateSecurityStructurePreviewApp.swift */; };
 		488BBECA2A2B29F40019C723 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 488BBEC92A2B29F40019C723 /* Assets.xcassets */; };
 		488BBED72A2B2B0B0019C723 /* CreateSecurityStructureFeature in Frameworks */ = {isa = PBXBuildFile; productRef = 488BBED62A2B2B0B0019C723 /* CreateSecurityStructureFeature */; };
@@ -118,7 +122,11 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2D99C8B22A4B2F8F00D3782F /* AppPreferencesClientLive in Frameworks */,
 				2D889E072A4AF5050023441D /* FeaturesPreviewerFeature in Frameworks */,
+				2D99C8B02A4B1E1500D3782F /* OnboardingClientLive in Frameworks */,
+				2D99C8AE2A4B137800D3782F /* AccountsClientLive in Frameworks */,
+				2D99C8AC2A4B12A200D3782F /* FactorSourcesClientLive in Frameworks */,
 				2D889E052A4AE6030023441D /* OnboardingFeature in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -409,6 +417,10 @@
 			packageProductDependencies = (
 				2D889E042A4AE6030023441D /* OnboardingFeature */,
 				2D889E062A4AF5050023441D /* FeaturesPreviewerFeature */,
+				2D99C8AB2A4B12A200D3782F /* FactorSourcesClientLive */,
+				2D99C8AD2A4B137800D3782F /* AccountsClientLive */,
+				2D99C8AF2A4B1E1500D3782F /* OnboardingClientLive */,
+				2D99C8B12A4B2F8F00D3782F /* AppPreferencesClientLive */,
 			);
 			productName = OnboardingPreview;
 			productReference = 2D7178CA2A4AD84F005C89FF /* OnboardingPreview.app */;
@@ -1009,6 +1021,10 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = OnboardingPreview;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.finance";
+				INFOPLIST_KEY_NSCameraUsageDescription = "\"This lets you scan QR codes for Radix Connect linking.\"";
+				INFOPLIST_KEY_NSFaceIDUsageDescription = "\"This app authenticates you when signing transactions and connecting to dApps.\"";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -1019,6 +1035,7 @@
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UIUserInterfaceStyle = Light;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
@@ -1092,6 +1109,10 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = OnboardingPreview;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.finance";
+				INFOPLIST_KEY_NSCameraUsageDescription = "\"This lets you scan QR codes for Radix Connect linking.\"";
+				INFOPLIST_KEY_NSFaceIDUsageDescription = "\"This app authenticates you when signing transactions and connecting to dApps.\"";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -1102,6 +1123,7 @@
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UIUserInterfaceStyle = Light;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
@@ -1180,6 +1202,10 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = OnboardingPreview;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.finance";
+				INFOPLIST_KEY_NSCameraUsageDescription = "\"This lets you scan QR codes for Radix Connect linking.\"";
+				INFOPLIST_KEY_NSFaceIDUsageDescription = "\"This app authenticates you when signing transactions and connecting to dApps.\"";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -1190,6 +1216,7 @@
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UIUserInterfaceStyle = Light;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
@@ -1269,6 +1296,10 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = OnboardingPreview;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.finance";
+				INFOPLIST_KEY_NSCameraUsageDescription = "\"This lets you scan QR codes for Radix Connect linking.\"";
+				INFOPLIST_KEY_NSFaceIDUsageDescription = "\"This app authenticates you when signing transactions and connecting to dApps.\"";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -1279,6 +1310,7 @@
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UIUserInterfaceStyle = Light;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
@@ -1352,6 +1384,10 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = OnboardingPreview;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.finance";
+				INFOPLIST_KEY_NSCameraUsageDescription = "\"This lets you scan QR codes for Radix Connect linking.\"";
+				INFOPLIST_KEY_NSFaceIDUsageDescription = "\"This app authenticates you when signing transactions and connecting to dApps.\"";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -1362,6 +1398,7 @@
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UIUserInterfaceStyle = Light;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
@@ -3598,6 +3635,22 @@
 		2D889E062A4AF5050023441D /* FeaturesPreviewerFeature */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = FeaturesPreviewerFeature;
+		};
+		2D99C8AB2A4B12A200D3782F /* FactorSourcesClientLive */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = FactorSourcesClientLive;
+		};
+		2D99C8AD2A4B137800D3782F /* AccountsClientLive */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = AccountsClientLive;
+		};
+		2D99C8AF2A4B1E1500D3782F /* OnboardingClientLive */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = OnboardingClientLive;
+		};
+		2D99C8B12A4B2F8F00D3782F /* AppPreferencesClientLive */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = AppPreferencesClientLive;
 		};
 		488BBED62A2B2B0B0019C723 /* CreateSecurityStructureFeature */ = {
 			isa = XCSwiftPackageProductDependency;

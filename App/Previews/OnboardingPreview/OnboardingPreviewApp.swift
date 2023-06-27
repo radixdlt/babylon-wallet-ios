@@ -1,4 +1,7 @@
+import AccountsClientLive
+import FactorSourcesClientLive
 import FeaturesPreviewerFeature
+import OnboardingClientLive
 import OnboardingFeature
 import SwiftUI
 
@@ -8,18 +11,25 @@ struct OnboardingPreviewApp: App {
 	var body: some Scene {
 		FeaturesPreviewer<OnboardingCoordinator>.delegateAction {
 			guard case let .completed = $0 else { return nil }
-			return nil
-		} withReducer: {
-			$0
-				.dependency(\.factorSourcesClient, .previewApp)
-				._printChanges()
+			return .success(3)
+		} withReducer: { onboarding in
+			CombineReducers {
+				onboarding
+					.dependency(\.cacheClient, .noop)
+					.dependency(\.userDefaultsClient, .noop)
+					.dependency(\.radixConnectClient, .previewValue)
+					.dependency(\.appPreferencesClient, .previewValue)
+					.dependency(\.localAuthenticationClient.queryConfig) { .biometricsAndPasscodeSetUp }
+					.dependency(\.factorSourcesClient, .liveValue)
+			}
+			._printChanges()
 		}
 	}
 }
 
 // MARK: - OnboardingCoordinator + PreviewedFeature
 extension OnboardingCoordinator: PreviewedFeature {
-	public typealias ResultFromFeature = Profile.Network.Account
+	public typealias ResultFromFeature = Int
 }
 
 // MARK: - OnboardingCoordinator + EmptyInitializable
@@ -31,22 +41,4 @@ extension OnboardingCoordinator.State: EmptyInitializable {}
 // MARK: - OnboardingCoordinator.View + FeatureView
 extension OnboardingCoordinator.View: FeatureView {
 	public typealias Feature = OnboardingCoordinator
-}
-
-import Cryptography
-import FactorSourcesClient
-
-extension FactorSourcesClient {
-	static let previewApp: Self =
-		with(noop) {
-			$0.saveFactorSource = { _ in }
-			$0.getFactorSources = { @Sendable in
-				let device = try! DeviceFactorSource.babylon(
-					mnemonicWithPassphrase: .init(
-						mnemonic: Mnemonic(phrase: "zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo wrong", language: .english)
-					)
-				)
-				return NonEmpty<IdentifiedArrayOf<FactorSource>>.init(rawValue: [device.embed()])!
-			}
-		}
 }
