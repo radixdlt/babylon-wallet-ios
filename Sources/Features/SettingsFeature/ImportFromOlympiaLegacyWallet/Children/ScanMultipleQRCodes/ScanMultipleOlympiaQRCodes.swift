@@ -21,7 +21,7 @@ public struct ScanMultipleOlympiaQRCodes: Sendable, FeatureReducer {
 			numberOfPayloadsToScan: Int? = nil,
 			scannedPayloads: IdentifiedArrayOf<ScannedPayload> = []
 		) {
-			self.scanQR = .init(scanInstructions: L10n.ImportLegacyWallet.scanQRCodeInstructions)
+			self.scanQR = .init(scanInstructions: L10n.ImportOlympiaAccounts.ScanQR.instructions)
 			self.numberOfPayloadsToScan = numberOfPayloadsToScan
 			self.scannedPayloads = scannedPayloads
 		}
