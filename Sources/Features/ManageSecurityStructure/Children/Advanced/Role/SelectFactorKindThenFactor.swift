@@ -49,7 +49,7 @@ public struct SelectFactorKindThenFactor: Sendable, FeatureReducer {
 		case let .selected(kind):
 			switch kind {
 			case .ledgerHQHardwareWallet:
-				state.selectLedger = .init(allowSelection: true, context: .setupMFA)
+				state.selectLedger = .init(context: .setupMFA)
 			default:
 				state.factorSourceOfKind = .init(kind: kind, mode: .selection)
 			}
