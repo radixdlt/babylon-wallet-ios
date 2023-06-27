@@ -24,19 +24,20 @@ extension SelectFactorKindThenFactor {
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				ScrollView {
-					VStack(spacing: .large3) {
+					VStack(spacing: .small3) {
 						ForEach(FactorSourceKind.allCases) { kind in
 							VStack(spacing: 0) {
 								let isEnabled = kind.supports(role: viewStore.role)
 								Button(kind.selectedFactorDisplay) {
 									viewStore.send(.selected(kind))
 								}
-								.disabled(!isEnabled)
-								.buttonStyle(.borderedProminent)
+								.controlState(isEnabled ? .enabled : .disabled)
+								.buttonStyle(.primaryRectangular)
 								if !isEnabled {
 									Text("Not supported")
 								}
 							}
+							.padding()
 						}
 					}
 				}

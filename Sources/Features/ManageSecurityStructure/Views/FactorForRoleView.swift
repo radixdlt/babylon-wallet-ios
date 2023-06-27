@@ -23,3 +23,26 @@ public struct FactorForRoleView<Role: RoleProtocol, Factor: FactorSourceProtocol
 		.frame(maxWidth: .infinity)
 	}
 }
+
+// MARK: - RoleProtocol
+public protocol RoleProtocol {
+	static var role: SecurityStructureRole { get }
+}
+
+// MARK: - PrimaryRoleTag
+/// Tag for Primary role
+public enum PrimaryRoleTag: RoleProtocol {
+	public static let role: SecurityStructureRole = .primary
+}
+
+// MARK: - RecoveryRoleTag
+/// Tag for Recovery role
+public enum RecoveryRoleTag: RoleProtocol {
+	public static let role: SecurityStructureRole = .recovery
+}
+
+// MARK: - ConfirmationRoleTag
+/// Tag for confirmation role
+public enum ConfirmationRoleTag: RoleProtocol {
+	public static let role: SecurityStructureRole = .confirmation
+}

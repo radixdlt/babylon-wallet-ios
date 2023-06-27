@@ -264,7 +264,7 @@ public struct FactorsListView: SwiftUI.View {
 
 			// FIXME: strings
 			Button("Add \(title) factor", action: addFactorAction)
-				.buttonStyle(.primaryRectangular)
+				.buttonStyle(.secondaryRectangular)
 		}
 		.multilineTextAlignment(.leading)
 	}
