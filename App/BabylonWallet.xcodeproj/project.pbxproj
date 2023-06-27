@@ -323,11 +323,11 @@
 		E6CDB3772A1F625500F9DA44 /* Previews */ = {
 			isa = PBXGroup;
 			children = (
-				E6DF7A592A3739F00058DE15 /* SecurityStructureConfigurationListPreview */,
 				E65B18BC2A30A173004187D8 /* AddTrustedContactPreview */,
 				488BBEED2A2CB40A0019C723 /* AnswerSecurityQuestionsPreview */,
 				488BBEBE2A2B29970019C723 /* CreateSecurityStructurePreview */,
 				E6E777F82A1F62D90085529F /* ImportMnemonicPreview */,
+				E6DF7A592A3739F00058DE15 /* SecurityStructureConfigurationListPreview */,
 			);
 			path = Previews;
 			sourceTree = "<group>";
@@ -600,10 +600,10 @@
 			targets = (
 				E6805BC3286DB3ED00861180 /* Radix Wallet (iOS) */,
 				E6805BC9286DB3ED00861180 /* Radix Wallet (macOS) */,
-				E6CDB37B2A1F628E00F9DA44 /* ImportMnemonicPreview */,
-				488BBEC22A2B29F30019C723 /* CreateSecurityStructurePreview */,
-				488BBEEB2A2CB40A0019C723 /* AnswerSecurityQuestionsPreview */,
 				E65B18C22A30A202004187D8 /* AddTrustedContactPreview */,
+				488BBEEB2A2CB40A0019C723 /* AnswerSecurityQuestionsPreview */,
+				488BBEC22A2B29F30019C723 /* CreateSecurityStructurePreview */,
+				E6CDB37B2A1F628E00F9DA44 /* ImportMnemonicPreview */,
 				E6DF7A572A3739F00058DE15 /* SecurityStructureConfigurationListPreview */,
 			);
 		};
