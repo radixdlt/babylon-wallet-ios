@@ -14,9 +14,9 @@ public struct Securified: Sendable, Hashable, Codable {
 
 	/// Maps from `FactorInstance.ID` to `FactorInstance`, which is what is useful for use through out the wallet.
 	var transactionSigningStructure: AppliedSecurityStructure {
-		func decorate(
-			_ keyPath: KeyPath<ProfileSnapshot.AppliedSecurityStructure, RoleOfTier<FactorInstance.ID>>
-		) throws -> RoleOfTier<FactorInstance> {
+		func decorate<R: RoleProtocol>(
+			_ keyPath: KeyPath<ProfileSnapshot.AppliedSecurityStructure, RoleOfTier<R, FactorInstance.ID>>
+		) throws -> RoleOfTier<R, FactorInstance> {
 			let roleWithfactorInstanceIDs = accessController.securityStructure[keyPath: keyPath]
 
 			func lookup(id: FactorInstance.ID) -> FactorInstance {

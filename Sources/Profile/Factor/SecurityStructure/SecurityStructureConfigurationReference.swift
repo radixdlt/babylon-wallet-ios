@@ -16,6 +16,6 @@ extension SecurityStructureConfigurationReference.Configuration {
 	}
 }
 
-extension SecurityStructureConfigurationReference.Configuration.Role {
+extension SecurityStructureConfigurationReference.Configuration.Recovery {
 	public static let defaultNumberOfDaysUntilAutoConfirmation: RecoveryAutoConfirmDelayInDays = .init(14)
 }

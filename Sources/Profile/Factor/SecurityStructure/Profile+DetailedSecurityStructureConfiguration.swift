@@ -21,9 +21,9 @@ extension Profile {
 		)
 	}
 
-	func detailedSecurityStructureRole(
-		referenceRole reference: RoleOfTier<FactorSourceID>
-	) throws -> RoleOfTier<FactorSource> {
+	func detailedSecurityStructureRole<R: RoleProtocol>(
+		referenceRole reference: RoleOfTier<R, FactorSourceID>
+	) throws -> RoleOfTier<R, FactorSource> {
 		func lookup(id: FactorSourceID) throws -> FactorSource {
 			guard let factorSource = factorSources.first(where: { $0.id == id }) else {
 				throw FactorSourceWithIDNotFound()

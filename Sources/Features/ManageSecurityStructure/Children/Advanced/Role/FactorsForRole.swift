@@ -10,28 +10,14 @@ extension Collection<FactorSource> {
 	}
 }
 
-// MARK: - RoleWithFactors
-public struct RoleWithFactors: Sendable, Hashable {
-	public let role: SecurityStructureRole
-	public let factors: RoleOfTier<FactorSource>
-
-	public init(
-		role: SecurityStructureRole,
-		factors: RoleOfTier<FactorSource>
-	) {
-		self.role = role
-		self.factors = factors
-	}
-}
-
 // MARK: - ExistingRoleMadeLessSafeConfirmationDialog
-public enum ExistingRoleMadeLessSafeConfirmationDialog: Sendable, Hashable {
-	case makeRoleLessSafe(with: RoleWithFactors)
+public enum ExistingRoleMadeLessSafeConfirmationDialog<R: RoleProtocol>: Sendable, Hashable {
+	case makeRoleLessSafe(with: RoleOfTier<R, FactorSource>)
 	case discardChanges
 	case cancel
 }
 
-extension RoleOfTier<FactorSource> {
+extension RoleOfTier where AbstractFactor == FactorSource {
 	func isLessSafe(than other: Self) -> Bool {
 		if thresholdFactors.count < other.thresholdFactors.count {
 			// We consider FEWER threshold factors LESS safe
@@ -53,7 +39,7 @@ extension RoleOfTier<FactorSource> {
 }
 
 // MARK: - FactorsForRole
-public struct FactorsForRole: Sendable, FeatureReducer {
+public struct FactorsForRole<R: RoleProtocol>: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public var role: SecurityStructureRole
 		public var thresholdString: String
@@ -63,11 +49,11 @@ public struct FactorsForRole: Sendable, FeatureReducer {
 		@PresentationState
 		public var destination: Destinations.State?
 
-		public let existing: RoleOfTier<FactorSource>?
+		public let existing: RoleOfTier<R, FactorSource>?
 
 		public init(
 			role: SecurityStructureRole,
-			factors exiting: RoleOfTier<FactorSource>?
+			factors exiting: RoleOfTier<R, FactorSource>?
 		) {
 			self.role = role
 			if let exiting {
@@ -91,7 +77,7 @@ public struct FactorsForRole: Sendable, FeatureReducer {
 		case removeThresholdFactor(FactorSourceID)
 
 		case thresholdChanged(String)
-		case confirmedRoleWithFactors(RoleWithFactors)
+		case confirmedRoleWithFactors(RoleOfTier<R, FactorSource>)
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -99,7 +85,7 @@ public struct FactorsForRole: Sendable, FeatureReducer {
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
-		case confirmedRoleWithFactors(RoleWithFactors)
+		case confirmedRoleWithFactors(RoleOfTier<R, FactorSource>)
 	}
 
 	public struct Destinations: Sendable, ReducerProtocol {
@@ -107,14 +93,14 @@ public struct FactorsForRole: Sendable, FeatureReducer {
 			case addThresholdFactor(SelectFactorKindThenFactor.State)
 			case addAdminFactor(SelectFactorKindThenFactor.State)
 
-			case existingRoleMadeLessSafeConfirmationDialog(ConfirmationDialogState<ExistingRoleMadeLessSafeConfirmationDialog>)
+			case existingRoleMadeLessSafeConfirmationDialog(ConfirmationDialogState<ExistingRoleMadeLessSafeConfirmationDialog<R>>)
 		}
 
 		public enum Action: Sendable, Equatable {
 			case addThresholdFactor(SelectFactorKindThenFactor.Action)
 			case addAdminFactor(SelectFactorKindThenFactor.Action)
 
-			case existingRoleMadeLessSafeConfirmationDialog(ExistingRoleMadeLessSafeConfirmationDialog)
+			case existingRoleMadeLessSafeConfirmationDialog(ExistingRoleMadeLessSafeConfirmationDialog<R>)
 		}
 
 		public init() {}
@@ -162,8 +148,31 @@ public struct FactorsForRole: Sendable, FeatureReducer {
 			return .none
 
 		case let .confirmedRoleWithFactors(roleWithFactors):
-			if let existing = state.existing, roleWithFactors.factors.isLessSafe(than: existing) {
-				state.destination = .existingRoleMadeLessSafeConfirmationDialog(.lessSafe(with: roleWithFactors))
+			if let existing = state.existing, roleWithFactors.isLessSafe(than: existing) {
+				state.destination = .existingRoleMadeLessSafeConfirmationDialog(
+					.init(
+						// FIXME: strings
+						title: { TextState("Less safe") },
+						actions: {
+							ButtonState(role: .destructive, action: .makeRoleLessSafe(with: roleWithFactors)) {
+								// FIXME: strings
+								TextState("Decrease security")
+							}
+							ButtonState(role: .none, action: .discardChanges) {
+								// FIXME: strings
+								TextState("Discard changes")
+							}
+							ButtonState(role: .cancel, action: .cancel) {
+								// FIXME: strings
+								TextState("Cancel")
+							}
+						},
+						message: {
+							// FIXME: strings
+							TextState("You are about to decrease the level of security you had setup by removing factors. Are you sure you want to do that?")
+						}
+					)
+				)
 				return .none
 			} else {
 				return .send(.delegate(.confirmedRoleWithFactors(roleWithFactors)))
@@ -201,32 +210,5 @@ public struct FactorsForRole: Sendable, FeatureReducer {
 		default:
 			return .none
 		}
-	}
-}
-
-extension ConfirmationDialogState<ExistingRoleMadeLessSafeConfirmationDialog> {
-	static func lessSafe(with lessSafe: RoleWithFactors) -> ConfirmationDialogState {
-		.init(
-			// FIXME: strings
-			title: { TextState("Less safe") },
-			actions: {
-				ButtonState(role: .destructive, action: .makeRoleLessSafe(with: lessSafe)) {
-					// FIXME: strings
-					TextState("Decrease security")
-				}
-				ButtonState(role: .none, action: .discardChanges) {
-					// FIXME: strings
-					TextState("Discard changes")
-				}
-				ButtonState(role: .cancel, action: .cancel) {
-					// FIXME: strings
-					TextState("Cancel")
-				}
-			},
-			message: {
-				// FIXME: strings
-				TextState("You are about to decrease the level of security you had setup by removing factors. Are you sure you want to do that?")
-			}
-		)
 	}
 }

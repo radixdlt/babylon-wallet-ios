@@ -10,10 +10,9 @@ public struct AdvancedManageSecurityStructureFlow: Sendable, FeatureReducer {
 
 		public let existing: SecurityStructureConfigurationDetailed?
 
-		public typealias Role = SecurityStructureConfigurationDetailed.Configuration.Role
-		public var primaryRole: Role?
-		public var recoveryRole: Role?
-		public var confirmationRole: Role?
+		public var primaryRole: SecurityStructureConfigurationDetailed.Configuration.Primary?
+		public var recoveryRole: SecurityStructureConfigurationDetailed.Configuration.Recovery?
+		public var confirmationRole: SecurityStructureConfigurationDetailed.Configuration.Confirmation?
 		public var numberOfDaysUntilAutoConfirmation: RecoveryAutoConfirmDelayInDays
 
 		@PresentationState
@@ -30,7 +29,7 @@ public struct AdvancedManageSecurityStructureFlow: Sendable, FeatureReducer {
 				self.numberOfDaysUntilAutoConfirmation = config.numberOfDaysUntilAutoConfirmation
 			case .new:
 				self.existing = nil
-				self.numberOfDaysUntilAutoConfirmation = SecurityStructureConfigurationReference.Configuration.Role.defaultNumberOfDaysUntilAutoConfirmation
+				self.numberOfDaysUntilAutoConfirmation = SecurityStructureConfigurationReference.Configuration.Recovery.defaultNumberOfDaysUntilAutoConfirmation
 				self.primaryRole = nil
 				self.recoveryRole = nil
 				self.confirmationRole = nil
@@ -40,16 +39,26 @@ public struct AdvancedManageSecurityStructureFlow: Sendable, FeatureReducer {
 
 	public struct Destinations: Sendable, ReducerProtocol {
 		public enum State: Sendable, Hashable {
-			case factorsForRole(FactorsForRole.State)
+			case factorsForPrimaryRole(FactorsForRole<PrimaryRoleTag>.State)
+			case factorsForRecoveryRole(FactorsForRole<RecoveryRoleTag>.State)
+			case factorsForConfirmationRole(FactorsForRole<ConfirmationRoleTag>.State)
 		}
 
 		public enum Action: Sendable, Equatable {
-			case factorsForRole(FactorsForRole.Action)
+			case factorsForPrimaryRole(FactorsForRole<PrimaryRoleTag>.Action)
+			case factorsForRecoveryRole(FactorsForRole<RecoveryRoleTag>.Action)
+			case factorsForConfirmationRole(FactorsForRole<ConfirmationRoleTag>.Action)
 		}
 
 		public var body: some ReducerProtocolOf<Self> {
-			Scope(state: /State.factorsForRole, action: /Action.factorsForRole) {
-				FactorsForRole()
+			Scope(state: /State.factorsForPrimaryRole, action: /Action.factorsForPrimaryRole) {
+				FactorsForRole<PrimaryRoleTag>()
+			}
+			Scope(state: /State.factorsForRecoveryRole, action: /Action.factorsForRecoveryRole) {
+				FactorsForRole<RecoveryRoleTag>()
+			}
+			Scope(state: /State.factorsForConfirmationRole, action: /Action.factorsForConfirmationRole) {
+				FactorsForRole<ConfirmationRoleTag>()
 			}
 		}
 	}
@@ -94,15 +103,15 @@ public struct AdvancedManageSecurityStructureFlow: Sendable, FeatureReducer {
 			return .none
 
 		case .primaryRoleButtonTapped:
-			state.destination = .factorsForRole(.init(role: .primary, factors: state.primaryRole))
+			state.destination = .factorsForPrimaryRole(.init(role: .primary, factors: state.primaryRole))
 			return .none
 
 		case .recoveryRoleButtonTapped:
-			state.destination = .factorsForRole(.init(role: .recovery, factors: state.recoveryRole))
+			state.destination = .factorsForRecoveryRole(.init(role: .recovery, factors: state.recoveryRole))
 			return .none
 
 		case .confirmationRoleButtonTapped:
-			state.destination = .factorsForRole(.init(role: .confirmation, factors: state.confirmationRole))
+			state.destination = .factorsForConfirmationRole(.init(role: .confirmation, factors: state.confirmationRole))
 			return .none
 
 		case let .finished(config):
@@ -117,17 +126,25 @@ public struct AdvancedManageSecurityStructureFlow: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
-		case let .destination(.presented(.factorsForRole(.delegate(.confirmedRoleWithFactors(roleWithFactors))))):
-			switch roleWithFactors.role {
-			case .confirmation:
-				state.confirmationRole = roleWithFactors.factors
-			case .primary:
-				state.primaryRole = roleWithFactors.factors
-			case .recovery:
-				state.recoveryRole = roleWithFactors.factors
-			}
-			state.destination = nil
-			return .none
+//		case let .destination(.presented(.factorsForRole(.delegate(.confirmedRoleWithFactors(roleWithFactors))))):
+//			switch roleWithFactors.role {
+//			case .confirmation:
+//				state.confirmationRole = roleWithFactors.factors
+//			case .primary:
+//				state.primaryRole = roleWithFactors.factors
+//			case .recovery:
+//				state.recoveryRole = roleWithFactors.factors
+//			}
+//			state.destination = nil
+//			return .none
+		case let .destination(.presented(.factorsForPrimaryRole(.delegate(.confirmedRoleWithFactors(roleWithFactors))))):
+			fatalError()
+
+		case let .destination(.presented(.factorsForRecoveryRole(.delegate(.confirmedRoleWithFactors(roleWithFactors))))):
+			fatalError()
+
+		case let .destination(.presented(.factorsForConfirmationRole(.delegate(.confirmedRoleWithFactors(roleWithFactors))))):
+			fatalError()
 
 		default:
 			return .none

@@ -1,11 +1,38 @@
 import Prelude
 
+// MARK: - RoleProtocol
+public protocol RoleProtocol: Sendable, Hashable {
+	static var role: SecurityStructureRole { get }
+}
+
+// MARK: - PrimaryRoleTag
+/// Tag for Primary role
+public enum PrimaryRoleTag: RoleProtocol {
+	public static let role: SecurityStructureRole = .primary
+}
+
+// MARK: - RecoveryRoleTag
+/// Tag for Recovery role
+public enum RecoveryRoleTag: RoleProtocol {
+	public static let role: SecurityStructureRole = .recovery
+}
+
+// MARK: - ConfirmationRoleTag
+/// Tag for confirmation role
+public enum ConfirmationRoleTag: RoleProtocol {
+	public static let role: SecurityStructureRole = .confirmation
+}
+
 // MARK: - RoleOfTier
-public struct RoleOfTier<AbstractFactor>:
+public struct RoleOfTier<Role: RoleProtocol, AbstractFactor>:
 	Sendable, Hashable, Codable
 	where
 	AbstractFactor: FactorOfTierProtocol & Sendable & Hashable & Codable
 {
+	public static var role: SecurityStructureRole {
+		Role.role
+	}
+
 	/// Factors which are used in combination with other instances, amounting to at
 	/// least `threshold` many instances to perform some function with this role.
 	public var thresholdFactors: OrderedSet<AbstractFactor>
@@ -18,11 +45,11 @@ public struct RoleOfTier<AbstractFactor>:
 	public var superAdminFactors: OrderedSet<AbstractFactor>
 
 	public init(
-		role: SecurityStructureRole,
 		thresholdFactors: OrderedSet<AbstractFactor>,
 		threshold: UInt,
 		superAdminFactors: OrderedSet<AbstractFactor>
 	) throws {
+		let role = Role.role
 		guard threshold <= thresholdFactors.count else {
 			throw RoleOfTierError.thresholdMustBeLessThanOrEqualToLengthOfThresholdFactors
 		}
@@ -106,7 +133,7 @@ extension RoleOfTier where AbstractFactor == FactorSourceID {
 }
 
 extension RoleOfTier where AbstractFactor == FactorSource {
-	public func asReference() -> RoleOfTier<FactorSourceID> {
+	public func asReference() -> RoleOfTier<Role, FactorSourceID> {
 		try! .init(
 			uncheckedThresholdFactors: .init(validating: thresholdFactors.map(\.id)),
 			superAdminFactors: .init(validating: superAdminFactors.map(\.id)),

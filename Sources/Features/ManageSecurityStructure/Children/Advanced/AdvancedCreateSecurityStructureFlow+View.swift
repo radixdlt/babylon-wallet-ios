@@ -23,9 +23,9 @@ extension AdvancedManageSecurityStructureFlow {
 		let mode: Mode
 
 		let numberOfDaysUntilAutoConfirmationString: String
-		let primaryRole: AdvancedManageSecurityStructureFlow.State.Role?
-		let recoveryRole: AdvancedManageSecurityStructureFlow.State.Role?
-		let confirmationRole: AdvancedManageSecurityStructureFlow.State.Role?
+		let primaryRole: SecurityStructureConfigurationDetailed.Configuration.Primary?
+		let recoveryRole: SecurityStructureConfigurationDetailed.Configuration.Recovery?
+		let confirmationRole: SecurityStructureConfigurationDetailed.Configuration.Confirmation?
 
 		var numberOfDaysUntilAutoConfirmationHint: Hint? {
 			// FIXME: strings
@@ -81,21 +81,21 @@ extension AdvancedManageSecurityStructureFlow {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				ScrollView {
 					VStack {
-						FactorsForRoleButton(
+						FactorsForRoleButton<PrimaryRoleTag>(
 							role: .primary,
 							roleOfTier: viewStore.primaryRole
 						) {
 							viewStore.send(.primaryRoleButtonTapped)
 						}
 
-						FactorsForRoleButton(
+						FactorsForRoleButton<RecoveryRoleTag>(
 							role: .recovery,
 							roleOfTier: viewStore.recoveryRole
 						) {
 							viewStore.send(.recoveryRoleButtonTapped)
 						}
 
-						FactorsForRoleButton(
+						FactorsForRoleButton<ConfirmationRoleTag>(
 							role: .confirmation,
 							roleOfTier: viewStore.confirmationRole
 						) {
@@ -143,16 +143,36 @@ extension View {
 	@MainActor
 	fileprivate func destinations(store: StoreOf<AdvancedManageSecurityStructureFlow>) -> some View {
 		let destinationStore = store.scope(state: \.$destination, action: { .child(.destination($0)) })
-		return factorsForRoleSheet(with: destinationStore)
+		return primary(destinationStore).recovery(destinationStore).confirmation(destinationStore)
 	}
 
 	@MainActor
-	private func factorsForRoleSheet(with destinationStore: PresentationStoreOf<AdvancedManageSecurityStructureFlow.Destinations>) -> some View {
+	private func primary(_ destinationStore: PresentationStoreOf<AdvancedManageSecurityStructureFlow.Destinations>) -> some View {
 		sheet(
 			store: destinationStore,
-			state: /AdvancedManageSecurityStructureFlow.Destinations.State.factorsForRole,
-			action: AdvancedManageSecurityStructureFlow.Destinations.Action.factorsForRole,
-			content: { store in NavigationView { FactorsForRole.View(store: store) } }
+			state: /AdvancedManageSecurityStructureFlow.Destinations.State.factorsForPrimaryRole,
+			action: AdvancedManageSecurityStructureFlow.Destinations.Action.factorsForPrimaryRole,
+			content: { store in NavigationView { FactorsForRole<PrimaryRoleTag>.View(store: store) } }
+		)
+	}
+
+	@MainActor
+	private func recovery(_ destinationStore: PresentationStoreOf<AdvancedManageSecurityStructureFlow.Destinations>) -> some View {
+		sheet(
+			store: destinationStore,
+			state: /AdvancedManageSecurityStructureFlow.Destinations.State.factorsForRecoveryRole,
+			action: AdvancedManageSecurityStructureFlow.Destinations.Action.factorsForRecoveryRole,
+			content: { store in NavigationView { FactorsForRole<RecoveryRoleTag>.View(store: store) } }
+		)
+	}
+
+	@MainActor
+	private func confirmation(_ destinationStore: PresentationStoreOf<AdvancedManageSecurityStructureFlow.Destinations>) -> some View {
+		sheet(
+			store: destinationStore,
+			state: /AdvancedManageSecurityStructureFlow.Destinations.State.factorsForConfirmationRole,
+			action: AdvancedManageSecurityStructureFlow.Destinations.Action.factorsForConfirmationRole,
+			content: { store in NavigationView { FactorsForRole<ConfirmationRoleTag>.View(store: store) } }
 		)
 	}
 }
@@ -164,14 +184,14 @@ extension RoleOfTier {
 }
 
 // MARK: - FactorsForRoleButton
-struct FactorsForRoleButton: SwiftUI.View {
+struct FactorsForRoleButton<R: RoleProtocol>: SwiftUI.View {
 	let role: SecurityStructureRole
-	let roleOfTier: AdvancedManageSecurityStructureFlow.State.Role?
+	let roleOfTier: RoleOfTier<R, FactorSource>?
 	let action: () -> Void
 
 	init(
 		role: SecurityStructureRole,
-		roleOfTier: AdvancedManageSecurityStructureFlow.State.Role?,
+		roleOfTier: RoleOfTier<R, FactorSource>?,
 		action: @escaping () -> Void
 	) {
 		self.role = role

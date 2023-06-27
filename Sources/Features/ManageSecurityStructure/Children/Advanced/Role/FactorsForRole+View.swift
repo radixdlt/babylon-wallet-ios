@@ -25,7 +25,7 @@ extension FactorsForRole {
 		let thresholdFactors: [FactorSource]
 		let adminFactors: [FactorSource]
 
-		var roleWithFactors: RoleWithFactors? {
+		var roleWithFactors: RoleOfTier<R, FactorSource>? {
 			try? createRoleWithFactors()
 		}
 
@@ -55,14 +55,13 @@ extension FactorsForRole {
 			return thresholdInt
 		}
 
-		func createRoleWithFactors() throws -> RoleWithFactors {
+		func createRoleWithFactors() throws -> RoleOfTier<R, FactorSource> {
 			guard !thresholdFactors.isEmpty else {
-				return try .init(role: role, factors: RoleOfTier<FactorSource>(
-					role: role,
+				return try .init(
 					thresholdFactors: [],
 					threshold: 0,
 					superAdminFactors: .init(validating: adminFactors)
-				))
+				)
 			}
 
 			let thresholdInt_ = try thresholdInt()
@@ -73,12 +72,11 @@ extension FactorsForRole {
 				throw ThresholdGreaterThanNumberOfThresholdFactors()
 			}
 
-			return try .init(role: role, factors: RoleOfTier<FactorSource>(
-				role: role,
+			return try .init(
 				thresholdFactors: .init(validating: thresholdFactors),
 				threshold: .init(thresholdInt_),
 				superAdminFactors: .init(validating: adminFactors)
-			))
+			)
 		}
 
 		var validationErrorMsg: String? {
@@ -184,14 +182,14 @@ extension FactorsForRole {
 
 extension View {
 	@MainActor
-	fileprivate func destinations(with store: StoreOf<FactorsForRole>) -> some SwiftUI.View {
+	fileprivate func destinations<R: RoleProtocol>(with store: StoreOf<FactorsForRole<R>>) -> some SwiftUI.View {
 		let destinationStore = store.scope(state: \.$destination, action: { .child(.destination($0)) })
 		return addThresholdFactorSheet(with: destinationStore)
 			.addAdminFactorSheet(with: destinationStore)
 	}
 
 	@MainActor
-	private func addThresholdFactorSheet(with destinationStore: PresentationStoreOf<FactorsForRole.Destinations>) -> some SwiftUI.View {
+	private func addThresholdFactorSheet<R: RoleProtocol>(with destinationStore: PresentationStoreOf<FactorsForRole<R>.Destinations>) -> some SwiftUI.View {
 		sheet(
 			store: destinationStore,
 			state: /FactorsForRole.Destinations.State.addThresholdFactor,
@@ -201,7 +199,7 @@ extension View {
 	}
 
 	@MainActor
-	private func addAdminFactorSheet(with destinationStore: PresentationStoreOf<FactorsForRole.Destinations>) -> some SwiftUI.View {
+	private func addAdminFactorSheet<R: RoleProtocol>(with destinationStore: PresentationStoreOf<FactorsForRole<R>.Destinations>) -> some SwiftUI.View {
 		sheet(
 			store: destinationStore,
 			state: /FactorsForRole.Destinations.State.addAdminFactor,
