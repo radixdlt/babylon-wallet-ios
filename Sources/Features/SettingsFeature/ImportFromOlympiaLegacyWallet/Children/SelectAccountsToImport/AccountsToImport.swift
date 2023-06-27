@@ -1,8 +1,8 @@
 import FeaturePrelude
 import ImportLegacyWalletClient
 
-// MARK: - SelectAccountsToImport
-public struct SelectAccountsToImport: Sendable, FeatureReducer {
+// MARK: - AccountsToImport
+public struct AccountsToImport: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public let availableAccounts: IdentifiedArrayOf<OlympiaAccountToMigrate>
 		var selectedAccounts: [OlympiaAccountToMigrate]?
