@@ -1,51 +1,91 @@
 import Prelude
 
+// MARK: - SupportedUsageForRole
+public enum SupportedUsageForRole: Sendable, Hashable {
+	/// Either alone or combined with other
+	case aloneOrWhenCombinedWithOther
+
+	/// Not alone, only together with another FactorSourceKind
+	case onlyWhenCombinedWithOther
+}
+
 extension FactorSourceKind {
-	public var isPrimaryRoleSupported: Bool {
+	public var supportedUsageForPrimaryRole: SupportedUsageForRole? {
 		switch self {
-		case .device, .ledgerHQHardwareWallet, .offDeviceMnemonic:
-			return true
+		case .device:
+			return .aloneOrWhenCombinedWithOther
+
+		case .ledgerHQHardwareWallet:
+			return .aloneOrWhenCombinedWithOther
+
+		case .offDeviceMnemonic:
+			return .aloneOrWhenCombinedWithOther
+
 		case .trustedContact:
-			return false
+			return nil
+
 		case .securityQuestions:
-			// This factor source kind is too cryptographically weak to be allowed for primary.
-			return false
+			return .onlyWhenCombinedWithOther
 		}
 	}
 
-	public var isRecoveryRoleSupported: Bool {
+	public var supportedUsageForRecoveryRole: SupportedUsageForRole? {
 		switch self {
 		case .device:
 			// If a user has lost her phone, how can she use it to perform recovery...she cant!
-			return false
-		case .ledgerHQHardwareWallet, .offDeviceMnemonic, .trustedContact:
-			return true
+			return nil
+
+		case .ledgerHQHardwareWallet:
+			return .aloneOrWhenCombinedWithOther
+
+		case .offDeviceMnemonic:
+			return .aloneOrWhenCombinedWithOther
+
+		case .trustedContact:
+			return .aloneOrWhenCombinedWithOther
+
 		case .securityQuestions:
-			// This factor source kind is too cryptographically weak to be allowed for recovery
-			return false
+			return .onlyWhenCombinedWithOther
 		}
 	}
 
-	public var isConfirmationRoleSupported: Bool {
+	public var supportedUsageForConfirmationRole: SupportedUsageForRole? {
 		switch self {
 		case .device:
-			return true
-		case .ledgerHQHardwareWallet, .offDeviceMnemonic:
-			return true
+			return .aloneOrWhenCombinedWithOther
+
+		case .ledgerHQHardwareWallet:
+			return .aloneOrWhenCombinedWithOther
+
+		case .offDeviceMnemonic:
+			return .aloneOrWhenCombinedWithOther
+
 		case .trustedContact:
-			return false
+			return nil
+
 		case .securityQuestions:
-			return true
+			return .aloneOrWhenCombinedWithOther
 		}
 	}
 
 	public func supports(
 		role: SecurityStructureRole
 	) -> Bool {
+		supportedUsage(for: role) != nil
+	}
+
+	public func supportedUsage(
+		for role: SecurityStructureRole
+	) -> SupportedUsageForRole? {
 		switch role {
-		case .primary: return isPrimaryRoleSupported
-		case .recovery: return isRecoveryRoleSupported
-		case .confirmation: return isConfirmationRoleSupported
+		case .primary:
+			return supportedUsageForPrimaryRole
+
+		case .recovery:
+			return supportedUsageForRecoveryRole
+
+		case .confirmation:
+			return supportedUsageForConfirmationRole
 		}
 	}
 }
@@ -76,14 +116,25 @@ public struct RoleOfTier<AbstractFactor>:
 		guard threshold <= thresholdFactors.count else {
 			throw RoleOfTierError.thresholdMustBeLessThanOrEqualToLengthOfThresholdFactors
 		}
+
+		if
+			let first = thresholdFactors.first,
+			thresholdFactors.count == 1,
+			first.factorSourceKind.supportedUsage(for: role) == .onlyWhenCombinedWithOther
+		{
+			throw RoleOfTierError.thresholdFactorContainsSingleFactorNotAllowdToBeSingle
+		}
+
 		guard thresholdFactors.allSatisfy({ $0.factorSourceKind.supports(role: role) }) else {
 			throw RoleOfTierError.thresholdFactorsSupportsUnsupportedFactorSourceKindForRole
 		}
-		guard superAdminFactors.allSatisfy({ $0.factorSourceKind.supports(role: role) }) else {
-			throw RoleOfTierError.adminFactorsSupportsUnsupportedFactorSourceKindForRole
+
+		guard !superAdminFactors.contains(where: { $0.factorSourceKind.supportedUsage(for: role) == .onlyWhenCombinedWithOther }) else {
+			throw RoleOfTierError.adminFactorContainsFactorNotAllowdToBeSingle
 		}
-		guard Set(superAdminFactors).intersection(Set(thresholdFactors)).isEmpty else {
-			throw RoleOfTierError.factorSharedBetweenThresholdFactorsAndAdminFactors
+
+		guard superAdminFactors.allSatisfy({ $0.factorSourceKind.supports(role: role) }) else {
+			throw RoleOfTierError.adminFactorContainsUnsupportedFactors
 		}
 
 		self.thresholdFactors = thresholdFactors
@@ -113,9 +164,11 @@ public struct RoleOfTier<AbstractFactor>:
 // MARK: - RoleOfTierError
 public enum RoleOfTierError: Swift.Error {
 	case thresholdMustBeLessThanOrEqualToLengthOfThresholdFactors
-	case factorSharedBetweenThresholdFactorsAndAdminFactors
 	case thresholdFactorsSupportsUnsupportedFactorSourceKindForRole
 	case adminFactorsSupportsUnsupportedFactorSourceKindForRole
+	case thresholdFactorContainsSingleFactorNotAllowdToBeSingle
+	case adminFactorContainsFactorNotAllowdToBeSingle
+	case adminFactorContainsUnsupportedFactors
 }
 
 extension RoleOfTier where AbstractFactor == FactorSource {
