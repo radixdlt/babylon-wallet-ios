@@ -20,77 +20,13 @@ struct ThresholdGreaterThanNumberOfThresholdFactors: Swift.Error {}
 // MARK: - ThresholdMustBeGreaterThanZeroIfThresholdFactorsAreSet
 struct ThresholdMustBeGreaterThanZeroIfThresholdFactorsAreSet: Swift.Error {}
 
-// MARK: - FactorsForRole.View
+// MARK: - FactorsForRole.ViewState
 extension FactorsForRole {
 	public struct ViewState: Equatable {
 		let role: SecurityStructureRole
 		let thresholdString: String
 		let thresholdFactors: [FactorSource]
 		let adminFactors: [FactorSource]
-
-		var roleWithFactors: RoleOfTier<R, FactorSource>? {
-			try? createRoleWithFactors()
-		}
-
-		var thresholdHint: Hint? {
-			do {
-				_ = try validatedThresholdInt()
-				return nil
-			} catch {
-				return .error("\(String(describing: error))")
-			}
-		}
-
-		var unvalidatedThresholdAsInt: Int? {
-			try? unvalidatedThresholdInt()
-		}
-
-		func unvalidatedThresholdInt() throws -> Int {
-			guard
-				let thresholdInt = Int(thresholdString)
-			else {
-				throw ThresholdNotAnInteger()
-			}
-			return thresholdInt
-		}
-
-		func validatedThresholdInt() throws -> Int {
-			let thresholdInt_ = try unvalidatedThresholdInt()
-			guard
-				thresholdInt_ <= thresholdFactors.count
-			else {
-				throw ThresholdGreaterThanNumberOfThresholdFactors()
-			}
-			if !thresholdFactors.isEmpty, thresholdInt_ == 0 {
-				throw ThresholdMustBeGreaterThanZeroIfThresholdFactorsAreSet()
-			}
-			return thresholdInt_
-		}
-
-		func createRoleWithFactors() throws -> RoleOfTier<R, FactorSource> {
-			guard !thresholdFactors.isEmpty else {
-				return try .init(
-					thresholdFactors: [],
-					threshold: 0,
-					superAdminFactors: .init(validating: adminFactors)
-				)
-			}
-
-			return try .init(
-				thresholdFactors: .init(validating: thresholdFactors),
-				threshold: .init(validatedThresholdInt()),
-				superAdminFactors: .init(validating: adminFactors)
-			)
-		}
-
-		var validationErrorMsg: String? {
-			do {
-				_ = try createRoleWithFactors()
-				return nil
-			} catch {
-				return "Error: \(String(describing: error))"
-			}
-		}
 
 		init(
 			role: SecurityStructureRole,
@@ -104,7 +40,76 @@ extension FactorsForRole {
 			self.adminFactors = adminFactors
 		}
 	}
+}
 
+extension FactorsForRole.ViewState {
+	var roleWithFactors: RoleOfTier<R, FactorSource>? {
+		try? createRoleWithFactors()
+	}
+
+	var thresholdHint: Hint? {
+		do {
+			_ = try validatedThresholdInt()
+			return nil
+		} catch {
+			return .error("\(String(describing: error))")
+		}
+	}
+
+	var unvalidatedThresholdAsInt: Int? {
+		try? unvalidatedThresholdInt()
+	}
+
+	func unvalidatedThresholdInt() throws -> Int {
+		guard
+			let thresholdInt = Int(thresholdString)
+		else {
+			throw ThresholdNotAnInteger()
+		}
+		return thresholdInt
+	}
+
+	func validatedThresholdInt() throws -> Int {
+		let thresholdInt_ = try unvalidatedThresholdInt()
+		guard
+			thresholdInt_ <= thresholdFactors.count
+		else {
+			throw ThresholdGreaterThanNumberOfThresholdFactors()
+		}
+		if !thresholdFactors.isEmpty, thresholdInt_ == 0 {
+			throw ThresholdMustBeGreaterThanZeroIfThresholdFactorsAreSet()
+		}
+		return thresholdInt_
+	}
+
+	func createRoleWithFactors() throws -> RoleOfTier<R, FactorSource> {
+		guard !thresholdFactors.isEmpty else {
+			return try .init(
+				thresholdFactors: [],
+				threshold: 0,
+				superAdminFactors: .init(validating: adminFactors)
+			)
+		}
+
+		return try .init(
+			thresholdFactors: .init(validating: thresholdFactors),
+			threshold: .init(validatedThresholdInt()),
+			superAdminFactors: .init(validating: adminFactors)
+		)
+	}
+
+	var validationErrorMsg: String? {
+		do {
+			_ = try createRoleWithFactors()
+			return nil
+		} catch {
+			return "Error: \(String(describing: error))"
+		}
+	}
+}
+
+// MARK: - FactorsForRole.View
+extension FactorsForRole {
 	@MainActor
 	public struct View: SwiftUI.View {
 		private let store: StoreOf<FactorsForRole>
