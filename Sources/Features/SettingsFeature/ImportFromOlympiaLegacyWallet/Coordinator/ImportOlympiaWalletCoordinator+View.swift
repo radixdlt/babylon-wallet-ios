@@ -2,18 +2,8 @@ import FeaturePrelude
 import ImportMnemonicFeature
 import ImportOlympiaLedgerAccountsAndFactorSourcesFeature
 
-extension ImportOlympiaWalletCoordinator.State {
-	var viewState: ImportOlympiaWalletCoordinator.ViewState {
-		.init()
-	}
-}
-
 // MARK: - ImportOlympiaWalletCoordinator.View
 extension ImportOlympiaWalletCoordinator {
-	public struct ViewState: Equatable {
-		// TODO: declare some properties
-	}
-
 	@MainActor
 	public struct View: SwiftUI.View {
 		private let store: StoreOf<ImportOlympiaWalletCoordinator>
@@ -26,24 +16,23 @@ extension ImportOlympiaWalletCoordinator {
 			NavigationStackStore(
 				store.scope(state: \.path, action: { .child(.path($0)) })
 			) {
-				IfLetStore(
-					store.scope(state: \.root, action: { .child(.root($0)) })
-				) {
-					Destinations.View(store: $0)
-					#if os(iOS)
-						.toolbar {
-							ToolbarItem(placement: .navigationBarLeading) {
-								CloseButton {
-									ViewStore(store.stateless).send(.view(.closeButtonTapped))
-								}
+				let scanQRStore = store.scope(state: \.scanQR, action: { .child(.scanQR($0)) })
+				ScanMultipleOlympiaQRCodes.View(store: scanQRStore)
+					.navigationTitle(L10n.ImportLegacyWallet.title)
+					.navigationBarTitleDisplayMode(.large)
+				#if os(iOS)
+					.toolbar {
+						ToolbarItem(placement: .primaryAction) {
+							CloseButton {
+								ViewStore(store.stateless).send(.view(.closeButtonTapped))
 							}
 						}
-					#endif
-				}
-				// This is required to disable the animation of internal components during transition
-				.transaction { $0.animation = nil }
+					}
+				#endif
+					// This is required to disable the animation of internal components during transition
+					.transaction { $0.animation = nil }
 			} destination: {
-				Destinations.View(store: $0)
+				Path.View(store: $0)
 			}
 			#if os(iOS)
 			.navigationTransition(.slide, interactivity: .disabled)
@@ -52,34 +41,33 @@ extension ImportOlympiaWalletCoordinator {
 	}
 }
 
-// MARK: - ImportOlympiaWalletCoordinator.Destinations.View
-extension ImportOlympiaWalletCoordinator.Destinations {
+// MARK: - ImportOlympiaWalletCoordinator.Path.View
+extension ImportOlympiaWalletCoordinator.Path {
 	struct View: SwiftUI.View {
-		let store: StoreOf<ImportOlympiaWalletCoordinator.Destinations>
+		let store: StoreOf<ImportOlympiaWalletCoordinator.Path>
 
 		var body: some SwiftUI.View {
-			ZStack {
-				SwitchStore(store) {
-					CaseLet(
-						state: /State.scanMultipleOlympiaQRCodes,
-						action: Action.scanMultipleOlympiaQRCodes,
-						then: { ScanMultipleOlympiaQRCodes.View(store: $0) }
-					)
+			SwitchStore(store) { state in
+				switch state {
+				case .selectAccountsToImport:
 					CaseLet(
 						state: /State.selectAccountsToImport,
 						action: Action.selectAccountsToImport,
 						then: { SelectAccountsToImport.View(store: $0) }
 					)
+				case .importMnemonic:
 					CaseLet(
 						state: /State.importMnemonic,
 						action: Action.importMnemonic,
 						then: { ImportMnemonic.View(store: $0) }
 					)
+				case .importOlympiaLedgerAccountsAndFactorSources:
 					CaseLet(
 						state: /State.importOlympiaLedgerAccountsAndFactorSources,
 						action: Action.importOlympiaLedgerAccountsAndFactorSources,
 						then: { ImportOlympiaLedgerAccountsAndFactorSources.View(store: $0) }
 					)
+				case .completion:
 					CaseLet(
 						state: /State.completion,
 						action: Action.completion,
@@ -87,7 +75,6 @@ extension ImportOlympiaWalletCoordinator.Destinations {
 					)
 				}
 			}
-			.navigationTitle(L10n.ImportLegacyWallet.title)
 		}
 	}
 }

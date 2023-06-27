@@ -13,18 +13,15 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 		public var selectedAccounts: OlympiaAccountsToImport?
 		public var mnemonicWithPassphrase: MnemonicWithPassphrase?
 		public var migratedAccounts: IdentifiedArrayOf<Profile.Network.Account> = .init()
+		public var scanQR: ScanMultipleOlympiaQRCodes.State = .init()
 
-		var root: Destinations.State?
-		var path: StackState<Destinations.State> = .init()
+		var path: StackState<Path.State> = .init()
 
-		public init() {
-			self.root = .scanMultipleOlympiaQRCodes(.init())
-		}
+		public init() {}
 	}
 
-	public struct Destinations: Sendable, ReducerProtocol {
+	public struct Path: Sendable, ReducerProtocol {
 		public enum State: Sendable, Hashable {
-			case scanMultipleOlympiaQRCodes(ScanMultipleOlympiaQRCodes.State)
 			case selectAccountsToImport(SelectAccountsToImport.State)
 			case importMnemonic(ImportMnemonic.State)
 			case importOlympiaLedgerAccountsAndFactorSources(ImportOlympiaLedgerAccountsAndFactorSources.State)
@@ -32,7 +29,6 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 		}
 
 		public enum Action: Sendable, Equatable {
-			case scanMultipleOlympiaQRCodes(ScanMultipleOlympiaQRCodes.Action)
 			case selectAccountsToImport(SelectAccountsToImport.Action)
 			case importMnemonic(ImportMnemonic.Action)
 			case importOlympiaLedgerAccountsAndFactorSources(ImportOlympiaLedgerAccountsAndFactorSources.Action)
@@ -40,9 +36,6 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 		}
 
 		public var body: some ReducerProtocolOf<Self> {
-			Scope(state: /State.scanMultipleOlympiaQRCodes, action: /Action.scanMultipleOlympiaQRCodes) {
-				ScanMultipleOlympiaQRCodes()
-			}
 			Scope(state: /State.selectAccountsToImport, action: /Action.selectAccountsToImport) {
 				SelectAccountsToImport()
 			}
@@ -63,8 +56,8 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 	}
 
 	public enum ChildAction: Sendable, Equatable {
-		case root(Destinations.Action)
-		case path(StackActionOf<Destinations>)
+		case scanQR(ScanMultipleOlympiaQRCodes.Action)
+		case path(StackActionOf<Path>)
 	}
 
 	public enum InternalAction: Sendable, Equatable {
@@ -94,12 +87,12 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 	public init() {}
 
 	public var body: some ReducerProtocolOf<Self> {
+		Scope(state: \.scanQR, action: /Action.child .. ChildAction.scanQR) {
+			ScanMultipleOlympiaQRCodes()
+		}
 		Reduce(core)
-			.ifLet(\.root, action: /Action.child .. ChildAction.root) {
-				Destinations()
-			}
 			.forEach(\.path, action: /Action.child .. ChildAction.path) {
-				Destinations()
+				Path()
 			}
 	}
 
@@ -121,11 +114,10 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
-		case let .root(.scanMultipleOlympiaQRCodes(.delegate(.finishedScanning(olympiaWallet)))):
+		case let .scanQR(.delegate(.finishedScanning(olympiaWallet))):
 			state.expectedMnemonicWordCount = olympiaWallet.mnemonicWordCount
 			let scanned = olympiaWallet.accounts
 			return .run { send in
-
 				let alreadyImported = await importLegacyWalletClient.findAlreadyImportedIfAny(scanned)
 
 				await send(.internal(.findAlreadyImportedOlympiaSoftwareAccounts(
@@ -167,7 +159,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 			guard let migratedAccounts = Profile.Network.Accounts(rawValue: state.migratedAccounts) else {
 				fatalError("bad!")
 			}
-			let destination = Destinations.State.completion(.init(migratedAccounts: migratedAccounts, unvalidatedOlympiaHardwareAccounts: unvalidatedOlympiaAccounts))
+			let destination = Path.State.completion(.init(migratedAccounts: migratedAccounts, unvalidatedOlympiaHardwareAccounts: unvalidatedOlympiaAccounts))
 			if state.path.last != destination {
 				state.path.append(destination)
 			}
@@ -191,7 +183,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 					return .twelve
 				}()
 
-				let destination = Destinations.State.importMnemonic(.init(
+				let destination = Path.State.importMnemonic(.init(
 					persistAsMnemonicKind: nil,
 					wordCount: expectedWordCount
 				))
@@ -212,7 +204,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 			)
 
 		case let .migrateHardwareAccounts(hardwareAccounts, networkID):
-			let destination = Destinations.State.importOlympiaLedgerAccountsAndFactorSources(.init(
+			let destination = Path.State.importOlympiaLedgerAccountsAndFactorSources(.init(
 				hardwareAccounts: hardwareAccounts,
 				networkID: networkID
 			))
@@ -222,7 +214,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 			return .none
 
 		case let .findAlreadyImportedOlympiaSoftwareAccounts(scanned, alreadyImported):
-			let destination = Destinations.State.selectAccountsToImport(.init(
+			let destination = Path.State.selectAccountsToImport(.init(
 				scannedAccounts: scanned,
 				alreadyImported: alreadyImported
 			))
@@ -249,7 +241,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 			} else {
 				assert(state.selectedAccounts?.hardware == nil)
 				// no hardware accounts to migrate...
-				let destination = Destinations.State.completion(.init(migratedAccounts: migratedSoftwareAccounts.babylonAccounts, unvalidatedOlympiaHardwareAccounts: nil))
+				let destination = Path.State.completion(.init(migratedAccounts: migratedSoftwareAccounts.babylonAccounts, unvalidatedOlympiaHardwareAccounts: nil))
 				if state.path.last != destination {
 					state.path.append(destination)
 				}
