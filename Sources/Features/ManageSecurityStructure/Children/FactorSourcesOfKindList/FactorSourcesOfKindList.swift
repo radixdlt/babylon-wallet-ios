@@ -145,10 +145,8 @@ public struct FactorSourcesOfKindList<FactorSourceOfKind: Sendable & Hashable>: 
 				state.canOnlyHaveOneFactorSourceOfKind,
 				let existing = state.factorSources.last
 			{
-				print("displaying Confirmation Dialoge ✅")
 				state.destination = .existingFactorSourceWillBeDeletedConfirmationDialog(.deletion(of: existing))
 			} else {
-				print("displaying Confirmation Dialog NOT 🚩")
 				state.destination = .addNewFactorSource(.init(kind: state.kind))
 			}
 			return .none

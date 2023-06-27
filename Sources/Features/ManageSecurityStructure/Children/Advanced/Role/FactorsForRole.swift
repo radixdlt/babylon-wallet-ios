@@ -28,13 +28,7 @@ extension RoleOfTier where AbstractFactor == FactorSource {
 			return true
 		}
 
-		// We consider MORE admin factors LESS safe ONLY if thresholdFactors is empty,
-		// since if thresholdFactors is empty, using any admin factor is more safe than no factors at all.
-		if thresholdFactors.isEmpty {
-			return superAdminFactors.count < other.superAdminFactors.count
-		} else {
-			return superAdminFactors.count > other.superAdminFactors.count
-		}
+		return false
 	}
 }
 
