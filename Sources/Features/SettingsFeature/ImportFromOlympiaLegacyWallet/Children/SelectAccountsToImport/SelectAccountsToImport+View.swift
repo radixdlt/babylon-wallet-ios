@@ -30,11 +30,7 @@ extension SelectAccountsToImport {
 		}
 
 		public var body: some SwiftUI.View {
-			WithViewStore(
-				store,
-				observe: { $0.viewState },
-				send: { .view($0) }
-			) { viewStore in
+			WithViewStore(store, observe: { $0.viewState }, send: { .view($0) }) { viewStore in
 				ScrollView {
 					VStack(spacing: .small1) {
 						Selection(
@@ -53,7 +49,6 @@ extension SelectAccountsToImport {
 							)
 						}
 					}
-
 					.padding(.horizontal, .medium1)
 					.padding(.bottom, .medium2)
 				}
