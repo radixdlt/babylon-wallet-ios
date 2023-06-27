@@ -56,7 +56,7 @@ extension RoleOfTier<FactorSource> {
 public struct FactorsForRole: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public var role: SecurityStructureRole
-		public var threshold: UInt?
+		public var thresholdString: String
 		public var thresholdFactorSources: IdentifiedArrayOf<FactorSource>
 		public var adminFactorSources: IdentifiedArrayOf<FactorSource>
 
@@ -71,12 +71,12 @@ public struct FactorsForRole: Sendable, FeatureReducer {
 		) {
 			self.role = role
 			if let exiting {
-				self.threshold = exiting.threshold
+				self.thresholdString = exiting.threshold.description
 				self.thresholdFactorSources = .init(uncheckedUniqueElements: exiting.thresholdFactors)
 				self.adminFactorSources = .init(uncheckedUniqueElements: exiting.superAdminFactors)
 				self.existing = exiting
 			} else {
-				self.threshold = 0
+				self.thresholdString = "0"
 				self.thresholdFactorSources = []
 				self.adminFactorSources = []
 				self.existing = nil
@@ -142,10 +142,7 @@ public struct FactorsForRole: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case let .thresholdChanged(thresholdString):
-			guard let threshold = UInt(thresholdString) else {
-				return .none
-			}
-			state.threshold = threshold
+			state.thresholdString = thresholdString
 			return .none
 
 		case .addThresholdFactor:

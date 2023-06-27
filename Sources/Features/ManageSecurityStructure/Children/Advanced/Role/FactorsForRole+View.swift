@@ -4,59 +4,100 @@ extension FactorsForRole.State {
 	var viewState: FactorsForRole.ViewState {
 		.init(
 			role: role,
-			threshold: threshold?.description ?? "",
+			thresholdString: thresholdString,
 			thresholdFactors: .init(thresholdFactorSources),
 			adminFactors: .init(adminFactorSources)
 		)
 	}
 }
 
+// MARK: - ThresholdNotAnInteger
+struct ThresholdNotAnInteger: Swift.Error {}
+
+// MARK: - ThresholdGreaterThanNumberOfThresholdFactors
+struct ThresholdGreaterThanNumberOfThresholdFactors: Swift.Error {}
+
 // MARK: - FactorsForRole.View
 extension FactorsForRole {
 	public struct ViewState: Equatable {
 		let role: SecurityStructureRole
-		let threshold: String
+		let thresholdString: String
 		let thresholdFactors: [FactorSource]
 		let adminFactors: [FactorSource]
 
 		var roleWithFactors: RoleWithFactors? {
-			if !thresholdFactors.isEmpty {
+			try? createRoleWithFactors()
+		}
+
+		var thresholdHint: Hint? {
+			do {
 				guard
-					let thresholdInt = Int(threshold),
-					thresholdInt <= thresholdFactors.count
+					try thresholdInt() <= thresholdFactors.count
 				else {
-					return nil
+					throw ThresholdGreaterThanNumberOfThresholdFactors()
 				}
-				guard let factors = try? RoleOfTier<FactorSource>(
-					role: role,
-					thresholdFactors: .init(validating: thresholdFactors),
-					threshold: .init(thresholdInt),
-					superAdminFactors: .init(validating: adminFactors)
-				) else {
-					return nil
-				}
-				return .init(role: role, factors: factors)
-			} else {
-				guard let factors = try? RoleOfTier<FactorSource>(
+				return nil
+			} catch {
+				return .error("\(String(describing: error))")
+			}
+		}
+
+		var thresholdAsInt: Int? {
+			try? thresholdInt()
+		}
+
+		func thresholdInt() throws -> Int {
+			guard
+				let thresholdInt = Int(thresholdString)
+			else {
+				throw ThresholdNotAnInteger()
+			}
+			return thresholdInt
+		}
+
+		func createRoleWithFactors() throws -> RoleWithFactors {
+			guard !thresholdFactors.isEmpty else {
+				return try .init(role: role, factors: RoleOfTier<FactorSource>(
 					role: role,
 					thresholdFactors: [],
 					threshold: 0,
 					superAdminFactors: .init(validating: adminFactors)
-				) else {
-					return nil
-				}
-				return .init(role: role, factors: factors)
+				))
+			}
+
+			let thresholdInt_ = try thresholdInt()
+
+			guard
+				thresholdInt_ <= thresholdFactors.count
+			else {
+				throw ThresholdGreaterThanNumberOfThresholdFactors()
+			}
+
+			return try .init(role: role, factors: RoleOfTier<FactorSource>(
+				role: role,
+				thresholdFactors: .init(validating: thresholdFactors),
+				threshold: .init(thresholdInt_),
+				superAdminFactors: .init(validating: adminFactors)
+			))
+		}
+
+		var validationErrorMsg: String? {
+			do {
+				_ = try createRoleWithFactors()
+				return nil
+			} catch {
+				return "Error: \(String(describing: error))"
 			}
 		}
 
 		init(
 			role: SecurityStructureRole,
-			threshold: String,
+			thresholdString: String,
 			thresholdFactors: [FactorSource],
 			adminFactors: [FactorSource]
 		) {
 			self.role = role
-			self.threshold = threshold
+			self.thresholdString = thresholdString
 			self.thresholdFactors = thresholdFactors
 			self.adminFactors = adminFactors
 		}
@@ -88,7 +129,9 @@ extension FactorsForRole {
 						// FIXME: strings
 						FactorsListView(
 							title: "Threshold",
-							subtitle: "Requires >=\(viewStore.threshold) (threshold) factors to be used together.",
+							subtitle: viewStore.thresholdAsInt.map {
+								"Requires >=\($0) (threshold) factors to be used together."
+							} ?? "",
 							factors: viewStore.thresholdFactors,
 							addFactorAction: { viewStore.send(.addThresholdFactor) },
 							removeFactorAction: {
@@ -101,10 +144,10 @@ extension FactorsForRole {
 							primaryHeading: "Threshold",
 							placeholder: "Threshold",
 							text: viewStore.binding(
-								get: \.threshold,
+								get: \.thresholdString,
 								send: { .thresholdChanged($0) }
 							),
-							hint: nil,
+							hint: viewStore.thresholdHint,
 							showClearButton: false
 						)
 					}
@@ -117,6 +160,11 @@ extension FactorsForRole {
 						// FIXME: strings
 						Button("Confirm", action: action)
 							.buttonStyle(.primaryRectangular)
+						if let validationErrorMsg = viewStore.validationErrorMsg {
+							Text(validationErrorMsg)
+								.font(.app.body3HighImportance)
+								.foregroundColor(.app.red1)
+						}
 					}
 				}
 				.destinations(with: store)
