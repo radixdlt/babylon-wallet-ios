@@ -20,7 +20,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		public var networkID: NetworkID? = nil
 
 		/// does not include lock fee?
-		public var analyzedManifestToReview: AnalyzeManifestWithPreviewContextResponse? = nil
+		public var analyzedManifestToReview: AnalyzeTransactionExecutionResponse? = nil
 
 		public var fee: BigDecimal
 		public var feePayerSelectionAmongstCandidates: FeePayerSelectionAmongstCandidates?
@@ -341,7 +341,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 	}
 
 	private func review(
-		manifestPreview manifestPreviewToReview: AnalyzeManifestWithPreviewContextResponse,
+		manifestPreview manifestPreviewToReview: AnalyzeTransactionExecutionResponse,
 		feeAdded: BigDecimal,
 		networkID: NetworkID
 	) -> EffectTask<Action> {
@@ -447,7 +447,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 				factorsLeftToSignWith: response.signingFactors,
 				signingPurposeWithPayload: .signTransaction(
 					ephemeralNotaryPrivateKey: state.ephemeralNotaryPrivateKey,
-					response.compiledIntent,
+					response.intent,
 					origin: state.signTransactionPurpose
 				)
 			))
@@ -492,9 +492,9 @@ extension TransactionReview {
 		case estimated(instructionIndex: UInt32)
 	}
 
-	private func extractUserAccounts(_ manifest: AnalyzeManifestWithPreviewContextResponse) async throws -> [Account] {
+	private func extractUserAccounts(_ manifest: AnalyzeTransactionExecutionResponse) async throws -> [Account] {
 		let userAccounts = try await accountsClient.getAccountsOnCurrentNetwork()
-		return try manifest
+		return manifest
 			.encounteredAddresses
 			.componentAddresses
 			.accounts
@@ -505,12 +505,12 @@ extension TransactionReview {
 				if let userAccount {
 					return .user(.init(address: userAccount.address, label: userAccount.displayName, appearanceID: userAccount.appearanceID))
 				} else {
-					return try .external(.init(componentAddress: encounteredAccount), approved: false)
+					return .external(encounteredAccount, approved: false)
 				}
 			}
 	}
 
-	private func extractUsedDapps(_ manifest: AnalyzeManifestWithPreviewContextResponse) async throws -> TransactionReviewDappsUsed.State? {
+	private func extractUsedDapps(_ manifest: AnalyzeTransactionExecutionResponse) async throws -> TransactionReviewDappsUsed.State? {
 		let components = manifest.encounteredAddresses.componentAddresses.userApplications
 		let dApps = try await components.asyncMap(extractDappInfo)
 		guard !dApps.isEmpty else { return nil }
@@ -533,7 +533,7 @@ extension TransactionReview {
 		)
 	}
 
-	private func exctractProofs(_ manifest: AnalyzeManifestWithPreviewContextResponse) async throws -> TransactionReviewProofs.State? {
+	private func exctractProofs(_ manifest: AnalyzeTransactionExecutionResponse) async throws -> TransactionReviewProofs.State? {
 		let proofs = try await manifest.accountProofResources.map(\.address).asyncMap(extractProofInfo)
 		guard !proofs.isEmpty else { return nil }
 
@@ -553,7 +553,7 @@ extension TransactionReview {
 	}
 
 	private func extractWithdrawals(
-		_ manifest: AnalyzeManifestWithPreviewContextResponse,
+		_ manifest: AnalyzeTransactionExecutionResponse,
 		userAccounts: [Account],
 		networkID: NetworkID
 	) async throws -> TransactionReviewAccounts.State? {
@@ -563,8 +563,8 @@ extension TransactionReview {
 			let account = try userAccounts.account(for: withdrawal.componentAddress)
 
 			let transfers = try await transferInfo(
-				resourceSpecifier: withdrawal.resourceSpecifier,
-				createdEntities: manifest.createdEntities,
+				resourceQuantifier: withdrawal.resourceQuantifier,
+				createdEntities: manifest.newlyCreated,
 				networkID: networkID,
 				type: .exact
 			)
@@ -581,7 +581,7 @@ extension TransactionReview {
 	}
 
 	private func extractDeposits(
-		_ manifest: AnalyzeManifestWithPreviewContextResponse,
+		_ manifest: AnalyzeTransactionExecutionResponse,
 		userAccounts: [Account],
 		networkID: NetworkID
 	) async throws -> TransactionReviewAccounts.State? {
@@ -591,8 +591,8 @@ extension TransactionReview {
 			let account = try userAccounts.account(for: deposit.componentAddress)
 
 			let transfers = try await transferInfo(
-				resourceSpecifier: deposit.resourceSpecifier,
-				createdEntities: manifest.createdEntities,
+				resourceQuantifier: deposit.resourceQuantifier,
+				createdEntities: manifest.newlyCreated,
 				networkID: networkID,
 				type: deposit.transferType
 			)
@@ -614,22 +614,25 @@ extension TransactionReview {
 	}
 
 	func transferInfo(
-		resourceSpecifier: ResourceSpecifier,
-		createdEntities: CreatedEntitities?,
+		resourceQuantifier: ResourceQuantifier,
+		createdEntities: NewlyCreated?,
 		networkID: NetworkID,
 		type: TransferType
 	) async throws -> [Transfer] {
-		let resourceAddress = resourceSpecifier.resourceAddress
-		let isNew = createdEntities?.resourceAddresses.contains(resourceAddress) == true
-		let metadata = isNew ? nil : try? await gatewayAPIClient.getEntityMetadata(resourceAddress.address)
-		let addressKind = try engineToolkitClient.decodeAddress(resourceAddress.address).entityType
+		func newResource(at index: Int) -> NewlyCreatedResource? {
+			guard let newResources = createdEntities?.resources, !newResources.isEmpty, index < newResources.count else {
+				return nil
+			}
 
-		switch (resourceSpecifier, addressKind) {
-		case (let .amount(_, decimalAmount), .fungibleResource):
-			let amount = try BigDecimal(fromString: decimalAmount.value)
+			return newResources[index]
+		}
 
+		switch resourceQuantifier {
+		case let .amount(.existing(resourceAddress), amount):
+			let amount = try BigDecimal(fromString: amount.value)
+			let metadata = try? await gatewayAPIClient.getEntityMetadata(resourceAddress.address)
 			func guarantee() -> TransactionClient.Guarantee? {
-				guard !isNew, case let .estimated(instructionIndex) = type else { return nil }
+				guard case let .estimated(instructionIndex) = type else { return nil }
 				return .init(amount: amount, instructionIndex: instructionIndex, resourceAddress: resourceAddress)
 			}
 
@@ -641,16 +644,30 @@ extension TransactionReview {
 				isXRD: (try? engineToolkitClient.isXRD(resource: resourceAddress, on: networkID)) ?? false,
 				guarantee: guarantee()
 			))]
+		case let .amount(.newlyCreated(index), amount):
+			let amount = try BigDecimal(fromString: amount.value)
+			guard let resource = newResource(at: index) else {
+				return []
+			}
 
-		case (let .ids(_, ids), .nonFungibleResource):
-			// https://rdxworks.slack.com/archives/C02MTV9602H/p1681155601557349
+			return [
+				.fungible(.init(
+					amount: amount,
+					name: resource.name,
+					symbol: resource.symbol,
+					thumbnail: resource.iconURL,
+					isXRD: false
+				)),
+			]
+		case let .ids(.existing(resourceAddress), ids):
+			let metadata = try? await gatewayAPIClient.getEntityMetadata(resourceAddress.address)
 			let maximumNFTIDChunkSize = 29
 
 			var result: [Transfer] = []
 			for idChunk in ids.chunks(ofCount: maximumNFTIDChunkSize) {
 				let tokens = try await gatewayAPIClient.getNonFungibleData(.init(
 					resourceAddress: resourceAddress.address,
-					nonFungibleIds: idChunk.map { try $0.toString() }
+					nonFungibleIds: idChunk.map(\.value)
 				))
 				.nonFungibleIds
 				.map {
@@ -667,8 +684,19 @@ extension TransactionReview {
 
 			return result
 
-		default:
-			return []
+		case let .ids(.newlyCreated(index), ids):
+			guard let resource = newResource(at: index) else {
+				return []
+			}
+
+			return ids.map { id in
+				.nonFungible(.init(
+					resourceName: resource.name,
+					resourceImage: resource.iconURL,
+					tokenID: id.value,
+					tokenName: nil
+				))
+			}
 		}
 	}
 }
@@ -828,54 +856,33 @@ extension Collection where Element: Equatable {
 extension AccountDeposit {
 	public var componentAddress: ComponentAddress {
 		switch self {
-		case let .exact(componentAddress, _), let .estimate(_, componentAddress, _):
+		case let .guaranteed(componentAddress, _), let .predicted(_, componentAddress, _):
 			return componentAddress
 		}
 	}
 
-	public var resourceSpecifier: ResourceSpecifier {
+	public var resourceQuantifier: ResourceQuantifier {
 		switch self {
-		case let .exact(_, resourceSpecifier), let .estimate(_, _, resourceSpecifier):
+		case let .guaranteed(_, resourceSpecifier), let .predicted(_, _, resourceSpecifier):
 			return resourceSpecifier
 		}
 	}
 
 	var transferType: TransactionReview.TransferType {
 		switch self {
-		case .exact:
+		case .guaranteed:
 			return .exact
-		case let .estimate(index, _, _):
+		case let .predicted(index, _, _):
 			return .estimated(instructionIndex: index)
 		}
 	}
 }
 
-extension ResourceSpecifier {
-	var resourceAddress: ResourceAddress {
+extension ResourceQuantifier {
+	var resourceManagerSpecifier: ResourceManagerSpecifier {
 		switch self {
 		case let .amount(resourceAddress, _), let .ids(resourceAddress, _):
 			return resourceAddress
-		}
-	}
-}
-
-// TODO: Remove once RET is migrated to `ash`, this is meant to be temporary
-extension NonFungibleLocalIdInternal {
-	struct InvalidLocalID: Error {}
-
-	public func toString() throws -> String {
-		switch self {
-		case let .integer(value):
-			return "#\(value)#"
-		case .uuid:
-			throw InvalidLocalID()
-		case let .string(value):
-			return "<\(value)>"
-		case let .bytes(value):
-			guard let string = String(data: value.data, encoding: .utf8) else {
-				throw InvalidLocalID()
-			}
-			return "[\(string)]"
 		}
 	}
 }

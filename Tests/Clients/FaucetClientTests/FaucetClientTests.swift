@@ -163,7 +163,7 @@ final class FaucetClientTests: TestCase {
 					intent: .previewValue,
 					transactionSigners: .init(
 						notaryPublicKey: .previewValue,
-						intentSigning: .notaryAsSignatory
+						intentSigning: .notaryIsSignatory
 					)
 				)
 			}

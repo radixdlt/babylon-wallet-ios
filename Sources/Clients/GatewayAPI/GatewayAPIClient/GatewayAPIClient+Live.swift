@@ -131,8 +131,13 @@ extension GatewayAPIClient {
 		@Sendable
 		func getEntityDetails(_ addresses: [String]) async throws -> GatewayAPI.StateEntityDetailsResponse {
 			try await post(
-				request: GatewayAPI.StateEntityDetailsRequest(addresses: addresses, aggregationLevel: .vault)
-			) { @Sendable base in base.appendingPathComponent("state/entity/details") }
+				request: GatewayAPI.StateEntityDetailsRequest(
+					optIns: .init(
+						nonFungibleIncludeNfids: true,
+						explicitMetadata: EntityMetadataKey.allCases.map(\.rawValue)
+					),
+					addresses: addresses, aggregationLevel: .vault
+				)) { @Sendable base in base.appendingPathComponent("state/entity/details") }
 		}
 
 		@Sendable

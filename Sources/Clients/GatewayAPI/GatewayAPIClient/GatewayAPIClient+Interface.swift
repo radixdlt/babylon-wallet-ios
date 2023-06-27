@@ -135,7 +135,7 @@ extension GatewayAPI.EntityMetadataCollection {
 // FIXME: Temporary hack to extract the key_image_url, until we have a proper schema
 extension GatewayAPI.StateNonFungibleDetailsResponseItem {
 	public var keyImageURL: URL? {
-		guard let dictionary = mutableData.rawJson.value as? [String: Any] else { return nil }
+		guard let dictionary = data.rawJson.value as? [String: Any] else { return nil }
 		guard let elements = dictionary["elements"] as? [[String: Any]] else { return nil }
 		let values = elements.filter { $0["type"] as? String == "String" }.compactMap { $0["value"] as? String }
 		let extensions = ["jpg", "jpeg", "png", "pdf", "svg", "gif"]

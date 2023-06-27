@@ -49,7 +49,13 @@
  
  {"instruction":"PUBLISH_PACKAGE","code":{"kind":"Blob","value":"01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"},"schema":{"kind":"Bytes","hex":"4d2101230c2100"},"royalty_config":{"kind":"Map","key_kind":"String","value_kind":"Tuple","entries":[]},"metadata":{"kind":"Map","key_kind":"String","value_kind":"String","entries":[]}},
  
- {"instruction":"PUBLISH_PACKAGE_ADVANCED","code":{"kind":"Blob","value":"01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"},"schema":{"kind":"Bytes","hex":"4d2101230c2100"},"royalty_config":{"kind":"Map","key_kind":"String","value_kind":"Tuple","entries":[]},"metadata":{"kind":"Map","key_kind":"String","value_kind":"String","entries":[]},"authority_rules":{"kind":"Tuple","fields":[{"kind":"Map","key_kind":"Tuple","value_kind":"Enum","entries":[]},{"kind":"Map","key_kind":"Tuple","value_kind":"Enum","entries":[]},{"kind":"Map","key_kind":"String","value_kind":"Enum","entries":[]},{"kind":"Enum","variant":{"type":"U8","discriminator":"0"},"fields":[{"kind":"Enum","variant":{"type":"U8","discriminator":"0"},"fields":[]}]},{"kind":"Map","key_kind":"Tuple","value_kind":"Enum","entries":[]},{"kind":"Map","key_kind":"String","value_kind":"Enum","entries":[]},{"kind":"Enum","variant":{"type":"U8","discriminator":"0"},"fields":[{"kind":"Enum","variant":{"type":"U8","discriminator":"0"},"fields":[]}]}]}},
+ {"instruction":"PUBLISH_PACKAGE_ADVANCED",
+         "code":{"kind":"Blob","value":"01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"},
+         "schema":{"kind":"Bytes","hex":"4d2101230c2100"},
+         "royalty_config":{"kind":"Map","key_kind":"String","value_kind":"Tuple","entries":[]},
+         "metadata":{"kind":"Map","key_kind":"String","value_kind":"String","entries":[]},
+         "authority_rules":{"kind":"Map","key_kind":"Tuple","value_kind":"Enum","entries":[]}
+ },
  
  {"instruction":"BURN_RESOURCE","bucket":{"kind":"Bucket","value":"ident"}},
  

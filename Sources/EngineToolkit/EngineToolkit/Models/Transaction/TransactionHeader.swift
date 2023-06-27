@@ -8,7 +8,7 @@ public struct TransactionHeader: Sendable, Codable, Hashable {
 	public let nonce: Nonce
 	public let publicKey: Engine.PublicKey
 	public let notaryIsSignatory: Bool
-	public let tipPercentage: UInt8
+	public let tipPercentage: UInt16
 
 	private enum CodingKeys: String, CodingKey {
 		case networkId = "network_id"
@@ -28,7 +28,7 @@ public struct TransactionHeader: Sendable, Codable, Hashable {
 		nonce: Nonce,
 		publicKey: Engine.PublicKey,
 		notaryIsSignatory: Bool,
-		tipPercentage: UInt8
+		tipPercentage: UInt16
 	) {
 		self.networkId = networkId
 		self.startEpochInclusive = startEpochInclusive

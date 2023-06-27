@@ -9,11 +9,17 @@ public struct AssertWorktopContains: InstructionProtocol {
 	}
 
 	// MARK: Stored properties
+	public let amount: Decimal_
 	public let resourceAddress: ResourceAddress
 
 	// MARK: Init
 
-	public init(resourceAddress: ResourceAddress) {
+	// Using same order of args as Scrypto: AMOUNT, ADDRESS
+	public init(
+		amount: Decimal_,
+		resourceAddress: ResourceAddress
+	) {
+		self.amount = amount
 		self.resourceAddress = resourceAddress
 	}
 }
@@ -22,6 +28,7 @@ extension AssertWorktopContains {
 	// MARK: CodingKeys
 	private enum CodingKeys: String, CodingKey {
 		case type = "instruction"
+		case amount
 		case resourceAddress = "resource_address"
 	}
 
@@ -31,6 +38,7 @@ extension AssertWorktopContains {
 		try container.encode(Self.kind, forKey: .type)
 
 		try container.encodeValue(resourceAddress, forKey: .resourceAddress)
+		try container.encodeValue(amount, forKey: .amount)
 	}
 
 	public init(from decoder: Decoder) throws {
@@ -42,6 +50,7 @@ extension AssertWorktopContains {
 		}
 
 		try self.init(
+			amount: container.decodeValue(forKey: .amount),
 			resourceAddress: container.decodeValue(forKey: .resourceAddress)
 		)
 	}

@@ -6,15 +6,15 @@
       "ledgerHQHardwareWalletSigningDisplayMode" : "verbose"
     },
     "gateways" : {
-      "current" : "https://rcnet.radixdlt.com/",
+      "current" : "https://enkinet-gateway.radixdlt.com/",
       "saved" : [
         {
           "network" : {
             "displayDescription" : "RCnet",
-            "id" : 12,
-            "name" : "kisharnet"
+            "id" : 33,
+            "name" : "enkinet"
           },
-          "url" : "https://rcnet.radixdlt.com/"
+          "url" : "https://enkinet-gateway.radixdlt.com/"
         }
       ]
     },
@@ -63,7 +63,7 @@
           {
             "forAccount" : 3,
             "forIdentity" : 2,
-            "networkID" : 12
+            "networkID" : 33
           }
         ]
       },
@@ -208,7 +208,7 @@
           "address" : "account_rdx12xsvygvltz4uhsht6tdrfxktzpmnl77r0d40j8agmujgdj022sudkk",
           "appearanceID" : 0,
           "displayName" : "First",
-          "networkID" : 12,
+          "networkID" : 33,
           "securityState" : {
             "discriminator" : "unsecured",
             "unsecuredEntityControl" : {
@@ -269,7 +269,7 @@
           "address" : "account_rdx1283u6e8r2jnz4a3jwv0hnrqfr5aq50yc9ts523sd96hzfjxqqcs89q",
           "appearanceID" : 1,
           "displayName" : "Second",
-          "networkID" : 12,
+          "networkID" : 33,
           "securityState" : {
             "discriminator" : "unsecured",
             "unsecuredEntityControl" : {
@@ -392,7 +392,7 @@
         {
           "dAppDefinitionAddress" : "account_rdx12ygudy0at0ttc2wmsxw2ejx4dqf3dwlr9rsusk287mmynxeas5p2mk",
           "displayName" : "RadiSwap",
-          "networkID" : 12,
+          "networkID" : 33,
           "referencesToAuthorizedPersonas" : [
             {
               "identityAddress" : "identity_rdx122svygvltz4uhsht6tdrfxktzpmnl77r0d40j8agmujgdj02qcdznz",
@@ -432,7 +432,7 @@
           ]
         }
       ],
-      "networkID" : 12,
+      "networkID" : 33,
       "personas" : [
         {
           "address" : "identity_rdx122svygvltz4uhsht6tdrfxktzpmnl77r0d40j8agmujgdj02qcdznz",
@@ -447,7 +447,7 @@
               "value" : "Incognitoson"
             }
           ],
-          "networkID" : 12,
+          "networkID" : 33,
           "securityState" : {
             "discriminator" : "unsecured",
             "unsecuredEntityControl" : {
@@ -517,7 +517,7 @@
               "value" : "Publicson"
             }
           ],
-          "networkID" : 12,
+          "networkID" : 33,
           "securityState" : {
             "discriminator" : "unsecured",
             "unsecuredEntityControl" : {

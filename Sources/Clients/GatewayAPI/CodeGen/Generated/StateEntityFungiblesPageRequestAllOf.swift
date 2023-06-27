@@ -13,29 +13,35 @@ import AnyCodable
 @available(*, deprecated, renamed: "GatewayAPI.StateEntityFungiblesPageRequestAllOf")
 public typealias StateEntityFungiblesPageRequestAllOf = GatewayAPI.StateEntityFungiblesPageRequestAllOf
 
-// MARK: - GatewayAPI.StateEntityFungiblesPageRequestAllOf
 extension GatewayAPI {
-	public struct StateEntityFungiblesPageRequestAllOf: Codable, Hashable {
-		/** Bech32m-encoded human readable version of the entity's global address or hex-encoded id. */
-		public private(set) var address: String
-		public private(set) var aggregationLevel: ResourceAggregationLevel?
 
-		public init(address: String, aggregationLevel: ResourceAggregationLevel? = nil) {
-			self.address = address
-			self.aggregationLevel = aggregationLevel
-		}
+public struct StateEntityFungiblesPageRequestAllOf: Codable, Hashable {
 
-		public enum CodingKeys: String, CodingKey, CaseIterable {
-			case address
-			case aggregationLevel = "aggregation_level"
-		}
+    /** Bech32m-encoded human readable version of the address. */
+    public private(set) var address: String
+    public private(set) var aggregationLevel: ResourceAggregationLevel?
+    public private(set) var optIns: StateEntityFungiblesPageRequestOptIns?
 
-		// Encodable protocol methods
+    public init(address: String, aggregationLevel: ResourceAggregationLevel? = nil, optIns: StateEntityFungiblesPageRequestOptIns? = nil) {
+        self.address = address
+        self.aggregationLevel = aggregationLevel
+        self.optIns = optIns
+    }
 
-		public func encode(to encoder: Encoder) throws {
-			var container = encoder.container(keyedBy: CodingKeys.self)
-			try container.encode(address, forKey: .address)
-			try container.encodeIfPresent(aggregationLevel, forKey: .aggregationLevel)
-		}
-	}
+    public enum CodingKeys: String, CodingKey, CaseIterable {
+        case address
+        case aggregationLevel = "aggregation_level"
+        case optIns = "opt_ins"
+    }
+
+    // Encodable protocol methods
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(address, forKey: .address)
+        try container.encodeIfPresent(aggregationLevel, forKey: .aggregationLevel)
+        try container.encodeIfPresent(optIns, forKey: .optIns)
+    }
+}
+
 }
