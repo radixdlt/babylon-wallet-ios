@@ -1273,6 +1273,38 @@ public enum L10n {
     public static let viewMnemonics = L10n.tr("Localizable", "importOlympiaAccounts_viewMnemonics", fallback: "View Mnemonics")
     /// What is a Mnemonic
     public static let whatIsMnemonic = L10n.tr("Localizable", "importOlympiaAccounts_whatIsMnemonic", fallback: "What is a Mnemonic")
+    public enum AccountsToImport {
+      /// Import %d accounts
+      public static func buttonManyAccounts(_ p1: Int) -> String {
+        return L10n.tr("Localizable", "importOlympiaAccounts_accountsToImport_buttonManyAccounts", p1, fallback: "Import %d accounts")
+      }
+      /// Import 1 account
+      public static let buttonOneAcccount = L10n.tr("Localizable", "importOlympiaAccounts_accountsToImport_buttonOneAcccount", fallback: "Import 1 account")
+      /// Ledger (Legacy)
+      public static let ledgerAccount = L10n.tr("Localizable", "importOlympiaAccounts_accountsToImport_ledgerAccount", fallback: "Ledger (Legacy)")
+      /// Legacy Account
+      public static let legacyAccount = L10n.tr("Localizable", "importOlympiaAccounts_accountsToImport_legacyAccount", fallback: "Legacy Account")
+      /// New Address
+      public static let newAddressLabel = L10n.tr("Localizable", "importOlympiaAccounts_accountsToImport_newAddressLabel", fallback: "New Address")
+      /// Olympia Address (Obsolete)
+      public static let olympiaAddressLabel = L10n.tr("Localizable", "importOlympiaAccounts_accountsToImport_olympiaAddressLabel", fallback: "Olympia Address (Obsolete)")
+      /// The following accounts will be imported to your new wallet.
+      public static let subtitle = L10n.tr("Localizable", "importOlympiaAccounts_accountsToImport_subtitle", fallback: "The following accounts will be imported to your new wallet.")
+      /// Import Accounts
+      public static let title = L10n.tr("Localizable", "importOlympiaAccounts_accountsToImport_title", fallback: "Import Accounts")
+      /// Unnamed
+      public static let unnamed = L10n.tr("Localizable", "importOlympiaAccounts_accountsToImport_unnamed", fallback: "Unnamed")
+    }
+    public enum ScanQR {
+      /// Scan the QR code shown in the Export section of the Radix Desktop Wallet for Olympia.
+      public static let instructions = L10n.tr("Localizable", "importOlympiaAccounts_scanQR_instructions", fallback: "Scan the QR code shown in the Export section of the Radix Desktop Wallet for Olympia.")
+      /// Scanned: %d/%d
+      public static func scannedLabel(_ p1: Int, _ p2: Int) -> String {
+        return L10n.tr("Localizable", "importOlympiaAccounts_scanQR_scannedLabel", p1, p2, fallback: "Scanned: %d/%d")
+      }
+      /// Import Legacy Olympia Accounts
+      public static let title = L10n.tr("Localizable", "importOlympiaAccounts_scanQR_title", fallback: "Import Legacy Olympia Accounts")
+    }
   }
   public enum ImportOlympiaLedgerAccounts {
     /// %@ - #%d accounts

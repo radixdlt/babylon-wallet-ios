@@ -18,8 +18,6 @@ extension ImportOlympiaWalletCoordinator {
 			) {
 				let scanQRStore = store.scope(state: \.scanQR, action: { .child(.scanQR($0)) })
 				ScanMultipleOlympiaQRCodes.View(store: scanQRStore)
-					.navigationTitle(L10n.ImportLegacyWallet.title)
-					.navigationBarTitleDisplayMode(.large)
 				#if os(iOS)
 					.toolbar {
 						ToolbarItem(placement: .primaryAction) {
@@ -49,10 +47,10 @@ extension ImportOlympiaWalletCoordinator.Path {
 		var body: some SwiftUI.View {
 			SwitchStore(store) { state in
 				switch state {
-				case .selectAccountsToImport:
+				case .accountsToImport:
 					CaseLet(
-						state: /State.selectAccountsToImport,
-						action: Action.selectAccountsToImport,
+						state: /State.accountsToImport,
+						action: Action.accountsToImport,
 						then: { AccountsToImport.View(store: $0) }
 					)
 				case .importMnemonic:

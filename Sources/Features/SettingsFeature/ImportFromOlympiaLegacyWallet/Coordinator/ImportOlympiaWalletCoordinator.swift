@@ -10,7 +10,7 @@ import Profile
 public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public var expectedMnemonicWordCount: BIP39.WordCount?
-		public var selectedAccounts: OlympiaAccountsToImport?
+		public var accountsToImport: OlympiaAccountsToImport?
 		public var mnemonicWithPassphrase: MnemonicWithPassphrase?
 		public var migratedAccounts: IdentifiedArrayOf<Profile.Network.Account> = .init()
 		public var scanQR: ScanMultipleOlympiaQRCodes.State = .init()
@@ -22,21 +22,21 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 
 	public struct Path: Sendable, ReducerProtocol {
 		public enum State: Sendable, Hashable {
-			case selectAccountsToImport(AccountsToImport.State)
+			case accountsToImport(AccountsToImport.State)
 			case importMnemonic(ImportMnemonic.State)
 			case importOlympiaLedgerAccountsAndFactorSources(ImportOlympiaLedgerAccountsAndFactorSources.State)
 			case completion(CompletionMigrateOlympiaAccountsToBabylon.State)
 		}
 
 		public enum Action: Sendable, Equatable {
-			case selectAccountsToImport(AccountsToImport.Action)
+			case accountsToImport(AccountsToImport.Action)
 			case importMnemonic(ImportMnemonic.Action)
 			case importOlympiaLedgerAccountsAndFactorSources(ImportOlympiaLedgerAccountsAndFactorSources.Action)
 			case completion(CompletionMigrateOlympiaAccountsToBabylon.Action)
 		}
 
 		public var body: some ReducerProtocolOf<Self> {
-			Scope(state: /State.selectAccountsToImport, action: /Action.selectAccountsToImport) {
+			Scope(state: /State.accountsToImport, action: /Action.accountsToImport) {
 				AccountsToImport()
 			}
 			Scope(state: /State.importMnemonic, action: /Action.importMnemonic) {
@@ -126,25 +126,25 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 				)))
 			}
 
-		case let .path(.element(_, action: .selectAccountsToImport(.delegate(.selectedAccounts(accounts))))):
-			state.selectedAccounts = accounts
-
-			if let softwareAccounts = accounts.software {
-				return .run { send in
-					let idOfExistingFactorSource = await factorSourcesClient
-						.checkIfHasOlympiaFactorSourceForAccounts(softwareAccounts)
-
-					await send(.internal(.checkedIfOlympiaFactorSourceAlreadyExists(idOfExistingFactorSource)))
-				}
-			} else if let hardwareAccounts = accounts.hardware {
-				return migrateHardwareAccounts(hardwareAccounts)
-			}
-
-			return .none
+//		case let .path(.element(_, action: .accountsToImport(.delegate(.selectedAccounts(accounts))))):
+//			state.selectedAccounts = accounts
+//
+//			if let softwareAccounts = accounts.software {
+//				return .run { send in
+//					let idOfExistingFactorSource = await factorSourcesClient
+//						.checkIfHasOlympiaFactorSourceForAccounts(softwareAccounts)
+//
+//					await send(.internal(.checkedIfOlympiaFactorSourceAlreadyExists(idOfExistingFactorSource)))
+//				}
+//			} else if let hardwareAccounts = accounts.hardware {
+//				return migrateHardwareAccounts(hardwareAccounts)
+//			}
+//
+//			return .none
 
 		case let .path(.element(_, action: .importMnemonic(.delegate(.notSavedInProfile(mnemonicWithPassphrase))))):
 			state.mnemonicWithPassphrase = mnemonicWithPassphrase
-			guard let softwareAccounts = state.selectedAccounts?.software else {
+			guard let softwareAccounts = state.accountsToImport?.software else {
 				assertionFailure("Bad implementation, expected 'state.selectedAccounts.software' to have been set.")
 				return .none
 			}
@@ -193,7 +193,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 				}
 				return .none
 			}
-			guard let softwareAccounts = state.selectedAccounts?.software else {
+			guard let softwareAccounts = state.accountsToImport?.software else {
 				assertionFailure("Bad implementation, expected 'state.selectedAccounts.software' to have been set.")
 				return .none
 			}
@@ -214,7 +214,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 			return .none
 
 		case let .findAlreadyImportedOlympiaSoftwareAccounts(scanned, alreadyImported):
-			let destination = Path.State.selectAccountsToImport(.init(
+			let destination = Path.State.accountsToImport(.init(
 				scannedAccounts: scanned,
 				alreadyImported: alreadyImported
 			))
@@ -234,12 +234,12 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 
 		case let .migratedOlympiaSoftwareAccounts(migratedSoftwareAccounts):
 
-			if let hardwareAccounts = state.selectedAccounts?.hardware {
+			if let hardwareAccounts = state.accountsToImport?.hardware {
 				state.migratedAccounts.append(contentsOf: migratedSoftwareAccounts.babylonAccounts.rawValue)
 				// also need to add ledger and then migrate hardware account
 				return migrateHardwareAccounts(hardwareAccounts)
 			} else {
-				assert(state.selectedAccounts?.hardware == nil)
+				assert(state.accountsToImport?.hardware == nil)
 				// no hardware accounts to migrate...
 				let destination = Path.State.completion(.init(migratedAccounts: migratedSoftwareAccounts.babylonAccounts, unvalidatedOlympiaHardwareAccounts: nil))
 				if state.path.last != destination {

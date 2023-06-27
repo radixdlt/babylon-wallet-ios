@@ -29,12 +29,14 @@ extension ScanMultipleOlympiaQRCodes {
 			VStack {
 				WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 					if let numberOfPayloadsToScan = viewStore.numberOfPayloadsToScan {
-						Text(L10n.ImportLegacyWallet.scannedLabel(viewStore.numberOfPayloadsScanned, numberOfPayloadsToScan))
+						Text(L10n.ImportOlympiaAccounts.ScanQR.scannedLabel(viewStore.numberOfPayloadsScanned, numberOfPayloadsToScan))
 					}
 				}
 				let scanStore = store.scope(state: \.scanQR, action: { .child(.scanQR($0)) })
 				ScanQRCoordinator.View(store: scanStore)
 			}
+			.navigationTitle(L10n.ImportOlympiaAccounts.ScanQR.title)
+			.navigationBarTitleDisplayMode(.large)
 		}
 	}
 }

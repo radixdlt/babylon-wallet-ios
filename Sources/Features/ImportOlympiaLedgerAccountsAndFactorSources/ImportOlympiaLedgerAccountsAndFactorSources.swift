@@ -30,7 +30,7 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 		/// Not yet migrated, containing unvalidated and validated accounts.
 		public var unmigrated: OlympiaAccountsValidation
 
-		/// Migrated (an before that validated)
+		/// Migrated (and before that validated)
 		public var ledgersWithAccounts: OrderedSet<LedgerWithAccounts> = []
 
 		public var chooseLedger: LedgerHardwareDevices.State
