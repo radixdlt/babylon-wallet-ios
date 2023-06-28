@@ -1,27 +1,34 @@
 import Foundation
 
-// MARK: - Nested2
-struct Nested2: Codable, Equatable {
+// MARK: - Nested
+struct Nested: Codable, Equatable {
 	struct Configuration {
 		let decodedVersionFromParent: Int
 	}
 
-	public static let currentVersion = 2
+	public static let currentVersion = 3
 	internal private(set) var version: Int = Self.currentVersion
 	let label: String
 	let inner: Inner
+	let anotherInner: Inner3 // New in version 3
 
 	struct Inner: Encodable, DecodableWithConfiguration, Equatable {
 		let foo: String
 		let bar: String // New in version 2
 	}
+
+	// New in version 3
+	struct Inner3: Equatable, Codable {
+		let bizz: String
+	}
 }
 
-extension Nested2 {
+extension Nested {
 	private enum CodingKeys: String, CodingKey {
 		case version
 		case label
 		case inner
+		case anotherInner
 	}
 
 	init(from decoder: Decoder) throws {
@@ -35,31 +42,34 @@ extension Nested2 {
 				decodedVersionFromParent: version
 			)
 		)
+		if version < 3 {
+			self.anotherInner = .init(bizz: "MIGRATED_FROM_\(version)")
+		} else {
+			self.anotherInner = try container.decode(Inner3.self, forKey: .anotherInner)
+		}
+
 		self.version = Self.currentVersion
 	}
 }
 
-extension Nested2.Inner {
+extension Nested.Inner {
 	private enum CodingKeys: String, CodingKey {
 		case foo
 		case bar // New in version 2
 	}
 
-	init(from decoder: Decoder, configuration: Nested2.Configuration) throws {
+	init(from decoder: Decoder, configuration: Nested.Configuration) throws {
 		let container = try decoder.container(keyedBy: CodingKeys.self)
 		let version = configuration.decodedVersionFromParent
 
 		self.foo = try container.decode(String.self, forKey: .foo)
-		switch version {
-		case 1:
+		if version < 2 {
 			self.bar = "MIGRATED_FROM_\(version)"
-		case 2:
+		} else {
 			self.bar = try container.decode(String.self, forKey: .bar)
-		default:
-			throw FailedToDecodeWithConfigurationUnknownVersion()
 		}
 	}
 }
 
-// MARK: - FailedToDecodeWithConfigurationUnknownVersion
-struct FailedToDecodeWithConfigurationUnknownVersion: Swift.Error {}
+// MARK: - UnknownVersion
+struct UnknownVersion: Swift.Error {}
