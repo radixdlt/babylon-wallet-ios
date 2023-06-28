@@ -4,6 +4,8 @@ import VersionedCodable
 typealias Model = ModelV3
 
 // MARK: - ModelV3
+/// This demonstrates versioning using multiple types for each model version, using the lib
+/// `VersionedCodable` to not have to write as much code.
 struct ModelV3: VersionedCodable, Equatable {
 	let label: String
 	let inner: Inner
