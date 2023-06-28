@@ -46,6 +46,7 @@ public struct AccountsToImport: Sendable, FeatureReducer {
  return .internal(.checkedIfOlympiaFactorSourceAlreadyExists(idOfExistingFactorSource))
  if let idOfExistingFactorSource {
  convertSoftwareAccountsToBabylon
+
  case let .migratedOlympiaSoftwareAccounts(migratedSoftwareAccounts):
  state.migratedAccounts.append(contentsOf: migratedSoftwareAccounts.babylonAccounts.rawValue)
  return migrateHardwareAccounts(hardwareAccounts)
