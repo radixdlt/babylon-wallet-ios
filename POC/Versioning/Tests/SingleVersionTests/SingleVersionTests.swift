@@ -5,7 +5,7 @@ import XCTest
 final class NestedTests: XCTestCase {
 	// MARK: Encoding
 	func test_encoding() throws {
-		let nested = Nested(
+		let nested = Model(
 			label: "test",
 			inner: .init(
 				foo: "nested",
@@ -40,7 +40,7 @@ final class NestedTests: XCTestCase {
 					"bizz": "buzz",
 				],
 			],
-			Nested(
+			Model(
 				version: 3,
 				label: "test",
 				inner: .init(
@@ -61,7 +61,7 @@ final class NestedTests: XCTestCase {
 					"foo": "decoding",
 				],
 			],
-			Nested(
+			Model(
 				version: 3,
 				label: "test",
 				inner: .init(
@@ -83,7 +83,7 @@ final class NestedTests: XCTestCase {
 					"bar": "test",
 				],
 			],
-			Nested(
+			Model(
 				version: 3,
 				label: "test",
 				inner: .init(
@@ -102,7 +102,7 @@ final class NestedTests: XCTestCase {
 				"label": "test"
 			}
 			""",
-			type: Nested.self
+			type: Model.self
 		)
 	}
 
@@ -114,7 +114,7 @@ final class NestedTests: XCTestCase {
 				"label": "test"
 			}
 			""",
-			type: Nested.self
+			type: Model.self
 		)
 	}
 
@@ -126,7 +126,7 @@ final class NestedTests: XCTestCase {
 				"label": "test"
 			}
 			""",
-			type: Nested.self
+			type: Model.self
 		)
 	}
 
@@ -137,7 +137,7 @@ final class NestedTests: XCTestCase {
 				"version": 2
 			}
 			""",
-			type: Nested.self
+			type: Model.self
 		)
 	}
 }

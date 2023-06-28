@@ -1,7 +1,7 @@
 import Foundation
 
-// MARK: - Nested
-struct Nested: Codable, Equatable {
+// MARK: - Model
+struct Model: Codable, Equatable {
 	static let currentVersion = 3
 
 	let version: Int
@@ -22,14 +22,14 @@ struct Nested: Codable, Equatable {
 	}
 }
 
-// MARK: Nested.Configuration
-extension Nested {
+// MARK: Model.Configuration
+extension Model {
 	struct Configuration {
 		let decodedVersionFromParent: Int
 	}
 }
 
-extension Nested {
+extension Model {
 	struct Inner: Encodable, DecodableWithConfiguration, Equatable {
 		let foo: String
 		let bar: String // New in version 2
@@ -41,7 +41,7 @@ extension Nested {
 	}
 }
 
-extension Nested {
+extension Model {
 	private enum CodingKeys: String, CodingKey {
 		case version
 		case label
@@ -70,13 +70,13 @@ extension Nested {
 	}
 }
 
-extension Nested.Inner {
+extension Model.Inner {
 	private enum CodingKeys: String, CodingKey {
 		case foo
 		case bar // New in version 2
 	}
 
-	init(from decoder: Decoder, configuration: Nested.Configuration) throws {
+	init(from decoder: Decoder, configuration: Model.Configuration) throws {
 		let container = try decoder.container(keyedBy: CodingKeys.self)
 		let version = configuration.decodedVersionFromParent
 
