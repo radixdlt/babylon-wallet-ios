@@ -1,9 +1,9 @@
-import Foundation
-@testable import SingleVersion
-import XCTest
+@_exported import Foundation
+@_exported import JSONTesting
+@_exported import XCTest
 
 extension XCTestCase {
-	func assertFailingDecoding<T: Decodable>(
+	public func assertFailingDecoding<T: Decodable>(
 		json: String,
 		type: T.Type = T.self
 	) {

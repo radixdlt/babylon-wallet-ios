@@ -11,13 +11,29 @@ let package = Package(
 	],
 	targets: [
 		.target(
+			name: "TestUtils",
+			dependencies: [
+				.product(name: "JSONTesting", package: "swift-json-testing"),
+			]
+		),
+		.target(
 			name: "SingleVersion"
 		),
 		.testTarget(
 			name: "SingleVersionTests",
 			dependencies: [
 				"SingleVersion",
-				.product(name: "JSONTesting", package: "swift-json-testing"),
+				"TestUtils",
+			]
+		),
+		.target(
+			name: "VersionEveryModel"
+		),
+		.testTarget(
+			name: "VersionEveryModelTests",
+			dependencies: [
+				"VersionEveryModel",
+				"TestUtils",
 			]
 		),
 	]
