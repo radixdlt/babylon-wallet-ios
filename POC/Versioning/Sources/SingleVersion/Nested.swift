@@ -70,6 +70,3 @@ extension Nested.Inner {
 		}
 	}
 }
-
-// MARK: - UnknownVersion
-struct UnknownVersion: Swift.Error {}
