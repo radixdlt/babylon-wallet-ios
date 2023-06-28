@@ -662,13 +662,9 @@ package.addModules([
 		],
 		tests: .no
 	),
-
 	.client(
-		name: "OnboardingClient",
-		dependencies: [
-			"Profile",
-			"Cryptography",
-		],
+		name: "OverlayWindowClient",
+		dependencies: [],
 		tests: .no
 	),
 	.client(
@@ -678,6 +674,15 @@ package.addModules([
 			"ProfileStore",
 		],
 		tests: .yes()
+	),
+
+	.client(
+		name: "OnboardingClient",
+		dependencies: [
+			"Profile",
+			"Cryptography",
+		],
+		tests: .no
 	),
 
 	.client(
@@ -828,6 +833,7 @@ package.addModules([
 			"DesignSystem",
 			"Resources",
 			"SharedModels",
+			"OverlayWindowClient",
 		],
 		tests: .yes()
 	),

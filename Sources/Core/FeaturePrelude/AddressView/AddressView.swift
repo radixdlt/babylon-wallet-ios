@@ -1,3 +1,4 @@
+import OverlayWindowClient
 import Prelude
 import Resources
 import SharedModels
@@ -12,7 +13,7 @@ public struct AddressView: SwiftUI.View, Sendable {
 
 	@Dependency(\.pasteboardClient) var pasteboardClient
 	@Dependency(\.openURL) var openURL
-	@Dependency(\.bannerClient) var bannerClient
+	@Dependency(\.overlayWindowClient) var overlayWindowClient
 
 	public init(
 		_ identifiable: LedgerIdentifiable,
@@ -101,7 +102,13 @@ extension AddressView {
 
 	private func copyToPasteboard() {
 		pasteboardClient.copyString(identifiable.address)
-                bannerClient.schedule(userInfo: "Copied")
+		overlayWindowClient.schedule(hud:
+			.init(
+				text: "Copied",
+				icon: .system("checkmark.circle.fill"),
+				iconForegroundColor: .app.green1
+			)
+		)
 	}
 
 	private func viewOnRadixDashboard() {

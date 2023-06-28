@@ -108,10 +108,22 @@ public struct App: Sendable, FeatureReducer {
 						// easy to think a test failed if we print this warning during tests.
 						loggerGlobal.error("An error occurred: \(String(describing: error))")
 					}
-                                        @Dependency(\.bannerClient) var bannerClient
-                                        bannerClient.schedule(userError: error)
+					@Dependency(\.overlayWindowClient) var overlayWindowClient
+					// bannerClient.schedule(userError: error)
 
-                                        bannerClient.scheduleAlert(.init(title: "hello", buttons: [.ini]))
+					let action = await overlayWindowClient.schedule(alert: .init(
+						title: { TextState(L10n.Splash.IncompatibleProfileVersionAlert.title) },
+						actions: {
+							ButtonState(role: .destructive, action: .primaryButtonTapped) {
+								TextState(L10n.Splash.IncompatibleProfileVersionAlert.delete)
+							}
+
+							ButtonState(role: .none, action: .secondaryButtonTapped) {
+								TextState("Hello")
+							}
+						},
+						message: { TextState(L10n.Splash.IncompatibleProfileVersionAlert.message) }
+					))
 
 					// Maybe instead we should listen here for the Profile.State change,
 					// and when it switches to `.ephemeral` we navigate to onboarding.
@@ -121,7 +133,7 @@ public struct App: Sendable, FeatureReducer {
 						// A slight delay to allow any modal that may be shown to be dismissed.
 						try? await clock.sleep(for: .seconds(0.5))
 					}
-					//await send(.internal(.displayErrorAlert(UserFacingError(error))))
+					// await send(.internal(.displayErrorAlert(UserFacingError(error))))
 				}
 			}
 
