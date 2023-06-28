@@ -10,20 +10,9 @@ public struct OverlayWindowClient: Sendable {
 	public var scheduledItems: ScheduledItems
 	public var scheduleAlert: ScheduleAlert
 	public var scheduleHUD: ScheduleHUD
-
 	public var sendAlertAction: SendAlertAction
+
 	var onAlertAction: OnAlertAction
-}
-
-// MARK: - ImageAsset + Hashable
-extension ImageAsset: Hashable {
-	public static func == (lhs: ImageAsset, rhs: ImageAsset) -> Bool {
-		lhs.name == rhs.name
-	}
-
-	public func hash(into hasher: inout Hasher) {
-		hasher.combine(self.name)
-	}
 }
 
 extension OverlayWindowClient {
@@ -34,7 +23,7 @@ extension OverlayWindowClient {
 	typealias OnAlertAction = @Sendable (Item.AlertState.ID) async -> Item.AlertAction
 }
 
-// MARK: - OverlayWindowClient.Item
+// MARK: OverlayWindowClient.Item
 extension OverlayWindowClient {
 	public enum Item: Sendable, Hashable {
 		public typealias AlertState = ComposableArchitecture.AlertState<AlertAction>
@@ -84,6 +73,17 @@ extension OverlayWindowClient {
 				iconForegroundColor: .app.green1
 			)
 		)
+	}
+}
+
+// MARK: - ImageAsset + Hashable
+extension ImageAsset: Hashable {
+	public static func == (lhs: ImageAsset, rhs: ImageAsset) -> Bool {
+		lhs.name == rhs.name
+	}
+
+	public func hash(into hasher: inout Hasher) {
+		hasher.combine(self.name)
 	}
 }
 
