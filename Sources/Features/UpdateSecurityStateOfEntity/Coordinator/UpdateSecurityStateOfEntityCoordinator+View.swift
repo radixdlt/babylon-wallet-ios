@@ -1,4 +1,5 @@
 import FeaturePrelude
+import SecurityStructureConfigurationListFeature
 
 extension UpdateSecurityStateOfEntityCoordinator.State {
 	var viewState: UpdateSecurityStateOfEntityCoordinator.ViewState {
@@ -20,12 +21,27 @@ extension UpdateSecurityStateOfEntityCoordinator {
 		}
 
 		public var body: some SwiftUI.View {
-			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-				// TODO: implement
-				Text("Implement: UpdateSecurityStateOfEntityCoordinator \(Entity.entityKind.rawValue)")
-					.background(Color.yellow)
-					.foregroundColor(.red)
-					.onAppear { viewStore.send(.appeared) }
+			NavigationStackStore(
+				store.scope(state: \.path, action: { .child(.path($0)) })
+			) {
+				path(for: store.scope(state: \.root, action: { .child(.root($0)) }))
+
+					// This is required to disable the animation of internal components during transition
+					.transaction { $0.animation = nil }
+			} destination: {
+				path(for: $0)
+			}
+		}
+
+		func path(
+			for store: StoreOf<UpdateSecurityStateOfEntityCoordinator.Path>
+		) -> some SwiftUI.View {
+			SwitchStore(store) {
+				CaseLet(
+					state: /UpdateSecurityStateOfEntityCoordinator.Path.State.selectSecurityStructureConfig,
+					action: UpdateSecurityStateOfEntityCoordinator.Path.Action.selectSecurityStructureConfig,
+					then: { SecurityStructureConfigurationListCoordinator.View(store: $0) }
+				)
 			}
 		}
 	}
