@@ -9,7 +9,7 @@ typealias Model = ModelV3
 struct ModelV3: VersionedCodable, Equatable {
 	let label: String
 	let inner: Inner
-	let anotherInner: AnotherInner // New in version
+	let anotherInner: AnotherInner // New
 
 	init(label: String, inner: Inner, anotherInner: AnotherInner) {
 		self.label = label
@@ -35,7 +35,7 @@ extension Model {
 	typealias Inner = InnerV2
 	struct InnerV2: VersionedCodable, Equatable {
 		let foo: String
-		let bar: String // New in version 2
+		let bar: String // New
 		init(foo: String, bar: String) {
 			self.foo = foo
 			self.bar = bar
@@ -51,8 +51,9 @@ extension Model {
 		}
 	}
 
-	// New in version 3
 	typealias AnotherInner = AnotherInnerV1
+
+	// New
 	struct AnotherInnerV1: VersionedCodable, Equatable {
 		let bizz: String
 		init(bizz: String) {
@@ -68,7 +69,7 @@ extension Model {
 extension Model {
 	struct ModelV2: VersionedCodable, Equatable {
 		let label: String
-		let inner: InnerV2
+		let inner: InnerV2 // New
 		init(label: String, inner: InnerV2) {
 			self.label = label
 			self.inner = inner
