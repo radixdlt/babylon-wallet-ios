@@ -48,7 +48,7 @@ public struct OnboardingCoordinator: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
 		case .commitEphemeralResult(.success):
-			return .send(.delegate(.completed))
+			return completed
 		case let .commitEphemeralResult(.failure(error)):
 			fatalError("Unable to use app, failed to commit profile, error: \(String(describing: error))")
 		}
@@ -65,7 +65,7 @@ public struct OnboardingCoordinator: Sendable, FeatureReducer {
 			return .none
 
 		case .startup(.delegate(.completed)):
-			return .send(.delegate(.completed))
+			return completed
 
 		case .createAccountCoordinator(.delegate(.completed)):
 			return .task {
@@ -77,5 +77,9 @@ public struct OnboardingCoordinator: Sendable, FeatureReducer {
 		default:
 			return .none
 		}
+	}
+
+	private var completed: EffectTask<Action> {
+		.send(.delegate(.completed))
 	}
 }
