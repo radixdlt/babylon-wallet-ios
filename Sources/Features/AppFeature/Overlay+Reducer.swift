@@ -1,4 +1,5 @@
 import FeaturePrelude
+import OverlayWindowClient
 import SwiftUI
 
 struct OverlayReducer: Sendable, FeatureReducer {

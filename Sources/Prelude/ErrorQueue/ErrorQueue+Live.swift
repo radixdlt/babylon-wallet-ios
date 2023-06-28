@@ -9,6 +9,10 @@ extension ErrorQueue: DependencyKey {
 		return Self(
 			errors: { errorChannel.eraseToAnyAsyncSequence() },
 			schedule: { error in
+				if !_XCTIsTesting {
+					// easy to think a test failed if we print this warning during tests.
+					loggerGlobal.error("An error occurred: \(String(describing: error))")
+				}
 				Task {
 					await errorChannel.send(error)
 				}

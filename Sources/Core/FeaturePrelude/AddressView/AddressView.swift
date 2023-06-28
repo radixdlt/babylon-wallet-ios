@@ -1,19 +1,24 @@
-import OverlayWindowClient
+import GatewaysClient
+import PasteboardClient
 import Prelude
+import QRGeneratorClient
 import Resources
 import SharedModels
 import SwiftUI
 
 // MARK: - AddressView
-public struct AddressView: SwiftUI.View, Sendable {
+public struct AddressView: View {
 	let identifiable: LedgerIdentifiable
 	let isTappable: Bool
 	private let format: AddressFormat
 	private let action: Action
 
-	@Dependency(\.pasteboardClient) var pasteboardClient
+	@Dependency(\.gatewaysClient) var gatewaysClient
 	@Dependency(\.openURL) var openURL
-	@Dependency(\.overlayWindowClient) var overlayWindowClient
+	@Dependency(\.pasteboardClient) var pasteboardClient
+	@Dependency(\.qrGeneratorClient) var qrGeneratorClient
+
+	@State private var qrCodeContent: AccountAddress? = nil
 
 	public init(
 		_ identifiable: LedgerIdentifiable,
@@ -24,16 +29,16 @@ public struct AddressView: SwiftUI.View, Sendable {
 
 		switch identifiable {
 		case .address:
-			format = .default
-			action = .copy
+			self.format = .default
+			self.action = .copy
 		case let .identifier(identifier):
 			switch identifier {
 			case .transaction:
-				format = .default
-				action = .viewOnDashboard
+				self.format = .default
+				self.action = .viewOnDashboard
 			case .nonFungibleGlobalID:
-				format = .nonFungibleLocalId
-				action = .copy
+				self.format = .nonFungibleLocalId
+				self.action = .copy
 			}
 		}
 	}
@@ -44,6 +49,9 @@ extension AddressView {
 	public var body: some View {
 		if isTappable {
 			tappableAddressView
+				.sheet(item: $qrCodeContent) { accountAddress in
+					AccountAddressQRCodePanel(address: accountAddress)
+				}
 		} else {
 			addressView
 		}
@@ -65,6 +73,12 @@ extension AddressView {
 
 				Button(L10n.AddressAction.viewOnDashboard, asset: AssetResource.iconLinkOut) {
 					viewOnRadixDashboard()
+				}
+
+				if case let .address(.account(accountAddress)) = identifiable {
+					Button(L10n.AddressAction.showAccountQR, asset: AssetResource.qrCodeScanner) {
+						showQR(for: accountAddress)
+					}
 				}
 			}
 		}
@@ -102,27 +116,26 @@ extension AddressView {
 
 	private func copyToPasteboard() {
 		pasteboardClient.copyString(identifiable.address)
-		overlayWindowClient.schedule(hud:
-			.init(
-				text: "Copied",
-				icon: .system("checkmark.circle.fill"),
-				iconForegroundColor: .app.green1
-			)
-		)
 	}
 
 	private func viewOnRadixDashboard() {
-		guard let addressURL else { return }
-		Task { await openURL(addressURL) }
+		guard let path else { return }
+		Task { [openURL, gatewaysClient] in
+			let currentNetwork = await gatewaysClient.getCurrentGateway().network
+			await openURL(
+				Radix.Dashboard.dashboard(forNetwork: currentNetwork)
+					.url
+					.appending(path: path)
+			)
+		}
+	}
+
+	private func showQR(for accountAddress: AccountAddress) {
+		qrCodeContent = accountAddress
 	}
 
 	private var path: String? {
 		identifiable.addressPrefix + "/" + identifiable.address
-	}
-
-	private var addressURL: URL? {
-		guard let path else { return nil }
-		return Radix.Dashboard.rcnet.url.appending(path: path)
 	}
 }
 
@@ -137,7 +150,78 @@ extension AddressView {
 #if DEBUG
 struct AddressView_Previews: PreviewProvider {
 	static var previews: some View {
-		AddressView(.address(.account(try! .init(address: "account_wqs8qxdx7qw8c"))))
+		AddressView(.address(.account(try! .init(address: "account_tdx_b_1p8ahenyznrqy2w0tyg00r82rwuxys6z8kmrhh37c7maqpydx7p"))))
 	}
 }
 #endif
+
+// MARK: - AccountAddressQRCodePanel
+public struct AccountAddressQRCodePanel: View {
+	private let address: AccountAddress
+	private let closeAction: (() -> Void)?
+
+	public init(address: AccountAddress, closeAction: (() -> Void)? = nil) {
+		self.address = address
+		self.closeAction = closeAction
+	}
+
+	public var body: some View {
+		VStack(spacing: 0) {
+			if let closeAction {
+				CloseButtonBar(action: closeAction)
+			}
+			QRCodeView(QR.addressPrefix + address.address, size: Self.qrImageSize)
+				.padding([.horizontal, .bottom], .large3)
+				.padding(.top, topPadding)
+		}
+		.presentationDetents([.medium])
+		.presentationDragIndicator(.visible)
+	}
+
+	private var topPadding: CGFloat {
+		closeAction == nil ? .large3 : 0
+	}
+
+	private static let qrImageSize: CGFloat = 300
+}
+
+// MARK: - QRCodeView
+public struct QRCodeView: View {
+	@Dependency(\.qrGeneratorClient) var qrGeneratorClient
+
+	private let content: String
+	private let size: CGSize
+	@State private var qrImage: Result<CGImage, Error>? = nil
+
+	public init(_ content: String, size: CGFloat) {
+		self.content = content
+		self.size = .init(width: size, height: size)
+	}
+
+	public var body: some View {
+		ZStack {
+			switch qrImage {
+			case .none:
+				Color.clear
+			case let .success(value):
+				Image(value, scale: 1, label: Text(L10n.AddressAction.QrCodeView.qrCodeLabel))
+					.resizable()
+					.aspectRatio(1, contentMode: .fit)
+					.transition(.scale(scale: 0.95).combined(with: .opacity))
+			case .failure:
+				Text(L10n.AddressAction.QrCodeView.failureLabel)
+					.foregroundColor(.app.alert)
+					.textStyle(.body1HighImportance)
+			}
+		}
+		.animation(.easeInOut, value: qrImage != nil)
+		.task {
+			do {
+				let image = try await qrGeneratorClient.generate(.init(content: content, size: size))
+				self.qrImage = .success(image)
+			} catch {
+				self.qrImage = .failure(error)
+			}
+		}
+	}
+}

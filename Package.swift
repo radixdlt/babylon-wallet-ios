@@ -79,6 +79,7 @@ package.addModules([
 			"AppPreferencesClient",
 			"MainFeature",
 			"OnboardingFeature",
+			"OverlayWindowClient",
 			"SplashFeature",
 		],
 		tests: .yes()
@@ -664,7 +665,9 @@ package.addModules([
 	),
 	.client(
 		name: "OverlayWindowClient",
-		dependencies: [],
+		dependencies: [
+			"DesignSystem",
+		],
 		tests: .no
 	),
 	.client(
@@ -683,6 +686,13 @@ package.addModules([
 			"Cryptography",
 		],
 		tests: .no
+	),
+	.client(
+		name: "PasteboardClient",
+		dependencies: [
+			"OverlayWindowClient",
+		],
+		tests: .yes()
 	),
 
 	.client(
@@ -833,7 +843,7 @@ package.addModules([
 			"DesignSystem",
 			"Resources",
 			"SharedModels",
-			"OverlayWindowClient",
+			"PasteboardClient",
 		],
 		tests: .yes()
 	),

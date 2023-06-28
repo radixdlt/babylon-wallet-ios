@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import FeaturePrelude
+import OverlayWindowClient
 import SwiftUI
 
 // MARK: - OverlayReducer.View
