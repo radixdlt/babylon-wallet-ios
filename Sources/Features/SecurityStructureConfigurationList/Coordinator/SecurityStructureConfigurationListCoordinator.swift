@@ -17,12 +17,16 @@ public struct SecurityStructureConfigurationListCoordinator: Sendable, FeatureRe
 	}
 
 	public enum InternalAction: Sendable, Equatable {
-		case loadDetailsForSecurityStructureResult(TaskResult<SecurityStructureConfigurationDetailed>)
+		case openDetails(for: SecurityStructureConfigurationDetailed)
 	}
 
 	public enum ChildAction: Sendable, Equatable {
 		case configList(SecurityStructureConfigurationList.Action)
 		case destination(PresentationAction<Destination.Action>)
+	}
+
+	public enum DelegateAction: Sendable, Equatable {
+		case selectedConfig(SecurityStructureConfigurationDetailed)
 	}
 
 	// MARK: - Destination
@@ -65,12 +69,8 @@ public struct SecurityStructureConfigurationListCoordinator: Sendable, FeatureRe
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
-		case let .loadDetailsForSecurityStructureResult(.success(config)):
+		case let .openDetails(for: config):
 			state.destination = .manageSecurityStructureCoordinator(.init(mode: .existing(config)))
-			return .none
-		case let .loadDetailsForSecurityStructureResult(.failure(error)):
-			loggerGlobal.error("Failed to load details for security structure config reference, error: \(error)")
-			errorQueue.schedule(error)
 			return .none
 		}
 	}
@@ -81,14 +81,17 @@ public struct SecurityStructureConfigurationListCoordinator: Sendable, FeatureRe
 			state.destination = .manageSecurityStructureCoordinator(.init())
 			return .none
 
-		case let .configList(.delegate(.displayDetails(configReference))):
+		case let .configList(.delegate(.displayDetails(reference))):
+			return loadDetails(
+				of: reference,
+				then: { .internal(.openDetails(for: $0)) }
+			)
 
-			return .task {
-				let taskResult = await TaskResult {
-					try await appPreferencesClient.getDetailsOfSecurityStructure(configReference)
-				}
-				return .internal(.loadDetailsForSecurityStructureResult(taskResult))
-			}
+		case let .configList(.delegate(.selectedConfig(reference))):
+			return loadDetails(
+				of: reference,
+				then: { .delegate(.selectedConfig($0)) }
+			)
 
 		case let .destination(.presented(.manageSecurityStructureCoordinator(.delegate(.done(.success(config)))))):
 			let configReference = config.asReference()
@@ -98,6 +101,19 @@ public struct SecurityStructureConfigurationListCoordinator: Sendable, FeatureRe
 
 		default:
 			return .none
+		}
+	}
+
+	func loadDetails(
+		of reference: SecurityStructureConfigurationReference,
+		then withDetails: @escaping @Sendable (SecurityStructureConfigurationDetailed) -> Action
+	) -> EffectTask<Action> {
+		.run { send in
+			let details = try await appPreferencesClient.getDetailsOfSecurityStructure(reference)
+			return await send(withDetails(details))
+		} catch: { error, _ in
+			loggerGlobal.error("Failed to load details for security structure config reference, error: \(error)")
+			errorQueue.schedule(error)
 		}
 	}
 }

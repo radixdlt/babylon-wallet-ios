@@ -61,6 +61,17 @@ public struct UpdateSecurityStateOfEntityCoordinator<Entity: EntityProtocol & Se
 			return .none
 		}
 	}
+
+	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+		switch childAction {
+		case let .root(.selectSecurityStructureConfig(.delegate(.selectedConfig(configDetailed)))):
+			print("🔮Securify account with: \(configDetailed.metadata.label)")
+			return .none
+
+		default:
+			return .none
+		}
+	}
 }
 
 extension UpdateSecurityStateOfEntityCoordinator.State where Entity == Profile.Network.Account {

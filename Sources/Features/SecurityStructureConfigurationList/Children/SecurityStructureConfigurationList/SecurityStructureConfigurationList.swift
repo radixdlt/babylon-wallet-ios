@@ -92,6 +92,7 @@ public struct SecurityStructureConfigurationList: Sendable, FeatureReducer {
 				return .none
 			}
 			return .send(.delegate(.displayDetails(configState.configReference)))
+
 		default: return .none
 		}
 	}
