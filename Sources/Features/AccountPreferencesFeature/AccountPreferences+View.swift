@@ -5,6 +5,7 @@ import ShowQRFeature
 #if DEBUG
 // Manifest turning account into Dapp Definition type, debug action...
 import TransactionReviewFeature
+import UpdateSecurityStateOfEntityFeature
 #endif // DEBUG
 
 extension AccountPreferences.State {
@@ -107,6 +108,13 @@ extension AccountPreferences {
 					}
 					#if DEBUG
 					.sheet(
+							store: store.destination,
+							state: /AccountPreferences.Destination.State.updateSecurityStateOfAccount,
+							action: AccountPreferences.Destination.Action.updateSecurityStateOfAccount
+						) { store in
+							UpdateSecurityStateOfEntityCoordinator<Profile.Network.Account>.View(store: store)
+						}
+						.sheet(
 							store: store.destination,
 							state: /AccountPreferences.Destination.State.createAuthKey,
 							action: AccountPreferences.Destination.Action.createAuthKey
@@ -262,17 +270,17 @@ extension AccountPreferences.View {
 
 #endif // DEBUG
 
-#if DEBUG
-import SwiftUI // NB: necessary for previews to appear
-
-struct AccountPreferences_Preview: PreviewProvider {
-	static var previews: some View {
-		AccountPreferences.View(
-			store: .init(
-				initialState: .init(address: try! .init(address: "account_tdx_c_1px26p5tyqq65809em2h4yjczxcxj776kaun6sv3dw66sc3wrm6")),
-				reducer: AccountPreferences()
-			)
-		)
-	}
-}
-#endif
+// #if DEBUG
+// import SwiftUI // NB: necessary for previews to appear
+//
+// struct AccountPreferences_Preview: PreviewProvider {
+//	static var previews: some View {
+//		AccountPreferences.View(
+//			store: .init(
+//				initialState: .init(address: try! .init(address: "account_tdx_c_1px26p5tyqq65809em2h4yjczxcxj776kaun6sv3dw66sc3wrm6")),
+//				reducer: AccountPreferences()
+//			)
+//		)
+//	}
+// }
+// #endif

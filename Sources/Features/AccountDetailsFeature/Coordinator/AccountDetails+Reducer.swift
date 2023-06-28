@@ -75,7 +75,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 			return .send(.delegate(.dismiss))
 
 		case .preferencesButtonTapped:
-			state.destination = .preferences(.init(address: state.account.address))
+			state.destination = .preferences(.init(account: state.account))
 			return .none
 
 		case .transferButtonTapped:

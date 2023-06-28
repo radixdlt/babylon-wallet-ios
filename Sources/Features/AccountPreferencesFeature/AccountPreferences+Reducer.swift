@@ -11,6 +11,7 @@ import ShowQRFeature
 import EngineToolkitClient
 // Manifest turning account into Dapp Definition type, debug action...
 import TransactionReviewFeature
+import UpdateSecurityStateOfEntityFeature
 #endif // DEBUG
 
 // MARK: - AccountPreferences
@@ -18,7 +19,11 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 	// MARK: - State
 
 	public struct State: Sendable, Hashable {
-		public let address: AccountAddress
+		public let account: Profile.Network.Account
+		public var address: AccountAddress {
+			account.address
+		}
+
 		public var faucetButtonState: ControlState
 
 		@PresentationState
@@ -36,10 +41,10 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 		#endif
 
 		public init(
-			address: AccountAddress,
+			account: Profile.Network.Account,
 			faucetButtonState: ControlState = .enabled
 		) {
-			self.address = address
+			self.account = account
 			self.faucetButtonState = faucetButtonState
 
 			#if DEBUG
@@ -101,6 +106,7 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 		public enum State: Equatable, Hashable {
 			case showQR(ShowQR.State)
 			#if DEBUG
+			case updateSecurityStateOfAccount(UpdateSecurityStateOfEntityCoordinator<Profile.Network.Account>.State)
 			case createAuthKey(CreateAuthKey.State)
 			case reviewTransactionTurningAccountIntoDappDefType(TransactionReview.State)
 			#endif // DEBUG
@@ -109,6 +115,7 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 		public enum Action: Equatable {
 			case showQR(ShowQR.Action)
 			#if DEBUG
+			case updateSecurityStateOfAccount(UpdateSecurityStateOfEntityCoordinator<Profile.Network.Account>.Action)
 			case createAuthKey(CreateAuthKey.Action)
 			case reviewTransactionTurningAccountIntoDappDefType(TransactionReview.Action)
 			#endif // DEBUG
@@ -119,6 +126,9 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 				ShowQR()
 			}
 			#if DEBUG
+			Scope(state: /State.updateSecurityStateOfAccount, action: /Action.updateSecurityStateOfAccount) {
+				UpdateSecurityStateOfEntityCoordinator<Profile.Network.Account>()
+			}
 			Scope(state: /State.createAuthKey, action: /Action.createAuthKey) {
 				CreateAuthKey()
 			}
@@ -168,7 +178,7 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 			}
 		#if DEBUG
 		case .updateSecurityStateButtonTapped:
-			print("UPDATE SECURITY STATE")
+			state.destination = .updateSecurityStateOfAccount(.init(account: state.account))
 			return .none
 
 		case .createAndUploadAuthKeyButtonTapped:

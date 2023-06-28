@@ -40,6 +40,7 @@ package.addModules([
 			"AccountPortfoliosClient",
 			"CreateAuthKeyFeature",
 			"ShowQRFeature",
+			"UpdateSecurityStateOfEntityFeature",
 		],
 		tests: .yes()
 	),
@@ -440,7 +441,15 @@ package.addModules([
 		],
 		tests: .yes()
 	),
-
+	.feature(
+		name: "UpdateSecurityStateOfEntityFeature",
+		featureSuffixDroppedFromFolderName: true,
+		dependencies: [
+			"SecurityStructureConfigurationListFeature",
+			"TransactionReviewFeature",
+		],
+		tests: .no
+	),
 ])
 
 // MARK: - Clients
