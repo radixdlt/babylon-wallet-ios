@@ -18,7 +18,7 @@ public struct OnboardingCoordinator: Sendable, FeatureReducer {
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
-		case completed
+		case completed(Profile.Network.Account?)
 	}
 
 	public enum InternalAction: Sendable, Equatable {
@@ -48,7 +48,8 @@ public struct OnboardingCoordinator: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
 		case .commitEphemeralResult(.success):
-			return completed
+			return sendDelegateCompleted(state: state)
+
 		case let .commitEphemeralResult(.failure(error)):
 			fatalError("Unable to use app, failed to commit profile, error: \(String(describing: error))")
 		}
@@ -65,7 +66,7 @@ public struct OnboardingCoordinator: Sendable, FeatureReducer {
 			return .none
 
 		case .startup(.delegate(.completed)):
-			return completed
+			return sendDelegateCompleted(state: state)
 
 		case .createAccountCoordinator(.delegate(.completed)):
 			return .task {
@@ -74,12 +75,26 @@ public struct OnboardingCoordinator: Sendable, FeatureReducer {
 				}
 				return .internal(.commitEphemeralResult(result))
 			}
+
 		default:
 			return .none
 		}
 	}
 
-	private var completed: EffectTask<Action> {
-		.send(.delegate(.completed))
+	private func sendDelegateCompleted(state: State) -> EffectTask<Action> {
+		.send(.delegate(.completed(state.newAccount)))
+	}
+}
+
+extension OnboardingCoordinator.State {
+	fileprivate var newAccount: Profile.Network.Account? {
+		guard
+			let lastStepState = (/Self.createAccountCoordinator).extract(from: self)?.path.last,
+			let newAccountCompletionState = (/CreateAccountCoordinator.Destinations.State.step3_completion).extract(from: lastStepState)
+		else {
+			return nil
+		}
+
+		return newAccountCompletionState.account
 	}
 }

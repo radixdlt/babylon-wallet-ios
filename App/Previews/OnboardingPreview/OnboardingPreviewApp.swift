@@ -10,8 +10,11 @@ import SwiftUI
 struct OnboardingPreviewApp: App {
 	var body: some Scene {
 		FeaturesPreviewer<OnboardingCoordinator>.delegateAction {
-			guard case let .completed = $0 else { return nil }
-			return .success(3)
+			guard case let .completed(result) = $0 else {
+				return nil
+			}
+
+			return result.map(TaskResult.success)
 		} withReducer: { onboarding in
 			CombineReducers {
 				onboarding
@@ -37,7 +40,7 @@ struct OnboardingPreviewApp: App {
 
 // MARK: - OnboardingCoordinator + PreviewedFeature
 extension OnboardingCoordinator: PreviewedFeature {
-	public typealias ResultFromFeature = Int
+	public typealias ResultFromFeature = Profile.Network.Account
 }
 
 // MARK: - OnboardingCoordinator + EmptyInitializable
