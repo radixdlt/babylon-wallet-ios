@@ -28,26 +28,45 @@ public struct AccountsToImport: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
-			// MARK: - OlympiaAccountsToImport
-			public struct OlympiaAccountsToImport: Sendable, Hashable {
-				public let software: NonEmpty<OrderedSet<OlympiaAccountToMigrate>>?
-				public let hardware: NonEmpty<OrderedSet<OlympiaAccountToMigrate>>?
-
-				init(selectedAccounts all: NonEmpty<OrderedSet<OlympiaAccountToMigrate>>) {
-					let software = NonEmpty(rawValue: OrderedSet(all.filter { $0.accountType == .software }))
-					let hardware = NonEmpty(rawValue: OrderedSet(all.filter { $0.accountType == .hardware }))
-					self.software = software
-					self.hardware = hardware
-
-					if software == nil, hardware == nil {
-						let error = "Bad implementation, software AND hardware accounts cannot be both empty."
-						loggerGlobal.critical(.init(stringLiteral: error))
-						assertionFailure(error)
-					}
-				}
-			}
 		case .continueButtonTapped:
 			return .send(.delegate(.continueImport))
 		}
 	}
 }
+
+/*
+ - scanQR
+ case let .scanQR(.delegate(.finishedScanning(olympiaWallet))):
+ state.expectedMnemonicWordCount = olympiaWallet.mnemonicWordCount
+ let scanned = olympiaWallet.accounts
+ case let .foundAlreadyImportedOlympiaSoftwareAccounts(scanned, alreadyImported):
+ state.accountsToImport = accountsToImport
+ - accountsToImport
+ case .accountsToImport(.delegate(.continueImport)):
+ if let softwareAccounts = state.softwareAccountsToMigrate {
+ return migrateSoftwareAccounts(softwareAccounts):
+ return .internal(.checkedIfOlympiaFactorSourceAlreadyExists(idOfExistingFactorSource))
+ if let idOfExistingFactorSource {
+ convertSoftwareAccountsToBabylon
+ case let .migratedOlympiaSoftwareAccounts(migratedSoftwareAccounts):
+ state.migratedAccounts.append(contentsOf: migratedSoftwareAccounts.babylonAccounts.rawValue)
+ return migrateHardwareAccounts(hardwareAccounts)
+
+ } else {
+ - .importMnemonic(.init(persistAsMnemonicKind: nil, wordCount: expectedWordCount))
+ case let .importMnemonic(.delegate(.notSavedInProfile(mnemonicWithPassphrase))):
+ state.mnemonicWithPassphrase = mnemonicWithPassphrase
+ return validateSoftwareAccounts(mnemonicWithPassphrase, softwareAccounts: softwareAccounts)
+ convertSoftwareAccountsToBabylon
+ }
+
+ - importMnemonic
+
+ } else if let hardwareAccounts = state.hardwareAccountsToMigrate {
+ return migrateHardwareAccounts(hardwareAccounts)
+ - .importOlympiaLedgerAccountsAndFactorSources
+ case let .importOlympiaLedgerAccountsAndFactorSources(.delegate(.completed(ledgersWithAccounts, unvalidatedOlympiaAccounts))):
+ append migratedAccounts.append
+ - .completion
+ }
+ */
