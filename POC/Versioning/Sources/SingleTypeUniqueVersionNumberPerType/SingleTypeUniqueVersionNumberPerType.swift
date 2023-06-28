@@ -7,7 +7,7 @@ protocol VersionedModel: Codable, Equatable {
 }
 
 // MARK: - Model
-/// This is a demonstration of versioning where we version every child model type of the root, and the root itself.
+/// This is a demonstration of versioning where we version every child model type of the root, and the root iteself.
 struct Model: VersionedModel {
 	static let currentVersion = 2
 

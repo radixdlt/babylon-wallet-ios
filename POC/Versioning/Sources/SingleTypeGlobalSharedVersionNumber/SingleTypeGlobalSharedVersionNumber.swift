@@ -10,13 +10,13 @@ struct Model: Codable, Equatable {
 	let version: Int
 	let label: String
 	let inner: Inner
-	let anotherInner: Inner3 // New in version 3
+	let anotherInner: AnotherInner // New in version 3
 
 	init(
 		version: Int = Self.currentVersion,
 		label: String,
 		inner: Inner,
-		anotherInner: Inner3
+		anotherInner: AnotherInner
 	) {
 		self.version = version
 		self.label = label
@@ -39,7 +39,7 @@ extension Model {
 	}
 
 	// New in version 3
-	struct Inner3: Equatable, Codable {
+	struct AnotherInner: Equatable, Codable {
 		let bizz: String
 	}
 }
@@ -66,7 +66,7 @@ extension Model {
 		if version < 3 {
 			self.anotherInner = .init(bizz: "MIGRATED_FROM_\(version)")
 		} else {
-			self.anotherInner = try container.decode(Inner3.self, forKey: .anotherInner)
+			self.anotherInner = try container.decode(AnotherInner.self, forKey: .anotherInner)
 		}
 
 		self.version = Self.currentVersion
