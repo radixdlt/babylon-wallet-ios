@@ -1,17 +1,8 @@
 import Foundation
 
-// MARK: - Versioned
-protocol Versioned {
-	var decodedVersionFromParent: Int { get }
-	init(decodedVersionFromParent: Int)
-}
-
-// MARK: - RadixDecodableWithConfiguration
-protocol RadixDecodableWithConfiguration: DecodableWithConfiguration where DecodingConfiguration: Versioned {}
-
 // MARK: - Nested2
-struct Nested2: Codable {
-	struct Configuration: Versioned {
+struct Nested2: Codable, Equatable {
+	struct Configuration {
 		let decodedVersionFromParent: Int
 	}
 
@@ -20,7 +11,7 @@ struct Nested2: Codable {
 	let label: String
 	let inner: Inner
 
-	struct Inner: Encodable, RadixDecodableWithConfiguration {
+	struct Inner: Encodable, DecodableWithConfiguration, Equatable {
 		let foo: String
 		let bar: String // New in version 2
 	}

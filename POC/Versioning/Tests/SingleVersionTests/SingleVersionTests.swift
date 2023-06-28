@@ -34,9 +34,18 @@ final class NestedTests: XCTestCase {
 				}
 			}
 			"""
-		) { (migrated: Nested2) in
-			XCTAssertEqual(migrated.version, 2)
-			XCTAssertEqual(migrated.inner.bar, "MIGRATED_FROM_1")
+		) {
+			XCTAssertEqual(
+				$0,
+				Nested2(
+					version: 2,
+					label: "test",
+					inner: .init(
+						foo: "decoding",
+						bar: "MIGRATED_FROM_1"
+					)
+				)
+			)
 		}
 	}
 
