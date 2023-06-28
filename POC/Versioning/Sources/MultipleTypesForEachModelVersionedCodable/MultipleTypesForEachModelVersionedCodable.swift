@@ -3,6 +3,29 @@ import VersionedCodable
 
 typealias Model = ModelV3
 
+typealias GenericType<Value: Codable & Equatable> = GenericTypeV2<Value>
+
+// MARK: - GenericTypeV2
+struct GenericTypeV2<Value>: VersionedCodable, Equatable where Value: Codable & Equatable {
+	let value: Value
+	init(value: Value) {
+		self.value = value
+	}
+
+	static var version: Int? { 2 }
+	typealias PreviousVersion = GenericTypeV1<Value>
+	init(from prev: PreviousVersion) throws {
+		self.init(value: prev.valeu)
+	}
+}
+
+// MARK: - GenericTypeV1
+struct GenericTypeV1<Value>: VersionedCodable, Equatable where Value: Codable & Equatable {
+	let valeu: Value // SIC: typo fixed in v2
+	static var version: Int? { 1 }
+	typealias PreviousVersion = NothingEarlier
+}
+
 // MARK: - ModelV3
 /// This demonstrates versioning using multiple types for each model version, using the lib
 /// `VersionedCodable` to not have to write as much code.
@@ -34,19 +57,16 @@ struct ModelV3: VersionedCodable, Equatable {
 extension Model {
 	typealias Inner = InnerV2
 	struct InnerV2: VersionedCodable, Equatable {
-		let foo: String
-		let bar: String // New
-		init(foo: String, bar: String) {
-			self.foo = foo
-			self.bar = bar
+		let innerGeneric: GenericTypeV2<String>
+		init(innerGeneric: GenericTypeV2<String>) {
+			self.innerGeneric = innerGeneric
 		}
 
 		static let version: Int? = 2
 		typealias PreviousVersion = InnerV1
 		init(from prev: PreviousVersion) throws {
-			self.init(
-				foo: prev.foo,
-				bar: "MIGRATED_FROM_\(PreviousVersion.version!)"
+			try self.init(
+				innerGeneric: .init(from: prev.innerGeneric)
 			)
 		}
 	}
@@ -101,9 +121,9 @@ extension Model {
 // MARK: - Model.InnerV1
 extension Model {
 	struct InnerV1: VersionedCodable, Equatable {
-		let foo: String
-		init(foo: String) {
-			self.foo = foo
+		let innerGeneric: GenericTypeV1<String>
+		init(innerGeneric: GenericTypeV1<String>) {
+			self.innerGeneric = innerGeneric
 		}
 
 		static let version: Int? = 1

@@ -7,8 +7,7 @@ final class MultipleTypesForEachModelVersionedCodableTests: XCTestCase {
 		let nested = Model(
 			label: "test",
 			inner: .init(
-				foo: "nested",
-				bar: "encoding"
+				innerGeneric: .init(value: "Value=String.self")
 			),
 			anotherInner: .init(bizz: "buzz")
 		)
@@ -18,8 +17,10 @@ final class MultipleTypesForEachModelVersionedCodableTests: XCTestCase {
 				"version": 3,
 				"label": "test",
 				"inner": [
-					"foo": "nested",
-					"bar": "encoding",
+					"version": 0,
+					"innerGeneric": [
+						"value": "Value=String.self",
+					],
 				],
 				"anotherInner": [
 					"bizz": "buzz",
@@ -36,8 +37,9 @@ final class MultipleTypesForEachModelVersionedCodableTests: XCTestCase {
 				"version": 3,
 				"label": "test",
 				"inner": [
-					"foo": "decoding",
-					"bar": "test",
+					"innerGeneric": [
+						"value": "Value=String.self",
+					],
 				],
 				"anotherInner": [
 					"bizz": "buzz",
@@ -46,8 +48,7 @@ final class MultipleTypesForEachModelVersionedCodableTests: XCTestCase {
 			Model(
 				label: "test",
 				inner: .init(
-					foo: "decoding",
-					bar: "test"
+					innerGeneric: .init(value: "Value=String.self")
 				),
 				anotherInner: .init(bizz: "buzz")
 			)
@@ -60,15 +61,15 @@ final class MultipleTypesForEachModelVersionedCodableTests: XCTestCase {
 				"version": 2,
 				"label": "test",
 				"inner": [
-					"foo": "decoding",
-					"bar": "test",
+					"innerGeneric": [
+						"value": "Value=String.self",
+					],
 				],
 			],
 			Model(
 				label: "test",
 				inner: .init(
-					foo: "decoding",
-					bar: "test"
+					innerGeneric: .init(value: "Value=String.self")
 				),
 				anotherInner: .init(bizz: "MIGRATED_FROM_2")
 			)
@@ -81,14 +82,15 @@ final class MultipleTypesForEachModelVersionedCodableTests: XCTestCase {
 				"version": 1,
 				"label": "test",
 				"inner": [
-					"foo": "decoding",
+					"innerGeneric": [
+						"valeu": "Value=String.self",
+					],
 				],
 			],
 			Model(
 				label: "test",
 				inner: .init(
-					foo: "decoding",
-					bar: "MIGRATED_FROM_1"
+					innerGeneric: .init(value: "Value=String.self")
 				),
 				anotherInner: .init(bizz: "MIGRATED_FROM_2")
 			)
