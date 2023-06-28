@@ -15,12 +15,20 @@ struct OnboardingPreviewApp: App {
 		} withReducer: { onboarding in
 			CombineReducers {
 				onboarding
-					.dependency(\.cacheClient, .noop)
 					.dependency(\.userDefaultsClient, .noop)
-					.dependency(\.radixConnectClient, .previewValue)
 					.dependency(\.appPreferencesClient, .previewValue)
 					.dependency(\.localAuthenticationClient.queryConfig) { .biometricsAndPasscodeSetUp }
-					.dependency(\.factorSourcesClient, .liveValue)
+
+				Reduce { _, action in
+					if case .child(.previewResult(.delegate(.restart))) = action {
+						return .run { _ in
+							@Dependency(\.appPreferencesClient) var appPreferences
+							try? await appPreferences.deleteProfileAndFactorSources(false)
+						}
+					}
+
+					return .none
+				}
 			}
 			._printChanges()
 		}
