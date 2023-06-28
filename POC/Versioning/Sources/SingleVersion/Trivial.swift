@@ -1,11 +1,5 @@
 import Foundation
 
-// MARK: - VersionedCodable
-protocol VersionedCodable: Codable {
-	static var minVersion: Int { get }
-	var version: Int { get }
-}
-
 // MARK: - Trivial2
 struct Trivial2: VersionedCodable {
 	static let minVersion: Int = 2
