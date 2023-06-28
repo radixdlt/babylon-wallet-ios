@@ -31,15 +31,6 @@ extension CreationOfAccount {
 			.navigationBarTitleDisplayMode(.inline)
 			.navigationBarInlineTitleFont(.app.secondaryHeader)
 			#endif
-			#if targetEnvironment(simulator)
-			.onFirstTask {
-				ViewStore(store.stateless).send(.view(.onFirstTask))
-			}
-			#else
-			.onFirstTask { @MainActor in
-					await ViewStore(store.stateless).send(.view(.onFirstTask)).finish()
-				}
-			#endif
 		}
 	}
 }
