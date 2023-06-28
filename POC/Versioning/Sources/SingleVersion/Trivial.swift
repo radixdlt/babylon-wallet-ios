@@ -34,6 +34,13 @@ extension Trivial2 {
 			)
 		}
 	}
+
+	func encode(to encoder: Encoder) throws {
+		var container = encoder.container(keyedBy: CodingKeys.self)
+		try container.encode(version, forKey: .version)
+		try container.encode(label, forKey: .label)
+		try container.encode(foo, forKey: .foo)
+	}
 }
 
 // MARK: - DecodingErrorUnknownVersion

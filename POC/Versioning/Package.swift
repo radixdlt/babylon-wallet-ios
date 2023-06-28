@@ -5,12 +5,19 @@ import PackageDescription
 
 let package = Package(
 	name: "Versioning",
+	dependencies: [
+		.package(url: "https://github.com/davdroman/swift-json-testing", from: "0.1.0"),
+	],
 	targets: [
 		.target(
-			name: "SingleVersion"),
+			name: "SingleVersion"
+		),
 		.testTarget(
 			name: "SingleVersionTests",
-			dependencies: ["SingleVersion"]
+			dependencies: [
+				"SingleVersion",
+				.product(name: "JSONTesting", package: "swift-json-testing"),
+			]
 		),
 	]
 )
