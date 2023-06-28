@@ -8,6 +8,7 @@ let package = Package(
 	platforms: [.macOS(.v13), .iOS(.v16)],
 	dependencies: [
 		.package(url: "https://github.com/davdroman/swift-json-testing", from: "0.1.0"),
+		.package(url: "https://github.com/jrothwell/VersionedCodable", from: "1.0.1"),
 	],
 	targets: [
 		.target(
@@ -17,22 +18,36 @@ let package = Package(
 			]
 		),
 		.target(
-			name: "SingleVersion"
+			name: "SingleTypeGlobalSharedVersionNumber"
 		),
 		.testTarget(
-			name: "SingleVersionTests",
+			name: "SingleTypeGlobalSharedVersionNumberTests",
 			dependencies: [
-				"SingleVersion",
+				"SingleTypeGlobalSharedVersionNumber",
 				"TestUtils",
 			]
 		),
 		.target(
-			name: "VersionEveryModel"
+			name: "SingleTypeUniqueVersionNumberPerType"
 		),
 		.testTarget(
-			name: "VersionEveryModelTests",
+			name: "SingleTypeUniqueVersionNumberPerTypeTests",
 			dependencies: [
-				"VersionEveryModel",
+				"SingleTypeUniqueVersionNumberPerType",
+				"TestUtils",
+			]
+		),
+
+		.target(
+			name: "MultipleTypesForEachModelVersionedCodable",
+			dependencies: [
+				"VersionedCodable",
+			]
+		),
+		.testTarget(
+			name: "MultipleTypesForEachModelVersionedCodableTests",
+			dependencies: [
+				"MultipleTypesForEachModelVersionedCodable",
 				"TestUtils",
 			]
 		),

@@ -1,7 +1,7 @@
-@testable import SingleVersion
+@testable import SingleTypeGlobalSharedVersionNumber
 import TestUtils
 
-final class SingleVersionTests: XCTestCase {
+final class SingleTypeGlobalSharedVersionNumberTests: XCTestCase {
 	// MARK: Encoding
 	func test_encoding() throws {
 		let nested = Model(

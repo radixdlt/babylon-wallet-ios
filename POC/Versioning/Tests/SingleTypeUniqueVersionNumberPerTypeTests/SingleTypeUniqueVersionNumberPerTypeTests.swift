@@ -1,7 +1,7 @@
+@testable import SingleTypeUniqueVersionNumberPerType
 import TestUtils
-@testable import VersionEveryModel
 
-final class VersionEveryModelTests: XCTestCase {
+final class SingleTypeUniqueVersionNumberPerTypeTests: XCTestCase {
 	// MARK: Encoding
 	func test_every_encoding() throws {
 		let nested = Model(
