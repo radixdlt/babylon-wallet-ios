@@ -1,25 +1,63 @@
 import Foundation
 
-// MARK: - Trivial0
-struct Trivial0: Codable {
+// MARK: - VersionedCodable
+protocol VersionedCodable: Codable {
+	static var minVersion: Int { get }
+	var version: Int { get }
+}
+
+// MARK: - Trivial2
+struct Trivial2: VersionedCodable {
+	static let minVersion: Int = 2
+	internal private(set) var version: Int = Self.minVersion
 	let label: String
-	let version: Int
-	init(label: String) {
-		self.label = label
-		self.version = 0
+	let foo: String // New in version 2
+}
+
+// MARK: Codable
+extension Trivial2 {
+	private enum CodingKeys: String, CodingKey {
+		case version
+		case label
+		case foo // New in version 2
+	}
+
+	init(from decoder: Decoder) throws {
+		let container = try decoder.container(keyedBy: CodingKeys.self)
+		let version = try container.decode(Int.self, forKey: .version)
+		self.label = try container.decode(String.self, forKey: .label)
+		switch version {
+		case 1:
+			self.foo = "MIGRATED_FROM_\(version)"
+			self.version = Self.minVersion // bump version
+		case Self.minVersion:
+			self.foo = try container.decode(String.self, forKey: .foo)
+			self.version = version
+		default:
+			throw DecodingErrorUnknownVersion(
+				decodedVersion: version,
+				decoding: Self.self
+			)
+		}
 	}
 }
 
-// MARK: - Trivial1
-struct Trivial1: Codable {
-	let label: String
-	let id: UUID
-	let version: Int
-	init(id: UUID = .init(), label: String) {
-		self.label = label
-		self.id = id
-		self.version = 1
+// MARK: - DecodingErrorUnknownVersion
+struct DecodingErrorUnknownVersion: LocalizedError {
+	let decodedVersion: Int
+	let minVersion: Int
+	let type: String
+
+	init<D: VersionedCodable>(
+		decodedVersion: Int,
+		decoding type: D.Type = D.self
+	) {
+		self.decodedVersion = decodedVersion
+		self.type = String(describing: type)
+		self.minVersion = type.minVersion
+	}
+
+	var errorDescription: String? {
+		"Failed to decode '\(type)', decoded version: '\(decodedVersion)', minVersion: '\(minVersion)'"
 	}
 }
-
-typealias Trivial = Trivial1
