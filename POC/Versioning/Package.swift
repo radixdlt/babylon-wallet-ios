@@ -5,6 +5,7 @@ import PackageDescription
 
 let package = Package(
 	name: "Versioning",
+	platforms: [.macOS(.v13), .iOS(.v16)],
 	dependencies: [
 		.package(url: "https://github.com/davdroman/swift-json-testing", from: "0.1.0"),
 	],
