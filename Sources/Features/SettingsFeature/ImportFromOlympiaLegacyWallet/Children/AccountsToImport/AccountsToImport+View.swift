@@ -19,8 +19,7 @@ extension AccountsToImport {
 						Text(L10n.ImportOlympiaAccounts.AccountsToImport.subtitle)
 
 						ForEach(viewStore.scannedAccounts) { account in
-							let isAlreadyImported = viewStore.alreadyImported.contains(account.id)
-							AccountRow(viewState: account.viewState(isAlreadyImported: isAlreadyImported))
+							AccountRow(viewState: account.viewState)
 						}
 					}
 					.padding(.horizontal, .medium1)
@@ -40,14 +39,13 @@ extension AccountsToImport {
 }
 
 extension OlympiaAccountToMigrate {
-	public func viewState(isAlreadyImported: Bool) -> AccountRow.ViewState {
+	public var viewState: AccountRow.ViewState {
 		.init(
 			accountName: displayName?.rawValue ?? L10n.ImportOlympiaAccounts.AccountsToImport.unnamed,
 			olympiaAddress: address.address.rawValue,
 			appearanceID: .fromIndex(Int(addressIndex)),
 			derivationPath: path.derivationPath,
-			olympiaAccountType: accountType,
-			isAlreadyImported: isAlreadyImported
+			olympiaAccountType: accountType
 		)
 	}
 }
@@ -60,7 +58,6 @@ public struct AccountRow: View {
 		public let appearanceID: Profile.Network.Account.AppearanceID
 		public let derivationPath: String
 		public let olympiaAccountType: Olympia.AccountType
-		public let isAlreadyImported: Bool
 	}
 
 	public let viewState: ViewState
@@ -96,17 +93,8 @@ public struct AccountRow: View {
 				.foregroundColor(.app.gray4)
 		}
 		.padding(.medium1)
-		.background(labelBackground)
+		.background(viewState.appearanceID.gradient)
 		.cornerRadius(.small1)
-	}
-
-	@ViewBuilder
-	private var labelBackground: some SwiftUI.View {
-		if !viewState.isAlreadyImported {
-			viewState.appearanceID.gradient
-		} else {
-			Color.app.gray3
-		}
 	}
 }
 
