@@ -5,14 +5,11 @@ import ImportLegacyWalletClient
 public struct AccountsToImport: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public let scannedAccounts: NonEmpty<OrderedSet<OlympiaAccountToMigrate>>
-		public let alreadyImported: Set<OlympiaAccountToMigrate.ID>
 
 		public init(
-			scannedAccounts: NonEmpty<OrderedSet<OlympiaAccountToMigrate>>,
-			alreadyImported: Set<OlympiaAccountToMigrate.ID> = []
+			scannedAccounts: NonEmpty<OrderedSet<OlympiaAccountToMigrate>>
 		) {
 			self.scannedAccounts = scannedAccounts
-			self.alreadyImported = alreadyImported
 		}
 	}
 
@@ -43,8 +40,9 @@ public struct AccountsToImport: Sendable, FeatureReducer {
  state.accountsToImport = accountsToImport
  - accountsToImport
  case .accountsToImport(.delegate(.continueImport)):
+
  if let softwareAccounts = state.softwareAccountsToMigrate {
- return migrateSoftwareAccounts(softwareAccounts):
+    return migrateSoftwareAccounts(softwareAccounts):
  return .internal(.checkedIfOlympiaFactorSourceAlreadyExists(idOfExistingFactorSource))
  if let idOfExistingFactorSource {
  convertSoftwareAccountsToBabylon
