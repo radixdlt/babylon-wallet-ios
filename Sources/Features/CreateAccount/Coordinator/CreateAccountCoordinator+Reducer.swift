@@ -149,3 +149,9 @@ extension CreateAccountCoordinator {
 		}
 	}
 }
+
+extension CreateAccountCoordinator.State {
+	public var lastStepState: CreateAccountCoordinator.Destinations.State? {
+		path.last
+	}
+}

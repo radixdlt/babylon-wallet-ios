@@ -89,7 +89,7 @@ public struct OnboardingCoordinator: Sendable, FeatureReducer {
 extension OnboardingCoordinator.State {
 	fileprivate var newAccount: Profile.Network.Account? {
 		guard
-			let lastStepState = (/Self.createAccountCoordinator).extract(from: self)?.path.last,
+			let lastStepState = (/Self.createAccountCoordinator).extract(from: self)?.lastStepState,
 			let newAccountCompletionState = (/CreateAccountCoordinator.Destinations.State.step3_completion).extract(from: lastStepState)
 		else {
 			return nil
