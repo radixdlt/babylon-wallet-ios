@@ -1,6 +1,9 @@
 import Foundation
 
 // MARK: - Model
+/// This is a demonstration of versioning where we have a single global version number put in the
+/// root of the `Model`, which is then passed to children using `init:from:configuration`
+/// decoding init part of the `DecodableWithConfiguration` protcocol introduced in iOS 15.
 struct Model: Codable, Equatable {
 	static let currentVersion = 3
 
