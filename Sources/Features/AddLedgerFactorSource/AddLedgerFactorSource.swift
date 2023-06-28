@@ -178,9 +178,9 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 extension AlertState<Never> {
 	static func ledgerAlreadyExists(_ ledger: LedgerHardwareWalletFactorSource) -> AlertState {
 		AlertState {
-			TextState(L10n.AddLedger.AlreadyAddedAlert.title)
+			TextState(L10n.AddLedgerDevice.AlreadyAddedAlert.title)
 		} message: {
-			TextState(L10n.AddLedger.AlreadyAddedAlert.message(ledger.hint.name))
+			TextState(L10n.AddLedgerDevice.AlreadyAddedAlert.message(ledger.hint.name))
 		}
 	}
 }

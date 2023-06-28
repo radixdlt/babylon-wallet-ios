@@ -30,7 +30,7 @@ extension TransactionReviewProofs {
 					ForEach(viewStore.proofs) { proof in
 						VStack(spacing: 0) {
 							let metadata = proof.metadata
-							DappView(thumbnail: metadata?.thumbnail, name: metadata?.name ?? L10n.TransactionReview.unknown) {
+							ProofView(thumbnail: metadata.thumbnail, name: metadata.name ?? L10n.TransactionReview.unknown) {
 								viewStore.send(.proofTapped(id: proof.id))
 							}
 							.padding(.bottom, .medium3)
@@ -47,7 +47,7 @@ extension TransactionReviewProofs {
 			.padding(.bottom, .medium1)
 		}
 
-		struct DappView: SwiftUI.View {
+		struct ProofView: SwiftUI.View {
 			let thumbnail: URL?
 			let name: String
 			let action: () -> Void
