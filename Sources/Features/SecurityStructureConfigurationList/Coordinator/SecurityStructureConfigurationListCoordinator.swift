@@ -10,7 +10,7 @@ public struct SecurityStructureConfigurationListCoordinator: Sendable, FeatureRe
 		public var destination: Destination.State? = nil
 
 		public init(
-			configList: SecurityStructureConfigurationList.State = .init()
+			configList: SecurityStructureConfigurationList.State
 		) {
 			self.configList = configList
 		}

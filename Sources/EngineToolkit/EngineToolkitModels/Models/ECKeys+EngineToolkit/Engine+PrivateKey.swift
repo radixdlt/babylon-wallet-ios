@@ -11,7 +11,7 @@ extension Engine {
 
 extension Engine.PrivateKey {
 	public func publicKey() throws -> Engine.PublicKey {
-		try SLIP10.PrivateKey(engine: self)
+		SLIP10.PrivateKey(engine: self)
 			.publicKey()
 			.intoEngine()
 	}

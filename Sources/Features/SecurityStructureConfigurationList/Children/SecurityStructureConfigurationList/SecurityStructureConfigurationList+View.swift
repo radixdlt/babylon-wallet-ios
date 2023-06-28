@@ -1,7 +1,24 @@
 import FeaturePrelude
 
+extension SecurityStructureConfigurationList.State {
+	var viewState: SecurityStructureConfigurationList.ViewState {
+		.init(state: self)
+	}
+}
+
 // MARK: - SecurityStructureConfigurationList.View
 extension SecurityStructureConfigurationList {
+	public struct ViewState: Equatable {
+		var allowSelection: Bool { context != .settings }
+		let context: State.Context
+		let configurations: IdentifiedArrayOf<SecurityStructureConfigurationReference>
+		var configurationsArray: [SecurityStructureConfigurationReference]? { .init(configurations) }
+		init(state: State) {
+			self.context = state.context
+			self.configurations = .init(uncheckedUniqueElements: state.configs.map(\.configReference))
+		}
+	}
+
 	@MainActor
 	public struct View: SwiftUI.View {
 		private let store: StoreOf<SecurityStructureConfigurationList>
@@ -11,7 +28,7 @@ extension SecurityStructureConfigurationList {
 		}
 
 		public var body: some SwiftUI.View {
-			WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
+			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				VStack(spacing: 0) {
 					ScrollView {
 						Text("Security Structure Configs")
@@ -23,7 +40,25 @@ extension SecurityStructureConfigurationList {
 						Separator()
 							.padding(.bottom, .small2)
 
-						list(store: store)
+						if viewStore.allowSelection {
+							Selection(
+								viewStore.binding(
+									get: \.configurationsArray,
+									send: { .selectedConfig($0?.first) }
+								),
+								from: viewStore.configurations,
+								requiring: .exactly(1)
+							) { item in
+								SecurityStructureConfigurationRowView
+								SecurityStructureConfigurationRow.View(
+									viewState: .init(factorSource: item.value),
+									isSelected: item.isSelected,
+									action: item.action
+								)
+							}
+						} else {
+							list(store: store)
+						}
 					}
 
 					// FIXME: Strings
@@ -57,23 +92,3 @@ extension SecurityStructureConfigurationList {
 		}
 	}
 }
-
-#if DEBUG
-import SwiftUI // NB: necessary for previews to appear
-
-// MARK: - SecurityStructureConfigurationList_Preview
-struct SecurityStructureConfigurationList_Preview: PreviewProvider {
-	static var previews: some View {
-		SecurityStructureConfigurationList.View(
-			store: .init(
-				initialState: .previewValue,
-				reducer: SecurityStructureConfigurationList()
-			)
-		)
-	}
-}
-
-extension SecurityStructureConfigurationList.State {
-	public static let previewValue = Self()
-}
-#endif

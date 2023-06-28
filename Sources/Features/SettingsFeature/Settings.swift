@@ -227,7 +227,9 @@ public struct AppSettings: Sendable, FeatureReducer {
 			}
 
 		case .securityStructureConfigsButtonTapped:
-			state.destination = .securityStructureConfigs(.init())
+			state.destination = .securityStructureConfigs(.init(
+				configList: .init(context: .settings)
+			))
 			return .none
 
 		#endif

@@ -4,13 +4,29 @@ import FeaturePrelude
 // MARK: - SecurityStructureConfigurationList
 public struct SecurityStructureConfigurationList: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
-		public var configs: IdentifiedArrayOf<SecurityStructureConfigurationRow.State> = []
-		public init() {}
+		public enum Context: Sendable, Hashable {
+			case settings
+			/// Use it
+			case securifyEntity
+		}
+
+		public let context: Context
+		public var selectedConfig: SecurityStructureConfigurationReference? = nil
+		public var configs: IdentifiedArrayOf<SecurityStructureConfigurationRow.State>
+
+		public init(
+			context: Context,
+			configs: IdentifiedArrayOf<SecurityStructureConfigurationRow.State> = []
+		) {
+			self.context = context
+			self.configs = configs
+		}
 	}
 
 	public enum ViewAction: Sendable, Equatable {
 		case task
 		case createNewStructure
+		case selectedConfig(SecurityStructureConfigurationReference?)
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -53,6 +69,11 @@ public struct SecurityStructureConfigurationList: Sendable, FeatureReducer {
 					uncheckedUniqueElements: configs.map(SecurityStructureConfigurationRow.State.init))
 				))
 			}
+
+		case let .selectedConfig(config):
+			state.selectedConfig = config
+			return .none
+
 		case .createNewStructure:
 			return .send(.delegate(.createNewStructure))
 		}

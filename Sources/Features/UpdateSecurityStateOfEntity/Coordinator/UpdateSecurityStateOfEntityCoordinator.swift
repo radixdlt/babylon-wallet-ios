@@ -11,7 +11,9 @@ public struct UpdateSecurityStateOfEntityCoordinator<Entity: EntityProtocol & Se
 
 		public init(entity: Entity) {
 			self.entity = entity
-			self.root = .selectSecurityStructureConfig(.init())
+			self.root = .selectSecurityStructureConfig(.init(
+				configList: .init(context: .securifyEntity)
+			))
 		}
 	}
 
