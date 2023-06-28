@@ -27,6 +27,7 @@ public struct SecurityStructureConfigurationList: Sendable, FeatureReducer {
 		case task
 		case createNewStructure
 		case selectedConfig(SecurityStructureConfigurationReference?)
+		case confirmedSelectedConfig(SecurityStructureConfigurationReference)
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -40,6 +41,7 @@ public struct SecurityStructureConfigurationList: Sendable, FeatureReducer {
 	public enum DelegateAction: Sendable, Equatable {
 		case createNewStructure
 		case displayDetails(SecurityStructureConfigurationReference)
+		case selectedConfig(SecurityStructureConfigurationReference)
 	}
 
 	@Dependency(\.appPreferencesClient) var appPreferencesClient
@@ -73,6 +75,9 @@ public struct SecurityStructureConfigurationList: Sendable, FeatureReducer {
 		case let .selectedConfig(config):
 			state.selectedConfig = config
 			return .none
+
+		case let .confirmedSelectedConfig(config):
+			return .send(.delegate(.selectedConfig(config)))
 
 		case .createNewStructure:
 			return .send(.delegate(.createNewStructure))

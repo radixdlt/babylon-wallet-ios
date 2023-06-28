@@ -13,9 +13,11 @@ extension SecurityStructureConfigurationList {
 		let context: State.Context
 		let configurations: IdentifiedArrayOf<SecurityStructureConfigurationReference>
 		var configurationsArray: [SecurityStructureConfigurationReference]? { .init(configurations) }
+		let selectedConfig: SecurityStructureConfigurationReference?
 		init(state: State) {
 			self.context = state.context
 			self.configurations = .init(uncheckedUniqueElements: state.configs.map(\.configReference))
+			self.selectedConfig = state.selectedConfig
 		}
 	}
 
@@ -68,11 +70,21 @@ extension SecurityStructureConfigurationList {
 					.padding(.horizontal, .medium3)
 					.padding(.vertical, .large1)
 				}
+				.footer(visible: viewStore.allowSelection) {
+					WithControlRequirements(
+						viewStore.selectedConfig,
+						forAction: { viewStore.send(.confirmedSelectedConfig($0)) }
+					) { action in
+						Button("Confirm config", action: action)
+							.buttonStyle(.primaryRectangular)
+							.padding(.bottom, .medium1)
+					}
+				}
 				.task { @MainActor in
 					await viewStore.send(.task).finish()
 				}
 				// FIXME: Strings
-				.navigationTitle("Multifactor Setups")
+				.navigationTitle("Multifactor Configs")
 			}
 		}
 
