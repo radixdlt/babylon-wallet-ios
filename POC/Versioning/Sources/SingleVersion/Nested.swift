@@ -2,16 +2,34 @@ import Foundation
 
 // MARK: - Nested
 struct Nested: Codable, Equatable {
-	struct Configuration {
-		let decodedVersionFromParent: Int
-	}
+	static let currentVersion = 3
 
-	public static let currentVersion = 3
-	internal private(set) var version: Int = Self.currentVersion
+	let version: Int
 	let label: String
 	let inner: Inner
 	let anotherInner: Inner3 // New in version 3
 
+	init(
+		version: Int = Self.currentVersion,
+		label: String,
+		inner: Inner,
+		anotherInner: Inner3
+	) {
+		self.version = version
+		self.label = label
+		self.inner = inner
+		self.anotherInner = anotherInner
+	}
+}
+
+// MARK: Nested.Configuration
+extension Nested {
+	struct Configuration {
+		let decodedVersionFromParent: Int
+	}
+}
+
+extension Nested {
 	struct Inner: Encodable, DecodableWithConfiguration, Equatable {
 		let foo: String
 		let bar: String // New in version 2
