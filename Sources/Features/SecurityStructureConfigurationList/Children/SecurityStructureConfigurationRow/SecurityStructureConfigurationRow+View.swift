@@ -3,9 +3,7 @@ import FeaturePrelude
 extension SecurityStructureConfigurationRow.State {
 	var viewState: SecurityStructureConfigurationRow.ViewState {
 		.init(
-			label: configReference.metadata.label,
-			createdOn: configReference.metadata.createdOn,
-			lastUpdatedOn: configReference.metadata.lastUpdatedOn
+			metadata: configReference.metadata
 		)
 	}
 }
@@ -13,9 +11,7 @@ extension SecurityStructureConfigurationRow.State {
 // MARK: - SecurityStructureConfigurationRow.View
 extension SecurityStructureConfigurationRow {
 	public struct ViewState: Equatable {
-		let label: String
-		let createdOn: Date
-		let lastUpdatedOn: Date
+		let metadata: SecurityStructureMetadata
 	}
 
 	@MainActor
@@ -30,9 +26,7 @@ extension SecurityStructureConfigurationRow {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				SecurityStructureConfigurationRowView(
 					isSelected: nil, // not select**able**
-					label: viewStore.label,
-					createdOn: viewStore.createdOn,
-					lastUpdatedOn: viewStore.lastUpdatedOn,
+					metadata: viewStore.metadata,
 					action: { viewStore.send(.displayDetails) }
 				)
 			}
@@ -43,24 +37,22 @@ extension SecurityStructureConfigurationRow {
 // MARK: - SecurityStructureConfigurationRowView
 public struct SecurityStructureConfigurationRowView: SwiftUI.View {
 	let isSelected: Bool?
-	let label: String
-	let createdOn: Date
-	let lastUpdatedOn: Date
+	let metadata: SecurityStructureMetadata
 	let action: () -> Void
 	public var body: some SwiftUI.View {
 		Card(.app.gray5, action: action) {
 			HStack {
 				VStack(alignment: .leading, spacing: 0) {
-					Text(label)
+					Text(metadata.label)
 						.foregroundColor(.app.gray1)
 						.textStyle(.secondaryHeader)
 						.padding(.bottom, .small1)
 
 					// FIXME: Strings
-					LabelledDate(label: "Created", date: createdOn)
+					LabelledDate(label: "Created", date: metadata.createdOn)
 						.padding(.bottom, .small3)
 
-					LabelledDate(label: "Updated", date: lastUpdatedOn)
+					LabelledDate(label: "Updated", date: metadata.lastUpdatedOn)
 						.padding(.bottom, .small3)
 				}
 

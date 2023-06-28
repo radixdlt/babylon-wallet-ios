@@ -49,10 +49,9 @@ extension SecurityStructureConfigurationList {
 								from: viewStore.configurations,
 								requiring: .exactly(1)
 							) { item in
-								SecurityStructureConfigurationRowView
-								SecurityStructureConfigurationRow.View(
-									viewState: .init(factorSource: item.value),
+								SecurityStructureConfigurationRowView(
 									isSelected: item.isSelected,
+									metadata: item.value.metadata,
 									action: item.action
 								)
 							}
