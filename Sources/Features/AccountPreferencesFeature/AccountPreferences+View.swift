@@ -12,6 +12,7 @@ extension AccountPreferences.State {
 		#if DEBUG
 		return .init(
 			faucetButtonState: faucetButtonState,
+			canUpdateSecurityState: canUpdateSecurityState,
 			canTurnIntoDappDefinitionAccounType: canTurnIntoDappDefinitionAccountType,
 			canCreateAuthSigningKey: canCreateAuthSigningKey,
 			createFungibleTokenButtonState: createFungibleTokenButtonState,
@@ -31,6 +32,7 @@ extension AccountPreferences {
 		public var faucetButtonState: ControlState
 
 		#if DEBUG
+		public var canUpdateSecurityState: Bool
 		public var canTurnIntoDappDefinitionAccounType: Bool
 		public var canCreateAuthSigningKey: Bool
 		public var createFungibleTokenButtonState: ControlState
@@ -42,6 +44,7 @@ extension AccountPreferences {
 		#if DEBUG
 		public init(
 			faucetButtonState: ControlState,
+			canUpdateSecurityState: Bool,
 			canTurnIntoDappDefinitionAccounType: Bool,
 			canCreateAuthSigningKey: Bool,
 			createFungibleTokenButtonState: ControlState,
@@ -49,6 +52,7 @@ extension AccountPreferences {
 			createMultipleFungibleTokenButtonState: ControlState,
 			createMultipleNonFungibleTokenButtonState: ControlState
 		) {
+			self.canUpdateSecurityState = canUpdateSecurityState
 			self.faucetButtonState = faucetButtonState
 			self.canTurnIntoDappDefinitionAccounType = canTurnIntoDappDefinitionAccounType
 			self.canCreateAuthSigningKey = canCreateAuthSigningKey
@@ -78,6 +82,7 @@ extension AccountPreferences {
 					VStack(alignment: .leading) {
 						faucetButton(with: viewStore)
 						#if DEBUG
+						updateSecurityStateButton(with: viewStore)
 						turnIntoDappDefinitionAccountTypeButton(with: viewStore)
 						createAndUploadAuthKeyButton(with: viewStore)
 						createFungibleTokenButton(with: viewStore)
@@ -174,6 +179,15 @@ extension AccountPreferences.View {
 		}
 		.buttonStyle(.secondaryRectangular(shouldExpand: true))
 		.controlState(viewStore.canTurnIntoDappDefinitionAccounType ? .enabled : .disabled)
+	}
+
+	@ViewBuilder
+	private func updateSecurityStateButton(with viewStore: ViewStoreOf<AccountPreferences>) -> some View {
+		Button("Update Security state") {
+			viewStore.send(.updateSecurityStateButtonTapped)
+		}
+		.buttonStyle(.secondaryRectangular(shouldExpand: true))
+		.controlState(viewStore.canUpdateSecurityState ? .enabled : .disabled)
 	}
 
 	@ViewBuilder

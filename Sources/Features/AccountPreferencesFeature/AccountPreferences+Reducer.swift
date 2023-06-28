@@ -25,6 +25,8 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 		var destination: Destination.State? = nil
 
 		#if DEBUG
+		public var canUpdateSecurityState: Bool
+
 		public var canCreateAuthSigningKey: Bool
 		public var canTurnIntoDappDefinitionAccountType: Bool
 		public var createFungibleTokenButtonState: ControlState
@@ -41,6 +43,7 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 			self.faucetButtonState = faucetButtonState
 
 			#if DEBUG
+			self.canUpdateSecurityState = true
 			self.canCreateAuthSigningKey = false
 			self.canTurnIntoDappDefinitionAccountType = false
 			self.createFungibleTokenButtonState = .enabled
@@ -59,6 +62,7 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 		case faucetButtonTapped
 
 		#if DEBUG
+		case updateSecurityStateButtonTapped
 		case turnIntoDappDefinitionAccountTypeButtonTapped
 		case createAndUploadAuthKeyButtonTapped
 		case createFungibleTokenButtonTapped
@@ -163,6 +167,10 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 				try await faucetClient.getFreeXRD(.init(recipientAccountAddress: $0))
 			}
 		#if DEBUG
+		case .updateSecurityStateButtonTapped:
+			print("UPDATE SECURITY STATE")
+			return .none
+
 		case .createAndUploadAuthKeyButtonTapped:
 			return .run { [accountAddress = state.address] send in
 				let account = try await accountsClient.getAccountByAddress(accountAddress)
