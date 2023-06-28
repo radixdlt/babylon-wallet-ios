@@ -24,23 +24,23 @@ extension AddLedgerFactorSource {
 			NavigationStack {
 				WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 					VStack {
-						Text(L10n.AddLedger.AddDevice.title)
+						Text(L10n.AddLedgerDevice.AddDevice.title)
 							.textStyle(.sheetTitle)
 							.padding(.top, .small1)
 							.padding(.bottom, .large1)
 
-						Text(L10n.AddLedger.AddDevice.body1)
+						Text(L10n.AddLedgerDevice.AddDevice.body1)
 							.textStyle(.body1Regular)
 							.padding(.bottom, .large1)
 							.padding(.horizontal, .medium3)
 
-						Text(L10n.AddLedger.AddDevice.body2)
+						Text(L10n.AddLedgerDevice.AddDevice.body2)
 							.textStyle(.body1Regular)
 							.padding(.horizontal, .medium3)
 
 						Spacer()
 
-						Button(L10n.AddLedger.AddDevice.continue) {
+						Button(L10n.AddLedgerDevice.AddDevice.continue) {
 							viewStore.send(.sendAddLedgerRequestButtonTapped)
 						}
 						.controlState(viewStore.continueButtonControlState)
@@ -123,18 +123,18 @@ extension NameLedgerFactorSource {
 			NavigationStack {
 				WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 					VStack {
-						Text(L10n.AddLedger.NameLedger.title)
+						Text(L10n.AddLedgerDevice.NameLedger.title)
 							.textStyle(.sheetTitle)
 							.padding(.top, .small1)
 							.padding(.bottom, .medium3)
 
-						Text(L10n.AddLedger.NameLedger.body)
+						Text(L10n.AddLedgerDevice.NameLedger.body)
 							.textStyle(.body1Regular)
 							.padding(.bottom, .medium1)
 							.multilineTextAlignment(.center)
 
 						AppTextField(
-							placeholder: L10n.AddLedger.NameLedger.namePlaceholder,
+							placeholder: L10n.AddLedgerDevice.NameLedger.namePlaceholder,
 							text: Binding(
 								get: { viewStore.ledgerName },
 								set: { viewStore.send(.ledgerNameChanged($0)) }
@@ -146,7 +146,7 @@ extension NameLedgerFactorSource {
 					.padding(.horizontal, .medium1)
 					.foregroundColor(.app.gray1)
 					.footer {
-						Button(L10n.AddLedger.NameLedger.continueButtonTitle) {
+						Button(L10n.AddLedgerDevice.NameLedger.continueButtonTitle) {
 							viewStore.send(.confirmNameButtonTapped)
 						}
 						.controlState(viewStore.confirmButtonControlState)

@@ -41,7 +41,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			nonce: Nonce,
 			signTransactionPurpose: SigningPurpose.SignTransactionPurpose,
 			message: String?,
-			feeToAdd: BigDecimal = .temporaryStandardFee, // fix me use estimate from `analyze`
+			feeToAdd: BigDecimal = .temporaryStandardFee, // FIXME: use estimate from `analyze`
 			ephemeralNotaryPrivateKey: Curve25519.Signing.PrivateKey = .init(),
 			customizeGuarantees: TransactionReviewGuarantees.State? = nil
 		) {
@@ -107,6 +107,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			case selectFeePayer(SelectFeePayer.State)
 			case signing(Signing.State)
 			case submitting(SubmitTransaction.State)
+			case dApp(SimpleDappDetails.State)
 		}
 
 		public enum Action: Sendable, Equatable {
@@ -114,6 +115,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			case selectFeePayer(SelectFeePayer.Action)
 			case signing(Signing.Action)
 			case submitting(SubmitTransaction.Action)
+			case dApp(SimpleDappDetails.Action)
 		}
 
 		public var body: some ReducerProtocolOf<Self> {
@@ -128,6 +130,9 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			}
 			Scope(state: /State.submitting, action: /Action.submitting) {
 				SubmitTransaction()
+			}
+			Scope(state: /State.dApp, action: /Action.dApp) {
+				SimpleDappDetails()
 			}
 		}
 	}
@@ -202,9 +207,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			guard let transactionWithLockFee = state.transactionWithLockFee else { return .none }
 			state.canApproveTX = false
 
-			let guarantees = state.allGuarantees
-
-			return .task {
+			return .task { [guarantees = state.allGuarantees] in
 				await .internal(.addGuaranteeToManifestResult(
 					TaskResult {
 						try await addingGuarantees(
@@ -219,6 +222,10 @@ public struct TransactionReview: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
+		case let .dAppsUsed(.delegate(.openDapp(id))):
+			state.destination = .dApp(.init(dAppID: id))
+			return .none
+
 		case .deposits(.delegate(.showCustomizeGuarantees)):
 			guard let deposits = state.deposits else { return .none } // TODO: Handle?
 
@@ -234,15 +241,37 @@ public struct TransactionReview: Sendable, FeatureReducer {
 
 			return .none
 
-		case let .destination(.presented(.customizeGuarantees(.delegate(.applyGuarantees(guarantees))))):
+		case let .destination(.presented(presentedAction)):
+			return reduce(into: &state, presentedAction: presentedAction)
+
+		case .destination(.dismiss):
+			if case .signing = state.destination {
+				return cancelSigningEffect(state: &state)
+			} else if case .submitting = state.destination {
+				// This is used when tapping outside the Submitting sheet, no need to set destination to nil
+				return delayedEffect(for: .delegate(.userDismissedTransactionStatus))
+			}
+
+			return .none
+
+		default:
+			return .none
+		}
+	}
+
+	public func reduce(into state: inout State, presentedAction: Destinations.Action) -> EffectTask<Action> {
+		switch presentedAction {
+		case let .customizeGuarantees(.delegate(.applyGuarantees(guarantees))):
 			for transfer in guarantees.map(\.transfer) {
 				guard let guarantee = transfer.guarantee else { continue }
 				state.applyGuarantee(guarantee, transferID: transfer.id)
 			}
 
 			return .none
+		case .customizeGuarantees:
+			return .none
 
-		case let .destination(.presented(.selectFeePayer(.delegate(.selected(selected))))):
+		case let .selectFeePayer(.delegate(.selected(selected))):
 			state.feePayerSelectionAmongstCandidates = selected
 			state.destination = nil
 			return .run { [transactionManifest = state.transactionManifest] send in
@@ -258,66 +287,64 @@ public struct TransactionReview: Sendable, FeatureReducer {
 				)))
 			}
 
-		case .destination(.presented(.signing(.delegate(.cancelSigning)))):
+		case .selectFeePayer:
+			return .none
+
+		case .signing(.delegate(.cancelSigning)):
 			state.destination = nil
 			return cancelSigningEffect(state: &state)
 
-		case .destination(.presented(.signing(.delegate(.failedToSign)))):
+		case .signing(.delegate(.failedToSign)):
 			loggerGlobal.error("Failed sign tx")
 			state.destination = nil
 			state.canApproveTX = true
 			return .none
 
-		case let .destination(.presented(.signing(.delegate(.finishedSigning(.signTransaction(notarizedTX, origin: _)))))):
+		case let .signing(.delegate(.finishedSigning(.signTransaction(notarizedTX, origin: _)))):
 			state.destination = .submitting(.init(notarizedTX: notarizedTX))
 			return .none
 
-		case .destination(.presented(.signing(.delegate(.finishedSigning(.signAuth(_)))))):
+		case .signing(.delegate(.finishedSigning(.signAuth(_)))):
 			state.canApproveTX = true
 			assertionFailure("Did not expect to have sign auth data...")
 			return .none
 
-		case let .destination(.presented(.submitting(.delegate(.submittedButNotCompleted(txID))))):
+		case .signing:
+			return .none
+
+		case let .submitting(.delegate(.submittedButNotCompleted(txID))):
 			return .send(.delegate(.signedTXAndSubmittedToGateway(txID)))
 
-		case
-			.destination(.presented(.submitting(.delegate(.failedToSubmit)))):
+		case .submitting(.delegate(.failedToSubmit)):
 			state.destination = nil
 			state.canApproveTX = true
 			loggerGlobal.error("Failed to submit tx")
 			return .none
 
-		case .destination(.presented(.submitting(.delegate(.failedToReceiveStatusUpdate)))):
+		case .submitting(.delegate(.failedToReceiveStatusUpdate)):
 			state.destination = nil
 			loggerGlobal.error("Failed to receive status update")
 			return .none
 
-		case .destination(.presented(.submitting(.delegate(.submittedTransactionFailed)))):
+		case .submitting(.delegate(.submittedTransactionFailed)):
 			state.destination = nil
 			state.canApproveTX = true
 			loggerGlobal.error("Submitted TX failed")
 			return .send(.delegate(.failed(.failedToSubmit)))
 
-		case let .destination(.presented(.submitting(.delegate(.committedSuccessfully(txID))))):
+		case let .submitting(.delegate(.committedSuccessfully(txID))):
 			state.destination = nil
 			return delayedEffect(for: .delegate(.transactionCompleted(txID)))
 
-		case .destination(.presented(.submitting(.delegate(.manuallyDismiss)))):
+		case .submitting(.delegate(.manuallyDismiss)):
 			// This is used when the close button is pressed, we have to manually
 			state.destination = nil
 			return delayedEffect(for: .delegate(.userDismissedTransactionStatus))
 
-		case .destination(.dismiss):
-			if case .signing = state.destination {
-				return cancelSigningEffect(state: &state)
-			} else if case .submitting = state.destination {
-				// This is used when tapping outside the Submitting sheet, no need to set destination to nil
-				return delayedEffect(for: .delegate(.userDismissedTransactionStatus))
-			}
-
+		case .submitting:
 			return .none
 
-		default:
+		case .dApp:
 			return .none
 		}
 	}
@@ -361,7 +388,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 					userAccounts: userAccounts,
 					networkID: networkID
 				),
-				proofs: try? exctractProofs(manifestPreviewToReview),
+				proofs: exctractProofs(manifestPreviewToReview),
 				networkFee: .init(fee: feeAdded, isCongested: false)
 			)
 			await send(.internal(.createTransactionReview(content)))
@@ -518,37 +545,28 @@ extension TransactionReview {
 		return TransactionReviewDappsUsed.State(isExpanded: true, dApps: .init(uniqueElements: Set(dApps)))
 	}
 
-	private func extractDappInfo(_ component: ComponentAddress) async throws -> LedgerEntity {
+	private func extractDappInfo(_ component: ComponentAddress) async throws -> DappEntity {
 		let dAppDefinitionAddress = try await gatewayAPIClient.getDappDefinitionAddress(component)
 		let metadata = try? await gatewayAPIClient.getDappMetadata(dAppDefinitionAddress)
 			.validating(dAppComponent: component)
 
-		return LedgerEntity(
-			id: dAppDefinitionAddress.id,
-			metadata: .init(
-				name: metadata?.name ?? L10n.TransactionReview.unknown,
-				thumbnail: metadata?.iconURL,
-				description: metadata?.description
-			)
+		return DappEntity(
+			id: dAppDefinitionAddress,
+			metadata: .init(metadata: metadata)
 		)
 	}
 
-	private func exctractProofs(_ manifest: AnalyzeManifestWithPreviewContextResponse) async throws -> TransactionReviewProofs.State? {
-		let proofs = try await manifest.accountProofResources.map(\.address).asyncMap(extractProofInfo)
+	private func exctractProofs(_ manifest: AnalyzeManifestWithPreviewContextResponse) async -> TransactionReviewProofs.State? {
+		let proofs = await manifest.accountProofResources.asyncMap(extractProofInfo)
 		guard !proofs.isEmpty else { return nil }
 
 		return TransactionReviewProofs.State(proofs: .init(uniqueElements: proofs))
 	}
 
-	private func extractProofInfo(_ address: String) async throws -> LedgerEntity {
-		let metadata = try? await gatewayAPIClient.getEntityMetadata(address)
-		return LedgerEntity(
+	private func extractProofInfo(_ address: ResourceAddress) async -> ProofEntity {
+		await ProofEntity(
 			id: address,
-			metadata: .init(
-				name: metadata?.name ?? L10n.TransactionReview.unknown,
-				thumbnail: metadata?.iconURL,
-				description: metadata?.description
-			)
+			metadata: .init(metadata: try? gatewayAPIClient.getEntityMetadata(address.address))
 		)
 	}
 
@@ -676,25 +694,25 @@ extension TransactionReview {
 // MARK: Useful types
 
 extension TransactionReview {
-	public struct LedgerEntity: Sendable, Identifiable, Hashable {
-		public let id: AccountAddress.ID
-		public let metadata: Metadata?
+	public struct ProofEntity: Sendable, Identifiable, Hashable {
+		public let id: ResourceAddress
+		public let metadata: EntityMetadata
+	}
 
-		init(id: AccountAddress.ID, metadata: Metadata?) {
-			self.id = id
-			self.metadata = metadata
-		}
+	public struct DappEntity: Sendable, Identifiable, Hashable {
+		public let id: DappDefinitionAddress
+		public let metadata: EntityMetadata?
+	}
 
-		public struct Metadata: Sendable, Hashable {
-			public let name: String
-			public let thumbnail: URL?
-			public let description: String?
+	public struct EntityMetadata: Sendable, Hashable {
+		public let name: String?
+		public let thumbnail: URL?
+		public let description: String?
 
-			public init(name: String, thumbnail: URL?, description: String?) {
-				self.name = name
-				self.thumbnail = thumbnail
-				self.description = description
-			}
+		public init(metadata: GatewayAPI.EntityMetadataCollection?) {
+			self.name = metadata?.name
+			self.thumbnail = metadata?.iconURL
+			self.description = metadata?.description
 		}
 	}
 
@@ -876,6 +894,224 @@ extension NonFungibleLocalIdInternal {
 				throw InvalidLocalID()
 			}
 			return "[\(string)]"
+		}
+	}
+}
+
+// MARK: - SimpleDappDetails
+// FIXME: Remove and make settings use stacks
+
+public struct SimpleDappDetails: Sendable, FeatureReducer {
+	@Dependency(\.errorQueue) var errorQueue
+	@Dependency(\.gatewayAPIClient) var gatewayAPIClient
+	@Dependency(\.openURL) var openURL
+	@Dependency(\.cacheClient) var cacheClient
+
+	public struct FailedToLoadMetadata: Error, Hashable {}
+
+	public typealias Store = StoreOf<Self>
+
+	// MARK: State
+
+	public struct State: Sendable, Hashable {
+		public var dAppID: DappDefinitionAddress
+
+		@Loadable
+		public var metadata: GatewayAPI.EntityMetadataCollection? = nil
+
+		@Loadable
+		public var resources: Resources? = nil
+
+		@Loadable
+		public var associatedDapps: [AssociatedDapp]? = nil
+
+		public init(
+			dAppID: DappDefinitionAddress,
+			metadata: GatewayAPI.EntityMetadataCollection? = nil,
+			resources: Resources? = nil,
+			associatedDapps: [AssociatedDapp]? = nil
+		) {
+			self.dAppID = dAppID
+			self.metadata = metadata
+			self.resources = resources
+			self.associatedDapps = associatedDapps
+		}
+
+		public struct Resources: Hashable, Sendable {
+			public var fungible: [ResourceDetails]
+			public var nonFungible: [ResourceDetails]
+
+			// TODO: This should be consolidated with other types that represent resources
+			public struct ResourceDetails: Identifiable, Hashable, Sendable {
+				public var id: ResourceAddress { address }
+
+				public let address: ResourceAddress
+				public let fungibility: Fungibility
+				public let name: String
+				public let symbol: String?
+				public let description: String?
+				public let iconURL: URL?
+
+				public enum Fungibility: Hashable, Sendable {
+					case fungible
+					case nonFungible
+				}
+			}
+		}
+
+		// TODO: This should be consolidated with other types that represent resources
+		public struct AssociatedDapp: Identifiable, Hashable, Sendable {
+			public var id: DappDefinitionAddress { address }
+
+			public let address: DappDefinitionAddress
+			public let name: String
+			public let iconURL: URL?
+		}
+	}
+
+	// MARK: Action
+
+	public enum ViewAction: Sendable, Equatable {
+		case appeared
+		case openURLTapped(URL)
+	}
+
+	public enum InternalAction: Sendable, Equatable {
+		case metadataLoaded(Loadable<GatewayAPI.EntityMetadataCollection>)
+		case resourcesLoaded(Loadable<State.Resources>)
+		case associatedDappsLoaded(Loadable<[State.AssociatedDapp]>)
+	}
+
+	// MARK: - Destination
+
+	// MARK: Reducer
+
+	public init() {}
+
+	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+		switch viewAction {
+		case .appeared:
+			state.$metadata = .loading
+			state.$resources = .loading
+			return .task { [dAppID = state.dAppID] in
+				let result = await TaskResult {
+					try await cacheClient.withCaching(
+						cacheEntry: .dAppMetadata(dAppID.address),
+						request: {
+							try await gatewayAPIClient.getEntityMetadata(dAppID.address)
+						}
+					)
+				}
+				return .internal(.metadataLoaded(.init(result: result)))
+			}
+
+		case let .openURLTapped(url):
+			return .fireAndForget {
+				await openURL(url)
+			}
+		}
+	}
+
+	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
+		switch internalAction {
+		case let .metadataLoaded(metadata):
+			state.$metadata = metadata
+
+			let dAppDefinitionAddress = state.dAppID
+			return .run { send in
+				let resources = await metadata.flatMap { await loadResources(metadata: $0, validated: dAppDefinitionAddress) }
+				await send(.internal(.resourcesLoaded(resources)))
+
+				let associatedDapps = await metadata.flatMap { await loadDapps(metadata: $0, validated: dAppDefinitionAddress) }
+				await send(.internal(.associatedDappsLoaded(associatedDapps)))
+			}
+
+		case let .resourcesLoaded(resources):
+			state.$resources = resources
+			return .none
+
+		case let .associatedDappsLoaded(dApps):
+			state.$associatedDapps = dApps
+			return .none
+		}
+	}
+
+	/// Loads any fungible and non-fungible resources associated with the dApp
+	private func loadResources(
+		metadata: GatewayAPI.EntityMetadataCollection,
+		validated dappDefinitionAddress: DappDefinitionAddress
+	) async -> Loadable<SimpleDappDetails.State.Resources> {
+		guard let claimedEntities = metadata.claimedEntities, !claimedEntities.isEmpty else {
+			return .idle
+		}
+
+		let result = await TaskResult {
+			let allResourceItems = try await gatewayAPIClient.fetchResourceDetails(claimedEntities)
+				.items
+				// FIXME: Uncomment this when when we can rely on dApps conforming to the standards
+				// .filter { $0.metadata.dappDefinition == dAppDefinitionAddress.address }
+				.compactMap(\.resourceDetails)
+
+			return State.Resources(fungible: allResourceItems.filter { $0.fungibility == .fungible },
+			                       nonFungible: allResourceItems.filter { $0.fungibility == .nonFungible })
+		}
+
+		return .init(result: result)
+	}
+
+	/// Loads any other dApps associated with the dApp
+	private func loadDapps(
+		metadata: GatewayAPI.EntityMetadataCollection,
+		validated dappDefinitionAddress: DappDefinitionAddress
+	) async -> Loadable<[State.AssociatedDapp]> {
+		let dAppDefinitions = try? metadata.dappDefinitions?.compactMap(DappDefinitionAddress.init)
+		guard let dAppDefinitions else { return .idle }
+
+		let associatedDapps = await dAppDefinitions.parallelMap { dApp in
+			try? await extractDappInfo(for: dApp, validating: dappDefinitionAddress)
+		}
+		.compactMap { $0 }
+
+		guard !associatedDapps.isEmpty else { return .idle }
+
+		return .success(associatedDapps)
+	}
+
+	/// Helper function that loads and extracts dApp info for a given dApp, validating that it points back to the dApp of this screen
+	private func extractDappInfo(
+		for dApp: DappDefinitionAddress,
+		validating dAppDefinitionAddress: DappDefinitionAddress
+	) async throws -> State.AssociatedDapp {
+		let metadata = try await gatewayAPIClient.getEntityMetadata(dApp.address)
+		// FIXME: Uncomment this when when we can rely on dApps conforming to the standards
+		// .validating(dAppDefinitionAddress: dAppDefinitionAddress)
+		guard let name = metadata.name else {
+			throw GatewayAPI.EntityMetadataCollection.MetadataError.missingName
+		}
+		return .init(address: dApp, name: name, iconURL: metadata.iconURL)
+	}
+}
+
+extension GatewayAPI.StateEntityDetailsResponseItem {
+	var resourceDetails: SimpleDappDetails.State.Resources.ResourceDetails? {
+		guard let fungibility else { return nil }
+		return .init(address: .init(address: address),
+		             fungibility: fungibility,
+		             name: metadata.name ?? L10n.AuthorizedDapps.DAppDetails.unknownTokenName,
+		             symbol: metadata.symbol,
+		             description: metadata.description,
+		             iconURL: metadata.iconURL)
+	}
+
+	private var fungibility: SimpleDappDetails.State.Resources.ResourceDetails.Fungibility? {
+		guard let details else { return nil }
+		switch details {
+		case .fungibleResource:
+			return .fungible
+		case .nonFungibleResource:
+			return .nonFungible
+		case .fungibleVault, .nonFungibleVault, .package, .component:
+			return nil
 		}
 	}
 }
