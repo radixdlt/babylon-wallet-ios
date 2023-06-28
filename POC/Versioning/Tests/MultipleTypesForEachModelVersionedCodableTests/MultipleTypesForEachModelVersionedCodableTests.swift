@@ -17,7 +17,6 @@ final class MultipleTypesForEachModelVersionedCodableTests: XCTestCase {
 				"version": 3,
 				"label": "test",
 				"inner": [
-					"version": 0,
 					"innerGeneric": [
 						"value": "Value=String.self",
 					],
