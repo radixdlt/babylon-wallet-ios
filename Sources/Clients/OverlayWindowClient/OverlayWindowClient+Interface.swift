@@ -15,37 +15,31 @@ public struct OverlayWindowClient: Sendable {
 	public var scheduleAlert: ScheduleAlert
 
 	/// Schedule a HUD to be shown in the Overlay Window.
-	/// /// Usually to be called from the Main Window.
+	/// Usually to be called from the Main Window.
 	public var scheduleHUD: ScheduleHUD
 
 	/// This is meant to be used by the Overlay Window to send
 	/// back the actions from an Alert to the Main Window.
 	public var sendAlertAction: SendAlertAction
 
-	/// Internal observer for actions emitted from an Alert.
-	public var onAlertAction: OnAlertAction
-
 	public init(
 		scheduledItems: @escaping ScheduledItems,
 		scheduleAlert: @escaping ScheduleAlert,
 		scheduleHUD: @escaping ScheduleHUD,
-		sendAlertAction: @escaping SendAlertAction,
-		onAlertAction: @escaping OnAlertAction
+		sendAlertAction: @escaping SendAlertAction
 	) {
 		self.scheduledItems = scheduledItems
 		self.scheduleAlert = scheduleAlert
 		self.scheduleHUD = scheduleHUD
 		self.sendAlertAction = sendAlertAction
-		self.onAlertAction = onAlertAction
 	}
 }
 
 extension OverlayWindowClient {
-	public typealias ScheduleAlert = @Sendable (Item.AlertState) -> Void
+	public typealias ScheduleAlert = @Sendable (Item.AlertState) async -> Item.AlertAction
 	public typealias ScheduleHUD = @Sendable (Item.HUD) -> Void
 	public typealias SendAlertAction = @Sendable (Item.AlertAction, Item.AlertState.ID) -> Void
 	public typealias ScheduledItems = @Sendable () -> AnyAsyncSequence<Item>
-	public typealias OnAlertAction = @Sendable (Item.AlertState.ID) async -> Item.AlertAction
 }
 
 // MARK: OverlayWindowClient.Item
@@ -92,17 +86,6 @@ extension OverlayWindowClient {
 
 		case hud(HUD)
 		case alert(AlertState)
-	}
-}
-
-extension OverlayWindowClient {
-	public func schedule(hud: Item.HUD) {
-		scheduleHUD(hud)
-	}
-
-	public func schedule(alert: Item.AlertState) async -> Item.AlertAction {
-		scheduleAlert(alert)
-		return await onAlertAction(alert.id)
 	}
 }
 

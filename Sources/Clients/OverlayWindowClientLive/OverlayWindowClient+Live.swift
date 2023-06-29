@@ -31,13 +31,12 @@ extension OverlayWindowClient: DependencyKey {
 
 		return .init(
 			scheduledItems: { items.eraseToAnyAsyncSequence() },
-			scheduleAlert: { items.send(.alert($0)) },
+			scheduleAlert: { alert in
+				items.send(.alert(alert))
+				return await alertActions.first { $0.id == alert.id }?.action ?? .dismissed
+			},
 			scheduleHUD: { items.send(.hud($0)) },
-			sendAlertAction: { action, id in alertActions.send((action, id)) },
-			onAlertAction: { id in
-				/// Fallback to `dismissed` action.
-				await alertActions.first { $0.id == id }?.action ?? .dismissed
-			}
+			sendAlertAction: { action, id in alertActions.send((action, id)) }
 		)
 	}()
 }
