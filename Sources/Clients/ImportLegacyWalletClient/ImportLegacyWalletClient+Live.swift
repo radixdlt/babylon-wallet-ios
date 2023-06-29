@@ -2,6 +2,7 @@ import AccountsClient
 import ClientPrelude
 import Cryptography
 import EngineToolkitClient
+import FactorSourcesClient
 import Profile
 
 // MARK: - ImportLegacyWalletClient + DependencyKey
@@ -10,13 +11,14 @@ extension ImportLegacyWalletClient: DependencyKey {
 
 	public static let liveValue: Self = {
 		@Dependency(\.accountsClient) var accountsClient
+		@Dependency(\.factorSourcesClient) var factorSourcesClient
 
 		@Sendable func migrate(
 			accounts: NonEmpty<Set<OlympiaAccountToMigrate>>,
 			factorSouceID: FactorSourceID.FromHash
 		) async throws -> (accounts: NonEmpty<OrderedSet<MigratedAccount>>, networkID: NetworkID) {
 			let sortedOlympia = accounts.sorted(by: \.addressIndex)
-			let networkID = Radix.Gateway.default.network.id // we import to the default network, not the current.
+			let networkID = await factorSourcesClient.getCurrentNetworkID()
 			let accountIndexOffset = try await accountsClient.getAccountsOnCurrentNetwork().count
 
 			var accountsSet = OrderedSet<MigratedAccount>()
@@ -101,7 +103,6 @@ extension ImportLegacyWalletClient: DependencyKey {
 				return migratedAccounts
 			},
 			migrateOlympiaHardwareAccountsToBabylon: { request in
-
 				let (accounts, networkID) = try await migrate(
 					accounts: request.olympiaAccounts,
 					factorSouceID: request.ledgerFactorSourceID
