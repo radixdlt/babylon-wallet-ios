@@ -43,7 +43,7 @@ public struct Securified: Sendable, Hashable, Codable {
 	public var transactionSigningStructure: AppliedSecurityStructure {
 		func decorate<R: RoleProtocol>(
 			_ keyPath: KeyPath<ProfileSnapshot.AppliedSecurityStructure, RoleOfTier<R, FactorInstance.ID>>
-		) throws -> RoleOfTier<R, FactorInstance> {
+		) -> RoleOfTier<R, FactorInstance> {
 			let roleWithfactorInstanceIDs = accessController.securityStructure[keyPath: keyPath]
 
 			func lookup(id: FactorInstance.ID) -> FactorInstance {
@@ -62,7 +62,7 @@ public struct Securified: Sendable, Hashable, Codable {
 			)
 		}
 
-		return try! .init(
+		return .init(
 			numberOfDaysUntilAutoConfirmation: accessController.securityStructure.numberOfDaysUntilAutoConfirmation,
 			primaryRole: decorate(\.primaryRole),
 			recoveryRole: decorate(\.recoveryRole),
