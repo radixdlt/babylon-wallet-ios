@@ -4,12 +4,39 @@ import ImportLegacyWalletClient
 // MARK: - AccountsToImport
 public struct AccountsToImport: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
-		public let scannedAccounts: NonEmpty<OrderedSet<OlympiaAccountToMigrate>>
+		public let scannedAccounts: [ImportableAccount]
 
 		public init(
 			scannedAccounts: NonEmpty<OrderedSet<OlympiaAccountToMigrate>>
 		) {
-			self.scannedAccounts = scannedAccounts
+			@Dependency(\.engineToolkitClient) var engineToolkitClient
+
+			let networkId = Radix.Gateway.default.network.id
+
+			self.scannedAccounts = scannedAccounts.map { account in
+				let babylonAddress = try? engineToolkitClient.deriveVirtualAccountAddress(.init(
+					publicKey: .ecdsaSecp256k1(account.publicKey.intoEngine()),
+					networkId: networkId
+				))
+
+				return .init(
+					accountName: account.displayName?.rawValue,
+					olympiaAddress: account.address,
+					bablyonAddress: babylonAddress,
+					appearanceID: .fromIndex(Int(account.addressIndex)),
+					derivationPath: account.path.derivationPath,
+					olympiaAccountType: account.accountType
+				)
+			}
+		}
+
+		public struct ImportableAccount: Sendable, Hashable {
+			public let accountName: String?
+			public let olympiaAddress: LegacyOlympiaAccountAddress
+			public let bablyonAddress: ComponentAddress?
+			public let appearanceID: Profile.Network.Account.AppearanceID
+			public let derivationPath: String
+			public let olympiaAccountType: Olympia.AccountType
 		}
 	}
 
