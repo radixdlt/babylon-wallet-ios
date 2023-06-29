@@ -6,7 +6,6 @@ import AppKit
 public typealias Pasteboard = NSPasteboard
 #endif
 import Dependencies
-import OverlayWindowClient
 
 // MARK: - PasteboardClient + DependencyKey
 extension PasteboardClient: DependencyKey {
@@ -19,15 +18,17 @@ extension PasteboardClient: DependencyKey {
 		pasteboard.declareTypes([.string], owner: nil)
 		#endif
 
-		@Dependency(\.overlayWindowClient) var overlayWindowClient
+		let copyEvents = AsyncPassthroughSubject<String>()
+
 		return Self(
+			copyEvents: { copyEvents.share().eraseToAnyAsyncSequence() },
 			copyString: { aString in
 				#if os(iOS)
 				pasteboard.string = aString
 				#elseif os(macOS)
 				pasteboard.setString(aString, forType: .string)
 				#endif
-				overlayWindowClient.scheduleCopiedItem()
+				copyEvents.send(aString)
 			},
 			getString: {
 				#if os(iOS)

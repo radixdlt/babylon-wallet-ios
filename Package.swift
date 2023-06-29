@@ -687,13 +687,6 @@ package.addModules([
 		],
 		tests: .no
 	),
-	.client(
-		name: "PasteboardClient",
-		dependencies: [
-			"OverlayWindowClient",
-		],
-		tests: .yes()
-	),
 
 	.client(
 		name: "P2PLinksClient",
@@ -843,7 +836,6 @@ package.addModules([
 			"DesignSystem",
 			"Resources",
 			"SharedModels",
-			"PasteboardClient",
 		],
 		tests: .yes()
 	),

@@ -4,7 +4,6 @@ import Dependencies
 import Prelude
 import Resources
 import SwiftUI
-import UIKit
 
 extension OverlayWindowClient: DependencyKey {
 	public static let liveValue: Self = {
@@ -12,11 +11,20 @@ extension OverlayWindowClient: DependencyKey {
 		let alertActions = AsyncPassthroughSubject<(action: Item.AlertAction, id: Item.AlertState.ID)>()
 
 		@Dependency(\.errorQueue) var errorQueue
+		@Dependency(\.pasteboardClient) var pasteBoardClient
 
 		errorQueue.errors().map { error in
 			Item.alert(.init(
 				title: { TextState(L10n.Common.errorAlertTitle) },
 				message: { TextState(error.localizedDescription) }
+			))
+		}.subscribe(items)
+
+		pasteBoardClient.copyEvents().map { _ in
+			Item.hud(.init(
+				text: "Copied",
+				icon: .system("checkmark.circle.fill"),
+				iconForegroundColor: .app.green1
 			))
 		}.subscribe(items)
 

@@ -1,5 +1,4 @@
 import GatewaysClient
-import PasteboardClient
 import Prelude
 import QRGeneratorClient
 import Resources
