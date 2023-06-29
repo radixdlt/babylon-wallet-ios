@@ -80,7 +80,7 @@ public struct AccountRow: View {
 				.textStyle(.body2Link)
 				.foregroundColor(.white)
 				.padding(.bottom, .small2)
-			Text(viewState.olympiaAddress)
+			Text(viewState.olympiaAddress.formatted(.default))
 				.textStyle(.body2Regular)
 				.foregroundColor(.app.gray4)
 
@@ -88,7 +88,7 @@ public struct AccountRow: View {
 				.textStyle(.body2Link)
 				.foregroundColor(.white)
 				.padding(.bottom, .small2)
-			Text(viewState.olympiaAddress)
+			Text(viewState.derivationPath.formatted(.default))
 				.textStyle(.body2Regular)
 				.foregroundColor(.app.gray4)
 		}

@@ -4,18 +4,18 @@ import FeaturePrelude
 extension CompletionMigrateOlympiaAccountsToBabylon.State {
 	var viewState: CompletionMigrateOlympiaAccountsToBabylon.ViewState {
 		let title: String = {
-			switch migratedAccounts.count {
+			switch migratedAccounts!.count {
 			case 0:
 				return L10n.ImportLegacyWallet.Completion.titleNoAccounts
 			case 1:
 				return L10n.ImportLegacyWallet.Completion.titleOneAccount
 			default:
-				return L10n.ImportLegacyWallet.Completion.titleManyAccounts(migratedAccounts.count)
+				return L10n.ImportLegacyWallet.Completion.titleManyAccounts(migratedAccounts!.count)
 			}
 		}()
 
 		return .init(
-			accounts: migratedAccounts,
+			accounts: migratedAccounts!,
 			title: title
 		)
 	}
