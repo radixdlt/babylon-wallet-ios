@@ -4,13 +4,16 @@ import Profile
 // MARK: - CompletionMigrateOlympiaAccountsToBabylon
 public struct CompletionMigrateOlympiaAccountsToBabylon: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
-		public let migratedAccounts: Profile.Network.Accounts
+		public let previouslyMigratedAccounts: [OlympiaAccountToMigrate]
+		public let migratedAccounts: Profile.Network.Accounts?
 		public let unvalidatedOlympiaHardwareAccounts: Set<OlympiaAccountToMigrate>?
 		public init(
-			migratedAccounts: Profile.Network.Accounts,
+			previouslyMigratedAccounts: [OlympiaAccountToMigrate],
+			migratedAccounts: IdentifiedArrayOf<Profile.Network.Account>,
 			unvalidatedOlympiaHardwareAccounts: Set<OlympiaAccountToMigrate>?
 		) {
-			self.migratedAccounts = migratedAccounts
+			self.previouslyMigratedAccounts = previouslyMigratedAccounts
+			self.migratedAccounts = .init(rawValue: migratedAccounts)
 			self.unvalidatedOlympiaHardwareAccounts = unvalidatedOlympiaHardwareAccounts
 		}
 	}
