@@ -29,7 +29,7 @@ extension AccountsToImport {
 							.padding(.horizontal, .large2)
 
 						ForEach(viewStore.scannedAccounts) { account in
-							AccountView(viewState: account.viewState)
+							AccountView(viewState: account)
 								.padding(.horizontal, .medium3)
 						}
 					}
@@ -46,27 +46,9 @@ extension AccountsToImport {
 	}
 }
 
-extension OlympiaAccountToMigrate {
-	public var viewState: AccountView.ViewState {
-		.init(
-			accountName: displayName?.rawValue ?? L10n.ImportOlympiaAccounts.AccountsToImport.unnamed,
-			olympiaAddress: address.address.rawValue,
-			appearanceID: .fromIndex(Int(addressIndex)),
-			derivationPath: path.derivationPath,
-			olympiaAccountType: accountType
-		)
-	}
-}
-
 // MARK: - AccountView
 public struct AccountView: View {
-	public struct ViewState: Equatable {
-		public let accountName: String
-		public let olympiaAddress: String
-		public let appearanceID: Profile.Network.Account.AppearanceID
-		public let derivationPath: String
-		public let olympiaAccountType: Olympia.AccountType
-	}
+	public typealias ViewState = AccountsToImport.State.ImportableAccount
 
 	public let viewState: ViewState
 
@@ -78,28 +60,43 @@ public struct AccountView: View {
 		HStack(spacing: 0) {
 			VStack(alignment: .leading, spacing: .small1) {
 				VPair(
-					heading: viewState.accountName,
+					heading: viewState.accountName ?? L10n.ImportOlympiaAccounts.AccountsToImport.unnamed,
 					largeHeading: true,
 					value: viewState.olympiaAccountType.label
 				)
 
 				VPair(
 					heading: L10n.ImportOlympiaAccounts.AccountsToImport.olympiaAddressLabel,
-					value: viewState.olympiaAddress.formatted(.default)
+					value: viewState.olympiaAddress.address.rawValue.formatted(.default)
 				)
 
-				VPair(
-					heading: L10n.ImportOlympiaAccounts.AccountsToImport.newAddressLabel,
-					value: viewState.derivationPath.formatted(.default)
-				)
+				if let babylonAddress = viewState.bablyonAddress {
+					VPair(
+						heading: L10n.ImportOlympiaAccounts.AccountsToImport.newAddressLabel,
+						value: babylonAddress.address.formatted(.default)
+					)
+				} else {
+					Text("Unable to derive Babylon address") // FIXME: Strings
+						.textStyle(.secondaryHeader)
+						.foregroundColor(.app.alert)
+				}
 			}
 
 			Spacer(minLength: 0)
 		}
 		.padding(.vertical, .medium1)
 		.padding(.horizontal, .medium2)
-		.background(viewState.appearanceID.gradient)
+		.background(background)
 		.cornerRadius(.small1)
+	}
+
+	@ViewBuilder
+	var background: some View {
+		if viewState.bablyonAddress != nil {
+			viewState.appearanceID.gradient
+		} else {
+			Color.app.gray3
+		}
 	}
 
 	struct VPair: View {
