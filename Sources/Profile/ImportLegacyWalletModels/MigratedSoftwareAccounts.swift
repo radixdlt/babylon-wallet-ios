@@ -7,7 +7,7 @@ public struct MigratedSoftwareAccounts: Sendable, Hashable {
 
 	public let accounts: NonEmpty<OrderedSet<MigratedAccount>>
 	public var babylonAccounts: Profile.Network.Accounts {
-		.init(rawValue: .init(uncheckedUniqueElements: self.accounts.rawValue.elements.map(\.babylon)))!
+		.init(rawValue: .init(uncheckedUniqueElements: accounts.rawValue.elements.map(\.babylon)))!
 	}
 
 	public let factorSourceToSave: DeviceFactorSource?

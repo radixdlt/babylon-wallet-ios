@@ -15,15 +15,25 @@ extension AccountsToImport {
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
 				ScrollView {
-					VStack(spacing: .small1) {
+					VStack(spacing: .medium3) {
+						Text(L10n.ImportOlympiaAccounts.AccountsToImport.title)
+							.textStyle(.sheetTitle)
+							.foregroundColor(.app.gray1)
+							.multilineTextAlignment(.center)
+							.padding(.horizontal, .large2)
+
 						Text(L10n.ImportOlympiaAccounts.AccountsToImport.subtitle)
+							.textStyle(.body1Regular)
+							.foregroundColor(.app.gray1)
+							.multilineTextAlignment(.center)
+							.padding(.horizontal, .large2)
 
 						ForEach(viewStore.scannedAccounts) { account in
-							AccountRow(viewState: account.viewState)
+							AccountView(viewState: account.viewState)
+								.padding(.horizontal, .medium3)
 						}
 					}
-					.padding(.horizontal, .medium1)
-					.padding(.bottom, .medium2)
+					.padding(.bottom, .medium3)
 				}
 				.footer {
 					Button(viewStore.buttonTitle) {
@@ -32,14 +42,12 @@ extension AccountsToImport {
 					.buttonStyle(.primaryRectangular)
 				}
 			}
-			.navigationTitle(L10n.ImportOlympiaAccounts.AccountsToImport.title)
-			.navigationBarTitleDisplayMode(.large)
 		}
 	}
 }
 
 extension OlympiaAccountToMigrate {
-	public var viewState: AccountRow.ViewState {
+	public var viewState: AccountView.ViewState {
 		.init(
 			accountName: displayName?.rawValue ?? L10n.ImportOlympiaAccounts.AccountsToImport.unnamed,
 			olympiaAddress: address.address.rawValue,
@@ -50,8 +58,8 @@ extension OlympiaAccountToMigrate {
 	}
 }
 
-// MARK: - AccountRow
-public struct AccountRow: View {
+// MARK: - AccountView
+public struct AccountView: View {
 	public struct ViewState: Equatable {
 		public let accountName: String
 		public let olympiaAddress: String
@@ -67,34 +75,48 @@ public struct AccountRow: View {
 	}
 
 	public var body: some View {
-		VStack(alignment: .leading, spacing: .medium2) {
-			Text(viewState.accountName)
-				.textStyle(.secondaryHeader)
-				.foregroundColor(.white)
-				.padding(.bottom, .small2)
-			Text(viewState.olympiaAccountType.label)
-				.textStyle(.body2Regular)
-				.foregroundColor(.app.gray4)
+		HStack(spacing: 0) {
+			VStack(alignment: .leading, spacing: .small1) {
+				VPair(
+					heading: viewState.accountName,
+					largeHeading: true,
+					value: viewState.olympiaAccountType.label
+				)
 
-			Text(L10n.ImportOlympiaAccounts.AccountsToImport.olympiaAddressLabel)
-				.textStyle(.body2Link)
-				.foregroundColor(.white)
-				.padding(.bottom, .small2)
-			Text(viewState.olympiaAddress.formatted(.default))
-				.textStyle(.body2Regular)
-				.foregroundColor(.app.gray4)
+				VPair(
+					heading: L10n.ImportOlympiaAccounts.AccountsToImport.olympiaAddressLabel,
+					value: viewState.olympiaAddress.formatted(.default)
+				)
 
-			Text(L10n.ImportOlympiaAccounts.AccountsToImport.newAddressLabel)
-				.textStyle(.body2Link)
-				.foregroundColor(.white)
-				.padding(.bottom, .small2)
-			Text(viewState.derivationPath.formatted(.default))
-				.textStyle(.body2Regular)
-				.foregroundColor(.app.gray4)
+				VPair(
+					heading: L10n.ImportOlympiaAccounts.AccountsToImport.newAddressLabel,
+					value: viewState.derivationPath.formatted(.default)
+				)
+			}
+
+			Spacer(minLength: 0)
 		}
-		.padding(.medium1)
+		.padding(.vertical, .medium1)
+		.padding(.horizontal, .medium2)
 		.background(viewState.appearanceID.gradient)
 		.cornerRadius(.small1)
+	}
+
+	struct VPair: View {
+		let heading: String
+		var largeHeading: Bool = false
+		let value: String
+
+		var body: some View {
+			VStack(alignment: .leading, spacing: .small3) {
+				Text(heading)
+					.textStyle(largeHeading ? .secondaryHeader : .body2Link)
+					.foregroundColor(.white)
+				Text(value)
+					.textStyle(.body2Regular)
+					.foregroundColor(.app.gray4)
+			}
+		}
 	}
 }
 
