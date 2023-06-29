@@ -40,6 +40,7 @@ public struct ScanMultipleOlympiaQRCodes: Sendable, FeatureReducer {
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
+		case viewAppeared
 		case finishedScanning(ScannedParsedOlympiaWalletToMigrate)
 	}
 
@@ -105,7 +106,7 @@ public struct ScanMultipleOlympiaQRCodes: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .appeared:
-			return .none
+			return .send(.delegate(.viewAppeared))
 		}
 	}
 }
