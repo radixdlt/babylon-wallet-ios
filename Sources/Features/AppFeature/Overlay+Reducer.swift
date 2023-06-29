@@ -33,6 +33,7 @@ struct OverlayReducer: Sendable, FeatureReducer {
 
 	enum InternalAction: Sendable, Equatable {
 		case scheduleItem(OverlayWindowClient.Item)
+		case showNextItemIfPossible
 	}
 
 	enum ChildAction: Sendable, Equatable {
@@ -40,6 +41,7 @@ struct OverlayReducer: Sendable, FeatureReducer {
 	}
 
 	@Dependency(\.overlayWindowClient) var overlayWindowClient
+	@Dependency(\.continuousClock) var clock
 
 	var body: some ReducerProtocolOf<Self> {
 		Reduce(core)
@@ -70,7 +72,9 @@ struct OverlayReducer: Sendable, FeatureReducer {
 		switch internalAction {
 		case let .scheduleItem(event):
 			state.itemsQueue.append(event)
-			return showEventIfPossible(state: &state)
+			return showItemIfPossible(state: &state)
+		case .showNextItemIfPossible:
+			return showItemIfPossible(state: &state)
 		}
 	}
 
@@ -84,29 +88,31 @@ struct OverlayReducer: Sendable, FeatureReducer {
 		}
 	}
 
-	/// Sets the interaction enabled on the window, by implication this will also enable/disable the interaction
-	/// with the main app window. When showing an Alert, we don't want users to be able to interact with the main app window for example.
-	private func setIsUserInteractionEnabled(_ state: inout State, isEnabled: Bool) -> EffectTask<Action> {
-		Task { @MainActor [window = state.window] in
-			window.isUserInteractionEnabled = isEnabled
-		}
-		return .none
-	}
-
-	private func dismiss(_ state: inout State) -> EffectTask<Action> {
-		state.itemsQueue.removeFirst()
-		return setIsUserInteractionEnabled(&state, isEnabled: false)
-			.concatenate(with: showEventIfPossible(state: &state))
-	}
-
-	private func showEventIfPossible(state: inout State) -> EffectTask<Action> {
-		guard !state.isPresenting, !state.itemsQueue.isEmpty else {
+	private func showItemIfPossible(state: inout State) -> EffectTask<Action> {
+		guard !state.itemsQueue.isEmpty else {
 			return .none
 		}
 
-		let event = state.itemsQueue[0]
+		if state.isPresenting {
+			let presentedItem = state.itemsQueue[0]
 
-		switch event {
+			if case .hud = presentedItem {
+				// A HUD is force dismissed when next item comes in, AKA it is a lower priority.
+				state.hud = nil
+				state.itemsQueue.removeFirst()
+				return .run { send in
+					// Hacky - A very minor delay is needed before showing the next item is a HUD.
+					try await clock.sleep(for: .milliseconds(100))
+					await send(.internal(.showNextItemIfPossible))
+				}
+			} else {
+				return .none
+			}
+		}
+
+		let nextItem = state.itemsQueue[0]
+
+		switch nextItem {
 		case let .hud(hud):
 			state.hud = .init(content: hud)
 			return .none
@@ -117,11 +123,26 @@ struct OverlayReducer: Sendable, FeatureReducer {
 	}
 
 	private func dismissAlert(state: inout State, withAction action: OverlayWindowClient.Item.AlertAction) -> EffectTask<Action> {
-		let event = state.itemsQueue[0]
-		if case let .alert(state) = event {
+		let item = state.itemsQueue[0]
+		if case let .alert(state) = item {
 			overlayWindowClient.sendAlertAction(action, state.id)
 		}
 
 		return dismiss(&state)
+	}
+
+	private func dismiss(_ state: inout State) -> EffectTask<Action> {
+		state.itemsQueue.removeFirst()
+		return setIsUserInteractionEnabled(&state, isEnabled: false)
+			.concatenate(with: showItemIfPossible(state: &state))
+	}
+
+	/// Sets the interaction enabled on the window, by implication this will also enable/disable the interaction
+	/// with the main app window. When showing an Alert, we don't want users to be able to interact with the main app window for example.
+	private func setIsUserInteractionEnabled(_ state: inout State, isEnabled: Bool) -> EffectTask<Action> {
+		Task { @MainActor [window = state.window] in
+			window.isUserInteractionEnabled = isEnabled
+		}
+		return .none
 	}
 }

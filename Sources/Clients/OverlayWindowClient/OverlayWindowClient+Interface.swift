@@ -58,20 +58,35 @@ extension OverlayWindowClient {
 			case dismissed
 		}
 
-		public struct HUD: Sendable, Hashable {
-			public enum Icon: Sendable, Hashable {
+		public struct HUD: Sendable, Hashable, Identifiable {
+			public enum Icon: Sendable {
 				case asset(ImageAsset)
 				case system(String)
 			}
 
+			public let id: UUID
 			public let text: String
 			public let icon: Icon?
 			public let iconForegroundColor: Color?
 
-			public init(text: String, icon: Icon?, iconForegroundColor: Color?) {
+			public init(
+				id: UUID = UUID(),
+				text: String,
+				icon: Icon?,
+				iconForegroundColor: Color?
+			) {
+				self.id = id
 				self.text = text
 				self.icon = icon
 				self.iconForegroundColor = iconForegroundColor
+			}
+
+			public func hash(into hasher: inout Hasher) {
+				hasher.combine(id)
+			}
+
+			public static func == (lhs: HUD, rhs: HUD) -> Bool {
+				lhs.id == rhs.id
 			}
 		}
 
@@ -88,17 +103,6 @@ extension OverlayWindowClient {
 	public func schedule(alert: Item.AlertState) async -> Item.AlertAction {
 		scheduleAlert(alert)
 		return await onAlertAction(alert.id)
-	}
-}
-
-// MARK: - ImageAsset + Hashable
-extension ImageAsset: Hashable {
-	public static func == (lhs: ImageAsset, rhs: ImageAsset) -> Bool {
-		lhs.name == rhs.name
-	}
-
-	public func hash(into hasher: inout Hasher) {
-		hasher.combine(self.name)
 	}
 }
 
