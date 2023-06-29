@@ -128,6 +128,8 @@ extension DisplayMnemonics {
 					switch account.securityState {
 					case let .unsecured(unsecuredEntityControl):
 						return unsecuredEntityControl.transactionSigning.factorSourceID == factorSource.id
+					case let .securified(securified):
+						return securified.transactionSigningStructure.primaryRole.superAdminFactors.contains(where: { $0.factorSourceID == factorSource.id.embed() }) || securified.transactionSigningStructure.primaryRole.thresholdFactors.contains(where: { $0.factorSourceID == factorSource.id.embed() })
 					}
 				}
 				return AccountsForDeviceFactorSource(

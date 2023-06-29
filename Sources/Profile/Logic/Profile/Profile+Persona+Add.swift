@@ -28,6 +28,10 @@ extension Profile {
 			try self.factorSources.updateFactorSource(id: factorSourceID) {
 				try $0.increaseNextDerivationIndex(for: persona.kind, networkID: persona.networkID)
 			}
+		case .securified:
+			let errMsg = "CRITICAL ERROR: Do not know how or if we should update the `nextDerivationIndex` of any factor source with newly added Persona since its securityState was `securified`, i.e. not virtual."
+			loggerGlobal.critical(.init(stringLiteral: errMsg))
+			assertionFailure(errMsg)
 		}
 	}
 

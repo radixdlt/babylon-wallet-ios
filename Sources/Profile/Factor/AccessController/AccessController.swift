@@ -2,19 +2,14 @@ import Prelude
 
 // MARK: - AccessController
 public struct AccessController: Sendable, Hashable, Codable {
+	// FIXME: Replace with AccessControllerAddress from RET?
 	public struct Address: Sendable, Hashable, Codable {}
 
 	/// On ledger component address
 	public let address: Address
 
-	/// Time factor, used e.g. by recovery role, as a countdown until recovery automaticall
-	/// goes through.
-	public let time: Duration
-
 	public let securityStructure: ProfileSnapshot.AppliedSecurityStructure
 }
-
-public typealias AppliedSecurityStructure = AbstractSecurityStructure<FactorInstance>
 
 // MARK: - ProfileSnapshot.AppliedSecurityStructure
 extension ProfileSnapshot {

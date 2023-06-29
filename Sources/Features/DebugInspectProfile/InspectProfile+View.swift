@@ -669,6 +669,8 @@ extension EntityView {
 					unsecuredControl: unsecuredControl,
 					indentation: inOneLevel
 				)
+			case let .securified(securified):
+				Text("IMPL: Securified")
 			}
 
 			if let persona = self.entity as? Profile.Network.Persona {

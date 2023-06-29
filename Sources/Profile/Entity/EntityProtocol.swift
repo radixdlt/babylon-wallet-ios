@@ -15,15 +15,12 @@ public protocol EntityBaseProtocol {
 }
 
 extension EntityBaseProtocol {
-	public var virtualHierarchicalDeterministicFactorInstances: Set<HierarchicalDeterministicFactorInstance> {
-		var factorInstances = Set<HierarchicalDeterministicFactorInstance>()
+	public var primaryRoleSuperAdminFactorInstances: Set<HierarchicalDeterministicFactorInstance> {
 		switch securityState {
 		case let .unsecured(unsecuredEntityControl):
-			factorInstances.insert(unsecuredEntityControl.transactionSigning)
-			if let authSigning = unsecuredEntityControl.authenticationSigning {
-				factorInstances.insert(authSigning)
-			}
-			return factorInstances
+			return [unsecuredEntityControl.transactionSigning]
+		case let .securified(securified):
+			return Set(securified.transactionSigningStructure.primaryRole.superAdminFactors.map { try! $0.virtualHierarchicalDeterministic() })
 		}
 	}
 
@@ -31,6 +28,8 @@ extension EntityBaseProtocol {
 		switch securityState {
 		case let .unsecured(unsecuredEntityControl):
 			return unsecuredEntityControl.authenticationSigning != nil
+		case let .securified(securified):
+			return securified.authenticationSigning != nil
 		}
 	}
 }

@@ -50,11 +50,9 @@ public struct GetAuthKeyDerivationPath: Sendable, FeatureReducer {
 
 				let factorSourceID: FactorSourceID
 				let authSignDerivationPath: DerivationPath
-				let unsecuredEntityControl: UnsecuredEntityControl
 
 				switch entity.securityState {
-				case let .unsecured(unsecuredEntityControl_):
-					unsecuredEntityControl = unsecuredEntityControl_
+				case let .unsecured(unsecuredEntityControl):
 					guard unsecuredEntityControl.authenticationSigning == nil else {
 						loggerGlobal.notice("Entity: \(entity) already has an authenticationSigning")
 						await send(.delegate(.entityAlreadyHasAuthenticationSigningKey))
@@ -75,6 +73,8 @@ public struct GetAuthKeyDerivationPath: Sendable, FeatureReducer {
 							keyKind: .authenticationSigning
 						).wrapAsDerivationPath()
 					}
+				case .securified:
+					await send(.delegate(.entityAlreadyHasAuthenticationSigningKey))
 				}
 
 				guard let factorSource = try await factorSourcesClient.getFactorSource(id: factorSourceID) else {
@@ -229,6 +229,7 @@ public struct CreateAuthKey: Sendable, FeatureReducer {
 			}
 
 			return .run { [entity = state.entity] send in
+
 				switch entity {
 				case var .account(account):
 					switch account.securityState {
@@ -236,19 +237,27 @@ public struct CreateAuthKey: Sendable, FeatureReducer {
 						assert(entityControl.authenticationSigning == nil)
 						entityControl.authenticationSigning = authenticationSigningFactorInstance
 						account.securityState = .unsecured(entityControl)
-						try await accountsClient.updateAccount(account)
-						await send(.internal(.finishedSettingFactorInstance))
+					case var .securified(securified):
+						assert(securified.authenticationSigning == nil)
+						securified.authenticationSigning = authenticationSigningFactorInstance
+						account.securityState = .securified(securified)
 					}
+					try await accountsClient.updateAccount(account)
 				case var .persona(persona):
 					switch persona.securityState {
 					case var .unsecured(entityControl):
 						assert(entityControl.authenticationSigning == nil)
 						entityControl.authenticationSigning = authenticationSigningFactorInstance
 						persona.securityState = .unsecured(entityControl)
-						try await personasClient.updatePersona(persona)
-						await send(.internal(.finishedSettingFactorInstance))
+					case var .securified(securified):
+						assert(securified.authenticationSigning == nil)
+						securified.authenticationSigning = authenticationSigningFactorInstance
+						persona.securityState = .securified(securified)
 					}
+					try await personasClient.updatePersona(persona)
 				}
+
+				await send(.internal(.finishedSettingFactorInstance))
 			}
 
 		default:

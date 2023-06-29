@@ -13,6 +13,8 @@ public enum EntitySecurityState:
 	/// with single factor instance until securified, and
 	/// thus protected with an "AccessControl".
 	case unsecured(UnsecuredEntityControl)
+
+	case securified(Securified)
 }
 
 extension EntitySecurityState {
@@ -20,6 +22,8 @@ extension EntitySecurityState {
 		switch self {
 		case let .unsecured(unsecuredEntityControl):
 			return "EntitySecurityState.unsecured(\(unsecuredEntityControl)"
+		case let .securified(securified):
+			return "EntitySecurityState.securified(\(securified)"
 		}
 	}
 
@@ -34,16 +38,17 @@ extension EntitySecurityState {
 
 extension EntitySecurityState {
 	internal enum Discriminator: String, Sendable, Equatable, Codable {
-		case unsecured
+		case unsecured, securified
 	}
 
 	public enum CodingKeys: String, CodingKey {
-		case discriminator, unsecuredEntityControl
+		case discriminator, unsecuredEntityControl, securified
 	}
 
 	internal var discriminator: Discriminator {
 		switch self {
 		case .unsecured: return .unsecured
+		case .securified: return .securified
 		}
 	}
 
@@ -53,6 +58,8 @@ extension EntitySecurityState {
 		switch self {
 		case let .unsecured(unsecuredEntityControl):
 			try keyedContainer.encode(unsecuredEntityControl, forKey: .unsecuredEntityControl)
+		case let .securified(securified):
+			try keyedContainer.encode(securified, forKey: .securified)
 		}
 	}
 
@@ -62,6 +69,8 @@ extension EntitySecurityState {
 		switch discriminator {
 		case .unsecured:
 			self = try .unsecured(keyedContainer.decode(UnsecuredEntityControl.self, forKey: .unsecuredEntityControl))
+		case .securified:
+			self = try .securified(keyedContainer.decode(Securified.self, forKey: .securified))
 		}
 	}
 }

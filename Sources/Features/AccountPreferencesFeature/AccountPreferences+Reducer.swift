@@ -30,8 +30,6 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 		var destination: Destination.State? = nil
 
 		#if DEBUG
-		public var canUpdateSecurityState: Bool
-
 		public var canCreateAuthSigningKey: Bool
 		public var canTurnIntoDappDefinitionAccountType: Bool
 		public var createFungibleTokenButtonState: ControlState
@@ -48,7 +46,6 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 			self.faucetButtonState = faucetButtonState
 
 			#if DEBUG
-			self.canUpdateSecurityState = true
 			self.canCreateAuthSigningKey = false
 			self.canTurnIntoDappDefinitionAccountType = false
 			self.createFungibleTokenButtonState = .enabled

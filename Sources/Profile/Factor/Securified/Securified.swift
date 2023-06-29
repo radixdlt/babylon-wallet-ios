@@ -8,12 +8,39 @@ public struct Securified: Sendable, Hashable, Codable {
 	private var transactionSigningFactorInstances: OrderedSet<FactorInstance>
 
 	/// The factor instance which can be used for ROLA.
-	public var authenticationSigning: HierarchicalDeterministicFactorInstance?
+	public var authenticationSigning: HierarchicalDeterministicFactorInstance
+
 	/// The factor instance used to encrypt/decrypt messages
-	public var messageEncryption: HierarchicalDeterministicFactorInstance?
+	public var messageEncryption: HierarchicalDeterministicFactorInstance
+
+	// N.B We MUST set the `authenticationSigning` and the `messageEncryption` factor instance
+	// part of securifying the entity because we use the `UnsecuredEntityControl`'s
+	// `transactionSigningFactorInstance`'s derivationPath as a base for the derivation path
+	// for the authenticationSigning and messageEncryption factor instance respectively.
+	// Otherwise we have no natural derivation path...?
+	init(
+		accessController: AccessController,
+		transactionSigningFactorInstances: OrderedSet<FactorInstance>,
+		authenticationSigning: HierarchicalDeterministicFactorInstance,
+		messageEncryption: HierarchicalDeterministicFactorInstance
+	) throws {
+		guard transactionSigningFactorInstances.allSatisfy({
+			switch $0.badge {
+			case let .virtual(.hierarchicalDeterministic(hdPubKey)):
+				return hdPubKey.publicKey.curve != .secp256k1
+			}
+		}) else {
+			struct Secp256k1NotAllowedInSecurifiedEntities: Swift.Error {}
+			throw Secp256k1NotAllowedInSecurifiedEntities()
+		}
+		self.accessController = accessController
+		self.transactionSigningFactorInstances = transactionSigningFactorInstances
+		self.authenticationSigning = authenticationSigning
+		self.messageEncryption = messageEncryption
+	}
 
 	/// Maps from `FactorInstance.ID` to `FactorInstance`, which is what is useful for use through out the wallet.
-	var transactionSigningStructure: AppliedSecurityStructure {
+	public var transactionSigningStructure: AppliedSecurityStructure {
 		func decorate<R: RoleProtocol>(
 			_ keyPath: KeyPath<ProfileSnapshot.AppliedSecurityStructure, RoleOfTier<R, FactorInstance.ID>>
 		) throws -> RoleOfTier<R, FactorInstance> {
@@ -43,3 +70,5 @@ public struct Securified: Sendable, Hashable, Codable {
 		)
 	}
 }
+
+public typealias AppliedSecurityStructure = AbstractSecurityStructure<FactorInstance>

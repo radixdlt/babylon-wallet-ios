@@ -61,7 +61,7 @@ extension GatewayAPI.TransactionPreviewRequest {
 			costUnitLimit: .init(header.costUnitLimit),
 			tipPercentage: .init(header.tipPercentage),
 			nonce: .init(header.nonce.rawValue),
-			signerPublicKeys: transactionSigners.signerPublicKeys.map(GatewayAPI.PublicKey.init(from:)),
+			signerPublicKeys: transactionSigners.primaryRoleSuperAdminPublicKeys.map(GatewayAPI.PublicKey.init(from:)),
 			flags: flags
 		)
 	}
@@ -75,10 +75,10 @@ extension TransactionSigners {
 		}
 	}
 
-	public var signerPublicKeys: Set<SLIP10.PublicKey> {
+	public var primaryRoleSuperAdminPublicKeys: Set<SLIP10.PublicKey> {
 		switch intentSigning {
 		case let .intentSigners(signers):
-			return Set(signers.flatMap { $0.virtualHierarchicalDeterministicFactorInstances.map(\.publicKey) })
+			return Set(signers.flatMap { $0.primaryRoleSuperAdminFactorInstances.map(\.publicKey) })
 		case .notaryAsSignatory:
 			return []
 		}

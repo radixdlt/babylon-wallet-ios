@@ -134,6 +134,9 @@ extension Profile.Network.Account {
 			if case .ecdsaSecp256k1 = control.transactionSigning.publicKey {
 				return true
 			}
+		case .securified:
+			// We do not allow `secp256k1` factor sources in Securified entities.
+			return false
 		}
 		return false
 	}

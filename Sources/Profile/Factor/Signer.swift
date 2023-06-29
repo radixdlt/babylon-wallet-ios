@@ -15,30 +15,30 @@ public struct Signer: Sendable, Hashable, Identifiable {
 	public var id: ID { entity }
 	public let entity: EntityPotentiallyVirtual
 
-	public let factorInstancesRequiredToSign: Set<HierarchicalDeterministicFactorInstance>
+	public let primaryRoleSuperAdminFactorInstances: Set<HierarchicalDeterministicFactorInstance>
 
 	init(
-		factorInstancesRequiredToSign: Set<HierarchicalDeterministicFactorInstance>,
+		primaryRoleSuperAdminFactorInstances: Set<HierarchicalDeterministicFactorInstance>,
 		of entity: EntityPotentiallyVirtual
 	) throws {
 		guard
-			entity.virtualHierarchicalDeterministicFactorInstances
-			.isSuperset(of: factorInstancesRequiredToSign)
+			entity.primaryRoleSuperAdminFactorInstances
+			.isSuperset(of: primaryRoleSuperAdminFactorInstances)
 		else {
 			struct FoundUnrelatedFactorInstances: Swift.Error {}
 			throw FoundUnrelatedFactorInstances()
 		}
-		self.factorInstancesRequiredToSign = factorInstancesRequiredToSign
+		self.primaryRoleSuperAdminFactorInstances = primaryRoleSuperAdminFactorInstances
 		self.entity = entity
 	}
 
 	public init(
-		factorInstanceRequiredToSign: HierarchicalDeterministicFactorInstance,
+		primaryRoleSuperAdminFactorInstance: HierarchicalDeterministicFactorInstance,
 		entity: EntityPotentiallyVirtual
 	) throws {
 		try self.init(
-			factorInstancesRequiredToSign: [
-				factorInstanceRequiredToSign,
+			primaryRoleSuperAdminFactorInstances: [
+				primaryRoleSuperAdminFactorInstance,
 			],
 			of: entity
 		)
@@ -57,8 +57,8 @@ public enum EntityPotentiallyVirtual: Sendable, Hashable, EntityBaseProtocol, Id
 
 	case account(Profile.Network.Account)
 	case persona(Profile.Network.Persona)
-	public var virtualHierarchicalDeterministicFactorInstances: Set<HierarchicalDeterministicFactorInstance> {
-		property(\.virtualHierarchicalDeterministicFactorInstances)
+	public var primaryRoleSuperAdminFactorInstances: Set<HierarchicalDeterministicFactorInstance> {
+		property(\.primaryRoleSuperAdminFactorInstances)
 	}
 
 	public func asAccount() throws -> Profile.Network.Account {
