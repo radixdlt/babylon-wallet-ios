@@ -11,6 +11,8 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 	public typealias AccountsToMigrate = NonEmpty<OrderedSet<OlympiaAccountToMigrate>>
 	public typealias MigratedAccounts = IdentifiedArrayOf<Profile.Network.Account>
 
+	// MARK: State
+
 	public struct State: Sendable, Hashable {
 		public var scanQR: ScanMultipleOlympiaQRCodes.State = .init()
 		public var path: StackState<Path.State> = .init()
@@ -19,6 +21,8 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 
 		public init() {}
 	}
+
+	// MARK: Progress
 
 	enum Progress: Sendable, Hashable {
 		case start
@@ -52,36 +56,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 		}
 	}
 
-	public struct Path: Sendable, ReducerProtocol {
-		public enum State: Sendable, Hashable {
-			case accountsToImport(AccountsToImport.State)
-			case importMnemonic(ImportMnemonic.State)
-			case importOlympiaLedgerAccountsAndFactorSources(ImportOlympiaLedgerAccountsAndFactorSources.State)
-			case completion(CompletionMigrateOlympiaAccountsToBabylon.State)
-		}
-
-		public enum Action: Sendable, Equatable {
-			case accountsToImport(AccountsToImport.Action)
-			case importMnemonic(ImportMnemonic.Action)
-			case importOlympiaLedgerAccountsAndFactorSources(ImportOlympiaLedgerAccountsAndFactorSources.Action)
-			case completion(CompletionMigrateOlympiaAccountsToBabylon.Action)
-		}
-
-		public var body: some ReducerProtocolOf<Self> {
-			Scope(state: /State.accountsToImport, action: /Action.accountsToImport) {
-				AccountsToImport()
-			}
-			Scope(state: /State.importMnemonic, action: /Action.importMnemonic) {
-				ImportMnemonic()
-			}
-			Scope(state: /State.importOlympiaLedgerAccountsAndFactorSources, action: /Action.importOlympiaLedgerAccountsAndFactorSources) {
-				ImportOlympiaLedgerAccountsAndFactorSources()
-			}
-			Scope(state: /State.completion, action: /Action.completion) {
-				CompletionMigrateOlympiaAccountsToBabylon()
-			}
-		}
-	}
+	// MARK: Action
 
 	public enum ViewAction: Sendable, Equatable {
 		case closeButtonTapped
@@ -113,6 +88,41 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 		case dismiss
 	}
 
+	// MARK: Path
+
+	public struct Path: Sendable, ReducerProtocol {
+		public enum State: Sendable, Hashable {
+			case accountsToImport(AccountsToImport.State)
+			case importMnemonic(ImportMnemonic.State)
+			case importOlympiaLedgerAccountsAndFactorSources(ImportOlympiaLedgerAccountsAndFactorSources.State)
+			case completion(CompletionMigrateOlympiaAccountsToBabylon.State)
+		}
+
+		public enum Action: Sendable, Equatable {
+			case accountsToImport(AccountsToImport.Action)
+			case importMnemonic(ImportMnemonic.Action)
+			case importOlympiaLedgerAccountsAndFactorSources(ImportOlympiaLedgerAccountsAndFactorSources.Action)
+			case completion(CompletionMigrateOlympiaAccountsToBabylon.Action)
+		}
+
+		public var body: some ReducerProtocolOf<Self> {
+			Scope(state: /State.accountsToImport, action: /Action.accountsToImport) {
+				AccountsToImport()
+			}
+			Scope(state: /State.importMnemonic, action: /Action.importMnemonic) {
+				ImportMnemonic()
+			}
+			Scope(state: /State.importOlympiaLedgerAccountsAndFactorSources, action: /Action.importOlympiaLedgerAccountsAndFactorSources) {
+				ImportOlympiaLedgerAccountsAndFactorSources()
+			}
+			Scope(state: /State.completion, action: /Action.completion) {
+				CompletionMigrateOlympiaAccountsToBabylon()
+			}
+		}
+	}
+
+	// MARK: Reducer
+
 	@Dependency(\.factorSourcesClient) var factorSourcesClient
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.importLegacyWalletClient) var importLegacyWalletClient
@@ -128,6 +138,64 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 				Path()
 			}
 	}
+
+	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+		switch viewAction {
+		case .closeButtonTapped:
+			return .send(.delegate(.dismiss))
+		}
+	}
+
+	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+		switch childAction {
+		case let .scanQR(.delegate(.finishedScanning(olympiaWallet))):
+			return finishedScanning(in: &state, olympiaWallet: olympiaWallet)
+
+		case let .path(.element(_, action: pathAction)):
+			return reduce(into: &state, pathAction: pathAction)
+
+		default:
+			return .none
+		}
+	}
+
+	public func reduce(into state: inout State, pathAction: Path.Action) -> EffectTask<Action> {
+		switch pathAction {
+		case .accountsToImport(.delegate(.continueImport)):
+			return continueImporting(in: &state)
+
+		case let .importMnemonic(.delegate(.notSavedInProfile(mnemonicWithPassphrase))):
+			return importedMnemonic(in: &state, mnemonicWithPassphrase: mnemonicWithPassphrase)
+
+		case let .importOlympiaLedgerAccountsAndFactorSources(.delegate(.completed(ledgersWithAccounts, unvalidatedAccounts))):
+			return importedOlympiaLedgerAccountsAndFactorSources(in: &state, ledgersWithAccounts: ledgersWithAccounts, unvalidated: unvalidatedAccounts)
+
+		case .completion(.delegate(.finishedMigration)):
+			return .send(.delegate(.finishedMigration))
+
+		default:
+			return .none
+		}
+	}
+
+	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
+		switch internalAction {
+		case let .foundAlreadyImportedOlympiaSoftwareAccounts(alreadyImported):
+			return foundAlreadyImportedAccounts(in: &state, alreadyImported: alreadyImported)
+
+		case let .checkedIfOlympiaFactorSourceAlreadyExists(idOfExistingFactorSource, softwareAccounts):
+			return checkedIfOlympiaFactorSourceAlreadyExists(in: &state, idOfExistingFactorSource: idOfExistingFactorSource, softwareAccounts: softwareAccounts)
+
+		case let .migratedSoftwareAccountsToBabylon(softwareAccounts):
+			return migratedSoftwareAccountsToBabylon(in: &state, softwareAccounts: softwareAccounts)
+
+		case let .setDestination(destination):
+			state.path.append(destination)
+			return .none
+		}
+	}
+
+	// MARK: Main logic
 
 	private func finishedScanning(
 		in state: inout State,
@@ -336,8 +404,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 					previouslyMigratedAccounts: progress.previouslyImported,
 					migratedAccounts: softwareAccounts.babylonAccounts.rawValue,
 					unvalidatedOlympiaHardwareAccounts: nil
-				)
-				)
+				))
 			)
 		}
 	}
@@ -370,65 +437,8 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 				previouslyMigratedAccounts: progress.previouslyImported,
 				migratedAccounts: progress.softwareAccounts + hardwareAccounts,
 				unvalidatedOlympiaHardwareAccounts: unvalidatedHardwareAccounts
-			)
-			)
+			))
 		)
-	}
-
-	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
-		switch viewAction {
-		case .closeButtonTapped:
-			return .send(.delegate(.dismiss))
-		}
-	}
-
-	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
-		switch childAction {
-		case let .scanQR(.delegate(.finishedScanning(olympiaWallet))):
-			return finishedScanning(in: &state, olympiaWallet: olympiaWallet)
-
-		case let .path(.element(_, action: pathAction)):
-			return reduce(into: &state, pathAction: pathAction)
-
-		default:
-			return .none
-		}
-	}
-
-	public func reduce(into state: inout State, pathAction: Path.Action) -> EffectTask<Action> {
-		switch pathAction {
-		case .accountsToImport(.delegate(.continueImport)):
-			return continueImporting(in: &state)
-
-		case let .importMnemonic(.delegate(.notSavedInProfile(mnemonicWithPassphrase))):
-			return importedMnemonic(in: &state, mnemonicWithPassphrase: mnemonicWithPassphrase)
-
-		case let .importOlympiaLedgerAccountsAndFactorSources(.delegate(.completed(ledgersWithAccounts, unvalidatedAccounts))):
-			return importedOlympiaLedgerAccountsAndFactorSources(in: &state, ledgersWithAccounts: ledgersWithAccounts, unvalidated: unvalidatedAccounts)
-
-		case .completion(.delegate(.finishedMigration)):
-			return .send(.delegate(.finishedMigration))
-
-		default:
-			return .none
-		}
-	}
-
-	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
-		switch internalAction {
-		case let .foundAlreadyImportedOlympiaSoftwareAccounts(alreadyImported):
-			return foundAlreadyImportedAccounts(in: &state, alreadyImported: alreadyImported)
-
-		case let .checkedIfOlympiaFactorSourceAlreadyExists(idOfExistingFactorSource, softwareAccounts):
-			return checkedIfOlympiaFactorSourceAlreadyExists(in: &state, idOfExistingFactorSource: idOfExistingFactorSource, softwareAccounts: softwareAccounts)
-
-		case let .migratedSoftwareAccountsToBabylon(softwareAccounts):
-			return migratedSoftwareAccountsToBabylon(in: &state, softwareAccounts: softwareAccounts)
-
-		case let .setDestination(destination):
-			state.path.append(destination)
-			return .none
-		}
 	}
 }
 
