@@ -103,9 +103,8 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 		case migratedSoftwareAccountsToBabylon(
 			MigratedSoftwareAccounts
 		)
-		case migrateHardwareAccounts(
-			AccountsToMigrate,
-			NetworkID
+		case setDestination(
+			Path.State
 		)
 	}
 
@@ -171,11 +170,12 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 			softwareAccountsToMigrate: softwareAccounts,
 			hardwareAccountsToMigrate: hardwareAccounts
 		))
-		state.path.append(
-			.accountsToImport(.init(scannedAccounts: progress.accountsToMigrate))
-		)
 
-		return .none
+		return .setDestination(
+			.accountsToImport(.init(
+				scannedAccounts: progress.accountsToMigrate
+			))
+		)
 	}
 
 	private func continueImporting(
@@ -188,11 +188,12 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 		} else if let hardwareAccounts = progress.hardwareAccountsToMigrate {
 			return migrateHardwareAccounts(hardwareAccounts)
 		} else {
-			return complete(
-				in: &state,
-				previouslyImported: progress.previouslyImported,
-				migratedAccounts: [],
-				unvalidatedHardwareAccounts: nil
+			return .setDestination(
+				.completion(.init(
+					previouslyMigratedAccounts: progress.previouslyImported,
+					migratedAccounts: [],
+					unvalidatedOlympiaHardwareAccounts: nil
+				))
 			)
 		}
 	}
@@ -220,9 +221,11 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 		))
 
 		guard let idOfExistingFactorSource else {
-			return importMnemonic(
-				in: &state,
-				expectedMnemonicWordCount: progress.expectedMnemonicWordCount
+			return .setDestination(
+				.importMnemonic(.init(
+					persistAsMnemonicKind: nil,
+					wordCount: progress.expectedMnemonicWordCount
+				))
 			)
 		}
 
@@ -231,20 +234,6 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 			factorSourceID: idOfExistingFactorSource,
 			factorSource: nil
 		)
-	}
-
-	private func importMnemonic(
-		in state: inout State,
-		expectedMnemonicWordCount: BIP39.WordCount
-	) -> EffectTask<Action> {
-		state.path.append(
-			.importMnemonic(.init(
-				persistAsMnemonicKind: nil,
-				wordCount: expectedMnemonicWordCount
-			))
-		)
-
-		return .none
 	}
 
 	private func importedMnemonic(
@@ -342,11 +331,13 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 			// also need to add ledger and then migrate hardware account
 			return migrateHardwareAccounts(hardwareAccounts)
 		} else {
-			return complete(
-				in: &state,
-				previouslyImported: progress.previouslyImported,
-				migratedAccounts: softwareAccounts.babylonAccounts.rawValue,
-				unvalidatedHardwareAccounts: nil
+			return .setDestination(
+				.completion(.init(
+					previouslyMigratedAccounts: progress.previouslyImported,
+					migratedAccounts: softwareAccounts.babylonAccounts.rawValue,
+					unvalidatedOlympiaHardwareAccounts: nil
+				)
+				)
 			)
 		}
 	}
@@ -356,22 +347,13 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 	) -> EffectTask<Action> {
 		.task {
 			let networkID = await factorSourcesClient.getCurrentNetworkID()
-			return .internal(.migrateHardwareAccounts(hardwareAccounts, networkID))
-		}
-	}
-
-	private func migrateHardwareAccounts(
-		in state: inout State,
-		hardwareAccounts: AccountsToMigrate,
-		networkID: NetworkID
-	) -> EffectTask<Action> {
-		state.path.append(
-			.importOlympiaLedgerAccountsAndFactorSources(.init(
-				hardwareAccounts: hardwareAccounts,
-				networkID: networkID
+			return .internal(.setDestination(
+				.importOlympiaLedgerAccountsAndFactorSources(.init(
+					hardwareAccounts: hardwareAccounts,
+					networkID: networkID
+				))
 			))
-		)
-		return .none
+		}
 	}
 
 	private func importedOlympiaLedgerAccountsAndFactorSources(
@@ -383,27 +365,14 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 
 		let hardwareAccounts = IdentifiedArray(uniqueElements: ledgersWithAccounts.flatMap { $0.migratedAccounts.map(\.babylon) })
 
-		return complete(
-			in: &state,
-			previouslyImported: progress.previouslyImported,
-			migratedAccounts: progress.softwareAccounts + hardwareAccounts,
-			unvalidatedHardwareAccounts: unvalidatedHardwareAccounts
-		)
-	}
-
-	public func complete(
-		in state: inout State,
-		previouslyImported: [OlympiaAccountToMigrate],
-		migratedAccounts: MigratedAccounts,
-		unvalidatedHardwareAccounts: Set<OlympiaAccountToMigrate>?
-	) -> EffectTask<Action> {
-		state.path.append(
+		return .setDestination(
 			.completion(.init(
-				migratedAccounts: .init(rawValue: migratedAccounts)!,
-				unvalidatedOlympiaHardwareAccounts: []
-			))
+				previouslyMigratedAccounts: progress.previouslyImported,
+				migratedAccounts: progress.softwareAccounts + hardwareAccounts,
+				unvalidatedOlympiaHardwareAccounts: unvalidatedHardwareAccounts
+			)
+			)
 		)
-		return .none
 	}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
@@ -456,9 +425,16 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 		case let .migratedSoftwareAccountsToBabylon(softwareAccounts):
 			return migratedSoftwareAccountsToBabylon(in: &state, softwareAccounts: softwareAccounts)
 
-		case let .migrateHardwareAccounts(hardwareAccounts, networkID):
-			return migrateHardwareAccounts(in: &state, hardwareAccounts: hardwareAccounts, networkID: networkID)
+		case let .setDestination(destination):
+			state.path.append(destination)
+			return .none
 		}
+	}
+}
+
+extension EffectTask<ImportOlympiaWalletCoordinator.Action> {
+	static func setDestination(_ destination: ImportOlympiaWalletCoordinator.Path.State) -> EffectTask {
+		.send(.internal(.setDestination(destination)))
 	}
 }
 
