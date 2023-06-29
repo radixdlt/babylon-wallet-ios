@@ -23,11 +23,11 @@ public struct ManageSecurityStructureCoordinator: Sendable, FeatureReducer {
 		public init(mode: Mode = .new) {
 			self.mode = mode
 			switch mode {
-			case let .existing(config) where config.isSimple:
-				self.root = .simpleSetupFlow(.init(mode: .existing(config)))
-			case let .existing(config) where !config.isSimple:
-				self.root = .advancedSetupFlow(.init(mode: .existing(config)))
-			case .existing: preconditionFailure("Already handled above")
+			case let .existing(config):
+				self.root = config.isSimple
+					? .simpleSetupFlow(.init(mode: .existing(config)))
+					: .advancedSetupFlow(.init(mode: .existing(config)))
+
 			case .new:
 				self.root = .start(.init())
 			}

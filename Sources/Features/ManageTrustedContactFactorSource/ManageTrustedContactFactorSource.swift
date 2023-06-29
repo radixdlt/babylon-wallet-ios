@@ -144,7 +144,6 @@ public struct ManageTrustedContactFactorSource: Sendable, FeatureReducer {
 			return .none
 
 		case let .continueButtonTapped(accountAddress, emailAddress, name):
-//			return .send(.delegate(.done()))
 			return .task {
 				let result = await TaskResult {
 					let factorSource = TrustedContactFactorSource.from(
