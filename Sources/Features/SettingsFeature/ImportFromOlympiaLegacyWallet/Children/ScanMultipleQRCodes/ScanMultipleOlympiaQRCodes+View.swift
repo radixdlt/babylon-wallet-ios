@@ -34,7 +34,7 @@ extension ScanMultipleOlympiaQRCodes {
 					.padding(.horizontal, .large2)
 
 				WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-					if let numberOfPayloadsToScan = viewStore.numberOfPayloadsToScan {
+					if let numberOfPayloadsToScan = viewStore.numberOfPayloadsToScan, numberOfPayloadsToScan > 1 {
 						Text(L10n.ImportOlympiaAccounts.ScanQR.scannedLabel(viewStore.numberOfPayloadsScanned, numberOfPayloadsToScan))
 							.padding(.top, .medium1)
 					}
@@ -44,6 +44,9 @@ extension ScanMultipleOlympiaQRCodes {
 				ScanQRCoordinator.View(store: scanStore)
 
 				Spacer(minLength: 0)
+			}
+			.onAppear {
+				ViewStore(store).send(.view(.appeared))
 			}
 		}
 	}

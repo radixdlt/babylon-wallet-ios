@@ -7,16 +7,15 @@ public struct AccountsToImport: Sendable, FeatureReducer {
 		public let scannedAccounts: [ImportableAccount]
 
 		public init(
+			networkID: NetworkID,
 			scannedAccounts: NonEmpty<OrderedSet<OlympiaAccountToMigrate>>
 		) {
 			@Dependency(\.engineToolkitClient) var engineToolkitClient
 
-			let networkId = Radix.Gateway.default.network.id
-
 			self.scannedAccounts = scannedAccounts.map { account in
 				let babylonAddress = try? engineToolkitClient.deriveVirtualAccountAddress(.init(
 					publicKey: .ecdsaSecp256k1(account.publicKey.intoEngine()),
-					networkId: networkId
+					networkId: networkID
 				))
 
 				return .init(
@@ -24,18 +23,17 @@ public struct AccountsToImport: Sendable, FeatureReducer {
 					olympiaAddress: account.address,
 					bablyonAddress: babylonAddress,
 					appearanceID: .fromIndex(Int(account.addressIndex)),
-					derivationPath: account.path.derivationPath,
 					olympiaAccountType: account.accountType
 				)
 			}
 		}
 
-		public struct ImportableAccount: Sendable, Hashable {
+		public struct ImportableAccount: Sendable, Hashable, Identifiable {
+			public var id: LegacyOlympiaAccountAddress { olympiaAddress }
 			public let accountName: String?
 			public let olympiaAddress: LegacyOlympiaAccountAddress
 			public let bablyonAddress: ComponentAddress?
 			public let appearanceID: Profile.Network.Account.AppearanceID
-			public let derivationPath: String
 			public let olympiaAccountType: Olympia.AccountType
 		}
 	}
