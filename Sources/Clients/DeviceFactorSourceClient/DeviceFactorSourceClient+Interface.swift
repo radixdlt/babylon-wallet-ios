@@ -75,6 +75,12 @@ public struct SignatureFromOnDeviceHDRequest: Sendable, Hashable {
 	}
 }
 
+func extractPrimaryRoleSuperAdminDeviceFactorInstance(from securified: Securified) throws -> HierarchicalDeterministicFactorInstance {
+	guard let factor = try? securified.transactionSigningStructure.primaryRole.superAdminFactors.first(where: { $0.factorSourceKind == .device })?.virtualHierarchicalDeterministic() else {
+		throw ExpectedToSignTransactionWithEntityWhichIsSecurifiedButPrimaryRoleContainsNoSuperAdminFactorOfKindDevice()
+	}
+}
+
 // MARK: - FailedToDeviceFactorSourceForSigning
 struct FailedToDeviceFactorSourceForSigning: Swift.Error {}
 
@@ -89,35 +95,42 @@ extension DeviceFactorSourceClient {
 		@Dependency(\.factorSourcesClient) var factorSourcesClient
 		@Dependency(\.secureStorageClient) var secureStorageClient
 
-		switch signerEntity.securityState {
-		case let .unsecured(control):
-			let factorInstance = {
+		let factorInstance = try {
+			switch signerEntity.securityState {
+			case let .unsecured(control):
 				switch purpose {
 				case .signAuth:
 					return control.authenticationSigning ?? control.transactionSigning
 				case .signTransaction:
 					return control.transactionSigning
 				}
-			}()
-
-			guard
-				let deviceFactorSource = try await factorSourcesClient.getDeviceFactorSource(of: factorInstance)
-			else {
-				throw FailedToDeviceFactorSourceForSigning()
+			case let .securified(securified):
+				switch purpose {
+				case .signAuth:
+					return securified.authenticationSigning
+				case .signTransaction:
+					return try extractPrimaryRoleSuperAdminDeviceFactorInstance(from: securified)
+				}
 			}
+		}()
 
-			let signatures = try await signUsingDeviceFactorSource(
-				deviceFactorSource: deviceFactorSource,
-				signerEntities: [signerEntity],
-				unhashedDataToSign: unhashedDataToSign,
-				purpose: purpose
-			)
-
-			guard let signature = signatures.first, signatures.count == 1 else {
-				throw IncorrectSignatureCountExpectedExactlyOne()
-			}
-			return signature
+		guard
+			let deviceFactorSource = try await factorSourcesClient.getDeviceFactorSource(of: factorInstance)
+		else {
+			throw FailedToDeviceFactorSourceForSigning()
 		}
+
+		let signatures = try await signUsingDeviceFactorSource(
+			deviceFactorSource: deviceFactorSource,
+			signerEntities: [signerEntity],
+			unhashedDataToSign: unhashedDataToSign,
+			purpose: purpose
+		)
+
+		guard let signature = signatures.first, signatures.count == 1 else {
+			throw IncorrectSignatureCountExpectedExactlyOne()
+		}
+		return signature
 	}
 
 	public func signUsingDeviceFactorSource(
@@ -141,49 +154,56 @@ extension DeviceFactorSourceClient {
 		var signatures = Set<SignatureOfEntity>()
 
 		for entity in signerEntities {
-			switch entity.securityState {
-			case let .unsecured(unsecuredControl):
+			let factorInstance = try {
+				switch entity.securityState {
+				case let .unsecured(unsecuredControl):
 
-				let factorInstance = {
 					switch purpose {
 					case .signAuth:
 						return unsecuredControl.authenticationSigning ?? unsecuredControl.transactionSigning
 					case .signTransaction:
 						return unsecuredControl.transactionSigning
 					}
-				}()
-
-				let derivationPath = factorInstance.derivationPath
-
-				if factorInstance.factorSourceID != factorSourceID {
-					let errMsg = "Discrepancy, you specified to use a device factor source you beleived to be the one controlling the entity, but it does not match the genesis factor source id."
-					loggerGlobal.critical(.init(stringLiteral: errMsg))
-					assertionFailure(errMsg)
+				case let .securified(securified):
+					switch purpose {
+					case .signAuth:
+						return securified.authenticationSigning
+					case .signTransaction:
+						return try extractPrimaryRoleSuperAdminDeviceFactorInstance(from: securified)
+					}
 				}
-				let curve = factorInstance.publicKey.curve
+			}()
 
-				loggerGlobal.debug("🔏 Signing data with device, with entity=\(entity.displayName), curve=\(curve), factor source hint.name=\(deviceFactorSource.hint.name), hint.model=\(deviceFactorSource.hint.model)")
+			let derivationPath = factorInstance.derivationPath
 
-				let signatureWithPublicKey = try await self.signatureFromOnDeviceHD(.init(
-					hdRoot: hdRoot,
-					derivationPath: derivationPath,
-					curve: curve,
-					unhashedData: Data(unhashedDataToSign)
-				))
-
-				let entitySignature = SignatureOfEntity(
-					signerEntity: entity,
-					derivationPath: derivationPath,
-					factorSourceID: factorSourceID.embed(),
-					signatureWithPublicKey: signatureWithPublicKey
-				)
-
-				signatures.insert(entitySignature)
+			if factorInstance.factorSourceID != factorSourceID {
+				let errMsg = "Discrepancy, you specified to use a device factor source you beleived to be the one controlling the entity, but it does not match the genesis factor source id."
+				loggerGlobal.critical(.init(stringLiteral: errMsg))
+				assertionFailure(errMsg)
 			}
-		}
+			let curve = factorInstance.publicKey.curve
 
-		return signatures
+			loggerGlobal.debug("🔏 Signing data with device, with entity=\(entity.displayName), curve=\(curve), factor source hint.name=\(deviceFactorSource.hint.name), hint.model=\(deviceFactorSource.hint.model)")
+
+			let signatureWithPublicKey = try await self.signatureFromOnDeviceHD(.init(
+				hdRoot: hdRoot,
+				derivationPath: derivationPath,
+				curve: curve,
+				unhashedData: Data(unhashedDataToSign)
+			))
+
+			let entitySignature = SignatureOfEntity(
+				signerEntity: entity,
+				derivationPath: derivationPath,
+				factorSourceID: factorSourceID.embed(),
+				signatureWithPublicKey: signatureWithPublicKey
+			)
+
+			signatures.insert(entitySignature)
+		}
 	}
+
+	return signatures
 }
 
 extension SigningPurpose {
@@ -206,3 +226,6 @@ extension SigningPurpose {
 
 // MARK: - FactorInstanceDoesNotHaveADerivationPathUnableToSign
 struct FactorInstanceDoesNotHaveADerivationPathUnableToSign: Swift.Error {}
+
+// MARK: - ExpectedToSignTransactionWithEntityWhichIsSecurifiedButPrimaryRoleContainsNoSuperAdminFactorOfKindDevice
+struct ExpectedToSignTransactionWithEntityWhichIsSecurifiedButPrimaryRoleContainsNoSuperAdminFactorOfKindDevice: Swift.Error {}

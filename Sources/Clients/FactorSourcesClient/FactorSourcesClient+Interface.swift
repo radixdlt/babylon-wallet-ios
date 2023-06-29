@@ -165,7 +165,7 @@ public struct SigningFactor: Sendable, Hashable, Identifiable {
 	public var signers: Signers
 
 	public var expectedSignatureCount: Int {
-		signers.map(\.factorInstancesRequiredToSign.count).reduce(0, +)
+		signers.map(\.primaryRoleSuperAdminFactorInstances.count).reduce(0, +)
 	}
 
 	public init(
