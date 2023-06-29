@@ -1,7 +1,8 @@
 import SwiftUI
 
-// MARK: - AnimationObserverModifer
-public struct AnimationObserverModifer<Value: Sendable & VectorArithmetic>: Animatable, ViewModifier {
+// MARK: - AnimationCompletionViewModifier
+/// A view modifier allowing to observe the completion of a given value animation
+public struct AnimationCompletionViewModifier<Value: Sendable & VectorArithmetic>: Animatable, ViewModifier {
 	public typealias Observer = @MainActor @Sendable () -> Void
 	public var animatableData: Value {
 		didSet {
@@ -27,7 +28,7 @@ public struct AnimationObserverModifer<Value: Sendable & VectorArithmetic>: Anim
 }
 
 extension View {
-	public func onAnimationCompleted<Value: Sendable & VectorArithmetic>(for animatedValue: Value, observer: @escaping AnimationObserverModifer.Observer) -> some View {
-		modifier(AnimationObserverModifer(animatedValue: animatedValue, observer: observer))
+	public func onAnimationCompleted<Value: Sendable & VectorArithmetic>(for animatedValue: Value, observer: @escaping AnimationCompletionViewModifier.Observer) -> some View {
+		modifier(AnimationCompletionViewModifier(animatedValue: animatedValue, observer: observer))
 	}
 }

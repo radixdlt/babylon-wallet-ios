@@ -1,9 +1,10 @@
 import AsyncExtensions
 import ComposableArchitecture
 import Dependencies
+import DesignSystem
+import OverlayWindowClient
 import Prelude
 import Resources
-import SwiftUI
 
 extension OverlayWindowClient: DependencyKey {
 	public static let liveValue: Self = {

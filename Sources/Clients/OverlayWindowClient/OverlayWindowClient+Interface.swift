@@ -1,7 +1,6 @@
 import AsyncExtensions
 import ComposableArchitecture
 import Dependencies
-import DesignSystem
 import Resources
 import SwiftUI
 
@@ -24,7 +23,21 @@ public struct OverlayWindowClient: Sendable {
 	public var sendAlertAction: SendAlertAction
 
 	/// Internal observer for actions emitted from an Alert.
-	var onAlertAction: OnAlertAction
+	public var onAlertAction: OnAlertAction
+
+	public init(
+		scheduledItems: @escaping ScheduledItems,
+		scheduleAlert: @escaping ScheduleAlert,
+		scheduleHUD: @escaping ScheduleHUD,
+		sendAlertAction: @escaping SendAlertAction,
+		onAlertAction: @escaping OnAlertAction
+	) {
+		self.scheduledItems = scheduledItems
+		self.scheduleAlert = scheduleAlert
+		self.scheduleHUD = scheduleHUD
+		self.sendAlertAction = sendAlertAction
+		self.onAlertAction = onAlertAction
+	}
 }
 
 extension OverlayWindowClient {
@@ -32,7 +45,7 @@ extension OverlayWindowClient {
 	public typealias ScheduleHUD = @Sendable (Item.HUD) -> Void
 	public typealias SendAlertAction = @Sendable (Item.AlertAction, Item.AlertState.ID) -> Void
 	public typealias ScheduledItems = @Sendable () -> AnyAsyncSequence<Item>
-	typealias OnAlertAction = @Sendable (Item.AlertState.ID) async -> Item.AlertAction
+	public typealias OnAlertAction = @Sendable (Item.AlertState.ID) async -> Item.AlertAction
 }
 
 // MARK: OverlayWindowClient.Item
@@ -75,16 +88,6 @@ extension OverlayWindowClient {
 	public func schedule(alert: Item.AlertState) async -> Item.AlertAction {
 		scheduleAlert(alert)
 		return await onAlertAction(alert.id)
-	}
-
-	public func scheduleCopiedItem() {
-		schedule(hud:
-			.init(
-				text: "Copied",
-				icon: .system("checkmark.circle.fill"),
-				iconForegroundColor: .app.green1
-			)
-		)
 	}
 }
 

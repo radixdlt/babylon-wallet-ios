@@ -671,6 +671,13 @@ package.addModules([
 		tests: .no
 	),
 	.client(
+		name: "OverlayWindowClientLive",
+		dependencies: [
+			"OverlayWindowClient",
+		],
+		tests: .no
+	),
+	.client(
 		name: "OnboardingClientLive",
 		dependencies: [
 			"OnboardingClient",
