@@ -22,17 +22,12 @@ extension OverlayWindowClient: DependencyKey {
 
 		return .init(
 			scheduledItems: { items.eraseToAnyAsyncSequence() },
-			scheduleAlert: {
-				items.send(.alert($0))
-			},
-			scheduleHUD: {
-				items.send(.hud($0))
-			},
-			sendAlertAction: { action, id in
-				alertActions.send((action, id))
-			},
+			scheduleAlert: { items.send(.alert($0)) },
+			scheduleHUD: { items.send(.hud($0)) },
+			sendAlertAction: { action, id in alertActions.send((action, id)) },
 			onAlertAction: { id in
-				await alertActions.first { $0.id == id }!.action
+				/// Fallback to `dismissed` action.
+				await alertActions.first { $0.id == id }?.action ?? .dismissed
 			}
 		)
 	}()

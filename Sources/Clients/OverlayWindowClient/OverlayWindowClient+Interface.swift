@@ -6,12 +6,24 @@ import Resources
 import SwiftUI
 
 // MARK: - OverlayWindowClient
+/// This client is the intermediary between Main Window and the Overlay Window.
 public struct OverlayWindowClient: Sendable {
+	/// All scheduled items to be shown in Overlay Window.
 	public var scheduledItems: ScheduledItems
+
+	/// Schedule an Alert to be shown in the Overlay Window.
+	/// Usually to be called from the Main Window.
 	public var scheduleAlert: ScheduleAlert
+
+	/// Schedule a HUD to be shown in the Overlay Window.
+	/// /// Usually to be called from the Main Window.
 	public var scheduleHUD: ScheduleHUD
+
+	/// This is meant to be used by the Overlay Window to send
+	/// back the actions from an Alert to the Main Window.
 	public var sendAlertAction: SendAlertAction
 
+	/// Internal observer for actions emitted from an Alert.
 	var onAlertAction: OnAlertAction
 }
 

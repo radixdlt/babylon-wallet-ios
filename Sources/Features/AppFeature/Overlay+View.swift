@@ -57,6 +57,7 @@ struct HUD: FeatureReducer {
 		switch viewAction {
 		case .dismissCompleted:
 			if state.offset == State.hiddenOffset {
+				/// Notify the delegate only after the animation did complete.
 				return .send(.delegate(.dismiss))
 			} else {
 				return .run { send in
@@ -79,10 +80,7 @@ struct HUD: FeatureReducer {
 	}
 }
 
-// MARK: - SwiftUI.Animation + Sendable
-extension SwiftUI.Animation: @unchecked Sendable {}
-
-// MARK: - HUD.View
+// MARK: HUD.View
 extension HUD {
 	struct View: SwiftUI.View {
 		private let store: StoreOf<HUD>
@@ -129,6 +127,9 @@ extension HUD {
 		}
 	}
 }
+
+// MARK: - SwiftUI.Animation + Sendable
+extension SwiftUI.Animation: @unchecked Sendable {}
 
 extension SwiftUI.Animation {
 	static var hudAnimation: SwiftUI.Animation {
