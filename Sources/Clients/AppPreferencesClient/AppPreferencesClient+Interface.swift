@@ -14,18 +14,22 @@ public struct AppPreferencesClient: Sendable {
 	public var extractProfileSnapshot: ExtractProfileSnapshot
 	public var deleteProfileAndFactorSources: DeleteProfileSnapshot
 
+	public var getDetailsOfSecurityStructure: GetDetailsOfSecurityStructure
+
 	public init(
 		getPreferences: @escaping GetPreferences,
 		updatePreferences: @escaping UpdatePreferences,
 		extractProfileSnapshot: @escaping ExtractProfileSnapshot,
 		deleteProfileAndFactorSources: @escaping DeleteProfileSnapshot,
-		setIsCloudProfileSyncEnabled: @escaping SetIsCloudProfileSyncEnabled
+		setIsCloudProfileSyncEnabled: @escaping SetIsCloudProfileSyncEnabled,
+		getDetailsOfSecurityStructure: @escaping GetDetailsOfSecurityStructure
 	) {
 		self.getPreferences = getPreferences
 		self.updatePreferences = updatePreferences
 		self.extractProfileSnapshot = extractProfileSnapshot
 		self.deleteProfileAndFactorSources = deleteProfileAndFactorSources
 		self.setIsCloudProfileSyncEnabled = setIsCloudProfileSyncEnabled
+		self.getDetailsOfSecurityStructure = getDetailsOfSecurityStructure
 	}
 }
 
@@ -36,6 +40,7 @@ extension AppPreferencesClient {
 	public typealias UpdatePreferences = @Sendable (AppPreferences) async throws -> Void
 	public typealias ExtractProfileSnapshot = @Sendable () async -> ProfileSnapshot
 	public typealias DeleteProfileSnapshot = @Sendable (_ keepInICloudIfPresent: Bool) async throws -> Void
+	public typealias GetDetailsOfSecurityStructure = @Sendable (SecurityStructureConfigurationReference) async throws -> SecurityStructureConfigurationDetailed
 }
 
 extension AppPreferencesClient {

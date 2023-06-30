@@ -24,6 +24,14 @@ extension FactorSourcesClient: DependencyKey {
 			}
 		}
 
+		let updateFactorSource: UpdateFactorSource = { source in
+			try await getProfileStore().updating { profile in
+				try profile.factorSources.updateFactorSource(id: source.id) {
+					$0 = source
+				}
+			}
+		}
+
 		return Self(
 			getCurrentNetworkID: { await getProfileStore().profile.networkID },
 			getFactorSources: getFactorSources,
@@ -89,6 +97,7 @@ extension FactorSourcesClient: DependencyKey {
 				}
 			},
 			saveFactorSource: saveFactorSource,
+			updateFactorSource: updateFactorSource,
 			getSigningFactors: { request in
 				assert(request.signers.allSatisfy { $0.networkID == request.networkID })
 				return try await signingFactors(
@@ -110,6 +119,14 @@ extension FactorSourcesClient: DependencyKey {
 					}
 					profile.factorSources = .init(rawValue: factorSources)!
 				}
+			},
+			flagFactorSourceForDeletion: { id in
+				let factorSources = try await getFactorSources()
+				guard var factorSource = factorSources.rawValue[id: id] else {
+					throw FactorSourceNotFound()
+				}
+				factorSource.flag(.deletedByUser)
+				try await updateFactorSource(factorSource)
 			}
 		)
 	}

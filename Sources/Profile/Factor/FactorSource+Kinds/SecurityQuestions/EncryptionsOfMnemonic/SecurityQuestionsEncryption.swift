@@ -41,15 +41,36 @@ public enum CAP23 {
 			"＇", // Rationale: Same as apostrophe (this is "Full Width Apostrophe" (U+FF07))
 		]))
 
-	/// `answer.lowercased().trimWhitespaceAndNewLine().utf8`
-	public static func entropyFrom(
-		freeformAnswer: NonEmptyString
-	) -> NonEmpty<HexCodable> {
-		let data = Data(
-			freeformAnswer.rawValue
+	public struct TrimmedAnswer: Sendable, Hashable {
+		/// Non empty trimmed answer
+		public let answer: NonEmptyString
+
+		public init(nonTrimmed: NonEmptyString) throws {
+			let trimmed = nonTrimmed.rawValue
 				.lowercased()
 				.removingCharacters(from: forbiddenCharacters)
-				.utf8
+
+			guard let nonEmptyTrimmed = NonEmptyString(rawValue: trimmed) else {
+				struct AnswerIsEmptyWhenTrimmed: Swift.Error {}
+				throw AnswerIsEmptyWhenTrimmed()
+			}
+
+			self.answer = nonEmptyTrimmed
+		}
+	}
+
+	public static func trimmedAnswer(
+		freeformAnswer: NonEmptyString
+	) throws -> TrimmedAnswer {
+		try .init(nonTrimmed: freeformAnswer)
+	}
+
+	/// `answer.lowercased().trimWhitespaceAndNewLine().utf8`
+	public static func entropyFrom(
+		freeformAnswer: TrimmedAnswer
+	) throws -> NonEmpty<HexCodable> {
+		let data = Data(
+			freeformAnswer.answer.utf8
 		)
 
 		return NonEmpty<HexCodable>(rawValue: .init(data: data))!

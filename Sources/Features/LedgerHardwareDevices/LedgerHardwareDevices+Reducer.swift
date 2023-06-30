@@ -19,6 +19,7 @@ public struct LedgerHardwareDevices: Sendable, FeatureReducer {
 			case settings
 			case importOlympia
 			case createHardwareAccount
+			case setupMFA
 		}
 
 		public let context: Context
