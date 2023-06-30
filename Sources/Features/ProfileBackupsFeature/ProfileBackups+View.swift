@@ -33,7 +33,7 @@ extension ProfileBackups {
 					content: { store in
 						NavigationView {
 							ImportMnemonic.View(store: store)
-								.navigationTitle("Import Seed Phrase") // FIXME: strings
+								.navigationTitle(L10n.ImportMnemonic.navigationTitle)
 						}
 					}
 				)
@@ -58,8 +58,8 @@ extension ProfileBackups.View {
 	@MainActor
 	private func isCloudProfileSyncEnabled(with viewStore: ViewStoreOf<ProfileBackups>) -> some SwiftUI.View {
 		ToggleView(
-			title: "Sync Wallet Data to iCloud", // FIXME: strings
-			subtitle: "Warning: If disabled you might lose access to accounts/personas.", // FIXME: strings
+			title: L10n.IOSProfileBackup.ProfileSync.title,
+			subtitle: L10n.IOSProfileBackup.ProfileSync.subtitle,
 			isOn: viewStore.binding(
 				get: \.isCloudProfileSyncEnabled,
 				send: { .cloudProfileSyncToggled($0) }
@@ -73,7 +73,7 @@ extension ProfileBackups.View {
 			// TODO: This is speculative design, needs to be updated once we have the proper design
 			VStack(spacing: .medium1) {
 				if !viewStore.shownInSettings {
-					Button("Import Backup Wallet data") { // FIXME: strings
+					Button(L10n.IOSProfileBackup.importBackupWallet) {
 						viewStore.send(.tappedImportProfile)
 					}
 					.buttonStyle(.primaryRectangular)
@@ -82,7 +82,7 @@ extension ProfileBackups.View {
 				Separator()
 
 				HStack {
-					Text("Wallet backups in your iCloud account:") // FIXME: strings
+					Text(L10n.IOSProfileBackup.cloudBackupWallet)
 						.textStyle(.body1Header)
 					Spacer()
 				}
@@ -105,13 +105,13 @@ extension ProfileBackups.View {
 							viewStore.selectedProfileHeader,
 							forAction: { viewStore.send(.tappedUseCloudBackup($0)) },
 							control: { action in
-								Button("Use iCloud Backup Data", action: action)
+								Button(L10n.IOSProfileBackup.useICloudBackup, action: action)
 									.buttonStyle(.primaryRectangular)
 							}
 						)
 					}
 				} else {
-					Text("No Cloud Backup Data") // FIXME: strings
+					Text(L10n.IOSProfileBackup.noCloudBackup)
 				}
 			}
 			.padding(.horizontal, .medium3)
@@ -122,29 +122,29 @@ extension ProfileBackups.View {
 	private func cloudBackupDataCard(_ item: SelectionItem<ProfileSnapshot.Header>, viewStore: ViewStoreOf<ProfileBackups>) -> some View {
 		let header = item.value
 		let isVersionCompatible = header.isVersionCompatible()
-		let creatingDevice = header.creatingDevice.id == viewStore.thisDeviceID ? "This Device" : header.creatingDevice.description.rawValue // FIXME: strings
-		let lastUsedOnDevice = header.lastUsedOnDevice.id == viewStore.thisDeviceID ? "This Device" : header.lastUsedOnDevice.description.rawValue // FIXME: strings
+		let creatingDevice = header.creatingDevice.id == viewStore.thisDeviceID ? L10n.IOSProfileBackup.thisDevice : header.creatingDevice.description.rawValue
+		let lastUsedOnDevice = header.lastUsedOnDevice.id == viewStore.thisDeviceID ? L10n.IOSProfileBackup.thisDevice : header.lastUsedOnDevice.description.rawValue
 
 		return Card(action: item.action) {
 			HStack {
 				VStack(alignment: .leading, spacing: 0) {
 					// TODO: Proper fields to be updated based on the final UX
-					Text("Creating Device: \(creatingDevice)")
+					Text(L10n.IOSProfileBackup.creatingDevice(creatingDevice))
 						.foregroundColor(.app.gray1)
 						.textStyle(.secondaryHeader)
 					Group {
-						Text("Creation Date: \(formatDate(header.creationDate))") // FIXME: strings
-						Text("Last used on device: \(lastUsedOnDevice)") // FIXME: strings
-						Text("Last Modified Date: \(formatDate(header.lastModified))") // FIXME: strings
-						Text("Number of networks: \(header.contentHint.numberOfNetworks)") // FIXME: strings
-						Text("Number of total accounts: \(header.contentHint.numberOfAccountsOnAllNetworksInTotal)") // FIXME: strings
-						Text("Number of total personas: \(header.contentHint.numberOfPersonasOnAllNetworksInTotal)") // FIXME: strings
+						Text(L10n.IOSProfileBackup.creationDateLabel(formatDate(header.creationDate)))
+						Text(L10n.IOSProfileBackup.lastUsedOnDeviceLabel(lastUsedOnDevice))
+						Text(L10n.IOSProfileBackup.lastModifedDateLabel(formatDate(header.lastModified)))
+						Text(L10n.IOSProfileBackup.numberOfNetworksLabel(header.contentHint.numberOfNetworks))
+						Text(L10n.IOSProfileBackup.totalAccountsNumberLabel(header.contentHint.numberOfAccountsOnAllNetworksInTotal))
+						Text(L10n.IOSProfileBackup.totalPersonasNumberLabel(header.contentHint.numberOfPersonasOnAllNetworksInTotal))
 					}
 					.foregroundColor(.app.gray2)
 					.textStyle(.body2Regular)
 
 					if !isVersionCompatible {
-						Text("Incompatible Wallet data") // FIXME: strings
+						Text(L10n.IOSProfileBackup.incompatibleWalletDataLabel)
 							.foregroundColor(.red)
 							.textStyle(.body2HighImportance)
 					}

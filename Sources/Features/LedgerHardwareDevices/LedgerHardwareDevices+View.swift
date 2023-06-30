@@ -12,25 +12,25 @@ extension LedgerHardwareDevices.State {
 // MARK: - LedgerHardwareDevice.View
 extension LedgerHardwareDevices {
 	public struct ViewState: Equatable {
-		let allowSelection: Bool
-		let showHeaders: Bool
+		var allowSelection: Bool { context != .settings }
+		var showHeaders: Bool { context != .importOlympia }
+		var showIcon: Bool { context != .settings }
+
 		let ledgers: Loadable<IdentifiedArrayOf<LedgerHardwareWalletFactorSource>>
 		let selectedLedgerID: FactorSourceID.FromHash?
 		let selectedLedgerControlRequirements: SelectedLedgerControlRequirements?
 		let context: State.Context
 
 		init(state: LedgerHardwareDevices.State) {
-			self.allowSelection = state.allowSelection
-			self.showHeaders = state.showHeaders
 			self.ledgers = state.$ledgers
 			self.selectedLedgerID = state.selectedLedgerID
-			self.context = state.context
 
 			if let id = state.selectedLedgerID, let selectedLedger = state.ledgers?[id: id] {
 				self.selectedLedgerControlRequirements = .init(selectedLedger: selectedLedger)
 			} else {
 				self.selectedLedgerControlRequirements = nil
 			}
+			self.context = state.context
 		}
 
 		var ledgersArray: [LedgerHardwareWalletFactorSource]? { .init(ledgers.wrappedValue ?? []) }
@@ -74,12 +74,7 @@ extension LedgerHardwareDevices {
 				ScrollView {
 					VStack(spacing: 0) {
 						Group {
-							if viewStore.context == .settings {
-								Text(L10n.LedgerHardwareDevices.subtitleAllLedgers)
-									.textStyle(.body1HighImportance)
-									.foregroundColor(.app.gray2)
-									.padding(.vertical, .medium1)
-							} else {
+							if viewStore.allowSelection {
 								Image(asset: AssetResource.iconHardwareLedger)
 									.frame(.medium)
 									.padding(.vertical, .medium2)
@@ -88,6 +83,11 @@ extension LedgerHardwareDevices {
 									.textStyle(.sheetTitle)
 									.foregroundColor(.app.gray1)
 									.padding(.bottom, .medium1)
+							} else {
+								Text(L10n.LedgerHardwareDevices.subtitleAllLedgers)
+									.textStyle(.body1HighImportance)
+									.foregroundColor(.app.gray2)
+									.padding(.vertical, .medium1)
 							}
 
 							if viewStore.showHeaders {
@@ -120,10 +120,7 @@ extension LedgerHardwareDevices {
 						Spacer(minLength: 0)
 					}
 				}
-				.frame(
-					minWidth: 0,
-					maxWidth: .infinity
-				)
+				.frame(minWidth: 0, maxWidth: .infinity)
 				.footer(visible: viewStore.allowSelection) {
 					WithControlRequirements(
 						viewStore.selectedLedgerControlRequirements,

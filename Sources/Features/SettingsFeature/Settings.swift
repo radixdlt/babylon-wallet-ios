@@ -190,7 +190,6 @@ public struct AppSettings: Sendable, FeatureReducer {
 			return .none
 
 		case .personasButtonTapped:
-			// TODO: implement
 			state.destination = .personas(.init())
 			return .none
 
@@ -203,7 +202,7 @@ public struct AppSettings: Sendable, FeatureReducer {
 			return .none
 
 		case .ledgerHardwareWalletsButtonTapped:
-			state.destination = .ledgerHardwareWallets(.init(allowSelection: false, context: .settings, showHeaders: true))
+			state.destination = .ledgerHardwareWallets(.init(context: .settings))
 			return .none
 
 		case .mnemonicsButtonTapped:

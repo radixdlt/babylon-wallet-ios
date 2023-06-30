@@ -180,7 +180,7 @@ bundle exec fastlane ios register_new_iphone_device
 bundle exec fastlane mac register_new_mac_device
 ```
 
-After the above setup, you are good to go with building and running the app on iPhone or Mac device.
+After the above setup, you are good to go with building and running the app on iPhone or Mac device. Open the `App/BabylonWallet.xcodeproj` and select the `Radix Wallet Dev (iOS)` scheme and hit run (`⌘R`).
 
 # Testing
 1. Unit tests for each package, split into multiple files for each seperate system under test (sut).

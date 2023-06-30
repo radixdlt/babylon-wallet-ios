@@ -13,7 +13,7 @@ extension CreationOfAccount {
 
 		public var body: some SwiftUI.View {
 			ZStack {
-				SwitchStore(store.scope(state: \.step)) {
+				SwitchStore(store.scope(state: \.step, action: { $0 })) {
 					CaseLet(
 						state: /CreationOfAccount.State.Step.step0_chooseLedger,
 						action: { CreationOfAccount.Action.child(.step0_chooseLedger($0)) },

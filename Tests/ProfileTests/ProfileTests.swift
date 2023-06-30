@@ -443,6 +443,7 @@ final class ProfileTests: TestCase {
 		XCTAssertEqual(network.networkID, networkID)
 
 		XCTAssertTrue(profile.appPreferences.security.isCloudProfileSyncEnabled, "iCloud sync should be opt-out.")
+
 		XCTAssertTrue(profile.appPreferences.security.isDeveloperModeEnabled, "Developer mode should default to on")
 
 		let curve25519FactorSourceMnemonic = try Mnemonic(
