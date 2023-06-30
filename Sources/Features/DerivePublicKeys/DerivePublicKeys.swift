@@ -98,8 +98,6 @@ public struct DerivePublicKeys: Sendable, FeatureReducer {
 			case .device:
 				return .task {
 					do {
-						try? await Task.sleep(for: .seconds(1))
-
 						let babylonFactorSource = try await factorSourcesClient
 							.getFactorSources()
 							.babylonDeviceFactorSources()
