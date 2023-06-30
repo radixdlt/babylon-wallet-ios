@@ -177,7 +177,7 @@
       "location" : "https://github.com/radixdlt/swift-composable-architecture",
       "state" : {
         "branch" : "full-scope",
-        "revision" : "1aab649749d49f6d2b3e97f6c4b33a03bf26e892"
+        "revision" : "eb29ed75d29ac326cc469b9126a4a571b700d152"
       }
     },
     {
@@ -320,8 +320,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/swiftui-navigation",
       "state" : {
-        "revision" : "db81007362f998654239021ca9308a264e59d3e2",
-        "version" : "0.7.2"
+        "revision" : "2aa885e719087ee19df251c08a5980ad3e787f12",
+        "version" : "0.8.0"
       }
     },
     {
