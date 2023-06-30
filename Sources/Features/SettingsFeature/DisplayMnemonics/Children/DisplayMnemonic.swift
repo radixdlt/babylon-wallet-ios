@@ -61,7 +61,11 @@ public struct DisplayMnemonic: Sendable, FeatureReducer {
 				loggerGlobal.error("Mnemonic was nil")
 				return .send(.delegate(.failedToLoad))
 			}
-			state.importMnemonic = .init(mnemonicWithPassphrase: mnemonicWithPassphrase)
+
+			state.importMnemonic = .init(
+				warning: L10n.RevealSeedPhrase.warning,
+				mnemonicWithPassphrase: mnemonicWithPassphrase
+			)
 			return .none
 
 		case let .loadMnemonicResult(.failure(error)):

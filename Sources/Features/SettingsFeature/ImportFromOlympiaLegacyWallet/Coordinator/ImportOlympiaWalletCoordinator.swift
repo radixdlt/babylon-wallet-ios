@@ -201,7 +201,6 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 	private func scanViewAppeared(
 		in state: inout State
 	) -> EffectTask<Action> {
-		print("•••• reset scanner")
 		state.progress = .start
 		return .none
 	}
@@ -306,6 +305,11 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 
 		state.path.append(
 			.importMnemonic(.init(
+				header: .init(
+					title: L10n.ImportOlympiaAccounts.VerifySeedPhrase.title,
+					subtitle: L10n.ImportOlympiaAccounts.VerifySeedPhrase.subtitle
+				),
+				warning: L10n.ImportOlympiaAccounts.VerifySeedPhrase.warning,
 				persistAsMnemonicKind: nil,
 				wordCount: progress.expectedMnemonicWordCount
 			))

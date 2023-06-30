@@ -8,6 +8,8 @@ extension ImportMnemonic.State {
 	var viewState: ImportMnemonic.ViewState {
 		.init(
 			isReadonlyMode: isReadonlyMode,
+			header: header,
+			warning: warning,
 			isHidingSecrets: isHidingSecrets,
 			rowCount: rowCount,
 			wordCount: wordCount,
@@ -26,6 +28,8 @@ extension ImportMnemonic.State {
 extension ImportMnemonic {
 	public struct ViewState: Equatable {
 		let isReadonlyMode: Bool
+		let header: State.Header?
+		let warning: String?
 		let isHidingSecrets: Bool
 		let rowCount: Int
 		let wordCount: BIP39.WordCount
@@ -70,18 +74,35 @@ extension ImportMnemonic {
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				ScrollView(showsIndicators: false) {
-					VStack(spacing: .large1) {
+					VStack(spacing: 0) {
+						if let header = viewStore.header {
+							HeaderView(header: header)
+								.padding(.bottom, .medium1)
+						}
+
+						if let warning = viewStore.warning {
+							WarningView(text: warning)
+								.padding(.top, viewStore.header == nil ? .medium3 : 0)
+								.padding(.horizontal, .large3)
+								.padding(.bottom, .large3)
+						}
+
 						wordsGrid(with: viewStore)
+							.padding(.horizontal, .medium2)
+							.padding(.bottom, .large3)
 
 						if viewStore.isShowingChangeWordCountButtons {
 							changeWordCountButtons(with: viewStore)
+								.padding(.horizontal, .medium2)
+								.padding(.bottom, .large3)
 						}
 
 						if viewStore.isShowingPassphrase {
 							passphrase(with: viewStore)
+								.padding(.horizontal, .medium2)
+								.padding(.bottom, .medium2)
 						}
 					}
-					.padding(.horizontal, .small3)
 					.redacted(reason: .privacy, if: viewStore.isHidingSecrets)
 					#if os(iOS)
 						.onReceive(NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification)) { _ in
@@ -96,7 +117,6 @@ extension ImportMnemonic {
 						}
 				}
 				.animation(.default, value: viewStore.wordCount)
-				.padding(.medium3)
 				.onAppear { viewStore.send(.appeared) }
 				#if !DEBUG && os(iOS)
 					.screenshotProtected(isProtected: true)
@@ -112,6 +132,26 @@ extension ImportMnemonic {
 					)
 			}
 		}
+
+		struct HeaderView: SwiftUI.View {
+			let header: State.Header
+
+			var body: some SwiftUI.View {
+				VStack(spacing: 0) {
+					Text(header.title)
+						.textStyle(.sheetTitle)
+						.padding(.bottom, .medium3)
+
+					if let subtitle = header.subtitle {
+						Text(subtitle)
+							.textStyle(.body1Regular)
+					}
+				}
+				.foregroundColor(.app.gray1)
+				.multilineTextAlignment(.center)
+				.padding(.horizontal, .large3)
+			}
+		}
 	}
 }
 
@@ -122,17 +162,14 @@ extension ImportMnemonic.View {
 			columns: .init(
 				repeating: .init(.flexible()),
 				count: 3
-			)
+			),
+			spacing: .medium2
 		) {
 			ForEachStore(
-				store.scope(state: \.words, action: { .child(.word(id: $0, child: $1)) }),
-				content: { importMnemonicWordStore in
-					VStack(spacing: 0) {
-						ImportMnemonicWord.View(store: importMnemonicWordStore)
-						Spacer(minLength: .medium2)
-					}
-				}
-			)
+				store.scope(state: \.words, action: { .child(.word(id: $0, child: $1)) })
+			) { importMnemonicWordStore in
+				ImportMnemonicWord.View(store: importMnemonicWordStore)
+			}
 		}
 	}
 
