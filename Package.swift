@@ -430,6 +430,7 @@ package.addModules([
 	.feature(
 		name: "TransactionReviewFeature",
 		dependencies: [
+			"AuthorizedDappsClient",
 			"GatewayAPI",
 			"TransactionClient",
 			"SigningFeature",

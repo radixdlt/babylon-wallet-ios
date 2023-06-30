@@ -108,7 +108,7 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 		public enum State: Hashable {
 			case editPersona(EditPersona.State)
 			case createAuthKey(CreateAuthKey.State)
-			case dAppDetails(SimpleDappDetails.State)
+			case dAppDetails(SimpleAuthDappDetails.State)
 
 			case confirmForgetAlert(AlertState<Action.ConfirmForgetAlert>)
 		}
@@ -116,7 +116,7 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 		public enum Action: Equatable {
 			case editPersona(EditPersona.Action)
 			case createAuthKey(CreateAuthKey.Action)
-			case dAppDetails(SimpleDappDetails.Action)
+			case dAppDetails(SimpleAuthDappDetails.Action)
 
 			case confirmForgetAlert(ConfirmForgetAlert)
 
@@ -134,7 +134,7 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 				CreateAuthKey()
 			}
 			Scope(state: /State.dAppDetails, action: /Action.dAppDetails) {
-				SimpleDappDetails()
+				SimpleAuthDappDetails()
 			}
 		}
 	}
@@ -353,10 +353,10 @@ extension AlertState<PersonaDetails.Destination.Action.ConfirmForgetAlert> {
 	}
 }
 
-// MARK: - SimpleDappDetails
+// MARK: - SimpleAuthDappDetails
 // FIXME: Remove and make settings use stacks
 
-public struct SimpleDappDetails: Sendable, FeatureReducer {
+public struct SimpleAuthDappDetails: Sendable, FeatureReducer {
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.gatewayAPIClient) var gatewayAPIClient
 	@Dependency(\.openURL) var openURL
@@ -497,7 +497,7 @@ public struct SimpleDappDetails: Sendable, FeatureReducer {
 	private func loadResources(
 		metadata: GatewayAPI.EntityMetadataCollection,
 		validated dappDefinitionAddress: DappDefinitionAddress
-	) async -> Loadable<SimpleDappDetails.State.Resources> {
+	) async -> Loadable<SimpleAuthDappDetails.State.Resources> {
 		guard let claimedEntities = metadata.claimedEntities, !claimedEntities.isEmpty else {
 			return .idle
 		}
@@ -550,7 +550,7 @@ public struct SimpleDappDetails: Sendable, FeatureReducer {
 }
 
 extension GatewayAPI.StateEntityDetailsResponseItem {
-	var resourceDetails: SimpleDappDetails.State.Resources.ResourceDetails? {
+	var resourceDetails: SimpleAuthDappDetails.State.Resources.ResourceDetails? {
 		guard let fungibility else { return nil }
 		return .init(address: .init(address: address),
 		             fungibility: fungibility,
@@ -560,7 +560,7 @@ extension GatewayAPI.StateEntityDetailsResponseItem {
 		             iconURL: metadata.iconURL)
 	}
 
-	private var fungibility: SimpleDappDetails.State.Resources.ResourceDetails.Fungibility? {
+	private var fungibility: SimpleAuthDappDetails.State.Resources.ResourceDetails.Fungibility? {
 		guard let details else { return nil }
 		switch details {
 		case .fungibleResource:
