@@ -13,8 +13,6 @@ struct OverlayReducer: Sendable, FeatureReducer {
 		@PresentationState
 		public var alert: Alerts.State?
 		public var hud: HUD.State?
-
-		let window: UIWindow
 	}
 
 	struct Alerts: Sendable, ReducerProtocol {
@@ -140,8 +138,7 @@ struct OverlayReducer: Sendable, FeatureReducer {
 	/// Sets the interaction enabled on the window, by implication this will also enable/disable the interaction
 	/// with the main app window. When showing an Alert, we don't want users to be able to interact with the main app window for example.
 	private func setIsUserInteractionEnabled(_ state: inout State, isEnabled: Bool) -> EffectTask<Action> {
-		.run { @MainActor [window = state.window] _ in
-			window.isUserInteractionEnabled = isEnabled
-		}
+		overlayWindowClient.setIsUserIteractionEnabled(isEnabled)
+		return .none
 	}
 }

@@ -1,3 +1,5 @@
+import Dependencies
+import OverlayWindowClient
 import SwiftUI
 import UIKit
 
@@ -17,16 +19,25 @@ public final class SceneDelegate: NSObject, UIWindowSceneDelegate, ObservableObj
 	}
 
 	func overlayWindow(in scene: UIWindowScene) {
-		let overlayWindow = UIWindow(windowScene: scene)
-		overlayWindow.rootViewController = UIHostingController(
-			rootView: OverlayReducer.View(
-				store: .init(initialState: .init(window: overlayWindow),
-				             reducer: OverlayReducer())
+		let overlayView = OverlayReducer.View(
+			store: .init(
+				initialState: .init(),
+				reducer: OverlayReducer()
 			))
+
+		let overlayWindow = UIWindow(windowScene: scene)
+		overlayWindow.rootViewController = UIHostingController(rootView: overlayView)
 		overlayWindow.rootViewController?.view.backgroundColor = .clear
 		overlayWindow.windowLevel = .normal + 1
 		overlayWindow.isUserInteractionEnabled = false
 		overlayWindow.makeKeyAndVisible()
+
+		@Dependency(\.overlayWindowClient) var overlayWindowClient
+		Task { @MainActor [overlayWindow] in
+			for try await isUserInteractionEnabled in overlayWindowClient.isUserInteractionEnabled() {
+				overlayWindow.isUserInteractionEnabled = isUserInteractionEnabled
+			}
+		}
 
 		self.overlayWindow = overlayWindow
 	}

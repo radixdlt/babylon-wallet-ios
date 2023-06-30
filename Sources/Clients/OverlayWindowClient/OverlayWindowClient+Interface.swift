@@ -22,16 +22,23 @@ public struct OverlayWindowClient: Sendable {
 	/// back the actions from an Alert to the Main Window.
 	public var sendAlertAction: SendAlertAction
 
+	public var setIsUserIteractionEnabled: SetIsUserIteractionEnabled
+	public var isUserInteractionEnabled: IsUserInteractionEnabled
+
 	public init(
 		scheduledItems: @escaping ScheduledItems,
 		scheduleAlert: @escaping ScheduleAlert,
 		scheduleHUD: @escaping ScheduleHUD,
-		sendAlertAction: @escaping SendAlertAction
+		sendAlertAction: @escaping SendAlertAction,
+		setIsUserIteractionEnabled: @escaping SetIsUserIteractionEnabled,
+		isUserInteractionEnabled: @escaping IsUserInteractionEnabled
 	) {
 		self.scheduledItems = scheduledItems
 		self.scheduleAlert = scheduleAlert
 		self.scheduleHUD = scheduleHUD
 		self.sendAlertAction = sendAlertAction
+		self.setIsUserIteractionEnabled = setIsUserIteractionEnabled
+		self.isUserInteractionEnabled = isUserInteractionEnabled
 	}
 }
 
@@ -40,6 +47,9 @@ extension OverlayWindowClient {
 	public typealias ScheduleHUD = @Sendable (Item.HUD) -> Void
 	public typealias SendAlertAction = @Sendable (Item.AlertAction, Item.AlertState.ID) -> Void
 	public typealias ScheduledItems = @Sendable () -> AnyAsyncSequence<Item>
+
+	public typealias SetIsUserIteractionEnabled = @Sendable (Bool) -> Void
+	public typealias IsUserInteractionEnabled = @Sendable () -> AnyAsyncSequence<Bool>
 }
 
 // MARK: OverlayWindowClient.Item
