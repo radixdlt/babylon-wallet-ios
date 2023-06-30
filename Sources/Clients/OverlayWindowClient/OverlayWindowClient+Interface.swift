@@ -62,36 +62,8 @@ extension OverlayWindowClient {
 			case dismissed
 		}
 
-		public struct HUD: Sendable, Hashable, Identifiable {
-			public enum Icon: Sendable {
-				case asset(ImageAsset)
-				case system(String)
-			}
-
-			public let id: UUID
-			public let text: String
-			public let icon: Icon?
-			public let iconForegroundColor: Color?
-
-			public init(
-				id: UUID = UUID(),
-				text: String,
-				icon: Icon?,
-				iconForegroundColor: Color?
-			) {
-				self.id = id
-				self.text = text
-				self.icon = icon
-				self.iconForegroundColor = iconForegroundColor
-			}
-
-			public func hash(into hasher: inout Hasher) {
-				hasher.combine(id)
-			}
-
-			public static func == (lhs: HUD, rhs: HUD) -> Bool {
-				lhs.id == rhs.id
-			}
+		public enum HUD: Sendable, Hashable {
+			case copied
 		}
 
 		case hud(HUD)

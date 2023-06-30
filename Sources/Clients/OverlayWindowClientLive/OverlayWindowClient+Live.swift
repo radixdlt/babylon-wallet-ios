@@ -22,13 +22,7 @@ extension OverlayWindowClient: DependencyKey {
 			))
 		}.subscribe(items)
 
-		pasteBoardClient.copyEvents().map { _ in
-			Item.hud(.init(
-				text: "Copied",
-				icon: .system("checkmark.circle.fill"),
-				iconForegroundColor: .app.green1
-			))
-		}.subscribe(items)
+		pasteBoardClient.copyEvents().map { _ in Item.hud(.copied) }.subscribe(items)
 
 		return .init(
 			scheduledItems: { items.eraseToAnyAsyncSequence() },

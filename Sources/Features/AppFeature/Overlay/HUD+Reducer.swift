@@ -13,7 +13,7 @@ struct HUD: FeatureReducer {
 
 	enum ViewAction: Equatable {
 		case onAppear
-		case dismissCompleted
+		case animationCompletion
 	}
 
 	enum DelegateAction: Equatable {
@@ -28,7 +28,7 @@ struct HUD: FeatureReducer {
 
 	func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
-		case .dismissCompleted:
+		case .animationCompletion:
 			if state.offset == State.hiddenOffset {
 				/// Notify the delegate only after the animation did complete.
 				return .send(.delegate(.dismiss))

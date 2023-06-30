@@ -1,7 +1,37 @@
 import FeaturePrelude
+import OverlayWindowClient
+
+extension HUD.State {
+	var viewState: HUD.ViewState {
+		switch content {
+		case .copied:
+			return .init(
+				offset: offset,
+				text: "Copied",
+				icon: .init(kind: .system("checkmark.circle.fill"), foregroundColor: .app.green1)
+			)
+		}
+	}
+}
 
 // MARK: - HUD.View
 extension HUD {
+	struct ViewState: Equatable, Sendable {
+		struct Icon: Equatable {
+			enum Kind: Equatable {
+				case asset(ImageAsset)
+				case system(String)
+			}
+
+			let kind: Kind
+			let foregroundColor: Color
+		}
+
+		let offset: Double
+		let text: String
+		let icon: Icon?
+	}
+
 	struct View: SwiftUI.View {
 		private let store: StoreOf<HUD>
 
@@ -10,14 +40,23 @@ extension HUD {
 		}
 
 		var body: some SwiftUI.View {
-			WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
+			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				VStack {
 					HStack {
-						Image(systemName: "checkmark.circle.fill")
-							.foregroundColor(.app.green1)
+						if let icon = viewStore.icon {
+							Group {
+								switch icon.kind {
+								case let .system(name):
+									Image(systemName: name)
+								case let .asset(asset):
+									Image(asset: asset)
+								}
+							}
+							.foregroundColor(icon.foregroundColor)
 							.frame(.smallest)
+						}
 
-						Text(viewStore.content.text)
+						Text(viewStore.text)
 							.foregroundColor(.app.gray1)
 							.font(.footnote)
 					}
@@ -38,7 +77,7 @@ extension HUD {
 						viewStore.send(.onAppear, animation: .hudAnimation)
 					}
 					.onAnimationCompleted(for: viewStore.offset) {
-						viewStore.send(.dismissCompleted)
+						viewStore.send(.animationCompletion)
 					}
 
 					Spacer()
