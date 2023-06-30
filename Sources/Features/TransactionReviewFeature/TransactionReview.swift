@@ -1057,9 +1057,9 @@ public struct SimpleDappDetails: Sendable, FeatureReducer {
 				.items
 				// FIXME: Uncomment this when when we can rely on dApps conforming to the standards
 				// .filter { $0.metadata.dappDefinition == dAppDefinitionAddress.address }
-                                .compactMap {
-                                        try $0.resourceDetails()
-                                }
+				.compactMap {
+					try $0.resourceDetails()
+				}
 
 			return State.Resources(fungible: allResourceItems.filter { $0.fungibility == .fungible },
 			                       nonFungible: allResourceItems.filter { $0.fungibility == .nonFungible })
@@ -1102,27 +1102,26 @@ public struct SimpleDappDetails: Sendable, FeatureReducer {
 }
 
 extension GatewayAPI.StateEntityDetailsResponseItem {
-        func resourceDetails() throws -> SimpleDappDetails.State.Resources.ResourceDetails? {
-                guard let fungibility else { return nil }
-                let address = try ResourceAddress(validatingAddress: address)
-                return .init(address: address,
-                             fungibility: fungibility,
-                             name: metadata.name ?? L10n.AuthorizedDapps.DAppDetails.unknownTokenName,
-                             symbol: metadata.symbol,
-                             description: metadata.description,
-                             iconURL: metadata.iconURL)
-        }
+	func resourceDetails() throws -> SimpleDappDetails.State.Resources.ResourceDetails? {
+		guard let fungibility else { return nil }
+		let address = try ResourceAddress(validatingAddress: address)
+		return .init(address: address,
+		             fungibility: fungibility,
+		             name: metadata.name ?? L10n.AuthorizedDapps.DAppDetails.unknownTokenName,
+		             symbol: metadata.symbol,
+		             description: metadata.description,
+		             iconURL: metadata.iconURL)
+	}
 
-        private var fungibility: SimpleDappDetails.State.Resources.ResourceDetails.Fungibility? {
-                guard let details else { return nil }
-                switch details {
-                case .fungibleResource:
-                        return .fungible
-                case .nonFungibleResource:
-                        return .nonFungible
-                case .fungibleVault, .nonFungibleVault, .package, .component:
-                        return nil
-                }
-        }
+	private var fungibility: SimpleDappDetails.State.Resources.ResourceDetails.Fungibility? {
+		guard let details else { return nil }
+		switch details {
+		case .fungibleResource:
+			return .fungible
+		case .nonFungibleResource:
+			return .nonFungible
+		case .fungibleVault, .nonFungibleVault, .package, .component:
+			return nil
+		}
+	}
 }
-
