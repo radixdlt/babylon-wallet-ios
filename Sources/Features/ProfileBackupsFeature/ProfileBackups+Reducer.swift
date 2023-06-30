@@ -227,7 +227,9 @@ public struct ProfileBackups: Sendable, FeatureReducer {
 	}
 
 	private func showImportMnemonic(state: inout State) {
-		state.destination = .importMnemonic(.init(persistAsMnemonicKind: .onDevice(.babylon)))
+		state.destination = .importMnemonic(.init(
+			persistAsMnemonicKind: .onDevice(.babylon)
+		))
 	}
 
 	private func updateCloudSync(state: inout State, isEnabled: Bool) -> EffectTask<Action> {

@@ -27,7 +27,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			precondition(positiveDelta.isMultiple(of: ImportMnemonic.wordsPerRow))
 
 			let wordCount = words.count
-			let newWordCount = BIP39.WordCount(wordCount: wordCount + delta)! // might infact be subtraction
+			let newWordCount = BIP39.WordCount(wordCount: wordCount + delta)! // might in fact be subtraction
 			if delta > 0 {
 				// is increasing word count
 				words.append(contentsOf: (wordCount ..< newWordCount.rawValue).map {
@@ -67,10 +67,15 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 		public let isReadonlyMode: Bool
 		public var isHidingSecrets: Bool = false
 
+		public let header: Header?
+		public let warning: String?
+
 		@PresentationState
 		public var offDeviceMnemonicInfoPrompt: OffDeviceMnemonicInfo.State?
 
 		public init(
+			header: Header? = nil,
+			warning: String? = nil,
 			persistAsMnemonicKind persistedKind: MnemonicBasedFactorSourceKind?,
 			language: BIP39.Language = .english,
 			wordCount: BIP39.WordCount = .twelve,
@@ -87,12 +92,19 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			self.isReadonlyMode = isReadonlyMode
 			self.words = []
 			self.offDeviceMnemonicInfoPrompt = offDeviceMnemonicInfoPrompt
+			self.header = header
+			self.warning = warning
 			changeWordCount(by: wordCount.rawValue)
 		}
 
 		public init(
+			header: Header? = nil,
+			warning: String? = nil,
 			mnemonicWithPassphrase: MnemonicWithPassphrase
 		) {
+			self.header = header
+			self.warning = warning
+
 			let mnemonic = mnemonicWithPassphrase.mnemonic
 			self.persistedKind = nil
 			self.language = mnemonic.language
@@ -119,6 +131,16 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 					}
 			)
 			self.bip39Passphrase = mnemonicWithPassphrase.passphrase
+		}
+
+		public struct Header: Sendable, Hashable {
+			public let title: String
+			public let subtitle: String?
+
+			public init(title: String, subtitle: String? = nil) {
+				self.title = title
+				self.subtitle = subtitle
+			}
 		}
 	}
 
