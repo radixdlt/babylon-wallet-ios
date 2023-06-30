@@ -79,6 +79,7 @@ func extractPrimaryRoleSuperAdminDeviceFactorInstance(from securified: Securifie
 	guard let factor = try? securified.transactionSigningStructure.primaryRole.superAdminFactors.first(where: { $0.factorSourceKind == .device })?.virtualHierarchicalDeterministic() else {
 		throw ExpectedToSignTransactionWithEntityWhichIsSecurifiedButPrimaryRoleContainsNoSuperAdminFactorOfKindDevice()
 	}
+	return factor
 }
 
 // MARK: - FailedToDeviceFactorSourceForSigning
@@ -201,9 +202,9 @@ extension DeviceFactorSourceClient {
 
 			signatures.insert(entitySignature)
 		}
-	}
 
-	return signatures
+		return signatures
+	}
 }
 
 extension SigningPurpose {

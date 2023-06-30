@@ -74,6 +74,8 @@ extension DeviceFactorSourceClient: DependencyKey {
 								)
 
 								return privateKey.publicKey() == factorInstance.publicKey
+							case let .securified(securified):
+								fatalError()
 							}
 						} catch {
 							return false

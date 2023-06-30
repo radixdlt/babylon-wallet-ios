@@ -10,7 +10,7 @@ extension Profile.Network {
 		public let networkID: NetworkID
 		public var id: ID { networkID }
 
-		public var forAccount: Index
+		public var forAccount: [AccountAddress]
 		public var forIdentity: Index
 
 		public init(

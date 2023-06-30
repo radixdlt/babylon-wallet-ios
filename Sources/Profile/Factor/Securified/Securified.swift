@@ -8,21 +8,18 @@ public struct Securified: Sendable, Hashable, Codable {
 	private var transactionSigningFactorInstances: OrderedSet<FactorInstance>
 
 	/// The factor instance which can be used for ROLA.
-	public var authenticationSigning: HierarchicalDeterministicFactorInstance
+	public var authenticationSigning: HierarchicalDeterministicFactorInstance?
 
 	/// The factor instance used to encrypt/decrypt messages
-	public var messageEncryption: HierarchicalDeterministicFactorInstance
+	public var messageEncryption: HierarchicalDeterministicFactorInstance?
 
-	// N.B We MUST set the `authenticationSigning` and the `messageEncryption` factor instance
-	// part of securifying the entity because we use the `UnsecuredEntityControl`'s
-	// `transactionSigningFactorInstance`'s derivationPath as a base for the derivation path
-	// for the authenticationSigning and messageEncryption factor instance respectively.
-	// Otherwise we have no natural derivation path...?
 	init(
+		// WHAT IS THIS?! 🤔
+		// given 2 virtual accounts, A and LEDGER account B
+		// they have the SAME derivation path, since index=0.
+		canonicalDerivationPathForNonTXSigningFactorInstance: DerivationPath,
 		accessController: AccessController,
-		transactionSigningFactorInstances: OrderedSet<FactorInstance>,
-		authenticationSigning: HierarchicalDeterministicFactorInstance,
-		messageEncryption: HierarchicalDeterministicFactorInstance
+		transactionSigningFactorInstances: OrderedSet<FactorInstance>
 	) throws {
 		guard transactionSigningFactorInstances.allSatisfy({
 			switch $0.badge {
