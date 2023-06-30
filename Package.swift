@@ -601,7 +601,8 @@ package.addModules([
 		exclude: [
 			"CodeGen/Input/",
 		],
-		tests: .yes()
+		tests: .yes(),
+		disableConcurrencyChecks: true
 	),
 
 	.client(
@@ -1151,6 +1152,7 @@ extension Package {
 		let resources: [Resource]?
 		let plugins: [Target.PluginUsage]?
 		let tests: Tests
+		let disableConcurrencyChecks: Bool
 		let isProduct: Bool
 
 		static func feature(
@@ -1162,6 +1164,7 @@ extension Package {
 			resources: [Resource]? = nil,
 			plugins: [Target.PluginUsage]? = nil,
 			tests: Tests,
+			disableConcurrencyChecks: Bool = false,
 			isProduct: Bool = true
 		) -> Self {
 			.init(
@@ -1173,6 +1176,7 @@ extension Package {
 				resources: resources,
 				plugins: plugins,
 				tests: tests,
+				disableConcurrencyChecks: disableConcurrencyChecks,
 				isProduct: isProduct
 			)
 		}
@@ -1185,6 +1189,7 @@ extension Package {
 			resources: [Resource]? = nil,
 			plugins: [Target.PluginUsage]? = nil,
 			tests: Tests,
+			disableConcurrencyChecks: Bool = false,
 			isProduct: Bool = true
 		) -> Self {
 			.init(
@@ -1196,6 +1201,7 @@ extension Package {
 				resources: resources,
 				plugins: plugins,
 				tests: tests,
+				disableConcurrencyChecks: disableConcurrencyChecks,
 				isProduct: isProduct
 			)
 		}
@@ -1208,6 +1214,7 @@ extension Package {
 			resources: [Resource]? = nil,
 			plugins: [Target.PluginUsage]? = nil,
 			tests: Tests,
+			disableConcurrencyChecks: Bool = false,
 			isProduct: Bool = true
 		) -> Self {
 			.init(
@@ -1219,6 +1226,7 @@ extension Package {
 				resources: resources,
 				plugins: plugins,
 				tests: tests,
+				disableConcurrencyChecks: disableConcurrencyChecks,
 				isProduct: isProduct
 			)
 		}
@@ -1232,6 +1240,7 @@ extension Package {
 			resources: [Resource]? = nil,
 			plugins: [Target.PluginUsage]? = nil,
 			tests: Tests,
+			disableConcurrencyChecks: Bool = false,
 			isProduct: Bool = true
 		) -> Self {
 			.init(
@@ -1243,6 +1252,7 @@ extension Package {
 				resources: resources,
 				plugins: plugins,
 				tests: tests,
+				disableConcurrencyChecks: disableConcurrencyChecks,
 				isProduct: isProduct
 			)
 		}
@@ -1291,7 +1301,7 @@ extension Package {
 				path: targetPath,
 				exclude: module.exclude,
 				resources: module.resources,
-				swiftSettings: [
+				swiftSettings: module.disableConcurrencyChecks ? [] : [
 					.unsafeFlags([
 						"-Xfrontend", "-warn-concurrency",
 						"-Xfrontend", "-enable-actor-data-race-checks",
