@@ -196,7 +196,7 @@ public struct ProfileBackups: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
-		case let .destination(.presented(.importMnemonic(.delegate(.savedInProfile(factorSourceID))))):
+		case let .destination(.presented(.importMnemonic(.delegate(.savedInProfile(factorSource))))):
 			guard let importedContent = state.importedContent else {
 				assertionFailure("Imported mnemonic, but didn't import neither a snapshot or a profile header")
 				return .none
@@ -205,9 +205,9 @@ public struct ProfileBackups: Sendable, FeatureReducer {
 			return .run { [importedContent] send in
 				switch importedContent {
 				case let .left(snapshot):
-					try await backupsClient.importProfileSnapshot(snapshot, factorSourceID)
+					try await backupsClient.importProfileSnapshot(snapshot, factorSource.id)
 				case let .right(header):
-					try await backupsClient.importCloudProfile(header, factorSourceID)
+					try await backupsClient.importCloudProfile(header, factorSource.id)
 				}
 				await send(.delegate(.profileImported))
 			} catch: { error, _ in

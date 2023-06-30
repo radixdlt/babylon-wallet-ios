@@ -29,14 +29,21 @@ public struct DebugInspectProfile: Sendable, FeatureReducer {
 
 	public enum ViewAction: Sendable, Equatable {
 		case toggleModeButtonTapped
+		case copyJSONButtonTapped
 	}
 
+	@Dependency(\.pasteboardClient) var pasteboardClient
 	public init() {}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .toggleModeButtonTapped:
 			state.mode.toggle()
+			return .none
+		case .copyJSONButtonTapped:
+			if let json = state.json {
+				pasteboardClient.copyString(json)
+			}
 			return .none
 		}
 	}

@@ -1,5 +1,5 @@
-import CreateSecurityStructureFeature
 import FeaturePrelude
+import ManageSecurityStructureFeature
 
 // MARK: - SecurityStructureConfigurationListCoordinator
 public struct SecurityStructureConfigurationListCoordinator: Sendable, FeatureReducer {
@@ -16,6 +16,10 @@ public struct SecurityStructureConfigurationListCoordinator: Sendable, FeatureRe
 		}
 	}
 
+	public enum InternalAction: Sendable, Equatable {
+		case loadDetailsForSecurityStructureResult(TaskResult<SecurityStructureConfigurationDetailed>)
+	}
+
 	public enum ChildAction: Sendable, Equatable {
 		case configList(SecurityStructureConfigurationList.Action)
 		case destination(PresentationAction<Destination.Action>)
@@ -25,21 +29,19 @@ public struct SecurityStructureConfigurationListCoordinator: Sendable, FeatureRe
 
 	public struct Destination: ReducerProtocol {
 		public enum State: Equatable, Hashable {
-			case createSecurityStructureConfig(CreateSecurityStructureCoordinator.State)
-			case securityStructureConfigDetails(SecurityStructureConfigDetails.State)
+			case manageSecurityStructureCoordinator(ManageSecurityStructureCoordinator.State)
 		}
 
 		public enum Action: Equatable {
-			case createSecurityStructureConfig(CreateSecurityStructureCoordinator.Action)
-			case securityStructureConfigDetails(SecurityStructureConfigDetails.Action)
+			case manageSecurityStructureCoordinator(ManageSecurityStructureCoordinator.Action)
 		}
 
 		public var body: some ReducerProtocolOf<Self> {
-			Scope(state: /State.createSecurityStructureConfig, action: /Action.createSecurityStructureConfig) {
-				CreateSecurityStructureCoordinator()
-			}
-			Scope(state: /State.securityStructureConfigDetails, action: /Action.securityStructureConfigDetails) {
-				SecurityStructureConfigDetails()
+			Scope(
+				state: /State.manageSecurityStructureCoordinator,
+				action: /Action.manageSecurityStructureCoordinator
+			) {
+				ManageSecurityStructureCoordinator()
 			}
 		}
 	}
@@ -61,18 +63,36 @@ public struct SecurityStructureConfigurationListCoordinator: Sendable, FeatureRe
 			}
 	}
 
+	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
+		switch internalAction {
+		case let .loadDetailsForSecurityStructureResult(.success(config)):
+			state.destination = .manageSecurityStructureCoordinator(.init(mode: .existing(config)))
+			return .none
+		case let .loadDetailsForSecurityStructureResult(.failure(error)):
+			loggerGlobal.error("Failed to load details for security structure config reference, error: \(error)")
+			errorQueue.schedule(error)
+			return .none
+		}
+	}
+
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
 		case .configList(.delegate(.createNewStructure)):
-			state.destination = .createSecurityStructureConfig(.init())
+			state.destination = .manageSecurityStructureCoordinator(.init())
 			return .none
 
-		case let .configList(.delegate(.displayDetails(config))):
-			state.destination = .securityStructureConfigDetails(.init(config: config))
-			return .none
+		case let .configList(.delegate(.displayDetails(configReference))):
 
-		case let .destination(.presented(.createSecurityStructureConfig(.delegate(.done(.success(config)))))):
-			state.configList.configs.append(.init(config: config))
+			return .task {
+				let taskResult = await TaskResult {
+					try await appPreferencesClient.getDetailsOfSecurityStructure(configReference)
+				}
+				return .internal(.loadDetailsForSecurityStructureResult(taskResult))
+			}
+
+		case let .destination(.presented(.manageSecurityStructureCoordinator(.delegate(.done(.success(config)))))):
+			let configReference = config.asReference()
+			state.configList.configs[id: configReference.id] = .init(configReference: configReference)
 			state.destination = nil
 			return .none
 

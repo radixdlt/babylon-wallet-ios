@@ -147,7 +147,8 @@ extension ProfileSnapshot.Header.Version {
 	/// - 35: Change FactorSource into an enum
 	/// - 36: Add `structureConfigurations` to `AppPreferences.Security`
 	/// - 37: Change `FactorSourceID` -> enum
-	public static let minimum: Self = 37
+	/// - 38: Added `updatedOn` date to `SecurityStructureConfiguration`
+	public static let minimum: Self = 38
 }
 
 extension ProfileSnapshot.Header {

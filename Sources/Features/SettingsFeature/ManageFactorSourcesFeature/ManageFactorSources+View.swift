@@ -90,7 +90,11 @@ extension FactorSourceView {
 			VPair(heading: "Kind", item: factorSource.kind)
 			VPair(heading: "Added on", item: factorSource.addedOn.ISO8601Format())
 			VPair(heading: "ID", item: String(factorSource.id.description.mask(showLast: 6)))
+			if factorSource.isFlaggedForDeletion {
+				Text("🚩🗑️ flagged as deleted")
+			}
 		}
+		.padding()
 		.border(Color.app.gray1, width: 2)
 	}
 }
