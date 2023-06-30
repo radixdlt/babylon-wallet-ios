@@ -62,8 +62,17 @@ extension OverlayWindowClient {
 			case dismissed
 		}
 
-		public enum HUD: Sendable, Hashable {
-			case copied
+		public struct HUD: Sendable, Hashable, Identifiable {
+			public enum Kind: Sendable, Hashable {
+				case copied
+			}
+
+			public let id = UUID()
+			public let kind: Kind
+
+			public init(kind: Kind) {
+				self.kind = kind
+			}
 		}
 
 		case hud(HUD)

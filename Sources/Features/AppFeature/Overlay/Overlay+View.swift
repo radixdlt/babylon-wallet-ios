@@ -15,14 +15,17 @@ extension OverlayReducer {
 		var body: some SwiftUI.View {
 			WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
 				IfLetStore(
-					store.scope(
-						state: \.hud,
-						action: { .child(.hud($0)) }
-					),
+					store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+					state: /OverlayReducer.Destinations.State.hud,
+					action: OverlayReducer.Destinations.Action.hud,
 					then: { HUD.View(store: $0) }
 				)
+				.alert(
+					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+					state: /OverlayReducer.Destinations.State.alert,
+					action: OverlayReducer.Destinations.Action.alert
+				)
 				.task { viewStore.send(.task) }
-				.alert(store: store.scope(state: \.$alert, action: { .view(.alert($0)) }))
 			}
 		}
 	}

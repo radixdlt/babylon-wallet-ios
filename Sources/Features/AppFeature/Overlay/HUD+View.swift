@@ -3,7 +3,7 @@ import OverlayWindowClient
 
 extension HUD.State {
 	var viewState: HUD.ViewState {
-		switch content {
+		switch content.kind {
 		case .copied:
 			return .init(
 				offset: offset,

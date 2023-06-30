@@ -7,27 +7,15 @@ struct OverlayReducer: Sendable, FeatureReducer {
 		var itemsQueue: OrderedSet<OverlayWindowClient.Item> = []
 
 		var isPresenting: Bool {
-			alert != nil || hud != nil
+			destination != nil
 		}
 
 		@PresentationState
-		public var alert: Alerts.State?
-                
-		public var hud: HUD.State?
-	}
-
-	struct Alerts: Sendable, ReducerProtocol {
-		typealias State = OverlayWindowClient.Item.AlertState
-		typealias Action = OverlayWindowClient.Item.AlertAction
-
-		var body: some ReducerProtocolOf<Self> {
-			EmptyReducer()
-		}
+		public var destination: Destinations.State?
 	}
 
 	enum ViewAction: Sendable, Equatable {
 		case task
-		case alert(PresentationAction<Alerts.Action>)
 	}
 
 	enum InternalAction: Sendable, Equatable {
@@ -36,7 +24,28 @@ struct OverlayReducer: Sendable, FeatureReducer {
 	}
 
 	enum ChildAction: Sendable, Equatable {
-		case hud(HUD.Action)
+		case destination(PresentationAction<Destinations.Action>)
+	}
+
+	public struct Destinations: Sendable, ReducerProtocol {
+		public enum State: Sendable, Hashable {
+			case hud(HUD.State)
+			case alert(OverlayWindowClient.Item.AlertState)
+		}
+
+		public enum Action: Sendable, Equatable {
+			case hud(HUD.Action)
+			case alert(OverlayWindowClient.Item.AlertAction)
+		}
+
+		public var body: some ReducerProtocol<State, Action> {
+			Scope(state: /State.hud, action: /Action.hud) {
+				HUD()
+			}
+			Scope(state: /State.alert, action: /Action.alert) {
+				EmptyReducer()
+			}
+		}
 	}
 
 	@Dependency(\.overlayWindowClient) var overlayWindowClient
@@ -44,11 +53,8 @@ struct OverlayReducer: Sendable, FeatureReducer {
 
 	var body: some ReducerProtocolOf<Self> {
 		Reduce(core)
-			.ifLet(\.$alert, action: /Action.view .. ViewAction.alert) {
-				Alerts()
-			}
-			.ifLet(\.hud, action: /Action.child .. ChildAction.hud) {
-				HUD()
+			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
+				Destinations()
 			}
 	}
 
@@ -60,10 +66,6 @@ struct OverlayReducer: Sendable, FeatureReducer {
 					await send(.internal(.scheduleItem(item)))
 				}
 			}
-		case .alert(.dismiss):
-			return dismissAlert(state: &state, withAction: .dismissed)
-		case let .alert(.presented(action)):
-			return dismissAlert(state: &state, withAction: action)
 		}
 	}
 
@@ -79,9 +81,17 @@ struct OverlayReducer: Sendable, FeatureReducer {
 
 	func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
-		case .hud(.delegate(.dismiss)):
-			state.hud = nil
+		case .destination(.dismiss):
 			return dismiss(&state)
+		case let .destination(.presented(.alert(action))):
+			let item = state.itemsQueue[0]
+			if case let .alert(state) = item {
+				overlayWindowClient.sendAlertAction(action, state.id)
+			}
+			return .none
+		case .destination(.presented(.hud(.delegate(.dismiss)))):
+			return dismiss(&state)
+
 		default:
 			return .none
 		}
@@ -93,11 +103,13 @@ struct OverlayReducer: Sendable, FeatureReducer {
 		}
 
 		if state.isPresenting {
-			let presentedItem = state.itemsQueue[0]
+			guard let presentedItem = state.itemsQueue.first else {
+				return .none
+			}
 
 			if case .hud = presentedItem {
 				// A HUD is force dismissed when next item comes in, AKA it is a lower priority.
-				state.hud = nil
+				state.destination = nil
 				state.itemsQueue.removeFirst()
 				return .run { send in
 					// Hacky - A very minor delay is needed before showing the next item is a HUD.
@@ -113,10 +125,10 @@ struct OverlayReducer: Sendable, FeatureReducer {
 
 		switch nextItem {
 		case let .hud(hud):
-			state.hud = .init(content: hud)
+			state.destination = .hud(.init(content: hud))
 			return .none
 		case let .alert(alert):
-			state.alert = alert
+			state.destination = .alert(alert)
 			return setIsUserInteractionEnabled(&state, isEnabled: true)
 		}
 	}
@@ -131,6 +143,7 @@ struct OverlayReducer: Sendable, FeatureReducer {
 	}
 
 	private func dismiss(_ state: inout State) -> EffectTask<Action> {
+		state.destination = nil
 		state.itemsQueue.removeFirst()
 		return setIsUserInteractionEnabled(&state, isEnabled: false)
 			.concatenate(with: showItemIfPossible(state: &state))
