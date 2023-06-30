@@ -377,7 +377,6 @@
 				488BBEED2A2CB40A0019C723 /* AnswerSecurityQuestionsPreview */,
 				488BBEBE2A2B29970019C723 /* ManageSecurityStructurePreview */,
 				E6E777F82A1F62D90085529F /* ImportMnemonicPreview */,
-				E6DF7A592A3739F00058DE15 /* SecurityStructureConfigurationListPreview */,
 			);
 			path = Previews;
 			sourceTree = "<group>";
