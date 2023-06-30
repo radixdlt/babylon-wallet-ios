@@ -37,6 +37,7 @@ public struct ChooseQuestions: Sendable, FeatureReducer {
 			availableQuestions: NonEmpty<OrderedSet<SecurityQuestion>> = SecurityQuestionsFactorSource.defaultQuestions
 		) {
 			self.availableQuestions = availableQuestions
+			self.selectedQuestions = nil
 		}
 	}
 

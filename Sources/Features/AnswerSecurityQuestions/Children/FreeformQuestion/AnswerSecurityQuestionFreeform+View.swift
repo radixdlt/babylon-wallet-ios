@@ -24,11 +24,11 @@ public extension AnswerSecurityQuestionFreeform {
 			buttonTitle = state.isLast ? "Submit" : "Next question"
 		}
 
-		var validAnswer: AnswerToSecurityQuestion.Answer? {
+		var validAnswer: SecurityQuestionAnswerAsEntropy? {
 			guard let nonEmpty = NonEmptyString(rawValue: answer) else {
 				return nil
 			}
-			return .from(nonEmpty)
+			return try? .from(nonEmpty)
 		}
 	}
 

@@ -31,6 +31,8 @@ public struct AppTextField<FocusValue: Hashable, Accessory: View, InnerAccessory
 		}
 	}
 
+	@Environment(\.isEnabled) var isEnabled: Bool
+
 	let primaryHeading: PrimaryHeading?
 	let secondaryHeading: String?
 	let placeholder: String
@@ -91,7 +93,7 @@ public struct AppTextField<FocusValue: Hashable, Accessory: View, InnerAccessory
 					if let primaryHeading {
 						Text(primaryHeading.text)
 							.textStyle(primaryHeading.isProminent ? .body1HighImportance : .body2Regular)
-							.foregroundColor(primaryHeading.isProminent ? accentColor : .app.gray2)
+							.foregroundColor(primaryHeading.isProminent && isEnabled ? accentColor : .app.gray2)
 							.multilineTextAlignment(.leading)
 					}
 
@@ -120,7 +122,7 @@ public struct AppTextField<FocusValue: Hashable, Accessory: View, InnerAccessory
 						}
 					}
 					.privacySensitive()
-					.foregroundColor(.app.gray1)
+					.foregroundColor(isEnabled ? .app.gray1 : .app.gray2)
 					.textStyle(.body1Regular)
 					.alignmentGuide(.textFieldAlignment, computeValue: { $0[VerticalAlignment.center] })
 
