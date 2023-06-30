@@ -43,11 +43,13 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 		let interactionItems: NonEmpty<OrderedSet<AnyInteractionItem>>
 		var responseItems: OrderedDictionary<AnyInteractionItem, AnyInteractionResponseItem> = [:]
 
+		var interactionItem: AnyInteractionItem? = nil
+
 		@PresentationState
 		var personaNotFoundErrorAlert: AlertState<ViewAction.PersonaNotFoundErrorAlertAction>? = nil
 
-		var root: Destinations.State?
-		var path: StackState<Destinations.State> = .init()
+		var root: Path.State? = nil
+		var path: StackState<Path.State> = .init()
 
 		init?(
 			dappMetadata: DappMetadata,
@@ -58,12 +60,15 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 
 			if let interactionItems = NonEmpty(rawValue: OrderedSet<AnyInteractionItem>(for: remoteInteraction.erasedItems)) {
 				self.interactionItems = interactionItems
-				self.root = Destinations.State(
+				self.root = Path.State(
 					for: interactionItems.first,
 					interaction: remoteInteraction,
 					dappMetadata: dappMetadata,
 					persona: nil
 				)
+				if root != nil {
+					self.interactionItem = interactionItems.first
+				}
 			} else {
 				return nil
 			}
@@ -110,8 +115,8 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 	}
 
 	enum ChildAction: Sendable, Equatable {
-		case root(Destinations.Action)
-		case path(StackActionOf<Destinations>)
+		case root(Path.Action)
+		case path(StackActionOf<Path>)
 	}
 
 	enum DelegateAction: Sendable, Equatable {
@@ -121,11 +126,8 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 		case dismiss
 	}
 
-	struct Destinations: Sendable, ReducerProtocol {
-		typealias State = RelayState<DappInteractionFlow.State.AnyInteractionItem, MainState>
-		typealias Action = RelayAction<DappInteractionFlow.State.AnyInteractionItem, MainAction>
-
-		enum MainState: Sendable, Hashable {
+	struct Path: Sendable, ReducerProtocol {
+		enum State: Sendable, Hashable {
 			case login(Login.State)
 			case accountPermission(AccountPermission.State)
 			case chooseAccounts(AccountPermissionChooseAccounts.State)
@@ -134,7 +136,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			case reviewTransaction(TransactionReview.State)
 		}
 
-		enum MainAction: Sendable, Equatable {
+		enum Action: Sendable, Equatable {
 			case login(Login.Action)
 			case accountPermission(AccountPermission.Action)
 			case chooseAccounts(AccountPermissionChooseAccounts.Action)
@@ -144,26 +146,23 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 		}
 
 		var body: some ReducerProtocolOf<Self> {
-			Relay {
-				EmptyReducer()
-					.ifCaseLet(/MainState.login, action: /MainAction.login) {
-						Login()
-					}
-					.ifCaseLet(/MainState.accountPermission, action: /MainAction.accountPermission) {
-						AccountPermission()
-					}
-					.ifCaseLet(/MainState.chooseAccounts, action: /MainAction.chooseAccounts) {
-						AccountPermissionChooseAccounts()
-					}
-					.ifCaseLet(/MainState.personaDataPermission, action: /MainAction.personaDataPermission) {
-						PersonaDataPermission()
-					}
-					.ifCaseLet(/MainState.oneTimePersonaData, action: /MainAction.oneTimePersonaData) {
-						OneTimePersonaData()
-					}
-					.ifCaseLet(/MainState.reviewTransaction, action: /MainAction.reviewTransaction) {
-						TransactionReview()
-					}
+			Scope(state: /State.login, action: /Action.login) {
+				Login()
+			}
+			Scope(state: /State.accountPermission, action: /Action.accountPermission) {
+				AccountPermission()
+			}
+			Scope(state: /State.chooseAccounts, action: /Action.chooseAccounts) {
+				AccountPermissionChooseAccounts()
+			}
+			Scope(state: /State.personaDataPermission, action: /Action.personaDataPermission) {
+				PersonaDataPermission()
+			}
+			Scope(state: /State.oneTimePersonaData, action: /Action.oneTimePersonaData) {
+				OneTimePersonaData()
+			}
+			Scope(state: /State.reviewTransaction, action: /Action.reviewTransaction) {
+				TransactionReview()
 			}
 		}
 	}
@@ -171,10 +170,10 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 	var body: some ReducerProtocolOf<Self> {
 		Reduce(core)
 			.ifLet(\.root, action: /Action.child .. ChildAction.root) {
-				Destinations()
+				Path()
 			}
 			.forEach(\.path, action: /Action.child .. ChildAction.path) {
-				Destinations()
+				Path()
 			}
 			.ifLet(\.$personaNotFoundErrorAlert, action: /Action.view .. ViewAction.personaNotFoundErrorAlert)
 	}
@@ -410,7 +409,8 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			return dismissEffect(for: state, errorKind: errorKind, message: message)
 		}
 
-		guard let (item, action) = childAction.itemAndAction else { return .none }
+		guard let item = state.interactionItem, let action = childAction.pathAction else { return .none }
+
 		switch action {
 		case .login(.delegate(.failedToSignAuthChallenge)):
 			return dismissEffect(
@@ -548,21 +548,23 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 	}
 
 	func continueEffect(for state: inout State) -> EffectTask<Action> {
-		if
-			let nextRequest = state.interactionItems.first(where: { state.responseItems[$0] == nil }),
-			let destination = Destinations.State(
-				for: nextRequest,
-				interaction: state.remoteInteraction,
-				dappMetadata: state.dappMetadata,
-				persona: state.persona
-			)
+		if let nextRequest = state.interactionItems.first(where: { state.responseItems[$0] == nil }),
+		   let destination = Path.State(
+		   	for: nextRequest,
+		   	interaction: state.remoteInteraction,
+		   	dappMetadata: state.dappMetadata,
+		   	persona: state.persona
+		   )
 		{
+			state.interactionItem = nextRequest
 			if state.root == nil {
 				state.root = destination
 			} else if state.path.last != destination {
 				state.path.append(destination)
 			}
+
 			return .none
+
 		} else {
 			return finishInteractionFlow(state)
 		}
@@ -707,10 +709,10 @@ extension OrderedSet<DappInteractionFlow.State.AnyInteractionItem> {
 }
 
 extension DappInteractionFlow.ChildAction {
-	var itemAndAction: (DappInteractionFlow.State.AnyInteractionItem, DappInteractionFlow.Destinations.MainAction)? {
+	var pathAction: DappInteractionFlow.Path.Action? {
 		switch self {
-		case let .root(.relay(item, action)), let .path(.element(_, .relay(item, action))):
-			return (item, action)
+		case let .root(action), let .path(.element(_, action)):
+			return action
 
 		case .path(.popFrom), .path(.push):
 			return nil
@@ -718,7 +720,7 @@ extension DappInteractionFlow.ChildAction {
 	}
 }
 
-extension DappInteractionFlow.Destinations.State {
+extension DappInteractionFlow.Path.State {
 	init?(
 		for anyItem: DappInteractionFlow.State.AnyInteractionItem,
 		interaction: DappInteractionFlow.State.RemoteInteraction,
@@ -729,46 +731,46 @@ extension DappInteractionFlow.Destinations.State {
 		case .remote(.auth(.usePersona)):
 			return nil
 		case let .remote(.auth(.login(loginRequest))):
-			self = .relayed(anyItem, with: .login(.init(
+			self = .login(.init(
 				dappMetadata: dappMetadata,
 				loginRequest: loginRequest
-			)))
+			))
 
 		case let .local(.accountPermissionRequested(numberOfAccounts)):
-			self = .relayed(anyItem, with: .accountPermission(.init(
+			self = .accountPermission(.init(
 				dappMetadata: dappMetadata,
 				numberOfAccounts: numberOfAccounts
-			)))
+			))
 
 		case let .remote(.ongoingAccounts(item)):
-			self = .relayed(anyItem, with: .chooseAccounts(.init(
+			self = .chooseAccounts(.init(
 				challenge: item.challenge,
 				accessKind: .ongoing,
 				dappMetadata: dappMetadata,
 				numberOfAccounts: item.numberOfAccounts
-			)))
+			))
 
 		case let .remote(.oneTimeAccounts(item)):
-			self = .relayed(anyItem, with: .chooseAccounts(.init(
+			self = .chooseAccounts(.init(
 				challenge: item.challenge,
 				accessKind: .oneTime,
 				dappMetadata: dappMetadata,
 				numberOfAccounts: item.numberOfAccounts
-			)))
+			))
 
 		case let .remote(.oneTimePersonaData(item)):
-			self = .relayed(anyItem, with: .oneTimePersonaData(.init(
+			self = .oneTimePersonaData(.init(
 				dappMetadata: dappMetadata,
 				requiredFieldIDs: item.fields
-			)))
+			))
 
 		case let .remote(.ongoingPersonaData(item)):
 			if let persona {
-				self = .relayed(anyItem, with: .personaDataPermission(.init(
+				self = .personaDataPermission(.init(
 					dappMetadata: dappMetadata,
 					personaID: persona.id,
 					requiredFieldIDs: item.fields
-				)))
+				))
 			} else {
 				assertionFailure("Persona data request requires a persona.")
 				return nil
@@ -776,12 +778,12 @@ extension DappInteractionFlow.Destinations.State {
 
 		case let .remote(.send(item)):
 			@Dependency(\.engineToolkitClient) var engineToolkitClient
-			self = .relayed(anyItem, with: .reviewTransaction(.init(
+			self = .reviewTransaction(.init(
 				transactionManifest: item.transactionManifest,
 				nonce: engineToolkitClient.generateTXNonce(),
 				signTransactionPurpose: .manifestFromDapp,
 				message: item.message
-			)))
+			))
 		}
 	}
 }
