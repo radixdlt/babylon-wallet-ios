@@ -93,7 +93,7 @@ public struct AppTextField<FocusValue: Hashable, Accessory: View, InnerAccessory
 					if let primaryHeading {
 						Text(primaryHeading.text)
 							.textStyle(primaryHeading.isProminent ? .body1HighImportance : .body2Regular)
-							.foregroundColor(primaryHeading.isProminent && isEnabled ? accentColor : .app.gray2)
+							.foregroundColor(primaryHeading.isProminent && isEnabled ? accentColor(border: false) : .app.gray2)
 							.multilineTextAlignment(.leading)
 					}
 
@@ -147,7 +147,7 @@ public struct AppTextField<FocusValue: Hashable, Accessory: View, InnerAccessory
 				.cornerRadius(.small2)
 				.overlay(
 					RoundedRectangle(cornerRadius: .small2)
-						.stroke(accentColor, lineWidth: 1)
+						.stroke(accentColor(border: true), lineWidth: 1)
 				)
 
 				hint
@@ -158,10 +158,10 @@ public struct AppTextField<FocusValue: Hashable, Accessory: View, InnerAccessory
 		}
 	}
 
-	private var accentColor: Color {
+	private func accentColor(border: Bool) -> Color {
 		switch hint?.kind {
 		case .none:
-			return .app.gray1
+			return border ? .app.gray4 : .app.gray1
 		case .info:
 			return .app.gray1
 		case .error:

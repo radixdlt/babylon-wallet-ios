@@ -8,6 +8,7 @@ extension ImportMnemonic.State {
 	var viewState: ImportMnemonic.ViewState {
 		.init(
 			isReadonlyMode: isReadonlyMode,
+			isAdvancedMode: isAdvancedMode,
 			header: header,
 			warning: warning,
 			isHidingSecrets: isHidingSecrets,
@@ -28,6 +29,7 @@ extension ImportMnemonic.State {
 extension ImportMnemonic {
 	public struct ViewState: Equatable {
 		let isReadonlyMode: Bool
+		let isAdvancedMode: Bool
 		let header: State.Header?
 		let warning: String?
 		let isHidingSecrets: Bool
@@ -53,11 +55,15 @@ extension ImportMnemonic.ViewState {
 	}
 
 	var isShowingPassphrase: Bool {
-		!(isReadonlyMode && bip39Passphrase.isEmpty)
+		isAdvancedMode && !(isReadonlyMode && bip39Passphrase.isEmpty)
 	}
 
 	var isShowingChangeWordCountButtons: Bool {
 		!isReadonlyMode
+	}
+
+	var modeButtonTitle: String {
+		isAdvancedMode ? L10n.ImportMnemonic.regularModeButton : L10n.ImportMnemonic.advancedModeButton
 	}
 }
 
@@ -102,6 +108,13 @@ extension ImportMnemonic {
 								.padding(.horizontal, .medium2)
 								.padding(.bottom, .medium2)
 						}
+
+						Button(viewStore.modeButtonTitle) {
+							viewStore.send(.toggleModeButtonTapped)
+						}
+						.buttonStyle(.blue)
+						.frame(height: .large1)
+						.padding(.bottom, .medium2)
 					}
 					.redacted(reason: .privacy, if: viewStore.isHidingSecrets)
 					#if os(iOS)
@@ -112,11 +125,12 @@ extension ImportMnemonic {
 							viewStore.send(.scenePhase(.inactive))
 						}
 					#endif
-						.footer {
-							footer(with: viewStore)
-						}
+				}
+				.footer {
+					footer(with: viewStore)
 				}
 				.animation(.default, value: viewStore.wordCount)
+				.animation(.default, value: viewStore.isAdvancedMode)
 				.onAppear { viewStore.send(.appeared) }
 				#if !DEBUG && os(iOS)
 					.screenshotProtected(isProtected: true)
@@ -140,7 +154,7 @@ extension ImportMnemonic {
 				VStack(spacing: 0) {
 					Text(header.title)
 						.textStyle(.sheetTitle)
-						.padding(.bottom, .medium3)
+						.padding(.bottom, .large2)
 
 					if let subtitle = header.subtitle {
 						Text(subtitle)
@@ -176,7 +190,7 @@ extension ImportMnemonic.View {
 	@ViewBuilder
 	private func passphrase(with viewStore: ViewStoreOf<ImportMnemonic>) -> some SwiftUI.View {
 		AppTextField(
-			primaryHeading: .init(text: L10n.ImportMnemonic.passphrase, isProminent: false),
+			primaryHeading: .init(text: L10n.ImportMnemonic.passphrase, isProminent: true),
 			placeholder: L10n.ImportMnemonic.passphrasePlaceholder,
 			text: viewStore.binding(
 				get: \.bip39Passphrase,

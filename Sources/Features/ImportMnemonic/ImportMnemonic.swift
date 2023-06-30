@@ -65,6 +65,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 		public let persistedKind: MnemonicBasedFactorSourceKind?
 
 		public let isReadonlyMode: Bool
+		public var isAdvancedMode: Bool = false
 		public var isHidingSecrets: Bool = false
 
 		public let header: Header?
@@ -148,6 +149,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 		case appeared
 		case scenePhase(ScenePhase)
 
+		case toggleModeButtonTapped
 		case passphraseChanged(String)
 		case addRowButtonTapped
 		case removeRowButtonTapped
@@ -247,6 +249,10 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 
 		case let .passphraseChanged(passphrase):
 			state.bip39Passphrase = passphrase
+			return .none
+
+		case .toggleModeButtonTapped:
+			state.isAdvancedMode.toggle()
 			return .none
 
 		case .addRowButtonTapped:

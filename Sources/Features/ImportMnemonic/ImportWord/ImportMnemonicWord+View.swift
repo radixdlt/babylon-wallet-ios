@@ -69,7 +69,7 @@ extension ImportMnemonicWord {
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				AppTextField(
-					primaryHeading: .init(text: L10n.ImportMnemonic.wordHeading(viewStore.index + 1), isProminent: false),
+					primaryHeading: .init(text: L10n.ImportMnemonic.wordHeading(viewStore.index + 1), isProminent: true),
 					placeholder: viewStore.placeholder,
 					text: .init(
 						get: { viewStore.displayText },
@@ -87,7 +87,9 @@ extension ImportMnemonicWord {
 					showClearButton: viewStore.showClearButton,
 					innerAccessory: {
 						if viewStore.displayValidAccessory {
-							Image(systemName: "checkmark.seal.fill").foregroundColor(.app.green1)
+							Image(asset: AssetResource.successCheckmark)
+								.resizable()
+								.frame(.smallest)
 						}
 					}
 				)
@@ -102,7 +104,7 @@ extension ImportMnemonicWord {
 						viewStore.focusedField != nil // we only display the currently selected textfields candidates
 					{
 						ToolbarItemGroup(placement: .keyboard) {
-							ScrollView([.horizontal], showsIndicators: false) {
+							ScrollView(.horizontal, showsIndicators: false) {
 								HStack {
 									ForEach(autocompletionCandidates.candidates, id: \.self) { candidate in
 										Button(candidate.word.rawValue) {
@@ -112,6 +114,8 @@ extension ImportMnemonicWord {
 									}
 								}
 							}
+							.frame(maxWidth: .infinity)
+							.border(.orange)
 						}
 					}
 				}
