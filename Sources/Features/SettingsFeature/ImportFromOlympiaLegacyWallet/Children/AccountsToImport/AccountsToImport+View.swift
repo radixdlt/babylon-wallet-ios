@@ -61,8 +61,8 @@ public struct AccountView: View {
 			VStack(alignment: .leading, spacing: .small1) {
 				VPair(
 					heading: viewState.accountName ?? L10n.ImportOlympiaAccounts.AccountsToImport.unnamed,
-					largeHeading: true,
-					value: viewState.olympiaAccountType.label
+					value: viewState.olympiaAccountType.label,
+					large: true
 				)
 
 				VPair(
@@ -101,18 +101,19 @@ public struct AccountView: View {
 
 	struct VPair: View {
 		let heading: String
-		var largeHeading: Bool = false
 		let value: String
+		var large: Bool = false
 
 		var body: some View {
-			VStack(alignment: .leading, spacing: .small3) {
+			VStack(alignment: .leading, spacing: large ? .small2 : .small3) {
 				Text(heading)
-					.textStyle(largeHeading ? .secondaryHeader : .body2Link)
+					.textStyle(large ? .secondaryHeader : .body2Link)
 					.foregroundColor(.white)
 				Text(value)
-					.textStyle(.body2Regular)
+					.textStyle(.body2Link)
 					.foregroundColor(.app.gray4)
 			}
+			.padding(.bottom, large ? .small3 : 0)
 		}
 	}
 }
