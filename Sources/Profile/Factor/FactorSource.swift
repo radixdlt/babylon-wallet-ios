@@ -37,6 +37,10 @@ extension FactorSource {
 		property(\.kind)
 	}
 
+	public func embed() -> FactorSource {
+		self
+	}
+
 	public mutating func update<Property>(
 		_ writableKeyPath: WritableKeyPath<any FactorSourceProtocol, Property>,
 		to newValue: Property
@@ -64,7 +68,7 @@ extension FactorSource {
 		}
 	}
 
-	private func property<Property>(_ keyPath: KeyPath<BaseFactorSourceProtocol, Property>) -> Property {
+	private func property<Property>(_ keyPath: KeyPath<any BaseFactorSourceProtocol, Property>) -> Property {
 		switch self {
 		case let .device(factorSource): return factorSource[keyPath: keyPath]
 		case let .ledger(factorSource): return factorSource[keyPath: keyPath]

@@ -55,7 +55,7 @@ package.addModules([
 		tests: .no
 	),
 	.feature(
-		name: "AddTrustedContactFactorSourceFeature",
+		name: "ManageTrustedContactFactorSourceFeature",
 		featureSuffixDroppedFromFolderName: true,
 		dependencies: [
 			"FactorSourcesClient",
@@ -123,14 +123,6 @@ package.addModules([
 		tests: .no
 	),
 	.feature(
-		name: "LedgerHardwareDevicesFeature",
-		featureSuffixDroppedFromFolderName: true,
-		dependencies: [
-			"AddLedgerFactorSourceFeature",
-		],
-		tests: .no
-	),
-	.feature(
 		name: "CreateAuthKeyFeature",
 		featureSuffixDroppedFromFolderName: true,
 		dependencies: [
@@ -164,17 +156,6 @@ package.addModules([
 			"GatewayAPI",
 			"PersonasClient",
 			"DerivePublicKeysFeature",
-		],
-		tests: .no
-	),
-	.feature(
-		name: "CreateSecurityStructureFeature",
-		featureSuffixDroppedFromFolderName: true,
-		dependencies: [
-			"Profile",
-			"AnswerSecurityQuestionsFeature",
-			"AddTrustedContactFactorSourceFeature",
-			"AppPreferencesClient", // Save SecurityStructureConfig
 		],
 		tests: .no
 	),
@@ -244,6 +225,7 @@ package.addModules([
 	.feature(
 		name: "GeneralSettings",
 		dependencies: [
+			"CacheClient",
 			"AppPreferencesClient",
 			"FactorSourcesClient", // check if has any ledgers
 		],
@@ -286,6 +268,14 @@ package.addModules([
 		tests: .no
 	),
 	.feature(
+		name: "LedgerHardwareDevicesFeature",
+		featureSuffixDroppedFromFolderName: true,
+		dependencies: [
+			"AddLedgerFactorSourceFeature",
+		],
+		tests: .no
+	),
+	.feature(
 		name: "MainFeature",
 		dependencies: [
 			"AppPreferencesClient",
@@ -294,6 +284,19 @@ package.addModules([
 			"SettingsFeature",
 		],
 		tests: .yes()
+	),
+	.feature(
+		name: "ManageSecurityStructureFeature",
+		featureSuffixDroppedFromFolderName: true,
+		dependencies: [
+			"Profile",
+			"AnswerSecurityQuestionsFeature",
+			"ManageTrustedContactFactorSourceFeature",
+			"LedgerHardwareDevicesFeature",
+			"ImportMnemonicFeature", // Add `offDeviceMnemonic`
+			"AppPreferencesClient", // Save SecurityStructureConfig
+		],
+		tests: .no
 	),
 	.feature(
 		name: "NewConnectionFeature",
@@ -368,7 +371,7 @@ package.addModules([
 		featureSuffixDroppedFromFolderName: true,
 		dependencies: [
 			"AppPreferencesClient",
-			"CreateSecurityStructureFeature",
+			"ManageSecurityStructureFeature",
 		],
 		tests: .no
 	),

@@ -30,7 +30,7 @@ final class AppFeatureTests: TestCase {
 	}
 
 	func test_splash__GIVEN__an_existing_profile__WHEN__existing_profile_loaded__THEN__we_navigate_to_main() async throws {
-		// GIVEN: an existinœg profile
+		// GIVEN: an existing profile
 		let accountRecoveryNeeded = true
 		let clock = TestClock()
 		let store = TestStore(

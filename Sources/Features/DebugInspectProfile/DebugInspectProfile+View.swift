@@ -35,6 +35,13 @@ extension DebugInspectProfile {
 				}
 				.toolbar {
 					ToolbarItem(placement: .navigationBarTrailing) {
+						Button("Copy JSON") {
+							viewStore.send(.copyJSONButtonTapped)
+						}
+						.buttonStyle(.borderedProminent)
+					}
+
+					ToolbarItem(placement: .navigationBarTrailing) {
 						Button(viewStore.mode.toggleButtonText) {
 							viewStore.send(.toggleModeButtonTapped)
 						}
