@@ -68,62 +68,68 @@ extension ImportMnemonicWord {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-				AppTextField(
-					primaryHeading: .init(text: L10n.ImportMnemonic.wordHeading(viewStore.index + 1), isProminent: true),
-					placeholder: viewStore.placeholder,
-					text: .init(
-						get: { viewStore.displayText },
-						set: { viewStore.send(.wordChanged(input: $0.lowercased().trimmingWhitespacesAndNewlines())) }
-					),
-					hint: viewStore.hint,
-					focus: .on(
-						.textField,
-						binding: viewStore.binding(
-							get: \.focusedField,
-							send: { .textFieldFocused($0) }
+				VStack(spacing: .small3) {
+					AppTextField(
+						primaryHeading: .init(text: L10n.ImportMnemonic.wordHeading(viewStore.index + 1), isProminent: true),
+						placeholder: viewStore.placeholder,
+						text: .init(
+							get: { viewStore.displayText },
+							set: { viewStore.send(.wordChanged(input: $0.lowercased().trimmingWhitespacesAndNewlines())) }
 						),
-						to: $focusedField
-					),
-					showClearButton: viewStore.showClearButton,
-					innerAccessory: {
-						if viewStore.displayValidAccessory {
-							Image(asset: AssetResource.successCheckmark)
-								.resizable()
-								.frame(.smallest)
+						hint: viewStore.hint,
+						focus: .on(
+							.textField,
+							binding: viewStore.binding(
+								get: \.focusedField,
+								send: { .textFieldFocused($0) }
+							),
+							to: $focusedField
+						),
+						showClearButton: viewStore.showClearButton,
+						innerAccessory: {
+							if viewStore.displayValidAccessory {
+								Image(asset: AssetResource.successCheckmark)
+									.resizable()
+									.frame(.smallest)
+							}
 						}
-					}
-				)
-				.disabled(viewStore.isReadonlyMode)
-				.minimumScaleFactor(0.9)
-				.keyboardType(.alphabet)
-				.textInputAutocapitalization(.never)
-				.autocorrectionDisabled()
-				.toolbar {
-					if
-						let autocompletionCandidates = viewStore.autocompletionCandidates,
-						viewStore.focusedField != nil // we only display the currently selected textfields candidates
-					{
-						ToolbarItemGroup(placement: .keyboard) {
-							ScrollView(.horizontal, showsIndicators: false) {
-								HStack {
-									ForEach(autocompletionCandidates.candidates, id: \.self) { candidate in
-										Button(candidate.word.rawValue) {
-											viewStore.send(.userSelectedCandidate(candidate))
+					)
+					.disabled(viewStore.isReadonlyMode)
+					.minimumScaleFactor(0.9)
+					.keyboardType(.alphabet)
+					.textInputAutocapitalization(.never)
+					.autocorrectionDisabled()
+					.toolbar {
+						// We only display the currently selected textfields candidates
+						if let autocompletionCandidates = viewStore.autocompletionCandidates, viewStore.focusedField != nil {
+							ToolbarItemGroup(placement: .keyboard) {
+								ScrollView(.horizontal, showsIndicators: false) {
+									HStack {
+										ForEach(autocompletionCandidates.candidates, id: \.self) { candidate in
+											Button(candidate.word.rawValue) {
+												viewStore.send(.userSelectedCandidate(candidate))
+											}
+											.buttonStyle(.primaryRectangular(height: .toolbarButtonHeight))
 										}
-										.buttonStyle(.primaryRectangular(height: .toolbarButtonHeight))
+									}
+									.padding(.horizontal, .small2)
+								}
+								.mask {
+									HStack(spacing: 0) {
+										LinearGradient(colors: [.clear, .white], startPoint: .leading, endPoint: .trailing)
+											.frame(width: .small2)
+										Color.white
+										LinearGradient(colors: [.white, .clear], startPoint: .leading, endPoint: .trailing)
+											.frame(width: .small2)
 									}
 								}
 							}
-							.mask {
-								HStack(spacing: 0) {
-									LinearGradient(colors: [.clear, .white], startPoint: .leading, endPoint: .trailing)
-										.frame(width: .small2)
-									Color.white
-									LinearGradient(colors: [.white, .clear], startPoint: .leading, endPoint: .trailing)
-										.frame(width: .small2)
-								}
-							}
 						}
+					}
+
+					if viewStore.hint == nil {
+						Hint.error(L10n.Common.invalid) // Dummy spacer
+							.opacity(0)
 					}
 				}
 			}
