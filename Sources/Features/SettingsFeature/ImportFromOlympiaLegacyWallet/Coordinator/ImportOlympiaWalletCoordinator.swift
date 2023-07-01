@@ -51,8 +51,6 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 			let accountsToMigrate: AccountsToMigrate?
 			let networkID: NetworkID
 			let previouslyImported: [MigratableAccount]
-
-			var expectedMnemonicWordCount: BIP39.WordCount { previous.expectedMnemonicWordCount }
 		}
 
 		struct CheckedIfOlympiaFactorSourceAlreadyExists: Sendable, Hashable {
@@ -63,10 +61,6 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 		struct MigratedSoftwareAccounts: Sendable, Hashable {
 			let previous: FoundAlreadyImported
 			let migratedSoftwareAccounts: MigratedAccounts
-
-			var hardwareAccountsToMigrate: AccountsToMigrate? { previous.accountsToMigrate?.hardware }
-			var previouslyImported: [MigratableAccount] { previous.previouslyImported }
-			var networkID: NetworkID { previous.networkID }
 		}
 	}
 
@@ -324,7 +318,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 				warning: L10n.ImportOlympiaAccounts.VerifySeedPhrase.warning,
 				isWordCountFixed: true,
 				persistAsMnemonicKind: nil,
-				wordCount: progress.expectedMnemonicWordCount
+				wordCount: progress.previous.expectedMnemonicWordCount
 			))
 		)
 
@@ -434,17 +428,17 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 	) -> EffectTask<Action> {
 		guard case let .migratedSoftwareAccounts(progress) = state.progress else { return progressError(state.progress) }
 
-		if let hardwareAccounts = progress.hardwareAccountsToMigrate {
+		if let hardwareAccounts = progress.previous.accountsToMigrate?.hardware {
 			state.path.append(
 				.importOlympiaLedgerAccountsAndFactorSources(.init(
 					hardwareAccounts: hardwareAccounts,
-					networkID: progress.networkID
+					networkID: progress.previous.networkID
 				))
 			)
 		} else {
 			state.path.append(
 				.completion(.init(
-					previouslyMigrated: progress.previouslyImported,
+					previouslyMigrated: progress.previous.previouslyImported,
 					migrated: progress.migratedSoftwareAccounts,
 					unvalidatedOlympiaHardwareAccounts: nil
 				))
@@ -465,7 +459,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 
 		state.path.append(
 			.completion(.init(
-				previouslyMigrated: progress.previouslyImported,
+				previouslyMigrated: progress.previous.previouslyImported,
 				migrated: progress.migratedSoftwareAccounts + hardwareAccounts,
 				unvalidatedOlympiaHardwareAccounts: unvalidatedHardwareAccounts
 			))
