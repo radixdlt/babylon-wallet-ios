@@ -175,15 +175,9 @@ extension ImportMnemonic.View {
 				count: 3
 			)
 		) {
-			ForEachStore(
-				store.scope(state: \.words, action: { .child(.word(id: $0, child: $1)) }),
-				content: { importMnemonicWordStore in
-					VStack(spacing: 0) {
-						ImportMnemonicWord.View(store: importMnemonicWordStore)
-						Spacer(minLength: .medium2)
-					}
-				}
-			)
+			ForEachStore(store.scope(state: \.words, action: { .child(.word(id: $0, child: $1)) })) {
+				ImportMnemonicWord.View(store: $0)
+			}
 		}
 	}
 
