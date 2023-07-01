@@ -47,17 +47,15 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 		}
 
 		struct FoundAlreadyImported: Sendable, Hashable {
-			let expectedMnemonicWordCount: BIP39.WordCount
+			let previous: ScannedQR
 			let accountsToMigrate: AccountsToMigrate?
 			let networkID: NetworkID
 			let previouslyImported: [MigratableAccount]
 		}
 
 		struct CheckedIfOlympiaFactorSourceAlreadyExists: Sendable, Hashable {
-			let networkID: NetworkID
-			let previouslyImported: [MigratableAccount]
+			let previous: FoundAlreadyImported
 			let softwareAccountsToMigrate: AccountsToMigrate
-			let hardwareAccountsToMigrate: AccountsToMigrate?
 		}
 
 		struct MigratedSoftwareAccounts: Sendable, Hashable {
@@ -253,7 +251,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 		let notMigrated = progress.scannedAccounts.filter { !alreadyImported.contains($0.id) }
 
 		state.progress = .foundAlreadyImported(.init(
-			expectedMnemonicWordCount: progress.expectedMnemonicWordCount,
+			previous: progress,
 			accountsToMigrate: NonEmpty(rawValue: OrderedSet(notMigrated)),
 			networkID: networkID,
 			previouslyImported: alreadyMigrated
@@ -303,10 +301,8 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 		guard case let .foundAlreadyImported(progress) = state.progress else { return progressError(state.progress) }
 
 		state.progress = .checkedIfOlympiaFactorSourceAlreadyExists(.init(
-			networkID: progress.networkID,
-			previouslyImported: progress.previouslyImported,
-			softwareAccountsToMigrate: softwareAccounts,
-			hardwareAccountsToMigrate: progress.accountsToMigrate?.hardware
+			previous: progress,
+			softwareAccountsToMigrate: softwareAccounts
 		))
 
 		if let idOfExistingFactorSource {
@@ -326,7 +322,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 				warning: L10n.ImportOlympiaAccounts.VerifySeedPhrase.warning,
 				isWordCountFixed: true,
 				persistAsMnemonicKind: nil,
-				wordCount: progress.expectedMnemonicWordCount
+				wordCount: progress.previous.expectedMnemonicWordCount
 			))
 		)
 
@@ -424,10 +420,10 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 		guard case let .checkedIfOlympiaFactorSourceAlreadyExists(progress) = state.progress else { return progressError(state.progress) }
 
 		state.progress = .migratedSoftwareAccounts(.init(
-			networkID: progress.networkID,
-			previouslyImported: progress.previouslyImported,
+			networkID: progress.previous.networkID,
+			previouslyImported: progress.previous.previouslyImported,
 			softwareAccounts: softwareAccounts.babylonAccounts.rawValue,
-			hardwareAccountsToMigrate: progress.hardwareAccountsToMigrate
+			hardwareAccountsToMigrate: progress.previous.accountsToMigrate?.hardware
 		))
 
 		return migrateHardwareAccounts(in: &state)
