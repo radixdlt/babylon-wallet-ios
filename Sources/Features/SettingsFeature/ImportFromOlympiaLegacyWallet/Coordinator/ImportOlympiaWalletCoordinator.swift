@@ -96,7 +96,6 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 
 	public enum DelegateAction: Sendable, Equatable {
 		case finishedMigration(gotoAccountList: Bool)
-		case dismiss
 	}
 
 	// MARK: Path
@@ -136,6 +135,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 
 	@Dependency(\.factorSourcesClient) var factorSourcesClient
 	@Dependency(\.engineToolkitClient) var engineToolkitClient
+	@Dependency(\.dismiss) var dismiss
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.importLegacyWalletClient) var importLegacyWalletClient
 
@@ -154,7 +154,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .closeButtonTapped:
-			return .send(.delegate(.dismiss))
+			return .run { _ in await dismiss() }
 		}
 	}
 
@@ -507,12 +507,13 @@ extension ImportOlympiaWalletCoordinator {
 	private func progressError(_ progress: Progress, line: Int = #line) -> EffectTask<Action> {
 		loggerGlobal.error("Implementation error. Incorrect progress value at line \(line): \(progress)")
 		assertionFailure("Implementation error. Incorrect progress value at line \(line): \(progress)")
-		return .send(.delegate(.dismiss))
+		return .run { _ in await dismiss() }
 	}
 
 	private func generalError(_ error: Error) -> EffectTask<Action> {
 		loggerGlobal.error("ImportOlympiaWalletCoordinator failed with error: \(error)")
-		return .send(.delegate(.dismiss))
+		errorQueue.schedule(error)
+		return .run { _ in await dismiss() }
 	}
 }
 

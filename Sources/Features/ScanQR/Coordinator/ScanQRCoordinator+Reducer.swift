@@ -23,10 +23,6 @@ public struct ScanQRCoordinator: Sendable, FeatureReducer {
 		}
 	}
 
-	public enum ViewAction: Sendable, Equatable {
-		case closeButtonTapped
-	}
-
 	public enum InternalAction: Sendable, Equatable {
 		case proceedWithScan
 	}
@@ -55,13 +51,6 @@ public struct ScanQRCoordinator: Sendable, FeatureReducer {
 		}
 
 		Reduce(core)
-	}
-
-	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
-		switch viewAction {
-		case .closeButtonTapped:
-			return .send(.delegate(.dismiss))
-		}
 	}
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
