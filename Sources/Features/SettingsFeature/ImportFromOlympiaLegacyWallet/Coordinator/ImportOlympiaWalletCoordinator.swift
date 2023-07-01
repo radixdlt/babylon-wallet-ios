@@ -171,6 +171,9 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, pathAction: Path.Action) -> EffectTask<Action> {
 		switch pathAction {
+		case .accountsToImport(.delegate(.viewAppeared)):
+			return accountsToImportViewAppeared(in: &state)
+
 		case .accountsToImport(.delegate(.continueImport)):
 			return continueImporting(in: &state)
 
@@ -260,6 +263,16 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 				scannedAccounts: scannedAccounts
 			))
 		)
+		return .none
+	}
+
+	private func accountsToImportViewAppeared(
+		in state: inout State
+	) -> EffectTask<Action> {
+		// This happens if the user steps back from ImportMnemonic to AccountsToImport
+		if case let .checkedIfOlympiaFactorSourceAlreadyExists(progress) = state.progress {
+			state.progress = .foundAlreadyImported(progress.previous)
+		}
 		return .none
 	}
 
