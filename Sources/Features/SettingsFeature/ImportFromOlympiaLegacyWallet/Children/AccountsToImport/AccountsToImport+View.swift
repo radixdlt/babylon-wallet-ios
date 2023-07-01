@@ -41,6 +41,9 @@ extension AccountsToImport {
 					}
 					.buttonStyle(.primaryRectangular)
 				}
+				.onAppear {
+					viewStore.send(.appeared)
+				}
 			}
 		}
 	}
