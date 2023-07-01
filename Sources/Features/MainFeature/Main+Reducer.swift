@@ -72,10 +72,6 @@ public struct Main: Sendable, FeatureReducer {
 				loggerGlobal.error("Failed to delete profile: \(error)")
 			}
 
-		case .destination(.presented(.settings(.delegate(.dismiss)))):
-			state.destination = nil
-			return .none
-
 		default:
 			return .none
 		}

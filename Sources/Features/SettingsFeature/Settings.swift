@@ -19,6 +19,7 @@ public struct AppSettings: Sendable, FeatureReducer {
 	@Dependency(\.appPreferencesClient) var appPreferencesClient
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.p2pLinksClient) var p2pLinksClient
+	@Dependency(\.dismiss) var dismiss
 
 	public typealias Store = StoreOf<Self>
 
@@ -72,7 +73,6 @@ public struct AppSettings: Sendable, FeatureReducer {
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
-		case dismiss // TODO: remove this and use @Dependency(\.dismiss) when TCA tools are released
 		case deleteProfileAndFactorSources(keepInICloudIfPresent: Bool)
 	}
 
@@ -172,7 +172,9 @@ public struct AppSettings: Sendable, FeatureReducer {
 			return loadP2PLinks()
 
 		case .backButtonTapped:
-			return .send(.delegate(.dismiss))
+			return .run { _ in
+				await dismiss()
+			}
 
 		case .addP2PLinkButtonTapped:
 			state.destination = .manageP2PLinks(.init(destination: .newConnection(.init())))
@@ -265,15 +267,16 @@ public struct AppSettings: Sendable, FeatureReducer {
 				return .none
 			}
 
-		#if DEBUG
-		case .destination(.presented(.importOlympiaWalletCoordinator(.delegate(.dismiss)))):
+		case let .destination(.presented(.importOlympiaWalletCoordinator(.delegate(.finishedMigration(gotoAccountList))))):
 			state.destination = nil
-			return .none
 
-		case .destination(.presented(.importOlympiaWalletCoordinator(.delegate(.finishedMigration)))):
-			state.destination = nil
+			if gotoAccountList {
+				print("DISMISSING SETTINGS")
+				return .run { _ in
+					await dismiss()
+				}
+			}
 			return .none
-		#endif
 
 		case .destination:
 			return .none

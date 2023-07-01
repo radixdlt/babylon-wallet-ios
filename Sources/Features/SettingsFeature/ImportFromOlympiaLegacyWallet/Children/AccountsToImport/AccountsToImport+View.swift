@@ -16,17 +16,17 @@ extension AccountsToImport {
 			WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
 				ScrollView {
 					VStack(spacing: .medium3) {
-						Text(L10n.ImportOlympiaAccounts.AccountsToImport.title)
-							.textStyle(.sheetTitle)
-							.foregroundColor(.app.gray1)
-							.multilineTextAlignment(.center)
-							.padding(.horizontal, .large2)
+						Group {
+							Text(L10n.ImportOlympiaAccounts.AccountsToImport.title)
+								.textStyle(.sheetTitle)
+								.padding(.horizontal, .large2)
 
-						Text(L10n.ImportOlympiaAccounts.AccountsToImport.subtitle)
-							.textStyle(.body1Regular)
-							.foregroundColor(.app.gray1)
-							.multilineTextAlignment(.center)
-							.padding(.horizontal, .large2)
+							Text(L10n.ImportOlympiaAccounts.AccountsToImport.subtitle)
+								.textStyle(.body1Regular)
+								.padding(.horizontal, .large2)
+						}
+						.foregroundColor(.app.gray1)
+						.multilineTextAlignment(.center)
 
 						ForEach(viewStore.scannedAccounts) { account in
 							AccountView(viewState: account)
@@ -48,7 +48,7 @@ extension AccountsToImport {
 
 // MARK: - AccountView
 public struct AccountView: View {
-	public typealias ViewState = AccountsToImport.State.ImportableAccount
+	public typealias ViewState = ImportOlympiaWalletCoordinator.MigratableAccount
 
 	public let viewState: ViewState
 
@@ -70,33 +70,18 @@ public struct AccountView: View {
 					value: viewState.olympiaAddress.address.rawValue.formatted(.default)
 				)
 
-				if let babylonAddress = viewState.bablyonAddress {
-					VPair(
-						heading: L10n.ImportOlympiaAccounts.AccountsToImport.newAddressLabel,
-						value: babylonAddress.address.formatted(.default)
-					)
-				} else {
-					Text("Unable to derive Babylon address") // FIXME: Strings
-						.textStyle(.secondaryHeader)
-						.foregroundColor(.app.alert)
-				}
+				VPair(
+					heading: L10n.ImportOlympiaAccounts.AccountsToImport.newAddressLabel,
+					value: viewState.babylonAddress.address.formatted(.default)
+				)
 			}
 
 			Spacer(minLength: 0)
 		}
 		.padding(.vertical, .medium1)
 		.padding(.horizontal, .medium2)
-		.background(background)
+		.background(viewState.appearanceID.gradient)
 		.cornerRadius(.small1)
-	}
-
-	@ViewBuilder
-	var background: some View {
-		if viewState.bablyonAddress != nil {
-			viewState.appearanceID.gradient
-		} else {
-			Color.app.gray3
-		}
 	}
 
 	struct VPair: View {
@@ -109,8 +94,9 @@ public struct AccountView: View {
 				Text(heading)
 					.textStyle(large ? .secondaryHeader : .body2Link)
 					.foregroundColor(.white)
+
 				Text(value)
-					.textStyle(.body2Link)
+					.textStyle(.body2Regular)
 					.foregroundColor(.app.gray4)
 			}
 			.padding(.bottom, large ? .small3 : 0)

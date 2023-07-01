@@ -4,34 +4,39 @@ import Profile
 // MARK: - CompletionMigrateOlympiaAccountsToBabylon
 public struct CompletionMigrateOlympiaAccountsToBabylon: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
-		public let previouslyMigratedAccounts: [OlympiaAccountToMigrate]
-		public let migratedAccounts: Profile.Network.Accounts?
+		public let previouslyMigrated: [ImportOlympiaWalletCoordinator.MigratableAccount]
+		public let migrated: IdentifiedArrayOf<Profile.Network.Account>
 		public let unvalidatedOlympiaHardwareAccounts: Set<OlympiaAccountToMigrate>?
+
 		public init(
-			previouslyMigratedAccounts: [OlympiaAccountToMigrate],
-			migratedAccounts: IdentifiedArrayOf<Profile.Network.Account>,
+			previouslyMigrated: [ImportOlympiaWalletCoordinator.MigratableAccount],
+			migrated: IdentifiedArrayOf<Profile.Network.Account>,
 			unvalidatedOlympiaHardwareAccounts: Set<OlympiaAccountToMigrate>?
 		) {
-			self.previouslyMigratedAccounts = previouslyMigratedAccounts
-			self.migratedAccounts = .init(rawValue: migratedAccounts)
+			self.previouslyMigrated = previouslyMigrated
+			self.migrated = migrated
 			self.unvalidatedOlympiaHardwareAccounts = unvalidatedOlympiaHardwareAccounts
 		}
 	}
 
 	public enum ViewAction: Sendable, Equatable {
-		case finishButtonTapped
+		case closeButtonTapped
+		case accountListButtonTapped
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
-		case finishedMigration
+		case finishedMigration(gotoAccountList: Bool)
 	}
 
 	public init() {}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
-		case .finishButtonTapped:
-			return .send(.delegate(.finishedMigration))
+		case .closeButtonTapped:
+			return .send(.delegate(.finishedMigration(gotoAccountList: false)))
+
+		case .accountListButtonTapped:
+			return .send(.delegate(.finishedMigration(gotoAccountList: true)))
 		}
 	}
 }

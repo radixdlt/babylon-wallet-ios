@@ -28,7 +28,7 @@ extension DisplayMnemonics {
 							.multilineTextAlignment(.leading)
 							.padding(.horizontal, .medium3)
 
-						WarningView(text: L10n.SeedPhrases.warning)
+						WarningErrorView(text: L10n.SeedPhrases.warning, type: .warning)
 							.padding(.horizontal, .medium3)
 
 						ForEachStore(

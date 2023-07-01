@@ -22,6 +22,15 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 		public init() {}
 	}
 
+	public struct MigratableAccount: Sendable, Hashable, Identifiable {
+		public let id: K1.PublicKey
+		public let accountName: String?
+		public let olympiaAddress: LegacyOlympiaAccountAddress
+		public let babylonAddress: AccountAddress
+		public let appearanceID: Profile.Network.Account.AppearanceID
+		public let olympiaAccountType: Olympia.AccountType
+	}
+
 	// MARK: Progress
 
 	enum Progress: Sendable, Hashable {
@@ -40,21 +49,21 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 		struct FoundAlreadyImported: Sendable, Hashable {
 			let networkID: NetworkID
 			let expectedMnemonicWordCount: BIP39.WordCount
-			let previouslyImported: [OlympiaAccountToMigrate]
+			let previouslyImported: [MigratableAccount]
 			let softwareAccountsToMigrate: AccountsToMigrate?
 			let hardwareAccountsToMigrate: AccountsToMigrate?
 		}
 
 		struct CheckedIfOlympiaFactorSourceAlreadyExists: Sendable, Hashable {
 			let networkID: NetworkID
-			let previouslyImported: [OlympiaAccountToMigrate]
+			let previouslyImported: [MigratableAccount]
 			let softwareAccountsToMigrate: AccountsToMigrate
 			let hardwareAccountsToMigrate: AccountsToMigrate?
 		}
 
 		struct MigratedSoftwareAccounts: Sendable, Hashable {
 			let networkID: NetworkID
-			let previouslyImported: [OlympiaAccountToMigrate]
+			let previouslyImported: [MigratableAccount]
 			let softwareAccounts: MigratedAccounts
 			let hardwareAccountsToMigrate: AccountsToMigrate?
 		}
@@ -86,7 +95,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
-		case finishedMigration
+		case finishedMigration(gotoAccountList: Bool)
 		case dismiss
 	}
 
@@ -126,6 +135,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 	// MARK: Reducer
 
 	@Dependency(\.factorSourcesClient) var factorSourcesClient
+	@Dependency(\.engineToolkitClient) var engineToolkitClient
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.importLegacyWalletClient) var importLegacyWalletClient
 
@@ -175,8 +185,8 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 		case let .importOlympiaLedgerAccountsAndFactorSources(.delegate(.completed(ledgersWithAccounts, unvalidatedAccounts))):
 			return importedOlympiaLedgerAccountsAndFactorSources(in: &state, ledgersWithAccounts: ledgersWithAccounts, unvalidated: unvalidatedAccounts)
 
-		case .completion(.delegate(.finishedMigration)):
-			return .send(.delegate(.finishedMigration))
+		case let .completion(.delegate(.finishedMigration(gotoAccountList: gotoAccountList))):
+			return .send(.delegate(.finishedMigration(gotoAccountList: gotoAccountList)))
 
 		default:
 			return .none
@@ -231,23 +241,30 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 	) -> EffectTask<Action> {
 		guard case let .scannedQR(progress) = state.progress else { return progressError(state.progress) }
 
-		let previouslyImported = progress.accountsToMigrate.filter { alreadyImported.contains($0.id) }
-		let notImported = progress.accountsToMigrate.filter { !alreadyImported.contains($0.id) }
-		let softwareAccounts = NonEmpty(rawValue: OrderedSet(notImported.filter { $0.accountType == .software }))
-		let hardwareAccounts = NonEmpty(rawValue: OrderedSet(notImported.filter { $0.accountType == .hardware }))
+		let scannedAccounts: NonEmptyArray<MigratableAccount>
+		do {
+			scannedAccounts = try migratableAccounts(from: progress.accountsToMigrate, networkID: networkID)
+		} catch {
+			errorQueue.schedule(error)
+			return generalError(error)
+		}
+
+		let alreadyMigrated = scannedAccounts.rawValue.filter { alreadyImported.contains($0.id) }
+		let notMigrated = progress.accountsToMigrate.filter { !alreadyImported.contains($0.id) }
+		let softwareAccounts = NonEmpty(rawValue: OrderedSet(notMigrated.filter { $0.accountType == .software }))
+		let hardwareAccounts = NonEmpty(rawValue: OrderedSet(notMigrated.filter { $0.accountType == .hardware }))
 
 		state.progress = .foundAlreadyImported(.init(
 			networkID: networkID,
 			expectedMnemonicWordCount: progress.expectedMnemonicWordCount,
-			previouslyImported: previouslyImported,
+			previouslyImported: alreadyMigrated,
 			softwareAccountsToMigrate: softwareAccounts,
 			hardwareAccountsToMigrate: hardwareAccounts
 		))
 
 		state.path.append(
 			.accountsToImport(.init(
-				networkID: networkID,
-				scannedAccounts: progress.accountsToMigrate
+				scannedAccounts: scannedAccounts
 			))
 		)
 		return .none
@@ -310,6 +327,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 					subtitle: L10n.ImportOlympiaAccounts.VerifySeedPhrase.subtitle
 				),
 				warning: L10n.ImportOlympiaAccounts.VerifySeedPhrase.warning,
+				isWordCountFixed: true,
 				persistAsMnemonicKind: nil,
 				wordCount: progress.expectedMnemonicWordCount
 			))
@@ -433,8 +451,8 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 		} else {
 			state.path.append(
 				.completion(.init(
-					previouslyMigratedAccounts: progress.previouslyImported,
-					migratedAccounts: progress.softwareAccounts,
+					previouslyMigrated: progress.previouslyImported,
+					migrated: progress.softwareAccounts,
 					unvalidatedOlympiaHardwareAccounts: nil
 				))
 			)
@@ -454,18 +472,46 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 
 		state.path.append(
 			.completion(.init(
-				previouslyMigratedAccounts: progress.previouslyImported,
-				migratedAccounts: progress.softwareAccounts + hardwareAccounts,
+				previouslyMigrated: progress.previouslyImported,
+				migrated: progress.softwareAccounts + hardwareAccounts,
 				unvalidatedOlympiaHardwareAccounts: unvalidatedHardwareAccounts
 			))
 		)
 
 		return .none
 	}
+}
+
+// MARK: - Helper methods
+
+extension ImportOlympiaWalletCoordinator {
+	private func migratableAccounts(from scannedAccounts: AccountsToMigrate, networkID: NetworkID) throws -> NonEmptyArray<MigratableAccount> {
+		try scannedAccounts.map { account in
+			let derivedAddress = try engineToolkitClient.deriveVirtualAccountAddress(.init(
+				publicKey: .ecdsaSecp256k1(account.publicKey.intoEngine()),
+				networkId: networkID
+			))
+			let babylonAddress = try AccountAddress(componentAddress: derivedAddress)
+
+			return MigratableAccount(
+				id: account.id,
+				accountName: account.displayName?.rawValue,
+				olympiaAddress: account.address,
+				babylonAddress: babylonAddress,
+				appearanceID: .fromIndex(Int(account.addressIndex)),
+				olympiaAccountType: account.accountType
+			)
+		}
+	}
 
 	private func progressError(_ progress: Progress, line: Int = #line) -> EffectTask<Action> {
 		loggerGlobal.error("Implementation error. Incorrect progress value at line \(line): \(progress)")
 		assertionFailure("Implementation error. Incorrect progress value at line \(line): \(progress)")
+		return .send(.delegate(.dismiss))
+	}
+
+	private func generalError(_ error: Error) -> EffectTask<Action> {
+		loggerGlobal.error("ImportOlympiaWalletCoordinator failed with error: \(error)")
 		return .send(.delegate(.dismiss))
 	}
 }
