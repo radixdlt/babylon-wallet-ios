@@ -43,15 +43,14 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 
 		struct ScannedQR: Sendable, Hashable {
 			let expectedMnemonicWordCount: BIP39.WordCount
-			let accountsToMigrate: AccountsToMigrate
+			let scannedAccounts: AccountsToMigrate
 		}
 
 		struct FoundAlreadyImported: Sendable, Hashable {
-			let networkID: NetworkID
 			let expectedMnemonicWordCount: BIP39.WordCount
+			let accountsToMigrate: AccountsToMigrate?
+			let networkID: NetworkID
 			let previouslyImported: [MigratableAccount]
-			let softwareAccountsToMigrate: AccountsToMigrate?
-			let hardwareAccountsToMigrate: AccountsToMigrate?
 		}
 
 		struct CheckedIfOlympiaFactorSourceAlreadyExists: Sendable, Hashable {
@@ -224,7 +223,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 		let scanned = olympiaWallet.accounts
 		state.progress = .scannedQR(.init(
 			expectedMnemonicWordCount: olympiaWallet.mnemonicWordCount,
-			accountsToMigrate: scanned
+			scannedAccounts: scanned
 		))
 
 		return .task {
@@ -243,23 +242,21 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 
 		let scannedAccounts: NonEmptyArray<MigratableAccount>
 		do {
-			scannedAccounts = try migratableAccounts(from: progress.accountsToMigrate, networkID: networkID)
+			scannedAccounts = try migratableAccounts(from: progress.scannedAccounts, networkID: networkID)
 		} catch {
 			errorQueue.schedule(error)
 			return generalError(error)
 		}
 
+		// These collections have different elements, the alreadyMigrated one keeps track of the babylon address
 		let alreadyMigrated = scannedAccounts.rawValue.filter { alreadyImported.contains($0.id) }
-		let notMigrated = progress.accountsToMigrate.filter { !alreadyImported.contains($0.id) }
-		let softwareAccounts = NonEmpty(rawValue: OrderedSet(notMigrated.filter { $0.accountType == .software }))
-		let hardwareAccounts = NonEmpty(rawValue: OrderedSet(notMigrated.filter { $0.accountType == .hardware }))
+		let notMigrated = progress.scannedAccounts.filter { !alreadyImported.contains($0.id) }
 
 		state.progress = .foundAlreadyImported(.init(
-			networkID: networkID,
 			expectedMnemonicWordCount: progress.expectedMnemonicWordCount,
-			previouslyImported: alreadyMigrated,
-			softwareAccountsToMigrate: softwareAccounts,
-			hardwareAccountsToMigrate: hardwareAccounts
+			accountsToMigrate: NonEmpty(rawValue: OrderedSet(notMigrated)),
+			networkID: networkID,
+			previouslyImported: alreadyMigrated
 		))
 
 		state.path.append(
@@ -275,7 +272,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 	) -> EffectTask<Action> {
 		guard case let .foundAlreadyImported(progress) = state.progress else { return progressError(state.progress) }
 
-		if let softwareAccounts = progress.softwareAccountsToMigrate {
+		if let softwareAccounts = progress.accountsToMigrate?.software {
 			return checkIfOlympiaFactorSourceAlreadyExists(softwareAccounts)
 		}
 
@@ -283,7 +280,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 			networkID: progress.networkID,
 			previouslyImported: progress.previouslyImported,
 			softwareAccounts: [],
-			hardwareAccountsToMigrate: progress.hardwareAccountsToMigrate
+			hardwareAccountsToMigrate: progress.accountsToMigrate?.hardware
 		))
 
 		return migrateHardwareAccounts(in: &state)
@@ -309,7 +306,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 			networkID: progress.networkID,
 			previouslyImported: progress.previouslyImported,
 			softwareAccountsToMigrate: softwareAccounts,
-			hardwareAccountsToMigrate: progress.hardwareAccountsToMigrate
+			hardwareAccountsToMigrate: progress.accountsToMigrate?.hardware
 		))
 
 		if let idOfExistingFactorSource {
@@ -522,3 +519,13 @@ struct GotNoAccountsToImport: Error {}
 
 // MARK: - OlympiaFactorSourceToSaveIDDisrepancy
 struct OlympiaFactorSourceToSaveIDDisrepancy: Error {}
+
+extension Collection<OlympiaAccountToMigrate> {
+	var software: ImportOlympiaWalletCoordinator.AccountsToMigrate? {
+		NonEmpty(rawValue: OrderedSet(filter { $0.accountType == .software }))
+	}
+
+	var hardware: ImportOlympiaWalletCoordinator.AccountsToMigrate? {
+		NonEmpty(rawValue: OrderedSet(filter { $0.accountType == .hardware }))
+	}
+}
