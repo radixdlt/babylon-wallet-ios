@@ -13,16 +13,14 @@ extension ImportOlympiaWalletCoordinator {
 		}
 
 		public var body: some SwiftUI.View {
-			NavigationStackStore(
-				store.scope(state: \.path, action: { .child(.path($0)) })
-			) {
+			NavigationStackStore(store.scope(state: \.path, action: { .child(.path($0)) })) {
 				let scanQRStore = store.scope(state: \.scanQR, action: { .child(.scanQR($0)) })
 				ScanMultipleOlympiaQRCodes.View(store: scanQRStore)
 				#if os(iOS)
 					.toolbar {
 						ToolbarItem(placement: .primaryAction) {
 							CloseButton {
-								ViewStore(store.stateless).send(.view(.closeButtonTapped))
+								store.send(.view(.closeButtonTapped))
 							}
 						}
 					}
