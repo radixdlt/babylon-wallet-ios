@@ -45,6 +45,7 @@ public struct ScanMultipleOlympiaQRCodes: Sendable, FeatureReducer {
 	}
 
 	@Dependency(\.importLegacyWalletClient) var importLegacyWalletClient
+	@Dependency(\.dismiss) var dismiss
 	@Dependency(\.errorQueue) var errorQueue
 
 	public init() {}
@@ -91,6 +92,12 @@ public struct ScanMultipleOlympiaQRCodes: Sendable, FeatureReducer {
 				errorQueue.schedule(error)
 			}
 			return .none
+
+		case .scanQR(.delegate(.dismiss)):
+			return .run { _ in
+				await dismiss()
+			}
+
 		default:
 			return .none
 		}

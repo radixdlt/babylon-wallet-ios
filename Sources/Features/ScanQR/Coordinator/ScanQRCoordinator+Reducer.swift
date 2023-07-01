@@ -46,16 +46,10 @@ public struct ScanQRCoordinator: Sendable, FeatureReducer {
 
 	public var body: some ReducerProtocolOf<Self> {
 		Scope(state: \.step, action: /.self) {
-			Scope(
-				state: /State.Step.cameraPermission,
-				action: /Action.child .. ChildAction.cameraPermission
-			) {
+			Scope(state: /State.Step.cameraPermission, action: /Action.child .. ChildAction.cameraPermission) {
 				CameraPermission()
 			}
-			Scope(
-				state: /State.Step.scanQR,
-				action: /Action.child .. ChildAction.scanQR
-			) {
+			Scope(state: /State.Step.scanQR, action: /Action.child .. ChildAction.scanQR) {
 				ScanQR()
 			}
 		}
