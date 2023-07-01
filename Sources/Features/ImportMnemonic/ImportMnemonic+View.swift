@@ -173,14 +173,17 @@ extension ImportMnemonic.View {
 			columns: .init(
 				repeating: .init(.flexible()),
 				count: 3
-			),
-			spacing: .medium2
+			)
 		) {
 			ForEachStore(
-				store.scope(state: \.words, action: { .child(.word(id: $0, child: $1)) })
-			) { importMnemonicWordStore in
-				ImportMnemonicWord.View(store: importMnemonicWordStore)
-			}
+				store.scope(state: \.words, action: { .child(.word(id: $0, child: $1)) }),
+				content: { importMnemonicWordStore in
+					VStack(spacing: 0) {
+						ImportMnemonicWord.View(store: importMnemonicWordStore)
+						Spacer(minLength: .medium2)
+					}
+				}
+			)
 		}
 	}
 
