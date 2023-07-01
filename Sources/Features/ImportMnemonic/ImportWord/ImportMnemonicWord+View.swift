@@ -114,8 +114,15 @@ extension ImportMnemonicWord {
 									}
 								}
 							}
-							.frame(maxWidth: .infinity)
-							.border(.orange)
+							.mask {
+								HStack(spacing: 0) {
+									LinearGradient(colors: [.clear, .white], startPoint: .leading, endPoint: .trailing)
+										.frame(width: .small2)
+									Color.white
+									LinearGradient(colors: [.white, .clear], startPoint: .leading, endPoint: .trailing)
+										.frame(width: .small2)
+								}
+							}
 						}
 					}
 				}

@@ -65,6 +65,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 		public let persistedKind: MnemonicBasedFactorSourceKind?
 
 		public let isReadonlyMode: Bool
+		public let isWordCountFixed: Bool
 		public var isAdvancedMode: Bool = false
 		public var isHidingSecrets: Bool = false
 
@@ -77,6 +78,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 		public init(
 			header: Header? = nil,
 			warning: String? = nil,
+			isWordCountFixed: Bool = false,
 			persistAsMnemonicKind persistedKind: MnemonicBasedFactorSourceKind?,
 			language: BIP39.Language = .english,
 			wordCount: BIP39.WordCount = .twelve,
@@ -89,8 +91,8 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			self.language = language
 			self.bip39Passphrase = bip39Passphrase
 
-			let isReadonlyMode = false
-			self.isReadonlyMode = isReadonlyMode
+			self.isReadonlyMode = false
+			self.isWordCountFixed = isWordCountFixed
 			self.words = []
 			self.offDeviceMnemonicInfoPrompt = offDeviceMnemonicInfoPrompt
 			self.header = header
@@ -111,6 +113,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			self.language = mnemonic.language
 			let isReadonlyMode = true
 			self.isReadonlyMode = isReadonlyMode
+			self.isWordCountFixed = true
 			self.words = .init(
 				uniqueElements: mnemonic.words
 					.enumerated()

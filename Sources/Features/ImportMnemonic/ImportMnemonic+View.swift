@@ -8,6 +8,7 @@ extension ImportMnemonic.State {
 	var viewState: ImportMnemonic.ViewState {
 		.init(
 			isReadonlyMode: isReadonlyMode,
+			isWordCountFixed: isWordCountFixed,
 			isAdvancedMode: isAdvancedMode,
 			header: header,
 			warning: warning,
@@ -29,6 +30,7 @@ extension ImportMnemonic.State {
 extension ImportMnemonic {
 	public struct ViewState: Equatable {
 		let isReadonlyMode: Bool
+		let isWordCountFixed: Bool
 		let isAdvancedMode: Bool
 		let header: State.Header?
 		let warning: String?
@@ -58,10 +60,6 @@ extension ImportMnemonic.ViewState {
 		isAdvancedMode && !(isReadonlyMode && bip39Passphrase.isEmpty)
 	}
 
-	var isShowingChangeWordCountButtons: Bool {
-		!isReadonlyMode
-	}
-
 	var modeButtonTitle: String {
 		isAdvancedMode ? L10n.ImportMnemonic.regularModeButton : L10n.ImportMnemonic.advancedModeButton
 	}
@@ -87,7 +85,7 @@ extension ImportMnemonic {
 						}
 
 						if let warning = viewStore.warning {
-							WarningView(text: warning)
+							WarningErrorView(text: warning, type: .warning)
 								.padding(.top, viewStore.header == nil ? .medium3 : 0)
 								.padding(.horizontal, .large3)
 								.padding(.bottom, .large3)
@@ -97,7 +95,7 @@ extension ImportMnemonic {
 							.padding(.horizontal, .medium2)
 							.padding(.bottom, .large3)
 
-						if viewStore.isShowingChangeWordCountButtons {
+						if !viewStore.isWordCountFixed {
 							changeWordCountButtons(with: viewStore)
 								.padding(.horizontal, .medium2)
 								.padding(.bottom, .large3)
@@ -114,7 +112,9 @@ extension ImportMnemonic {
 						}
 						.buttonStyle(.blue)
 						.frame(height: .large1)
-						.padding(.bottom, .medium2)
+						.padding(.bottom, .medium1)
+
+						footer(with: viewStore)
 					}
 					.redacted(reason: .privacy, if: viewStore.isHidingSecrets)
 					#if os(iOS)
@@ -125,9 +125,6 @@ extension ImportMnemonic {
 							viewStore.send(.scenePhase(.inactive))
 						}
 					#endif
-				}
-				.footer {
-					footer(with: viewStore)
 				}
 				.animation(.default, value: viewStore.wordCount)
 				.animation(.default, value: viewStore.isAdvancedMode)
@@ -242,8 +239,7 @@ extension ImportMnemonic.View {
 		) { action in
 			if !viewStore.isReadonlyMode {
 				if viewStore.isNonChecksummed {
-					Text(L10n.ImportMnemonic.checksumFailure)
-						.foregroundColor(.app.red1)
+					WarningErrorView(text: L10n.ImportMnemonic.checksumFailure, type: .error)
 				}
 				Button(L10n.ImportMnemonic.importSeedPhrase, action: action)
 					.buttonStyle(.primaryRectangular)
@@ -254,6 +250,7 @@ extension ImportMnemonic.View {
 				.buttonStyle(.primaryRectangular)
 			}
 		}
+		.padding([.horizontal, .bottom], .medium2)
 	}
 }
 

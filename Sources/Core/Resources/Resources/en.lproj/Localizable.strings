@@ -410,14 +410,16 @@
 "transactionSigning_signTransactionButtonTitle" = "Approve Transaction";
 "transactionSigning_signingAndSubmittingTransaction" = "Submitting transaction…";
 "importMnemonic_navigationTitle" = "Import Seed Phrase";
-"importMnemonic_wordHeading" = "word #%d";
+"importMnemonic_wordHeading" = "Word %d";
 "importMnemonic_passphrase" = "Passphrase";
 "importMnemonic_passphrasePlaceholder" = "Passphrase";
-"importMnemonic_passphraseHint" = "BIP39 Passphrase is often called a \'25th word\'.";
+"importMnemonic_passphraseHint" = "Optional BIP39 Passphrase. This is not your wallet password, and the Radix Desktop Wallet did not use a BIP39 passphrase. This is only to support import from other wallets that may have used one.";
 "importMnemonic_fewerWords" = "Fewer words";
 "importMnemonic_moreWords" = "More words";
 "importMnemonic_checksumFailure" = "Incorrect seed phrase";
-"importMnemonic_importSeedPhrase" = "Import seed phrase";
+"importMnemonic_advancedModeButton" = "Advanced Mode";
+"importMnemonic_regularModeButton" = "Regular Mode";
+"importMnemonic_importSeedPhrase" = "Import";
 "importMnemonic_offDevice_storyPrimaryHeading" = "Tell a story";
 "importMnemonic_offDevice_storyPlaceholder" = "Hitchcock\'s The Birds mixed with Office space";
 "importMnemonic_offDevice_storyHint" = "Without revealing the words, what comes to mind when reading this seed phrase?";
@@ -568,6 +570,19 @@ Install the Connector extension, open it to see the linking QR code, and tap con
 
 "importOlympiaAccounts_accountsToImport_buttonManyAccounts" = "Import %d accounts";
 "importOlympiaAccounts_accountsToImport_buttonOneAcccount" = "Import 1 account";
+
+"importOlympiaAccounts_verifySeedPhrase_title" = "Verify With Your Seed Phrase";
+"importOlympiaAccounts_verifySeedPhrase_subtitle" = "To complete importing your accounts, please view your seed phrase in the Radix Desktop Wallet and enter the words here.";
+"importOlympiaAccounts_verifySeedPhrase_warning" = "This is a one-time process to import your accounts. Never give your seed phrase to anyone for any reason.";
+
+"importOlympiaAccounts_completion_title" = "Congratulations";
+"importOlympiaAccounts_completion_subtitleMultiple" = "You've imported your accounts";
+"importOlympiaAccounts_completion_subtitleSingle" = "You've imported your account";
+
+"importOlympiaAccounts_completion_explanation" = "They will live on the Radix Network and you can access them anytime in your Wallet.";
+"importOlympiaAccounts_completion_accountListButtonTitle" = "Continue to Account List";
+
+
 
 
 

@@ -1181,25 +1181,29 @@ public enum L10n {
     }
   }
   public enum ImportMnemonic {
+    /// Advanced Mode
+    public static let advancedModeButton = L10n.tr("Localizable", "importMnemonic_advancedModeButton", fallback: "Advanced Mode")
     /// Incorrect seed phrase
     public static let checksumFailure = L10n.tr("Localizable", "importMnemonic_checksumFailure", fallback: "Incorrect seed phrase")
     /// Fewer words
     public static let fewerWords = L10n.tr("Localizable", "importMnemonic_fewerWords", fallback: "Fewer words")
-    /// Import seed phrase
-    public static let importSeedPhrase = L10n.tr("Localizable", "importMnemonic_importSeedPhrase", fallback: "Import seed phrase")
+    /// Import
+    public static let importSeedPhrase = L10n.tr("Localizable", "importMnemonic_importSeedPhrase", fallback: "Import")
     /// More words
     public static let moreWords = L10n.tr("Localizable", "importMnemonic_moreWords", fallback: "More words")
     /// Import Seed Phrase
     public static let navigationTitle = L10n.tr("Localizable", "importMnemonic_navigationTitle", fallback: "Import Seed Phrase")
     /// Passphrase
     public static let passphrase = L10n.tr("Localizable", "importMnemonic_passphrase", fallback: "Passphrase")
-    /// BIP39 Passphrase is often called a '25th word'.
-    public static let passphraseHint = L10n.tr("Localizable", "importMnemonic_passphraseHint", fallback: "BIP39 Passphrase is often called a '25th word'.")
+    /// Optional BIP39 Passphrase. This is not your wallet password, and the Radix Desktop Wallet did not use a BIP39 passphrase. This is only to support import from other wallets that may have used one.
+    public static let passphraseHint = L10n.tr("Localizable", "importMnemonic_passphraseHint", fallback: "Optional BIP39 Passphrase. This is not your wallet password, and the Radix Desktop Wallet did not use a BIP39 passphrase. This is only to support import from other wallets that may have used one.")
     /// Passphrase
     public static let passphrasePlaceholder = L10n.tr("Localizable", "importMnemonic_passphrasePlaceholder", fallback: "Passphrase")
-    /// word #%d
+    /// Regular Mode
+    public static let regularModeButton = L10n.tr("Localizable", "importMnemonic_regularModeButton", fallback: "Regular Mode")
+    /// Word %d
     public static func wordHeading(_ p1: Int) -> String {
-      return L10n.tr("Localizable", "importMnemonic_wordHeading", p1, fallback: "word #%d")
+      return L10n.tr("Localizable", "importMnemonic_wordHeading", p1, fallback: "Word %d")
     }
     public enum OffDevice {
       /// Without revealing location, vague hint on where this mnemonic is backed up, if anywhere.
@@ -1295,6 +1299,18 @@ public enum L10n {
       /// Unnamed
       public static let unnamed = L10n.tr("Localizable", "importOlympiaAccounts_accountsToImport_unnamed", fallback: "Unnamed")
     }
+    public enum Completion {
+      /// Continue to Account List
+      public static let accountListButtonTitle = L10n.tr("Localizable", "importOlympiaAccounts_completion_accountListButtonTitle", fallback: "Continue to Account List")
+      /// They will live on the Radix Network and you can access them anytime in your Wallet.
+      public static let explanation = L10n.tr("Localizable", "importOlympiaAccounts_completion_explanation", fallback: "They will live on the Radix Network and you can access them anytime in your Wallet.")
+      /// You've imported your accounts
+      public static let subtitleMultiple = L10n.tr("Localizable", "importOlympiaAccounts_completion_subtitleMultiple", fallback: "You've imported your accounts")
+      /// You've imported your account
+      public static let subtitleSingle = L10n.tr("Localizable", "importOlympiaAccounts_completion_subtitleSingle", fallback: "You've imported your account")
+      /// Congratulations
+      public static let title = L10n.tr("Localizable", "importOlympiaAccounts_completion_title", fallback: "Congratulations")
+    }
     public enum ScanQR {
       /// Scan the QR code shown in the Export section of the Radix Desktop Wallet for Olympia.
       public static let instructions = L10n.tr("Localizable", "importOlympiaAccounts_scanQR_instructions", fallback: "Scan the QR code shown in the Export section of the Radix Desktop Wallet for Olympia.")
@@ -1304,6 +1320,14 @@ public enum L10n {
       }
       /// Import Legacy Olympia Accounts
       public static let title = L10n.tr("Localizable", "importOlympiaAccounts_scanQR_title", fallback: "Import Legacy Olympia Accounts")
+    }
+    public enum VerifySeedPhrase {
+      /// To complete importing your accounts, please view your seed phrase in the Radix Desktop Wallet and enter the words here.
+      public static let subtitle = L10n.tr("Localizable", "importOlympiaAccounts_verifySeedPhrase_subtitle", fallback: "To complete importing your accounts, please view your seed phrase in the Radix Desktop Wallet and enter the words here.")
+      /// Verify With Your Seed Phrase
+      public static let title = L10n.tr("Localizable", "importOlympiaAccounts_verifySeedPhrase_title", fallback: "Verify With Your Seed Phrase")
+      /// This is a one-time process to import your accounts. Never give your seed phrase to anyone for any reason.
+      public static let warning = L10n.tr("Localizable", "importOlympiaAccounts_verifySeedPhrase_warning", fallback: "This is a one-time process to import your accounts. Never give your seed phrase to anyone for any reason.")
     }
   }
   public enum ImportOlympiaLedgerAccounts {
