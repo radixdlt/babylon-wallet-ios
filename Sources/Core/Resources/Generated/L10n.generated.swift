@@ -1181,8 +1181,8 @@ public enum L10n {
     }
   }
   public enum ImportMnemonic {
-    /// Seed phrase not checksummed
-    public static let checksumFailure = L10n.tr("Localizable", "importMnemonic_checksumFailure", fallback: "Seed phrase not checksummed")
+    /// Incorrect seed phrase
+    public static let checksumFailure = L10n.tr("Localizable", "importMnemonic_checksumFailure", fallback: "Incorrect seed phrase")
     /// Fewer words
     public static let fewerWords = L10n.tr("Localizable", "importMnemonic_fewerWords", fallback: "Fewer words")
     /// Import seed phrase
