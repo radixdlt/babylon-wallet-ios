@@ -582,6 +582,16 @@ Install the Connector extension, open it to see the linking QR code, and tap con
 "importOlympiaAccounts_completion_explanation" = "They will live on the Radix Network and you can access them anytime in your Wallet.";
 "importOlympiaAccounts_completion_accountListButtonTitle" = "Continue to Account List";
 
+// Only Android
+"importOlympiaAccounts_alreadyImported" = "Already imported";
+"importOlympiaAccounts_bip39passphrase" = "BIP39 passphrase";
+"importOlympiaAccounts_importLabel" = "Import";
+"importOlympiaAccounts_invalidMnemonic" = "Invalid Mnemonic";
+"importOlympiaAccounts_invalidPayload" = "Invalid QR code";
+"importOlympiaAccounts_noMnemonicFound" = "No mnemonic found for accounts";
+"importOlympiaAccounts_passphrase" = "Passphrase";
+"importOlympiaAccounts_seedPhrase" = "Seed phrase";
+
 "importOlympiaLedgerAccounts_unverifiedAccountsLeft" = "#%d accounts left to import";
 "importOlympiaLedgerAccounts_importLedgersAndAccounts" = "Imported ledgers and accounts";
 "importOlympiaLedgerAccounts_accountCount" = "%@ - #%d accounts";

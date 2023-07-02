@@ -1131,6 +1131,22 @@ public enum L10n {
     }
   }
   public enum ImportOlympiaAccounts {
+    /// Already imported
+    public static let alreadyImported = L10n.tr("Localizable", "importOlympiaAccounts_alreadyImported", fallback: "Already imported")
+    /// BIP39 passphrase
+    public static let bip39passphrase = L10n.tr("Localizable", "importOlympiaAccounts_bip39passphrase", fallback: "BIP39 passphrase")
+    /// Import
+    public static let importLabel = L10n.tr("Localizable", "importOlympiaAccounts_importLabel", fallback: "Import")
+    /// Invalid Mnemonic
+    public static let invalidMnemonic = L10n.tr("Localizable", "importOlympiaAccounts_invalidMnemonic", fallback: "Invalid Mnemonic")
+    /// Invalid QR code
+    public static let invalidPayload = L10n.tr("Localizable", "importOlympiaAccounts_invalidPayload", fallback: "Invalid QR code")
+    /// No mnemonic found for accounts
+    public static let noMnemonicFound = L10n.tr("Localizable", "importOlympiaAccounts_noMnemonicFound", fallback: "No mnemonic found for accounts")
+    /// Passphrase
+    public static let passphrase = L10n.tr("Localizable", "importOlympiaAccounts_passphrase", fallback: "Passphrase")
+    /// Seed phrase
+    public static let seedPhrase = L10n.tr("Localizable", "importOlympiaAccounts_seedPhrase", fallback: "Seed phrase")
     public enum AccountsToImport {
       /// Import %d accounts
       public static func buttonManyAccounts(_ p1: Int) -> String {
