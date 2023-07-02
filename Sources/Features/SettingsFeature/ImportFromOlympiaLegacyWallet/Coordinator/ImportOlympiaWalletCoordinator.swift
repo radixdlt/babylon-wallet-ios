@@ -78,7 +78,8 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 	public enum InternalAction: Sendable, Equatable {
 		case foundAlreadyImportedOlympiaSoftwareAccounts(
 			NetworkID,
-			Set<OlympiaAccountToMigrate.ID>
+			Set<OlympiaAccountToMigrate.ID>,
+			existingAccounts: Int
 		)
 		case checkedIfOlympiaFactorSourceAlreadyExists(
 			FactorSourceID.FromHash?,
@@ -128,6 +129,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 
 	// MARK: Reducer
 
+	@Dependency(\.accountsClient) var accountsClient
 	@Dependency(\.factorSourcesClient) var factorSourcesClient
 	@Dependency(\.engineToolkitClient) var engineToolkitClient
 	@Dependency(\.dismiss) var dismiss
@@ -193,8 +195,8 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
-		case let .foundAlreadyImportedOlympiaSoftwareAccounts(networkID, alreadyImported):
-			return foundAlreadyImportedAccounts(in: &state, networkID: networkID, alreadyImported: alreadyImported)
+		case let .foundAlreadyImportedOlympiaSoftwareAccounts(networkID, alreadyImported, existingAccounts):
+			return foundAlreadyImportedAccounts(in: &state, networkID: networkID, alreadyImported: alreadyImported, existingAccounts: existingAccounts)
 
 		case let .checkedIfOlympiaFactorSourceAlreadyExists(idOfExistingFactorSource, softwareAccounts):
 			return checkedIfOlympiaFactorSourceAlreadyExists(in: &state, idOfExistingFactorSource: idOfExistingFactorSource, softwareAccounts: softwareAccounts)
@@ -228,20 +230,22 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 		return .task {
 			let alreadyImported = await importLegacyWalletClient.findAlreadyImportedIfAny(scanned)
 			let networkID = await factorSourcesClient.getCurrentNetworkID()
-			return .internal(.foundAlreadyImportedOlympiaSoftwareAccounts(networkID, alreadyImported))
+			let existingAccounts = await (try? accountsClient.getAccountsOnNetwork(networkID).count) ?? 0
+			return .internal(.foundAlreadyImportedOlympiaSoftwareAccounts(networkID, alreadyImported, existingAccounts: existingAccounts))
 		}
 	}
 
 	private func foundAlreadyImportedAccounts(
 		in state: inout State,
 		networkID: NetworkID,
-		alreadyImported: Set<OlympiaAccountToMigrate.ID>
+		alreadyImported: Set<OlympiaAccountToMigrate.ID>,
+		existingAccounts: Int
 	) -> EffectTask<Action> {
 		guard case let .scannedQR(progress) = state.progress else { return progressError(state.progress) }
 
 		let scannedAccounts: NonEmptyArray<MigratableAccount>
 		do {
-			scannedAccounts = try migratableAccounts(from: progress.scannedAccounts, networkID: networkID)
+			scannedAccounts = try migratableAccounts(from: progress.scannedAccounts, networkID: networkID, existingAccounts: existingAccounts)
 		} catch {
 			errorQueue.schedule(error)
 			return generalError(error)
@@ -485,12 +489,17 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 // MARK: - Helper methods
 
 extension ImportOlympiaWalletCoordinator {
-	private func migratableAccounts(from scannedAccounts: AccountsToMigrate, networkID: NetworkID) throws -> NonEmptyArray<MigratableAccount> {
-		try scannedAccounts.map { account in
+	private func migratableAccounts(
+		from scannedAccounts: AccountsToMigrate,
+		networkID: NetworkID,
+		existingAccounts: Int
+	) throws -> NonEmpty<[MigratableAccount]> {
+		let result = try scannedAccounts.enumerated().map { index, account in
 			let derivedAddress = try engineToolkitClient.deriveVirtualAccountAddress(.init(
 				publicKey: .ecdsaSecp256k1(account.publicKey.intoEngine()),
 				networkId: networkID
 			))
+
 			let babylonAddress = try AccountAddress(componentAddress: derivedAddress)
 
 			return MigratableAccount(
@@ -498,10 +507,18 @@ extension ImportOlympiaWalletCoordinator {
 				accountName: account.displayName?.rawValue,
 				olympiaAddress: account.address,
 				babylonAddress: babylonAddress,
-				appearanceID: .fromIndex(Int(account.addressIndex)),
+				appearanceID: .fromIndex(existingAccounts + index),
 				olympiaAccountType: account.accountType
 			)
 		}
+
+		guard let nonEmpty = NonEmpty<[MigratableAccount]>(result) else {
+			assertionFailure("This is impossible")
+			struct ImpossibleError: Error {}
+			throw ImpossibleError()
+		}
+
+		return nonEmpty
 	}
 
 	private func progressError(_ progress: Progress, line: Int = #line) -> EffectTask<Action> {
