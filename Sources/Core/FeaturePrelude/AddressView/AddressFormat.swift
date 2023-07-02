@@ -3,6 +3,7 @@ import Foundation
 // MARK: - AddressFormat
 public enum AddressFormat: String, Sendable {
 	case `default`
+	case olympia
 	case nonFungibleLocalId
 }
 
@@ -21,6 +22,8 @@ extension String {
 		switch format {
 		case .default:
 			return truncatedMiddle(keepFirst: 4, last: 6)
+		case .olympia:
+			return truncatedMiddle(keepFirst: 3, last: 9)
 		case .nonFungibleLocalId:
 			return colonSeparated()
 		}
