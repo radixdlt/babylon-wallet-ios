@@ -70,7 +70,7 @@ public struct AccountView: View {
 
 				VPair(
 					heading: L10n.ImportOlympiaAccounts.AccountsToImport.olympiaAddressLabel,
-					value: viewState.olympiaAddress.address.rawValue.formatted(.default)
+					value: viewState.olympiaAddress.address.rawValue.formatted(.olympia)
 				)
 
 				VPair(
