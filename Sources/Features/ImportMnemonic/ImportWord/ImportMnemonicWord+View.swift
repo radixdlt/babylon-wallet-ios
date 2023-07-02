@@ -112,16 +112,12 @@ extension ImportMnemonicWord {
 											.buttonStyle(.primaryRectangular(height: .toolbarButtonHeight))
 										}
 									}
-									.padding(.horizontal, .small2)
 								}
 								.mask {
-									HStack(spacing: 0) {
-										LinearGradient(colors: [.clear, .white], startPoint: .leading, endPoint: .trailing)
-											.frame(width: .small2)
-										Color.white
-										LinearGradient(colors: [.white, .clear], startPoint: .leading, endPoint: .trailing)
-											.frame(width: .small2)
-									}
+									Rectangle()
+										.fill()
+										.frame(height: .toolbarButtonHeight)
+										.cornerRadius(.small2)
 								}
 							}
 						}
