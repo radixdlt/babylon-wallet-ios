@@ -13,7 +13,6 @@ extension LedgerHardwareDevices.State {
 extension LedgerHardwareDevices {
 	public struct ViewState: Equatable {
 		var allowSelection: Bool { context != .settings }
-		var showHeaders: Bool { context != .importOlympia }
 		var showIcon: Bool { context != .settings }
 
 		let ledgers: Loadable<IdentifiedArrayOf<LedgerHardwareWalletFactorSource>>
@@ -90,26 +89,25 @@ extension LedgerHardwareDevices {
 									.padding(.vertical, .medium1)
 							}
 
-							if viewStore.showHeaders {
-								if let subtitle = viewStore.subtitle {
-									Text(subtitle)
-										.foregroundColor(.app.gray1)
-										.textStyle(.secondaryHeader)
-										.padding(.horizontal, .medium1)
-										.padding(.bottom, .medium1)
-								}
-
-								//        FIXME: Uncomment and implement
-								//        Button(L10n.LedgerHardwareDevices.ledgerFactorSourceInfoCaption) {
-								//                viewStore.send(.whatIsALedgerButtonTapped)
-								//        }
-								//        .buttonStyle(.info)
-								//        .flushedLeft
+							if let subtitle = viewStore.subtitle {
+								Text(subtitle)
+									.foregroundColor(.app.gray1)
+									.textStyle(.secondaryHeader)
+									.padding(.horizontal, .medium1)
+									.padding(.bottom, .medium1)
 							}
+
+							//        FIXME: Uncomment and implement
+							//        Button(L10n.LedgerHardwareDevices.ledgerFactorSourceInfoCaption) {
+							//                viewStore.send(.whatIsALedgerButtonTapped)
+							//        }
+							//        .buttonStyle(.info)
+							//        .flushedLeft
 						}
 						.multilineTextAlignment(.center)
 
 						ledgerList(viewStore: viewStore)
+							.padding(.horizontal, .medium1)
 							.padding(.bottom, .medium1)
 
 						Button(L10n.LedgerHardwareDevices.addNewLedger) {
@@ -141,15 +139,9 @@ extension LedgerHardwareDevices {
 		@ViewBuilder
 		private func ledgerList(viewStore: ViewStoreOf<LedgerHardwareDevices>) -> some SwiftUI.View {
 			switch viewStore.ledgers {
-			case .idle, .loading, .failure,
-			     // We are already showing `subtitleNoLedgers` in the header
-			     .success([]) where viewStore.showHeaders:
+			case .idle, .loading, .failure, .success([]):
+				// We are already showing `subtitleNoLedgers` in the header
 				EmptyView()
-			case .success([]):
-				Text(L10n.LedgerHardwareDevices.subtitleNoLedgers)
-					.foregroundColor(.app.gray1)
-					.textStyle(.secondaryHeader)
-					.multilineTextAlignment(.center)
 
 			case let .success(ledgers):
 				VStack(spacing: .medium1) {
