@@ -34,6 +34,9 @@ extension AppPreferencesClient: DependencyKey {
 					profile.id,
 					isEnabled ? .enable : .disable
 				)
+			},
+			getDetailsOfSecurityStructure: { configRef in
+				try await getProfileStore().profile.detailedSecurityStructureConfiguration(reference: configRef)
 			}
 		)
 	}

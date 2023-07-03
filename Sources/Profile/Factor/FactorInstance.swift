@@ -4,13 +4,13 @@ import Prelude
 
 // MARK: - FactorInstance
 /// An factor instance created from a FactorSource.
-public struct FactorInstance: Sendable, Hashable, Codable, Identifiable {
+public struct FactorInstance: Sendable, Hashable, Codable, Identifiable, FactorOfTierProtocol {
 	// FIXME: COMPLETELY incorrectly implemented, MUST be sent in probably, because Profile cannot
 	// use EngineToolkit which we must, to do Blake hash.
 	/// A string uniquely identifying this Factor Source, on format:
 	/// `FactorSourceKind(1) || "#" || BadgeAddress(String)` e.g.
 	/// `de#resource_sim1qgqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqs64j5z6:[9f58abcbc2ebd2da349acb10773ffbc37b6af91fa8df2486c9ea]"`
-	public struct ID: Sendable, Hashable, Codable {
+	public struct ID: Sendable, Hashable, Codable, FactorOfTierProtocol {
 		public let factorSourceKind: FactorSourceKind
 		public let badgeAddress: BadgeAddress
 
@@ -110,6 +110,10 @@ extension FactorInstance {
 }
 
 extension FactorInstance {
+	public var factorSourceKind: FactorSourceKind {
+		id.factorSourceKind
+	}
+
 	/// Tries to unwrap this factor instance's badge as virtual hierarchical deterministic one.
 	public func virtualHierarchicalDeterministic() throws -> HierarchicalDeterministicFactorInstance {
 		try .init(factorInstance: self)

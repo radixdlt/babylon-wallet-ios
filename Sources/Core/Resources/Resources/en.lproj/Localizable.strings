@@ -475,7 +475,7 @@
 "importMnemonic_passphraseHint" = "BIP39 Passphrase is often called a \'25th word\'.";
 "importMnemonic_fewerWords" = "Fewer words";
 "importMnemonic_moreWords" = "More words";
-"importMnemonic_checksumFailure" = "Seed phrase not checksummed";
+"importMnemonic_checksumFailure" = "Incorrect seed phrase";
 "importMnemonic_importSeedPhrase" = "Import seed phrase";
 "importMnemonic_offDevice_storyPrimaryHeading" = "Tell a story";
 "importMnemonic_offDevice_storyPlaceholder" = "Hitchcock\'s The Birds mixed with Office space";

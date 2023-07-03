@@ -40,10 +40,6 @@ public struct CreationOfAccount: Sendable, FeatureReducer {
 		}
 	}
 
-	public enum ViewAction: Sendable, Equatable {
-		case onFirstTask
-	}
-
 	public enum InternalAction: Sendable, Equatable {
 		case createAccountResult(TaskResult<Profile.Network.Account>)
 	}

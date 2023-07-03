@@ -31,7 +31,7 @@
     "security" : {
       "isCloudProfileSyncEnabled" : true,
       "isDeveloperModeEnabled" : true,
-      "structureConfigurations" : [
+      "structureConfigurationReferences" : [
 
       ]
     }
@@ -49,6 +49,9 @@
               "cap26"
             ]
           },
+          "flags" : [
+
+          ],
           "lastUsedOn" : "1970-01-01T00:00:00Z"
         },
         "hint" : {
@@ -83,6 +86,9 @@
               "bip44Olympia"
             ]
           },
+          "flags" : [
+
+          ],
           "lastUsedOn" : "1970-01-01T00:00:00Z"
         },
         "hint" : {
@@ -109,6 +115,9 @@
               "cap26"
             ]
           },
+          "flags" : [
+
+          ],
           "lastUsedOn" : "1970-01-01T00:00:00Z"
         },
         "contact" : {
@@ -139,6 +148,9 @@
               "cap26"
             ]
           },
+          "flags" : [
+
+          ],
           "lastUsedOn" : "1970-01-01T00:00:00Z"
         },
         "hint" : {
@@ -165,6 +177,9 @@
               "bip44Olympia"
             ]
           },
+          "flags" : [
+
+          ],
           "lastUsedOn" : "1970-01-01T00:00:00Z"
         },
         "hint" : {
@@ -199,7 +214,7 @@
       "description" : "computer unit test",
       "id" : "BABE1442-3C98-41FF-AFB0-D0F5829B020D"
     },
-    "snapshotVersion" : 37
+    "snapshotVersion" : 38
   },
   "networks" : [
     {
@@ -408,8 +423,8 @@
                 }
               },
               "sharedFieldIDs" : [
-                "givenName",
-                "familyName"
+                "familyName",
+                "givenName"
               ]
             },
             {
@@ -425,8 +440,8 @@
                 }
               },
               "sharedFieldIDs" : [
-                "familyName",
-                "givenName"
+                "givenName",
+                "familyName"
               ]
             }
           ]

@@ -7,6 +7,8 @@ public enum FactorSourceKind:
 	Sendable,
 	Hashable,
 	Codable,
+	CaseIterable,
+	Identifiable,
 	CustomStringConvertible
 {
 	/// A user owned unencrypted mnemonic (and optional BIP39 passphrase) stored on device,
@@ -58,4 +60,9 @@ public enum FactorSourceKind:
 	///  * Off device
 	///  * Hierarchical deterministic  (**Encrypted** mnemonic)
 	case securityQuestions
+}
+
+extension FactorSourceKind {
+	public typealias ID = RawValue
+	public var id: ID { rawValue }
 }
