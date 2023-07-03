@@ -39,21 +39,21 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 
 	public struct Destinations: ReducerProtocol {
 		public enum State: Sendable, Hashable {
+			case nameLedgerAndDerivePublicKeys(NameLedgerAndDerivePublicKeys.State)
 			case derivePublicKeys(DerivePublicKeys.State)
-			case nameLedger(NameLedgerFactorSource.State)
 		}
 
 		public enum Action: Sendable, Equatable {
+			case nameLedgerAndDerivePublicKeys(NameLedgerAndDerivePublicKeys.Action)
 			case derivePublicKeys(DerivePublicKeys.Action)
-			case nameLedger(NameLedgerFactorSource.Action)
 		}
 
 		public var body: some ReducerProtocolOf<Self> {
+			Scope(state: /State.nameLedgerAndDerivePublicKeys, action: /Action.nameLedgerAndDerivePublicKeys) {
+				NameLedgerAndDerivePublicKeys()
+			}
 			Scope(state: /State.derivePublicKeys, action: /Action.derivePublicKeys) {
 				DerivePublicKeys()
-			}
-			Scope(state: /State.nameLedger, action: /Action.nameLedger) {
-				NameLedgerFactorSource()
 			}
 		}
 	}
@@ -65,9 +65,6 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 	public enum InternalAction: Sendable, Equatable {
 		/// Starts the process of adding a new Ledger device
 		case addNewLedger(DeviceInfo)
-
-		/// Saved the newly added Ledger device
-		case savedNewLedger(LedgerHardwareWalletFactorSource)
 
 		/// Adds a previously saved device to the list and continues
 		case addExistingLedger(LedgerHardwareWalletFactorSource)
@@ -112,16 +109,16 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
 		case let .addNewLedger(deviceInfo):
-			state.destinations = .nameLedger(.init(deviceInfo: deviceInfo))
+			state.destinations = .nameLedgerAndDerivePublicKeys(.init(deviceInfo: deviceInfo))
 			return .none
 
-		case let .savedNewLedger(ledger):
-			state.destinations = nil
-			return .run { send in
-				// FIXME: Hack to avoid a crash when we show the DerivePublicKeys view too quickly
-				try? await Task.sleep(for: .milliseconds(700))
-				await send(.internal(.addExistingLedger(ledger)))
-			}
+//		case let .savedNewLedger(ledger):
+//			state.destinations = nil
+//			return .run { send in
+//				// FIXME: Hack to avoid a crash when we show the DerivePublicKeys view too quickly
+//				try? await Task.sleep(for: .milliseconds(700))
+//				await send(.internal(.addExistingLedger(ledger)))
+//			}
 
 		case let .addExistingLedger(ledger):
 			return addAccountUsingLedger(in: &state, ledger: ledger)
@@ -173,12 +170,12 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 					olympiaAccountsToValidate: state.olympiaAccounts.unvalidated
 				)
 
-			case let .nameLedger(.delegate(.complete(ledger))):
-				return saveNewLedger(ledger)
-
-			case .nameLedger(.delegate(.failedToCreateLedgerFactorSource)):
-				return .none
-//				return .send(.delegate(.failedToAddLedger))
+//			case let .nameLedger(.delegate(.complete(ledger))):
+//				return saveNewLedger(ledger)
+//
+//			case .nameLedger(.delegate(.failedToCreateLedgerFactorSource)):
+//				return .none
+////				return .send(.delegate(.failedToAddLedger))
 
 			default:
 				return .none
@@ -205,17 +202,6 @@ extension ImportOlympiaLedgerAccountsAndFactorSources {
 			} else {
 				await send(.internal(.addNewLedger(ledgerInfo)))
 			}
-		}
-	}
-
-	private func saveNewLedger(_ ledger: LedgerHardwareWalletFactorSource) -> EffectTask<Action> {
-		.run { send in
-			try await factorSourcesClient.saveFactorSource(ledger.embed())
-			loggerGlobal.notice("Saved Ledger factor source! ✅ ")
-			await send(.internal(.savedNewLedger(ledger)))
-		} catch: { error, _ in
-			loggerGlobal.error("Failed to save Factor Source, error: \(error)")
-			errorQueue.schedule(error)
 		}
 	}
 
@@ -333,6 +319,95 @@ extension LedgerHardwareWalletFactorSource.DeviceModel {
 		case .nanoS: self = .nanoS
 		case .nanoX: self = .nanoX
 		case .nanoSPlus: self = .nanoSPlus
+		}
+	}
+}
+
+// MARK: - NameLedgerAndDerivePublicKeys
+public struct NameLedgerAndDerivePublicKeys: Sendable, FeatureReducer {
+	public struct State: Sendable, Hashable {
+		public var nameLedger: NameLedgerFactorSource.State?
+
+		public init(deviceInfo: DeviceInfo) {
+			self.nameLedger = .init(deviceInfo: deviceInfo)
+		}
+
+		public init(ledger: LedgerHardwareWalletFactorSource) {
+			self.nameLedger = nil
+		}
+
+		@PresentationState
+		public var derivePublicKeys: DerivePublicKeys.State? = nil
+	}
+
+	public enum ChildAction: Sendable, Equatable {
+		case nameLedger(NameLedgerFactorSource.Action)
+		case derivePublicKeys(PresentationAction<DerivePublicKeys.Action>)
+	}
+
+	public enum InternalAction: Sendable, Equatable {
+		/// Saved the newly added Ledger device
+		case savedNewLedger(LedgerHardwareWalletFactorSource)
+	}
+
+	public typealias DelegateAction = DerivePublicKeys.DelegateAction
+
+	@Dependency(\.errorQueue) var errorQueue
+	@Dependency(\.factorSourcesClient) var factorSourcesClient
+
+	public init() {}
+
+	public var body: some ReducerProtocolOf<Self> {
+		Scope(state: \State.nameLedger, action: /Action.child .. /ChildAction.nameLedger) {
+			NameLedgerFactorSource()
+		}
+		Reduce(core)
+			.ifLet(\.$derivePublicKeys, action: /Action.child .. ChildAction.derivePublicKeys) {
+				DerivePublicKeys()
+			}
+	}
+
+	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+		switch childAction {
+		case let .nameLedger(.delegate(.complete(ledger))):
+			return saveNewLedger(ledger)
+
+		case .nameLedger(.delegate(.failedToCreateLedgerFactorSource)):
+			// TODO: Handle problem
+			return .none
+
+		case let .derivePublicKeys(.presented(.delegate(derivePublicKeysAction))):
+			return .send(.delegate(derivePublicKeysAction))
+
+		default:
+			return .none
+		}
+	}
+
+	private func saveNewLedger(_ ledger: LedgerHardwareWalletFactorSource) -> EffectTask<Action> {
+		.run { send in
+			try await factorSourcesClient.saveFactorSource(ledger.embed())
+			loggerGlobal.notice("Saved Ledger factor source! ✅ ")
+			await send(.internal(.savedNewLedger(ledger)))
+		} catch: { error, _ in
+			loggerGlobal.error("Failed to save Factor Source, error: \(error)")
+			errorQueue.schedule(error)
+		}
+	}
+}
+
+// MARK: NameLedgerAndDerivePublicKeys.View
+extension NameLedgerAndDerivePublicKeys {
+	@MainActor
+	public struct View: SwiftUI.View {
+		private let store: StoreOf<NameLedgerAndDerivePublicKeys>
+
+		public init(store: StoreOf<NameLedgerAndDerivePublicKeys>) {
+			self.store = store
+		}
+
+		public var body: some SwiftUI.View {
+			EmptyView()
 		}
 	}
 }
