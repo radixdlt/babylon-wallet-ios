@@ -82,7 +82,14 @@ extension ImportOlympiaLedgerAccountsAndFactorSources {
 					store: store.destination,
 					state: /ImportOlympiaLedgerAccountsAndFactorSources.Destinations.State.nameLedgerAndDerivePublicKeys,
 					action: ImportOlympiaLedgerAccountsAndFactorSources.Destinations.Action.nameLedgerAndDerivePublicKeys,
-					content: { NameLedgerAndDerivePublicKeys.View(store: $0) }
+					content: { childStore in
+						WithNavigationBar {
+							store.send(.view(.closeButtonTapped))
+						} content: {
+							NameLedgerAndDerivePublicKeys.View(store: childStore)
+								.navigationBarBackButtonHidden()
+						}
+					}
 				)
 			}
 		}
