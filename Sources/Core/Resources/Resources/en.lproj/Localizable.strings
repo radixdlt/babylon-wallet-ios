@@ -592,6 +592,9 @@ Install the Connector extension, open it to see the linking QR code, and tap con
 "importOlympiaAccounts_passphrase" = "Passphrase";
 "importOlympiaAccounts_seedPhrase" = "Seed phrase";
 
-"importOlympiaLedgerAccounts_unverifiedAccountsLeft" = "#%d accounts left to import";
-"importOlympiaLedgerAccounts_importLedgersAndAccounts" = "Imported ledgers and accounts";
-"importOlympiaLedgerAccounts_accountCount" = "%@ - #%d accounts";
+"importOlympiaLedgerAccounts_title" = "Confirm Ledgers";
+"importOlympiaLedgerAccounts_subtitle" = "%d of your accounts are controlled by Ledger Hardware Wallets";
+"importOlympiaLedgerAccounts_listHeading" = "Currently Known Ledgers:";
+"importOlympiaLedgerAccounts_knownLedgersNone" = "None";
+"importOlympiaLedgerAccounts_otherDeviceAccounts" = "%d more accounts are controlled by other devices. Connect a Ledger hardware wallet device and tap Continue.";
+"importOlympiaLedgerAccounts_continueButtonTitle" = "Continue";
