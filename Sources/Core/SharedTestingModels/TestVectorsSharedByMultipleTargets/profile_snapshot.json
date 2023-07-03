@@ -10,7 +10,7 @@
       "saved" : [
         {
           "network" : {
-            "displayDescription" : "RCnet",
+            "displayDescription" : "Enkinet (Test Network)",
             "id" : 33,
             "name" : "enkinet"
           },
@@ -214,13 +214,13 @@
       "description" : "computer unit test",
       "id" : "BABE1442-3C98-41FF-AFB0-D0F5829B020D"
     },
-    "snapshotVersion" : 38
+    "snapshotVersion" : 39
   },
   "networks" : [
     {
       "accounts" : [
         {
-          "address" : "account_rdx12xsvygvltz4uhsht6tdrfxktzpmnl77r0d40j8agmujgdj022sudkk",
+          "address" : "account_tdx_21_129keupt05nakwqkx0865rrqp47c8g9gpktky06d6yl9e708n9cqvsx",
           "appearanceID" : 0,
           "displayName" : "First",
           "networkID" : 33,
@@ -281,7 +281,7 @@
           }
         },
         {
-          "address" : "account_rdx1283u6e8r2jnz4a3jwv0hnrqfr5aq50yc9ts523sd96hzfjxqqcs89q",
+          "address" : "account_tdx_21_1293rfaz9cmp6jkc2qh7ggxsr3gc703u78un9w7al68juka22rxrh5d",
           "appearanceID" : 1,
           "displayName" : "Second",
           "networkID" : 33,
@@ -342,7 +342,7 @@
           }
         },
         {
-          "address" : "account_rdx1290de5whwuwgk2wyvrgvu6449706jtashgnp9n96yhp80cst9uaam3",
+          "address" : "account_tdx_21_12yq3vgq69l207w3zuw0zyhcf9ppzvl2sw22zeaatnuuvgxzq09fwrp",
           "appearanceID" : 2,
           "displayName" : "Third",
           "networkID" : 12,
@@ -405,17 +405,17 @@
       ],
       "authorizedDapps" : [
         {
-          "dAppDefinitionAddress" : "account_rdx12ygudy0at0ttc2wmsxw2ejx4dqf3dwlr9rsusk287mmynxeas5p2mk",
+          "dAppDefinitionAddress" : "account_tdx_21_12y6ra8syx8arxqvzmj5edyd8fpazcvfuq6vfn4e7fppky3qwwy6khj",
           "displayName" : "RadiSwap",
           "networkID" : 33,
           "referencesToAuthorizedPersonas" : [
             {
-              "identityAddress" : "identity_rdx122svygvltz4uhsht6tdrfxktzpmnl77r0d40j8agmujgdj02qcdznz",
+              "identityAddress" : "identity_tdx_21_12fx3znxjhdrpv4dnurg220n8st5ep70u3ffsmcf0n0xprkzawa3hsc",
               "lastLogin" : "2001-01-01T00:00:00Z",
               "sharedAccounts" : {
                 "accountsReferencedByAddress" : [
-                  "account_rdx1283u6e8r2jnz4a3jwv0hnrqfr5aq50yc9ts523sd96hzfjxqqcs89q",
-                  "account_rdx1290de5whwuwgk2wyvrgvu6449706jtashgnp9n96yhp80cst9uaam3"
+                  "account_tdx_21_12yq3vgq69l207w3zuw0zyhcf9ppzvl2sw22zeaatnuuvgxzq09fwrp",
+                  "account_tdx_21_1293rfaz9cmp6jkc2qh7ggxsr3gc703u78un9w7al68juka22rxrh5d"
                 ],
                 "request" : {
                   "quantifier" : "exactly",
@@ -428,11 +428,11 @@
               ]
             },
             {
-              "identityAddress" : "identity_rdx12t3u6e8r2jnz4a3jwv0hnrqfr5aq50yc9ts523sd96hzfjxq2spgq5",
+              "identityAddress" : "identity_tdx_21_12gp3n799aya3gq6qlljehp0p8vpmdkuuykq3dqx5ehspuwzugmj49q",
               "lastLogin" : "2001-01-01T00:00:00Z",
               "sharedAccounts" : {
                 "accountsReferencedByAddress" : [
-                  "account_rdx1283u6e8r2jnz4a3jwv0hnrqfr5aq50yc9ts523sd96hzfjxqqcs89q"
+                  "account_tdx_21_129keupt05nakwqkx0865rrqp47c8g9gpktky06d6yl9e708n9cqvsx"
                 ],
                 "request" : {
                   "quantifier" : "atLeast",
@@ -450,7 +450,7 @@
       "networkID" : 33,
       "personas" : [
         {
-          "address" : "identity_rdx122svygvltz4uhsht6tdrfxktzpmnl77r0d40j8agmujgdj02qcdznz",
+          "address" : "identity_tdx_21_12fx3znxjhdrpv4dnurg220n8st5ep70u3ffsmcf0n0xprkzawa3hsc",
           "displayName" : "Mrs Incognito",
           "fields" : [
             {
@@ -520,7 +520,7 @@
           }
         },
         {
-          "address" : "identity_rdx12t3u6e8r2jnz4a3jwv0hnrqfr5aq50yc9ts523sd96hzfjxq2spgq5",
+          "address" : "identity_tdx_21_12gp3n799aya3gq6qlljehp0p8vpmdkuuykq3dqx5ehspuwzugmj49q",
           "displayName" : "Mrs Public",
           "fields" : [
             {

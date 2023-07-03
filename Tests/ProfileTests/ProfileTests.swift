@@ -478,7 +478,7 @@ final class ProfileTests: TestCase {
 
 		XCTAssertEqual(
 			network.accounts[0].address.address,
-			"account_rdx12xsvygvltz4uhsht6tdrfxktzpmnl77r0d40j8agmujgdj022sudkk"
+			"account_tdx_21_129keupt05nakwqkx0865rrqp47c8g9gpktky06d6yl9e708n9cqvsx"
 		)
 
 		// Account 1
@@ -493,7 +493,7 @@ final class ProfileTests: TestCase {
 
 		XCTAssertEqual(
 			network.accounts[1].address.address,
-			"account_rdx1283u6e8r2jnz4a3jwv0hnrqfr5aq50yc9ts523sd96hzfjxqqcs89q"
+			"account_tdx_21_1293rfaz9cmp6jkc2qh7ggxsr3gc703u78un9w7al68juka22rxrh5d"
 		)
 
 		// Account 2
@@ -508,7 +508,7 @@ final class ProfileTests: TestCase {
 
 		XCTAssertEqual(
 			network.accounts[2].address.address,
-			"account_rdx1290de5whwuwgk2wyvrgvu6449706jtashgnp9n96yhp80cst9uaam3"
+			"account_tdx_21_12yq3vgq69l207w3zuw0zyhcf9ppzvl2sw22zeaatnuuvgxzq09fwrp"
 		)
 
 		// Persona 0
@@ -523,7 +523,7 @@ final class ProfileTests: TestCase {
 
 		XCTAssertEqual(
 			network.personas[0].address.address,
-			"identity_rdx122svygvltz4uhsht6tdrfxktzpmnl77r0d40j8agmujgdj02qcdznz"
+			"identity_tdx_21_12fx3znxjhdrpv4dnurg220n8st5ep70u3ffsmcf0n0xprkzawa3hsc"
 		)
 
 		// Persona 1
@@ -538,7 +538,7 @@ final class ProfileTests: TestCase {
 
 		XCTAssertEqual(
 			network.personas[1].address.address,
-			"identity_rdx12t3u6e8r2jnz4a3jwv0hnrqfr5aq50yc9ts523sd96hzfjxq2spgq5"
+			"identity_tdx_21_12gp3n799aya3gq6qlljehp0p8vpmdkuuykq3dqx5ehspuwzugmj49q"
 		)
 
 		XCTAssertEqual(profile.appPreferences.p2pLinks.links.count, 2)
@@ -550,7 +550,7 @@ final class ProfileTests: TestCase {
 		XCTAssertEqual(network.authorizedDapps[0].referencesToAuthorizedPersonas[0].sharedFieldIDs?.count, 2)
 		XCTAssertEqual(network.authorizedDapps[0].referencesToAuthorizedPersonas[0].sharedAccounts?.request.quantifier, .exactly)
 		XCTAssertEqual(network.authorizedDapps[0].referencesToAuthorizedPersonas[0].sharedAccounts?.request.quantity, 2)
-		XCTAssertEqual(network.authorizedDapps[0].referencesToAuthorizedPersonas[0].sharedAccounts?.accountsReferencedByAddress.map(\.address), ["account_rdx1283u6e8r2jnz4a3jwv0hnrqfr5aq50yc9ts523sd96hzfjxqqcs89q", "account_rdx1290de5whwuwgk2wyvrgvu6449706jtashgnp9n96yhp80cst9uaam3"])
+		XCTAssertEqual(network.authorizedDapps[0].referencesToAuthorizedPersonas[0].sharedAccounts?.accountsReferencedByAddress.map(\.address), ["account_tdx_21_12yq3vgq69l207w3zuw0zyhcf9ppzvl2sw22zeaatnuuvgxzq09fwrp", "account_tdx_21_1293rfaz9cmp6jkc2qh7ggxsr3gc703u78un9w7al68juka22rxrh5d"])
 	}
 
 	func test_version_compatibility_check_too_low() throws {
