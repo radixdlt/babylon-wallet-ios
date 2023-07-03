@@ -117,8 +117,11 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 
 		case let .savedNewLedger(ledger):
 			state.destinations = nil
-			state.knownLedgers.append(ledger)
-			return addAccountUsingLedger(in: &state, ledger: ledger)
+			return .run { send in
+				// FIXME: Hack to avoid a crash when we show the DerivePublicKeys view too quickly
+				try? await Task.sleep(for: .milliseconds(700))
+				await send(.internal(.addExistingLedger(ledger)))
+			}
 
 		case let .addExistingLedger(ledger):
 			return addAccountUsingLedger(in: &state, ledger: ledger)
