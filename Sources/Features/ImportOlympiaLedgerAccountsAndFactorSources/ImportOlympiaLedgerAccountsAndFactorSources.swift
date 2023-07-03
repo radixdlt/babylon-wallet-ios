@@ -13,11 +13,13 @@ import SharedModels
 
 // MARK: - ImportOlympiaLedgerAccountsAndFactorSources
 public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureReducer {
+	public typealias NewLedgerInfo = P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.GetDeviceInfo
+
 	public struct State: Sendable, Hashable {
 		public let networkID: NetworkID
 
 		/// Not yet migrated, containing unvalidated and validated accounts.
-		public var olympiaACcounts: OlympiaAccountsValidation
+		public var olympiaAccounts: OlympiaAccountsValidation
 
 		/// Migrated (and before that validated)
 		public var migratedAccounts: IdentifiedArrayOf<Profile.Network.Account> = []
@@ -33,7 +35,7 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 		) {
 			precondition(hardwareAccounts.allSatisfy { $0.accountType == .hardware })
 			self.networkID = networkID
-			self.olympiaACcounts = .init(validated: [], unvalidated: Set(hardwareAccounts.elements))
+			self.olympiaAccounts = .init(validated: [], unvalidated: Set(hardwareAccounts.elements))
 		}
 	}
 
@@ -58,8 +60,14 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 	}
 
 	public enum InternalAction: Sendable, Equatable {
+		/// Adds a new device to the list and continues
+		case addNewLedger(NewLedgerInfo)
+
+		/// Adds a previously saved device to the list and continues
+		case addExistingLedger(LedgerHardwareWalletFactorSource)
+
 		/// Validated public keys against expected, then migrate...
-		case validatedAccounts(NonEmpty<Set<OlympiaAccountToMigrate>>, LedgerHardwareWalletFactorSource)
+		case validatedAccounts(NonEmpty<Set<OlympiaAccountToMigrate>>, LedgerHardwareWalletFactorSource.ID)
 
 		/// Migrated accounts of validated public keys
 		case migratedOlympiaHardwareAccounts(NonEmpty<[Profile.Network.Account]>)
@@ -91,49 +99,49 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .continueTapped:
-
-//			ledgerHardwareWalletClient.getDeviceInfo
-
-			let ledger: LedgerHardwareWalletFactorSource = { fatalError() }()
-
-			state.knownLedgers.append(ledger)
-
-			state.destinations = .derivePublicKeys(.init(
-				derivationPathOption: .knownPaths(
-					.init(uncheckedUniqueElements: state.olympiaACcounts.unvalidated.map { $0.path.wrapAsDerivationPath() }),
-					networkID: state.networkID
-				),
-				factorSourceOption: .specific(ledger.embed()),
-				purpose: .importLegacyAccounts
-			))
-			return .none
+			return addLedger()
 		}
 	}
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
-		case let .validatedAccounts(validatedAccounts, ledger):
+		case let .addNewLedger(ledgerInfo):
+			return .none
 
+		case let .addExistingLedger(ledger):
+			state.knownLedgers.append(ledger)
+
+			state.destinations = .derivePublicKeys(.init(
+				derivationPathOption: .knownPaths(
+					.init(uncheckedUniqueElements: state.olympiaAccounts.unvalidated.map { $0.path.wrapAsDerivationPath() }),
+					networkID: state.networkID
+				),
+				factorSourceOption: .specific(ledger.embed()),
+				purpose: .importLegacyAccounts
+			))
+
+			return .none
+
+		case let .validatedAccounts(validatedAccounts, ledgerID):
 			for validatedAccount in validatedAccounts {
-				state.olympiaACcounts.unvalidated.remove(validatedAccount)
-				state.olympiaACcounts.validated.append(contentsOf: validatedAccounts)
+				state.olympiaAccounts.unvalidated.remove(validatedAccount)
+				state.olympiaAccounts.validated.append(contentsOf: validatedAccounts)
 			}
-			return convertHardwareAccountsToBabylon(
-				ledger: ledger,
+			return migrateOlympiaHardwareAccounts(
+				ledgerID: ledgerID,
 				validatedAccountsToMigrate: validatedAccounts
 			)
 
 		case let .migratedOlympiaHardwareAccounts(migratedAccounts):
-			loggerGlobal.notice("Adding Ledger with accounts...")
-
+			loggerGlobal.notice("Adding migrated accounts...")
 			state.migratedAccounts.append(contentsOf: migratedAccounts)
 
-			if state.olympiaACcounts.unvalidated.isEmpty {
+			if state.olympiaAccounts.unvalidated.isEmpty {
 				loggerGlobal.notice("Finished migrating all accounts.")
 				return .send(.delegate(.completed(state.migratedAccounts)))
 			}
 
-			loggerGlobal.notice("state.unmigrated.unvalidated not empty #\(state.olympiaACcounts.unvalidated), need to migrate more accounds...")
+			loggerGlobal.notice("#\(state.olympiaAccounts.unvalidated) left to migrate...")
 
 			return .none
 		}
@@ -141,8 +149,6 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
-//		case let .chooseLedger(.delegate(.choseLedger(ledger))):
-
 		case let .destinations(.presented(presentedAction)):
 			switch presentedAction {
 			case .derivePublicKeys(.delegate(.failedToDerivePublicKey)):
@@ -152,15 +158,15 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 
 			case let .derivePublicKeys(.delegate(.derivedPublicKeys(publicKeys, factorSourceID, _))):
 				state.destinations = nil
-				guard let id = factorSourceID.extract(FactorSourceID.FromHash.self), let ledger = state.knownLedgers[id: id] else {
+				guard let ledgerID = factorSourceID.extract(FactorSourceID.FromHash.self) else {
 					loggerGlobal.error("Failed to find ledger with factor sourceID in local state: \(factorSourceID)")
 					return .none
 				}
 
 				return validate(
 					derivedPublicKeys: publicKeys,
-					ledger: ledger,
-					olympiaAccountsToValidate: state.olympiaACcounts.unvalidated
+					ledgerID: ledgerID,
+					olympiaAccountsToValidate: state.olympiaAccounts.unvalidated
 				)
 
 			default:
@@ -171,10 +177,29 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 			return .none
 		}
 	}
+}
+
+// MARK: Helper methods
+
+extension ImportOlympiaLedgerAccountsAndFactorSources {
+	private func addLedger() -> EffectTask<Action> {
+		.run { send in
+			let ledgerInfo = try await ledgerHardwareWalletClient.getDeviceInfo()
+
+			if let ledger = try await factorSourcesClient.getFactorSource(
+				id: .init(kind: .ledgerHQHardwareWallet, hash: ledgerInfo.id.data.data),
+				as: LedgerHardwareWalletFactorSource.self
+			) {
+				await send(.internal(.addExistingLedger(ledger)))
+			} else {
+				await send(.internal(.addNewLedger(ledgerInfo)))
+			}
+		}
+	}
 
 	private func validate(
 		derivedPublicKeys: OrderedSet<HierarchicalDeterministicPublicKey>,
-		ledger: LedgerHardwareWalletFactorSource,
+		ledgerID: LedgerHardwareWalletFactorSource.ID,
 		olympiaAccountsToValidate: Set<OlympiaAccountToMigrate>
 	) -> EffectTask<Action> {
 		.run { send in
@@ -183,7 +208,7 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 				guard let validated = NonEmpty<Set>(validation.validated) else {
 					throw NoValidatedAccountsError()
 				}
-				await send(.internal(.validatedAccounts(validated, ledger)))
+				await send(.internal(.validatedAccounts(validated, ledgerID)))
 			} catch {
 				loggerGlobal.error("Failed to validate accounts, error: \(error)")
 				errorQueue.schedule(error)
@@ -191,8 +216,8 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 		}
 	}
 
-	private func convertHardwareAccountsToBabylon(
-		ledger: LedgerHardwareWalletFactorSource,
+	private func migrateOlympiaHardwareAccounts(
+		ledgerID: LedgerHardwareWalletFactorSource.ID,
 		validatedAccountsToMigrate olympiaAccounts: NonEmpty<Set<OlympiaAccountToMigrate>>
 	) -> EffectTask<Action> {
 		loggerGlobal.notice("Converting hardware accounts to babylon...")
@@ -201,7 +226,7 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 			let migrated = try await importLegacyWalletClient.migrateOlympiaHardwareAccountsToBabylon(
 				.init(
 					olympiaAccounts: olympiaAccounts,
-					ledgerFactorSourceID: ledger.id
+					ledgerFactorSourceID: ledgerID
 				)
 			)
 			let migratedAccounts = migrated.accounts.map(\.babylon)
