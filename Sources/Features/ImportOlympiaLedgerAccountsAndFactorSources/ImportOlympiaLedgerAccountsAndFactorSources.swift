@@ -209,12 +209,9 @@ extension ImportOlympiaLedgerAccountsAndFactorSources {
 		state.knownLedgers.append(ledger)
 
 		state.destinations = .derivePublicKeys(.init(
-			derivationPathOption: .knownPaths(
-				.init(uncheckedUniqueElements: state.olympiaAccounts.unvalidated.map { $0.path.wrapAsDerivationPath() }),
-				networkID: state.networkID
-			),
-			factorSourceOption: .specific(ledger.embed()),
-			purpose: .importLegacyAccounts
+			ledger: ledger,
+			olympiaAccounts: state.olympiaAccounts.unvalidated,
+			networkID: state.networkID
 		))
 
 		return .none
@@ -326,18 +323,31 @@ extension LedgerHardwareWalletFactorSource.DeviceModel {
 // MARK: - NameLedgerAndDerivePublicKeys
 public struct NameLedgerAndDerivePublicKeys: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
-		public var nameLedger: NameLedgerFactorSource.State?
+		public let networkID: NetworkID
 
-		public init(deviceInfo: DeviceInfo) {
-			self.nameLedger = .init(deviceInfo: deviceInfo)
-		}
+		public let olympiaAccounts: Set<OlympiaAccountToMigrate>
 
-		public init(ledger: LedgerHardwareWalletFactorSource) {
-			self.nameLedger = nil
-		}
+		public var nameLedger: NameLedgerFactorSource.State? = nil
 
 		@PresentationState
 		public var derivePublicKeys: DerivePublicKeys.State? = nil
+
+		public init(networkID: NetworkID, olympiaAccounts: Set<OlympiaAccountToMigrate>, deviceInfo: DeviceInfo) {
+			self.networkID = networkID
+			self.olympiaAccounts = olympiaAccounts
+			self.nameLedger = .init(deviceInfo: deviceInfo)
+		}
+
+		public init(networkID: NetworkID, olympiaAccounts: Set<OlympiaAccountToMigrate>, ledger: LedgerHardwareWalletFactorSource) {
+			self.networkID = networkID
+			self.olympiaAccounts = olympiaAccounts
+
+			showDerivePublicKeys(using: ledger)
+		}
+
+		mutating func showDerivePublicKeys(using ledger: LedgerHardwareWalletFactorSource) {
+			derivePublicKeys = .init(ledger: ledger, olympiaAccounts: olympiaAccounts, networkID: networkID)
+		}
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -350,7 +360,14 @@ public struct NameLedgerAndDerivePublicKeys: Sendable, FeatureReducer {
 		case savedNewLedger(LedgerHardwareWalletFactorSource)
 	}
 
-	public typealias DelegateAction = DerivePublicKeys.DelegateAction
+	public enum DelegateAction: Sendable, Equatable {
+		/// Saved the newly added Ledger device
+		case savedNewLedger(LedgerHardwareWalletFactorSource)
+
+		case failedToSaveNewLedger
+
+		case derivePublicKeys(DerivePublicKeys.DelegateAction)
+	}
 
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.factorSourcesClient) var factorSourcesClient
@@ -358,10 +375,10 @@ public struct NameLedgerAndDerivePublicKeys: Sendable, FeatureReducer {
 	public init() {}
 
 	public var body: some ReducerProtocolOf<Self> {
-		Scope(state: \State.nameLedger, action: /Action.child .. /ChildAction.nameLedger) {
-			NameLedgerFactorSource()
-		}
 		Reduce(core)
+			.ifLet(\.nameLedger, action: /Action.child .. ChildAction.nameLedger) {
+				NameLedgerFactorSource()
+			}
 			.ifLet(\.$derivePublicKeys, action: /Action.child .. ChildAction.derivePublicKeys) {
 				DerivePublicKeys()
 			}
@@ -373,13 +390,20 @@ public struct NameLedgerAndDerivePublicKeys: Sendable, FeatureReducer {
 			return saveNewLedger(ledger)
 
 		case .nameLedger(.delegate(.failedToCreateLedgerFactorSource)):
-			// TODO: Handle problem
-			return .none
+			return .send(.delegate(.failedToSaveNewLedger)) // FIXME: Handle in parent
 
 		case let .derivePublicKeys(.presented(.delegate(derivePublicKeysAction))):
-			return .send(.delegate(derivePublicKeysAction))
+			return .send(.delegate(.derivePublicKeys(derivePublicKeysAction))) // FIXME: Handle in parent
 
 		default:
+			return .none
+		}
+	}
+
+	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
+		switch internalAction {
+		case let .savedNewLedger(ledger):
+			state.showDerivePublicKeys(using: ledger)
 			return .none
 		}
 	}
@@ -388,6 +412,7 @@ public struct NameLedgerAndDerivePublicKeys: Sendable, FeatureReducer {
 		.run { send in
 			try await factorSourcesClient.saveFactorSource(ledger.embed())
 			loggerGlobal.notice("Saved Ledger factor source! ✅ ")
+			await send(.delegate(.savedNewLedger(ledger))) // FIXME: Handle in parent
 			await send(.internal(.savedNewLedger(ledger)))
 		} catch: { error, _ in
 			loggerGlobal.error("Failed to save Factor Source, error: \(error)")
@@ -396,7 +421,20 @@ public struct NameLedgerAndDerivePublicKeys: Sendable, FeatureReducer {
 	}
 }
 
-// MARK: NameLedgerAndDerivePublicKeys.View
+extension DerivePublicKeys.State {
+	public init(ledger: LedgerHardwareWalletFactorSource, olympiaAccounts: Set<OlympiaAccountToMigrate>, networkID: NetworkID) {
+		self.init(
+			derivationPathOption: .knownPaths(
+				.init(uncheckedUniqueElements: olympiaAccounts.map { $0.path.wrapAsDerivationPath() }),
+				networkID: networkID
+			),
+			factorSourceOption: .specific(ledger.embed()),
+			purpose: .importLegacyAccounts
+		)
+	}
+}
+
+// MARK: - NameLedgerAndDerivePublicKeys.View
 extension NameLedgerAndDerivePublicKeys {
 	@MainActor
 	public struct View: SwiftUI.View {
@@ -408,6 +446,10 @@ extension NameLedgerAndDerivePublicKeys {
 
 		public var body: some SwiftUI.View {
 			EmptyView()
+				.navigationDestination(
+					store: store.scope(state: \.$derivePublicKeys, action: { .child(.derivePublicKeys($0)) }),
+					destination: { DerivePublicKeys.View(store: $0) }
+				)
 		}
 	}
 }
