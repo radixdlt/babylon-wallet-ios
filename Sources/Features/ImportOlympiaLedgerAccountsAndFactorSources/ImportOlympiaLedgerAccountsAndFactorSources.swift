@@ -54,6 +54,7 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 	}
 
 	public enum ViewAction: Sendable, Equatable {
+		case closeButtonTapped
 		case continueTapped
 	}
 
@@ -76,6 +77,9 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
+		case failedToSaveNewLedger
+		case failedToDerivePublicKey
+		case cancelled
 		case completed(IdentifiedArrayOf<Profile.Network.Account>)
 	}
 
@@ -96,6 +100,9 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
+		case .closeButtonTapped:
+			return .send(.delegate(.cancelled))
+
 		case .continueTapped:
 			return .run { send in
 				let ledgerInfo = try await ledgerHardwareWalletClient.getDeviceInfo()
@@ -115,6 +122,8 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
 		case let .useNewLedger(deviceInfo):
+			print("• ..useNewLedger")
+
 			state.destinations = .nameLedgerAndDerivePublicKeys(.init(
 				networkID: state.networkID,
 				olympiaAccounts: state.olympiaAccounts.unvalidated,
@@ -132,6 +141,7 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 			return .none
 
 		case let .validatedAccounts(validatedAccounts, ledgerID):
+			print("• .validatedAccounts")
 			for validatedAccount in validatedAccounts {
 				state.olympiaAccounts.unvalidated.remove(validatedAccount)
 				state.olympiaAccounts.validated.append(contentsOf: validatedAccounts)
@@ -142,6 +152,8 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 			)
 
 		case let .migratedOlympiaHardwareAccounts(migratedAccounts):
+			print("• .migratedOlympiaHardwareAccounts")
+
 			loggerGlobal.notice("Adding migrated accounts...")
 			state.migratedAccounts.append(contentsOf: migratedAccounts)
 
@@ -161,22 +173,23 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 		case let .destinations(.presented(.nameLedgerAndDerivePublicKeys(.delegate(delegateAction)))):
 			switch delegateAction {
 			case .failedToSaveNewLedger:
-//				errorQueue.schedule(."Failed to add ledger" as! Error) // FIXME: Strings
+				print("• .failedToSaveNewLedger")
 				state.destinations = nil
-				return .none
-			////				return .send(.delegate(.failedToAddLedger))
-			///
+				return .send(.delegate(.failedToSaveNewLedger))
+
 			case let .savedNewLedger(ledger):
+				print("• .savedNewLedger : \(ledger.hint.name)")
 				state.knownLedgers.append(ledger)
-				print("••• ADDED A LEDGER TO THE LIST: \(ledger.hint.name)")
 				return .none
 
 			case .derivePublicKeys(.failedToDerivePublicKey):
-				loggerGlobal.error("ImportOlympiaAccountsAndFactorSource - child derivePublicKeys failed to derive public key")
+				print("• .failedToDerivePublicKey")
 				state.destinations = nil
-				return .none
+				return .send(.delegate(.failedToDerivePublicKey))
 
 			case let .derivePublicKeys(.derivedPublicKeys(publicKeys, factorSourceID, _)):
+				print("• .derivePublicKeys")
+
 				state.destinations = nil
 				guard let ledgerID = factorSourceID.extract(FactorSourceID.FromHash.self) else {
 					loggerGlobal.error("Failed to find ledger with factor sourceID in local state: \(factorSourceID)")
@@ -189,6 +202,8 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 					olympiaAccountsToValidate: state.olympiaAccounts.unvalidated
 				)
 			}
+
+		case .destinations(.dismiss):
 
 		default:
 			return .none
@@ -394,7 +409,7 @@ public struct NameLedgerAndDerivePublicKeys: Sendable, FeatureReducer {
 		.run { send in
 			try await factorSourcesClient.saveFactorSource(ledger.embed())
 			loggerGlobal.notice("Saved Ledger factor source! ✅ ")
-			await send(.delegate(.savedNewLedger(ledger))) // FIXME: Handle in parent
+			await send(.delegate(.savedNewLedger(ledger)))
 			await send(.internal(.savedNewLedger(ledger)))
 		} catch: { error, _ in
 			loggerGlobal.error("Failed to save Factor Source, error: \(error)")
@@ -429,6 +444,8 @@ extension NameLedgerAndDerivePublicKeys {
 		public var body: some SwiftUI.View {
 			IfLetStore(store.scope(state: \.nameLedger, action: { .child(.nameLedger($0)) })) {
 				NameLedgerFactorSource.View(store: $0)
+			} else: {
+				Rectangle().fill(.clear)
 			}
 			.navigationDestination(
 				store: store.scope(state: \.$derivePublicKeys, action: { .child(.derivePublicKeys($0)) }),
