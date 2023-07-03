@@ -182,8 +182,8 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 		case let .importMnemonic(.delegate(.notSavedInProfile(mnemonicWithPassphrase))):
 			return importedMnemonic(in: &state, mnemonicWithPassphrase: mnemonicWithPassphrase)
 
-		case let .importOlympiaLedgerAccountsAndFactorSources(.delegate(.completed(ledgersWithAccounts, unvalidatedAccounts))):
-			return importedOlympiaLedgerAccountsAndFactorSources(in: &state, ledgersWithAccounts: ledgersWithAccounts, unvalidated: unvalidatedAccounts)
+		case let .importOlympiaLedgerAccountsAndFactorSources(.delegate(.completed(ledgersWithAccounts))):
+			return importedOlympiaLedgerAccountsAndFactorSources(in: &state, ledgersWithAccounts: ledgersWithAccounts)
 
 		case let .completion(.delegate(.finishedMigration(gotoAccountList: gotoAccountList))):
 			return .send(.delegate(.finishedMigration(gotoAccountList: gotoAccountList)))
@@ -456,8 +456,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 			state.path.append(
 				.completion(.init(
 					previouslyMigrated: progress.previous.previouslyImported,
-					migrated: progress.migratedSoftwareAccounts,
-					unvalidatedOlympiaHardwareAccounts: nil
+					migrated: progress.migratedSoftwareAccounts
 				))
 			)
 		}
@@ -467,8 +466,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 
 	private func importedOlympiaLedgerAccountsAndFactorSources(
 		in state: inout State,
-		ledgersWithAccounts: OrderedSet<ImportOlympiaLedgerAccountsAndFactorSources.LedgerWithAccounts>,
-		unvalidated unvalidatedHardwareAccounts: Set<OlympiaAccountToMigrate>?
+		ledgersWithAccounts: OrderedSet<ImportOlympiaLedgerAccountsAndFactorSources.LedgerWithAccounts>
 	) -> EffectTask<Action> {
 		guard case let .migratedSoftwareAccounts(progress) = state.progress else { return progressError(state.progress) }
 
@@ -477,8 +475,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 		state.path.append(
 			.completion(.init(
 				previouslyMigrated: progress.previous.previouslyImported,
-				migrated: progress.migratedSoftwareAccounts + hardwareAccounts,
-				unvalidatedOlympiaHardwareAccounts: unvalidatedHardwareAccounts
+				migrated: progress.migratedSoftwareAccounts + hardwareAccounts
 			))
 		)
 
