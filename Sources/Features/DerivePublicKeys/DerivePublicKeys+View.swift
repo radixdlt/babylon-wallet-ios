@@ -13,7 +13,6 @@ extension DerivePublicKeys {
 		public let ledger: LedgerHardwareWalletFactorSource?
 	}
 
-	@MainActor
 	public struct View: SwiftUI.View {
 		private let store: StoreOf<DerivePublicKeys>
 
@@ -47,6 +46,9 @@ extension DerivePublicKeys {
 				}
 				.padding(.horizontal, .medium1)
 				.onFirstTask { @MainActor in
+					/// For more information about that `sleep` please  check [this discussion in Slack](https://rdxworks.slack.com/archives/C03QFAWBRNX/p1687967412207119?thread_ts=1687964494.772899&cid=C03QFAWBRNX)
+					try? await Task.sleep(for: .seconds(0.7))
+
 					await viewStore.send(.onFirstTask).finish()
 				}
 			}

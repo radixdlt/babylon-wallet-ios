@@ -64,6 +64,11 @@ public struct AnswerSecurityQuestionsCoordinator: Sendable, FeatureReducer {
 				guard case let .answerQuestion(freeformState) = self else { return nil }
 				return freeformState.answerToQuestion
 			}
+
+			public var rawAnswerToQuestion: AbstractAnswerToSecurityQuestion<NonEmptyString>? {
+				guard case let .answerQuestion(freeformState) = self else { return nil }
+				return freeformState.rawAnswerToQuestion
+			}
 		}
 
 		public enum Action: Sendable, Equatable {
@@ -111,34 +116,29 @@ public struct AnswerSecurityQuestionsCoordinator: Sendable, FeatureReducer {
 		case
 			let .root(.chooseQuestions(.delegate(.choseQuestions(chosenQuestions)))):
 			state.questions = chosenQuestions.rawValue
-			state.path.append(.answerQuestion(.init(question: chosenQuestions.first, isLast: chosenQuestions.count == 1)))
-			return .none
+			return answerNextQuestion(&state)
 
 		case
 			.root(.answerQuestion(.delegate(.answered))),
 			.path(.element(id: _, action: .answerQuestion(.delegate(.answered)))):
 
-			return continueEffect(for: &state)
+			return answerNextQuestion(&state)
 
 		default: return .none
 		}
 	}
 
-	func continueEffect(for state: inout State) -> EffectTask<Action> {
+	func answerNextQuestion(_ state: inout State) -> EffectTask<Action> {
 		let answers = ([state.root] + state.path).compactMap(\.answerToQuestion)
 		let unansweredQuestions = state.questions.filter { question in
 			!answers.contains(where: { $0.question == question })
 		}
 
 		if let nextQuestion = unansweredQuestions.first {
-			let pathState = Path.State.answerQuestion(
-				.init(
-					question: nextQuestion,
-					isLast: unansweredQuestions.count == 1
-				)
-			)
-
-			state.path.append(pathState)
+			state.path.append(.answerQuestion(.init(
+				question: nextQuestion,
+				isLast: unansweredQuestions.count == 1
+			)))
 
 			return .none
 		} else {
@@ -148,29 +148,29 @@ public struct AnswerSecurityQuestionsCoordinator: Sendable, FeatureReducer {
 				)
 			)!
 			precondition(answers.count == state.questions.count)
-			return .task { [purpose = state.purpose] in
 
-				let taskResult = await TaskResult {
+			return .task { [purpose = state.purpose] in
+				let taskResult = await TaskResult { () -> State.Purpose.AnswersResult in
 					switch purpose {
 					case let .decrypt(factorSource):
 						precondition(factorSource.sealedMnemonic.securityQuestions.elements == answers.elements.map(\.question))
 
 						let mnemonic = try factorSource.decrypt(answersToQuestions: answers)
 
-						return State.Purpose.AnswersResult.decrypted(mnemonic)
+						return .decrypted(mnemonic)
 
 					case .encrypt:
 						let mnemonic = try mnemonicClient.generate(.twentyFour, .english)
 						loggerGlobal.debug("mnemonic: \(mnemonic.phrase)")
 
-						let factorSource = try SecurityQuestionsFactorSource.from(
+						let securityQuestionsFactorSource = try SecurityQuestionsFactorSource.from(
 							mnemonic: mnemonic,
 							answersToQuestions: answers
 						)
 
-						try await factorSourcesClient.saveFactorSource(factorSource.embed())
+						try await factorSourcesClient.saveFactorSource(securityQuestionsFactorSource.embed())
 
-						return State.Purpose.AnswersResult.encrypted(factorSource)
+						return .encrypted(securityQuestionsFactorSource)
 					}
 				}
 				return .delegate(.done(taskResult))

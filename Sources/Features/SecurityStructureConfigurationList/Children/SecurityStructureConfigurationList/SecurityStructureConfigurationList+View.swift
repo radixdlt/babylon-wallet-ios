@@ -38,7 +38,7 @@ extension SecurityStructureConfigurationList {
 					await viewStore.send(.task).finish()
 				}
 				// FIXME: Strings
-				.navigationTitle("Mult-Factor Setups")
+				.navigationTitle("Multifactor Setups")
 			}
 		}
 

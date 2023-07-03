@@ -27,7 +27,7 @@ public struct CreationOfAccount: Sendable, FeatureReducer {
 			self.isCreatingLedgerAccount = isCreatingLedgerAccount
 
 			if isCreatingLedgerAccount {
-				self.step = .step0_chooseLedger(.init(allowSelection: true, context: .ledgerSelection))
+				self.step = .step0_chooseLedger(.init(context: .createHardwareAccount))
 			} else {
 				self.step = .step1_derivePublicKeys(
 					.init(
@@ -38,10 +38,6 @@ public struct CreationOfAccount: Sendable, FeatureReducer {
 				)
 			}
 		}
-	}
-
-	public enum ViewAction: Sendable, Equatable {
-		case onFirstTask
 	}
 
 	public enum InternalAction: Sendable, Equatable {

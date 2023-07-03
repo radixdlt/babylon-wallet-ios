@@ -9,8 +9,10 @@ public struct FactorSourcesClient: Sendable {
 	public var addPrivateHDFactorSource: AddPrivateHDFactorSource
 	public var checkIfHasOlympiaFactorSourceForAccounts: CheckIfHasOlympiaFactorSourceForAccounts
 	public var saveFactorSource: SaveFactorSource
+	public var updateFactorSource: UpdateFactorSource
 	public var getSigningFactors: GetSigningFactors
 	public var updateLastUsed: UpdateLastUsed
+	public var flagFactorSourceForDeletion: FlagFactorSourceForDeletion
 
 	public init(
 		getCurrentNetworkID: @escaping GetCurrentNetworkID,
@@ -19,8 +21,10 @@ public struct FactorSourcesClient: Sendable {
 		addPrivateHDFactorSource: @escaping AddPrivateHDFactorSource,
 		checkIfHasOlympiaFactorSourceForAccounts: @escaping CheckIfHasOlympiaFactorSourceForAccounts,
 		saveFactorSource: @escaping SaveFactorSource,
+		updateFactorSource: @escaping UpdateFactorSource,
 		getSigningFactors: @escaping GetSigningFactors,
-		updateLastUsed: @escaping UpdateLastUsed
+		updateLastUsed: @escaping UpdateLastUsed,
+		flagFactorSourceForDeletion: @escaping FlagFactorSourceForDeletion
 	) {
 		self.getCurrentNetworkID = getCurrentNetworkID
 		self.getFactorSources = getFactorSources
@@ -28,8 +32,10 @@ public struct FactorSourcesClient: Sendable {
 		self.addPrivateHDFactorSource = addPrivateHDFactorSource
 		self.checkIfHasOlympiaFactorSourceForAccounts = checkIfHasOlympiaFactorSourceForAccounts
 		self.saveFactorSource = saveFactorSource
+		self.updateFactorSource = updateFactorSource
 		self.getSigningFactors = getSigningFactors
 		self.updateLastUsed = updateLastUsed
+		self.flagFactorSourceForDeletion = flagFactorSourceForDeletion
 	}
 }
 
@@ -41,8 +47,10 @@ extension FactorSourcesClient {
 	public typealias AddPrivateHDFactorSource = @Sendable (AddPrivateHDFactorSourceRequest) async throws -> FactorSourceID
 	public typealias CheckIfHasOlympiaFactorSourceForAccounts = @Sendable (NonEmpty<OrderedSet<OlympiaAccountToMigrate>>) async -> FactorSourceID.FromHash?
 	public typealias SaveFactorSource = @Sendable (FactorSource) async throws -> Void
+	public typealias UpdateFactorSource = @Sendable (FactorSource) async throws -> Void
 	public typealias GetSigningFactors = @Sendable (GetSigningFactorsRequest) async throws -> SigningFactors
 	public typealias UpdateLastUsed = @Sendable (UpdateFactorSourceLastUsedRequest) async throws -> Void
+	public typealias FlagFactorSourceForDeletion = @Sendable (FactorSourceID) async throws -> Void
 }
 
 // MARK: - AddPrivateHDFactorSourceRequest
@@ -183,34 +191,38 @@ extension FactorSourcesClient {
 	public func addOffDeviceFactorSource(
 		mnemonicWithPassphrase: MnemonicWithPassphrase,
 		label: OffDeviceMnemonicFactorSource.Hint.Label
-	) async throws -> FactorSourceID {
+	) async throws -> FactorSource {
 		let factorSource = try OffDeviceMnemonicFactorSource.from(
 			mnemonicWithPassphrase: mnemonicWithPassphrase,
 			label: label
 		)
 
-		return try await addPrivateHDFactorSource(.init(
+		_ = try await addPrivateHDFactorSource(.init(
 			factorSource: factorSource.embed(),
 			mnemonicWithPasshprase: mnemonicWithPassphrase,
 			saveIntoProfile: true
 		))
+
+		return factorSource.embed()
 	}
 
 	public func addOnDeviceFactorSource(
 		onDeviceMnemonicKind: MnemonicBasedFactorSourceKind.OnDeviceMnemonicKind,
 		mnemonicWithPassphrase: MnemonicWithPassphrase
-	) async throws -> FactorSourceID {
+	) async throws -> FactorSource {
 		let isOlympiaCompatible = onDeviceMnemonicKind == .olympia
 
 		let factorSource: DeviceFactorSource = try isOlympiaCompatible
 			? .olympia(mnemonicWithPassphrase: mnemonicWithPassphrase)
 			: .babylon(mnemonicWithPassphrase: mnemonicWithPassphrase)
 
-		return try await addPrivateHDFactorSource(.init(
+		_ = try await addPrivateHDFactorSource(.init(
 			factorSource: factorSource.embed(),
 			mnemonicWithPasshprase: mnemonicWithPassphrase,
 			saveIntoProfile: isOlympiaCompatible
 		))
+
+		return factorSource.embed()
 	}
 }
 

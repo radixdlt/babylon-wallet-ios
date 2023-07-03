@@ -53,26 +53,33 @@ public struct SecurityQuestion: Sendable, Hashable, Codable, Identifiable {
 	}
 }
 
-// MARK: - AnswerToSecurityQuestion
-public struct AnswerToSecurityQuestion: Sendable, Hashable, Codable {
-	public struct Answer: Sendable, Hashable, Codable {
-		public let entropy: NonEmpty<HexCodable>
-		private init(entropy: NonEmpty<HexCodable>) {
-			self.entropy = entropy
-		}
-
-		public static func from(_ answer: NonEmptyString) -> Self {
-			.init(
-				entropy: CAP23.entropyFrom(freeformAnswer: answer)
-			)
-		}
+// MARK: - SecurityQuestionAnswerAsEntropy
+public struct SecurityQuestionAnswerAsEntropy: Sendable, Hashable, Codable {
+	public let entropy: NonEmpty<HexCodable>
+	private init(entropy: NonEmpty<HexCodable>) {
+		self.entropy = entropy
 	}
 
+	public static func from(_ answer: NonEmptyString) throws -> Self {
+		try from(CAP23.trimmedAnswer(freeformAnswer: answer))
+	}
+
+	public static func from(_ answer: CAP23.TrimmedAnswer) throws -> Self {
+		try .init(
+			entropy: CAP23.entropyFrom(freeformAnswer: answer)
+		)
+	}
+}
+
+public typealias AnswerToSecurityQuestion = AbstractAnswerToSecurityQuestion<SecurityQuestionAnswerAsEntropy>
+
+// MARK: - AbstractAnswerToSecurityQuestion
+public struct AbstractAnswerToSecurityQuestion<AbstractAnswer>: Sendable, Hashable, Codable where AbstractAnswer: Sendable & Hashable & Codable {
 	public let question: SecurityQuestion
-	public let answer: Answer
+	public let answer: AbstractAnswer
 
 	public init(
-		answer: Answer,
+		answer: AbstractAnswer,
 		to question: SecurityQuestion
 	) {
 		self.answer = answer

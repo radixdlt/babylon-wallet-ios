@@ -2,7 +2,11 @@ import FeaturePrelude
 
 extension SecurityStructureConfigurationRow.State {
 	var viewState: SecurityStructureConfigurationRow.ViewState {
-		.init(label: config.label.rawValue, createdOn: config.created)
+		.init(
+			label: configReference.metadata.label,
+			createdOn: configReference.metadata.createdOn,
+			lastUpdatedOn: configReference.metadata.lastUpdatedOn
+		)
 	}
 }
 
@@ -11,6 +15,7 @@ extension SecurityStructureConfigurationRow {
 	public struct ViewState: Equatable {
 		let label: String
 		let createdOn: Date
+		let lastUpdatedOn: Date
 	}
 
 	@MainActor
@@ -33,6 +38,9 @@ extension SecurityStructureConfigurationRow {
 
 							// FIXME: Strings
 							LabelledDate(label: "Created", date: viewStore.createdOn)
+								.padding(.bottom, .small3)
+
+							LabelledDate(label: "Updated", date: viewStore.lastUpdatedOn)
 								.padding(.bottom, .small3)
 						}
 

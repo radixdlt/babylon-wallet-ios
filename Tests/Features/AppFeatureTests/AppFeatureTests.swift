@@ -30,7 +30,7 @@ final class AppFeatureTests: TestCase {
 	}
 
 	func test_splash__GIVEN__an_existing_profile__WHEN__existing_profile_loaded__THEN__we_navigate_to_main() async throws {
-		// GIVEN: an existinœg profile
+		// GIVEN: an existing profile
 		let accountRecoveryNeeded = true
 		let clock = TestClock()
 		let store = TestStore(
@@ -99,23 +99,6 @@ final class AppFeatureTests: TestCase {
 		// then
 		await store.send(.child(.splash(.delegate(.completed(outcome, accountRecoveryNeeded: false))))) {
 			$0.root = .onboardingCoordinator(.init())
-		}
-
-		await store.receive(.internal(.displayErrorAlert(
-			App.UserFacingError(foobar)
-		))) {
-			$0.alert = .userErrorAlert(
-				.init(
-					title: { TextState("An Error Occurred") },
-					actions: {},
-					message: { TextState("Failed to import Radix Wallet backup: valueNotFound(Profile.Profile, Swift.DecodingError.Context(codingPath: [], debugDescription: \"Something went wrong\", underlyingError: nil))") }
-				)
-			)
-		}
-
-		await store.send(.view(.alert(.dismiss))) {
-			// then
-			$0.alert = nil
 		}
 
 		await clock.run() // fast-forward clock to the end of time

@@ -17,13 +17,17 @@ extension FactorSource {
 		/// is used.
 		public var lastUsedOn: Date
 
+		public var flags: OrderedSet<FactorSourceFlag>
+
 		public init(
 			cryptoParameters: FactorSource.CryptoParameters = .babylon,
+			flags: OrderedSet<FactorSourceFlag> = [],
 			addedOn: Date? = nil,
 			lastUsedOn: Date? = nil
 		) {
 			@Dependency(\.date) var date
 			self.cryptoParameters = cryptoParameters
+			self.flags = flags
 			self.addedOn = addedOn ?? date()
 			self.lastUsedOn = lastUsedOn ?? date()
 		}
@@ -33,6 +37,7 @@ extension FactorSource {
 extension FactorSource.Common {
 	public static func from(
 		cryptoParameters: FactorSource.CryptoParameters = .babylon,
+		flags: OrderedSet<FactorSourceFlag> = [],
 		addedOn: Date,
 		lastUsedOn: Date
 	) throws -> Self {
