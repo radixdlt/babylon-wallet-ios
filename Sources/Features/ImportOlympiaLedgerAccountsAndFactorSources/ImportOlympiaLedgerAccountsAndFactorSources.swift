@@ -54,7 +54,6 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 	}
 
 	public enum ViewAction: Sendable, Equatable {
-		case closeButtonTapped
 		case continueTapped
 	}
 
@@ -77,10 +76,13 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
-		case failedToSaveNewLedger
-		case failedToDerivePublicKey
-		case cancelled
+		case failed(Failure)
 		case completed(IdentifiedArrayOf<Profile.Network.Account>)
+
+		public enum Failure: Sendable, Equatable {
+			case failedToSaveNewLedger
+			case failedToDerivePublicKey
+		}
 	}
 
 	@Dependency(\.errorQueue) var errorQueue
@@ -100,9 +102,6 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
-		case .closeButtonTapped:
-			return .send(.delegate(.cancelled))
-
 		case .continueTapped:
 			return .run { send in
 				let ledgerInfo = try await ledgerHardwareWalletClient.getDeviceInfo()
@@ -175,7 +174,7 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 			case .failedToSaveNewLedger:
 				print("• .failedToSaveNewLedger")
 				state.destinations = nil
-				return .send(.delegate(.failedToSaveNewLedger))
+				return .send(.delegate(.failed(.failedToSaveNewLedger)))
 
 			case let .savedNewLedger(ledger):
 				print("• .savedNewLedger : \(ledger.hint.name)")
@@ -183,13 +182,10 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 				return .none
 
 			case .derivePublicKeys(.failedToDerivePublicKey):
-				print("• .failedToDerivePublicKey")
 				state.destinations = nil
-				return .send(.delegate(.failedToDerivePublicKey))
+				return .send(.delegate(.failed(.failedToDerivePublicKey)))
 
 			case let .derivePublicKeys(.derivedPublicKeys(publicKeys, factorSourceID, _)):
-				print("• .derivePublicKeys")
-
 				state.destinations = nil
 				guard let ledgerID = factorSourceID.extract(FactorSourceID.FromHash.self) else {
 					loggerGlobal.error("Failed to find ledger with factor sourceID in local state: \(factorSourceID)")
@@ -202,8 +198,6 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 					olympiaAccountsToValidate: state.olympiaAccounts.unvalidated
 				)
 			}
-
-		case .destinations(.dismiss):
 
 		default:
 			return .none
@@ -347,6 +341,10 @@ public struct NameLedgerAndDerivePublicKeys: Sendable, FeatureReducer {
 		}
 	}
 
+	public enum ViewAction: Sendable, Equatable {
+		case closeButtonTapped
+	}
+
 	public enum ChildAction: Sendable, Equatable {
 		case nameLedger(NameLedgerFactorSource.Action)
 		case derivePublicKeys(PresentationAction<DerivePublicKeys.Action>)
@@ -358,7 +356,6 @@ public struct NameLedgerAndDerivePublicKeys: Sendable, FeatureReducer {
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
-		/// Saved the newly added Ledger device
 		case savedNewLedger(LedgerHardwareWalletFactorSource)
 
 		case failedToSaveNewLedger
@@ -366,6 +363,7 @@ public struct NameLedgerAndDerivePublicKeys: Sendable, FeatureReducer {
 		case derivePublicKeys(DerivePublicKeys.DelegateAction)
 	}
 
+	@Dependency(\.dismiss) var dismiss
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.factorSourcesClient) var factorSourcesClient
 
@@ -379,6 +377,15 @@ public struct NameLedgerAndDerivePublicKeys: Sendable, FeatureReducer {
 			.ifLet(\.$derivePublicKeys, action: /Action.child .. ChildAction.derivePublicKeys) {
 				DerivePublicKeys()
 			}
+	}
+
+	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+		switch viewAction {
+		case .closeButtonTapped:
+			return .run { _ in
+				await dismiss()
+			}
+		}
 	}
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
@@ -428,29 +435,5 @@ extension DerivePublicKeys.State {
 			factorSourceOption: .specific(ledger.embed()),
 			purpose: .importLegacyAccounts
 		)
-	}
-}
-
-// MARK: - NameLedgerAndDerivePublicKeys.View
-extension NameLedgerAndDerivePublicKeys {
-	@MainActor
-	public struct View: SwiftUI.View {
-		private let store: StoreOf<NameLedgerAndDerivePublicKeys>
-
-		public init(store: StoreOf<NameLedgerAndDerivePublicKeys>) {
-			self.store = store
-		}
-
-		public var body: some SwiftUI.View {
-			IfLetStore(store.scope(state: \.nameLedger, action: { .child(.nameLedger($0)) })) {
-				NameLedgerFactorSource.View(store: $0)
-			} else: {
-				Rectangle().fill(.clear)
-			}
-			.navigationDestination(
-				store: store.scope(state: \.$derivePublicKeys, action: { .child(.derivePublicKeys($0)) }),
-				destination: { DerivePublicKeys.View(store: $0) }
-			)
-		}
 	}
 }
