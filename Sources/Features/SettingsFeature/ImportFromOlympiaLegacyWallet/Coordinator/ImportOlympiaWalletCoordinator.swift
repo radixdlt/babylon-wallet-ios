@@ -182,8 +182,8 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 		case let .importMnemonic(.delegate(.notSavedInProfile(mnemonicWithPassphrase))):
 			return importedMnemonic(in: &state, mnemonicWithPassphrase: mnemonicWithPassphrase)
 
-		case let .importOlympiaLedgerAccountsAndFactorSources(.delegate(.completed(ledgersWithAccounts))):
-			return importedOlympiaLedgerAccountsAndFactorSources(in: &state, ledgersWithAccounts: ledgersWithAccounts)
+		case let .importOlympiaLedgerAccountsAndFactorSources(.delegate(.completed(migratedAccounts))):
+			return importedOlympiaLedgerAccountsAndFactorSources(in: &state, migratedAccounts: migratedAccounts)
 
 		case let .completion(.delegate(.finishedMigration(gotoAccountList: gotoAccountList))):
 			return .send(.delegate(.finishedMigration(gotoAccountList: gotoAccountList)))
@@ -466,16 +466,14 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 
 	private func importedOlympiaLedgerAccountsAndFactorSources(
 		in state: inout State,
-		ledgersWithAccounts: OrderedSet<ImportOlympiaLedgerAccountsAndFactorSources.LedgerWithAccounts>
+		migratedAccounts: MigratedAccounts
 	) -> EffectTask<Action> {
 		guard case let .migratedSoftwareAccounts(progress) = state.progress else { return progressError(state.progress) }
-
-		let hardwareAccounts = IdentifiedArray(uniqueElements: ledgersWithAccounts.flatMap { $0.migratedAccounts.map(\.babylon) })
 
 		state.path.append(
 			.completion(.init(
 				previouslyMigrated: progress.previous.previouslyImported,
-				migrated: progress.migratedSoftwareAccounts + hardwareAccounts
+				migrated: progress.migratedSoftwareAccounts + migratedAccounts
 			))
 		)
 

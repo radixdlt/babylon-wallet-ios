@@ -6,8 +6,9 @@ import LedgerHardwareDevicesFeature
 extension ImportOlympiaLedgerAccountsAndFactorSources.State {
 	var viewState: ImportOlympiaLedgerAccountsAndFactorSources.ViewState {
 		.init(
-			numberOfUnverifiedAccounts: unmigrated.unvalidated.count,
-			ledgersWithAccounts: ledgersWithAccounts
+			ledgerControlledAccounts: olympiaACcounts.unvalidated.count + olympiaACcounts.validated.count,
+			knownLedgers: knownLedgers,
+			moreAccounts: olympiaACcounts.unvalidated.count
 		)
 	}
 }
@@ -15,8 +16,9 @@ extension ImportOlympiaLedgerAccountsAndFactorSources.State {
 // MARK: - ImportOlympiaLedgerAccountsAndFactorSources.View
 extension ImportOlympiaLedgerAccountsAndFactorSources {
 	public struct ViewState: Equatable {
-		public let numberOfUnverifiedAccounts: Int
-		public let ledgersWithAccounts: OrderedSet<LedgerWithAccounts>
+		public let ledgerControlledAccounts: Int
+		public let knownLedgers: IdentifiedArrayOf<LedgerHardwareWalletFactorSource>
+		public let moreAccounts: Int
 	}
 
 	@MainActor
@@ -29,32 +31,75 @@ extension ImportOlympiaLedgerAccountsAndFactorSources {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-				VStack {
-					Text(L10n.ImportOlympiaLedgerAccounts.unverifiedAccountsLeft(viewStore.numberOfUnverifiedAccounts))
-						.textStyle(.body1Header)
+				VStack(alignment: .center) {
+					Text("Confirm Ledgers") // FIXME: Strings
+						.textStyle(.sheetTitle)
+						.foregroundColor(.app.gray1)
+						.multilineTextAlignment(.center)
+						.padding(.top, .small1)
+						.padding(.bottom, .medium2)
 
-					Spacer()
+					Text("\(viewStore.ledgerControlledAccounts) of your accounts are controlled by Ledger Hardware Wallets") // FIXME: Strings
+						.textStyle(.body1Regular)
+						.foregroundColor(.app.gray1)
+						.multilineTextAlignment(.center)
+						.padding(.horizontal, .large3)
+						.padding(.bottom, .medium3)
 
-					if !viewStore.ledgersWithAccounts.isEmpty {
-						Text(L10n.ImportOlympiaLedgerAccounts.importLedgersAndAccounts)
+					Text("Currently Known Ledgers") // FIXME: Strings
+						.textStyle(.body1Regular)
+						.foregroundColor(.app.gray1)
+						.padding(.bottom, .medium3)
 
-						ScrollView {
-							ForEach(viewStore.ledgersWithAccounts, id: \.self) { ledgerWithAccounts in
-								LazyVStack {
-									Text(L10n.ImportOlympiaLedgerAccounts.accountCount(ledgerWithAccounts.displayName, ledgerWithAccounts.migratedAccounts.count))
-								}
+					if viewStore.knownLedgers.isEmpty {
+						Card(.app.gray5) {
+							Text("None") // FIXME: Strings
+						}
+						.padding(.horizontal, .medium1)
+
+					} else {
+						ForEach(viewStore.knownLedgers) { ledger in
+							VStack(spacing: .small1) {
+								LedgerRowView(viewState: .init(factorSource: ledger))
+									.padding(.horizontal, .medium1)
 							}
 						}
+						.padding(.bottom, .medium3)
 					}
 
-					Spacer()
+					Text("\(viewStore.moreAccounts) more accounts are controlled by other devices. Connect a Ledger hardware wallet device and tap Continue.") // FIXME: Strings
+						.padding(.horizontal, .large3)
 
-					LedgerHardwareDevices.View(
-						store: store.scope(
-							state: \.chooseLedger,
-							action: { .child(.chooseLedger($0)) }
-						)
-					)
+					Button("Continue") { // FIXME: Strings
+						viewStore.send(.continueTapped)
+					}
+					.buttonStyle(.primaryRectangular)
+
+//					Text(L10n.ImportOlympiaLedgerAccounts.unverifiedAccountsLeft(viewStore.numberOfUnverifiedAccounts))
+//						.textStyle(.body1Header)
+//
+//					Spacer()
+//
+//					if !viewStore.ledgersWithAccounts.isEmpty {
+//						Text(L10n.ImportOlympiaLedgerAccounts.importLedgersAndAccounts)
+//
+//						ScrollView {
+//							ForEach(viewStore.ledgersWithAccounts, id: \.self) { ledgerWithAccounts in
+//								LazyVStack {
+//									Text(L10n.ImportOlympiaLedgerAccounts.accountCount(ledgerWithAccounts.displayName, ledgerWithAccounts.migratedAccounts.count))
+//								}
+//							}
+//						}
+//					}
+//
+//					Spacer()
+//
+//					LedgerHardwareDevices.View(
+//						store: store.scope(
+//							state: \.chooseLedger,
+//							action: { .child(.chooseLedger($0)) }
+//						)
+//					)
 				}
 				.sheet(
 					store: store.destination,
