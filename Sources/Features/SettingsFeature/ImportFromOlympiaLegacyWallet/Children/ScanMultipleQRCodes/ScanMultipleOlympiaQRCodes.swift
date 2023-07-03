@@ -18,12 +18,15 @@ public struct ScanMultipleOlympiaQRCodes: Sendable, FeatureReducer {
 		public var scannedPayloads: IdentifiedArrayOf<ScannedPayload>
 
 		public init(
-			numberOfPayloadsToScan: Int? = nil,
 			scannedPayloads: IdentifiedArrayOf<ScannedPayload> = []
 		) {
 			self.scanQR = .init(scanInstructions: L10n.ImportOlympiaAccounts.ScanQR.instructions)
-			self.numberOfPayloadsToScan = numberOfPayloadsToScan
 			self.scannedPayloads = scannedPayloads
+		}
+
+		public mutating func reset() {
+			numberOfPayloadsToScan = nil
+			scannedPayloads = []
 		}
 	}
 
