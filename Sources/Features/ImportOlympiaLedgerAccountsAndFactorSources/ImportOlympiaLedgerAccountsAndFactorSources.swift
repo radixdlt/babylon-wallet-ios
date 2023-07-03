@@ -13,8 +13,6 @@ import SharedModels
 
 // MARK: - ImportOlympiaLedgerAccountsAndFactorSources
 public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureReducer {
-	public typealias NewLedgerInfo = P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.GetDeviceInfo
-
 	public struct State: Sendable, Hashable {
 		public let networkID: NetworkID
 
@@ -61,7 +59,7 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 
 	public enum InternalAction: Sendable, Equatable {
 		/// Adds a new device to the list and continues
-		case addNewLedger(NewLedgerInfo)
+		case addNewLedger(DeviceInfo)
 
 		/// Adds a previously saved device to the list and continues
 		case addExistingLedger(LedgerHardwareWalletFactorSource)
