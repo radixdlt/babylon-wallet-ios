@@ -28,8 +28,8 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 		public var destinations: Destinations.State?
 
 		public init(
-			hardwareAccounts: NonEmpty<OrderedSet<OlympiaAccountToMigrate>>,
-			networkID: NetworkID
+			networkID: NetworkID,
+			hardwareAccounts: NonEmpty<OrderedSet<OlympiaAccountToMigrate>>
 		) {
 			precondition(hardwareAccounts.allSatisfy { $0.accountType == .hardware })
 			self.networkID = networkID
@@ -40,20 +40,15 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 	public struct Destinations: ReducerProtocol {
 		public enum State: Sendable, Hashable {
 			case nameLedgerAndDerivePublicKeys(NameLedgerAndDerivePublicKeys.State)
-			case derivePublicKeys(DerivePublicKeys.State)
 		}
 
 		public enum Action: Sendable, Equatable {
 			case nameLedgerAndDerivePublicKeys(NameLedgerAndDerivePublicKeys.Action)
-			case derivePublicKeys(DerivePublicKeys.Action)
 		}
 
 		public var body: some ReducerProtocolOf<Self> {
 			Scope(state: /State.nameLedgerAndDerivePublicKeys, action: /Action.nameLedgerAndDerivePublicKeys) {
 				NameLedgerAndDerivePublicKeys()
-			}
-			Scope(state: /State.derivePublicKeys, action: /Action.derivePublicKeys) {
-				DerivePublicKeys()
 			}
 		}
 	}
@@ -64,10 +59,10 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 
 	public enum InternalAction: Sendable, Equatable {
 		/// Starts the process of adding a new Ledger device
-		case addNewLedger(DeviceInfo)
+		case useNewLedger(DeviceInfo)
 
 		/// Adds a previously saved device to the list and continues
-		case addExistingLedger(LedgerHardwareWalletFactorSource)
+		case useExistingLedger(LedgerHardwareWalletFactorSource)
 
 		/// Validated public keys against expected, then migrate...
 		case validatedAccounts(NonEmpty<Set<OlympiaAccountToMigrate>>, LedgerHardwareWalletFactorSource.ID)
@@ -102,26 +97,39 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .continueTapped:
-			return addLedger()
+			return .run { send in
+				let ledgerInfo = try await ledgerHardwareWalletClient.getDeviceInfo()
+
+				if let ledger = try await factorSourcesClient.getFactorSource(
+					id: .init(kind: .ledgerHQHardwareWallet, hash: ledgerInfo.id.data.data),
+					as: LedgerHardwareWalletFactorSource.self
+				) {
+					await send(.internal(.useExistingLedger(ledger)))
+				} else {
+					await send(.internal(.useNewLedger(ledgerInfo)))
+				}
+			}
 		}
 	}
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
-		case let .addNewLedger(deviceInfo):
-			state.destinations = .nameLedgerAndDerivePublicKeys(.init(deviceInfo: deviceInfo))
+		case let .useNewLedger(deviceInfo):
+			state.destinations = .nameLedgerAndDerivePublicKeys(.init(
+				networkID: state.networkID,
+				olympiaAccounts: state.olympiaAccounts.unvalidated,
+				deviceInfo: deviceInfo
+			))
 			return .none
 
-//		case let .savedNewLedger(ledger):
-//			state.destinations = nil
-//			return .run { send in
-//				// FIXME: Hack to avoid a crash when we show the DerivePublicKeys view too quickly
-//				try? await Task.sleep(for: .milliseconds(700))
-//				await send(.internal(.addExistingLedger(ledger)))
-//			}
+		case let .useExistingLedger(ledger):
+			state.destinations = .nameLedgerAndDerivePublicKeys(.init(
+				networkID: state.networkID,
+				olympiaAccounts: state.olympiaAccounts.unvalidated,
+				ledger: ledger
+			))
 
-		case let .addExistingLedger(ledger):
-			return addAccountUsingLedger(in: &state, ledger: ledger)
+			return .none
 
 		case let .validatedAccounts(validatedAccounts, ledgerID):
 			for validatedAccount in validatedAccounts {
@@ -150,14 +158,25 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
-		case let .destinations(.presented(presentedAction)):
-			switch presentedAction {
-			case .derivePublicKeys(.delegate(.failedToDerivePublicKey)):
+		case let .destinations(.presented(.nameLedgerAndDerivePublicKeys(.delegate(delegateAction)))):
+			switch delegateAction {
+			case .failedToSaveNewLedger:
+//				errorQueue.schedule(."Failed to add ledger" as! Error) // FIXME: Strings
+				state.destinations = nil
+				return .none
+			////				return .send(.delegate(.failedToAddLedger))
+			///
+			case let .savedNewLedger(ledger):
+				state.knownLedgers.append(ledger)
+				print("••• ADDED A LEDGER TO THE LIST: \(ledger.hint.name)")
+				return .none
+
+			case .derivePublicKeys(.failedToDerivePublicKey):
 				loggerGlobal.error("ImportOlympiaAccountsAndFactorSource - child derivePublicKeys failed to derive public key")
 				state.destinations = nil
 				return .none
 
-			case let .derivePublicKeys(.delegate(.derivedPublicKeys(publicKeys, factorSourceID, _))):
+			case let .derivePublicKeys(.derivedPublicKeys(publicKeys, factorSourceID, _)):
 				state.destinations = nil
 				guard let ledgerID = factorSourceID.extract(FactorSourceID.FromHash.self) else {
 					loggerGlobal.error("Failed to find ledger with factor sourceID in local state: \(factorSourceID)")
@@ -169,16 +188,6 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 					ledgerID: ledgerID,
 					olympiaAccountsToValidate: state.olympiaAccounts.unvalidated
 				)
-
-//			case let .nameLedger(.delegate(.complete(ledger))):
-//				return saveNewLedger(ledger)
-//
-//			case .nameLedger(.delegate(.failedToCreateLedgerFactorSource)):
-//				return .none
-////				return .send(.delegate(.failedToAddLedger))
-
-			default:
-				return .none
 			}
 
 		default:
@@ -190,33 +199,6 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 // MARK: Helper methods
 
 extension ImportOlympiaLedgerAccountsAndFactorSources {
-	private func addLedger() -> EffectTask<Action> {
-		.run { send in
-			let ledgerInfo = try await ledgerHardwareWalletClient.getDeviceInfo()
-
-			if let ledger = try await factorSourcesClient.getFactorSource(
-				id: .init(kind: .ledgerHQHardwareWallet, hash: ledgerInfo.id.data.data),
-				as: LedgerHardwareWalletFactorSource.self
-			) {
-				await send(.internal(.addExistingLedger(ledger)))
-			} else {
-				await send(.internal(.addNewLedger(ledgerInfo)))
-			}
-		}
-	}
-
-	private func addAccountUsingLedger(in state: inout State, ledger: LedgerHardwareWalletFactorSource) -> EffectTask<Action> {
-		state.knownLedgers.append(ledger)
-
-		state.destinations = .derivePublicKeys(.init(
-			ledger: ledger,
-			olympiaAccounts: state.olympiaAccounts.unvalidated,
-			networkID: state.networkID
-		))
-
-		return .none
-	}
-
 	private func validate(
 		derivedPublicKeys: OrderedSet<HierarchicalDeterministicPublicKey>,
 		ledgerID: LedgerHardwareWalletFactorSource.ID,
@@ -390,10 +372,10 @@ public struct NameLedgerAndDerivePublicKeys: Sendable, FeatureReducer {
 			return saveNewLedger(ledger)
 
 		case .nameLedger(.delegate(.failedToCreateLedgerFactorSource)):
-			return .send(.delegate(.failedToSaveNewLedger)) // FIXME: Handle in parent
+			return .send(.delegate(.failedToSaveNewLedger))
 
 		case let .derivePublicKeys(.presented(.delegate(derivePublicKeysAction))):
-			return .send(.delegate(.derivePublicKeys(derivePublicKeysAction))) // FIXME: Handle in parent
+			return .send(.delegate(.derivePublicKeys(derivePublicKeysAction)))
 
 		default:
 			return .none
@@ -445,11 +427,13 @@ extension NameLedgerAndDerivePublicKeys {
 		}
 
 		public var body: some SwiftUI.View {
-			EmptyView()
-				.navigationDestination(
-					store: store.scope(state: \.$derivePublicKeys, action: { .child(.derivePublicKeys($0)) }),
-					destination: { DerivePublicKeys.View(store: $0) }
-				)
+			IfLetStore(store.scope(state: \.nameLedger, action: { .child(.nameLedger($0)) })) {
+				NameLedgerFactorSource.View(store: $0)
+			}
+			.navigationDestination(
+				store: store.scope(state: \.$derivePublicKeys, action: { .child(.derivePublicKeys($0)) }),
+				destination: { DerivePublicKeys.View(store: $0) }
+			)
 		}
 	}
 }

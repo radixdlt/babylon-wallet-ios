@@ -449,8 +449,8 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 		if let hardwareAccounts = progress.previous.accountsToMigrate?.hardware {
 			state.path.append(
 				.importOlympiaLedgerAccountsAndFactorSources(.init(
-					hardwareAccounts: hardwareAccounts,
-					networkID: progress.previous.networkID
+					networkID: progress.previous.networkID,
+					hardwareAccounts: hardwareAccounts
 				))
 			)
 		} else {
