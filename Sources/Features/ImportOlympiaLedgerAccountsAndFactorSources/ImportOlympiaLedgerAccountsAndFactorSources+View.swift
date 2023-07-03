@@ -82,14 +82,7 @@ extension ImportOlympiaLedgerAccountsAndFactorSources {
 					store: store.destination,
 					state: /ImportOlympiaLedgerAccountsAndFactorSources.Destinations.State.nameLedgerAndDerivePublicKeys,
 					action: ImportOlympiaLedgerAccountsAndFactorSources.Destinations.Action.nameLedgerAndDerivePublicKeys,
-					content: { childStore in
-						WithNavigationBar {
-							store.send(.view(.closeButtonTapped))
-						} content: {
-							NameLedgerAndDerivePublicKeys.View(store: childStore)
-								.navigationBarBackButtonHidden()
-						}
-					}
+					content: { NameLedgerAndDerivePublicKeys.View(store: $0) }
 				)
 			}
 		}
@@ -102,22 +95,31 @@ private extension StoreOf<ImportOlympiaLedgerAccountsAndFactorSources> {
 	}
 }
 
-// #if DEBUG
-// import SwiftUI // NB: necessary for previews to appear
-//
-//// MARK: - ImportOlympiaLedgerAccountsAndFactorSource_Preview
-// struct ImportOlympiaLedgerAccountsAndFactorSource_Preview: PreviewProvider {
-//	static var previews: some View {
-//		ImportOlympiaLedgerAccountsAndFactorSources.View(
-//			store: .init(
-//				initialState: .previewValue,
-//				reducer: ImportOlympiaLedgerAccountsAndFactorSources()
-//			)
-//		)
-//	}
-// }
-//
-// extension ImportOlympiaLedgerAccountsAndFactorSources.State {
-//    public static let previewValue = Self(hardwareAccounts: <#NonEmpty<OrderedSet<OlympiaAccountToMigrate>>#>)
-// }
-// #endif
+// MARK: - NameLedgerAndDerivePublicKeys.View
+extension NameLedgerAndDerivePublicKeys {
+	@MainActor
+	public struct View: SwiftUI.View {
+		private let store: StoreOf<NameLedgerAndDerivePublicKeys>
+
+		public init(store: StoreOf<NameLedgerAndDerivePublicKeys>) {
+			self.store = store
+		}
+
+		public var body: some SwiftUI.View {
+			IfLetStore(store.scope(state: \.nameLedger, action: { .child(.nameLedger($0)) })) { childStore in
+				VStack(spacing: 0) {
+					CloseButtonBar {
+						store.send(.view(.closeButtonTapped))
+					}
+					NameLedgerFactorSource.View(store: childStore)
+				}
+			} else: {
+				Rectangle().fill(.clear)
+			}
+			.navigationDestination(
+				store: store.scope(state: \.$derivePublicKeys, action: { .child(.derivePublicKeys($0)) }),
+				destination: { DerivePublicKeys.View(store: $0) }
+			)
+		}
+	}
+}

@@ -185,6 +185,9 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 		case let .importOlympiaLedgerAccountsAndFactorSources(.delegate(.completed(migratedAccounts))):
 			return importedOlympiaLedgerAccountsAndFactorSources(in: &state, migratedAccounts: migratedAccounts)
 
+		case let .importOlympiaLedgerAccountsAndFactorSources(.delegate(.failed(failure))):
+			return cancelOlympiaLedgerAccountsAndFactorSources(in: &state, failure: failure)
+
 		case let .completion(.delegate(.finishedMigration(gotoAccountList: gotoAccountList))):
 			return .send(.delegate(.finishedMigration(gotoAccountList: gotoAccountList)))
 
@@ -479,6 +482,17 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 		)
 
 		return .none
+	}
+
+	private func cancelOlympiaLedgerAccountsAndFactorSources(
+		in state: inout State,
+		failure: ImportOlympiaLedgerAccountsAndFactorSources.DelegateAction.Failure
+	) -> EffectTask<Action> {
+		guard case .migratedSoftwareAccounts = state.progress else { return progressError(state.progress) }
+
+		return .run { _ in
+			await dismiss()
+		}
 	}
 }
 
