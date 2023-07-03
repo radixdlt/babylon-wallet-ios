@@ -1,7 +1,6 @@
 import AsyncExtensions
 import ComposableArchitecture
 import Dependencies
-import DesignSystem
 import OverlayWindowClient
 import Prelude
 import Resources

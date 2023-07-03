@@ -669,9 +669,7 @@ package.addModules([
 	),
 	.client(
 		name: "OverlayWindowClient",
-		dependencies: [
-			"DesignSystem",
-		],
+		dependencies: [],
 		tests: .no
 	),
 	.client(
