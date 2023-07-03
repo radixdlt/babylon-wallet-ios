@@ -36,7 +36,7 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 		public var chooseLedger: LedgerHardwareDevices.State
 
 		@PresentationState
-		public var derivePublicKeys: DerivePublicKeys.State?
+		public var destinations: Destinations.State?
 
 		public init(
 			hardwareAccounts: NonEmpty<OrderedSet<OlympiaAccountToMigrate>>,
@@ -50,9 +50,23 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 		}
 	}
 
+	public struct Destinations: ReducerProtocol {
+		public enum State: Sendable, Hashable {
+			case derivePublicKeys(DerivePublicKeys.State)
+		}
+
+		public enum Action: Sendable, Equatable {
+			case derivePublicKeys(DerivePublicKeys.Action)
+		}
+
+		public var body: some ReducerProtocolOf<Self> {
+			Scope(state: /State.derivePublicKeys, action: /Action.derivePublicKeys) {
+				DerivePublicKeys()
+			}
+		}
 	}
 
-	public enum ViewAction: Sendable, Equatable { }
+	public enum ViewAction: Sendable, Equatable {}
 
 	public enum InternalAction: Sendable, Equatable {
 		/// Validated public keys against expected, then migrate...
@@ -64,7 +78,7 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 
 	public enum ChildAction: Sendable, Equatable {
 		case chooseLedger(LedgerHardwareDevices.Action)
-		case derivePublicKeys(PresentationAction<DerivePublicKeys.Action>)
+		case destinations(PresentationAction<Destinations.Action>)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -84,13 +98,13 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 			LedgerHardwareDevices()
 		}
 		Reduce(core)
-			.ifLet(\.$derivePublicKeys, action: /Action.child .. ChildAction.derivePublicKeys) {
-				DerivePublicKeys()
+			.ifLet(\.$destinations, action: /Action.child .. ChildAction.destinations) {
+				Destinations()
 			}
 	}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
-		switch viewAction { }
+		switch viewAction {}
 	}
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
@@ -122,30 +136,37 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 				return .send(.delegate(.completed(ledgersWithAccounts: state.ledgersWithAccounts)))
 			}
 
-			state.derivePublicKeys = .init(
+			state.destinations = .derivePublicKeys(.init(
 				derivationPathOption: .knownPaths(
 					.init(uncheckedUniqueElements: state.unmigrated.unvalidated.map { $0.path.wrapAsDerivationPath() }),
 					networkID: state.networkID
 				),
 				factorSourceOption: .specific(ledger.embed()),
 				purpose: .importLegacyAccounts
-			)
+			))
 			return .none
 
-		case .derivePublicKeys(.presented(.delegate(.failedToDerivePublicKey))):
-			loggerGlobal.error("ImportOlympiaAccountsAndFactorSource - child derivePublicKeys failed to derive public key")
-			state.derivePublicKeys = nil
-			return .none
+		case let .destinations(.presented(presentedAction)):
+			switch presentedAction {
+			case .derivePublicKeys(.delegate(.failedToDerivePublicKey)):
+				loggerGlobal.error("ImportOlympiaAccountsAndFactorSource - child derivePublicKeys failed to derive public key")
+				state.destinations = nil
+				return .none
 
-		case let .derivePublicKeys(.presented(.delegate(.derivedPublicKeys(publicKeys, factorSourceID, _)))):
-			state.derivePublicKeys = nil
-			guard let id = factorSourceID.extract(FactorSourceID.FromHash.self), let ledger = state.chooseLedger.ledgers?[id: id] else {
-				loggerGlobal.error("Failed to find ledger with factor sourceID in local state: \(factorSourceID)")
+			case let .derivePublicKeys(.delegate(.derivedPublicKeys(publicKeys, factorSourceID, _))):
+				state.destinations = nil
+				guard let id = factorSourceID.extract(FactorSourceID.FromHash.self), let ledger = state.chooseLedger.ledgers?[id: id] else {
+					loggerGlobal.error("Failed to find ledger with factor sourceID in local state: \(factorSourceID)")
+					return .none
+				}
+				return validate(derivedPublicKeys: publicKeys, ledger: ledger, state: state)
+
+			default:
 				return .none
 			}
-			return validate(derivedPublicKeys: publicKeys, ledger: ledger, state: state)
 
-		default: return .none
+		default:
+			return .none
 		}
 	}
 

@@ -57,17 +57,20 @@ extension ImportOlympiaLedgerAccountsAndFactorSources {
 					)
 				}
 				.sheet(
-					store: store.scope(
-						state: \.$derivePublicKeys,
-						action: { .child(.derivePublicKeys($0)) }
-					),
-					content: {
-						DerivePublicKeys.View(store: $0)
-					}
+					store: store.destination,
+					state: /ImportOlympiaLedgerAccountsAndFactorSources.Destinations.State.derivePublicKeys,
+					action: ImportOlympiaLedgerAccountsAndFactorSources.Destinations.Action.derivePublicKeys,
+					content: { DerivePublicKeys.View(store: $0) }
 				)
 				.padding(.horizontal, .medium3)
 			}
 		}
+	}
+}
+
+private extension StoreOf<ImportOlympiaLedgerAccountsAndFactorSources> {
+	var destination: PresentationStoreOf<ImportOlympiaLedgerAccountsAndFactorSources.Destinations> {
+		scope(state: \.$destinations, action: { .child(.destinations($0)) })
 	}
 }
 
