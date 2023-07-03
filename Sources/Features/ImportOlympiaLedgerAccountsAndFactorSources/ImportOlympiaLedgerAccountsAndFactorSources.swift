@@ -50,9 +50,9 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 		}
 	}
 
-	public enum ViewAction: Sendable, Equatable {
-		case skipRestOfTheAccounts
 	}
+
+	public enum ViewAction: Sendable, Equatable { }
 
 	public enum InternalAction: Sendable, Equatable {
 		/// Validated public keys against expected, then migrate...
@@ -68,10 +68,7 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
-		case completed(
-			ledgersWithAccounts: OrderedSet<LedgerWithAccounts>,
-			unvalidatedAccounts: Set<OlympiaAccountToMigrate>
-		)
+		case completed(ledgersWithAccounts: OrderedSet<LedgerWithAccounts>)
 	}
 
 	@Dependency(\.errorQueue) var errorQueue
@@ -93,13 +90,7 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 	}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
-		switch viewAction {
-		case .skipRestOfTheAccounts:
-			return .send(.delegate(.completed(
-				ledgersWithAccounts: state.ledgersWithAccounts,
-				unvalidatedAccounts: state.unmigrated.unvalidated
-			)))
-		}
+		switch viewAction { }
 	}
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
@@ -128,10 +119,7 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 		switch childAction {
 		case let .chooseLedger(.delegate(.choseLedger(ledger))):
 			guard !state.unmigrated.unvalidated.isEmpty else {
-				return .send(.delegate(.completed(
-					ledgersWithAccounts: state.ledgersWithAccounts,
-					unvalidatedAccounts: []
-				)))
+				return .send(.delegate(.completed(ledgersWithAccounts: state.ledgersWithAccounts)))
 			}
 
 			state.derivePublicKeys = .init(
@@ -220,10 +208,7 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 		}
 		loggerGlobal.notice("Finished migrating all accounts.")
 
-		return .send(.delegate(.completed(
-			ledgersWithAccounts: state.ledgersWithAccounts,
-			unvalidatedAccounts: []
-		)))
+		return .send(.delegate(.completed(ledgersWithAccounts: state.ledgersWithAccounts)))
 	}
 
 	private func validate(

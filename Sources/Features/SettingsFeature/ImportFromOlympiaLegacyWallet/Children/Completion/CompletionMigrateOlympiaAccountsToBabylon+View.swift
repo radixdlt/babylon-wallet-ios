@@ -200,8 +200,7 @@ struct CompletionMigrateOlympiaAccountsToBabylon_Preview: PreviewProvider {
 extension CompletionMigrateOlympiaAccountsToBabylon.State {
 	public static let previewValue = Self(
 		previouslyMigrated: [],
-		migrated: [.previewValue0, .previewValue1],
-		unvalidatedOlympiaHardwareAccounts: nil
+		migrated: [.previewValue0, .previewValue1]
 	)
 }
 

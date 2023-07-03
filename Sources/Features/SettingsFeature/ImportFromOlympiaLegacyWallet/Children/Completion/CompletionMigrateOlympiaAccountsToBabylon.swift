@@ -6,16 +6,13 @@ public struct CompletionMigrateOlympiaAccountsToBabylon: Sendable, FeatureReduce
 	public struct State: Sendable, Hashable {
 		public let previouslyMigrated: [ImportOlympiaWalletCoordinator.MigratableAccount]
 		public let migrated: IdentifiedArrayOf<Profile.Network.Account>
-		public let unvalidatedOlympiaHardwareAccounts: Set<OlympiaAccountToMigrate>?
 
 		public init(
 			previouslyMigrated: [ImportOlympiaWalletCoordinator.MigratableAccount],
-			migrated: IdentifiedArrayOf<Profile.Network.Account>,
-			unvalidatedOlympiaHardwareAccounts: Set<OlympiaAccountToMigrate>?
+			migrated: IdentifiedArrayOf<Profile.Network.Account>
 		) {
 			self.previouslyMigrated = previouslyMigrated
 			self.migrated = migrated
-			self.unvalidatedOlympiaHardwareAccounts = unvalidatedOlympiaHardwareAccounts
 		}
 	}
 
