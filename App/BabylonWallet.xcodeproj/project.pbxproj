@@ -28,6 +28,7 @@
 		8329E48B2A20E948004FC2AE /* DappInteractionClientLive in Frameworks */ = {isa = PBXBuildFile; productRef = 8329E48A2A20E948004FC2AE /* DappInteractionClientLive */; };
 		837BC3C729BB28CF0082C363 /* P2PLinksClientLive in Frameworks */ = {isa = PBXBuildFile; productRef = 837BC3C629BB28CF0082C363 /* P2PLinksClientLive */; };
 		838B08EF2A24F16E006F6320 /* BackupsClientLive in Frameworks */ = {isa = PBXBuildFile; productRef = 838B08EE2A24F16E006F6320 /* BackupsClientLive */; };
+		838EDEB62A4D6C68005902C4 /* OverlayWindowClientLive in Frameworks */ = {isa = PBXBuildFile; productRef = 838EDEB52A4D6C68005902C4 /* OverlayWindowClientLive */; };
 		83B9D894294CAEBA00C4582D /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 83B9D897294CAEBA00C4582D /* InfoPlist.strings */; };
 		83B9D895294CAEBA00C4582D /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 83B9D897294CAEBA00C4582D /* InfoPlist.strings */; };
 		A43E8A3D2A1658B000642E44 /* QRGeneratorClientLive in Frameworks */ = {isa = PBXBuildFile; productRef = A43E8A3C2A1658B000642E44 /* QRGeneratorClientLive */; };
@@ -162,6 +163,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				838EDEB62A4D6C68005902C4 /* OverlayWindowClientLive in Frameworks */,
 				E6203E4229B1E943000B8784 /* AppPreferencesClientLive in Frameworks */,
 				838B08EF2A24F16E006F6320 /* BackupsClientLive in Frameworks */,
 				8329E48B2A20E948004FC2AE /* DappInteractionClientLive in Frameworks */,
@@ -534,6 +536,7 @@
 				A43E8A3C2A1658B000642E44 /* QRGeneratorClientLive */,
 				8329E48A2A20E948004FC2AE /* DappInteractionClientLive */,
 				838B08EE2A24F16E006F6320 /* BackupsClientLive */,
+				838EDEB52A4D6C68005902C4 /* OverlayWindowClientLive */,
 			);
 			productName = "Wallet (iOS)";
 			productReference = E6805BC4286DB3ED00861180 /* Radix Wallet Dev.app */;
@@ -3708,6 +3711,10 @@
 		838B08EE2A24F16E006F6320 /* BackupsClientLive */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = BackupsClientLive;
+		};
+		838EDEB52A4D6C68005902C4 /* OverlayWindowClientLive */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = OverlayWindowClientLive;
 		};
 		A43E8A3A2A1658A800642E44 /* QRGeneratorClientLive */ = {
 			isa = XCSwiftPackageProductDependency;

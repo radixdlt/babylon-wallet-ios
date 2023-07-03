@@ -79,6 +79,7 @@ package.addModules([
 			"AppPreferencesClient",
 			"MainFeature",
 			"OnboardingFeature",
+			"OverlayWindowClient",
 			"SplashFeature",
 		],
 		tests: .yes()
@@ -667,12 +668,15 @@ package.addModules([
 		],
 		tests: .no
 	),
-
 	.client(
-		name: "OnboardingClient",
+		name: "OverlayWindowClient",
+		dependencies: [],
+		tests: .no
+	),
+	.client(
+		name: "OverlayWindowClientLive",
 		dependencies: [
-			"Profile",
-			"Cryptography",
+			"OverlayWindowClient",
 		],
 		tests: .no
 	),
@@ -683,6 +687,15 @@ package.addModules([
 			"ProfileStore",
 		],
 		tests: .yes()
+	),
+
+	.client(
+		name: "OnboardingClient",
+		dependencies: [
+			"Profile",
+			"Cryptography",
+		],
+		tests: .no
 	),
 
 	.client(
