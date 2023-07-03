@@ -55,5 +55,27 @@ extension Collection where Element: Sendable {
 	}
 }
 
+extension AsyncSequence {
+	public func subscribe(
+		_ continuation: AsyncStream<Element>.Continuation
+	) where Self: Sendable {
+		Task {
+			for try await value in self {
+				continuation.yield(value)
+			}
+		}
+	}
+}
+
+extension AsyncSequence {
+	public func subscribe(_ listener: some AsyncSubject<Element, Never>) where Self: Sendable {
+		Task {
+			for try await value in self {
+				listener.send(value)
+			}
+		}
+	}
+}
+
 // MARK: - TimeoutError
 public struct TimeoutError: Error {}

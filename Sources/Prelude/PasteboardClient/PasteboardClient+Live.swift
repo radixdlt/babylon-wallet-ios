@@ -17,13 +17,18 @@ extension PasteboardClient: DependencyKey {
 		// https://stackoverflow.com/a/71927867
 		pasteboard.declareTypes([.string], owner: nil)
 		#endif
+
+		let copyEvents = AsyncPassthroughSubject<String>()
+
 		return Self(
+			copyEvents: { copyEvents.share().eraseToAnyAsyncSequence() },
 			copyString: { aString in
 				#if os(iOS)
 				pasteboard.string = aString
 				#elseif os(macOS)
 				pasteboard.setString(aString, forType: .string)
 				#endif
+				copyEvents.send(aString)
 			},
 			getString: {
 				#if os(iOS)

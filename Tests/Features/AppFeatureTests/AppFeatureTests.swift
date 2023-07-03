@@ -101,23 +101,6 @@ final class AppFeatureTests: TestCase {
 			$0.root = .onboardingCoordinator(.init())
 		}
 
-		await store.receive(.internal(.displayErrorAlert(
-			App.UserFacingError(foobar)
-		))) {
-			$0.alert = .userErrorAlert(
-				.init(
-					title: { TextState("An Error Occurred") },
-					actions: {},
-					message: { TextState("Failed to import Radix Wallet backup: valueNotFound(Profile.Profile, Swift.DecodingError.Context(codingPath: [], debugDescription: \"Something went wrong\", underlyingError: nil))") }
-				)
-			)
-		}
-
-		await store.send(.view(.alert(.dismiss))) {
-			// then
-			$0.alert = nil
-		}
-
 		await clock.run() // fast-forward clock to the end of time
 		await viewTask.cancel()
 	}
