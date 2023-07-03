@@ -33,20 +33,20 @@ extension ImportOlympiaLedgerAccountsAndFactorSources {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				ScrollView(showsIndicators: false) {
 					VStack(alignment: .center, spacing: .medium2) {
-						Text("Confirm Ledgers") // FIXME: Strings
+						Text(L10n.ImportOlympiaLedgerAccounts.title)
 							.textStyle(.sheetTitle)
 							.padding(.top, .small1)
 
-						Text("\(viewStore.ledgerControlledAccounts) of your accounts are controlled by Ledger Hardware Wallets") // FIXME: Strings
+						Text(L10n.ImportOlympiaLedgerAccounts.subtitle(viewStore.ledgerControlledAccounts))
 							.textStyle(.body1Header)
 							.padding(.horizontal, .large3)
 
-						Text("Currently Known Ledgers:") // FIXME: Strings
+						Text(L10n.ImportOlympiaLedgerAccounts.listHeading)
 							.textStyle(.body1Header)
 
 						if viewStore.knownLedgers.isEmpty {
 							Card(.app.gray5) {
-								Text("None") // FIXME: Strings
+								Text(L10n.ImportOlympiaLedgerAccounts.knownLedgersNone)
 									.textStyle(.secondaryHeader)
 									.frame(height: .largeButtonHeight)
 									.frame(maxWidth: .infinity)
@@ -62,7 +62,7 @@ extension ImportOlympiaLedgerAccountsAndFactorSources {
 						}
 
 						if viewStore.moreAccounts > 0 {
-							Text("\(viewStore.moreAccounts) more accounts are controlled by other devices. Connect a Ledger hardware wallet device and tap Continue.") // FIXME: Strings
+							Text(L10n.ImportOlympiaLedgerAccounts.otherDeviceAccounts(viewStore.moreAccounts))
 								.textStyle(.body1Regular)
 								.padding(.horizontal, .large3)
 						}
@@ -73,7 +73,7 @@ extension ImportOlympiaLedgerAccountsAndFactorSources {
 					.multilineTextAlignment(.center)
 				}
 				.footer(visible: viewStore.moreAccounts > 0) {
-					Button("Continue") { // FIXME: Strings
+					Button(L10n.ImportOlympiaLedgerAccounts.continueButtonTitle) {
 						viewStore.send(.continueTapped)
 					}
 					.buttonStyle(.primaryRectangular)
@@ -106,20 +106,22 @@ extension NameLedgerAndDerivePublicKeys {
 		}
 
 		public var body: some SwiftUI.View {
-			IfLetStore(store.scope(state: \.nameLedger, action: { .child(.nameLedger($0)) })) { childStore in
-				VStack(spacing: 0) {
-					CloseButtonBar {
-						store.send(.view(.closeButtonTapped))
-					}
+			WithNavigationBar {
+				store.send(.view(.closeButtonTapped))
+			} content: {
+				IfLetStore(store.scope(state: \.nameLedger, action: { .child(.nameLedger($0)) })) { childStore in
 					NameLedgerFactorSource.View(store: childStore)
+				} else: {
+					Rectangle()
+						.fill(.clear)
 				}
-			} else: {
-				Rectangle().fill(.clear)
+				.navigationDestination(
+					store: store.scope(state: \.$derivePublicKeys, action: { .child(.derivePublicKeys($0)) })
+				) {
+					DerivePublicKeys.View(store: $0)
+						.navigationBarBackButtonHidden()
+				}
 			}
-			.navigationDestination(
-				store: store.scope(state: \.$derivePublicKeys, action: { .child(.derivePublicKeys($0)) }),
-				destination: { DerivePublicKeys.View(store: $0) }
-			)
 		}
 	}
 }

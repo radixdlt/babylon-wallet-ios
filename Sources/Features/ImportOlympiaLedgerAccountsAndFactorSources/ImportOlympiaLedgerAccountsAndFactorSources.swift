@@ -121,8 +121,6 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
 		case let .useNewLedger(deviceInfo):
-			print("• ..useNewLedger")
-
 			state.destinations = .nameLedgerAndDerivePublicKeys(.init(
 				networkID: state.networkID,
 				olympiaAccounts: state.olympiaAccounts.unvalidated,
@@ -140,7 +138,6 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 			return .none
 
 		case let .validatedAccounts(validatedAccounts, ledgerID):
-			print("• .validatedAccounts")
 			for validatedAccount in validatedAccounts {
 				state.olympiaAccounts.unvalidated.remove(validatedAccount)
 				state.olympiaAccounts.validated.append(contentsOf: validatedAccounts)
@@ -151,8 +148,6 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 			)
 
 		case let .migratedOlympiaHardwareAccounts(migratedAccounts):
-			print("• .migratedOlympiaHardwareAccounts")
-
 			loggerGlobal.notice("Adding migrated accounts...")
 			state.migratedAccounts.append(contentsOf: migratedAccounts)
 
@@ -172,12 +167,10 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 		case let .destinations(.presented(.nameLedgerAndDerivePublicKeys(.delegate(delegateAction)))):
 			switch delegateAction {
 			case .failedToSaveNewLedger:
-				print("• .failedToSaveNewLedger")
 				state.destinations = nil
 				return .send(.delegate(.failed(.failedToSaveNewLedger)))
 
 			case let .savedNewLedger(ledger):
-				print("• .savedNewLedger : \(ledger.hint.name)")
 				state.knownLedgers.append(ledger)
 				return .none
 
