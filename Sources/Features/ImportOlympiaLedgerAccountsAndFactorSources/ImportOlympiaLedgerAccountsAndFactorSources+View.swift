@@ -84,6 +84,12 @@ extension ImportOlympiaLedgerAccountsAndFactorSources {
 					action: ImportOlympiaLedgerAccountsAndFactorSources.Destinations.Action.derivePublicKeys,
 					content: { DerivePublicKeys.View(store: $0) }
 				)
+				.sheet(
+					store: store.destination,
+					state: /ImportOlympiaLedgerAccountsAndFactorSources.Destinations.State.nameLedger,
+					action: ImportOlympiaLedgerAccountsAndFactorSources.Destinations.Action.nameLedger,
+					content: { NameLedgerFactorSource.View(store: $0) }
+				)
 			}
 		}
 	}

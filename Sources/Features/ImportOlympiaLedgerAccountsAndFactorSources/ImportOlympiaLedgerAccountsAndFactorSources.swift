@@ -40,15 +40,20 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 	public struct Destinations: ReducerProtocol {
 		public enum State: Sendable, Hashable {
 			case derivePublicKeys(DerivePublicKeys.State)
+			case nameLedger(NameLedgerFactorSource.State)
 		}
 
 		public enum Action: Sendable, Equatable {
 			case derivePublicKeys(DerivePublicKeys.Action)
+			case nameLedger(NameLedgerFactorSource.Action)
 		}
 
 		public var body: some ReducerProtocolOf<Self> {
 			Scope(state: /State.derivePublicKeys, action: /Action.derivePublicKeys) {
 				DerivePublicKeys()
+			}
+			Scope(state: /State.nameLedger, action: /Action.nameLedger) {
+				NameLedgerFactorSource()
 			}
 		}
 	}
@@ -58,8 +63,11 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 	}
 
 	public enum InternalAction: Sendable, Equatable {
-		/// Adds a new device to the list and continues
+		/// Starts the process of adding a new Ledger device
 		case addNewLedger(DeviceInfo)
+
+		/// Saved the newly added Ledger device
+		case savedNewLedger(LedgerHardwareWalletFactorSource)
 
 		/// Adds a previously saved device to the list and continues
 		case addExistingLedger(LedgerHardwareWalletFactorSource)
@@ -103,22 +111,17 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
-		case let .addNewLedger(ledgerInfo):
+		case let .addNewLedger(deviceInfo):
+			state.destinations = .nameLedger(.init(deviceInfo: deviceInfo))
 			return .none
+
+		case let .savedNewLedger(ledger):
+			state.destinations = nil
+			state.knownLedgers.append(ledger)
+			return addAccountUsingLedger(in: &state, ledger: ledger)
 
 		case let .addExistingLedger(ledger):
-			state.knownLedgers.append(ledger)
-
-			state.destinations = .derivePublicKeys(.init(
-				derivationPathOption: .knownPaths(
-					.init(uncheckedUniqueElements: state.olympiaAccounts.unvalidated.map { $0.path.wrapAsDerivationPath() }),
-					networkID: state.networkID
-				),
-				factorSourceOption: .specific(ledger.embed()),
-				purpose: .importLegacyAccounts
-			))
-
-			return .none
+			return addAccountUsingLedger(in: &state, ledger: ledger)
 
 		case let .validatedAccounts(validatedAccounts, ledgerID):
 			for validatedAccount in validatedAccounts {
@@ -167,6 +170,13 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 					olympiaAccountsToValidate: state.olympiaAccounts.unvalidated
 				)
 
+			case let .nameLedger(.delegate(.complete(ledger))):
+				return saveNewLedger(ledger)
+
+			case .nameLedger(.delegate(.failedToCreateLedgerFactorSource)):
+				return .none
+//				return .send(.delegate(.failedToAddLedger))
+
 			default:
 				return .none
 			}
@@ -193,6 +203,32 @@ extension ImportOlympiaLedgerAccountsAndFactorSources {
 				await send(.internal(.addNewLedger(ledgerInfo)))
 			}
 		}
+	}
+
+	private func saveNewLedger(_ ledger: LedgerHardwareWalletFactorSource) -> EffectTask<Action> {
+		.run { send in
+			try await factorSourcesClient.saveFactorSource(ledger.embed())
+			loggerGlobal.notice("Saved Ledger factor source! ✅ ")
+			await send(.internal(.savedNewLedger(ledger)))
+		} catch: { error, _ in
+			loggerGlobal.error("Failed to save Factor Source, error: \(error)")
+			errorQueue.schedule(error)
+		}
+	}
+
+	private func addAccountUsingLedger(in state: inout State, ledger: LedgerHardwareWalletFactorSource) -> EffectTask<Action> {
+		state.knownLedgers.append(ledger)
+
+		state.destinations = .derivePublicKeys(.init(
+			derivationPathOption: .knownPaths(
+				.init(uncheckedUniqueElements: state.olympiaAccounts.unvalidated.map { $0.path.wrapAsDerivationPath() }),
+				networkID: state.networkID
+			),
+			factorSourceOption: .specific(ledger.embed()),
+			purpose: .importLegacyAccounts
+		))
+
+		return .none
 	}
 
 	private func validate(
