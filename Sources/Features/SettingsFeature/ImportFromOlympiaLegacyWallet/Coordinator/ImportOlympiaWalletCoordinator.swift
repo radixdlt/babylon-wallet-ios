@@ -212,6 +212,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 		in state: inout State
 	) -> EffectTask<Action> {
 		state.progress = .start
+		state.scanQR.reset()
 		return .none
 	}
 
