@@ -104,9 +104,9 @@ public struct AppSettings: Sendable, FeatureReducer {
 			case profileBackups(ProfileBackups.Action)
 			case ledgerHardwareWallets(LedgerHardwareDevices.Action)
 			case mnemonics(DisplayMnemonics.Action)
+			case importOlympiaWalletCoordinator(ImportOlympiaWalletCoordinator.Action)
 
 			#if DEBUG
-			case importOlympiaWalletCoordinator(ImportOlympiaWalletCoordinator.Action)
 			case debugInspectProfile(DebugInspectProfile.Action)
 			case debugManageFactorSources(ManageFactorSources.Action)
 			case securityStructureConfigs(SecurityStructureConfigurationListCoordinator.Action)
