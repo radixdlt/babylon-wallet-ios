@@ -2,6 +2,7 @@ import AddLedgerFactorSourceFeature
 import DerivePublicKeysFeature
 import FeaturePrelude
 import LedgerHardwareDevicesFeature
+import NewConnectionFeature
 
 extension ImportOlympiaLedgerAccountsAndFactorSources.State {
 	var viewState: ImportOlympiaLedgerAccountsAndFactorSources.ViewState {
@@ -78,20 +79,51 @@ extension ImportOlympiaLedgerAccountsAndFactorSources {
 					}
 					.buttonStyle(.primaryRectangular)
 				}
-				.sheet(
-					store: store.destination,
-					state: /ImportOlympiaLedgerAccountsAndFactorSources.Destinations.State.nameLedgerAndDerivePublicKeys,
-					action: ImportOlympiaLedgerAccountsAndFactorSources.Destinations.Action.nameLedgerAndDerivePublicKeys,
-					content: { NameLedgerAndDerivePublicKeys.View(store: $0) }
-				)
+				.destinations(with: store)
+				.onFirstTask { @MainActor in
+					await viewStore.send(.onFirstTask).finish()
+				}
 			}
 		}
 	}
 }
 
-private extension StoreOf<ImportOlympiaLedgerAccountsAndFactorSources> {
-	var destination: PresentationStoreOf<ImportOlympiaLedgerAccountsAndFactorSources.Destinations> {
-		scope(state: \.$destinations, action: { .child(.destinations($0)) })
+extension View {
+	@MainActor
+	fileprivate func destinations(with store: StoreOf<ImportOlympiaLedgerAccountsAndFactorSources>) -> some View {
+		let destinationStore = store.scope(state: \.$destinations, action: { .child(.destinations($0)) })
+		return addNewP2PLinkSheet(with: destinationStore)
+			.noP2PLinkAlert(with: destinationStore)
+			.nameLedgerSheet(with: destinationStore)
+	}
+
+	@MainActor
+	private func noP2PLinkAlert(with destinationStore: PresentationStoreOf<ImportOlympiaLedgerAccountsAndFactorSources.Destinations>) -> some View {
+		alert(
+			store: destinationStore,
+			state: /ImportOlympiaLedgerAccountsAndFactorSources.Destinations.State.noP2PLink,
+			action: ImportOlympiaLedgerAccountsAndFactorSources.Destinations.Action.noP2PLink
+		)
+	}
+
+	@MainActor
+	private func addNewP2PLinkSheet(with destinationStore: PresentationStoreOf<ImportOlympiaLedgerAccountsAndFactorSources.Destinations>) -> some View {
+		sheet(
+			store: destinationStore,
+			state: /ImportOlympiaLedgerAccountsAndFactorSources.Destinations.State.addNewP2PLink,
+			action: ImportOlympiaLedgerAccountsAndFactorSources.Destinations.Action.addNewP2PLink,
+			content: { NewConnection.View(store: $0) }
+		)
+	}
+
+	@MainActor
+	private func nameLedgerSheet(with destinationStore: PresentationStoreOf<ImportOlympiaLedgerAccountsAndFactorSources.Destinations>) -> some View {
+		sheet(
+			store: destinationStore,
+			state: /ImportOlympiaLedgerAccountsAndFactorSources.Destinations.State.nameLedgerAndDerivePublicKeys,
+			action: ImportOlympiaLedgerAccountsAndFactorSources.Destinations.Action.nameLedgerAndDerivePublicKeys,
+			content: { NameLedgerAndDerivePublicKeys.View(store: $0) }
+		)
 	}
 }
 
