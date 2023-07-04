@@ -1,5 +1,13 @@
 import Prelude
 
+// MARK: - _EntitySecurityStateProtocol
+protocol _EntitySecurityStateProtocol {
+	var index: UInt { get }
+}
+
+// MARK: - UnsecuredEntityControl + _EntitySecurityStateProtocol
+extension UnsecuredEntityControl: _EntitySecurityStateProtocol {}
+
 // MARK: - EntitySecurityState
 /// Security state of an entity (Account/Persona).
 public enum EntitySecurityState:

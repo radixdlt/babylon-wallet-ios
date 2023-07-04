@@ -18,7 +18,7 @@ public struct DerivePublicKeys: Sendable, FeatureReducer {
 		public var ledgerBeingUsed: LedgerHardwareWalletFactorSource?
 		public enum DerivationPathOption: Sendable, Hashable {
 			case knownPaths(OrderedSet<DerivationPath>, networkID: NetworkID)
-			case nextBasedOnFactorSource(networkOption: NetworkOption, entityKind: EntityKind, curve: SLIP10.Curve)
+			case next(networkOption: NetworkOption, entityKind: EntityKind, curve: SLIP10.Curve)
 
 			public enum NetworkOption: Sendable, Hashable {
 				case specific(NetworkID)
@@ -38,7 +38,7 @@ public struct DerivePublicKeys: Sendable, FeatureReducer {
 				networkID: NetworkID?,
 				curve: SLIP10.Curve
 			) -> Self {
-				.nextBasedOnFactorSource(
+				.next(
 					networkOption: .init(networkID: networkID),
 					entityKind: entityKind,
 					curve: curve
@@ -233,11 +233,7 @@ extension DerivePublicKeys {
 				}
 			}()
 			return deriveWithKnownDerivationPaths(derivationPaths, networkID, loadMnemonicPurpose)
-		case let .nextBasedOnFactorSource(networkOption, entityKind, curve):
-			guard let nextDerivationIndicesPerNetwork = hdFactorSource.nextDerivationIndicesPerNetwork else {
-				loggerGlobal.error("Unable to derive public keys with non entity creating factor source")
-				return .send(.delegate(.failedToDerivePublicKey))
-			}
+		case let .next(networkOption, entityKind, curve):
 			let loadMnemonicPurpose: SecureStorageClient.LoadMnemonicPurpose = {
 				switch state.purpose {
 				case .createEntity:
@@ -250,18 +246,20 @@ extension DerivePublicKeys {
 			}()
 			switch networkOption {
 			case let .specific(networkID):
-				do {
-					let derivationPath = try nextDerivationIndicesPerNetwork.derivationPathForNextEntity(kind: entityKind, networkID: networkID)
-					assert(derivationPath.curveForScheme == curve)
-					return deriveWithKnownDerivationPaths([derivationPath], networkID, loadMnemonicPurpose)
-				} catch {
-					loggerGlobal.error("Failed to create derivation path, error: \(error)")
-					return .send(.delegate(.failedToDerivePublicKey))
-				}
+				let derivationPath: DerivationPath = {
+					fatalError()
+					// try nextDerivationIndicesPerNetwork.derivationPathForNextEntity(kind: entityKind, networkID: networkID)
+				}()
+				assert(derivationPath.curveForScheme == curve)
+				return deriveWithKnownDerivationPaths([derivationPath], networkID, loadMnemonicPurpose)
+
 			case .useCurrent:
 				return .run { send in
 					let networkID = await factorSourcesClient.getCurrentNetworkID()
-					let derivationPath = try nextDerivationIndicesPerNetwork.derivationPathForNextEntity(kind: entityKind, networkID: networkID)
+					let derivationPath: DerivationPath = {
+						fatalError()
+						//                        try nextDerivationIndicesPerNetwork.derivationPathForNextEntity(kind: entityKind, networkID: networkID)
+					}()
 					await send(calculatedDerivationPath(derivationPath, networkID, loadMnemonicPurpose))
 				} catch: { error, send in
 					loggerGlobal.error("Failed to create derivation path, error: \(error)")

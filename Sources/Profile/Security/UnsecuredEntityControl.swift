@@ -12,6 +12,8 @@ public struct UnsecuredEntityControl:
 	CustomStringConvertible,
 	CustomDumpReflectable
 {
+	public let entityIndex: UInt
+
 	/// The factor instance which was used to create this unsecured entity, which
 	/// also controls this entity and is used for signign transactions.
 	public let transactionSigning: HierarchicalDeterministicFactorInstance
@@ -20,9 +22,21 @@ public struct UnsecuredEntityControl:
 	public var authenticationSigning: HierarchicalDeterministicFactorInstance?
 
 	public init(
+		entityIndex: UInt,
 		transactionSigning: HierarchicalDeterministicFactorInstance,
 		authenticationSigning: HierarchicalDeterministicFactorInstance? = nil
 	) {
+		switch transactionSigning.derivationPath.scheme {
+		case .cap26:
+			if let anyAccountPath = try? transactionSigning.derivationPath.asAccountPath() {
+				if let babylonAccountPath = try? anyAccountPath.asBabylonAccountPath() {
+					precondition(babylonAccountPath.index == entityIndex)
+				} // if BIP44 like (legacy) the `entityIndex` will not be the same as derivation path's index
+			} else if let personaPath = try? transactionSigning.derivationPath.asIdentityPath() {
+				precondition(personaPath.index == entityIndex)
+			}
+		case .bip44Olympia: break
+		}
 		self.transactionSigning = transactionSigning
 		self.authenticationSigning = authenticationSigning
 	}

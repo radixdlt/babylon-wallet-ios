@@ -7,6 +7,10 @@ public protocol EntityBaseProtocol {
 	/// The ID of the network this entity exists on.
 	var networkID: NetworkID { get }
 
+	/// The index of the account, being a counter, e.g. if you already have two accounts and create a third,
+	/// the index of the new account will be 2 (and the indices of the first is 0 and second is 1).
+	var index: UInt { get }
+
 	/// Security state of this entity, either `secured` or not (controlled by a single FactorInstance)
 	var securityState: EntitySecurityState { get }
 

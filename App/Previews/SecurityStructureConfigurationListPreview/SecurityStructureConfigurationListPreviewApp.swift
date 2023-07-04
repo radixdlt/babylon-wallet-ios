@@ -183,9 +183,7 @@ let bestFriend = """
 						{
 							"model": "",
 							"name": ""
-						},
-						"nextDerivationIndicesPerNetwork":
-						[]
+						}
 					},
 					"discriminator": "device"
 				}
@@ -352,9 +350,7 @@ let instabridge = """
 						{
 							"model": "",
 							"name": ""
-						},
-						"nextDerivationIndicesPerNetwork":
-						[]
+						}
 					},
 					"discriminator": "device"
 				}
@@ -520,9 +516,7 @@ let colleague = """
 						{
 							"model": "",
 							"name": ""
-						},
-						"nextDerivationIndicesPerNetwork":
-						[]
+						}
 					},
 					"discriminator": "device"
 				}

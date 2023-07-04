@@ -48,6 +48,10 @@ extension Profile.Network {
 		/// The ID of the network this account exists on.
 		public let networkID: NetworkID
 
+		public var index: UInt {
+			securityState.index
+		}
+
 		/// The globally unique and identifiable Radix component address of this account. Can be used as
 		/// a stable ID. Cryptographically derived from a seeding public key which typically was created by
 		/// the `DeviceFactorSource` (and typically the same public key as an instance of the device factor
