@@ -44,12 +44,14 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 		public enum State: Sendable, Hashable {
 			case noP2PLink(AlertState<NoP2PLinkAlert>)
 			case addNewP2PLink(NewConnection.State)
+			case noAccountsOnLedger(AlertState<NoAccountsOnLedgerAlert>)
 			case nameLedgerAndDerivePublicKeys(NameLedgerAndDerivePublicKeys.State)
 		}
 
 		public enum Action: Sendable, Equatable {
 			case noP2PLink(NoP2PLinkAlert)
 			case addNewP2PLink(NewConnection.Action)
+			case noAccountsOnLedger(NoAccountsOnLedgerAlert)
 			case nameLedgerAndDerivePublicKeys(NameLedgerAndDerivePublicKeys.Action)
 		}
 
@@ -78,7 +80,10 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 		case useExistingLedger(LedgerHardwareWalletFactorSource)
 
 		/// Validated public keys against expected, then migrate...
-		case validatedAccounts(NonEmpty<Set<OlympiaAccountToMigrate>>, LedgerHardwareWalletFactorSource.ID)
+		case validatedAccounts(Set<OlympiaAccountToMigrate>, LedgerHardwareWalletFactorSource.ID)
+
+		/// No accounts on the currently connected Ledger device
+		case noAccountsOnLedgerAlert
 
 		/// Migrated accounts of validated public keys
 		case migratedOlympiaHardwareAccounts(NonEmpty<[Profile.Network.Account]>)
@@ -164,6 +169,13 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 			return .none
 
 		case let .validatedAccounts(validatedAccounts, ledgerID):
+			guard let validatedAccounts = NonEmpty<Set>(validatedAccounts) else {
+				return .run { send in
+					// If we set the destination directly, the alert will never be presented
+					await send(.internal(.noAccountsOnLedgerAlert))
+				}
+			}
+
 			for validatedAccount in validatedAccounts {
 				state.olympiaAccounts.unvalidated.remove(validatedAccount)
 				state.olympiaAccounts.validated.append(contentsOf: validatedAccounts)
@@ -172,6 +184,10 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 				ledgerID: ledgerID,
 				validatedAccountsToMigrate: validatedAccounts
 			)
+
+		case .noAccountsOnLedgerAlert:
+			state.destinations = .noAccountsOnLedger(.noAccountsOnLedgerAlert)
+			return .none
 
 		case let .migratedOlympiaHardwareAccounts(migratedAccounts):
 			loggerGlobal.notice("Adding migrated accounts...")
@@ -273,10 +289,8 @@ extension ImportOlympiaLedgerAccountsAndFactorSources {
 		.run { send in
 			do {
 				let validation = try await validate(derivedPublicKeys: derivedPublicKeys, olympiaAccountsToValidate: olympiaAccountsToValidate)
-				guard let validated = NonEmpty<Set>(validation.validated) else {
-					throw NoValidatedAccountsError()
-				}
-				await send(.internal(.validatedAccounts(validated, ledgerID)))
+
+				await send(.internal(.validatedAccounts(validation.validated, ledgerID)))
 			} catch {
 				loggerGlobal.error("Failed to validate accounts, error: \(error)")
 				errorQueue.schedule(error)
@@ -354,8 +368,6 @@ extension ImportOlympiaLedgerAccountsAndFactorSources {
 			unvalidated: olympiaAccountsToValidate
 		)
 	}
-
-	struct NoValidatedAccountsError: Error {}
 }
 
 extension LedgerHardwareWalletFactorSource.DeviceModel {
@@ -478,6 +490,19 @@ public struct NameLedgerAndDerivePublicKeys: Sendable, FeatureReducer {
 		} catch: { error, _ in
 			loggerGlobal.error("Failed to save Factor Source, error: \(error)")
 			errorQueue.schedule(error)
+		}
+	}
+}
+
+// MARK: - NoAccountsOnLedgerAlert
+public enum NoAccountsOnLedgerAlert: Sendable, Hashable {}
+
+extension AlertState<NoAccountsOnLedgerAlert> {
+	public static var noAccountsOnLedgerAlert: AlertState {
+		AlertState {
+			TextState("No accounts on Ledger") // FIXME: Strings
+		} message: {
+			TextState("The Ledger device contained none of the accounts being imported") // FIXME: Strings
 		}
 	}
 }
