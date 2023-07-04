@@ -95,6 +95,7 @@ extension View {
 		return addNewP2PLinkSheet(with: destinationStore)
 			.noP2PLinkAlert(with: destinationStore)
 			.nameLedgerSheet(with: destinationStore)
+			.noAccountsOnLedgerAlert(with: destinationStore)
 	}
 
 	@MainActor
@@ -123,6 +124,15 @@ extension View {
 			state: /ImportOlympiaLedgerAccountsAndFactorSources.Destinations.State.nameLedgerAndDerivePublicKeys,
 			action: ImportOlympiaLedgerAccountsAndFactorSources.Destinations.Action.nameLedgerAndDerivePublicKeys,
 			content: { NameLedgerAndDerivePublicKeys.View(store: $0) }
+		)
+	}
+
+	@MainActor
+	private func noAccountsOnLedgerAlert(with destinationStore: PresentationStoreOf<ImportOlympiaLedgerAccountsAndFactorSources.Destinations>) -> some View {
+		alert(
+			store: destinationStore,
+			state: /ImportOlympiaLedgerAccountsAndFactorSources.Destinations.State.noAccountsOnLedger,
+			action: ImportOlympiaLedgerAccountsAndFactorSources.Destinations.Action.noAccountsOnLedger
 		)
 	}
 }
