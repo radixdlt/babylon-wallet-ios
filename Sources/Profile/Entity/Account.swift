@@ -48,8 +48,8 @@ extension Profile.Network {
 		/// The ID of the network this account exists on.
 		public let networkID: NetworkID
 
-		public var index: UInt {
-			securityState.index
+		public var index: HD.Path.Component.Child.Value {
+			securityState.entityIndex
 		}
 
 		/// The globally unique and identifiable Radix component address of this account. Can be used as

@@ -9,6 +9,7 @@ extension Profile.Network.Account {
 			address: "account_tdx_c_1px9r7zkwfrve4cv3xlehwz8k29vp2q2dp6jhdx2mlkxsh4kqke"
 		),
 		securityState: .unsecured(.init(
+			entityIndex: 0,
 			transactionSigning: .init(
 				factorSourceID: .device(hash: "09bfa80bcc9b75d6ad82d59730f7b179cbc668ba6ad4008721d5e6a179ff55f1"),
 				publicKey: .eddsaEd25519(.init(
@@ -28,6 +29,7 @@ extension Profile.Network.Account {
 			address: "account_tdx_a_1qvlrgnqrvk6tzmg8z6lusprl3weupfkmu52gkfhmncjsnhn0kp"
 		),
 		securityState: .unsecured(.init(
+			entityIndex: 1,
 			transactionSigning: .init(
 				factorSourceID: .device(hash: "09bfa80bcc9b75d6ad82d59730f7b179cbc668ba6ad4008721d5e6a179ff55f1"),
 				publicKey: .eddsaEd25519(.init(
@@ -35,7 +37,8 @@ extension Profile.Network.Account {
 						hex: "b862c4ef84a4a97c37760636f6b94d1fba7b4881ac15a073f6c57e2996bbeca8")
 				)),
 				derivationPath: .accountPath(.init(derivationPath: "m/44H/1022H/10H/525H/1460H/1H"))
-			))),
+			)
+		)),
 		appearanceID: ._1,
 		displayName: "Secondary"
 	)

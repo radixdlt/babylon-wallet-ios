@@ -31,6 +31,7 @@ extension AccountsClient: DependencyKey {
 				let numberOfExistingAccounts = (try? profile.network(id: networkID))?.accounts.count ?? 0
 				return try Profile.Network.Account(
 					networkID: networkID,
+					index: .init(numberOfExistingAccounts),
 					factorInstance: request.factorInstance,
 					displayName: request.name,
 					extraProperties: .init(numberOfAccountsOnNetwork: numberOfExistingAccounts)

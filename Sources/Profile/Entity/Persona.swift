@@ -19,6 +19,10 @@ extension Profile.Network {
 		/// The ID of the network this persona exists on.
 		public let networkID: NetworkID
 
+		public var index: HD.Path.Component.Child.Value {
+			securityState.entityIndex
+		}
+
 		/// The globally unique and identifiable Radix component address of this persona. Can be used as
 		/// a stable ID. Cryptographically derived from a seeding public key which typically was created by
 		/// the `DeviceFactorSource`
