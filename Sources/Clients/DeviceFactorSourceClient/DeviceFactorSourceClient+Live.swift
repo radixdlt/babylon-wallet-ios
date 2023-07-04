@@ -33,7 +33,7 @@ extension DeviceFactorSourceClient: DependencyKey {
 					)
 					return HierarchicalDeterministicPublicKey(publicKey: key.publicKey(), derivationPath: $0)
 				}
-				return OrderedSet(derivedKeys)
+				return derivedKeys
 			},
 			signatureFromOnDeviceHD: { request in
 				let privateKey = try request.hdRoot.derivePrivateKey(
