@@ -13,7 +13,6 @@ public struct EngineToolkitClient: Sendable, DependencyKey {
 	public var compileTransactionIntent: CompileTransactionIntent
 	public var compileSignedTransactionIntent: CompileSignedTransactionIntent
 	public var compileNotarizedTransactionIntent: CompileNotarizedTransactionIntent
-	
 	public var decompileTransactionIntent: DecompileTransactionIntent
 	public var decompileNotarizedTransactionIntent: DecompileNotarizedTransactionIntent
 
