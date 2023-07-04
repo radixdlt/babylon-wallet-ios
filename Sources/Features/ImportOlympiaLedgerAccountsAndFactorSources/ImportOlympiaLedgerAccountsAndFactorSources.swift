@@ -6,6 +6,7 @@ import FeaturePrelude
 import ImportLegacyWalletClient
 import LedgerHardwareDevicesFeature
 import LedgerHardwareWalletClient
+import NewConnectionFeature
 import Profile
 import RadixConnectClient
 import RadixConnectModels
@@ -27,6 +28,8 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 		@PresentationState
 		public var destinations: Destinations.State?
 
+		public var hasAConnectorExtension: Bool = false
+
 		public init(
 			networkID: NetworkID,
 			hardwareAccounts: NonEmpty<OrderedSet<OlympiaAccountToMigrate>>
@@ -39,14 +42,21 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 
 	public struct Destinations: ReducerProtocol {
 		public enum State: Sendable, Hashable {
+			case noP2PLink(AlertState<NoP2PLinkAlert>)
+			case addNewP2PLink(NewConnection.State)
 			case nameLedgerAndDerivePublicKeys(NameLedgerAndDerivePublicKeys.State)
 		}
 
 		public enum Action: Sendable, Equatable {
+			case noP2PLink(NoP2PLinkAlert)
+			case addNewP2PLink(NewConnection.Action)
 			case nameLedgerAndDerivePublicKeys(NameLedgerAndDerivePublicKeys.Action)
 		}
 
 		public var body: some ReducerProtocolOf<Self> {
+			Scope(state: /State.addNewP2PLink, action: /Action.addNewP2PLink) {
+				NewConnection()
+			}
 			Scope(state: /State.nameLedgerAndDerivePublicKeys, action: /Action.nameLedgerAndDerivePublicKeys) {
 				NameLedgerAndDerivePublicKeys()
 			}
@@ -54,10 +64,13 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 	}
 
 	public enum ViewAction: Sendable, Equatable {
+		case onFirstTask
 		case continueTapped
 	}
 
 	public enum InternalAction: Sendable, Equatable {
+		case hasAConnectorExtension(Bool)
+
 		/// Starts the process of adding a new Ledger device
 		case useNewLedger(DeviceInfo)
 
@@ -90,6 +103,7 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 	@Dependency(\.factorSourcesClient) var factorSourcesClient
 	@Dependency(\.importLegacyWalletClient) var importLegacyWalletClient
 	@Dependency(\.ledgerHardwareWalletClient) var ledgerHardwareWalletClient
+	@Dependency(\.p2pLinksClient) var p2pLinksClient
 
 	public init() {}
 
@@ -102,7 +116,15 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
+		case .onFirstTask:
+			return checkP2PLinkEffect()
+
 		case .continueTapped:
+			guard state.hasAConnectorExtension else {
+				state.destinations = .noP2PLink(.noP2Plink)
+				return .none
+			}
+
 			return .run { send in
 				let ledgerInfo = try await ledgerHardwareWalletClient.getDeviceInfo()
 
@@ -120,6 +142,10 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
+		case let .hasAConnectorExtension(isConnected):
+			state.hasAConnectorExtension = isConnected
+			return .none
+
 		case let .useNewLedger(deviceInfo):
 			state.destinations = .nameLedgerAndDerivePublicKeys(.init(
 				networkID: state.networkID,
@@ -164,6 +190,33 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
+		case let .destinations(.presented(.noP2PLink(noP2PLinkAction))):
+			switch noP2PLinkAction {
+			case .addNewP2PLinkTapped:
+				state.destinations = .addNewP2PLink(.init())
+				return .none
+
+			case .cancelTapped:
+				return .none
+			}
+
+		case let .destinations(.presented(.addNewP2PLink(.delegate(addNewP2PLinkAction)))):
+			switch addNewP2PLinkAction {
+			case let .newConnection(connectedClient):
+				state.destinations = nil
+
+				return .run { _ in
+					try await p2pLinksClient.addP2PLink(connectedClient)
+				} catch: { error, _ in
+					loggerGlobal.error("Failed P2PLink, error \(error)")
+					errorQueue.schedule(error)
+				}
+
+			case .dismiss:
+				state.destinations = nil
+				return .none
+			}
+
 		case let .destinations(.presented(.nameLedgerAndDerivePublicKeys(.delegate(delegateAction)))):
 			switch delegateAction {
 			case .failedToSaveNewLedger:
@@ -201,6 +254,17 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 // MARK: Helper methods
 
 extension ImportOlympiaLedgerAccountsAndFactorSources {
+	private func checkP2PLinkEffect() -> EffectTask<Action> {
+		.run { send in
+			for try await isConnected in await ledgerHardwareWalletClient.isConnectedToAnyConnectorExtension() {
+				guard !Task.isCancelled else { return }
+				await send(.internal(.hasAConnectorExtension(isConnected)))
+			}
+		} catch: { error, _ in
+			loggerGlobal.error("failed to get links updates, error: \(error)")
+		}
+	}
+
 	private func validate(
 		derivedPublicKeys: OrderedSet<HierarchicalDeterministicPublicKey>,
 		ledgerID: LedgerHardwareWalletFactorSource.ID,
