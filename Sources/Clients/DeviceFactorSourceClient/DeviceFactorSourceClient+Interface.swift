@@ -23,7 +23,7 @@ public struct DeviceFactorSourceClient: Sendable {
 
 // MARK: DeviceFactorSourceClient.onDeviceHDPublicKey
 extension DeviceFactorSourceClient {
-	public typealias PublicKeysFromOnDeviceHD = @Sendable (PublicKeysFromOnDeviceHDRequest) async throws -> OrderedSet<HierarchicalDeterministicPublicKey>
+	public typealias PublicKeysFromOnDeviceHD = @Sendable (PublicKeysFromOnDeviceHDRequest) async throws -> [HierarchicalDeterministicPublicKey]
 	public typealias SignatureFromOnDeviceHD = @Sendable (SignatureFromOnDeviceHDRequest) async throws -> SignatureWithPublicKey
 	public typealias IsAccountRecoveryNeeded = @Sendable () async throws -> Bool
 }
@@ -34,12 +34,12 @@ struct DiscrepancyUnsupportedCurve: Swift.Error {}
 // MARK: - PublicKeysFromOnDeviceHDRequest
 public struct PublicKeysFromOnDeviceHDRequest: Sendable, Hashable {
 	public let deviceFactorSource: DeviceFactorSource
-	public let derivationPaths: OrderedSet<DerivationPath>
+	public let derivationPaths: [DerivationPath]
 	public let loadMnemonicPurpose: SecureStorageClient.LoadMnemonicPurpose
 
 	public init(
 		deviceFactorSource: DeviceFactorSource,
-		derivationPaths: OrderedSet<DerivationPath>,
+		derivationPaths: [DerivationPath],
 		loadMnemonicPurpose: SecureStorageClient.LoadMnemonicPurpose
 	) throws {
 		for derivationPath in derivationPaths {

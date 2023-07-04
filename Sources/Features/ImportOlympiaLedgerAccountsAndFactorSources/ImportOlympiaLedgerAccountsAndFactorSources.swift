@@ -277,7 +277,7 @@ extension ImportOlympiaLedgerAccountsAndFactorSources {
 	}
 
 	private func validate(
-		derivedPublicKeys: OrderedSet<HierarchicalDeterministicPublicKey>,
+		derivedPublicKeys: [HierarchicalDeterministicPublicKey],
 		ledgerID: LedgerHardwareWalletFactorSource.ID,
 		olympiaAccountsToValidate: Set<OlympiaAccountToMigrate>
 	) -> EffectTask<Action> {
@@ -317,7 +317,7 @@ extension ImportOlympiaLedgerAccountsAndFactorSources {
 	}
 
 	private func validate(
-		derivedPublicKeys: OrderedSet<HierarchicalDeterministicPublicKey>,
+		derivedPublicKeys: [HierarchicalDeterministicPublicKey],
 		olympiaAccountsToValidate: Set<OlympiaAccountToMigrate>
 	) async throws -> OlympiaAccountsValidation {
 		guard !derivedPublicKeys.isEmpty else {
@@ -479,7 +479,7 @@ public struct NameLedgerAndDerivePublicKeys: Sendable, FeatureReducer {
 	private func saveNewLedger(_ ledger: LedgerHardwareWalletFactorSource) -> EffectTask<Action> {
 		.run { send in
 			try await factorSourcesClient.saveFactorSource(ledger.embed())
-			loggerGlobal.notice("Saved Ledger factor source! ✅ ")
+			loggerGlobal.notice("Saved Ledger factor source! ✅")
 			await send(.delegate(.savedNewLedger(ledger)))
 			await send(.internal(.savedNewLedger(ledger)))
 		} catch: { error, _ in
@@ -493,7 +493,7 @@ extension DerivePublicKeys.State {
 	public init(ledger: LedgerHardwareWalletFactorSource, olympiaAccounts: Set<OlympiaAccountToMigrate>, networkID: NetworkID) {
 		self.init(
 			derivationPathOption: .knownPaths(
-				.init(uncheckedUniqueElements: olympiaAccounts.map { $0.path.wrapAsDerivationPath() }),
+				olympiaAccounts.map { $0.path.wrapAsDerivationPath() },
 				networkID: networkID
 			),
 			factorSourceOption: .specific(ledger.embed()),
