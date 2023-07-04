@@ -12,7 +12,7 @@ extension AccountsClient: DependencyKey {
 	) -> Self {
 		let saveVirtualAccount: SaveVirtualAccount = { request in
 			try await getProfileStore().updating {
-				try $0.addAccount(request.account, shouldUpdateFactorSourceNextDerivationIndex: request.shouldUpdateFactorSourceNextDerivationIndex)
+				try $0.addAccount(request.account)
 			}
 		}
 
@@ -20,21 +20,33 @@ extension AccountsClient: DependencyKey {
 			try await getProfileStore().network().accounts
 		}
 
+		let getCurrentNetworkID: GetCurrentNetworkID = { await getProfileStore().profile.networkID }
+
+		let getAccountsOnNetwork: GetAccountsOnNetwork = { try await getProfileStore().profile.network(id: $0).accounts }
+
+		let nextAccountIndex: NextAccountIndex = { maybeNetworkID in
+			let currentNetworkID = await getCurrentNetworkID()
+			let networkID = maybeNetworkID ?? currentNetworkID
+			let index = await (try? getAccountsOnNetwork(networkID).count) ?? 0
+			return HD.Path.Component.Child.Value(index)
+		}
+
 		return Self(
-			getCurrentNetworkID: { await getProfileStore().profile.networkID },
+			getCurrentNetworkID: getCurrentNetworkID,
+			nextAccountIndex: nextAccountIndex,
 			getAccountsOnCurrentNetwork: getAccountsOnCurrentNetwork,
 			accountsOnCurrentNetwork: { await getProfileStore().accountValues() },
-			getAccountsOnNetwork: { try await getProfileStore().profile.network(id: $0).accounts },
+			getAccountsOnNetwork: getAccountsOnNetwork,
 			newVirtualAccount: { request in
 				let networkID = request.networkID
 				let profile = await getProfileStore().profile
-				let numberOfExistingAccounts = (try? profile.network(id: networkID))?.accounts.count ?? 0
+				let numberOfExistingAccounts = await nextAccountIndex(networkID)
 				return try Profile.Network.Account(
 					networkID: networkID,
 					index: .init(numberOfExistingAccounts),
 					factorInstance: request.factorInstance,
 					displayName: request.name,
-					extraProperties: .init(numberOfAccountsOnNetwork: numberOfExistingAccounts)
+					extraProperties: .init(numberOfAccountsOnNetwork: .init(numberOfExistingAccounts))
 				)
 			},
 			saveVirtualAccount: saveVirtualAccount,

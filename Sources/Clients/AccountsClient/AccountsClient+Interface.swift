@@ -5,6 +5,7 @@ import Profile
 // MARK: - AccountsClient
 public struct AccountsClient: Sendable {
 	public var getCurrentNetworkID: GetCurrentNetworkID
+	public var nextAccountIndex: NextAccountIndex
 
 	/// Accounts on current network (active gateway)
 	public var getAccountsOnCurrentNetwork: GetAccountsOnCurrentNetwork
@@ -29,6 +30,7 @@ public struct AccountsClient: Sendable {
 
 	public init(
 		getCurrentNetworkID: @escaping GetCurrentNetworkID,
+		nextAccountIndex: @escaping NextAccountIndex,
 		getAccountsOnCurrentNetwork: @escaping GetAccountsOnCurrentNetwork,
 		accountsOnCurrentNetwork: @escaping AccountsOnCurrentNetwork,
 		getAccountsOnNetwork: @escaping GetAccountsOnNetwork,
@@ -39,6 +41,7 @@ public struct AccountsClient: Sendable {
 		updateAccount: @escaping UpdateAccount
 	) {
 		self.getCurrentNetworkID = getCurrentNetworkID
+		self.nextAccountIndex = nextAccountIndex
 		self.getAccountsOnCurrentNetwork = getAccountsOnCurrentNetwork
 		self.getAccountsOnNetwork = getAccountsOnNetwork
 		self.accountsOnCurrentNetwork = accountsOnCurrentNetwork
@@ -52,6 +55,7 @@ public struct AccountsClient: Sendable {
 
 extension AccountsClient {
 	public typealias GetCurrentNetworkID = @Sendable () async -> NetworkID
+	public typealias NextAccountIndex = @Sendable (NetworkID?) async -> HD.Path.Component.Child.Value
 	public typealias GetAccountsOnCurrentNetwork = @Sendable () async throws -> Profile.Network.Accounts
 	public typealias GetAccountsOnNetwork = @Sendable (NetworkID) async throws -> Profile.Network.Accounts
 
@@ -82,9 +86,7 @@ public struct NewAccountRequest: Sendable, Hashable {
 // MARK: - SaveAccountRequest
 public struct SaveAccountRequest: Sendable, Hashable {
 	public let account: Profile.Network.Account
-	public let shouldUpdateFactorSourceNextDerivationIndex: Bool
-	public init(account: Profile.Network.Account, shouldUpdateFactorSourceNextDerivationIndex: Bool) {
+	public init(account: Profile.Network.Account) {
 		self.account = account
-		self.shouldUpdateFactorSourceNextDerivationIndex = shouldUpdateFactorSourceNextDerivationIndex
 	}
 }

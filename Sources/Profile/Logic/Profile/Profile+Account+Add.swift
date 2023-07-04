@@ -46,8 +46,7 @@ extension Profile {
 
 	/// Saves an `Account` into the profile
 	public mutating func addAccount(
-		_ account: Profile.Network.Account,
-		shouldUpdateFactorSourceNextDerivationIndex: Bool = true
+		_ account: Profile.Network.Account
 	) throws {
 		let networkID = account.networkID
 		// can be nil if this is a new network

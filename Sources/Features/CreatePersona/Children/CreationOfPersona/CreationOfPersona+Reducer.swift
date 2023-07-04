@@ -79,7 +79,7 @@ public struct CreationOfPersona: Sendable, FeatureReducer {
 				return .send(.delegate(.createPersonaFailed))
 			}
 			return .run { [name = state.name, fields = state.fields] send in
-				let personaIndex = try await personasClient.getPersonas().count
+				let personaIndex = await personasClient.nextPersonaIndex(networkID)
 				let persona = try Profile.Network.Persona(
 					networkID: networkID,
 					index: .init(personaIndex),
