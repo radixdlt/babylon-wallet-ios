@@ -269,17 +269,19 @@ public struct AppSettings: Sendable, FeatureReducer {
 
 		case let .destination(.presented(.importOlympiaWalletCoordinator(.delegate(.finishedMigration(gotoAccountList))))):
 			state.destination = nil
-
 			if gotoAccountList {
-				print("DISMISSING SETTINGS")
-				return .run { _ in
-					await dismiss()
-				}
+				return dismissSettings()
 			}
 			return .none
 
 		case .destination:
 			return .none
+		}
+	}
+
+	private func dismissSettings() -> EffectTask<Action> {
+		.run { _ in
+			await dismiss()
 		}
 	}
 }
