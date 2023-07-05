@@ -87,7 +87,7 @@ extension EngineToolkitClient {
 
 	public typealias DeriveOlympiaAdressFromPublicKey = @Sendable (K1.PublicKey) throws -> String
 
-	public typealias DeriveVirtualAccountAddress = @Sendable (DeriveVirtualAccountAddressRequest) throws -> ComponentAddress
+	public typealias DeriveVirtualAccountAddress = @Sendable (DeriveVirtualAccountAddressRequest) throws -> AccountAddress
 
 	public typealias GenerateTXID = @Sendable (TransactionIntent) throws -> TXID
 

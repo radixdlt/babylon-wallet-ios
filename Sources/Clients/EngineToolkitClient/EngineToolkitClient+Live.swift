@@ -73,7 +73,6 @@ extension EngineToolkitClient {
 					.deriveVirtualAccountAddressRequest(request: $0)
 					.get()
 					.virtualAccountAddress
-					.asComponentAddress
 			},
 			generateTXID: { transactionIntent in
 				let hash = try hashTransactionItent(transactionIntent).hash

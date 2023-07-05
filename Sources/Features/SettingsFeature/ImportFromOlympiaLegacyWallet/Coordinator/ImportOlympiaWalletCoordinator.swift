@@ -505,12 +505,10 @@ extension ImportOlympiaWalletCoordinator {
 		existingAccounts: Int
 	) throws -> NonEmpty<[MigratableAccount]> {
 		let result = try scannedAccounts.enumerated().map { index, account in
-			let derivedAddress = try engineToolkitClient.deriveVirtualAccountAddress(.init(
+			let babylonAddress = try engineToolkitClient.deriveVirtualAccountAddress(.init(
 				publicKey: .ecdsaSecp256k1(account.publicKey.intoEngine()),
 				networkId: networkID
 			))
-
-			let babylonAddress = try AccountAddress(componentAddress: derivedAddress)
 
 			return MigratableAccount(
 				id: account.id,
