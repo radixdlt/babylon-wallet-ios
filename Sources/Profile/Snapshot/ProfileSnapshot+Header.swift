@@ -148,8 +148,9 @@ extension ProfileSnapshot.Header.Version {
 	/// - 36: Add `structureConfigurations` to `AppPreferences.Security`
 	/// - 37: Change `FactorSourceID` -> enum
 	/// - 38: Added `updatedOn` date to `SecurityStructureConfiguration`
-	/// - 39: Changed Persona data/field format
-	public static let minimum: Self = 39
+	/// - 39: Address format changed with `Birch` update
+	/// - 40: Changed Persona data/field format
+	public static let minimum: Self = 40
 }
 
 extension ProfileSnapshot.Header {

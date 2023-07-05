@@ -17,6 +17,7 @@ public struct AssetTransfer: Sendable, FeatureReducer {
 	@Dependency(\.dappInteractionClient) var dappInteractionClient
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.engineToolkitClient) var engineToolkitClient
+	@Dependency(\.gatewaysClient) var gatewaysClient
 
 	public init() {}
 
@@ -52,22 +53,21 @@ public struct AssetTransfer: Sendable, FeatureReducer {
 			return .none
 
 		case .sendTransferTapped:
-			do {
-				let manifest = try createManifest(state)
+			return .run { [accounts = state.accounts, message = state.message?.message] send in
+				let manifest = try await createManifest(accounts)
 				dappInteractionClient.addWalletInteraction(
 					.transaction(.init(
 						send: .init(
 							version: .default,
 							transactionManifest: manifest,
-							message: state.message?.message
+							message: message
 						)
 					))
 				)
-			} catch {
+				await send(.delegate(.dismissed))
+			} catch: { error, _ in
 				errorQueue.schedule(error)
-				return .none
 			}
-			return .send(.delegate(.dismissed))
 
 		case .closeButtonTapped:
 			return .send(.delegate(.dismissed))
@@ -141,23 +141,24 @@ extension AssetTransfer {
 		}
 	}
 
-	private func createManifest(_ state: State) throws -> TransactionManifest {
-		let involvedFungibleResources = extractInvolvedFungibleResources(state.accounts.receivingAccounts)
-		let fungiblesTransferInstruction = involvedFungibleResources.flatMap {
-			fungibleResourceTransferInstruction(witdhrawAccount: state.accounts.fromAccount.address, $0)
+	private func createManifest(_ accounts: TransferAccountList.State) async throws -> TransactionManifest {
+		let involvedFungibleResources = extractInvolvedFungibleResources(accounts.receivingAccounts)
+		let fungiblesTransferInstruction = try involvedFungibleResources.flatMap {
+			try fungibleResourceTransferInstruction(witdhrawAccount: accounts.fromAccount.address, $0)
 		}
 
-		let involvedNonFungibles = extractInvolvedNonFungibleResource(state.accounts.receivingAccounts)
+		let involvedNonFungibles = extractInvolvedNonFungibleResource(accounts.receivingAccounts)
 		let nonFungiblesTransferInstruction = try involvedNonFungibles.flatMap {
-			try nonFungibleResourceTransferInstruction(witdhrawAccount: state.accounts.fromAccount.address, $0)
+			try nonFungibleResourceTransferInstruction(witdhrawAccount: accounts.fromAccount.address, $0)
 		}
 
 		let allInstructions = fungiblesTransferInstruction + nonFungiblesTransferInstruction
 		let manifest = TransactionManifest(instructions: .parsed(allInstructions.map { $0.embed() }))
 
+		let networkID = await gatewaysClient.getCurrentNetworkID()
 		return try engineToolkitClient.convertManifestToString(.init(
 			version: .default,
-			networkID: .default,
+			networkID: networkID,
 			manifest: manifest
 		))
 	}
@@ -224,13 +225,13 @@ extension AssetTransfer {
 	private func fungibleResourceTransferInstruction(
 		witdhrawAccount: AccountAddress,
 		_ resource: InvolvedFungibleResource
-	) -> [any InstructionProtocol] {
+	) throws -> [any InstructionProtocol] {
 		let accountWithdrawals: [any InstructionProtocol] = [
 			CallMethod(
-				receiver: .init(address: witdhrawAccount.address),
+				receiver: witdhrawAccount,
 				methodName: "withdraw",
 				arguments: [
-					.address(.init(address: resource.address.address)),
+					.address(resource.address.asGeneral()),
 					.decimal(.init(value: resource.totalTransferAmount.toString())),
 				]
 			),
@@ -240,16 +241,16 @@ extension AssetTransfer {
 			let bucket = UUID().uuidString
 
 			let instructions: [any InstructionProtocol] = [
-				TakeFromWorktopByAmount(
+				TakeFromWorktop(
 					amount: .init(value: account.amount.toString()),
-					resourceAddress: .init(address: resource.address.address),
-					bucket: .init(identifier: bucket)
+					resourceAddress: resource.address,
+					bucket: .init(value: bucket)
 				),
 
 				CallMethod(
-					receiver: .init(address: account.id.address),
-					methodName: "deposit",
-					arguments: [.bucket(.init(identifier: bucket))]
+					receiver: account.id,
+					methodName: "try_deposit_or_abort",
+					arguments: [.bucket(.init(value: bucket))]
 				),
 			]
 
@@ -265,10 +266,10 @@ extension AssetTransfer {
 	) throws -> [any InstructionProtocol] {
 		let accountWithdrawals: [any InstructionProtocol] = try [
 			CallMethod(
-				receiver: .init(address: witdhrawAccount.address),
+				receiver: witdhrawAccount,
 				methodName: "withdraw_non_fungibles",
 				arguments: [
-					.address(.init(address: resource.address.address)),
+					.address(resource.address.asGeneral()),
 					.array(.init(
 						elementKind: .nonFungibleLocalId,
 						elements: resource.allTokens.map {
@@ -283,16 +284,16 @@ extension AssetTransfer {
 			let bucket = UUID().uuidString
 
 			let instructions: [any InstructionProtocol] = try [
-				TakeFromWorktopByIds(
+				TakeNonFungiblesFromWorktop(
 					Set(account.tokens.map { try $0.id.toRETLocalID() }),
-					resourceAddress: .init(address: resource.address.address),
-					bucket: .init(identifier: bucket)
+					resourceAddress: resource.address,
+					bucket: .init(value: bucket)
 				),
 
 				CallMethod(
-					receiver: .init(address: account.id.address),
-					methodName: "deposit",
-					arguments: [.bucket(.init(identifier: bucket))]
+					receiver: account.id,
+					methodName: "try_deposit_or_abort",
+					arguments: [.bucket(.init(value: bucket))]
 				),
 			]
 
@@ -304,29 +305,7 @@ extension AssetTransfer {
 }
 
 extension AccountPortfolio.NonFungibleResource.NonFungibleToken.LocalID {
-	struct InvalidLocalID: Error {}
-
-	// TODO: Remove once RET is migrated to `ash`, this is meant to be temporary
-	func toRETLocalID() throws -> NonFungibleLocalId {
-		guard rawValue.count >= 3 else {
-			throw InvalidLocalID()
-		}
-		let prefix = rawValue.prefix(1)
-		let value = String(self.rawValue.dropLast().dropFirst())
-
-		switch prefix {
-		case "#":
-			return .integer(UInt64(value)!)
-		case "<":
-			return .string(value)
-		case "[":
-			guard let bytes = value.data(using: .utf8)?.bytes else {
-				throw InvalidLocalID()
-			}
-			return .bytes(bytes)
-		default:
-			// UUID local id is not working properly in current version of RET
-			throw InvalidLocalID()
-		}
+	func toRETLocalID() -> NonFungibleLocalId {
+		.init(value: rawValue)
 	}
 }

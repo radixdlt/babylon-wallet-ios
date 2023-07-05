@@ -126,31 +126,31 @@ extension AccountsClient {
 	}
 }
 
-// extension AuthorizedDappsClient {
-//	static func previewValueOnePersona() -> Self {
-//		with(noop) {
-//			$0.getAuthorizedDapps = {
-//				var dapp = Profile.Network.AuthorizedDapp(
-//					networkID: .nebunet,
-//					dAppDefinitionAddress: try! .init(address: "account_tdx_b_1qlujhx6yh6tuctgw6nl68fr2dwg3y5k7h7mc6l04zsfsg7yeqh"),
-//					displayName: .init(rawValue: "something")!
-//				)
-//				dapp.referencesToAuthorizedPersonas = [
-//					.init(
-//						identityAddress: Profile.Network.Persona.previewValue1.address,
-//						lastLogin: .now,
-//						sharedAccounts: try! .init(
-//							accountsReferencedByAddress: [try! AccountAddress(address: "account_tdx_b_1qlujhx6yh6tuctgw6nl68fr2dwg3y5k7h7mc6l04zsfsg7yeqh")],
-//							forRequest: .exactly(1)
-//						),
-//						sharedFieldIDs: nil
-//					),
-//				]
-//				return [dapp]
-//			}
-//		}
-//	}
-// }
+extension AuthorizedDappsClient {
+	static func previewValueOnePersona() -> Self {
+		with(noop) {
+			$0.getAuthorizedDapps = {
+				var dapp = Profile.Network.AuthorizedDapp(
+					networkID: .nebunet,
+					dAppDefinitionAddress: try! .init(validatingAddress: "account_tdx_b_1qlujhx6yh6tuctgw6nl68fr2dwg3y5k7h7mc6l04zsfsg7yeqh"),
+					displayName: .init(rawValue: "something")!
+				)
+				dapp.referencesToAuthorizedPersonas = [
+					.init(
+						identityAddress: Profile.Network.Persona.previewValue1.address,
+						lastLogin: .now,
+						sharedAccounts: try! .init(
+							ids: [try! AccountAddress(validatingAddress: "account_tdx_b_1qlujhx6yh6tuctgw6nl68fr2dwg3y5k7h7mc6l04zsfsg7yeqh")],
+							forRequest: .exactly(1)
+						),
+						sharedPersonaData: .init()
+					),
+				]
+				return [dapp]
+			}
+		}
+	}
+}
 
 extension PersonasClient {
 	static func previewValueTwoPersonas(existing: Bool) -> Self {

@@ -16,6 +16,9 @@ public struct EngineToolkitClient: Sendable, DependencyKey {
 	public var decompileTransactionIntent: DecompileTransactionIntent
 	public var decompileNotarizedTransactionIntent: DecompileNotarizedTransactionIntent
 
+	public var hashTransactionIntent: HashTransactionIntent
+	public var hashSignedTransactionIntent: HashSignedTransactionIntent
+
 	public var deriveOlympiaAdressFromPublicKey: DeriveOlympiaAdressFromPublicKey
 
 	public var generateTXID: GenerateTXID
@@ -76,14 +79,18 @@ extension EngineToolkitClient {
 
 	public typealias CompileNotarizedTransactionIntent = @Sendable (NotarizedTransaction) throws -> CompileNotarizedTransactionIntentResponse
 
+	public typealias HashTransactionIntent = @Sendable (TransactionIntent) throws -> HashTransactionIntentResponse
+
+	public typealias HashSignedTransactionIntent = @Sendable (SignedTransactionIntent) throws -> HashSignedTransactionItentResponse
+
 	public typealias DeriveOlympiaAdressFromPublicKey = @Sendable (K1.PublicKey) throws -> String
 
 	public typealias GenerateTXID = @Sendable (TransactionIntent) throws -> TXID
 
 	public typealias KnownEntityAddresses = @Sendable (NetworkID) throws -> KnownEntityAddressesResponse
 
-	public typealias AnalyzeManifest = @Sendable (AnalyzeManifestRequest) throws -> AnalyzeManifestResponse
-	public typealias AnalyzeManifestWithPreviewContext = @Sendable (AnalyzeManifestWithPreviewContextRequest) throws -> AnalyzeManifestWithPreviewContextResponse
+	public typealias AnalyzeManifest = @Sendable (AnalyzeManifestRequest) throws -> ExtractAddressesFromManifestResponse
+	public typealias AnalyzeManifestWithPreviewContext = @Sendable (AnalyzeTransactionExecutionRequest) throws -> AnalyzeTransactionExecutionResponse
 
 	public typealias DecodeAddressRequest = @Sendable (String) throws -> DecodeAddressResponse
 
@@ -109,11 +116,5 @@ public struct AnalyzeManifestRequest: Sendable, Hashable {
 extension TransactionManifest: CustomDumpStringConvertible {
 	public var customDumpDescription: String {
 		description
-	}
-}
-
-extension AccountAddress {
-	public init(componentAddress: ComponentAddress) throws {
-		try self.init(address: componentAddress.address)
 	}
 }

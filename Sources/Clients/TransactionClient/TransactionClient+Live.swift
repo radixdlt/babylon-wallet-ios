@@ -44,16 +44,16 @@ extension TransactionClient {
 			let analyzed = try engineToolkitClient.analyzeManifest(.init(manifest: manifest, networkID: networkID))
 			let allAccounts = try await accountsClient.getAccountsOnNetwork(networkID)
 
-			func accountFromComponentAddress(_ componentAddress: ComponentAddress) -> Profile.Network.Account? {
+			func accountFromComponentAddress(_ componentAddress: AccountAddress) -> Profile.Network.Account? {
 				allAccounts.first(where: { $0.address.address == componentAddress.address })
 			}
-			func identityFromComponentAddress(_ componentAddress: ComponentAddress) async throws -> Profile.Network.Persona {
-				try await personasClient.getPersona(id: IdentityAddress(address: componentAddress.address))
+			func identityFromComponentAddress(_ componentAddress: IdentityAddress) async throws -> Profile.Network.Persona {
+				try await personasClient.getPersona(id: IdentityAddress(validatingAddress: componentAddress.address))
 			}
-			func mapAccount(_ keyPath: KeyPath<AnalyzeManifestResponse, [ComponentAddress]>) throws -> OrderedSet<Profile.Network.Account> {
+			func mapAccount(_ keyPath: KeyPath<ExtractAddressesFromManifestResponse, [AccountAddress]>) throws -> OrderedSet<Profile.Network.Account> {
 				try .init(validating: analyzed[keyPath: keyPath].compactMap(accountFromComponentAddress))
 			}
-			func mapIdentity(_ keyPath: KeyPath<AnalyzeManifestResponse, [ComponentAddress]>) async throws -> OrderedSet<Profile.Network.Persona> {
+			func mapIdentity(_ keyPath: KeyPath<ExtractAddressesFromManifestResponse, [IdentityAddress]>) async throws -> OrderedSet<Profile.Network.Persona> {
 				try await .init(validating: analyzed[keyPath: keyPath].asyncMap(identityFromComponentAddress))
 			}
 
@@ -76,7 +76,7 @@ extension TransactionClient {
 				if let nonEmpty = NonEmpty(rawValue: myInvolvedEntities.entitiesRequiringAuth) {
 					return .intentSigners(nonEmpty)
 				} else {
-					return .notaryAsSignatory
+					return .notaryIsSignatory
 				}
 			}()
 
@@ -144,8 +144,8 @@ extension TransactionClient {
 
 			loggerGlobal.debug("Setting fee payer to: \(addressOfPayer.address)")
 
-			let lockFeeCallMethodInstruction = engineToolkitClient.lockFeeCallMethod(
-				address: ComponentAddress(address: addressOfPayer.address),
+			let lockFeeCallMethodInstruction = try engineToolkitClient.lockFeeCallMethod(
+				address: ComponentAddress(validatingAddress: addressOfPayer.address),
 				fee: feeToAdd.description
 			).embed()
 
@@ -235,14 +235,12 @@ extension TransactionClient {
 			let transactionSigners = try await getTransactionSigners(request)
 
 			let header = TransactionHeader(
-				version: engineToolkitClient.getTransactionVersion(),
 				networkId: request.networkID,
 				startEpochInclusive: epoch,
 				endEpochExclusive: epoch + request.makeTransactionHeaderInput.epochWindow,
 				nonce: request.nonce,
 				publicKey: SLIP10.PublicKey.eddsaEd25519(transactionSigners.notaryPublicKey).intoEngine(),
-				notaryAsSignatory: transactionSigners.notaryAsSignatory,
-				costUnitLimit: request.makeTransactionHeaderInput.costUnitLimit,
+				notaryIsSignatory: transactionSigners.notaryIsSignatory,
 				tipPercentage: request.makeTransactionHeaderInput.tipPercentage
 			)
 
@@ -256,23 +254,15 @@ extension TransactionClient {
 		}
 
 		let notarizeTransaction: NotarizeTransaction = { request in
-
-			let intent = try engineToolkitClient.decompileTransactionIntent(.init(
-				compiledIntent: request.compileTransactionIntent.compiledIntent,
-				instructionsOutputKind: .parsed
-			))
-
 			let signedTransactionIntent = SignedTransactionIntent(
-				intent: intent,
+				intent: request.transactionIntent,
 				intentSignatures: Array(request.intentSignatures)
 			)
-			let txID = try engineToolkitClient.generateTXID(intent)
-			let compiledSignedIntent = try engineToolkitClient.compileSignedTransactionIntent(
-				signedTransactionIntent
-			)
+
+			let signedIntentHash = try engineToolkitClient.hashSignedTransactionIntent(signedTransactionIntent).hash
 
 			let notarySignature = try request.notary.sign(
-				hashOfMessage: blake2b(data: compiledSignedIntent.compiledIntent)
+				hashOfMessage: Data(hex: signedIntentHash)
 			)
 
 			let uncompiledNotarized = try NotarizedTransaction(
@@ -283,6 +273,8 @@ extension TransactionClient {
 			let compiledNotarizedTXIntent = try engineToolkitClient.compileNotarizedTransactionIntent(
 				uncompiledNotarized
 			)
+
+			let txID = try engineToolkitClient.generateTXID(request.transactionIntent)
 
 			return .init(
 				notarized: compiledNotarizedTXIntent,
@@ -364,7 +356,7 @@ extension TransactionClient {
 			/// Will be increased with each added guarantee to account for the difference in indexes from the initial manifest.
 			var indexInc = 1 // LockFee was added, start from 1
 			for guarantee in guarantees {
-				let guaranteeInstruction: Instruction = .assertWorktopContainsByAmount(.init(
+				let guaranteeInstruction: Instruction = .assertWorktopContains(.init(
 					amount: .init(
 						value: guarantee.amount.toString()
 					),
@@ -394,8 +386,6 @@ extension TransactionClient {
 				rawValue: Set(Array(transactionIntentWithSigners.transactionSigners.intentSignerEntitiesOrEmpty()) + [.account(request.feePayer)])
 			)!
 
-			let compiledIntent = try engineToolkitClient.compileTransactionIntent(transactionIntentWithSigners.intent)
-
 			let signingFactors = try await factorSourcesClient.getSigningFactors(.init(
 				networkID: request.networkID,
 				signers: entities,
@@ -420,7 +410,7 @@ extension TransactionClient {
 			}
 			printSigners()
 
-			return .init(compiledIntent: compiledIntent, signingFactors: signingFactors)
+			return .init(intent: transactionIntentWithSigners.intent, signingFactors: signingFactors)
 		}
 
 		let myInvolvedEntities: MyInvolvedEntities = { manifest in

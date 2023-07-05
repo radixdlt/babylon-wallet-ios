@@ -376,17 +376,9 @@ extension EngineToolkitClient {
 		// # Set List Metadata on Resource
 		// https://github.com/radixdlt/radixdlt-scrypto/blob/main/transaction/examples/metadata/metadata.rtm#L97-L101
 		let setMetadataInstruction = SetMetadata(
-			entityAddress: .init(address: account.address.address),
+			accountAddress: account.address,
 			key: EntityMetadataKey.accountType.rawValue,
-			value: Enum(
-				.u8(0), // what is this?
-				fields: [
-					.enum(.init(
-						.u8(0), // what is this?
-						fields: [.string(GatewayAPI.EntityMetadataCollection.AccountType.dappDefinition.rawValue)]
-					)),
-				]
-			)
+			value: Enum(.metadata_String, fields: [.string(GatewayAPI.EntityMetadataCollection.AccountType.dappDefinition.rawValue)])
 		)
 
 		let manifestParsed = TransactionManifest(

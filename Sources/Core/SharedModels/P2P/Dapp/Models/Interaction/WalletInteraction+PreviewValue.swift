@@ -74,7 +74,7 @@ extension P2P.Dapp.Request.Metadata {
 		version: P2P.Dapp.currentVersion,
 		networkId: .simulator,
 		origin: .init(string: "foo.bar"),
-		dAppDefinitionAddress: .init(address: "account_tdx_b_1p8ahenyznrqy2w0tyg00r82rwuxys6z8kmrhh37c7maqpydx7p")
+		dAppDefinitionAddress: .init(validatingAddress: "account_tdx_b_1p8ahenyznrqy2w0tyg00r82rwuxys6z8kmrhh37c7maqpydx7p")
 	)
 }
 

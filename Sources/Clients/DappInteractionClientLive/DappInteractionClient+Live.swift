@@ -35,7 +35,7 @@ extension DappInteractionClient: DependencyKey {
 							version: P2P.Dapp.currentVersion,
 							networkId: .default,
 							origin: DappOrigin.wallet,
-							dAppDefinitionAddress: DappDefinitionAddress.wallet
+							dAppDefinitionAddress: .wallet
 						)
 					)
 				))
@@ -81,7 +81,7 @@ extension DappInteractionClient {
 			let dappDefinitionAddress: DappDefinitionAddress
 			do {
 				dappDefinitionAddress = try DappDefinitionAddress(
-					address: nonValidated.metadata.dAppDefinitionAddress
+					validatingAddress: nonValidated.metadata.dAppDefinitionAddress
 				)
 			} catch {
 				return .invalid(.invalidDappDefinitionAddress(gotStringWhichIsAnInvalidAccountAddress: nonvalidatedMeta.dAppDefinitionAddress))

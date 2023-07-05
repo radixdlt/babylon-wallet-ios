@@ -7,7 +7,7 @@ import TestingPrelude
 
 // MARK: - ProfileTests
 final class ProfileTests: TestCase {
-	let gateway = Radix.Gateway.kisharnet
+	let gateway = Radix.Gateway.enkinet
 
 	func test_p2p_client_eq() throws {
 		let pw = try ConnectionPassword(.init(.deadbeef32Bytes))
@@ -165,7 +165,7 @@ final class ProfileTests: TestCase {
 			$0.date = .constant(stableDate)
 		} operation: {
 			let trustedContactFactorSource = TrustedContactFactorSource.from(
-				radixAddress: "account_tdx_c_1px0jul7a44s65568d32f82f0lkssjwx6f5t5e44yl6csqurxw3",
+				radixAddress: "account_rdx1283u6e8r2jnz4a3jwv0hnrqfr5aq50yc9ts523sd96hzfjxqqcs89q",
 				emailAddress: "hi@rdx.works",
 				name: "My friend"
 			)
@@ -357,7 +357,7 @@ final class ProfileTests: TestCase {
 		let authorizedDapp = try profile.addAuthorizedDapp(
 			.init(
 				networkID: networkID,
-				dAppDefinitionAddress: .init(address: "account_tdx_c_1px0jul7a44s65568d32f82f0lkssjwx6f5t5e44yl6csqurxw3"),
+				dAppDefinitionAddress: .init(validatingAddress: "account_sim1cyvgx33089ukm2pl97pv4max0x40ruvfy4lt60yvya744cve475w0q"),
 				displayName: "RadiSwap",
 				referencesToAuthorizedPersonas:
 				.init(arrayLiteral:
@@ -389,14 +389,14 @@ final class ProfileTests: TestCase {
 			)
 		)
 		let authorizedPersona0 = authorizedDapp.referencesToAuthorizedPersonas[0]
-		var authorizedPersona0SharedAccounts = try XCTUnwrap(authorizedPersona0.sharedAccounts)
+		var authorizedPersona0SharedAccounts: Profile.Network.AuthorizedDapp.AuthorizedPersonaSimple.SharedAccounts = try XCTUnwrap(authorizedPersona0.sharedAccounts)
 		XCTAssertThrowsError(
 			try authorizedPersona0SharedAccounts.update([secondAccount.address]),
 			"Should not be able to specify another number of accounts if `exactly` was specified."
 		)
 
 		let authorizedPersona1 = authorizedDapp.referencesToAuthorizedPersonas[1]
-		var authorizedPersona1SharedAccounts = try XCTUnwrap(authorizedPersona1.sharedAccounts)
+		var authorizedPersona1SharedAccounts: Profile.Network.AuthorizedDapp.AuthorizedPersonaSimple.SharedAccounts = try XCTUnwrap(authorizedPersona1.sharedAccounts)
 		XCTAssertNoThrow(
 			try authorizedPersona1SharedAccounts.update([
 				secondAccount.address,
@@ -505,7 +505,7 @@ final class ProfileTests: TestCase {
 
 		XCTAssertEqual(
 			network.accounts[0].address.address,
-			"account_tdx_c_1pyezed90u5qtagu2247rqw7f04vc7wnhsfjz4nf6vuvqtj9kcq"
+			"account_tdx_21_129keupt05nakwqkx0865rrqp47c8g9gpktky06d6yl9e708n9cqvsx"
 		)
 
 		// Account 1
@@ -520,7 +520,7 @@ final class ProfileTests: TestCase {
 
 		XCTAssertEqual(
 			network.accounts[1].address.address,
-			"account_tdx_c_1p82arz264ntf727q2s7f7cm6pqucgqzuru3z7mgeg3gqua0wlj"
+			"account_tdx_21_1293rfaz9cmp6jkc2qh7ggxsr3gc703u78un9w7al68juka22rxrh5d"
 		)
 
 		// Account 2
@@ -535,7 +535,7 @@ final class ProfileTests: TestCase {
 
 		XCTAssertEqual(
 			network.accounts[2].address.address,
-			"account_tdx_c_1pygfwtlv7l90rcsge6t0f0jwn3cuzp05y8geek45qw7s98msmw"
+			"account_tdx_21_12yq3vgq69l207w3zuw0zyhcf9ppzvl2sw22zeaatnuuvgxzq09fwrp"
 		)
 
 		// Persona 0
@@ -550,7 +550,7 @@ final class ProfileTests: TestCase {
 
 		XCTAssertEqual(
 			network.personas[0].address.address,
-			"identity_tdx_c_1pntzwn92848tkaatj4psmgtuvsn83lnknku6av34alxqdrsvjv"
+			"identity_tdx_21_12fx3znxjhdrpv4dnurg220n8st5ep70u3ffsmcf0n0xprkzawa3hsc"
 		)
 
 		// Persona 1
@@ -565,7 +565,7 @@ final class ProfileTests: TestCase {
 
 		XCTAssertEqual(
 			network.personas[1].address.address,
-			"identity_tdx_c_1p30wtkl76qpyenu88sverfdh0qwf70gulgu29k72myqq2hqg0r"
+			"identity_tdx_21_12gp3n799aya3gq6qlljehp0p8vpmdkuuykq3dqx5ehspuwzugmj49q"
 		)
 
 		XCTAssertEqual(profile.appPreferences.p2pLinks.links.count, 2)
@@ -588,7 +588,7 @@ final class ProfileTests: TestCase {
 
 		XCTAssertEqual(network.authorizedDapps[0].referencesToAuthorizedPersonas[0].sharedAccounts?.request.quantifier, .exactly)
 		XCTAssertEqual(network.authorizedDapps[0].referencesToAuthorizedPersonas[0].sharedAccounts?.request.quantity, 2)
-		XCTAssertEqual(network.authorizedDapps[0].referencesToAuthorizedPersonas[0].sharedAccounts?.ids.map(\.address), ["account_tdx_c_1p82arz264ntf727q2s7f7cm6pqucgqzuru3z7mgeg3gqua0wlj", "account_tdx_c_1pygfwtlv7l90rcsge6t0f0jwn3cuzp05y8geek45qw7s98msmw"])
+		XCTAssertEqual(network.authorizedDapps[0].referencesToAuthorizedPersonas[0].sharedAccounts?.ids.map(\.address), ["account_tdx_21_12yq3vgq69l207w3zuw0zyhcf9ppzvl2sw22zeaatnuuvgxzq09fwrp", "account_tdx_21_1293rfaz9cmp6jkc2qh7ggxsr3gc703u78un9w7al68juka22rxrh5d"])
 	}
 
 	func test_version_compatibility_check_too_low() throws {
@@ -682,10 +682,10 @@ extension EmailAddress: ExpressibleByStringLiteral {
 	}
 }
 
-// MARK: - AccountAddress + ExpressibleByStringLiteral
-extension AccountAddress: ExpressibleByStringLiteral {
+// MARK: - SpecificAddress + ExpressibleByStringLiteral
+extension SpecificAddress: ExpressibleByStringLiteral {
 	public init(stringLiteral value: String) {
-		try! self.init(address: value)
+		try! self.init(validatingAddress: value)
 	}
 }
 

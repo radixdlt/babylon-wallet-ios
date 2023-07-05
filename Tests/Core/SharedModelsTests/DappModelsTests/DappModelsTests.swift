@@ -10,7 +10,7 @@ final class ToDappResponseTests: TestCase {
 				.unauthorized(.init(
 					oneTimeAccounts: P2P.Dapp.Response.WalletInteractionSuccessResponse.AccountsRequestResponseItem.withoutProofOfOwnership(accounts: [
 						.init(
-							accountAddress: try! .init(address: "account_tdx_b_1p8ahenyznrqy2w0tyg00r82rwuxys6z8kmrhh37c7maqpydx7p"),
+							accountAddress: try! .init(validatingAddress: "account_tdx_b_1p8ahenyznrqy2w0tyg00r82rwuxys6z8kmrhh37c7maqpydx7p"),
 							label: "Label",
 							appearanceId: .fromIndex(0)
 						),
@@ -371,9 +371,9 @@ extension HexCodable32Bytes: ExpressibleByStringLiteral {
 	}
 }
 
-// MARK: - IdentityAddress + ExpressibleByStringLiteral
-extension IdentityAddress: ExpressibleByStringLiteral {
+// MARK: - IdentityAddress + ExpressibleByExtendedGraphemeClusterLiteral, ExpressibleByUnicodeScalarLiteral, ExpressibleByStringLiteral
+extension IdentityAddress: ExpressibleByExtendedGraphemeClusterLiteral & ExpressibleByUnicodeScalarLiteral & ExpressibleByStringLiteral {
 	public init(stringLiteral: String) {
-		try! self.init(address: stringLiteral)
+		try! self.init(validatingAddress: stringLiteral)
 	}
 }

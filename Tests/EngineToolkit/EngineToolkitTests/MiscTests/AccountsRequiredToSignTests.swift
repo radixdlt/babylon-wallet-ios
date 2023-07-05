@@ -2,31 +2,34 @@
 import Prelude
 
 final class AccountsRequiredToSignTests: TestCase {
+	let account = try! AccountAddress(validatingAddress: "account_sim1cyvgx33089ukm2pl97pv4max0x40ruvfy4lt60yvya744cve475w0q")
+	let genericAddress = try! Address(validatingAddress: "component_sim1cqvgx33089ukm2pl97pv4max0x40ruvfy4lt60yvya744cvemygpmu")
+
 	override func setUp() {
 		debugPrint = false
 		super.setUp()
 	}
 
-	func analyze(manifest: TransactionManifest, networkID: NetworkID = .simulator) throws -> AnalyzeManifestResponse {
-		try EngineToolkit().analyzeManifest(request: .init(manifest: manifest, networkId: networkID)).get()
+	func analyze(manifest: TransactionManifest, networkID: NetworkID = .simulator) throws -> ExtractAddressesFromManifestResponse {
+		try RadixEngine.instance.extractAddressesFromManifest(request: .init(manifest: manifest, networkId: networkID)).get()
 	}
 
 	func test_setMetaData() throws {
 		let transactionManifest = TransactionManifest {
 			SetMetadata(
-				entityAddress: "account_sim1qspjlnwx4gdcazhral74rjgzgysrslf8ngrfmprecrrss3p9md",
+				accountAddress: account,
 				key: "name",
-				value: Enum(.string("Radix Dashboard"))
+				value: .init(.option_Some)
 			)
 
 			SetMetadata(
-				entityAddress: "component_sim1q0kryz5scup945usk39qjc2yjh6l5zsyuh8t7v5pk0tshjs68x",
+				entityAddress: genericAddress,
 				key: "name",
-				value: Enum(.string("Radix Dashboard"))
+				value: .init(.option_Some)
 			)
 		}
 		let analyzed = try analyze(manifest: transactionManifest)
-		let expected: [ComponentAddress] = ["account_sim1qspjlnwx4gdcazhral74rjgzgysrslf8ngrfmprecrrss3p9md"]
+		let expected: [AccountAddress] = [account]
 		XCTAssertNoDifference(expected, analyzed.accountsRequiringAuth)
 		XCTAssertNoDifference(expected, analyzed.accountAddresses)
 	}

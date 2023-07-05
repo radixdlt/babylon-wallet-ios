@@ -1,7 +1,7 @@
 import AccountPortfoliosClient
 import ClientPrelude
+import EngineToolkit
 import EngineToolkitClient
-import EngineToolkitModels
 import GatewayAPI
 import TransactionClient
 
@@ -99,10 +99,9 @@ extension SubmitTransactionClient: DependencyKey {
 			@Dependency(\.accountPortfoliosClient) var accountPortfoliosClient
 
 			let changedAccounts: [Profile.Network.Account.EntityAddress]?
-
 			do {
 				let decompiledNotarized = try engineToolkitClient.decompileNotarizedTransactionIntent(.init(
-					compiledNotarizedIntent: Array(request.compiledNotarizedTXIntent.compiledIntent),
+					compiledNotarizedIntent: request.compiledNotarizedTXIntent.compiledIntent,
 					instructionsOutputKind: .parsed
 				))
 				debugPrintTX(decompiledNotarized)
@@ -119,7 +118,7 @@ extension SubmitTransactionClient: DependencyKey {
 			}
 
 			let submitTransactionRequest = GatewayAPI.TransactionSubmitRequest(
-				notarizedTransactionHex: Data(request.compiledNotarizedTXIntent.compiledIntent).hex
+				notarizedTransactionHex: request.compiledNotarizedTXIntent.compiledIntent.hex
 			)
 
 			let response = try await gatewayAPIClient.submitTransaction(submitTransactionRequest)

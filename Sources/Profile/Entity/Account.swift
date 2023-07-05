@@ -1,6 +1,5 @@
 import Cryptography
 import EngineToolkit
-import EngineToolkitModels
 import Prelude
 
 // MARK: - EntityExtraProperties
@@ -112,19 +111,19 @@ extension Profile.Network.Account {
 
 	public static let nameMaxLength = 30
 
-	public static func deriveAddress(
+	public static func deriveVirtualAddress(
 		networkID: NetworkID,
 		factorInstance: HierarchicalDeterministicFactorInstance
 	) throws -> EntityAddress {
 		_ = try factorInstance.derivationPath.asAccountPath()
-		let response = try EngineToolkit().deriveVirtualAccountAddressRequest(
+		let response = try RadixEngine.instance.deriveVirtualAccountAddressRequest(
 			request: .init(
 				publicKey: factorInstance.publicKey.intoEngine(),
 				networkId: networkID
 			)
 		).get()
 
-		return try EntityAddress(address: response.virtualAccountAddress.address)
+		return response.virtualAccountAddress
 	}
 
 	public var isOlympiaAccount: Bool {

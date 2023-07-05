@@ -1,8 +1,7 @@
-import EngineToolkitModels
 import Prelude
 
-// MARK: - EngineToolkit.Error
-extension EngineToolkit {
+// MARK: - RadixEngine.Error
+extension RadixEngine {
 	public enum Error: Sendable, LocalizedError, Equatable {
 		/// We failed to call serialize the request, so we did not even get
 		/// a chance to call the function in the Radix Engine Toolkit.
@@ -19,8 +18,8 @@ extension EngineToolkit {
 	}
 }
 
-// MARK: - EngineToolkit.Error.SerializeRequestFailure
-extension EngineToolkit.Error {
+// MARK: - RadixEngine.Error.SerializeRequestFailure
+extension RadixEngine.Error {
 	/// We failed to call serialize the request, so we did not even get
 	/// a chance to call the function in the Radix Engine Toolkit.
 	public enum SerializeRequestFailure: String, Sendable, LocalizedError, Equatable {
@@ -29,8 +28,8 @@ extension EngineToolkit.Error {
 	}
 }
 
-// MARK: - EngineToolkit.Error.CallLibraryFunctionFailure
-extension EngineToolkit.Error {
+// MARK: - RadixEngine.Error.CallLibraryFunctionFailure
+extension RadixEngine.Error {
 	/// We successfully serialized the request but failed to call the
 	/// function in the Radix Engine Toolkit, or managed to call it but
 	/// got no returned output.
@@ -45,8 +44,8 @@ extension EngineToolkit.Error {
 	}
 }
 
-// MARK: - EngineToolkit.Error.DeserializeResponseFailure
-extension EngineToolkit.Error {
+// MARK: - RadixEngine.Error.DeserializeResponseFailure
+extension RadixEngine.Error {
 	/// We successfully called the function in the Radix Engine Toolkit, but
 	/// we failed to deserialize the returned output.
 	public enum DeserializeResponseFailure: Sendable, LocalizedError, Equatable {
@@ -69,8 +68,8 @@ extension EngineToolkit.Error {
 	}
 }
 
-// MARK: - EngineToolkit.Error.DeserializeResponseFailure.BeforeDecodingError
-extension EngineToolkit.Error.DeserializeResponseFailure {
+// MARK: - RadixEngine.Error.DeserializeResponseFailure.BeforeDecodingError
+extension RadixEngine.Error.DeserializeResponseFailure {
 	/// Failed to even try deserializing the JSON response string into any decodable type.
 	public enum BeforeDecodingError: String, Sendable, LocalizedError, Equatable {
 		case failedToUTF8EncodeResponseJSONString

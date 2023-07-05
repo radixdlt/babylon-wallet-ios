@@ -1,5 +1,5 @@
 import Cryptography
-import EngineToolkitModels
+import EngineToolkit
 import Prelude
 
 // MARK: - EntityBaseProtocol
@@ -39,12 +39,12 @@ extension EntityBaseProtocol {
 /// An `Account` or a `Persona`
 public protocol EntityProtocol: EntityBaseProtocol, Sendable, Equatable, Identifiable where ID == EntityAddress {
 	/// The type of address of entity.
-	associatedtype EntityAddress: AddressKindProtocol & Hashable
+	associatedtype EntityAddress: AddressProtocol & Hashable
 	associatedtype ExtraProperties: Sendable
 
 	static var entityKind: EntityKind { get }
 
-	static func deriveAddress(
+	static func deriveVirtualAddress(
 		networkID: NetworkID,
 		factorInstance: HierarchicalDeterministicFactorInstance
 	) throws -> EntityAddress
@@ -96,7 +96,7 @@ extension EntityProtocol {
 		displayName: NonEmpty<String>,
 		extraProperties: ExtraProperties
 	) throws {
-		let address = try Self.deriveAddress(networkID: networkID, factorInstance: factorInstance)
+		let address = try Self.deriveVirtualAddress(networkID: networkID, factorInstance: factorInstance)
 		self.init(
 			networkID: networkID,
 			address: address,

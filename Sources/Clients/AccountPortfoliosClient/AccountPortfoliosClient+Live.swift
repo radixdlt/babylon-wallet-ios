@@ -172,12 +172,16 @@ extension AccountPortfoliosClient {
 
 		// Build up the resources from the raw items.
 		async let fungibleResources = createFungibleResources(rawItems: rawFungibleResources)
-		async let nonFungibleResources = createNonFungibleResources(rawAccountDetails.address, rawItems: rawNonFungibleResources)
+		async let nonFungibleResources = createNonFungibleResources(
+			rawAccountDetails.address,
+			rawItems: rawNonFungibleResources,
+			ledgerState: ledgerState
+		)
 
 		let isDappDefintionAccountType = rawAccountDetails.metadata.accountType == .dappDefinition
 
 		return try await AccountPortfolio(
-			owner: .init(address: rawAccountDetails.address),
+			owner: .init(validatingAddress: rawAccountDetails.address),
 			isDappDefintionAccountType: isDappDefintionAccountType,
 			fungibleResources: fungibleResources,
 			nonFungibleResources: nonFungibleResources
@@ -193,12 +197,8 @@ extension AccountPortfoliosClient {
 		guard !rawItems.isEmpty else {
 			return .init()
 		}
-		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
-		// Fetch all the detailed information for the loaded resources.
-		// TODO: This will become obsolete with next version of GW, the details would be embeded in GatewayAPI.FungibleResourcesCollectionItem itself.
-		let allResourceDetails = try await gatewayAPIClient.fetchResourceDetails(rawItems.map(\.resourceAddress)).items
 
-		let fungibleresources = rawItems.map { resource in
+		let fungibleresources = try rawItems.map { resource in
 			let amount: BigDecimal = {
 				// Resources of an account always have one single vault which stores the value.
 				guard let resourceVault = resource.vaults.items.first else {
@@ -216,10 +216,8 @@ extension AccountPortfoliosClient {
 				}
 			}()
 
-			let resourceAddress = ResourceAddress(address: resource.resourceAddress)
-
-			// TODO: This lookup will be obsolete once the metadata is present in GatewayAPI.FungibleResourcesCollectionItem
-			let metadata = allResourceDetails.first { $0.address == resource.resourceAddress }?.metadata
+			let resourceAddress = try ResourceAddress(validatingAddress: resource.resourceAddress)
+			let metadata = resource.explicitMetadata
 
 			return AccountPortfolio.FungibleResource(
 				resourceAddress: resourceAddress,
@@ -231,13 +229,14 @@ extension AccountPortfoliosClient {
 			)
 		}
 
-		return fungibleresources.sorted()
+		return await fungibleresources.sorted()
 	}
 
 	@Sendable
 	static func createNonFungibleResources(
 		_ accountAddress: String,
-		rawItems: [GatewayAPI.NonFungibleResourcesCollectionItem]
+		rawItems: [GatewayAPI.NonFungibleResourcesCollectionItem],
+		ledgerState: GatewayAPI.LedgerState
 	) async throws -> AccountPortfolio.NonFungibleResources {
 		// We are interested in vault aggregated items
 		let vaultItems = rawItems.compactMap(\.vault)
@@ -247,24 +246,34 @@ extension AccountPortfoliosClient {
 
 		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
 
-		// TODO: This will become obsolete with next version of GW, the details would be embeded in GatewayAPI.NonFungibleResourcesCollectionItem
-		let allResourceDetails = try await gatewayAPIClient.fetchResourceDetails(rawItems.map(\.resourceAddress)).items
-
 		@Sendable
-		func tokens(
+		func getAllTokens(
 			resource: GatewayAPI.NonFungibleResourcesCollectionItemVaultAggregated
-		) async throws -> IdentifiedArrayOf<AccountPortfolio.NonFungibleResource.NonFungibleToken> {
+		) async throws -> [String] {
 			guard let vault = resource.vaults.items.first else { return [] }
+			let firstPageItems = vault.items ?? []
 
-			let nftIDs = try await fetchAllPaginatedItems(
-				cursor: nil,
+			guard let nextPageCursor = vault.nextCursor else {
+				return firstPageItems
+			}
+
+			let additionalItems = try await fetchAllPaginatedItems(
+				cursor: PageCursor(ledgerState: ledgerState, nextPageCursor: nextPageCursor),
 				fetchEntityNonFungibleResourceIdsPage(
 					accountAddress,
 					resourceAddress: resource.resourceAddress,
 					vaultAddress: vault.vaultAddress
 				)
 			)
-			.map(\.nonFungibleId)
+
+			return firstPageItems + additionalItems
+		}
+
+		@Sendable
+		func tokens(
+			resource: GatewayAPI.NonFungibleResourcesCollectionItemVaultAggregated
+		) async throws -> IdentifiedArrayOf<AccountPortfolio.NonFungibleResource.NonFungibleToken> {
+			let nftIDs = try await getAllTokens(resource: resource)
 
 			// https://rdxworks.slack.com/archives/C02MTV9602H/p1681155601557349
 			let maximumNFTIDChunkSize = 29
@@ -295,12 +304,10 @@ extension AccountPortfoliosClient {
 		let nonFungibleResources = try await vaultItems.parallelMap { resource in
 			// Load the nftIds from the resource vault
 			let tokens = try await tokens(resource: resource)
+			let metadata = resource.explicitMetadata
 
-			// TODO: This lookup will be obsolete once the metadata is present in GatewayAPI.NonFungibleResourcesCollectionItem
-			let metadata = allResourceDetails.first { $0.address == resource.resourceAddress }?.metadata
-
-			return AccountPortfolio.NonFungibleResource(
-				resourceAddress: .init(address: resource.resourceAddress),
+			return try AccountPortfolio.NonFungibleResource(
+				resourceAddress: .init(validatingAddress: resource.resourceAddress),
 				name: metadata?.name,
 				description: metadata?.description,
 				iconURL: metadata?.iconURL,
@@ -366,7 +373,7 @@ extension AccountPortfoliosClient {
 		_ accountAddress: String,
 		resourceAddress: String,
 		vaultAddress: String
-	) -> @Sendable (PageCursor?) async throws -> PaginatedResourceResponse<GatewayAPI.NonFungibleIdsCollectionItem> {
+	) -> @Sendable (PageCursor?) async throws -> PaginatedResourceResponse<String> {
 		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
 
 		return { pageCursor in
@@ -449,14 +456,17 @@ extension AccountPortfoliosClient {
 }
 
 extension Array where Element == AccountPortfolio.FungibleResource {
-	func sorted() -> AccountPortfolio.FungibleResources {
+	func sorted() async -> AccountPortfolio.FungibleResources {
 		@Dependency(\.engineToolkitClient) var engineToolkitClient
+		@Dependency(\.gatewaysClient) var gatewaysClient
 
 		var xrdResource: AccountPortfolio.FungibleResource?
 		var nonXrdResources: [AccountPortfolio.FungibleResource] = []
 
+		let networkId = await gatewaysClient.getCurrentNetworkID()
+
 		for resource in self {
-			let isXRD = try? engineToolkitClient.isXRD(resource: resource.resourceAddress, on: Radix.Network.default.id)
+			let isXRD = try? engineToolkitClient.isXRD(resource: resource.resourceAddress, on: networkId)
 			if isXRD == true {
 				xrdResource = resource
 			} else {

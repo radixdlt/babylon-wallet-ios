@@ -31,7 +31,7 @@ extension EngineToolkitClient {
 		try manifestForFaucet(
 			includeLockFeeInstruction: includeLockFeeInstruction,
 			networkID: networkID,
-			componentAddress: .init(address: accountAddress.address)
+			componentAddress: accountAddress.asComponentAddress
 		)
 	}
 
@@ -62,9 +62,9 @@ extension EngineToolkitClient {
 
 			CallMethod(
 				receiver: componentAddress,
-				methodName: "deposit_batch"
+				methodName: "try_deposit_batch_or_abort"
 			) {
-				Expression("ENTIRE_WORKTOP")
+				ManifestExpression.entireWorktop
 			},
 		]
 
@@ -104,37 +104,41 @@ extension EngineToolkitClient {
 				// compose name from two strings
 				let name = [BIP39.WordList.english.randomElement()?.capitalized ?? "Unknown", BIP39.WordList.english.randomElement() ?? "Unknown"].joined(separator: " ")
 				// add Name
-				metdataEntries.append([.string("name"), .string(name)])
+				metdataEntries.append([.string("name"), .enum(.init(.metadata_String, fields: [.string(name)]))])
 			}
 
 			if addSymbol {
+				let symbol = BIP39.WordList.english.randomElement()?.capitalized ?? "Unknown"
 				// add symbol
-				metdataEntries.append([.string("symbol"), .string(BIP39.WordList.english.randomElement()?.capitalized ?? "Unknown")])
+				metdataEntries.append(
+					[.string("symbol"), .enum(.init(.metadata_String, fields: [.string(symbol)]))]
+				)
 			}
 
 			if addIcon {
-				metdataEntries.append([
-					.string("icon_url"),
-					.string("https://c4.wallpaperflare.com/wallpaper/817/534/563/ave-bosque-fantasia-fenix-wallpaper-preview.jpg"),
-				])
+				let url = "https://c4.wallpaperflare.com/wallpaper/817/534/563/ave-bosque-fantasia-fenix-wallpaper-preview.jpg"
+
+				metdataEntries.append(
+					[.string("icon_url"), .enum(.init(.metadata_String, fields: [.string(url)]))]
+				)
 			}
 
 			metdataEntries.append(
-				[.string("description"), .string(description)]
+				[.string("description"), .enum(.init(.metadata_String, fields: [.string(description)]))]
 			)
 
 			let metdata = Map_(
-				keyValueKind: .string,
-				valueValueKind: .string,
+				keyKind: .string,
+				valueKind: .enum,
 				entries: metdataEntries
 			)
 
 			let accessRules = Map_(
-				keyValueKind: .enum,
-				valueValueKind: .tuple,
+				keyKind: .enum,
+				valueKind: .tuple,
 				entries: [
-					[.enum(.init(.string("ResourceMethodAuthKey::Withdraw"))), .tuple(.init(arrayLiteral: .enum(.init(.string("AccessRule::AllowAll"))), .enum(.init(.string("AccessRule::DenyAll")))))],
-					[.enum(.init(.string("ResourceMethodAuthKey::Deposit"))), .tuple(.init(arrayLiteral: .enum(.init(.string("AccessRule::AllowAll"))), .enum(.init(.string("AccessRule::DenyAll")))))],
+					[.enum(.init(.string(.resourceMethodAuthKey_Withdraw))), .tuple(.init(arrayLiteral: .enum(.init(.string(.accessRule_AllowAll))), .enum(.init(.string(.accessRule_DenyAll)))))],
+					[.enum(.init(.string(.resourceMethodAuthKey_Deposit))), .tuple(.init(arrayLiteral: .enum(.init(.string(.accessRule_AllowAll))), .enum(.init(.string(.accessRule_DenyAll)))))],
 				]
 			)
 
@@ -158,8 +162,8 @@ extension EngineToolkitClient {
 			lockFeeCallMethod(address: faucetAddress),
 		] + tokens +
 			[
-				CallMethod(receiver: .init(address: accountAddress.address), methodName: "deposit_batch") {
-					Expression(stringLiteral: "ENTIRE_WORKTOP")
+				CallMethod(receiver: accountAddress.asComponentAddress, methodName: "try_deposit_batch_or_abort") {
+					ManifestExpression.entireWorktop
 				},
 			]
 
@@ -176,35 +180,36 @@ extension EngineToolkitClient {
 		initialSupply: String = "21000000"
 	) throws -> TransactionManifest {
 		let faucetAddress = try faucetAddress(for: networkID)
+		let iconURL = "https://c4.wallpaperflare.com/wallpaper/817/534/563/ave-bosque-fantasia-fenix-wallpaper-preview.jpg"
 		let instructions: [any InstructionProtocol] = [
 			lockFeeCallMethod(address: faucetAddress),
 
 			CreateFungibleResourceWithInitialSupply(
 				divisibility: tokenDivisivility,
 				metadata: Map_(
-					keyValueKind: .string,
-					valueValueKind: .string,
+					keyKind: .string,
+					valueKind: .enum,
 					entries: [
-						[.string("name"), .string(tokenName)],
-						[.string("symbol"), .string(tokenSymbol)],
-						[.string("description"), .string(description)],
-						[.string("icon_url"), .string("https://c4.wallpaperflare.com/wallpaper/817/534/563/ave-bosque-fantasia-fenix-wallpaper-preview.jpg")],
+						[.string("name"), .enum(.init(.metadata_String, fields: [.string(tokenName)]))],
+						[.string("symbol"), .enum(.init(.metadata_String, fields: [.string(tokenSymbol)]))],
+						[.string("description"), .enum(.init(.metadata_String, fields: [.string(description)]))],
+						[.string("icon_url"), .enum(.init(.metadata_String, fields: [.string(iconURL)]))],
 					]
 				),
 
 				accessRules: .init(
-					keyValueKind: .enum,
-					valueValueKind: .tuple,
+					keyKind: .enum,
+					valueKind: .tuple,
 					entries: [
-						[.enum(.init(.string("ResourceMethodAuthKey::Withdraw"))), .tuple(.init(arrayLiteral: .enum(.init(.string("AccessRule::AllowAll"))), .enum(.init(.string("AccessRule::DenyAll")))))],
-						[.enum(.init(.string("ResourceMethodAuthKey::Deposit"))), .tuple(.init(arrayLiteral: .enum(.init(.string("AccessRule::AllowAll"))), .enum(.init(.string("AccessRule::DenyAll")))))],
+						[.enum(.init(.string(.resourceMethodAuthKey_Withdraw))), .tuple(.init(arrayLiteral: .enum(.init(.string(.accessRule_AllowAll))), .enum(.init(.string(.accessRule_DenyAll)))))],
+						[.enum(.init(.string(.resourceMethodAuthKey_Deposit))), .tuple(.init(arrayLiteral: .enum(.init(.string(.accessRule_AllowAll))), .enum(.init(.string(.accessRule_DenyAll)))))],
 					]
 				),
 				initialSupply: .decimal(.init(value: initialSupply))
 			),
 
-			CallMethod(receiver: .init(address: accountAddress.address), methodName: "deposit_batch") {
-				Expression(stringLiteral: "ENTIRE_WORKTOP")
+			CallMethod(receiver: accountAddress.asComponentAddress, methodName: "try_deposit_batch_or_abort") {
+				ManifestExpression.entireWorktop
 			},
 		]
 
@@ -222,7 +227,7 @@ extension EngineToolkitClient {
 			lockFeeCallMethod(address: faucetAddress),
 
 			CreateNonFungibleResourceWithInitialSupply(
-				idType: .init(.string("NonFungibleIdType::Integer")),
+				idType: .init(.string(.nonFungibleIdType_Integer)),
 				schema: [
 					.tuple([
 						.array(.init(elementKind: .enum, elements: [])),
@@ -233,32 +238,33 @@ extension EngineToolkitClient {
 					.array(.init(elementKind: .string, elements: [])),
 				],
 				metadata: Map_(
-					keyValueKind: .string,
-					valueValueKind: .string,
+					keyKind: .string,
+					valueKind: .enum,
 					entries: [
-						[.string("name"), .string(nftName)],
-						[.string("description"), .string(nftDescription)],
+						[.string("name"), .enum(.init(.metadata_String, fields: [.string(nftName)]))],
+						[.string("description"), .enum(.init(.metadata_String, fields: [.string(nftDescription)]))],
+						[.string("icon_url"), .enum(.init(.metadata_String, fields: [.string("https://i.imgur.com/9YQ9Z0x.png")]))],
 					]
 				),
 				accessRules: .init(
-					keyValueKind: .enum,
-					valueValueKind: .tuple,
+					keyKind: .enum,
+					valueKind: .tuple,
 					entries: [
-						[.enum(.init(.string("ResourceMethodAuthKey::Withdraw"))), .tuple(.init(arrayLiteral: .enum(.init(.string("AccessRule::AllowAll"))), .enum(.init(.string("AccessRule::DenyAll")))))],
-						[.enum(.init(.string("ResourceMethodAuthKey::Deposit"))), .tuple(.init(arrayLiteral: .enum(.init(.string("AccessRule::AllowAll"))), .enum(.init(.string("AccessRule::DenyAll")))))],
+						[.enum(.init(.string(.resourceMethodAuthKey_Withdraw))), .tuple(.init(arrayLiteral: .enum(.init(.string(.accessRule_AllowAll))), .enum(.init(.string(.accessRule_DenyAll)))))],
+						[.enum(.init(.string(.resourceMethodAuthKey_Deposit))), .tuple(.init(arrayLiteral: .enum(.init(.string(.accessRule_AllowAll))), .enum(.init(.string(.accessRule_DenyAll)))))],
 					]
 				),
 				initialSupply: .map(
-					.init(keyValueKind: .nonFungibleLocalId, valueValueKind: .tuple, entries: [
-						[.nonFungibleLocalId(.integer(1)), .tuple([.tuple(
+					.init(keyKind: .nonFungibleLocalId, valueKind: .tuple, entries: [
+						[.nonFungibleLocalId("#1#"), .tuple([.tuple(
 							[.string("Hello World"), .decimal(.init(value: "12"))]
 						)])],
 					])
 				)
 			),
 
-			CallMethod(receiver: .init(address: accountAddress.address), methodName: "deposit_batch") {
-				Expression(stringLiteral: "ENTIRE_WORKTOP")
+			CallMethod(receiver: accountAddress.asComponentAddress, methodName: "try_deposit_batch_or_abort") {
+				ManifestExpression.entireWorktop
 			},
 		]
 
@@ -277,22 +283,22 @@ extension EngineToolkitClient {
 			let shouldAddName = Bool.random()
 			if shouldAddName {
 				metadataEntries.append(
-					[.string("name"), .string(BIP39.randomPhrase(maxSize: 5))]
+					[.string("name"), .enum(.init(.metadata_String, fields: [.string(BIP39.randomPhrase(maxSize: 5))]))]
 				)
 			}
 
 			metadataEntries.append(
-				[.string("description"), .string(BIP39.randomPhrase(maxSize: 20))]
+				[.string("description"), .enum(.init(.metadata_String, fields: [.string(BIP39.randomPhrase(maxSize: 20))]))]
 			)
 
 			let nftIds = stride(from: 0, to: idsCount, by: 1).map {
-				[ManifestASTValue.nonFungibleLocalId(.integer(UInt64($0))), .tuple([.tuple(
+				[ManifestASTValue.nonFungibleLocalId(.init(value: "#\($0)#")), .tuple([.tuple(
 					[.string("Hello World \($0)"), .decimal(.init(value: "\($0)"))]
 				)])]
 			}
 
 			return try CreateNonFungibleResourceWithInitialSupply(
-				idType: .init(.string("NonFungibleIdType::Integer")),
+				idType: .init(.string(.nonFungibleIdType_Integer)),
 				schema: [
 					.tuple([
 						.array(.init(elementKind: .enum, elements: [])),
@@ -303,26 +309,26 @@ extension EngineToolkitClient {
 					.array(.init(elementKind: .string, elements: [])),
 				],
 				metadata: Map_(
-					keyValueKind: .string,
-					valueValueKind: .string,
+					keyKind: .string,
+					valueKind: .enum,
 					entries: metadataEntries
 				),
 				accessRules: .init(
-					keyValueKind: .enum,
-					valueValueKind: .tuple,
+					keyKind: .enum,
+					valueKind: .tuple,
 					entries: [
-						[.enum(.init(.string("ResourceMethodAuthKey::Withdraw"))), .tuple(.init(arrayLiteral: .enum(.init(.string("AccessRule::AllowAll"))), .enum(.init(.string("AccessRule::DenyAll")))))],
-						[.enum(.init(.string("ResourceMethodAuthKey::Deposit"))), .tuple(.init(arrayLiteral: .enum(.init(.string("AccessRule::AllowAll"))), .enum(.init(.string("AccessRule::DenyAll")))))],
+						[.enum(.init(.string(.resourceMethodAuthKey_Withdraw))), .tuple(.init(arrayLiteral: .enum(.init(.string(.accessRule_AllowAll))), .enum(.init(.string(.accessRule_DenyAll)))))],
+						[.enum(.init(.string(.resourceMethodAuthKey_Deposit))), .tuple(.init(arrayLiteral: .enum(.init(.string(.accessRule_AllowAll))), .enum(.init(.string(.accessRule_DenyAll)))))],
 					]
 				),
 				initialSupply: .map(
-					.init(keyValueKind: .nonFungibleLocalId, valueValueKind: .tuple, entries: nftIds)
+					.init(keyKind: .nonFungibleLocalId, valueKind: .tuple, entries: nftIds)
 				)
 			)
 		}
 
-		let instructions: [any InstructionProtocol] = [lockFeeCallMethod(address: faucetAddress)] + tokens + [CallMethod(receiver: .init(address: accountAddress.address), methodName: "deposit_batch") {
-			Expression(stringLiteral: "ENTIRE_WORKTOP")
+		let instructions: [any InstructionProtocol] = [lockFeeCallMethod(address: faucetAddress)] + tokens + [CallMethod(receiver: accountAddress.asComponentAddress, methodName: "try_deposit_batch_or_abort") {
+			ManifestExpression.entireWorktop
 		}]
 
 		return TransactionManifest(instructions: .parsed(instructions.map { $0.embed() }))

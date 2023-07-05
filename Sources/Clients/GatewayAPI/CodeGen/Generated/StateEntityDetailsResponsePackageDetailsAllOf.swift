@@ -13,29 +13,32 @@ import AnyCodable
 @available(*, deprecated, renamed: "GatewayAPI.StateEntityDetailsResponsePackageDetailsAllOf")
 public typealias StateEntityDetailsResponsePackageDetailsAllOf = GatewayAPI.StateEntityDetailsResponsePackageDetailsAllOf
 
-// MARK: - GatewayAPI.StateEntityDetailsResponsePackageDetailsAllOf
 extension GatewayAPI {
-	public struct StateEntityDetailsResponsePackageDetailsAllOf: Codable, Hashable {
-		/** Hex-encoded binary blob. */
-		public private(set) var codeHex: String?
-		public private(set) var royaltyAggregator: FungibleResourcesCollectionItemGloballyAggregated?
 
-		public init(codeHex: String? = nil, royaltyAggregator: FungibleResourcesCollectionItemGloballyAggregated? = nil) {
-			self.codeHex = codeHex
-			self.royaltyAggregator = royaltyAggregator
-		}
+public struct StateEntityDetailsResponsePackageDetailsAllOf: Codable, Hashable {
 
-		public enum CodingKeys: String, CodingKey, CaseIterable {
-			case codeHex = "code_hex"
-			case royaltyAggregator = "royalty_aggregator"
-		}
+    /** Hex-encoded binary blob. */
+    public private(set) var codeHex: String?
+    /** String-encoded decimal representing the amount of a related fungible resource. */
+    public private(set) var royaltyVaultBalance: String?
 
-		// Encodable protocol methods
+    public init(codeHex: String? = nil, royaltyVaultBalance: String? = nil) {
+        self.codeHex = codeHex
+        self.royaltyVaultBalance = royaltyVaultBalance
+    }
 
-		public func encode(to encoder: Encoder) throws {
-			var container = encoder.container(keyedBy: CodingKeys.self)
-			try container.encodeIfPresent(codeHex, forKey: .codeHex)
-			try container.encodeIfPresent(royaltyAggregator, forKey: .royaltyAggregator)
-		}
-	}
+    public enum CodingKeys: String, CodingKey, CaseIterable {
+        case codeHex = "code_hex"
+        case royaltyVaultBalance = "royalty_vault_balance"
+    }
+
+    // Encodable protocol methods
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encodeIfPresent(codeHex, forKey: .codeHex)
+        try container.encodeIfPresent(royaltyVaultBalance, forKey: .royaltyVaultBalance)
+    }
+}
+
 }

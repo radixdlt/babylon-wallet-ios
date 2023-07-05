@@ -496,7 +496,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 
 				guard
 					let selectedAccounts = try? sharedAccounts.ids.compactMap({ sharedAccount in
-						try allAccounts[id: .init(address: sharedAccount.address)]
+						try allAccounts[id: .init(validatingAddress: sharedAccount.address)]
 					}),
 					selectedAccounts.count == sharedAccounts.ids.count
 				else { return nil }
