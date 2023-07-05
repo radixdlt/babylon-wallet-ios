@@ -159,6 +159,7 @@ final class ProfileTests: TestCase {
 
 		var profile = _profile
 		XCTAssertEqual(profile.appPreferences.gateways.current.network, gateway.network)
+
 		profile.factorSources.append(olympiaFactorSource)
 
 		let (trustedContactFactorSource, offDeviceMnemonicFactorSource, ledgerFactorSource) = try withDependencies {
@@ -184,10 +185,14 @@ final class ProfileTests: TestCase {
 		profile.factorSources.append(ledgerFactorSource)
 
 		func addNewAccount(_ name: NonEmptyString) throws -> Profile.Network.Account {
-			let index = try profile.factorSources.babylonDevice.nextDerivationIndex(
-				for: .account,
-				networkID: networkID
-			)
+			let _index: Int = {
+				do {
+					return try profile.network(id: networkID).accounts.count
+				} catch {
+					return 0
+				}
+			}()
+			let index = HD.Path.Component.Child.Value(_index)
 
 			let derivationPath = try AccountBabylonDerivationPath(
 				networkID: networkID,
@@ -212,6 +217,7 @@ final class ProfileTests: TestCase {
 
 			var account = try Profile.Network.Account(
 				networkID: networkID,
+				index: index,
 				factorInstance: factorInstance,
 				displayName: name,
 				extraProperties: .init(appearanceID: .fromIndex(Int(index)))
@@ -244,16 +250,30 @@ final class ProfileTests: TestCase {
 		}
 
 		func addNewPersona(_ name: NonEmptyString, fields: IdentifiedArrayOf<Profile.Network.Persona.Field>) throws -> Profile.Network.Persona {
-			let derivationPath = try profile.factorSources.babylonDevice.derivationPath(
-				forNext: .identity,
-				networkID: profile.networkID
+//			let derivationPath = try profile.factorSources.babylonDevice.derivationPath(
+//				forNext: .identity,
+//				networkID: profile.networkID
+//			)
+			let _index: Int = {
+				do {
+					return try profile.network(id: networkID).personas.count
+				} catch {
+					return 0
+				}
+			}()
+			let index = HD.Path.Component.Child.Value(_index)
+
+			let derivationPath = try IdentityHierarchicalDeterministicDerivationPath(
+				networkID: networkID,
+				index: index,
+				keyKind: .transactionSigning
 			)
 			let hdRoot = try curve25519FactorSourceMnemonic.hdRoot()
 
 			let publicKey = try hdRoot.derivePublicKey(
 				path: .init(
 					scheme: .cap26,
-					path: derivationPath.path
+					path: derivationPath.derivationPath
 				),
 				curve: .curve25519
 			)
@@ -261,13 +281,19 @@ final class ProfileTests: TestCase {
 			let factorInstance = HierarchicalDeterministicFactorInstance(
 				id: babylonFactorSource.id,
 				publicKey: publicKey,
-				derivationPath: derivationPath
+				derivationPath: derivationPath.wrapAsDerivationPath()
 			)
 
-			var persona = try Profile.Network.Persona(networkID: networkID, factorInstance: factorInstance, displayName: name, extraProperties: .init(fields: fields))
+			var persona = try Profile.Network.Persona(
+				networkID: networkID,
+				index: index,
+				factorInstance: factorInstance,
+				displayName: name,
+				extraProperties: .init(fields: fields)
+			)
 
 			if case var .unsecured(control) = persona.securityState {
-				let path = try derivationPath.asIdentityPath().switching(keyKind: .authenticationSigning)
+				let path = try derivationPath.switching(keyKind: .authenticationSigning)
 				let authPublicKey = try hdRoot.derivePublicKey(
 					path: .init(
 						scheme: .cap26,
@@ -424,8 +450,6 @@ final class ProfileTests: TestCase {
 			XCTAssertEqual(factorSource.hint.model, deviceFactorModel)
 		}
 		let deviceFactorSource = profile.factorSources.babylonDevice
-		XCTAssertEqual(try deviceFactorSource.nextDerivationIndex(for: .account, networkID: profile.networkID), 3)
-		XCTAssertEqual(try deviceFactorSource.nextDerivationIndex(for: .identity, networkID: profile.networkID), 2)
 
 		XCTAssertEqual(profile.networks.count, 1)
 		let networkID = gateway.network.id
