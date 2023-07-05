@@ -78,7 +78,7 @@ extension TransactionSigners {
 		switch intentSigning {
 		case let .intentSigners(signers):
 			return Set(signers.flatMap { $0.primaryRoleSuperAdminFactorInstances.map(\.publicKey) })
-		case .notaryAsSignatory:
+		case .notaryIsSignatory:
 			return []
 		}
 	}

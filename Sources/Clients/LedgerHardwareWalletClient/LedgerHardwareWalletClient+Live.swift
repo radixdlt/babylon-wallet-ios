@@ -73,7 +73,7 @@ extension LedgerHardwareWalletClient: DependencyKey {
 			let signerEntities = Set(signers.map(\.entity))
 
 			for requiredSigner in signers {
-				for requiredSigningFactor in requiredSigner.factorInstancesRequiredToSign {
+				for requiredSigningFactor in requiredSigner.primaryRoleSuperAdminFactorInstances {
 					guard
 						let signature = signaturesValidated.first(where: {
 							$0.signature.publicKey == requiredSigningFactor.publicKey

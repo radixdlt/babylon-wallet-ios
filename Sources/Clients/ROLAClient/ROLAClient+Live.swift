@@ -6,6 +6,9 @@ import EngineToolkitClient
 import GatewayAPI
 import RegexBuilder
 
+// MARK: - SecurifiedEntriesHaveNoCanonicalTransactionSigningKey
+struct SecurifiedEntriesHaveNoCanonicalTransactionSigningKey: Swift.Error {}
+
 extension ROLAClient {
 	public static let liveValue: Self = {
 		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
@@ -32,6 +35,8 @@ extension ROLAClient {
 				switch entity.securityState {
 				case let .unsecured(control):
 					return try .init(hashing: control.transactionSigning.publicKey)
+				case .securified:
+					throw SecurifiedEntriesHaveNoCanonicalTransactionSigningKey()
 				}
 			}()
 
