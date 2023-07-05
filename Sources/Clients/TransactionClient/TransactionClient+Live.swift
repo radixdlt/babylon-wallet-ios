@@ -401,7 +401,7 @@ extension TransactionClient {
 						for signer in signingFactor.signers {
 							let entity = signer.entity
 							print("\t\t🔮 * Entity: \(entity.displayName): *")
-							for factorInstance in signer.factorInstancesRequiredToSign {
+							for factorInstance in signer.primaryRoleSuperAdminFactorInstances {
 								print("\t\t\t🔮 * FactorInstance: \(String(describing: factorInstance.derivationPath)) \(factorInstance.publicKey)")
 							}
 						}

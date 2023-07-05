@@ -291,7 +291,7 @@ struct InvalidSignature: Swift.Error {}
 
 extension Signer {
 	var keyParams: [P2P.LedgerHardwareWallet.KeyParameters] {
-		factorInstancesRequiredToSign.compactMap {
+		primaryRoleSuperAdminFactorInstances.compactMap {
 			P2P.LedgerHardwareWallet.KeyParameters(
 				curve: $0.publicKey.curve.cast(),
 				derivationPath: $0.derivationPath.path
