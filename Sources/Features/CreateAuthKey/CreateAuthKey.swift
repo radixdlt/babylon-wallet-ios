@@ -73,20 +73,22 @@ public struct GetAuthKeyDerivationPath: Sendable, FeatureReducer {
 							keyKind: .authenticationSigning
 						).wrapAsDerivationPath()
 					}
+
+					guard let factorSource = try await factorSourcesClient.getFactorSource(id: factorSourceID) else {
+						loggerGlobal.error("Failed to find factor source with ID: \(factorSourceID)")
+						await send(.delegate(.failedToFindFactorSource))
+						return
+					}
+
+					await send(.delegate(.gotDerivationPath(
+						authSignDerivationPath,
+						factorSource
+					)))
+
 				case .securified:
 					await send(.delegate(.entityAlreadyHasAuthenticationSigningKey))
-				}
-
-				guard let factorSource = try await factorSourcesClient.getFactorSource(id: factorSourceID) else {
-					loggerGlobal.error("Failed to find factor source with ID: \(factorSourceID)")
-					await send(.delegate(.failedToFindFactorSource))
 					return
 				}
-
-				await send(.delegate(.gotDerivationPath(
-					authSignDerivationPath,
-					factorSource
-				)))
 			}
 		}
 	}
