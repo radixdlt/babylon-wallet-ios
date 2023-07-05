@@ -580,58 +580,57 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			// Save login date, data fields, and ongoing accounts to Profile
 			if let persona = state.persona {
 				// FIXME: handle error
-//				try await updatePersona(persona, state, responseItems: response.items)
-				fatalError()
+				try await updatePersona(persona, state, responseItems: response.items)
 			}
 
 			await send(.delegate(.submit(response, state.dappMetadata)))
 		}
 	}
 
-//	func updatePersona(
-//		_ persona: Profile.Network.Persona,
-//		_ state: State,
-//		responseItems: P2P.Dapp.Response.WalletInteractionSuccessResponse.Items
-//	) async throws {
-//		let networkID = await gatewaysClient.getCurrentNetworkID()
-//		var authorizedDapp = state.authorizedDapp ?? .init(
-//			networkID: networkID,
-//			dAppDefinitionAddress: state.dappMetadata.dAppDefinitionAddress,
-//			displayName: {
-//				switch state.dappMetadata {
-//				case let .ledger(ledger): return ledger.name
-//				case .request, .wallet: return nil
-//				}
-//			}()
-//		)
-//		// This extraction is really verbose right now, but it should become a lot simpler with native case paths
-//		let sharedAccountsInfo: (P2P.Dapp.Request.NumberOfAccounts, [P2P.Dapp.Response.WalletAccount])? = unwrap(
-//			{
-//				switch state.remoteInteraction.items {
-//				case let .request(.authorized(items)):
-//					return items.ongoingAccounts?.numberOfAccounts
-//				default:
-//					return nil
-//				}
-//			}(),
-//			{
-//				switch responseItems {
-//				case let .request(.authorized(items)):
-//					return items.ongoingAccounts?.accounts
-//				default:
-//					return nil
-//				}
-//			}()
-//		)
-//		let sharedAccounts: Profile.Network.AuthorizedDapp.AuthorizedPersonaSimple.SharedAccounts?
-//		if let (numberOfAccounts, accounts) = sharedAccountsInfo {
-//			sharedAccounts = try .init(
-//				accountsReferencedByAddress: OrderedSet(accounts.map(\.address)),
-//				forRequest: numberOfAccounts
-//			)
-//		} else {
-//			sharedAccounts = nil
-//		}
+	func updatePersona(
+		_ persona: Profile.Network.Persona,
+		_ state: State,
+		responseItems: P2P.Dapp.Response.WalletInteractionSuccessResponse.Items
+	) async throws {
+		let networkID = await gatewaysClient.getCurrentNetworkID()
+		var authorizedDapp = state.authorizedDapp ?? .init(
+			networkID: networkID,
+			dAppDefinitionAddress: state.dappMetadata.dAppDefinitionAddress,
+			displayName: {
+				switch state.dappMetadata {
+				case let .ledger(ledger): return ledger.name
+				case .request, .wallet: return nil
+				}
+			}()
+		)
+		// This extraction is really verbose right now, but it should become a lot simpler with native case paths
+		let sharedAccountsInfo: (P2P.Dapp.Request.NumberOfAccounts, [P2P.Dapp.Response.WalletAccount])? = unwrap(
+			{
+				switch state.remoteInteraction.items {
+				case let .request(.authorized(items)):
+					return items.ongoingAccounts?.numberOfAccounts
+				default:
+					return nil
+				}
+			}(),
+			{
+				switch responseItems {
+				case let .request(.authorized(items)):
+					return items.ongoingAccounts?.accounts
+				default:
+					return nil
+				}
+			}()
+		)
+		let sharedAccounts: Profile.Network.AuthorizedDapp.AuthorizedPersonaSimple.SharedAccounts?
+		if let (numberOfAccounts, accounts) = sharedAccountsInfo {
+			sharedAccounts = try .init(
+				ids: OrderedSet(accounts.map(\.address)),
+				forRequest: numberOfAccounts
+			)
+		} else {
+			sharedAccounts = nil
+		}
 //		let sharedFieldIDs: Set<Profile.Network.Persona.Field.ID>? = {
 //			switch state.remoteInteraction.items {
 //			case let .request(.authorized(items)):
@@ -640,13 +639,14 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 //				return nil
 //			}
 //		}()
-//		@Dependency(\.date) var now
-//		let authorizedPersona: Profile.Network.AuthorizedDapp.AuthorizedPersonaSimple = {
-//			if var authorizedPersona = state.authorizedPersona {
-//				authorizedPersona.lastLogin = now()
-//				if let sharedAccounts {
-//					authorizedPersona.sharedAccounts = sharedAccounts
-//				}
+		@Dependency(\.date) var now
+		let authorizedPersona: Profile.Network.AuthorizedDapp.AuthorizedPersonaSimple = {
+			if var authorizedPersona = state.authorizedPersona {
+				authorizedPersona.lastLogin = now()
+				if let sharedAccounts {
+					authorizedPersona.sharedAccounts = sharedAccounts
+				}
+				// FIXME! use `items.ongoingPersonaData`
 //				if let sharedFieldIDs {
 //					if let existingSharedFieldIDs = authorizedPersona.sharedFieldIDs {
 //						authorizedPersona.sharedFieldIDs = existingSharedFieldIDs.union(sharedFieldIDs)
@@ -654,19 +654,19 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 //						authorizedPersona.sharedFieldIDs = sharedFieldIDs
 //					}
 //				}
-//				return authorizedPersona
-//			} else {
-//				return .init(
-//					identityAddress: persona.address,
-//					lastLogin: now(),
-//					sharedAccounts: sharedAccounts,
-//					sharedFieldIDs: sharedFieldIDs
-//				)
-//			}
-//		}()
-//		authorizedDapp.referencesToAuthorizedPersonas[id: authorizedPersona.id] = authorizedPersona
-//		try await authorizedDappsClient.updateOrAddAuthorizedDapp(authorizedDapp)
-//	}
+				return authorizedPersona
+			} else {
+				return .init(
+					identityAddress: persona.address,
+					lastLogin: now(),
+					sharedAccounts: sharedAccounts,
+					sharedPersonaData: .init() // FIXME! use `items.ongoingPersonaData`
+				)
+			}
+		}()
+		authorizedDapp.referencesToAuthorizedPersonas[id: authorizedPersona.id] = authorizedPersona
+		try await authorizedDappsClient.updateOrAddAuthorizedDapp(authorizedDapp)
+	}
 
 	func goBackEffect(for state: inout State) -> EffectTask<Action> {
 		state.responseItems.removeLast()
