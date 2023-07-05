@@ -155,6 +155,7 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 			return .none
 
 		case let .useExistingLedger(ledger):
+			state.knownLedgers.append(ledger)
 			state.destinations = .nameLedgerAndDerivePublicKeys(.init(
 				networkID: state.networkID,
 				olympiaAccounts: state.olympiaAccounts.unvalidated,
