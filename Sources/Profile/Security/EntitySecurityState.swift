@@ -32,6 +32,8 @@ extension EntitySecurityState {
 		switch self {
 		case let .unsecured(control):
 			return control.entityIndex
+		case let .securified(securified):
+			return securified.entityIndex
 		}
 	}
 

@@ -32,8 +32,8 @@ extension EntityBaseProtocol {
 		switch securityState {
 		case let .unsecured(unsecuredEntityControl):
 			return unsecuredEntityControl.authenticationSigning != nil
-		case let .securified(securified):
-			return securified.authenticationSigning != nil
+		case .securified:
+			return true
 		}
 	}
 }

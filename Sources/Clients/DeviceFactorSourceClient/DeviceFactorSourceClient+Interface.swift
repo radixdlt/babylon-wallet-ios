@@ -173,25 +173,14 @@ extension DeviceFactorSourceClient {
 						return try extractPrimaryRoleSuperAdminDeviceFactorInstance(from: securified)
 					}
 				}
-				let curve = factorInstance.publicKey.curve
+			}()
 
-				loggerGlobal.debug("🔏 Signing data with device, with entity=\(entity.displayName), curve=\(curve), factor source hint.name=\(deviceFactorSource.hint.name), hint.model=\(deviceFactorSource.hint.model)")
+			let derivationPath = factorInstance.derivationPath
 
-				let signatureWithPublicKey = try await self.signatureFromOnDeviceHD(.init(
-					hdRoot: hdRoot,
-					derivationPath: derivationPath,
-					curve: curve,
-					hashedData: Data(hashedDataToSign)
-				))
-
-				let entitySignature = SignatureOfEntity(
-					signerEntity: entity,
-					derivationPath: derivationPath,
-					factorSourceID: factorSourceID.embed(),
-					signatureWithPublicKey: signatureWithPublicKey
-				)
-
-				signatures.insert(entitySignature)
+			if factorInstance.factorSourceID != factorSourceID {
+				let errMsg = "Discrepancy, you specified to use a device factor source you beleived to be the one controlling the entity, but it does not match the genesis factor source id."
+				loggerGlobal.critical(.init(stringLiteral: errMsg))
+				assertionFailure(errMsg)
 			}
 			let curve = factorInstance.publicKey.curve
 
@@ -201,7 +190,7 @@ extension DeviceFactorSourceClient {
 				hdRoot: hdRoot,
 				derivationPath: derivationPath,
 				curve: curve,
-				unhashedData: Data(unhashedDataToSign)
+				hashedData: Data(hashedDataToSign)
 			))
 
 			let entitySignature = SignatureOfEntity(
