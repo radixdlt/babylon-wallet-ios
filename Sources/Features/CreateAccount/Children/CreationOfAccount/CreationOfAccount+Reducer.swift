@@ -40,10 +40,6 @@ public struct CreationOfAccount: Sendable, FeatureReducer {
 		}
 	}
 
-	public enum ViewAction: Sendable, Equatable {
-		case onFirstTask
-	}
-
 	public enum InternalAction: Sendable, Equatable {
 		case createAccountResult(TaskResult<Profile.Network.Account>)
 	}
@@ -91,7 +87,7 @@ public struct CreationOfAccount: Sendable, FeatureReducer {
 
 		case let .createAccountResult(.success(account)):
 			return .task {
-				try await accountsClient.saveVirtualAccount(.init(account: account, shouldUpdateFactorSourceNextDerivationIndex: true))
+				try await accountsClient.saveVirtualAccount(.init(account: account))
 				return .delegate(.createdAccount(account))
 			} catch: { error in
 				loggerGlobal.error("Failed to save newly created virtual account into profile: \(error)")

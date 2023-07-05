@@ -4,19 +4,17 @@ import ScanQRFeature
 
 #if DEBUG
 import Cryptography
-import EngineToolkit
 extension AccountAddress {
 	public static func random(networkID: NetworkID? = nil) -> Self {
 		let curve25519PublicKey = Curve25519.PrivateKey().publicKey
-		let address = try! EngineToolkit()
+		return try! RadixEngine.instance
 			.deriveVirtualAccountAddressRequest(
 				request: .init(
 					publicKey: SLIP10.PublicKey.eddsaEd25519(curve25519PublicKey).intoEngine(),
 					networkId: networkID ?? .default
 				)
 			)
-			.get().virtualAccountAddress.address
-		return try! .init(address: address)
+			.get().virtualAccountAddress
 	}
 }
 #endif

@@ -1,9 +1,6 @@
 import Cryptography
-import EngineToolkitModels
+import EngineToolkit
 import Prelude
-
-// MARK: - CannotCreateDerivationPathEntityIndexIsOutOfBound
-struct CannotCreateDerivationPathEntityIndexIsOutOfBound: Swift.Error {}
 
 extension HD.Path.Component.Child {
 	public static let bip44Purpose: Self = .init(nonHardenedValue: 44, isHardened: true)
@@ -47,7 +44,7 @@ extension HD.Path.Full {
 
 	public static func identity(
 		networkID: NetworkID,
-		index: Profile.Network.NextDerivationIndices.Index,
+		index: HD.Path.Component.Child.Value,
 		keyKind: KeyKind
 	) throws -> Self {
 		try .defaultForEntity(
@@ -60,7 +57,7 @@ extension HD.Path.Full {
 
 	public static func account(
 		networkID: NetworkID,
-		index: Profile.Network.NextDerivationIndices.Index,
+		index: HD.Path.Component.Child.Value,
 		keyKind: KeyKind
 	) throws -> Self {
 		try .defaultForEntity(
@@ -74,16 +71,9 @@ extension HD.Path.Full {
 	public static func defaultForEntity(
 		networkID: NetworkID,
 		entityKind: EntityKind,
-		index unboundIndex: Profile.Network.NextDerivationIndices.Index,
+		index: HD.Path.Component.Child.Value,
 		keyKind: KeyKind
 	) throws -> Self {
-		guard
-			unboundIndex >= 0,
-			Int(HierarchicalDeterministic.Path.Component.Child.Value.max) > unboundIndex
-		else {
-			throw CannotCreateDerivationPathEntityIndexIsOutOfBound()
-		}
-		let index = HierarchicalDeterministic.Path.Component.Child.Value(unboundIndex)
 		let isHardened = true
 		return try Self(
 			children: [
@@ -105,7 +95,7 @@ public protocol EntityDerivationPathProtocol: DerivationPathSchemeProtocol {
 	var fullPath: HD.Path.Full { get }
 	init(
 		networkID: NetworkID,
-		index: Profile.Network.NextDerivationIndices.Index,
+		index: HD.Path.Component.Child.Value,
 		keyKind: KeyKind
 	) throws
 

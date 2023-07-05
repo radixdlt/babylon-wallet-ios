@@ -1,11 +1,15 @@
 import Cryptography
-import EngineToolkitModels
+import EngineToolkit
 import Prelude
 
 // MARK: - EntityBaseProtocol
 public protocol EntityBaseProtocol {
 	/// The ID of the network this entity exists on.
 	var networkID: NetworkID { get }
+
+	/// The index of the account, being a counter, e.g. if you already have two accounts and create a third,
+	/// the index of the new account will be 2 (and the indices of the first is 0 and second is 1).
+	var index: HD.Path.Component.Child.Value { get }
 
 	/// Security state of this entity, either `secured` or not (controlled by a single FactorInstance)
 	var securityState: EntitySecurityState { get }
@@ -38,12 +42,12 @@ extension EntityBaseProtocol {
 /// An `Account` or a `Persona`
 public protocol EntityProtocol: EntityBaseProtocol, Sendable, Equatable, Identifiable where ID == EntityAddress {
 	/// The type of address of entity.
-	associatedtype EntityAddress: AddressKindProtocol & Hashable
+	associatedtype EntityAddress: AddressProtocol & Hashable
 	associatedtype ExtraProperties: Sendable
 
 	static var entityKind: EntityKind { get }
 
-	static func deriveAddress(
+	static func deriveVirtualAddress(
 		networkID: NetworkID,
 		factorInstance: HierarchicalDeterministicFactorInstance
 	) throws -> EntityAddress
@@ -75,6 +79,7 @@ extension EntityProtocol {
 
 	public init(
 		networkID: NetworkID,
+		index: HD.Path.Component.Child.Value,
 		address: EntityAddress,
 		factorInstance: HierarchicalDeterministicFactorInstance,
 		displayName: NonEmpty<String>,
@@ -83,7 +88,7 @@ extension EntityProtocol {
 		self.init(
 			networkID: networkID,
 			address: address,
-			securityState: .unsecured(.init(transactionSigning: factorInstance)),
+			securityState: .unsecured(.init(entityIndex: index, transactionSigning: factorInstance)),
 			displayName: displayName,
 			extraProperties: extraProperties
 		)
@@ -91,13 +96,15 @@ extension EntityProtocol {
 
 	public init(
 		networkID: NetworkID,
+		index: HD.Path.Component.Child.Value,
 		factorInstance: HierarchicalDeterministicFactorInstance,
 		displayName: NonEmpty<String>,
 		extraProperties: ExtraProperties
 	) throws {
-		let address = try Self.deriveAddress(networkID: networkID, factorInstance: factorInstance)
+		let address = try Self.deriveVirtualAddress(networkID: networkID, factorInstance: factorInstance)
 		self.init(
 			networkID: networkID,
+			index: index,
 			address: address,
 			factorInstance: factorInstance,
 			displayName: displayName,

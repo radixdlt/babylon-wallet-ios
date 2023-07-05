@@ -17,7 +17,7 @@ extension ImportLegacyWalletClient: DependencyKey {
 		) async throws -> (accounts: NonEmpty<OrderedSet<MigratedAccount>>, networkID: NetworkID) {
 			let sortedOlympia = accounts.sorted(by: \.addressIndex)
 			let networkID = Radix.Gateway.default.network.id // we import to the default network, not the current.
-			let accountIndexOffset = try await accountsClient.getAccountsOnCurrentNetwork().count
+			let accountIndex = await accountsClient.nextAccountIndex(networkID)
 
 			var accountsSet = OrderedSet<MigratedAccount>()
 			for olympiaAccount in sortedOlympia {
@@ -28,13 +28,13 @@ extension ImportLegacyWalletClient: DependencyKey {
 					derivationPath: olympiaAccount.path.wrapAsDerivationPath()
 				)
 				let displayName = olympiaAccount.displayName ?? "Unnamned olympia account \(olympiaAccount.addressIndex)"
-				let accountIndex = accountIndexOffset + Int(olympiaAccount.addressIndex)
 
 				let babylon = try Profile.Network.Account(
 					networkID: networkID,
+					index: HD.Path.Component.Child.Value(accountIndex),
 					factorInstance: factorInstance,
 					displayName: displayName,
-					extraProperties: .init(appearanceID: .fromIndex(accountIndex))
+					extraProperties: .init(appearanceID: .fromIndex(.init(accountIndex)))
 				)
 
 				let migrated = MigratedAccount(olympia: olympiaAccount, babylon: babylon)
@@ -48,8 +48,7 @@ extension ImportLegacyWalletClient: DependencyKey {
 			// Save all accounts
 			for account in accounts {
 				try await accountsClient.saveVirtualAccount(.init(
-					account: account.babylon,
-					shouldUpdateFactorSourceNextDerivationIndex: false
+					account: account.babylon
 				))
 			}
 

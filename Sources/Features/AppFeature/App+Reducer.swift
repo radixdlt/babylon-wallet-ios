@@ -35,7 +35,6 @@ public struct App: Sendable, FeatureReducer {
 
 	public enum InternalAction: Sendable, Equatable {
 		case incompatibleProfileDeleted
-		case displayErrorAlert(App.UserFacingError)
 		case toMain(isAccountRecoveryNeeded: Bool)
 		case toOnboarding
 	}
@@ -48,17 +47,11 @@ public struct App: Sendable, FeatureReducer {
 
 	public struct Alerts: Sendable, ReducerProtocol {
 		public enum State: Sendable, Hashable {
-			case userErrorAlert(AlertState<Action.UserErrorAlertAction>)
 			case incompatibleProfileErrorAlert(AlertState<Action.IncompatibleProfileErrorAlertAction>)
 		}
 
 		public enum Action: Sendable, Equatable {
-			case userErrorAlert(UserErrorAlertAction)
 			case incompatibleProfileErrorAlert(IncompatibleProfileErrorAlertAction)
-
-			public enum UserErrorAlertAction: Sendable, Hashable {
-				// NB: no actions, just letting the system show the default "OK" button
-			}
 
 			public enum IncompatibleProfileErrorAlertAction: Sendable, Hashable {
 				case deleteWalletDataButtonTapped
@@ -99,16 +92,11 @@ public struct App: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .task:
-			if let engineVersion = try? EngineToolkit().information().get() {
+			if let engineVersion = try? RadixEngine.instance.information().get() {
 				print("EngineToolkit commit hash: \(engineVersion.lastCommitHash), package version: \(engineVersion.packageVersion)")
 			}
 			return .run { send in
 				for try await error in errorQueue.errors() {
-					if !_XCTIsTesting {
-						// easy to think a test failed if we print this warning during tests.
-						loggerGlobal.error("An error occurred: \(String(describing: error))")
-					}
-
 					// Maybe instead we should listen here for the Profile.State change,
 					// and when it switches to `.ephemeral` we navigate to onboarding.
 					// For now, we react to the specific error, since the Profile.State is meant to be private.
@@ -117,7 +105,6 @@ public struct App: Sendable, FeatureReducer {
 						// A slight delay to allow any modal that may be shown to be dismissed.
 						try? await clock.sleep(for: .seconds(0.5))
 					}
-					await send(.internal(.displayErrorAlert(UserFacingError(error))))
 				}
 			}
 
@@ -137,15 +124,6 @@ public struct App: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
-		case let .displayErrorAlert(error):
-			state.alert = .userErrorAlert(
-				.init(
-					title: { TextState(L10n.Common.errorAlertTitle) },
-					message: { TextState(error.legibleLocalizedDescription) }
-				)
-			)
-			return .none
-
 		case .incompatibleProfileDeleted:
 			return goToOnboarding(state: &state)
 		case let .toMain(isAccountRecoveryNeeded):

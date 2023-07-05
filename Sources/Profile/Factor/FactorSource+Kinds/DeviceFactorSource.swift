@@ -10,19 +10,15 @@ public struct DeviceFactorSource: FactorSourceProtocol {
 
 	public var hint: Hint // We update "name"
 
-	public var nextDerivationIndicesPerNetwork: NextDerivationIndicesPerNetwork? // nil for olympia
-
 	internal init(
 		id: ID,
 		common: FactorSource.Common,
-		hint: Hint,
-		nextDerivationIndicesPerNetwork: NextDerivationIndicesPerNetwork? = nil
+		hint: Hint
 	) {
 		precondition(id.kind == Self.kind)
 		self.id = id
 		self.common = common
 		self.hint = hint
-		self.nextDerivationIndicesPerNetwork = nextDerivationIndicesPerNetwork
 	}
 }
 
@@ -62,8 +58,7 @@ extension DeviceFactorSource {
 				addedOn: addedOn ?? date(),
 				lastUsedOn: lastUsedOn ?? date()
 			),
-			hint: .init(name: name, model: model),
-			nextDerivationIndicesPerNetwork: isOlympiaCompatible ? nil : .init()
+			hint: .init(name: name, model: model)
 		)
 	}
 
@@ -103,26 +98,3 @@ extension DeviceFactorSource {
 		)
 	}
 }
-
-import EngineToolkitModels
-extension DeviceFactorSource {
-	public func nextDerivationIndex(for entityKind: EntityKind, networkID: NetworkID) throws -> Profile.Network.NextDerivationIndices.Index {
-		guard let nextDerivationIndicesPerNetwork else {
-			throw CalledDerivationPathOnOlympiaDeviceFactorNotSupported()
-		}
-		return nextDerivationIndicesPerNetwork.nextForEntity(kind: entityKind, networkID: networkID)
-	}
-
-	public func derivationPath(forNext entityKind: EntityKind, networkID: NetworkID) throws -> DerivationPath {
-		guard let nextDerivationIndicesPerNetwork else {
-			throw CalledDerivationPathOnOlympiaDeviceFactorNotSupported()
-		}
-		return try nextDerivationIndicesPerNetwork.derivationPathForNextEntity(
-			kind: entityKind,
-			networkID: networkID
-		)
-	}
-}
-
-// MARK: - CalledDerivationPathOnOlympiaDeviceFactorNotSupported
-struct CalledDerivationPathOnOlympiaDeviceFactorNotSupported: Swift.Error {}

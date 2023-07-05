@@ -41,7 +41,6 @@ extension NewAccountCompletion {
 		}
 	}
 
-	@MainActor
 	public struct View: SwiftUI.View {
 		private let store: StoreOf<NewAccountCompletion>
 
@@ -88,7 +87,6 @@ extension NewAccountCompletion {
 }
 
 private extension NewAccountCompletion.View {
-	@MainActor
 	@ViewBuilder
 	func accountsStackView(
 		with viewStore: ViewStoreOf<NewAccountCompletion>
@@ -120,12 +118,10 @@ private extension NewAccountCompletion.View {
 		}
 	}
 
-	@MainActor
 	func scale(index: Int) -> CGFloat {
 		1 - (CGFloat(index + 1) * 0.05)
 	}
 
-	@MainActor
 	func reversedZIndex(count: Int, index: Int) -> Double {
 		Double(count - index)
 	}

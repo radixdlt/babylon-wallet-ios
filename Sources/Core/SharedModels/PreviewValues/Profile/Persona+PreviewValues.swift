@@ -7,9 +7,10 @@ extension Profile.Network.Persona {
 		try! Self(
 			networkID: .nebunet,
 			address: .init(
-				address: "identity_tdx_a_1qwv0unmwmxschqj8sntg6n9eejkrr6yr6fa4ekxazdzqhm6wy5"
+				validatingAddress: "identity_tdx_a_1qwv0unmwmxschqj8sntg6n9eejkrr6yr6fa4ekxazdzqhm6wy5"
 			),
 			securityState: .unsecured(.init(
+				entityIndex: 0,
 				transactionSigning: .init(
 					factorSourceID: .device(hash: "09bfa80bcc9b75d6ad82d59730f7b179cbc668ba6ad4008721d5e6a179ff55f1"),
 					publicKey: .eddsaEd25519(.init(
@@ -31,9 +32,10 @@ extension Profile.Network.Persona {
 		try! Self(
 			networkID: .nebunet,
 			address: .init(
-				address: "identity_tdx_a_1qvlrgnqrvk6tzmg8z6lusprl3weupfkmu52gkfhmncjsnhn0kp"
+				validatingAddress: "identity_tdx_a_1qvlrgnqrvk6tzmg8z6lusprl3weupfkmu52gkfhmncjsnhn0kp"
 			),
 			securityState: .unsecured(.init(
+				entityIndex: 1,
 				transactionSigning: .init(
 					factorSourceID: .device(hash: "09bfa80bcc9b75d6ad82d59730f7b179cbc668ba6ad4008721d5e6a179ff55f1"),
 					publicKey: .eddsaEd25519(.init(

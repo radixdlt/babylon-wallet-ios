@@ -7,7 +7,7 @@ final class TestOfErrors: TestCase {
 	// MARK: From EngineToolkit
 
 	func test_error_serializeRequestFailure_utf8Decode() throws {
-		let sut = EngineToolkit(jsonStringFromJSONData: { _ in nil /* utf8 decode fail */ })
+		let sut = RadixEngine(jsonStringFromJSONData: { _ in nil /* utf8 decode fail */ })
 		XCTAssert(
 			sut.information(),
 			throwsSpecificError: .serializeRequestFailure(.utf8DecodingFailed)
@@ -15,7 +15,7 @@ final class TestOfErrors: TestCase {
 	}
 
 	func test_error_serializeRequestFailure_jsonEncodeRequestFailed() throws {
-		let sut = EngineToolkit(jsonEncoder: FailingJSONEncoder())
+		let sut = RadixEngine(jsonEncoder: FailingJSONEncoder())
 		XCTAssert(
 			sut.information(),
 			throwsSpecificError: .serializeRequestFailure(.jsonEncodeRequestFailed)
@@ -23,10 +23,10 @@ final class TestOfErrors: TestCase {
 	}
 
 	func test_error_callLibraryFunctionFailure_no_output_from_function() throws {
-		let sut = EngineToolkit()
+		let sut = RadixEngine.instance
 
 		// Have to use otherwise private method `callLibraryFunction` to mock mo response from `function`.
-		let emptyResult: Result<InformationResponse, EngineToolkit.Error> = sut.callLibraryFunction(
+		let emptyResult: Result<InformationResponse, RadixEngine.Error> = sut.callLibraryFunction(
 			request: InformationRequest(),
 			function: { _ in nil /* mock nil response */ }
 		)
@@ -38,7 +38,7 @@ final class TestOfErrors: TestCase {
 	}
 
 	func test_error_deserializeResponseFailure_utf8EncodingFailed() throws {
-		let sut = EngineToolkit(jsonDataFromJSONString: { _ in nil /* utf8 encode fail */ })
+		let sut = RadixEngine(jsonDataFromJSONString: { _ in nil /* utf8 encode fail */ })
 		XCTAssert(
 			sut.information(),
 			throwsSpecificError: .deserializeResponseFailure(.beforeDecodingError(.failedToUTF8EncodeResponseJSONString))

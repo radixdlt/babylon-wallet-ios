@@ -507,7 +507,9 @@ public struct SimpleAuthDappDetails: Sendable, FeatureReducer {
 				.items
 				// FIXME: Uncomment this when when we can rely on dApps conforming to the standards
 				// .filter { $0.metadata.dappDefinition == dAppDefinitionAddress.address }
-				.compactMap(\.resourceDetails)
+				.compactMap {
+					try $0.resourceDetails()
+				}
 
 			return State.Resources(fungible: allResourceItems.filter { $0.fungibility == .fungible },
 			                       nonFungible: allResourceItems.filter { $0.fungibility == .nonFungible })
@@ -550,9 +552,10 @@ public struct SimpleAuthDappDetails: Sendable, FeatureReducer {
 }
 
 extension GatewayAPI.StateEntityDetailsResponseItem {
-	var resourceDetails: SimpleAuthDappDetails.State.Resources.ResourceDetails? {
+	func resourceDetails() throws -> SimpleAuthDappDetails.State.Resources.ResourceDetails? {
 		guard let fungibility else { return nil }
-		return .init(address: .init(address: address),
+		let address = try ResourceAddress(validatingAddress: address)
+		return .init(address: address,
 		             fungibility: fungibility,
 		             name: metadata.name ?? L10n.AuthorizedDapps.DAppDetails.unknownTokenName,
 		             symbol: metadata.symbol,

@@ -1,5 +1,5 @@
 import Cryptography
-import EngineToolkitModels
+import EngineToolkit
 import Profile
 import TestingPrelude
 
@@ -27,18 +27,6 @@ final class FactorSourcesCodableTests: TestCase {
 				model: "iPhone 16",
 				name: "New phone"
 			)
-			babylon.nextDerivationIndicesPerNetwork?.increaseNextDerivationIndex(
-				for: .account,
-				networkID: networkID
-			)
-			babylon.nextDerivationIndicesPerNetwork?.increaseNextDerivationIndex(
-				for: .account,
-				networkID: networkID
-			)
-			babylon.nextDerivationIndicesPerNetwork?.increaseNextDerivationIndex(
-				for: .identity,
-				networkID: networkID
-			)
 
 			anyFactorSources.append(babylon)
 
@@ -47,7 +35,6 @@ final class FactorSourcesCodableTests: TestCase {
 				model: "iPhone 14 Pro Max",
 				name: "Old phone"
 			)
-			XCTAssertNil(olympia.nextDerivationIndicesPerNetwork)
 			anyFactorSources.append(olympia)
 
 			var ledger = try LedgerHardwareWalletFactorSource.model(
@@ -55,10 +42,7 @@ final class FactorSourcesCodableTests: TestCase {
 				name: "Orange",
 				deviceID: .init(.deadbeef32Bytes)
 			)
-			ledger.nextDerivationIndicesPerNetwork?.increaseNextDerivationIndex(
-				for: .account,
-				networkID: networkID
-			)
+
 			anyFactorSources.append(ledger)
 
 			try anyFactorSources.append(
@@ -70,7 +54,7 @@ final class FactorSourcesCodableTests: TestCase {
 
 			anyFactorSources.append(
 				TrustedContactFactorSource.from(
-					radixAddress: "account_tdx_c_1px0jul7a44s65568d32f82f0lkssjwx6f5t5e44yl6csqurxw3",
+					radixAddress: "account_rdx1283u6e8r2jnz4a3jwv0hnrqfr5aq50yc9ts523sd96hzfjxqqcs89q",
 					emailAddress: "hi@rdx.works",
 					name: "My friend"
 				)

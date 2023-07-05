@@ -1,5 +1,5 @@
 import Cryptography
-import EngineToolkitModels
+import EngineToolkit
 import Prelude
 
 // MARK: - AccountDerivationPath
@@ -106,7 +106,7 @@ public struct AccountBabylonDerivationPath:
 
 	public init(
 		networkID: NetworkID,
-		index: Profile.Network.NextDerivationIndices.Index,
+		index: HD.Path.Component.Child.Value,
 		keyKind: KeyKind
 	) throws {
 		try self.init(fullPath: HD.Path.Full.account(

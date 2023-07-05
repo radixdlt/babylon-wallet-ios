@@ -9,32 +9,10 @@ public struct Securified: Sendable, Hashable, Codable {
 
 	/// The factor instance which can be used for ROLA.
 	public var authenticationSigning: HierarchicalDeterministicFactorInstance?
-
 	/// The factor instance used to encrypt/decrypt messages
 	public var messageEncryption: HierarchicalDeterministicFactorInstance?
 
-	init(
-		// WHAT IS THIS?! 🤔
-		// given 2 virtual accounts, A and LEDGER account B
-		// they have the SAME derivation path, since index=0.
-		canonicalDerivationPathForNonTXSigningFactorInstance: DerivationPath,
-		accessController: AccessController,
-		transactionSigningFactorInstances: OrderedSet<FactorInstance>
-	) throws {
-		guard transactionSigningFactorInstances.allSatisfy({
-			switch $0.badge {
-			case let .virtual(.hierarchicalDeterministic(hdPubKey)):
-				return hdPubKey.publicKey.curve != .secp256k1
-			}
-		}) else {
-			struct Secp256k1NotAllowedInSecurifiedEntities: Swift.Error {}
-			throw Secp256k1NotAllowedInSecurifiedEntities()
-		}
-		self.accessController = accessController
-		self.transactionSigningFactorInstances = transactionSigningFactorInstances
-		self.authenticationSigning = authenticationSigning
-		self.messageEncryption = messageEncryption
-	}
+	public init(entityIndex: ..)
 
 	/// Maps from `FactorInstance.ID` to `FactorInstance`, which is what is useful for use through out the wallet.
 	public var transactionSigningStructure: AppliedSecurityStructure {
@@ -67,5 +45,3 @@ public struct Securified: Sendable, Hashable, Codable {
 		)
 	}
 }
-
-public typealias AppliedSecurityStructure = AbstractSecurityStructure<FactorInstance>

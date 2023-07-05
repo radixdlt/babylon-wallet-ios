@@ -1,5 +1,5 @@
 import Cryptography
-import EngineToolkitModels
+import EngineToolkit
 import Prelude
 
 // MARK: - IdentityHierarchicalDeterministicDerivationPath
@@ -34,7 +34,7 @@ public struct IdentityHierarchicalDeterministicDerivationPath:
 
 	public init(
 		networkID: NetworkID,
-		index: Profile.Network.NextDerivationIndices.Index,
+		index: HD.Path.Component.Child.Value,
 		keyKind: KeyKind
 	) throws {
 		try self.init(fullPath: HD.Path.Full.identity(

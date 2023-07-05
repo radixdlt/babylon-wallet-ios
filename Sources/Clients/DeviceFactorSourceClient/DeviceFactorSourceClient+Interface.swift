@@ -59,19 +59,19 @@ public struct SignatureFromOnDeviceHDRequest: Sendable, Hashable {
 	public let derivationPath: DerivationPath
 	public let curve: SLIP10.Curve
 
-	/// The data to hash and sign
-	public let unhashedData: Data
+	/// The data to sign
+	public let hashedData: Data
 
 	public init(
 		hdRoot: HD.Root,
 		derivationPath: DerivationPath,
 		curve: SLIP10.Curve,
-		unhashedData: Data
+		hashedData: Data
 	) {
 		self.hdRoot = hdRoot
 		self.derivationPath = derivationPath
 		self.curve = curve
-		self.unhashedData = unhashedData
+		self.hashedData = hashedData
 	}
 }
 
@@ -90,7 +90,7 @@ struct IncorrectSignatureCountExpectedExactlyOne: Swift.Error {}
 extension DeviceFactorSourceClient {
 	public func signUsingDeviceFactorSource(
 		signerEntity: EntityPotentiallyVirtual,
-		unhashedDataToSign: some DataProtocol,
+		hashedDataToSign: some DataProtocol,
 		purpose: SigningPurpose
 	) async throws -> SignatureOfEntity {
 		@Dependency(\.factorSourcesClient) var factorSourcesClient
@@ -124,7 +124,7 @@ extension DeviceFactorSourceClient {
 		let signatures = try await signUsingDeviceFactorSource(
 			deviceFactorSource: deviceFactorSource,
 			signerEntities: [signerEntity],
-			unhashedDataToSign: unhashedDataToSign,
+			hashedDataToSign: hashedDataToSign,
 			purpose: purpose
 		)
 
@@ -137,7 +137,7 @@ extension DeviceFactorSourceClient {
 	public func signUsingDeviceFactorSource(
 		deviceFactorSource: DeviceFactorSource,
 		signerEntities: Set<EntityPotentiallyVirtual>,
-		unhashedDataToSign: some DataProtocol,
+		hashedDataToSign: some DataProtocol,
 		purpose: SigningPurpose
 	) async throws -> Set<SignatureOfEntity> {
 		@Dependency(\.factorSourcesClient) var factorSourcesClient
@@ -173,14 +173,25 @@ extension DeviceFactorSourceClient {
 						return try extractPrimaryRoleSuperAdminDeviceFactorInstance(from: securified)
 					}
 				}
-			}()
+				let curve = factorInstance.publicKey.curve
 
-			let derivationPath = factorInstance.derivationPath
+				loggerGlobal.debug("🔏 Signing data with device, with entity=\(entity.displayName), curve=\(curve), factor source hint.name=\(deviceFactorSource.hint.name), hint.model=\(deviceFactorSource.hint.model)")
 
-			if factorInstance.factorSourceID != factorSourceID {
-				let errMsg = "Discrepancy, you specified to use a device factor source you beleived to be the one controlling the entity, but it does not match the genesis factor source id."
-				loggerGlobal.critical(.init(stringLiteral: errMsg))
-				assertionFailure(errMsg)
+				let signatureWithPublicKey = try await self.signatureFromOnDeviceHD(.init(
+					hdRoot: hdRoot,
+					derivationPath: derivationPath,
+					curve: curve,
+					hashedData: Data(hashedDataToSign)
+				))
+
+				let entitySignature = SignatureOfEntity(
+					signerEntity: entity,
+					derivationPath: derivationPath,
+					factorSourceID: factorSourceID.embed(),
+					signatureWithPublicKey: signatureWithPublicKey
+				)
+
+				signatures.insert(entitySignature)
 			}
 			let curve = factorInstance.publicKey.curve
 

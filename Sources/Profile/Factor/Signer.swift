@@ -1,5 +1,5 @@
 import Cryptography
-import EngineToolkitModels
+import EngineToolkit
 import Prelude
 
 // MARK: - ExpectedAccountGotPersona
@@ -53,6 +53,10 @@ public enum EntityPotentiallyVirtual: Sendable, Hashable, EntityBaseProtocol, Id
 		case let .account(entity): return entity.address.address
 		case let .persona(entity): return entity.address.address
 		}
+	}
+
+	public var index: HD.Path.Component.Child.Value {
+		securityState.entityIndex
 	}
 
 	case account(Profile.Network.Account)

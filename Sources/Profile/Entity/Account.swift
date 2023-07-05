@@ -1,6 +1,5 @@
 import Cryptography
 import EngineToolkit
-import EngineToolkitModels
 import Prelude
 
 // MARK: - EntityExtraProperties
@@ -47,6 +46,10 @@ extension Profile.Network {
 	{
 		/// The ID of the network this account exists on.
 		public let networkID: NetworkID
+
+		public var index: HD.Path.Component.Child.Value {
+			securityState.entityIndex
+		}
 
 		/// The globally unique and identifiable Radix component address of this account. Can be used as
 		/// a stable ID. Cryptographically derived from a seeding public key which typically was created by
@@ -112,19 +115,19 @@ extension Profile.Network.Account {
 
 	public static let nameMaxLength = 30
 
-	public static func deriveAddress(
+	public static func deriveVirtualAddress(
 		networkID: NetworkID,
 		factorInstance: HierarchicalDeterministicFactorInstance
 	) throws -> EntityAddress {
 		_ = try factorInstance.derivationPath.asAccountPath()
-		let response = try EngineToolkit().deriveVirtualAccountAddressRequest(
+		let response = try RadixEngine.instance.deriveVirtualAccountAddressRequest(
 			request: .init(
 				publicKey: factorInstance.publicKey.intoEngine(),
 				networkId: networkID
 			)
 		).get()
 
-		return try EntityAddress(address: response.virtualAccountAddress.address)
+		return response.virtualAccountAddress
 	}
 
 	public var isOlympiaAccount: Bool {

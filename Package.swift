@@ -80,6 +80,7 @@ package.addModules([
 			"AppPreferencesClient",
 			"MainFeature",
 			"OnboardingFeature",
+			"OverlayWindowClient",
 			"SplashFeature",
 		],
 		tests: .yes()
@@ -193,9 +194,11 @@ package.addModules([
 		name: "DerivePublicKeysFeature",
 		featureSuffixDroppedFromFolderName: true,
 		dependencies: [
+			"AccountsClient",
+			"DeviceFactorSourceClient",
 			"FactorSourcesClient",
 			"LedgerHardwareWalletClient",
-			"DeviceFactorSourceClient",
+			"PersonasClient",
 		],
 		tests: .no
 	),
@@ -610,7 +613,8 @@ package.addModules([
 		exclude: [
 			"CodeGen/Input/",
 		],
-		tests: .yes()
+		tests: .yes(),
+		disableConcurrencyChecks: true
 	),
 
 	.client(
@@ -675,12 +679,15 @@ package.addModules([
 		],
 		tests: .no
 	),
-
 	.client(
-		name: "OnboardingClient",
+		name: "OverlayWindowClient",
+		dependencies: [],
+		tests: .no
+	),
+	.client(
+		name: "OverlayWindowClientLive",
 		dependencies: [
-			"Profile",
-			"Cryptography",
+			"OverlayWindowClient",
 		],
 		tests: .no
 	),
@@ -691,6 +698,15 @@ package.addModules([
 			"ProfileStore",
 		],
 		tests: .yes()
+	),
+
+	.client(
+		name: "OnboardingClient",
+		dependencies: [
+			"Profile",
+			"Cryptography",
+		],
+		tests: .no
 	),
 
 	.client(
@@ -910,7 +926,6 @@ package.addModules([
 	.core(
 		name: "SharedModels",
 		dependencies: [
-			"EngineToolkitModels",
 			"RadixConnectModels",
 			"Profile",
 		],
@@ -948,8 +963,8 @@ package.addModules([
 		category: .engineToolkit,
 		dependencies: [
 			"Cryptography",
-			"EngineToolkitModels",
 			"RadixEngineToolkit",
+			.product(name: "ComposableArchitecture", package: "swift-composable-architecture"), // actually just CasePaths
 		],
 		tests: .yes(
 			dependencies: [],
@@ -957,14 +972,6 @@ package.addModules([
 				.process("TestVectors/"),
 			]
 		)
-	),
-	.module(
-		name: "EngineToolkitModels",
-		category: .engineToolkit,
-		dependencies: [
-			"Cryptography",
-		],
-		tests: .no
 	),
 	.module(
 		name: "RadixConnectModels",
@@ -1160,6 +1167,7 @@ extension Package {
 		let resources: [Resource]?
 		let plugins: [Target.PluginUsage]?
 		let tests: Tests
+		let disableConcurrencyChecks: Bool
 		let isProduct: Bool
 
 		static func feature(
@@ -1171,6 +1179,7 @@ extension Package {
 			resources: [Resource]? = nil,
 			plugins: [Target.PluginUsage]? = nil,
 			tests: Tests,
+			disableConcurrencyChecks: Bool = false,
 			isProduct: Bool = true
 		) -> Self {
 			.init(
@@ -1182,6 +1191,7 @@ extension Package {
 				resources: resources,
 				plugins: plugins,
 				tests: tests,
+				disableConcurrencyChecks: disableConcurrencyChecks,
 				isProduct: isProduct
 			)
 		}
@@ -1194,6 +1204,7 @@ extension Package {
 			resources: [Resource]? = nil,
 			plugins: [Target.PluginUsage]? = nil,
 			tests: Tests,
+			disableConcurrencyChecks: Bool = false,
 			isProduct: Bool = true
 		) -> Self {
 			.init(
@@ -1205,6 +1216,7 @@ extension Package {
 				resources: resources,
 				plugins: plugins,
 				tests: tests,
+				disableConcurrencyChecks: disableConcurrencyChecks,
 				isProduct: isProduct
 			)
 		}
@@ -1217,6 +1229,7 @@ extension Package {
 			resources: [Resource]? = nil,
 			plugins: [Target.PluginUsage]? = nil,
 			tests: Tests,
+			disableConcurrencyChecks: Bool = false,
 			isProduct: Bool = true
 		) -> Self {
 			.init(
@@ -1228,6 +1241,7 @@ extension Package {
 				resources: resources,
 				plugins: plugins,
 				tests: tests,
+				disableConcurrencyChecks: disableConcurrencyChecks,
 				isProduct: isProduct
 			)
 		}
@@ -1241,6 +1255,7 @@ extension Package {
 			resources: [Resource]? = nil,
 			plugins: [Target.PluginUsage]? = nil,
 			tests: Tests,
+			disableConcurrencyChecks: Bool = false,
 			isProduct: Bool = true
 		) -> Self {
 			.init(
@@ -1252,6 +1267,7 @@ extension Package {
 				resources: resources,
 				plugins: plugins,
 				tests: tests,
+				disableConcurrencyChecks: disableConcurrencyChecks,
 				isProduct: isProduct
 			)
 		}
@@ -1300,7 +1316,7 @@ extension Package {
 				path: targetPath,
 				exclude: module.exclude,
 				resources: module.resources,
-				swiftSettings: [
+				swiftSettings: module.disableConcurrencyChecks ? [] : [
 					.unsafeFlags([
 						"-Xfrontend", "-warn-concurrency",
 						"-Xfrontend", "-enable-actor-data-race-checks",

@@ -13,32 +13,38 @@ import AnyCodable
 @available(*, deprecated, renamed: "GatewayAPI.StateEntityDetailsRequest")
 public typealias StateEntityDetailsRequest = GatewayAPI.StateEntityDetailsRequest
 
-// MARK: - GatewayAPI.StateEntityDetailsRequest
 extension GatewayAPI {
-	public struct StateEntityDetailsRequest: Codable, Hashable {
-		public private(set) var atLedgerState: LedgerStateSelector?
-		public private(set) var addresses: [String]
-		public private(set) var aggregationLevel: ResourceAggregationLevel?
 
-		public init(atLedgerState: LedgerStateSelector? = nil, addresses: [String], aggregationLevel: ResourceAggregationLevel? = nil) {
-			self.atLedgerState = atLedgerState
-			self.addresses = addresses
-			self.aggregationLevel = aggregationLevel
-		}
+public struct StateEntityDetailsRequest: Codable, Hashable {
 
-		public enum CodingKeys: String, CodingKey, CaseIterable {
-			case atLedgerState = "at_ledger_state"
-			case addresses
-			case aggregationLevel = "aggregation_level"
-		}
+    public private(set) var atLedgerState: LedgerStateSelector?
+    public private(set) var optIns: StateEntityDetailsOptIns?
+    public private(set) var addresses: [String]
+    public private(set) var aggregationLevel: ResourceAggregationLevel?
 
-		// Encodable protocol methods
+    public init(atLedgerState: LedgerStateSelector? = nil, optIns: StateEntityDetailsOptIns? = nil, addresses: [String], aggregationLevel: ResourceAggregationLevel? = nil) {
+        self.atLedgerState = atLedgerState
+        self.optIns = optIns
+        self.addresses = addresses
+        self.aggregationLevel = aggregationLevel
+    }
 
-		public func encode(to encoder: Encoder) throws {
-			var container = encoder.container(keyedBy: CodingKeys.self)
-			try container.encodeIfPresent(atLedgerState, forKey: .atLedgerState)
-			try container.encode(addresses, forKey: .addresses)
-			try container.encodeIfPresent(aggregationLevel, forKey: .aggregationLevel)
-		}
-	}
+    public enum CodingKeys: String, CodingKey, CaseIterable {
+        case atLedgerState = "at_ledger_state"
+        case optIns = "opt_ins"
+        case addresses
+        case aggregationLevel = "aggregation_level"
+    }
+
+    // Encodable protocol methods
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encodeIfPresent(atLedgerState, forKey: .atLedgerState)
+        try container.encodeIfPresent(optIns, forKey: .optIns)
+        try container.encode(addresses, forKey: .addresses)
+        try container.encodeIfPresent(aggregationLevel, forKey: .aggregationLevel)
+    }
+}
+
 }
