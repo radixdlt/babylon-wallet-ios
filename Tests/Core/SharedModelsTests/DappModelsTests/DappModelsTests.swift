@@ -10,7 +10,7 @@ final class ToDappResponseTests: TestCase {
 				.unauthorized(.init(
 					oneTimeAccounts: P2P.Dapp.Response.WalletInteractionSuccessResponse.AccountsRequestResponseItem.withoutProofOfOwnership(accounts: [
 						.init(
-							accountAddress: try! .init(validatingAddress: "account_tdx_b_1p8ahenyznrqy2w0tyg00r82rwuxys6z8kmrhh37c7maqpydx7p"),
+							accountAddress: try! .init(validatingAddress: "account_tdx_21_12yth59wfyl8e4axupym0c96g9heuf5j06lv2lgc2cuapzlmj6alzzn"),
 							label: "Label",
 							appearanceId: .fromIndex(0)
 						),
@@ -35,7 +35,7 @@ final class ToDappResponseTests: TestCase {
 					"oneTimeAccounts": [
 						"accounts": [
 							[
-								"address": "account_tdx_b_1p8ahenyznrqy2w0tyg00r82rwuxys6z8kmrhh37c7maqpydx7p",
+								"address": "account_tdx_21_12yth59wfyl8e4axupym0c96g9heuf5j06lv2lgc2cuapzlmj6alzzn",
 								"appearanceId": 0,
 								"label": "Label",
 							],
@@ -87,7 +87,7 @@ final class ToDappResponseTests: TestCase {
 				"version": 1,
 				"networkId": 34,
 				"origin": "radixdlt.dashboard.com",
-				"dAppDefinitionAddress": "account_tdx_c_1px26p5tyqq65809em2h4yjczxcxj776kaun6sv3dw66sc3wrm6",
+				"dAppDefinitionAddress": "account_tdx_21_12yth59wfyl8e4axupym0c96g9heuf5j06lv2lgc2cuapzlmj6alzzn",
 			],
 		]
 		try XCTAssertJSONDecoding(
@@ -110,7 +110,7 @@ final class ToDappResponseTests: TestCase {
 				metadata: .init(
 					version: 1, networkId: 34,
 					origin: "radixdlt.dashboard.com",
-					dAppDefinitionAddress: "account_tdx_c_1px26p5tyqq65809em2h4yjczxcxj776kaun6sv3dw66sc3wrm6"
+					dAppDefinitionAddress: "account_tdx_21_12yth59wfyl8e4axupym0c96g9heuf5j06lv2lgc2cuapzlmj6alzzn"
 				)
 			)
 		)
@@ -131,7 +131,7 @@ final class ToDappResponseTests: TestCase {
 				"version": 1,
 				"networkId": 34,
 				"origin": "https://dashboard-pr-126.rdx-works-main.extratools.works",
-				"dAppDefinitionAddress": "account_tdx_c_1px26p5tyqq65809em2h4yjczxcxj776kaun6sv3dw66sc3wrm6",
+				"dAppDefinitionAddress": "account_tdx_21_12yth59wfyl8e4axupym0c96g9heuf5j06lv2lgc2cuapzlmj6alzzn",
 			],
 		]
 		try XCTAssertJSONDecoding(
@@ -148,7 +148,7 @@ final class ToDappResponseTests: TestCase {
 				metadata: .init(
 					version: 1, networkId: 34,
 					origin: "https://dashboard-pr-126.rdx-works-main.extratools.works",
-					dAppDefinitionAddress: "account_tdx_c_1px26p5tyqq65809em2h4yjczxcxj776kaun6sv3dw66sc3wrm6"
+					dAppDefinitionAddress: "account_tdx_21_12yth59wfyl8e4axupym0c96g9heuf5j06lv2lgc2cuapzlmj6alzzn"
 				)
 			)
 		)
@@ -167,7 +167,7 @@ final class ToDappResponseTests: TestCase {
 				"version": 1,
 				"networkId": 34,
 				"origin": "https://dashboard-pr-126.rdx-works-main.extratools.works",
-				"dAppDefinitionAddress": "account_tdx_c_1px26p5tyqq65809em2h4yjczxcxj776kaun6sv3dw66sc3wrm6",
+				"dAppDefinitionAddress": "account_tdx_21_12yth59wfyl8e4axupym0c96g9heuf5j06lv2lgc2cuapzlmj6alzzn",
 			],
 		]
 		try XCTAssertJSONDecoding(
@@ -181,7 +181,7 @@ final class ToDappResponseTests: TestCase {
 					version: 1,
 					networkId: 34,
 					origin: "https://dashboard-pr-126.rdx-works-main.extratools.works",
-					dAppDefinitionAddress: "account_tdx_c_1px26p5tyqq65809em2h4yjczxcxj776kaun6sv3dw66sc3wrm6"
+					dAppDefinitionAddress: "account_tdx_21_12yth59wfyl8e4axupym0c96g9heuf5j06lv2lgc2cuapzlmj6alzzn"
 				)
 			)
 		)
@@ -201,7 +201,7 @@ final class ToDappResponseTests: TestCase {
 				"version": 1,
 				"networkId": 34,
 				"origin": "https://dashboard-pr-126.rdx-works-main.extratools.works",
-				"dAppDefinitionAddress": "account_tdx_c_1px26p5tyqq65809em2h4yjczxcxj776kaun6sv3dw66sc3wrm6",
+				"dAppDefinitionAddress": "account_tdx_21_12yth59wfyl8e4axupym0c96g9heuf5j06lv2lgc2cuapzlmj6alzzn",
 			],
 		]
 		try XCTAssertJSONDecoding(
@@ -215,7 +215,7 @@ final class ToDappResponseTests: TestCase {
 					version: 1,
 					networkId: 34,
 					origin: "https://dashboard-pr-126.rdx-works-main.extratools.works",
-					dAppDefinitionAddress: "account_tdx_c_1px26p5tyqq65809em2h4yjczxcxj776kaun6sv3dw66sc3wrm6"
+					dAppDefinitionAddress: "account_tdx_21_12yth59wfyl8e4axupym0c96g9heuf5j06lv2lgc2cuapzlmj6alzzn"
 				)
 			)
 		)
@@ -228,14 +228,14 @@ final class ToDappResponseTests: TestCase {
 				"discriminator": "authorizedRequest",
 				"auth": [
 					"discriminator": "usePersona",
-					"identityAddress": "identity_tdx_a_1qwv0unmwmxschqj8sntg6n9eejkrr6yr6fa4ekxazdzqhm6wy5",
+					"identityAddress": "identity_tdx_21_12tljxea3s0mse52jmpvsphr0haqs86sung8d3qlhr763nxttj59650",
 				],
 			],
 			"metadata": [
 				"version": 1,
 				"networkId": 34,
 				"origin": "https://dashboard-pr-126.rdx-works-main.extratools.works",
-				"dAppDefinitionAddress": "account_tdx_c_1px26p5tyqq65809em2h4yjczxcxj776kaun6sv3dw66sc3wrm6",
+				"dAppDefinitionAddress": "account_tdx_21_12yth59wfyl8e4axupym0c96g9heuf5j06lv2lgc2cuapzlmj6alzzn",
 			],
 		]
 		try XCTAssertJSONDecoding(
@@ -243,13 +243,13 @@ final class ToDappResponseTests: TestCase {
 			P2P.Dapp.RequestUnvalidated(
 				id: "ed987de8-fc30-40d0-81ea-e3eef117a2cc",
 				items: .request(.authorized(.init(
-					auth: .usePersona(.init(identityAddress: "identity_tdx_a_1qwv0unmwmxschqj8sntg6n9eejkrr6yr6fa4ekxazdzqhm6wy5"))
+					auth: .usePersona(.init(identityAddress: "identity_tdx_21_12tljxea3s0mse52jmpvsphr0haqs86sung8d3qlhr763nxttj59650"))
 				))),
 				metadata: .init(
 					version: 1,
 					networkId: 34,
 					origin: "https://dashboard-pr-126.rdx-works-main.extratools.works",
-					dAppDefinitionAddress: "account_tdx_c_1px26p5tyqq65809em2h4yjczxcxj776kaun6sv3dw66sc3wrm6"
+					dAppDefinitionAddress: "account_tdx_21_12yth59wfyl8e4axupym0c96g9heuf5j06lv2lgc2cuapzlmj6alzzn"
 				)
 			)
 		)
@@ -261,7 +261,7 @@ final class ToDappResponseTests: TestCase {
 			items: .request(.authorized(.init(
 				auth: .usePersona(.init(
 					persona: .init(
-						identityAddress: "identity_tdx_a_1qwv0unmwmxschqj8sntg6n9eejkrr6yr6fa4ekxazdzqhm6wy5",
+						identityAddress: "identity_tdx_21_12tljxea3s0mse52jmpvsphr0haqs86sung8d3qlhr763nxttj59650",
 						label: "MrHyde"
 					)))
 			)))
@@ -277,7 +277,7 @@ final class ToDappResponseTests: TestCase {
 					"auth": [
 						"discriminator": "usePersona",
 						"persona": [
-							"identityAddress": "identity_tdx_a_1qwv0unmwmxschqj8sntg6n9eejkrr6yr6fa4ekxazdzqhm6wy5",
+							"identityAddress": "identity_tdx_21_12tljxea3s0mse52jmpvsphr0haqs86sung8d3qlhr763nxttj59650",
 							"label": "MrHyde",
 						],
 					],
@@ -292,7 +292,7 @@ final class ToDappResponseTests: TestCase {
 			items: .request(.authorized(.init(
 				auth: .login(.withoutChallenge(.init(
 					persona: .init(
-						identityAddress: "identity_tdx_a_1qwv0unmwmxschqj8sntg6n9eejkrr6yr6fa4ekxazdzqhm6wy5",
+						identityAddress: "identity_tdx_21_12tljxea3s0mse52jmpvsphr0haqs86sung8d3qlhr763nxttj59650",
 						label: "MrHyde"
 					)
 				)))
@@ -309,7 +309,7 @@ final class ToDappResponseTests: TestCase {
 					"auth": [
 						"discriminator": "loginWithoutChallenge",
 						"persona": [
-							"identityAddress": "identity_tdx_a_1qwv0unmwmxschqj8sntg6n9eejkrr6yr6fa4ekxazdzqhm6wy5",
+							"identityAddress": "identity_tdx_21_12tljxea3s0mse52jmpvsphr0haqs86sung8d3qlhr763nxttj59650",
 							"label": "MrHyde",
 						],
 					],
@@ -324,7 +324,7 @@ final class ToDappResponseTests: TestCase {
 			items: .request(.authorized(.init(
 				auth: .login(.withChallenge(.init(
 					persona: .init(
-						identityAddress: "identity_tdx_a_1qwv0unmwmxschqj8sntg6n9eejkrr6yr6fa4ekxazdzqhm6wy5",
+						identityAddress: "identity_tdx_21_1225rkl8svrs5fdc8rcmc7dk8wy4n0dap8da6dn58hptv47w9hmha5p",
 						label: "MrHyde"
 					),
 					challenge: "deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef",
@@ -348,7 +348,7 @@ final class ToDappResponseTests: TestCase {
 					"auth": [
 						"discriminator": "loginWithChallenge",
 						"persona": [
-							"identityAddress": "identity_tdx_a_1qwv0unmwmxschqj8sntg6n9eejkrr6yr6fa4ekxazdzqhm6wy5",
+							"identityAddress": "identity_tdx_21_1225rkl8svrs5fdc8rcmc7dk8wy4n0dap8da6dn58hptv47w9hmha5p",
 							"label": "MrHyde",
 						],
 						"challenge": "deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef",
