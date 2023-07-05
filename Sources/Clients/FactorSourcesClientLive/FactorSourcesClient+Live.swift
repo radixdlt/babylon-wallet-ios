@@ -142,24 +142,17 @@ internal func signingFactors(
 	var signingFactors: [FactorSourceKind: IdentifiedArrayOf<SigningFactor>] = [:]
 
 	for entity in entities {
-		switch entity.securityState {
-		case let .unsecured(unsecuredEntityControl):
-
-			let factorInstance = {
-				switch signingPurpose {
-				case .signAuth:
-					return unsecuredEntityControl.authenticationSigning ?? unsecuredEntityControl.transactionSigning
-				case .signTransaction:
-					return unsecuredEntityControl.transactionSigning
-				}
-			}()
-
+		func add(factorInstance: HierarchicalDeterministicFactorInstance) throws {
 			let id = factorInstance.factorSourceID
 			guard let factorSource = allFactorSources[id: id.embed()] else {
 				assertionFailure("Bad! factor source not found")
 				throw FactorSourceNotFound()
 			}
-			let signer = try Signer(factorInstanceRequiredToSign: factorInstance, entity: entity)
+			let signer = try Signer(
+				primaryRoleSuperAdminFactorInstance: factorInstance,
+				entity: entity
+			)
+
 			let sigingFactor = SigningFactor(factorSource: factorSource, signer: signer)
 
 			if var existingArray: IdentifiedArrayOf<SigningFactor> = signingFactors[factorSource.kind] {
@@ -175,6 +168,25 @@ internal func signingFactors(
 			} else {
 				// trivial case,
 				signingFactors[factorSource.kind] = .init(uniqueElements: [sigingFactor])
+			}
+		}
+
+		switch entity.securityState {
+		case let .unsecured(unsecuredEntityControl):
+			let factorInstance = {
+				switch signingPurpose {
+				case .signAuth:
+					return unsecuredEntityControl.authenticationSigning ?? unsecuredEntityControl.transactionSigning
+				case .signTransaction:
+					return unsecuredEntityControl.transactionSigning
+				}
+			}()
+			try add(factorInstance: factorInstance)
+
+		case let .securified(securified):
+			for factorInstance in securified.transactionSigningStructure.primaryRole.superAdminFactors {
+				let hd = try factorInstance.virtualHierarchicalDeterministic()
+				try add(factorInstance: hd)
 			}
 		}
 	}

@@ -28,6 +28,10 @@ extension AccountList {
 					switch account.securityState {
 					case let .unsecured(unsecuredEntityControl):
 						return unsecuredEntityControl.transactionSigning.factorInstance.factorSourceID.kind == .ledgerHQHardwareWallet
+					case let .securified(securified):
+						let adminFactors = securified.transactionSigningStructure.primaryRole.superAdminFactors
+						let thresholdFactors = securified.transactionSigningStructure.primaryRole.thresholdFactors
+						return adminFactors.count == 1 && adminFactors.first?.factorSourceKind == .ledgerHQHardwareWallet || thresholdFactors.count == 1 && thresholdFactors.first?.factorSourceKind == .ledgerHQHardwareWallet
 					}
 				}()
 			}
@@ -96,6 +100,8 @@ extension AccountList {
 					} else {
 						return .none
 					}
+				case .securified:
+					return .none
 				}
 			}
 		}
