@@ -20,7 +20,7 @@ public struct ChooseReceivingAccount: Sendable, FeatureReducer {
 			if !manualAccountAddress.isEmpty,
 			   !chooseAccounts.filteredAccounts.contains(where: { $0.address == manualAccountAddress })
 			{
-				return try? AccountAddress(address: manualAccountAddress)
+				return try? AccountAddress(validatingAddress: manualAccountAddress)
 			}
 			return nil
 		}

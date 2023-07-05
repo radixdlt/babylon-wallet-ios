@@ -18,7 +18,7 @@ extension GatewayAPI {
 public struct StateNonFungibleDataResponse: Codable, Hashable {
 
     public private(set) var ledgerState: LedgerState
-    /** Bech32m-encoded human readable version of the resource (fungible, non-fungible) global address or hex-encoded id. */
+    /** Bech32m-encoded human readable version of the address. */
     public private(set) var resourceAddress: String
     public private(set) var nonFungibleIdType: NonFungibleIdType
     public private(set) var nonFungibleIds: [StateNonFungibleDetailsResponseItem]

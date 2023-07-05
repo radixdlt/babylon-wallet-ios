@@ -1,5 +1,5 @@
 import Cryptography
-import EngineToolkitModels
+import EngineToolkit
 import GatewayAPI
 import Prelude
 import Profile
@@ -10,7 +10,7 @@ public struct TransactionSigners: Sendable, Hashable {
 	public let intentSigning: IntentSigning
 
 	public enum IntentSigning: Sendable, Hashable {
-		case notaryAsSignatory
+		case notaryIsSignatory
 		case intentSigners(NonEmpty<OrderedSet<EntityPotentiallyVirtual>>)
 	}
 
@@ -43,13 +43,13 @@ extension GatewayAPI.TransactionPreviewRequest {
 			permitInvalidHeaderEpoch: false
 		)
 
-		struct NotaryAsSignatoryDiscrepancy: Swift.Error {}
-		guard transactionSigners.notaryAsSignatory == header.notaryAsSignatory else {
-			loggerGlobal.error("Preview incorrectly implemented, found discrepancy in `notaryAsSignatory` and `transactionSigners`.")
+		struct NotaryIsSignatoryDiscrepancy: Swift.Error {}
+		guard transactionSigners.notaryIsSignatory == header.notaryIsSignatory else {
+			loggerGlobal.error("Preview incorrectly implemented, found discrepancy in `notaryIsSignatory` and `transactionSigners`.")
 			assertionFailure("discrepancy")
-			throw NotaryAsSignatoryDiscrepancy()
+			throw NotaryIsSignatoryDiscrepancy()
 		}
-		let notaryAsSignatory = transactionSigners.notaryAsSignatory
+		let notaryIsSignatory = transactionSigners.notaryIsSignatory
 
 		self.init(
 			manifest: manifestString,
@@ -57,8 +57,7 @@ extension GatewayAPI.TransactionPreviewRequest {
 			startEpochInclusive: .init(header.startEpochInclusive.rawValue),
 			endEpochExclusive: .init(header.endEpochExclusive.rawValue),
 			notaryPublicKey: GatewayAPI.PublicKey(from: header.publicKey),
-			notaryAsSignatory: notaryAsSignatory,
-			costUnitLimit: .init(header.costUnitLimit),
+			notaryIsSignatory: notaryIsSignatory,
 			tipPercentage: .init(header.tipPercentage),
 			nonce: .init(header.nonce.rawValue),
 			signerPublicKeys: transactionSigners.signerPublicKeys.map(GatewayAPI.PublicKey.init(from:)),
@@ -68,10 +67,10 @@ extension GatewayAPI.TransactionPreviewRequest {
 }
 
 extension TransactionSigners {
-	public var notaryAsSignatory: Bool {
+	public var notaryIsSignatory: Bool {
 		switch self.intentSigning {
 		case .intentSigners: return false
-		case .notaryAsSignatory: return true
+		case .notaryIsSignatory: return true
 		}
 	}
 
@@ -79,14 +78,14 @@ extension TransactionSigners {
 		switch intentSigning {
 		case let .intentSigners(signers):
 			return Set(signers.flatMap { $0.virtualHierarchicalDeterministicFactorInstances.map(\.publicKey) })
-		case .notaryAsSignatory:
+		case .notaryIsSignatory:
 			return []
 		}
 	}
 
 	public func intentSignerEntitiesOrEmpty() -> OrderedSet<EntityPotentiallyVirtual> {
 		switch intentSigning {
-		case .notaryAsSignatory: return .init()
+		case .notaryIsSignatory: return .init()
 		case let .intentSigners(signers): return OrderedSet(signers)
 		}
 	}
@@ -117,15 +116,15 @@ extension GatewayAPI.PublicKey {
 // MARK: - NotarizeTransactionRequest
 public struct NotarizeTransactionRequest: Sendable, Hashable {
 	public let intentSignatures: Set<Engine.SignatureWithPublicKey>
-	public let compileTransactionIntent: CompileTransactionIntentResponse
+	public let transactionIntent: TransactionIntent
 	public let notary: SLIP10.PrivateKey
 	public init(
 		intentSignatures: Set<Engine.SignatureWithPublicKey>,
-		compileTransactionIntent: CompileTransactionIntentResponse,
+		transactionIntent: TransactionIntent,
 		notary: SLIP10.PrivateKey
 	) {
 		self.intentSignatures = intentSignatures
-		self.compileTransactionIntent = compileTransactionIntent
+		self.transactionIntent = transactionIntent
 		self.notary = notary
 	}
 }
@@ -251,7 +250,7 @@ public struct AddFeeToManifestOutcomeExcludesLockFee: Sendable, Equatable {
 
 // MARK: - TransactionToReview
 public struct TransactionToReview: Sendable, Equatable {
-	public let analyzedManifestToReview: AnalyzeManifestWithPreviewContextResponse
+	public let analyzedManifestToReview: AnalyzeTransactionExecutionResponse
 	public let addFeeToManifestOutcome: AddFeeToManifestOutcome
 	public let networkID: NetworkID
 }

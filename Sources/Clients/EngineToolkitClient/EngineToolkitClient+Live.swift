@@ -1,23 +1,20 @@
 import ClientPrelude
 import Cryptography
 @preconcurrency import EngineToolkit
-import struct Profile.AccountAddress
 
 extension EngineToolkitClient {
 	public static let liveValue: Self = {
-		let engineToolkit = EngineToolkit()
-
 		let generateTXNonce: GenerateTXNonce = { Nonce.secureRandom() }
 
 		let compileTransactionIntent: CompileTransactionIntent = { transactionIntent in
-			try engineToolkit.compileTransactionIntentRequest(
+			try RadixEngine.instance.compileTransactionIntentRequest(
 				request: transactionIntent
 			).get()
 		}
 
 		let convertManifestInstructionsToJSONIfItWasString: ConvertManifestInstructionsToJSONIfItWasString = { request in
 
-			let converted = try engineToolkit.convertManifest(
+			let converted = try RadixEngine.instance.convertManifest(
 				request: .init(
 					manifest: request.manifest,
 					outputFormat: .parsed,
@@ -36,49 +33,57 @@ extension EngineToolkitClient {
 			)
 		}
 
+		let hashTransactionItent: HashTransactionIntent = { intent in
+			try RadixEngine.instance.hashTransactionIntent(intent).get()
+		}
+
 		return Self(
 			getTransactionVersion: { TXVersion.default },
 			generateTXNonce: generateTXNonce,
 			convertManifestInstructionsToJSONIfItWasString: convertManifestInstructionsToJSONIfItWasString,
-			convertManifestToString: { try engineToolkit.convertManifest(request: .init(manifest: $0.manifest, outputFormat: .string, networkId: $0.networkID)).get() },
+			convertManifestToString: { try RadixEngine.instance.convertManifest(request: .init(manifest: $0.manifest, outputFormat: .string, networkId: $0.networkID)).get() },
 			compileTransactionIntent: compileTransactionIntent,
 			compileSignedTransactionIntent: {
-				try engineToolkit
+				try RadixEngine.instance
 					.compileSignedTransactionIntentRequest(request: $0)
 					.get()
 			},
 			compileNotarizedTransactionIntent: {
-				try engineToolkit.compileNotarizedTransactionIntentRequest(request: $0).get()
+				try RadixEngine.instance.compileNotarizedTransactionIntentRequest(request: $0).get()
 			},
 			decompileTransactionIntent: {
-				try engineToolkit.decompileTransactionIntentRequest(request: $0).get()
+				try RadixEngine.instance.decompileTransactionIntentRequest(request: $0).get()
 			},
 			decompileNotarizedTransactionIntent: {
-				try engineToolkit.decompileNotarizedTransactionIntentRequest(request: $0).get()
+				try RadixEngine.instance.decompileNotarizedTransactionIntentRequest(request: $0).get()
+			},
+			hashTransactionIntent: hashTransactionItent,
+			hashSignedTransactionIntent: { intent in
+				try RadixEngine.instance.hashSignedTransactionIntent(intent).get()
 			},
 			deriveOlympiaAdressFromPublicKey: {
-				try engineToolkit.deriveOlympiaAddressFromPublicKeyRequest(
+				try RadixEngine.instance.deriveOlympiaAddressFromPublicKeyRequest(
 					request: .init(network: .mainnet, publicKey: $0.intoEngine())
 				)
 				.get()
 				.olympiaAccountAddress
 			},
+
 			generateTXID: { transactionIntent in
-				let compiledTransactionIntent = try compileTransactionIntent(transactionIntent)
-				let hash = try blake2b(data: compiledTransactionIntent.compiledIntent)
-				return TXID(rawValue: hash.hex)
+				let hash = try hashTransactionItent(transactionIntent).hash
+				return TXID(rawValue: hash)
 			},
 			knownEntityAddresses: { networkID throws -> KnownEntityAddressesResponse in
-				try engineToolkit.knownEntityAddresses(request: .init(networkId: networkID)).get()
+				try RadixEngine.instance.knownEntityAddresses(request: .init(networkId: networkID)).get()
 			},
 			analyzeManifest: { request in
-				try engineToolkit.analyzeManifest(request: .init(manifest: request.manifest, networkId: request.networkID)).get()
+				try RadixEngine.instance.extractAddressesFromManifest(request: .init(manifest: request.manifest, networkId: request.networkID)).get()
 			},
 			analyzeManifestWithPreviewContext: { manifestWithPreviewContext in
-				try engineToolkit.analyzeManifestWithPreviewContext(request: manifestWithPreviewContext).get()
+				try RadixEngine.instance.analyzeTransactionExecution(request: manifestWithPreviewContext).get()
 			},
 			decodeAddress: { address in
-				try engineToolkit.decodeAddressRequest(request: .init(address: address)).get()
+				try RadixEngine.instance.decodeAddressRequest(request: .init(address: address)).get()
 			}
 		)
 	}()

@@ -341,12 +341,12 @@ public struct DappDetails: Sendable, FeatureReducer {
 extension GatewayAPI.StateEntityDetailsResponseItem {
 	var resourceDetails: DappDetails.State.Resources.ResourceDetails? {
 		guard let fungibility else { return nil }
-		return .init(address: .init(address: address),
-		             fungibility: fungibility,
-		             name: metadata.name ?? L10n.AuthorizedDapps.DAppDetails.unknownTokenName,
-		             symbol: metadata.symbol,
-		             description: metadata.description,
-		             iconURL: metadata.iconURL)
+		return try? .init(address: .init(validatingAddress: address),
+		                  fungibility: fungibility,
+		                  name: metadata.name ?? L10n.AuthorizedDapps.DAppDetails.unknownTokenName,
+		                  symbol: metadata.symbol,
+		                  description: metadata.description,
+		                  iconURL: metadata.iconURL)
 	}
 
 	private var fungibility: DappDetails.State.Resources.ResourceDetails.Fungibility? {

@@ -2,7 +2,6 @@ import ClientPrelude
 import Cryptography
 import DeviceFactorSourceClient
 import EngineToolkitClient
-import EngineToolkitModels
 import GatewayAPI
 import GatewaysClient
 import SubmitTransactionClient
@@ -46,8 +45,7 @@ extension FaucetClient: DependencyKey {
 		}
 
 		@Sendable func signSubmitTX(
-			manifest: TransactionManifest,
-			signIntent: (Data, TransactionSigners) async throws -> Set<Engine.SignatureWithPublicKey> = { _, _ in [] }
+			manifest: TransactionManifest
 		) async throws {
 			@Dependency(\.transactionClient) var transactionClient
 			@Dependency(\.engineToolkitClient) var engineToolkitClient
@@ -68,11 +66,10 @@ extension FaucetClient: DependencyKey {
 			)
 
 			let transactionIntent = builtTransactionIntentWithSigners.intent
-			let compiledIntent = try engineToolkitClient.compileTransactionIntent(transactionIntent)
 
 			let notarized = try await transactionClient.notarizeTransaction(.init(
-				intentSignatures: signIntent(Data(compiledIntent.compiledIntent), builtTransactionIntentWithSigners.transactionSigners),
-				compileTransactionIntent: compiledIntent,
+				intentSignatures: [],
+				transactionIntent: transactionIntent,
 				notary: .curve25519(ephemeralNotary)
 			))
 

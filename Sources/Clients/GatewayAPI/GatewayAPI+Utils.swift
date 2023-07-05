@@ -4,9 +4,6 @@ import Foundation
 // MARK: - GatewayAPI.StateEntityDetailsResponse + Sendable
 extension GatewayAPI.StateEntityDetailsResponse: @unchecked Sendable {}
 
-// MARK: - GatewayAPI.NonFungibleIdsCollectionItem + Sendable
-extension GatewayAPI.NonFungibleIdsCollectionItem: @unchecked Sendable {}
-
 // MARK: - GatewayAPI.NonFungibleResourcesCollectionItemVaultAggregatedVaultItem + Sendable
 extension GatewayAPI.NonFungibleResourcesCollectionItemVaultAggregatedVaultItem: @unchecked Sendable {}
 
@@ -116,7 +113,7 @@ extension GatewayAPI.EntityMetadataCollection {
 }
 
 // MARK: - EntityMetadataKey
-public enum EntityMetadataKey: String {
+public enum EntityMetadataKey: String, CaseIterable {
 	case name
 	case symbol
 	case description
@@ -143,7 +140,7 @@ extension [GatewayAPI.EntityMetadataItem] {
 
 extension GatewayAPI.StateNonFungibleDataResponse {
 	public func nonFungibleData(for nonFungibleId: String) -> AnyCodable? {
-		nonFungibleIds.first { $0.nonFungibleId == nonFungibleId }?.mutableData.rawJson
+		nonFungibleIds.first { $0.nonFungibleId == nonFungibleId }?.data.rawJson
 	}
 }
 

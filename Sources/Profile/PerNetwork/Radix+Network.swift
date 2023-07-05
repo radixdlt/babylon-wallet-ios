@@ -1,4 +1,4 @@
-import EngineToolkitModels
+import EngineToolkit
 import Prelude
 
 // MARK: - Radix
@@ -62,6 +62,12 @@ extension Radix.Network {
 		name: "mardunet",
 		id: .mardunet,
 		displayDescription: "Mardunet (Test Network)"
+	)
+
+	public static let simulator = Self(
+		name: "simulator",
+		id: .simulator,
+		displayDescription: "Simulator (Test Network)"
 	)
 }
 

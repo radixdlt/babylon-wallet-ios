@@ -3,9 +3,9 @@ import FeaturePrelude
 // MARK: - NonFungibleResourceAsset
 public struct NonFungibleResourceAsset: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable, Identifiable {
-		public typealias ID = ResourceAddress
+		public typealias ID = String
 		public var id: ID {
-			resourceAddress.nftGlobalId(nftToken.id)
+			resourceAddress.nftGlobalId(nftToken.id).formatted
 		}
 
 		public let resourceImage: URL?

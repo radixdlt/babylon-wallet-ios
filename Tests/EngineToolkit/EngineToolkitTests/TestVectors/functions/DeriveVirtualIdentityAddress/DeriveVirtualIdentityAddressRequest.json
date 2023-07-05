@@ -1,0 +1,7 @@
+{
+  "network_id": "242",
+  "public_key": {
+    "curve": "EcdsaSecp256k1",
+    "public_key": "03c32f9761dd3f961a3d12747e54db6b821bd022ef92b9ebf591bfe186885baa21"
+  }
+}

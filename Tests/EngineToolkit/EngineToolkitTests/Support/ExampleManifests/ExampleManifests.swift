@@ -20,7 +20,7 @@ typealias TestTransaction = (
 // the EdDSA Ed25519 curve.
 func testTransactionEd25519(
 	signerCount: UInt,
-	notaryAsSignatory: Bool = true,
+	notaryIsSignatory: Bool = true,
 	file: StaticString = #file,
 	line: UInt = #line
 ) throws -> TestTransaction {
@@ -36,7 +36,7 @@ func testTransactionEd25519(
 // the ECDAS `secp256k1` curve.
 func testTransactionSecp256k1(
 	signerCount: UInt,
-	notaryAsSignatory: Bool = true,
+	notaryIsSignatory: Bool = true,
 	file: StaticString = #file,
 	line: UInt = #line
 ) throws -> TestTransaction {
@@ -50,23 +50,21 @@ func testTransactionSecp256k1(
 private func _testTransaction(
 	notaryPrivateKey: Engine.PrivateKey,
 	signerPrivateKeys: [Engine.PrivateKey],
-	notaryAsSignatory: Bool = true,
+	notaryIsSignatory: Bool = true,
 	file: StaticString = #file,
 	line: UInt = #line
 ) throws -> TestTransaction {
 	// The engine toolkit to use to create this notarized transaction
-	let sut = EngineToolkit()
+	let sut = RadixEngine.instance
 
 	let transactionManifest = TransactionManifest(instructions: .string(complexManifestString))
 	let transactionHeader = try TransactionHeader(
-		version: 0x01,
 		networkId: 0xF2,
 		startEpochInclusive: 0,
 		endEpochExclusive: 10,
 		nonce: 0,
 		publicKey: notaryPrivateKey.publicKey(),
-		notaryAsSignatory: notaryAsSignatory,
-		costUnitLimit: 10_000_000,
+		notaryIsSignatory: notaryIsSignatory,
 		tipPercentage: 0
 	)
 
@@ -83,4 +81,14 @@ private func _testTransaction(
 		compiledSignedTransactionIntent: signedTXContext.compileSignedTransactionIntentResponse.compiledIntent,
 		compiledNotarizedTransactionIntent: compiledNotarizedTransactionIntent
 	)
+}
+
+import Foundation
+
+public func resource(
+	named fileName: String,
+	extension fileExtension: String
+) throws -> Data {
+	let fileURL = Bundle.module.url(forResource: fileName, withExtension: fileExtension)
+	return try Data(contentsOf: fileURL!)
 }

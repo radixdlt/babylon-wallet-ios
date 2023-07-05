@@ -8,7 +8,7 @@ final class TransactionBuildingTests: TestCase {
 		let privateKeyA = Engine.PrivateKey.curve25519(.init())
 		let privateKeyB = Engine.PrivateKey.curve25519(.init())
 		let privateKeyC = Engine.PrivateKey.curve25519(.init())
-		let notaryPrivateKey = Engine.PrivateKey.curve25519(.init())
+		let notaryPrivateKey = Engine.PrivateKey.secp256k1(.init())
 
 		let txContext = try TransactionManifest.complex
 			.header(.example(notaryPrivateKey: notaryPrivateKey))
@@ -23,15 +23,15 @@ final class TransactionBuildingTests: TestCase {
 			intentSignatures: txContext.notarizedTransaction.signedIntent.intentSignatures
 		)
 
-		let compiledSignedTransactionIntent = try EngineToolkit().compileSignedTransactionIntentRequest(
-			request: signedTransactionIntent
-		).get().compiledIntent
+		let signedIntentHash = try RadixEngine.instance
+			.hashSignedTransactionIntent(signedTransactionIntent)
+			.get().hash
 
 		let isValid = try notaryPrivateKey
 			.publicKey()
 			.isValidSignature(
 				txContext.notarizedTransaction.notarySignature,
-				hashed: blake2b(data: compiledSignedTransactionIntent)
+				hashed: Data(hex: signedIntentHash)
 			)
 
 		XCTAssertTrue(isValid)
@@ -43,14 +43,12 @@ extension TransactionHeader {
 		notaryPrivateKey: Engine.PrivateKey
 	) throws -> Self {
 		try Self(
-			version: 0x01,
 			networkId: 0xF2,
 			startEpochInclusive: 0,
 			endEpochExclusive: 10,
 			nonce: 0,
 			publicKey: notaryPrivateKey.publicKey(),
-			notaryAsSignatory: true,
-			costUnitLimit: 10_000_000,
+			notaryIsSignatory: true,
 			tipPercentage: 0
 		)
 	}
