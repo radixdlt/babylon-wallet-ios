@@ -6,15 +6,15 @@
       "ledgerHQHardwareWalletSigningDisplayMode" : "verbose"
     },
     "gateways" : {
-      "current" : "https://rcnet.radixdlt.com/",
+      "current" : "https://enkinet-gateway.radixdlt.com/",
       "saved" : [
         {
           "network" : {
-            "displayDescription" : "RCnet",
-            "id" : 12,
-            "name" : "kisharnet"
+            "displayDescription" : "Enkinet (Test Network)",
+            "id" : 33,
+            "name" : "enkinet"
           },
-          "url" : "https://rcnet.radixdlt.com/"
+          "url" : "https://enkinet-gateway.radixdlt.com/"
         }
       ]
     },
@@ -66,7 +66,7 @@
           {
             "forAccount" : 3,
             "forIdentity" : 2,
-            "networkID" : 12
+            "networkID" : 33
           }
         ]
       },
@@ -125,7 +125,7 @@
           "name" : "My friend"
         },
         "id" : {
-          "body" : "account_tdx_c_1px0jul7a44s65568d32f82f0lkssjwx6f5t5e44yl6csqurxw3",
+          "body" : "account_rdx1283u6e8r2jnz4a3jwv0hnrqfr5aq50yc9ts523sd96hzfjxqqcs89q",
           "kind" : "trustedContact"
         }
       }
@@ -214,16 +214,16 @@
       "description" : "computer unit test",
       "id" : "BABE1442-3C98-41FF-AFB0-D0F5829B020D"
     },
-    "snapshotVersion" : 38
+    "snapshotVersion" : 39
   },
   "networks" : [
     {
       "accounts" : [
         {
-          "address" : "account_tdx_c_1pyezed90u5qtagu2247rqw7f04vc7wnhsfjz4nf6vuvqtj9kcq",
+          "address" : "account_tdx_21_129keupt05nakwqkx0865rrqp47c8g9gpktky06d6yl9e708n9cqvsx",
           "appearanceID" : 0,
           "displayName" : "First",
-          "networkID" : 12,
+          "networkID" : 33,
           "securityState" : {
             "discriminator" : "unsecured",
             "unsecuredEntityControl" : {
@@ -281,10 +281,10 @@
           }
         },
         {
-          "address" : "account_tdx_c_1p82arz264ntf727q2s7f7cm6pqucgqzuru3z7mgeg3gqua0wlj",
+          "address" : "account_tdx_21_1293rfaz9cmp6jkc2qh7ggxsr3gc703u78un9w7al68juka22rxrh5d",
           "appearanceID" : 1,
           "displayName" : "Second",
-          "networkID" : 12,
+          "networkID" : 33,
           "securityState" : {
             "discriminator" : "unsecured",
             "unsecuredEntityControl" : {
@@ -342,7 +342,7 @@
           }
         },
         {
-          "address" : "account_tdx_c_1pygfwtlv7l90rcsge6t0f0jwn3cuzp05y8geek45qw7s98msmw",
+          "address" : "account_tdx_21_12yq3vgq69l207w3zuw0zyhcf9ppzvl2sw22zeaatnuuvgxzq09fwrp",
           "appearanceID" : 2,
           "displayName" : "Third",
           "networkID" : 12,
@@ -405,17 +405,17 @@
       ],
       "authorizedDapps" : [
         {
-          "dAppDefinitionAddress" : "account_tdx_c_1px0jul7a44s65568d32f82f0lkssjwx6f5t5e44yl6csqurxw3",
+          "dAppDefinitionAddress" : "account_tdx_21_12y6ra8syx8arxqvzmj5edyd8fpazcvfuq6vfn4e7fppky3qwwy6khj",
           "displayName" : "RadiSwap",
-          "networkID" : 12,
+          "networkID" : 33,
           "referencesToAuthorizedPersonas" : [
             {
-              "identityAddress" : "identity_tdx_c_1pntzwn92848tkaatj4psmgtuvsn83lnknku6av34alxqdrsvjv",
+              "identityAddress" : "identity_tdx_21_12fx3znxjhdrpv4dnurg220n8st5ep70u3ffsmcf0n0xprkzawa3hsc",
               "lastLogin" : "2001-01-01T00:00:00Z",
               "sharedAccounts" : {
                 "accountsReferencedByAddress" : [
-                  "account_tdx_c_1p82arz264ntf727q2s7f7cm6pqucgqzuru3z7mgeg3gqua0wlj",
-                  "account_tdx_c_1pygfwtlv7l90rcsge6t0f0jwn3cuzp05y8geek45qw7s98msmw"
+                  "account_tdx_21_12yq3vgq69l207w3zuw0zyhcf9ppzvl2sw22zeaatnuuvgxzq09fwrp",
+                  "account_tdx_21_1293rfaz9cmp6jkc2qh7ggxsr3gc703u78un9w7al68juka22rxrh5d"
                 ],
                 "request" : {
                   "quantifier" : "exactly",
@@ -428,11 +428,11 @@
               ]
             },
             {
-              "identityAddress" : "identity_tdx_c_1p30wtkl76qpyenu88sverfdh0qwf70gulgu29k72myqq2hqg0r",
+              "identityAddress" : "identity_tdx_21_12gp3n799aya3gq6qlljehp0p8vpmdkuuykq3dqx5ehspuwzugmj49q",
               "lastLogin" : "2001-01-01T00:00:00Z",
               "sharedAccounts" : {
                 "accountsReferencedByAddress" : [
-                  "account_tdx_c_1p82arz264ntf727q2s7f7cm6pqucgqzuru3z7mgeg3gqua0wlj"
+                  "account_tdx_21_129keupt05nakwqkx0865rrqp47c8g9gpktky06d6yl9e708n9cqvsx"
                 ],
                 "request" : {
                   "quantifier" : "atLeast",
@@ -447,10 +447,10 @@
           ]
         }
       ],
-      "networkID" : 12,
+      "networkID" : 33,
       "personas" : [
         {
-          "address" : "identity_tdx_c_1pntzwn92848tkaatj4psmgtuvsn83lnknku6av34alxqdrsvjv",
+          "address" : "identity_tdx_21_12fx3znxjhdrpv4dnurg220n8st5ep70u3ffsmcf0n0xprkzawa3hsc",
           "displayName" : "Mrs Incognito",
           "fields" : [
             {
@@ -462,7 +462,7 @@
               "value" : "Incognitoson"
             }
           ],
-          "networkID" : 12,
+          "networkID" : 33,
           "securityState" : {
             "discriminator" : "unsecured",
             "unsecuredEntityControl" : {
@@ -520,7 +520,7 @@
           }
         },
         {
-          "address" : "identity_tdx_c_1p30wtkl76qpyenu88sverfdh0qwf70gulgu29k72myqq2hqg0r",
+          "address" : "identity_tdx_21_12gp3n799aya3gq6qlljehp0p8vpmdkuuykq3dqx5ehspuwzugmj49q",
           "displayName" : "Mrs Public",
           "fields" : [
             {
@@ -532,7 +532,7 @@
               "value" : "Publicson"
             }
           ],
-          "networkID" : 12,
+          "networkID" : 33,
           "securityState" : {
             "discriminator" : "unsecured",
             "unsecuredEntityControl" : {

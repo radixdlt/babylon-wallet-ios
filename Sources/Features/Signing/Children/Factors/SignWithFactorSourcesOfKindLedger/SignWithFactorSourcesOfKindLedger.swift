@@ -1,5 +1,5 @@
 import AppPreferencesClient
-import EngineToolkit
+import EngineToolkitClient
 import FactorSourcesClient
 import FeaturePrelude
 import LedgerHardwareWalletClient
@@ -25,6 +25,7 @@ public struct SignWithFactorSourcesOfKindLedger: SignWithFactorSourcesOfKindRedu
 
 	@Dependency(\.ledgerHardwareWalletClient) var ledgerHardwareWalletClient
 	@Dependency(\.appPreferencesClient) var appPreferencesClient
+	@Dependency(\.engineToolkitClient) var engineToolkitClient
 
 	public init() {}
 
@@ -55,31 +56,17 @@ public struct SignWithFactorSourcesOfKindLedger: SignWithFactorSourcesOfKindRedu
 		state: State
 	) async throws -> Set<SignatureOfEntity> {
 		switch state.signingPurposeWithPayload {
-		case let .signTransaction(_, compiledIntent, _):
-			let dataToSign = Data(compiledIntent.compiledIntent)
-			do {
-				let expectedHash = try blake2b(data: dataToSign)
-				loggerGlobal.notice("\n\nExpected TX hash: \(expectedHash.hex)\n\n")
-			} catch {
-				loggerGlobal.critical("Failed to hash: \(error)")
-			}
+		case let .signTransaction(_, intent, _):
 			let ledgerTXDisplayMode: LedgerHardwareWalletFactorSource.SigningDisplayMode = await appPreferencesClient.getPreferences().display.ledgerHQHardwareWalletSigningDisplayMode
 
 			return try await ledgerHardwareWalletClient.signTransaction(.init(
 				ledger: ledger,
 				signers: signers,
-				unhashedDataToSign: dataToSign,
+				transactionIntent: intent,
 				ledgerTXDisplayMode: ledgerTXDisplayMode.mode,
 				displayHashOnLedgerDisplay: false
 			))
 		case let .signAuth(authToSign):
-			do {
-				let expectedHash = try blake2b(data: authToSign.payloadToHashAndSign)
-				loggerGlobal.notice("\n\nExpected TX hash: \(expectedHash.hex)\n\n")
-			} catch {
-				loggerGlobal.critical("Failed to hash: \(error)")
-			}
-
 			return try await ledgerHardwareWalletClient.signAuthChallenge(.init(
 				ledger: ledger,
 				signers: signers,

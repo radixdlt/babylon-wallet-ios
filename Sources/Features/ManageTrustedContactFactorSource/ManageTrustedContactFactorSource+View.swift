@@ -31,7 +31,7 @@ extension ManageTrustedContactFactorSource {
 		}
 
 		var address: AccountAddress? {
-			try? AccountAddress(address: radixAddress)
+			try? AccountAddress(validatingAddress: radixAddress)
 		}
 
 		var addressHint: Hint? {

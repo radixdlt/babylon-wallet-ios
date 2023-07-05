@@ -1,4 +1,3 @@
-import EngineToolkitModels
 import Prelude
 
 // MARK: - Profile.Network.Persona
@@ -164,7 +163,7 @@ extension Profile.Network.Persona {
 import Cryptography
 import EngineToolkit
 extension Profile.Network.Persona {
-	public static func deriveAddress(
+	public static func deriveVirtualAddress(
 		networkID: NetworkID,
 		factorInstance: HierarchicalDeterministicFactorInstance
 	) throws -> EntityAddress {
@@ -173,14 +172,14 @@ extension Profile.Network.Persona {
 			throw WrongEntityInDerivationPath()
 		}
 
-		let response = try EngineToolkit().deriveVirtualIdentityAddressRequest(
+		let response = try RadixEngine.instance.deriveVirtualIdentityAddressRequest(
 			request: .init(
 				publicKey: factorInstance.publicKey.intoEngine(),
 				networkId: networkID
 			)
 		).get()
 
-		return try EntityAddress(address: response.virtualIdentityAddress.address)
+		return response.virtualIdentityAddress
 	}
 }
 

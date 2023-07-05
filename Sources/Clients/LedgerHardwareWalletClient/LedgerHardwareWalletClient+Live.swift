@@ -13,6 +13,7 @@ extension LedgerHardwareWalletClient: DependencyKey {
 
 	public static let liveValue: Self = {
 		@Dependency(\.radixConnectClient) var radixConnectClient
+		@Dependency(\.engineToolkitClient) var engineToolkitClient
 
 		@Sendable func makeRequest<Response: Sendable>(
 			_ request: P2P.ConnectorExtension.Request.LedgerHardwareWallet.Request,
@@ -124,16 +125,17 @@ extension LedgerHardwareWalletClient: DependencyKey {
 				})
 			},
 			signTransaction: { request in
-				let hashedMsg = try blake2b(data: request.unhashedDataToSign)
+				let hashedMsg = try engineToolkitClient.hashTransactionIntent(request.transactionIntent)
+				let compiledTransactionIntent = try engineToolkitClient.compileTransactionIntent(request.transactionIntent)
 				return try await sign(
 					signers: request.signers,
-					expectedHashedMessage: hashedMsg
+					expectedHashedMessage: Data(hex: hashedMsg.hash)
 				) {
 					try await makeRequest(
 						.signTransaction(.init(
 							signers: request.signers.flatMap(\.keyParams),
 							ledgerDevice: request.ledger.device(),
-							compiledTransactionIntent: .init(data: request.unhashedDataToSign),
+							compiledTransactionIntent: .init(data: compiledTransactionIntent.compiledIntent.data),
 							displayHash: request.displayHashOnLedgerDisplay,
 							mode: request.ledgerTXDisplayMode
 						)),
@@ -152,7 +154,7 @@ extension LedgerHardwareWalletClient: DependencyKey {
 				let hash = try blake2b(data: rolaPayload.payloadToHashAndSign)
 				return try await sign(
 					signers: request.signers,
-					expectedHashedMessage: hash
+					expectedHashedMessage: hash.data
 				) {
 					try await makeRequest(
 						.signChallenge(.init(

@@ -90,7 +90,7 @@ extension Profile.JSONDecodingError: Hashable {
 		}
 	}
 
-	// Swift.DecodingError made `Equatable` inside `EngineToolkitModels`
+	// Swift.DecodingError made `Equatable` inside `EngineToolkit`
 	public struct FailedToDecodeProfile: Sendable, LocalizedError, Equatable {
 		public let decodingError: Swift.DecodingError
 		public init(decodingError: DecodingError) {

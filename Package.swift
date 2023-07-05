@@ -917,7 +917,6 @@ package.addModules([
 	.core(
 		name: "SharedModels",
 		dependencies: [
-			"EngineToolkitModels",
 			"RadixConnectModels",
 			"Profile",
 		],
@@ -955,8 +954,8 @@ package.addModules([
 		category: .engineToolkit,
 		dependencies: [
 			"Cryptography",
-			"EngineToolkitModels",
 			"RadixEngineToolkit",
+			.product(name: "ComposableArchitecture", package: "swift-composable-architecture"), // actually just CasePaths
 		],
 		tests: .yes(
 			dependencies: [],
@@ -964,14 +963,6 @@ package.addModules([
 				.process("TestVectors/"),
 			]
 		)
-	),
-	.module(
-		name: "EngineToolkitModels",
-		category: .engineToolkit,
-		dependencies: [
-			"Cryptography",
-		],
-		tests: .no
 	),
 	.module(
 		name: "RadixConnectModels",

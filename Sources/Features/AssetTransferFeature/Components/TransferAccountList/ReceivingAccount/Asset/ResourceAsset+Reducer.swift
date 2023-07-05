@@ -3,7 +3,7 @@ import FeaturePrelude
 // Higher order reducer composing all types of assets that can be transferred
 public struct ResourceAsset: Sendable, FeatureReducer {
 	public enum State: Sendable, Hashable, Identifiable {
-		public typealias ID = ResourceAddress
+		public typealias ID = String
 		public var id: ID {
 			switch self {
 			case let .fungibleAsset(asset):

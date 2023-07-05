@@ -2,16 +2,16 @@
 import TestingPrelude
 
 class TestCase: TestingPrelude.TestCase {
-	var sut = EngineToolkit()
+	var sut = RadixEngine.instance
 	var debugPrint = false
 
 	override func setUp() {
 		super.setUp()
 		continueAfterFailure = false
-		EngineToolkit._debugPrint = debugPrint
+		RadixEngine._debugPrint = debugPrint
 	}
 
 	override func tearDown() {
-		EngineToolkit._debugPrint = false
+		RadixEngine._debugPrint = false
 	}
 }

@@ -1,5 +1,5 @@
 import Cryptography
-import EngineToolkitModels
+import EngineToolkit
 import Prelude
 
 extension HD.Path.Component.Child {

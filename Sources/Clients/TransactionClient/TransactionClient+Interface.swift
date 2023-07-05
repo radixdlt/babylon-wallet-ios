@@ -101,11 +101,11 @@ extension TransactionClient {
 	}
 
 	public struct PrepareForSiginingResponse: Equatable, Sendable {
-		public let compiledIntent: CompileTransactionIntentResponse
+		public let intent: TransactionIntent
 		public let signingFactors: SigningFactors
 
-		public init(compiledIntent: CompileTransactionIntentResponse, signingFactors: SigningFactors) {
-			self.compiledIntent = compiledIntent
+		public init(intent: TransactionIntent, signingFactors: SigningFactors) {
+			self.intent = intent
 			self.signingFactors = signingFactors
 		}
 	}

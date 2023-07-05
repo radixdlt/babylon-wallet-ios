@@ -1,5 +1,5 @@
 import Cryptography
-import EngineToolkitModels
+import EngineToolkit
 import Prelude
 
 // MARK: - LegacyOlympiaBIP44LikeDerivationPath

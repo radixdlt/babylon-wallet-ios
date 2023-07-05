@@ -3,10 +3,10 @@ import FeaturePrelude
 // MARK: - FungibleResourceAsset
 public struct FungibleResourceAsset: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable, Identifiable {
-		public typealias ID = ResourceAddress
+		public typealias ID = String
 
 		public var id: ID {
-			resource.resourceAddress
+			resource.resourceAddress.address
 		}
 
 		public var balance: BigDecimal {

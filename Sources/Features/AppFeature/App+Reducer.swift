@@ -92,7 +92,7 @@ public struct App: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .task:
-			if let engineVersion = try? EngineToolkit().information().get() {
+			if let engineVersion = try? RadixEngine.instance.information().get() {
 				print("EngineToolkit commit hash: \(engineVersion.lastCommitHash), package version: \(engineVersion.packageVersion)")
 			}
 			return .run { send in
