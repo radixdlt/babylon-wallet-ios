@@ -21,6 +21,12 @@ extension ImportLegacyWalletClient: DependencyKey {
 			let networkID = await factorSourcesClient.getCurrentNetworkID()
 			let accountIndexOffset = try await accountsClient.getAccountsOnCurrentNetwork().count
 
+			guard let defaultAccountName: NonEmptyString = .init(rawValue: L10n.ImportOlympiaAccounts.AccountsToImport.unnamed) else {
+				// The L10n string should not be empty, so this should not be possible
+				struct ImplementationError: Error {}
+				throw ImplementationError()
+			}
+
 			var accountsSet = OrderedSet<MigratedAccount>()
 			for olympiaAccount in sortedOlympia {
 				let publicKey = SLIP10.PublicKey.ecdsaSecp256k1(olympiaAccount.publicKey)
@@ -29,7 +35,8 @@ extension ImportLegacyWalletClient: DependencyKey {
 					publicKey: publicKey,
 					derivationPath: olympiaAccount.path.wrapAsDerivationPath()
 				)
-				let displayName = olympiaAccount.displayName ?? "Unnamned olympia account \(olympiaAccount.addressIndex)"
+
+				let displayName = olympiaAccount.displayName ?? defaultAccountName
 				let accountIndex = accountIndexOffset + Int(olympiaAccount.addressIndex)
 
 				let babylon = try Profile.Network.Account(
