@@ -111,6 +111,7 @@ public enum SigningPurpose: Sendable, Hashable {
 		public enum InternalTXSignPurpose: Sendable, Hashable {
 			case transfer
 			case uploadAuthKey
+			case securifyEntity(kind: EntityKind)
 			#if DEBUG
 			/// E.g. turn account into dapp definition account type (setting metadata)
 			case debugModifyAccount

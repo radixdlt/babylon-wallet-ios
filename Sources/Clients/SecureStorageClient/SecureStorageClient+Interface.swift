@@ -53,6 +53,8 @@ extension SecureStorageClient {
 
 		case updateAccountMetadata
 
+		case securifyEntity(kind: EntityKind)
+
 		public var description: String {
 			switch self {
 			case .importOlympiaAccounts:
@@ -71,6 +73,8 @@ extension SecureStorageClient {
 				return "createSignAuthKey"
 			case .updateAccountMetadata:
 				return "updateAccountMetadata"
+			case let .securifyEntity(kind):
+				return "securifyEntity(\(kind))"
 			}
 		}
 	}

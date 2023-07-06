@@ -1,5 +1,6 @@
 import FeaturePrelude
 import SecurityStructureConfigurationListFeature
+import TransactionReviewFeature
 
 extension UpdateSecurityStateOfEntityCoordinator.State {
 	var viewState: UpdateSecurityStateOfEntityCoordinator.ViewState {
@@ -41,6 +42,11 @@ extension UpdateSecurityStateOfEntityCoordinator {
 					state: /UpdateSecurityStateOfEntityCoordinator.Path.State.selectSecurityStructureConfig,
 					action: UpdateSecurityStateOfEntityCoordinator.Path.Action.selectSecurityStructureConfig,
 					then: { SecurityStructureConfigurationListCoordinator.View(store: $0) }
+				)
+				CaseLet(
+					state: /UpdateSecurityStateOfEntityCoordinator.Path.State.securifyEntity,
+					action: UpdateSecurityStateOfEntityCoordinator.Path.Action.securifyEntity,
+					then: { TransactionReview.View(store: $0) }
 				)
 			}
 		}

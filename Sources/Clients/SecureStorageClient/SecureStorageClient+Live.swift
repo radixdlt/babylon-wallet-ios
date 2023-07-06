@@ -217,6 +217,11 @@ extension SecureStorageClient: DependencyKey {
 					case .checkingAccounts:
 						return L10n.Biometrics.Prompt.checkingAccounts
 
+					case let .securifyEntity(kind):
+						let entityKindName = kind == .account ? L10n.Common.account : L10n.Common.persona
+						// FIXME: strings
+						return "Securify \(entityKindName)"
+
 					case .updateAccountMetadata:
 						// This is debug only... for now.
 						return L10n.Biometrics.Prompt.updateAccountMetadata

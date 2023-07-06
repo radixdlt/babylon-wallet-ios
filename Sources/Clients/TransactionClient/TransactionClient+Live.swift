@@ -282,6 +282,8 @@ extension TransactionClient {
 			)
 		}
 
+		let convertManifestToString: ConvertManifestToString = { try await engineToolkitClient.convertManifestToString(.init(version: .default, networkID: gatewaysClient.getCurrentNetworkID(), manifest: $0)) }
+
 		let getTransactionReview: GetTransactionReview = { request in
 			let networkID = await gatewaysClient.getCurrentNetworkID()
 
@@ -324,8 +326,10 @@ extension TransactionClient {
 				ephemeralNotaryPublicKey: request.ephemeralNotaryPublicKey
 			))
 
+			let rawManifest = try await convertManifestToString(request.manifestToSign)
+
 			return try .init(
-				rawManifest: request.manifestToSign,
+				rawManifest: rawManifest,
 				header: intent.intent.header,
 				transactionSigners: intent.transactionSigners
 			)
@@ -423,7 +427,7 @@ extension TransactionClient {
 
 		return Self(
 			convertManifestInstructionsToJSONIfItWasString: convertManifestInstructionsToJSONIfItWasString,
-			convertManifestToString: { try await engineToolkitClient.convertManifestToString(.init(version: .default, networkID: gatewaysClient.getCurrentNetworkID(), manifest: $0)) },
+			convertManifestToString: convertManifestToString,
 			lockFeeBySearchingForSuitablePayer: lockFeeBySearchingForSuitablePayer,
 			lockFeeWithSelectedPayer: lockFeeWithSelectedPayer,
 			addInstructionToManifest: addInstructionToManifest,

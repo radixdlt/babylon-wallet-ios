@@ -1,5 +1,6 @@
 import FeaturePrelude
 import SecurityStructureConfigurationListFeature
+import TransactionReviewFeature
 
 // MARK: - UpdateSecurityStateOfEntityCoordinator
 public struct UpdateSecurityStateOfEntityCoordinator<Entity: EntityProtocol & Sendable & Hashable>: Sendable, FeatureReducer {
@@ -20,15 +21,20 @@ public struct UpdateSecurityStateOfEntityCoordinator<Entity: EntityProtocol & Se
 	public struct Path: Sendable, Hashable, ReducerProtocol {
 		public enum State: Sendable, Hashable {
 			case selectSecurityStructureConfig(SecurityStructureConfigurationListCoordinator.State)
+			case securifyEntity(TransactionReview.State)
 		}
 
 		public enum Action: Sendable, Equatable {
 			case selectSecurityStructureConfig(SecurityStructureConfigurationListCoordinator.Action)
+			case securifyEntity(TransactionReview.Action)
 		}
 
 		public var body: some ReducerProtocolOf<Self> {
 			Scope(state: /State.selectSecurityStructureConfig, action: /Action.selectSecurityStructureConfig) {
 				SecurityStructureConfigurationListCoordinator()
+			}
+			Scope(state: /State.securifyEntity, action: /Action.securifyEntity) {
+				TransactionReview()
 			}
 		}
 	}
@@ -65,7 +71,13 @@ public struct UpdateSecurityStateOfEntityCoordinator<Entity: EntityProtocol & Se
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
 		case let .root(.selectSecurityStructureConfig(.delegate(.selectedConfig(configDetailed)))):
-			print("🔮Securify account with: \(configDetailed.metadata.label)")
+			let manifest = manifest(for: configDetailed)
+			state.path.append(.securifyEntity(.init(
+				transactionManifest: manifest,
+				nonce: Nonce.secureRandom(),
+				signTransactionPurpose: .internalManifest(.securifyEntity(kind: Entity.entityKind)),
+				message: nil
+			)))
 			return .none
 
 		default:
@@ -84,4 +96,8 @@ extension UpdateSecurityStateOfEntityCoordinator.State where Entity == Profile.N
 	public init(persona: Entity) {
 		self.init(entity: persona)
 	}
+}
+
+private func manifest(for configDetailed: SecurityStructureConfigurationDetailed) -> TransactionManifest {
+	.init(instructions: .parsed([]))
 }
