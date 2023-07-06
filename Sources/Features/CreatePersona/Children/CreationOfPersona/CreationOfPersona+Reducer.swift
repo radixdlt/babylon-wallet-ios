@@ -14,11 +14,7 @@ public struct CreationOfPersona: Sendable, FeatureReducer {
 			personaData: PersonaData? = nil
 		) {
 			self.name = name
-			#if DEBUG
-			self.personaData = .previewValue
-			#else
 			self.personaData = .init()
-			#endif
 			self.derivePublicKeys = .init(
 				derivationPathOption: .nextBasedOnFactorSource(
 					networkOption: .useCurrent,
