@@ -1,3 +1,4 @@
+import EngineToolkit
 import Prelude
 
 // MARK: - Profile.Network.Persona
@@ -29,8 +30,7 @@ extension Profile.Network {
 		/// A required non empty display name, used by presentation layer and sent to Dapps when requested.
 		public var displayName: NonEmptyString
 
-		/// Fields containing personal information you have inputted.
-		public var fields: IdentifiedArrayOf<Field>
+		public var personaData: PersonaData
 
 		public init(
 			networkID: NetworkID,
@@ -42,7 +42,7 @@ extension Profile.Network {
 			self.networkID = networkID
 			self.address = address
 			self.securityState = securityState
-			self.fields = extraProperties.fields
+			self.personaData = extraProperties.personaData
 			self.displayName = displayName
 		}
 
@@ -57,7 +57,7 @@ extension Profile.Network {
 				address: address,
 				securityState: securityState,
 				displayName: displayName,
-				fields: []
+				personaData: .init()
 			)
 		}
 	}
@@ -66,9 +66,9 @@ extension Profile.Network {
 extension Profile.Network.Persona {
 	/// Ephemeral, only used as arg passed to init.
 	public struct ExtraProperties: Sendable, Hashable, Codable {
-		public var fields: IdentifiedArrayOf<Field>
-		public init(fields: IdentifiedArrayOf<Field> = []) {
-			self.fields = fields
+		public var personaData: PersonaData
+		public init(personaData: PersonaData) {
+			self.personaData = personaData
 		}
 	}
 
@@ -77,9 +77,15 @@ extension Profile.Network.Persona {
 		address: EntityAddress,
 		securityState: EntitySecurityState,
 		displayName: NonEmpty<String>,
-		fields: IdentifiedArrayOf<Field>
+		personaData: PersonaData
 	) {
-		self.init(networkID: networkID, address: address, securityState: securityState, displayName: displayName, extraProperties: .init(fields: fields))
+		self.init(
+			networkID: networkID,
+			address: address,
+			securityState: securityState,
+			displayName: displayName,
+			extraProperties: .init(personaData: personaData)
+		)
 	}
 
 	public static var entityKind: EntityKind { .identity }
@@ -97,7 +103,7 @@ extension Profile.Network.Persona {
 			children: [
 				"address": address,
 				"securityState": securityState,
-				"fields": fields,
+				"personaData": personaData,
 				"displayName": String(describing: displayName),
 			],
 			displayStyle: .struct
@@ -109,55 +115,11 @@ extension Profile.Network.Persona {
 		"displayName": \(String(describing: displayName)),
 		"address": \(address),
 		"securityState": \(securityState),
-		"fields": \(fields)
+		"personaData": \(personaData)
 		"""
 	}
 }
 
-// MARK: - Profile.Network.Persona.Field
-extension Profile.Network.Persona {
-	/// A field containing personal informations
-	public struct Field:
-		Sendable,
-		Hashable,
-		Codable,
-		Identifiable,
-		CustomStringConvertible,
-		CustomDumpReflectable
-	{
-		public enum ID:
-			String,
-			Sendable,
-			Hashable,
-			Codable,
-			CaseIterable,
-			CustomStringConvertible,
-			CustomDumpRepresentable
-		{
-			case givenName
-			case familyName
-			case emailAddress
-			case phoneNumber
-		}
-
-		public typealias Value = NonEmpty<String>
-
-		/// Field identifier, e.g. `emailAddress` or `phoneNumber`.
-		public let id: ID
-
-		/// The content of this field, a non empty string,
-		/// e.g. "foo@bar.com" for email address or "555-5555" as phone number.
-		public let value: Value
-
-		public init(id: ID, value: Value) {
-			self.id = id
-			self.value = value
-		}
-	}
-}
-
-import Cryptography
-import EngineToolkit
 extension Profile.Network.Persona {
 	public static func deriveVirtualAddress(
 		networkID: NetworkID,
@@ -176,43 +138,5 @@ extension Profile.Network.Persona {
 		).get()
 
 		return response.virtualIdentityAddress
-	}
-}
-
-// MARK: - Profile.Network.Persona.Field.ID + Comparable
-extension Profile.Network.Persona.Field.ID: Comparable {
-	public static func < (lhs: Self, rhs: Self) -> Bool {
-		guard
-			let lhsIndex = Self.allCases.firstIndex(of: lhs),
-			let rhsIndex = Self.allCases.firstIndex(of: rhs)
-		else {
-			assertionFailure(
-				"""
-				This code path should never occur, unless you're manually conforming to `CaseIterable` and `allCases` is incomplete.
-				"""
-			)
-			return false
-		}
-		return lhsIndex < rhsIndex
-	}
-}
-
-extension Profile.Network.Persona.Field {
-	public var customDumpMirror: Mirror {
-		.init(
-			self,
-			children: [
-				"id": id,
-				"value": value,
-			],
-			displayStyle: .struct
-		)
-	}
-
-	public var description: String {
-		"""
-		"id": \(id),
-		"value": \(value)
-		"""
 	}
 }

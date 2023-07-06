@@ -106,7 +106,7 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 
 	public struct Destination: ReducerProtocol {
 		public enum State: Hashable {
-			case editPersona(EditPersona.State)
+//			case editPersona(EditPersona.State)
 			case createAuthKey(CreateAuthKey.State)
 			case dAppDetails(SimpleAuthDappDetails.State)
 
@@ -114,7 +114,7 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 		}
 
 		public enum Action: Equatable {
-			case editPersona(EditPersona.Action)
+//			case editPersona(EditPersona.Action)
 			case createAuthKey(CreateAuthKey.Action)
 			case dAppDetails(SimpleAuthDappDetails.Action)
 
@@ -127,9 +127,9 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 		}
 
 		public var body: some ReducerProtocolOf<Self> {
-			Scope(state: /State.editPersona, action: /Action.editPersona) {
-				EditPersona()
-			}
+//			Scope(state: /State.editPersona, action: /Action.editPersona) {
+//				EditPersona()
+//			}
 			Scope(state: /State.createAuthKey, action: /Action.createAuthKey) {
 				CreateAuthKey()
 			}
@@ -150,15 +150,15 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
-		case let .destination(.presented(.editPersona(.delegate(.personaSaved(persona))))):
-			guard persona.id == state.mode.id else { return .none }
-			return .run { [mode = state.mode] send in
-				let updated = try await reload(in: mode)
-				await send(.internal(.reloaded(updated)))
-				await send(.delegate(.personaChanged(persona.id)))
-			} catch: { error, _ in
-				loggerGlobal.error("Failed to reload, error: \(error)")
-			}
+//		case let .destination(.presented(.editPersona(.delegate(.personaSaved(persona))))):
+//			guard persona.id == state.mode.id else { return .none }
+//			return .run { [mode = state.mode] send in
+//				let updated = try await reload(in: mode)
+//				await send(.internal(.reloaded(updated)))
+//				await send(.delegate(.personaChanged(persona.id)))
+//			} catch: { error, _ in
+//				loggerGlobal.error("Failed to reload, error: \(error)")
+//			}
 
 		case .destination(.presented(.confirmForgetAlert(.confirmTapped))):
 			guard case let .dApp(dApp, persona: persona) = state.mode else {
@@ -250,15 +250,16 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 			return .none
 
 		case let .editablePersonaFetched(persona):
-			switch state.mode {
-			case .general:
-				state.destination = .editPersona(.init(mode: .edit, persona: persona))
-			case let .dApp(_, detailedPersona):
-				let fieldIDs = (detailedPersona.sharedFields ?? []).ids
-				state.destination = .editPersona(.init(mode: .dapp(requiredFieldIDs: Set(fieldIDs)), persona: persona))
-			}
-
-			return .none
+//			switch state.mode {
+//			case .general:
+//				state.destination = .editPersona(.init(mode: .edit, persona: persona))
+//			case let .dApp(_, detailedPersona):
+//				let fieldIDs = (detailedPersona.sharedFields ?? []).ids
+//				state.destination = .editPersona(.init(mode: .dapp(requiredFieldIDs: Set(fieldIDs)), persona: persona))
+//			}
+//
+//			return .none
+			fatalError()
 
 		case let .dAppsUpdated(dApps):
 			guard case let .general(persona, _) = state.mode else { return .none }

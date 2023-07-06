@@ -53,9 +53,7 @@ extension P2P.Dapp.Request.AccountsRequestItem {
 }
 
 extension P2P.Dapp.Request.PersonaDataRequestItem {
-	public static let previewValue: Self = .init(
-		fields: [.givenName, .familyName, .emailAddress]
-	)
+	public static let previewValue = Self(isRequestingName: true)
 }
 
 extension P2P.Dapp.Request.SendTransactionItem {
