@@ -88,12 +88,6 @@ extension PersonaDetails.View {
 			action: PersonaDetails.Destination.Action.dAppDetails,
 			destination: { SimpleAuthDappDetails.View(store: $0) }
 		)
-//		.sheet(
-//			store: store.destination,
-//			state: /PersonaDetails.Destination.State.editPersona,
-//			action: PersonaDetails.Destination.Action.editPersona,
-//			content: { EditPersona.View(store: $0) }
-//		)
 		.sheet(
 			store: store.destination,
 			state: /PersonaDetails.Destination.State.createAuthKey,
@@ -279,11 +273,6 @@ private extension PersonaDetails.State {
 	}
 
 	var dAppInfo: PersonaDetails.View.InfoSection.ViewState.DappInfo? {
-//		guard case let .dApp(dApp, persona) = mode else { return nil }
-//		return .init(
-//			name: dApp.displayName?.rawValue ?? L10n.DAppRequest.Metadata.unknownName,
-//			isSharingNothing: persona.sharedFields.isNilOrEmpty
-//		)
 		fatalError()
 	}
 }
@@ -292,16 +281,7 @@ private extension PersonaDetails.View.InfoSection.ViewState {
 	init(
 		dAppInfo: DappInfo?,
 		personaName: String
-//		fields: IdentifiedArrayOf<Profile.Network.Persona.Field>
 	) {
-//		self.init(
-//			dAppInfo: dAppInfo,
-//			personaName: personaName,
-//			firstName: fields[id: .givenName]?.value.rawValue,
-//			lastName: fields[id: .familyName]?.value.rawValue,
-//			emailAddress: fields[id: .emailAddress]?.value.rawValue,
-//			phoneNumber: fields[id: .phoneNumber]?.value.rawValue
-//		)
 		fatalError()
 	}
 }
@@ -380,7 +360,6 @@ extension PersonaDetails.View {
 						}
 
 						if let middleName = viewStore.middleName {
-							// FIXME: YES Localize, but... the WHOLE design of this WHOLE view have to change...
 							VPair(heading: "Middle", item: middleName)
 						}
 

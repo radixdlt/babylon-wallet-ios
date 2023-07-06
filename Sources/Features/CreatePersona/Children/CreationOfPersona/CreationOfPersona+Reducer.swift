@@ -15,7 +15,6 @@ public struct CreationOfPersona: Sendable, FeatureReducer {
 		) {
 			self.name = name
 			#if DEBUG
-			// FIXME: REMOVE THIS TEMPORARY SETTING OF PERSONA DATA!
 			self.personaData = .previewValue
 			#else
 			self.personaData = .init()
