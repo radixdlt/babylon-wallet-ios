@@ -44,6 +44,11 @@ extension UpdateSecurityStateOfEntityCoordinator {
 					then: { SecurityStructureConfigurationListCoordinator.View(store: $0) }
 				)
 				CaseLet(
+					state: /UpdateSecurityStateOfEntityCoordinator.Path.State.factorInstancesFromFactorSources,
+					action: UpdateSecurityStateOfEntityCoordinator.Path.Action.factorInstancesFromFactorSources,
+					then: { FactorInstancesFromFactorSourcesCoordinator.View(store: $0) }
+				)
+				CaseLet(
 					state: /UpdateSecurityStateOfEntityCoordinator.Path.State.securifyEntity,
 					action: UpdateSecurityStateOfEntityCoordinator.Path.Action.securifyEntity,
 					then: { TransactionReview.View(store: $0) }

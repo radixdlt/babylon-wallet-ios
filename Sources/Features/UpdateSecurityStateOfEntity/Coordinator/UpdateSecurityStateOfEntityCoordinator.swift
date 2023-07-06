@@ -21,17 +21,24 @@ public struct UpdateSecurityStateOfEntityCoordinator<Entity: EntityProtocol & Se
 	public struct Path: Sendable, Hashable, ReducerProtocol {
 		public enum State: Sendable, Hashable {
 			case selectSecurityStructureConfig(SecurityStructureConfigurationListCoordinator.State)
+
+			/// `AbstractSecurityStructure<FactorSource> -> AbstractSecurityStructure<FactorInstance>`
+			case factorInstancesFromFactorSources(FactorInstancesFromFactorSourcesCoordinator.State)
 			case securifyEntity(TransactionReview.State)
 		}
 
 		public enum Action: Sendable, Equatable {
 			case selectSecurityStructureConfig(SecurityStructureConfigurationListCoordinator.Action)
+			case factorInstancesFromFactorSources(FactorInstancesFromFactorSourcesCoordinator.Action)
 			case securifyEntity(TransactionReview.Action)
 		}
 
 		public var body: some ReducerProtocolOf<Self> {
 			Scope(state: /State.selectSecurityStructureConfig, action: /Action.selectSecurityStructureConfig) {
 				SecurityStructureConfigurationListCoordinator()
+			}
+			Scope(state: /State.factorInstancesFromFactorSources, action: /Action.factorInstancesFromFactorSources) {
+				FactorInstancesFromFactorSourcesCoordinator()
 			}
 			Scope(state: /State.securifyEntity, action: /Action.securifyEntity) {
 				TransactionReview()
@@ -71,7 +78,10 @@ public struct UpdateSecurityStateOfEntityCoordinator<Entity: EntityProtocol & Se
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
 		case let .root(.selectSecurityStructureConfig(.delegate(.selectedConfig(configDetailed)))):
-			let manifest = manifest(for: configDetailed, entity: state.entity)
+			state.path.append(.factorInstancesFromFactorSources(.init(structure: configDetailed)))
+			return .none
+		case let .path(.element(id: _, action: .factorInstancesFromFactorSources(.delegate(.done(.success(factorInstancesLevel)))))):
+			let manifest = manifest(for: factorInstancesLevel, entity: state.entity)
 			state.path.append(.securifyEntity(.init(
 				transactionManifest: manifest,
 				nonce: Nonce.secureRandom(),
@@ -99,38 +109,12 @@ extension UpdateSecurityStateOfEntityCoordinator.State where Entity == Profile.N
 }
 
 private func manifest(
-	for configDetailed: SecurityStructureConfigurationDetailed,
+	for securityStructure: AbstractSecurityStructureConfiguration<FactorInstance>,
 	entity: some EntityProtocol
 ) -> TransactionManifest {
 	guard case .unsecured = entity.securityState else {
 		fatalError()
 	}
-
-	func instantiate(
-		factorSourceLevel: AbstractSecurityStructureConfiguration<FactorSource>
-	) -> AbstractSecurityStructureConfiguration<FactorInstance> {
-		func instancesFor<R>(
-			role: RoleOfTier<R, FactorSource>
-		) -> RoleOfTier<R, FactorInstance> {
-			fatalError()
-		}
-		func instances<R>(
-			for keyPath: KeyPath<AbstractSecurityStructureConfiguration<FactorSource>.Configuration, RoleOfTier<R, FactorSource>>
-		) -> RoleOfTier<R, FactorInstance> {
-			instancesFor(role: configDetailed.configuration[keyPath: keyPath])
-		}
-		return .init(
-			metadata: configDetailed.metadata,
-			configuration: .init(
-				numberOfMinutesUntilAutoConfirmation: configDetailed.configuration.numberOfMinutesUntilAutoConfirmation,
-				primaryRole: instances(for: \.primaryRole),
-				recoveryRole: instances(for: \.recoveryRole),
-				confirmationRole: instances(for: \.confirmationRole)
-			)
-		)
-	}
-
-	let securityStructure = instantiate(factorSourceLevel: configDetailed)
 
 	let ruleSet: Tuple = {
 		func rulesFor<R>(role: RoleOfTier<R, FactorInstance>) -> ManifestASTValue {
