@@ -71,7 +71,7 @@ public struct UpdateSecurityStateOfEntityCoordinator<Entity: EntityProtocol & Se
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
 		case let .root(.selectSecurityStructureConfig(.delegate(.selectedConfig(configDetailed)))):
-			let manifest = manifest(for: configDetailed)
+			let manifest = manifest(for: configDetailed, entity: state.entity)
 			state.path.append(.securifyEntity(.init(
 				transactionManifest: manifest,
 				nonce: Nonce.secureRandom(),
@@ -98,6 +98,61 @@ extension UpdateSecurityStateOfEntityCoordinator.State where Entity == Profile.N
 	}
 }
 
-private func manifest(for configDetailed: SecurityStructureConfigurationDetailed) -> TransactionManifest {
-	.init(instructions: .parsed([]))
+private func manifest(
+	for configDetailed: SecurityStructureConfigurationDetailed,
+	entity: some EntityProtocol
+) -> TransactionManifest {
+	guard case .unsecured = entity.securityState else {
+		fatalError()
+	}
+
+	func instantiate(
+		factorSourceLevel: AbstractSecurityStructureConfiguration<FactorSource>
+	) -> AbstractSecurityStructureConfiguration<FactorInstance> {
+		func instancesFor<R>(
+			role: RoleOfTier<R, FactorSource>
+		) -> RoleOfTier<R, FactorInstance> {
+			fatalError()
+		}
+		func instances<R>(
+			for keyPath: KeyPath<AbstractSecurityStructureConfiguration<FactorSource>.Configuration, RoleOfTier<R, FactorSource>>
+		) -> RoleOfTier<R, FactorInstance> {
+			instancesFor(role: configDetailed.configuration[keyPath: keyPath])
+		}
+		return .init(
+			metadata: configDetailed.metadata,
+			configuration: .init(
+				numberOfMinutesUntilAutoConfirmation: configDetailed.configuration.numberOfMinutesUntilAutoConfirmation,
+				primaryRole: instances(for: \.primaryRole),
+				recoveryRole: instances(for: \.recoveryRole),
+				confirmationRole: instances(for: \.confirmationRole)
+			)
+		)
+	}
+
+	let securityStructure = instantiate(factorSourceLevel: configDetailed)
+
+	let ruleSet: Tuple = {
+		func rulesFor<R>(role: RoleOfTier<R, FactorInstance>) -> ManifestASTValue {
+			.string("Placeholder")
+		}
+		func rules<R>(
+			for keypath: KeyPath<AbstractSecurityStructureConfiguration<FactorInstance>.Configuration, RoleOfTier<R, FactorInstance>>
+		) -> ManifestASTValue {
+			rulesFor(role: securityStructure.configuration[keyPath: keypath])
+		}
+		return Tuple(values: [
+			rules(for: \.primaryRole),
+			rules(for: \.recoveryRole),
+			rules(for: \.confirmationRole),
+		])
+	}()
+
+	return TransactionManifest {
+		CreateAccessController(
+			controlledAsset: Bucket(value: entity.address.address),
+			ruleSet: ruleSet,
+			timedRecoveryDelayInMinutes: .u64(securityStructure.configuration.numberOfMinutesUntilAutoConfirmation.rawValue)
+		)
+	}
 }

@@ -16,10 +16,10 @@ public struct RecoveryAndConfirmationFactors: Sendable, Hashable {
 }
 
 // FIXME: strings
-public let numberOfDaysUntilAutoConfirmationTitlePlaceholder = "Days until auto confirm"
-public let numberOfDaysUntilAutoConfirmationSecondary = "Integer"
-public let numberOfDaysUntilAutoConfirmationErrorNotInt = "Not and integer"
-public let numberOfDaysUntilAutoConfirmationHintInfo = "The phone confirmer is only needed if you want to skip waiting the number of specified days."
+public let numberOfMinutesUntilAutoConfirmationTitlePlaceholder = "Days until auto confirm"
+public let numberOfMinutesUntilAutoConfirmationSecondary = "Integer"
+public let numberOfMinutesUntilAutoConfirmationErrorNotInt = "Not and integer"
+public let numberOfMinutesUntilAutoConfirmationHintInfo = "The phone confirmer is only needed if you want to skip waiting the number of specified days."
 
 // MARK: - SimpleManageSecurityStructureFlow.View
 extension SimpleManageSecurityStructureFlow {
@@ -37,7 +37,7 @@ extension SimpleManageSecurityStructureFlow {
 
 		let mode: Mode
 		let confirmerOfNewPhone: SecurityQuestionsFactorSource?
-		let numberOfDaysUntilAutoConfirmation: String
+		let numberOfMinutesUntilAutoConfirmation: String
 		let lostPhoneHelper: TrustedContactFactorSource?
 		var simpleSecurityStructure: RecoveryAndConfirmationFactors? {
 			guard let lostPhoneHelper, let confirmerOfNewPhone else {
@@ -49,12 +49,12 @@ extension SimpleManageSecurityStructureFlow {
 			)
 		}
 
-		var numberOfDaysUntilAutoConfirmationHint: Hint? {
+		var numberOfMinutesUntilAutoConfirmationHint: Hint? {
 			// FIXME: strings
-			guard let _ = RecoveryAutoConfirmDelayInDays.RawValue(numberOfDaysUntilAutoConfirmation) else {
-				return .error(numberOfDaysUntilAutoConfirmationErrorNotInt)
+			guard let _ = RecoveryAutoConfirmDelayInMinutes.RawValue(numberOfMinutesUntilAutoConfirmation) else {
+				return .error(numberOfMinutesUntilAutoConfirmationErrorNotInt)
 			}
-			return .info(numberOfDaysUntilAutoConfirmationHintInfo)
+			return .info(numberOfMinutesUntilAutoConfirmationHintInfo)
 		}
 
 		init(state: SimpleManageSecurityStructureFlow.State) {
@@ -64,12 +64,12 @@ extension SimpleManageSecurityStructureFlow {
 				self.confirmerOfNewPhone = try! existing.configuration.confirmationRole.thresholdFactors[0].extract(as: SecurityQuestionsFactorSource.self)
 				self.lostPhoneHelper = try! existing.configuration.recoveryRole.thresholdFactors[0].extract(as: TrustedContactFactorSource.self)
 				self.mode = .existing
-				self.numberOfDaysUntilAutoConfirmation = existing.configuration.numberOfDaysUntilAutoConfirmation.description
+				self.numberOfMinutesUntilAutoConfirmation = existing.configuration.numberOfMinutesUntilAutoConfirmation.description
 			case let .new(new):
 				self.confirmerOfNewPhone = new.confirmerOfNewPhone
 				self.lostPhoneHelper = new.lostPhoneHelper
 				self.mode = .new
-				self.numberOfDaysUntilAutoConfirmation = new.numberOfDaysUntilAutoConfirmation.description
+				self.numberOfMinutesUntilAutoConfirmation = new.numberOfMinutesUntilAutoConfirmation.description
 			}
 		}
 	}
@@ -93,14 +93,14 @@ extension SimpleManageSecurityStructureFlow {
 						}
 
 						AppTextField(
-							primaryHeading: .init(text: numberOfDaysUntilAutoConfirmationTitlePlaceholder),
-							secondaryHeading: numberOfDaysUntilAutoConfirmationSecondary,
-							placeholder: numberOfDaysUntilAutoConfirmationTitlePlaceholder,
+							primaryHeading: .init(text: numberOfMinutesUntilAutoConfirmationTitlePlaceholder),
+							secondaryHeading: numberOfMinutesUntilAutoConfirmationSecondary,
+							placeholder: numberOfMinutesUntilAutoConfirmationTitlePlaceholder,
 							text: viewStore.binding(
-								get: \.numberOfDaysUntilAutoConfirmation,
+								get: \.numberOfMinutesUntilAutoConfirmation,
 								send: { .changedNumberOfDaysUntilAutoConfirmation($0) }
 							),
-							hint: viewStore.numberOfDaysUntilAutoConfirmationHint,
+							hint: viewStore.numberOfMinutesUntilAutoConfirmationHint,
 							showClearButton: false
 						)
 						.keyboardType(.numberPad)

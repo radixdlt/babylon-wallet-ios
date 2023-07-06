@@ -54,7 +54,7 @@ public struct Securified: Sendable, Hashable, Codable {
 		}
 
 		return .init(
-			numberOfDaysUntilAutoConfirmation: accessController.securityStructure.numberOfDaysUntilAutoConfirmation,
+			numberOfMinutesUntilAutoConfirmation: accessController.securityStructure.numberOfMinutesUntilAutoConfirmation,
 			primaryRole: decorate(\.primaryRole),
 			recoveryRole: decorate(\.recoveryRole),
 			confirmationRole: decorate(\.confirmationRole)

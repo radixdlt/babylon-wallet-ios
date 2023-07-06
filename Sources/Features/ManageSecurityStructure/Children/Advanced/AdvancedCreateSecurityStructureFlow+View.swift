@@ -22,29 +22,29 @@ extension AdvancedManageSecurityStructureFlow {
 
 		let mode: Mode
 
-		let numberOfDaysUntilAutoConfirmationString: String
+		let numberOfMinutesUntilAutoConfirmationString: String
 		let primaryRole: SecurityStructureConfigurationDetailed.Configuration.Primary?
 		let recoveryRole: SecurityStructureConfigurationDetailed.Configuration.Recovery?
 		let confirmationRole: SecurityStructureConfigurationDetailed.Configuration.Confirmation?
 
-		var numberOfDaysUntilAutoConfirmationHint: Hint? {
+		var numberOfMinutesUntilAutoConfirmationHint: Hint? {
 			// FIXME: strings
-			guard let _ = numberOfDaysUntilAutoConfirmation else {
-				return .error(numberOfDaysUntilAutoConfirmationErrorNotInt)
+			guard let _ = numberOfMinutesUntilAutoConfirmation else {
+				return .error(numberOfMinutesUntilAutoConfirmationErrorNotInt)
 			}
-			return .info(numberOfDaysUntilAutoConfirmationHintInfo)
+			return .info(numberOfMinutesUntilAutoConfirmationHintInfo)
 		}
 
 		init(state: AdvancedManageSecurityStructureFlow.State) {
-			self.numberOfDaysUntilAutoConfirmationString = state.numberOfDaysUntilAutoConfirmation.description
+			self.numberOfMinutesUntilAutoConfirmationString = state.numberOfMinutesUntilAutoConfirmation.description
 			self.mode = state.existing == nil ? .new : .existing
 			self.primaryRole = state.primaryRole
 			self.recoveryRole = state.recoveryRole
 			self.confirmationRole = state.confirmationRole
 		}
 
-		var numberOfDaysUntilAutoConfirmation: RecoveryAutoConfirmDelayInDays? {
-			guard let rawValue = RecoveryAutoConfirmDelayInDays.RawValue(numberOfDaysUntilAutoConfirmationString) else {
+		var numberOfMinutesUntilAutoConfirmation: RecoveryAutoConfirmDelayInMinutes? {
+			guard let rawValue = RecoveryAutoConfirmDelayInMinutes.RawValue(numberOfMinutesUntilAutoConfirmationString) else {
 				return nil
 			}
 			return .init(rawValue: rawValue)
@@ -55,13 +55,13 @@ extension AdvancedManageSecurityStructureFlow {
 				let primary = primaryRole,
 				let recovery = recoveryRole,
 				let confirmation = confirmationRole,
-				let numberOfDaysUntilAutoConfirmation
+				let numberOfMinutesUntilAutoConfirmation
 			else {
 				return nil
 			}
 
 			return .init(
-				numberOfDaysUntilAutoConfirmation: numberOfDaysUntilAutoConfirmation,
+				numberOfMinutesUntilAutoConfirmation: numberOfMinutesUntilAutoConfirmation,
 				primaryRole: primary,
 				recoveryRole: recovery,
 				confirmationRole: confirmation
@@ -103,14 +103,14 @@ extension AdvancedManageSecurityStructureFlow {
 						}
 
 						AppTextField(
-							primaryHeading: .init(text: numberOfDaysUntilAutoConfirmationTitlePlaceholder),
-							secondaryHeading: numberOfDaysUntilAutoConfirmationSecondary,
-							placeholder: numberOfDaysUntilAutoConfirmationTitlePlaceholder,
+							primaryHeading: .init(text: numberOfMinutesUntilAutoConfirmationTitlePlaceholder),
+							secondaryHeading: numberOfMinutesUntilAutoConfirmationSecondary,
+							placeholder: numberOfMinutesUntilAutoConfirmationTitlePlaceholder,
 							text: viewStore.binding(
-								get: \.numberOfDaysUntilAutoConfirmationString,
+								get: \.numberOfMinutesUntilAutoConfirmationString,
 								send: { .changedNumberOfDaysUntilAutoConfirmation($0) }
 							),
-							hint: viewStore.numberOfDaysUntilAutoConfirmationHint,
+							hint: viewStore.numberOfMinutesUntilAutoConfirmationHint,
 							showClearButton: false
 						)
 						.keyboardType(.numberPad)

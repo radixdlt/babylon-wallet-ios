@@ -12,21 +12,21 @@ public struct AbstractSecurityStructure<AbstractFactor>:
 	public var recoveryRole: Recovery
 	public var confirmationRole: Confirmation
 
-	public var numberOfDaysUntilAutoConfirmation: RecoveryAutoConfirmDelayInDays
+	public var numberOfMinutesUntilAutoConfirmation: RecoveryAutoConfirmDelayInMinutes
 
 	public init(
-		numberOfDaysUntilAutoConfirmation: RecoveryAutoConfirmDelayInDays,
+		numberOfMinutesUntilAutoConfirmation: RecoveryAutoConfirmDelayInMinutes,
 		primaryRole: Primary,
 		recoveryRole: Recovery,
 		confirmationRole: Confirmation
 	) {
-		self.numberOfDaysUntilAutoConfirmation = numberOfDaysUntilAutoConfirmation
+		self.numberOfMinutesUntilAutoConfirmation = numberOfMinutesUntilAutoConfirmation
 		self.primaryRole = primaryRole
 		self.recoveryRole = recoveryRole
 		self.confirmationRole = confirmationRole
 	}
 }
 
-// MARK: - RecoveryAutoConfirmDelayInDaysTag
-public enum RecoveryAutoConfirmDelayInDaysTag {}
-public typealias RecoveryAutoConfirmDelayInDays = Tagged<RecoveryAutoConfirmDelayInDaysTag, UInt>
+// MARK: - RecoveryAutoConfirmDelayInMinutesTag
+public enum RecoveryAutoConfirmDelayInMinutesTag {}
+public typealias RecoveryAutoConfirmDelayInMinutes = Tagged<RecoveryAutoConfirmDelayInMinutesTag, UInt64>

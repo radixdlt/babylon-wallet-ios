@@ -16,7 +16,7 @@ public struct SimpleManageSecurityStructureFlow: Sendable, FeatureReducer {
 			public struct New: Sendable, Hashable {
 				public var lostPhoneHelper: TrustedContactFactorSource?
 				public var confirmerOfNewPhone: SecurityQuestionsFactorSource?
-				public var numberOfDaysUntilAutoConfirmation: RecoveryAutoConfirmDelayInDays = SecurityStructureConfigurationReference.Configuration.Recovery.defaultNumberOfDaysUntilAutoConfirmation
+				public var numberOfMinutesUntilAutoConfirmation: RecoveryAutoConfirmDelayInMinutes = SecurityStructureConfigurationReference.Configuration.Recovery.defaultNumberOfDaysUntilAutoConfirmation
 
 				public init(
 					lostPhoneHelper: TrustedContactFactorSource? = nil,
@@ -139,19 +139,19 @@ public struct SimpleManageSecurityStructureFlow: Sendable, FeatureReducer {
 		case let .changedNumberOfDaysUntilAutoConfirmation(delayAsString):
 
 			guard
-				let raw = RecoveryAutoConfirmDelayInDays.RawValue(delayAsString)
+				let raw = RecoveryAutoConfirmDelayInMinutes.RawValue(delayAsString)
 			else {
 				return .none
 			}
-			let delay = RecoveryAutoConfirmDelayInDays(rawValue: raw)
+			let delay = RecoveryAutoConfirmDelayInMinutes(rawValue: raw)
 
 			switch state.mode {
 			case var .existing(existing):
 				precondition(existing.isSimple)
-				existing.configuration.numberOfDaysUntilAutoConfirmation = delay
+				existing.configuration.numberOfMinutesUntilAutoConfirmation = delay
 				state.mode = .existing(existing)
 			case var .new(new):
-				new.numberOfDaysUntilAutoConfirmation = delay
+				new.numberOfMinutesUntilAutoConfirmation = delay
 				state.mode = .new(new)
 			}
 			return .none
@@ -205,7 +205,7 @@ public struct SimpleManageSecurityStructureFlow: Sendable, FeatureReducer {
 						}.first!
 
 						let config = SecurityStructureConfigurationDetailed.Configuration(
-							numberOfDaysUntilAutoConfirmation: new.numberOfDaysUntilAutoConfirmation,
+							numberOfMinutesUntilAutoConfirmation: new.numberOfMinutesUntilAutoConfirmation,
 							primaryRole: .single(primary, for: .primary),
 							recoveryRole: .single(simpleFactorConfig.singleRecoveryFactor, for: .recovery),
 							confirmationRole: .single(simpleFactorConfig.singleConfirmationFactor, for: .confirmation)

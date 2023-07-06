@@ -13,7 +13,7 @@ public struct AdvancedManageSecurityStructureFlow: Sendable, FeatureReducer {
 		public var primaryRole: SecurityStructureConfigurationDetailed.Configuration.Primary?
 		public var recoveryRole: SecurityStructureConfigurationDetailed.Configuration.Recovery?
 		public var confirmationRole: SecurityStructureConfigurationDetailed.Configuration.Confirmation?
-		public var numberOfDaysUntilAutoConfirmation: RecoveryAutoConfirmDelayInDays
+		public var numberOfMinutesUntilAutoConfirmation: RecoveryAutoConfirmDelayInMinutes
 
 		@PresentationState
 		var destination: Destinations.State? = nil
@@ -26,10 +26,10 @@ public struct AdvancedManageSecurityStructureFlow: Sendable, FeatureReducer {
 				self.primaryRole = config.primaryRole
 				self.recoveryRole = config.recoveryRole
 				self.confirmationRole = config.confirmationRole
-				self.numberOfDaysUntilAutoConfirmation = config.numberOfDaysUntilAutoConfirmation
+				self.numberOfMinutesUntilAutoConfirmation = config.numberOfMinutesUntilAutoConfirmation
 			case .new:
 				self.existing = nil
-				self.numberOfDaysUntilAutoConfirmation = SecurityStructureConfigurationReference.Configuration.Recovery.defaultNumberOfDaysUntilAutoConfirmation
+				self.numberOfMinutesUntilAutoConfirmation = SecurityStructureConfigurationReference.Configuration.Recovery.defaultNumberOfDaysUntilAutoConfirmation
 				self.primaryRole = nil
 				self.recoveryRole = nil
 				self.confirmationRole = nil
@@ -94,12 +94,12 @@ public struct AdvancedManageSecurityStructureFlow: Sendable, FeatureReducer {
 		case let .changedNumberOfDaysUntilAutoConfirmation(delayAsString):
 
 			guard
-				let raw = RecoveryAutoConfirmDelayInDays.RawValue(delayAsString)
+				let raw = RecoveryAutoConfirmDelayInMinutes.RawValue(delayAsString)
 			else {
 				return .none
 			}
-			let delay = RecoveryAutoConfirmDelayInDays(rawValue: raw)
-			state.numberOfDaysUntilAutoConfirmation = delay
+			let delay = RecoveryAutoConfirmDelayInMinutes(rawValue: raw)
+			state.numberOfMinutesUntilAutoConfirmation = delay
 			return .none
 
 		case .primaryRoleButtonTapped:

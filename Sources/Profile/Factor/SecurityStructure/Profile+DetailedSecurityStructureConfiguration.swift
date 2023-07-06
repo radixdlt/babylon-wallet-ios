@@ -14,7 +14,7 @@ extension Profile {
 		referenceConfiguration reference: SecurityStructureConfigurationReference.Configuration
 	) throws -> SecurityStructureConfigurationDetailed.Configuration {
 		try .init(
-			numberOfDaysUntilAutoConfirmation: reference.numberOfDaysUntilAutoConfirmation,
+			numberOfMinutesUntilAutoConfirmation: reference.numberOfMinutesUntilAutoConfirmation,
 			primaryRole: detailedSecurityStructureRole(referenceRole: reference.primaryRole),
 			recoveryRole: detailedSecurityStructureRole(referenceRole: reference.recoveryRole),
 			confirmationRole: detailedSecurityStructureRole(referenceRole: reference.confirmationRole)

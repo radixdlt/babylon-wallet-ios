@@ -18,7 +18,7 @@ extension SecurityStructureConfigurationDetailed {
 extension SecurityStructureConfigurationDetailed.Configuration {
 	public func asReference() -> SecurityStructureConfigurationReference.Configuration {
 		.init(
-			numberOfDaysUntilAutoConfirmation: numberOfDaysUntilAutoConfirmation,
+			numberOfMinutesUntilAutoConfirmation: numberOfMinutesUntilAutoConfirmation,
 			primaryRole: primaryRole.asReference(),
 			recoveryRole: recoveryRole.asReference(),
 			confirmationRole: confirmationRole.asReference()

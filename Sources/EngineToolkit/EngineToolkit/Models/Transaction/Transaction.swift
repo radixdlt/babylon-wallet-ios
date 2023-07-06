@@ -63,13 +63,13 @@ extension SpecificInstructionsBuilder {
 		instructions
 	}
 
-	public static func buildBlock(_ instruction: any InstructionProtocol) -> [any InstructionProtocol] {
-		[instruction]
-	}
-
-	public static func buildBlock(_ instruction: any InstructionProtocol) -> any InstructionProtocol {
-		instruction
-	}
+//	public static func buildBlock(_ instruction: any InstructionProtocol) -> [any InstructionProtocol] {
+//		[instruction]
+//	}
+//
+//	public static func buildBlock(_ instruction: any InstructionProtocol) -> any InstructionProtocol {
+//		instruction
+//	}
 }
 
 extension TransactionManifest {
