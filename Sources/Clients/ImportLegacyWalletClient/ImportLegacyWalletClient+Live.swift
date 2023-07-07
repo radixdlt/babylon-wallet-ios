@@ -17,10 +17,13 @@ extension ImportLegacyWalletClient: DependencyKey {
 		) async throws -> (accounts: NonEmpty<OrderedSet<MigratedAccount>>, networkID: NetworkID) {
 			let sortedOlympia = accounts.sorted(by: \.addressIndex)
 			let networkID = Radix.Gateway.default.network.id // we import to the default network, not the current.
-			let accountIndex = await accountsClient.nextAccountIndex(networkID)
+			let accountIndexBase = await accountsClient.nextAccountIndex(networkID)
 
+			var accountOffset: HD.Path.Component.Child.Value = 0
 			var accountsSet = OrderedSet<MigratedAccount>()
 			for olympiaAccount in sortedOlympia {
+				defer { accountOffset += 1 }
+				let accountIndex = accountIndexBase + accountOffset
 				let publicKey = SLIP10.PublicKey.ecdsaSecp256k1(olympiaAccount.publicKey)
 				let factorInstance = HierarchicalDeterministicFactorInstance(
 					id: factorSouceID,
