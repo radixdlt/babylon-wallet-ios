@@ -2,7 +2,7 @@ import DesignSystem
 import Profile
 
 extension SelectionRequirement {
-	public init(_ numberOfAccounts: Profile.Network.AuthorizedDapp.AuthorizedPersonaSimple.SharedAccounts.NumberOfAccounts) {
+	public init(_ numberOfAccounts: Profile.Network.AuthorizedDapp.AuthorizedPersonaSimple.SharedAccounts.Number) {
 		switch numberOfAccounts.quantifier {
 		case .exactly:
 			self = .exactly(numberOfAccounts.quantity)

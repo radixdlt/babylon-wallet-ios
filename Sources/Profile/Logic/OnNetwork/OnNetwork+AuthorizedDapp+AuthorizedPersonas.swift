@@ -34,9 +34,8 @@ extension Profile.Network {
 		/// being the tripple `(accountAddress, displayName, appearanceID)`
 		public let simpleAccounts: OrderedSet<AccountForDisplay>?
 
-		/// The persona data that the user has given the Dapp access to,
-		/// being the trippple: `(id, kind, value)`
-		public let sharedFields: IdentifiedArrayOf<Profile.Network.Persona.Field>?
+		/// The persona data that the user has given the Dapp access to
+		public let sharedPersonaData: PersonaData
 
 		/// If this persona has an auth sign key created
 		public let hasAuthenticationSigningKey: Bool
@@ -70,7 +69,7 @@ extension Profile.Network {
 				displayName: persona.displayName,
 				simpleAccounts: {
 					if let sharedAccounts = simple.sharedAccounts {
-						return try .init(sharedAccounts.accountsReferencedByAddress.map { accountAddress in
+						return try .init(sharedAccounts.ids.map { accountAddress in
 							guard
 								let account = self.accounts.first(where: { $0.address == accountAddress })
 							else {
@@ -86,13 +85,71 @@ extension Profile.Network {
 						return nil
 					}
 				}(),
-				sharedFields: {
-					guard let sharedFieldIDs = simple.sharedFieldIDs else { return nil }
-					let presentFields = sharedFieldIDs.compactMap { fieldID in
-						persona.fields.first { $0.id == fieldID }
+				sharedPersonaData: {
+					let full = persona.personaData
+					let shared = simple.sharedPersonaData
+					guard
+						Set(full.entries.map(\.id))
+						.isSuperset(of: shared.entryIDs)
+					else {
+						throw AuthorizedDappReferencesFieldIDThatDoesNotExist()
 					}
-					return .init(uniqueElements: presentFields)
-				}(), hasAuthenticationSigningKey: persona.hasAuthenticationSigningKey
+
+					func pick<T>(
+						from fullKeyPath: KeyPath<PersonaData, PersonaData.IdentifiedEntry<T>?>,
+						using sharedKeyPath: KeyPath<Profile.Network.AuthorizedDapp.AuthorizedPersonaSimple.SharedPersonaData,
+							PersonaDataEntryID?>
+					) -> PersonaData.IdentifiedEntry<T>? {
+						guard
+							let identifiedEntry = full[keyPath: fullKeyPath]
+						else {
+							return nil
+						}
+						guard
+							shared[keyPath: sharedKeyPath] == identifiedEntry.id
+						else {
+							return nil
+						}
+						return identifiedEntry
+					}
+
+					func filter<T>(
+						from fullKeyPath: KeyPath<PersonaData, PersonaData.CollectionOfIdentifiedEntries<T>>,
+						using sharedKeyPath: KeyPath<Profile.Network.AuthorizedDapp.AuthorizedPersonaSimple.SharedPersonaData, Profile.Network.AuthorizedDapp.AuthorizedPersonaSimple.SharedPersonaData.SharedCollection?>
+					) throws -> PersonaData.CollectionOfIdentifiedEntries<T> {
+						try .init(
+							collection: .init(uncheckedUniqueElements: full[keyPath: fullKeyPath].filter { value in
+								guard let sharedCollection = shared[keyPath: sharedKeyPath] else {
+									return false
+								}
+								guard sharedCollection.ids.contains(value.id) else {
+									return false
+								}
+								return true
+							})
+						)
+					}
+
+					let personaData = try PersonaData(
+						name: pick(from: \.name, using: \.name),
+						dateOfBirth: pick(from: \.dateOfBirth, using: \.dateOfBirth),
+						companyName: pick(from: \.companyName, using: \.companyName),
+						emailAddresses: filter(from: \.emailAddresses, using: \.emailAddresses),
+						phoneNumbers: filter(from: \.phoneNumbers, using: \.phoneNumbers),
+						urls: filter(from: \.urls, using: \.urls),
+						postalAddresses: filter(from: \.postalAddresses, using: \.postalAddresses),
+						creditCards: filter(from: \.creditCards, using: \.creditCards)
+					)
+
+					// The only purpose of this switch is to make sure we get a compilation error when we add a new PersonaData.Entry kind, so
+					// we do not forget to handle it here.
+					switch PersonaData.Entry.Kind.name {
+					case .name, .dateOfBirth, .companyName, .emailAddress, .phoneNumber, .url, .postalAddress, .creditCard: break
+					}
+
+					return personaData
+				}(),
+				hasAuthenticationSigningKey: persona.hasAuthenticationSigningKey
 			)
 		})
 

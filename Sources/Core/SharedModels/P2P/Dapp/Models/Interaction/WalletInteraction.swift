@@ -5,7 +5,9 @@ import Profile
 // MARK: - P2P.Dapp.Request
 extension P2P.Dapp {
 	public typealias Version = Tagged<Self, UInt>
-	public static let currentVersion: Version = 1
+	/// Temporarily disables Dapp communication.
+	/// Should be reverted as soon as we implement [ABW-1872](https://radixdlt.atlassian.net/browse/ABW-1872)
+	public static let currentVersion: Version = 2
 
 	public struct Request: Sendable, Hashable, Identifiable {
 		public typealias ID = RequestUnvalidated.ID

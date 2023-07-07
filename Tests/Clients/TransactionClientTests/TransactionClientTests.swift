@@ -69,6 +69,7 @@ extension Profile.Network.Account {
 	static func new(address: String) -> Self {
 		try! .init(
 			networkID: .simulator,
+			index: 0,
 			address: AccountAddress(validatingAddress: address),
 			factorInstance: .init(
 				factorSourceID: .previewValue,

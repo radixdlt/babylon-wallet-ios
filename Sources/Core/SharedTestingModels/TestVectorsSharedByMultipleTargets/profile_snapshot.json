@@ -204,7 +204,7 @@
       "description" : "computer unit test",
       "id" : "BABE1442-3C98-41FF-AFB0-D0F5829B020D"
     },
-    "snapshotVersion" : 40
+    "snapshotVersion" : 41
   },
   "networks" : [
     {
@@ -406,7 +406,7 @@
               "identityAddress" : "identity_tdx_21_1225rkl8svrs5fdc8rcmc7dk8wy4n0dap8da6dn58hptv47w9hmha5p",
               "lastLogin" : "2001-01-01T00:00:00Z",
               "sharedAccounts" : {
-                "accountsReferencedByAddress" : [
+                "ids" : [
                   "account_tdx_21_12xg7tf7aup8lrxkvug0vzatntzww0c6jnntyj6yd4eg5920kpxpzvt",
                   "account_tdx_21_12yth59wfyl8e4axupym0c96g9heuf5j06lv2lgc2cuapzlmj6alzzn"
                 ],
@@ -415,16 +415,66 @@
                   "quantity" : 2
                 }
               },
-              "sharedFieldIDs" : [
-                "familyName",
-                "givenName"
-              ]
+              "sharedPersonaData" : {
+                "companyName" : "00000000-0000-0000-0000-000000000002",
+                "creditCards" : {
+                  "ids" : [
+                    "00000000-0000-0000-0000-00000000000B"
+                  ],
+                  "request" : {
+                    "quantifier" : "atLeast",
+                    "quantity" : 1
+                  }
+                },
+                "dateOfBirth" : "00000000-0000-0000-0000-000000000001",
+                "emailAddresses" : {
+                  "ids" : [
+                    "00000000-0000-0000-0000-000000000003",
+                    "00000000-0000-0000-0000-000000000004"
+                  ],
+                  "request" : {
+                    "quantifier" : "atLeast",
+                    "quantity" : 1
+                  }
+                },
+                "name" : "00000000-0000-0000-0000-000000000000",
+                "phoneNumbers" : {
+                  "ids" : [
+                    "00000000-0000-0000-0000-000000000005",
+                    "00000000-0000-0000-0000-000000000006"
+                  ],
+                  "request" : {
+                    "quantifier" : "atLeast",
+                    "quantity" : 1
+                  }
+                },
+                "postalAddresses" : {
+                  "ids" : [
+                    "00000000-0000-0000-0000-000000000009",
+                    "00000000-0000-0000-0000-00000000000A"
+                  ],
+                  "request" : {
+                    "quantifier" : "atLeast",
+                    "quantity" : 1
+                  }
+                },
+                "urls" : {
+                  "ids" : [
+                    "00000000-0000-0000-0000-000000000007",
+                    "00000000-0000-0000-0000-000000000008"
+                  ],
+                  "request" : {
+                    "quantifier" : "atLeast",
+                    "quantity" : 1
+                  }
+                }
+              }
             },
             {
               "identityAddress" : "identity_tdx_21_12tljxea3s0mse52jmpvsphr0haqs86sung8d3qlhr763nxttj59650",
               "lastLogin" : "2001-01-01T00:00:00Z",
               "sharedAccounts" : {
-                "accountsReferencedByAddress" : [
+                "ids" : [
                   "account_tdx_21_12xg7tf7aup8lrxkvug0vzatntzww0c6jnntyj6yd4eg5920kpxpzvt"
                 ],
                 "request" : {
@@ -432,10 +482,9 @@
                   "quantity" : 1
                 }
               },
-              "sharedFieldIDs" : [
-                "givenName",
-                "familyName"
-              ]
+              "sharedPersonaData" : {
+                "name" : "00000000-0000-0000-0000-0000000000FF"
+              }
             }
           ]
         }
@@ -444,18 +493,131 @@
       "personas" : [
         {
           "address" : "identity_tdx_21_1225rkl8svrs5fdc8rcmc7dk8wy4n0dap8da6dn58hptv47w9hmha5p",
-          "displayName" : "Mrs Incognito",
-          "fields" : [
-            {
-              "id" : "givenName",
-              "value" : "Jane"
-            },
-            {
-              "id" : "familyName",
-              "value" : "Incognitoson"
-            }
-          ],
+          "displayName" : "Satoshi",
           "networkID" : 33,
+          "personaData" : {
+            "companyName" : {
+              "id" : "00000000-0000-0000-0000-000000000002",
+              "value" : "Bitcoin"
+            },
+            "creditCards" : [
+              {
+                "id" : "00000000-0000-0000-0000-00000000000B",
+                "value" : {
+                  "cvc" : 512,
+                  "expiry" : {
+                    "month" : 12,
+                    "year" : 2142
+                  },
+                  "holder" : "Satoshi Nakamoto",
+                  "number" : "0000 0000 2100 0000"
+                }
+              }
+            ],
+            "dateOfBirth" : {
+              "id" : "00000000-0000-0000-0000-000000000001",
+              "value" : "2009-01-03T12:00:00Z"
+            },
+            "emailAddresses" : [
+              {
+                "id" : "00000000-0000-0000-0000-000000000003",
+                "value" : "satoshi@nakamoto.bitcoin"
+              },
+              {
+                "id" : "00000000-0000-0000-0000-000000000004",
+                "value" : "be.your@own.bank"
+              }
+            ],
+            "name" : {
+              "id" : "00000000-0000-0000-0000-000000000000",
+              "value" : {
+                "family" : "Nakamoto",
+                "given" : "Satoshi",
+                "middle" : "Creator of Bitcoin",
+                "variant" : "eastern"
+              }
+            },
+            "phoneNumbers" : [
+              {
+                "id" : "00000000-0000-0000-0000-000000000005",
+                "value" : "21000000"
+              },
+              {
+                "id" : "00000000-0000-0000-0000-000000000006",
+                "value" : "123456789"
+              }
+            ],
+            "postalAddresses" : [
+              {
+                "id" : "00000000-0000-0000-0000-000000000009",
+                "value" : [
+                  {
+                    "discriminator" : "postalCode",
+                    "value" : "21 000 000"
+                  },
+                  {
+                    "discriminator" : "prefecture",
+                    "value" : "SHA256"
+                  },
+                  {
+                    "discriminator" : "countySlashCity",
+                    "value" : "Hashtown"
+                  },
+                  {
+                    "discriminator" : "furtherDivisionsLine0",
+                    "value" : "Sound money street"
+                  },
+                  {
+                    "discriminator" : "furtherDivisionsLine1",
+                    "value" : ""
+                  },
+                  {
+                    "discriminator" : "countryOrRegion",
+                    "value" : "japan"
+                  }
+                ]
+              },
+              {
+                "id" : "00000000-0000-0000-0000-00000000000A",
+                "value" : [
+                  {
+                    "discriminator" : "streetLine0",
+                    "value" : "Copthall House"
+                  },
+                  {
+                    "discriminator" : "streetLine1",
+                    "value" : "King street"
+                  },
+                  {
+                    "discriminator" : "townSlashCity",
+                    "value" : "Newcastle-under-Lyme"
+                  },
+                  {
+                    "discriminator" : "county",
+                    "value" : "Newcastle"
+                  },
+                  {
+                    "discriminator" : "postcode",
+                    "value" : "ST5 1UE"
+                  },
+                  {
+                    "discriminator" : "countryOrRegion",
+                    "value" : "unitedKingdom"
+                  }
+                ]
+              }
+            ],
+            "urls" : [
+              {
+                "id" : "00000000-0000-0000-0000-000000000007",
+                "value" : "bitcoin.org"
+              },
+              {
+                "id" : "00000000-0000-0000-0000-000000000008",
+                "value" : "https://github.com/bitcoin-core/secp256k1"
+              }
+            ]
+          },
           "securityState" : {
             "discriminator" : "unsecured",
             "unsecuredEntityControl" : {
@@ -516,17 +678,32 @@
         {
           "address" : "identity_tdx_21_12tljxea3s0mse52jmpvsphr0haqs86sung8d3qlhr763nxttj59650",
           "displayName" : "Mrs Public",
-          "fields" : [
-            {
-              "id" : "givenName",
-              "value" : "Maria"
-            },
-            {
-              "id" : "familyName",
-              "value" : "Publicson"
-            }
-          ],
           "networkID" : 33,
+          "personaData" : {
+            "creditCards" : [
+
+            ],
+            "emailAddresses" : [
+
+            ],
+            "name" : {
+              "id" : "00000000-0000-0000-0000-0000000000FF",
+              "value" : {
+                "family" : "Publicson",
+                "given" : "Maria",
+                "variant" : "western"
+              }
+            },
+            "phoneNumbers" : [
+
+            ],
+            "postalAddresses" : [
+
+            ],
+            "urls" : [
+
+            ]
+          },
           "securityState" : {
             "discriminator" : "unsecured",
             "unsecuredEntityControl" : {

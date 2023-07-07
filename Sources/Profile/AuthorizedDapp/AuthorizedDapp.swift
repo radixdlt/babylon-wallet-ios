@@ -88,6 +88,42 @@ public struct DappOrigin: Sendable, Hashable, Codable {
 	}
 }
 
+// MARK: - RequestedNumber
+// TODO: evolve this into an enum mirroring `SelectionRequirement` in `Selection.swift` to enable case switching.
+//
+// Things to keep in mind:
+//
+// - It will require a custom Codable implementation to make up for the move from struct(ured) to enum. Make sure implementation matches CAP-21's spec by writing some XCTAssertJSON tests beforehand.
+// - Don't just typealias NumberOfAccounts = SelectionRequirement, as they're not the same conceptually and should be allowed to evolve independently!
+public struct RequestedNumber: Sendable, Hashable, Codable {
+	public enum Quantifier: String, Sendable, Hashable, Codable {
+		case exactly
+		case atLeast
+	}
+
+	public let quantifier: Quantifier
+	public let quantity: Int
+
+	public var isValid: Bool {
+		switch (quantifier, quantity) {
+		case (.exactly, 0):
+			return false
+		case (_, ..<0):
+			return false
+		default:
+			return true
+		}
+	}
+
+	public static func exactly(_ quantity: Int) -> Self {
+		.init(quantifier: .exactly, quantity: quantity)
+	}
+
+	public static func atLeast(_ quantity: Int) -> Self {
+		.init(quantifier: .atLeast, quantity: quantity)
+	}
+}
+
 // MARK: - Profile.Network.AuthorizedDapp.AuthorizedPersonaSimple
 extension Profile.Network.AuthorizedDapp {
 	public struct AuthorizedPersonaSimple:
@@ -104,63 +140,92 @@ extension Profile.Network.AuthorizedDapp {
 		/// Date of last login for this persona.
 		public var lastLogin: Date
 
+		public typealias SharedAccounts = Shared<AccountAddress>
 		/// List of "ongoing accountAddresses" that user given the dApp access to.
 		public var sharedAccounts: SharedAccounts?
 
-		/// List of "ongoing personaData" (identified by Profile.Network.Persona.Field.ID) that user has given the Dapp access to.
-		/// mutable so that we can mutate the fields
-		public var sharedFieldIDs: Set<Profile.Network.Persona.Field.ID>?
-
-		public struct SharedAccounts:
+		public struct SharedPersonaData:
 			Sendable,
 			Hashable,
 			Codable
 		{
-			// TODO: evolve this into an enum mirroring `SelectionRequirement` in `Selection.swift` to enable case switching.
-			//
-			// Things to keep in mind:
-			//
-			// - It will require a custom Codable implementation to make up for the move from struct(ured) to enum. Make sure implementation matches CAP-21's spec by writing some XCTAssertJSON tests beforehand.
-			// - Don't just typealias NumberOfAccounts = SelectionRequirement, as they're not the same conceptually and should be allowed to evolve independently!
-			public struct NumberOfAccounts: Sendable, Hashable, Codable {
-				public enum Quantifier: String, Sendable, Hashable, Codable {
-					case exactly
-					case atLeast
+			public typealias SharedCollection = Shared<PersonaDataEntryID>
+
+			public let name: PersonaDataEntryID?
+			public let dateOfBirth: PersonaDataEntryID?
+			public let companyName: PersonaDataEntryID?
+
+			public let emailAddresses: SharedCollection?
+			public let phoneNumbers: SharedCollection?
+			public let urls: SharedCollection?
+			public let postalAddresses: SharedCollection?
+			public let creditCards: SharedCollection?
+
+			public var entryIDs: Set<PersonaDataEntryID> {
+				var ids: [PersonaDataEntryID] = [
+					name, dateOfBirth, companyName,
+				].compactMap { $0 }
+				ids.append(contentsOf: emailAddresses?.ids ?? [])
+				ids.append(contentsOf: phoneNumbers?.ids ?? [])
+				ids.append(contentsOf: urls?.ids ?? [])
+				ids.append(contentsOf: postalAddresses?.ids ?? [])
+				ids.append(contentsOf: creditCards?.ids ?? [])
+
+				// The only purpose of this switch is to make sure we get a compilation error when we add a new PersonaData.Entry kind, so
+				// we do not forget to handle it here.
+				switch PersonaData.Entry.Kind.name {
+				case .name, .dateOfBirth, .companyName, .emailAddress, .phoneNumber, .url, .postalAddress, .creditCard: break
 				}
 
-				public let quantifier: Quantifier
-				public let quantity: Int
-
-				public var isValid: Bool {
-					switch (quantifier, quantity) {
-					case (.exactly, 0):
-						return false
-					case (_, ..<0):
-						return false
-					default:
-						return true
-					}
-				}
-
-				public static func exactly(_ quantity: Int) -> Self {
-					.init(quantifier: .exactly, quantity: quantity)
-				}
-
-				public static func atLeast(_ quantity: Int) -> Self {
-					.init(quantifier: .atLeast, quantity: quantity)
-				}
+				return Set(ids)
 			}
 
-			public let request: NumberOfAccounts
-			public private(set) var accountsReferencedByAddress: OrderedSet<AccountAddress>
+			public init(
+				name: PersonaDataEntryID? = nil,
+				dateOfBirth: PersonaDataEntryID? = nil,
+				companyName: PersonaDataEntryID? = nil,
+				emailAddresses: SharedCollection? = nil,
+				phoneNumbers: SharedCollection? = nil,
+				urls: SharedCollection? = nil,
+				postalAddresses: SharedCollection? = nil,
+				creditCards: SharedCollection? = nil
+			) {
+				self.name = name
+				self.dateOfBirth = dateOfBirth
+				self.companyName = companyName
+
+				self.emailAddresses = emailAddresses
+				self.phoneNumbers = phoneNumbers
+				self.urls = urls
+				self.postalAddresses = postalAddresses
+				self.creditCards = creditCards
+
+				// The only purpose of this switch is to make sure we get a compilation error when we add a new PersonaData.Entry kind, so
+				// we do not forget to handle it here.
+				switch PersonaData.Entry.Kind.name {
+				case .name, .dateOfBirth, .companyName, .emailAddress, .phoneNumber, .url, .postalAddress, .creditCard: break
+				}
+			}
+		}
+
+		public var sharedPersonaData: SharedPersonaData
+
+		public struct Shared<ID>:
+			Sendable,
+			Hashable,
+			Codable where ID: Sendable & Hashable & Codable
+		{
+			public typealias Number = RequestedNumber
+			public let request: Number
+			public private(set) var ids: OrderedSet<ID>
 
 			public init(
-				accountsReferencedByAddress: OrderedSet<AccountAddress>,
-				forRequest request: NumberOfAccounts
+				ids: OrderedSet<ID>,
+				forRequest request: Number
 			) throws {
-				try Self.validate(accountsReferencedByAddress: accountsReferencedByAddress, forRequest: request)
+				try Self.validate(ids: ids, forRequest: request)
 				self.request = request
-				self.accountsReferencedByAddress = accountsReferencedByAddress
+				self.ids = ids
 			}
 		}
 
@@ -168,40 +233,44 @@ extension Profile.Network.AuthorizedDapp {
 			identityAddress: IdentityAddress,
 			lastLogin: Date,
 			sharedAccounts: SharedAccounts?,
-			sharedFieldIDs: Set<Profile.Network.Persona.Field.ID>?
+			sharedPersonaData: SharedPersonaData
 		) {
 			self.identityAddress = identityAddress
 			self.lastLogin = lastLogin
 			self.sharedAccounts = sharedAccounts
-			self.sharedFieldIDs = sharedFieldIDs
+			self.sharedPersonaData = sharedPersonaData
 		}
 	}
 }
 
-extension Profile.Network.AuthorizedDapp.AuthorizedPersonaSimple.SharedAccounts {
+// MARK: - NotEnoughEntiresProvided
+struct NotEnoughEntiresProvided: Swift.Error {}
+
+// MARK: - InvalidNumberOfEntries
+struct InvalidNumberOfEntries: Swift.Error {}
+
+extension Profile.Network.AuthorizedDapp.AuthorizedPersonaSimple.Shared {
 	public static func validate(
-		accountsReferencedByAddress: OrderedSet<AccountAddress>,
-		forRequest request: NumberOfAccounts
+		ids: OrderedSet<ID>,
+		forRequest request: Number
 	) throws {
 		switch request.quantifier {
 		case .atLeast:
-			guard accountsReferencedByAddress.count >= request.quantity else {
-				struct NotEnoughAccountsProvided: Swift.Error {}
-				throw NotEnoughAccountsProvided()
+			guard ids.count >= request.quantity else {
+				throw NotEnoughEntiresProvided()
 			}
 		// all good
 		case .exactly:
-			guard accountsReferencedByAddress.count == request.quantity else {
-				struct InvalidNumberOfAccounts: Swift.Error {}
-				throw InvalidNumberOfAccounts()
+			guard ids.count == request.quantity else {
+				throw InvalidNumberOfEntries()
 			}
 			// all good
 		}
 	}
 
-	public mutating func updateAccounts(_ new: OrderedSet<AccountAddress>) throws {
-		try Self.validate(accountsReferencedByAddress: new, forRequest: self.request)
-		self.accountsReferencedByAddress = new
+	public mutating func update(_ new: OrderedSet<ID>) throws {
+		try Self.validate(ids: new, forRequest: self.request)
+		self.ids = new
 	}
 }
 
