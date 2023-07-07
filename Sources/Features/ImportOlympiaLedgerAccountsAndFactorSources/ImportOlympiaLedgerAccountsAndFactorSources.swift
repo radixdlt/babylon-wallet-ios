@@ -236,6 +236,7 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 				return .send(.delegate(.failed(.failedToSaveNewLedger)))
 
 			case let .savedNewLedger(ledger):
+				print("• IMPORT OLYMPIA nameLedgerAndDerivePublicKeys.delegate savedNewLedger")
 				state.knownLedgers.append(ledger)
 				return .none
 
@@ -285,7 +286,6 @@ extension ImportOlympiaLedgerAccountsAndFactorSources {
 		.run { send in
 			do {
 				let validation = try await validate(derivedPublicKeys: derivedPublicKeys, olympiaAccountsToValidate: olympiaAccountsToValidate)
-
 				await send(.internal(.validatedAccounts(validation.validated, ledgerID)))
 			} catch {
 				loggerGlobal.error("Failed to validate accounts, error: \(error)")
@@ -472,21 +472,31 @@ public struct NameLedgerAndDerivePublicKeys: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
 		case let .savedNewLedger(ledger):
+			print("• NAMELEDGER AND DERIVE internalAction savedNewLedger")
+
 			state.showDerivePublicKeys(using: ledger)
 			return .none
 		}
 	}
 
 	private func saveNewLedger(_ ledger: LedgerHardwareWalletFactorSource) -> EffectTask<Action> {
-		.run { send in
-			try await factorSourcesClient.saveFactorSource(ledger.embed())
-			loggerGlobal.notice("Saved Ledger factor source! ✅")
-			await send(.delegate(.savedNewLedger(ledger)))
-			await send(.internal(.savedNewLedger(ledger)))
-		} catch: { error, _ in
-			loggerGlobal.error("Failed to save Factor Source, error: \(error)")
-			errorQueue.schedule(error)
-		}
+		print("• NAMELEDGER AND DERIVE - saveNewLedger"); return
+
+				.run { send in
+					try await factorSourcesClient.saveFactorSource(ledger.embed())
+					loggerGlobal.notice("Saved Ledger factor source! ✅")
+
+					print("• NAMELEDGER AND DERIVE - saveNewLedger - SUCCESS")
+
+					await send(.delegate(.savedNewLedger(ledger)))
+					await send(.internal(.savedNewLedger(ledger)))
+				} catch: { error, _ in
+
+					print("• NAMELEDGER AND DERIVE - FAILURE")
+
+					loggerGlobal.error("Failed to save Factor Source, error: \(error)")
+					errorQueue.schedule(error)
+				}
 	}
 }
 
