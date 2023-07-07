@@ -11,7 +11,6 @@ public struct NewPersonaInfo: Sendable, FeatureReducer {
 		public var inputtedName: String
 		public var sanitizedName: NonEmptyString?
 
-		// FIXME: Build support for input of persona "fields"/"entries"!
 		public var personaData: PersonaData
 		public var focusedInputField: InputField?
 
