@@ -6,15 +6,20 @@ import PersonasClient
 public struct CreationOfPersona: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public let name: NonEmptyString
-		public let fields: IdentifiedArrayOf<Profile.Network.Persona.Field>
+		public let personaData: PersonaData
 		public var derivePublicKeys: DerivePublicKeys.State
 
 		public init(
 			name: NonEmptyString,
-			fields: IdentifiedArrayOf<Profile.Network.Persona.Field>
+			personaData: PersonaData? = nil
 		) {
 			self.name = name
-			self.fields = fields
+			#if DEBUG
+			// FIXME: REMOVE THIS TEMPORARY SETTING OF PERSONA DATA!
+			self.personaData = .previewValue
+			#else
+			self.personaData = .init()
+			#endif
 			self.derivePublicKeys = .init(
 				derivationPathOption: .next(
 					networkOption: .useCurrent,
@@ -78,7 +83,7 @@ public struct CreationOfPersona: Sendable, FeatureReducer {
 				loggerGlobal.error("Failed to create persona expected one single key, got: \(hdKeys.count)")
 				return .send(.delegate(.createPersonaFailed))
 			}
-			return .run { [name = state.name, fields = state.fields] send in
+			return .run { [name = state.name, personaData = state.personaData] send in
 				let personaIndex = await personasClient.nextPersonaIndex(networkID)
 				let persona = try Profile.Network.Persona(
 					networkID: networkID,
@@ -89,7 +94,7 @@ public struct CreationOfPersona: Sendable, FeatureReducer {
 						derivationPath: hdKey.derivationPath
 					),
 					displayName: name,
-					extraProperties: .init(fields: fields)
+					extraProperties: .init(personaData: personaData)
 				)
 
 				await send(.internal(.createPersonaResult(

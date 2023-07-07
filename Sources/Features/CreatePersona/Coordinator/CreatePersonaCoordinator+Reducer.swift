@@ -124,9 +124,9 @@ extension CreatePersonaCoordinator {
 			let .root(.step1_newPersonaInfo(.delegate(.proceed(name, fields)))),
 			let .path(.element(_, action: .step1_newPersonaInfo(.delegate(.proceed(name, fields))))):
 
+			// FIXME: use "fields"
 			state.path.append(.step2_creationOfPersona(.init(
-				name: name,
-				fields: fields
+				name: name
 			)))
 			return .none
 

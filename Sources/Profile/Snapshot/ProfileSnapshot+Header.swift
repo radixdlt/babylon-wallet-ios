@@ -149,8 +149,9 @@ extension ProfileSnapshot.Header.Version {
 	/// - 37: Change `FactorSourceID` -> enum
 	/// - 38: Added `updatedOn` date to `SecurityStructureConfiguration`
 	/// - 39: Address format changed with `Birch` update
-	/// - 40: Change counter to not be factor source based.
-	public static let minimum: Self = 40
+	/// - 40: Changed Persona data/field format
+	/// - 41: Change counter to not be factor source based.
+	public static let minimum: Self = 41
 }
 
 extension ProfileSnapshot.Header {

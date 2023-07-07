@@ -212,11 +212,12 @@ extension PublicKeyHash {
 	public init(hashing publicKey: SLIP10.PublicKey) throws {
 		let hashBytes = try blake2b(data: publicKey.compressedData).suffix(Self.hashLength)
 
-		guard hashBytes.count == Self.hashLength else {
+		guard
+			hashBytes.count == Self.hashLength,
+			let hex = String(hashBytes.hex)
+		else {
 			throw InvalidPublicKeyHashLength(got: hashBytes.count, expected: Self.hashLength)
 		}
-
-		let hex = String(hashBytes.hex)
 
 		switch publicKey {
 		case .ecdsaSecp256k1:

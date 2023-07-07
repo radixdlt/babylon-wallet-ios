@@ -48,11 +48,11 @@ extension PersonaDetails.View {
 					.padding(.top, .large3)
 					#endif
 
-					Button(L10n.AuthorizedDapps.PersonaDetails.editPersona) {
-						viewStore.send(.editPersonaTapped)
-					}
-					.buttonStyle(.secondaryRectangular)
-					.padding(.vertical, .large3)
+//					Button(L10n.AuthorizedDapps.PersonaDetails.editPersona) {
+//						viewStore.send(.editPersonaTapped)
+//					}
+//					.buttonStyle(.secondaryRectangular)
+//					.padding(.vertical, .large3)
 
 					if viewStore.isDappPersona {
 						IfLetStore(store.scope(state: \.accountSection, action: PersonaDetails.Action.view)) {
@@ -88,12 +88,12 @@ extension PersonaDetails.View {
 			action: PersonaDetails.Destination.Action.dAppDetails,
 			destination: { SimpleAuthDappDetails.View(store: $0) }
 		)
-		.sheet(
-			store: store.destination,
-			state: /PersonaDetails.Destination.State.editPersona,
-			action: PersonaDetails.Destination.Action.editPersona,
-			content: { EditPersona.View(store: $0) }
-		)
+//		.sheet(
+//			store: store.destination,
+//			state: /PersonaDetails.Destination.State.editPersona,
+//			action: PersonaDetails.Destination.Action.editPersona,
+//			content: { EditPersona.View(store: $0) }
+//		)
 		.sheet(
 			store: store.destination,
 			state: /PersonaDetails.Destination.State.createAuthKey,
@@ -266,37 +266,43 @@ private extension PersonaDetails.State {
 		case let .dApp(_, persona: persona):
 			return .init(
 				dAppInfo: dAppInfo,
-				personaName: personaName,
-				fields: persona.sharedFields ?? []
+				personaName: persona.displayName.rawValue,
+				personaData: nil
 			)
 		case let .general(persona, _):
 			return .init(
 				dAppInfo: nil,
-				personaName: personaName,
-				fields: persona.fields
+				personaName: persona.displayName.rawValue,
+				personaData: persona.personaData
 			)
 		}
 	}
 
 	var dAppInfo: PersonaDetails.View.InfoSection.ViewState.DappInfo? {
-		guard case let .dApp(dApp, persona) = mode else { return nil }
-		return .init(
-			name: dApp.displayName?.rawValue ?? L10n.DAppRequest.Metadata.unknownName,
-			isSharingNothing: persona.sharedFields.isNilOrEmpty
-		)
+//		guard case let .dApp(dApp, persona) = mode else { return nil }
+//		return .init(
+//			name: dApp.displayName?.rawValue ?? L10n.DAppRequest.Metadata.unknownName,
+//			isSharingNothing: persona.sharedFields.isNilOrEmpty
+//		)
+		fatalError()
 	}
 }
 
 private extension PersonaDetails.View.InfoSection.ViewState {
-	init(dAppInfo: DappInfo?, personaName: String, fields: IdentifiedArrayOf<Profile.Network.Persona.Field>) {
-		self.init(
-			dAppInfo: dAppInfo,
-			personaName: personaName,
-			firstName: fields[id: .givenName]?.value.rawValue,
-			lastName: fields[id: .familyName]?.value.rawValue,
-			emailAddress: fields[id: .emailAddress]?.value.rawValue,
-			phoneNumber: fields[id: .phoneNumber]?.value.rawValue
-		)
+	init(
+		dAppInfo: DappInfo?,
+		personaName: String
+//		fields: IdentifiedArrayOf<Profile.Network.Persona.Field>
+	) {
+//		self.init(
+//			dAppInfo: dAppInfo,
+//			personaName: personaName,
+//			firstName: fields[id: .givenName]?.value.rawValue,
+//			lastName: fields[id: .familyName]?.value.rawValue,
+//			emailAddress: fields[id: .emailAddress]?.value.rawValue,
+//			phoneNumber: fields[id: .phoneNumber]?.value.rawValue
+//		)
+		fatalError()
 	}
 }
 
@@ -307,14 +313,45 @@ extension PersonaDetails.View {
 		struct ViewState: Equatable {
 			let dAppInfo: DappInfo?
 			let personaName: String
+			let companyName: String?
 			let firstName: String?
+			let middleName: String?
 			let lastName: String?
-			let emailAddress: String?
-			let phoneNumber: String?
+			let dateOfBirth: Date?
+			let emailAddresses: [String]?
+			let phoneNumbers: [String]?
+			let urls: [String]?
+			let postalAddresses: [PersonaData.PostalAddress]?
+			let creditCards: [PersonaData.CreditCard]?
 
 			struct DappInfo: Equatable {
 				let name: String
 				let isSharingNothing: Bool
+			}
+
+			init(
+				dAppInfo: DappInfo?,
+				personaName: String,
+				personaData: PersonaData?
+			) {
+				self.dAppInfo = dAppInfo
+				self.personaName = personaName
+				self.dateOfBirth = personaData?.dateOfBirth?.value.date
+				self.companyName = personaData?.companyName?.value.name
+				self.firstName = personaData?.name?.value.given
+				self.middleName = personaData?.name?.value.middle
+				self.lastName = personaData?.name?.value.family
+				self.emailAddresses = personaData?.emailAddresses.map(\.value.email)
+				self.phoneNumbers = personaData?.phoneNumbers.map(\.value.number)
+				self.urls = personaData?.urls.map(\.value.url)
+				self.postalAddresses = personaData?.postalAddresses.map(\.value)
+				self.creditCards = personaData?.creditCards.map(\.value)
+
+				// The only purpose of this switch is to make sure we get a compilation error when we add a new PersonaData.Entry kind, so
+				// we do not forget to handle it here.
+				switch PersonaData.Entry.Kind.name {
+				case .name, .dateOfBirth, .companyName, .emailAddress, .phoneNumber, .url, .postalAddress, .creditCard: break
+				}
 			}
 		}
 
@@ -337,20 +374,67 @@ extension PersonaDetails.View {
 						}
 					}
 
-					if let firstName = viewStore.firstName {
-						VPair(heading: L10n.AuthorizedDapps.PersonaDetails.firstName, item: firstName)
+					Group {
+						if let firstName = viewStore.firstName {
+							VPair(heading: L10n.AuthorizedDapps.PersonaDetails.firstName, item: firstName)
+						}
+
+						if let middleName = viewStore.middleName {
+							// FIXME: YES Localize, but... the WHOLE design of this WHOLE view have to change...
+							VPair(heading: "Middle", item: middleName)
+						}
+
+						if let lastName = viewStore.lastName {
+							VPair(heading: L10n.AuthorizedDapps.PersonaDetails.lastName, item: lastName)
+						}
+
+						if let dateOfBirth = viewStore.dateOfBirth {
+							VPair(heading: "Date of birth", item: dateOfBirth.ISO8601Format())
+						}
+
+						if let companyName = viewStore.companyName {
+							VPair(heading: "Company", item: companyName)
+						}
 					}
 
-					if let lastName = viewStore.lastName {
-						VPair(heading: L10n.AuthorizedDapps.PersonaDetails.lastName, item: lastName)
+					if let emailAddresses = viewStore.emailAddresses {
+						Text("Emails").font(.app.sectionHeader)
+						ForEach(emailAddresses, id: \.self) { emailAddress in
+							VPair(heading: L10n.AuthorizedDapps.PersonaDetails.emailAddress, item: emailAddress)
+						}
 					}
 
-					if let emailAddress = viewStore.emailAddress {
-						VPair(heading: L10n.AuthorizedDapps.PersonaDetails.emailAddress, item: emailAddress)
+					if let phoneNumbers = viewStore.phoneNumbers {
+						Text("Phone numbers").font(.app.sectionHeader)
+						ForEach(phoneNumbers, id: \.self) { phoneNumber in
+							VPair(heading: L10n.AuthorizedDapps.PersonaDetails.phoneNumber, item: phoneNumber)
+						}
 					}
 
-					if let phoneNumber = viewStore.phoneNumber {
-						VPair(heading: L10n.AuthorizedDapps.PersonaDetails.phoneNumber, item: phoneNumber)
+					if let urls = viewStore.urls {
+						Text("URLs").font(.app.sectionHeader)
+						ForEach(urls, id: \.self) { url in
+							VPair(heading: "URL", item: url)
+						}
+					}
+
+					if let creditCards = viewStore.creditCards {
+						Text("Credit cards").font(.app.sectionHeader)
+						ForEach(creditCards, id: \.self) { creditCard in
+							VPair(heading: "Card Holder", item: creditCard.holder)
+							VPair(heading: "Card Number", item: creditCard.number)
+							VPair(heading: "Card Expiry", item: "\(creditCard.expiry.year)/\(creditCard.expiry.month)")
+							VPair(heading: "Card CVC", item: creditCard.cvc)
+						}
+					}
+
+					if let postalAddresses = viewStore.postalAddresses {
+						Text("Addresses").font(.app.sectionHeader)
+						ForEach(postalAddresses, id: \.self) { postalAddress in
+							ForEach(postalAddress.fields) { field in
+								HPair(label: field.discriminator.rawValue, item: field.valueAsString)
+							}
+						}
 					}
 				}
 				.padding(.horizontal, .medium1)
