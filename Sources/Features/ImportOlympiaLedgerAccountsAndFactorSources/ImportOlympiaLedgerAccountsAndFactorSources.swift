@@ -168,7 +168,7 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 			guard let validatedAccounts = NonEmpty<Set>(validatedAccounts) else {
 				struct NoAccountsOnLedgerError: LocalizedError {
 					var errorDescription: String? {
-						"None of the accounts were fuond on the current Ledger device"
+						"No new accounts were found on this Ledger device" // FIXME: Strings
 					}
 				}
 
