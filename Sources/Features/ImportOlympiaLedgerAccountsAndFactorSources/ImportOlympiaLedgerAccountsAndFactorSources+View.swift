@@ -33,12 +33,14 @@ extension ImportOlympiaLedgerAccountsAndFactorSources {
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				ScrollView(showsIndicators: false) {
-					VStack(alignment: .center, spacing: .medium2) {
+					VStack(alignment: .center) {
 						Text(L10n.ImportOlympiaLedgerAccounts.title)
 							.textStyle(.sheetTitle)
 							.padding(.top, .small1)
+							.padding(.horizontal, .large3)
+							.padding(.bottom, .medium3)
 
-						Text(L10n.ImportOlympiaLedgerAccounts.subtitle(viewStore.ledgerControlledAccounts))
+						Text(L10n.ImportOlympiaLedgerAccounts.subtitle)
 							.textStyle(.body1Header)
 							.padding(.horizontal, .large3)
 
