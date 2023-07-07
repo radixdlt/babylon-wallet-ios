@@ -584,3 +584,52 @@ Install the Connector extension, open it to see the linking QR code, and tap con
 "iOSProfileBackup_totalAccountsNumberLabel" = "Number of Accounts: %d";
 "iOSProfileBackup_totalPersonasNumberLabel" = "Number of Personas: %d";
 "iOSProfileBackup_incompatibleWalletDataLabel" = "Incompatible Wallet data";
+
+
+
+// To be removed
+"importOlympiaLedgerAccounts_unverifiedAccountsLeft" = "#%d accounts left to import";
+"importOlympiaLedgerAccounts_importLedgersAndAccounts" = "Imported ledgers and accounts";
+"importOlympiaLedgerAccounts_accountCount" = "%@ - #%d accounts";
+
+"importLegacyWallet_title" = "Legacy Wallet Import";
+"importLegacyWallet_scanQRCodeInstructions" = "Use the export feature of your Radix Olympia Desktop Wallet to choose the accounts to export and generate an export QR code.";
+"importLegacyWallet_scannedLabel" = "Scanned: %d/%d";
+"importLegacyWallet_alreadyImportedLabel" = "Already imported";
+"importLegacyWallet_selectAccountsToImport_accountType" = "Type";
+"importLegacyWallet_selectAccountsToImport_derivationPath" = "Path";
+"importLegacyWallet_selectAccountsToImport_deselectAll" = "Deselect all";
+"importLegacyWallet_selectAccountsToImport_importManyAccounts" = "Import %d accounts";
+"importLegacyWallet_selectAccountsToImport_importOneAcccount" = "Import 1 account";
+"importLegacyWallet_selectAccountsToImport_importZeroAccounts" = "Import accounts";
+"importLegacyWallet_selectAccountsToImport_name" = "Name";
+"importLegacyWallet_selectAccountsToImport_olympiaAddress" = "Olympia Address";
+"importLegacyWallet_selectAccountsToImport_selectAllNonImported" = "Select all non imported";
+"importLegacyWallet_selectAccountsToImport_unnamed" = "Unnamed";
+"importLegacyWallet_hardwareImport_skipButton" = "Skip remaining accounts";
+"importLegacyWallet_scanQRCode_title" = "Import Legacy Olympia Accounts";
+"importLegacyWallet_accountsToImport_title" = "Import Accounts";
+"importLegacyWallet_accountsToImport_subtitle" = "The following accounts will be imported to your new wallet.";
+"importLegacyWallet_accountsToImport_emptyState" = "No accounts found to import.";
+"importLegacyWallet_accountsToImport_button" = "Import %d Accounts";
+"importLegacyWallet_accountsToImport_legacyAccount" = "Legacy Account";
+"importLegacyWallet_accountsToImport_ledgerAccount" = "Ledger (Legacy)";
+"importLegacyWallet_accountsToImport_newAddress" = "New Address";
+"importLegacyWallet_completion_title" = "Congratulations";
+"importLegacyWallet_completion_titleNoAccounts" = "No accounts imported.";
+"importLegacyWallet_completion_titleOneAccount" = "Imported 1 account.";
+"importLegacyWallet_completion_titleManyAccounts" = "Imported #%d accounts.";
+"importLegacyWallet_completion_subtitle" = "You\'ve imported your accounts.";
+"importLegacyWallet_completion_footer" = "They will live on the Radix Network and you can access them anytime in your Wallet.";
+"importLegacyWallet_hardwareImport_title" = "%d of your Olympia accounts are controlled by Ledger hardware wallets.";
+"importLegacyWallet_hardwareImport_noLedgers" = "None";
+"importLegacyWallet_hardwareImport_subtitle" = "Currently known Ledgers:";
+"importLegacyWallet_hardwareImport_footer" = "%d more accounts are controlled by other devices. Connect a Ledger hardware wallet device and tap Continue.";
+"importLegacyWallet_seedPhrase_title" = "Verify With Your Seed Phrase";
+"importLegacyWallet_seedPhrase_subtitle" = "To complete importing your accounts, please view your seed phrase in the Radix Desktop Wallet and enter the words here.";
+"importLegacyWallet_seedPhrase_warning" = "This is a one-time process to import your accounts. Never give your seed phrase to anyone for any reason.";
+"importLegacyWallet_seedPhrase_wordLabel" = "Word %d";
+"importLegacyWallet_seedPhrase_regularMode" = "Regular Mode";
+"importLegacyWallet_seedPhrase_advancedMode" = "Advanced Mode";
+"importLegacyWallet_seedPhrase_passphraseHint" = "Optional BIP39 Passphrase. This is not your wallet password, and the Radix Desktop Wallet did not use a BIP39 passphrase. This is only to support import from other wallets that may have used one.";
+"importLegacyWallet_seedPhrase_passphraseLabel" = "Passphrase";
