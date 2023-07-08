@@ -490,6 +490,9 @@
 "importOlympiaLedgerAccounts_knownLedgersNone" = "None";
 "importOlympiaLedgerAccounts_otherDeviceAccounts" = "%d more accounts are controlled by other devices. Connect a Ledger hardware wallet device and tap Continue.";
 "importOlympiaLedgerAccounts_continueButtonTitle" = "Continue";
+"importOlympiaLedgerAccounts_unverifiedAccountsLeft" = "#%d accounts left to import";
+"importOlympiaLedgerAccounts_importLedgersAndAccounts" = "Imported ledgers and accounts";
+"importOlympiaLedgerAccounts_accountCount" = "%@ - #%d accounts";
 "signing_withDeviceFactorSource_signTransaction" = "Sign transaction with phone";
 "signing_withDeviceFactorSource_idLabel" = "Factor Source ID: %@";
 "signing_useLedgerLabel_Ledger" = "Ledger";
