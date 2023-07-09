@@ -1181,25 +1181,29 @@ public enum L10n {
     }
   }
   public enum ImportMnemonic {
+    /// Advanced Mode
+    public static let advancedModeButton = L10n.tr("Localizable", "importMnemonic_advancedModeButton", fallback: "Advanced Mode")
     /// Incorrect seed phrase
     public static let checksumFailure = L10n.tr("Localizable", "importMnemonic_checksumFailure", fallback: "Incorrect seed phrase")
     /// Fewer words
     public static let fewerWords = L10n.tr("Localizable", "importMnemonic_fewerWords", fallback: "Fewer words")
-    /// Import seed phrase
-    public static let importSeedPhrase = L10n.tr("Localizable", "importMnemonic_importSeedPhrase", fallback: "Import seed phrase")
+    /// Import
+    public static let importSeedPhrase = L10n.tr("Localizable", "importMnemonic_importSeedPhrase", fallback: "Import")
     /// More words
     public static let moreWords = L10n.tr("Localizable", "importMnemonic_moreWords", fallback: "More words")
     /// Import Seed Phrase
     public static let navigationTitle = L10n.tr("Localizable", "importMnemonic_navigationTitle", fallback: "Import Seed Phrase")
     /// Passphrase
     public static let passphrase = L10n.tr("Localizable", "importMnemonic_passphrase", fallback: "Passphrase")
-    /// BIP39 Passphrase is often called a '25th word'.
-    public static let passphraseHint = L10n.tr("Localizable", "importMnemonic_passphraseHint", fallback: "BIP39 Passphrase is often called a '25th word'.")
+    /// Optional BIP39 Passphrase. This is not your wallet password, and the Radix Desktop Wallet did not use a BIP39 passphrase. This is only to support import from other wallets that may have used one.
+    public static let passphraseHint = L10n.tr("Localizable", "importMnemonic_passphraseHint", fallback: "Optional BIP39 Passphrase. This is not your wallet password, and the Radix Desktop Wallet did not use a BIP39 passphrase. This is only to support import from other wallets that may have used one.")
     /// Passphrase
     public static let passphrasePlaceholder = L10n.tr("Localizable", "importMnemonic_passphrasePlaceholder", fallback: "Passphrase")
-    /// word #%d
+    /// Regular Mode
+    public static let regularModeButton = L10n.tr("Localizable", "importMnemonic_regularModeButton", fallback: "Regular Mode")
+    /// Word %d
     public static func wordHeading(_ p1: Int) -> String {
-      return L10n.tr("Localizable", "importMnemonic_wordHeading", p1, fallback: "word #%d")
+      return L10n.tr("Localizable", "importMnemonic_wordHeading", p1, fallback: "Word %d")
     }
     public enum OffDevice {
       /// Without revealing location, vague hint on where this mnemonic is backed up, if anywhere.
@@ -1231,10 +1235,6 @@ public enum L10n {
     }
   }
   public enum ImportOlympiaAccounts {
-    /// Account already imported
-    public static let accountAlreadyImported = L10n.tr("Localizable", "importOlympiaAccounts_accountAlreadyImported", fallback: "Account already imported")
-    /// Here are all your Mnemonics. Tap one to display
-    public static let allMnemonicsHeading = L10n.tr("Localizable", "importOlympiaAccounts_allMnemonicsHeading", fallback: "Here are all your Mnemonics. Tap one to display")
     /// Already imported
     public static let alreadyImported = L10n.tr("Localizable", "importOlympiaAccounts_alreadyImported", fallback: "Already imported")
     /// BIP39 passphrase
@@ -1245,42 +1245,88 @@ public enum L10n {
     public static let invalidMnemonic = L10n.tr("Localizable", "importOlympiaAccounts_invalidMnemonic", fallback: "Invalid Mnemonic")
     /// Invalid QR code
     public static let invalidPayload = L10n.tr("Localizable", "importOlympiaAccounts_invalidPayload", fallback: "Invalid QR code")
-    /// Mnemonic
-    public static let mnemonic = L10n.tr("Localizable", "importOlympiaAccounts_mnemonic", fallback: "Mnemonic")
-    /// Mnemonic: %@ Passphrase: %@
-    public static func mnemonicAndPassphrase(_ p1: Any, _ p2: Any) -> String {
-      return L10n.tr("Localizable", "importOlympiaAccounts_mnemonicAndPassphrase", String(describing: p1), String(describing: p2), fallback: "Mnemonic: %@ Passphrase: %@")
-    }
-    /// Mnemonics
-    public static let mnemonics = L10n.tr("Localizable", "importOlympiaAccounts_mnemonics", fallback: "Mnemonics")
     /// No mnemonic found for accounts
     public static let noMnemonicFound = L10n.tr("Localizable", "importOlympiaAccounts_noMnemonicFound", fallback: "No mnemonic found for accounts")
     /// Passphrase
     public static let passphrase = L10n.tr("Localizable", "importOlympiaAccounts_passphrase", fallback: "Passphrase")
-    /// Scanned %d/%d
-    public static func scannedProgress(_ p1: Int, _ p2: Int) -> String {
-      return L10n.tr("Localizable", "importOlympiaAccounts_scannedProgress", p1, p2, fallback: "Scanned %d/%d")
-    }
-    /// Please scan next qr code
-    public static let scanNextQrCode = L10n.tr("Localizable", "importOlympiaAccounts_scanNextQrCode", fallback: "Please scan next qr code")
     /// Seed phrase
     public static let seedPhrase = L10n.tr("Localizable", "importOlympiaAccounts_seedPhrase", fallback: "Seed phrase")
-    /// Import Olympia Accounts
-    public static let title = L10n.tr("Localizable", "importOlympiaAccounts_title", fallback: "Import Olympia Accounts")
-    /// Type
-    public static let typeLabel = L10n.tr("Localizable", "importOlympiaAccounts_typeLabel", fallback: "Type")
-    /// View Mnemonics
-    public static let viewMnemonics = L10n.tr("Localizable", "importOlympiaAccounts_viewMnemonics", fallback: "View Mnemonics")
-    /// What is a Mnemonic
-    public static let whatIsMnemonic = L10n.tr("Localizable", "importOlympiaAccounts_whatIsMnemonic", fallback: "What is a Mnemonic")
+    public enum AccountsToImport {
+      /// Import %d accounts
+      public static func buttonManyAccounts(_ p1: Int) -> String {
+        return L10n.tr("Localizable", "importOlympiaAccounts_accountsToImport_buttonManyAccounts", p1, fallback: "Import %d accounts")
+      }
+      /// Import 1 account
+      public static let buttonOneAcccount = L10n.tr("Localizable", "importOlympiaAccounts_accountsToImport_buttonOneAcccount", fallback: "Import 1 account")
+      /// Ledger (Legacy)
+      public static let ledgerAccount = L10n.tr("Localizable", "importOlympiaAccounts_accountsToImport_ledgerAccount", fallback: "Ledger (Legacy)")
+      /// Legacy Account
+      public static let legacyAccount = L10n.tr("Localizable", "importOlympiaAccounts_accountsToImport_legacyAccount", fallback: "Legacy Account")
+      /// New Address
+      public static let newAddressLabel = L10n.tr("Localizable", "importOlympiaAccounts_accountsToImport_newAddressLabel", fallback: "New Address")
+      /// Olympia Address (Obsolete)
+      public static let olympiaAddressLabel = L10n.tr("Localizable", "importOlympiaAccounts_accountsToImport_olympiaAddressLabel", fallback: "Olympia Address (Obsolete)")
+      /// The following accounts will be imported to your new wallet.
+      public static let subtitle = L10n.tr("Localizable", "importOlympiaAccounts_accountsToImport_subtitle", fallback: "The following accounts will be imported to your new wallet.")
+      /// Import Accounts
+      public static let title = L10n.tr("Localizable", "importOlympiaAccounts_accountsToImport_title", fallback: "Import Accounts")
+      /// Unnamed
+      public static let unnamed = L10n.tr("Localizable", "importOlympiaAccounts_accountsToImport_unnamed", fallback: "Unnamed")
+    }
+    public enum Completion {
+      /// Continue to Account List
+      public static let accountListButtonTitle = L10n.tr("Localizable", "importOlympiaAccounts_completion_accountListButtonTitle", fallback: "Continue to Account List")
+      /// They will live on the Radix Network and you can access them anytime in your Wallet.
+      public static let explanation = L10n.tr("Localizable", "importOlympiaAccounts_completion_explanation", fallback: "They will live on the Radix Network and you can access them anytime in your Wallet.")
+      /// You've imported your accounts
+      public static let subtitleMultiple = L10n.tr("Localizable", "importOlympiaAccounts_completion_subtitleMultiple", fallback: "You've imported your accounts")
+      /// You've imported your account
+      public static let subtitleSingle = L10n.tr("Localizable", "importOlympiaAccounts_completion_subtitleSingle", fallback: "You've imported your account")
+      /// Congratulations
+      public static let title = L10n.tr("Localizable", "importOlympiaAccounts_completion_title", fallback: "Congratulations")
+    }
+    public enum ScanQR {
+      /// Scan the QR code shown in the Export section of the Radix Desktop Wallet for Olympia.
+      public static let instructions = L10n.tr("Localizable", "importOlympiaAccounts_scanQR_instructions", fallback: "Scan the QR code shown in the Export section of the Radix Desktop Wallet for Olympia.")
+      /// Scanned: %d/%d
+      public static func scannedLabel(_ p1: Int, _ p2: Int) -> String {
+        return L10n.tr("Localizable", "importOlympiaAccounts_scanQR_scannedLabel", p1, p2, fallback: "Scanned: %d/%d")
+      }
+      /// Import Legacy Olympia Accounts
+      public static let title = L10n.tr("Localizable", "importOlympiaAccounts_scanQR_title", fallback: "Import Legacy Olympia Accounts")
+    }
+    public enum VerifySeedPhrase {
+      /// To complete importing your accounts, please view your seed phrase in the Radix Desktop Wallet and enter the words here.
+      public static let subtitle = L10n.tr("Localizable", "importOlympiaAccounts_verifySeedPhrase_subtitle", fallback: "To complete importing your accounts, please view your seed phrase in the Radix Desktop Wallet and enter the words here.")
+      /// Verify With Your Seed Phrase
+      public static let title = L10n.tr("Localizable", "importOlympiaAccounts_verifySeedPhrase_title", fallback: "Verify With Your Seed Phrase")
+      /// This is a one-time process to import your accounts. Never give your seed phrase to anyone for any reason.
+      public static let warning = L10n.tr("Localizable", "importOlympiaAccounts_verifySeedPhrase_warning", fallback: "This is a one-time process to import your accounts. Never give your seed phrase to anyone for any reason.")
+    }
   }
   public enum ImportOlympiaLedgerAccounts {
     /// %@ - #%d accounts
     public static func accountCount(_ p1: Any, _ p2: Int) -> String {
       return L10n.tr("Localizable", "importOlympiaLedgerAccounts_accountCount", String(describing: p1), p2, fallback: "%@ - #%d accounts")
     }
+    /// Continue
+    public static let continueButtonTitle = L10n.tr("Localizable", "importOlympiaLedgerAccounts_continueButtonTitle", fallback: "Continue")
     /// Imported ledgers and accounts
     public static let importLedgersAndAccounts = L10n.tr("Localizable", "importOlympiaLedgerAccounts_importLedgersAndAccounts", fallback: "Imported ledgers and accounts")
+    /// None
+    public static let knownLedgersNone = L10n.tr("Localizable", "importOlympiaLedgerAccounts_knownLedgersNone", fallback: "None")
+    /// Currently Known Ledgers:
+    public static let listHeading = L10n.tr("Localizable", "importOlympiaLedgerAccounts_listHeading", fallback: "Currently Known Ledgers:")
+    /// %d more accounts are controlled by other devices. Connect a Ledger hardware wallet device and tap Continue.
+    public static func otherDeviceAccounts(_ p1: Int) -> String {
+      return L10n.tr("Localizable", "importOlympiaLedgerAccounts_otherDeviceAccounts", p1, fallback: "%d more accounts are controlled by other devices. Connect a Ledger hardware wallet device and tap Continue.")
+    }
+    /// %d of your accounts are controlled by Ledger Hardware Wallets
+    public static func subtitle(_ p1: Int) -> String {
+      return L10n.tr("Localizable", "importOlympiaLedgerAccounts_subtitle", p1, fallback: "%d of your accounts are controlled by Ledger Hardware Wallets")
+    }
+    /// Confirm Ledgers
+    public static let title = L10n.tr("Localizable", "importOlympiaLedgerAccounts_title", fallback: "Confirm Ledgers")
     /// #%d accounts left to import
     public static func unverifiedAccountsLeft(_ p1: Int) -> String {
       return L10n.tr("Localizable", "importOlympiaLedgerAccounts_unverifiedAccountsLeft", p1, fallback: "#%d accounts left to import")
