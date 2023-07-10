@@ -39,9 +39,9 @@ extension ImportOlympiaLedgerAccountsAndFactorSources {
 						Text(L10n.ImportOlympiaLedgerAccounts.importLedgersAndAccounts)
 
 						ScrollView {
-							ForEach(viewStore.ledgersWithAccounts, id: \.self) { ledgerWithAccounts in
+							ForEach(viewStore.ledgersWithAccounts, id: \.self) { _ in
 								LazyVStack {
-									Text(L10n.ImportOlympiaLedgerAccounts.accountCount(ledgerWithAccounts.displayName, ledgerWithAccounts.migratedAccounts.count))
+//									Text(L10n.ImportOlympiaLedgerAccounts.accountCount(ledgerWithAccounts.displayName, ledgerWithAccounts.migratedAccounts.count))
 								}
 							}
 						}
