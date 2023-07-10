@@ -1305,28 +1305,28 @@ public enum L10n {
     }
   }
   public enum ImportOlympiaLedgerAccounts {
-    /// %@ - #%d accounts
-    public static func accountCount(_ p1: Any, _ p2: Int) -> String {
-      return L10n.tr("Localizable", "importOlympiaLedgerAccounts_accountCount", String(describing: p1), p2, fallback: "%@ - #%d accounts")
+    /// Accounts remaining to verify: %d
+    public static func accountCount(_ p1: Int) -> String {
+      return L10n.tr("Localizable", "importOlympiaLedgerAccounts_accountCount", p1, fallback: "Accounts remaining to verify: %d")
     }
     /// Continue
     public static let continueButtonTitle = L10n.tr("Localizable", "importOlympiaLedgerAccounts_continueButtonTitle", fallback: "Continue")
     /// Imported ledgers and accounts
     public static let importLedgersAndAccounts = L10n.tr("Localizable", "importOlympiaLedgerAccounts_importLedgersAndAccounts", fallback: "Imported ledgers and accounts")
+    /// Connect your next Ledger device, launch the Radix Babylon app on it, and tap Continue here.
+    public static let instruction = L10n.tr("Localizable", "importOlympiaLedgerAccounts_instruction", fallback: "Connect your next Ledger device, launch the Radix Babylon app on it, and tap Continue here.")
     /// None
     public static let knownLedgersNone = L10n.tr("Localizable", "importOlympiaLedgerAccounts_knownLedgersNone", fallback: "None")
-    /// Currently Known Ledgers:
-    public static let listHeading = L10n.tr("Localizable", "importOlympiaLedgerAccounts_listHeading", fallback: "Currently Known Ledgers:")
+    /// Already verified Ledger devices:
+    public static let listHeading = L10n.tr("Localizable", "importOlympiaLedgerAccounts_listHeading", fallback: "Already verified Ledger devices:")
     /// %d more accounts are controlled by other devices. Connect a Ledger hardware wallet device and tap Continue.
     public static func otherDeviceAccounts(_ p1: Int) -> String {
       return L10n.tr("Localizable", "importOlympiaLedgerAccounts_otherDeviceAccounts", p1, fallback: "%d more accounts are controlled by other devices. Connect a Ledger hardware wallet device and tap Continue.")
     }
-    /// %d of your accounts are controlled by Ledger Hardware Wallets
-    public static func subtitle(_ p1: Int) -> String {
-      return L10n.tr("Localizable", "importOlympiaLedgerAccounts_subtitle", p1, fallback: "%d of your accounts are controlled by Ledger Hardware Wallets")
-    }
-    /// Confirm Ledgers
-    public static let title = L10n.tr("Localizable", "importOlympiaLedgerAccounts_title", fallback: "Confirm Ledgers")
+    /// You are attempting to import one or more Olympia accounts that must be verified with a Ledger hardware wallet device.
+    public static let subtitle = L10n.tr("Localizable", "importOlympiaLedgerAccounts_subtitle", fallback: "You are attempting to import one or more Olympia accounts that must be verified with a Ledger hardware wallet device.")
+    /// Verify With Ledger Device
+    public static let title = L10n.tr("Localizable", "importOlympiaLedgerAccounts_title", fallback: "Verify With Ledger Device")
     /// #%d accounts left to import
     public static func unverifiedAccountsLeft(_ p1: Int) -> String {
       return L10n.tr("Localizable", "importOlympiaLedgerAccounts_unverifiedAccountsLeft", p1, fallback: "#%d accounts left to import")
