@@ -71,12 +71,16 @@ final class ROLAClientTests: TestCase {
 	}
 
 	func omit_test_generate_rola_payload_hash_vectors() throws {
-		let origins: [P2P.Dapp.Request.Metadata.Origin] = try ["https://dashboard.rdx.works", "https://stella.swap", "https://rola.xrd"].map { try .init(string: $0) }
+		let origins: [P2P.Dapp.Request.Metadata.Origin] = try [
+			"https://dashboard.rdx.works",
+			"https://stella.swap",
+			"https://rola.xrd",
+		].map { try .init(string: $0) }
 		let accounts: [DappDefinitionAddress] = try [
-			.init(validatingAddress: "account_rdx168fghy4kapzfnwpmq7t7753425lwklk65r82ys7pz2xzleehk2ap0k"),
-			.init(validatingAddress: "account_rdx12xsvygvltz4uhsht6tdrfxktzpmnl77r0d40j8agmujgdj022sudkk"),
-			.init(validatingAddress: "account_rdx168e8u653alt59xm8ple6khu6cgce9cfx9mlza6wxf7qs3wwdh0pwrf"),
-		]
+			"account_rdx168fghy4kapzfnwpmq7t7753425lwklk65r82ys7pz2xzleehk2ap0k",
+			"account_rdx12xsvygvltz4uhsht6tdrfxktzpmnl77r0d40j8agmujgdj022sudkk",
+			"account_rdx168e8u653alt59xm8ple6khu6cgce9cfx9mlza6wxf7qs3wwdh0pwrf",
+		].map { try .init(validatingAddress: $0) }
 		let vectors: [TestVector] = try origins.flatMap { origin -> [TestVector] in
 			try accounts.flatMap { dAppDefinitionAddress -> [TestVector] in
 				try (UInt8.zero ..< 10).map { seed -> TestVector in
