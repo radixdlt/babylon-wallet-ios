@@ -1,4 +1,3 @@
-import EngineToolkit
 import Prelude
 
 // MARK: - AccountPortfolio
@@ -124,20 +123,22 @@ extension AccountPortfolio {
 }
 
 extension AccountPortfolio.NonFungibleResource {
-	public func nftGlobalID(for id: NonFungibleToken.LocalID) -> GlobalID {
-		resourceAddress.nftGlobalId(id).formatted
+	public func nftGlobalID(for id: NonFungibleToken.LocalID) throws -> GlobalID {
+		try resourceAddress.nftGlobalId(id).formatted
 	}
 }
 
 extension NonFungibleGlobalId {
 	public var formatted: String {
-		resourceAddress.address + ":" + nonFungibleLocalId.value
+                asStr()
+		//resourceAddress.address + ":" + nonFungibleLocalId.value
 	}
 }
 
 extension ResourceAddress {
-	public func nftGlobalId(_ localID: AccountPortfolio.NonFungibleResource.NonFungibleToken.LocalID) -> NonFungibleGlobalId {
-		.init(resourceAddress: self, nonFungibleLocalId: .init(value: localID.rawValue))
+	public func nftGlobalId(_ localID: AccountPortfolio.NonFungibleResource.NonFungibleToken.LocalID) throws -> NonFungibleGlobalId {
+                try .fromParts(resourceAddress: self.toEngine(), nonFungibleLocalId: .str(value: localID.rawValue))
+		//.init(resourceAddress: self, nonFungibleLocalId: .init(value: localID.rawValue))
 	}
 }
 

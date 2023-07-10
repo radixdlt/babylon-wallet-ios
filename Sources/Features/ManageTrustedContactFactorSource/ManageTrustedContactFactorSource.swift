@@ -5,16 +5,14 @@ import ScanQRFeature
 #if DEBUG
 import Cryptography
 extension AccountAddress {
-	public static func random(networkID: NetworkID? = nil) -> Self {
+        public static func random(networkID: NetworkID = .default) -> Self {
 		let curve25519PublicKey = Curve25519.PrivateKey().publicKey
-		return try! RadixEngine.instance
-			.deriveVirtualAccountAddressRequest(
-				request: .init(
-					publicKey: SLIP10.PublicKey.eddsaEd25519(curve25519PublicKey).intoEngine(),
-					networkId: networkID ?? .default
-				)
-			)
-			.get().virtualAccountAddress
+                let address = try! deriveVirtualAccountAddressFromPublicKey(
+                        publicKey: SLIP10.PublicKey.eddsaEd25519(curve25519PublicKey).intoEngine(),
+                        networkId: networkID.rawValue
+                )
+
+                return .init(address: address.addressString(), decodedKind: address.entityType())
 	}
 }
 #endif

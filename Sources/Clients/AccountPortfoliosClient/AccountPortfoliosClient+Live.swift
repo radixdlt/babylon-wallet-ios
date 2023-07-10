@@ -1,6 +1,5 @@
 import CacheClient
 import ClientPrelude
-import EngineToolkitClient
 import GatewayAPI
 import SharedModels
 
@@ -457,7 +456,6 @@ extension AccountPortfoliosClient {
 
 extension Array where Element == AccountPortfolio.FungibleResource {
 	func sorted() async -> AccountPortfolio.FungibleResources {
-		@Dependency(\.engineToolkitClient) var engineToolkitClient
 		@Dependency(\.gatewaysClient) var gatewaysClient
 
 		var xrdResource: AccountPortfolio.FungibleResource?
@@ -466,7 +464,7 @@ extension Array where Element == AccountPortfolio.FungibleResource {
 		let networkId = await gatewaysClient.getCurrentNetworkID()
 
 		for resource in self {
-			let isXRD = try? engineToolkitClient.isXRD(resource: resource.resourceAddress, on: networkId)
+                        let isXRD = try? resource.resourceAddress.isXRD(on: networkId)
 			if isXRD == true {
 				xrdResource = resource
 			} else {

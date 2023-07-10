@@ -90,7 +90,6 @@ package.addModules([
 			"ScanQRFeature",
 			"ChooseAccountsFeature",
 			"AssetsFeature",
-			"EngineToolkitClient",
 			"DappInteractionClient",
 		],
 		tests: .yes()
@@ -385,7 +384,6 @@ package.addModules([
 			"AuthorizedDAppsFeature",
 			"CacheClient",
 			"DebugInspectProfileFeature",
-			"EngineToolkitClient",
 			"GatewayAPI",
 			"GatewaySettingsFeature",
 			"ImportMnemonicFeature",
@@ -411,7 +409,6 @@ package.addModules([
 		featureSuffixDroppedFromFolderName: true,
 		dependencies: [
 			"AppPreferencesClient",
-			"EngineToolkit",
 			"FactorSourcesClient",
 			"LedgerHardwareWalletClient",
 			"Profile",
@@ -464,7 +461,6 @@ package.addModules([
 	.client(
 		name: "AccountPortfoliosClient",
 		dependencies: [
-			"EngineToolkitClient",
 			"GatewayAPI",
 			"CacheClient",
 		],
@@ -553,15 +549,6 @@ package.addModules([
 		tests: .yes()
 	),
 	.client(
-		name: "EngineToolkitClient",
-		dependencies: [
-			"Cryptography",
-			"EngineToolkit",
-			"Profile",
-		],
-		tests: .yes()
-	),
-	.client(
 		name: "FactorSourcesClient",
 		dependencies: [
 			"Profile",
@@ -581,7 +568,6 @@ package.addModules([
 		name: "FaucetClient",
 		dependencies: [
 			"DeviceFactorSourceClient",
-			"EngineToolkitClient",
 			"GatewayAPI",
 			"GatewaysClient", // getCurrentNetworkID
 			"SubmitTransactionClient",
@@ -626,7 +612,6 @@ package.addModules([
 		name: "ImportLegacyWalletClient",
 		dependencies: [
 			"AccountsClient",
-			"EngineToolkitClient",
 			"LedgerHardwareWalletClient",
 			"Profile", // Olympia models
 		],
@@ -779,7 +764,6 @@ package.addModules([
 			"GatewayAPI",
 			"CacheClient",
 			"DeviceFactorSourceClient",
-			"EngineToolkitClient",
 		],
 		tests: .yes(
 			dependencies: [],
@@ -791,7 +775,6 @@ package.addModules([
 	.client(
 		name: "SubmitTransactionClient",
 		dependencies: [
-			"EngineToolkitClient",
 			"GatewayAPI",
 			"TransactionClient",
 		],
@@ -802,7 +785,6 @@ package.addModules([
 		dependencies: [
 			"AccountsClient",
 			"AccountPortfoliosClient",
-			"EngineToolkitClient",
 			"FactorSourcesClient",
 			"GatewayAPI",
 			"PersonasClient",
@@ -933,7 +915,6 @@ package.addModules([
 		name: "Profile",
 		dependencies: [
 			"Cryptography",
-			"EngineToolkit", // address derivation, blake hash
 			"RadixConnectModels",
 			"Resources",
 			.product(name: "ComposableArchitecture", package: "swift-composable-architecture"), // actually just CasePaths
@@ -942,21 +923,6 @@ package.addModules([
 			dependencies: [
 				"SharedTestingModels",
 			],
-			resources: [
-				.process("TestVectors/"),
-			]
-		)
-	),
-	.module(
-		name: "EngineToolkit",
-		category: .engineToolkit,
-		dependencies: [
-			"Cryptography",
-			"RadixEngineToolkit",
-			.product(name: "ComposableArchitecture", package: "swift-composable-architecture"), // actually just CasePaths
-		],
-		tests: .yes(
-			dependencies: [],
 			resources: [
 				.process("TestVectors/"),
 			]
@@ -1033,6 +999,7 @@ package.addModules([
 		name: "Prelude",
 		remoteDependencies: [
 			.package(url: "https://github.com/apple/swift-collections", branch: "main"), // TODO: peg to specific version once main is tagged
+
 		],
 		dependencies: [
 			.product(name: "Algorithms", package: "swift-algorithms") {
@@ -1098,17 +1065,14 @@ package.addModules([
 			.product(name: "Validated", package: "swift-validated") {
 				.package(url: "https://github.com/pointfreeco/swift-validated", exact: "0.2.1")
 			},
+			.product(name: "EngineToolkitUniFFI", package: "swift-engine-toolkit") {
+				.package(url: "https://github.com/radixdlt/swift-engine-toolkit", exact: "0.10.0-elm.1-5b838e5")
+			},
+
 		],
 		tests: .yes(dependencies: [])
 	),
 ])
-
-package.targets.append(
-	.binaryTarget(
-		name: "RadixEngineToolkit",
-		path: "Sources/EngineToolkit/RadixEngineToolkit/RadixEngineToolkit.xcframework"
-	)
-)
 
 // MARK: - Unit Tests
 
@@ -1135,7 +1099,6 @@ extension Package {
 			case core
 			case module(name: String)
 			static let testing: Self = .module(name: "Testing")
-			static let engineToolkit: Self = .module(name: "EngineToolkit")
 			static let radixConnect: Self = .module(name: "RadixConnect")
 			var pathComponent: String {
 				switch self {

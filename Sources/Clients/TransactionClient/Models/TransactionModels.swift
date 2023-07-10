@@ -1,5 +1,4 @@
 import Cryptography
-import EngineToolkit
 import GatewayAPI
 import Prelude
 import Profile
@@ -29,13 +28,6 @@ extension GatewayAPI.TransactionPreviewRequest {
 		header: TransactionHeader,
 		transactionSigners: TransactionSigners
 	) throws {
-		let manifestString = {
-			switch rawManifest.instructions {
-			case let .string(manifestString): return manifestString
-			case .parsed: fatalError("you should have converted manifest to string first")
-			}
-		}()
-
 		let flags = GatewayAPI.TransactionPreviewRequestFlags(
 			unlimitedLoan: true, // True since no lock fee is added
 			assumeAllSignatureProofs: false,
@@ -51,15 +43,15 @@ extension GatewayAPI.TransactionPreviewRequest {
 		}
 		let notaryIsSignatory = transactionSigners.notaryIsSignatory
 
-		self.init(
-			manifest: manifestString,
-			blobsHex: rawManifest.blobs.map(\.hex),
-			startEpochInclusive: .init(header.startEpochInclusive.rawValue),
-			endEpochExclusive: .init(header.endEpochExclusive.rawValue),
-			notaryPublicKey: GatewayAPI.PublicKey(from: header.publicKey),
+		try self.init(
+                        manifest: rawManifest.instructions().asStr(),
+			blobsHex: rawManifest.blobs().map(\.hex),
+			startEpochInclusive: .init(header.startEpochInclusive),
+			endEpochExclusive: .init(header.endEpochExclusive),
+			notaryPublicKey: GatewayAPI.PublicKey(from: header.notaryPublicKey),
 			notaryIsSignatory: notaryIsSignatory,
 			tipPercentage: .init(header.tipPercentage),
-			nonce: .init(header.nonce.rawValue),
+			nonce: .init(header.nonce),
 			signerPublicKeys: transactionSigners.signerPublicKeys.map(GatewayAPI.PublicKey.init(from:)),
 			flags: flags
 		)
@@ -92,12 +84,12 @@ extension TransactionSigners {
 }
 
 extension GatewayAPI.PublicKey {
-	init(from engine: Engine.PublicKey) {
+	init(from engine: EngineToolkitUniFFI.PublicKey) {
 		switch engine {
-		case let .ecdsaSecp256k1(key):
-			self = .ecdsaSecp256k1(.init(keyType: .ecdsaSecp256k1, keyHex: key.bytes.hex))
-		case let .eddsaEd25519(key):
-			self = .eddsaEd25519(.init(keyType: .eddsaEd25519, keyHex: key.bytes.hex))
+		case let .ecdsaSecp256k1(bytes):
+                        self = .ecdsaSecp256k1(.init(keyType: .ecdsaSecp256k1, keyHex: bytes.hex()))
+		case let .eddsaEd25519(bytes):
+			self = .eddsaEd25519(.init(keyType: .eddsaEd25519, keyHex: bytes.hex()))
 		}
 	}
 }
@@ -115,12 +107,12 @@ extension GatewayAPI.PublicKey {
 
 // MARK: - NotarizeTransactionRequest
 public struct NotarizeTransactionRequest: Sendable, Hashable {
-	public let intentSignatures: Set<Engine.SignatureWithPublicKey>
-	public let transactionIntent: TransactionIntent
+	public let intentSignatures: Set<EngineToolkitUniFFI.SignatureWithPublicKey>
+	public let transactionIntent: Intent
 	public let notary: SLIP10.PrivateKey
 	public init(
-		intentSignatures: Set<Engine.SignatureWithPublicKey>,
-		transactionIntent: TransactionIntent,
+		intentSignatures: Set<EngineToolkitUniFFI.SignatureWithPublicKey>,
+		transactionIntent: Intent,
 		notary: SLIP10.PrivateKey
 	) {
 		self.intentSignatures = intentSignatures
@@ -131,9 +123,9 @@ public struct NotarizeTransactionRequest: Sendable, Hashable {
 
 // MARK: - NotarizeTransactionResponse
 public struct NotarizeTransactionResponse: Sendable, Hashable {
-	public let notarized: CompileNotarizedTransactionIntentResponse
+	public let notarized: [UInt8]
 	public let txID: TXID
-	public init(notarized: CompileNotarizedTransactionIntentResponse, txID: TXID) {
+	public init(notarized: [UInt8], txID: TXID) {
 		self.notarized = notarized
 		self.txID = txID
 	}
@@ -250,7 +242,7 @@ public struct AddFeeToManifestOutcomeExcludesLockFee: Sendable, Equatable {
 
 // MARK: - TransactionToReview
 public struct TransactionToReview: Sendable, Equatable {
-	public let analyzedManifestToReview: AnalyzeTransactionExecutionResponse
+	public let analyzedManifestToReview: ExecutionAnalysis
 	public let addFeeToManifestOutcome: AddFeeToManifestOutcome
 	public let networkID: NetworkID
 }

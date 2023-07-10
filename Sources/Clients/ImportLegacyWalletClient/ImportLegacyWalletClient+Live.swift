@@ -1,7 +1,6 @@
 import AccountsClient
 import ClientPrelude
 import Cryptography
-import EngineToolkitClient
 import Profile
 
 // MARK: - ImportLegacyWalletClient + DependencyKey
@@ -115,14 +114,13 @@ extension ImportLegacyWalletClient: DependencyKey {
 				return migratedAccounts
 			},
 			findAlreadyImportedIfAny: { scannedAccounts in
-				@Dependency(\.engineToolkitClient) var engineToolkitClient
 				do {
 					let accounts = try await accountsClient.getAccountsOnCurrentNetwork()
 					let babylonAddresses = Set<AccountAddress>(accounts.map(\.address))
 					let setOfExistingData = try Set(babylonAddresses.map {
 						// the first byte is an address type discriminator byte, which differs between Babylon and Olympia,
 						// so we must remove it.
-						try Data(engineToolkitClient.decodeAddress($0.address).data.dropFirst())
+                                                try Data(EngineToolkitUniFFI.Address(address: $0.address).bytes().dropFirst())
 					})
 					guard let payloadByteCount = setOfExistingData.first?.count else {
 						return []
@@ -150,9 +148,7 @@ extension ImportLegacyWalletClient: DependencyKey {
 func convert(
 	parsedOlympiaAccount raw: Olympia.Parsed.Account
 ) throws -> OlympiaAccountToMigrate {
-	@Dependency(\.engineToolkitClient) var engineToolkitClient
-
-	let bech32Address = try engineToolkitClient.deriveOlympiaAdressFromPublicKey(raw.publicKey)
+        let bech32Address = try deriveOlympiaAccountAddressFromPublicKey(publicKey: raw.publicKey.intoEngine(), olympiaNetwork: .mainnet).asStr()
 
 	guard let nonEmptyString = NonEmptyString(rawValue: bech32Address) else {
 		struct FailedToCreateNonEmptyOlympiaAddress: Swift.Error {}

@@ -96,8 +96,6 @@ extension SelectAccountsToImport {
 	}
 }
 
-import EngineToolkit
-
 // MARK: - SelectAccountsToImportRow
 enum SelectAccountsToImportRow {
 	struct ViewState: Equatable {

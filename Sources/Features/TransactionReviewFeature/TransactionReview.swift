@@ -20,7 +20,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		public var networkID: NetworkID? = nil
 
 		/// does not include lock fee?
-		public var analyzedManifestToReview: AnalyzeTransactionExecutionResponse? = nil
+		public var analyzedManifestToReview: ExecutionAnalysis? = nil
 
 		public var fee: BigDecimal
 		public var feePayerSelectionAmongstCandidates: FeePayerSelectionAmongstCandidates?
@@ -140,7 +140,6 @@ public struct TransactionReview: Sendable, FeatureReducer {
 	@Dependency(\.transactionClient) var transactionClient
 	@Dependency(\.gatewayAPIClient) var gatewayAPIClient
 	@Dependency(\.accountsClient) var accountsClient
-	@Dependency(\.engineToolkitClient) var engineToolkitClient
 	@Dependency(\.continuousClock) var clock
 	@Dependency(\.errorQueue) var errorQueue
 
@@ -192,7 +191,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 				let guarantees = state.allGuarantees
 				return .run { send in
 					let manifest = try await addingGuarantees(to: transactionWithLockFee, guarantees: guarantees)
-					let rawTransaction = try manifest.toString(preamble: "", networkID: networkID)
+                                        let rawTransaction = try manifest.instructions().asStr()
 					await send(.internal(.rawTransactionCreated(rawTransaction)))
 				} catch: { _, _ in
 					// TODO: Handle error?
@@ -368,7 +367,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 	}
 
 	private func review(
-		manifestPreview manifestPreviewToReview: AnalyzeTransactionExecutionResponse,
+		manifestPreview manifestPreviewToReview: ExecutionAnalysis,
 		feeAdded: BigDecimal,
 		networkID: NetworkID
 	) -> EffectTask<Action> {
@@ -516,33 +515,35 @@ extension TransactionReview {
 	// MARK: - TransferType
 	enum TransferType {
 		case exact
-		case estimated(instructionIndex: UInt32)
+		case estimated(instructionIndex: UInt64)
 	}
 
-	private func extractUserAccounts(_ manifest: AnalyzeTransactionExecutionResponse) async throws -> [Account] {
+	private func extractUserAccounts(_ analysis: ExecutionAnalysis) async throws -> [Account] {
 		let userAccounts = try await accountsClient.getAccountsOnCurrentNetwork()
-		return manifest
-			.encounteredAddresses
-			.componentAddresses
-			.accounts
-			.map { encounteredAccount in
-				let userAccount = userAccounts.first { userAccount in
-					userAccount.address.address == encounteredAccount.address
-				}
-				if let userAccount {
-					return .user(.init(address: userAccount.address, label: userAccount.displayName, appearanceID: userAccount.appearanceID))
-				} else {
-					return .external(encounteredAccount, approved: false)
-				}
-			}
+                fatalError()
+//		return manifest
+//			.encounteredAddresses
+//			.componentAddresses
+//			.accounts
+//			.map { encounteredAccount in
+//				let userAccount = userAccounts.first { userAccount in
+//					userAccount.address.address == encounteredAccount.address
+//				}
+//				if let userAccount {
+//					return .user(.init(address: userAccount.address, label: userAccount.displayName, appearanceID: userAccount.appearanceID))
+//				} else {
+//					return .external(encounteredAccount, approved: false)
+//				}
+//			}
 	}
 
-	private func extractUsedDapps(_ manifest: AnalyzeTransactionExecutionResponse) async throws -> TransactionReviewDappsUsed.State? {
-		let components = manifest.encounteredAddresses.componentAddresses.userApplications
-		let dApps = try await components.asyncMap(extractDappInfo)
-		guard !dApps.isEmpty else { return nil }
-
-		return TransactionReviewDappsUsed.State(isExpanded: true, dApps: .init(uniqueElements: Set(dApps)))
+	private func extractUsedDapps(_ manifest: ExecutionAnalysis) async throws -> TransactionReviewDappsUsed.State? {
+                fatalError()
+//		let components = manifest.encounteredAddresses.componentAddresses.userApplications
+//		let dApps = try await components.asyncMap(extractDappInfo)
+//		guard !dApps.isEmpty else { return nil }
+//
+//		return TransactionReviewDappsUsed.State(isExpanded: true, dApps: .init(uniqueElements: Set(dApps)))
 	}
 
 	private func extractDappInfo(_ component: ComponentAddress) async throws -> DappEntity {
@@ -556,11 +557,12 @@ extension TransactionReview {
 		)
 	}
 
-	private func exctractProofs(_ manifest: AnalyzeTransactionExecutionResponse) async -> TransactionReviewProofs.State? {
-		let proofs = await manifest.accountProofResources.asyncMap(extractProofInfo)
-		guard !proofs.isEmpty else { return nil }
-
-		return TransactionReviewProofs.State(proofs: .init(uniqueElements: proofs))
+	private func exctractProofs(_ manifest: ExecutionAnalysis) async -> TransactionReviewProofs.State? {
+                fatalError()
+//		let proofs = await manifest.accountProofResources.asyncMap(extractProofInfo)
+//		guard !proofs.isEmpty else { return nil }
+//
+//		return TransactionReviewProofs.State(proofs: .init(uniqueElements: proofs))
 	}
 
 	private func extractProofInfo(_ address: ResourceAddress) async -> ProofEntity {
@@ -571,151 +573,154 @@ extension TransactionReview {
 	}
 
 	private func extractWithdrawals(
-		_ manifest: AnalyzeTransactionExecutionResponse,
+		_ manifest: ExecutionAnalysis,
 		userAccounts: [Account],
 		networkID: NetworkID
 	) async throws -> TransactionReviewAccounts.State? {
 		var withdrawals: [Account: [Transfer]] = [:]
 
-		for withdrawal in manifest.accountWithdraws {
-			let account = try userAccounts.account(for: withdrawal.componentAddress)
-
-			let transfers = try await transferInfo(
-				resourceQuantifier: withdrawal.resourceQuantifier,
-				createdEntities: manifest.newlyCreated,
-				networkID: networkID,
-				type: .exact
-			)
-
-			withdrawals[account, default: []].append(contentsOf: transfers)
-		}
-
-		guard !withdrawals.isEmpty else { return nil }
-
-		let accounts = withdrawals.map {
-			TransactionReviewAccount.State(account: $0.key, transfers: .init(uniqueElements: $0.value))
-		}
-		return .init(accounts: .init(uniqueElements: accounts), showCustomizeGuarantees: false)
+                fatalError()
+//		for withdrawal in manifest.accountWithdraws {
+//			let account = try userAccounts.account(for: withdrawal.componentAddress)
+//
+//			let transfers = try await transferInfo(
+//				resourceQuantifier: withdrawal.resourceQuantifier,
+//				createdEntities: manifest.newlyCreated,
+//				networkID: networkID,
+//				type: .exact
+//			)
+//
+//			withdrawals[account, default: []].append(contentsOf: transfers)
+//		}
+//
+//		guard !withdrawals.isEmpty else { return nil }
+//
+//		let accounts = withdrawals.map {
+//			TransactionReviewAccount.State(account: $0.key, transfers: .init(uniqueElements: $0.value))
+//		}
+//		return .init(accounts: .init(uniqueElements: accounts), showCustomizeGuarantees: false)
 	}
 
 	private func extractDeposits(
-		_ manifest: AnalyzeTransactionExecutionResponse,
+		_ manifest: ExecutionAnalysis,
 		userAccounts: [Account],
 		networkID: NetworkID
 	) async throws -> TransactionReviewAccounts.State? {
-		var deposits: [Account: [Transfer]] = [:]
-
-		for deposit in manifest.accountDeposits {
-			let account = try userAccounts.account(for: deposit.componentAddress)
-
-			let transfers = try await transferInfo(
-				resourceQuantifier: deposit.resourceQuantifier,
-				createdEntities: manifest.newlyCreated,
-				networkID: networkID,
-				type: deposit.transferType
-			)
-
-			deposits[account, default: []].append(contentsOf: transfers)
-		}
-
-		let reviewAccounts = deposits
-			.filter { !$0.value.isEmpty }
-			.map { TransactionReviewAccount.State(account: $0.key, transfers: .init(uniqueElements: $0.value)) }
-
-		guard !reviewAccounts.isEmpty else { return nil }
-
-		let requiresGuarantees = reviewAccounts.contains { reviewAccount in
-			reviewAccount.transfers.contains { $0.fungible?.guarantee != nil }
-		}
-
-		return .init(accounts: .init(uniqueElements: reviewAccounts), showCustomizeGuarantees: requiresGuarantees)
+                fatalError()
+//		var deposits: [Account: [Transfer]] = [:]
+//
+//		for deposit in manifest.accountDeposits {
+//			let account = try userAccounts.account(for: deposit.componentAddress)
+//
+//			let transfers = try await transferInfo(
+//				resourceQuantifier: deposit.resourceQuantifier,
+//				createdEntities: manifest.newlyCreated,
+//				networkID: networkID,
+//				type: deposit.transferType
+//			)
+//
+//			deposits[account, default: []].append(contentsOf: transfers)
+//		}
+//
+//		let reviewAccounts = deposits
+//			.filter { !$0.value.isEmpty }
+//			.map { TransactionReviewAccount.State(account: $0.key, transfers: .init(uniqueElements: $0.value)) }
+//
+//		guard !reviewAccounts.isEmpty else { return nil }
+//
+//		let requiresGuarantees = reviewAccounts.contains { reviewAccount in
+//			reviewAccount.transfers.contains { $0.fungible?.guarantee != nil }
+//		}
+//
+//		return .init(accounts: .init(uniqueElements: reviewAccounts), showCustomizeGuarantees: requiresGuarantees)
 	}
 
 	func transferInfo(
-		resourceQuantifier: ResourceQuantifier,
-		createdEntities: NewlyCreated?,
+		resourceQuantifier: ResourceSpecifier,
+		createdEntities: [String: [String: MetadataValue]]?,
 		networkID: NetworkID,
 		type: TransferType
 	) async throws -> [Transfer] {
-		func newResource(at index: Int) -> NewlyCreatedResource? {
-			guard let newResources = createdEntities?.resources, !newResources.isEmpty, index < newResources.count else {
-				return nil
-			}
-
-			return newResources[index]
-		}
-
-		switch resourceQuantifier {
-		case let .amount(.existing(resourceAddress), amount):
-			let amount = try BigDecimal(fromString: amount.value)
-			let metadata = try? await gatewayAPIClient.getEntityMetadata(resourceAddress.address)
-			func guarantee() -> TransactionClient.Guarantee? {
-				guard case let .estimated(instructionIndex) = type else { return nil }
-				return .init(amount: amount, instructionIndex: instructionIndex, resourceAddress: resourceAddress)
-			}
-
-			return [.fungible(.init(
-				amount: amount,
-				name: metadata?.name,
-				symbol: metadata?.symbol,
-				thumbnail: metadata?.iconURL,
-				isXRD: (try? engineToolkitClient.isXRD(resource: resourceAddress, on: networkID)) ?? false,
-				guarantee: guarantee()
-			))]
-		case let .amount(.newlyCreated(index), amount):
-			let amount = try BigDecimal(fromString: amount.value)
-			guard let resource = newResource(at: index) else {
-				return []
-			}
-
-			return [
-				.fungible(.init(
-					amount: amount,
-					name: resource.name,
-					symbol: resource.symbol,
-					thumbnail: resource.iconURL,
-					isXRD: false
-				)),
-			]
-		case let .ids(.existing(resourceAddress), ids):
-			let metadata = try? await gatewayAPIClient.getEntityMetadata(resourceAddress.address)
-			let maximumNFTIDChunkSize = 29
-
-			var result: [Transfer] = []
-			for idChunk in ids.chunks(ofCount: maximumNFTIDChunkSize) {
-				let tokens = try await gatewayAPIClient.getNonFungibleData(.init(
-					resourceAddress: resourceAddress.address,
-					nonFungibleIds: idChunk.map(\.value)
-				))
-				.nonFungibleIds
-				.map {
-					Transfer.nonFungible(.init(
-						resourceName: metadata?.name,
-						resourceImage: metadata?.iconURL,
-						tokenID: $0.nonFungibleId.userFacingNonFungibleLocalID,
-						tokenName: nil
-					))
-				}
-
-				result.append(contentsOf: tokens)
-			}
-
-			return result
-
-		case let .ids(.newlyCreated(index), ids):
-			guard let resource = newResource(at: index) else {
-				return []
-			}
-
-			return ids.map { id in
-				.nonFungible(.init(
-					resourceName: resource.name,
-					resourceImage: resource.iconURL,
-					tokenID: id.value,
-					tokenName: nil
-				))
-			}
-		}
+                fatalError()
+//		func newResource(at index: Int) -> NewlyCreatedResource? {
+//			guard let newResources = createdEntities?.resources, !newResources.isEmpty, index < newResources.count else {
+//				return nil
+//			}
+//
+//			return newResources[index]
+//		}
+//
+//		switch resourceQuantifier {
+//		case let .amount(.existing(resourceAddress), amount):
+//			let amount = try BigDecimal(fromString: amount.value)
+//			let metadata = try? await gatewayAPIClient.getEntityMetadata(resourceAddress.address)
+//			func guarantee() -> TransactionClient.Guarantee? {
+//				guard case let .estimated(instructionIndex) = type else { return nil }
+//				return .init(amount: amount, instructionIndex: instructionIndex, resourceAddress: resourceAddress)
+//			}
+//
+//			return [.fungible(.init(
+//				amount: amount,
+//				name: metadata?.name,
+//				symbol: metadata?.symbol,
+//				thumbnail: metadata?.iconURL,
+//				isXRD: (try? engineToolkitClient.isXRD(resource: resourceAddress, on: networkID)) ?? false,
+//				guarantee: guarantee()
+//			))]
+//		case let .amount(.newlyCreated(index), amount):
+//			let amount = try BigDecimal(fromString: amount.value)
+//			guard let resource = newResource(at: index) else {
+//				return []
+//			}
+//
+//			return [
+//				.fungible(.init(
+//					amount: amount,
+//					name: resource.name,
+//					symbol: resource.symbol,
+//					thumbnail: resource.iconURL,
+//					isXRD: false
+//				)),
+//			]
+//		case let .ids(.existing(resourceAddress), ids):
+//			let metadata = try? await gatewayAPIClient.getEntityMetadata(resourceAddress.address)
+//			let maximumNFTIDChunkSize = 29
+//
+//			var result: [Transfer] = []
+//			for idChunk in ids.chunks(ofCount: maximumNFTIDChunkSize) {
+//				let tokens = try await gatewayAPIClient.getNonFungibleData(.init(
+//					resourceAddress: resourceAddress.address,
+//					nonFungibleIds: idChunk.map(\.value)
+//				))
+//				.nonFungibleIds
+//				.map {
+//					Transfer.nonFungible(.init(
+//						resourceName: metadata?.name,
+//						resourceImage: metadata?.iconURL,
+//						tokenID: $0.nonFungibleId.userFacingNonFungibleLocalID,
+//						tokenName: nil
+//					))
+//				}
+//
+//				result.append(contentsOf: tokens)
+//			}
+//
+//			return result
+//
+//		case let .ids(.newlyCreated(index), ids):
+//			guard let resource = newResource(at: index) else {
+//				return []
+//			}
+//
+//			return ids.map { id in
+//				.nonFungible(.init(
+//					resourceName: resource.name,
+//					resourceImage: resource.iconURL,
+//					tokenID: id.value,
+//					tokenName: nil
+//				))
+//			}
+//		}
 	}
 }
 
@@ -871,17 +876,10 @@ extension Collection where Element: Equatable {
 	}
 }
 
-extension AccountDeposit {
-	public var componentAddress: ComponentAddress {
+extension Source {
+	public var resourceSpecifier: ResourceSpecifier {
 		switch self {
-		case let .guaranteed(componentAddress, _), let .predicted(_, componentAddress, _):
-			return componentAddress
-		}
-	}
-
-	public var resourceQuantifier: ResourceQuantifier {
-		switch self {
-		case let .guaranteed(_, resourceSpecifier), let .predicted(_, _, resourceSpecifier):
+		case let .guaranteed(resourceSpecifier), let .predicted(_, resourceSpecifier):
 			return resourceSpecifier
 		}
 	}
@@ -890,20 +888,20 @@ extension AccountDeposit {
 		switch self {
 		case .guaranteed:
 			return .exact
-		case let .predicted(index, _, _):
+		case let .predicted(index, _):
 			return .estimated(instructionIndex: index)
 		}
 	}
 }
 
-extension ResourceQuantifier {
-	var resourceManagerSpecifier: ResourceManagerSpecifier {
-		switch self {
-		case let .amount(resourceAddress, _), let .ids(resourceAddress, _):
-			return resourceAddress
-		}
-	}
-}
+//extension ResourceQuantifier {
+//	var resourceManagerSpecifier: Re {
+//		switch self {
+//		case let .amount(resourceAddress, _), let .ids(resourceAddress, _):
+//			return resourceAddress
+//		}
+//	}
+//}
 
 // MARK: - SimpleDappDetails
 // FIXME: Remove and make settings use stacks

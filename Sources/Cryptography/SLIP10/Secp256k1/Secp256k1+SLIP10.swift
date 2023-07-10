@@ -24,3 +24,9 @@ extension K1.ECDSAWithKeyRecovery.PublicKey: CustomDebugStringConvertible {
 		compressedRepresentation.hex
 	}
 }
+
+extension K1.PublicKey {
+        public func intoEngine() -> EngineToolkitUniFFI.PublicKey {
+                .ecdsaSecp256k1(value: Array(compressedRepresentation))
+        }
+}

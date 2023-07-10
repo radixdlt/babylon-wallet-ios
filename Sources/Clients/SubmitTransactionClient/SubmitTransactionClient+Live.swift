@@ -1,7 +1,5 @@
 import AccountPortfoliosClient
 import ClientPrelude
-import EngineToolkit
-import EngineToolkitClient
 import GatewayAPI
 import TransactionClient
 
@@ -76,37 +74,33 @@ extension SubmitTransactionClient: DependencyKey {
 		let submitTransaction: SubmitTransaction = { request in
 			let txID = request.txID
 
-			func debugPrintTX(_ decompiledNotarized: DecompileNotarizedTransactionIntentResponse) {
-				let signedIntent = decompiledNotarized.signedIntent
-				let notarySignature = decompiledNotarized.notarySignature
-				let intent = signedIntent.intent
-				let intentSignatures = signedIntent.intentSignatures
+			func debugPrintTX(_ decompiledNotarized: NotarizedTransaction) {
+                                let signedIntent = decompiledNotarized.signedIntent()
+                                let notarySignature = decompiledNotarized.notarySignature()
+                                let intent = signedIntent.intent()
+				let intentSignatures = signedIntent.intentSignatures()
 				// RET prints when convertManifest is called, when it is removed, this can be moved down
 				// inline inside `print`.
-				let txIntentString = intent.description(lookupNetworkName: { try? Radix.Network.lookupBy(id: $0).name.rawValue })
-				print("\n\n🔮 DEBUG TRANSACTION START 🔮a")
-				print("TXID: \(txID.rawValue)")
-				print("TransactionIntent: \(txIntentString)")
-				print("\n\nINTENT SIGNATURES: \(intentSignatures.map { "\npublicKey: \($0.publicKey?.compressedRepresentation.hex ?? "")\nsig: \($0.signature.bytes.hex)" }.joined(separator: "\n"))")
-				print("\nNOTARY SIGNATURE: \(notarySignature)")
-				print("\n\nCOMPILED TX INTENT:\n\(request.compiledNotarizedTXIntent.compiledIntent.hex)")
-				print("\n\nCOMPILED NOTARIZED INTENT:\n\(request.compiledNotarizedTXIntent.compiledIntent.hex)")
-				print("\n\n\n🔮 DEBUG TRANSACTION END 🔮\n\n")
+//				let txIntentString = intent.description(lookupNetworkName: { try? Radix.Network.lookupBy(id: $0).name.rawValue })
+//				print("\n\n🔮 DEBUG TRANSACTION START 🔮a")
+//				print("TXID: \(txID.rawValue)")
+//				print("TransactionIntent: \(txIntentString)")
+//				print("\n\nINTENT SIGNATURES: \(intentSignatures.map { "\npublicKey: \($0.publicKey?.compressedRepresentation.hex ?? "")\nsig: \($0.signature.bytes.hex)" }.joined(separator: "\n"))")
+//				print("\nNOTARY SIGNATURE: \(notarySignature)")
+//				print("\n\nCOMPILED TX INTENT:\n\(request.compiledNotarizedTXIntent.hex)")
+//				print("\n\nCOMPILED NOTARIZED INTENT:\n\(request.compiledNotarizedTXIntent.hex)")
+//				print("\n\n\n🔮 DEBUG TRANSACTION END 🔮\n\n")
 			}
 
-			@Dependency(\.engineToolkitClient) var engineToolkitClient
 			@Dependency(\.transactionClient) var transactionClient
 			@Dependency(\.accountPortfoliosClient) var accountPortfoliosClient
 
 			let changedAccounts: [Profile.Network.Account.EntityAddress]?
 			do {
-				let decompiledNotarized = try engineToolkitClient.decompileNotarizedTransactionIntent(.init(
-					compiledNotarizedIntent: request.compiledNotarizedTXIntent.compiledIntent,
-					instructionsOutputKind: .parsed
-				))
+                                let decompiledNotarized = try NotarizedTransaction.decompile(compiledNotarizedTransaction: request.compiledNotarizedTXIntent)
 				debugPrintTX(decompiledNotarized)
 
-				let manifest = decompiledNotarized.signedIntent.intent.manifest
+				let manifest = decompiledNotarized.signedIntent().intent().manifest()
 
 				let involvedAccounts = try await transactionClient.myInvolvedEntities(manifest)
 				changedAccounts = involvedAccounts.accountsDepositedInto
@@ -118,7 +112,7 @@ extension SubmitTransactionClient: DependencyKey {
 			}
 
 			let submitTransactionRequest = GatewayAPI.TransactionSubmitRequest(
-				notarizedTransactionHex: request.compiledNotarizedTXIntent.compiledIntent.hex
+				notarizedTransactionHex: request.compiledNotarizedTXIntent.hex()
 			)
 
 			let response = try await gatewayAPIClient.submitTransaction(submitTransactionRequest)

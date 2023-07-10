@@ -1,7 +1,6 @@
 import ClientPrelude
 import ComposableArchitecture // actually CasePaths... but CI fails if we do `import CasePaths` 🤷‍♂️
 import Cryptography
-import EngineToolkit
 import FactorSourcesClient
 import Profile
 import RadixConnectClient
@@ -13,7 +12,6 @@ extension LedgerHardwareWalletClient: DependencyKey {
 
 	public static let liveValue: Self = {
 		@Dependency(\.radixConnectClient) var radixConnectClient
-		@Dependency(\.engineToolkitClient) var engineToolkitClient
 
 		@Sendable func makeRequest<Response: Sendable>(
 			_ request: P2P.ConnectorExtension.Request.LedgerHardwareWallet.Request,
@@ -125,17 +123,17 @@ extension LedgerHardwareWalletClient: DependencyKey {
 				})
 			},
 			signTransaction: { request in
-				let hashedMsg = try engineToolkitClient.hashTransactionIntent(request.transactionIntent)
-				let compiledTransactionIntent = try engineToolkitClient.compileTransactionIntent(request.transactionIntent)
+                                let hashedMsg = try request.transactionIntent.intentHash()
+                                let compiledTransactionIntent = try request.transactionIntent.compile()
 				return try await sign(
 					signers: request.signers,
-					expectedHashedMessage: Data(hex: hashedMsg.hash)
+                                        expectedHashedMessage: hashedMsg.bytes().data
 				) {
 					try await makeRequest(
 						.signTransaction(.init(
 							signers: request.signers.flatMap(\.keyParams),
 							ledgerDevice: request.ledger.device(),
-							compiledTransactionIntent: .init(data: compiledTransactionIntent.compiledIntent.data),
+                                                        compiledTransactionIntent: .init(data: compiledTransactionIntent.data),
 							displayHash: request.displayHashOnLedgerDisplay,
 							mode: request.ledgerTXDisplayMode
 						)),
@@ -254,13 +252,13 @@ extension P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.DerivedPu
 
 extension P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.SignatureOfSigner {
 	struct Validated: Sendable, Hashable {
-		public let signature: SignatureWithPublicKey
+                public let signature: Cryptography.SignatureWithPublicKey
 		public let derivationPath: DerivationPath
 	}
 
 	func validate(hashed: Data) throws -> Validated {
 		let hdPubKey = try self.derivedPublicKey.hdPubKey()
-		let signatureWithPublicKey: SignatureWithPublicKey
+                let signatureWithPublicKey: Cryptography.SignatureWithPublicKey
 		switch hdPubKey.publicKey {
 		case let .ecdsaSecp256k1(pubKey):
 			signatureWithPublicKey = try .ecdsaSecp256k1(
