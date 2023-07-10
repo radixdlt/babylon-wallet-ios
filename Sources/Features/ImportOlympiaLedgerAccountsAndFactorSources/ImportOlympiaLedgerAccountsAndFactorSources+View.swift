@@ -7,7 +7,6 @@ import NewConnectionFeature
 extension ImportOlympiaLedgerAccountsAndFactorSources.State {
 	var viewState: ImportOlympiaLedgerAccountsAndFactorSources.ViewState {
 		.init(
-			ledgerControlledAccounts: olympiaAccounts.unvalidated.count + olympiaAccounts.validated.count,
 			knownLedgers: knownLedgers,
 			moreAccounts: olympiaAccounts.unvalidated.count
 		)
@@ -17,7 +16,6 @@ extension ImportOlympiaLedgerAccountsAndFactorSources.State {
 // MARK: - ImportOlympiaLedgerAccountsAndFactorSources.View
 extension ImportOlympiaLedgerAccountsAndFactorSources {
 	public struct ViewState: Equatable {
-		public let ledgerControlledAccounts: Int
 		public let knownLedgers: IdentifiedArrayOf<LedgerHardwareWalletFactorSource>
 		public let moreAccounts: Int
 	}
@@ -33,43 +31,43 @@ extension ImportOlympiaLedgerAccountsAndFactorSources {
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				ScrollView(showsIndicators: false) {
-					VStack(alignment: .center) {
-						Text(L10n.ImportOlympiaLedgerAccounts.title)
-							.textStyle(.sheetTitle)
-							.padding(.top, .small1)
-							.padding(.horizontal, .large3)
-							.padding(.bottom, .medium3)
+					VStack(alignment: .center, spacing: .medium3) {
+						Group {
+							Text(L10n.ImportOlympiaLedgerAccounts.title)
+								.textStyle(.sheetTitle)
 
-//						Text(L10n.ImportOlympiaLedgerAccounts.subtitle)
-//							.textStyle(.body1Header)
-//							.padding(.horizontal, .large3)
+							Text(L10n.ImportOlympiaLedgerAccounts.subtitle)
+								.textStyle(.body1Regular)
 
-						Text(L10n.ImportOlympiaLedgerAccounts.listHeading)
-							.textStyle(.body1Header)
+							Text(L10n.ImportOlympiaLedgerAccounts.accountCount(viewStore.moreAccounts))
+								.textStyle(.body1Header)
+						}
+						.padding(.horizontal, .large2)
 
-						if viewStore.knownLedgers.isEmpty {
-							Card(.app.gray5) {
-								Text(L10n.ImportOlympiaLedgerAccounts.knownLedgersNone)
-									.textStyle(.secondaryHeader)
-									.frame(height: .largeButtonHeight)
-									.frame(maxWidth: .infinity)
-							}
-							.padding(.horizontal, .medium3)
-						} else {
+						if !viewStore.knownLedgers.isEmpty {
+							Text(L10n.ImportOlympiaLedgerAccounts.listHeading)
+								.textStyle(.body1Header)
+								.padding(.top, .medium3)
+								.padding(.horizontal, .large2)
+
 							ForEach(viewStore.knownLedgers) { ledger in
-								VStack(spacing: .small1) {
-									LedgerRowView(viewState: .init(factorSource: ledger))
-										.padding(.horizontal, .medium3)
+								Card(.app.gray5) {
+									Text(ledger.hint.name)
+										.textStyle(.secondaryHeader)
+										.multilineTextAlignment(.leading)
+										.flushedLeft
+										.padding(.horizontal, .large3)
+										.padding(.vertical, .medium1)
 								}
 							}
+							.padding(.horizontal, .medium3)
 						}
 
 						if viewStore.moreAccounts > 0 {
-							Text(L10n.ImportOlympiaLedgerAccounts.otherDeviceAccounts(viewStore.moreAccounts))
+							Text(L10n.ImportOlympiaLedgerAccounts.subtitle)
 								.textStyle(.body1Regular)
-								.padding(.horizontal, .large3)
+								.padding(.horizontal, .large2)
 						}
-
 						Spacer(minLength: 0)
 					}
 					.foregroundColor(.app.gray1)
