@@ -40,9 +40,9 @@ extension ImportOlympiaLedgerAccountsAndFactorSources {
 							.padding(.horizontal, .large3)
 							.padding(.bottom, .medium3)
 
-						Text(L10n.ImportOlympiaLedgerAccounts.subtitle)
-							.textStyle(.body1Header)
-							.padding(.horizontal, .large3)
+//						Text(L10n.ImportOlympiaLedgerAccounts.subtitle)
+//							.textStyle(.body1Header)
+//							.padding(.horizontal, .large3)
 
 						Text(L10n.ImportOlympiaLedgerAccounts.listHeading)
 							.textStyle(.body1Header)
