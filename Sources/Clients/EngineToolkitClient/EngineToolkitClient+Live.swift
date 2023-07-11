@@ -68,7 +68,12 @@ extension EngineToolkitClient {
 				.get()
 				.olympiaAccountAddress
 			},
-
+			deriveVirtualAccountAddress: {
+				try RadixEngine.instance
+					.deriveVirtualAccountAddressRequest(request: $0)
+					.get()
+					.virtualAccountAddress
+			},
 			generateTXID: { transactionIntent in
 				let hash = try hashTransactionItent(transactionIntent).hash
 				return TXID(rawValue: hash)

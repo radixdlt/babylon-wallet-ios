@@ -17,7 +17,7 @@ public struct DerivePublicKeys: Sendable, FeatureReducer {
 		public let derivationsPathOption: DerivationPathOption
 		public var ledgerBeingUsed: LedgerHardwareWalletFactorSource?
 		public enum DerivationPathOption: Sendable, Hashable {
-			case knownPaths(OrderedSet<DerivationPath>, networkID: NetworkID)
+			case knownPaths([DerivationPath], networkID: NetworkID)
 			case nextBasedOnFactorSource(networkOption: NetworkOption, entityKind: EntityKind, curve: SLIP10.Curve)
 
 			public enum NetworkOption: Sendable, Hashable {
@@ -78,7 +78,7 @@ public struct DerivePublicKeys: Sendable, FeatureReducer {
 
 	public enum DelegateAction: Sendable, Hashable {
 		case derivedPublicKeys(
-			OrderedSet<HierarchicalDeterministicPublicKey>,
+			[HierarchicalDeterministicPublicKey],
 			factorSourceID: FactorSourceID,
 			networkID: NetworkID
 		)
@@ -164,7 +164,7 @@ extension DerivePublicKeys {
 
 	private func deriveWith(
 		deviceFactorSource: DeviceFactorSource,
-		derivationPaths: OrderedSet<DerivationPath>,
+		derivationPaths: [DerivationPath],
 		networkID: NetworkID,
 		loadMnemonicPurpose: SecureStorageClient.LoadMnemonicPurpose,
 		state: State
@@ -190,15 +190,15 @@ extension DerivePublicKeys {
 
 	private func deriveWith(
 		ledger: LedgerHardwareWalletFactorSource,
-		derivationPaths: OrderedSet<DerivationPath>,
+		derivationPaths: [DerivationPath],
 		networkID: NetworkID,
 		state: State
 	) -> EffectTask<Action> {
 		.task {
 			do {
-				let hdKeys = try await ledgerHardwareWalletClient.derivePublicKeys(OrderedSet(validating: derivationPaths.map {
+				let hdKeys = try await ledgerHardwareWalletClient.derivePublicKeys(derivationPaths.map {
 					P2P.LedgerHardwareWallet.KeyParameters(curve: $0.curveForScheme.p2pCurve, derivationPath: $0.path)
-				}), ledger)
+				}, ledger)
 
 				return .delegate(.derivedPublicKeys(
 					hdKeys,
@@ -217,7 +217,7 @@ extension DerivePublicKeys {
 	private func withDerivationPath<Source: HDFactorSourceProtocol>(
 		state: State,
 		hdFactorSource: Source,
-		knownPaths deriveWithKnownDerivationPaths: (OrderedSet<DerivationPath>, NetworkID, SecureStorageClient.LoadMnemonicPurpose) -> EffectTask<Action>,
+		knownPaths deriveWithKnownDerivationPaths: ([DerivationPath], NetworkID, SecureStorageClient.LoadMnemonicPurpose) -> EffectTask<Action>,
 		calculating calculatedDerivationPath: @escaping @Sendable (DerivationPath, NetworkID, SecureStorageClient.LoadMnemonicPurpose) -> Action
 	) -> EffectTask<Action> {
 		switch state.derivationsPathOption {

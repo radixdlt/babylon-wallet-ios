@@ -114,15 +114,15 @@ extension LedgerHardwareWalletClient: DependencyKey {
 			derivePublicKeys: { keysParams, factorSource in
 				let response = try await makeRequest(
 					.derivePublicKeys(.init(
-						keysParameters: Array(keysParams),
+						keysParameters: keysParams,
 						ledgerDevice: factorSource.device()
 					)),
 					responseCasePath: /P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.derivePublicKeys
 				)
 
-				return try OrderedSet(validating: response.map {
+				return try response.map {
 					try $0.hdPubKey()
-				})
+				}
 			},
 			signTransaction: { request in
 				let hashedMsg = try engineToolkitClient.hashTransactionIntent(request.transactionIntent)

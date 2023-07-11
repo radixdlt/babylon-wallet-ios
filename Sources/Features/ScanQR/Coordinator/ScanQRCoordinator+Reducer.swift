@@ -23,10 +23,6 @@ public struct ScanQRCoordinator: Sendable, FeatureReducer {
 		}
 	}
 
-	public enum ViewAction: Sendable, Equatable {
-		case closeButtonTapped
-	}
-
 	public enum InternalAction: Sendable, Equatable {
 		case proceedWithScan
 	}
@@ -46,28 +42,15 @@ public struct ScanQRCoordinator: Sendable, FeatureReducer {
 
 	public var body: some ReducerProtocolOf<Self> {
 		Scope(state: \.step, action: /.self) {
-			Scope(
-				state: /State.Step.cameraPermission,
-				action: /Action.child .. ChildAction.cameraPermission
-			) {
+			Scope(state: /State.Step.cameraPermission, action: /Action.child .. ChildAction.cameraPermission) {
 				CameraPermission()
 			}
-			Scope(
-				state: /State.Step.scanQR,
-				action: /Action.child .. ChildAction.scanQR
-			) {
+			Scope(state: /State.Step.scanQR, action: /Action.child .. ChildAction.scanQR) {
 				ScanQR()
 			}
 		}
 
 		Reduce(core)
-	}
-
-	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
-		switch viewAction {
-		case .closeButtonTapped:
-			return .send(.delegate(.dismiss))
-		}
 	}
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {

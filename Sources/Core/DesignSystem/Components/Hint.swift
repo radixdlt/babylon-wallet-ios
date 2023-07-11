@@ -15,7 +15,7 @@ public struct Hint: View, Equatable {
 		self.text = text
 	}
 
-	public static func info(@ViewBuilder _ text: () -> Text) -> Self {
+	public static func info(_ text: () -> Text) -> Self {
 		.init(kind: .info, text: text())
 	}
 
@@ -23,7 +23,7 @@ public struct Hint: View, Equatable {
 		.init(kind: .info, text: Text(string))
 	}
 
-	public static func error(@ViewBuilder _ text: () -> Text) -> Self {
+	public static func error(_ text: () -> Text) -> Self {
 		.init(kind: .error, text: text())
 	}
 

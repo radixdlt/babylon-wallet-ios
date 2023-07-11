@@ -6,11 +6,7 @@ import NewConnectionFeature
 import Profile
 import SharedModels
 
-// MARK: - DeviceInfo
-public struct DeviceInfo: Sendable, Hashable {
-	public let id: HexCodable32Bytes
-	public let model: P2P.LedgerHardwareWallet.Model
-}
+public typealias DeviceInfo = P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.GetDeviceInfo
 
 // MARK: - AddLedgerFactorSource
 public struct AddLedgerFactorSource: Sendable, FeatureReducer {
@@ -129,8 +125,7 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 		state.isWaitingForResponseFromLedger = true
 		return .task {
 			let result = await TaskResult {
-				let info = try await ledgerHardwareWalletClient.getDeviceInfo()
-				return DeviceInfo(id: info.id, model: info.model)
+				try await ledgerHardwareWalletClient.getDeviceInfo()
 			}
 
 			return .internal(.getDeviceInfoResult(result))
