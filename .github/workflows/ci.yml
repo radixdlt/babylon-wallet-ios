@@ -13,7 +13,7 @@ concurrency:
 jobs:
 
   snyk_scan_deps_licences:
-    runs-on: ubuntu-latest
+    runs-on: macos-13
     steps:
       - uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b
       - name: Run Snyk to check for deps vulnerabilities
@@ -24,7 +24,7 @@ jobs:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
 
   snyk_scan_code:
-    runs-on: ubuntu-latest
+    runs-on: macos-13
     steps:
       - uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b
 
@@ -37,7 +37,7 @@ jobs:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
 
   snyk_online_monitor:
-    runs-on: ubuntu-latest
+    runs-on: macos-13
     steps:
       - uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b
       - name: Enable Snyk online monitoring to check for vulnerabilities
