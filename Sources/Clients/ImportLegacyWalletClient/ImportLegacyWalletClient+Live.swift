@@ -120,7 +120,7 @@ extension ImportLegacyWalletClient: DependencyKey {
 					let setOfExistingData = try Set(babylonAddresses.map {
 						// the first byte is an address type discriminator byte, which differs between Babylon and Olympia,
 						// so we must remove it.
-                                                try Data(EngineToolkitUniFFI.Address(address: $0.address).bytes().dropFirst())
+						try Data(EngineToolkitUniFFI.Address(address: $0.address).bytes().dropFirst())
 					})
 					guard let payloadByteCount = setOfExistingData.first?.count else {
 						return []
@@ -148,7 +148,7 @@ extension ImportLegacyWalletClient: DependencyKey {
 func convert(
 	parsedOlympiaAccount raw: Olympia.Parsed.Account
 ) throws -> OlympiaAccountToMigrate {
-        let bech32Address = try deriveOlympiaAccountAddressFromPublicKey(publicKey: raw.publicKey.intoEngine(), olympiaNetwork: .mainnet).asStr()
+	let bech32Address = try deriveOlympiaAccountAddressFromPublicKey(publicKey: raw.publicKey.intoEngine(), olympiaNetwork: .mainnet).asStr()
 
 	guard let nonEmptyString = NonEmptyString(rawValue: bech32Address) else {
 		struct FailedToCreateNonEmptyOlympiaAddress: Swift.Error {}

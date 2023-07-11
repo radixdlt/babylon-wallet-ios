@@ -129,11 +129,11 @@ extension Profile.Network.Persona {
 			throw WrongEntityInDerivationPath()
 		}
 
-                let engineAddress = try deriveVirtualIdentityAddressFromPublicKey(
-                        publicKey: factorInstance.publicKey.intoEngine(),
-                        networkId: networkID.rawValue
-                )
+		let engineAddress = try deriveVirtualIdentityAddressFromPublicKey(
+			publicKey: factorInstance.publicKey.intoEngine(),
+			networkId: networkID.rawValue
+		)
 
-                return .init(address: engineAddress.addressString(), decodedKind: engineAddress.entityType())
+		return .init(address: engineAddress.addressString(), decodedKind: engineAddress.entityType())
 	}
 }

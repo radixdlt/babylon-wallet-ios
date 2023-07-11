@@ -153,9 +153,9 @@ public struct SpecificAddress<Kind: SpecificEntityType>: Sendable, Hashable, Ide
 		self.init(address: address, decodedKind: type)
 	}
 
-        public static func == (lhs: Self, rhs: Self) -> Bool {
-                lhs.address == rhs.address
-        }
+	public static func == (lhs: Self, rhs: Self) -> Bool {
+		lhs.address == rhs.address
+	}
 }
 
 // MARK: Codable
@@ -186,9 +186,9 @@ extension SpecificAddress {
 }
 
 extension SpecificAddress {
-        public func toEngine() throws -> EngineToolkitUniFFI.Address {
-                try .init(address: address)
-        }
+	public func toEngine() throws -> EngineToolkitUniFFI.Address {
+		try .init(address: address)
+	}
 }
 
 extension AccountAddress {
@@ -198,13 +198,13 @@ extension AccountAddress {
 }
 
 extension EngineToolkitUniFFI.Address {
-        public func asSpecific<T>() throws -> SpecificAddress<T> {
-                try .init(validatingAddress: addressString())
-        }
+	public func asSpecific<T>() throws -> SpecificAddress<T> {
+		try .init(validatingAddress: addressString())
+	}
 }
 
 extension [EngineToolkitUniFFI.Address] {
-        public func asSpecific<T>() throws -> [SpecificAddress<T>] {
-                try map { try $0.asSpecific() }
-        }
+	public func asSpecific<T>() throws -> [SpecificAddress<T>] {
+		try map { try $0.asSpecific() }
+	}
 }

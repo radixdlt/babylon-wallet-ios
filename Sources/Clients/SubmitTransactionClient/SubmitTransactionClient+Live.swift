@@ -75,9 +75,9 @@ extension SubmitTransactionClient: DependencyKey {
 			let txID = request.txID
 
 			func debugPrintTX(_ decompiledNotarized: NotarizedTransaction) {
-                                let signedIntent = decompiledNotarized.signedIntent()
-                                let notarySignature = decompiledNotarized.notarySignature()
-                                let intent = signedIntent.intent()
+				let signedIntent = decompiledNotarized.signedIntent()
+				let notarySignature = decompiledNotarized.notarySignature()
+				let intent = signedIntent.intent()
 				let intentSignatures = signedIntent.intentSignatures()
 				// RET prints when convertManifest is called, when it is removed, this can be moved down
 				// inline inside `print`.
@@ -97,7 +97,7 @@ extension SubmitTransactionClient: DependencyKey {
 
 			let changedAccounts: [Profile.Network.Account.EntityAddress]?
 			do {
-                                let decompiledNotarized = try NotarizedTransaction.decompile(compiledNotarizedTransaction: request.compiledNotarizedTXIntent)
+				let decompiledNotarized = try NotarizedTransaction.decompile(compiledNotarizedTransaction: request.compiledNotarizedTXIntent)
 				debugPrintTX(decompiledNotarized)
 
 				let manifest = decompiledNotarized.signedIntent().intent().manifest()

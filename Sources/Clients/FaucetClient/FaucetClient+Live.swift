@@ -56,7 +56,7 @@ extension FaucetClient: DependencyKey {
 				.init(
 					networkID: networkID,
 					manifest: manifest,
-                                        nonce: .secureRandom(),
+					nonce: .secureRandom(),
 					isFaucetTransaction: true,
 					ephemeralNotaryPublicKey: ephemeralNotary.publicKey
 				)
@@ -94,7 +94,7 @@ extension FaucetClient: DependencyKey {
 			let manifest = try TransactionManifest.manifestForFaucet(
 				includeLockFeeInstruction: true,
 				networkID: networkID,
-                                componentAddress: accountAddress.asGeneral()
+				componentAddress: accountAddress.asGeneral()
 			)
 
 			try await signSubmitTX(manifest: manifest)
@@ -113,8 +113,8 @@ extension FaucetClient: DependencyKey {
 		}
 
 		#if DEBUG
-		let createFungibleToken: CreateFungibleToken = { request in
-                        fatalError()
+		let createFungibleToken: CreateFungibleToken = { _ in
+			fatalError()
 //			let networkID = await gatewaysClient.getCurrentNetworkID()
 //			let manifest = try {
 //				if request.numberOfTokens == 1 {
@@ -136,8 +136,8 @@ extension FaucetClient: DependencyKey {
 //			try await signSubmitTX(manifest: manifest)
 		}
 
-		let createNonFungibleToken: CreateNonFungibleToken = { request in
-                        fatalError()
+		let createNonFungibleToken: CreateNonFungibleToken = { _ in
+			fatalError()
 //			let networkID = await gatewaysClient.getCurrentNetworkID()
 //			let manifest = try {
 //				if request.numberOfTokens == 1 {

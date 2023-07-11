@@ -166,7 +166,7 @@ public struct CreateAuthKey: Sendable, FeatureReducer {
 		case let .createdManifestForAuthKeyCreation(manifest, authenticationSigningFactorInstance):
 			state.step = .transactionReview(.init(
 				transactionManifest: manifest,
-                                nonce: .secureRandom(),
+				nonce: .secureRandom(),
 				signTransactionPurpose: .internalManifest(.uploadAuthKey),
 				message: nil
 			))

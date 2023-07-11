@@ -44,7 +44,7 @@ extension GatewayAPI.TransactionPreviewRequest {
 		let notaryIsSignatory = transactionSigners.notaryIsSignatory
 
 		try self.init(
-                        manifest: rawManifest.instructions().asStr(),
+			manifest: rawManifest.instructions().asStr(),
 			blobsHex: rawManifest.blobs().map(\.hex),
 			startEpochInclusive: .init(header.startEpochInclusive),
 			endEpochExclusive: .init(header.endEpochExclusive),
@@ -87,7 +87,7 @@ extension GatewayAPI.PublicKey {
 	init(from engine: EngineToolkitUniFFI.PublicKey) {
 		switch engine {
 		case let .ecdsaSecp256k1(bytes):
-                        self = .ecdsaSecp256k1(.init(keyType: .ecdsaSecp256k1, keyHex: bytes.hex()))
+			self = .ecdsaSecp256k1(.init(keyType: .ecdsaSecp256k1, keyHex: bytes.hex()))
 		case let .eddsaEd25519(bytes):
 			self = .eddsaEd25519(.init(keyType: .eddsaEd25519, keyHex: bytes.hex()))
 		}
@@ -175,12 +175,12 @@ public struct TransactionIntentWithSigners: Sendable, Hashable {
 extension TransactionClient {
 	public struct Guarantee: Sendable, Hashable {
 		public var amount: BigDecimal
-		public var instructionIndex: UInt32
+		public var instructionIndex: UInt64
 		public var resourceAddress: ResourceAddress
 
 		public init(
 			amount: BigDecimal,
-			instructionIndex: UInt32,
+			instructionIndex: UInt64,
 			resourceAddress: ResourceAddress
 		) {
 			self.amount = amount

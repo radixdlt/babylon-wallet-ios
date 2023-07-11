@@ -123,17 +123,17 @@ extension LedgerHardwareWalletClient: DependencyKey {
 				})
 			},
 			signTransaction: { request in
-                                let hashedMsg = try request.transactionIntent.intentHash()
-                                let compiledTransactionIntent = try request.transactionIntent.compile()
+				let hashedMsg = try request.transactionIntent.intentHash()
+				let compiledTransactionIntent = try request.transactionIntent.compile()
 				return try await sign(
 					signers: request.signers,
-                                        expectedHashedMessage: hashedMsg.bytes().data
+					expectedHashedMessage: hashedMsg.bytes().data
 				) {
 					try await makeRequest(
 						.signTransaction(.init(
 							signers: request.signers.flatMap(\.keyParams),
 							ledgerDevice: request.ledger.device(),
-                                                        compiledTransactionIntent: .init(data: compiledTransactionIntent.data),
+							compiledTransactionIntent: .init(data: compiledTransactionIntent.data),
 							displayHash: request.displayHashOnLedgerDisplay,
 							mode: request.ledgerTXDisplayMode
 						)),
@@ -252,13 +252,13 @@ extension P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.DerivedPu
 
 extension P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.SignatureOfSigner {
 	struct Validated: Sendable, Hashable {
-                public let signature: Cryptography.SignatureWithPublicKey
+		public let signature: Cryptography.SignatureWithPublicKey
 		public let derivationPath: DerivationPath
 	}
 
 	func validate(hashed: Data) throws -> Validated {
 		let hdPubKey = try self.derivedPublicKey.hdPubKey()
-                let signatureWithPublicKey: Cryptography.SignatureWithPublicKey
+		let signatureWithPublicKey: Cryptography.SignatureWithPublicKey
 		switch hdPubKey.publicKey {
 		case let .ecdsaSecp256k1(pubKey):
 			signatureWithPublicKey = try .ecdsaSecp256k1(

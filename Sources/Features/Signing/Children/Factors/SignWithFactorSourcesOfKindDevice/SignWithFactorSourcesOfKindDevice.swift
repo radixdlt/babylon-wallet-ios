@@ -52,7 +52,7 @@ public struct SignWithFactorSourcesOfKindDevice: SignWithFactorSourcesOfKindRedu
 			switch state.signingPurposeWithPayload {
 			case let .signAuth(auth): return try blake2b(data: auth.payloadToHashAndSign)
 			case let .signTransaction(_, intent, _):
-                                return try intent.intentHash().bytes().data
+				return try intent.intentHash().bytes().data
 			}
 		}()
 

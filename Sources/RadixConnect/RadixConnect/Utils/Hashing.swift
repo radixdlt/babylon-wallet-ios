@@ -1,6 +1,6 @@
 import Foundation
-import RadixConnectModels
 import Prelude
+import RadixConnectModels
 
 extension Data {
 	func hash() throws -> Data {

@@ -29,15 +29,15 @@ extension P2P.Dapp.Request {
 
 			let manifestString = try container.decode(String.self, forKey: .transactionManifestString)
 			let blobsHex = try container.decodeIfPresent([String].self, forKey: .blobsHex) ?? []
-                        let blobsBytes = try blobsHex.map {
-                                try [UInt8](Data(hex: $0))
-                        }
-                        let instructions = try Instructions.fromString(
-                                string: manifestString,
-                                blobs: blobsBytes,
-                                networkId: NetworkID.default.rawValue
-                        )
-                        let manifest = TransactionManifest(instructions: instructions, blobs: blobsBytes)
+			let blobsBytes = try blobsHex.map {
+				try [UInt8](Data(hex: $0))
+			}
+			let instructions = try Instructions.fromString(
+				string: manifestString,
+				blobs: blobsBytes,
+				networkId: NetworkID.default.rawValue
+			)
+			let manifest = TransactionManifest(instructions: instructions, blobs: blobsBytes)
 
 			try self.init(
 				version: container.decode(TXVersion.self, forKey: .version),

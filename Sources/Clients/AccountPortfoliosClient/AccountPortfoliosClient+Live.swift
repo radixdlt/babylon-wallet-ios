@@ -464,7 +464,7 @@ extension Array where Element == AccountPortfolio.FungibleResource {
 		let networkId = await gatewaysClient.getCurrentNetworkID()
 
 		for resource in self {
-                        let isXRD = try? resource.resourceAddress.isXRD(on: networkId)
+			let isXRD = try? resource.resourceAddress.isXRD(on: networkId)
 			if isXRD == true {
 				xrdResource = resource
 			} else {

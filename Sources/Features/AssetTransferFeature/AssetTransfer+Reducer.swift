@@ -143,25 +143,24 @@ extension AssetTransfer {
 		let involvedFungibleResources = extractInvolvedFungibleResources(accounts.receivingAccounts)
 		let fungiblesTransferInstruction = try involvedFungibleResources.map {
 			try fungibleResourceTransferInstruction(witdhrawAccount: accounts.fromAccount.address, $0)
-                }
+		}
 
 		let involvedNonFungibles = extractInvolvedNonFungibleResource(accounts.receivingAccounts)
-		let nonFungiblesTransferInstruction = try involvedNonFungibles.flatMap {
+		let nonFungiblesTransferInstruction = try involvedNonFungibles.map {
 			try nonFungibleResourceTransferInstruction(witdhrawAccount: accounts.fromAccount.address, $0)
 		}
 
-//		let allInstructions = fungiblesTransferInstruction + nonFungiblesTransferInstruction
-//		let manifest = TransactionManifest(instructions: .parsed(allInstructions.map { $0.embed() }))
-//
+		let allInstructions = fungiblesTransferInstruction + nonFungiblesTransferInstruction
+
 		let networkID = await gatewaysClient.getCurrentNetworkID()
-                return try .init(
-                        instructions: .fromString(
-                                string: String(fungiblesTransferInstruction.joined(by: "\n")),
-                                blobs: [],
-                                networkId: networkID.rawValue
-                        ),
-                        blobs: []
-                )
+		return try .init(
+			instructions: .fromString(
+				string: String(allInstructions.joined(by: "\n")),
+				blobs: [],
+				networkId: networkID.rawValue
+			),
+			blobs: []
+		)
 	}
 
 	private func extractInvolvedFungibleResources(
@@ -227,75 +226,68 @@ extension AssetTransfer {
 		witdhrawAccount: AccountAddress,
 		_ resource: InvolvedFungibleResource
 	) throws -> String {
-		let accountWithdrawals: [String] = [
-                        """
-CALL_METHOD
-    Address("\(witdhrawAccount.address)")
-    "withdraw"
-    Address("\(resource.address.address)")
-    Decimal("\(resource.totalTransferAmount.toString())");
-"""
+		let accountWithdrawals = [
+			"""
+			CALL_METHOD
+			    Address("\(witdhrawAccount.address)")
+			    "withdraw"
+			    Address("\(resource.address.address)")
+			    Decimal("\(resource.totalTransferAmount.toString())");
+			""",
 		]
 
-                let deposits: [String] = resource.accounts.map { account in
-                        let bucket = UUID().uuidString
+		let deposits: [String] = resource.accounts.map { account in
+			let bucket = UUID().uuidString
 
-                       return """
-TAKE_FROM_WORKTOP Address("\(resource.address.address)") Decimal("\(account.amount.toString())") Bucket("\(bucket)");
-CALL_METHOD Address("\(account.id.address)") "try_deposit_or_abort" Bucket("\(bucket)");
-"""
-                }
+			return """
+			TAKE_FROM_WORKTOP Address("\(resource.address.address)") Decimal("\(account.amount.toString())") Bucket("\(bucket)");
+			CALL_METHOD Address("\(account.id.address)") "try_deposit_or_abort" Bucket("\(bucket)");
+			"""
+		}
 
-                return String((accountWithdrawals + deposits).joined(by: "\n"))
+		return String((accountWithdrawals + deposits).joined(by: "\n"))
 	}
 
 	private func nonFungibleResourceTransferInstruction(
 		witdhrawAccount: AccountAddress,
 		_ resource: InvolvedNonFungibleResource
-	) throws -> [Instruction] {
-                fatalError()
-//		let accountWithdrawals: [any InstructionProtocol] = try [
-//			CallMethod(
-//				receiver: witdhrawAccount,
-//				methodName: "withdraw_non_fungibles",
-//				arguments: [
-//					.address(resource.address.asGeneral()),
-//					.array(.init(
-//						elementKind: .nonFungibleLocalId,
-//						elements: resource.allTokens.map {
-//							try .nonFungibleLocalId($0.id.toRETLocalID())
-//						}
-//					)),
-//				]
-//			),
-//		]
-//
-//		let deposits: [any InstructionProtocol] = try resource.accounts.flatMap { account in
-//			let bucket = UUID().uuidString
-//
-//			let instructions: [any InstructionProtocol] = try [
-//				TakeNonFungiblesFromWorktop(
-//					Set(account.tokens.map { try $0.id.toRETLocalID() }),
-//					resourceAddress: resource.address,
-//					bucket: .init(value: bucket)
-//				),
-//
-//				CallMethod(
-//					receiver: account.id,
-//					methodName: "try_deposit_or_abort",
-//					arguments: [.bucket(.init(value: bucket))]
-//				),
-//			]
-//
-//			return instructions
-//		}
-//
-//		return accountWithdrawals + deposits
+	) throws -> String {
+		let localIds = resource.allTokens.map {
+			"NonFungibleLocalId('\($0.id)')"
+		}.joined(by: ",")
+
+		let accountWithdrawals = """
+		CALL_METHOD
+		    Address("\(witdhrawAccount.address)")
+		    "withdraw_non_fungibles"
+		    Address("\(resource.address.address)")
+		    Array<NonFungibleLocalId>(\(localIds);
+		"""
+		let deposits: [String] = resource.accounts.map { account in
+			let bucket = UUID().uuidString
+			let localIds = account.tokens.map {
+				"NonFungibleLocalId('\($0.id)')"
+			}.joined(by: ",")
+
+			return """
+			TAKE_NON_FUNGIBLES_FROM_WORKTOP
+			        Address('\(resource.address.address)')
+			        Array<NonFungibleLocalId>(\(localIds))
+			        Bucket('\(bucket)');
+
+			CALL_METHOD
+			        Address('\(account.id)')
+			        'try_deposit_or_abort'
+			        Bucket('\(bucket)');
+			"""
+		}
+
+		return String(([accountWithdrawals] + deposits).joined(by: "\n"))
 	}
 }
 
 extension AccountPortfolio.NonFungibleResource.NonFungibleToken.LocalID {
 	func toRETLocalID() -> NonFungibleLocalId {
-                .str(value: rawValue)
+		.str(value: rawValue)
 	}
 }

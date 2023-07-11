@@ -167,9 +167,9 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 			}
 
 		case .turnIntoDappDefinitionAccountTypeButtonTapped:
-			return .run { [accountAddress = state.address] send in
+			return .run { [accountAddress = state.address] _ in
 				let account = try await accountsClient.getAccountByAddress(accountAddress)
-                                fatalError()
+				fatalError()
 //				let manifest = try await engineToolkitClient.manifestMarkingAccountAsDappDefinitionType(account: account)
 //				await send(.internal(.turnIntoDappDefAccountType(manifest)))
 			} catch: { error, _ in
@@ -287,7 +287,7 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 		case let .turnIntoDappDefAccountType(manifest):
 			state.destination = .reviewTransactionTurningAccountIntoDappDefType(.init(
 				transactionManifest: manifest,
-                                nonce: .secureRandom(),
+				nonce: .secureRandom(),
 				signTransactionPurpose: .internalManifest(.debugModifyAccount),
 				message: nil
 			))
@@ -366,8 +366,8 @@ extension AccountPreferences {
 	#endif
 }
 
-//#if DEBUG
-//extension EngineToolkitClient {
+// #if DEBUG
+// extension EngineToolkitClient {
 //	fileprivate func manifestMarkingAccountAsDappDefinitionType(
 //		account: Profile.Network.Account
 //	) async throws -> TransactionManifest {
@@ -387,5 +387,5 @@ extension AccountPreferences {
 //
 //		return manifestString
 //	}
-//}
-//#endif
+// }
+// #endif

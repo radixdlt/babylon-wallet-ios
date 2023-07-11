@@ -41,22 +41,22 @@ extension TransactionClient {
 		) async throws -> MyEntitiesInvolvedInTransaction {
 			let allAccounts = try await accountsClient.getAccountsOnNetwork(networkID)
 
-                        func accountFromComponentAddress(_ accountAddress: AccountAddress) -> Profile.Network.Account? {
-                                allAccounts.first(where: { $0.address == accountAddress })
+			func accountFromComponentAddress(_ accountAddress: AccountAddress) -> Profile.Network.Account? {
+				allAccounts.first(where: { $0.address == accountAddress })
 			}
 			func identityFromComponentAddress(_ identityAddress: IdentityAddress) async throws -> Profile.Network.Persona {
 				try await personasClient.getPersona(id: identityAddress)
 			}
-                        func mapAccount(_ extract: @escaping () -> [EngineToolkitUniFFI.Address]) throws -> OrderedSet<Profile.Network.Account> {
-                                try .init(validating: extract().asSpecific().compactMap(accountFromComponentAddress))
+			func mapAccount(_ extract: @escaping () -> [EngineToolkitUniFFI.Address]) throws -> OrderedSet<Profile.Network.Account> {
+				try .init(validating: extract().asSpecific().compactMap(accountFromComponentAddress))
 			}
 			func mapIdentity(_ extract: @escaping () -> [EngineToolkitUniFFI.Address]) async throws -> OrderedSet<Profile.Network.Persona> {
-                                try await .init(validating: extract().asSpecific().asyncMap(identityFromComponentAddress))
+				try await .init(validating: extract().asSpecific().asyncMap(identityFromComponentAddress))
 			}
 
 			return try await MyEntitiesInvolvedInTransaction(
-                                identitiesRequiringAuth: mapIdentity(manifest.identitiesRequiringAuth),
-                                accountsRequiringAuth: mapAccount(manifest.accountsRequiringAuth),
+				identitiesRequiringAuth: mapIdentity(manifest.identitiesRequiringAuth),
+				accountsRequiringAuth: mapAccount(manifest.accountsRequiringAuth),
 				accountsWithdrawnFrom: mapAccount(manifest.accountsWithdrawnFrom),
 				accountsDepositedInto: mapAccount(manifest.accountsDepositedInto)
 			)
@@ -119,8 +119,8 @@ extension TransactionClient {
 			})
 		}
 
-		let convertManifestInstructionsToJSONIfItWasString: ConvertManifestInstructionsToJSONIfItWasString = { manifest in
-                        fatalError()
+		let convertManifestInstructionsToJSONIfItWasString: ConvertManifestInstructionsToJSONIfItWasString = { _ in
+			fatalError()
 //			try await engineToolkitClient.convertManifestInstructionsToJSONIfItWasString(
 //				.init(
 //					version: engineToolkitClient.getTransactionVersion(),
@@ -138,7 +138,7 @@ extension TransactionClient {
 			}
 
 			loggerGlobal.debug("Setting fee payer to: \(addressOfPayer.address)")
-                        return try manifest.withLockFeeCallMethodAdded(address: addressOfPayer.asGeneral())
+			return try manifest.withLockFeeCallMethodAdded(address: addressOfPayer.asGeneral())
 		}
 
 		let lockFeeBySearchingForSuitablePayer: LockFeeBySearchingForSuitablePayer = { manifest, feeToAdd in
@@ -219,45 +219,46 @@ extension TransactionClient {
 			let transactionSigners = try await getTransactionSigners(request)
 
 			let header = TransactionHeader(
-                                networkId: request.networkID.rawValue,
-                                startEpochInclusive: epoch.rawValue,
-                                endEpochExclusive: (epoch + request.makeTransactionHeaderInput.epochWindow).rawValue,
-                                nonce: request.nonce.rawValue,
-                                notaryPublicKey: SLIP10.PublicKey.eddsaEd25519(transactionSigners.notaryPublicKey).intoEngine(),
-                                notaryIsSignatory: transactionSigners.notaryIsSignatory,
-                                tipPercentage: request.makeTransactionHeaderInput.tipPercentage)
+				networkId: request.networkID.rawValue,
+				startEpochInclusive: epoch.rawValue,
+				endEpochExclusive: (epoch + request.makeTransactionHeaderInput.epochWindow).rawValue,
+				nonce: request.nonce.rawValue,
+				notaryPublicKey: SLIP10.PublicKey.eddsaEd25519(transactionSigners.notaryPublicKey).intoEngine(),
+				notaryIsSignatory: transactionSigners.notaryIsSignatory,
+				tipPercentage: request.makeTransactionHeaderInput.tipPercentage
+			)
 
-
-                        return .init(
-                                intent: .init(header: header, manifest: request.manifest),
-                                transactionSigners: transactionSigners
-                        )
+			return .init(
+				intent: .init(header: header, manifest: request.manifest),
+				transactionSigners: transactionSigners
+			)
 		}
 
 		let notarizeTransaction: NotarizeTransaction = { request in
+			let manifest = request.transactionIntent.manifest().instructions().instructionsList()
 			let signedTransactionIntent = SignedIntent(
 				intent: request.transactionIntent,
 				intentSignatures: Array(request.intentSignatures)
 			)
 
-                        let signedIntentHash = try signedTransactionIntent.signedIntentHash()
+			let signedIntentHash = try signedTransactionIntent.signedIntentHash()
 
 			let notarySignature = try request.notary.sign(
-                                hashOfMessage: signedIntentHash.bytes().data
+				hashOfMessage: signedIntentHash.bytes().data
 			)
 
 			let uncompiledNotarized = try NotarizedTransaction(
 				signedIntent: signedTransactionIntent,
-                                notarySignature: notarySignature.intoEngine().signature
+				notarySignature: notarySignature.intoEngine().signature
 			)
 
-                        let compiledNotarizedTXIntent = try uncompiledNotarized.compile()
+			let compiledNotarizedTXIntent = try uncompiledNotarized.compile()
 
-                        let txID = try request.transactionIntent.hash()
+			let txID = try request.transactionIntent.hash()
 
 			return .init(
 				notarized: compiledNotarizedTXIntent,
-                                txID: .init(txID.asStr())
+				txID: .init(txID.asStr())
 			)
 		}
 
@@ -273,7 +274,7 @@ extension TransactionClient {
 			}
 			let receiptBytes = try [UInt8](hex: transactionPreviewResponse.encodedReceipt)
 
-                        let analyzedManifestToReview = try request.manifestToSign.analyzeExecution(transactionReceipt: receiptBytes)
+			let analyzedManifestToReview = try request.manifestToSign.analyzeExecution(transactionReceipt: receiptBytes)
 
 			let addFeeToManifestOutcome = try await lockFeeBySearchingForSuitablePayer(
 				request.manifestToSign,
@@ -311,20 +312,19 @@ extension TransactionClient {
 			_ manifestWithLockFee: TransactionManifest,
 			guarantees: [Guarantee]
 		) async throws -> TransactionManifest {
-                        var manifestWithLockFee = manifestWithLockFee
+			var manifestWithLockFee = manifestWithLockFee
 
 			/// Will be increased with each added guarantee to account for the difference in indexes from the initial manifest.
 			var indexInc = 1 // LockFee was added, start from 1
 			for guarantee in guarantees {
-                                let guaranteeInstruction: Instruction =  try .assertWorktopContains(
-                                        resourceAddress: guarantee.resourceAddress.toEngine(),
+				let guaranteeInstruction: Instruction = try .assertWorktopContains(
+					resourceAddress: guarantee.resourceAddress.toEngine(),
 					amount: .init(value: guarantee.amount.toString())
 				)
 
+				manifestWithLockFee = try manifestWithLockFee.withInstructionAdded(guaranteeInstruction, at: Int(guarantee.instructionIndex) + indexInc)
 
-                                manifestWithLockFee = try manifestWithLockFee.withInstructionAdded(guaranteeInstruction, at: Int(guarantee.instructionIndex) + indexInc)
-
-                                indexInc += 1
+				indexInc += 1
 			}
 			return manifestWithLockFee
 		}
@@ -379,9 +379,9 @@ extension TransactionClient {
 		return Self(
 			convertManifestInstructionsToJSONIfItWasString: convertManifestInstructionsToJSONIfItWasString,
 			convertManifestToString: { _ in
-                                fatalError()
-//                                try await engineToolkitClient.convertManifestToString(.init(version: .default, networkID: gatewaysClient.getCurrentNetworkID(), manifest: $0))
-                        },
+				fatalError()
+				//                                try await engineToolkitClient.convertManifestToString(.init(version: .default, networkID: gatewaysClient.getCurrentNetworkID(), manifest: $0))
+			},
 			lockFeeBySearchingForSuitablePayer: lockFeeBySearchingForSuitablePayer,
 			lockFeeWithSelectedPayer: lockFeeWithSelectedPayer,
 			addGuaranteesToManifest: addGuaranteesToManifest,

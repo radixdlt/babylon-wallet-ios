@@ -44,20 +44,20 @@ extension ROLAClient {
 			loggerGlobal.notice("Setting ownerKeyHashes to: \(ownerKeyHashes)")
 
 			let arrayOfEngineToolkitBytesValues: [ManifestValue] = try ownerKeyHashes.map { hash in
-                                try .enumValue(discriminator: 0, fields: [.blobValue(value: .init(value: .init(hash: hash.bytes())))])
+				try .enumValue(discriminator: 0, fields: [.blobValue(value: .init(value: .init(hash: hash.bytes())))])
 			}
 
 			// # Set List Metadata on Resource
 			// https://github.com/radixdlt/radixdlt-scrypto/blob/main/transaction/examples/metadata/metadata.rtm#L97-L101
-                        let setMetadataInstruction = try Instruction.callMetadataMethod(
-                                address: .init(
-                                        address: entityAddress.address),
-                                methodName: "owner_keys",
-                                args: .enumValue(discriminator: 0, fields: [.arrayValue(elementValueKind: .enumValue, elements: arrayOfEngineToolkitBytesValues)])
-                        )
+			let setMetadataInstruction = try Instruction.callMetadataMethod(
+				address: .init(
+					address: entityAddress.address),
+				methodName: "owner_keys",
+				args: .enumValue(discriminator: 0, fields: [.arrayValue(elementValueKind: .enumValue, elements: arrayOfEngineToolkitBytesValues)])
+			)
 
-                        let instructions = try Instructions.fromInstructions(instructions: [setMetadataInstruction], networkId: entity.networkID.rawValue)
-                        return .init(instructions: instructions, blobs: [])
+			let instructions = try Instructions.fromInstructions(instructions: [setMetadataInstruction], networkId: entity.networkID.rawValue)
+			return .init(instructions: instructions, blobs: [])
 		}
 
 		return Self(
@@ -199,9 +199,9 @@ extension PublicKeyHash {
 
 		switch publicKey {
 		case .ecdsaSecp256k1:
-                        self = .ecdsaSecp256k1(value: hashBytes.bytes)
+			self = .ecdsaSecp256k1(value: hashBytes.bytes)
 		case .eddsaEd25519:
-                        self = .eddsaEd25519(value: hashBytes.bytes)
+			self = .eddsaEd25519(value: hashBytes.bytes)
 		}
 	}
 }
@@ -241,7 +241,7 @@ extension GatewayAPI.EntityMetadataCollection {
 			let (_, hashType, hash) = output
 
 			if hashType == curve25519Prefix {
-                                return .eddsaEd25519(value: hash.data(using: .utf8)!.bytes)
+				return .eddsaEd25519(value: hash.data(using: .utf8)!.bytes)
 			} else if hashType == secp256k1Prefix {
 				return .ecdsaSecp256k1(value: hash.data(using: .utf8)!.bytes)
 			} else {
@@ -255,15 +255,15 @@ extension PublicKeyHash {
 	/// https://rdxworks.slack.com/archives/C031A0V1A1W/p1683275008777499?thread_ts=1683221252.228129&cid=C031A0V1A1W
 	var curveKindScryptoDiscriminator: ManifestValue {
 		switch self {
-                case .ecdsaSecp256k1: return .u8Value(value: 0x00)
+		case .ecdsaSecp256k1: return .u8Value(value: 0x00)
 		case .eddsaEd25519: return .u8Value(value: 0x01)
 		}
 	}
 
 	func bytes() throws -> [UInt8] {
-                switch self {
-                case let .ecdsaSecp256k1(value), let .eddsaEd25519(value):
-                        return value
-                }
+		switch self {
+		case let .ecdsaSecp256k1(value), let .eddsaEd25519(value):
+			return value
+		}
 	}
 }

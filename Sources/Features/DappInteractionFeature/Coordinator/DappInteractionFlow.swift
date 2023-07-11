@@ -778,7 +778,7 @@ extension DappInteractionFlow.Destinations.State {
 		case let .remote(.send(item)):
 			self = .relayed(anyItem, with: .reviewTransaction(.init(
 				transactionManifest: item.transactionManifest,
-                                nonce: .secureRandom(),
+				nonce: .secureRandom(),
 				signTransactionPurpose: .manifestFromDapp,
 				message: item.message
 			)))

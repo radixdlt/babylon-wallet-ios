@@ -42,7 +42,7 @@ public struct FactorInstance: Sendable, Hashable, Codable, Identifiable, FactorO
 				let payload = k1PubKey.compressedRepresentation.prefix(26)
 				return try! .init(
 					factorSourceKind: factorSourceID.kind,
-                                        badgeAddress: .virtual(.fromParts(resourceAddress: .init(address: "resource_sim1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxakj8n3"), nonFungibleLocalId: .integer(value: 1)))
+					badgeAddress: .virtual(.fromParts(resourceAddress: .init(address: "resource_sim1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxakj8n3"), nonFungibleLocalId: .integer(value: 1)))
 				)
 			case let .eddsaEd25519(curve25519PubKey):
 				// FIXME: THIS IS COMPLETELY WRONG, placeholder only
@@ -275,35 +275,35 @@ public struct HierarchicalDeterministicFactorInstance: Sendable, Hashable, Codab
 }
 
 extension FactorInstance.ID.BadgeAddress {
-        private enum CodingKeys: String, CodingKey {
-            case virtual
-            case resourceAddress
-        }
+	private enum CodingKeys: String, CodingKey {
+		case virtual
+		case resourceAddress
+	}
 
-        public init(from decoder: Decoder) throws {
-                let container = try decoder.container(keyedBy: CodingKeys.self)
+	public init(from decoder: Decoder) throws {
+		let container = try decoder.container(keyedBy: CodingKeys.self)
 
-                if var virtualContainer = try? container.nestedUnkeyedContainer(forKey: .virtual) {
-                        self = try .virtual(.init(nonFungibleGlobalId: virtualContainer.decode(String.self)))
-                } else if var resourceAddressContainer = try? container.nestedUnkeyedContainer(forKey: .resourceAddress) {
-                        self = try .resourceAddress(.init(validatingAddress: resourceAddressContainer.decode(String.self)))
-                } else {
-                        throw DecodingError.dataCorruptedError(forKey: .virtual, in: container, debugDescription: "Invalid Badge Address")
-                }
-        }
+		if var virtualContainer = try? container.nestedUnkeyedContainer(forKey: .virtual) {
+			self = try .virtual(.init(nonFungibleGlobalId: virtualContainer.decode(String.self)))
+		} else if var resourceAddressContainer = try? container.nestedUnkeyedContainer(forKey: .resourceAddress) {
+			self = try .resourceAddress(.init(validatingAddress: resourceAddressContainer.decode(String.self)))
+		} else {
+			throw DecodingError.dataCorruptedError(forKey: .virtual, in: container, debugDescription: "Invalid Badge Address")
+		}
+	}
 
-        public func encode(to encoder: Encoder) throws {
-                var container = encoder.container(keyedBy: CodingKeys.self)
+	public func encode(to encoder: Encoder) throws {
+		var container = encoder.container(keyedBy: CodingKeys.self)
 
-                switch self {
-                case let .virtual(id):
-                        var nestedContainer = container.nestedUnkeyedContainer(forKey: .virtual)
-                        try nestedContainer.encode(id.asStr())
-                case let .resourceAddress(address):
-                        var nestedContainer = container.nestedUnkeyedContainer(forKey: .resourceAddress)
-                        try nestedContainer.encode(address.address)
-                }
-        }
+		switch self {
+		case let .virtual(id):
+			var nestedContainer = container.nestedUnkeyedContainer(forKey: .virtual)
+			try nestedContainer.encode(id.asStr())
+		case let .resourceAddress(address):
+			var nestedContainer = container.nestedUnkeyedContainer(forKey: .resourceAddress)
+			try nestedContainer.encode(address.address)
+		}
+	}
 }
 
 // MARK: - BadgeIsNotVirtualHierarchicalDeterministic

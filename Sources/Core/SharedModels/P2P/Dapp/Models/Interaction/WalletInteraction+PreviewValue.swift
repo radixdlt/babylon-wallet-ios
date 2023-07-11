@@ -3,7 +3,7 @@ import Prelude
 #if DEBUG
 
 extension TransactionManifest {
-        public static let previewValue = try! TransactionManifest(instructions: .fromString(string: complexManifestString, blobs: [], networkId: NetworkID.default.rawValue), blobs: [])
+	public static let previewValue = try! TransactionManifest(instructions: .fromString(string: complexManifestString, blobs: [], networkId: NetworkID.default.rawValue), blobs: [])
 }
 
 private let complexManifestString = """

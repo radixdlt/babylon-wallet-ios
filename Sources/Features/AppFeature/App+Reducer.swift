@@ -91,8 +91,8 @@ public struct App: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .task:
-                        let retBuildInfo = buildInformation()
-                        print("EngineToolkit commit hash: \(retBuildInfo.version)")
+			let retBuildInfo = buildInformation()
+			print("EngineToolkit commit hash: \(retBuildInfo.version)")
 			return .run { send in
 				for try await error in errorQueue.errors() {
 					// Maybe instead we should listen here for the Profile.State change,

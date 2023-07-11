@@ -130,15 +130,15 @@ extension AccountPortfolio.NonFungibleResource {
 
 extension NonFungibleGlobalId {
 	public var formatted: String {
-                asStr()
-		//resourceAddress.address + ":" + nonFungibleLocalId.value
+		asStr()
+		// resourceAddress.address + ":" + nonFungibleLocalId.value
 	}
 }
 
 extension ResourceAddress {
 	public func nftGlobalId(_ localID: AccountPortfolio.NonFungibleResource.NonFungibleToken.LocalID) throws -> NonFungibleGlobalId {
-                try .fromParts(resourceAddress: self.toEngine(), nonFungibleLocalId: .str(value: localID.rawValue))
-		//.init(resourceAddress: self, nonFungibleLocalId: .init(value: localID.rawValue))
+		try .fromParts(resourceAddress: self.toEngine(), nonFungibleLocalId: .str(value: localID.rawValue))
+		// .init(resourceAddress: self, nonFungibleLocalId: .init(value: localID.rawValue))
 	}
 }
 
