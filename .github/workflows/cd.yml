@@ -70,3 +70,19 @@ jobs:
           bundle exec fastlane ios deploy --env ios.$FLAVOUR
         env:
           GIT_TOKEN: ${{ secrets.RADIX_BOT_PAT }}
+
+  snyk_online_monitor:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+      - name: Install snyk
+        run: |
+          npm install snyk -g
+          snyk -v
+          snyk auth ${{ secrets.SNYK_TOKEN }}
+      - name: Enable Snyk online monitoring to check for vulnerabilities
+        run: |
+          snyk monitor --all-projects --org=${{ secrets.SNYK_ORG_ID }}
