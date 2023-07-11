@@ -12,6 +12,25 @@ concurrency:
 
 jobs:
 
+  snyk_scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+      - name: Install snyk
+        run: |
+          npm install snyk -g
+          snyk -v
+          snyk auth ${{ secrets.SNYK_TOKEN }}
+      - name: Snyk deps and licences scan
+        run: |
+          snyk test --all-projects --org=${{ secrets.SNYK_ORG_ID }} --severity-threshold=high
+      - name: Snyk code scan
+        run: |
+          snyk code test --all-projects --org=${{ secrets.SNYK_ORG_ID }} --severity-threshold=high
+
   linting:
     name: "Linting"
     runs-on: macos-13

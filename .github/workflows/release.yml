@@ -1,0 +1,31 @@
+name: Release
+
+on:
+  release:
+    types:
+      - "published"
+
+jobs:
+
+  publish_sbom:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+      - name: Install snyk
+        run: |
+          npm install snyk -g
+          snyk -v
+          snyk auth ${{ secrets.SNYK_TOKEN }}
+      - name: Generate SBOM
+        run: |
+          snyk sbom --all-projects --org=${{ secrets.SNYK_ORG_ID }} --format=cyclonedx1.4+json --json-file-output sbom.json
+      - name: Upload SBOM
+        uses: svenstaro/upload-release-action@2b9d2847a97b04d02ad5c3df2d3a27baa97ce689 # v2.6.1
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: sbom.json
+          tag: ${{ github.ref }}
+          overwrite: true
