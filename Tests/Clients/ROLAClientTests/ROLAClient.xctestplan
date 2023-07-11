@@ -1,0 +1,24 @@
+{
+  "configurations" : [
+    {
+      "id" : "872F0A97-3B3F-49B1-99E6-381C6536FA2C",
+      "name" : "Test Scheme Action",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "codeCoverage" : false
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:",
+        "identifier" : "ROLAClientTests",
+        "name" : "ROLAClientTests"
+      }
+    }
+  ],
+  "version" : 1
+}
