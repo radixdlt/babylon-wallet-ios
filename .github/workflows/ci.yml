@@ -19,38 +19,47 @@ jobs:
       - uses: actions/setup-node@v2
         with:
           node-version: '14'
-      - run: |
+      - name: Install snyk
+        run: |
           npm install snyk -g
           snyk -v
-      - run: |
-          snyk auth ${{ secrets.SNYK_TOKEN }} # snyk authentication using GH secrets
+      - name: Run Snyk to check for deps vulnerabilities
+        run: |
+          snyk auth ${{ secrets.SNYK_TOKEN }}
           snyk test --all-projects --org=${{ secrets.SNYK_ORG_ID }} --severity-threshold=high
-#
-#  snyk_scan_code:
-#    runs-on: ubuntu-latest
-#    steps:
-#      - uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b
-#
-#      - name: Run Snyk to check for code vulnerabilities
-#        uses: snyk/actions/cocoapods@b98d498629f1c368650224d6d212bf7dfa89e4bf # v0.4.0
-#        with:
-#          args: --all-projects --org=${{ secrets.SNYK_ORG_ID }} --severity-threshold=high
-#          command: code test
-#        env:
-#          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-#
-#  snyk_online_monitor:
-#    runs-on: ubuntu-latest
-#    steps:
-#      - uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b
-#      - name: Enable Snyk online monitoring to check for vulnerabilities
-#        uses: snyk/actions/cocoapods@b98d498629f1c368650224d6d212bf7dfa89e4bf # v0.4.0
-#        with:
-#          args: --all-projects --org=${{ secrets.SNYK_ORG_ID }}
-#          command: monitor
-#        env:
-#          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-#
+
+  snyk_scan_code:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+      - name: Install snyk
+        run: |
+          npm install snyk -g
+          snyk -v
+      - name: Run Snyk to check for deps vulnerabilities
+        run: |
+          snyk auth ${{ secrets.SNYK_TOKEN }}
+          snyk code test --all-projects --org=${{ secrets.SNYK_ORG_ID }} --severity-threshold=high
+
+  snyk_online_monitor:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+      - name: Install snyk
+        run: |
+          npm install snyk -g
+          snyk -v
+      - name: Enable Snyk online monitoring to check for vulnerabilities
+        run: |
+          snyk auth ${{ secrets.SNYK_TOKEN }}
+          snyk monitor --all-projects --org=${{ secrets.SNYK_ORG_ID }}
+
 #  linting:
 #    name: "Linting"
 #    runs-on: macos-13
