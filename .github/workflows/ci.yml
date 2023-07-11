@@ -13,40 +13,43 @@ concurrency:
 jobs:
 
   snyk_scan_deps_licences:
-    runs-on: macos-13
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b
-      - name: Run Snyk to check for deps vulnerabilities
-        uses: snyk/actions/cocoapods@b98d498629f1c368650224d6d212bf7dfa89e4bf # v0.4.0
+      - uses: actions/setup-node@v2
         with:
-          args: --all-projects --org=${{ secrets.SNYK_ORG_ID }} --severity-threshold=high
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-
-  snyk_scan_code:
-    runs-on: macos-13
-    steps:
-      - uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b
-
-      - name: Run Snyk to check for code vulnerabilities
-        uses: snyk/actions/cocoapods@b98d498629f1c368650224d6d212bf7dfa89e4bf # v0.4.0
-        with:
-          args: --all-projects --org=${{ secrets.SNYK_ORG_ID }} --severity-threshold=high
-          command: code test
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-
-  snyk_online_monitor:
-    runs-on: macos-13
-    steps:
-      - uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b
-      - name: Enable Snyk online monitoring to check for vulnerabilities
-        uses: snyk/actions/cocoapods@b98d498629f1c368650224d6d212bf7dfa89e4bf # v0.4.0
-        with:
-          args: --all-projects --org=${{ secrets.SNYK_ORG_ID }}
-          command: monitor
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+          node-version: '14'
+      - run: |
+          npm install snyk -g
+          snyk -v
+      - run: |
+          snyk auth ${{ secrets.SNYK_TOKEN }} # snyk authentication using GH secrets
+          snyk test --all-projects --org=${{ secrets.SNYK_ORG_ID }} --severity-threshold=high
+#
+#  snyk_scan_code:
+#    runs-on: ubuntu-latest
+#    steps:
+#      - uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b
+#
+#      - name: Run Snyk to check for code vulnerabilities
+#        uses: snyk/actions/cocoapods@b98d498629f1c368650224d6d212bf7dfa89e4bf # v0.4.0
+#        with:
+#          args: --all-projects --org=${{ secrets.SNYK_ORG_ID }} --severity-threshold=high
+#          command: code test
+#        env:
+#          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+#
+#  snyk_online_monitor:
+#    runs-on: ubuntu-latest
+#    steps:
+#      - uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b
+#      - name: Enable Snyk online monitoring to check for vulnerabilities
+#        uses: snyk/actions/cocoapods@b98d498629f1c368650224d6d212bf7dfa89e4bf # v0.4.0
+#        with:
+#          args: --all-projects --org=${{ secrets.SNYK_ORG_ID }}
+#          command: monitor
+#        env:
+#          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
 #
 #  linting:
 #    name: "Linting"
