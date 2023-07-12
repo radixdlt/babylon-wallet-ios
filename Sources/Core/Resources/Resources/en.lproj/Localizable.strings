@@ -21,6 +21,7 @@
 "assetDetails_currentSupply" = "Current Supply";
 "assetDetails_supplyUnkown" = "Unknown";
 "assetDetails_behavior" = "Behavior";
+"assetDetails_tags" = "Tags";
 "assetDetails_associatedDapps" = "Associated dApps";
 "assetDetails_tokenDetails_noTokens" = "You have no Tokens";
 "assetDetails_tokenDetails_whatAreTokens" = "What are Tokens?";
@@ -114,9 +115,10 @@
 "linkedConnectors_newConnection_subtitle" = "Scan the QR code shown in the Radix Connector browser extension";
 "linkedConnectors_newConnection_linking" = "Linking…";
 "linkedConnectors_nameNewConnector_title" = "Name New Connector";
+"linkedConnectors_nameNewConnector_subtitle" = "What would you like to call this Connector?";
 "linkedConnectors_nameNewConnector_textFieldPlaceholder" = "e.g. Chrome on Personal Laptop";
-"linkedConnectors_nameNewConnector_textFieldHint" = "Give a name to this Radix Connector";
-"linkedConnectors_nameNewConnector_saveLinkButtonTitle" = "Save Link and Continue";
+"linkedConnectors_nameNewConnector_textFieldHint" = "Name this connector e.g. ‘Chrome on MacBook Pro’";
+"linkedConnectors_nameNewConnector_saveLinkButtonTitle" = "Continue";
 "linkedConnectors_removeConnectionAlert_title" = "Remove Connection";
 "linkedConnectors_removeConnectionAlert_message" = "You will no longer be able to connect your wallet to this device and browser combination.";
 "linkedConnectors_removeConnectionAlert_removeButtonTitle" = "Remove";
@@ -205,9 +207,9 @@
 "createEntity_completion_title" = "Congratulations";
 "createEntity_ledger_createAccount" = "Create Ledger Account";
 "createEntity_ledger_createPersona" = "Create Ledger Persona";
-"createEntity_nameNewEntity_explanation" = "This can be changed any time";
+"createEntity_nameNewEntity_explanation" = "Your Account lives on the Radix Network and you can access it any time in your Wallet.";
 "createEntity_nameNewEntity_ledgerTitle" = "Create with Ledger Hardware Wallet";
-"createEntity_nameNewEntity_ledgerSubtitle" = "Transactions will be signed using a Ledger device";
+"createEntity_nameNewEntity_ledgerSubtitle" = "You will be asked to sign transactions with the Ledger device you select";
 "createPersona_emptyDisplayName" = "Empty display name";
 "createPersona_completion_subtitleFirst" = "You’ve created your first Persona!";
 "createPersona_completion_subtitleNotFirst" = "Your Persona has been created.";
@@ -505,19 +507,19 @@
 "signing_signatureSuccessful_title" = "Signed";
 "signing_signatureSuccessful_body" = "Signature successful";
 "ledgerHardwareDevices_linkConnectorAlert_title" = "Link a Connector";
-"ledgerHardwareDevices_linkConnectorAlert_message" = "To use a Ledger hardware wallet device, it must be connected to a computer running the Radix Connector browser extension.
-
-Install the Connector extension, open it to see the linking QR code, and tap continue.";
+"ledgerHardwareDevices_linkConnectorAlert_message" = "To use a Ledger hardware wallet device, it must be connected to a computer running the Radix Connector browser extension.";
 "ledgerHardwareDevices_linkConnectorAlert_continue" = "Continue";
-"ledgerHardwareDevices_navigationTitleAllowSelection" = "Choose Device";
+"ledgerHardwareDevices_navigationTitleAllowSelection" = "Choose Ledger";
+"ledgerHardwareDevices_navigationTitleNoSelection" = "Choose Ledger Device";
 "ledgerHardwareDevices_navigationTitleGeneral" = "Ledger Devices";
 "ledgerHardwareDevices_ledgerFactorSourceInfoCaption" = "What is a Ledger Factor Source";
 "ledgerHardwareDevices_addNewLedger" = "Add Ledger Device";
 "ledgerHardwareDevices_addedHeading" = "Added";
 "ledgerHardwareDevices_usedHeading" = "Last Used";
 "ledgerHardwareDevices_continueWithLedger" = "Continue";
-"ledgerHardwareDevices_subtitleNoLedgers" = "No Ledger devices have been added.";
+"ledgerHardwareDevices_subtitleNoLedgers" = "No Ledger devices currently added to your Radix Wallet";
 "ledgerHardwareDevices_subtitleSelectLedger" = "Choose a Ledger device to use";
+"ledgerHardwareDevices_subtitleSelectLedgerExisting" = "Choose an existing Ledger or add a new one";
 "ledgerHardwareDevices_subtitleAllLedgers" = "Here are all the Ledger devices you have added.";
 "ledgerHardwareDevices_subtitleFailure" = "Could not find Ledger devices";
 "displayMnemonics_cautionAlert_title" = "Use Caution";
@@ -562,7 +564,8 @@ Install the Connector extension, open it to see the linking QR code, and tap con
 "addLedgerDevice_addDevice_body2" = "Connect your Ledger to a computer running a linked Radix Connector browser extension, and make sure the Radix Babylon app is running on the Ledger device.";
 "addLedgerDevice_addDevice_continue" = "Continue";
 "addLedgerDevice_nameLedger_title" = "Name Your Ledger";
-"addLedgerDevice_nameLedger_body" = "Enter a label for this Ledger device";
+"addLedgerDevice_nameLedger_subtitle" = "What would you like to call this Ledger device?";
+"addLedgerDevice_nameLedger_fieldHint" = "This will be displayed when you’re prompted to sign with this ledger";
 "addLedgerDevice_nameLedger_detectedType" = "Detected type: %@";
 "addLedgerDevice_nameLedger_namePlaceholder" = "Green Ledger Nano S+";
 "addLedgerDevice_nameLedger_continueButtonTitle" = "Save and Continue";
