@@ -242,12 +242,7 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 		case let .editablePersonaFetched(persona):
 			switch state.mode {
 			case .general:
-				state.destination = .editPersona(
-					.init(
-						mode: .edit,
-						persona: persona
-					)
-				)
+				state.destination = .editPersona(.init(mode: .edit, persona: persona))
 			case let .dApp(_, detailedPersona):
 				break
 			}

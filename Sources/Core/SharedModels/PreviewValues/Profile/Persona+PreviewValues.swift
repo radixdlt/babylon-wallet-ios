@@ -18,17 +18,8 @@ extension Profile.Network.Persona {
 				derivationPath: .identityPath(.init(derivationPath: "m/44H/1022H/10H/618H/1460H/0H"))
 			)
 		)),
-		displayName: "Alan",
-		personaData: .init(
-			name: .init(
-				id: .init(uuidString: "00000000-0000-0000-0000-000000000000")!,
-				value: .init(
-					given: "Alan",
-					family: "Turing",
-					variant: .western
-				)
-			)
-		)
+		displayName: "Sato",
+		personaData: .previewValue
 	)
 
 	public static let previewValue1: Self = try! Self(
