@@ -6,7 +6,7 @@ extension Profile.Network.Persona {
 	public static let previewValue0: Self = try! Self(
 		networkID: .nebunet,
 		address: .init(
-			validatingAddress: "identity_tdx_a_1qwv0unmwmxschqj8sntg6n9eejkrr6yr6fa4ekxazdzqhm6wy5"
+			validatingAddress: "identity_tdx_21_12tljxea3s0mse52jmpvsphr0haqs86sung8d3qlhr763nxttj59650"
 		),
 		securityState: .unsecured(.init(
 			transactionSigning: .init(
@@ -24,7 +24,7 @@ extension Profile.Network.Persona {
 				id: .init(uuidString: "00000000-0000-0000-0000-000000000000")!,
 				value: .init(
 					given: "Alan",
-					family: "Turin",
+					family: "Turing",
 					variant: .western
 				)
 			)
