@@ -20,10 +20,11 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 		/// Not yet migrated, containing unvalidated and validated accounts.
 		public var olympiaAccounts: OlympiaAccountsValidation
 
-		/// Migrated (and before that validated)
-		public var migratedAccounts: IdentifiedArrayOf<Profile.Network.Account> = []
-
+		/// All ledgers that have been on this screen
 		public var knownLedgers: IdentifiedArrayOf<LedgerHardwareWalletFactorSource> = []
+
+		/// Migrated (and before that validated)
+		public var migratedAccounts: [MigratedHardwareAccounts] = []
 
 		@PresentationState
 		public var destinations: Destinations.State?
@@ -81,7 +82,7 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 		case validatedAccounts(Set<OlympiaAccountToMigrate>, LedgerHardwareWalletFactorSource.ID)
 
 		/// Migrated accounts of validated public keys
-		case migratedOlympiaHardwareAccounts(NonEmpty<[Profile.Network.Account]>)
+		case migratedOlympiaHardwareAccounts(MigratedHardwareAccounts)
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -187,11 +188,12 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 
 		case let .migratedOlympiaHardwareAccounts(migratedAccounts):
 			loggerGlobal.notice("Adding migrated accounts...")
-			state.migratedAccounts.append(contentsOf: migratedAccounts)
+			state.migratedAccounts.append(migratedAccounts)
 
 			if state.olympiaAccounts.unvalidated.isEmpty {
 				loggerGlobal.notice("Finished migrating all accounts.")
-				return .send(.delegate(.completed(state.migratedAccounts)))
+				let babylonAccounts = state.migratedAccounts.collectBabylonAccounts()
+				return .send(.delegate(.completed(babylonAccounts)))
 			}
 
 			loggerGlobal.notice("#\(state.olympiaAccounts.unvalidated) left to migrate...")
@@ -354,10 +356,9 @@ extension ImportOlympiaLedgerAccountsAndFactorSources {
 					ledgerFactorSourceID: ledgerID
 				)
 			)
-			let migratedAccounts = migrated.accounts.map(\.babylon)
-			loggerGlobal.notice("Converted #\(migratedAccounts.count) accounts to babylon! ✅")
+			loggerGlobal.notice("Converted #\(migrated.accounts.count) accounts to babylon! ✅")
 
-			await send(.internal(.migratedOlympiaHardwareAccounts(migratedAccounts)))
+			await send(.internal(.migratedOlympiaHardwareAccounts(migrated)))
 		} catch: { error, _ in
 			loggerGlobal.error("Failed to migrate accounts to babylon, error: \(error)")
 			errorQueue.schedule(error)
