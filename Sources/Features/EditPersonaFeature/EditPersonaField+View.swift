@@ -34,8 +34,34 @@ extension EditPersonaField {
 		}
 
 		public var body: some SwiftUI.View {
-			WithViewStore(store, observe: ViewState.init(state:), send: { .view($0) }) { _ in
-				EmptyView()
+			WithViewStore(store, observe: ViewState.init(state:), send: { .view($0) }) { viewStore in
+				AppTextField(
+					primaryHeading: .init(text: viewStore.primaryHeading),
+					secondaryHeading: viewStore.secondaryHeading,
+					placeholder: "",
+					text: viewStore.validation(
+						get: \.$input,
+						send: { .inputFieldChanged($0) }
+					),
+					hint: viewStore.inputHint,
+					innerAccessory: {
+						if viewStore.isDynamic {
+							Button(action: { viewStore.send(.deleteButtonTapped) }) {
+								Image(asset: AssetResource.trash)
+									.offset(x: .small3)
+									.frame(.verySmall, alignment: .trailing)
+							}
+							.modifier {
+								if viewStore.canBeDeleted { $0 } else { $0.hidden() }
+							}
+						}
+					}
+				)
+				#if os(iOS)
+				.textContentType(viewStore.contentType)
+				.keyboardType(viewStore.keyboardType)
+				.textInputAutocapitalization(viewStore.capitalization?.rawValue)
+				#endif
 			}
 		}
 	}
