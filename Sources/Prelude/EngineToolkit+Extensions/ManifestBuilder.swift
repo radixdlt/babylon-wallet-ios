@@ -1,12 +1,10 @@
 import EngineToolkitUniFFI
 
+// MARK: - Mutation
 extension TransactionManifest {
 	public func withInstructionAdded(_ instruction: Instruction, at index: Int) throws -> TransactionManifest {
-		var instructionList = instructions().instructionsList()
-		instructionList.insert(instruction, at: index)
-
-		return try .init(
-			instructions: .fromInstructions(instructions: instructionList, networkId: instructions().networkId()),
+		try .init(
+			instructions: instructions().withInstructionAdded(instruction, at: index),
 			blobs: blobs()
 		)
 	}
@@ -16,43 +14,25 @@ extension TransactionManifest {
 		fee: String = "10"
 	) throws -> TransactionManifest {
 		try withInstructionAdded(
-			.callMethod(
-				address: .init(address: address.address),
-				methodName: "lock_fee",
-				args: .tupleValue(fields: [.decimalValue(value: .init(value: fee))])
-			),
+			.lockFeeCall(address: address, fee: fee),
 			at: 0
 		)
 	}
+}
 
+// MARK: - Custom Manifests
+extension TransactionManifest {
 	public static func manifestForFaucet(
 		includeLockFeeInstruction: Bool,
 		networkID: NetworkID,
 		componentAddress: Address
 	) throws -> TransactionManifest {
-		let faucet = utilsKnownAddresses(networkId: networkID.rawValue).componentAddresses.faucet
-		let raw = """
-		CALL_METHOD
-		    Address("\(faucet.addressString())")
-		    "lock_fee"
-		    Decimal("10");
-
-		# Calling the "free" method on the faucet component which is the method responsible for dispensing
-		# XRD from the faucet.
-		CALL_METHOD
-		    Address("\(faucet.addressString())")
-		    "free";
-
-		# Depositing all of the XRD dispensed from the faucet into our account component.
-		CALL_METHOD
-		    Address("\(componentAddress.address)")
-		    "try_deposit_batch_or_abort"
-		    Expression("ENTIRE_WORKTOP");
-
-		"""
-		let instructions = try Instructions.fromString(string: raw, blobs: [], networkId: networkID.rawValue)
-		return TransactionManifest(
-			instructions: instructions,
+		try .init(
+			instructions: .faucet(
+				includeLockFeeInstruction: includeLockFeeInstruction,
+				networkID: networkID,
+				componentAddress: componentAddress
+			),
 			blobs: []
 		)
 	}
@@ -61,75 +41,139 @@ extension TransactionManifest {
 		account: AccountAddress,
 		network: NetworkID
 	) throws -> TransactionManifest {
-		let raw = """
-		\(noFungibleWithInitialSupplyInstruction())
-		CALL_METHOD
-		    Address("\(account.address)")
-		    "deposit_batch"
-		    Expression("ENTIRE_WORKTOP")
-		;
-		"""
-
-		return try .init(instructions: .fromString(string: raw, blobs: [], networkId: network.rawValue), blobs: [])
+		try .init(instructions: .createNonFungibleToken(account: account, network: network), blobs: [])
 	}
 
 	public static func manifestForCreateMultipleNonFungibleTokens(
 		account: AccountAddress,
 		network: NetworkID
 	) throws -> TransactionManifest {
-		let instructions = [String](repeating: noFungibleWithInitialSupplyInstruction(), count: 10).joined(separator: "\n")
-		let raw = """
-		 \(instructions)
-		CALL_METHOD
-		    Address("\(account.address)")
-		    "deposit_batch"
-		    Expression("ENTIRE_WORKTOP")
-		;
-		"""
-
-		return try .init(instructions: .fromString(string: raw, blobs: [], networkId: network.rawValue), blobs: [])
+		try .init(instructions: .createMultipleNonFungibleTokens(account: account, network: network), blobs: [])
 	}
 
 	public static func manifestForCreateFungibleToken(
 		account: AccountAddress,
 		network: NetworkID
 	) throws -> TransactionManifest {
-		let raw = """
-		\(fungibleWithInitialSupplyInstruction())
-
-		                # Depositing the entirety of the initial supply of the newly created resource into our account
-		                # component.
-		                CALL_METHOD
-		                    Address("\(account.address)")
-		                    "deposit_batch"
-		                    Expression("ENTIRE_WORKTOP");
-		"""
-
-		return try .init(instructions: .fromString(string: raw, blobs: [], networkId: network.rawValue), blobs: [])
+		try .init(instructions: .createFungibleToken(account: account, network: network), blobs: [])
 	}
 
 	public static func manifestForCreateMultipleFungibleTokens(
 		account: AccountAddress,
 		network: NetworkID
 	) throws -> TransactionManifest {
-		let instructions = [String](repeating: fungibleWithInitialSupplyInstruction(), count: 20).joined(separator: "\n")
-		let raw = """
-		 \(instructions)
-		CALL_METHOD
-		    Address("\(account.address)")
-		    "deposit_batch"
-		    Expression("ENTIRE_WORKTOP")
-		;
-		"""
+		try .init(instructions: .createMultipleFungibleTokens(account: account, network: network), blobs: [])
+	}
+}
 
-		return try .init(instructions: .fromString(string: raw, blobs: [], networkId: network.rawValue), blobs: [])
+extension Instructions {
+	public func withInstructionAdded(_ instruction: Instruction, at index: Int) throws -> Instructions {
+		var instructionList = self.instructionsList()
+		instructionList.insert(instruction, at: index)
+		return try .fromInstructions(instructions: instructionList, networkId: self.networkId())
 	}
 
-	private func faucetAddress(networkID: NetworkID) -> EngineToolkitUniFFI.Address {
+	public func withLockFeeCallMethodAdded(
+		address: Address,
+		fee: String = "10"
+	) throws -> Instructions {
+		try withInstructionAdded(
+			.lockFeeCall(address: address, fee: fee),
+			at: 0
+		)
+	}
+
+	static func faucetAddress(networkID: NetworkID) -> EngineToolkitUniFFI.Address {
 		utilsKnownAddresses(networkId: networkID.rawValue).componentAddresses.faucet
 	}
 
-	private static func fungibleWithInitialSupplyInstruction() -> String {
+	static func from(rawInstructions: [String], network: NetworkID) throws -> Instructions {
+		try .fromString(string: rawInstructions.joined(separator: "\n"), blobs: [], networkId: network.rawValue)
+	}
+
+	static func createFungibleToken(
+		account: AccountAddress,
+		network: NetworkID
+	) throws -> Instructions {
+		let instructions: [String] = [Instruction.fungibleWithInitialSupplyInstruction(), Instruction.depositBatch(account: account)]
+		return try .from(rawInstructions: instructions, network: network)
+	}
+
+	static func createMultipleFungibleTokens(
+		account: AccountAddress,
+		network: NetworkID
+	) throws -> Instructions {
+		let instructions = [String](repeating: Instruction.fungibleWithInitialSupplyInstruction(), count: 20) + [Instruction.depositBatch(account: account)]
+		return try .from(rawInstructions: instructions, network: network)
+	}
+
+	static func createMultipleNonFungibleTokens(
+		account: AccountAddress,
+		network: NetworkID
+	) throws -> Instructions {
+		let instructions = [String](repeating: Instruction.noFungibleWithInitialSupplyInstruction(), count: 10) + [Instruction.depositBatch(account: account)]
+		return try .from(rawInstructions: instructions, network: network)
+	}
+
+	static func createNonFungibleToken(
+		account: AccountAddress,
+		network: NetworkID
+	) throws -> Instructions {
+		let instructions: [String] = [Instruction.noFungibleWithInitialSupplyInstruction(), Instruction.depositBatch(account: account)]
+		return try .from(rawInstructions: instructions, network: network)
+	}
+
+	static func faucet(
+		includeLockFeeInstruction: Bool,
+		networkID: NetworkID,
+		componentAddress: Address
+	) throws -> Instructions {
+		let faucet = faucetAddress(networkID: networkID)
+		var rawInstructions = [Instruction.free(address: faucet), Instruction.tryDepositBatchOrAbort(componentAddress: componentAddress)]
+		let instructions = try Instructions.from(rawInstructions: rawInstructions, network: networkID)
+
+		if includeLockFeeInstruction {
+			return try instructions.withLockFeeCallMethodAdded(address: componentAddress)
+		}
+		return instructions
+	}
+}
+
+extension Instruction {
+	static func lockFeeCall(
+		address: Address,
+		fee: String = "10"
+	) throws -> Instruction {
+		try .callMethod(address: .init(address: address.address), methodName: "lock_fee", args: .tupleValue(fields: [.decimalValue(value: .init(value: fee))]))
+	}
+
+	static func depositBatch(account: AccountAddress) -> String {
+		"""
+		CALL_METHOD
+		    Address("\(account.address)")
+		    "deposit_batch"
+		    Expression("ENTIRE_WORKTOP");
+		"""
+	}
+
+	static func free(address: EngineToolkitUniFFI.Address) -> String {
+		"""
+		CALL_METHOD
+		    Address("\(address.addressString())")
+		    "free";
+		"""
+	}
+
+	static func tryDepositBatchOrAbort(componentAddress: Address) -> String {
+		"""
+		                CALL_METHOD
+		                    Address("\(componentAddress.address)")
+		                    "try_deposit_batch_or_abort"
+		                    Expression("ENTIRE_WORKTOP");
+		"""
+	}
+
+	static func fungibleWithInitialSupplyInstruction() -> String {
 		"""
 		                CREATE_FUNGIBLE_RESOURCE_WITH_INITIAL_SUPPLY
 		                    18u8
@@ -148,7 +192,7 @@ extension TransactionManifest {
 		"""
 	}
 
-	private static func noFungibleWithInitialSupplyInstruction() -> String {
+	static func noFungibleWithInitialSupplyInstruction() -> String {
 		"""
 		CREATE_NON_FUNGIBLE_RESOURCE_WITH_INITIAL_SUPPLY
 		    Enum<1u8>()
@@ -296,14 +340,5 @@ extension TransactionManifest {
 		    )
 		;
 		"""
-	}
-}
-
-extension Instruction {
-	public static func lockFeeCall(
-		address: Address,
-		fee: String = "10"
-	) throws -> Instruction {
-		try .callMethod(address: .init(address: address.address), methodName: "lock_fee", args: .decimalValue(value: .init(value: fee)))
 	}
 }

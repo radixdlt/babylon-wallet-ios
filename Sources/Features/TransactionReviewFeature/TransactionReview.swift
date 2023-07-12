@@ -1193,7 +1193,7 @@ extension TransactionType {
 			)
 
 		case let .transfer(from, transfers):
-			var withdraws: [String: [ResourceSpecifier]] = [from.addressString(): []]
+			var withdraws: [String: ResourceSpecifier] = [:]
 			var deposits: [String: [Source]] = [:]
 			var allAddresses: [EngineToolkitUniFFI.Address] = [from]
 
@@ -1204,16 +1204,24 @@ extension TransactionType {
 				for (rawResourceAddress, resource) in resouceTransfers {
 					let resourceAddress = try EngineToolkitUniFFI.Address(address: rawResourceAddress)
 					let resourceSpecifier: ResourceSpecifier = {
+						let existingResource = withdraws[rawResourceAddress]
+
 						switch resource {
 						case let .amount(amount):
+							if let totalAmount = existingResource?.amount {
+								return .amount(resourceAddress: resourceAddress, amount: totalAmount.add(other: amount))
+							}
 							return .amount(resourceAddress: resourceAddress, amount: amount)
 						case let .ids(ids):
+							if let allIds = existingResource?.ids {
+								return .ids(resourceAddress: resourceAddress, ids: allIds + ids)
+							}
 							return .ids(resourceAddress: resourceAddress, ids: ids)
 						}
 					}()
 
-					withdraws[from.addressString()]?.append(resourceSpecifier)
-					deposits[rawResourceAddress, default: []].append(resourceSpecifier.toSource)
+					withdraws[rawResourceAddress] = resourceSpecifier
+					deposits[address, default: []].append(resourceSpecifier.toSource)
 				}
 			}
 
@@ -1225,7 +1233,7 @@ extension TransactionType {
 			return .conforming(
 				.init(
 					accountProofs: [],
-					accountWithdraws: withdraws,
+					accountWithdraws: [from.addressString(): Array(withdraws.values)],
 					accountDeposits: deposits,
 					addressesInManifest: addressesInManifest,
 					metadataOfNewlyCreatedEntities: [:],
@@ -1252,6 +1260,21 @@ extension TransactionType {
 extension ResourceSpecifier {
 	var toSource: Source {
 		.guaranteed(value: self)
+	}
+
+	var amount: EngineToolkitUniFFI.Decimal? {
+		if case let .amount(_, amount) = self {
+			return amount
+		}
+
+		return nil
+	}
+
+	var ids: [NonFungibleLocalId]? {
+		if case let .ids(_, ids) = self {
+			return ids
+		}
+		return nil
 	}
 
 	var resourceAddress: EngineToolkitUniFFI.Address {

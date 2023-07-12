@@ -366,6 +366,7 @@ extension DappInteractor {
 					return
 				}
 
+				print("New incomming request")
 				switch incomingRequest {
 				case let .valid(requestEnvelope):
 					await send(.internal(.receivedRequestFromDapp(

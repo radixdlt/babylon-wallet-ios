@@ -1,18 +1,6 @@
 import EngineToolkitUniFFI
 import Foundation
 
-// extension NonFungibleGlobalId: Codable {
-//        public func encode(to encoder: Encoder) throws {
-//                var container = encoder.singleValueContainer()
-//                try container.encode(self.asStr())
-//        }
-//
-//        public convenience init(from decoder: Decoder) throws {
-//                let container = try decoder.singleValueContainer()
-//                try self.init(nonFungibleGlobalId: container.decode(String.self))
-//        }
-// }
-
 extension SignatureWithPublicKey {
 	public var signature: Signature {
 		switch self {
