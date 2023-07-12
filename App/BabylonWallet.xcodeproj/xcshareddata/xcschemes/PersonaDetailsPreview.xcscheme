@@ -14,7 +14,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "AE8501432A5EA4CE0025E7EC"
+               BlueprintIdentifier = "AEEB60202A5EA5CB0045F153"
                BuildableName = "PersonaDetailsPreview.app"
                BlueprintName = "PersonaDetailsPreview"
                ReferencedContainer = "container:BabylonWallet.xcodeproj">
@@ -43,7 +43,7 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "AE8501432A5EA4CE0025E7EC"
+            BlueprintIdentifier = "AEEB60202A5EA5CB0045F153"
             BuildableName = "PersonaDetailsPreview.app"
             BlueprintName = "PersonaDetailsPreview"
             ReferencedContainer = "container:BabylonWallet.xcodeproj">
@@ -60,7 +60,7 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "AE8501432A5EA4CE0025E7EC"
+            BlueprintIdentifier = "AEEB60202A5EA5CB0045F153"
             BuildableName = "PersonaDetailsPreview.app"
             BlueprintName = "PersonaDetailsPreview"
             ReferencedContainer = "container:BabylonWallet.xcodeproj">
