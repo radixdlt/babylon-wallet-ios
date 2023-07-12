@@ -22,12 +22,17 @@ public struct EditPersona: Sendable, FeatureReducer {
 		let mode: Mode
 		let persona: Profile.Network.Persona
 
+		var labelField: EditPersonaStaticField.State
 		public init(
 			mode: Mode,
 			persona: Profile.Network.Persona
 		) {
 			self.mode = mode
 			self.persona = persona
+			self.labelField = EditPersonaStaticField.State(
+				id: .personaLabel,
+				initial: persona.displayName.rawValue
+			)
 		}
 	}
 
@@ -61,6 +66,10 @@ public struct EditPersona: Sendable, FeatureReducer {
 	@Dependency(\.dismiss) var dismiss
 
 	public var body: some ReducerProtocolOf<Self> {
+		Scope(state: \.labelField, action: /Action.child .. ChildAction.labelField) {
+			EditPersonaField()
+		}
+
 		Reduce(core)
 	}
 
