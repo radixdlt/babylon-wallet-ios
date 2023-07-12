@@ -119,17 +119,6 @@ extension TransactionClient {
 			})
 		}
 
-		let convertManifestInstructionsToJSONIfItWasString: ConvertManifestInstructionsToJSONIfItWasString = { _ in
-			fatalError()
-//			try await engineToolkitClient.convertManifestInstructionsToJSONIfItWasString(
-//				.init(
-//					version: engineToolkitClient.getTransactionVersion(),
-//					networkID: gatewaysClient.getCurrentNetworkID(),
-//					manifest: manifest
-//				)
-//			)
-		}
-
 		let lockFeeWithSelectedPayer: LockFeeWithSelectedPayer = { manifest, feeToAdd, addressOfPayer in
 			// assert account still has enough funds to pay
 			guard await accountsWithEnoughFunds(from: [addressOfPayer], toPay: feeToAdd).first?.owner == addressOfPayer else {
@@ -306,28 +295,6 @@ extension TransactionClient {
 			)
 		}
 
-		@Sendable
-		func addGuaranteesToManifest(
-			_ manifestWithLockFee: TransactionManifest,
-			guarantees: [Guarantee]
-		) async throws -> TransactionManifest {
-			var manifestWithLockFee = manifestWithLockFee
-
-			/// Will be increased with each added guarantee to account for the difference in indexes from the initial manifest.
-			var indexInc = 1 // LockFee was added, start from 1
-			for guarantee in guarantees {
-				let guaranteeInstruction: Instruction = try .assertWorktopContains(
-					resourceAddress: guarantee.resourceAddress.toEngine(),
-					amount: .init(value: guarantee.amount.toString())
-				)
-
-				manifestWithLockFee = try manifestWithLockFee.withInstructionAdded(guaranteeInstruction, at: Int(guarantee.instructionIndex) + indexInc)
-
-				indexInc += 1
-			}
-			return manifestWithLockFee
-		}
-
 		let prepareForSigning: PrepareForSigning = { request in
 			let transactionIntentWithSigners = try await buildTransactionIntent(.init(
 				networkID: request.networkID,
@@ -376,14 +343,8 @@ extension TransactionClient {
 		}
 
 		return Self(
-			convertManifestInstructionsToJSONIfItWasString: convertManifestInstructionsToJSONIfItWasString,
-			convertManifestToString: { _ in
-				fatalError()
-				//                                try await engineToolkitClient.convertManifestToString(.init(version: .default, networkID: gatewaysClient.getCurrentNetworkID(), manifest: $0))
-			},
 			lockFeeBySearchingForSuitablePayer: lockFeeBySearchingForSuitablePayer,
 			lockFeeWithSelectedPayer: lockFeeWithSelectedPayer,
-			addGuaranteesToManifest: addGuaranteesToManifest,
 			getTransactionReview: getTransactionReview,
 			buildTransactionIntent: buildTransactionIntent,
 			notarizeTransaction: notarizeTransaction,

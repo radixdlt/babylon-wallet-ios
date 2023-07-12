@@ -3,11 +3,8 @@ import ClientPrelude
 
 extension TransactionClient: TestDependencyKey {
 	public static let testValue: TransactionClient = .init(
-		convertManifestInstructionsToJSONIfItWasString: unimplemented("\(Self.self).convertManifestInstructionsToJSONIfItWasString"),
-		convertManifestToString: unimplemented("\(Self.self).convertManifestToString"),
 		lockFeeBySearchingForSuitablePayer: unimplemented("\(Self.self).lockFeeBySearchingForSuitablePayer"),
 		lockFeeWithSelectedPayer: unimplemented("\(Self.self).lockFeeWithSelectedPayer"),
-		addGuaranteesToManifest: unimplemented("\(Self.self).addGuaranteesToManifest"),
 		getTransactionReview: unimplemented("\(Self.self).getTransactionReview"),
 		buildTransactionIntent: unimplemented("\(Self.self).buildTransactionIntent"),
 		notarizeTransaction: unimplemented("\(Self.self).notarizeTransaction"),

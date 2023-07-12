@@ -108,11 +108,11 @@ extension GatewayAPI.PublicKey {
 // MARK: - NotarizeTransactionRequest
 public struct NotarizeTransactionRequest: Sendable, Hashable {
 	public let intentSignatures: Set<EngineToolkitUniFFI.SignatureWithPublicKey>
-	public let transactionIntent: Intent
+	public let transactionIntent: TransactionIntent
 	public let notary: SLIP10.PrivateKey
 	public init(
 		intentSignatures: Set<EngineToolkitUniFFI.SignatureWithPublicKey>,
-		transactionIntent: Intent,
+		transactionIntent: TransactionIntent,
 		notary: SLIP10.PrivateKey
 	) {
 		self.intentSignatures = intentSignatures
@@ -143,7 +143,7 @@ public struct BuildTransactionIntentRequest: Sendable {
 	public init(
 		networkID: NetworkID,
 		manifest: TransactionManifest,
-		nonce: Nonce,
+		nonce: Nonce = .secureRandom(),
 		makeTransactionHeaderInput: MakeTransactionHeaderInput = .default,
 		isFaucetTransaction: Bool = false,
 		ephemeralNotaryPublicKey: Curve25519.Signing.PublicKey

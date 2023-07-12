@@ -64,6 +64,14 @@ extension TransactionManifest {
 	) throws -> TransactionManifest {
 		try .init(instructions: .createMultipleFungibleTokens(account: account, network: network), blobs: [])
 	}
+
+	public static func manifestForOwnerKeys(
+		address: String,
+		keyHashes: [PublicKeyHash],
+		networkID: NetworkID
+	) throws -> TransactionManifest {
+		try .init(instructions: .ownerKeys(address: address, keyHashes: keyHashes, networkID: networkID), blobs: [])
+	}
 }
 
 extension Instructions {
@@ -137,6 +145,10 @@ extension Instructions {
 		}
 		return instructions
 	}
+
+	static func ownerKeys(address: String, keyHashes: [PublicKeyHash], networkID: NetworkID) throws -> Instructions {
+		try .from(rawInstructions: [Instruction.ownerKeysMetadata(address: address, keyHashes: keyHashes)], network: networkID)
+	}
 }
 
 extension Instruction {
@@ -170,6 +182,26 @@ extension Instruction {
 		                    Address("\(componentAddress.address)")
 		                    "try_deposit_batch_or_abort"
 		                    Expression("ENTIRE_WORKTOP");
+		"""
+	}
+
+	static func publicKeyHash(_ hash: PublicKeyHash) throws -> String {
+		try """
+		Enum<\(hash.discriminator)>(
+		Bytes("\(hash.bytes().hex)")
+		)
+		"""
+	}
+
+	static func ownerKeysMetadata(address: String, keyHashes: [PublicKeyHash]) throws -> String {
+		let hashInstructions = try keyHashes.map(publicKeyHash(_:))
+		return """
+		SET_METADATA
+		    Address("\(address)")
+		    "owner_keys"
+		    Enum<Metadata::PublicKeyHashArray>(Array<Enum>(
+		\(String(hashInstructions.joined(separator: ",\n")))
+		    ));
 		"""
 	}
 
@@ -340,5 +372,22 @@ extension Instruction {
 		    )
 		;
 		"""
+	}
+}
+
+extension PublicKeyHash {
+	/// https://rdxworks.slack.com/archives/C031A0V1A1W/p1683275008777499?thread_ts=1683221252.228129&cid=C031A0V1A1W
+	var discriminator: String {
+		switch self {
+		case .ecdsaSecp256k1: return "0u8"
+		case .eddsaEd25519: return "1u8"
+		}
+	}
+
+	func bytes() throws -> [UInt8] {
+		switch self {
+		case let .ecdsaSecp256k1(value), let .eddsaEd25519(value):
+			return value
+		}
 	}
 }

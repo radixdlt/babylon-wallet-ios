@@ -81,15 +81,15 @@ extension SubmitTransactionClient: DependencyKey {
 				let intentSignatures = signedIntent.intentSignatures()
 				// RET prints when convertManifest is called, when it is removed, this can be moved down
 				// inline inside `print`.
-//				let txIntentString = intent.description(lookupNetworkName: { try? Radix.Network.lookupBy(id: $0).name.rawValue })
-//				print("\n\n🔮 DEBUG TRANSACTION START 🔮a")
-//				print("TXID: \(txID.rawValue)")
-//				print("TransactionIntent: \(txIntentString)")
-//				print("\n\nINTENT SIGNATURES: \(intentSignatures.map { "\npublicKey: \($0.publicKey?.compressedRepresentation.hex ?? "")\nsig: \($0.signature.bytes.hex)" }.joined(separator: "\n"))")
-//				print("\nNOTARY SIGNATURE: \(notarySignature)")
-//				print("\n\nCOMPILED TX INTENT:\n\(request.compiledNotarizedTXIntent.hex)")
-//				print("\n\nCOMPILED NOTARIZED INTENT:\n\(request.compiledNotarizedTXIntent.hex)")
-//				print("\n\n\n🔮 DEBUG TRANSACTION END 🔮\n\n")
+				let txIntentString = intent.description(lookupNetworkName: { try? Radix.Network.lookupBy(id: $0).name.rawValue })
+				print("\n\n🔮 DEBUG TRANSACTION START 🔮a")
+				print("TXID: \(txID.rawValue)")
+				print("TransactionIntent: \(txIntentString)")
+				print("\n\nINTENT SIGNATURES: \(intentSignatures.map { "\npublicKey: \($0.publicKey?.bytes.hex ?? "")\nsig: \($0.signature.bytes.hex)" }.joined(separator: "\n"))")
+				print("\nNOTARY SIGNATURE: \(notarySignature)")
+				print("\n\nCOMPILED TX INTENT:\n\(request.compiledNotarizedTXIntent.hex)")
+				print("\n\nCOMPILED NOTARIZED INTENT:\n\(request.compiledNotarizedTXIntent.hex)")
+				print("\n\n\n🔮 DEBUG TRANSACTION END 🔮\n\n")
 			}
 
 			@Dependency(\.transactionClient) var transactionClient

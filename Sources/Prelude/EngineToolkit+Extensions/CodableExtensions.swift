@@ -20,3 +20,25 @@ extension SignatureWithPublicKey {
 		}
 	}
 }
+
+extension Signature {
+	public var bytes: [UInt8] {
+		switch self {
+		case let .ecdsaSecp256k1(value):
+			return value
+		case let .eddsaEd25519(value):
+			return value
+		}
+	}
+}
+
+extension PublicKey {
+	public var bytes: [UInt8] {
+		switch self {
+		case let .ecdsaSecp256k1(value):
+			return value
+		case let .eddsaEd25519(value):
+			return value
+		}
+	}
+}

@@ -42,28 +42,7 @@ extension ROLAClient {
 			}
 
 			loggerGlobal.notice("Setting ownerKeyHashes to: \(ownerKeyHashes)")
-
-			let x: Hash
-			let hashInstructions: [String] = try ownerKeyHashes.map { hash in
-				try """
-				Enum<\(hash.discriminator)>(
-				Bytes("\(hash.bytes().hex)")
-				)
-				"""
-			}
-
-			let hex = try! ownerKeyHashes.first!.bytes().hex()
-			let rawInstruction = """
-			SET_METADATA
-			    Address("\(entityAddress.address)")
-			    "owner_keys"
-			    Enum<Metadata::PublicKeyHashArray>(Array<Enum>(
-			\(String(hashInstructions.joined(by: ",\n")))
-			    ));
-			"""
-
-			let instructions = try Instructions.fromString(string: rawInstruction, blobs: [], networkId: entity.networkID.rawValue)
-			return .init(instructions: instructions, blobs: [])
+			return try .manifestForOwnerKeys(address: entityAddress.address, keyHashes: ownerKeyHashes, networkID: entity.networkID)
 		}
 
 		return Self(
@@ -254,23 +233,6 @@ extension GatewayAPI.EntityMetadataCollection {
 			} else {
 				return nil
 			}
-		}
-	}
-}
-
-extension PublicKeyHash {
-	/// https://rdxworks.slack.com/archives/C031A0V1A1W/p1683275008777499?thread_ts=1683221252.228129&cid=C031A0V1A1W
-	var discriminator: String {
-		switch self {
-		case .ecdsaSecp256k1: return "0u8"
-		case .eddsaEd25519: return "1u8"
-		}
-	}
-
-	func bytes() throws -> [UInt8] {
-		switch self {
-		case let .ecdsaSecp256k1(value), let .eddsaEd25519(value):
-			return value
 		}
 	}
 }

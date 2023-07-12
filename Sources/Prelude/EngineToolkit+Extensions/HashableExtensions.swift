@@ -1,8 +1,6 @@
 import EngineToolkitUniFFI
 import Foundation
 
-public typealias TransactionIntent = Intent
-
 // MARK: - NonFungibleGlobalId + Equatable, Hashable
 extension NonFungibleGlobalId: Equatable, Hashable {
 	public static func == (lhs: EngineToolkitUniFFI.NonFungibleGlobalId, rhs: EngineToolkitUniFFI.NonFungibleGlobalId) -> Bool {
