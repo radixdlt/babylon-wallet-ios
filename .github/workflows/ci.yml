@@ -13,6 +13,7 @@ concurrency:
 jobs:
 
   snyk_scan:
+    name: "Snyk scan"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b
@@ -32,6 +33,7 @@ jobs:
           snyk code test --all-projects --org=${{ secrets.SNYK_ORG_ID }} --severity-threshold=high
 
   snyk_sbom:
+    name: "Snyk SBOM"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b
@@ -107,6 +109,7 @@ jobs:
         run: bundle exec fastlane ios build --env ios.beta
 
   snyk_online_monitor:
+    name: "Snyk monitoring"
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     needs:
