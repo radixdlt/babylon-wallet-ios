@@ -216,7 +216,8 @@ public struct DappDetails: Sendable, FeatureReducer {
 
 		case let .personas(.delegate(.openDetails(persona))):
 			guard let detailedPersona = state.dApp.detailedAuthorizedPersonas[id: persona.id] else { return .none }
-			state.destination = .personaDetails(PersonaDetails.State(.dApp(state.dApp, persona: detailedPersona)))
+			let personaDetailsState = PersonaDetails.State(.dApp(state.dApp, persona: detailedPersona))
+			state.destination = .personaDetails(personaDetailsState)
 			return .none
 
 		case .personas:

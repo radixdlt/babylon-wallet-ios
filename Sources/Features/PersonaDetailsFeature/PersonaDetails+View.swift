@@ -272,7 +272,11 @@ private extension PersonaDetails.State {
 	}
 
 	var dAppInfo: PersonaDetails.View.InfoSection.ViewState.DappInfo? {
-		fatalError()
+		guard case let .dApp(dApp, persona) = mode else { return nil }
+		return .init(
+			name: dApp.displayName?.rawValue ?? L10n.DAppRequest.Metadata.unknownName,
+			isSharingNothing: persona.sharedPersonaData.entries.isEmpty
+		)
 	}
 }
 
