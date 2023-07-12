@@ -43,20 +43,26 @@ extension ROLAClient {
 
 			loggerGlobal.notice("Setting ownerKeyHashes to: \(ownerKeyHashes)")
 
-			let arrayOfEngineToolkitBytesValues: [ManifestValue] = try ownerKeyHashes.map { hash in
-				try .enumValue(discriminator: 0, fields: [.blobValue(value: .init(value: .init(hash: hash.bytes())))])
+			let x: Hash
+			let hashInstructions: [String] = try ownerKeyHashes.map { hash in
+				try """
+				Enum<\(hash.discriminator)>(
+				Bytes("\(hash.bytes().hex)")
+				)
+				"""
 			}
 
-			// # Set List Metadata on Resource
-			// https://github.com/radixdlt/radixdlt-scrypto/blob/main/transaction/examples/metadata/metadata.rtm#L97-L101
-			let setMetadataInstruction = try Instruction.callMetadataMethod(
-				address: .init(
-					address: entityAddress.address),
-				methodName: "owner_keys",
-				args: .enumValue(discriminator: 0, fields: [.arrayValue(elementValueKind: .enumValue, elements: arrayOfEngineToolkitBytesValues)])
-			)
+			let hex = try! ownerKeyHashes.first!.bytes().hex()
+			let rawInstruction = """
+			SET_METADATA
+			    Address("\(entityAddress.address)")
+			    "owner_keys"
+			    Enum<Metadata::PublicKeyHashArray>(Array<Enum>(
+			\(String(hashInstructions.joined(by: ",\n")))
+			    ));
+			"""
 
-			let instructions = try Instructions.fromInstructions(instructions: [setMetadataInstruction], networkId: entity.networkID.rawValue)
+			let instructions = try Instructions.fromString(string: rawInstruction, blobs: [], networkId: entity.networkID.rawValue)
 			return .init(instructions: instructions, blobs: [])
 		}
 
@@ -240,10 +246,11 @@ extension GatewayAPI.EntityMetadataCollection {
 
 			let (_, hashType, hash) = output
 
+			let bytes = try [UInt8].init(hex: String(hash))
 			if hashType == curve25519Prefix {
-				return .eddsaEd25519(value: hash.data(using: .utf8)!.bytes)
+				return .eddsaEd25519(value: bytes)
 			} else if hashType == secp256k1Prefix {
-				return .ecdsaSecp256k1(value: hash.data(using: .utf8)!.bytes)
+				return .ecdsaSecp256k1(value: bytes)
 			} else {
 				return nil
 			}
@@ -253,10 +260,10 @@ extension GatewayAPI.EntityMetadataCollection {
 
 extension PublicKeyHash {
 	/// https://rdxworks.slack.com/archives/C031A0V1A1W/p1683275008777499?thread_ts=1683221252.228129&cid=C031A0V1A1W
-	var curveKindScryptoDiscriminator: ManifestValue {
+	var discriminator: String {
 		switch self {
-		case .ecdsaSecp256k1: return .u8Value(value: 0x00)
-		case .eddsaEd25519: return .u8Value(value: 0x01)
+		case .ecdsaSecp256k1: return "0u8"
+		case .eddsaEd25519: return "1u8"
 		}
 	}
 

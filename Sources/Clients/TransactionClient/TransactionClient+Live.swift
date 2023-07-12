@@ -235,7 +235,6 @@ extension TransactionClient {
 		}
 
 		let notarizeTransaction: NotarizeTransaction = { request in
-			let manifest = request.transactionIntent.manifest().instructions().instructionsList()
 			let signedTransactionIntent = SignedIntent(
 				intent: request.transactionIntent,
 				intentSignatures: Array(request.intentSignatures)

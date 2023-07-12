@@ -57,57 +57,245 @@ extension TransactionManifest {
 		)
 	}
 
-//
-	//        public func manifestForMultipleCreateFungibleToken(
-	//                networkID: NetworkID,
-	//                accountAddress: AccountAddress,
-	//                tokensCount: Int = 20
-	//        ) throws -> TransactionManifest {
-	//                let faucetAddress = faucetAddress(networkID: networkID)
-//
-	//                let tokens: [Instruction] = stride(from: 0, to: tokensCount, by: 1).map { _ in
-	//                        var metdataEntries: [[MetadataValue]] = []
-//
-	//                        let addName = Bool.random()
-	//                        let addSymbol = Bool.random()
-	//                        let addIcon = Bool.random()
-	//                        let hasSupply = Bool.random()
-	//                        let initialSupply = String(Int.random(in: 0 ..< 100_000))
-	//                        let description = BIP39.randomPhrase(maxSize: 20)
-//
-	//                        if addName {
-	//                                // compose name from two strings
-	//                                let name = [BIP39.WordList.english.randomElement()?.capitalized ?? "Unknown", BIP39.WordList.english.randomElement() ?? "Unknown"].joined(separator: " ")
-	//                                // add Name
-	//                                metdataEntries.append([.stringValue(value: "name"), .stringValue(value: name)])
-	//                        }
-//
-	//                        if addSymbol {
-	//                                let symbol = BIP39.WordList.english.randomElement()?.capitalized ?? "Unknown"
-	//                                // add symbol
-	//                                metdataEntries.append(
-	//                                        [.stringValue(value: "symbol"), .stringValue(value: symbol)]
-	//                                )
-	//                        }
-//
-	//                        if addIcon {
-	//                                let url = "https://c4.wallpaperflare.com/wallpaper/817/534/563/ave-bosque-fantasia-fenix-wallpaper-preview.jpg"
-//
-	//                                metdataEntries.append(
-	//                                        [.stringValue(value: "icon_url"), .urlValue(value: url)]
-	//                                )
-	//                        }
-//
-	//                        metdataEntries.append(
-	//                                [.stringValue(value: "description"), .stringValue(value: description)]
-	//                        )
-//
-	//                        let accessRules = Instruction.create
-	//                }
-	//        }
+	public static func manifestForCreateNonFungibleToken(
+		account: AccountAddress,
+		network: NetworkID
+	) throws -> TransactionManifest {
+		let raw = """
+		\(noFungibleWithInitialSupplyInstruction())
+		CALL_METHOD
+		    Address("\(account.address)")
+		    "deposit_batch"
+		    Expression("ENTIRE_WORKTOP")
+		;
+		"""
 
-	func faucetAddress(networkID: NetworkID) -> EngineToolkitUniFFI.Address {
+		return try .init(instructions: .fromString(string: raw, blobs: [], networkId: network.rawValue), blobs: [])
+	}
+
+	public static func manifestForCreateMultipleNonFungibleTokens(
+		account: AccountAddress,
+		network: NetworkID
+	) throws -> TransactionManifest {
+		let instructions = [String](repeating: noFungibleWithInitialSupplyInstruction(), count: 10).joined(separator: "\n")
+		let raw = """
+		 \(instructions)
+		CALL_METHOD
+		    Address("\(account.address)")
+		    "deposit_batch"
+		    Expression("ENTIRE_WORKTOP")
+		;
+		"""
+
+		return try .init(instructions: .fromString(string: raw, blobs: [], networkId: network.rawValue), blobs: [])
+	}
+
+	public static func manifestForCreateFungibleToken(
+		account: AccountAddress,
+		network: NetworkID
+	) throws -> TransactionManifest {
+		let raw = """
+		\(fungibleWithInitialSupplyInstruction())
+
+		                # Depositing the entirety of the initial supply of the newly created resource into our account
+		                # component.
+		                CALL_METHOD
+		                    Address("\(account.address)")
+		                    "deposit_batch"
+		                    Expression("ENTIRE_WORKTOP");
+		"""
+
+		return try .init(instructions: .fromString(string: raw, blobs: [], networkId: network.rawValue), blobs: [])
+	}
+
+	public static func manifestForCreateMultipleFungibleTokens(
+		account: AccountAddress,
+		network: NetworkID
+	) throws -> TransactionManifest {
+		let instructions = [String](repeating: fungibleWithInitialSupplyInstruction(), count: 20).joined(separator: "\n")
+		let raw = """
+		 \(instructions)
+		CALL_METHOD
+		    Address("\(account.address)")
+		    "deposit_batch"
+		    Expression("ENTIRE_WORKTOP")
+		;
+		"""
+
+		return try .init(instructions: .fromString(string: raw, blobs: [], networkId: network.rawValue), blobs: [])
+	}
+
+	private func faucetAddress(networkID: NetworkID) -> EngineToolkitUniFFI.Address {
 		utilsKnownAddresses(networkId: networkID.rawValue).componentAddresses.faucet
+	}
+
+	private static func fungibleWithInitialSupplyInstruction() -> String {
+		"""
+		                CREATE_FUNGIBLE_RESOURCE_WITH_INITIAL_SUPPLY
+		                    18u8
+		                    Map<String, Enum>(
+		                        "name" => Enum<Metadata::String>("MyResource"),
+		                        "symbol" => Enum<Metadata::String>("VIP"),
+		                        "description" => Enum<Metadata::String>("A very innovative and important resource"),
+		                        "icon_url" => Enum<Metadata::String>("https://i.imgur.com/9YQ9Z0x.png")
+		                    )
+		                    Map<Enum, Tuple>(
+
+		                        Enum<ResourceMethodAuthKey::Withdraw>() => Tuple(Enum<AccessRule::AllowAll>(), Enum<AccessRule::DenyAll>()),
+		                        Enum<ResourceMethodAuthKey::Deposit>() => Tuple(Enum<AccessRule::AllowAll>(), Enum<AccessRule::DenyAll>())
+		                    )
+		                    Decimal("21000000");
+		"""
+	}
+
+	private static func noFungibleWithInitialSupplyInstruction() -> String {
+		"""
+		CREATE_NON_FUNGIBLE_RESOURCE_WITH_INITIAL_SUPPLY
+		    Enum<1u8>()
+		    Tuple(
+		        Tuple(
+		            Array<Enum>(),
+		            Array<Tuple>(),
+		            Array<Enum>()
+		        ),
+		        Enum<0u8>(
+		            64u8
+		        ),
+		        Array<String>()
+		    )
+		    Map<String, Enum>(
+		        "name" => Enum<0u8>(
+		            "MyResource"
+		        ),
+		        "description" => Enum<0u8>(
+		            "A very innovative and important resource"
+		        ),
+		        "icon_url" => Enum<0u8>(
+		            "https://i.imgur.com/9YQ9Z0x.png"
+		        )
+		    )
+		    Map<Enum, Tuple>(
+		        Enum<4u8>() => Tuple(
+		            Enum<0u8>(),
+		            Enum<1u8>()
+		        ),
+		        Enum<5u8>() => Tuple(
+		            Enum<0u8>(),
+		            Enum<1u8>()
+		        )
+		    )
+		    Map<NonFungibleLocalId, Tuple>(
+		        NonFungibleLocalId("#1#") => Tuple(
+		            Tuple(
+		                "https://image-service-test-images.s3.eu-west-2.amazonaws.com/wallet_test_images/Filling+Station+Breakfast-large.jpg",
+		                Decimal("0")
+		            )
+		        ),
+		        NonFungibleLocalId("#2#") => Tuple(
+		            Tuple(
+		                "https://image-service-test-images.s3.eu-west-2.amazonaws.com/wallet_test_images/Filling+Station+Breakfast-large.jpg",
+		                Decimal("1")
+		            )
+		        ),
+		        NonFungibleLocalId("#3#") => Tuple(
+		            Tuple(
+		                "https://image-service-test-images.s3.eu-west-2.amazonaws.com/wallet_test_images/Filling+Station+Breakfast-medium.jpg",
+		                Decimal("2")
+		            )
+		        ),
+		        NonFungibleLocalId("#4#") => Tuple(
+		            Tuple(
+		                "https://image-service-test-images.s3.eu-west-2.amazonaws.com/wallet_test_images/Filling+Station+Breakfast-small.jpg",
+		                Decimal("3")
+		            )
+		        ),
+		        NonFungibleLocalId("#5#") => Tuple(
+		            Tuple(
+		                "https://image-service-test-images.s3.eu-west-2.amazonaws.com/wallet_test_images/Frame 6-large.png",
+		                Decimal("4")
+		            )
+		        ),
+		        NonFungibleLocalId("#6#") => Tuple(
+		            Tuple(
+		                "https://image-service-test-images.s3.eu-west-2.amazonaws.com/wallet_test_images/Frame 6-medium.png",
+		                Decimal("5")
+		            )
+		        ),
+		        NonFungibleLocalId("#7#") => Tuple(
+		            Tuple(
+		                "https://image-service-test-images.s3.eu-west-2.amazonaws.com/wallet_test_images/Frame 6-small.png",
+		                Decimal("6")
+		            )
+		        ),
+		        NonFungibleLocalId("#8#") => Tuple(
+		            Tuple(
+		                "https://image-service-test-images.s3.eu-west-2.amazonaws.com/wallet_test_images/Fried Kway Teow-large.jpg",
+		                Decimal("7")
+		            )
+		        ),
+		        NonFungibleLocalId("#9#") => Tuple(
+		            Tuple(
+		                "https://image-service-test-images.s3.eu-west-2.amazonaws.com/wallet_test_images/Fried Kway Teow-medium.jpg",
+		                Decimal("8")
+		            )
+		        ),
+		        NonFungibleLocalId("#10#") => Tuple(
+		            Tuple(
+		                "https://image-service-test-images.s3.eu-west-2.amazonaws.com/wallet_test_images/Fried Kway Teow-small.jpg",
+		                Decimal("9")
+		            )
+		        ),
+		        NonFungibleLocalId("#11#") => Tuple(
+		            Tuple(
+		                "https://image-service-test-images.s3.eu-west-2.amazonaws.com/wallet_test_images/ICON-transparency.png",
+		                Decimal("10")
+		            )
+		        ),
+		        NonFungibleLocalId("#12#") => Tuple(
+		            Tuple(
+		                "https://image-service-test-images.s3.eu-west-2.amazonaws.com/wallet_test_images/KL Haze-large.jpg",
+		                Decimal("11")
+		            )
+		        ),
+		        NonFungibleLocalId("#13#") => Tuple(
+		            Tuple(
+		                "https://image-service-test-images.s3.eu-west-2.amazonaws.com/wallet_test_images/KL Haze-medium.jpg",
+		                Decimal("12")
+		            )
+		        ),
+		        NonFungibleLocalId("#14#") => Tuple(
+		            Tuple(
+		                "https://image-service-test-images.s3.eu-west-2.amazonaws.com/wallet_test_images/KL Haze-small.jpg",
+		                Decimal("13")
+		            )
+		        ),
+		        NonFungibleLocalId("#15#") => Tuple(
+		            Tuple(
+		                "https://image-service-test-images.s3.eu-west-2.amazonaws.com/wallet_test_images/modern_kunst_museum_pano-2.jpg",
+		                Decimal("14")
+		            )
+		        ),
+		        NonFungibleLocalId("#16#") => Tuple(
+		            Tuple(
+		                "https://image-service-test-images.s3.eu-west-2.amazonaws.com/wallet_test_images/modern_kunst_museum_pano-3.jpg",
+		                Decimal("15")
+		            )
+		        ),
+		        NonFungibleLocalId("#17#") => Tuple(
+		            Tuple(
+		                "https://image-service-test-images.s3.eu-west-2.amazonaws.com/wallet_test_images/modern_kunst_museum_pano.jpg",
+		                Decimal("16")
+		            )
+		        ),
+		        NonFungibleLocalId("#18#") => Tuple(
+		            Tuple(
+		                "https://image-service-test-images.s3.eu-west-2.amazonaws.com/wallet_test_images/scryptonaut_patch.svg",
+		                Decimal("17")
+		            )
+		        )
+		    )
+		;
+		"""
 	}
 }
 

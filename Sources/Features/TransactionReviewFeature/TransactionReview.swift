@@ -15,12 +15,12 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		public let message: String?
 		public let signTransactionPurpose: SigningPurpose.SignTransactionPurpose
 
-		public var transactionWithLockFee: TransactionManifest?
+		public var transactionManifestWithLockFee: TransactionManifest?
 
 		public var networkID: NetworkID? = nil
 
 		/// does not include lock fee?
-		public var transaction: TransactionType.GeneralTransaction? = nil
+		public var reviewTransaction: ReviewedTransaction? = nil
 
 		public var fee: BigDecimal
 		public var feePayerSelectionAmongstCandidates: FeePayerSelectionAmongstCandidates?
@@ -187,23 +187,14 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		case .showRawTransactionTapped:
 			switch state.displayMode {
 			case .review:
-				guard let transactionWithLockFee = state.transactionWithLockFee, let networkID = state.networkID else { return .none }
-				let guarantees = state.allGuarantees
-				return .run { send in
-					let manifest = try await addingGuarantees(to: transactionWithLockFee, guarantees: guarantees)
-					let rawTransaction = try manifest.instructions().asStr()
-					await send(.internal(.rawTransactionCreated(rawTransaction)))
-				} catch: { _, _ in
-					// TODO: Handle error?
-				}
-
+				return showRawTransaction(&state)
 			case .raw:
 				state.displayMode = .review
 				return .none
 			}
 
 		case .approveTapped:
-			guard let transactionWithLockFee = state.transactionWithLockFee else { return .none }
+			guard let transactionWithLockFee = state.transactionManifestWithLockFee else { return .none }
 			state.canApproveTX = false
 
 			return .task { [guarantees = state.allGuarantees] in
@@ -354,8 +345,8 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		return .none
 	}
 
-	private func review(_ state: State) -> EffectTask<Action> {
-		guard let manifestPreviewToReview = state.transaction else {
+	private func review(_ state: inout State) -> EffectTask<Action> {
+		guard let transactionToReview = state.reviewTransaction else {
 			assertionFailure("Bad implementation, expected `analyzedManifestToReview`")
 			return .none
 		}
@@ -363,37 +354,51 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			assertionFailure("Bad implementation, expected `networkID`")
 			return .none
 		}
-		return review(transaction: manifestPreviewToReview, feeAdded: state.fee, networkID: networkID)
+
+		return review(state: &state, feeAdded: state.fee)
 	}
 
 	private func review(
-		transaction: TransactionType.GeneralTransaction,
-		feeAdded: BigDecimal,
-		networkID: NetworkID
+		state: inout State,
+		feeAdded: BigDecimal
 	) -> EffectTask<Action> {
-		.run { send in
-			// TODO: Determine what is the minimal information required
-			let userAccounts = try await extractUserAccounts(transaction)
+		guard let transactionToReview = state.reviewTransaction else {
+			assertionFailure("Bad implementation, expected `analyzedManifestToReview`")
+			return .none
+		}
+		guard let networkID = state.networkID else {
+			assertionFailure("Bad implementation, expected `networkID`")
+			return .none
+		}
 
-			let content = await TransactionReview.TransactionContent(
-				withdrawals: try? extractWithdrawals(
-					transaction,
-					userAccounts: userAccounts,
-					networkID: networkID
-				),
-				dAppsUsed: try? extractUsedDapps(transaction),
-				deposits: try? extractDeposits(
-					transaction,
-					userAccounts: userAccounts,
-					networkID: networkID
-				),
-				proofs: try? exctractProofs(transaction),
-				networkFee: .init(fee: feeAdded, isCongested: false)
-			)
-			await send(.internal(.createTransactionReview(content)))
-		} catch: { error, _ in
-			loggerGlobal.error("Failed to extract user accounts, error: \(error)")
-			// FIXME: propagate/display error?
+		switch transactionToReview {
+		case let .conforming(transaction):
+			return .run { send in
+				// TODO: Determine what is the minimal information required
+				let userAccounts = try await extractUserAccounts(transaction)
+
+				let content = await TransactionReview.TransactionContent(
+					withdrawals: try? extractWithdrawals(
+						transaction,
+						userAccounts: userAccounts,
+						networkID: networkID
+					),
+					dAppsUsed: try? extractUsedDapps(transaction),
+					deposits: try? extractDeposits(
+						transaction,
+						userAccounts: userAccounts,
+						networkID: networkID
+					),
+					proofs: try? exctractProofs(transaction),
+					networkFee: .init(fee: feeAdded, isCongested: false)
+				)
+				await send(.internal(.createTransactionReview(content)))
+			} catch: { error, _ in
+				loggerGlobal.error("Failed to extract user accounts, error: \(error)")
+				// FIXME: propagate/display error?
+			}
+		case .nonConforming:
+			return showRawTransaction(&state)
 		}
 	}
 
@@ -404,24 +409,24 @@ public struct TransactionReview: Sendable, FeatureReducer {
 
 		case let .previewLoaded(.success(preview)):
 			state.networkID = preview.networkID
+			state.reviewTransaction = try! preview.analyzedManifestToReview.transactionType.asReviewedTransaction()
 			switch preview.addFeeToManifestOutcome {
 			case let .includesLockFee(manifestInclLockFee):
 				state.feePayerSelectionAmongstCandidates = manifestInclLockFee.feePayerSelectionAmongstCandidates
-				state.transactionWithLockFee = manifestInclLockFee.manifestWithLockFee
+				state.transactionManifestWithLockFee = manifestInclLockFee.manifestWithLockFee
+
 				return self.review(
-					transaction: try! preview.analyzedManifestToReview.transactionType.generalTransaction()!,
-					feeAdded: manifestInclLockFee.feePayerSelectionAmongstCandidates.fee,
-					networkID: preview.networkID
+					state: &state,
+					feeAdded: manifestInclLockFee.feePayerSelectionAmongstCandidates.fee
 				)
 			case let .excludesLockFee(excludingLockFee):
-				state.transaction = try! preview.analyzedManifestToReview.transactionType.generalTransaction()!
 				state.destination = .selectFeePayer(.init(candidates: excludingLockFee.feePayerCandidates, fee: excludingLockFee.feeNotYetAdded))
 				return .none
 			}
 
 		case let .addedTransactionFeeToSelectedPayerResult(.success(manifestWithLockFee)):
-			state.transactionWithLockFee = manifestWithLockFee
-			return review(state)
+			state.transactionManifestWithLockFee = manifestWithLockFee
+			return review(&state)
 
 		case let .addedTransactionFeeToSelectedPayerResult(.failure(error)):
 			loggerGlobal.error("Failed to add fee for selected payer to manifest, error: \(error)")
@@ -487,9 +492,37 @@ public struct TransactionReview: Sendable, FeatureReducer {
 	public func addingGuarantees(
 		to manifest: TransactionManifest,
 		guarantees: [TransactionClient.Guarantee]
-	) async throws -> TransactionManifest {
+	) throws -> TransactionManifest {
 		guard !guarantees.isEmpty else { return manifest }
-		return try await transactionClient.addGuaranteesToManifest(manifest, guarantees)
+
+		var manifest = manifest
+
+		/// Will be increased with each added guarantee to account for the difference in indexes from the initial manifest.
+		var indexInc = 1 // LockFee was added, start from 1
+		for guarantee in guarantees {
+			let guaranteeInstruction: Instruction = try .assertWorktopContains(
+				resourceAddress: guarantee.resourceAddress.toEngine(),
+				amount: .init(value: guarantee.amount.toString())
+			)
+
+			manifest = try manifest.withInstructionAdded(guaranteeInstruction, at: Int(guarantee.instructionIndex) + indexInc)
+
+			indexInc += 1
+		}
+		return manifest
+	}
+
+	func showRawTransaction(_ state: inout State) -> EffectTask<Action> {
+		guard let transactionWithLockFee = state.transactionManifestWithLockFee else { return .none }
+		let guarantees = state.allGuarantees
+		do {
+			let manifest = try addingGuarantees(to: transactionWithLockFee, guarantees: guarantees)
+			let rawTransaction = try manifest.instructions().asStr()
+			state.displayMode = .raw(rawTransaction)
+		} catch {
+			errorQueue.schedule(error)
+		}
+		return .none
 	}
 
 	func delayedEffect(
@@ -899,15 +932,6 @@ extension Source {
 }
 
 // MARK: - SimpleDappDetails
-// extension ResourceQuantifier {
-//	var resourceManagerSpecifier: Re {
-//		switch self {
-//		case let .amount(resourceAddress, _), let .ids(resourceAddress, _):
-//			return resourceAddress
-//		}
-//	}
-// }
-
 // FIXME: Remove and make settings use stacks
 
 public struct SimpleDappDetails: Sendable, FeatureReducer {
@@ -1128,6 +1152,12 @@ extension GatewayAPI.StateEntityDetailsResponseItem {
 	}
 }
 
+// MARK: - ReviewedTransaction
+public enum ReviewedTransaction: Hashable {
+	case conforming(TransactionType.GeneralTransaction)
+	case nonConforming
+}
+
 extension TransactionType {
 	public struct GeneralTransaction: Hashable {
 		let accountProofs: [EngineToolkitUniFFI.Address]
@@ -1142,7 +1172,7 @@ extension TransactionType {
 		}
 	}
 
-	func generalTransaction() throws -> GeneralTransaction? {
+	fileprivate func asReviewedTransaction() throws -> ReviewedTransaction {
 		switch self {
 		case let .simpleTransfer(from, to, transferred):
 			let allAddresses = [from, to, transferred.resourceAddress]
@@ -1151,13 +1181,15 @@ extension TransactionType {
 				addressesInManifest[address.entityType(), default: []].append(address)
 			}
 
-			return .init(
-				accountProofs: [],
-				accountWithdraws: [from.addressString(): [transferred]],
-				accountDeposits: [to.addressString(): [transferred.toSource]],
-				addressesInManifest: addressesInManifest,
-				metadataOfNewlyCreatedEntities: [:],
-				dataOfNewlyMintedNonFungibles: [:]
+			return .conforming(
+				.init(
+					accountProofs: [],
+					accountWithdraws: [from.addressString(): [transferred]],
+					accountDeposits: [to.addressString(): [transferred.toSource]],
+					addressesInManifest: addressesInManifest,
+					metadataOfNewlyCreatedEntities: [:],
+					dataOfNewlyMintedNonFungibles: [:]
+				)
 			)
 
 		case let .transfer(from, transfers):
@@ -1190,25 +1222,29 @@ extension TransactionType {
 				addressesInManifest[address.entityType(), default: []].append(address)
 			}
 
-			return .init(
-				accountProofs: [],
-				accountWithdraws: withdraws,
-				accountDeposits: deposits,
-				addressesInManifest: addressesInManifest,
-				metadataOfNewlyCreatedEntities: [:],
-				dataOfNewlyMintedNonFungibles: [:]
+			return .conforming(
+				.init(
+					accountProofs: [],
+					accountWithdraws: withdraws,
+					accountDeposits: deposits,
+					addressesInManifest: addressesInManifest,
+					metadataOfNewlyCreatedEntities: [:],
+					dataOfNewlyMintedNonFungibles: [:]
+				)
 			)
 		case let .generalTransaction(accountProofs, accountWithdraws, accountDeposits, addressesInManifest, metadataOfNewlyCreatedEntities, dataOfNewlyMintedNonFungibles):
-			return .init(
-				accountProofs: accountProofs,
-				accountWithdraws: accountWithdraws,
-				accountDeposits: accountDeposits,
-				addressesInManifest: addressesInManifest,
-				metadataOfNewlyCreatedEntities: metadataOfNewlyCreatedEntities,
-				dataOfNewlyMintedNonFungibles: dataOfNewlyMintedNonFungibles
+			return .conforming(
+				.init(
+					accountProofs: accountProofs,
+					accountWithdraws: accountWithdraws,
+					accountDeposits: accountDeposits,
+					addressesInManifest: addressesInManifest,
+					metadataOfNewlyCreatedEntities: metadataOfNewlyCreatedEntities,
+					dataOfNewlyMintedNonFungibles: dataOfNewlyMintedNonFungibles
+				)
 			)
 		case .nonConforming:
-			return nil
+			return .nonConforming
 		}
 	}
 }

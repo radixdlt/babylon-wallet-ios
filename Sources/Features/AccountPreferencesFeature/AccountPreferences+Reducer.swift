@@ -167,11 +167,10 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 			}
 
 		case .turnIntoDappDefinitionAccountTypeButtonTapped:
-			return .run { [accountAddress = state.address] _ in
+			return .run { [accountAddress = state.address] send in
 				let account = try await accountsClient.getAccountByAddress(accountAddress)
-				fatalError()
-//				let manifest = try await engineToolkitClient.manifestMarkingAccountAsDappDefinitionType(account: account)
-//				await send(.internal(.turnIntoDappDefAccountType(manifest)))
+				let manifest = try TransactionManifest.manifestMarkingAccountAsDappDefinitionType(account: account)
+				await send(.internal(.turnIntoDappDefAccountType(manifest)))
 			} catch: { error, _ in
 				loggerGlobal.warning("Failed to create manifest which turns account into dapp definition account type, error: \(error)")
 			}
@@ -366,26 +365,18 @@ extension AccountPreferences {
 	#endif
 }
 
-// #if DEBUG
-// extension EngineToolkitClient {
-//	fileprivate func manifestMarkingAccountAsDappDefinitionType(
-//		account: Profile.Network.Account
-//	) async throws -> TransactionManifest {
-//		// # Set List Metadata on Resource
-//		// https://github.com/radixdlt/radixdlt-scrypto/blob/main/transaction/examples/metadata/metadata.rtm#L97-L101
-//		let setMetadataInstruction = SetMetadata(
-//			accountAddress: account.address,
-//			key: EntityMetadataKey.accountType.rawValue,
-//			value: Enum(.metadata_String, fields: [.string(GatewayAPI.EntityMetadataCollection.AccountType.dappDefinition.rawValue)])
-//		)
-//
-//		let manifestParsed = TransactionManifest(
-//			instructions: [
-//				.setMetadata(setMetadataInstruction),
-//			]
-//		)
-//
-//		return manifestString
-//	}
-// }
-// #endif
+#if DEBUG
+extension TransactionManifest {
+	fileprivate static func manifestMarkingAccountAsDappDefinitionType(
+		account: Profile.Network.Account
+	) throws -> TransactionManifest {
+		let raw = """
+		SET_METADATA
+		            Address("\(account.address.address)")
+		            "account_type"
+		            Enum<Metadata::String>("dapp definition");
+		"""
+		return try .init(instructions: .fromString(string: raw, blobs: [], networkId: account.networkID.rawValue), blobs: [])
+	}
+}
+#endif
