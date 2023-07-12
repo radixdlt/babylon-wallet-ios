@@ -114,6 +114,7 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 		}
 
 		public enum Action: Equatable {
+			case editPersona(EditPersona.Action)
 			case createAuthKey(CreateAuthKey.Action)
 			case dAppDetails(SimpleAuthDappDetails.Action)
 
@@ -126,6 +127,9 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 		}
 
 		public var body: some ReducerProtocolOf<Self> {
+			Scope(state: /State.editPersona, action: /Action.editPersona) {
+				EditPersona()
+			}
 			Scope(state: /State.createAuthKey, action: /Action.createAuthKey) {
 				CreateAuthKey()
 			}
@@ -240,6 +244,7 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 			case .general:
 				state.destination = .editPersona(
 					.init(
+						mode: .edit,
 						persona: persona
 					)
 				)

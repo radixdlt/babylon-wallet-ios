@@ -1,4 +1,5 @@
 import CreateAuthKeyFeature
+import EditPersonaFeature
 import FeaturePrelude
 
 // MARK: - View
@@ -86,6 +87,12 @@ extension PersonaDetails.View {
 			state: /PersonaDetails.Destination.State.dAppDetails,
 			action: PersonaDetails.Destination.Action.dAppDetails,
 			destination: { SimpleAuthDappDetails.View(store: $0) }
+		)
+		.sheet(
+			store: store.destination,
+			state: /PersonaDetails.Destination.State.editPersona,
+			action: PersonaDetails.Destination.Action.editPersona,
+			content: { EditPersona.View(store: $0) }
 		)
 		.sheet(
 			store: store.destination,

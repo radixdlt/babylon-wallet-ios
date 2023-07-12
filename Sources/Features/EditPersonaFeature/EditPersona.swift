@@ -19,11 +19,14 @@ public struct EditPersona: Sendable, FeatureReducer {
 			case personaLabel
 		}
 
+		let mode: Mode
 		let persona: Profile.Network.Persona
 
 		public init(
+			mode: Mode,
 			persona: Profile.Network.Persona
 		) {
+			self.mode = mode
 			self.persona = persona
 		}
 	}

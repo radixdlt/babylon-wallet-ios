@@ -104,6 +104,7 @@ struct EditPersona_Preview: PreviewProvider {
 extension EditPersona.State {
 	public static func previewValue(mode: EditPersona.State.Mode) -> Self {
 		.init(
+			mode: mode,
 			persona: .previewValue0
 		)
 	}
