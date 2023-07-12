@@ -150,6 +150,16 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
+		case let .destination(.presented(.editPersona(.delegate(.personaSaved(persona))))):
+			guard persona.id == state.mode.id else { return .none }
+			return .run { [mode = state.mode] send in
+				let updated = try await reload(in: mode)
+				await send(.internal(.reloaded(updated)))
+				await send(.delegate(.personaChanged(persona.id)))
+			} catch: { error, _ in
+				loggerGlobal.error("Failed to reload, error: \(error)")
+			}
+
 		case .destination(.presented(.confirmForgetAlert(.confirmTapped))):
 			guard case let .dApp(dApp, persona: persona) = state.mode else {
 				return .none
