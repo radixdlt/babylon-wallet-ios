@@ -16,13 +16,17 @@ extension EditPersonaField {
 		let canBeDeleted: Bool
 
 		init(state: State) {
-			fatalError()
 			self.primaryHeading = state.id.title
+			self.secondaryHeading = nil
+			self._input = .init(wrappedValue: "", onNil: nil, rules: [])
+			self.inputHint = nil
 			#if os(iOS)
 			self.capitalization = state.id.capitalization
 			self.keyboardType = state.id.keyboardType
 			self.contentType = state.id.contentType
 			#endif
+			self.isDynamic = false
+			self.canBeDeleted = false
 		}
 	}
 

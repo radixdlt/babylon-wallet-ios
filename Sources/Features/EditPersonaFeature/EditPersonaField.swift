@@ -14,9 +14,8 @@ public protocol EditPersonaFieldID: Sendable, Hashable, Comparable {
 public struct EditPersonaField<ID: EditPersonaFieldID>: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable, Identifiable {
 		public let id: ID
-
 		private init(
-			id: ID
+			id: ID // ,
 		) {
 			self.id = id
 		}
