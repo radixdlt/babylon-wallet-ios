@@ -1,8 +1,13 @@
 import EngineToolkitUniFFI
 import Foundation
 
-// MARK: - NonFungibleGlobalId + Equatable, Hashable
-extension NonFungibleGlobalId: Equatable, Hashable {
+// MARK: - NonFungibleGlobalId + Hashable
+/// Conformance of RET models to Hashable. An improvement would be if RET could add the below two new APIs:
+/// - `equals(other:_)-> Bool`
+/// - `hashed() -> [UInt8]` // speculative.
+/// That would allow to use a tool like Sourcery to autogenerate Equatable and Hashable conformances.
+
+extension NonFungibleGlobalId: Hashable {
 	public static func == (lhs: EngineToolkitUniFFI.NonFungibleGlobalId, rhs: EngineToolkitUniFFI.NonFungibleGlobalId) -> Bool {
 		lhs.asStr() == rhs.asStr()
 	}
@@ -12,8 +17,8 @@ extension NonFungibleGlobalId: Equatable, Hashable {
 	}
 }
 
-// MARK: - TransactionManifest + Equatable
-extension TransactionManifest: Equatable {
+// MARK: - TransactionManifest + Hashable
+extension TransactionManifest: Hashable {
 	public static func == (lhs: EngineToolkitUniFFI.TransactionManifest, rhs: EngineToolkitUniFFI.TransactionManifest) -> Bool {
 		lhs.accountsDepositedInto() == rhs.accountsDepositedInto() &&
 			lhs.accountsRequiringAuth() == rhs.accountsRequiringAuth() &&
@@ -23,10 +28,7 @@ extension TransactionManifest: Equatable {
 			lhs.identitiesRequiringAuth() == rhs.identitiesRequiringAuth() &&
 			lhs.instructions() == rhs.instructions()
 	}
-}
 
-// MARK: - TransactionManifest + Hashable
-extension TransactionManifest: Hashable {
 	public func hash(into hasher: inout Hasher) {
 		hasher.combine(accountsDepositedInto())
 		hasher.combine(accountsRequiringAuth())
@@ -38,16 +40,13 @@ extension TransactionManifest: Hashable {
 	}
 }
 
-// MARK: - Instructions + Equatable
-extension Instructions: Equatable {
+// MARK: - Instructions + Hashable
+extension Instructions: Hashable {
 	public static func == (lhs: EngineToolkitUniFFI.Instructions, rhs: EngineToolkitUniFFI.Instructions) -> Bool {
 		lhs.instructionsList() == rhs.instructionsList() &&
 			lhs.networkId() == rhs.networkId()
 	}
-}
 
-// MARK: - Instructions + Hashable
-extension Instructions: Hashable {
 	public func hash(into hasher: inout Hasher) {
 		hasher.combine(instructionsList())
 		hasher.combine(networkId())
@@ -160,10 +159,7 @@ extension Instruction: Hashable {
 			hasher.combine(amount)
 		}
 	}
-}
 
-// MARK: - Instruction + Equatable
-extension Instruction: Equatable {
 	public static func == (lhs: Instruction, rhs: Instruction) -> Bool {
 		switch (lhs, rhs) {
 		case let (.takeAllFromWorktop(lhs), .takeAllFromWorktop(rhs)):
@@ -222,8 +218,8 @@ extension Instruction: Equatable {
 	}
 }
 
-// MARK: - ManifestValue + Equatable
-extension ManifestValue: Equatable {
+// MARK: - ManifestValue + Hashable
+extension ManifestValue: Hashable {
 	public static func == (lhs: ManifestValue, rhs: ManifestValue) -> Bool {
 		switch (lhs, rhs) {
 		case let (.boolValue(lhs), .boolValue(rhs)):
@@ -278,10 +274,7 @@ extension ManifestValue: Equatable {
 			return false
 		}
 	}
-}
 
-// MARK: - ManifestValue + Hashable
-extension ManifestValue: Hashable {
 	public func hash(into hasher: inout Hasher) {
 		switch self {
 		case let .boolValue(value):
@@ -364,8 +357,8 @@ extension ManifestValue: Hashable {
 	}
 }
 
-// MARK: - MapEntry + Equatable, Hashable
-extension MapEntry: Equatable, Hashable {
+// MARK: - MapEntry + Hashable
+extension MapEntry: Hashable {
 	public func hash(into hasher: inout Hasher) {
 		hasher.combine(key)
 		hasher.combine(value)
@@ -377,8 +370,8 @@ extension MapEntry: Equatable, Hashable {
 	}
 }
 
-// MARK: - EngineToolkitUniFFI.Decimal + Equatable, Hashable
-extension EngineToolkitUniFFI.Decimal: Equatable, Hashable {
+// MARK: - EngineToolkitUniFFI.Decimal + Hashable
+extension EngineToolkitUniFFI.Decimal: Hashable {
 	public func hash(into hasher: inout Hasher) {
 		hasher.combine(self.asStr())
 	}
@@ -388,8 +381,8 @@ extension EngineToolkitUniFFI.Decimal: Equatable, Hashable {
 	}
 }
 
-// MARK: - EngineToolkitUniFFI.PreciseDecimal + Equatable, Hashable
-extension EngineToolkitUniFFI.PreciseDecimal: Equatable, Hashable {
+// MARK: - EngineToolkitUniFFI.PreciseDecimal + Hashable
+extension EngineToolkitUniFFI.PreciseDecimal: Hashable {
 	public func hash(into hasher: inout Hasher) {
 		hasher.combine(self.asStr())
 	}
@@ -399,8 +392,8 @@ extension EngineToolkitUniFFI.PreciseDecimal: Equatable, Hashable {
 	}
 }
 
-// MARK: - ManifestBlobRef + Equatable, Hashable
-extension ManifestBlobRef: Equatable, Hashable {
+// MARK: - ManifestBlobRef + Hashable
+extension ManifestBlobRef: Hashable {
 	public func hash(into hasher: inout Hasher) {
 		hasher.combine(self.value.bytes())
 	}
@@ -417,8 +410,8 @@ extension Hash: Equatable {
 	}
 }
 
-// MARK: - EngineToolkitUniFFI.Address + Equatable, Hashable
-extension EngineToolkitUniFFI.Address: Equatable, Hashable {
+// MARK: - EngineToolkitUniFFI.Address + Hashable
+extension EngineToolkitUniFFI.Address: Hashable {
 	public static func == (lhs: EngineToolkitUniFFI.Address, rhs: EngineToolkitUniFFI.Address) -> Bool {
 		lhs.addressString() == rhs.addressString()
 	}
@@ -428,16 +421,13 @@ extension EngineToolkitUniFFI.Address: Equatable, Hashable {
 	}
 }
 
-// MARK: - TransactionIntent + Equatable
-extension TransactionIntent: Equatable {
+// MARK: - TransactionIntent + Hashable
+extension TransactionIntent: Hashable {
 	public static func == (lhs: EngineToolkitUniFFI.Intent, rhs: EngineToolkitUniFFI.Intent) -> Bool {
 		lhs.header() == rhs.header() &&
 			lhs.manifest() == rhs.manifest()
 	}
-}
 
-// MARK: - TransactionIntent + Hashable
-extension TransactionIntent: Hashable {
 	public func hash(into hasher: inout Hasher) {
 		hasher.combine(header())
 		hasher.combine(manifest())

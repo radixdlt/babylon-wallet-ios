@@ -1,6 +1,9 @@
 import EngineToolkitUniFFI
 
 // MARK: - Mutation
+
+/// NOTE: This is temporary code - RET will soon add a dedidcated ManifestBuilder to be used.
+///
 extension TransactionManifest {
 	public func withInstructionAdded(_ instruction: Instruction, at index: Int) throws -> TransactionManifest {
 		try .init(
