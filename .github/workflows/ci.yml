@@ -31,6 +31,22 @@ jobs:
         run: |
           snyk code test --all-projects --org=${{ secrets.SNYK_ORG_ID }} --severity-threshold=high
 
+  snyk_sbom:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+      - name: Install snyk
+        run: |
+          npm install snyk -g
+          snyk -v
+          snyk auth ${{ secrets.SNYK_TOKEN }}
+      - name: Generate SBOM # check SBOM can be generated but nothing is done with it
+        run: |
+          snyk sbom --all-projects --org=${{ secrets.SNYK_ORG_ID }} --format=cyclonedx1.4+json --json-file-output sbom.json
+
   linting:
     name: "Linting"
     runs-on: macos-13
@@ -52,6 +68,8 @@ jobs:
 
     needs:
       - linting
+      - snyk_scan
+      - snyk_sbom
 
     steps:
       - uses: actions/checkout@v3.1.0
@@ -87,6 +105,23 @@ jobs:
 
       - name: "Build and archive (release)"
         run: bundle exec fastlane ios build --env ios.beta
+
+  snyk_online_monitor:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+      - name: Install snyk
+        run: |
+          npm install snyk -g
+          snyk -v
+          snyk auth ${{ secrets.SNYK_TOKEN }}
+      - name: Enable Snyk online monitoring to check for vulnerabilities
+        run: |
+          snyk monitor --all-projects --org=${{ secrets.SNYK_ORG_ID }}
 
   # snapshot_tests:
   #   name: "Snapshot tests"
