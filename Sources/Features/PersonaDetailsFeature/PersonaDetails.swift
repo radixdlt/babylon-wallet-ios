@@ -1,5 +1,6 @@
 import AuthorizedDappsClient
 import CreateAuthKeyFeature
+import EditPersonaFeature
 import FeaturePrelude
 import GatewayAPI
 
@@ -105,6 +106,7 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 
 	public struct Destination: ReducerProtocol {
 		public enum State: Hashable {
+			case editPersona(EditPersona.State)
 			case createAuthKey(CreateAuthKey.State)
 			case dAppDetails(SimpleAuthDappDetails.State)
 
@@ -234,7 +236,18 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 			return .none
 
 		case let .editablePersonaFetched(persona):
-			fatalError()
+			switch state.mode {
+			case .general:
+				state.destination = .editPersona(
+					.init(
+						persona: persona
+					)
+				)
+			case let .dApp(_, detailedPersona):
+				break
+			}
+
+			return .none
 
 		case let .dAppsUpdated(dApps):
 			guard case let .general(persona, _) = state.mode else { return .none }

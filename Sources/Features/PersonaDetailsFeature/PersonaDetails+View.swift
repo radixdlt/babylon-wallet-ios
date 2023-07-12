@@ -47,11 +47,11 @@ extension PersonaDetails.View {
 					.padding(.top, .large3)
 					#endif
 
-//					Button(L10n.AuthorizedDapps.PersonaDetails.editPersona) {
-//						viewStore.send(.editPersonaTapped)
-//					}
-//					.buttonStyle(.secondaryRectangular)
-//					.padding(.vertical, .large3)
+					Button(L10n.AuthorizedDapps.PersonaDetails.editPersona) {
+						viewStore.send(.editPersonaTapped)
+					}
+					.buttonStyle(.secondaryRectangular)
+					.padding(.vertical, .large3)
 
 					if viewStore.isDappPersona {
 						IfLetStore(store.scope(state: \.accountSection, action: PersonaDetails.Action.view)) {
