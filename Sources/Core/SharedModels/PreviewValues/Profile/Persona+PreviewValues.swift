@@ -34,7 +34,7 @@ extension Profile.Network.Persona {
 	public static let previewValue1: Self = try! Self(
 		networkID: .nebunet,
 		address: .init(
-			validatingAddress: "identity_tdx_a_1qvlrgnqrvk6tzmg8z6lusprl3weupfkmu52gkfhmncjsnhn0kp"
+			validatingAddress: "identity_tdx_21_12tljxea3s0mse52jmpvsphr0haqs86sung8d3qlhr763nxttj59650"
 		),
 		securityState: .unsecured(.init(
 			transactionSigning: .init(
