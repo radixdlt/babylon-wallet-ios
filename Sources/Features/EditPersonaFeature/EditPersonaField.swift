@@ -40,3 +40,47 @@ public struct EditPersonaField<ID: EditPersonaFieldID>: Sendable, FeatureReducer
 		}
 	}
 }
+
+// MARK: Static Fields
+
+public typealias EditPersonaStaticField = EditPersonaField<EditPersona.State.StaticFieldID>
+
+// MARK: - EditPersona.State.StaticFieldID + EditPersonaFieldID
+extension EditPersona.State.StaticFieldID: EditPersonaFieldID {
+	public var title: String {
+		switch self {
+		case .personaLabel: return L10n.AuthorizedDapps.PersonaDetails.personaLabelHeading
+		}
+	}
+
+	#if os(iOS)
+	public var contentType: UITextContentType? {
+		switch self {
+		case .personaLabel: return .none
+		}
+	}
+
+	public var keyboardType: UIKeyboardType {
+		switch self {
+		case .personaLabel: return .default
+		}
+	}
+
+	public var capitalization: EquatableTextInputCapitalization? {
+		switch self {
+		case .personaLabel: return .words
+		}
+	}
+	#endif
+}
+
+extension EditPersonaStaticField.State {
+	public init(
+		id: ID,
+		initial: String?
+	) {
+		self.init(
+			id: id // ,
+		)
+	}
+}

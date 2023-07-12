@@ -42,6 +42,10 @@ public struct EditPersona: Sendable, FeatureReducer {
 		}
 	}
 
+	public enum ChildAction: Sendable, Equatable {
+		case labelField(EditPersonaStaticField.Action)
+	}
+
 	public struct Destinations: Sendable, ReducerProtocol {
 		public enum State: Sendable, Hashable {}
 

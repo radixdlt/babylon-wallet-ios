@@ -38,6 +38,13 @@ extension EditPersona {
 						VStack(spacing: .medium1) {
 							PersonaThumbnail(viewStore.avatarURL, size: .veryLarge)
 
+							EditPersonaStaticField.View(
+								store: store.scope(
+									state: \.labelField,
+									action: { .child(.labelField($0)) }
+								)
+							)
+
 							Separator()
 
 							Button(action: { viewStore.send(.addAFieldButtonTapped) }) {
