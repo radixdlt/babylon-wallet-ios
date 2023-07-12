@@ -8,7 +8,13 @@ extension EditPersona.State {
 			avatarURL: URL(string: "something")!,
 			addAFieldButtonState: .disabled,
 			output: { () -> EditPersona.Output? in
-				nil
+				guard
+					let personaLabelInput = labelField.input,
+					let personaLabelOutput = NonEmptyString(rawValue: personaLabelInput.trimmingWhitespace())
+				else {
+					return nil
+				}
+				return EditPersona.Output(personaLabel: personaLabelOutput)
 			}()
 		)
 	}

@@ -13,11 +13,31 @@ public protocol EditPersonaFieldID: Sendable, Hashable, Comparable {
 // MARK: - EditPersonaField
 public struct EditPersonaField<ID: EditPersonaFieldID>: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable, Identifiable {
+		public enum Kind: Sendable, Hashable {
+			case `static`
+			var isStatic: Bool {
+				self == .static
+			}
+
+			var isDynamic: Bool {
+				false
+			}
+		}
+
+		public let kind: Kind
 		public let id: ID
+
+		@Validation<String, String>
+		public var input: String?
+
 		private init(
-			id: ID // ,
+			kind: Kind,
+			id: ID,
+			input: Validation<String, String>
 		) {
+			self.kind = kind
 			self.id = id
+			self._input = input
 		}
 	}
 
@@ -33,6 +53,7 @@ public struct EditPersonaField<ID: EditPersonaFieldID>: Sendable, FeatureReducer
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case let .inputFieldChanged(input):
+			state.input = input
 			return .none
 
 		case .deleteButtonTapped:
@@ -80,7 +101,13 @@ extension EditPersonaStaticField.State {
 		initial: String?
 	) {
 		self.init(
-			id: id // ,
+			kind: .static,
+			id: id,
+			input: .init(
+				wrappedValue: initial,
+				onNil: L10n.EditPersona.Error.blank,
+				rules: [.if(\.isBlank, error: L10n.EditPersona.Error.blank)]
+			)
 		)
 	}
 }

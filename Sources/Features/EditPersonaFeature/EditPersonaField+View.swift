@@ -18,14 +18,14 @@ extension EditPersonaField {
 		init(state: State) {
 			self.primaryHeading = state.id.title
 			self.secondaryHeading = nil
-			self._input = .init(wrappedValue: "", onNil: nil, rules: [])
-			self.inputHint = nil
+			self._input = state.$input
+			self.inputHint = (state.$input.errors?.first).map { .error($0) }
 			#if os(iOS)
 			self.capitalization = state.id.capitalization
 			self.keyboardType = state.id.keyboardType
 			self.contentType = state.id.contentType
 			#endif
-			self.isDynamic = false
+			self.isDynamic = true
 			self.canBeDeleted = false
 		}
 	}
