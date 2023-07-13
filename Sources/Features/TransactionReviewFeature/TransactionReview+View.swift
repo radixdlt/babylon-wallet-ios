@@ -25,7 +25,7 @@ extension TransactionReview.State {
 			rawTransaction: displayMode.rawTransaction,
 			showApproveButton: transactionManifestWithLockFee != nil,
 			canApproveTX: canApproveTX,
-			canToggleViewMode: reviewTransaction != nil && reviewTransaction != .nonConforming
+			canToggleViewMode: reviewedTransaction != nil && reviewedTransaction != .nonConforming
 		)
 	}
 

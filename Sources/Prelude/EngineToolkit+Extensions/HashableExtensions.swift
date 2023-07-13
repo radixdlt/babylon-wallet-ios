@@ -508,6 +508,7 @@ extension TransactionType: Hashable {
 		):
 			return lhsAccountProofs == rhsAccountProofs &&
 				lhsAccountWithdraws == rhsAccountWithdraws &&
+				lhsAccountDeposits == rhsAccountDeposits &&
 				lhsAddressesInManifest == rhsAddressesInManifest &&
 				lhsMetadataOfNewlyCreatedEntities == rhsMetadataOfNewlyCreatedEntities &&
 				lhsDataOfNewlyMintedNonFungibles == rhsDataOfNewlyMintedNonFungibles

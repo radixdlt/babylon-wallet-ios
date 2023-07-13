@@ -20,7 +20,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		public var networkID: NetworkID? = nil
 
 		/// does not include lock fee?
-		public var reviewTransaction: ReviewedTransaction? = nil
+		public var reviewedTransaction: ReviewedTransaction? = nil
 
 		public var fee: BigDecimal
 		public var feePayerSelectionAmongstCandidates: FeePayerSelectionAmongstCandidates?
@@ -89,8 +89,6 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		case previewLoaded(TaskResult<TransactionToReview>)
 		case addedTransactionFeeToSelectedPayerResult(TaskResult<TransactionManifest>)
 		case createTransactionReview(TransactionReview.TransactionContent)
-		case rawTransactionCreated(String)
-		case addGuaranteeToManifestResult(TaskResult<TransactionManifest>)
 		case prepareForSigningResult(TaskResult<TransactionClient.PrepareForSiginingResponse>)
 	}
 
@@ -196,16 +194,33 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		case .approveTapped:
 			guard let transactionWithLockFee = state.transactionManifestWithLockFee else { return .none }
 			state.canApproveTX = false
+			do {
+				let manifest = transactionWithLockFee // try addingGuarantees(to: transactionWithLockFee, guarantees: state.allGuarantees)
+				guard let feePayerSelectionAmongstCandidates = state.feePayerSelectionAmongstCandidates else {
+					assertionFailure("Expected feePayerSelectionAmongstCandidates")
+					return .none
+				}
+				guard let networkID = state.networkID else {
+					assertionFailure("Expected networkID")
+					return .none
+				}
 
-			return .task { [guarantees = state.allGuarantees] in
-				await .internal(.addGuaranteeToManifestResult(
-					TaskResult {
-						try await addingGuarantees(
-							to: transactionWithLockFee,
-							guarantees: guarantees
-						)
-					}
-				))
+				let request = TransactionClient.PrepareForSigningRequest(
+					nonce: state.nonce,
+					manifest: manifest,
+					networkID: networkID,
+					feePayer: feePayerSelectionAmongstCandidates.selected.account,
+					purpose: .signTransaction(state.signTransactionPurpose),
+					ephemeralNotaryPublicKey: state.ephemeralNotaryPrivateKey.publicKey
+				)
+				return .task {
+					await .internal(.prepareForSigningResult(TaskResult {
+						try await transactionClient.prepareForSigning(request)
+					}))
+				}
+			} catch {
+				errorQueue.schedule(error)
+				return .none
 			}
 		}
 	}
@@ -346,23 +361,14 @@ public struct TransactionReview: Sendable, FeatureReducer {
 	}
 
 	private func review(_ state: inout State) -> EffectTask<Action> {
-		guard let transactionToReview = state.reviewTransaction else {
-			assertionFailure("Bad implementation, expected `analyzedManifestToReview`")
-			return .none
-		}
-		guard let networkID = state.networkID else {
-			assertionFailure("Bad implementation, expected `networkID`")
-			return .none
-		}
-
-		return review(state: &state, feeAdded: state.fee)
+		review(state: &state, feeAdded: state.fee)
 	}
 
 	private func review(
 		state: inout State,
 		feeAdded: BigDecimal
 	) -> EffectTask<Action> {
-		guard let transactionToReview = state.reviewTransaction else {
+		guard let transactionToReview = state.reviewedTransaction else {
 			assertionFailure("Bad implementation, expected `analyzedManifestToReview`")
 			return .none
 		}
@@ -409,7 +415,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 
 		case let .previewLoaded(.success(preview)):
 			state.networkID = preview.networkID
-			state.reviewTransaction = try! preview.analyzedManifestToReview.transactionType.asReviewedTransaction()
+			state.reviewedTransaction = try! preview.analyzedManifestToReview.transactionType.asReviewedTransaction()
 			switch preview.addFeeToManifestOutcome {
 			case let .includesLockFee(manifestInclLockFee):
 				state.feePayerSelectionAmongstCandidates = manifestInclLockFee.feePayerSelectionAmongstCandidates
@@ -441,38 +447,6 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			state.networkFee = content.networkFee
 			return .none
 
-		case let .addGuaranteeToManifestResult(.success(manifest)):
-			guard let feePayerSelectionAmongstCandidates = state.feePayerSelectionAmongstCandidates else {
-				assertionFailure("Expected feePayerSelectionAmongstCandidates")
-				return .none
-			}
-			guard let networkID = state.networkID else {
-				assertionFailure("Expected networkID")
-				return .none
-			}
-
-			let request = TransactionClient.PrepareForSigningRequest(
-				nonce: state.nonce,
-				manifest: manifest,
-				networkID: networkID,
-				feePayer: feePayerSelectionAmongstCandidates.selected.account,
-				purpose: .signTransaction(state.signTransactionPurpose),
-				ephemeralNotaryPublicKey: state.ephemeralNotaryPrivateKey.publicKey
-			)
-			return .task {
-				await .internal(.prepareForSigningResult(TaskResult {
-					try await transactionClient.prepareForSigning(request)
-				}))
-			}
-
-		case let .addGuaranteeToManifestResult(.failure(error)):
-			loggerGlobal.error("Failed to add guarantees to manifest, error: \(error)")
-			// FIXME: propagate/display error?
-			return .none
-
-		case let .rawTransactionCreated(transaction):
-			state.displayMode = .raw(transaction)
-			return .none
 		case let .prepareForSigningResult(.success(response)):
 			state.destination = .signing(.init(
 				factorsLeftToSignWith: response.signingFactors,
@@ -1153,13 +1127,15 @@ extension GatewayAPI.StateEntityDetailsResponseItem {
 }
 
 // MARK: - ReviewedTransaction
-public enum ReviewedTransaction: Hashable {
+public enum ReviewedTransaction: Hashable, Sendable {
 	case conforming(TransactionType.GeneralTransaction)
 	case nonConforming
 }
 
+/// This is kinda temporary conversion of all transaction types into GeneralTransaction, until(not sure if needed) we will want to
+/// have specific UI for different transaction types
 extension TransactionType {
-	public struct GeneralTransaction: Hashable {
+	public struct GeneralTransaction: Hashable, Sendable {
 		let accountProofs: [EngineToolkitUniFFI.Address]
 		let accountWithdraws: [String: [ResourceSpecifier]]
 		let accountDeposits: [String: [Source]]
@@ -1175,10 +1151,12 @@ extension TransactionType {
 	fileprivate func asReviewedTransaction() throws -> ReviewedTransaction {
 		switch self {
 		case let .simpleTransfer(from, to, transferred):
-			let allAddresses = [from, to, transferred.resourceAddress]
-			var addressesInManifest: [EngineToolkitUniFFI.EntityType: [EngineToolkitUniFFI.Address]] = [:]
-			for address in allAddresses {
-				addressesInManifest[address.entityType(), default: []].append(address)
+			let addressesInManifest = [
+				from,
+				to,
+				transferred.resourceAddress,
+			].reduce(into: [EngineToolkitUniFFI.EntityType: [EngineToolkitUniFFI.Address]]()) { partialResult, address in
+				partialResult[address.entityType(), default: []].append(address)
 			}
 
 			return .conforming(
@@ -1195,14 +1173,15 @@ extension TransactionType {
 		case let .transfer(from, transfers):
 			var withdraws: [String: ResourceSpecifier] = [:]
 			var deposits: [String: [Source]] = [:]
-			var allAddresses: [EngineToolkitUniFFI.Address] = [from]
+			var allAddresses: Set<EngineToolkitUniFFI.Address> = [from]
 
 			for (address, resouceTransfers) in transfers {
 				let accountAddress = try EngineToolkitUniFFI.Address(address: address)
-				allAddresses.append(accountAddress)
+				allAddresses.insert(accountAddress)
 
 				for (rawResourceAddress, resource) in resouceTransfers {
 					let resourceAddress = try EngineToolkitUniFFI.Address(address: rawResourceAddress)
+					allAddresses.insert(resourceAddress)
 					let resourceSpecifier: ResourceSpecifier = {
 						let existingResource = withdraws[rawResourceAddress]
 
@@ -1225,9 +1204,8 @@ extension TransactionType {
 				}
 			}
 
-			var addressesInManifest: [EngineToolkitUniFFI.EntityType: [EngineToolkitUniFFI.Address]] = [:]
-			for address in allAddresses {
-				addressesInManifest[address.entityType(), default: []].append(address)
+			let addressesInManifest = allAddresses.reduce(into: [EngineToolkitUniFFI.EntityType: [EngineToolkitUniFFI.Address]]()) { partialResult, address in
+				partialResult[address.entityType(), default: []].append(address)
 			}
 
 			return .conforming(

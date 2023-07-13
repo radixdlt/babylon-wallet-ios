@@ -226,6 +226,7 @@ extension AssetTransfer {
 		witdhrawAccount: AccountAddress,
 		_ resource: InvolvedFungibleResource
 	) throws -> String {
+		// FIXME: Temporary and ugly, until the RET provides the manifest builder
 		let accountWithdrawals = [
 			"""
 			CALL_METHOD
@@ -252,33 +253,34 @@ extension AssetTransfer {
 		witdhrawAccount: AccountAddress,
 		_ resource: InvolvedNonFungibleResource
 	) throws -> String {
-		let localIds = resource.allTokens.map {
-			"NonFungibleLocalId('\($0.id)')"
-		}.joined(by: ",")
+		// FIXME: Temporary and ugly, until the RET provides the manifest builder
+		let localIds = String(resource.allTokens.map {
+			"NonFungibleLocalId(\"\($0.id)\")"
+		}.joined(by: ","))
 
 		let accountWithdrawals = """
 		CALL_METHOD
 		    Address("\(witdhrawAccount.address)")
 		    "withdraw_non_fungibles"
 		    Address("\(resource.address.address)")
-		    Array<NonFungibleLocalId>(\(localIds);
+		    Array<NonFungibleLocalId>(\(localIds));
 		"""
 		let deposits: [String] = resource.accounts.map { account in
 			let bucket = UUID().uuidString
-			let localIds = account.tokens.map {
-				"NonFungibleLocalId('\($0.id)')"
-			}.joined(by: ",")
+			let localIds = String(account.tokens.map {
+				"NonFungibleLocalId(\"\($0.id)\")"
+			}.joined(by: ","))
 
 			return """
 			TAKE_NON_FUNGIBLES_FROM_WORKTOP
-			        Address('\(resource.address.address)')
+			        Address("\(resource.address.address)")
 			        Array<NonFungibleLocalId>(\(localIds))
-			        Bucket('\(bucket)');
+			        Bucket(\"\(bucket)\");
 
 			CALL_METHOD
-			        Address('\(account.id)')
-			        'try_deposit_or_abort'
-			        Bucket('\(bucket)');
+			        Address("\(account.id)")
+			        "try_deposit_or_abort"
+			        Bucket("\(bucket)");
 			"""
 		}
 

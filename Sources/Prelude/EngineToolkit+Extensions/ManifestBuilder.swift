@@ -2,8 +2,6 @@ import EngineToolkitUniFFI
 
 // MARK: - Mutation
 
-/// NOTE: This is temporary code - RET will soon add a dedidcated ManifestBuilder to be used.
-///
 extension TransactionManifest {
 	public func withInstructionAdded(_ instruction: Instruction, at index: Int) throws -> TransactionManifest {
 		try .init(
@@ -22,6 +20,8 @@ extension TransactionManifest {
 		)
 	}
 }
+
+/// NOTE: This is temporary code - RET will soon add a dedidcated ManifestBuilder to be used.
 
 // MARK: - Custom Manifests
 extension TransactionManifest {
@@ -106,8 +106,11 @@ extension Instructions {
 		account: AccountAddress,
 		network: NetworkID
 	) throws -> Instructions {
-		let instructions: [String] = [Instruction.fungibleWithInitialSupplyInstruction(), Instruction.depositBatch(account: account)]
-		return try .from(rawInstructions: instructions, network: network)
+		let instructions: [String] = [
+			Instruction.fungibleWithInitialSupplyInstruction(),
+			Instruction.depositBatch(account: account),
+		]
+		return try .from(rawInstructions: instructions, network: network).withLockFeeCallMethodAdded(address: account.asGeneral())
 	}
 
 	static func createMultipleFungibleTokens(
@@ -115,7 +118,7 @@ extension Instructions {
 		network: NetworkID
 	) throws -> Instructions {
 		let instructions = [String](repeating: Instruction.fungibleWithInitialSupplyInstruction(), count: 20) + [Instruction.depositBatch(account: account)]
-		return try .from(rawInstructions: instructions, network: network)
+		return try .from(rawInstructions: instructions, network: network).withLockFeeCallMethodAdded(address: account.asGeneral())
 	}
 
 	static func createMultipleNonFungibleTokens(
@@ -123,15 +126,18 @@ extension Instructions {
 		network: NetworkID
 	) throws -> Instructions {
 		let instructions = [String](repeating: Instruction.noFungibleWithInitialSupplyInstruction(), count: 10) + [Instruction.depositBatch(account: account)]
-		return try .from(rawInstructions: instructions, network: network)
+		return try .from(rawInstructions: instructions, network: network).withLockFeeCallMethodAdded(address: account.asGeneral())
 	}
 
 	static func createNonFungibleToken(
 		account: AccountAddress,
 		network: NetworkID
 	) throws -> Instructions {
-		let instructions: [String] = [Instruction.noFungibleWithInitialSupplyInstruction(), Instruction.depositBatch(account: account)]
-		return try .from(rawInstructions: instructions, network: network)
+		let instructions: [String] = [
+			Instruction.noFungibleWithInitialSupplyInstruction(),
+			Instruction.depositBatch(account: account),
+		]
+		return try .from(rawInstructions: instructions, network: network).withLockFeeCallMethodAdded(address: account.asGeneral())
 	}
 
 	static func faucet(
@@ -144,7 +150,7 @@ extension Instructions {
 		let instructions = try Instructions.from(rawInstructions: rawInstructions, network: networkID)
 
 		if includeLockFeeInstruction {
-			return try instructions.withLockFeeCallMethodAdded(address: componentAddress)
+			return try instructions.withLockFeeCallMethodAdded(address: faucet.asSpecific())
 		}
 		return instructions
 	}
@@ -223,7 +229,7 @@ extension Instruction {
 		                        Enum<ResourceMethodAuthKey::Withdraw>() => Tuple(Enum<AccessRule::AllowAll>(), Enum<AccessRule::DenyAll>()),
 		                        Enum<ResourceMethodAuthKey::Deposit>() => Tuple(Enum<AccessRule::AllowAll>(), Enum<AccessRule::DenyAll>())
 		                    )
-		                    Decimal("21000000");
+		                    Decimal("10000");
 		"""
 	}
 

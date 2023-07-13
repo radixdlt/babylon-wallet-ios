@@ -242,7 +242,7 @@ extension TransactionClient {
 
 			let compiledNotarizedTXIntent = try uncompiledNotarized.compile()
 
-			let txID = try request.transactionIntent.hash()
+			let txID = try request.transactionIntent.intentHash()
 
 			return .init(
 				notarized: compiledNotarizedTXIntent,
