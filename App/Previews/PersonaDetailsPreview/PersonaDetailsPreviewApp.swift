@@ -8,22 +8,22 @@ import SwiftUI
 struct PersonaDetailsPreviewApp: App {
 	var body: some Scene {
 		FeaturesPreviewer<PersonaDetails>.action {
-			guard let result = (/PersonaDetails.Action.child
+			guard let persona = (/PersonaDetails.Action.child
 				.. PersonaDetails.ChildAction.destination
 				.. PresentationAction<PersonaDetails.Destination.Action>.presented
 				.. PersonaDetails.Destination.Action.editPersona
-				.. EditPersona.Action.view
-				.. EditPersona.ViewAction.saveButtonTapped
+				.. EditPersona.Action.delegate
+				.. EditPersona.DelegateAction.personaSaved
 			).extract(from: $0) else {
 				return nil
 			}
 
 			return TaskResult(
-				Result<PersonaDetails.ResultFromFeature, Never>.success(result)
+				Result<PersonaDetails.ResultFromFeature, Never>.success(persona)
 			)
 		} withReducer: {
 			$0
-				.dependency(\.personasClient, with(.noop) { $0.updatePersona = { _ in }})
+				.dependency(\.personasClient, with(.noop) { $0.updatePersona = { @Sendable _ in }})
 				._printChanges()
 		}
 	}
@@ -31,7 +31,7 @@ struct PersonaDetailsPreviewApp: App {
 
 // MARK: - PersonaDetails + PreviewedFeature
 extension PersonaDetails: PreviewedFeature {
-	public typealias ResultFromFeature = EditPersona.Output
+	public typealias ResultFromFeature = Profile.Network.Persona
 }
 
 // MARK: - PersonaDetails + EmptyInitializable
