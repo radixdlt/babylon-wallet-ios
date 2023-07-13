@@ -193,6 +193,7 @@ public struct EditPersona: Sendable, FeatureReducer {
 extension EditPersona.State {
 	func hasChanges() -> Bool {
 		guard let output = viewState.output else { return false }
-		return output.personaLabel != persona.displayName // || persona.fields != output.fields
+		// FIXME: || persona.fields != output.fields
+		return output.personaLabel != persona.displayName
 	}
 }
