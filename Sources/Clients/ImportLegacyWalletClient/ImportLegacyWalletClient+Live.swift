@@ -117,6 +117,7 @@ extension ImportLegacyWalletClient: DependencyKey {
 
 				let migratedAccounts = try MigratedHardwareAccounts(
 					networkID: networkID,
+					ledgerID: request.ledgerFactorSourceID,
 					accounts: accounts
 				)
 
