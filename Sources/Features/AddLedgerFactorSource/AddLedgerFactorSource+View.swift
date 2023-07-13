@@ -128,7 +128,7 @@ extension NameLedgerFactorSource {
 							.padding(.top, .small1)
 							.padding(.bottom, .medium3)
 
-						Text(L10n.AddLedgerDevice.NameLedger.body)
+						Text(L10n.AddLedgerDevice.NameLedger.subtitle)
 							.textStyle(.body1Regular)
 							.padding(.bottom, .medium1)
 							.multilineTextAlignment(.center)
