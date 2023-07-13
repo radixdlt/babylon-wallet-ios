@@ -415,19 +415,23 @@ public struct TransactionReview: Sendable, FeatureReducer {
 
 		case let .previewLoaded(.success(preview)):
 			state.networkID = preview.networkID
-			state.reviewedTransaction = try! preview.analyzedManifestToReview.transactionType.asReviewedTransaction()
-			switch preview.addFeeToManifestOutcome {
-			case let .includesLockFee(manifestInclLockFee):
-				state.feePayerSelectionAmongstCandidates = manifestInclLockFee.feePayerSelectionAmongstCandidates
-				state.transactionManifestWithLockFee = manifestInclLockFee.manifestWithLockFee
+			do {
+				state.reviewedTransaction = try preview.analyzedManifestToReview.transactionType.asReviewedTransaction()
+				switch preview.addFeeToManifestOutcome {
+				case let .includesLockFee(manifestInclLockFee):
+					state.feePayerSelectionAmongstCandidates = manifestInclLockFee.feePayerSelectionAmongstCandidates
+					state.transactionManifestWithLockFee = manifestInclLockFee.manifestWithLockFee
 
-				return self.review(
-					state: &state,
-					feeAdded: manifestInclLockFee.feePayerSelectionAmongstCandidates.fee
-				)
-			case let .excludesLockFee(excludingLockFee):
-				state.destination = .selectFeePayer(.init(candidates: excludingLockFee.feePayerCandidates, fee: excludingLockFee.feeNotYetAdded))
-				return .none
+					return self.review(
+						state: &state,
+						feeAdded: manifestInclLockFee.feePayerSelectionAmongstCandidates.fee
+					)
+				case let .excludesLockFee(excludingLockFee):
+					state.destination = .selectFeePayer(.init(candidates: excludingLockFee.feePayerCandidates, fee: excludingLockFee.feeNotYetAdded))
+					return .none
+				}
+			} catch {
+				errorQueue.schedule(error)
 			}
 
 		case let .addedTransactionFeeToSelectedPayerResult(.success(manifestWithLockFee)):

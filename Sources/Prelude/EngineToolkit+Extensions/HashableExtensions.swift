@@ -20,22 +20,12 @@ extension NonFungibleGlobalId: Hashable {
 // MARK: - TransactionManifest + Hashable
 extension TransactionManifest: Hashable {
 	public static func == (lhs: EngineToolkitUniFFI.TransactionManifest, rhs: EngineToolkitUniFFI.TransactionManifest) -> Bool {
-		lhs.accountsDepositedInto() == rhs.accountsDepositedInto() &&
-			lhs.accountsRequiringAuth() == rhs.accountsRequiringAuth() &&
-			lhs.accountsWithdrawnFrom() == rhs.accountsWithdrawnFrom() &&
-			lhs.blobs() == rhs.blobs() &&
-			lhs.extractAddresses() == rhs.extractAddresses() &&
-			lhs.identitiesRequiringAuth() == rhs.identitiesRequiringAuth() &&
+		lhs.blobs() == rhs.blobs() &&
 			lhs.instructions() == rhs.instructions()
 	}
 
 	public func hash(into hasher: inout Hasher) {
-		hasher.combine(accountsDepositedInto())
-		hasher.combine(accountsRequiringAuth())
-		hasher.combine(accountsWithdrawnFrom())
 		hasher.combine(blobs())
-		hasher.combine(extractAddresses())
-		hasher.combine(identitiesRequiringAuth())
 		hasher.combine(instructions())
 	}
 }

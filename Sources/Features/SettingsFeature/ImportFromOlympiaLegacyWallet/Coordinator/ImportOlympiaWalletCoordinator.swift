@@ -131,7 +131,6 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 
 	@Dependency(\.accountsClient) var accountsClient
 	@Dependency(\.factorSourcesClient) var factorSourcesClient
-	@Dependency(\.engineToolkitClient) var engineToolkitClient
 	@Dependency(\.dismiss) var dismiss
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.importLegacyWalletClient) var importLegacyWalletClient
@@ -505,10 +504,10 @@ extension ImportOlympiaWalletCoordinator {
 		existingAccounts: Int
 	) throws -> NonEmpty<[MigratableAccount]> {
 		let result = try scannedAccounts.enumerated().map { index, account in
-			let babylonAddress = try engineToolkitClient.deriveVirtualAccountAddress(.init(
-				publicKey: .ecdsaSecp256k1(account.publicKey.intoEngine()),
-				networkId: networkID
-			))
+			let babylonAddress: AccountAddress = try deriveVirtualAccountAddressFromPublicKey(
+				publicKey: account.publicKey.intoEngine(),
+				networkId: networkID.rawValue
+			).asSpecific()
 
 			return MigratableAccount(
 				id: account.id,
