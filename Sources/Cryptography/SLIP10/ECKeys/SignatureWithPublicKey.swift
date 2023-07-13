@@ -63,7 +63,7 @@ extension SignatureWithPublicKey {
 }
 
 extension SignatureWithPublicKey {
-	public func intoEngine() throws -> EngineToolkitUniFFI.SignatureWithPublicKey {
+	public func intoEngine() throws -> EngineToolkit.SignatureWithPublicKey {
 		switch self {
 		case let .ecdsaSecp256k1(signature, _):
 			return try .ecdsaSecp256k1(signature: Array(signature.radixSerialize()))

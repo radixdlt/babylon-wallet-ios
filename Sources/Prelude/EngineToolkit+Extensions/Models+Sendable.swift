@@ -1,4 +1,4 @@
-import EngineToolkitUniFFI
+import EngineToolkit
 import Foundation
 
 // MARK: - TransactionManifest + Sendable
@@ -13,8 +13,8 @@ extension Instructions: @unchecked Sendable {}
 // MARK: - Instruction + Sendable
 extension Instruction: @unchecked Sendable {}
 
-// MARK: - EngineToolkitUniFFI.Address + Sendable
-extension EngineToolkitUniFFI.Address: @unchecked Sendable {}
+// MARK: - EngineToolkit.Address + Sendable
+extension EngineToolkit.Address: @unchecked Sendable {}
 
 // MARK: - ManifestValue + Sendable
 extension ManifestValue: @unchecked Sendable {}
@@ -22,8 +22,8 @@ extension ManifestValue: @unchecked Sendable {}
 // MARK: - MapEntry + Sendable
 extension MapEntry: @unchecked Sendable {}
 
-// MARK: - EngineToolkitUniFFI.Decimal + Sendable
-extension EngineToolkitUniFFI.Decimal: @unchecked Sendable {}
+// MARK: - EngineToolkit.Decimal + Sendable
+extension EngineToolkit.Decimal: @unchecked Sendable {}
 
 // MARK: - PreciseDecimal + Sendable
 extension PreciseDecimal: @unchecked Sendable {}

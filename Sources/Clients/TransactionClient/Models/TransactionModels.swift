@@ -84,7 +84,7 @@ extension TransactionSigners {
 }
 
 extension GatewayAPI.PublicKey {
-	init(from engine: EngineToolkitUniFFI.PublicKey) {
+	init(from engine: EngineToolkit.PublicKey) {
 		switch engine {
 		case let .ecdsaSecp256k1(bytes):
 			self = .ecdsaSecp256k1(.init(keyType: .ecdsaSecp256k1, keyHex: bytes.hex()))
@@ -107,11 +107,11 @@ extension GatewayAPI.PublicKey {
 
 // MARK: - NotarizeTransactionRequest
 public struct NotarizeTransactionRequest: Sendable, Hashable {
-	public let intentSignatures: Set<EngineToolkitUniFFI.SignatureWithPublicKey>
+	public let intentSignatures: Set<EngineToolkit.SignatureWithPublicKey>
 	public let transactionIntent: TransactionIntent
 	public let notary: SLIP10.PrivateKey
 	public init(
-		intentSignatures: Set<EngineToolkitUniFFI.SignatureWithPublicKey>,
+		intentSignatures: Set<EngineToolkit.SignatureWithPublicKey>,
 		transactionIntent: TransactionIntent,
 		notary: SLIP10.PrivateKey
 	) {

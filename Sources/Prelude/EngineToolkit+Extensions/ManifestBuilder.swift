@@ -1,4 +1,4 @@
-import EngineToolkitUniFFI
+import EngineToolkit
 
 // MARK: - Mutation
 
@@ -94,7 +94,7 @@ extension Instructions {
 		)
 	}
 
-	static func faucetAddress(networkID: NetworkID) -> EngineToolkitUniFFI.Address {
+	static func faucetAddress(networkID: NetworkID) -> EngineToolkit.Address {
 		utilsKnownAddresses(networkId: networkID.rawValue).componentAddresses.faucet
 	}
 
@@ -177,7 +177,7 @@ extension Instruction {
 		"""
 	}
 
-	static func free(address: EngineToolkitUniFFI.Address) -> String {
+	static func free(address: EngineToolkit.Address) -> String {
 		"""
 		CALL_METHOD
 		    Address("\(address.addressString())")

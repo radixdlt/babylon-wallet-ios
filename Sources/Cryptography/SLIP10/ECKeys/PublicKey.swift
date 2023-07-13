@@ -86,7 +86,7 @@ extension SLIP10.PublicKey: CustomDebugStringConvertible, CustomDumpStringConver
 import Prelude
 
 extension SLIP10.PublicKey {
-	public func intoEngine() -> EngineToolkitUniFFI.PublicKey {
+	public func intoEngine() -> EngineToolkit.PublicKey {
 		switch self {
 		case let .ecdsaSecp256k1(key):
 			return .ecdsaSecp256k1(value: Array(key.compressedRepresentation))

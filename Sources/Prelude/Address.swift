@@ -1,4 +1,4 @@
-import EngineToolkitUniFFI
+import EngineToolkit
 import Foundation
 
 public typealias Address = SpecificAddress<GeneralEntityType>
@@ -146,7 +146,7 @@ public struct SpecificAddress<Kind: SpecificEntityType>: Sendable, Hashable, Ide
 	}
 
 	public init(validatingAddress address: String) throws {
-		let type = try EngineToolkitUniFFI.Address(address: address).entityType()
+		let type = try EngineToolkit.Address(address: address).entityType()
 		guard Kind.addressSpace.contains(type) else {
 			throw InvalidAddress(decodedKind: type, addressSpace: Kind.addressSpace)
 		}
@@ -186,7 +186,7 @@ extension SpecificAddress {
 }
 
 extension SpecificAddress {
-	public func toEngine() throws -> EngineToolkitUniFFI.Address {
+	public func toEngine() throws -> EngineToolkit.Address {
 		try .init(address: address)
 	}
 }
@@ -197,13 +197,13 @@ extension AccountAddress {
 	}
 }
 
-extension EngineToolkitUniFFI.Address {
+extension EngineToolkit.Address {
 	public func asSpecific<T>() throws -> SpecificAddress<T> {
 		try .init(validatingAddress: addressString())
 	}
 }
 
-extension [EngineToolkitUniFFI.Address] {
+extension [EngineToolkit.Address] {
 	public func asSpecific<T>() throws -> [SpecificAddress<T>] {
 		try map { try $0.asSpecific() }
 	}

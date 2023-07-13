@@ -47,10 +47,10 @@ extension TransactionClient {
 			func identityFromComponentAddress(_ identityAddress: IdentityAddress) async throws -> Profile.Network.Persona {
 				try await personasClient.getPersona(id: identityAddress)
 			}
-			func mapAccount(_ extract: @escaping () -> [EngineToolkitUniFFI.Address]) throws -> OrderedSet<Profile.Network.Account> {
+			func mapAccount(_ extract: @escaping () -> [EngineToolkit.Address]) throws -> OrderedSet<Profile.Network.Account> {
 				try .init(validating: extract().asSpecific().compactMap(accountFromComponentAddress))
 			}
-			func mapIdentity(_ extract: @escaping () -> [EngineToolkitUniFFI.Address]) async throws -> OrderedSet<Profile.Network.Persona> {
+			func mapIdentity(_ extract: @escaping () -> [EngineToolkit.Address]) async throws -> OrderedSet<Profile.Network.Persona> {
 				try await .init(validating: extract().asSpecific().asyncMap(identityFromComponentAddress))
 			}
 

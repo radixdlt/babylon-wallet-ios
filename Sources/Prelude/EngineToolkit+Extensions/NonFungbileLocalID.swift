@@ -1,4 +1,4 @@
-import EngineToolkitUniFFI
+import EngineToolkit
 
 extension NonFungibleLocalId {
 	struct InvalidLocalID: Error {}

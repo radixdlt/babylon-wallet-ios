@@ -432,6 +432,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 				}
 			} catch {
 				errorQueue.schedule(error)
+				return .none
 			}
 
 		case let .addedTransactionFeeToSelectedPayerResult(.success(manifestWithLockFee)):
@@ -698,12 +699,12 @@ extension TransactionReview {
 
 		case let .ids(_, ids):
 			if isNewResource {
-				return ids.map { _ in
-					Transfer.nonFungible(.init(
+				return try ids.map { id in
+					try Transfer.nonFungible(.init(
 						resourceName: metadata.name,
 						resourceImage: metadata.thumbnail,
-						tokenID: "",
-						tokenName: metadata.name
+						tokenID: id.toString().userFacingNonFungibleLocalID,
+						tokenName: nil
 					))
 				}
 			}
@@ -715,10 +716,7 @@ extension TransactionReview {
 				let tokens = try await gatewayAPIClient.getNonFungibleData(.init(
 					resourceAddress: resourceAddress.address,
 					nonFungibleIds: idChunk.map {
-						if case let .integer(int) = $0 {
-							return "#\(int)#"
-						}
-						fatalError()
+						try $0.toString()
 					}
 				))
 				.nonFungibleIds
@@ -1140,14 +1138,14 @@ public enum ReviewedTransaction: Hashable, Sendable {
 /// have specific UI for different transaction types
 extension TransactionType {
 	public struct GeneralTransaction: Hashable, Sendable {
-		let accountProofs: [EngineToolkitUniFFI.Address]
+		let accountProofs: [EngineToolkit.Address]
 		let accountWithdraws: [String: [ResourceSpecifier]]
 		let accountDeposits: [String: [Source]]
-		let addressesInManifest: [EngineToolkitUniFFI.EntityType: [EngineToolkitUniFFI.Address]]
+		let addressesInManifest: [EngineToolkit.EntityType: [EngineToolkit.Address]]
 		let metadataOfNewlyCreatedEntities: [String: [String: MetadataValue]]
 		let dataOfNewlyMintedNonFungibles: [String: [NonFungibleLocalId: [UInt8]]]
 
-		var allAddress: [EngineToolkitUniFFI.Address] {
+		var allAddress: [EngineToolkit.Address] {
 			addressesInManifest.flatMap(\.value)
 		}
 	}
@@ -1159,7 +1157,7 @@ extension TransactionType {
 				from,
 				to,
 				transferred.resourceAddress,
-			].reduce(into: [EngineToolkitUniFFI.EntityType: [EngineToolkitUniFFI.Address]]()) { partialResult, address in
+			].reduce(into: [EngineToolkit.EntityType: [EngineToolkit.Address]]()) { partialResult, address in
 				partialResult[address.entityType(), default: []].append(address)
 			}
 
@@ -1177,14 +1175,14 @@ extension TransactionType {
 		case let .transfer(from, transfers):
 			var withdraws: [String: ResourceSpecifier] = [:]
 			var deposits: [String: [Source]] = [:]
-			var allAddresses: Set<EngineToolkitUniFFI.Address> = [from]
+			var allAddresses: Set<EngineToolkit.Address> = [from]
 
 			for (address, resouceTransfers) in transfers {
-				let accountAddress = try EngineToolkitUniFFI.Address(address: address)
+				let accountAddress = try EngineToolkit.Address(address: address)
 				allAddresses.insert(accountAddress)
 
 				for (rawResourceAddress, resource) in resouceTransfers {
-					let resourceAddress = try EngineToolkitUniFFI.Address(address: rawResourceAddress)
+					let resourceAddress = try EngineToolkit.Address(address: rawResourceAddress)
 					allAddresses.insert(resourceAddress)
 					let resourceSpecifier: ResourceSpecifier = {
 						let existingResource = withdraws[rawResourceAddress]
@@ -1208,7 +1206,7 @@ extension TransactionType {
 				}
 			}
 
-			let addressesInManifest = allAddresses.reduce(into: [EngineToolkitUniFFI.EntityType: [EngineToolkitUniFFI.Address]]()) { partialResult, address in
+			let addressesInManifest = allAddresses.reduce(into: [EngineToolkit.EntityType: [EngineToolkit.Address]]()) { partialResult, address in
 				partialResult[address.entityType(), default: []].append(address)
 			}
 
@@ -1244,7 +1242,7 @@ extension ResourceSpecifier {
 		.guaranteed(value: self)
 	}
 
-	var amount: EngineToolkitUniFFI.Decimal? {
+	var amount: EngineToolkit.Decimal? {
 		if case let .amount(_, amount) = self {
 			return amount
 		}
@@ -1259,7 +1257,7 @@ extension ResourceSpecifier {
 		return nil
 	}
 
-	var resourceAddress: EngineToolkitUniFFI.Address {
+	var resourceAddress: EngineToolkit.Address {
 		switch self {
 		case let .amount(resourceAddress, _):
 			return resourceAddress

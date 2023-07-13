@@ -1053,8 +1053,8 @@ package.addModules([
 			.product(name: "Validated", package: "swift-validated") {
 				.package(url: "https://github.com/pointfreeco/swift-validated", exact: "0.2.1")
 			},
-			.product(name: "EngineToolkitUniFFI", package: "swift-engine-toolkit") {
-				.package(url: "https://github.com/radixdlt/swift-engine-toolkit", exact: "0.10.0-elm.1-5b838e5")
+			.product(name: "EngineToolkit", package: "swift-engine-toolkit") {
+				.package(url: "https://github.com/radixdlt/swift-engine-toolkit", exact: "0.10.0-elm.1-9e2590e")
 			},
 
 		],

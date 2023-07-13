@@ -1,4 +1,4 @@
-import EngineToolkitUniFFI
+import EngineToolkit
 import Foundation
 
 extension SignatureWithPublicKey {

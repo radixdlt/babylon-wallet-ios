@@ -1,4 +1,4 @@
-import EngineToolkitUniFFI
+import EngineToolkit
 import Foundation
 
 // MARK: - NonFungibleGlobalId + Hashable
@@ -8,7 +8,7 @@ import Foundation
 /// That would allow to use a tool like Sourcery to autogenerate Equatable and Hashable conformances.
 
 extension NonFungibleGlobalId: Hashable {
-	public static func == (lhs: EngineToolkitUniFFI.NonFungibleGlobalId, rhs: EngineToolkitUniFFI.NonFungibleGlobalId) -> Bool {
+	public static func == (lhs: EngineToolkit.NonFungibleGlobalId, rhs: EngineToolkit.NonFungibleGlobalId) -> Bool {
 		lhs.asStr() == rhs.asStr()
 	}
 
@@ -19,7 +19,7 @@ extension NonFungibleGlobalId: Hashable {
 
 // MARK: - TransactionManifest + Hashable
 extension TransactionManifest: Hashable {
-	public static func == (lhs: EngineToolkitUniFFI.TransactionManifest, rhs: EngineToolkitUniFFI.TransactionManifest) -> Bool {
+	public static func == (lhs: EngineToolkit.TransactionManifest, rhs: EngineToolkit.TransactionManifest) -> Bool {
 		lhs.blobs() == rhs.blobs() &&
 			lhs.instructions() == rhs.instructions()
 	}
@@ -32,7 +32,7 @@ extension TransactionManifest: Hashable {
 
 // MARK: - Instructions + Hashable
 extension Instructions: Hashable {
-	public static func == (lhs: EngineToolkitUniFFI.Instructions, rhs: EngineToolkitUniFFI.Instructions) -> Bool {
+	public static func == (lhs: EngineToolkit.Instructions, rhs: EngineToolkit.Instructions) -> Bool {
 		lhs.instructionsList() == rhs.instructionsList() &&
 			lhs.networkId() == rhs.networkId()
 	}
@@ -360,24 +360,24 @@ extension MapEntry: Hashable {
 	}
 }
 
-// MARK: - EngineToolkitUniFFI.Decimal + Hashable
-extension EngineToolkitUniFFI.Decimal: Hashable {
+// MARK: - EngineToolkit.Decimal + Hashable
+extension EngineToolkit.Decimal: Hashable {
 	public func hash(into hasher: inout Hasher) {
 		hasher.combine(self.asStr())
 	}
 
-	public static func == (lhs: EngineToolkitUniFFI.Decimal, rhs: EngineToolkitUniFFI.Decimal) -> Bool {
+	public static func == (lhs: EngineToolkit.Decimal, rhs: EngineToolkit.Decimal) -> Bool {
 		lhs.equal(other: rhs)
 	}
 }
 
-// MARK: - EngineToolkitUniFFI.PreciseDecimal + Hashable
-extension EngineToolkitUniFFI.PreciseDecimal: Hashable {
+// MARK: - EngineToolkit.PreciseDecimal + Hashable
+extension EngineToolkit.PreciseDecimal: Hashable {
 	public func hash(into hasher: inout Hasher) {
 		hasher.combine(self.asStr())
 	}
 
-	public static func == (lhs: EngineToolkitUniFFI.PreciseDecimal, rhs: EngineToolkitUniFFI.PreciseDecimal) -> Bool {
+	public static func == (lhs: EngineToolkit.PreciseDecimal, rhs: EngineToolkit.PreciseDecimal) -> Bool {
 		lhs.equal(other: rhs)
 	}
 }
@@ -395,14 +395,14 @@ extension ManifestBlobRef: Hashable {
 
 // MARK: - Hash + Equatable
 extension Hash: Equatable {
-	public static func == (lhs: EngineToolkitUniFFI.Hash, rhs: EngineToolkitUniFFI.Hash) -> Bool {
+	public static func == (lhs: EngineToolkit.Hash, rhs: EngineToolkit.Hash) -> Bool {
 		lhs.bytes() == rhs.bytes()
 	}
 }
 
-// MARK: - EngineToolkitUniFFI.Address + Hashable
-extension EngineToolkitUniFFI.Address: Hashable {
-	public static func == (lhs: EngineToolkitUniFFI.Address, rhs: EngineToolkitUniFFI.Address) -> Bool {
+// MARK: - EngineToolkit.Address + Hashable
+extension EngineToolkit.Address: Hashable {
+	public static func == (lhs: EngineToolkit.Address, rhs: EngineToolkit.Address) -> Bool {
 		lhs.addressString() == rhs.addressString()
 	}
 
@@ -413,7 +413,7 @@ extension EngineToolkitUniFFI.Address: Hashable {
 
 // MARK: - TransactionIntent + Hashable
 extension TransactionIntent: Hashable {
-	public static func == (lhs: EngineToolkitUniFFI.Intent, rhs: EngineToolkitUniFFI.Intent) -> Bool {
+	public static func == (lhs: EngineToolkit.Intent, rhs: EngineToolkit.Intent) -> Bool {
 		lhs.header() == rhs.header() &&
 			lhs.manifest() == rhs.manifest()
 	}

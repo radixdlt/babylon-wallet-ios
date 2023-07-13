@@ -289,21 +289,8 @@ struct DappInteractor: Sendable, FeatureReducer {
 	}
 
 	func dismissCurrentModalAndRequest(_ request: RequestEnvelope, for state: inout State) {
-		let dismissManifest = request.request.items.manifest
-		let storedManifest = state.requestQueue.first!.request.items.manifest
 		state.requestQueue.remove(request)
 		state.currentModal = nil
-	}
-}
-
-extension P2P.Dapp.Request.Items {
-	var manifest: TransactionManifest {
-		switch self {
-		case let .transaction(items):
-			return items.send.transactionManifest
-		default:
-			fatalError()
-		}
 	}
 }
 
@@ -379,7 +366,6 @@ extension DappInteractor {
 					return
 				}
 
-				print("New incomming request")
 				switch incomingRequest {
 				case let .valid(requestEnvelope):
 					await send(.internal(.receivedRequestFromDapp(
