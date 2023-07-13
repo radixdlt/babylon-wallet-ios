@@ -12,12 +12,18 @@ extension EditPersonaField {
 		let keyboardType: UIKeyboardType
 		let capitalization: EquatableTextInputCapitalization?
 		#endif
-		let isDynamic: Bool
+		let isDeletable: Bool
 		let canBeDeleted: Bool
 
 		init(state: State) {
 			self.primaryHeading = state.id.title
-			self.secondaryHeading = nil
+			self.secondaryHeading = {
+				if state.kind == .dynamic(isRequiredByDapp: true) {
+					return L10n.EditPersona.requiredByDapp
+				} else {
+					return nil
+				}
+			}()
 			self._input = state.$input
 			self.inputHint = (state.$input.errors?.first).map { .error($0) }
 			#if os(iOS)
@@ -25,8 +31,15 @@ extension EditPersonaField {
 			self.keyboardType = state.id.keyboardType
 			self.contentType = state.id.contentType
 			#endif
-			self.isDynamic = state.kind.isDynamic
-			self.canBeDeleted = false
+			self.isDeletable = state.kind.isDynamic
+			self.canBeDeleted = {
+				switch state.kind {
+				case .static:
+					return false
+				case let .dynamic(isRequiredByDapp):
+					return !isRequiredByDapp
+				}
+			}()
 		}
 	}
 
@@ -49,7 +62,7 @@ extension EditPersonaField {
 					),
 					hint: viewStore.inputHint,
 					innerAccessory: {
-						if viewStore.isDynamic {
+						if viewStore.isDeletable {
 							Button(action: { viewStore.send(.deleteButtonTapped) }) {
 								Image(asset: AssetResource.trash)
 									.offset(x: .small3)

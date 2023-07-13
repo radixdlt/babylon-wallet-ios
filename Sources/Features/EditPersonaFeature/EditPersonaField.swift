@@ -15,13 +15,15 @@ public struct EditPersonaField<ID: EditPersonaFieldID>: Sendable, FeatureReducer
 	public struct State: Sendable, Hashable, Identifiable {
 		public enum Kind: Sendable, Hashable {
 			case `static`
+			case dynamic(isRequiredByDapp: Bool)
 
 			var isStatic: Bool {
 				self == .static
 			}
 
 			var isDynamic: Bool {
-				false
+				guard case .dynamic = self else { return false }
+				return true
 			}
 		}
 
