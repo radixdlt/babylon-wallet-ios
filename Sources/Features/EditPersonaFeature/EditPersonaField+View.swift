@@ -17,13 +17,7 @@ extension EditPersonaField {
 
 		init(state: State) {
 			self.primaryHeading = state.id.title
-			self.secondaryHeading = {
-//				if state.kind == .dynamic(isRequiredByDapp: true) {
-//					return L10n.EditPersona.requiredByDapp
-//				} else {
-				nil
-//				}
-			}()
+			self.secondaryHeading = nil
 			self._input = state.$input
 			self.inputHint = (state.$input.errors?.first).map { .error($0) }
 			#if os(iOS)
@@ -32,14 +26,7 @@ extension EditPersonaField {
 			self.contentType = state.id.contentType
 			#endif
 			self.isDynamic = state.kind.isDynamic
-			self.canBeDeleted = {
-//				switch state.kind {
-//				case .static:
-				false
-//				case let .dynamic(isRequiredByDapp):
-//					return !isRequiredByDapp
-//				}
-			}()
+			self.canBeDeleted = false
 		}
 	}
 

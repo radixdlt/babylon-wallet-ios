@@ -6,13 +6,7 @@ extension EditPersona.State {
 		.init(
 			personaLabel: persona.displayName.rawValue,
 			avatarURL: URL(string: "something")!,
-			addAFieldButtonState: {
-//				if dynamicFields.count < DynamicFieldID.allCases.count {
-//					return .enabled
-//				} else {
-				.disabled
-//				}
-			}(),
+			addAFieldButtonState: .disabled,
 			output: { () -> EditPersona.Output? in
 				guard
 					let personaLabelInput = labelField.input,
@@ -20,21 +14,7 @@ extension EditPersona.State {
 				else {
 					return nil
 				}
-//				var fieldsOutput: IdentifiedArrayOf<Profile.Network.Persona.Field> = []
-//				for field in dynamicFields {
-//					guard
-//						let fieldInput = field.input,
-//						let fieldOutput = NonEmptyString(rawValue: fieldInput.trimmingWhitespace())
-//					else {
-//						if field.kind == .dynamic(isRequiredByDapp: true) {
-//							return nil
-//						} else {
-//							continue
-//						}
-//					}
-//					fieldsOutput[id: field.id] = .init(id: field.id, value: fieldOutput)
-//				}
-				return EditPersona.Output(personaLabel: personaLabelOutput) // , fields: fieldsOutput)
+				return EditPersona.Output(personaLabel: personaLabelOutput)
 			}()
 		)
 	}
@@ -73,14 +53,6 @@ extension EditPersona {
 
 							Separator()
 
-//							ForEachStore(
-//								store.scope(
-//									state: \.dynamicFields,
-//									action: { .child(.dynamicField(id: $0, action: $1)) }
-//								),
-//								content: { EditPersonaDynamicField.View(store: $0) }
-//							)
-
 							Button(action: { viewStore.send(.addAFieldButtonTapped) }) {
 								Text(L10n.EditPersona.addAField).padding(.horizontal, .medium2)
 							}
@@ -111,17 +83,6 @@ extension EditPersona {
 					}
 					#endif
 				}
-//				.confirmationDialog(
-//					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-//					state: /EditPersona.Destinations.State.closeConfirmationDialog,
-//					action: EditPersona.Destinations.Action.closeConfirmationDialog
-//				)
-//				.sheet(
-//					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-//					state: /EditPersona.Destinations.State.addFields,
-//					action: EditPersona.Destinations.Action.addFields,
-//					content: { EditPersonaAddFields.View(store: $0) }
-//				)
 			}
 		}
 	}
@@ -137,12 +98,6 @@ struct EditPersona_Preview: PreviewProvider {
 			store: .init(
 				initialState: .previewValue(
 					mode: .edit
-//					mode: .dapp(
-//						requiredFieldIDs: [
-//							.givenName,
-//							.emailAddress,
-//						]
-//					)
 				),
 				reducer: EditPersona()
 			)

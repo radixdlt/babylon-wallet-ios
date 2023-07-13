@@ -1,6 +1,5 @@
 import AuthorizedDappsClient
 import CreateAuthKeyFeature
-import EditPersonaFeature
 import FeaturePrelude
 import GatewayAPI
 
@@ -254,8 +253,6 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 			case .general:
 				state.destination = .editPersona(.init(mode: .edit, persona: persona))
 			case let .dApp(_, detailedPersona):
-//				let fieldIDs = (detailedPersona.sharedFields ?? []).ids
-//				state.destination = .editPersona(.init(mode: .dapp(requiredFieldIDs: Set(fieldIDs)), persona: persona))
 				fatalError()
 			}
 

@@ -15,15 +15,12 @@ public struct EditPersonaField<ID: EditPersonaFieldID>: Sendable, FeatureReducer
 	public struct State: Sendable, Hashable, Identifiable {
 		public enum Kind: Sendable, Hashable {
 			case `static`
-//			case dynamic(isRequiredByDapp: Bool)
 
 			var isStatic: Bool {
 				self == .static
 			}
 
 			var isDynamic: Bool {
-//				guard case .dynamic = self else { return false }
-//				return true
 				false
 			}
 		}
@@ -115,79 +112,3 @@ extension EditPersonaStaticField.State {
 		)
 	}
 }
-
-//// MARK: Dynamic Fields
-//
-// public typealias EditPersonaDynamicField = EditPersonaField<EditPersona.State.DynamicFieldID>
-//
-//// MARK: - EditPersona.State.DynamicFieldID + EditPersonaFieldID
-// extension EditPersona.State.DynamicFieldID: EditPersonaFieldID {
-//	public var title: String {
-//		switch self {
-//		case .givenName: return L10n.AuthorizedDapps.PersonaDetails.firstName
-//		case .familyName: return L10n.AuthorizedDapps.PersonaDetails.lastName
-//		case .emailAddress: return L10n.AuthorizedDapps.PersonaDetails.emailAddress
-//		case .phoneNumber: return L10n.AuthorizedDapps.PersonaDetails.phoneNumber
-//		}
-//	}
-//
-//	#if os(iOS)
-//	public var contentType: UITextContentType? {
-//		switch self {
-//		case .givenName: return .givenName
-//		case .familyName: return .familyName
-//		case .emailAddress: return .emailAddress
-//		case .phoneNumber: return .telephoneNumber
-//		}
-//	}
-//
-//	public var keyboardType: UIKeyboardType {
-//		switch self {
-//		case .givenName: return .default
-//		case .familyName: return .default
-//		case .emailAddress: return .emailAddress
-//		case .phoneNumber: return .phonePad
-//		}
-//	}
-//
-//	public var capitalization: EquatableTextInputCapitalization? {
-//		switch self {
-//		case .givenName: return .words
-//		case .familyName: return .words
-//		case .emailAddress: return .never
-//		case .phoneNumber: return .none
-//		}
-//	}
-//	#endif
-// }
-//
-// extension EditPersonaDynamicField.State {
-//	public init(
-//		id: ID,
-//		initial: String?,
-//		isRequiredByDapp: Bool
-//	) {
-//		self.init(
-//			kind: .dynamic(isRequiredByDapp: isRequiredByDapp),
-//			id: id,
-//			input: .init(
-//				wrappedValue: initial,
-//				onNil: {
-//					if isRequiredByDapp {
-//						return L10n.EditPersona.Error.requiredByDapp
-//					} else {
-//						return nil
-//					}
-//				}(),
-//				rules: .build {
-//					if isRequiredByDapp {
-//						.if(\.isBlank, error: L10n.EditPersona.Error.requiredByDapp)
-//					}
-//					if id == .emailAddress {
-//						.unless(\.isEmailAddress, error: L10n.EditPersona.Error.invalidEmailAddress)
-//					}
-//				}
-//			)
-//		)
-//	}
-// }
