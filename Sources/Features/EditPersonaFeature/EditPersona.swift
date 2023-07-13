@@ -64,7 +64,7 @@ public struct EditPersona: Sendable, FeatureReducer {
 	}
 
 	public enum ChildAction: Sendable, Equatable {
-		case labelField(EditPersonaStaticField.Action)
+		case labelEntry(EditPersonaEntry<EditPersona.State.StaticFieldID>.Action)
 		case dynamicField(id: EditPersonaDynamicField.State.ID, action: EditPersonaDynamicField.Action)
 		case destination(PresentationAction<Destinations.Action>)
 	}
@@ -98,8 +98,11 @@ public struct EditPersona: Sendable, FeatureReducer {
 	@Dependency(\.errorQueue) var errorQueue
 
 	public var body: some ReducerProtocolOf<Self> {
-		Scope(state: \.labelField, action: /Action.child .. ChildAction.labelField) {
-			EditPersonaField()
+		Scope(
+			state: \.labelField,
+			action: /Action.child .. ChildAction.labelEntry
+		) {
+			EditPersonaEntry()
 		}
 
 		Reduce(core)

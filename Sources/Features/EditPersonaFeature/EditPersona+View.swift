@@ -75,11 +75,11 @@ extension EditPersona {
 						VStack(spacing: .medium1) {
 							PersonaThumbnail(viewStore.avatarURL, size: .veryLarge)
 
-							EditPersonaStaticField.View(
+							EditPersonaEntry.View(
 								store: store.scope(
 									state: \.labelField,
 									action: (/Action.child
-										.. EditPersona.ChildAction.labelField
+										.. EditPersona.ChildAction.labelEntry
 									).embed
 								)
 							)
