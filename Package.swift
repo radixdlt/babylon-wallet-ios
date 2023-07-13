@@ -107,6 +107,7 @@ package.addModules([
 		dependencies: [
 			"AuthorizedDappsClient",
 			"CacheClient",
+			"EditPersonaFeature",
 			"PersonasFeature",
 			"GatewayAPI",
 		],
@@ -167,6 +168,7 @@ package.addModules([
 			"CreatePersonaFeature",
 			"CacheClient",
 			"ChooseAccountsFeature",
+			"EditPersonaFeature",
 			"GatewayAPI",
 			"GatewaysClient", // get current network
 			"RadixConnectClient",
@@ -194,6 +196,14 @@ package.addModules([
 			"FactorSourcesClient",
 			"LedgerHardwareWalletClient",
 			"DeviceFactorSourceClient",
+		],
+		tests: .no
+	),
+	.feature(
+		name: "EditPersonaFeature",
+		dependencies: [
+			"PersonasClient",
+			"Profile",
 		],
 		tests: .no
 	),
@@ -326,6 +336,7 @@ package.addModules([
 		name: "PersonaDetailsFeature",
 		dependencies: [
 			"AuthorizedDappsClient",
+			"EditPersonaFeature",
 			"CreateAuthKeyFeature",
 			"GatewayAPI",
 		],
@@ -385,6 +396,7 @@ package.addModules([
 			"RadixConnectClient",
 			"ScanQRFeature",
 			"SecurityStructureConfigurationListFeature",
+			"EditPersonaFeature",
 			"ProfileBackupsFeature",
 		],
 		tests: .yes()
