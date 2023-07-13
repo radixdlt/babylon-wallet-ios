@@ -27,7 +27,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			precondition(positiveDelta.isMultiple(of: ImportMnemonic.wordsPerRow))
 
 			let wordCount = words.count
-			let newWordCount = BIP39.WordCount(wordCount: wordCount + delta)! // might infact be subtraction
+			let newWordCount = BIP39.WordCount(wordCount: wordCount + delta)! // might in fact be subtraction
 			if delta > 0 {
 				// is increasing word count
 				words.append(contentsOf: (wordCount ..< newWordCount.rawValue).map {
@@ -65,12 +65,20 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 		public let persistedKind: MnemonicBasedFactorSourceKind?
 
 		public let isReadonlyMode: Bool
+		public let isWordCountFixed: Bool
+		public var isAdvancedMode: Bool = false
 		public var isHidingSecrets: Bool = false
+
+		public let header: Header?
+		public let warning: String?
 
 		@PresentationState
 		public var offDeviceMnemonicInfoPrompt: OffDeviceMnemonicInfo.State?
 
 		public init(
+			header: Header? = nil,
+			warning: String? = nil,
+			isWordCountFixed: Bool = false,
 			persistAsMnemonicKind persistedKind: MnemonicBasedFactorSourceKind?,
 			language: BIP39.Language = .english,
 			wordCount: BIP39.WordCount = .twelve,
@@ -83,21 +91,29 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			self.language = language
 			self.bip39Passphrase = bip39Passphrase
 
-			let isReadonlyMode = false
-			self.isReadonlyMode = isReadonlyMode
+			self.isReadonlyMode = false
+			self.isWordCountFixed = isWordCountFixed
 			self.words = []
 			self.offDeviceMnemonicInfoPrompt = offDeviceMnemonicInfoPrompt
+			self.header = header
+			self.warning = warning
 			changeWordCount(by: wordCount.rawValue)
 		}
 
 		public init(
+			header: Header? = nil,
+			warning: String? = nil,
 			mnemonicWithPassphrase: MnemonicWithPassphrase
 		) {
+			self.header = header
+			self.warning = warning
+
 			let mnemonic = mnemonicWithPassphrase.mnemonic
 			self.persistedKind = nil
 			self.language = mnemonic.language
 			let isReadonlyMode = true
 			self.isReadonlyMode = isReadonlyMode
+			self.isWordCountFixed = true
 			self.words = .init(
 				uniqueElements: mnemonic.words
 					.enumerated()
@@ -120,12 +136,23 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			)
 			self.bip39Passphrase = mnemonicWithPassphrase.passphrase
 		}
+
+		public struct Header: Sendable, Hashable {
+			public let title: String
+			public let subtitle: String?
+
+			public init(title: String, subtitle: String? = nil) {
+				self.title = title
+				self.subtitle = subtitle
+			}
+		}
 	}
 
 	public enum ViewAction: Sendable, Equatable {
 		case appeared
 		case scenePhase(ScenePhase)
 
+		case toggleModeButtonTapped
 		case passphraseChanged(String)
 		case addRowButtonTapped
 		case removeRowButtonTapped
@@ -225,6 +252,10 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 
 		case let .passphraseChanged(passphrase):
 			state.bip39Passphrase = passphrase
+			return .none
+
+		case .toggleModeButtonTapped:
+			state.isAdvancedMode.toggle()
 			return .none
 
 		case .addRowButtonTapped:

@@ -1,6 +1,7 @@
 import AccountsClient
 import ClientPrelude
 import Cryptography
+import FactorSourcesClient
 import Profile
 
 // MARK: - ImportLegacyWalletClient + DependencyKey
@@ -9,14 +10,21 @@ extension ImportLegacyWalletClient: DependencyKey {
 
 	public static let liveValue: Self = {
 		@Dependency(\.accountsClient) var accountsClient
+		@Dependency(\.factorSourcesClient) var factorSourcesClient
 
 		@Sendable func migrate(
 			accounts: NonEmpty<Set<OlympiaAccountToMigrate>>,
 			factorSouceID: FactorSourceID.FromHash
 		) async throws -> (accounts: NonEmpty<OrderedSet<MigratedAccount>>, networkID: NetworkID) {
 			let sortedOlympia = accounts.sorted(by: \.addressIndex)
-			let networkID = Radix.Gateway.default.network.id // we import to the default network, not the current.
+			let networkID = await factorSourcesClient.getCurrentNetworkID()
 			let accountIndexOffset = try await accountsClient.getAccountsOnCurrentNetwork().count
+
+			guard let defaultAccountName: NonEmptyString = .init(rawValue: L10n.ImportOlympiaAccounts.AccountsToImport.unnamed) else {
+				// The L10n string should not be empty, so this should not be possible
+				struct ImplementationError: Error {}
+				throw ImplementationError()
+			}
 
 			var accountsSet = OrderedSet<MigratedAccount>()
 			for olympiaAccount in sortedOlympia {
@@ -26,7 +34,8 @@ extension ImportLegacyWalletClient: DependencyKey {
 					publicKey: publicKey,
 					derivationPath: olympiaAccount.path.wrapAsDerivationPath()
 				)
-				let displayName = olympiaAccount.displayName ?? "Unnamned olympia account \(olympiaAccount.addressIndex)"
+
+				let displayName = olympiaAccount.displayName ?? defaultAccountName
 				let accountIndex = accountIndexOffset + Int(olympiaAccount.addressIndex)
 
 				let babylon = try Profile.Network.Account(
@@ -100,7 +109,6 @@ extension ImportLegacyWalletClient: DependencyKey {
 				return migratedAccounts
 			},
 			migrateOlympiaHardwareAccountsToBabylon: { request in
-
 				let (accounts, networkID) = try await migrate(
 					accounts: request.olympiaAccounts,
 					factorSouceID: request.ledgerFactorSourceID

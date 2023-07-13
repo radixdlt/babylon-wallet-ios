@@ -19,6 +19,7 @@ public struct AppSettings: Sendable, FeatureReducer {
 	@Dependency(\.appPreferencesClient) var appPreferencesClient
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.p2pLinksClient) var p2pLinksClient
+	@Dependency(\.dismiss) var dismiss
 
 	public typealias Store = StoreOf<Self>
 
@@ -72,7 +73,6 @@ public struct AppSettings: Sendable, FeatureReducer {
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
-		case dismiss // TODO: remove this and use @Dependency(\.dismiss) when TCA tools are released
 		case deleteProfileAndFactorSources(keepInICloudIfPresent: Bool)
 	}
 
@@ -104,9 +104,9 @@ public struct AppSettings: Sendable, FeatureReducer {
 			case profileBackups(ProfileBackups.Action)
 			case ledgerHardwareWallets(LedgerHardwareDevices.Action)
 			case mnemonics(DisplayMnemonics.Action)
+			case importOlympiaWalletCoordinator(ImportOlympiaWalletCoordinator.Action)
 
 			#if DEBUG
-			case importOlympiaWalletCoordinator(ImportOlympiaWalletCoordinator.Action)
 			case debugInspectProfile(DebugInspectProfile.Action)
 			case debugManageFactorSources(ManageFactorSources.Action)
 			case securityStructureConfigs(SecurityStructureConfigurationListCoordinator.Action)
@@ -172,7 +172,9 @@ public struct AppSettings: Sendable, FeatureReducer {
 			return loadP2PLinks()
 
 		case .backButtonTapped:
-			return .send(.delegate(.dismiss))
+			return .run { _ in
+				await dismiss()
+			}
 
 		case .addP2PLinkButtonTapped:
 			state.destination = .manageP2PLinks(.init(destination: .newConnection(.init())))
@@ -265,18 +267,21 @@ public struct AppSettings: Sendable, FeatureReducer {
 				return .none
 			}
 
-		#if DEBUG
-		case .destination(.presented(.importOlympiaWalletCoordinator(.delegate(.dismiss)))):
+		case let .destination(.presented(.importOlympiaWalletCoordinator(.delegate(.finishedMigration(gotoAccountList))))):
 			state.destination = nil
+			if gotoAccountList {
+				return dismissSettings()
+			}
 			return .none
-
-		case .destination(.presented(.importOlympiaWalletCoordinator(.delegate(.finishedMigration)))):
-			state.destination = nil
-			return .none
-		#endif
 
 		case .destination:
 			return .none
+		}
+	}
+
+	private func dismissSettings() -> EffectTask<Action> {
+		.run { _ in
+			await dismiss()
 		}
 	}
 }

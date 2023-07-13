@@ -15,7 +15,7 @@ public struct LedgerHardwareWalletClient: Sendable {
 extension LedgerHardwareWalletClient {
 	public typealias IsConnectedToAnyConnectorExtension = @Sendable () async -> AnyAsyncSequence<Bool>
 	public typealias GetDeviceInfo = @Sendable () async throws -> P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.GetDeviceInfo
-	public typealias DerivePublicKeys = @Sendable (OrderedSet<P2P.LedgerHardwareWallet.KeyParameters>, LedgerHardwareWalletFactorSource) async throws -> OrderedSet<HierarchicalDeterministicPublicKey>
+	public typealias DerivePublicKeys = @Sendable ([P2P.LedgerHardwareWallet.KeyParameters], LedgerHardwareWalletFactorSource) async throws -> [HierarchicalDeterministicPublicKey]
 	public typealias SignTransaction = @Sendable (SignTransactionWithLedgerRequest) async throws -> Set<SignatureOfEntity>
 	public typealias SignAuthChallenge = @Sendable (SignAuthChallengeWithLedgerRequest) async throws -> Set<SignatureOfEntity>
 }
