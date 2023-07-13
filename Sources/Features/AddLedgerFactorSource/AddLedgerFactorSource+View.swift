@@ -23,41 +23,46 @@ extension AddLedgerFactorSource {
 		public var body: some SwiftUI.View {
 			NavigationStack {
 				WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-					VStack {
-						Text(L10n.AddLedgerDevice.AddDevice.title)
-							.textStyle(.sheetTitle)
-							.padding(.top, .small1)
-							.padding(.bottom, .large1)
+					ScrollView(showsIndicators: false) {
+						VStack(spacing: 0) {
+							Image(asset: AssetResource.iconHardwareLedger)
+								.resizable()
+								.frame(.huge)
+								.padding(.top, .huge2)
+								.padding(.bottom, .huge1)
 
-						Text(L10n.AddLedgerDevice.AddDevice.body1)
-							.textStyle(.body1Regular)
-							.padding(.bottom, .large1)
-							.padding(.horizontal, .medium3)
+							Text(L10n.AddLedgerDevice.AddDevice.title)
+								.textStyle(.sheetTitle)
+								.padding(.bottom, .large3)
 
-						Text(L10n.AddLedgerDevice.AddDevice.body2)
-							.textStyle(.body1Regular)
-							.padding(.horizontal, .medium3)
+							Text(L10n.AddLedgerDevice.AddDevice.body1)
+								.textStyle(.body1Regular)
+								.padding(.horizontal, .large3)
+								.padding(.bottom, .medium2)
 
-						Spacer()
-
+							Text(L10n.AddLedgerDevice.AddDevice.body2)
+								.textStyle(.body1Regular)
+								.padding(.horizontal, .large3)
+								.padding(.bottom, .small1)
+						}
+						.multilineTextAlignment(.center)
+						.foregroundColor(.app.gray1)
+					}
+					.footer {
 						Button(L10n.AddLedgerDevice.AddDevice.continue) {
 							viewStore.send(.sendAddLedgerRequestButtonTapped)
 						}
 						.controlState(viewStore.continueButtonControlState)
 						.buttonStyle(.primaryRectangular)
-						.padding(.bottom, .large2)
 					}
-					.multilineTextAlignment(.center)
-					.foregroundColor(.app.gray1)
-					.padding(.horizontal, .medium3)
 					#if os(iOS)
-						.toolbar {
-							ToolbarItem(placement: .primaryAction) {
-								CloseButton {
-									viewStore.send(.closeButtonTapped)
-								}
+					.toolbar {
+						ToolbarItem(placement: .primaryAction) {
+							CloseButton {
+								viewStore.send(.closeButtonTapped)
 							}
 						}
+					}
 					#endif
 				}
 				.destination(store: store)
