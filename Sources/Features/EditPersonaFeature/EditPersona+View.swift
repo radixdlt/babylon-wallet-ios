@@ -28,6 +28,25 @@ extension EditPersona.State {
 			}()
 		)
 	}
+
+	func fieldsOutput(
+		dynamicFields: IdentifiedArrayOf<EditPersonaDynamicField.State>
+	) -> IdentifiedArrayOf<Identified<EditPersonaDynamicField.State.ID, String>>? {
+		var fieldsOutput: IdentifiedArrayOf<Identified<EditPersonaDynamicField.State.ID, String>> = []
+		for field in dynamicFields {
+			guard let fieldInput = field.input else {
+				if field.kind == .dynamic(isRequiredByDapp: true) {
+					return nil
+				} else {
+					continue
+				}
+			}
+			let fieldOutput = fieldInput.trimmingWhitespace()
+			fieldsOutput[id: field.id] = .init(fieldOutput, id: field.id)
+		}
+
+		return fieldsOutput
+	}
 }
 
 // MARK: - EditPersonaDetails.View
