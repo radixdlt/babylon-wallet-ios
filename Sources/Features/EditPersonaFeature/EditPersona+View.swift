@@ -14,7 +14,19 @@ extension EditPersona.State {
 				else {
 					return nil
 				}
-				return EditPersona.Output(personaLabel: personaLabelOutput)
+				var fieldsOutput: IdentifiedArrayOf<Identified<EditPersonaDynamicField.State.ID, String>> = []
+				for field in dynamicFields {
+					guard let fieldInput = field.input else {
+						if field.kind == .dynamic(isRequiredByDapp: true) {
+							return nil
+						} else {
+							continue
+						}
+					}
+					let fieldOutput = fieldInput.trimmingWhitespace()
+					fieldsOutput[id: field.id] = .init(fieldOutput, id: field.id)
+				}
+				return EditPersona.Output(personaLabel: personaLabelOutput, fields: fieldsOutput)
 			}()
 		)
 	}
@@ -47,11 +59,23 @@ extension EditPersona {
 							EditPersonaStaticField.View(
 								store: store.scope(
 									state: \.labelField,
-									action: { .child(.labelField($0)) }
+									action: (/Action.child
+										.. EditPersona.ChildAction.labelField
+									).embed
 								)
 							)
 
 							Separator()
+
+							ForEachStore(
+								store.scope(
+									state: \.dynamicFields,
+									action: (/Action.child
+										.. EditPersona.ChildAction.dynamicField
+									).embed
+								),
+								content: EditPersonaDynamicField.View.init
+							)
 
 							Button(action: { viewStore.send(.addAFieldButtonTapped) }) {
 								Text(L10n.EditPersona.addAField).padding(.horizontal, .medium2)

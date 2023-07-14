@@ -5,6 +5,7 @@ import PersonasClient
 extension EditPersona {
 	public struct Output: Sendable, Hashable {
 		let personaLabel: NonEmptyString
+		let fields: IdentifiedArrayOf<Identified<EditPersonaDynamicField.State.ID, String>>
 	}
 }
 
@@ -19,9 +20,12 @@ public struct EditPersona: Sendable, FeatureReducer {
 			case personaLabel
 		}
 
+		public typealias DynamicFieldID = PersonaData.Entry
+
 		let mode: Mode
 		let persona: Profile.Network.Persona
 		var labelField: EditPersonaStaticField.State
+		var dynamicFields: IdentifiedArrayOf<EditPersonaDynamicField.State> = []
 
 		public init(
 			mode: Mode,
@@ -32,6 +36,20 @@ public struct EditPersona: Sendable, FeatureReducer {
 			self.labelField = EditPersonaStaticField.State(
 				id: .personaLabel,
 				initial: persona.displayName.rawValue
+			)
+			self.dynamicFields = IdentifiedArray(
+				uncheckedUniqueElements: persona.personaData.entries.map { entry in
+					EditPersonaDynamicField.State(
+						id: entry.value,
+						initial: entry.value.title,
+						isRequiredByDapp: {
+							switch mode {
+							case .edit:
+								return false
+							}
+						}()
+					)
+				}
 			)
 		}
 	}
@@ -49,6 +67,7 @@ public struct EditPersona: Sendable, FeatureReducer {
 
 	public enum ChildAction: Sendable, Equatable {
 		case labelField(EditPersonaStaticField.Action)
+		case dynamicField(id: EditPersonaDynamicField.State.ID, action: EditPersonaDynamicField.Action)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -77,6 +96,9 @@ public struct EditPersona: Sendable, FeatureReducer {
 		}
 
 		Reduce(core)
+			.forEach(\.dynamicFields, action: /Action.child .. ChildAction.dynamicField) {
+				EditPersonaField()
+			}
 	}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {

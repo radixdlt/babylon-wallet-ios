@@ -1,7 +1,7 @@
 import FeaturePrelude
 
 // MARK: - EditPersonaFieldID
-public protocol EditPersonaFieldID: Sendable, Hashable, Comparable {
+public protocol EditPersonaFieldID: Sendable, Hashable {
 	var title: String { get }
 	#if os(iOS)
 	var contentType: UITextContentType? { get }
@@ -110,6 +110,62 @@ extension EditPersonaStaticField.State {
 				wrappedValue: initial,
 				onNil: L10n.EditPersona.Error.blank,
 				rules: [.if(\.isBlank, error: L10n.EditPersona.Error.blank)]
+			)
+		)
+	}
+}
+
+// MARK: Dynamic Fields
+
+public typealias EditPersonaDynamicField = EditPersonaField<EditPersona.State.DynamicFieldID>
+
+// MARK: - EditPersona.State.DynamicFieldID + EditPersonaFieldID
+extension EditPersona.State.DynamicFieldID: EditPersonaFieldID {
+	public var title: String {
+		"title"
+	}
+
+	#if os(iOS)
+	public var contentType: UITextContentType? {
+		nil
+	}
+
+	public var keyboardType: UIKeyboardType {
+		.default
+	}
+
+	public var capitalization: EquatableTextInputCapitalization? {
+		nil
+	}
+	#endif
+}
+
+extension EditPersonaDynamicField.State {
+	public init(
+		id: ID,
+		initial: String?,
+		isRequiredByDapp: Bool
+	) {
+		self.init(
+			kind: .dynamic(isRequiredByDapp: isRequiredByDapp),
+			id: id,
+			input: .init(
+				wrappedValue: initial,
+				onNil: {
+					if isRequiredByDapp {
+						return L10n.EditPersona.Error.requiredByDapp
+					} else {
+						return nil
+					}
+				}(),
+				rules: .build {
+					if isRequiredByDapp {
+						.if(\.isBlank, error: L10n.EditPersona.Error.requiredByDapp)
+					}
+					if case PersonaData.Entry.emailAddress = id {
+						.unless(\.isEmailAddress, error: L10n.EditPersona.Error.invalidEmailAddress)
+					}
+				}
 			)
 		)
 	}
