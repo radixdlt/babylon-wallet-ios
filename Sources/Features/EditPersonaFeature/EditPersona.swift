@@ -9,6 +9,21 @@ extension EditPersona {
 	}
 }
 
+extension PersonaData.Entry {
+	var text: String {
+		switch self {
+		case let .name(entryModel): return entryModel.description
+		case let .dateOfBirth(entryModel): return entryModel.description
+		case let .companyName(entryModel): return entryModel.description
+		case let .emailAddress(entryModel): return entryModel.description
+		case let .phoneNumber(entryModel): return entryModel.description
+		case let .url(entryModel): return entryModel.description
+		case let .postalAddress(entryModel): return entryModel.description
+		case let .creditCard(entryModel): return entryModel.description
+		}
+	}
+}
+
 // MARK: - EditPersona
 public struct EditPersona: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
@@ -41,7 +56,7 @@ public struct EditPersona: Sendable, FeatureReducer {
 				uncheckedUniqueElements: persona.personaData.entries.map { entry in
 					EditPersonaDynamicField.State(
 						id: entry.value,
-						initial: entry.value.title,
+						text: entry.value.text,
 						isRequiredByDapp: {
 							switch mode {
 							case .edit:

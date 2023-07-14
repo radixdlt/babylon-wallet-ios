@@ -122,20 +122,56 @@ public typealias EditPersonaDynamicField = EditPersonaField<EditPersona.State.Dy
 // MARK: - EditPersona.State.DynamicFieldID + EditPersonaFieldID
 extension EditPersona.State.DynamicFieldID: EditPersonaFieldID {
 	public var title: String {
-		"title"
+		switch self {
+		case .name: return "Name"
+		case .dateOfBirth: return "DoB"
+		case .companyName: return "Company name"
+		case .emailAddress: return L10n.AuthorizedDapps.PersonaDetails.emailAddress
+		case .phoneNumber: return L10n.AuthorizedDapps.PersonaDetails.phoneNumber
+		case .url: return "URL"
+		case .postalAddress: return "Postal Address"
+		case .creditCard: return "Credit Card"
+		}
 	}
 
 	#if os(iOS)
 	public var contentType: UITextContentType? {
-		nil
+		switch self {
+		case .name: return .name
+		case .dateOfBirth: return .dateTime
+		case .companyName: return .organizationName
+		case .emailAddress: return .emailAddress
+		case .phoneNumber: return .telephoneNumber
+		case .url: return .URL
+		case .postalAddress: return .fullStreetAddress
+		case .creditCard: return .creditCardNumber
+		}
 	}
 
 	public var keyboardType: UIKeyboardType {
-		.default
+		switch self {
+		case .name: return .default
+		case .dateOfBirth: return .default
+		case .companyName: return .default
+		case .emailAddress: return .emailAddress
+		case .phoneNumber: return .phonePad
+		case .url: return .URL
+		case .postalAddress: return .default
+		case .creditCard: return .asciiCapableNumberPad
+		}
 	}
 
 	public var capitalization: EquatableTextInputCapitalization? {
-		nil
+		switch self {
+		case .name: return .words
+		case .dateOfBirth: return .never
+		case .companyName: return .words
+		case .emailAddress: return .never
+		case .phoneNumber: return .none
+		case .url: return .never
+		case .postalAddress: return .words
+		case .creditCard: return .none
+		}
 	}
 	#endif
 }
@@ -143,14 +179,14 @@ extension EditPersona.State.DynamicFieldID: EditPersonaFieldID {
 extension EditPersonaDynamicField.State {
 	public init(
 		id: ID,
-		initial: String?,
+		text: String?,
 		isRequiredByDapp: Bool
 	) {
 		self.init(
 			kind: .dynamic(isRequiredByDapp: isRequiredByDapp),
 			id: id,
 			input: .init(
-				wrappedValue: initial,
+				wrappedValue: text,
 				onNil: {
 					if isRequiredByDapp {
 						return L10n.EditPersona.Error.requiredByDapp
