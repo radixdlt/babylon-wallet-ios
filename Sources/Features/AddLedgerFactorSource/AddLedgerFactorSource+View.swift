@@ -140,28 +140,38 @@ extension NameLedgerFactorSource {
 		public var body: some SwiftUI.View {
 			NavigationStack {
 				WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-					VStack {
-						Text(L10n.AddLedgerDevice.NameLedger.title)
-							.textStyle(.sheetTitle)
-							.padding(.top, .small1)
-							.padding(.bottom, .medium3)
+					ScrollView(showsIndicators: false) {
+						VStack(spacing: 0) {
+							Text(L10n.AddLedgerDevice.NameLedger.title)
+								.textStyle(.sheetTitle)
+								.padding(.top, .small1)
+								.padding(.horizontal, .large3)
+								.padding(.bottom, .small2)
 
-						Text(L10n.AddLedgerDevice.NameLedger.subtitle)
-							.textStyle(.body1Regular)
-							.padding(.bottom, .medium1)
-							.multilineTextAlignment(.center)
+							Text(L10n.AddLedgerDevice.NameLedger.subtitle)
+								.textStyle(.body1Regular)
+								.multilineTextAlignment(.center)
+								.padding(.horizontal, .large1)
+								.padding(.bottom, .large1)
 
-						AppTextField(
-							placeholder: L10n.AddLedgerDevice.NameLedger.namePlaceholder,
-							text: Binding(
-								get: { viewStore.ledgerName },
-								set: { viewStore.send(.ledgerNameChanged($0)) }
+							Text(L10n.AddLedgerDevice.NameLedger.detectedType(viewStore.model.displayName))
+								.textStyle(.body1Header)
+								.multilineTextAlignment(.center)
+								.padding(.horizontal, .large1)
+								.padding(.bottom, .medium1)
+
+							AppTextField(
+								placeholder: "",
+								text: Binding(
+									get: { viewStore.ledgerName },
+									set: { viewStore.send(.ledgerNameChanged($0)) }
+								),
+								hint: .info(L10n.AddLedgerDevice.NameLedger.fieldHint)
 							)
-						)
-
-						Spacer()
+							.padding(.horizontal, .medium3)
+							.padding(.bottom, .small1)
+						}
 					}
-					.padding(.horizontal, .medium1)
 					.foregroundColor(.app.gray1)
 					.footer {
 						Button(L10n.AddLedgerDevice.NameLedger.continueButtonTitle) {
@@ -172,6 +182,19 @@ extension NameLedgerFactorSource {
 					}
 				}
 			}
+		}
+	}
+}
+
+extension P2P.LedgerHardwareWallet.Model {
+	var displayName: String {
+		switch self {
+		case .nanoS:
+			return "Ledger Nano S"
+		case .nanoSPlus:
+			return "Ledger Nano S+"
+		case .nanoX:
+			return "Ledger Nano X"
 		}
 	}
 }
