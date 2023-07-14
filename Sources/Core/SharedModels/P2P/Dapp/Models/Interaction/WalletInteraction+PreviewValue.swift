@@ -1,9 +1,10 @@
+import EngineKit
 import Prelude
 
 #if DEBUG
 
 extension TransactionManifest {
-	public static let previewValue = Self(instructions: .string(complexManifestString))
+	public static let previewValue = try! TransactionManifest(instructions: .fromString(string: complexManifestString, blobs: [], networkId: NetworkID.default.rawValue), blobs: [])
 }
 
 private let complexManifestString = """

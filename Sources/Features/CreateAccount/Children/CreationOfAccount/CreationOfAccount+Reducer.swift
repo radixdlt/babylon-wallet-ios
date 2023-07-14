@@ -1,6 +1,7 @@
 import AccountsClient
 import Cryptography
 import DerivePublicKeysFeature
+import EngineKit
 import FeaturePrelude
 import LedgerHardwareDevicesFeature
 import LedgerHardwareWalletClient

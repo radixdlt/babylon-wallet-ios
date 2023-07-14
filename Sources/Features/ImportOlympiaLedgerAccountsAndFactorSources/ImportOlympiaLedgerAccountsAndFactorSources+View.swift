@@ -8,6 +8,7 @@ extension ImportOlympiaLedgerAccountsAndFactorSources.State {
 	var viewState: ImportOlympiaLedgerAccountsAndFactorSources.ViewState {
 		.init(
 			knownLedgers: knownLedgers,
+			migrated: migratedAccounts,
 			moreAccounts: olympiaAccounts.unvalidated.count
 		)
 	}
@@ -16,8 +17,18 @@ extension ImportOlympiaLedgerAccountsAndFactorSources.State {
 // MARK: - ImportOlympiaLedgerAccountsAndFactorSources.View
 extension ImportOlympiaLedgerAccountsAndFactorSources {
 	public struct ViewState: Equatable {
-		public let knownLedgers: IdentifiedArrayOf<LedgerHardwareWalletFactorSource>
+		public let usedLedgers: IdentifiedArrayOf<LedgerHardwareWalletFactorSource>
 		public let moreAccounts: Int
+
+		public init(
+			knownLedgers: IdentifiedArrayOf<LedgerHardwareWalletFactorSource>,
+			migrated: [MigratedHardwareAccounts],
+			moreAccounts: Int
+		) {
+			let usedLedgerIDs = Set(migrated.map(\.ledgerID))
+			self.usedLedgers = knownLedgers.filter { usedLedgerIDs.contains($0.id) }
+			self.moreAccounts = moreAccounts
+		}
 	}
 
 	@MainActor
@@ -44,13 +55,13 @@ extension ImportOlympiaLedgerAccountsAndFactorSources {
 						}
 						.padding(.horizontal, .large2)
 
-						if !viewStore.knownLedgers.isEmpty {
+						if !viewStore.usedLedgers.isEmpty {
 							Text(L10n.ImportOlympiaLedgerAccounts.listHeading)
 								.textStyle(.body1Header)
 								.padding(.top, .medium3)
 								.padding(.horizontal, .large2)
 
-							ForEach(viewStore.knownLedgers) { ledger in
+							ForEach(viewStore.usedLedgers) { ledger in
 								Card(.app.gray5) {
 									Text(ledger.hint.name)
 										.textStyle(.secondaryHeader)

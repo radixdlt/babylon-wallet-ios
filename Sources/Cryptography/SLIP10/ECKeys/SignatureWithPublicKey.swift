@@ -1,6 +1,7 @@
 import CryptoKit
 import Foundation
 import K1
+import Prelude
 
 // MARK: - SignatureWithPublicKey
 public enum SignatureWithPublicKey: Sendable, Hashable, CustomDebugStringConvertible, Identifiable {

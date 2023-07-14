@@ -90,8 +90,8 @@ package.addModules([
 			"ScanQRFeature",
 			"ChooseAccountsFeature",
 			"AssetsFeature",
-			"EngineToolkitClient",
 			"DappInteractionClient",
+			"EngineKit",
 		],
 		tests: .yes()
 	),
@@ -385,7 +385,6 @@ package.addModules([
 			"AuthorizedDAppsFeature",
 			"CacheClient",
 			"DebugInspectProfileFeature",
-			"EngineToolkitClient",
 			"GatewayAPI",
 			"GatewaySettingsFeature",
 			"ImportMnemonicFeature",
@@ -398,6 +397,7 @@ package.addModules([
 			"SecurityStructureConfigurationListFeature",
 			"EditPersonaFeature",
 			"ProfileBackupsFeature",
+			"EngineKit",
 		],
 		tests: .yes()
 	),
@@ -411,13 +411,13 @@ package.addModules([
 		featureSuffixDroppedFromFolderName: true,
 		dependencies: [
 			"AppPreferencesClient",
-			"EngineToolkit",
 			"FactorSourcesClient",
 			"LedgerHardwareWalletClient",
 			"Profile",
 			"TransactionClient",
 			"DeviceFactorSourceClient",
 			"ROLAClient",
+			"EngineKit",
 		],
 		tests: .no
 	),
@@ -464,9 +464,9 @@ package.addModules([
 	.client(
 		name: "AccountPortfoliosClient",
 		dependencies: [
-			"EngineToolkitClient",
 			"GatewayAPI",
 			"CacheClient",
+			"EngineKit",
 		],
 		tests: .yes()
 	),
@@ -553,15 +553,6 @@ package.addModules([
 		tests: .yes()
 	),
 	.client(
-		name: "EngineToolkitClient",
-		dependencies: [
-			"Cryptography",
-			"EngineToolkit",
-			"Profile",
-		],
-		tests: .yes()
-	),
-	.client(
 		name: "FactorSourcesClient",
 		dependencies: [
 			"Profile",
@@ -581,11 +572,11 @@ package.addModules([
 		name: "FaucetClient",
 		dependencies: [
 			"DeviceFactorSourceClient",
-			"EngineToolkitClient",
 			"GatewayAPI",
 			"GatewaysClient", // getCurrentNetworkID
 			"SubmitTransactionClient",
 			"TransactionClient",
+			"EngineKit",
 		],
 		tests: .yes()
 	),
@@ -626,9 +617,9 @@ package.addModules([
 		name: "ImportLegacyWalletClient",
 		dependencies: [
 			"AccountsClient",
-			"EngineToolkitClient",
 			"LedgerHardwareWalletClient",
 			"Profile", // Olympia models
+			"EngineKit",
 		],
 		tests: .yes(
 			resources: [
@@ -779,7 +770,7 @@ package.addModules([
 			"GatewayAPI",
 			"CacheClient",
 			"DeviceFactorSourceClient",
-			"EngineToolkitClient",
+			"EngineKit",
 		],
 		tests: .yes(
 			dependencies: [],
@@ -791,9 +782,9 @@ package.addModules([
 	.client(
 		name: "SubmitTransactionClient",
 		dependencies: [
-			"EngineToolkitClient",
 			"GatewayAPI",
 			"TransactionClient",
+			"EngineKit",
 		],
 		tests: .no
 	),
@@ -802,10 +793,10 @@ package.addModules([
 		dependencies: [
 			"AccountsClient",
 			"AccountPortfoliosClient",
-			"EngineToolkitClient",
 			"FactorSourcesClient",
 			"GatewayAPI",
 			"PersonasClient",
+			"EngineKit",
 		],
 		tests: .yes()
 	),
@@ -933,7 +924,7 @@ package.addModules([
 		name: "Profile",
 		dependencies: [
 			"Cryptography",
-			"EngineToolkit", // address derivation, blake hash
+			"EngineKit",
 			"RadixConnectModels",
 			"Resources",
 			.product(name: "ComposableArchitecture", package: "swift-composable-architecture"), // actually just CasePaths
@@ -942,21 +933,6 @@ package.addModules([
 			dependencies: [
 				"SharedTestingModels",
 			],
-			resources: [
-				.process("TestVectors/"),
-			]
-		)
-	),
-	.module(
-		name: "EngineToolkit",
-		category: .engineToolkit,
-		dependencies: [
-			"Cryptography",
-			"RadixEngineToolkit",
-			.product(name: "ComposableArchitecture", package: "swift-composable-architecture"), // actually just CasePaths
-		],
-		tests: .yes(
-			dependencies: [],
 			resources: [
 				.process("TestVectors/"),
 			]
@@ -1022,6 +998,16 @@ package.addModules([
 		tests: .no
 	),
 	.module(
+		name: "EngineKit",
+		dependencies: [
+			"Cryptography",
+			.product(name: "EngineToolkit", package: "swift-engine-toolkit") {
+				.package(url: "https://github.com/radixdlt/swift-engine-toolkit", exact: "0.10.0-elm.1-9e2590e")
+			},
+		],
+		tests: .no
+	),
+	.module(
 		name: "ClientTestingPrelude",
 		category: .testing,
 		dependencies: [
@@ -1033,6 +1019,7 @@ package.addModules([
 		name: "Prelude",
 		remoteDependencies: [
 			.package(url: "https://github.com/apple/swift-collections", branch: "main"), // TODO: peg to specific version once main is tagged
+
 		],
 		dependencies: [
 			.product(name: "Algorithms", package: "swift-algorithms") {
@@ -1103,13 +1090,6 @@ package.addModules([
 	),
 ])
 
-package.targets.append(
-	.binaryTarget(
-		name: "RadixEngineToolkit",
-		path: "Sources/EngineToolkit/RadixEngineToolkit/RadixEngineToolkit.xcframework"
-	)
-)
-
 // MARK: - Unit Tests
 
 package.addModules([
@@ -1135,7 +1115,6 @@ extension Package {
 			case core
 			case module(name: String)
 			static let testing: Self = .module(name: "Testing")
-			static let engineToolkit: Self = .module(name: "EngineToolkit")
 			static let radixConnect: Self = .module(name: "RadixConnect")
 			var pathComponent: String {
 				switch self {

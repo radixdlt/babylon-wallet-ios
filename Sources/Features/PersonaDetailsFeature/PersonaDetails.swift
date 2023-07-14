@@ -1,6 +1,7 @@
 import AuthorizedDappsClient
 import CreateAuthKeyFeature
 import EditPersonaFeature
+import EngineKit
 import FeaturePrelude
 import GatewayAPI
 

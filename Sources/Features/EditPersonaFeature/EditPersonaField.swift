@@ -1,6 +1,7 @@
 import FeaturePrelude
 
 // MARK: - EditPersonaFieldID
+// FIXME: Bring back `Comparable` if necessary (alongside `@Sorted(by: \.id)` at `EditPersona.State.dynamicFields`)
 public protocol EditPersonaFieldID: Sendable, Hashable {
 	var title: String { get }
 	#if os(iOS)
@@ -121,6 +122,7 @@ public typealias EditPersonaDynamicField = EditPersonaField<EditPersona.State.Dy
 
 // MARK: - EditPersona.State.DynamicFieldID + EditPersonaFieldID
 extension EditPersona.State.DynamicFieldID: EditPersonaFieldID {
+	// FIXME: Localize
 	public var title: String {
 		switch self {
 		case .name: return "Name"

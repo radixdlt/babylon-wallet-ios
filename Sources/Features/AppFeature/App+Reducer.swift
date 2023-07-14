@@ -1,5 +1,5 @@
 import AppPreferencesClient
-import EngineToolkit
+import EngineKit
 import FeaturePrelude
 import MainFeature
 import OnboardingClient
@@ -92,9 +92,8 @@ public struct App: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .task:
-			if let engineVersion = try? RadixEngine.instance.information().get() {
-				print("EngineToolkit commit hash: \(engineVersion.lastCommitHash), package version: \(engineVersion.packageVersion)")
-			}
+			let retBuildInfo = buildInformation()
+			print("EngineToolkit commit hash: \(retBuildInfo.version)")
 			return .run { send in
 				for try await error in errorQueue.errors() {
 					// Maybe instead we should listen here for the Profile.State change,

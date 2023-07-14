@@ -1,7 +1,7 @@
 import Cryptography
 import CustomDump
 import DeviceFactorSourceClient
-import EngineToolkit
+import EngineKit
 import FactorSourcesClient
 import FeaturePrelude
 import Profile
@@ -12,20 +12,6 @@ import TransactionClient
 extension K1.PublicKey: CustomDumpStringConvertible {
 	public var customDumpDescription: String {
 		self.compressedRepresentation.hex
-	}
-}
-
-// MARK: - CompileTransactionIntentResponse + CustomDumpStringConvertible
-extension CompileTransactionIntentResponse: CustomDumpStringConvertible {
-	public var customDumpDescription: String {
-		compiledIntent.hex
-	}
-}
-
-// MARK: - CompileNotarizedTransactionIntentResponse + CustomDumpStringConvertible
-extension CompileNotarizedTransactionIntentResponse: CustomDumpStringConvertible {
-	public var customDumpDescription: String {
-		compiledIntent.hex
 	}
 }
 
@@ -148,7 +134,7 @@ public struct Signing: Sendable, FeatureReducer {
 
 				return .run { [signatures = state.signatures] send in
 					await send(.internal(.notarizeResult(TaskResult {
-						let intentSignatures: Set<Engine.SignatureWithPublicKey> = try Set(signatures.map {
+						let intentSignatures: Set<EngineToolkit.SignatureWithPublicKey> = try Set(signatures.map {
 							try $0.signatureWithPublicKey.intoEngine()
 						})
 						return try await transactionClient.notarizeTransaction(.init(

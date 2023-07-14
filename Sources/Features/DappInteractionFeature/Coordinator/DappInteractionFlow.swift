@@ -1,7 +1,7 @@
 import AccountsClient
 import AuthorizedDappsClient
 import Cryptography
-import EngineToolkitClient
+import EngineKit
 import FeaturePrelude
 import GatewaysClient
 import PersonasClient
@@ -183,7 +183,6 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 	@Dependency(\.personasClient) var personasClient
 	@Dependency(\.accountsClient) var accountsClient
 	@Dependency(\.authorizedDappsClient) var authorizedDappsClient
-	@Dependency(\.engineToolkitClient) var engineToolkitClient
 
 	func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
@@ -397,7 +396,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 
 		func handleSignAndSubmitTX(
 			_ item: State.AnyInteractionItem,
-			_ txID: TransactionIntent.TXID
+			_ txID: TXID
 		) -> EffectTask<Action> {
 			state.responseItems[item] = .remote(.send(.init(txID: txID)))
 			return continueEffect(for: &state)
@@ -778,10 +777,9 @@ extension DappInteractionFlow.Destinations.State {
 //			}
 
 		case let .remote(.send(item)):
-			@Dependency(\.engineToolkitClient) var engineToolkitClient
 			self = .relayed(anyItem, with: .reviewTransaction(.init(
 				transactionManifest: item.transactionManifest,
-				nonce: engineToolkitClient.generateTXNonce(),
+				nonce: .secureRandom(),
 				signTransactionPurpose: .manifestFromDapp,
 				message: item.message
 			)))

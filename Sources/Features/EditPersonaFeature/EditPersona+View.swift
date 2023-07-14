@@ -48,8 +48,8 @@ extension EditPersona {
 		}
 
 		public var body: some SwiftUI.View {
-			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-				NavigationStack {
+			NavigationStack {
+				WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 					ScrollView(showsIndicators: false) {
 						VStack(spacing: .medium1) {
 							PersonaThumbnail(viewStore.avatarURL, size: .veryLarge)

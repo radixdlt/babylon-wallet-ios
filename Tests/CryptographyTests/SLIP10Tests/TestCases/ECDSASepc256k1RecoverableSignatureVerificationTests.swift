@@ -1,5 +1,4 @@
 import Cryptography
-import EngineToolkit
 import TestingPrelude
 
 final class ECDSASepc256k1RecoverableSignatureVerificationTests: TestCase {
