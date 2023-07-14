@@ -63,3 +63,17 @@ extension RadixConnectClient {
 
 	public typealias SendResponse = @Sendable (_ response: P2P.RTCOutgoingMessage.Response, _ origin: P2P.RTCRoute) async throws -> Void
 }
+
+extension RadixConnectClient {
+	public func idsOfConnectedPeerConnections() async -> [PeerConnectionID] {
+		let connectedClients = await RTCClients().currentlyConnectedClients
+		@Dependency(\.p2pLinksClient) var p2pLinksClient
+
+		let links = await p2pLinksClient.getP2PLinks()
+
+		return connectedClients.flatMap { connectedClient -> [PeerConnectionID] in
+			guard links.contains(where: { $0.id == connectedClient.clientID }) else { return [] }
+			return connectedClient.idsOfConnectedPeerConnections
+		}
+	}
+}
