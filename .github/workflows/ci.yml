@@ -50,6 +50,8 @@ jobs:
       - name: Generate SBOM # check SBOM can be generated but nothing is done with it
         run: |
           snyk sbom --debug --all-projects --org=${{ secrets.SNYK_ORG_ID }} --format=cyclonedx1.4+json --json-file-output sbom.json
+        env:
+          GIT_TOKEN: ${{ secrets.RADIX_BOT_PAT }}
 
   linting:
     name: "Linting"
