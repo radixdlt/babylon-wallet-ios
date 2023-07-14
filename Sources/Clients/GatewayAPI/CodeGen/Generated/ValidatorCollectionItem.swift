@@ -19,24 +19,32 @@ public struct ValidatorCollectionItem: Codable, Hashable {
 
     /** Bech32m-encoded human readable version of the address. */
     public private(set) var address: String
+    public private(set) var stakeVault: ValidatorVaultItem
+    public private(set) var pendingXrdWithdrawVault: ValidatorVaultItem
+    public private(set) var lockedOwnerStakeUnitVault: ValidatorVaultItem
+    public private(set) var pendingOwnerStakeUnitUnlockVault: ValidatorVaultItem
     public private(set) var state: AnyCodable?
-    /** String-encoded decimal representing the amount of a related fungible resource. */
-    public private(set) var currentStake: String
     public private(set) var activeInEpoch: ValidatorCollectionItemActiveInEpoch?
     public private(set) var metadata: EntityMetadataCollection
 
-    public init(address: String, state: AnyCodable? = nil, currentStake: String, activeInEpoch: ValidatorCollectionItemActiveInEpoch? = nil, metadata: EntityMetadataCollection) {
+    public init(address: String, stakeVault: ValidatorVaultItem, pendingXrdWithdrawVault: ValidatorVaultItem, lockedOwnerStakeUnitVault: ValidatorVaultItem, pendingOwnerStakeUnitUnlockVault: ValidatorVaultItem, state: AnyCodable? = nil, activeInEpoch: ValidatorCollectionItemActiveInEpoch? = nil, metadata: EntityMetadataCollection) {
         self.address = address
+        self.stakeVault = stakeVault
+        self.pendingXrdWithdrawVault = pendingXrdWithdrawVault
+        self.lockedOwnerStakeUnitVault = lockedOwnerStakeUnitVault
+        self.pendingOwnerStakeUnitUnlockVault = pendingOwnerStakeUnitUnlockVault
         self.state = state
-        self.currentStake = currentStake
         self.activeInEpoch = activeInEpoch
         self.metadata = metadata
     }
 
     public enum CodingKeys: String, CodingKey, CaseIterable {
         case address
+        case stakeVault = "stake_vault"
+        case pendingXrdWithdrawVault = "pending_xrd_withdraw_vault"
+        case lockedOwnerStakeUnitVault = "locked_owner_stake_unit_vault"
+        case pendingOwnerStakeUnitUnlockVault = "pending_owner_stake_unit_unlock_vault"
         case state
-        case currentStake = "current_stake"
         case activeInEpoch = "active_in_epoch"
         case metadata
     }
@@ -46,8 +54,11 @@ public struct ValidatorCollectionItem: Codable, Hashable {
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(address, forKey: .address)
+        try container.encode(stakeVault, forKey: .stakeVault)
+        try container.encode(pendingXrdWithdrawVault, forKey: .pendingXrdWithdrawVault)
+        try container.encode(lockedOwnerStakeUnitVault, forKey: .lockedOwnerStakeUnitVault)
+        try container.encode(pendingOwnerStakeUnitUnlockVault, forKey: .pendingOwnerStakeUnitUnlockVault)
         try container.encodeIfPresent(state, forKey: .state)
-        try container.encode(currentStake, forKey: .currentStake)
         try container.encodeIfPresent(activeInEpoch, forKey: .activeInEpoch)
         try container.encode(metadata, forKey: .metadata)
     }

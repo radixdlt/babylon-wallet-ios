@@ -18,8 +18,7 @@ extension GatewayAPI {
 public struct StateEntityDetailsResponseNonFungibleResourceDetails: Codable, Hashable {
 
     public private(set) var type: StateEntityDetailsResponseItemDetailsType
-    public private(set) var accessRulesChain: AnyCodable
-    public private(set) var vaultAccessRulesChain: AnyCodable
+    public private(set) var accessRules: ComponentEntityAccessRules
     public private(set) var nonFungibleIdType: NonFungibleIdType
     /** String-encoded decimal representing the amount of a related fungible resource. */
     public private(set) var totalSupply: String
@@ -28,10 +27,9 @@ public struct StateEntityDetailsResponseNonFungibleResourceDetails: Codable, Has
     /** String-encoded decimal representing the amount of a related fungible resource. */
     public private(set) var totalBurned: String
 
-    public init(type: StateEntityDetailsResponseItemDetailsType, accessRulesChain: AnyCodable, vaultAccessRulesChain: AnyCodable, nonFungibleIdType: NonFungibleIdType, totalSupply: String, totalMinted: String, totalBurned: String) {
+    public init(type: StateEntityDetailsResponseItemDetailsType, accessRules: ComponentEntityAccessRules, nonFungibleIdType: NonFungibleIdType, totalSupply: String, totalMinted: String, totalBurned: String) {
         self.type = type
-        self.accessRulesChain = accessRulesChain
-        self.vaultAccessRulesChain = vaultAccessRulesChain
+        self.accessRules = accessRules
         self.nonFungibleIdType = nonFungibleIdType
         self.totalSupply = totalSupply
         self.totalMinted = totalMinted
@@ -40,8 +38,7 @@ public struct StateEntityDetailsResponseNonFungibleResourceDetails: Codable, Has
 
     public enum CodingKeys: String, CodingKey, CaseIterable {
         case type
-        case accessRulesChain = "access_rules_chain"
-        case vaultAccessRulesChain = "vault_access_rules_chain"
+        case accessRules = "access_rules"
         case nonFungibleIdType = "non_fungible_id_type"
         case totalSupply = "total_supply"
         case totalMinted = "total_minted"
@@ -53,8 +50,7 @@ public struct StateEntityDetailsResponseNonFungibleResourceDetails: Codable, Has
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(type, forKey: .type)
-        try container.encode(accessRulesChain, forKey: .accessRulesChain)
-        try container.encode(vaultAccessRulesChain, forKey: .vaultAccessRulesChain)
+        try container.encode(accessRules, forKey: .accessRules)
         try container.encode(nonFungibleIdType, forKey: .nonFungibleIdType)
         try container.encode(totalSupply, forKey: .totalSupply)
         try container.encode(totalMinted, forKey: .totalMinted)

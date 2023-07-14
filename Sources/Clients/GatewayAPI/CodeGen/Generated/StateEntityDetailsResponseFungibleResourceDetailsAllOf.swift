@@ -17,8 +17,8 @@ extension GatewayAPI {
 
 public struct StateEntityDetailsResponseFungibleResourceDetailsAllOf: Codable, Hashable {
 
-    public private(set) var accessRulesChain: AnyCodable
-    public private(set) var vaultAccessRulesChain: AnyCodable
+    static let divisibilityRule = NumericRule<Int>(minimum: 0, exclusiveMinimum: false, maximum: nil, exclusiveMaximum: false, multipleOf: nil)
+    public private(set) var accessRules: ComponentEntityAccessRules
     public private(set) var divisibility: Int
     /** String-encoded decimal representing the amount of a related fungible resource. */
     public private(set) var totalSupply: String
@@ -27,9 +27,8 @@ public struct StateEntityDetailsResponseFungibleResourceDetailsAllOf: Codable, H
     /** String-encoded decimal representing the amount of a related fungible resource. */
     public private(set) var totalBurned: String
 
-    public init(accessRulesChain: AnyCodable, vaultAccessRulesChain: AnyCodable, divisibility: Int, totalSupply: String, totalMinted: String, totalBurned: String) {
-        self.accessRulesChain = accessRulesChain
-        self.vaultAccessRulesChain = vaultAccessRulesChain
+    public init(accessRules: ComponentEntityAccessRules, divisibility: Int, totalSupply: String, totalMinted: String, totalBurned: String) {
+        self.accessRules = accessRules
         self.divisibility = divisibility
         self.totalSupply = totalSupply
         self.totalMinted = totalMinted
@@ -37,8 +36,7 @@ public struct StateEntityDetailsResponseFungibleResourceDetailsAllOf: Codable, H
     }
 
     public enum CodingKeys: String, CodingKey, CaseIterable {
-        case accessRulesChain = "access_rules_chain"
-        case vaultAccessRulesChain = "vault_access_rules_chain"
+        case accessRules = "access_rules"
         case divisibility
         case totalSupply = "total_supply"
         case totalMinted = "total_minted"
@@ -49,8 +47,7 @@ public struct StateEntityDetailsResponseFungibleResourceDetailsAllOf: Codable, H
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(accessRulesChain, forKey: .accessRulesChain)
-        try container.encode(vaultAccessRulesChain, forKey: .vaultAccessRulesChain)
+        try container.encode(accessRules, forKey: .accessRules)
         try container.encode(divisibility, forKey: .divisibility)
         try container.encode(totalSupply, forKey: .totalSupply)
         try container.encode(totalMinted, forKey: .totalMinted)

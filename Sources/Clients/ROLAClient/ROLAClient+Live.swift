@@ -173,7 +173,7 @@ func payloadToHash(
 	)
 }
 
-extension PublicKeyHash {
+extension EngineKit.PublicKeyHash {
 	public struct InvalidPublicKeyHashLength: Error {
 		public let got: Int
 		public let expected: Int

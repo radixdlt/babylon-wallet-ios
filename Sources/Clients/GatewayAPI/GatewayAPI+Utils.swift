@@ -46,6 +46,7 @@ extension GatewayAPI.StateEntityDetailsResponseItemDetails {
 
 extension GatewayAPI.EntityMetadataCollection {
 	public var name: String? {
+                items
 		items[.name]?.asString
 	}
 

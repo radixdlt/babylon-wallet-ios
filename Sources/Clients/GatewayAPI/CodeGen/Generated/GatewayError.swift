@@ -15,54 +15,24 @@ public typealias GatewayError = GatewayAPI.GatewayError
 
 extension GatewayAPI {
 
-public enum GatewayError: Codable, JSONEncodable, Hashable {
-    case typeAnyCodable(AnyCodable)
-    case typeEntityNotFoundError(EntityNotFoundError)
-    case typeInternalServerError(InternalServerError)
-    case typeInvalidEntityError(InvalidEntityError)
-    case typeInvalidRequestError(InvalidRequestError)
-    case typeNotSyncedUpError(NotSyncedUpError)
-    case typeTransactionNotFoundError(TransactionNotFoundError)
+public struct GatewayError: Codable, Hashable {
 
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.singleValueContainer()
-        switch self {
-        case .typeAnyCodable(let value):
-            try container.encode(value)
-        case .typeEntityNotFoundError(let value):
-            try container.encode(value)
-        case .typeInternalServerError(let value):
-            try container.encode(value)
-        case .typeInvalidEntityError(let value):
-            try container.encode(value)
-        case .typeInvalidRequestError(let value):
-            try container.encode(value)
-        case .typeNotSyncedUpError(let value):
-            try container.encode(value)
-        case .typeTransactionNotFoundError(let value):
-            try container.encode(value)
-        }
+    /** The type of error. Each subtype may have its own additional structured fields. */
+    public private(set) var type: String
+
+    public init(type: String) {
+        self.type = type
     }
 
-    public init(from decoder: Decoder) throws {
-        let container = try decoder.singleValueContainer()
-        if let value = try? container.decode(AnyCodable.self) {
-            self = .typeAnyCodable(value)
-        } else if let value = try? container.decode(EntityNotFoundError.self) {
-            self = .typeEntityNotFoundError(value)
-        } else if let value = try? container.decode(InternalServerError.self) {
-            self = .typeInternalServerError(value)
-        } else if let value = try? container.decode(InvalidEntityError.self) {
-            self = .typeInvalidEntityError(value)
-        } else if let value = try? container.decode(InvalidRequestError.self) {
-            self = .typeInvalidRequestError(value)
-        } else if let value = try? container.decode(NotSyncedUpError.self) {
-            self = .typeNotSyncedUpError(value)
-        } else if let value = try? container.decode(TransactionNotFoundError.self) {
-            self = .typeTransactionNotFoundError(value)
-        } else {
-            throw DecodingError.typeMismatch(Self.Type.self, .init(codingPath: decoder.codingPath, debugDescription: "Unable to decode instance of GatewayError"))
-        }
+    public enum CodingKeys: String, CodingKey, CaseIterable {
+        case type
+    }
+
+    // Encodable protocol methods
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(type, forKey: .type)
     }
 }
 
