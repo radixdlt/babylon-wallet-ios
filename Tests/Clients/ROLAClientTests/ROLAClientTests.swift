@@ -1,6 +1,7 @@
 import CacheClient
 import ClientTestingPrelude
 import Cryptography
+import EngineKit
 import GatewayAPI
 @testable import ROLAClient
 

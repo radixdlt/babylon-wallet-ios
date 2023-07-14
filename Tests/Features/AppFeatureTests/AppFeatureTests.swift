@@ -1,4 +1,5 @@
 @testable import AppFeature
+import EngineKit
 import FeatureTestingPrelude
 import OnboardingClient
 import OnboardingFeature

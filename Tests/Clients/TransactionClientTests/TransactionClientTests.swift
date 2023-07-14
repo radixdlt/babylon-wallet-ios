@@ -1,5 +1,6 @@
 import ClientPrelude
 import CryptoKit
+import EngineKit
 import GatewaysClient
 import Profile
 import TestingPrelude
@@ -8,33 +9,38 @@ import TransactionClient
 // MARK: - TransactionClientTests
 final class TransactionClientTests: TestCase {
 	func test_accountsSuitableToPayTXFee_CREATE_FUNGIBLE_RESOURCE_then_deposit_batch() async throws {
-		let transactionManifest = TransactionManifest(instructions: .string(
-			"""
-			                           CREATE_FUNGIBLE_RESOURCE
-			                           18u8
-			                           Map<String, Enum>(
-			                             "name" =>  Enum<Metadata::String>("MyResource"),                                        # Resource Name
-			                             "symbol" => Enum<Metadata::String>("RSRC"),                                            # Resource Symbol
-			                             "description" => Enum<Metadata::String>("A very innovative and important resource")    # Resource Description
-			                           )
-			                           Map<Enum, Tuple>(
-			                            Enum<ResourceMethodAuthKey::Withdraw>() => Tuple(Enum<AccessRule::AllowAll>(), Enum<AccessRule::DenyAll>()),
-			                            Enum<ResourceMethodAuthKey::Deposit>() => Tuple(Enum<AccessRule::AllowAll>(), Enum<AccessRule::DenyAll>())
-			                           );
+		let transactionManifest = try TransactionManifest(
+			instructions: .fromString(
+				string:
+				"""
+				                           CREATE_FUNGIBLE_RESOURCE
+				                           18u8
+				                           Map<String, Enum>(
+				                             "name" =>  Enum<Metadata::String>("MyResource"),                                        # Resource Name
+				                             "symbol" => Enum<Metadata::String>("RSRC"),                                            # Resource Symbol
+				                             "description" => Enum<Metadata::String>("A very innovative and important resource")    # Resource Description
+				                           )
+				                           Map<Enum, Tuple>(
+				                            Enum<ResourceMethodAuthKey::Withdraw>() => Tuple(Enum<AccessRule::AllowAll>(), Enum<AccessRule::DenyAll>()),
+				                            Enum<ResourceMethodAuthKey::Deposit>() => Tuple(Enum<AccessRule::AllowAll>(), Enum<AccessRule::DenyAll>())
+				                           );
 
 
-			                           CALL_METHOD
-			                               Address("account_sim1cyvgx33089ukm2pl97pv4max0x40ruvfy4lt60yvya744cve475w0q")
-			                               "deposit_batch"
-			                               Expression("ENTIRE_WORKTOP");
-			"""
-		))
+				                           CALL_METHOD
+				                               Address("account_tdx_21_12ya9jylskaa6gdrfr8nvve3pfc6wyhyw7eg83fwlc7fv2w0eanumcd")
+				                               "deposit_batch"
+				                               Expression("ENTIRE_WORKTOP");
+				""",
+				blobs: [],
+				networkId: NetworkID.default.rawValue
+			),
+			blobs: []
+		)
 
 		let sut = TransactionClient.liveValue
-		let expectedAccount = Profile.Network.Account.new(address: "account_sim1cyvgx33089ukm2pl97pv4max0x40ruvfy4lt60yvya744cve475w0q")
+		let expectedAccount = Profile.Network.Account.new(address: "account_tdx_21_12ya9jylskaa6gdrfr8nvve3pfc6wyhyw7eg83fwlc7fv2w0eanumcd")
 		try await withDependencies({
 			$0.gatewaysClient.getCurrentGateway = { Radix.Gateway.simulator }
-			$0.engineToolkitClient.analyzeManifest = { try EngineToolkitClient.liveValue.analyzeManifest($0) }
 			$0.accountsClient.getAccountsOnNetwork = { _ in Profile.Network.Accounts(rawValue: .init(uncheckedUniqueElements: [expectedAccount]))! }
 			$0.accountPortfoliosClient.fetchAccountPortfolios = { addresses, _ in try addresses.map {
 				try .init(
@@ -42,15 +48,13 @@ final class TransactionClientTests: TestCase {
 					isDappDefintionAccountType: false,
 					fungibleResources: .init(
 						xrdResource: .init(
-							resourceAddress: .init(validatingAddress: "resource_sim1thvwu8dh6lk4y9mntemkvj25wllq8adq42skzufp4m8wxxuemugnez"),
+							resourceAddress: .init(validatingAddress: "resource_tdx_21_1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxsmgder"),
 							amount: 11
 						)
 					),
 					nonFungibleResources: []
 				)
 			} }
-			$0.engineToolkitClient.getTransactionVersion = { .default }
-			$0.engineToolkitClient.convertManifestInstructionsToJSONIfItWasString = EngineToolkitClient.liveValue.convertManifestInstructionsToJSONIfItWasString
 		}, operation: {
 			let res = try await sut.lockFeeBySearchingForSuitablePayer(transactionManifest, 10)
 			switch res {
