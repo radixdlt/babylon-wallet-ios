@@ -17,7 +17,6 @@ extension GatewayAPI {
 
 public struct StateEntityDetailsResponseFungibleResourceDetailsAllOf: Codable, Hashable {
 
-    static let divisibilityRule = NumericRule<Int>(minimum: 0, exclusiveMinimum: false, maximum: nil, exclusiveMaximum: false, multipleOf: nil)
     public private(set) var accessRules: ComponentEntityAccessRules
     public private(set) var divisibility: Int
     /** String-encoded decimal representing the amount of a related fungible resource. */

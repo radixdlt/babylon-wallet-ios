@@ -10,14 +10,17 @@ import Foundation
 import AnyCodable
 #endif
 
+@available(*, deprecated, renamed: "GatewayAPI.PublicKey")
+public typealias PublicKey = GatewayAPI.PublicKey
+
 // MARK: - GatewayAPI.PublicKey
 extension GatewayAPI {
-        public enum PublicKeyHash: Codable, Hashable {
-                case ecdsaSecp256k1(PublicKeyHashEcdsaSecp256k1)
-                case eddsaEd25519(PublicKeyHashEddsaEd25519)
+        public enum PublicKey: Codable, Hashable {
+                case ecdsaSecp256k1(PublicKeyEcdsaSecp256k1)
+                case eddsaEd25519(PublicKeyEddsaEd25519)
 
                 public enum CodingKeys: String, CodingKey, CaseIterable {
-                        case keyType = "key_hash_type"
+                        case keyType = "key_type"
                 }
 
                 public init(from decoder: Decoder) throws {

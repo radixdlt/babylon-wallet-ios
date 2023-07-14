@@ -29,12 +29,7 @@ extension GatewayAPI.TransactionPreviewRequest {
 		header: TransactionHeader,
 		transactionSigners: TransactionSigners
 	) throws {
-		let flags = GatewayAPI.TransactionPreviewRequestFlags(
-			unlimitedLoan: true, // True since no lock fee is added
-			assumeAllSignatureProofs: false,
-			permitDuplicateIntentHash: false,
-			permitInvalidHeaderEpoch: false
-		)
+		let flags = GatewayAPI.TransactionPreviewRequestFlags(useFreeCredit: true, assumeAllSignatureProofs: false, skipEpochCheck: false)
 
 		struct NotaryIsSignatoryDiscrepancy: Swift.Error {}
 		guard transactionSigners.notaryIsSignatory == header.notaryIsSignatory else {

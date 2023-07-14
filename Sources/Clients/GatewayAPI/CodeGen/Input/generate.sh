@@ -42,6 +42,7 @@ rm ../Generated/NonFungibleResourcesCollectionItem.swift
 rm ../Generated/StateEntityDetailsResponseItemDetails.swift
 rm ../Generated/PublicKey.swift
 rm ../Generated/MetadataTypedValue.swift
+rm ../Generated/PublicKeyHash.swift
 
 cd $OUTPUTDIR
 find $PROJECT_NAME -type f -not -name 'Configuration.swift' \
@@ -50,6 +51,7 @@ find $PROJECT_NAME -type f -not -name 'Configuration.swift' \
 -not -name 'StateEntityDetailsResponseItemDetails.swift' \
 -not -name 'PublicKey.swift' \
 -not -name 'MetadataTypedValue.swift' \
+-not -name 'PublicKeyHash.swift' \
 -delete
 
 rm -r docs Cartfile git_push.sh $PROJECT_NAME.podspec Package.swift project.yml README.md .gitignore .openapi-generator-ignore .swiftformat .openapi-generator/FILES  .openapi-generator/VERSION
