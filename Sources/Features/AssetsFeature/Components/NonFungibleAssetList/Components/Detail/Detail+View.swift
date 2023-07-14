@@ -5,7 +5,7 @@ extension NonFungibleAssetList.Detail.State {
 	var viewState: NonFungibleAssetList.Detail.ViewState {
 		.init(
 			keyImage: token.keyImageURL,
-			nonFungibleGlobalID: try! resource.nftGlobalID(for: token.id),
+			nonFungibleGlobalID: resource.nftGlobalID(for: token.id),
 			name: token.name,
 			description: token.description,
 			resourceName: resource.name,

@@ -481,7 +481,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		var indexInc = 1 // LockFee was added, start from 1
 		for guarantee in guarantees {
 			let guaranteeInstruction: Instruction = try .assertWorktopContains(
-				resourceAddress: guarantee.resourceAddress.toEngine(),
+				resourceAddress: guarantee.resourceAddress.intoEngine(),
 				amount: .init(value: guarantee.amount.toString())
 			)
 

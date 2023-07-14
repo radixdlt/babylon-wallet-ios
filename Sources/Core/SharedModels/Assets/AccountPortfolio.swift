@@ -124,20 +124,14 @@ extension AccountPortfolio {
 }
 
 extension AccountPortfolio.NonFungibleResource {
-	public func nftGlobalID(for id: NonFungibleToken.LocalID) throws -> GlobalID {
-		try resourceAddress.nftGlobalId(id).formatted
-	}
-}
-
-extension NonFungibleGlobalId {
-	public var formatted: String {
-		asStr()
+	public func nftGlobalID(for id: NonFungibleToken.LocalID) -> GlobalID {
+		resourceAddress.nftGlobalId(id)
 	}
 }
 
 extension ResourceAddress {
-	public func nftGlobalId(_ localID: AccountPortfolio.NonFungibleResource.NonFungibleToken.LocalID) throws -> NonFungibleGlobalId {
-		try .fromParts(resourceAddress: self.toEngine(), nonFungibleLocalId: .from(stringFormat: localID.rawValue))
+	public func nftGlobalId(_ localID: AccountPortfolio.NonFungibleResource.NonFungibleToken.LocalID) -> String {
+		address + ":" + localID.rawValue
 	}
 }
 

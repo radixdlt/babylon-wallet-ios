@@ -41,7 +41,7 @@ extension TransactionHeader {
 		startEpochInclusive: \(String(describing: startEpochInclusive)),
 		endEpochExclusive: \(String(describing: endEpochExclusive)),
 		nonce: \(String(describing: nonce)),
-		                notaryPublicKey: \(notaryPublicKey.bytes.hex()),
+		notaryPublicKey: \(notaryPublicKey.bytes.hex()),
 		notaryIsSignatory: \(String(describing: notaryIsSignatory)),
 		tipPercentage: \(String(describing: tipPercentage)),
 		"""

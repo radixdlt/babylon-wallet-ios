@@ -186,7 +186,7 @@ extension SpecificAddress {
 }
 
 extension SpecificAddress {
-	public func toEngine() throws -> EngineToolkit.Address {
+	public func intoEngine() throws -> EngineToolkit.Address {
 		try .init(address: address)
 	}
 }
