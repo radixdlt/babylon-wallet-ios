@@ -1,5 +1,6 @@
 import ClientPrelude
 import Cryptography
+import EngineKit
 import GatewaysClient
 
 // MARK: - Date + Sendable

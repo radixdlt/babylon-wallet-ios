@@ -1,5 +1,4 @@
 import Cryptography
-import EngineToolkit
 import Prelude
 
 // MARK: - SLIP10.PublicKey + Codable

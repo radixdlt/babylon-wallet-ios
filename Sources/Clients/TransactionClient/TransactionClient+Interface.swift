@@ -1,16 +1,12 @@
 import ClientPrelude
 import Cryptography
-import EngineToolkitClient
+import EngineKit
 import FactorSourcesClient
 
 // MARK: - TransactionClient
 public struct TransactionClient: Sendable, DependencyKey {
-	public var convertManifestInstructionsToJSONIfItWasString: ConvertManifestInstructionsToJSONIfItWasString
-	public var convertManifestToString: ConvertManifestToString
 	public var lockFeeBySearchingForSuitablePayer: LockFeeBySearchingForSuitablePayer
 	public var lockFeeWithSelectedPayer: LockFeeWithSelectedPayer
-	public var addInstructionToManifest: AddInstructionToManifest
-	public var addGuaranteesToManifest: AddGuaranteesToManifest
 	public var getTransactionReview: GetTransactionReview
 	public var buildTransactionIntent: BuildTransactionIntent
 	public var notarizeTransaction: NotarizeTransaction
@@ -20,12 +16,8 @@ public struct TransactionClient: Sendable, DependencyKey {
 
 // MARK: TransactionClient.SignAndSubmitTransaction
 extension TransactionClient {
-	public typealias AddInstructionToManifest = @Sendable (AddInstructionToManifestRequest) async throws -> TransactionManifest
 	public typealias LockFeeBySearchingForSuitablePayer = @Sendable (TransactionManifest, _ fee: BigDecimal) async throws -> AddFeeToManifestOutcome
 	public typealias LockFeeWithSelectedPayer = @Sendable (TransactionManifest, _ fee: BigDecimal, _ payer: AccountAddress) async throws -> TransactionManifest
-	public typealias AddGuaranteesToManifest = @Sendable (TransactionManifest, [Guarantee]) async throws -> TransactionManifest
-	public typealias ConvertManifestInstructionsToJSONIfItWasString = @Sendable (TransactionManifest) async throws -> JSONInstructionsTransactionManifest
-	public typealias ConvertManifestToString = @Sendable (TransactionManifest) async throws -> TransactionManifest
 
 	public typealias GetTransactionReview = @Sendable (ManifestReviewRequest) async throws -> TransactionToReview
 	public typealias BuildTransactionIntent = @Sendable (BuildTransactionIntentRequest) async throws -> TransactionIntentWithSigners
@@ -62,14 +54,6 @@ public struct AddInstructionToManifestRequest: Sendable, Hashable {
 		self.manifest = manifest
 		self.location = location
 	}
-
-	public init(
-		_ instruction: any InstructionProtocol,
-		to manifest: TransactionManifest,
-		at location: AddInstructionToManifestLocation
-	) {
-		self.init(instruction: instruction.embed(), to: manifest, at: location)
-	}
 }
 
 extension TransactionClient {
@@ -80,7 +64,7 @@ extension TransactionClient {
 		public let networkID: NetworkID
 		public let purpose: SigningPurpose
 
-		public var compiledIntent: CompileTransactionIntentResponse? = nil
+		public var compiledIntent: [UInt8]? = nil
 		public let ephemeralNotaryPublicKey: Curve25519.Signing.PublicKey
 
 		public init(

@@ -23,13 +23,14 @@ extension TransactionReview.State {
 			viewControlState: viewControlState,
 			showDottedLine: (withdrawals != nil || message != nil) && deposits != nil,
 			rawTransaction: displayMode.rawTransaction,
-			showApproveButton: transactionWithLockFee != nil,
-			canApproveTX: canApproveTX
+			showApproveButton: transactionManifestWithLockFee != nil,
+			canApproveTX: canApproveTX,
+			canToggleViewMode: reviewedTransaction != nil && reviewedTransaction != .nonConforming
 		)
 	}
 
 	private var viewControlState: ControlState {
-		if transactionWithLockFee == nil {
+		if transactionManifestWithLockFee == nil {
 			return .loading(.global(text: L10n.TransactionSigning.preparingTransaction))
 		} else {
 			return .enabled
@@ -48,6 +49,7 @@ extension TransactionReview {
 		let rawTransaction: String?
 		let showApproveButton: Bool
 		let canApproveTX: Bool
+		let canToggleViewMode: Bool
 	}
 
 	@MainActor
@@ -67,11 +69,13 @@ extension TransactionReview {
 					.navigationTitle(L10n.TransactionReview.title)
 					.toolbar {
 						ToolbarItem(placement: .automatic) {
-							Button(asset: AssetResource.code) {
-								viewStore.send(.showRawTransactionTapped)
+							if viewStore.canToggleViewMode {
+								Button(asset: AssetResource.code) {
+									viewStore.send(.showRawTransactionTapped)
+								}
+								.buttonStyle(.secondaryRectangular(isInToolbar: true))
+								.brightness(viewStore.rawTransaction == nil ? 0 : -0.15)
 							}
-							.buttonStyle(.secondaryRectangular(isInToolbar: true))
-							.brightness(viewStore.rawTransaction == nil ? 0 : -0.15)
 						}
 					}
 					.destinations(with: store)
@@ -122,7 +126,7 @@ extension TransactionReview {
 						.padding(.bottom, .medium1)
 					}
 				}
-				.animation(.easeInOut, value: viewStore.rawTransaction)
+				.animation(.easeInOut, value: viewStore.canToggleViewMode ? viewStore.rawTransaction : nil)
 				.padding(.horizontal, .medium3)
 			}
 		}

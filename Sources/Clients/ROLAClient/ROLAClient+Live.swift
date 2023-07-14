@@ -2,7 +2,7 @@ import CacheClient
 import ClientPrelude
 import Cryptography
 import DeviceFactorSourceClient
-import EngineToolkitClient
+import EngineKit
 import GatewayAPI
 import RegexBuilder
 
@@ -13,7 +13,6 @@ extension ROLAClient {
 		@Dependency(\.deviceFactorSourceClient) var deviceFactorSourceClient
 
 		let manifestForAuthKeyCreation: ManifestForAuthKeyCreation = { request in
-			@Dependency(\.engineToolkitClient) var engineToolkitClient
 			let entity = request.entity
 			let newPublicKey = request.newPublicKey
 
@@ -44,41 +43,7 @@ extension ROLAClient {
 			}
 
 			loggerGlobal.notice("Setting ownerKeyHashes to: \(ownerKeyHashes)")
-
-			let arrayOfEngineToolkitBytesValues: [ManifestASTValue] = try ownerKeyHashes.map { hash in
-				try ManifestASTValue.enum(
-					.init(hash.curveKindScryptoDiscriminator, fields: [.bytes(hash.bytes())])
-				)
-			}
-
-			// # Set List Metadata on Resource
-			// https://github.com/radixdlt/radixdlt-scrypto/blob/main/transaction/examples/metadata/metadata.rtm#L97-L101
-			let setMetadataInstruction = try SetMetadata(
-				entityAddress: entityAddress,
-				key: SetMetadata.ownerKeysKey,
-				value: Enum(
-					.metadata_PublicKeyHashArray,
-					fields: [.array(.init(
-						elementKind: .enum,
-						elements: arrayOfEngineToolkitBytesValues
-					)
-					)]
-				)
-			)
-
-			let manifestParsed = TransactionManifest(
-				instructions: [
-					.setMetadata(setMetadataInstruction),
-				]
-			)
-
-			let manifestString = try engineToolkitClient.convertManifestToString(.init(
-				version: .default,
-				networkID: entity.networkID,
-				manifest: manifestParsed
-			))
-
-			return manifestString
+			return try .manifestForOwnerKeys(address: entityAddress.address, keyHashes: ownerKeyHashes, networkID: entity.networkID)
 		}
 
 		return Self(
@@ -220,17 +185,16 @@ extension PublicKeyHash {
 		let hashBytes = try blake2b(data: publicKey.compressedData).suffix(Self.hashLength)
 
 		guard
-			hashBytes.count == Self.hashLength,
-			let hex = String(hashBytes.hex)
+			hashBytes.count == Self.hashLength
 		else {
 			throw InvalidPublicKeyHashLength(got: hashBytes.count, expected: Self.hashLength)
 		}
 
 		switch publicKey {
 		case .ecdsaSecp256k1:
-			self = .ecdsaSecp256k1(hex)
+			self = .ecdsaSecp256k1(value: hashBytes.bytes)
 		case .eddsaEd25519:
-			self = .eddsaEd25519(hex)
+			self = .eddsaEd25519(value: hashBytes.bytes)
 		}
 	}
 }
@@ -239,7 +203,7 @@ extension GatewayAPI.EntityMetadataCollection {
 	// FIXME: change to using hashes, which will happen... soon. Which will clean up this
 	// terrible parsing mess.
 	public func ownerKeyHashes() throws -> [PublicKeyHash]? {
-		guard let response = items[customKey: SetMetadata.ownerKeysKey]?.asStringCollection else {
+		guard let response = items[customKey: "owner_keys"]?.asStringCollection else {
 			return nil
 		}
 
@@ -269,27 +233,14 @@ extension GatewayAPI.EntityMetadataCollection {
 
 			let (_, hashType, hash) = output
 
+			let bytes = try [UInt8].init(hex: String(hash))
 			if hashType == curve25519Prefix {
-				return .eddsaEd25519(String(hash))
+				return .eddsaEd25519(value: bytes)
 			} else if hashType == secp256k1Prefix {
-				return .ecdsaSecp256k1(String(hash))
+				return .ecdsaSecp256k1(value: bytes)
 			} else {
 				return nil
 			}
 		}
-	}
-}
-
-extension PublicKeyHash {
-	/// https://rdxworks.slack.com/archives/C031A0V1A1W/p1683275008777499?thread_ts=1683221252.228129&cid=C031A0V1A1W
-	var curveKindScryptoDiscriminator: EnumDiscriminator {
-		switch self {
-		case .ecdsaSecp256k1: return .string(.publicKeyHash_Secp256k1)
-		case .eddsaEd25519: return .string(.publicKeyHash_Ed25519)
-		}
-	}
-
-	func bytes() throws -> Bytes {
-		try Bytes(hex: hash)
 	}
 }

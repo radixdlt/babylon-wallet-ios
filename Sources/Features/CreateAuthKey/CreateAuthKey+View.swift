@@ -28,7 +28,12 @@ extension CreateAuthKey {
 					CaseLet(
 						state: /CreateAuthKey.State.Step.transactionReview,
 						action: { CreateAuthKey.Action.child(.transactionReview($0)) },
-						then: { TransactionReview.View(store: $0) }
+						then: { store in
+							// FIXME: CreateAuthKey should use DappInteractionClient to schedule a transaction!!!
+							NavigationView {
+								TransactionReview.View(store: store)
+							}
+						}
 					)
 				}
 			}

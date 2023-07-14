@@ -1,3 +1,4 @@
+import EngineKit
 @testable import SharedModels
 import TestingPrelude
 
@@ -141,7 +142,7 @@ final class ToDappResponseTests: TestCase {
 				items: .transaction(.init(
 					send: .init(
 						version: 1,
-						transactionManifest: .init(instructions: .string("")),
+						transactionManifest: .init(instructions: .fromInstructions(instructions: [], networkId: NetworkID.default.rawValue), blobs: []),
 						message: "MSG"
 					)
 				)),

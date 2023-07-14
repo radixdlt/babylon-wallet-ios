@@ -1,5 +1,6 @@
 import AsyncExtensions
 import ClientPrelude
+import EngineKit
 import SharedModels
 
 // MARK: - DappInteractionClient

@@ -1,5 +1,6 @@
 import ClientPrelude
 import Cryptography
+import EngineKit
 
 // MARK: - GatewayAPIClient + TestDependencyKey
 extension GatewayAPIClient: TestDependencyKey {
