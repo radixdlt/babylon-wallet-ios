@@ -11,6 +11,7 @@ extension EditPersona {
 
 extension PersonaData.Entry {
 	var text: String {
+		// FIXME: Use proper values and granularity (Entry-, instead of Field-level) when Entry types will be supported
 		switch self {
 		case let .name(entryModel): return entryModel.description
 		case let .dateOfBirth(entryModel): return entryModel.description
