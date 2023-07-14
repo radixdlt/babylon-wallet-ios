@@ -23,37 +23,21 @@ extension AddLedgerFactorSource {
 		public var body: some SwiftUI.View {
 			NavigationStack {
 				WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-					ScrollView(showsIndicators: false) {
-						VStack(spacing: 0) {
-							Image(asset: AssetResource.iconHardwareLedger)
-								.resizable()
-								.frame(.huge)
-								.padding(.top, .huge2)
-								.padding(.bottom, .huge1)
-
-							Text(L10n.AddLedgerDevice.AddDevice.title)
-								.textStyle(.sheetTitle)
-								.padding(.bottom, .large3)
-
-							Text(L10n.AddLedgerDevice.AddDevice.body1)
-								.textStyle(.body1Regular)
-								.padding(.horizontal, .large3)
-								.padding(.bottom, .medium2)
-
-							Text(L10n.AddLedgerDevice.AddDevice.body2)
-								.textStyle(.body1Regular)
-								.padding(.horizontal, .large3)
-								.padding(.bottom, .small1)
+					VStack(spacing: 0) {
+						ViewThatFits(in: .vertical) {
+							InnerView(small: false)
+							InnerView(small: true)
 						}
-						.multilineTextAlignment(.center)
-						.foregroundColor(.app.gray1)
-					}
-					.footer {
+
+						Spacer(minLength: .small1)
+
 						Button(L10n.AddLedgerDevice.AddDevice.continue) {
 							viewStore.send(.sendAddLedgerRequestButtonTapped)
 						}
-						.controlState(viewStore.continueButtonControlState)
 						.buttonStyle(.primaryRectangular)
+						.controlState(viewStore.continueButtonControlState)
+						.padding(.horizontal, .medium3)
+						.padding(.bottom, .large2)
 					}
 					#if os(iOS)
 					.toolbar {
@@ -67,6 +51,35 @@ extension AddLedgerFactorSource {
 				}
 				.destination(store: store)
 			}
+		}
+	}
+
+	struct InnerView: SwiftUI.View {
+		let small: Bool
+
+		var body: some SwiftUI.View {
+			VStack(spacing: 0) {
+				Image(asset: AssetResource.iconHardwareLedger)
+					.resizable()
+					.frame(small ? .veryLarge : .huge)
+					.padding(.top, small ? .large3 : .huge2)
+					.padding(.bottom, small ? .large2 : .huge1)
+
+				Text(L10n.AddLedgerDevice.AddDevice.title)
+					.textStyle(.sheetTitle)
+					.padding(.bottom, small ? .medium3 : .large3)
+
+				Text(L10n.AddLedgerDevice.AddDevice.body1)
+					.textStyle(.body1Regular)
+					.padding(.horizontal, .large3)
+					.padding(.bottom, .medium2)
+
+				Text(L10n.AddLedgerDevice.AddDevice.body2)
+					.textStyle(.body1Regular)
+					.padding(.horizontal, .large3)
+			}
+			.multilineTextAlignment(.center)
+			.foregroundColor(.app.gray1)
 		}
 	}
 }
