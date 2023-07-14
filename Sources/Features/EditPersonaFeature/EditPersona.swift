@@ -52,20 +52,7 @@ public struct EditPersona: Sendable, FeatureReducer {
 				id: .personaLabel,
 				initial: persona.displayName.rawValue
 			)
-			self.dynamicFields = IdentifiedArray(
-				uncheckedUniqueElements: persona.personaData.entries.map { entry in
-					EditPersonaDynamicField.State(
-						id: entry.value,
-						text: entry.value.text,
-						isRequiredByDapp: {
-							switch mode {
-							case .edit:
-								return false
-							}
-						}()
-					)
-				}
-			)
+			self.dynamicFields = persona.personaData.dynamicFields(in: mode)
 		}
 	}
 
@@ -148,5 +135,46 @@ extension EditPersona.State {
 	func hasChanges() -> Bool {
 		guard let output = viewState.output else { return false }
 		return output.personaLabel != persona.displayName
+			|| fieldsOutput(dynamicFields: persona.personaData.dynamicFields(in: mode)) != output.fields
+	}
+}
+
+extension EditPersona.State {
+	func fieldsOutput(
+		dynamicFields: IdentifiedArrayOf<EditPersonaDynamicField.State>
+	) -> IdentifiedArrayOf<Identified<EditPersonaDynamicField.State.ID, String>>? {
+		var fieldsOutput: IdentifiedArrayOf<Identified<EditPersonaDynamicField.State.ID, String>> = []
+		for field in dynamicFields {
+			guard let fieldInput = field.input else {
+				if field.kind == .dynamic(isRequiredByDapp: true) {
+					return nil
+				} else {
+					continue
+				}
+			}
+			let fieldOutput = fieldInput.trimmingWhitespace()
+			fieldsOutput[id: field.id] = .init(fieldOutput, id: field.id)
+		}
+
+		return fieldsOutput
+	}
+}
+
+extension PersonaData {
+	func dynamicFields(in mode: EditPersona.State.Mode) -> IdentifiedArrayOf<EditPersonaDynamicField.State> {
+		IdentifiedArray(
+			uncheckedUniqueElements: entries.map { entry in
+				EditPersonaDynamicField.State(
+					id: entry.value,
+					text: entry.value.text,
+					isRequiredByDapp: {
+						switch mode {
+						case .edit:
+							return false
+						}
+					}()
+				)
+			}
+		)
 	}
 }

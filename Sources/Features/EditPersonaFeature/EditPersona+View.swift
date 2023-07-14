@@ -10,23 +10,15 @@ extension EditPersona.State {
 			output: { () -> EditPersona.Output? in
 				guard
 					let personaLabelInput = labelField.input,
-					let personaLabelOutput = NonEmptyString(rawValue: personaLabelInput.trimmingWhitespace())
+					let personaLabelOutput = NonEmptyString(rawValue: personaLabelInput.trimmingWhitespace()),
+					let fieldsOutput = fieldsOutput(dynamicFields: dynamicFields)
 				else {
 					return nil
 				}
-				var fieldsOutput: IdentifiedArrayOf<Identified<EditPersonaDynamicField.State.ID, String>> = []
-				for field in dynamicFields {
-					guard let fieldInput = field.input else {
-						if field.kind == .dynamic(isRequiredByDapp: true) {
-							return nil
-						} else {
-							continue
-						}
-					}
-					let fieldOutput = fieldInput.trimmingWhitespace()
-					fieldsOutput[id: field.id] = .init(fieldOutput, id: field.id)
-				}
-				return EditPersona.Output(personaLabel: personaLabelOutput, fields: fieldsOutput)
+				return EditPersona.Output(
+					personaLabel: personaLabelOutput,
+					fields: fieldsOutput
+				)
 			}()
 		)
 	}
