@@ -1,4 +1,5 @@
 import CreateAuthKeyFeature
+import EditPersonaFeature
 import FeaturePrelude
 
 // MARK: - View
@@ -47,11 +48,11 @@ extension PersonaDetails.View {
 					.padding(.top, .large3)
 					#endif
 
-//					Button(L10n.AuthorizedDapps.PersonaDetails.editPersona) {
-//						viewStore.send(.editPersonaTapped)
-//					}
-//					.buttonStyle(.secondaryRectangular)
-//					.padding(.vertical, .large3)
+					Button(L10n.AuthorizedDapps.PersonaDetails.editPersona) {
+						viewStore.send(.editPersonaTapped)
+					}
+					.buttonStyle(.secondaryRectangular)
+					.padding(.vertical, .large3)
 
 					if viewStore.isDappPersona {
 						IfLetStore(store.scope(state: \.accountSection, action: PersonaDetails.Action.view)) {
@@ -86,6 +87,18 @@ extension PersonaDetails.View {
 			state: /PersonaDetails.Destination.State.dAppDetails,
 			action: PersonaDetails.Destination.Action.dAppDetails,
 			destination: { SimpleAuthDappDetails.View(store: $0) }
+		)
+//		.sheet(
+//			store: store.destination,
+//			state: /PersonaDetails.Destination.State.editPersona,
+//			action: PersonaDetails.Destination.Action.editPersona,
+//			content: { EditPersona.View(store: $0) }
+//		)
+		.sheet(
+			store: store.destination,
+			state: /PersonaDetails.Destination.State.editPersona,
+			action: PersonaDetails.Destination.Action.editPersona,
+			content: { EditPersona.View(store: $0) }
 		)
 		.sheet(
 			store: store.destination,
@@ -284,7 +297,16 @@ private extension PersonaDetails.View.InfoSection.ViewState {
 	init(
 		dAppInfo: DappInfo?,
 		personaName: String
+//		fields: IdentifiedArrayOf<Profile.Network.Persona.Field>
 	) {
+//		self.init(
+//			dAppInfo: dAppInfo,
+//			personaName: personaName,
+//			firstName: fields[id: .givenName]?.value.rawValue,
+//			lastName: fields[id: .familyName]?.value.rawValue,
+//			emailAddress: fields[id: .emailAddress]?.value.rawValue,
+//			phoneNumber: fields[id: .phoneNumber]?.value.rawValue
+//		)
 		fatalError()
 	}
 }
@@ -363,6 +385,7 @@ extension PersonaDetails.View {
 						}
 
 						if let middleName = viewStore.middleName {
+							// FIXME: YES Localize, but... the WHOLE design of this WHOLE view have to change...
 							VPair(heading: "Middle", item: middleName)
 						}
 

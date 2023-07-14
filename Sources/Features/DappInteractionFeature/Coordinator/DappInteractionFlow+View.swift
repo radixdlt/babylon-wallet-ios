@@ -75,6 +75,16 @@ extension DappInteractionFlow {
 					action: DappInteractionFlow.Destinations.MainAction.chooseAccounts,
 					then: { AccountPermissionChooseAccounts.View(store: $0) }
 				)
+//				CaseLet(
+//					state: /DappInteractionFlow.Destinations.MainState.personaDataPermission,
+//					action: DappInteractionFlow.Destinations.MainAction.personaDataPermission,
+//					then: { PersonaDataPermission.View(store: $0) }
+//				)
+//				CaseLet(
+//					state: /DappInteractionFlow.Destinations.MainState.oneTimePersonaData,
+//					action: DappInteractionFlow.Destinations.MainAction.oneTimePersonaData,
+//					then: { OneTimePersonaData.View(store: $0) }
+//				)
 				CaseLet(
 					state: /DappInteractionFlow.Destinations.MainState.reviewTransaction,
 					action: DappInteractionFlow.Destinations.MainAction.reviewTransaction,
@@ -99,6 +109,7 @@ struct DappInteraction_Preview: PreviewProvider {
 				)!,
 				reducer: DappInteractionFlow()
 					.dependency(\.accountsClient, .previewValueTwoAccounts())
+//					.dependency(\.authorizedDappsClient, .previewValueOnePersona())
 					.dependency(\.personasClient, .previewValueTwoPersonas(existing: true))
 					.dependency(\.personasClient, .previewValueTwoPersonas(existing: false))
 			)
