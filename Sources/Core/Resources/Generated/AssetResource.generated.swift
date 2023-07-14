@@ -75,6 +75,7 @@ public enum AssetResource {
   public static let ledger = ImageAsset(name: "ledger")
   public static let personas = ImageAsset(name: "personas")
   public static let qrCodeScanner = ImageAsset(name: "qr-code-scanner")
+  public static let tempLinkConnector = ImageAsset(name: "temp-link-connector")
   public static let splash = ImageAsset(name: "Splash")
   public static let splashItem1 = ImageAsset(name: "splash-item-1")
   public static let splashItem2 = ImageAsset(name: "splash-item-2")
