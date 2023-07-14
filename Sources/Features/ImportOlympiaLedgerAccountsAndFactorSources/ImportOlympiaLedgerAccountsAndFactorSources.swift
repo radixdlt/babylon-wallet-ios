@@ -502,3 +502,13 @@ extension DerivePublicKeys.State {
 		)
 	}
 }
+
+// MARK: - OlympiaAccountsValidation
+public struct OlympiaAccountsValidation: Sendable, Hashable {
+	public var validated: Set<OlympiaAccountToMigrate>
+	public var unvalidated: Set<OlympiaAccountToMigrate>
+	public init(validated: Set<OlympiaAccountToMigrate>, unvalidated: Set<OlympiaAccountToMigrate>) {
+		self.validated = validated
+		self.unvalidated = unvalidated
+	}
+}
