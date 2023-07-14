@@ -1,4 +1,5 @@
 import EngineToolkit
+import Prelude
 
 extension NonFungibleLocalId {
 	struct InvalidLocalID: Error {}

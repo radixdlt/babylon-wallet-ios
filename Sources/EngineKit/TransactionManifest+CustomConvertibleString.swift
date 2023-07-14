@@ -1,3 +1,5 @@
+import Prelude
+
 // MARK: - TransactionManifest + CustomStringConvertible
 extension TransactionManifest: CustomStringConvertible {}
 

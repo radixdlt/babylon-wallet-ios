@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import CryptoKit
+import EngineKit
 import FeaturePrelude
 import GatewayAPI
 import SigningFeature
@@ -94,8 +95,8 @@ public struct TransactionReview: Sendable, FeatureReducer {
 
 	public enum DelegateAction: Sendable, Equatable {
 		case failed(TransactionFailure)
-		case signedTXAndSubmittedToGateway(TransactionIntent.TXID)
-		case transactionCompleted(TransactionIntent.TXID)
+		case signedTXAndSubmittedToGateway(TXID)
+		case transactionCompleted(TXID)
 		case userDismissedTransactionStatus
 	}
 
@@ -195,7 +196,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			guard let transactionWithLockFee = state.transactionManifestWithLockFee else { return .none }
 			state.canApproveTX = false
 			do {
-				let manifest = transactionWithLockFee // try addingGuarantees(to: transactionWithLockFee, guarantees: state.allGuarantees)
+				let manifest = try addingGuarantees(to: transactionWithLockFee, guarantees: state.allGuarantees)
 				guard let feePayerSelectionAmongstCandidates = state.feePayerSelectionAmongstCandidates else {
 					assertionFailure("Expected feePayerSelectionAmongstCandidates")
 					return .none
@@ -684,7 +685,7 @@ extension TransactionReview {
 			let amount = try BigDecimal(fromString: amount.asStr())
 
 			func guarantee() -> TransactionClient.Guarantee? {
-				guard case let .estimated(instructionIndex) = type else { return nil }
+				guard case let .estimated(instructionIndex) = type, !isNewResource else { return nil }
 				return .init(amount: amount, instructionIndex: instructionIndex, resourceAddress: resourceAddress)
 			}
 
@@ -1184,25 +1185,28 @@ extension TransactionType {
 				for (rawResourceAddress, resource) in resouceTransfers {
 					let resourceAddress = try EngineToolkit.Address(address: rawResourceAddress)
 					allAddresses.insert(resourceAddress)
-					let resourceSpecifier: ResourceSpecifier = {
-						let existingResource = withdraws[rawResourceAddress]
 
-						switch resource {
-						case let .amount(amount):
-							if let totalAmount = existingResource?.amount {
-								return .amount(resourceAddress: resourceAddress, amount: totalAmount.add(other: amount))
-							}
-							return .amount(resourceAddress: resourceAddress, amount: amount)
-						case let .ids(ids):
-							if let allIds = existingResource?.ids {
-								return .ids(resourceAddress: resourceAddress, ids: allIds + ids)
-							}
-							return .ids(resourceAddress: resourceAddress, ids: ids)
+					let existingResource = withdraws[rawResourceAddress]
+					var total: ResourceSpecifier
+					let transfered: ResourceSpecifier
+
+					switch resource {
+					case let .amount(amount):
+						transfered = .amount(resourceAddress: resourceAddress, amount: amount)
+						total = transfered
+						if let totalAmount = existingResource?.amount {
+							total = .amount(resourceAddress: resourceAddress, amount: totalAmount.add(other: amount))
 						}
-					}()
+					case let .ids(ids):
+						transfered = .ids(resourceAddress: resourceAddress, ids: ids)
+						total = transfered
+						if let allIds = existingResource?.ids {
+							total = .ids(resourceAddress: resourceAddress, ids: allIds + ids)
+						}
+					}
 
-					withdraws[rawResourceAddress] = resourceSpecifier
-					deposits[address, default: []].append(resourceSpecifier.toSource)
+					withdraws[rawResourceAddress] = total
+					deposits[address, default: []].append(transfered.toSource)
 				}
 			}
 

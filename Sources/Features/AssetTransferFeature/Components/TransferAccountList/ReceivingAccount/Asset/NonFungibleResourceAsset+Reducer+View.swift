@@ -1,3 +1,4 @@
+import EngineKit
 import FeaturePrelude
 
 // MARK: - NonFungibleResourceAsset

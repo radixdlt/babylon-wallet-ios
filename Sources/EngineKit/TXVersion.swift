@@ -1,3 +1,5 @@
+import Tagged
+
 // MARK: - TXVersionTag
 public enum TXVersionTag: Sendable {}
 

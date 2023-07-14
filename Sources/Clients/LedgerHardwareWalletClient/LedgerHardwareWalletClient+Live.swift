@@ -1,6 +1,7 @@
 import ClientPrelude
 import ComposableArchitecture // actually CasePaths... but CI fails if we do `import CasePaths` 🤷‍♂️
 import Cryptography
+import EngineKit
 import FactorSourcesClient
 import Profile
 import RadixConnectClient

@@ -1,6 +1,7 @@
 import AuthorizedDappsClient
 import CreatePersonaFeature
 import DeviceFactorSourceClient
+import EngineKit
 import FeaturePrelude
 import PersonasClient
 import ROLAClient

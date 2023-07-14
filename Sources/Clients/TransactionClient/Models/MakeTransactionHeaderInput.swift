@@ -1,4 +1,5 @@
 import ClientPrelude
+import EngineKit
 
 // MARK: - MakeTransactionHeaderInput
 public struct MakeTransactionHeaderInput: Sendable, Hashable {

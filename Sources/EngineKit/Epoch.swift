@@ -1,3 +1,5 @@
+import Tagged
+
 // MARK: - EpochTag
 public enum EpochTag: Sendable {}
 

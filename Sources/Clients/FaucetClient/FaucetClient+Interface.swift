@@ -1,6 +1,7 @@
 import ClientPrelude
 import Cryptography
 import DeviceFactorSourceClient
+import EngineKit
 import TransactionClient
 
 // MARK: - FaucetClient

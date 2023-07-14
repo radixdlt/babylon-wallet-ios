@@ -1,5 +1,6 @@
 import AccountsClient
 import AuthorizedDappsClient
+import EngineKit
 import FeaturePrelude
 import PersonasClient
 import TransactionReviewFeature

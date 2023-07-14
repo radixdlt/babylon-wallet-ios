@@ -1,4 +1,5 @@
 import ClientPrelude
+import EngineKit
 import Profile
 
 // MARK: - AuthorizedDappsClient

@@ -1,6 +1,7 @@
 import AccountsClient
 import AuthorizedDappsClient
 import Cryptography
+import EngineKit
 import FeaturePrelude
 import GatewaysClient
 import PersonasClient
@@ -356,7 +357,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 
 		func handleSignAndSubmitTX(
 			_ item: State.AnyInteractionItem,
-			_ txID: TransactionIntent.TXID
+			_ txID: TXID
 		) -> EffectTask<Action> {
 			state.responseItems[item] = .remote(.send(.init(txID: txID)))
 			return continueEffect(for: &state)

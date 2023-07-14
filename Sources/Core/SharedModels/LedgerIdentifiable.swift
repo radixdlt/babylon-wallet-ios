@@ -1,3 +1,4 @@
+import EngineKit
 import Prelude
 
 // MARK: - LedgerIdentifiable
@@ -26,7 +27,7 @@ public enum LedgerIdentifiable: Sendable {
 
 extension LedgerIdentifiable {
 	public enum Identifier: Sendable {
-		case transaction(Intent.TXID)
+		case transaction(TXID)
 		case nonFungibleGlobalID(AccountPortfolio.NonFungibleResource.GlobalID)
 
 		public var address: String {

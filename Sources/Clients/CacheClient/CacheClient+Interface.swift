@@ -1,4 +1,5 @@
 import ClientPrelude
+import EngineKit
 
 // MARK: - CacheClient
 public struct CacheClient: Sendable {

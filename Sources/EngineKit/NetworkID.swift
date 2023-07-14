@@ -1,3 +1,5 @@
+import Tagged
+
 // MARK: - NetworkIDType
 
 // TODO: move this type to Network.swift.

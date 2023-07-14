@@ -1,4 +1,5 @@
 import Foundation
+import Tagged
 
 extension Nonce {
 	public static func secureRandom() -> Self {

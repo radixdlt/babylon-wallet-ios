@@ -1,5 +1,6 @@
 import AuthorizedDappsClient
 import CacheClient
+import EngineKit
 import FeaturePrelude
 import GatewayAPI
 import PersonaDetailsFeature

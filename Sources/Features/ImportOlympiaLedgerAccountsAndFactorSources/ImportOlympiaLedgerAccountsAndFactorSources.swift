@@ -1,6 +1,7 @@
 import AddLedgerFactorSourceFeature
 import Cryptography
 import DerivePublicKeysFeature
+import EngineKit
 import FactorSourcesClient
 import FeaturePrelude
 import ImportLegacyWalletClient

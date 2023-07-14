@@ -9,6 +9,7 @@ import PersonasFeature
 import ProfileBackupsFeature
 #if DEBUG
 import DebugInspectProfileFeature
+import EngineKit
 import RadixConnectModels // read signaling client url
 import SecureStorageClient
 import SecurityStructureConfigurationListFeature

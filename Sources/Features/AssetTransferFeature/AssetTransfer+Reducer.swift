@@ -1,4 +1,5 @@
 import DappInteractionClient
+import EngineKit
 import FeaturePrelude
 
 // MARK: - AssetTransfer

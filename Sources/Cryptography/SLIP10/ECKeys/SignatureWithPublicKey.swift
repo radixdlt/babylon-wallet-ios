@@ -61,17 +61,3 @@ extension SignatureWithPublicKey {
 		}
 	}
 }
-
-extension SignatureWithPublicKey {
-	public func intoEngine() throws -> EngineToolkit.SignatureWithPublicKey {
-		switch self {
-		case let .ecdsaSecp256k1(signature, _):
-			return try .ecdsaSecp256k1(signature: Array(signature.radixSerialize()))
-		case let .eddsaEd25519(signature, publicKey):
-			return .eddsaEd25519(
-				signature: [UInt8](signature),
-				publicKey: [UInt8](publicKey.rawRepresentation)
-			)
-		}
-	}
-}

@@ -91,6 +91,7 @@ package.addModules([
 			"ChooseAccountsFeature",
 			"AssetsFeature",
 			"DappInteractionClient",
+			"EngineKit",
 		],
 		tests: .yes()
 	),
@@ -384,6 +385,7 @@ package.addModules([
 			"ScanQRFeature",
 			"SecurityStructureConfigurationListFeature",
 			"ProfileBackupsFeature",
+			"EngineKit",
 		],
 		tests: .yes()
 	),
@@ -403,6 +405,7 @@ package.addModules([
 			"TransactionClient",
 			"DeviceFactorSourceClient",
 			"ROLAClient",
+			"EngineKit",
 		],
 		tests: .no
 	),
@@ -451,6 +454,7 @@ package.addModules([
 		dependencies: [
 			"GatewayAPI",
 			"CacheClient",
+			"EngineKit",
 		],
 		tests: .yes()
 	),
@@ -560,6 +564,7 @@ package.addModules([
 			"GatewaysClient", // getCurrentNetworkID
 			"SubmitTransactionClient",
 			"TransactionClient",
+			"EngineKit",
 		],
 		tests: .yes()
 	),
@@ -602,6 +607,7 @@ package.addModules([
 			"AccountsClient",
 			"LedgerHardwareWalletClient",
 			"Profile", // Olympia models
+			"EngineKit",
 		],
 		tests: .yes(
 			resources: [
@@ -752,6 +758,7 @@ package.addModules([
 			"GatewayAPI",
 			"CacheClient",
 			"DeviceFactorSourceClient",
+			"EngineKit",
 		],
 		tests: .yes(
 			dependencies: [],
@@ -765,6 +772,7 @@ package.addModules([
 		dependencies: [
 			"GatewayAPI",
 			"TransactionClient",
+			"EngineKit",
 		],
 		tests: .no
 	),
@@ -776,6 +784,7 @@ package.addModules([
 			"FactorSourcesClient",
 			"GatewayAPI",
 			"PersonasClient",
+			"EngineKit",
 		],
 		tests: .yes()
 	),
@@ -903,6 +912,7 @@ package.addModules([
 		name: "Profile",
 		dependencies: [
 			"Cryptography",
+			"EngineKit",
 			"RadixConnectModels",
 			"Resources",
 			.product(name: "ComposableArchitecture", package: "swift-composable-architecture"), // actually just CasePaths
@@ -972,6 +982,16 @@ package.addModules([
 		category: .testing,
 		dependencies: [
 			"FeaturePrelude", "TestingPrelude", "SharedTestingModels",
+		],
+		tests: .no
+	),
+	.module(
+		name: "EngineKit",
+		dependencies: [
+			"Cryptography",
+			.product(name: "EngineToolkit", package: "swift-engine-toolkit") {
+				.package(url: "https://github.com/radixdlt/swift-engine-toolkit", exact: "0.10.0-elm.1-9e2590e")
+			},
 		],
 		tests: .no
 	),
@@ -1053,10 +1073,6 @@ package.addModules([
 			.product(name: "Validated", package: "swift-validated") {
 				.package(url: "https://github.com/pointfreeco/swift-validated", exact: "0.2.1")
 			},
-			.product(name: "EngineToolkit", package: "swift-engine-toolkit") {
-				.package(url: "https://github.com/radixdlt/swift-engine-toolkit", exact: "0.10.0-elm.1-9e2590e")
-			},
-
 		],
 		tests: .yes(dependencies: [])
 	),
