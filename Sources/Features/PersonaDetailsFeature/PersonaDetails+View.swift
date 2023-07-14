@@ -1,4 +1,5 @@
 import CreateAuthKeyFeature
+import EditPersonaFeature
 import FeaturePrelude
 
 // MARK: - View
