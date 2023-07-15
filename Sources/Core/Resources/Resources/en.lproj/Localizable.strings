@@ -299,7 +299,7 @@
 "transactionReview_title" = "Review Transaction";
 "transactionReview_approveButtonTitle" = "Approve";
 "transactionReview_customizeGuaranteesButtonTitle" = "Customize Guarantees";
-"transactionReview_depositsHeading" = "Depositing";
+"transactionReview_depositsHeading" = "Depositing To";
 "transactionReview_estimated" = "Estimated";
 "transactionReview_externalAccountName" = "Account";
 "transactionReview_guaranteed" = "Guaranteed";
@@ -310,7 +310,7 @@
 "transactionReview_unknown" = "Unknown";
 "transactionReview_usingDappsHeading" = "Using dApps";
 "transactionReview_unknownComponents" = "%d Unknown Components";
-"transactionReview_withdrawalsHeading" = "Withdrawing";
+"transactionReview_withdrawalsHeading" = "Withdrawing From";
 "transactionReview_xrdAmount" = "XRD %@";
 "transactionReview_networkFee_heading" = "Transaction Fee";
 "transactionReview_networkFee_congestedText" = "The network is currently congested. Add a tip to speed up your transfer.";
