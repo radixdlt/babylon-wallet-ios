@@ -34,7 +34,7 @@ public struct DappThumbnail: View {
 				placeholder
 			}
 		case .unknown:
-			// TODO: Show different icon if known
+			// TODO: Show different icon if unknown
 			placeholder
 		}
 	}
@@ -75,7 +75,7 @@ public struct TokenThumbnail: View {
 			Image(asset: AssetResource.xrd)
 				.resizable()
 		case let .known(url):
-			LoadableImage(url: url, size: .fixedSize(size)) {
+			LoadableImage(url: url, size: .fixedSize(size), placeholders: .init(brokenImage: .standard)) {
 				placeholder
 			}
 		case .unknown:
@@ -101,7 +101,7 @@ public struct NFTThumbnail: View {
 	}
 
 	public var body: some View {
-		LoadableImage(url: url, size: .fixedSize(size), loading: .color(.app.gray1)) {
+		LoadableImage(url: url, size: .fixedSize(size), placeholders: .init(loading: .color(.app.gray1))) {
 			Image(asset: AssetResource.nft)
 				.resizable()
 		}
@@ -112,16 +112,16 @@ public struct NFTThumbnail: View {
 
 // MARK: - PersonaThumbnail
 public struct PersonaThumbnail: View {
-	private let content: URL?
+	private let url: URL?
 	private let size: HitTargetSize
 
-	public init(_ content: URL?, size hitTargetSize: HitTargetSize = .small) {
-		self.content = content
+	public init(_ url: URL?, size hitTargetSize: HitTargetSize = .small) {
+		self.url = url
 		self.size = hitTargetSize
 	}
 
 	public var body: some View {
-		LoadableImage(url: content, size: .fixedSize(size)) {
+		LoadableImage(url: url, size: .fixedSize(size)) {
 			Image(asset: AssetResource.persona)
 				.resizable()
 		}
@@ -134,19 +134,17 @@ public struct PersonaThumbnail: View {
 /// A helper view that handles the loading state, and potentially the error state
 public struct LoadableImage<Placeholder: View>: View {
 	let url: URL?
-	let isVectorImage: Bool
 	let sizingBehaviour: LoadableImageSize
-	let loadingBehaviour: LoadableImageLoadingBehaviour
+	let placeholderBehaviour: LoadableImagePlaceholderBehaviour
 	let placeholder: Placeholder
 
 	public init(
 		url: URL?,
 		size sizingBehaviour: LoadableImageSize,
-		loading loadingBehaviour: LoadableImageLoadingBehaviour = .placeholder,
+		placeholders placeholderBehaviour: LoadableImagePlaceholderBehaviour = .default,
 		placeholder: () -> Placeholder
 	) {
-		self.isVectorImage = url?.isVectorImage ?? false
-		if let url, !isVectorImage, case let .fixedSize(hitTargetSize, _) = sizingBehaviour {
+		if let url, !url.isVectorImage, case let .fixedSize(hitTargetSize, _) = sizingBehaviour {
 			@Dependency(\.urlFormatterClient) var urlFormatterClient
 			self.url = urlFormatterClient.fixedSizeImage(url, Screen.pixelScale * hitTargetSize.frame)
 		} else {
@@ -154,8 +152,18 @@ public struct LoadableImage<Placeholder: View>: View {
 		}
 
 		self.sizingBehaviour = sizingBehaviour
-		self.loadingBehaviour = loadingBehaviour
+		self.placeholderBehaviour = placeholderBehaviour
 		self.placeholder = placeholder()
+	}
+
+	public init(
+		url: URL,
+		size sizingBehaviour: LoadableImageSize,
+		placeholders placeholderBehaviour: LoadableImagePlaceholderBehaviour = .default
+	) where Placeholder == EmptyView {
+		self.init(url: url, size: sizingBehaviour, placeholders: placeholderBehaviour) {
+			EmptyView()
+		}
 	}
 
 	public var body: some View {
@@ -165,15 +173,15 @@ public struct LoadableImage<Placeholder: View>: View {
 					loadingView
 				} else if let image = state.image {
 					imageView(image: image, imageSize: state.imageContainer?.image.size)
-				} else if let error = state.error {
-					if isVectorImage {
-						let _ = loggerGlobal.warning("Could not load thumbnail \(url): \(error)")
-					} else {
-						let _ = loggerGlobal.warning("Vector images are not supported \(url): \(error)")
+				} else {
+					brokenImageView
+					if let error = state.error {
+						if url.isVectorImage {
+							let _ = loggerGlobal.warning("Could not load thumbnail \(url): \(error)")
+						} else {
+							let _ = loggerGlobal.warning("Vector images are not supported \(url): \(error)")
+						}
 					}
-
-					Image(asset: AssetResource.brokenImagePlaceholder)
-						.aspectRatio(contentMode: .fit)
 				}
 			}
 		} else {
@@ -204,7 +212,7 @@ public struct LoadableImage<Placeholder: View>: View {
 
 	@ViewBuilder
 	private var loadingView: some View {
-		switch loadingBehaviour {
+		switch placeholderBehaviour.loading {
 		case .shimmer:
 			Color.gray
 				.shimmer(active: true, config: .accountResourcesLoading)
@@ -213,7 +221,29 @@ public struct LoadableImage<Placeholder: View>: View {
 		case let .asset(imageAsset):
 			Image(asset: imageAsset)
 				.resizable()
-		case .placeholder:
+		case .standard:
+			placeholder
+		}
+	}
+
+	@MainActor
+	@ViewBuilder
+	private var brokenImageView: some View {
+		switch placeholderBehaviour.brokenImage {
+		case let .asset(imageAsset):
+			Image(asset: imageAsset)
+				.resizable()
+		case .brokenImage:
+			HStack(spacing: 0) {
+				Spacer(minLength: .small1)
+
+				Image(asset: AssetResource.brokenImagePlaceholder)
+
+				Spacer(minLength: .small1)
+			}
+			.frame(height: .imagePlaceholderHeight)
+			.background(.app.gray4)
+		case .standard:
 			placeholder
 		}
 	}
@@ -230,12 +260,31 @@ public enum LoadableImageSize: Equatable {
 	}
 }
 
-// MARK: - LoadableImageLoadingBehaviour
-public enum LoadableImageLoadingBehaviour {
-	case shimmer
-	case color(Color)
-	case asset(ImageAsset)
-	case placeholder
+// MARK: - LoadableImagePlaceholderBehaviour
+public struct LoadableImagePlaceholderBehaviour {
+	public let loading: LoadingPlaceholder
+	public let brokenImage: BrokenImagePlaceholder
+
+	public static let `default`: Self = .init()
+
+	/// `standard` refers to the placeholder supplied when creating the `LoadableImage`
+	public init(loading: LoadingPlaceholder = .standard, brokenImage: BrokenImagePlaceholder = .brokenImage) {
+		self.loading = loading
+		self.brokenImage = brokenImage
+	}
+
+	public enum LoadingPlaceholder {
+		case shimmer
+		case color(Color)
+		case asset(ImageAsset)
+		case standard
+	}
+
+	public enum BrokenImagePlaceholder {
+		case asset(ImageAsset)
+		case brokenImage
+		case standard
+	}
 }
 
 extension URL {
