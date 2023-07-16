@@ -166,20 +166,14 @@ public struct LoadableImage<Placeholder: View>: View {
 				} else if let image = state.image {
 					imageView(image: image, imageSize: state.imageContainer?.image.size)
 				} else if let error = state.error {
-					let _ = loggerGlobal.warning("Could not load thumbnail \(url): \(error)")
-					// FIXME: Show some image or officially sanctioned copy
-					if !sizingBehaviour.isFixedSize {
-						let text = isVectorImage
-							? L10n.Misc.RemoteThumbnails.vectorImageFailure
-							: L10n.Misc.RemoteThumbnails.loadingFailure
-						Text(text)
-							.textStyle(.body1HighImportance)
-							.foregroundColor(.app.alert)
+					if isVectorImage {
+						let _ = loggerGlobal.warning("Could not load thumbnail \(url): \(error)")
 					} else {
-						placeholder
+						let _ = loggerGlobal.warning("Vector images are not supported \(url): \(error)")
 					}
-				} else {
-					placeholder
+
+					Image(asset: AssetResource.brokenImagePlaceholder)
+						.aspectRatio(contentMode: .fit)
 				}
 			}
 		} else {
