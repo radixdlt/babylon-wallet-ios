@@ -181,8 +181,8 @@ extension EditPersona.State.DynamicFieldID: EditPersonaFieldID {
 extension EditPersona.State.DynamicFieldID: Comparable {
 	public static func < (lhs: Self, rhs: Self) -> Bool {
 		guard
-			let lhsIndex = Self.supportedKinds.firstIndex(of: lhs.kind),
-			let rhsIndex = Self.supportedKinds.firstIndex(of: rhs.kind)
+			let lhsIndex = Self.supportedKinds.firstIndex(of: lhs),
+			let rhsIndex = Self.supportedKinds.firstIndex(of: rhs)
 		else {
 			assertionFailure(
 				"""
@@ -196,7 +196,7 @@ extension EditPersona.State.DynamicFieldID: Comparable {
 }
 
 extension EditPersona.State.DynamicFieldID {
-	static var supportedKinds: [Self.Kind] {
+	static var supportedKinds: [Self] {
 		[
 			.name,
 			.emailAddress,
@@ -227,7 +227,7 @@ extension EditPersonaDynamicField.State {
 					if isRequiredByDapp {
 						.if(\.isBlank, error: L10n.EditPersona.Error.requiredByDapp)
 					}
-					if case PersonaData.Entry.emailAddress = id {
+					if case PersonaData.Entry.Kind.emailAddress = id {
 						.unless(\.isEmailAddress, error: L10n.EditPersona.Error.invalidEmailAddress)
 					}
 				}

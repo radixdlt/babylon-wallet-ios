@@ -34,7 +34,7 @@ extension EditPersonaAddEntryKinds {
 
 						SelectionList(
 							viewStore.availableEntryKinds,
-							title: \.entry.kind.rawValue,
+							title: \.title,
 							selection: viewStore.binding(
 								get: \.selectedEntryKinds,
 								send: { .selectedEntryKindsChanged($0) }

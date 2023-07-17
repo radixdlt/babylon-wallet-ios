@@ -1,7 +1,7 @@
 import FeaturePrelude
 
 public struct EditPersonaAddEntryKinds: Sendable, FeatureReducer {
-	public typealias EntryKind = EditPersona.State.DynamicFieldID.Kind
+	public typealias EntryKind = EditPersona.State.DynamicFieldID
 
 	public struct State: Sendable, Hashable {
 		let availableEntryKinds: [EntryKind]

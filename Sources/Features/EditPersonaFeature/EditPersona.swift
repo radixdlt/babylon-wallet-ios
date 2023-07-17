@@ -21,7 +21,7 @@ public struct EditPersona: Sendable, FeatureReducer {
 			case personaLabel
 		}
 
-		public typealias DynamicFieldID = PersonaData.Entry
+		public typealias DynamicFieldID = PersonaData.Entry.Kind
 
 		let mode: Mode
 		let persona: Profile.Network.Persona
@@ -147,7 +147,7 @@ public struct EditPersona: Sendable, FeatureReducer {
 			}
 
 		case .addAFieldButtonTapped:
-			state.destination = .addFields(.init(excludedEntryKinds: state.dynamicFields.map(\.id.kind)))
+			state.destination = .addFields(.init(excludedEntryKinds: state.dynamicFields.map(\.id)))
 			return .none
 		}
 	}
@@ -157,7 +157,7 @@ public struct EditPersona: Sendable, FeatureReducer {
 		case let .destination(.presented(.addFields(.delegate(.addEntryKinds(fieldsToAdd))))):
 			state.dynamicFields.append(contentsOf: fieldsToAdd.map {
 				.init(
-					id: $0.entry,
+					id: $0,
 					text: nil,
 					isRequiredByDapp: false
 				)
@@ -207,10 +207,10 @@ extension PersonaData {
 		in mode: EditPersona.State.Mode
 	) -> IdentifiedArrayOf<EditPersonaDynamicField.State> {
 		IdentifiedArray(
-			uncheckedUniqueElements: entries.map { entry in
+			uncheckedUniqueElements: entries.map(\.value).map { entryValue in
 				EditPersonaDynamicField.State(
-					id: entry.value,
-					text: entry.value.text,
+					id: entryValue.kind,
+					text: entryValue.text,
 					isRequiredByDapp: {
 						switch mode {
 						case .edit:
