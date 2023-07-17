@@ -137,8 +137,8 @@ extension GatewayAPI.EntityMetadataCollection {
 extension GatewayAPI.StateNonFungibleDetailsResponseItem {
 	public var details: (name: String?, keyImageURL: URL?) {
 		guard let dictionary = data.rawJson.value as? [String: Any] else { return (nil, nil) }
-		guard let elements = dictionary["elements"] as? [[String: Any]] else { return (nil, nil) }
-		let strings = elements.filter { $0["type"] as? String == "String" }.compactMap { $0["value"] as? String }
+		guard let elements = dictionary["fields"] as? [[String: Any]] else { return (nil, nil) }
+		let strings = elements.filter { $0["kind"] as? String == "String" }.compactMap { $0["value"] as? String }
 
 		var name: String? = nil
 		var keyImageURL: URL? = nil
