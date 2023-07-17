@@ -126,6 +126,11 @@ extension EditPersona {
 					}
 					#endif
 				}
+//				.confirmationDialog(
+//					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+//					state: /EditPersona.Destinations.State.closeConfirmationDialog,
+//					action: EditPersona.Destinations.Action.closeConfirmationDialog
+//				)
 				.sheet(
 					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
 					state: /EditPersona.Destinations.State.addFields,
@@ -147,6 +152,12 @@ struct EditPersona_Preview: PreviewProvider {
 			store: .init(
 				initialState: .previewValue(
 					mode: .edit
+//					mode: .dapp(
+//						requiredFieldIDs: [
+//							.givenName,
+//							.emailAddress,
+//						]
+//					)
 				),
 				reducer: EditPersona()
 			)

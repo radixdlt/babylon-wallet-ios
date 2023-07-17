@@ -329,6 +329,7 @@ extension PersonaData.PostalAddress.Field {
 }
 
 extension PersonaData.PostalAddress.Field {
+	// FIXME: Strings localize this
 	public var display: String {
 		switch self {
 		case .districtSlashSubdivision: return "District/Subdivision"

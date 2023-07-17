@@ -26,6 +26,7 @@ public struct EditPersona: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public enum Mode: Sendable, Hashable {
 			case edit
+//			case dapp(requiredFieldIDs: Set<DynamicFieldID>)
 		}
 
 		public enum StaticFieldID: Sendable, Hashable, Comparable {
@@ -54,6 +55,11 @@ public struct EditPersona: Sendable, FeatureReducer {
 				initial: persona.displayName.rawValue
 			)
 			self.dynamicFields = persona.personaData.dynamicFields(in: mode)
+//			if case let .dapp(requiredFieldIDs) = mode {
+//				for requiredFieldID in requiredFieldIDs where dynamicFields[id: requiredFieldID] == nil {
+//					dynamicFields.append(.init(id: requiredFieldID, initial: nil, isRequiredByDapp: true))
+//				}
+//			}
 		}
 	}
 
@@ -80,10 +86,12 @@ public struct EditPersona: Sendable, FeatureReducer {
 
 	public struct Destinations: Sendable, ReducerProtocol {
 		public enum State: Sendable, Hashable {
+//			case closeConfirmationDialog(ConfirmationDialogState<ViewAction.CloseConfirmationDialogAction>)
 			case addFields(EditPersonaAddFields.State)
 		}
 
 		public enum Action: Sendable, Equatable {
+//			case closeConfirmationDialog(ViewAction.CloseConfirmationDialogAction)
 			case addFields(EditPersonaAddFields.Action)
 		}
 
@@ -122,6 +130,21 @@ public struct EditPersona: Sendable, FeatureReducer {
 					await dismiss()
 				}
 			}
+
+//			state.destination = .closeConfirmationDialog(
+//				.init(titleVisibility: .hidden) {
+//					TextState("")
+//				} actions: {
+//					ButtonState(role: .destructive, action: .send(.discardChanges)) {
+//						TextState(L10n.EditPersona.CloseConfirmationDialog.discardChanges)
+//					}
+//					ButtonState(role: .cancel, action: .send(.keepEditing)) {
+//						TextState(L10n.EditPersona.CloseConfirmationDialog.keepEditing)
+//					}
+//				} message: {
+//					TextState(L10n.EditPersona.CloseConfirmationDialog.message)
+//				}
+//			)
 
 			return .none
 
@@ -193,6 +216,25 @@ public struct EditPersona: Sendable, FeatureReducer {
 			return .none
 		}
 	}
+
+//	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+//		switch childAction {
+//		case .destination(.presented(.closeConfirmationDialog(.discardChanges))):
+//			return .fireAndForget { await dismiss() }
+//
+//		case let .destination(.presented(.addFields(.delegate(.addFields(fieldsToAdd))))):
+//			state.dynamicFields.append(contentsOf: fieldsToAdd.map { .init(id: $0, initial: nil, isRequiredByDapp: false) })
+//			state.destination = nil
+//			return .none
+//
+//		case let .dynamicField(id, action: .delegate(.delete)):
+//			state.dynamicFields.remove(id: id)
+//			return .none
+//
+//		default:
+//			return .none
+//		}
+//	}
 }
 
 extension EditPersona.State {
