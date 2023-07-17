@@ -37,6 +37,7 @@ public struct EditPersona: Sendable, FeatureReducer {
 		let mode: Mode
 		let persona: Profile.Network.Persona
 		var labelField: EditPersonaStaticField.State
+		@Sorted(by: \.id)
 		var dynamicFields: IdentifiedArrayOf<EditPersonaDynamicField.State> = []
 
 		@PresentationState
