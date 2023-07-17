@@ -144,10 +144,10 @@ extension GatewayAPI.StateNonFungibleDetailsResponseItem {
 		var keyImageURL: URL? = nil
 
 		for string in strings {
-			if keyImageURL == nil, let url = getKeyImageURL(from: string) {
-				keyImageURL = url
-			} else if name == nil {
-				name = string
+			if keyImageURL == nil, let foundKeyImageURL = getKeyImageURL(from: string) {
+				keyImageURL = foundKeyImageURL
+			} else if name == nil, let foundName = getName(from: string) {
+				name = foundName
 			}
 		}
 
@@ -164,5 +164,11 @@ extension GatewayAPI.StateNonFungibleDetailsResponseItem {
 		guard extensions.contains(url.pathExtension) else { return nil }
 
 		return url
+	}
+
+	private func getName(from string: String) -> String? {
+		guard !string.hasPrefix("https") else { return nil }
+
+		return string
 	}
 }
