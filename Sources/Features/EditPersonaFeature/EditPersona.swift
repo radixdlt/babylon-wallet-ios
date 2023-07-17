@@ -141,7 +141,7 @@ public struct EditPersona: Sendable, FeatureReducer {
 			}
 
 		case .addAFieldButtonTapped:
-			state.destination = .addFields(.init(excludedFieldIDs: state.dynamicFields.map(\.id)))
+			state.destination = .addFields(.init(excludedFieldIDs: state.dynamicFields.map(\.entryKind)))
 			return .none
 		}
 	}
@@ -149,7 +149,14 @@ public struct EditPersona: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
 		case let .destination(.presented(.addFields(.delegate(.addFields(fieldsToAdd))))):
-			state.dynamicFields.append(contentsOf: fieldsToAdd.map { .init(id: $0, text: nil, isRequiredByDapp: false) })
+			state.dynamicFields.append(contentsOf: fieldsToAdd.map {
+				.init(
+					id: $0.entry,
+					text: nil,
+					isRequiredByDapp: false,
+					entryKind: $0.entry.kind
+				)
+			})
 			state.destination = nil
 			return .none
 
@@ -183,9 +190,48 @@ extension PersonaData {
 						case .edit:
 							return false
 						}
-					}()
+					}(),
+					entryKind: entry.value.kind
 				)
 			}
 		)
+	}
+}
+
+extension PersonaData.Entry.Kind {
+	var entry: PersonaData.Entry {
+		switch self {
+		case .name:
+			return .name(.init(given: "", family: "", variant: .eastern))
+		case .dateOfBirth:
+			fallthrough
+		case .companyName:
+			fatalError()
+		case .emailAddress:
+			return .emailAddress(.init(email: ""))
+		case .url:
+			fatalError()
+		case .phoneNumber:
+			return .phoneNumber(.init(number: ""))
+		case .postalAddress:
+			fatalError()
+		case .creditCard:
+			fatalError()
+		}
+	}
+}
+
+extension PersonaData.Entry {
+	var kind: Kind {
+		switch self {
+		case .name: return .name
+		case .dateOfBirth: return .dateOfBirth
+		case .companyName: return .companyName
+		case .emailAddress: return .emailAddress
+		case .phoneNumber: return .phoneNumber
+		case .url: return .url
+		case .postalAddress: return .postalAddress
+		case .creditCard: return .creditCard
+		}
 	}
 }

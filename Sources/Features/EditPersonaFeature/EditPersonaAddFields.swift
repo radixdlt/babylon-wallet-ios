@@ -1,25 +1,27 @@
 import FeaturePrelude
 
 public struct EditPersonaAddFields: Sendable, FeatureReducer {
+	public typealias EntryKind = EditPersona.State.DynamicFieldID.Kind
+
 	public struct State: Sendable, Hashable {
-		let availableFields: [EditPersona.State.DynamicFieldID]
-		var selectedFields: [EditPersona.State.DynamicFieldID]? = nil
+		let availableFields: [EntryKind]
+		var selectedFields: [EntryKind]? = nil
 
 		public init(
-			excludedFieldIDs: [EditPersona.State.DynamicFieldID]
+			excludedFieldIDs: [EntryKind]
 		) {
-			self.availableFields = []
+			self.availableFields = EditPersona.State.DynamicFieldID.supportedKinds.filter { !excludedFieldIDs.contains($0) }
 		}
 	}
 
 	public enum ViewAction: Sendable, Equatable {
 		case closeButtonTapped
-		case selectedFieldsChanged([EditPersona.State.DynamicFieldID]?)
-		case addButtonTapped([EditPersona.State.DynamicFieldID])
+		case selectedFieldsChanged([EntryKind]?)
+		case addButtonTapped([EntryKind])
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
-		case addFields([EditPersona.State.DynamicFieldID])
+		case addFields([EntryKind])
 	}
 
 	@Dependency(\.dismiss) var dismiss

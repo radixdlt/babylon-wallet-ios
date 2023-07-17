@@ -11,8 +11,8 @@ extension EditPersonaAddFields.State {
 
 extension EditPersonaAddFields {
 	public struct ViewState: Equatable {
-		let availableFields: [EditPersona.State.DynamicFieldID]
-		let selectedFields: [EditPersona.State.DynamicFieldID]?
+		let availableFields: [EntryKind]
+		let selectedFields: [EntryKind]?
 	}
 
 	public struct View: SwiftUI.View {
@@ -34,7 +34,7 @@ extension EditPersonaAddFields {
 
 						SelectionList(
 							viewStore.availableFields,
-							title: \.title,
+							title: \.entry.kind.rawValue,
 							selection: viewStore.binding(
 								get: \.selectedFields,
 								send: { .selectedFieldsChanged($0) }
@@ -84,7 +84,7 @@ struct EditPersonaAddFields_Preview: View {
 			store: Store(
 				initialState: EditPersonaAddFields.State(
 					excludedFieldIDs: [
-						.emailAddress(.init(email: "yo@yo.com")),
+						.emailAddress,
 					]
 				),
 				reducer: EditPersonaAddFields()

@@ -7,7 +7,7 @@ extension EditPersona.State {
 			personaLabel: persona.displayName.rawValue,
 			avatarURL: URL(string: "something")!,
 			addAFieldButtonState: {
-				if dynamicFields.count < DynamicFieldID.supportedEntryKinds.count {
+				if dynamicFields.count < DynamicFieldID.supportedKinds.count {
 					return .enabled
 				} else {
 					return .disabled
@@ -171,8 +171,8 @@ extension EditPersona.State {
 }
 #endif
 
-extension PersonaData.Entry {
-	static var supportedEntryKinds: [Self.Kind] {
+extension EditPersona.State.DynamicFieldID {
+	static var supportedKinds: [Self.Kind] {
 		[
 			.name,
 			.phoneNumber,
