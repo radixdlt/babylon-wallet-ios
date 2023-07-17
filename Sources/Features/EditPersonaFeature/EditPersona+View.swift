@@ -6,13 +6,7 @@ extension EditPersona.State {
 		.init(
 			personaLabel: persona.displayName.rawValue,
 			avatarURL: URL(string: "something")!,
-			addAFieldButtonState: {
-//				if dynamicFields.count < DynamicFieldID.allCases.count {
-//					return .enabled
-//				} else {
-				.disabled
-//				}
-			}(),
+			addAFieldButtonState: .disabled,
 			output: { () -> EditPersona.Output? in
 				guard
 					let personaLabelInput = labelField.input,
@@ -124,17 +118,6 @@ extension EditPersona {
 					}
 					#endif
 				}
-//				.confirmationDialog(
-//					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-//					state: /EditPersona.Destinations.State.closeConfirmationDialog,
-//					action: EditPersona.Destinations.Action.closeConfirmationDialog
-//				)
-//				.sheet(
-//					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-//					state: /EditPersona.Destinations.State.addFields,
-//					action: EditPersona.Destinations.Action.addFields,
-//					content: { EditPersonaAddFields.View(store: $0) }
-//				)
 			}
 		}
 	}
@@ -150,12 +133,6 @@ struct EditPersona_Preview: PreviewProvider {
 			store: .init(
 				initialState: .previewValue(
 					mode: .edit
-//					mode: .dapp(
-//						requiredFieldIDs: [
-//							.givenName,
-//							.emailAddress,
-//						]
-//					)
 				),
 				reducer: EditPersona()
 			)
