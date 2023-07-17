@@ -43,6 +43,9 @@ public struct EditPersona: Sendable, FeatureReducer {
 		var labelField: EditPersonaStaticField.State
 		var dynamicFields: IdentifiedArrayOf<EditPersonaDynamicField.State> = []
 
+		@PresentationState
+		var destination: Destinations.State? = nil
+
 		public init(
 			mode: Mode,
 			persona: Profile.Network.Persona
@@ -71,6 +74,7 @@ public struct EditPersona: Sendable, FeatureReducer {
 	public enum ChildAction: Sendable, Equatable {
 		case labelField(EditPersonaStaticField.Action)
 		case dynamicField(id: EditPersonaDynamicField.State.ID, action: EditPersonaDynamicField.Action)
+		case destination(PresentationAction<Destinations.Action>)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -78,11 +82,18 @@ public struct EditPersona: Sendable, FeatureReducer {
 	}
 
 	public struct Destinations: Sendable, ReducerProtocol {
-		public enum State: Sendable, Hashable {}
+		public enum State: Sendable, Hashable {
+			case addFields(EditPersonaAddFields.State)
+		}
 
-		public enum Action: Sendable, Equatable {}
+		public enum Action: Sendable, Equatable {
+			case addFields(EditPersonaAddFields.Action)
+		}
 
 		public var body: some ReducerProtocolOf<Self> {
+			Scope(state: /State.addFields, action: /Action.addFields) {
+				EditPersonaAddFields()
+			}
 			EmptyReducer()
 		}
 	}
@@ -101,6 +112,9 @@ public struct EditPersona: Sendable, FeatureReducer {
 		Reduce(core)
 			.forEach(\.dynamicFields, action: /Action.child .. ChildAction.dynamicField) {
 				EditPersonaField()
+			}
+			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
+				Destinations()
 			}
 	}
 
@@ -127,6 +141,23 @@ public struct EditPersona: Sendable, FeatureReducer {
 			}
 
 		case .addAFieldButtonTapped:
+			state.destination = .addFields(.init(excludedFieldIDs: state.dynamicFields.map(\.id)))
+			return .none
+		}
+	}
+
+	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+		switch childAction {
+		case let .destination(.presented(.addFields(.delegate(.addFields(fieldsToAdd))))):
+			state.dynamicFields.append(contentsOf: fieldsToAdd.map { .init(id: $0, text: nil, isRequiredByDapp: false) })
+			state.destination = nil
+			return .none
+
+		case let .dynamicField(id, action: .delegate(.delete)):
+			state.dynamicFields.remove(id: id)
+			return .none
+
+		default:
 			return .none
 		}
 	}

@@ -16,3 +16,7 @@ public func not<T>(
 		!f(input)
 	}
 }
+
+public func identity<T>(_ t: T) -> T {
+	t
+}

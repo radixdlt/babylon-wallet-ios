@@ -23,7 +23,12 @@ struct PersonaDetailsPreviewApp: App {
 			)
 		} withReducer: {
 			$0
-				.dependency(\.personasClient, with(.noop) { $0.updatePersona = { @Sendable _ in }})
+				.dependency(
+					\.personasClient,
+					with(.noop) {
+						$0.updatePersona = { @Sendable _ in }
+					}
+				)
 				._printChanges()
 		}
 	}
@@ -41,7 +46,12 @@ extension PersonaDetails: EmptyInitializable {}
 extension PersonaDetails.State: EmptyInitializable {
 	public init() {
 		self.init(.general(
-			.previewValue0,
+			.init(
+				networkID: Profile.Network.Persona.previewValue0.networkID,
+				address: Profile.Network.Persona.previewValue0.address,
+				securityState: Profile.Network.Persona.previewValue0.securityState,
+				displayName: "Some name"
+			),
 			dApps: []
 		))
 	}

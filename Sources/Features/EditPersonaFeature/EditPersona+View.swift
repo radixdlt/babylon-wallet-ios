@@ -6,7 +6,13 @@ extension EditPersona.State {
 		.init(
 			personaLabel: persona.displayName.rawValue,
 			avatarURL: URL(string: "something")!,
-			addAFieldButtonState: .disabled,
+			addAFieldButtonState: {
+				if dynamicFields.count < DynamicFieldID.supportedEntryKinds.count {
+					return .enabled
+				} else {
+					return .disabled
+				}
+			}(),
 			output: { () -> EditPersona.Output? in
 				guard
 					let personaLabelInput = labelField.input,
@@ -118,6 +124,12 @@ extension EditPersona {
 					}
 					#endif
 				}
+				.sheet(
+					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+					state: /EditPersona.Destinations.State.addFields,
+					action: EditPersona.Destinations.Action.addFields,
+					content: { EditPersonaAddFields.View(store: $0) }
+				)
 			}
 		}
 	}
@@ -158,3 +170,13 @@ extension EditPersona.State {
 	}
 }
 #endif
+
+extension PersonaData.Entry {
+	static var supportedEntryKinds: [Self.Kind] {
+		[
+			.name,
+			.phoneNumber,
+			.emailAddress,
+		]
+	}
+}

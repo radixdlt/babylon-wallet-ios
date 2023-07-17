@@ -180,7 +180,7 @@ extension PersonaDetails.View {
 		let store: Store<PersonaDetails.State.AccountSection, PersonaDetails.ViewAction>
 
 		var body: some View {
-			WithViewStore(store, observe: { $0 }) { viewStore in
+			WithViewStore(store, observe: identity) { viewStore in
 				VStack(spacing: 0) {
 					Text(L10n.AuthorizedDapps.PersonaDetails.accountSharingDescription(viewStore.dAppName))
 						.textBlock
