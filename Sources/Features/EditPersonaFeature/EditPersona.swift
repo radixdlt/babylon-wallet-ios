@@ -10,17 +10,13 @@ extension EditPersona {
 }
 
 extension PersonaData.Entry {
+	// FIXME: Use proper values and granularity (Entry-, instead of Field-level) when Entry types will be supported
 	var text: String {
-		// FIXME: Use proper values and granularity (Entry-, instead of Field-level) when Entry types will be supported
 		switch self {
 		case let .name(entryModel): return entryModel.description
-		case let .dateOfBirth(entryModel): return entryModel.description
-		case let .companyName(entryModel): return entryModel.description
-		case let .emailAddress(entryModel): return entryModel.description
-		case let .phoneNumber(entryModel): return entryModel.description
-		case let .url(entryModel): return entryModel.description
-		case let .postalAddress(entryModel): return entryModel.description
-		case let .creditCard(entryModel): return entryModel.description
+		case let .emailAddress(entryModel): return entryModel.email
+		case let .phoneNumber(entryModel): return entryModel.number
+		default: fatalError()
 		}
 	}
 }
@@ -94,7 +90,6 @@ public struct EditPersona: Sendable, FeatureReducer {
 			Scope(state: /State.addFields, action: /Action.addFields) {
 				EditPersonaAddFields()
 			}
-			EmptyReducer()
 		}
 	}
 
