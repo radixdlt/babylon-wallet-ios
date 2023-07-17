@@ -137,10 +137,10 @@ public struct EditPersona: Sendable, FeatureReducer {
 				output.fields.forEach { identifiedFieldOutput in
 					switch identifiedFieldOutput.id {
 					// FIXME: Implement when multi-field entries support will be implemented in the UI, or entries will become supported at all
-					case let .name(entryModel): break
-					case let .dateOfBirth(entryModel): break
-					case let .companyName(entryModel): break
-					case let .emailAddress(entryModel):
+					case .name: break
+					case .dateOfBirth: break
+					case .companyName: break
+					case .emailAddress:
 						persona.personaData.emailAddresses = try! .init(
 							collection: .init(
 								uncheckedUniqueElements: [
@@ -148,7 +148,7 @@ public struct EditPersona: Sendable, FeatureReducer {
 								]
 							)
 						)
-					case let .phoneNumber(entryModel):
+					case .phoneNumber:
 						persona.personaData.phoneNumbers = try! .init(
 							collection: .init(
 								uncheckedUniqueElements: [
@@ -156,9 +156,9 @@ public struct EditPersona: Sendable, FeatureReducer {
 								]
 							)
 						)
-					case let .url(entryModel): break
-					case let .postalAddress(entryModel): break
-					case let .creditCard(entryModel): break
+					case .url: break
+					case .postalAddress: break
+					case .creditCard: break
 					}
 				}
 
