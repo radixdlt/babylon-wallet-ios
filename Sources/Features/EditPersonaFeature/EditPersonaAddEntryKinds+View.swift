@@ -1,24 +1,24 @@
 import FeaturePrelude
 
-extension EditPersonaAddFields.State {
-	var viewState: EditPersonaAddFields.ViewState {
+extension EditPersonaAddEntryKinds.State {
+	var viewState: EditPersonaAddEntryKinds.ViewState {
 		.init(
-			availableFields: availableFields,
-			selectedFields: selectedFields
+			availableEntryKinds: availableEntryKinds,
+			selectedEntryKinds: selectedEntryKinds
 		)
 	}
 }
 
-extension EditPersonaAddFields {
+extension EditPersonaAddEntryKinds {
 	public struct ViewState: Equatable {
-		let availableFields: [EntryKind]
-		let selectedFields: [EntryKind]?
+		let availableEntryKinds: [EntryKind]
+		let selectedEntryKinds: [EntryKind]?
 	}
 
 	public struct View: SwiftUI.View {
-		private let store: StoreOf<EditPersonaAddFields>
+		private let store: StoreOf<EditPersonaAddEntryKinds>
 
-		public init(store: StoreOf<EditPersonaAddFields>) {
+		public init(store: StoreOf<EditPersonaAddEntryKinds>) {
 			self.store = store
 		}
 
@@ -33,11 +33,11 @@ extension EditPersonaAddFields {
 							.padding([.top, .horizontal], .medium3)
 
 						SelectionList(
-							viewStore.availableFields,
+							viewStore.availableEntryKinds,
 							title: \.entry.kind.rawValue,
 							selection: viewStore.binding(
-								get: \.selectedFields,
-								send: { .selectedFieldsChanged($0) }
+								get: \.selectedEntryKinds,
+								send: { .selectedEntryKindsChanged($0) }
 							),
 							requiring: .atLeast(1)
 						)
@@ -56,7 +56,7 @@ extension EditPersonaAddFields {
 						.separator(.top)
 						.footer {
 							WithControlRequirements(
-								viewStore.selectedFields,
+								viewStore.selectedEntryKinds,
 								forAction: { viewStore.send(.addButtonTapped($0)) }
 							) { action in
 								Button(L10n.EditPersona.AddAField.add, action: action)
@@ -72,22 +72,22 @@ extension EditPersonaAddFields {
 #if DEBUG
 import SwiftUI // NB: necessary for previews to appear
 
-struct EditPersonaAddFields_PreviewProvider: PreviewProvider {
+struct EditPersonaAddEntryKinds_PreviewProvider: PreviewProvider {
 	static var previews: some View {
-		EditPersonaAddFields_Preview()
+		EditPersonaAddEntryKinds_Preview()
 	}
 }
 
-struct EditPersonaAddFields_Preview: View {
+struct EditPersonaAddEntryKinds_Preview: View {
 	var body: some View {
-		EditPersonaAddFields.View(
+		EditPersonaAddEntryKinds.View(
 			store: Store(
-				initialState: EditPersonaAddFields.State(
-					excludedFieldIDs: [
+				initialState: EditPersonaAddEntryKinds.State(
+					excludedEntryKinds: [
 						.emailAddress,
 					]
 				),
-				reducer: EditPersonaAddFields()
+				reducer: EditPersonaAddEntryKinds()
 			)
 		)
 	}

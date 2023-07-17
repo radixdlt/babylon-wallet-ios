@@ -75,17 +75,17 @@ public struct EditPersona: Sendable, FeatureReducer {
 	public struct Destinations: Sendable, ReducerProtocol {
 		public enum State: Sendable, Hashable {
 //			case closeConfirmationDialog(ConfirmationDialogState<ViewAction.CloseConfirmationDialogAction>)
-			case addFields(EditPersonaAddFields.State)
+			case addFields(EditPersonaAddEntryKinds.State)
 		}
 
 		public enum Action: Sendable, Equatable {
 //			case closeConfirmationDialog(ViewAction.CloseConfirmationDialogAction)
-			case addFields(EditPersonaAddFields.Action)
+			case addFields(EditPersonaAddEntryKinds.Action)
 		}
 
 		public var body: some ReducerProtocolOf<Self> {
 			Scope(state: /State.addFields, action: /Action.addFields) {
-				EditPersonaAddFields()
+				EditPersonaAddEntryKinds()
 			}
 		}
 	}
@@ -147,20 +147,19 @@ public struct EditPersona: Sendable, FeatureReducer {
 			}
 
 		case .addAFieldButtonTapped:
-			state.destination = .addFields(.init(excludedFieldIDs: state.dynamicFields.map(\.entryKind)))
+			state.destination = .addFields(.init(excludedEntryKinds: state.dynamicFields.map(\.id.kind)))
 			return .none
 		}
 	}
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
-		case let .destination(.presented(.addFields(.delegate(.addFields(fieldsToAdd))))):
+		case let .destination(.presented(.addFields(.delegate(.addEntryKinds(fieldsToAdd))))):
 			state.dynamicFields.append(contentsOf: fieldsToAdd.map {
 				.init(
 					id: $0.entry,
 					text: nil,
-					isRequiredByDapp: false,
-					entryKind: $0.entry.kind
+					isRequiredByDapp: false
 				)
 			})
 			state.destination = nil
@@ -180,7 +179,7 @@ public struct EditPersona: Sendable, FeatureReducer {
 //		case .destination(.presented(.closeConfirmationDialog(.discardChanges))):
 //			return .fireAndForget { await dismiss() }
 //
-//		case let .destination(.presented(.addFields(.delegate(.addFields(fieldsToAdd))))):
+//		case let .destination(.presented(.addEntryKinds(.delegate(.addEntryKinds(fieldsToAdd))))):
 //			state.dynamicFields.append(contentsOf: fieldsToAdd.map { .init(id: $0, initial: nil, isRequiredByDapp: false) })
 //			state.destination = nil
 //			return .none
@@ -217,8 +216,7 @@ extension PersonaData {
 						case .edit:
 							return false
 						}
-					}(),
-					entryKind: entry.value.kind
+					}()
 				)
 			}
 		)
@@ -239,21 +237,21 @@ extension Profile.Network.Persona {
 			case .dateOfBirth: break
 			case .companyName: break
 			case .emailAddress:
-				updatedPersona.personaData.emailAddresses = try! .init(
+				updatedPersona.personaData.emailAddresses = (try? .init(
 					collection: .init(
 						uncheckedUniqueElements: [
 							.init(value: .init(email: identifiedFieldOutput.value)),
 						]
 					)
-				)
+				)) ?? .init()
 			case .phoneNumber:
-				updatedPersona.personaData.phoneNumbers = try! .init(
+				updatedPersona.personaData.phoneNumbers = (try? .init(
 					collection: .init(
 						uncheckedUniqueElements: [
 							.init(value: .init(number: identifiedFieldOutput.value)),
 						]
 					)
-				)
+				)) ?? .init()
 			case .url: break
 			case .postalAddress: break
 			case .creditCard: break

@@ -50,7 +50,12 @@ extension PersonaDetails.State: EmptyInitializable {
 				networkID: Profile.Network.Persona.previewValue0.networkID,
 				address: Profile.Network.Persona.previewValue0.address,
 				securityState: Profile.Network.Persona.previewValue0.securityState,
-				displayName: "Some name"
+				displayName: "Some name",
+				personaData: try! .init(phoneNumbers: .init(
+					collection: [
+						.init(value: .init(number: "2")),
+					]
+				))
 			),
 			dApps: []
 		))

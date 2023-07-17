@@ -135,7 +135,7 @@ extension EditPersona {
 					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
 					state: /EditPersona.Destinations.State.addFields,
 					action: EditPersona.Destinations.Action.addFields,
-					content: { EditPersonaAddFields.View(store: $0) }
+					content: { EditPersonaAddEntryKinds.View(store: $0) }
 				)
 			}
 		}
