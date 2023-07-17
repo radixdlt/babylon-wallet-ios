@@ -48,7 +48,7 @@ extension EditPersonaAddFields {
 						.navigationBarTitleDisplayMode(.inline)
 						.navigationBarInlineTitleFont(.app.secondaryHeader)
 						.toolbar {
-							ToolbarItem(placement: .navigationBarLeading) {
+							ToolbarItem(placement: .primaryAction) {
 								CloseButton(action: { viewStore.send(.closeButtonTapped) })
 							}
 						}
