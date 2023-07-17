@@ -183,13 +183,3 @@ extension EditPersona.State {
 	}
 }
 #endif
-
-extension EditPersona.State.DynamicFieldID {
-	static var supportedKinds: [Self.Kind] {
-		[
-			.name,
-			.emailAddress,
-			.phoneNumber,
-		]
-	}
-}

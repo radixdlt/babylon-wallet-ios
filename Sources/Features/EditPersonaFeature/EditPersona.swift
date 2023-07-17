@@ -9,18 +9,6 @@ extension EditPersona {
 	}
 }
 
-extension PersonaData.Entry {
-	// FIXME: Use proper values and granularity (Entry-, instead of Field-level) when Entry types will be supported
-	var text: String {
-		switch self {
-		case let .name(entryModel): return entryModel.description
-		case let .emailAddress(entryModel): return entryModel.email
-		case let .phoneNumber(entryModel): return entryModel.number
-		default: fatalError()
-		}
-	}
-}
-
 // MARK: - EditPersona
 public struct EditPersona: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
@@ -150,39 +138,9 @@ public struct EditPersona: Sendable, FeatureReducer {
 
 		case let .saveButtonTapped(output):
 			return .run { [state] send in
-				var persona = state.persona
-				persona.displayName = output.personaLabel
-				persona.personaData = .init()
-				output.fields.forEach { identifiedFieldOutput in
-					switch identifiedFieldOutput.id {
-					// FIXME: Implement when multi-field entries support will be implemented in the UI, or entries will become supported at all
-					case .name: break
-					case .dateOfBirth: break
-					case .companyName: break
-					case .emailAddress:
-						persona.personaData.emailAddresses = try! .init(
-							collection: .init(
-								uncheckedUniqueElements: [
-									.init(value: .init(email: identifiedFieldOutput.value)),
-								]
-							)
-						)
-					case .phoneNumber:
-						persona.personaData.phoneNumbers = try! .init(
-							collection: .init(
-								uncheckedUniqueElements: [
-									.init(value: .init(number: identifiedFieldOutput.value)),
-								]
-							)
-						)
-					case .url: break
-					case .postalAddress: break
-					case .creditCard: break
-					}
-				}
-
-				try await personasClient.updatePersona(persona)
-				await send(.delegate(.personaSaved(persona)))
+				let updatedPersona = state.persona.updated(with: output)
+				try await personasClient.updatePersona(updatedPersona)
+				await send(.delegate(.personaSaved(updatedPersona)))
 				await dismiss()
 			} catch: { error, _ in
 				errorQueue.schedule(error)
@@ -264,6 +222,57 @@ extension PersonaData {
 				)
 			}
 		)
+	}
+}
+
+extension Profile.Network.Persona {
+	fileprivate func updated(with output: EditPersona.Output) -> Self {
+		var updatedPersona = self
+
+		updatedPersona.displayName = output.personaLabel
+
+		updatedPersona.personaData = .init()
+		output.fields.forEach { identifiedFieldOutput in
+			// FIXME: Implement when multi-field entries support will be implemented in the UI, or entries will become supported at all
+			switch identifiedFieldOutput.id {
+			case .name: break
+			case .dateOfBirth: break
+			case .companyName: break
+			case .emailAddress:
+				updatedPersona.personaData.emailAddresses = try! .init(
+					collection: .init(
+						uncheckedUniqueElements: [
+							.init(value: .init(email: identifiedFieldOutput.value)),
+						]
+					)
+				)
+			case .phoneNumber:
+				updatedPersona.personaData.phoneNumbers = try! .init(
+					collection: .init(
+						uncheckedUniqueElements: [
+							.init(value: .init(number: identifiedFieldOutput.value)),
+						]
+					)
+				)
+			case .url: break
+			case .postalAddress: break
+			case .creditCard: break
+			}
+		}
+
+		return updatedPersona
+	}
+}
+
+extension PersonaData.Entry {
+	// FIXME: Use proper values and granularity (Entry-, instead of Field-level) when Entry types will be supported
+	var text: String {
+		switch self {
+		case let .name(entryModel): return entryModel.description
+		case let .emailAddress(entryModel): return entryModel.email
+		case let .phoneNumber(entryModel): return entryModel.number
+		default: fatalError()
+		}
 	}
 }
 
