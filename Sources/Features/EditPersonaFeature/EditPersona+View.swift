@@ -177,8 +177,8 @@ extension EditPersona.State.DynamicFieldID {
 	static var supportedKinds: [Self.Kind] {
 		[
 			.name,
-			.phoneNumber,
 			.emailAddress,
+			.phoneNumber,
 		]
 	}
 }

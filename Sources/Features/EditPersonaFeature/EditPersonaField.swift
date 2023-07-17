@@ -1,8 +1,7 @@
 import FeaturePrelude
 
 // MARK: - EditPersonaFieldID
-// FIXME: Bring back `Comparable` if necessary (alongside `@Sorted(by: \.id)` at `EditPersona.State.dynamicFields`)
-public protocol EditPersonaFieldID: Sendable, Hashable {
+public protocol EditPersonaFieldID: Sendable, Hashable, Comparable {
 	var title: String { get }
 	#if os(iOS)
 	var contentType: UITextContentType? { get }
@@ -180,6 +179,24 @@ extension EditPersona.State.DynamicFieldID: EditPersonaFieldID {
 		}
 	}
 	#endif
+}
+
+// MARK: - EditPersona.State.DynamicFieldID + Comparable
+extension EditPersona.State.DynamicFieldID: Comparable {
+	public static func < (lhs: Self, rhs: Self) -> Bool {
+		guard
+			let lhsIndex = Self.supportedKinds.firstIndex(of: lhs.kind),
+			let rhsIndex = Self.supportedKinds.firstIndex(of: rhs.kind)
+		else {
+			assertionFailure(
+				"""
+				This code path should never occur, unless you're manually conforming to `CaseIterable` and `allCases` is incomplete.
+				"""
+			)
+			return false
+		}
+		return lhsIndex < rhsIndex
+	}
 }
 
 extension EditPersonaDynamicField.State {
