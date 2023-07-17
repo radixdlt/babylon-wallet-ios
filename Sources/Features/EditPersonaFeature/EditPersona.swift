@@ -133,6 +133,34 @@ public struct EditPersona: Sendable, FeatureReducer {
 			return .run { [state] send in
 				var persona = state.persona
 				persona.displayName = output.personaLabel
+				output.fields.forEach { identifiedFieldOutput in
+					switch identifiedFieldOutput.id {
+					// FIXME: Implement when multi-field entries support will be implemented in the UI, or entries will become supported at all
+					case let .name(entryModel): break
+					case let .dateOfBirth(entryModel): break
+					case let .companyName(entryModel): break
+					case let .emailAddress(entryModel):
+						persona.personaData.emailAddresses = try! .init(
+							collection: .init(
+								uncheckedUniqueElements: [
+									.init(value: .init(email: identifiedFieldOutput.value)),
+								]
+							)
+						)
+					case let .phoneNumber(entryModel):
+						persona.personaData.phoneNumbers = try! .init(
+							collection: .init(
+								uncheckedUniqueElements: [
+									.init(value: .init(number: identifiedFieldOutput.value)),
+								]
+							)
+						)
+					case let .url(entryModel): break
+					case let .postalAddress(entryModel): break
+					case let .creditCard(entryModel): break
+					}
+				}
+
 				try await personasClient.updatePersona(persona)
 				await send(.delegate(.personaSaved(persona)))
 				await dismiss()
