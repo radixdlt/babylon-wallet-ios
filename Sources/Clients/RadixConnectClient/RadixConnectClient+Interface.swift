@@ -30,6 +30,7 @@ public struct RadixConnectClient: DependencyKey, Sendable {
 
 	public var getP2PLinks: GetP2PLinks
 	public var getP2PLinksWithConnectionStatusUpdates: GetP2PLinksWithConnectionStatusUpdates
+	public var idsOfConnectedPeerConnections: IDsOfConnectedPeerConnections
 	public var storeP2PLink: StoreP2PLink
 	public var deleteP2PLinkByPassword: DeleteP2PLinkByPassword
 	public var addP2PWithPassword: AddP2PWithPassword
@@ -51,6 +52,7 @@ extension RadixConnectClient {
 
 	public typealias GetP2PLinks = @Sendable () async throws -> OrderedSet<P2PLink>
 	public typealias GetP2PLinksWithConnectionStatusUpdates = @Sendable () async -> AnyAsyncSequence<[P2P.LinkConnectionUpdate]>
+	public typealias IDsOfConnectedPeerConnections = @Sendable () async -> [PeerConnectionID]
 
 	public typealias StoreP2PLink = @Sendable (P2PLink) async throws -> Void
 
@@ -62,18 +64,4 @@ extension RadixConnectClient {
 	public typealias SendRequest = @Sendable (_ request: P2P.RTCOutgoingMessage.Request, _ sendStrategy: P2P.RTCOutgoingMessage.Request.SendStrategy) async throws -> Int
 
 	public typealias SendResponse = @Sendable (_ response: P2P.RTCOutgoingMessage.Response, _ origin: P2P.RTCRoute) async throws -> Void
-}
-
-extension RadixConnectClient {
-	public func idsOfConnectedPeerConnections() async -> [PeerConnectionID] {
-		let connectedClients = await RTCClients().currentlyConnectedClients
-		@Dependency(\.p2pLinksClient) var p2pLinksClient
-
-		let links = await p2pLinksClient.getP2PLinks()
-
-		return connectedClients.flatMap { connectedClient -> [PeerConnectionID] in
-			guard links.contains(where: { $0.id == connectedClient.clientID }) else { return [] }
-			return connectedClient.idsOfConnectedPeerConnections
-		}
-	}
 }

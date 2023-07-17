@@ -60,6 +60,17 @@ extension RadixConnectClient {
 				await OrderedSet(p2pLinksClient.getP2PLinks())
 			},
 			getP2PLinksWithConnectionStatusUpdates: getP2PLinksWithConnectionStatusUpdates,
+			idsOfConnectedPeerConnections: {
+				let connectedClients = await rtcClients.currentlyConnectedClients
+				@Dependency(\.p2pLinksClient) var p2pLinksClient
+
+				let links = await p2pLinksClient.getP2PLinks()
+
+				return connectedClients.flatMap { connectedClient -> [PeerConnectionID] in
+					guard links.contains(where: { $0.id == connectedClient.clientID }) else { return [] }
+					return connectedClient.idsOfConnectedPeerConnections
+				}
+			},
 			storeP2PLink: { client in
 				try await p2pLinksClient.addP2PLink(client)
 			},
