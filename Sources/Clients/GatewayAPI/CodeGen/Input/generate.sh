@@ -36,22 +36,16 @@ mv ../$PROJECT_NAME/Classes/OpenAPIs/Extensions.swift ../Generated/AUXILARY
 mv ../$PROJECT_NAME/Classes/OpenAPIs/CodableHelper.swift ../Generated/AUXILARY
 mv ../$PROJECT_NAME/Classes/OpenAPIs/OpenISO8601DateFormatter.swift ../Generated/AUXILARY
 
-# Remove malformed models
+# Remove malformed models, replaced with CreatedModels
 rm ../Generated/FungibleResourcesCollectionItem.swift
 rm ../Generated/NonFungibleResourcesCollectionItem.swift
 rm ../Generated/StateEntityDetailsResponseItemDetails.swift
 rm ../Generated/PublicKey.swift
 rm ../Generated/MetadataTypedValue.swift
 rm ../Generated/PublicKeyHash.swift
+rm ../Generated/GatewayError.swift
 
 cd $OUTPUTDIR
-find $PROJECT_NAME -type f -not -name 'Configuration.swift' \
--not -name 'FungibleResourcesCollectionItem.swift' \
--not -name 'NonFungibleResourcesCollectionItem.swift' \
--not -name 'StateEntityDetailsResponseItemDetails.swift' \
--not -name 'PublicKey.swift' \
--not -name 'MetadataTypedValue.swift' \
--not -name 'PublicKeyHash.swift' \
--delete
+find $PROJECT_NAME -type f -not -name 'Configuration.swift' -delete
 
 rm -r docs Cartfile git_push.sh $PROJECT_NAME.podspec Package.swift project.yml README.md .gitignore .openapi-generator-ignore .swiftformat .openapi-generator/FILES  .openapi-generator/VERSION
