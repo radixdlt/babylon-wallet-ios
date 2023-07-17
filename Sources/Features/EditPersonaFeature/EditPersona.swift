@@ -133,6 +133,7 @@ public struct EditPersona: Sendable, FeatureReducer {
 			return .run { [state] send in
 				var persona = state.persona
 				persona.displayName = output.personaLabel
+				persona.personaData = .init()
 				output.fields.forEach { identifiedFieldOutput in
 					switch identifiedFieldOutput.id {
 					// FIXME: Implement when multi-field entries support will be implemented in the UI, or entries will become supported at all
@@ -207,7 +208,9 @@ extension EditPersona.State {
 }
 
 extension PersonaData {
-	func dynamicFields(in mode: EditPersona.State.Mode) -> IdentifiedArrayOf<EditPersonaDynamicField.State> {
+	func dynamicFields(
+		in mode: EditPersona.State.Mode
+	) -> IdentifiedArrayOf<EditPersonaDynamicField.State> {
 		IdentifiedArray(
 			uncheckedUniqueElements: entries.map { entry in
 				EditPersonaDynamicField.State(
