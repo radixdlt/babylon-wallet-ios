@@ -1130,7 +1130,7 @@ components:
         - Pending
         - Rejected
 
-   TransactionReceiptStatus:
+    TransactionReceiptStatus:
       type: string
       enum:
         - Succeeded
@@ -1142,8 +1142,7 @@ components:
       type: object
       properties:
         status:
-          description: The status of the transaction.
-          $ref: "#/components/schemas/TransactionStatus"
+          $ref: "#/components/schemas/TransactionReceiptStatus"
         fee_summary:
           description: Fees paid, Only present if the `status` is not `Rejected`.
           type: object
@@ -1447,7 +1446,7 @@ components:
         encoded_receipt:
           $ref: "#/components/schemas/HexString"
         receipt:
-          type: object
+          $ref: "#/components/schemas/TransactionReceipt"
         resource_changes:
           type: array
           items:
