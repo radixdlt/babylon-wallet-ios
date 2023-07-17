@@ -237,6 +237,7 @@ extension Profile.Network.Persona {
 			case .dateOfBirth: break
 			case .companyName: break
 			case .emailAddress:
+				// FIXME: `try` and handle errors properly when we will have multiple entries of that kind
 				updatedPersona.personaData.emailAddresses = (try? .init(
 					collection: .init(
 						uncheckedUniqueElements: [
@@ -245,6 +246,7 @@ extension Profile.Network.Persona {
 					)
 				)) ?? .init()
 			case .phoneNumber:
+				// FIXME: `try` and handle errors properly when we will have multiple entries of that kind
 				updatedPersona.personaData.phoneNumbers = (try? .init(
 					collection: .init(
 						uncheckedUniqueElements: [
