@@ -34,15 +34,17 @@ extension EditPersona.State {
 	) -> IdentifiedArrayOf<Identified<EditPersonaDynamicField.State.ID, String>>? {
 		var fieldsOutput: IdentifiedArrayOf<Identified<EditPersonaDynamicField.State.ID, String>> = []
 		for field in dynamicFields {
-			guard let fieldInput = field.input else {
+			guard
+				let fieldInput = field.input,
+				let fieldOutput = NonEmptyString(rawValue: fieldInput.trimmingWhitespace())
+			else {
 				if field.kind == .dynamic(isRequiredByDapp: true) {
 					return nil
 				} else {
 					continue
 				}
 			}
-			let fieldOutput = fieldInput.trimmingWhitespace()
-			fieldsOutput[id: field.id] = .init(fieldOutput, id: field.id)
+			fieldsOutput[id: field.id] = .init(fieldOutput.rawValue, id: field.id)
 		}
 
 		return fieldsOutput
