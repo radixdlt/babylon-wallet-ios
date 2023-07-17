@@ -16,27 +16,36 @@ extension EditPersona.State {
 			output: { () -> EditPersona.Output? in
 				guard
 					let personaLabelInput = labelField.input,
-					let personaLabelOutput = NonEmptyString(rawValue: personaLabelInput.trimmingWhitespace())
+					let personaLabelOutput = NonEmptyString(rawValue: personaLabelInput.trimmingWhitespace()),
+					let fieldsOutput = fieldsOutput(dynamicFields: dynamicFields)
 				else {
 					return nil
 				}
-//				var fieldsOutput: IdentifiedArrayOf<Profile.Network.Persona.Field> = []
-//				for field in dynamicFields {
-//					guard
-//						let fieldInput = field.input,
-//						let fieldOutput = NonEmptyString(rawValue: fieldInput.trimmingWhitespace())
-//					else {
-//						if field.kind == .dynamic(isRequiredByDapp: true) {
-//							return nil
-//						} else {
-//							continue
-//						}
-//					}
-//					fieldsOutput[id: field.id] = .init(id: field.id, value: fieldOutput)
-//				}
-				return EditPersona.Output(personaLabel: personaLabelOutput) // , fields: fieldsOutput)
+				return EditPersona.Output(
+					personaLabel: personaLabelOutput,
+					fields: fieldsOutput
+				)
 			}()
 		)
+	}
+
+	func fieldsOutput(
+		dynamicFields: IdentifiedArrayOf<EditPersonaDynamicField.State>
+	) -> IdentifiedArrayOf<Identified<EditPersonaDynamicField.State.ID, String>>? {
+		var fieldsOutput: IdentifiedArrayOf<Identified<EditPersonaDynamicField.State.ID, String>> = []
+		for field in dynamicFields {
+			guard let fieldInput = field.input else {
+				if field.kind == .dynamic(isRequiredByDapp: true) {
+					return nil
+				} else {
+					continue
+				}
+			}
+			let fieldOutput = fieldInput.trimmingWhitespace()
+			fieldsOutput[id: field.id] = .init(fieldOutput, id: field.id)
+		}
+
+		return fieldsOutput
 	}
 }
 
@@ -67,19 +76,23 @@ extension EditPersona {
 							EditPersonaStaticField.View(
 								store: store.scope(
 									state: \.labelField,
-									action: { .child(.labelField($0)) }
+									action: (/Action.child
+										.. EditPersona.ChildAction.labelField
+									).embed
 								)
 							)
 
 							Separator()
 
-//							ForEachStore(
-//								store.scope(
-//									state: \.dynamicFields,
-//									action: { .child(.dynamicField(id: $0, action: $1)) }
-//								),
-//								content: { EditPersonaDynamicField.View(store: $0) }
-//							)
+							ForEachStore(
+								store.scope(
+									state: \.dynamicFields,
+									action: (/Action.child
+										.. EditPersona.ChildAction.dynamicField
+									).embed
+								),
+								content: EditPersonaDynamicField.View.init
+							)
 
 							Button(action: { viewStore.send(.addAFieldButtonTapped) }) {
 								Text(L10n.EditPersona.addAField).padding(.horizontal, .medium2)

@@ -5,7 +5,23 @@ import PersonasClient
 extension EditPersona {
 	public struct Output: Sendable, Hashable {
 		let personaLabel: NonEmptyString
-//		let fields: IdentifiedArrayOf<Profile.Network.Persona.Field>
+		let fields: IdentifiedArrayOf<Identified<EditPersonaDynamicField.State.ID, String>>
+	}
+}
+
+extension PersonaData.Entry {
+	var text: String {
+		// FIXME: Use proper values and granularity (Entry-, instead of Field-level) when Entry types will be supported
+		switch self {
+		case let .name(entryModel): return entryModel.description
+		case let .dateOfBirth(entryModel): return entryModel.description
+		case let .companyName(entryModel): return entryModel.description
+		case let .emailAddress(entryModel): return entryModel.description
+		case let .phoneNumber(entryModel): return entryModel.description
+		case let .url(entryModel): return entryModel.description
+		case let .postalAddress(entryModel): return entryModel.description
+		case let .creditCard(entryModel): return entryModel.description
+		}
 	}
 }
 
@@ -21,13 +37,13 @@ public struct EditPersona: Sendable, FeatureReducer {
 			case personaLabel
 		}
 
-//		public typealias DynamicFieldID = Profile.Network.Persona.Field.ID
+		public typealias DynamicFieldID = PersonaData.Entry
 
 		let mode: Mode
 		let persona: Profile.Network.Persona
 		var labelField: EditPersonaStaticField.State
 //		@Sorted(by: \.id)
-//		var dynamicFields: IdentifiedArrayOf<EditPersonaDynamicField.State> = []
+		var dynamicFields: IdentifiedArrayOf<EditPersonaDynamicField.State> = []
 //
 //		@PresentationState
 //		var destination: Destinations.State? = nil
@@ -42,22 +58,7 @@ public struct EditPersona: Sendable, FeatureReducer {
 				id: .personaLabel,
 				initial: persona.displayName.rawValue
 			)
-//			self.dynamicFields = IdentifiedArray(
-//				uncheckedUniqueElements: persona.fields.map { field in
-//					EditPersonaDynamicField.State(
-//						id: field.id,
-//						initial: field.value.rawValue,
-//						isRequiredByDapp: {
-//							switch mode {
-//							case .edit:
-//								return false
-//							case let .dapp(requiredFieldIDs):
-//								return requiredFieldIDs.contains(field.id)
-//							}
-//						}()
-//					)
-//				}
-//			)
+			self.dynamicFields = persona.personaData.dynamicFields(in: mode)
 //			if case let .dapp(requiredFieldIDs) = mode {
 //				for requiredFieldID in requiredFieldIDs where dynamicFields[id: requiredFieldID] == nil {
 //					dynamicFields.append(.init(id: requiredFieldID, initial: nil, isRequiredByDapp: true))
@@ -79,7 +80,7 @@ public struct EditPersona: Sendable, FeatureReducer {
 
 	public enum ChildAction: Sendable, Equatable {
 		case labelField(EditPersonaStaticField.Action)
-//		case dynamicField(id: EditPersonaDynamicField.State.ID, action: EditPersonaDynamicField.Action)
+		case dynamicField(id: EditPersonaDynamicField.State.ID, action: EditPersonaDynamicField.Action)
 //		case destination(PresentationAction<Destinations.Action>)
 	}
 
@@ -118,9 +119,9 @@ public struct EditPersona: Sendable, FeatureReducer {
 		}
 
 		Reduce(core)
-//			.forEach(\.dynamicFields, action: /Action.child .. ChildAction.dynamicField) {
-//				EditPersonaField()
-//			}
+			.forEach(\.dynamicFields, action: /Action.child .. ChildAction.dynamicField) {
+				EditPersonaField()
+			}
 //			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
 //				Destinations()
 //			}
@@ -194,7 +195,25 @@ extension EditPersona.State {
 	func hasChanges() -> Bool {
 		guard let output = viewState.output else { return false }
 		return output.personaLabel != persona.displayName
-		// FIXME: Ensure that we check the dynamic fields as well (when we bring them back)
-		// || persona.fields != output.fields
+			|| fieldsOutput(dynamicFields: persona.personaData.dynamicFields(in: mode)) != output.fields
+	}
+}
+
+extension PersonaData {
+	func dynamicFields(in mode: EditPersona.State.Mode) -> IdentifiedArrayOf<EditPersonaDynamicField.State> {
+		IdentifiedArray(
+			uncheckedUniqueElements: entries.map { entry in
+				EditPersonaDynamicField.State(
+					id: entry.value,
+					text: entry.value.text,
+					isRequiredByDapp: {
+						switch mode {
+						case .edit:
+							return false
+						}
+					}()
+				)
+			}
+		)
 	}
 }
