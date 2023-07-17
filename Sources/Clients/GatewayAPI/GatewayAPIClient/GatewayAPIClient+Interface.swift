@@ -135,18 +135,34 @@ extension GatewayAPI.EntityMetadataCollection {
 
 // FIXME: Temporary hack to extract the key_image_url, until we have a proper schema
 extension GatewayAPI.StateNonFungibleDetailsResponseItem {
-	public var keyImageURL: URL? {
-		guard let dictionary = data.rawJson.value as? [String: Any] else { return nil }
-		guard let elements = dictionary["elements"] as? [[String: Any]] else { return nil }
-		let values = elements.filter { $0["type"] as? String == "String" }.compactMap { $0["value"] as? String }
-		let extensions = ["jpg", "jpeg", "png", "pdf", "svg", "gif"]
-		for value in values {
-			for ext in extensions {
-				if value.lowercased().hasSuffix(ext) {
-					return .init(string: value)
-				}
+	public var details: (name: String?, keyImageURL: URL?) {
+		guard let dictionary = data.rawJson.value as? [String: Any] else { return (nil, nil) }
+		guard let elements = dictionary["elements"] as? [[String: Any]] else { return (nil, nil) }
+		let strings = elements.filter { $0["type"] as? String == "String" }.compactMap { $0["value"] as? String }
+
+		var name: String? = nil
+		var keyImageURL: URL? = nil
+
+		for string in strings {
+			if keyImageURL == nil, let url = getKeyImageURL(from: string) {
+				keyImageURL = url
+			} else if name == nil {
+				name = string
 			}
 		}
-		return nil
+
+		return (name, keyImageURL)
+	}
+
+	private func getKeyImageURL(from string: String) -> URL? {
+		guard let url = URL(string: string) else { return nil }
+
+		let schemes = ["http", "https"]
+		guard let scheme = url.scheme, schemes.contains(scheme) else { return nil }
+
+		let extensions = ["jpg", "jpeg", "png", "pdf", "svg", "gif"]
+		guard extensions.contains(url.pathExtension) else { return nil }
+
+		return url
 	}
 }
