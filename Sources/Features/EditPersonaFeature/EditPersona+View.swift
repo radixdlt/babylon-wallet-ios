@@ -30,9 +30,9 @@ extension EditPersona.State {
 	}
 
 	func fieldsOutput(
-		dynamicFields: IdentifiedArrayOf<EditPersonaDynamicField.State>
-	) -> IdentifiedArrayOf<Identified<EditPersonaDynamicField.State.ID, String>>? {
-		var fieldsOutput: IdentifiedArrayOf<Identified<EditPersonaDynamicField.State.ID, String>> = []
+		dynamicFields: IdentifiedArrayOf<EditPersonaDynamicEntry.State>
+	) -> IdentifiedArrayOf<Identified<EditPersonaDynamicEntry.State.ID, String>>? {
+		var fieldsOutput: IdentifiedArrayOf<Identified<EditPersonaDynamicEntry.State.ID, String>> = []
 		for field in dynamicFields {
 			guard
 				let fieldInput = field.input,
@@ -93,7 +93,7 @@ extension EditPersona {
 										.. EditPersona.ChildAction.dynamicField
 									).embed
 								),
-								content: EditPersonaDynamicField.View.init
+								content: EditPersonaDynamicEntry.View.init
 							)
 
 							Button(action: { viewStore.send(.addAFieldButtonTapped) }) {

@@ -117,7 +117,7 @@ extension EditPersonaStaticField.State {
 
 // MARK: Dynamic Fields
 
-public typealias EditPersonaDynamicField = EditPersonaField<EditPersona.State.DynamicFieldID>
+public typealias EditPersonaDynamicEntry = EditPersonaEntry<EditPersona.State.DynamicFieldID>
 
 // MARK: - EditPersona.State.DynamicFieldID + EditPersonaFieldID
 extension EditPersona.State.DynamicFieldID: EditPersonaFieldID {
@@ -205,7 +205,7 @@ extension EditPersona.State.DynamicFieldID {
 	}
 }
 
-extension EditPersonaDynamicField.State {
+extension EditPersonaDynamicEntry.State {
 	public init(
 		id: ID,
 		text: String?,

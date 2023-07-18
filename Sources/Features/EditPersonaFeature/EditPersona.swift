@@ -6,7 +6,7 @@ import Prelude
 extension EditPersona {
 	public struct Output: Sendable, Hashable {
 		let personaLabel: NonEmptyString
-		let fields: IdentifiedArrayOf<Identified<EditPersonaDynamicField.State.ID, String>>
+		let fields: IdentifiedArrayOf<Identified<EditPersonaDynamicEntry.State.ID, String>>
 	}
 }
 
@@ -27,7 +27,7 @@ public struct EditPersona: Sendable, FeatureReducer {
 		let persona: Profile.Network.Persona
 		var labelField: EditPersonaStaticField.State
 		@Sorted(by: \.id)
-		var dynamicFields: IdentifiedArrayOf<EditPersonaDynamicField.State> = []
+		var dynamicFields: IdentifiedArrayOf<EditPersonaDynamicEntry.State> = []
 
 		@PresentationState
 		var destination: Destinations.State? = nil
@@ -59,7 +59,7 @@ public struct EditPersona: Sendable, FeatureReducer {
 
 	public enum ChildAction: Sendable, Equatable {
 		case labelEntry(EditPersonaEntry<EditPersona.State.StaticFieldID>.Action)
-		case dynamicField(id: EditPersonaDynamicField.State.ID, action: EditPersonaDynamicField.Action)
+		case dynamicField(id: EditPersonaDynamicEntry.State.ID, action: EditPersonaDynamicEntry.Action)
 		case destination(PresentationAction<Destinations.Action>)
 	}
 
@@ -101,7 +101,7 @@ public struct EditPersona: Sendable, FeatureReducer {
 
 		Reduce(core)
 			.forEach(\.dynamicFields, action: /Action.child .. ChildAction.dynamicField) {
-				EditPersonaField()
+				EditPersonaEntry()
 			}
 			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
 				Destinations()
@@ -165,7 +165,7 @@ public struct EditPersona: Sendable, FeatureReducer {
 			state.destination = nil
 			return .none
 
-		case let .dynamicField(id, action: .delegate(.delete)):
+		case let .dynamicField(id, action: .child(.field(.delegate(.delete)))):
 			state.dynamicFields.remove(id: id)
 			return .none
 
@@ -186,10 +186,10 @@ extension EditPersona.State {
 extension PersonaData {
 	func dynamicFields(
 		in mode: EditPersona.State.Mode
-	) -> IdentifiedArrayOf<EditPersonaDynamicField.State> {
+	) -> IdentifiedArrayOf<EditPersonaDynamicEntry.State> {
 		IdentifiedArray(
 			uncheckedUniqueElements: entries.map(\.value).map { entryValue in
-				EditPersonaDynamicField.State(
+				EditPersonaDynamicEntry.State(
 					id: entryValue.kind,
 					text: entryValue.text,
 					isRequiredByDapp: {
