@@ -1002,7 +1002,7 @@ package.addModules([
 		dependencies: [
 			"Cryptography",
 			.product(name: "EngineToolkit", package: "swift-engine-toolkit") {
-				.package(url: "https://github.com/radixdlt/swift-engine-toolkit", exact: "0.10.0-elm.1-e842ed0")
+                                .package(url: "https://github.com/radixdlt/swift-engine-toolkit", revision: "a12a0e0dc9d508358778d049bfb9667aa96a4f7c")
 			},
 		],
 		tests: .no
