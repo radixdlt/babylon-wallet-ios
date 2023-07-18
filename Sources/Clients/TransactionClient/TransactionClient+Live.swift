@@ -247,7 +247,7 @@ extension TransactionClient {
 
 			return .init(
 				notarized: compiledNotarizedTXIntent,
-				txID: .init(txID.asStr())
+				txID: txID
 			)
 		}
 

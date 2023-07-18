@@ -810,3 +810,14 @@ extension ManifestAddress: Hashable {
 		}
 	}
 }
+
+// MARK: - TransactionHash + Hashable
+extension TransactionHash: Hashable {
+	public static func == (lhs: TransactionHash, rhs: TransactionHash) -> Bool {
+		lhs.asStr() == rhs.asStr()
+	}
+
+	public func hash(into hasher: inout Hasher) {
+		hasher.combine(asStr())
+	}
+}

@@ -1,4 +1,10 @@
 import EngineToolkit
 import Tagged
 
-public typealias TXID = Tagged<Intent, String>
+public typealias TXID = TransactionHash
+
+extension TXID {
+	public var hex: String {
+		bytes().hex()
+	}
+}
