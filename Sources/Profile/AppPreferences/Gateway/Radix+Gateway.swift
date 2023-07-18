@@ -44,6 +44,13 @@ extension Radix.Gateway {
 		)
 	}
 
+	public static var ansharnet: Self {
+		.init(
+			network: .ansharnet,
+			url: URL(string: "https://ansharnet-gateway.radixdlt.com/")!
+		)
+	}
+
 	public static var hammunet: Self {
 		.init(
 			network: .hammunet,

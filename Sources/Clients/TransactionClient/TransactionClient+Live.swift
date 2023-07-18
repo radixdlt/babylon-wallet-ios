@@ -219,7 +219,7 @@ extension TransactionClient {
 			)
 
 			return .init(
-				intent: .init(header: header, manifest: request.manifest),
+				intent: .init(header: header, manifest: request.manifest, message: .none),
 				transactionSigners: transactionSigners
 			)
 		}

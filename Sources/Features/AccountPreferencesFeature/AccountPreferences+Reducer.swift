@@ -377,7 +377,7 @@ extension TransactionManifest {
 		            "account_type"
 		            Enum<Metadata::String>("dapp definition");
 		"""
-		return try .init(instructions: .fromString(string: raw, blobs: [], networkId: account.networkID.rawValue), blobs: [])
+		return try .init(instructions: .fromString(string: raw, networkId: account.networkID.rawValue), blobs: [])
 	}
 }
 #endif

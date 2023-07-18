@@ -95,11 +95,11 @@ extension Instructions {
 	}
 
 	static func faucetAddress(networkID: NetworkID) -> EngineToolkit.Address {
-		utilsKnownAddresses(networkId: networkID.rawValue).componentAddresses.faucet
+		knownAddresses(networkId: networkID.rawValue).componentAddresses.faucet
 	}
 
 	static func from(rawInstructions: [String], network: NetworkID) throws -> Instructions {
-		try .fromString(string: rawInstructions.joined(separator: "\n"), blobs: [], networkId: network.rawValue)
+		try .fromString(string: rawInstructions.joined(separator: "\n"), networkId: network.rawValue)
 	}
 
 	static func createFungibleToken(
@@ -165,7 +165,7 @@ extension Instruction {
 		address: Address,
 		fee: String = "10"
 	) throws -> Instruction {
-		try .callMethod(address: .init(address: address.address), methodName: "lock_fee", args: .tupleValue(fields: [.decimalValue(value: .init(value: fee))]))
+		try .callMethod(address: .static(value: .init(address: address.address)), methodName: "lock_fee", args: .tupleValue(fields: [.decimalValue(value: .init(value: fee))]))
 	}
 
 	static func depositBatch(account: AccountAddress) -> String {
@@ -388,14 +388,14 @@ extension PublicKeyHash {
 	/// https://rdxworks.slack.com/archives/C031A0V1A1W/p1683275008777499?thread_ts=1683221252.228129&cid=C031A0V1A1W
 	var discriminator: String {
 		switch self {
-		case .ecdsaSecp256k1: return "0u8"
-		case .eddsaEd25519: return "1u8"
+		case .secp256k1: return "0u8"
+		case .ed25519: return "1u8"
 		}
 	}
 
 	func bytes() throws -> [UInt8] {
 		switch self {
-		case let .ecdsaSecp256k1(value), let .eddsaEd25519(value):
+		case let .secp256k1(value), let .ed25519(value):
 			return value
 		}
 	}

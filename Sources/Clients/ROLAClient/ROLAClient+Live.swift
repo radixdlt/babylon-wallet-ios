@@ -192,9 +192,9 @@ extension EngineKit.PublicKeyHash {
 
 		switch publicKey {
 		case .ecdsaSecp256k1:
-			self = .ecdsaSecp256k1(value: hashBytes.bytes)
+			self = .secp256k1(value: hashBytes.bytes)
 		case .eddsaEd25519:
-			self = .eddsaEd25519(value: hashBytes.bytes)
+			self = .ed25519(value: hashBytes.bytes)
 		}
 	}
 }
@@ -209,10 +209,10 @@ extension GatewayAPI.EntityMetadataCollection {
 			switch hash {
 			case let .ecdsaSecp256k1(value):
 				let bytes = try [UInt8].init(hex: value.hashHex)
-				return .ecdsaSecp256k1(value: bytes)
+				return .secp256k1(value: bytes)
 			case let .eddsaEd25519(value):
 				let bytes = try [UInt8].init(hex: value.hashHex)
-				return .eddsaEd25519(value: bytes)
+				return .ed25519(value: bytes)
 			}
 		}
 	}

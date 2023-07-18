@@ -35,7 +35,6 @@ extension P2P.Dapp.Request {
 			}
 			let instructions = try Instructions.fromString(
 				string: manifestString,
-				blobs: blobsBytes,
 				networkId: NetworkID.default.rawValue
 			)
 			let manifest = TransactionManifest(instructions: instructions, blobs: blobsBytes)

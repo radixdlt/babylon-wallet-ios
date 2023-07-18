@@ -82,9 +82,9 @@ extension TransactionSigners {
 extension GatewayAPI.PublicKey {
 	init(from engine: EngineToolkit.PublicKey) {
 		switch engine {
-		case let .ecdsaSecp256k1(bytes):
+		case let .secp256k1(bytes):
 			self = .ecdsaSecp256k1(.init(keyType: .ecdsaSecp256k1, keyHex: bytes.hex()))
-		case let .eddsaEd25519(bytes):
+		case let .ed25519(bytes):
 			self = .eddsaEd25519(.init(keyType: .eddsaEd25519, keyHex: bytes.hex()))
 		}
 	}

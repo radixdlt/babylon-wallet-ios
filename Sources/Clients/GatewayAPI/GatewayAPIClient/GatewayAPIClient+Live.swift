@@ -73,6 +73,7 @@ extension GatewayAPIClient {
 				throw BadHTTPResponseCode(got: httpURLResponse.statusCode)
 			}
 
+			let respStr = try data.prettyPrintedJSONString
 			let response = try jsonDecoder.decode(Response.self, from: data)
 
 			return response
@@ -134,8 +135,8 @@ extension GatewayAPIClient {
 			try await post(
 				request: GatewayAPI.StateEntityDetailsRequest(
 					optIns: .init(
-						nonFungibleIncludeNfids: true,
-						explicitMetadata: EntityMetadataKey.allCases.map(\.rawValue)
+						nonFungibleIncludeNfids: true
+						// explicitMetadata: EntityMetadataKey.allCases.map(\.rawValue)
 					),
 					addresses: addresses, aggregationLevel: .vault
 				)) { @Sendable base in base.appendingPathComponent("state/entity/details") }

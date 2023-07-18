@@ -157,7 +157,6 @@ extension AssetTransfer {
 		return try .init(
 			instructions: .fromString(
 				string: String(allInstructions.joined(by: "\n")),
-				blobs: [],
 				networkId: networkID.rawValue
 			),
 			blobs: []

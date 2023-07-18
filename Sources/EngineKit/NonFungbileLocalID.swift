@@ -18,7 +18,7 @@ extension NonFungibleLocalId {
 			}
 			return .integer(value: value)
 		case "{":
-			return .uuid(value: value)
+			return .ruid(value: [])
 		case "<":
 			return .str(value: value)
 		case "[":
@@ -34,18 +34,6 @@ extension NonFungibleLocalId {
 	}
 
 	public func toString() throws -> String {
-		switch self {
-		case let .integer(value):
-			return "#\(value)#"
-		case let .uuid(uuid):
-			return "{\(uuid)}"
-		case let .str(value):
-			return "<\(value)>"
-		case let .bytes(value):
-			guard let string = String(data: value.data, encoding: .utf8) else {
-				throw InvalidLocalID()
-			}
-			return "[\(string)]"
-		}
+		try nonFungibleLocalIdAsStr(value: self)
 	}
 }
