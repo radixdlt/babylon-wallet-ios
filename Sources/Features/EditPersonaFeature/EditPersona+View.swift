@@ -152,12 +152,6 @@ struct EditPersona_Preview: PreviewProvider {
 			store: .init(
 				initialState: .previewValue(
 					mode: .edit
-//					mode: .dapp(
-//						requiredFieldIDs: [
-//							.givenName,
-//							.emailAddress,
-//						]
-//					)
 				),
 				reducer: EditPersona()
 			)

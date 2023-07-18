@@ -15,7 +15,6 @@ public struct EditPersona: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public enum Mode: Sendable, Hashable {
 			case edit
-//			case dapp(requiredFieldIDs: Set<DynamicFieldID>)
 		}
 
 		public enum StaticFieldID: Sendable, Hashable, Comparable {
@@ -44,11 +43,6 @@ public struct EditPersona: Sendable, FeatureReducer {
 				initial: persona.displayName.rawValue
 			)
 			self.dynamicFields = persona.personaData.dynamicFields(in: mode)
-//			if case let .dapp(requiredFieldIDs) = mode {
-//				for requiredFieldID in requiredFieldIDs where dynamicFields[id: requiredFieldID] == nil {
-//					dynamicFields.append(.init(id: requiredFieldID, initial: nil, isRequiredByDapp: true))
-//				}
-//			}
 		}
 	}
 
