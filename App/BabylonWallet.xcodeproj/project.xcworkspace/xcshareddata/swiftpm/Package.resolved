@@ -221,8 +221,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/radixdlt/swift-engine-toolkit",
       "state" : {
-        "revision" : "132d453eb76911f31d3d50adb3b4bf2937253fb1",
-        "version" : "0.10.0-elm.1-9e2590e"
+        "revision" : "96ca6cfbe342561bce7ca3ffcac6d95ae8e21337",
+        "version" : "0.10.0-elm.1-938afec"
       }
     },
     {
@@ -282,7 +282,7 @@
     {
       "identity" : "swift-numerics",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/apple/swift-numerics.git",
+      "location" : "https://github.com/apple/swift-numerics",
       "state" : {
         "revision" : "0a5bc04095a675662cf24757cc0640aa2204253b",
         "version" : "1.0.2"
