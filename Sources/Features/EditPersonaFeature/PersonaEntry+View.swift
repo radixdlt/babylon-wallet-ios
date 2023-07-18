@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import Prelude
 import SwiftUI
 
 extension EditPersonaEntry {
@@ -12,7 +13,7 @@ extension EditPersonaEntry {
 		public var body: some SwiftUI.View {
 			EditPersonaField.View(
 				store: store.scope(
-					state: { $0 },
+					state: identity,
 					action: (/Action.child .. EditPersonaEntry<ID>.ChildAction.field).embed
 				)
 			)

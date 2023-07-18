@@ -98,7 +98,7 @@ extension EditPersona.State.StaticFieldID: EditPersonaFieldID {
 	#endif
 }
 
-extension EditPersonaEntry<EditPersona.State.StaticFieldID>.State {
+extension EditPersonaStaticField.State {
 	public init(
 		id: ID,
 		initial: String?
