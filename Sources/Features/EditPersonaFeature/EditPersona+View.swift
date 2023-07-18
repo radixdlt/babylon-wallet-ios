@@ -126,11 +126,11 @@ extension EditPersona {
 					}
 					#endif
 				}
-//				.confirmationDialog(
-//					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-//					state: /EditPersona.Destinations.State.closeConfirmationDialog,
-//					action: EditPersona.Destinations.Action.closeConfirmationDialog
-//				)
+				.confirmationDialog(
+					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+					state: /EditPersona.Destinations.State.closeConfirmationDialog,
+					action: EditPersona.Destinations.Action.closeConfirmationDialog
+				)
 				.sheet(
 					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
 					state: /EditPersona.Destinations.State.addFields,
