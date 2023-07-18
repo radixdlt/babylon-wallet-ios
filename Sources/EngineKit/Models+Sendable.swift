@@ -55,8 +55,11 @@ extension ResourceSpecifier: @unchecked Sendable {}
 // MARK: - Resources + Sendable
 extension Resources: @unchecked Sendable {}
 
-// MARK: - Source + Sendable
-extension Source: @unchecked Sendable {}
+// MARK: - ResourceTracker + Sendable
+extension ResourceTracker: @unchecked Sendable {}
+
+// MARK: - DecimalSource + Sendable
+extension DecimalSource: @unchecked Sendable {}
 
 // MARK: - MetadataValue + Sendable
 extension MetadataValue: @unchecked Sendable {}

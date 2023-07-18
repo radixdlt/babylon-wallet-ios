@@ -108,7 +108,7 @@ extension Instructions {
 	) throws -> Instructions {
 		let instructions: [String] = [
 			Instruction.fungibleWithInitialSupplyInstruction(),
-			Instruction.depositBatch(account: account),
+			Instruction.tryDepositBatchOrAbort(componentAddress: account.asGeneral()),
 		]
 		return try .from(rawInstructions: instructions, network: network).withLockFeeCallMethodAdded(address: account.asGeneral())
 	}
@@ -117,7 +117,7 @@ extension Instructions {
 		account: AccountAddress,
 		network: NetworkID
 	) throws -> Instructions {
-		let instructions = [String](repeating: Instruction.fungibleWithInitialSupplyInstruction(), count: 20) + [Instruction.depositBatch(account: account)]
+		let instructions = [String](repeating: Instruction.fungibleWithInitialSupplyInstruction(), count: 20) + [Instruction.tryDepositBatchOrAbort(componentAddress: account.asGeneral())]
 		return try .from(rawInstructions: instructions, network: network).withLockFeeCallMethodAdded(address: account.asGeneral())
 	}
 
@@ -125,7 +125,7 @@ extension Instructions {
 		account: AccountAddress,
 		network: NetworkID
 	) throws -> Instructions {
-		let instructions = [String](repeating: Instruction.noFungibleWithInitialSupplyInstruction(), count: 10) + [Instruction.depositBatch(account: account)]
+		let instructions = [String](repeating: Instruction.noFungibleWithInitialSupplyInstruction(), count: 10) + [Instruction.tryDepositBatchOrAbort(componentAddress: account.asGeneral())]
 		return try .from(rawInstructions: instructions, network: network).withLockFeeCallMethodAdded(address: account.asGeneral())
 	}
 
@@ -135,7 +135,7 @@ extension Instructions {
 	) throws -> Instructions {
 		let instructions: [String] = [
 			Instruction.noFungibleWithInitialSupplyInstruction(),
-			Instruction.depositBatch(account: account),
+			Instruction.tryDepositBatchOrAbort(componentAddress: account.asGeneral()),
 		]
 		return try .from(rawInstructions: instructions, network: network).withLockFeeCallMethodAdded(address: account.asGeneral())
 	}

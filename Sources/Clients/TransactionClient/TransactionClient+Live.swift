@@ -241,6 +241,8 @@ extension TransactionClient {
 				notarySignature: notarySignature.intoEngine().signature
 			)
 
+			let resp = try uncompiledNotarized.staticallyValidate(validationConfig: .default(networkId: request.transactionIntent.header().networkId))
+
 			let compiledNotarizedTXIntent = try uncompiledNotarized.compile()
 
 			let txID = try request.transactionIntent.intentHash()

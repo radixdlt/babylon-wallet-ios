@@ -585,28 +585,52 @@ extension Resources: Hashable {
 	}
 }
 
-// MARK: - Source + Hashable
-extension Source: Hashable {
-	public func hash(into hasher: inout Hasher) {
-		switch self {
-		case let .guaranteed(value):
-			hasher.combine("guaranteed")
-			hasher.combine(value)
-		case let .predicted(instructionIndex, value):
-			hasher.combine("predicted")
-			hasher.combine(instructionIndex)
-			hasher.combine(value)
+// MARK: - ResourceTracker + Hashable
+extension ResourceTracker: Hashable {
+	public static func == (lhs: ResourceTracker, rhs: ResourceTracker) -> Bool {
+		switch (lhs, rhs) {
+		case let (.fungible(lhsAddress, lhsAmount), .fungible(rhsAddress, rhsAmount)):
+			return lhsAddress == rhsAddress && lhsAmount == rhsAmount
+		case let (.nonFungible(lhsAddress, lhsAmount, lhsIds), .nonFungible(rhsAddress, rhsAmount, rhsIds)):
+			return lhsAddress == rhsAddress && lhsAmount == rhsAmount && lhsIds == rhsIds
+		default:
+			return false
 		}
 	}
 
-	public static func == (lhs: Source, rhs: Source) -> Bool {
+	public func hash(into hasher: inout Hasher) {
+		switch self {
+		case let .fungible(resourceAddress, amount):
+			hasher.combine(resourceAddress)
+			hasher.combine(amount)
+		case let .nonFungible(resourceAddress, amount, ids):
+			hasher.combine(resourceAddress)
+			hasher.combine(amount)
+			hasher.combine(ids)
+		}
+	}
+}
+
+// MARK: - DecimalSource + Hashable
+extension DecimalSource: Hashable {
+	public static func == (lhs: DecimalSource, rhs: DecimalSource) -> Bool {
 		switch (lhs, rhs) {
 		case let (.guaranteed(lhsValue), .guaranteed(rhsValue)):
 			return lhsValue == rhsValue
-		case let (.predicted(lhsIndex, lhsValue), .predicted(rhsIndex, rhsValue)):
-			return lhsIndex == rhsIndex && lhsValue == rhsValue
+		case let (.predicted(lhsInstructionIndex, lhsValue), .predicted(rhsInstructionIndex, rhsValue)):
+			return lhsInstructionIndex == rhsInstructionIndex && lhsValue == rhsValue
 		default:
 			return false
+		}
+	}
+
+	public func hash(into hasher: inout Hasher) {
+		switch self {
+		case let .guaranteed(value):
+			hasher.combine(value)
+		case let .predicted(instructionIndex, value):
+			hasher.combine(instructionIndex)
+			hasher.combine(value)
 		}
 	}
 }
