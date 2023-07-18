@@ -1,5 +1,6 @@
 import FeaturePrelude
 import PersonasClient
+import Prelude
 
 // MARK: - EditPersona.Output
 extension EditPersona {
@@ -237,7 +238,7 @@ extension Profile.Network.Persona {
 			case .dateOfBirth: break
 			case .companyName: break
 			case .emailAddress:
-				// FIXME: `try` and handle errors properly when we will have multiple entries of that kind
+				// FIXME: `try` and handle errors properly when we will have multiple entries of that kind (as the only reason to throw here is related to multiple values)
 				updatedPersona.personaData.emailAddresses = (try? .init(
 					collection: .init(
 						uncheckedUniqueElements: [
@@ -246,7 +247,7 @@ extension Profile.Network.Persona {
 					)
 				)) ?? .init()
 			case .phoneNumber:
-				// FIXME: `try` and handle errors properly when we will have multiple entries of that kind
+				// FIXME: `try` and handle errors properly when we will have multiple entries of that kind (as the only reason to throw here is related to multiple values)
 				updatedPersona.personaData.phoneNumbers = (try? .init(
 					collection: .init(
 						uncheckedUniqueElements: [
