@@ -24,8 +24,7 @@ public struct EditPersona: Sendable, FeatureReducer {
 		public typealias DynamicFieldID = PersonaData.Entry.Kind
 
 		let mode: Mode
-		let initialPersona: Profile.Network.Persona
-		var personaData: PersonaData
+		var persona: Profile.Network.Persona
 		var labelField: EditPersonaStaticField.State
 
 		@PresentationState
@@ -36,8 +35,7 @@ public struct EditPersona: Sendable, FeatureReducer {
 			persona: Profile.Network.Persona
 		) {
 			self.mode = mode
-			self.initialPersona = persona
-			self.personaData = persona.personaData
+			self.persona = persona
 			self.labelField = EditPersonaStaticField.State(
 				id: .personaLabel,
 				initial: persona.displayName.rawValue
@@ -131,7 +129,7 @@ public struct EditPersona: Sendable, FeatureReducer {
 
 		case let .saveButtonTapped(output):
 			return .run { [state] send in
-				let updatedPersona = state.initialPersona.updated(with: output)
+				let updatedPersona = state.persona.updated(with: output)
 				try await personasClient.updatePersona(updatedPersona)
 				await send(.delegate(.personaSaved(updatedPersona)))
 				await dismiss()
@@ -142,9 +140,9 @@ public struct EditPersona: Sendable, FeatureReducer {
 		case .addAFieldButtonTapped:
 			let alreadyAddedEntryKinds: [PersonaData.Entry.Kind] = {
 				[
-					state.personaData.name.map { _ in .name },
-					!state.personaData.emailAddresses.isEmpty ? .emailAddress : nil,
-					!state.personaData.phoneNumbers.isEmpty ? .phoneNumber : nil,
+					state.persona.personaData.name.map { _ in .name },
+					!state.persona.personaData.emailAddresses.isEmpty ? .emailAddress : nil,
+					!state.persona.personaData.phoneNumbers.isEmpty ? .phoneNumber : nil,
 				].compactMap(identity)
 			}()
 			state.destination = .addFields(.init(excludedEntryKinds: alreadyAddedEntryKinds))
@@ -161,7 +159,7 @@ public struct EditPersona: Sendable, FeatureReducer {
 			fieldsToAdd.map(\.entry.kind).forEach { entryKind in
 				switch entryKind {
 				case .name:
-					state.personaData.name = .init(
+					state.persona.personaData.name = .init(
 						value: .init(given: "", family: "", variant: .eastern)
 					)
 				case .dateOfBirth:
@@ -169,11 +167,11 @@ public struct EditPersona: Sendable, FeatureReducer {
 				case .companyName:
 					fatalError()
 				case .emailAddress:
-					state.personaData.emailAddresses = .init()
+					state.persona.personaData.emailAddresses = .init()
 				case .url:
 					fatalError()
 				case .phoneNumber:
-					state.personaData.phoneNumbers = .init()
+					state.persona.personaData.phoneNumbers = .init()
 				case .postalAddress:
 					fatalError()
 				case .creditCard:
@@ -192,8 +190,8 @@ public struct EditPersona: Sendable, FeatureReducer {
 extension EditPersona.State {
 	func hasChanges() -> Bool {
 		guard let output = viewState.output else { return false }
-		return output.personaLabel != initialPersona.displayName
-			|| initialPersona.personaData != output.personaData
+		return output.personaLabel != persona.displayName
+			|| persona.personaData != output.personaData
 	}
 }
 
