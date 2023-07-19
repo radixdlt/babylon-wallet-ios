@@ -216,20 +216,53 @@ extension Instruction {
 
 	static func fungibleWithInitialSupplyInstruction() -> String {
 		"""
-		                CREATE_FUNGIBLE_RESOURCE_WITH_INITIAL_SUPPLY
-		                    18u8
-		                    Map<String, Enum>(
-		                        "name" => Enum<Metadata::String>("MyResource"),
-		                        "symbol" => Enum<Metadata::String>("VIP"),
-		                        "description" => Enum<Metadata::String>("A very innovative and important resource"),
-		                        "icon_url" => Enum<Metadata::String>("https://i.imgur.com/9YQ9Z0x.png")
-		                    )
-		                    Map<Enum, Tuple>(
-
-		                        Enum<ResourceMethodAuthKey::Withdraw>() => Tuple(Enum<AccessRule::AllowAll>(), Enum<AccessRule::DenyAll>()),
-		                        Enum<ResourceMethodAuthKey::Deposit>() => Tuple(Enum<AccessRule::AllowAll>(), Enum<AccessRule::DenyAll>())
-		                    )
-		                    Decimal("10000");
+		CREATE_FUNGIBLE_RESOURCE_WITH_INITIAL_SUPPLY
+		    # Owner role - This gets metadata permissions, and is the default for other permissions
+		    # Can set as Enum<OwnerRole::Fixed>(access_rule)  or Enum<OwnerRole::Updatable>(access_rule)
+		    Enum<OwnerRole::None>()
+		    true             # Whether the engine should track supply (avoid for massively parallelizable tokens)
+		    18u8             # Divisibility (between 0u8 and 18u8)
+		    Decimal("100") # Initial supply
+		    Tuple(
+		        Some(         # Mint Roles (if None: defaults to DenyAll, DenyAll)
+		            Tuple(
+		                Some(Enum<AccessRule::AllowAll>()),  # Minter (if None: defaults to Owner)
+		                Some(Enum<AccessRule::DenyAll>())    # Minter Updater (if None: defaults to Owner)
+		            )
+		        ),
+		        None,        # Burn Roles (if None: defaults to DenyAll, DenyAll)
+		        None,        # Freeze Roles (if None: defaults to DenyAll, DenyAll)
+		        None,        # Recall Roles (if None: defaults to DenyAll, DenyAll)
+		        None,        # Withdraw Roles (if None: defaults to AllowAll, DenyAll)
+		        None         # Deposit Roles (if None: defaults to AllowAll, DenyAll)
+		    )
+		    Tuple(                                                                   # Metadata initialization
+		        Map<String, Tuple>(                                                  # Initial metadata values
+		            "name" => Tuple(
+		                Some(Enum<Metadata::String>("MyResource")),    # Resource Name
+		                true                                                         # Locked
+		            ),
+		            "symbol" => Tuple(
+		                Some(Enum<Metadata::String>("VIP")),
+		                true
+		            ),
+		            "description" => Tuple(
+		                Some(Enum<Metadata::String>("A very innovative and important resource")),
+		                true
+		            ),
+		            "icon_url" => Tuple(
+		              Some(Enum<Metadata::String>("https://i.imgur.com/9YQ9Z0x.png")),
+		              true
+		            )
+		        ),
+		        Map<String, Enum>(                                                   # Metadata roles
+		            "metadata_setter" => Some(Enum<AccessRule::AllowAll>()),         # Metadata setter role
+		            "metadata_setter_updater" => None,                               # Metadata setter updater role as None defaults to OWNER
+		            "metadata_locker" => Some(Enum<AccessRule::DenyAll>()),          # Metadata locker role
+		            "metadata_locker_updater" => None                                # Metadata locker updater role as None defaults to OWNER
+		        )
+		    )
+		    None;             # No Address Reservation
 		"""
 	}
 

@@ -287,9 +287,3 @@ extension AssetTransfer {
 		return String(([accountWithdrawals] + deposits).joined(by: "\n"))
 	}
 }
-
-extension AccountPortfolio.NonFungibleResource.NonFungibleToken.LocalID {
-	func toRETLocalID() -> NonFungibleLocalId {
-		.str(value: rawValue)
-	}
-}

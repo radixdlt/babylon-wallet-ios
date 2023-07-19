@@ -286,8 +286,8 @@ extension AccountPortfoliosClient {
 				))
 				.nonFungibleIds
 				.map {
-					AccountPortfolio.NonFungibleResource.NonFungibleToken(
-						id: .init($0.nonFungibleId),
+					try AccountPortfolio.NonFungibleResource.NonFungibleToken(
+						id: .from(stringFormat: $0.nonFungibleId),
 						name: nil,
 						description: nil,
 						keyImageURL: $0.keyImageURL,

@@ -30,7 +30,7 @@ extension GatewayAPI.TransactionPreviewRequest {
 		transactionSigners: TransactionSigners
 	) throws {
 		let flags = GatewayAPI.TransactionPreviewRequestFlags(
-			useFreeCredit: true,
+			useFreeCredit: false,
 			assumeAllSignatureProofs: false,
 			skipEpochCheck: false
 		)

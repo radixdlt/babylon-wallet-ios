@@ -93,15 +93,13 @@ extension AccountPortfolio {
 		}
 
 		public struct NonFungibleToken: Sendable, Hashable, Identifiable, Codable {
-			public typealias LocalID = Tagged<Self, String>
-
-			public let id: LocalID
+			public let id: NonFungibleLocalId
 			public let name: String?
 			public let description: String?
 			public let keyImageURL: URL?
 			public let metadata: [Metadata]
 
-			public init(id: ID, name: String?, description: String?, keyImageURL: URL?, metadata: [Metadata]) {
+			public init(id: NonFungibleLocalId, name: String?, description: String?, keyImageURL: URL?, metadata: [Metadata]) {
 				self.id = id
 				self.name = name
 				self.description = description
@@ -124,14 +122,14 @@ extension AccountPortfolio {
 }
 
 extension AccountPortfolio.NonFungibleResource {
-	public func nftGlobalID(for id: NonFungibleToken.LocalID) -> GlobalID {
-		resourceAddress.nftGlobalId(id)
+	public func nftGlobalID(for id: NonFungibleLocalId) throws -> NonFungibleGlobalId {
+		try resourceAddress.nftGlobalId(id)
 	}
 }
 
 extension ResourceAddress {
-	public func nftGlobalId(_ localID: AccountPortfolio.NonFungibleResource.NonFungibleToken.LocalID) -> String {
-		address + ":" + localID.rawValue
+	public func nftGlobalId(_ localID: NonFungibleLocalId) throws -> NonFungibleGlobalId {
+		try NonFungibleGlobalId.fromParts(resourceAddress: self.intoEngine(), nonFungibleLocalId: localID)
 	}
 }
 
@@ -173,5 +171,12 @@ extension AccountPortfolio.FungibleResource {
 extension AccountPortfolio.NonFungibleResource {
 	public var nonEmpty: Self? {
 		tokens.isEmpty ? nil : self
+	}
+}
+
+// MARK: - NonFungibleLocalId + Identifiable
+extension NonFungibleLocalId: Identifiable {
+	public var id: String {
+		(try? nonFungibleLocalIdAsStr(value: self)) ?? UUID().uuidString
 	}
 }

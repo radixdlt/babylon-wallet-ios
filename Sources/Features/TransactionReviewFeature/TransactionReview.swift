@@ -697,7 +697,8 @@ extension TransactionReview {
 				isXRD: (try? resourceAddress.isXRD(on: networkID)) ?? false,
 				guarantee: guarantee()
 			))]
-		case let .nonFungible(_, _, .guaranteed(ids)):
+		case let .nonFungible(_, _, .guaranteed(ids)),
+		     let .nonFungible(_, _, ids: .predicted(instructionIndex: _, value: ids)):
 			if isNewResource {
 				return try ids.map { id in
 					try Transfer.nonFungible(.init(

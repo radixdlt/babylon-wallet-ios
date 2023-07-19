@@ -5,7 +5,7 @@ extension NonFungibleAssetList.Detail.State {
 	var viewState: NonFungibleAssetList.Detail.ViewState {
 		.init(
 			keyImage: token.keyImageURL,
-			nonFungibleGlobalID: resource.nftGlobalID(for: token.id),
+			nonFungibleGlobalID: try! resource.nftGlobalID(for: token.id),
 			name: token.name,
 			description: token.description,
 			resourceName: resource.name,
@@ -20,7 +20,7 @@ extension NonFungibleAssetList.Detail.State {
 extension NonFungibleAssetList.Detail {
 	public struct ViewState: Equatable {
 		let keyImage: URL?
-		let nonFungibleGlobalID: AccountPortfolio.NonFungibleResource.GlobalID
+		let nonFungibleGlobalID: NonFungibleGlobalId
 		let name: String?
 		let description: String?
 		let resourceName: String?
@@ -96,12 +96,5 @@ extension NonFungibleAssetList.Detail {
 				.foregroundColor(.app.gray1)
 			}
 		}
-	}
-}
-
-extension AccountPortfolio.NonFungibleResource {
-	// TODO: unit test
-	func nftAddress(for id: NonFungibleToken.ID) -> String {
-		resourceAddress.address + ":" + id.rawValue
 	}
 }

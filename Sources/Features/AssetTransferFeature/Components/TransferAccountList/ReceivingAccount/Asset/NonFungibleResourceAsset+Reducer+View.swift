@@ -6,7 +6,7 @@ public struct NonFungibleResourceAsset: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable, Identifiable {
 		public typealias ID = String
 		public var id: ID {
-			resourceAddress.nftGlobalId(nftToken.id)
+			try! resourceAddress.nftGlobalId(nftToken.id).asStr()
 		}
 
 		public let resourceImage: URL?
@@ -31,7 +31,7 @@ extension NonFungibleResourceAsset {
 extension NonFungibleResourceAsset.State {
 	var viewState: NonFungibleResourceAsset.ViewState {
 		.init(
-			tokenID: nftToken.id.rawValue.userFacingNonFungibleLocalID,
+			tokenID: "", // nftToken.id.userFacingNonFungibleLocalID,
 			tokenName: nftToken.name,
 			thumbnail: resourceImage
 		)

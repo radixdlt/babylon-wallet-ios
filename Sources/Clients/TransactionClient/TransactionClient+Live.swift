@@ -256,6 +256,16 @@ extension TransactionClient {
 		let getTransactionReview: GetTransactionReview = { request in
 			let networkID = await gatewaysClient.getCurrentNetworkID()
 
+			let addFeeToManifestOutcome = try await lockFeeBySearchingForSuitablePayer(
+				request.manifestToSign,
+				request.feeToAdd
+			)
+
+			guard case let .includesLockFee(outcome) = addFeeToManifestOutcome else {
+				fatalError()
+			}
+			var request = ManifestReviewRequest(manifestToSign: outcome.manifestWithLockFee, nonce: request.nonce, feeToAdd: request.feeToAdd)
+
 			let transactionPreviewRequest = try await createTransactionPreviewRequest(for: request, networkID: networkID)
 			let transactionPreviewResponse = try await gatewayAPIClient.transactionPreview(transactionPreviewRequest)
 			guard transactionPreviewResponse.receipt.status == .succeeded else {
@@ -267,10 +277,6 @@ extension TransactionClient {
 
 			let analyzedManifestToReview = try request.manifestToSign.analyzeExecution(transactionReceipt: receiptBytes)
 
-			let addFeeToManifestOutcome = try await lockFeeBySearchingForSuitablePayer(
-				request.manifestToSign,
-				request.feeToAdd
-			)
 			return TransactionToReview(
 				analyzedManifestToReview: analyzedManifestToReview,
 				addFeeToManifestOutcome: addFeeToManifestOutcome,
