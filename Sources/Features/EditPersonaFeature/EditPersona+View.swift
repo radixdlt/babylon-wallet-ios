@@ -85,6 +85,15 @@ extension EditPersona {
 
 							Separator()
 
+							EditPersonaData.View(
+								store: store.scope(
+									state: \.persona.personaData,
+									action: (/Action.child
+										.. EditPersona.ChildAction.personaData
+									).embed
+								)
+							)
+
 							Button(action: { viewStore.send(.addAFieldButtonTapped) }) {
 								Text(L10n.EditPersona.addAField).padding(.horizontal, .medium2)
 							}

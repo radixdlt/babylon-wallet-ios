@@ -56,7 +56,7 @@ public struct EditPersona: Sendable, FeatureReducer {
 
 	public enum ChildAction: Sendable, Equatable {
 		case labelField(EditPersonaStaticField.Action)
-		case entries(action: EditPersonaEntry.Action)
+		case personaData(action: EditPersonaData.Action)
 		case destination(PresentationAction<Destinations.Action>)
 	}
 
@@ -161,11 +161,11 @@ public struct EditPersona: Sendable, FeatureReducer {
 				case .companyName:
 					fatalError()
 				case .emailAddress:
-					state.persona.personaData.emailAddresses = try! .init(collection: .init(arrayLiteral: .init(value: .init(email: ""))))
+					state.persona.personaData.emailAddresses = try! .init(collection: [.init(value: .init(email: ""))])
 				case .url:
 					fatalError()
 				case .phoneNumber:
-					state.persona.personaData.phoneNumbers = try! .init(collection: .init(arrayLiteral: .init(value: .init(number: ""))))
+					state.persona.personaData.phoneNumbers = try! .init(collection: [.init(value: .init(number: ""))])
 				case .postalAddress:
 					fatalError()
 				case .creditCard:
