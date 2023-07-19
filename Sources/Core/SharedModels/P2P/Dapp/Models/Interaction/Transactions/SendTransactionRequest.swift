@@ -1,7 +1,11 @@
 import EngineKit
 import Prelude
 
-// MARK: - P2P.Dapp.Request.SendTransactionWriteRequestItem
+extension CodingUserInfoKey {
+	public static let networkIdKey = CodingUserInfoKey(rawValue: "networkIdKey")!
+}
+
+// MARK: - P2P.Dapp.Request.SendTransactionItem
 extension P2P.Dapp.Request {
 	public struct SendTransactionItem: Sendable, Hashable, Decodable {
 		public let transactionManifest: TransactionManifest
@@ -33,9 +37,12 @@ extension P2P.Dapp.Request {
 			let blobsBytes = try blobsHex.map {
 				try [UInt8](Data(hex: $0))
 			}
+
+			let networkID = decoder.userInfo[.networkIdKey] as! UInt8
+
 			let instructions = try Instructions.fromString(
 				string: manifestString,
-				networkId: NetworkID.default.rawValue
+				networkId: networkID
 			)
 			let manifest = TransactionManifest(instructions: instructions, blobs: blobsBytes)
 

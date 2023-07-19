@@ -952,6 +952,7 @@ package.addModules([
 		dependencies: [
 			"RadixConnectModels",
 			"SharedModels",
+			"GatewaysClient",
 			.product(name: "WebRTC", package: "WebRTC") {
 				.package(url: "https://github.com/stasel/WebRTC", from: "110.0.0")
 			},

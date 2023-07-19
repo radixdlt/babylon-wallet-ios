@@ -31,8 +31,8 @@ extension GatewayAPI.TransactionPreviewRequest {
 	) throws {
 		let flags = GatewayAPI.TransactionPreviewRequestFlags(
 			useFreeCredit: true,
-			assumeAllSignatureProofs: true,
-			skipEpochCheck: true
+			assumeAllSignatureProofs: false,
+			skipEpochCheck: false
 		)
 
 		struct NotaryIsSignatoryDiscrepancy: Swift.Error {}
@@ -44,15 +44,8 @@ extension GatewayAPI.TransactionPreviewRequest {
 		let notaryIsSignatory = transactionSigners.notaryIsSignatory
 
 		try self.init(
-			manifest: """
-			SETT_METADATA
-			    Address("account_tdx_d_1286vek06repleh7zsj4y30659s757tj8s75s45f7crhmkqtygpagsg")
-			    "account_type"
-			    Enum<0u8>(
-			        "dapp definition"
-			    );
-			""", // rawManifest.instructions().asStr(),
-			// blobsHex: nil, //rawManifest.blobs().map(\.hex),
+			manifest: rawManifest.instructions().asStr(),
+			blobsHex: rawManifest.blobs().map(\.hex),
 			startEpochInclusive: .init(header.startEpochInclusive),
 			endEpochExclusive: .init(header.endEpochExclusive),
 			notaryPublicKey: GatewayAPI.PublicKey(from: header.notaryPublicKey),

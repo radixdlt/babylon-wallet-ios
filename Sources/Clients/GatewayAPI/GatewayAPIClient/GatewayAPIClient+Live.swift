@@ -136,8 +136,8 @@ extension GatewayAPIClient {
 			try await post(
 				request: GatewayAPI.StateEntityDetailsRequest(
 					optIns: .init(
-						nonFungibleIncludeNfids: true
-						// explicitMetadata: EntityMetadataKey.allCases.map(\.rawValue)
+						nonFungibleIncludeNfids: true,
+						explicitMetadata: Array(EntityMetadataKey.allCases.map(\.rawValue).prefix(10))
 					),
 					addresses: addresses, aggregationLevel: .vault
 				)) { @Sendable base in base.appendingPathComponent("state/entity/details") }
