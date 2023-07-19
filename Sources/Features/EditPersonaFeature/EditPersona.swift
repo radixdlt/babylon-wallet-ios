@@ -262,29 +262,6 @@ extension PersonaData.Entry {
 	}
 }
 
-extension PersonaData.Entry.Kind {
-	var entry: PersonaData.Entry {
-		switch self {
-		case .name:
-			return .name(.init(given: "", family: "", variant: .eastern))
-		case .dateOfBirth:
-			fallthrough
-		case .companyName:
-			fatalError()
-		case .emailAddress:
-			return .emailAddress(.init(email: ""))
-		case .url:
-			fatalError()
-		case .phoneNumber:
-			return .phoneNumber(.init(number: ""))
-		case .postalAddress:
-			fatalError()
-		case .creditCard:
-			fatalError()
-		}
-	}
-}
-
 extension PersonaData.Entry {
 	var kind: Kind {
 		switch self {
