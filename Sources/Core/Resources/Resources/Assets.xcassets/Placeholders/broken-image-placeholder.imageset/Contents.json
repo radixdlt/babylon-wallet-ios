@@ -1,0 +1,12 @@
+{
+  "images" : [
+	{
+	  "filename" : "broken-image-placeholder.pdf",
+	  "idiom" : "universal"
+	}
+  ],
+  "info" : {
+	"author" : "xcode",
+	"version" : 1
+  }
+}
