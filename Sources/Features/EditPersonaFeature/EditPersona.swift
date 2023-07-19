@@ -138,13 +138,7 @@ public struct EditPersona: Sendable, FeatureReducer {
 			}
 
 		case .addAFieldButtonTapped:
-			let alreadyAddedEntryKinds: [PersonaData.Entry.Kind] = {
-				[
-					state.persona.personaData.name.map { _ in .name },
-					!state.persona.personaData.emailAddresses.isEmpty ? .emailAddress : nil,
-					!state.persona.personaData.phoneNumbers.isEmpty ? .phoneNumber : nil,
-				].compactMap(identity)
-			}()
+			let alreadyAddedEntryKinds: [PersonaData.Entry.Kind] = state.persona.personaData.alreadyAddedEntryKinds
 			state.destination = .addFields(.init(excludedEntryKinds: alreadyAddedEntryKinds))
 			return .none
 		}
@@ -167,11 +161,11 @@ public struct EditPersona: Sendable, FeatureReducer {
 				case .companyName:
 					fatalError()
 				case .emailAddress:
-					state.persona.personaData.emailAddresses = .init()
+					state.persona.personaData.emailAddresses = try! .init(collection: .init(arrayLiteral: .init(value: .init(email: ""))))
 				case .url:
 					fatalError()
 				case .phoneNumber:
-					state.persona.personaData.phoneNumbers = .init()
+					state.persona.personaData.phoneNumbers = try! .init(collection: .init(arrayLiteral: .init(value: .init(number: ""))))
 				case .postalAddress:
 					fatalError()
 				case .creditCard:
@@ -275,5 +269,15 @@ extension PersonaData.Entry {
 		case .postalAddress: return .postalAddress
 		case .creditCard: return .creditCard
 		}
+	}
+}
+
+extension PersonaData {
+	var alreadyAddedEntryKinds: [PersonaData.Entry.Kind] {
+		[
+			name.map { _ in .name },
+			!emailAddresses.isEmpty ? .emailAddress : nil,
+			!phoneNumbers.isEmpty ? .phoneNumber : nil,
+		].compactMap(identity)
 	}
 }

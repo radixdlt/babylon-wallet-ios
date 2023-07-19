@@ -4,19 +4,25 @@ import Profile
 extension EditPersona.State {
 	var viewState: EditPersona.ViewState {
 		.init(
-			personaLabel: initialPersona.displayName.rawValue,
+			personaLabel: persona.displayName.rawValue,
 			avatarURL: URL(string: "something")!,
-			addAFieldButtonState: .enabled,
+			addAFieldButtonState: {
+				if persona.personaData.alreadyAddedEntryKinds.count < DynamicFieldID.supportedKinds.count {
+					return .enabled
+				} else {
+					return .disabled
+				}
+			}(),
 			output: { () -> EditPersona.Output? in
 				guard
 					let personaLabelInput = labelField.input,
-					let personaLabelOutput = NonEmptyString(rawValue: personaLabelInput.trimmingWhitespace()) // ,
+					let personaLabelOutput = NonEmptyString(rawValue: personaLabelInput.trimmingWhitespace())
 				else {
 					return nil
 				}
 				return EditPersona.Output(
 					personaLabel: personaLabelOutput,
-					personaData: personaData
+					personaData: persona.personaData
 				)
 			}()
 		)
