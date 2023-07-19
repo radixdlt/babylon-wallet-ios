@@ -222,22 +222,24 @@ extension Profile.Network.Persona {
 			case .companyName: break
 			case .emailAddress:
 				// FIXME: `try` and handle errors properly when we will have multiple entries of that kind (as the only reason to throw here is related to multiple values)
-				updatedPersona.personaData.emailAddresses = (try? .init(
+				let emailAddresses = try? PersonaData.IdentifiedEmailAddresses(
 					collection: .init(
 						uncheckedUniqueElements: [
 							.init(value: .init(email: identifiedFieldOutput.value)),
 						]
 					)
-				)) ?? .init()
+				)
+				updatedPersona.personaData.emailAddresses = emailAddresses ?? .init()
 			case .phoneNumber:
 				// FIXME: `try` and handle errors properly when we will have multiple entries of that kind (as the only reason to throw here is related to multiple values)
-				updatedPersona.personaData.phoneNumbers = (try? .init(
+				let phoneAddresses = try? PersonaData.IdentifiedPhoneNumbers(
 					collection: .init(
 						uncheckedUniqueElements: [
 							.init(value: .init(number: identifiedFieldOutput.value)),
 						]
 					)
-				)) ?? .init()
+				)
+				updatedPersona.personaData.phoneNumbers = phoneAddresses ?? .init()
 			case .url: break
 			case .postalAddress: break
 			case .creditCard: break
