@@ -4,26 +4,19 @@ import Profile
 extension EditPersona.State {
 	var viewState: EditPersona.ViewState {
 		.init(
-			personaLabel: persona.displayName.rawValue,
+			personaLabel: initialPersona.displayName.rawValue,
 			avatarURL: URL(string: "something")!,
-			addAFieldButtonState: {
-				if dynamicFields.count < DynamicFieldID.supportedKinds.count {
-					return .enabled
-				} else {
-					return .disabled
-				}
-			}(),
+			addAFieldButtonState: .enabled,
 			output: { () -> EditPersona.Output? in
 				guard
 					let personaLabelInput = labelField.input,
-					let personaLabelOutput = NonEmptyString(rawValue: personaLabelInput.trimmingWhitespace()),
-					let fieldsOutput = fieldsOutput(dynamicFields: dynamicFields)
+					let personaLabelOutput = NonEmptyString(rawValue: personaLabelInput.trimmingWhitespace()) // ,
 				else {
 					return nil
 				}
 				return EditPersona.Output(
 					personaLabel: personaLabelOutput,
-					fields: fieldsOutput
+					personaData: personaData
 				)
 			}()
 		)
@@ -75,26 +68,16 @@ extension EditPersona {
 						VStack(spacing: .medium1) {
 							PersonaThumbnail(viewStore.avatarURL, size: .veryLarge)
 
-							EditPersonaEntry.View(
+							EditPersonaField.View(
 								store: store.scope(
 									state: \.labelField,
 									action: (/Action.child
-										.. EditPersona.ChildAction.labelEntry
+										.. EditPersona.ChildAction.labelField
 									).embed
 								)
 							)
 
 							Separator()
-
-							ForEachStore(
-								store.scope(
-									state: \.dynamicFields,
-									action: (/Action.child
-										.. EditPersona.ChildAction.dynamicField
-									).embed
-								),
-								content: EditPersonaDynamicEntry.View.init
-							)
 
 							Button(action: { viewStore.send(.addAFieldButtonTapped) }) {
 								Text(L10n.EditPersona.addAField).padding(.horizontal, .medium2)

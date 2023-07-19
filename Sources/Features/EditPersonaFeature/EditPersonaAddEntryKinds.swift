@@ -7,10 +7,9 @@ public struct EditPersonaAddEntryKinds: Sendable, FeatureReducer {
 		let availableEntryKinds: [EntryKind]
 		var selectedEntryKinds: [EntryKind]? = nil
 
-		public init(
-			excludedEntryKinds: [EntryKind]
-		) {
-			self.availableEntryKinds = EditPersona.State.DynamicFieldID.supportedKinds.filter { !excludedEntryKinds.contains($0) }
+		public init(excludedEntryKinds: [EntryKind]) {
+			self.availableEntryKinds = EditPersona.State.DynamicFieldID.supportedKinds
+				.filter { !excludedEntryKinds.contains($0) }
 		}
 	}
 

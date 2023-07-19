@@ -1,18 +1,44 @@
 import FeaturePrelude
 
-public struct EditPersonaEntry<ID: EditPersonaFieldID>: Sendable, FeatureReducer {
-	public typealias State = EditPersonaField<ID>.State
+// MARK: - EditPersonaEntry
+public struct EditPersonaEntry: Sendable, FeatureReducer {
+	public typealias State = PersonaData
 
 	public enum ChildAction: Sendable, Equatable {
-		case field(EditPersonaField<ID>.Action)
+		case emailAddress(EditPersonaDynamicEntry.Action)
 	}
 
 	public var body: some ReducerProtocolOf<Self> {
-		Scope(
-			state: \.self,
-			action: /Action.child .. EditPersonaEntry<ID>.ChildAction.field
-		) {
-			EditPersonaField()
+		EmptyReducer()
+			.ifLet(
+				\.emailAddresses.dynamicField,
+				action: /Action.child .. ChildAction.emailAddress
+			) {
+				EditPersonaField()
+			}
+	}
+}
+
+extension EditPersonaDynamicEntry.State {
+	var email: Self? {
+		get {
+			self.id == .emailAddress ? self : nil
 		}
+		set {}
+	}
+}
+
+extension PersonaData.IdentifiedEmailAddresses {
+	var dynamicField: EditPersonaDynamicEntry.State? {
+		get {
+			first.map {
+				.init(
+					id: .emailAddress,
+					text: $0.value.email,
+					isRequiredByDapp: false
+				)
+			}
+		}
+		set {}
 	}
 }

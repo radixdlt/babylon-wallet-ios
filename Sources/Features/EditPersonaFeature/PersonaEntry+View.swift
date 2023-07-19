@@ -11,12 +11,16 @@ extension EditPersonaEntry {
 		}
 
 		public var body: some SwiftUI.View {
-			EditPersonaField.View(
-				store: store.scope(
-					state: identity,
-					action: (/Action.child .. EditPersonaEntry<ID>.ChildAction.field).embed
+			IfLetStore(
+				store.scope(state: { $0.emailAddresses.dynamicField })
+			) { store in
+				EditPersonaField.View(
+					store: store.scope(
+						state: identity,
+						action: (/Action.child .. EditPersonaEntry.ChildAction.emailAddress).embed
+					)
 				)
-			)
+			}
 		}
 	}
 }
