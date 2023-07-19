@@ -11,9 +11,7 @@ extension EditPersonaData {
 		}
 
 		public var body: some SwiftUI.View {
-			IfLetStore(
-				store.scope(state: { $0.emailAddresses.dynamicField })
-			) { store in
+			IfLetStore(store) { store in
 				EditPersonaField.View(
 					store: store.scope(
 						state: identity,

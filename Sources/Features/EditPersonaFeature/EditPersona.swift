@@ -6,7 +6,15 @@ import Prelude
 extension EditPersona {
 	public struct Output: Sendable, Hashable {
 		let personaLabel: NonEmptyString
-		let personaData: PersonaData
+		let emailAddress: EditPersonaDynamicEntry.State?
+
+		var personaData: PersonaData {
+			var personaData = PersonaData()
+			(emailAddress?.input).map {
+				personaData.emailAddresses = try! .init(collection: [.init(value: .init(email: $0))])
+			}
+			return personaData
+		}
 	}
 }
 
@@ -25,10 +33,17 @@ public struct EditPersona: Sendable, FeatureReducer {
 
 		let mode: Mode
 		var persona: Profile.Network.Persona
+		var entries: EditPersonaData.State
 		var labelField: EditPersonaStaticField.State
 
 		@PresentationState
 		var destination: Destinations.State? = nil
+
+		var alreadyAddedEntryKinds: [PersonaData.Entry.Kind] {
+			[
+				entries != nil ? .emailAddress : nil,
+			].compactMap(identity)
+		}
 
 		public init(
 			mode: Mode,
@@ -40,6 +55,13 @@ public struct EditPersona: Sendable, FeatureReducer {
 				id: .personaLabel,
 				initial: persona.displayName.rawValue
 			)
+			self.entries = (persona.personaData.emailAddresses.first).map {
+				.init(
+					id: .emailAddress,
+					text: $0.value.email,
+					isRequiredByDapp: false
+				)
+			}
 		}
 	}
 
@@ -96,6 +118,13 @@ public struct EditPersona: Sendable, FeatureReducer {
 			EditPersonaField()
 		}
 
+		Scope(
+			state: \.entries,
+			action: /Action.child .. ChildAction.personaData
+		) {
+			EditPersonaData()
+		}
+
 		Reduce(core)
 			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
 				Destinations()
@@ -138,7 +167,7 @@ public struct EditPersona: Sendable, FeatureReducer {
 			}
 
 		case .addAFieldButtonTapped:
-			let alreadyAddedEntryKinds: [PersonaData.Entry.Kind] = state.persona.personaData.alreadyAddedEntryKinds
+			let alreadyAddedEntryKinds: [PersonaData.Entry.Kind] = state.alreadyAddedEntryKinds
 			state.destination = .addFields(.init(excludedEntryKinds: alreadyAddedEntryKinds))
 			return .none
 		}
@@ -161,11 +190,15 @@ public struct EditPersona: Sendable, FeatureReducer {
 				case .companyName:
 					fatalError()
 				case .emailAddress:
-					state.persona.personaData.emailAddresses = try! .init(collection: [.init(value: .init(email: ""))])
+					state.entries = .init(
+						id: entryKind,
+						text: nil,
+						isRequiredByDapp: false
+					)
 				case .url:
 					fatalError()
 				case .phoneNumber:
-					state.persona.personaData.phoneNumbers = try! .init(collection: [.init(value: .init(number: ""))])
+					fatalError()
 				case .postalAddress:
 					fatalError()
 				case .creditCard:
@@ -173,6 +206,10 @@ public struct EditPersona: Sendable, FeatureReducer {
 				}
 			}
 			state.destination = nil
+			return .none
+
+		case .personaData(action: .child(.emailAddress(.delegate(.delete)))):
+			state.entries = nil
 			return .none
 
 		default:
@@ -269,15 +306,5 @@ extension PersonaData.Entry {
 		case .postalAddress: return .postalAddress
 		case .creditCard: return .creditCard
 		}
-	}
-}
-
-extension PersonaData {
-	var alreadyAddedEntryKinds: [PersonaData.Entry.Kind] {
-		[
-			name.map { _ in .name },
-			!emailAddresses.isEmpty ? .emailAddress : nil,
-			!phoneNumbers.isEmpty ? .phoneNumber : nil,
-		].compactMap(identity)
 	}
 }

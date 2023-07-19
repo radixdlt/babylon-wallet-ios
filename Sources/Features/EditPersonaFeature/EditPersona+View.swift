@@ -7,7 +7,7 @@ extension EditPersona.State {
 			personaLabel: persona.displayName.rawValue,
 			avatarURL: URL(string: "something")!,
 			addAFieldButtonState: {
-				if persona.personaData.alreadyAddedEntryKinds.count < DynamicFieldID.supportedKinds.count {
+				if alreadyAddedEntryKinds.count < DynamicFieldID.supportedKinds.count {
 					return .enabled
 				} else {
 					return .disabled
@@ -22,7 +22,7 @@ extension EditPersona.State {
 				}
 				return EditPersona.Output(
 					personaLabel: personaLabelOutput,
-					personaData: persona.personaData
+					emailAddress: entries
 				)
 			}()
 		)
@@ -87,7 +87,7 @@ extension EditPersona {
 
 							EditPersonaData.View(
 								store: store.scope(
-									state: \.persona.personaData,
+									state: \.entries,
 									action: (/Action.child
 										.. EditPersona.ChildAction.personaData
 									).embed
