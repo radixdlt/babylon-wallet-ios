@@ -32,8 +32,8 @@ public struct EditPersona: Sendable, FeatureReducer {
 		public typealias DynamicFieldID = PersonaData.Entry.Kind
 
 		let mode: Mode
-		var persona: Profile.Network.Persona
-		var entries: EditPersonaData.State
+		let persona: Profile.Network.Persona
+		var entries: EditPersonaEntries.State
 		var labelField: EditPersonaStaticField.State
 
 		@PresentationState
@@ -78,7 +78,7 @@ public struct EditPersona: Sendable, FeatureReducer {
 
 	public enum ChildAction: Sendable, Equatable {
 		case labelField(EditPersonaStaticField.Action)
-		case personaData(action: EditPersonaData.Action)
+		case personaData(action: EditPersonaEntries.Action)
 		case destination(PresentationAction<Destinations.Action>)
 	}
 
@@ -122,7 +122,7 @@ public struct EditPersona: Sendable, FeatureReducer {
 			state: \.entries,
 			action: /Action.child .. ChildAction.personaData
 		) {
-			EditPersonaData()
+			EditPersonaEntries()
 		}
 
 		Reduce(core)
@@ -182,9 +182,7 @@ public struct EditPersona: Sendable, FeatureReducer {
 			fieldsToAdd.map(\.entry.kind).forEach { entryKind in
 				switch entryKind {
 				case .name:
-					state.persona.personaData.name = .init(
-						value: .init(given: "", family: "", variant: .eastern)
-					)
+					fatalError()
 				case .dateOfBirth:
 					fatalError()
 				case .companyName:

@@ -85,7 +85,7 @@ extension EditPersona {
 
 							Separator()
 
-							EditPersonaData.View(
+							EditPersonaEntries.View(
 								store: store.scope(
 									state: \.entries,
 									action: (/Action.child

@@ -2,11 +2,11 @@ import ComposableArchitecture
 import Prelude
 import SwiftUI
 
-extension EditPersonaData {
+extension EditPersonaEntries {
 	public struct View: SwiftUI.View {
-		private let store: StoreOf<EditPersonaData>
+		private let store: StoreOf<EditPersonaEntries>
 
-		public init(store: StoreOf<EditPersonaData>) {
+		public init(store: StoreOf<EditPersonaEntries>) {
 			self.store = store
 		}
 
@@ -15,7 +15,7 @@ extension EditPersonaData {
 				EditPersonaField.View(
 					store: store.scope(
 						state: identity,
-						action: (/Action.child .. EditPersonaData.ChildAction.emailAddress).embed
+						action: (/Action.child .. EditPersonaEntries.ChildAction.emailAddress).embed
 					)
 				)
 			}

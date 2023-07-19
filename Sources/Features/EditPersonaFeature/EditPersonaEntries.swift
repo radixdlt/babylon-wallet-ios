@@ -1,7 +1,7 @@
 import FeaturePrelude
 
-// MARK: - EditPersonaData
-public struct EditPersonaData: Sendable, FeatureReducer {
+// MARK: - EditPersonaEntries
+public struct EditPersonaEntries: Sendable, FeatureReducer {
 	public typealias State = EditPersonaDynamicEntry.State?
 
 	public enum ChildAction: Sendable, Equatable {
