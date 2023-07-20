@@ -211,14 +211,7 @@ extension EditPersonaDynamicField.State {
 						return nil
 					}
 				}(),
-				rules: .build {
-					if isRequiredByDapp {
-						.if(\.isBlank, error: L10n.EditPersona.Error.requiredByDapp)
-					}
-					if case PersonaData.Entry.Kind.emailAddress = id {
-						.unless(\.isEmailAddress, error: L10n.EditPersona.Error.invalidEmailAddress)
-					}
-				}
+				rules: []
 			),
 			isDeletable: true,
 			isRequestedByDapp: false
