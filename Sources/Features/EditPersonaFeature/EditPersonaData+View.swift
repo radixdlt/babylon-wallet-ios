@@ -20,6 +20,15 @@ extension EditPersonaEntries {
 				),
 				then: EditPersonaField.View.init
 			)
+			IfLetStore(
+				store.scope(
+					state: \.name,
+					action: (/Action.child
+						.. EditPersonaEntries.ChildAction.name
+					).embed
+				),
+				then: EditPersonaName.View.init
+			)
 		}
 	}
 }

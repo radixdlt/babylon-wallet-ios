@@ -235,3 +235,27 @@ extension EditPersonaDynamicEntry.State {
 		)
 	}
 }
+
+extension EditPersonaField<EditPersonaName.State.Property>.State {
+	public init(
+		id: ID,
+		text: String?,
+		isRequiredByDapp: Bool
+	) {
+		self.init(
+			kind: .dynamic(isRequiredByDapp: isRequiredByDapp),
+			id: id,
+			input: .init(
+				wrappedValue: text,
+				onNil: {
+					if isRequiredByDapp {
+						return L10n.EditPersona.Error.requiredByDapp
+					} else {
+						return nil
+					}
+				}(),
+				rules: []
+			)
+		)
+	}
+}

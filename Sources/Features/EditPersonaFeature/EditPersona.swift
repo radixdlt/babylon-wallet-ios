@@ -6,12 +6,22 @@ import Prelude
 extension EditPersona {
 	public struct Output: Sendable, Hashable {
 		let personaLabel: NonEmptyString
+		let name: EditPersonaName.State?
 		let emailAddress: EditPersonaDynamicEntry.State?
 
 		var personaData: PersonaData {
 			var personaData = PersonaData()
 			(emailAddress?.input).map {
 				personaData.emailAddresses = try! .init(collection: [.init(value: .init(email: $0))])
+			}
+			name.map {
+				personaData.name = .init(
+					value: .init(
+						given: $0.given.input ?? "",
+						family: $0.family.input ?? "",
+						variant: .eastern
+					)
+				)
 			}
 			return personaData
 		}
@@ -41,6 +51,7 @@ public struct EditPersona: Sendable, FeatureReducer {
 
 		var alreadyAddedEntryKinds: [PersonaData.Entry.Kind] {
 			[
+				entries.name.map { _ in .name },
 				entries.emailAddress.map { _ in .emailAddress },
 			].compactMap(identity)
 		}
@@ -176,7 +187,7 @@ public struct EditPersona: Sendable, FeatureReducer {
 			fieldsToAdd.map(\.entry.kind).forEach { entryKind in
 				switch entryKind {
 				case .name:
-					fatalError()
+					state.entries.name = .init(with: PersonaData.Name(given: "", family: "", variant: .eastern))
 				case .dateOfBirth:
 					fatalError()
 				case .companyName:
