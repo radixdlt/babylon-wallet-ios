@@ -1,6 +1,6 @@
-// import EditPersonaFeature
-// import FeaturePrelude
-//
+import EditPersonaFeature
+import FeaturePrelude
+
 // extension PersonaDataPermissionBox.State {
 //	var viewState: PersonaDataPermissionBox.ViewState {
 //		.init(
@@ -43,74 +43,76 @@
 //	}
 // }
 //
-// extension PersonaDataPermissionBox {
-//	struct ViewState: Equatable {
-//		let personaLabel: String
-//		let existingRequiredFields: String?
-//		let missingRequiredFields: Hint?
-//	}
-//
-//	@MainActor
-//	struct View: SwiftUI.View {
-//		let store: StoreOf<PersonaDataPermissionBox>
-//		let action: () -> Void
-//		let accessory: AnyView
-//
-//		init(
-//			store: StoreOf<PersonaDataPermissionBox>,
-//			action: @escaping () -> Void = {},
-//			@ViewBuilder accessory: () -> some SwiftUI.View = { EmptyView() }
-//		) {
-//			self.store = store
-//			self.action = action
-//			self.accessory = AnyView(accessory())
-//		}
-//
-//		var body: some SwiftUI.View {
-//			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-//				DappPermissionBox {
-//					Button(action: action) {
-//						HStack(spacing: .medium2) {
-//							Circle()
-//								.strokeBorder(Color.app.gray3, lineWidth: 1)
-//								.background(Circle().fill(Color.app.gray4))
-//								.frame(.small)
-//							Text(viewStore.personaLabel)
-//								.foregroundColor(.app.gray1)
-//								.textStyle(.secondaryHeader)
-//							Spacer()
-//							accessory
-//						}
-//						.padding(.medium2)
-//					}
-//					.buttonStyle(.inert)
-//				} content: {
-//					VStack(alignment: .leading, spacing: .small1) {
-//						if let existingRequiredFields = viewStore.existingRequiredFields {
-//							Text(existingRequiredFields)
-//								.foregroundColor(.app.gray2)
-//								.textStyle(.body2Regular)
-//						}
-//
-//						viewStore.missingRequiredFields
-//
-//						Button(L10n.DAppRequest.PersonalDataBox.edit) {
-//							viewStore.send(.editButtonTapped)
-//						}
-//						.modifier {
-//							if viewStore.missingRequiredFields != nil {
-//								$0.buttonStyle(.primaryRectangular)
-//							} else {
-//								$0.buttonStyle(.secondaryRectangular(shouldExpand: true))
-//							}
-//						}
-//					}
-//					.padding(.medium2)
-//				}
-//			}
-//		}
-//	}
-// }
+extension PersonaDataPermissionBox {
+	//	struct ViewState: Equatable {
+	//		let personaLabel: String
+	//		let existingRequiredFields: String?
+	//		let missingRequiredFields: Hint?
+	//	}
+	//
+	@MainActor
+	struct View: SwiftUI.View {
+		let store: StoreOf<PersonaDataPermissionBox>
+		let action: () -> Void
+		let accessory: AnyView
+
+		init(
+			store: StoreOf<PersonaDataPermissionBox>,
+			action: @escaping () -> Void = {},
+			@ViewBuilder accessory: () -> some SwiftUI.View = { EmptyView() }
+		) {
+			self.store = store
+			self.action = action
+			self.accessory = AnyView(accessory())
+		}
+
+		var body: some SwiftUI.View {
+			Circle().fill(.orange)
+			//			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
+			//				DappPermissionBox {
+			//					Button(action: action) {
+			//						HStack(spacing: .medium2) {
+			//							Circle()
+			//								.strokeBorder(Color.app.gray3, lineWidth: 1)
+			//								.background(Circle().fill(Color.app.gray4))
+			//								.frame(.small)
+			//							Text(viewStore.personaLabel)
+			//								.foregroundColor(.app.gray1)
+			//								.textStyle(.secondaryHeader)
+			//							Spacer()
+			//							accessory
+			//						}
+			//						.padding(.medium2)
+			//					}
+			//					.buttonStyle(.inert)
+			//				} content: {
+			//					VStack(alignment: .leading, spacing: .small1) {
+			//						if let existingRequiredFields = viewStore.existingRequiredFields {
+			//							Text(existingRequiredFields)
+			//								.foregroundColor(.app.gray2)
+			//								.textStyle(.body2Regular)
+			//						}
+			//
+			//						viewStore.missingRequiredFields
+			//
+			//						Button(L10n.DAppRequest.PersonalDataBox.edit) {
+			//							viewStore.send(.editButtonTapped)
+			//						}
+			//						.modifier {
+			//							if viewStore.missingRequiredFields != nil {
+			//								$0.buttonStyle(.primaryRectangular)
+			//							} else {
+			//								$0.buttonStyle(.secondaryRectangular(shouldExpand: true))
+			//							}
+			//						}
+			//					}
+			//					.padding(.medium2)
+			//				}
+			//			}
+		}
+	}
+}
+
 //
 // #if DEBUG
 // import SwiftUI // NB: necessary for previews to appear

@@ -129,7 +129,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			case login(Login.State)
 			case accountPermission(AccountPermission.State)
 			case chooseAccounts(AccountPermissionChooseAccounts.State)
-//			case personaDataPermission(PersonaDataPermission.State)
+			case personaDataPermission(PersonaDataPermission.State)
 //			case oneTimePersonaData(OneTimePersonaData.State)
 			case reviewTransaction(TransactionReview.State)
 		}
@@ -138,7 +138,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			case login(Login.Action)
 			case accountPermission(AccountPermission.Action)
 			case chooseAccounts(AccountPermissionChooseAccounts.Action)
-//			case personaDataPermission(PersonaDataPermission.Action)
+			case personaDataPermission(PersonaDataPermission.Action)
 //			case oneTimePersonaData(OneTimePersonaData.Action)
 			case reviewTransaction(TransactionReview.Action)
 		}
@@ -155,9 +155,9 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 					.ifCaseLet(/MainState.chooseAccounts, action: /MainAction.chooseAccounts) {
 						AccountPermissionChooseAccounts()
 					}
-//					.ifCaseLet(/MainState.personaDataPermission, action: /MainAction.personaDataPermission) {
-//						PersonaDataPermission()
-//					}
+					.ifCaseLet(/MainState.personaDataPermission, action: /MainAction.personaDataPermission) {
+						PersonaDataPermission()
+					}
 //					.ifCaseLet(/MainState.oneTimePersonaData, action: /MainAction.oneTimePersonaData) {
 //						OneTimePersonaData()
 //					}
@@ -764,17 +764,16 @@ extension DappInteractionFlow.Destinations.State {
 //			)))
 
 		case let .remote(.ongoingPersonaData(item)):
-			fatalError()
-//			if let persona {
-//				self = .relayed(anyItem, with: .personaDataPermission(.init(
-//					dappMetadata: dappMetadata,
-//					personaID: persona.id,
-//					requiredFieldIDs: item.fields
-//				)))
-//			} else {
-//				assertionFailure("Persona data request requires a persona.")
-//				return nil
-//			}
+			guard let persona else {
+				assertionFailure("Persona data request requires a persona.")
+				return nil
+			}
+
+			self = .relayed(anyItem, with: .personaDataPermission(.init(
+				dappMetadata: dappMetadata,
+				personaID: persona.id,
+				requested: item
+			)))
 
 		case let .remote(.send(item)):
 			self = .relayed(anyItem, with: .reviewTransaction(.init(

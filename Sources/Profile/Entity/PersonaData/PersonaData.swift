@@ -81,9 +81,10 @@ extension PersonaData {
 extension PersonaData {
 	public static let previewValue: Self = try! .init(
 		name: .init(value: .init(
-			given: "Satoshi",
-			middle: "Creator of Bitcoin",
-			family: "Nakamoto", variant: .eastern
+			variant: .eastern,
+			familyName: "Nakamoto",
+			givenNames: "Satoshi",
+			nickname: "Bitcoin"
 		)),
 		dateOfBirth: .init(value: .init(year: 2009, month: 1, day: 3)),
 		companyName: .init(value: .init(name: "Bitcoin")),
