@@ -60,7 +60,10 @@ extension GatewayAPIClient {
 				urlRequest.timeoutInterval = timeoutInterval
 			}
 
-			dump(urlRequest.httpBody?.prettyPrintedJSONString)
+			// dump(urlRequest.httpBody?.prettyPrintedJSONString)
+			if let msg = urlRequest.httpBody?.prettyPrintedJSONString as? String {
+				loggerGlobal.info(.init(stringLiteral: msg))
+			}
 			let (data, urlResponse) = try await urlSession.data(for: urlRequest)
 
 			guard let httpURLResponse = urlResponse as? HTTPURLResponse else {

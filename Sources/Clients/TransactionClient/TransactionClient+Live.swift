@@ -201,6 +201,19 @@ extension TransactionClient {
 				throw TransactionFailure.failedToPrepareForTXSigning(.failedToFindAccountWithEnoughFundsToLockFee)
 			}
 
+			let feePayer = nonEmpty.first
+			let manifestWithLockFee = try await lockFeeWithSelectedPayer(
+				manifest,
+				feeToAdd, feePayer.account.address
+			)
+
+			return .includesLockFee(.init(manifestWithLockFee: manifestWithLockFee, feePayerSelectionAmongstCandidates: .init(
+				selected: feePayer,
+				candidates: nonEmpty,
+				fee: feeToAdd,
+				selection: .auto
+			)))
+
 			return .excludesLockFee(.init(manifestExcludingLockFee: manifest, feePayerCandidates: nonEmpty, feeNotYetAdded: feeToAdd))
 		}
 

@@ -42,6 +42,9 @@ extension GatewayAPI.TransactionPreviewRequest {
 			throw NotaryIsSignatoryDiscrepancy()
 		}
 		let notaryIsSignatory = transactionSigners.notaryIsSignatory
+		let hex = rawManifest.blobs().map {
+			Hash.fromUnhashedBytes(bytes: $0).asStr()
+		}
 
 		try self.init(
 			manifest: rawManifest.instructions().asStr(),
