@@ -50,6 +50,14 @@ public struct EditPersonaEntries: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
+		case .name(.delegate(.delete)):
+			state.name = nil
+			return .none
+
+		case .emailAddress(.delegate(.delete)):
+			state.emailAddress = nil
+			return .none
+
 		default:
 			return .none
 		}

@@ -14,21 +14,32 @@ public protocol EditPersonaFieldID: Sendable, Hashable, Comparable {
 public struct EditPersonaField<ID: EditPersonaFieldID>: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable, Identifiable {
 		public let id: ID
+		let isDeletable: Bool
+		let isRequestedByDapp: Bool
 
 		@Validation<String, String>
 		public var input: String?
 
 		private init(
 			id: ID,
-			input: Validation<String, String>
+			input: Validation<String, String>,
+			isDeletable: Bool,
+			isRequestedByDapp: Bool
 		) {
 			self.id = id
 			self._input = input
+			self.isDeletable = isDeletable
+			self.isRequestedByDapp = isRequestedByDapp
 		}
 	}
 
 	public enum ViewAction: Sendable, Equatable {
 		case inputFieldChanged(String)
+		case deleteButtonTapped
+	}
+
+	public enum DelegateAction: Sendable, Equatable {
+		case delete
 	}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
@@ -36,6 +47,8 @@ public struct EditPersonaField<ID: EditPersonaFieldID>: Sendable, FeatureReducer
 		case let .inputFieldChanged(input):
 			state.input = input
 			return .none
+		case .deleteButtonTapped:
+			return .send(.delegate(.delete))
 		}
 	}
 }
@@ -84,7 +97,9 @@ extension EditPersonaStaticField.State {
 				wrappedValue: initial,
 				onNil: L10n.EditPersona.Error.blank,
 				rules: [.if(\.isBlank, error: L10n.EditPersona.Error.blank)]
-			)
+			),
+			isDeletable: false,
+			isRequestedByDapp: false
 		)
 	}
 }
@@ -204,7 +219,9 @@ extension EditPersonaDynamicField.State {
 						.unless(\.isEmailAddress, error: L10n.EditPersona.Error.invalidEmailAddress)
 					}
 				}
-			)
+			),
+			isDeletable: true,
+			isRequestedByDapp: false
 		)
 	}
 }
@@ -227,7 +244,9 @@ extension EditPersonaField<EditPersonaName.State.Property>.State {
 					}
 				}(),
 				rules: []
-			)
+			),
+			isDeletable: false,
+			isRequestedByDapp: isRequiredByDapp
 		)
 	}
 }
