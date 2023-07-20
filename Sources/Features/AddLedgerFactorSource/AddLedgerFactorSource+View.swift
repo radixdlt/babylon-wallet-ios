@@ -112,6 +112,41 @@ extension View {
 	}
 }
 
+// MARK: - LinkConnectorView
+@MainActor
+struct LinkConnectorView: SwiftUI.View {
+	let buttonAction: () -> Void
+
+	public var body: some SwiftUI.View {
+		VStack(spacing: 0) {
+			Image(asset: AssetResource.tempLinkConnector) // FIXME: Use actual icon
+				.resizable()
+				.frame(.veryHuge)
+				.padding(.top, .large2)
+				.padding(.bottom, .huge3)
+
+			Text("Link a Connector") // FIXME: Strings L10n.AddLedgerDevice.LinkConnector.
+				.textStyle(.sheetTitle)
+				.padding(.bottom, .large3)
+
+			Text("To use a Ledger hardware wallet device, it must be connected to a computer running the Radix Connector browser extension.") // FIXME: Strings
+				.textStyle(.body1Regular)
+				.padding(.horizontal, .large2)
+				.padding(.bottom, .large1)
+
+			Button("Link a Connector", action: buttonAction) // FIXME: Strings L10n.AddLedgerDevice.LinkConnector
+				.buttonStyle(.primaryRectangular)
+				.padding(.horizontal, .medium3)
+
+			Spacer(minLength: 0)
+		}
+		.multilineTextAlignment(.center)
+		.foregroundColor(.app.gray1)
+	}
+}
+
+// MARK: - NameLedgerFactorSource
+
 extension NameLedgerFactorSource.State {
 	var viewState: NameLedgerFactorSource.ViewState {
 		.init(

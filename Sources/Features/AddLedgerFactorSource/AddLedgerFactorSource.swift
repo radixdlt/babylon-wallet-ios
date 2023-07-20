@@ -70,6 +70,7 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.factorSourcesClient) var factorSourcesClient
 	@Dependency(\.ledgerHardwareWalletClient) var ledgerHardwareWalletClient
+	@Dependency(\.radixConnectClient) var radixConnectClient
 
 	public init() {}
 

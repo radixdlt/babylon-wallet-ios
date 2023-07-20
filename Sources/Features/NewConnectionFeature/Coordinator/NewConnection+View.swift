@@ -34,10 +34,7 @@ extension NewConnection {
 						CaseLet(
 							state: /NewConnection.State.connectUsingSecrets,
 							action: { NewConnection.Action.child(.connectUsingSecrets($0)) },
-							then: {
-								ConnectUsingSecrets.View(store: $0)
-									.withTitle(L10n.LinkedConnectors.NameNewConnector.title)
-							}
+							then: { ConnectUsingSecrets.View(store: $0) }
 						)
 					}
 				}

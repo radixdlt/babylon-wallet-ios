@@ -30,6 +30,7 @@ public struct RadixConnectClient: DependencyKey, Sendable {
 
 	public var getP2PLinks: GetP2PLinks
 	public var getP2PLinksWithConnectionStatusUpdates: GetP2PLinksWithConnectionStatusUpdates
+	public var idsOfConnectedPeerConnections: IDsOfConnectedPeerConnections
 	public var storeP2PLink: StoreP2PLink
 	public var deleteP2PLinkByPassword: DeleteP2PLinkByPassword
 	public var addP2PWithPassword: AddP2PWithPassword
@@ -51,6 +52,7 @@ extension RadixConnectClient {
 
 	public typealias GetP2PLinks = @Sendable () async throws -> OrderedSet<P2PLink>
 	public typealias GetP2PLinksWithConnectionStatusUpdates = @Sendable () async -> AnyAsyncSequence<[P2P.LinkConnectionUpdate]>
+	public typealias IDsOfConnectedPeerConnections = @Sendable () async -> [PeerConnectionID]
 
 	public typealias StoreP2PLink = @Sendable (P2PLink) async throws -> Void
 
