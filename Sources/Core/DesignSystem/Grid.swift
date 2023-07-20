@@ -65,4 +65,7 @@ extension CGFloat {
 
 	/// 275
 	public static let smallDetent: Self = 275
+
+	/// 150
+	public static let imagePlaceholderHeight: Self = 150
 }

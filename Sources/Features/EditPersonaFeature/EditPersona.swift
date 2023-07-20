@@ -229,33 +229,11 @@ extension EditPersona.State {
 	}
 }
 
-extension PersonaData {
-	func dynamicFields(
-		in mode: EditPersona.State.Mode
-	) -> IdentifiedArrayOf<EditPersonaDynamicField.State> {
-		IdentifiedArray(
-			uncheckedUniqueElements: entries.map(\.value).map { entryValue in
-				EditPersonaDynamicField.State(
-					id: entryValue.kind,
-					text: entryValue.text,
-					isRequiredByDapp: {
-						switch mode {
-						case .edit:
-							return false
-						}
-					}()
-				)
-			}
-		)
-	}
-}
-
 extension Profile.Network.Persona {
 	fileprivate func updated(with output: EditPersona.Output) -> Self {
 		var updatedPersona = self
 
 		updatedPersona.displayName = output.personaLabel
-
 		updatedPersona.personaData = output.personaData
 
 		return updatedPersona
