@@ -1,55 +1,69 @@
 import EditPersonaFeature
 import FeaturePrelude
 
-// extension PersonaDataPermissionBox.State {
-//	var viewState: PersonaDataPermissionBox.ViewState {
-//		.init(
-//			personaLabel: persona.displayName.rawValue,
-//			existingRequiredFields: {
-//				var existingRequiredFields = persona.fields.filter { allRequiredFieldIDs.contains($0.id) }
-//
-//				let name = [
-//					existingRequiredFields.remove(id: .givenName)?.value.rawValue,
-//					existingRequiredFields.remove(id: .familyName)?.value.rawValue,
-//				]
-//				.compacted()
-//				.joined(separator: " ")
-//				.nilIfBlank
-//
-//				let otherFields = existingRequiredFields
-//					.sorted(by: { $0.id < $1.id })
-//					.map(\.value.rawValue)
-//
-//				if let allFields = ([name].compacted() + otherFields).nilIfEmpty {
-//					return allFields.joined(separator: "\n")
-//				} else {
-//					return nil
-//				}
-//			}(),
-//			missingRequiredFields: { () -> Hint? in
-//				if let missingRequiredFieldIDs {
-//					return .error {
-//						Text {
-//							L10n.DAppRequest.PersonalDataBox.requiredInformation.text.bold()
-//							" "
-//							missingRequiredFieldIDs.sorted().map(\.title.localizedLowercase).joined(separator: ", ")
-//						}
-//					}
-//				} else {
-//					return nil
-//				}
-//			}()
-//		)
-//	}
-// }
-//
+extension PersonaDataPermissionBox.State {
+	var viewState: PersonaDataPermissionBox.ViewState {
+		.init(
+			personaLabel: persona.displayName.rawValue,
+			existingRequiredEntries:
+			persona.personaData.existingRequestEntries(requested)
+				.sorted(by: \.discriminator)
+				.map(\.description)
+				.nilIfEmpty?
+				.joined(separator: "\n"),
+
+			missingRequiredEntries: { () -> Hint? in
+				switch response {
+				case .success:
+					return nil
+				case let .failure(error):
+					return .error {
+						Text {
+							"Issues:".text.bold() // FIXME: Strings
+							" "
+							error.issues.keys.sorted().map(\.title.localizedLowercase).joined(separator: ", ")
+							//						L10n.DAppRequest.PersonalDataBox.requiredInformation.text.bold()
+							//						" "
+							//						missingRequiredFieldIDs.sorted().map(\.title.localizedLowercase).joined(separator: ", ")
+						}
+					}
+				}
+			}()
+		)
+	}
+}
+
+// FIXME: This could also be a requirement in BasePersonaDataEntryProtocol
+extension PersonaData.Entry {
+	var description: String {
+		switch self {
+		case let .name(name):
+			return name.description
+		case let .dateOfBirth(dateOfBirth):
+			return dateOfBirth.description
+		case let .companyName(companyName):
+			return companyName.description
+		case let .emailAddress(emailAddress):
+			return emailAddress.description
+		case let .phoneNumber(phoneNumber):
+			return phoneNumber.description
+		case let .url(associatedURL):
+			return associatedURL.description
+		case let .postalAddress(postalAddress):
+			return postalAddress.description
+		case let .creditCard(creditCard):
+			return creditCard.description
+		}
+	}
+}
+
 extension PersonaDataPermissionBox {
-	//	struct ViewState: Equatable {
-	//		let personaLabel: String
-	//		let existingRequiredFields: String?
-	//		let missingRequiredFields: Hint?
-	//	}
-	//
+	struct ViewState: Equatable {
+		let personaLabel: String
+		let existingRequiredEntries: String?
+		let missingRequiredEntries: Hint?
+	}
+
 	@MainActor
 	struct View: SwiftUI.View {
 		let store: StoreOf<PersonaDataPermissionBox>
@@ -67,48 +81,47 @@ extension PersonaDataPermissionBox {
 		}
 
 		var body: some SwiftUI.View {
-			Circle().fill(.orange)
-			//			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-			//				DappPermissionBox {
-			//					Button(action: action) {
-			//						HStack(spacing: .medium2) {
-			//							Circle()
-			//								.strokeBorder(Color.app.gray3, lineWidth: 1)
-			//								.background(Circle().fill(Color.app.gray4))
-			//								.frame(.small)
-			//							Text(viewStore.personaLabel)
-			//								.foregroundColor(.app.gray1)
-			//								.textStyle(.secondaryHeader)
-			//							Spacer()
-			//							accessory
-			//						}
-			//						.padding(.medium2)
-			//					}
-			//					.buttonStyle(.inert)
-			//				} content: {
-			//					VStack(alignment: .leading, spacing: .small1) {
-			//						if let existingRequiredFields = viewStore.existingRequiredFields {
-			//							Text(existingRequiredFields)
-			//								.foregroundColor(.app.gray2)
-			//								.textStyle(.body2Regular)
-			//						}
-			//
-			//						viewStore.missingRequiredFields
-			//
-			//						Button(L10n.DAppRequest.PersonalDataBox.edit) {
-			//							viewStore.send(.editButtonTapped)
-			//						}
-			//						.modifier {
-			//							if viewStore.missingRequiredFields != nil {
-			//								$0.buttonStyle(.primaryRectangular)
-			//							} else {
-			//								$0.buttonStyle(.secondaryRectangular(shouldExpand: true))
-			//							}
-			//						}
-			//					}
-			//					.padding(.medium2)
-			//				}
-			//			}
+			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
+				DappPermissionBox {
+					Button(action: action) {
+						HStack(spacing: .medium2) {
+							Circle()
+								.strokeBorder(Color.app.gray3, lineWidth: 1)
+								.background(Circle().fill(Color.app.gray4))
+								.frame(.small)
+							Text(viewStore.personaLabel)
+								.foregroundColor(.app.gray1)
+								.textStyle(.secondaryHeader)
+							Spacer()
+							accessory
+						}
+						.padding(.medium2)
+					}
+					.buttonStyle(.inert)
+				} content: {
+					VStack(alignment: .leading, spacing: .small1) {
+						if let existingRequiredFields = viewStore.existingRequiredEntries {
+							Text(existingRequiredFields)
+								.foregroundColor(.app.gray2)
+								.textStyle(.body2Regular)
+						}
+
+						viewStore.missingRequiredEntries
+
+						Button(L10n.DAppRequest.PersonalDataBox.edit) {
+							viewStore.send(.editButtonTapped)
+						}
+						.modifier {
+							if viewStore.missingRequiredEntries != nil {
+								$0.buttonStyle(.primaryRectangular)
+							} else {
+								$0.buttonStyle(.secondaryRectangular(shouldExpand: true))
+							}
+						}
+					}
+					.padding(.medium2)
+				}
+			}
 		}
 	}
 }

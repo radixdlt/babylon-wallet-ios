@@ -41,36 +41,3 @@ extension P2P.Dapp.Response.WalletInteractionSuccessResponse {
 		}
 	}
 }
-
-extension P2P.Dapp.Response.WalletInteractionSuccessResponse.PersonaDataRequestResponseItem {
-	public init(_ personaData: PersonaData, request: P2P.Dapp.Request.PersonaDataRequestItem) throws {
-		let issues = personaData.requestIssues(request)
-		guard issues.isEmpty else {
-			throw PersonaDataRequestError(issues: issues)
-		}
-		self.init(personaData)
-	}
-
-	public init(_ personaData: PersonaData) {
-		self.init(
-			name: personaData.name?.value,
-			dateOfBirth: personaData.dateOfBirth?.value,
-			companyName: personaData.companyName?.value,
-			emailAddresses: personaData.emailAddresses.values,
-			phoneNumbers: personaData.phoneNumbers.values,
-			urls: personaData.urls.values,
-			postalAddresses: personaData.postalAddresses.values,
-			creditCards: personaData.creditCards.values
-		)
-	}
-
-	public struct PersonaDataRequestError: Error {
-		let issues: [PersonaData.Entry.Kind: P2P.Dapp.Request.Issue]
-	}
-}
-
-extension PersonaData.CollectionOfIdentifiedEntries {
-	public var values: OrderedSet<Value>? {
-		try? .init(validating: collection.elements.map(\.value))
-	}
-}

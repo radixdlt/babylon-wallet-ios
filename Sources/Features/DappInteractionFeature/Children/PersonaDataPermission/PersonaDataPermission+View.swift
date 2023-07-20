@@ -7,7 +7,7 @@ extension PersonaDataPermission.State {
 			thumbnail: dappMetadata.thumbnail,
 			title: L10n.DAppRequest.PersonalDataPermission.title,
 			subtitle: L10n.DAppRequest.PersonalDataPermission.subtitle(dappMetadata.name),
-			output: (persona?.persona.personaData).flatMap { try? .init($0, request: requested) }
+			output: try? persona?.response.get()
 		)
 	}
 }

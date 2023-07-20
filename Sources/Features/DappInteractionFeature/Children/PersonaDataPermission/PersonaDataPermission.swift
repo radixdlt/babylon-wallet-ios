@@ -2,7 +2,7 @@ import EditPersonaFeature
 import FeaturePrelude
 import PersonasClient
 
-// MARK: - AccountPermission
+// MARK: - PersonaDataPermission
 struct PersonaDataPermission: Sendable, FeatureReducer {
 	typealias Request = P2P.Dapp.Request.PersonaDataRequestItem
 	typealias Response = P2P.Dapp.Response.WalletInteractionSuccessResponse.PersonaDataRequestResponseItem
@@ -43,7 +43,6 @@ struct PersonaDataPermission: Sendable, FeatureReducer {
 
 	enum DelegateAction: Sendable, Equatable {
 		case personaUpdated(Profile.Network.Persona)
-		//				case continueButtonTapped(IdentifiedArrayOf<Profile.Network.Persona.Field>)
 		case continueButtonTapped(Response)
 	}
 
@@ -122,5 +121,43 @@ struct PersonaDataPermission: Sendable, FeatureReducer {
 		default:
 			return .none
 		}
+	}
+}
+
+extension PersonaDataPermission.Response {
+	public init(_ personaData: PersonaData) {
+		self.init(
+			name: personaData.name?.value,
+			dateOfBirth: personaData.dateOfBirth?.value,
+			companyName: personaData.companyName?.value,
+			emailAddresses: personaData.emailAddresses.values,
+			phoneNumbers: personaData.phoneNumbers.values,
+			urls: personaData.urls.values,
+			postalAddresses: personaData.postalAddresses.values,
+			creditCards: personaData.creditCards.values
+		)
+	}
+
+	public typealias Result = Swift.Result<Self, RequestError>
+
+	public struct RequestError: Error, Hashable {
+		public let issues: [PersonaData.Entry.Kind: P2P.Dapp.Request.Issue]
+	}
+}
+
+extension PersonaData.CollectionOfIdentifiedEntries {
+	public var values: OrderedSet<Value>? {
+		try? .init(validating: collection.elements.map(\.value))
+	}
+}
+
+extension PersonaDataPermission.Response.Result {
+	init(request: PersonaDataPermission.Request, personaData: PersonaData) {
+		let issues = personaData.requestIssues(request)
+		guard issues.isEmpty else {
+			self = .failure(.init(issues: issues))
+			return
+		}
+		self = .success(.init(personaData))
 	}
 }

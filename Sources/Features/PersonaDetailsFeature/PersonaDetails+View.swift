@@ -337,9 +337,13 @@ extension PersonaDetails.View {
 				self.personaName = personaName
 				self.dateOfBirth = personaData?.dateOfBirth?.value.date
 				self.companyName = personaData?.companyName?.value.name
-				self.firstName = personaData?.name?.value.given
-				self.middleName = personaData?.name?.value.middle
-				self.lastName = personaData?.name?.value.family
+				self.firstName = "" // FIXME: Use actual
+				self.middleName = ""
+				self.lastName = ""
+
+//				self.firstName = personaData?.name?.value.given
+//				self.middleName = personaData?.name?.value.middle
+//				self.lastName = personaData?.name?.value.family
 				self.emailAddresses = personaData?.emailAddresses.map(\.value.email)
 				self.phoneNumbers = personaData?.phoneNumbers.map(\.value.number)
 				self.urls = personaData?.urls.map(\.value.url)

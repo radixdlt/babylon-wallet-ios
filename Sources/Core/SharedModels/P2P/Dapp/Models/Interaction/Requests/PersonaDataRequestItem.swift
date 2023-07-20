@@ -12,22 +12,30 @@ extension P2P.Dapp.Request {
 			numberOfRequestedEmailAddresses: RequestedNumber? = nil,
 			numberOfRequestedPhoneNumbers: RequestedNumber? = nil
 		) {
-			// The only purpose of this switch is to make sure we get a compilation error when we add a new PersonaData.Entry kind, so
-			// we do not forget to handle it here.
-			switch PersonaData.Entry.Kind.name {
-			case .name, .dateOfBirth, .companyName, .emailAddress, .phoneNumber, .url, .postalAddress, .creditCard: break
-			}
-
 			self.isRequestingName = isRequestingName
 			self.numberOfRequestedEmailAddresses = numberOfRequestedEmailAddresses
 			self.numberOfRequestedPhoneNumbers = numberOfRequestedPhoneNumbers
+		}
+
+		public var requestedEntries: Set<PersonaData.Entry.Kind> {
+			var result: Set<PersonaData.Entry.Kind> = []
+			if isRequestingName == true {
+				result.insert(.name)
+			}
+			if numberOfRequestedPhoneNumbers?.isValid == true {
+				result.insert(.phoneNumber)
+			}
+			if numberOfRequestedEmailAddresses?.isValid == true {
+				result.insert(.emailAddress)
+			}
+			return result
 		}
 	}
 
 	public enum Issue: Sendable, Hashable, Decodable {
 		case isMissing
 		case needsMore(RequestedNumber)
-		case needsFewer(RequestedNumber)
+		case needsFewer(Int) // TODO: Perhaps we should skip this case, and simply pick the requested number of entries?
 	}
 }
 
@@ -47,6 +55,11 @@ extension PersonaData {
 
 		return result
 	}
+
+	public func existingRequestEntries(_ item: P2P.Dapp.Request.PersonaDataRequestItem) -> [PersonaData.Entry] {
+		let requested = item.requestedEntries
+		return entries.filter { requested.contains($0.value.discriminator) }.map(\.value)
+	}
 }
 
 extension PersonaData.CollectionOfIdentifiedEntries {
@@ -58,7 +71,7 @@ extension PersonaData.CollectionOfIdentifiedEntries {
 			if missing > 0 {
 				return .needsMore(.exactly(missing))
 			} else if missing < 0 {
-				return .needsFewer(.exactly(-missing))
+				return .needsFewer(-missing)
 			}
 		case .atLeast:
 			if missing > 0 {
