@@ -28,7 +28,7 @@ extension EditPersonaEntries {
 					).embed
 				)
 			) { store in
-				EntryWrapperView(
+				EditPersonaEntryWrapperView(
 					viewState: .init(
 						name: "Name!",
 						isRequestedByDapp: true,
