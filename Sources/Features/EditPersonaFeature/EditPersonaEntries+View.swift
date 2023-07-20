@@ -19,11 +19,10 @@ extension EditPersonaEntries {
 					).embed
 				)
 			) { store in
-				EditPersonaEntry.View(store: store) { s in
-					AnyView(EditPersonaName.View(
-						store: s
-					))
-				}
+				EditPersonaEntry.View(
+					store: store,
+					contentView: EditPersonaName.View.init
+				)
 			}
 
 			IfLetStore(

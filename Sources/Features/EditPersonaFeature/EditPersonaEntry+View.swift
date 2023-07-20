@@ -5,7 +5,7 @@ extension EditPersonaEntry {
 	public struct View: SwiftUI.View {
 		let store: StoreOf<EditPersonaEntry>
 
-		let contentView: (StoreOf<ContentReducer>) -> AnyView
+		let contentView: (StoreOf<ContentReducer>) -> ContentReducer.View
 
 		public var body: some SwiftUI.View {
 			VStack {

@@ -13,7 +13,6 @@ extension EditPersona {
 
 		var personaData: PersonaData {
 			var personaData = PersonaData()
-
 			name.map {
 				personaData.name = .init(
 					value: .init(
