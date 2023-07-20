@@ -187,7 +187,18 @@ public struct EditPersona: Sendable, FeatureReducer {
 			fieldsToAdd.map(\.entry.kind).forEach { entryKind in
 				switch entryKind {
 				case .name:
-					state.entries.name = .init(with: PersonaData.Name(given: "", family: "", variant: .eastern))
+					state.entries.name = .init(
+						name: "Name",
+						isRequestedByDapp: false,
+						content: .init(
+							with: PersonaData.Name(
+								given: "",
+								family: "",
+								variant: .eastern
+							),
+							isRequestedByDapp: false
+						)
+					)
 				case .dateOfBirth:
 					fatalError()
 				case .companyName:
@@ -209,10 +220,6 @@ public struct EditPersona: Sendable, FeatureReducer {
 				}
 			}
 			state.destination = nil
-			return .none
-
-		case .personaData(action: .child(.emailAddress(.delegate(.delete)))):
-			state.entries.emailAddress = nil
 			return .none
 
 		default:

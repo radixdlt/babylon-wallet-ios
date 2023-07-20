@@ -19,13 +19,10 @@ extension EditPersonaEntries {
 					).embed
 				)
 			) { store in
-				EditPersonaEntryWrapperView(
-					viewState: .init(
-						name: "Name!",
-						isRequestedByDapp: false
-					)
-				) {
-					EditPersonaName.View(store: store)
+				EditPersonaEntry.View(store: store) { s in
+					AnyView(EditPersonaName.View(
+						store: s
+					))
 				}
 			}
 

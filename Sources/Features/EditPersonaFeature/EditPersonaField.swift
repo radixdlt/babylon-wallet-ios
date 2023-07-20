@@ -29,11 +29,6 @@ public struct EditPersonaField<ID: EditPersonaFieldID>: Sendable, FeatureReducer
 
 	public enum ViewAction: Sendable, Equatable {
 		case inputFieldChanged(String)
-		case deleteButtonTapped
-	}
-
-	public enum DelegateAction: Sendable, Equatable {
-		case delete
 	}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
@@ -41,9 +36,6 @@ public struct EditPersonaField<ID: EditPersonaFieldID>: Sendable, FeatureReducer
 		case let .inputFieldChanged(input):
 			state.input = input
 			return .none
-
-		case .deleteButtonTapped:
-			return .send(.delegate(.delete))
 		}
 	}
 }

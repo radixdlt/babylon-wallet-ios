@@ -3,7 +3,7 @@ import FeaturePrelude
 // MARK: - EditPersonaEntries
 public struct EditPersonaEntries: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
-		var name: EditPersonaName.State?
+		var name: EditPersonaEntry<EditPersonaName>.State?
 		var emailAddress: EditPersonaDynamicField.State?
 
 		init(with personaData: PersonaData) {
@@ -14,13 +14,22 @@ public struct EditPersonaEntries: Sendable, FeatureReducer {
 					isRequiredByDapp: false
 				)
 			}
-			self.name = (personaData.name?.value).map(EditPersonaName.State.init)
+			self.name = (personaData.name?.value).map {
+				EditPersonaEntry<EditPersonaName>.State(
+					name: "Name...",
+					isRequestedByDapp: false,
+					content: EditPersonaName.State(
+						with: $0,
+						isRequestedByDapp: false
+					)
+				)
+			}
 		}
 	}
 
 	public enum ChildAction: Sendable, Equatable {
 		case emailAddress(EditPersonaDynamicField.Action)
-		case name(EditPersonaName.Action)
+		case name(EditPersonaEntry<EditPersonaName>.Action)
 	}
 
 	public var body: some ReducerProtocolOf<Self> {
@@ -35,7 +44,14 @@ public struct EditPersonaEntries: Sendable, FeatureReducer {
 				\.name,
 				action: /Action.child .. ChildAction.name
 			) {
-				EditPersonaName()
+				EditPersonaEntry<EditPersonaName>()
 			}
+	}
+
+	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+		switch childAction {
+		default:
+			return .none
+		}
 	}
 }

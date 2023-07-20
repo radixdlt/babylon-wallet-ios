@@ -1,41 +1,57 @@
 import FeaturePrelude
 
-// MARK: - EntryWrapperView
-struct EditPersonaEntryWrapperView<ContentView>: View where ContentView: View {
-	public struct ViewState: Equatable {
-		let name: String
-		let isRequestedByDapp: Bool
-		var canBeDeleted: Bool {
-			!isRequestedByDapp
-		}
-	}
+// MARK: - EditPersonaEntry.View
+extension EditPersonaEntry {
+	public struct View: SwiftUI.View {
+		let store: StoreOf<EditPersonaEntry>
 
-	let viewState: ViewState
-	let contentView: () -> ContentView
+		let contentView: (StoreOf<ContentReducer>) -> AnyView
 
-	var body: some View {
-		VStack {
-			HStack {
-				VStack {
-					Text(viewState.name)
-					if viewState.isRequestedByDapp {
-						Text(L10n.EditPersona.requiredByDapp)
-							.textStyle(.body2Regular)
-							.foregroundColor(.app.gray2)
-							.multilineTextAlignment(.trailing)
+		public var body: some SwiftUI.View {
+			VStack {
+				HStack {
+					WithViewStore(
+						store.scope(
+							state: identity,
+							action: Action.view
+						),
+						observe: identity
+					) { viewStore in
+						VStack {
+							Text(viewStore.name)
+							if viewStore.isRequestedByDapp {
+								Text(L10n.EditPersona.requiredByDapp)
+									.textStyle(.body2Regular)
+									.foregroundColor(.app.gray2)
+									.multilineTextAlignment(.trailing)
+							}
+						}
+						Button(action: { viewStore.send(.deleteButtonTapped) }) {
+							Image(asset: AssetResource.trash)
+								.offset(x: .small3)
+								.frame(.verySmall, alignment: .trailing)
+						}
+						.modifier {
+							if viewStore.canBeDeleted { $0 } else { $0.hidden() }
+						}
 					}
 				}
-				Button(action: {}) {
-					Image(asset: AssetResource.trash)
-						.offset(x: .small3)
-						.frame(.verySmall, alignment: .trailing)
-				}
-				.modifier {
-					if viewState.canBeDeleted { $0 } else { $0.hidden() }
-				}
-			}
 
-			contentView()
+				contentView(
+					store.scope(
+						state: \.content,
+						action: (/Action.child
+							.. EditPersonaEntry<ContentReducer>.ChildAction.content
+						).embed
+					)
+				)
+			}
 		}
+	}
+}
+
+extension EditPersonaEntry.State {
+	fileprivate var canBeDeleted: Bool {
+		!isRequestedByDapp
 	}
 }

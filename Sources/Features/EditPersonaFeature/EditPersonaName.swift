@@ -11,7 +11,10 @@ public struct EditPersonaName: FeatureReducer {
 		var family: EditPersonaField<Property>.State
 		var given: EditPersonaField<Property>.State
 
-		init(with name: PersonaData.Name) {
+		init(
+			with name: PersonaData.Name,
+			isRequestedByDapp: Bool
+		) {
 			self.family = EditPersonaField<State.Property>.State(
 				id: .family,
 				text: name.family,
@@ -29,6 +32,8 @@ public struct EditPersonaName: FeatureReducer {
 		case family(EditPersonaField<State.Property>.Action)
 		case given(EditPersonaField<State.Property>.Action)
 	}
+
+	public init() {}
 
 	public var body: some ReducerProtocolOf<Self> {
 		Scope(
@@ -51,3 +56,6 @@ extension EditPersonaName.State.Property: EditPersonaFieldID {
 	public var keyboardType: UIKeyboardType { .default }
 	public var capitalization: DesignSystem.EquatableTextInputCapitalization? { .words }
 }
+
+// MARK: - EditPersonaName + EmptyInitializable
+extension EditPersonaName: EmptyInitializable {}
