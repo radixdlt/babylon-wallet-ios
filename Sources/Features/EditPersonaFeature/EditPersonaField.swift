@@ -239,3 +239,46 @@ extension EditPersonaField<EditPersonaName.State.Property>.State {
 		)
 	}
 }
+
+// MARK: - EntryWrapperView
+struct EntryWrapperView<WrappedView>: View where WrappedView: View {
+	public struct ViewState: Equatable {
+		let name: String
+		let isRequestedByDapp: Bool
+		let isDeletable: Bool
+		var canBeDeleted: Bool {
+			!isRequestedByDapp
+		}
+	}
+
+	let viewState: ViewState
+	let wrapped: () -> WrappedView
+
+	var body: some View {
+		VStack {
+			HStack {
+				VStack {
+					Text(viewState.name)
+					if viewState.isRequestedByDapp {
+						Text(L10n.EditPersona.requiredByDapp)
+							.textStyle(.body2Regular)
+							.foregroundColor(.app.gray2)
+							.multilineTextAlignment(.trailing)
+					}
+				}
+				if viewState.isDeletable {
+					Button(action: {}) {
+						Image(asset: AssetResource.trash)
+							.offset(x: .small3)
+							.frame(.verySmall, alignment: .trailing)
+					}
+					.modifier {
+						if viewState.canBeDeleted { $0 } else { $0.hidden() }
+					}
+				}
+			}
+
+			wrapped()
+		}
+	}
+}

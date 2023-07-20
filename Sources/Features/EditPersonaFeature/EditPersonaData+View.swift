@@ -26,9 +26,18 @@ extension EditPersonaEntries {
 					action: (/Action.child
 						.. EditPersonaEntries.ChildAction.name
 					).embed
-				),
-				then: EditPersonaName.View.init
-			)
+				)
+			) { store in
+				EntryWrapperView(
+					viewState: .init(
+						name: "Name!",
+						isRequestedByDapp: true,
+						isDeletable: true
+					)
+				) {
+					EditPersonaName.View(store: store)
+				}
+			}
 		}
 	}
 }
