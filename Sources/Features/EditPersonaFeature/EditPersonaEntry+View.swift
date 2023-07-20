@@ -5,7 +5,6 @@ struct EditPersonaEntryWrapperView<ContentView>: View where ContentView: View {
 	public struct ViewState: Equatable {
 		let name: String
 		let isRequestedByDapp: Bool
-		let isDeletable: Bool
 		var canBeDeleted: Bool {
 			!isRequestedByDapp
 		}
@@ -26,15 +25,13 @@ struct EditPersonaEntryWrapperView<ContentView>: View where ContentView: View {
 							.multilineTextAlignment(.trailing)
 					}
 				}
-				if viewState.isDeletable {
-					Button(action: {}) {
-						Image(asset: AssetResource.trash)
-							.offset(x: .small3)
-							.frame(.verySmall, alignment: .trailing)
-					}
-					.modifier {
-						if viewState.canBeDeleted { $0 } else { $0.hidden() }
-					}
+				Button(action: {}) {
+					Image(asset: AssetResource.trash)
+						.offset(x: .small3)
+						.frame(.verySmall, alignment: .trailing)
+				}
+				.modifier {
+					if viewState.canBeDeleted { $0 } else { $0.hidden() }
 				}
 			}
 

@@ -13,15 +13,6 @@ extension EditPersonaEntries {
 		public var body: some SwiftUI.View {
 			IfLetStore(
 				store.scope(
-					state: \.emailAddress,
-					action: (/Action.child
-						.. EditPersonaEntries.ChildAction.emailAddress
-					).embed
-				),
-				then: EditPersonaField.View.init
-			)
-			IfLetStore(
-				store.scope(
 					state: \.name,
 					action: (/Action.child
 						.. EditPersonaEntries.ChildAction.name
@@ -31,13 +22,22 @@ extension EditPersonaEntries {
 				EditPersonaEntryWrapperView(
 					viewState: .init(
 						name: "Name!",
-						isRequestedByDapp: true,
-						isDeletable: true
+						isRequestedByDapp: false
 					)
 				) {
 					EditPersonaName.View(store: store)
 				}
 			}
+
+			IfLetStore(
+				store.scope(
+					state: \.emailAddress,
+					action: (/Action.child
+						.. EditPersonaEntries.ChildAction.emailAddress
+					).embed
+				),
+				then: EditPersonaField.View.init
+			)
 		}
 	}
 }
