@@ -173,10 +173,3 @@ extension AccountPortfolio.NonFungibleResource {
 		tokens.isEmpty ? nil : self
 	}
 }
-
-// MARK: - NonFungibleLocalId + Identifiable
-extension NonFungibleLocalId: Identifiable {
-	public var id: String {
-		(try? nonFungibleLocalIdAsStr(value: self)) ?? UUID().uuidString
-	}
-}
