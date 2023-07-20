@@ -1,27 +1,12 @@
 import FeaturePrelude
 import PersonasClient
+import Prelude
 
 // MARK: - EditPersona.Output
 extension EditPersona {
 	public struct Output: Sendable, Hashable {
 		let personaLabel: NonEmptyString
 		let fields: IdentifiedArrayOf<Identified<EditPersonaDynamicField.State.ID, String>>
-	}
-}
-
-extension PersonaData.Entry {
-	var text: String {
-		// FIXME: Use proper values and granularity (Entry-, instead of Field-level) when Entry types will be supported
-		switch self {
-		case let .name(entryModel): return entryModel.description
-		case let .dateOfBirth(entryModel): return entryModel.description
-		case let .companyName(entryModel): return entryModel.description
-		case let .emailAddress(entryModel): return entryModel.description
-		case let .phoneNumber(entryModel): return entryModel.description
-		case let .url(entryModel): return entryModel.description
-		case let .postalAddress(entryModel): return entryModel.description
-		case let .creditCard(entryModel): return entryModel.description
-		}
 	}
 }
 
@@ -37,16 +22,16 @@ public struct EditPersona: Sendable, FeatureReducer {
 			case personaLabel
 		}
 
-		public typealias DynamicFieldID = PersonaData.Entry
+		public typealias DynamicFieldID = PersonaData.Entry.Kind
 
 		let mode: Mode
 		let persona: Profile.Network.Persona
 		var labelField: EditPersonaStaticField.State
-//		@Sorted(by: \.id)
+		@Sorted(by: \.id)
 		var dynamicFields: IdentifiedArrayOf<EditPersonaDynamicField.State> = []
-//
-//		@PresentationState
-//		var destination: Destinations.State? = nil
+
+		@PresentationState
+		var destination: Destinations.State? = nil
 
 		public init(
 			mode: Mode,
@@ -81,7 +66,7 @@ public struct EditPersona: Sendable, FeatureReducer {
 	public enum ChildAction: Sendable, Equatable {
 		case labelField(EditPersonaStaticField.Action)
 		case dynamicField(id: EditPersonaDynamicField.State.ID, action: EditPersonaDynamicField.Action)
-//		case destination(PresentationAction<Destinations.Action>)
+		case destination(PresentationAction<Destinations.Action>)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -90,20 +75,19 @@ public struct EditPersona: Sendable, FeatureReducer {
 
 	public struct Destinations: Sendable, ReducerProtocol {
 		public enum State: Sendable, Hashable {
-//			case closeConfirmationDialog(ConfirmationDialogState<ViewAction.CloseConfirmationDialogAction>)
-//			case addFields(EditPersonaAddFields.State)
+			case closeConfirmationDialog(ConfirmationDialogState<ViewAction.CloseConfirmationDialogAction>)
+			case addFields(EditPersonaAddEntryKinds.State)
 		}
 
 		public enum Action: Sendable, Equatable {
-//			case closeConfirmationDialog(ViewAction.CloseConfirmationDialogAction)
-//			case addFields(EditPersonaAddFields.Action)
+			case closeConfirmationDialog(ViewAction.CloseConfirmationDialogAction)
+			case addFields(EditPersonaAddEntryKinds.Action)
 		}
 
 		public var body: some ReducerProtocolOf<Self> {
-//			Scope(state: /State.addFields, action: /Action.addFields) {
-//				EditPersonaAddFields()
-//			}
-			EmptyReducer()
+			Scope(state: /State.addFields, action: /Action.addFields) {
+				EditPersonaAddEntryKinds()
+			}
 		}
 	}
 
@@ -122,9 +106,9 @@ public struct EditPersona: Sendable, FeatureReducer {
 			.forEach(\.dynamicFields, action: /Action.child .. ChildAction.dynamicField) {
 				EditPersonaField()
 			}
-//			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
-//				Destinations()
-//			}
+			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
+				Destinations()
+			}
 	}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
@@ -136,59 +120,62 @@ public struct EditPersona: Sendable, FeatureReducer {
 				}
 			}
 
-//			state.destination = .closeConfirmationDialog(
-//				.init(titleVisibility: .hidden) {
-//					TextState("")
-//				} actions: {
-//					ButtonState(role: .destructive, action: .send(.discardChanges)) {
-//						TextState(L10n.EditPersona.CloseConfirmationDialog.discardChanges)
-//					}
-//					ButtonState(role: .cancel, action: .send(.keepEditing)) {
-//						TextState(L10n.EditPersona.CloseConfirmationDialog.keepEditing)
-//					}
-//				} message: {
-//					TextState(L10n.EditPersona.CloseConfirmationDialog.message)
-//				}
-//			)
-
+			state.destination = .closeConfirmationDialog(
+				.init(titleVisibility: .hidden) {
+					TextState("")
+				} actions: {
+					ButtonState(role: .destructive, action: .send(.discardChanges)) {
+						TextState(L10n.EditPersona.CloseConfirmationDialog.discardChanges)
+					}
+					ButtonState(role: .cancel, action: .send(.keepEditing)) {
+						TextState(L10n.EditPersona.CloseConfirmationDialog.keepEditing)
+					}
+				} message: {
+					TextState(L10n.EditPersona.CloseConfirmationDialog.message)
+				}
+			)
 			return .none
 
 		case let .saveButtonTapped(output):
 			return .run { [state] send in
-				var persona = state.persona
-				persona.displayName = output.personaLabel
-//				persona.fields = output.fields
-				try await personasClient.updatePersona(persona)
-				await send(.delegate(.personaSaved(persona)))
+				let updatedPersona = state.persona.updated(with: output)
+				try await personasClient.updatePersona(updatedPersona)
+				await send(.delegate(.personaSaved(updatedPersona)))
 				await dismiss()
 			} catch: { error, _ in
 				errorQueue.schedule(error)
 			}
 
 		case .addAFieldButtonTapped:
-//			state.destination = .addFields(.init(excludedFieldIDs: state.dynamicFields.map(\.id)))
+			state.destination = .addFields(.init(excludedEntryKinds: state.dynamicFields.map(\.id)))
 			return .none
 		}
 	}
 
-//	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
-//		switch childAction {
-//		case .destination(.presented(.closeConfirmationDialog(.discardChanges))):
-//			return .fireAndForget { await dismiss() }
-//
-//		case let .destination(.presented(.addFields(.delegate(.addFields(fieldsToAdd))))):
-//			state.dynamicFields.append(contentsOf: fieldsToAdd.map { .init(id: $0, initial: nil, isRequiredByDapp: false) })
-//			state.destination = nil
-//			return .none
-//
-//		case let .dynamicField(id, action: .delegate(.delete)):
-//			state.dynamicFields.remove(id: id)
-//			return .none
-//
-//		default:
-//			return .none
-//		}
-//	}
+	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+		switch childAction {
+		case .destination(.presented(.closeConfirmationDialog(.discardChanges))):
+			return .fireAndForget { await dismiss() }
+
+		case let .destination(.presented(.addFields(.delegate(.addEntryKinds(fieldsToAdd))))):
+			state.dynamicFields.append(contentsOf: fieldsToAdd.map {
+				.init(
+					id: $0,
+					text: nil,
+					isRequiredByDapp: false
+				)
+			})
+			state.destination = nil
+			return .none
+
+		case let .dynamicField(id, action: .delegate(.delete)):
+			state.dynamicFields.remove(id: id)
+			return .none
+
+		default:
+			return .none
+		}
+	}
 }
 
 extension EditPersona.State {
@@ -200,12 +187,14 @@ extension EditPersona.State {
 }
 
 extension PersonaData {
-	func dynamicFields(in mode: EditPersona.State.Mode) -> IdentifiedArrayOf<EditPersonaDynamicField.State> {
+	func dynamicFields(
+		in mode: EditPersona.State.Mode
+	) -> IdentifiedArrayOf<EditPersonaDynamicField.State> {
 		IdentifiedArray(
-			uncheckedUniqueElements: entries.map { entry in
+			uncheckedUniqueElements: entries.map(\.value).map { entryValue in
 				EditPersonaDynamicField.State(
-					id: entry.value,
-					text: entry.value.text,
+					id: entryValue.kind,
+					text: entryValue.text,
 					isRequiredByDapp: {
 						switch mode {
 						case .edit:
@@ -215,5 +204,75 @@ extension PersonaData {
 				)
 			}
 		)
+	}
+}
+
+extension Profile.Network.Persona {
+	fileprivate func updated(with output: EditPersona.Output) -> Self {
+		var updatedPersona = self
+
+		updatedPersona.displayName = output.personaLabel
+
+		updatedPersona.personaData = .init()
+		output.fields.forEach { identifiedFieldOutput in
+			// FIXME: Implement when multi-field entries support will be implemented in the UI, or entries will become supported at all
+			switch identifiedFieldOutput.id {
+			case .name: break
+			case .dateOfBirth: break
+			case .companyName: break
+			case .emailAddress:
+				// FIXME: `try` and handle errors properly when we will have multiple entries of that kind (as the only reason to throw here is related to multiple values)
+				let emailAddresses = try? PersonaData.IdentifiedEmailAddresses(
+					collection: .init(
+						uncheckedUniqueElements: [
+							.init(value: .init(email: identifiedFieldOutput.value)),
+						]
+					)
+				)
+				updatedPersona.personaData.emailAddresses = emailAddresses ?? .init()
+			case .phoneNumber:
+				// FIXME: `try` and handle errors properly when we will have multiple entries of that kind (as the only reason to throw here is related to multiple values)
+				let phoneAddresses = try? PersonaData.IdentifiedPhoneNumbers(
+					collection: .init(
+						uncheckedUniqueElements: [
+							.init(value: .init(number: identifiedFieldOutput.value)),
+						]
+					)
+				)
+				updatedPersona.personaData.phoneNumbers = phoneAddresses ?? .init()
+			case .url: break
+			case .postalAddress: break
+			case .creditCard: break
+			}
+		}
+
+		return updatedPersona
+	}
+}
+
+extension PersonaData.Entry {
+	// FIXME: Use proper values and granularity (Entry-, instead of Field-level) when Entry types will be supported
+	var text: String {
+		switch self {
+		case let .name(entryModel): return entryModel.description
+		case let .emailAddress(entryModel): return entryModel.email
+		case let .phoneNumber(entryModel): return entryModel.number
+		default: fatalError()
+		}
+	}
+}
+
+extension PersonaData.Entry {
+	var kind: Kind {
+		switch self {
+		case .name: return .name
+		case .dateOfBirth: return .dateOfBirth
+		case .companyName: return .companyName
+		case .emailAddress: return .emailAddress
+		case .phoneNumber: return .phoneNumber
+		case .url: return .url
+		case .postalAddress: return .postalAddress
+		case .creditCard: return .creditCard
+		}
 	}
 }

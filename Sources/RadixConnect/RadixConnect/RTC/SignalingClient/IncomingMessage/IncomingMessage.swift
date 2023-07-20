@@ -74,7 +74,7 @@ extension SignalingClient.IncomingMessage.RemoteData {
 		guard let offer = message.primitive.offer else {
 			return nil
 		}
-		return .init(content: offer, id: remoteClientId)
+		return .init(offer, id: remoteClientId)
 	}
 
 	/// Extract the Answer by attaching the remote client id.
@@ -82,7 +82,7 @@ extension SignalingClient.IncomingMessage.RemoteData {
 		guard let answer = message.primitive.answer else {
 			return nil
 		}
-		return .init(content: answer, id: remoteClientId)
+		return .init(answer, id: remoteClientId)
 	}
 
 	/// Extract the ICECandidate by attaching the remote client id.
@@ -90,7 +90,7 @@ extension SignalingClient.IncomingMessage.RemoteData {
 		guard let candidate = message.primitive.iceCandidate else {
 			return nil
 		}
-		return .init(content: candidate, id: remoteClientId)
+		return .init(candidate, id: remoteClientId)
 	}
 }
 

@@ -112,7 +112,7 @@ struct SignalingClient: Sendable {
 		let message = ClientMessage(
 			requestId: idBuilder(),
 			targetClientId: primitive.id,
-			primitive: primitive.content
+			primitive: primitive.value
 		)
 		let encodedMessage = try jsonEncoder.encode(message)
 		try await transport.send(message: encodedMessage)

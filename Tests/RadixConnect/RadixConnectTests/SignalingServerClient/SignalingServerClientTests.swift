@@ -14,17 +14,17 @@ final class SignalingClientTests: TestCase {
 	static let sdp = RTCPrimitive.SDP(rawValue: "Some sdp desc")
 
 	static let offer = IdentifiedRTCPrimitive(
-		content: .offer(.init(sdp: sdp)),
+		.offer(.init(sdp: sdp)),
 		id: remoteClientId
 	)
 
 	static let answer = IdentifiedRTCPrimitive(
-		content: .answer(.init(sdp: sdp)),
+		.answer(.init(sdp: sdp)),
 		id: remoteClientId
 	)
 
 	static let iceCandidate = IdentifiedRTCPrimitive(
-		content: .iceCandidate(.init(
+		.iceCandidate(.init(
 			sdp: sdp,
 			sdpMLineIndex: 32,
 			sdpMid: "Mid"
@@ -58,14 +58,14 @@ final class SignalingClientTests: TestCase {
 	func test_sentMessagesAreInCorrectFormat_offer() async throws {
 		try await assertSentMessageFormat(
 			Self.offer,
-			expectedPayload: Self.offer.content.payload
+			expectedPayload: Self.offer.value.payload
 		)
 	}
 
 	func test_sentMessagesAreInCorrectFormat_answer() async throws {
 		try await assertSentMessageFormat(
 			Self.answer,
-			expectedPayload: Self.answer.content.payload
+			expectedPayload: Self.answer.value.payload
 		)
 	}
 
@@ -116,11 +116,11 @@ final class SignalingClientTests: TestCase {
 
 	func test_receivedMessagesAreProperlyDecoded_offer() async throws {
 		try await assertIncomingPrimitiveDecoding(
-			payload: Self.offer.content.payload,
+			payload: Self.offer.value.payload,
 			method: "offer",
 			stream: signalingClient.onOffer,
 			expected: IdentifiedRTCOffer(
-				content: Self.offer.content.offer!,
+				Self.offer.value.offer!,
 				id: Self.offer.id
 			)
 		)
@@ -128,11 +128,11 @@ final class SignalingClientTests: TestCase {
 
 	func test_receivedMessagesAreProperlyDecoded_answer() async throws {
 		try await assertIncomingPrimitiveDecoding(
-			payload: Self.answer.content.payload,
+			payload: Self.answer.value.payload,
 			method: "answer",
 			stream: signalingClient.onAnswer,
 			expected: IdentifiedRTCAnswer(
-				content: Self.answer.content.answer!,
+				Self.answer.value.answer!,
 				id: Self.answer.id
 			)
 		)
@@ -140,11 +140,11 @@ final class SignalingClientTests: TestCase {
 
 	func test_receivedMessagesAreProperlyDecoded_iceCandidate() async throws {
 		try await assertIncomingPrimitiveDecoding(
-			payload: Self.iceCandidate.content.payload,
+			payload: Self.iceCandidate.value.payload,
 			method: "iceCandidate",
 			stream: signalingClient.onICECanddiate,
 			expected: IdentifiedRTCICECandidate(
-				content: Self.iceCandidate.content.iceCandidate!,
+				Self.iceCandidate.value.iceCandidate!,
 				id: Self.iceCandidate.id
 			)
 		)
@@ -207,7 +207,7 @@ final class SignalingClientTests: TestCase {
 		line: UInt = #line
 	) async throws {
 		let exp = expectation(description: "Wait for message")
-		let expectedMethod = SignalingClient.ClientMessage.Method(from: primitive.content)
+		let expectedMethod = SignalingClient.ClientMessage.Method(from: primitive.value)
 
 		Task {
 			try await signalingClient.sendToRemote(primitive)

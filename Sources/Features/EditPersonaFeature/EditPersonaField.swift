@@ -1,8 +1,7 @@
 import FeaturePrelude
 
 // MARK: - EditPersonaFieldID
-// FIXME: Bring back `Comparable` if necessary (alongside `@Sorted(by: \.id)` at `EditPersona.State.dynamicFields`)
-public protocol EditPersonaFieldID: Sendable, Hashable {
+public protocol EditPersonaFieldID: Sendable, Hashable, Comparable {
 	var title: String { get }
 	#if os(iOS)
 	var contentType: UITextContentType? { get }
@@ -178,6 +177,34 @@ extension EditPersona.State.DynamicFieldID: EditPersonaFieldID {
 	#endif
 }
 
+// MARK: - EditPersona.State.DynamicFieldID + Comparable
+extension EditPersona.State.DynamicFieldID: Comparable {
+	public static func < (lhs: Self, rhs: Self) -> Bool {
+		guard
+			let lhsIndex = Self.supportedKinds.firstIndex(of: lhs),
+			let rhsIndex = Self.supportedKinds.firstIndex(of: rhs)
+		else {
+			assertionFailure(
+				"""
+				This code path should never occur, unless you're manually conforming to `CaseIterable` and `allCases` is incomplete.
+				"""
+			)
+			return false
+		}
+		return lhsIndex < rhsIndex
+	}
+}
+
+extension EditPersona.State.DynamicFieldID {
+	static var supportedKinds: [Self] {
+		[
+			.name,
+			.emailAddress,
+			.phoneNumber,
+		]
+	}
+}
+
 extension EditPersonaDynamicField.State {
 	public init(
 		id: ID,
@@ -200,7 +227,7 @@ extension EditPersonaDynamicField.State {
 					if isRequiredByDapp {
 						.if(\.isBlank, error: L10n.EditPersona.Error.requiredByDapp)
 					}
-					if case PersonaData.Entry.emailAddress = id {
+					if case PersonaData.Entry.Kind.emailAddress = id {
 						.unless(\.isEmailAddress, error: L10n.EditPersona.Error.invalidEmailAddress)
 					}
 				}
