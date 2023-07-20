@@ -201,19 +201,6 @@ extension TransactionClient {
 				throw TransactionFailure.failedToPrepareForTXSigning(.failedToFindAccountWithEnoughFundsToLockFee)
 			}
 
-			let feePayer = nonEmpty.first
-			let manifestWithLockFee = try await lockFeeWithSelectedPayer(
-				manifest,
-				feeToAdd, feePayer.account.address
-			)
-
-			return .includesLockFee(.init(manifestWithLockFee: manifestWithLockFee, feePayerSelectionAmongstCandidates: .init(
-				selected: feePayer,
-				candidates: nonEmpty,
-				fee: feeToAdd,
-				selection: .auto
-			)))
-
 			return .excludesLockFee(.init(manifestExcludingLockFee: manifest, feePayerCandidates: nonEmpty, feeNotYetAdded: feeToAdd))
 		}
 
@@ -254,8 +241,6 @@ extension TransactionClient {
 				notarySignature: notarySignature.intoEngine().signature
 			)
 
-			let resp = try uncompiledNotarized.staticallyValidate(validationConfig: .default(networkId: request.transactionIntent.header().networkId))
-
 			let compiledNotarizedTXIntent = try uncompiledNotarized.compile()
 
 			let txID = try request.transactionIntent.intentHash()
@@ -273,11 +258,6 @@ extension TransactionClient {
 				request.manifestToSign,
 				request.feeToAdd
 			)
-
-			guard case let .includesLockFee(outcome) = addFeeToManifestOutcome else {
-				fatalError()
-			}
-			var request = ManifestReviewRequest(manifestToSign: outcome.manifestWithLockFee, nonce: request.nonce, feeToAdd: request.feeToAdd)
 
 			let transactionPreviewRequest = try await createTransactionPreviewRequest(for: request, networkID: networkID)
 			let transactionPreviewResponse = try await gatewayAPIClient.transactionPreview(transactionPreviewRequest)

@@ -30,7 +30,7 @@ extension GatewayAPI.TransactionPreviewRequest {
 		transactionSigners: TransactionSigners
 	) throws {
 		let flags = GatewayAPI.TransactionPreviewRequestFlags(
-			useFreeCredit: false,
+			useFreeCredit: true,
 			assumeAllSignatureProofs: false,
 			skipEpochCheck: false
 		)
@@ -42,9 +42,6 @@ extension GatewayAPI.TransactionPreviewRequest {
 			throw NotaryIsSignatoryDiscrepancy()
 		}
 		let notaryIsSignatory = transactionSigners.notaryIsSignatory
-		let hex = rawManifest.blobs().map {
-			Hash.fromUnhashedBytes(bytes: $0).asStr()
-		}
 
 		try self.init(
 			manifest: rawManifest.instructions().asStr(),

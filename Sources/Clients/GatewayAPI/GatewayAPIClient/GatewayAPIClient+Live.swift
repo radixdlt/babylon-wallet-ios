@@ -60,10 +60,6 @@ extension GatewayAPIClient {
 				urlRequest.timeoutInterval = timeoutInterval
 			}
 
-			// dump(urlRequest.httpBody?.prettyPrintedJSONString)
-			if let msg = urlRequest.httpBody?.prettyPrintedJSONString as? String {
-				loggerGlobal.info(.init(stringLiteral: msg))
-			}
 			let (data, urlResponse) = try await urlSession.data(for: urlRequest)
 
 			guard let httpURLResponse = urlResponse as? HTTPURLResponse else {
@@ -77,7 +73,6 @@ extension GatewayAPIClient {
 				throw BadHTTPResponseCode(got: httpURLResponse.statusCode)
 			}
 
-			let respStr = try data.prettyPrintedJSONString
 			let response = try jsonDecoder.decode(Response.self, from: data)
 
 			return response
