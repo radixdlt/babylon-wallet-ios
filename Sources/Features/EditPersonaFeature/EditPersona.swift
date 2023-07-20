@@ -6,14 +6,14 @@ import Prelude
 extension EditPersona {
 	public struct Output: Sendable, Hashable {
 		let personaLabel: NonEmptyString
+
 		let name: EditPersonaName.State?
 		let emailAddress: EditPersonaDynamicField.State?
+		let phoneNumber: EditPersonaDynamicField.State?
 
 		var personaData: PersonaData {
 			var personaData = PersonaData()
-			(emailAddress?.input).map {
-				personaData.emailAddresses = try! .init(collection: [.init(value: .init(email: $0))])
-			}
+
 			name.map {
 				personaData.name = .init(
 					value: .init(
@@ -23,6 +23,13 @@ extension EditPersona {
 					)
 				)
 			}
+			(emailAddress?.input).map {
+				personaData.emailAddresses = try! .init(collection: [.init(value: .init(email: $0))])
+			}
+			(phoneNumber?.input).map {
+				personaData.phoneNumbers = try! .init(collection: [.init(value: .init(number: $0))])
+			}
+
 			return personaData
 		}
 	}
@@ -53,6 +60,7 @@ public struct EditPersona: Sendable, FeatureReducer {
 			[
 				entries.name.map { _ in .name },
 				entries.emailAddress.map { _ in .emailAddress },
+				entries.phoneNumber.map { _ in .phoneNumber },
 			].compactMap(identity)
 		}
 
@@ -199,23 +207,19 @@ public struct EditPersona: Sendable, FeatureReducer {
 							isRequestedByDapp: false
 						)
 					)
-				case .dateOfBirth:
-					fatalError()
-				case .companyName:
-					fatalError()
 				case .emailAddress:
 					state.entries.emailAddress = .init(
 						id: entryKind,
 						text: nil,
 						isRequiredByDapp: false
 					)
-				case .url:
-					fatalError()
 				case .phoneNumber:
-					fatalError()
-				case .postalAddress:
-					fatalError()
-				case .creditCard:
+					state.entries.phoneNumber = .init(
+						id: entryKind,
+						text: nil,
+						isRequiredByDapp: false
+					)
+				default:
 					fatalError()
 				}
 			}

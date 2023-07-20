@@ -35,6 +35,16 @@ extension EditPersonaEntries {
 				),
 				then: EditPersonaField.View.init
 			)
+
+			IfLetStore(
+				store.scope(
+					state: \.phoneNumber,
+					action: (/Action.child
+						.. EditPersonaEntries.ChildAction.phoneNumber
+					).embed
+				),
+				then: EditPersonaField.View.init
+			)
 		}
 	}
 }

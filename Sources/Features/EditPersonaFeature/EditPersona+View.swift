@@ -20,10 +20,12 @@ extension EditPersona.State {
 				else {
 					return nil
 				}
+
 				return EditPersona.Output(
 					personaLabel: personaLabelOutput,
 					name: entries.name?.content,
-					emailAddress: entries.emailAddress
+					emailAddress: entries.emailAddress,
+					phoneNumber: entries.phoneNumber
 				)
 			}()
 		)
