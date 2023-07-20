@@ -13,32 +13,15 @@ public protocol EditPersonaFieldID: Sendable, Hashable, Comparable {
 // MARK: - EditPersonaField
 public struct EditPersonaField<ID: EditPersonaFieldID>: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable, Identifiable {
-		public enum Kind: Sendable, Hashable {
-			case `static`
-			case dynamic(isRequiredByDapp: Bool)
-
-			var isStatic: Bool {
-				self == .static
-			}
-
-			var isDynamic: Bool {
-				guard case .dynamic = self else { return false }
-				return true
-			}
-		}
-
-		public let kind: Kind
 		public let id: ID
 
 		@Validation<String, String>
 		public var input: String?
 
 		private init(
-			kind: Kind,
 			id: ID,
 			input: Validation<String, String>
 		) {
-			self.kind = kind
 			self.id = id
 			self._input = input
 		}
@@ -104,7 +87,6 @@ extension EditPersonaStaticField.State {
 		initial: String?
 	) {
 		self.init(
-			kind: .static,
 			id: id,
 			input: .init(
 				wrappedValue: initial,
@@ -117,7 +99,7 @@ extension EditPersonaStaticField.State {
 
 // MARK: Dynamic Fields
 
-public typealias EditPersonaDynamicEntry = EditPersonaField<EditPersona.State.DynamicFieldID>
+public typealias EditPersonaDynamicField = EditPersonaField<EditPersona.State.DynamicFieldID>
 
 // MARK: - EditPersona.State.DynamicFieldID + EditPersonaFieldID
 extension EditPersona.State.DynamicFieldID: EditPersonaFieldID {
@@ -205,14 +187,13 @@ extension EditPersona.State.DynamicFieldID {
 	}
 }
 
-extension EditPersonaDynamicEntry.State {
+extension EditPersonaDynamicField.State {
 	public init(
 		id: ID,
 		text: String?,
 		isRequiredByDapp: Bool
 	) {
 		self.init(
-			kind: .dynamic(isRequiredByDapp: isRequiredByDapp),
 			id: id,
 			input: .init(
 				wrappedValue: text,
@@ -243,7 +224,6 @@ extension EditPersonaField<EditPersonaName.State.Property>.State {
 		isRequiredByDapp: Bool
 	) {
 		self.init(
-			kind: .dynamic(isRequiredByDapp: isRequiredByDapp),
 			id: id,
 			input: .init(
 				wrappedValue: text,

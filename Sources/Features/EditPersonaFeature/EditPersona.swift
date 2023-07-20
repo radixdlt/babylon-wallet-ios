@@ -7,7 +7,7 @@ extension EditPersona {
 	public struct Output: Sendable, Hashable {
 		let personaLabel: NonEmptyString
 		let name: EditPersonaName.State?
-		let emailAddress: EditPersonaDynamicEntry.State?
+		let emailAddress: EditPersonaDynamicField.State?
 
 		var personaData: PersonaData {
 			var personaData = PersonaData()
@@ -232,10 +232,10 @@ extension EditPersona.State {
 extension PersonaData {
 	func dynamicFields(
 		in mode: EditPersona.State.Mode
-	) -> IdentifiedArrayOf<EditPersonaDynamicEntry.State> {
+	) -> IdentifiedArrayOf<EditPersonaDynamicField.State> {
 		IdentifiedArray(
 			uncheckedUniqueElements: entries.map(\.value).map { entryValue in
-				EditPersonaDynamicEntry.State(
+				EditPersonaDynamicField.State(
 					id: entryValue.kind,
 					text: entryValue.text,
 					isRequiredByDapp: {

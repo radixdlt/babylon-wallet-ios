@@ -4,7 +4,7 @@ import FeaturePrelude
 public struct EditPersonaEntries: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		var name: EditPersonaName.State?
-		var emailAddress: EditPersonaDynamicEntry.State?
+		var emailAddress: EditPersonaDynamicField.State?
 
 		init(with personaData: PersonaData) {
 			self.emailAddress = (personaData.emailAddresses.first).map {
@@ -19,7 +19,7 @@ public struct EditPersonaEntries: Sendable, FeatureReducer {
 	}
 
 	public enum ChildAction: Sendable, Equatable {
-		case emailAddress(EditPersonaDynamicEntry.Action)
+		case emailAddress(EditPersonaDynamicField.Action)
 		case name(EditPersonaName.Action)
 	}
 
