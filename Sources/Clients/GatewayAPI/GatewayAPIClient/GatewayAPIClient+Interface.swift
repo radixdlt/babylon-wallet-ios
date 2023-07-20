@@ -167,7 +167,7 @@ extension GatewayAPI.StateNonFungibleDetailsResponseItem {
 	}
 
 	private func getName(from string: String) -> String? {
-		guard !string.hasPrefix("https") else { return nil }
+		guard !string.hasPrefix("http") else { return nil }
 
 		return string
 	}
