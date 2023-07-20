@@ -13,7 +13,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 
 		public let nonce: Nonce
 		public let transactionManifest: TransactionManifest
-		public let message: String?
+		public let message: Message
 		public let signTransactionPurpose: SigningPurpose.SignTransactionPurpose
 
 		public var transactionManifestWithLockFee: TransactionManifest?
@@ -41,7 +41,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			transactionManifest: TransactionManifest,
 			nonce: Nonce,
 			signTransactionPurpose: SigningPurpose.SignTransactionPurpose,
-			message: String?,
+			message: Message,
 			feeToAdd: BigDecimal = .temporaryStandardFee, // FIXME: use estimate from `analyze`
 			ephemeralNotaryPrivateKey: Curve25519.Signing.PrivateKey = .init(),
 			customizeGuarantees: TransactionReviewGuarantees.State? = nil
@@ -170,10 +170,11 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		switch viewAction {
 		case .appeared:
 			let manifest = state.transactionManifest
-			return .task { [feeToAdd = state.fee, nonce = state.nonce] in
+			return .task { [feeToAdd = state.fee, nonce = state.nonce, message = state.message] in
 				await .internal(.previewLoaded(TaskResult {
 					try await transactionClient.getTransactionReview(.init(
 						manifestToSign: manifest,
+						message: message,
 						nonce: nonce,
 						feeToAdd: feeToAdd
 					))
@@ -209,6 +210,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 				let request = TransactionClient.PrepareForSigningRequest(
 					nonce: state.nonce,
 					manifest: manifest,
+					message: state.message,
 					networkID: networkID,
 					feePayer: feePayerSelectionAmongstCandidates.selected.account,
 					purpose: .signTransaction(state.signTransactionPurpose),

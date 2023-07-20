@@ -289,7 +289,7 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 				transactionManifest: manifest,
 				nonce: .secureRandom(),
 				signTransactionPurpose: .internalManifest(.debugModifyAccount),
-				message: nil
+				message: .none
 			))
 			return .none
 

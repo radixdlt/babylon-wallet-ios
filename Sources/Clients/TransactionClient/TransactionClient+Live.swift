@@ -219,7 +219,7 @@ extension TransactionClient {
 			)
 
 			return .init(
-				intent: .init(header: header, manifest: request.manifest, message: .none),
+				intent: .init(header: header, manifest: request.manifest, message: request.message),
 				transactionSigners: transactionSigners
 			)
 		}
@@ -285,6 +285,7 @@ extension TransactionClient {
 			let intent = try await buildTransactionIntent(.init(
 				networkID: gatewaysClient.getCurrentNetworkID(),
 				manifest: request.manifestToSign,
+				message: request.message,
 				nonce: request.nonce,
 				makeTransactionHeaderInput: request.makeTransactionHeaderInput,
 				ephemeralNotaryPublicKey: request.ephemeralNotaryPublicKey
@@ -301,6 +302,7 @@ extension TransactionClient {
 			let transactionIntentWithSigners = try await buildTransactionIntent(.init(
 				networkID: request.networkID,
 				manifest: request.manifest,
+				message: request.message,
 				nonce: request.nonce,
 				ephemeralNotaryPublicKey: request.ephemeralNotaryPublicKey
 			))
