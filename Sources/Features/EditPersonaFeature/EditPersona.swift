@@ -41,7 +41,7 @@ public struct EditPersona: Sendable, FeatureReducer {
 
 		var alreadyAddedEntryKinds: [PersonaData.Entry.Kind] {
 			[
-				entries != nil ? .emailAddress : nil,
+				entries.emailAddress.map { _ in .emailAddress },
 			].compactMap(identity)
 		}
 
@@ -55,13 +55,7 @@ public struct EditPersona: Sendable, FeatureReducer {
 				id: .personaLabel,
 				initial: persona.displayName.rawValue
 			)
-			self.entries = (persona.personaData.emailAddresses.first).map {
-				.init(
-					id: .emailAddress,
-					text: $0.value.email,
-					isRequiredByDapp: false
-				)
-			}
+			self.entries = .init(with: persona.personaData)
 		}
 	}
 
@@ -188,7 +182,7 @@ public struct EditPersona: Sendable, FeatureReducer {
 				case .companyName:
 					fatalError()
 				case .emailAddress:
-					state.entries = .init(
+					state.entries.emailAddress = .init(
 						id: entryKind,
 						text: nil,
 						isRequiredByDapp: false
@@ -207,7 +201,7 @@ public struct EditPersona: Sendable, FeatureReducer {
 			return .none
 
 		case .personaData(action: .child(.emailAddress(.delegate(.delete)))):
-			state.entries = nil
+			state.entries.emailAddress = nil
 			return .none
 
 		default:

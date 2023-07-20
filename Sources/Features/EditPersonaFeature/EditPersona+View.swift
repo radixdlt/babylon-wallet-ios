@@ -22,7 +22,7 @@ extension EditPersona.State {
 				}
 				return EditPersona.Output(
 					personaLabel: personaLabelOutput,
-					emailAddress: entries
+					emailAddress: entries.emailAddress
 				)
 			}()
 		)
