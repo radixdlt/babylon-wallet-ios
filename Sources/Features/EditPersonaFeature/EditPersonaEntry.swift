@@ -20,13 +20,6 @@ public struct EditPersonaEntry<ContentReducer>: FeatureReducer where ContentRedu
 		case delete
 	}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
-		switch viewAction {
-		case .deleteButtonTapped:
-			return .send(.delegate(.delete))
-		}
-	}
-
 	public var body: some ReducerProtocolOf<Self> {
 		Reduce(core)
 
@@ -35,5 +28,12 @@ public struct EditPersonaEntry<ContentReducer>: FeatureReducer where ContentRedu
 			action: /Action.child .. ChildAction.content,
 			child: ContentReducer.init
 		)
+	}
+
+	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+		switch viewAction {
+		case .deleteButtonTapped:
+			return .send(.delegate(.delete))
+		}
 	}
 }

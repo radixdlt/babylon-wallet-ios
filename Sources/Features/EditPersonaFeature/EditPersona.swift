@@ -62,11 +62,11 @@ public struct EditPersona: Sendable, FeatureReducer {
 		) {
 			self.mode = mode
 			self.persona = persona
+			self.entries = .init(with: persona.personaData)
 			self.labelField = EditPersonaStaticField.State(
 				id: .personaLabel,
 				initial: persona.displayName.rawValue
 			)
-			self.entries = .init(with: persona.personaData)
 		}
 	}
 

@@ -33,7 +33,7 @@ public struct EditPersonaEntries: Sendable, FeatureReducer {
 	}
 
 	public var body: some ReducerProtocolOf<Self> {
-		EmptyReducer()
+		Reduce(core)
 			.ifLet(
 				\.emailAddress,
 				action: /Action.child .. ChildAction.emailAddress
