@@ -185,7 +185,6 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			}
 
 			return .run { [dappDefinitionAddress = state.dappMetadata.dAppDefinitionAddress] send in
-
 				let identityAddress = usePersonaRequestItem.identityAddress
 				guard
 					let persona = try await personasClient.getPersonas()[id: identityAddress],
@@ -407,11 +406,9 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 		case let .chooseAccounts(.delegate(.continue(accessKind, chosenAccounts))):
 			return handleAccounts(item, chosenAccounts, accessKind)
 
-		// TODO: Test this
 		case let .personaDataPermission(.delegate(.personaUpdated(persona))):
 			return handlePersonaUpdated(&state, persona)
 
-		// TODO: Test this
 		case let .oneTimePersonaData(.delegate(.personaUpdated(persona))):
 			return handlePersonaUpdated(&state, persona)
 
@@ -420,6 +417,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 
 		case .reviewTransaction(.delegate(.transactionCompleted)):
 			return .send(.delegate(.dismissWithSuccess(state.dappMetadata)))
+
 		case .reviewTransaction(.delegate(.userDismissedTransactionStatus)):
 			return .send(.delegate(.dismiss))
 
@@ -444,9 +442,9 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 		if resetItem.accounts {
 			authorizedPersona.sharedAccounts = nil
 		}
-//		if resetItem.personaData {
-//			authorizedPersona.sharedFieldIDs = nil
-//		}
+		if resetItem.personaData {
+			authorizedPersona.sharedPersonaData = .init()
+		}
 		authorizedDapp.referencesToAuthorizedPersonas[id: authorizedPersona.id] = authorizedPersona
 		state.authorizedDapp = authorizedDapp
 		state.authorizedPersona = authorizedPersona

@@ -255,9 +255,9 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 			case .general:
 				state.destination = .editPersona(.init(mode: .edit, persona: persona))
 			case let .dApp(_, detailedPersona):
-				fatalError()
-				//				let fieldIDs = (detailedPersona.sharedFields ?? []).ids
-				//				state.destination = .editPersona(.init(mode: .dapp(requiredFieldIDs: Set(fieldIDs)), persona: persona))
+				// TODO: This should be tested
+				let required = Set(detailedPersona.sharedPersonaData.entries.map(\.value.discriminator))
+				state.destination = .editPersona(.init(mode: .dapp(requiredEntries: required), persona: persona))
 			}
 
 			return .none

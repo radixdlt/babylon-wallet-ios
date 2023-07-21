@@ -66,6 +66,7 @@ struct DappInteractionCoordinator: Sendable, FeatureReducer {
 					message: nil
 				)), .request(state.interaction.metadata))))
 			}
+
 		case .malformedInteractionErrorAlert:
 			return .none
 		}
@@ -88,12 +89,14 @@ struct DappInteractionCoordinator: Sendable, FeatureReducer {
 				)
 			}
 			return .none
+
 		case .loading(.delegate(.dismiss)):
 			return .send(.delegate(.submit(.failure(.init(
 				interactionId: state.interaction.id,
 				errorType: .rejectedByUser,
 				message: nil
 			)), .request(state.interaction.metadata))))
+
 		case let .flow(.delegate(.dismissWithFailure(error))):
 			return .send(.delegate(.submit(.failure(error), .request(state.interaction.metadata))))
 
@@ -105,6 +108,7 @@ struct DappInteractionCoordinator: Sendable, FeatureReducer {
 
 		case let .flow(.delegate(.submit(response, dappMetadata))):
 			return .send(.delegate(.submit(.success(response), dappMetadata)))
+
 		default:
 			return .none
 		}

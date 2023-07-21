@@ -149,10 +149,10 @@ struct OneTimePersonaData: Sendable, FeatureReducer {
 		switch childAction {
 		case let .persona(id, .delegate(.edit)):
 			if let persona = state.personas[id: id] {
-//				state.destination = .editPersona(.init(
-//					mode: .dapp(requiredFieldIDs: state.requiredFieldIDs),
-//					persona: persona.persona
-//				))
+				state.destination = .editPersona(.init(
+					mode: .dapp(requiredEntries: Set(state.requested.kindRequests.keys)),
+					persona: persona.persona
+				))
 			}
 			return .none
 
