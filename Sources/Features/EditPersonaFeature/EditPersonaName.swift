@@ -24,7 +24,6 @@ public struct EditPersonaName: FeatureReducer, EmptyInitializable {
 				isRequiredByDapp: isRequestedByDapp,
 				showsName: true
 			)
-
 			self.nickName = EditPersonaDynamicField.State(
 				id: .nickName,
 				text: name.nickname,
