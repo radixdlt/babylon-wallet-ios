@@ -369,18 +369,14 @@ extension PersonaDetails.View {
 						}
 					}
 
-					if let emailAddresses = viewStore.emailAddresses {
+					if let emailAddress = viewStore.emailAddresses?.first {
 						Text("Email").font(.app.sectionHeader)
-						ForEach(emailAddresses, id: \.self) { emailAddress in
-							VPair(heading: L10n.AuthorizedDapps.PersonaDetails.emailAddress, item: emailAddress)
-						}
+						VPair(heading: L10n.AuthorizedDapps.PersonaDetails.emailAddress, item: emailAddress)
 					}
 
-					if let phoneNumbers = viewStore.phoneNumbers {
+					if let phoneNumber = viewStore.phoneNumbers?.first {
 						Text("Phone number").font(.app.sectionHeader)
-						ForEach(phoneNumbers, id: \.self) { phoneNumber in
-							VPair(heading: L10n.AuthorizedDapps.PersonaDetails.phoneNumber, item: phoneNumber)
-						}
+						VPair(heading: L10n.AuthorizedDapps.PersonaDetails.phoneNumber, item: phoneNumber)
 					}
 				}
 				.padding(.horizontal, .medium1)
