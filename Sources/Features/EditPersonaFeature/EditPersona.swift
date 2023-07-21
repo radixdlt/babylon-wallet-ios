@@ -208,7 +208,7 @@ extension EditPersona.State.Mode {
 		case .edit:
 			return []
 		case let .dapp(requested):
-			return requiredFieldIDs
+			return Set(requested.kindRequests.keys)
 		}
 	}
 }

@@ -18,8 +18,8 @@ extension P2P.Dapp.Request {
 			self.numberOfRequestedPhoneNumbers = numberOfRequestedPhoneNumbers
 		}
 
-		public var requestedEntries: [PersonaData.Entry.Kind: RequestType] {
-			var result: [PersonaData.Entry.Kind: RequestType] = [:]
+		public var kindRequests: [PersonaData.Entry.Kind: KindRequest] {
+			var result: [PersonaData.Entry.Kind: KindRequest] = [:]
 			if isRequestingName == true {
 				result[.name] = .entry
 			}
@@ -37,100 +37,87 @@ extension P2P.Dapp.Request {
 extension P2P.Dapp.Request {
 	public typealias Response = P2P.Dapp.Response.WalletInteractionSuccessResponse.PersonaDataRequestResponseItem
 
-	public struct RequestError: Error, Sendable, Hashable {
-		public let entries: [PersonaData.Entry.Kind: EntryError]
-	}
-
-	public enum EntryError: Error, Sendable, Hashable {
+	public enum MissingEntry: Sendable, Hashable {
 		case missingEntry
 		case missing(Int)
 	}
 
-	public enum RequestType: Sendable, Hashable {
+	public enum KindRequest: Sendable, Hashable {
 		case entry
 		case number(RequestedNumber)
 	}
 }
 
-extension P2P.Dapp.Request.RequestType {
-	func validate(actualCount: Int) -> P2P.Dapp.Request.EntryError? {
-		switch self {
-		case .entry:
-			return actualCount == 0 ? .missingEntry : nil
-		case let .number(number):
-			return actualCount < number.quantity ? .missing(number.quantity - actualCount) : nil
+// MARK: - P2P.Dapp.Request.RequestValidation
+extension P2P.Dapp.Request {
+	public struct RequestValidation: Sendable, Hashable {
+		public var missingEntries: [PersonaData.Entry.Kind: MissingEntry] = [:]
+		public var existingRequestedEntries: [PersonaData.Entry.Kind: [PersonaData.Entry]] = [:]
+
+		public var response: P2P.Dapp.Request.Response? {
+			guard missingEntries.isEmpty else { return nil }
+			return try? .init(
+				name: existingRequestedEntries.extract(.name),
+				emailAddresses: existingRequestedEntries.extract(.emailAddress),
+				phoneNumbers: existingRequestedEntries.extract(.phoneNumber)
+			)
 		}
+	}
+}
+
+private extension [PersonaData.Entry.Kind: [PersonaData.Entry]] {
+	func extract<F>(_ kind: PersonaData.Entry.Kind, as: F.Type = F.self) throws -> F? where F: PersonaDataEntryProtocol {
+		try self[kind]?.first.map { try $0.extract(as: F.self) }
+	}
+
+	func extract<F>(_ kind: PersonaData.Entry.Kind, as: F.Type = F.self) throws -> OrderedSet<F>? where F: PersonaDataEntryProtocol {
+		try self[kind].map { try $0.extract() }
+	}
+}
+
+private extension [PersonaData.Entry] {
+	func extract<F>(as _: F.Type = F.self) throws -> OrderedSet<F> where F: PersonaDataEntryProtocol {
+		try .init(validating: map { try $0.extract() })
 	}
 }
 
 extension PersonaData {
-	public func missingEntries(for request: P2P.Dapp.Request.PersonaDataRequestItem) -> [PersonaData.Entry.Kind: P2P.Dapp.Request.EntryError] {
-		let existing = existingEntries(for: request)
+	public func responseValidation(for request: P2P.Dapp.Request.PersonaDataRequestItem) -> P2P.Dapp.Request.RequestValidation {
+		let kindRequests = request.kindRequests
 
-		var missing: [PersonaData.Entry.Kind: P2P.Dapp.Request.EntryError] = [:]
-		for (kind, request) in request.requestedEntries {
-			missing[kind] = request.validate(actualCount: existing[kind] ?? 0)
+		var result = P2P.Dapp.Request.RequestValidation()
+
+		for (kind, values) in allExistingEntries {
+			guard let kindRequest = kindRequests[kind] else { continue }
+			switch validate(values, for: kindRequest) {
+			case let .left(missingEntry):
+				result.missingEntries[kind] = missingEntry
+			case let .right(responseValues):
+				result.existingRequestedEntries[kind] = responseValues
+			}
 		}
-
-		return missing
-	}
-
-	public func existingEntries(for request: P2P.Dapp.Request.PersonaDataRequestItem) -> [PersonaData.Entry.Kind: Int] {
-		var result: [PersonaData.Entry.Kind: Int] = [:]
-
-		result[.name] = name == nil ? 0 : 1
-		result[.phoneNumber] = phoneNumbers.count
-		result[.emailAddress] = emailAddresses.count
 
 		return result
 	}
 
-	public func response(for request: P2P.Dapp.Request.PersonaDataRequestItem) -> Result<P2P.Dapp.Request.Response, P2P.Dapp.Request.RequestError> {
-		var missing: [Entry.Kind: P2P.Dapp.Request.EntryError] = [:]
-		var response = P2P.Dapp.Request.Response()
-
-		if request.isRequestingName == true {
-			if let value = name?.value {
-				response.name = value
-			} else {
-				missing[.name] = .missingEntry
-			}
+	private func validate(_ entries: [PersonaData.Entry], for request: P2P.Dapp.Request.KindRequest) -> Either<P2P.Dapp.Request.MissingEntry, [Entry]> {
+		switch request {
+		case .entry:
+			guard let first = entries.first else { return .left(.missingEntry) }
+			return .right([first])
+		case let .number(number):
+			let values = Set(entries.prefix(number.quantity))
+			let missing = number.quantity - values.count
+			guard missing <= 0 else { return .left(.missing(missing)) }
+			return .right(Array(values))
 		}
-
-		if let emailsNumber = request.numberOfRequestedEmailAddresses {
-			switch emailAddresses.requestedValues(emailsNumber) {
-			case let .success(value):
-				response.emailAddresses = value
-			case let .failure(error):
-				missing[.emailAddress] = error
-			}
-		}
-
-		if let phoneNumbersNumber = request.numberOfRequestedPhoneNumbers {
-			switch phoneNumbers.requestedValues(phoneNumbersNumber) {
-			case let .success(value):
-				response.phoneNumbers = value
-			case let .failure(error):
-				missing[.emailAddress] = error
-			}
-		}
-
-		return missing.isEmpty ? .success(response) : .failure(.init(entries: missing))
-	}
-}
-
-extension PersonaData.CollectionOfIdentifiedEntries {
-	public func requestedValues(_ number: RequestedNumber) -> Result<OrderedSet<Value>, P2P.Dapp.Request.EntryError> {
-		let values = Set(collection.elements.map(\.value).prefix(number.quantity))
-		let missing = number.quantity - values.count
-		guard missing <= 0 else {
-			return .failure(.missing(missing))
-		}
-
-		return .success(.init(uncheckedUniqueElements: values))
 	}
 
-	public var values: OrderedSet<Value>? {
-		try? .init(validating: collection.elements.map(\.value))
+	private var allExistingEntries: [PersonaData.Entry.Kind: [PersonaData.Entry]] {
+		var result: [PersonaData.Entry.Kind: [PersonaData.Entry]] = [:]
+		for entry in entries {
+			result[entry.value.discriminator, default: []].append(entry.value)
+		}
+		return result
 	}
 }

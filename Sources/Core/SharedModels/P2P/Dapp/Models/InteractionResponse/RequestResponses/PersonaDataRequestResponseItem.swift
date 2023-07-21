@@ -4,15 +4,15 @@ import Profile
 // MARK: - P2P.Dapp.Response.WalletInteractionSuccessResponse.PersonaDataRequestResponseItem
 extension P2P.Dapp.Response.WalletInteractionSuccessResponse {
 	public struct PersonaDataRequestResponseItem: Sendable, Hashable, Encodable {
-		public var name: PersonaData.Name?
-		public var dateOfBirth: PersonaData.DateOfBirth?
-		public var companyName: PersonaData.CompanyName?
+		public let name: PersonaData.Name?
+		public let dateOfBirth: PersonaData.DateOfBirth?
+		public let companyName: PersonaData.CompanyName?
 
-		public var emailAddresses: OrderedSet<PersonaData.EmailAddress>?
-		public var phoneNumbers: OrderedSet<PersonaData.PhoneNumber>?
-		public var urls: OrderedSet<PersonaData.AssociatedURL>?
-		public var postalAddresses: OrderedSet<PersonaData.PostalAddress>?
-		public var creditCards: OrderedSet<PersonaData.CreditCard>?
+		public let emailAddresses: OrderedSet<PersonaData.EmailAddress>?
+		public let phoneNumbers: OrderedSet<PersonaData.PhoneNumber>?
+		public let urls: OrderedSet<PersonaData.AssociatedURL>?
+		public let postalAddresses: OrderedSet<PersonaData.PostalAddress>?
+		public let creditCards: OrderedSet<PersonaData.CreditCard>?
 
 		public init(
 			name: PersonaData.Name? = nil,

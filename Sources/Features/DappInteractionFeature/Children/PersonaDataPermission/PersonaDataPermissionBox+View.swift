@@ -5,27 +5,25 @@ extension PersonaDataPermissionBox.State {
 	var viewState: PersonaDataPermissionBox.ViewState {
 		.init(
 			personaLabel: persona.displayName.rawValue,
-			existingRequiredEntries:
-			persona.personaData.existingRequestEntries(requested)
-				.sorted(by: \.discriminator)
-				.map(\.description)
+			existingRequiredEntries: responseValidation.existingRequestedEntries
+				.sorted(by: \.key)
+				.map { $0.value.map(\.description).joined(separator: ", ") }
 				.nilIfEmpty?
 				.joined(separator: "\n"),
 
-			missingRequiredEntries: { () -> Hint? in
-				switch result {
-				case .success:
-					return nil
-				case let .failure(error):
-					return .error {
+			missingRequiredEntries:
+			responseValidation.missingEntries
+				.keys
+				.nilIfEmpty
+				.map { kinds in
+					.error {
 						Text {
 							L10n.DAppRequest.PersonalDataBox.requiredInformation.text.bold()
 							" "
-							error.entries.keys.sorted().map(\.title.localizedLowercase).joined(separator: ", ")
+							kinds.sorted().map(\.title.localizedLowercase).joined(separator: ", ")
 						}
 					}
 				}
-			}()
 		)
 	}
 }

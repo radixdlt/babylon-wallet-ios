@@ -6,7 +6,7 @@ struct PersonaDataPermissionBox: Sendable, FeatureReducer {
 		var id: Profile.Network.Persona.ID { persona.id }
 		let persona: Profile.Network.Persona
 		let requested: P2P.Dapp.Request.PersonaDataRequestItem
-		let result: P2P.Dapp.Request.ResponseResult
+		let responseValidation: P2P.Dapp.Request.RequestValidation
 
 		init(
 			persona: Profile.Network.Persona,
@@ -14,7 +14,7 @@ struct PersonaDataPermissionBox: Sendable, FeatureReducer {
 		) {
 			self.persona = persona
 			self.requested = requested
-			self.result = persona.personaData.response(for: requested)
+			self.responseValidation = persona.personaData.responseValidation(for: requested)
 		}
 	}
 
