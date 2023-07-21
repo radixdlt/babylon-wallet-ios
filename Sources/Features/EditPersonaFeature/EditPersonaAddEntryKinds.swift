@@ -1,16 +1,16 @@
 import FeaturePrelude
 
-public struct EditPersonaAddEntryKinds: Sendable, FeatureReducer {
-	public typealias EntryKind = EditPersona.State.DynamicFieldID
+public typealias EntryKind = PersonaData.Entry.Kind
 
+// MARK: - EditPersonaAddEntryKinds
+public struct EditPersonaAddEntryKinds: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		let availableEntryKinds: [EntryKind]
 		var selectedEntryKinds: [EntryKind]? = nil
 
-		public init(
-			excludedEntryKinds: [EntryKind]
-		) {
-			self.availableEntryKinds = EditPersona.State.DynamicFieldID.supportedKinds.filter { !excludedEntryKinds.contains($0) }
+		public init(excludedEntryKinds: [EntryKind]) {
+			self.availableEntryKinds = EntryKind.supportedKinds
+				.filter { !excludedEntryKinds.contains($0) }
 		}
 	}
 

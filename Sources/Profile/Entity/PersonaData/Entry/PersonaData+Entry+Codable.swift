@@ -33,7 +33,7 @@ extension PersonaData.Entry {
 		let container = try decoder.container(keyedBy: CodingKeys.self)
 		let discriminator = try container.decode(PersonaData.Entry.Kind.self, forKey: .discriminator)
 		switch discriminator {
-		case .name:
+		case .fullName:
 			self = try .name(container.decode(PersonaData.Name.self, forKey: .name))
 		case .dateOfBirth:
 			self = try .dateOfBirth(container.decode(PersonaData.DateOfBirth.self, forKey: .dateOfBirth))

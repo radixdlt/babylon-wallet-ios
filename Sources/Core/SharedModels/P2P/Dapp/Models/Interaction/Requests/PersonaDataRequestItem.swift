@@ -13,6 +13,12 @@ extension P2P.Dapp.Request {
 			numberOfRequestedEmailAddresses: RequestedNumber? = nil,
 			numberOfRequestedPhoneNumbers: RequestedNumber? = nil
 		) {
+			// The only purpose of this switch is to make sure we get a compilation error when we add a new PersonaData.Entry kind, so
+			// we do not forget to handle it here.
+			switch PersonaData.Entry.Kind.fullName {
+			case .fullName, .dateOfBirth, .companyName, .emailAddress, .phoneNumber, .url, .postalAddress, .creditCard: break
+			}
+
 			self.isRequestingName = isRequestingName
 			self.numberOfRequestedEmailAddresses = numberOfRequestedEmailAddresses
 			self.numberOfRequestedPhoneNumbers = numberOfRequestedPhoneNumbers
@@ -21,7 +27,7 @@ extension P2P.Dapp.Request {
 		public var kindRequests: [PersonaData.Entry.Kind: KindRequest] {
 			var result: [PersonaData.Entry.Kind: KindRequest] = [:]
 			if isRequestingName == true {
-				result[.name] = .entry
+				result[.fullName] = .entry
 			}
 			if let numberOfRequestedPhoneNumbers, numberOfRequestedPhoneNumbers.isValid {
 				result[.phoneNumber] = .number(numberOfRequestedPhoneNumbers)
@@ -57,7 +63,7 @@ extension P2P.Dapp.Request {
 		public var response: P2P.Dapp.Request.Response? {
 			guard missingEntries.isEmpty else { return nil }
 			return try? .init(
-				name: existingRequestedEntries.extract(.name),
+				name: existingRequestedEntries.extract(.fullName),
 				emailAddresses: existingRequestedEntries.extract(.emailAddress),
 				phoneNumbers: existingRequestedEntries.extract(.phoneNumber)
 			)

@@ -51,11 +51,15 @@ extension PersonaDetails.State: EmptyInitializable {
 				address: Profile.Network.Persona.previewValue0.address,
 				securityState: Profile.Network.Persona.previewValue0.securityState,
 				displayName: "Some name",
-				personaData: try! .init(phoneNumbers: .init(
-					collection: [
-						.init(value: .init(number: "2")),
-					]
-				))
+				personaData: PersonaData(
+					name: .init(
+						value: .init(
+							given: "Maciek",
+							family: "Czarnik",
+							variant: .western
+						)
+					)
+				)
 			),
 			dApps: []
 		))
