@@ -17,10 +17,10 @@ final class PersonaFieldTests: TestCase {
 			PersonaData(
 				name: .init(
 					value: .init(
-						given: "John",
-						middle: "Fitzgerald",
-						family: "Kennedy",
-						variant: .western
+						variant: .western,
+						familyName: "Kennedy",
+						givenNames: "John",
+						nickname: "Fitzgerald"
 					)
 				)
 			)
@@ -37,9 +37,9 @@ final class PersonaFieldTests: TestCase {
 			PersonaData(
 				name: .init(
 					value: .init(
-						given: "Chan-wook",
-						family: "Park",
-						variant: .eastern
+						variant: .eastern,
+						familyName: "Park",
+						givenNames: "Chan-wook"
 					)
 				)
 			)
@@ -147,9 +147,9 @@ final class PersonaFieldTests: TestCase {
 			let personaData = PersonaData(
 				name: .init(
 					value: .init(
-						given: "Olof",
-						family: "Palme",
-						variant: .western
+						variant: .western,
+						familyName: "Palme",
+						givenNames: "Olof"
 					)
 				),
 				postalAddresses: [[
