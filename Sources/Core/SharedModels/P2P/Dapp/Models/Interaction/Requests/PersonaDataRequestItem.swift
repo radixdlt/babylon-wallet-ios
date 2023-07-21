@@ -50,54 +50,35 @@ extension P2P.Dapp.Request {
 extension PersonaData {
 	public func response(for request: P2P.Dapp.Request.PersonaDataRequestItem) -> Result<P2P.Dapp.Response.WalletInteractionSuccessResponse.PersonaDataRequestResponseItem, P2P.Dapp.Request.RequestError> {
 		var missing: [Entry.Kind: P2P.Dapp.Request.EntryError] = [:]
+		var result = P2P.Dapp.Response.WalletInteractionSuccessResponse.PersonaDataRequestResponseItem()
 
-		let responseName: PersonaData.Name?
 		if request.isRequestingName == true {
 			if let value = name?.value {
-				responseName = value
+				result.name = value
 			} else {
-				responseName = nil
 				missing[.name] = .missingEntry
 			}
-		} else {
-			responseName = nil
 		}
 
-		let responseEmails: OrderedSet<PersonaData.EmailAddress>?
 		if let emailsNumber = request.numberOfRequestedEmailAddresses {
 			switch emailAddresses.requestedValues(emailsNumber) {
 			case let .success(value):
-				responseEmails = value
+				result.emailAddresses = value
 			case let .failure(error):
-				responseEmails = nil
 				missing[.emailAddress] = error
 			}
-		} else {
-			responseEmails = nil
 		}
 
-		let responsePhoneNumbers: OrderedSet<PersonaData.PhoneNumber>?
 		if let phoneNumbersNumber = request.numberOfRequestedPhoneNumbers {
 			switch phoneNumbers.requestedValues(phoneNumbersNumber) {
 			case let .success(value):
-				responsePhoneNumbers = value
+				result.phoneNumbers = value
 			case let .failure(error):
-				responsePhoneNumbers = nil
 				missing[.emailAddress] = error
 			}
-		} else {
-			responsePhoneNumbers = nil
 		}
 
-		guard missing.isEmpty else {
-			return .failure(.init(entries: missing))
-		}
-
-		return .success(.init(
-			name: responseName,
-			emailAddresses: responseEmails,
-			phoneNumbers: responsePhoneNumbers
-		))
+		return missing.isEmpty ? .success(result) : .failure(.init(entries: missing))
 	}
 }
 
