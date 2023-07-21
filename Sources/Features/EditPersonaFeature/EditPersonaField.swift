@@ -223,9 +223,6 @@ extension EditPersonaDynamicField.State {
 					if isRequiredByDapp {
 						.if(\.isBlank, error: L10n.EditPersona.Error.requiredByDapp)
 					}
-					if id == .emailAddress {
-						.unless(\.isEmailAddress, error: L10n.EditPersona.Error.invalidEmailAddress)
-					}
 				}
 			),
 			isRequestedByDapp: isRequiredByDapp,

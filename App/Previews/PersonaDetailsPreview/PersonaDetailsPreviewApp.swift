@@ -54,9 +54,10 @@ extension PersonaDetails.State: EmptyInitializable {
 				personaData: PersonaData(
 					name: .init(
 						value: .init(
-							given: "Maciek",
-							family: "Czarnik",
-							variant: .western
+							variant: .western,
+							familyName: "Czarnik",
+							givenNames: "Maciek Tomasz",
+							nickname: "Czajnik"
 						)
 					)
 				)
