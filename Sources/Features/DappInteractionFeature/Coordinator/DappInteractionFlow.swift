@@ -444,6 +444,9 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 		if resetItem.accounts {
 			authorizedPersona.sharedAccounts = nil
 		}
+//		if resetItem.personaData {
+//			authorizedPersona.sharedFieldIDs = nil
+//		}
 		authorizedDapp.referencesToAuthorizedPersonas[id: authorizedPersona.id] = authorizedPersona
 		state.authorizedDapp = authorizedDapp
 		state.authorizedPersona = authorizedPersona

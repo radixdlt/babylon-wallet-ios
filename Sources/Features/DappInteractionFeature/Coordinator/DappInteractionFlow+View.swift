@@ -109,6 +109,7 @@ struct DappInteraction_Preview: PreviewProvider {
 				)!,
 				reducer: DappInteractionFlow()
 					.dependency(\.accountsClient, .previewValueTwoAccounts())
+//					.dependency(\.authorizedDappsClient, .previewValueOnePersona())
 					.dependency(\.personasClient, .previewValueTwoPersonas(existing: true))
 					.dependency(\.personasClient, .previewValueTwoPersonas(existing: false))
 			)
