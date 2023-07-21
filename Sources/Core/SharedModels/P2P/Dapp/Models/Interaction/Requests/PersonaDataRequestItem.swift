@@ -118,12 +118,4 @@ extension PersonaData {
 			return .right(Array(values))
 		}
 	}
-
-	private var allExistingEntries: [PersonaData.Entry.Kind: [PersonaData.Entry]] {
-		var result: [PersonaData.Entry.Kind: [PersonaData.Entry]] = [:]
-		for entry in entries {
-			result[entry.value.discriminator, default: []].append(entry.value)
-		}
-		return result
-	}
 }

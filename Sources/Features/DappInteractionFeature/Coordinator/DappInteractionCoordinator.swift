@@ -44,20 +44,13 @@ struct DappInteractionCoordinator: Sendable, FeatureReducer {
 
 	var body: some ReducerProtocolOf<Self> {
 		Scope(state: \.childState, action: /.self) {
-			Scope(
-				state: /State.ChildState.loading,
-				action: /Action.child .. ChildAction.loading
-			) {
+			Scope(state: /State.ChildState.loading, action: /Action.child .. ChildAction.loading) {
 				DappInteractionLoading()
 			}
-			Scope(
-				state: /State.ChildState.flow,
-				action: /Action.child .. ChildAction.flow
-			) {
+			Scope(state: /State.ChildState.flow, action: /Action.child .. ChildAction.flow) {
 				DappInteractionFlow()
 			}
 		}
-
 		Reduce(core)
 			.ifLet(\.$errorAlert, action: /Action.view .. ViewAction.malformedInteractionErrorAlert)
 	}

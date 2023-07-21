@@ -123,7 +123,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			case accountPermission(AccountPermission.State)
 			case chooseAccounts(AccountPermissionChooseAccounts.State)
 			case personaDataPermission(PersonaDataPermission.State)
-//			case oneTimePersonaData(OneTimePersonaData.State)
+			case oneTimePersonaData(OneTimePersonaData.State)
 			case reviewTransaction(TransactionReview.State)
 		}
 
@@ -132,7 +132,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			case accountPermission(AccountPermission.Action)
 			case chooseAccounts(AccountPermissionChooseAccounts.Action)
 			case personaDataPermission(PersonaDataPermission.Action)
-//			case oneTimePersonaData(OneTimePersonaData.Action)
+			case oneTimePersonaData(OneTimePersonaData.Action)
 			case reviewTransaction(TransactionReview.Action)
 		}
 
@@ -151,9 +151,9 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 					.ifCaseLet(/MainState.personaDataPermission, action: /MainAction.personaDataPermission) {
 						PersonaDataPermission()
 					}
-//					.ifCaseLet(/MainState.oneTimePersonaData, action: /MainAction.oneTimePersonaData) {
-//						OneTimePersonaData()
-//					}
+					.ifCaseLet(/MainState.oneTimePersonaData, action: /MainAction.oneTimePersonaData) {
+						OneTimePersonaData()
+					}
 					.ifCaseLet(/MainState.reviewTransaction, action: /MainAction.reviewTransaction) {
 						TransactionReview()
 					}
@@ -207,6 +207,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			case .cancelButtonTapped:
 				return dismissEffect(for: state, errorKind: .invalidPersona, message: nil)
 			}
+
 		case .personaNotFoundErrorAlert:
 			return .none
 
@@ -399,8 +400,20 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			state.responseItems[item] = .remote(.ongoingPersonaData(response))
 			return continueEffect(for: &state)
 
+		case let .oneTimePersonaData(.delegate(.continueButtonTapped(response))):
+			state.responseItems[item] = .remote(.oneTimePersonaData(response))
+			return continueEffect(for: &state)
+
 		case let .chooseAccounts(.delegate(.continue(accessKind, chosenAccounts))):
 			return handleAccounts(item, chosenAccounts, accessKind)
+
+		// TODO: Test this
+		case let .personaDataPermission(.delegate(.personaUpdated(persona))):
+			return handlePersonaUpdated(&state, persona)
+
+		// TODO: Test this
+		case let .oneTimePersonaData(.delegate(.personaUpdated(persona))):
+			return handlePersonaUpdated(&state, persona)
 
 		case let .reviewTransaction(.delegate(.signedTXAndSubmittedToGateway(txID))):
 			return handleSignAndSubmitTX(item, txID)
@@ -469,7 +482,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 
 			await send(.internal(.autofillOngoingResponseItemsIfPossible(payload)))
 		} catch: { error, _ in
-			loggerGlobal.warning("Unable to autofil ongoing response, error: \(error)")
+			loggerGlobal.warning("Unable to autofill ongoing response, error: \(error)")
 		}
 	}
 
@@ -682,7 +695,10 @@ extension DappInteractionFlow.Destinations.State {
 			)))
 
 		case let .remote(.oneTimePersonaData(item)):
-			fatalError()
+			self = .relayed(anyItem, with: .oneTimePersonaData(.init(
+				dappMetadata: dappMetadata,
+				requested: item
+			)))
 
 		case let .remote(.ongoingPersonaData(item)):
 			guard let persona else {
