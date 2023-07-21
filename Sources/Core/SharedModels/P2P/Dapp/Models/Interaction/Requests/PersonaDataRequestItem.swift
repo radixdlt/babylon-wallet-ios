@@ -89,12 +89,11 @@ private extension [PersonaData.Entry] {
 
 extension PersonaData {
 	public func responseValidation(for request: P2P.Dapp.Request.PersonaDataRequestItem) -> P2P.Dapp.Request.RequestValidation {
-		let kindRequests = request.kindRequests
+		let allExisting = Dictionary(grouping: entries.map(\.value), by: \.discriminator)
 
 		var result = P2P.Dapp.Request.RequestValidation()
-
-		for (kind, values) in allExistingEntries {
-			guard let kindRequest = kindRequests[kind] else { continue }
+		for (kind, kindRequest) in request.kindRequests {
+			let values = allExisting[kind] ?? []
 			switch validate(values, for: kindRequest) {
 			case let .left(missingEntry):
 				result.missingEntries[kind] = missingEntry
