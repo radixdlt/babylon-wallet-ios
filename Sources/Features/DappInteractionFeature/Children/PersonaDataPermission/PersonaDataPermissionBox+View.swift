@@ -19,41 +19,14 @@ extension PersonaDataPermissionBox.State {
 				case let .failure(error):
 					return .error {
 						Text {
-							"Issues:".text.bold() // FIXME: Strings
+							L10n.DAppRequest.PersonalDataBox.requiredInformation.text.bold()
 							" "
-							error.issues.keys.sorted().map(\.title.localizedLowercase).joined(separator: ", ")
-							//						L10n.DAppRequest.PersonalDataBox.requiredInformation.text.bold()
-							//						" "
-							//						missingRequiredFieldIDs.sorted().map(\.title.localizedLowercase).joined(separator: ", ")
+							error.missing.keys.sorted().map(\.title.localizedLowercase).joined(separator: ", ")
 						}
 					}
 				}
 			}()
 		)
-	}
-}
-
-// FIXME: This could also be a requirement in BasePersonaDataEntryProtocol
-extension PersonaData.Entry {
-	var description: String {
-		switch self {
-		case let .name(name):
-			return name.description
-		case let .dateOfBirth(dateOfBirth):
-			return dateOfBirth.description
-		case let .companyName(companyName):
-			return companyName.description
-		case let .emailAddress(emailAddress):
-			return emailAddress.description
-		case let .phoneNumber(phoneNumber):
-			return phoneNumber.description
-		case let .url(associatedURL):
-			return associatedURL.description
-		case let .postalAddress(postalAddress):
-			return postalAddress.description
-		case let .creditCard(creditCard):
-			return creditCard.description
-		}
 	}
 }
 

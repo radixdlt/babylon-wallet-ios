@@ -15,7 +15,7 @@ public struct EditPersona: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public enum Mode: Sendable, Hashable {
 			case edit
-//			case dapp(requiredFieldIDs: Set<DynamicFieldID>)
+			case dapp(requested: P2P.Dapp.Request.PersonaDataRequestItem)
 		}
 
 		public enum StaticFieldID: Sendable, Hashable, Comparable {
@@ -44,11 +44,10 @@ public struct EditPersona: Sendable, FeatureReducer {
 				initial: persona.displayName.rawValue
 			)
 			self.dynamicFields = persona.personaData.dynamicFields(in: mode)
-//			if case let .dapp(requiredFieldIDs) = mode {
-//				for requiredFieldID in requiredFieldIDs where dynamicFields[id: requiredFieldID] == nil {
-//					dynamicFields.append(.init(id: requiredFieldID, initial: nil, isRequiredByDapp: true))
-//				}
-//			}
+
+			for requiredFieldID in mode.requiredFields where dynamicFields[id: requiredFieldID] == nil {
+				dynamicFields.append(.init(id: requiredFieldID, text: nil, isRequiredByDapp: true))
+			}
 		}
 	}
 
@@ -186,6 +185,7 @@ extension EditPersona.State {
 	}
 }
 
+// FIXME: This can be simplified, and it seems duplicated
 extension PersonaData {
 	func dynamicFields(
 		in mode: EditPersona.State.Mode
@@ -193,17 +193,23 @@ extension PersonaData {
 		IdentifiedArray(
 			uncheckedUniqueElements: entries.map(\.value).map { entryValue in
 				EditPersonaDynamicField.State(
-					id: entryValue.kind,
-					text: entryValue.text,
-					isRequiredByDapp: {
-						switch mode {
-						case .edit:
-							return false
-						}
-					}()
+					id: entryValue.discriminator,
+					text: entryValue.description,
+					isRequiredByDapp: mode.requiredFields.contains(entryValue.discriminator)
 				)
 			}
 		)
+	}
+}
+
+extension EditPersona.State.Mode {
+	var requiredFields: Set<EditPersona.State.DynamicFieldID> {
+		switch self {
+		case .edit:
+			return []
+		case let .dapp(requested):
+			return requiredFieldIDs
+		}
 	}
 }
 
@@ -247,32 +253,5 @@ extension Profile.Network.Persona {
 		}
 
 		return updatedPersona
-	}
-}
-
-extension PersonaData.Entry {
-	// FIXME: Use proper values and granularity (Entry-, instead of Field-level) when Entry types will be supported
-	var text: String {
-		switch self {
-		case let .name(entryModel): return entryModel.description
-		case let .emailAddress(entryModel): return entryModel.email
-		case let .phoneNumber(entryModel): return entryModel.number
-		default: fatalError()
-		}
-	}
-}
-
-extension PersonaData.Entry {
-	var kind: Kind {
-		switch self {
-		case .name: return .name
-		case .dateOfBirth: return .dateOfBirth
-		case .companyName: return .companyName
-		case .emailAddress: return .emailAddress
-		case .phoneNumber: return .phoneNumber
-		case .url: return .url
-		case .postalAddress: return .postalAddress
-		case .creditCard: return .creditCard
-		}
 	}
 }

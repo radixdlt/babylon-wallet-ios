@@ -17,68 +17,102 @@ extension P2P.Dapp.Request {
 			self.numberOfRequestedPhoneNumbers = numberOfRequestedPhoneNumbers
 		}
 
-		public var requestedEntries: Set<PersonaData.Entry.Kind> {
-			var result: Set<PersonaData.Entry.Kind> = []
-			if isRequestingName == true {
-				result.insert(.name)
-			}
-			if numberOfRequestedPhoneNumbers?.isValid == true {
-				result.insert(.phoneNumber)
-			}
-			if numberOfRequestedEmailAddresses?.isValid == true {
-				result.insert(.emailAddress)
-			}
-			return result
-		}
+//		public var requestedEntries: Set<PersonaData.Entry.Kind> {
+//			var result: Set<PersonaData.Entry.Kind> = []
+//			if isRequestingName == true {
+//				result.insert(.name)
+//			}
+//			if numberOfRequestedPhoneNumbers?.isValid == true {
+//				result.insert(.phoneNumber)
+//			}
+//			if numberOfRequestedEmailAddresses?.isValid == true {
+//				result.insert(.emailAddress)
+//			}
+//			return result
+//		}
 	}
 
-	public enum Issue: Sendable, Hashable, Decodable {
-		case isMissing
-		case needsMore(RequestedNumber)
-		case needsFewer(Int) // TODO: Perhaps we should skip this case, and simply pick the requested number of entries?
+	public struct RequestError: Error, Sendable, Hashable {
+		let entries: [PersonaData.Entry.Kind: EntryError]
+	}
+
+	public enum EntryError: Error, Sendable, Hashable {
+		case missingEntry
+		case missing(Int)
+	}
+
+	public enum RequestType: Sendable, Hashable {
+		case entry
+		case number(RequestedNumber)
 	}
 }
 
 extension PersonaData {
-	public func requestIssues(_ item: P2P.Dapp.Request.PersonaDataRequestItem) -> [Entry.Kind: P2P.Dapp.Request.Issue] {
-		var result: [Entry.Kind: P2P.Dapp.Request.Issue] = [:]
-		if item.isRequestingName == true, name == nil {
-			result[.name] = .isMissing
-		}
-		if let emailsNumber = item.numberOfRequestedEmailAddresses {
-			result[.emailAddress] = emailAddresses.requestIssue(emailsNumber)
+	public func response(for request: P2P.Dapp.Request.PersonaDataRequestItem) -> Result<P2P.Dapp.Response.WalletInteractionSuccessResponse.PersonaDataRequestResponseItem, P2P.Dapp.Request.RequestError> {
+		var missing: [Entry.Kind: P2P.Dapp.Request.EntryError] = [:]
+
+		let responseName: PersonaData.Name?
+		if request.isRequestingName == true {
+			if let value = name?.value {
+				responseName = value
+			} else {
+				responseName = nil
+				missing[.name] = .missingEntry
+			}
+		} else {
+			responseName = nil
 		}
 
-		if let phoneNumbersNumber = item.numberOfRequestedPhoneNumbers {
-			result[.phoneNumber] = emailAddresses.requestIssue(phoneNumbersNumber)
+		let responseEmails: OrderedSet<PersonaData.EmailAddress>?
+		if let emailsNumber = request.numberOfRequestedEmailAddresses {
+			switch emailAddresses.requestedValues(emailsNumber) {
+			case let .success(value):
+				responseEmails = value
+			case let .failure(error):
+				responseEmails = nil
+				missing[.emailAddress] = error
+			}
+		} else {
+			responseEmails = nil
 		}
 
-		return result
-	}
+		let responsePhoneNumbers: OrderedSet<PersonaData.PhoneNumber>?
+		if let phoneNumbersNumber = request.numberOfRequestedPhoneNumbers {
+			switch phoneNumbers.requestedValues(phoneNumbersNumber) {
+			case let .success(value):
+				responsePhoneNumbers = value
+			case let .failure(error):
+				responsePhoneNumbers = nil
+				missing[.emailAddress] = error
+			}
+		} else {
+			responsePhoneNumbers = nil
+		}
 
-	public func existingRequestEntries(_ item: P2P.Dapp.Request.PersonaDataRequestItem) -> [PersonaData.Entry] {
-		let requested = item.requestedEntries
-		return entries.filter { requested.contains($0.value.discriminator) }.map(\.value)
+		guard missing.isEmpty else {
+			return .failure(.init(entries: missing))
+		}
+
+		return .success(.init(
+			name: responseName,
+			emailAddresses: responseEmails,
+			phoneNumbers: responsePhoneNumbers
+		))
 	}
 }
 
 extension PersonaData.CollectionOfIdentifiedEntries {
-	public func requestIssue(_ number: RequestedNumber) -> P2P.Dapp.Request.Issue? {
-		let missing = number.quantity - count
-
-		switch number.quantifier {
-		case .exactly:
-			if missing > 0 {
-				return .needsMore(.exactly(missing))
-			} else if missing < 0 {
-				return .needsFewer(-missing)
-			}
-		case .atLeast:
-			if missing > 0 {
-				return .needsMore(.atLeast(missing))
-			}
+	public func requestedValues(_ number: RequestedNumber) -> Result<OrderedSet<Value>, P2P.Dapp.Request.EntryError> {
+		let values = Set(collection.elements.map(\.value).prefix(number.quantity))
+		let missing = number.quantity - values.count
+		guard missing <= 0 else {
+			return .failure(.missing(missing))
 		}
 
-		return nil
+		return .success(.init(uncheckedUniqueElements: values))
+	}
+
+	public var values: OrderedSet<Value>? {
+		try? .init(validating: collection.elements.map(\.value))
 	}
 }
