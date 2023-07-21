@@ -1,4 +1,4 @@
-"homePage_applySecuritySettings" = "Backup your seed phrase";
+"homePage_applySecuritySettings" = "Please back up your seed phrase";
 "homePage_backedUpMnemonicHeading" = "I have backed up this seed phrase";
 "homePage_createNewAccount" = "Create a New Account";
 "homePage_legacyAccountHeading" = "Legacy";
