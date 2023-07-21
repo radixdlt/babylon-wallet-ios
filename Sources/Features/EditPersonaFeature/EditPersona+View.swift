@@ -7,7 +7,7 @@ extension EditPersona.State {
 			personaLabel: persona.displayName.rawValue,
 			avatarURL: URL(string: "something")!,
 			addAFieldButtonState: {
-				if alreadyAddedEntryKinds.count < DynamicFieldID.supportedKinds.count {
+				if alreadyAddedEntryKinds.count < EntryKind.supportedKinds.count {
 					return .enabled
 				} else {
 					return .disabled
@@ -24,8 +24,8 @@ extension EditPersona.State {
 				return EditPersona.Output(
 					personaLabel: personaLabelOutput,
 					name: entries.name?.content,
-					emailAddress: entries.emailAddress,
-					phoneNumber: entries.phoneNumber
+					emailAddress: entries.emailAddress?.content,
+					phoneNumber: entries.phoneNumber?.content
 				)
 			}()
 		)
@@ -64,6 +64,13 @@ extension EditPersona {
 									).embed
 								)
 							)
+
+							Separator()
+
+							Text("dApps can request permission from you to share the following fields of information.")
+								.multilineTextAlignment(.leading)
+								.textStyle(.body1HighImportance)
+								.foregroundColor(.app.gray2)
 
 							Separator()
 

@@ -1,6 +1,5 @@
 import ComposableArchitecture
-import Prelude
-import SwiftUI
+import FeaturePrelude
 
 extension EditPersonaEntries {
 	public struct View: SwiftUI.View {
@@ -11,39 +10,53 @@ extension EditPersonaEntries {
 		}
 
 		public var body: some SwiftUI.View {
-			IfLetStore(
-				store.scope(
-					state: \.name,
-					action: (/Action.child
-						.. EditPersonaEntries.ChildAction.name
-					).embed
-				)
-			) { store in
-				EditPersonaEntry.View(
-					store: store,
-					contentView: EditPersonaName.View.init
-				)
+			VStack(spacing: .medium2) {
+				IfLetStore(
+					store.scope(
+						state: \.name,
+						action: (/Action.child
+							.. EditPersonaEntries.ChildAction.name
+						).embed
+					)
+				) { store in
+					EditPersonaEntry.View(
+						store: store,
+						contentView: EditPersonaName.View.init
+					)
+
+					Separator()
+				}
+
+				IfLetStore(
+					store.scope(
+						state: \.emailAddress,
+						action: (/Action.child
+							.. EditPersonaEntries.ChildAction.emailAddress
+						).embed
+					)
+				) { store in
+					EditPersonaEntry.View(
+						store: store,
+						contentView: EditPersonaDynamicField.View.init
+					)
+					Separator()
+				}
+
+				IfLetStore(
+					store.scope(
+						state: \.phoneNumber,
+						action: (/Action.child
+							.. EditPersonaEntries.ChildAction.phoneNumber
+						).embed
+					)
+				) { store in
+					EditPersonaEntry.View(
+						store: store,
+						contentView: EditPersonaDynamicField.View.init
+					)
+					Separator()
+				}
 			}
-
-			IfLetStore(
-				store.scope(
-					state: \.emailAddress,
-					action: (/Action.child
-						.. EditPersonaEntries.ChildAction.emailAddress
-					).embed
-				),
-				then: EditPersonaField.View.init
-			)
-
-			IfLetStore(
-				store.scope(
-					state: \.phoneNumber,
-					action: (/Action.child
-						.. EditPersonaEntries.ChildAction.phoneNumber
-					).embed
-				),
-				then: EditPersonaField.View.init
-			)
 		}
 	}
 }

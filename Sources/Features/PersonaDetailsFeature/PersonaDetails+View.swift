@@ -304,9 +304,7 @@ extension PersonaDetails.View {
 			let dAppInfo: DappInfo?
 			let personaName: String
 			let companyName: String?
-			let firstName: String?
-			let middleName: String?
-			let lastName: String?
+			let fullName: String?
 			let dateOfBirth: Date?
 			let emailAddresses: [String]?
 			let phoneNumbers: [String]?
@@ -328,9 +326,7 @@ extension PersonaDetails.View {
 				self.personaName = personaName
 				self.dateOfBirth = personaData?.dateOfBirth?.value.date
 				self.companyName = personaData?.companyName?.value.name
-				self.firstName = personaData?.name?.value.given
-				self.middleName = personaData?.name?.value.middle
-				self.lastName = personaData?.name?.value.family
+				self.fullName = personaData?.name?.value.description
 				self.emailAddresses = personaData?.emailAddresses.map(\.value.email)
 				self.phoneNumbers = personaData?.phoneNumbers.map(\.value.number)
 				self.urls = personaData?.urls.map(\.value.url)
@@ -339,8 +335,8 @@ extension PersonaDetails.View {
 
 				// The only purpose of this switch is to make sure we get a compilation error when we add a new PersonaData.Entry kind, so
 				// we do not forget to handle it here.
-				switch PersonaData.Entry.Kind.name {
-				case .name, .dateOfBirth, .companyName, .emailAddress, .phoneNumber, .url, .postalAddress, .creditCard: break
+				switch PersonaData.Entry.Kind.fullName {
+				case .fullName, .dateOfBirth, .companyName, .emailAddress, .phoneNumber, .url, .postalAddress, .creditCard: break
 				}
 			}
 		}
@@ -365,16 +361,11 @@ extension PersonaDetails.View {
 					}
 
 					Group {
-						if let firstName = viewStore.firstName {
-							VPair(heading: L10n.AuthorizedDapps.PersonaDetails.firstName, item: firstName)
-						}
-
-						if let middleName = viewStore.middleName {
-							VPair(heading: "Middle", item: middleName)
-						}
-
-						if let lastName = viewStore.lastName {
-							VPair(heading: L10n.AuthorizedDapps.PersonaDetails.lastName, item: lastName)
+						if let fullName = viewStore.fullName {
+							VPair(
+								heading: "Full Name", // FIXME: Localize
+								item: fullName
+							)
 						}
 
 						if let dateOfBirth = viewStore.dateOfBirth {

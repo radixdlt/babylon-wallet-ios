@@ -3,42 +3,109 @@ import FeaturePrelude
 // MARK: - EditPersonaEntries
 public struct EditPersonaEntries: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
+		// FIXME: Find a way to have an array of EditPersonaEntries, instead of separate properties
 		var name: EditPersonaEntry<EditPersonaName>.State?
-		var emailAddress: EditPersonaDynamicField.State?
-		var phoneNumber: EditPersonaDynamicField.State?
+		var emailAddress: EditPersonaEntry<EditPersonaDynamicField>.State?
+		var phoneNumber: EditPersonaEntry<EditPersonaDynamicField>.State?
 
-		init(with personaData: PersonaData) {
+		init(with personaData: PersonaData, mode: EditPersona.State.Mode) {
+			func isRequestedByDap(_ kind: EntryKind) -> Bool {
+				if case let .dapp(requiredEntries) = mode {
+					return requiredEntries.contains(kind)
+				}
+				return false
+			}
+
 			self.name = (personaData.name?.value).map {
-				EditPersonaEntry<EditPersonaName>.State(
-					name: "Name...",
-					isRequestedByDapp: false,
+				let isRequestedByDapp = isRequestedByDap(.fullName)
+
+				return EditPersonaEntry<EditPersonaName>.State(
+					kind: .fullName,
+					isRequestedByDapp: isRequestedByDapp,
 					content: EditPersonaName.State(
 						with: $0,
-						isRequestedByDapp: false
+						isRequestedByDapp: isRequestedByDapp
 					)
 				)
 			}
 			self.emailAddress = (personaData.emailAddresses.first).map {
-				.init(
-					id: .emailAddress,
-					text: $0.value.email,
-					isRequiredByDapp: false
+				let isRequestedByDapp = isRequestedByDap(.emailAddress)
+
+				return EditPersonaEntry<EditPersonaDynamicField>.State(
+					kind: .emailAddress,
+					isRequestedByDapp: isRequestedByDapp,
+					content: .init(
+						id: .emailAddress,
+						text: $0.value.email,
+						isRequiredByDapp: isRequestedByDapp,
+						showsName: false
+					)
 				)
 			}
 			self.phoneNumber = (personaData.phoneNumbers.first).map {
-				.init(
-					id: .phoneNumber,
-					text: $0.value.number,
-					isRequiredByDapp: false
+				let isRequestedByDapp = isRequestedByDap(.phoneNumber)
+
+				return EditPersonaEntry<EditPersonaDynamicField>.State(
+					kind: .phoneNumber,
+					isRequestedByDapp: isRequestedByDapp,
+					content: .init(
+						id: .phoneNumber,
+						text: $0.value.number,
+						isRequiredByDapp: isRequestedByDapp,
+						showsName: false
+					)
 				)
+			}
+
+			if case let .dapp(requiredEntries) = mode {
+				requiredEntries.forEach { kind in
+					switch kind {
+					case .fullName where self.name == nil:
+						self.name = .init(
+							kind: .fullName,
+							isRequestedByDapp: true,
+							content: .init(
+								with: .init(
+									given: "",
+									family: "",
+									variant: .eastern
+								),
+								isRequestedByDapp: true
+							)
+						)
+					case .emailAddress where self.emailAddress == nil:
+						self.emailAddress = .init(
+							kind: .emailAddress,
+							isRequestedByDapp: true,
+							content: .init(
+								id: .emailAddress,
+								text: "",
+								isRequiredByDapp: true,
+								showsName: false
+							)
+						)
+					case .phoneNumber where self.phoneNumber == nil:
+						self.phoneNumber = .init(
+							kind: .phoneNumber,
+							isRequestedByDapp: true,
+							content: .init(
+								id: .phoneNumber,
+								text: "",
+								isRequiredByDapp: true, showsName: false
+							)
+						)
+					default:
+						break
+					}
+				}
 			}
 		}
 	}
 
 	public enum ChildAction: Sendable, Equatable {
 		case name(EditPersonaEntry<EditPersonaName>.Action)
-		case emailAddress(EditPersonaDynamicField.Action)
-		case phoneNumber(EditPersonaDynamicField.Action)
+		case emailAddress(EditPersonaEntry<EditPersonaDynamicField>.Action)
+		case phoneNumber(EditPersonaEntry<EditPersonaDynamicField>.Action)
 	}
 
 	public var body: some ReducerProtocolOf<Self> {
@@ -53,13 +120,13 @@ public struct EditPersonaEntries: Sendable, FeatureReducer {
 				\.emailAddress,
 				action: /Action.child .. ChildAction.emailAddress
 			) {
-				EditPersonaField()
+				EditPersonaEntry<EditPersonaDynamicField>()
 			}
 			.ifLet(
 				\.phoneNumber,
 				action: /Action.child .. ChildAction.phoneNumber
 			) {
-				EditPersonaField()
+				EditPersonaEntry<EditPersonaDynamicField>()
 			}
 	}
 

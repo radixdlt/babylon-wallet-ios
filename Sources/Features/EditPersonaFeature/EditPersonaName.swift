@@ -1,36 +1,49 @@
 import FeaturePrelude
 
 // MARK: - EditPersonaName
-public struct EditPersonaName: FeatureReducer {
+public struct EditPersonaName: FeatureReducer, EmptyInitializable {
 	public struct State: Sendable, Hashable {
-		public enum Property: Sendable, Hashable {
-			case family
-			case given
-		}
-
-		var family: EditPersonaField<Property>.State
-		var given: EditPersonaField<Property>.State
+		var family: EditPersonaDynamicField.State
+		var given: EditPersonaDynamicField.State
+		var nickName: EditPersonaDynamicField.State
+		var variant: PersonaData.Name.Variant
 
 		init(
 			with name: PersonaData.Name,
 			isRequestedByDapp: Bool
 		) {
-			self.family = EditPersonaField<State.Property>.State(
-				id: .family,
+			self.family = EditPersonaDynamicField.State(
+				id: .familyName,
 				text: name.family,
-				isRequiredByDapp: false
+				isRequiredByDapp: isRequestedByDapp,
+				showsName: true
 			)
-			self.given = EditPersonaField<State.Property>.State(
-				id: .given,
+			self.given = EditPersonaDynamicField.State(
+				id: .givenNames,
 				text: name.given,
-				isRequiredByDapp: false
+				isRequiredByDapp: isRequestedByDapp,
+				showsName: true
 			)
+
+			self.nickName = EditPersonaDynamicField.State(
+				id: .nickName,
+				text: name.middle,
+				isRequiredByDapp: isRequestedByDapp,
+				showsName: true
+			)
+
+			self.variant = name.variant
 		}
 	}
 
+	public enum ViewAction: Sendable, Equatable {
+		case variantPick(PersonaData.Name.Variant)
+	}
+
 	public enum ChildAction: Sendable, Equatable {
-		case family(EditPersonaField<State.Property>.Action)
-		case given(EditPersonaField<State.Property>.Action)
+		case family(EditPersonaDynamicField.Action)
+		case given(EditPersonaDynamicField.Action)
+		case nickname(EditPersonaDynamicField.Action)
 	}
 
 	public init() {}
@@ -46,16 +59,21 @@ public struct EditPersonaName: FeatureReducer {
 			action: /Action.child .. ChildAction.given,
 			child: EditPersonaField.init
 		)
+
+		Scope(
+			state: \.nickName,
+			action: /Action.child .. ChildAction.nickname,
+			child: EditPersonaField.init
+		)
+
+		Reduce(core)
+	}
+
+	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+		switch viewAction {
+		case let .variantPick(variant):
+			state.variant = variant
+			return .none
+		}
 	}
 }
-
-// MARK: - EditPersonaName.State.Property + EditPersonaFieldID
-extension EditPersonaName.State.Property: EditPersonaFieldID {
-	public var title: String { "name" }
-	public var contentType: UITextContentType? { .name }
-	public var keyboardType: UIKeyboardType { .default }
-	public var capitalization: DesignSystem.EquatableTextInputCapitalization? { .words }
-}
-
-// MARK: - EditPersonaName + EmptyInitializable
-extension EditPersonaName: EmptyInitializable {}

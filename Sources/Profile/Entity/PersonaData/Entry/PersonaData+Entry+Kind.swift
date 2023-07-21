@@ -3,7 +3,7 @@ import Foundation
 // MARK: - PersonaData.Entry.Kind
 extension PersonaData.Entry {
 	public enum Kind: String, Sendable, Hashable, Codable {
-		case name
+		case fullName
 		case dateOfBirth
 		case companyName
 

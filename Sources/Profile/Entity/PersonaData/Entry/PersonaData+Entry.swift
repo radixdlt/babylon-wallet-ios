@@ -19,7 +19,7 @@ extension PersonaData {
 extension PersonaData.Entry {
 	public var discriminator: PersonaData.Entry.Kind {
 		switch self {
-		case .name: return .name
+		case .name: return .fullName
 		case .dateOfBirth: return .dateOfBirth
 		case .companyName: return .companyName
 

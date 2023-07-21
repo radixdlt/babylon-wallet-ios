@@ -17,8 +17,9 @@ extension EditPersona {
 				personaData.name = .init(
 					value: .init(
 						given: $0.given.input ?? "",
+						middle: $0.nickName.input,
 						family: $0.family.input ?? "",
-						variant: .eastern
+						variant: $0.variant
 					)
 				)
 			}
@@ -39,13 +40,12 @@ public struct EditPersona: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public enum Mode: Sendable, Hashable {
 			case edit
+			case dapp(requiredEntries: Set<EntryKind>)
 		}
 
 		public enum StaticFieldID: Sendable, Hashable, Comparable {
 			case personaLabel
 		}
-
-		public typealias DynamicFieldID = PersonaData.Entry.Kind
 
 		let mode: Mode
 		let persona: Profile.Network.Persona
@@ -57,7 +57,7 @@ public struct EditPersona: Sendable, FeatureReducer {
 
 		var alreadyAddedEntryKinds: [PersonaData.Entry.Kind] {
 			[
-				entries.name.map { _ in .name },
+				entries.name.map { _ in .fullName },
 				entries.emailAddress.map { _ in .emailAddress },
 				entries.phoneNumber.map { _ in .phoneNumber },
 			].compactMap(identity)
@@ -69,7 +69,7 @@ public struct EditPersona: Sendable, FeatureReducer {
 		) {
 			self.mode = mode
 			self.persona = persona
-			self.entries = .init(with: persona.personaData)
+			self.entries = .init(with: persona.personaData, mode: mode)
 			self.labelField = EditPersonaStaticField.State(
 				id: .personaLabel,
 				initial: persona.displayName.rawValue
@@ -193,9 +193,9 @@ public struct EditPersona: Sendable, FeatureReducer {
 		case let .destination(.presented(.addFields(.delegate(.addEntryKinds(fieldsToAdd))))):
 			fieldsToAdd.map(\.entry.kind).forEach { entryKind in
 				switch entryKind {
-				case .name:
+				case .fullName:
 					state.entries.name = .init(
-						name: "Name",
+						kind: entryKind,
 						isRequestedByDapp: false,
 						content: .init(
 							with: PersonaData.Name(
@@ -208,15 +208,26 @@ public struct EditPersona: Sendable, FeatureReducer {
 					)
 				case .emailAddress:
 					state.entries.emailAddress = .init(
-						id: entryKind,
-						text: nil,
-						isRequiredByDapp: false
+						kind: entryKind,
+						isRequestedByDapp: false,
+						content: .init(
+							id: .emailAddress,
+							text: "",
+							isRequiredByDapp: false,
+							showsName: false
+						)
 					)
+
 				case .phoneNumber:
 					state.entries.phoneNumber = .init(
-						id: entryKind,
-						text: nil,
-						isRequiredByDapp: false
+						kind: entryKind,
+						isRequestedByDapp: false,
+						content: .init(
+							id: .phoneNumber,
+							text: "",
+							isRequiredByDapp: false,
+							showsName: false
+						)
 					)
 				default:
 					fatalError()
@@ -265,7 +276,7 @@ extension PersonaData.Entry {
 extension PersonaData.Entry.Kind {
 	var entry: PersonaData.Entry {
 		switch self {
-		case .name:
+		case .fullName:
 			return .name(.init(given: "", family: "", variant: .eastern))
 		case .dateOfBirth:
 			fallthrough
@@ -288,7 +299,7 @@ extension PersonaData.Entry.Kind {
 extension PersonaData.Entry {
 	var kind: Kind {
 		switch self {
-		case .name: return .name
+		case .name: return .fullName
 		case .dateOfBirth: return .dateOfBirth
 		case .companyName: return .companyName
 		case .emailAddress: return .emailAddress

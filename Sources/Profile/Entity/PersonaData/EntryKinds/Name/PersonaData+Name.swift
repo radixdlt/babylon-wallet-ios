@@ -4,9 +4,9 @@ import Prelude
 extension PersonaData {
 	public struct Name: Sendable, Hashable, Codable, PersonaDataEntryProtocol, CustomStringConvertible {
 		public static var casePath: CasePath<PersonaData.Entry, Self> = /PersonaData.Entry.name
-		public static var kind = PersonaData.Entry.Kind.name
+		public static var kind = PersonaData.Entry.Kind.fullName
 
-		public enum Variant: String, Sendable, Hashable, Codable {
+		public enum Variant: String, Sendable, Hashable, Codable, CaseIterable {
 			/// order: `given middle family`
 			case western
 

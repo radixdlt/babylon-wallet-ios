@@ -2,7 +2,8 @@ import FeaturePrelude
 
 public struct EditPersonaEntry<ContentReducer>: FeatureReducer where ContentReducer: FeatureReducer & EmptyInitializable {
 	public struct State: Sendable, Hashable {
-		let name: String
+		typealias ID = EntryKind
+		let kind: EntryKind
 		let isRequestedByDapp: Bool
 
 		var content: ContentReducer.State
