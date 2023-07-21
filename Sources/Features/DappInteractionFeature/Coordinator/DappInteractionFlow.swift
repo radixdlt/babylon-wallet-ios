@@ -395,6 +395,10 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 		case .accountPermission(.delegate(.continueButtonTapped)):
 			return handleAccountPermission(item)
 
+		case let .personaDataPermission(.delegate(.continueButtonTapped(response))):
+			state.responseItems[item] = .remote(.ongoingPersonaData(response))
+			return continueEffect(for: &state)
+
 		case let .chooseAccounts(.delegate(.continue(accessKind, chosenAccounts))):
 			return handleAccounts(item, chosenAccounts, accessKind)
 
