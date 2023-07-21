@@ -7,7 +7,7 @@ extension PersonaDataPermission.State {
 			thumbnail: dappMetadata.thumbnail,
 			title: L10n.DAppRequest.PersonalDataPermission.title,
 			subtitle: L10n.DAppRequest.PersonalDataPermission.subtitle(dappMetadata.name),
-			output: try? persona?.response.get()
+			output: try? persona?.result.get()
 		)
 	}
 }
@@ -18,7 +18,7 @@ extension PersonaDataPermission {
 		let thumbnail: URL?
 		let title: String
 		let subtitle: String
-		let output: Response?
+		let output: P2P.Dapp.Request.Response?
 	}
 
 	@MainActor

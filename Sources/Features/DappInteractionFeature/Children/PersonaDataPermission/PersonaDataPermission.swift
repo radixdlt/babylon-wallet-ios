@@ -4,14 +4,11 @@ import PersonasClient
 
 // MARK: - PersonaDataPermission
 struct PersonaDataPermission: Sendable, FeatureReducer {
-	typealias Request = P2P.Dapp.Request.PersonaDataRequestItem
-	typealias Response = P2P.Dapp.Response.WalletInteractionSuccessResponse.PersonaDataRequestResponseItem
-
 	struct State: Sendable, Hashable {
 		let dappMetadata: DappMetadata
 		let personaID: Profile.Network.Persona.ID
 		var persona: PersonaDataPermissionBox.State?
-		let requested: Request
+		let requested: P2P.Dapp.Request.PersonaDataRequestItem
 
 		@PresentationState
 		var destination: Destinations.State?
@@ -19,7 +16,7 @@ struct PersonaDataPermission: Sendable, FeatureReducer {
 		init(
 			dappMetadata: DappMetadata,
 			personaID: Profile.Network.Persona.ID,
-			requested: Request
+			requested: P2P.Dapp.Request.PersonaDataRequestItem
 		) {
 			self.dappMetadata = dappMetadata
 			self.personaID = personaID
@@ -29,7 +26,7 @@ struct PersonaDataPermission: Sendable, FeatureReducer {
 
 	enum ViewAction: Sendable, Equatable {
 		case task
-		case continueButtonTapped(Response)
+		case continueButtonTapped(P2P.Dapp.Request.Response)
 	}
 
 	enum InternalAction: Sendable, Equatable {
@@ -43,7 +40,7 @@ struct PersonaDataPermission: Sendable, FeatureReducer {
 
 	enum DelegateAction: Sendable, Equatable {
 		case personaUpdated(Profile.Network.Persona)
-		case continueButtonTapped(Response)
+		case continueButtonTapped(P2P.Dapp.Request.Response)
 	}
 
 	struct Destinations: Sendable, ReducerProtocol {

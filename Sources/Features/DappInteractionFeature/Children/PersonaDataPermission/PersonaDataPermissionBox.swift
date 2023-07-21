@@ -5,16 +5,16 @@ struct PersonaDataPermissionBox: Sendable, FeatureReducer {
 	struct State: Sendable, Hashable, Identifiable {
 		var id: Profile.Network.Persona.ID { persona.id }
 		let persona: Profile.Network.Persona
-		let requested: PersonaDataPermission.Request
-		let response: PersonaDataPermission.Response.Result
+		let requested: P2P.Dapp.Request.PersonaDataRequestItem
+		let result: P2P.Dapp.Request.ResponseResult
 
 		init(
 			persona: Profile.Network.Persona,
-			requested: PersonaDataPermission.Request
+			requested: P2P.Dapp.Request.PersonaDataRequestItem
 		) {
 			self.persona = persona
 			self.requested = requested
-			self.response = .init(request: requested, personaData: persona.personaData)
+			self.result = persona.personaData.response(for: requested)
 		}
 	}
 

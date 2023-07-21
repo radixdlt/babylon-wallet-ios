@@ -13,7 +13,7 @@ extension PersonaDataPermissionBox.State {
 				.joined(separator: "\n"),
 
 			missingRequiredEntries: { () -> Hint? in
-				switch response {
+				switch result {
 				case .success:
 					return nil
 				case let .failure(error):
@@ -21,7 +21,7 @@ extension PersonaDataPermissionBox.State {
 						Text {
 							L10n.DAppRequest.PersonalDataBox.requiredInformation.text.bold()
 							" "
-							error.missing.keys.sorted().map(\.title.localizedLowercase).joined(separator: ", ")
+							error.entries.keys.sorted().map(\.title.localizedLowercase).joined(separator: ", ")
 						}
 					}
 				}

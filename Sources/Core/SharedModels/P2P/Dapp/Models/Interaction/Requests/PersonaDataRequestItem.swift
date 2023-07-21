@@ -1,6 +1,7 @@
 import Prelude
 import Profile
 
+// MARK: - P2P.Dapp.Request.PersonaDataRequestItem
 extension P2P.Dapp.Request {
 	public struct PersonaDataRequestItem: Sendable, Hashable, Decodable {
 		public let isRequestingName: Bool?
@@ -17,23 +18,27 @@ extension P2P.Dapp.Request {
 			self.numberOfRequestedPhoneNumbers = numberOfRequestedPhoneNumbers
 		}
 
-//		public var requestedEntries: Set<PersonaData.Entry.Kind> {
-//			var result: Set<PersonaData.Entry.Kind> = []
-//			if isRequestingName == true {
-//				result.insert(.name)
-//			}
-//			if numberOfRequestedPhoneNumbers?.isValid == true {
-//				result.insert(.phoneNumber)
-//			}
-//			if numberOfRequestedEmailAddresses?.isValid == true {
-//				result.insert(.emailAddress)
-//			}
-//			return result
-//		}
+		public var requestedEntries: [PersonaData.Entry.Kind: RequestType] {
+			var result: [PersonaData.Entry.Kind: RequestType] = [:]
+			if isRequestingName == true {
+				result[.name] = .entry
+			}
+			if let numberOfRequestedPhoneNumbers, numberOfRequestedPhoneNumbers.isValid {
+				result[.phoneNumber] = .number(numberOfRequestedPhoneNumbers)
+			}
+			if let numberOfRequestedEmailAddresses, numberOfRequestedEmailAddresses.isValid {
+				result[.emailAddress] = .number(numberOfRequestedEmailAddresses)
+			}
+			return result
+		}
 	}
+}
+
+extension P2P.Dapp.Request {
+	public typealias Response = P2P.Dapp.Response.WalletInteractionSuccessResponse.PersonaDataRequestResponseItem
 
 	public struct RequestError: Error, Sendable, Hashable {
-		let entries: [PersonaData.Entry.Kind: EntryError]
+		public let entries: [PersonaData.Entry.Kind: EntryError]
 	}
 
 	public enum EntryError: Error, Sendable, Hashable {
@@ -47,14 +52,46 @@ extension P2P.Dapp.Request {
 	}
 }
 
+extension P2P.Dapp.Request.RequestType {
+	func validate(actualCount: Int) -> P2P.Dapp.Request.EntryError? {
+		switch self {
+		case .entry:
+			return actualCount == 0 ? .missingEntry : nil
+		case let .number(number):
+			return actualCount < number.quantity ? .missing(number.quantity - actualCount) : nil
+		}
+	}
+}
+
 extension PersonaData {
-	public func response(for request: P2P.Dapp.Request.PersonaDataRequestItem) -> Result<P2P.Dapp.Response.WalletInteractionSuccessResponse.PersonaDataRequestResponseItem, P2P.Dapp.Request.RequestError> {
+	public func missingEntries(for request: P2P.Dapp.Request.PersonaDataRequestItem) -> [PersonaData.Entry.Kind: P2P.Dapp.Request.EntryError] {
+		let existing = existingEntries(for: request)
+
+		var missing: [PersonaData.Entry.Kind: P2P.Dapp.Request.EntryError] = [:]
+		for (kind, request) in request.requestedEntries {
+			missing[kind] = request.validate(actualCount: existing[kind] ?? 0)
+		}
+
+		return missing
+	}
+
+	public func existingEntries(for request: P2P.Dapp.Request.PersonaDataRequestItem) -> [PersonaData.Entry.Kind: Int] {
+		var result: [PersonaData.Entry.Kind: Int] = [:]
+
+		result[.name] = name == nil ? 0 : 1
+		result[.phoneNumber] = phoneNumbers.count
+		result[.emailAddress] = emailAddresses.count
+
+		return result
+	}
+
+	public func response(for request: P2P.Dapp.Request.PersonaDataRequestItem) -> Result<P2P.Dapp.Request.Response, P2P.Dapp.Request.RequestError> {
 		var missing: [Entry.Kind: P2P.Dapp.Request.EntryError] = [:]
-		var result = P2P.Dapp.Response.WalletInteractionSuccessResponse.PersonaDataRequestResponseItem()
+		var response = P2P.Dapp.Request.Response()
 
 		if request.isRequestingName == true {
 			if let value = name?.value {
-				result.name = value
+				response.name = value
 			} else {
 				missing[.name] = .missingEntry
 			}
@@ -63,7 +100,7 @@ extension PersonaData {
 		if let emailsNumber = request.numberOfRequestedEmailAddresses {
 			switch emailAddresses.requestedValues(emailsNumber) {
 			case let .success(value):
-				result.emailAddresses = value
+				response.emailAddresses = value
 			case let .failure(error):
 				missing[.emailAddress] = error
 			}
@@ -72,13 +109,13 @@ extension PersonaData {
 		if let phoneNumbersNumber = request.numberOfRequestedPhoneNumbers {
 			switch phoneNumbers.requestedValues(phoneNumbersNumber) {
 			case let .success(value):
-				result.phoneNumbers = value
+				response.phoneNumbers = value
 			case let .failure(error):
 				missing[.emailAddress] = error
 			}
 		}
 
-		return missing.isEmpty ? .success(result) : .failure(.init(entries: missing))
+		return missing.isEmpty ? .success(response) : .failure(.init(entries: missing))
 	}
 }
 
