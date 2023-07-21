@@ -9,90 +9,31 @@ public struct EditPersonaEntries: Sendable, FeatureReducer {
 		var phoneNumber: EditPersonaEntry<EditPersonaDynamicField>.State?
 
 		init(with personaData: PersonaData, mode: EditPersona.State.Mode) {
-			func isRequestedByDap(_ kind: EntryKind) -> Bool {
-				if case let .dapp(requiredEntries) = mode {
-					return requiredEntries.contains(kind)
-				}
-				return false
-			}
+			let required = mode.requiredEntries
 
 			self.name = (personaData.name?.value).map {
-				let isRequestedByDapp = isRequestedByDap(.fullName)
-
-				return EditPersonaEntry<EditPersonaName>.State(
-					kind: .fullName,
-					isRequestedByDapp: isRequestedByDapp,
-					content: EditPersonaName.State(
-						with: $0,
-						isRequestedByDapp: isRequestedByDapp
-					)
-				)
+				.entry(name: $0, isRequestedByDapp: required.contains(.fullName))
 			}
-			self.emailAddress = (personaData.emailAddresses.first).map {
-				let isRequestedByDapp = isRequestedByDap(.emailAddress)
-
-				return EditPersonaEntry<EditPersonaDynamicField>.State(
-					kind: .emailAddress,
-					isRequestedByDapp: isRequestedByDapp,
-					content: .init(
-						id: .emailAddress,
-						text: $0.value.email,
-						isRequiredByDapp: isRequestedByDapp,
-						showsName: false
-					)
-				)
+			self.emailAddress = (personaData.emailAddresses.first).flatMap {
+				try? .singleFieldEntry(.emailAddress, text: $0.value.email, isRequestedByDapp: required.contains(.emailAddress))
 			}
-			self.phoneNumber = (personaData.phoneNumbers.first).map {
-				let isRequestedByDapp = isRequestedByDap(.phoneNumber)
-
-				return EditPersonaEntry<EditPersonaDynamicField>.State(
-					kind: .phoneNumber,
-					isRequestedByDapp: isRequestedByDapp,
-					content: .init(
-						id: .phoneNumber,
-						text: $0.value.number,
-						isRequiredByDapp: isRequestedByDapp,
-						showsName: false
-					)
-				)
+			self.phoneNumber = (personaData.phoneNumbers.first).flatMap {
+				try? .singleFieldEntry(.phoneNumber, text: $0.value.number, isRequestedByDapp: required.contains(.phoneNumber))
 			}
 
-			if case let .dapp(requiredEntries) = mode {
-				requiredEntries.forEach { kind in
-					switch kind {
-					case .fullName where self.name == nil:
-						self.name = .init(
-							kind: .fullName,
-							isRequestedByDapp: true,
-							content: .init(
-								with: .init(variant: .eastern, familyName: "", givenNames: ""),
-								isRequestedByDapp: true
-							)
-						)
-					case .emailAddress where self.emailAddress == nil:
-						self.emailAddress = .init(
-							kind: .emailAddress,
-							isRequestedByDapp: true,
-							content: .init(
-								id: .emailAddress,
-								text: "",
-								isRequiredByDapp: true,
-								showsName: false
-							)
-						)
-					case .phoneNumber where self.phoneNumber == nil:
-						self.phoneNumber = .init(
-							kind: .phoneNumber,
-							isRequestedByDapp: true,
-							content: .init(
-								id: .phoneNumber,
-								text: "",
-								isRequiredByDapp: true, showsName: false
-							)
-						)
-					default:
-						break
-					}
+			for kind in required {
+				switch kind {
+				case .fullName where self.name == nil:
+					self.name = .entry(isRequestedByDapp: true)
+
+				case .emailAddress where self.emailAddress == nil:
+					self.emailAddress = try? .singleFieldEntry(kind, isRequestedByDapp: true)
+
+				case .phoneNumber where self.phoneNumber == nil:
+					self.phoneNumber = try? .singleFieldEntry(kind, isRequestedByDapp: true)
+
+				default:
+					continue
 				}
 			}
 		}
@@ -106,22 +47,13 @@ public struct EditPersonaEntries: Sendable, FeatureReducer {
 
 	public var body: some ReducerProtocolOf<Self> {
 		Reduce(core)
-			.ifLet(
-				\.name,
-				action: /Action.child .. ChildAction.name
-			) {
+			.ifLet(\.name, action: /Action.child .. ChildAction.name) {
 				EditPersonaEntry<EditPersonaName>()
 			}
-			.ifLet(
-				\.emailAddress,
-				action: /Action.child .. ChildAction.emailAddress
-			) {
+			.ifLet(\.emailAddress, action: /Action.child .. ChildAction.emailAddress) {
 				EditPersonaEntry<EditPersonaDynamicField>()
 			}
-			.ifLet(
-				\.phoneNumber,
-				action: /Action.child .. ChildAction.phoneNumber
-			) {
+			.ifLet(\.phoneNumber, action: /Action.child .. ChildAction.phoneNumber) {
 				EditPersonaEntry<EditPersonaDynamicField>()
 			}
 	}

@@ -13,22 +13,21 @@ extension EditPersona {
 
 		var personaData: PersonaData {
 			var personaData = PersonaData()
-			name.map {
-				personaData.name = .init(
-					value: .init(
-						variant: $0.variant,
-						familyName: $0.family.input ?? "",
-						givenNames: $0.given.input ?? "",
-						nickname: $0.nickName.input
-					)
-				)
+
+			personaData.name = name.map {
+				.init(value: .init(
+					variant: $0.variant,
+					familyName: $0.family.input ?? "",
+					givenNames: $0.given.input ?? "",
+					nickname: $0.nickName.input
+				))
 			}
-			(emailAddress?.input).map {
-				personaData.emailAddresses = try! .init(collection: [.init(value: .init(email: $0))])
-			}
-			(phoneNumber?.input).map {
-				personaData.phoneNumbers = try! .init(collection: [.init(value: .init(number: $0))])
-			}
+
+			personaData.emailAddresses = (emailAddress?.input)
+				.flatMap { try? .init(collection: [.init(value: .init(email: $0))]) } ?? .init()
+
+			personaData.phoneNumbers = (phoneNumber?.input)
+				.flatMap { try? .init(collection: [.init(value: .init(number: $0))]) } ?? .init()
 
 			return personaData
 		}
@@ -56,11 +55,7 @@ public struct EditPersona: Sendable, FeatureReducer {
 		var destination: Destinations.State? = nil
 
 		var alreadyAddedEntryKinds: [PersonaData.Entry.Kind] {
-			[
-				entries.name.map { _ in .fullName },
-				entries.emailAddress.map { _ in .emailAddress },
-				entries.phoneNumber.map { _ in .phoneNumber },
-			].compactMap(identity)
+			[entries.name?.kind, entries.emailAddress?.kind, entries.phoneNumber?.kind].compactMap(identity)
 		}
 
 		public init(
@@ -123,20 +118,12 @@ public struct EditPersona: Sendable, FeatureReducer {
 	@Dependency(\.errorQueue) var errorQueue
 
 	public var body: some ReducerProtocolOf<Self> {
-		Scope(
-			state: \.labelField,
-			action: /Action.child .. ChildAction.labelField
-		) {
+		Scope(state: \.labelField, action: /Action.child .. ChildAction.labelField) {
 			EditPersonaField()
 		}
-
-		Scope(
-			state: \.entries,
-			action: /Action.child .. ChildAction.personaData
-		) {
+		Scope(state: \.entries, action: /Action.child .. ChildAction.personaData) {
 			EditPersonaEntries()
 		}
-
 		Reduce(core)
 			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
 				Destinations()
@@ -191,46 +178,19 @@ public struct EditPersona: Sendable, FeatureReducer {
 			return .fireAndForget { await dismiss() }
 
 		case let .destination(.presented(.addFields(.delegate(.addEntryKinds(fieldsToAdd))))):
-			fieldsToAdd.map(\.entry.kind).forEach { entryKind in
-				switch entryKind {
+			for kind in fieldsToAdd {
+				switch kind {
 				case .fullName:
-					state.entries.name = .init(
-						kind: entryKind,
-						isRequestedByDapp: false,
-						content: .init(
-							with: PersonaData.Name(
-								variant: .eastern,
-								familyName: "",
-								givenNames: ""
-							),
-							isRequestedByDapp: false
-						)
-					)
+					state.entries.name = .entry()
+
 				case .emailAddress:
-					state.entries.emailAddress = .init(
-						kind: entryKind,
-						isRequestedByDapp: false,
-						content: .init(
-							id: .emailAddress,
-							text: "",
-							isRequiredByDapp: false,
-							showsName: false
-						)
-					)
+					state.entries.emailAddress = try? .singleFieldEntry(kind)
 
 				case .phoneNumber:
-					state.entries.phoneNumber = .init(
-						kind: entryKind,
-						isRequestedByDapp: false,
-						content: .init(
-							id: .phoneNumber,
-							text: "",
-							isRequiredByDapp: false,
-							showsName: false
-						)
-					)
+					state.entries.phoneNumber = try? .singleFieldEntry(kind)
+
 				default:
-					fatalError()
+					continue
 				}
 			}
 			state.destination = nil
@@ -242,24 +202,23 @@ public struct EditPersona: Sendable, FeatureReducer {
 	}
 }
 
-extension EditPersona.State {
-	func hasChanges() -> Bool {
-		guard let output = viewState.output else { return false }
-		return output.personaLabel != persona.displayName
-			|| persona.personaData != output.personaData
+extension EditPersona.State.Mode {
+	var requiredEntries: Set<PersonaData.Entry.Kind> {
+		switch self {
+		case .edit:
+			return []
+		case let .dapp(requiredEntries):
+			return requiredEntries
+		}
 	}
 }
 
-// extension EditPersona.State.Mode {
-//	var requiredFields: Set<EditPersona.State.DynamicFieldID> {
-//		switch self {
-//		case .edit:
-//			return []
-//		case let .dapp(requested):
-//			return Set(requested.kindRequests.keys)
-//		}
-//	}
-// }
+extension EditPersona.State {
+	func hasChanges() -> Bool {
+		guard let output = viewState.output else { return false }
+		return output.personaLabel != persona.displayName || persona.personaData != output.personaData
+	}
+}
 
 extension Profile.Network.Persona {
 	fileprivate func updated(with output: EditPersona.Output) -> Self {
@@ -284,40 +243,43 @@ extension PersonaData.Entry {
 	}
 }
 
-extension PersonaData.Entry.Kind {
-	var entry: PersonaData.Entry {
-		switch self {
-		case .fullName:
-			return .name(.init(variant: .eastern, familyName: "", givenNames: ""))
-		case .dateOfBirth:
-			fallthrough
-		case .companyName:
-			fatalError()
+extension EditPersonaEntry<EditPersonaDynamicField>.State {
+	struct NotApplicableError: Error {}
+
+	static func singleFieldEntry(_ kind: PersonaData.Entry.Kind, text: String = "", isRequestedByDapp: Bool = false) throws -> Self {
+		switch kind {
+		case .fullName, .dateOfBirth, .companyName, .url, .postalAddress, .creditCard:
+			throw NotApplicableError()
 		case .emailAddress:
-			return .emailAddress(.init(email: ""))
-		case .url:
-			fatalError()
+			return .init(kind: .emailAddress, field: .emailAddress, text: text, isRequestedByDapp: isRequestedByDapp)
 		case .phoneNumber:
-			return .phoneNumber(.init(number: ""))
-		case .postalAddress:
-			fatalError()
-		case .creditCard:
-			fatalError()
+			return .init(kind: .phoneNumber, field: .phoneNumber, text: text, isRequestedByDapp: isRequestedByDapp)
 		}
+	}
+
+	private init(kind: PersonaData.Entry.Kind, field: DynamicFieldID, text: String, isRequestedByDapp: Bool) {
+		self.init(
+			kind: kind,
+			isRequestedByDapp: isRequestedByDapp,
+			content: .init(
+				id: field,
+				text: text,
+				isRequiredByDapp: isRequestedByDapp,
+				showsName: false
+			)
+		)
 	}
 }
 
-extension PersonaData.Entry {
-	var kind: Kind {
-		switch self {
-		case .name: return .fullName
-		case .dateOfBirth: return .dateOfBirth
-		case .companyName: return .companyName
-		case .emailAddress: return .emailAddress
-		case .phoneNumber: return .phoneNumber
-		case .url: return .url
-		case .postalAddress: return .postalAddress
-		case .creditCard: return .creditCard
-		}
+extension EditPersonaEntry<EditPersonaName>.State {
+	static func entry(
+		name: PersonaData.Name = .init(variant: .western, familyName: "", givenNames: ""),
+		isRequestedByDapp: Bool = false
+	) -> Self {
+		.init(
+			kind: .fullName,
+			isRequestedByDapp: isRequestedByDapp,
+			content: .init(with: name, isRequestedByDapp: isRequestedByDapp)
+		)
 	}
 }

@@ -24,11 +24,9 @@ public struct EditPersonaEntry<ContentReducer>: FeatureReducer where ContentRedu
 	public var body: some ReducerProtocolOf<Self> {
 		Reduce(core)
 
-		Scope(
-			state: \.content,
-			action: /Action.child .. ChildAction.content,
-			child: ContentReducer.init
-		)
+		Scope(state: \.content, action: /Action.child .. ChildAction.content) {
+			ContentReducer()
+		}
 	}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
