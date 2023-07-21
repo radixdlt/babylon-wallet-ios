@@ -246,7 +246,10 @@ extension EditPersona.State {
 	func hasChanges() -> Bool {
 		guard let output = viewState.output else { return false }
 		return output.personaLabel != persona.displayName
-			|| persona.personaData != output.personaData
+			// FIXME: Figure out some better way for diffing. Currently if we'd simply do `output.personaData != persona.personaData` we'd get `false` as `id`s would not match.
+			|| output.personaData.name?.value != persona.personaData.name?.value
+			|| output.personaData.emailAddresses.first?.value != persona.personaData.emailAddresses.first?.value
+			|| output.personaData.phoneNumbers.first?.value != persona.personaData.phoneNumbers.first?.value
 	}
 }
 
