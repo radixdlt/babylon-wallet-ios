@@ -326,7 +326,7 @@ extension PersonaDetails.View {
 				self.personaName = personaName
 				self.dateOfBirth = personaData?.dateOfBirth?.value.date
 				self.companyName = personaData?.companyName?.value.name
-				self.fullName = personaData?.name?.value.description
+				self.fullName = personaData?.name?.value.formatted
 				self.emailAddresses = personaData?.emailAddresses.map(\.value.email)
 				self.phoneNumbers = personaData?.phoneNumbers.map(\.value.number)
 				self.urls = personaData?.urls.map(\.value.url)

@@ -538,9 +538,9 @@
 			"name" : {
 			  "id" : "00000000-0000-0000-0000-000000000000",
 			  "value" : {
-				"family" : "Nakamoto",
-				"given" : "Satoshi",
-				"middle" : "Creator of Bitcoin",
+				"familyName" : "Nakamoto",
+				"givenNames" : "Satoshi",
+				"nickname" : "Bitcoin",
 				"variant" : "eastern"
 			  }
 			},
@@ -695,8 +695,8 @@
 			"name" : {
 			  "id" : "00000000-0000-0000-0000-0000000000FF",
 			  "value" : {
-				"family" : "Publicson",
-				"given" : "Maria",
+				"familyName" : "Publicson",
+				"givenNames" : "Maria",
 				"variant" : "western"
 			  }
 			},

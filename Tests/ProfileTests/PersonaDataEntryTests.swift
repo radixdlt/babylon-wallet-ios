@@ -267,9 +267,9 @@ final class PersonaFieldTests: TestCase {
 			"name": [
 				"id": "00000000-0000-0000-0000-000000000000",
 				"value": [
-					"family": "Nakamoto",
-					"given": "Satoshi",
-					"middle": "Creator of Bitcoin",
+					"familyName": "Nakamoto",
+					"givenNames": "Satoshi",
+					"nickname": "Bitcoin",
 					"variant": "eastern",
 				],
 			],

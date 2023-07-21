@@ -44,8 +44,8 @@ final class ToDappResponseTests: TestCase {
 					],
 					"oneTimePersonaData": [
 						"name": [
-							"given": "Percy",
-							"family": "Jackson",
+							"givenNames": "Percy",
+							"familyName": "Jackson",
 							"variant": "western",
 						],
 						"emailAddresses": [
