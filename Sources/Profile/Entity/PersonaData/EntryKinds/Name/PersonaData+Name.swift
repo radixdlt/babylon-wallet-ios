@@ -41,7 +41,11 @@ extension PersonaData {
 				case .eastern: return [familyName, givenNames]
 				}
 			}()
-			return components.joined(separator: " ")
+
+			let firstLine = components.joined(separator: " ")
+			return """
+			\(firstLine)\(nickname.map { "\n\($0)" } ?? "")
+			"""
 		}
 	}
 }
