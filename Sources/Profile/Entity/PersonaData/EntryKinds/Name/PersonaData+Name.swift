@@ -35,13 +35,27 @@ extension PersonaData {
 		}
 
 		public var description: String {
+			let components: [String?] = {
+				switch variant {
+				case .western: return [givenNames, nickname, familyName]
+				case .eastern: return [familyName, nickname, givenNames]
+				}
+			}()
+			return components.compactMap { $0 }.joined(separator: " ")
+		}
+
+		public var formatted: String {
 			let components: [String] = {
 				switch variant {
 				case .western: return [givenNames, familyName]
 				case .eastern: return [familyName, givenNames]
 				}
 			}()
-			return components.joined(separator: " ")
+
+			let firstLine = components.joined(separator: " ")
+			return """
+			\(firstLine)\(nickname.map { "\n\($0)" } ?? "")
+			"""
 		}
 	}
 }

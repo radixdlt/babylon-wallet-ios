@@ -202,6 +202,17 @@ public struct EditPersona: Sendable, FeatureReducer {
 	}
 }
 
+extension EditPersona.State {
+	func hasChanges() -> Bool {
+		guard let output = viewState.output else { return false }
+		return output.personaLabel != persona.displayName
+			// FIXME: Figure out some better way for diffing. Currently if we'd simply do `output.personaData != persona.personaData` we'd get `false` as `id`s would not match.
+			|| output.personaData.name?.value != persona.personaData.name?.value
+			|| output.personaData.emailAddresses.first?.value != persona.personaData.emailAddresses.first?.value
+			|| output.personaData.phoneNumbers.first?.value != persona.personaData.phoneNumbers.first?.value
+	}
+}
+
 extension EditPersona.State.Mode {
 	var requiredEntries: Set<PersonaData.Entry.Kind> {
 		switch self {
@@ -210,13 +221,6 @@ extension EditPersona.State.Mode {
 		case let .dapp(requiredEntries):
 			return requiredEntries
 		}
-	}
-}
-
-extension EditPersona.State {
-	func hasChanges() -> Bool {
-		guard let output = viewState.output else { return false }
-		return output.personaLabel != persona.displayName || persona.personaData != output.personaData
 	}
 }
 

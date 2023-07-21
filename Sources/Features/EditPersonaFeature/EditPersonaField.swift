@@ -219,14 +219,7 @@ extension EditPersonaDynamicField.State {
 						return nil
 					}
 				}(),
-				rules: .build {
-					if isRequiredByDapp {
-						.if(\.isBlank, error: L10n.EditPersona.Error.requiredByDapp)
-					}
-					if id == .emailAddress {
-						.unless(\.isEmailAddress, error: L10n.EditPersona.Error.invalidEmailAddress)
-					}
-				}
+				rules: []
 			),
 			isRequestedByDapp: isRequiredByDapp,
 			showsName: showsName
