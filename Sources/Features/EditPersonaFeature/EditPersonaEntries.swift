@@ -65,7 +65,7 @@ public struct EditPersonaEntries: Sendable, FeatureReducer {
 							kind: .fullName,
 							isRequestedByDapp: true,
 							content: .init(
-								with: .init(variant: .eastern, familyName: "", givenNames: ""),
+								with: .init(variant: .eastern, familyName: "", givenNames: "", nickname: ""),
 								isRequestedByDapp: true
 							)
 						)
