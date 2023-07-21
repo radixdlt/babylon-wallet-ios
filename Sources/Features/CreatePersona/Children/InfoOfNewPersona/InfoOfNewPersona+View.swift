@@ -16,6 +16,7 @@ extension NewPersonaInfo {
 		public let focusedInputField: State.InputField?
 
 		public struct SanitizedNameRequirement: Equatable {
+			// FIXME: Allow input of `PersonaData`!
 			public let sanitizedName: NonEmptyString
 		}
 

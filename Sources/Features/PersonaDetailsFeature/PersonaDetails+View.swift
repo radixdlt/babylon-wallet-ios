@@ -291,7 +291,16 @@ private extension PersonaDetails.View.InfoSection.ViewState {
 	init(
 		dAppInfo: DappInfo?,
 		personaName: String
+//		fields: IdentifiedArrayOf<Profile.Network.Persona.Field>
 	) {
+//		self.init(
+//			dAppInfo: dAppInfo,
+//			personaName: personaName,
+//			firstName: fields[id: .givenName]?.value.rawValue,
+//			lastName: fields[id: .familyName]?.value.rawValue,
+//			emailAddress: fields[id: .emailAddress]?.value.rawValue,
+//			phoneNumber: fields[id: .phoneNumber]?.value.rawValue
+//		)
 		fatalError()
 	}
 }
@@ -369,6 +378,7 @@ extension PersonaDetails.View {
 						}
 
 						if let dateOfBirth = viewStore.dateOfBirth {
+							// FIXME: YES Localize, but... the WHOLE design of this WHOLE view have to change...
 							VPair(heading: "Date of birth", item: dateOfBirth.ISO8601Format())
 						}
 

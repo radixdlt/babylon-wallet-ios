@@ -69,6 +69,12 @@ public struct EditPersona: Sendable, FeatureReducer {
 				id: .personaLabel,
 				initial: persona.displayName.rawValue
 			)
+
+//			if case let .dapp(requiredFieldIDs) = mode {
+//				for requiredFieldID in requiredFieldIDs where dynamicFields[id: requiredFieldID] == nil {
+//					dynamicFields.append(.init(id: requiredFieldID, initial: nil, isRequiredByDapp: true))
+//				}
+//			}
 		}
 	}
 

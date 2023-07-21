@@ -96,31 +96,3 @@ extension PersonaDataPermissionBox {
 		}
 	}
 }
-
-//
-// #if DEBUG
-// import SwiftUI // NB: necessary for previews to appear
-//
-// struct PersonaDataPermissionBox_PreviewProvider: PreviewProvider {
-//	static var previews: some View {
-//		WithState(initialValue: false) { $isSelected in
-//			PersonaDataPermissionBox.View(
-//				store: Store(
-//					initialState: .init(
-//						persona: .previewValue0,
-//						requiredFieldIDs: [.givenName, .emailAddress]
-//					),
-//					reducer: PersonaDataPermissionBox()
-//				),
-//				action: { isSelected.toggle() }
-//			) {
-//				RadioButton(
-//					appearance: .dark,
-//					state: isSelected ? .selected : .unselected
-//				)
-//			}
-//			.padding()
-//		}
-//	}
-// }
-// #endif
