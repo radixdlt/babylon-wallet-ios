@@ -30,7 +30,7 @@ extension NonFungibleAssetList {
 		}
 
 		public enum DelegateAction: Sendable, Equatable {
-			case open(NonFungibleLocalId)
+			case open(NonFungibleGlobalId)
 		}
 
 		public init() {}

@@ -255,7 +255,7 @@ extension AssetTransfer {
 	) throws -> String {
 		// FIXME: Temporary and ugly, until the RET provides the manifest builder
 		let localIds = try String(resource.allTokens.map {
-			try "NonFungibleLocalId(\"\($0.id.toString())\")"
+			try "NonFungibleLocalId(\"\($0.id.localId().toString())\")"
 		}.joined(by: ","))
 
 		let accountWithdrawals = """
@@ -268,7 +268,7 @@ extension AssetTransfer {
 		let deposits: [String] = try resource.accounts.map { account in
 			let bucket = UUID().uuidString
 			let localIds = try String(account.tokens.map {
-				try "NonFungibleLocalId(\"\($0.id.toString())\")"
+				try "NonFungibleLocalId(\"\($0.id.localId().toString())\")"
 			}.joined(by: ","))
 
 			return """

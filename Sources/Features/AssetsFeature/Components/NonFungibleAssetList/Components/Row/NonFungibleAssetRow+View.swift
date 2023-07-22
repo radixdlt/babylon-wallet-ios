@@ -79,7 +79,7 @@ extension NonFungibleAssetList.Row.View {
 		let isDisabled = viewStore.disabled.contains(asset.id)
 		HStack {
 			NFTIDView(
-				id: asset.id.toUserFacingString(),
+				id: asset.id.localId().toUserFacingString(),
 				name: asset.name,
 				description: asset.description,
 				thumbnail: viewStore.isExpanded ? asset.keyImageURL : nil
