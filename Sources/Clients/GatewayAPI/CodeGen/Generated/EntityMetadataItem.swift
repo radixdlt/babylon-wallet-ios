@@ -21,18 +21,21 @@ public struct EntityMetadataItem: Codable, Hashable {
     /** Entity metadata key. */
     public private(set) var key: String
     public private(set) var value: EntityMetadataItemValue
+    public private(set) var isLocked: Bool
     /** TBD */
     public private(set) var lastUpdatedAtStateVersion: Int64
 
-    public init(key: String, value: EntityMetadataItemValue, lastUpdatedAtStateVersion: Int64) {
+    public init(key: String, value: EntityMetadataItemValue, isLocked: Bool, lastUpdatedAtStateVersion: Int64) {
         self.key = key
         self.value = value
+        self.isLocked = isLocked
         self.lastUpdatedAtStateVersion = lastUpdatedAtStateVersion
     }
 
     public enum CodingKeys: String, CodingKey, CaseIterable {
         case key
         case value
+        case isLocked = "is_locked"
         case lastUpdatedAtStateVersion = "last_updated_at_state_version"
     }
 
@@ -42,6 +45,7 @@ public struct EntityMetadataItem: Codable, Hashable {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(key, forKey: .key)
         try container.encode(value, forKey: .value)
+        try container.encode(isLocked, forKey: .isLocked)
         try container.encode(lastUpdatedAtStateVersion, forKey: .lastUpdatedAtStateVersion)
     }
 }

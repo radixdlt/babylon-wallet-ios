@@ -48,7 +48,6 @@ extension SignalingClient.IncomingMessage: Decodable {
 
 		switch responseType {
 		case .fromRemoteClient:
-			let encryptionKey = decoder.userInfo[.clientMessageEncryptonKey] as! SignalingClient.EncryptionKey
 			let message = try container.decode(SignalingClient.ClientMessage.self, forKey: .message)
 			let remoteClientId = try container.decode(RemoteClientID.self, forKey: .remoteClientId)
 			self = .fromRemoteClient(.init(remoteClientId: remoteClientId, message: message))

@@ -17,25 +17,21 @@ extension GatewayAPI {
 
 public struct EntityMetadataItemValueAllOf: Codable, Hashable {
 
-    public private(set) var asString: String?
-    public private(set) var asStringCollection: [String]?
+    public private(set) var typed: MetadataTypedValue?
 
-    public init(asString: String? = nil, asStringCollection: [String]? = nil) {
-        self.asString = asString
-        self.asStringCollection = asStringCollection
+    public init(typed: MetadataTypedValue? = nil) {
+        self.typed = typed
     }
 
     public enum CodingKeys: String, CodingKey, CaseIterable {
-        case asString = "as_string"
-        case asStringCollection = "as_string_collection"
+        case typed
     }
 
     // Encodable protocol methods
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encodeIfPresent(asString, forKey: .asString)
-        try container.encodeIfPresent(asStringCollection, forKey: .asStringCollection)
+        try container.encodeIfPresent(typed, forKey: .typed)
     }
 }
 

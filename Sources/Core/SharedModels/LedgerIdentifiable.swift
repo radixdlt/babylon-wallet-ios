@@ -28,14 +28,14 @@ public enum LedgerIdentifiable: Sendable {
 extension LedgerIdentifiable {
 	public enum Identifier: Sendable {
 		case transaction(TXID)
-		case nonFungibleGlobalID(AccountPortfolio.NonFungibleResource.GlobalID)
+		case nonFungibleGlobalID(NonFungibleGlobalId)
 
 		public var address: String {
 			switch self {
 			case let .transaction(txId):
-				return txId.rawValue
+				return txId.asStr()
 			case let .nonFungibleGlobalID(nonFungibleGlobalId):
-				return nonFungibleGlobalId
+				return nonFungibleGlobalId.asStr()
 			}
 		}
 

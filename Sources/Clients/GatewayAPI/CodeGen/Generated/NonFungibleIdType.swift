@@ -19,6 +19,6 @@ public enum NonFungibleIdType: String, Codable, CaseIterable {
     case string = "String"
     case integer = "Integer"
     case bytes = "Bytes"
-    case uuid = "Uuid"
+    case ruid = "Ruid"
 }
 }

@@ -1,6 +1,7 @@
 import AsyncExtensions
 import CryptoKit
 import Foundation
+import GatewaysClient
 import Prelude
 import SharedModels
 
@@ -377,7 +378,7 @@ extension RTCClient {
 			.receivedMessagesStream()
 			.map { (messageResult: Result<DataChannelClient.AssembledMessage, Error>) in
 				let route = P2P.RTCRoute(connectionId: self.id, peerConnectionId: connection.id)
-				return P2P.RTCIncomingMessage(
+				return await P2P.RTCIncomingMessage(
 					result: decode(messageResult),
 					route: .rtc(route)
 				)
@@ -400,8 +401,11 @@ extension RTCClient {
 // this ugliness will become less ugly!
 func decode(
 	_ messageResult: Result<DataChannelClient.AssembledMessage, Error>
-) -> Result<P2P.RTCMessageFromPeer, Error> {
+) async -> Result<P2P.RTCMessageFromPeer, Error> {
+	@Dependency(\.gatewaysClient) var gatewaysClient
+	let currentNetwork = await gatewaysClient.getCurrentNetworkID()
 	let jsonDecoder = JSONDecoder()
+	jsonDecoder.userInfo[.networkIdKey] = currentNetwork.rawValue
 
 	return messageResult.flatMap { (message: DataChannelClient.AssembledMessage) in
 

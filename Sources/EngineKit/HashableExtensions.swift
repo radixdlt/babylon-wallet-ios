@@ -80,9 +80,6 @@ extension Instruction: Hashable {
 		case let .pushToAuthZone(proofId):
 			hasher.combine("pushToAuthZone")
 			hasher.combine(proofId)
-		case let .createProofFromAuthZone(resourceAddress):
-			hasher.combine("createProofFromAuthZone")
-			hasher.combine(resourceAddress)
 		case let .createProofFromAuthZoneOfAmount(resourceAddress, amount):
 			hasher.combine("createProofFromAuthZoneOfAmount")
 			hasher.combine(resourceAddress)
@@ -94,9 +91,6 @@ extension Instruction: Hashable {
 		case let .createProofFromAuthZoneOfAll(resourceAddress):
 			hasher.combine("createProofFromAuthZoneOfAll")
 			hasher.combine(resourceAddress)
-		case let .createProofFromBucket(bucketId):
-			hasher.combine("createProofFromBucket")
-			hasher.combine(bucketId)
 		case let .createProofFromBucketOfAmount(bucketId, amount):
 			hasher.combine("createProofFromBucketOfAmount")
 			hasher.combine(bucketId)
@@ -143,10 +137,18 @@ extension Instruction: Hashable {
 			hasher.combine(address)
 			hasher.combine(methodName)
 			hasher.combine(args)
-		case let .recallResource(vaultId, amount):
-			hasher.combine("recallResource")
-			hasher.combine(vaultId)
-			hasher.combine(amount)
+		case let .assertWorktopContainsAny(resourceAddress):
+			hasher.combine("assertWorktopContainsAny")
+			hasher.combine(resourceAddress)
+		case let .callDirectVaultMethod(address, methodName, args):
+			hasher.combine("callDirectVaultMethod")
+			hasher.combine(address)
+			hasher.combine(methodName)
+			hasher.combine(args)
+		case let .allocateGlobalAddress(packageAddress, blueprintName):
+			hasher.combine("allocateGlobalAddress")
+			hasher.combine(packageAddress)
+			hasher.combine(blueprintName)
 		}
 	}
 
@@ -171,15 +173,11 @@ extension Instruction: Hashable {
 			return true
 		case let (.pushToAuthZone(lhs), .pushToAuthZone(rhs)):
 			return lhs == rhs
-		case let (.createProofFromAuthZone(lhs), .createProofFromAuthZone(rhs)):
-			return lhs == rhs
 		case let (.createProofFromAuthZoneOfAmount(lhsAddress, lhsAmount), .createProofFromAuthZoneOfAmount(rhsAddress, rhsAmount)):
 			return lhsAddress == rhsAddress && lhsAmount == rhsAmount
 		case let (.createProofFromAuthZoneOfNonFungibles(lhsAddress, lhsIds), .createProofFromAuthZoneOfNonFungibles(rhsAddress, rhsIds)):
 			return lhsAddress == rhsAddress && lhsIds == rhsIds
 		case let (.createProofFromAuthZoneOfAll(lhs), .createProofFromAuthZoneOfAll(rhs)):
-			return lhs == rhs
-		case let (.createProofFromBucket(lhs), .createProofFromBucket(rhs)):
 			return lhs == rhs
 		case let (.burnResource(lhs), .burnResource(rhs)):
 			return lhs == rhs
@@ -189,8 +187,6 @@ extension Instruction: Hashable {
 			return lhs == rhs
 		case let (.createProofFromBucketOfAmount(lhsBucketId, lhsAmount), .createProofFromBucketOfAmount(rhsBucketId, rhsAmount)):
 			return lhsBucketId == rhsBucketId && lhsAmount == rhsAmount
-		case let (.recallResource(lhsAddress, lhsAmount), .recallResource(rhsAddress, rhsAmount)):
-			return lhsAddress == rhsAddress && lhsAmount == rhsAmount
 		case let (.createProofFromBucketOfNonFungibles(lhsBucketId, lhsIds), .createProofFromBucketOfNonFungibles(rhsBucketId, rhsIds)):
 			return lhsBucketId == rhsBucketId && lhsIds == rhsIds
 		case let (.createProofFromBucketOfAll(lhs), .createProofFromBucketOfAll(rhs)):
@@ -342,6 +338,9 @@ extension ManifestValue: Hashable {
 			hasher.combine(value)
 		case let .nonFungibleLocalIdValue(value):
 			hasher.combine("nonFungibleLocalIdValue")
+			hasher.combine(value)
+		case let .addressReservationValue(value):
+			hasher.combine("addressReservationValue")
 			hasher.combine(value)
 		}
 	}
@@ -586,28 +585,52 @@ extension Resources: Hashable {
 	}
 }
 
-// MARK: - Source + Hashable
-extension Source: Hashable {
-	public func hash(into hasher: inout Hasher) {
-		switch self {
-		case let .guaranteed(value):
-			hasher.combine("guaranteed")
-			hasher.combine(value)
-		case let .predicted(instructionIndex, value):
-			hasher.combine("predicted")
-			hasher.combine(instructionIndex)
-			hasher.combine(value)
+// MARK: - ResourceTracker + Hashable
+extension ResourceTracker: Hashable {
+	public static func == (lhs: ResourceTracker, rhs: ResourceTracker) -> Bool {
+		switch (lhs, rhs) {
+		case let (.fungible(lhsAddress, lhsAmount), .fungible(rhsAddress, rhsAmount)):
+			return lhsAddress == rhsAddress && lhsAmount == rhsAmount
+		case let (.nonFungible(lhsAddress, lhsAmount, lhsIds), .nonFungible(rhsAddress, rhsAmount, rhsIds)):
+			return lhsAddress == rhsAddress && lhsAmount == rhsAmount && lhsIds == rhsIds
+		default:
+			return false
 		}
 	}
 
-	public static func == (lhs: Source, rhs: Source) -> Bool {
+	public func hash(into hasher: inout Hasher) {
+		switch self {
+		case let .fungible(resourceAddress, amount):
+			hasher.combine(resourceAddress)
+			hasher.combine(amount)
+		case let .nonFungible(resourceAddress, amount, ids):
+			hasher.combine(resourceAddress)
+			hasher.combine(amount)
+			hasher.combine(ids)
+		}
+	}
+}
+
+// MARK: - DecimalSource + Hashable
+extension DecimalSource: Hashable {
+	public static func == (lhs: DecimalSource, rhs: DecimalSource) -> Bool {
 		switch (lhs, rhs) {
 		case let (.guaranteed(lhsValue), .guaranteed(rhsValue)):
 			return lhsValue == rhsValue
-		case let (.predicted(lhsIndex, lhsValue), .predicted(rhsIndex, rhsValue)):
-			return lhsIndex == rhsIndex && lhsValue == rhsValue
+		case let (.predicted(lhsInstructionIndex, lhsValue), .predicted(rhsInstructionIndex, rhsValue)):
+			return lhsInstructionIndex == rhsInstructionIndex && lhsValue == rhsValue
 		default:
 			return false
+		}
+	}
+
+	public func hash(into hasher: inout Hasher) {
+		switch self {
+		case let .guaranteed(value):
+			hasher.combine(value)
+		case let .predicted(instructionIndex, value):
+			hasher.combine(instructionIndex)
+			hasher.combine(value)
 		}
 	}
 }
@@ -784,5 +807,41 @@ extension MetadataValue: Hashable {
 			hasher.combine("publicKeyHashArrayValue")
 			hasher.combine(value)
 		}
+	}
+}
+
+// MARK: - ManifestAddress + Hashable
+extension ManifestAddress: Hashable {
+	public static func == (lhs: ManifestAddress, rhs: ManifestAddress) -> Bool {
+		switch (lhs, rhs) {
+		case let (.named(lhs), .named(rhs)):
+			return lhs == rhs
+		case let (.static(lhs), .static(rhs)):
+			return lhs == rhs
+		default:
+			return false
+		}
+	}
+
+	public func hash(into hasher: inout Hasher) {
+		switch self {
+		case let .named(value):
+			hasher.combine("named")
+			hasher.combine(value)
+		case let .static(value):
+			hasher.combine("static")
+			hasher.combine(value)
+		}
+	}
+}
+
+// MARK: - TransactionHash + Hashable
+extension TransactionHash: Hashable {
+	public static func == (lhs: TransactionHash, rhs: TransactionHash) -> Bool {
+		lhs.asStr() == rhs.asStr()
+	}
+
+	public func hash(into hasher: inout Hasher) {
+		hasher.combine(asStr())
 	}
 }

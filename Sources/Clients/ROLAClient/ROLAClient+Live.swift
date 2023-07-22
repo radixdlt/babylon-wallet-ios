@@ -173,7 +173,7 @@ func payloadToHash(
 	)
 }
 
-extension PublicKeyHash {
+extension EngineKit.PublicKeyHash {
 	public struct InvalidPublicKeyHashLength: Error {
 		public let got: Int
 		public let expected: Int
@@ -192,54 +192,27 @@ extension PublicKeyHash {
 
 		switch publicKey {
 		case .ecdsaSecp256k1:
-			self = .ecdsaSecp256k1(value: hashBytes.bytes)
+			self = .secp256k1(value: hashBytes.bytes)
 		case .eddsaEd25519:
-			self = .eddsaEd25519(value: hashBytes.bytes)
+			self = .ed25519(value: hashBytes.bytes)
 		}
 	}
 }
 
 extension GatewayAPI.EntityMetadataCollection {
-	// FIXME: change to using hashes, which will happen... soon. Which will clean up this
-	// terrible parsing mess.
 	public func ownerKeyHashes() throws -> [PublicKeyHash]? {
-		guard let response = items[customKey: "owner_keys"]?.asStringCollection else {
+		guard let response = ownerKeys else {
 			return nil
 		}
 
-		let curve25519Prefix = "EddsaEd25519PublicKeyHash"
-		let secp256k1Prefix = "EcdsaSecp256k1PublicKeyHash"
-
-		let regex = Regex {
-			Capture {
-				ChoiceOf {
-					curve25519Prefix
-					secp256k1Prefix
-				}
-			}
-			"(\""
-			Capture {
-				OneOrMore {
-					CharacterClass.hexDigit
-				}
-			}
-			"\")"
-		}
-
-		return try response.compactMap { elem -> PublicKeyHash? in
-			guard let output = try regex.wholeMatch(in: elem)?.output else {
-				return nil
-			}
-
-			let (_, hashType, hash) = output
-
-			let bytes = try [UInt8].init(hex: String(hash))
-			if hashType == curve25519Prefix {
-				return .eddsaEd25519(value: bytes)
-			} else if hashType == secp256k1Prefix {
-				return .ecdsaSecp256k1(value: bytes)
-			} else {
-				return nil
+		return try response.compactMap { hash in
+			switch hash {
+			case let .ecdsaSecp256k1(value):
+				let bytes = try [UInt8].init(hex: value.hashHex)
+				return .secp256k1(value: bytes)
+			case let .eddsaEd25519(value):
+				let bytes = try [UInt8].init(hex: value.hashHex)
+				return .ed25519(value: bytes)
 			}
 		}
 	}

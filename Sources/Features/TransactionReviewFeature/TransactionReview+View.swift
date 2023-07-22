@@ -17,11 +17,19 @@ extension View {
 extension TransactionReview.State {
 	var viewState: TransactionReview.ViewState {
 		.init(
-			message: message,
+			message: {
+				// TODO: handle the rest of types
+				if case let .plainText(value) = message,
+				   case let .str(str) = value.message
+				{
+					return str
+				}
+				return nil
+			}(),
 			isExpandedDappUsed: dAppsUsed?.isExpanded == true,
 			showDepositsHeading: deposits != nil,
 			viewControlState: viewControlState,
-			showDottedLine: (withdrawals != nil || message != nil) && deposits != nil,
+			showDottedLine: (withdrawals != nil || message != .none) && deposits != nil,
 			rawTransaction: displayMode.rawTransaction,
 			showApproveButton: transactionManifestWithLockFee != nil,
 			canApproveTX: canApproveTX,

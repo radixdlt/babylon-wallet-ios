@@ -60,6 +60,7 @@ extension TransactionClient {
 	public struct PrepareForSigningRequest: Equatable, Sendable {
 		public let nonce: Nonce
 		public let manifest: TransactionManifest
+		public let message: Message
 		public let feePayer: Profile.Network.Account
 		public let networkID: NetworkID
 		public let purpose: SigningPurpose
@@ -70,6 +71,7 @@ extension TransactionClient {
 		public init(
 			nonce: Nonce,
 			manifest: TransactionManifest,
+			message: Message,
 			networkID: NetworkID,
 			feePayer: Profile.Network.Account,
 			purpose: SigningPurpose,
@@ -77,6 +79,7 @@ extension TransactionClient {
 		) {
 			self.nonce = nonce
 			self.manifest = manifest
+			self.message = message
 			self.networkID = networkID
 			self.feePayer = feePayer
 			self.purpose = purpose

@@ -95,11 +95,11 @@ extension Instructions {
 	}
 
 	static func faucetAddress(networkID: NetworkID) -> EngineToolkit.Address {
-		utilsKnownAddresses(networkId: networkID.rawValue).componentAddresses.faucet
+		knownAddresses(networkId: networkID.rawValue).componentAddresses.faucet
 	}
 
 	static func from(rawInstructions: [String], network: NetworkID) throws -> Instructions {
-		try .fromString(string: rawInstructions.joined(separator: "\n"), blobs: [], networkId: network.rawValue)
+		try .fromString(string: rawInstructions.joined(separator: "\n"), networkId: network.rawValue)
 	}
 
 	static func createFungibleToken(
@@ -108,7 +108,7 @@ extension Instructions {
 	) throws -> Instructions {
 		let instructions: [String] = [
 			Instruction.fungibleWithInitialSupplyInstruction(),
-			Instruction.depositBatch(account: account),
+			Instruction.tryDepositBatchOrAbort(componentAddress: account.asGeneral()),
 		]
 		return try .from(rawInstructions: instructions, network: network).withLockFeeCallMethodAdded(address: account.asGeneral())
 	}
@@ -117,7 +117,7 @@ extension Instructions {
 		account: AccountAddress,
 		network: NetworkID
 	) throws -> Instructions {
-		let instructions = [String](repeating: Instruction.fungibleWithInitialSupplyInstruction(), count: 20) + [Instruction.depositBatch(account: account)]
+		let instructions = [String](repeating: Instruction.fungibleWithInitialSupplyInstruction(), count: 20) + [Instruction.tryDepositBatchOrAbort(componentAddress: account.asGeneral())]
 		return try .from(rawInstructions: instructions, network: network).withLockFeeCallMethodAdded(address: account.asGeneral())
 	}
 
@@ -125,7 +125,7 @@ extension Instructions {
 		account: AccountAddress,
 		network: NetworkID
 	) throws -> Instructions {
-		let instructions = [String](repeating: Instruction.noFungibleWithInitialSupplyInstruction(), count: 10) + [Instruction.depositBatch(account: account)]
+		let instructions = [String](repeating: Instruction.noFungibleWithInitialSupplyInstruction(), count: 10) + [Instruction.tryDepositBatchOrAbort(componentAddress: account.asGeneral())]
 		return try .from(rawInstructions: instructions, network: network).withLockFeeCallMethodAdded(address: account.asGeneral())
 	}
 
@@ -135,7 +135,7 @@ extension Instructions {
 	) throws -> Instructions {
 		let instructions: [String] = [
 			Instruction.noFungibleWithInitialSupplyInstruction(),
-			Instruction.depositBatch(account: account),
+			Instruction.tryDepositBatchOrAbort(componentAddress: account.asGeneral()),
 		]
 		return try .from(rawInstructions: instructions, network: network).withLockFeeCallMethodAdded(address: account.asGeneral())
 	}
@@ -165,7 +165,7 @@ extension Instruction {
 		address: Address,
 		fee: String = "10"
 	) throws -> Instruction {
-		try .callMethod(address: .init(address: address.address), methodName: "lock_fee", args: .tupleValue(fields: [.decimalValue(value: .init(value: fee))]))
+		try .callMethod(address: .static(value: .init(address: address.address)), methodName: "lock_fee", args: .tupleValue(fields: [.decimalValue(value: .init(value: fee))]))
 	}
 
 	static func depositBatch(account: AccountAddress) -> String {
@@ -216,20 +216,53 @@ extension Instruction {
 
 	static func fungibleWithInitialSupplyInstruction() -> String {
 		"""
-		                CREATE_FUNGIBLE_RESOURCE_WITH_INITIAL_SUPPLY
-		                    18u8
-		                    Map<String, Enum>(
-		                        "name" => Enum<Metadata::String>("MyResource"),
-		                        "symbol" => Enum<Metadata::String>("VIP"),
-		                        "description" => Enum<Metadata::String>("A very innovative and important resource"),
-		                        "icon_url" => Enum<Metadata::String>("https://i.imgur.com/9YQ9Z0x.png")
-		                    )
-		                    Map<Enum, Tuple>(
-
-		                        Enum<ResourceMethodAuthKey::Withdraw>() => Tuple(Enum<AccessRule::AllowAll>(), Enum<AccessRule::DenyAll>()),
-		                        Enum<ResourceMethodAuthKey::Deposit>() => Tuple(Enum<AccessRule::AllowAll>(), Enum<AccessRule::DenyAll>())
-		                    )
-		                    Decimal("10000");
+		CREATE_FUNGIBLE_RESOURCE_WITH_INITIAL_SUPPLY
+		    # Owner role - This gets metadata permissions, and is the default for other permissions
+		    # Can set as Enum<OwnerRole::Fixed>(access_rule)  or Enum<OwnerRole::Updatable>(access_rule)
+		    Enum<OwnerRole::None>()
+		    true             # Whether the engine should track supply (avoid for massively parallelizable tokens)
+		    18u8             # Divisibility (between 0u8 and 18u8)
+		    Decimal("100") # Initial supply
+		    Tuple(
+		        Some(         # Mint Roles (if None: defaults to DenyAll, DenyAll)
+		            Tuple(
+		                Some(Enum<AccessRule::AllowAll>()),  # Minter (if None: defaults to Owner)
+		                Some(Enum<AccessRule::DenyAll>())    # Minter Updater (if None: defaults to Owner)
+		            )
+		        ),
+		        None,        # Burn Roles (if None: defaults to DenyAll, DenyAll)
+		        None,        # Freeze Roles (if None: defaults to DenyAll, DenyAll)
+		        None,        # Recall Roles (if None: defaults to DenyAll, DenyAll)
+		        None,        # Withdraw Roles (if None: defaults to AllowAll, DenyAll)
+		        None         # Deposit Roles (if None: defaults to AllowAll, DenyAll)
+		    )
+		    Tuple(                                                                   # Metadata initialization
+		        Map<String, Tuple>(                                                  # Initial metadata values
+		            "name" => Tuple(
+		                Some(Enum<Metadata::String>("MyResource")),    # Resource Name
+		                true                                                         # Locked
+		            ),
+		            "symbol" => Tuple(
+		                Some(Enum<Metadata::String>("VIP")),
+		                true
+		            ),
+		            "description" => Tuple(
+		                Some(Enum<Metadata::String>("A very innovative and important resource")),
+		                true
+		            ),
+		            "icon_url" => Tuple(
+		              Some(Enum<Metadata::String>("https://i.imgur.com/9YQ9Z0x.png")),
+		              true
+		            )
+		        ),
+		        Map<String, Enum>(                                                   # Metadata roles
+		            "metadata_setter" => Some(Enum<AccessRule::AllowAll>()),         # Metadata setter role
+		            "metadata_setter_updater" => None,                               # Metadata setter updater role as None defaults to OWNER
+		            "metadata_locker" => Some(Enum<AccessRule::DenyAll>()),          # Metadata locker role
+		            "metadata_locker_updater" => None                                # Metadata locker updater role as None defaults to OWNER
+		        )
+		    )
+		    None;             # No Address Reservation
 		"""
 	}
 
@@ -388,14 +421,14 @@ extension PublicKeyHash {
 	/// https://rdxworks.slack.com/archives/C031A0V1A1W/p1683275008777499?thread_ts=1683221252.228129&cid=C031A0V1A1W
 	var discriminator: String {
 		switch self {
-		case .ecdsaSecp256k1: return "0u8"
-		case .eddsaEd25519: return "1u8"
+		case .secp256k1: return "0u8"
+		case .ed25519: return "1u8"
 		}
 	}
 
 	func bytes() throws -> [UInt8] {
 		switch self {
-		case let .ecdsaSecp256k1(value), let .eddsaEd25519(value):
+		case let .secp256k1(value), let .ed25519(value):
 			return value
 		}
 	}

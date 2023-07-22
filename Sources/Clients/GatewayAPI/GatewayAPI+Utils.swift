@@ -44,6 +44,28 @@ extension GatewayAPI.StateEntityDetailsResponseItemDetails {
 	}
 }
 
+extension GatewayAPI.EntityMetadataItemValue {
+	public var asString: String? {
+		typed?.stringValue?.value
+	}
+
+	public var asStringCollection: [String]? {
+		typed?.stringArrayValue?.values
+	}
+
+	public var asURL: URL? {
+		(typed?.urlValue?.value).flatMap(URL.init)
+	}
+
+	public var asURLCollection: [URL]? {
+		typed?.urlArrayValue?.values.compactMap(URL.init)
+	}
+
+	public var publicKeyHashes: [GatewayAPI.PublicKeyHash]? {
+		typed?.publicKeyHashArrayValue?.values
+	}
+}
+
 extension GatewayAPI.EntityMetadataCollection {
 	public var name: String? {
 		items[.name]?.asString
@@ -58,7 +80,7 @@ extension GatewayAPI.EntityMetadataCollection {
 	}
 
 	public var iconURL: URL? {
-		items[.iconURL]?.asString.flatMap(URL.init)
+		items[.iconURL]?.asURL
 	}
 
 	public var dappDefinition: String? {
@@ -74,11 +96,15 @@ extension GatewayAPI.EntityMetadataCollection {
 	}
 
 	public var claimedWebsites: [URL]? {
-		items[.claimedWebsites]?.asStringCollection?.compactMap(URL.init)
+		items[.claimedWebsites]?.asURLCollection
 	}
 
 	public var accountType: AccountType? {
 		items[.accountType]?.asString.flatMap(AccountType.init)
+	}
+
+	public var ownerKeys: [GatewayAPI.PublicKeyHash]? {
+		items[.ownerKeys]?.publicKeyHashes
 	}
 
 	public enum AccountType: String {
@@ -124,6 +150,7 @@ public enum EntityMetadataKey: String, CaseIterable {
 	case claimedWebsites = "claimed_websites"
 	case relatedWebsites = "related_websites"
 	case accountType = "account_type"
+	case ownerKeys = "owner_keys"
 }
 
 extension [GatewayAPI.EntityMetadataItem] {
