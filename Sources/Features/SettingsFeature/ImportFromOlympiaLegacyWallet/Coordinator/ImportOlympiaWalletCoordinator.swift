@@ -277,8 +277,11 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 	private func accountsToImportViewAppeared(
 		in state: inout State
 	) -> EffectTask<Action> {
-		// This happens if the user steps back from ImportMnemonic to AccountsToImport
 		if case let .checkedIfOlympiaFactorSourceAlreadyExists(progress) = state.progress {
+			// This happens if the user steps back from ImportMnemonic to AccountsToImport
+			state.progress = .foundAlreadyImported(progress.previous)
+		} else if case let .migratedSoftwareAccounts(progress) = state.progress {
+			// This happens if the user steps back from ImportOlympiaLedgerAccountsAndFactorSources to AccountsToImport
 			state.progress = .foundAlreadyImported(progress.previous)
 		}
 		return .none

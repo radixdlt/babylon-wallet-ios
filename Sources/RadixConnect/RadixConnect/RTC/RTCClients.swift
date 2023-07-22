@@ -22,6 +22,12 @@ public actor RTCClients {
 		}
 	}
 
+	// MARK: - Properties
+
+	public var currentlyConnectedClients: [P2P.ClientConnectionsUpdate] {
+		clientConnectionsUpdateSubject.value
+	}
+
 	// MARK: - Streams
 
 	/// A **multicasted** async sequence for received message from ALL RTCClients.

@@ -39,34 +39,45 @@ extension ConnectUsingSecrets {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: ViewState.init(state:), send: { .view($0) }) { viewStore in
-				VStack(alignment: .leading) {
-					AppTextField(
-						placeholder: L10n.LinkedConnectors.NameNewConnector.textFieldPlaceholder,
-						text: viewStore.binding(
-							get: \.nameOfConnection,
-							send: { .nameOfConnectionChanged($0) }
-						),
-						hint: .info(L10n.LinkedConnectors.NameNewConnector.textFieldHint),
-						focus: .on(
-							.connectionName,
-							binding: viewStore.binding(
-								get: \.focusedField,
-								send: { .textFieldFocused($0) }
+				ScrollView(showsIndicators: false) {
+					VStack(spacing: 0) {
+						Text(L10n.LinkedConnectors.NameNewConnector.title)
+							.foregroundColor(.app.gray1)
+							.textStyle(.sheetTitle)
+							.padding(.bottom, .small1)
+
+						Text(L10n.LinkedConnectors.NameNewConnector.subtitle)
+							.textStyle(.body1Regular)
+							.multilineTextAlignment(.center)
+							.padding(.horizontal, .large1)
+							.padding(.bottom, .huge2)
+
+						AppTextField(
+							placeholder: "",
+							text: viewStore.binding(
+								get: \.nameOfConnection,
+								send: { .nameOfConnectionChanged($0) }
 							),
-							to: $focusedField
+							hint: .info(L10n.LinkedConnectors.NameNewConnector.textFieldHint),
+							focus: .on(
+								.connectionName,
+								binding: viewStore.binding(
+									get: \.focusedField,
+									send: { .textFieldFocused($0) }
+								),
+								to: $focusedField
+							)
 						)
-					)
-					.autocorrectionDisabled()
-					.padding(.medium3)
-
-					Spacer()
-
+						.autocorrectionDisabled()
+						.padding(.horizontal, .medium3)
+					}
+				}
+				.footer {
 					Button(L10n.LinkedConnectors.NameNewConnector.saveLinkButtonTitle) {
 						viewStore.send(.confirmNameButtonTapped)
 					}
 					.controlState(viewStore.saveButtonControlState)
 					.buttonStyle(.primaryRectangular)
-					.padding(.medium3)
 				}
 				.controlState(viewStore.screenState)
 				.onAppear {

@@ -1,8 +1,7 @@
 import FeaturePrelude
 
 // MARK: - EditPersonaFieldID
-// FIXME: Bring back `Comparable` if necessary (alongside `@Sorted(by: \.id)` at `EditPersona.State.dynamicFields`)
-public protocol EditPersonaFieldID: Sendable, Hashable {
+public protocol EditPersonaFieldID: Sendable, Hashable, Comparable {
 	var title: String { get }
 	#if os(iOS)
 	var contentType: UITextContentType? { get }
@@ -12,46 +11,32 @@ public protocol EditPersonaFieldID: Sendable, Hashable {
 }
 
 // MARK: - EditPersonaField
-public struct EditPersonaField<ID: EditPersonaFieldID>: Sendable, FeatureReducer {
+public struct EditPersonaField<ID: EditPersonaFieldID>: Sendable, FeatureReducer, EmptyInitializable {
 	public struct State: Sendable, Hashable, Identifiable {
-		public enum Kind: Sendable, Hashable {
-			case `static`
-			case dynamic(isRequiredByDapp: Bool)
-
-			var isStatic: Bool {
-				self == .static
-			}
-
-			var isDynamic: Bool {
-				guard case .dynamic = self else { return false }
-				return true
-			}
-		}
-
-		public let kind: Kind
 		public let id: ID
+		let isRequestedByDapp: Bool
+		let showsName: Bool
 
 		@Validation<String, String>
 		public var input: String?
 
 		private init(
-			kind: Kind,
 			id: ID,
-			input: Validation<String, String>
+			input: Validation<String, String>,
+			isRequestedByDapp: Bool,
+			showsName: Bool
 		) {
-			self.kind = kind
 			self.id = id
 			self._input = input
+			self.isRequestedByDapp = isRequestedByDapp
+			self.showsName = showsName
 		}
 	}
 
+	public init() {}
+
 	public enum ViewAction: Sendable, Equatable {
 		case inputFieldChanged(String)
-		case deleteButtonTapped
-	}
-
-	public enum DelegateAction: Sendable, Equatable {
-		case delete
 	}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
@@ -59,9 +44,6 @@ public struct EditPersonaField<ID: EditPersonaFieldID>: Sendable, FeatureReducer
 		case let .inputFieldChanged(input):
 			state.input = input
 			return .none
-
-		case .deleteButtonTapped:
-			return .send(.delegate(.delete))
 		}
 	}
 }
@@ -105,27 +87,44 @@ extension EditPersonaStaticField.State {
 		initial: String?
 	) {
 		self.init(
-			kind: .static,
 			id: id,
 			input: .init(
 				wrappedValue: initial,
 				onNil: L10n.EditPersona.Error.blank,
 				rules: [.if(\.isBlank, error: L10n.EditPersona.Error.blank)]
-			)
+			),
+			isRequestedByDapp: false,
+			showsName: true
 		)
 	}
 }
 
 // MARK: Dynamic Fields
 
-public typealias EditPersonaDynamicField = EditPersonaField<EditPersona.State.DynamicFieldID>
+public typealias EditPersonaDynamicField = EditPersonaField<DynamicFieldID>
 
-// MARK: - EditPersona.State.DynamicFieldID + EditPersonaFieldID
-extension EditPersona.State.DynamicFieldID: EditPersonaFieldID {
+// MARK: - DynamicFieldID
+public enum DynamicFieldID: Hashable, Sendable {
+	case givenNames
+	case nickName
+	case familyName
+	case emailAddress
+	case phoneNumber
+	case dateOfBirth
+	case companyName
+	case url
+	case postalAddress
+	case creditCard
+}
+
+// MARK: EditPersonaFieldID
+extension DynamicFieldID: EditPersonaFieldID {
 	// FIXME: Localize
 	public var title: String {
 		switch self {
-		case .name: return "Name"
+		case .givenNames: return "Given names(s)"
+		case .nickName: return "Nickname"
+		case .familyName: return "Family Name"
 		case .dateOfBirth: return "DoB"
 		case .companyName: return "Company name"
 		case .emailAddress: return L10n.AuthorizedDapps.PersonaDetails.emailAddress
@@ -139,7 +138,9 @@ extension EditPersona.State.DynamicFieldID: EditPersonaFieldID {
 	#if os(iOS)
 	public var contentType: UITextContentType? {
 		switch self {
-		case .name: return .name
+		case .givenNames: return .name
+		case .nickName: return .name
+		case .familyName: return .name
 		case .dateOfBirth: return .dateTime
 		case .companyName: return .organizationName
 		case .emailAddress: return .emailAddress
@@ -152,7 +153,9 @@ extension EditPersona.State.DynamicFieldID: EditPersonaFieldID {
 
 	public var keyboardType: UIKeyboardType {
 		switch self {
-		case .name: return .default
+		case .givenNames: return .default
+		case .nickName: return .default
+		case .familyName: return .default
 		case .dateOfBirth: return .default
 		case .companyName: return .default
 		case .emailAddress: return .emailAddress
@@ -165,7 +168,9 @@ extension EditPersona.State.DynamicFieldID: EditPersonaFieldID {
 
 	public var capitalization: EquatableTextInputCapitalization? {
 		switch self {
-		case .name: return .words
+		case .givenNames: return .words
+		case .nickName: return .words
+		case .familyName: return .words
 		case .dateOfBirth: return .never
 		case .companyName: return .words
 		case .emailAddress: return .never
@@ -178,14 +183,32 @@ extension EditPersona.State.DynamicFieldID: EditPersonaFieldID {
 	#endif
 }
 
+// MARK: - PersonaData.Entry.Kind + Comparable
+extension PersonaData.Entry.Kind: Comparable {
+	public static func < (lhs: Self, rhs: Self) -> Bool {
+		guard
+			let lhsIndex = Self.supportedKinds.firstIndex(of: lhs),
+			let rhsIndex = Self.supportedKinds.firstIndex(of: rhs)
+		else {
+			assertionFailure(
+				"""
+				This code path should never occur, unless you're manually conforming to `CaseIterable` and `allCases` is incomplete.
+				"""
+			)
+			return false
+		}
+		return lhsIndex < rhsIndex
+	}
+}
+
 extension EditPersonaDynamicField.State {
 	public init(
 		id: ID,
 		text: String?,
-		isRequiredByDapp: Bool
+		isRequiredByDapp: Bool,
+		showsName: Bool
 	) {
 		self.init(
-			kind: .dynamic(isRequiredByDapp: isRequiredByDapp),
 			id: id,
 			input: .init(
 				wrappedValue: text,
@@ -196,15 +219,10 @@ extension EditPersonaDynamicField.State {
 						return nil
 					}
 				}(),
-				rules: .build {
-					if isRequiredByDapp {
-						.if(\.isBlank, error: L10n.EditPersona.Error.requiredByDapp)
-					}
-					if case PersonaData.Entry.emailAddress = id {
-						.unless(\.isEmailAddress, error: L10n.EditPersona.Error.invalidEmailAddress)
-					}
-				}
-			)
+				rules: []
+			),
+			isRequestedByDapp: isRequiredByDapp,
+			showsName: showsName
 		)
 	}
 }
