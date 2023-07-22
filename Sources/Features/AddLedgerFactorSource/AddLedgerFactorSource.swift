@@ -70,6 +70,7 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.factorSourcesClient) var factorSourcesClient
 	@Dependency(\.ledgerHardwareWalletClient) var ledgerHardwareWalletClient
+	@Dependency(\.radixConnectClient) var radixConnectClient
 
 	public init() {}
 
@@ -242,16 +243,6 @@ extension LedgerHardwareWalletFactorSource {
 			name: name,
 			deviceID: device.id
 		)
-	}
-}
-
-// MARK: - OlympiaAccountsValidation
-public struct OlympiaAccountsValidation: Sendable, Hashable {
-	public var validated: Set<OlympiaAccountToMigrate>
-	public var unvalidated: Set<OlympiaAccountToMigrate>
-	public init(validated: Set<OlympiaAccountToMigrate>, unvalidated: Set<OlympiaAccountToMigrate>) {
-		self.validated = validated
-		self.unvalidated = unvalidated
 	}
 }
 

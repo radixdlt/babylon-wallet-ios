@@ -20,6 +20,12 @@ public enum HitTargetSize: CGFloat {
 	/// 104
 	case veryLarge = 104
 
+	/// 140
+	case huge = 140
+
+	/// 200
+	case veryHuge = 200
+
 	public var frame: CGSize {
 		.init(width: rawValue, height: rawValue)
 	}
@@ -38,6 +44,10 @@ public enum HitTargetSize: CGFloat {
 			return .small1
 		case .veryLarge:
 			return .medium3
+		case .huge:
+			return .medium2
+		case .veryHuge:
+			return .medium1
 		}
 	}
 }

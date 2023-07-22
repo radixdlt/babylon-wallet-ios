@@ -23,45 +23,63 @@ extension AddLedgerFactorSource {
 		public var body: some SwiftUI.View {
 			NavigationStack {
 				WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-					VStack {
-						Text(L10n.AddLedgerDevice.AddDevice.title)
-							.textStyle(.sheetTitle)
-							.padding(.top, .small1)
-							.padding(.bottom, .large1)
+					VStack(spacing: 0) {
+						ViewThatFits(in: .vertical) {
+							InnerView(small: false)
+							InnerView(small: true)
+						}
 
-						Text(L10n.AddLedgerDevice.AddDevice.body1)
-							.textStyle(.body1Regular)
-							.padding(.bottom, .large1)
-							.padding(.horizontal, .medium3)
-
-						Text(L10n.AddLedgerDevice.AddDevice.body2)
-							.textStyle(.body1Regular)
-							.padding(.horizontal, .medium3)
-
-						Spacer()
+						Spacer(minLength: .small1)
 
 						Button(L10n.AddLedgerDevice.AddDevice.continue) {
 							viewStore.send(.sendAddLedgerRequestButtonTapped)
 						}
-						.controlState(viewStore.continueButtonControlState)
 						.buttonStyle(.primaryRectangular)
+						.controlState(viewStore.continueButtonControlState)
+						.padding(.horizontal, .medium3)
 						.padding(.bottom, .large2)
 					}
-					.multilineTextAlignment(.center)
-					.foregroundColor(.app.gray1)
-					.padding(.horizontal, .medium3)
 					#if os(iOS)
-						.toolbar {
-							ToolbarItem(placement: .primaryAction) {
-								CloseButton {
-									viewStore.send(.closeButtonTapped)
-								}
+					.toolbar {
+						ToolbarItem(placement: .primaryAction) {
+							CloseButton {
+								viewStore.send(.closeButtonTapped)
 							}
 						}
+					}
 					#endif
 				}
 				.destination(store: store)
 			}
+		}
+	}
+
+	struct InnerView: SwiftUI.View {
+		let small: Bool
+
+		var body: some SwiftUI.View {
+			VStack(spacing: 0) {
+				Image(asset: AssetResource.iconHardwareLedger)
+					.resizable()
+					.frame(small ? .veryLarge : .huge)
+					.padding(.top, small ? .large3 : .huge2)
+					.padding(.bottom, small ? .large2 : .huge1)
+
+				Text(L10n.AddLedgerDevice.AddDevice.title)
+					.textStyle(.sheetTitle)
+					.padding(.bottom, small ? .medium3 : .large3)
+
+				Text(L10n.AddLedgerDevice.AddDevice.body1)
+					.textStyle(.body1Regular)
+					.padding(.horizontal, .large3)
+					.padding(.bottom, .medium2)
+
+				Text(L10n.AddLedgerDevice.AddDevice.body2)
+					.textStyle(.body1Regular)
+					.padding(.horizontal, .large3)
+			}
+			.multilineTextAlignment(.center)
+			.foregroundColor(.app.gray1)
 		}
 	}
 }
@@ -94,6 +112,41 @@ extension View {
 	}
 }
 
+// MARK: - LinkConnectorView
+@MainActor
+struct LinkConnectorView: SwiftUI.View {
+	let buttonAction: () -> Void
+
+	public var body: some SwiftUI.View {
+		VStack(spacing: 0) {
+			Image(asset: AssetResource.tempLinkConnector) // FIXME: Use actual icon
+				.resizable()
+				.frame(.veryHuge)
+				.padding(.top, .large2)
+				.padding(.bottom, .huge3)
+
+			Text("Link a Connector") // FIXME: Strings L10n.AddLedgerDevice.LinkConnector.
+				.textStyle(.sheetTitle)
+				.padding(.bottom, .large3)
+
+			Text("To use a Ledger hardware wallet device, it must be connected to a computer running the Radix Connector browser extension.") // FIXME: Strings
+				.textStyle(.body1Regular)
+				.padding(.horizontal, .large2)
+				.padding(.bottom, .large1)
+
+			Button("Link a Connector", action: buttonAction) // FIXME: Strings L10n.AddLedgerDevice.LinkConnector
+				.buttonStyle(.primaryRectangular)
+				.padding(.horizontal, .medium3)
+
+			Spacer(minLength: 0)
+		}
+		.multilineTextAlignment(.center)
+		.foregroundColor(.app.gray1)
+	}
+}
+
+// MARK: - NameLedgerFactorSource
+
 extension NameLedgerFactorSource.State {
 	var viewState: NameLedgerFactorSource.ViewState {
 		.init(
@@ -122,28 +175,38 @@ extension NameLedgerFactorSource {
 		public var body: some SwiftUI.View {
 			NavigationStack {
 				WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-					VStack {
-						Text(L10n.AddLedgerDevice.NameLedger.title)
-							.textStyle(.sheetTitle)
-							.padding(.top, .small1)
-							.padding(.bottom, .medium3)
+					ScrollView(showsIndicators: false) {
+						VStack(spacing: 0) {
+							Text(L10n.AddLedgerDevice.NameLedger.title)
+								.textStyle(.sheetTitle)
+								.padding(.top, .small1)
+								.padding(.horizontal, .large3)
+								.padding(.bottom, .small2)
 
-						Text(L10n.AddLedgerDevice.NameLedger.subtitle)
-							.textStyle(.body1Regular)
-							.padding(.bottom, .medium1)
-							.multilineTextAlignment(.center)
+							Text(L10n.AddLedgerDevice.NameLedger.subtitle)
+								.textStyle(.body1Regular)
+								.multilineTextAlignment(.center)
+								.padding(.horizontal, .large1)
+								.padding(.bottom, .large1)
 
-						AppTextField(
-							placeholder: L10n.AddLedgerDevice.NameLedger.namePlaceholder,
-							text: Binding(
-								get: { viewStore.ledgerName },
-								set: { viewStore.send(.ledgerNameChanged($0)) }
+							Text(L10n.AddLedgerDevice.NameLedger.detectedType(viewStore.model.displayName))
+								.textStyle(.body1Header)
+								.multilineTextAlignment(.center)
+								.padding(.horizontal, .large1)
+								.padding(.bottom, .medium1)
+
+							AppTextField(
+								placeholder: "",
+								text: Binding(
+									get: { viewStore.ledgerName },
+									set: { viewStore.send(.ledgerNameChanged($0)) }
+								),
+								hint: .info(L10n.AddLedgerDevice.NameLedger.fieldHint)
 							)
-						)
-
-						Spacer()
+							.padding(.horizontal, .medium3)
+							.padding(.bottom, .small1)
+						}
 					}
-					.padding(.horizontal, .medium1)
 					.foregroundColor(.app.gray1)
 					.footer {
 						Button(L10n.AddLedgerDevice.NameLedger.continueButtonTitle) {
@@ -154,6 +217,19 @@ extension NameLedgerFactorSource {
 					}
 				}
 			}
+		}
+	}
+}
+
+extension P2P.LedgerHardwareWallet.Model {
+	var displayName: String {
+		switch self {
+		case .nanoS:
+			return "Ledger Nano S"
+		case .nanoSPlus:
+			return "Ledger Nano S+"
+		case .nanoX:
+			return "Ledger Nano X"
 		}
 	}
 }

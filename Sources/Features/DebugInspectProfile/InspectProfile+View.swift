@@ -505,11 +505,11 @@ public struct DappAuthorizedPersonaView: IndentedView {
 
 				if let name = sharedPersonaData.name {
 					Text("Name")
-					Labeled("Given", value: name.value.given)
-					if let middle = name.value.middle {
-						Labeled("Middle", value: middle)
+					Labeled("Given Names", value: name.value.givenNames)
+					if let nickname = name.value.nickname {
+						Labeled("Nickname", value: nickname)
 					}
-					Labeled("Family", value: name.value.family)
+					Labeled("Family Name", value: name.value.familyName)
 					Labeled("id", value: name.id)
 				}
 
@@ -525,7 +525,7 @@ public struct DappAuthorizedPersonaView: IndentedView {
 					Labeled("id", value: email.id)
 				}
 
-				Text("Phonen umbers")
+				Text("Phonenumbers")
 				ForEach(sharedPersonaData.phoneNumbers) { phone in
 					Labeled("Value", value: phone.value.number)
 					Labeled("id", value: phone.id)
