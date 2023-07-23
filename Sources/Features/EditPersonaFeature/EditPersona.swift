@@ -287,3 +287,73 @@ extension EditPersonaEntry<EditPersonaName>.State {
 		)
 	}
 }
+
+extension Profile.Network.Persona {
+	fileprivate func updated(with output: EditPersona.Output) -> Self {
+		var updatedPersona = self
+
+		updatedPersona.displayName = output.personaLabel
+
+		updatedPersona.personaData = .init()
+		output.fields.forEach { identifiedFieldOutput in
+			// FIXME: Implement when multi-field entries support will be implemented in the UI, or entries will become supported at all
+			switch identifiedFieldOutput.id {
+			case .name: break
+			case .dateOfBirth: break
+			case .companyName: break
+			case .emailAddress:
+				// FIXME: `try` and handle errors properly when we will have multiple entries of that kind (as the only reason to throw here is related to multiple values)
+				let emailAddresses = try? PersonaData.IdentifiedEmailAddresses(
+					collection: .init(
+						uncheckedUniqueElements: [
+							.init(value: .init(email: identifiedFieldOutput.value)),
+						]
+					)
+				)
+				updatedPersona.personaData.emailAddresses = emailAddresses ?? .init()
+			case .phoneNumber:
+				// FIXME: `try` and handle errors properly when we will have multiple entries of that kind (as the only reason to throw here is related to multiple values)
+				let phoneAddresses = try? PersonaData.IdentifiedPhoneNumbers(
+					collection: .init(
+						uncheckedUniqueElements: [
+							.init(value: .init(number: identifiedFieldOutput.value)),
+						]
+					)
+				)
+				updatedPersona.personaData.phoneNumbers = phoneAddresses ?? .init()
+			case .url: break
+			case .postalAddress: break
+			case .creditCard: break
+			}
+		}
+
+		return updatedPersona
+	}
+}
+
+extension PersonaData.Entry {
+	// FIXME: Use proper values and granularity (Entry-, instead of Field-level) when Entry types will be supported
+	var text: String {
+		switch self {
+		case let .name(entryModel): return entryModel.description
+		case let .emailAddress(entryModel): return entryModel.email
+		case let .phoneNumber(entryModel): return entryModel.number
+		default: fatalError()
+		}
+	}
+}
+
+extension PersonaData.Entry {
+	var kind: Kind {
+		switch self {
+		case .name: return .name
+		case .dateOfBirth: return .dateOfBirth
+		case .companyName: return .companyName
+		case .emailAddress: return .emailAddress
+		case .phoneNumber: return .phoneNumber
+		case .url: return .url
+		case .postalAddress: return .postalAddress
+		case .creditCard: return .creditCard
+		}
+	}
+}
