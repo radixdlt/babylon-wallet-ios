@@ -19,8 +19,8 @@ extension PersonaData.Entry.Kind {
 	public static var supportedKinds: [Self] {
 		[
 			.fullName,
-			.emailAddress,
 			.phoneNumber,
+			.emailAddress,
 		]
 	}
 

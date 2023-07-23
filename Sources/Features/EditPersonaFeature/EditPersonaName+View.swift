@@ -69,7 +69,7 @@ extension EditPersonaName {
 
 		// FIXME: Reordering could probably be done nicer by using a Grid probably
 		@ViewBuilder
-		func easternOrder() -> some SwiftUI.View {
+		func westernOrder() -> some SwiftUI.View {
 			HStack(alignment: .top, spacing: .medium3) {
 				EditPersonaField.View(
 					store: store.scope(
@@ -101,7 +101,7 @@ extension EditPersonaName {
 		}
 
 		@ViewBuilder
-		func westernOrder() -> some SwiftUI.View {
+		func easternOrder() -> some SwiftUI.View {
 			EditPersonaField.View(
 				store: store.scope(
 					state: \.family,
