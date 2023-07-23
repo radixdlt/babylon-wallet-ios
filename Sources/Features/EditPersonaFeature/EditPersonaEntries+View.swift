@@ -29,9 +29,9 @@ extension EditPersonaEntries {
 
 				IfLetStore(
 					store.scope(
-						state: \.emailAddress,
+						state: \.phoneNumber,
 						action: (/Action.child
-							.. EditPersonaEntries.ChildAction.emailAddress
+							.. EditPersonaEntries.ChildAction.phoneNumber
 						).embed
 					)
 				) { store in
@@ -44,9 +44,9 @@ extension EditPersonaEntries {
 
 				IfLetStore(
 					store.scope(
-						state: \.phoneNumber,
+						state: \.emailAddress,
 						action: (/Action.child
-							.. EditPersonaEntries.ChildAction.phoneNumber
+							.. EditPersonaEntries.ChildAction.emailAddress
 						).embed
 					)
 				) { store in

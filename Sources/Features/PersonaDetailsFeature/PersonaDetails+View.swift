@@ -360,23 +360,28 @@ extension PersonaDetails.View {
 						}
 					}
 
-					Group {
-						if let fullName = viewStore.fullName {
-							VPair(
-								heading: "Full Name", // FIXME: Localize
-								item: fullName
-							)
-						}
-					}
-
-					if let emailAddress = viewStore.emailAddresses?.first {
-						Text("Email").font(.app.sectionHeader)
-						VPair(heading: L10n.AuthorizedDapps.PersonaDetails.emailAddress, item: emailAddress)
+					if let fullName = viewStore.fullName {
+						VPair(
+							heading: "Full Name", // FIXME: Localize
+							item: fullName
+						)
+						Separator()
 					}
 
 					if let phoneNumber = viewStore.phoneNumbers?.first {
-						Text("Phone number").font(.app.sectionHeader)
-						VPair(heading: L10n.AuthorizedDapps.PersonaDetails.phoneNumber, item: phoneNumber)
+						VPair(
+							heading: L10n.AuthorizedDapps.PersonaDetails.phoneNumber,
+							item: phoneNumber
+						)
+						Separator()
+					}
+
+					if let emailAddress = viewStore.emailAddresses?.first {
+						VPair(
+							heading: L10n.AuthorizedDapps.PersonaDetails.emailAddress,
+							item: emailAddress
+						)
+						Separator()
 					}
 				}
 				.padding(.horizontal, .medium1)
