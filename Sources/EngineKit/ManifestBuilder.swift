@@ -1,4 +1,5 @@
 import EngineToolkit
+import Prelude
 
 // MARK: - Mutation
 
@@ -12,7 +13,7 @@ extension TransactionManifest {
 
 	public func withLockFeeCallMethodAdded(
 		address: Address,
-		fee: String = "10"
+		fee: BigDecimal = .temporaryStandardFee
 	) throws -> TransactionManifest {
 		try withInstructionAdded(
 			.lockFeeCall(address: address, fee: fee),
@@ -86,7 +87,7 @@ extension Instructions {
 
 	public func withLockFeeCallMethodAdded(
 		address: Address,
-		fee: String = "10"
+		fee: BigDecimal = .temporaryStandardFee
 	) throws -> Instructions {
 		try withInstructionAdded(
 			.lockFeeCall(address: address, fee: fee),
@@ -163,9 +164,9 @@ extension Instructions {
 extension Instruction {
 	static func lockFeeCall(
 		address: Address,
-		fee: String = "10"
+		fee: BigDecimal
 	) throws -> Instruction {
-		try .callMethod(address: .static(value: .init(address: address.address)), methodName: "lock_fee", args: .tupleValue(fields: [.decimalValue(value: .init(value: fee))]))
+		try .callMethod(address: .static(value: .init(address: address.address)), methodName: "lock_fee", args: .tupleValue(fields: [.decimalValue(value: .init(value: fee.toString()))]))
 	}
 
 	static func depositBatch(account: AccountAddress) -> String {
