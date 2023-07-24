@@ -80,7 +80,7 @@ extension GatewayAPI.EntityMetadataCollection {
 	}
 
 	public var iconURL: URL? {
-		items[.iconURL]?.asURL
+		items[.iconURL]?.asString.flatMap(URL.init)
 	}
 
 	public var dappDefinition: String? {

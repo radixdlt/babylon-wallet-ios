@@ -29,7 +29,7 @@ final class StringExtraTests: XCTestCase {
 	func test_givenNonFungibleGlobalIDAsInput_whenNonFungibleLocalIDIsSelectedAsFormat_thenReformatAddress() {
 		let localID = "ticket_19206"
 		let resourceAddress = "resource_1qlq38wvrvh5m4kaz6etaac4389qtuycnp89atc8acdfi"
-		let globalID = resourceAddress + ":" + localID
+		let globalID = resourceAddress + ":" + "<" + localID + ">"
 		XCTAssertEqual(globalID.formatted(.nonFungibleLocalId), localID)
 	}
 }
