@@ -33,7 +33,7 @@ extension LedgerIdentifiable {
 		public var address: String {
 			switch self {
 			case let .transaction(txId):
-				return txId.asStr()
+				return txId.hex
 			case let .nonFungibleGlobalID(nonFungibleGlobalId):
 				return nonFungibleGlobalId.asStr()
 			}
