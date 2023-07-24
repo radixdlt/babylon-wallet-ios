@@ -206,7 +206,7 @@
 "createAccount_derivePublicKeys_title" = "Creating Account";
 "createAccount_derivePublicKeys_subtitle" = "Deriving public keys";
 "createEntity_completion_destinationChooseAccounts" = "Choose Accounts";
-"createEntity_completion_destinationChoosePersonas" = "Choose Personas";
+"createEntity_completion_destinationChoosePersonas" = "Persona Selection";
 "createEntity_completion_destinationGateways" = "Gateways";
 "createEntity_completion_destinationHome" = "Account List";
 "createEntity_completion_destinationPersonaList" = "Persona List";
