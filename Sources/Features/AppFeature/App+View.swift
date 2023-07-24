@@ -44,8 +44,7 @@ extension App {
 				.task { @MainActor in
 					await ViewStore(store.stateless).send(.view(.task)).finish()
 				}
-				// FIXME: It is not clear if this should be kept for Beta tester release
-				// .showDeveloperDisclaimerBanner()
+				.showDeveloperDisclaimerBanner()
 				.presentsLoadingViewOverlay()
 			}
 		}
