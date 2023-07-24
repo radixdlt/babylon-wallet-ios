@@ -231,7 +231,7 @@ final class PeerConnectionNegotiatorTests: TestCase {
 		let configuredOffer = try await peerConnection.onOfferConfigured()
 
 		// Assert that the configured offer does amtch the Incoming offer
-		XCTAssertEqual(configuredOffer, primitive.content.offer!)
+		XCTAssertEqual(configuredOffer, primitive.value.offer!)
 
 		// Complete the set remote offer action on peerConnection, thus allowing the negotiation to flow further
 		peerConnection.completeSetRemoteDescription(with: .success(()))
@@ -251,7 +251,7 @@ final class PeerConnectionNegotiatorTests: TestCase {
 		let configuredICECandidate = try await peerConnection.configuredICECandidate.first()
 
 		// Assert that the configured ICECandidate does match the Incoming ICECanddiate
-		XCTAssertEqual(configuredICECandidate, primitive.content.iceCandidate)
+		XCTAssertEqual(configuredICECandidate, primitive.value.iceCandidate)
 
 		// Complete the add ICECandidate action on PeerConnection
 		peerConnection.completeAddICECandidate(with: .success(()))
@@ -263,7 +263,7 @@ final class PeerConnectionNegotiatorTests: TestCase {
 		peerConnectionDelegate: MockPeerConnectionDelegate
 	) async throws {
 		// Generate local ICECandidate
-		peerConnectionDelegate.generateICECandiddate(primitive.content.iceCandidate!)
+		peerConnectionDelegate.generateICECandiddate(primitive.value.iceCandidate!)
 
 		// Assert that the generated ICECandidate was properly sent
 		try await assertDidSendMessage(primitive)
@@ -278,13 +278,13 @@ final class PeerConnectionNegotiatorTests: TestCase {
 		await peerConnection.onLocalAnswerCreated()
 
 		// Complete the create local answer request
-		peerConnection.completeCreateLocalAnswerRequest(with: .success(primitive.content.answer!))
+		peerConnection.completeCreateLocalAnswerRequest(with: .success(primitive.value.answer!))
 
 		let answer = try await peerConnection.onAnswerConfigured()
 		peerConnection.completeSetLocalDescription(with: .success(()))
 
 		// Assert that the configured answer does match the created one
-		XCTAssertEqual(answer, primitive.content.answer!)
+		XCTAssertEqual(answer, primitive.value.answer!)
 
 		// Assert that the created answer is properly sent through the webSocket
 		try await assertDidSendMessage(primitive)
@@ -298,7 +298,7 @@ final class PeerConnectionNegotiatorTests: TestCase {
 				try await self.jsonDecoder.decode(SignalingClient.ClientMessage.self, from: $0)
 			}
 			.filter {
-				$0.targetClientId == primitive.id && $0.primitive == primitive.content
+				$0.targetClientId == primitive.id && $0.primitive == primitive.value
 			}
 			.first()
 		webSocketClient.respondToRequest(message: .success(sentMessage.requestId))
@@ -307,11 +307,11 @@ final class PeerConnectionNegotiatorTests: TestCase {
 	/// Creates a client message that is to be received from remote client
 	func makeClientMessage(_ primitive: IdentifiedRTCPrimitive) throws -> JSONValue {
 		let requestId = SignalingClient.ClientMessage.RequestID.any.rawValue
-		let encoded = try jsonEncoder.encode(primitive.content.payload)
+		let encoded = try jsonEncoder.encode(primitive.value.payload)
 		let encrypted = try Self.encryptionKey.encrypt(data: encoded)
 		let data = JSONValue.dictionary([
 			"requestId": .string(requestId),
-			"method": .string(SignalingClient.ClientMessage.Method(from: primitive.content).rawValue),
+			"method": .string(SignalingClient.ClientMessage.Method(from: primitive.value).rawValue),
 			"targetClientId": .string(UUID().uuidString),
 			"encryptedPayload": .string(encrypted.hex),
 		])

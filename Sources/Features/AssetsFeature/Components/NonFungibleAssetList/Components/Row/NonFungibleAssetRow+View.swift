@@ -1,3 +1,4 @@
+import EngineKit
 import FeaturePrelude
 
 // MARK: - NonFungibleTokenList.Row.View
@@ -78,7 +79,7 @@ extension NonFungibleAssetList.Row.View {
 		let isDisabled = viewStore.disabled.contains(asset.id)
 		HStack {
 			NFTIDView(
-				id: asset.id.toUserFacingString,
+				id: asset.id.localId().toUserFacingString(),
 				name: asset.name,
 				description: asset.description,
 				thumbnail: viewStore.isExpanded ? asset.keyImageURL : nil
@@ -156,18 +157,6 @@ extension NonFungibleAssetList.Row.View {
 
 		/// default scale for one card
 		static let scale: CGFloat = 0.05
-	}
-}
-
-extension AccountPortfolio.NonFungibleResource.NonFungibleToken.ID {
-	var toUserFacingString: String {
-		// Just a safety guard. Each NFT Id should be of format <prefix>value<suffix>
-		guard rawValue.count >= 3 else {
-			loggerGlobal.warning("Invalid nft id: \(rawValue)")
-			return rawValue
-		}
-		// Nothing fancy, just remove the prefix and suffix.
-		return String(rawValue.dropLast(1).dropFirst())
 	}
 }
 

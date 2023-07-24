@@ -1,10 +1,11 @@
+import Prelude
 import RadixConnectModels
 import Tagged
 
-typealias IdentifiedRTCPrimitive = Identified<RTCPrimitive, RemoteClientID>
-typealias IdentifiedRTCOffer = Identified<RTCPrimitive.Offer, RemoteClientID>
-typealias IdentifiedRTCAnswer = Identified<RTCPrimitive.Answer, RemoteClientID>
-typealias IdentifiedRTCICECandidate = Identified<RTCPrimitive.ICECandidate, RemoteClientID>
+typealias IdentifiedRTCPrimitive = Identified<RemoteClientID, RTCPrimitive>
+typealias IdentifiedRTCOffer = Identified<RemoteClientID, RTCPrimitive.Offer>
+typealias IdentifiedRTCAnswer = Identified<RemoteClientID, RTCPrimitive.Answer>
+typealias IdentifiedRTCICECandidate = Identified<RemoteClientID, RTCPrimitive.ICECandidate>
 
 // MARK: - RTCPrimitive
 /// Describes the possible RTC primitive exchanged during the WebRTC negotiation

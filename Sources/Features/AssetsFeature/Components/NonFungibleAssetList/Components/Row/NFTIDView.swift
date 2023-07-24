@@ -14,10 +14,11 @@ struct NFTFullView: View {
 	}
 
 	var body: some View {
-		LoadableImage(url: url, size: .flexible(minAspect: minAspect, maxAspect: maxAspect), loading: .shimmer) {
-			Rectangle()
-				.fill(.app.gray4)
-		}
+		LoadableImage(
+			url: url,
+			size: .flexible(minAspect: minAspect, maxAspect: maxAspect),
+			placeholders: .init(loading: .shimmer)
+		)
 		.cornerRadius(.small1)
 	}
 }

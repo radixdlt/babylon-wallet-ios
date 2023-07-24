@@ -18,7 +18,7 @@ extension SubmitTransactionClient: DependencyKey {
 
 			@Sendable func pollTransactionStatus() async throws -> GatewayAPI.TransactionStatus {
 				let txStatusRequest = GatewayAPI.TransactionStatusRequest(
-					intentHashHex: txID.rawValue
+					intentHashHex: txID.hex
 				)
 				let txStatusResponse = try await gatewayAPIClient.transactionStatus(txStatusRequest)
 				return txStatusResponse.status
@@ -84,7 +84,7 @@ extension SubmitTransactionClient: DependencyKey {
 				// inline inside `print`.
 				let txIntentString = intent.description(lookupNetworkName: { try? Radix.Network.lookupBy(id: $0).name.rawValue })
 				print("\n\n🔮 DEBUG TRANSACTION START 🔮a")
-				print("TXID: \(txID.rawValue)")
+				print("TXID: \(txID.asStr())")
 				print("TransactionIntent: \(txIntentString)")
 				print("\n\nINTENT SIGNATURES: \(intentSignatures.map { "\npublicKey: \($0.publicKey?.bytes.hex ?? "")\nsig: \($0.signature.bytes.hex)" }.joined(separator: "\n"))")
 				print("\nNOTARY SIGNATURE: \(notarySignature)")

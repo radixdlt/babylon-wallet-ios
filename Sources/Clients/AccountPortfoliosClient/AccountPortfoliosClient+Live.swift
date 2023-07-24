@@ -285,10 +285,12 @@ extension AccountPortfoliosClient {
 					nonFungibleIds: Array(nftIDChunk)
 				))
 				.nonFungibleIds
-				.map { item in
-					let details = item.details
-					return AccountPortfolio.NonFungibleResource.NonFungibleToken(
-						id: .init(item.nonFungibleId),
+				.map {
+					try AccountPortfolio.NonFungibleResource.NonFungibleToken(
+						id: .fromParts(
+							resourceAddress: .init(address: resource.resourceAddress),
+							nonFungibleLocalId: .from(stringFormat: $0.nonFungibleId)
+						),
 						name: details.name,
 						description: nil,
 						keyImageURL: details.keyImageURL,

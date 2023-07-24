@@ -56,6 +56,9 @@ extension NetworkID {
 	/// Decimal value: 12
 	public static let kisharnet: Self = 0x0C
 
+	/// https://github.com/radixdlt/babylon-node/blob/96be25b8fb4beacf80f22f22ef8ece9ce55b68b4/common/src/main/java/com/radixdlt/networks/Network.java#L98
+	public static let ansharnet: Self = 0x0D
+
 	/// RDX Development - Semi-permanent Testnets (start with 0x2)
 	// - gilganet = Integration, after Gilgamesh
 	// - enkinet = Misc Network 1, after Enki / Enkidu

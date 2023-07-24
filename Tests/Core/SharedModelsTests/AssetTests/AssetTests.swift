@@ -5,13 +5,15 @@ import TestingPrelude
 final class AssetTests: TestCase {
 	func test_givenNonFungibleTokenAndContainer_outputCorrectNonFungibleGlobalID() throws {
 		let rawLocalID = "#123#"
-		let localId = AccountPortfolio.NonFungibleResource.NonFungibleToken.LocalID(rawValue: rawLocalID)
-		let resourceAddress = try ResourceAddress(validatingAddress: "resource_sim1thvwu8dh6lk4y9mntemkvj25wllq8adq42skzufp4m8wxxuemugnez")
+		let localId = try nonFungibleLocalIdFromStr(string: rawLocalID)
+		let resourceAddress = try ResourceAddress(validatingAddress: "resource_tdx_d_1nfn7hdrua4wcxwq26qq2gpv2ew0p94k66ms3nmluev6rerr7sszc5z")
+
+		let globalId = try NonFungibleGlobalId.fromParts(resourceAddress: resourceAddress.intoEngine(), nonFungibleLocalId: localId)
 		let sut = AccountPortfolio.NonFungibleResource(
 			resourceAddress: resourceAddress,
-			tokens: [.init(id: localId, name: nil, description: nil, keyImageURL: nil, metadata: [])]
+			tokens: [.init(id: globalId, name: nil, description: nil, keyImageURL: nil, metadata: [])]
 		)
-		let expectedGlobalID = resourceAddress.address + ":" + rawLocalID
-		XCTAssertEqual(sut.nftGlobalID(for: localId), expectedGlobalID)
+		let expectedGlobalID = try NonFungibleGlobalId.fromParts(resourceAddress: resourceAddress.intoEngine(), nonFungibleLocalId: localId)
+		XCTAssertEqual(globalId, expectedGlobalID)
 	}
 }

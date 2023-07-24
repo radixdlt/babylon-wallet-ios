@@ -156,9 +156,12 @@ final class FaucetClientTests: TestCase {
 			.init(accountAddress: acco0, epoch: currentEpoch),
 			.init(accountAddress: acco1, epoch: 5),
 		])
+
+		let hash = try TransactionHash.fromStr(string: "txid_tdx_d_1pycj4pzxu9fc9x4qxflu63x7fmmal2raafd3wj9vea9nr5wy84dqsdq4cj", networkId: NetworkID.ansharnet.rawValue)
+
 		try await withDependencies {
 			$0.gatewayAPIClient.getEpoch = { currentEpoch }
-			$0.submitTXClient.submitTransaction = { _ in .init("mocked_txid") }
+			$0.submitTXClient.submitTransaction = { _ in hash }
 			$0.transactionClient.buildTransactionIntent = { _ in
 				TransactionIntentWithSigners(
 					intent: .previewValue,
@@ -168,7 +171,7 @@ final class FaucetClientTests: TestCase {
 					)
 				)
 			}
-			$0.transactionClient.notarizeTransaction = { _ in NotarizeTransactionResponse(notarized: .init([]), txID: .init("mocked_txid")) }
+			$0.transactionClient.notarizeTransaction = { _ in try NotarizeTransactionResponse(notarized: .init([]), txID: hash) }
 			$0.submitTXClient.hasTXBeenCommittedSuccessfully = { _ in }
 			$0.gatewaysClient.getCurrentGateway = { .enkinet }
 			$0.userDefaultsClient.dataForKey = { _ in json.data }
@@ -206,12 +209,12 @@ extension TransactionHeader {
 		startEpochInclusive: 0,
 		endEpochExclusive: 1,
 		nonce: 0,
-		notaryPublicKey: .eddsaEd25519(value: Array(Curve25519.Signing.PublicKey.previewValue.rawRepresentation)),
+		notaryPublicKey: .ed25519(value: Array(Curve25519.Signing.PublicKey.previewValue.rawRepresentation)),
 		notaryIsSignatory: true,
 		tipPercentage: 0
 	)
 }
 
 extension TransactionIntent {
-	static let previewValue = try! TransactionIntent(header: .previewValue, manifest: TransactionManifest(instructions: .fromInstructions(instructions: [], networkId: NetworkID.kisharnet.rawValue), blobs: []))
+	static let previewValue = try! TransactionIntent(header: .previewValue, manifest: TransactionManifest(instructions: .fromInstructions(instructions: [], networkId: NetworkID.kisharnet.rawValue), blobs: []), message: .none)
 }

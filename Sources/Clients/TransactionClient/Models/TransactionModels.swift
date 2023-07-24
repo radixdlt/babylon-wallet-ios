@@ -30,10 +30,9 @@ extension GatewayAPI.TransactionPreviewRequest {
 		transactionSigners: TransactionSigners
 	) throws {
 		let flags = GatewayAPI.TransactionPreviewRequestFlags(
-			unlimitedLoan: true, // True since no lock fee is added
+			useFreeCredit: true,
 			assumeAllSignatureProofs: false,
-			permitDuplicateIntentHash: false,
-			permitInvalidHeaderEpoch: false
+			skipEpochCheck: false
 		)
 
 		struct NotaryIsSignatoryDiscrepancy: Swift.Error {}
@@ -87,9 +86,9 @@ extension TransactionSigners {
 extension GatewayAPI.PublicKey {
 	init(from engine: EngineToolkit.PublicKey) {
 		switch engine {
-		case let .ecdsaSecp256k1(bytes):
+		case let .secp256k1(bytes):
 			self = .ecdsaSecp256k1(.init(keyType: .ecdsaSecp256k1, keyHex: bytes.hex()))
-		case let .eddsaEd25519(bytes):
+		case let .ed25519(bytes):
 			self = .eddsaEd25519(.init(keyType: .eddsaEd25519, keyHex: bytes.hex()))
 		}
 	}
@@ -137,6 +136,7 @@ public struct BuildTransactionIntentRequest: Sendable {
 	public let networkID: NetworkID
 	public let nonce: Nonce
 	public let manifest: TransactionManifest
+	public let message: Message
 	public let makeTransactionHeaderInput: MakeTransactionHeaderInput
 	public let isFaucetTransaction: Bool
 	public let ephemeralNotaryPublicKey: Curve25519.Signing.PublicKey
@@ -144,6 +144,7 @@ public struct BuildTransactionIntentRequest: Sendable {
 	public init(
 		networkID: NetworkID,
 		manifest: TransactionManifest,
+		message: Message,
 		nonce: Nonce = .secureRandom(),
 		makeTransactionHeaderInput: MakeTransactionHeaderInput = .default,
 		isFaucetTransaction: Bool = false,
@@ -151,6 +152,7 @@ public struct BuildTransactionIntentRequest: Sendable {
 	) {
 		self.networkID = networkID
 		self.manifest = manifest
+		self.message = message
 		self.nonce = nonce
 		self.makeTransactionHeaderInput = makeTransactionHeaderInput
 		self.isFaucetTransaction = isFaucetTransaction
@@ -194,6 +196,7 @@ extension TransactionClient {
 // MARK: - ManifestReviewRequest
 public struct ManifestReviewRequest: Sendable {
 	public let manifestToSign: TransactionManifest
+	public let message: Message
 	public let nonce: Nonce
 	public let feeToAdd: BigDecimal
 	public let makeTransactionHeaderInput: MakeTransactionHeaderInput
@@ -201,12 +204,14 @@ public struct ManifestReviewRequest: Sendable {
 
 	public init(
 		manifestToSign: TransactionManifest,
+		message: Message,
 		nonce: Nonce,
 		makeTransactionHeaderInput: MakeTransactionHeaderInput = .default,
 		feeToAdd: BigDecimal,
 		ephemeralNotaryPublicKey: Curve25519.Signing.PublicKey = Curve25519.Signing.PrivateKey().publicKey
 	) {
 		self.manifestToSign = manifestToSign
+		self.message = message
 		self.nonce = nonce
 		self.feeToAdd = feeToAdd
 		self.makeTransactionHeaderInput = makeTransactionHeaderInput

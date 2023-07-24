@@ -168,7 +168,7 @@
       "location" : "https://github.com/apple/swift-collections",
       "state" : {
         "branch" : "main",
-        "revision" : "939cfd25234472b4dc91c3caeab304d15bca9a73"
+        "revision" : "53a8adc54374f620002a3b6401d39e0feb3c57ae"
       }
     },
     {
@@ -221,7 +221,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/radixdlt/swift-engine-toolkit",
       "state" : {
-        "revision" : "a12a0e0dc9d508358778d049bfb9667aa96a4f7c"
+        "branch" : "release/rcnet-v2-phase-2",
+        "revision" : "2373e89a0d3f02c82a6def01df311d9410e4c609"
       }
     },
     {

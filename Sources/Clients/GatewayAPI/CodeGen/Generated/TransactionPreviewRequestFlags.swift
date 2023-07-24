@@ -17,33 +17,29 @@ extension GatewayAPI {
 
 public struct TransactionPreviewRequestFlags: Codable, Hashable {
 
-    public private(set) var unlimitedLoan: Bool
+    public private(set) var useFreeCredit: Bool
     public private(set) var assumeAllSignatureProofs: Bool
-    public private(set) var permitDuplicateIntentHash: Bool
-    public private(set) var permitInvalidHeaderEpoch: Bool
+    public private(set) var skipEpochCheck: Bool
 
-    public init(unlimitedLoan: Bool, assumeAllSignatureProofs: Bool, permitDuplicateIntentHash: Bool, permitInvalidHeaderEpoch: Bool) {
-        self.unlimitedLoan = unlimitedLoan
+    public init(useFreeCredit: Bool, assumeAllSignatureProofs: Bool, skipEpochCheck: Bool) {
+        self.useFreeCredit = useFreeCredit
         self.assumeAllSignatureProofs = assumeAllSignatureProofs
-        self.permitDuplicateIntentHash = permitDuplicateIntentHash
-        self.permitInvalidHeaderEpoch = permitInvalidHeaderEpoch
+        self.skipEpochCheck = skipEpochCheck
     }
 
     public enum CodingKeys: String, CodingKey, CaseIterable {
-        case unlimitedLoan = "unlimited_loan"
+        case useFreeCredit = "use_free_credit"
         case assumeAllSignatureProofs = "assume_all_signature_proofs"
-        case permitDuplicateIntentHash = "permit_duplicate_intent_hash"
-        case permitInvalidHeaderEpoch = "permit_invalid_header_epoch"
+        case skipEpochCheck = "skip_epoch_check"
     }
 
     // Encodable protocol methods
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(unlimitedLoan, forKey: .unlimitedLoan)
+        try container.encode(useFreeCredit, forKey: .useFreeCredit)
         try container.encode(assumeAllSignatureProofs, forKey: .assumeAllSignatureProofs)
-        try container.encode(permitDuplicateIntentHash, forKey: .permitDuplicateIntentHash)
-        try container.encode(permitInvalidHeaderEpoch, forKey: .permitInvalidHeaderEpoch)
+        try container.encode(skipEpochCheck, forKey: .skipEpochCheck)
     }
 }
 

@@ -4,6 +4,12 @@ import TestingPrelude
 
 // MARK: - ToDappResponseTests
 final class ToDappResponseTests: TestCase {
+	let decoder: JSONDecoder = {
+		let decoder = JSONDecoder()
+		decoder.userInfo[.networkIdKey] = NetworkID.default.rawValue
+		return decoder
+	}()
+
 	func test_encode_response() throws {
 		let sut = P2P.Dapp.Response.success(.init(
 			interactionId: "an_id",
@@ -17,7 +23,7 @@ final class ToDappResponseTests: TestCase {
 						),
 					]),
 					oneTimePersonaData: .init(
-						name: .init(given: "Percy", family: "Jackson", variant: .western),
+						name: .init(variant: .western, familyName: "Jackson", givenNames: "Percy"),
 						emailAddresses: [.init(email: "lightningthief@olympus.lol")],
 						phoneNumbers: [.init(number: "555 5555")]
 					)
@@ -44,8 +50,8 @@ final class ToDappResponseTests: TestCase {
 					],
 					"oneTimePersonaData": [
 						"name": [
-							"given": "Percy",
-							"family": "Jackson",
+							"givenNames": "Percy",
+							"familyName": "Jackson",
 							"variant": "western",
 						],
 						"emailAddresses": [
@@ -74,11 +80,11 @@ final class ToDappResponseTests: TestCase {
 				],
 				"oneTimePersonaData": [
 					"isRequestingName": true,
-					"emailAddressesRequested": [
+					"numberOfRequestedEmailAddresses": [
 						"quantifier": "atLeast",
 						"quantity": 1,
 					],
-					"phoneNumbersAddressesRequested": [
+					"numberOfRequestedPhoneNumbers": [
 						"quantifier": "exactly",
 						"quantity": 1,
 					],
@@ -103,8 +109,8 @@ final class ToDappResponseTests: TestCase {
 						),
 						oneTimePersonaData: .init(
 							isRequestingName: true,
-							emailAddressesRequested: .atLeast(1),
-							phoneNumbersAddressesRequested: .exactly(1)
+							numberOfRequestedEmailAddresses: .atLeast(1),
+							numberOfRequestedPhoneNumbers: .exactly(1)
 						)
 					))
 				),
@@ -151,7 +157,8 @@ final class ToDappResponseTests: TestCase {
 					origin: "https://dashboard-pr-126.rdx-works-main.extratools.works",
 					dAppDefinitionAddress: "account_tdx_21_12yth59wfyl8e4axupym0c96g9heuf5j06lv2lgc2cuapzlmj6alzzn"
 				)
-			)
+			),
+			decoder: decoder
 		)
 	}
 
@@ -184,7 +191,8 @@ final class ToDappResponseTests: TestCase {
 					origin: "https://dashboard-pr-126.rdx-works-main.extratools.works",
 					dAppDefinitionAddress: "account_tdx_21_12yth59wfyl8e4axupym0c96g9heuf5j06lv2lgc2cuapzlmj6alzzn"
 				)
-			)
+			),
+			decoder: decoder
 		)
 	}
 
@@ -218,7 +226,8 @@ final class ToDappResponseTests: TestCase {
 					origin: "https://dashboard-pr-126.rdx-works-main.extratools.works",
 					dAppDefinitionAddress: "account_tdx_21_12yth59wfyl8e4axupym0c96g9heuf5j06lv2lgc2cuapzlmj6alzzn"
 				)
-			)
+			),
+			decoder: decoder
 		)
 	}
 
@@ -252,7 +261,8 @@ final class ToDappResponseTests: TestCase {
 					origin: "https://dashboard-pr-126.rdx-works-main.extratools.works",
 					dAppDefinitionAddress: "account_tdx_21_12yth59wfyl8e4axupym0c96g9heuf5j06lv2lgc2cuapzlmj6alzzn"
 				)
-			)
+			),
+			decoder: decoder
 		)
 	}
 

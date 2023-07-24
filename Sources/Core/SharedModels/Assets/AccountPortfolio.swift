@@ -70,7 +70,6 @@ extension AccountPortfolio {
 	}
 
 	public struct NonFungibleResource: Sendable, Hashable, Identifiable, Codable {
-		public typealias GlobalID = String
 		public var id: ResourceAddress { resourceAddress }
 		public let resourceAddress: ResourceAddress
 		public let name: String?
@@ -93,15 +92,19 @@ extension AccountPortfolio {
 		}
 
 		public struct NonFungibleToken: Sendable, Hashable, Identifiable, Codable {
-			public typealias LocalID = Tagged<Self, String>
-
-			public let id: LocalID
+			public let id: NonFungibleGlobalId
 			public let name: String?
 			public let description: String?
 			public let keyImageURL: URL?
 			public let metadata: [Metadata]
 
-			public init(id: ID, name: String?, description: String?, keyImageURL: URL?, metadata: [Metadata]) {
+			public init(
+				id: NonFungibleGlobalId,
+				name: String?,
+				description: String?,
+				keyImageURL: URL?,
+				metadata: [Metadata]
+			) {
 				self.id = id
 				self.name = name
 				self.description = description
@@ -124,14 +127,14 @@ extension AccountPortfolio {
 }
 
 extension AccountPortfolio.NonFungibleResource {
-	public func nftGlobalID(for id: NonFungibleToken.LocalID) -> GlobalID {
-		resourceAddress.nftGlobalId(id)
+	public func nftGlobalID(for id: NonFungibleLocalId) throws -> NonFungibleGlobalId {
+		try resourceAddress.nftGlobalId(id)
 	}
 }
 
 extension ResourceAddress {
-	public func nftGlobalId(_ localID: AccountPortfolio.NonFungibleResource.NonFungibleToken.LocalID) -> String {
-		address + ":" + localID.rawValue
+	public func nftGlobalId(_ localID: NonFungibleLocalId) throws -> NonFungibleGlobalId {
+		try NonFungibleGlobalId.fromParts(resourceAddress: self.intoEngine(), nonFungibleLocalId: localID)
 	}
 }
 
@@ -173,5 +176,36 @@ extension AccountPortfolio.FungibleResource {
 extension AccountPortfolio.NonFungibleResource {
 	public var nonEmpty: Self? {
 		tokens.isEmpty ? nil : self
+	}
+}
+
+extension AccountPortfolio.NonFungibleResource.NonFungibleToken {
+	enum CodingKeys: CodingKey {
+		case id
+		case name
+		case description
+		case keyImageURL
+		case metadata
+	}
+
+	public init(from decoder: Decoder) throws {
+		let container = try decoder.container(keyedBy: CodingKeys.self)
+
+		try self.init(
+			id: .init(nonFungibleGlobalId: container.decode(String.self, forKey: .id)),
+			name: container.decodeIfPresent(String.self, forKey: .name),
+			description: container.decodeIfPresent(String.self, forKey: .description),
+			keyImageURL: container.decodeIfPresent(URL.self, forKey: .keyImageURL),
+			metadata: container.decode([AccountPortfolio.Metadata].self, forKey: .metadata)
+		)
+	}
+
+	public func encode(to encoder: Encoder) throws {
+		var container = encoder.container(keyedBy: CodingKeys.self)
+		try container.encode(id.asStr(), forKey: .id)
+		try container.encodeIfPresent(name, forKey: .name)
+		try container.encodeIfPresent(description, forKey: .description)
+		try container.encodeIfPresent(keyImageURL, forKey: .keyImageURL)
+		try container.encode(metadata, forKey: .metadata)
 	}
 }

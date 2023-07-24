@@ -27,6 +27,8 @@ extension Radix.Dashboard {
 			return .enkinet
 		case .hammunet:
 			return .hammunet
+		case .ansharnet:
+			return .rcnetV2
 		default:
 			return .rcnet
 		}
@@ -37,6 +39,12 @@ extension Radix.Dashboard {
 	public static var rcnet: Self {
 		.init(
 			url: URL(string: "https://rcnet-dashboard.radixdlt.com/")!
+		)
+	}
+
+	public static var rcnetV2: Self {
+		.init(
+			url: URL(string: "https://rcnet-v2-dashboard.radixdlt.com/")!
 		)
 	}
 

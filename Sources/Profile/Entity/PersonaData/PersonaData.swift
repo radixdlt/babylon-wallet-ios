@@ -34,8 +34,8 @@ public struct PersonaData: Sendable, Hashable, Codable, CustomStringConvertible 
 	) {
 		// The only purpose of this switch is to make sure we get a compilation error when we add a new PersonaData.Entry kind, so
 		// we do not forget to handle it here.
-		switch PersonaData.Entry.Kind.name {
-		case .name, .dateOfBirth, .companyName, .emailAddress, .phoneNumber, .url, .postalAddress, .creditCard: break
+		switch PersonaData.Entry.Kind.fullName {
+		case .fullName, .dateOfBirth, .companyName, .emailAddress, .phoneNumber, .url, .postalAddress, .creditCard: break
 		}
 
 		self.name = name
@@ -66,8 +66,8 @@ extension PersonaData {
 
 		// The only purpose of this switch is to make sure we get a compilation error when we add a new PersonaData.Entry kind, so
 		// we do not forget to handle it here.
-		switch PersonaData.Entry.Kind.name {
-		case .name, .dateOfBirth, .companyName, .emailAddress, .phoneNumber, .url, .postalAddress, .creditCard: break
+		switch PersonaData.Entry.Kind.fullName {
+		case .fullName, .dateOfBirth, .companyName, .emailAddress, .phoneNumber, .url, .postalAddress, .creditCard: break
 		}
 
 		return sequence.compactMap { $0 }
@@ -81,9 +81,10 @@ extension PersonaData {
 extension PersonaData {
 	public static let previewValue: Self = try! .init(
 		name: .init(value: .init(
-			given: "Satoshi",
-			middle: "Creator of Bitcoin",
-			family: "Nakamoto", variant: .eastern
+			variant: .eastern,
+			familyName: "Nakamoto",
+			givenNames: "Satoshi",
+			nickname: "Bitcoin"
 		)),
 		dateOfBirth: .init(value: .init(year: 2009, month: 1, day: 3)),
 		companyName: .init(value: .init(name: "Bitcoin")),
