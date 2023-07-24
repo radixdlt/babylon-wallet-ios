@@ -3,7 +3,7 @@ import Foundation
 
 extension BigDecimal {
 	// FIXME: This should not be used once we can get the actual fees
-	public static let temporaryStandardFee: BigDecimal = 15
+	public static let temporaryStandardFee: BigDecimal = 25
 }
 
 extension BigDecimal {
