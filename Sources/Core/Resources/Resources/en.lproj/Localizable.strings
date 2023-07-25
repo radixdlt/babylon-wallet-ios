@@ -575,7 +575,7 @@
 "addLedgerDevice_nameLedger_continueButtonTitle" = "Save and Continue";
 "androidProfileBackup_disabledText" = "Back up is turned off";
 "androidProfileBackup_lastBackedUp" = "Last Backed up: %@";
-"androidProfileBackup_noLastBackUp" = "Not Backed up yet";
+"androidProfileBackup_noLastBackUp" = "Not backed up yet";
 "androidProfileBackup_openSystemBackupSettings" = "Open System Backup Settings";
 "androidProfileBackup_backupWalletData_title" = "Backup Wallet Data";
 "androidProfileBackup_backupWalletData_message" = "Warning: If disabled you might lose access to your Accounts and Personas.";
