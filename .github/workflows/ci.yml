@@ -12,6 +12,22 @@ concurrency:
 
 jobs:
 
+  test_sbom:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+      - name: Install snyk
+        run: |
+          npm install snyk -g
+          snyk -v
+          snyk auth ${{ secrets.SNYK_TOKEN }}
+      - name: Generate SBOM
+        run: |
+          snyk sbom --all-projects --org=${{ secrets.SNYK_ORG_ID }} --format=cyclonedx1.4+json --json-file-output sbom.json
+
   snyk_scan:
     name: "Snyk scan"
     runs-on: ubuntu-latest
