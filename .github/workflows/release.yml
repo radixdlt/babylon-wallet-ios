@@ -31,4 +31,3 @@ jobs:
         with:
           files: sbom.json
           repo-token: ${{ secrets.GITHUB_TOKEN }}
-          release-tag: ${{ env.RELEASE_VERSION }}
