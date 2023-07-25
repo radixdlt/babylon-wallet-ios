@@ -14,6 +14,10 @@ jobs:
       - uses: actions/setup-node@v2
         with:
           node-version: '14'
+      - uses: webfactory/ssh-agent@v0.6.0
+        with:
+          ssh-private-key: |
+            ${{ secrets.SWIFT_ENGINE_TOOLKIT_SSH_KEY }}
       - name: Install snyk
         run: |
           npm install snyk -g
@@ -23,9 +27,7 @@ jobs:
         run: |
           snyk sbom --all-projects --org=${{ secrets.SNYK_ORG_ID }} --format=cyclonedx1.4+json --json-file-output sbom.json
       - name: Upload SBOM
-        uses: svenstaro/upload-release-action@2b9d2847a97b04d02ad5c3df2d3a27baa97ce689 # v2.6.1
+        uses: AButler/upload-release-assets@c94805dc72e4b20745f543da0f62eaee7722df7a # v2.0.2
         with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: sbom.json
-          tag: ${{ github.ref }}
-          overwrite: true
+          files: sbom.json
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
