@@ -170,7 +170,7 @@ extension DappMetadata.Ledger {
 			dAppDefinintionAddress: dAppDefinintionAddress,
 			name: name,
 			description: items[.description]?.asString,
-			thumbnail: items[.iconURL]?.asString.flatMap(URL.init)
+			thumbnail: items[.iconURL]?.asURL
 		)
 	}
 }
