@@ -160,9 +160,6 @@ extension GatewayAPI.StateNonFungibleDetailsResponseItem {
 		let schemes = ["http", "https"]
 		guard let scheme = url.scheme, schemes.contains(scheme) else { return nil }
 
-		let extensions = ["jpg", "jpeg", "png", "pdf", "svg", "gif"]
-		guard extensions.contains(url.pathExtension) else { return nil }
-
 		return url
 	}
 
