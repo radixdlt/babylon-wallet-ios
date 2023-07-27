@@ -60,6 +60,18 @@ extension GatewayAPI.EntityMetadataItemValue {
 	public var asURLCollection: [URL]? {
 		typed?.urlArrayValue?.values.compactMap(URL.init)
 	}
+    
+    public var asOriginCollection: [URL]? {
+        typed?.originArrayValue?.values.compactMap(URL.init)
+    }
+    
+    public var asGlobalAddress: String? {
+        typed?.globalAddressValue?.value
+    }
+    
+    public var asGlobalAddressCollection: [String]? {
+        typed?.globalAddressArrayValue?.values
+    }
 
 	public var publicKeyHashes: [GatewayAPI.PublicKeyHash]? {
 		typed?.publicKeyHashArrayValue?.values
@@ -84,19 +96,19 @@ extension GatewayAPI.EntityMetadataCollection {
 	}
 
 	public var dappDefinition: String? {
-		items[.dappDefinition]?.asString
+		items[.dappDefinition]?.asGlobalAddress
 	}
 
 	public var dappDefinitions: [String]? {
-		items[.dappDefinitions]?.asStringCollection
+		items[.dappDefinitions]?.asGlobalAddressCollection
 	}
 
 	public var claimedEntities: [String]? {
-		items[.claimedEntities]?.asStringCollection
+		items[.claimedEntities]?.asGlobalAddressCollection
 	}
 
 	public var claimedWebsites: [URL]? {
-		items[.claimedWebsites]?.asURLCollection
+		items[.claimedWebsites]?.asOriginCollection
 	}
 
 	public var accountType: AccountType? {
