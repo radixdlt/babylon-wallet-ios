@@ -657,7 +657,7 @@ extension TransactionReview {
 
 	func transferInfo(
 		resourceQuantifier: ResourceTracker,
-		createdEntities: [String: [String: MetadataValue]]?,
+		createdEntities: [String: [String: MetadataValue?]]?,
 		networkID: NetworkID,
 		type: TransferType
 	) async throws -> [Transfer] {
@@ -667,9 +667,9 @@ extension TransactionReview {
 		let metadata: (name: String?, symbol: String?, thumbnail: URL?) = await {
 			if let newResourceMetadata = createdEntities?[resourceAddress.address] {
 				return (
-					newResourceMetadata["name"]?.string,
-					newResourceMetadata["symbol"]?.string,
-					newResourceMetadata["icon_url"]?.string.flatMap(URL.init)
+					newResourceMetadata["name"]??.string,
+					newResourceMetadata["symbol"]??.string,
+					newResourceMetadata["icon_url"]??.string.flatMap(URL.init)
 				)
 			} else {
 				let remoteMetadata = try? await gatewayAPIClient.getEntityMetadata(resourceAddress.address)
@@ -1179,7 +1179,7 @@ extension TransactionType {
 		let accountWithdraws: [String: [ResourceTracker]]
 		let accountDeposits: [String: [ResourceTracker]]
 		let addressesInManifest: [EngineToolkit.EntityType: [EngineToolkit.Address]]
-		let metadataOfNewlyCreatedEntities: [String: [String: MetadataValue]]
+		let metadataOfNewlyCreatedEntities: [String: [String: MetadataValue?]]
 		let dataOfNewlyMintedNonFungibles: [String: [NonFungibleLocalId: [UInt8]]]
 
 		var allAddress: [EngineToolkit.Address] {
