@@ -129,8 +129,8 @@ extension DappDetails.View {
 					if let domain = viewStore.domain {
 						Text(L10n.AuthorizedDapps.DAppDetails.website)
 							.sectionHeading
-						
-                        Button(domain.absoluteString) {
+
+						Button(domain.absoluteString) {
 							viewStore.send(.openURLTapped(domain))
 						}
 						.buttonStyle(.url)
