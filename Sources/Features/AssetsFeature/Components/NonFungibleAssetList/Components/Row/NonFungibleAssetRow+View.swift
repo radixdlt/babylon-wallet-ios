@@ -17,7 +17,11 @@ extension NonFungibleAssetList.Row {
 
 extension NonFungibleAssetList.Row.View {
 	public var body: some SwiftUI.View {
-		WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
+		WithViewStore(
+			store,
+			observe: identity,
+			send: NonFungibleAssetList.Row.Action.view
+		) { viewStore in
 			if viewStore.resource.tokens.isEmpty {
 				EmptyView()
 			} else {
@@ -25,7 +29,11 @@ extension NonFungibleAssetList.Row.View {
 					rowView(viewStore)
 						.zIndex(.infinity)
 					ForEach(
-						Array(assetsToDisplay(viewStore).enumerated()),
+						Array(
+							assetsToDisplay(viewStore)
+								.sorted(by: \.localId)
+								.enumerated()
+						),
 						id: \.element
 					) { index, item in
 						componentView(with: viewStore, asset: item, index: index)
@@ -181,3 +189,21 @@ extension NonFungibleAssetList.Row.State {
 	)
 }
 #endif
+
+extension AccountPortfolio.NonFungibleResource.NonFungibleToken {
+	fileprivate var localId: NonFungibleLocalId {
+		id.localId()
+	}
+}
+
+// MARK: - NonFungibleLocalId + Comparable
+extension NonFungibleLocalId: Comparable {
+	public static func < (lhs: Self, rhs: Self) -> Bool {
+		switch (lhs, rhs) {
+		case let (.integer(value: lhs), .integer(value: rhs)):
+			return lhs < rhs
+		case let (lhs, rhs):
+			return lhs.toUserFacingString() < rhs.toUserFacingString()
+		}
+	}
+}
