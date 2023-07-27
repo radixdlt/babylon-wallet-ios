@@ -669,7 +669,7 @@ extension TransactionReview {
 				return (
 					newResourceMetadata["name"]??.string,
 					newResourceMetadata["symbol"]??.string,
-					newResourceMetadata["icon_url"]??.string.flatMap(URL.init)
+					newResourceMetadata["icon_url"]??.url
 				)
 			} else {
 				let remoteMetadata = try? await gatewayAPIClient.getEntityMetadata(resourceAddress.address)
@@ -736,9 +736,6 @@ extension TransactionReview {
 			}
 
 			return result
-		default:
-			assertionFailure()
-			return []
 		}
 	}
 }
