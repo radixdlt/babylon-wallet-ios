@@ -60,18 +60,18 @@ extension GatewayAPI.EntityMetadataItemValue {
 	public var asURLCollection: [URL]? {
 		typed?.urlArrayValue?.values.compactMap(URL.init)
 	}
-    
-    public var asOriginCollection: [URL]? {
-        typed?.originArrayValue?.values.compactMap(URL.init)
-    }
-    
-    public var asGlobalAddress: String? {
-        typed?.globalAddressValue?.value
-    }
-    
-    public var asGlobalAddressCollection: [String]? {
-        typed?.globalAddressArrayValue?.values
-    }
+
+	public var asOriginCollection: [URL]? {
+		typed?.originArrayValue?.values.compactMap(URL.init)
+	}
+
+	public var asGlobalAddress: String? {
+		typed?.globalAddressValue?.value
+	}
+
+	public var asGlobalAddressCollection: [String]? {
+		typed?.globalAddressArrayValue?.values
+	}
 
 	public var publicKeyHashes: [GatewayAPI.PublicKeyHash]? {
 		typed?.publicKeyHashArrayValue?.values
