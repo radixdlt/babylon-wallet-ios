@@ -144,9 +144,15 @@ extension GatewayAPI.StateNonFungibleDetailsResponseItem {
 		var keyImageURL: URL? = nil
 
 		for string in strings {
-			if keyImageURL == nil, let foundKeyImageURL = getKeyImageURL(from: string) {
+			if
+				keyImageURL == nil,
+				let foundKeyImageURL = getKeyImageURL(from: string)
+			{
 				keyImageURL = foundKeyImageURL
-			} else if name == nil, let foundName = getName(from: string) {
+			} else if
+				name == nil,
+				let foundName = getName(from: string)
+			{
 				name = foundName
 			}
 		}
@@ -155,7 +161,12 @@ extension GatewayAPI.StateNonFungibleDetailsResponseItem {
 	}
 
 	private func getKeyImageURL(from string: String) -> URL? {
-		guard let url = URL(string: string) else { return nil }
+		guard
+			let url = (string.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed))
+			.flatMap(URL.init(string:))
+		else {
+			return nil
+		}
 
 		let schemes = ["http", "https"]
 		guard let scheme = url.scheme, schemes.contains(scheme) else { return nil }
