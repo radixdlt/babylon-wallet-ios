@@ -14,17 +14,13 @@ public struct AuthorizedDapps: Sendable, FeatureReducer {
 	// MARK: State
 
 	public struct State: Sendable, Hashable {
-		public var dApps: Profile.Network.AuthorizedDapps
+		public var dApps: Profile.Network.AuthorizedDapps = []
 		public var thumbnails: [Profile.Network.AuthorizedDapp.ID: URL] = [:]
 
 		@PresentationState
 		public var presentedDapp: DappDetails.State?
 
-		public init(
-			dApps: Profile.Network.AuthorizedDapps = [],
-			presentedDapp: DappDetails.State? = nil
-		) {
-			self.dApps = dApps
+		public init(presentedDapp: DappDetails.State? = nil) {
 			self.presentedDapp = presentedDapp
 		}
 	}
