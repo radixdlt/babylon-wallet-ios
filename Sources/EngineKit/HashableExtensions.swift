@@ -484,7 +484,8 @@ extension TransactionType: Hashable {
 				lhsAccountDeposits,
 				lhsAddressesInManifest,
 				lhsMetadataOfNewlyCreatedEntities,
-				lhsDataOfNewlyMintedNonFungibles
+				lhsDataOfNewlyMintedNonFungibles,
+				lhsAddressesOfNewlyCreatedEntities
 			),
 			.generalTransaction(
 				rhsAccountProofs,
@@ -492,7 +493,8 @@ extension TransactionType: Hashable {
 				rhsAccountDeposits,
 				rhsAddressesInManifest,
 				rhsMetadataOfNewlyCreatedEntities,
-				rhsDataOfNewlyMintedNonFungibles
+				rhsDataOfNewlyMintedNonFungibles,
+				rhsAddressesOfNewlyCreatedEntities
 			)
 		):
 			return lhsAccountProofs == rhsAccountProofs &&
@@ -500,7 +502,8 @@ extension TransactionType: Hashable {
 				lhsAccountDeposits == rhsAccountDeposits &&
 				lhsAddressesInManifest == rhsAddressesInManifest &&
 				lhsMetadataOfNewlyCreatedEntities == rhsMetadataOfNewlyCreatedEntities &&
-				lhsDataOfNewlyMintedNonFungibles == rhsDataOfNewlyMintedNonFungibles
+				lhsDataOfNewlyMintedNonFungibles == rhsDataOfNewlyMintedNonFungibles &&
+				lhsAddressesOfNewlyCreatedEntities == rhsAddressesOfNewlyCreatedEntities
 		case (.nonConforming, .nonConforming):
 			return true
 		default:
@@ -519,7 +522,7 @@ extension TransactionType: Hashable {
 			hasher.combine("transfer")
 			hasher.combine(from)
 			hasher.combine(transfers)
-		case let .generalTransaction(accountProofs, accountWithdraws, accountDeposits, addressesInManifest, metadataOfNewlyCreatedEntities, dataOfNewlyMintedNonFungibles):
+		case let .generalTransaction(accountProofs, accountWithdraws, accountDeposits, addressesInManifest, metadataOfNewlyCreatedEntities, dataOfNewlyMintedNonFungibles, addressesOfNewlyCreatedEntities):
 			hasher.combine("generalTransaction")
 			hasher.combine(accountProofs)
 			hasher.combine(accountWithdraws)
@@ -527,6 +530,7 @@ extension TransactionType: Hashable {
 			hasher.combine(addressesInManifest)
 			hasher.combine(metadataOfNewlyCreatedEntities)
 			hasher.combine(dataOfNewlyMintedNonFungibles)
+			hasher.combine(addressesOfNewlyCreatedEntities)
 		case .nonConforming:
 			hasher.combine("nonConforming")
 		}
