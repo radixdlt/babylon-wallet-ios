@@ -42,7 +42,7 @@ public struct AssetsView: Sendable, FeatureReducer {
 
 		init(
 			account: Profile.Network.Account,
-			assetKinds: NonEmpty<[AssetKind]> = .init([.fungible, .nonFungible])!,
+			assetKinds: NonEmpty<[AssetKind]> = .init(rawValue: AssetKind.allCases)!,
 			fungibleTokenList: FungibleAssetList.State,
 			nonFungibleTokenList: NonFungibleAssetList.State,
 			mode: Mode
