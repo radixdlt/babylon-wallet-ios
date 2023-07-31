@@ -39,7 +39,12 @@ extension AssetsView {
 								)
 							)
 						case .poolUnits:
-							Text("Pool Units 💰")
+							PoolUnitsList.View(
+								store: .init(
+									initialState: .init(),
+									reducer: PoolUnitsList()
+								)
+							)
 						}
 					}
 					.padding(.bottom, .medium1)
