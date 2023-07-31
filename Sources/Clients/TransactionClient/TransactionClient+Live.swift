@@ -160,12 +160,12 @@ extension TransactionClient {
 					return nil
 				}
 
-				let feePayer = nonEmpty.first
+				let feePayer = candidates.first
 				let addressOfPayer = feePayer.account.address
 
 				guard await accountsWithEnoughFunds(from: [addressOfPayer], toPay: feeToAdd).first?.owner == addressOfPayer else {
 					assertionFailure("did you JUST spend funds? unlucky...")
-					throw TransactionFailure.failedToPrepareForTXSigning(.failedToFindAccountWithEnoughFundsToLockFee)
+					return nil
 				}
 
 				let manifestWithLockFee = try await lockFeeWithSelectedPayer(
@@ -178,7 +178,7 @@ extension TransactionClient {
 					manifestWithLockFee: manifestWithLockFee,
 					feePayerSelectionAmongstCandidates: .init(
 						selected: feePayer,
-						candidates: nonEmpty,
+						candidates: candidates,
 						fee: feeToAdd,
 						selection: .auto
 					)
@@ -209,7 +209,7 @@ extension TransactionClient {
 			let remainingAccounts = Set(allAccounts.rawValue.elements).subtracting(triedAccounts)
 			let remainingCandidates = try await feePayerCandiates(accounts: .init(remainingAccounts), fee: feeToAdd)
 
-			return .excludesLockFee(.init(manifestExcludingLockFee: manifest, feePayerCandidates: nonEmpty, feeNotYetAdded: feeToAdd))
+			return .excludesLockFee(.init(manifestExcludingLockFee: manifest, feePayerCandidates: .init(uniqueElements: remainingCandidates), feeNotYetAdded: feeToAdd))
 		}
 
 		let buildTransactionIntent: BuildTransactionIntent = { request in
