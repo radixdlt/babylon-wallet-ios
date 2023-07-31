@@ -2,7 +2,7 @@ import FeaturePrelude
 
 extension PoolUnitsList.LSUComponent.State {
 	var viewState: PoolUnitsList.LSUComponent.ViewState {
-		.init(units: .init(), stakeClaimNFTs: .init())
+		.init(liquidStakeUnits: .init(), stakeClaimNFTs: .init())
 	}
 }
 
@@ -12,7 +12,7 @@ extension PoolUnitsList.ViewState {
 			lsuComponents: .init(
 				[
 					.init(
-						units: .init(
+						liquidStakeUnits: .init(
 							uncheckedUniqueElements: [
 								.init(
 									thumbnail: .xrd,
@@ -89,7 +89,7 @@ extension PoolUnitsList.LSUComponent {
 		let title: String = ""
 		let imageURL: URL = .init(string: "www.wp.pl")!
 
-		let units: IdentifiedArrayOf<UnitViewState>
+		let liquidStakeUnits: IdentifiedArrayOf<UnitViewState>
 		let stakeClaimNFTs: IdentifiedArrayOf<StakeClaimNFTViewState>
 	}
 
@@ -102,6 +102,19 @@ extension PoolUnitsList.LSUComponent {
 		}
 
 		public var body: some SwiftUI.View {
+			ForEachStore(
+				store.scope(
+					state: \.liquidStakeUnits,
+					action: { (_: String, _: Prelude.Unit) in
+						fatalError()
+					}
+				)
+			) { liquidStakeUnitViewStore in
+				WithViewStore(liquidStakeUnitViewStore) {
+					Text("\($0.state.description)")
+				}
+			}
+
 			WithViewStore(store, observe: identity, send: identity) { viewStore in
 				Text("\(viewStore.state.description)")
 					.background(Color.yellow)
@@ -114,6 +127,13 @@ extension PoolUnitsList.LSUComponent {
 // MARK: - PoolUnitsList.LSUComponent.ViewState + CustomStringConvertible
 extension PoolUnitsList.LSUComponent.ViewState: CustomStringConvertible {
 	public var description: String {
-		"\(id), \(imageURL), \(stakeClaimNFTs), \(title), \(units)"
+		"\(id), \(imageURL), \(stakeClaimNFTs), \(title)"
+	}
+}
+
+// MARK: - PoolUnitsList.LSUComponent.UnitViewState + CustomStringConvertible
+extension PoolUnitsList.LSUComponent.UnitViewState: CustomStringConvertible {
+	var description: String {
+		"\(id), \(stakedAmmount), \(symbol), \(tokenAmount)"
 	}
 }

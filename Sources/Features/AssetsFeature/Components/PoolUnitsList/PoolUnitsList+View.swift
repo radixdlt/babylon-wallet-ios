@@ -27,19 +27,13 @@ extension PoolUnitsList {
 		}
 
 		public var body: some SwiftUI.View {
-			WithViewStore(store, observe: identity, send: identity) { _ in
+			WithViewStore(store) { _ in
 				IfLetStore(store.scope(state: \.lsuComponents, action: identity)) { lsuComponentsViewStore in
 					ForEachStore(
 						lsuComponentsViewStore.scope(
 							state: \.rawValue,
-							action: {
-								switch $0 {
-								case let (_, action):
-									switch action {
-									case .appeared:
-										fatalError()
-									}
-								}
+							action: { _ in
+								fatalError()
 							}
 						),
 						content: LSUComponent.View.init
