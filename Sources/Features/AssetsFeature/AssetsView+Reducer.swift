@@ -8,6 +8,7 @@ public struct AssetsView: Sendable, FeatureReducer {
 		public enum AssetKind: String, Sendable, Hashable, CaseIterable, Identifiable {
 			case fungible
 			case nonFungible
+			case poolUnits
 
 			var displayText: String {
 				switch self {
@@ -15,6 +16,8 @@ public struct AssetsView: Sendable, FeatureReducer {
 					return L10n.Account.tokens
 				case .nonFungible:
 					return L10n.Account.nfts
+				case .poolUnits:
+					return L10n.Account.poolUnits
 				}
 			}
 		}

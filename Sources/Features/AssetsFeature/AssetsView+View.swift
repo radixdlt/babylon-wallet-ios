@@ -38,6 +38,8 @@ extension AssetsView {
 									action: { .child(.nonFungibleTokenList($0)) }
 								)
 							)
+						case .poolUnits:
+							Text("Pool Units 💰")
 						}
 					}
 					.padding(.bottom, .medium1)
