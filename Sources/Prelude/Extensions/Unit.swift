@@ -5,5 +5,7 @@ import Foundation
 /// `TaskResult<Void>` which does not compile since `Void` is not `Equatable`. We
 /// can now use `TaskResult<Unit>`.
 public struct Unit: Sendable, Hashable, Codable, Error {
-	public init() {}
+	public static var instance: Self { self.init() }
+
+	private init() {}
 }
