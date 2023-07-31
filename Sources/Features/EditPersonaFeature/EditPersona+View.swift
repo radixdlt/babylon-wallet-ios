@@ -7,7 +7,7 @@ extension EditPersona.State {
 			personaLabel: persona.displayName.rawValue,
 			avatarURL: URL(string: "something")!,
 			addAFieldButtonState: {
-				if dynamicFields.count < DynamicFieldID.supportedKinds.count {
+				if alreadyAddedEntryKinds.count < EntryKind.supportedKinds.count {
 					return .enabled
 				} else {
 					return .disabled
@@ -16,38 +16,19 @@ extension EditPersona.State {
 			output: { () -> EditPersona.Output? in
 				guard
 					let personaLabelInput = labelField.input,
-					let personaLabelOutput = NonEmptyString(rawValue: personaLabelInput.trimmingWhitespace()),
-					let fieldsOutput = fieldsOutput(dynamicFields: dynamicFields)
+					let personaLabelOutput = NonEmptyString(rawValue: personaLabelInput.trimmingWhitespace())
 				else {
 					return nil
 				}
+
 				return EditPersona.Output(
 					personaLabel: personaLabelOutput,
-					fields: fieldsOutput
+					name: entries.name?.content,
+					emailAddress: entries.emailAddress?.content,
+					phoneNumber: entries.phoneNumber?.content
 				)
 			}()
 		)
-	}
-
-	func fieldsOutput(
-		dynamicFields: IdentifiedArrayOf<EditPersonaDynamicField.State>
-	) -> IdentifiedArrayOf<Identified<EditPersonaDynamicField.State.ID, String>>? {
-		var fieldsOutput: IdentifiedArrayOf<Identified<EditPersonaDynamicField.State.ID, String>> = []
-		for field in dynamicFields {
-			guard
-				let fieldInput = field.input,
-				let fieldOutput = NonEmptyString(rawValue: fieldInput.trimmingWhitespace())
-			else {
-				if field.kind == .dynamic(isRequiredByDapp: true) {
-					return nil
-				} else {
-					continue
-				}
-			}
-			fieldsOutput[id: field.id] = .init(fieldOutput.rawValue, id: field.id)
-		}
-
-		return fieldsOutput
 	}
 }
 
@@ -75,7 +56,7 @@ extension EditPersona {
 						VStack(spacing: .medium1) {
 							PersonaThumbnail(viewStore.avatarURL, size: .veryLarge)
 
-							EditPersonaStaticField.View(
+							EditPersonaField.View(
 								store: store.scope(
 									state: \.labelField,
 									action: (/Action.child
@@ -86,14 +67,20 @@ extension EditPersona {
 
 							Separator()
 
-							ForEachStore(
-								store.scope(
-									state: \.dynamicFields,
+							Text("dApps can request permission from you to share the following fields of information.")
+								.multilineTextAlignment(.leading)
+								.textStyle(.body1HighImportance)
+								.foregroundColor(.app.gray2)
+
+							Separator()
+
+							EditPersonaEntries.View(
+								store: store.scope(
+									state: \.entries,
 									action: (/Action.child
-										.. EditPersona.ChildAction.dynamicField
+										.. EditPersona.ChildAction.personaData
 									).embed
-								),
-								content: EditPersonaDynamicField.View.init
+								)
 							)
 
 							Button(action: { viewStore.send(.addAFieldButtonTapped) }) {
@@ -152,12 +139,6 @@ struct EditPersona_Preview: PreviewProvider {
 			store: .init(
 				initialState: .previewValue(
 					mode: .edit
-//					mode: .dapp(
-//						requiredFieldIDs: [
-//							.givenName,
-//							.emailAddress,
-//						]
-//					)
 				),
 				reducer: EditPersona()
 			)

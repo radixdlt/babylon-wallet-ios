@@ -13,7 +13,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 
 		public let nonce: Nonce
 		public let transactionManifest: TransactionManifest
-		public let message: String?
+		public let message: Message
 		public let signTransactionPurpose: SigningPurpose.SignTransactionPurpose
 
 		public var transactionManifestWithLockFee: TransactionManifest?
@@ -41,7 +41,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			transactionManifest: TransactionManifest,
 			nonce: Nonce,
 			signTransactionPurpose: SigningPurpose.SignTransactionPurpose,
-			message: String?,
+			message: Message,
 			feeToAdd: BigDecimal = .temporaryStandardFee, // FIXME: use estimate from `analyze`
 			ephemeralNotaryPrivateKey: Curve25519.Signing.PrivateKey = .init(),
 			customizeGuarantees: TransactionReviewGuarantees.State? = nil
@@ -170,10 +170,11 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		switch viewAction {
 		case .appeared:
 			let manifest = state.transactionManifest
-			return .task { [feeToAdd = state.fee, nonce = state.nonce] in
+			return .task { [feeToAdd = state.fee, nonce = state.nonce, message = state.message] in
 				await .internal(.previewLoaded(TaskResult {
 					try await transactionClient.getTransactionReview(.init(
 						manifestToSign: manifest,
+						message: message,
 						nonce: nonce,
 						feeToAdd: feeToAdd
 					))
@@ -209,6 +210,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 				let request = TransactionClient.PrepareForSigningRequest(
 					nonce: state.nonce,
 					manifest: manifest,
+					message: state.message,
 					networkID: networkID,
 					feePayer: feePayerSelectionAmongstCandidates.selected.account,
 					purpose: .signTransaction(state.signTransactionPurpose),
@@ -630,7 +632,7 @@ extension TransactionReview {
 
 			let transfers = try await accountDeposits.asyncFlatMap {
 				try await transferInfo(
-					resourceQuantifier: $0.resourceSpecifier,
+					resourceQuantifier: $0,
 					createdEntities: transaction.metadataOfNewlyCreatedEntities,
 					networkID: networkID,
 					type: $0.transferType
@@ -654,8 +656,8 @@ extension TransactionReview {
 	}
 
 	func transferInfo(
-		resourceQuantifier: ResourceSpecifier,
-		createdEntities: [String: [String: MetadataValue]]?,
+		resourceQuantifier: ResourceTracker,
+		createdEntities: [String: [String: MetadataValue?]]?,
 		networkID: NetworkID,
 		type: TransferType
 	) async throws -> [Transfer] {
@@ -665,9 +667,9 @@ extension TransactionReview {
 		let metadata: (name: String?, symbol: String?, thumbnail: URL?) = await {
 			if let newResourceMetadata = createdEntities?[resourceAddress.address] {
 				return (
-					newResourceMetadata["name"]?.string,
-					newResourceMetadata["symbol"]?.string,
-					newResourceMetadata["icon_URL"]?.url
+					newResourceMetadata["name"]??.string,
+					newResourceMetadata["symbol"]??.string,
+					newResourceMetadata["icon_url"]??.url
 				)
 			} else {
 				let remoteMetadata = try? await gatewayAPIClient.getEntityMetadata(resourceAddress.address)
@@ -681,11 +683,11 @@ extension TransactionReview {
 		}()
 
 		switch resourceQuantifier {
-		case let .amount(_, amount):
-			let amount = try BigDecimal(fromString: amount.asStr())
+		case let .fungible(_, source):
+			let amount = try BigDecimal(fromString: source.amount.asStr())
 
 			func guarantee() -> TransactionClient.Guarantee? {
-				guard case let .estimated(instructionIndex) = type, !isNewResource else { return nil }
+				guard case let .predicted(instructionIndex, _) = source, !isNewResource else { return nil }
 				return .init(amount: amount, instructionIndex: instructionIndex, resourceAddress: resourceAddress)
 			}
 
@@ -697,8 +699,8 @@ extension TransactionReview {
 				isXRD: (try? resourceAddress.isXRD(on: networkID)) ?? false,
 				guarantee: guarantee()
 			))]
-
-		case let .ids(_, ids):
+		case let .nonFungible(_, _, .guaranteed(ids)),
+		     let .nonFungible(_, _, ids: .predicted(instructionIndex: _, value: ids)):
 			if isNewResource {
 				return try ids.map { id in
 					try Transfer.nonFungible(.init(
@@ -890,20 +892,51 @@ extension Collection where Element: Equatable {
 	}
 }
 
-extension Source {
-	public var resourceSpecifier: ResourceSpecifier {
+extension ResourceTracker {
+	public var decimalSource: DecimalSource {
 		switch self {
-		case let .guaranteed(resourceSpecifier), let .predicted(_, resourceSpecifier):
-			return resourceSpecifier
+		case let .fungible(_, amount):
+			return amount
+		case let .nonFungible(_, amount, _):
+			return amount
 		}
 	}
 
 	var transferType: TransactionReview.TransferType {
-		switch self {
+		switch decimalSource {
 		case .guaranteed:
 			return .exact
-		case let .predicted(index, _):
-			return .estimated(instructionIndex: index)
+		case let .predicted(instructionIndex, _):
+			return .estimated(instructionIndex: instructionIndex)
+		}
+	}
+
+	public var resourceAddress: EngineToolkit.Address {
+		switch self {
+		case let .fungible(address, _):
+			return address
+		case let .nonFungible(address, _, _):
+			return address
+		}
+	}
+
+	var ids: [NonFungibleLocalId]? {
+		switch self {
+		case .fungible:
+			return nil
+		case let .nonFungible(_, _, source):
+			return source.ids
+		}
+	}
+}
+
+extension NonFungibleLocalIdVecSource {
+	var ids: [NonFungibleLocalId] {
+		switch self {
+		case let .guaranteed(value):
+			return value
+		case let .predicted(_, value):
+			return value
 		}
 	}
 }
@@ -1140,10 +1173,10 @@ public enum ReviewedTransaction: Hashable, Sendable {
 extension TransactionType {
 	public struct GeneralTransaction: Hashable, Sendable {
 		let accountProofs: [EngineToolkit.Address]
-		let accountWithdraws: [String: [ResourceSpecifier]]
-		let accountDeposits: [String: [Source]]
+		let accountWithdraws: [String: [ResourceTracker]]
+		let accountDeposits: [String: [ResourceTracker]]
 		let addressesInManifest: [EngineToolkit.EntityType: [EngineToolkit.Address]]
-		let metadataOfNewlyCreatedEntities: [String: [String: MetadataValue]]
+		let metadataOfNewlyCreatedEntities: [String: [String: MetadataValue?]]
 		let dataOfNewlyMintedNonFungibles: [String: [NonFungibleLocalId: [UInt8]]]
 
 		var allAddress: [EngineToolkit.Address] {
@@ -1165,8 +1198,8 @@ extension TransactionType {
 			return .conforming(
 				.init(
 					accountProofs: [],
-					accountWithdraws: [from.addressString(): [transferred]],
-					accountDeposits: [to.addressString(): [transferred.toSource]],
+					accountWithdraws: [from.addressString(): [transferred.toResourceTracker]],
+					accountDeposits: [to.addressString(): [transferred.toResourceTracker]],
 					addressesInManifest: addressesInManifest,
 					metadataOfNewlyCreatedEntities: [:],
 					dataOfNewlyMintedNonFungibles: [:]
@@ -1174,8 +1207,8 @@ extension TransactionType {
 			)
 
 		case let .transfer(from, transfers):
-			var withdraws: [String: ResourceSpecifier] = [:]
-			var deposits: [String: [Source]] = [:]
+			var withdraws: [String: ResourceTracker] = [:]
+			var deposits: [String: [ResourceTracker]] = [:]
 			var allAddresses: Set<EngineToolkit.Address> = [from]
 
 			for (address, resouceTransfers) in transfers {
@@ -1187,26 +1220,42 @@ extension TransactionType {
 					allAddresses.insert(resourceAddress)
 
 					let existingResource = withdraws[rawResourceAddress]
-					var total: ResourceSpecifier
-					let transfered: ResourceSpecifier
+					var total: ResourceTracker
+					let transfered: ResourceTracker
 
 					switch resource {
 					case let .amount(amount):
-						transfered = .amount(resourceAddress: resourceAddress, amount: amount)
+						transfered = .fungible(
+							resourceAddress: resourceAddress,
+							amount: .guaranteed(value: amount)
+						)
 						total = transfered
-						if let totalAmount = existingResource?.amount {
-							total = .amount(resourceAddress: resourceAddress, amount: totalAmount.add(other: amount))
+						if let totalAmount = existingResource?.decimalSource.amount {
+							let sum = totalAmount.add(other: amount)
+							total = .fungible(
+								resourceAddress: resourceAddress,
+								amount: .guaranteed(value: sum)
+							)
 						}
 					case let .ids(ids):
-						transfered = .ids(resourceAddress: resourceAddress, ids: ids)
+						transfered = try! .nonFungible(
+							resourceAddress: resourceAddress,
+							amount: .guaranteed(value: .init(value: "\(ids.count)")),
+							ids: .guaranteed(value: ids)
+						)
 						total = transfered
 						if let allIds = existingResource?.ids {
-							total = .ids(resourceAddress: resourceAddress, ids: allIds + ids)
+							let sum = allIds + ids
+							total = try! .nonFungible(
+								resourceAddress: resourceAddress,
+								amount: .guaranteed(value: .init(value: "\(sum.count)")),
+								ids: .guaranteed(value: sum)
+							)
 						}
 					}
 
 					withdraws[rawResourceAddress] = total
-					deposits[address, default: []].append(transfered.toSource)
+					deposits[address, default: []].append(transfered)
 				}
 			}
 
@@ -1242,11 +1291,7 @@ extension TransactionType {
 }
 
 extension ResourceSpecifier {
-	var toSource: Source {
-		.guaranteed(value: self)
-	}
-
-	var amount: EngineToolkit.Decimal? {
+	var amount: EngineKit.Decimal? {
 		if case let .amount(_, amount) = self {
 			return amount
 		}
@@ -1269,6 +1314,15 @@ extension ResourceSpecifier {
 			return resourceAddress
 		}
 	}
+
+	var toResourceTracker: ResourceTracker {
+		switch self {
+		case let .amount(resourceAddress, amount):
+			return .fungible(resourceAddress: resourceAddress, amount: .guaranteed(value: amount))
+		case let .ids(resourceAddress, ids):
+			return try! .nonFungible(resourceAddress: resourceAddress, amount: .guaranteed(value: .init(value: "\(ids.count)")), ids: .guaranteed(value: ids))
+		}
+	}
 }
 
 extension MetadataValue {
@@ -1284,5 +1338,16 @@ extension MetadataValue {
 			return URL(string: value)
 		}
 		return nil
+	}
+}
+
+extension DecimalSource {
+	var amount: EngineKit.Decimal {
+		switch self {
+		case let .guaranteed(value):
+			return value
+		case let .predicted(_, value):
+			return value
+		}
 	}
 }

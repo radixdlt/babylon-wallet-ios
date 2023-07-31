@@ -219,7 +219,7 @@ extension TransactionClient {
 			)
 
 			return .init(
-				intent: .init(header: header, manifest: request.manifest),
+				intent: .init(header: header, manifest: request.manifest, message: request.message),
 				transactionSigners: transactionSigners
 			)
 		}
@@ -247,12 +247,17 @@ extension TransactionClient {
 
 			return .init(
 				notarized: compiledNotarizedTXIntent,
-				txID: .init(txID.asStr())
+				txID: txID
 			)
 		}
 
 		let getTransactionReview: GetTransactionReview = { request in
 			let networkID = await gatewaysClient.getCurrentNetworkID()
+
+			let addFeeToManifestOutcome = try await lockFeeBySearchingForSuitablePayer(
+				request.manifestToSign,
+				request.feeToAdd
+			)
 
 			let transactionPreviewRequest = try await createTransactionPreviewRequest(for: request, networkID: networkID)
 			let transactionPreviewResponse = try await gatewayAPIClient.transactionPreview(transactionPreviewRequest)
@@ -265,10 +270,6 @@ extension TransactionClient {
 
 			let analyzedManifestToReview = try request.manifestToSign.analyzeExecution(transactionReceipt: receiptBytes)
 
-			let addFeeToManifestOutcome = try await lockFeeBySearchingForSuitablePayer(
-				request.manifestToSign,
-				request.feeToAdd
-			)
 			return TransactionToReview(
 				analyzedManifestToReview: analyzedManifestToReview,
 				addFeeToManifestOutcome: addFeeToManifestOutcome,
@@ -284,6 +285,7 @@ extension TransactionClient {
 			let intent = try await buildTransactionIntent(.init(
 				networkID: gatewaysClient.getCurrentNetworkID(),
 				manifest: request.manifestToSign,
+				message: request.message,
 				nonce: request.nonce,
 				makeTransactionHeaderInput: request.makeTransactionHeaderInput,
 				ephemeralNotaryPublicKey: request.ephemeralNotaryPublicKey
@@ -300,6 +302,7 @@ extension TransactionClient {
 			let transactionIntentWithSigners = try await buildTransactionIntent(.init(
 				networkID: request.networkID,
 				manifest: request.manifest,
+				message: request.message,
 				nonce: request.nonce,
 				ephemeralNotaryPublicKey: request.ephemeralNotaryPublicKey
 			))

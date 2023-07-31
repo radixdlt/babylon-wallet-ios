@@ -3,7 +3,7 @@ import ComposableArchitecture // actually CasePaths... but CI fails if we do `im
 import Cryptography
 import EngineKit
 import FactorSourcesClient
-import Profile
+import struct Profile.Signer
 import RadixConnectClient
 import ROLAClient
 

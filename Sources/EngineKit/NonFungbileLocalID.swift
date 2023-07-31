@@ -2,50 +2,84 @@ import EngineToolkit
 import Prelude
 
 extension NonFungibleLocalId {
-	struct InvalidLocalID: Error {}
-
 	public static func from(stringFormat: String) throws -> Self {
-		guard stringFormat.count >= 3 else {
-			loggerGlobal.warning("Invalid nft id: \(stringFormat)")
-			throw InvalidLocalID()
-		}
-		let prefix = stringFormat.prefix(1)
-		let value = String(stringFormat.dropLast().dropFirst())
-		switch prefix {
-		case "#":
-			guard let value = UInt64(value) else {
-				throw InvalidLocalID()
-			}
-			return .integer(value: value)
-		case "{":
-			return .uuid(value: value)
-		case "<":
-			return .str(value: value)
-		case "[":
-			return try .bytes(value: value.map {
-				guard let byte = UInt8(String($0)) else {
-					throw InvalidLocalID()
-				}
-				return byte
-			})
-		default:
-			throw InvalidLocalID()
-		}
+		try nonFungibleLocalIdFromStr(string: stringFormat)
 	}
 
 	public func toString() throws -> String {
+		try nonFungibleLocalIdAsStr(value: self)
+	}
+
+	public func toUserFacingString() -> String {
+		do {
+			let rawValue = try toString()
+			// Just a safety guard. Each NFT Id should be of format <prefix>value<suffix>
+			guard rawValue.count >= 3 else {
+				loggerGlobal.warning("Invalid nft id: \(rawValue)")
+				return rawValue
+			}
+			// Nothing fancy, just remove the prefix and suffix.
+			return String(rawValue.dropLast().dropFirst())
+		} catch {
+			// Should not happen, just to not throw an error.
+			return ""
+		}
+	}
+}
+
+// MARK: - NonFungibleLocalId + Identifiable
+extension NonFungibleLocalId: Identifiable {
+	public var id: String {
+		do {
+			return try nonFungibleLocalIdAsStr(value: self)
+		} catch {
+			assertionFailure("Failed to convert nft id to string!! \(error)")
+			return ""
+		}
+	}
+}
+
+// MARK: - NonFungibleLocalId + Codable
+extension NonFungibleLocalId: Codable {
+	enum CodingKeys: CodingKey {
+		case integer
+		case str
+		case bytes
+		case ruid
+	}
+
+	public init(from decoder: Decoder) throws {
+		let container = try decoder.container(keyedBy: CodingKeys.self)
+		if let value = try? container.decode(UInt64.self, forKey: .integer) {
+			self = .integer(value: value)
+			return
+		}
+		if let value = try? container.decode(String.self, forKey: .str) {
+			self = .str(value: value)
+			return
+		}
+		if let value = try? container.decode([UInt8].self, forKey: .bytes) {
+			self = .bytes(value: value)
+			return
+		}
+		if let value = try? container.decode([UInt8].self, forKey: .ruid) {
+			self = .ruid(value: value)
+			return
+		}
+		throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: decoder.codingPath, debugDescription: "Unable to decode values."))
+	}
+
+	public func encode(to encoder: Encoder) throws {
+		var container = encoder.container(keyedBy: CodingKeys.self)
 		switch self {
 		case let .integer(value):
-			return "#\(value)#"
-		case let .uuid(uuid):
-			return "{\(uuid)}"
+			try container.encode(value, forKey: .integer)
 		case let .str(value):
-			return "<\(value)>"
+			try container.encode(value, forKey: .str)
 		case let .bytes(value):
-			guard let string = String(data: value.data, encoding: .utf8) else {
-				throw InvalidLocalID()
-			}
-			return "[\(string)]"
+			try container.encode(value, forKey: .bytes)
+		case let .ruid(value):
+			try container.encode(value, forKey: .ruid)
 		}
 	}
 }

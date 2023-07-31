@@ -69,27 +69,5 @@ extension EditPersonaAddEntryKinds {
 	}
 }
 
-#if DEBUG
-import SwiftUI // NB: necessary for previews to appear
-
-struct EditPersonaAddEntryKinds_PreviewProvider: PreviewProvider {
-	static var previews: some View {
-		EditPersonaAddEntryKinds_Preview()
-	}
-}
-
-struct EditPersonaAddEntryKinds_Preview: View {
-	var body: some View {
-		EditPersonaAddEntryKinds.View(
-			store: Store(
-				initialState: EditPersonaAddEntryKinds.State(
-					excludedEntryKinds: [
-						.emailAddress,
-					]
-				),
-				reducer: EditPersonaAddEntryKinds()
-			)
-		)
-	}
-}
-#endif
+/// No `PreviewProvider` here ☹️
+/// Use the `PersonaDetailsPreview` scheme instead 🤠

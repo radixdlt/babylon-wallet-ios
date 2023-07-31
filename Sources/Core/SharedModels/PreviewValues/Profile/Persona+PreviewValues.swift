@@ -42,9 +42,9 @@ extension Profile.Network.Persona {
 			name: .init(
 				id: .init(uuidString: "00000000-0000-0000-0000-000000000000")!,
 				value: .init(
-					given: "Rick",
-					family: "Sanchez",
-					variant: .western
+					variant: .western,
+					familyName: "Sanchez",
+					givenNames: "Rick"
 				)
 			)
 		)

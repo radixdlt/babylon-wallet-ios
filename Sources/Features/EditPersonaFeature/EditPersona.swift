@@ -6,7 +6,31 @@ import Prelude
 extension EditPersona {
 	public struct Output: Sendable, Hashable {
 		let personaLabel: NonEmptyString
-		let fields: IdentifiedArrayOf<Identified<EditPersonaDynamicField.State.ID, String>>
+
+		let name: EditPersonaName.State?
+		let emailAddress: EditPersonaDynamicField.State?
+		let phoneNumber: EditPersonaDynamicField.State?
+
+		var personaData: PersonaData {
+			var personaData = PersonaData()
+
+			personaData.name = name.map {
+				.init(value: .init(
+					variant: $0.variant,
+					familyName: $0.family.input ?? "",
+					givenNames: $0.given.input ?? "",
+					nickname: $0.nickName.input
+				))
+			}
+
+			personaData.emailAddresses = (emailAddress?.input)
+				.flatMap { try? .init(collection: [.init(value: .init(email: $0))]) } ?? .init()
+
+			personaData.phoneNumbers = (phoneNumber?.input)
+				.flatMap { try? .init(collection: [.init(value: .init(number: $0))]) } ?? .init()
+
+			return personaData
+		}
 	}
 }
 
@@ -15,23 +39,24 @@ public struct EditPersona: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public enum Mode: Sendable, Hashable {
 			case edit
-//			case dapp(requiredFieldIDs: Set<DynamicFieldID>)
+			case dapp(requiredEntries: Set<EntryKind>)
 		}
 
 		public enum StaticFieldID: Sendable, Hashable, Comparable {
 			case personaLabel
 		}
 
-		public typealias DynamicFieldID = PersonaData.Entry.Kind
-
 		let mode: Mode
 		let persona: Profile.Network.Persona
+		var entries: EditPersonaEntries.State
 		var labelField: EditPersonaStaticField.State
-		@Sorted(by: \.id)
-		var dynamicFields: IdentifiedArrayOf<EditPersonaDynamicField.State> = []
 
 		@PresentationState
 		var destination: Destinations.State? = nil
+
+		var alreadyAddedEntryKinds: [PersonaData.Entry.Kind] {
+			[entries.name?.kind, entries.emailAddress?.kind, entries.phoneNumber?.kind].compactMap(identity)
+		}
 
 		public init(
 			mode: Mode,
@@ -39,16 +64,11 @@ public struct EditPersona: Sendable, FeatureReducer {
 		) {
 			self.mode = mode
 			self.persona = persona
+			self.entries = .init(with: persona.personaData, mode: mode)
 			self.labelField = EditPersonaStaticField.State(
 				id: .personaLabel,
 				initial: persona.displayName.rawValue
 			)
-			self.dynamicFields = persona.personaData.dynamicFields(in: mode)
-//			if case let .dapp(requiredFieldIDs) = mode {
-//				for requiredFieldID in requiredFieldIDs where dynamicFields[id: requiredFieldID] == nil {
-//					dynamicFields.append(.init(id: requiredFieldID, initial: nil, isRequiredByDapp: true))
-//				}
-//			}
 		}
 	}
 
@@ -65,7 +85,7 @@ public struct EditPersona: Sendable, FeatureReducer {
 
 	public enum ChildAction: Sendable, Equatable {
 		case labelField(EditPersonaStaticField.Action)
-		case dynamicField(id: EditPersonaDynamicField.State.ID, action: EditPersonaDynamicField.Action)
+		case personaData(action: EditPersonaEntries.Action)
 		case destination(PresentationAction<Destinations.Action>)
 	}
 
@@ -101,11 +121,10 @@ public struct EditPersona: Sendable, FeatureReducer {
 		Scope(state: \.labelField, action: /Action.child .. ChildAction.labelField) {
 			EditPersonaField()
 		}
-
+		Scope(state: \.entries, action: /Action.child .. ChildAction.personaData) {
+			EditPersonaEntries()
+		}
 		Reduce(core)
-			.forEach(\.dynamicFields, action: /Action.child .. ChildAction.dynamicField) {
-				EditPersonaField()
-			}
 			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
 				Destinations()
 			}
@@ -147,7 +166,8 @@ public struct EditPersona: Sendable, FeatureReducer {
 			}
 
 		case .addAFieldButtonTapped:
-			state.destination = .addFields(.init(excludedEntryKinds: state.dynamicFields.map(\.id)))
+			let alreadyAddedEntryKinds: [PersonaData.Entry.Kind] = state.alreadyAddedEntryKinds
+			state.destination = .addFields(.init(excludedEntryKinds: alreadyAddedEntryKinds))
 			return .none
 		}
 	}
@@ -158,18 +178,22 @@ public struct EditPersona: Sendable, FeatureReducer {
 			return .fireAndForget { await dismiss() }
 
 		case let .destination(.presented(.addFields(.delegate(.addEntryKinds(fieldsToAdd))))):
-			state.dynamicFields.append(contentsOf: fieldsToAdd.map {
-				.init(
-					id: $0,
-					text: nil,
-					isRequiredByDapp: false
-				)
-			})
-			state.destination = nil
-			return .none
+			for kind in fieldsToAdd {
+				switch kind {
+				case .fullName:
+					state.entries.name = .entry()
 
-		case let .dynamicField(id, action: .delegate(.delete)):
-			state.dynamicFields.remove(id: id)
+				case .emailAddress:
+					state.entries.emailAddress = try? .singleFieldEntry(kind)
+
+				case .phoneNumber:
+					state.entries.phoneNumber = try? .singleFieldEntry(kind)
+
+				default:
+					continue
+				}
+			}
+			state.destination = nil
 			return .none
 
 		default:
@@ -182,28 +206,21 @@ extension EditPersona.State {
 	func hasChanges() -> Bool {
 		guard let output = viewState.output else { return false }
 		return output.personaLabel != persona.displayName
-			|| fieldsOutput(dynamicFields: persona.personaData.dynamicFields(in: mode)) != output.fields
+			// FIXME: Figure out some better way for diffing. Currently if we'd simply do `output.personaData != persona.personaData` we'd get `false` as `id`s would not match.
+			|| output.personaData.name?.value != persona.personaData.name?.value
+			|| output.personaData.emailAddresses.first?.value != persona.personaData.emailAddresses.first?.value
+			|| output.personaData.phoneNumbers.first?.value != persona.personaData.phoneNumbers.first?.value
 	}
 }
 
-extension PersonaData {
-	func dynamicFields(
-		in mode: EditPersona.State.Mode
-	) -> IdentifiedArrayOf<EditPersonaDynamicField.State> {
-		IdentifiedArray(
-			uncheckedUniqueElements: entries.map(\.value).map { entryValue in
-				EditPersonaDynamicField.State(
-					id: entryValue.kind,
-					text: entryValue.text,
-					isRequiredByDapp: {
-						switch mode {
-						case .edit:
-							return false
-						}
-					}()
-				)
-			}
-		)
+extension EditPersona.State.Mode {
+	var requiredEntries: Set<PersonaData.Entry.Kind> {
+		switch self {
+		case .edit:
+			return []
+		case let .dapp(requiredEntries):
+			return requiredEntries
+		}
 	}
 }
 
@@ -212,39 +229,7 @@ extension Profile.Network.Persona {
 		var updatedPersona = self
 
 		updatedPersona.displayName = output.personaLabel
-
-		updatedPersona.personaData = .init()
-		output.fields.forEach { identifiedFieldOutput in
-			// FIXME: Implement when multi-field entries support will be implemented in the UI, or entries will become supported at all
-			switch identifiedFieldOutput.id {
-			case .name: break
-			case .dateOfBirth: break
-			case .companyName: break
-			case .emailAddress:
-				// FIXME: `try` and handle errors properly when we will have multiple entries of that kind (as the only reason to throw here is related to multiple values)
-				let emailAddresses = try? PersonaData.IdentifiedEmailAddresses(
-					collection: .init(
-						uncheckedUniqueElements: [
-							.init(value: .init(email: identifiedFieldOutput.value)),
-						]
-					)
-				)
-				updatedPersona.personaData.emailAddresses = emailAddresses ?? .init()
-			case .phoneNumber:
-				// FIXME: `try` and handle errors properly when we will have multiple entries of that kind (as the only reason to throw here is related to multiple values)
-				let phoneAddresses = try? PersonaData.IdentifiedPhoneNumbers(
-					collection: .init(
-						uncheckedUniqueElements: [
-							.init(value: .init(number: identifiedFieldOutput.value)),
-						]
-					)
-				)
-				updatedPersona.personaData.phoneNumbers = phoneAddresses ?? .init()
-			case .url: break
-			case .postalAddress: break
-			case .creditCard: break
-			}
-		}
+		updatedPersona.personaData = output.personaData
 
 		return updatedPersona
 	}
@@ -262,10 +247,51 @@ extension PersonaData.Entry {
 	}
 }
 
+extension EditPersonaEntry<EditPersonaDynamicField>.State {
+	struct NotApplicableError: Error {}
+
+	static func singleFieldEntry(_ kind: PersonaData.Entry.Kind, text: String = "", isRequestedByDapp: Bool = false) throws -> Self {
+		switch kind {
+		case .fullName, .dateOfBirth, .companyName, .url, .postalAddress, .creditCard:
+			throw NotApplicableError()
+		case .emailAddress:
+			return .init(kind: .emailAddress, field: .emailAddress, text: text, isRequestedByDapp: isRequestedByDapp)
+		case .phoneNumber:
+			return .init(kind: .phoneNumber, field: .phoneNumber, text: text, isRequestedByDapp: isRequestedByDapp)
+		}
+	}
+
+	private init(kind: PersonaData.Entry.Kind, field: DynamicFieldID, text: String, isRequestedByDapp: Bool) {
+		self.init(
+			kind: kind,
+			isRequestedByDapp: isRequestedByDapp,
+			content: .init(
+				id: field,
+				text: text,
+				isRequiredByDapp: isRequestedByDapp,
+				showsName: false
+			)
+		)
+	}
+}
+
+extension EditPersonaEntry<EditPersonaName>.State {
+	static func entry(
+		name: PersonaData.Name = .init(variant: .western, familyName: "", givenNames: ""),
+		isRequestedByDapp: Bool = false
+	) -> Self {
+		.init(
+			kind: .fullName,
+			isRequestedByDapp: isRequestedByDapp,
+			content: .init(with: name, isRequestedByDapp: isRequestedByDapp)
+		)
+	}
+}
+
 extension PersonaData.Entry {
 	var kind: Kind {
 		switch self {
-		case .name: return .name
+		case .name: return .fullName
 		case .dateOfBirth: return .dateOfBirth
 		case .companyName: return .companyName
 		case .emailAddress: return .emailAddress

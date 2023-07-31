@@ -44,6 +44,40 @@ extension GatewayAPI.StateEntityDetailsResponseItemDetails {
 	}
 }
 
+extension GatewayAPI.EntityMetadataItemValue {
+	public var asString: String? {
+		typed?.stringValue?.value
+	}
+
+	public var asStringCollection: [String]? {
+		typed?.stringArrayValue?.values
+	}
+
+	public var asURL: URL? {
+		(typed?.urlValue?.value).flatMap(URL.init)
+	}
+
+	public var asURLCollection: [URL]? {
+		typed?.urlArrayValue?.values.compactMap(URL.init)
+	}
+
+	public var asOriginCollection: [URL]? {
+		typed?.originArrayValue?.values.compactMap(URL.init)
+	}
+
+	public var asGlobalAddress: String? {
+		typed?.globalAddressValue?.value
+	}
+
+	public var asGlobalAddressCollection: [String]? {
+		typed?.globalAddressArrayValue?.values
+	}
+
+	public var publicKeyHashes: [GatewayAPI.PublicKeyHash]? {
+		typed?.publicKeyHashArrayValue?.values
+	}
+}
+
 extension GatewayAPI.EntityMetadataCollection {
 	public var name: String? {
 		items[.name]?.asString
@@ -58,27 +92,31 @@ extension GatewayAPI.EntityMetadataCollection {
 	}
 
 	public var iconURL: URL? {
-		items[.iconURL]?.asString.flatMap(URL.init)
+		items[.iconURL]?.asURL
 	}
 
 	public var dappDefinition: String? {
-		items[.dappDefinition]?.asString
+		items[.dappDefinition]?.asGlobalAddress
 	}
 
 	public var dappDefinitions: [String]? {
-		items[.dappDefinitions]?.asStringCollection
+		items[.dappDefinitions]?.asGlobalAddressCollection
 	}
 
 	public var claimedEntities: [String]? {
-		items[.claimedEntities]?.asStringCollection
+		items[.claimedEntities]?.asGlobalAddressCollection
 	}
 
 	public var claimedWebsites: [URL]? {
-		items[.claimedWebsites]?.asStringCollection?.compactMap(URL.init)
+		items[.claimedWebsites]?.asOriginCollection
 	}
 
 	public var accountType: AccountType? {
 		items[.accountType]?.asString.flatMap(AccountType.init)
+	}
+
+	public var ownerKeys: [GatewayAPI.PublicKeyHash]? {
+		items[.ownerKeys]?.publicKeyHashes
 	}
 
 	public enum AccountType: String {
@@ -124,6 +162,7 @@ public enum EntityMetadataKey: String, CaseIterable {
 	case claimedWebsites = "claimed_websites"
 	case relatedWebsites = "related_websites"
 	case accountType = "account_type"
+	case ownerKeys = "owner_keys"
 }
 
 extension [GatewayAPI.EntityMetadataItem] {

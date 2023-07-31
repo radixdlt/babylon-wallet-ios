@@ -1,3 +1,4 @@
+import EngineKit
 import FeaturePrelude
 
 // MARK: - NonFungibleTokenList.Row.View
@@ -16,7 +17,11 @@ extension NonFungibleAssetList.Row {
 
 extension NonFungibleAssetList.Row.View {
 	public var body: some SwiftUI.View {
-		WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
+		WithViewStore(
+			store,
+			observe: identity,
+			send: NonFungibleAssetList.Row.Action.view
+		) { viewStore in
 			if viewStore.resource.tokens.isEmpty {
 				EmptyView()
 			} else {
@@ -24,7 +29,11 @@ extension NonFungibleAssetList.Row.View {
 					rowView(viewStore)
 						.zIndex(.infinity)
 					ForEach(
-						Array(assetsToDisplay(viewStore).enumerated()),
+						Array(
+							assetsToDisplay(viewStore)
+								.sorted(by: \.localId)
+								.enumerated()
+						),
 						id: \.element
 					) { index, item in
 						componentView(with: viewStore, asset: item, index: index)
@@ -78,7 +87,7 @@ extension NonFungibleAssetList.Row.View {
 		let isDisabled = viewStore.disabled.contains(asset.id)
 		HStack {
 			NFTIDView(
-				id: asset.id.toUserFacingString,
+				id: asset.id.localId().toUserFacingString(),
 				name: asset.name,
 				description: asset.description,
 				thumbnail: viewStore.isExpanded ? asset.keyImageURL : nil
@@ -159,18 +168,6 @@ extension NonFungibleAssetList.Row.View {
 	}
 }
 
-extension AccountPortfolio.NonFungibleResource.NonFungibleToken.ID {
-	var toUserFacingString: String {
-		// Just a safety guard. Each NFT Id should be of format <prefix>value<suffix>
-		guard rawValue.count >= 3 else {
-			loggerGlobal.warning("Invalid nft id: \(rawValue)")
-			return rawValue
-		}
-		// Nothing fancy, just remove the prefix and suffix.
-		return String(rawValue.dropLast(1).dropFirst())
-	}
-}
-
 #if DEBUG
 import SwiftUI // NB: necessary for previews to appear
 
@@ -192,3 +189,21 @@ extension NonFungibleAssetList.Row.State {
 	)
 }
 #endif
+
+extension AccountPortfolio.NonFungibleResource.NonFungibleToken {
+	fileprivate var localId: NonFungibleLocalId {
+		id.localId()
+	}
+}
+
+// MARK: - NonFungibleLocalId + Comparable
+extension NonFungibleLocalId: Comparable {
+	public static func < (lhs: Self, rhs: Self) -> Bool {
+		switch (lhs, rhs) {
+		case let (.integer(value: lhs), .integer(value: rhs)):
+			return lhs < rhs
+		case let (lhs, rhs):
+			return lhs.toUserFacingString() < rhs.toUserFacingString()
+		}
+	}
+}

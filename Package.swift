@@ -952,6 +952,7 @@ package.addModules([
 		dependencies: [
 			"RadixConnectModels",
 			"SharedModels",
+			"GatewaysClient",
 			.product(name: "WebRTC", package: "WebRTC") {
 				.package(url: "https://github.com/stasel/WebRTC", from: "110.0.0")
 			},
@@ -1002,7 +1003,7 @@ package.addModules([
 		dependencies: [
 			"Cryptography",
 			.product(name: "EngineToolkit", package: "swift-engine-toolkit") {
-				.package(url: "https://github.com/radixdlt/swift-engine-toolkit", revision: "a12a0e0dc9d508358778d049bfb9667aa96a4f7c")
+				.package(url: "https://github.com/radixdlt/swift-engine-toolkit", exact: "0.11.0-b68ff8d")
 			},
 		],
 		tests: .no

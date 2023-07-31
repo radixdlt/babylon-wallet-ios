@@ -291,16 +291,7 @@ private extension PersonaDetails.View.InfoSection.ViewState {
 	init(
 		dAppInfo: DappInfo?,
 		personaName: String
-//		fields: IdentifiedArrayOf<Profile.Network.Persona.Field>
 	) {
-//		self.init(
-//			dAppInfo: dAppInfo,
-//			personaName: personaName,
-//			firstName: fields[id: .givenName]?.value.rawValue,
-//			lastName: fields[id: .familyName]?.value.rawValue,
-//			emailAddress: fields[id: .emailAddress]?.value.rawValue,
-//			phoneNumber: fields[id: .phoneNumber]?.value.rawValue
-//		)
 		fatalError()
 	}
 }
@@ -313,9 +304,7 @@ extension PersonaDetails.View {
 			let dAppInfo: DappInfo?
 			let personaName: String
 			let companyName: String?
-			let firstName: String?
-			let middleName: String?
-			let lastName: String?
+			let fullName: String?
 			let dateOfBirth: Date?
 			let emailAddresses: [String]?
 			let phoneNumbers: [String]?
@@ -337,9 +326,7 @@ extension PersonaDetails.View {
 				self.personaName = personaName
 				self.dateOfBirth = personaData?.dateOfBirth?.value.date
 				self.companyName = personaData?.companyName?.value.name
-				self.firstName = personaData?.name?.value.given
-				self.middleName = personaData?.name?.value.middle
-				self.lastName = personaData?.name?.value.family
+				self.fullName = personaData?.name?.value.formatted
 				self.emailAddresses = personaData?.emailAddresses.map(\.value.email)
 				self.phoneNumbers = personaData?.phoneNumbers.map(\.value.number)
 				self.urls = personaData?.urls.map(\.value.url)
@@ -348,8 +335,8 @@ extension PersonaDetails.View {
 
 				// The only purpose of this switch is to make sure we get a compilation error when we add a new PersonaData.Entry kind, so
 				// we do not forget to handle it here.
-				switch PersonaData.Entry.Kind.name {
-				case .name, .dateOfBirth, .companyName, .emailAddress, .phoneNumber, .url, .postalAddress, .creditCard: break
+				switch PersonaData.Entry.Kind.fullName {
+				case .fullName, .dateOfBirth, .companyName, .emailAddress, .phoneNumber, .url, .postalAddress, .creditCard: break
 				}
 			}
 		}
@@ -373,67 +360,28 @@ extension PersonaDetails.View {
 						}
 					}
 
-					Group {
-						if let firstName = viewStore.firstName {
-							VPair(heading: L10n.AuthorizedDapps.PersonaDetails.firstName, item: firstName)
-						}
-
-						if let middleName = viewStore.middleName {
-							// FIXME: YES Localize, but... the WHOLE design of this WHOLE view have to change...
-							VPair(heading: "Middle", item: middleName)
-						}
-
-						if let lastName = viewStore.lastName {
-							VPair(heading: L10n.AuthorizedDapps.PersonaDetails.lastName, item: lastName)
-						}
-
-						if let dateOfBirth = viewStore.dateOfBirth {
-							VPair(heading: "Date of birth", item: dateOfBirth.ISO8601Format())
-						}
-
-						if let companyName = viewStore.companyName {
-							VPair(heading: "Company", item: companyName)
-						}
+					if let fullName = viewStore.fullName {
+						VPair(
+							heading: "Full Name", // FIXME: Localize
+							item: fullName
+						)
+						Separator()
 					}
 
-					if let emailAddresses = viewStore.emailAddresses {
-						Text("Emails").font(.app.sectionHeader)
-						ForEach(emailAddresses, id: \.self) { emailAddress in
-							VPair(heading: L10n.AuthorizedDapps.PersonaDetails.emailAddress, item: emailAddress)
-						}
+					if let phoneNumber = viewStore.phoneNumbers?.first {
+						VPair(
+							heading: L10n.AuthorizedDapps.PersonaDetails.phoneNumber,
+							item: phoneNumber
+						)
+						Separator()
 					}
 
-					if let phoneNumbers = viewStore.phoneNumbers {
-						Text("Phone numbers").font(.app.sectionHeader)
-						ForEach(phoneNumbers, id: \.self) { phoneNumber in
-							VPair(heading: L10n.AuthorizedDapps.PersonaDetails.phoneNumber, item: phoneNumber)
-						}
-					}
-
-					if let urls = viewStore.urls {
-						Text("URLs").font(.app.sectionHeader)
-						ForEach(urls, id: \.self) { url in
-							VPair(heading: "URL", item: url)
-						}
-					}
-
-					if let creditCards = viewStore.creditCards {
-						Text("Credit cards").font(.app.sectionHeader)
-						ForEach(creditCards, id: \.self) { creditCard in
-							VPair(heading: "Card Holder", item: creditCard.holder)
-							VPair(heading: "Card Number", item: creditCard.number)
-							VPair(heading: "Card Expiry", item: "\(creditCard.expiry.year)/\(creditCard.expiry.month)")
-							VPair(heading: "Card CVC", item: creditCard.cvc)
-						}
-					}
-
-					if let postalAddresses = viewStore.postalAddresses {
-						Text("Addresses").font(.app.sectionHeader)
-						ForEach(postalAddresses, id: \.self) { postalAddress in
-							ForEach(postalAddress.fields) { field in
-								HPair(label: field.discriminator.rawValue, item: field.valueAsString)
-							}
-						}
+					if let emailAddress = viewStore.emailAddresses?.first {
+						VPair(
+							heading: L10n.AuthorizedDapps.PersonaDetails.emailAddress,
+							item: emailAddress
+						)
+						Separator()
 					}
 				}
 				.padding(.horizontal, .medium1)
