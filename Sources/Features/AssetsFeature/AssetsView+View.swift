@@ -13,7 +13,7 @@ extension AssetsView {
 		}
 
 		public var body: some SwiftUI.View {
-			WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
+			WithViewStore(store, observe: identity, send: FeatureAction.view) { viewStore in
 				ScrollView {
 					VStack(spacing: .medium3) {
 						assetTypeSelectorView(viewStore)
@@ -42,7 +42,7 @@ extension AssetsView {
 							PoolUnitsList.View(
 								store: .init(
 									initialState: .init(),
-									reducer: PoolUnitsList()
+									reducer: EmptyReducer()
 								)
 							)
 						}

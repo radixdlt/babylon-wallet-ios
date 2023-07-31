@@ -9,19 +9,19 @@ extension PoolUnitsList.State {
 // MARK: - PoolUnitsList.View
 extension PoolUnitsList {
 	public struct ViewState: Equatable {
-		// TODO: declare some properties
+		public init() {}
 	}
 
 	@MainActor
 	public struct View: SwiftUI.View {
-		private let store: StoreOf<PoolUnitsList>
+		private let store: Store<PoolUnitsList.ViewState, PoolUnitsList.ViewAction>
 
-		public init(store: StoreOf<PoolUnitsList>) {
+		public init(store: Store<PoolUnitsList.ViewState, PoolUnitsList.ViewAction>) {
 			self.store = store
 		}
 
 		public var body: some SwiftUI.View {
-			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
+			WithViewStore(store, observe: identity, send: identity) { viewStore in
 				// TODO: implement
 				Text("Implement: PoolUnitsList")
 					.background(Color.yellow)
@@ -31,23 +31,3 @@ extension PoolUnitsList {
 		}
 	}
 }
-
-#if DEBUG
-import SwiftUI // NB: necessary for previews to appear
-
-// MARK: - PoolUnitsList_Preview
-struct PoolUnitsList_Preview: PreviewProvider {
-	static var previews: some View {
-		PoolUnitsList.View(
-			store: .init(
-				initialState: .previewValue,
-				reducer: PoolUnitsList()
-			)
-		)
-	}
-}
-
-extension PoolUnitsList.State {
-	public static let previewValue = Self()
-}
-#endif
