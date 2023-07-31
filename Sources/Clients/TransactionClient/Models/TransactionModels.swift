@@ -242,7 +242,7 @@ public struct AddFeeToManifestOutcomeIncludesLockFee: Sendable, Equatable {
 // MARK: - AddFeeToManifestOutcomeExcludesLockFee
 public struct AddFeeToManifestOutcomeExcludesLockFee: Sendable, Equatable {
 	public let manifestExcludingLockFee: TransactionManifest
-	public let feePayerCandidates: NonEmpty<IdentifiedArrayOf<FeePayerCandiate>>
+	public let feePayerCandidates: IdentifiedArrayOf<FeePayerCandiate>
 	public let feeNotYetAdded: BigDecimal
 }
 

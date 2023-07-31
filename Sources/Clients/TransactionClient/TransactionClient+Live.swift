@@ -26,6 +26,16 @@ public struct MyEntitiesInvolvedInTransaction: Sendable, Hashable {
 	public let accountsDepositedInto: OrderedSet<Profile.Network.Account>
 }
 
+// MARK: - PredefinedFees
+enum PredefinedFees {
+	enum WalletFees {
+		static let feeLock: BigDecimal = 10
+		static let guarantee: BigDecimal = 1
+	}
+
+	static let networkFeeMargin: BigDecimal = 1.15
+}
+
 extension TransactionClient {
 	public static var liveValue: Self {
 		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
@@ -145,8 +155,8 @@ extension TransactionClient {
 				)
 				triedAccounts.append(contentsOf: accountsToCheck)
 				guard
-					let candidates = NonEmpty<IdentifiedArrayOf<FeePayerCandiate>>(rawValue: .init(uncheckedUniqueElements: involvedFeePayerCandidates)),
-					else {
+					let candidates = NonEmpty<IdentifiedArrayOf<FeePayerCandiate>>(rawValue: .init(uncheckedUniqueElements: involvedFeePayerCandidates))
+				else {
 					return nil
 				}
 
@@ -198,10 +208,6 @@ extension TransactionClient {
 
 			let remainingAccounts = Set(allAccounts.rawValue.elements).subtracting(triedAccounts)
 			let remainingCandidates = try await feePayerCandiates(accounts: .init(remainingAccounts), fee: feeToAdd)
-
-			guard let nonEmpty = NonEmpty<IdentifiedArrayOf<FeePayerCandiate>>(rawValue: .init(uncheckedUniqueElements: remainingCandidates)) else {
-				throw TransactionFailure.failedToPrepareForTXSigning(.failedToFindAccountWithEnoughFundsToLockFee)
-			}
 
 			return .excludesLockFee(.init(manifestExcludingLockFee: manifest, feePayerCandidates: nonEmpty, feeNotYetAdded: feeToAdd))
 		}
@@ -358,8 +364,28 @@ extension TransactionClient {
 			myInvolvedEntities: myInvolvedEntities
 		)
 	}
+
+	func calculateTransactionFee(_ executionAnalysis: ExecutionAnalysis, tip: BigDecimal = .zero) throws -> (min: BigDecimal, max: BigDecimal) {
+		let networkFee = try BigDecimal(executionAnalysis.feeSummary.networkFee) * PredefinedFees.networkFeeMargin
+		let royaltyFee = try BigDecimal(executionAnalysis.feeSummary.royaltyFee)
+		let nonContingentLock = try BigDecimal(executionAnalysis.feeLocks.lock)
+		let contingentLock = try BigDecimal(executionAnalysis.feeLocks.contingentLock)
+
+		let totalRequiredFee = networkFee + royaltyFee + tip
+
+		if totalRequiredFee < nonContingentLock {
+			return (.zero, .zero)
+		}
+
+		let maxUserFee = totalRequiredFee - nonContingentLock
+		let minUserFee = maxUserFee - contingentLock
+
+		return (minUserFee, maxUserFee)
+	}
 }
 
-extension ExecutionAnalysis {
-	func lockFeeValue() -> BigDecimal {}
+extension BigDecimal {
+	init(_ engineDecimal: EngineKit.Decimal) throws {
+		try self.init(fromString: engineDecimal.asStr())
+	}
 }
