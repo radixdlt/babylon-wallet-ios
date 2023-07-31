@@ -20,13 +20,13 @@ extension PersonaData {
 
 		public let givenNames: String
 
-		public let nickname: String?
+		public let nickname: String
 
 		public init(
 			variant: Variant,
 			familyName: String,
 			givenNames: String,
-			nickname: String? = nil
+			nickname: String
 		) {
 			self.variant = variant
 			self.familyName = familyName
@@ -35,13 +35,13 @@ extension PersonaData {
 		}
 
 		public var description: String {
-			let components: [String?] = {
+			let components: [String] = {
 				switch variant {
 				case .western: return [givenNames, nickname, familyName]
 				case .eastern: return [familyName, nickname, givenNames]
 				}
 			}()
-			return components.compactMap { $0 }.joined(separator: " ")
+			return components.joined(separator: " ")
 		}
 
 		public var formatted: String {
@@ -54,7 +54,7 @@ extension PersonaData {
 
 			let firstLine = components.joined(separator: " ")
 			return """
-			\(firstLine)\(nickname.map { "\n\($0)" } ?? "")
+			\(firstLine)"\n"\(nickname)
 			"""
 		}
 	}
