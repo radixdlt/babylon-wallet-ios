@@ -120,13 +120,7 @@ extension TransactionClient {
 			})
 		}
 
-		let lockFeeWithSelectedPayer: LockFeeWithSelectedPayer = { manifest, feeToAdd, addressOfPayer in
-			// assert account still has enough funds to pay
-			guard await accountsWithEnoughFunds(from: [addressOfPayer], toPay: feeToAdd).first?.owner == addressOfPayer else {
-				assertionFailure("did you JUST spend funds? unlucky...")
-				throw TransactionFailure.failedToPrepareForTXSigning(.failedToFindAccountWithEnoughFundsToLockFee)
-			}
-
+		let lockFeeWithSelectedPayer: LockFeeWithSelectedPayer = { manifest, _, addressOfPayer in
 			loggerGlobal.debug("Setting fee payer to: \(addressOfPayer.address)")
 			return try manifest.withLockFeeCallMethodAdded(address: addressOfPayer.asGeneral())
 		}
@@ -151,15 +145,23 @@ extension TransactionClient {
 				)
 				triedAccounts.append(contentsOf: accountsToCheck)
 				guard
-					let nonEmpty = NonEmpty<IdentifiedArrayOf<FeePayerCandiate>>(rawValue: .init(uncheckedUniqueElements: involvedFeePayerCandidates))
-				else {
+					let candidates = NonEmpty<IdentifiedArrayOf<FeePayerCandiate>>(rawValue: .init(uncheckedUniqueElements: involvedFeePayerCandidates)),
+					else {
 					return nil
 				}
 
 				let feePayer = nonEmpty.first
+				let addressOfPayer = feePayer.account.address
+
+				guard await accountsWithEnoughFunds(from: [addressOfPayer], toPay: feeToAdd).first?.owner == addressOfPayer else {
+					assertionFailure("did you JUST spend funds? unlucky...")
+					throw TransactionFailure.failedToPrepareForTXSigning(.failedToFindAccountWithEnoughFundsToLockFee)
+				}
+
 				let manifestWithLockFee = try await lockFeeWithSelectedPayer(
 					manifest,
-					feeToAdd, feePayer.account.address
+					feeToAdd,
+					feePayer.account.address
 				)
 
 				return .init(
@@ -254,11 +256,6 @@ extension TransactionClient {
 		let getTransactionReview: GetTransactionReview = { request in
 			let networkID = await gatewaysClient.getCurrentNetworkID()
 
-			let addFeeToManifestOutcome = try await lockFeeBySearchingForSuitablePayer(
-				request.manifestToSign,
-				request.feeToAdd
-			)
-
 			let transactionPreviewRequest = try await createTransactionPreviewRequest(for: request, networkID: networkID)
 			let transactionPreviewResponse = try await gatewayAPIClient.transactionPreview(transactionPreviewRequest)
 			guard transactionPreviewResponse.receipt.status == .succeeded else {
@@ -269,6 +266,11 @@ extension TransactionClient {
 			let receiptBytes = try [UInt8](hex: transactionPreviewResponse.encodedReceipt)
 
 			let analyzedManifestToReview = try request.manifestToSign.analyzeExecution(transactionReceipt: receiptBytes)
+
+			let addFeeToManifestOutcome = try await lockFeeBySearchingForSuitablePayer(
+				request.manifestToSign,
+				request.feeToAdd
+			)
 
 			return TransactionToReview(
 				analyzedManifestToReview: analyzedManifestToReview,
@@ -356,4 +358,8 @@ extension TransactionClient {
 			myInvolvedEntities: myInvolvedEntities
 		)
 	}
+}
+
+extension ExecutionAnalysis {
+	func lockFeeValue() -> BigDecimal {}
 }
