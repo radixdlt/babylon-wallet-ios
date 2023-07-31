@@ -603,7 +603,8 @@ extension TransactionReview {
 			let transfers = try await resources.asyncFlatMap {
 				try await transferInfo(
 					resourceQuantifier: $0,
-					createdEntities: transaction.metadataOfNewlyCreatedEntities,
+					metadataOfCreatedEntities: transaction.metadataOfNewlyCreatedEntities,
+					createdEntities: transaction.addressesOfNewlyCreatedEntities,
 					networkID: networkID,
 					type: .exact
 				)
@@ -633,7 +634,8 @@ extension TransactionReview {
 			let transfers = try await accountDeposits.asyncFlatMap {
 				try await transferInfo(
 					resourceQuantifier: $0,
-					createdEntities: transaction.metadataOfNewlyCreatedEntities,
+					metadataOfCreatedEntities: transaction.metadataOfNewlyCreatedEntities,
+					createdEntities: transaction.addressesOfNewlyCreatedEntities,
 					networkID: networkID,
 					type: $0.transferType
 				)
@@ -657,15 +659,16 @@ extension TransactionReview {
 
 	func transferInfo(
 		resourceQuantifier: ResourceTracker,
-		createdEntities: [String: [String: MetadataValue?]]?,
+		metadataOfCreatedEntities: [String: [String: MetadataValue?]]?,
+		createdEntities: [EngineToolkit.Address],
 		networkID: NetworkID,
 		type: TransferType
 	) async throws -> [Transfer] {
 		let resourceAddress: ResourceAddress = try resourceQuantifier.resourceAddress.asSpecific()
-		let isNewResource = createdEntities?[resourceAddress.address] != nil
+		let isNewResource = createdEntities.contains(resourceQuantifier.resourceAddress)
 
 		let metadata: (name: String?, symbol: String?, thumbnail: URL?) = await {
-			if let newResourceMetadata = createdEntities?[resourceAddress.address] {
+			if let newResourceMetadata = metadataOfCreatedEntities?[resourceAddress.address] {
 				return (
 					newResourceMetadata["name"]??.string,
 					newResourceMetadata["symbol"]??.string,
@@ -1178,6 +1181,7 @@ extension TransactionType {
 		let addressesInManifest: [EngineToolkit.EntityType: [EngineToolkit.Address]]
 		let metadataOfNewlyCreatedEntities: [String: [String: MetadataValue?]]
 		let dataOfNewlyMintedNonFungibles: [String: [NonFungibleLocalId: [UInt8]]]
+		let addressesOfNewlyCreatedEntities: [EngineToolkit.Address]
 
 		var allAddress: [EngineToolkit.Address] {
 			addressesInManifest.flatMap(\.value)
@@ -1202,7 +1206,8 @@ extension TransactionType {
 					accountDeposits: [to.addressString(): [transferred.toResourceTracker]],
 					addressesInManifest: addressesInManifest,
 					metadataOfNewlyCreatedEntities: [:],
-					dataOfNewlyMintedNonFungibles: [:]
+					dataOfNewlyMintedNonFungibles: [:],
+					addressesOfNewlyCreatedEntities: []
 				)
 			)
 
@@ -1270,10 +1275,11 @@ extension TransactionType {
 					accountDeposits: deposits,
 					addressesInManifest: addressesInManifest,
 					metadataOfNewlyCreatedEntities: [:],
-					dataOfNewlyMintedNonFungibles: [:]
+					dataOfNewlyMintedNonFungibles: [:],
+					addressesOfNewlyCreatedEntities: []
 				)
 			)
-		case let .generalTransaction(accountProofs, accountWithdraws, accountDeposits, addressesInManifest, metadataOfNewlyCreatedEntities, dataOfNewlyMintedNonFungibles):
+		case let .generalTransaction(accountProofs, accountWithdraws, accountDeposits, addressesInManifest, metadataOfNewlyCreatedEntities, dataOfNewlyMintedNonFungibles, addressesOfNewlyCreatedEntities):
 			return .conforming(
 				.init(
 					accountProofs: accountProofs,
@@ -1281,7 +1287,8 @@ extension TransactionType {
 					accountDeposits: accountDeposits,
 					addressesInManifest: addressesInManifest,
 					metadataOfNewlyCreatedEntities: metadataOfNewlyCreatedEntities,
-					dataOfNewlyMintedNonFungibles: dataOfNewlyMintedNonFungibles
+					dataOfNewlyMintedNonFungibles: dataOfNewlyMintedNonFungibles,
+					addressesOfNewlyCreatedEntities: addressesOfNewlyCreatedEntities
 				)
 			)
 		case .nonConforming:
