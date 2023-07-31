@@ -9,7 +9,7 @@ struct AssetsFeaturePreviewApp: App {
 		WindowGroup {
 			PoolUnitsList.View(
 				store: .init(
-					initialState: .init(),
+					initialState: .preview,
 					reducer: EmptyReducer()
 				)
 			)

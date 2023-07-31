@@ -2,14 +2,20 @@ import FeaturePrelude
 
 extension PoolUnitsList.State {
 	var viewState: PoolUnitsList.ViewState {
-		.init()
+		.init(lsuComponents: nil)
 	}
 }
 
 // MARK: - PoolUnitsList.View
 extension PoolUnitsList {
 	public struct ViewState: Equatable {
-		public init() {}
+		let lsuComponents: NonEmpty<IdentifiedArrayOf<LSUComponent.ViewState>>?
+
+		init(
+			lsuComponents: NonEmpty<IdentifiedArrayOf<LSUComponent.ViewState>>?
+		) {
+			self.lsuComponents = lsuComponents
+		}
 	}
 
 	@MainActor
@@ -21,12 +27,24 @@ extension PoolUnitsList {
 		}
 
 		public var body: some SwiftUI.View {
-			WithViewStore(store, observe: identity, send: identity) { viewStore in
-				// TODO: implement
-				Text("Implement: PoolUnitsList")
-					.background(Color.yellow)
-					.foregroundColor(.red)
-					.onAppear { viewStore.send(.appeared) }
+			WithViewStore(store, observe: identity, send: identity) { _ in
+				IfLetStore(store.scope(state: \.lsuComponents, action: identity)) { lsuComponentsViewStore in
+					ForEachStore(
+						lsuComponentsViewStore.scope(
+							state: \.rawValue,
+							action: {
+								switch $0 {
+								case let (_, action):
+									switch action {
+									case .appeared:
+										fatalError()
+									}
+								}
+							}
+						),
+						content: LSUComponent.View.init
+					)
+				}
 			}
 		}
 	}

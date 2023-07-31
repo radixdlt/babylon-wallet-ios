@@ -29,7 +29,11 @@ extension FungibleAssetList.Row {
 		}
 
 		public var body: some SwiftUI.View {
-			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
+			WithViewStore(
+				store,
+				observe: \.viewState,
+				send: FeatureAction.view
+			) { viewStore in
 				HStack(alignment: .center) {
 					HStack(spacing: .small1) {
 						TokenThumbnail(viewStore.thumbnail, size: .small)
@@ -41,11 +45,9 @@ extension FungibleAssetList.Row {
 
 					Spacer()
 
-					VStack(alignment: .trailing, spacing: .small3) {
-						Text(viewStore.tokenAmount)
-							.foregroundColor(.app.gray1)
-							.textStyle(.secondaryHeader)
-					}
+					Text(viewStore.tokenAmount)
+						.foregroundColor(.app.gray1)
+						.textStyle(.secondaryHeader)
 
 					if let isSelected = viewStore.isSelected {
 						CheckmarkView(appearance: .dark, isChecked: isSelected)

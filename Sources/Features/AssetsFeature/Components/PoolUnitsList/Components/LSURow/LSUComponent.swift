@@ -1,8 +1,8 @@
 import FeaturePrelude
 
 extension PoolUnitsList {
-	// MARK: - LSURow
-	public struct LSURow: Sendable, FeatureReducer {
+	// MARK: - LSUComponent
+	public struct LSUComponent: Sendable, FeatureReducer {
 		public struct State: Sendable, Hashable {
 			public init() {}
 		}
