@@ -4,6 +4,6 @@ import Foundation
 /// Useful when writing features where actions semantically have associated value
 /// `TaskResult<Void>` which does not compile since `Void` is not `Equatable`. We
 /// can now use `TaskResult<Unit>`.
-public struct Unit: Sendable, Hashable, Codable {
+public struct Unit: Sendable, Hashable, Codable, Error {
 	public init() {}
 }
