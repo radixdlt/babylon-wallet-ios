@@ -39,13 +39,14 @@ final class PersonaFieldTests: TestCase {
 					value: .init(
 						variant: .eastern,
 						familyName: "Park",
-						givenNames: "Chan-wook"
+						givenNames: "Chan-wook",
+						nickname: "Wook"
 					)
 				)
 			)
 		}
 		let aName = try dappRequest(value: \.name, from: personaData)
-		XCTAssertEqual(aName.value.valueForDapp, "Park Chan-wook")
+		XCTAssertEqual(aName.value.valueForDapp, "Park Wook Chan-wook")
 	}
 
 	func test_email_addresses() throws {
@@ -149,7 +150,8 @@ final class PersonaFieldTests: TestCase {
 					value: .init(
 						variant: .western,
 						familyName: "Palme",
-						givenNames: "Olof"
+						givenNames: "Olof",
+						nickname: "Oly"
 					)
 				),
 				postalAddresses: [[
