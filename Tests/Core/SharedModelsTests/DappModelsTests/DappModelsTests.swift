@@ -23,7 +23,7 @@ final class ToDappResponseTests: TestCase {
 						),
 					]),
 					oneTimePersonaData: .init(
-						name: .init(variant: .western, familyName: "Jackson", givenNames: "Percy"),
+						name: .init(variant: .western, familyName: "Jackson", givenNames: "Percy", nickname: "Percy J"),
 						emailAddresses: [.init(email: "lightningthief@olympus.lol")],
 						phoneNumbers: [.init(number: "555 5555")]
 					)
@@ -52,6 +52,7 @@ final class ToDappResponseTests: TestCase {
 						"name": [
 							"givenNames": "Percy",
 							"familyName": "Jackson",
+							"nickname": "Percy J",
 							"variant": "western",
 						],
 						"emailAddresses": [

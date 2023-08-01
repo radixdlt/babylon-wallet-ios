@@ -325,7 +325,7 @@ final class ProfileTests: TestCase {
 			personaData: .init(
 				name: .init(
 					id: .init(uuidString: "00000000-0000-0000-0000-0000000000FF")!,
-					value: .init(variant: .western, familyName: "Publicson", givenNames: "Maria")
+					value: .init(variant: .western, familyName: "Publicson", givenNames: "Maria", nickname: "Publy")
 				)
 			)
 		)
