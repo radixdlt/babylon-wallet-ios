@@ -2,6 +2,9 @@ import SwiftUI
 
 // MARK: - HitTargetSize
 public enum HitTargetSize: CGFloat {
+	/// 16
+	case tiny = 16
+
 	/// 24
 	case smallest = 24
 
@@ -32,6 +35,8 @@ public enum HitTargetSize: CGFloat {
 
 	public var cornerRadius: CGFloat {
 		switch self {
+		case .tiny:
+			return .small3
 		case .smallest:
 			return .small3
 		case .verySmall:

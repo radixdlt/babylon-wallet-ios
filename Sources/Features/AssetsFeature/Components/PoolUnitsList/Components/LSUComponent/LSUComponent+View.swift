@@ -4,7 +4,7 @@ extension PoolUnitsList.LSUComponent.State {
 	var viewState: PoolUnitsList.LSUComponent.ViewState {
 		.init(
 			title: "Radostakes",
-			liquidStakeUnits: .init(),
+			liquidStakeUnits: nil,
 			stakeClaimNFTs: nil
 		)
 	}
@@ -17,38 +17,40 @@ extension PoolUnitsList.ViewState {
 				[
 					.init(
 						title: "Radostakes",
-						liquidStakeUnits: [
-							.init(
-								thumbnail: .xrd,
-								symbol: "XRD",
-								tokenAmount: "2.0129822",
-								stakedAmmount: "$138,021.03"
-							),
-							.init(
-								thumbnail: .unknown,
-								symbol: "???",
-								tokenAmount: "4.434255",
-								stakedAmmount: "$78,371.20"
-							),
-						],
+						liquidStakeUnits: .init(
+							rawValue: [
+								.init(
+									thumbnail: .xrd,
+									symbol: "XRD",
+									tokenAmount: "2.0129822",
+									stakedAmmount: "$138,021.03"
+								),
+								.init(
+									thumbnail: .unknown,
+									symbol: "???",
+									tokenAmount: "4.434255",
+									stakedAmmount: "$78,371.20"
+								),
+							]
+						),
 						stakeClaimNFTs: .init(
 							rawValue: [
 								.init(
 									id: 0,
 									thumbnail: .xrd,
-									kind: .unstaking,
+									status: .unstaking,
 									tokenAmount: "450.0"
 								),
 								.init(
 									id: 1,
 									thumbnail: .xrd,
-									kind: .unstaking,
+									status: .unstaking,
 									tokenAmount: "1,250.0"
 								),
 								.init(
 									id: 2,
 									thumbnail: .xrd,
-									kind: .readyToClaim,
+									status: .readyToClaim,
 									tokenAmount: "1,200.0"
 								),
 							]
@@ -56,14 +58,16 @@ extension PoolUnitsList.ViewState {
 					),
 					.init(
 						title: "Radix N Stakes",
-						liquidStakeUnits: [
-							.init(
-								thumbnail: .xrd,
-								symbol: "XRD",
-								tokenAmount: "332.231578",
-								stakedAmmount: "$863.21"
-							),
-						],
+						liquidStakeUnits: .init(
+							rawValue: [
+								.init(
+									thumbnail: .xrd,
+									symbol: "XRD",
+									tokenAmount: "332.231578",
+									stakedAmmount: "$863.21"
+								),
+							]
+						),
 						stakeClaimNFTs: nil
 					),
 				]
@@ -72,10 +76,19 @@ extension PoolUnitsList.ViewState {
 	}
 }
 
-// MARK: - StakeClaimNFTKind
-enum StakeClaimNFTKind: Equatable {
+// MARK: - StakeClaimNFTStatus
+enum StakeClaimNFTStatus: Equatable {
 	case unstaking
 	case readyToClaim
+
+	var localized: String {
+		switch self {
+		case .unstaking:
+			return "Unstaking"
+		case .readyToClaim:
+			return "Ready to Claim"
+		}
+	}
 }
 
 extension PoolUnitsList.LSUComponent {
@@ -95,7 +108,7 @@ extension PoolUnitsList.LSUComponent {
 		let id: Int
 
 		let thumbnail: TokenThumbnail.Content
-		let kind: StakeClaimNFTKind
+		let status: StakeClaimNFTStatus
 		let tokenAmount: String
 	}
 }
@@ -110,7 +123,7 @@ extension PoolUnitsList.LSUComponent {
 		let title: String
 		let imageURL: URL = .init(string: "www.wp.pl")!
 
-		let liquidStakeUnits: IdentifiedArrayOf<LiquidStakeUnitViewState>
+		let liquidStakeUnits: NonEmpty<IdentifiedArrayOf<LiquidStakeUnitViewState>>?
 		let stakeClaimNFTs: NonEmpty<IdentifiedArrayOf<StakeClaimNFTViewState>>?
 	}
 
@@ -125,20 +138,48 @@ extension PoolUnitsList.LSUComponent {
 		// style...
 		public var body: some SwiftUI.View {
 			WithViewStore(store) { viewStore in
-				VStack(spacing: .medium1) {
+				VStack(alignment: .leading, spacing: .medium2) {
 					Text(viewStore.title)
-					// localize
-					Text("LIQUID STAKE UNITS")
 
-					ForEach(viewStore.liquidStakeUnits) {
-						Text("\($0.description)")
+					if let liquidStakeUnits = viewStore.liquidStakeUnits {
+						Text("LIQUID STAKE UNITS")
+
+						ForEach(liquidStakeUnits) {
+							Text("\($0.description)")
+						}
 					}
 
 					if let stakeClaimNFTs = viewStore.stakeClaimNFTs {
-						ForEach(stakeClaimNFTs) {
-							Text("\($0.id)")
-								.background(Color.yellow)
-								.foregroundColor(.red)
+						VStack(alignment: .leading, spacing: .small2) {
+							Text("STAKE CLAIM NFTS")
+								.foregroundColor(.app.gray2)
+								.textStyle(.body2HighImportance)
+
+							ForEach(stakeClaimNFTs) { stakeClaimNFT in
+								HStack(alignment: .center) {
+									HStack(spacing: .small1) {
+										TokenThumbnail(
+											stakeClaimNFT.thumbnail,
+											size: .tiny
+										)
+
+										Text(stakeClaimNFT.status.localized)
+											.foregroundColor(.app.gray2)
+											.textStyle(.body2HighImportance)
+									}
+
+									Spacer()
+
+									Text(stakeClaimNFT.tokenAmount)
+										.foregroundColor(.app.gray1)
+										.textStyle(.secondaryHeader)
+								}
+								.padding(.medium3)
+								.overlay(
+									RoundedRectangle(cornerRadius: .small1)
+										.stroke(.app.gray4, lineWidth: 1)
+								)
+							}
 						}
 					}
 				}
