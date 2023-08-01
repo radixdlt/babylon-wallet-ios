@@ -2,7 +2,11 @@ import FeaturePrelude
 
 extension PoolUnitsList.LSUComponent.State {
 	var viewState: PoolUnitsList.LSUComponent.ViewState {
-		.init(liquidStakeUnits: .init(), stakeClaimNFTs: .init())
+		.init(
+			title: "Radostakes",
+			liquidStakeUnits: .init(),
+			stakeClaimNFTs: nil
+		)
 	}
 }
 
@@ -12,18 +16,23 @@ extension PoolUnitsList.ViewState {
 			lsuComponents: .init(
 				[
 					.init(
-						liquidStakeUnits: .init(
-							uncheckedUniqueElements: [
-								.init(
-									thumbnail: .xrd,
-									symbol: "XRD",
-									tokenAmount: "2.0129822",
-									stakedAmmount: "$138,021.03"
-								),
-							]
-						),
+						title: "Radostakes",
+						liquidStakeUnits: [
+							.init(
+								thumbnail: .xrd,
+								symbol: "XRD",
+								tokenAmount: "2.0129822",
+								stakedAmmount: "$138,021.03"
+							),
+							.init(
+								thumbnail: .unknown,
+								symbol: "???",
+								tokenAmount: "4.434255",
+								stakedAmmount: "$78,371.20"
+							),
+						],
 						stakeClaimNFTs: .init(
-							uncheckedUniqueElements: [
+							rawValue: [
 								.init(
 									id: 0,
 									thumbnail: .xrd,
@@ -45,6 +54,18 @@ extension PoolUnitsList.ViewState {
 							]
 						)
 					),
+					.init(
+						title: "Radix N Stakes",
+						liquidStakeUnits: [
+							.init(
+								thumbnail: .xrd,
+								symbol: "XRD",
+								tokenAmount: "332.231578",
+								stakedAmmount: "$863.21"
+							),
+						],
+						stakeClaimNFTs: nil
+					),
 				]
 			)
 		)
@@ -58,7 +79,7 @@ enum StakeClaimNFTKind: Equatable {
 }
 
 extension PoolUnitsList.LSUComponent {
-	struct UnitViewState: Identifiable, Equatable {
+	struct LiquidStakeUnitViewState: Identifiable, Equatable {
 		var id: String {
 			symbol
 		}
@@ -86,11 +107,11 @@ extension PoolUnitsList.LSUComponent {
 			title
 		}
 
-		let title: String = ""
+		let title: String
 		let imageURL: URL = .init(string: "www.wp.pl")!
 
-		let liquidStakeUnits: IdentifiedArrayOf<UnitViewState>
-		let stakeClaimNFTs: IdentifiedArrayOf<StakeClaimNFTViewState>
+		let liquidStakeUnits: IdentifiedArrayOf<LiquidStakeUnitViewState>
+		let stakeClaimNFTs: NonEmpty<IdentifiedArrayOf<StakeClaimNFTViewState>>?
 	}
 
 	@MainActor
@@ -101,24 +122,26 @@ extension PoolUnitsList.LSUComponent {
 			self.store = store
 		}
 
+		// style...
 		public var body: some SwiftUI.View {
-			ForEachStore(
-				store.scope(
-					state: \.liquidStakeUnits,
-					action: { (_: String, _: Prelude.Unit) in
-						fatalError()
-					}
-				)
-			) { liquidStakeUnitViewStore in
-				WithViewStore(liquidStakeUnitViewStore) {
-					Text("\($0.state.description)")
-				}
-			}
+			WithViewStore(store) { viewStore in
+				VStack(spacing: .medium1) {
+					Text(viewStore.title)
+					// localize
+					Text("LIQUID STAKE UNITS")
 
-			WithViewStore(store, observe: identity, send: identity) { viewStore in
-				Text("\(viewStore.state.description)")
-					.background(Color.yellow)
-					.foregroundColor(.red)
+					ForEach(viewStore.liquidStakeUnits) {
+						Text("\($0.description)")
+					}
+
+					if let stakeClaimNFTs = viewStore.stakeClaimNFTs {
+						ForEach(stakeClaimNFTs) {
+							Text("\($0.id)")
+								.background(Color.yellow)
+								.foregroundColor(.red)
+						}
+					}
+				}
 			}
 		}
 	}
@@ -131,8 +154,8 @@ extension PoolUnitsList.LSUComponent.ViewState: CustomStringConvertible {
 	}
 }
 
-// MARK: - PoolUnitsList.LSUComponent.UnitViewState + CustomStringConvertible
-extension PoolUnitsList.LSUComponent.UnitViewState: CustomStringConvertible {
+// MARK: - PoolUnitsList.LSUComponent.LiquidStakeUnitViewState + CustomStringConvertible
+extension PoolUnitsList.LSUComponent.LiquidStakeUnitViewState: CustomStringConvertible {
 	var description: String {
 		"\(id), \(stakedAmmount), \(symbol), \(tokenAmount)"
 	}

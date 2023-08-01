@@ -21,3 +21,8 @@ public func not<T>(
 public func identity<T>(_ t: T) -> T {
 	t
 }
+
+/// Wherever you have to handle `Never`
+public func absurd<T>(_ never: Never) -> T {
+	switch never {}
+}
