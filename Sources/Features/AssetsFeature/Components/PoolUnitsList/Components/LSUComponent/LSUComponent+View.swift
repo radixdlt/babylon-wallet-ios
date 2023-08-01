@@ -61,7 +61,6 @@ extension PoolUnitsList.LSUComponent {
 		let stakeClaimNFTs: NonEmpty<IdentifiedArrayOf<StakeClaimNFTViewState>>?
 	}
 
-	@MainActor
 	public struct View: SwiftUI.View {
 		private let store: Store<PoolUnitsList.LSUComponent.ViewState, PoolUnitsList.LSUComponent.ViewAction>
 
@@ -161,6 +160,7 @@ extension PoolUnitsList.LSUComponent {
 extension PoolUnitsList.ViewState {
 	public static var preview: Self {
 		.init(
+			isExpanded: false,
 			lsuComponents: .init(
 				[
 					.init(

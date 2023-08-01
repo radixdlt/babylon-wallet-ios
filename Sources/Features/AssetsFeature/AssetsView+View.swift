@@ -41,7 +41,10 @@ extension AssetsView {
 						case .poolUnits:
 							PoolUnitsList.View(
 								store: .init(
-									initialState: .init(lsuComponents: nil),
+									initialState: .init(
+										isExpanded: false,
+										lsuComponents: nil
+									),
 									reducer: EmptyReducer()
 								)
 							)

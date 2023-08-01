@@ -30,7 +30,11 @@ public struct StackedViewsLayout: Layout {
 		return properties
 	}
 
-	public func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
+	public func sizeThatFits(
+		proposal: ProposedViewSize,
+		subviews: Subviews,
+		cache: inout ()
+	) -> CGSize {
 		let container = proposal.replacingUnspecifiedDimensions()
 		guard !subviews.isEmpty else {
 			return container
@@ -47,15 +51,25 @@ public struct StackedViewsLayout: Layout {
 		return .init(width: container.width, height: height)
 	}
 
-	public func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) {
+	public func placeSubviews(
+		in bounds: CGRect,
+		proposal: ProposedViewSize,
+		subviews: Subviews,
+		cache: inout ()
+	) {
 		let container = proposal.replacingUnspecifiedDimensions()
 		var offset: CGFloat = 0
 		for (index, subview) in subviews.enumerated() {
 			let place = CGPoint(x: bounds.minX, y: bounds.minY + offset)
-			subview.place(at: place, proposal: .init(width: container.width, height: nil))
+			subview.place(
+				at: place,
+				proposal: .init(width: container.width, height: nil)
+			)
 
 			if isExpanded {
-				let subviewSize = subview.sizeThatFits(.init(width: container.width, height: nil))
+				let subviewSize = subview.sizeThatFits(
+					.init(width: container.width, height: nil)
+				)
 				offset += subviewSize.height + spacing
 			} else {
 				// The rest of the cards that go over `collapsedViewsCount` will go behind the last card.

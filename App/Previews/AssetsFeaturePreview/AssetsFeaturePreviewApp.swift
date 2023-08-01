@@ -10,7 +10,13 @@ struct AssetsFeaturePreviewApp: App {
 			PoolUnitsList.View(
 				store: .init(
 					initialState: .preview,
-					reducer: EmptyReducer()
+					reducer: Reduce { state, action in
+						if action == .isExpandedToggled {
+							state.isExpanded.toggle()
+						}
+
+						return .none
+					}
 				)
 			)
 		}
