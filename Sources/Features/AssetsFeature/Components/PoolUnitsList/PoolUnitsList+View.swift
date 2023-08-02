@@ -56,6 +56,7 @@ extension PoolUnitsList {
 					WithViewStore(store, observe: \.isExpanded) { isExpandedViewStore in
 						StackedViewsLayout(
 							isExpanded: isExpandedViewStore.state,
+							spacing: 1,
 							collapsedViewsCount: 1
 						) {
 							WithViewStore(
@@ -66,7 +67,6 @@ extension PoolUnitsList {
 									NFTThumbnail(lsuResourceViewStore.iconURL, size: .small)
 
 									VStack(alignment: .leading) {
-										// warning
 										Text(lsuResourceViewStore.name ?? "")
 											.foregroundColor(.app.gray1)
 											.textStyle(.secondaryHeader)
@@ -95,7 +95,7 @@ extension PoolUnitsList {
 							}
 
 							if isExpandedViewStore.state {
-								VStack {
+								VStack(spacing: 1) {
 									ForEachStore(
 										lsuComponentsStore.scope(
 											state: \.rawValue,
@@ -105,6 +105,7 @@ extension PoolUnitsList {
 										),
 										content: LSUComponent.View.init
 									)
+									.background(.app.white)
 								}
 							}
 
@@ -127,6 +128,7 @@ extension PoolUnitsList {
 								.frame(width: geometry.size.width)
 								.scaleEffect(0.95)
 								.tokenRowShadow(!isExpandedViewStore.state)
+								.opacity(isExpandedViewStore.state ? 0 : 1)
 							}
 						}
 						.padding(.medium1)

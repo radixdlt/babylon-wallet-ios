@@ -18,7 +18,7 @@ struct AssetsFeaturePreviewApp: App {
 						return .none
 					}
 				)
-			)
+			).background(Color.gray)
 		}
 	}
 }
