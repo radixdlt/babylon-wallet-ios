@@ -67,7 +67,7 @@ extension PoolUnitsList {
 									NFTThumbnail(lsuResourceViewStore.iconURL, size: .small)
 
 									VStack(alignment: .leading) {
-										Text(lsuResourceViewStore.name ?? "")
+										Text(lsuResourceViewStore.name)
 											.foregroundColor(.app.gray1)
 											.textStyle(.secondaryHeader)
 
@@ -107,6 +107,10 @@ extension PoolUnitsList {
 									)
 									.background(.app.white)
 								}
+								.roundedCorners(
+									.bottom,
+									radius: .small1
+								)
 							}
 
 							GeometryReader { geometry in

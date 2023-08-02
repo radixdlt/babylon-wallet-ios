@@ -55,7 +55,7 @@ extension PoolUnitsList.LSUComponent {
 		}
 
 		let title: String
-		let imageURL: URL = .init(string: "www.wp.pl")!
+		let imageURL: URL = .init(string: "https://i.ibb.co/NsKCTpT/Screenshot-2023-08-02-at-18-18-56.png")!
 
 		let liquidStakeUnits: NonEmpty<IdentifiedArrayOf<LiquidStakeUnitViewState>>?
 		let stakeClaimNFTs: NonEmpty<IdentifiedArrayOf<StakeClaimNFTViewState>>?
@@ -71,7 +71,10 @@ extension PoolUnitsList.LSUComponent {
 		public var body: some SwiftUI.View {
 			WithViewStore(store) { viewStore in
 				VStack(alignment: .leading, spacing: .medium2) {
-					Text(viewStore.title)
+					HStack(spacing: .small1) {
+						NFTThumbnail(viewStore.imageURL, size: .smallest)
+						Text(viewStore.title)
+					}
 
 					if let liquidStakeUnits = viewStore.liquidStakeUnits {
 						Text("LIQUID STAKE UNITS")
@@ -109,16 +112,17 @@ extension PoolUnitsList.LSUComponent {
 									}
 								}
 							}
-							.padding(.medium2)
+							.padding(.small2)
 							.overlay(
 								RoundedRectangle(cornerRadius: .small1)
 									.stroke(.app.gray4, lineWidth: 1)
+									.padding(.small2 * -1)
 							)
 						}
 					}
 
 					if let stakeClaimNFTs = viewStore.stakeClaimNFTs {
-						VStack(alignment: .leading, spacing: .small2) {
+						VStack(alignment: .leading, spacing: .medium1) {
 							Text("STAKE CLAIM NFTS")
 								.foregroundColor(.app.gray2)
 								.textStyle(.body2HighImportance)
@@ -128,7 +132,7 @@ extension PoolUnitsList.LSUComponent {
 									HStack(spacing: .small1) {
 										TokenThumbnail(
 											stakeClaimNFT.thumbnail,
-											size: .tiny
+											size: .smallest
 										)
 
 										Text(stakeClaimNFT.status.localized)
@@ -142,16 +146,17 @@ extension PoolUnitsList.LSUComponent {
 										.foregroundColor(.app.gray1)
 										.textStyle(.secondaryHeader)
 								}
-								.padding(.medium3)
+								.padding(.small2)
 								.overlay(
 									RoundedRectangle(cornerRadius: .small1)
 										.stroke(.app.gray4, lineWidth: 1)
+										.padding(.small2 * -1)
 								)
 							}
 						}
 					}
 				}
-				.padding(.medium3)
+				.padding(.medium1)
 			}
 		}
 	}
@@ -172,12 +177,6 @@ extension PoolUnitsList.ViewState {
 									symbol: "XRD",
 									tokenAmount: "2.0129822",
 									stakedAmmount: "$138,021.03"
-								),
-								.init(
-									thumbnail: .unknown,
-									symbol: "???",
-									tokenAmount: "4.434255",
-									stakedAmmount: "$78,371.20"
 								),
 							]
 						),
