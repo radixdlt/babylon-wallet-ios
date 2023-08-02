@@ -33,8 +33,12 @@ struct NFTIDView: View {
 	var body: some View {
 		VStack(spacing: .small1) {
 			if let thumbnail {
-				NFTFullView(url: thumbnail, minAspect: minImageAspect, maxAspect: maxImageAspect)
-					.padding(.bottom, .small1)
+				NFTFullView(
+					url: thumbnail,
+					minAspect: minImageAspect,
+					maxAspect: maxImageAspect
+				)
+				.padding(.bottom, .small1)
 			}
 			KeyValueView(key: L10n.AssetDetails.NFTDetails.id, value: id)
 		}

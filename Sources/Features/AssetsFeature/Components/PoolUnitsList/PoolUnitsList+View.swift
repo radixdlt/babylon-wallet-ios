@@ -56,7 +56,7 @@ extension PoolUnitsList {
 					WithViewStore(store, observe: \.isExpanded) { isExpandedViewStore in
 						StackedViewsLayout(
 							isExpanded: isExpandedViewStore.state,
-							collapsedViewsCount: 2
+							collapsedViewsCount: 1
 						) {
 							WithViewStore(
 								store,
@@ -83,6 +83,7 @@ extension PoolUnitsList {
 								.roundedCorners(isExpandedViewStore.state ? .top : .allCorners, radius: .small1)
 								.tokenRowShadow(!isExpandedViewStore.state)
 							}
+							.zIndex(.infinity)
 							.roundedCorners(
 								isExpandedViewStore.state
 									? .top
@@ -90,25 +91,46 @@ extension PoolUnitsList {
 								radius: .small1
 							)
 							.tokenRowShadow(!isExpandedViewStore.state)
-							.padding(.medium1)
 							.onTapGesture {
-								isExpandedViewStore.send(.isExpandedToggled)
+								isExpandedViewStore.send(.isExpandedToggled, animation: .easeInOut)
 							}
 
 							if isExpandedViewStore.state {
-								ForEachStore(
-									lsuComponentsStore.scope(
-										state: \.rawValue,
-										action: { _ in
-											fatalError()
-										}
-									),
-									content: LSUComponent.View.init
+								VStack {
+									ForEachStore(
+										lsuComponentsStore.scope(
+											state: \.rawValue,
+											action: { _ in
+												fatalError()
+											}
+										),
+										content: LSUComponent.View.init
+									)
+								}
+							}
+
+							GeometryReader { geometry in
+								Spacer(
+									minLength: isExpandedViewStore.state
+										? .zero
+										: 40
 								)
-							} else {
-								Text("TEMP!")
+								.padding(
+									isExpandedViewStore.state
+										? .zero
+										: .medium1
+								)
+								.background(.app.white)
+								.roundedCorners(
+									.bottom,
+									radius: .small1
+								)
+								.frame(width: geometry.size.width)
+								.scaleEffect(0.95)
+								.tokenRowShadow(!isExpandedViewStore.state)
 							}
 						}
+						.padding(.medium1)
 					}
 				}
 			}
