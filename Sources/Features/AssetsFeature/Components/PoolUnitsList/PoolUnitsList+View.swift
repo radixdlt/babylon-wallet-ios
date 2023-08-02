@@ -27,7 +27,7 @@ extension PoolUnitsList {
 			isExpanded: Bool,
 			lsuComponents: NonEmpty<IdentifiedArrayOf<LSUComponent.ViewState>>?,
 			lsuResource: LSUResourceViewState = .init(
-				iconURL: .init(string: "www.wp.pl")!,
+				iconURL: .init(string: "https://i.ibb.co/KG06168/Screenshot-2023-08-02-at-16-19-29.png")!,
 				name: "Radix Network XRD Stake"
 			)
 		) {
@@ -78,21 +78,20 @@ extension PoolUnitsList {
 
 									Spacer()
 								}
-								.padding(.horizontal, .medium1)
+								.padding(.medium1)
 								.background(.app.white)
 								.roundedCorners(isExpandedViewStore.state ? .top : .allCorners, radius: .small1)
+								.zIndex(.infinity)
+								.roundedCorners(
+									isExpandedViewStore.state
+										? .top
+										: .allCorners,
+									radius: .small1
+								)
 								.tokenRowShadow(!isExpandedViewStore.state)
-							}
-							.zIndex(.infinity)
-							.roundedCorners(
-								isExpandedViewStore.state
-									? .top
-									: .allCorners,
-								radius: .small1
-							)
-							.tokenRowShadow(!isExpandedViewStore.state)
-							.onTapGesture {
-								isExpandedViewStore.send(.isExpandedToggled, animation: .easeInOut)
+								.onTapGesture {
+									isExpandedViewStore.send(.isExpandedToggled, animation: .easeInOut)
+								}
 							}
 
 							if isExpandedViewStore.state {
@@ -113,7 +112,7 @@ extension PoolUnitsList {
 								Spacer(
 									minLength: isExpandedViewStore.state
 										? .zero
-										: 40
+										: 88
 								)
 								.padding(
 									isExpandedViewStore.state
