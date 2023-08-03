@@ -17,17 +17,15 @@ extension PoolUnitsList {
 		}
 
 		public var body: some SwiftUI.View {
-			ScrollView {
-				IfLetStore(
-					store.scope(
-						state: \.lsuResource,
-						action: (
-							/PoolUnitsList.Action.child .. PoolUnitsList.ChildAction.lsuResource
-						).embed
-					),
-					then: LSUResource.View.init
-				)
-			}
+			IfLetStore(
+				store.scope(
+					state: \.lsuResource,
+					action: (
+						/PoolUnitsList.Action.child .. PoolUnitsList.ChildAction.lsuResource
+					).embed
+				),
+				then: LSUResource.View.init
+			)
 		}
 	}
 }

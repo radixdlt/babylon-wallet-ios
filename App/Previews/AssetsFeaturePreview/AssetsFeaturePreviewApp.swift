@@ -7,12 +7,12 @@ import SwiftUI
 struct AssetsFeaturePreviewApp: App {
 	var body: some Scene {
 		WindowGroup {
-			PoolUnitsList.View(
+			AssetsView.View(
 				store: .init(
-					initialState: .preview,
-					reducer: PoolUnitsList()
+					initialState: .init(account: .previewValue0),
+					reducer: AssetsView.init
 				)
-			).background(Color.gray)
+			)
 		}
 	}
 }

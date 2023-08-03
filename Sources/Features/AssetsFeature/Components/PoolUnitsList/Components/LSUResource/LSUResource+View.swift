@@ -1,63 +1,5 @@
 import FeaturePrelude
 
-extension PoolUnitsList.LSUResource.State {
-	var viewState: PoolUnitsList.LSUResource.ViewState {
-		.init(
-			isExpanded: isExpanded,
-			iconURL: .init(string: "https://i.ibb.co/KG06168/Screenshot-2023-08-02-at-16-19-29.png")!,
-			name: "Radix Network XRD Stake",
-			components: .init(
-				[
-					.init(
-						title: "Radostakes",
-						liquidStakeUnit: .init(
-							thumbnail: .xrd,
-							symbol: "XRD",
-							tokenAmount: "2.0129822"
-						),
-						stakeClaimNFTs: .init(
-							rawValue: [
-								.init(
-									id: 0,
-									thumbnail: .xrd,
-									status: .unstaking,
-									tokenAmount: "450.0"
-								),
-								.init(
-									id: 1,
-									thumbnail: .xrd,
-									status: .unstaking,
-									tokenAmount: "1,250.0"
-								),
-								.init(
-									id: 2,
-									thumbnail: .xrd,
-									status: .readyToClaim,
-									tokenAmount: "1,200.0"
-								),
-							]
-						)
-					),
-					.init(
-						title: "Radix N Stakes",
-						liquidStakeUnit: nil,
-						stakeClaimNFTs: .init(
-							rawValue: [
-								.init(
-									id: 0,
-									thumbnail: .xrd,
-									status: .unstaking,
-									tokenAmount: "23,2132.321"
-								),
-							]
-						)
-					),
-				]
-			)!
-		)
-	}
-}
-
 extension PoolUnitsList.LSUResource {
 	public struct ViewState: Sendable, Equatable {
 		let isExpanded: Bool
@@ -162,5 +104,63 @@ extension PoolUnitsList.LSUResource {
 				radius: .small1
 			)
 		}
+	}
+}
+
+extension PoolUnitsList.LSUResource.State {
+	var viewState: PoolUnitsList.LSUResource.ViewState {
+		.init(
+			isExpanded: isExpanded,
+			iconURL: .init(string: "https://i.ibb.co/KG06168/Screenshot-2023-08-02-at-16-19-29.png")!,
+			name: "Radix Network XRD Stake",
+			components: .init(
+				[
+					.init(
+						title: "Radostakes",
+						liquidStakeUnit: .init(
+							thumbnail: .xrd,
+							symbol: "XRD",
+							tokenAmount: "2.0129822"
+						),
+						stakeClaimNFTs: .init(
+							rawValue: [
+								.init(
+									id: 0,
+									thumbnail: .xrd,
+									status: .unstaking,
+									tokenAmount: "450.0"
+								),
+								.init(
+									id: 1,
+									thumbnail: .xrd,
+									status: .unstaking,
+									tokenAmount: "1,250.0"
+								),
+								.init(
+									id: 2,
+									thumbnail: .xrd,
+									status: .readyToClaim,
+									tokenAmount: "1,200.0"
+								),
+							]
+						)
+					),
+					.init(
+						title: "Radix N Stakes",
+						liquidStakeUnit: nil,
+						stakeClaimNFTs: .init(
+							rawValue: [
+								.init(
+									id: 0,
+									thumbnail: .xrd,
+									status: .unstaking,
+									tokenAmount: "23,2132.321"
+								),
+							]
+						)
+					),
+				]
+			)!
+		)
 	}
 }
