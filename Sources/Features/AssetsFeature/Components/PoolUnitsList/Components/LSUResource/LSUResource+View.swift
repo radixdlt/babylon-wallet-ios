@@ -1,13 +1,6 @@
 import FeaturePrelude
 
 // MARK: - CGFloatPreferenceKey
-struct CGFloatPreferenceKey: PreferenceKey {
-	static var defaultValue: CGFloat = .zero
-
-	static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
-		value = nextValue()
-	}
-}
 
 extension PoolUnitsList.LSUResource {
 	public struct ViewState: Sendable, Equatable {
@@ -51,7 +44,7 @@ extension PoolUnitsList.LSUResource {
 				}
 				.padding(.horizontal, .medium3)
 			}
-			.onPreferenceChange(CGFloatPreferenceKey.self) {
+			.onPreferenceChange(HeightPreferenceKey.self) {
 				headerHeight = $0
 			}
 		}
@@ -82,7 +75,7 @@ extension PoolUnitsList.LSUResource {
 			.overlay(
 				GeometryReader { geometry in
 					Color.clear.anchorPreference(
-						key: CGFloatPreferenceKey.self,
+						key: HeightPreferenceKey.self,
 						value: .bounds
 					) {
 						geometry[$0].height
@@ -129,6 +122,15 @@ extension PoolUnitsList.LSUResource {
 				.offset(y: .small1)
 			}
 		}
+	}
+}
+
+// MARK: - HeightPreferenceKey
+private struct HeightPreferenceKey: PreferenceKey {
+	static var defaultValue: CGFloat = .zero
+
+	static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+		value = nextValue()
 	}
 }
 
