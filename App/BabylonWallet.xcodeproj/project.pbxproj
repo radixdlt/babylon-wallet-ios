@@ -44,6 +44,7 @@
 		AEEB602C2A5EA5CC0045F153 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AEEB602B2A5EA5CC0045F153 /* Preview Assets.xcassets */; };
 		AEEB60342A5EA5E40045F153 /* PersonaDetailsFeature in Frameworks */ = {isa = PBXBuildFile; productRef = AEEB60332A5EA5E40045F153 /* PersonaDetailsFeature */; };
 		AEEB60362A5EA6430045F153 /* FeaturesPreviewerFeature in Frameworks */ = {isa = PBXBuildFile; productRef = AEEB60352A5EA6430045F153 /* FeaturesPreviewerFeature */; };
+		AEF35A712A7C111800D14583 /* URLFormatterClientLive in Frameworks */ = {isa = PBXBuildFile; productRef = AEF35A702A7C111800D14583 /* URLFormatterClientLive */; };
 		D5B1769F29267C1F00AAE13B /* AppIcon.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D5B1769E29267C1F00AAE13B /* AppIcon.xcassets */; };
 		D5B176A029267C1F00AAE13B /* AppIcon.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D5B1769E29267C1F00AAE13B /* AppIcon.xcassets */; };
 		D5D0A22529CB50A100772231 /* P2PLinksClientLive in Frameworks */ = {isa = PBXBuildFile; productRef = D5D0A22429CB50A100772231 /* P2PLinksClientLive */; };
@@ -175,6 +176,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				AE68BE332A77F10E006024B8 /* AssetsFeature in Frameworks */,
+				AEF35A712A7C111800D14583 /* URLFormatterClientLive in Frameworks */,
 				AE68BE312A77F103006024B8 /* FeaturesPreviewerFeature in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -570,6 +572,7 @@
 			packageProductDependencies = (
 				AE68BE302A77F103006024B8 /* FeaturesPreviewerFeature */,
 				AE68BE322A77F10E006024B8 /* AssetsFeature */,
+				AEF35A702A7C111800D14583 /* URLFormatterClientLive */,
 			);
 			productName = AssetsFeaturePreview;
 			productReference = AE68BE1E2A77F01B006024B8 /* AssetsFeaturePreview.app */;
@@ -4815,6 +4818,10 @@
 		AEEB60352A5EA6430045F153 /* FeaturesPreviewerFeature */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = FeaturesPreviewerFeature;
+		};
+		AEF35A702A7C111800D14583 /* URLFormatterClientLive */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = URLFormatterClientLive;
 		};
 		D5D0A22429CB50A100772231 /* P2PLinksClientLive */ = {
 			isa = XCSwiftPackageProductDependency;

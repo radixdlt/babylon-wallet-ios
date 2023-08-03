@@ -143,7 +143,9 @@ extension PoolUnitsList.LSUResource.State {
 			components: .init(
 				[
 					.init(
+						id: 0,
 						title: "Radostakes",
+						imageURL: .init(string: "https://i.ibb.co/NsKCTpT/Screenshot-2023-08-02-at-18-18-56.png")!,
 						liquidStakeUnit: .init(
 							thumbnail: .xrd,
 							symbol: "XRD",
@@ -173,7 +175,9 @@ extension PoolUnitsList.LSUResource.State {
 						)
 					),
 					.init(
+						id: 1,
 						title: "Radix N Stakes",
+						imageURL: .init(string: "https://i.ibb.co/NsKCTpT/Screenshot-2023-08-02-at-18-18-56.png")!,
 						liquidStakeUnit: nil,
 						stakeClaimNFTs: .init(
 							rawValue: [

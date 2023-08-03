@@ -144,7 +144,12 @@ public struct LoadableImage<Placeholder: View>: View {
 		placeholders placeholderBehaviour: LoadableImagePlaceholderBehaviour = .default,
 		placeholder: () -> Placeholder
 	) {
-		self.url = url
+		if let url, !url.isVectorImage, case let .fixedSize(hitTargetSize, _) = sizingBehaviour {
+			@Dependency(\.urlFormatterClient) var urlFormatterClient
+			self.url = urlFormatterClient.fixedSizeImage(url, Screen.pixelScale * hitTargetSize.frame)
+		} else {
+			self.url = url
+		}
 
 		self.sizingBehaviour = sizingBehaviour
 		self.placeholderBehaviour = placeholderBehaviour

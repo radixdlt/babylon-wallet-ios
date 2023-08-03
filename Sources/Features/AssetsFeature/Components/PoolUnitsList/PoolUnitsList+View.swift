@@ -1,11 +1,5 @@
 import FeaturePrelude
 
-// MARK: - LSUResourceViewState
-struct LSUResourceViewState: Equatable {
-	let iconURL: URL
-	let name: String
-}
-
 // MARK: - PoolUnitsList.View
 extension PoolUnitsList {
 	@MainActor

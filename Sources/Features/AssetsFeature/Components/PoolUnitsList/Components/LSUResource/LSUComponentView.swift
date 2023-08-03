@@ -39,12 +39,10 @@ struct LSUComponentView: View {
 	typealias StakeClaimNFTsViewState = NonEmpty<IdentifiedArrayOf<StakeClaimNFTViewState>>
 
 	public struct ViewState: Equatable, Identifiable {
-		public var id: String {
-			title
-		}
+		public var id: Int
 
 		let title: String
-		let imageURL: URL = .init(string: "https://i.ibb.co/NsKCTpT/Screenshot-2023-08-02-at-18-18-56.png")!
+		let imageURL: URL
 
 		let liquidStakeUnit: LiquidStakeUnitViewState?
 		let stakeClaimNFTs: StakeClaimNFTsViewState?
