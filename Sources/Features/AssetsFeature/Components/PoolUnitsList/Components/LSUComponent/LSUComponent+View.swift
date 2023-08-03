@@ -4,7 +4,7 @@ extension PoolUnitsList.LSUComponent.State {
 	var viewState: PoolUnitsList.LSUComponent.ViewState {
 		.init(
 			title: "Radostakes",
-			liquidStakeUnits: nil,
+			liquidStakeUnit: nil,
 			stakeClaimNFTs: nil
 		)
 	}
@@ -34,8 +34,6 @@ extension PoolUnitsList.LSUComponent {
 		let thumbnail: TokenThumbnail.Content
 		let symbol: String
 		let tokenAmount: String
-
-		let stakedAmmount: String
 	}
 
 	struct StakeClaimNFTViewState: Identifiable, Equatable {
@@ -57,7 +55,7 @@ extension PoolUnitsList.LSUComponent {
 		let title: String
 		let imageURL: URL = .init(string: "https://i.ibb.co/NsKCTpT/Screenshot-2023-08-02-at-18-18-56.png")!
 
-		let liquidStakeUnits: NonEmpty<IdentifiedArrayOf<LiquidStakeUnitViewState>>?
+		let liquidStakeUnit: LiquidStakeUnitViewState?
 		let stakeClaimNFTs: NonEmpty<IdentifiedArrayOf<StakeClaimNFTViewState>>?
 	}
 
@@ -74,51 +72,45 @@ extension PoolUnitsList.LSUComponent {
 					HStack(spacing: .small1) {
 						NFTThumbnail(viewStore.imageURL, size: .smallest)
 						Text(viewStore.title)
+						Spacer()
 					}
 
-					if let liquidStakeUnits = viewStore.liquidStakeUnits {
+					if let liquidStakeUnit = viewStore.state.liquidStakeUnit {
 						Text("LIQUID STAKE UNITS")
 							.foregroundColor(.app.gray2)
 							.textStyle(.body2HighImportance)
 
-						ForEach(liquidStakeUnits) { liquidStakeUnit in
-							HStack {
-								HStack(spacing: .small1) {
-									TokenThumbnail(
-										liquidStakeUnit.thumbnail,
-										size: .small
-									)
+						HStack {
+							HStack(spacing: .small1) {
+								TokenThumbnail(
+									liquidStakeUnit.thumbnail,
+									size: .small
+								)
 
-									HStack {
-										VStack(alignment: .leading) {
-											Text(liquidStakeUnit.symbol)
-												.foregroundColor(.app.gray1)
-												.textStyle(.body2HighImportance)
-											Text("Staked")
-												.foregroundColor(.app.gray2)
-												.textStyle(.body2HighImportance)
-										}
-
-										Spacer()
-
-										VStack(alignment: .trailing) {
-											Text(liquidStakeUnit.tokenAmount)
-												.foregroundColor(.app.gray1)
-												.textStyle(.body2HighImportance)
-											Text(liquidStakeUnit.stakedAmmount)
-												.foregroundColor(.app.gray2)
-												.textStyle(.body2HighImportance)
-										}
+								HStack {
+									VStack(alignment: .leading) {
+										Text(liquidStakeUnit.symbol)
+											.foregroundColor(.app.gray1)
+											.textStyle(.body2HighImportance)
+										Text("Staked")
+											.foregroundColor(.app.gray2)
+											.textStyle(.body2HighImportance)
 									}
+
+									Spacer()
+
+									Text(liquidStakeUnit.tokenAmount)
+										.foregroundColor(.app.gray1)
+										.textStyle(.secondaryHeader)
 								}
 							}
-							.padding(.small2)
-							.overlay(
-								RoundedRectangle(cornerRadius: .small1)
-									.stroke(.app.gray4, lineWidth: 1)
-									.padding(.small2 * -1)
-							)
 						}
+						.padding(.small2)
+						.overlay(
+							RoundedRectangle(cornerRadius: .small1)
+								.stroke(.app.gray4, lineWidth: 1)
+								.padding(.small2 * -1)
+						)
 					}
 
 					if let stakeClaimNFTs = viewStore.stakeClaimNFTs {
@@ -170,15 +162,10 @@ extension PoolUnitsList.ViewState {
 				[
 					.init(
 						title: "Radostakes",
-						liquidStakeUnits: .init(
-							rawValue: [
-								.init(
-									thumbnail: .xrd,
-									symbol: "XRD",
-									tokenAmount: "2.0129822",
-									stakedAmmount: "$138,021.03"
-								),
-							]
+						liquidStakeUnit: .init(
+							thumbnail: .xrd,
+							symbol: "XRD",
+							tokenAmount: "2.0129822"
 						),
 						stakeClaimNFTs: .init(
 							rawValue: [
@@ -205,17 +192,17 @@ extension PoolUnitsList.ViewState {
 					),
 					.init(
 						title: "Radix N Stakes",
-						liquidStakeUnits: .init(
+						liquidStakeUnit: nil,
+						stakeClaimNFTs: .init(
 							rawValue: [
 								.init(
+									id: 0,
 									thumbnail: .xrd,
-									symbol: "XRD",
-									tokenAmount: "332.231578",
-									stakedAmmount: "$863.21"
+									status: .unstaking,
+									tokenAmount: "23,2132.321"
 								),
 							]
-						),
-						stakeClaimNFTs: nil
+						)
 					),
 				]
 			)
