@@ -270,72 +270,35 @@ public struct FeePayerSelectionAmongstCandidates: Sendable, Hashable {
 
 // MARK: - TransactionFee
 public struct TransactionFee: Hashable, Sendable {
-	public enum Mode: Hashable {
-		case normal
-		case advanced(AdvancedFeeCustomization)
-	}
-
-	public struct FeeSummary: Hashable {
-		let networkFee: BigDecimal
-		let royaltyFee: BigDecimal
-
-		public init(networkFee: BigDecimal, royaltyFee: BigDecimal) {
-			self.networkFee = networkFee * 1.15
-			self.royaltyFee = royaltyFee
-		}
-	}
-
-	public struct FeeLocks: Hashable {
-		let nonContingentLock: BigDecimal
-		let contingentLock: BigDecimal
-
-		public init(nonContingentLock: BigDecimal, contingentLock: BigDecimal) {
-			self.nonContingentLock = nonContingentLock
-			self.contingentLock = contingentLock
-		}
-	}
-
-	public struct AdvancedFeeCustomization: Hashable {
-		public var networkAndRoyaltyFee: BigDecimal
-		public var tipPercentage: BigDecimal
-
-		public init(networkAndRoyaltyFee: BigDecimal, tipPercentage: BigDecimal) {
-			self.networkAndRoyaltyFee = networkAndRoyaltyFee
-			self.tipPercentage = tipPercentage
-		}
-	}
-
-	public struct TotalFee {
-		let min: BigDecimal
-		let max: BigDecimal
-
-		public var lockFee: BigDecimal {
-			// We always lock the max amount
-			max
-		}
-
-		public var displayedTotalFee: String {
-			if max > min {
-				return "\(min.format()) - \(max.format()) XRD"
-			}
-			return "\(max.format()) XRD"
-		}
-	}
-
 	let feeSummary: FeeSummary
 	let feeLocks: FeeLocks
-
 	public var mode: Mode = .normal
 
-	public mutating func toggleMode() {
-		switch mode {
-		case .normal:
-			mode = .advanced(.init(networkAndRoyaltyFee: networkFee + royaltyFee, tipPercentage: .zero))
-		case .advanced:
-			mode = .normal
-		}
+	public init(feeSummary: FeeSummary, feeLocks: FeeLocks, mode: Mode) {
+		self.feeSummary = feeSummary
+		self.feeLocks = feeLocks
+		self.mode = mode
 	}
 
+	public init(executionAnalysis: ExecutionAnalysis) throws {
+		let feeSummary: FeeSummary = try .init(
+			networkFee: .init(executionAnalysis.feeSummary.networkFee),
+			royaltyFee: .init(executionAnalysis.feeSummary.royaltyFee)
+		)
+		let feeLocks: FeeLocks = try .init(
+			nonContingentLock: .init(executionAnalysis.feeLocks.lock),
+			contingentLock: .init(executionAnalysis.feeLocks.contingentLock)
+		)
+
+		self.init(
+			feeSummary: feeSummary,
+			feeLocks: feeLocks,
+			mode: .normal
+		)
+	}
+}
+
+extension TransactionFee {
 	public var networkFee: BigDecimal {
 		max(feeSummary.networkFee - feeLocks.nonContingentLock, .zero)
 	}
@@ -364,26 +327,66 @@ public struct TransactionFee: Hashable, Sendable {
 		}
 	}
 
-	public init(feeSummary: FeeSummary, feeLocks: FeeLocks, mode: Mode) {
-		self.feeSummary = feeSummary
-		self.feeLocks = feeLocks
-		self.mode = mode
+	public mutating func toggleMode() {
+		switch mode {
+		case .normal:
+			mode = .advanced(.init(networkAndRoyaltyFee: networkFee + royaltyFee, tipPercentage: .zero))
+		case .advanced:
+			mode = .normal
+		}
+	}
+}
+
+extension TransactionFee {
+	public enum Mode: Hashable, Sendable {
+		case normal
+		case advanced(AdvancedFeeCustomization)
 	}
 
-	public init(executionAnalysis: ExecutionAnalysis) throws {
-		let feeSummary: FeeSummary = try .init(
-			networkFee: .init(executionAnalysis.feeSummary.networkFee),
-			royaltyFee: .init(executionAnalysis.feeSummary.royaltyFee)
-		)
-		let feeLocks: FeeLocks = try .init(
-			nonContingentLock: .init(executionAnalysis.feeLocks.lock),
-			contingentLock: .init(executionAnalysis.feeLocks.contingentLock)
-		)
+	public struct FeeSummary: Hashable, Sendable {
+		let networkFee: BigDecimal
+		let royaltyFee: BigDecimal
 
-		self.init(
-			feeSummary: feeSummary,
-			feeLocks: feeLocks,
-			mode: .normal
-		)
+		public init(networkFee: BigDecimal, royaltyFee: BigDecimal) {
+			self.networkFee = networkFee * 1.15
+			self.royaltyFee = royaltyFee
+		}
+	}
+
+	public struct FeeLocks: Hashable, Sendable {
+		let nonContingentLock: BigDecimal
+		let contingentLock: BigDecimal
+
+		public init(nonContingentLock: BigDecimal, contingentLock: BigDecimal) {
+			self.nonContingentLock = nonContingentLock
+			self.contingentLock = contingentLock
+		}
+	}
+
+	public struct AdvancedFeeCustomization: Hashable, Sendable {
+		public var networkAndRoyaltyFee: BigDecimal
+		public var tipPercentage: BigDecimal
+
+		public init(networkAndRoyaltyFee: BigDecimal, tipPercentage: BigDecimal) {
+			self.networkAndRoyaltyFee = networkAndRoyaltyFee
+			self.tipPercentage = tipPercentage
+		}
+	}
+
+	public struct TotalFee: Hashable, Sendable {
+		let min: BigDecimal
+		let max: BigDecimal
+
+		public var lockFee: BigDecimal {
+			// We always lock the max amount
+			max
+		}
+
+		public var displayedTotalFee: String {
+			if max > min {
+				return "\(min.format()) - \(max.format()) XRD"
+			}
+			return "\(max.format()) XRD"
+		}
 	}
 }

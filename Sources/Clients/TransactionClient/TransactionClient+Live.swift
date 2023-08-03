@@ -84,6 +84,7 @@ extension TransactionClient {
 			)
 		}
 
+		@Sendable
 		func feePayerSelectionAmongstCandidates(
 			_ manifest: TransactionManifest,
 			_ executionAnalysis: ExecutionAnalysis
