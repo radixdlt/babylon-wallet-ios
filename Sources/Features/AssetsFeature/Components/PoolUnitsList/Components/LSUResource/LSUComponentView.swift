@@ -23,6 +23,7 @@ extension LSUComponentView {
 		case unstaking
 		case readyToClaim
 
+		// FIXME: Localize
 		var localized: String {
 			switch self {
 			case .unstaking:
@@ -71,6 +72,7 @@ struct LSUComponentView: View {
 
 	private func liquidStakeUnitView(with viewState: LiquidStakeUnitViewState) -> some View {
 		Group {
+			// FIXME: Localize
 			Text("LIQUID STAKE UNITS")
 				.foregroundColor(.app.gray2)
 				.textStyle(.body2HighImportance)
@@ -87,6 +89,7 @@ struct LSUComponentView: View {
 							Text(viewState.symbol)
 								.foregroundColor(.app.gray1)
 								.textStyle(.body2HighImportance)
+							// FIXME: Localize
 							Text("Staked")
 								.foregroundColor(.app.gray2)
 								.textStyle(.body2HighImportance)
@@ -111,6 +114,7 @@ struct LSUComponentView: View {
 
 	private func stakeClaimNFTsView(with viewState: StakeClaimNFTsViewState) -> some View {
 		VStack(alignment: .leading, spacing: .medium1) {
+			// FIXME: Localize
 			Text("STAKE CLAIM NFTS")
 				.foregroundColor(.app.gray2)
 				.textStyle(.body2HighImportance)

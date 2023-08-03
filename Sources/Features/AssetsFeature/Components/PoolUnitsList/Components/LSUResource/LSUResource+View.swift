@@ -60,6 +60,7 @@ extension PoolUnitsList.LSUResource {
 						.foregroundColor(.app.gray1)
 						.textStyle(.secondaryHeader)
 
+					// FIXME: Localize
 					Text("\(viewStore.components.count) Stakes")
 						.foregroundColor(.app.gray2)
 						.textStyle(.body2HighImportance)
