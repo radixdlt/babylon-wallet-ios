@@ -3,31 +3,21 @@ import FeaturePrelude
 // MARK: - PoolUnitsList
 public struct PoolUnitsList: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
-		let isExpanded: Bool
-
-		public init(isExpanded: Bool) {
-			self.isExpanded = isExpanded
-		}
+		var lsuResource: LSUResource.State?
 	}
 
-	public enum ViewAction: Sendable, Equatable {
-		case appeared
-
-		case isExpandedToggled
+	public enum ChildAction: Sendable, Equatable {
+		case lsuResource(LSUResource.Action)
 	}
 
 	public init() {}
 
-	public func reduce(
-		into state: inout State,
-		viewAction: ViewAction
-	) -> EffectTask<Action> {
-		switch viewAction {
-		case .appeared:
-			return .none
-
-		case .isExpandedToggled:
-			return .none
-		}
+	public var body: some ReducerProtocolOf<Self> {
+		Reduce(core)
+			.ifLet(
+				\.lsuResource,
+				action: /Action.child .. ChildAction.lsuResource,
+				then: LSUResource.init
+			)
 	}
 }

@@ -9,3 +9,10 @@ public struct Unit: Sendable, Hashable, Codable, Error {
 
 	private init() {}
 }
+
+// MARK: Identifiable
+extension Unit: Identifiable {
+	public var id: Self {
+		self
+	}
+}
