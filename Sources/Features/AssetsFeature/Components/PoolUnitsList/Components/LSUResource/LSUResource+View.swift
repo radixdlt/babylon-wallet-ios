@@ -1,5 +1,14 @@
 import FeaturePrelude
 
+// MARK: - CGFloatPreferenceKey
+struct CGFloatPreferenceKey: PreferenceKey {
+	static var defaultValue: CGFloat = .zero
+
+	static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+		value = nextValue()
+	}
+}
+
 extension PoolUnitsList.LSUResource {
 	public struct ViewState: Sendable, Equatable {
 		let isExpanded: Bool
@@ -10,6 +19,9 @@ extension PoolUnitsList.LSUResource {
 
 	public struct View: SwiftUI.View {
 		private let store: StoreOf<PoolUnitsList.LSUResource>
+
+		@SwiftUI.State
+		private var headerHeight: CGFloat = .zero
 
 		public init(store: StoreOf<PoolUnitsList.LSUResource>) {
 			self.store = store
@@ -32,29 +44,15 @@ extension PoolUnitsList.LSUResource {
 						componentsView(with: viewStore.components.rawValue)
 					}
 
-					GeometryReader { geometry in
-						Spacer(
-							minLength: viewStore.isExpanded
-								? .zero
-								: 58
-						)
-						.padding(
-							viewStore.isExpanded
-								? .zero
-								: .medium1
-						)
-						.background(.app.white)
-						.roundedCorners(
-							.bottom,
-							radius: .small1
-						)
-						.frame(width: geometry.size.width)
-						.scaleEffect(0.95)
-						.tokenRowShadow(!viewStore.isExpanded)
-						.opacity(viewStore.isExpanded ? 0 : 1)
-					}
+					cardBehindHeader(
+						isStackExpanded: viewStore.isExpanded,
+						headerHeight: headerHeight
+					)
 				}
 				.padding(.horizontal, .medium3)
+			}
+			.onPreferenceChange(CGFloatPreferenceKey.self) {
+				headerHeight = $0
 			}
 		}
 
@@ -79,14 +77,18 @@ extension PoolUnitsList.LSUResource {
 			.padding(.medium1)
 			.background(.app.white)
 			.roundedCorners(viewStore.isExpanded ? .top : .allCorners, radius: .small1)
-			.zIndex(.infinity)
-			.roundedCorners(
-				viewStore.isExpanded
-					? .top
-					: .allCorners,
-				radius: .small1
-			)
 			.tokenRowShadow(!viewStore.isExpanded)
+			.zIndex(.infinity)
+			.overlay(
+				GeometryReader { geometry in
+					Color.clear.anchorPreference(
+						key: CGFloatPreferenceKey.self,
+						value: .bounds
+					) {
+						geometry[$0].height
+					}
+				}
+			)
 			.onTapGesture {
 				viewStore.send(.isExpandedToggled, animation: .easeInOut)
 			}
@@ -103,6 +105,29 @@ extension PoolUnitsList.LSUResource {
 				.bottom,
 				radius: .small1
 			)
+		}
+
+		private func cardBehindHeader(
+			isStackExpanded: Bool,
+			headerHeight: CGFloat
+		) -> some SwiftUI.View {
+			GeometryReader { geometry in
+				Spacer(
+					minLength: isStackExpanded
+						? .zero
+						: headerHeight
+				)
+				.background(.app.white)
+				.roundedCorners(
+					.bottom,
+					radius: .small1
+				)
+				.frame(width: geometry.size.width)
+				.scaleEffect(0.95)
+				.tokenRowShadow(!isStackExpanded)
+				.opacity(isStackExpanded ? 0 : 1)
+				.offset(y: .small1)
+			}
 		}
 	}
 }
