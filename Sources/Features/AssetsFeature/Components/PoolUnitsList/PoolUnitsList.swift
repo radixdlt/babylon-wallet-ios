@@ -21,3 +21,9 @@ public struct PoolUnitsList: Sendable, FeatureReducer {
 			)
 	}
 }
+
+extension PoolUnitsList.State {
+	public static var preview: Self {
+		.init(lsuResource: .init())
+	}
+}

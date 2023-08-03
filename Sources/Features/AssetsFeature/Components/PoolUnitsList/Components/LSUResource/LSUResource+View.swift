@@ -94,7 +94,7 @@ extension PoolUnitsList.LSUResource {
 						Spacer(
 							minLength: viewStore.isExpanded
 								? .zero
-								: 88
+								: 58
 						)
 						.padding(
 							viewStore.isExpanded
@@ -112,7 +112,7 @@ extension PoolUnitsList.LSUResource {
 						.opacity(viewStore.isExpanded ? 0 : 1)
 					}
 				}
-				.padding(.medium1)
+				.padding(.horizontal, .medium3)
 			}
 		}
 
@@ -127,7 +127,7 @@ extension PoolUnitsList.LSUResource {
 						.foregroundColor(.app.gray1)
 						.textStyle(.secondaryHeader)
 
-					Text("3 Stakes")
+					Text("\(viewStore.components.count) Stakes")
 						.foregroundColor(.app.gray2)
 						.textStyle(.body2HighImportance)
 				}

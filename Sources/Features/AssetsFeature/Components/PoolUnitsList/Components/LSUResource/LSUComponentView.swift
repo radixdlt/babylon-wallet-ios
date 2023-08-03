@@ -146,14 +146,3 @@ struct LSUComponentView: View {
 		}
 	}
 }
-
-extension PoolUnitsList.State {
-	public static var preview: Self {
-		.init(
-			lsuResource: .init(
-				isExpanded: false,
-				components: []
-			)
-		)
-	}
-}

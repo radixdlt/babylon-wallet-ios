@@ -4,9 +4,7 @@ extension PoolUnitsList {
 	// MARK: - LSUResource
 	public struct LSUResource: Sendable, FeatureReducer {
 		public struct State: Sendable, Hashable {
-			var isExpanded: Bool
-
-			let components: IdentifiedArrayOf<Prelude.Unit>
+			var isExpanded: Bool = false
 		}
 
 		public enum ViewAction: Sendable, Equatable {
