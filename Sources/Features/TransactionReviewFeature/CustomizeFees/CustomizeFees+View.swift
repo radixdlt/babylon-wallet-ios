@@ -146,7 +146,7 @@ extension CustomizeFees {
 		}
 
 		func feePayerView(_ viewStore: ViewStoreOf<CustomizeFees>) -> some SwiftUI.View {
-			VStack {
+			VStack(alignment: .leading) {
 				HStack {
 					Text("Pay Fee From")
 						.textStyle(.body1Link)
@@ -168,10 +168,12 @@ extension CustomizeFees {
 					)
 					.cornerRadius(.small1)
 				} else {
-					Text(viewStore.noFeePayerText)
-						.foregroundColor(.app.gray2)
-						.textStyle(.body1Header)
-						.background(.app.gray5)
+					AppTextField(placeholder: "", text: .constant(viewStore.noFeePayerText))
+						.disabled(true)
+//					Text(viewStore.noFeePayerText)
+//						.foregroundColor(.app.gray2)
+//						.textStyle(.body1Header)
+//						.background(.app.gray5)
 				}
 
 				if let insufficientBalanceMessage = viewStore.insufficientBalanceMessage {
