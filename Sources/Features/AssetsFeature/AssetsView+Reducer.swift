@@ -24,8 +24,10 @@ public struct AssetsView: Sendable, FeatureReducer {
 
 		public var activeAssetKind: AssetKind
 		public var assetKinds: NonEmpty<[AssetKind]>
+
 		public var fungibleTokenList: FungibleAssetList.State
 		public var nonFungibleTokenList: NonFungibleAssetList.State
+		public var poolUnitsList: PoolUnitsList.State
 
 		public let account: Profile.Network.Account
 		public var isLoadingResources: Bool = false
@@ -36,6 +38,7 @@ public struct AssetsView: Sendable, FeatureReducer {
 				account: account,
 				fungibleTokenList: .init(),
 				nonFungibleTokenList: .init(rows: []),
+				poolUnitsList: .init(),
 				mode: mode
 			)
 		}
@@ -45,6 +48,7 @@ public struct AssetsView: Sendable, FeatureReducer {
 			assetKinds: NonEmpty<[AssetKind]> = .init(rawValue: AssetKind.allCases)!,
 			fungibleTokenList: FungibleAssetList.State,
 			nonFungibleTokenList: NonFungibleAssetList.State,
+			poolUnitsList: PoolUnitsList.State,
 			mode: Mode
 		) {
 			self.account = account
@@ -52,6 +56,7 @@ public struct AssetsView: Sendable, FeatureReducer {
 			self.activeAssetKind = assetKinds.first
 			self.fungibleTokenList = fungibleTokenList
 			self.nonFungibleTokenList = nonFungibleTokenList
+			self.poolUnitsList = poolUnitsList
 			self.mode = mode
 		}
 	}
@@ -67,6 +72,7 @@ public struct AssetsView: Sendable, FeatureReducer {
 	public enum ChildAction: Sendable, Equatable {
 		case fungibleTokenList(FungibleAssetList.Action)
 		case nonFungibleTokenList(NonFungibleAssetList.Action)
+		case poolUnitsList(PoolUnitsList.Action)
 	}
 
 	public enum InternalAction: Sendable, Equatable {
@@ -83,12 +89,25 @@ public struct AssetsView: Sendable, FeatureReducer {
 	public init() {}
 
 	public var body: some ReducerProtocolOf<Self> {
-		Scope(state: \.nonFungibleTokenList, action: /Action.child .. ChildAction.nonFungibleTokenList) {
-			NonFungibleAssetList()
-		}
-		Scope(state: \.fungibleTokenList, action: /Action.child .. ChildAction.fungibleTokenList) {
+		Scope(
+			state: \.fungibleTokenList,
+			action: /Action.child .. ChildAction.fungibleTokenList
+		) {
 			FungibleAssetList()
 		}
+		Scope(
+			state: \.nonFungibleTokenList,
+			action: /Action.child .. ChildAction.nonFungibleTokenList
+		) {
+			NonFungibleAssetList()
+		}
+		Scope(
+			state: \.poolUnitsList,
+			action: /Action.child .. ChildAction.poolUnitsList
+		) {
+			PoolUnitsList()
+		}
+
 		Reduce(core)
 	}
 

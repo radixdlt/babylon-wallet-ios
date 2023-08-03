@@ -40,9 +40,9 @@ extension AssetsView {
 							)
 						case .poolUnits:
 							PoolUnitsList.View(
-								store: .init(
-									initialState: .init(),
-									reducer: EmptyReducer()
+								store: store.scope(
+									state: \.poolUnitsList,
+									action: { .child(.poolUnitsList($0)) }
 								)
 							)
 						}
@@ -108,7 +108,13 @@ struct AssetsView_Preview: PreviewProvider {
 	static var previews: some View {
 		AssetsView.View(
 			store: .init(
-				initialState: .init(account: .previewValue0, fungibleTokenList: .init(), nonFungibleTokenList: .init(rows: []), mode: .normal),
+				initialState: .init(
+					account: .previewValue0,
+					fungibleTokenList: .init(),
+					nonFungibleTokenList: .init(rows: []),
+					poolUnitsList: .init(),
+					mode: .normal
+				),
 				reducer: AssetsView()
 			)
 		)
