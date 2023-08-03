@@ -108,7 +108,6 @@ public struct ChooseAccounts: Sendable, FeatureReducer {
 		switch childAction {
 		case .destination(.presented(.createAccount(.delegate(.completed)))):
 			return loadAccounts()
-
 		default:
 			return .none
 		}

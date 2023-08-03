@@ -26,16 +26,6 @@ public struct MyEntitiesInvolvedInTransaction: Sendable, Hashable {
 	public let accountsDepositedInto: OrderedSet<Profile.Network.Account>
 }
 
-// MARK: - PredefinedFees
-enum PredefinedFees {
-	enum WalletFees {
-		static let feeLock: BigDecimal = 10
-		static let guarantee: BigDecimal = 1
-	}
-
-	static let networkFeeMargin: BigDecimal = 1.15
-}
-
 extension TransactionClient {
 	public static var liveValue: Self {
 		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
@@ -94,122 +84,77 @@ extension TransactionClient {
 			)
 		}
 
-		@Sendable
-		func accountsWithEnoughFunds(
-			from addresses: [AccountAddress],
-			toPay fee: BigDecimal
-		) async -> Set<AccountPortfolio> {
-			guard !addresses.isEmpty else { return Set() }
-			guard let portfolios = try? await accountPortfoliosClient.fetchAccountPortfolios(addresses, true) else {
-				return Set()
-			}
-			return Set(portfolios.filter {
-				guard let xrdBalance = $0.fungibleResources.xrdResource?.amount else { return false }
-				return xrdBalance >= fee
-			})
-		}
+		func feePayerSelectionAmongstCandidates(
+			_ manifest: TransactionManifest,
+			_ executionAnalysis: ExecutionAnalysis
+		) async throws -> FeePayerSelectionAmongstCandidates {
+			let transactionFee = try TransactionFee(executionAnalysis: executionAnalysis)
+			let lockFee = transactionFee.totalFee.lockFee
 
-		@Sendable
-		func feePayerCandiates(
-			accounts: OrderedSet<Profile.Network.Account>,
-			fee: BigDecimal
-		) async throws -> OrderedSet<FeePayerCandiate> {
-			let portfolios = await accountsWithEnoughFunds(from: accounts.map(\.address), toPay: fee)
-			return try .init(validating: portfolios.compactMap { tokenBalance in
+			let networkID = await gatewaysClient.getCurrentNetworkID()
+			let allAccounts = try await accountsClient.getAccountsOnNetwork(networkID)
+			let allFeePayerCandidates = try await accountPortfoliosClient.fetchAccountPortfolios(allAccounts.map(\.address), true).compactMap { portfolio -> FeePayerCandidate? in
 				guard
-					let account = accounts.first(where: { account in account.address == tokenBalance.owner }),
-					let xrdBalance = tokenBalance.fungibleResources.xrdResource?.amount
+					let account = allAccounts.first(where: { account in account.address == portfolio.owner })
 				else {
 					assertionFailure("Failed to find account or no balance, this should never happen.")
 					return nil
 				}
-				return FeePayerCandiate(
+				return FeePayerCandidate(
 					account: account,
-					xrdBalance: xrdBalance
+					xrdBalance: portfolio.fungibleResources.xrdResource?.amount ?? .zero
 				)
-			})
-		}
+			}
 
-		let lockFeeWithSelectedPayer: LockFeeWithSelectedPayer = { manifest, _, addressOfPayer in
-			loggerGlobal.debug("Setting fee payer to: \(addressOfPayer.address)")
-			return try manifest.withLockFeeCallMethodAdded(address: addressOfPayer.asGeneral())
-		}
+			guard
+				let allCandidates = NonEmpty<IdentifiedArrayOf<FeePayerCandidate>>(rawValue: .init(uncheckedUniqueElements: allFeePayerCandidates))
+			else {
+				struct NoFeePayerCandidates: Error {}
+				// Should not ever happen, user should have at least one account
+				throw NoFeePayerCandidates()
+			}
 
-		let lockFeeBySearchingForSuitablePayer: LockFeeBySearchingForSuitablePayer = { manifest, feeToAdd in
-			let networkID = await gatewaysClient.getCurrentNetworkID()
-			let myInvolvedEntities = try await myEntitiesInvolvedInTransaction(
-				networkID: networkID,
-				manifest: manifest
-			)
-
-			loggerGlobal.debug("My involved entities: \(myInvolvedEntities)")
-			var triedAccounts: Set<Profile.Network.Account> = []
-
-			func findFeePayer(
-				amongst keyPath: KeyPath<MyEntitiesInvolvedInTransaction, OrderedSet<Profile.Network.Account>>
-			) async throws -> AddFeeToManifestOutcomeIncludesLockFee? {
-				let accountsToCheck = myInvolvedEntities[keyPath: keyPath]
-				let involvedFeePayerCandidates = try await feePayerCandiates(
-					accounts: accountsToCheck,
-					fee: feeToAdd
-				)
-				triedAccounts.append(contentsOf: accountsToCheck)
-				guard
-					let candidates = NonEmpty<IdentifiedArrayOf<FeePayerCandiate>>(rawValue: .init(uncheckedUniqueElements: involvedFeePayerCandidates))
-				else {
+			let feePayer: FeePayerCandidate? = try? await {
+				guard lockFee > .zero else {
 					return nil
 				}
 
-				let feePayer = candidates.first
-				let addressOfPayer = feePayer.account.address
+				let myInvolvedEntities = try await myEntitiesInvolvedInTransaction(
+					networkID: networkID,
+					manifest: manifest
+				)
 
-				guard await accountsWithEnoughFunds(from: [addressOfPayer], toPay: feeToAdd).first?.owner == addressOfPayer else {
-					assertionFailure("did you JUST spend funds? unlucky...")
-					return nil
+				let candidatesWithEnoughFunds = allFeePayerCandidates.filter {
+					$0.xrdBalance >= lockFee
 				}
 
-				let manifestWithLockFee = try await lockFeeWithSelectedPayer(
-					manifest,
-					feeToAdd,
-					feePayer.account.address
-				)
+				func findFeePayer(
+					amongst keyPath: KeyPath<MyEntitiesInvolvedInTransaction, OrderedSet<Profile.Network.Account>>
+				) async throws -> FeePayerCandidate? {
+					let accountsToCheck = myInvolvedEntities[keyPath: keyPath]
+					return candidatesWithEnoughFunds.first { accountsToCheck.contains($0.account) }
+				}
 
-				return .init(
-					manifestWithLockFee: manifestWithLockFee,
-					feePayerSelectionAmongstCandidates: .init(
-						selected: feePayer,
-						candidates: candidates,
-						fee: feeToAdd,
-						selection: .auto
-					)
-				)
-			}
+				// First try amonst `accountsWithdrawnFrom`
+				if let feePayer = try await findFeePayer(amongst: \.accountsWithdrawnFrom) {
+					loggerGlobal.debug("Find suitable fee payer in: 'accountsWithdrawnFrom', specifically: \(feePayer)")
+					return feePayer
+				}
+				// no candiates amonst `accountsWithdrawnFrom` => fallback to `accountsRequiringAuth`
+				if let feePayer = try await findFeePayer(amongst: \.accountsRequiringAuth) {
+					loggerGlobal.debug("Find suitable fee payer in: 'accountsRequiringAuth', specifically: \(feePayer)")
+					return feePayer
+				}
+				// no candiates amonst `accountsRequiringAuth` => fallback to `accountsDepositedInto`
+				if let feePayer = try await findFeePayer(amongst: \.accountsDepositedInto) {
+					loggerGlobal.debug("Find suitable fee payer in: 'accountsDepositedInto', specifically: \(feePayer)")
+					return feePayer
+				}
+				loggerGlobal.debug("Did not find any suitable fee payer, retrieving candidates for user selection....")
+				return nil
+			}()
 
-			// First try amonst `accountsWithdrawnFrom`
-			if let withLockFee = try await findFeePayer(amongst: \.accountsWithdrawnFrom) {
-				loggerGlobal.debug("Find suitable fee payer in: 'accountsWithdrawnFrom', specifically: \(withLockFee.feePayerSelectionAmongstCandidates.selected)")
-				return .includesLockFee(withLockFee)
-			}
-			// no candiates amonst `accountsWithdrawnFrom` => fallback to `accountsRequiringAuth`
-			if let withLockFee = try await findFeePayer(amongst: \.accountsRequiringAuth) {
-				loggerGlobal.debug("Find suitable fee payer in: 'accountsRequiringAuth', specifically: \(withLockFee.feePayerSelectionAmongstCandidates.selected)")
-				return .includesLockFee(withLockFee)
-			}
-			// no candiates amonst `accountsRequiringAuth` => fallback to `accountsDepositedInto`
-			if let withLockFee = try await findFeePayer(amongst: \.accountsDepositedInto) {
-				loggerGlobal.debug("Find suitable fee payer in: 'accountsDepositedInto', specifically: \(withLockFee.feePayerSelectionAmongstCandidates.selected)")
-				return .includesLockFee(withLockFee)
-			}
-			loggerGlobal.debug("Did not find any suitable fee payer, retrieving candidates for user selection....")
-
-			// None of the accounts in `myInvolvedAccounts` had any XRD, skip them all and fallback to fetching XRD for all other accounts on this
-			// network that not part of `myInvolvedAccounts`.
-			let allAccounts = try await accountsClient.getAccountsOnNetwork(networkID)
-
-			let remainingAccounts = Set(allAccounts.rawValue.elements).subtracting(triedAccounts)
-			let remainingCandidates = try await feePayerCandiates(accounts: .init(remainingAccounts), fee: feeToAdd)
-
-			return .excludesLockFee(.init(manifestExcludingLockFee: manifest, feePayerCandidates: .init(uniqueElements: remainingCandidates), feeNotYetAdded: feeToAdd))
+			return .init(selected: feePayer, candidates: allCandidates, transactionFee: transactionFee)
 		}
 
 		let buildTransactionIntent: BuildTransactionIntent = { request in
@@ -272,16 +217,11 @@ extension TransactionClient {
 			let receiptBytes = try [UInt8](hex: transactionPreviewResponse.encodedReceipt)
 
 			let analyzedManifestToReview = try request.manifestToSign.analyzeExecution(transactionReceipt: receiptBytes)
-
-			let addFeeToManifestOutcome = try await lockFeeBySearchingForSuitablePayer(
-				request.manifestToSign,
-				request.feeToAdd
-			)
-
+			let feePayerSelection = try await feePayerSelectionAmongstCandidates(request.manifestToSign, analyzedManifestToReview)
 			return TransactionToReview(
 				analyzedManifestToReview: analyzedManifestToReview,
-				addFeeToManifestOutcome: addFeeToManifestOutcome,
-				networkID: networkID
+				networkID: networkID,
+				feePayerSelectionAmongstCandidates: feePayerSelection
 			)
 		}
 
@@ -355,32 +295,12 @@ extension TransactionClient {
 		}
 
 		return Self(
-			lockFeeBySearchingForSuitablePayer: lockFeeBySearchingForSuitablePayer,
-			lockFeeWithSelectedPayer: lockFeeWithSelectedPayer,
 			getTransactionReview: getTransactionReview,
 			buildTransactionIntent: buildTransactionIntent,
 			notarizeTransaction: notarizeTransaction,
 			prepareForSigning: prepareForSigning,
 			myInvolvedEntities: myInvolvedEntities
 		)
-	}
-
-	func calculateTransactionFee(_ executionAnalysis: ExecutionAnalysis, tip: BigDecimal = .zero) throws -> (min: BigDecimal, max: BigDecimal) {
-		let networkFee = try BigDecimal(executionAnalysis.feeSummary.networkFee) * PredefinedFees.networkFeeMargin
-		let royaltyFee = try BigDecimal(executionAnalysis.feeSummary.royaltyFee)
-		let nonContingentLock = try BigDecimal(executionAnalysis.feeLocks.lock)
-		let contingentLock = try BigDecimal(executionAnalysis.feeLocks.contingentLock)
-
-		let totalRequiredFee = networkFee + royaltyFee + tip
-
-		if totalRequiredFee < nonContingentLock {
-			return (.zero, .zero)
-		}
-
-		let maxUserFee = totalRequiredFee - nonContingentLock
-		let minUserFee = maxUserFee - contingentLock
-
-		return (minUserFee, maxUserFee)
 	}
 }
 

@@ -4,23 +4,20 @@ import TransactionClient
 
 extension SelectFeePayer.State {
 	var viewState: SelectFeePayer.ViewState {
-		.init(candidates: feePayerCandidates.rawValue, selectedPayerID: selectedPayerID, fee: fee)
+		.init(
+			candidates: feePayerSelection.candidates.rawValue,
+			fee: feePayerSelection.transactionFee.totalFee.displayedTotalFee,
+			selectedPayer: feePayerSelection.selected
+		)
 	}
 }
 
 // MARK: - SelectFeePayer.View
 extension SelectFeePayer {
 	public struct ViewState: Equatable {
-		let candidates: IdentifiedArrayOf<FeePayerCandiate>
-		var candidatesArray: [FeePayerCandiate]? { .init(candidates) }
-		let selectedPayerID: FeePayerCandiate.ID?
-		let fee: BigDecimal
-		var selectedPayer: FeePayerCandiate? {
-			guard let id = selectedPayerID else {
-				return nil
-			}
-			return candidates[id: id]
-		}
+		let candidates: IdentifiedArrayOf<FeePayerCandidate>
+		let fee: String
+		var selectedPayer: FeePayerCandidate?
 	}
 
 	@MainActor
@@ -35,33 +32,27 @@ extension SelectFeePayer {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				VStack {
 					VStack {
-						Text(L10n.TransactionReview.SelectFeePayer.navigationTitle)
+						Text("Select Fee Payer Account")
 							.textStyle(.sheetTitle)
 							.foregroundColor(.app.gray1)
 							.padding(.top, .medium3)
 							.padding(.horizontal, .medium1)
 							.padding(.bottom, .small2)
 
-						Text(L10n.TransactionReview.SelectFeePayer.body)
+						Text("Please select an Account with enough XRD to pay \(viewStore.fee) fee for this transaction.")
 							.textStyle(.body1HighImportance)
 							.foregroundColor(.app.gray2)
 							.padding(.horizontal, .large3)
 							.padding(.bottom, .small1)
 
-						Text(L10n.TransactionReview.SelectFeePayer.selectAccount)
-							.textStyle(.body1HighImportance)
-							.foregroundColor(.app.gray2)
-							.padding(.horizontal, .large3)
-
 						ScrollView {
 							VStack(spacing: .small1) {
 								Selection(
 									viewStore.binding(
-										get: \.candidatesArray,
-										send: { .selectedPayer(id: $0?.first?.id) }
+										get: \.selectedPayer,
+										send: { .selectedPayer($0) }
 									),
-									from: viewStore.candidates,
-									requiring: .exactly(1)
+									from: viewStore.candidates
 								) { item in
 									SelectAccountToPayForFeeRow.View(
 										viewState: .init(candidate: item.value),
@@ -74,14 +65,13 @@ extension SelectFeePayer {
 							.padding(.bottom, .medium2)
 						}
 					}
-					.navigationTitle(L10n.TransactionReview.SelectFeePayer.navigationTitle)
 				}
 				.footer {
 					WithControlRequirements(
 						viewStore.selectedPayer,
 						forAction: { viewStore.send(.confirmedFeePayer($0)) }
 					) { action in
-						Button(L10n.TransactionReview.SelectFeePayer.confirmButton, action: action)
+						Button("Select Account", action: action)
 							.buttonStyle(.primaryRectangular)
 					}
 				}
@@ -98,7 +88,7 @@ enum SelectAccountToPayForFeeRow {
 		let accountAddress: AccountAddress
 		let xrdBalance: BigDecimal
 
-		init(candidate: FeePayerCandiate) {
+		init(candidate: FeePayerCandidate) {
 			appearanceID = candidate.account.appearanceID
 			accountName = candidate.account.displayName.rawValue
 			accountAddress = candidate.account.address
@@ -123,6 +113,9 @@ enum SelectAccountToPayForFeeRow {
 						AddressView(.address(.account(viewState.accountAddress)), isTappable: false)
 							.foregroundColor(.app.whiteTransparent)
 							.textStyle(.body2HighImportance)
+						Text("Balance \(viewState.xrdBalance.format(maxPlaces: 2)) XRD")
+							.foregroundColor(.app.white)
+							.textStyle(.body1Header)
 					}
 
 					Spacer()

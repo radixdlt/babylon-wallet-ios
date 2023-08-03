@@ -3,8 +3,6 @@ import ClientPrelude
 
 extension TransactionClient: TestDependencyKey {
 	public static let testValue: TransactionClient = .init(
-		lockFeeBySearchingForSuitablePayer: unimplemented("\(Self.self).lockFeeBySearchingForSuitablePayer"),
-		lockFeeWithSelectedPayer: unimplemented("\(Self.self).lockFeeWithSelectedPayer"),
 		getTransactionReview: unimplemented("\(Self.self).getTransactionReview"),
 		buildTransactionIntent: unimplemented("\(Self.self).buildTransactionIntent"),
 		notarizeTransaction: unimplemented("\(Self.self).notarizeTransaction"),

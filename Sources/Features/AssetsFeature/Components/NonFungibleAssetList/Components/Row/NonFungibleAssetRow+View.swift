@@ -26,6 +26,7 @@ extension NonFungibleAssetList.Row.View {
 				EmptyView()
 			} else {
 				StackedViewsLayout(isExpanded: viewStore.isExpanded) {
+					// Header
 					rowView(viewStore)
 						.zIndex(.infinity)
 					ForEach(

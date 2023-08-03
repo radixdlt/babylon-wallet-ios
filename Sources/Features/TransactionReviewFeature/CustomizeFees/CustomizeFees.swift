@@ -2,44 +2,41 @@ import EngineKit
 import FeaturePrelude
 import TransactionClient
 
-struct CustomizeFees: FeatureReducer {
-	struct State: Hashable, Sendable {
-		var feePayerCandidates: FeePayerSelectionAmongstCandidates
-		let feeSummary: FeeSummary
-		let feeLocks: FeeLocks
-		var tip: BigDecimal
-		var feePayerAccount: Profile.Network.Account {
-			feePayerCandidates.selected.account
+public struct CustomizeFees: FeatureReducer {
+	public struct State: Hashable, Sendable {
+		var feePayerSelection: FeePayerSelectionAmongstCandidates
+
+		var feePayerAccount: Profile.Network.Account? {
+			feePayerSelection.selected?.account
+		}
+
+		var transactionFee: TransactionFee {
+			feePayerSelection.transactionFee
 		}
 
 		@PresentationState
 		public var destination: Destinations.State? = nil
 
-		var total: BigDecimal {
-			tip
-		}
-
 		init(
-			feePayerCandidates: FeePayerSelectionAmongstCandidates,
-			feeSummary: FeeSummary,
-			feeLocks: FeeLocks,
-			tip: BigDecimal,
-			total: BigDecimal
+			feePayerSelection: FeePayerSelectionAmongstCandidates
 		) {
-			self.feePayerCandidates = feePayerCandidates
-			self.feeSummary = feeSummary
-			self.feeLocks = feeLocks
-			self.tip = .zero
+			self.feePayerSelection = feePayerSelection
 		}
 	}
 
-	enum ViewAction: Equatable {
+	public enum ViewAction: Equatable {
 		case changeFeePayerTapped
-		case viewAdvancedModeTapped
+		case toggleMode
+		case totalNetworkAndRoyaltyFeesChanged(String)
+		case tipPercentageChanged(String)
 	}
 
-	enum ChildAction: Equatable {
+	public enum ChildAction: Equatable {
 		case destination(PresentationAction<Destinations.Action>)
+	}
+
+	public enum DelegateAction: Equatable {
+		case updated(FeePayerSelectionAmongstCandidates)
 	}
 
 	public struct Destinations: Sendable, ReducerProtocol {
@@ -65,21 +62,38 @@ struct CustomizeFees: FeatureReducer {
 			}
 	}
 
-	func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .changeFeePayerTapped:
-			state.destination = .selectFeePayer(.init(candidates: state.feePayerCandidates.candidates, fee: state.feePayerCandidates.fee))
+			state.destination = .selectFeePayer(.init(feePayerSelection: state.feePayerSelection))
 			return .none
-		case .viewAdvancedModeTapped:
-			return .none
+		case .toggleMode:
+			state.feePayerSelection.transactionFee.toggleMode()
+			return .send(.delegate(.updated(state.feePayerSelection)))
+		case let .totalNetworkAndRoyaltyFeesChanged(amount):
+			guard case let .advanced(advanced) = state.transactionFee.mode, let value = try? BigDecimal(localizedFromString: amount) else {
+				return .none
+			}
+
+			state.feePayerSelection.transactionFee.mode = .advanced(.init(networkAndRoyaltyFee: value, tipPercentage: advanced.tipPercentage))
+			return .send(.delegate(.updated(state.feePayerSelection)))
+		case let .tipPercentageChanged(percentage):
+			guard case let .advanced(advanced) = state.transactionFee.mode, let value = try? BigDecimal(localizedFromString: percentage) else {
+				return .none
+			}
+
+			state.feePayerSelection.transactionFee.mode = .advanced(.init(networkAndRoyaltyFee: advanced.networkAndRoyaltyFee, tipPercentage: value))
+			return .send(.delegate(.updated(state.feePayerSelection)))
 		}
 	}
 
-	func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
 		case let .destination(.presented(.selectFeePayer(.delegate(.selected(selection))))):
-			state.feePayerCandidates = selection
-			return .none
+			state.feePayerSelection.selected = selection
+			state.destination = nil
+			return .send(.delegate(.updated(state.feePayerSelection)))
+
 		default:
 			return .none
 		}

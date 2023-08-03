@@ -8,39 +8,175 @@ import TransactionClient
 
 // MARK: - TransactionClientTests
 final class TransactionClientTests: TestCase {
-	func test_accountsSuitableToPayTXFee_CREATE_FUNGIBLE_RESOURCE_then_deposit_batch() async throws {
-		let expectedAccount = Profile.Network.Account.new(address: "account_tdx_21_12ya9jylskaa6gdrfr8nvve3pfc6wyhyw7eg83fwlc7fv2w0eanumcd")
-		let transactionManifest = try TransactionManifest.manifestForCreateFungibleToken(
-			account: .init(validatingAddress: "account_tdx_21_12ya9jylskaa6gdrfr8nvve3pfc6wyhyw7eg83fwlc7fv2w0eanumcd"),
-			network: NetworkID.enkinet
-		)
-		let sut = TransactionClient.liveValue
+	// MARK: - TransactionFee tests
+	func testNormalModeNoLocks() {
+		let feeSummary = TransactionFee.FeeSummary(networkFee: 10, royaltyFee: 20)
+		let feeLocks = TransactionFee.FeeLocks(nonContingentLock: 0, contingentLock: 0)
+		let transaction = TransactionFee(feeSummary: feeSummary, feeLocks: feeLocks, mode: .normal)
 
-		try await withDependencies({
-			$0.gatewaysClient.getCurrentGateway = { Radix.Gateway.simulator }
-			$0.accountsClient.getAccountsOnNetwork = { _ in Profile.Network.Accounts(rawValue: .init(uncheckedUniqueElements: [expectedAccount]))! }
-			$0.accountPortfoliosClient.fetchAccountPortfolios = { addresses, _ in try addresses.map {
-				try .init(
-					owner: $0,
-					isDappDefintionAccountType: false,
-					fungibleResources: .init(
-						xrdResource: .init(
-							resourceAddress: .init(validatingAddress: "resource_tdx_21_1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxsmgder"),
-							amount: 11
-						)
-					),
-					nonFungibleResources: []
-				)
-			} }
-		}, operation: {
-			let res = try await sut.lockFeeBySearchingForSuitablePayer(transactionManifest, 10)
-			switch res {
-			case let .includesLockFee(incl):
-				XCTAssertEqual(incl.feePayerSelectionAmongstCandidates.selected.account, expectedAccount)
-			case .excludesLockFee:
-				XCTFail("expected to have includesLockFee")
-			}
-		})
+		XCTAssertEqual(transaction.networkFee, 11.50)
+		XCTAssertEqual(transaction.royaltyFee, 20)
+		XCTAssertEqual(transaction.totalFee.lockFee, 31.50)
+		XCTAssertEqual(transaction.totalFee.displayedTotalFee, "31.5 XRD")
+	}
+
+	func testNormalModeNonContingentLock_1() {
+		let feeSummary = TransactionFee.FeeSummary(networkFee: 10, royaltyFee: 20)
+		let feeLocks = TransactionFee.FeeLocks(nonContingentLock: 5, contingentLock: 0)
+		let transaction = TransactionFee(feeSummary: feeSummary, feeLocks: feeLocks, mode: .normal)
+
+		XCTAssertEqual(transaction.networkFee, 6.50)
+		XCTAssertEqual(transaction.royaltyFee, 20)
+		XCTAssertEqual(transaction.totalFee.lockFee, 26.50)
+		XCTAssertEqual(transaction.totalFee.displayedTotalFee, "26.5 XRD")
+	}
+
+	func testNormalModeNonContingentLock_2() {
+		let feeSummary = TransactionFee.FeeSummary(networkFee: 10, royaltyFee: 20)
+		let feeLocks = TransactionFee.FeeLocks(nonContingentLock: 11.5, contingentLock: 0)
+		let transaction = TransactionFee(feeSummary: feeSummary, feeLocks: feeLocks, mode: .normal)
+
+		XCTAssertEqual(transaction.networkFee, 0)
+		XCTAssertEqual(transaction.royaltyFee, 20)
+		XCTAssertEqual(transaction.totalFee.lockFee, 20)
+		XCTAssertEqual(transaction.totalFee.displayedTotalFee, "20 XRD")
+	}
+
+	func testNormalModeNonContingentLock_3() {
+		let feeSummary = TransactionFee.FeeSummary(networkFee: 10, royaltyFee: 20)
+		let feeLocks = TransactionFee.FeeLocks(nonContingentLock: 15, contingentLock: 0)
+		let transaction = TransactionFee(feeSummary: feeSummary, feeLocks: feeLocks, mode: .normal)
+
+		XCTAssertEqual(transaction.networkFee, 0)
+		XCTAssertEqual(transaction.royaltyFee, 16.5)
+		XCTAssertEqual(transaction.totalFee.lockFee, 16.5)
+		XCTAssertEqual(transaction.totalFee.displayedTotalFee, "16.5 XRD")
+	}
+
+	func testNormalModeNonContingentLock_4() {
+		let feeSummary = TransactionFee.FeeSummary(networkFee: 10, royaltyFee: 20)
+		let feeLocks = TransactionFee.FeeLocks(nonContingentLock: 31.5, contingentLock: 0)
+		let transaction = TransactionFee(feeSummary: feeSummary, feeLocks: feeLocks, mode: .normal)
+
+		XCTAssertEqual(transaction.networkFee, 0)
+		XCTAssertEqual(transaction.royaltyFee, 0)
+		XCTAssertEqual(transaction.totalFee.lockFee, 0)
+		XCTAssertEqual(transaction.totalFee.displayedTotalFee, "0 XRD")
+	}
+
+	func testNormalModeNonContingentLock_5() {
+		let feeSummary = TransactionFee.FeeSummary(networkFee: 10, royaltyFee: 20)
+		let feeLocks = TransactionFee.FeeLocks(nonContingentLock: 100, contingentLock: 0)
+		let transaction = TransactionFee(feeSummary: feeSummary, feeLocks: feeLocks, mode: .normal)
+
+		XCTAssertEqual(transaction.networkFee, 0)
+		XCTAssertEqual(transaction.royaltyFee, 0)
+		XCTAssertEqual(transaction.totalFee.lockFee, 0)
+		XCTAssertEqual(transaction.totalFee.displayedTotalFee, "0 XRD")
+	}
+
+	func testNormalModeContingentLock_1() {
+		let feeSummary = TransactionFee.FeeSummary(networkFee: 10, royaltyFee: 20)
+		let feeLocks = TransactionFee.FeeLocks(nonContingentLock: 0, contingentLock: 5)
+		let transaction = TransactionFee(feeSummary: feeSummary, feeLocks: feeLocks, mode: .normal)
+
+		XCTAssertEqual(transaction.networkFee, 11.5)
+		XCTAssertEqual(transaction.royaltyFee, 20)
+		XCTAssertEqual(transaction.totalFee.lockFee, 31.5)
+		XCTAssertEqual(transaction.totalFee.displayedTotalFee, "26.5 - 31.5 XRD")
+	}
+
+	func testNormalModeContingentLock_2() {
+		let feeSummary = TransactionFee.FeeSummary(networkFee: 10, royaltyFee: 20)
+		let feeLocks = TransactionFee.FeeLocks(nonContingentLock: 5, contingentLock: 5)
+		let transaction = TransactionFee(feeSummary: feeSummary, feeLocks: feeLocks, mode: .normal)
+
+		XCTAssertEqual(transaction.networkFee, 6.5)
+		XCTAssertEqual(transaction.royaltyFee, 20)
+		XCTAssertEqual(transaction.totalFee.lockFee, 26.5)
+		XCTAssertEqual(transaction.totalFee.displayedTotalFee, "21.5 - 26.5 XRD")
+	}
+
+	func testAdvancedModeNoLocks() {
+		let feeSummary = TransactionFee.FeeSummary(networkFee: 10, royaltyFee: 20)
+		let feeLocks = TransactionFee.FeeLocks(nonContingentLock: 0, contingentLock: 0)
+		var transaction = TransactionFee(feeSummary: feeSummary, feeLocks: feeLocks, mode: .normal)
+		transaction.toggleToAdvancedMode()
+
+		XCTAssertEqual(transaction.totalFee.lockFee, 31.5)
+		XCTAssertEqual(transaction.totalFee.displayedTotalFee, "31.5 XRD")
+	}
+
+	func testAdvancedModeLocks() {
+		let feeSummary = TransactionFee.FeeSummary(networkFee: 10, royaltyFee: 20)
+		let feeLocks = TransactionFee.FeeLocks(nonContingentLock: 5, contingentLock: 5)
+		var transaction = TransactionFee(feeSummary: feeSummary, feeLocks: feeLocks, mode: .normal)
+		transaction.toggleToAdvancedMode()
+
+		XCTAssertEqual(transaction.totalFee.lockFee, 26.5)
+		XCTAssertEqual(transaction.totalFee.displayedTotalFee, "26.5 XRD")
+	}
+
+	func testAdvancedModeEdited_1() {
+		let feeSummary = TransactionFee.FeeSummary(networkFee: 10, royaltyFee: 20)
+		let feeLocks = TransactionFee.FeeLocks(nonContingentLock: 5, contingentLock: 5)
+		var transaction = TransactionFee(feeSummary: feeSummary, feeLocks: feeLocks, mode: .normal)
+		transaction.mode = .advanced(.init(networkAndRoyaltyFee: 20, tipPercentage: .zero))
+
+		XCTAssertEqual(transaction.totalFee.lockFee, 20)
+		XCTAssertEqual(transaction.totalFee.displayedTotalFee, "20 XRD")
+	}
+
+	func testAdvancedModeEdited_2() {
+		let feeSummary = TransactionFee.FeeSummary(networkFee: 10, royaltyFee: 20)
+		let feeLocks = TransactionFee.FeeLocks(nonContingentLock: 0, contingentLock: 0)
+		var transaction = TransactionFee(feeSummary: feeSummary, feeLocks: feeLocks, mode: .normal)
+		transaction.mode = .advanced(.init(networkAndRoyaltyFee: 50, tipPercentage: 0.5))
+
+		// 50 - royaltyFee(20) = 30
+		// 30 * 0.5 = 15
+		// 50 + 15 = 65
+		XCTAssertEqual(transaction.totalFee.lockFee, 65.0)
+		XCTAssertEqual(transaction.totalFee.displayedTotalFee, "65 XRD")
+	}
+
+	func testAdvancedModeEdited_3() {
+		let feeSummary = TransactionFee.FeeSummary(networkFee: 10, royaltyFee: 20)
+		let feeLocks = TransactionFee.FeeLocks(nonContingentLock: 0, contingentLock: 0)
+		var transaction = TransactionFee(feeSummary: feeSummary, feeLocks: feeLocks, mode: .normal)
+		transaction.mode = .advanced(.init(networkAndRoyaltyFee: 25, tipPercentage: 0.5))
+
+		// 25 - royaltyFee(20) = 5
+		// 5 * 0.5 = 2.5
+		// 25 + 2.5 = 27.5
+		XCTAssertEqual(transaction.totalFee.lockFee, 27.5)
+		XCTAssertEqual(transaction.totalFee.displayedTotalFee, "27.5 XRD")
+	}
+
+	func testAdvancedModeEdited_4() {
+		let feeSummary = TransactionFee.FeeSummary(networkFee: 10, royaltyFee: 20)
+		let feeLocks = TransactionFee.FeeLocks(nonContingentLock: 0, contingentLock: 0)
+		var transaction = TransactionFee(feeSummary: feeSummary, feeLocks: feeLocks, mode: .normal)
+		transaction.mode = .advanced(.init(networkAndRoyaltyFee: 15, tipPercentage: 0.5))
+
+		// 15 - royaltyFee(20) = 15 ?? Ignore royalty fee and use the whole amount as network fee
+		// 15 * 0.5 = 7.5
+		// 15 + 7.5 = 22.5
+		XCTAssertEqual(transaction.totalFee.lockFee, 22.5)
+		XCTAssertEqual(transaction.totalFee.displayedTotalFee, "22.5 XRD")
+	}
+
+	func testAdvancedModeEdited_5() {
+		let feeSummary = TransactionFee.FeeSummary(networkFee: 10, royaltyFee: 20)
+		let feeLocks = TransactionFee.FeeLocks(nonContingentLock: 26.5, contingentLock: 10)
+		var transaction = TransactionFee(feeSummary: feeSummary, feeLocks: feeLocks, mode: .normal)
+		transaction.mode = .advanced(.init(networkAndRoyaltyFee: 25, tipPercentage: 0.5))
+
+		// 25 - royaltyFee(5) = 20
+		// 20 * 0.5 = 10
+		// 25 + 10 = 30
+		XCTAssertEqual(transaction.totalFee.lockFee, 35)
+		XCTAssertEqual(transaction.totalFee.displayedTotalFee, "35 XRD")
 	}
 }
 

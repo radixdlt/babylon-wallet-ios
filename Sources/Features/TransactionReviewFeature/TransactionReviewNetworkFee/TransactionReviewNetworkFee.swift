@@ -1,20 +1,25 @@
 import FeaturePrelude
+import TransactionClient
 
 // MARK: - TransactionReviewNetworkFee
 public struct TransactionReviewNetworkFee: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
-		public var fee: BigDecimal
-		public var isCongested: Bool
+		public let feePayerSelection: FeePayerSelectionAmongstCandidates
 
-		public init(fee: BigDecimal, isCongested: Bool) {
-			self.fee = fee
-			self.isCongested = isCongested
+		public init(
+			feePayerSelection: FeePayerSelectionAmongstCandidates
+		) {
+			self.feePayerSelection = feePayerSelection
 		}
 	}
 
 	public enum ViewAction: Sendable, Equatable {
 		case infoTapped
 		case customizeTapped
+	}
+
+	public enum DelegateAction: Sendable, Equatable {
+		case showCustomizeFees
 	}
 
 	public init() {}
@@ -24,7 +29,7 @@ public struct TransactionReviewNetworkFee: Sendable, FeatureReducer {
 		case .infoTapped:
 			return .none
 		case .customizeTapped:
-			return .none
+			return .send(.delegate(.showCustomizeFees))
 		}
 	}
 }

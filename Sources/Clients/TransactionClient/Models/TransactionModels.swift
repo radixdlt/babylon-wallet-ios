@@ -198,7 +198,6 @@ public struct ManifestReviewRequest: Sendable {
 	public let manifestToSign: TransactionManifest
 	public let message: Message
 	public let nonce: Nonce
-	public let feeToAdd: BigDecimal
 	public let makeTransactionHeaderInput: MakeTransactionHeaderInput
 	public let ephemeralNotaryPublicKey: Curve25519.Signing.PublicKey
 
@@ -207,20 +206,18 @@ public struct ManifestReviewRequest: Sendable {
 		message: Message,
 		nonce: Nonce,
 		makeTransactionHeaderInput: MakeTransactionHeaderInput = .default,
-		feeToAdd: BigDecimal,
 		ephemeralNotaryPublicKey: Curve25519.Signing.PublicKey = Curve25519.Signing.PrivateKey().publicKey
 	) {
 		self.manifestToSign = manifestToSign
 		self.message = message
 		self.nonce = nonce
-		self.feeToAdd = feeToAdd
 		self.makeTransactionHeaderInput = makeTransactionHeaderInput
 		self.ephemeralNotaryPublicKey = ephemeralNotaryPublicKey
 	}
 }
 
-// MARK: - FeePayerCandiate
-public struct FeePayerCandiate: Sendable, Hashable, Identifiable {
+// MARK: - FeePayerCandidate
+public struct FeePayerCandidate: Sendable, Hashable, Identifiable {
 	public let account: Profile.Network.Account
 	public let xrdBalance: BigDecimal
 	public typealias ID = Profile.Network.Account.ID
@@ -242,41 +239,151 @@ public struct AddFeeToManifestOutcomeIncludesLockFee: Sendable, Equatable {
 // MARK: - AddFeeToManifestOutcomeExcludesLockFee
 public struct AddFeeToManifestOutcomeExcludesLockFee: Sendable, Equatable {
 	public let manifestExcludingLockFee: TransactionManifest
-	public let feePayerCandidates: IdentifiedArrayOf<FeePayerCandiate>
+	public let feePayerCandidates: IdentifiedArrayOf<FeePayerCandidate>
 	public let feeNotYetAdded: BigDecimal
 }
 
 // MARK: - TransactionToReview
 public struct TransactionToReview: Sendable, Equatable {
 	public let analyzedManifestToReview: ExecutionAnalysis
-	public let addFeeToManifestOutcome: AddFeeToManifestOutcome
 	public let networkID: NetworkID
+	public let feePayerSelectionAmongstCandidates: FeePayerSelectionAmongstCandidates
 }
 
 // MARK: - FeePayerSelectionAmongstCandidates
 public struct FeePayerSelectionAmongstCandidates: Sendable, Hashable {
-	public enum Selection: Sendable, Hashable {
-		case selectedByUser
-		case auto
-	}
-
-	public let selected: FeePayerCandiate
+	public var selected: FeePayerCandidate?
 	/// contains `selected`
-	public let candidates: NonEmpty<IdentifiedArrayOf<FeePayerCandiate>>
-
-	public let fee: BigDecimal
-
-	public let selection: Selection
+	public let candidates: NonEmpty<IdentifiedArrayOf<FeePayerCandidate>>
+	public var transactionFee: TransactionFee
 
 	public init(
-		selected: FeePayerCandiate,
-		candidates: NonEmpty<IdentifiedArrayOf<FeePayerCandiate>>,
-		fee: BigDecimal,
-		selection: Selection
+		selected: FeePayerCandidate?,
+		candidates: NonEmpty<IdentifiedArrayOf<FeePayerCandidate>>,
+		transactionFee: TransactionFee
 	) {
 		self.selected = selected
 		self.candidates = candidates
-		self.fee = fee
-		self.selection = selection
+		self.transactionFee = transactionFee
+	}
+}
+
+// MARK: - TransactionFee
+public struct TransactionFee: Hashable, Sendable {
+	public enum Mode: Hashable {
+		case normal
+		case advanced(AdvancedFeeCustomization)
+	}
+
+	public struct FeeSummary: Hashable {
+		let networkFee: BigDecimal
+		let royaltyFee: BigDecimal
+
+		public init(networkFee: BigDecimal, royaltyFee: BigDecimal) {
+			self.networkFee = networkFee * 1.15
+			self.royaltyFee = royaltyFee
+		}
+	}
+
+	public struct FeeLocks: Hashable {
+		let nonContingentLock: BigDecimal
+		let contingentLock: BigDecimal
+
+		public init(nonContingentLock: BigDecimal, contingentLock: BigDecimal) {
+			self.nonContingentLock = nonContingentLock
+			self.contingentLock = contingentLock
+		}
+	}
+
+	public struct AdvancedFeeCustomization: Hashable {
+		public var networkAndRoyaltyFee: BigDecimal
+		public var tipPercentage: BigDecimal
+
+		public init(networkAndRoyaltyFee: BigDecimal, tipPercentage: BigDecimal) {
+			self.networkAndRoyaltyFee = networkAndRoyaltyFee
+			self.tipPercentage = tipPercentage
+		}
+	}
+
+	public struct TotalFee {
+		let min: BigDecimal
+		let max: BigDecimal
+
+		public var lockFee: BigDecimal {
+			// We always lock the max amount
+			max
+		}
+
+		public var displayedTotalFee: String {
+			if max > min {
+				return "\(min.format()) - \(max.format()) XRD"
+			}
+			return "\(max.format()) XRD"
+		}
+	}
+
+	let feeSummary: FeeSummary
+	let feeLocks: FeeLocks
+
+	public var mode: Mode = .normal
+
+	public mutating func toggleMode() {
+		switch mode {
+		case .normal:
+			mode = .advanced(.init(networkAndRoyaltyFee: networkFee + royaltyFee, tipPercentage: .zero))
+		case .advanced:
+			mode = .normal
+		}
+	}
+
+	public var networkFee: BigDecimal {
+		max(feeSummary.networkFee - feeLocks.nonContingentLock, .zero)
+	}
+
+	public var royaltyFee: BigDecimal {
+		let remainingNonContingentLock = max(feeLocks.nonContingentLock - feeSummary.networkFee, .zero)
+		return max(feeSummary.royaltyFee - remainingNonContingentLock, .zero)
+	}
+
+	public var totalFee: TotalFee {
+		switch mode {
+		case .normal:
+			let maxFee = networkFee + royaltyFee
+			let minFee = max(maxFee - feeLocks.contingentLock, .zero)
+			return .init(min: minFee, max: maxFee)
+		case let .advanced(advanced):
+			let networkFee = {
+				guard advanced.networkAndRoyaltyFee > royaltyFee else {
+					return advanced.networkAndRoyaltyFee
+				}
+				return advanced.networkAndRoyaltyFee - royaltyFee
+			}()
+			let tipAmount = networkFee * advanced.tipPercentage
+			let total = advanced.networkAndRoyaltyFee + tipAmount
+			return .init(min: total, max: total)
+		}
+	}
+
+	public init(feeSummary: FeeSummary, feeLocks: FeeLocks, mode: Mode) {
+		self.feeSummary = feeSummary
+		self.feeLocks = feeLocks
+		self.mode = mode
+	}
+
+	public init(executionAnalysis: ExecutionAnalysis) throws {
+		let feeSummary: FeeSummary = try .init(
+			networkFee: .init(executionAnalysis.feeSummary.networkFee),
+			royaltyFee: .init(executionAnalysis.feeSummary.royaltyFee)
+		)
+		let feeLocks: FeeLocks = try .init(
+			nonContingentLock: .init(executionAnalysis.feeLocks.lock),
+			contingentLock: .init(executionAnalysis.feeLocks.contingentLock)
+		)
+
+		self.init(
+			feeSummary: feeSummary,
+			feeLocks: feeLocks,
+			mode: .normal
+		)
 	}
 }
