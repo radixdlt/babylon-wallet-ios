@@ -1,20 +1,5 @@
 import FeaturePrelude
 
-// MARK: - StakeClaimNFTStatus
-enum StakeClaimNFTStatus: Equatable {
-	case unstaking
-	case readyToClaim
-
-	var localized: String {
-		switch self {
-		case .unstaking:
-			return "Unstaking"
-		case .readyToClaim:
-			return "Ready to Claim"
-		}
-	}
-}
-
 extension LSUComponentView {
 	struct LiquidStakeUnitViewState: Identifiable, Equatable {
 		var id: String {
@@ -33,10 +18,26 @@ extension LSUComponentView {
 		let status: StakeClaimNFTStatus
 		let tokenAmount: String
 	}
+
+	enum StakeClaimNFTStatus: Equatable {
+		case unstaking
+		case readyToClaim
+
+		var localized: String {
+			switch self {
+			case .unstaking:
+				return "Unstaking"
+			case .readyToClaim:
+				return "Ready to Claim"
+			}
+		}
+	}
 }
 
 // MARK: - LSUComponentView
 struct LSUComponentView: View {
+	typealias StakeClaimNFTsViewState = NonEmpty<IdentifiedArrayOf<StakeClaimNFTViewState>>
+
 	public struct ViewState: Equatable, Identifiable {
 		public var id: String {
 			title
@@ -46,7 +47,7 @@ struct LSUComponentView: View {
 		let imageURL: URL = .init(string: "https://i.ibb.co/NsKCTpT/Screenshot-2023-08-02-at-18-18-56.png")!
 
 		let liquidStakeUnit: LiquidStakeUnitViewState?
-		let stakeClaimNFTs: NonEmpty<IdentifiedArrayOf<StakeClaimNFTViewState>>?
+		let stakeClaimNFTs: StakeClaimNFTsViewState?
 	}
 
 	let viewState: ViewState
@@ -59,35 +60,81 @@ struct LSUComponentView: View {
 				Spacer()
 			}
 
-			if let liquidStakeUnit = viewState.liquidStakeUnit {
-				Text("LIQUID STAKE UNITS")
-					.foregroundColor(.app.gray2)
-					.textStyle(.body2HighImportance)
+			if let liquidStakeUnitViewState = viewState.liquidStakeUnit {
+				liquidStakeUnitView(with: liquidStakeUnitViewState)
+			}
 
+			if let stakeClaimNFTsViewState = viewState.stakeClaimNFTs {
+				stakeClaimNFTsView(with: stakeClaimNFTsViewState)
+			}
+		}
+		.padding(.medium1)
+	}
+
+	private func liquidStakeUnitView(with viewState: LiquidStakeUnitViewState) -> some View {
+		Group {
+			Text("LIQUID STAKE UNITS")
+				.foregroundColor(.app.gray2)
+				.textStyle(.body2HighImportance)
+
+			HStack {
+				HStack(spacing: .small1) {
+					TokenThumbnail(
+						viewState.thumbnail,
+						size: .small
+					)
+
+					HStack {
+						VStack(alignment: .leading) {
+							Text(viewState.symbol)
+								.foregroundColor(.app.gray1)
+								.textStyle(.body2HighImportance)
+							Text("Staked")
+								.foregroundColor(.app.gray2)
+								.textStyle(.body2HighImportance)
+						}
+
+						Spacer()
+
+						Text(viewState.tokenAmount)
+							.foregroundColor(.app.gray1)
+							.textStyle(.secondaryHeader)
+					}
+				}
+			}
+			.padding(.small2)
+			.overlay(
+				RoundedRectangle(cornerRadius: .small1)
+					.stroke(.app.gray4, lineWidth: 1)
+					.padding(.small2 * -1)
+			)
+		}
+	}
+
+	private func stakeClaimNFTsView(with viewState: StakeClaimNFTsViewState) -> some View {
+		VStack(alignment: .leading, spacing: .medium1) {
+			Text("STAKE CLAIM NFTS")
+				.foregroundColor(.app.gray2)
+				.textStyle(.body2HighImportance)
+
+			ForEach(viewState) { stakeClaimNFT in
 				HStack {
 					HStack(spacing: .small1) {
 						TokenThumbnail(
-							liquidStakeUnit.thumbnail,
-							size: .small
+							stakeClaimNFT.thumbnail,
+							size: .smallest
 						)
 
-						HStack {
-							VStack(alignment: .leading) {
-								Text(liquidStakeUnit.symbol)
-									.foregroundColor(.app.gray1)
-									.textStyle(.body2HighImportance)
-								Text("Staked")
-									.foregroundColor(.app.gray2)
-									.textStyle(.body2HighImportance)
-							}
-
-							Spacer()
-
-							Text(liquidStakeUnit.tokenAmount)
-								.foregroundColor(.app.gray1)
-								.textStyle(.secondaryHeader)
-						}
+						Text(stakeClaimNFT.status.localized)
+							.foregroundColor(.app.gray2)
+							.textStyle(.body2HighImportance)
 					}
+
+					Spacer()
+
+					Text(stakeClaimNFT.tokenAmount)
+						.foregroundColor(.app.gray1)
+						.textStyle(.secondaryHeader)
 				}
 				.padding(.small2)
 				.overlay(
@@ -96,43 +143,7 @@ struct LSUComponentView: View {
 						.padding(.small2 * -1)
 				)
 			}
-
-			if let stakeClaimNFTs = viewState.stakeClaimNFTs {
-				VStack(alignment: .leading, spacing: .medium1) {
-					Text("STAKE CLAIM NFTS")
-						.foregroundColor(.app.gray2)
-						.textStyle(.body2HighImportance)
-
-					ForEach(stakeClaimNFTs) { stakeClaimNFT in
-						HStack {
-							HStack(spacing: .small1) {
-								TokenThumbnail(
-									stakeClaimNFT.thumbnail,
-									size: .smallest
-								)
-
-								Text(stakeClaimNFT.status.localized)
-									.foregroundColor(.app.gray2)
-									.textStyle(.body2HighImportance)
-							}
-
-							Spacer()
-
-							Text(stakeClaimNFT.tokenAmount)
-								.foregroundColor(.app.gray1)
-								.textStyle(.secondaryHeader)
-						}
-						.padding(.small2)
-						.overlay(
-							RoundedRectangle(cornerRadius: .small1)
-								.stroke(.app.gray4, lineWidth: 1)
-								.padding(.small2 * -1)
-						)
-					}
-				}
-			}
 		}
-		.padding(.medium1)
 	}
 }
 
