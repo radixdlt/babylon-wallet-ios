@@ -58,7 +58,6 @@ extension PoolUnitsList.LSUResource.State {
 	}
 }
 
-// MARK: - PoolUnitsList.LSUComponent.View
 extension PoolUnitsList.LSUResource {
 	public struct ViewState: Sendable, Equatable {
 		let isExpanded: Bool

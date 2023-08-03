@@ -1,7 +1,7 @@
 import FeaturePrelude
 
 extension PoolUnitsList {
-	// MARK: - LSUComponent
+	// MARK: - LSUResource
 	public struct LSUResource: Sendable, FeatureReducer {
 		public struct State: Sendable, Hashable {
 			var isExpanded: Bool
