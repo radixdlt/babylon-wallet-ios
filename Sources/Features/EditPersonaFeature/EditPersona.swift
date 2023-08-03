@@ -19,7 +19,7 @@ extension EditPersona {
 					variant: $0.variant,
 					familyName: $0.family.input ?? "",
 					givenNames: $0.given.input ?? "",
-					nickname: $0.nickName.input
+					nickname: $0.nickName.input ?? ""
 				))
 			}
 
@@ -277,7 +277,7 @@ extension EditPersonaEntry<EditPersonaDynamicField>.State {
 
 extension EditPersonaEntry<EditPersonaName>.State {
 	static func entry(
-		name: PersonaData.Name = .init(variant: .western, familyName: "", givenNames: ""),
+		name: PersonaData.Name = .init(variant: .western, familyName: "", givenNames: "", nickname: ""),
 		isRequestedByDapp: Bool = false
 	) -> Self {
 		.init(

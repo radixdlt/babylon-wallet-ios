@@ -44,7 +44,8 @@ extension Profile.Network.Persona {
 				value: .init(
 					variant: .western,
 					familyName: "Sanchez",
-					givenNames: "Rick"
+					givenNames: "Rick",
+					nickname: "Ricky"
 				)
 			)
 		)
