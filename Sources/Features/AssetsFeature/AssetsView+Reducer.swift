@@ -38,7 +38,7 @@ public struct AssetsView: Sendable, FeatureReducer {
 				account: account,
 				fungibleTokenList: .init(),
 				nonFungibleTokenList: .init(rows: []),
-				poolUnitsList: .init(lsuResource: .init()),
+				poolUnitsList: .preview,
 				mode: mode
 			)
 		}

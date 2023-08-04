@@ -32,6 +32,12 @@ public struct PoolUnitsList: Sendable, FeatureReducer {
 
 extension PoolUnitsList.State {
 	public static var preview: Self {
-		.init(lsuResource: .init())
+		.init(
+			lsuResource: .init(),
+			poolUnitTokens: [
+				.init(id: 0),
+				.init(id: 2),
+			]
+		)
 	}
 }

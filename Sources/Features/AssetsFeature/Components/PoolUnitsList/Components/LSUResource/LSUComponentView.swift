@@ -1,16 +1,6 @@
 import FeaturePrelude
 
 extension LSUComponentView {
-	struct LiquidStakeUnitViewState: Identifiable, Equatable {
-		var id: String {
-			symbol
-		}
-
-		let thumbnail: TokenThumbnail.Content
-		let symbol: String
-		let tokenAmount: String
-	}
-
 	struct StakeClaimNFTViewState: Identifiable, Equatable {
 		let id: Int
 
@@ -45,7 +35,7 @@ struct LSUComponentView: View {
 		let title: String
 		let imageURL: URL
 
-		let liquidStakeUnit: LiquidStakeUnitViewState?
+		let liquidStakeUnit: PoolUnitResourceView.ViewState?
 		let stakeClaimNFTs: StakeClaimNFTsViewState?
 	}
 
@@ -60,53 +50,26 @@ struct LSUComponentView: View {
 			}
 
 			if let liquidStakeUnitViewState = viewState.liquidStakeUnit {
-				liquidStakeUnitView(with: liquidStakeUnitViewState)
+				liquidStakeUnitView(viewState: liquidStakeUnitViewState)
 			}
 
 			if let stakeClaimNFTsViewState = viewState.stakeClaimNFTs {
-				stakeClaimNFTsView(with: stakeClaimNFTsViewState)
+				stakeClaimNFTsView(viewState: stakeClaimNFTsViewState)
 			}
 		}
 		.padding(.medium1)
 	}
 
-	private func liquidStakeUnitView(with viewState: LiquidStakeUnitViewState) -> some View {
-		Group {
-			// FIXME: Localize
-			Text("LIQUID STAKE UNITS")
-				.stakeHeaderStyle
+	@ViewBuilder
+	private func liquidStakeUnitView(viewState: PoolUnitResourceView.ViewState) -> some View {
+		// FIXME: Localize
+		Text("LIQUID STAKE UNITS")
+			.stakeHeaderStyle
 
-			HStack {
-				HStack(spacing: .small1) {
-					TokenThumbnail(
-						viewState.thumbnail,
-						size: .small
-					)
-
-					HStack {
-						VStack(alignment: .leading) {
-							Text(viewState.symbol)
-								.foregroundColor(.app.gray1)
-								.textStyle(.body2HighImportance)
-							// FIXME: Localize
-							Text("Staked")
-								.foregroundColor(.app.gray2)
-								.textStyle(.body2HighImportance)
-						}
-
-						Spacer()
-
-						Text(viewState.tokenAmount)
-							.foregroundColor(.app.gray1)
-							.textStyle(.secondaryHeader)
-					}
-				}
-			}
-			.borderAround
-		}
+		PoolUnitResourceView(viewState: viewState)
 	}
 
-	private func stakeClaimNFTsView(with viewState: StakeClaimNFTsViewState) -> some View {
+	private func stakeClaimNFTsView(viewState: StakeClaimNFTsViewState) -> some View {
 		VStack(alignment: .leading, spacing: .medium1) {
 			// FIXME: Localize
 			Text("STAKE CLAIM NFTS")
@@ -150,5 +113,49 @@ extension View {
 					.stroke(.app.gray4, lineWidth: 1)
 					.padding(.small2 * -1)
 			)
+	}
+}
+
+// MARK: - PoolUnitResourceView
+struct PoolUnitResourceView: View {
+	struct ViewState: Identifiable, Equatable {
+		var id: String {
+			symbol
+		}
+
+		let thumbnail: TokenThumbnail.Content
+		let symbol: String
+		let tokenAmount: String
+	}
+
+	let viewState: ViewState
+
+	var body: some View {
+		HStack(spacing: .small1) {
+			TokenThumbnail(
+				viewState.thumbnail,
+				size: .small
+			)
+
+			HStack {
+				VStack(alignment: .leading) {
+					Text(viewState.symbol)
+						.foregroundColor(.app.gray1)
+						.textStyle(.body2HighImportance)
+
+					// FIXME: Localize
+					Text("Staked")
+						.foregroundColor(.app.gray2)
+						.textStyle(.body2HighImportance)
+				}
+
+				Spacer()
+
+				Text(viewState.tokenAmount)
+					.foregroundColor(.app.gray1)
+					.textStyle(.secondaryHeader)
+			}
+		}
+		.borderAround
 	}
 }

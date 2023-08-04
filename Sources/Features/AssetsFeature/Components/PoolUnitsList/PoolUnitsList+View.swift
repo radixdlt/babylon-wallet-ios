@@ -15,10 +15,22 @@ extension PoolUnitsList {
 				store.scope(
 					state: \.lsuResource,
 					action: (
-						/PoolUnitsList.Action.child .. PoolUnitsList.ChildAction.lsuResource
+						/PoolUnitsList.Action.child
+							.. PoolUnitsList.ChildAction.lsuResource
 					).embed
 				),
 				then: LSUResource.View.init
+			)
+
+			ForEachStore(
+				store.scope(
+					state: \.poolUnitTokens,
+					action: (
+						/PoolUnitsList.Action.child
+							.. PoolUnitsList.ChildAction.poolUnitTokens
+					).embed
+				),
+				content: PoolUnitToken.View.init
 			)
 		}
 	}
