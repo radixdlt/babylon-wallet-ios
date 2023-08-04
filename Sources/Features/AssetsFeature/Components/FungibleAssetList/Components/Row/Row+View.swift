@@ -45,9 +45,11 @@ extension FungibleAssetList.Row {
 
 					Spacer()
 
-					Text(viewStore.tokenAmount)
-						.foregroundColor(.app.gray1)
-						.textStyle(.secondaryHeader)
+					VStack(alignment: .trailing, spacing: .small3) {
+						Text(viewStore.tokenAmount)
+							.foregroundColor(.app.gray1)
+							.textStyle(.secondaryHeader)
+					}
 
 					if let isSelected = viewStore.isSelected {
 						CheckmarkView(appearance: .dark, isChecked: isSelected)
