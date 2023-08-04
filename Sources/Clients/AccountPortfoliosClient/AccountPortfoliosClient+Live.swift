@@ -230,6 +230,10 @@ extension AccountPortfoliosClient {
 
 		let addressesToValidate = stakeUnitCandidates.compactMap(\.explicitMetadata?.validator?.address) + stakeClaimNFTCandidates.compactMap(\.explicitMetadata?.validator?.address) + poolUnitCandidates.compactMap(\.explicitMetadata?.pool?.address)
 
+		guard !addressesToValidate.isEmpty else {
+			return .init(radixNetworkStakes: [], poolUnits: [])
+		}
+
 		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
 		@Dependency(\.gatewaysClient) var gatewaysClient
 
