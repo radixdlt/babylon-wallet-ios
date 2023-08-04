@@ -11,8 +11,8 @@ extension PoolUnitsList.LSUResource.State {
 			components: .init(rawValue: .init(uncheckedUniqueElements: stakes.map { stake in
 				LSUComponentView.ViewState(
 					id: stake.validator.address.address,
-					title: stake.stakeUnitResource.name ?? "Unknown",
-					imageURL: stake.stakeUnitResource.iconURL ?? .init(string: "https://i.ibb.co/KG06168/Screenshot-2023-08-02-at-16-19-29.png")!,
+					title: stake.validator.name ?? "Unknown",
+					imageURL: stake.validator.iconURL ?? .init(string: "https://i.ibb.co/KG06168/Screenshot-2023-08-02-at-16-19-29.png")!,
 					liquidStakeUnit: .init(thumbnail: .xrd, symbol: "XRD", tokenAmount: stake.xrdRedemptionValue.format()),
 					stakeClaimNFTs: .init(rawValue: stake.stakeClaimResource.map { claimNFT in
 						.init(uncheckedUniqueElements: claimNFT.tokens.map { token in

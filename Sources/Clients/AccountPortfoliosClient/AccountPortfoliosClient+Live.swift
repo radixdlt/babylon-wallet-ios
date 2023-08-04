@@ -240,8 +240,7 @@ extension AccountPortfoliosClient {
 		let networkId = await gatewaysClient.getCurrentNetworkID()
 		let xrdAddress = knownAddresses(networkId: networkId.rawValue).resourceAddresses.xrd.addressString()
 
-		// Pass the proper ledger state
-		let details = try await gatewayAPIClient.fetchResourceDetails(addressesToValidate, explicitMetadata: [], ledgerState: ledgerState)
+		let details = try await gatewayAPIClient.fetchResourceDetails(addressesToValidate, explicitMetadata: EntityMetadataKey.allCases, ledgerState: ledgerState)
 
 		let stakeUnits = try await details.items.asyncCompactMap { item -> AccountPortfolio.PoolUnitResources.RadixNetworkStake? in
 			guard let validatorDetails = item.details?.component?.state?.validatorState else {

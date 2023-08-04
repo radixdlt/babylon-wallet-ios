@@ -85,7 +85,7 @@ struct LSUComponentView: View {
 						)
 
 						Text(stakeClaimNFT.status.localized)
-							.foregroundColor(.app.gray2)
+							.foregroundColor(stakeClaimNFT.status == .unstaking ? .app.gray2 : .app.green1)
 							.textStyle(.body2HighImportance)
 					}
 

@@ -259,6 +259,9 @@ extension AccountPortfolio.NonFungibleResource.NonFungibleToken {
 		case description
 		case keyImageURL
 		case metadata
+		case stakeClaimAmount
+		case claimEpoch
+		case canBeClaimed
 	}
 
 	public init(from decoder: Decoder) throws {
@@ -269,7 +272,10 @@ extension AccountPortfolio.NonFungibleResource.NonFungibleToken {
 			name: container.decodeIfPresent(String.self, forKey: .name),
 			description: container.decodeIfPresent(String.self, forKey: .description),
 			keyImageURL: container.decodeIfPresent(URL.self, forKey: .keyImageURL),
-			metadata: container.decode([AccountPortfolio.Metadata].self, forKey: .metadata)
+			metadata: container.decode([AccountPortfolio.Metadata].self, forKey: .metadata),
+			stakeClaimAmount: container.decodeIfPresent(BigDecimal.self, forKey: .stakeClaimAmount),
+			claimEpoch: container.decodeIfPresent(Epoch.self, forKey: .claimEpoch),
+			canBeClaimed: container.decode(Bool.self, forKey: .canBeClaimed)
 		)
 	}
 
@@ -280,5 +286,8 @@ extension AccountPortfolio.NonFungibleResource.NonFungibleToken {
 		try container.encodeIfPresent(description, forKey: .description)
 		try container.encodeIfPresent(keyImageURL, forKey: .keyImageURL)
 		try container.encode(metadata, forKey: .metadata)
+		try container.encodeIfPresent(stakeClaimAmount, forKey: .stakeClaimAmount)
+		try container.encodeIfPresent(claimEpoch, forKey: .claimEpoch)
+		try container.encode(canBeClaimed, forKey: .canBeClaimed)
 	}
 }
