@@ -2,6 +2,34 @@ import FeaturePrelude
 
 // MARK: - CGFloatPreferenceKey
 
+extension PoolUnitsList.LSUResource.State {
+	var viewState: PoolUnitsList.LSUResource.ViewState {
+		.init(
+			isExpanded: isExpanded,
+			iconURL: .init(string: "https://i.ibb.co/KG06168/Screenshot-2023-08-02-at-16-19-29.png")!,
+			name: "Radix Network XRD Stake",
+			components: .init(rawValue: .init(uncheckedUniqueElements: stakes.map { stake in
+				LSUComponentView.ViewState(
+					id: stake.validator.address.address,
+					title: stake.stakeUnitResource.name ?? "Unknown",
+					imageURL: stake.stakeUnitResource.iconURL ?? .init(string: "https://i.ibb.co/KG06168/Screenshot-2023-08-02-at-16-19-29.png")!,
+					liquidStakeUnit: .init(thumbnail: .xrd, symbol: "XRD", tokenAmount: stake.xrdRedemptionValue.format()),
+					stakeClaimNFTs: .init(rawValue: stake.stakeClaimResource.map { claimNFT in
+						.init(uncheckedUniqueElements: claimNFT.tokens.map { token in
+							LSUComponentView.StakeClaimNFTViewState(
+								id: token.id.asStr(),
+								thumbnail: .xrd,
+								status: token.canBeClaimed ? .readyToClaim : .unstaking,
+								tokenAmount: token.stakeClaimAmount?.format() ?? "0.00"
+							)
+						})
+					} ?? [])
+				)
+			}))!
+		)
+	}
+}
+
 extension PoolUnitsList.LSUResource {
 	public struct ViewState: Sendable, Equatable {
 		let isExpanded: Bool
@@ -124,69 +152,6 @@ private struct HeightPreferenceKey: PreferenceKey {
 
 	static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
 		value = nextValue()
-	}
-}
-
-extension PoolUnitsList.LSUResource.State {
-	// FIXME: Rewire
-	var viewState: PoolUnitsList.LSUResource.ViewState {
-		.init(
-			isExpanded: isExpanded,
-			iconURL: .init(string: "https://i.ibb.co/KG06168/Screenshot-2023-08-02-at-16-19-29.png")!,
-			name: "Radix Network XRD Stake",
-			components: .init(
-				[
-					.init(
-						id: 0,
-						title: "Radostakes",
-						imageURL: .init(string: "https://i.ibb.co/NsKCTpT/Screenshot-2023-08-02-at-18-18-56.png")!,
-						liquidStakeUnit: .init(
-							thumbnail: .xrd,
-							symbol: "XRD",
-							tokenAmount: "2.0129822"
-						),
-						stakeClaimNFTs: .init(
-							rawValue: [
-								.init(
-									id: 0,
-									thumbnail: .xrd,
-									status: .unstaking,
-									tokenAmount: "450.0"
-								),
-								.init(
-									id: 1,
-									thumbnail: .xrd,
-									status: .unstaking,
-									tokenAmount: "1,250.0"
-								),
-								.init(
-									id: 2,
-									thumbnail: .xrd,
-									status: .readyToClaim,
-									tokenAmount: "1,200.0"
-								),
-							]
-						)
-					),
-					.init(
-						id: 1,
-						title: "Radix N Stakes",
-						imageURL: .init(string: "https://i.ibb.co/NsKCTpT/Screenshot-2023-08-02-at-18-18-56.png")!,
-						liquidStakeUnit: nil,
-						stakeClaimNFTs: .init(
-							rawValue: [
-								.init(
-									id: 0,
-									thumbnail: .xrd,
-									status: .unstaking,
-									tokenAmount: "23,2132.321"
-								),
-							]
-						)
-					),
-				]
-			)!
-		)
 	}
 }
 

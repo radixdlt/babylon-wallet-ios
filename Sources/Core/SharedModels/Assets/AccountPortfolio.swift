@@ -8,17 +8,20 @@ public struct AccountPortfolio: Sendable, Hashable, Codable {
 	public let isDappDefintionAccountType: Bool
 	public var fungibleResources: FungibleResources
 	public var nonFungibleResources: NonFungibleResources
+	public var poolUnitResources: PoolUnitResources
 
 	public init(
 		owner: AccountAddress,
 		isDappDefintionAccountType: Bool,
 		fungibleResources: FungibleResources,
-		nonFungibleResources: NonFungibleResources
+		nonFungibleResources: NonFungibleResources,
+		poolUnitResources: PoolUnitResources
 	) {
 		self.owner = owner
 		self.isDappDefintionAccountType = isDappDefintionAccountType
 		self.fungibleResources = fungibleResources
 		self.nonFungibleResources = nonFungibleResources
+		self.poolUnitResources = poolUnitResources
 	}
 }
 
@@ -103,6 +106,12 @@ extension AccountPortfolio {
 
 			// The claim amount if the it is a stake claim nft
 			public let stakeClaimAmount: BigDecimal?
+			// Epoch when the nft can be claimed
+			public let claimEpoch: Epoch?
+
+			// This is temporarily computed directly when loadingt he resource.
+			// It should be probably optimized to check the resource can be claimed retroactively by checkingt he network Epoch
+			public let canBeClaimed: Bool
 
 			public init(
 				id: NonFungibleGlobalId,
@@ -110,7 +119,9 @@ extension AccountPortfolio {
 				description: String?,
 				keyImageURL: URL?,
 				metadata: [Metadata],
-				stakeClaimAmount: BigDecimal? = nil
+				stakeClaimAmount: BigDecimal? = nil,
+				claimEpoch: Epoch? = nil,
+				canBeClaimed: Bool = false
 			) {
 				self.id = id
 				self.name = name
@@ -118,11 +129,13 @@ extension AccountPortfolio {
 				self.keyImageURL = keyImageURL
 				self.metadata = metadata
 				self.stakeClaimAmount = stakeClaimAmount
+				self.claimEpoch = claimEpoch
+				self.canBeClaimed = canBeClaimed
 			}
 		}
 	}
 
-	public struct PoolUnits {
+	public struct PoolUnitResources: Sendable, Hashable, Codable {
 		public let radixNetworkStakes: [RadixNetworkStake]
 		public let poolUnits: [String]
 
@@ -144,21 +157,24 @@ extension AccountPortfolio {
 	}
 }
 
-// MARK: - AccountPortfolio.PoolUnits.RadixNetworkStake
-extension AccountPortfolio.PoolUnits {
-	public struct RadixNetworkStake {
-		public struct Validator {
+// MARK: - AccountPortfolio.PoolUnitResources.RadixNetworkStake
+extension AccountPortfolio.PoolUnitResources {
+	public struct RadixNetworkStake: Sendable, Hashable, Codable {
+		public struct Validator: Sendable, Hashable, Codable {
+			public let address: ValidatorAddress
 			public let xrdVaultBalance: BigDecimal
 			public let name: String?
 			public let description: String?
 			public let iconURL: URL?
 
 			public init(
+				address: ValidatorAddress,
 				xrdVaultBalance: BigDecimal,
 				name: String? = nil,
 				description: String? = nil,
 				iconURL: URL? = nil
 			) {
+				self.address = address
 				self.xrdVaultBalance = xrdVaultBalance
 				self.name = name
 				self.description = description
@@ -169,6 +185,10 @@ extension AccountPortfolio.PoolUnits {
 		public let validator: Validator
 		public let stakeUnitResource: AccountPortfolio.FungibleResource
 		public let stakeClaimResource: AccountPortfolio.NonFungibleResource?
+
+		public var xrdRedemptionValue: BigDecimal {
+			(stakeUnitResource.amount * validator.xrdVaultBalance) / (stakeUnitResource.totalSupply ?? .one)
+		}
 
 		public init(validator: Validator, stakeUnitResource: AccountPortfolio.FungibleResource, stakeClaimResource: AccountPortfolio.NonFungibleResource?) {
 			self.validator = validator
@@ -213,7 +233,8 @@ extension AccountPortfolio {
 				xrdResource: fungibleResources.xrdResource?.nonEmpty,
 				nonXrdResources: fungibleResources.nonXrdResources.compactMap(\.nonEmpty)
 			),
-			nonFungibleResources: nonFungibleResources.compactMap(\.nonEmpty)
+			nonFungibleResources: nonFungibleResources.compactMap(\.nonEmpty),
+			poolUnitResources: poolUnitResources
 		)
 	}
 }

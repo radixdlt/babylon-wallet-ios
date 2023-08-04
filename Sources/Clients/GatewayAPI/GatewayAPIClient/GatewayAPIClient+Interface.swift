@@ -137,15 +137,17 @@ extension GatewayAPI.EntityMetadataCollection {
 
 // FIXME: Temporary hack to extract the key_image_url, until we have a proper schema
 extension GatewayAPI.StateNonFungibleDetailsResponseItem {
-	public var details: (name: String?, keyImageURL: URL?, stakeClaim: BigDecimal?) {
-		guard let dictionary = data.rawJson.dictionary else { return (nil, nil, nil) }
-		guard let elements = dictionary["fields"]?.array?.compactMap(\.dictionary) else { return (nil, nil, nil) }
+	public var details: (name: String?, keyImageURL: URL?, stakeClaim: BigDecimal?, claimEpoch: Epoch?) {
+		guard let dictionary = data.rawJson.dictionary else { return (nil, nil, nil, nil) }
+		guard let elements = dictionary["fields"]?.array?.compactMap(\.dictionary) else { return (nil, nil, nil, nil) }
 		let strings = elements.filter { $0["kind"]?.string == "String" }.compactMap { $0["value"]?.string }
 		let decimals = elements.filter { $0["kind"]?.string == "Decimal" }.compactMap { $0["value"]?.string }
+		let u64s = elements.filter { $0["kind"]?.string == "U64" }.compactMap { $0["value"]?.string }
 
 		var name: String? = nil
 		var keyImageURL: URL? = nil
 		let stakeClaim: BigDecimal? = try? decimals.first.map(BigDecimal.init(fromString:))
+		let claimEpoch: Epoch? = u64s.first.flatMap(UInt64.init).map(Epoch.init(rawValue:))
 
 		for string in strings {
 			if
@@ -161,7 +163,7 @@ extension GatewayAPI.StateNonFungibleDetailsResponseItem {
 			}
 		}
 
-		return (name, keyImageURL, stakeClaim)
+		return (name, keyImageURL, stakeClaim, claimEpoch)
 	}
 
 	private func getKeyImageURL(from string: String) -> URL? {

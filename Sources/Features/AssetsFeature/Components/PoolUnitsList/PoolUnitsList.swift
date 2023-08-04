@@ -33,7 +33,7 @@ public struct PoolUnitsList: Sendable, FeatureReducer {
 extension PoolUnitsList.State {
 	public static var preview: Self {
 		.init(
-			lsuResource: .init(),
+                        lsuResource: .init(stakes: []),
 			lpTokens: [
 				.init(id: 0),
 				.init(id: 2),

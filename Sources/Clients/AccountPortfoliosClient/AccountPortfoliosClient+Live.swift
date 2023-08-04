@@ -205,7 +205,8 @@ extension AccountPortfoliosClient {
 			owner: .init(validatingAddress: rawAccountDetails.address),
 			isDappDefintionAccountType: isDappDefintionAccountType,
 			fungibleResources: fungibleResources,
-			nonFungibleResources: nonFungibleResources
+			nonFungibleResources: nonFungibleResources,
+			poolUnitResources: poolUnitResources
 		)
 	}
 
@@ -214,7 +215,7 @@ extension AccountPortfoliosClient {
 		rawFungibleResources: [GatewayAPI.FungibleResourcesCollectionItemVaultAggregated],
 		rawNonFungibleResources: [GatewayAPI.NonFungibleResourcesCollectionItemVaultAggregated],
 		ledgerState: GatewayAPI.LedgerState
-	) async throws -> AccountPortfolio.PoolUnits {
+	) async throws -> AccountPortfolio.PoolUnitResources {
 		let stakeUnitCandidates = rawFungibleResources.filter {
 			$0.explicitMetadata?.validator != nil
 		}
@@ -238,7 +239,7 @@ extension AccountPortfoliosClient {
 		// Pass the proper ledger state
 		let details = try await gatewayAPIClient.fetchResourceDetails(addressesToValidate, explicitMetadata: [], ledgerState: ledgerState)
 
-		let stakeUnits = try await details.items.asyncCompactMap { item -> AccountPortfolio.PoolUnits.RadixNetworkStake? in
+		let stakeUnits = try await details.items.asyncCompactMap { item -> AccountPortfolio.PoolUnitResources.RadixNetworkStake? in
 			guard let validatorDetails = item.details?.component?.state?.validatorState else {
 				// Consider it not a validtor
 				return nil
@@ -278,7 +279,8 @@ extension AccountPortfoliosClient {
 				return nil
 			}
 
-			let validator = try AccountPortfolio.PoolUnits.RadixNetworkStake.Validator(
+			let validator = try AccountPortfolio.PoolUnitResources.RadixNetworkStake.Validator(
+				address: .init(validatingAddress: item.address),
 				xrdVaultBalance: .init(fromString: xrdStakeVaultBalance),
 				name: item.explicitMetadata?.name,
 				description: item.explicitMetadata?.description,
@@ -446,7 +448,9 @@ extension AccountPortfoliosClient {
 						description: nil,
 						keyImageURL: details.keyImageURL,
 						metadata: [],
-						stakeClaimAmount: details.stakeClaim
+						stakeClaimAmount: details.stakeClaim,
+						claimEpoch: details.claimEpoch,
+						canBeClaimed: UInt64(ledgerState.epoch) >= (details.claimEpoch?.rawValue ?? UInt64.max)
 					)
 				}
 
