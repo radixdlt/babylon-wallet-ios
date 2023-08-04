@@ -31,7 +31,7 @@ extension PoolUnitsList {
 								.. PoolUnitsList.ChildAction.lpTokens
 						).embed
 					),
-					content: LPToken.View.init
+					content: PoolUnit.View.init
 				)
 			}
 			.padding(.horizontal, .medium3)

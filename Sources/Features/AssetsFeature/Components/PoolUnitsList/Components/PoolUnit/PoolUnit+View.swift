@@ -1,7 +1,7 @@
 import FeaturePrelude
 
-// MARK: - LPToken.View
-extension LPToken {
+// MARK: - PoolUnit.View
+extension PoolUnit {
 	public struct ViewState: Equatable {
 		let iconURL: URL
 		let name: String
@@ -9,9 +9,9 @@ extension LPToken {
 	}
 
 	public struct View: SwiftUI.View {
-		private let store: StoreOf<LPToken>
+		private let store: StoreOf<PoolUnit>
 
-		public init(store: StoreOf<LPToken>) {
+		public init(store: StoreOf<PoolUnit>) {
 			self.store = store
 		}
 
@@ -19,7 +19,7 @@ extension LPToken {
 			WithViewStore(
 				store,
 				observe: \.viewState,
-				send: LPToken.Action.view
+				send: PoolUnit.Action.view
 			) { viewStore in
 				VStack(spacing: .medium3 * 2) {
 					makePoolUnitView(
@@ -54,8 +54,8 @@ extension LPToken {
 	}
 }
 
-extension LPToken.State {
-	var viewState: LPToken.ViewState {
+extension PoolUnit.State {
+	var viewState: PoolUnit.ViewState {
 		.init(
 			iconURL: .init(string: "https://i.ibb.co/KG06168/Screenshot-2023-08-02-at-16-19-29.png")!,
 			name: "Some LP Token",
