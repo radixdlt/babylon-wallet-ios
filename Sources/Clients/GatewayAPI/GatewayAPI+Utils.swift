@@ -1,5 +1,7 @@
 import AnyCodable
+import EngineKit
 import Foundation
+import Prelude
 
 // MARK: - GatewayAPI.StateEntityDetailsResponse + Sendable
 extension GatewayAPI.StateEntityDetailsResponse: @unchecked Sendable {}
@@ -119,6 +121,42 @@ extension GatewayAPI.EntityMetadataCollection {
 		items[.ownerKeys]?.publicKeyHashes
 	}
 
+	public var validator: ValidatorAddress? {
+		guard let validator = items[.validator] else {
+			return nil
+		}
+
+		guard let validatorAddress = validator.asGlobalAddress else {
+			assertionFailure("validator found, but it was not wrapped as global address")
+			return nil
+		}
+
+		do {
+			return try ValidatorAddress(validatingAddress: validatorAddress)
+		} catch {
+			assertionFailure(error.localizedDescription)
+			return nil
+		}
+	}
+
+	public var pool: ResourcePoolAddress? {
+		guard let pool = items[.pool] else {
+			return nil
+		}
+
+		guard let poolAddress = pool.asGlobalAddress else {
+			assertionFailure("pool found, but it was not wrapped as global address")
+			return nil
+		}
+
+		do {
+			return try ResourcePoolAddress(validatingAddress: poolAddress)
+		} catch {
+			assertionFailure(error.localizedDescription)
+			return nil
+		}
+	}
+
 	public enum AccountType: String {
 		case dappDefinition = "dapp definition"
 	}
@@ -157,11 +195,15 @@ public enum EntityMetadataKey: String, CaseIterable {
 	case description
 	case iconURL = "icon_url"
 	case dappDefinition = "dapp_definition"
+	case validator
+	case pool
 	case dappDefinitions = "dapp_definitions"
 	case claimedEntities = "claimed_entities"
 	case claimedWebsites = "claimed_websites"
 	case relatedWebsites = "related_websites"
 	case accountType = "account_type"
+	case poolUnit = "pool_unit"
+	case claimNFT = "claim_nft"
 	case ownerKeys = "owner_keys"
 }
 
@@ -174,12 +216,6 @@ extension [GatewayAPI.EntityMetadataItem] {
 
 	public subscript(customKey key: String) -> GatewayAPI.EntityMetadataItemValue? {
 		first { $0.key == key }?.value
-	}
-}
-
-extension GatewayAPI.StateNonFungibleDataResponse {
-	public func nonFungibleData(for nonFungibleId: String) -> AnyCodable? {
-		nonFungibleIds.first { $0.nonFungibleId == nonFungibleId }?.data.rawJson
 	}
 }
 

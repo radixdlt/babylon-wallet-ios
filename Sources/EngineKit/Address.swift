@@ -17,6 +17,7 @@ public typealias GenericComponentAddress = SpecificAddress<GenericComponentEntit
 public typealias VaultAddress = SpecificAddress<VaultEntityType>
 public typealias ValidatorAddress = SpecificAddress<ValidatorEntityType>
 public typealias KeyValueStoreAddress = SpecificAddress<KeyValueStoreEntityType>
+public typealias ResourcePoolAddress = SpecificAddress<ResourcePoolEntityType>
 
 // MARK: - EntityType + CaseIterable
 extension EntityType: CaseIterable {
@@ -40,6 +41,9 @@ extension EntityType: CaseIterable {
 			.internalGenericComponent,
 			.internalKeyValueStore,
 			.internalNonFungibleVault,
+			.globalOneResourcePool,
+			.globalTwoResourcePool,
+			.globalMultiResourcePool,
 		]
 	}
 }
@@ -109,6 +113,11 @@ public enum VaultEntityType: SpecificEntityType {
 // MARK: - ValidatorEntityType
 public enum ValidatorEntityType: SpecificEntityType {
 	public static let addressSpace: Set<EntityType> = [.globalValidator]
+}
+
+// MARK: - ResourcePoolEntityType
+public enum ResourcePoolEntityType: SpecificEntityType {
+	public static let addressSpace: Set<EntityType> = [.globalOneResourcePool, .globalTwoResourcePool, .globalMultiResourcePool]
 }
 
 // MARK: - KeyValueStoreEntityType

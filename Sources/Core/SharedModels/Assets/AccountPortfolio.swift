@@ -48,6 +48,7 @@ extension AccountPortfolio {
 		public let symbol: String?
 		public let description: String?
 		public let iconURL: URL?
+		public let totalSupply: BigDecimal?
 		// TBD: Add the rest of required metadata fields
 
 		public init(
@@ -57,7 +58,8 @@ extension AccountPortfolio {
 			name: String? = nil,
 			symbol: String? = nil,
 			description: String? = nil,
-			iconURL: URL? = nil
+			iconURL: URL? = nil,
+			totalSupply: BigDecimal? = nil
 		) {
 			self.resourceAddress = resourceAddress
 			self.amount = amount
@@ -66,6 +68,7 @@ extension AccountPortfolio {
 			self.symbol = symbol
 			self.description = description
 			self.iconURL = iconURL
+			self.totalSupply = totalSupply
 		}
 	}
 
@@ -98,19 +101,34 @@ extension AccountPortfolio {
 			public let keyImageURL: URL?
 			public let metadata: [Metadata]
 
+			// The claim amount if the it is a stake claim nft
+			public let stakeClaimAmount: BigDecimal?
+
 			public init(
 				id: NonFungibleGlobalId,
 				name: String?,
 				description: String?,
 				keyImageURL: URL?,
-				metadata: [Metadata]
+				metadata: [Metadata],
+				stakeClaimAmount: BigDecimal? = nil
 			) {
 				self.id = id
 				self.name = name
 				self.description = description
 				self.keyImageURL = keyImageURL
 				self.metadata = metadata
+				self.stakeClaimAmount = stakeClaimAmount
 			}
+		}
+	}
+
+	public struct PoolUnits {
+		public let radixNetworkStakes: [RadixNetworkStake]
+		public let poolUnits: [String]
+
+		public init(radixNetworkStakes: [RadixNetworkStake], poolUnits: [String]) {
+			self.radixNetworkStakes = radixNetworkStakes
+			self.poolUnits = poolUnits
 		}
 	}
 
@@ -122,6 +140,40 @@ extension AccountPortfolio {
 		public init(key: String, value: String) {
 			self.key = key
 			self.value = value
+		}
+	}
+}
+
+// MARK: - AccountPortfolio.PoolUnits.RadixNetworkStake
+extension AccountPortfolio.PoolUnits {
+	public struct RadixNetworkStake {
+		public struct Validator {
+			public let xrdVaultBalance: BigDecimal
+			public let name: String?
+			public let description: String?
+			public let iconURL: URL?
+
+			public init(
+				xrdVaultBalance: BigDecimal,
+				name: String? = nil,
+				description: String? = nil,
+				iconURL: URL? = nil
+			) {
+				self.xrdVaultBalance = xrdVaultBalance
+				self.name = name
+				self.description = description
+				self.iconURL = iconURL
+			}
+		}
+
+		public let validator: Validator
+		public let stakeUnitResource: AccountPortfolio.FungibleResource
+		public let stakeClaimResource: AccountPortfolio.NonFungibleResource?
+
+		public init(validator: Validator, stakeUnitResource: AccountPortfolio.FungibleResource, stakeClaimResource: AccountPortfolio.NonFungibleResource?) {
+			self.validator = validator
+			self.stakeUnitResource = stakeUnitResource
+			self.stakeClaimResource = stakeClaimResource
 		}
 	}
 }

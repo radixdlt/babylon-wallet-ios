@@ -35,8 +35,8 @@ extension GatewayAPIClient {
 	public typealias GetEpoch = @Sendable () async throws -> Epoch
 
 	// MARK: - Entity
-	public typealias GetEntityDetails = @Sendable (_ addresses: [String]) async throws -> GatewayAPI.StateEntityDetailsResponse
-	public typealias GetEntityMetdata = @Sendable (_ address: String) async throws -> GatewayAPI.EntityMetadataCollection
+	public typealias GetEntityDetails = @Sendable (_ addresses: [String], _ explicitMetadata: [EntityMetadataKey], _ ledgerState: GatewayAPI.LedgerState?) async throws -> GatewayAPI.StateEntityDetailsResponse
+	public typealias GetEntityMetdata = @Sendable (_ address: String, _ explicitMetadata: [EntityMetadataKey]) async throws -> GatewayAPI.EntityMetadataCollection
 
 	// MARK: - Fungible
 	public typealias GetEntityFungiblesPage = @Sendable (GatewayAPI.StateEntityFungiblesPageRequest) async throws -> GatewayAPI.StateEntityFungiblesPageResponse
@@ -64,7 +64,7 @@ extension GatewayAPIClient {
 
 	/// Extracts the dApp definition address from a component, if one is present
 	public func getDappDefinitionAddress(_ component: ComponentAddress) async throws -> DappDefinitionAddress {
-		let entityMetadata = try await getEntityMetadata(component.address)
+		let entityMetadata = try await getEntityMetadata(component.address, EntityMetadataKey.allCases)
 
 		guard let dappDefinitionAddressString = entityMetadata.dappDefinition else {
 			throw GatewayAPI.EntityMetadataCollection.MetadataError.missingDappDefinition
@@ -75,7 +75,7 @@ extension GatewayAPIClient {
 
 	/// Fetches the metadata for a dApp. If the component address is supplied, it validates that it is contained in `claimed_entities`
 	public func getDappMetadata(_ dappDefinition: DappDefinitionAddress) async throws -> GatewayAPI.EntityMetadataCollection {
-		let dappDefinition = try await getEntityMetadata(dappDefinition.address)
+		let dappDefinition = try await getEntityMetadata(dappDefinition.address, EntityMetadataKey.allCases)
 
 		guard dappDefinition.accountType == .dappDefinition else {
 			throw GatewayAPI.EntityMetadataCollection.MetadataError.accountTypeNotDappDefinition
@@ -90,13 +90,15 @@ extension GatewayAPIClient {
 
 	/// Loads the details for all the addresses provided.
 	@Sendable
-	public func fetchResourceDetails(_ addresses: [String]) async throws -> GatewayAPI.StateEntityDetailsResponse {
+	public func fetchResourceDetails(_ addresses: [String], explicitMetadata: [EntityMetadataKey], ledgerState: GatewayAPI.LedgerState? = nil) async throws -> GatewayAPI.StateEntityDetailsResponse {
 		/// gatewayAPIClient.getEntityDetails accepts only `entityDetailsPageSize` addresses for one request.
 		/// Thus, chunk the addresses in chunks of `entityDetailsPageSize` and load the details in separate, parallel requests.
 		let allResponses = try await addresses
 			.chunks(ofCount: GatewayAPIClient.entityDetailsPageSize)
 			.map(Array.init)
-			.parallelMap(getEntityDetails)
+			.parallelMap {
+				try await getEntityDetails($0, explicitMetadata, ledgerState)
+			}
 
 		guard !allResponses.isEmpty else {
 			throw EmptyEntityDetailsResponse()
@@ -135,13 +137,15 @@ extension GatewayAPI.EntityMetadataCollection {
 
 // FIXME: Temporary hack to extract the key_image_url, until we have a proper schema
 extension GatewayAPI.StateNonFungibleDetailsResponseItem {
-	public var details: (name: String?, keyImageURL: URL?) {
-		guard let dictionary = data.rawJson.value as? [String: Any] else { return (nil, nil) }
-		guard let elements = dictionary["fields"] as? [[String: Any]] else { return (nil, nil) }
-		let strings = elements.filter { $0["kind"] as? String == "String" }.compactMap { $0["value"] as? String }
+	public var details: (name: String?, keyImageURL: URL?, stakeClaim: BigDecimal?) {
+		guard let dictionary = data.rawJson.dictionary else { return (nil, nil, nil) }
+		guard let elements = dictionary["fields"]?.array?.compactMap(\.dictionary) else { return (nil, nil, nil) }
+		let strings = elements.filter { $0["kind"]?.string == "String" }.compactMap { $0["value"]?.string }
+		let decimals = elements.filter { $0["kind"]?.string == "Decimal" }.compactMap { $0["value"]?.string }
 
 		var name: String? = nil
 		var keyImageURL: URL? = nil
+		let stakeClaim: BigDecimal? = try? decimals.first.map(BigDecimal.init(fromString:))
 
 		for string in strings {
 			if
@@ -157,7 +161,7 @@ extension GatewayAPI.StateNonFungibleDetailsResponseItem {
 			}
 		}
 
-		return (name, keyImageURL)
+		return (name, keyImageURL, stakeClaim)
 	}
 
 	private func getKeyImageURL(from string: String) -> URL? {

@@ -94,7 +94,7 @@ struct DappInteractionLoading: Sendable, FeatureReducer {
 							return .cachedIsValid
 						},
 						request: {
-							let entityMetadataForDapp = try await gatewayAPIClient.getEntityMetadata(dappDefinitionAddress.address)
+							let entityMetadataForDapp = try await gatewayAPIClient.getEntityMetadata(dappDefinitionAddress.address, [])
 							return DappMetadata.Ledger(
 								entityMetadataForDapp: entityMetadataForDapp,
 								dAppDefinintionAddress: dappDefinitionAddress,

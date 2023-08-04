@@ -79,7 +79,7 @@ public struct AuthorizedDapps: Sendable, FeatureReducer {
 				for dApp in dApps {
 					let iconURL = try? await cacheClient.withCaching(
 						cacheEntry: .dAppMetadata(dApp.id.address),
-						request: { try await gatewayAPIClient.getEntityMetadata(dApp.id.address) }
+						request: { try await gatewayAPIClient.getEntityMetadata(dApp.id.address, []) }
 					).iconURL
 					if let iconURL {
 						await send(.internal(.loadedThumbnail(iconURL, dApp: dApp.id)))
