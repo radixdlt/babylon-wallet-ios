@@ -35,7 +35,7 @@ struct LSUComponentView: View {
 		let title: String
 		let imageURL: URL
 
-		let liquidStakeUnit: PoolUnitResourceView.ViewState?
+		let liquidStakeUnit: PoolUnitResourceViewState?
 		let stakeClaimNFTs: StakeClaimNFTsViewState?
 	}
 
@@ -61,12 +61,12 @@ struct LSUComponentView: View {
 	}
 
 	@ViewBuilder
-	private func liquidStakeUnitView(viewState: PoolUnitResourceView.ViewState) -> some View {
+	private func liquidStakeUnitView(viewState: PoolUnitResourceViewState) -> some View {
 		// FIXME: Localize
 		Text("LIQUID STAKE UNITS")
 			.stakeHeaderStyle
 
-		PoolUnitResourceView(viewState: viewState)
+		makeLiquidStakeUnitPoolUnitResourceView(viewState: viewState)
 			.borderAround
 	}
 
@@ -117,19 +117,21 @@ extension View {
 	}
 }
 
-// MARK: - PoolUnitResourceView
-struct PoolUnitResourceView: View {
-	struct ViewState: Identifiable, Equatable {
-		var id: String {
-			symbol
-		}
-
-		let thumbnail: TokenThumbnail.Content
-		let symbol: String
-		let tokenAmount: String
+// MARK: - PoolUnitResourceViewState
+struct PoolUnitResourceViewState: Identifiable, Equatable {
+	var id: String {
+		symbol
 	}
 
-	let viewState: ViewState
+	let thumbnail: TokenThumbnail.Content
+	let symbol: String
+	let tokenAmount: String
+}
+
+// MARK: - PoolUnitResourceView
+struct PoolUnitResourceView<NameView>: View where NameView: View {
+	let viewState: PoolUnitResourceViewState
+	let nameView: NameView
 
 	var body: some View {
 		HStack(spacing: .small1) {
@@ -139,16 +141,7 @@ struct PoolUnitResourceView: View {
 			)
 
 			HStack {
-				VStack(alignment: .leading) {
-					Text(viewState.symbol)
-						.foregroundColor(.app.gray1)
-						.textStyle(.body2HighImportance)
-
-					// FIXME: Localize
-					Text("Staked")
-						.foregroundColor(.app.gray2)
-						.textStyle(.body2HighImportance)
-				}
+				nameView
 
 				Spacer()
 
@@ -158,4 +151,33 @@ struct PoolUnitResourceView: View {
 			}
 		}
 	}
+}
+
+func makeLiquidStakeUnitPoolUnitResourceView(
+	viewState: PoolUnitResourceViewState
+) -> some View {
+	PoolUnitResourceView(
+		viewState: viewState,
+		nameView: VStack(alignment: .leading) {
+			Text(viewState.symbol)
+				.foregroundColor(.app.gray1)
+				.textStyle(.body2HighImportance)
+
+			// FIXME: Localize
+			Text("Staked")
+				.foregroundColor(.app.gray2)
+				.textStyle(.body2HighImportance)
+		}
+	)
+}
+
+func makePoolUnitPoolUnitResourceView(
+	viewState: PoolUnitResourceViewState
+) -> some View {
+	PoolUnitResourceView(
+		viewState: viewState,
+		nameView: Text(viewState.symbol)
+			.foregroundColor(.app.gray1)
+			.textStyle(.body2HighImportance)
+	)
 }

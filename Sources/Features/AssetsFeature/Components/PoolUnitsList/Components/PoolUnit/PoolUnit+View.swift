@@ -5,7 +5,7 @@ extension PoolUnit {
 	public struct ViewState: Equatable {
 		let iconURL: URL
 		let name: String
-		let resources: NonEmpty<IdentifiedArrayOf<PoolUnitResourceView.ViewState>>
+		let resources: NonEmpty<IdentifiedArrayOf<PoolUnitResourceViewState>>
 	}
 
 	public struct View: SwiftUI.View {
@@ -33,7 +33,7 @@ extension PoolUnit {
 					VStack(spacing: 1) {
 						ForEach(
 							viewStore.resources,
-							content: PoolUnitResourceView.init
+							content: makePoolUnitPoolUnitResourceView
 						)
 						.padding(.medium3)
 						.background(.app.white)
