@@ -8,7 +8,6 @@ extension LPToken {
 		let resources: NonEmpty<IdentifiedArrayOf<PoolUnitResourceView.ViewState>>
 	}
 
-	@MainActor
 	public struct View: SwiftUI.View {
 		private let store: StoreOf<LPToken>
 
@@ -24,11 +23,26 @@ extension LPToken {
 			) { viewStore in
 				VStack {
 					Text(viewStore.name)
-					ForEach(
-						viewStore.resources,
-						content: PoolUnitResourceView.init
+
+					VStack(spacing: 1) {
+						ForEach(
+							viewStore.resources,
+							content: PoolUnitResourceView.init
+						)
+						.padding(.medium3)
+						.background(.app.white)
+					}
+					.background(.app.gray4)
+					.overlay(
+						RoundedRectangle(cornerRadius: .small1)
+							.stroke(.app.gray4, lineWidth: 1)
 					)
+					.padding(.small2 * -1)
 				}
+				.padding(.medium1)
+				.background(.app.white)
+				.roundedCorners(radius: .small1)
+				.tokenRowShadow()
 			}
 		}
 	}

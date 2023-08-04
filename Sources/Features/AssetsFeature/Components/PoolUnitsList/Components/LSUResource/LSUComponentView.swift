@@ -67,6 +67,7 @@ struct LSUComponentView: View {
 			.stakeHeaderStyle
 
 		PoolUnitResourceView(viewState: viewState)
+			.borderAround
 	}
 
 	private func stakeClaimNFTsView(viewState: StakeClaimNFTsViewState) -> some View {
@@ -156,6 +157,5 @@ struct PoolUnitResourceView: View {
 					.textStyle(.secondaryHeader)
 			}
 		}
-		.borderAround
 	}
 }

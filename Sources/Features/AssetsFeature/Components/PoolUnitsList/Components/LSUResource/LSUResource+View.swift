@@ -42,7 +42,6 @@ extension PoolUnitsList.LSUResource {
 						headerHeight: headerHeight
 					)
 				}
-				.padding(.horizontal, .medium3)
 			}
 			.onPreferenceChange(HeightPreferenceKey.self) {
 				headerHeight = $0
