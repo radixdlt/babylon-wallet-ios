@@ -29,6 +29,7 @@ public struct CustomizeFees: FeatureReducer {
 		case toggleMode
 		case totalNetworkAndRoyaltyFeesChanged(String)
 		case tipPercentageChanged(String)
+		case closed
 	}
 
 	public enum ChildAction: Equatable {
@@ -54,6 +55,8 @@ public struct CustomizeFees: FeatureReducer {
 			}
 		}
 	}
+
+	@Dependency(\.dismiss) var dismiss
 
 	public var body: some ReducerProtocolOf<Self> {
 		Reduce(core)
@@ -84,6 +87,10 @@ public struct CustomizeFees: FeatureReducer {
 
 			state.feePayerSelection.transactionFee.mode = .advanced(.init(networkAndRoyaltyFee: advanced.networkAndRoyaltyFee, tipPercentage: value))
 			return .send(.delegate(.updated(state.feePayerSelection)))
+		case .closed:
+			return .run { _ in
+				await dismiss()
+			}
 		}
 	}
 

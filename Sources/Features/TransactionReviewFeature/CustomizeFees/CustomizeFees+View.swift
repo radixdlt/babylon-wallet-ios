@@ -4,6 +4,8 @@ import TransactionClient
 extension CustomizeFees.State {
 	var viewState: CustomizeFees.ViewState {
 		.init(
+			title: transactionFee.mode == .normal ? "Customize Fees" : "Advanced \n Customize Fees",
+			description: transactionFee.mode == .normal ? "Choose what account to pay the transaction fee from, or add a “tip” to speed up your transaction if necessary." : "Fully customize fee payment for this transaction. Not recommended unless you are a developer or advanced user.",
 			isNormalMode: transactionFee.mode == .normal,
 			totalNetworkAndRoyaltyFee: {
 				if case let .advanced(advanced) = transactionFee.mode {
@@ -39,7 +41,7 @@ extension CustomizeFees.State {
 			insufficientBalanceMessage: {
 				if let feePayer = feePayerSelection.selected {
 					if feePayer.xrdBalance < transactionFee.totalFee.lockFee {
-						return "Insufficient balance to pay the transaction fee, please choose another account" // TODO: strings
+						return "Insufficient balance to pay the transaction fee" // TODO: strings
 					}
 				}
 				return nil
@@ -50,6 +52,8 @@ extension CustomizeFees.State {
 
 extension CustomizeFees {
 	public struct ViewState: Equatable {
+		let title: String
+		let description: String
 		let isNormalMode: Bool
 		let totalNetworkAndRoyaltyFee: String
 		let tipPercentage: String
@@ -69,13 +73,20 @@ extension CustomizeFees {
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				ScrollView {
-					VStack {
+					VStack(spacing: .zero) {
+						HStack {
+							CloseButton {
+								viewStore.send(.closed)
+							}
+							Spacer()
+						}
 						VStack {
-							Text("Customize Fees") // TODO: strings
+							Text(viewStore.title)
 								.textStyle(.sheetTitle)
 								.foregroundColor(.app.gray1)
 								.padding(.bottom, .small1)
-							Text("Choose what account to pay the transaction fee from, or add a “tip” to speed up your transaction if necessary.") // TODO: strings
+								.multilineTextAlignment(.center)
+							Text(viewStore.description)
 								.textStyle(.body1Regular)
 								.foregroundColor(.app.gray1)
 								.multilineTextAlignment(.center)
@@ -85,7 +96,7 @@ extension CustomizeFees {
 							feePayerView(viewStore)
 								.padding(.top, .small1)
 						}
-						.padding(.medium1)
+						.padding([.horizontal, .bottom], .medium1)
 
 						if viewStore.isNormalMode {
 							normalModeFeesBreakdownView(viewStore)
@@ -100,6 +111,7 @@ extension CustomizeFees {
 					}
 					.textStyle(.body1StandaloneLink)
 					.foregroundColor(.app.blue2)
+					.padding(.bottom, .medium1)
 				}
 				.background(.app.background)
 			}
@@ -150,6 +162,8 @@ extension CustomizeFees {
 		@ViewBuilder
 		func advancedModeBreakdownView(_ viewStore: ViewStoreOf<CustomizeFees>) -> some SwiftUI.View {
 			VStack(spacing: .medium1) {
+				Divider()
+
 				AppTextField(
 					primaryHeading: "XRD to Lock for Network & Royalty Fees", // TODO: strings
 					placeholder: "",
@@ -199,7 +213,7 @@ extension CustomizeFees {
 				Spacer()
 				Text(fee.formatted(false))
 					.textStyle(.body1HighImportance)
-					.foregroundColor(fee == .zero ? .app.gray3 : .app.gray1)
+					.foregroundColor(fee == .zero ? .app.gray2 : .app.gray1)
 			}
 		}
 

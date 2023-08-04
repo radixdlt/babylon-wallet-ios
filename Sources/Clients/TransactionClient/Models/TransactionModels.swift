@@ -315,13 +315,8 @@ extension TransactionFee {
 			let minFee = max(maxFee - feeLocks.contingentLock, .zero)
 			return .init(min: minFee, max: maxFee)
 		case let .advanced(advanced):
-			let networkFee = {
-				guard advanced.networkAndRoyaltyFee > royaltyFee else {
-					return advanced.networkAndRoyaltyFee
-				}
-				return advanced.networkAndRoyaltyFee - royaltyFee
-			}()
-			let tipAmount = networkFee * advanced.tipPercentage
+			let networkFee = max(advanced.networkAndRoyaltyFee - royaltyFee, .zero)
+			let tipAmount = networkFee * (advanced.tipPercentage / 100)
 			let total = advanced.networkAndRoyaltyFee + tipAmount
 			return .init(min: total, max: total)
 		}
