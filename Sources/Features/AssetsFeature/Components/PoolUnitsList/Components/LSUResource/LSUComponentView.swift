@@ -74,8 +74,7 @@ struct LSUComponentView: View {
 		Group {
 			// FIXME: Localize
 			Text("LIQUID STAKE UNITS")
-				.foregroundColor(.app.gray2)
-				.textStyle(.body2HighImportance)
+				.stakeHeaderStyle
 
 			HStack {
 				HStack(spacing: .small1) {
@@ -103,12 +102,7 @@ struct LSUComponentView: View {
 					}
 				}
 			}
-			.padding(.small2)
-			.overlay(
-				RoundedRectangle(cornerRadius: .small1)
-					.stroke(.app.gray4, lineWidth: 1)
-					.padding(.small2 * -1)
-			)
+			.borderAround
 		}
 	}
 
@@ -116,8 +110,7 @@ struct LSUComponentView: View {
 		VStack(alignment: .leading, spacing: .medium1) {
 			// FIXME: Localize
 			Text("STAKE CLAIM NFTS")
-				.foregroundColor(.app.gray2)
-				.textStyle(.body2HighImportance)
+				.stakeHeaderStyle
 
 			ForEach(viewState) { stakeClaimNFT in
 				HStack {
@@ -138,13 +131,24 @@ struct LSUComponentView: View {
 						.foregroundColor(.app.gray1)
 						.textStyle(.secondaryHeader)
 				}
-				.padding(.small2)
-				.overlay(
-					RoundedRectangle(cornerRadius: .small1)
-						.stroke(.app.gray4, lineWidth: 1)
-						.padding(.small2 * -1)
-				)
+				.borderAround
 			}
 		}
+	}
+}
+
+extension View {
+	fileprivate var stakeHeaderStyle: some View {
+		foregroundColor(.app.gray2)
+			.textStyle(.body2HighImportance)
+	}
+
+	fileprivate var borderAround: some View {
+		padding(.small2)
+			.overlay(
+				RoundedRectangle(cornerRadius: .small1)
+					.stroke(.app.gray4, lineWidth: 1)
+					.padding(.small2 * -1)
+			)
 	}
 }
