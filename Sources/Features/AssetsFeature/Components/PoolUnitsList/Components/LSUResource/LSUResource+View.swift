@@ -51,11 +51,16 @@ extension PoolUnitsList.LSUResource {
 		private func headerView(
 			with viewStore: ViewStore<ViewState, ViewAction>
 		) -> some SwiftUI.View {
-			X(viewState: .init(
-				iconURL: viewStore.iconURL,
-				name: viewStore.name
-			))
-			.padding(.medium1)
+			makeLiquidStakePoolUnitHeaderView(
+				viewState: .init(
+					poolUnit: .init(
+						iconURL: viewStore.iconURL,
+						name: viewStore.name
+					),
+					numberOfStakes: viewStore.components.count
+				)
+			)
+			.padding(.medium2)
 			.background(.app.white)
 			.roundedCorners(viewStore.isExpanded ? .top : .allCorners, radius: .small1)
 			.tokenRowShadow(!viewStore.isExpanded)
@@ -185,30 +190,58 @@ extension PoolUnitsList.LSUResource.State {
 	}
 }
 
-// MARK: - X
-struct X: View {
-	struct ViewState {
-		let iconURL: URL
-		let name: String
-	}
+// MARK: - PoolUnitHeaderViewState
+struct PoolUnitHeaderViewState {
+	let iconURL: URL
+	let name: String
+}
 
-	let viewState: ViewState
+// MARK: - PoolUnitHeaderView
+struct PoolUnitHeaderView<NameView>: View where NameView: View {
+	let viewState: PoolUnitHeaderViewState
+
+	let nameView: NameView
 
 	var body: some View {
 		HStack(spacing: .medium2) {
 			NFTThumbnail(viewState.iconURL, size: .small)
 
-			VStack(alignment: .leading) {
-				Text(viewState.name)
-					.foregroundColor(.app.gray1)
-					.textStyle(.secondaryHeader)
-
-				Text("2 Stakes")
-					.foregroundColor(.app.gray2)
-					.textStyle(.body2HighImportance)
-			}
+			nameView
 
 			Spacer()
 		}
 	}
+}
+
+// MARK: - LiquidStakePoolUnitHeaderViewState
+struct LiquidStakePoolUnitHeaderViewState {
+	let poolUnit: PoolUnitHeaderViewState
+	let numberOfStakes: Int
+}
+
+func makeLiquidStakePoolUnitHeaderView(
+	viewState: LiquidStakePoolUnitHeaderViewState
+) -> some View {
+	PoolUnitHeaderView(
+		viewState: viewState.poolUnit,
+		nameView: VStack(alignment: .leading) {
+			Text(viewState.poolUnit.name)
+				.foregroundColor(.app.gray1)
+				.textStyle(.secondaryHeader)
+
+			// FIXME: Localize
+			Text("\(viewState.numberOfStakes) Stakes")
+				.foregroundColor(.app.gray2)
+				.textStyle(.body2HighImportance)
+		}
+	)
+}
+
+func makePoolUnitView(viewState: PoolUnitHeaderViewState) -> some View {
+	PoolUnitHeaderView(
+		viewState: viewState,
+		nameView: Text(viewState.name)
+			.foregroundColor(.app.gray1)
+			.textStyle(.secondaryHeader)
+	)
 }

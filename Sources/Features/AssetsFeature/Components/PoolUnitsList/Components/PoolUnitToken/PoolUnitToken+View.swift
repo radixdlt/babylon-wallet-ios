@@ -21,8 +21,14 @@ extension LPToken {
 				observe: \.viewState,
 				send: LPToken.Action.view
 			) { viewStore in
-				VStack {
-					X(viewState: .init(iconURL: viewStore.iconURL, name: viewStore.name))
+				VStack(spacing: .medium3 * 2) {
+					makePoolUnitView(
+						viewState: .init(
+							iconURL: viewStore.iconURL,
+							name: viewStore.name
+						)
+					)
+					.padding(.medium3 * -0.25)
 
 					VStack(spacing: 1) {
 						ForEach(
@@ -52,7 +58,7 @@ extension LPToken.State {
 	var viewState: LPToken.ViewState {
 		.init(
 			iconURL: .init(string: "https://i.ibb.co/KG06168/Screenshot-2023-08-02-at-16-19-29.png")!,
-			name: "Bytcoin",
+			name: "Some LP Token",
 			resources: .init(
 				rawValue: [
 					.init(
