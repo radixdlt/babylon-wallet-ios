@@ -488,7 +488,7 @@
 "assetTransfer_chooseReceivingAccount_invalidAddressError" = "Invalid address";
 "assetTransfer_chooseReceivingAccount_alreadyAddedError" = "Account already added";
 "assetTransfer_chooseReceivingAccount_navigationTitle" = "Choose Receiving Account";
-"assetTransfer_chooseReceivingAccount_enterManually" = "Enter or scan and Account address";
+"assetTransfer_chooseReceivingAccount_enterManually" = "Enter or scan an Account address";
 "assetTransfer_chooseReceivingAccount_chooseOwnAccount" = "Or: Choose one of your own Accounts";
 "assetTransfer_chooseReceivingAccount_scanQRNavigationTitle" = "Scan Account QR Code";
 "assetTransfer_chooseReceivingAccount_addressFieldPlaceholder" = "Enter Radix Account address";
