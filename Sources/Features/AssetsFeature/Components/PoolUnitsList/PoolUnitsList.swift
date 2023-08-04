@@ -4,10 +4,13 @@ import FeaturePrelude
 public struct PoolUnitsList: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		var lsuResource: LSUResource.State?
+
+		var poolUnitTokens: IdentifiedArrayOf<PoolUnitToken.State> = []
 	}
 
 	public enum ChildAction: Sendable, Equatable {
 		case lsuResource(LSUResource.Action)
+		case poolUnitTokens(id: PoolUnitToken.State.ID, action: PoolUnitToken.Action)
 	}
 
 	public init() {}
@@ -18,6 +21,11 @@ public struct PoolUnitsList: Sendable, FeatureReducer {
 				\.lsuResource,
 				action: /Action.child .. ChildAction.lsuResource,
 				then: LSUResource.init
+			)
+			.forEach(
+				\.poolUnitTokens,
+				action: /Action.child .. ChildAction.poolUnitTokens,
+				element: PoolUnitToken.init
 			)
 	}
 }
