@@ -51,22 +51,10 @@ extension PoolUnitsList.LSUResource {
 		private func headerView(
 			with viewStore: ViewStore<ViewState, ViewAction>
 		) -> some SwiftUI.View {
-			HStack(spacing: .medium2) {
-				NFTThumbnail(viewStore.iconURL, size: .small)
-
-				VStack(alignment: .leading) {
-					Text(viewStore.name)
-						.foregroundColor(.app.gray1)
-						.textStyle(.secondaryHeader)
-
-					// FIXME: Localize
-					Text("\(viewStore.components.count) Stakes")
-						.foregroundColor(.app.gray2)
-						.textStyle(.body2HighImportance)
-				}
-
-				Spacer()
-			}
+			X(viewState: .init(
+				iconURL: viewStore.iconURL,
+				name: viewStore.name
+			))
 			.padding(.medium1)
 			.background(.app.white)
 			.roundedCorners(viewStore.isExpanded ? .top : .allCorners, radius: .small1)
@@ -194,5 +182,33 @@ extension PoolUnitsList.LSUResource.State {
 				]
 			)!
 		)
+	}
+}
+
+// MARK: - X
+struct X: View {
+	struct ViewState {
+		let iconURL: URL
+		let name: String
+	}
+
+	let viewState: ViewState
+
+	var body: some View {
+		HStack(spacing: .medium2) {
+			NFTThumbnail(viewState.iconURL, size: .small)
+
+			VStack(alignment: .leading) {
+				Text(viewState.name)
+					.foregroundColor(.app.gray1)
+					.textStyle(.secondaryHeader)
+
+				Text("2 Stakes")
+					.foregroundColor(.app.gray2)
+					.textStyle(.body2HighImportance)
+			}
+
+			Spacer()
+		}
 	}
 }

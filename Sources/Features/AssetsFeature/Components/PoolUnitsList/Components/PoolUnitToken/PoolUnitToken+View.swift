@@ -22,7 +22,7 @@ extension LPToken {
 				send: LPToken.Action.view
 			) { viewStore in
 				VStack {
-					Text(viewStore.name)
+					X(viewState: .init(iconURL: viewStore.iconURL, name: viewStore.name))
 
 					VStack(spacing: 1) {
 						ForEach(
