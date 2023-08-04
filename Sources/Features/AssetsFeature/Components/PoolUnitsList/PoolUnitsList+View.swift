@@ -24,13 +24,13 @@ extension PoolUnitsList {
 
 			ForEachStore(
 				store.scope(
-					state: \.poolUnitTokens,
+					state: \.lpTokens,
 					action: (
 						/PoolUnitsList.Action.child
-							.. PoolUnitsList.ChildAction.poolUnitTokens
+							.. PoolUnitsList.ChildAction.lpTokens
 					).embed
 				),
-				content: PoolUnitToken.View.init
+				content: LPToken.View.init
 			)
 		}
 	}

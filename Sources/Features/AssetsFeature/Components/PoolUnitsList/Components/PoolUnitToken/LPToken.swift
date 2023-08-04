@@ -1,8 +1,9 @@
 import FeaturePrelude
 
-// MARK: - PoolUnitToken
-public struct PoolUnitToken: Sendable, FeatureReducer {
+// MARK: - LPToken
+public struct LPToken: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable, Identifiable {
+		// Int temp
 		public let id: Int
 	}
 
