@@ -5,6 +5,8 @@ extension PoolUnitsList {
 	public struct LSUResource: Sendable, FeatureReducer {
 		public struct State: Sendable, Hashable {
 			var isExpanded: Bool = false
+
+			// FIXME: Rewire
 		}
 
 		public enum ViewAction: Sendable, Equatable {

@@ -136,6 +136,7 @@ private struct HeightPreferenceKey: PreferenceKey {
 }
 
 extension PoolUnitsList.LSUResource.State {
+	// FIXME: Rewire
 	var viewState: PoolUnitsList.LSUResource.ViewState {
 		.init(
 			isExpanded: isExpanded,
