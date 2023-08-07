@@ -75,8 +75,19 @@ struct LSUComponentView: View {
 		Text("LIQUID STAKE UNITS")
 			.stakeHeaderStyle
 
-		poolUnitResourceView(viewState: viewState)
-			.borderAround
+		PoolUnitResourceView(viewState: viewState) {
+			VStack(alignment: .leading) {
+				Text(viewState.symbol)
+					.foregroundColor(.app.gray1)
+					.textStyle(.body2HighImportance)
+
+				// FIXME: Localize
+				Text("Staked")
+					.foregroundColor(.app.gray2)
+					.textStyle(.body2HighImportance)
+			}
+		}
+		.borderAround
 	}
 
 	private func stakeClaimNFTsView(viewState: StakeClaimNFTsViewState) -> some View {
@@ -105,23 +116,6 @@ struct LSUComponentView: View {
 						.textStyle(.secondaryHeader)
 				}
 				.borderAround
-			}
-		}
-	}
-
-	private func poolUnitResourceView(
-		viewState: PoolUnitResourceViewState
-	) -> some View {
-		PoolUnitResourceView(viewState: viewState) {
-			VStack(alignment: .leading) {
-				Text(viewState.symbol)
-					.foregroundColor(.app.gray1)
-					.textStyle(.body2HighImportance)
-
-				// FIXME: Localize
-				Text("Staked")
-					.foregroundColor(.app.gray2)
-					.textStyle(.body2HighImportance)
 			}
 		}
 	}
