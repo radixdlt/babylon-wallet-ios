@@ -210,112 +210,6 @@ extension AccountPortfoliosClient {
 		)
 	}
 
-	static func createPoolUnitResources(
-		_ accountAddress: String,
-		rawFungibleResources: [GatewayAPI.FungibleResourcesCollectionItemVaultAggregated],
-		rawNonFungibleResources: [GatewayAPI.NonFungibleResourcesCollectionItemVaultAggregated],
-		ledgerState: GatewayAPI.LedgerState
-	) async throws -> AccountPortfolio.PoolUnitResources {
-		let stakeUnitCandidates = rawFungibleResources.filter {
-			$0.explicitMetadata?.validator != nil
-		}
-
-		let stakeClaimNFTCandidates = rawNonFungibleResources.filter {
-			$0.explicitMetadata?.validator != nil
-		}
-
-		let poolUnitCandidates = rawFungibleResources.filter {
-			$0.explicitMetadata?.pool != nil
-		}
-
-		let addressesToValidate = stakeUnitCandidates.compactMap(\.explicitMetadata?.validator?.address) + stakeClaimNFTCandidates.compactMap(\.explicitMetadata?.validator?.address) + poolUnitCandidates.compactMap(\.explicitMetadata?.pool?.address)
-
-		guard !addressesToValidate.isEmpty else {
-			return .init(radixNetworkStakes: [], poolUnits: [])
-		}
-
-		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
-		@Dependency(\.gatewaysClient) var gatewaysClient
-
-		let networkId = await gatewaysClient.getCurrentNetworkID()
-		let xrdAddress = knownAddresses(networkId: networkId.rawValue).resourceAddresses.xrd.addressString()
-
-		let details = try await gatewayAPIClient.fetchResourceDetails(addressesToValidate, explicitMetadata: EntityMetadataKey.allCases, ledgerState: ledgerState)
-
-		let stakeUnits = try await details.items.asyncCompactMap { item -> AccountPortfolio.PoolUnitResources.RadixNetworkStake? in
-			guard let validatorDetails = item.details?.component?.state?.validatorState else {
-				// Consider it not a validtor
-				return nil
-			}
-
-			// xrd balance
-			guard let xrdResource = item
-				.fungibleResources?
-				.items
-				.first(where: { $0.resourceAddress == xrdAddress })
-			else {
-				assertionFailure("A validator didn't contain an xrd resource")
-				return nil
-			}
-
-			guard let xrdStakeVaultBalance = xrdResource
-				.vault?
-				.vaults
-				.items
-				.first(where: { $0.vaultAddress == validatorDetails.stakeXRDVaultAddress })?.amount
-			else {
-				assertionFailure("Validtor XRD Resource didn't contain the \(validatorDetails.stakeXRDVaultAddress) vault ")
-				return nil
-			}
-
-			let validatorStakeUnitCandidate = stakeUnitCandidates.first {
-				$0.explicitMetadata?.validator?.address == item.address
-			}
-
-			guard let validatorStakeUnitCandidate else { // having a stake unit is required
-				assertionFailure("No stake unit could be matched for the validator declared stake unit address, possibly wrong implementation")
-				return nil
-			}
-
-			guard validatorDetails.stakeUnitResourceAddress == validatorStakeUnitCandidate.resourceAddress else {
-				assertionFailure("Bad stake unit candidate, not declared by the validator")
-				return nil
-			}
-
-			let validator = try AccountPortfolio.PoolUnitResources.RadixNetworkStake.Validator(
-				address: .init(validatingAddress: item.address),
-				xrdVaultBalance: .init(fromString: xrdStakeVaultBalance),
-				name: item.explicitMetadata?.name,
-				description: item.explicitMetadata?.description,
-				iconURL: item.explicitMetadata?.iconURL
-			)
-
-			let stakeUnitFungibleResource = try await createFungibleResource(validatorStakeUnitCandidate, ledgerState: ledgerState)
-
-			let stakeClaimNft: AccountPortfolio.NonFungibleResource? = try await { () -> AccountPortfolio.NonFungibleResource? in
-				let stakeClaimNft = stakeClaimNFTCandidates.first {
-					$0.explicitMetadata?.validator?.address == item.address
-				}
-
-				guard let stakeClaimNft else {
-					return nil
-				}
-
-				guard validatorDetails.unstakeClaimTokenResourceAddress == stakeClaimNft.resourceAddress else {
-					assertionFailure("Bad stake claim nft candidate, not declared by the validator")
-					return nil
-				}
-
-				return try await createNonFungibleResource(accountAddress, stakeClaimNft, ledgerState: ledgerState)
-
-			}()
-
-			return .init(validator: validator, stakeUnitResource: stakeUnitFungibleResource, stakeClaimResource: stakeClaimNft)
-		}
-
-		return .init(radixNetworkStakes: stakeUnits, poolUnits: [])
-	}
-
 	@Sendable
 	static func createFungibleResources(
 		rawItems: [GatewayAPI.FungibleResourcesCollectionItem],
@@ -474,6 +368,125 @@ extension AccountPortfoliosClient {
 			iconURL: metadata?.iconURL,
 			tokens: tokens
 		)
+	}
+}
+
+// MARK: Pool Units
+extension AccountPortfoliosClient {
+	@Sendable
+	static func createPoolUnitResources(
+		_ accountAddress: String,
+		rawFungibleResources: [GatewayAPI.FungibleResourcesCollectionItemVaultAggregated],
+		rawNonFungibleResources: [GatewayAPI.NonFungibleResourcesCollectionItemVaultAggregated],
+		ledgerState: GatewayAPI.LedgerState
+	) async throws -> AccountPortfolio.PoolUnitResources {
+		// One Resource Pool created:
+		//  - 058959450bc3a7cf2830b4e9a5b968fec987fedb0de8419ab12ceb1964a9a841
+		//  - pool_tdx_d_1cnjvq6kzp3rp7lv0ddpglezmt409nct55hegq5wpd89666nv94zmk9
+		//  - resource_tdx_d_1thfds4qff7twt8j40smxldrge54sam7py2htaps6cxl278ukmgpekm
+
+		let stakeUnitCandidates = rawFungibleResources.filter {
+			$0.explicitMetadata?.validator != nil
+		}
+
+		let stakeClaimNFTCandidates = rawNonFungibleResources.filter {
+			$0.explicitMetadata?.validator != nil
+		}
+
+		let poolUnitCandidates = rawFungibleResources.filter {
+			$0.explicitMetadata?.pool != nil
+		}
+
+		let addressesToValidate = stakeUnitCandidates.compactMap(\.explicitMetadata?.validator?.address) + stakeClaimNFTCandidates.compactMap(\.explicitMetadata?.validator?.address) + poolUnitCandidates.compactMap(\.explicitMetadata?.pool?.address)
+
+		guard !addressesToValidate.isEmpty else {
+			return .init(radixNetworkStakes: [], poolUnits: [])
+		}
+
+		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
+		@Dependency(\.gatewaysClient) var gatewaysClient
+
+		let networkId = await gatewaysClient.getCurrentNetworkID()
+		let xrdAddress = knownAddresses(networkId: networkId.rawValue).resourceAddresses.xrd.addressString()
+
+		let poolUnitDetails = try await gatewayAPIClient.fetchResourceDetails(
+			addressesToValidate,
+			explicitMetadata: EntityMetadataKey.allCases,
+			ledgerState: ledgerState
+		)
+
+		let stakeUnits = try await poolUnitDetails.items.asyncCompactMap { item -> AccountPortfolio.PoolUnitResources.RadixNetworkStake? in
+			guard let validatorDetails = item.details?.component?.state?.validatorState else {
+				// Consider it not a validtor
+				return nil
+			}
+
+			// xrd balance
+			guard let xrdResource = item
+				.fungibleResources?
+				.items
+				.first(where: { $0.resourceAddress == xrdAddress })
+			else {
+				assertionFailure("A validator didn't contain an xrd resource")
+				return nil
+			}
+
+			guard let xrdStakeVaultBalance = xrdResource
+				.vault?
+				.vaults
+				.items
+				.first(where: { $0.vaultAddress == validatorDetails.stakeXRDVaultAddress })?.amount
+			else {
+				assertionFailure("Validtor XRD Resource didn't contain the \(validatorDetails.stakeXRDVaultAddress) vault ")
+				return nil
+			}
+
+			let validatorStakeUnitCandidate = stakeUnitCandidates.first {
+				$0.explicitMetadata?.validator?.address == item.address
+			}
+
+			guard let validatorStakeUnitCandidate else { // having a stake unit is required
+				assertionFailure("No stake unit could be matched for the validator declared stake unit address, possibly wrong implementation")
+				return nil
+			}
+
+			guard validatorDetails.stakeUnitResourceAddress == validatorStakeUnitCandidate.resourceAddress else {
+				assertionFailure("Bad stake unit candidate, not declared by the validator")
+				return nil
+			}
+
+			let validator = try AccountPortfolio.PoolUnitResources.RadixNetworkStake.Validator(
+				address: .init(validatingAddress: item.address),
+				xrdVaultBalance: .init(fromString: xrdStakeVaultBalance),
+				name: item.explicitMetadata?.name,
+				description: item.explicitMetadata?.description,
+				iconURL: item.explicitMetadata?.iconURL
+			)
+
+			let stakeUnitFungibleResource = try await createFungibleResource(validatorStakeUnitCandidate, ledgerState: ledgerState)
+
+			let stakeClaimNft: AccountPortfolio.NonFungibleResource? = try await { () -> AccountPortfolio.NonFungibleResource? in
+				let stakeClaimNft = stakeClaimNFTCandidates.first {
+					$0.explicitMetadata?.validator?.address == item.address
+				}
+
+				guard let stakeClaimNft else {
+					return nil
+				}
+
+				guard validatorDetails.unstakeClaimTokenResourceAddress == stakeClaimNft.resourceAddress else {
+					assertionFailure("Bad stake claim nft candidate, not declared by the validator")
+					return nil
+				}
+
+				return try await createNonFungibleResource(accountAddress, stakeClaimNft, ledgerState: ledgerState)
+
+			}()
+
+			return .init(validator: validator, stakeUnitResource: stakeUnitFungibleResource, stakeClaimResource: stakeClaimNft)
+		}
+
+		return .init(radixNetworkStakes: stakeUnits, poolUnits: [])
 	}
 }
 
