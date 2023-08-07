@@ -20,17 +20,19 @@ public struct PoolUnit: Sendable, FeatureReducer {
 
 	public struct Destinations: Sendable, ReducerProtocol {
 		public enum State: Sendable, Hashable {
-			case details(Prelude.Unit)
+			case details(PoolUnitDetails.State)
 		}
 
 		public enum Action: Sendable, Equatable {
-			case details(FungibleTokenDetails.Action)
+			case details(PoolUnitDetails.Action)
 		}
 
 		public var body: some ReducerProtocolOf<Self> {
-			Scope(state: /State.details, action: /Action.details) {
-				EmptyReducer()
-			}
+			Scope(
+				state: /State.details,
+				action: /Action.details,
+				child: PoolUnitDetails.init
+			)
 		}
 	}
 
@@ -38,10 +40,9 @@ public struct PoolUnit: Sendable, FeatureReducer {
 		Reduce(core)
 			.ifLet(
 				\.$destination,
-				action: /Action.child .. ChildAction.destination
-			) {
-				Destinations()
-			}
+				action: /Action.child .. ChildAction.destination,
+				destination: Destinations.init
+			)
 	}
 
 	public func reduce(
@@ -50,7 +51,7 @@ public struct PoolUnit: Sendable, FeatureReducer {
 	) -> EffectTask<Action> {
 		switch viewAction {
 		case .didTap:
-			state.destination = .details(.instance)
+			state.destination = .details(.init())
 
 			return .none
 		}

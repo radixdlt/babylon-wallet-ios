@@ -59,7 +59,7 @@ extension PoolUnit {
 				),
 				state: /Destinations.State.details,
 				action: Destinations.Action.details,
-				content: { _ in Text("Details") }
+				content: PoolUnitDetails.View.init
 			)
 		}
 
