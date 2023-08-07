@@ -181,7 +181,10 @@ extension AccountPortfoliosClient {
 			// TODO: Check pool units also
 			!poolUnitResources.radixNetworkStakes.contains {
 				$0.stakeUnitResource.resourceAddress.address == rawItem.resourceAddress
-			}
+			} &&
+				!poolUnitResources.poolUnits.contains {
+					$0.poolUnitResource.resourceAddress.address == rawItem.resourceAddress
+				}
 		}
 
 		let filteredRawNonFungibleResources = rawNonFungibleResources.filter { rawItem in
@@ -385,6 +388,11 @@ extension AccountPortfoliosClient {
 		//  - pool_tdx_d_1cnjvq6kzp3rp7lv0ddpglezmt409nct55hegq5wpd89666nv94zmk9
 		//  - resource_tdx_d_1thfds4qff7twt8j40smxldrge54sam7py2htaps6cxl278ukmgpekm
 
+		// Two Resources pool created:
+		// - ee7c5dd26b5f70e0d990a1e86ea5d6ce94464d5e1c7724a64082518023313d70
+		// - pool_tdx_d_1ch8fq2yvwsctvfxevn6wxq7htl9yf2gxh9l0efcvzu2dn4sdcgkqxn
+		// - resource_tdx_d_1t4r8h77z2hg09lewjl7dql5vcp3hz6879cd2zpsg5x3sct9034eujr
+
 		let stakeUnitCandidates = rawFungibleResources.filter {
 			$0.explicitMetadata?.validator != nil
 		}
@@ -421,6 +429,20 @@ extension AccountPortfoliosClient {
 				return nil
 			}
 
+			let validatorStakeUnitCandidate = stakeUnitCandidates.first {
+				$0.explicitMetadata?.validator?.address == item.address
+			}
+
+			guard let validatorStakeUnitCandidate else { // having a stake unit is required
+				assertionFailure("No stake unit could be matched for the validator declared stake unit address, possibly wrong implementation")
+				return nil
+			}
+
+			guard validatorDetails.stakeUnitResourceAddress == validatorStakeUnitCandidate.resourceAddress else {
+				assertionFailure("Bad stake unit candidate, not declared by the validator")
+				return nil
+			}
+
 			// xrd balance
 			guard let xrdResource = item
 				.fungibleResources?
@@ -438,20 +460,6 @@ extension AccountPortfoliosClient {
 				.first(where: { $0.vaultAddress == validatorDetails.stakeXRDVaultAddress })?.amount
 			else {
 				assertionFailure("Validtor XRD Resource didn't contain the \(validatorDetails.stakeXRDVaultAddress) vault ")
-				return nil
-			}
-
-			let validatorStakeUnitCandidate = stakeUnitCandidates.first {
-				$0.explicitMetadata?.validator?.address == item.address
-			}
-
-			guard let validatorStakeUnitCandidate else { // having a stake unit is required
-				assertionFailure("No stake unit could be matched for the validator declared stake unit address, possibly wrong implementation")
-				return nil
-			}
-
-			guard validatorDetails.stakeUnitResourceAddress == validatorStakeUnitCandidate.resourceAddress else {
-				assertionFailure("Bad stake unit candidate, not declared by the validator")
 				return nil
 			}
 
@@ -486,7 +494,59 @@ extension AccountPortfoliosClient {
 			return .init(validator: validator, stakeUnitResource: stakeUnitFungibleResource, stakeClaimResource: stakeClaimNft)
 		}
 
-		return .init(radixNetworkStakes: stakeUnits, poolUnits: [])
+		let poolUnits = try await poolUnitDetails.items.asyncCompactMap { item -> AccountPortfolio.PoolUnitResources.PoolUnit? in
+			guard let poolAddress = try? ResourcePoolAddress(validatingAddress: item.address) else {
+				return nil
+			}
+
+			// create pool unit
+			guard let poolUnitResourceAddress = item.explicitMetadata?.poolUnitResource else {
+				assertionFailure("Pool Unit does not contain the pool unit resource address")
+				return nil
+			}
+
+			let poolUnitResourceCandidate = poolUnitCandidates.first {
+				$0.explicitMetadata?.pool == poolAddress
+			}
+
+			guard let poolUnitResourceCandidate else {
+				assertionFailure("No pool unit could candidate be matched for the pool unit declared pool unit address, possibly wrong implementation")
+				return nil
+			}
+
+			guard poolUnitResourceCandidate.resourceAddress == poolUnitResourceAddress.address else {
+				assertionFailure("Bad stake pool unit address candidate, not declared by the pool unit")
+				return nil
+			}
+
+			guard let poolUnitResources = item.fungibleResources else {
+				assertionFailure("Empty Pool Unit!!!")
+				return nil
+			}
+
+			let allFungibleResources = try await {
+				guard let nextPageCursor = poolUnitResources.nextCursor else {
+					return poolUnitResources.items
+				}
+
+				let additionalItems = try await fetchAllPaginatedItems(
+					cursor: PageCursor(ledgerState: ledgerState, nextPageCursor: nextPageCursor),
+					fetchAccountFungibleResourcePage(poolAddress.address)
+				)
+
+				return poolUnitResources.items + additionalItems
+			}()
+
+			let resources = try await createFungibleResources(rawItems: allFungibleResources, ledgerState: ledgerState)
+			let poolUnitResource = try await createFungibleResource(poolUnitResourceCandidate, ledgerState: ledgerState)
+			return .init(
+				pool: .init(address: poolAddress, name: item.explicitMetadata?.name, description: item.explicitMetadata?.description, iconURL: item.explicitMetadata?.iconURL),
+				poolUnitResource: poolUnitResource,
+				poolResources: resources
+			)
+		}
+
+		return .init(radixNetworkStakes: stakeUnits, poolUnits: poolUnits)
 	}
 }
 

@@ -159,8 +159,12 @@ public struct AssetsView: Sendable, FeatureReducer {
 
 			state.fungibleTokenList = .init(xrdToken: xrd, nonXrdTokens: .init(uniqueElements: nonXrd))
 			state.nonFungibleTokenList = .init(rows: .init(uniqueElements: nfts))
+
 			if !portfolio.poolUnitResources.radixNetworkStakes.isEmpty {
-				state.poolUnitsList = .init(lsuResource: .init(stakes: portfolio.poolUnitResources.radixNetworkStakes))
+				state.poolUnitsList = .init(
+					lsuResource: .init(stakes: portfolio.poolUnitResources.radixNetworkStakes),
+					lpTokens: .init(uncheckedUniqueElements: portfolio.poolUnitResources.poolUnits.map { .init(poolUnit: $0) })
+				)
 			}
 			return .none
 		}

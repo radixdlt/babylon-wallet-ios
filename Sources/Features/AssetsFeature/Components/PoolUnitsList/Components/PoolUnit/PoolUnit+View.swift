@@ -3,7 +3,7 @@ import FeaturePrelude
 // MARK: - PoolUnit.View
 extension PoolUnit {
 	public struct ViewState: Equatable {
-		let iconURL: URL
+		let iconURL: URL?
 		let name: String
 		let resources: NonEmpty<IdentifiedArrayOf<PoolUnitResourceViewState>>
 	}
@@ -56,23 +56,14 @@ extension PoolUnit {
 
 extension PoolUnit.State {
 	var viewState: PoolUnit.ViewState {
-		.init(
-			iconURL: .init(string: "https://i.ibb.co/KG06168/Screenshot-2023-08-02-at-16-19-29.png")!,
-			name: "Some LP Token",
-			resources: .init(
-				rawValue: [
-					.init(
-						thumbnail: .xrd,
-						symbol: "XRD",
-						tokenAmount: "2.0129822"
-					),
-					.init(
-						thumbnail: .known(.init(string: "https://i.ibb.co/KG06168/Screenshot-2023-08-02-at-16-19-29.png")!),
-						symbol: "WTF",
-						tokenAmount: "32.6129822"
-					),
-				]
-			)!
+		let allResources = [poolUnit.poolResources.xrdResource!] + poolUnit.poolResources.nonXrdResources
+
+		return .init(
+			iconURL: poolUnit.pool.iconURL,
+			name: poolUnit.pool.name ?? "Unknown",
+			resources: .init(rawValue: .init(uniqueElements: allResources.map {
+				PoolUnitResourceViewState(thumbnail: .known($0.iconURL), symbol: $0.symbol!, tokenAmount: $0.amount.format())
+			}))!
 		)
 	}
 }

@@ -157,6 +157,24 @@ extension GatewayAPI.EntityMetadataCollection {
 		}
 	}
 
+	public var poolUnitResource: ResourceAddress? {
+		guard let poolUnit = items[.poolUnit] else {
+			return nil
+		}
+
+		guard let poolUnitAddress = poolUnit.asGlobalAddress else {
+			assertionFailure("pool unit found, but it was not wrapped as global address")
+			return nil
+		}
+
+		do {
+			return try ResourceAddress(validatingAddress: poolUnitAddress)
+		} catch {
+			assertionFailure(error.localizedDescription)
+			return nil
+		}
+	}
+
 	public enum AccountType: String {
 		case dappDefinition = "dapp definition"
 	}
@@ -197,13 +215,12 @@ public enum EntityMetadataKey: String, CaseIterable {
 	case dappDefinition = "dapp_definition"
 	case validator
 	case pool
+	case poolUnit = "pool_unit"
 	case dappDefinitions = "dapp_definitions"
 	case claimedEntities = "claimed_entities"
 	case claimedWebsites = "claimed_websites"
 	case relatedWebsites = "related_websites"
 	case accountType = "account_type"
-	case poolUnit = "pool_unit"
-	case claimNFT = "claim_nft"
 	case ownerKeys = "owner_keys"
 }
 

@@ -137,9 +137,9 @@ extension AccountPortfolio {
 
 	public struct PoolUnitResources: Sendable, Hashable, Codable {
 		public let radixNetworkStakes: [RadixNetworkStake]
-		public let poolUnits: [String]
+		public let poolUnits: [PoolUnit]
 
-		public init(radixNetworkStakes: [RadixNetworkStake], poolUnits: [String]) {
+		public init(radixNetworkStakes: [RadixNetworkStake], poolUnits: [PoolUnit]) {
 			self.radixNetworkStakes = radixNetworkStakes
 			self.poolUnits = poolUnits
 		}
@@ -159,6 +159,41 @@ extension AccountPortfolio {
 
 // MARK: - AccountPortfolio.PoolUnitResources.RadixNetworkStake
 extension AccountPortfolio.PoolUnitResources {
+	public struct PoolUnit: Sendable, Hashable, Codable {
+		public struct Pool: Sendable, Hashable, Codable {
+			public let address: ResourcePoolAddress
+			public let name: String?
+			public let description: String?
+			public let iconURL: URL?
+
+			public init(
+				address: ResourcePoolAddress,
+				name: String?,
+				description: String?,
+				iconURL: URL?
+			) {
+				self.address = address
+				self.name = name
+				self.description = description
+				self.iconURL = iconURL
+			}
+		}
+
+		public let pool: Pool
+		public let poolUnitResource: AccountPortfolio.FungibleResource
+		public let poolResources: AccountPortfolio.FungibleResources
+
+		public init(
+			pool: Pool,
+			poolUnitResource: AccountPortfolio.FungibleResource,
+			poolResources: AccountPortfolio.FungibleResources
+		) {
+			self.pool = pool
+			self.poolUnitResource = poolUnitResource
+			self.poolResources = poolResources
+		}
+	}
+
 	public struct RadixNetworkStake: Sendable, Hashable, Codable {
 		public struct Validator: Sendable, Hashable, Codable {
 			public let address: ValidatorAddress

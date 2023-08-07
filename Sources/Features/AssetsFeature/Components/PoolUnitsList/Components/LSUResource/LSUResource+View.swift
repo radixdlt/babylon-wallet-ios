@@ -157,7 +157,7 @@ private struct HeightPreferenceKey: PreferenceKey {
 
 // MARK: - PoolUnitHeaderViewState
 struct PoolUnitHeaderViewState {
-	let iconURL: URL
+	let iconURL: URL?
 	let name: String
 }
 
