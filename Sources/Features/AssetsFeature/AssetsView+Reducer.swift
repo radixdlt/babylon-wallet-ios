@@ -38,6 +38,7 @@ public struct AssetsView: Sendable, FeatureReducer {
 				account: account,
 				fungibleTokenList: .init(),
 				nonFungibleTokenList: .init(rows: []),
+				// FIXME: Rewire
 				poolUnitsList: .preview,
 				mode: mode
 			)

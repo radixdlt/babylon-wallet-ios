@@ -21,19 +21,18 @@ extension PoolUnit {
 				observe: \.viewState,
 				send: PoolUnit.Action.view
 			) { viewStore in
-				VStack(spacing: .medium3 * 2) {
-					makePoolUnitView(
-						viewState: .init(
-							iconURL: viewStore.iconURL,
-							name: viewStore.name
-						)
-					)
-					.padding(.medium3 * -0.25)
+				VStack(spacing: .large2) {
+					PoolUnitHeaderView(viewState: .init(iconURL: viewStore.iconURL)) {
+						Text(viewStore.name)
+							.foregroundColor(.app.gray1)
+							.textStyle(.secondaryHeader)
+					}
+					.padding(.small3 * -1)
 
 					VStack(spacing: 1) {
 						ForEach(
 							viewStore.resources,
-							content: makePoolUnitPoolUnitResourceView
+							content: poolUnitResourceView
 						)
 						.padding(.medium3)
 						.background(.app.white)
@@ -51,10 +50,21 @@ extension PoolUnit {
 				.tokenRowShadow()
 			}
 		}
+
+		private func poolUnitResourceView(
+			viewState: PoolUnitResourceViewState
+		) -> some SwiftUI.View {
+			PoolUnitResourceView(viewState: viewState) {
+				Text(viewState.symbol)
+					.foregroundColor(.app.gray1)
+					.textStyle(.body2HighImportance)
+			}
+		}
 	}
 }
 
 extension PoolUnit.State {
+	// FIXME: Rewire to real State
 	var viewState: PoolUnit.ViewState {
 		.init(
 			iconURL: .init(string: "https://i.ibb.co/KG06168/Screenshot-2023-08-02-at-16-19-29.png")!,

@@ -75,7 +75,7 @@ struct LSUComponentView: View {
 		Text("LIQUID STAKE UNITS")
 			.stakeHeaderStyle
 
-		makeLiquidStakeUnitPoolUnitResourceView(viewState: viewState)
+		poolUnitResourceView(viewState: viewState)
 			.borderAround
 	}
 
@@ -108,6 +108,23 @@ struct LSUComponentView: View {
 			}
 		}
 	}
+
+	private func poolUnitResourceView(
+		viewState: PoolUnitResourceViewState
+	) -> some View {
+		PoolUnitResourceView(viewState: viewState) {
+			VStack(alignment: .leading) {
+				Text(viewState.symbol)
+					.foregroundColor(.app.gray1)
+					.textStyle(.body2HighImportance)
+
+				// FIXME: Localize
+				Text("Staked")
+					.foregroundColor(.app.gray2)
+					.textStyle(.body2HighImportance)
+			}
+		}
+	}
 }
 
 extension View {
@@ -124,69 +141,4 @@ extension View {
 					.padding(.small2 * -1)
 			)
 	}
-}
-
-// MARK: - PoolUnitResourceViewState
-struct PoolUnitResourceViewState: Identifiable, Equatable {
-	var id: String {
-		symbol
-	}
-
-	let thumbnail: TokenThumbnail.Content
-	let symbol: String
-	let tokenAmount: String
-}
-
-// MARK: - PoolUnitResourceView
-struct PoolUnitResourceView<NameView>: View where NameView: View {
-	let viewState: PoolUnitResourceViewState
-	let nameView: NameView
-
-	var body: some View {
-		HStack(spacing: .small1) {
-			TokenThumbnail(
-				viewState.thumbnail,
-				size: .small
-			)
-
-			HStack {
-				nameView
-
-				Spacer()
-
-				Text(viewState.tokenAmount)
-					.foregroundColor(.app.gray1)
-					.textStyle(.secondaryHeader)
-			}
-		}
-	}
-}
-
-func makeLiquidStakeUnitPoolUnitResourceView(
-	viewState: PoolUnitResourceViewState
-) -> some View {
-	PoolUnitResourceView(
-		viewState: viewState,
-		nameView: VStack(alignment: .leading) {
-			Text(viewState.symbol)
-				.foregroundColor(.app.gray1)
-				.textStyle(.body2HighImportance)
-
-			// FIXME: Localize
-			Text("Staked")
-				.foregroundColor(.app.gray2)
-				.textStyle(.body2HighImportance)
-		}
-	)
-}
-
-func makePoolUnitPoolUnitResourceView(
-	viewState: PoolUnitResourceViewState
-) -> some View {
-	PoolUnitResourceView(
-		viewState: viewState,
-		nameView: Text(viewState.symbol)
-			.foregroundColor(.app.gray1)
-			.textStyle(.body2HighImportance)
-	)
 }
