@@ -48,7 +48,19 @@ extension PoolUnit {
 				.background(.app.white)
 				.roundedCorners(radius: .small1)
 				.tokenRowShadow()
+				.onTapGesture {
+					viewStore.send(.didTap)
+				}
 			}
+			.sheet(
+				store: store.scope(
+					state: \.$destination,
+					action: (/Action.child .. PoolUnit.ChildAction.destination).embed
+				),
+				state: /Destinations.State.details,
+				action: Destinations.Action.details,
+				content: { _ in Text("Details") }
+			)
 		}
 
 		private func poolUnitResourceView(
