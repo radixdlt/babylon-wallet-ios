@@ -10,14 +10,14 @@ extension PoolUnitsList.LSUResource.State {
 			name: "Radix Network XRD Stake",
 			components: .init(rawValue: .init(uncheckedUniqueElements: stakes.map { stake in
 				LSUComponentView.ViewState(
-					id: stake.validator.address.address,
+					id: stake.validator.address,
 					title: stake.validator.name ?? "Unknown",
 					imageURL: stake.validator.iconURL ?? .init(string: "https://i.ibb.co/KG06168/Screenshot-2023-08-02-at-16-19-29.png")!,
 					liquidStakeUnit: .init(thumbnail: .xrd, symbol: "XRD", tokenAmount: stake.xrdRedemptionValue.format()),
 					stakeClaimNFTs: .init(rawValue: stake.stakeClaimResource.map { claimNFT in
 						.init(uncheckedUniqueElements: claimNFT.tokens.map { token in
 							LSUComponentView.StakeClaimNFTViewState(
-								id: token.id.asStr(),
+								id: token.id,
 								thumbnail: .xrd,
 								status: token.canBeClaimed ? .readyToClaim : .unstaking,
 								tokenAmount: token.stakeClaimAmount?.format() ?? "0.00"
@@ -61,14 +61,14 @@ extension PoolUnitsList.LSUResource {
 				) {
 					headerView(with: viewStore)
 
-					if viewStore.isExpanded {
-						componentsView(with: viewStore.components.rawValue)
-					}
-
-					cardBehindHeader(
-						isStackExpanded: viewStore.isExpanded,
-						headerHeight: headerHeight
-					)
+//					if viewStore.isExpanded {
+					componentsView(with: viewStore.components.rawValue)
+//					}
+//
+//					cardBehindHeader(
+//						isStackExpanded: viewStore.isExpanded,
+//						headerHeight: headerHeight
+//					)
 				}
 			}
 			.onPreferenceChange(HeightPreferenceKey.self) {

@@ -222,6 +222,23 @@ public enum EntityMetadataKey: String, CaseIterable {
 	case relatedWebsites = "related_websites"
 	case accountType = "account_type"
 	case ownerKeys = "owner_keys"
+
+	// The GW limits the number of metadata keys we can ask for
+	static var maxAllowedKeys = 10
+}
+
+extension [EntityMetadataKey] {
+	public static var resourceMetadataKeys: [EntityMetadataKey] {
+		[.name, .symbol, .description, .iconURL, .validator, .pool, .accountType, .dappDefinition]
+	}
+
+	public static var poolUnitMetadataKeys: [EntityMetadataKey] {
+		resourceMetadataKeys + [.poolUnit]
+	}
+
+	public static var dappMetadataKeys: [EntityMetadataKey] {
+		[.name, .description, .iconURL, .claimedEntities, .claimedWebsites, .relatedWebsites, .dappDefinitions]
+	}
 }
 
 extension [GatewayAPI.EntityMetadataItem] {

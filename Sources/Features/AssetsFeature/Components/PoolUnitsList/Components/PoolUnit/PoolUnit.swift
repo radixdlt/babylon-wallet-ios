@@ -5,7 +5,7 @@ import FeaturePrelude
 public struct PoolUnit: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable, Identifiable {
 		public var id: ResourcePoolAddress {
-			poolUnit.pool.address
+			poolUnit.poolAddress
 		}
 
 		public let poolUnit: AccountPortfolio.PoolUnitResources.PoolUnit

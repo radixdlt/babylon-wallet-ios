@@ -163,7 +163,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 					try await cacheClient.withCaching(
 						cacheEntry: .dAppMetadata(dAppID.address),
 						request: {
-							try await gatewayAPIClient.getEntityMetadata(dAppID.address, [])
+							try await gatewayAPIClient.getEntityMetadata(dAppID.address, .dappMetadataKeys)
 						}
 					)
 				}
@@ -270,7 +270,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 		}
 
 		let result = await TaskResult {
-			let allResourceItems = try await gatewayAPIClient.fetchResourceDetails(claimedEntities, explicitMetadata: [.dappDefinition])
+			let allResourceItems = try await gatewayAPIClient.fetchResourceDetails(claimedEntities, explicitMetadata: .resourceMetadataKeys)
 				.items
 				.filter { $0.metadata.dappDefinition == dAppDefinitionAddress.address }
 				.compactMap(\.resourceDetails)

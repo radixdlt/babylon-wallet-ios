@@ -73,8 +73,6 @@ extension GatewayAPIClient {
 				throw BadHTTPResponseCode(got: httpURLResponse.statusCode)
 			}
 
-			dump(data.prettyPrintedJSONString)
-
 			let response = try jsonDecoder.decode(Response.self, from: data)
 
 			return response
@@ -133,20 +131,24 @@ extension GatewayAPIClient {
 
 		@Sendable
 		func getEntityDetails(_ addresses: [String], explictMetadata: [EntityMetadataKey], ledgerState: GatewayAPI.LedgerState?) async throws -> GatewayAPI.StateEntityDetailsResponse {
-			try await post(
+			assert(explictMetadata.count <= EntityMetadataKey.maxAllowedKeys)
+			return try await post(
 				request: GatewayAPI.StateEntityDetailsRequest(
 					atLedgerState: ledgerState?.selector,
 					optIns: .init(
 						nonFungibleIncludeNfids: true,
-						explicitMetadata: Array(explictMetadata.map(\.rawValue).prefix(10))
+						explicitMetadata: explictMetadata.map(\.rawValue)
 					),
 					addresses: addresses, aggregationLevel: .vault
 				)) { @Sendable base in base.appendingPathComponent("state/entity/details") }
 		}
 
 		@Sendable
-		func getSingleEntityDetails(_ address: String) async throws -> SingleEntityDetailsResponse {
-			let response = try await getEntityDetails([address], explictMetadata: [], ledgerState: nil)
+		func getSingleEntityDetails(
+			_ address: String,
+			explictMetadata: [EntityMetadataKey]
+		) async throws -> SingleEntityDetailsResponse {
+			let response = try await getEntityDetails([address], explictMetadata: explictMetadata, ledgerState: nil)
 			guard let item = response.items.first else {
 				throw EmptyEntityDetailsResponse()
 			}
@@ -176,8 +178,8 @@ extension GatewayAPIClient {
 				return Epoch(rawValue: .init(response.ledgerState.epoch))
 			},
 			getEntityDetails: getEntityDetails,
-			getEntityMetadata: { address, _ in
-				try await getSingleEntityDetails(address).details.metadata
+			getEntityMetadata: { address, explicitMetadata in
+				try await getSingleEntityDetails(address, explictMetadata: explicitMetadata).details.metadata
 			},
 			getEntityFungiblesPage: { request in
 				try await post(

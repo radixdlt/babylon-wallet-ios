@@ -107,7 +107,7 @@ extension AccountPortfoliosClient {
 		_ addresses: [AccountAddress]
 	) async throws -> [AccountPortfolio] {
 		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
-		let details = try await gatewayAPIClient.fetchResourceDetails(addresses.map(\.address), explicitMetadata: EntityMetadataKey.allCases)
+		let details = try await gatewayAPIClient.fetchResourceDetails(addresses.map(\.address), explicitMetadata: .resourceMetadataKeys)
 		return try await details.items.parallelMap {
 			try await createAccountPortfolio($0, ledgerState: details.ledgerState)
 		}
@@ -118,7 +118,7 @@ extension AccountPortfoliosClient {
 		_ accountAddress: AccountAddress
 	) async throws -> AccountPortfolio {
 		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
-		let accountDetails = try await gatewayAPIClient.fetchResourceDetails([accountAddress.address], explicitMetadata: EntityMetadataKey.allCases)
+		let accountDetails = try await gatewayAPIClient.fetchResourceDetails([accountAddress.address], explicitMetadata: .resourceMetadataKeys)
 		guard let accountItem = accountDetails.items.first else {
 			throw EmptyAccountDetails()
 		}
@@ -132,43 +132,10 @@ extension AccountPortfoliosClient {
 		_ rawAccountDetails: GatewayAPI.StateEntityDetailsResponseItem,
 		ledgerState: GatewayAPI.LedgerState
 	) async throws -> AccountPortfolio {
-		// Fetch all fungible resources by requesting additional pages if available
-		let fetchAllFungibleResources = {
-			guard let firstPage = rawAccountDetails.fungibleResources else {
-				return [GatewayAPI.FungibleResourcesCollectionItem]()
-			}
-
-			guard let nextPageCursor = firstPage.nextCursor else {
-				return firstPage.items
-			}
-
-			let additionalItems = try await fetchAllPaginatedItems(
-				cursor: PageCursor(ledgerState: ledgerState, nextPageCursor: nextPageCursor),
-				fetchAccountFungibleResourcePage(rawAccountDetails.address)
-			)
-
-			return firstPage.items + additionalItems
-		}
-
-		// Fetch all non-fungible resources by requesting additional pages if available
-		let fetchAllNonFungibleResources = {
-			guard let firstPage = rawAccountDetails.nonFungibleResources else {
-				return [GatewayAPI.NonFungibleResourcesCollectionItem]()
-			}
-
-			guard let nextPageCursor = firstPage.nextCursor else {
-				return firstPage.items
-			}
-
-			let additionalItems = try await fetchAllPaginatedItems(
-				cursor: PageCursor(ledgerState: ledgerState, nextPageCursor: nextPageCursor),
-				fetchNonFungibleResourcePage(rawAccountDetails.address)
-			)
-
-			return firstPage.items + additionalItems
-		}
-
-		let (rawFungibleResources, rawNonFungibleResources) = try await (fetchAllFungibleResources(), fetchAllNonFungibleResources())
+		let (rawFungibleResources, rawNonFungibleResources) = try await (
+			fetchAllFungibleResources(rawAccountDetails, ledgerState: ledgerState),
+			fetchAllNonFungibleResources(rawAccountDetails, ledgerState: ledgerState)
+		)
 
 		let poolUnitResources = try await createPoolUnitResources(
 			rawAccountDetails.address,
@@ -178,24 +145,25 @@ extension AccountPortfoliosClient {
 		)
 
 		let filteredRawFungibleResources = rawFungibleResources.filter { rawItem in
-			// TODO: Check pool units also
 			!poolUnitResources.radixNetworkStakes.contains {
 				$0.stakeUnitResource.resourceAddress.address == rawItem.resourceAddress
-			} &&
+			}
+				&&
 				!poolUnitResources.poolUnits.contains {
 					$0.poolUnitResource.resourceAddress.address == rawItem.resourceAddress
 				}
 		}
 
 		let filteredRawNonFungibleResources = rawNonFungibleResources.filter { rawItem in
-			// TODO: Check pool units also
 			!poolUnitResources.radixNetworkStakes.contains {
 				$0.stakeClaimResource?.resourceAddress.address == rawItem.resourceAddress
 			}
 		}
 
-		// Build up the resources from the raw items.
-		async let fungibleResources = createFungibleResources(rawItems: filteredRawFungibleResources, ledgerState: ledgerState)
+		async let fungibleResources = createFungibleResources(
+			rawItems: filteredRawFungibleResources,
+			ledgerState: ledgerState
+		)
 		async let nonFungibleResources = createNonFungibleResources(
 			rawAccountDetails.address,
 			rawItems: filteredRawNonFungibleResources,
@@ -224,11 +192,9 @@ extension AccountPortfoliosClient {
 			return .init()
 		}
 
-		let fungibleresources = try await rawItems.asyncMap {
+		return try await rawItems.asyncMap {
 			try await createFungibleResource($0, ledgerState: ledgerState)
-		}
-
-		return await fungibleresources.sorted()
+		}.sorted()
 	}
 
 	@Sendable
@@ -278,15 +244,9 @@ extension AccountPortfoliosClient {
 	) async throws -> AccountPortfolio.NonFungibleResources {
 		// We are interested in vault aggregated items
 		let vaultItems = rawItems.compactMap(\.vault)
-		guard !vaultItems.isEmpty else {
-			return []
-		}
-
-		let nonFungibleResources = try await vaultItems.parallelMap { resource in
+		return try await vaultItems.parallelMap { resource in
 			try await createNonFungibleResource(accountAddress, resource, ledgerState: ledgerState)
-		}
-
-		return nonFungibleResources.sorted()
+		}.sorted()
 	}
 
 	@Sendable
@@ -339,6 +299,7 @@ extension AccountPortfoliosClient {
 				.nonFungibleIds
 				.map { item in
 					let details = item.details
+					let canBeClaimed = UInt64(ledgerState.epoch) >= (details.claimEpoch?.rawValue ?? UInt64.max)
 					return try AccountPortfolio.NonFungibleResource.NonFungibleToken(
 						id: .fromParts(
 							resourceAddress: .init(address: resource.resourceAddress),
@@ -349,8 +310,7 @@ extension AccountPortfoliosClient {
 						keyImageURL: details.keyImageURL,
 						metadata: [],
 						stakeClaimAmount: details.stakeClaim,
-						claimEpoch: details.claimEpoch,
-						canBeClaimed: UInt64(ledgerState.epoch) >= (details.claimEpoch?.rawValue ?? UInt64.max)
+						canBeClaimed: canBeClaimed
 					)
 				}
 
@@ -409,13 +369,13 @@ extension AccountPortfoliosClient {
 
 		let poolUnitDetails = try await gatewayAPIClient.fetchResourceDetails(
 			addressesToValidate,
-			explicitMetadata: EntityMetadataKey.allCases,
+			explicitMetadata: .poolUnitMetadataKeys,
 			ledgerState: ledgerState
 		)
 
 		let stakeUnits = try await poolUnitDetails.items.asyncCompactMap { item -> AccountPortfolio.PoolUnitResources.RadixNetworkStake? in
 			guard let validatorDetails = item.details?.component?.state?.validatorState else {
-				// Consider it not a validtor
+				// Considered as not a validator, return nil
 				return nil
 			}
 
@@ -423,17 +383,19 @@ extension AccountPortfoliosClient {
 				$0.explicitMetadata?.validator?.address == item.address
 			}
 
-			guard let validatorStakeUnitCandidate else { // having a stake unit is required
+			// Check first if there is a candidate referencing the validator
+			guard let validatorStakeUnitCandidate else {
 				assertionFailure("No stake unit could be matched for the validator declared stake unit address, possibly wrong implementation")
 				return nil
 			}
 
+			// Then check that the found candidate is also decalred by the validator
 			guard validatorDetails.stakeUnitResourceAddress == validatorStakeUnitCandidate.resourceAddress else {
 				assertionFailure("Bad stake unit candidate, not declared by the validator")
 				return nil
 			}
 
-			// xrd balance
+			// Get the validator XRD resource
 			guard let xrdResource = item
 				.fungibleResources?
 				.items
@@ -443,6 +405,7 @@ extension AccountPortfoliosClient {
 				return nil
 			}
 
+			// Get the balance of the xrd by matching the vault address
 			guard let xrdStakeVaultBalance = xrdResource
 				.vault?
 				.vaults
@@ -453,6 +416,7 @@ extension AccountPortfoliosClient {
 				return nil
 			}
 
+			// Create validator with the information from the validator resource
 			let validator = try AccountPortfolio.PoolUnitResources.RadixNetworkStake.Validator(
 				address: .init(validatingAddress: item.address),
 				xrdVaultBalance: .init(fromString: xrdStakeVaultBalance),
@@ -461,23 +425,28 @@ extension AccountPortfoliosClient {
 				iconURL: item.explicitMetadata?.iconURL
 			)
 
+			// Create the fungible resource for the stake unit candidate
 			let stakeUnitFungibleResource = try await createFungibleResource(validatorStakeUnitCandidate, ledgerState: ledgerState)
 
+			// Extract the stake claim NFT, which might exist or not
 			let stakeClaimNft: AccountPortfolio.NonFungibleResource? = try await { () -> AccountPortfolio.NonFungibleResource? in
-				let stakeClaimNft = stakeClaimNFTCandidates.first {
+				let stakeClaimNFTCandidate = stakeClaimNFTCandidates.first {
 					$0.explicitMetadata?.validator?.address == item.address
 				}
 
-				guard let stakeClaimNft else {
+				// Check first if there is a candidate referencing the validator
+				guard let stakeClaimNFTCandidate else {
 					return nil
 				}
 
-				guard validatorDetails.unstakeClaimTokenResourceAddress == stakeClaimNft.resourceAddress else {
+				// Then validate that the validator is also referencing the candidate
+				guard validatorDetails.unstakeClaimTokenResourceAddress == stakeClaimNFTCandidate.resourceAddress else {
 					assertionFailure("Bad stake claim nft candidate, not declared by the validator")
 					return nil
 				}
 
-				return try await createNonFungibleResource(accountAddress, stakeClaimNft, ledgerState: ledgerState)
+				// Create the NFT collection. NOTE: This will bring-in all the unstaking and ready to claim nft tokens.
+				return try await createNonFungibleResource(accountAddress, stakeClaimNFTCandidate, ledgerState: ledgerState)
 
 			}()
 
@@ -521,7 +490,7 @@ extension AccountPortfoliosClient {
 
 				let additionalItems = try await fetchAllPaginatedItems(
 					cursor: PageCursor(ledgerState: ledgerState, nextPageCursor: nextPageCursor),
-					fetchAccountFungibleResourcePage(poolAddress.address)
+					fetchFungibleResourcePage(poolAddress.address)
 				)
 
 				return poolUnitResources.items + additionalItems
@@ -529,8 +498,9 @@ extension AccountPortfoliosClient {
 
 			let resources = try await createFungibleResources(rawItems: allFungibleResources, ledgerState: ledgerState)
 			let poolUnitResource = try await createFungibleResource(poolUnitResourceCandidate, ledgerState: ledgerState)
+
 			return .init(
-				pool: .init(address: poolAddress, name: item.explicitMetadata?.name, description: item.explicitMetadata?.description, iconURL: item.explicitMetadata?.iconURL),
+				poolAddress: poolAddress,
 				poolUnitResource: poolUnitResource,
 				poolResources: resources
 			)
@@ -542,8 +512,51 @@ extension AccountPortfoliosClient {
 
 // MARK: - Endpoints
 extension AccountPortfoliosClient {
-	static func fetchAccountFungibleResourcePage(
-		_ accountAddress: String
+	@Sendable
+	static func fetchAllFungibleResources(
+		_ entityDetails: GatewayAPI.StateEntityDetailsResponseItem,
+		ledgerState: GatewayAPI.LedgerState
+	) async throws -> [GatewayAPI.FungibleResourcesCollectionItem] {
+		guard let firstPage = entityDetails.fungibleResources else {
+			return [GatewayAPI.FungibleResourcesCollectionItem]()
+		}
+
+		guard let nextPageCursor = firstPage.nextCursor else {
+			return firstPage.items
+		}
+
+		let additionalItems = try await fetchAllPaginatedItems(
+			cursor: PageCursor(ledgerState: ledgerState, nextPageCursor: nextPageCursor),
+			fetchFungibleResourcePage(entityDetails.address)
+		)
+
+		return firstPage.items + additionalItems
+	}
+
+	// FIXME: Similar function to the above, maybe worth extracting in a single function?
+	@Sendable
+	static func fetchAllNonFungibleResources(
+		_ entityDetails: GatewayAPI.StateEntityDetailsResponseItem,
+		ledgerState: GatewayAPI.LedgerState
+	) async throws -> [GatewayAPI.NonFungibleResourcesCollectionItem] {
+		guard let firstPage = entityDetails.nonFungibleResources else {
+			return [GatewayAPI.NonFungibleResourcesCollectionItem]()
+		}
+
+		guard let nextPageCursor = firstPage.nextCursor else {
+			return firstPage.items
+		}
+
+		let additionalItems = try await fetchAllPaginatedItems(
+			cursor: PageCursor(ledgerState: ledgerState, nextPageCursor: nextPageCursor),
+			fetchNonFungibleResourcePage(entityDetails.address)
+		)
+
+		return firstPage.items + additionalItems
+	}
+
+	static func fetchFungibleResourcePage(
+		_ entityAddress: String
 	) -> @Sendable (PageCursor?) async throws -> PaginatedResourceResponse<GatewayAPI.FungibleResourcesCollectionItem> {
 		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
 
@@ -551,8 +564,8 @@ extension AccountPortfoliosClient {
 			let request = GatewayAPI.StateEntityFungiblesPageRequest(
 				atLedgerState: pageCursor?.ledgerState.selector,
 				cursor: pageCursor?.nextPageCursor,
-				address: accountAddress,
-				aggregationLevel: .global
+				address: entityAddress,
+				aggregationLevel: .vault
 			)
 			let response = try await gatewayAPIClient.getEntityFungiblesPage(request)
 

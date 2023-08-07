@@ -59,10 +59,14 @@ extension PoolUnit.State {
 		let allResources = [poolUnit.poolResources.xrdResource!] + poolUnit.poolResources.nonXrdResources
 
 		return .init(
-			iconURL: poolUnit.pool.iconURL,
-			name: poolUnit.pool.name ?? "Unknown",
+			iconURL: poolUnit.poolUnitResource.iconURL,
+			name: poolUnit.poolUnitResource.name ?? "Unknown",
 			resources: .init(rawValue: .init(uniqueElements: allResources.map {
-				PoolUnitResourceViewState(thumbnail: .known($0.iconURL), symbol: $0.symbol!, tokenAmount: poolUnit.redemptionValue(for: $0).format())
+				PoolUnitResourceViewState(
+					thumbnail: .known($0.iconURL),
+					symbol: $0.symbol ?? $0.name ?? "Unknown",
+					tokenAmount: poolUnit.redemptionValue(for: $0).format()
+				)
 			}))!
 		)
 	}

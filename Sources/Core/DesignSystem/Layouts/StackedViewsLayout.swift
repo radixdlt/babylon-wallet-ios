@@ -45,7 +45,7 @@ public struct StackedViewsLayout: Layout {
 			if isExpanded {
 				return heights.reduce(0.0, +) + spacing * CGFloat(subviews.count - 1)
 			} else {
-				return heights[0] + CGFloat(collapsedViewsCount - 1) * collapsedSpacing
+				return heights[0] + CGFloat(max(collapsedViewsCount - 1, 1)) * collapsedSpacing
 			}
 		}()
 		return .init(width: container.width, height: height)
@@ -72,7 +72,6 @@ public struct StackedViewsLayout: Layout {
 				)
 				offset += subviewSize.height + spacing
 			} else {
-				// The rest of the cards that go over `collapsedViewsCount` will go behind the last card.
 				if index < collapsedViewsCount - 1 {
 					offset += collapsedSpacing
 				}

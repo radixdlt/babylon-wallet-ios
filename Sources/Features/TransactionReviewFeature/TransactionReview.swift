@@ -587,7 +587,7 @@ extension TransactionReview {
 	private func extractProofInfo(_ address: ResourceAddress) async -> ProofEntity {
 		await ProofEntity(
 			id: address,
-			metadata: .init(metadata: try? gatewayAPIClient.getEntityMetadata(address.address, []))
+			metadata: .init(metadata: try? gatewayAPIClient.getEntityMetadata(address.address, .dappMetadataKeys))
 		)
 	}
 
@@ -1044,7 +1044,7 @@ public struct SimpleDappDetails: Sendable, FeatureReducer {
 					try await cacheClient.withCaching(
 						cacheEntry: .dAppMetadata(dAppID.address),
 						request: {
-							try await gatewayAPIClient.getEntityMetadata(dAppID.address, [])
+							try await gatewayAPIClient.getEntityMetadata(dAppID.address, .dappMetadataKeys)
 						}
 					)
 				}
@@ -1092,7 +1092,7 @@ public struct SimpleDappDetails: Sendable, FeatureReducer {
 		}
 
 		let result = await TaskResult {
-			let allResourceItems = try await gatewayAPIClient.fetchResourceDetails(claimedEntities, explicitMetadata: [])
+			let allResourceItems = try await gatewayAPIClient.fetchResourceDetails(claimedEntities, explicitMetadata: .resourceMetadataKeys)
 				.items
 				// FIXME: Uncomment this when when we can rely on dApps conforming to the standards
 				// .filter { $0.metadata.dappDefinition == dAppDefinitionAddress.address }

@@ -106,11 +106,7 @@ extension AccountPortfolio {
 
 			// The claim amount if the it is a stake claim nft
 			public let stakeClaimAmount: BigDecimal?
-			// Epoch when the nft can be claimed
-			public let claimEpoch: Epoch?
-
-			// This is temporarily computed directly when loadingt he resource.
-			// It should be probably optimized to check the resource can be claimed retroactively by checkingt he network Epoch
+			// Indication that stake unit amount can be claimed if it is stake claim nft
 			public let canBeClaimed: Bool
 
 			public init(
@@ -120,7 +116,6 @@ extension AccountPortfolio {
 				keyImageURL: URL?,
 				metadata: [Metadata],
 				stakeClaimAmount: BigDecimal? = nil,
-				claimEpoch: Epoch? = nil,
 				canBeClaimed: Bool = false
 			) {
 				self.id = id
@@ -129,7 +124,6 @@ extension AccountPortfolio {
 				self.keyImageURL = keyImageURL
 				self.metadata = metadata
 				self.stakeClaimAmount = stakeClaimAmount
-				self.claimEpoch = claimEpoch
 				self.canBeClaimed = canBeClaimed
 			}
 		}
@@ -160,35 +154,16 @@ extension AccountPortfolio {
 // MARK: - AccountPortfolio.PoolUnitResources.RadixNetworkStake
 extension AccountPortfolio.PoolUnitResources {
 	public struct PoolUnit: Sendable, Hashable, Codable {
-		public struct Pool: Sendable, Hashable, Codable {
-			public let address: ResourcePoolAddress
-			public let name: String?
-			public let description: String?
-			public let iconURL: URL?
-
-			public init(
-				address: ResourcePoolAddress,
-				name: String?,
-				description: String?,
-				iconURL: URL?
-			) {
-				self.address = address
-				self.name = name
-				self.description = description
-				self.iconURL = iconURL
-			}
-		}
-
-		public let pool: Pool
+		public let poolAddress: ResourcePoolAddress
 		public let poolUnitResource: AccountPortfolio.FungibleResource
 		public let poolResources: AccountPortfolio.FungibleResources
 
 		public init(
-			pool: Pool,
+			poolAddress: ResourcePoolAddress,
 			poolUnitResource: AccountPortfolio.FungibleResource,
 			poolResources: AccountPortfolio.FungibleResources
 		) {
-			self.pool = pool
+			self.poolAddress = poolAddress
 			self.poolUnitResource = poolUnitResource
 			self.poolResources = poolResources
 		}
@@ -316,7 +291,6 @@ extension AccountPortfolio.NonFungibleResource.NonFungibleToken {
 			keyImageURL: container.decodeIfPresent(URL.self, forKey: .keyImageURL),
 			metadata: container.decode([AccountPortfolio.Metadata].self, forKey: .metadata),
 			stakeClaimAmount: container.decodeIfPresent(BigDecimal.self, forKey: .stakeClaimAmount),
-			claimEpoch: container.decodeIfPresent(Epoch.self, forKey: .claimEpoch),
 			canBeClaimed: container.decode(Bool.self, forKey: .canBeClaimed)
 		)
 	}
@@ -329,7 +303,6 @@ extension AccountPortfolio.NonFungibleResource.NonFungibleToken {
 		try container.encodeIfPresent(keyImageURL, forKey: .keyImageURL)
 		try container.encode(metadata, forKey: .metadata)
 		try container.encodeIfPresent(stakeClaimAmount, forKey: .stakeClaimAmount)
-		try container.encodeIfPresent(claimEpoch, forKey: .claimEpoch)
 		try container.encode(canBeClaimed, forKey: .canBeClaimed)
 	}
 }
