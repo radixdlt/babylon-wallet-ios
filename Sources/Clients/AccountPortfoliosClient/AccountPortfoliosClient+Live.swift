@@ -383,16 +383,6 @@ extension AccountPortfoliosClient {
 		rawNonFungibleResources: [GatewayAPI.NonFungibleResourcesCollectionItemVaultAggregated],
 		ledgerState: GatewayAPI.LedgerState
 	) async throws -> AccountPortfolio.PoolUnitResources {
-		// One Resource Pool created:
-		//  - 058959450bc3a7cf2830b4e9a5b968fec987fedb0de8419ab12ceb1964a9a841
-		//  - pool_tdx_d_1cnjvq6kzp3rp7lv0ddpglezmt409nct55hegq5wpd89666nv94zmk9
-		//  - resource_tdx_d_1thfds4qff7twt8j40smxldrge54sam7py2htaps6cxl278ukmgpekm
-
-		// Two Resources pool created:
-		// - ee7c5dd26b5f70e0d990a1e86ea5d6ce94464d5e1c7724a64082518023313d70
-		// - pool_tdx_d_1ch8fq2yvwsctvfxevn6wxq7htl9yf2gxh9l0efcvzu2dn4sdcgkqxn
-		// - resource_tdx_d_1t4r8h77z2hg09lewjl7dql5vcp3hz6879cd2zpsg5x3sct9034eujr
-
 		let stakeUnitCandidates = rawFungibleResources.filter {
 			$0.explicitMetadata?.validator != nil
 		}

@@ -62,7 +62,7 @@ extension PoolUnit.State {
 			iconURL: poolUnit.pool.iconURL,
 			name: poolUnit.pool.name ?? "Unknown",
 			resources: .init(rawValue: .init(uniqueElements: allResources.map {
-				PoolUnitResourceViewState(thumbnail: .known($0.iconURL), symbol: $0.symbol!, tokenAmount: $0.amount.format())
+				PoolUnitResourceViewState(thumbnail: .known($0.iconURL), symbol: $0.symbol!, tokenAmount: poolUnit.redemptionValue(for: $0).format())
 			}))!
 		)
 	}
