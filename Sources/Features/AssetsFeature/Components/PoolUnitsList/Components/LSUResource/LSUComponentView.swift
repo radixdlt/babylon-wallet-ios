@@ -42,7 +42,7 @@ struct LSUComponentView: View {
 		public var id: Int
 
 		let title: String
-		let imageURL: URL
+		let imageURL: URL?
 
 		let liquidStakeUnit: PoolUnitResourceViewState?
 		let stakeClaimNFTs: StakeClaimNFTsViewState?

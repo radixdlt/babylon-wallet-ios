@@ -1,9 +1,8 @@
 import FeaturePrelude
 
 // MARK: - PoolUnitHeaderViewState
-// not here
 struct PoolUnitHeaderViewState {
-	let iconURL: URL
+	let iconURL: URL?
 }
 
 // MARK: - PoolUnitHeaderView
