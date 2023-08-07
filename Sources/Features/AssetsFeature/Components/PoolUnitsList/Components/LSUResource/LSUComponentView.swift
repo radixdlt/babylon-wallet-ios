@@ -14,12 +14,21 @@ extension LSUComponentView {
 		case readyToClaim
 
 		// FIXME: Localize
-		var localized: String {
+		fileprivate var localized: String {
 			switch self {
 			case .unstaking:
 				return "Unstaking"
 			case .readyToClaim:
 				return "Ready to Claim"
+			}
+		}
+
+		fileprivate var foregroundColor: Color {
+			switch self {
+			case .unstaking:
+				return .app.gray2
+			case .readyToClaim:
+				return .app.green1
 			}
 		}
 	}
@@ -42,7 +51,7 @@ struct LSUComponentView: View {
 	let viewState: ViewState
 
 	var body: some View {
-		VStack(alignment: .leading, spacing: .medium2) {
+		VStack(alignment: .leading, spacing: .medium1) {
 			HStack(spacing: .small1) {
 				NFTThumbnail(viewState.imageURL, size: .smallest)
 				Text(viewState.title)
@@ -85,7 +94,7 @@ struct LSUComponentView: View {
 						)
 
 						Text(stakeClaimNFT.status.localized)
-							.foregroundColor(.app.gray2)
+							.foregroundColor(stakeClaimNFT.status.foregroundColor)
 							.textStyle(.body2HighImportance)
 					}
 
