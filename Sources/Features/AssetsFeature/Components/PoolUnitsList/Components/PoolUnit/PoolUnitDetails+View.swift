@@ -17,7 +17,7 @@ extension PoolUnitDetails.State {
 // MARK: - PoolUnitDetails.View
 extension PoolUnitDetails {
 	public struct ViewState: Equatable {
-		let xViewState: XViewState
+		let xViewState: DetailsContainerWithHeaderViewState
 	}
 
 	@MainActor
@@ -34,7 +34,7 @@ extension PoolUnitDetails {
 				observe: \.viewState,
 				send: PoolUnitDetails.Action.view
 			) { viewStore in
-				X(viewState: viewStore.xViewState) {
+				DetailsContainerWithHeader(viewState: viewStore.xViewState) {
 					EmptyView()
 				} closeButtonAction: {
 					viewStore.send(.closeButtonTapped)
