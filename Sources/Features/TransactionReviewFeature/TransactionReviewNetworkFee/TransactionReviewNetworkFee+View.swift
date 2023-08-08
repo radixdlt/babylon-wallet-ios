@@ -31,9 +31,9 @@ extension TransactionReviewNetworkFee {
 							.foregroundColor(.app.gray1)
 					}
 
-					if case .needsFeePayer = viewStore.reviewedTransaction.feePayingIsValid {
+					if case .needsFeePayer = viewStore.reviewedTransaction.feePayingValidation {
 						WarningErrorView(text: "Please select a fee payer for the transaction fee", type: .warning)
-					} else if case .insufficientBalance = viewStore.reviewedTransaction.feePayingIsValid {
+					} else if case .insufficientBalance = viewStore.reviewedTransaction.feePayingValidation {
 						WarningErrorView(text: "Insufficient balance", type: .error)
 					}
 
