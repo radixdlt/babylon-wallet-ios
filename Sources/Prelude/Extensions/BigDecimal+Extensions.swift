@@ -178,3 +178,13 @@ extension BigDecimal {
 		}
 	}
 }
+
+extension BigDecimal {
+	public var clamped: BigDecimal {
+		max(0, self)
+	}
+
+	public func clampedDiff(_ other: BigDecimal) -> BigDecimal {
+		(self - other).clamped
+	}
+}

@@ -224,25 +224,6 @@ public struct FeePayerCandidate: Sendable, Hashable, Identifiable {
 	public var id: ID { account.id }
 }
 
-// MARK: - AddFeeToManifestOutcome
-public enum AddFeeToManifestOutcome: Sendable, Equatable {
-	case includesLockFee(AddFeeToManifestOutcomeIncludesLockFee)
-	case excludesLockFee(AddFeeToManifestOutcomeExcludesLockFee)
-}
-
-// MARK: - AddFeeToManifestOutcomeIncludesLockFee
-public struct AddFeeToManifestOutcomeIncludesLockFee: Sendable, Equatable {
-	public let manifestWithLockFee: TransactionManifest
-	public let feePayerSelectionAmongstCandidates: FeePayerSelectionAmongstCandidates
-}
-
-// MARK: - AddFeeToManifestOutcomeExcludesLockFee
-public struct AddFeeToManifestOutcomeExcludesLockFee: Sendable, Equatable {
-	public let manifestExcludingLockFee: TransactionManifest
-	public let feePayerCandidates: IdentifiedArrayOf<FeePayerCandidate>
-	public let feeNotYetAdded: BigDecimal
-}
-
 // MARK: - TransactionToReview
 public struct TransactionToReview: Sendable, Equatable {
 	public let analyzedManifestToReview: ExecutionAnalysis
@@ -270,8 +251,13 @@ public struct FeePayerSelectionAmongstCandidates: Sendable, Hashable {
 
 // MARK: - TransactionFee
 public struct TransactionFee: Hashable, Sendable {
+	/// FeeSummary after transaction was analyzed
 	let feeSummary: FeeSummary
+
+	/// FeeLocks after transaction was analyzed
 	let feeLocks: FeeLocks
+
+	/// The calculaton mode
 	public var mode: Mode = .normal
 
 	public init(feeSummary: FeeSummary, feeLocks: FeeLocks, mode: Mode) {
@@ -299,23 +285,29 @@ public struct TransactionFee: Hashable, Sendable {
 }
 
 extension TransactionFee {
+	/// NetworkFee that takes into account any locks
 	public var networkFee: BigDecimal {
-		max(feeSummary.networkFee - feeLocks.nonContingentLock, .zero)
+		feeSummary.networkFee.clampedDiff(feeLocks.nonContingentLock)
 	}
 
+	/// RoyaltyFee  that takes into account any locks
 	public var royaltyFee: BigDecimal {
-		let remainingNonContingentLock = max(feeLocks.nonContingentLock - feeSummary.networkFee, .zero)
-		return max(feeSummary.royaltyFee - remainingNonContingentLock, .zero)
+		// nonContingetLock is first subtracted from the network fee, thent he remained from the royaltyFee
+		let remainingNonContingentLock = feeLocks.nonContingentLock.clampedDiff(feeSummary.networkFee)
+		return feeSummary.royaltyFee.clampedDiff(remainingNonContingentLock)
 	}
 
+	/// Calculates the totalFee for the transaction based on the `mode`
 	public var totalFee: TotalFee {
 		switch mode {
 		case .normal:
 			let maxFee = networkFee + royaltyFee
-			let minFee = max(maxFee - feeLocks.contingentLock, .zero)
+			let minFee = maxFee.clampedDiff(feeLocks.contingentLock)
 			return .init(min: minFee, max: maxFee)
 		case let .advanced(advanced):
-			let networkFee = max(advanced.networkAndRoyaltyFee - royaltyFee, .zero)
+			// Tip is calculated based on the networkFee.
+			// Since networkAndRoyaltyFee is a single value, royaltyFee is considered constant. Basically only the networkFee changes when the networkAndRoyaltyFee changes.
+			let networkFee = advanced.networkAndRoyaltyFee.clampedDiff(royaltyFee)
 			let tipAmount = networkFee * (advanced.tipPercentage / 100)
 			let total = advanced.networkAndRoyaltyFee + tipAmount
 			return .init(min: total, max: total)
@@ -333,6 +325,13 @@ extension TransactionFee {
 }
 
 extension TransactionFee {
+	enum PredefinedFeeConstants {
+		/// a 15% margin is added here to make up for the ambiguity of the transaction preview estimate)
+		static let networkFeeMultiplier: BigDecimal = 1.15
+
+		// TODO: Add WalletFees table. Which is yet to be determined.
+	}
+
 	public enum Mode: Hashable, Sendable {
 		case normal
 		case advanced(AdvancedFeeCustomization)
@@ -343,7 +342,7 @@ extension TransactionFee {
 		let royaltyFee: BigDecimal
 
 		public init(networkFee: BigDecimal, royaltyFee: BigDecimal) {
-			self.networkFee = networkFee * 1.15
+			self.networkFee = networkFee * PredefinedFeeConstants.networkFeeMultiplier
 			self.royaltyFee = royaltyFee
 		}
 	}

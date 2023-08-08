@@ -3,6 +3,7 @@ import TransactionClient
 
 extension CustomizeFees.State {
 	var viewState: CustomizeFees.ViewState {
+		// TODO: strings
 		.init(
 			title: transactionFee.mode == .normal ? "Customize Fees" : "Advanced \n Customize Fees",
 			description: transactionFee.mode == .normal ? "Choose what account to pay the transaction fee from, or add a “tip” to speed up your transaction if necessary." : "Fully customize fee payment for this transaction. Not recommended unless you are a developer or advanced user.",
@@ -22,17 +23,17 @@ extension CustomizeFees.State {
 			modeSwitchTitle: {
 				switch transactionFee.mode {
 				case .normal:
-					return "View Advanced Mode" // TODO: strings
+					return "View Advanced Mode"
 				case .advanced:
-					return "View Normal Mode" // TODO: strings
+					return "View Normal Mode"
 				}
 			}(),
 			feePayer: feePayerSelection.selected,
 			noFeePayerText: {
 				if transactionFee.totalFee.lockFee == .zero {
-					return "None required" // TODO: strings
+					return "None required"
 				} else {
-					return "No Account selected" // TODO: strings
+					return "No Account selected"
 				}
 			}(),
 			networkFee: transactionFee.networkFee,
@@ -41,7 +42,7 @@ extension CustomizeFees.State {
 			insufficientBalanceMessage: {
 				if let feePayer = feePayerSelection.selected {
 					if feePayer.xrdBalance < transactionFee.totalFee.lockFee {
-						return "Insufficient balance to pay the transaction fee" // TODO: strings
+						return "Insufficient balance to pay the transaction fee"
 					}
 				}
 				return nil
@@ -82,16 +83,7 @@ extension CustomizeFees {
 					ScrollView {
 						VStack(spacing: .zero) {
 							VStack {
-								Text(viewStore.title)
-									.textStyle(.sheetTitle)
-									.foregroundColor(.app.gray1)
-									.padding(.bottom, .small1)
-									.multilineTextAlignment(.center)
-								Text(viewStore.description)
-									.textStyle(.body1Regular)
-									.foregroundColor(.app.gray1)
-									.multilineTextAlignment(.center)
-									.padding(.bottom, .medium2)
+								infoView(viewStore)
 								Divider()
 
 								feePayerView(viewStore)
@@ -125,6 +117,22 @@ extension CustomizeFees {
 			)
 		}
 
+		func infoView(_ viewStore: ViewStoreOf<CustomizeFees>) -> some SwiftUI.View {
+			VStack {
+				Text(viewStore.title)
+					.textStyle(.sheetTitle)
+					.foregroundColor(.app.gray1)
+					.padding(.bottom, .small1)
+					.multilineTextAlignment(.center)
+				Text(viewStore.description)
+					.textStyle(.body1Regular)
+					.foregroundColor(.app.gray1)
+					.multilineTextAlignment(.center)
+					.padding(.bottom, .medium2)
+			}
+		}
+
+		@ViewBuilder
 		func feePayerView(_ viewStore: ViewStoreOf<CustomizeFees>) -> some SwiftUI.View {
 			VStack(alignment: .leading) {
 				HStack {

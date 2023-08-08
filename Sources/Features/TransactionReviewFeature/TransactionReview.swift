@@ -481,13 +481,8 @@ public struct TransactionReview: Sendable, FeatureReducer {
 	}
 
 	func transactionManifestWithWalletInstructionsAdded(_ state: State) throws -> TransactionManifest {
-		guard let networkFee = state.networkFee else {
-			assertionFailure("NetworkFee state was not set")
-			return state.transactionManifest
-		}
-
 		let transactionWithLockFee: TransactionManifest = try {
-			guard let feePayerSelection = state.networkFee?.reviewedTransaction.feePayerSelection,
+			guard let feePayerSelection = state.reviewedTransaction?.feePayerSelection,
 			      let feePayer = feePayerSelection.selected
 			else {
 				return state.transactionManifest
@@ -1360,7 +1355,7 @@ enum FeeValidationOutcome {
 }
 
 extension ReviewedTransaction {
-	var feePayingIsValid: FeeValidationOutcome {
+	var feePayingValidation: FeeValidationOutcome {
 		switch transaction {
 		case .nonConforming:
 			return feePayerSelection.validate
