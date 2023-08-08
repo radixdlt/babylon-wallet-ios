@@ -4,7 +4,6 @@ extension PoolUnitsList.LSUResource {
 	public struct ViewState: Sendable, Equatable {
 		let isExpanded: Bool
 		let iconURL: URL?
-		let name: String
 		let components: NonEmpty<IdentifiedArrayOf<LSUComponentView.ViewState>>
 	}
 
@@ -51,7 +50,8 @@ extension PoolUnitsList.LSUResource {
 		) -> some SwiftUI.View {
 			PoolUnitHeaderView(viewState: .init(iconURL: viewStore.iconURL)) {
 				VStack(alignment: .leading) {
-					Text(viewStore.name)
+					// FIXME: Localize
+					Text("Radix Network XRD Stake")
 						.foregroundColor(.app.gray1)
 						.textStyle(.secondaryHeader)
 
@@ -134,7 +134,6 @@ extension PoolUnitsList.LSUResource.State {
 		.init(
 			isExpanded: isExpanded,
 			iconURL: .init(string: "https://i.ibb.co/KG06168/Screenshot-2023-08-02-at-16-19-29.png")!,
-			name: "Radix Network XRD Stake",
 			components: .init(
 				[
 					.init(
