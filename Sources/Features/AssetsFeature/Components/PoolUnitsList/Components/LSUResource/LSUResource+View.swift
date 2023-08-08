@@ -3,7 +3,7 @@ import FeaturePrelude
 extension PoolUnitsList.LSUResource {
 	public struct ViewState: Sendable, Equatable {
 		let isExpanded: Bool
-		let iconURL: URL
+		let iconURL: URL?
 		let name: String
 		let components: NonEmpty<IdentifiedArrayOf<LSUComponentView.ViewState>>
 	}

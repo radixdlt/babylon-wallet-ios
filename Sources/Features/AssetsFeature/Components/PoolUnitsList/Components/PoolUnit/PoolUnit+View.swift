@@ -3,7 +3,7 @@ import FeaturePrelude
 // MARK: - PoolUnit.View
 extension PoolUnit {
 	public struct ViewState: Equatable {
-		let iconURL: URL
+		let iconURL: URL?
 		let name: String
 		let resources: NonEmpty<IdentifiedArrayOf<PoolUnitResourceViewState>>
 	}
