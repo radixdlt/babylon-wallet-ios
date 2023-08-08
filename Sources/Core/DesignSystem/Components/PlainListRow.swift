@@ -83,7 +83,7 @@ extension View {
 struct PlainListRow_Previews: PreviewProvider {
 	static var previews: some View {
 		PlainListRow(
-			.asset(AssetResource.generalSettings),
+			.asset(AssetResource.appSettings),
 			title: "A title",
 			showChevron: true
 		)

@@ -1,9 +1,9 @@
 import AppPreferencesClient
+import AppSettings
 import AuthorizedDAppsFeature
 import FeaturePrelude
 import GatewayAPI
 import GatewaySettingsFeature
-import GeneralSettings
 import LedgerHardwareDevicesFeature
 import P2PLinksFeature
 import PersonasFeature
@@ -48,7 +48,7 @@ public struct Settings: Sendable, FeatureReducer {
 		case gatewaysButtonTapped
 		case authorizedDappsButtonTapped
 		case personasButtonTapped
-		case generalSettingsButtonTapped
+		case appSettingsButtonTapped
 		case profileBackupsButtonTapped
 		case ledgerHardwareWalletsButtonTapped
 		case mnemonicsButtonTapped
@@ -82,7 +82,7 @@ public struct Settings: Sendable, FeatureReducer {
 			case gatewaySettings(GatewaySettings.State)
 			case authorizedDapps(AuthorizedDapps.State)
 			case personas(PersonasCoordinator.State)
-			case generalSettings(GeneralSettings.State)
+			case appSettings(AppSettings.State)
 			case profileBackups(ProfileBackups.State)
 			case ledgerHardwareWallets(LedgerHardwareDevices.State)
 			case mnemonics(DisplayMnemonics.State)
@@ -100,7 +100,7 @@ public struct Settings: Sendable, FeatureReducer {
 			case gatewaySettings(GatewaySettings.Action)
 			case authorizedDapps(AuthorizedDapps.Action)
 			case personas(PersonasCoordinator.Action)
-			case generalSettings(GeneralSettings.Action)
+			case appSettings(AppSettings.Action)
 			case profileBackups(ProfileBackups.Action)
 			case ledgerHardwareWallets(LedgerHardwareDevices.Action)
 			case mnemonics(DisplayMnemonics.Action)
@@ -126,8 +126,8 @@ public struct Settings: Sendable, FeatureReducer {
 			Scope(state: /State.personas, action: /Action.personas) {
 				PersonasCoordinator()
 			}
-			Scope(state: /State.generalSettings, action: /Action.generalSettings) {
-				GeneralSettings()
+			Scope(state: /State.appSettings, action: /Action.appSettings) {
+				AppSettings()
 			}
 			Scope(state: /State.profileBackups, action: /Action.profileBackups) {
 				ProfileBackups()
@@ -196,8 +196,8 @@ public struct Settings: Sendable, FeatureReducer {
 			state.destination = .personas(.init())
 			return .none
 
-		case .generalSettingsButtonTapped:
-			state.destination = .generalSettings(.init())
+		case .appSettingsButtonTapped:
+			state.destination = .appSettings(.init())
 			return .none
 
 		case .profileBackupsButtonTapped:
@@ -256,7 +256,7 @@ public struct Settings: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
-		case let .destination(.presented(.generalSettings(.delegate(.deleteProfileAndFactorSources(keepInICloudIfPresent))))):
+		case let .destination(.presented(.appSettings(.delegate(.deleteProfileAndFactorSources(keepInICloudIfPresent))))):
 			return .send(.delegate(.deleteProfileAndFactorSources(keepInICloudIfPresent: keepInICloudIfPresent)))
 
 		case .destination(.dismiss):

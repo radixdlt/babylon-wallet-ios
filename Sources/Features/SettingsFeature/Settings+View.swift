@@ -1,8 +1,8 @@
+import AppSettings
 import AuthorizedDAppsFeature
 import FeaturePrelude
 import GatewayAPI
 import GatewaySettingsFeature
-import GeneralSettings
 import LedgerHardwareDevicesFeature
 import P2PLinksFeature
 import PersonasFeature
@@ -85,7 +85,7 @@ extension View {
 			.gatewaySettings(with: destinationStore)
 			.authorizedDapps(with: destinationStore)
 			.personas(with: destinationStore)
-			.generalSettings(with: destinationStore)
+			.appSettings(with: destinationStore)
 			.profileBackups(with: destinationStore)
 			.ledgerHardwareWallets(with: destinationStore)
 			.mnemonics(with: destinationStore)
@@ -138,12 +138,12 @@ extension View {
 	}
 
 	@MainActor
-	private func generalSettings(with destinationStore: PresentationStoreOf<Settings.Destinations>) -> some View {
+	private func appSettings(with destinationStore: PresentationStoreOf<Settings.Destinations>) -> some View {
 		navigationDestination(
 			store: destinationStore,
-			state: /Settings.Destinations.State.generalSettings,
-			action: Settings.Destinations.Action.generalSettings,
-			destination: { GeneralSettings.View(store: $0) }
+			state: /Settings.Destinations.State.appSettings,
+			action: Settings.Destinations.Action.appSettings,
+			destination: { AppSettings.View(store: $0) }
 		)
 	}
 
@@ -311,8 +311,8 @@ extension Settings.View {
 			),
 			.init(
 				title: L10n.Settings.appSettings,
-				icon: .asset(AssetResource.generalSettings),
-				action: .generalSettingsButtonTapped
+				icon: .asset(AssetResource.appSettings),
+				action: .appSettingsButtonTapped
 			),
 			.init(
 				title: L10n.Settings.backups,
@@ -336,7 +336,7 @@ extension Settings.View {
 		models.append(contentsOf: [
 			.init(
 				title: L10n.Settings.importFromLegacyWallet,
-				icon: .asset(AssetResource.generalSettings),
+				icon: .asset(AssetResource.appSettings),
 				action: .importFromOlympiaWalletButtonTapped
 			),
 			.init(

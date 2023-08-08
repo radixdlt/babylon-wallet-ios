@@ -1,7 +1,7 @@
 import FeaturePrelude
 
-extension GeneralSettings.State {
-	var viewState: GeneralSettings.ViewState {
+extension AppSettings.State {
+	var viewState: AppSettings.ViewState {
 		.init(
 			hasLedgerHardwareWalletFactorSources: hasLedgerHardwareWalletFactorSources,
 			useVerboseLedgerDisplayMode: (preferences?.display.ledgerHQHardwareWalletSigningDisplayMode ?? .default) == .verbose,
@@ -11,8 +11,8 @@ extension GeneralSettings.State {
 	}
 }
 
-// MARK: - GeneralSettings.View
-extension GeneralSettings {
+// MARK: - AppSettings.View
+extension AppSettings {
 	public struct ViewState: Equatable {
 		let hasLedgerHardwareWalletFactorSources: Bool
 
@@ -25,9 +25,9 @@ extension GeneralSettings {
 
 	@MainActor
 	public struct View: SwiftUI.View {
-		private let store: StoreOf<GeneralSettings>
+		private let store: StoreOf<AppSettings>
 
-		public init(store: StoreOf<GeneralSettings>) {
+		public init(store: StoreOf<AppSettings>) {
 			self.store = store
 		}
 
@@ -41,12 +41,12 @@ extension GeneralSettings {
 			}
 			.confirmationDialog(
 				store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-				state: /GeneralSettings.Destinations.State.deleteProfileConfirmationDialog,
-				action: GeneralSettings.Destinations.Action.deleteProfileConfirmationDialog
+				state: /AppSettings.Destinations.State.deleteProfileConfirmationDialog,
+				action: AppSettings.Destinations.Action.deleteProfileConfirmationDialog
 			)
 		}
 
-		private func coreView(with viewStore: ViewStoreOf<GeneralSettings>) -> some SwiftUI.View {
+		private func coreView(with viewStore: ViewStoreOf<AppSettings>) -> some SwiftUI.View {
 			VStack(spacing: .zero) {
 				isDeveloperModeEnabled(with: viewStore)
 
@@ -65,7 +65,7 @@ extension GeneralSettings {
 			.padding(.medium3)
 		}
 
-		private func isUsingVerboseLedgerMode(with viewStore: ViewStoreOf<GeneralSettings>) -> some SwiftUI.View {
+		private func isUsingVerboseLedgerMode(with viewStore: ViewStoreOf<AppSettings>) -> some SwiftUI.View {
 			ToggleView(
 				title: L10n.AppSettings.VerboseLedgerMode.title,
 				subtitle: L10n.AppSettings.VerboseLedgerMode.subtitle,
@@ -76,7 +76,7 @@ extension GeneralSettings {
 			)
 		}
 
-		private func isDeveloperModeEnabled(with viewStore: ViewStoreOf<GeneralSettings>) -> some SwiftUI.View {
+		private func isDeveloperModeEnabled(with viewStore: ViewStoreOf<AppSettings>) -> some SwiftUI.View {
 			ToggleView(
 				title: L10n.AppSettings.DeveloperMode.title,
 				subtitle: L10n.AppSettings.DeveloperMode.subtitle,
@@ -87,7 +87,7 @@ extension GeneralSettings {
 			)
 		}
 
-		private func exportLogs(with viewStore: ViewStoreOf<GeneralSettings>) -> some SwiftUI.View {
+		private func exportLogs(with viewStore: ViewStoreOf<AppSettings>) -> some SwiftUI.View {
 			HStack {
 				VStack(alignment: .leading, spacing: 0) {
 					Text("Export Logs")
@@ -117,7 +117,7 @@ extension GeneralSettings {
 			.frame(height: .largeButtonHeight)
 		}
 
-		private func resetWallet(with viewStore: ViewStoreOf<GeneralSettings>) -> some SwiftUI.View {
+		private func resetWallet(with viewStore: ViewStoreOf<AppSettings>) -> some SwiftUI.View {
 			HStack {
 				VStack(alignment: .leading, spacing: 0) {
 					Text(L10n.AppSettings.ResetWallet.title)
@@ -164,19 +164,19 @@ struct ShareView: UIViewControllerRepresentable {
 #if DEBUG
 import SwiftUI // NB: necessary for previews to appear
 
-// MARK: - GeneralSettings_Preview
-struct GeneralSettings_Preview: PreviewProvider {
+// MARK: - AppSettings_Preview
+struct AppSettings_Preview: PreviewProvider {
 	static var previews: some View {
-		GeneralSettings.View(
+		AppSettings.View(
 			store: .init(
 				initialState: .previewValue,
-				reducer: GeneralSettings()
+				reducer: AppSettings()
 			)
 		)
 	}
 }
 
-extension GeneralSettings.State {
+extension AppSettings.State {
 	public static let previewValue = Self()
 }
 #endif
