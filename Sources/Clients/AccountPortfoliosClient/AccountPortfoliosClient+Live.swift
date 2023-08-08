@@ -355,9 +355,36 @@ extension AccountPortfoliosClient {
 			$0.explicitMetadata?.pool != nil
 		}
 
-		let addressesToValidate = stakeUnitCandidates.compactMap(\.explicitMetadata?.validator?.address) + stakeClaimNFTCandidates.compactMap(\.explicitMetadata?.validator?.address) + poolUnitCandidates.compactMap(\.explicitMetadata?.pool?.address)
+		func matchCandidate(
+			for item: GatewayAPI.StateEntityDetailsResponseItem,
+			candidates: [GatewayAPI.FungibleResourcesCollectionItemVaultAggregated],
+			metadataAddressMatch: KeyPath<GatewayAPI.EntityMetadataCollection, String?>
+		) -> GatewayAPI.FungibleResourcesCollectionItemVaultAggregated? {
+			guard let poolUnitResourceAddress = item.explicitMetadata?.poolUnitResource else {
+				assertionFailure("Pool Unit does not contain the pool unit resource address")
+				return nil
+			}
 
-		guard !addressesToValidate.isEmpty else {
+			guard let candidate = candidates.first(where: {
+				$0.explicitMetadata?[keyPath: metadataAddressMatch] == item.address
+			}) else {
+				assertionFailure("No candidated could be matched")
+				return nil
+			}
+
+			guard candidate.resourceAddress == poolUnitResourceAddress.address else {
+				assertionFailure("Bad candidate, not declared by the pool unit")
+				return nil
+			}
+
+			return candidate
+		}
+
+		let stakeAndPoolAddresses = stakeUnitCandidates.compactMap(\.explicitMetadata?.validator?.address) +
+			stakeClaimNFTCandidates.compactMap(\.explicitMetadata?.validator?.address) +
+			poolUnitCandidates.compactMap(\.explicitMetadata?.pool?.address)
+
+		guard !stakeAndPoolAddresses.isEmpty else {
 			return .init(radixNetworkStakes: [], poolUnits: [])
 		}
 
@@ -367,31 +394,22 @@ extension AccountPortfoliosClient {
 		let networkId = await gatewaysClient.getCurrentNetworkID()
 		let xrdAddress = knownAddresses(networkId: networkId.rawValue).resourceAddresses.xrd.addressString()
 
-		let poolUnitDetails = try await gatewayAPIClient.fetchResourceDetails(
-			addressesToValidate,
+		let stakeAndPoolUnitDetails = try await gatewayAPIClient.fetchResourceDetails(
+			stakeAndPoolAddresses,
 			explicitMetadata: .poolUnitMetadataKeys,
 			ledgerState: ledgerState
 		)
 
-		let stakeUnits = try await poolUnitDetails.items.asyncCompactMap { item -> AccountPortfolio.PoolUnitResources.RadixNetworkStake? in
+		let stakeUnits = try await stakeAndPoolUnitDetails.items.asyncCompactMap { item -> AccountPortfolio.PoolUnitResources.RadixNetworkStake? in
 			guard let validatorDetails = item.details?.component?.state?.validatorState else {
 				// Considered as not a validator, return nil
 				return nil
 			}
 
-			let validatorStakeUnitCandidate = stakeUnitCandidates.first {
-				$0.explicitMetadata?.validator?.address == item.address
-			}
+			let validatorStakeUnitCandidate = matchCandidate(for: item, candidates: stakeUnitCandidates, metadataAddressMatch: \.validator?.address)
 
-			// Check first if there is a candidate referencing the validator
 			guard let validatorStakeUnitCandidate else {
-				assertionFailure("No stake unit could be matched for the validator declared stake unit address, possibly wrong implementation")
-				return nil
-			}
-
-			// Then check that the found candidate is also decalred by the validator
-			guard validatorDetails.stakeUnitResourceAddress == validatorStakeUnitCandidate.resourceAddress else {
-				assertionFailure("Bad stake unit candidate, not declared by the validator")
+				assertionFailure("No candidate could be matched with the stake unit")
 				return nil
 			}
 
@@ -453,51 +471,38 @@ extension AccountPortfoliosClient {
 			return .init(validator: validator, stakeUnitResource: stakeUnitFungibleResource, stakeClaimResource: stakeClaimNft)
 		}
 
-		let poolUnits = try await poolUnitDetails.items.asyncCompactMap { item -> AccountPortfolio.PoolUnitResources.PoolUnit? in
+		let poolUnits = try await stakeAndPoolUnitDetails.items.asyncCompactMap { item -> AccountPortfolio.PoolUnitResources.PoolUnit? in
 			guard let poolAddress = try? ResourcePoolAddress(validatingAddress: item.address) else {
 				return nil
 			}
 
-			// create pool unit
-			guard let poolUnitResourceAddress = item.explicitMetadata?.poolUnitResource else {
-				assertionFailure("Pool Unit does not contain the pool unit resource address")
-				return nil
-			}
-
-			let poolUnitResourceCandidate = poolUnitCandidates.first {
-				$0.explicitMetadata?.pool == poolAddress
-			}
+			let poolUnitResourceCandidate = matchCandidate(
+				for: item,
+				candidates: poolUnitCandidates,
+				metadataAddressMatch: \.pool?.address
+			)
 
 			guard let poolUnitResourceCandidate else {
-				assertionFailure("No pool unit could candidate be matched for the pool unit declared pool unit address, possibly wrong implementation")
+				assertionFailure("Pool Unit not matched by any candidate")
 				return nil
 			}
 
-			guard poolUnitResourceCandidate.resourceAddress == poolUnitResourceAddress.address else {
-				assertionFailure("Bad stake pool unit address candidate, not declared by the pool unit")
-				return nil
-			}
+			let allFungibleResources = try await fetchAllFungibleResources(item, ledgerState: ledgerState)
 
-			guard let poolUnitResources = item.fungibleResources else {
+			// 2. A pool should always have resources, there is no zero resources pool.
+			guard !allFungibleResources.isEmpty else {
 				assertionFailure("Empty Pool Unit!!!")
 				return nil
 			}
 
-			let allFungibleResources = try await {
-				guard let nextPageCursor = poolUnitResources.nextCursor else {
-					return poolUnitResources.items
-				}
-
-				let additionalItems = try await fetchAllPaginatedItems(
-					cursor: PageCursor(ledgerState: ledgerState, nextPageCursor: nextPageCursor),
-					fetchFungibleResourcePage(poolAddress.address)
-				)
-
-				return poolUnitResources.items + additionalItems
-			}()
-
-			let resources = try await createFungibleResources(rawItems: allFungibleResources, ledgerState: ledgerState)
-			let poolUnitResource = try await createFungibleResource(poolUnitResourceCandidate, ledgerState: ledgerState)
+			let resources = try await createFungibleResources(
+				rawItems: allFungibleResources,
+				ledgerState: ledgerState
+			)
+			let poolUnitResource = try await createFungibleResource(
+				poolUnitResourceCandidate,
+				ledgerState: ledgerState
+			)
 
 			return .init(
 				poolAddress: poolAddress,

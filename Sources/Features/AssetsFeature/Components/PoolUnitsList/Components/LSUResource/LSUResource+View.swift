@@ -61,14 +61,14 @@ extension PoolUnitsList.LSUResource {
 				) {
 					headerView(with: viewStore)
 
-//					if viewStore.isExpanded {
-					componentsView(with: viewStore.components.rawValue)
-//					}
-//
-//					cardBehindHeader(
-//						isStackExpanded: viewStore.isExpanded,
-//						headerHeight: headerHeight
-//					)
+					if viewStore.isExpanded {
+						componentsView(with: viewStore.components.rawValue)
+					}
+
+					cardBehindHeader(
+						isStackExpanded: viewStore.isExpanded,
+						headerHeight: headerHeight
+					)
 				}
 			}
 			.onPreferenceChange(HeightPreferenceKey.self) {

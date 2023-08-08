@@ -122,57 +122,27 @@ extension GatewayAPI.EntityMetadataCollection {
 	}
 
 	public var validator: ValidatorAddress? {
-		guard let validator = items[.validator] else {
-			return nil
-		}
-
-		guard let validatorAddress = validator.asGlobalAddress else {
-			assertionFailure("validator found, but it was not wrapped as global address")
-			return nil
-		}
-
-		do {
-			return try ValidatorAddress(validatingAddress: validatorAddress)
-		} catch {
-			assertionFailure(error.localizedDescription)
-			return nil
-		}
+		extract(
+			key: .validator,
+			keyPath: \.asGlobalAddress,
+			transform: ValidatorAddress.init(validatingAddress:)
+		)
 	}
 
 	public var pool: ResourcePoolAddress? {
-		guard let pool = items[.pool] else {
-			return nil
-		}
-
-		guard let poolAddress = pool.asGlobalAddress else {
-			assertionFailure("pool found, but it was not wrapped as global address")
-			return nil
-		}
-
-		do {
-			return try ResourcePoolAddress(validatingAddress: poolAddress)
-		} catch {
-			assertionFailure(error.localizedDescription)
-			return nil
-		}
+		extract(
+			key: .pool,
+			keyPath: \.asGlobalAddress,
+			transform: ResourcePoolAddress.init(validatingAddress:)
+		)
 	}
 
 	public var poolUnitResource: ResourceAddress? {
-		guard let poolUnit = items[.poolUnit] else {
-			return nil
-		}
-
-		guard let poolUnitAddress = poolUnit.asGlobalAddress else {
-			assertionFailure("pool unit found, but it was not wrapped as global address")
-			return nil
-		}
-
-		do {
-			return try ResourceAddress(validatingAddress: poolUnitAddress)
-		} catch {
-			assertionFailure(error.localizedDescription)
-			return nil
-		}
+		extract(
+			key: .poolUnit,
+			keyPath: \.asGlobalAddress,
+			transform: ResourceAddress.init(validatingAddress:)
+		)
 	}
 
 	public enum AccountType: String {
@@ -202,6 +172,28 @@ extension GatewayAPI.EntityMetadataCollection {
 			case .dAppDefinitionNotReciprocating:
 				return "This dApp definition does not point back to the dApp definition that claims to be associated with it"
 			}
+		}
+	}
+
+	private func extract<Value, Field>(
+		key: EntityMetadataKey,
+		keyPath: KeyPath<GatewayAPI.EntityMetadataItemValue, Field?>,
+		transform: @escaping (Field) throws -> Value
+	) -> Value? {
+		guard let item = items[key] else {
+			return nil
+		}
+
+		guard let field = item[keyPath: keyPath] else {
+			assertionFailure("item found, but it was not wrapped in the expected field")
+			return nil
+		}
+
+		do {
+			return try transform(field)
+		} catch {
+			assertionFailure(error.localizedDescription)
+			return nil
 		}
 	}
 }
