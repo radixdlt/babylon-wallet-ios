@@ -101,7 +101,7 @@ final class TransactionClientTests: TestCase {
 		let feeSummary = TransactionFee.FeeSummary(networkFee: 10, royaltyFee: 20)
 		let feeLocks = TransactionFee.FeeLocks(nonContingentLock: 0, contingentLock: 0)
 		var transaction = TransactionFee(feeSummary: feeSummary, feeLocks: feeLocks, mode: .normal)
-		transaction.toggleToAdvancedMode()
+		transaction.toggleMode()
 
 		XCTAssertEqual(transaction.totalFee.lockFee, 31.5)
 		XCTAssertEqual(transaction.totalFee.displayedTotalFee, "31.5 XRD")
@@ -111,7 +111,7 @@ final class TransactionClientTests: TestCase {
 		let feeSummary = TransactionFee.FeeSummary(networkFee: 10, royaltyFee: 20)
 		let feeLocks = TransactionFee.FeeLocks(nonContingentLock: 5, contingentLock: 5)
 		var transaction = TransactionFee(feeSummary: feeSummary, feeLocks: feeLocks, mode: .normal)
-		transaction.toggleToAdvancedMode()
+		transaction.toggleMode()
 
 		XCTAssertEqual(transaction.totalFee.lockFee, 26.5)
 		XCTAssertEqual(transaction.totalFee.displayedTotalFee, "26.5 XRD")
@@ -131,7 +131,7 @@ final class TransactionClientTests: TestCase {
 		let feeSummary = TransactionFee.FeeSummary(networkFee: 10, royaltyFee: 20)
 		let feeLocks = TransactionFee.FeeLocks(nonContingentLock: 0, contingentLock: 0)
 		var transaction = TransactionFee(feeSummary: feeSummary, feeLocks: feeLocks, mode: .normal)
-		transaction.mode = .advanced(.init(networkAndRoyaltyFee: 50, tipPercentage: 0.5))
+		transaction.mode = .advanced(.init(networkAndRoyaltyFee: 50, tipPercentage: 50))
 
 		// 50 - royaltyFee(20) = 30
 		// 30 * 0.5 = 15
@@ -144,7 +144,7 @@ final class TransactionClientTests: TestCase {
 		let feeSummary = TransactionFee.FeeSummary(networkFee: 10, royaltyFee: 20)
 		let feeLocks = TransactionFee.FeeLocks(nonContingentLock: 0, contingentLock: 0)
 		var transaction = TransactionFee(feeSummary: feeSummary, feeLocks: feeLocks, mode: .normal)
-		transaction.mode = .advanced(.init(networkAndRoyaltyFee: 25, tipPercentage: 0.5))
+		transaction.mode = .advanced(.init(networkAndRoyaltyFee: 25, tipPercentage: 50))
 
 		// 25 - royaltyFee(20) = 5
 		// 5 * 0.5 = 2.5
@@ -157,20 +157,20 @@ final class TransactionClientTests: TestCase {
 		let feeSummary = TransactionFee.FeeSummary(networkFee: 10, royaltyFee: 20)
 		let feeLocks = TransactionFee.FeeLocks(nonContingentLock: 0, contingentLock: 0)
 		var transaction = TransactionFee(feeSummary: feeSummary, feeLocks: feeLocks, mode: .normal)
-		transaction.mode = .advanced(.init(networkAndRoyaltyFee: 15, tipPercentage: 0.5))
+		transaction.mode = .advanced(.init(networkAndRoyaltyFee: 15, tipPercentage: 50))
 
-		// 15 - royaltyFee(20) = 15 ?? Ignore royalty fee and use the whole amount as network fee
-		// 15 * 0.5 = 7.5
-		// 15 + 7.5 = 22.5
-		XCTAssertEqual(transaction.totalFee.lockFee, 22.5)
-		XCTAssertEqual(transaction.totalFee.displayedTotalFee, "22.5 XRD")
+		// 15 - royaltyFee(20) = 0 ?? Ignore royalty fee and use the whole amount as network fee
+		// 0 * 0.5 = 0.0
+		// 15 + 0.0= 22.5
+		XCTAssertEqual(transaction.totalFee.lockFee, 15)
+		XCTAssertEqual(transaction.totalFee.displayedTotalFee, "15 XRD")
 	}
 
 	func testAdvancedModeEdited_5() {
 		let feeSummary = TransactionFee.FeeSummary(networkFee: 10, royaltyFee: 20)
 		let feeLocks = TransactionFee.FeeLocks(nonContingentLock: 26.5, contingentLock: 10)
 		var transaction = TransactionFee(feeSummary: feeSummary, feeLocks: feeLocks, mode: .normal)
-		transaction.mode = .advanced(.init(networkAndRoyaltyFee: 25, tipPercentage: 0.5))
+		transaction.mode = .advanced(.init(networkAndRoyaltyFee: 25, tipPercentage: 50))
 
 		// 25 - royaltyFee(5) = 20
 		// 20 * 0.5 = 10
