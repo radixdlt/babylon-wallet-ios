@@ -15,6 +15,7 @@
 "account_tokens" = "Tokens";
 "account_nfts" = "NFTs";
 "account_poolUnits" = "Pool Units";
+"account_poolUnits_lsuResourceHeader" = "Radix Network XRD Stake";
 "account_poolUnits_unstaking" = "Unstaking";
 "account_poolUnits_readyToClaim" = "Ready to Claim";
 "account_poolUnits_liquidStakeUnits" = "LIQUID STAKE UNITS";
