@@ -72,46 +72,48 @@ extension CustomizeFees {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-				ScrollView {
-					VStack(spacing: .zero) {
-						HStack {
-							CloseButton {
-								viewStore.send(.closed)
+				VStack(spacing: .zero) {
+					HStack {
+						CloseButton {
+							viewStore.send(.closed)
+						}
+						Spacer()
+					}
+					ScrollView {
+						VStack(spacing: .zero) {
+							VStack {
+								Text(viewStore.title)
+									.textStyle(.sheetTitle)
+									.foregroundColor(.app.gray1)
+									.padding(.bottom, .small1)
+									.multilineTextAlignment(.center)
+								Text(viewStore.description)
+									.textStyle(.body1Regular)
+									.foregroundColor(.app.gray1)
+									.multilineTextAlignment(.center)
+									.padding(.bottom, .medium2)
+								Divider()
+
+								feePayerView(viewStore)
+									.padding(.top, .small1)
 							}
-							Spacer()
-						}
-						VStack {
-							Text(viewStore.title)
-								.textStyle(.sheetTitle)
-								.foregroundColor(.app.gray1)
-								.padding(.bottom, .small1)
-								.multilineTextAlignment(.center)
-							Text(viewStore.description)
-								.textStyle(.body1Regular)
-								.foregroundColor(.app.gray1)
-								.multilineTextAlignment(.center)
-								.padding(.bottom, .medium2)
-							Divider()
+							.padding([.horizontal, .bottom], .medium1)
 
-							feePayerView(viewStore)
-								.padding(.top, .small1)
+							if viewStore.isNormalMode {
+								normalModeFeesBreakdownView(viewStore)
+							} else {
+								advancedModeBreakdownView(viewStore)
+							}
 						}
-						.padding([.horizontal, .bottom], .medium1)
+						.padding(.vertical, .medium3)
 
-						if viewStore.isNormalMode {
-							normalModeFeesBreakdownView(viewStore)
-						} else {
-							advancedModeBreakdownView(viewStore)
+						Button(viewStore.modeSwitchTitle) {
+							viewStore.send(.toggleMode)
 						}
+						.textStyle(.body1StandaloneLink)
+						.foregroundColor(.app.blue2)
+						.padding(.bottom, .medium1)
 					}
-					.padding(.vertical, .medium3)
-
-					Button(viewStore.modeSwitchTitle) {
-						viewStore.send(.toggleMode)
-					}
-					.textStyle(.body1StandaloneLink)
-					.foregroundColor(.app.blue2)
-					.padding(.bottom, .medium1)
 				}
 				.background(.app.background)
 			}

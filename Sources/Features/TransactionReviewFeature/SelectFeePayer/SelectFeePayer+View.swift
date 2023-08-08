@@ -31,39 +31,39 @@ extension SelectFeePayer {
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				VStack {
-					VStack {
-						Text("Select Fee Payer Account")
-							.textStyle(.sheetTitle)
-							.foregroundColor(.app.gray1)
-							.padding(.top, .medium3)
-							.padding(.horizontal, .medium1)
-							.padding(.bottom, .small2)
+					Text("Select Fee Payer Account")
+						.textStyle(.sheetTitle)
+						.foregroundColor(.app.gray1)
+						.padding(.top, .medium3)
+						.padding(.horizontal, .medium1)
+						.padding(.bottom, .small2)
+						.multilineTextAlignment(.center)
 
-						Text("Please select an Account with enough XRD to pay \(viewStore.fee) fee for this transaction.")
-							.textStyle(.body1HighImportance)
-							.foregroundColor(.app.gray2)
-							.padding(.horizontal, .large3)
-							.padding(.bottom, .small1)
+					Text("Please select an Account with enough XRD to pay \(viewStore.fee) fee for this transaction.")
+						.textStyle(.body1HighImportance)
+						.foregroundColor(.app.gray2)
+						.padding(.horizontal, .large3)
+						.padding(.bottom, .small1)
+						.multilineTextAlignment(.center)
 
-						ScrollView {
-							VStack(spacing: .small1) {
-								Selection(
-									viewStore.binding(
-										get: \.selectedPayer,
-										send: { .selectedPayer($0) }
-									),
-									from: viewStore.candidates
-								) { item in
-									SelectAccountToPayForFeeRow.View(
-										viewState: .init(candidate: item.value),
-										isSelected: item.isSelected,
-										action: item.action
-									)
-								}
+					ScrollView {
+						VStack(spacing: .small1) {
+							Selection(
+								viewStore.binding(
+									get: \.selectedPayer,
+									send: { .selectedPayer($0) }
+								),
+								from: viewStore.candidates
+							) { item in
+								SelectAccountToPayForFeeRow.View(
+									viewState: .init(candidate: item.value),
+									isSelected: item.isSelected,
+									action: item.action
+								)
 							}
-							.padding(.horizontal, .medium1)
-							.padding(.bottom, .medium2)
 						}
+						.padding(.horizontal, .medium1)
+						.padding(.bottom, .medium2)
 					}
 				}
 				.footer {
@@ -71,7 +71,7 @@ extension SelectFeePayer {
 						viewStore.selectedPayer,
 						forAction: { viewStore.send(.confirmedFeePayer($0)) }
 					) { action in
-						Button("Select Account", action: action)
+						Button(L10n.TransactionReview.SelectFeePayer.selectAccount, action: action)
 							.buttonStyle(.primaryRectangular)
 					}
 				}
@@ -83,15 +83,11 @@ extension SelectFeePayer {
 // MARK: - SelectAccountToPayForFeeRow
 enum SelectAccountToPayForFeeRow {
 	struct ViewState: Equatable {
-		let appearanceID: Profile.Network.Account.AppearanceID
-		let accountName: String
-		let accountAddress: AccountAddress
+		let account: Profile.Network.Account
 		let xrdBalance: BigDecimal
 
 		init(candidate: FeePayerCandidate) {
-			appearanceID = candidate.account.appearanceID
-			accountName = candidate.account.displayName.rawValue
-			accountAddress = candidate.account.address
+			account = candidate.account
 			xrdBalance = candidate.xrdBalance
 		}
 	}
@@ -104,33 +100,19 @@ enum SelectAccountToPayForFeeRow {
 
 		var body: some SwiftUI.View {
 			Button(action: action) {
-				HStack {
-					VStack(alignment: .leading, spacing: .medium3) {
-						Text(viewState.accountName)
-							.foregroundColor(.app.white)
-							.textStyle(.body1Header)
-
-						AddressView(.address(.account(viewState.accountAddress)), isTappable: false)
-							.foregroundColor(.app.whiteTransparent)
-							.textStyle(.body2HighImportance)
-						Text("Balance \(viewState.xrdBalance.format(maxPlaces: 2)) XRD")
-							.foregroundColor(.app.white)
-							.textStyle(.body1Header)
+				Card {
+					VStack(spacing: 0) {
+						SmallAccountCard(account: viewState.account)
+						HStack {
+							TokenBalanceView(viewState: .init(thumbnail: .xrd, name: "XRD", balance: viewState.xrdBalance))
+							RadioButton(
+								appearance: .dark,
+								state: isSelected ? .selected : .unselected
+							)
+						}
+						.padding(.medium3)
 					}
-
-					Spacer()
-
-					RadioButton(
-						appearance: .light,
-						state: isSelected ? .selected : .unselected
-					)
 				}
-				.padding(.medium1)
-				.background(
-					viewState.appearanceID.gradient
-						.brightness(isSelected ? -0.1 : 0)
-				)
-				.cornerRadius(.small1)
 			}
 			.buttonStyle(.inert)
 		}
