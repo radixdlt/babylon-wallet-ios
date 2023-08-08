@@ -28,16 +28,16 @@ public struct Main: Sendable, FeatureReducer {
 
 	public struct Destinations: Sendable, ReducerProtocol {
 		public enum State: Sendable, Hashable {
-			case settings(AppSettings.State)
+			case settings(Settings.State)
 		}
 
 		public enum Action: Sendable, Equatable {
-			case settings(AppSettings.Action)
+			case settings(Settings.Action)
 		}
 
 		public var body: some ReducerProtocolOf<Self> {
 			Scope(state: /State.settings, action: /Action.settings) {
-				AppSettings()
+				Settings()
 			}
 		}
 	}

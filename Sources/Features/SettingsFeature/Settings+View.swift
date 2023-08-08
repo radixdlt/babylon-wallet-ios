@@ -15,8 +15,8 @@ import SecureStorageClient
 import SecurityStructureConfigurationListFeature
 #endif
 
-// MARK: - AppSettings.View
-extension AppSettings {
+// MARK: - Settings.View
+extension Settings {
 	@MainActor
 	public struct View: SwiftUI.View {
 		private let store: Store
@@ -33,7 +33,7 @@ extension AppSettings {
 		let shouldShowAddP2PLinkButton: Bool
 		let appVersion: String
 
-		init(state: AppSettings.State) {
+		init(state: Settings.State) {
 			#if DEBUG
 			let retCommitHash: String = buildInformation().version
 			self.debugAppInfo = "RET #\(retCommitHash), SS \(RadixConnectConstants.defaultSignalingServer.absoluteString)"
@@ -46,7 +46,7 @@ extension AppSettings {
 	}
 }
 
-extension AppSettings.View {
+extension Settings.View {
 	public var body: some View {
 		WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 			let destinationStore = store.scope(state: \.$destination, action: { .child(.destination($0)) })
@@ -67,8 +67,8 @@ extension AppSettings.View {
 
 // MARK: - Extensions
 
-extension AppSettings.State {
-	var viewState: AppSettings.ViewState {
+extension Settings.State {
+	var viewState: Settings.ViewState {
 		.init(state: self)
 	}
 }
@@ -79,7 +79,7 @@ extension View {
 	//
 	// Maybe the new result builder performance improvements in Swift 5.8 will correct this.
 	@MainActor
-	fileprivate func navigationDestinations(with destinationStore: PresentationStoreOf<AppSettings.Destinations>) -> some View {
+	fileprivate func navigationDestinations(with destinationStore: PresentationStoreOf<Settings.Destinations>) -> some View {
 		self
 			.manageP2PLinks(with: destinationStore)
 			.gatewaySettings(with: destinationStore)
@@ -98,71 +98,71 @@ extension View {
 	}
 
 	@MainActor
-	private func manageP2PLinks(with destinationStore: PresentationStoreOf<AppSettings.Destinations>) -> some View {
+	private func manageP2PLinks(with destinationStore: PresentationStoreOf<Settings.Destinations>) -> some View {
 		navigationDestination(
 			store: destinationStore,
-			state: /AppSettings.Destinations.State.manageP2PLinks,
-			action: AppSettings.Destinations.Action.manageP2PLinks,
+			state: /Settings.Destinations.State.manageP2PLinks,
+			action: Settings.Destinations.Action.manageP2PLinks,
 			destination: { P2PLinksFeature.View(store: $0) }
 		)
 	}
 
 	@MainActor
-	private func gatewaySettings(with destinationStore: PresentationStoreOf<AppSettings.Destinations>) -> some View {
+	private func gatewaySettings(with destinationStore: PresentationStoreOf<Settings.Destinations>) -> some View {
 		navigationDestination(
 			store: destinationStore,
-			state: /AppSettings.Destinations.State.gatewaySettings,
-			action: AppSettings.Destinations.Action.gatewaySettings,
+			state: /Settings.Destinations.State.gatewaySettings,
+			action: Settings.Destinations.Action.gatewaySettings,
 			destination: { GatewaySettings.View(store: $0) }
 		)
 	}
 
 	@MainActor
-	private func authorizedDapps(with destinationStore: PresentationStoreOf<AppSettings.Destinations>) -> some View {
+	private func authorizedDapps(with destinationStore: PresentationStoreOf<Settings.Destinations>) -> some View {
 		navigationDestination(
 			store: destinationStore,
-			state: /AppSettings.Destinations.State.authorizedDapps,
-			action: AppSettings.Destinations.Action.authorizedDapps,
+			state: /Settings.Destinations.State.authorizedDapps,
+			action: Settings.Destinations.Action.authorizedDapps,
 			destination: { AuthorizedDapps.View(store: $0) }
 		)
 	}
 
 	@MainActor
-	private func personas(with destinationStore: PresentationStoreOf<AppSettings.Destinations>) -> some View {
+	private func personas(with destinationStore: PresentationStoreOf<Settings.Destinations>) -> some View {
 		navigationDestination(
 			store: destinationStore,
-			state: /AppSettings.Destinations.State.personas,
-			action: AppSettings.Destinations.Action.personas,
+			state: /Settings.Destinations.State.personas,
+			action: Settings.Destinations.Action.personas,
 			destination: { PersonasCoordinator.View(store: $0) }
 		)
 	}
 
 	@MainActor
-	private func generalSettings(with destinationStore: PresentationStoreOf<AppSettings.Destinations>) -> some View {
+	private func generalSettings(with destinationStore: PresentationStoreOf<Settings.Destinations>) -> some View {
 		navigationDestination(
 			store: destinationStore,
-			state: /AppSettings.Destinations.State.generalSettings,
-			action: AppSettings.Destinations.Action.generalSettings,
+			state: /Settings.Destinations.State.generalSettings,
+			action: Settings.Destinations.Action.generalSettings,
 			destination: { GeneralSettings.View(store: $0) }
 		)
 	}
 
 	@MainActor
-	private func profileBackups(with destinationStore: PresentationStoreOf<AppSettings.Destinations>) -> some View {
+	private func profileBackups(with destinationStore: PresentationStoreOf<Settings.Destinations>) -> some View {
 		navigationDestination(
 			store: destinationStore,
-			state: /AppSettings.Destinations.State.profileBackups,
-			action: AppSettings.Destinations.Action.profileBackups,
+			state: /Settings.Destinations.State.profileBackups,
+			action: Settings.Destinations.Action.profileBackups,
 			destination: { ProfileBackups.View(store: $0) }
 		)
 	}
 
 	@MainActor
-	private func ledgerHardwareWallets(with destinationStore: PresentationStoreOf<AppSettings.Destinations>) -> some View {
+	private func ledgerHardwareWallets(with destinationStore: PresentationStoreOf<Settings.Destinations>) -> some View {
 		navigationDestination(
 			store: destinationStore,
-			state: /AppSettings.Destinations.State.ledgerHardwareWallets,
-			action: AppSettings.Destinations.Action.ledgerHardwareWallets,
+			state: /Settings.Destinations.State.ledgerHardwareWallets,
+			action: Settings.Destinations.Action.ledgerHardwareWallets,
 			destination: {
 				LedgerHardwareDevices.View(store: $0)
 					.background(.app.gray5)
@@ -173,58 +173,58 @@ extension View {
 	}
 
 	@MainActor
-	private func mnemonics(with destinationStore: PresentationStoreOf<AppSettings.Destinations>) -> some View {
+	private func mnemonics(with destinationStore: PresentationStoreOf<Settings.Destinations>) -> some View {
 		navigationDestination(
 			store: destinationStore,
-			state: /AppSettings.Destinations.State.mnemonics,
-			action: AppSettings.Destinations.Action.mnemonics,
+			state: /Settings.Destinations.State.mnemonics,
+			action: Settings.Destinations.Action.mnemonics,
 			destination: { DisplayMnemonics.View(store: $0) }
 		)
 	}
 
 	#if DEBUG
 	@MainActor
-	private func importFromOlympiaLegacyWallet(with destinationStore: PresentationStoreOf<AppSettings.Destinations>) -> some View {
+	private func importFromOlympiaLegacyWallet(with destinationStore: PresentationStoreOf<Settings.Destinations>) -> some View {
 		sheet(
 			store: destinationStore,
-			state: /AppSettings.Destinations.State.importOlympiaWalletCoordinator,
-			action: AppSettings.Destinations.Action.importOlympiaWalletCoordinator,
+			state: /Settings.Destinations.State.importOlympiaWalletCoordinator,
+			action: Settings.Destinations.Action.importOlympiaWalletCoordinator,
 			content: { ImportOlympiaWalletCoordinator.View(store: $0) }
 		)
 	}
 
 	@MainActor
 	private func factorSources(
-		with destinationStore: PresentationStoreOf<AppSettings.Destinations>
+		with destinationStore: PresentationStoreOf<Settings.Destinations>
 	) -> some View {
 		navigationDestination(
 			store: destinationStore,
-			state: /AppSettings.Destinations.State.debugManageFactorSources,
-			action: AppSettings.Destinations.Action.debugManageFactorSources,
+			state: /Settings.Destinations.State.debugManageFactorSources,
+			action: Settings.Destinations.Action.debugManageFactorSources,
 			destination: { ManageFactorSources.View(store: $0) }
 		)
 	}
 
 	@MainActor
 	private func debugInspectProfile(
-		with destinationStore: PresentationStoreOf<AppSettings.Destinations>
+		with destinationStore: PresentationStoreOf<Settings.Destinations>
 	) -> some View {
 		navigationDestination(
 			store: destinationStore,
-			state: /AppSettings.Destinations.State.debugInspectProfile,
-			action: AppSettings.Destinations.Action.debugInspectProfile,
+			state: /Settings.Destinations.State.debugInspectProfile,
+			action: Settings.Destinations.Action.debugInspectProfile,
 			destination: { DebugInspectProfile.View(store: $0) }
 		)
 	}
 
 	@MainActor
 	private func securityStructureConfigs(
-		with destinationStore: PresentationStoreOf<AppSettings.Destinations>
+		with destinationStore: PresentationStoreOf<Settings.Destinations>
 	) -> some View {
 		navigationDestination(
 			store: destinationStore,
-			state: /AppSettings.Destinations.State.securityStructureConfigs,
-			action: AppSettings.Destinations.Action.securityStructureConfigs,
+			state: /Settings.Destinations.State.securityStructureConfigs,
+			action: Settings.Destinations.Action.securityStructureConfigs,
 			destination: { SecurityStructureConfigurationListCoordinator.View(store: $0) }
 		)
 	}
@@ -233,18 +233,18 @@ extension View {
 
 // MARK: - SettingsRowModel
 
-extension AppSettings.View {
+extension Settings.View {
 	struct RowModel: Identifiable {
 		var id: String { title }
 
 		let title: String
 		var subtitle: String?
 		let icon: AssetIcon.Content
-		let action: AppSettings.ViewAction
+		let action: Settings.ViewAction
 	}
 
 	@MainActor
-	private func settingsView(viewStore: ViewStoreOf<AppSettings>) -> some View {
+	private func settingsView(viewStore: ViewStoreOf<Settings>) -> some View {
 		VStack(spacing: .zero) {
 			ScrollView {
 				VStack(spacing: .zero) {
@@ -364,10 +364,10 @@ import SwiftUI // NB: necessary for previews to appear
 
 struct SettingsView_Previews: PreviewProvider {
 	static var previews: some View {
-		AppSettings.View(
+		Settings.View(
 			store: .init(
 				initialState: .init(),
-				reducer: AppSettings()
+				reducer: Settings()
 			)
 		)
 	}

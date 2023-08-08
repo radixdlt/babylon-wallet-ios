@@ -14,8 +14,8 @@ import DebugInspectProfileFeature
 import SecurityStructureConfigurationListFeature
 #endif // DEBUG
 
-// MARK: - AppSettings
-public struct AppSettings: Sendable, FeatureReducer {
+// MARK: - Settings
+public struct Settings: Sendable, FeatureReducer {
 	@Dependency(\.appPreferencesClient) var appPreferencesClient
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.p2pLinksClient) var p2pLinksClient
@@ -287,7 +287,7 @@ public struct AppSettings: Sendable, FeatureReducer {
 }
 
 // MARK: Private
-extension AppSettings {
+extension Settings {
 	fileprivate func loadP2PLinks() -> EffectTask<Action> {
 		.task {
 			await .internal(.loadP2PLinksResult(
