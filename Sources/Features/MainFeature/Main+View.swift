@@ -29,7 +29,7 @@ extension Main {
 					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
 					state: /Main.Destinations.State.settings,
 					action: Main.Destinations.Action.settings,
-					destination: { AppSettings.View(store: $0) }
+					destination: { Settings.View(store: $0) }
 				)
 				#endif
 			}

@@ -1,7 +1,7 @@
 @testable import SettingsFeature
 import TestingPrelude
 
-final class AppSettingsViewStateTests: TestCase {
+final class SettingsViewStateTests: TestCase {
 	func testAppVersion() {
 		withDependencies {
 			$0.bundleInfo = .init(
@@ -13,7 +13,7 @@ final class AppSettingsViewStateTests: TestCase {
 				version: "42"
 			)
 		} operation: {
-			let sut = AppSettings.ViewState(state: .init())
+			let sut = Settings.ViewState(state: .init())
 			XCTAssertEqual(sut.appVersion, "Version: 4.2.0 build #42")
 		}
 	}
