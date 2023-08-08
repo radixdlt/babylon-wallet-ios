@@ -34,7 +34,7 @@ extension PoolUnitDetails {
 				observe: \.viewState,
 				send: PoolUnitDetails.Action.view
 			) { viewStore in
-				DetailsContainerWithHeader(viewState: viewStore.xViewState) {
+				DetailsContainerWithHeaderView(viewState: viewStore.xViewState) {
 					EmptyView()
 				} closeButtonAction: {
 					viewStore.send(.closeButtonTapped)

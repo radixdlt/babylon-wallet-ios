@@ -34,7 +34,7 @@ extension FungibleTokenDetails {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-				DetailsContainerWithHeader(viewState: viewStore.xViewState) {
+				DetailsContainerWithHeaderView(viewState: viewStore.xViewState) {
 					details(with: viewStore)
 				} closeButtonAction: {
 					viewStore.send(.closeButtonTapped)

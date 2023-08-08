@@ -9,8 +9,8 @@ struct DetailsContainerWithHeaderViewState: Equatable {
 	let symbol: String?
 }
 
-// MARK: - DetailsContainerWithHeader
-struct DetailsContainerWithHeader<DetailsView>: View where DetailsView: View {
+// MARK: - DetailsContainerWithHeaderView
+struct DetailsContainerWithHeaderView<DetailsView>: View where DetailsView: View {
 	let viewState: DetailsContainerWithHeaderViewState
 	let closeButtonAction: () -> Void
 	let detailsView: DetailsView
