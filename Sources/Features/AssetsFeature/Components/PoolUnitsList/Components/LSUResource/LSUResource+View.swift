@@ -3,7 +3,7 @@ import FeaturePrelude
 extension PoolUnitsList.LSUResource {
 	public struct ViewState: Sendable, Equatable {
 		let isExpanded: Bool
-		let iconURL: URL
+		let iconURL: URL?
 		let name: String
 		let components: NonEmpty<IdentifiedArrayOf<LSUComponentView.ViewState>>
 	}
@@ -138,7 +138,7 @@ extension PoolUnitsList.LSUResource.State {
 				LSUComponentView.ViewState(
 					id: stake.validator.address,
 					title: stake.validator.name ?? "Unknown",
-					imageURL: stake.validator.iconURL ?? .init(string: "https://i.ibb.co/KG06168/Screenshot-2023-08-02-at-16-19-29.png")!,
+					imageURL: stake.validator.iconURL,
 					liquidStakeUnit: stake.xrdRedemptionValue.map { .init(thumbnail: .xrd, symbol: "XRD", tokenAmount: $0.format()) },
 					stakeClaimNFTs: .init(rawValue: stake.stakeClaimResource.map { claimNFT in
 						.init(uncheckedUniqueElements: claimNFT.tokens.map { token in
