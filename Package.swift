@@ -225,7 +225,7 @@ package.addModules([
 		tests: .yes()
 	),
 	.feature(
-		name: "GeneralSettings",
+		name: "AppSettings",
 		dependencies: [
 			"CacheClient",
 			"AppPreferencesClient",
@@ -390,7 +390,7 @@ package.addModules([
 			"GatewayAPI",
 			"GatewaySettingsFeature",
 			"ImportMnemonicFeature",
-			"GeneralSettings",
+			"AppSettings",
 			"ImportLegacyWalletClient",
 			"P2PLinksFeature",
 			"PersonasFeature",

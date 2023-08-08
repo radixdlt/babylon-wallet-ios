@@ -5,8 +5,8 @@ import FeaturePrelude
 import Logging
 import RadixConnectClient
 
-// MARK: - GeneralSettings
-public struct GeneralSettings: Sendable, FeatureReducer {
+// MARK: - AppSettings
+public struct AppSettings: Sendable, FeatureReducer {
 	// MARK: State
 
 	public struct State: Sendable, Hashable {
@@ -167,7 +167,7 @@ public struct GeneralSettings: Sendable, FeatureReducer {
 	}
 }
 
-extension ConfirmationDialogState<GeneralSettings.Destinations.Action.DeleteProfileConfirmationDialogAction> {
+extension ConfirmationDialogState<AppSettings.Destinations.Action.DeleteProfileConfirmationDialogAction> {
 	static let deleteProfileConfirmationDialog = ConfirmationDialogState {
 		TextState(L10n.AppSettings.ResetWalletDialog.title)
 	} actions: {
