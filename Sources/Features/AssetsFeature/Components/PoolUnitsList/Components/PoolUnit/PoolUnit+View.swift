@@ -66,18 +66,26 @@ extension PoolUnit {
 extension PoolUnit.State {
 	// FIXME: Rewire to real State
 	var viewState: PoolUnit.ViewState {
-		let allResources = [poolUnit.poolResources.xrdResource!] + poolUnit.poolResources.nonXrdResources
+		let xrdResourceViewState = poolUnit.poolResources.xrdResource.map {
+			[PoolUnitResourceViewState(
+				thumbnail: .xrd,
+				symbol: "XRD",
+				tokenAmount: poolUnit.redemptionValue(for: $0).format()
+			)]
+		} ?? []
+
+		let allResourceViewStates = xrdResourceViewState + poolUnit.poolResources.nonXrdResources.map {
+			PoolUnitResourceViewState(
+				thumbnail: .known($0.iconURL),
+				symbol: $0.symbol ?? $0.name ?? "Unknown",
+				tokenAmount: poolUnit.redemptionValue(for: $0).format()
+			)
+		}
 
 		return .init(
 			iconURL: poolUnit.poolUnitResource.iconURL,
 			name: poolUnit.poolUnitResource.name ?? "Unknown",
-			resources: .init(rawValue: .init(uniqueElements: allResources.map {
-				PoolUnitResourceViewState(
-					thumbnail: .known($0.iconURL),
-					symbol: $0.symbol ?? $0.name ?? "Unknown",
-					tokenAmount: poolUnit.redemptionValue(for: $0).format()
-				)
-			}))!
+			resources: .init(rawValue: .init(uniqueElements: allResourceViewStates))! // Safe to unwrap, guaranteed to not be empty
 		)
 	}
 }
