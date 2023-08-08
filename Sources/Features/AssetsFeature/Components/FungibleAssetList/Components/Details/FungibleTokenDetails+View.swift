@@ -4,12 +4,14 @@ import FeaturePrelude
 extension FungibleTokenDetails.State {
 	var viewState: FungibleTokenDetails.ViewState {
 		.init(
-			displayName: resource.name ?? "",
 			resourceAddress: resource.resourceAddress,
-			thumbnail: isXRD ? .xrd : .known(resource.iconURL),
-			amount: resource.amount.format(),
-			symbol: resource.symbol,
-			description: resource.description
+			description: resource.description,
+			xViewState: .init(
+				displayName: resource.name ?? "",
+				thumbnail: isXRD ? .xrd : .known(resource.iconURL),
+				amount: resource.amount.format(),
+				symbol: resource.symbol
+			)
 		)
 	}
 }
@@ -17,12 +19,9 @@ extension FungibleTokenDetails.State {
 // MARK: - FungibleTokenDetails.View
 extension FungibleTokenDetails {
 	public struct ViewState: Equatable {
-		let displayName: String
 		let resourceAddress: ResourceAddress
-		let thumbnail: TokenThumbnail.Content
-		let amount: String
-		let symbol: String?
 		let description: String?
+		let xViewState: XViewState
 	}
 
 	@MainActor
@@ -35,40 +34,12 @@ extension FungibleTokenDetails {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-				NavigationStack {
-					ScrollView {
-						header(with: viewStore)
-						details(with: viewStore)
-					}
-					#if os(iOS)
-					.navigationBarTitle(viewStore.displayName)
-					.navigationBarTitleColor(.app.gray1)
-					.navigationBarTitleDisplayMode(.inline)
-					.navigationBarInlineTitleFont(.app.secondaryHeader)
-					.toolbar {
-						ToolbarItem(placement: .primaryAction) {
-							CloseButton {
-								viewStore.send(.closeButtonTapped)
-							}
-						}
-					}
-					#endif
-				}
-				.tint(.app.gray1)
-				.foregroundColor(.app.gray1)
-			}
-		}
-
-		@ViewBuilder
-		private func header(with viewStore: ViewStoreOf<FungibleTokenDetails>) -> some SwiftUI.View {
-			VStack(spacing: .medium3) {
-				TokenThumbnail(viewStore.thumbnail, size: .veryLarge)
-				if let symbol = viewStore.symbol {
-					Text(viewStore.amount).font(.app.sheetTitle).kerning(-0.5) +
-						Text(" " + symbol).font(.app.sectionHeader)
+				X(viewState: viewStore.xViewState) {
+					details(with: viewStore)
+				} closeButtonAction: {
+					viewStore.send(.closeButtonTapped)
 				}
 			}
-			.padding(.top, .small2)
 		}
 
 		@ViewBuilder
@@ -121,3 +92,65 @@ struct FungibleTokenDetails_Preview: PreviewProvider {
 	}
 }
 #endif
+
+// MARK: - XViewState
+struct XViewState: Equatable {
+	let displayName: String
+	let thumbnail: TokenThumbnail.Content
+	let amount: String
+	let symbol: String?
+}
+
+// MARK: - X
+struct X<DetailsView>: View where DetailsView: View {
+	let viewState: XViewState
+	let closeButtonAction: () -> Void
+	let detailsView: DetailsView
+
+	init(
+		viewState: XViewState,
+		@ViewBuilder detailsView: () -> DetailsView,
+		closeButtonAction: @escaping () -> Void
+	) {
+		self.viewState = viewState
+		self.detailsView = detailsView()
+		self.closeButtonAction = closeButtonAction
+	}
+
+	var body: some View {
+		NavigationStack {
+			ScrollView {
+				header(with: viewState)
+				detailsView
+			}
+			#if os(iOS)
+			.navigationBarTitle(viewState.displayName)
+			.navigationBarTitleColor(.app.gray1)
+			.navigationBarTitleDisplayMode(.inline)
+			.navigationBarInlineTitleFont(.app.secondaryHeader)
+			.toolbar {
+				ToolbarItem(placement: .primaryAction) {
+					CloseButton(action: closeButtonAction)
+				}
+			}
+			#endif
+		}
+		.tint(.app.gray1)
+		.foregroundColor(.app.gray1)
+	}
+
+	@ViewBuilder
+	private func header(with viewState: XViewState) -> some SwiftUI.View {
+		VStack(spacing: .medium3) {
+			TokenThumbnail(viewState.thumbnail, size: .veryLarge)
+			if let symbol = viewState.symbol {
+				Text(viewState.amount)
+					.font(.app.sheetTitle)
+					.kerning(-0.5)
+					+ Text(" " + symbol)
+					.font(.app.sectionHeader)
+			}
+		}
+		.padding(.top, .small2)
+	}
+}
