@@ -200,14 +200,17 @@ extension AccountPortfolio.PoolUnitResources {
 		}
 
 		public let validator: Validator
-		public let stakeUnitResource: AccountPortfolio.FungibleResource
+		public let stakeUnitResource: AccountPortfolio.FungibleResource?
 		public let stakeClaimResource: AccountPortfolio.NonFungibleResource?
 
-		public var xrdRedemptionValue: BigDecimal {
-			(stakeUnitResource.amount * validator.xrdVaultBalance) / (stakeUnitResource.totalSupply ?? .one)
+		public var xrdRedemptionValue: BigDecimal? {
+			guard let stakeUnitResource else {
+				return nil
+			}
+			return (stakeUnitResource.amount * validator.xrdVaultBalance) / (stakeUnitResource.totalSupply ?? .one)
 		}
 
-		public init(validator: Validator, stakeUnitResource: AccountPortfolio.FungibleResource, stakeClaimResource: AccountPortfolio.NonFungibleResource?) {
+		public init(validator: Validator, stakeUnitResource: AccountPortfolio.FungibleResource?, stakeClaimResource: AccountPortfolio.NonFungibleResource?) {
 			self.validator = validator
 			self.stakeUnitResource = stakeUnitResource
 			self.stakeClaimResource = stakeClaimResource

@@ -146,7 +146,7 @@ extension AccountPortfoliosClient {
 
 		let filteredRawFungibleResources = rawFungibleResources.filter { rawItem in
 			!poolUnitResources.radixNetworkStakes.contains {
-				$0.stakeUnitResource.resourceAddress.address == rawItem.resourceAddress
+				$0.stakeUnitResource?.resourceAddress.address == rawItem.resourceAddress
 			}
 				&&
 				!poolUnitResources.poolUnits.contains {
@@ -368,12 +368,12 @@ extension AccountPortfoliosClient {
 			guard let candidate = candidates.first(where: {
 				$0.explicitMetadata?[keyPath: metadataAddressMatch] == item.address
 			}) else {
-				assertionFailure("No candidated could be matched")
+				// assertionFailure("No candidated could be matched")
 				return nil
 			}
 
 			guard candidate.resourceAddress == poolUnitResourceAddress.address else {
-				assertionFailure("Bad candidate, not declared by the pool unit")
+				// assertionFailure("Bad candidate, not declared by the pool unit")
 				return nil
 			}
 
@@ -403,13 +403,6 @@ extension AccountPortfoliosClient {
 		let stakeUnits = try await stakeAndPoolUnitDetails.items.asyncCompactMap { item -> AccountPortfolio.PoolUnitResources.RadixNetworkStake? in
 			guard let validatorDetails = item.details?.component?.state?.validatorState else {
 				// Considered as not a validator, return nil
-				return nil
-			}
-
-			let validatorStakeUnitCandidate = matchCandidate(for: item, candidates: stakeUnitCandidates, metadataAddressMatch: \.validator?.address)
-
-			guard let validatorStakeUnitCandidate else {
-				assertionFailure("No candidate could be matched with the stake unit")
 				return nil
 			}
 
@@ -443,8 +436,15 @@ extension AccountPortfoliosClient {
 				iconURL: item.explicitMetadata?.iconURL
 			)
 
-			// Create the fungible resource for the stake unit candidate
-			let stakeUnitFungibleResource = try await createFungibleResource(validatorStakeUnitCandidate, ledgerState: ledgerState)
+			let stakeUnitFungibleResource: AccountPortfolio.FungibleResource? = try await { () -> AccountPortfolio.FungibleResource? in
+				let validatorStakeUnitCandidate = matchCandidate(for: item, candidates: stakeUnitCandidates, metadataAddressMatch: \.validator?.address)
+
+				guard let validatorStakeUnitCandidate else {
+					return nil
+				}
+
+				return try await createFungibleResource(validatorStakeUnitCandidate, ledgerState: ledgerState)
+			}()
 
 			// Extract the stake claim NFT, which might exist or not
 			let stakeClaimNft: AccountPortfolio.NonFungibleResource? = try await { () -> AccountPortfolio.NonFungibleResource? in
@@ -464,11 +464,16 @@ extension AccountPortfoliosClient {
 				}
 
 				// Create the NFT collection. NOTE: This will bring-in all the unstaking and ready to claim nft tokens.
-				return try await createNonFungibleResource(accountAddress, stakeClaimNFTCandidate, ledgerState: ledgerState)
+				return try await createNonFungibleResource(accountAddress, stakeClaimNFTCandidate, ledgerState: ledgerState).nonEmpty
 
 			}()
 
-			return .init(validator: validator, stakeUnitResource: stakeUnitFungibleResource, stakeClaimResource: stakeClaimNft)
+			// Either stakeUnit is present or stakeClaimNft
+			if stakeUnitFungibleResource != nil || stakeClaimNft != nil {
+				return .init(validator: validator, stakeUnitResource: stakeUnitFungibleResource, stakeClaimResource: stakeClaimNft)
+			}
+
+			return nil
 		}
 
 		let poolUnits = try await stakeAndPoolUnitDetails.items.asyncCompactMap { item -> AccountPortfolio.PoolUnitResources.PoolUnit? in

@@ -15,12 +15,21 @@ extension LSUComponentView {
 		case readyToClaim
 
 		// FIXME: Localize
-		var localized: String {
+		fileprivate var localized: String {
 			switch self {
 			case .unstaking:
 				return "Unstaking"
 			case .readyToClaim:
 				return "Ready to Claim"
+			}
+		}
+
+		fileprivate var foregroundColor: Color {
+			switch self {
+			case .unstaking:
+				return .app.gray2
+			case .readyToClaim:
+				return .app.green1
 			}
 		}
 	}
@@ -34,7 +43,7 @@ struct LSUComponentView: View {
 		public var id: ValidatorAddress
 
 		let title: String
-		let imageURL: URL
+		let imageURL: URL?
 
 		let liquidStakeUnit: PoolUnitResourceViewState?
 		let stakeClaimNFTs: StakeClaimNFTsViewState?
@@ -43,7 +52,7 @@ struct LSUComponentView: View {
 	let viewState: ViewState
 
 	var body: some View {
-		VStack(alignment: .leading, spacing: .medium2) {
+		VStack(alignment: .leading, spacing: .medium1) {
 			HStack(spacing: .small1) {
 				TokenThumbnail(.known(viewState.imageURL), size: .smallest)
 				Text(viewState.title)
@@ -67,8 +76,19 @@ struct LSUComponentView: View {
 		Text("LIQUID STAKE UNITS")
 			.stakeHeaderStyle
 
-		makeLiquidStakeUnitPoolUnitResourceView(viewState: viewState)
-			.borderAround
+		PoolUnitResourceView(viewState: viewState) {
+			VStack(alignment: .leading) {
+				Text(viewState.symbol)
+					.foregroundColor(.app.gray1)
+					.textStyle(.body2HighImportance)
+
+				// FIXME: Localize
+				Text("Staked")
+					.foregroundColor(.app.gray2)
+					.textStyle(.body2HighImportance)
+			}
+		}
+		.borderAround
 	}
 
 	private func stakeClaimNFTsView(viewState: StakeClaimNFTsViewState) -> some View {
@@ -86,7 +106,7 @@ struct LSUComponentView: View {
 						)
 
 						Text(stakeClaimNFT.status.localized)
-							.foregroundColor(stakeClaimNFT.status == .unstaking ? .app.gray2 : .app.green1)
+							.foregroundColor(stakeClaimNFT.status.foregroundColor)
 							.textStyle(.body2HighImportance)
 					}
 
@@ -116,69 +136,4 @@ extension View {
 					.padding(.small2 * -1)
 			)
 	}
-}
-
-// MARK: - PoolUnitResourceViewState
-struct PoolUnitResourceViewState: Identifiable, Equatable {
-	var id: String {
-		symbol
-	}
-
-	let thumbnail: TokenThumbnail.Content
-	let symbol: String
-	let tokenAmount: String
-}
-
-// MARK: - PoolUnitResourceView
-struct PoolUnitResourceView<NameView>: View where NameView: View {
-	let viewState: PoolUnitResourceViewState
-	let nameView: NameView
-
-	var body: some View {
-		HStack(spacing: .small1) {
-			TokenThumbnail(
-				viewState.thumbnail,
-				size: .small
-			)
-
-			HStack {
-				nameView
-
-				Spacer()
-
-				Text(viewState.tokenAmount)
-					.foregroundColor(.app.gray1)
-					.textStyle(.secondaryHeader)
-			}
-		}
-	}
-}
-
-func makeLiquidStakeUnitPoolUnitResourceView(
-	viewState: PoolUnitResourceViewState
-) -> some View {
-	PoolUnitResourceView(
-		viewState: viewState,
-		nameView: VStack(alignment: .leading) {
-			Text(viewState.symbol)
-				.foregroundColor(.app.gray1)
-				.textStyle(.body2HighImportance)
-
-			// FIXME: Localize
-			Text("Staked")
-				.foregroundColor(.app.gray2)
-				.textStyle(.body2HighImportance)
-		}
-	)
-}
-
-func makePoolUnitPoolUnitResourceView(
-	viewState: PoolUnitResourceViewState
-) -> some View {
-	PoolUnitResourceView(
-		viewState: viewState,
-		nameView: Text(viewState.symbol)
-			.foregroundColor(.app.gray1)
-			.textStyle(.body2HighImportance)
-	)
 }
