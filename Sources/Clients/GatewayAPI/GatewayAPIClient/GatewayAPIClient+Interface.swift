@@ -35,8 +35,8 @@ extension GatewayAPIClient {
 	public typealias GetEpoch = @Sendable () async throws -> Epoch
 
 	// MARK: - Entity
-	public typealias GetEntityDetails = @Sendable (_ addresses: [String], _ explicitMetadata: [EntityMetadataKey], _ ledgerState: GatewayAPI.LedgerState?) async throws -> GatewayAPI.StateEntityDetailsResponse
-	public typealias GetEntityMetdata = @Sendable (_ address: String, _ explicitMetadata: [EntityMetadataKey]) async throws -> GatewayAPI.EntityMetadataCollection
+	public typealias GetEntityDetails = @Sendable (_ addresses: [String], _ explicitMetadata: Set<EntityMetadataKey>, _ ledgerState: GatewayAPI.LedgerState?) async throws -> GatewayAPI.StateEntityDetailsResponse
+	public typealias GetEntityMetdata = @Sendable (_ address: String, _ explicitMetadata: Set<EntityMetadataKey>) async throws -> GatewayAPI.EntityMetadataCollection
 
 	// MARK: - Fungible
 	public typealias GetEntityFungiblesPage = @Sendable (GatewayAPI.StateEntityFungiblesPageRequest) async throws -> GatewayAPI.StateEntityFungiblesPageResponse
@@ -90,7 +90,7 @@ extension GatewayAPIClient {
 
 	/// Loads the details for all the addresses provided.
 	@Sendable
-	public func fetchResourceDetails(_ addresses: [String], explicitMetadata: [EntityMetadataKey], ledgerState: GatewayAPI.LedgerState? = nil) async throws -> GatewayAPI.StateEntityDetailsResponse {
+	public func fetchResourceDetails(_ addresses: [String], explicitMetadata: Set<EntityMetadataKey>, ledgerState: GatewayAPI.LedgerState? = nil) async throws -> GatewayAPI.StateEntityDetailsResponse {
 		/// gatewayAPIClient.getEntityDetails accepts only `entityDetailsPageSize` addresses for one request.
 		/// Thus, chunk the addresses in chunks of `entityDetailsPageSize` and load the details in separate, parallel requests.
 		let allResponses = try await addresses

@@ -219,16 +219,16 @@ public enum EntityMetadataKey: String, CaseIterable {
 	static var maxAllowedKeys = 10
 }
 
-extension [EntityMetadataKey] {
-	public static var resourceMetadataKeys: [EntityMetadataKey] {
+extension Set<EntityMetadataKey> {
+	public static var resourceMetadataKeys: Set<EntityMetadataKey> {
 		[.name, .symbol, .description, .iconURL, .validator, .pool, .accountType, .dappDefinition]
 	}
 
-	public static var poolUnitMetadataKeys: [EntityMetadataKey] {
-		resourceMetadataKeys + [.poolUnit]
+	public static var poolUnitMetadataKeys: Set<EntityMetadataKey> {
+		resourceMetadataKeys.union([.poolUnit])
 	}
 
-	public static var dappMetadataKeys: [EntityMetadataKey] {
+	public static var dappMetadataKeys: Set<EntityMetadataKey> {
 		[.name, .description, .iconURL, .claimedEntities, .claimedWebsites, .relatedWebsites, .dappDefinitions]
 	}
 }
