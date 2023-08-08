@@ -27,22 +27,10 @@ extension PoolUnit {
 							.foregroundColor(.app.gray1)
 							.textStyle(.secondaryHeader)
 					}
-					.padding(.small3 * -1)
+					.padding(-.small3)
 
-					VStack(spacing: 1) {
-						ForEach(
-							viewStore.resources,
-							content: poolUnitResourceView
-						)
-						.padding(.medium3)
-						.background(.app.white)
-					}
-					.background(.app.gray4)
-					.overlay(
-						RoundedRectangle(cornerRadius: .small1)
-							.stroke(.app.gray4, lineWidth: 1)
-					)
-					.padding(.small2 * -1)
+					PoolUnitResourcesView(resources: viewStore.resources)
+						.padding(-.small2)
 				}
 				.padding(.medium1)
 				.background(.app.white)
@@ -61,16 +49,6 @@ extension PoolUnit {
 				action: Destinations.Action.details,
 				content: PoolUnitDetails.View.init
 			)
-		}
-
-		private func poolUnitResourceView(
-			viewState: PoolUnitResourceViewState
-		) -> some SwiftUI.View {
-			PoolUnitResourceView(viewState: viewState) {
-				Text(viewState.symbol)
-					.foregroundColor(.app.gray1)
-					.textStyle(.body2HighImportance)
-			}
 		}
 	}
 }
