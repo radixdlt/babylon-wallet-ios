@@ -174,7 +174,7 @@ final class ROLAClientTests: TestCase {
 
 		// when
 		try await withDependencies {
-			$0.gatewayAPIClient.getEntityMetadata = { _ in metadataCollection }
+			$0.gatewayAPIClient.getEntityMetadata = { _, _ in metadataCollection }
 			$0.cacheClient.load = { _, _ in throw CacheClient.Error.dataLoadingFailed }
 			$0.cacheClient.save = { _, _ in }
 		} operation: {
@@ -197,7 +197,7 @@ final class ROLAClientTests: TestCase {
 
 		// when
 		await withDependencies {
-			$0.gatewayAPIClient.getEntityMetadata = { _ in metadataCollection }
+			$0.gatewayAPIClient.getEntityMetadata = { _, _ in metadataCollection }
 			$0.cacheClient.load = { _, _ in throw CacheClient.Error.dataLoadingFailed }
 			$0.cacheClient.save = { _, _ in }
 		} operation: {
@@ -226,7 +226,7 @@ final class ROLAClientTests: TestCase {
 
 		// when
 		await withDependencies {
-			$0.gatewayAPIClient.getEntityMetadata = { _ in metadataCollection }
+			$0.gatewayAPIClient.getEntityMetadata = { _, _ in metadataCollection }
 			$0.cacheClient.load = { _, _ in throw CacheClient.Error.dataLoadingFailed }
 			$0.cacheClient.save = { _, _ in }
 		} operation: {
