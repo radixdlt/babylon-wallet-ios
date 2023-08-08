@@ -34,21 +34,24 @@ extension TransactionClient {
 		public let nonce: Nonce
 		public let manifest: TransactionManifest
 		public let message: Message
-		public let feePayer: Profile.Network.Account
+		// Optional, as there might not be any fee
+		public let feePayer: Profile.Network.Account?
 		public let networkID: NetworkID
 		public let purpose: SigningPurpose
 
 		public var compiledIntent: [UInt8]? = nil
 		public let ephemeralNotaryPublicKey: Curve25519.Signing.PublicKey
+		public let transactionHeader: MakeTransactionHeaderInput
 
 		public init(
 			nonce: Nonce,
 			manifest: TransactionManifest,
 			message: Message,
 			networkID: NetworkID,
-			feePayer: Profile.Network.Account,
+			feePayer: Profile.Network.Account?,
 			purpose: SigningPurpose,
-			ephemeralNotaryPublicKey: Curve25519.Signing.PublicKey
+			ephemeralNotaryPublicKey: Curve25519.Signing.PublicKey,
+			transactionHeader: MakeTransactionHeaderInput
 		) {
 			self.nonce = nonce
 			self.manifest = manifest
@@ -57,6 +60,7 @@ extension TransactionClient {
 			self.feePayer = feePayer
 			self.purpose = purpose
 			self.ephemeralNotaryPublicKey = ephemeralNotaryPublicKey
+			self.transactionHeader = transactionHeader
 		}
 	}
 

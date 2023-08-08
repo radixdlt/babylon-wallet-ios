@@ -146,7 +146,7 @@ public struct BuildTransactionIntentRequest: Sendable {
 		manifest: TransactionManifest,
 		message: Message,
 		nonce: Nonce = .secureRandom(),
-		makeTransactionHeaderInput: MakeTransactionHeaderInput = .default,
+		makeTransactionHeaderInput: MakeTransactionHeaderInput,
 		isFaucetTransaction: Bool = false,
 		ephemeralNotaryPublicKey: Curve25519.Signing.PublicKey
 	) {

@@ -58,6 +58,7 @@ extension FaucetClient: DependencyKey {
 					networkID: networkID,
 					manifest: manifest,
 					message: .none,
+					makeTransactionHeaderInput: .default,
 					isFaucetTransaction: true,
 					ephemeralNotaryPublicKey: ephemeralNotary.publicKey
 				)

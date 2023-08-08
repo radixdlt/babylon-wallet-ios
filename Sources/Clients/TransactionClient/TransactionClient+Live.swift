@@ -253,11 +253,13 @@ extension TransactionClient {
 				manifest: request.manifest,
 				message: request.message,
 				nonce: request.nonce,
+				makeTransactionHeaderInput: request.transactionHeader,
 				ephemeralNotaryPublicKey: request.ephemeralNotaryPublicKey
 			))
 
+			// request.feePayer.map()
 			let entities = NonEmpty(
-				rawValue: Set(Array(transactionIntentWithSigners.transactionSigners.intentSignerEntitiesOrEmpty()) + [.account(request.feePayer)])
+				rawValue: Set(Array(transactionIntentWithSigners.transactionSigners.intentSignerEntitiesOrEmpty()))
 			)!
 
 			let signingFactors = try await factorSourcesClient.getSigningFactors(.init(

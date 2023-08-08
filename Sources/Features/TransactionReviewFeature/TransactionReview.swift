@@ -188,23 +188,35 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			state.canApproveTX = false
 			do {
 				let manifest = try transactionManifestWithWalletInstructionsAdded(state)
-				guard let feePayer = state.reviewedTransaction?.feePayerSelection.selected else {
-					assertionFailure("Expected feePayerSelectionAmongstCandidates")
+				guard let reviewedTransaction = state.reviewedTransaction else {
+					assertionFailure("Expected reviewedTransaction")
 					return .none
 				}
+
 				guard let networkID = state.networkID else {
 					assertionFailure("Expected networkID")
 					return .none
 				}
+
+				let tipPercentage: UInt16 = {
+					switch reviewedTransaction.feePayerSelection.transactionFee.mode {
+					case .normal:
+						return 0
+					case let .advanced(customization):
+						let converted = UInt16(truncatingIfNeeded: customization.tipPercentage.integerValue)
+						return converted
+					}
+				}()
 
 				let request = TransactionClient.PrepareForSigningRequest(
 					nonce: state.nonce,
 					manifest: manifest,
 					message: state.message,
 					networkID: networkID,
-					feePayer: feePayer.account,
+					feePayer: reviewedTransaction.feePayerSelection.selected?.account,
 					purpose: .signTransaction(state.signTransactionPurpose),
-					ephemeralNotaryPublicKey: state.ephemeralNotaryPrivateKey.publicKey
+					ephemeralNotaryPublicKey: state.ephemeralNotaryPrivateKey.publicKey,
+					transactionHeader: .init(tipPercentage: tipPercentage)
 				)
 				return .task {
 					await .internal(.prepareForSigningResult(TaskResult {
