@@ -219,7 +219,7 @@ final class GatewaySettingsFeatureTests: TestCase {
 		// when
 		await store.send(.view(.addNewGatewayButtonTapped))
 		await store.receive(.internal(.gatewayValidationResult(.success(.previewValue))))
-		await store.receive(.internal(.addGatewayResult(.success(.init()))))
+		await store.receive(.internal(.addGatewayResult(.success(.instance))))
 		await store.receive(.delegate(.dismiss))
 	}
 }

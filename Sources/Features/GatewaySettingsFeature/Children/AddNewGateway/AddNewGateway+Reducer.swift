@@ -95,7 +95,7 @@ public struct AddNewGateway: Sendable, FeatureReducer {
 			return .task {
 				let result = await TaskResult {
 					let _ = try await gatewaysClient.addGateway(gateway)
-					return Unit()
+					return Unit.instance
 				}
 				return .internal(.addGatewayResult(result))
 			}
