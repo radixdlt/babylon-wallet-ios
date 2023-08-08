@@ -45,17 +45,16 @@ extension FungibleTokenDetails {
 		@ViewBuilder
 		private func details(with viewStore: ViewStoreOf<FungibleTokenDetails>) -> some SwiftUI.View {
 			VStack(spacing: .medium1) {
-				let divider = Color.app.gray4.frame(height: 1).padding(.horizontal, .medium1)
+				let divider = Color.app.gray4
+					.frame(height: 1)
+					.padding(.horizontal, -.small2)
 				if let description = viewStore.description {
-					divider
-
 					Text(description)
 						.textStyle(.body1Regular)
 						.frame(maxWidth: .infinity, alignment: .leading)
-						.padding(.horizontal, .large2)
-				}
 
-				divider
+					divider
+				}
 
 				VStack(spacing: .medium3) {
 					HStack {
@@ -70,7 +69,6 @@ extension FungibleTokenDetails {
 					}
 				}
 				.frame(maxWidth: .infinity, alignment: .leading)
-				.padding(.horizontal, .large2)
 				.textStyle(.body1Regular)
 				.lineLimit(1)
 			}
@@ -120,8 +118,16 @@ struct X<DetailsView>: View where DetailsView: View {
 	var body: some View {
 		NavigationStack {
 			ScrollView {
-				header(with: viewState)
-				detailsView
+				Group {
+					header(with: viewState)
+
+					Color.app.gray4
+						.frame(height: 1)
+						.padding(.horizontal, -.small2)
+
+					detailsView
+				}
+				.padding(.horizontal, .large2)
 			}
 			#if os(iOS)
 			.navigationBarTitle(viewState.displayName)
