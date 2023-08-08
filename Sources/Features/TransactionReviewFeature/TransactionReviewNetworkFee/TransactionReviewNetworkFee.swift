@@ -4,12 +4,12 @@ import TransactionClient
 // MARK: - TransactionReviewNetworkFee
 public struct TransactionReviewNetworkFee: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
-		public let feePayerSelection: FeePayerSelectionAmongstCandidates
+		public let reviewedTransaction: ReviewedTransaction
 
 		public init(
-			feePayerSelection: FeePayerSelectionAmongstCandidates
+			reviewedTransaction: ReviewedTransaction
 		) {
-			self.feePayerSelection = feePayerSelection
+			self.reviewedTransaction = reviewedTransaction
 		}
 	}
 

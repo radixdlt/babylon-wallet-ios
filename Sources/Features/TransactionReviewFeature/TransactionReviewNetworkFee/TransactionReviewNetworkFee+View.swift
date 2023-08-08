@@ -26,19 +26,15 @@ extension TransactionReviewNetworkFee {
 
 						Spacer(minLength: 0)
 
-						Text(viewStore.feePayerSelection.transactionFee.totalFee.displayedTotalFee) // TODO:  Revisit
+						Text(viewStore.reviewedTransaction.feePayerSelection.transactionFee.totalFee.displayedTotalFee) // TODO:  Revisit
 							.textStyle(.body1HighImportance)
 							.foregroundColor(.app.gray1)
 					}
 
-					if viewStore.feePayerSelection.transactionFee.totalFee.lockFee > .zero {
-						if let feePayer = viewStore.feePayerSelection.selected {
-							if feePayer.xrdBalance < viewStore.feePayerSelection.transactionFee.totalFee.lockFee {
-								WarningErrorView(text: "Insufficient balance to pay the transaction fee", type: .error)
-							}
-						} else {
-							WarningErrorView(text: "Please select a fee payer for the transaction fee", type: .warning)
-						}
+					if case .needsFeePayer = viewStore.reviewedTransaction.feePayingIsValid {
+						WarningErrorView(text: "Please select a fee payer for the transaction fee", type: .warning)
+					} else if case .insufficientBalance = viewStore.reviewedTransaction.feePayingIsValid {
+						WarningErrorView(text: "Insufficient balance", type: .error)
 					}
 
 					Button(L10n.TransactionReview.NetworkFee.customizeButtonTitle) {

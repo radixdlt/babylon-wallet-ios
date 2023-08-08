@@ -32,7 +32,8 @@ extension TransactionReview.State {
 			showDottedLine: (withdrawals != nil || message != .none) && deposits != nil,
 			rawTransaction: displayMode.rawTransaction,
 			showApproveButton: reviewedTransaction != nil,
-			canApproveTX: canApproveTX,
+			canApproveTX: canApproveTX &&
+				reviewedTransaction?.feePayingIsValid == .valid,
 			canToggleViewMode: reviewedTransaction != nil && reviewedTransaction?.transaction != .nonConforming
 		)
 	}
