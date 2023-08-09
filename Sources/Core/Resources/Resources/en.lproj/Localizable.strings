@@ -22,6 +22,10 @@
 "account_poolUnits_staked" = "Staked";
 "account_poolUnits_stakeClaimNFTs" = "STAKE CLAIM NFTS";
 "account_poolUnits_numberOfStakes" = "%d Stakes";
+"account_poolUnits_unknownValidatorName" = "Unknown";
+"account_poolUnits_unknownSymbolName" = "Unknown";
+"account_poolUnits_unknownPoolUnitName" = "Unknown";
+"account_poolUnits_details_currentRedeemableValue" = "Current Redeemable Value";
 "account_badges" = "Badges";
 "assetDetails_resourceAddress" = "Address";
 "assetDetails_name" = "Name";
