@@ -74,4 +74,19 @@ enum DetailsContainerWithHeaderViewMaker {
 	static func makeSeparator() -> some View {
 		Separator().padding(.horizontal, -.small2)
 	}
+
+	@ViewBuilder
+	static func makeDescriptionView(description: String?) -> some View {
+		if let description = description {
+			Group {
+				Text(description)
+					.textStyle(.body1Regular)
+					.frame(maxWidth: .infinity, alignment: .leading)
+
+				DetailsContainerWithHeaderViewMaker.makeSeparator()
+			}
+		} else {
+			EmptyView()
+		}
+	}
 }

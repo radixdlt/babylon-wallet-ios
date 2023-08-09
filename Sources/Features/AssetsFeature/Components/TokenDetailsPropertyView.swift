@@ -28,5 +28,7 @@ struct TokenDetailsPropertyView<PropertyView>: View where PropertyView: View {
 			propertyView
 				.textStyle(.body1HighImportance)
 		}
+		.frame(maxWidth: .infinity, alignment: .leading)
+		.lineLimit(1)
 	}
 }

@@ -71,18 +71,15 @@ extension PoolUnitDetails {
 							resources: viewStore.resources
 						)
 
-						DetailsContainerWithHeaderViewMaker.makeSeparator()
+						DetailsContainerWithHeaderViewMaker
+							.makeSeparator()
 
-						if let description = viewStore.description {
-							Text(description)
-								.textStyle(.body1Regular)
-								.frame(maxWidth: .infinity, alignment: .leading)
-
-							DetailsContainerWithHeaderViewMaker.makeSeparator()
-						}
+						DetailsContainerWithHeaderViewMaker
+							.makeDescriptionView(description: viewStore.description)
 
 						VStack(spacing: .medium3) {
-							TokenDetailsPropertyViewMaker.makeAddress(resourceAddress: viewStore.resourceAddress)
+							TokenDetailsPropertyViewMaker
+								.makeAddress(resourceAddress: viewStore.resourceAddress)
 							TokenDetailsPropertyView(
 								// FIXME: Localize
 								title: "Name",

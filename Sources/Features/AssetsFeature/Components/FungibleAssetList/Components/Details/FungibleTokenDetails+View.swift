@@ -35,30 +35,17 @@ extension FungibleTokenDetails {
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				DetailsContainerWithHeaderView(viewState: viewStore.xViewState) {
-					details(with: viewStore)
+					VStack(spacing: .medium1) {
+						DetailsContainerWithHeaderViewMaker
+							.makeDescriptionView(description: viewStore.description)
+
+						TokenDetailsPropertyViewMaker.makeAddress(
+							resourceAddress: viewStore.resourceAddress
+						)
+					}
 				} closeButtonAction: {
 					viewStore.send(.closeButtonTapped)
 				}
-			}
-		}
-
-		@ViewBuilder
-		private func details(with viewStore: ViewStoreOf<FungibleTokenDetails>) -> some SwiftUI.View {
-			VStack(spacing: .medium1) {
-				if let description = viewStore.description {
-					Text(description)
-						.textStyle(.body1Regular)
-						.frame(maxWidth: .infinity, alignment: .leading)
-
-					DetailsContainerWithHeaderViewMaker.makeSeparator()
-				}
-
-				TokenDetailsPropertyViewMaker.makeAddress(
-					resourceAddress: viewStore.resourceAddress
-				)
-				.frame(maxWidth: .infinity, alignment: .leading)
-				.textStyle(.body1Regular)
-				.lineLimit(1)
 			}
 		}
 	}
