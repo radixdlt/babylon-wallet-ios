@@ -34,6 +34,7 @@ struct DetailsContainerWithHeaderView<DetailsView>: View where DetailsView: View
 					DetailsContainerWithHeaderViewMaker.makeSeparator()
 
 					detailsView
+						.padding(.vertical, .medium3)
 				}
 				.padding(.horizontal, .large2)
 			}

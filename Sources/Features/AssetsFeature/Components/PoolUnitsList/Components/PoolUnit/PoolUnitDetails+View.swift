@@ -3,32 +3,19 @@ import FeaturePrelude
 
 extension PoolUnitDetails.State {
 	var viewState: PoolUnitDetails.ViewState {
-		// FIXME: Rewire
-		.init(
+		let poolUnitResource = poolUnit.poolUnitResource
+		return .init(
 			containerWithHeader: .init(
-				displayName: "temp",
-				thumbnail: .xrd,
-				amount: "2312.213223",
-				symbol: "SYM"
+				displayName: poolUnitResource.name ?? "Unknown",
+				thumbnail: .known(poolUnitResource.iconURL),
+				amount: poolUnitResource.amount.format(),
+				symbol: poolUnitResource.symbol
 			),
-			resources: .init(
-				rawValue: [
-					.init(
-						thumbnail: .xrd,
-						symbol: "XRD",
-						tokenAmount: "2.0129822"
-					),
-					.init(
-						thumbnail: .known(.init(string: "https://i.ibb.co/KG06168/Screenshot-2023-08-02-at-16-19-29.png")!),
-						symbol: "WTF",
-						tokenAmount: "32.6129822"
-					),
-				]
-			)!,
-			description: "Radaswap’s Lending pool token for the Radaswap pool, used to pay network usage fees and stake to support network security.",
-			resourceAddress: .init(address: "yoyoyoy", decodedKind: .globalAccount),
-			name: "Radix Token",
-			currentSupply: "9,743,724,898.2"
+			resources: poolUnit.resourceViewStates,
+			description: poolUnitResource.description,
+			resourceAddress: poolUnitResource.resourceAddress,
+			name: poolUnitResource.name ?? "Uknown",
+			currentSupply: poolUnitResource.totalSupply?.format() ?? "Unknown"
 		)
 	}
 }
@@ -92,7 +79,6 @@ extension PoolUnitDetails {
 							)
 						}
 					}
-					.padding(.vertical, .medium3)
 				} closeButtonAction: {
 					viewStore.send(.closeButtonTapped)
 				}

@@ -55,26 +55,33 @@ extension PoolUnit {
 
 extension PoolUnit.State {
 	var viewState: PoolUnit.ViewState {
-		let xrdResourceViewState = poolUnit.poolResources.xrdResource.map {
-			[PoolUnitResourceViewState(
+		.init(
+			iconURL: poolUnit.poolUnitResource.iconURL,
+			name: poolUnit.poolUnitResource.name ?? "Unknown", // FIXME: strings
+			resources: poolUnit.resourceViewStates
+		)
+	}
+}
+
+extension AccountPortfolio.PoolUnitResources.PoolUnit {
+	var resourceViewStates: NonEmpty<IdentifiedArrayOf<PoolUnitResourceViewState>> {
+		let xrdResourceViewState = poolResources.xrdResource.map {
+			PoolUnitResourceViewState(
 				thumbnail: .xrd,
 				symbol: "XRD",
-				tokenAmount: poolUnit.redemptionValue(for: $0).format()
-			)]
-		} ?? []
-
-		let allResourceViewStates = xrdResourceViewState + poolUnit.poolResources.nonXrdResources.map {
-			PoolUnitResourceViewState(
-				thumbnail: .known($0.iconURL),
-				symbol: $0.symbol ?? $0.name ?? "Unknown", // FIXME: strings
-				tokenAmount: poolUnit.redemptionValue(for: $0).format()
+				tokenAmount: redemptionValue(for: $0).format()
 			)
 		}
 
 		return .init(
-			iconURL: poolUnit.poolUnitResource.iconURL,
-			name: poolUnit.poolUnitResource.name ?? "Unknown", // FIXME: strings
-			resources: .init(rawValue: .init(uniqueElements: allResourceViewStates))! // Safe to unwrap, guaranteed to not be empty
-		)
+			rawValue: xrdResourceViewState.map { [$0] } ?? []
+				+ poolResources.nonXrdResources.map {
+					PoolUnitResourceViewState(
+						thumbnail: .known($0.iconURL),
+						symbol: $0.symbol ?? $0.name ?? "Unknown", // FIXME: strings
+						tokenAmount: redemptionValue(for: $0).format()
+					)
+				}
+		)! // Safe to unwrap, guaranteed to not be empty
 	}
 }

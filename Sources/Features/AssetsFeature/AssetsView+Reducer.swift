@@ -169,7 +169,10 @@ public struct AssetsView: Sendable, FeatureReducer {
 
 			state.poolUnitsList = .init(
 				lsuResource: lsuResource,
-				poolUnits: .init(uncheckedUniqueElements: portfolio.poolUnitResources.poolUnits.map { .init(poolUnit: $0) })
+				poolUnits: .init(
+					uncheckedUniqueElements: portfolio.poolUnitResources.poolUnits
+						.map { .init(poolUnit: $0) }
+				)
 			)
 			return .none
 		}
