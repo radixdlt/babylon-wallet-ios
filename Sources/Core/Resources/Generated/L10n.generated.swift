@@ -21,6 +21,34 @@ public enum L10n {
     public static let tokens = L10n.tr("Localizable", "account_tokens", fallback: "Tokens")
     /// Transfer
     public static let transfer = L10n.tr("Localizable", "account_transfer", fallback: "Transfer")
+    public enum PoolUnits {
+      /// LIQUID STAKE UNITS
+      public static let liquidStakeUnits = L10n.tr("Localizable", "account_poolUnits_liquidStakeUnits", fallback: "LIQUID STAKE UNITS")
+      /// Radix Network XRD Stake
+      public static let lsuResourceHeader = L10n.tr("Localizable", "account_poolUnits_lsuResourceHeader", fallback: "Radix Network XRD Stake")
+      /// %d Stakes
+      public static func numberOfStakes(_ p1: Int) -> String {
+        return L10n.tr("Localizable", "account_poolUnits_numberOfStakes", p1, fallback: "%d Stakes")
+      }
+      /// Ready to Claim
+      public static let readyToClaim = L10n.tr("Localizable", "account_poolUnits_readyToClaim", fallback: "Ready to Claim")
+      /// STAKE CLAIM NFTS
+      public static let stakeClaimNFTs = L10n.tr("Localizable", "account_poolUnits_stakeClaimNFTs", fallback: "STAKE CLAIM NFTS")
+      /// Staked
+      public static let staked = L10n.tr("Localizable", "account_poolUnits_staked", fallback: "Staked")
+      /// Unknown
+      public static let unknownPoolUnitName = L10n.tr("Localizable", "account_poolUnits_unknownPoolUnitName", fallback: "Unknown")
+      /// Unknown
+      public static let unknownSymbolName = L10n.tr("Localizable", "account_poolUnits_unknownSymbolName", fallback: "Unknown")
+      /// Unknown
+      public static let unknownValidatorName = L10n.tr("Localizable", "account_poolUnits_unknownValidatorName", fallback: "Unknown")
+      /// Unstaking
+      public static let unstaking = L10n.tr("Localizable", "account_poolUnits_unstaking", fallback: "Unstaking")
+      public enum Details {
+        /// Current Redeemable Value
+        public static let currentRedeemableValue = L10n.tr("Localizable", "account_poolUnits_details_currentRedeemableValue", fallback: "Current Redeemable Value")
+      }
+    }
   }
   public enum AccountSettings {
     /// Account Color
@@ -199,8 +227,8 @@ public enum L10n {
     public static func lastBackedUp(_ p1: Any) -> String {
       return L10n.tr("Localizable", "androidProfileBackup_lastBackedUp", String(describing: p1), fallback: "Last Backed up: %@")
     }
-    /// Not Backed up yet
-    public static let noLastBackUp = L10n.tr("Localizable", "androidProfileBackup_noLastBackUp", fallback: "Not Backed up yet")
+    /// Not backed up yet
+    public static let noLastBackUp = L10n.tr("Localizable", "androidProfileBackup_noLastBackUp", fallback: "Not backed up yet")
     /// Open System Backup Settings
     public static let openSystemBackupSettings = L10n.tr("Localizable", "androidProfileBackup_openSystemBackupSettings", fallback: "Open System Backup Settings")
     public enum BackupWalletData {
@@ -356,8 +384,8 @@ public enum L10n {
       public static let alreadyAddedError = L10n.tr("Localizable", "assetTransfer_chooseReceivingAccount_alreadyAddedError", fallback: "Account already added")
       /// Or: Choose one of your own Accounts
       public static let chooseOwnAccount = L10n.tr("Localizable", "assetTransfer_chooseReceivingAccount_chooseOwnAccount", fallback: "Or: Choose one of your own Accounts")
-      /// Enter or scan and Account address
-      public static let enterManually = L10n.tr("Localizable", "assetTransfer_chooseReceivingAccount_enterManually", fallback: "Enter or scan and Account address")
+      /// Enter or scan an Account address
+      public static let enterManually = L10n.tr("Localizable", "assetTransfer_chooseReceivingAccount_enterManually", fallback: "Enter or scan an Account address")
       /// Invalid address
       public static let invalidAddressError = L10n.tr("Localizable", "assetTransfer_chooseReceivingAccount_invalidAddressError", fallback: "Invalid address")
       /// Choose Receiving Account
@@ -438,20 +466,22 @@ public enum L10n {
       public static let emailAddress = L10n.tr("Localizable", "authorizedDapps_personaDetails_emailAddress", fallback: "Email Address")
       /// First Name
       public static let firstName = L10n.tr("Localizable", "authorizedDapps_personaDetails_firstName", fallback: "First Name")
+      /// Full Name
+      public static let fullName = L10n.tr("Localizable", "authorizedDapps_personaDetails_fullName", fallback: "Full Name")
+      /// Given Name(s)
+      public static let givenName = L10n.tr("Localizable", "authorizedDapps_personaDetails_givenName", fallback: "Given Name(s)")
       /// Last Name
       public static let lastName = L10n.tr("Localizable", "authorizedDapps_personaDetails_lastName", fallback: "Last Name")
-      /// Name
-      public static let name = L10n.tr("Localizable", "authorizedDapps_personaDetails_name", fallback: "Name")
-      /// Family
-      public static let nameFamily = L10n.tr("Localizable", "authorizedDapps_personaDetails_nameFamily", fallback: "Family")
-      /// Given
-      public static let nameGiven = L10n.tr("Localizable", "authorizedDapps_personaDetails_nameGiven", fallback: "Given")
-      /// Middle
-      public static let nameMiddle = L10n.tr("Localizable", "authorizedDapps_personaDetails_nameMiddle", fallback: "Middle")
-      /// eastern
-      public static let nameVariantEastern = L10n.tr("Localizable", "authorizedDapps_personaDetails_nameVariantEastern", fallback: "eastern")
-      /// western
-      public static let nameVariantWestern = L10n.tr("Localizable", "authorizedDapps_personaDetails_nameVariantWestern", fallback: "western")
+      /// Family Name
+      public static let nameFamily = L10n.tr("Localizable", "authorizedDapps_personaDetails_nameFamily", fallback: "Family Name")
+      /// Name Order
+      public static let nameVariant = L10n.tr("Localizable", "authorizedDapps_personaDetails_nameVariant", fallback: "Name Order")
+      /// Eastern style (family name first)
+      public static let nameVariantEastern = L10n.tr("Localizable", "authorizedDapps_personaDetails_nameVariantEastern", fallback: "Eastern style (family name first)")
+      /// Western style (given name(s) first)
+      public static let nameVariantWestern = L10n.tr("Localizable", "authorizedDapps_personaDetails_nameVariantWestern", fallback: "Western style (given name(s) first)")
+      /// Nickname
+      public static let nickname = L10n.tr("Localizable", "authorizedDapps_personaDetails_nickname", fallback: "Nickname")
       /// You are not sharing any personal data with %@.
       public static func notSharingAnything(_ p1: Any) -> String {
         return L10n.tr("Localizable", "authorizedDapps_personaDetails_notSharingAnything", String(describing: p1), fallback: "You are not sharing any personal data with %@.")
@@ -588,8 +618,8 @@ public enum L10n {
     public enum Completion {
       /// Choose Accounts
       public static let destinationChooseAccounts = L10n.tr("Localizable", "createEntity_completion_destinationChooseAccounts", fallback: "Choose Accounts")
-      /// Choose Personas
-      public static let destinationChoosePersonas = L10n.tr("Localizable", "createEntity_completion_destinationChoosePersonas", fallback: "Choose Personas")
+      /// Persona Selection
+      public static let destinationChoosePersonas = L10n.tr("Localizable", "createEntity_completion_destinationChoosePersonas", fallback: "Persona Selection")
       /// Gateways
       public static let destinationGateways = L10n.tr("Localizable", "createEntity_completion_destinationGateways", fallback: "Gateways")
       /// Account List
@@ -1007,8 +1037,8 @@ public enum L10n {
     }
   }
   public enum HomePage {
-    /// Backup your seed phrase
-    public static let applySecuritySettings = L10n.tr("Localizable", "homePage_applySecuritySettings", fallback: "Backup your seed phrase")
+    /// Please back up your seed phrase
+    public static let applySecuritySettings = L10n.tr("Localizable", "homePage_applySecuritySettings", fallback: "Please back up your seed phrase")
     /// I have backed up this seed phrase
     public static let backedUpMnemonicHeading = L10n.tr("Localizable", "homePage_backedUpMnemonicHeading", fallback: "I have backed up this seed phrase")
     /// Create a New Account
@@ -1547,9 +1577,59 @@ public enum L10n {
     public static let usingDappsHeading = L10n.tr("Localizable", "transactionReview_usingDappsHeading", fallback: "Using dApps")
     /// Withdrawing From
     public static let withdrawalsHeading = L10n.tr("Localizable", "transactionReview_withdrawalsHeading", fallback: "Withdrawing From")
-    /// XRD %@
+    /// %@ XRD
     public static func xrdAmount(_ p1: Any) -> String {
-      return L10n.tr("Localizable", "transactionReview_xrdAmount", String(describing: p1), fallback: "XRD %@")
+      return L10n.tr("Localizable", "transactionReview_xrdAmount", String(describing: p1), fallback: "%@ XRD")
+    }
+    public enum CustomizeNetworkFeeSheet {
+      /// Change
+      public static let changeButtonTitle = L10n.tr("Localizable", "transactionReview_customizeNetworkFeeSheet_changeButtonTitle", fallback: "Change")
+      /// Network Fee
+      public static let networkFee = L10n.tr("Localizable", "transactionReview_customizeNetworkFeeSheet_networkFee", fallback: "Network Fee")
+      /// XRD to Lock for Network and Royalty Fees
+      public static let networkRoyaltyFeesFieldLabel = L10n.tr("Localizable", "transactionReview_customizeNetworkFeeSheet_networkRoyaltyFeesFieldLabel", fallback: "XRD to Lock for Network and Royalty Fees")
+      /// None due
+      public static let noneDue = L10n.tr("Localizable", "transactionReview_customizeNetworkFeeSheet_noneDue", fallback: "None due")
+      /// None required
+      public static let noneRequired = L10n.tr("Localizable", "transactionReview_customizeNetworkFeeSheet_noneRequired", fallback: "None required")
+      /// Pay fee from
+      public static let payFeeFrom = L10n.tr("Localizable", "transactionReview_customizeNetworkFeeSheet_payFeeFrom", fallback: "Pay fee from")
+      /// Royalty fee
+      public static let royaltyFee = L10n.tr("Localizable", "transactionReview_customizeNetworkFeeSheet_royaltyFee", fallback: "Royalty fee")
+      /// Select Fee Payer
+      public static let selectFeePayerButtonTitle = L10n.tr("Localizable", "transactionReview_customizeNetworkFeeSheet_selectFeePayerButtonTitle", fallback: "Select Fee Payer")
+      /// Tip to Lock(% of the Network Fee)
+      public static func tipFieldLabel(_ p1: Int) -> String {
+        return L10n.tr("Localizable", "transactionReview_customizeNetworkFeeSheet_tipFieldLabel", p1, fallback: "Tip to Lock(% of the Network Fee)")
+      }
+      /// View Advanced Mode
+      public static let viewAdvancedModeButtonTitle = L10n.tr("Localizable", "transactionReview_customizeNetworkFeeSheet_viewAdvancedModeButtonTitle", fallback: "View Advanced Mode")
+      /// View Normal Mode
+      public static let viewNormalModeButtonTitle = L10n.tr("Localizable", "transactionReview_customizeNetworkFeeSheet_viewNormalModeButtonTitle", fallback: "View Normal Mode")
+      public enum AdvancedMode {
+        /// Fully customize fee payment for this transaction. Not recommended unless you are a developer or advanced user.
+        public static let subtitle = L10n.tr("Localizable", "transactionReview_customizeNetworkFeeSheet_advancedMode_subtitle", fallback: "Fully customize fee payment for this transaction. Not recommended unless you are a developer or advanced user.")
+        /// Advanced Customize Fees
+        public static let title = L10n.tr("Localizable", "transactionReview_customizeNetworkFeeSheet_advancedMode_title", fallback: "Advanced Customize Fees")
+      }
+      public enum InsufficientBalance {
+        /// Insufficient balance to pay the transaction fee
+        public static let warning = L10n.tr("Localizable", "transactionReview_customizeNetworkFeeSheet_insufficientBalance_warning", fallback: "Insufficient balance to pay the transaction fee")
+      }
+      public enum NormalMode {
+        /// Choose what account to pay the transaction fee from, or add a “tip” to speed up your transaction if necessary.
+        public static let subtitle = L10n.tr("Localizable", "transactionReview_customizeNetworkFeeSheet_normalMode_subtitle", fallback: "Choose what account to pay the transaction fee from, or add a “tip” to speed up your transaction if necessary.")
+        /// Customize Fees
+        public static let title = L10n.tr("Localizable", "transactionReview_customizeNetworkFeeSheet_normalMode_title", fallback: "Customize Fees")
+      }
+      public enum SelectFeePayer {
+        /// Select an account to pay %@ XRD transaction fee
+        public static func subtitle(_ p1: Any) -> String {
+          return L10n.tr("Localizable", "transactionReview_customizeNetworkFeeSheet_selectFeePayer_subtitle", String(describing: p1), fallback: "Select an account to pay %@ XRD transaction fee")
+        }
+        /// Please select a fee payer for the transaction fee
+        public static let warning = L10n.tr("Localizable", "transactionReview_customizeNetworkFeeSheet_selectFeePayer_warning", fallback: "Please select a fee payer for the transaction fee")
+      }
     }
     public enum Guarantees {
       /// Apply
