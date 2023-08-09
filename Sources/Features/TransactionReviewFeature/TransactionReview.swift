@@ -419,7 +419,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		case let .previewLoaded(.success(preview)):
 			state.networkID = preview.networkID
 			do {
-				state.reviewedTransaction = try preview.analyzedManifestToReview.transactionType.asReviewedTransaction()
+				state.reviewedTransaction = try preview.analyzedManifestToReview.transactionTypes.asReviewedTransaction()
 				switch preview.addFeeToManifestOutcome {
 				case let .includesLockFee(manifestInclLockFee):
 					state.feePayerSelectionAmongstCandidates = manifestInclLockFee.feePayerSelectionAmongstCandidates
@@ -1171,9 +1171,37 @@ public enum ReviewedTransaction: Hashable, Sendable {
 	case nonConforming
 }
 
+extension [TransactionType] {
+	fileprivate func asReviewedTransaction() throws -> ReviewedTransaction {
+		// Empty array means non conforming transaction. ET was not able to map it to any type
+		guard !isEmpty else {
+			return .nonConforming
+		}
+
+		// First try to get the general transaction, if missing then convert the first transaction to general transaction
+		return try firstNonNil(\.generalTransaction).map(ReviewedTransaction.conforming) ?? first!.asReviewedTransaction()
+	}
+}
+
 /// This is kinda temporary conversion of all transaction types into GeneralTransaction, until(not sure if needed) we will want to
 /// have specific UI for different transaction types
 extension TransactionType {
+	var generalTransaction: GeneralTransaction? {
+		if case let .generalTransaction(accountProofs, accountWithdraws, accountDeposits, addressesInManifest, metadataOfNewlyCreatedEntities, dataOfNewlyMintedNonFungibles, addressesOfNewlyCreatedEntities) = self {
+			return .init(
+				accountProofs: accountProofs,
+				accountWithdraws: accountWithdraws,
+				accountDeposits: accountDeposits,
+				addressesInManifest: addressesInManifest,
+				metadataOfNewlyCreatedEntities: metadataOfNewlyCreatedEntities,
+				dataOfNewlyMintedNonFungibles: dataOfNewlyMintedNonFungibles,
+				addressesOfNewlyCreatedEntities: addressesOfNewlyCreatedEntities
+			)
+		}
+
+		return nil
+	}
+
 	public struct GeneralTransaction: Hashable, Sendable {
 		let accountProofs: [EngineToolkit.Address]
 		let accountWithdraws: [String: [ResourceTracker]]
@@ -1291,7 +1319,7 @@ extension TransactionType {
 					addressesOfNewlyCreatedEntities: addressesOfNewlyCreatedEntities
 				)
 			)
-		case .nonConforming:
+		default:
 			return .nonConforming
 		}
 	}
