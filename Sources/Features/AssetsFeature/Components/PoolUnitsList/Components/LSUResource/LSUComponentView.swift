@@ -54,7 +54,7 @@ struct LSUComponentView: View {
 	var body: some View {
 		VStack(alignment: .leading, spacing: .medium1) {
 			HStack(spacing: .small1) {
-				TokenThumbnail(.known(viewState.imageURL), size: .smallest)
+				NFTThumbnail(viewState.imageURL, size: .smallest)
 				Text(viewState.title)
 				Spacer()
 			}

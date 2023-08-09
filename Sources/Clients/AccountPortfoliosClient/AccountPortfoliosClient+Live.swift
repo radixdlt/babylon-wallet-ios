@@ -145,19 +145,11 @@ extension AccountPortfoliosClient {
 		)
 
 		let filteredRawFungibleResources = rawFungibleResources.filter { rawItem in
-			!poolUnitResources.radixNetworkStakes.contains {
-				$0.stakeUnitResource?.resourceAddress.address == rawItem.resourceAddress
-			}
-				&&
-				!poolUnitResources.poolUnits.contains {
-					$0.poolUnitResource.resourceAddress.address == rawItem.resourceAddress
-				}
+			!poolUnitResources.fungibleResourceAddresses.contains(rawItem.resourceAddress)
 		}
 
 		let filteredRawNonFungibleResources = rawNonFungibleResources.filter { rawItem in
-			!poolUnitResources.radixNetworkStakes.contains {
-				$0.stakeClaimResource?.resourceAddress.address == rawItem.resourceAddress
-			}
+			!poolUnitResources.nonFungibleResourceAddresses.contains(rawItem.resourceAddress)
 		}
 
 		async let fungibleResources = createFungibleResources(
@@ -299,7 +291,7 @@ extension AccountPortfoliosClient {
 				.nonFungibleIds
 				.map { item in
 					let details = item.details
-					let canBeClaimed = UInt64(ledgerState.epoch) >= (details.claimEpoch?.rawValue ?? UInt64.max)
+					let canBeClaimed = details.claimEpoch.map { UInt64(ledgerState.epoch) >= $0.rawValue } ?? false
 					return try AccountPortfolio.NonFungibleResource.NonFungibleToken(
 						id: .fromParts(
 							resourceAddress: .init(address: resource.resourceAddress),
@@ -355,7 +347,7 @@ extension AccountPortfoliosClient {
 			$0.explicitMetadata?.pool != nil
 		}
 
-		func matchCandidate(
+		func matchPoolUnitCandidate(
 			for item: GatewayAPI.StateEntityDetailsResponseItem,
 			candidates: [GatewayAPI.FungibleResourcesCollectionItemVaultAggregated],
 			metadataAddressMatch: KeyPath<GatewayAPI.EntityMetadataCollection, String?>
@@ -368,21 +360,20 @@ extension AccountPortfoliosClient {
 			guard let candidate = candidates.first(where: {
 				$0.explicitMetadata?[keyPath: metadataAddressMatch] == item.address
 			}) else {
-				// assertionFailure("No candidated could be matched")
 				return nil
 			}
 
 			guard candidate.resourceAddress == poolUnitResourceAddress.address else {
-				// assertionFailure("Bad candidate, not declared by the pool unit")
+				assertionFailure("Bad candidate, not declared by the pool unit")
 				return nil
 			}
 
 			return candidate
 		}
 
-		let stakeAndPoolAddresses = stakeUnitCandidates.compactMap(\.explicitMetadata?.validator?.address) +
-			stakeClaimNFTCandidates.compactMap(\.explicitMetadata?.validator?.address) +
-			poolUnitCandidates.compactMap(\.explicitMetadata?.pool?.address)
+		let stakeAndPoolAddresses = stakeUnitCandidates.compactMap(\.explicitMetadata?.validator?.address)
+			+ stakeClaimNFTCandidates.compactMap(\.explicitMetadata?.validator?.address)
+			+ poolUnitCandidates.compactMap(\.explicitMetadata?.pool?.address)
 
 		guard !stakeAndPoolAddresses.isEmpty else {
 			return .init(radixNetworkStakes: [], poolUnits: [])
@@ -401,6 +392,10 @@ extension AccountPortfoliosClient {
 		)
 
 		let stakeUnits = try await stakeAndPoolUnitDetails.items.asyncCompactMap { item -> AccountPortfolio.PoolUnitResources.RadixNetworkStake? in
+			guard let validatorAddress = try? ValidatorAddress(validatingAddress: item.address) else {
+				return nil
+			}
+
 			guard let validatorDetails = item.details?.component?.state?.validatorState else {
 				// Considered as not a validator, return nil
 				return nil
@@ -429,7 +424,7 @@ extension AccountPortfoliosClient {
 
 			// Create validator with the information from the validator resource
 			let validator = try AccountPortfolio.PoolUnitResources.RadixNetworkStake.Validator(
-				address: .init(validatingAddress: item.address),
+				address: validatorAddress,
 				xrdVaultBalance: .init(fromString: xrdStakeVaultBalance),
 				name: item.explicitMetadata?.name,
 				description: item.explicitMetadata?.description,
@@ -437,13 +432,17 @@ extension AccountPortfoliosClient {
 			)
 
 			let stakeUnitFungibleResource: AccountPortfolio.FungibleResource? = try await { () -> AccountPortfolio.FungibleResource? in
-				let validatorStakeUnitCandidate = matchCandidate(for: item, candidates: stakeUnitCandidates, metadataAddressMatch: \.validator?.address)
+				let validatorStakeUnit = matchPoolUnitCandidate(
+					for: item,
+					candidates: stakeUnitCandidates,
+					metadataAddressMatch: \.validator?.address
+				)
 
-				guard let validatorStakeUnitCandidate else {
+				guard let validatorStakeUnit else {
 					return nil
 				}
 
-				return try await createFungibleResource(validatorStakeUnitCandidate, ledgerState: ledgerState)
+				return try await createFungibleResource(validatorStakeUnit, ledgerState: ledgerState)
 			}()
 
 			// Extract the stake claim NFT, which might exist or not
@@ -481,7 +480,7 @@ extension AccountPortfoliosClient {
 				return nil
 			}
 
-			let poolUnitResourceCandidate = matchCandidate(
+			let poolUnitResourceCandidate = matchPoolUnitCandidate(
 				for: item,
 				candidates: poolUnitCandidates,
 				metadataAddressMatch: \.pool?.address
@@ -494,7 +493,6 @@ extension AccountPortfoliosClient {
 
 			let allFungibleResources = try await fetchAllFungibleResources(item, ledgerState: ledgerState)
 
-			// 2. A pool should always have resources, there is no zero resources pool.
 			guard !allFungibleResources.isEmpty else {
 				assertionFailure("Empty Pool Unit!!!")
 				return nil
@@ -756,5 +754,20 @@ extension Array where Element == AccountPortfolio.NonFungibleResource {
 				return lhs.resourceAddress.address < rhs.resourceAddress.address
 			}
 		}
+	}
+}
+
+extension AccountPortfolio.PoolUnitResources {
+	// The fungible resources used to build up the pool units.
+	// Will be used to filter out those from the general fungible resources list.
+	fileprivate var fungibleResourceAddresses: [String] {
+		radixNetworkStakes.compactMap(\.stakeUnitResource?.resourceAddress.address) +
+			poolUnits.map(\.poolUnitResource.resourceAddress.address)
+	}
+
+	// The non fungible resources used to build up the pool units.
+	// Will be used to filter out those from the general fungible resources list.
+	fileprivate var nonFungibleResourceAddresses: [String] {
+		radixNetworkStakes.compactMap(\.stakeClaimResource?.resourceAddress.address)
 	}
 }

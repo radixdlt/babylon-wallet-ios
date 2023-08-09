@@ -124,7 +124,7 @@ extension GatewayAPI.EntityMetadataCollection {
 	public var validator: ValidatorAddress? {
 		extract(
 			key: .validator,
-			keyPath: \.asGlobalAddress,
+			from: \.asGlobalAddress,
 			transform: ValidatorAddress.init(validatingAddress:)
 		)
 	}
@@ -132,7 +132,7 @@ extension GatewayAPI.EntityMetadataCollection {
 	public var pool: ResourcePoolAddress? {
 		extract(
 			key: .pool,
-			keyPath: \.asGlobalAddress,
+			from: \.asGlobalAddress,
 			transform: ResourcePoolAddress.init(validatingAddress:)
 		)
 	}
@@ -140,7 +140,7 @@ extension GatewayAPI.EntityMetadataCollection {
 	public var poolUnitResource: ResourceAddress? {
 		extract(
 			key: .poolUnit,
-			keyPath: \.asGlobalAddress,
+			from: \.asGlobalAddress,
 			transform: ResourceAddress.init(validatingAddress:)
 		)
 	}
@@ -177,7 +177,7 @@ extension GatewayAPI.EntityMetadataCollection {
 
 	private func extract<Value, Field>(
 		key: EntityMetadataKey,
-		keyPath: KeyPath<GatewayAPI.EntityMetadataItemValue, Field?>,
+		from keyPath: KeyPath<GatewayAPI.EntityMetadataItemValue, Field?>,
 		transform: @escaping (Field) throws -> Value
 	) -> Value? {
 		guard let item = items[key] else {
