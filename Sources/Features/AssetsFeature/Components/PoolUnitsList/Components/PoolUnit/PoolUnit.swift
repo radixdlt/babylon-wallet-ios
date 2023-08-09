@@ -4,10 +4,18 @@ import FeaturePrelude
 // MARK: - PoolUnit
 public struct PoolUnit: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable, Identifiable {
-		public var id: Int
+		public var id: ResourcePoolAddress {
+			poolUnit.poolAddress
+		}
+
+		public let poolUnit: AccountPortfolio.PoolUnitResources.PoolUnit
 
 		@PresentationState
 		public var destination: Destinations.State?
+
+		public init(poolUnit: AccountPortfolio.PoolUnitResources.PoolUnit) {
+			self.poolUnit = poolUnit
+		}
 	}
 
 	public enum ViewAction: Sendable, Equatable {
