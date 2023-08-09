@@ -199,8 +199,6 @@ public struct AccountSecurity: Sendable, FeatureReducer {
 	public enum ViewAction: Sendable, Equatable {
 		case mnemonicsButtonTapped
 		case ledgerHardwareWalletsButtonTapped
-		case verboseLedgerSigningButtonTapped
-		case defaultDepositGuaranteeButtonTapped
 		case importFromOlympiaWalletButtonTapped
 	}
 
@@ -214,16 +212,12 @@ public struct AccountSecurity: Sendable, FeatureReducer {
 		public enum State: Sendable, Hashable {
 			case mnemonics(DisplayMnemonics.State)
 			case ledgerHardwareWallets(LedgerHardwareDevices.State)
-//			case verboseLedgerSigning(VerboseLedgerSigning.State)
-//			case defaultDepositGuarantees(DefaultDepositGuarantees.State)
 			case importOlympiaWalletCoordinator(ImportOlympiaWalletCoordinator.State)
 		}
 
 		public enum Action: Sendable, Equatable {
 			case mnemonics(DisplayMnemonics.Action)
 			case ledgerHardwareWallets(LedgerHardwareDevices.Action)
-//			case verboseLedgerSigning(VerboseLedgerSigning.Action)
-//			case defaultDepositGuarantees(DefaultDepositGuarantees.Action)
 			case importOlympiaWalletCoordinator(ImportOlympiaWalletCoordinator.Action)
 		}
 
@@ -259,14 +253,6 @@ public struct AccountSecurity: Sendable, FeatureReducer {
 
 		case .ledgerHardwareWalletsButtonTapped:
 			state.destination = .ledgerHardwareWallets(.init(context: .settings))
-			return .none
-
-		case .verboseLedgerSigningButtonTapped:
-			// state.destination = .verboseLedgerSigning(.init())
-			return .none
-
-		case .defaultDepositGuaranteeButtonTapped:
-			// state.destination = .defaultDepositGuarantee(.init())
 			return .none
 
 		case .importFromOlympiaWalletButtonTapped:

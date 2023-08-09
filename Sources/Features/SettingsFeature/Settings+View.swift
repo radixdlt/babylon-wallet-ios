@@ -360,8 +360,6 @@ extension AccountSecurity.View {
 			#endif
 				.mnemonics(with: destinationStore)
 				.ledgerHardwareWallets(with: destinationStore)
-//			.verboseLedgerSigning(with: destinationStore)
-//			.defaultDepositGuarantees(with: destinationStore)
 				.importFromOlympiaLegacyWallet(with: destinationStore)
 				.tint(.app.gray1)
 				.foregroundColor(.app.gray1)
@@ -381,16 +379,6 @@ extension AccountSecurity.View {
 				title: L10n.Settings.ledgerHardwareWallets,
 				icon: .asset(AssetResource.ledger),
 				action: .ledgerHardwareWalletsButtonTapped
-			),
-			.init(
-				title: "Verbose Ledger Signing", // FIXME: Strings
-				icon: .asset(AssetResource.ledger), // FIXME: Pick
-				action: .verboseLedgerSigningButtonTapped
-			),
-			.init(
-				title: "Default Deposit Guarantee", // FIXME: Strings
-				icon: .asset(AssetResource.ledger),
-				action: .defaultDepositGuaranteeButtonTapped
 			),
 			.init(
 				title: L10n.Settings.importFromLegacyWallet,
@@ -427,28 +415,6 @@ private extension View {
 					.toolbarBackground(.visible, for: .navigationBar)
 			}
 		)
-	}
-
-	@MainActor
-	func verboseLedgerSigning(with destinationStore: PresentationStoreOf<AccountSecurity.Destinations>) -> some View {
-		EmptyView()
-		//		navigationDestination(
-		//			store: destinationStore,
-		//			state: /AccountSecurity.Destinations.State.verboseLedgerSigning,
-		//			action: AccountSecurity.Destinations.Action.verboseLedgerSigning,
-		//			destination: { VerboseLedgerSigning.View(store: $0) }
-		//		)
-	}
-
-	@MainActor
-	func defaultDepositGuarantees(with destinationStore: PresentationStoreOf<AccountSecurity.Destinations>) -> some View {
-		EmptyView()
-		//		navigationDestination(
-		//			store: destinationStore,
-		//			state: /AccountSecurity.Destinations.State.defaultDepositGuarantees,
-		//			action: AccountSecurity.Destinations.Action.defaultDepositGuarantees,
-		//			destination: { DefaultDepositGuarantees.View(store: $0) }
-		//		)
 	}
 
 	@MainActor
