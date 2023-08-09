@@ -80,37 +80,19 @@ extension PoolUnitDetails {
 
 							Separator().padding(.horizontal, -.small2)
 						}
+
 						VStack(spacing: .medium3) {
-							HStack {
-								Text(L10n.AssetDetails.resourceAddress)
-									.textStyle(.body1Regular)
-									.foregroundColor(.app.gray2)
-
-								Spacer(minLength: .zero)
-
-								AddressView(.address(.resource(viewStore.resourceAddress)))
-									.textStyle(.body1HighImportance)
-							}
-							HStack {
-								Text("Name")
-									.textStyle(.body1Regular)
-									.foregroundColor(.app.gray2)
-
-								Spacer(minLength: .zero)
-
-								Text(viewStore.name)
-									.textStyle(.body1HighImportance)
-							}
-							HStack {
-								Text("Current Supply")
-									.textStyle(.body1Regular)
-									.foregroundColor(.app.gray2)
-
-								Spacer(minLength: .zero)
-
-								Text(viewStore.currentSupply)
-									.textStyle(.body1HighImportance)
-							}
+							TokenDetailsPropertyViewMaker.makeAddress(resourceAddress: viewStore.resourceAddress)
+							TokenDetailsPropertyView(
+								// FIXME: Localize
+								title: "Name",
+								propertyView: Text(viewStore.name)
+							)
+							TokenDetailsPropertyView(
+								// FIXME: Localize
+								title: "Current Supply",
+								propertyView: Text(viewStore.currentSupply)
+							)
 						}
 					}
 					.padding(.vertical, .medium3)
