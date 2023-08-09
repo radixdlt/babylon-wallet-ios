@@ -38,7 +38,13 @@ public struct AssetsView: Sendable, FeatureReducer {
 				account: account,
 				fungibleTokenList: .init(),
 				nonFungibleTokenList: .init(rows: []),
-				poolUnitsList: .init(),
+				poolUnitsList: .init(
+					lsuResource: .init(stakes: []),
+					poolUnits: [
+						.init(id: 0),
+						.init(id: 1),
+					]
+				),
 				mode: mode
 			)
 		}
@@ -168,8 +174,7 @@ public struct AssetsView: Sendable, FeatureReducer {
 			}()
 
 			state.poolUnitsList = .init(
-				lsuResource: lsuResource,
-				poolUnits: .init(uncheckedUniqueElements: portfolio.poolUnitResources.poolUnits.map { .init(poolUnit: $0) })
+				lsuResource: lsuResource
 			)
 			return .none
 		}
