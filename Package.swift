@@ -226,15 +226,6 @@ package.addModules([
 		tests: .yes()
 	),
 	.feature(
-		name: "AppSettings",
-		dependencies: [
-			"CacheClient",
-			"AppPreferencesClient",
-			"FactorSourcesClient", // check if has any ledgers
-		],
-		tests: .no
-	),
-	.feature(
 		name: "HomeFeature",
 		dependencies: [
 			"AccountDetailsFeature",
@@ -391,7 +382,7 @@ package.addModules([
 			"GatewayAPI",
 			"GatewaySettingsFeature",
 			"ImportMnemonicFeature",
-			"AppSettings",
+			"FactorSourcesClient", // Check if user has any ledgers
 			"ImportLegacyWalletClient",
 			"P2PLinksFeature",
 			"PersonasFeature",

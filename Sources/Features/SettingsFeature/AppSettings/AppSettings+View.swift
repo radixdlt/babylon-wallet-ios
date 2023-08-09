@@ -1,10 +1,11 @@
 import FeaturePrelude
+import GatewaySettingsFeature
+import P2PLinksFeature
+import ProfileBackupsFeature
 
 extension AppSettings.State {
 	var viewState: AppSettings.ViewState {
 		.init(
-			hasLedgerHardwareWalletFactorSources: hasLedgerHardwareWalletFactorSources,
-			useVerboseLedgerDisplayMode: (preferences?.display.ledgerHQHardwareWalletSigningDisplayMode ?? .default) == .verbose,
 			isDeveloperModeEnabled: preferences?.security.isDeveloperModeEnabled ?? false,
 			isExportingLogs: exportLogs
 		)
@@ -14,11 +15,6 @@ extension AppSettings.State {
 // MARK: - AppSettings.View
 extension AppSettings {
 	public struct ViewState: Equatable {
-		let hasLedgerHardwareWalletFactorSources: Bool
-
-		/// only to be displayed if `hasLedgerHardwareWalletFactorSources` is true
-		let useVerboseLedgerDisplayMode: Bool
-
 		let isDeveloperModeEnabled: Bool
 		let isExportingLogs: URL?
 	}
@@ -33,11 +29,37 @@ extension AppSettings {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
+				let destinationStore = store.scope(state: \.$destination, action: { .child(.destination($0)) })
 				ScrollView {
-					coreView(with: viewStore)
-						.navigationTitle(L10n.AppSettings.title)
-						.onAppear { viewStore.send(.appeared) }
+					VStack(spacing: .zero) {
+						VStack(spacing: .zero) {
+							ForEach(rows) { row in
+								SettingsRow(row: row) {
+									viewStore.send(row.action)
+								}
+							}
+						}
+
+						VStack(spacing: .zero) {
+							isDeveloperModeEnabled(with: viewStore)
+								.withSeparator
+
+							if !RuntimeInfo.isAppStoreBuild {
+								exportLogs(with: viewStore)
+									.withSeparator
+							}
+
+							resetWallet(with: viewStore)
+								.withSeparator
+						}
+						.padding(.horizontal, .medium3)
+					}
+					.navigationTitle(L10n.AppSettings.title)
+					.onAppear { viewStore.send(.appeared) }
 				}
+				.manageP2PLinks(with: destinationStore)
+				.gatewaySettings(with: destinationStore)
+				.profileBackups(with: destinationStore)
 			}
 			.confirmationDialog(
 				store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
@@ -46,38 +68,30 @@ extension AppSettings {
 			)
 		}
 
-		private func coreView(with viewStore: ViewStoreOf<AppSettings>) -> some SwiftUI.View {
-			VStack(spacing: .zero) {
-				isDeveloperModeEnabled(with: viewStore)
-
-				if !RuntimeInfo.isAppStoreBuild {
-					exportLogs(with: viewStore)
-				}
-
-				if viewStore.hasLedgerHardwareWalletFactorSources {
-					isUsingVerboseLedgerMode(with: viewStore)
-				}
-
-				resetWallet(with: viewStore)
-
-				Separator()
-			}
-			.padding(.medium3)
-		}
-
-		private func isUsingVerboseLedgerMode(with viewStore: ViewStoreOf<AppSettings>) -> some SwiftUI.View {
-			ToggleView(
-				title: L10n.AppSettings.VerboseLedgerMode.title,
-				subtitle: L10n.AppSettings.VerboseLedgerMode.subtitle,
-				isOn: viewStore.binding(
-					get: \.useVerboseLedgerDisplayMode,
-					send: { .useVerboseModeToggled($0) }
-				)
-			)
+		private var rows: [SettingsRowModel<AppSettings>] {
+			[
+				.init(
+					title: L10n.Settings.linkedConnectors,
+					icon: .asset(AssetResource.desktopConnections),
+					action: .manageP2PLinksButtonTapped
+				),
+				.init(
+					title: L10n.Settings.gateways,
+					icon: .asset(AssetResource.gateway),
+					action: .gatewaysButtonTapped
+				),
+				.init(
+					title: L10n.Settings.backups,
+					subtitle: nil, // TODO: Determine, if possible, the date of last backup.
+					icon: .asset(AssetResource.backups),
+					action: .profileBackupsButtonTapped
+				),
+			]
 		}
 
 		private func isDeveloperModeEnabled(with viewStore: ViewStoreOf<AppSettings>) -> some SwiftUI.View {
 			ToggleView(
+				icon: AssetResource.developerMode,
 				title: L10n.AppSettings.DeveloperMode.title,
 				subtitle: L10n.AppSettings.DeveloperMode.subtitle,
 				isOn: viewStore.binding(
@@ -90,28 +104,23 @@ extension AppSettings {
 		private func exportLogs(with viewStore: ViewStoreOf<AppSettings>) -> some SwiftUI.View {
 			HStack {
 				VStack(alignment: .leading, spacing: 0) {
-					Text("Export Logs")
+					Text("Export Logs") // FIXME: Strings
 						.foregroundColor(.app.gray1)
 						.textStyle(.body1HighImportance)
 
-					Text("Export and save debugging logs")
+					Text("Export and save debugging logs") // FIXME: Strings
 						.foregroundColor(.app.gray2)
 						.textStyle(.body2Regular)
 						.fixedSize()
 				}
 
-				Button("Export") {
+				Button("Export") { // FIXME: Strings
 					viewStore.send(.exportLogsTapped)
 				}
 				.buttonStyle(.secondaryRectangular)
 				.flushedRight
 			}
-			.sheet(item:
-				viewStore.binding(
-					get: { $0.isExportingLogs },
-					send: { _ in .exportLogsDismissed }
-				)
-			) { logFilePath in
+			.sheet(item: viewStore.binding(get: \.isExportingLogs, send: { _ in .exportLogsDismissed })) { logFilePath in
 				ShareView(items: [logFilePath])
 			}
 			.frame(height: .largeButtonHeight)
@@ -139,6 +148,38 @@ extension AppSettings {
 			}
 			.frame(height: .largeButtonHeight)
 		}
+	}
+}
+
+private extension View {
+	@MainActor
+	func manageP2PLinks(with destinationStore: PresentationStoreOf<AppSettings.Destinations>) -> some View {
+		navigationDestination(
+			store: destinationStore,
+			state: /AppSettings.Destinations.State.manageP2PLinks,
+			action: AppSettings.Destinations.Action.manageP2PLinks,
+			destination: { P2PLinksFeature.View(store: $0) }
+		)
+	}
+
+	@MainActor
+	func gatewaySettings(with destinationStore: PresentationStoreOf<AppSettings.Destinations>) -> some View {
+		navigationDestination(
+			store: destinationStore,
+			state: /AppSettings.Destinations.State.gatewaySettings,
+			action: AppSettings.Destinations.Action.gatewaySettings,
+			destination: { GatewaySettings.View(store: $0) }
+		)
+	}
+
+	@MainActor
+	func profileBackups(with destinationStore: PresentationStoreOf<AppSettings.Destinations>) -> some View {
+		navigationDestination(
+			store: destinationStore,
+			state: /AppSettings.Destinations.State.profileBackups,
+			action: AppSettings.Destinations.Action.profileBackups,
+			destination: { ProfileBackups.View(store: $0) }
+		)
 	}
 }
 

@@ -51,7 +51,6 @@ public struct Main: Sendable, FeatureReducer {
 		Scope(state: \.home, action: /Action.child .. ChildAction.home) {
 			Home()
 		}
-
 		Reduce(core)
 			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
 				Destinations()

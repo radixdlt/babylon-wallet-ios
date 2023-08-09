@@ -16,3 +16,14 @@ public struct UserDefaultsClient: Sendable {
 	public var setDouble: @Sendable (Double, Key) async -> Void
 	public var setInteger: @Sendable (Int, Key) async -> Void
 }
+
+extension UserDefaultsClient {
+	private static let hideMigrateOlympiaButtonKey = "hideMigrateOlympiaButton"
+	public var hideMigrateOlympiaButtonKey: Bool {
+		boolForKey(Self.hideMigrateOlympiaButtonKey)
+	}
+
+	public func setHideMigrateOlympiaButtonKey(_ value: Bool) async {
+		await setBool(value, Self.hideMigrateOlympiaButtonKey)
+	}
+}

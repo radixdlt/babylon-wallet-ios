@@ -10,8 +10,8 @@ public struct PlainListRow<Icon: View>: View {
 
 	public init(
 		title: String,
-		subtitle: String? = nil,
 		showChevron: Bool = true,
+		subtitle: String? = nil,
 		@ViewBuilder icon: () -> Icon
 	) {
 		self.isShowingChevron = showChevron
@@ -26,29 +26,52 @@ public struct PlainListRow<Icon: View>: View {
 		subtitle: String? = nil,
 		showChevron: Bool = true
 	) where Icon == AssetIcon {
-		self.isShowingChevron = showChevron
-		self.title = title
-		self.subtitle = subtitle
-		self.icon = AssetIcon(content)
+		self.init(
+			title: title,
+			showChevron: showChevron,
+			subtitle: subtitle,
+			icon: { AssetIcon(content) }
+		)
 	}
 
 	public var body: some View {
 		HStack(spacing: .zero) {
 			icon
 				.padding(.trailing, .medium3)
-			VStack(alignment: .leading, spacing: .zero) {
-				Text(title)
-					.textStyle(.secondaryHeader)
-					.foregroundColor(.app.gray1)
-				if let subtitle {
-					Text(subtitle)
-						.textStyle(.body2Regular)
-						.foregroundColor(.app.gray2)
-				}
-			}
+
+			PlainListRowCore(title: title, subtitle: subtitle)
+
 			Spacer(minLength: 0)
+
 			if isShowingChevron {
 				Image(asset: AssetResource.chevronRight)
+			}
+		}
+		.frame(minHeight: .largeButtonHeight)
+		.padding(.horizontal, .medium3)
+	}
+}
+
+// MARK: - PlainListRowCore
+struct PlainListRowCore: View {
+	let title: String
+	let subtitle: String?
+
+	var body: some View {
+		VStack(alignment: .leading, spacing: .zero) {
+			Text(title)
+				.lineSpacing(-6)
+				.lineLimit(1)
+				.textStyle(.secondaryHeader)
+				.foregroundColor(.app.gray1)
+
+			if let subtitle {
+				Text(subtitle)
+					.lineSpacing(-4)
+					.lineLimit(2)
+					.minimumScaleFactor(0.8)
+					.textStyle(.body2Regular)
+					.foregroundColor(.app.gray2)
 			}
 		}
 	}
