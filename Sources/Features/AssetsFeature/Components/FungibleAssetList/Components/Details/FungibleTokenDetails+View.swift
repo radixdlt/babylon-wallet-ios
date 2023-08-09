@@ -45,15 +45,12 @@ extension FungibleTokenDetails {
 		@ViewBuilder
 		private func details(with viewStore: ViewStoreOf<FungibleTokenDetails>) -> some SwiftUI.View {
 			VStack(spacing: .medium1) {
-				let divider = Color.app.gray4
-					.frame(height: 1)
-					.padding(.horizontal, -.small2)
 				if let description = viewStore.description {
 					Text(description)
 						.textStyle(.body1Regular)
 						.frame(maxWidth: .infinity, alignment: .leading)
 
-					divider
+					Separator().padding(.horizontal, -.small2)
 				}
 
 				VStack(spacing: .medium3) {

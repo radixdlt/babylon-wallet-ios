@@ -31,9 +31,7 @@ struct DetailsContainerWithHeaderView<DetailsView>: View where DetailsView: View
 				Group {
 					header(with: viewState)
 
-					Color.app.gray4
-						.frame(height: 1)
-						.padding(.horizontal, -.small2)
+					Separator().padding(.horizontal, -.small2)
 
 					detailsView
 				}
