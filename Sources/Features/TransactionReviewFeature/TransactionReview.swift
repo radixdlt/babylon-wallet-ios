@@ -587,7 +587,7 @@ extension TransactionReview {
 	private func extractProofInfo(_ address: ResourceAddress) async -> ProofEntity {
 		await ProofEntity(
 			id: address,
-			metadata: .init(metadata: try? gatewayAPIClient.getEntityMetadata(address.address))
+			metadata: .init(metadata: try? gatewayAPIClient.getEntityMetadata(address.address, .dappMetadataKeys))
 		)
 	}
 
@@ -675,7 +675,7 @@ extension TransactionReview {
 					newResourceMetadata["icon_url"]??.url
 				)
 			} else {
-				let remoteMetadata = try? await gatewayAPIClient.getEntityMetadata(resourceAddress.address)
+				let remoteMetadata = try? await gatewayAPIClient.getEntityMetadata(resourceAddress.address, [.name, .symbol, .iconURL])
 
 				return (
 					remoteMetadata?.name,
@@ -1044,7 +1044,7 @@ public struct SimpleDappDetails: Sendable, FeatureReducer {
 					try await cacheClient.withCaching(
 						cacheEntry: .dAppMetadata(dAppID.address),
 						request: {
-							try await gatewayAPIClient.getEntityMetadata(dAppID.address)
+							try await gatewayAPIClient.getEntityMetadata(dAppID.address, .dappMetadataKeys)
 						}
 					)
 				}
@@ -1092,7 +1092,7 @@ public struct SimpleDappDetails: Sendable, FeatureReducer {
 		}
 
 		let result = await TaskResult {
-			let allResourceItems = try await gatewayAPIClient.fetchResourceDetails(claimedEntities)
+			let allResourceItems = try await gatewayAPIClient.fetchResourceDetails(claimedEntities, explicitMetadata: .resourceMetadataKeys)
 				.items
 				// FIXME: Uncomment this when when we can rely on dApps conforming to the standards
 				// .filter { $0.metadata.dappDefinition == dAppDefinitionAddress.address }
@@ -1130,7 +1130,7 @@ public struct SimpleDappDetails: Sendable, FeatureReducer {
 		for dApp: DappDefinitionAddress,
 		validating dAppDefinitionAddress: DappDefinitionAddress
 	) async throws -> State.AssociatedDapp {
-		let metadata = try await gatewayAPIClient.getEntityMetadata(dApp.address)
+		let metadata = try await gatewayAPIClient.getEntityMetadata(dApp.address, [.name, .iconURL])
 		// FIXME: Uncomment this when when we can rely on dApps conforming to the standards
 		// .validating(dAppDefinitionAddress: dAppDefinitionAddress)
 		guard let name = metadata.name else {

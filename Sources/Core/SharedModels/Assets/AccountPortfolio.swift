@@ -8,17 +8,20 @@ public struct AccountPortfolio: Sendable, Hashable, Codable {
 	public let isDappDefintionAccountType: Bool
 	public var fungibleResources: FungibleResources
 	public var nonFungibleResources: NonFungibleResources
+	public var poolUnitResources: PoolUnitResources
 
 	public init(
 		owner: AccountAddress,
 		isDappDefintionAccountType: Bool,
 		fungibleResources: FungibleResources,
-		nonFungibleResources: NonFungibleResources
+		nonFungibleResources: NonFungibleResources,
+		poolUnitResources: PoolUnitResources
 	) {
 		self.owner = owner
 		self.isDappDefintionAccountType = isDappDefintionAccountType
 		self.fungibleResources = fungibleResources
 		self.nonFungibleResources = nonFungibleResources
+		self.poolUnitResources = poolUnitResources
 	}
 }
 
@@ -48,6 +51,7 @@ extension AccountPortfolio {
 		public let symbol: String?
 		public let description: String?
 		public let iconURL: URL?
+		public let totalSupply: BigDecimal?
 		// TBD: Add the rest of required metadata fields
 
 		public init(
@@ -57,7 +61,8 @@ extension AccountPortfolio {
 			name: String? = nil,
 			symbol: String? = nil,
 			description: String? = nil,
-			iconURL: URL? = nil
+			iconURL: URL? = nil,
+			totalSupply: BigDecimal? = nil
 		) {
 			self.resourceAddress = resourceAddress
 			self.amount = amount
@@ -66,6 +71,7 @@ extension AccountPortfolio {
 			self.symbol = symbol
 			self.description = description
 			self.iconURL = iconURL
+			self.totalSupply = totalSupply
 		}
 	}
 
@@ -98,19 +104,38 @@ extension AccountPortfolio {
 			public let keyImageURL: URL?
 			public let metadata: [Metadata]
 
+			// The claim amount if the it is a stake claim nft
+			public let stakeClaimAmount: BigDecimal?
+			// Indication that stake unit amount can be claimed if it is stake claim nft
+			public let canBeClaimed: Bool
+
 			public init(
 				id: NonFungibleGlobalId,
 				name: String?,
 				description: String?,
 				keyImageURL: URL?,
-				metadata: [Metadata]
+				metadata: [Metadata],
+				stakeClaimAmount: BigDecimal? = nil,
+				canBeClaimed: Bool = false
 			) {
 				self.id = id
 				self.name = name
 				self.description = description
 				self.keyImageURL = keyImageURL
 				self.metadata = metadata
+				self.stakeClaimAmount = stakeClaimAmount
+				self.canBeClaimed = canBeClaimed
 			}
+		}
+	}
+
+	public struct PoolUnitResources: Sendable, Hashable, Codable {
+		public let radixNetworkStakes: [RadixNetworkStake]
+		public let poolUnits: [PoolUnit]
+
+		public init(radixNetworkStakes: [RadixNetworkStake], poolUnits: [PoolUnit]) {
+			self.radixNetworkStakes = radixNetworkStakes
+			self.poolUnits = poolUnits
 		}
 	}
 
@@ -122,6 +147,72 @@ extension AccountPortfolio {
 		public init(key: String, value: String) {
 			self.key = key
 			self.value = value
+		}
+	}
+}
+
+// MARK: - AccountPortfolio.PoolUnitResources.RadixNetworkStake
+extension AccountPortfolio.PoolUnitResources {
+	public struct PoolUnit: Sendable, Hashable, Codable {
+		public let poolAddress: ResourcePoolAddress
+		public let poolUnitResource: AccountPortfolio.FungibleResource
+		public let poolResources: AccountPortfolio.FungibleResources
+
+		public init(
+			poolAddress: ResourcePoolAddress,
+			poolUnitResource: AccountPortfolio.FungibleResource,
+			poolResources: AccountPortfolio.FungibleResources
+		) {
+			self.poolAddress = poolAddress
+			self.poolUnitResource = poolUnitResource
+			self.poolResources = poolResources
+		}
+
+		public func redemptionValue(for resource: AccountPortfolio.FungibleResource) -> BigDecimal {
+			let poolUnitTotalSupply = poolUnitResource.totalSupply ?? .one
+			let unroundedRedemptionValue = poolUnitResource.amount * resource.amount / poolUnitTotalSupply
+			return resource.divisibility.map { unroundedRedemptionValue.withPrecision($0) } ?? unroundedRedemptionValue
+		}
+	}
+
+	public struct RadixNetworkStake: Sendable, Hashable, Codable {
+		public struct Validator: Sendable, Hashable, Codable {
+			public let address: ValidatorAddress
+			public let xrdVaultBalance: BigDecimal
+			public let name: String?
+			public let description: String?
+			public let iconURL: URL?
+
+			public init(
+				address: ValidatorAddress,
+				xrdVaultBalance: BigDecimal,
+				name: String? = nil,
+				description: String? = nil,
+				iconURL: URL? = nil
+			) {
+				self.address = address
+				self.xrdVaultBalance = xrdVaultBalance
+				self.name = name
+				self.description = description
+				self.iconURL = iconURL
+			}
+		}
+
+		public let validator: Validator
+		public let stakeUnitResource: AccountPortfolio.FungibleResource?
+		public let stakeClaimResource: AccountPortfolio.NonFungibleResource?
+
+		public var xrdRedemptionValue: BigDecimal? {
+			guard let stakeUnitResource else {
+				return nil
+			}
+			return (stakeUnitResource.amount * validator.xrdVaultBalance) / (stakeUnitResource.totalSupply ?? .one)
+		}
+
+		public init(validator: Validator, stakeUnitResource: AccountPortfolio.FungibleResource?, stakeClaimResource: AccountPortfolio.NonFungibleResource?) {
+			self.validator = validator
+			self.stakeUnitResource = stakeUnitResource
+			self.stakeClaimResource = stakeClaimResource
 		}
 	}
 }
@@ -161,7 +252,8 @@ extension AccountPortfolio {
 				xrdResource: fungibleResources.xrdResource?.nonEmpty,
 				nonXrdResources: fungibleResources.nonXrdResources.compactMap(\.nonEmpty)
 			),
-			nonFungibleResources: nonFungibleResources.compactMap(\.nonEmpty)
+			nonFungibleResources: nonFungibleResources.compactMap(\.nonEmpty),
+			poolUnitResources: poolUnitResources
 		)
 	}
 }
@@ -186,6 +278,9 @@ extension AccountPortfolio.NonFungibleResource.NonFungibleToken {
 		case description
 		case keyImageURL
 		case metadata
+		case stakeClaimAmount
+		case claimEpoch
+		case canBeClaimed
 	}
 
 	public init(from decoder: Decoder) throws {
@@ -196,7 +291,9 @@ extension AccountPortfolio.NonFungibleResource.NonFungibleToken {
 			name: container.decodeIfPresent(String.self, forKey: .name),
 			description: container.decodeIfPresent(String.self, forKey: .description),
 			keyImageURL: container.decodeIfPresent(URL.self, forKey: .keyImageURL),
-			metadata: container.decode([AccountPortfolio.Metadata].self, forKey: .metadata)
+			metadata: container.decode([AccountPortfolio.Metadata].self, forKey: .metadata),
+			stakeClaimAmount: container.decodeIfPresent(BigDecimal.self, forKey: .stakeClaimAmount),
+			canBeClaimed: container.decode(Bool.self, forKey: .canBeClaimed)
 		)
 	}
 
@@ -207,5 +304,7 @@ extension AccountPortfolio.NonFungibleResource.NonFungibleToken {
 		try container.encodeIfPresent(description, forKey: .description)
 		try container.encodeIfPresent(keyImageURL, forKey: .keyImageURL)
 		try container.encode(metadata, forKey: .metadata)
+		try container.encodeIfPresent(stakeClaimAmount, forKey: .stakeClaimAmount)
+		try container.encode(canBeClaimed, forKey: .canBeClaimed)
 	}
 }

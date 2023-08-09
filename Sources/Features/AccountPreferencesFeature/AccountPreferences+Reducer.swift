@@ -356,7 +356,7 @@ extension AccountPreferences {
 
 			do {
 				let isDappDefinitionAccount: Bool = try await gatewayAPIClient
-					.getEntityMetadata(address.address)
+					.getEntityMetadata(address.address, [.accountType])
 					.accountType == .dappDefinition
 
 				await send(.internal(.canTurnIntoDappDefAccountType(!isDappDefinitionAccount)))
