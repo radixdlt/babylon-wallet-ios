@@ -1,4 +1,7 @@
 import FeaturePrelude
+import GatewaySettingsFeature
+import P2PLinksFeature
+import ProfileBackupsFeature
 
 extension AppSettings.State {
 	var viewState: AppSettings.ViewState {
@@ -33,11 +36,15 @@ extension AppSettings {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
+				let destinationStore = store.scope(state: \.$destination, action: { .child(.destination($0)) })
 				ScrollView {
 					coreView(with: viewStore)
 						.navigationTitle(L10n.AppSettings.title)
 						.onAppear { viewStore.send(.appeared) }
 				}
+				.manageP2PLinks(with: destinationStore)
+				.gatewaySettings(with: destinationStore)
+				.profileBackups(with: destinationStore)
 			}
 			.confirmationDialog(
 				store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
@@ -48,21 +55,56 @@ extension AppSettings {
 
 		private func coreView(with viewStore: ViewStoreOf<AppSettings>) -> some SwiftUI.View {
 			VStack(spacing: .zero) {
-				isDeveloperModeEnabled(with: viewStore)
-
-				if !RuntimeInfo.isAppStoreBuild {
-					exportLogs(with: viewStore)
+				VStack(spacing: .zero) {
+					ForEach(rows) { row in
+						PlainListRow(row.icon, title: row.title)
+							.tappable {
+								viewStore.send(row.action)
+							}
+							.withSeparator
+					}
 				}
 
-				if viewStore.hasLedgerHardwareWalletFactorSources {
+				VStack(spacing: .zero) {
+					isDeveloperModeEnabled(with: viewStore)
+						.withSeparator
+
+					if !RuntimeInfo.isAppStoreBuild {
+						exportLogs(with: viewStore)
+							.withSeparator
+					}
+
+//					if viewStore.hasLedgerHardwareWalletFactorSources {
 					isUsingVerboseLedgerMode(with: viewStore)
+						.withSeparator
+//					}
+
+					resetWallet(with: viewStore)
+						.withSeparator
 				}
-
-				resetWallet(with: viewStore)
-
-				Separator()
+				.padding(.horizontal, .medium3)
 			}
-			.padding(.medium3)
+		}
+
+		private var rows: [SettingsRowModel<AppSettings>] {
+			[
+				.init(
+					title: L10n.Settings.linkedConnectors,
+					icon: .asset(AssetResource.desktopConnections),
+					action: .manageP2PLinksButtonTapped
+				),
+				.init(
+					title: L10n.Settings.gateways,
+					icon: .asset(AssetResource.gateway),
+					action: .gatewaysButtonTapped
+				),
+				.init(
+					title: L10n.Settings.backups,
+					subtitle: "bla bla", // nil, // TODO: Determine, if possible, the date of last backup.
+					icon: .asset(AssetResource.backups),
+					action: .profileBackupsButtonTapped
+				),
+			]
 		}
 
 		private func isUsingVerboseLedgerMode(with viewStore: ViewStoreOf<AppSettings>) -> some SwiftUI.View {
@@ -139,6 +181,38 @@ extension AppSettings {
 			}
 			.frame(height: .largeButtonHeight)
 		}
+	}
+}
+
+private extension View {
+	@MainActor
+	func manageP2PLinks(with destinationStore: PresentationStoreOf<AppSettings.Destinations>) -> some View {
+		navigationDestination(
+			store: destinationStore,
+			state: /AppSettings.Destinations.State.manageP2PLinks,
+			action: AppSettings.Destinations.Action.manageP2PLinks,
+			destination: { P2PLinksFeature.View(store: $0) }
+		)
+	}
+
+	@MainActor
+	func gatewaySettings(with destinationStore: PresentationStoreOf<AppSettings.Destinations>) -> some View {
+		navigationDestination(
+			store: destinationStore,
+			state: /AppSettings.Destinations.State.gatewaySettings,
+			action: AppSettings.Destinations.Action.gatewaySettings,
+			destination: { GatewaySettings.View(store: $0) }
+		)
+	}
+
+	@MainActor
+	func profileBackups(with destinationStore: PresentationStoreOf<AppSettings.Destinations>) -> some View {
+		navigationDestination(
+			store: destinationStore,
+			state: /AppSettings.Destinations.State.profileBackups,
+			action: AppSettings.Destinations.Action.profileBackups,
+			destination: { ProfileBackups.View(store: $0) }
+		)
 	}
 }
 

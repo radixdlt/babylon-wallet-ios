@@ -2,7 +2,10 @@ import AppPreferencesClient
 import CacheClient
 import FactorSourcesClient
 import FeaturePrelude
+import GatewaySettingsFeature
 import Logging
+import P2PLinksFeature
+import ProfileBackupsFeature
 import RadixConnectClient
 
 // MARK: - AppSettings
@@ -24,6 +27,11 @@ public struct AppSettings: Sendable, FeatureReducer {
 
 	public enum ViewAction: Sendable, Equatable {
 		case appeared
+
+		case manageP2PLinksButtonTapped
+		case gatewaysButtonTapped
+		case profileBackupsButtonTapped
+
 		case useVerboseModeToggled(Bool)
 		case developerModeToggled(Bool)
 		case exportLogsTapped
@@ -48,10 +56,16 @@ public struct AppSettings: Sendable, FeatureReducer {
 
 	public struct Destinations: Sendable, ReducerProtocol {
 		public enum State: Sendable, Hashable {
+			case manageP2PLinks(P2PLinksFeature.State)
+			case gatewaySettings(GatewaySettings.State)
+			case profileBackups(ProfileBackups.State)
 			case deleteProfileConfirmationDialog(ConfirmationDialogState<Action.DeleteProfileConfirmationDialogAction>)
 		}
 
 		public enum Action: Sendable, Equatable {
+			case manageP2PLinks(P2PLinksFeature.Action)
+			case gatewaySettings(GatewaySettings.Action)
+			case profileBackups(ProfileBackups.Action)
 			case deleteProfileConfirmationDialog(DeleteProfileConfirmationDialogAction)
 
 			public enum DeleteProfileConfirmationDialogAction: Sendable, Hashable {
@@ -62,7 +76,15 @@ public struct AppSettings: Sendable, FeatureReducer {
 		}
 
 		public var body: some ReducerProtocolOf<Self> {
-			EmptyReducer()
+			Scope(state: /State.manageP2PLinks, action: /Action.manageP2PLinks) {
+				P2PLinksFeature()
+			}
+			Scope(state: /State.gatewaySettings, action: /Action.gatewaySettings) {
+				GatewaySettings()
+			}
+			Scope(state: /State.profileBackups, action: /Action.profileBackups) {
+				ProfileBackups()
+			}
 		}
 	}
 
@@ -98,6 +120,18 @@ public struct AppSettings: Sendable, FeatureReducer {
 					await send(.internal(.hasLedgerHardwareWalletFactorSourcesLoaded(true)))
 				}
 			}
+
+		case .manageP2PLinksButtonTapped:
+			state.destination = .manageP2PLinks(.init())
+			return .none
+
+		case .gatewaysButtonTapped:
+			state.destination = .gatewaySettings(.init())
+			return .none
+
+		case .profileBackupsButtonTapped:
+			state.destination = .profileBackups(.init(context: .settings))
+			return .none
 
 		case let .developerModeToggled(isEnabled):
 			state.preferences?.security.isDeveloperModeEnabled = isEnabled
