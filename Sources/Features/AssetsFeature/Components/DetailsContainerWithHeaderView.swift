@@ -31,7 +31,7 @@ struct DetailsContainerWithHeaderView<DetailsView>: View where DetailsView: View
 				Group {
 					header(with: viewState)
 
-					Separator().padding(.horizontal, -.small2)
+					DetailsContainerWithHeaderViewMaker.makeSeparator()
 
 					detailsView
 				}
@@ -66,5 +66,12 @@ struct DetailsContainerWithHeaderView<DetailsView>: View where DetailsView: View
 			}
 		}
 		.padding(.top, .small2)
+	}
+}
+
+// MARK: - DetailsContainerWithHeaderViewMaker
+enum DetailsContainerWithHeaderViewMaker {
+	static func makeSeparator() -> some View {
+		Separator().padding(.horizontal, -.small2)
 	}
 }

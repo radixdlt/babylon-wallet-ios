@@ -71,14 +71,14 @@ extension PoolUnitDetails {
 							resources: viewStore.resources
 						)
 
-						Separator().padding(.horizontal, -.small2)
+						DetailsContainerWithHeaderViewMaker.makeSeparator()
 
 						if let description = viewStore.description {
 							Text(description)
 								.textStyle(.body1Regular)
 								.frame(maxWidth: .infinity, alignment: .leading)
 
-							Separator().padding(.horizontal, -.small2)
+							DetailsContainerWithHeaderViewMaker.makeSeparator()
 						}
 
 						VStack(spacing: .medium3) {

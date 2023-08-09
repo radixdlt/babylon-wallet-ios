@@ -50,7 +50,7 @@ extension FungibleTokenDetails {
 						.textStyle(.body1Regular)
 						.frame(maxWidth: .infinity, alignment: .leading)
 
-					Separator().padding(.horizontal, -.small2)
+					DetailsContainerWithHeaderViewMaker.makeSeparator()
 				}
 
 				TokenDetailsPropertyViewMaker.makeAddress(
