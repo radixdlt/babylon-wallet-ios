@@ -55,7 +55,9 @@ struct DetailsContainerWithHeaderView<DetailsView>: View where DetailsView: View
 	}
 
 	@ViewBuilder
-	private func header(with viewState: DetailsContainerWithHeaderViewState) -> some SwiftUI.View {
+	private func header(
+		with viewState: DetailsContainerWithHeaderViewState
+	) -> some SwiftUI.View {
 		VStack(spacing: .medium3) {
 			TokenThumbnail(viewState.thumbnail, size: .veryLarge)
 			if let symbol = viewState.symbol {

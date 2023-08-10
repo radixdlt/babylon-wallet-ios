@@ -57,7 +57,7 @@ extension PoolUnit.State {
 	var viewState: PoolUnit.ViewState {
 		.init(
 			iconURL: poolUnit.poolUnitResource.iconURL,
-			name: poolUnit.poolUnitResource.name ?? "Unknown", // FIXME: strings
+			name: poolUnit.poolUnitResource.name ?? L10n.Account.PoolUnits.unknownPoolUnitName,
 			resources: poolUnit.resourceViewStates
 		)
 	}
@@ -78,7 +78,7 @@ extension AccountPortfolio.PoolUnitResources.PoolUnit {
 				+ poolResources.nonXrdResources.map {
 					PoolUnitResourceViewState(
 						thumbnail: .known($0.iconURL),
-						symbol: $0.symbol ?? $0.name ?? "Unknown", // FIXME: strings
+						symbol: $0.symbol ?? $0.name ?? L10n.Account.PoolUnits.unknownSymbolName,
 						tokenAmount: redemptionValue(for: $0).format()
 					)
 				}

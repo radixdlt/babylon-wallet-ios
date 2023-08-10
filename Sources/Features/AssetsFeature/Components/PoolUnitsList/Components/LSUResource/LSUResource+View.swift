@@ -50,13 +50,11 @@ extension PoolUnitsList.LSUResource {
 		) -> some SwiftUI.View {
 			PoolUnitHeaderView(viewState: .init(iconURL: viewStore.iconURL)) {
 				VStack(alignment: .leading) {
-					// FIXME: Localize
-					Text("Radix Network XRD Stake")
+					Text(L10n.Account.PoolUnits.lsuResourceHeader)
 						.foregroundColor(.app.gray1)
 						.textStyle(.secondaryHeader)
 
-					// FIXME: Localize
-					Text("\(viewStore.components.count) Stakes")
+					Text(L10n.Account.PoolUnits.numberOfStakes(viewStore.components.count))
 						.foregroundColor(.app.gray2)
 						.textStyle(.body2HighImportance)
 				}

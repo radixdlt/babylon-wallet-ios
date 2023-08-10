@@ -6,7 +6,7 @@ extension PoolUnitDetails.State {
 		let poolUnitResource = poolUnit.poolUnitResource
 		return .init(
 			containerWithHeader: .init(
-				displayName: poolUnitResource.name ?? "Unknown",
+				displayName: poolUnitResource.name ?? L10n.Account.PoolUnits.unknownPoolUnitName,
 				thumbnail: .known(poolUnitResource.iconURL),
 				amount: poolUnitResource.amount.format(),
 				symbol: poolUnitResource.symbol
@@ -14,8 +14,7 @@ extension PoolUnitDetails.State {
 			resources: poolUnit.resourceViewStates,
 			description: poolUnitResource.description,
 			resourceAddress: poolUnitResource.resourceAddress,
-			name: poolUnitResource.name ?? "Uknown",
-			currentSupply: poolUnitResource.totalSupply?.format() ?? "Unknown"
+			currentSupply: poolUnitResource.totalSupply?.format() ?? L10n.AssetDetails.supplyUnkown
 		)
 	}
 }
@@ -30,7 +29,6 @@ extension PoolUnitDetails {
 		let description: String?
 
 		let resourceAddress: ResourceAddress
-		let name: String
 		let currentSupply: String
 	}
 
@@ -50,8 +48,7 @@ extension PoolUnitDetails {
 			) { viewStore in
 				DetailsContainerWithHeaderView(viewState: viewStore.containerWithHeader) {
 					VStack(spacing: .medium1) {
-						// FIXME: Localize
-						Text("Current Redeemable Value")
+						Text(L10n.Account.PoolUnits.Details.currentRedeemableValue)
 							.textStyle(.secondaryHeader)
 							.foregroundColor(.app.gray1)
 						PoolUnitResourcesView(
@@ -68,13 +65,7 @@ extension PoolUnitDetails {
 							TokenDetailsPropertyViewMaker
 								.makeAddress(resourceAddress: viewStore.resourceAddress)
 							TokenDetailsPropertyView(
-								// FIXME: Localize
-								title: "Name",
-								propertyView: Text(viewStore.name)
-							)
-							TokenDetailsPropertyView(
-								// FIXME: Localize
-								title: "Current Supply",
+								title: L10n.AssetDetails.currentSupply,
 								propertyView: Text(viewStore.currentSupply)
 							)
 						}
