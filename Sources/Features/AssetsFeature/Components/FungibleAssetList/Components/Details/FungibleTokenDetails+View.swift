@@ -4,14 +4,14 @@ import FeaturePrelude
 extension FungibleTokenDetails.State {
 	var viewState: FungibleTokenDetails.ViewState {
 		.init(
-			resourceAddress: resource.resourceAddress,
-			description: resource.description,
 			detailsContainerWithHeader: .init(
 				displayName: resource.name ?? "",
 				thumbnail: isXRD ? .xrd : .known(resource.iconURL),
 				amount: resource.amount.format(),
 				symbol: resource.symbol
-			)
+			),
+			description: resource.description,
+			resourceAddress: resource.resourceAddress
 		)
 	}
 }
