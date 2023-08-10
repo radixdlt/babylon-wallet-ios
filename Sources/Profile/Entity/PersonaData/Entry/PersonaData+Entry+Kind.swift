@@ -1,4 +1,5 @@
 import Foundation
+import Resources
 
 // MARK: - PersonaData.Entry.Kind
 extension PersonaData.Entry {
@@ -27,7 +28,7 @@ extension PersonaData.Entry.Kind {
 	public var title: String {
 		switch self {
 		case .fullName:
-			return "Full Name"
+			return L10n.AuthorizedDapps.PersonaDetails.fullName
 		case .emailAddress:
 			return "Email Address"
 		case .phoneNumber:
