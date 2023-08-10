@@ -27,64 +27,61 @@ extension PoolUnit {
 							.foregroundColor(.app.gray1)
 							.textStyle(.secondaryHeader)
 					}
-					.padding(.small3 * -1)
+					.padding(-.small3)
 
-					VStack(spacing: 1) {
-						ForEach(
-							viewStore.resources,
-							content: poolUnitResourceView
-						)
-						.padding(.medium3)
-						.background(.app.white)
-					}
-					.background(.app.gray4)
-					.overlay(
-						RoundedRectangle(cornerRadius: .small1)
-							.stroke(.app.gray4, lineWidth: 1)
-					)
-					.padding(.small2 * -1)
+					PoolUnitResourcesView(resources: viewStore.resources)
+						.padding(-.small2)
 				}
 				.padding(.medium1)
 				.background(.app.white)
 				.roundedCorners(radius: .small1)
 				.tokenRowShadow()
+				.onTapGesture {
+					viewStore.send(.didTap)
+				}
 			}
-		}
-
-		private func poolUnitResourceView(
-			viewState: PoolUnitResourceViewState
-		) -> some SwiftUI.View {
-			PoolUnitResourceView(viewState: viewState) {
-				Text(viewState.symbol)
-					.foregroundColor(.app.gray1)
-					.textStyle(.body2HighImportance)
-			}
+			.sheet(
+				store: store.scope(
+					state: \.$destination,
+					action: (/Action.child .. PoolUnit.ChildAction.destination).embed
+				),
+				state: /Destinations.State.details,
+				action: Destinations.Action.details,
+				content: PoolUnitDetails.View.init
+			)
 		}
 	}
 }
 
 extension PoolUnit.State {
 	var viewState: PoolUnit.ViewState {
-		let xrdResourceViewState = poolUnit.poolResources.xrdResource.map {
-			[PoolUnitResourceViewState(
+		.init(
+			iconURL: poolUnit.poolUnitResource.iconURL,
+			name: poolUnit.poolUnitResource.name ?? L10n.Account.PoolUnits.unknownPoolUnitName,
+			resources: poolUnit.resourceViewStates
+		)
+	}
+}
+
+extension AccountPortfolio.PoolUnitResources.PoolUnit {
+	var resourceViewStates: NonEmpty<IdentifiedArrayOf<PoolUnitResourceViewState>> {
+		let xrdResourceViewState = poolResources.xrdResource.map {
+			PoolUnitResourceViewState(
 				thumbnail: .xrd,
 				symbol: "XRD",
-				tokenAmount: poolUnit.redemptionValue(for: $0).format()
-			)]
-		} ?? []
-
-		let allResourceViewStates = xrdResourceViewState + poolUnit.poolResources.nonXrdResources.map {
-			PoolUnitResourceViewState(
-				thumbnail: .known($0.iconURL),
-				symbol: $0.symbol ?? $0.name ?? L10n.Account.PoolUnits.unknownSymbolName,
-				tokenAmount: poolUnit.redemptionValue(for: $0).format()
+				tokenAmount: redemptionValue(for: $0).format()
 			)
 		}
 
 		return .init(
-			iconURL: poolUnit.poolUnitResource.iconURL,
-			name: poolUnit.poolUnitResource.name ?? L10n.Account.PoolUnits.unknownPoolUnitName,
-			resources: .init(rawValue: .init(uniqueElements: allResourceViewStates))! // Safe to unwrap, guaranteed to not be empty
-		)
+			rawValue: xrdResourceViewState.map { [$0] } ?? []
+				+ poolResources.nonXrdResources.map {
+					PoolUnitResourceViewState(
+						thumbnail: .known($0.iconURL),
+						symbol: $0.symbol ?? $0.name ?? L10n.Account.PoolUnits.unknownSymbolName,
+						tokenAmount: redemptionValue(for: $0).format()
+					)
+				}
+		)! // Safe to unwrap, guaranteed to not be empty
 	}
 }

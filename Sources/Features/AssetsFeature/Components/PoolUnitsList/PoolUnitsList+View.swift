@@ -25,10 +25,10 @@ extension PoolUnitsList {
 
 				ForEachStore(
 					store.scope(
-						state: \.lpTokens,
+						state: \.poolUnits,
 						action: (
 							/PoolUnitsList.Action.child
-								.. PoolUnitsList.ChildAction.lpTokens
+								.. PoolUnitsList.ChildAction.poolUnit
 						).embed
 					),
 					content: PoolUnit.View.init

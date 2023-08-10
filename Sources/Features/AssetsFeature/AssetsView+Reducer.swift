@@ -38,8 +38,7 @@ public struct AssetsView: Sendable, FeatureReducer {
 				account: account,
 				fungibleTokenList: .init(),
 				nonFungibleTokenList: .init(rows: []),
-				// FIXME: Rewire
-				poolUnitsList: .preview,
+				poolUnitsList: .init(),
 				mode: mode
 			)
 		}
@@ -170,7 +169,10 @@ public struct AssetsView: Sendable, FeatureReducer {
 
 			state.poolUnitsList = .init(
 				lsuResource: lsuResource,
-				lpTokens: .init(uncheckedUniqueElements: portfolio.poolUnitResources.poolUnits.map { .init(poolUnit: $0) })
+				poolUnits: .init(
+					uncheckedUniqueElements: portfolio.poolUnitResources.poolUnits
+						.map { .init(poolUnit: $0) }
+				)
 			)
 			return .none
 		}
