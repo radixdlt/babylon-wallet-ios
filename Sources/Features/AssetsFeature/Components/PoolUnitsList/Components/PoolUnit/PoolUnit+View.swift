@@ -64,25 +64,27 @@ extension PoolUnit {
 }
 
 extension PoolUnit.State {
-	// FIXME: Rewire to real State
 	var viewState: PoolUnit.ViewState {
-		.init(
-			iconURL: .init(string: "https://i.ibb.co/KG06168/Screenshot-2023-08-02-at-16-19-29.png")!,
-			name: "Some LP Token",
-			resources: .init(
-				rawValue: [
-					.init(
-						thumbnail: .xrd,
-						symbol: "XRD",
-						tokenAmount: "2.0129822"
-					),
-					.init(
-						thumbnail: .known(.init(string: "https://i.ibb.co/KG06168/Screenshot-2023-08-02-at-16-19-29.png")!),
-						symbol: "WTF",
-						tokenAmount: "32.6129822"
-					),
-				]
-			)!
+		let xrdResourceViewState = poolUnit.poolResources.xrdResource.map {
+			[PoolUnitResourceViewState(
+				thumbnail: .xrd,
+				symbol: "XRD",
+				tokenAmount: poolUnit.redemptionValue(for: $0).format()
+			)]
+		} ?? []
+
+		let allResourceViewStates = xrdResourceViewState + poolUnit.poolResources.nonXrdResources.map {
+			PoolUnitResourceViewState(
+				thumbnail: .known($0.iconURL),
+				symbol: $0.symbol ?? $0.name ?? "Unknown", // FIXME: strings
+				tokenAmount: poolUnit.redemptionValue(for: $0).format()
+			)
+		}
+
+		return .init(
+			iconURL: poolUnit.poolUnitResource.iconURL,
+			name: poolUnit.poolUnitResource.name ?? "Unknown", // FIXME: strings
+			resources: .init(rawValue: .init(uniqueElements: allResourceViewStates))! // Safe to unwrap, guaranteed to not be empty
 		)
 	}
 }

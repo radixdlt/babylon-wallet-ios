@@ -16,6 +16,13 @@ extension GatewayAPI {
 		case package(StateEntityDetailsResponsePackageDetails)
 		case component(StateEntityDetailsResponseComponentDetails)
 
+		public var component: StateEntityDetailsResponseComponentDetails? {
+			if case let .component(wrapped) = self {
+				return wrapped
+			}
+			return nil
+		}
+
 		public enum CodingKeys: String, CodingKey, CaseIterable {
 			case type
 		}
