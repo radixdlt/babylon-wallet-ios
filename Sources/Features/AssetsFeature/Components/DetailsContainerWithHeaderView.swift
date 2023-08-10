@@ -4,23 +4,28 @@ import SwiftUI
 // MARK: - DetailsContainerWithHeaderViewState
 struct DetailsContainerWithHeaderViewState: Equatable {
 	let displayName: String
-	let thumbnail: TokenThumbnail.Content
 	let amount: String
 	let symbol: String?
 }
 
 // MARK: - DetailsContainerWithHeaderView
-struct DetailsContainerWithHeaderView<DetailsView>: View where DetailsView: View {
+struct DetailsContainerWithHeaderView<ThumbnailView, DetailsView>: View
+	where ThumbnailView: View, DetailsView: View
+{
 	let viewState: DetailsContainerWithHeaderViewState
 	let closeButtonAction: () -> Void
+
+	let thumbnailView: ThumbnailView
 	let detailsView: DetailsView
 
 	init(
 		viewState: DetailsContainerWithHeaderViewState,
+		@ViewBuilder thumbnailView: () -> ThumbnailView,
 		@ViewBuilder detailsView: () -> DetailsView,
 		closeButtonAction: @escaping () -> Void
 	) {
 		self.viewState = viewState
+		self.thumbnailView = thumbnailView()
 		self.detailsView = detailsView()
 		self.closeButtonAction = closeButtonAction
 	}
@@ -59,7 +64,8 @@ struct DetailsContainerWithHeaderView<DetailsView>: View where DetailsView: View
 		with viewState: DetailsContainerWithHeaderViewState
 	) -> some SwiftUI.View {
 		VStack(spacing: .medium3) {
-			TokenThumbnail(viewState.thumbnail, size: .veryLarge)
+			thumbnailView
+
 			if let symbol = viewState.symbol {
 				Text(viewState.amount)
 					.font(.app.sheetTitle)

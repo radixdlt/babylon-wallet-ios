@@ -6,10 +6,10 @@ extension FungibleTokenDetails.State {
 		.init(
 			detailsContainerWithHeader: .init(
 				displayName: resource.name ?? "",
-				thumbnail: isXRD ? .xrd : .known(resource.iconURL),
 				amount: resource.amount.format(),
 				symbol: resource.symbol
 			),
+			thumbnail: isXRD ? .xrd : .known(resource.iconURL),
 			description: resource.description,
 			resourceAddress: resource.resourceAddress
 		)
@@ -20,6 +20,7 @@ extension FungibleTokenDetails.State {
 extension FungibleTokenDetails {
 	public struct ViewState: Equatable {
 		let detailsContainerWithHeader: DetailsContainerWithHeaderViewState
+		let thumbnail: TokenThumbnail.Content
 		let description: String?
 		let resourceAddress: ResourceAddress
 	}
@@ -35,14 +36,14 @@ extension FungibleTokenDetails {
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				DetailsContainerWithHeaderView(viewState: viewStore.detailsContainerWithHeader) {
-					VStack(spacing: .medium1) {
-						DetailsContainerWithHeaderViewMaker
-							.makeDescriptionView(description: viewStore.description)
+					TokenThumbnail(viewStore.thumbnail, size: .veryLarge)
+				} detailsView: {
+					DetailsContainerWithHeaderViewMaker
+						.makeDescriptionView(description: viewStore.description)
 
-						TokenDetailsPropertyViewMaker.makeAddress(
-							resourceAddress: viewStore.resourceAddress
-						)
-					}
+					TokenDetailsPropertyViewMaker.makeAddress(
+						resourceAddress: viewStore.resourceAddress
+					)
 				} closeButtonAction: {
 					viewStore.send(.closeButtonTapped)
 				}

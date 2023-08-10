@@ -7,10 +7,10 @@ extension PoolUnitDetails.State {
 		return .init(
 			containerWithHeader: .init(
 				displayName: poolUnitResource.name ?? L10n.Account.PoolUnits.unknownPoolUnitName,
-				thumbnail: .known(poolUnitResource.iconURL),
 				amount: poolUnitResource.amount.format(),
 				symbol: poolUnitResource.symbol
 			),
+			thumbnailURL: poolUnitResource.iconURL,
 			resources: poolUnit.resourceViewStates,
 			description: poolUnitResource.description,
 			resourceAddress: poolUnitResource.resourceAddress,
@@ -23,6 +23,7 @@ extension PoolUnitDetails.State {
 extension PoolUnitDetails {
 	public struct ViewState: Equatable {
 		let containerWithHeader: DetailsContainerWithHeaderViewState
+		let thumbnailURL: URL?
 
 		let resources: NonEmpty<IdentifiedArrayOf<PoolUnitResourceViewState>>
 
@@ -47,6 +48,8 @@ extension PoolUnitDetails {
 				send: PoolUnitDetails.Action.view
 			) { viewStore in
 				DetailsContainerWithHeaderView(viewState: viewStore.containerWithHeader) {
+					NFTThumbnail(viewStore.thumbnailURL, size: .veryLarge)
+				} detailsView: {
 					VStack(spacing: .medium1) {
 						Text(L10n.Account.PoolUnits.Details.currentRedeemableValue)
 							.textStyle(.secondaryHeader)
