@@ -68,7 +68,7 @@ struct DetailsContainerWithHeaderView<DetailsView>: View where DetailsView: View
 					.font(.app.sectionHeader)
 			}
 		}
-		.padding(.top, .small2)
+		.padding(.vertical, .small2)
 	}
 }
 
