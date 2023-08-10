@@ -66,9 +66,7 @@ extension LSUComponent {
 
 					if let liquidStakeUnitViewState = viewStore.liquidStakeUnit {
 						liquidStakeUnitView(viewState: liquidStakeUnitViewState)
-							.onTapGesture {
-								viewStore.send(.didTap)
-							}
+							.onTapGesture { viewStore.send(.didTap) }
 					}
 
 					if let stakeClaimNFTsViewState = viewStore.stakeClaimNFTs {
@@ -76,6 +74,15 @@ extension LSUComponent {
 					}
 				}
 				.padding(.medium1)
+				.sheet(
+					store: store.scope(
+						state: \.$destination,
+						action: (/Action.child .. LSUComponent.ChildAction.destination).embed
+					),
+					state: /Destinations.State.details,
+					action: Destinations.Action.details,
+					content: LSUDetails.View.init
+				)
 			}
 		}
 

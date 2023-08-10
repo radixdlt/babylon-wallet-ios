@@ -22,18 +22,18 @@ public struct LSUComponent: FeatureReducer {
 
 	public struct Destinations: Sendable, ReducerProtocol {
 		public enum State: Sendable, Hashable {
-			case details(PoolUnitDetails.State)
+			case details(LSUDetails.State)
 		}
 
 		public enum Action: Sendable, Equatable {
-			case details(PoolUnitDetails.Action)
+			case details(LSUDetails.Action)
 		}
 
 		public var body: some ReducerProtocolOf<Self> {
 			Scope(
 				state: /State.details,
 				action: /Action.details,
-				child: PoolUnitDetails.init
+				child: LSUDetails.init
 			)
 		}
 	}
@@ -44,7 +44,7 @@ public struct LSUComponent: FeatureReducer {
 	) -> EffectTask<Action> {
 		switch viewAction {
 		case .didTap:
-			state.destination = .details(.init())
+			state.destination = .details(.init(stake: 3))
 
 			return .none
 		}
