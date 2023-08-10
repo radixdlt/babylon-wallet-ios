@@ -296,6 +296,8 @@ extension TransactionClient {
 				ephemeralNotaryPublicKey: request.ephemeralNotaryPublicKey
 			))
 
+			try dump(request.manifestToSign.toString())
+
 			return try .init(
 				rawManifest: request.manifestToSign,
 				header: intent.intent.header(),

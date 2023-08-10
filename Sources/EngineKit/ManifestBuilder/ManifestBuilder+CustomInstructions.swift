@@ -51,6 +51,12 @@ extension ManifestBuilder {
 	}
 }
 
+extension ManifestBuilderBucket {
+	public static var unique: ManifestBuilderBucket {
+		.init(name: UUID().uuidString)
+	}
+}
+
 extension SpecificAddress {
 	public func intoManifestBuilderAddress() throws -> ManifestBuilderAddress {
 		try .static(value: self.intoEngine())
