@@ -2,36 +2,6 @@ import EngineToolkit
 import Prelude
 
 extension ManifestBuilder {
-	public func withdrawAmount(
-		from entity: Address,
-		resource: ResourceAddress,
-		amount: BigDecimal
-	) throws -> ManifestBuilder {
-		try callMethod(
-			address: entity.intoManifestBuilderAddress(),
-			methodName: "withdraw",
-			args: [.addressValue(value: resource.intoManifestBuilderAddress()), .decimalValue(value: amount.intoEngine())]
-		)
-	}
-
-	public func withdrawTokens(
-		from entity: Address,
-		resource: ResourceAddress,
-		tokens: [NonFungibleLocalId]
-	) throws -> ManifestBuilder {
-		try callMethod(
-			address: entity.intoManifestBuilderAddress(),
-			methodName: "withdraw",
-			args: [
-				.addressValue(value: resource.intoManifestBuilderAddress()),
-				.arrayValue(
-					elementValueKind: .nonFungibleLocalIdValue,
-					elements: tokens.map { .nonFungibleLocalIdValue(value: $0) }
-				),
-			]
-		)
-	}
-
 	public func setOwnerKeys(
 		from entity: Address,
 		ownerKeyHashes: [PublicKeyHash]

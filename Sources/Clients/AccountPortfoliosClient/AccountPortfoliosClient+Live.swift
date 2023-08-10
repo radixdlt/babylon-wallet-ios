@@ -291,7 +291,8 @@ extension AccountPortfoliosClient {
 				.nonFungibleIds
 				.map { item in
 					let details = item.details
-					let canBeClaimed = details.claimEpoch.map { UInt64(ledgerState.epoch) >= $0.rawValue } ?? false
+					let canBeClaimed = false
+					// details.claimEpoch.map { UInt64(ledgerState.epoch) >= $0.rawValue } ?? false
 					return try AccountPortfolio.NonFungibleResource.NonFungibleToken(
 						id: .fromParts(
 							resourceAddress: .init(address: resource.resourceAddress),
@@ -301,7 +302,7 @@ extension AccountPortfoliosClient {
 						description: nil,
 						keyImageURL: details.keyImageURL,
 						metadata: [],
-						stakeClaimAmount: details.stakeClaim,
+						stakeClaimAmount: nil, // details.stakeClaim,
 						canBeClaimed: canBeClaimed
 					)
 				}

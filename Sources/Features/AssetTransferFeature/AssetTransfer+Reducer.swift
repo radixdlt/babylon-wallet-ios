@@ -148,10 +148,10 @@ extension AssetTransfer {
 
 		return try ManifestBuilder.make {
 			for resource in involvedFungibleResources {
-				ManifestBuilder.withdrawAmount(
-					accounts.fromAccount.address.asGeneral(),
-					resource.address,
-					resource.totalTransferAmount
+				try ManifestBuilder.withdrawAmount(
+					accounts.fromAccount.address.intoEngine(),
+					resource.address.intoEngine(),
+					resource.totalTransferAmount.intoEngine()
 				)
 
 				for account in resource.accounts {
@@ -170,9 +170,9 @@ extension AssetTransfer {
 			}
 
 			for resource in involvedNonFungibles {
-				ManifestBuilder.withdrawTokens(
-					accounts.fromAccount.address.asGeneral(),
-					resource.address,
+				try ManifestBuilder.withdrawTokens(
+					accounts.fromAccount.address.intoEngine(),
+					resource.address.intoEngine(),
 					resource.allTokens.map { $0.id.localId() }
 				)
 
