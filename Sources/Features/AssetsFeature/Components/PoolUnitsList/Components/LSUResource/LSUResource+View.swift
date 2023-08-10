@@ -1,6 +1,6 @@
 import FeaturePrelude
 
-extension PoolUnitsList.LSUResource {
+extension LSUResource {
 	public struct ViewState: Sendable, Equatable {
 		let isExpanded: Bool
 		let iconURL: URL?
@@ -8,12 +8,12 @@ extension PoolUnitsList.LSUResource {
 	}
 
 	public struct View: SwiftUI.View {
-		private let store: StoreOf<PoolUnitsList.LSUResource>
+		private let store: StoreOf<LSUResource>
 
 		@SwiftUI.State
 		private var headerHeight: CGFloat = .zero
 
-		public init(store: StoreOf<PoolUnitsList.LSUResource>) {
+		public init(store: StoreOf<LSUResource>) {
 			self.store = store
 		}
 
@@ -21,7 +21,7 @@ extension PoolUnitsList.LSUResource {
 			WithViewStore(
 				store,
 				observe: \.viewState,
-				send: PoolUnitsList.LSUResource.Action.view
+				send: LSUResource.Action.view
 			) { viewStore in
 				StackedViewsLayout(
 					isExpanded: viewStore.isExpanded,
@@ -126,8 +126,8 @@ private struct HeightPreferenceKey: PreferenceKey {
 	}
 }
 
-extension PoolUnitsList.LSUResource.State {
-	var viewState: PoolUnitsList.LSUResource.ViewState {
+extension LSUResource.State {
+	var viewState: LSUResource.ViewState {
 		.init(
 			isExpanded: isExpanded,
 			iconURL: .init(string: "https://i.ibb.co/KG06168/Screenshot-2023-08-02-at-16-19-29.png")!,
