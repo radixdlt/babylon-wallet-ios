@@ -46,35 +46,35 @@ extension GatewayAPI.StateEntityDetailsResponseItemDetails {
 
 extension GatewayAPI.EntityMetadataItemValue {
 	public var asString: String? {
-		typed?.stringValue?.value
+		typed.stringValue?.value
 	}
 
 	public var asStringCollection: [String]? {
-		typed?.stringArrayValue?.values
+		typed.stringArrayValue?.values
 	}
 
 	public var asURL: URL? {
-		(typed?.urlValue?.value).flatMap(URL.init)
+		(typed.urlValue?.value).flatMap(URL.init)
 	}
 
 	public var asURLCollection: [URL]? {
-		typed?.urlArrayValue?.values.compactMap(URL.init)
+		typed.urlArrayValue?.values.compactMap(URL.init)
 	}
 
 	public var asOriginCollection: [URL]? {
-		typed?.originArrayValue?.values.compactMap(URL.init)
+		typed.originArrayValue?.values.compactMap(URL.init)
 	}
 
 	public var asGlobalAddress: String? {
-		typed?.globalAddressValue?.value
+		typed.globalAddressValue?.value
 	}
 
 	public var asGlobalAddressCollection: [String]? {
-		typed?.globalAddressArrayValue?.values
+		typed.globalAddressArrayValue?.values
 	}
 
 	public var publicKeyHashes: [GatewayAPI.PublicKeyHash]? {
-		typed?.publicKeyHashArrayValue?.values
+		typed.publicKeyHashArrayValue?.values
 	}
 }
 
@@ -177,15 +177,9 @@ extension [GatewayAPI.EntityMetadataItem] {
 	}
 }
 
-extension GatewayAPI.StateNonFungibleDataResponse {
-	public func nonFungibleData(for nonFungibleId: String) -> AnyCodable? {
-		nonFungibleIds.first { $0.nonFungibleId == nonFungibleId }?.data.rawJson
-	}
-}
-
 extension GatewayAPI.LedgerState {
 	public var selector: GatewayAPI.LedgerStateSelector {
 		// TODO: Determine what other fields should be sent
-		.init(stateVersion: stateVersion)
+		.init(stateVersion: stateVersion, epoch: epoch, round: round)
 	}
 }

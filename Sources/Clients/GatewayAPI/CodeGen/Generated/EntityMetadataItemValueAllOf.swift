@@ -17,9 +17,9 @@ extension GatewayAPI {
 
 public struct EntityMetadataItemValueAllOf: Codable, Hashable {
 
-    public private(set) var typed: MetadataTypedValue?
+    public private(set) var typed: MetadataTypedValue
 
-    public init(typed: MetadataTypedValue? = nil) {
+    public init(typed: MetadataTypedValue) {
         self.typed = typed
     }
 
@@ -31,7 +31,7 @@ public struct EntityMetadataItemValueAllOf: Codable, Hashable {
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encodeIfPresent(typed, forKey: .typed)
+        try container.encode(typed, forKey: .typed)
     }
 }
 

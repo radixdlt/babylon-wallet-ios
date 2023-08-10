@@ -73,6 +73,7 @@ extension GatewayAPIClient {
 				throw BadHTTPResponseCode(got: httpURLResponse.statusCode)
 			}
 
+			print("========= \n \(data.prettyPrintedJSONString)")
 			let response = try jsonDecoder.decode(Response.self, from: data)
 
 			return response

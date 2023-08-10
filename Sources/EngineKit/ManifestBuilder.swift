@@ -1,7 +1,138 @@
 import EngineToolkit
 import Prelude
 
-// MARK: - Mutation
+// MARK: - Result Builder
+extension ManifestBuilder {
+	public static let faucetLockFee = flip(faucetLockFee)
+	public static let faucetFreeXrd = flip(faucetFreeXrd)
+	public static let accountTryDepositBatchOrAbort = flip(accountTryDepositBatchOrAbort)
+	public static let withdrawAmount = flip(withdrawAmount)
+	public static let withdrawTokens = flip(withdrawTokens)
+	public static let takeFromWorktop = flip(takeFromWorktop)
+	public static let accountTryDepositOrAbort = flip(accountTryDepositOrAbort)
+	public static let takeNonFungiblesFromWorktop = flip(takeNonFungiblesFromWorktop)
+
+	@resultBuilder
+	public enum InstructionsChain {
+		public typealias Instructions = [Instruction]
+		public typealias Instruction = (ManifestBuilder) throws -> ManifestBuilder
+
+		public static func buildBlock(_ components: Instructions...) -> Instructions {
+			Array(components.joined())
+		}
+
+		public static func buildArray(_ components: [Instructions]) -> Instructions {
+			Array(components.joined())
+		}
+
+		public static func buildExpression(_ expression: @escaping Instruction) -> Instructions {
+			[expression]
+		}
+
+		public static func buildOptional(_ component: Instructions?) -> Instructions {
+			component ?? []
+		}
+	}
+
+	public static func make(@InstructionsChain _ content: () throws -> InstructionsChain.Instructions) throws -> ManifestBuilder {
+		var builder = ManifestBuilder()
+		try content().forEach {
+			builder = try $0(builder)
+		}
+		return builder
+	}
+}
+
+// MARK: - Helper build functions
+extension ManifestBuilder {
+	public func withdrawAmount(from entity: Address, resource: ResourceAddress, amount: BigDecimal) throws -> EngineToolkit.ManifestBuilder {
+		try callMethod(
+			address: entity.wrapped(),
+			methodName: "withdraw",
+			args: [.addressValue(value: resource.wrapped()), .decimalValue(value: amount.intoEngine())]
+		)
+	}
+
+	public func withdrawTokens(from entity: Address, resource: ResourceAddress, tokens: [NonFungibleLocalId]) throws -> EngineToolkit.ManifestBuilder {
+		try callMethod(
+			address: entity.wrapped(),
+			methodName: "withdraw",
+			args: [
+				.addressValue(value: resource.wrapped()),
+				.arrayValue(
+					elementValueKind: .nonFungibleLocalIdValue,
+					elements: tokens.map { .nonFungibleLocalIdValue(value: $0) }
+				),
+			]
+		)
+	}
+}
+
+// MARK: - Predifined manifest builders
+extension ManifestBuilder {
+	public static func manifestForFaucett(
+		includeLockFeeInstruction: Bool,
+		networkID: NetworkID,
+		componentAddress: Address
+	) throws -> TransactionManifest {
+		try Self.make {
+			if includeLockFeeInstruction {
+				faucetLockFee
+			}
+			faucetFreeXrd
+			try accountTryDepositBatchOrAbort(componentAddress.intoEngine(), nil)
+		}
+		.build(networkId: networkID.rawValue)
+	}
+}
+
+func flip<A, T>(_ f: @escaping (A) -> () throws -> T) -> (A) throws -> T {
+	{ a in
+		try f(a)()
+	}
+}
+
+func flip<A, B, T>(_ f: @escaping (A) -> (B) throws -> T) -> (B) -> (A) throws -> T {
+	{ b in
+		{ a in
+			try f(a)(b)
+		}
+	}
+}
+
+func flip<A, B, C, T>(_ f: @escaping (A) -> (B, C) throws -> T) -> (B, C) -> (A) throws -> T {
+	{ b, c in
+		{ a in
+			try f(a)(b, c)
+		}
+	}
+}
+
+func flip<A, B, C, D, T>(_ f: @escaping (A) -> (B, C, D) throws -> T) -> (B, C, D) -> (A) throws -> T {
+	{ b, c, d in
+		{ a in
+			try f(a)(b, c, d)
+		}
+	}
+}
+
+extension ManifestBuilderBucket {
+	public static var unique: ManifestBuilderBucket {
+		.init(name: UUID().uuidString)
+	}
+}
+
+extension SpecificAddress {
+	func wrapped() throws -> ManifestBuilderAddress {
+		try .static(value: self.intoEngine())
+	}
+}
+
+extension BigDecimal {
+	public func intoEngine() throws -> EngineKit.Decimal {
+		try .init(value: toString())
+	}
+}
 
 extension TransactionManifest {
 	public func withInstructionAdded(_ instruction: Instruction, at index: Int) throws -> TransactionManifest {
@@ -15,14 +146,16 @@ extension TransactionManifest {
 		address: Address,
 		fee: BigDecimal = .temporaryStandardFee
 	) throws -> TransactionManifest {
-		try withInstructionAdded(
-			.lockFeeCall(address: address, fee: fee),
-			at: 0
-		)
+		try modify(modifications: TransactionManifestModifications(
+			addAccessControllerProofs: [],
+			addLockFee: .init(
+				accountAddress: address.intoEngine(),
+				amount: fee.intoEngine()
+			),
+			addAssertions: []
+		))
 	}
 }
-
-/// NOTE: This is temporary code - RET will soon add a dedidcated ManifestBuilder to be used.
 
 // MARK: - Custom Manifests
 extension TransactionManifest {
@@ -31,14 +164,11 @@ extension TransactionManifest {
 		networkID: NetworkID,
 		componentAddress: Address
 	) throws -> TransactionManifest {
-		try .init(
-			instructions: .faucet(
-				includeLockFeeInstruction: includeLockFeeInstruction,
-				networkID: networkID,
-				componentAddress: componentAddress
-			),
-			blobs: []
-		)
+		try EngineToolkit.ManifestBuilder()
+			.faucetLockFee()
+			.faucetFreeXrd()
+			.accountTryDepositBatchOrAbort(accountAddress: componentAddress.intoEngine(), authorizedDepositorBadge: nil)
+			.build(networkId: networkID.rawValue)
 	}
 
 	public static func manifestForCreateNonFungibleToken(

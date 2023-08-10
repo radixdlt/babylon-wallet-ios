@@ -136,28 +136,29 @@ extension GatewayAPI.EntityMetadataCollection {
 // FIXME: Temporary hack to extract the key_image_url, until we have a proper schema
 extension GatewayAPI.StateNonFungibleDetailsResponseItem {
 	public var details: (name: String?, keyImageURL: URL?) {
-		guard let dictionary = data.rawJson.value as? [String: Any] else { return (nil, nil) }
-		guard let elements = dictionary["fields"] as? [[String: Any]] else { return (nil, nil) }
-		let strings = elements.filter { $0["kind"] as? String == "String" }.compactMap { $0["value"] as? String }
-
-		var name: String? = nil
-		var keyImageURL: URL? = nil
-
-		for string in strings {
-			if
-				keyImageURL == nil,
-				let foundKeyImageURL = getKeyImageURL(from: string)
-			{
-				keyImageURL = foundKeyImageURL
-			} else if
-				name == nil,
-				let foundName = getName(from: string)
-			{
-				name = foundName
-			}
-		}
-
-		return (name, keyImageURL)
+		return (nil, nil)
+//		guard let dictionary = data.rawJson.value as? [String: Any] else { return (nil, nil) }
+//		guard let elements = dictionary["fields"] as? [[String: Any]] else { return (nil, nil) }
+//		let strings = elements.filter { $0["kind"] as? String == "String" }.compactMap { $0["value"] as? String }
+//
+//		var name: String? = nil
+//		var keyImageURL: URL? = nil
+//
+//		for string in strings {
+//			if
+//				keyImageURL == nil,
+//				let foundKeyImageURL = getKeyImageURL(from: string)
+//			{
+//				keyImageURL = foundKeyImageURL
+//			} else if
+//				name == nil,
+//				let foundName = getName(from: string)
+//			{
+//				name = foundName
+//			}
+//		}
+//
+//		return (name, keyImageURL)
 	}
 
 	private func getKeyImageURL(from string: String) -> URL? {

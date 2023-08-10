@@ -141,26 +141,59 @@ extension AssetTransfer {
 	}
 
 	private func createManifest(_ accounts: TransferAccountList.State) async throws -> TransactionManifest {
-		let involvedFungibleResources = extractInvolvedFungibleResources(accounts.receivingAccounts)
-		let fungiblesTransferInstruction = try involvedFungibleResources.map {
-			try fungibleResourceTransferInstruction(witdhrawAccount: accounts.fromAccount.address, $0)
-		}
-
-		let involvedNonFungibles = extractInvolvedNonFungibleResource(accounts.receivingAccounts)
-		let nonFungiblesTransferInstruction = try involvedNonFungibles.map {
-			try nonFungibleResourceTransferInstruction(witdhrawAccount: accounts.fromAccount.address, $0)
-		}
-
-		let allInstructions = fungiblesTransferInstruction + nonFungiblesTransferInstruction
-
 		let networkID = await gatewaysClient.getCurrentNetworkID()
-		return try .init(
-			instructions: .fromString(
-				string: String(allInstructions.joined(by: "\n")),
-				networkId: networkID.rawValue
-			),
-			blobs: []
-		)
+
+		let involvedFungibleResources = extractInvolvedFungibleResources(accounts.receivingAccounts)
+		let involvedNonFungibles = extractInvolvedNonFungibleResource(accounts.receivingAccounts)
+
+		return try ManifestBuilder.make {
+			for resource in involvedFungibleResources {
+				ManifestBuilder.withdrawAmount(
+					accounts.fromAccount.address.asGeneral(),
+					resource.address,
+					resource.totalTransferAmount
+				)
+
+				for account in resource.accounts {
+					let bucket = ManifestBuilderBucket.unique
+					try ManifestBuilder.takeFromWorktop(
+						resource.address.intoEngine(),
+						account.amount.intoEngine(),
+						bucket
+					)
+					try ManifestBuilder.accountTryDepositOrAbort(
+						account.id.intoEngine(),
+						nil,
+						bucket
+					)
+				}
+			}
+
+			for resource in involvedNonFungibles {
+				ManifestBuilder.withdrawTokens(
+					accounts.fromAccount.address.asGeneral(),
+					resource.address,
+					resource.allTokens.map { $0.id.localId() }
+				)
+
+				for account in resource.accounts {
+					let bucket = ManifestBuilderBucket.unique
+					let localIds = account.tokens.map { $0.id.localId() }
+
+					try ManifestBuilder.takeNonFungiblesFromWorktop(
+						resource.address.intoEngine(),
+						localIds,
+						bucket
+					)
+					try ManifestBuilder.accountTryDepositOrAbort(
+						account.id.intoEngine(),
+						nil,
+						bucket
+					)
+				}
+			}
+		}
+		.build(networkId: networkID.rawValue)
 	}
 
 	private func extractInvolvedFungibleResources(
@@ -220,70 +253,5 @@ extension AssetTransfer {
 		}
 
 		return resources
-	}
-
-	private func fungibleResourceTransferInstruction(
-		witdhrawAccount: AccountAddress,
-		_ resource: InvolvedFungibleResource
-	) throws -> String {
-		// FIXME: Temporary and ugly, until the RET provides the manifest builder
-		let accountWithdrawals = [
-			"""
-			CALL_METHOD
-			    Address("\(witdhrawAccount.address)")
-			    "withdraw"
-			    Address("\(resource.address.address)")
-			    Decimal("\(resource.totalTransferAmount.toString())");
-			""",
-		]
-
-		let deposits: [String] = resource.accounts.map { account in
-			let bucket = UUID().uuidString
-
-			return """
-			TAKE_FROM_WORKTOP Address("\(resource.address.address)") Decimal("\(account.amount.toString())") Bucket("\(bucket)");
-			CALL_METHOD Address("\(account.id.address)") "try_deposit_or_abort" Bucket("\(bucket)");
-			"""
-		}
-
-		return String((accountWithdrawals + deposits).joined(by: "\n"))
-	}
-
-	private func nonFungibleResourceTransferInstruction(
-		witdhrawAccount: AccountAddress,
-		_ resource: InvolvedNonFungibleResource
-	) throws -> String {
-		// FIXME: Temporary and ugly, until the RET provides the manifest builder
-		let localIds = try String(resource.allTokens.map {
-			try "NonFungibleLocalId(\"\($0.id.localId().toString())\")"
-		}.joined(by: ","))
-
-		let accountWithdrawals = """
-		CALL_METHOD
-		    Address("\(witdhrawAccount.address)")
-		    "withdraw_non_fungibles"
-		    Address("\(resource.address.address)")
-		    Array<NonFungibleLocalId>(\(localIds));
-		"""
-		let deposits: [String] = try resource.accounts.map { account in
-			let bucket = UUID().uuidString
-			let localIds = try String(account.tokens.map {
-				try "NonFungibleLocalId(\"\($0.id.localId().toString())\")"
-			}.joined(by: ","))
-
-			return """
-			TAKE_NON_FUNGIBLES_FROM_WORKTOP
-			        Address("\(resource.address.address)")
-			        Array<NonFungibleLocalId>(\(localIds))
-			        Bucket(\"\(bucket)\");
-
-			CALL_METHOD
-			        Address("\(account.id)")
-			        "try_deposit_or_abort"
-			        Bucket("\(bucket)");
-			"""
-		}
-
-		return String(([accountWithdrawals] + deposits).joined(by: "\n"))
 	}
 }
