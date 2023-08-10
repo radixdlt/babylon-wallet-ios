@@ -29,7 +29,8 @@ final class TransactionClientTests: TestCase {
 							amount: 11
 						)
 					),
-					nonFungibleResources: []
+					nonFungibleResources: [],
+					poolUnitResources: .init(radixNetworkStakes: [], poolUnits: [])
 				)
 			} }
 		}, operation: {

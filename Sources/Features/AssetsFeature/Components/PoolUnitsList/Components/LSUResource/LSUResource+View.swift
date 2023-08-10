@@ -55,8 +55,7 @@ extension PoolUnitsList.LSUResource {
 						.foregroundColor(.app.gray1)
 						.textStyle(.secondaryHeader)
 
-					// FIXME: Localize
-					Text("\(viewStore.components.count) Stakes")
+					Text(L10n.Account.PoolUnits.numberOfStakes(viewStore.components.count))
 						.foregroundColor(.app.gray2)
 						.textStyle(.body2HighImportance)
 				}
@@ -129,64 +128,29 @@ private struct HeightPreferenceKey: PreferenceKey {
 }
 
 extension PoolUnitsList.LSUResource.State {
-	// FIXME: Rewire
 	var viewState: PoolUnitsList.LSUResource.ViewState {
 		.init(
 			isExpanded: isExpanded,
 			iconURL: .init(string: "https://i.ibb.co/KG06168/Screenshot-2023-08-02-at-16-19-29.png")!,
-			name: "Radix Network XRD Stake",
-			components: .init(
-				[
-					.init(
-						id: 0,
-						title: "Radostakes",
-						imageURL: .init(string: "https://i.ibb.co/NsKCTpT/Screenshot-2023-08-02-at-18-18-56.png")!,
-						liquidStakeUnit: .init(
-							thumbnail: .xrd,
-							symbol: "XRD",
-							tokenAmount: "2.0129822"
-						),
-						stakeClaimNFTs: .init(
-							rawValue: [
-								.init(
-									id: 0,
-									thumbnail: .xrd,
-									status: .unstaking,
-									tokenAmount: "450.0"
-								),
-								.init(
-									id: 1,
-									thumbnail: .xrd,
-									status: .unstaking,
-									tokenAmount: "1,250.0"
-								),
-								.init(
-									id: 2,
-									thumbnail: .xrd,
-									status: .readyToClaim,
-									tokenAmount: "1,200.0"
-								),
-							]
-						)
-					),
-					.init(
-						id: 1,
-						title: "Radix N Stakes",
-						imageURL: .init(string: "https://i.ibb.co/NsKCTpT/Screenshot-2023-08-02-at-18-18-56.png")!,
-						liquidStakeUnit: nil,
-						stakeClaimNFTs: .init(
-							rawValue: [
-								.init(
-									id: 0,
-									thumbnail: .xrd,
-									status: .unstaking,
-									tokenAmount: "23,2132.321"
-								),
-							]
-						)
-					),
-				]
-			)!
+			name: L10n.Account.PoolUnits.lsuResourceHeader,
+			components: .init(rawValue: .init(uncheckedUniqueElements: stakes.map { stake in
+				LSUComponentView.ViewState(
+					id: stake.validator.address,
+					title: stake.validator.name ?? L10n.Account.PoolUnits.unknownValidatorName,
+					imageURL: stake.validator.iconURL,
+					liquidStakeUnit: stake.xrdRedemptionValue.map { .init(thumbnail: .xrd, symbol: "XRD", tokenAmount: $0.format()) },
+					stakeClaimNFTs: .init(rawValue: stake.stakeClaimResource.map { claimNFT in
+						.init(uncheckedUniqueElements: claimNFT.tokens.map { token in
+							LSUComponentView.StakeClaimNFTViewState(
+								id: token.id,
+								thumbnail: .xrd,
+								status: token.canBeClaimed ? .readyToClaim : .unstaking,
+								tokenAmount: (token.stakeClaimAmount ?? 0).format()
+							)
+						})
+					} ?? [])
+				)
+			}))!
 		)
 	}
 }

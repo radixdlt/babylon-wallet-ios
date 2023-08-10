@@ -24,7 +24,7 @@ extension ROLAClient {
 					return persona.address.asGeneral()
 				}
 			}()
-			let metadata = try await gatewayAPIClient.getEntityMetadata(entityAddress.address)
+			let metadata = try await gatewayAPIClient.getEntityMetadata(entityAddress.address, [.ownerKeys])
 			var ownerKeyHashes = try metadata.ownerKeyHashes() ?? []
 
 			let transactionSigningKeyHash: PublicKeyHash = try {
@@ -57,7 +57,7 @@ extension ROLAClient {
 				let metadataCollection = try await cacheClient.withCaching(
 					cacheEntry: .rolaDappVerificationMetadata(metadata.dAppDefinitionAddress.address),
 					request: {
-						try await gatewayAPIClient.getEntityMetadata(metadata.dAppDefinitionAddress.address)
+						try await gatewayAPIClient.getEntityMetadata(metadata.dAppDefinitionAddress.address, [.accountType, .relatedWebsites])
 					}
 				)
 

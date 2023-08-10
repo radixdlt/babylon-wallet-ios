@@ -1,5 +1,7 @@
 import AnyCodable
+import EngineKit
 import Foundation
+import Prelude
 
 // MARK: - GatewayAPI.StateEntityDetailsResponse + Sendable
 extension GatewayAPI.StateEntityDetailsResponse: @unchecked Sendable {}
@@ -119,6 +121,30 @@ extension GatewayAPI.EntityMetadataCollection {
 		items[.ownerKeys]?.publicKeyHashes
 	}
 
+	public var validator: ValidatorAddress? {
+		extract(
+			key: .validator,
+			from: \.asGlobalAddress,
+			transform: ValidatorAddress.init(validatingAddress:)
+		)
+	}
+
+	public var pool: ResourcePoolAddress? {
+		extract(
+			key: .pool,
+			from: \.asGlobalAddress,
+			transform: ResourcePoolAddress.init(validatingAddress:)
+		)
+	}
+
+	public var poolUnitResource: ResourceAddress? {
+		extract(
+			key: .poolUnit,
+			from: \.asGlobalAddress,
+			transform: ResourceAddress.init(validatingAddress:)
+		)
+	}
+
 	public enum AccountType: String {
 		case dappDefinition = "dapp definition"
 	}
@@ -148,6 +174,28 @@ extension GatewayAPI.EntityMetadataCollection {
 			}
 		}
 	}
+
+	private func extract<Value, Field>(
+		key: EntityMetadataKey,
+		from keyPath: KeyPath<GatewayAPI.EntityMetadataItemValue, Field?>,
+		transform: @escaping (Field) throws -> Value
+	) -> Value? {
+		guard let item = items[key] else {
+			return nil
+		}
+
+		guard let field = item[keyPath: keyPath] else {
+			assertionFailure("item found, but it was not wrapped in the expected field")
+			return nil
+		}
+
+		do {
+			return try transform(field)
+		} catch {
+			assertionFailure(error.localizedDescription)
+			return nil
+		}
+	}
 }
 
 // MARK: - EntityMetadataKey
@@ -157,12 +205,32 @@ public enum EntityMetadataKey: String, CaseIterable {
 	case description
 	case iconURL = "icon_url"
 	case dappDefinition = "dapp_definition"
+	case validator
+	case pool
+	case poolUnit = "pool_unit"
 	case dappDefinitions = "dapp_definitions"
 	case claimedEntities = "claimed_entities"
 	case claimedWebsites = "claimed_websites"
 	case relatedWebsites = "related_websites"
 	case accountType = "account_type"
 	case ownerKeys = "owner_keys"
+
+	// The GW limits the number of metadata keys we can ask for
+	static var maxAllowedKeys = 10
+}
+
+extension Set<EntityMetadataKey> {
+	public static var resourceMetadataKeys: Set<EntityMetadataKey> {
+		[.name, .symbol, .description, .iconURL, .validator, .pool, .accountType, .dappDefinition]
+	}
+
+	public static var poolUnitMetadataKeys: Set<EntityMetadataKey> {
+		resourceMetadataKeys.union([.poolUnit])
+	}
+
+	public static var dappMetadataKeys: Set<EntityMetadataKey> {
+		[.name, .description, .iconURL, .claimedEntities, .claimedWebsites, .relatedWebsites, .dappDefinitions]
+	}
 }
 
 extension [GatewayAPI.EntityMetadataItem] {

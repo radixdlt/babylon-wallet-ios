@@ -362,7 +362,7 @@ extension PersonaDetails.View {
 
 					if let fullName = viewStore.fullName {
 						VPair(
-							heading: "Full Name", // FIXME: Localize
+							heading: L10n.AuthorizedDapps.PersonaDetails.fullName,
 							item: fullName
 						)
 						Separator()

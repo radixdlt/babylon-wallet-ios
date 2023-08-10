@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Prelude
 #if canImport(AnyCodable)
 import AnyCodable
 #endif
@@ -18,9 +19,9 @@ extension GatewayAPI {
 public struct ScryptoSborValue: Codable, Hashable {
 
     public private(set) var rawHex: String
-    public private(set) var programmaticJson: AnyCodable
+    public private(set) var programmaticJson: JSONValue
 
-    public init(rawHex: String, programmaticJson: AnyCodable) {
+    public init(rawHex: String, programmaticJson: JSONValue) {
         self.rawHex = rawHex
         self.programmaticJson = programmaticJson
     }

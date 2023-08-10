@@ -6,7 +6,7 @@ extension PoolUnitsList {
 		public struct State: Sendable, Hashable {
 			var isExpanded: Bool = false
 
-			// FIXME: Rewire
+			let stakes: [AccountPortfolio.PoolUnitResources.RadixNetworkStake]
 		}
 
 		public enum ViewAction: Sendable, Equatable {
