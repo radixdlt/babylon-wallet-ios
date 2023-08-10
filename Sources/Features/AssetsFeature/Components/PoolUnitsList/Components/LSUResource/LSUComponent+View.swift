@@ -49,25 +49,34 @@ extension LSUComponent {
 	}
 
 	public struct View: SwiftUI.View {
-		let viewState: ViewState
+		let store: StoreOf<LSUComponent>
 
 		public var body: some SwiftUI.View {
-			VStack(alignment: .leading, spacing: .medium1) {
-				HStack(spacing: .small1) {
-					NFTThumbnail(viewState.imageURL, size: .smallest)
-					Text(viewState.title)
-					Spacer()
-				}
+			WithViewStore(
+				store,
+				observe: \.viewState,
+				send: Action.view
+			) { viewStore in
+				VStack(alignment: .leading, spacing: .medium1) {
+					HStack(spacing: .small1) {
+						NFTThumbnail(viewStore.imageURL, size: .smallest)
+						Text(viewStore.title)
+						Spacer()
+					}
 
-				if let liquidStakeUnitViewState = viewState.liquidStakeUnit {
-					liquidStakeUnitView(viewState: liquidStakeUnitViewState)
-				}
+					if let liquidStakeUnitViewState = viewStore.liquidStakeUnit {
+						liquidStakeUnitView(viewState: liquidStakeUnitViewState)
+							.onTapGesture {
+								viewStore.send(.didTap)
+							}
+					}
 
-				if let stakeClaimNFTsViewState = viewState.stakeClaimNFTs {
-					stakeClaimNFTsView(viewState: stakeClaimNFTsViewState)
+					if let stakeClaimNFTsViewState = viewStore.stakeClaimNFTs {
+						stakeClaimNFTsView(viewState: stakeClaimNFTsViewState)
+					}
 				}
+				.padding(.medium1)
 			}
-			.padding(.medium1)
 		}
 
 		@ViewBuilder
@@ -133,5 +142,42 @@ extension View {
 					.stroke(.app.gray4, lineWidth: 1)
 					.padding(.small2 * -1)
 			)
+	}
+}
+
+extension LSUComponent.State {
+	var viewState: LSUComponent.ViewState {
+		.init(
+			id: 0,
+			title: "Radostakes",
+			imageURL: .init(string: "https://i.ibb.co/NsKCTpT/Screenshot-2023-08-02-at-18-18-56.png")!,
+			liquidStakeUnit: .init(
+				thumbnail: .xrd,
+				symbol: "XRD",
+				tokenAmount: "2.0129822"
+			),
+			stakeClaimNFTs: .init(
+				rawValue: [
+					.init(
+						id: 0,
+						thumbnail: .xrd,
+						status: .unstaking,
+						tokenAmount: "450.0"
+					),
+					.init(
+						id: 1,
+						thumbnail: .xrd,
+						status: .unstaking,
+						tokenAmount: "1,250.0"
+					),
+					.init(
+						id: 2,
+						thumbnail: .xrd,
+						status: .readyToClaim,
+						tokenAmount: "1,200.0"
+					),
+				]
+			)
+		)
 	}
 }

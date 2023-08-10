@@ -4,7 +4,7 @@ extension LSUResource {
 	public struct ViewState: Sendable, Equatable {
 		let isExpanded: Bool
 		let iconURL: URL?
-		let components: NonEmpty<IdentifiedArrayOf<LSUComponent.ViewState>>
+		let numberOfStakes: Int
 	}
 
 	public struct View: SwiftUI.View {
@@ -31,7 +31,7 @@ extension LSUResource {
 					headerView(with: viewStore)
 
 					if viewStore.isExpanded {
-						componentsView(with: viewStore.components.rawValue)
+						componentsView
 					}
 
 					cardBehindHeader(
@@ -54,7 +54,7 @@ extension LSUResource {
 						.foregroundColor(.app.gray1)
 						.textStyle(.secondaryHeader)
 
-					Text(L10n.Account.PoolUnits.numberOfStakes(viewStore.components.count))
+					Text(L10n.Account.PoolUnits.numberOfStakes(viewStore.numberOfStakes))
 						.foregroundColor(.app.gray2)
 						.textStyle(.body2HighImportance)
 				}
@@ -79,12 +79,19 @@ extension LSUResource {
 			}
 		}
 
-		private func componentsView(
-			with componentViewStates: IdentifiedArrayOf<LSUComponent.ViewState>
-		) -> some SwiftUI.View {
+		private var componentsView: some SwiftUI.View {
 			VStack(spacing: 1) {
-				ForEach(componentViewStates, content: LSUComponent.View.init)
-					.background(.app.white)
+				ForEachStore(
+					store.scope(
+						state: \.components,
+						action: (
+							/LSUResource.Action.child
+								.. LSUResource.ChildAction.component
+						).embed
+					),
+					content: LSUComponent.View.init
+				)
+				.background(.app.white)
 			}
 			.roundedCorners(
 				.bottom,
@@ -131,58 +138,7 @@ extension LSUResource.State {
 		.init(
 			isExpanded: isExpanded,
 			iconURL: .init(string: "https://i.ibb.co/KG06168/Screenshot-2023-08-02-at-16-19-29.png")!,
-			components: .init(
-				[
-					.init(
-						id: 0,
-						title: "Radostakes",
-						imageURL: .init(string: "https://i.ibb.co/NsKCTpT/Screenshot-2023-08-02-at-18-18-56.png")!,
-						liquidStakeUnit: .init(
-							thumbnail: .xrd,
-							symbol: "XRD",
-							tokenAmount: "2.0129822"
-						),
-						stakeClaimNFTs: .init(
-							rawValue: [
-								.init(
-									id: 0,
-									thumbnail: .xrd,
-									status: .unstaking,
-									tokenAmount: "450.0"
-								),
-								.init(
-									id: 1,
-									thumbnail: .xrd,
-									status: .unstaking,
-									tokenAmount: "1,250.0"
-								),
-								.init(
-									id: 2,
-									thumbnail: .xrd,
-									status: .readyToClaim,
-									tokenAmount: "1,200.0"
-								),
-							]
-						)
-					),
-					.init(
-						id: 1,
-						title: "Radix N Stakes",
-						imageURL: .init(string: "https://i.ibb.co/NsKCTpT/Screenshot-2023-08-02-at-18-18-56.png")!,
-						liquidStakeUnit: nil,
-						stakeClaimNFTs: .init(
-							rawValue: [
-								.init(
-									id: 0,
-									thumbnail: .xrd,
-									status: .unstaking,
-									tokenAmount: "23,2132.321"
-								),
-							]
-						)
-					),
-				]
-			)!
+			numberOfStakes: components.count
 		)
 	}
 }
