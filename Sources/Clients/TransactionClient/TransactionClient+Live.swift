@@ -128,7 +128,12 @@ extension TransactionClient {
 			}
 
 			loggerGlobal.debug("Setting fee payer to: \(addressOfPayer.address)")
-			return try manifest.withLockFeeCallMethodAdded(address: addressOfPayer.asGeneral())
+			// This will go away with FeePayer update
+			return try manifest.modify(modifications: .init(
+				addAccessControllerProofs: [],
+				addLockFee: .init(accountAddress: addressOfPayer.intoEngine(), amount: feeToAdd.intoEngine()),
+				addAssertions: []
+			))
 		}
 
 		let lockFeeBySearchingForSuitablePayer: LockFeeBySearchingForSuitablePayer = { manifest, feeToAdd in

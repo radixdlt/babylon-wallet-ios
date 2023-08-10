@@ -43,7 +43,12 @@ extension ROLAClient {
 			}
 
 			loggerGlobal.notice("Setting ownerKeyHashes to: \(ownerKeyHashes)")
-			return try .manifestForOwnerKeys(address: entityAddress.address, keyHashes: ownerKeyHashes, networkID: entity.networkID)
+			return try ManifestBuilder()
+				.setOwnerKeys(
+					from: entityAddress,
+					ownerKeyHashes: ownerKeyHashes
+				)
+				.build(networkId: request.entity.networkID.rawValue)
 		}
 
 		return Self(

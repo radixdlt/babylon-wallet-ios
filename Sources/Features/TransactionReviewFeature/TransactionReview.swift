@@ -477,21 +477,23 @@ public struct TransactionReview: Sendable, FeatureReducer {
 	) throws -> TransactionManifest {
 		guard !guarantees.isEmpty else { return manifest }
 
-		var manifest = manifest
-
-		/// Will be increased with each added guarantee to account for the difference in indexes from the initial manifest.
-		var indexInc = 1 // LockFee was added, start from 1
-		for guarantee in guarantees {
-			let guaranteeInstruction: Instruction = try .assertWorktopContains(
-				resourceAddress: guarantee.resourceAddress.intoEngine(),
-				amount: .init(value: guarantee.amount.toString())
+		let assertions: [IndexedAssertion] = try guarantees.map {
+			try .init(
+				// Increase by one because we also add guarantees.
+				// Will be reverted once FeePayer updates are merged, as we will be adding
+				// the lock fee right before sending the transaction, and not exactly after the review.
+				index: $0.instructionIndex + 1,
+				assertion: .amount(
+					resourceAddress: $0.resourceAddress.intoEngine(),
+					amount: $0.amount.intoEngine()
+				)
 			)
-
-			manifest = try manifest.withInstructionAdded(guaranteeInstruction, at: Int(guarantee.instructionIndex) + indexInc)
-
-			indexInc += 1
 		}
-		return manifest
+		return try manifest.modify(modifications: .init(
+			addAccessControllerProofs: [],
+			addLockFee: nil,
+			addAssertions: assertions
+		))
 	}
 
 	func showRawTransaction(_ state: inout State) -> EffectTask<Action> {

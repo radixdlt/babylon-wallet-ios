@@ -33,7 +33,7 @@ struct AddTrustedContactPreviewApp: SwiftUI.App {
 import FactorSourcesClient
 extension FactorSourcesClient {
 	static let previewApp: Self =
-		with(noop) {
+		update(noop) {
 			$0.saveFactorSource = { _ in }
 		}
 }

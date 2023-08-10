@@ -40,7 +40,7 @@ private struct PresentationBackgroundModifier: ViewModifier {
 				let backgroundView: UIView = {
 					switch background {
 					case let .blur(style):
-						return with(UIVisualEffectView(effect: UIBlurEffect(style: style))) {
+						return update(UIVisualEffectView(effect: UIBlurEffect(style: style))) {
 							$0.frame = containerView.bounds
 							$0.autoresizingMask = [.flexibleWidth, .flexibleHeight]
 						}

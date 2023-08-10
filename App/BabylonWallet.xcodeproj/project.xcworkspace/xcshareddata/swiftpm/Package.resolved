@@ -230,8 +230,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/radixdlt/swift-engine-toolkit",
       "state" : {
-        "revision" : "040b80d1bd847ec6db403512160d92ef368d2c6c",
-        "version" : "0.12.0-fig.1-9127122"
+        "revision" : "c7ab970048ec165a2c0414abeac61c333568f8a7",
+        "version" : "0.12.0-fig.1-a50f411"
       }
     },
     {
@@ -295,6 +295,15 @@
       "state" : {
         "revision" : "0a5bc04095a675662cf24757cc0640aa2204253b",
         "version" : "1.0.2"
+      }
+    },
+    {
+      "identity" : "swift-overture",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/pointfreeco/swift-overture",
+      "state" : {
+        "revision" : "7977acd7597f413717058acc1e080731249a1d7e",
+        "version" : "0.5.0"
       }
     },
     {
