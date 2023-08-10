@@ -170,7 +170,12 @@ public struct AssetsView: Sendable, FeatureReducer {
 				guard !portfolio.poolUnitResources.radixNetworkStakes.isEmpty else {
 					return nil
 				}
-				return .init(stakes: portfolio.poolUnitResources.radixNetworkStakes)
+				return .init(
+					stakes: .init(
+						uniqueElements: portfolio.poolUnitResources.radixNetworkStakes
+							.map(LSUDetails.State.init)
+					)
+				)
 			}()
 
 			state.poolUnitsList = .init(

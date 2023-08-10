@@ -6,14 +6,25 @@ extension PoolUnitsList {
 		public struct State: Sendable, Hashable {
 			var isExpanded: Bool = false
 
-			let stakes: [AccountPortfolio.PoolUnitResources.RadixNetworkStake]
+			var stakes: IdentifiedArrayOf<LSUDetails.State>
 		}
 
 		public enum ViewAction: Sendable, Equatable {
 			case isExpandedToggled
 		}
 
-		public init() {}
+		public enum ChildAction: Sendable, Equatable {
+			case details(id: LSUDetails.State.ID, action: LSUDetails.Action)
+		}
+
+		public var body: some ReducerProtocolOf<Self> {
+			Reduce(core)
+				.forEach(
+					\.stakes,
+					action: /Action.child .. ChildAction.details,
+					element: LSUDetails.init
+				)
+		}
 
 		public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 			switch viewAction {
