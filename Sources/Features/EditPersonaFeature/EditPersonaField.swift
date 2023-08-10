@@ -122,9 +122,9 @@ extension DynamicFieldID: EditPersonaFieldID {
 	// FIXME: Localize
 	public var title: String {
 		switch self {
-		case .givenNames: return "Given Name(s)"
-		case .nickName: return "Nickname"
-		case .familyName: return "Family Name"
+		case .givenNames: return L10n.AuthorizedDapps.PersonaDetails.givenName
+		case .nickName: return L10n.AuthorizedDapps.PersonaDetails.nickname
+		case .familyName: return L10n.AuthorizedDapps.PersonaDetails.nameFamily
 		case .dateOfBirth: return "DoB"
 		case .companyName: return "Company Name"
 		case .emailAddress: return L10n.AuthorizedDapps.PersonaDetails.emailAddress

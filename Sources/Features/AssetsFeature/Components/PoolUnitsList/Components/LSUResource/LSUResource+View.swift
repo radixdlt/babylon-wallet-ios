@@ -55,8 +55,7 @@ extension PoolUnitsList.LSUResource {
 						.foregroundColor(.app.gray1)
 						.textStyle(.secondaryHeader)
 
-					// FIXME: Localize
-					Text("\(viewStore.components.count) Stakes")
+					Text(L10n.Account.PoolUnits.numberOfStakes(viewStore.components.count))
 						.foregroundColor(.app.gray2)
 						.textStyle(.body2HighImportance)
 				}
@@ -133,11 +132,11 @@ extension PoolUnitsList.LSUResource.State {
 		.init(
 			isExpanded: isExpanded,
 			iconURL: .init(string: "https://i.ibb.co/KG06168/Screenshot-2023-08-02-at-16-19-29.png")!,
-			name: "Radix Network XRD Stake",
+			name: L10n.Account.PoolUnits.lsuResourceHeader,
 			components: .init(rawValue: .init(uncheckedUniqueElements: stakes.map { stake in
 				LSUComponentView.ViewState(
 					id: stake.validator.address,
-					title: stake.validator.name ?? "Unknown",
+					title: stake.validator.name ?? L10n.Account.PoolUnits.unknownValidatorName,
 					imageURL: stake.validator.iconURL,
 					liquidStakeUnit: stake.xrdRedemptionValue.map { .init(thumbnail: .xrd, symbol: "XRD", tokenAmount: $0.format()) },
 					stakeClaimNFTs: .init(rawValue: stake.stakeClaimResource.map { claimNFT in
@@ -146,7 +145,7 @@ extension PoolUnitsList.LSUResource.State {
 								id: token.id,
 								thumbnail: .xrd,
 								status: token.canBeClaimed ? .readyToClaim : .unstaking,
-								tokenAmount: token.stakeClaimAmount?.format() ?? "0.00"
+								tokenAmount: (token.stakeClaimAmount ?? 0).format()
 							)
 						})
 					} ?? [])
