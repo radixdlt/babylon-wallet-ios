@@ -1,7 +1,9 @@
 import EngineKit
 import FeaturePrelude
 
-extension LSUComponentView {
+extension LSUComponent.ViewState {
+	typealias StakeClaimNFTsViewState = NonEmpty<IdentifiedArrayOf<StakeClaimNFTViewState>>
+
 	struct StakeClaimNFTViewState: Identifiable, Equatable {
 		let id: Int
 
@@ -35,10 +37,8 @@ extension LSUComponentView {
 }
 
 // MARK: - LSUComponentView
-struct LSUComponentView: View {
-	typealias StakeClaimNFTsViewState = NonEmpty<IdentifiedArrayOf<StakeClaimNFTViewState>>
-
-	public struct ViewState: Equatable, Identifiable {
+extension LSUComponent {
+	public struct ViewState: Sendable, Equatable, Identifiable {
 		public var id: Int
 
 		let title: String
@@ -48,71 +48,73 @@ struct LSUComponentView: View {
 		let stakeClaimNFTs: StakeClaimNFTsViewState?
 	}
 
-	let viewState: ViewState
+	public struct View: SwiftUI.View {
+		let viewState: ViewState
 
-	var body: some View {
-		VStack(alignment: .leading, spacing: .medium1) {
-			HStack(spacing: .small1) {
-				NFTThumbnail(viewState.imageURL, size: .smallest)
-				Text(viewState.title)
-				Spacer()
-			}
+		public var body: some SwiftUI.View {
+			VStack(alignment: .leading, spacing: .medium1) {
+				HStack(spacing: .small1) {
+					NFTThumbnail(viewState.imageURL, size: .smallest)
+					Text(viewState.title)
+					Spacer()
+				}
 
-			if let liquidStakeUnitViewState = viewState.liquidStakeUnit {
-				liquidStakeUnitView(viewState: liquidStakeUnitViewState)
-			}
+				if let liquidStakeUnitViewState = viewState.liquidStakeUnit {
+					liquidStakeUnitView(viewState: liquidStakeUnitViewState)
+				}
 
-			if let stakeClaimNFTsViewState = viewState.stakeClaimNFTs {
-				stakeClaimNFTsView(viewState: stakeClaimNFTsViewState)
+				if let stakeClaimNFTsViewState = viewState.stakeClaimNFTs {
+					stakeClaimNFTsView(viewState: stakeClaimNFTsViewState)
+				}
 			}
+			.padding(.medium1)
 		}
-		.padding(.medium1)
-	}
 
-	@ViewBuilder
-	private func liquidStakeUnitView(viewState: PoolUnitResourceViewState) -> some View {
-		Text(L10n.Account.PoolUnits.liquidStakeUnits)
-			.stakeHeaderStyle
-
-		PoolUnitResourceView(viewState: viewState) {
-			VStack(alignment: .leading) {
-				Text(viewState.symbol)
-					.foregroundColor(.app.gray1)
-					.textStyle(.body2HighImportance)
-
-				Text(L10n.Account.PoolUnits.staked)
-					.foregroundColor(.app.gray2)
-					.textStyle(.body2HighImportance)
-			}
-		}
-		.borderAround
-	}
-
-	private func stakeClaimNFTsView(viewState: StakeClaimNFTsViewState) -> some View {
-		VStack(alignment: .leading, spacing: .medium1) {
-			Text(L10n.Account.PoolUnits.stakeClaimNFTs)
+		@ViewBuilder
+		private func liquidStakeUnitView(viewState: PoolUnitResourceViewState) -> some SwiftUI.View {
+			Text(L10n.Account.PoolUnits.liquidStakeUnits)
 				.stakeHeaderStyle
 
-			ForEach(viewState) { stakeClaimNFT in
-				HStack {
-					HStack(spacing: .small1) {
-						TokenThumbnail(
-							stakeClaimNFT.thumbnail,
-							size: .smallest
-						)
-
-						Text(stakeClaimNFT.status.localized)
-							.foregroundColor(stakeClaimNFT.status.foregroundColor)
-							.textStyle(.body2HighImportance)
-					}
-
-					Spacer()
-
-					Text(stakeClaimNFT.tokenAmount)
+			PoolUnitResourceView(viewState: viewState) {
+				VStack(alignment: .leading) {
+					Text(viewState.symbol)
 						.foregroundColor(.app.gray1)
-						.textStyle(.secondaryHeader)
+						.textStyle(.body2HighImportance)
+
+					Text(L10n.Account.PoolUnits.staked)
+						.foregroundColor(.app.gray2)
+						.textStyle(.body2HighImportance)
 				}
-				.borderAround
+			}
+			.borderAround
+		}
+
+		private func stakeClaimNFTsView(viewState: ViewState.StakeClaimNFTsViewState) -> some SwiftUI.View {
+			VStack(alignment: .leading, spacing: .medium1) {
+				Text(L10n.Account.PoolUnits.stakeClaimNFTs)
+					.stakeHeaderStyle
+
+				ForEach(viewState) { stakeClaimNFT in
+					HStack {
+						HStack(spacing: .small1) {
+							TokenThumbnail(
+								stakeClaimNFT.thumbnail,
+								size: .smallest
+							)
+
+							Text(stakeClaimNFT.status.localized)
+								.foregroundColor(stakeClaimNFT.status.foregroundColor)
+								.textStyle(.body2HighImportance)
+						}
+
+						Spacer()
+
+						Text(stakeClaimNFT.tokenAmount)
+							.foregroundColor(.app.gray1)
+							.textStyle(.secondaryHeader)
+					}
+					.borderAround
+				}
 			}
 		}
 	}
@@ -131,5 +133,16 @@ extension View {
 					.stroke(.app.gray4, lineWidth: 1)
 					.padding(.small2 * -1)
 			)
+	}
+}
+
+// MARK: - LSUComponent
+public struct LSUComponent: FeatureReducer {
+	public struct State: Sendable, Hashable, Identifiable {
+		public var id: String {
+			stake.validator.address.address
+		}
+
+		let stake: AccountPortfolio.PoolUnitResources.RadixNetworkStake
 	}
 }

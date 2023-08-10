@@ -4,7 +4,7 @@ extension LSUResource {
 	public struct ViewState: Sendable, Equatable {
 		let isExpanded: Bool
 		let iconURL: URL?
-		let components: NonEmpty<IdentifiedArrayOf<LSUComponentView.ViewState>>
+		let components: NonEmpty<IdentifiedArrayOf<LSUComponent.ViewState>>
 	}
 
 	public struct View: SwiftUI.View {
@@ -80,10 +80,10 @@ extension LSUResource {
 		}
 
 		private func componentsView(
-			with componentViewStates: IdentifiedArrayOf<LSUComponentView.ViewState>
+			with componentViewStates: IdentifiedArrayOf<LSUComponent.ViewState>
 		) -> some SwiftUI.View {
 			VStack(spacing: 1) {
-				ForEach(componentViewStates, content: LSUComponentView.init)
+				ForEach(componentViewStates, content: LSUComponent.View.init)
 					.background(.app.white)
 			}
 			.roundedCorners(

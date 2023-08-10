@@ -39,7 +39,7 @@ public struct AssetsView: Sendable, FeatureReducer {
 				fungibleTokenList: .init(),
 				nonFungibleTokenList: .init(rows: []),
 				poolUnitsList: .init(
-					lsuResource: .init(stakes: []),
+					lsuResource: .init(components: []),
 					poolUnits: [
 						.init(id: 0),
 						.init(id: 1),
@@ -171,9 +171,9 @@ public struct AssetsView: Sendable, FeatureReducer {
 					return nil
 				}
 				return .init(
-					stakes: .init(
+					components: .init(
 						uniqueElements: portfolio.poolUnitResources.radixNetworkStakes
-							.map(LSUDetails.State.init)
+							.map(LSUComponent.State.init)
 					)
 				)
 			}()

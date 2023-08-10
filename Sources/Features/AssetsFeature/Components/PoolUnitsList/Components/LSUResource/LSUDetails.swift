@@ -1,11 +1,7 @@
 import FeaturePrelude
 
 public struct LSUDetails: Sendable, FeatureReducer {
-	public struct State: Sendable, Hashable, Identifiable {
-		public var id: String {
-			stake.validator.address.address
-		}
-
+	public struct State: Sendable, Hashable {
 		let stake: AccountPortfolio.PoolUnitResources.RadixNetworkStake
 	}
 
