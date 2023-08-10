@@ -3,18 +3,30 @@ import FeaturePrelude
 
 extension PoolUnitDetails.State {
 	var viewState: PoolUnitDetails.ViewState {
-		let poolUnitResource = poolUnit.poolUnitResource
-		return .init(
+		.init(
 			containerWithHeader: .init(
-				displayName: poolUnitResource.name ?? L10n.Account.PoolUnits.unknownPoolUnitName,
-				amount: poolUnitResource.amount.format(),
-				symbol: poolUnitResource.symbol
+				displayName: "YOYO",
+				amount: "100",
+				symbol: "XRD"
 			),
-			thumbnailURL: poolUnitResource.iconURL,
-			resources: poolUnit.resourceViewStates,
-			description: poolUnitResource.description,
-			resourceAddress: poolUnitResource.resourceAddress,
-			currentSupply: poolUnitResource.totalSupply?.format() ?? L10n.AssetDetails.supplyUnkown
+			thumbnailURL: .init(string: "https://i.ibb.co/KG06168/Screenshot-2023-08-02-at-16-19-29.png")!,
+			resources: .init(
+				rawValue: [
+					.init(
+						thumbnail: .xrd,
+						symbol: "XRD",
+						tokenAmount: "2.0129822"
+					),
+					.init(
+						thumbnail: .known(.init(string: "https://i.ibb.co/KG06168/Screenshot-2023-08-02-at-16-19-29.png")!),
+						symbol: "WTF",
+						tokenAmount: "32.6129822"
+					),
+				]
+			)!,
+			description: "poolUnitResource.description",
+			resourceAddress: .init(address: "yoyo", decodedKind: .globalIdentity),
+			currentSupply: "1000"
 		)
 	}
 }

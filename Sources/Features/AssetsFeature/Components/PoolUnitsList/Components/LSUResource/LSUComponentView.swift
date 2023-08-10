@@ -3,7 +3,7 @@ import FeaturePrelude
 
 extension LSUComponentView {
 	struct StakeClaimNFTViewState: Identifiable, Equatable {
-		let id: NonFungibleGlobalId
+		let id: Int
 
 		let thumbnail: TokenThumbnail.Content
 		let status: StakeClaimNFTStatus
@@ -39,7 +39,7 @@ struct LSUComponentView: View {
 	typealias StakeClaimNFTsViewState = NonEmpty<IdentifiedArrayOf<StakeClaimNFTViewState>>
 
 	public struct ViewState: Equatable, Identifiable {
-		public var id: ValidatorAddress
+		public var id: Int
 
 		let title: String
 		let imageURL: URL?
