@@ -137,7 +137,7 @@ extension PoolUnitsList.LSUResource.State {
 						.map { stake in
 							LSUComponentView.ViewState(
 								id: stake.validator.address,
-								title: stake.validator.name ?? "Unknown",
+								title: stake.validator.name ?? L10n.Account.PoolUnits.unknownValidatorName,
 								imageURL: stake.validator.iconURL,
 								liquidStakeUnit: stake.xrdRedemptionValue
 									.map {
@@ -157,7 +157,7 @@ extension PoolUnitsList.LSUResource.State {
 															id: token.id,
 															thumbnail: .xrd,
 															status: token.canBeClaimed ? .readyToClaim : .unstaking,
-															tokenAmount: token.stakeClaimAmount?.format() ?? "0.00"
+															tokenAmount: (token.stakeClaimAmount ?? 0).format()
 														)
 													}
 											)
