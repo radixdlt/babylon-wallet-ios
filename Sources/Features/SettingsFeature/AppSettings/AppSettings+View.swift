@@ -6,8 +6,6 @@ import ProfileBackupsFeature
 extension AppSettings.State {
 	var viewState: AppSettings.ViewState {
 		.init(
-			hasLedgerHardwareWalletFactorSources: hasLedgerHardwareWalletFactorSources,
-			useVerboseLedgerDisplayMode: (preferences?.display.ledgerHQHardwareWalletSigningDisplayMode ?? .default) == .verbose,
 			isDeveloperModeEnabled: preferences?.security.isDeveloperModeEnabled ?? false,
 			isExportingLogs: exportLogs
 		)
@@ -17,11 +15,6 @@ extension AppSettings.State {
 // MARK: - AppSettings.View
 extension AppSettings {
 	public struct ViewState: Equatable {
-		let hasLedgerHardwareWalletFactorSources: Bool
-
-		/// only to be displayed if `hasLedgerHardwareWalletFactorSources` is true
-		let useVerboseLedgerDisplayMode: Bool
-
 		let isDeveloperModeEnabled: Bool
 		let isExportingLogs: URL?
 	}
@@ -38,9 +31,33 @@ extension AppSettings {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				let destinationStore = store.scope(state: \.$destination, action: { .child(.destination($0)) })
 				ScrollView {
-					coreView(with: viewStore)
-						.navigationTitle(L10n.AppSettings.title)
-						.onAppear { viewStore.send(.appeared) }
+					VStack(spacing: .zero) {
+						VStack(spacing: .zero) {
+							ForEach(rows) { row in
+								PlainListRow(row.icon, title: row.title)
+									.tappable {
+										viewStore.send(row.action)
+									}
+									.withSeparator
+							}
+						}
+
+						VStack(spacing: .zero) {
+							isDeveloperModeEnabled(with: viewStore)
+								.withSeparator
+
+							if !RuntimeInfo.isAppStoreBuild {
+								exportLogs(with: viewStore)
+									.withSeparator
+							}
+
+							resetWallet(with: viewStore)
+								.withSeparator
+						}
+						.padding(.horizontal, .medium3)
+					}
+					.navigationTitle(L10n.AppSettings.title)
+					.onAppear { viewStore.send(.appeared) }
 				}
 				.manageP2PLinks(with: destinationStore)
 				.gatewaySettings(with: destinationStore)
@@ -51,39 +68,6 @@ extension AppSettings {
 				state: /AppSettings.Destinations.State.deleteProfileConfirmationDialog,
 				action: AppSettings.Destinations.Action.deleteProfileConfirmationDialog
 			)
-		}
-
-		private func coreView(with viewStore: ViewStoreOf<AppSettings>) -> some SwiftUI.View {
-			VStack(spacing: .zero) {
-				VStack(spacing: .zero) {
-					ForEach(rows) { row in
-						PlainListRow(row.icon, title: row.title)
-							.tappable {
-								viewStore.send(row.action)
-							}
-							.withSeparator
-					}
-				}
-
-				VStack(spacing: .zero) {
-					isDeveloperModeEnabled(with: viewStore)
-						.withSeparator
-
-					if !RuntimeInfo.isAppStoreBuild {
-						exportLogs(with: viewStore)
-							.withSeparator
-					}
-
-//					if viewStore.hasLedgerHardwareWalletFactorSources {
-					isUsingVerboseLedgerMode(with: viewStore)
-						.withSeparator
-//					}
-
-					resetWallet(with: viewStore)
-						.withSeparator
-				}
-				.padding(.horizontal, .medium3)
-			}
 		}
 
 		private var rows: [SettingsRowModel<AppSettings>] {
@@ -107,17 +91,6 @@ extension AppSettings {
 			]
 		}
 
-		private func isUsingVerboseLedgerMode(with viewStore: ViewStoreOf<AppSettings>) -> some SwiftUI.View {
-			ToggleView(
-				title: L10n.AppSettings.VerboseLedgerMode.title,
-				subtitle: L10n.AppSettings.VerboseLedgerMode.subtitle,
-				isOn: viewStore.binding(
-					get: \.useVerboseLedgerDisplayMode,
-					send: { .useVerboseModeToggled($0) }
-				)
-			)
-		}
-
 		private func isDeveloperModeEnabled(with viewStore: ViewStoreOf<AppSettings>) -> some SwiftUI.View {
 			ToggleView(
 				title: L10n.AppSettings.DeveloperMode.title,
@@ -132,28 +105,23 @@ extension AppSettings {
 		private func exportLogs(with viewStore: ViewStoreOf<AppSettings>) -> some SwiftUI.View {
 			HStack {
 				VStack(alignment: .leading, spacing: 0) {
-					Text("Export Logs")
+					Text("Export Logs") // FIXME: Strings
 						.foregroundColor(.app.gray1)
 						.textStyle(.body1HighImportance)
 
-					Text("Export and save debugging logs")
+					Text("Export and save debugging logs") // FIXME: Strings
 						.foregroundColor(.app.gray2)
 						.textStyle(.body2Regular)
 						.fixedSize()
 				}
 
-				Button("Export") {
+				Button("Export") { // FIXME: Strings
 					viewStore.send(.exportLogsTapped)
 				}
 				.buttonStyle(.secondaryRectangular)
 				.flushedRight
 			}
-			.sheet(item:
-				viewStore.binding(
-					get: { $0.isExportingLogs },
-					send: { _ in .exportLogsDismissed }
-				)
-			) { logFilePath in
+			.sheet(item: viewStore.binding(get: \.isExportingLogs, send: { _ in .exportLogsDismissed })) { logFilePath in
 				ShareView(items: [logFilePath])
 			}
 			.frame(height: .largeButtonHeight)

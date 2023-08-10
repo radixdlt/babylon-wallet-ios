@@ -2,8 +2,23 @@ import AuthorizedDAppsFeature
 import FeaturePrelude
 import LedgerHardwareDevicesFeature
 
+extension AccountSecurity.State {
+	var viewState: AccountSecurity.ViewState {
+		.init(
+			hasLedgerHardwareWalletFactorSources: hasLedgerHardwareWalletFactorSources,
+			useVerboseLedgerDisplayMode: (preferences?.display.ledgerHQHardwareWalletSigningDisplayMode ?? .default) == .verbose
+		)
+	}
+}
+
 // MARK: - AccountSecurity.View
 extension AccountSecurity {
+	public struct ViewState: Equatable {
+		let hasLedgerHardwareWalletFactorSources: Bool
+		/// only to be displayed if `hasLedgerHardwareWalletFactorSources` is true
+		let useVerboseLedgerDisplayMode: Bool
+	}
+
 	@MainActor
 	public struct View: SwiftUI.View {
 		private let store: Store
@@ -16,16 +31,27 @@ extension AccountSecurity {
 
 extension AccountSecurity.View {
 	public var body: some View {
-		WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
+		WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 			let destinationStore = store.scope(state: \.$destination, action: { .child(.destination($0)) })
 			ScrollView {
-				ForEach(rows) { row in
-					PlainListRow(row.icon, title: row.title, subtitle: row.subtitle)
-						.tappable {
-							viewStore.send(row.action)
-						}
-						.withSeparator
+				VStack(spacing: .zero) {
+					ForEach(rows) { row in
+						PlainListRow(row.icon, title: row.title, subtitle: row.subtitle)
+							.tappable {
+								viewStore.send(row.action)
+							}
+							.withSeparator
+					}
+
+					if viewStore.hasLedgerHardwareWalletFactorSources {
+						isUsingVerboseLedgerMode(with: viewStore)
+							.withSeparator
+							.padding(.horizontal, .medium3)
+					}
 				}
+			}
+			.onAppear {
+				viewStore.send(.appeared)
 			}
 			.navigationTitle("Account Security") // FIXME: Strings - L10n.Settings.AccountSecurity.title
 			#if os(iOS)
@@ -40,6 +66,17 @@ extension AccountSecurity.View {
 				.foregroundColor(.app.gray1)
 		}
 		.presentsLoadingViewOverlay()
+	}
+
+	private func isUsingVerboseLedgerMode(with viewStore: ViewStoreOf<AccountSecurity>) -> some SwiftUI.View {
+		ToggleView(
+			title: L10n.AppSettings.VerboseLedgerMode.title,
+			subtitle: L10n.AppSettings.VerboseLedgerMode.subtitle,
+			isOn: viewStore.binding(
+				get: \.useVerboseLedgerDisplayMode,
+				send: { .useVerboseModeToggled($0) }
+			)
+		)
 	}
 
 	@MainActor
@@ -96,8 +133,8 @@ private extension View {
 	func importFromOlympiaLegacyWallet(with destinationStore: PresentationStoreOf<AccountSecurity.Destinations>) -> some View {
 		sheet(
 			store: destinationStore,
-			state: /AccountSecurity.Destinations.State.importOlympiaWalletCoordinator,
-			action: AccountSecurity.Destinations.Action.importOlympiaWalletCoordinator,
+			state: /AccountSecurity.Destinations.State.importOlympiaWallet,
+			action: AccountSecurity.Destinations.Action.importOlympiaWallet,
 			content: { ImportOlympiaWalletCoordinator.View(store: $0) }
 		)
 	}

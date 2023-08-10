@@ -23,12 +23,14 @@ extension DebugSettings.View {
 		WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
 			let destinationStore = store.scope(state: \.$destination, action: { .child(.destination($0)) })
 			ScrollView {
-				ForEach(rows) { row in
-					PlainListRow(row.icon, title: row.title, subtitle: row.subtitle)
-						.tappable {
-							viewStore.send(row.action)
-						}
-						.withSeparator
+				VStack(spacing: .zero) {
+					ForEach(rows) { row in
+						PlainListRow(row.icon, title: row.title, subtitle: row.subtitle)
+							.tappable {
+								viewStore.send(row.action)
+							}
+							.withSeparator
+					}
 				}
 			}
 			.padding(.bottom, .large3)

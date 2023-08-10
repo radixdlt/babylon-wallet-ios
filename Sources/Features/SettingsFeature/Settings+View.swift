@@ -30,6 +30,7 @@ extension Settings {
 		let debugAppInfo: String
 		#endif
 		let shouldShowAddP2PLinkButton: Bool
+		let shouldShowMigrateOlympiaButton: Bool
 		let appVersion: String
 
 		init(state: Settings.State) {
@@ -39,6 +40,7 @@ extension Settings {
 			#endif
 
 			self.shouldShowAddP2PLinkButton = state.userHasNoP2PLinks ?? false
+			self.shouldShowMigrateOlympiaButton = state.shouldShowMigrateOlympiaButton
 			@Dependency(\.bundleInfo) var bundleInfo: BundleInfo
 			self.appVersion = L10n.Settings.appVersion(bundleInfo.shortVersion, bundleInfo.version)
 		}
@@ -87,12 +89,22 @@ extension Settings.View {
 	private func settingsView(viewStore: ViewStoreOf<Settings>) -> some View {
 		ScrollView {
 			VStack(spacing: .zero) {
-				if viewStore.shouldShowAddP2PLinkButton {
-					ConnectExtensionView {
-						viewStore.send(.addP2PLinkButtonTapped)
+				VStack(spacing: .medium3) {
+					if viewStore.shouldShowAddP2PLinkButton {
+						ConnectExtensionView {
+							viewStore.send(.addP2PLinkButtonTapped)
+						}
 					}
-					.padding(.medium3)
+					if viewStore.shouldShowMigrateOlympiaButton {
+						MigrateOlympiaAccountsView {
+							viewStore.send(.importOlympiaButtonTapped)
+						} dismiss: {
+							viewStore.send(.dismissImportOlympiaHeaderButtonTapped)
+						}
+						.transition(headerTransition)
+					}
 				}
+				.padding(.medium3)
 
 				ForEach(rows) { row in
 					PlainListRow(row.icon, title: row.title, subtitle: row.subtitle)
@@ -118,9 +130,14 @@ extension Settings.View {
 				#endif
 			}
 		}
+		.animation(.default, value: viewStore.shouldShowMigrateOlympiaButton)
 		.onAppear {
 			viewStore.send(.appeared)
 		}
+	}
+
+	private var headerTransition: AnyTransition {
+		.scale(scale: 0.8).combined(with: .opacity)
 	}
 
 	@MainActor
@@ -167,6 +184,7 @@ extension View {
 	@MainActor
 	fileprivate func navigationDestinations(with destinationStore: PresentationStoreOf<Settings.Destinations>) -> some View {
 		self
+			.importFromOlympiaLegacyWallet(with: destinationStore)
 			.manageP2PLinks(with: destinationStore)
 			.authorizedDapps(with: destinationStore)
 			.personas(with: destinationStore)
@@ -184,6 +202,16 @@ extension View {
 			state: /Settings.Destinations.State.manageP2PLinks,
 			action: Settings.Destinations.Action.manageP2PLinks,
 			destination: { P2PLinksFeature.View(store: $0) }
+		)
+	}
+
+	@MainActor
+	func importFromOlympiaLegacyWallet(with destinationStore: PresentationStoreOf<Settings.Destinations>) -> some View {
+		sheet(
+			store: destinationStore,
+			state: /Settings.Destinations.State.importOlympiaWallet,
+			action: Settings.Destinations.Action.importOlympiaWallet,
+			content: { ImportOlympiaWalletCoordinator.View(store: $0) }
 		)
 	}
 
@@ -262,7 +290,7 @@ struct ConnectExtensionView: View {
 	var body: some View {
 		VStack(spacing: .medium2) {
 			Image(asset: AssetResource.browsers)
-				.padding([.top, .horizontal], .medium1)
+				.padding(.horizontal, .medium1)
 
 			Text(L10n.Settings.LinkToConnectorHeader.title)
 				.textStyle(.body1Header)
@@ -280,8 +308,9 @@ struct ConnectExtensionView: View {
 					shouldExpand: true,
 					image: .init(asset: AssetResource.qrCodeScanner)
 				))
-				.padding([.bottom, .horizontal], .medium1)
+				.padding(.horizontal, .medium1)
 		}
+		.padding(.vertical, .medium1)
 		.background(Color.app.gray5)
 		.cornerRadius(.medium3)
 	}
@@ -289,30 +318,35 @@ struct ConnectExtensionView: View {
 
 // MARK: - MigrateOlympiaAccountsView
 struct MigrateOlympiaAccountsView: View {
-	let dismiss: () -> Void
 	let action: () -> Void
+	let dismiss: () -> Void
 
 	var body: some View {
 		VStack(spacing: .medium2) {
-			Text(L10n.Settings.LinkToConnectorHeader.title)
+			Text("Radix Olympia Desktop Wallet user?") // FIXME: Strings - L10n.Settings.MigrateOlympiaAccountHeader.title
 				.textStyle(.body1Header)
 				.foregroundColor(.app.gray1)
 				.padding(.horizontal, .medium2)
 
-			Text(L10n.Settings.LinkToConnectorHeader.subtitle)
+			Text("Get started importing your Olympia accounts into your new Radix Wallet.") // FIXME: Strings - L10n.Settings.MigrateOlympiaAccountHeader.subtitle
 				.foregroundColor(.app.gray2)
 				.textStyle(.body2Regular)
 				.multilineTextAlignment(.center)
-				.padding(.horizontal, .medium2)
+				.padding(.horizontal, .medium1)
 
-			Button(L10n.Settings.LinkToConnectorHeader.linkToConnector, action: action)
+			Button("Import Legacy Accounts", action: action) // FIXME: Strings - L10n.Settings.MigrateOlympiaAccountHeader.importLegacyAccounts
 				.buttonStyle(.secondaryRectangular(
 					shouldExpand: true,
-					image: .init(asset: AssetResource.qrCodeScanner)
+					image: .init(asset: AssetResource.qrCodeScanner) // FIXME: Pick asset
 				))
-				.padding([.bottom, .horizontal], .medium1)
+				.padding(.horizontal, .medium1)
 		}
+		.padding(.vertical, .medium1)
 		.background(Color.app.gray5)
 		.cornerRadius(.medium3)
+		.overlay(alignment: .topTrailing) {
+			CloseButton(action: dismiss)
+				.offset(x: .small3, y: -.small3)
+		}
 	}
 }

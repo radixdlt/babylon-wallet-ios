@@ -1,3 +1,4 @@
+import AccountsClient
 import AppPreferencesClient
 import AuthorizedDAppsFeature
 import FeaturePrelude
@@ -18,9 +19,13 @@ public struct Settings: Sendable, FeatureReducer {
 		@PresentationState
 		public var destination: Destinations.State?
 
-		public var userHasNoP2PLinks: Bool?
+		public var shouldShowMigrateOlympiaButton: Bool
+		public var userHasNoP2PLinks: Bool? = nil
 
-		public init() {}
+		public init() {
+			@Dependency(\.userDefaultsClient) var userDefaultsClient: UserDefaultsClient
+			self.shouldShowMigrateOlympiaButton = !userDefaultsClient.hideMigrateOlympiaButtonKey
+		}
 	}
 
 	// MARK: Action
@@ -28,6 +33,8 @@ public struct Settings: Sendable, FeatureReducer {
 	public enum ViewAction: Sendable, Equatable {
 		case appeared
 		case addP2PLinkButtonTapped
+		case importOlympiaButtonTapped
+		case dismissImportOlympiaHeaderButtonTapped
 
 		case authorizedDappsButtonTapped
 		case personasButtonTapped
@@ -37,7 +44,8 @@ public struct Settings: Sendable, FeatureReducer {
 	}
 
 	public enum InternalAction: Sendable, Equatable {
-		case loadP2PLinksResult(TaskResult<P2PLinks>)
+		case loadedP2PLinks(P2PLinks)
+		case loadAccountsResult(TaskResult<Profile.Network.Accounts>)
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -51,6 +59,7 @@ public struct Settings: Sendable, FeatureReducer {
 	public struct Destinations: Sendable, ReducerProtocol {
 		public enum State: Sendable, Hashable {
 			case manageP2PLinks(P2PLinksFeature.State)
+			case importOlympiaWallet(ImportOlympiaWalletCoordinator.State)
 
 			case authorizedDapps(AuthorizedDapps.State)
 			case personas(PersonasCoordinator.State)
@@ -61,6 +70,7 @@ public struct Settings: Sendable, FeatureReducer {
 
 		public enum Action: Sendable, Equatable {
 			case manageP2PLinks(P2PLinksFeature.Action)
+			case importOlympiaWallet(ImportOlympiaWalletCoordinator.Action)
 
 			case authorizedDapps(AuthorizedDapps.Action)
 			case personas(PersonasCoordinator.Action)
@@ -72,6 +82,9 @@ public struct Settings: Sendable, FeatureReducer {
 		public var body: some ReducerProtocolOf<Self> {
 			Scope(state: /State.manageP2PLinks, action: /Action.manageP2PLinks) {
 				P2PLinksFeature()
+			}
+			Scope(state: /State.importOlympiaWallet, action: /Action.importOlympiaWallet) {
+				ImportOlympiaWalletCoordinator()
 			}
 			Scope(state: /State.authorizedDapps, action: /Action.authorizedDapps) {
 				AuthorizedDapps()
@@ -93,9 +106,11 @@ public struct Settings: Sendable, FeatureReducer {
 
 	// MARK: Reducer
 
+	@Dependency(\.accountsClient) var accountsClient
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.p2pLinksClient) var p2pLinksClient
 	@Dependency(\.dismiss) var dismiss
+	@Dependency(\.userDefaultsClient) var userDefaultsClient
 
 	public var body: some ReducerProtocolOf<Self> {
 		Reduce(core)
@@ -107,11 +122,19 @@ public struct Settings: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .appeared:
-			return loadP2PLinks()
+			// We don't need to load the accounts if they have dismissed the olympia header before
+			return loadP2PLinks(andAccounts: state.shouldShowMigrateOlympiaButton)
 
 		case .addP2PLinkButtonTapped:
 			state.destination = .manageP2PLinks(.init(destination: .newConnection(.init())))
 			return .none
+
+		case .importOlympiaButtonTapped:
+			state.destination = .importOlympiaWallet(.init())
+			return .none
+
+		case .dismissImportOlympiaHeaderButtonTapped:
+			return hideImportOlympiaHeader(in: &state)
 
 		case .authorizedDappsButtonTapped:
 			state.destination = .authorizedDapps(.init())
@@ -137,12 +160,18 @@ public struct Settings: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
-		case let .loadP2PLinksResult(.success(clients)):
+		case let .loadedP2PLinks(clients):
 			state.userHasNoP2PLinks = clients.isEmpty
 			return .none
 
-		case let .loadP2PLinksResult(.failure(error)):
-			errorQueue.schedule(error)
+		case let .loadAccountsResult(.success(accounts)):
+			if accounts.contains(where: \.isOlympiaAccount) {
+				return hideImportOlympiaHeader(in: &state)
+			}
+			return .none
+
+		case let .loadAccountsResult(.failure(error)):
+			loggerGlobal.error("Failed to load accounts: \(error)")
 			return .none
 		}
 	}
@@ -164,17 +193,27 @@ public struct Settings: Sendable, FeatureReducer {
 			return .none
 		}
 	}
+
+	private func hideImportOlympiaHeader(in state: inout State) -> EffectTask<Action> {
+		state.shouldShowMigrateOlympiaButton = false
+		return .run { _ in
+			await userDefaultsClient.setHideMigrateOlympiaButtonKey(true)
+		}
+	}
 }
 
 // MARK: Private
 extension Settings {
-	private func loadP2PLinks() -> EffectTask<Action> {
-		.task {
-			await .internal(.loadP2PLinksResult(
-				TaskResult {
-					await p2pLinksClient.getP2PLinks()
-				}
-			))
+	private func loadP2PLinks(andAccounts loadAccounts: Bool = false) -> EffectTask<Action> {
+		.run { send in
+			await send(.internal(.loadedP2PLinks(
+				p2pLinksClient.getP2PLinks()
+			)))
+			if loadAccounts {
+				await send(.internal(.loadAccountsResult(
+					TaskResult { try await accountsClient.getAccountsOnCurrentNetwork() }
+				)))
+			}
 		}
 	}
 }
