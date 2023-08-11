@@ -22,12 +22,3 @@ public struct LSUDetails: Sendable, FeatureReducer {
 		}
 	}
 }
-
-extension AccountPortfolio {
-	static func xrdRedemptionValue(
-		validator: AccountPortfolio.PoolUnitResources.RadixNetworkStake.Validator,
-		stakeUnitResource: AccountPortfolio.FungibleResource
-	) -> BigDecimal {
-		(stakeUnitResource.amount * validator.xrdVaultBalance) / (stakeUnitResource.totalSupply ?? .one)
-	}
-}

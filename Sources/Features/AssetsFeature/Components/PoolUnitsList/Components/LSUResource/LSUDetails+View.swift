@@ -6,7 +6,7 @@ extension LSUDetails {
 		let containerWithHeader: DetailsContainerWithHeaderViewState
 		let thumbnailURL: URL?
 
-		let tokenAmount: String
+		let redeemableTokenAmount: String
 
 		let description: String?
 
@@ -35,7 +35,7 @@ extension LSUDetails {
 							.textStyle(.secondaryHeader)
 							.foregroundColor(.app.gray1)
 						PoolUnitResourcesView(
-							resources: .init(.init(xrdAmount: viewStore.tokenAmount))
+							resources: .init(.init(xrdAmount: viewStore.redeemableTokenAmount))
 						)
 
 						DetailsContainerWithHeaderViewMaker
@@ -71,7 +71,10 @@ extension LSUDetails.State {
 				symbolAndAmount: stakeUnitResource.symbolAndAmount
 			),
 			thumbnailURL: validator.iconURL,
-			tokenAmount: stakeUnitResource.amount.format(),
+			redeemableTokenAmount: AccountPortfolio.xrdRedemptionValue(
+				validator: validator,
+				stakeUnitResource: stakeUnitResource
+			).format(),
 			description: stakeUnitResource.description,
 			resourceAddress: stakeUnitResource.resourceAddress,
 			currentSupply: validator.xrdVaultBalance.format()
