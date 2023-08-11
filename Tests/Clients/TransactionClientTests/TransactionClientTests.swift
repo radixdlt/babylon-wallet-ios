@@ -10,9 +10,9 @@ import TransactionClient
 final class TransactionClientTests: TestCase {
 	func test_accountsSuitableToPayTXFee_CREATE_FUNGIBLE_RESOURCE_then_deposit_batch() async throws {
 		let expectedAccount = Profile.Network.Account.new(address: "account_tdx_21_12ya9jylskaa6gdrfr8nvve3pfc6wyhyw7eg83fwlc7fv2w0eanumcd")
-		let transactionManifest = try TransactionManifest.manifestForCreateFungibleToken(
+		let transactionManifest = try ManifestBuilder.manifestForCreateFungibleToken(
 			account: .init(validatingAddress: "account_tdx_21_12ya9jylskaa6gdrfr8nvve3pfc6wyhyw7eg83fwlc7fv2w0eanumcd"),
-			network: NetworkID.enkinet
+			networkID: NetworkID.enkinet
 		)
 		let sut = TransactionClient.liveValue
 
