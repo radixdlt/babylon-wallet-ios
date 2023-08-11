@@ -3,10 +3,10 @@ import FeaturePrelude
 public struct LSUComponent: FeatureReducer {
 	public struct State: Sendable, Hashable, Identifiable {
 		public var id: String {
-			"\(stake)"
+			stake.validator.address.address
 		}
 
-		let stake: Int
+		let stake: AccountPortfolio.PoolUnitResources.RadixNetworkStake
 
 		@PresentationState
 		public var destination: Destinations.State?
@@ -53,7 +53,7 @@ public struct LSUComponent: FeatureReducer {
 	) -> EffectTask<Action> {
 		switch viewAction {
 		case .didTap:
-			state.destination = .details(.init(stake: 3))
+			state.destination = .details(.init(stake: state.stake))
 
 			return .none
 		}

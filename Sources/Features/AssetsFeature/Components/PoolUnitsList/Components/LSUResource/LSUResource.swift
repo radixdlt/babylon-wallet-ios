@@ -5,10 +5,7 @@ public struct LSUResource: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		var isExpanded: Bool = false
 
-		var components: IdentifiedArrayOf<LSUComponent.State> = [
-			LSUComponent.State(stake: 0),
-			LSUComponent.State(stake: 1),
-		]
+		var components: IdentifiedArrayOf<LSUComponent.State>
 	}
 
 	public enum ViewAction: Sendable, Equatable {

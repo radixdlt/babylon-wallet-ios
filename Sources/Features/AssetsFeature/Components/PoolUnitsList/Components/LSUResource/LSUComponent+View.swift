@@ -5,7 +5,7 @@ extension LSUComponent.ViewState {
 	typealias StakeClaimNFTsViewState = NonEmpty<IdentifiedArrayOf<StakeClaimNFTViewState>>
 
 	struct StakeClaimNFTViewState: Identifiable, Equatable {
-		let id: Int
+		let id: NonFungibleGlobalId
 
 		let thumbnail: TokenThumbnail.Content
 		let status: StakeClaimNFTStatus
@@ -39,7 +39,7 @@ extension LSUComponent.ViewState {
 // MARK: - LSUComponentView
 extension LSUComponent {
 	public struct ViewState: Sendable, Equatable, Identifiable {
-		public var id: Int
+		public var id: ValidatorAddress
 
 		let title: String
 		let imageURL: URL?
@@ -156,35 +156,32 @@ extension View {
 extension LSUComponent.State {
 	var viewState: LSUComponent.ViewState {
 		.init(
-			id: 0,
-			title: "Radostakes",
-			imageURL: .init(string: "https://i.ibb.co/NsKCTpT/Screenshot-2023-08-02-at-18-18-56.png")!,
-			liquidStakeUnit: .init(
-				thumbnail: .xrd,
-				symbol: "XRD",
-				tokenAmount: "2.0129822"
-			),
+			id: stake.validator.address,
+			title: stake.validator.name ?? "Unknown",
+			imageURL: stake.validator.iconURL,
+			liquidStakeUnit: stake.xrdRedemptionValue
+				.map {
+					.init(
+						thumbnail: .xrd,
+						symbol: "XRD",
+						tokenAmount: $0.format()
+					)
+				},
 			stakeClaimNFTs: .init(
-				rawValue: [
-					.init(
-						id: 0,
-						thumbnail: .xrd,
-						status: .unstaking,
-						tokenAmount: "450.0"
-					),
-					.init(
-						id: 1,
-						thumbnail: .xrd,
-						status: .unstaking,
-						tokenAmount: "1,250.0"
-					),
-					.init(
-						id: 2,
-						thumbnail: .xrd,
-						status: .readyToClaim,
-						tokenAmount: "1,200.0"
-					),
-				]
+				rawValue: stake.stakeClaimResource
+					.map { claimNFT in
+						.init(
+							uncheckedUniqueElements: claimNFT.tokens
+								.map { token in
+									LSUComponent.ViewState.StakeClaimNFTViewState(
+										id: token.id,
+										thumbnail: .xrd,
+										status: token.canBeClaimed ? .readyToClaim : .unstaking,
+										tokenAmount: token.stakeClaimAmount?.format() ?? "0.00"
+									)
+								}
+						)
+					} ?? []
 			)
 		)
 	}

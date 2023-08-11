@@ -38,13 +38,7 @@ public struct AssetsView: Sendable, FeatureReducer {
 				account: account,
 				fungibleTokenList: .init(),
 				nonFungibleTokenList: .init(rows: []),
-				poolUnitsList: .init(
-					lsuResource: .init(),
-					poolUnits: [
-						.init(id: 0),
-						.init(id: 1),
-					]
-				),
+				poolUnitsList: .init(),
 				mode: mode
 			)
 		}
@@ -166,10 +160,24 @@ public struct AssetsView: Sendable, FeatureReducer {
 			state.fungibleTokenList = .init(xrdToken: xrd, nonXrdTokens: .init(uniqueElements: nonXrd))
 			state.nonFungibleTokenList = .init(rows: .init(uniqueElements: nfts))
 
-			let lsuResource: LSUResource.State? = nil
+			let lsuResource: LSUResource.State? = {
+				guard !portfolio.poolUnitResources.radixNetworkStakes.isEmpty else {
+					return nil
+				}
+				return .init(
+					components: .init(
+						uniqueElements: portfolio.poolUnitResources.radixNetworkStakes
+							.map { LSUComponent.State(stake: $0) }
+					)
+				)
+			}()
 
 			state.poolUnitsList = .init(
-				lsuResource: lsuResource
+				lsuResource: lsuResource,
+				poolUnits: .init(
+					uncheckedUniqueElements: portfolio.poolUnitResources.poolUnits
+						.map { .init(poolUnit: $0) }
+				)
 			)
 			return .none
 		}

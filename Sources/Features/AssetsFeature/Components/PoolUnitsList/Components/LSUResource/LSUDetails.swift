@@ -2,7 +2,7 @@ import FeaturePrelude
 
 public struct LSUDetails: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
-		let stake: Int
+		let stake: AccountPortfolio.PoolUnitResources.RadixNetworkStake
 	}
 
 	@Dependency(\.dismiss) var dismiss

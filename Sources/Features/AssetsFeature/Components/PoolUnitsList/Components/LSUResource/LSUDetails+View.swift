@@ -65,15 +65,15 @@ extension LSUDetails.State {
 	var viewState: LSUDetails.ViewState {
 		.init(
 			containerWithHeader: .init(
-				displayName: "YOYO",
-				amount: "100",
+				displayName: stake.validator.name ?? "Unknown",
+				amount: (stake.xrdRedemptionValue ?? 0).format(),
 				symbol: "XRD"
 			),
-			thumbnailURL: .init(string: "https://i.ibb.co/KG06168/Screenshot-2023-08-02-at-16-19-29.png")!,
-			tokenAmount: "23113",
-			description: "poolUnitResource.description",
-			resourceAddress: .init(address: "yoyo", decodedKind: .globalIdentity),
-			currentSupply: "1000"
+			thumbnailURL: stake.validator.iconURL,
+			tokenAmount: (stake.stakeUnitResource?.amount ?? 0).format(),
+			description: stake.validator.description,
+			resourceAddress: stake.stakeUnitResource!.resourceAddress,
+			currentSupply: stake.validator.xrdVaultBalance.format()
 		)
 	}
 }

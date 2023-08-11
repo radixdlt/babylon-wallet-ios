@@ -2,7 +2,9 @@ import FeaturePrelude
 
 // MARK: - PoolUnitDetails
 public struct PoolUnitDetails: Sendable, FeatureReducer {
-	public struct State: Sendable, Hashable {}
+	public struct State: Sendable, Hashable {
+		let poolUnit: AccountPortfolio.PoolUnitResources.PoolUnit
+	}
 
 	@Dependency(\.dismiss) var dismiss
 

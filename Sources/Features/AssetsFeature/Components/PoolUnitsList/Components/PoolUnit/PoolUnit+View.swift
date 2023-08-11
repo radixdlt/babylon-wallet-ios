@@ -54,22 +54,32 @@ extension PoolUnit {
 extension PoolUnit.State {
 	var viewState: PoolUnit.ViewState {
 		.init(
-			iconURL: .init(string: "https://i.ibb.co/KG06168/Screenshot-2023-08-02-at-16-19-29.png")!,
-			name: "Some LP Token",
-			resources: .init(
-				rawValue: [
-					.init(
-						thumbnail: .xrd,
-						symbol: "XRD",
-						tokenAmount: "2.0129822"
-					),
-					.init(
-						thumbnail: .known(.init(string: "https://i.ibb.co/KG06168/Screenshot-2023-08-02-at-16-19-29.png")!),
-						symbol: "WTF",
-						tokenAmount: "32.6129822"
-					),
-				]
-			)!
+			iconURL: poolUnit.poolUnitResource.iconURL,
+			name: poolUnit.poolUnitResource.name ?? L10n.Account.PoolUnits.unknownPoolUnitName,
+			resources: poolUnit.resourceViewStates
 		)
+	}
+}
+
+extension AccountPortfolio.PoolUnitResources.PoolUnit {
+	var resourceViewStates: NonEmpty<IdentifiedArrayOf<PoolUnitResourceViewState>> {
+		let xrdResourceViewState = poolResources.xrdResource.map {
+			PoolUnitResourceViewState(
+				thumbnail: .xrd,
+				symbol: "XRD",
+				tokenAmount: redemptionValue(for: $0).format()
+			)
+		}
+
+		return .init(
+			rawValue: xrdResourceViewState.map { [$0] } ?? []
+				+ poolResources.nonXrdResources.map {
+					PoolUnitResourceViewState(
+						thumbnail: .known($0.iconURL),
+						symbol: $0.symbol ?? $0.name ?? L10n.Account.PoolUnits.unknownSymbolName,
+						tokenAmount: redemptionValue(for: $0).format()
+					)
+				}
+		)! // Safe to unwrap, guaranteed to not be empty
 	}
 }

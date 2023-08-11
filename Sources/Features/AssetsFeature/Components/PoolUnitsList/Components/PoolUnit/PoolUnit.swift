@@ -4,10 +4,14 @@ import FeaturePrelude
 // MARK: - PoolUnit
 public struct PoolUnit: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable, Identifiable {
-		public var id: Int
+		public var id: ResourcePoolAddress {
+			poolUnit.poolAddress
+		}
+
+		let poolUnit: AccountPortfolio.PoolUnitResources.PoolUnit
 
 		@PresentationState
-		public var destination: Destinations.State?
+		var destination: Destinations.State?
 	}
 
 	public enum ViewAction: Sendable, Equatable {
@@ -51,7 +55,9 @@ public struct PoolUnit: Sendable, FeatureReducer {
 	) -> EffectTask<Action> {
 		switch viewAction {
 		case .didTap:
-			state.destination = .details(.init())
+			state.destination = .details(
+				.init(poolUnit: state.poolUnit)
+			)
 
 			return .none
 		}
