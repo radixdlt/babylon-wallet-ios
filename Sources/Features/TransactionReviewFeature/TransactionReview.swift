@@ -12,7 +12,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		public var displayMode: DisplayMode = .review
 
 		public let nonce: Nonce
-		public var transactionManifest: TransactionManifest
+		public let transactionManifest: TransactionManifest
 		public let message: Message
 		public let signTransactionPurpose: SigningPurpose.SignTransactionPurpose
 
@@ -479,9 +479,6 @@ public struct TransactionReview: Sendable, FeatureReducer {
 
 		let assertions: [IndexedAssertion] = try guarantees.map {
 			try .init(
-				// Increase by one because we also add guarantees.
-				// Will be reverted once FeePayer updates are merged, as we will be adding
-				// the lock fee right before sending the transaction, and not exactly after the review.
 				index: $0.instructionIndex,
 				assertion: .amount(
 					resourceAddress: $0.resourceAddress.intoEngine(),
