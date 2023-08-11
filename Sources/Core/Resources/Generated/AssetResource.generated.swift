@@ -99,6 +99,8 @@ public enum AssetResource {
   public static let splashItem4 = ImageAsset(name: "splash-item-4")
   public static let splashItem5 = ImageAsset(name: "splash-item-5")
   public static let splashPhoneFrame = ImageAsset(name: "splash-phone-frame")
+  public static let officialTagIcon = ImageAsset(name: "official-tag-icon")
+  public static let tagIcon = ImageAsset(name: "tag-icon")
   public static let successCheckmark = ImageAsset(name: "success-checkmark")
   public static let transactionInProgress = ImageAsset(name: "transaction_in_progress")
   public static let warningError = ImageAsset(name: "warning_error")

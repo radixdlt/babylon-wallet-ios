@@ -6,11 +6,13 @@ public struct FungibleTokenDetails: Sendable, FeatureReducer {
 		let resource: AccountPortfolio.FungibleResource
 		let isXRD: Bool
 		let behaviors: [AssetBehavior]
+		let tags: [AssetTag]
 
-		public init(resource: AccountPortfolio.FungibleResource, isXRD: Bool, behaviors: [AssetBehavior]) {
+		public init(resource: AccountPortfolio.FungibleResource, isXRD: Bool, behaviors: [AssetBehavior], tags: [AssetTag]) {
 			self.resource = resource
 			self.isXRD = isXRD
 			self.behaviors = behaviors
+			self.tags = tags
 		}
 	}
 

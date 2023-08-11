@@ -8,7 +8,8 @@ extension FungibleTokenDetails.State {
 			thumbnail: isXRD ? .xrd : .known(resource.iconURL),
 			description: resource.description,
 			resourceAddress: resource.resourceAddress,
-			behaviors: behaviors
+			behaviors: behaviors,
+			tags: tags
 		)
 	}
 }
@@ -21,7 +22,7 @@ extension FungibleTokenDetails {
 		let description: String?
 		let resourceAddress: ResourceAddress
 		let behaviors: [AssetBehavior]
-//		let tags: [AssetBehavior]
+		let tags: [AssetTag]
 	}
 
 	@MainActor
@@ -46,17 +47,7 @@ extension FungibleTokenDetails {
 
 						AssetBehaviorSection(behaviors: viewStore.behaviors)
 
-						if !viewStore.behaviors.isEmpty {
-							Text(L10n.AssetDetails.behavior)
-								.textStyle(.body1Regular)
-								.foregroundColor(.app.gray2)
-
-							VStack(alignment: .leading, spacing: .small1) {
-								ForEach(viewStore.behaviors, id: \.self) { behavior in
-									AssetBehaviorRow(behavior: behavior)
-								}
-							}
-						}
+						AssetTagsSection(tags: viewStore.tags)
 					}
 				} closeButtonAction: {
 					viewStore.send(.closeButtonTapped)
@@ -73,7 +64,7 @@ struct FungibleTokenDetails_Preview: PreviewProvider {
 	static var previews: some View {
 		FungibleTokenDetails.View(
 			store: .init(
-				initialState: try! .init(resource: .init(resourceAddress: .init(validatingAddress: "resource_tdx_c_1qyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq40v2wv"), amount: .zero), isXRD: true, behaviors: [.simpleAsset]),
+				initialState: try! .init(resource: .init(resourceAddress: .init(validatingAddress: "resource_tdx_c_1qyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq40v2wv"), amount: .zero), isXRD: true, behaviors: [.simpleAsset], tags: [.officialRadix, .token]),
 				reducer: FungibleTokenDetails()
 			)
 		)

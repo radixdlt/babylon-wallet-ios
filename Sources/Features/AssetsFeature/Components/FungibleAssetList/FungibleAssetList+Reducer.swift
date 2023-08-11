@@ -66,12 +66,12 @@ public struct FungibleAssetList: Sendable, FeatureReducer {
 		case .destination:
 			return .none
 		case let .xrdRow(.delegate(.selected(token))):
-			state.destination = .details(.init(resource: token, isXRD: true, behaviors: .mock))
+			state.destination = .details(.init(resource: token, isXRD: true, behaviors: .mock, tags: .mock))
 			return .none
 		case .xrdRow:
 			return .none
 		case let .nonXRDRow(_, .delegate(.selected(token))):
-			state.destination = .details(.init(resource: token, isXRD: false, behaviors: .mock))
+			state.destination = .details(.init(resource: token, isXRD: false, behaviors: .mock, tags: .mock))
 			return .none
 		case .nonXRDRow:
 			return .none
@@ -81,4 +81,8 @@ public struct FungibleAssetList: Sendable, FeatureReducer {
 
 extension [AssetBehavior] {
 	static let mock: Self = [.simpleAsset, .movementRestricted, .nftDataChangeable]
+}
+
+extension [AssetTag] {
+	static let mock: Self = [.officialRadix, .token, .custom("Hello"), .custom("Lorem Ipsum"), .custom("World"), .custom("TikTok"), .custom("ByteDance")]
 }
