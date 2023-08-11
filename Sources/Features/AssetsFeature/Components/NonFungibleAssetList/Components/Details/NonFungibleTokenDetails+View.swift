@@ -1,8 +1,8 @@
 import EngineKit
 import FeaturePrelude
 
-extension NonFungibleAssetList.Detail.State {
-	var viewState: NonFungibleAssetList.Detail.ViewState {
+extension NonFungibleTokenDetails.State {
+	var viewState: NonFungibleTokenDetails.ViewState {
 		.init(
 			keyImage: token.keyImageURL,
 			nonFungibleGlobalID: token.id,
@@ -17,7 +17,7 @@ extension NonFungibleAssetList.Detail.State {
 }
 
 // MARK: - NonFungibleTokenList.Detail.View
-extension NonFungibleAssetList.Detail {
+extension NonFungibleTokenDetails {
 	public struct ViewState: Equatable {
 		let keyImage: URL?
 		let nonFungibleGlobalID: NonFungibleGlobalId
@@ -31,9 +31,9 @@ extension NonFungibleAssetList.Detail {
 
 	@MainActor
 	public struct View: SwiftUI.View {
-		private let store: StoreOf<NonFungibleAssetList.Detail>
+		private let store: StoreOf<NonFungibleTokenDetails>
 
-		public init(store: StoreOf<NonFungibleAssetList.Detail>) {
+		public init(store: StoreOf<NonFungibleTokenDetails>) {
 			self.store = store
 		}
 
@@ -76,9 +76,7 @@ extension NonFungibleAssetList.Detail {
 								divider
 
 								VStack(spacing: .medium3) {
-									KeyValueView(key: L10n.AssetDetails.resourceAddress) {
-										AddressView(.address(.resource(viewStore.resourceAddress)))
-									}
+									KeyValueView(resourceAddress: viewStore.resourceAddress)
 
 									if let name = viewStore.resourceName {
 										KeyValueView(key: L10n.AssetDetails.NFTDetails.resourceName, value: name)

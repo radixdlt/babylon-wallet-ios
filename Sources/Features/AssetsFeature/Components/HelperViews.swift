@@ -1,3 +1,4 @@
+import EngineKit
 import FeaturePrelude
 import SharedModels
 
@@ -53,6 +54,12 @@ struct KeyValueView<Content: View>: View {
 	let key: String
 	let content: Content
 
+	init(resourceAddress: ResourceAddress) where Content == AddressView {
+		self.init(key: L10n.AssetDetails.resourceAddress) {
+			AddressView(.address(.resource(resourceAddress)))
+		}
+	}
+
 	init(key: String, value: String) where Content == Text {
 		self.key = key
 		self.content = Text(value)
@@ -72,6 +79,40 @@ struct KeyValueView<Content: View>: View {
 			content
 				.multilineTextAlignment(.trailing)
 				.textStyle(.body1HighImportance)
+				.foregroundColor(.app.gray1)
+		}
+	}
+}
+
+// MARK: - AssetBehaviorSection
+struct AssetBehaviorSection: View {
+	let behaviors: [AssetBehavior]
+
+	var body: some View {
+		if !behaviors.isEmpty {
+			Text(L10n.AssetDetails.behavior)
+				.textStyle(.body1Regular)
+				.foregroundColor(.app.gray2)
+
+			VStack(alignment: .leading, spacing: .small1) {
+				ForEach(behaviors, id: \.self) { behavior in
+					AssetBehaviorRow(behavior: behavior)
+				}
+			}
+		}
+	}
+}
+
+// MARK: - AssetBehaviorRow
+struct AssetBehaviorRow: View {
+	let behavior: AssetBehavior
+
+	var body: some View {
+		HStack(spacing: .medium3) {
+			Image(asset: behavior.icon)
+
+			Text(behavior.description)
+				.textStyle(.body2Regular)
 				.foregroundColor(.app.gray1)
 		}
 	}

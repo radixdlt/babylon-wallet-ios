@@ -7,7 +7,8 @@ extension FungibleTokenDetails.State {
 			detailsContainerWithHeader: resource.detailsContainerWithHeaderViewState,
 			thumbnail: isXRD ? .xrd : .known(resource.iconURL),
 			description: resource.description,
-			resourceAddress: resource.resourceAddress
+			resourceAddress: resource.resourceAddress,
+			behaviors: behaviors
 		)
 	}
 }
@@ -19,6 +20,8 @@ extension FungibleTokenDetails {
 		let thumbnail: TokenThumbnail.Content
 		let description: String?
 		let resourceAddress: ResourceAddress
+		let behaviors: [AssetBehavior]
+//		let tags: [AssetBehavior]
 	}
 
 	@MainActor
@@ -38,10 +41,23 @@ extension FungibleTokenDetails {
 						DetailsContainerWithHeaderViewMaker
 							.makeDescriptionView(description: description)
 					}
+					VStack(alignment: .leading, spacing: .medium3) {
+						KeyValueView(resourceAddress: viewStore.resourceAddress)
 
-					TokenDetailsPropertyViewMaker.makeResourceAddress(
-						address: viewStore.resourceAddress
-					)
+						AssetBehaviorSection(behaviors: viewStore.behaviors)
+
+						if !viewStore.behaviors.isEmpty {
+							Text(L10n.AssetDetails.behavior)
+								.textStyle(.body1Regular)
+								.foregroundColor(.app.gray2)
+
+							VStack(alignment: .leading, spacing: .small1) {
+								ForEach(viewStore.behaviors, id: \.self) { behavior in
+									AssetBehaviorRow(behavior: behavior)
+								}
+							}
+						}
+					}
 				} closeButtonAction: {
 					viewStore.send(.closeButtonTapped)
 				}
@@ -57,7 +73,7 @@ struct FungibleTokenDetails_Preview: PreviewProvider {
 	static var previews: some View {
 		FungibleTokenDetails.View(
 			store: .init(
-				initialState: try! .init(resource: .init(resourceAddress: .init(validatingAddress: "resource_tdx_c_1qyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq40v2wv"), amount: .zero), isXRD: true),
+				initialState: try! .init(resource: .init(resourceAddress: .init(validatingAddress: "resource_tdx_c_1qyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq40v2wv"), amount: .zero), isXRD: true, behaviors: [.simpleAsset]),
 				reducer: FungibleTokenDetails()
 			)
 		)

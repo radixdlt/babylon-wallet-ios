@@ -3,6 +3,7 @@ import EngineKit
 import FeaturePrelude
 import SharedModels
 
+// MARK: - FungibleAssetList
 public struct FungibleAssetList: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public var xrdToken: Row.State?
@@ -65,15 +66,19 @@ public struct FungibleAssetList: Sendable, FeatureReducer {
 		case .destination:
 			return .none
 		case let .xrdRow(.delegate(.selected(token))):
-			state.destination = .details(.init(resource: token, isXRD: true))
+			state.destination = .details(.init(resource: token, isXRD: true, behaviors: .mock))
 			return .none
 		case .xrdRow:
 			return .none
 		case let .nonXRDRow(_, .delegate(.selected(token))):
-			state.destination = .details(.init(resource: token, isXRD: false))
+			state.destination = .details(.init(resource: token, isXRD: false, behaviors: .mock))
 			return .none
 		case .nonXRDRow:
 			return .none
 		}
 	}
+}
+
+extension [AssetBehavior] {
+	static let mock: Self = [.simpleAsset, .movementRestricted, .nftDataChangeable]
 }
