@@ -77,10 +77,7 @@ extension LSUDetails.State {
 			containerWithHeader: stakeUnitResource.detailsContainerWithHeaderViewState,
 			thumbnailURL: stakeUnitResource.iconURL,
 			validatorNameViewState: .init(with: validator),
-			redeemableTokenAmount: AccountPortfolio.xrdRedemptionValue(
-				validator: validator,
-				stakeUnitResource: stakeUnitResource
-			).format(),
+			redeemableTokenAmount: xrdRedemptionValue.format(),
 			description: stakeUnitResource.description,
 			resourceAddress: stakeUnitResource.resourceAddress,
 			currentSupply: validator.xrdVaultBalance.format(),

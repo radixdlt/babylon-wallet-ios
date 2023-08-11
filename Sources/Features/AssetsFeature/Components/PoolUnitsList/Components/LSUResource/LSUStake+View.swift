@@ -153,15 +153,12 @@ extension LSUStake.State {
 		.init(
 			id: stake.validator.address,
 			validatorNameViewState: .init(with: stake.validator),
-			liquidStakeUnit: stake.stakeUnitResource
+			liquidStakeUnit: stake.xrdRedemptionValue
 				.map {
 					.init(
 						thumbnail: .xrd,
 						symbol: "XRD",
-						tokenAmount: AccountPortfolio.xrdRedemptionValue(
-							validator: stake.validator,
-							stakeUnitResource: $0
-						).format()
+						tokenAmount: $0.format()
 					)
 				},
 			stakeClaimNFTs: .init(
@@ -181,14 +178,5 @@ extension LSUStake.State {
 					} ?? []
 			)
 		)
-	}
-}
-
-extension AccountPortfolio {
-	static func xrdRedemptionValue(
-		validator: AccountPortfolio.PoolUnitResources.RadixNetworkStake.Validator,
-		stakeUnitResource: AccountPortfolio.FungibleResource
-	) -> BigDecimal {
-		(stakeUnitResource.amount * validator.xrdVaultBalance) / (stakeUnitResource.totalSupply ?? .one)
 	}
 }

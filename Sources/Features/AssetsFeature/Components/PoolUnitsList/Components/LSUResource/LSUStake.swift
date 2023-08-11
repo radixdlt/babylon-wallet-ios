@@ -1,4 +1,5 @@
 import FeaturePrelude
+import LoggerDependency
 
 public struct LSUStake: FeatureReducer {
 	public struct State: Sendable, Hashable, Identifiable {
@@ -38,6 +39,8 @@ public struct LSUStake: FeatureReducer {
 		}
 	}
 
+	@Dependency(\.logger) var logger
+
 	public var body: some ReducerProtocolOf<Self> {
 		Reduce(core)
 			.ifLet(
@@ -53,14 +56,20 @@ public struct LSUStake: FeatureReducer {
 	) -> EffectTask<Action> {
 		switch viewAction {
 		case .didTap:
-			guard let resource = state.stake.stakeUnitResource else {
+			guard
+				let resource = state.stake.stakeUnitResource,
+				let xrdRedemptionValue = state.stake.xrdRedemptionValue
+			else {
+				logger.fault("We should not be able to tap a stake in such state")
+
 				return .none
 			}
 
 			state.destination = .details(
 				.init(
 					validator: state.stake.validator,
-					stakeUnitResource: resource
+					stakeUnitResource: resource,
+					xrdRedemptionValue: xrdRedemptionValue
 				)
 			)
 
