@@ -80,19 +80,11 @@ extension PoolUnitDetails {
 }
 
 extension AccountPortfolio.FungibleResource {
-	var symbolAndAmount: DetailsContainerWithHeaderViewState.SymbolAndAmount? {
-		symbol.map {
-			.init(
-				amount: amount.format(),
-				symbol: $0
-			)
-		}
-	}
-
 	var detailsContainerWithHeaderViewState: DetailsContainerWithHeaderViewState {
 		.init(
 			title: name ?? L10n.Account.PoolUnits.unknownPoolUnitName,
-			symbolAndAmount: symbolAndAmount
+			amount: amount.format(),
+			symbol: symbol
 		)
 	}
 }
