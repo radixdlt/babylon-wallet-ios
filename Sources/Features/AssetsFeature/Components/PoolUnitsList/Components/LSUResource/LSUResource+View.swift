@@ -83,13 +83,13 @@ extension LSUResource {
 			VStack(spacing: 1) {
 				ForEachStore(
 					store.scope(
-						state: \.components,
+						state: \.stakes,
 						action: (
 							/LSUResource.Action.child
-								.. LSUResource.ChildAction.component
+								.. LSUResource.ChildAction.stake
 						).embed
 					),
-					content: LSUComponent.View.init
+					content: LSUStake.View.init
 				)
 				.background(.app.white)
 			}
@@ -138,7 +138,7 @@ extension LSUResource.State {
 		.init(
 			isExpanded: isExpanded,
 			iconURL: .init(string: "https://i.ibb.co/KG06168/Screenshot-2023-08-02-at-16-19-29.png")!,
-			numberOfStakes: components.count
+			numberOfStakes: stakes.count
 		)
 	}
 }

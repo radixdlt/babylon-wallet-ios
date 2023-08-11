@@ -5,7 +5,7 @@ public struct LSUResource: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		var isExpanded: Bool = false
 
-		var components: IdentifiedArrayOf<LSUComponent.State>
+		var stakes: IdentifiedArrayOf<LSUStake.State>
 	}
 
 	public enum ViewAction: Sendable, Equatable {
@@ -13,15 +13,15 @@ public struct LSUResource: Sendable, FeatureReducer {
 	}
 
 	public enum ChildAction: Sendable, Equatable {
-		case component(id: LSUComponent.State.ID, action: LSUComponent.Action)
+		case stake(id: LSUStake.State.ID, action: LSUStake.Action)
 	}
 
 	public var body: some ReducerProtocolOf<Self> {
 		Reduce(core)
 			.forEach(
-				\.components,
-				action: /Action.child .. ChildAction.component,
-				element: LSUComponent.init
+				\.stakes,
+				action: /Action.child .. ChildAction.stake,
+				element: LSUStake.init
 			)
 	}
 

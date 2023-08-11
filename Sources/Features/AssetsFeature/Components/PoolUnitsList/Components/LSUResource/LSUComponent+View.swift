@@ -1,7 +1,7 @@
 import EngineKit
 import FeaturePrelude
 
-extension LSUComponent.ViewState {
+extension LSUStake.ViewState {
 	typealias StakeClaimNFTsViewState = NonEmpty<IdentifiedArrayOf<StakeClaimNFTViewState>>
 
 	struct StakeClaimNFTViewState: Identifiable, Equatable {
@@ -37,7 +37,7 @@ extension LSUComponent.ViewState {
 }
 
 // MARK: - LSUComponentView
-extension LSUComponent {
+extension LSUStake {
 	public struct ViewState: Sendable, Equatable, Identifiable {
 		public var id: ValidatorAddress
 
@@ -49,7 +49,7 @@ extension LSUComponent {
 	}
 
 	public struct View: SwiftUI.View {
-		let store: StoreOf<LSUComponent>
+		let store: StoreOf<LSUStake>
 
 		public var body: some SwiftUI.View {
 			WithViewStore(
@@ -78,7 +78,7 @@ extension LSUComponent {
 				.sheet(
 					store: store.scope(
 						state: \.$destination,
-						action: (/Action.child .. LSUComponent.ChildAction.destination).embed
+						action: (/Action.child .. LSUStake.ChildAction.destination).embed
 					),
 					state: /Destinations.State.details,
 					action: Destinations.Action.details,
@@ -154,8 +154,8 @@ extension View {
 	}
 }
 
-extension LSUComponent.State {
-	var viewState: LSUComponent.ViewState {
+extension LSUStake.State {
+	var viewState: LSUStake.ViewState {
 		.init(
 			id: stake.validator.address,
 			title: stake.validator.name ?? L10n.Account.PoolUnits.unknownValidatorName,
@@ -177,7 +177,7 @@ extension LSUComponent.State {
 						.init(
 							uncheckedUniqueElements: claimNFT.tokens
 								.map { token in
-									LSUComponent.ViewState.StakeClaimNFTViewState(
+									LSUStake.ViewState.StakeClaimNFTViewState(
 										id: token.id,
 										thumbnail: .xrd,
 										status: token.canBeClaimed ? .readyToClaim : .unstaking,

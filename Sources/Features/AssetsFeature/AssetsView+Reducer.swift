@@ -165,9 +165,9 @@ public struct AssetsView: Sendable, FeatureReducer {
 					return nil
 				}
 				return .init(
-					components: .init(
+					stakes: .init(
 						uniqueElements: portfolio.poolUnitResources.radixNetworkStakes
-							.map { LSUComponent.State(stake: $0) }
+							.map { LSUStake.State(stake: $0) }
 					)
 				)
 			}()

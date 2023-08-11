@@ -1,6 +1,6 @@
 import FeaturePrelude
 
-public struct LSUComponent: FeatureReducer {
+public struct LSUStake: FeatureReducer {
 	public struct State: Sendable, Hashable, Identifiable {
 		public var id: String {
 			stake.validator.address.address
