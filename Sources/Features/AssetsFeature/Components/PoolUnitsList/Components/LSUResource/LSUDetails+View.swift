@@ -65,15 +65,18 @@ extension LSUDetails.State {
 	var viewState: LSUDetails.ViewState {
 		.init(
 			containerWithHeader: .init(
-				displayName: stake.validator.name ?? "Unknown",
-				amount: (stake.xrdRedemptionValue ?? 0).format(),
+				displayName: validator.name ?? L10n.Account.PoolUnits.unknownValidatorName,
+				amount: AccountPortfolio.xrdRedemptionValue(
+					validator: validator,
+					stakeUnitResource: stakeUnitResource
+				).format(),
 				symbol: "XRD"
 			),
-			thumbnailURL: stake.validator.iconURL,
-			tokenAmount: (stake.stakeUnitResource?.amount ?? 0).format(),
-			description: stake.validator.description,
-			resourceAddress: stake.stakeUnitResource!.resourceAddress,
-			currentSupply: stake.validator.xrdVaultBalance.format()
+			thumbnailURL: validator.iconURL,
+			tokenAmount: stakeUnitResource.amount.format(),
+			description: stakeUnitResource.description,
+			resourceAddress: stakeUnitResource.resourceAddress,
+			currentSupply: validator.xrdVaultBalance.format()
 		)
 	}
 }

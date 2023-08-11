@@ -53,7 +53,16 @@ public struct LSUComponent: FeatureReducer {
 	) -> EffectTask<Action> {
 		switch viewAction {
 		case .didTap:
-			state.destination = .details(.init(stake: state.stake))
+			guard let resource = state.stake.stakeUnitResource else {
+				return .none
+			}
+
+			state.destination = .details(
+				.init(
+					validator: state.stake.validator,
+					stakeUnitResource: resource
+				)
+			)
 
 			return .none
 		}

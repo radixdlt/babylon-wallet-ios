@@ -1,8 +1,10 @@
 import FeaturePrelude
 
+// MARK: - LSUDetails
 public struct LSUDetails: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
-		let stake: AccountPortfolio.PoolUnitResources.RadixNetworkStake
+		let validator: AccountPortfolio.PoolUnitResources.RadixNetworkStake.Validator
+		let stakeUnitResource: AccountPortfolio.FungibleResource
 	}
 
 	@Dependency(\.dismiss) var dismiss
@@ -18,5 +20,14 @@ public struct LSUDetails: Sendable, FeatureReducer {
 				await dismiss()
 			}
 		}
+	}
+}
+
+extension AccountPortfolio {
+	static func xrdRedemptionValue(
+		validator: AccountPortfolio.PoolUnitResources.RadixNetworkStake.Validator,
+		stakeUnitResource: AccountPortfolio.FungibleResource
+	) -> BigDecimal {
+		(stakeUnitResource.amount * validator.xrdVaultBalance) / (stakeUnitResource.totalSupply ?? .one)
 	}
 }

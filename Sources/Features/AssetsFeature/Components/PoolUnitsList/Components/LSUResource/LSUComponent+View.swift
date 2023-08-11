@@ -158,14 +158,17 @@ extension LSUComponent.State {
 	var viewState: LSUComponent.ViewState {
 		.init(
 			id: stake.validator.address,
-			title: stake.validator.name ?? "Unknown",
+			title: stake.validator.name ?? L10n.Account.PoolUnits.unknownValidatorName,
 			imageURL: stake.validator.iconURL,
-			liquidStakeUnit: stake.xrdRedemptionValue
+			liquidStakeUnit: stake.stakeUnitResource
 				.map {
 					.init(
 						thumbnail: .xrd,
 						symbol: "XRD",
-						tokenAmount: $0.format()
+						tokenAmount: AccountPortfolio.xrdRedemptionValue(
+							validator: stake.validator,
+							stakeUnitResource: $0
+						).format()
 					)
 				},
 			stakeClaimNFTs: .init(
@@ -178,7 +181,7 @@ extension LSUComponent.State {
 										id: token.id,
 										thumbnail: .xrd,
 										status: token.canBeClaimed ? .readyToClaim : .unstaking,
-										tokenAmount: token.stakeClaimAmount?.format() ?? "0.00"
+										tokenAmount: (token.stakeClaimAmount ?? 0).format()
 									)
 								}
 						)
