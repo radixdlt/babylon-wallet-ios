@@ -57,6 +57,18 @@ struct SettingsRowModel<Feature: FeatureReducer>: Identifiable {
 	let action: Feature.ViewAction
 }
 
+// MARK: - SettingsRow
+struct SettingsRow<Feature: FeatureReducer>: View {
+	let row: SettingsRowModel<Feature>
+	let action: () -> Void
+
+	var body: some View {
+		PlainListRow(row.icon, title: row.title, subtitle: row.subtitle)
+			.tappable(action)
+			.withSeparator
+	}
+}
+
 extension Settings.View {
 	public var body: some View {
 		WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
@@ -107,11 +119,9 @@ extension Settings.View {
 				.padding(.medium3)
 
 				ForEach(rows) { row in
-					PlainListRow(row.icon, title: row.title, subtitle: row.subtitle)
-						.tappable {
-							viewStore.send(row.action)
-						}
-						.withSeparator
+					SettingsRow(row: row) {
+						viewStore.send(row.action)
+					}
 				}
 			}
 			.padding(.bottom, .large3)

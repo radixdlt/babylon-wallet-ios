@@ -39,16 +39,7 @@ public struct PlainListRow<Icon: View>: View {
 			icon
 				.padding(.trailing, .medium3)
 
-			VStack(alignment: .leading, spacing: .zero) {
-				Text(title)
-					.textStyle(.secondaryHeader)
-					.foregroundColor(.app.gray1)
-				if let subtitle {
-					Text(subtitle)
-						.textStyle(.body2Regular)
-						.foregroundColor(.app.gray2)
-				}
-			}
+			PlainListRowCore(title: title, subtitle: subtitle)
 
 			Spacer(minLength: 0)
 
@@ -56,8 +47,33 @@ public struct PlainListRow<Icon: View>: View {
 				Image(asset: AssetResource.chevronRight)
 			}
 		}
-		.frame(height: .largeButtonHeight)
+		.frame(minHeight: .largeButtonHeight)
 		.padding(.horizontal, .medium3)
+	}
+}
+
+// MARK: - PlainListRowCore
+struct PlainListRowCore: View {
+	let title: String
+	let subtitle: String?
+
+	var body: some View {
+		VStack(alignment: .leading, spacing: .zero) {
+			Text(title)
+				.lineSpacing(-6)
+				.lineLimit(1)
+				.textStyle(.secondaryHeader)
+				.foregroundColor(.app.gray1)
+
+			if let subtitle {
+				Text(subtitle)
+					.lineSpacing(-4)
+					.lineLimit(2)
+					.minimumScaleFactor(0.8)
+					.textStyle(.body2Regular)
+					.foregroundColor(.app.gray2)
+			}
+		}
 	}
 }
 

@@ -23,11 +23,12 @@ public struct AccountSecurity: Sendable, FeatureReducer {
 
 	public enum ViewAction: Sendable, Equatable {
 		case appeared
-		case mnemonicsButtonTapped
-		case ledgerHardwareWalletsButtonTapped
-		case importFromOlympiaWalletButtonTapped
 
+		case mnemonicsButtonTapped
+		case defaultDepositGuaranteeButtonTapped
+		case ledgerHardwareWalletsButtonTapped
 		case useVerboseModeToggled(Bool)
+		case importFromOlympiaWalletButtonTapped
 	}
 
 	public enum InternalAction: Sendable, Equatable {
@@ -43,12 +44,14 @@ public struct AccountSecurity: Sendable, FeatureReducer {
 		public enum State: Sendable, Hashable {
 			case mnemonics(DisplayMnemonics.State)
 			case ledgerHardwareWallets(LedgerHardwareDevices.State)
+			case depositGuarantees(DefaultDepositGuarantees.State)
 			case importOlympiaWallet(ImportOlympiaWalletCoordinator.State)
 		}
 
 		public enum Action: Sendable, Equatable {
 			case mnemonics(DisplayMnemonics.Action)
 			case ledgerHardwareWallets(LedgerHardwareDevices.Action)
+			case depositGuarantees(DefaultDepositGuarantees.Action)
 			case importOlympiaWallet(ImportOlympiaWalletCoordinator.Action)
 		}
 
@@ -58,6 +61,9 @@ public struct AccountSecurity: Sendable, FeatureReducer {
 			}
 			Scope(state: /State.ledgerHardwareWallets, action: /Action.ledgerHardwareWallets) {
 				LedgerHardwareDevices()
+			}
+			Scope(state: /State.depositGuarantees, action: /Action.depositGuarantees) {
+				DefaultDepositGuarantees()
 			}
 			Scope(state: /State.importOlympiaWallet, action: /Action.importOlympiaWallet) {
 				ImportOlympiaWalletCoordinator()
@@ -103,8 +109,8 @@ public struct AccountSecurity: Sendable, FeatureReducer {
 			state.destination = .ledgerHardwareWallets(.init(context: .settings))
 			return .none
 
-		case .importFromOlympiaWalletButtonTapped:
-			state.destination = .importOlympiaWallet(.init())
+		case .defaultDepositGuaranteeButtonTapped:
+			state.destination = .depositGuarantees(.init())
 			return .none
 
 		case let .useVerboseModeToggled(useVerboseMode):
@@ -113,6 +119,10 @@ public struct AccountSecurity: Sendable, FeatureReducer {
 			return .fireAndForget {
 				try await appPreferencesClient.updatePreferences(preferences)
 			}
+
+		case .importFromOlympiaWalletButtonTapped:
+			state.destination = .importOlympiaWallet(.init())
+			return .none
 		}
 	}
 

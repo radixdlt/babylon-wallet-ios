@@ -36,17 +36,20 @@ extension AccountSecurity.View {
 			ScrollView {
 				VStack(spacing: .zero) {
 					ForEach(rows) { row in
-						PlainListRow(row.icon, title: row.title, subtitle: row.subtitle)
-							.tappable {
-								viewStore.send(row.action)
-							}
-							.withSeparator
+						SettingsRow(row: row) {
+							viewStore.send(row.action)
+						}
 					}
 
-					if viewStore.hasLedgerHardwareWalletFactorSources {
-						isUsingVerboseLedgerMode(with: viewStore)
-							.withSeparator
-							.padding(.horizontal, .medium3)
+//					if viewStore.hasLedgerHardwareWalletFactorSources {
+					isUsingVerboseLedgerMode(with: viewStore)
+						.padding(.horizontal, .medium3)
+						.withSeparator
+//					}
+
+					let row = importOlympiaRow
+					SettingsRow(row: row) {
+						viewStore.send(row.action)
 					}
 				}
 			}
@@ -61,6 +64,7 @@ extension AccountSecurity.View {
 			#endif
 				.mnemonics(with: destinationStore)
 				.ledgerHardwareWallets(with: destinationStore)
+				.depositGuarantees(with: destinationStore)
 				.importFromOlympiaLegacyWallet(with: destinationStore)
 				.tint(.app.gray1)
 				.foregroundColor(.app.gray1)
@@ -70,7 +74,8 @@ extension AccountSecurity.View {
 
 	private func isUsingVerboseLedgerMode(with viewStore: ViewStoreOf<AccountSecurity>) -> some SwiftUI.View {
 		ToggleView(
-			title: L10n.AppSettings.VerboseLedgerMode.title,
+			icon: AssetResource.ledger, // FIXME: icon?
+			title: "Verbose Ledger Signing", // FIXME: STrings - wait for update to L10n.AppSettings.VerboseLedgerMode.title,
 			subtitle: L10n.AppSettings.VerboseLedgerMode.subtitle,
 			isOn: viewStore.binding(
 				get: \.useVerboseLedgerDisplayMode,
@@ -93,11 +98,21 @@ extension AccountSecurity.View {
 				action: .ledgerHardwareWalletsButtonTapped
 			),
 			.init(
-				title: L10n.Settings.importFromLegacyWallet,
-				icon: .asset(AssetResource.appSettings),
-				action: .importFromOlympiaWalletButtonTapped
+				title: "Deposit Guarantees", // FIXME: Strings - L10n.Settings.depositGuarantees
+				subtitle: "Set your default guaranteed minimum for estimated profits", // FIXME: Strings
+				icon: .asset(AssetResource.depositGuarantees),
+				action: .defaultDepositGuaranteeButtonTapped
 			),
 		]
+	}
+
+	@MainActor
+	private var importOlympiaRow: SettingsRowModel<AccountSecurity> {
+		.init(
+			title: L10n.Settings.importFromLegacyWallet,
+			icon: .asset(AssetResource.appSettings),
+			action: .importFromOlympiaWalletButtonTapped
+		)
 	}
 }
 
@@ -126,6 +141,16 @@ private extension View {
 					.navigationTitle(L10n.Settings.ledgerHardwareWallets)
 					.toolbarBackground(.visible, for: .navigationBar)
 			}
+		)
+	}
+
+	@MainActor
+	func depositGuarantees(with destinationStore: PresentationStoreOf<AccountSecurity.Destinations>) -> some View {
+		navigationDestination(
+			store: destinationStore,
+			state: /AccountSecurity.Destinations.State.depositGuarantees,
+			action: AccountSecurity.Destinations.Action.depositGuarantees,
+			destination: { DefaultDepositGuarantees.View(store: $0) }
 		)
 	}
 

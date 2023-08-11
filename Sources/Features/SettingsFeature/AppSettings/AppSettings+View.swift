@@ -34,11 +34,9 @@ extension AppSettings {
 					VStack(spacing: .zero) {
 						VStack(spacing: .zero) {
 							ForEach(rows) { row in
-								PlainListRow(row.icon, title: row.title)
-									.tappable {
-										viewStore.send(row.action)
-									}
-									.withSeparator
+								SettingsRow(row: row) {
+									viewStore.send(row.action)
+								}
 							}
 						}
 
@@ -84,7 +82,7 @@ extension AppSettings {
 				),
 				.init(
 					title: L10n.Settings.backups,
-					subtitle: "bla bla", // nil, // TODO: Determine, if possible, the date of last backup.
+					subtitle: nil, // TODO: Determine, if possible, the date of last backup.
 					icon: .asset(AssetResource.backups),
 					action: .profileBackupsButtonTapped
 				),
@@ -93,6 +91,7 @@ extension AppSettings {
 
 		private func isDeveloperModeEnabled(with viewStore: ViewStoreOf<AppSettings>) -> some SwiftUI.View {
 			ToggleView(
+				icon: AssetResource.developerMode,
 				title: L10n.AppSettings.DeveloperMode.title,
 				subtitle: L10n.AppSettings.DeveloperMode.subtitle,
 				isOn: viewStore.binding(

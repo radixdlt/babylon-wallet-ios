@@ -25,11 +25,9 @@ extension DebugSettings.View {
 			ScrollView {
 				VStack(spacing: .zero) {
 					ForEach(rows) { row in
-						PlainListRow(row.icon, title: row.title, subtitle: row.subtitle)
-							.tappable {
-								viewStore.send(row.action)
-							}
-							.withSeparator
+						SettingsRow(row: row) {
+							viewStore.send(row.action)
+						}
 					}
 				}
 			}
