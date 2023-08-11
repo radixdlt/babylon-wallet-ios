@@ -70,7 +70,7 @@ extension LSUDetails.State {
 	var viewState: LSUDetails.ViewState {
 		.init(
 			containerWithHeader: stakeUnitResource.detailsContainerWithHeaderViewState,
-			thumbnailURL: validator.iconURL,
+			thumbnailURL: stakeUnitResource.iconURL,
 			redeemableTokenAmount: AccountPortfolio.xrdRedemptionValue(
 				validator: validator,
 				stakeUnitResource: stakeUnitResource
