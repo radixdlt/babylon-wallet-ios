@@ -61,6 +61,7 @@ extension LSUComponent {
 					HStack(spacing: .small1) {
 						NFTThumbnail(viewStore.imageURL, size: .smallest)
 						Text(viewStore.title)
+							.font(.app.body1Header)
 						Spacer()
 					}
 
