@@ -278,6 +278,8 @@ extension AccountPortfolio.NonFungibleResource.NonFungibleToken {
 			case name
 			case description
 			case keyImageURL
+			case claimEpoch
+			case claimAmount
 
 			public init?(rawValue: String) {
 				switch rawValue {
@@ -287,6 +289,10 @@ extension AccountPortfolio.NonFungibleResource.NonFungibleToken {
 					self = .description
 				case "key_image_url":
 					self = .keyImageURL
+				case "claim_epoch":
+					self = .claimEpoch
+				case "claim_amount":
+					self = .claimAmount
 				default:
 					return nil
 				}
@@ -313,6 +319,20 @@ extension AccountPortfolio.NonFungibleResource.NonFungibleToken {
 				return url
 			}
 
+			var u64: UInt64? {
+				guard case let .u64(u64) = self else {
+					return nil
+				}
+				return u64
+			}
+
+			var decimal: BigDecimal? {
+				guard case let .decimal(decimal) = self else {
+					return nil
+				}
+				return decimal
+			}
+
 			public init?(typeName: String, value: JSONValue) {
 				switch typeName {
 				case "String":
@@ -330,6 +350,11 @@ extension AccountPortfolio.NonFungibleResource.NonFungibleToken {
 						return nil
 					}
 					self = .u64(u64)
+				case "Decimal":
+					guard let decimal = try? value.string.map(BigDecimal.init(fromString:)) else {
+						return nil
+					}
+					self = .decimal(decimal)
 				default:
 					return nil
 				}
@@ -359,6 +384,14 @@ extension [AccountPortfolio.NonFungibleResource.NonFungibleToken.NFTData] {
 
 	public var keyImageURL: URL? {
 		self[.keyImageURL]?.asURL
+	}
+
+	public var claimEpoch: UInt64? {
+		self[.claimEpoch]?.u64
+	}
+
+	public var claimAmount: BigDecimal? {
+		self[.claimAmount]?.decimal
 	}
 }
 

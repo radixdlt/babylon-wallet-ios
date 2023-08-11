@@ -18,7 +18,7 @@ import Tagged
 public typealias NetworkID = Tagged<(network: (), id: ()), UInt8>
 
 extension NetworkID {
-	public static let `default` = enkinet
+	public static let `default` = hammunet
 }
 
 extension NetworkID {
