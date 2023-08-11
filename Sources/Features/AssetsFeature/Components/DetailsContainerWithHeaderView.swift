@@ -3,9 +3,13 @@ import SwiftUI
 
 // MARK: - DetailsContainerWithHeaderViewState
 struct DetailsContainerWithHeaderViewState: Equatable {
+	struct SymbolAndAmount: Equatable {
+		let amount: String
+		let symbol: String
+	}
+
 	let displayName: String
-	let amount: String
-	let symbol: String?
+	let symbolAndAmount: SymbolAndAmount?
 }
 
 // MARK: - DetailsContainerWithHeaderView
@@ -66,11 +70,11 @@ struct DetailsContainerWithHeaderView<ThumbnailView, DetailsView>: View
 		VStack(spacing: .medium3) {
 			thumbnailView
 
-			if let symbol = viewState.symbol {
-				Text(viewState.amount)
+			if let symbolAndAmount = viewState.symbolAndAmount {
+				Text(symbolAndAmount.amount)
 					.font(.app.sheetTitle)
 					.kerning(-0.5)
-					+ Text(" " + symbol)
+					+ Text(" " + symbolAndAmount.symbol)
 					.font(.app.sectionHeader)
 			}
 		}
@@ -85,17 +89,11 @@ enum DetailsContainerWithHeaderViewMaker {
 	}
 
 	@ViewBuilder
-	static func makeDescriptionView(description: String?) -> some View {
-		if let description = description {
-			Group {
-				Text(description)
-					.textStyle(.body1Regular)
-					.frame(maxWidth: .infinity, alignment: .leading)
+	static func makeDescriptionView(description: String) -> some View {
+		Text(description)
+			.textStyle(.body1Regular)
+			.frame(maxWidth: .infinity, alignment: .leading)
 
-				DetailsContainerWithHeaderViewMaker.makeSeparator()
-			}
-		} else {
-			EmptyView()
-		}
+		DetailsContainerWithHeaderViewMaker.makeSeparator()
 	}
 }

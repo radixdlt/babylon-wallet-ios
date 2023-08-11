@@ -41,8 +41,10 @@ extension LSUDetails {
 						DetailsContainerWithHeaderViewMaker
 							.makeSeparator()
 
-						DetailsContainerWithHeaderViewMaker
-							.makeDescriptionView(description: viewStore.description)
+						if let description = viewStore.description {
+							DetailsContainerWithHeaderViewMaker
+								.makeDescriptionView(description: description)
+						}
 
 						VStack(spacing: .medium3) {
 							TokenDetailsPropertyViewMaker
@@ -66,11 +68,7 @@ extension LSUDetails.State {
 		.init(
 			containerWithHeader: .init(
 				displayName: validator.name ?? L10n.Account.PoolUnits.unknownValidatorName,
-				amount: AccountPortfolio.xrdRedemptionValue(
-					validator: validator,
-					stakeUnitResource: stakeUnitResource
-				).format(),
-				symbol: "XRD"
+				symbolAndAmount: stakeUnitResource.symbolAndAmount
 			),
 			thumbnailURL: validator.iconURL,
 			tokenAmount: stakeUnitResource.amount.format(),

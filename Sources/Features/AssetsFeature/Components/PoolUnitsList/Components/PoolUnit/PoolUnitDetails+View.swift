@@ -3,18 +3,14 @@ import FeaturePrelude
 
 extension PoolUnitDetails.State {
 	var viewState: PoolUnitDetails.ViewState {
-		let poolUnitResource = poolUnit.poolUnitResource
+		let resource = poolUnit.poolUnitResource
 		return .init(
-			containerWithHeader: .init(
-				displayName: poolUnitResource.name ?? L10n.Account.PoolUnits.unknownPoolUnitName,
-				amount: poolUnitResource.amount.format(),
-				symbol: poolUnitResource.symbol
-			),
-			thumbnailURL: poolUnitResource.iconURL,
+			containerWithHeader: resource.detailsContainerWithHeaderViewState,
+			thumbnailURL: resource.iconURL,
 			resources: poolUnit.resourceViewStates,
-			description: poolUnitResource.description,
-			resourceAddress: poolUnitResource.resourceAddress,
-			currentSupply: poolUnitResource.totalSupply?.format() ?? L10n.AssetDetails.supplyUnkown
+			description: resource.description,
+			resourceAddress: resource.resourceAddress,
+			currentSupply: resource.totalSupply?.format() ?? L10n.AssetDetails.supplyUnkown
 		)
 	}
 }
@@ -61,8 +57,10 @@ extension PoolUnitDetails {
 						DetailsContainerWithHeaderViewMaker
 							.makeSeparator()
 
-						DetailsContainerWithHeaderViewMaker
-							.makeDescriptionView(description: viewStore.description)
+						if let description = viewStore.description {
+							DetailsContainerWithHeaderViewMaker
+								.makeDescriptionView(description: description)
+						}
 
 						VStack(spacing: .medium3) {
 							TokenDetailsPropertyViewMaker
@@ -78,5 +76,23 @@ extension PoolUnitDetails {
 				}
 			}
 		}
+	}
+}
+
+extension AccountPortfolio.FungibleResource {
+	var symbolAndAmount: DetailsContainerWithHeaderViewState.SymbolAndAmount? {
+		symbol.map {
+			.init(
+				amount: amount.format(),
+				symbol: $0
+			)
+		}
+	}
+
+	var detailsContainerWithHeaderViewState: DetailsContainerWithHeaderViewState {
+		.init(
+			displayName: name ?? L10n.Account.PoolUnits.unknownPoolUnitName,
+			symbolAndAmount: symbolAndAmount
+		)
 	}
 }

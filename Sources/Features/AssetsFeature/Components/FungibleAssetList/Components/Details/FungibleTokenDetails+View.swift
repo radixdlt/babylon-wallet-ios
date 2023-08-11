@@ -4,11 +4,7 @@ import FeaturePrelude
 extension FungibleTokenDetails.State {
 	var viewState: FungibleTokenDetails.ViewState {
 		.init(
-			detailsContainerWithHeader: .init(
-				displayName: resource.name ?? "",
-				amount: resource.amount.format(),
-				symbol: resource.symbol
-			),
+			detailsContainerWithHeader: resource.detailsContainerWithHeaderViewState,
 			thumbnail: isXRD ? .xrd : .known(resource.iconURL),
 			description: resource.description,
 			resourceAddress: resource.resourceAddress
@@ -38,8 +34,10 @@ extension FungibleTokenDetails {
 				DetailsContainerWithHeaderView(viewState: viewStore.detailsContainerWithHeader) {
 					TokenThumbnail(viewStore.thumbnail, size: .veryLarge)
 				} detailsView: {
-					DetailsContainerWithHeaderViewMaker
-						.makeDescriptionView(description: viewStore.description)
+					if let description = viewStore.description {
+						DetailsContainerWithHeaderViewMaker
+							.makeDescriptionView(description: description)
+					}
 
 					TokenDetailsPropertyViewMaker.makeAddress(
 						resourceAddress: viewStore.resourceAddress
