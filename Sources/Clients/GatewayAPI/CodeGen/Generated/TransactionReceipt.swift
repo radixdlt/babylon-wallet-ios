@@ -17,6 +17,7 @@ extension GatewayAPI {
 
 public struct TransactionReceipt: Codable, Hashable {
 
+    /** The status of the transaction. */
     public private(set) var status: TransactionReceiptStatus?
     /** Fees paid, Only present if the `status` is not `Rejected`. */
     public private(set) var feeSummary: AnyCodable?

@@ -505,9 +505,9 @@ public struct DappAuthorizedPersonaView: IndentedView {
 
 				if let name = sharedPersonaData.name {
 					Text("Name")
-					Labeled("Given Names", value: name.value.givenNames)
-					Labeled("Nickname", value: name.value.nickname)
-					Labeled("Family Name", value: name.value.familyName)
+					Labeled(L10n.AuthorizedDapps.PersonaDetails.givenName, value: name.value.givenNames)
+					Labeled(L10n.AuthorizedDapps.PersonaDetails.nickname, value: name.value.nickname)
+					Labeled(L10n.AuthorizedDapps.PersonaDetails.nameFamily, value: name.value.familyName)
 					Labeled("id", value: name.id)
 				}
 

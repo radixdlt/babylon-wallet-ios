@@ -39,7 +39,7 @@ extension EditPersonaName {
 				}
 			} label: {
 				VStack(alignment: .leading, spacing: .small3) {
-					Text("Name Order") // FIXME: Localize
+					Text(L10n.AuthorizedDapps.PersonaDetails.nameVariant)
 						.textStyle(.body1HighImportance)
 						.foregroundColor(.app.gray1)
 						.multilineTextAlignment(.leading)
@@ -138,9 +138,9 @@ extension PersonaData.Name.Variant {
 	var text: String {
 		switch self {
 		case .western:
-			return "Western style (given name(s) first)"
+			return L10n.AuthorizedDapps.PersonaDetails.nameVariantWestern
 		case .eastern:
-			return "Eastern style (family name first)"
+			return L10n.AuthorizedDapps.PersonaDetails.nameVariantEastern
 		}
 	}
 }

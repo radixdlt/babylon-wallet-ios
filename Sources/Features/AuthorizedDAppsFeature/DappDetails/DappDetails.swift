@@ -163,7 +163,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 					try await cacheClient.withCaching(
 						cacheEntry: .dAppMetadata(dAppID.address),
 						request: {
-							try await gatewayAPIClient.getEntityMetadata(dAppID.address)
+							try await gatewayAPIClient.getEntityMetadata(dAppID.address, .dappMetadataKeys)
 						}
 					)
 				}
@@ -270,7 +270,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 		}
 
 		let result = await TaskResult {
-			let allResourceItems = try await gatewayAPIClient.fetchResourceDetails(claimedEntities)
+			let allResourceItems = try await gatewayAPIClient.fetchResourceDetails(claimedEntities, explicitMetadata: .resourceMetadataKeys)
 				.items
 				.filter { $0.metadata.dappDefinition == dAppDefinitionAddress.address }
 				.compactMap(\.resourceDetails)
@@ -305,7 +305,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 		for dApp: DappDefinitionAddress,
 		validating dAppDefinitionAddress: DappDefinitionAddress
 	) async throws -> State.AssociatedDapp {
-		let metadata = try await gatewayAPIClient.getEntityMetadata(dApp.address)
+		let metadata = try await gatewayAPIClient.getEntityMetadata(dApp.address, [.name, .iconURL])
 		// FIXME: Uncomment this when when we can rely on dApps conforming to the standards
 		// .validating(dAppDefinitionAddress: dAppDefinitionAddress)
 		guard let name = metadata.name else {

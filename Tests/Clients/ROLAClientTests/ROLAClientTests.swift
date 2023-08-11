@@ -168,13 +168,13 @@ final class ROLAClientTests: TestCase {
 		let metadata = metadata(origin: origin, dAppDefinitionAddress: dAppDefinitionAddress)
 		let accountType = "dapp definition"
 		let metadataCollection = GatewayAPI.EntityMetadataCollection(items: [
-			.init(key: "account_type", value: .init(rawHex: "", rawJson: "", typed: .stringValue(.init(type: .string, value: accountType))), isLocked: false, lastUpdatedAtStateVersion: 0),
-			.init(key: "related_websites", value: .init(rawHex: "", rawJson: "", typed: .stringValue(.init(type: .string, value: origin))), isLocked: false, lastUpdatedAtStateVersion: 0),
+			.init(key: "account_type", value: .init(rawHex: "", programmaticJson: "", typed: .stringValue(.init(type: .string, value: accountType))), isLocked: false, lastUpdatedAtStateVersion: 0),
+			.init(key: "related_websites", value: .init(rawHex: "", programmaticJson: "", typed: .stringValue(.init(type: .string, value: origin))), isLocked: false, lastUpdatedAtStateVersion: 0),
 		])
 
 		// when
 		try await withDependencies {
-			$0.gatewayAPIClient.getEntityMetadata = { _ in metadataCollection }
+			$0.gatewayAPIClient.getEntityMetadata = { _, _ in metadataCollection }
 			$0.cacheClient.load = { _, _ in throw CacheClient.Error.dataLoadingFailed }
 			$0.cacheClient.save = { _, _ in }
 		} operation: {
@@ -189,15 +189,15 @@ final class ROLAClientTests: TestCase {
 		let wrongAccountType = "wrong account type"
 
 		let metadataCollection = GatewayAPI.EntityMetadataCollection(items: [
-			.init(key: "account_type", value: .init(rawHex: "", rawJson: "", typed: .stringValue(.init(type: .string, value: wrongAccountType))), isLocked: false, lastUpdatedAtStateVersion: 0),
-			.init(key: "related_websites", value: .init(rawHex: "", rawJson: "", typed: .stringValue(.init(type: .string, value: origin))), isLocked: false, lastUpdatedAtStateVersion: 0),
+			.init(key: "account_type", value: .init(rawHex: "", programmaticJson: "", typed: .stringValue(.init(type: .string, value: wrongAccountType))), isLocked: false, lastUpdatedAtStateVersion: 0),
+			.init(key: "related_websites", value: .init(rawHex: "", programmaticJson: "", typed: .stringValue(.init(type: .string, value: origin))), isLocked: false, lastUpdatedAtStateVersion: 0),
 		])
 
 		let expectedError = ROLAFailure.wrongAccountType
 
 		// when
 		await withDependencies {
-			$0.gatewayAPIClient.getEntityMetadata = { _ in metadataCollection }
+			$0.gatewayAPIClient.getEntityMetadata = { _, _ in metadataCollection }
 			$0.cacheClient.load = { _, _ in throw CacheClient.Error.dataLoadingFailed }
 			$0.cacheClient.save = { _, _ in }
 		} operation: {
@@ -218,15 +218,15 @@ final class ROLAClientTests: TestCase {
 		let accountType = "dapp definition"
 
 		let metadataCollection = GatewayAPI.EntityMetadataCollection(items: [
-			.init(key: "account_type", value: .init(rawHex: "", rawJson: "", typed: .stringValue(.init(type: .string, value: accountType))), isLocked: false, lastUpdatedAtStateVersion: 0),
-			.init(key: "related_websites", value: .init(rawHex: "", rawJson: "", typed: .stringValue(.init(type: .string, value: origin))), isLocked: false, lastUpdatedAtStateVersion: 0),
+			.init(key: "account_type", value: .init(rawHex: "", programmaticJson: "", typed: .stringValue(.init(type: .string, value: accountType))), isLocked: false, lastUpdatedAtStateVersion: 0),
+			.init(key: "related_websites", value: .init(rawHex: "", programmaticJson: "", typed: .stringValue(.init(type: .string, value: origin))), isLocked: false, lastUpdatedAtStateVersion: 0),
 		])
 
 		let expectedError = ROLAFailure.unknownWebsite
 
 		// when
 		await withDependencies {
-			$0.gatewayAPIClient.getEntityMetadata = { _ in metadataCollection }
+			$0.gatewayAPIClient.getEntityMetadata = { _, _ in metadataCollection }
 			$0.cacheClient.load = { _, _ in throw CacheClient.Error.dataLoadingFailed }
 			$0.cacheClient.save = { _, _ in }
 		} operation: {

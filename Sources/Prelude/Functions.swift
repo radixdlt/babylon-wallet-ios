@@ -1,11 +1,11 @@
 import Foundation
 
-public func with<T>(
+public func update<T>(
 	_ initial: T,
-	update: (inout T) throws -> Void
+	with: (inout T) throws -> Void
 ) rethrows -> T {
 	var value = initial
-	try update(&value)
+	try with(&value)
 	return value
 }
 
@@ -20,4 +20,9 @@ public func not<T>(
 /// You can use `identity` instead of `{ $0 }`
 public func identity<T>(_ t: T) -> T {
 	t
+}
+
+/// Wherever you have to handle `Never`
+public func absurd<T>(_ never: Never) -> T {
+	switch never {}
 }

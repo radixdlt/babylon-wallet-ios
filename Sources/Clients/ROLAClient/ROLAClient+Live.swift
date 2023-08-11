@@ -24,7 +24,7 @@ extension ROLAClient {
 					return persona.address.asGeneral()
 				}
 			}()
-			let metadata = try await gatewayAPIClient.getEntityMetadata(entityAddress.address)
+			let metadata = try await gatewayAPIClient.getEntityMetadata(entityAddress.address, [.ownerKeys])
 			var ownerKeyHashes = try metadata.ownerKeyHashes() ?? []
 
 			let transactionSigningKeyHash: PublicKeyHash = try {
@@ -43,7 +43,12 @@ extension ROLAClient {
 			}
 
 			loggerGlobal.notice("Setting ownerKeyHashes to: \(ownerKeyHashes)")
-			return try .manifestForOwnerKeys(address: entityAddress.address, keyHashes: ownerKeyHashes, networkID: entity.networkID)
+			return try ManifestBuilder()
+				.setOwnerKeys(
+					from: entityAddress,
+					ownerKeyHashes: ownerKeyHashes
+				)
+				.build(networkId: request.entity.networkID.rawValue)
 		}
 
 		return Self(
@@ -52,7 +57,7 @@ extension ROLAClient {
 				let metadataCollection = try await cacheClient.withCaching(
 					cacheEntry: .rolaDappVerificationMetadata(metadata.dAppDefinitionAddress.address),
 					request: {
-						try await gatewayAPIClient.getEntityMetadata(metadata.dAppDefinitionAddress.address)
+						try await gatewayAPIClient.getEntityMetadata(metadata.dAppDefinitionAddress.address, [.accountType, .relatedWebsites])
 					}
 				)
 

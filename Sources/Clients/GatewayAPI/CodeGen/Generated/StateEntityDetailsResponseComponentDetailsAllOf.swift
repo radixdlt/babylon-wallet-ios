@@ -21,15 +21,15 @@ public struct StateEntityDetailsResponseComponentDetailsAllOf: Codable, Hashable
     public private(set) var packageAddress: String?
     public private(set) var blueprintName: String
     public private(set) var state: AnyCodable?
-    public private(set) var accessRules: ComponentEntityAccessRules
+    public private(set) var roleAssignments: ComponentEntityRoleAssignments?
     /** String-encoded decimal representing the amount of a related fungible resource. */
     public private(set) var royaltyVaultBalance: String?
 
-    public init(packageAddress: String? = nil, blueprintName: String, state: AnyCodable? = nil, accessRules: ComponentEntityAccessRules, royaltyVaultBalance: String? = nil) {
+    public init(packageAddress: String? = nil, blueprintName: String, state: AnyCodable? = nil, roleAssignments: ComponentEntityRoleAssignments? = nil, royaltyVaultBalance: String? = nil) {
         self.packageAddress = packageAddress
         self.blueprintName = blueprintName
         self.state = state
-        self.accessRules = accessRules
+        self.roleAssignments = roleAssignments
         self.royaltyVaultBalance = royaltyVaultBalance
     }
 
@@ -37,7 +37,7 @@ public struct StateEntityDetailsResponseComponentDetailsAllOf: Codable, Hashable
         case packageAddress = "package_address"
         case blueprintName = "blueprint_name"
         case state
-        case accessRules = "access_rules"
+        case roleAssignments = "role_assignments"
         case royaltyVaultBalance = "royalty_vault_balance"
     }
 
@@ -48,7 +48,7 @@ public struct StateEntityDetailsResponseComponentDetailsAllOf: Codable, Hashable
         try container.encodeIfPresent(packageAddress, forKey: .packageAddress)
         try container.encode(blueprintName, forKey: .blueprintName)
         try container.encodeIfPresent(state, forKey: .state)
-        try container.encode(accessRules, forKey: .accessRules)
+        try container.encodeIfPresent(roleAssignments, forKey: .roleAssignments)
         try container.encodeIfPresent(royaltyVaultBalance, forKey: .royaltyVaultBalance)
     }
 }

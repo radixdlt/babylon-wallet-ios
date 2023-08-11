@@ -414,7 +414,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 				state.reviewedTransaction = try .init(
 					feePayerSelection: preview.feePayerSelectionAmongstCandidates,
 					networkId: preview.networkID,
-					transaction: preview.analyzedManifestToReview.transactionType.transactionKind()
+					transaction: preview.analyzedManifestToReview.transactionTypes.transactionKind()
 				)
 				return review(&state)
 			} catch {
@@ -446,29 +446,6 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		}
 	}
 
-	public func addingGuarantees(
-		to manifest: TransactionManifest,
-		guarantees: [TransactionClient.Guarantee]
-	) throws -> TransactionManifest {
-		guard !guarantees.isEmpty else { return manifest }
-
-		var manifest = manifest
-
-		/// Will be increased with each added guarantee to account for the difference in indexes from the initial manifest.
-		var indexInc = 1 // LockFee was added, start from 1
-		for guarantee in guarantees {
-			let guaranteeInstruction: Instruction = try .assertWorktopContains(
-				resourceAddress: guarantee.resourceAddress.intoEngine(),
-				amount: .init(value: guarantee.amount.toString())
-			)
-
-			manifest = try manifest.withInstructionAdded(guaranteeInstruction, at: Int(guarantee.instructionIndex) + indexInc)
-
-			indexInc += 1
-		}
-		return manifest
-	}
-
 	func showRawTransaction(_ state: inout State) -> EffectTask<Action> {
 		do {
 			let manifest = try transactionManifestWithWalletInstructionsAdded(state)
@@ -481,18 +458,33 @@ public struct TransactionReview: Sendable, FeatureReducer {
 	}
 
 	func transactionManifestWithWalletInstructionsAdded(_ state: State) throws -> TransactionManifest {
-		let transactionWithLockFee: TransactionManifest = try {
+		let lockFee: LockFeeModification? = try {
 			guard let feePayerSelection = state.reviewedTransaction?.feePayerSelection,
 			      let feePayer = feePayerSelection.selected
 			else {
-				return state.transactionManifest
+				return nil
 			}
-			return try state.transactionManifest.withLockFeeCallMethodAdded(
-				address: feePayer.account.address.asGeneral(),
-				fee: feePayerSelection.transactionFee.totalFee.lockFee
+			return try .init(
+				accountAddress: feePayer.account.address.intoEngine(),
+				amount: feePayerSelection.transactionFee.totalFee.lockFee.intoEngine()
 			)
 		}()
-		return try addingGuarantees(to: transactionWithLockFee, guarantees: state.allGuarantees)
+
+		let assertions: [IndexedAssertion] = try state.allGuarantees.map {
+			try .init(
+				index: $0.instructionIndex,
+				assertion: .amount(
+					resourceAddress: $0.resourceAddress.intoEngine(),
+					amount: $0.amount.intoEngine()
+				)
+			)
+		}
+
+		return try state.transactionManifest.modify(modifications: .init(
+			addAccessControllerProofs: [],
+			addLockFee: lockFee,
+			addAssertions: assertions
+		))
 	}
 
 	func delayedEffect(
@@ -575,7 +567,7 @@ extension TransactionReview {
 	private func extractProofInfo(_ address: ResourceAddress) async -> ProofEntity {
 		await ProofEntity(
 			id: address,
-			metadata: .init(metadata: try? gatewayAPIClient.getEntityMetadata(address.address))
+			metadata: .init(metadata: try? gatewayAPIClient.getEntityMetadata(address.address, .dappMetadataKeys))
 		)
 	}
 
@@ -591,7 +583,8 @@ extension TransactionReview {
 			let transfers = try await resources.asyncFlatMap {
 				try await transferInfo(
 					resourceQuantifier: $0,
-					createdEntities: transaction.metadataOfNewlyCreatedEntities,
+					metadataOfCreatedEntities: transaction.metadataOfNewlyCreatedEntities,
+					createdEntities: transaction.addressesOfNewlyCreatedEntities,
 					networkID: networkID,
 					type: .exact
 				)
@@ -621,7 +614,8 @@ extension TransactionReview {
 			let transfers = try await accountDeposits.asyncFlatMap {
 				try await transferInfo(
 					resourceQuantifier: $0,
-					createdEntities: transaction.metadataOfNewlyCreatedEntities,
+					metadataOfCreatedEntities: transaction.metadataOfNewlyCreatedEntities,
+					createdEntities: transaction.addressesOfNewlyCreatedEntities,
 					networkID: networkID,
 					type: $0.transferType
 				)
@@ -645,22 +639,23 @@ extension TransactionReview {
 
 	func transferInfo(
 		resourceQuantifier: ResourceTracker,
-		createdEntities: [String: [String: MetadataValue?]]?,
+		metadataOfCreatedEntities: [String: [String: MetadataValue?]]?,
+		createdEntities: [EngineToolkit.Address],
 		networkID: NetworkID,
 		type: TransferType
 	) async throws -> [Transfer] {
 		let resourceAddress: ResourceAddress = try resourceQuantifier.resourceAddress.asSpecific()
-		let isNewResource = createdEntities?[resourceAddress.address] != nil
+		let isNewResource = createdEntities.contains(resourceQuantifier.resourceAddress)
 
 		let metadata: (name: String?, symbol: String?, thumbnail: URL?) = await {
-			if let newResourceMetadata = createdEntities?[resourceAddress.address] {
+			if let newResourceMetadata = metadataOfCreatedEntities?[resourceAddress.address] {
 				return (
 					newResourceMetadata["name"]??.string,
 					newResourceMetadata["symbol"]??.string,
 					newResourceMetadata["icon_url"]??.url
 				)
 			} else {
-				let remoteMetadata = try? await gatewayAPIClient.getEntityMetadata(resourceAddress.address)
+				let remoteMetadata = try? await gatewayAPIClient.getEntityMetadata(resourceAddress.address, [.name, .symbol, .iconURL])
 
 				return (
 					remoteMetadata?.name,
@@ -1029,7 +1024,7 @@ public struct SimpleDappDetails: Sendable, FeatureReducer {
 					try await cacheClient.withCaching(
 						cacheEntry: .dAppMetadata(dAppID.address),
 						request: {
-							try await gatewayAPIClient.getEntityMetadata(dAppID.address)
+							try await gatewayAPIClient.getEntityMetadata(dAppID.address, .dappMetadataKeys)
 						}
 					)
 				}
@@ -1077,7 +1072,7 @@ public struct SimpleDappDetails: Sendable, FeatureReducer {
 		}
 
 		let result = await TaskResult {
-			let allResourceItems = try await gatewayAPIClient.fetchResourceDetails(claimedEntities)
+			let allResourceItems = try await gatewayAPIClient.fetchResourceDetails(claimedEntities, explicitMetadata: .resourceMetadataKeys)
 				.items
 				// FIXME: Uncomment this when when we can rely on dApps conforming to the standards
 				// .filter { $0.metadata.dappDefinition == dAppDefinitionAddress.address }
@@ -1115,7 +1110,7 @@ public struct SimpleDappDetails: Sendable, FeatureReducer {
 		for dApp: DappDefinitionAddress,
 		validating dAppDefinitionAddress: DappDefinitionAddress
 	) async throws -> State.AssociatedDapp {
-		let metadata = try await gatewayAPIClient.getEntityMetadata(dApp.address)
+		let metadata = try await gatewayAPIClient.getEntityMetadata(dApp.address, [.name, .iconURL])
 		// FIXME: Uncomment this when when we can rely on dApps conforming to the standards
 		// .validating(dAppDefinitionAddress: dAppDefinitionAddress)
 		guard let name = metadata.name else {
@@ -1163,9 +1158,37 @@ public enum TransactionKind: Hashable, Sendable {
 	case nonConforming
 }
 
+extension [TransactionType] {
+	fileprivate func transactionKind() throws -> TransactionKind {
+		// Empty array means non conforming transaction. ET was not able to map it to any type
+		guard !isEmpty else {
+			return .nonConforming
+		}
+
+		// First try to get the general transaction, if missing then convert the first transaction to general transaction
+		return try firstNonNil(\.generalTransaction).map(TransactionKind.conforming) ?? first!.transactionKind()
+	}
+}
+
 /// This is kinda temporary conversion of all transaction types into GeneralTransaction, until(not sure if needed) we will want to
 /// have specific UI for different transaction types
 extension TransactionType {
+	var generalTransaction: GeneralTransaction? {
+		if case let .generalTransaction(accountProofs, accountWithdraws, accountDeposits, addressesInManifest, metadataOfNewlyCreatedEntities, dataOfNewlyMintedNonFungibles, addressesOfNewlyCreatedEntities) = self {
+			return .init(
+				accountProofs: accountProofs,
+				accountWithdraws: accountWithdraws,
+				accountDeposits: accountDeposits,
+				addressesInManifest: addressesInManifest,
+				metadataOfNewlyCreatedEntities: metadataOfNewlyCreatedEntities,
+				dataOfNewlyMintedNonFungibles: dataOfNewlyMintedNonFungibles,
+				addressesOfNewlyCreatedEntities: addressesOfNewlyCreatedEntities
+			)
+		}
+
+		return nil
+	}
+
 	public struct GeneralTransaction: Hashable, Sendable {
 		let accountProofs: [EngineToolkit.Address]
 		let accountWithdraws: [String: [ResourceTracker]]
@@ -1173,6 +1196,7 @@ extension TransactionType {
 		let addressesInManifest: [EngineToolkit.EntityType: [EngineToolkit.Address]]
 		let metadataOfNewlyCreatedEntities: [String: [String: MetadataValue?]]
 		let dataOfNewlyMintedNonFungibles: [String: [NonFungibleLocalId: [UInt8]]]
+		let addressesOfNewlyCreatedEntities: [EngineToolkit.Address]
 
 		var allAddress: [EngineToolkit.Address] {
 			addressesInManifest.flatMap(\.value)
@@ -1197,7 +1221,8 @@ extension TransactionType {
 					accountDeposits: [to.addressString(): [transferred.toResourceTracker]],
 					addressesInManifest: addressesInManifest,
 					metadataOfNewlyCreatedEntities: [:],
-					dataOfNewlyMintedNonFungibles: [:]
+					dataOfNewlyMintedNonFungibles: [:],
+					addressesOfNewlyCreatedEntities: []
 				)
 			)
 
@@ -1265,10 +1290,11 @@ extension TransactionType {
 					accountDeposits: deposits,
 					addressesInManifest: addressesInManifest,
 					metadataOfNewlyCreatedEntities: [:],
-					dataOfNewlyMintedNonFungibles: [:]
+					dataOfNewlyMintedNonFungibles: [:],
+					addressesOfNewlyCreatedEntities: []
 				)
 			)
-		case let .generalTransaction(accountProofs, accountWithdraws, accountDeposits, addressesInManifest, metadataOfNewlyCreatedEntities, dataOfNewlyMintedNonFungibles):
+		case let .generalTransaction(accountProofs, accountWithdraws, accountDeposits, addressesInManifest, metadataOfNewlyCreatedEntities, dataOfNewlyMintedNonFungibles, addressesOfNewlyCreatedEntities):
 			return .conforming(
 				.init(
 					accountProofs: accountProofs,
@@ -1276,10 +1302,11 @@ extension TransactionType {
 					accountDeposits: accountDeposits,
 					addressesInManifest: addressesInManifest,
 					metadataOfNewlyCreatedEntities: metadataOfNewlyCreatedEntities,
-					dataOfNewlyMintedNonFungibles: dataOfNewlyMintedNonFungibles
+					dataOfNewlyMintedNonFungibles: dataOfNewlyMintedNonFungibles,
+					addressesOfNewlyCreatedEntities: addressesOfNewlyCreatedEntities
 				)
 			)
-		case .nonConforming:
+		default:
 			return .nonConforming
 		}
 	}

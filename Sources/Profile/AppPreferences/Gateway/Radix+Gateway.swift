@@ -24,7 +24,7 @@ extension Radix {
 }
 
 extension Radix.Gateway {
-	public static let `default` = Radix.Gateway.ansharnet
+	public static let `default` = Radix.Gateway.hammunet
 }
 
 extension Radix.Gateway {

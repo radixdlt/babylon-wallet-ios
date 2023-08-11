@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Prelude
 #if canImport(AnyCodable)
 import AnyCodable
 #endif
@@ -18,16 +19,16 @@ extension GatewayAPI {
 public struct ScryptoSborValue: Codable, Hashable {
 
     public private(set) var rawHex: String
-    public private(set) var rawJson: AnyCodable
+    public private(set) var programmaticJson: JSONValue
 
-    public init(rawHex: String, rawJson: AnyCodable) {
+    public init(rawHex: String, programmaticJson: JSONValue) {
         self.rawHex = rawHex
-        self.rawJson = rawJson
+        self.programmaticJson = programmaticJson
     }
 
     public enum CodingKeys: String, CodingKey, CaseIterable {
         case rawHex = "raw_hex"
-        case rawJson = "raw_json"
+        case programmaticJson = "programmatic_json"
     }
 
     // Encodable protocol methods
@@ -35,7 +36,7 @@ public struct ScryptoSborValue: Codable, Hashable {
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(rawHex, forKey: .rawHex)
-        try container.encode(rawJson, forKey: .rawJson)
+        try container.encode(programmaticJson, forKey: .programmaticJson)
     }
 }
 

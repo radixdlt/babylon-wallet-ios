@@ -76,7 +76,7 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 		case hideLoader(updateControlState: WritableKeyPath<State, ControlState>)
 		#if DEBUG
 		case createAuthKeyWithAccount(Profile.Network.Account)
-		case turnIntoDappDefAccountType(TransactionManifest)
+		case reviewTransaction(TransactionManifest)
 		case canCreateAuthSigningKey(Bool)
 		case canTurnIntoDappDefAccountType(Bool)
 		#endif // DEBUG
@@ -97,7 +97,7 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 			case showQR(ShowQR.State)
 			#if DEBUG
 			case createAuthKey(CreateAuthKey.State)
-			case reviewTransactionTurningAccountIntoDappDefType(TransactionReview.State)
+			case reviewTransaction(TransactionReview.State)
 			#endif // DEBUG
 		}
 
@@ -105,7 +105,7 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 			case showQR(ShowQR.Action)
 			#if DEBUG
 			case createAuthKey(CreateAuthKey.Action)
-			case reviewTransactionTurningAccountIntoDappDefType(TransactionReview.Action)
+			case reviewTransaction(TransactionReview.Action)
 			#endif // DEBUG
 		}
 
@@ -117,7 +117,7 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 			Scope(state: /State.createAuthKey, action: /Action.createAuthKey) {
 				CreateAuthKey()
 			}
-			Scope(state: /State.reviewTransactionTurningAccountIntoDappDefType, action: /Action.reviewTransactionTurningAccountIntoDappDefType) {
+			Scope(state: /State.reviewTransaction, action: /Action.reviewTransaction) {
 				TransactionReview()
 			}
 			#endif // DEBUG
@@ -171,16 +171,18 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 			return .run { [accountAddress = state.address] send in
 				let account = try await accountsClient.getAccountByAddress(accountAddress)
 				let manifest = try TransactionManifest.manifestMarkingAccountAsDappDefinitionType(account: account)
-				await send(.internal(.turnIntoDappDefAccountType(manifest)))
+				await send(.internal(.reviewTransaction(manifest)))
 			} catch: { error, _ in
 				loggerGlobal.warning("Failed to create manifest which turns account into dapp definition account type, error: \(error)")
 			}
 
 		case .createFungibleTokenButtonTapped:
-			return call(buttonState: \.createFungibleTokenButtonState, into: &state) {
-				try await faucetClient.createFungibleToken(.init(
-					recipientAccountAddress: $0
-				))
+			return .run { [accountAddress = state.address] send in
+				let account = try await accountsClient.getAccountByAddress(accountAddress)
+				let manifest = try ManifestBuilder.manifestForCreateFungibleToken(account: account.address, networkID: account.networkID)
+				await send(.internal(.reviewTransaction(manifest)))
+			} catch: { error, _ in
+				loggerGlobal.warning("Failed to create manifest which turns account into dapp definition account type, error: \(error)")
 			}
 
 		case .createNonFungibleTokenButtonTapped:
@@ -226,11 +228,10 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 				}
 				return .none
 
-			case .reviewTransactionTurningAccountIntoDappDefType(.delegate(.transactionCompleted)), .reviewTransactionTurningAccountIntoDappDefType(.delegate(.failed)):
-				if case .reviewTransactionTurningAccountIntoDappDefType = state.destination {
+			case .reviewTransaction(.delegate(.transactionCompleted)), .reviewTransaction(.delegate(.failed)):
+				if case .reviewTransaction = state.destination {
 					state.destination = nil
 				}
-				state.canTurnIntoDappDefinitionAccountType = false
 				return .none
 			#endif
 
@@ -284,8 +285,8 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 			state.destination = .createAuthKey(.init(entity: .account(account)))
 			return .none
 
-		case let .turnIntoDappDefAccountType(manifest):
-			state.destination = .reviewTransactionTurningAccountIntoDappDefType(.init(
+		case let .reviewTransaction(manifest):
+			state.destination = .reviewTransaction(.init(
 				transactionManifest: manifest,
 				nonce: .secureRandom(),
 				signTransactionPurpose: .internalManifest(.debugModifyAccount),
@@ -356,7 +357,7 @@ extension AccountPreferences {
 
 			do {
 				let isDappDefinitionAccount: Bool = try await gatewayAPIClient
-					.getEntityMetadata(address.address)
+					.getEntityMetadata(address.address, [.accountType])
 					.accountType == .dappDefinition
 
 				await send(.internal(.canTurnIntoDappDefAccountType(!isDappDefinitionAccount)))
@@ -371,13 +372,9 @@ extension TransactionManifest {
 	fileprivate static func manifestMarkingAccountAsDappDefinitionType(
 		account: Profile.Network.Account
 	) throws -> TransactionManifest {
-		let raw = """
-		SET_METADATA
-		            Address("\(account.address.address)")
-		            "account_type"
-		            Enum<Metadata::String>("dapp definition");
-		"""
-		return try .init(instructions: .fromString(string: raw, networkId: account.networkID.rawValue), blobs: [])
+		try ManifestBuilder()
+			.setAccountType(from: account.address.asGeneral(), type: "dapp definition")
+			.build(networkId: account.networkID.rawValue)
 	}
 }
 #endif
