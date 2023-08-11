@@ -91,7 +91,7 @@ extension AccountPortfolio.FungibleResource {
 
 	var detailsContainerWithHeaderViewState: DetailsContainerWithHeaderViewState {
 		.init(
-			displayName: name ?? L10n.Account.PoolUnits.unknownPoolUnitName,
+			title: name ?? L10n.Account.PoolUnits.unknownPoolUnitName,
 			symbolAndAmount: symbolAndAmount
 		)
 	}

@@ -66,10 +66,7 @@ extension LSUDetails {
 extension LSUDetails.State {
 	var viewState: LSUDetails.ViewState {
 		.init(
-			containerWithHeader: .init(
-				displayName: validator.name ?? L10n.Account.PoolUnits.unknownValidatorName,
-				symbolAndAmount: stakeUnitResource.symbolAndAmount
-			),
+			containerWithHeader: stakeUnitResource.detailsContainerWithHeaderViewState,
 			thumbnailURL: validator.iconURL,
 			redeemableTokenAmount: AccountPortfolio.xrdRedemptionValue(
 				validator: validator,

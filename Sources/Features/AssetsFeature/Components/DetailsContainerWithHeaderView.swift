@@ -8,7 +8,7 @@ struct DetailsContainerWithHeaderViewState: Equatable {
 		let symbol: String
 	}
 
-	let displayName: String
+	let title: String
 	let symbolAndAmount: SymbolAndAmount?
 }
 
@@ -48,7 +48,7 @@ struct DetailsContainerWithHeaderView<ThumbnailView, DetailsView>: View
 				.padding(.horizontal, .large2)
 			}
 			#if os(iOS)
-			.navigationBarTitle(viewState.displayName)
+			.navigationBarTitle(viewState.title)
 			.navigationBarTitleColor(.app.gray1)
 			.navigationBarTitleDisplayMode(.inline)
 			.navigationBarInlineTitleFont(.app.secondaryHeader)
