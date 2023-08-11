@@ -178,7 +178,7 @@ extension Settings.View {
 			),
 			.init(
 				title: "Account Security & Settings", // FIXME: Strings - L10n.Settings.appSettings
-				icon: .asset(AssetResource.appSettings), // FIXME: Choose
+				icon: .asset(AssetResource.accountSecurity),
 				action: .accountSecurityButtonTapped
 			),
 			.init(

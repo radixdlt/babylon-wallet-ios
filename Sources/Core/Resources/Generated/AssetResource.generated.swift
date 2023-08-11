@@ -81,6 +81,7 @@ public enum AssetResource {
   public static let token = ImageAsset(name: "token")
   public static let unknownComponent = ImageAsset(name: "unknown-component")
   public static let xrd = ImageAsset(name: "xrd")
+  public static let accountSecurity = ImageAsset(name: "accountSecurity")
   public static let appSettings = ImageAsset(name: "appSettings")
   public static let authorizedDapps = ImageAsset(name: "authorized-dapps")
   public static let backups = ImageAsset(name: "backups")
