@@ -13,7 +13,7 @@ enum TokenDetailsPropertyViewMaker {
 
 	static func makeValidatorAddress(address: ValidatorAddress) -> some View {
 		makeAddressView(
-			title: "Validator Address",
+			title: "Validator",
 			address: .validator(address)
 		)
 	}

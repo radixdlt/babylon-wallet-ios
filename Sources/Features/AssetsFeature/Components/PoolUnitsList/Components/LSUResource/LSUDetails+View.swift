@@ -50,12 +50,12 @@ extension LSUDetails {
 						VStack(spacing: .medium3) {
 							TokenDetailsPropertyViewMaker
 								.makeResourceAddress(address: viewStore.resourceAddress)
+							TokenDetailsPropertyViewMaker
+								.makeValidatorAddress(address: viewStore.validatorAddress)
 							TokenDetailsPropertyView(
 								title: L10n.AssetDetails.currentSupply,
 								propertyView: Text(viewStore.currentSupply)
 							)
-							TokenDetailsPropertyViewMaker
-								.makeValidatorAddress(address: viewStore.validatorAddress)
 						}
 					}
 				} closeButtonAction: {
