@@ -64,7 +64,7 @@ extension PoolUnitDetails {
 
 						VStack(spacing: .medium3) {
 							TokenDetailsPropertyViewMaker
-								.makeAddress(resourceAddress: viewStore.resourceAddress)
+								.makeResourceAddress(address: viewStore.resourceAddress)
 							TokenDetailsPropertyView(
 								title: L10n.AssetDetails.currentSupply,
 								propertyView: Text(viewStore.currentSupply)

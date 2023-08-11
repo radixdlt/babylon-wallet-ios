@@ -12,6 +12,7 @@ extension LSUDetails {
 
 		let resourceAddress: ResourceAddress
 		let currentSupply: String
+		let validatorAddress: ValidatorAddress
 	}
 
 	public struct View: SwiftUI.View {
@@ -48,11 +49,13 @@ extension LSUDetails {
 
 						VStack(spacing: .medium3) {
 							TokenDetailsPropertyViewMaker
-								.makeAddress(resourceAddress: viewStore.resourceAddress)
+								.makeResourceAddress(address: viewStore.resourceAddress)
 							TokenDetailsPropertyView(
 								title: L10n.AssetDetails.currentSupply,
 								propertyView: Text(viewStore.currentSupply)
 							)
+							TokenDetailsPropertyViewMaker
+								.makeValidatorAddress(address: viewStore.validatorAddress)
 						}
 					}
 				} closeButtonAction: {
@@ -74,7 +77,8 @@ extension LSUDetails.State {
 			).format(),
 			description: stakeUnitResource.description,
 			resourceAddress: stakeUnitResource.resourceAddress,
-			currentSupply: validator.xrdVaultBalance.format()
+			currentSupply: validator.xrdVaultBalance.format(),
+			validatorAddress: validator.address
 		)
 	}
 }
