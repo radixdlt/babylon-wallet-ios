@@ -13,6 +13,7 @@ enum TokenDetailsPropertyViewMaker {
 
 	static func makeValidatorAddress(address: ValidatorAddress) -> some View {
 		makeAddressView(
+			// FIXME: L10n.Account.PoolUnits.validatorAddress
 			title: "Validator",
 			address: .validator(address)
 		)

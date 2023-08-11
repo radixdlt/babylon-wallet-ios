@@ -6,6 +6,8 @@ extension LSUDetails {
 		let containerWithHeader: DetailsContainerWithHeaderViewState
 		let thumbnailURL: URL?
 
+		let validatorNameViewState: ValidatorNameViewState
+
 		let redeemableTokenAmount: String
 
 		let description: String?
@@ -35,6 +37,9 @@ extension LSUDetails {
 						Text(L10n.Account.PoolUnits.Details.currentRedeemableValue)
 							.textStyle(.secondaryHeader)
 							.foregroundColor(.app.gray1)
+
+						LSUMaker.makeValidatorNameView(viewState: viewStore.validatorNameViewState)
+
 						PoolUnitResourcesView(
 							resources: .init(.init(xrdAmount: viewStore.redeemableTokenAmount))
 						)
@@ -71,6 +76,7 @@ extension LSUDetails.State {
 		.init(
 			containerWithHeader: stakeUnitResource.detailsContainerWithHeaderViewState,
 			thumbnailURL: stakeUnitResource.iconURL,
+			validatorNameViewState: .init(with: validator),
 			redeemableTokenAmount: AccountPortfolio.xrdRedemptionValue(
 				validator: validator,
 				stakeUnitResource: stakeUnitResource
@@ -79,6 +85,17 @@ extension LSUDetails.State {
 			resourceAddress: stakeUnitResource.resourceAddress,
 			currentSupply: validator.xrdVaultBalance.format(),
 			validatorAddress: validator.address
+		)
+	}
+}
+
+extension ValidatorNameViewState {
+	init(
+		with validator: AccountPortfolio.PoolUnitResources.RadixNetworkStake.Validator
+	) {
+		self.init(
+			imageURL: validator.iconURL,
+			name: validator.name ?? L10n.Account.PoolUnits.unknownValidatorName
 		)
 	}
 }

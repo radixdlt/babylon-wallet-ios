@@ -41,8 +41,7 @@ extension LSUStake {
 	public struct ViewState: Sendable, Equatable, Identifiable {
 		public var id: ValidatorAddress
 
-		let title: String
-		let imageURL: URL?
+		let validatorNameViewState: ValidatorNameViewState
 
 		let liquidStakeUnit: PoolUnitResourceViewState?
 		let stakeClaimNFTs: StakeClaimNFTsViewState?
@@ -58,12 +57,7 @@ extension LSUStake {
 				send: Action.view
 			) { viewStore in
 				VStack(alignment: .leading, spacing: .medium1) {
-					HStack(spacing: .small1) {
-						NFTThumbnail(viewStore.imageURL, size: .smallest)
-						Text(viewStore.title)
-							.font(.app.body1Header)
-						Spacer()
-					}
+					LSUMaker.makeValidatorNameView(viewState: viewStore.validatorNameViewState)
 
 					if let liquidStakeUnitViewState = viewStore.liquidStakeUnit {
 						liquidStakeUnitView(viewState: liquidStakeUnitViewState)
@@ -158,8 +152,7 @@ extension LSUStake.State {
 	var viewState: LSUStake.ViewState {
 		.init(
 			id: stake.validator.address,
-			title: stake.validator.name ?? L10n.Account.PoolUnits.unknownValidatorName,
-			imageURL: stake.validator.iconURL,
+			validatorNameViewState: .init(with: stake.validator),
 			liquidStakeUnit: stake.stakeUnitResource
 				.map {
 					.init(
@@ -198,4 +191,24 @@ extension AccountPortfolio {
 	) -> BigDecimal {
 		(stakeUnitResource.amount * validator.xrdVaultBalance) / (stakeUnitResource.totalSupply ?? .one)
 	}
+}
+
+// MARK: - LSUMaker
+enum LSUMaker {
+	static func makeValidatorNameView(
+		viewState: ValidatorNameViewState
+	) -> some View {
+		HStack(spacing: .small1) {
+			NFTThumbnail(viewState.imageURL, size: .smallest)
+			Text(viewState.name)
+				.font(.app.body1Header)
+			Spacer()
+		}
+	}
+}
+
+// MARK: - ValidatorNameViewState
+struct ValidatorNameViewState: Equatable {
+	let imageURL: URL?
+	let name: String
 }
