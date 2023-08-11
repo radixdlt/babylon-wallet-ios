@@ -102,6 +102,7 @@ extension LSUComponent {
 						.textStyle(.body2HighImportance)
 				}
 			}
+			.background(.app.white)
 			.borderAround
 		}
 

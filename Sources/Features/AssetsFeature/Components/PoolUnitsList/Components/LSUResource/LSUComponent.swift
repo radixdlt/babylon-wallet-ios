@@ -38,6 +38,15 @@ public struct LSUComponent: FeatureReducer {
 		}
 	}
 
+	public var body: some ReducerProtocolOf<Self> {
+		Reduce(core)
+			.ifLet(
+				\.$destination,
+				action: /Action.child .. ChildAction.destination,
+				destination: Destinations.init
+			)
+	}
+
 	public func reduce(
 		into state: inout State,
 		viewAction: ViewAction
