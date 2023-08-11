@@ -11,7 +11,8 @@ extension NonFungibleTokenDetails.State {
 			resourceName: resource.name,
 			resourceThumbnail: resource.iconURL,
 			resourceDescription: resource.description,
-			resourceAddress: resource.resourceAddress
+			resourceAddress: resource.resourceAddress,
+			behaviors: behaviors
 		)
 	}
 }
@@ -27,6 +28,7 @@ extension NonFungibleTokenDetails {
 		let resourceThumbnail: URL?
 		let resourceDescription: String?
 		let resourceAddress: ResourceAddress
+		let behaviors: [AssetBehavior]
 	}
 
 	@MainActor
@@ -81,6 +83,8 @@ extension NonFungibleTokenDetails {
 									if let name = viewStore.resourceName {
 										KeyValueView(key: L10n.AssetDetails.NFTDetails.resourceName, value: name)
 									}
+
+									AssetBehaviorSection(behaviors: viewStore.behaviors)
 								}
 								.padding(.horizontal, .large2)
 								.textStyle(.body1Regular)

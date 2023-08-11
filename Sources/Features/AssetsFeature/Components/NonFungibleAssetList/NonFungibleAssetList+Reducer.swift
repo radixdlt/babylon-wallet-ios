@@ -23,16 +23,16 @@ public struct NonFungibleAssetList: Sendable, FeatureReducer {
 
 	public struct Destinations: Sendable, ReducerProtocol {
 		public enum State: Sendable, Hashable {
-			case details(NonFungibleAssetList.Detail.State)
+			case details(NonFungibleTokenDetails.State)
 		}
 
 		public enum Action: Sendable, Equatable {
-			case details(NonFungibleAssetList.Detail.Action)
+			case details(NonFungibleTokenDetails.Action)
 		}
 
 		public var body: some ReducerProtocolOf<Self> {
 			Scope(state: /State.details, action: /Action.details) {
-				NonFungibleAssetList.Detail()
+				NonFungibleTokenDetails()
 			}
 		}
 	}
@@ -69,7 +69,7 @@ public struct NonFungibleAssetList: Sendable, FeatureReducer {
 				return .none
 			}
 
-			state.destination = .details(.init(token: token, resource: row.resource))
+			state.destination = .details(.init(token: token, resource: row.resource, behaviors: .mock))
 			return .none
 
 		case .asset:
