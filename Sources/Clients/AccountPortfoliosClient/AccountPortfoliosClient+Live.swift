@@ -772,3 +772,22 @@ extension AccountPortfolio.PoolUnitResources {
 		radixNetworkStakes.compactMap(\.stakeClaimResource?.resourceAddress.address)
 	}
 }
+
+// FIXME: Temporary hack to extract the key_image_url, until we have a proper schema
+extension GatewayAPI.StateNonFungibleDetailsResponseItem {
+	public typealias NFTData = AccountPortfolio.NonFungibleResource.NonFungibleToken.NFTData
+	public var details: [NFTData] {
+		data?.programmaticJson.dictionary?["fields"]?.array?.compactMap {
+			guard let dict = $0.dictionary,
+			      let value = dict["value"],
+			      let typeName = dict["kind"]?.string,
+			      let field = dict["field_name"]?.string.flatMap(NFTData.Field.init),
+			      let value = NFTData.Value(typeName: typeName, value: value)
+			else {
+				return nil
+			}
+
+			return .init(field: field, value: value)
+		} ?? []
+	}
+}

@@ -248,6 +248,6 @@ extension [GatewayAPI.EntityMetadataItem] {
 extension GatewayAPI.LedgerState {
 	public var selector: GatewayAPI.LedgerStateSelector {
 		// TODO: Determine what other fields should be sent
-		.init(stateVersion: stateVersion, epoch: epoch, round: round)
+		.init(stateVersion: stateVersion)
 	}
 }

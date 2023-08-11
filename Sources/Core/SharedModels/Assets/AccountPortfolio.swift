@@ -271,6 +271,97 @@ extension AccountPortfolio.NonFungibleResource {
 	}
 }
 
+// MARK: - AccountPortfolio.NonFungibleResource.NonFungibleToken.NFTData
+extension AccountPortfolio.NonFungibleResource.NonFungibleToken {
+	public struct NFTData: Sendable, Hashable, Codable {
+		public enum Field: String, Sendable, Hashable, Codable {
+			case name
+			case description
+			case keyImageURL
+
+			public init?(rawValue: String) {
+				switch rawValue {
+				case "name":
+					self = .name
+				case "description":
+					self = .description
+				case "key_image_url":
+					self = .keyImageURL
+				default:
+					return nil
+				}
+			}
+		}
+
+		public enum Value: Sendable, Hashable, Codable {
+			case string(String)
+			case url(URL)
+			case decimal(BigDecimal)
+			case u64(UInt64)
+
+			var asString: String? {
+				guard case let .string(str) = self else {
+					return nil
+				}
+				return str
+			}
+
+			var asURL: URL? {
+				guard case let .url(url) = self else {
+					return nil
+				}
+				return url
+			}
+
+			public init?(typeName: String, value: JSONValue) {
+				switch typeName {
+				case "String":
+					guard let str = value.string else {
+						return nil
+					}
+					self = .string(str)
+				case "Url":
+					guard let url = value.string.flatMap(URL.init) else {
+						return nil
+					}
+					self = .url(url)
+				case "U64":
+					guard let u64 = value.uint.map(UInt64.init) else {
+						return nil
+					}
+					self = .u64(u64)
+				default:
+					return nil
+				}
+			}
+		}
+
+		public let field: Field
+		public let value: Value
+
+		public init(field: Field, value: Value) {
+			self.field = field
+			self.value = value
+		}
+	}
+}
+
+extension [AccountPortfolio.NonFungibleResource.NonFungibleToken.NFTData] {
+	public typealias Field = Self.Element.Field
+
+	public subscript(field: Field) -> Self.Element.Value? {
+		first { $0.field == field }?.value
+	}
+
+	public var name: String? {
+		self[.name]?.asString
+	}
+
+	public var keyImageURL: URL? {
+		self[.keyImageURL]?.asURL
+	}
+}
+
 extension AccountPortfolio.NonFungibleResource.NonFungibleToken {
 	enum CodingKeys: CodingKey {
 		case id
