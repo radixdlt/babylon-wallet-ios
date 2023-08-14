@@ -404,7 +404,9 @@ extension TransactionFee {
 
 		public init(feeSummary: FeeSummary, feeLocks: FeeLocks) {
 			var networkFee = feeSummary.executionCost + feeSummary.finalizationCost + feeSummary.storageExpansionCost
-			networkFee += PredefinedFeeConstants.networkFeeMultiplier
+			networkFee *= PredefinedFeeConstants.networkFeeMultiplier
+
+			// Split the non contingent lock between network and royalty fees.
 			networkFee = networkFee.clampedDiff(feeLocks.nonContingentLock)
 
 			let remainingNonContingentLock = feeLocks.nonContingentLock.clampedDiff(networkFee)

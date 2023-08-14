@@ -4,36 +4,16 @@ import TransactionClient
 extension AdvancedCustomizationFees.State {
 	var viewState: AdvancedCustomizationFees.ViewState {
 		.init(
-			paddingAmount: advancedCustomization.paddingFee,
-			tipPercentage: advancedCustomization.tipPercentage,
-			networkExecution: advancedCustomization.feeSummary.executionCost,
-			networkFinalization: advancedCustomization.feeSummary.finalizationCost,
-			effectiveTip: advancedCustomization.tipAmount,
-			netowkrStorage: advancedCustomization.feeSummary.storageExpansionCost,
-			royalties: advancedCustomization.feeSummary.royaltyCost,
-			totalFee: advancedCustomization.total
 		)
 	}
 }
 
 extension AdvancedCustomizationFees {
 	public struct ViewState: Equatable, Sendable {
-		let paddingAmount: BigDecimal
-		let tipPercentage: BigDecimal
-		let networkExecution: BigDecimal
-		let networkFinalization: BigDecimal
-		let effectiveTip: BigDecimal
-		let netowkrStorage: BigDecimal
-		let royalties: BigDecimal
-		let totalFee: BigDecimal
+		let feeViewStates: IdentifiedArrayOf<FeeViewState>
 
-		var paddingAmountStr: String {
-			paddingAmount.format()
-		}
-
-		var tipPercentageStr: String {
-			tipPercentage.format()
-		}
+		let paddingAmountStr: String
+		let tipPercentageStr: String
 	}
 
 	@MainActor
@@ -53,7 +33,7 @@ extension AdvancedCustomizationFees {
 								send: ViewAction.paddingAmountChanged
 							)
 						)
-						.keyboardType(.numbersAndPunctuation)
+						.keyboardType(.decimalPad)
 						.multilineTextAlignment(.trailing)
 						.padding(.vertical, .medium1)
 
@@ -66,7 +46,7 @@ extension AdvancedCustomizationFees {
 								send: ViewAction.tipPercentageChanged
 							)
 						)
-						.keyboardType(.numbersAndPunctuation)
+						.keyboardType(.decimalPad)
 						.multilineTextAlignment(.trailing)
 						.padding(.bottom, .medium1)
 
@@ -82,12 +62,9 @@ extension AdvancedCustomizationFees {
 					.padding(.horizontal, .medium1)
 
 					VStack(spacing: .small1) {
-						feeView(title: "NETWORK EXECUTION", fee: viewStore.networkExecution) // TODO: strings
-						feeView(title: "NETWORK FINALIZATION", fee: viewStore.networkFinalization) // TODO: strings
-						feeView(title: "EFFECTIVE TIP", fee: viewStore.effectiveTip, showZero: true) // TODO: strings
-						feeView(title: "NETWORK STORAGE", fee: viewStore.netowkrStorage) // TODO: strings
-						feeView(title: "PADDING", fee: viewStore.paddingAmount, showZero: true) // TODO: strings
-						feeView(title: "ROYALTIES", fee: viewStore.royalties) // TODO: strings
+						ForEach(viewStore.feeViewStates) { viewState in
+							feeView(state: viewState)
+						}
 
 						Divider()
 
@@ -96,20 +73,6 @@ extension AdvancedCustomizationFees {
 					.padding(.medium1)
 					.background(.app.gray5)
 				}
-			}
-		}
-
-		@ViewBuilder
-		func feeView(title: String, fee: BigDecimal, showZero: Bool = false) -> some SwiftUI.View {
-			HStack {
-				Text(title)
-					.textStyle(.body1Link)
-					.foregroundColor(.app.gray2)
-					.textCase(.uppercase)
-				Spacer()
-				Text(fee.formatted(showZero))
-					.textStyle(.body1HighImportance)
-					.foregroundColor(fee == .zero ? .app.gray2 : .app.gray1)
 			}
 		}
 

@@ -251,12 +251,3 @@ extension CustomizeFees {
 //		}
 	}
 }
-
-extension BigDecimal {
-	func formatted(_ showsZero: Bool) -> String {
-		if !showsZero, self == .zero {
-			return "None Due" // TODO: strings
-		}
-		return "\(format()) XRD"
-	}
-}

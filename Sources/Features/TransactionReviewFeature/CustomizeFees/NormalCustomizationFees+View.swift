@@ -23,7 +23,7 @@ extension NormalCustomizationFees {
 		let store: StoreOf<NormalCustomizationFees>
 
 		public var body: some SwiftUI.View {
-			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
+			WithViewStore(store, observe: \.viewState) { viewStore in
 				VStack(spacing: .small1) {
 					feeView(title: "Network Fees", fee: viewStore.networkFee) // TODO: strings
 					feeView(title: "Royalty Fees", fee: viewStore.royaltyFee) // TODO: strings

@@ -11,6 +11,7 @@ public struct CustomizeFees: FeatureReducer {
 		}
 
 		var feePayerSelection: FeePayerSelectionAmongstCandidates
+		var modeState: CustomizationModeState
 
 		var feePayerAccount: Profile.Network.Account? {
 			feePayerSelection.selected?.account
@@ -22,8 +23,6 @@ public struct CustomizeFees: FeatureReducer {
 
 		@PresentationState
 		public var destination: Destinations.State? = nil
-
-		var modeState: CustomizationModeState
 
 		init(
 			feePayerSelection: FeePayerSelectionAmongstCandidates
@@ -68,11 +67,6 @@ public struct CustomizeFees: FeatureReducer {
 	@Dependency(\.dismiss) var dismiss
 
 	public var body: some ReducerProtocolOf<Self> {
-		Reduce(core)
-			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
-				Destinations()
-			}
-
 		Scope(state: \.modeState, action: /Action.child) {
 			EmptyReducer()
 				.ifCaseLet(/State.CustomizationModeState.normal, action: /ChildAction.normalFeeCustomization) {
@@ -82,6 +76,11 @@ public struct CustomizeFees: FeatureReducer {
 					AdvancedCustomizationFees()
 				}
 		}
+
+		Reduce(core)
+			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
+				Destinations()
+			}
 	}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
@@ -106,7 +105,6 @@ public struct CustomizeFees: FeatureReducer {
 			state.feePayerSelection.selected = selection
 			state.destination = nil
 			return .send(.delegate(.updated(state.feePayerSelection)))
-
 		default:
 			return .none
 		}

@@ -13,4 +13,6 @@ public struct NormalCustomizationFees: FeatureReducer {
 			self.normalCustomization = normalCustomization
 		}
 	}
+
+	/// For now no logic here, but normal mode in the future will allow users to select from predefined Tip fees.
 }
