@@ -54,6 +54,7 @@ extension LedgerIdentifiable {
 		case package(PackageAddress)
 		case resource(ResourceAddress)
 		case component(ComponentAddress)
+		case validator(ValidatorAddress)
 
 		public var address: String {
 			switch self {
@@ -65,6 +66,8 @@ extension LedgerIdentifiable {
 				return resourceAddress.address
 			case let .component(componentAddress):
 				return componentAddress.address
+			case let .validator(validatorAddress):
+				return validatorAddress.address
 			}
 		}
 
@@ -77,6 +80,8 @@ extension LedgerIdentifiable {
 			case .resource:
 				return "resource"
 			case .component:
+				return "component"
+			case .validator:
 				return "component"
 			}
 		}

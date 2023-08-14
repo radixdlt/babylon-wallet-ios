@@ -19,8 +19,9 @@ extension ImportLegacyWalletClient: DependencyKey {
 		) async throws -> (accounts: NonEmpty<OrderedSet<MigratedAccount>>, networkID: NetworkID) {
 			let sortedOlympia = accounts.sorted(by: \.addressIndex)
 			let networkID = await factorSourcesClient.getCurrentNetworkID()
-			let accountIndexOffset = try await accountsClient.getAccountsOnCurrentNetwork().count
+			let accountIndexBase = await accountsClient.nextAccountIndex(networkID)
 
+			var accountOffset: HD.Path.Component.Child.Value = 0
 			guard let defaultAccountName: NonEmptyString = .init(rawValue: L10n.ImportOlympiaAccounts.AccountsToImport.unnamed) else {
 				// The L10n string should not be empty, so this should not be possible
 				struct ImplementationError: Error {}
@@ -29,6 +30,8 @@ extension ImportLegacyWalletClient: DependencyKey {
 
 			var accountsSet = OrderedSet<MigratedAccount>()
 			for olympiaAccount in sortedOlympia {
+				defer { accountOffset += 1 }
+				let accountIndex = accountIndexBase + accountOffset
 				let publicKey = SLIP10.PublicKey.ecdsaSecp256k1(olympiaAccount.publicKey)
 				let factorInstance = HierarchicalDeterministicFactorInstance(
 					id: factorSouceID,
@@ -37,13 +40,13 @@ extension ImportLegacyWalletClient: DependencyKey {
 				)
 
 				let displayName = olympiaAccount.displayName ?? defaultAccountName
-				let accountIndex = accountIndexOffset + Int(olympiaAccount.addressIndex)
 
 				let babylon = try Profile.Network.Account(
 					networkID: networkID,
+					index: HD.Path.Component.Child.Value(accountIndex),
 					factorInstance: factorInstance,
 					displayName: displayName,
-					extraProperties: .init(appearanceID: .fromIndex(accountIndex))
+					extraProperties: .init(appearanceID: .fromIndex(.init(accountIndex)))
 				)
 
 				let migrated = MigratedAccount(olympia: olympiaAccount, babylon: babylon)
@@ -57,8 +60,7 @@ extension ImportLegacyWalletClient: DependencyKey {
 			// Save all accounts
 			for account in accounts {
 				try await accountsClient.saveVirtualAccount(.init(
-					account: account.babylon,
-					shouldUpdateFactorSourceNextDerivationIndex: false
+					account: account.babylon
 				))
 			}
 

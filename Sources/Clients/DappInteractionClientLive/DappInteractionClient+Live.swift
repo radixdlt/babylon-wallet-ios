@@ -26,14 +26,16 @@ extension DappInteractionClient: DependencyKey {
 		return .init(
 			interactions: interactionsStream.share().eraseToAnyAsyncSequence(),
 			addWalletInteraction: { items in
-				let request = ValidatedDappRequest.valid(.init(
+				@Dependency(\.gatewaysClient) var gatewaysClient
+
+				let request = await ValidatedDappRequest.valid(.init(
 					route: .wallet,
 					request: .init(
 						id: .init(UUID().uuidString),
 						items: items,
 						metadata: .init(
 							version: P2P.Dapp.currentVersion,
-							networkId: .default,
+							networkId: gatewaysClient.getCurrentNetworkID(),
 							origin: DappOrigin.wallet,
 							dAppDefinitionAddress: .wallet
 						)

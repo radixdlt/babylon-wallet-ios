@@ -277,26 +277,9 @@ extension AccountPortfolio.NonFungibleResource.NonFungibleToken {
 		public enum Field: String, Sendable, Hashable, Codable {
 			case name
 			case description
-			case keyImageURL
-			case claimEpoch
-			case claimAmount
-
-			public init?(rawValue: String) {
-				switch rawValue {
-				case "name":
-					self = .name
-				case "description":
-					self = .description
-				case "key_image_url":
-					self = .keyImageURL
-				case "claim_epoch":
-					self = .claimEpoch
-				case "claim_amount":
-					self = .claimAmount
-				default:
-					return nil
-				}
-			}
+			case keyImageURL = "key_image_url"
+			case claimEpoch = "claim_epoch"
+			case claimAmount = "claim_amount"
 		}
 
 		public enum Value: Sendable, Hashable, Codable {
@@ -305,14 +288,14 @@ extension AccountPortfolio.NonFungibleResource.NonFungibleToken {
 			case decimal(BigDecimal)
 			case u64(UInt64)
 
-			var asString: String? {
+			var string: String? {
 				guard case let .string(str) = self else {
 					return nil
 				}
 				return str
 			}
 
-			var asURL: URL? {
+			var url: URL? {
 				guard case let .url(url) = self else {
 					return nil
 				}
@@ -331,33 +314,6 @@ extension AccountPortfolio.NonFungibleResource.NonFungibleToken {
 					return nil
 				}
 				return decimal
-			}
-
-			public init?(typeName: String, value: JSONValue) {
-				switch typeName {
-				case "String":
-					guard let str = value.string else {
-						return nil
-					}
-					self = .string(str)
-				case "Url":
-					guard let url = value.string.flatMap(URL.init) else {
-						return nil
-					}
-					self = .url(url)
-				case "U64":
-					guard let u64 = value.uint.map(UInt64.init) else {
-						return nil
-					}
-					self = .u64(u64)
-				case "Decimal":
-					guard let decimal = try? value.string.map(BigDecimal.init(fromString:)) else {
-						return nil
-					}
-					self = .decimal(decimal)
-				default:
-					return nil
-				}
 			}
 		}
 
@@ -379,11 +335,11 @@ extension [AccountPortfolio.NonFungibleResource.NonFungibleToken.NFTData] {
 	}
 
 	public var name: String? {
-		self[.name]?.asString
+		self[.name]?.string
 	}
 
 	public var keyImageURL: URL? {
-		self[.keyImageURL]?.asURL
+		self[.keyImageURL]?.url
 	}
 
 	public var claimEpoch: UInt64? {

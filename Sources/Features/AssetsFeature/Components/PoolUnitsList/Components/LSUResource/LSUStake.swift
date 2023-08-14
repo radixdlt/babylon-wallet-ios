@@ -1,17 +1,16 @@
-import EngineKit
 import FeaturePrelude
+import LoggerDependency
 
-// MARK: - PoolUnit
-public struct PoolUnit: Sendable, FeatureReducer {
+public struct LSUStake: FeatureReducer {
 	public struct State: Sendable, Hashable, Identifiable {
-		public var id: ResourcePoolAddress {
-			poolUnit.poolAddress
+		public var id: String {
+			stake.validator.address.address
 		}
 
-		let poolUnit: AccountPortfolio.PoolUnitResources.PoolUnit
+		let stake: AccountPortfolio.PoolUnitResources.RadixNetworkStake
 
 		@PresentationState
-		var destination: Destinations.State?
+		public var destination: Destinations.State?
 	}
 
 	public enum ViewAction: Sendable, Equatable {
@@ -24,21 +23,23 @@ public struct PoolUnit: Sendable, FeatureReducer {
 
 	public struct Destinations: Sendable, ReducerProtocol {
 		public enum State: Sendable, Hashable {
-			case details(PoolUnitDetails.State)
+			case details(LSUDetails.State)
 		}
 
 		public enum Action: Sendable, Equatable {
-			case details(PoolUnitDetails.Action)
+			case details(LSUDetails.Action)
 		}
 
 		public var body: some ReducerProtocolOf<Self> {
 			Scope(
 				state: /State.details,
 				action: /Action.details,
-				child: PoolUnitDetails.init
+				child: LSUDetails.init
 			)
 		}
 	}
+
+	@Dependency(\.logger) var logger
 
 	public var body: some ReducerProtocolOf<Self> {
 		Reduce(core)
@@ -55,8 +56,21 @@ public struct PoolUnit: Sendable, FeatureReducer {
 	) -> EffectTask<Action> {
 		switch viewAction {
 		case .didTap:
+			guard
+				let resource = state.stake.stakeUnitResource,
+				let xrdRedemptionValue = state.stake.xrdRedemptionValue
+			else {
+				logger.fault("We should not be able to tap a stake in such state")
+
+				return .none
+			}
+
 			state.destination = .details(
-				.init(poolUnit: state.poolUnit)
+				.init(
+					validator: state.stake.validator,
+					stakeUnitResource: resource,
+					xrdRedemptionValue: xrdRedemptionValue
+				)
 			)
 
 			return .none

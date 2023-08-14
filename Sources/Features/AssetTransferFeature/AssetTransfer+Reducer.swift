@@ -54,7 +54,7 @@ public struct AssetTransfer: Sendable, FeatureReducer {
 		case .sendTransferTapped:
 			return .run { [accounts = state.accounts, message = state.message?.message] send in
 				let manifest = try await createManifest(accounts)
-				dappInteractionClient.addWalletInteraction(
+				await dappInteractionClient.addWalletInteraction(
 					.transaction(.init(
 						send: .init(
 							version: .default,

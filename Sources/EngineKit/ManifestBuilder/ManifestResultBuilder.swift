@@ -7,12 +7,12 @@ extension ManifestBuilder {
 	///
 	/// To be able to use manifest builder, it is required to transform all functions to have the same signature.
 	/// So this ResultBuilder defines an instruction as `(ManifestBuilder) throws -> ManifestBuilder`.
-	/// To achive this we flipe the arguments order of the manifest builder functions to a form of:
+	/// To achive this we flip the arguments order of the manifest builder functions to a form of:
 	/// `(args...) -> (ManifestBuilder) -> throws -> ManifestBuilder`
 	/// This allows to create partial instruction which are then build once put together.
 	///
-	public static let faucetLockFee = flipVoid(faucetLockFee)
-	public static let faucetFreeXrd = flipVoid(faucetFreeXrd)
+	public static let faucetLockFee = flip(faucetLockFee)
+	public static let faucetFreeXrd = flip(faucetFreeXrd)
 	public static let accountTryDepositBatchOrAbort = flip(accountTryDepositBatchOrAbort)
 	public static let withdrawAmount = flip(withdrawFromAccount)
 	public static let withdrawTokens = flip(withdrawNonFungiblesFromAccount)
@@ -57,12 +57,5 @@ extension ManifestBuilder {
 			builder = try $0(builder)
 		}
 		return builder
-	}
-}
-
-/// Additional flip that is not part of Overture.
-func flipVoid<A, T>(_ f: @escaping (A) -> () throws -> T) -> (A) throws -> T {
-	{ a in
-		try f(a)()
 	}
 }

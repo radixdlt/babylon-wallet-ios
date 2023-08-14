@@ -1306,7 +1306,7 @@ extension TransactionType {
 					addressesOfNewlyCreatedEntities: addressesOfNewlyCreatedEntities
 				)
 			)
-		default:
+		case .accountDepositSettings:
 			return .nonConforming
 		}
 	}
