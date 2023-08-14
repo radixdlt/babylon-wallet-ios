@@ -20,14 +20,6 @@ extension Profile {
 		assert(updatedElement == nil, "We expected this to be a new, unique, Persona, thus we expected it to be have been inserted, but it was not. Maybe all properties except the IdentityAddress was unique, and the reason why address was not unique is probably due to the fact that the wrong 'index' in the derivation path was use (same reused), due to bad logic in `storage` of the factor.")
 
 		try updateOnNetwork(network)
-
-		switch persona.securityState {
-		case let .unsecured(entityControl):
-			let factorSourceID = entityControl.transactionSigning.factorSourceID
-			try self.factorSources.updateFactorSource(id: factorSourceID) {
-				try $0.increaseNextDerivationIndex(for: persona.kind, networkID: persona.networkID)
-			}
-		}
 	}
 
 	public func hasAnyPersonaOnAnyNetwork() -> Bool {

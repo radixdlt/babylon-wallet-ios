@@ -28,18 +28,6 @@ final class FactorSourcesCodableTests: TestCase {
 				model: "iPhone 16",
 				name: "New phone"
 			)
-			babylon.nextDerivationIndicesPerNetwork?.increaseNextDerivationIndex(
-				for: .account,
-				networkID: networkID
-			)
-			babylon.nextDerivationIndicesPerNetwork?.increaseNextDerivationIndex(
-				for: .account,
-				networkID: networkID
-			)
-			babylon.nextDerivationIndicesPerNetwork?.increaseNextDerivationIndex(
-				for: .identity,
-				networkID: networkID
-			)
 
 			anyFactorSources.append(babylon)
 
@@ -48,7 +36,6 @@ final class FactorSourcesCodableTests: TestCase {
 				model: "iPhone 14 Pro Max",
 				name: "Old phone"
 			)
-			XCTAssertNil(olympia.nextDerivationIndicesPerNetwork)
 			anyFactorSources.append(olympia)
 
 			var ledger = try LedgerHardwareWalletFactorSource.model(
@@ -56,10 +43,7 @@ final class FactorSourcesCodableTests: TestCase {
 				name: "Orange",
 				deviceID: .init(.deadbeef32Bytes)
 			)
-			ledger.nextDerivationIndicesPerNetwork?.increaseNextDerivationIndex(
-				for: .account,
-				networkID: networkID
-			)
+
 			anyFactorSources.append(ledger)
 
 			try anyFactorSources.append(

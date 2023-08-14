@@ -8,20 +8,15 @@ public struct LedgerHardwareWalletFactorSource: FactorSourceProtocol {
 	public var common: FactorSource.Common // We update `lastUsed`
 	public let hint: Hint
 
-	// FIXME: MFA remove (should not be able to create accounts using ledger when MFA)
-	public var nextDerivationIndicesPerNetwork: NextDerivationIndicesPerNetwork?
-
 	internal init(
 		id: ID,
 		common: FactorSource.Common,
-		hint: Hint,
-		nextDerivationIndicesPerNetwork: NextDerivationIndicesPerNetwork?
+		hint: Hint
 	) {
 		precondition(id.kind == Self.kind)
 		self.id = id
 		self.common = common
 		self.hint = hint
-		self.nextDerivationIndicesPerNetwork = nextDerivationIndicesPerNetwork
 	}
 }
 
@@ -78,8 +73,7 @@ extension LedgerHardwareWalletFactorSource {
 		try .init(
 			id: ID(kind: .ledgerHQHardwareWallet, body: deviceID),
 			common: Self.common(isOlympiaCompatible: true),
-			hint: .init(name: name, model: model),
-			nextDerivationIndicesPerNetwork: .init()
+			hint: .init(name: name, model: model)
 		)
 	}
 }

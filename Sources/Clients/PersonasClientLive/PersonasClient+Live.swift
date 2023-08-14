@@ -1,4 +1,5 @@
 import ClientPrelude
+import Cryptography
 import PersonasClient
 import ProfileStore
 
@@ -8,9 +9,21 @@ extension PersonasClient: DependencyKey {
 	public static func live(
 		profileStore getProfileStore: @escaping @Sendable () async -> ProfileStore = { await .shared }
 	) -> Self {
-		Self(
+		let getPersonasOnNetwork: GetPersonasOnNetwork = { networkID in
+			guard let network = try? await getProfileStore().profile.network(id: networkID) else {
+				return .init()
+			}
+			return network.personas
+		}
+
+		return Self(
 			personas: {
 				await getProfileStore().personaValues()
+			},
+			nextPersonaIndex: { maybeNextworkID async -> HD.Path.Component.Child.Value in
+				let currentNetworkID = await getProfileStore().profile.networkID
+				let networkID = maybeNextworkID ?? currentNetworkID
+				return await HD.Path.Component.Child.Value(getPersonasOnNetwork(networkID).count)
 			},
 			getPersonas: {
 				guard let network = await getProfileStore().network else {
@@ -18,6 +31,7 @@ extension PersonasClient: DependencyKey {
 				}
 				return network.personas
 			},
+			getPersonasOnNetwork: getPersonasOnNetwork,
 			updatePersona: { persona in
 				try await getProfileStore().updating {
 					try $0.updatePersona(persona)

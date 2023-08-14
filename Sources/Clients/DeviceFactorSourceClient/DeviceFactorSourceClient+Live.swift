@@ -48,7 +48,8 @@ extension DeviceFactorSourceClient: DependencyKey {
 
 				do {
 					let deviceFactorSource = try await factorSourcesClient.getFactorSources().babylonDeviceFactorSources().sorted(by: \.lastUsedOn).first
-					let accounts = try await accountsClient.getAccountsOnNetwork(NetworkID.default)
+
+					let accounts = try await accountsClient.getAccountsOnCurrentNetwork()
 
 					guard let deviceFactorSource,
 					      let mnemonicWithPassphrase = try await secureStorageClient.loadMnemonicByFactorSourceID(

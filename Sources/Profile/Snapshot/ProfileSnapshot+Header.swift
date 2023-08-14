@@ -151,7 +151,8 @@ extension ProfileSnapshot.Header.Version {
 	/// - 39: Address format changed with `Birch` update
 	/// - 40: Changed Persona data/field format
 	/// - 41: Nickname is not optional
-	public static let minimum: Self = 41
+	/// - 42: Change counter to not be factor source based.
+	public static let minimum: Self = 42
 }
 
 extension ProfileSnapshot.Header {

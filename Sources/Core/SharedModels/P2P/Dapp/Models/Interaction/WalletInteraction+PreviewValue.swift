@@ -4,7 +4,7 @@ import Prelude
 #if DEBUG
 
 extension TransactionManifest {
-	public static let previewValue = try! TransactionManifest(instructions: .fromString(string: complexManifestString, networkId: NetworkID.default.rawValue), blobs: [])
+	public static let previewValue = try! TransactionManifest(instructions: .fromString(string: complexManifestString, networkId: Radix.Gateway.default.network.id.rawValue), blobs: [])
 }
 
 private let complexManifestString = """

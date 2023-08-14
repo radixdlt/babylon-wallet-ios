@@ -1,9 +1,19 @@
+import Cryptography
 import Prelude
+
+// MARK: - _EntitySecurityStateProtocol
+protocol _EntitySecurityStateProtocol {
+	var entityIndex: HD.Path.Component.Child.Value { get }
+}
+
+// MARK: - UnsecuredEntityControl + _EntitySecurityStateProtocol
+extension UnsecuredEntityControl: _EntitySecurityStateProtocol {}
 
 // MARK: - EntitySecurityState
 /// Security state of an entity (Account/Persona).
 public enum EntitySecurityState:
 	Sendable,
+	_EntitySecurityStateProtocol,
 	Hashable,
 	Codable,
 	CustomStringConvertible,
@@ -16,6 +26,13 @@ public enum EntitySecurityState:
 }
 
 extension EntitySecurityState {
+	public var entityIndex: HD.Path.Component.Child.Value {
+		switch self {
+		case let .unsecured(control):
+			return control.entityIndex
+		}
+	}
+
 	public var _description: String {
 		switch self {
 		case let .unsecured(unsecuredEntityControl):

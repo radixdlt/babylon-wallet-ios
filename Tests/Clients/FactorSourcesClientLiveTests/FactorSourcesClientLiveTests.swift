@@ -118,8 +118,7 @@ extension FactorSource {
 				common: .init(
 					cryptoParameters: olympiaCompat ? .olympiaBackwardsCompatible : .babylon
 				),
-				hint: .init(name: .init(name), model: .nanoS),
-				nextDerivationIndicesPerNetwork: .init()
+				hint: .init(name: .init(name), model: .nanoS)
 			)
 			return ledger.embed()
 		}
@@ -134,7 +133,7 @@ extension FactorSource {
 extension Profile.Network.Account {
 	static func new(factorSource: FactorSource, index: UInt32) -> Self {
 		try! .init(
-			networkID: .simulator,
+			networkID: .simulator, index: index,
 			factorInstance: .init(
 				factorSourceID: factorSource.id,
 				publicKey: .eddsaEd25519(Curve25519.Signing.PrivateKey().publicKey),
