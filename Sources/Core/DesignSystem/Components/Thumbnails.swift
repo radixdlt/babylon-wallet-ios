@@ -234,14 +234,19 @@ public struct LoadableImage<Placeholder: View>: View {
 			Image(asset: imageAsset)
 				.resizable()
 		case .brokenImage:
-			HStack(spacing: 0) {
-				Spacer(minLength: .small1)
+			VStack(spacing: 0) {
+				Spacer(minLength: 0)
 
-				Image(asset: AssetResource.brokenImagePlaceholder)
+				HStack(spacing: 0) {
+					Spacer(minLength: 0)
 
-				Spacer(minLength: .small1)
+					Image(asset: AssetResource.brokenImagePlaceholder)
+
+					Spacer(minLength: 0)
+				}
+
+				Spacer(minLength: 0)
 			}
-			.frame(height: .imagePlaceholderHeight)
 			.background(.app.gray4)
 		case .standard:
 			placeholder
