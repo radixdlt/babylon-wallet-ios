@@ -173,8 +173,16 @@ public struct LoadableImage<Placeholder: View>: View {
 					loadingView
 				} else if let image = state.image {
 					imageView(image: image, imageSize: state.imageContainer?.image.size)
+						.sized(
+							using: sizingBehaviour,
+							imageSize: state.imageContainer?.image.size
+						)
 				} else {
 					brokenImageView
+						.sized(
+							using: sizingBehaviour,
+							imageSize: state.imageContainer?.image.size
+						)
 					if let error = state.error {
 						if url.isVectorImage {
 							let _ = loggerGlobal.warning("Could not load thumbnail \(url): \(error)")
@@ -193,19 +201,13 @@ public struct LoadableImage<Placeholder: View>: View {
 	@ViewBuilder
 	private func imageView(image: NukeUI.Image, imageSize: CGSize?) -> some View {
 		switch sizingBehaviour {
-		case let .fixedSize(size, mode):
-			image
-				.resizingMode(mode)
-				.frame(width: size.frame.width, height: size.frame.height)
-		case let .flexible(minAspect, maxAspect):
+		case let .fixedSize(_, mode):
+			image.resizingMode(mode)
+		case .flexible:
 			if let imageSize {
-				let aspect = min(maxAspect, max(imageSize.width / imageSize.height, minAspect))
-				image
-					.resizingMode(.aspectFill)
-					.aspectRatio(aspect, contentMode: .fill)
+				image.resizingMode(.aspectFill)
 			} else {
 				image
-					.scaledToFill()
 			}
 		}
 	}
@@ -305,4 +307,24 @@ extension URL {
 	}
 
 	private static let vectorImageTypes: [String] = ["svg", "pdf"]
+}
+
+extension View {
+	@ViewBuilder
+	fileprivate func sized(
+		using sizingBehaviour: LoadableImageSize,
+		imageSize: CGSize?
+	) -> some View {
+		switch sizingBehaviour {
+		case let .fixedSize(size, _):
+			frame(width: size.frame.width, height: size.frame.height)
+		case let .flexible(minAspect, maxAspect):
+			if let imageSize {
+				let aspect = min(maxAspect, max(imageSize.width / imageSize.height, minAspect))
+				aspectRatio(aspect, contentMode: .fill)
+			} else {
+				scaledToFill()
+			}
+		}
+	}
 }
