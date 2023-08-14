@@ -210,8 +210,25 @@ extension AccountPortfoliosClient {
 
 		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
 
-		let details = try await gatewayAPIClient.getEntityDetails([resource.resourceAddress], [], ledgerState).items.first?.details?.fungible
+		let firstItem = try await gatewayAPIClient.getEntityDetails([resource.resourceAddress], [], ledgerState).items.first
+
+		if let firstItem {
+			if let metadata = firstItem.explicitMetadata {
+				print("EXPLICIT:", metadata)
+			}
+		}
+
+		let details = firstItem?.details?.fungible
 		let totalSupply = try details.map { try BigDecimal(fromString: $0.totalSupply) }
+
+		if let accessRules = details?.accessRules {
+			print("OWNER")
+			print(accessRules.owner)
+			print("ENTRIES")
+			print(accessRules.entries)
+		} else {
+			print("NO ACCESS RULES")
+		}
 
 		let resourceAddress = try ResourceAddress(validatingAddress: resource.resourceAddress)
 		let metadata = resource.explicitMetadata
@@ -224,6 +241,7 @@ extension AccountPortfoliosClient {
 			symbol: metadata?.symbol,
 			description: metadata?.description,
 			iconURL: metadata?.iconURL,
+			tags: "---",
 			totalSupply: totalSupply
 		)
 	}
