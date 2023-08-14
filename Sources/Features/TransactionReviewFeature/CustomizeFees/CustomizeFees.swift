@@ -115,9 +115,9 @@ extension TransactionFee {
 	var customizationModeState: CustomizeFees.State.CustomizationModeState {
 		switch mode {
 		case let .normal(normal):
-			return .normal(.init(normalCustomization: normal))
+			return .normal(.init(fees: normal))
 		case let .advanced(advanced):
-			return .advanced(.init(advancedCustomization: advanced))
+			return .advanced(.init(fees: advanced))
 		}
 	}
 }

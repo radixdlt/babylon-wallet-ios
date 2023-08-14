@@ -4,13 +4,16 @@ import TransactionClient
 extension AdvancedCustomizationFees.State {
 	var viewState: AdvancedCustomizationFees.ViewState {
 		.init(
+			feesViewState: .init(feeViewStates: fees.viewStates, totalFee: fees.total),
+			paddingAmountStr: fees.paddingFee.format(),
+			tipPercentageStr: fees.tipPercentage.format()
 		)
 	}
 }
 
 extension AdvancedCustomizationFees {
 	public struct ViewState: Equatable, Sendable {
-		let feeViewStates: IdentifiedArrayOf<FeeViewState>
+		let feesViewState: FeesView.ViewState
 
 		let paddingAmountStr: String
 		let tipPercentageStr: String
@@ -49,49 +52,11 @@ extension AdvancedCustomizationFees {
 						.keyboardType(.decimalPad)
 						.multilineTextAlignment(.trailing)
 						.padding(.bottom, .medium1)
-
-						HStack {
-							Text("Estimated transaction fees") // TODO: strings
-								.textStyle(.body1Link)
-								.foregroundColor(.app.gray2)
-								.textCase(.uppercase)
-							Spacer()
-						}
-						.padding(.bottom, .medium3)
 					}
 					.padding(.horizontal, .medium1)
 
-					VStack(spacing: .small1) {
-						ForEach(viewStore.feeViewStates) { viewState in
-							feeView(state: viewState)
-						}
-
-						Divider()
-
-						transactionFeeView(fee: viewStore.totalFee.format())
-					}
-					.padding(.medium1)
-					.background(.app.gray5)
+					FeesView(viewState: viewStore.feesViewState)
 				}
-			}
-		}
-
-		@ViewBuilder
-		func transactionFeeView(fee: String) -> some SwiftUI.View {
-			HStack {
-				VStack(alignment: .leading, spacing: .zero) {
-					Text("Transaction Fee") // TODO: strings
-						.textStyle(.body1Link)
-						.foregroundColor(.app.gray2)
-						.textCase(.uppercase)
-					Text("(maximum to lock)") // TODO: strings
-						.textStyle(.body1Link)
-						.foregroundColor(.app.gray2)
-				}
-				Spacer()
-				Text(fee)
-					.textStyle(.body1Header)
-					.foregroundColor(.app.gray1)
 			}
 		}
 	}

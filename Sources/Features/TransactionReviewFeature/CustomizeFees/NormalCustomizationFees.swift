@@ -5,12 +5,12 @@ import TransactionClient
 
 public struct NormalCustomizationFees: FeatureReducer {
 	public struct State: Hashable, Sendable {
-		var normalCustomization: TransactionFee.NormalFeeCustomization
+		let fees: TransactionFee.NormalFeeCustomization
 
 		init(
-			normalCustomization: TransactionFee.NormalFeeCustomization
+			fees: TransactionFee.NormalFeeCustomization
 		) {
-			self.normalCustomization = normalCustomization
+			self.fees = fees
 		}
 	}
 

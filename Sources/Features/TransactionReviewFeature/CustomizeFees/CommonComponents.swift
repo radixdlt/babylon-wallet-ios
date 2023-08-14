@@ -3,7 +3,7 @@ import TransactionClient
 
 // MARK: - FeesView
 struct FeesView: View {
-	struct ViewState {
+	struct ViewState: Equatable, Sendable {
 		let feeViewStates: IdentifiedArrayOf<FeeViewState>
 		let totalFee: BigDecimal
 	}
@@ -12,16 +12,25 @@ struct FeesView: View {
 
 	var body: some View {
 		VStack(spacing: .small1) {
-			ForEach(viewState.feeViewStates) { viewState in
-				feeView(state: viewState)
+			Text("Estimated transaction fees") // TODO: strings
+				.textStyle(.body1Link)
+				.foregroundColor(.app.gray2)
+				.textCase(.uppercase)
+				.multilineTextAlignment(.leading)
+				.padding(.medium1)
+
+			VStack(spacing: .small1) {
+				ForEach(viewState.feeViewStates) { viewState in
+					feeView(state: viewState)
+				}
+
+				Divider()
+
+				transactionFeeView(fee: viewState.totalFee.format())
 			}
-
-			Divider()
-
-			transactionFeeView(fee: viewState.totalFee.format())
+			.padding(.medium1)
+			.background(.app.gray5)
 		}
-		.padding(.medium1)
-		.background(.app.gray5)
 	}
 
 	@ViewBuilder
