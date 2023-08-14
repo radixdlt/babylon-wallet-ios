@@ -124,6 +124,74 @@ struct AssetBehaviorRow: View {
 	}
 }
 
+extension AssetBehavior {
+	public var description: String {
+		switch self {
+		case .simpleAsset:
+			return L10n.AccountSettings.Behaviors.simpleAsset
+		case .supplyIncreasable:
+			return L10n.AccountSettings.Behaviors.supplyIncreasable
+		case .supplyDecreasable:
+			return L10n.AccountSettings.Behaviors.supplyDecreasable
+		case .supplyIncreasableByAnyone:
+			return L10n.AccountSettings.Behaviors.supplyIncreasableByAnyone
+		case .supplyDecreasableByAnyone:
+			return L10n.AccountSettings.Behaviors.supplyDecreasableByAnyone
+		case .supplyFlexible:
+			return L10n.AccountSettings.Behaviors.supplyFlexible
+		case .supplyFlexibleByAnyone:
+			return L10n.AccountSettings.Behaviors.supplyFlexibleByAnyone
+		case .movementRestricted:
+			return L10n.AccountSettings.Behaviors.movementRestricted
+		case .movementRestrictableInFuture:
+			return L10n.AccountSettings.Behaviors.movementRestrictableInFuture
+		case .movementRestrictableInFutureByAnyone:
+			return L10n.AccountSettings.Behaviors.movementRestrictableInFutureByAnyone
+		case .removableByThirdParty:
+			return L10n.AccountSettings.Behaviors.removableByThirdParty
+		case .removableByAnyone:
+			return L10n.AccountSettings.Behaviors.removableByAnyone
+		case .freezableByThirdParty:
+			return "A third party can freeze this asset in place." // FIXME: Strings ... .freezableByThirdParty
+		case .freezableByAnyone:
+			return "Anyone can freeze this asset in place." // FIXME: Strings ... .freezableByAnyone
+		case .nftDataChangeable:
+			return L10n.AccountSettings.Behaviors.nftDataChangeable
+		case .nftDataChangeableByAnyone:
+			return L10n.AccountSettings.Behaviors.nftDataChangeableByAnyone
+
+		case .informationChangeable:
+			return L10n.AccountSettings.Behaviors.informationChangeable
+		case .informationChangeableByAnyone:
+			return L10n.AccountSettings.Behaviors.informationChangeableByAnyone
+		}
+	}
+
+	public var icon: ImageAsset {
+		switch self {
+		case .simpleAsset: return AssetResource.simpleAsset
+		case .supplyIncreasable: return AssetResource.supplyIncreasable
+		case .supplyDecreasable: return AssetResource.supplyDecreasable
+		case .supplyIncreasableByAnyone: return AssetResource.supplyIncreasableByAnyone
+		case .supplyDecreasableByAnyone: return AssetResource.supplyDecreasableByAnyone
+		case .supplyFlexible: return AssetResource.supplyFlexible
+		case .supplyFlexibleByAnyone: return AssetResource.supplyFlexibleByAnyone
+		case .movementRestrictableInFuture: return AssetResource.movementRestrictableInFuture
+		case .movementRestrictableInFutureByAnyone: return AssetResource.movementRestrictableInFutureByAnyone
+		case .movementRestricted: return AssetResource.movementRestricted
+		case .removableByThirdParty: return AssetResource.removableByThirdParty
+		case .removableByAnyone: return AssetResource.removableByAnyone
+		case .freezableByThirdParty: return AssetResource.removableByThirdParty // FIXME: icons
+		case .freezableByAnyone: return AssetResource.removableByAnyone // FIXME: icons
+		case .nftDataChangeable: return AssetResource.nftDataChangeable
+		case .nftDataChangeableByAnyone: return AssetResource.nftDataChangeableByAnyone
+
+		case .informationChangeable: return AssetResource.informationChangeable
+		case .informationChangeableByAnyone: return AssetResource.informationChangeableByAnyone
+		}
+	}
+}
+
 // MARK: - AssetTagsSection
 struct AssetTagsSection: View {
 	let tags: [AssetTag]
@@ -160,6 +228,32 @@ struct AssetTagView: View {
 		.background {
 			Bullet()
 				.stroke(.app.gray4)
+		}
+	}
+}
+
+extension AssetTag {
+	public var name: String {
+		switch self {
+		case .officialRadix:
+			return "Official Radix" // FIXME: Strings
+
+		case .token:
+			return "Token" // FIXME: Strings
+
+		case .nft:
+			return "NFT" // FIXME: Strings
+
+		case let .custom(string):
+			return string
+		}
+	}
+
+	public var icon: ImageAsset {
+		if case .officialRadix = self {
+			return AssetResource.officialTagIcon
+		} else {
+			return AssetResource.tagIcon
 		}
 	}
 }

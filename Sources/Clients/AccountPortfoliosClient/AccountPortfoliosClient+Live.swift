@@ -211,24 +211,8 @@ extension AccountPortfoliosClient {
 		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
 
 		let firstItem = try await gatewayAPIClient.getEntityDetails([resource.resourceAddress], [], ledgerState).items.first
-
-		if let firstItem {
-			if let metadata = firstItem.explicitMetadata {
-				print("EXPLICIT:", metadata)
-			}
-		}
-
 		let details = firstItem?.details?.fungible
 		let totalSupply = try details.map { try BigDecimal(fromString: $0.totalSupply) }
-
-		if let accessRules = details?.accessRules {
-			print("OWNER")
-			print(accessRules.owner)
-			print("ENTRIES")
-			print(accessRules.entries)
-		} else {
-			print("NO ACCESS RULES")
-		}
 
 		let resourceAddress = try ResourceAddress(validatingAddress: resource.resourceAddress)
 		let metadata = resource.explicitMetadata
@@ -241,7 +225,8 @@ extension AccountPortfoliosClient {
 			symbol: metadata?.symbol,
 			description: metadata?.description,
 			iconURL: metadata?.iconURL,
-			tags: "---",
+			behaviors: details?.roleAssignments.behaviors ?? [],
+			tags: [.officialRadix, .nft, .token],
 			totalSupply: totalSupply
 		)
 	}
@@ -837,3 +822,171 @@ extension AccountPortfolio.NonFungibleResource.NonFungibleToken.NFTData.Value {
 		}
 	}
 }
+
+extension GatewayAPI.ComponentEntityRoleAssignments {
+	var behaviors: [AssetBehavior] {
+		typealias ParsedName = GatewayAPI.RoleKey.ParsedName
+
+		enum Assigned {
+			case none, someone, anyone, unknown
+		}
+
+		func findEntry(_ name: GatewayAPI.RoleKey.ParsedName) -> GatewayAPI.ComponentEntityRoleAssignmentEntry? {
+			entries.first { $0.roleKey.parsedName == name }
+		}
+
+		func performer(_ name: GatewayAPI.RoleKey.ParsedName) -> Assigned {
+			guard let assignment = findEntry(name)?.parsedAssignment else { return .unknown }
+			switch assignment {
+			case .allowAll: return .anyone
+			case .denyAll: return .none
+			case .otherExplicit, .owner: return .someone
+			}
+		}
+
+		func updaters(_ name: GatewayAPI.RoleKey.ParsedName) -> Assigned {
+			guard let updaters = findEntry(name)?.updaterRoles, !updaters.isEmpty else { return .none }
+
+			// Lookup the corresponding assignments, ignoring unknown and empty values
+			let updaterAssignments = Set(updaters.compactMap(\.parsedName).compactMap(findEntry).compactMap(\.parsedAssignment))
+
+			if updaterAssignments.isEmpty {
+				return .unknown
+			} else if updaterAssignments == [.denyAll] {
+				return .none
+			} else if updaterAssignments.contains(.allowAll) {
+				return .anyone
+			} else {
+				return .someone
+			}
+		}
+
+		var result: Set<AssetBehavior> = []
+
+		// Withdrawer and depositor areas are checked together, but we look at the performer and updater role types separately
+		let movers: Set = [performer(.withdrawer), performer(.depositor)]
+		if movers != [.anyone] {
+			result.insert(.movementRestricted)
+		} else {
+			let moverUpdaters: Set = [updaters(.withdrawer), updaters(.depositor)]
+			if moverUpdaters.contains(.anyone) {
+				result.insert(.movementRestrictableInFutureByAnyone)
+			} else if moverUpdaters.contains(.someone) {
+				result.insert(.movementRestrictableInFuture)
+			}
+		}
+
+		// Other names are checked individually, but without distinguishing between the role types
+		func addBehavior(for name: GatewayAPI.RoleKey.ParsedName, ifSomeone: AssetBehavior, ifAnyone: AssetBehavior) {
+			let either: Set = [performer(name), updaters(name)]
+			if either.contains(.anyone) {
+				result.insert(ifAnyone)
+			} else if either.contains(.someone) {
+				result.insert(ifSomeone)
+			}
+		}
+
+		addBehavior(for: .minter, ifSomeone: .supplyIncreasable, ifAnyone: .supplyIncreasableByAnyone)
+		addBehavior(for: .burner, ifSomeone: .supplyDecreasable, ifAnyone: .supplyDecreasableByAnyone)
+		addBehavior(for: .recaller, ifSomeone: .removableByThirdParty, ifAnyone: .removableByAnyone)
+		addBehavior(for: .freezer, ifSomeone: .freezableByThirdParty, ifAnyone: .freezableByAnyone)
+		addBehavior(for: .nonFungibleDataUpdater, ifSomeone: .nftDataChangeable, ifAnyone: .nftDataChangeableByAnyone)
+
+		if result.isEmpty {
+			return [.simpleAsset]
+		}
+
+		// Finally we make some simplifying substitutions, and check if
+		func substitute(_ source: Set<AssetBehavior>, with target: AssetBehavior) {
+			if result.isSuperset(of: source) {
+				result.subtract(source)
+				result.insert(target)
+			}
+		}
+
+		// If supply is both increasable and decreasable, then it's "flexible"
+		substitute([.supplyIncreasableByAnyone, .supplyDecreasableByAnyone], with: .supplyFlexibleByAnyone)
+		substitute([.supplyIncreasable, .supplyDecreasable], with: .supplyFlexible)
+
+		return result.sorted()
+	}
+}
+
+extension GatewayAPI.RoleKey {
+	var parsedName: ParsedName? {
+		.init(rawValue: name)
+	}
+
+	enum ParsedName: String, Hashable {
+		case minter
+		case burner
+		case withdrawer
+		case depositor
+		case recaller
+		case freezer
+		case nonFungibleDataUpdater = "non_fungible_data_updater"
+
+		case minterUpdater = "minter_updater"
+		case burnerUpdater = "burner_updater"
+		case withdrawerUpdater = "withdrawer_updater"
+		case depositorUpdater = "depositor_updater"
+		case recallerUpdater = "recaller_updater"
+		case freezerUpdater = "freezer_updater"
+		case nonFungibleDataUpdaterUpdater = "non_fungible_data_updater_updater"
+
+		case metadataLocker = "metadata_locker"
+		case metadataSetter = "metadata_setter"
+		case royaltySetter = "royalty_setter"
+		case royaltyLocker = "royalty_locker"
+		case royaltyClaimer = "royalty_claimer"
+
+		case metadataLockerUpdater = "metadata_locker_updater"
+		case metadataSetterUpdater = "metadata_setter_updater"
+		case royaltySetterUpdater = "royalty_setter_updater"
+		case royaltyLockerUpdater = "royalty_locker_updater"
+		case royaltyClaimerUpdater = "royalty_claimer_updater"
+	}
+}
+
+extension GatewayAPI.ComponentEntityRoleAssignmentEntry {
+	var parsedAssignment: ParsedAssignment? {
+		.init(assignment)
+	}
+
+	enum ParsedAssignment: Hashable {
+		case owner
+		case denyAll
+		case allowAll
+		case otherExplicit
+
+		init?(_ assignment: GatewayAPI.ComponentEntityRoleAssignmentEntryAssignment) {
+			switch assignment.resolution {
+			case .owner:
+				guard assignment.explicitRule == nil else { return nil }
+				self = .owner
+			case .explicit:
+				guard let explicitRule = assignment.explicitRule?.value as? [String: Any] else { return nil }
+				guard let type = explicitRule["type"] as? String else { return nil }
+				switch type {
+				case "DenyAll":
+					self = .denyAll
+				case "AllowAll":
+					self = .allowAll
+				default:
+					self = .otherExplicit
+				}
+			}
+		}
+	}
+}
+
+// FIXME: these:
+/*
+ We don't have behaviour icons for "freezer"
+
+ We don't have behaviours for "metadata" and "royalty"
+
+ We don't have a role for informationChangeable*
+
+ What to do for areas where we have no (parsed) rule?
+ */

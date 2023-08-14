@@ -8,8 +8,8 @@ extension FungibleTokenDetails.State {
 			thumbnail: isXRD ? .xrd : .known(resource.iconURL),
 			description: resource.description,
 			resourceAddress: resource.resourceAddress,
-			behaviors: behaviors,
-			tags: tags
+			behaviors: resource.behaviors,
+			tags: resource.tags
 		)
 	}
 }
@@ -64,7 +64,15 @@ struct FungibleTokenDetails_Preview: PreviewProvider {
 	static var previews: some View {
 		FungibleTokenDetails.View(
 			store: .init(
-				initialState: try! .init(resource: .init(resourceAddress: .init(validatingAddress: "resource_tdx_c_1qyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq40v2wv"), amount: .zero), isXRD: true, behaviors: [.simpleAsset], tags: [.officialRadix, .token]),
+				initialState: try! .init(
+					resource: .init(
+						resourceAddress: .init(validatingAddress: "resource_tdx_c_1qyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq40v2wv"),
+						amount: .zero,
+						behaviors: .mock,
+						tags: .mock
+					),
+					isXRD: true
+				),
 				reducer: FungibleTokenDetails()
 			)
 		)

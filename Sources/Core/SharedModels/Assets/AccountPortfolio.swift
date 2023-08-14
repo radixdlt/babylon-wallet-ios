@@ -51,9 +51,8 @@ extension AccountPortfolio {
 		public let symbol: String?
 		public let description: String?
 		public let iconURL: URL?
-
-		public let tags: String
-
+		public let behaviors: [AssetBehavior]
+		public let tags: [AssetTag]
 		public let totalSupply: BigDecimal?
 		// TBD: Add the rest of required metadata fields
 
@@ -65,9 +64,8 @@ extension AccountPortfolio {
 			symbol: String? = nil,
 			description: String? = nil,
 			iconURL: URL? = nil,
-
-			tags: String,
-
+			behaviors: [AssetBehavior] = [],
+			tags: [AssetTag] = [],
 			totalSupply: BigDecimal? = nil
 		) {
 			self.resourceAddress = resourceAddress
@@ -76,11 +74,10 @@ extension AccountPortfolio {
 			self.name = name
 			self.symbol = symbol
 			self.description = description
-			self.tags = tags
 			self.iconURL = iconURL
+			self.behaviors = behaviors
+			self.tags = tags
 			self.totalSupply = totalSupply
-
-			print("TAGS:", tags)
 		}
 	}
 
