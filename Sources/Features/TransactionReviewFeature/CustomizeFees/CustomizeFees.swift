@@ -2,8 +2,14 @@ import EngineKit
 import FeaturePrelude
 import TransactionClient
 
+// MARK: - CustomizeFees
 public struct CustomizeFees: FeatureReducer {
 	public struct State: Hashable, Sendable {
+		enum CustomizationModeState: Hashable, Sendable {
+			case normal(NormalCustomizationFees.State)
+			case advanced(AdvancedCustomizationFees.State)
+		}
+
 		var feePayerSelection: FeePayerSelectionAmongstCandidates
 
 		var feePayerAccount: Profile.Network.Account? {
@@ -17,26 +23,29 @@ public struct CustomizeFees: FeatureReducer {
 		@PresentationState
 		public var destination: Destinations.State? = nil
 
+		var modeState: CustomizationModeState
+
 		init(
 			feePayerSelection: FeePayerSelectionAmongstCandidates
 		) {
 			self.feePayerSelection = feePayerSelection
+			self.modeState = feePayerSelection.transactionFee.customizationModeState
 		}
 	}
 
-	public enum ViewAction: Equatable {
+	public enum ViewAction: Equatable, Sendable {
 		case changeFeePayerTapped
 		case toggleMode
-		case totalNetworkAndRoyaltyFeesChanged(String)
-		case tipPercentageChanged(String)
 		case closed
 	}
 
-	public enum ChildAction: Equatable {
+	public enum ChildAction: Equatable, Sendable {
 		case destination(PresentationAction<Destinations.Action>)
+		case normalFeeCustomization(NormalCustomizationFees.Action)
+		case advancedFeeCustomization(AdvancedCustomizationFees.Action)
 	}
 
-	public enum DelegateAction: Equatable {
+	public enum DelegateAction: Equatable, Sendable {
 		case updated(FeePayerSelectionAmongstCandidates)
 	}
 
@@ -63,6 +72,16 @@ public struct CustomizeFees: FeatureReducer {
 			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
 				Destinations()
 			}
+
+		Scope(state: \.modeState, action: /Action.child) {
+			EmptyReducer()
+				.ifCaseLet(/State.CustomizationModeState.normal, action: /ChildAction.normalFeeCustomization) {
+					NormalCustomizationFees()
+				}
+				.ifCaseLet(/State.CustomizationModeState.advanced, action: /ChildAction.advancedFeeCustomization) {
+					AdvancedCustomizationFees()
+				}
+		}
 	}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
@@ -72,20 +91,7 @@ public struct CustomizeFees: FeatureReducer {
 			return .none
 		case .toggleMode:
 			state.feePayerSelection.transactionFee.toggleMode()
-			return .send(.delegate(.updated(state.feePayerSelection)))
-		case let .totalNetworkAndRoyaltyFeesChanged(amount):
-			guard case let .advanced(advanced) = state.transactionFee.mode, let value = try? BigDecimal(localizedFromString: amount) else {
-				return .none
-			}
-
-			state.feePayerSelection.transactionFee.mode = .advanced(.init(networkAndRoyaltyFee: value, tipPercentage: advanced.tipPercentage))
-			return .send(.delegate(.updated(state.feePayerSelection)))
-		case let .tipPercentageChanged(percentage):
-			guard case let .advanced(advanced) = state.transactionFee.mode, let value = try? BigDecimal(localizedFromString: percentage) else {
-				return .none
-			}
-
-			state.feePayerSelection.transactionFee.mode = .advanced(.init(networkAndRoyaltyFee: advanced.networkAndRoyaltyFee, tipPercentage: value))
+			state.modeState = state.feePayerSelection.transactionFee.customizationModeState
 			return .send(.delegate(.updated(state.feePayerSelection)))
 		case .closed:
 			return .run { _ in
@@ -103,6 +109,17 @@ public struct CustomizeFees: FeatureReducer {
 
 		default:
 			return .none
+		}
+	}
+}
+
+extension TransactionFee {
+	var customizationModeState: CustomizeFees.State.CustomizationModeState {
+		switch mode {
+		case let .normal(normal):
+			return .normal(.init(normalCustomization: normal))
+		case let .advanced(advanced):
+			return .advanced(.init(advancedCustomization: advanced))
 		}
 	}
 }

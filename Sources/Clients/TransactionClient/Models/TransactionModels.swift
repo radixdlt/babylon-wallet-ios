@@ -258,7 +258,7 @@ public struct TransactionFee: Hashable, Sendable {
 	let feeLocks: FeeLocks
 
 	/// The calculaton mode
-	public var mode: Mode = .normal
+	public var mode: Mode
 
 	public init(feeSummary: FeeSummary, feeLocks: FeeLocks, mode: Mode) {
 		self.feeSummary = feeSummary
@@ -268,9 +268,12 @@ public struct TransactionFee: Hashable, Sendable {
 
 	public init(executionAnalysis: ExecutionAnalysis) throws {
 		let feeSummary: FeeSummary = try .init(
-			networkFee: .init(executionAnalysis.feeSummary.networkFee),
-			royaltyFee: .init(executionAnalysis.feeSummary.royaltyFee)
+			executionCost: .init(executionAnalysis.feeSummary.executionCost),
+			finalizationCost: .init(executionAnalysis.feeSummary.finalizationCost),
+			storageExpansionCost: .init(executionAnalysis.feeSummary.storageExpansionCost),
+			royaltyCost: .init(executionAnalysis.feeSummary.royaltyCost)
 		)
+
 		let feeLocks: FeeLocks = try .init(
 			nonContingentLock: .init(executionAnalysis.feeLocks.lock),
 			contingentLock: .init(executionAnalysis.feeLocks.contingentLock)
@@ -279,48 +282,38 @@ public struct TransactionFee: Hashable, Sendable {
 		self.init(
 			feeSummary: feeSummary,
 			feeLocks: feeLocks,
-			mode: .normal
+			mode: .normal(.init(feeSummary: feeSummary, feeLocks: feeLocks))
 		)
 	}
 }
 
 extension TransactionFee {
-	/// NetworkFee that takes into account any locks
-	public var networkFee: BigDecimal {
-		feeSummary.networkFee.clampedDiff(feeLocks.nonContingentLock)
-	}
-
-	/// RoyaltyFee  that takes into account any locks
-	public var royaltyFee: BigDecimal {
-		// nonContingetLock is first subtracted from the network fee, thent he remained from the royaltyFee
-		let remainingNonContingentLock = feeLocks.nonContingentLock.clampedDiff(feeSummary.networkFee)
-		return feeSummary.royaltyFee.clampedDiff(remainingNonContingentLock)
-	}
-
 	/// Calculates the totalFee for the transaction based on the `mode`
 	public var totalFee: TotalFee {
 		switch mode {
-		case .normal:
-			let maxFee = networkFee + royaltyFee
+		case let .normal(normalCustomization):
+			let maxFee = normalCustomization.total
 			let minFee = maxFee.clampedDiff(feeLocks.contingentLock)
 			return .init(min: minFee, max: maxFee)
-		case let .advanced(advanced):
-			// Tip is calculated based on the networkFee.
-			// Since networkAndRoyaltyFee is a single value, royaltyFee is considered constant. Basically only the networkFee changes when the networkAndRoyaltyFee changes.
-			let networkFee = advanced.networkAndRoyaltyFee.clampedDiff(royaltyFee)
-			let tipAmount = networkFee * (advanced.tipPercentage / 100)
-			let total = advanced.networkAndRoyaltyFee + tipAmount
-			return .init(min: total, max: total)
+		case let .advanced(advancedCustomization):
+			return .init(min: advancedCustomization.total, max: advancedCustomization.total)
 		}
 	}
 
 	public mutating func toggleMode() {
 		switch mode {
 		case .normal:
-			mode = .advanced(.init(networkAndRoyaltyFee: networkFee + royaltyFee, tipPercentage: .zero))
+			mode = .advanced(.init(feeSummary: feeSummary))
 		case .advanced:
-			mode = .normal
+			mode = .normal(.init(feeSummary: feeSummary, feeLocks: feeLocks))
 		}
+	}
+
+	public var isNormalMode: Bool {
+		if case .normal = mode {
+			return true
+		}
+		return false
 	}
 }
 
@@ -333,17 +326,34 @@ extension TransactionFee {
 	}
 
 	public enum Mode: Hashable, Sendable {
-		case normal
+		case normal(NormalFeeCustomization)
 		case advanced(AdvancedFeeCustomization)
 	}
 
 	public struct FeeSummary: Hashable, Sendable {
-		let networkFee: BigDecimal
-		let royaltyFee: BigDecimal
+		public let executionCost: BigDecimal
+		public let finalizationCost: BigDecimal
+		public let storageExpansionCost: BigDecimal
+		public let royaltyCost: BigDecimal
 
-		public init(networkFee: BigDecimal, royaltyFee: BigDecimal) {
-			self.networkFee = networkFee * PredefinedFeeConstants.networkFeeMultiplier
-			self.royaltyFee = royaltyFee
+		public var networkFee: BigDecimal {
+			executionCost + finalizationCost
+		}
+
+		public var total: BigDecimal {
+			networkFee + storageExpansionCost + royaltyCost
+		}
+
+		public init(
+			executionCost: BigDecimal,
+			finalizationCost: BigDecimal,
+			storageExpansionCost: BigDecimal,
+			royaltyCost: BigDecimal
+		) {
+			self.executionCost = executionCost
+			self.finalizationCost = finalizationCost
+			self.storageExpansionCost = storageExpansionCost
+			self.royaltyCost = royaltyCost
 		}
 	}
 
@@ -358,12 +368,49 @@ extension TransactionFee {
 	}
 
 	public struct AdvancedFeeCustomization: Hashable, Sendable {
-		public var networkAndRoyaltyFee: BigDecimal
+		private let networkFee: BigDecimal
+
+		public let feeSummary: FeeSummary
+		public var paddingFee: BigDecimal
 		public var tipPercentage: BigDecimal
 
-		public init(networkAndRoyaltyFee: BigDecimal, tipPercentage: BigDecimal) {
-			self.networkAndRoyaltyFee = networkAndRoyaltyFee
-			self.tipPercentage = tipPercentage
+		public var tipAmount: BigDecimal {
+			(tipPercentage / 100) * networkFee
+		}
+
+		public var total: BigDecimal {
+			feeSummary.total + paddingFee + tipAmount
+		}
+
+		public init(feeSummary: FeeSummary) {
+			self.feeSummary = feeSummary
+			// The networkFee is used to derive the base PaddingFee as well the tipAmount
+			self.networkFee = feeSummary.executionCost + feeSummary.finalizationCost
+			self.paddingFee = networkFee * PredefinedFeeConstants.networkFeeMultiplier
+			self.tipPercentage = .zero
+		}
+	}
+
+	public struct NormalFeeCustomization: Hashable, Sendable {
+		public let networkFee: BigDecimal
+		public let royaltyFee: BigDecimal
+		public let total: BigDecimal
+
+		public init(networkFee: BigDecimal, royaltyFee: BigDecimal) {
+			self.networkFee = networkFee
+			self.royaltyFee = royaltyFee
+			self.total = networkFee + royaltyFee
+		}
+
+		public init(feeSummary: FeeSummary, feeLocks: FeeLocks) {
+			var networkFee = feeSummary.executionCost + feeSummary.finalizationCost + feeSummary.storageExpansionCost
+			networkFee += PredefinedFeeConstants.networkFeeMultiplier
+			networkFee = networkFee.clampedDiff(feeLocks.nonContingentLock)
+
+			let remainingNonContingentLock = feeLocks.nonContingentLock.clampedDiff(networkFee)
+			let royaltyFee = feeSummary.royaltyCost.clampedDiff(remainingNonContingentLock)
+
+			self.init(networkFee: networkFee, royaltyFee: royaltyFee)
 		}
 	}
 
