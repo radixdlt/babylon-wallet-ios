@@ -81,9 +81,10 @@ extension AccountPreferences {
 						turnIntoDappDefinitionAccountTypeButton(with: viewStore)
 						createAndUploadAuthKeyButton(with: viewStore)
 						createFungibleTokenButton(with: viewStore)
-						createNonFungibleTokenButton(with: viewStore)
-						createMultipleFungibleTokenButton(with: viewStore)
-						createMultipleNonFungibleTokenButton(with: viewStore)
+						// TODO: Re-enable. With new manifest builder that is not easy to handle.
+						// createNonFungibleTokenButton(with: viewStore)
+						// createMultipleFungibleTokenButton(with: viewStore)
+						// createMultipleNonFungibleTokenButton(with: viewStore)
 						#endif // DEBUG
 						qrCodeButton(with: viewStore)
 					}
@@ -110,8 +111,8 @@ extension AccountPreferences {
 						}
 						.sheet(
 							store: store.destination,
-							state: /AccountPreferences.Destination.State.reviewTransactionTurningAccountIntoDappDefType,
-							action: AccountPreferences.Destination.Action.reviewTransactionTurningAccountIntoDappDefType
+							state: /AccountPreferences.Destination.State.reviewTransaction,
+							action: AccountPreferences.Destination.Action.reviewTransaction
 						) { store in
 							// FIXME: Should use DappInteractionClient intstead to schedule a transaction
 							NavigationView {

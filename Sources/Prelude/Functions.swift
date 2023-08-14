@@ -1,11 +1,11 @@
 import Foundation
 
-public func with<T>(
+public func update<T>(
 	_ initial: T,
-	update: (inout T) throws -> Void
+	with: (inout T) throws -> Void
 ) rethrows -> T {
 	var value = initial
-	try update(&value)
+	try with(&value)
 	return value
 }
 

@@ -25,7 +25,7 @@ struct PersonaDetailsPreviewApp: App {
 			$0
 				.dependency(
 					\.personasClient,
-					with(.noop) {
+					update(.noop) {
 						$0.updatePersona = { @Sendable _ in }
 					}
 				)

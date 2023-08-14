@@ -67,8 +67,10 @@ public struct NetworkConfigurationResponseWellKnownAddresses: Codable, Hashable 
     public private(set) var genesisHelper: String
     /** Bech32m-encoded human readable version of the address. */
     public private(set) var faucet: String
+    /** Bech32m-encoded human readable version of the address. */
+    public private(set) var poolPackage: String
 
-    public init(xrd: String, secp256k1SignatureVirtualBadge: String, ed25519SignatureVirtualBadge: String, packageOfDirectCallerVirtualBadge: String, globalCallerVirtualBadge: String, systemTransactionBadge: String, packageOwnerBadge: String, validatorOwnerBadge: String, accountOwnerBadge: String, identityOwnerBadge: String, packagePackage: String, resourcePackage: String, accountPackage: String, identityPackage: String, consensusManagerPackage: String, accessControllerPackage: String, transactionProcessorPackage: String, metadataModulePackage: String, royaltyModulePackage: String, accessRulesPackage: String, genesisHelperPackage: String, faucetPackage: String, consensusManager: String, genesisHelper: String, faucet: String) {
+    public init(xrd: String, secp256k1SignatureVirtualBadge: String, ed25519SignatureVirtualBadge: String, packageOfDirectCallerVirtualBadge: String, globalCallerVirtualBadge: String, systemTransactionBadge: String, packageOwnerBadge: String, validatorOwnerBadge: String, accountOwnerBadge: String, identityOwnerBadge: String, packagePackage: String, resourcePackage: String, accountPackage: String, identityPackage: String, consensusManagerPackage: String, accessControllerPackage: String, transactionProcessorPackage: String, metadataModulePackage: String, royaltyModulePackage: String, accessRulesPackage: String, genesisHelperPackage: String, faucetPackage: String, consensusManager: String, genesisHelper: String, faucet: String, poolPackage: String) {
         self.xrd = xrd
         self.secp256k1SignatureVirtualBadge = secp256k1SignatureVirtualBadge
         self.ed25519SignatureVirtualBadge = ed25519SignatureVirtualBadge
@@ -94,6 +96,7 @@ public struct NetworkConfigurationResponseWellKnownAddresses: Codable, Hashable 
         self.consensusManager = consensusManager
         self.genesisHelper = genesisHelper
         self.faucet = faucet
+        self.poolPackage = poolPackage
     }
 
     public enum CodingKeys: String, CodingKey, CaseIterable {
@@ -122,6 +125,7 @@ public struct NetworkConfigurationResponseWellKnownAddresses: Codable, Hashable 
         case consensusManager = "consensus_manager"
         case genesisHelper = "genesis_helper"
         case faucet
+        case poolPackage = "pool_package"
     }
 
     // Encodable protocol methods
@@ -153,6 +157,7 @@ public struct NetworkConfigurationResponseWellKnownAddresses: Codable, Hashable 
         try container.encode(consensusManager, forKey: .consensusManager)
         try container.encode(genesisHelper, forKey: .genesisHelper)
         try container.encode(faucet, forKey: .faucet)
+        try container.encode(poolPackage, forKey: .poolPackage)
     }
 }
 

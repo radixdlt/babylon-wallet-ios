@@ -119,7 +119,7 @@ struct DappInteraction_Preview: PreviewProvider {
 
 extension AccountsClient {
 	static func previewValueTwoAccounts() -> Self {
-		with(noop) {
+		update(noop) {
 			$0.getAccountsOnCurrentNetwork = {
 				NonEmpty(.previewValue0, .previewValue1)
 			}
@@ -129,7 +129,7 @@ extension AccountsClient {
 
 extension AuthorizedDappsClient {
 	static func previewValueOnePersona() -> Self {
-		with(noop) {
+		update(noop) {
 			$0.getAuthorizedDapps = {
 				var dapp = Profile.Network.AuthorizedDapp(
 					networkID: .nebunet,
@@ -155,7 +155,7 @@ extension AuthorizedDappsClient {
 
 extension PersonasClient {
 	static func previewValueTwoPersonas(existing: Bool) -> Self {
-		with(noop) {
+		update(noop) {
 			$0.getPersonas = {
 				if existing {
 					return [.previewValue0, .previewValue1]
