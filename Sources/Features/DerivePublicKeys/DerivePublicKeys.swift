@@ -12,7 +12,7 @@ import SecureStorageClient
 public struct DerivePublicKeys: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public enum Purpose: Sendable, Hashable {
-			case createEntity
+			case createEntity(kind: EntityKind)
 			case importLegacyAccounts
 			case createAuthSigningKey
 		}
@@ -283,8 +283,8 @@ extension DerivePublicKeys {
 		case let .knownPaths(derivationPaths, networkID):
 			let loadMnemonicPurpose: SecureStorageClient.LoadMnemonicPurpose = {
 				switch state.purpose {
-				case .createEntity:
-					return .createEntity(kind: .account)
+				case let .createEntity(kind: entityKind):
+					return .createEntity(kind: entityKind)
 				case .createAuthSigningKey:
 					return .createSignAuthKey
 				case .importLegacyAccounts:
