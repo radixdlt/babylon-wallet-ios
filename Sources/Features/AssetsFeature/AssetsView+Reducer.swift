@@ -167,7 +167,7 @@ public struct AssetsView: Sendable, FeatureReducer {
 				return .init(
 					stakes: .init(
 						uniqueElements: portfolio.poolUnitResources.radixNetworkStakes
-							.map { LSUStake.State(stake: $0) }
+							.map { LSUStake.State(stake: $0, isSelected: false) }
 					)
 				)
 			}()

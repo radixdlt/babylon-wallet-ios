@@ -9,6 +9,8 @@ public struct LSUStake: FeatureReducer {
 
 		let stake: AccountPortfolio.PoolUnitResources.RadixNetworkStake
 
+		var isSelected: Bool?
+
 		@PresentationState
 		public var destination: Destinations.State?
 	}
@@ -56,24 +58,30 @@ public struct LSUStake: FeatureReducer {
 	) -> EffectTask<Action> {
 		switch viewAction {
 		case .didTap:
-			guard
-				let resource = state.stake.stakeUnitResource,
-				let xrdRedemptionValue = state.stake.xrdRedemptionValue
-			else {
-				logger.fault("We should not be able to tap a stake in such state")
+			if state.isSelected != nil {
+				state.isSelected?.toggle()
+
+				return .none
+			} else {
+				guard
+					let resource = state.stake.stakeUnitResource,
+					let xrdRedemptionValue = state.stake.xrdRedemptionValue
+				else {
+					logger.fault("We should not be able to tap a stake in such state")
+
+					return .none
+				}
+
+				state.destination = .details(
+					.init(
+						validator: state.stake.validator,
+						stakeUnitResource: resource,
+						xrdRedemptionValue: xrdRedemptionValue
+					)
+				)
 
 				return .none
 			}
-
-			state.destination = .details(
-				.init(
-					validator: state.stake.validator,
-					stakeUnitResource: resource,
-					xrdRedemptionValue: xrdRedemptionValue
-				)
-			)
-
-			return .none
 		}
 	}
 }
