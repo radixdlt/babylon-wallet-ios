@@ -1,27 +1,36 @@
 import FeaturePrelude
 
-extension PoolUnitsList {
-	// MARK: - LSUResource
-	public struct LSUResource: Sendable, FeatureReducer {
-		public struct State: Sendable, Hashable {
-			var isExpanded: Bool = false
+// MARK: - LSUResource
+public struct LSUResource: Sendable, FeatureReducer {
+	public struct State: Sendable, Hashable {
+		var isExpanded: Bool = false
 
-			let stakes: [AccountPortfolio.PoolUnitResources.RadixNetworkStake]
-		}
+		var stakes: IdentifiedArrayOf<LSUStake.State>
+	}
 
-		public enum ViewAction: Sendable, Equatable {
-			case isExpandedToggled
-		}
+	public enum ViewAction: Sendable, Equatable {
+		case isExpandedToggled
+	}
 
-		public init() {}
+	public enum ChildAction: Sendable, Equatable {
+		case stake(id: LSUStake.State.ID, action: LSUStake.Action)
+	}
 
-		public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
-			switch viewAction {
-			case .isExpandedToggled:
-				state.isExpanded.toggle()
+	public var body: some ReducerProtocolOf<Self> {
+		Reduce(core)
+			.forEach(
+				\.stakes,
+				action: /Action.child .. ChildAction.stake,
+				element: LSUStake.init
+			)
+	}
 
-				return .none
-			}
+	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+		switch viewAction {
+		case .isExpandedToggled:
+			state.isExpanded.toggle()
+
+			return .none
 		}
 	}
 }

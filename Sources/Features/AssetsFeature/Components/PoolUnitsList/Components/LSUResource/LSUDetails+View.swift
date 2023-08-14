@@ -1,39 +1,26 @@
 import EngineKit
 import FeaturePrelude
 
-extension PoolUnitDetails.State {
-	var viewState: PoolUnitDetails.ViewState {
-		let resource = poolUnit.poolUnitResource
-		return .init(
-			containerWithHeader: resource.detailsContainerWithHeaderViewState,
-			thumbnailURL: resource.iconURL,
-			resources: poolUnit.resourceViewStates,
-			description: resource.description,
-			resourceAddress: resource.resourceAddress,
-			currentSupply: resource.totalSupply?.format() ?? L10n.AssetDetails.supplyUnkown
-		)
-	}
-}
-
-// MARK: - PoolUnitDetails.View
-extension PoolUnitDetails {
+extension LSUDetails {
 	public struct ViewState: Equatable {
 		let containerWithHeader: DetailsContainerWithHeaderViewState
 		let thumbnailURL: URL?
 
-		let resources: NonEmpty<IdentifiedArrayOf<PoolUnitResourceViewState>>
+		let validatorNameViewState: ValidatorNameViewState
+
+		let redeemableTokenAmount: String
 
 		let description: String?
 
 		let resourceAddress: ResourceAddress
 		let currentSupply: String
+		let validatorAddress: ValidatorAddress
 	}
 
-	@MainActor
 	public struct View: SwiftUI.View {
-		private let store: StoreOf<PoolUnitDetails>
+		private let store: StoreOf<LSUDetails>
 
-		public init(store: StoreOf<PoolUnitDetails>) {
+		public init(store: StoreOf<LSUDetails>) {
 			self.store = store
 		}
 
@@ -41,7 +28,7 @@ extension PoolUnitDetails {
 			WithViewStore(
 				store,
 				observe: \.viewState,
-				send: PoolUnitDetails.Action.view
+				send: LSUDetails.Action.view
 			) { viewStore in
 				DetailsContainerWithHeaderView(viewState: viewStore.containerWithHeader) {
 					NFTThumbnail(viewStore.thumbnailURL, size: .veryLarge)
@@ -50,8 +37,11 @@ extension PoolUnitDetails {
 						Text(L10n.Account.PoolUnits.Details.currentRedeemableValue)
 							.textStyle(.secondaryHeader)
 							.foregroundColor(.app.gray1)
+
+						LSUMaker.makeValidatorNameView(viewState: viewStore.validatorNameViewState)
+
 						PoolUnitResourcesView(
-							resources: viewStore.resources
+							resources: .init(.init(xrdAmount: viewStore.redeemableTokenAmount))
 						)
 
 						DetailsContainerWithHeaderViewMaker
@@ -65,6 +55,8 @@ extension PoolUnitDetails {
 						VStack(spacing: .medium3) {
 							TokenDetailsPropertyViewMaker
 								.makeResourceAddress(address: viewStore.resourceAddress)
+							TokenDetailsPropertyViewMaker
+								.makeValidatorAddress(address: viewStore.validatorAddress)
 							TokenDetailsPropertyView(
 								title: L10n.AssetDetails.currentSupply,
 								propertyView: Text(viewStore.currentSupply)
@@ -79,12 +71,28 @@ extension PoolUnitDetails {
 	}
 }
 
-extension AccountPortfolio.FungibleResource {
-	var detailsContainerWithHeaderViewState: DetailsContainerWithHeaderViewState {
+extension LSUDetails.State {
+	var viewState: LSUDetails.ViewState {
 		.init(
-			title: name ?? L10n.Account.PoolUnits.unknownPoolUnitName,
-			amount: amount.format(),
-			symbol: symbol
+			containerWithHeader: stakeUnitResource.detailsContainerWithHeaderViewState,
+			thumbnailURL: stakeUnitResource.iconURL,
+			validatorNameViewState: .init(with: validator),
+			redeemableTokenAmount: xrdRedemptionValue.format(),
+			description: stakeUnitResource.description,
+			resourceAddress: stakeUnitResource.resourceAddress,
+			currentSupply: validator.xrdVaultBalance.format(),
+			validatorAddress: validator.address
+		)
+	}
+}
+
+extension ValidatorNameViewState {
+	init(
+		with validator: AccountPortfolio.PoolUnitResources.RadixNetworkStake.Validator
+	) {
+		self.init(
+			imageURL: validator.iconURL,
+			name: validator.name ?? L10n.Account.PoolUnits.unknownValidatorName
 		)
 	}
 }

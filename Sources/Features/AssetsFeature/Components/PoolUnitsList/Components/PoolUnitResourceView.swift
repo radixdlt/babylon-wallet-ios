@@ -11,6 +11,16 @@ struct PoolUnitResourceViewState: Identifiable, Equatable {
 	let tokenAmount: String
 }
 
+extension PoolUnitResourceViewState {
+	init(xrdAmount: String) {
+		self.init(
+			thumbnail: .xrd,
+			symbol: "XRD",
+			tokenAmount: xrdAmount
+		)
+	}
+}
+
 // MARK: - PoolUnitResourceView
 struct PoolUnitResourceView<NameView>: View where NameView: View {
 	let viewState: PoolUnitResourceViewState

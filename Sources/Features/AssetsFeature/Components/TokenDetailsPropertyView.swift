@@ -4,10 +4,28 @@ import Resources
 
 // MARK: - TokenDetailsPropertyViewMaker
 enum TokenDetailsPropertyViewMaker {
-	static func makeAddress(resourceAddress: ResourceAddress) -> some View {
-		TokenDetailsPropertyView(
+	static func makeResourceAddress(address: ResourceAddress) -> some View {
+		makeAddressView(
 			title: L10n.AssetDetails.resourceAddress,
-			propertyView: AddressView(.address(.resource(resourceAddress)))
+			address: .resource(address)
+		)
+	}
+
+	static func makeValidatorAddress(address: ValidatorAddress) -> some View {
+		makeAddressView(
+			// FIXME: L10n.Account.PoolUnits.validatorAddress
+			title: "Validator",
+			address: .validator(address)
+		)
+	}
+
+	private static func makeAddressView(
+		title: String,
+		address: LedgerIdentifiable.Address
+	) -> some View {
+		TokenDetailsPropertyView(
+			title: title,
+			propertyView: AddressView(.address(address))
 		)
 	}
 }

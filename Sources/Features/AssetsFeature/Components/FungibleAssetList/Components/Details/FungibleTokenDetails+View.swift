@@ -39,8 +39,8 @@ extension FungibleTokenDetails {
 							.makeDescriptionView(description: description)
 					}
 
-					TokenDetailsPropertyViewMaker.makeAddress(
-						resourceAddress: viewStore.resourceAddress
+					TokenDetailsPropertyViewMaker.makeResourceAddress(
+						address: viewStore.resourceAddress
 					)
 				} closeButtonAction: {
 					viewStore.send(.closeButtonTapped)

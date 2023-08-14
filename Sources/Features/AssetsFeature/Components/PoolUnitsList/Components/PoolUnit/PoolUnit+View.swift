@@ -36,9 +36,7 @@ extension PoolUnit {
 				.background(.app.white)
 				.roundedCorners(radius: .small1)
 				.tokenRowShadow()
-				.onTapGesture {
-					viewStore.send(.didTap)
-				}
+				.onTapGesture { viewStore.send(.didTap) }
 			}
 			.sheet(
 				store: store.scope(

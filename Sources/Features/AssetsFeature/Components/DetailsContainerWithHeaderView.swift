@@ -3,13 +3,9 @@ import SwiftUI
 
 // MARK: - DetailsContainerWithHeaderViewState
 struct DetailsContainerWithHeaderViewState: Equatable {
-	struct SymbolAndAmount: Equatable {
-		let amount: String
-		let symbol: String
-	}
-
-	let displayName: String
-	let symbolAndAmount: SymbolAndAmount?
+	let title: String
+	let amount: String
+	let symbol: String?
 }
 
 // MARK: - DetailsContainerWithHeaderView
@@ -48,7 +44,7 @@ struct DetailsContainerWithHeaderView<ThumbnailView, DetailsView>: View
 				.padding(.horizontal, .large2)
 			}
 			#if os(iOS)
-			.navigationBarTitle(viewState.displayName)
+			.navigationBarTitle(viewState.title)
 			.navigationBarTitleColor(.app.gray1)
 			.navigationBarTitleDisplayMode(.inline)
 			.navigationBarInlineTitleFont(.app.secondaryHeader)
@@ -70,13 +66,11 @@ struct DetailsContainerWithHeaderView<ThumbnailView, DetailsView>: View
 		VStack(spacing: .medium3) {
 			thumbnailView
 
-			if let symbolAndAmount = viewState.symbolAndAmount {
-				Text(symbolAndAmount.amount)
-					.font(.app.sheetTitle)
-					.kerning(-0.5)
-					+ Text(" " + symbolAndAmount.symbol)
-					.font(.app.sectionHeader)
-			}
+			Text(viewState.amount)
+				.font(.app.sheetTitle)
+				.kerning(-0.5)
+				+ Text((viewState.symbol).map { " " + $0 } ?? "")
+				.font(.app.sectionHeader)
 		}
 		.padding(.vertical, .small2)
 	}

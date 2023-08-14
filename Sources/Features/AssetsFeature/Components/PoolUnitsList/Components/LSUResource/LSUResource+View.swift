@@ -1,19 +1,19 @@
 import FeaturePrelude
 
-extension PoolUnitsList.LSUResource {
+extension LSUResource {
 	public struct ViewState: Sendable, Equatable {
 		let isExpanded: Bool
 		let iconURL: URL?
-		let components: NonEmpty<IdentifiedArrayOf<LSUComponentView.ViewState>>
+		let numberOfStakes: Int
 	}
 
 	public struct View: SwiftUI.View {
-		private let store: StoreOf<PoolUnitsList.LSUResource>
+		private let store: StoreOf<LSUResource>
 
 		@SwiftUI.State
 		private var headerHeight: CGFloat = .zero
 
-		public init(store: StoreOf<PoolUnitsList.LSUResource>) {
+		public init(store: StoreOf<LSUResource>) {
 			self.store = store
 		}
 
@@ -21,7 +21,7 @@ extension PoolUnitsList.LSUResource {
 			WithViewStore(
 				store,
 				observe: \.viewState,
-				send: PoolUnitsList.LSUResource.Action.view
+				send: LSUResource.Action.view
 			) { viewStore in
 				StackedViewsLayout(
 					isExpanded: viewStore.isExpanded,
@@ -31,7 +31,7 @@ extension PoolUnitsList.LSUResource {
 					headerView(with: viewStore)
 
 					if viewStore.isExpanded {
-						componentsView(with: viewStore.components.rawValue)
+						componentsView
 					}
 
 					cardBehindHeader(
@@ -54,7 +54,7 @@ extension PoolUnitsList.LSUResource {
 						.foregroundColor(.app.gray1)
 						.textStyle(.secondaryHeader)
 
-					Text(L10n.Account.PoolUnits.numberOfStakes(viewStore.components.count))
+					Text(L10n.Account.PoolUnits.numberOfStakes(viewStore.numberOfStakes))
 						.foregroundColor(.app.gray2)
 						.textStyle(.body2HighImportance)
 				}
@@ -79,12 +79,19 @@ extension PoolUnitsList.LSUResource {
 			}
 		}
 
-		private func componentsView(
-			with componentViewStates: IdentifiedArrayOf<LSUComponentView.ViewState>
-		) -> some SwiftUI.View {
+		private var componentsView: some SwiftUI.View {
 			VStack(spacing: 1) {
-				ForEach(componentViewStates, content: LSUComponentView.init)
-					.background(.app.white)
+				ForEachStore(
+					store.scope(
+						state: \.stakes,
+						action: (
+							/LSUResource.Action.child
+								.. LSUResource.ChildAction.stake
+						).embed
+					),
+					content: LSUStake.View.init
+				)
+				.background(.app.white)
 			}
 			.roundedCorners(
 				.bottom,
@@ -126,47 +133,12 @@ private struct HeightPreferenceKey: PreferenceKey {
 	}
 }
 
-extension PoolUnitsList.LSUResource.State {
-	var viewState: PoolUnitsList.LSUResource.ViewState {
+extension LSUResource.State {
+	var viewState: LSUResource.ViewState {
 		.init(
 			isExpanded: isExpanded,
 			iconURL: .init(string: "https://i.ibb.co/KG06168/Screenshot-2023-08-02-at-16-19-29.png")!,
-			components: .init(
-				rawValue: .init(
-					uncheckedUniqueElements: stakes
-						.map { stake in
-							LSUComponentView.ViewState(
-								id: stake.validator.address,
-								title: stake.validator.name ?? L10n.Account.PoolUnits.unknownValidatorName,
-								imageURL: stake.validator.iconURL,
-								liquidStakeUnit: stake.xrdRedemptionValue
-									.map {
-										.init(
-											thumbnail: .xrd,
-											symbol: "XRD",
-											tokenAmount: $0.format()
-										)
-									},
-								stakeClaimNFTs: .init(
-									rawValue: stake.stakeClaimResource
-										.map { claimNFT in
-											.init(
-												uncheckedUniqueElements: claimNFT.tokens
-													.map { token in
-														LSUComponentView.StakeClaimNFTViewState(
-															id: token.id,
-															thumbnail: .xrd,
-															status: token.canBeClaimed ? .readyToClaim : .unstaking,
-															tokenAmount: (token.stakeClaimAmount ?? 0).format()
-														)
-													}
-											)
-										} ?? []
-								)
-							)
-						}
-				)
-			)!
+			numberOfStakes: stakes.count
 		)
 	}
 }
