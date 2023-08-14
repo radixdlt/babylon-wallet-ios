@@ -6,7 +6,9 @@ import ScanQRFeature
 #if DEBUG
 import Cryptography
 extension AccountAddress {
-	public static func random(networkID: NetworkID = .default) -> Self {
+	public static func random(
+		networkID: NetworkID = Radix.Gateway.default.network.id
+	) -> Self {
 		let curve25519PublicKey = Curve25519.PrivateKey().publicKey
 		let address = try! deriveVirtualAccountAddressFromPublicKey(
 			publicKey: SLIP10.PublicKey.eddsaEd25519(curve25519PublicKey).intoEngine(),

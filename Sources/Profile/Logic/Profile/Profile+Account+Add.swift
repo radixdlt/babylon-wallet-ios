@@ -46,8 +46,7 @@ extension Profile {
 
 	/// Saves an `Account` into the profile
 	public mutating func addAccount(
-		_ account: Profile.Network.Account,
-		shouldUpdateFactorSourceNextDerivationIndex: Bool = true
+		_ account: Profile.Network.Account
 	) throws {
 		let networkID = account.networkID
 		// can be nil if this is a new network
@@ -67,35 +66,6 @@ extension Profile {
 				authorizedDapps: []
 			)
 			try networks.add(network)
-		}
-
-		guard shouldUpdateFactorSourceNextDerivationIndex else {
-			return
-		}
-		switch account.securityState {
-		case let .unsecured(entityControl):
-			let factorSourceID = entityControl.transactionSigning.factorSourceID
-			try self.factorSources.updateFactorSource(id: factorSourceID) {
-				try $0.increaseNextDerivationIndex(for: account.kind, networkID: account.networkID)
-			}
-		}
-	}
-}
-
-extension FactorSource {
-	public mutating func increaseNextDerivationIndex(
-		for entityKind: EntityKind,
-		networkID: NetworkID
-	) throws {
-		switch self {
-		case var .device(deviceFactorSource):
-			deviceFactorSource.nextDerivationIndicesPerNetwork?.increaseNextDerivationIndex(for: entityKind, networkID: networkID)
-			self = deviceFactorSource.embed()
-		case var .ledger(ledger): // FIXME: Post-MFA remove this
-			ledger.nextDerivationIndicesPerNetwork?.increaseNextDerivationIndex(for: entityKind, networkID: networkID)
-			self = ledger.embed()
-		default:
-			throw DisrepancyFactorSourceWrongKind(expected: .device, actual: kind)
 		}
 	}
 }

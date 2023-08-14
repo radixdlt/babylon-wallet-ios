@@ -193,9 +193,11 @@ package.addModules([
 		name: "DerivePublicKeysFeature",
 		featureSuffixDroppedFromFolderName: true,
 		dependencies: [
+			"AccountsClient",
+			"DeviceFactorSourceClient",
 			"FactorSourcesClient",
 			"LedgerHardwareWalletClient",
-			"DeviceFactorSourceClient",
+			"PersonasClient",
 		],
 		tests: .no
 	),

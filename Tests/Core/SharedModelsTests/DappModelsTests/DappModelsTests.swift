@@ -6,7 +6,7 @@ import TestingPrelude
 final class ToDappResponseTests: TestCase {
 	let decoder: JSONDecoder = {
 		let decoder = JSONDecoder()
-		decoder.userInfo[.networkIdKey] = NetworkID.default.rawValue
+		decoder.userInfo[.networkIdKey] = Radix.Gateway.default.network.id.rawValue
 		return decoder
 	}()
 
@@ -149,7 +149,13 @@ final class ToDappResponseTests: TestCase {
 				items: .transaction(.init(
 					send: .init(
 						version: 1,
-						transactionManifest: .init(instructions: .fromInstructions(instructions: [], networkId: NetworkID.default.rawValue), blobs: []),
+						transactionManifest: .init(
+							instructions: .fromInstructions(
+								instructions: [],
+								networkId: Radix.Gateway.default.network.id.rawValue
+							),
+							blobs: []
+						),
 						message: "MSG"
 					)
 				)),

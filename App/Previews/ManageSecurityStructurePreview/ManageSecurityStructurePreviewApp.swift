@@ -183,9 +183,7 @@ let instabridge = """
 						{
 							"model": "",
 							"name": ""
-						},
-						"nextDerivationIndicesPerNetwork":
-						[]
+						}
 					},
 					"discriminator": "device"
 				}

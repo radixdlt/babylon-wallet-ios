@@ -216,13 +216,6 @@ public struct DeviceFactorSouceView: View {
 	public var body: some View {
 		Labeled("Name", value: deviceFactorSource.hint.name)
 		Labeled("Model", value: deviceFactorSource.hint.model.rawValue)
-
-		if let nextDerivationIndicesPerNetwork = deviceFactorSource.nextDerivationIndicesPerNetwork {
-			NextDerivationIndicesPerNetworkView(
-				nextDerivationIndicesPerNetwork: nextDerivationIndicesPerNetwork,
-				indentation: .init()
-			)
-		}
 	}
 }
 
@@ -243,39 +236,6 @@ public struct OffDeviceMnemonicFactorSourceView: View {
 		Labeled("Language", value: offDeviceMnemonicFactorSource.bip39Parameters.language)
 		Labeled("Passphrase?", value: offDeviceMnemonicFactorSource.bip39Parameters.bip39PassphraseSpecified)
 		Labeled("Label", value: offDeviceMnemonicFactorSource.hint.label)
-	}
-}
-
-// MARK: - NextDerivationIndicesPerNetworkView
-public struct NextDerivationIndicesPerNetworkView: IndentedView {
-	public let nextDerivationIndicesPerNetwork: NextDerivationIndicesPerNetwork
-	public let indentation: Indentation
-
-	public var body: some View {
-		VStack(alignment: .leading, spacing: indentation.spacing) {
-			Text("Next derivation indices per network")
-				.fontWeight(.heavy)
-			#if os(macOS)
-				.font(.title)
-			#endif // os(macOS)
-
-			ForEach(nextDerivationIndicesPerNetwork.networks) { nextIndices in
-				NextDerivationIndicesForNetworkView(nextIndices: nextIndices, indentation: indentation.inOneLevel)
-			}
-		}
-	}
-}
-
-// MARK: - NextDerivationIndicesForNetworkView
-public struct NextDerivationIndicesForNetworkView: IndentedView {
-	public let nextIndices: Profile.Network.NextDerivationIndices
-	public let indentation: Indentation
-	public var body: some View {
-		VStack(alignment: .leading, spacing: indentation.spacing) {
-			Labeled("NetworkID", value: String(describing: nextIndices.networkID))
-			Labeled("    Next index for account", value: String(describing: nextIndices.forAccount))
-			Labeled("    Next index for persona", value: String(describing: nextIndices.forIdentity))
-		}
 	}
 }
 
@@ -685,8 +645,9 @@ extension EntityView {
 	public var body: some View {
 		VStack(alignment: .leading, spacing: indentation.spacing) {
 			Labeled("DisplayName", value: entity.displayName.rawValue)
-
+			Labeled("Index", value: entity.index)
 			Labeled("Address", value: entity.address.address)
+
 			switch entity.securityState {
 			case let .unsecured(unsecuredControl):
 				UnsecuredEntityControlView(

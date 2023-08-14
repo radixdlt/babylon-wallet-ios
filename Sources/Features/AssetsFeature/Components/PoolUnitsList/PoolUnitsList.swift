@@ -5,12 +5,12 @@ public struct PoolUnitsList: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		var lsuResource: LSUResource.State?
 
-		var lpTokens: IdentifiedArrayOf<PoolUnit.State> = []
+		var poolUnits: IdentifiedArrayOf<PoolUnit.State> = []
 	}
 
 	public enum ChildAction: Sendable, Equatable {
 		case lsuResource(LSUResource.Action)
-		case lpTokens(id: PoolUnit.State.ID, action: PoolUnit.Action)
+		case poolUnit(id: PoolUnit.State.ID, action: PoolUnit.Action)
 	}
 
 	public init() {}
@@ -23,18 +23,9 @@ public struct PoolUnitsList: Sendable, FeatureReducer {
 				then: LSUResource.init
 			)
 			.forEach(
-				\.lpTokens,
-				action: /Action.child .. ChildAction.lpTokens,
+				\.poolUnits,
+				action: /Action.child .. ChildAction.poolUnit,
 				element: PoolUnit.init
 			)
-	}
-}
-
-extension PoolUnitsList.State {
-	public static var preview: Self {
-		.init(
-			lsuResource: nil,
-			lpTokens: []
-		)
 	}
 }

@@ -9,6 +9,7 @@ extension Profile.Network.Persona {
 			validatingAddress: "identity_tdx_21_12tljxea3s0mse52jmpvsphr0haqs86sung8d3qlhr763nxttj59650"
 		),
 		securityState: .unsecured(.init(
+			entityIndex: 0,
 			transactionSigning: .init(
 				factorSourceID: .device(hash: "09bfa80bcc9b75d6ad82d59730f7b179cbc668ba6ad4008721d5e6a179ff55f1"),
 				publicKey: .eddsaEd25519(.init(
@@ -28,6 +29,7 @@ extension Profile.Network.Persona {
 			validatingAddress: "identity_tdx_21_12tljxea3s0mse52jmpvsphr0haqs86sung8d3qlhr763nxttj59650"
 		),
 		securityState: .unsecured(.init(
+			entityIndex: 0,
 			transactionSigning: .init(
 				factorSourceID: .device(hash: "09bfa80bcc9b75d6ad82d59730f7b179cbc668ba6ad4008721d5e6a179ff55f1"),
 				publicKey: .eddsaEd25519(.init(
