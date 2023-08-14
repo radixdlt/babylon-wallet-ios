@@ -645,8 +645,9 @@ extension EntityView {
 	public var body: some View {
 		VStack(alignment: .leading, spacing: indentation.spacing) {
 			Labeled("DisplayName", value: entity.displayName.rawValue)
-
+			Labeled("Index", value: entity.index)
 			Labeled("Address", value: entity.address.address)
+
 			switch entity.securityState {
 			case let .unsecured(unsecuredControl):
 				UnsecuredEntityControlView(
