@@ -450,6 +450,8 @@ package.addModules([
 		dependencies: [
 			"SecurityStructureConfigurationListFeature",
 			"TransactionReviewFeature",
+			"DerivePublicKeysFeature",
+			"AccountsClient",
 		],
 		tests: .no
 	),

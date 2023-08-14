@@ -1,3 +1,4 @@
+import AccountsClient
 import FeaturePrelude
 import SecurityStructureConfigurationListFeature
 import TransactionReviewFeature
@@ -46,6 +47,10 @@ public struct UpdateSecurityStateOfEntityCoordinator<Entity: EntityProtocol & Se
 		}
 	}
 
+	public enum InternalAction: Sendable, Equatable {
+		case createFactorBadges(on: NetworkID, with: SecurityStructureConfigurationDetailed)
+	}
+
 	public enum ChildAction: Sendable, Equatable {
 		case root(Path.Action)
 		case path(StackActionOf<Path>)
@@ -55,6 +60,7 @@ public struct UpdateSecurityStateOfEntityCoordinator<Entity: EntityProtocol & Se
 		case appeared
 	}
 
+	@Dependency(\.accountsClient) var accountsClient
 	public init() {}
 
 	public var body: some ReducerProtocolOf<Self> {
@@ -75,11 +81,21 @@ public struct UpdateSecurityStateOfEntityCoordinator<Entity: EntityProtocol & Se
 		}
 	}
 
+	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
+		switch internalAction {
+		case let .createFactorBadges(networkID, structure):
+			state.path.append(.factorInstancesFromFactorSources(.init(structure: structure, networkID: networkID)))
+			return .none
+		}
+	}
+
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
 		case let .root(.selectSecurityStructureConfig(.delegate(.selectedConfig(configDetailed)))):
-			state.path.append(.factorInstancesFromFactorSources(.init(structure: configDetailed)))
-			return .none
+			return .task {
+				let networkID = await accountsClient.getCurrentNetworkID()
+				return .internal(.createFactorBadges(on: networkID, with: configDetailed))
+			}
 		case let .path(.element(id: _, action: .factorInstancesFromFactorSources(.delegate(.done(.success(factorInstancesLevel)))))):
 			let manifest = manifest(for: factorInstancesLevel, entity: state.entity)
 			state.path.append(.securifyEntity(.init(
