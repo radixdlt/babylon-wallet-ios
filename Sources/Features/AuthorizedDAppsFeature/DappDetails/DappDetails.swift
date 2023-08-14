@@ -1,5 +1,6 @@
 import AuthorizedDappsClient
 import CacheClient
+import EngineKit
 import FeaturePrelude
 import GatewayAPI
 import PersonaDetailsFeature
@@ -162,7 +163,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 					try await cacheClient.withCaching(
 						cacheEntry: .dAppMetadata(dAppID.address),
 						request: {
-							try await gatewayAPIClient.getEntityMetadata(dAppID.address)
+							try await gatewayAPIClient.getEntityMetadata(dAppID.address, .dappMetadataKeys)
 						}
 					)
 				}
@@ -216,7 +217,8 @@ public struct DappDetails: Sendable, FeatureReducer {
 
 		case let .personas(.delegate(.openDetails(persona))):
 			guard let detailedPersona = state.dApp.detailedAuthorizedPersonas[id: persona.id] else { return .none }
-			state.destination = .personaDetails(PersonaDetails.State(.dApp(state.dApp, persona: detailedPersona)))
+			let personaDetailsState = PersonaDetails.State(.dApp(state.dApp, persona: detailedPersona))
+			state.destination = .personaDetails(personaDetailsState)
 			return .none
 
 		case .personas:
@@ -268,7 +270,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 		}
 
 		let result = await TaskResult {
-			let allResourceItems = try await gatewayAPIClient.fetchResourceDetails(claimedEntities)
+			let allResourceItems = try await gatewayAPIClient.fetchResourceDetails(claimedEntities, explicitMetadata: .resourceMetadataKeys)
 				.items
 				.filter { $0.metadata.dappDefinition == dAppDefinitionAddress.address }
 				.compactMap(\.resourceDetails)
@@ -303,7 +305,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 		for dApp: DappDefinitionAddress,
 		validating dAppDefinitionAddress: DappDefinitionAddress
 	) async throws -> State.AssociatedDapp {
-		let metadata = try await gatewayAPIClient.getEntityMetadata(dApp.address)
+		let metadata = try await gatewayAPIClient.getEntityMetadata(dApp.address, [.name, .iconURL])
 		// FIXME: Uncomment this when when we can rely on dApps conforming to the standards
 		// .validating(dAppDefinitionAddress: dAppDefinitionAddress)
 		guard let name = metadata.name else {

@@ -1,5 +1,4 @@
 import AppPreferencesClient
-import EngineToolkitClient
 import FactorSourcesClient
 import FeaturePrelude
 import LedgerHardwareWalletClient
@@ -25,7 +24,6 @@ public struct SignWithFactorSourcesOfKindLedger: SignWithFactorSourcesOfKindRedu
 
 	@Dependency(\.ledgerHardwareWalletClient) var ledgerHardwareWalletClient
 	@Dependency(\.appPreferencesClient) var appPreferencesClient
-	@Dependency(\.engineToolkitClient) var engineToolkitClient
 
 	public init() {}
 

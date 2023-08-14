@@ -1,5 +1,6 @@
 import Cryptography
-import EngineToolkit
+
+import EngineKit
 @testable import Profile
 import RadixConnectModels
 import SharedTestingModels
@@ -341,7 +342,7 @@ final class ProfileTests: TestCase {
 			personaData: .init(
 				name: .init(
 					id: .init(uuidString: "00000000-0000-0000-0000-0000000000FF")!,
-					value: .init(given: "Maria", family: "Publicson", variant: .western)
+					value: .init(variant: .western, familyName: "Publicson", givenNames: "Maria", nickname: "Publy")
 				)
 			)
 		)
@@ -722,10 +723,5 @@ extension Profile.Network.AuthorizedDapp.AuthorizedPersonaSimple.SharedPersonaDa
 			postalAddresses: .init(ids: .init(validating: personaData.postalAddresses.map(\.id)), forRequest: .atLeast(1)),
 			creditCards: .init(ids: .init(validating: personaData.creditCards.map(\.id)), forRequest: .atLeast(1))
 		)
-		// The only purpose of this switch is to make sure we get a compilation error when we add a new PersonaData.Entry kind, so
-		// we do not forget to handle it here.
-		switch PersonaData.Entry.Kind.name {
-		case .name, .dateOfBirth, .companyName, .emailAddress, .phoneNumber, .url, .postalAddress, .creditCard: break
-		}
 	}
 }

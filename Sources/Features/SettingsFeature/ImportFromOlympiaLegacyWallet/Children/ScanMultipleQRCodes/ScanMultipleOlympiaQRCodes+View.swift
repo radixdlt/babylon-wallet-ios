@@ -26,19 +26,27 @@ extension ScanMultipleOlympiaQRCodes {
 		}
 
 		public var body: some SwiftUI.View {
-			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-				VStack {
-					if let numberOfPayloadsToScan = viewStore.numberOfPayloadsToScan {
-						Text(L10n.ImportLegacyWallet.scannedLabel(viewStore.numberOfPayloadsScanned, numberOfPayloadsToScan))
-					}
-					SwitchStore(store.scope(state: \.step)) {
-						CaseLet(
-							state: /ScanMultipleOlympiaQRCodes.State.Step.scanQR,
-							action: { ScanMultipleOlympiaQRCodes.Action.child(.scanQR($0)) },
-							then: { ScanQRCoordinator.View(store: $0) }
-						)
+			VStack(spacing: 0) {
+				Text(L10n.ImportOlympiaAccounts.ScanQR.title)
+					.textStyle(.sheetTitle)
+					.foregroundColor(.app.gray1)
+					.multilineTextAlignment(.center)
+					.padding(.horizontal, .large2)
+
+				WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
+					if let numberOfPayloadsToScan = viewStore.numberOfPayloadsToScan, numberOfPayloadsToScan > 1 {
+						Text(L10n.ImportOlympiaAccounts.ScanQR.scannedLabel(viewStore.numberOfPayloadsScanned, numberOfPayloadsToScan))
+							.padding(.top, .medium1)
 					}
 				}
+
+				let scanStore = store.scope(state: \.scanQR, action: { .child(.scanQR($0)) })
+				ScanQRCoordinator.View(store: scanStore)
+
+				Spacer(minLength: 0)
+			}
+			.onAppear {
+				ViewStore(store).send(.view(.appeared))
 			}
 		}
 	}

@@ -6,7 +6,7 @@ extension Profile.Network.Persona {
 	public static let previewValue0: Self = try! Self(
 		networkID: .nebunet,
 		address: .init(
-			validatingAddress: "identity_tdx_a_1qwv0unmwmxschqj8sntg6n9eejkrr6yr6fa4ekxazdzqhm6wy5"
+			validatingAddress: "identity_tdx_21_12tljxea3s0mse52jmpvsphr0haqs86sung8d3qlhr763nxttj59650"
 		),
 		securityState: .unsecured(.init(
 			entityIndex: 0,
@@ -19,23 +19,14 @@ extension Profile.Network.Persona {
 				derivationPath: .identityPath(.init(derivationPath: "m/44H/1022H/10H/618H/1460H/0H"))
 			)
 		)),
-		displayName: "Alan",
-		personaData: .init(
-			name: .init(
-				id: .init(uuidString: "00000000-0000-0000-0000-000000000000")!,
-				value: .init(
-					given: "Alan",
-					family: "Turin",
-					variant: .western
-				)
-			)
-		)
+		displayName: "Sato",
+		personaData: .previewValue
 	)
 
 	public static let previewValue1: Self = try! Self(
 		networkID: .nebunet,
 		address: .init(
-			validatingAddress: "identity_tdx_a_1qvlrgnqrvk6tzmg8z6lusprl3weupfkmu52gkfhmncjsnhn0kp"
+			validatingAddress: "identity_tdx_21_12tljxea3s0mse52jmpvsphr0haqs86sung8d3qlhr763nxttj59650"
 		),
 		securityState: .unsecured(.init(
 			entityIndex: 0,
@@ -53,9 +44,10 @@ extension Profile.Network.Persona {
 			name: .init(
 				id: .init(uuidString: "00000000-0000-0000-0000-000000000000")!,
 				value: .init(
-					given: "Rick",
-					family: "Sanchez",
-					variant: .western
+					variant: .western,
+					familyName: "Sanchez",
+					givenNames: "Rick",
+					nickname: "Ricky"
 				)
 			)
 		)

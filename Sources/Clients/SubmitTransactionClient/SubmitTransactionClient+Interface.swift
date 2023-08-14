@@ -1,5 +1,5 @@
 import ClientPrelude
-import EngineToolkit
+import EngineKit
 import GatewayAPI
 
 // MARK: - SubmitTransactionFailure
@@ -44,8 +44,8 @@ extension SubmitTransactionClient {
 // MARK: - SubmitTXRequest
 public struct SubmitTXRequest: Sendable, Hashable {
 	public let txID: TXID
-	public let compiledNotarizedTXIntent: CompileNotarizedTransactionIntentResponse
-	public init(txID: TXID, compiledNotarizedTXIntent: CompileNotarizedTransactionIntentResponse) {
+	public let compiledNotarizedTXIntent: [UInt8]
+	public init(txID: TXID, compiledNotarizedTXIntent: [UInt8]) {
 		self.txID = txID
 		self.compiledNotarizedTXIntent = compiledNotarizedTXIntent
 	}

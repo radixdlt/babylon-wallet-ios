@@ -1,6 +1,7 @@
 import AccountPreferencesFeature
 import AssetsFeature
 import AssetTransferFeature
+import EngineKit
 import FeaturePrelude
 
 extension AccountDetails.State {

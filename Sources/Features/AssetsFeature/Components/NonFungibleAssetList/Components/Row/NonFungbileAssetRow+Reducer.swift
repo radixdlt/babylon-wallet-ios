@@ -1,3 +1,4 @@
+import EngineKit
 import FeaturePrelude
 
 extension NonFungibleAssetList {
@@ -29,7 +30,7 @@ extension NonFungibleAssetList {
 		}
 
 		public enum DelegateAction: Sendable, Equatable {
-			case open(AccountPortfolio.NonFungibleResource.NonFungibleToken.LocalID)
+			case open(NonFungibleGlobalId)
 		}
 
 		public init() {}

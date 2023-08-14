@@ -1,4 +1,4 @@
-import EngineToolkit
+import EngineKit
 import Prelude
 
 extension P2P.Dapp.Response.WalletInteractionSuccessResponse {
@@ -9,8 +9,20 @@ extension P2P.Dapp.Response.WalletInteractionSuccessResponse {
 	public struct SendTransactionResponseItem: Sendable, Hashable, Encodable {
 		public let transactionIntentHash: TXID
 
+		enum CodingKeys: CodingKey {
+			case transactionIntentHash
+		}
+
 		public init(txID: TXID) {
 			transactionIntentHash = txID
+		}
+
+		public func encode(to encoder: Encoder) throws {
+			var container = encoder.container(keyedBy: CodingKeys.self)
+			try container.encode(
+				transactionIntentHash.hex,
+				forKey: .transactionIntentHash
+			)
 		}
 	}
 }

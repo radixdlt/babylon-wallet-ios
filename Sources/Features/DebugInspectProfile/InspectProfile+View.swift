@@ -465,11 +465,9 @@ public struct DappAuthorizedPersonaView: IndentedView {
 
 				if let name = sharedPersonaData.name {
 					Text("Name")
-					Labeled("Given", value: name.value.given)
-					if let middle = name.value.middle {
-						Labeled("Middle", value: middle)
-					}
-					Labeled("Family", value: name.value.family)
+					Labeled(L10n.AuthorizedDapps.PersonaDetails.givenName, value: name.value.givenNames)
+					Labeled(L10n.AuthorizedDapps.PersonaDetails.nickname, value: name.value.nickname)
+					Labeled(L10n.AuthorizedDapps.PersonaDetails.nameFamily, value: name.value.familyName)
 					Labeled("id", value: name.id)
 				}
 
@@ -485,7 +483,7 @@ public struct DappAuthorizedPersonaView: IndentedView {
 					Labeled("id", value: email.id)
 				}
 
-				Text("Phonen umbers")
+				Text("Phonenumbers")
 				ForEach(sharedPersonaData.phoneNumbers) { phone in
 					Labeled("Value", value: phone.value.number)
 					Labeled("id", value: phone.id)

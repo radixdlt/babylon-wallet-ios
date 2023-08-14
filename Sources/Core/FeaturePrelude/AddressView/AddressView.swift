@@ -1,3 +1,4 @@
+import EngineKit
 import GatewaysClient
 import Prelude
 import QRGeneratorClient
@@ -57,9 +58,7 @@ extension AddressView {
 	}
 
 	private var tappableAddressView: some View {
-		Button {
-			tapAction()
-		} label: {
+		Button(action: tapAction) {
 			HStack(spacing: .small3) {
 				addressView
 				image

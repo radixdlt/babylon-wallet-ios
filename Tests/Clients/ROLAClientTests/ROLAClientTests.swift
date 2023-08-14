@@ -1,7 +1,7 @@
 import CacheClient
 import ClientTestingPrelude
 import Cryptography
-import EngineToolkit
+import EngineKit
 import GatewayAPI
 @testable import ROLAClient
 
@@ -71,12 +71,16 @@ final class ROLAClientTests: TestCase {
 	}
 
 	func omit_test_generate_rola_payload_hash_vectors() throws {
-		let origins: [P2P.Dapp.Request.Metadata.Origin] = try ["https://dashboard.rdx.works", "https://stella.swap", "https://rola.xrd"].map { try .init(string: $0) }
+		let origins: [P2P.Dapp.Request.Metadata.Origin] = try [
+			"https://dashboard.rdx.works",
+			"https://stella.swap",
+			"https://rola.xrd",
+		].map { try .init(string: $0) }
 		let accounts: [DappDefinitionAddress] = try [
-			.init(validatingAddress: "account_rdx168fghy4kapzfnwpmq7t7753425lwklk65r82ys7pz2xzleehk2ap0k"),
-			.init(validatingAddress: "account_rdx12xsvygvltz4uhsht6tdrfxktzpmnl77r0d40j8agmujgdj022sudkk"),
-			.init(validatingAddress: "account_rdx168e8u653alt59xm8ple6khu6cgce9cfx9mlza6wxf7qs3wwdh0pwrf"),
-		]
+			"account_sim1cyvgx33089ukm2pl97pv4max0x40ruvfy4lt60yvya744cve475w0q",
+			"account_sim1cyzfj6p254jy6lhr237s7pcp8qqz6c8ahq9mn6nkdjxxxat5syrgz9",
+			"account_sim168gge5mvjmkc7q4suyt3yddgk0c7yd5z6g662z4yc548cumw8nztch",
+		].map { try .init(validatingAddress: $0) }
 		let vectors: [TestVector] = try origins.flatMap { origin -> [TestVector] in
 			try accounts.flatMap { dAppDefinitionAddress -> [TestVector] in
 				try (UInt8.zero ..< 10).map { seed -> TestVector in
@@ -164,13 +168,13 @@ final class ROLAClientTests: TestCase {
 		let metadata = metadata(origin: origin, dAppDefinitionAddress: dAppDefinitionAddress)
 		let accountType = "dapp definition"
 		let metadataCollection = GatewayAPI.EntityMetadataCollection(items: [
-			.init(key: "account_type", value: .init(rawHex: "", rawJson: .nil, asString: accountType), lastUpdatedAtStateVersion: 0),
-			.init(key: "related_websites", value: .init(rawHex: "", rawJson: .nil, asString: origin), lastUpdatedAtStateVersion: 0),
+			.init(key: "account_type", value: .init(rawHex: "", rawJson: "", typed: .stringValue(.init(type: .string, value: accountType))), isLocked: false, lastUpdatedAtStateVersion: 0),
+			.init(key: "related_websites", value: .init(rawHex: "", rawJson: "", typed: .stringValue(.init(type: .string, value: origin))), isLocked: false, lastUpdatedAtStateVersion: 0),
 		])
 
 		// when
 		try await withDependencies {
-			$0.gatewayAPIClient.getEntityMetadata = { _ in metadataCollection }
+			$0.gatewayAPIClient.getEntityMetadata = { _, _ in metadataCollection }
 			$0.cacheClient.load = { _, _ in throw CacheClient.Error.dataLoadingFailed }
 			$0.cacheClient.save = { _, _ in }
 		} operation: {
@@ -185,15 +189,15 @@ final class ROLAClientTests: TestCase {
 		let wrongAccountType = "wrong account type"
 
 		let metadataCollection = GatewayAPI.EntityMetadataCollection(items: [
-			.init(key: "account_type", value: .init(rawHex: "", rawJson: .nil, asString: wrongAccountType), lastUpdatedAtStateVersion: 0),
-			.init(key: "related_websites", value: .init(rawHex: "", rawJson: .nil, asString: origin), lastUpdatedAtStateVersion: 0),
+			.init(key: "account_type", value: .init(rawHex: "", rawJson: "", typed: .stringValue(.init(type: .string, value: wrongAccountType))), isLocked: false, lastUpdatedAtStateVersion: 0),
+			.init(key: "related_websites", value: .init(rawHex: "", rawJson: "", typed: .stringValue(.init(type: .string, value: origin))), isLocked: false, lastUpdatedAtStateVersion: 0),
 		])
 
 		let expectedError = ROLAFailure.wrongAccountType
 
 		// when
 		await withDependencies {
-			$0.gatewayAPIClient.getEntityMetadata = { _ in metadataCollection }
+			$0.gatewayAPIClient.getEntityMetadata = { _, _ in metadataCollection }
 			$0.cacheClient.load = { _, _ in throw CacheClient.Error.dataLoadingFailed }
 			$0.cacheClient.save = { _, _ in }
 		} operation: {
@@ -214,15 +218,15 @@ final class ROLAClientTests: TestCase {
 		let accountType = "dapp definition"
 
 		let metadataCollection = GatewayAPI.EntityMetadataCollection(items: [
-			.init(key: "account_type", value: .init(rawHex: "", rawJson: .nil, asString: accountType), lastUpdatedAtStateVersion: 0),
-			.init(key: "related_websites", value: .init(rawHex: "", rawJson: .nil, asString: origin), lastUpdatedAtStateVersion: 0),
+			.init(key: "account_type", value: .init(rawHex: "", rawJson: "", typed: .stringValue(.init(type: .string, value: accountType))), isLocked: false, lastUpdatedAtStateVersion: 0),
+			.init(key: "related_websites", value: .init(rawHex: "", rawJson: "", typed: .stringValue(.init(type: .string, value: origin))), isLocked: false, lastUpdatedAtStateVersion: 0),
 		])
 
 		let expectedError = ROLAFailure.unknownWebsite
 
 		// when
 		await withDependencies {
-			$0.gatewayAPIClient.getEntityMetadata = { _ in metadataCollection }
+			$0.gatewayAPIClient.getEntityMetadata = { _, _ in metadataCollection }
 			$0.cacheClient.load = { _, _ in throw CacheClient.Error.dataLoadingFailed }
 			$0.cacheClient.save = { _, _ in }
 		} operation: {

@@ -1,7 +1,7 @@
 import ClientPrelude
 import Cryptography
 import DeviceFactorSourceClient
-import EngineToolkitClient
+import EngineKit
 import GatewayAPI
 import GatewaysClient
 import SubmitTransactionClient
@@ -16,7 +16,6 @@ extension FaucetClient: DependencyKey {
 	public static let liveValue: Self = {
 		@Dependency(\.userDefaultsClient) var userDefaultsClient
 		@Dependency(\.gatewaysClient) var gatewaysClient
-		@Dependency(\.engineToolkitClient) var engineToolkitClient
 
 		// Return `nil` for `not allowed to use` else: return `some` for `is alllowed to use`
 		@Sendable func isAllowedToUseFaucetIfSoGetEpochs(accountAddress: AccountAddress) async -> (epochs: EpochForWhenLastUsedByAccountAddress, current: Epoch?)? {
@@ -48,7 +47,6 @@ extension FaucetClient: DependencyKey {
 			manifest: TransactionManifest
 		) async throws {
 			@Dependency(\.transactionClient) var transactionClient
-			@Dependency(\.engineToolkitClient) var engineToolkitClient
 			@Dependency(\.submitTXClient) var submitTXClient
 
 			let networkID = await gatewaysClient.getCurrentNetworkID()
@@ -59,7 +57,7 @@ extension FaucetClient: DependencyKey {
 				.init(
 					networkID: networkID,
 					manifest: manifest,
-					nonce: engineToolkitClient.generateTXNonce(),
+					message: .none,
 					isFaucetTransaction: true,
 					ephemeralNotaryPublicKey: ephemeralNotary.publicKey
 				)
@@ -94,10 +92,10 @@ extension FaucetClient: DependencyKey {
 			}
 
 			let networkID = await gatewaysClient.getCurrentNetworkID()
-			let manifest = try engineToolkitClient.manifestForFaucet(
+			let manifest = try TransactionManifest.manifestForFaucet(
 				includeLockFeeInstruction: true,
 				networkID: networkID,
-				accountAddress: accountAddress
+				componentAddress: accountAddress.asGeneral()
 			)
 
 			try await signSubmitTX(manifest: manifest)
@@ -120,17 +118,14 @@ extension FaucetClient: DependencyKey {
 			let networkID = await gatewaysClient.getCurrentNetworkID()
 			let manifest = try {
 				if request.numberOfTokens == 1 {
-					return try engineToolkitClient.manifestForCreateFungibleToken(
-						networkID: networkID,
-						accountAddress: request.recipientAccountAddress,
-						tokenName: request.name,
-						tokenSymbol: request.symbol
+					return try TransactionManifest.manifestForCreateFungibleToken(
+						account: request.recipientAccountAddress,
+						network: networkID
 					)
 				} else {
-					return try engineToolkitClient.manifestForMultipleCreateFungibleToken(
-						networkID: networkID,
-						accountAddress: request.recipientAccountAddress,
-						tokensCount: request.numberOfTokens
+					return try TransactionManifest.manifestForCreateMultipleFungibleTokens(
+						account: request.recipientAccountAddress,
+						network: networkID
 					)
 				}
 			}()
@@ -142,17 +137,14 @@ extension FaucetClient: DependencyKey {
 			let networkID = await gatewaysClient.getCurrentNetworkID()
 			let manifest = try {
 				if request.numberOfTokens == 1 {
-					return try engineToolkitClient.manifestForCreateNonFungibleToken(
-						networkID: networkID,
-						accountAddress: request.recipientAccountAddress,
-						nftName: request.name
+					return try TransactionManifest.manifestForCreateNonFungibleToken(
+						account: request.recipientAccountAddress,
+						network: networkID
 					)
 				} else {
-					return try engineToolkitClient.manifestForCreateMultipleNonFungibleToken(
-						networkID: networkID,
-						accountAddress: request.recipientAccountAddress,
-						tokensCount: request.numberOfTokens,
-						idsCount: request.numberOfIds
+					return try TransactionManifest.manifestForCreateMultipleNonFungibleTokens(
+						account: request.recipientAccountAddress,
+						network: networkID
 					)
 				}
 			}()

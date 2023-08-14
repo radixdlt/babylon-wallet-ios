@@ -1,5 +1,6 @@
 import ClientPrelude
-import Profile
+import EngineKit
+import struct Profile.Signer
 
 // MARK: - FactorSourcesClient
 public struct FactorSourcesClient: Sendable {

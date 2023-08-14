@@ -1,4 +1,3 @@
-import EditPersonaFeature
 import FeaturePrelude
 
 // MARK: - PersonaList.View

@@ -17,7 +17,6 @@ public struct LedgerHardwareDevices: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public enum Context: Sendable, Hashable {
 			case settings
-			case importOlympia
 			case createHardwareAccount
 			case setupMFA
 		}
@@ -75,7 +74,7 @@ public struct LedgerHardwareDevices: Sendable, FeatureReducer {
 
 	public struct Destinations: Sendable, ReducerProtocol {
 		public enum State: Sendable, Hashable {
-			case noP2PLink(AlertState<Action.NoP2PLinkAlert>)
+			case noP2PLink(AlertState<NoP2PLinkAlert>)
 			case addNewP2PLink(NewConnection.State)
 			case addNewLedger(AddLedgerFactorSource.State)
 		}
@@ -84,11 +83,6 @@ public struct LedgerHardwareDevices: Sendable, FeatureReducer {
 			case noP2PLink(NoP2PLinkAlert)
 			case addNewP2PLink(NewConnection.Action)
 			case addNewLedger(AddLedgerFactorSource.Action)
-
-			public enum NoP2PLinkAlert: Sendable, Hashable {
-				case addNewP2PLinkTapped
-				case cancelTapped
-			}
 		}
 
 		public var body: some ReducerProtocolOf<Self> {
@@ -248,8 +242,14 @@ public struct LedgerHardwareDevices: Sendable, FeatureReducer {
 	}
 }
 
-extension AlertState<LedgerHardwareDevices.Destinations.Action.NoP2PLinkAlert> {
-	static var noP2Plink: AlertState {
+// MARK: - NoP2PLinkAlert
+public enum NoP2PLinkAlert: Sendable, Hashable {
+	case addNewP2PLinkTapped
+	case cancelTapped
+}
+
+extension AlertState<NoP2PLinkAlert> {
+	public static var noP2Plink: AlertState {
 		AlertState {
 			TextState(L10n.LedgerHardwareDevices.LinkConnectorAlert.title)
 		} actions: {

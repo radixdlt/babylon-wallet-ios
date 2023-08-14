@@ -18,7 +18,7 @@ final class MainFeatureTests: TestCase {
 		}
 
 		// when
-		await store.send(.child(.destination(.presented(.settings(.delegate(.dismiss)))))) {
+		await store.send(.child(.destination(.dismiss))) {
 			// then
 			$0.destination = nil
 		}

@@ -1,3 +1,6 @@
+import EngineKit
+import Prelude
+
 // MARK: - LedgerIdentifiable
 public enum LedgerIdentifiable: Sendable {
 	case address(Address)
@@ -24,15 +27,15 @@ public enum LedgerIdentifiable: Sendable {
 
 extension LedgerIdentifiable {
 	public enum Identifier: Sendable {
-		case transaction(TransactionIntent.TXID)
-		case nonFungibleGlobalID(AccountPortfolio.NonFungibleResource.GlobalID)
+		case transaction(TXID)
+		case nonFungibleGlobalID(NonFungibleGlobalId)
 
 		public var address: String {
 			switch self {
 			case let .transaction(txId):
-				return txId.rawValue
+				return txId.hex
 			case let .nonFungibleGlobalID(nonFungibleGlobalId):
-				return nonFungibleGlobalId
+				return nonFungibleGlobalId.asStr()
 			}
 		}
 
@@ -51,6 +54,7 @@ extension LedgerIdentifiable {
 		case package(PackageAddress)
 		case resource(ResourceAddress)
 		case component(ComponentAddress)
+		case validator(ValidatorAddress)
 
 		public var address: String {
 			switch self {
@@ -62,6 +66,8 @@ extension LedgerIdentifiable {
 				return resourceAddress.address
 			case let .component(componentAddress):
 				return componentAddress.address
+			case let .validator(validatorAddress):
+				return validatorAddress.address
 			}
 		}
 
@@ -74,6 +80,8 @@ extension LedgerIdentifiable {
 			case .resource:
 				return "resource"
 			case .component:
+				return "component"
+			case .validator:
 				return "component"
 			}
 		}

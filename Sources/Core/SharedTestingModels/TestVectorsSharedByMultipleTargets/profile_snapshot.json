@@ -204,7 +204,7 @@
       "description" : "computer unit test",
       "id" : "BABE1442-3C98-41FF-AFB0-D0F5829B020D"
     },
-    "snapshotVersion" : 41
+    "snapshotVersion" : 42
   },
   "networks" : [
     {
@@ -531,9 +531,9 @@
             "name" : {
               "id" : "00000000-0000-0000-0000-000000000000",
               "value" : {
-                "family" : "Nakamoto",
-                "given" : "Satoshi",
-                "middle" : "Creator of Bitcoin",
+                "familyName" : "Nakamoto",
+                "givenNames" : "Satoshi",
+                "nickname" : "Bitcoin",
                 "variant" : "eastern"
               }
             },
@@ -689,8 +689,9 @@
             "name" : {
               "id" : "00000000-0000-0000-0000-0000000000FF",
               "value" : {
-                "family" : "Publicson",
-                "given" : "Maria",
+                "familyName" : "Publicson",
+                "givenNames" : "Maria",
+                "nickname" : "Publy",
                 "variant" : "western"
               }
             },

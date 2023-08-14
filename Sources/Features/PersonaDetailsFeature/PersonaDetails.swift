@@ -1,6 +1,7 @@
 import AuthorizedDappsClient
 import CreateAuthKeyFeature
 import EditPersonaFeature
+import EngineKit
 import FeaturePrelude
 import GatewayAPI
 
@@ -106,7 +107,7 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 
 	public struct Destination: ReducerProtocol {
 		public enum State: Hashable {
-//			case editPersona(EditPersona.State)
+			case editPersona(EditPersona.State)
 			case createAuthKey(CreateAuthKey.State)
 			case dAppDetails(SimpleAuthDappDetails.State)
 
@@ -114,7 +115,7 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 		}
 
 		public enum Action: Equatable {
-//			case editPersona(EditPersona.Action)
+			case editPersona(EditPersona.Action)
 			case createAuthKey(CreateAuthKey.Action)
 			case dAppDetails(SimpleAuthDappDetails.Action)
 
@@ -127,9 +128,9 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 		}
 
 		public var body: some ReducerProtocolOf<Self> {
-//			Scope(state: /State.editPersona, action: /Action.editPersona) {
-//				EditPersona()
-//			}
+			Scope(state: /State.editPersona, action: /Action.editPersona) {
+				EditPersona()
+			}
 			Scope(state: /State.createAuthKey, action: /Action.createAuthKey) {
 				CreateAuthKey()
 			}
@@ -150,15 +151,15 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
-//		case let .destination(.presented(.editPersona(.delegate(.personaSaved(persona))))):
-//			guard persona.id == state.mode.id else { return .none }
-//			return .run { [mode = state.mode] send in
-//				let updated = try await reload(in: mode)
-//				await send(.internal(.reloaded(updated)))
-//				await send(.delegate(.personaChanged(persona.id)))
-//			} catch: { error, _ in
-//				loggerGlobal.error("Failed to reload, error: \(error)")
-//			}
+		case let .destination(.presented(.editPersona(.delegate(.personaSaved(persona))))):
+			guard persona.id == state.mode.id else { return .none }
+			return .run { [mode = state.mode] send in
+				let updated = try await reload(in: mode)
+				await send(.internal(.reloaded(updated)))
+				await send(.delegate(.personaChanged(persona.id)))
+			} catch: { error, _ in
+				loggerGlobal.error("Failed to reload, error: \(error)")
+			}
 
 		case .destination(.presented(.confirmForgetAlert(.confirmTapped))):
 			guard case let .dApp(dApp, persona: persona) = state.mode else {
@@ -250,16 +251,16 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 			return .none
 
 		case let .editablePersonaFetched(persona):
-//			switch state.mode {
-//			case .general:
-//				state.destination = .editPersona(.init(mode: .edit, persona: persona))
-//			case let .dApp(_, detailedPersona):
-//				let fieldIDs = (detailedPersona.sharedFields ?? []).ids
-//				state.destination = .editPersona(.init(mode: .dapp(requiredFieldIDs: Set(fieldIDs)), persona: persona))
-//			}
-//
-//			return .none
-			fatalError()
+			switch state.mode {
+			case .general:
+				state.destination = .editPersona(.init(mode: .edit, persona: persona))
+			case let .dApp(_, detailedPersona):
+				// TODO: This should be tested
+				let required = Set(detailedPersona.sharedPersonaData.entries.map(\.value.discriminator))
+				state.destination = .editPersona(.init(mode: .dapp(requiredEntries: required), persona: persona))
+			}
+
+			return .none
 
 		case let .dAppsUpdated(dApps):
 			guard case let .general(persona, _) = state.mode else { return .none }
@@ -456,7 +457,7 @@ public struct SimpleAuthDappDetails: Sendable, FeatureReducer {
 					try await cacheClient.withCaching(
 						cacheEntry: .dAppMetadata(dAppID.address),
 						request: {
-							try await gatewayAPIClient.getEntityMetadata(dAppID.address)
+							try await gatewayAPIClient.getEntityMetadata(dAppID.address, .dappMetadataKeys)
 						}
 					)
 				}
@@ -504,7 +505,7 @@ public struct SimpleAuthDappDetails: Sendable, FeatureReducer {
 		}
 
 		let result = await TaskResult {
-			let allResourceItems = try await gatewayAPIClient.fetchResourceDetails(claimedEntities)
+			let allResourceItems = try await gatewayAPIClient.fetchResourceDetails(claimedEntities, explicitMetadata: .resourceMetadataKeys)
 				.items
 				// FIXME: Uncomment this when when we can rely on dApps conforming to the standards
 				// .filter { $0.metadata.dappDefinition == dAppDefinitionAddress.address }
@@ -542,7 +543,7 @@ public struct SimpleAuthDappDetails: Sendable, FeatureReducer {
 		for dApp: DappDefinitionAddress,
 		validating dAppDefinitionAddress: DappDefinitionAddress
 	) async throws -> State.AssociatedDapp {
-		let metadata = try await gatewayAPIClient.getEntityMetadata(dApp.address)
+		let metadata = try await gatewayAPIClient.getEntityMetadata(dApp.address, [.name, .iconURL])
 		// FIXME: Uncomment this when when we can rely on dApps conforming to the standards
 		// .validating(dAppDefinitionAddress: dAppDefinitionAddress)
 		guard let name = metadata.name else {

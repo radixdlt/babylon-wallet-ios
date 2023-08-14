@@ -113,7 +113,10 @@ extension AccountPreferences {
 							state: /AccountPreferences.Destination.State.reviewTransactionTurningAccountIntoDappDefType,
 							action: AccountPreferences.Destination.Action.reviewTransactionTurningAccountIntoDappDefType
 						) { store in
-							TransactionReview.View(store: store)
+							// FIXME: Should use DappInteractionClient intstead to schedule a transaction
+							NavigationView {
+								TransactionReview.View(store: store)
+							}
 						}
 					#endif // DEBUG
 					#if os(iOS)

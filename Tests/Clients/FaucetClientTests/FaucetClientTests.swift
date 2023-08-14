@@ -1,12 +1,13 @@
 import ClientTestingPrelude
 import CryptoKit
+import EngineKit
 @testable import FaucetClient
 import TransactionClient
 
 // MARK: - FaucetClientTests
 final class FaucetClientTests: TestCase {
-	let acco0 = try! AccountAddress(validatingAddress: "account_sim1cyvgx33089ukm2pl97pv4max0x40ruvfy4lt60yvya744cve475w0q")
-	let acco1 = try! AccountAddress(validatingAddress: "account_sim1cyzfj6p254jy6lhr237s7pcp8qqz6c8ahq9mn6nkdjxxxat5syrgz9")
+	let acco0 = try! AccountAddress(validatingAddress: "account_tdx_21_12ya9jylskaa6gdrfr8nvve3pfc6wyhyw7eg83fwlc7fv2w0eanumcd")
+	let acco1 = try! AccountAddress(validatingAddress: "account_tdx_21_12xg7tf7aup8lrxkvug0vzatntzww0c6jnntyj6yd4eg5920kpxpzvt")
 
 	func test_json_encoding_of_EpochForWhenLastUsedByAccountAddress() throws {
 		var epochs = EpochForWhenLastUsedByAccountAddress()
@@ -19,11 +20,11 @@ final class FaucetClientTests: TestCase {
 				"epochForAccounts": [
 					[
 						"epoch": 2,
-						"accountAddress": "account_sim1cyvgx33089ukm2pl97pv4max0x40ruvfy4lt60yvya744cve475w0q",
+						"accountAddress": "account_tdx_21_12ya9jylskaa6gdrfr8nvve3pfc6wyhyw7eg83fwlc7fv2w0eanumcd",
 					],
 					[
 						"epoch": 5,
-						"accountAddress": "account_sim1cyzfj6p254jy6lhr237s7pcp8qqz6c8ahq9mn6nkdjxxxat5syrgz9",
+						"accountAddress": "account_tdx_21_12xg7tf7aup8lrxkvug0vzatntzww0c6jnntyj6yd4eg5920kpxpzvt",
 					],
 				],
 			]
@@ -35,11 +36,11 @@ final class FaucetClientTests: TestCase {
 			"epochForAccounts": [
 				[
 					"epoch": 2,
-					"accountAddress": "account_sim1cyvgx33089ukm2pl97pv4max0x40ruvfy4lt60yvya744cve475w0q",
+					"accountAddress": "account_tdx_21_12ya9jylskaa6gdrfr8nvve3pfc6wyhyw7eg83fwlc7fv2w0eanumcd",
 				],
 				[
 					"epoch": 5,
-					"accountAddress": "account_sim1cyzfj6p254jy6lhr237s7pcp8qqz6c8ahq9mn6nkdjxxxat5syrgz9",
+					"accountAddress": "account_tdx_21_12xg7tf7aup8lrxkvug0vzatntzww0c6jnntyj6yd4eg5920kpxpzvt",
 				],
 			],
 		]
@@ -77,7 +78,7 @@ final class FaucetClientTests: TestCase {
 				],
 				[
 					"epoch": 5,
-					"accountAddress": "account_tdx_b_1ppvvvxm3mpk2cja05fwhpmev0ylsznqfqhlewnrxg5gqmpswhu",
+					"accountAddress": "account_tdx_21_12xg7tf7aup8lrxkvug0vzatntzww0c6jnntyj6yd4eg5920kpxpzvt",
 				],
 			],
 		]
@@ -100,7 +101,7 @@ final class FaucetClientTests: TestCase {
 				],
 				[
 					"epoch": 5,
-					"accountAddress": "account_tdx_b_1ppvvvxm3mpk2cja05fwhpmev0ylsznqfqhlewnrxg5gqmpswhu",
+					"accountAddress": "account_tdx_21_12xg7tf7aup8lrxkvug0vzatntzww0c6jnntyj6yd4eg5920kpxpzvt",
 				],
 			],
 		]
@@ -123,7 +124,7 @@ final class FaucetClientTests: TestCase {
 				],
 				[
 					"epoch": 5,
-					"accountAddress": "account_sim1cyzfj6p254jy6lhr237s7pcp8qqz6c8ahq9mn6nkdjxxxat5syrgz9",
+					"accountAddress": "account_tdx_21_12xg7tf7aup8lrxkvug0vzatntzww0c6jnntyj6yd4eg5920kpxpzvt",
 				],
 			],
 		]
@@ -146,7 +147,7 @@ final class FaucetClientTests: TestCase {
 				],
 				[
 					"epoch": 5,
-					"accountAddress": "account_sim1cyzfj6p254jy6lhr237s7pcp8qqz6c8ahq9mn6nkdjxxxat5syrgz9",
+					"accountAddress": "account_tdx_21_12xg7tf7aup8lrxkvug0vzatntzww0c6jnntyj6yd4eg5920kpxpzvt",
 				],
 			],
 		]
@@ -155,9 +156,12 @@ final class FaucetClientTests: TestCase {
 			.init(accountAddress: acco0, epoch: currentEpoch),
 			.init(accountAddress: acco1, epoch: 5),
 		])
+
+		let hash = try TransactionHash.fromStr(string: "txid_tdx_d_1pycj4pzxu9fc9x4qxflu63x7fmmal2raafd3wj9vea9nr5wy84dqsdq4cj", networkId: NetworkID.ansharnet.rawValue)
+
 		try await withDependencies {
 			$0.gatewayAPIClient.getEpoch = { currentEpoch }
-			$0.submitTXClient.submitTransaction = { _ in .init("mocked_txid") }
+			$0.submitTXClient.submitTransaction = { _ in hash }
 			$0.transactionClient.buildTransactionIntent = { _ in
 				TransactionIntentWithSigners(
 					intent: .previewValue,
@@ -167,12 +171,9 @@ final class FaucetClientTests: TestCase {
 					)
 				)
 			}
-			$0.engineToolkitClient.generateTXNonce = { .init(0xDEAD) }
-			$0.engineToolkitClient.compileTransactionIntent = { _ in try .init(compiledIntentHex: "") }
-			$0.transactionClient.notarizeTransaction = { _ in NotarizeTransactionResponse(notarized: .init(compiledIntent: []), txID: .init("mocked_txid")) }
+			$0.transactionClient.notarizeTransaction = { _ in try NotarizeTransactionResponse(notarized: .init([]), txID: hash) }
 			$0.submitTXClient.hasTXBeenCommittedSuccessfully = { _ in }
-			$0.gatewaysClient.getCurrentGateway = { .nebunet }
-			$0.engineToolkitClient.knownEntityAddresses = { _ in KnownEntityAddressesResponse.previewValue }
+			$0.gatewaysClient.getCurrentGateway = { .enkinet }
 			$0.userDefaultsClient.dataForKey = { _ in json.data }
 			$0.userDefaultsClient.setData = { maybeData, key in
 				do {
@@ -198,22 +199,22 @@ extension Curve25519.Signing.PublicKey {
 	static let previewValue = try! Self(rawRepresentation: Data(hex: "573c0dc84196cb4a7dc8ddff1e92a859c98635a64ef5fe0bcf5c7fe5a7dab3e4"))
 }
 
-extension Engine.EddsaEd25519PublicKey {
-	static let previewValue = Self(bytes: Array(Curve25519.Signing.PublicKey.previewValue.rawRepresentation))
-}
+// extension Engine.EddsaEd25519PublicKey {
+//	static let previewValue = Self(bytes: Array(Curve25519.Signing.PublicKey.previewValue.rawRepresentation))
+// }
 
 extension TransactionHeader {
 	static let previewValue = Self(
-		networkId: .kisharnet,
+		networkId: NetworkID.enkinet.rawValue,
 		startEpochInclusive: 0,
 		endEpochExclusive: 1,
 		nonce: 0,
-		publicKey: .eddsaEd25519(.previewValue),
+		notaryPublicKey: .ed25519(value: Array(Curve25519.Signing.PublicKey.previewValue.rawRepresentation)),
 		notaryIsSignatory: true,
 		tipPercentage: 0
 	)
 }
 
 extension TransactionIntent {
-	static let previewValue = Self(header: .previewValue, manifest: TransactionManifest(instructions: ManifestInstructions.parsed([])))
+	static let previewValue = try! TransactionIntent(header: .previewValue, manifest: TransactionManifest(instructions: .fromInstructions(instructions: [], networkId: NetworkID.kisharnet.rawValue), blobs: []), message: .none)
 }

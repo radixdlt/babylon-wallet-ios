@@ -4,9 +4,9 @@ import Prelude
 extension PersonaData {
 	public struct Name: Sendable, Hashable, Codable, PersonaDataEntryProtocol, CustomStringConvertible {
 		public static var casePath: CasePath<PersonaData.Entry, Self> = /PersonaData.Entry.name
-		public static var kind = PersonaData.Entry.Kind.name
+		public static var kind = PersonaData.Entry.Kind.fullName
 
-		public enum Variant: String, Sendable, Hashable, Codable {
+		public enum Variant: String, Sendable, Hashable, Codable, CaseIterable {
 			/// order: `given middle family`
 			case western
 
@@ -16,30 +16,46 @@ extension PersonaData {
 
 		public let variant: Variant
 
-		/// First/Given/Fore-name, .e.g. `"John"`
-		public let given: String
+		public let familyName: String
 
-		/// Middle name, e.g. `"Fitzgerald"`
-		public let middle: String?
+		public let givenNames: String
 
-		/// Last/Family/Sur-name, .e.g. `"Kennedey"`
-		public let family: String
+		public let nickname: String
 
-		public init(given: String, middle: String? = nil, family: String, variant: Variant) {
-			self.given = given
-			self.middle = middle
-			self.family = family
+		public init(
+			variant: Variant,
+			familyName: String,
+			givenNames: String,
+			nickname: String
+		) {
 			self.variant = variant
+			self.familyName = familyName
+			self.givenNames = givenNames
+			self.nickname = nickname
 		}
 
 		public var description: String {
-			let components: [String?] = {
+			let components: [String] = {
 				switch variant {
-				case .western: return [given, middle, family]
-				case .eastern: return [family, middle, given]
+				case .western: return [givenNames, nickname, familyName]
+				case .eastern: return [familyName, nickname, givenNames]
 				}
 			}()
-			return components.compactMap { $0 }.joined(separator: " ")
+			return components.joined(separator: " ")
+		}
+
+		public var formatted: String {
+			let components: [String] = {
+				switch variant {
+				case .western: return [givenNames, familyName]
+				case .eastern: return [familyName, givenNames]
+				}
+			}()
+
+			let firstLine = components.joined(separator: " ")
+			return """
+			\(firstLine)"\n"\(nickname)
+			"""
 		}
 	}
 }

@@ -14,10 +14,11 @@ struct NFTFullView: View {
 	}
 
 	var body: some View {
-		LoadableImage(url: url, size: .flexible(minAspect: minAspect, maxAspect: maxAspect), loading: .shimmer) {
-			Rectangle()
-				.fill(.app.gray4)
-		}
+		LoadableImage(
+			url: url,
+			size: .flexible(minAspect: minAspect, maxAspect: maxAspect),
+			placeholders: .init(loading: .shimmer)
+		)
 		.cornerRadius(.small1)
 	}
 }
@@ -32,8 +33,12 @@ struct NFTIDView: View {
 	var body: some View {
 		VStack(spacing: .small1) {
 			if let thumbnail {
-				NFTFullView(url: thumbnail, minAspect: minImageAspect, maxAspect: maxImageAspect)
-					.padding(.bottom, .small1)
+				NFTFullView(
+					url: thumbnail,
+					minAspect: minImageAspect,
+					maxAspect: maxImageAspect
+				)
+				.padding(.bottom, .small1)
 			}
 			KeyValueView(key: L10n.AssetDetails.NFTDetails.id, value: id)
 		}

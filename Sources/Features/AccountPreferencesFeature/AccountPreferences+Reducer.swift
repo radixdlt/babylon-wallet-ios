@@ -1,14 +1,13 @@
 import AccountPortfoliosClient
 import AccountsClient
 import CreateAuthKeyFeature
+import EngineKit
 import FaucetClient
 import FeaturePrelude
 import GatewayAPI
 import ShowQRFeature
 
 #if DEBUG
-// creation of said manifest ...
-import EngineToolkitClient
 // Manifest turning account into Dapp Definition type, debug action...
 import TransactionReviewFeature
 #endif // DEBUG
@@ -129,7 +128,6 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 	@Dependency(\.faucetClient) var faucetClient
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.accountPortfoliosClient) var accountPortfoliosClient
-	@Dependency(\.engineToolkitClient) var engineToolkitClient
 
 	#if DEBUG
 	@Dependency(\.gatewayAPIClient) var gatewayAPIClient
@@ -172,7 +170,7 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 		case .turnIntoDappDefinitionAccountTypeButtonTapped:
 			return .run { [accountAddress = state.address] send in
 				let account = try await accountsClient.getAccountByAddress(accountAddress)
-				let manifest = try await engineToolkitClient.manifestMarkingAccountAsDappDefinitionType(account: account)
+				let manifest = try TransactionManifest.manifestMarkingAccountAsDappDefinitionType(account: account)
 				await send(.internal(.turnIntoDappDefAccountType(manifest)))
 			} catch: { error, _ in
 				loggerGlobal.warning("Failed to create manifest which turns account into dapp definition account type, error: \(error)")
@@ -289,9 +287,9 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 		case let .turnIntoDappDefAccountType(manifest):
 			state.destination = .reviewTransactionTurningAccountIntoDappDefType(.init(
 				transactionManifest: manifest,
-				nonce: engineToolkitClient.generateTXNonce(),
+				nonce: .secureRandom(),
 				signTransactionPurpose: .internalManifest(.debugModifyAccount),
-				message: nil
+				message: .none
 			))
 			return .none
 
@@ -358,7 +356,7 @@ extension AccountPreferences {
 
 			do {
 				let isDappDefinitionAccount: Bool = try await gatewayAPIClient
-					.getEntityMetadata(address.address)
+					.getEntityMetadata(address.address, [.accountType])
 					.accountType == .dappDefinition
 
 				await send(.internal(.canTurnIntoDappDefAccountType(!isDappDefinitionAccount)))
@@ -369,31 +367,17 @@ extension AccountPreferences {
 }
 
 #if DEBUG
-extension EngineToolkitClient {
-	fileprivate func manifestMarkingAccountAsDappDefinitionType(
+extension TransactionManifest {
+	fileprivate static func manifestMarkingAccountAsDappDefinitionType(
 		account: Profile.Network.Account
-	) async throws -> TransactionManifest {
-		// # Set List Metadata on Resource
-		// https://github.com/radixdlt/radixdlt-scrypto/blob/main/transaction/examples/metadata/metadata.rtm#L97-L101
-		let setMetadataInstruction = SetMetadata(
-			accountAddress: account.address,
-			key: EntityMetadataKey.accountType.rawValue,
-			value: Enum(.metadata_String, fields: [.string(GatewayAPI.EntityMetadataCollection.AccountType.dappDefinition.rawValue)])
-		)
-
-		let manifestParsed = TransactionManifest(
-			instructions: [
-				.setMetadata(setMetadataInstruction),
-			]
-		)
-
-		let manifestString = try convertManifestToString(.init(
-			version: .default,
-			networkID: account.networkID,
-			manifest: manifestParsed
-		))
-
-		return manifestString
+	) throws -> TransactionManifest {
+		let raw = """
+		SET_METADATA
+		            Address("\(account.address.address)")
+		            "account_type"
+		            Enum<Metadata::String>("dapp definition");
+		"""
+		return try .init(instructions: .fromString(string: raw, networkId: account.networkID.rawValue), blobs: [])
 	}
 }
 #endif

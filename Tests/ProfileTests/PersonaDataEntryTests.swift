@@ -1,6 +1,6 @@
 import CasePaths
 import Cryptography
-import EngineToolkit
+
 import JSONTesting
 @testable import Profile
 import RadixConnectModels
@@ -17,10 +17,10 @@ final class PersonaFieldTests: TestCase {
 			PersonaData(
 				name: .init(
 					value: .init(
-						given: "John",
-						middle: "Fitzgerald",
-						family: "Kennedy",
-						variant: .western
+						variant: .western,
+						familyName: "Kennedy",
+						givenNames: "John",
+						nickname: "Fitzgerald"
 					)
 				)
 			)
@@ -37,15 +37,16 @@ final class PersonaFieldTests: TestCase {
 			PersonaData(
 				name: .init(
 					value: .init(
-						given: "Chan-wook",
-						family: "Park",
-						variant: .eastern
+						variant: .eastern,
+						familyName: "Park",
+						givenNames: "Chan-wook",
+						nickname: "Wook"
 					)
 				)
 			)
 		}
 		let aName = try dappRequest(value: \.name, from: personaData)
-		XCTAssertEqual(aName.value.valueForDapp, "Park Chan-wook")
+		XCTAssertEqual(aName.value.valueForDapp, "Park Wook Chan-wook")
 	}
 
 	func test_email_addresses() throws {
@@ -147,9 +148,10 @@ final class PersonaFieldTests: TestCase {
 			let personaData = PersonaData(
 				name: .init(
 					value: .init(
-						given: "Olof",
-						family: "Palme",
-						variant: .western
+						variant: .western,
+						familyName: "Palme",
+						givenNames: "Olof",
+						nickname: "Oly"
 					)
 				),
 				postalAddresses: [[
@@ -267,9 +269,9 @@ final class PersonaFieldTests: TestCase {
 			"name": [
 				"id": "00000000-0000-0000-0000-000000000000",
 				"value": [
-					"family": "Nakamoto",
-					"given": "Satoshi",
-					"middle": "Creator of Bitcoin",
+					"familyName": "Nakamoto",
+					"givenNames": "Satoshi",
+					"nickname": "Bitcoin",
 					"variant": "eastern",
 				],
 			],

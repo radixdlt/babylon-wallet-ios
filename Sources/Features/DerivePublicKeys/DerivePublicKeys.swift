@@ -1,6 +1,7 @@
 import AccountsClient
 import Cryptography
 import DeviceFactorSourceClient
+import EngineKit
 import FactorSourcesClient
 import FeaturePrelude
 import LedgerHardwareWalletClient
@@ -19,7 +20,7 @@ public struct DerivePublicKeys: Sendable, FeatureReducer {
 		public let derivationsPathOption: DerivationPathOption
 		public var ledgerBeingUsed: LedgerHardwareWalletFactorSource?
 		public enum DerivationPathOption: Sendable, Hashable {
-			case knownPaths(OrderedSet<DerivationPath>, networkID: NetworkID)
+			case knownPaths([DerivationPath], networkID: NetworkID) // derivation paths must not be a Set, since import from Olympia can contain duplicate derivation paths, for different Ledger devices.
 			case next(networkOption: NetworkOption, entityKind: EntityKind, curve: SLIP10.Curve)
 
 			public enum NetworkOption: Sendable, Hashable {
@@ -80,7 +81,7 @@ public struct DerivePublicKeys: Sendable, FeatureReducer {
 
 	public enum DelegateAction: Sendable, Hashable {
 		case derivedPublicKeys(
-			OrderedSet<HierarchicalDeterministicPublicKey>,
+			[HierarchicalDeterministicPublicKey],
 			factorSourceID: FactorSourceID,
 			networkID: NetworkID
 		)
@@ -165,7 +166,10 @@ extension DerivePublicKeys {
 		)
 	}
 
-	private func deriveWith(ledgerFactorSource: LedgerHardwareWalletFactorSource, _ state: State) -> EffectTask<Action> {
+	private func deriveWith(
+		ledgerFactorSource: LedgerHardwareWalletFactorSource,
+		_ state: State
+	) -> EffectTask<Action> {
 		withDerivationPath(
 			state: state,
 			hdFactorSource: ledgerFactorSource,
@@ -183,7 +187,7 @@ extension DerivePublicKeys {
 
 	private func deriveWith(
 		deviceFactorSource: DeviceFactorSource,
-		derivationPaths: OrderedSet<DerivationPath>,
+		derivationPaths: [DerivationPath],
 		networkID: NetworkID,
 		loadMnemonicPurpose: SecureStorageClient.LoadMnemonicPurpose,
 		state: State
@@ -206,7 +210,7 @@ extension DerivePublicKeys {
 
 	private func _deriveWith(
 		deviceFactorSource: DeviceFactorSource,
-		derivationPaths: OrderedSet<DerivationPath>,
+		derivationPaths: [DerivationPath],
 		networkID: NetworkID,
 		loadMnemonicPurpose: SecureStorageClient.LoadMnemonicPurpose,
 		state: State
@@ -225,7 +229,7 @@ extension DerivePublicKeys {
 
 	private func deriveWith(
 		ledger: LedgerHardwareWalletFactorSource,
-		derivationPaths: OrderedSet<DerivationPath>,
+		derivationPaths: [DerivationPath],
 		networkID: NetworkID,
 		state: State
 	) -> EffectTask<Action> {
@@ -246,13 +250,19 @@ extension DerivePublicKeys {
 
 	private func _deriveWith(
 		ledger: LedgerHardwareWalletFactorSource,
-		derivationPaths: OrderedSet<DerivationPath>,
+		derivationPaths: [DerivationPath],
 		networkID: NetworkID,
 		state: State
 	) async throws -> Action {
-		let hdKeys = try await ledgerHardwareWalletClient.derivePublicKeys(OrderedSet(validating: derivationPaths.map {
-			P2P.LedgerHardwareWallet.KeyParameters(curve: $0.curveForScheme.p2pCurve, derivationPath: $0.path)
-		}), ledger)
+		let hdKeys = try await ledgerHardwareWalletClient.derivePublicKeys(
+			derivationPaths.map {
+				P2P.LedgerHardwareWallet.KeyParameters(
+					curve: $0.curveForScheme.p2pCurve,
+					derivationPath: $0.path
+				)
+			},
+			ledger
+		)
 
 		return .delegate(.derivedPublicKeys(
 			hdKeys,
@@ -266,7 +276,7 @@ extension DerivePublicKeys {
 	private func withDerivationPath<Source: HDFactorSourceProtocol>(
 		state: State,
 		hdFactorSource: Source,
-		knownPaths deriveWithKnownDerivationPaths: @escaping @Sendable (OrderedSet<DerivationPath>, NetworkID, SecureStorageClient.LoadMnemonicPurpose) async throws -> Action,
+		knownPaths deriveWithKnownDerivationPaths: @escaping @Sendable ([DerivationPath], NetworkID, SecureStorageClient.LoadMnemonicPurpose) async throws -> Action,
 		calculating calculatedDerivationPath: @escaping @Sendable (DerivationPath, NetworkID, SecureStorageClient.LoadMnemonicPurpose) -> Action
 	) -> EffectTask<Action> {
 		switch state.derivationsPathOption {

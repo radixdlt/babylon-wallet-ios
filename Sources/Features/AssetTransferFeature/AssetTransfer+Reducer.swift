@@ -1,5 +1,5 @@
 import DappInteractionClient
-import EngineToolkitClient
+import EngineKit
 import FeaturePrelude
 
 // MARK: - AssetTransfer
@@ -16,7 +16,6 @@ public struct AssetTransfer: Sendable, FeatureReducer {
 
 	@Dependency(\.dappInteractionClient) var dappInteractionClient
 	@Dependency(\.errorQueue) var errorQueue
-	@Dependency(\.engineToolkitClient) var engineToolkitClient
 	@Dependency(\.gatewaysClient) var gatewaysClient
 
 	public init() {}
@@ -143,24 +142,25 @@ extension AssetTransfer {
 
 	private func createManifest(_ accounts: TransferAccountList.State) async throws -> TransactionManifest {
 		let involvedFungibleResources = extractInvolvedFungibleResources(accounts.receivingAccounts)
-		let fungiblesTransferInstruction = try involvedFungibleResources.flatMap {
+		let fungiblesTransferInstruction = try involvedFungibleResources.map {
 			try fungibleResourceTransferInstruction(witdhrawAccount: accounts.fromAccount.address, $0)
 		}
 
 		let involvedNonFungibles = extractInvolvedNonFungibleResource(accounts.receivingAccounts)
-		let nonFungiblesTransferInstruction = try involvedNonFungibles.flatMap {
+		let nonFungiblesTransferInstruction = try involvedNonFungibles.map {
 			try nonFungibleResourceTransferInstruction(witdhrawAccount: accounts.fromAccount.address, $0)
 		}
 
 		let allInstructions = fungiblesTransferInstruction + nonFungiblesTransferInstruction
-		let manifest = TransactionManifest(instructions: .parsed(allInstructions.map { $0.embed() }))
 
 		let networkID = await gatewaysClient.getCurrentNetworkID()
-		return try engineToolkitClient.convertManifestToString(.init(
-			version: .default,
-			networkID: networkID,
-			manifest: manifest
-		))
+		return try .init(
+			instructions: .fromString(
+				string: String(allInstructions.joined(by: "\n")),
+				networkId: networkID.rawValue
+			),
+			blobs: []
+		)
 	}
 
 	private func extractInvolvedFungibleResources(
@@ -225,87 +225,65 @@ extension AssetTransfer {
 	private func fungibleResourceTransferInstruction(
 		witdhrawAccount: AccountAddress,
 		_ resource: InvolvedFungibleResource
-	) throws -> [any InstructionProtocol] {
-		let accountWithdrawals: [any InstructionProtocol] = [
-			CallMethod(
-				receiver: witdhrawAccount,
-				methodName: "withdraw",
-				arguments: [
-					.address(resource.address.asGeneral()),
-					.decimal(.init(value: resource.totalTransferAmount.toString())),
-				]
-			),
+	) throws -> String {
+		// FIXME: Temporary and ugly, until the RET provides the manifest builder
+		let accountWithdrawals = [
+			"""
+			CALL_METHOD
+			    Address("\(witdhrawAccount.address)")
+			    "withdraw"
+			    Address("\(resource.address.address)")
+			    Decimal("\(resource.totalTransferAmount.toString())");
+			""",
 		]
 
-		let deposits: [any InstructionProtocol] = resource.accounts.flatMap { account in
+		let deposits: [String] = resource.accounts.map { account in
 			let bucket = UUID().uuidString
 
-			let instructions: [any InstructionProtocol] = [
-				TakeFromWorktop(
-					amount: .init(value: account.amount.toString()),
-					resourceAddress: resource.address,
-					bucket: .init(value: bucket)
-				),
-
-				CallMethod(
-					receiver: account.id,
-					methodName: "try_deposit_or_abort",
-					arguments: [.bucket(.init(value: bucket))]
-				),
-			]
-
-			return instructions
+			return """
+			TAKE_FROM_WORKTOP Address("\(resource.address.address)") Decimal("\(account.amount.toString())") Bucket("\(bucket)");
+			CALL_METHOD Address("\(account.id.address)") "try_deposit_or_abort" Bucket("\(bucket)");
+			"""
 		}
 
-		return accountWithdrawals + deposits
+		return String((accountWithdrawals + deposits).joined(by: "\n"))
 	}
 
 	private func nonFungibleResourceTransferInstruction(
 		witdhrawAccount: AccountAddress,
 		_ resource: InvolvedNonFungibleResource
-	) throws -> [any InstructionProtocol] {
-		let accountWithdrawals: [any InstructionProtocol] = try [
-			CallMethod(
-				receiver: witdhrawAccount,
-				methodName: "withdraw_non_fungibles",
-				arguments: [
-					.address(resource.address.asGeneral()),
-					.array(.init(
-						elementKind: .nonFungibleLocalId,
-						elements: resource.allTokens.map {
-							try .nonFungibleLocalId($0.id.toRETLocalID())
-						}
-					)),
-				]
-			),
-		]
+	) throws -> String {
+		// FIXME: Temporary and ugly, until the RET provides the manifest builder
+		let localIds = try String(resource.allTokens.map {
+			try "NonFungibleLocalId(\"\($0.id.localId().toString())\")"
+		}.joined(by: ","))
 
-		let deposits: [any InstructionProtocol] = try resource.accounts.flatMap { account in
+		let accountWithdrawals = """
+		CALL_METHOD
+		    Address("\(witdhrawAccount.address)")
+		    "withdraw_non_fungibles"
+		    Address("\(resource.address.address)")
+		    Array<NonFungibleLocalId>(\(localIds));
+		"""
+		let deposits: [String] = try resource.accounts.map { account in
 			let bucket = UUID().uuidString
+			let localIds = try String(account.tokens.map {
+				try "NonFungibleLocalId(\"\($0.id.localId().toString())\")"
+			}.joined(by: ","))
 
-			let instructions: [any InstructionProtocol] = try [
-				TakeNonFungiblesFromWorktop(
-					Set(account.tokens.map { try $0.id.toRETLocalID() }),
-					resourceAddress: resource.address,
-					bucket: .init(value: bucket)
-				),
+			return """
+			TAKE_NON_FUNGIBLES_FROM_WORKTOP
+			        Address("\(resource.address.address)")
+			        Array<NonFungibleLocalId>(\(localIds))
+			        Bucket(\"\(bucket)\");
 
-				CallMethod(
-					receiver: account.id,
-					methodName: "try_deposit_or_abort",
-					arguments: [.bucket(.init(value: bucket))]
-				),
-			]
-
-			return instructions
+			CALL_METHOD
+			        Address("\(account.id)")
+			        "try_deposit_or_abort"
+			        Bucket("\(bucket)");
+			"""
 		}
 
-		return accountWithdrawals + deposits
-	}
-}
-
-extension AccountPortfolio.NonFungibleResource.NonFungibleToken.LocalID {
-	func toRETLocalID() -> NonFungibleLocalId {
-		.init(value: rawValue)
+		return String(([accountWithdrawals] + deposits).joined(by: "\n"))
 	}
 }

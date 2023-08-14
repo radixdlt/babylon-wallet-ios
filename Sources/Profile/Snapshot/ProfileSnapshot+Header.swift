@@ -150,8 +150,9 @@ extension ProfileSnapshot.Header.Version {
 	/// - 38: Added `updatedOn` date to `SecurityStructureConfiguration`
 	/// - 39: Address format changed with `Birch` update
 	/// - 40: Changed Persona data/field format
-	/// - 41: Change counter to not be factor source based.
-	public static let minimum: Self = 41
+	/// - 41: Nickname is not optional
+	/// - 42: Change counter to not be factor source based.
+	public static let minimum: Self = 42
 }
 
 extension ProfileSnapshot.Header {

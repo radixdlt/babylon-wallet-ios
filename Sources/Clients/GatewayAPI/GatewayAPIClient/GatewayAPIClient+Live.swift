@@ -1,5 +1,6 @@
 import ClientPrelude
 import Cryptography
+import EngineKit
 import GatewaysClient
 
 // MARK: - Date + Sendable
@@ -129,20 +130,25 @@ extension GatewayAPIClient {
 		}
 
 		@Sendable
-		func getEntityDetails(_ addresses: [String]) async throws -> GatewayAPI.StateEntityDetailsResponse {
-			try await post(
+		func getEntityDetails(_ addresses: [String], explictMetadata: Set<EntityMetadataKey>, ledgerState: GatewayAPI.LedgerState?) async throws -> GatewayAPI.StateEntityDetailsResponse {
+			assert(explictMetadata.count <= EntityMetadataKey.maxAllowedKeys)
+			return try await post(
 				request: GatewayAPI.StateEntityDetailsRequest(
+					atLedgerState: ledgerState?.selector,
 					optIns: .init(
 						nonFungibleIncludeNfids: true,
-						explicitMetadata: EntityMetadataKey.allCases.map(\.rawValue)
+						explicitMetadata: explictMetadata.map(\.rawValue)
 					),
 					addresses: addresses, aggregationLevel: .vault
 				)) { @Sendable base in base.appendingPathComponent("state/entity/details") }
 		}
 
 		@Sendable
-		func getSingleEntityDetails(_ address: String) async throws -> SingleEntityDetailsResponse {
-			let response = try await getEntityDetails([address])
+		func getSingleEntityDetails(
+			_ address: String,
+			explictMetadata: Set<EntityMetadataKey>
+		) async throws -> SingleEntityDetailsResponse {
+			let response = try await getEntityDetails([address], explictMetadata: explictMetadata, ledgerState: nil)
 			guard let item = response.items.first else {
 				throw EmptyEntityDetailsResponse()
 			}
@@ -172,8 +178,8 @@ extension GatewayAPIClient {
 				return Epoch(rawValue: .init(response.ledgerState.epoch))
 			},
 			getEntityDetails: getEntityDetails,
-			getEntityMetadata: { address in
-				try await getSingleEntityDetails(address).details.metadata
+			getEntityMetadata: { address, explicitMetadata in
+				try await getSingleEntityDetails(address, explictMetadata: explicitMetadata).details.metadata
 			},
 			getEntityFungiblesPage: { request in
 				try await post(

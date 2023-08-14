@@ -2,6 +2,7 @@ import AccountPortfoliosClient
 import AccountPreferencesFeature
 import AssetsFeature
 import AssetTransferFeature
+import EngineKit
 import FeaturePrelude
 import SharedModels
 

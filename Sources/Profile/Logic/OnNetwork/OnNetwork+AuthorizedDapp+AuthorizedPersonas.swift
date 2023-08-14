@@ -1,4 +1,4 @@
-import EngineToolkit
+import EngineKit
 import Prelude
 
 // MARK: ~~~=== LOGIC ===~~~
@@ -143,8 +143,8 @@ extension Profile.Network {
 
 					// The only purpose of this switch is to make sure we get a compilation error when we add a new PersonaData.Entry kind, so
 					// we do not forget to handle it here.
-					switch PersonaData.Entry.Kind.name {
-					case .name, .dateOfBirth, .companyName, .emailAddress, .phoneNumber, .url, .postalAddress, .creditCard: break
+					switch PersonaData.Entry.Kind.fullName {
+					case .fullName, .dateOfBirth, .companyName, .emailAddress, .phoneNumber, .url, .postalAddress, .creditCard: break
 					}
 
 					return personaData

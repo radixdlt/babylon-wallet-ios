@@ -9,7 +9,7 @@ import PersonasFeature
 import ProfileBackupsFeature
 #if DEBUG
 import DebugInspectProfileFeature
-import EngineToolkit // read RET commit hash
+import EngineKit
 import RadixConnectModels // read signaling client url
 import SecureStorageClient
 import SecurityStructureConfigurationListFeature
@@ -35,13 +35,7 @@ extension AppSettings {
 
 		init(state: AppSettings.State) {
 			#if DEBUG
-			let retCommitHash: String = {
-				do {
-					return try RadixEngine.instance.information().get().lastCommitHash
-				} catch {
-					return "Unknown"
-				}
-			}()
+			let retCommitHash: String = buildInformation().version
 			self.debugAppInfo = "RET #\(retCommitHash), SS \(RadixConnectConstants.defaultSignalingServer.absoluteString)"
 			#endif
 

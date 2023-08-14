@@ -80,8 +80,7 @@ extension AssetTransfer {
 			} content: {
 				View(store: store)
 			}
-			// FIXME: It is not clear if this should be kept for Beta tester release
-			// .showDeveloperDisclaimerBanner()
+			.showDeveloperDisclaimerBanner()
 		}
 	}
 }

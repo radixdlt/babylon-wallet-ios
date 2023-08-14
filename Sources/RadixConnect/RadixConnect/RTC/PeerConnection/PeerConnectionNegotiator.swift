@@ -132,7 +132,7 @@ extension PeerConnectionNegotiator {
 				defer {
 					log("Sent local ICE Candidate")
 				}
-				return try await signalingServerClient.sendToRemote(.init(content: .iceCandidate(candidate), id: clientID))
+				return try await signalingServerClient.sendToRemote(.init(.iceCandidate(candidate), id: clientID))
 			}.eraseToAnyAsyncSequence()
 
 		let onRemoteIceCandidate = signalingServerClient
@@ -140,7 +140,7 @@ extension PeerConnectionNegotiator {
 			.filter { $0.id == clientID }
 			.map {
 				log("Received remote ICE Candidate")
-				return try await peerConnectionClient.setRemoteICECandidate($0.content)
+				return try await peerConnectionClient.setRemoteICECandidate($0.value)
 			}
 			.eraseToAnyAsyncSequence()
 
@@ -164,22 +164,22 @@ extension PeerConnectionNegotiator {
 
 		try await trigger.doAsync(
 			receivedOffer: { offer in
-				try await peerConnectionClient.setRemoteOffer(offer.content)
+				try await peerConnectionClient.setRemoteOffer(offer.value)
 				log("Remote Offer was configured as local description")
 
 				let localAnswer = try await peerConnectionClient.createAnswer()
 				log("Created Answer")
 
-				try await signalingServerClient.sendToRemote(.init(content: .answer(localAnswer), id: offer.id))
+				try await signalingServerClient.sendToRemote(.init(.answer(localAnswer), id: offer.id))
 				log("Sent Answer to remote client")
 			},
 			remoteClientDidConnect: { clientID in
 				let offer = try await peerConnectionClient.createLocalOffer()
-				try await signalingServerClient.sendToRemote(.init(content: .offer(offer), id: clientID))
+				try await signalingServerClient.sendToRemote(.init(.offer(offer), id: clientID))
 				log("Sent Offer to remote client")
 
 				let answer = try await signalingServerClient.onAnswer.filter { $0.id == clientID }.first()
-				try await peerConnectionClient.setRemoteAnswer(answer.content)
+				try await peerConnectionClient.setRemoteAnswer(answer.value)
 				log("Received and configured remote Answer")
 			}
 		)

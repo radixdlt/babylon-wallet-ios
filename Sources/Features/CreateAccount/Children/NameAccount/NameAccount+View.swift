@@ -59,8 +59,7 @@ extension NameAccount {
 
 						AppTextField(
 							placeholder: viewStore.namePlaceholder,
-							text: nameBinding,
-							hint: .info(L10n.CreateEntity.NameNewEntity.explanation)
+							text: nameBinding
 						)
 						#if os(iOS)
 						.textFieldCharacterLimit(Profile.Network.Account.nameMaxLength, forText: nameBinding)
@@ -98,12 +97,18 @@ extension NameAccount.View {
 	}
 
 	private func subtitle(with viewState: NameAccount.ViewState) -> some View {
-		Text(viewState.subtitleText)
-			.fixedSize(horizontal: false, vertical: true)
-			.padding(.horizontal, .large1)
-			.multilineTextAlignment(.center)
-			.foregroundColor(.app.gray1)
-			.textStyle(.body1Regular)
+		VStack {
+			Text(viewState.subtitleText)
+				.fixedSize(horizontal: false, vertical: true)
+				.padding(.horizontal, .large1)
+				.multilineTextAlignment(.center)
+				.foregroundColor(.app.gray1)
+				.textStyle(.body1Regular)
+
+			Text(L10n.CreateAccount.NameNewAccount.explanation)
+				.foregroundColor(.app.gray2)
+				.textStyle(.body1Regular)
+		}
 	}
 
 	private func useLedgerAsFactorSource(

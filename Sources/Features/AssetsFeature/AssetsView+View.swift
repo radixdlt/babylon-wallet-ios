@@ -13,7 +13,7 @@ extension AssetsView {
 		}
 
 		public var body: some SwiftUI.View {
-			WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
+			WithViewStore(store, observe: identity, send: FeatureAction.view) { viewStore in
 				ScrollView {
 					VStack(spacing: .medium3) {
 						assetTypeSelectorView(viewStore)
@@ -36,6 +36,13 @@ extension AssetsView {
 								store: store.scope(
 									state: \.nonFungibleTokenList,
 									action: { .child(.nonFungibleTokenList($0)) }
+								)
+							)
+						case .poolUnits:
+							PoolUnitsList.View(
+								store: store.scope(
+									state: \.poolUnitsList,
+									action: { .child(.poolUnitsList($0)) }
 								)
 							)
 						}
@@ -101,7 +108,13 @@ struct AssetsView_Preview: PreviewProvider {
 	static var previews: some View {
 		AssetsView.View(
 			store: .init(
-				initialState: .init(account: .previewValue0, fungibleTokenList: .init(), nonFungibleTokenList: .init(rows: []), mode: .normal),
+				initialState: .init(
+					account: .previewValue0,
+					fungibleTokenList: .init(),
+					nonFungibleTokenList: .init(rows: []),
+					poolUnitsList: .init(),
+					mode: .normal
+				),
 				reducer: AssetsView()
 			)
 		)

@@ -21,17 +21,17 @@ public struct StateEntityDetailsResponseComponentDetails: Codable, Hashable {
     /** Bech32m-encoded human readable version of the address. */
     public private(set) var packageAddress: String?
     public private(set) var blueprintName: String
-    public private(set) var state: AnyCodable?
-    public private(set) var accessRulesChain: AnyCodable
+    public private(set) var state: StateEntityDetailsComponentState?
+    public private(set) var accessRules: ComponentEntityAccessRules
     /** String-encoded decimal representing the amount of a related fungible resource. */
     public private(set) var royaltyVaultBalance: String?
 
-    public init(type: StateEntityDetailsResponseItemDetailsType, packageAddress: String? = nil, blueprintName: String, state: AnyCodable? = nil, accessRulesChain: AnyCodable, royaltyVaultBalance: String? = nil) {
+    public init(type: StateEntityDetailsResponseItemDetailsType, packageAddress: String? = nil, blueprintName: String, state: StateEntityDetailsComponentState? = nil, accessRules: ComponentEntityAccessRules, royaltyVaultBalance: String? = nil) {
         self.type = type
         self.packageAddress = packageAddress
         self.blueprintName = blueprintName
         self.state = state
-        self.accessRulesChain = accessRulesChain
+        self.accessRules = accessRules
         self.royaltyVaultBalance = royaltyVaultBalance
     }
 
@@ -40,7 +40,7 @@ public struct StateEntityDetailsResponseComponentDetails: Codable, Hashable {
         case packageAddress = "package_address"
         case blueprintName = "blueprint_name"
         case state
-        case accessRulesChain = "access_rules_chain"
+        case accessRules = "access_rules"
         case royaltyVaultBalance = "royalty_vault_balance"
     }
 
@@ -52,7 +52,7 @@ public struct StateEntityDetailsResponseComponentDetails: Codable, Hashable {
         try container.encodeIfPresent(packageAddress, forKey: .packageAddress)
         try container.encode(blueprintName, forKey: .blueprintName)
         try container.encodeIfPresent(state, forKey: .state)
-        try container.encode(accessRulesChain, forKey: .accessRulesChain)
+        try container.encode(accessRules, forKey: .accessRules)
         try container.encodeIfPresent(royaltyVaultBalance, forKey: .royaltyVaultBalance)
     }
 }

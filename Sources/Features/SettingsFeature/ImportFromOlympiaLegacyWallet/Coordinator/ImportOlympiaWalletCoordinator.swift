@@ -1,4 +1,5 @@
 import Cryptography
+import EngineKit
 import FactorSourcesClient
 import FeaturePrelude
 import ImportLegacyWalletClient
@@ -8,43 +9,112 @@ import Profile
 
 // MARK: - ImportOlympiaWalletCoordinator
 public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
+	public typealias AccountsToMigrate = NonEmpty<OrderedSet<OlympiaAccountToMigrate>>
+	public typealias MigratedAccounts = IdentifiedArrayOf<Profile.Network.Account>
+
+	// MARK: State
+
 	public struct State: Sendable, Hashable {
-		public var expectedMnemonicWordCount: BIP39.WordCount?
-		public var selectedAccounts: OlympiaAccountsToImport?
-		public var mnemonicWithPassphrase: MnemonicWithPassphrase?
-		public var migratedAccounts: IdentifiedArrayOf<Profile.Network.Account> = .init()
+		public var scanQR: ScanMultipleOlympiaQRCodes.State = .init()
+		public var path: StackState<Path.State> = .init()
 
-		var root: Destinations.State?
-		var path: StackState<Destinations.State> = .init()
+		var progress: Progress = .start
 
-		public init() {
-			self.root = .scanMultipleOlympiaQRCodes(.init())
+		public init() {}
+	}
+
+	public struct MigratableAccount: Sendable, Hashable, Identifiable {
+		public let id: K1.PublicKey
+		public let accountName: String?
+		public let olympiaAddress: LegacyOlympiaAccountAddress
+		public let babylonAddress: AccountAddress
+		public let appearanceID: Profile.Network.Account.AppearanceID
+		public let olympiaAccountType: Olympia.AccountType
+	}
+
+	// MARK: Progress
+
+	enum Progress: Sendable, Hashable {
+		case start
+		case scannedQR(ScannedQR)
+		case foundAlreadyImported(FoundAlreadyImported)
+		case checkedIfOlympiaFactorSourceAlreadyExists(CheckedIfOlympiaFactorSourceAlreadyExists)
+		case migratedSoftwareAccounts(MigratedSoftwareAccounts)
+		case completion
+
+		struct ScannedQR: Sendable, Hashable {
+			let expectedMnemonicWordCount: BIP39.WordCount
+			let scannedAccounts: AccountsToMigrate
+		}
+
+		struct FoundAlreadyImported: Sendable, Hashable {
+			let previous: ScannedQR
+			let accountsToMigrate: AccountsToMigrate?
+			let networkID: NetworkID
+			let previouslyImported: [MigratableAccount]
+		}
+
+		struct CheckedIfOlympiaFactorSourceAlreadyExists: Sendable, Hashable {
+			let previous: FoundAlreadyImported
+			let softwareAccountsToMigrate: AccountsToMigrate
+		}
+
+		struct MigratedSoftwareAccounts: Sendable, Hashable {
+			let previous: FoundAlreadyImported
+			let migratedSoftwareAccounts: MigratedAccounts
 		}
 	}
 
-	public struct Destinations: Sendable, ReducerProtocol {
+	// MARK: Action
+
+	public enum ViewAction: Sendable, Equatable {
+		case closeButtonTapped
+	}
+
+	public enum ChildAction: Sendable, Equatable {
+		case scanQR(ScanMultipleOlympiaQRCodes.Action)
+		case path(StackActionOf<Path>)
+	}
+
+	public enum InternalAction: Sendable, Equatable {
+		case foundAlreadyImportedOlympiaSoftwareAccounts(
+			NetworkID,
+			Set<OlympiaAccountToMigrate.ID>,
+			existingAccounts: Int
+		)
+		case checkedIfOlympiaFactorSourceAlreadyExists(
+			FactorSourceID.FromHash?,
+			softwareAccounts: AccountsToMigrate
+		)
+		case migratedSoftwareAccountsToBabylon(
+			MigratedSoftwareAccounts
+		)
+	}
+
+	public enum DelegateAction: Sendable, Equatable {
+		case finishedMigration(gotoAccountList: Bool)
+	}
+
+	// MARK: Path
+
+	public struct Path: Sendable, ReducerProtocol {
 		public enum State: Sendable, Hashable {
-			case scanMultipleOlympiaQRCodes(ScanMultipleOlympiaQRCodes.State)
-			case selectAccountsToImport(SelectAccountsToImport.State)
+			case accountsToImport(AccountsToImport.State)
 			case importMnemonic(ImportMnemonic.State)
 			case importOlympiaLedgerAccountsAndFactorSources(ImportOlympiaLedgerAccountsAndFactorSources.State)
 			case completion(CompletionMigrateOlympiaAccountsToBabylon.State)
 		}
 
 		public enum Action: Sendable, Equatable {
-			case scanMultipleOlympiaQRCodes(ScanMultipleOlympiaQRCodes.Action)
-			case selectAccountsToImport(SelectAccountsToImport.Action)
+			case accountsToImport(AccountsToImport.Action)
 			case importMnemonic(ImportMnemonic.Action)
 			case importOlympiaLedgerAccountsAndFactorSources(ImportOlympiaLedgerAccountsAndFactorSources.Action)
 			case completion(CompletionMigrateOlympiaAccountsToBabylon.Action)
 		}
 
 		public var body: some ReducerProtocolOf<Self> {
-			Scope(state: /State.scanMultipleOlympiaQRCodes, action: /Action.scanMultipleOlympiaQRCodes) {
-				ScanMultipleOlympiaQRCodes()
-			}
-			Scope(state: /State.selectAccountsToImport, action: /Action.selectAccountsToImport) {
-				SelectAccountsToImport()
+			Scope(state: /State.accountsToImport, action: /Action.accountsToImport) {
+				AccountsToImport()
 			}
 			Scope(state: /State.importMnemonic, action: /Action.importMnemonic) {
 				ImportMnemonic()
@@ -58,234 +128,256 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 		}
 	}
 
-	public enum ViewAction: Sendable, Equatable {
-		case closeButtonTapped
-	}
+	// MARK: Reducer
 
-	public enum ChildAction: Sendable, Equatable {
-		case root(Destinations.Action)
-		case path(StackActionOf<Destinations>)
-	}
-
-	public enum InternalAction: Sendable, Equatable {
-		case findAlreadyImportedOlympiaSoftwareAccounts(
-			scanned: NonEmpty<OrderedSet<OlympiaAccountToMigrate>>,
-			alreadyImported: Set<OlympiaAccountToMigrate.ID>
-		)
-		case checkedIfOlympiaFactorSourceAlreadyExists(FactorSourceID.FromHash?)
-
-		case migrateHardwareAccounts(NonEmpty<OrderedSet<OlympiaAccountToMigrate>>, NetworkID)
-		case validatedOlympiaSoftwareAccounts(
-			softwareAccounts: NonEmpty<OrderedSet<OlympiaAccountToMigrate>>,
-			privateHDFactorSource: PrivateHDFactorSource
-		)
-		case migratedOlympiaSoftwareAccounts(MigratedSoftwareAccounts)
-	}
-
-	public enum DelegateAction: Sendable, Equatable {
-		case finishedMigration
-		case dismiss
-	}
-
+	@Dependency(\.accountsClient) var accountsClient
 	@Dependency(\.factorSourcesClient) var factorSourcesClient
+	@Dependency(\.dismiss) var dismiss
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.importLegacyWalletClient) var importLegacyWalletClient
+
 	public init() {}
 
 	public var body: some ReducerProtocolOf<Self> {
+		Scope(state: \.scanQR, action: /Action.child .. ChildAction.scanQR) {
+			ScanMultipleOlympiaQRCodes()
+		}
 		Reduce(core)
-			.ifLet(\.root, action: /Action.child .. ChildAction.root) {
-				Destinations()
-			}
 			.forEach(\.path, action: /Action.child .. ChildAction.path) {
-				Destinations()
+				Path()
 			}
 	}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .closeButtonTapped:
-			return .send(.delegate(.dismiss))
-		}
-	}
-
-	private func migrateHardwareAccounts(
-		_ hardwareAccounts: NonEmpty<OrderedSet<OlympiaAccountToMigrate>>
-	) -> EffectTask<Action> {
-		.task {
-			let networkID = await factorSourcesClient.getCurrentNetworkID()
-			return .internal(.migrateHardwareAccounts(hardwareAccounts, networkID))
+			return .run { _ in await dismiss() }
 		}
 	}
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
-		case let .root(.scanMultipleOlympiaQRCodes(.delegate(.finishedScanning(olympiaWallet)))):
-			state.expectedMnemonicWordCount = olympiaWallet.mnemonicWordCount
-			let scanned = olympiaWallet.accounts
-			return .run { send in
+		case .scanQR(.delegate(.viewAppeared)):
+			return scanViewAppeared(in: &state)
 
-				let alreadyImported = await importLegacyWalletClient.findAlreadyImportedIfAny(scanned)
+		case let .scanQR(.delegate(.finishedScanning(olympiaWallet))):
+			return finishedScanning(in: &state, olympiaWallet: olympiaWallet)
 
-				await send(.internal(.findAlreadyImportedOlympiaSoftwareAccounts(
-					scanned: scanned,
-					alreadyImported: alreadyImported
-				)))
-			}
+		case let .path(.element(_, action: pathAction)):
+			return reduce(into: &state, pathAction: pathAction)
 
-		case let .path(.element(_, action: .selectAccountsToImport(.delegate(.selectedAccounts(accounts))))):
-			state.selectedAccounts = accounts
-
-			if let softwareAccounts = accounts.software {
-				return .run { send in
-					let idOfExistingFactorSource = await factorSourcesClient
-						.checkIfHasOlympiaFactorSourceForAccounts(softwareAccounts)
-
-					await send(.internal(.checkedIfOlympiaFactorSourceAlreadyExists(idOfExistingFactorSource)))
-				}
-			} else if let hardwareAccounts = accounts.hardware {
-				return migrateHardwareAccounts(hardwareAccounts)
-			}
-
+		default:
 			return .none
+		}
+	}
 
-		case let .path(.element(_, action: .importMnemonic(.delegate(.notSavedInProfile(mnemonicWithPassphrase))))):
-			state.mnemonicWithPassphrase = mnemonicWithPassphrase
-			guard let softwareAccounts = state.selectedAccounts?.software else {
-				assertionFailure("Bad implementation, expected 'state.selectedAccounts.software' to have been set.")
-				return .none
-			}
-			return validateSoftwareAccounts(mnemonicWithPassphrase, softwareAccounts: softwareAccounts)
+	public func reduce(into state: inout State, pathAction: Path.Action) -> EffectTask<Action> {
+		switch pathAction {
+		case .accountsToImport(.delegate(.viewAppeared)):
+			return accountsToImportViewAppeared(in: &state)
 
-		case let .path(.element(_, action: .importOlympiaLedgerAccountsAndFactorSources(.delegate(
-			.completed(ledgersWithAccounts, unvalidatedOlympiaAccounts)
-		)))):
-			loggerGlobal.notice("Coordinator, proceeding to completion")
-			state.migratedAccounts.append(contentsOf: ledgersWithAccounts.flatMap { $0.migratedAccounts.map(\.babylon) })
+		case .accountsToImport(.delegate(.continueImport)):
+			return continueImporting(in: &state)
 
-			guard let migratedAccounts = Profile.Network.Accounts(rawValue: state.migratedAccounts) else {
-				fatalError("bad!")
-			}
-			let destination = Destinations.State.completion(.init(migratedAccounts: migratedAccounts, unvalidatedOlympiaHardwareAccounts: unvalidatedOlympiaAccounts))
-			if state.path.last != destination {
-				state.path.append(destination)
-			}
+		case let .importMnemonic(.delegate(.notSavedInProfile(mnemonicWithPassphrase))):
+			return importedMnemonic(in: &state, mnemonicWithPassphrase: mnemonicWithPassphrase)
+
+		case let .importOlympiaLedgerAccountsAndFactorSources(.delegate(.completed(migratedAccounts))):
+			return importedOlympiaLedgerAccountsAndFactorSources(in: &state, migratedAccounts: migratedAccounts)
+
+		case let .importOlympiaLedgerAccountsAndFactorSources(.delegate(.failed(failure))):
+			return cancelOlympiaLedgerAccountsAndFactorSources(in: &state, failure: failure)
+
+		case let .completion(.delegate(.finishedMigration(gotoAccountList: gotoAccountList))):
+			return .send(.delegate(.finishedMigration(gotoAccountList: gotoAccountList)))
+
+		default:
 			return .none
-
-		case .path(.element(_, action: .completion(.delegate(.finishedMigration)))):
-			return .send(.delegate(.finishedMigration))
-		default: return .none
 		}
 	}
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
-		case let .checkedIfOlympiaFactorSourceAlreadyExists(idOfExistingFactorSource):
-			guard let idOfExistingFactorSource else {
-				let expectedWordCount: BIP39.WordCount = {
-					if let expectedMnemonicWordCount = state.expectedMnemonicWordCount {
-						return expectedMnemonicWordCount
-					}
-					assertionFailure("Expected to have set 'expectedMnemonicWordCount'")
-					return .twelve
-				}()
+		case let .foundAlreadyImportedOlympiaSoftwareAccounts(networkID, alreadyImported, existingAccounts):
+			return foundAlreadyImportedAccounts(in: &state, networkID: networkID, alreadyImported: alreadyImported, existingAccounts: existingAccounts)
 
-				let destination = Destinations.State.importMnemonic(.init(
-					persistAsMnemonicKind: nil,
-					wordCount: expectedWordCount
-				))
+		case let .checkedIfOlympiaFactorSourceAlreadyExists(idOfExistingFactorSource, softwareAccounts):
+			return checkedIfOlympiaFactorSourceAlreadyExists(in: &state, idOfExistingFactorSource: idOfExistingFactorSource, softwareAccounts: softwareAccounts)
 
-				if state.path.last != destination {
-					state.path.append(destination)
-				}
-				return .none
-			}
-			guard let softwareAccounts = state.selectedAccounts?.software else {
-				assertionFailure("Bad implementation, expected 'state.selectedAccounts.software' to have been set.")
-				return .none
-			}
-			return convertSoftwareAccountsToBabylon(
+		case let .migratedSoftwareAccountsToBabylon(softwareAccounts):
+			return migratedSoftwareAccountsToBabylon(in: &state, softwareAccounts: softwareAccounts)
+		}
+	}
+
+	// MARK: Main logic
+
+	private func scanViewAppeared(
+		in state: inout State
+	) -> EffectTask<Action> {
+		state.progress = .start
+		state.scanQR.reset()
+		return .none
+	}
+
+	private func finishedScanning(
+		in state: inout State,
+		olympiaWallet: ScannedParsedOlympiaWalletToMigrate
+	) -> EffectTask<Action> {
+		guard case .start = state.progress else { return progressError(state.progress) }
+
+		let scanned = olympiaWallet.accounts
+		state.progress = .scannedQR(.init(
+			expectedMnemonicWordCount: olympiaWallet.mnemonicWordCount,
+			scannedAccounts: scanned
+		))
+
+		return .task {
+			let alreadyImported = await importLegacyWalletClient.findAlreadyImportedIfAny(scanned)
+			let networkID = await factorSourcesClient.getCurrentNetworkID()
+			let existingAccounts = await (try? accountsClient.getAccountsOnNetwork(networkID).count) ?? 0
+			return .internal(.foundAlreadyImportedOlympiaSoftwareAccounts(networkID, alreadyImported, existingAccounts: existingAccounts))
+		}
+	}
+
+	private func foundAlreadyImportedAccounts(
+		in state: inout State,
+		networkID: NetworkID,
+		alreadyImported: Set<OlympiaAccountToMigrate.ID>,
+		existingAccounts: Int
+	) -> EffectTask<Action> {
+		guard case let .scannedQR(progress) = state.progress else { return progressError(state.progress) }
+
+		let scannedAccounts: NonEmptyArray<MigratableAccount>
+		do {
+			scannedAccounts = try migratableAccounts(from: progress.scannedAccounts, networkID: networkID, existingAccounts: existingAccounts)
+		} catch {
+			errorQueue.schedule(error)
+			return generalError(error)
+		}
+
+		// These collections have different elements, the alreadyMigrated one keeps track of the babylon address
+		let alreadyMigrated = scannedAccounts.rawValue.filter { alreadyImported.contains($0.id) }
+		let notMigrated = progress.scannedAccounts.filter { !alreadyImported.contains($0.id) }
+
+		state.progress = .foundAlreadyImported(.init(
+			previous: progress,
+			accountsToMigrate: NonEmpty(rawValue: OrderedSet(notMigrated)),
+			networkID: networkID,
+			previouslyImported: alreadyMigrated
+		))
+
+		state.path.append(
+			.accountsToImport(.init(
+				scannedAccounts: scannedAccounts
+			))
+		)
+		return .none
+	}
+
+	private func accountsToImportViewAppeared(
+		in state: inout State
+	) -> EffectTask<Action> {
+		if case let .checkedIfOlympiaFactorSourceAlreadyExists(progress) = state.progress {
+			// This happens if the user steps back from ImportMnemonic to AccountsToImport
+			state.progress = .foundAlreadyImported(progress.previous)
+		} else if case let .migratedSoftwareAccounts(progress) = state.progress {
+			// This happens if the user steps back from ImportOlympiaLedgerAccountsAndFactorSources to AccountsToImport
+			state.progress = .foundAlreadyImported(progress.previous)
+		}
+		return .none
+	}
+
+	private func continueImporting(
+		in state: inout State
+	) -> EffectTask<Action> {
+		guard case let .foundAlreadyImported(progress) = state.progress else { return progressError(state.progress) }
+
+		if let softwareAccounts = progress.accountsToMigrate?.software {
+			return checkIfOlympiaFactorSourceAlreadyExists(softwareAccounts)
+		}
+
+		state.progress = .migratedSoftwareAccounts(.init(
+			previous: progress,
+			migratedSoftwareAccounts: []
+		))
+
+		return migrateHardwareAccounts(in: &state)
+	}
+
+	private func checkIfOlympiaFactorSourceAlreadyExists(
+		_ softwareAccounts: AccountsToMigrate
+	) -> EffectTask<Action> {
+		.task {
+			let idOfExistingFactorSource = await factorSourcesClient.checkIfHasOlympiaFactorSourceForAccounts(softwareAccounts)
+			return .internal(.checkedIfOlympiaFactorSourceAlreadyExists(idOfExistingFactorSource, softwareAccounts: softwareAccounts))
+		}
+	}
+
+	private func checkedIfOlympiaFactorSourceAlreadyExists(
+		in state: inout State,
+		idOfExistingFactorSource: FactorSourceID.FromHash?,
+		softwareAccounts: AccountsToMigrate
+	) -> EffectTask<Action> {
+		guard case let .foundAlreadyImported(progress) = state.progress else { return progressError(state.progress) }
+
+		state.progress = .checkedIfOlympiaFactorSourceAlreadyExists(.init(
+			previous: progress,
+			softwareAccountsToMigrate: softwareAccounts
+		))
+
+		if let idOfExistingFactorSource {
+			return migrateSoftwareAccountsToBabylon(
 				softwareAccounts,
 				factorSourceID: idOfExistingFactorSource,
 				factorSource: nil
 			)
-
-		case let .migrateHardwareAccounts(hardwareAccounts, networkID):
-			let destination = Destinations.State.importOlympiaLedgerAccountsAndFactorSources(.init(
-				hardwareAccounts: hardwareAccounts,
-				networkID: networkID
-			))
-			if state.path.last != destination {
-				state.path.append(destination)
-			}
-			return .none
-
-		case let .findAlreadyImportedOlympiaSoftwareAccounts(scanned, alreadyImported):
-			let destination = Destinations.State.selectAccountsToImport(.init(
-				scannedAccounts: scanned,
-				alreadyImported: alreadyImported
-			))
-
-			if state.path.last != destination {
-				state.path.append(destination)
-			}
-			return .none
-
-		case let .validatedOlympiaSoftwareAccounts(softwareAccounts, privateHDFactorSource):
-
-			return convertSoftwareAccountsToBabylon(
-				softwareAccounts,
-				factorSourceID: privateHDFactorSource.factorSource.id,
-				factorSource: privateHDFactorSource
-			)
-
-		case let .migratedOlympiaSoftwareAccounts(migratedSoftwareAccounts):
-
-			if let hardwareAccounts = state.selectedAccounts?.hardware {
-				state.migratedAccounts.append(contentsOf: migratedSoftwareAccounts.babylonAccounts.rawValue)
-				// also need to add ledger and then migrate hardware account
-				return migrateHardwareAccounts(hardwareAccounts)
-			} else {
-				assert(state.selectedAccounts?.hardware == nil)
-				// no hardware accounts to migrate...
-				let destination = Destinations.State.completion(.init(migratedAccounts: migratedSoftwareAccounts.babylonAccounts, unvalidatedOlympiaHardwareAccounts: nil))
-				if state.path.last != destination {
-					state.path.append(destination)
-				}
-			}
-			return .none
 		}
-	}
-}
 
-extension ImportOlympiaWalletCoordinator {
-	private func validateSoftwareAccounts(
-		_ mnemonicWithPassphrase: MnemonicWithPassphrase,
-		softwareAccounts: NonEmpty<OrderedSet<OlympiaAccountToMigrate>>
+		state.path.append(
+			.importMnemonic(.init(
+				header: .init(
+					title: L10n.ImportOlympiaAccounts.VerifySeedPhrase.title,
+					subtitle: L10n.ImportOlympiaAccounts.VerifySeedPhrase.subtitle
+				),
+				warning: L10n.ImportOlympiaAccounts.VerifySeedPhrase.warning,
+				isWordCountFixed: true,
+				persistAsMnemonicKind: nil,
+				wordCount: progress.previous.expectedMnemonicWordCount
+			))
+		)
+
+		return .none
+	}
+
+	private func importedMnemonic(
+		in state: inout State,
+		mnemonicWithPassphrase: MnemonicWithPassphrase
 	) -> EffectTask<Action> {
-		.run { send in
+		guard case let .checkedIfOlympiaFactorSourceAlreadyExists(progress) = state.progress else { return progressError(state.progress) }
+
+		do {
 			try mnemonicWithPassphrase.validatePublicKeysOf(
-				softwareAccounts: softwareAccounts
+				softwareAccounts: progress.softwareAccountsToMigrate
 			)
 
 			let privateHDFactorSource = try PrivateHDFactorSource(
 				mnemonicWithPassphrase: mnemonicWithPassphrase,
 				factorSource: DeviceFactorSource.olympia(mnemonicWithPassphrase: mnemonicWithPassphrase)
 			)
-			await send(
-				.internal(.validatedOlympiaSoftwareAccounts(
-					softwareAccounts: softwareAccounts,
-					privateHDFactorSource: privateHDFactorSource
-				))
-			)
 
-		} catch: { error, _ in
+			return migrateSoftwareAccountsToBabylon(
+				progress.softwareAccountsToMigrate,
+				factorSourceID: privateHDFactorSource.factorSource.id,
+				factorSource: privateHDFactorSource
+			)
+		} catch {
 			errorQueue.schedule(error)
+			return .none
 		}
 	}
 
-	private func convertSoftwareAccountsToBabylon(
-		_ olympiaAccounts: NonEmpty<OrderedSet<OlympiaAccountToMigrate>>,
+	private func migrateSoftwareAccountsToBabylon(
+		_ olympiaAccounts: AccountsToMigrate,
 		factorSourceID: FactorSourceID.FromHash,
 		factorSource: PrivateHDFactorSource?
 	) -> EffectTask<Action> {
@@ -335,15 +427,136 @@ extension ImportOlympiaWalletCoordinator {
 				}
 			}
 
-			await send(.internal(.migratedOlympiaSoftwareAccounts(migrated)))
+			await send(.internal(.migratedSoftwareAccountsToBabylon(migrated)))
 		} catch: { error, _ in
 			errorQueue.schedule(error)
 		}
 	}
+
+	public func migratedSoftwareAccountsToBabylon(
+		in state: inout State,
+		softwareAccounts: MigratedSoftwareAccounts
+	) -> EffectTask<Action> {
+		guard case let .checkedIfOlympiaFactorSourceAlreadyExists(progress) = state.progress else { return progressError(state.progress) }
+
+		state.progress = .migratedSoftwareAccounts(.init(
+			previous: progress.previous,
+			migratedSoftwareAccounts: softwareAccounts.babylonAccounts.rawValue
+		))
+
+		return migrateHardwareAccounts(in: &state)
+	}
+
+	private func migrateHardwareAccounts(
+		in state: inout State
+	) -> EffectTask<Action> {
+		guard case let .migratedSoftwareAccounts(progress) = state.progress else { return progressError(state.progress) }
+
+		if let hardwareAccounts = progress.previous.accountsToMigrate?.hardware {
+			state.path.append(
+				.importOlympiaLedgerAccountsAndFactorSources(.init(
+					networkID: progress.previous.networkID,
+					hardwareAccounts: hardwareAccounts
+				))
+			)
+		} else {
+			state.path.append(
+				.completion(.init(
+					previouslyMigrated: progress.previous.previouslyImported,
+					migrated: progress.migratedSoftwareAccounts
+				))
+			)
+		}
+
+		return .none
+	}
+
+	private func importedOlympiaLedgerAccountsAndFactorSources(
+		in state: inout State,
+		migratedAccounts: MigratedAccounts
+	) -> EffectTask<Action> {
+		guard case let .migratedSoftwareAccounts(progress) = state.progress else { return progressError(state.progress) }
+
+		state.path.append(
+			.completion(.init(
+				previouslyMigrated: progress.previous.previouslyImported,
+				migrated: progress.migratedSoftwareAccounts + migratedAccounts
+			))
+		)
+
+		return .none
+	}
+
+	private func cancelOlympiaLedgerAccountsAndFactorSources(
+		in state: inout State,
+		failure: ImportOlympiaLedgerAccountsAndFactorSources.DelegateAction.Failure
+	) -> EffectTask<Action> {
+		guard case .migratedSoftwareAccounts = state.progress else { return progressError(state.progress) }
+
+		return .run { _ in
+			await dismiss()
+		}
+	}
+}
+
+// MARK: - Helper methods
+
+extension ImportOlympiaWalletCoordinator {
+	private func migratableAccounts(
+		from scannedAccounts: AccountsToMigrate,
+		networkID: NetworkID,
+		existingAccounts: Int
+	) throws -> NonEmpty<[MigratableAccount]> {
+		let result = try scannedAccounts.enumerated().map { index, account in
+			let babylonAddress: AccountAddress = try deriveVirtualAccountAddressFromPublicKey(
+				publicKey: account.publicKey.intoEngine(),
+				networkId: networkID.rawValue
+			).asSpecific()
+
+			return MigratableAccount(
+				id: account.id,
+				accountName: account.displayName?.rawValue,
+				olympiaAddress: account.address,
+				babylonAddress: babylonAddress,
+				appearanceID: .fromIndex(existingAccounts + index),
+				olympiaAccountType: account.accountType
+			)
+		}
+
+		guard let nonEmpty = NonEmpty<[MigratableAccount]>(result) else {
+			assertionFailure("This is impossible")
+			struct ImpossibleError: Error {}
+			throw ImpossibleError()
+		}
+
+		return nonEmpty
+	}
+
+	private func progressError(_ progress: Progress, line: Int = #line) -> EffectTask<Action> {
+		loggerGlobal.error("Implementation error. Incorrect progress value at line \(line): \(progress)")
+		assertionFailure("Implementation error. Incorrect progress value at line \(line): \(progress)")
+		return .run { _ in await dismiss() }
+	}
+
+	private func generalError(_ error: Error) -> EffectTask<Action> {
+		loggerGlobal.error("ImportOlympiaWalletCoordinator failed with error: \(error)")
+		errorQueue.schedule(error)
+		return .run { _ in await dismiss() }
+	}
 }
 
 // MARK: - GotNoAccountsToImport
-struct GotNoAccountsToImport: Swift.Error {}
+struct GotNoAccountsToImport: Error {}
 
 // MARK: - OlympiaFactorSourceToSaveIDDisrepancy
-struct OlympiaFactorSourceToSaveIDDisrepancy: Swift.Error {}
+struct OlympiaFactorSourceToSaveIDDisrepancy: Error {}
+
+extension Collection<OlympiaAccountToMigrate> {
+	var software: ImportOlympiaWalletCoordinator.AccountsToMigrate? {
+		NonEmpty(rawValue: OrderedSet(filter { $0.accountType == .software }))
+	}
+
+	var hardware: ImportOlympiaWalletCoordinator.AccountsToMigrate? {
+		NonEmpty(rawValue: OrderedSet(filter { $0.accountType == .hardware }))
+	}
+}

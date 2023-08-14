@@ -1,5 +1,5 @@
 import Cryptography
-import EngineToolkit
+import EngineKit
 import GatewayAPI
 import Prelude
 import Profile
@@ -29,18 +29,10 @@ extension GatewayAPI.TransactionPreviewRequest {
 		header: TransactionHeader,
 		transactionSigners: TransactionSigners
 	) throws {
-		let manifestString = {
-			switch rawManifest.instructions {
-			case let .string(manifestString): return manifestString
-			case .parsed: fatalError("you should have converted manifest to string first")
-			}
-		}()
-
 		let flags = GatewayAPI.TransactionPreviewRequestFlags(
-			unlimitedLoan: true, // True since no lock fee is added
+			useFreeCredit: true,
 			assumeAllSignatureProofs: false,
-			permitDuplicateIntentHash: false,
-			permitInvalidHeaderEpoch: false
+			skipEpochCheck: false
 		)
 
 		struct NotaryIsSignatoryDiscrepancy: Swift.Error {}
@@ -51,15 +43,15 @@ extension GatewayAPI.TransactionPreviewRequest {
 		}
 		let notaryIsSignatory = transactionSigners.notaryIsSignatory
 
-		self.init(
-			manifest: manifestString,
-			blobsHex: rawManifest.blobs.map(\.hex),
-			startEpochInclusive: .init(header.startEpochInclusive.rawValue),
-			endEpochExclusive: .init(header.endEpochExclusive.rawValue),
-			notaryPublicKey: GatewayAPI.PublicKey(from: header.publicKey),
+		try self.init(
+			manifest: rawManifest.instructions().asStr(),
+			blobsHex: rawManifest.blobs().map(\.hex),
+			startEpochInclusive: .init(header.startEpochInclusive),
+			endEpochExclusive: .init(header.endEpochExclusive),
+			notaryPublicKey: GatewayAPI.PublicKey(from: header.notaryPublicKey),
 			notaryIsSignatory: notaryIsSignatory,
 			tipPercentage: .init(header.tipPercentage),
-			nonce: .init(header.nonce.rawValue),
+			nonce: .init(header.nonce),
 			signerPublicKeys: transactionSigners.signerPublicKeys.map(GatewayAPI.PublicKey.init(from:)),
 			flags: flags
 		)
@@ -92,12 +84,12 @@ extension TransactionSigners {
 }
 
 extension GatewayAPI.PublicKey {
-	init(from engine: Engine.PublicKey) {
+	init(from engine: EngineToolkit.PublicKey) {
 		switch engine {
-		case let .ecdsaSecp256k1(key):
-			self = .ecdsaSecp256k1(.init(keyType: .ecdsaSecp256k1, keyHex: key.bytes.hex))
-		case let .eddsaEd25519(key):
-			self = .eddsaEd25519(.init(keyType: .eddsaEd25519, keyHex: key.bytes.hex))
+		case let .secp256k1(bytes):
+			self = .ecdsaSecp256k1(.init(keyType: .ecdsaSecp256k1, keyHex: bytes.hex()))
+		case let .ed25519(bytes):
+			self = .eddsaEd25519(.init(keyType: .eddsaEd25519, keyHex: bytes.hex()))
 		}
 	}
 }
@@ -115,11 +107,11 @@ extension GatewayAPI.PublicKey {
 
 // MARK: - NotarizeTransactionRequest
 public struct NotarizeTransactionRequest: Sendable, Hashable {
-	public let intentSignatures: Set<Engine.SignatureWithPublicKey>
+	public let intentSignatures: Set<EngineToolkit.SignatureWithPublicKey>
 	public let transactionIntent: TransactionIntent
 	public let notary: SLIP10.PrivateKey
 	public init(
-		intentSignatures: Set<Engine.SignatureWithPublicKey>,
+		intentSignatures: Set<EngineToolkit.SignatureWithPublicKey>,
 		transactionIntent: TransactionIntent,
 		notary: SLIP10.PrivateKey
 	) {
@@ -131,9 +123,9 @@ public struct NotarizeTransactionRequest: Sendable, Hashable {
 
 // MARK: - NotarizeTransactionResponse
 public struct NotarizeTransactionResponse: Sendable, Hashable {
-	public let notarized: CompileNotarizedTransactionIntentResponse
+	public let notarized: [UInt8]
 	public let txID: TXID
-	public init(notarized: CompileNotarizedTransactionIntentResponse, txID: TXID) {
+	public init(notarized: [UInt8], txID: TXID) {
 		self.notarized = notarized
 		self.txID = txID
 	}
@@ -144,6 +136,7 @@ public struct BuildTransactionIntentRequest: Sendable {
 	public let networkID: NetworkID
 	public let nonce: Nonce
 	public let manifest: TransactionManifest
+	public let message: Message
 	public let makeTransactionHeaderInput: MakeTransactionHeaderInput
 	public let isFaucetTransaction: Bool
 	public let ephemeralNotaryPublicKey: Curve25519.Signing.PublicKey
@@ -151,13 +144,15 @@ public struct BuildTransactionIntentRequest: Sendable {
 	public init(
 		networkID: NetworkID,
 		manifest: TransactionManifest,
-		nonce: Nonce,
+		message: Message,
+		nonce: Nonce = .secureRandom(),
 		makeTransactionHeaderInput: MakeTransactionHeaderInput = .default,
 		isFaucetTransaction: Bool = false,
 		ephemeralNotaryPublicKey: Curve25519.Signing.PublicKey
 	) {
 		self.networkID = networkID
 		self.manifest = manifest
+		self.message = message
 		self.nonce = nonce
 		self.makeTransactionHeaderInput = makeTransactionHeaderInput
 		self.isFaucetTransaction = isFaucetTransaction
@@ -183,12 +178,12 @@ public struct TransactionIntentWithSigners: Sendable, Hashable {
 extension TransactionClient {
 	public struct Guarantee: Sendable, Hashable {
 		public var amount: BigDecimal
-		public var instructionIndex: UInt32
+		public var instructionIndex: UInt64
 		public var resourceAddress: ResourceAddress
 
 		public init(
 			amount: BigDecimal,
-			instructionIndex: UInt32,
+			instructionIndex: UInt64,
 			resourceAddress: ResourceAddress
 		) {
 			self.amount = amount
@@ -201,6 +196,7 @@ extension TransactionClient {
 // MARK: - ManifestReviewRequest
 public struct ManifestReviewRequest: Sendable {
 	public let manifestToSign: TransactionManifest
+	public let message: Message
 	public let nonce: Nonce
 	public let feeToAdd: BigDecimal
 	public let makeTransactionHeaderInput: MakeTransactionHeaderInput
@@ -208,12 +204,14 @@ public struct ManifestReviewRequest: Sendable {
 
 	public init(
 		manifestToSign: TransactionManifest,
+		message: Message,
 		nonce: Nonce,
 		makeTransactionHeaderInput: MakeTransactionHeaderInput = .default,
 		feeToAdd: BigDecimal,
 		ephemeralNotaryPublicKey: Curve25519.Signing.PublicKey = Curve25519.Signing.PrivateKey().publicKey
 	) {
 		self.manifestToSign = manifestToSign
+		self.message = message
 		self.nonce = nonce
 		self.feeToAdd = feeToAdd
 		self.makeTransactionHeaderInput = makeTransactionHeaderInput
@@ -250,7 +248,7 @@ public struct AddFeeToManifestOutcomeExcludesLockFee: Sendable, Equatable {
 
 // MARK: - TransactionToReview
 public struct TransactionToReview: Sendable, Equatable {
-	public let analyzedManifestToReview: AnalyzeTransactionExecutionResponse
+	public let analyzedManifestToReview: ExecutionAnalysis
 	public let addFeeToManifestOutcome: AddFeeToManifestOutcome
 	public let networkID: NetworkID
 }

@@ -13,26 +13,20 @@ public struct ScanMultipleOlympiaQRCodes: Sendable, FeatureReducer {
 			public let payloadIndex: Int
 		}
 
-		public enum Step: Sendable, Hashable {
-			case scanQR(ScanQRCoordinator.State)
-
-			public init() {
-				self = .scanQR(.init(scanInstructions: L10n.ImportLegacyWallet.scanQRCodeInstructions))
-			}
-		}
-
-		public var step: Step
+		public var scanQR: ScanQRCoordinator.State
 		public var numberOfPayloadsToScan: Int?
 		public var scannedPayloads: IdentifiedArrayOf<ScannedPayload>
 
 		public init(
-			step: Step = .init(),
-			numberOfPayloadsToScan: Int? = nil,
 			scannedPayloads: IdentifiedArrayOf<ScannedPayload> = []
 		) {
-			self.step = step
-			self.numberOfPayloadsToScan = numberOfPayloadsToScan
+			self.scanQR = .init(scanInstructions: L10n.ImportOlympiaAccounts.ScanQR.instructions)
 			self.scannedPayloads = scannedPayloads
+		}
+
+		public mutating func reset() {
+			numberOfPayloadsToScan = nil
+			scannedPayloads = []
 		}
 	}
 
@@ -49,22 +43,20 @@ public struct ScanMultipleOlympiaQRCodes: Sendable, FeatureReducer {
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
+		case viewAppeared
 		case finishedScanning(ScannedParsedOlympiaWalletToMigrate)
 	}
 
 	@Dependency(\.importLegacyWalletClient) var importLegacyWalletClient
+	@Dependency(\.dismiss) var dismiss
 	@Dependency(\.errorQueue) var errorQueue
 
 	public init() {}
 
 	public var body: some ReducerProtocolOf<Self> {
-		Scope(state: \.step, action: /Action.self) {
-			EmptyReducer()
-				.ifCaseLet(/State.Step.scanQR, action: /Action.child .. ChildAction.scanQR) {
-					ScanQRCoordinator()
-				}
+		Scope(state: \.scanQR, action: /Action.child .. ChildAction.scanQR) {
+			ScanQRCoordinator()
 		}
-
 		Reduce(core)
 	}
 
@@ -103,6 +95,12 @@ public struct ScanMultipleOlympiaQRCodes: Sendable, FeatureReducer {
 				errorQueue.schedule(error)
 			}
 			return .none
+
+		case .scanQR(.delegate(.dismiss)):
+			return .run { _ in
+				await dismiss()
+			}
+
 		default:
 			return .none
 		}
@@ -118,7 +116,7 @@ public struct ScanMultipleOlympiaQRCodes: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .appeared:
-			return .none
+			return .send(.delegate(.viewAppeared))
 		}
 	}
 }

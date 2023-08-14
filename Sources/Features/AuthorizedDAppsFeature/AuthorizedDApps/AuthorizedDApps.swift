@@ -14,17 +14,13 @@ public struct AuthorizedDapps: Sendable, FeatureReducer {
 	// MARK: State
 
 	public struct State: Sendable, Hashable {
-		public var dApps: Profile.Network.AuthorizedDapps
+		public var dApps: Profile.Network.AuthorizedDapps = []
 		public var thumbnails: [Profile.Network.AuthorizedDapp.ID: URL] = [:]
 
 		@PresentationState
 		public var presentedDapp: DappDetails.State?
 
-		public init(
-			dApps: Profile.Network.AuthorizedDapps = [],
-			presentedDapp: DappDetails.State? = nil
-		) {
-			self.dApps = dApps
+		public init(presentedDapp: DappDetails.State? = nil) {
 			self.presentedDapp = presentedDapp
 		}
 	}
@@ -83,7 +79,7 @@ public struct AuthorizedDapps: Sendable, FeatureReducer {
 				for dApp in dApps {
 					let iconURL = try? await cacheClient.withCaching(
 						cacheEntry: .dAppMetadata(dApp.id.address),
-						request: { try await gatewayAPIClient.getEntityMetadata(dApp.id.address) }
+						request: { try await gatewayAPIClient.getEntityMetadata(dApp.id.address, [.iconURL]) }
 					).iconURL
 					if let iconURL {
 						await send(.internal(.loadedThumbnail(iconURL, dApp: dApp.id)))

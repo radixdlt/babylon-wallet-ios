@@ -6,11 +6,7 @@ import NewConnectionFeature
 import Profile
 import SharedModels
 
-// MARK: - DeviceInfo
-public struct DeviceInfo: Sendable, Hashable {
-	public let id: HexCodable32Bytes
-	public let model: P2P.LedgerHardwareWallet.Model
-}
+public typealias DeviceInfo = P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.GetDeviceInfo
 
 // MARK: - AddLedgerFactorSource
 public struct AddLedgerFactorSource: Sendable, FeatureReducer {
@@ -74,6 +70,7 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.factorSourcesClient) var factorSourcesClient
 	@Dependency(\.ledgerHardwareWalletClient) var ledgerHardwareWalletClient
+	@Dependency(\.radixConnectClient) var radixConnectClient
 
 	public init() {}
 
@@ -129,8 +126,7 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 		state.isWaitingForResponseFromLedger = true
 		return .task {
 			let result = await TaskResult {
-				let info = try await ledgerHardwareWalletClient.getDeviceInfo()
-				return DeviceInfo(id: info.id, model: info.model)
+				try await ledgerHardwareWalletClient.getDeviceInfo()
 			}
 
 			return .internal(.getDeviceInfoResult(result))
@@ -247,16 +243,6 @@ extension LedgerHardwareWalletFactorSource {
 			name: name,
 			deviceID: device.id
 		)
-	}
-}
-
-// MARK: - OlympiaAccountsValidation
-public struct OlympiaAccountsValidation: Sendable, Hashable {
-	public var validated: Set<OlympiaAccountToMigrate>
-	public var unvalidated: Set<OlympiaAccountToMigrate>
-	public init(validated: Set<OlympiaAccountToMigrate>, unvalidated: Set<OlympiaAccountToMigrate>) {
-		self.validated = validated
-		self.unvalidated = unvalidated
 	}
 }
 

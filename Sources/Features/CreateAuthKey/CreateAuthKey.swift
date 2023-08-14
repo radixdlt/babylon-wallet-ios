@@ -1,7 +1,7 @@
 import AccountsClient
 import Cryptography
 import DerivePublicKeysFeature
-import EngineToolkit
+import EngineKit
 import FactorSourcesClient
 import FeaturePrelude
 import PersonasClient
@@ -134,7 +134,6 @@ public struct CreateAuthKey: Sendable, FeatureReducer {
 	@Dependency(\.accountsClient) var accountsClient
 	@Dependency(\.personasClient) var personasClient
 	@Dependency(\.factorSourcesClient) var factorSourcesClient
-	@Dependency(\.engineToolkitClient) var engineToolkitClient
 
 	public init() {}
 
@@ -168,9 +167,9 @@ public struct CreateAuthKey: Sendable, FeatureReducer {
 		case let .createdManifestForAuthKeyCreation(manifest, authenticationSigningFactorInstance):
 			state.step = .transactionReview(.init(
 				transactionManifest: manifest,
-				nonce: engineToolkitClient.generateTXNonce(),
+				nonce: .secureRandom(),
 				signTransactionPurpose: .internalManifest(.uploadAuthKey),
-				message: nil
+				message: .none
 			))
 			state.authenticationSigningFactorInstance = authenticationSigningFactorInstance
 			return .none

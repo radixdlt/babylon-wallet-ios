@@ -1,4 +1,4 @@
-import EngineToolkit
+import EngineKit
 import Prelude
 
 // MARK: - Radix
@@ -48,6 +48,13 @@ extension Radix.Network {
 		id: .kisharnet,
 		displayDescription: "RCnet"
 	)
+
+	public static let ansharnet = Self(
+		name: "ansharnet",
+		id: .ansharnet,
+		displayDescription: "RCnet-V2 test network"
+	)
+
 	public static let hammunet = Self(
 		name: "hammunet",
 		id: .hammunet,
@@ -75,6 +82,7 @@ extension Radix.Network {
 	fileprivate static let lookupSet: Set<Self> = [
 		.nebunet,
 		.kisharnet,
+		.ansharnet,
 		.hammunet,
 		.enkinet,
 		.mardunet,

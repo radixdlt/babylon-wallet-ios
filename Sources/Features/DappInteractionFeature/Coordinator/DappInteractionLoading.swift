@@ -1,4 +1,5 @@
 import CacheClient
+import EngineKit
 import FeaturePrelude
 import GatewayAPI
 
@@ -93,7 +94,7 @@ struct DappInteractionLoading: Sendable, FeatureReducer {
 							return .cachedIsValid
 						},
 						request: {
-							let entityMetadataForDapp = try await gatewayAPIClient.getEntityMetadata(dappDefinitionAddress.address)
+							let entityMetadataForDapp = try await gatewayAPIClient.getEntityMetadata(dappDefinitionAddress.address, .dappMetadataKeys)
 							return DappMetadata.Ledger(
 								entityMetadataForDapp: entityMetadataForDapp,
 								dAppDefinintionAddress: dappDefinitionAddress,
@@ -169,7 +170,7 @@ extension DappMetadata.Ledger {
 			dAppDefinintionAddress: dAppDefinintionAddress,
 			name: name,
 			description: items[.description]?.asString,
-			thumbnail: items[.iconURL]?.asString.flatMap(URL.init)
+			thumbnail: items[.iconURL]?.asURL
 		)
 	}
 }

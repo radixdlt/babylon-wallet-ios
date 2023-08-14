@@ -38,13 +38,7 @@ extension DisplayMnemonic {
 							action: { .child(.importMnemonic($0)) }
 						)
 					) { importMnemonicViewStore in
-						VStack(alignment: .leading, spacing: .medium2) {
-							WarningView(text: L10n.RevealSeedPhrase.warning)
-								.padding(.horizontal, .medium3)
-
-							ImportMnemonic.View(store: importMnemonicViewStore)
-						}
-						.padding(.top, .medium3)
+						ImportMnemonic.View(store: importMnemonicViewStore)
 					}
 				}
 			}

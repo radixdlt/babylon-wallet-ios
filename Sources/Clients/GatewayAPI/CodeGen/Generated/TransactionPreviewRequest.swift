@@ -30,7 +30,7 @@ public struct TransactionPreviewRequest: Codable, Hashable {
     public private(set) var notaryIsSignatory: Bool?
     /** An integer between `0` and `255`, giving the validator tip as a percentage amount. A value of `1` corresponds to 1% of the fee. */
     public private(set) var tipPercentage: Int
-    /** A decimal-string-encoded integer between `0` and `2^64 - 1`, used to ensure the transaction intent is unique. */
+    /** A decimal-string-encoded integer between `0` and `2^32 - 1`, used to ensure the transaction intent is unique. */
     public private(set) var nonce: Int64
     /** A list of public keys to be used as transaction signers */
     public private(set) var signerPublicKeys: [PublicKey]
