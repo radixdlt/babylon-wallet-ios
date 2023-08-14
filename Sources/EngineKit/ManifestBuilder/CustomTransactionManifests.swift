@@ -8,9 +8,9 @@ extension ManifestBuilder {
 	) throws -> TransactionManifest {
 		try Self.make {
 			if includeLockFeeInstruction {
-				faucetLockFee
+				faucetLockFee()
 			}
-			faucetFreeXrd
+			faucetFreeXrd()
 			try accountTryDepositBatchOrAbort(componentAddress.intoEngine(), nil)
 		}
 		.build(networkId: networkID.rawValue)

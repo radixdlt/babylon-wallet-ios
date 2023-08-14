@@ -266,7 +266,7 @@ extension TransactionClient {
 
 			let transactionPreviewRequest = try await createTransactionPreviewRequest(for: request, networkID: networkID)
 			let transactionPreviewResponse = try await gatewayAPIClient.transactionPreview(transactionPreviewRequest)
-			guard transactionPreviewResponse.receipt.status == GatewayAPI.TransactionReceiptStatus.succeeded else {
+			guard transactionPreviewResponse.receipt.status == .succeeded else {
 				throw TransactionFailure.failedToPrepareTXReview(
 					.failedToRetrieveTXReceipt(transactionPreviewResponse.receipt.errorMessage ?? "Unknown reason")
 				)
