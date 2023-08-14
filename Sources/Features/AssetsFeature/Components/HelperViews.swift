@@ -60,6 +60,12 @@ struct KeyValueView<Content: View>: View {
 		}
 	}
 
+	init(validatorAddress: ValidatorAddress) where Content == AddressView {
+		self.init(key: "Validator") { // FIXME: Strings - L10n.Account.PoolUnits.validatorAddress
+			AddressView(.address(.validator(validatorAddress)))
+		}
+	}
+
 	init(key: String, value: String) where Content == Text {
 		self.key = key
 		self.content = Text(value)
