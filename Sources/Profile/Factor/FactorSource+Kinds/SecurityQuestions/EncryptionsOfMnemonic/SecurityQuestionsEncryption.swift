@@ -163,21 +163,12 @@ public enum CAP23 {
 	}
 }
 
-// MARK: - EncryptionAES256GCM_Version1
-public struct EncryptionAES256GCM_Version1 {
-	public init() {}
-	public func decrypt(data: Data, key: SymmetricKey) throws -> Data {
-		let sealedBox = try AES.GCM.SealedBox(combined: data)
-		return try AES.GCM.open(sealedBox, using: key)
-	}
-
-	public func encrypt(data: Data, key: SymmetricKey) throws -> Data {
-		let sealedBox = try AES.GCM.seal(data, using: key)
-		guard let combined = sealedBox.combined else {
-			struct SealedBoxContainsNoCombinedCipher: Swift.Error {}
-			throw SealedBoxContainsNoCombinedCipher()
-		}
-		return combined
+// MARK: - SecurityQuestionsFactorSource.SealedMnemonic
+extension SecurityQuestionsFactorSource {
+	public struct SealedMnemonic: Sendable, Hashable, Codable {
+		public let securityQuestions: NonEmpty<OrderedSet<SecurityQuestion>>
+		public let encryptionScheme: EncryptionAES256GCM
+		public let encryptions: NonEmpty<OrderedSet<HexCodable>>
 	}
 }
 
@@ -185,14 +176,24 @@ extension SecurityQuestionsFactorSource.SealedMnemonic {
 	static func encrypt(
 		mnemonic: Mnemonic,
 		withAnswersToQuestions answersToQuestion: NonEmpty<OrderedSet<AnswerToSecurityQuestion>>,
-		jsonEncoder: JSONEncoder
+		jsonEncoder: JSONEncoder,
+		encryptionScheme: EncryptionAES256GCM = .default
 	) throws -> Self {
 		let plaintext = try jsonEncoder.encode(mnemonic)
-		let encryptionKeys = try CAP23.deriveEncryptionKeysFrom(answersToQuestions: answersToQuestion)
-		let encryptionScheme = EncryptionAES256GCM_Version1()
+
+		let encryptionKeys = try CAP23.deriveEncryptionKeysFrom(
+			answersToQuestions: answersToQuestion
+		)
+
 		let encryptionsArray = try encryptionKeys.map {
-			try HexCodable(data: encryptionScheme.encrypt(data: plaintext, key: $0))
+			try HexCodable(
+				data: encryptionScheme.encrypt(
+					data: plaintext,
+					key: $0
+				)
+			)
 		}
+
 		let encryptionsNonEmpty = NonEmpty<OrderedSet<HexCodable>>(
 			rawValue: OrderedSet(
 				uncheckedUniqueElements: encryptionsArray
@@ -207,6 +208,7 @@ extension SecurityQuestionsFactorSource.SealedMnemonic {
 
 		return Self(
 			securityQuestions: questions,
+			encryptionScheme: encryptionScheme,
 			encryptions: encryptionsNonEmpty
 		)
 	}
@@ -215,23 +217,25 @@ extension SecurityQuestionsFactorSource.SealedMnemonic {
 		withAnswersToQuestions answersToQuestion: NonEmpty<OrderedSet<AnswerToSecurityQuestion>>,
 		jsonDecoder: JSONDecoder
 	) throws -> Mnemonic {
-		let decryptionKeys = try CAP23.deriveEncryptionKeysFrom(answersToQuestions: answersToQuestion)
-		let encryptionScheme = EncryptionAES256GCM_Version1()
+		let decryptionKeys = try CAP23.deriveEncryptionKeysFrom(
+			answersToQuestions: answersToQuestion
+		)
+
 		for decryptionKey in decryptionKeys {
 			for encryptedMnemonic in self.encryptions {
-				let decrypted: Data
 				do {
-					decrypted = try encryptionScheme.decrypt(
+					let decrypted = try encryptionScheme.decrypt(
 						data: encryptedMnemonic.data,
 						key: decryptionKey
 					)
+					return try jsonDecoder.decode(Mnemonic.self, from: decrypted)
 				} catch {
 					continue
 				}
-				let decoded = try jsonDecoder.decode(Mnemonic.self, from: decrypted)
-				return decoded
 			}
 		}
+
+		// Failure
 		struct FailedToDecrypt: Swift.Error {}
 		throw FailedToDecrypt()
 	}

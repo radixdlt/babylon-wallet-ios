@@ -87,14 +87,6 @@ public struct AbstractAnswerToSecurityQuestion<AbstractAnswer>: Sendable, Hashab
 	}
 }
 
-// MARK: - SecurityQuestionsFactorSource.SealedMnemonic
-extension SecurityQuestionsFactorSource {
-	public struct SealedMnemonic: Sendable, Hashable, Codable {
-		public let securityQuestions: NonEmpty<OrderedSet<SecurityQuestion>>
-		public let encryptions: NonEmpty<OrderedSet<HexCodable>>
-	}
-}
-
 extension SecurityQuestionsFactorSource {
 	public func decrypt(
 		answersToQuestions: NonEmpty<OrderedSet<AnswerToSecurityQuestion>>

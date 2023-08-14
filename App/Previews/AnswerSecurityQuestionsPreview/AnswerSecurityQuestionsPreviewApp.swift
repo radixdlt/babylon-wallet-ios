@@ -5,7 +5,7 @@ import FeaturesPreviewerFeature
 extension AnswerSecurityQuestionsCoordinator.State: EmptyInitializable {
 	public init() {
 		self.init(
-			/// expect: `"walk warrior drive idle maid cherry connect slide slide phrase tower ability trash entry almost follow erupt egg trash tennis omit wing course sugar"`
+			/// expect: `"horn grass ticket ramp license matter volume film antenna school artefact script poem result culture gate learn minor when adjust jelly defense spring one"`
 //			purpose: .encrypt
 			purpose: .decrypt(try! .fromJSON(json))
 		)
@@ -62,54 +62,60 @@ extension SecurityQuestionsFactorSource {
 }
 
 private let json = """
- {
-	"common" :  {
-		"addedOn" : "2023-06-09T12:30:28Z",
-		"cryptoParameters" :  {
-			"supportedCurves" :  [
-				"curve25519"
-			],
-			"supportedDerivationPathSchemes" :  [
-				"cap26"
-			]
-		},
-		"id" : "5eec63f760a8d15b4e544bf334f5532b61ce741c28aa24475f49c472f33ac29d0e",
-		"lastUsedOn" : "2023-06-09T12:30:28Z"
-	},
-	"sealedMnemonic" :  {
-		"encryptions" :  [
-			"df0056d91a2e9a0ed9337b666c737268e0f1ecd894de302774647ec63001149d80df8054906ef9432b01f9adc13782ad441efdf263dab355f7e841742e1d82779094f78e5ba54012294578dd864c3cc47b3a54bd95edd0116f0c0f9962849914a9109632742b5780b926249bda284fce2194ea3225278b0dee1ec317c6cdb5c3ef6b10bf939004b8e1cffa2fb00a0c7a24026cd844e84eb0334da318bae3681652d1f7d22913262773100b8c8d6dcd3a46d2",
-			"0eddb0d0af54f52941dde0889d01c41b204fcce8e2b01e03a1244239150387f186807114a51e1f642026c8af3fffda722df5359b8a0dd7aee8395d044bd211c919bc8b4ec4e0e0aa5b6692a45e025664dfeadc2ba5bd02f8e34caa3cd3a11efac0751e3266df33df3ea8b00dd7c903dff632bfacf3e02ab639a03c15526d4e7908d96c031fe6c1959778e990dcc55a4583207d579b5b0d4d60c66768791800bd5aaa20f70c20c9e6f013d28b145ab69b4fca",
-			"10414dd09216922a3b6b3e2e3398f2488e83bd13adc7f24cbbdf11161d3e72e8670ed307d25f2d55197e9e604877ec5c45056ddda681b86aa7e1fa79bcdbf5c5beeb67c8b9f69c824e67df3855ee5c5896d956925f25b47c948fb85d2ea516ed8e19fb9112aa84a4542878ef61856e7e00cece114cf87ab7a97e36472f07e66417b62f63eea2d2afaf847b10ce5d7a88bc0021511e55dd07d6ef1ff67b938cb4a825d5445439bd03a86947b44163138ef868",
-			"68d1701a00e36376a3365cf151eb032a4de5fd9e00944404ddb0b6761f607ef9fe6dc0327a1d8b1d1f83ce5103fa913187e1ab99d12d8706817d1f054e27c5e54871612f7b54cb0c6a097ee46b39200d1b1f2a322620f8469be01a00805031f469434eb4d18fcf89a7715c9f83d4579d751aea445afcece2cccd20a803aad9390b0d36434f6bf94336cc7560df0b7b41c787991869ee2c9f25f8d0e974267d792c546816a7ece807693a5688f936dd1b9106"
+{
+	"common" : {
+	  "addedOn" : "2023-08-14T13:46:56Z",
+	  "cryptoParameters" : {
+		"supportedCurves" : [
+		  "curve25519"
 		],
-		"securityQuestions" :  [
-			 {
-				"id" : 0,
-				"kind" : "freeform",
-				"question" : "What's the first name of RDX Works Founder",
-				"version" : 1
-			},
-			 {
-				"id" : 1,
-				"kind" : "freeform",
-				"question" : "What's the first name of RDX Works CEO",
-				"version" : 1
-			},
-			 {
-				"id" : 2,
-				"kind" : "freeform",
-				"question" : "What's the first name of RDX Works CTO",
-				"version" : 1
-			},
-			 {
-				"id" : 3,
-				"kind" : "freeform",
-				"question" : "What's the first name of RDX Works CPO",
-				"version" : 1
-			}
+		"supportedDerivationPathSchemes" : [
+		  "cap26"
 		]
-	}
-}
+	  },
+	  "flags" : [
 
+	  ],
+	  "lastUsedOn" : "2023-08-14T13:46:56Z"
+	},
+	"id" : {
+	  "body" : "43efcc124fbaff4353ea6557ca17203659c0fa9cb05ce020bf49cef1e914f1f1",
+	  "kind" : "securityQuestions"
+	},
+	"sealedMnemonic" : {
+	  "encryptions" : [
+		"1ef9c8b3c8114df8aac683bb7184bd8b22e6d66616e051cca8d016050228e325596639d41e2e62680d3342ab18f81803a476bbf6eae239ea6ebbf7d31037182e6de29dde4d297c671c224c15c5bceaa1efb640ac16b3c8dcfe70c5dcd78d575f64944ac0120ddc195090f7dba45c5bc58a76c82c788fd294ab93a5c256b5714bf426f0e52e00cd12678e8b74cecf0aec5f5d63f718e1c3f4d1575d6d11e056e49ea7fae07a5177fed39b3825df83b76d81e5529e02d3d033",
+		"b1b72fb096887319f7ebcd5fc72a57c55e39a1cdcc94650902e1ddfcbde266b3c6eb7b74ef3bc0494856821eacc0d99cc2a674149ec5b733c5400bfb77bd933c67cb4a5f59548225b1d2f8562663e9a4d56bc942c8d0974c717e73821348675b09c78e731e601c68b1e81f0a5bd371b294b2d87317be6143a3578a322ac5a75c074092ada8fa3cf98f4d8f580b8691f71863912d15d92702a9a3539494c2c7ea1177408748040524b560b8822cd9e553797a2f4bd3a381ce",
+		"cbeef7108fb3247e7eb0a9aef967556300d2b29dfbd2e68fd25a70cd8180a7232aa76facaedc3031743883d9aa89f833ab43c42b4f988be5bfa57b397d79cd5671b7a3a101cd4db36e554b476b38a366fc9f1f96bd040b4da5d1e19cc61c7fd795558c4c21c9f79dfe7c3a4d5f11ec572180852718ac7afc4490c3e600286f095c5602bd044d01577d78cb5e9963fb0050ed346eaa405a3f5273f6af420b52612d83b95f1fb3332c6a261094d6aa9e3af361352639a2be65",
+		"f646f86bbba3ebccbdb008397bc8049a9e12dc7e4c4c88505c0939553b4cd10aacae6882600aadfef7a67d8b6bba6f7a7ecb3942c89b2dd269f93ab34f2bcb89b6b2144a60866440c35257990197b886e75346ddd010b452944065c838b608aa30e0d28a931c077f17d1797b7429ed822c4afa0557b11fe465f1476b5b03609d8e941db9dc89adafd20fb2b11a5613726c97156561a99a978cf1269b36868c35c3bbb8bacff7724fe7187bbda1ffcfd96b034227f3a0aa5d"
+	  ],
+	  "encryptionScheme" : "version1",
+	  "securityQuestions" : [
+		{
+		  "id" : 0,
+		  "kind" : "freeform",
+		  "question" : "What's the first name of RDX Works Founder",
+		  "version" : 1
+		},
+		{
+		  "id" : 1,
+		  "kind" : "freeform",
+		  "question" : "What's the first name of RDX Works CEO",
+		  "version" : 1
+		},
+		{
+		  "id" : 2,
+		  "kind" : "freeform",
+		  "question" : "What's the first name of RDX Works CTO",
+		  "version" : 1
+		},
+		{
+		  "id" : 3,
+		  "kind" : "freeform",
+		  "question" : "What's the first name of RDX Works CPO",
+		  "version" : 1
+		}
+	  ]
+	}
+  }
 """
