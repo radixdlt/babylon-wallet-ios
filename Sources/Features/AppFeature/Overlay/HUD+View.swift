@@ -17,6 +17,14 @@ extension HUD.State {
 				text: "Exported \(encrypted ? "encrypted " : "")wallet backup file",
 				icon: .init(kind: encrypted ? .system("lock.rectangle.stack") : .system("rectangle.stack"), foregroundColor: .app.green1)
 			)
+
+		case .decryptedProfile:
+			// FIXME: Strings
+			return .init(
+				offset: offset,
+				text: "Successfully decrypted wallet file.",
+				icon: .init(kind: .system("lock.open"), foregroundColor: .app.green1)
+			)
 		}
 	}
 }

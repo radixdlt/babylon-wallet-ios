@@ -31,6 +31,13 @@ public enum ExportableProfileFile: FileDocument, Sendable, Hashable {
 	case encrypted(EncryptedProfileSnapshot)
 }
 
+extension String {
+	static let profileFileEncryptedPart = "encrypted"
+	private static let filenameProfileBase = "radix_wallet_backup_file"
+	static let filenameProfileNotEncrypted: Self = "\(filenameProfileBase).plaintext.json"
+	static let filenameProfileEncrypted: Self = "\(filenameProfileBase).\(profileFileEncryptedPart).json"
+}
+
 extension ExportableProfileFile {
 	public static let readableContentTypes: [UTType] = [.profile]
 
@@ -306,15 +313,9 @@ public struct ProfileBackups: Sendable, FeatureReducer {
 			return .none
 
 		case let .profileExportResult(.success(exportedProfileURL)):
-			if let exported = state.profileFilePotentiallyEncrypted {
-				let didEncryptIt: Bool = {
-					switch exported {
-					case .encrypted: return true
-					case .plaintext: return false
-					}
-				}()
-				overlayWindowClient.scheduleHUD(.init(kind: .exportedProfile(encrypted: didEncryptIt)))
-			}
+			let didEncryptIt = exportedProfileURL.pathComponents.contains(.profileFileEncryptedPart)
+
+			overlayWindowClient.scheduleHUD(.init(kind: .exportedProfile(encrypted: didEncryptIt)))
 
 			loggerGlobal.notice("Profile successfully exported to: \(exportedProfileURL)")
 			return .none
@@ -388,6 +389,7 @@ public struct ProfileBackups: Sendable, FeatureReducer {
 
 		case let .destination(.presented(.inputEncryptionPassword(.delegate(.successfullyDecrypted(_, decrypted))))):
 			state.destination = nil
+			overlayWindowClient.scheduleHUD(.init(kind: .decryptedProfile))
 			importing(snapshot: decrypted, state: &state)
 			return .none
 

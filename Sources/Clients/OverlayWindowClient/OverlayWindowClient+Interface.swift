@@ -65,6 +65,7 @@ extension OverlayWindowClient {
 		public struct HUD: Sendable, Hashable, Identifiable {
 			public enum Kind: Sendable, Hashable {
 				case copied
+				case decryptedProfile
 				case exportedProfile(encrypted: Bool)
 			}
 

@@ -75,7 +75,12 @@ extension ProfileBackups {
 					),
 					document: viewStore.profileFilePotentiallyEncrypted,
 					contentType: .profile,
-					defaultFilename: "radix_wallet_backup_file.json",
+					defaultFilename: viewStore.profileFilePotentiallyEncrypted.map {
+						switch $0 {
+						case .plaintext: return String.filenameProfileNotEncrypted
+						case .encrypted: return String.filenameProfileEncrypted
+						}
+					} ?? String.filenameProfileNotEncrypted,
 					onCompletion: { viewStore.send(.profileExportResult($0.mapError { $0 as NSError })) }
 				)
 			}

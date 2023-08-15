@@ -7,7 +7,7 @@ extension InputEncryptionPassword.State {
 			confirmedEncryptionPassword: confirmedEncryptionPassword,
 			focusedField: focusedField,
 			needToConfirm: needToConfirm,
-			controlState: !inputtedEncryptionPassword.isEmpty && inputtedEncryptionPassword == confirmedEncryptionPassword ? .enabled : .disabled
+			controlState: (mode.isDecrypt && !inputtedEncryptionPassword.isEmpty) || (!inputtedEncryptionPassword.isEmpty && inputtedEncryptionPassword == confirmedEncryptionPassword) ? .enabled : .disabled
 		)
 	}
 }

@@ -1,5 +1,6 @@
 import Cryptography
 import FeaturePrelude
+import OverlayWindowClient
 
 public typealias EncryptionPassword = String
 
@@ -10,6 +11,13 @@ public struct InputEncryptionPassword: Sendable, FeatureReducer {
 			case decrypt(EncryptedProfileSnapshot)
 			case loadThenEncrypt(withScheme: EncryptionScheme = .default)
 			case encryptSpecific(ProfileSnapshot, withScheme: EncryptionScheme = .default)
+
+			var isDecrypt: Bool {
+				switch self {
+				case .decrypt: return true
+				case .loadThenEncrypt, .encryptSpecific: return false
+				}
+			}
 		}
 
 		public enum Field: String, Sendable, Hashable {
@@ -78,17 +86,20 @@ public struct InputEncryptionPassword: Sendable, FeatureReducer {
 
 		case .confirmedEncryptionPassword:
 			precondition(!state.inputtedEncryptionPassword.isEmpty)
-			precondition(state.inputtedEncryptionPassword == state.confirmedEncryptionPassword)
 
-			let password = state.confirmedEncryptionPassword
+			if !state.mode.isDecrypt {
+				precondition(state.inputtedEncryptionPassword == state.confirmedEncryptionPassword)
+			}
+
+			let password = state.inputtedEncryptionPassword
 
 			// FIXME: Version KDF!!
 			let encryptionKey = EncryptionScheme.kdf(password: password)
 
 			switch state.mode {
 			case .loadThenEncrypt:
-				preconditionFailure("should have loaded already...")
 				loggerGlobal.error("Should have loaded the profile to encrypt already")
+				preconditionFailure("should have loaded already...")
 				return .send(.delegate(.dismiss))
 
 			case let .encryptSpecific(snapshot, withScheme: encryptionScheme):
