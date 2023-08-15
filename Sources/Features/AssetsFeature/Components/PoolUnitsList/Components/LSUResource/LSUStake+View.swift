@@ -181,10 +181,11 @@ extension LSUStake.State {
 							uncheckedUniqueElements: claimNFT.tokens
 								.map { token in
 									LSUStake.ViewState.StakeClaimNFTViewState(
-										id: token.id,
+										id: token.id.asStr(),
 										thumbnail: .xrd,
 										status: token.canBeClaimed ? .readyToClaim : .unstaking,
-										tokenAmount: (token.stakeClaimAmount ?? 0).format()
+										tokenAmount: (token.stakeClaimAmount ?? 0).format(),
+										isSelected: nil
 									)
 								}
 						)
