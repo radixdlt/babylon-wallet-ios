@@ -663,6 +663,10 @@ public enum L10n {
       /// Your Persona has been created.
       public static let subtitleNotFirst = L10n.tr("Localizable", "createPersona_completion_subtitleNotFirst", fallback: "Your Persona has been created.")
     }
+    public enum DerivePublicKeys {
+      /// Creating Persona
+      public static let title = L10n.tr("Localizable", "createPersona_derivePublicKeys_title", fallback: "Creating Persona")
+    }
     public enum Explanation {
       /// Some dApps may request personal information, like name or email address, that can be added to your Persona. Add some data now if you like.
       public static let someDappsMayRequest = L10n.tr("Localizable", "createPersona_explanation_someDappsMayRequest", fallback: "Some dApps may request personal information, like name or email address, that can be added to your Persona. Add some data now if you like.")
@@ -1584,24 +1588,40 @@ public enum L10n {
     public enum CustomizeNetworkFeeSheet {
       /// Change
       public static let changeButtonTitle = L10n.tr("Localizable", "transactionReview_customizeNetworkFeeSheet_changeButtonTitle", fallback: "Change")
+      /// Effective Tip
+      public static let effectiveTip = L10n.tr("Localizable", "transactionReview_customizeNetworkFeeSheet_effectiveTip", fallback: "Effective Tip")
+      /// Network Execution
+      public static let networkExecution = L10n.tr("Localizable", "transactionReview_customizeNetworkFeeSheet_networkExecution", fallback: "Network Execution")
       /// Network Fee
       public static let networkFee = L10n.tr("Localizable", "transactionReview_customizeNetworkFeeSheet_networkFee", fallback: "Network Fee")
-      /// XRD to Lock for Network and Royalty Fees
-      public static let networkRoyaltyFeesFieldLabel = L10n.tr("Localizable", "transactionReview_customizeNetworkFeeSheet_networkRoyaltyFeesFieldLabel", fallback: "XRD to Lock for Network and Royalty Fees")
+      /// Network Finalization
+      public static let networkFinalization = L10n.tr("Localizable", "transactionReview_customizeNetworkFeeSheet_networkFinalization", fallback: "Network Finalization")
+      /// Network Storage
+      public static let networkStorage = L10n.tr("Localizable", "transactionReview_customizeNetworkFeeSheet_networkStorage", fallback: "Network Storage")
       /// None due
       public static let noneDue = L10n.tr("Localizable", "transactionReview_customizeNetworkFeeSheet_noneDue", fallback: "None due")
       /// None required
       public static let noneRequired = L10n.tr("Localizable", "transactionReview_customizeNetworkFeeSheet_noneRequired", fallback: "None required")
+      /// Padding
+      public static let padding = L10n.tr("Localizable", "transactionReview_customizeNetworkFeeSheet_padding", fallback: "Padding")
+      /// Adjust Fee Padding Amount (XRD)
+      public static let paddingField = L10n.tr("Localizable", "transactionReview_customizeNetworkFeeSheet_paddingField", fallback: "Adjust Fee Padding Amount (XRD)")
       /// Pay fee from
       public static let payFeeFrom = L10n.tr("Localizable", "transactionReview_customizeNetworkFeeSheet_payFeeFrom", fallback: "Pay fee from")
+      /// Royalties
+      public static let royalties = L10n.tr("Localizable", "transactionReview_customizeNetworkFeeSheet_royalties", fallback: "Royalties")
       /// Royalty fee
       public static let royaltyFee = L10n.tr("Localizable", "transactionReview_customizeNetworkFeeSheet_royaltyFee", fallback: "Royalty fee")
       /// Select Fee Payer
       public static let selectFeePayerButtonTitle = L10n.tr("Localizable", "transactionReview_customizeNetworkFeeSheet_selectFeePayerButtonTitle", fallback: "Select Fee Payer")
-      /// Tip to Lock(% of the Network Fee)
-      public static func tipFieldLabel(_ p1: Int) -> String {
-        return L10n.tr("Localizable", "transactionReview_customizeNetworkFeeSheet_tipFieldLabel", p1, fallback: "Tip to Lock(% of the Network Fee)")
+      /// (% of Execution + Finalization Fees)
+      public static func tipFieldInfo(_ p1: Int) -> String {
+        return L10n.tr("Localizable", "transactionReview_customizeNetworkFeeSheet_tipFieldInfo", p1, fallback: "(% of Execution + Finalization Fees)")
       }
+      /// Adjust Tip to Lock
+      public static let tipFieldLabel = L10n.tr("Localizable", "transactionReview_customizeNetworkFeeSheet_tipFieldLabel", fallback: "Adjust Tip to Lock")
+      /// Transaction Fee
+      public static let totalFee = L10n.tr("Localizable", "transactionReview_customizeNetworkFeeSheet_totalFee", fallback: "Transaction Fee")
       /// View Advanced Mode
       public static let viewAdvancedModeButtonTitle = L10n.tr("Localizable", "transactionReview_customizeNetworkFeeSheet_viewAdvancedModeButtonTitle", fallback: "View Advanced Mode")
       /// View Normal Mode
@@ -1629,6 +1649,10 @@ public enum L10n {
         }
         /// Please select a fee payer for the transaction fee
         public static let warning = L10n.tr("Localizable", "transactionReview_customizeNetworkFeeSheet_selectFeePayer_warning", fallback: "Please select a fee payer for the transaction fee")
+      }
+      public enum TotalFee {
+        /// (maximum to lock)
+        public static let info = L10n.tr("Localizable", "transactionReview_customizeNetworkFeeSheet_totalFee_info", fallback: "(maximum to lock)")
       }
     }
     public enum Guarantees {

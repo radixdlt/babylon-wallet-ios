@@ -30,7 +30,7 @@ extension HD.Root {
 }
 
 extension HD.Root {
-	internal func deriveKey<Curve>(
+	func deriveKey<Curve>(
 		path: HD.Path.Full,
 		keyToDerive: KeyToDerive
 	) throws -> HD.ExtendedKey<Curve> {
@@ -41,7 +41,7 @@ extension HD.Root {
 		)
 	}
 
-	internal func deriveKey<Curve>(
+	func deriveKey<Curve>(
 		path: HD.Path.Full,
 		curve: Curve.Type,
 		keyToDerive: KeyToDerive

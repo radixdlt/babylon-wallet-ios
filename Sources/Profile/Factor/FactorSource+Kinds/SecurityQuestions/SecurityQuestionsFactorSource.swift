@@ -9,7 +9,7 @@ public struct SecurityQuestionsFactorSource: FactorSourceProtocol {
 	public var common: FactorSource.Common // We update `lastUsed`
 	public let sealedMnemonic: SealedMnemonic
 
-	internal init(
+	init(
 		id: ID,
 		common: FactorSource.Common,
 		sealedMnemonic: SealedMnemonic

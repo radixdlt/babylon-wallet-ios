@@ -683,7 +683,7 @@ extension DeviceFactorSource {
 		name: String,
 		addedOn: Date
 	) throws -> Self {
-		try Self.babylon(mnemonicWithPassphrase: .init(mnemonic: mnemonic), model: model, name: name, addedOn: addedOn, lastUsedOn: addedOn)
+		try babylon(mnemonicWithPassphrase: .init(mnemonic: mnemonic), model: model, name: name, addedOn: addedOn, lastUsedOn: addedOn)
 	}
 
 	public static func olympia(
@@ -692,7 +692,7 @@ extension DeviceFactorSource {
 		name: String,
 		addedOn: Date
 	) throws -> Self {
-		try Self.olympia(mnemonicWithPassphrase: .init(mnemonic: mnemonic), model: model, name: name, addedOn: addedOn, lastUsedOn: addedOn)
+		try olympia(mnemonicWithPassphrase: .init(mnemonic: mnemonic), model: model, name: name, addedOn: addedOn, lastUsedOn: addedOn)
 	}
 }
 

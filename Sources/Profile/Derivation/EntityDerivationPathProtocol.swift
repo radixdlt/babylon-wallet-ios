@@ -207,7 +207,7 @@ extension EntityDerivationPathProtocol {
 	@discardableResult
 	static func validate(hdPath: HD.Path.Full) throws -> HD.Path.Full {
 		let components = hdPath.components
-		guard components.count == Self.expectedComponentCount else {
+		guard components.count == expectedComponentCount else {
 			throw InvalidDerivationPathForEntity.invalidComponentCount(got: components.count, expected: expectedComponentCount)
 		}
 
@@ -215,7 +215,7 @@ extension EntityDerivationPathProtocol {
 			throw InvalidDerivationPathForEntity.invalidFirstComponentNotRoot
 		}
 		let children = hdPath.children
-		guard children.count == (Self.expectedComponentCount - 1) else {
+		guard children.count == (expectedComponentCount - 1) else {
 			throw InvalidDerivationPathForEntity.multipleRootsFound
 		}
 

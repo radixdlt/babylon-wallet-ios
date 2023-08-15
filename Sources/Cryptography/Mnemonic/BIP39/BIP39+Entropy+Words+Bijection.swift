@@ -3,7 +3,7 @@ import CryptoKit
 import Prelude
 
 extension BIP39 {
-	internal static func mapEntropyToWords(
+	static func mapEntropyToWords(
 		entropy: Entropy,
 		language: Language
 	) throws -> [NonEmptyString] {
@@ -19,13 +19,13 @@ extension BIP39 {
 
 		let mnemonicWords = wordlist.words(at: indices)
 
-		return try Self.validateChecksumOf(
+		return try validateChecksumOf(
 			mnemonicWords: mnemonicWords,
 			language: language
 		)
 	}
 
-	internal static func mapWordsToEntropyBitArray(
+	static func mapWordsToEntropyBitArray(
 		words mnemonicWords: some Collection<BIP39.Word>,
 		language: Language
 	) throws -> BitArray {
@@ -33,7 +33,7 @@ extension BIP39 {
 	}
 
 	/// This is not mapping exactly to the entropy because the mnemonic words contains a checksummed word.
-	internal static func mapWordsToEntropyBitArray(
+	static func mapWordsToEntropyBitArray(
 		words mnemonicWords: [NonEmptyString],
 		language: Language
 	) throws -> BitArray {

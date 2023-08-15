@@ -60,7 +60,7 @@ extension SLIP10CurveProtocol {
 		Self.isCurve25519
 	}
 
-	public static var curveSeed: String { Self.curve.curveSeed }
-	public static var curveOrder: BigUInt { Self.curve.curveOrder }
+	public static var curveSeed: String { curve.curveSeed }
+	public static var curveOrder: BigUInt { curve.curveOrder }
 	public var curve: SLIP10.Curve { Self.curve }
 }

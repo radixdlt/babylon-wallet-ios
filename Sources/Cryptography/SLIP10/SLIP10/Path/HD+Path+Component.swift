@@ -18,9 +18,9 @@ extension HD.Path.Component {
 
 	public static func inferredDepth(string: String) throws -> Self {
 		switch string {
-		case Self.rootPrivateKey:
+		case rootPrivateKey:
 			return .root(onlyPublic: false)
-		case Self.rootOnlyPublicKey:
+		case rootOnlyPublicKey:
 			return .root(onlyPublic: true)
 		default:
 			return try .child(HD.Path.Component.Child(

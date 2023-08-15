@@ -54,7 +54,7 @@ extension CAP33 {
 				"\(account.addressIndex)",
 				// Replace all characters matching RESERVED characters with `ACCOUNT_NAME_REPLACEMENT` character
 				// Take first 30 characters of name only. Name can be empty. ALWAYS append `END_OF_ACCOUNT_NAME`.
-				Self._sanitize(name: account.name) + Olympia.Export.Separator.accountNameEnd,
+				_sanitize(name: account.name) + Olympia.Export.Separator.accountNameEnd,
 			].joined(separator: Olympia.Export.Separator.intra) // Join accounts with `INTRA_SEPARATOR` char
 		}
 

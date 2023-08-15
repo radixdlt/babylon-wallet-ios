@@ -402,11 +402,11 @@ extension ProfileStore.ProfileState {
 extension ProfileStore {
 	#if !canImport(UIKit)
 	/// used by tests
-	internal static let macOSDeviceNameFallback: DeviceFactorSource.Hint.Name = "macOS"
-	internal static let macOSDeviceModelFallback: DeviceFactorSource.Hint.Model = "macOS"
+	static let macOSDeviceNameFallback: DeviceFactorSource.Hint.Name = "macOS"
+	static let macOSDeviceModelFallback: DeviceFactorSource.Hint.Model = "macOS"
 	#endif
 
-	internal static func deviceDescription(
+	static func deviceDescription(
 		name: String,
 		model: DeviceFactorSource.Hint.Model
 	) -> NonEmptyString {
@@ -501,9 +501,9 @@ extension ProfileStore {
 		case let .success(.some(existing)):
 			return .persisted(existing)
 		case .success(.none):
-			return await .ephemeral(.init(profile: Self.newEphemeralProfile(), loadFailure: nil))
+			return await .ephemeral(.init(profile: newEphemeralProfile(), loadFailure: nil))
 		case let .failure(loadFailure):
-			return await .ephemeral(.init(profile: Self.newEphemeralProfile(), loadFailure: loadFailure))
+			return await .ephemeral(.init(profile: newEphemeralProfile(), loadFailure: loadFailure))
 		}
 	}
 

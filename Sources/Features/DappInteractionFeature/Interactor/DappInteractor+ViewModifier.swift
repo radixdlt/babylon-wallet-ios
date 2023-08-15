@@ -10,7 +10,7 @@ extension View {
 		)
 	}
 
-	internal func presentsDappInteractions(store: StoreOf<DappInteractor>) -> some View {
+	func presentsDappInteractions(store: StoreOf<DappInteractor>) -> some View {
 		self.modifier(DappInteractor.ViewModifier(store: store))
 	}
 }
