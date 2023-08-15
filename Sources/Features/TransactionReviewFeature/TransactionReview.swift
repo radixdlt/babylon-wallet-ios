@@ -446,6 +446,28 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		}
 	}
 
+	public func addingGuarantees(
+		to manifest: TransactionManifest,
+		guarantees: [TransactionClient.Guarantee]
+	) throws -> TransactionManifest {
+		guard !guarantees.isEmpty else { return manifest }
+
+		let assertions: [IndexedAssertion] = try guarantees.map {
+			try .init(
+				index: $0.instructionIndex,
+				assertion: .amount(
+					resourceAddress: $0.resourceAddress.intoEngine(),
+					amount: $0.amount.intoEngine()
+				)
+			)
+		}
+		return try manifest.modify(modifications: .init(
+			addAccessControllerProofs: [],
+			addLockFee: nil,
+			addAssertions: assertions
+		))
+	}
+
 	func showRawTransaction(_ state: inout State) -> EffectTask<Action> {
 		do {
 			let manifest = try transactionManifestWithWalletInstructionsAdded(state)
