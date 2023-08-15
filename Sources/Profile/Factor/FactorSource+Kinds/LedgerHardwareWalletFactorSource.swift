@@ -73,7 +73,7 @@ extension LedgerHardwareWalletFactorSource {
 		try .init(
 			id: ID(kind: .ledgerHQHardwareWallet, body: deviceID),
 			common: common(isOlympiaCompatible: true),
-			hint: .init(name: name, model: model),
+			hint: .init(name: name, model: model)
 		)
 	}
 }
