@@ -11,6 +11,7 @@ extension DependencyValues {
 extension BackupsClient: TestDependencyKey {
 	public static let previewValue: Self = .noop
 	public static let testValue = Self(
+		snapshotOfProfileForExport: unimplemented("\(Self.self).snapshotOfProfileForExport"),
 		loadProfileBackups: unimplemented("\(Self.self).loadProfile"),
 		importProfileSnapshot: unimplemented("\(Self.self).importProfileSnapshot"),
 		importCloudProfile: unimplemented("\(Self.self).importCloudProfile"),
@@ -18,6 +19,7 @@ extension BackupsClient: TestDependencyKey {
 	)
 
 	public static let noop = Self(
+		snapshotOfProfileForExport: { throw NoopError() },
 		loadProfileBackups: { nil },
 		importProfileSnapshot: { _, _ in throw NoopError() },
 		importCloudProfile: { _, _ in throw NoopError() },

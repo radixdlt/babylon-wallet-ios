@@ -10,6 +10,13 @@ extension HUD.State {
 				text: "Copied",
 				icon: .init(kind: .system("checkmark.circle.fill"), foregroundColor: .app.green1)
 			)
+		case let .exportedProfile(encrypted):
+			// FIXME: Strings
+			return .init(
+				offset: offset,
+				text: "Exported \(encrypted ? "encrypted " : "")wallet backup file",
+				icon: .init(kind: encrypted ? .system("lock.rectangle.stack") : .system("rectangle.stack"), foregroundColor: .app.green1)
+			)
 		}
 	}
 }

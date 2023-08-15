@@ -48,6 +48,18 @@ extension ProfileBackups {
 						}
 					}
 				)
+				.sheet(
+					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+					state: /ProfileBackups.Destinations.State.inputEncryptionPassword,
+					action: ProfileBackups.Destinations.Action.inputEncryptionPassword,
+					content: { store in
+						NavigationView {
+							InputEncryptionPassword.View(store: store)
+								// FIXME: Strings
+								.navigationTitle("Input password")
+						}
+					}
+				)
 				.fileImporter(
 					isPresented: viewStore.binding(
 						get: \.isDisplayingFileImporter,

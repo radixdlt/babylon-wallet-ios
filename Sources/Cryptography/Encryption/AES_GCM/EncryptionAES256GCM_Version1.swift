@@ -7,10 +7,31 @@ public protocol Encrypting: Codable {
 	func decrypt(data: Data, decryptionKey key: SymmetricKey) throws -> Data
 }
 
+extension Encrypting {
+	public func encrypt(data: HexCodable, encryptionKey key: SymmetricKey) throws -> Data {
+		try encrypt(data: data.data, encryptionKey: key)
+	}
+
+	public func decrypt(data: HexCodable, decryptionKey key: SymmetricKey) throws -> Data {
+		try decrypt(data: data.data, decryptionKey: key)
+	}
+}
+
 // MARK: - EncryptionScheme
 public enum EncryptionScheme: Sendable, Hashable, Codable, Encrypting {
 	case aes(EncryptionAES256GCM)
 	public static let `default`: Self = .aes(.init())
+
+	// FIXME: Version me!!!!!
+	public static func kdf(password: String) -> SymmetricKey {
+		let inputKeyMaterial = SymmetricKey(data: Data(password.utf8))
+		return HKDF<SHA256>.deriveKey(
+			inputKeyMaterial: inputKeyMaterial,
+			//            salt: salt,
+			//            info: info,
+			outputByteCount: SHA256.byteCount
+		)
+	}
 }
 
 extension EncryptionScheme {

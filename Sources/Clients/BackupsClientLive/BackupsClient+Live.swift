@@ -30,6 +30,18 @@ extension BackupsClient: DependencyKey {
 		}
 
 		return Self(
+			snapshotOfProfileForExport: {
+				let profileStore = await getProfileStore()
+				let profileOutcome = await profileStore.getLoadProfileOutcome()
+				switch profileOutcome {
+				case .existingProfile:
+					return await profileStore.profile.snapshot()
+				default:
+					loggerGlobal.error("Expected to find persisted profile in ProfileStore, but was \(profileOutcome)")
+					struct NoPersistedProfile: Error {}
+					throw NoPersistedProfile()
+				}
+			},
 			loadProfileBackups: { () -> ProfileSnapshot.HeaderList? in
 				do {
 					let headers = try await secureStorageClient.loadProfileHeaderList()

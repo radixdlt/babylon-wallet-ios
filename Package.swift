@@ -350,6 +350,7 @@ package.addModules([
 			"AppPreferencesClient",
 			"BackupsClient",
 			"ImportMnemonicFeature",
+			"OverlayWindowClient",
 		],
 		tests: .no
 	),
