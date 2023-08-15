@@ -78,11 +78,3 @@ public struct FungibleAssetList: Sendable, FeatureReducer {
 		}
 	}
 }
-
-extension [AssetBehavior] {
-	static let mock: Self = [.simpleAsset, .movementRestricted, .nftDataChangeable]
-}
-
-extension [AssetTag] {
-	static let mock: Self = [.officialRadix, .token, .custom("Hello"), .custom("Lorem Ipsum"), .custom("World"), .custom("TikTok"), .custom("ByteDance")]
-}

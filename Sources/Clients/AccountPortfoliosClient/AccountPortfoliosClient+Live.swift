@@ -217,6 +217,9 @@ extension AccountPortfoliosClient {
 		let resourceAddress = try ResourceAddress(validatingAddress: resource.resourceAddress)
 		let metadata = resource.explicitMetadata
 
+		let behaviors = firstItem?.details?.fungible?.roleAssignments.behaviors ?? []
+		let tags = (firstItem?.metadata.tags)?.map(AssetTag.init) ?? []
+
 		return AccountPortfolio.FungibleResource(
 			resourceAddress: resourceAddress,
 			amount: amount,
@@ -225,8 +228,8 @@ extension AccountPortfoliosClient {
 			symbol: metadata?.symbol,
 			description: metadata?.description,
 			iconURL: metadata?.iconURL,
-			behaviors: details?.roleAssignments.behaviors ?? [],
-			tags: [.officialRadix, .nft, .token],
+			behaviors: behaviors,
+			tags: tags,
 			totalSupply: totalSupply
 		)
 	}
@@ -319,11 +322,17 @@ extension AccountPortfoliosClient {
 		let tokens = try await tokens(resource: resource)
 		let metadata = resource.explicitMetadata
 
+		let firstItem = try await gatewayAPIClient.getEntityDetails([resource.resourceAddress], [], ledgerState).items.first
+		let behaviors = firstItem?.details?.nonFungible?.roleAssignments.behaviors ?? []
+		let tags = (firstItem?.metadata.tags)?.map(AssetTag.init) ?? []
+
 		return try AccountPortfolio.NonFungibleResource(
 			resourceAddress: .init(validatingAddress: resource.resourceAddress),
 			name: metadata?.name,
 			description: metadata?.description,
 			iconURL: metadata?.iconURL,
+			behaviors: behaviors,
+			tags: tags,
 			tokens: tokens
 		)
 	}
@@ -933,18 +942,6 @@ extension GatewayAPI.RoleKey {
 		case recallerUpdater = "recaller_updater"
 		case freezerUpdater = "freezer_updater"
 		case nonFungibleDataUpdaterUpdater = "non_fungible_data_updater_updater"
-
-		case metadataLocker = "metadata_locker"
-		case metadataSetter = "metadata_setter"
-		case royaltySetter = "royalty_setter"
-		case royaltyLocker = "royalty_locker"
-		case royaltyClaimer = "royalty_claimer"
-
-		case metadataLockerUpdater = "metadata_locker_updater"
-		case metadataSetterUpdater = "metadata_setter_updater"
-		case royaltySetterUpdater = "royalty_setter_updater"
-		case royaltyLockerUpdater = "royalty_locker_updater"
-		case royaltyClaimerUpdater = "royalty_claimer_updater"
 	}
 }
 
@@ -983,8 +980,6 @@ extension GatewayAPI.ComponentEntityRoleAssignmentEntry {
 // FIXME: these:
 /*
  We don't have behaviour icons for "freezer"
-
- We don't have behaviours for "metadata" and "royalty"
 
  We don't have a role for informationChangeable*
 

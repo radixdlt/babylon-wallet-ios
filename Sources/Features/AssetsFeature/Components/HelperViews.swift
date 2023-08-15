@@ -238,12 +238,6 @@ extension AssetTag {
 		case .officialRadix:
 			return "Official Radix" // FIXME: Strings
 
-		case .token:
-			return "Token" // FIXME: Strings
-
-		case .nft:
-			return "NFT" // FIXME: Strings
-
 		case let .custom(string):
 			return string
 		}

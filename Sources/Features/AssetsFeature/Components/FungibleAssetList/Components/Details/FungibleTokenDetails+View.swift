@@ -9,7 +9,7 @@ extension FungibleTokenDetails.State {
 			description: resource.description,
 			resourceAddress: resource.resourceAddress,
 			behaviors: resource.behaviors,
-			tags: resource.tags
+			tags: isXRD ? resource.tags + [.officialRadix] : resource.tags
 		)
 	}
 }
@@ -67,9 +67,7 @@ struct FungibleTokenDetails_Preview: PreviewProvider {
 				initialState: try! .init(
 					resource: .init(
 						resourceAddress: .init(validatingAddress: "resource_tdx_c_1qyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq40v2wv"),
-						amount: .zero,
-						behaviors: .mock,
-						tags: .mock
+						amount: .zero
 					),
 					isXRD: true
 				),

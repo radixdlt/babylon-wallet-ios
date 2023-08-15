@@ -69,7 +69,7 @@ public struct NonFungibleAssetList: Sendable, FeatureReducer {
 				return .none
 			}
 
-			state.destination = .details(.init(token: token, resource: row.resource, behaviors: .mock))
+			state.destination = .details(.init(token: token, resource: row.resource))
 			return .none
 
 		case .asset:

@@ -87,6 +87,8 @@ extension AccountPortfolio {
 		public let name: String?
 		public let description: String?
 		public let iconURL: URL?
+		public let behaviors: [AssetBehavior]
+		public let tags: [AssetTag]
 		public let tokens: IdentifiedArrayOf<NonFungibleToken>
 
 		public init(
@@ -94,12 +96,16 @@ extension AccountPortfolio {
 			name: String? = nil,
 			description: String? = nil,
 			iconURL: URL? = nil,
+			behaviors: [AssetBehavior] = [],
+			tags: [AssetTag] = [],
 			tokens: IdentifiedArrayOf<NonFungibleToken> = []
 		) {
 			self.resourceAddress = resourceAddress
 			self.name = name
 			self.description = description
 			self.iconURL = iconURL
+			self.behaviors = behaviors
+			self.tags = tags
 			self.tokens = tokens
 		}
 
