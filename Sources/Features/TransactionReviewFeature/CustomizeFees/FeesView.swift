@@ -40,12 +40,12 @@ struct FeesView: View {
 	func transactionFeeView(fee: String, isAdvancedMode: Bool) -> some SwiftUI.View {
 		HStack {
 			VStack(spacing: .zero) {
-				Text("Transaction Fee") // TODO: strings
+				Text(L10n.TransactionReview.CustomizeNetworkFeeSheet.totalFee) // TODO: strings
 					.textStyle(.body1Link)
 					.foregroundColor(.app.gray2)
 					.textCase(.uppercase)
 				if isAdvancedMode {
-					Text("(maximum to lock)") // TODO: strings
+					Text(L10n.TransactionReview.CustomizeNetworkFeeSheet.TotalFee.info) // TODO: strings
 						.textStyle(.body1Link)
 						.foregroundColor(.app.gray2)
 				}
@@ -86,12 +86,12 @@ struct FeeViewState: Equatable, Sendable, Identifiable {
 extension TransactionFee.AdvancedFeeCustomization {
 	var viewStates: IdentifiedArrayOf<FeeViewState> {
 		.init(uncheckedUniqueElements: [
-			.init(name: "NETWORK EXECUTION", amount: feeSummary.executionCost, isUserConfigurable: false),
-			.init(name: "NETWORK FINALIZATION", amount: feeSummary.finalizationCost, isUserConfigurable: false),
-			.init(name: "EFFECTIVE TIP", amount: tipAmount, isUserConfigurable: true),
-			.init(name: "NETWORK STORAGE", amount: feeSummary.storageExpansionCost, isUserConfigurable: false),
-			.init(name: "PADDING", amount: paddingFee, isUserConfigurable: true),
-			.init(name: "ROYALTIES", amount: feeSummary.royaltyCost, isUserConfigurable: false),
+			.init(name: L10n.TransactionReview.CustomizeNetworkFeeSheet.networkExecution, amount: feeSummary.executionCost, isUserConfigurable: false),
+			.init(name: L10n.TransactionReview.CustomizeNetworkFeeSheet.networkFinalization, amount: feeSummary.finalizationCost, isUserConfigurable: false),
+			.init(name: L10n.TransactionReview.CustomizeNetworkFeeSheet.effectiveTip, amount: tipAmount, isUserConfigurable: true),
+			.init(name: L10n.TransactionReview.CustomizeNetworkFeeSheet.networkStorage, amount: feeSummary.storageExpansionCost, isUserConfigurable: false),
+			.init(name: L10n.TransactionReview.CustomizeNetworkFeeSheet.padding, amount: paddingFee, isUserConfigurable: true),
+			.init(name: L10n.TransactionReview.CustomizeNetworkFeeSheet.royalties, amount: feeSummary.royaltyCost, isUserConfigurable: false),
 		])
 	}
 }

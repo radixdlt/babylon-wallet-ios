@@ -34,7 +34,7 @@ extension AdvancedFeesCustomization {
 						Group {
 							Divider()
 							AppTextField(
-								primaryHeading: "Adjust Fee Padding Amount (XRD)", // TODO: strings
+								primaryHeading: .init(text: L10n.TransactionReview.CustomizeNetworkFeeSheet.paddingField),
 								placeholder: "",
 								text: viewStore.binding(
 									get: \.paddingAmountStr,
@@ -54,8 +54,8 @@ extension AdvancedFeesCustomization {
 							.padding(.vertical, .medium1)
 
 							AppTextField(
-								primaryHeading: "Adjust Tip to Lock", // TODO: strings
-								secondaryHeading: "(% of Execution + Finalization Fees)",
+								primaryHeading: .init(text: L10n.TransactionReview.CustomizeNetworkFeeSheet.tipFieldLabel),
+								secondaryHeading: L10n.TransactionReview.CustomizeNetworkFeeSheet.tipFieldInfo(0),
 								placeholder: "",
 								text: viewStore.binding(
 									get: \.tipPercentageStr,

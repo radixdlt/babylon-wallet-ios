@@ -39,7 +39,7 @@ extension SelectFeePayer {
 						.padding(.bottom, .small2)
 						.multilineTextAlignment(.center)
 
-					Text(L10n.TransactionReview.CustomizeNetworkFeeSheet.SelectFeePayer.subtitle(fee))
+					Text(L10n.TransactionReview.CustomizeNetworkFeeSheet.SelectFeePayer.subtitle(viewStore.fee))
 						.textStyle(.body1HighImportance)
 						.foregroundColor(.app.gray2)
 						.padding(.horizontal, .large3)
