@@ -3,7 +3,7 @@ import FeaturePrelude
 import Foundation
 import TransactionClient
 
-public struct AdvancedCustomizationFees: FeatureReducer {
+public struct AdvancedFeesCustomization: FeatureReducer {
 	public struct State: Hashable, Sendable {
 		var fees: TransactionFee.AdvancedFeeCustomization
 

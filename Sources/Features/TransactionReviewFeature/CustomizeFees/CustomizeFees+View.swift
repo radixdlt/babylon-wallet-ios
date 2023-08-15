@@ -3,44 +3,43 @@ import TransactionClient
 
 extension CustomizeFees.State {
 	var viewState: CustomizeFees.ViewState {
-		// TODO: strings
 		.init(
 			title: {
 				switch transactionFee.mode {
 				case .normal:
-					return "Customize Fees"
+					return L10n.TransactionReview.CustomizeNetworkFeeSheet.NormalMode.title
 				case .advanced:
-					return "Advanced \n Customize Fees"
+					return L10n.TransactionReview.CustomizeNetworkFeeSheet.AdvancedMode.title
 				}
 			}(),
 			description: {
 				switch transactionFee.mode {
 				case .normal:
-					return "Choose what account to pay the transaction fee from, or add a “tip” to speed up your transaction if necessary."
+					return L10n.TransactionReview.CustomizeNetworkFeeSheet.NormalMode.subtitle
 				case .advanced:
-					return "Fully customize fee payment for this transaction. Not recommended unless you are a developer or advanced user."
+					return L10n.TransactionReview.CustomizeNetworkFeeSheet.AdvancedMode.subtitle
 				}
 			}(),
 			modeSwitchTitle: {
 				switch transactionFee.mode {
 				case .normal:
-					return "View Advanced Mode"
+					return L10n.TransactionReview.CustomizeNetworkFeeSheet.viewAdvancedModeButtonTitle
 				case .advanced:
-					return "View Normal Mode"
+					return L10n.TransactionReview.CustomizeNetworkFeeSheet.viewNormalModeButtonTitle
 				}
 			}(),
 			feePayer: feePayerSelection.selected,
 			noFeePayerText: {
 				if transactionFee.totalFee.lockFee == .zero {
-					return "None required"
+					return L10n.TransactionReview.CustomizeNetworkFeeSheet.noneRequired
 				} else {
-					return "No Account selected"
+					return L10n.TransactionReview.CustomizeNetworkFeeSheet.selectFeePayerButtonTitle
 				}
 			}(),
 			insufficientBalanceMessage: {
 				if let feePayer = feePayerSelection.selected {
 					if feePayer.xrdBalance < transactionFee.totalFee.lockFee {
-						return "Insufficient balance to pay the transaction fee"
+						return L10n.TransactionReview.CustomizeNetworkFeeSheet.InsufficientBalance.warning
 					}
 				}
 				return nil
@@ -88,17 +87,17 @@ extension CustomizeFees {
 								case .normal:
 									CaseLet(
 										state: /CustomizeFees.State.CustomizationModeState.normal,
-										action: CustomizeFees.ChildAction.normalFeeCustomization,
+										action: CustomizeFees.ChildAction.normalFeesCustomization,
 										then: {
-											NormalCustomizationFees.View(store: $0)
+											NormalFeesCustomization.View(store: $0)
 										}
 									)
 								case .advanced:
 									CaseLet(
 										state: /CustomizeFees.State.CustomizationModeState.advanced,
-										action: CustomizeFees.ChildAction.advancedFeeCustomization,
+										action: CustomizeFees.ChildAction.advancedFeesCustomization,
 										then: {
-											AdvancedCustomizationFees.View(store: $0)
+											AdvancedFeesCustomization.View(store: $0)
 										}
 									)
 								}
@@ -175,79 +174,5 @@ extension CustomizeFees {
 				}
 			}
 		}
-
-//		@ViewBuilder
-//		func advancedModeBreakdownView(_ viewStore: ViewStoreOf<CustomizeFees>) -> some SwiftUI.View {
-//			VStack(spacing: .medium1) {
-//				Divider()
-//
-//				AppTextField(
-//					primaryHeading: "Adjust Fee Padding Amount (XRD)", // TODO: strings
-//					placeholder: "",
-//					text: viewStore.binding(
-//						get: \.totalNetworkAndRoyaltyFee,
-//						send: ViewAction.totalNetworkAndRoyaltyFeesChanged
-//					)
-//				)
-		//                                .keyboardType(.numbersAndPunctuation)
-//
-//				AppTextField(
-//					primaryHeading: "Adjust Tip to Lock", // TODO: strings
-		//                                        secondaryHeading: "(% of Execution + Finalization Fees)",
-//					placeholder: "",
-//					text: viewStore.binding(
-//						get: \.tipPercentage,
-//						send: ViewAction.tipPercentageChanged
-//					)
-//				)
-//				.keyboardType(.numbersAndPunctuation)
-//
-//				transactionFeeView(fee: viewStore.totalFee)
-//			}
-//			.multilineTextAlignment(.trailing)
-//			.padding(.horizontal, .medium1)
-//		}
-//
-//		@ViewBuilder
-//		func normalModeFeesBreakdownView(_ viewStore: ViewStoreOf<CustomizeFees>) -> some SwiftUI.View {
-//			VStack(spacing: .small1) {
-		//                                feeView(title: "Network Fees", fee: viewStore.networkFee) // TODO: strings
-		//                                feeView(title: "Royalty Fees", fee: viewStore.royaltyFee) // TODO: strings
-//
-//				Divider()
-//
-//				transactionFeeView(fee: viewStore.totalFee)
-//			}
-//			.padding(.medium1)
-//			.background(.app.gray5)
-//		}
-//
-//		@ViewBuilder
-//		func feeView(title: String, fee: BigDecimal) -> some SwiftUI.View {
-//			HStack {
-//				Text(title)
-//					.textStyle(.body1Link)
-//					.foregroundColor(.app.gray2)
-//					.textCase(.uppercase)
-//				Spacer()
-//				Text(fee.formatted(false))
-//					.textStyle(.body1HighImportance)
-//					.foregroundColor(fee == .zero ? .app.gray2 : .app.gray1)
-//			}
-//		}
-//
-//		@ViewBuilder
-//		func transactionFeeView(fee: String) -> some SwiftUI.View {
-//			HStack {
-//				Text("Transaction Fee") // TODO: strings
-//					.textStyle(.body1Link)
-//					.foregroundColor(.app.gray2)
-//					.textCase(.uppercase)
-//				Spacer()
-//				Text(fee)
-//					.textStyle(.body1Header)
-//					.foregroundColor(.app.gray1)
-//			}
-//		}
 	}
 }

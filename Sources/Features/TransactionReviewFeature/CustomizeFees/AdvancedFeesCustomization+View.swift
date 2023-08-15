@@ -1,17 +1,17 @@
 import FeaturePrelude
 import TransactionClient
 
-extension AdvancedCustomizationFees.State {
-	var viewState: AdvancedCustomizationFees.ViewState {
+extension AdvancedFeesCustomization.State {
+	var viewState: AdvancedFeesCustomization.ViewState {
 		.init(
-			feesViewState: .init(feeViewStates: fees.viewStates, totalFee: fees.total),
-			paddingAmountStr: fees.paddingFee.format(),
-			tipPercentageStr: fees.tipPercentage.format()
+			feesViewState: .init(feeViewStates: fees.viewStates, totalFee: fees.total, isAdvancedMode: true),
+			paddingAmountStr: paddingAmountStr,
+			tipPercentageStr: tipPercentageStr
 		)
 	}
 }
 
-extension AdvancedCustomizationFees {
+extension AdvancedFeesCustomization {
 	public struct ViewState: Equatable, Sendable {
 		let feesViewState: FeesView.ViewState
 
@@ -21,7 +21,7 @@ extension AdvancedCustomizationFees {
 
 	@MainActor
 	public struct View: SwiftUI.View {
-		let store: StoreOf<AdvancedCustomizationFees>
+		let store: StoreOf<AdvancedFeesCustomization>
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in

@@ -6,18 +6,21 @@ struct FeesView: View {
 	struct ViewState: Equatable, Sendable {
 		let feeViewStates: IdentifiedArrayOf<FeeViewState>
 		let totalFee: BigDecimal
+		let isAdvancedMode: Bool
 	}
 
 	let viewState: ViewState
 
 	var body: some View {
 		VStack(spacing: .small1) {
-			Text("Estimated transaction fees") // TODO: strings
-				.textStyle(.body1Link)
-				.foregroundColor(.app.gray2)
-				.textCase(.uppercase)
-				.multilineTextAlignment(.leading)
-				.padding(.medium1)
+			HStack {
+				Text("Estimated transaction fees") // TODO: strings
+					.textStyle(.body1Link)
+					.foregroundColor(.app.gray2)
+					.textCase(.uppercase)
+				Spacer()
+			}
+			.padding(.horizontal, .medium1)
 
 			VStack(spacing: .small1) {
 				ForEach(viewState.feeViewStates) { viewState in
@@ -26,7 +29,7 @@ struct FeesView: View {
 
 				Divider()
 
-				transactionFeeView(fee: viewState.totalFee.format())
+				transactionFeeView(fee: viewState.totalFee.format(), isAdvancedMode: viewState.isAdvancedMode)
 			}
 			.padding(.medium1)
 			.background(.app.gray5)
@@ -34,12 +37,20 @@ struct FeesView: View {
 	}
 
 	@ViewBuilder
-	func transactionFeeView(fee: String) -> some SwiftUI.View {
+	func transactionFeeView(fee: String, isAdvancedMode: Bool) -> some SwiftUI.View {
 		HStack {
-			Text("Transaction Fee") // TODO: strings
-				.textStyle(.body1Link)
-				.foregroundColor(.app.gray2)
-				.textCase(.uppercase)
+			VStack(spacing: .zero) {
+				Text("Transaction Fee") // TODO: strings
+					.textStyle(.body1Link)
+					.foregroundColor(.app.gray2)
+					.textCase(.uppercase)
+				if isAdvancedMode {
+					Text("Transaction Fee") // TODO: strings
+						.textStyle(.body1Link)
+						.foregroundColor(.app.gray2)
+						.textCase(.uppercase)
+				}
+			}
 			Spacer()
 			Text(fee)
 				.textStyle(.body1Header)

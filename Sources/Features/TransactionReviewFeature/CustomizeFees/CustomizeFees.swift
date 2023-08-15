@@ -6,8 +6,8 @@ import TransactionClient
 public struct CustomizeFees: FeatureReducer {
 	public struct State: Hashable, Sendable {
 		enum CustomizationModeState: Hashable, Sendable {
-			case normal(NormalCustomizationFees.State)
-			case advanced(AdvancedCustomizationFees.State)
+			case normal(NormalFeesCustomization.State)
+			case advanced(AdvancedFeesCustomization.State)
 		}
 
 		var feePayerSelection: FeePayerSelectionAmongstCandidates
@@ -40,8 +40,8 @@ public struct CustomizeFees: FeatureReducer {
 
 	public enum ChildAction: Equatable, Sendable {
 		case destination(PresentationAction<Destinations.Action>)
-		case normalFeeCustomization(NormalCustomizationFees.Action)
-		case advancedFeeCustomization(AdvancedCustomizationFees.Action)
+		case normalFeesCustomization(NormalFeesCustomization.Action)
+		case advancedFeesCustomization(AdvancedFeesCustomization.Action)
 	}
 
 	public enum DelegateAction: Equatable, Sendable {
@@ -69,11 +69,11 @@ public struct CustomizeFees: FeatureReducer {
 	public var body: some ReducerProtocolOf<Self> {
 		Scope(state: \.modeState, action: /Action.child) {
 			EmptyReducer()
-				.ifCaseLet(/State.CustomizationModeState.normal, action: /ChildAction.normalFeeCustomization) {
-					NormalCustomizationFees()
+				.ifCaseLet(/State.CustomizationModeState.normal, action: /ChildAction.normalFeesCustomization) {
+					NormalFeesCustomization()
 				}
-				.ifCaseLet(/State.CustomizationModeState.advanced, action: /ChildAction.advancedFeeCustomization) {
-					AdvancedCustomizationFees()
+				.ifCaseLet(/State.CustomizationModeState.advanced, action: /ChildAction.advancedFeesCustomization) {
+					AdvancedFeesCustomization()
 				}
 		}
 

@@ -1,22 +1,22 @@
 import FeaturePrelude
 import TransactionClient
 
-extension NormalCustomizationFees.State {
-	var viewState: NormalCustomizationFees.ViewState {
+extension NormalFeesCustomization.State {
+	var viewState: NormalFeesCustomization.ViewState {
 		.init(
-			feesViewState: .init(feeViewStates: fees.viewStates, totalFee: fees.total)
+			feesViewState: .init(feeViewStates: fees.viewStates, totalFee: fees.total, isAdvancedMode: false)
 		)
 	}
 }
 
-extension NormalCustomizationFees {
+extension NormalFeesCustomization {
 	public struct ViewState: Equatable, Sendable {
 		let feesViewState: FeesView.ViewState
 	}
 
 	@MainActor
 	public struct View: SwiftUI.View {
-		let store: StoreOf<NormalCustomizationFees>
+		let store: StoreOf<NormalFeesCustomization>
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState) { viewStore in
