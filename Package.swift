@@ -193,9 +193,11 @@ package.addModules([
 		name: "DerivePublicKeysFeature",
 		featureSuffixDroppedFromFolderName: true,
 		dependencies: [
+			"AccountsClient",
+			"DeviceFactorSourceClient",
 			"FactorSourcesClient",
 			"LedgerHardwareWalletClient",
-			"DeviceFactorSourceClient",
+			"PersonasClient",
 		],
 		tests: .no
 	),
@@ -1003,7 +1005,7 @@ package.addModules([
 		dependencies: [
 			"Cryptography",
 			.product(name: "EngineToolkit", package: "swift-engine-toolkit") {
-				.package(url: "https://github.com/radixdlt/swift-engine-toolkit", exact: "0.11.0-7dd27a8")
+				.package(url: "https://github.com/radixdlt/swift-engine-toolkit", exact: "0.12.0-fig.1-f6c4402")
 			},
 		],
 		tests: .no
@@ -1086,6 +1088,10 @@ package.addModules([
 			.product(name: "Validated", package: "swift-validated") {
 				.package(url: "https://github.com/pointfreeco/swift-validated", exact: "0.2.1")
 			},
+			.product(name: "Overture", package: "swift-overture") {
+				.package(url: "https://github.com/pointfreeco/swift-overture", exact: "0.5.0")
+			},
+
 		],
 		tests: .yes(dependencies: [])
 	),

@@ -34,7 +34,7 @@ public struct CreationOfAccount: Sendable, FeatureReducer {
 					.init(
 						derivationPathOption: .next(for: .account, networkID: networkID, curve: .curve25519),
 						factorSourceOption: .device,
-						purpose: .createEntity
+						purpose: .createEntity(kind: .account)
 					)
 				)
 			}
@@ -88,7 +88,7 @@ public struct CreationOfAccount: Sendable, FeatureReducer {
 
 		case let .createAccountResult(.success(account)):
 			return .task {
-				try await accountsClient.saveVirtualAccount(.init(account: account, shouldUpdateFactorSourceNextDerivationIndex: true))
+				try await accountsClient.saveVirtualAccount(.init(account: account))
 				return .delegate(.createdAccount(account))
 			} catch: { error in
 				loggerGlobal.error("Failed to save newly created virtual account into profile: \(error)")
@@ -103,7 +103,7 @@ public struct CreationOfAccount: Sendable, FeatureReducer {
 			state.step = .step1_derivePublicKeys(.init(
 				derivationPathOption: .next(for: .account, networkID: state.networkID, curve: .curve25519),
 				factorSourceOption: .specific(ledger.embed()),
-				purpose: .createEntity
+				purpose: .createEntity(kind: .account)
 			))
 			return .none
 

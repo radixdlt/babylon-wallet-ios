@@ -17,7 +17,7 @@ extension GatewayAPI {
 
 public struct StateEntityDetailsResponseNonFungibleResourceDetailsAllOf: Codable, Hashable {
 
-    public private(set) var accessRules: ComponentEntityAccessRules
+    public private(set) var roleAssignments: ComponentEntityRoleAssignments
     public private(set) var nonFungibleIdType: NonFungibleIdType
     /** String-encoded decimal representing the amount of a related fungible resource. */
     public private(set) var totalSupply: String
@@ -26,8 +26,8 @@ public struct StateEntityDetailsResponseNonFungibleResourceDetailsAllOf: Codable
     /** String-encoded decimal representing the amount of a related fungible resource. */
     public private(set) var totalBurned: String
 
-    public init(accessRules: ComponentEntityAccessRules, nonFungibleIdType: NonFungibleIdType, totalSupply: String, totalMinted: String, totalBurned: String) {
-        self.accessRules = accessRules
+    public init(roleAssignments: ComponentEntityRoleAssignments, nonFungibleIdType: NonFungibleIdType, totalSupply: String, totalMinted: String, totalBurned: String) {
+        self.roleAssignments = roleAssignments
         self.nonFungibleIdType = nonFungibleIdType
         self.totalSupply = totalSupply
         self.totalMinted = totalMinted
@@ -35,7 +35,7 @@ public struct StateEntityDetailsResponseNonFungibleResourceDetailsAllOf: Codable
     }
 
     public enum CodingKeys: String, CodingKey, CaseIterable {
-        case accessRules = "access_rules"
+        case roleAssignments = "role_assignments"
         case nonFungibleIdType = "non_fungible_id_type"
         case totalSupply = "total_supply"
         case totalMinted = "total_minted"
@@ -46,7 +46,7 @@ public struct StateEntityDetailsResponseNonFungibleResourceDetailsAllOf: Codable
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(accessRules, forKey: .accessRules)
+        try container.encode(roleAssignments, forKey: .roleAssignments)
         try container.encode(nonFungibleIdType, forKey: .nonFungibleIdType)
         try container.encode(totalSupply, forKey: .totalSupply)
         try container.encode(totalMinted, forKey: .totalMinted)

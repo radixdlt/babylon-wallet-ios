@@ -18,10 +18,6 @@ import Tagged
 public typealias NetworkID = Tagged<(network: (), id: ()), UInt8>
 
 extension NetworkID {
-	public static let `default` = enkinet
-}
-
-extension NetworkID {
 	/// Public Facing Permanent Networks (0x00 - 0x09)
 	// - mainnet
 	// - stokenet

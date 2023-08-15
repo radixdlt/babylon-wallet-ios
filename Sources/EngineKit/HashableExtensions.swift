@@ -71,10 +71,6 @@ extension Instruction: Hashable {
 			hasher.combine(ids)
 		case .popFromAuthZone:
 			hasher.combine("popFromAuthZone")
-		case .clearAuthZone:
-			hasher.combine("clearAuthZone")
-		case .clearSignatureProofs:
-			hasher.combine("clearSignatureProofs")
 		case .dropAllProofs:
 			hasher.combine("dropAllProofs")
 		case let .pushToAuthZone(proofId):
@@ -132,11 +128,6 @@ extension Instruction: Hashable {
 			hasher.combine(address)
 			hasher.combine(methodName)
 			hasher.combine(args)
-		case let .callAccessRulesMethod(address, methodName, args):
-			hasher.combine("callAccessRulesMethod")
-			hasher.combine(address)
-			hasher.combine(methodName)
-			hasher.combine(args)
 		case let .assertWorktopContainsAny(resourceAddress):
 			hasher.combine("assertWorktopContainsAny")
 			hasher.combine(resourceAddress)
@@ -149,6 +140,19 @@ extension Instruction: Hashable {
 			hasher.combine("allocateGlobalAddress")
 			hasher.combine(packageAddress)
 			hasher.combine(blueprintName)
+		case .dropNamedProofs:
+			hasher.combine("dropNamedProofs")
+		case .dropAuthZoneProofs:
+			hasher.combine("dropAuthZoneProofs")
+		case .dropAuthZoneRegularProofs:
+			hasher.combine("dropAuthZoneRegularProofs")
+		case .dropAuthZoneSignatureProofs:
+			hasher.combine("dropAuthZoneSignatureProofs")
+		case let .callRoleAssignmentMethod(address, methodName, args):
+			hasher.combine("callRoleAssignmentMethod")
+			hasher.combine(address)
+			hasher.combine(methodName)
+			hasher.combine(args)
 		}
 	}
 
@@ -167,8 +171,9 @@ extension Instruction: Hashable {
 		case let (.assertWorktopContainsNonFungibles(lhsAddress, lhsIds), .assertWorktopContainsNonFungibles(rhsAddress, rhsIds)):
 			return lhsAddress == rhsAddress && lhsIds == rhsIds
 		case (.popFromAuthZone, .popFromAuthZone),
-		     (.clearAuthZone, .clearAuthZone),
-		     (.clearSignatureProofs, .clearSignatureProofs),
+		     (.dropAuthZoneProofs, .dropAuthZoneProofs),
+		     (.dropAuthZoneRegularProofs, .dropAuthZoneRegularProofs),
+		     (.dropAuthZoneSignatureProofs, .dropAuthZoneSignatureProofs),
 		     (.dropAllProofs, .dropAllProofs):
 			return true
 		case let (.pushToAuthZone(lhs), .pushToAuthZone(rhs)):
@@ -196,7 +201,7 @@ extension Instruction: Hashable {
 		case let (.callMethod(lhsAddress, lhsMethodName, lhsArgs), .callMethod(rhsAddress, rhsMethodName, rhsArgs)),
 		     let (.callRoyaltyMethod(lhsAddress, lhsMethodName, lhsArgs), .callRoyaltyMethod(rhsAddress, rhsMethodName, rhsArgs)),
 		     let (.callMetadataMethod(lhsAddress, lhsMethodName, lhsArgs), .callMetadataMethod(rhsAddress, rhsMethodName, rhsArgs)),
-		     let (.callAccessRulesMethod(lhsAddress, lhsMethodName, lhsArgs), .callAccessRulesMethod(rhsAddress, rhsMethodName, rhsArgs)):
+		     let (.callRoleAssignmentMethod(lhsAddress, lhsMethodName, lhsArgs), .callRoleAssignmentMethod(rhsAddress, rhsMethodName, rhsArgs)):
 			return lhsAddress == rhsAddress && lhsMethodName == rhsMethodName && lhsArgs == rhsArgs
 		default:
 			return false
@@ -428,13 +433,15 @@ extension ExecutionAnalysis: Hashable {
 	public static func == (lhs: ExecutionAnalysis, rhs: ExecutionAnalysis) -> Bool {
 		lhs.feeLocks == rhs.feeLocks &&
 			lhs.feeSummary == rhs.feeSummary &&
-			lhs.transactionType == rhs.transactionType
+			lhs.transactionTypes == rhs.transactionTypes &&
+			lhs.reservedInstructions == rhs.reservedInstructions
 	}
 
 	public func hash(into hasher: inout Hasher) {
 		hasher.combine(feeLocks)
 		hasher.combine(feeSummary)
-		hasher.combine(transactionType)
+		hasher.combine(transactionTypes)
+		hasher.combine(reservedInstructions)
 	}
 }
 
@@ -453,13 +460,17 @@ extension FeeLocks: Hashable {
 // MARK: - FeeSummary + Hashable
 extension FeeSummary: Hashable {
 	public static func == (lhs: FeeSummary, rhs: FeeSummary) -> Bool {
-		lhs.networkFee == rhs.networkFee &&
-			lhs.royaltyFee == rhs.royaltyFee
+		lhs.executionCost == rhs.executionCost &&
+			lhs.finalizationCost == rhs.finalizationCost &&
+			lhs.royaltyCost == rhs.royaltyCost &&
+			lhs.storageExpansionCost == rhs.storageExpansionCost
 	}
 
 	public func hash(into hasher: inout Hasher) {
-		hasher.combine(self.networkFee)
-		hasher.combine(self.royaltyFee)
+		hasher.combine(self.executionCost)
+		hasher.combine(self.finalizationCost)
+		hasher.combine(self.royaltyCost)
+		hasher.combine(self.storageExpansionCost)
 	}
 }
 
@@ -504,8 +515,13 @@ extension TransactionType: Hashable {
 				lhsMetadataOfNewlyCreatedEntities == rhsMetadataOfNewlyCreatedEntities &&
 				lhsDataOfNewlyMintedNonFungibles == rhsDataOfNewlyMintedNonFungibles &&
 				lhsAddressesOfNewlyCreatedEntities == rhsAddressesOfNewlyCreatedEntities
-		case (.nonConforming, .nonConforming):
-			return true
+		case let (
+			.accountDepositSettings(lhsResourcePreferenceChanges, lhsDefaultDepositRuleChanges, lhsAuthorizedDepositorsChanges),
+			.accountDepositSettings(rhsResourcePreferenceChanges, rhsDefaultDepositRuleChanges, rhsAuthorizedDepositorsChanges)
+		):
+			return lhsResourcePreferenceChanges == rhsResourcePreferenceChanges &&
+				lhsDefaultDepositRuleChanges == rhsDefaultDepositRuleChanges &&
+				lhsAuthorizedDepositorsChanges == rhsAuthorizedDepositorsChanges
 		default:
 			return false
 		}
@@ -531,8 +547,11 @@ extension TransactionType: Hashable {
 			hasher.combine(metadataOfNewlyCreatedEntities)
 			hasher.combine(dataOfNewlyMintedNonFungibles)
 			hasher.combine(addressesOfNewlyCreatedEntities)
-		case .nonConforming:
-			hasher.combine("nonConforming")
+		case let .accountDepositSettings(resourcePreferenceChanges, defaultDepositRuleChanges, authorizedDepositorsChanges):
+			hasher.combine("accountDepositSettings")
+			hasher.combine(resourcePreferenceChanges)
+			hasher.combine(defaultDepositRuleChanges)
+			hasher.combine(authorizedDepositorsChanges)
 		}
 	}
 }
@@ -847,5 +866,43 @@ extension TransactionHash: Hashable {
 
 	public func hash(into hasher: inout Hasher) {
 		hasher.combine(asStr())
+	}
+}
+
+// MARK: - AuthorizedDepositorsChanges + Hashable
+extension AuthorizedDepositorsChanges: Hashable {
+	public static func == (lhs: AuthorizedDepositorsChanges, rhs: AuthorizedDepositorsChanges) -> Bool {
+		lhs.added == rhs.added &&
+			lhs.removed == rhs.removed
+	}
+
+	public func hash(into hasher: inout Hasher) {
+		hasher.combine(added)
+		hasher.combine(removed)
+	}
+}
+
+// MARK: - ResourceOrNonFungible + Hashable
+extension ResourceOrNonFungible: Hashable {
+	public static func == (lhs: ResourceOrNonFungible, rhs: ResourceOrNonFungible) -> Bool {
+		switch (lhs, rhs) {
+		case let (.resource(lhsResource), .resource(rhsResource)):
+			return lhsResource == rhsResource
+		case let (.nonFungible(lhsNonFungible), .nonFungible(rhsNonFungible)):
+			return lhsNonFungible == rhsNonFungible
+		default:
+			return false
+		}
+	}
+
+	public func hash(into hasher: inout Hasher) {
+		switch self {
+		case let .resource(value):
+			hasher.combine("Resource")
+			hasher.combine(value)
+		case let .nonFungible(value):
+			hasher.combine("NonFungible")
+			hasher.combine(value)
+		}
 	}
 }

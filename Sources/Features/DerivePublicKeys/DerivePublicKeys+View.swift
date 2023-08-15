@@ -3,7 +3,10 @@ import Profile
 
 extension DerivePublicKeys.State {
 	var viewState: DerivePublicKeys.ViewState {
-		.init(ledger: ledgerBeingUsed)
+		.init(
+			ledger: ledgerBeingUsed,
+			entityKind: (/DerivePublicKeys.State.Purpose.createEntity).extract(from: purpose)
+		)
 	}
 }
 
@@ -11,6 +14,7 @@ extension DerivePublicKeys.State {
 extension DerivePublicKeys {
 	public struct ViewState: Equatable {
 		public let ledger: LedgerHardwareWalletFactorSource?
+		let entityKind: EntityKind?
 	}
 
 	public struct View: SwiftUI.View {
@@ -27,10 +31,15 @@ extension DerivePublicKeys {
 						.frame(.medium)
 						.padding(.vertical, .medium2)
 
-					Text(L10n.CreateAccount.DerivePublicKeys.title)
-						.textStyle(.sheetTitle)
-						.foregroundColor(.app.gray1)
-						.padding(.bottom, .medium1)
+					Text(
+						viewStore.entityKind == .account
+							? L10n.CreateAccount.DerivePublicKeys.title
+							// FIXME: Strings - L10n.CreatePersona.DerivePublicKeys.title
+							: "Creating Persona"
+					)
+					.textStyle(.sheetTitle)
+					.foregroundColor(.app.gray1)
+					.padding(.bottom, .medium1)
 
 					Text(L10n.CreateAccount.DerivePublicKeys.subtitle)
 						.foregroundColor(.app.gray1)

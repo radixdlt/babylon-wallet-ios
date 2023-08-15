@@ -1,9 +1,8 @@
 import Prelude
 
 // MARK: - HDFactorSourceProtocol
-public protocol HDFactorSourceProtocol: BaseFactorSourceProtocol {
-	var nextDerivationIndicesPerNetwork: NextDerivationIndicesPerNetwork? { get }
-}
+// Empty marker protocol only
+public protocol HDFactorSourceProtocol: BaseFactorSourceProtocol {}
 
 // MARK: - DeviceFactorSource + HDFactorSourceProtocol
 extension DeviceFactorSource: HDFactorSourceProtocol {}
@@ -12,8 +11,4 @@ extension DeviceFactorSource: HDFactorSourceProtocol {}
 extension LedgerHardwareWalletFactorSource: HDFactorSourceProtocol {}
 
 // MARK: - OffDeviceMnemonicFactorSource + HDFactorSourceProtocol
-extension OffDeviceMnemonicFactorSource: HDFactorSourceProtocol {
-	public var nextDerivationIndicesPerNetwork: NextDerivationIndicesPerNetwork? {
-		nil
-	}
-}
+extension OffDeviceMnemonicFactorSource: HDFactorSourceProtocol {}

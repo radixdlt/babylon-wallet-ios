@@ -42,7 +42,7 @@ struct ManageSecurityStructurePreviewApp: SwiftUI.App {
 import FactorSourcesClient
 extension FactorSourcesClient {
 	static let previewApp: Self =
-		with(noop) {
+		update(noop) {
 			$0.saveFactorSource = { _ in }
 			$0.getFactorSources = { @Sendable in
 				let device = try! DeviceFactorSource.babylon(
@@ -57,7 +57,7 @@ extension FactorSourcesClient {
 
 import AppPreferencesClient
 extension AppPreferencesClient {
-	static let previewApp: Self = with(noop) {
+	static let previewApp: Self = update(noop) {
 		$0.updatePreferences = { _ in }
 	}
 }
@@ -183,9 +183,7 @@ let instabridge = """
 						{
 							"model": "",
 							"name": ""
-						},
-						"nextDerivationIndicesPerNetwork":
-						[]
+						}
 					},
 					"discriminator": "device"
 				}

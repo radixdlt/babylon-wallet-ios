@@ -168,8 +168,8 @@ final class ROLAClientTests: TestCase {
 		let metadata = metadata(origin: origin, dAppDefinitionAddress: dAppDefinitionAddress)
 		let accountType = "dapp definition"
 		let metadataCollection = GatewayAPI.EntityMetadataCollection(items: [
-			.init(key: "account_type", value: .init(rawHex: "", rawJson: "", typed: .stringValue(.init(type: .string, value: accountType))), isLocked: false, lastUpdatedAtStateVersion: 0),
-			.init(key: "related_websites", value: .init(rawHex: "", rawJson: "", typed: .stringValue(.init(type: .string, value: origin))), isLocked: false, lastUpdatedAtStateVersion: 0),
+			.init(key: "account_type", value: .init(rawHex: "", programmaticJson: "", typed: .stringValue(.init(type: .string, value: accountType))), isLocked: false, lastUpdatedAtStateVersion: 0),
+			.init(key: "related_websites", value: .init(rawHex: "", programmaticJson: "", typed: .stringValue(.init(type: .string, value: origin))), isLocked: false, lastUpdatedAtStateVersion: 0),
 		])
 
 		// when
@@ -189,8 +189,8 @@ final class ROLAClientTests: TestCase {
 		let wrongAccountType = "wrong account type"
 
 		let metadataCollection = GatewayAPI.EntityMetadataCollection(items: [
-			.init(key: "account_type", value: .init(rawHex: "", rawJson: "", typed: .stringValue(.init(type: .string, value: wrongAccountType))), isLocked: false, lastUpdatedAtStateVersion: 0),
-			.init(key: "related_websites", value: .init(rawHex: "", rawJson: "", typed: .stringValue(.init(type: .string, value: origin))), isLocked: false, lastUpdatedAtStateVersion: 0),
+			.init(key: "account_type", value: .init(rawHex: "", programmaticJson: "", typed: .stringValue(.init(type: .string, value: wrongAccountType))), isLocked: false, lastUpdatedAtStateVersion: 0),
+			.init(key: "related_websites", value: .init(rawHex: "", programmaticJson: "", typed: .stringValue(.init(type: .string, value: origin))), isLocked: false, lastUpdatedAtStateVersion: 0),
 		])
 
 		let expectedError = ROLAFailure.wrongAccountType
@@ -218,8 +218,8 @@ final class ROLAClientTests: TestCase {
 		let accountType = "dapp definition"
 
 		let metadataCollection = GatewayAPI.EntityMetadataCollection(items: [
-			.init(key: "account_type", value: .init(rawHex: "", rawJson: "", typed: .stringValue(.init(type: .string, value: accountType))), isLocked: false, lastUpdatedAtStateVersion: 0),
-			.init(key: "related_websites", value: .init(rawHex: "", rawJson: "", typed: .stringValue(.init(type: .string, value: origin))), isLocked: false, lastUpdatedAtStateVersion: 0),
+			.init(key: "account_type", value: .init(rawHex: "", programmaticJson: "", typed: .stringValue(.init(type: .string, value: accountType))), isLocked: false, lastUpdatedAtStateVersion: 0),
+			.init(key: "related_websites", value: .init(rawHex: "", programmaticJson: "", typed: .stringValue(.init(type: .string, value: origin))), isLocked: false, lastUpdatedAtStateVersion: 0),
 		])
 
 		let expectedError = ROLAFailure.unknownWebsite

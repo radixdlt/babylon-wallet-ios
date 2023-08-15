@@ -21,32 +21,28 @@ public struct StateEntityDetailsResponsePackageDetailsAllOf: Codable, Hashable {
     /** Hex-encoded binary blob. */
     public private(set) var codeHashHex: String
     /** Hex-encoded binary blob. */
-    public private(set) var codeHex: String?
-    /** Hex-encoded binary blob. */
-    public private(set) var schemaHashHex: String
-    public private(set) var schema: AnyCodable?
+    public private(set) var codeHex: String
     /** String-encoded decimal representing the amount of a related fungible resource. */
     public private(set) var royaltyVaultBalance: String?
     public private(set) var blueprints: StateEntityDetailsResponsePackageDetailsBlueprintCollection?
+    public private(set) var schemas: StateEntityDetailsResponsePackageDetailsSchemaCollection?
 
-    public init(vmType: PackageVmType, codeHashHex: String, codeHex: String? = nil, schemaHashHex: String, schema: AnyCodable? = nil, royaltyVaultBalance: String? = nil, blueprints: StateEntityDetailsResponsePackageDetailsBlueprintCollection? = nil) {
+    public init(vmType: PackageVmType, codeHashHex: String, codeHex: String, royaltyVaultBalance: String? = nil, blueprints: StateEntityDetailsResponsePackageDetailsBlueprintCollection? = nil, schemas: StateEntityDetailsResponsePackageDetailsSchemaCollection? = nil) {
         self.vmType = vmType
         self.codeHashHex = codeHashHex
         self.codeHex = codeHex
-        self.schemaHashHex = schemaHashHex
-        self.schema = schema
         self.royaltyVaultBalance = royaltyVaultBalance
         self.blueprints = blueprints
+        self.schemas = schemas
     }
 
     public enum CodingKeys: String, CodingKey, CaseIterable {
         case vmType = "vm_type"
         case codeHashHex = "code_hash_hex"
         case codeHex = "code_hex"
-        case schemaHashHex = "schema_hash_hex"
-        case schema
         case royaltyVaultBalance = "royalty_vault_balance"
         case blueprints
+        case schemas
     }
 
     // Encodable protocol methods
@@ -55,11 +51,10 @@ public struct StateEntityDetailsResponsePackageDetailsAllOf: Codable, Hashable {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(vmType, forKey: .vmType)
         try container.encode(codeHashHex, forKey: .codeHashHex)
-        try container.encodeIfPresent(codeHex, forKey: .codeHex)
-        try container.encode(schemaHashHex, forKey: .schemaHashHex)
-        try container.encodeIfPresent(schema, forKey: .schema)
+        try container.encode(codeHex, forKey: .codeHex)
         try container.encodeIfPresent(royaltyVaultBalance, forKey: .royaltyVaultBalance)
         try container.encodeIfPresent(blueprints, forKey: .blueprints)
+        try container.encodeIfPresent(schemas, forKey: .schemas)
     }
 }
 
