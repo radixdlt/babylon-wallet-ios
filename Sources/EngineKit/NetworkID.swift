@@ -106,7 +106,7 @@ extension NetworkID {
 	}
 
 	public static func all(but excluded: NetworkID) -> AllCases {
-		var allBut = Self.allCases
+		var allBut = allCases
 		allBut.removeAll(where: { $0 == excluded })
 		return allBut
 	}

@@ -238,7 +238,7 @@ extension LedgerHardwareWalletFactorSource {
 		device: DeviceInfo,
 		name: String
 	) throws -> Self {
-		try Self.model(
+		try model(
 			.init(model: device.model),
 			name: name,
 			deviceID: device.id

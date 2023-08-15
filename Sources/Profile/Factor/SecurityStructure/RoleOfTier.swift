@@ -79,7 +79,7 @@ public struct RoleOfTier<Role: RoleProtocol, AbstractFactor>:
 		self.superAdminFactors = superAdminFactors
 	}
 
-	internal init(
+	init(
 		uncheckedThresholdFactors thresholdFactors: OrderedSet<AbstractFactor>,
 		superAdminFactors: OrderedSet<AbstractFactor>,
 		threshold: UInt
@@ -113,7 +113,7 @@ extension RoleOfTier where AbstractFactor == FactorSource {
 		_ factor: any FactorSourceProtocol,
 		for role: SecurityStructureRole
 	) -> Self {
-		Self.single(factor.embed(), for: role)
+		single(factor.embed(), for: role)
 	}
 }
 

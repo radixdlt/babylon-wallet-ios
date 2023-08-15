@@ -11,9 +11,9 @@ extension RadixConnectConstants {
 
 	public static let defaultSignalingServer: URL = {
 		#if DEBUG
-		return Self.devSignalingServer
+		return devSignalingServer
 		#else
-		return Self.prodSignalingServer
+		return prodSignalingServer
 		#endif // DEBUG
 	}()
 }

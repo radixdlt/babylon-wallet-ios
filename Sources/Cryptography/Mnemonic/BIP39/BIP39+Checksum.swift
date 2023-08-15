@@ -3,7 +3,7 @@ import Prelude
 
 extension BIP39 {
 	@discardableResult
-	internal static func validateChecksumOf(
+	static func validateChecksumOf(
 		mnemonicWords: [BIP39.Word],
 		language: BIP39.Language
 	) throws -> [NonEmptyString] {
@@ -11,7 +11,7 @@ extension BIP39 {
 	}
 
 	@discardableResult
-	internal static func validateChecksumOf(
+	static func validateChecksumOf(
 		mnemonicWords: [NonEmptyString],
 		language: BIP39.Language
 	) throws -> [NonEmptyString] {

@@ -11,7 +11,7 @@ public struct DeviceFactorSource: FactorSourceProtocol {
 
 	public var hint: Hint // We update "name"
 
-	internal init(
+	init(
 		id: ID,
 		common: FactorSource.Common,
 		hint: Hint
@@ -43,7 +43,7 @@ extension DeviceFactorSource {
 }
 
 extension DeviceFactorSource {
-	internal static func from(
+	static func from(
 		mnemonicWithPassphrase: MnemonicWithPassphrase,
 		model: Hint.Model = "",
 		name: String = "",
@@ -71,7 +71,7 @@ extension DeviceFactorSource {
 		lastUsedOn: Date? = nil
 	) throws -> Self {
 		@Dependency(\.date) var date
-		return try Self.from(
+		return try from(
 			mnemonicWithPassphrase: mnemonicWithPassphrase,
 			model: model,
 			name: name,
@@ -89,7 +89,7 @@ extension DeviceFactorSource {
 		lastUsedOn: Date? = nil
 	) throws -> Self {
 		@Dependency(\.date) var date
-		return try Self.from(
+		return try from(
 			mnemonicWithPassphrase: mnemonicWithPassphrase,
 			model: model,
 			name: name,

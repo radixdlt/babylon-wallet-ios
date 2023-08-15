@@ -201,7 +201,7 @@ private extension UserDefaultsClient {
 
 // MARK: - EpochForWhenLastUsedByAccountAddress
 // internal for tests
-internal struct EpochForWhenLastUsedByAccountAddress: Codable, Hashable, Sendable {
+struct EpochForWhenLastUsedByAccountAddress: Codable, Hashable, Sendable {
 	struct EpochForAccount: Codable, Sendable, Hashable, Identifiable {
 		typealias ID = AccountAddress
 		var id: ID { accountAddress }
@@ -209,8 +209,8 @@ internal struct EpochForWhenLastUsedByAccountAddress: Codable, Hashable, Sendabl
 		var epoch: Epoch
 	}
 
-	internal var epochForAccounts: IdentifiedArrayOf<EpochForAccount>
-	internal init(epochForAccounts: IdentifiedArrayOf<EpochForAccount> = .init()) {
+	var epochForAccounts: IdentifiedArrayOf<EpochForAccount>
+	init(epochForAccounts: IdentifiedArrayOf<EpochForAccount> = .init()) {
 		self.epochForAccounts = epochForAccounts
 	}
 

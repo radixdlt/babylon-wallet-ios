@@ -106,7 +106,7 @@ extension LegacyOlympiaBIP44LikeDerivationPath {
 	@discardableResult
 	static func validate(hdPath: HD.Path.Full) throws -> HD.Path.Full {
 		let components = hdPath.components
-		guard components.count == Self.expectedComponentCount else {
+		guard components.count == expectedComponentCount else {
 			throw InvalidBIP44LikeDerivationPath.invalidComponentCount(got: components.count, expected: expectedComponentCount)
 		}
 
@@ -114,7 +114,7 @@ extension LegacyOlympiaBIP44LikeDerivationPath {
 			throw InvalidBIP44LikeDerivationPath.invalidFirstComponentNotRoot
 		}
 		let children = components.dropFirst().compactMap(\.asChild)
-		guard children.count == (Self.expectedComponentCount - 1) else {
+		guard children.count == (expectedComponentCount - 1) else {
 			throw InvalidBIP44LikeDerivationPath.multipleRootsFound
 		}
 

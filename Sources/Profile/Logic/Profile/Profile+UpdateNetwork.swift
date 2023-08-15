@@ -2,7 +2,7 @@ import EngineKit
 import Prelude
 
 extension Profile {
-	internal mutating func updateOnNetwork(_ network: Profile.Network) throws {
+	mutating func updateOnNetwork(_ network: Profile.Network) throws {
 		try networks.update(network)
 	}
 }

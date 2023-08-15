@@ -3,7 +3,7 @@ import EngineKit
 import Prelude
 
 // MARK: - NoInstance
-internal struct NoInstance: Swift.Error {}
+struct NoInstance: Swift.Error {}
 
 // MARK: - AccountIndexOutOfBounds
 struct AccountIndexOutOfBounds: Swift.Error {}

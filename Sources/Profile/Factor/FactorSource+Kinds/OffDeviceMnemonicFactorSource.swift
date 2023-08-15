@@ -10,7 +10,7 @@ public struct OffDeviceMnemonicFactorSource: FactorSourceProtocol {
 	public let hint: Hint
 	public let bip39Parameters: BIP39Parameters
 
-	internal init(
+	init(
 		id: ID,
 		common: FactorSource.Common,
 		hint: Hint,

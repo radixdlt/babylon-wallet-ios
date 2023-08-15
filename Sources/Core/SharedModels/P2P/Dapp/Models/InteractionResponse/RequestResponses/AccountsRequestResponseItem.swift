@@ -30,7 +30,7 @@ extension P2P.Dapp.Response.WalletInteractionSuccessResponse {
 		}
 
 		/// for tests
-		internal static func withoutProofOfOwnership(accounts: [P2P.Dapp.Response.WalletAccount]) -> Self {
+		static func withoutProofOfOwnership(accounts: [P2P.Dapp.Response.WalletAccount]) -> Self {
 			Self(withoutProofOfOwnership: accounts)
 		}
 	}
