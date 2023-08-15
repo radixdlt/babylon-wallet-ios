@@ -33,6 +33,7 @@ extension ConnectUsingSecrets {
 		private let store: StoreOf<ConnectUsingSecrets>
 
 		@FocusState private var focusedField: ConnectUsingSecrets.State.Field?
+
 		public init(store: StoreOf<ConnectUsingSecrets>) {
 			self.store = store
 		}

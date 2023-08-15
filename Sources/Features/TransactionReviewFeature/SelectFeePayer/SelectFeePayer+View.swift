@@ -31,7 +31,7 @@ extension SelectFeePayer {
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				VStack {
-					Text("Select Fee Payer Account")
+					Text(L10n.TransactionReview.SelectFeePayer.navigationTitle)
 						.textStyle(.sheetTitle)
 						.foregroundColor(.app.gray1)
 						.padding(.top, .medium3)
@@ -39,7 +39,7 @@ extension SelectFeePayer {
 						.padding(.bottom, .small2)
 						.multilineTextAlignment(.center)
 
-					Text("Please select an Account with enough XRD to pay \(viewStore.fee) fee for this transaction.")
+					Text(L10n.TransactionReview.CustomizeNetworkFeeSheet.SelectFeePayer.subtitle(fee))
 						.textStyle(.body1HighImportance)
 						.foregroundColor(.app.gray2)
 						.padding(.horizontal, .large3)
@@ -71,7 +71,7 @@ extension SelectFeePayer {
 						viewStore.selectedPayer,
 						forAction: { viewStore.send(.confirmedFeePayer($0)) }
 					) { action in
-						Button(L10n.TransactionReview.SelectFeePayer.selectAccount, action: action)
+						Button(L10n.TransactionReview.CustomizeNetworkFeeSheet.selectFeePayerButtonTitle, action: action)
 							.buttonStyle(.primaryRectangular)
 					}
 				}

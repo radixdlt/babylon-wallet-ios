@@ -45,10 +45,9 @@ struct FeesView: View {
 					.foregroundColor(.app.gray2)
 					.textCase(.uppercase)
 				if isAdvancedMode {
-					Text("Transaction Fee") // TODO: strings
+					Text("(maximum to lock)") // TODO: strings
 						.textStyle(.body1Link)
 						.foregroundColor(.app.gray2)
-						.textCase(.uppercase)
 				}
 			}
 			Spacer()
@@ -109,8 +108,8 @@ extension TransactionFee.NormalFeeCustomization {
 extension BigDecimal {
 	func formatted(_ showsZero: Bool) -> String {
 		if !showsZero, self == .zero {
-			return "None Due" // TODO: strings
+			return L10n.TransactionReview.CustomizeNetworkFeeSheet.noneDue
 		}
-		return "\(format()) XRD"
+		return L10n.TransactionReview.xrdAmount(format())
 	}
 }

@@ -113,7 +113,6 @@ extension CustomizeFees {
 						.padding(.bottom, .medium1)
 					}
 				}
-				.background(.app.background)
 			}
 			.sheet(
 				store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),

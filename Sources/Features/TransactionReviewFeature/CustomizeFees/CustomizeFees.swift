@@ -105,6 +105,9 @@ public struct CustomizeFees: FeatureReducer {
 			state.feePayerSelection.selected = selection
 			state.destination = nil
 			return .send(.delegate(.updated(state.feePayerSelection)))
+		case let .advancedFeesCustomization(.delegate(.updated(advancedFees))):
+			state.feePayerSelection.transactionFee.mode = .advanced(advancedFees)
+			return .send(.delegate(.updated(state.feePayerSelection)))
 		default:
 			return .none
 		}
