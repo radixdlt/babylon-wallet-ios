@@ -50,7 +50,6 @@ extension GatewayAPIClient {
 			urlRequest.httpMethod = method
 			if let httpBody {
 				urlRequest.httpBody = httpBody
-				print(httpBody.prettyPrintedJSONString)
 			}
 
 			urlRequest.allHTTPHeaderFields = [

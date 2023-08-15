@@ -99,8 +99,8 @@ extension TransactionFee.AdvancedFeeCustomization {
 extension TransactionFee.NormalFeeCustomization {
 	var viewStates: IdentifiedArrayOf<FeeViewState> {
 		.init(uncheckedUniqueElements: [
-			.init(name: "NETWORK FEES", amount: networkFee, isUserConfigurable: false),
-			.init(name: "ROYALTY FEES", amount: royaltyFee, isUserConfigurable: false),
+			.init(name: L10n.TransactionReview.CustomizeNetworkFeeSheet.networkFee, amount: networkFee, isUserConfigurable: false),
+			.init(name: L10n.TransactionReview.CustomizeNetworkFeeSheet.royaltyFee, amount: royaltyFee, isUserConfigurable: false),
 		])
 	}
 }

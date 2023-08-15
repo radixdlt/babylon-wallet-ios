@@ -81,7 +81,7 @@ extension AdvancedFeesCustomization {
 					.toolbar {
 						ToolbarItemGroup(placement: .keyboard) {
 							Spacer()
-							Button("Done") {
+							Button(L10n.Common.done) {
 								viewStore.send(.focusChanged(nil))
 							}
 							.foregroundColor(.app.blue1)

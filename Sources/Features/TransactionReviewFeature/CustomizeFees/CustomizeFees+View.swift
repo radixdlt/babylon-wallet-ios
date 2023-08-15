@@ -141,13 +141,13 @@ extension CustomizeFees {
 		func feePayerView(_ viewStore: ViewStoreOf<CustomizeFees>) -> some SwiftUI.View {
 			VStack(alignment: .leading) {
 				HStack {
-					Text("Pay Fee From") // TODO: strings
+					Text(L10n.TransactionReview.CustomizeNetworkFeeSheet.payFeeFrom)
 						.textStyle(.body1Link)
 						.foregroundColor(.app.gray2)
 						.textCase(.uppercase)
 
 					Spacer()
-					Button("Change") { // TODO: strings
+					Button(L10n.TransactionReview.CustomizeNetworkFeeSheet.changeButtonTitle) {
 						viewStore.send(.changeFeePayerTapped)
 					}
 					.textStyle(.body1StandaloneLink)
