@@ -140,7 +140,10 @@ public struct AssetsView: Sendable, FeatureReducer {
 		switch internalAction {
 		case let .portfolioUpdated(portfolio):
 			let xrd = portfolio.fungibleResources.xrdResource.map { token in
-				FungibleAssetList.Row.State(xrdToken: token, isSelected: state.mode.xrdRowSelected)
+				FungibleAssetList.Row.State(
+					xrdToken: token,
+					isSelected: state.mode.xrdRowSelected
+				)
 			}
 			let nonXrd = portfolio.fungibleResources.nonXrdResources
 				.map { token in

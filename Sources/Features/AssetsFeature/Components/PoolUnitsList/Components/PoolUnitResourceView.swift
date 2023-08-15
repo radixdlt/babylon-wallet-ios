@@ -67,6 +67,8 @@ struct PoolUnitResourcesView: View {
 	let resources: NonEmpty<IdentifiedArrayOf<PoolUnitResourceViewState>>
 
 	var body: some View {
+		let strokeColor = Color.app.gray4
+
 		VStack(spacing: 1) {
 			ForEach(resources) { resource in
 				PoolUnitResourceView(viewState: resource) {
@@ -78,10 +80,10 @@ struct PoolUnitResourcesView: View {
 			.padding(.medium3)
 			.background(.app.white)
 		}
-		.background(.app.gray4)
+		.background(strokeColor)
 		.overlay(
 			RoundedRectangle(cornerRadius: .small1)
-				.stroke(.app.gray4, lineWidth: 1)
+				.stroke(strokeColor, lineWidth: 1)
 		)
 	}
 }

@@ -11,12 +11,15 @@ public struct LSUStake: FeatureReducer {
 
 		var isSelected: Bool?
 
+		var stakeClaimSelections: [Bool]? = [false, true]
+
 		@PresentationState
 		public var destination: Destinations.State?
 	}
 
 	public enum ViewAction: Sendable, Equatable {
 		case didTap
+		case didTapStakeClaimNFT(at: Int)
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -82,6 +85,10 @@ public struct LSUStake: FeatureReducer {
 
 				return .none
 			}
+		case let .didTapStakeClaimNFT(at: index):
+			state.stakeClaimSelections?[index].toggle()
+
+			return .none
 		}
 	}
 }
