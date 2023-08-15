@@ -18,18 +18,18 @@ extension GatewayAPI {
 public struct EntityMetadataItemValue: Codable, Hashable {
 
     public private(set) var rawHex: String
-    public private(set) var rawJson: AnyCodable
-    public private(set) var typed: MetadataTypedValue?
+    public private(set) var programmaticJson: AnyCodable
+    public private(set) var typed: MetadataTypedValue
 
-    public init(rawHex: String, rawJson: AnyCodable, typed: MetadataTypedValue? = nil) {
+    public init(rawHex: String, programmaticJson: AnyCodable, typed: MetadataTypedValue) {
         self.rawHex = rawHex
-        self.rawJson = rawJson
+        self.programmaticJson = programmaticJson
         self.typed = typed
     }
 
     public enum CodingKeys: String, CodingKey, CaseIterable {
         case rawHex = "raw_hex"
-        case rawJson = "raw_json"
+        case programmaticJson = "programmatic_json"
         case typed
     }
 
@@ -38,8 +38,8 @@ public struct EntityMetadataItemValue: Codable, Hashable {
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(rawHex, forKey: .rawHex)
-        try container.encode(rawJson, forKey: .rawJson)
-        try container.encodeIfPresent(typed, forKey: .typed)
+        try container.encode(programmaticJson, forKey: .programmaticJson)
+        try container.encode(typed, forKey: .typed)
     }
 }
 

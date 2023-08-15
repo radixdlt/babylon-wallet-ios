@@ -92,7 +92,7 @@ extension FaucetClient: DependencyKey {
 			}
 
 			let networkID = await gatewaysClient.getCurrentNetworkID()
-			let manifest = try TransactionManifest.manifestForFaucet(
+			let manifest = try ManifestBuilder.manifestForFaucet(
 				includeLockFeeInstruction: true,
 				networkID: networkID,
 				componentAddress: accountAddress.asGeneral()
@@ -117,39 +117,46 @@ extension FaucetClient: DependencyKey {
 		let createFungibleToken: CreateFungibleToken = { request in
 			let networkID = await gatewaysClient.getCurrentNetworkID()
 			let manifest = try {
-				if request.numberOfTokens == 1 {
-					return try TransactionManifest.manifestForCreateFungibleToken(
-						account: request.recipientAccountAddress,
-						network: networkID
-					)
-				} else {
-					return try TransactionManifest.manifestForCreateMultipleFungibleTokens(
-						account: request.recipientAccountAddress,
-						network: networkID
-					)
-				}
+				try ManifestBuilder.manifestForCreateFungibleToken(
+					account: request.recipientAccountAddress,
+					networkID: networkID
+				)
+				// TODO: Re-enable. With new manifest builder that is not easy to handle.
+//				if request.numberOfTokens == 1 {
+//					return try ManifestBuilder.manifestForCreateFungibleToken(
+//						account: request.recipientAccountAddress,
+				//                                                networkID: networkID
+//					)
+//				} else {
+//					return try TransactionManifest.manifestForCreateMultipleFungibleTokens(
+//						account: request.recipientAccountAddress,
+//						network: networkID
+//					)
+//				}
 			}()
 
 			try await signSubmitTX(manifest: manifest)
 		}
 
-		let createNonFungibleToken: CreateNonFungibleToken = { request in
-			let networkID = await gatewaysClient.getCurrentNetworkID()
-			let manifest = try {
-				if request.numberOfTokens == 1 {
-					return try TransactionManifest.manifestForCreateNonFungibleToken(
-						account: request.recipientAccountAddress,
-						network: networkID
-					)
-				} else {
-					return try TransactionManifest.manifestForCreateMultipleNonFungibleTokens(
-						account: request.recipientAccountAddress,
-						network: networkID
-					)
-				}
-			}()
+		let createNonFungibleToken: CreateNonFungibleToken = { _ in
+			fatalError()
+			// TODO: Re-enable. With new manifest builder that is not easy to handle.
+//			let networkID = await gatewaysClient.getCurrentNetworkID()
+//			let manifest = try {
+//				if request.numberOfTokens == 1 {
+//					return try TransactionManifest.manifestForCreateNonFungibleToken(
+//						account: request.recipientAccountAddress,
+//						network: networkID
+//					)
+//				} else {
+//					return try TransactionManifest.manifestForCreateMultipleNonFungibleTokens(
+//						account: request.recipientAccountAddress,
+//						network: networkID
+//					)
+//				}
+//			}()
 
-			try await signSubmitTX(manifest: manifest)
+//			try await signSubmitTX(manifest: manifest)
 		}
 
 		return Self(

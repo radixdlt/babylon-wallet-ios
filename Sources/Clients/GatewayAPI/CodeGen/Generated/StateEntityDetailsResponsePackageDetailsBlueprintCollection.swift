@@ -15,7 +15,6 @@ public typealias StateEntityDetailsResponsePackageDetailsBlueprintCollection = G
 
 extension GatewayAPI {
 
-/** Entity metadata collection. */
 public struct StateEntityDetailsResponsePackageDetailsBlueprintCollection: Codable, Hashable {
 
     /** Total number of items in underlying collection, fragment of which is available in `items` collection. */

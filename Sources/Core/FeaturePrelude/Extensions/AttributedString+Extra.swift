@@ -13,7 +13,7 @@ extension Text {
 // (@davdroman will work on one and open source it in his spare time)
 extension AttributedString {
 	public init(_ string: some StringProtocol, foregroundColor: Color) {
-		self = with(AttributedString(string)) { $0.foregroundColor = foregroundColor }
+		self = update(AttributedString(string)) { $0.foregroundColor = foregroundColor }
 	}
 
 	public init(markdown: some StringProtocol, replaceItalicsWith italicsColor: Color) {

@@ -271,6 +271,86 @@ extension AccountPortfolio.NonFungibleResource {
 	}
 }
 
+// MARK: - AccountPortfolio.NonFungibleResource.NonFungibleToken.NFTData
+extension AccountPortfolio.NonFungibleResource.NonFungibleToken {
+	public struct NFTData: Sendable, Hashable, Codable {
+		public enum Field: String, Sendable, Hashable, Codable {
+			case name
+			case description
+			case keyImageURL = "key_image_url"
+			case claimEpoch = "claim_epoch"
+			case claimAmount = "claim_amount"
+		}
+
+		public enum Value: Sendable, Hashable, Codable {
+			case string(String)
+			case url(URL)
+			case decimal(BigDecimal)
+			case u64(UInt64)
+
+			var string: String? {
+				guard case let .string(str) = self else {
+					return nil
+				}
+				return str
+			}
+
+			var url: URL? {
+				guard case let .url(url) = self else {
+					return nil
+				}
+				return url
+			}
+
+			var u64: UInt64? {
+				guard case let .u64(u64) = self else {
+					return nil
+				}
+				return u64
+			}
+
+			var decimal: BigDecimal? {
+				guard case let .decimal(decimal) = self else {
+					return nil
+				}
+				return decimal
+			}
+		}
+
+		public let field: Field
+		public let value: Value
+
+		public init(field: Field, value: Value) {
+			self.field = field
+			self.value = value
+		}
+	}
+}
+
+extension [AccountPortfolio.NonFungibleResource.NonFungibleToken.NFTData] {
+	public typealias Field = Self.Element.Field
+
+	public subscript(field: Field) -> Self.Element.Value? {
+		first { $0.field == field }?.value
+	}
+
+	public var name: String? {
+		self[.name]?.string
+	}
+
+	public var keyImageURL: URL? {
+		self[.keyImageURL]?.url
+	}
+
+	public var claimEpoch: UInt64? {
+		self[.claimEpoch]?.u64
+	}
+
+	public var claimAmount: BigDecimal? {
+		self[.claimAmount]?.decimal
+	}
+}
+
 extension AccountPortfolio.NonFungibleResource.NonFungibleToken {
 	enum CodingKeys: CodingKey {
 		case id

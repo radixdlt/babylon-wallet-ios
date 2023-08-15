@@ -291,7 +291,7 @@ extension AccountPortfoliosClient {
 				.nonFungibleIds
 				.map { item in
 					let details = item.details
-					let canBeClaimed = details.claimEpoch.map { UInt64(ledgerState.epoch) >= $0.rawValue } ?? false
+					let canBeClaimed = details.claimEpoch.map { UInt64(ledgerState.epoch) >= $0 } ?? false
 					return try AccountPortfolio.NonFungibleResource.NonFungibleToken(
 						id: .fromParts(
 							resourceAddress: .init(address: resource.resourceAddress),
@@ -301,7 +301,7 @@ extension AccountPortfoliosClient {
 						description: nil,
 						keyImageURL: details.keyImageURL,
 						metadata: [],
-						stakeClaimAmount: details.stakeClaim,
+						stakeClaimAmount: details.claimAmount,
 						canBeClaimed: canBeClaimed
 					)
 				}
@@ -769,5 +769,53 @@ extension AccountPortfolio.PoolUnitResources {
 	// Will be used to filter out those from the general fungible resources list.
 	fileprivate var nonFungibleResourceAddresses: [String] {
 		radixNetworkStakes.compactMap(\.stakeClaimResource?.resourceAddress.address)
+	}
+}
+
+// FIXME: Temporary hack to extract the key_image_url, until we have a proper schema
+extension GatewayAPI.StateNonFungibleDetailsResponseItem {
+	public typealias NFTData = AccountPortfolio.NonFungibleResource.NonFungibleToken.NFTData
+	public var details: [NFTData] {
+		data?.programmaticJson.dictionary?["fields"]?.array?.compactMap {
+			guard let dict = $0.dictionary,
+			      let value = dict["value"],
+			      let type = dict["kind"]?.string.flatMap(GatewayAPI.MetadataValueType.init),
+			      let field = dict["field_name"]?.string.flatMap(NFTData.Field.init),
+			      let value = NFTData.Value(type: type, value: value)
+			else {
+				return nil
+			}
+
+			return .init(field: field, value: value)
+		} ?? []
+	}
+}
+
+extension AccountPortfolio.NonFungibleResource.NonFungibleToken.NFTData.Value {
+	public init?(type: GatewayAPI.MetadataValueType, value: JSONValue) {
+		switch type {
+		case .string:
+			guard let str = value.string else {
+				return nil
+			}
+			self = .string(str)
+		case .url:
+			guard let url = value.string.flatMap(URL.init) else {
+				return nil
+			}
+			self = .url(url)
+		case .u64:
+			guard let u64 = value.uint.map(UInt64.init) else {
+				return nil
+			}
+			self = .u64(u64)
+		case .decimal:
+			guard let decimal = try? value.string.map(BigDecimal.init(fromString:)) else {
+				return nil
+			}
+			self = .decimal(decimal)
+		default:
+			return nil
+		}
 	}
 }

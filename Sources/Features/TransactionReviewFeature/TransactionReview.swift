@@ -419,7 +419,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		case let .previewLoaded(.success(preview)):
 			state.networkID = preview.networkID
 			do {
-				state.reviewedTransaction = try preview.analyzedManifestToReview.transactionType.asReviewedTransaction()
+				state.reviewedTransaction = try preview.analyzedManifestToReview.transactionTypes.asReviewedTransaction()
 				switch preview.addFeeToManifestOutcome {
 				case let .includesLockFee(manifestInclLockFee):
 					state.feePayerSelectionAmongstCandidates = manifestInclLockFee.feePayerSelectionAmongstCandidates
@@ -477,21 +477,20 @@ public struct TransactionReview: Sendable, FeatureReducer {
 	) throws -> TransactionManifest {
 		guard !guarantees.isEmpty else { return manifest }
 
-		var manifest = manifest
-
-		/// Will be increased with each added guarantee to account for the difference in indexes from the initial manifest.
-		var indexInc = 1 // LockFee was added, start from 1
-		for guarantee in guarantees {
-			let guaranteeInstruction: Instruction = try .assertWorktopContains(
-				resourceAddress: guarantee.resourceAddress.intoEngine(),
-				amount: .init(value: guarantee.amount.toString())
+		let assertions: [IndexedAssertion] = try guarantees.map {
+			try .init(
+				index: $0.instructionIndex,
+				assertion: .amount(
+					resourceAddress: $0.resourceAddress.intoEngine(),
+					amount: $0.amount.intoEngine()
+				)
 			)
-
-			manifest = try manifest.withInstructionAdded(guaranteeInstruction, at: Int(guarantee.instructionIndex) + indexInc)
-
-			indexInc += 1
 		}
-		return manifest
+		return try manifest.modify(modifications: .init(
+			addAccessControllerProofs: [],
+			addLockFee: nil,
+			addAssertions: assertions
+		))
 	}
 
 	func showRawTransaction(_ state: inout State) -> EffectTask<Action> {
@@ -1171,9 +1170,37 @@ public enum ReviewedTransaction: Hashable, Sendable {
 	case nonConforming
 }
 
+extension [TransactionType] {
+	fileprivate func asReviewedTransaction() throws -> ReviewedTransaction {
+		// Empty array means non conforming transaction. ET was not able to map it to any type
+		guard !isEmpty else {
+			return .nonConforming
+		}
+
+		// First try to get the general transaction, if missing then convert the first transaction to general transaction
+		return try firstNonNil(\.generalTransaction).map(ReviewedTransaction.conforming) ?? first!.asReviewedTransaction()
+	}
+}
+
 /// This is kinda temporary conversion of all transaction types into GeneralTransaction, until(not sure if needed) we will want to
 /// have specific UI for different transaction types
 extension TransactionType {
+	var generalTransaction: GeneralTransaction? {
+		if case let .generalTransaction(accountProofs, accountWithdraws, accountDeposits, addressesInManifest, metadataOfNewlyCreatedEntities, dataOfNewlyMintedNonFungibles, addressesOfNewlyCreatedEntities) = self {
+			return .init(
+				accountProofs: accountProofs,
+				accountWithdraws: accountWithdraws,
+				accountDeposits: accountDeposits,
+				addressesInManifest: addressesInManifest,
+				metadataOfNewlyCreatedEntities: metadataOfNewlyCreatedEntities,
+				dataOfNewlyMintedNonFungibles: dataOfNewlyMintedNonFungibles,
+				addressesOfNewlyCreatedEntities: addressesOfNewlyCreatedEntities
+			)
+		}
+
+		return nil
+	}
+
 	public struct GeneralTransaction: Hashable, Sendable {
 		let accountProofs: [EngineToolkit.Address]
 		let accountWithdraws: [String: [ResourceTracker]]
@@ -1291,7 +1318,7 @@ extension TransactionType {
 					addressesOfNewlyCreatedEntities: addressesOfNewlyCreatedEntities
 				)
 			)
-		case .nonConforming:
+		case .accountDepositSettings:
 			return .nonConforming
 		}
 	}
