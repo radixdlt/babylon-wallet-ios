@@ -167,7 +167,7 @@ public enum CAP23 {
 extension SecurityQuestionsFactorSource {
 	public struct SealedMnemonic: Sendable, Hashable, Codable {
 		public let securityQuestions: NonEmpty<OrderedSet<SecurityQuestion>>
-		public let encryptionScheme: EncryptionAES256GCM
+		public let encryptionScheme: EncryptionScheme
 		public let encryptions: NonEmpty<OrderedSet<HexCodable>>
 	}
 }
@@ -177,7 +177,7 @@ extension SecurityQuestionsFactorSource.SealedMnemonic {
 		mnemonic: Mnemonic,
 		withAnswersToQuestions answersToQuestion: NonEmpty<OrderedSet<AnswerToSecurityQuestion>>,
 		jsonEncoder: JSONEncoder,
-		encryptionScheme: EncryptionAES256GCM = .default
+		encryptionScheme: EncryptionScheme = .default
 	) throws -> Self {
 		let plaintext = try jsonEncoder.encode(mnemonic)
 
@@ -189,7 +189,7 @@ extension SecurityQuestionsFactorSource.SealedMnemonic {
 			try HexCodable(
 				data: encryptionScheme.encrypt(
 					data: plaintext,
-					key: $0
+					encryptionKey: $0
 				)
 			)
 		}
@@ -226,7 +226,7 @@ extension SecurityQuestionsFactorSource.SealedMnemonic {
 				do {
 					let decrypted = try encryptionScheme.decrypt(
 						data: encryptedMnemonic.data,
-						key: decryptionKey
+						decryptionKey: decryptionKey
 					)
 					return try jsonDecoder.decode(Mnemonic.self, from: decrypted)
 				} catch {

@@ -1,7 +1,58 @@
 import AppPreferencesClient
 import BackupsClient
+import Cryptography
 import FeaturePrelude
 import ImportMnemonicFeature
+import UniformTypeIdentifiers
+
+// MARK: - NoJSONDataFound
+struct NoJSONDataFound: Error {}
+
+// MARK: - EncryptedProfileSnapshot
+public struct EncryptedProfileSnapshot: Sendable, Codable, Hashable {
+	/// Encrypted JSON encoding of a `ProfileSnapshot`
+	public let encryptedSnapshot: HexCodable
+	public let encryptionScheme: EncryptionScheme
+}
+
+// MARK: - ExportableProfileFile
+public enum ExportableProfileFile: FileDocument, Sendable, Hashable {
+	case plaintext(ProfileSnapshot)
+	case encrypted(EncryptedProfileSnapshot)
+}
+
+extension ExportableProfileFile {
+	public static let readableContentTypes: [UTType] = [.profile]
+
+	public init(configuration: ReadConfiguration) throws {
+		guard let data = configuration.file.regularFileContents
+		else {
+			throw NoJSONDataFound()
+		}
+		try self.init(data: data)
+	}
+
+	public init(data: Data) throws {
+		@Dependency(\.jsonDecoder) var jsonDecoder
+		do {
+			self = try .plaintext(jsonDecoder().decode(ProfileSnapshot.self, from: data))
+		} catch {
+			self = try .encrypted(jsonDecoder().decode(EncryptedProfileSnapshot.self, from: data))
+		}
+	}
+
+	public func fileWrapper(configuration: WriteConfiguration) throws -> FileWrapper {
+		@Dependency(\.jsonEncoder) var jsonEncoder
+		switch self {
+		case let .plaintext(plaintext):
+			let jsonData = try jsonEncoder().encode(plaintext)
+			return FileWrapper(regularFileWithContents: jsonData)
+		case let .encrypted(encryptedSnapshot):
+			let jsonData = try jsonEncoder().encode(encryptedSnapshot)
+			return FileWrapper(regularFileWithContents: jsonData)
+		}
+	}
+}
 
 // MARK: - ProfileBackups
 public struct ProfileBackups: Sendable, FeatureReducer {
@@ -15,8 +66,11 @@ public struct ProfileBackups: Sendable, FeatureReducer {
 		public var backupProfileHeaders: ProfileSnapshot.HeaderList?
 		public var selectedProfileHeader: ProfileSnapshot.Header?
 		public var isDisplayingFileImporter: Bool
+		public var isDisplayingFileExporter: Bool
 		public var thisDeviceID: UUID?
 		public var context: Context
+
+		public var importedEncryptedSnapshot: EncryptedProfileSnapshot?
 		public var importedContent: Either<ProfileSnapshot, ProfileSnapshot.Header>?
 
 		var isCloudProfileSyncEnabled: Bool {
@@ -30,17 +84,21 @@ public struct ProfileBackups: Sendable, FeatureReducer {
 		@PresentationState
 		public var destination: Destinations.State?
 
+		public var profileFilePotentiallyEncrypted: ExportableProfileFile?
+
 		public init(
 			context: Context,
 			backupProfileHeaders: ProfileSnapshot.HeaderList? = nil,
 			selectedProfileHeader: ProfileSnapshot.Header? = nil,
 			isDisplayingFileImporter: Bool = false,
+			isDisplayingFileExporter: Bool = false,
 			thisDeviceID: UUID? = nil
 		) {
 			self.context = context
 			self.backupProfileHeaders = backupProfileHeaders
 			self.selectedProfileHeader = selectedProfileHeader
 			self.isDisplayingFileImporter = isDisplayingFileImporter
+			self.isDisplayingFileExporter = isDisplayingFileExporter
 			self.thisDeviceID = thisDeviceID
 		}
 	}
@@ -50,35 +108,63 @@ public struct ProfileBackups: Sendable, FeatureReducer {
 		case cloudProfileSyncToggled(Bool)
 		case selectedProfileHeader(ProfileSnapshot.Header?)
 		case tappedImportProfile
+		case exportProfileButtonTapped
 		case dismissFileImporter
+		case dismissFileExporter
 		case profileImportResult(Result<URL, NSError>)
+		case profileExportResult(Result<URL, NSError>)
 		case tappedUseCloudBackup(ProfileSnapshot.Header)
 	}
 
 	public struct Destinations: Sendable, ReducerProtocol {
 		static let confirmCloudSyncDisableAlert: Self.State = .confirmCloudSyncDisable(.init(
 			title: {
-				// FIXME: strings
+				// FIXME: Strings
 				TextState("Disabling iCloud sync will delete the iCloud backup data(wallet data will still be kept on this iPhone), are you sure you want to disable iCloud sync?")
 			},
 			actions: {
 				ButtonState(role: .destructive, action: .confirm) {
+					// FIXME: Strings
 					TextState("Confirm")
+				}
+			}
+		))
+
+		static let optionallyEncryptProfileBeforeExportingAlert: Self.State = .optionallyEncryptProfileBeforeExporting(.init(
+			title: {
+				// FIXME: Strings
+				TextState("Encrypt this backup with a password?")
+			},
+			actions: {
+				ButtonState(role: .destructive, action: .encrypt) {
+					// FIXME: Strings
+					TextState("Yes")
+				}
+				ButtonState(role: .destructive, action: .doNotEncrypt) {
+					// FIXME: Strings
+					TextState("No")
 				}
 			}
 		))
 
 		public enum State: Sendable, Hashable {
 			case confirmCloudSyncDisable(AlertState<Action.ConfirmCloudSyncDisable>)
+			case optionallyEncryptProfileBeforeExporting(AlertState<Action.SelectEncryptOrNot>)
 			case importMnemonic(ImportMnemonic.State)
 		}
 
 		public enum Action: Sendable, Equatable {
 			case confirmCloudSyncDisable(ConfirmCloudSyncDisable)
 			case importMnemonic(ImportMnemonic.Action)
+			case optionallyEncryptProfileBeforeExporting(SelectEncryptOrNot)
 
 			public enum ConfirmCloudSyncDisable: Sendable, Hashable {
 				case confirm
+			}
+
+			public enum SelectEncryptOrNot: Sendable, Hashable {
+				case encrypt
+				case doNotEncrypt
 			}
 		}
 
@@ -88,6 +174,9 @@ public struct ProfileBackups: Sendable, FeatureReducer {
 			}
 			Scope(state: /State.importMnemonic, action: /Action.importMnemonic) {
 				ImportMnemonic()
+			}
+			Scope(state: /State.optionallyEncryptProfileBeforeExporting, action: /Action.optionallyEncryptProfileBeforeExporting) {
+				EmptyReducer()
 			}
 		}
 	}
@@ -131,6 +220,10 @@ public struct ProfileBackups: Sendable, FeatureReducer {
 				return updateCloudSync(state: &state, isEnabled: true)
 			}
 
+		case .exportProfileButtonTapped:
+			state.destination = Destinations.optionallyEncryptProfileBeforeExportingAlert
+			return .none
+
 		case .task:
 			return .run { send in
 				await send(.internal(.loadThisDeviceIDResult(
@@ -163,6 +256,10 @@ public struct ProfileBackups: Sendable, FeatureReducer {
 			state.isDisplayingFileImporter = false
 			return .none
 
+		case .dismissFileExporter:
+			state.isDisplayingFileExporter = false
+			return .none
+
 		case let .profileImportResult(.failure(error)):
 			errorQueue.schedule(error)
 			return .none
@@ -170,12 +267,31 @@ public struct ProfileBackups: Sendable, FeatureReducer {
 		case let .profileImportResult(.success(profileURL)):
 			do {
 				let data = try dataReader.contentsOf(profileURL, options: .uncached)
-				let snapshot = try jsonDecoder().decode(ProfileSnapshot.self, from: data)
-				state.importedContent = .left(snapshot)
-				showImportMnemonic(state: &state)
+//				let snapshot = try jsonDecoder().decode(ProfileSnapshot.self, from: data)
+				//                let
+//				state.importedContent = .left(snapshot)
+				let possiblyEncrypted = try ExportableProfileFile(data: data)
+				//                state.importedContent = .left(snapshot)
+				switch possiblyEncrypted {
+				case let .encrypted(encrypted):
+					state.importedEncryptedSnapshot = encrypted
+					fatalError("prompt for encryption password and then `showImportMnemonic`")
+				case let .plaintext(snapshhot):
+					state.importedContent = .left(snapshhot)
+					showImportMnemonic(state: &state)
+				}
 			} catch {
 				errorQueue.schedule(error)
 			}
+			return .none
+
+		case let .profileExportResult(.success(exportedProfileURL)):
+			loggerGlobal.notice("Profile successfully exported to: \(exportedProfileURL)")
+			return .none
+
+		case let .profileExportResult(.failure(error)):
+			loggerGlobal.error("Failed to export profile, error: \(error)")
+			errorQueue.schedule(error)
 			return .none
 		}
 	}
@@ -214,6 +330,12 @@ public struct ProfileBackups: Sendable, FeatureReducer {
 				errorQueue.schedule(error)
 			}
 
+		case .destination(.presented(.optionallyEncryptProfileBeforeExporting(.doNotEncrypt))):
+			return exportProfile(encrypt: false, state: &state)
+
+		case .destination(.presented(.optionallyEncryptProfileBeforeExporting(.encrypt))):
+			return exportProfile(encrypt: true, state: &state)
+
 		case .destination(.presented(.confirmCloudSyncDisable(.confirm))):
 			state.destination = nil
 			return updateCloudSync(state: &state, isEnabled: false)
@@ -224,6 +346,16 @@ public struct ProfileBackups: Sendable, FeatureReducer {
 		default:
 			return .none
 		}
+	}
+
+	private func exportProfile(encrypt: Bool, state: inout State) -> EffectTask<Action> {
+		if encrypt {
+			fatalError("handle encrypt...")
+			state.isDisplayingFileExporter = true
+		} else {
+			state.isDisplayingFileExporter = true
+		}
+		return .none
 	}
 
 	private func showImportMnemonic(state: inout State) {

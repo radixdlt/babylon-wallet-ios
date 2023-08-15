@@ -17,6 +17,12 @@ extension ProfileBackups {
 				VStack(alignment: .leading, spacing: .medium3) {
 					if viewStore.shownInSettings {
 						isCloudProfileSyncEnabled(with: viewStore)
+
+						// FIXME: Strings
+						Button("Export Wallet Backup File") {
+							viewStore.send(.exportProfileButtonTapped)
+						}
+						.buttonStyle(.primaryRectangular)
 					}
 					backupsList(with: viewStore)
 				}
@@ -25,6 +31,11 @@ extension ProfileBackups {
 					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
 					state: /ProfileBackups.Destinations.State.confirmCloudSyncDisable,
 					action: ProfileBackups.Destinations.Action.confirmCloudSyncDisable
+				)
+				.alert(
+					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+					state: /ProfileBackups.Destinations.State.optionallyEncryptProfileBeforeExporting,
+					action: ProfileBackups.Destinations.Action.optionallyEncryptProfileBeforeExporting
 				)
 				.sheet(
 					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
@@ -44,6 +55,16 @@ extension ProfileBackups {
 					),
 					allowedContentTypes: [.profile],
 					onCompletion: { viewStore.send(.profileImportResult($0.mapError { $0 as NSError })) }
+				)
+				.fileExporter(
+					isPresented: viewStore.binding(
+						get: \.isDisplayingFileExporter,
+						send: .dismissFileExporter
+					),
+					document: viewStore.profileFilePotentiallyEncrypted,
+					contentType: .profile,
+					defaultFilename: "radix_wallet_backup_file.json",
+					onCompletion: { viewStore.send(.profileExportResult($0.mapError { $0 as NSError })) }
 				)
 			}
 			.task { @MainActor in
