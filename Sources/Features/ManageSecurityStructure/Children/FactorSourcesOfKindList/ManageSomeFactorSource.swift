@@ -16,7 +16,7 @@ public struct ManageSomeFactorSource<FactorSourceOfKind: BaseFactorSourceProtoco
 				fatalError("It is not possible to add another `device` factor source, bad application logic. Please make sure to disable any 'Add new' button if factor source kind is `device`.")
 
 			case .offDeviceMnemonic:
-				self = .manageOffDeviceMnemonics(.init(persistAsMnemonicKind: .offDevice))
+				self = .manageOffDeviceMnemonics(.init(persistAsMnemonicKind: .intoKeychainAndProfile(.offDevice)))
 
 			case .ledgerHQHardwareWallet:
 				fatalError("Should have handled Ledger by use of LedgerHardwareDevicesFeature")

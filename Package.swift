@@ -251,6 +251,7 @@ package.addModules([
 		dependencies: [
 			"FactorSourcesClient", // saves into profile, if specified
 			"MnemonicClient",
+			"OverlayWindowClient",
 			.product(name: "ScreenshotPreventing", package: "ScreenshotPreventing-iOS", condition: .when(platforms: [.iOS])) {
 				.package(url: "https://github.com/Sajjon/ScreenshotPreventing-iOS.git", from: "0.0.1")
 			},

@@ -2,6 +2,7 @@ import Cryptography
 import FactorSourcesClient
 import FeaturePrelude
 import MnemonicClient
+import OverlayWindowClient
 
 // MARK: - ImportMnemonic
 public struct ImportMnemonic: Sendable, FeatureReducer {
@@ -62,7 +63,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			words.compactMap(\.completeWord)
 		}
 
-		public let persistedKind: MnemonicBasedFactorSourceKind?
+		public let persistMnemonicMode: PersistMnemonicMode?
 
 		public let isReadonlyMode: Bool
 		public let isWordCountFixed: Bool
@@ -72,14 +73,23 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 		public let header: Header?
 		public let warning: String?
 
+		#if DEBUG
+		public var debugOnlyMnemonicPhraseSingleField = ""
+		#endif
+
 		@PresentationState
 		public var offDeviceMnemonicInfoPrompt: OffDeviceMnemonicInfo.State?
+
+		public enum PersistMnemonicMode: Sendable, Hashable {
+			case intoKeychainAndProfile(MnemonicBasedFactorSourceKind)
+			case intoKeychainOnly
+		}
 
 		public init(
 			header: Header? = nil,
 			warning: String? = nil,
 			isWordCountFixed: Bool = false,
-			persistAsMnemonicKind persistedKind: MnemonicBasedFactorSourceKind?,
+			persistAsMnemonicKind persistMnemonicMode: PersistMnemonicMode?,
 			language: BIP39.Language = .english,
 			wordCount: BIP39.WordCount = .twelve,
 			bip39Passphrase: String = "",
@@ -87,7 +97,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 		) {
 			precondition(wordCount.rawValue.isMultiple(of: ImportMnemonic.wordsPerRow))
 
-			self.persistedKind = persistedKind
+			self.persistMnemonicMode = persistMnemonicMode
 			self.language = language
 			self.bip39Passphrase = bip39Passphrase
 
@@ -109,7 +119,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			self.warning = warning
 
 			let mnemonic = mnemonicWithPassphrase.mnemonic
-			self.persistedKind = nil
+			self.persistMnemonicMode = nil
 			self.language = mnemonic.language
 			let isReadonlyMode = true
 			self.isReadonlyMode = isReadonlyMode
@@ -158,6 +168,11 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 		case removeRowButtonTapped
 		case doneViewing
 		case continueButtonTapped(Mnemonic)
+
+		#if DEBUG
+		case debugOnlyCopyMnemonic
+		case debugOnlyMnemonicChanged(String)
+		#endif
 	}
 
 	public enum InternalAction: Sendable, Equatable {
@@ -180,6 +195,11 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 	@Dependency(\.mnemonicClient) var mnemonicClient
 	@Dependency(\.continuousClock) var clock
 	@Dependency(\.factorSourcesClient) var factorSourcesClient
+
+	#if DEBUG
+	@Dependency(\.overlayWindowClient) var overlayWindowClient
+	@Dependency(\.pasteboardClient) var pasteboardClient
+	#endif
 
 	public init() {}
 
@@ -220,7 +240,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 
 		case let .offDeviceMnemonicInfoPrompt(.presented(.delegate(.done(label, mnemonicWithPassphrase)))):
 			state.offDeviceMnemonicInfoPrompt = nil
-			precondition(state.persistedKind == .offDevice)
+			precondition(state.persistMnemonicMode == .intoKeychainAndProfile(.offDevice))
 			return .task {
 				await .internal(.saveFactorSourceResult(
 					TaskResult {
@@ -271,12 +291,12 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 				mnemonic: mnemonic,
 				passphrase: state.bip39Passphrase
 			)
-			guard let persistedKind = state.persistedKind else {
+			guard let persistMnemonicMode = state.persistMnemonicMode else {
 				return .send(.delegate(.notSavedInProfile(mnemonicWithPassphrase)))
 			}
 
-			switch persistedKind {
-			case let .onDevice(onDeviceKind):
+			switch persistMnemonicMode {
+			case let .intoKeychainAndProfile(.onDevice(onDeviceKind)):
 				return .task {
 					await .internal(.saveFactorSourceResult(
 						TaskResult {
@@ -287,14 +307,43 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 						}
 					))
 				}
-			case .offDevice:
+			case .intoKeychainAndProfile(.offDevice):
 				state.offDeviceMnemonicInfoPrompt = .init(mnemonicWithPassphrase: mnemonicWithPassphrase)
 				return .none
+			case .intoKeychainOnly:
+				return .task {
+					await .internal(.saveFactorSourceResult(
+						TaskResult {
+							try await factorSourcesClient.addOnDeviceFactorSource(
+								onDeviceMnemonicKind: .babylon,
+								mnemonicWithPassphrase: mnemonicWithPassphrase,
+								saveIntoProfile: false
+							)
+						}
+					))
+				}
 			}
 
 		case .doneViewing:
 			assert(state.isReadonlyMode)
 			return .send(.delegate(.doneViewing))
+
+		#if DEBUG
+		case .debugOnlyCopyMnemonic:
+			if let mnemonic = state.mnemonic?.phrase.rawValue {
+				pasteboardClient.copyString(mnemonic)
+				overlayWindowClient.scheduleHUD(.init(kind: .copied))
+			}
+			return .none
+
+		case let .debugOnlyMnemonicChanged(mnemonic):
+			state.debugOnlyMnemonicPhraseSingleField = mnemonic
+			if let mnemonic = try? Mnemonic(phrase: mnemonic, language: state.language) {
+				return .send(.view(.continueButtonTapped(mnemonic)))
+			} else {
+				return .none
+			}
+		#endif
 		}
 	}
 

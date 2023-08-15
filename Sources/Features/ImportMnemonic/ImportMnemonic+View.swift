@@ -6,7 +6,7 @@ import ScreenshotPreventing
 
 extension ImportMnemonic.State {
 	var viewState: ImportMnemonic.ViewState {
-		.init(
+		var viewState = ImportMnemonic.ViewState(
 			isReadonlyMode: isReadonlyMode,
 			isWordCountFixed: isWordCountFixed,
 			isAdvancedMode: isAdvancedMode,
@@ -19,6 +19,10 @@ extension ImportMnemonic.State {
 			mnemonic: mnemonic,
 			bip39Passphrase: bip39Passphrase
 		)
+		#if DEBUG
+		viewState.debugOnlyMnemonicPhraseSingleField = self.debugOnlyMnemonicPhraseSingleField
+		#endif
+		return viewState
 	}
 
 	var rowCount: Int {
@@ -40,6 +44,9 @@ extension ImportMnemonic {
 		let completedWords: [BIP39.Word]
 		let mnemonic: Mnemonic?
 		let bip39Passphrase: String
+		#if DEBUG
+		var debugOnlyMnemonicPhraseSingleField: String = ""
+		#endif
 	}
 }
 
@@ -107,12 +114,34 @@ extension ImportMnemonic {
 								.padding(.bottom, .medium2)
 						}
 
-						Button(viewStore.modeButtonTitle) {
-							viewStore.send(.toggleModeButtonTapped)
+						#if DEBUG
+						if viewStore.isReadonlyMode {
+							Button("DEBUG ONLY Copy") {
+								viewStore.send(.debugOnlyCopyMnemonic)
+							}
+							.buttonStyle(.secondaryRectangular(isDestructive: true))
+							.padding(.bottom, .medium1)
+						} else if viewStore.isAdvancedMode {
+							AppTextField(
+								placeholder: "DEBUG ONLY paste mnemonic",
+								text: viewStore.binding(
+									get: { $0.debugOnlyMnemonicPhraseSingleField },
+									send: { .debugOnlyMnemonicChanged($0) }
+								)
+							)
+							.padding(.horizontal, .medium2)
+							.padding(.bottom, .medium2)
 						}
-						.buttonStyle(.blue)
-						.frame(height: .large1)
-						.padding(.bottom, .medium1)
+						#endif
+
+						if !viewStore.isReadonlyMode {
+							Button(viewStore.modeButtonTitle) {
+								viewStore.send(.toggleModeButtonTapped)
+							}
+							.buttonStyle(.blue)
+							.frame(height: .large1)
+							.padding(.bottom, .medium1)
+						}
 
 						footer(with: viewStore)
 					}

@@ -79,13 +79,13 @@ public struct ManageFactorSources: Sendable, FeatureReducer {
 
 		case .importOlympiaMnemonicButtonTapped:
 			state.destination = .importMnemonic(.init(
-				persistAsMnemonicKind: .onDevice(.olympia)
+				persistAsMnemonicKind: .intoKeychainAndProfile(.onDevice(.olympia))
 			))
 			return .none
 
 		case .addOffDeviceMnemonicButtonTapped:
 			state.destination = .importMnemonic(.init(
-				persistAsMnemonicKind: .offDevice
+				persistAsMnemonicKind: .intoKeychainAndProfile(.offDevice)
 			))
 			return .none
 

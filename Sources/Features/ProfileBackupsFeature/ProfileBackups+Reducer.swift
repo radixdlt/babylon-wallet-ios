@@ -285,6 +285,10 @@ public struct ProfileBackups: Sendable, FeatureReducer {
 
 		case let .profileImportResult(.success(profileURL)):
 			do {
+				guard profileURL.startAccessingSecurityScopedResource() else {
+					throw LackedPermissionToAccessSecurityScopedResource()
+				}
+				defer { profileURL.stopAccessingSecurityScopedResource() }
 				let data = try dataReader.contentsOf(profileURL, options: .uncached)
 				let possiblyEncrypted = try ExportableProfileFile(data: data)
 				switch possiblyEncrypted {
@@ -354,10 +358,11 @@ public struct ProfileBackups: Sendable, FeatureReducer {
 				assertionFailure("Imported mnemonic, but didn't import neither a snapshot or a profile header")
 				return .none
 			}
-
+			loggerGlobal.notice("Starting import snapshot process...")
 			return .run { [importedContent] send in
 				switch importedContent {
 				case let .left(snapshot):
+					loggerGlobal.notice("Importing snapshot...")
 					try await backupsClient.importProfileSnapshot(snapshot, factorSource.id)
 				case let .right(header):
 					try await backupsClient.importCloudProfile(header, factorSource.id)
@@ -381,7 +386,7 @@ public struct ProfileBackups: Sendable, FeatureReducer {
 			state.destination = nil
 			return .none
 
-		case let .destination(.presented(.inputEncryptionPassword(.delegate(.successfullyDecrypted(encrypted, decrypted))))):
+		case let .destination(.presented(.inputEncryptionPassword(.delegate(.successfullyDecrypted(_, decrypted))))):
 			state.destination = nil
 			importing(snapshot: decrypted, state: &state)
 			return .none
@@ -419,7 +424,7 @@ public struct ProfileBackups: Sendable, FeatureReducer {
 
 	private func showImportMnemonic(state: inout State) {
 		state.destination = .importMnemonic(.init(
-			persistAsMnemonicKind: .onDevice(.babylon)
+			persistAsMnemonicKind: .intoKeychainOnly
 		))
 	}
 
@@ -430,3 +435,6 @@ public struct ProfileBackups: Sendable, FeatureReducer {
 		}
 	}
 }
+
+// MARK: - LackedPermissionToAccessSecurityScopedResource
+struct LackedPermissionToAccessSecurityScopedResource: Error {}
