@@ -849,7 +849,7 @@ extension GatewayAPI.ComponentEntityRoleAssignments {
 			switch assignment {
 			case .allowAll: return .anyone
 			case .denyAll: return .none
-			case .otherExplicit, .owner: return .someone
+			case .protected, .otherExplicit, .owner: return .someone
 			}
 		}
 
@@ -954,6 +954,7 @@ extension GatewayAPI.ComponentEntityRoleAssignmentEntry {
 		case owner
 		case denyAll
 		case allowAll
+		case protected
 		case otherExplicit
 
 		init?(_ assignment: GatewayAPI.ComponentEntityRoleAssignmentEntryAssignment) {
@@ -969,6 +970,8 @@ extension GatewayAPI.ComponentEntityRoleAssignmentEntry {
 					self = .denyAll
 				case "AllowAll":
 					self = .allowAll
+				case "Protected":
+					self = .protected
 				default:
 					self = .otherExplicit
 				}
