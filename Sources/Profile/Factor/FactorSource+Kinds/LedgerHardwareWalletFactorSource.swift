@@ -8,7 +8,7 @@ public struct LedgerHardwareWalletFactorSource: FactorSourceProtocol {
 	public var common: FactorSource.Common // We update `lastUsed`
 	public let hint: Hint
 
-	internal init(
+	init(
 		id: ID,
 		common: FactorSource.Common,
 		hint: Hint
@@ -72,8 +72,8 @@ extension LedgerHardwareWalletFactorSource {
 	) throws -> Self {
 		try .init(
 			id: ID(kind: .ledgerHQHardwareWallet, body: deviceID),
-			common: Self.common(isOlympiaCompatible: true),
-			hint: .init(name: name, model: model)
+			common: common(isOlympiaCompatible: true),
+			hint: .init(name: name, model: model),
 		)
 	}
 }

@@ -70,7 +70,7 @@ extension PeerConnectionNegotiator {
 	) -> Task<Void, Error> {
 		@Sendable func negotiate(_ trigger: NegotiationTrigger) async {
 			do {
-				let peerConnection = try await Self.negotiatePeerConnection(
+				let peerConnection = try await negotiatePeerConnection(
 					trigger,
 					signalingServerClient: signalingClient,
 					factory: factory
@@ -120,7 +120,7 @@ extension PeerConnectionNegotiator {
 		factory: PeerConnectionFactory
 	) async throws -> PeerConnectionClient {
 		let clientID = trigger.clientID
-		let log = Self.tracePeerConnectionNegotiation(clientID)
+		let log = tracePeerConnectionNegotiation(clientID)
 
 		log("Triggered")
 		let peerConnectionClient = try factory.makePeerConnectionClient(for: clientID)

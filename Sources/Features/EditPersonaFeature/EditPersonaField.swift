@@ -187,8 +187,8 @@ extension DynamicFieldID: EditPersonaFieldID {
 extension PersonaData.Entry.Kind: Comparable {
 	public static func < (lhs: Self, rhs: Self) -> Bool {
 		guard
-			let lhsIndex = Self.supportedKinds.firstIndex(of: lhs),
-			let rhsIndex = Self.supportedKinds.firstIndex(of: rhs)
+			let lhsIndex = supportedKinds.firstIndex(of: lhs),
+			let rhsIndex = supportedKinds.firstIndex(of: rhs)
 		else {
 			assertionFailure(
 				"""

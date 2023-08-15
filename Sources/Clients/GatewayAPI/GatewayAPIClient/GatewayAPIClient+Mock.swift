@@ -32,14 +32,14 @@ extension GatewayAPIClient: TestDependencyKey {
 		.init(
 			getNetworkName: { _ in .init("Nebunet") },
 			getEpoch: { .init(rawValue: 123) },
-			getEntityDetails: unimplemented("\(Self.self).getEntityDetails"),
-			getEntityMetadata: unimplemented("\(Self.self).getEntityMetadata"),
-			getEntityFungiblesPage: unimplemented("\(Self.self).getEntityFungiblesPage"),
-			getEntityFungibleResourceVaultsPage: unimplemented("\(Self.self).getEntityFungibleResourceVaultsPage"),
-			getEntityNonFungiblesPage: unimplemented("\(Self.self).getEntityNonFungiblesPage"),
-			getEntityNonFungibleResourceVaultsPage: unimplemented("\(Self.self).getEntityNonFungibleResourceVaultsPage"),
-			getEntityNonFungibleIdsPage: unimplemented("\(Self.self).getEntityNonFungibleIdsPage"),
-			getNonFungibleData: unimplemented("\(Self.self).getNonFungibleData"),
+			getEntityDetails: unimplemented("\(self).getEntityDetails"),
+			getEntityMetadata: unimplemented("\(self).getEntityMetadata"),
+			getEntityFungiblesPage: unimplemented("\(self).getEntityFungiblesPage"),
+			getEntityFungibleResourceVaultsPage: unimplemented("\(self).getEntityFungibleResourceVaultsPage"),
+			getEntityNonFungiblesPage: unimplemented("\(self).getEntityNonFungiblesPage"),
+			getEntityNonFungibleResourceVaultsPage: unimplemented("\(self).getEntityNonFungibleResourceVaultsPage"),
+			getEntityNonFungibleIdsPage: unimplemented("\(self).getEntityNonFungibleIdsPage"),
+			getNonFungibleData: unimplemented("\(self).getNonFungibleData"),
 			submitTransaction: { _ in
 				.init(duplicate: submittedTXIsDoubleSpend)
 			},
@@ -51,7 +51,7 @@ extension GatewayAPIClient: TestDependencyKey {
 					errorMessage: nil
 				)
 			},
-			transactionPreview: unimplemented("\(Self.self).transactionPreview")
+			transactionPreview: unimplemented("\(self).transactionPreview")
 		)
 	}
 }

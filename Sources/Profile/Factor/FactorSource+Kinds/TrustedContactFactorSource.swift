@@ -10,7 +10,7 @@ public struct TrustedContactFactorSource: FactorSourceProtocol {
 	public var common: FactorSource.Common
 	public let contact: Contact
 
-	internal init(
+	init(
 		id: ID,
 		common: FactorSource.Common,
 		contact: Contact

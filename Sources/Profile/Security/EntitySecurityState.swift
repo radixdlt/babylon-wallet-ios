@@ -50,7 +50,7 @@ extension EntitySecurityState {
 }
 
 extension EntitySecurityState {
-	internal enum Discriminator: String, Sendable, Equatable, Codable {
+	enum Discriminator: String, Sendable, Equatable, Codable {
 		case unsecured
 	}
 
@@ -58,7 +58,7 @@ extension EntitySecurityState {
 		case discriminator, unsecuredEntityControl
 	}
 
-	internal var discriminator: Discriminator {
+	var discriminator: Discriminator {
 		switch self {
 		case .unsecured: return .unsecured
 		}

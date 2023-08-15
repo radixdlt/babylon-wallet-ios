@@ -25,7 +25,7 @@ extension BIP39 {
 	}
 
 	fileprivate static func makeWordList(for language: Language) -> WordList {
-		let words = Self.words(for: language)
+		let words = words(for: language)
 		return try! WordList(words: words, language: language)
 	}
 }

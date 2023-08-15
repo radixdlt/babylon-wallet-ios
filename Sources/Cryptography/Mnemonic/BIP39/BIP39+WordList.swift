@@ -58,7 +58,7 @@ extension BIP39 {
 }
 
 extension BIP39.WordList {
-	internal func words(at indices: [Word.Index]) -> [Word] {
+	func words(at indices: [Word.Index]) -> [Word] {
 		indices.map { index in
 			guard let word = self.indexToWord[index] else {
 				fatalError("Incorrect implementation, should always be able to located word at index. Index was: \(index), language: \(language)")
@@ -67,7 +67,7 @@ extension BIP39.WordList {
 		}
 	}
 
-	internal func indices(of words: [NonEmptyString]) -> [Word.Index] {
+	func indices(of words: [NonEmptyString]) -> [Word.Index] {
 		words.map { wordString in
 			guard let index = self.wordToIndex[wordString] else {
 				fatalError("Incorrect implementation, should always be able to located index of word. Word was: \(wordString), language: \(language)")
@@ -76,7 +76,7 @@ extension BIP39.WordList {
 		}
 	}
 
-	internal func bip39Words(from wordStrings: [NonEmptyString]) -> NonEmptyArray<Word>? {
+	func bip39Words(from wordStrings: [NonEmptyString]) -> NonEmptyArray<Word>? {
 		guard !wordStrings.isEmpty else { return nil }
 		var words: [Word] = []
 		for wordString in wordStrings {
@@ -157,7 +157,7 @@ extension BIP39.WordList {
 		)
 	}
 
-	internal func containsAllWords(in words: [NonEmptyString]) -> Bool {
+	func containsAllWords(in words: [NonEmptyString]) -> Bool {
 		bip39Words(from: words) != nil
 	}
 }
@@ -169,8 +169,8 @@ extension NonEmpty<OrderedSet<BIP39.Word>> {
 }
 
 extension BIP39.WordList {
-	internal static let size = 2048
+	static let size = 2048
 
 	/// `2^11 => 2048`
-	internal static let sizeLog2 = 11
+	static let sizeLog2 = 11
 }
