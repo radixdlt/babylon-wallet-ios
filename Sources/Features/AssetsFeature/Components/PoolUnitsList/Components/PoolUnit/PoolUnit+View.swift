@@ -6,6 +6,7 @@ extension PoolUnit {
 		let iconURL: URL?
 		let name: String
 		let resources: NonEmpty<IdentifiedArrayOf<PoolUnitResourceViewState>>
+		let isSelected: Bool?
 	}
 
 	public struct View: SwiftUI.View {
@@ -29,8 +30,14 @@ extension PoolUnit {
 					}
 					.padding(-.small3)
 
-					PoolUnitResourcesView(resources: viewStore.resources)
-						.padding(-.small2)
+					HStack {
+						PoolUnitResourcesView(resources: viewStore.resources)
+							.padding(-.small2)
+
+						if let isSelected = viewStore.isSelected {
+							CheckmarkView(appearance: .dark, isChecked: isSelected)
+						}
+					}
 				}
 				.padding(.medium1)
 				.background(.app.white)
@@ -56,7 +63,8 @@ extension PoolUnit.State {
 		.init(
 			iconURL: poolUnit.poolUnitResource.iconURL,
 			name: poolUnit.poolUnitResource.name ?? L10n.Account.PoolUnits.unknownPoolUnitName,
-			resources: poolUnit.resourceViewStates
+			resources: poolUnit.resourceViewStates,
+			isSelected: isSelected
 		)
 	}
 }
@@ -79,7 +87,7 @@ extension AccountPortfolio.PoolUnitResources.PoolUnit {
 						thumbnail: .known($0.iconURL),
 						symbol: $0.symbol ?? $0.name ?? L10n.Account.PoolUnits.unknownSymbolName,
 						tokenAmount: redemptionValue(for: $0).format(),
-						isSelected: false
+						isSelected: nil
 					)
 				}
 		)! // Safe to unwrap, guaranteed to not be empty
