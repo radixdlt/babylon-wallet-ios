@@ -38,12 +38,12 @@ extension PoolUnit {
 							CheckmarkView(appearance: .dark, isChecked: isSelected)
 						}
 					}
+					.onTapGesture { viewStore.send(.didTap) }
 				}
 				.padding(.medium1)
 				.background(.app.white)
 				.roundedCorners(radius: .small1)
 				.tokenRowShadow()
-				.onTapGesture { viewStore.send(.didTap) }
 			}
 			.sheet(
 				store: store.scope(
