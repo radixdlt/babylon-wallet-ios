@@ -123,10 +123,10 @@
 "linkedConnectors_lastConnected" = "Last connected %@";
 "linkedConnectors_linkNewConnector" = "Link New Connector";
 "linkedConnectors_newConnection_title" = "Link New Connector";
-"linkedConnectors_newConnection_subtitle" = "Scan the QR code shown in the Radix Connector browser extension";
+"linkedConnectors_newConnection_subtitle" = "Open your Radix Connector extension\'s menu by clicking its icon in your list of browser extensions, and scan the QR code shown.";
 "linkedConnectors_newConnection_linking" = "Linking…";
 "linkedConnectors_nameNewConnector_title" = "Name New Connector";
-"linkedConnectors_nameNewConnector_subtitle" = "What would you like to call this Connector?";
+"linkedConnectors_nameNewConnector_subtitle" = "What would you like to call this Radix Connector installation?";
 "linkedConnectors_nameNewConnector_textFieldPlaceholder" = "e.g. Chrome on Personal Laptop";
 "linkedConnectors_nameNewConnector_textFieldHint" = "Name this connector e.g. ‘Chrome on MacBook Pro’";
 "linkedConnectors_nameNewConnector_saveLinkButtonTitle" = "Continue";
