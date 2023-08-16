@@ -34,7 +34,7 @@ extension TransactionReviewNetworkFee {
 					if case .needsFeePayer = viewStore.reviewedTransaction.feePayingValidation {
 						WarningErrorView(text: "Please select a fee payer for the transaction fee", type: .warning)
 					} else if case .insufficientBalance = viewStore.reviewedTransaction.feePayingValidation {
-						WarningErrorView(text: L10n.TransactionReview.NetworkFee., type: .error)
+						WarningErrorView(text: "", type: .error)
 					}
 
 					Button(L10n.TransactionReview.NetworkFee.customizeButtonTitle) {

@@ -319,8 +319,8 @@ extension TransactionFee {
 
 extension TransactionFee {
 	enum PredefinedFeeConstants {
-		/// a 15% margin is added here to make up for the ambiguity of the transaction preview estimate)
-		static let networkFeeMultiplier: BigDecimal = 1.15
+		/// 15% margin is added here to make up for the ambiguity of the transaction preview estimate)
+		static let networkFeeMultiplier: BigDecimal = 0.15
 
 		// TODO: Add WalletFees table. Which is yet to be determined.
 	}
@@ -336,12 +336,8 @@ extension TransactionFee {
 		public let storageExpansionCost: BigDecimal
 		public let royaltyCost: BigDecimal
 
-		public var networkFee: BigDecimal {
-			executionCost + finalizationCost
-		}
-
 		public var total: BigDecimal {
-			networkFee + storageExpansionCost + royaltyCost
+			executionCost + finalizationCost + storageExpansionCost + royaltyCost
 		}
 
 		public init(
@@ -404,15 +400,13 @@ extension TransactionFee {
 
 		public init(feeSummary: FeeSummary, feeLocks: FeeLocks) {
 			var networkFee = feeSummary.executionCost + feeSummary.finalizationCost + feeSummary.storageExpansionCost
-			networkFee *= PredefinedFeeConstants.networkFeeMultiplier
-
-			// Split the non contingent lock between network and royalty fees.
-			networkFee = networkFee.clampedDiff(feeLocks.nonContingentLock)
-
+			networkFee += networkFee * PredefinedFeeConstants.networkFeeMultiplier
 			let remainingNonContingentLock = feeLocks.nonContingentLock.clampedDiff(networkFee)
-			let royaltyFee = feeSummary.royaltyCost.clampedDiff(remainingNonContingentLock)
 
-			self.init(networkFee: networkFee, royaltyFee: royaltyFee)
+			self.init(
+				networkFee: networkFee.clampedDiff(feeLocks.nonContingentLock),
+				royaltyFee: feeSummary.royaltyCost.clampedDiff(remainingNonContingentLock)
+			)
 		}
 	}
 
