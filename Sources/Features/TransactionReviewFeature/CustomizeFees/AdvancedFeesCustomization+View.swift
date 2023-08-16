@@ -53,7 +53,7 @@ extension AdvancedFeesCustomization {
 
 							AppTextField(
 								primaryHeading: .init(text: L10n.TransactionReview.CustomizeNetworkFeeSheet.tipFieldLabel),
-								secondaryHeading: L10n.TransactionReview.CustomizeNetworkFeeSheet.tipFieldInfo(0),
+								subHeading: L10n.TransactionReview.CustomizeNetworkFeeSheet.tipFieldInfo(0),
 								placeholder: "",
 								text: viewStore.binding(
 									get: \.tipPercentageStr,

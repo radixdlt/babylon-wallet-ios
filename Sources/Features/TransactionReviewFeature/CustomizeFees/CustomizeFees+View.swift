@@ -65,13 +65,12 @@ extension CustomizeFees {
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				VStack(spacing: .zero) {
-//					HStack {
-					CloseButton {
-						viewStore.send(.closed)
+					HStack {
+						CloseButton {
+							viewStore.send(.closed)
+						}
+						Spacer()
 					}
-					.frame(width: .infinity, alignment: .trailing)
-//						Spacer()
-//					}
 					ScrollView {
 						VStack(spacing: .zero) {
 							VStack {
