@@ -65,18 +65,18 @@ extension CustomizeFees {
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				VStack(spacing: .zero) {
-					HStack {
-						CloseButton {
-							viewStore.send(.closed)
-						}
-						Spacer()
+//					HStack {
+					CloseButton {
+						viewStore.send(.closed)
 					}
+					.frame(width: .infinity, alignment: .trailing)
+//						Spacer()
+//					}
 					ScrollView {
 						VStack(spacing: .zero) {
 							VStack {
 								infoView(viewStore)
 								Divider()
-
 								feePayerView(viewStore)
 									.padding(.top, .small1)
 							}
@@ -122,13 +122,14 @@ extension CustomizeFees {
 			)
 		}
 
+		@ViewBuilder
 		func infoView(_ viewStore: ViewStoreOf<CustomizeFees>) -> some SwiftUI.View {
 			VStack {
 				Text(viewStore.title)
 					.textStyle(.sheetTitle)
 					.foregroundColor(.app.gray1)
-					.padding(.bottom, .small1)
 					.multilineTextAlignment(.center)
+					.padding(.bottom, .small1)
 				Text(viewStore.description)
 					.textStyle(.body1Regular)
 					.foregroundColor(.app.gray1)

@@ -257,7 +257,6 @@ extension TransactionClient {
 				ephemeralNotaryPublicKey: request.ephemeralNotaryPublicKey
 			))
 
-			// request.feePayer.map()
 			let entities = NonEmpty(
 				rawValue: Set(Array(transactionIntentWithSigners.transactionSigners.intentSignerEntitiesOrEmpty()))
 			)!

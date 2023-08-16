@@ -1409,13 +1409,10 @@ extension ReviewedTransaction {
 		case .nonConforming:
 			return feePayerSelection.validate
 		case let .conforming(generalTransaction):
-			guard let feePayer = feePayerSelection.selected else {
+			guard let feePayer = feePayerSelection.selected,
+			      let feePayerWithdraws = generalTransaction.accountWithdraws[feePayer.account.address.address]
+			else {
 				return feePayerSelection.validate
-			}
-
-			guard let feePayerWithdraws = generalTransaction.accountWithdraws[feePayer.account.address.address] else {
-				// No FeePayer withdraws
-				return .valid
 			}
 
 			let xrdAddress = knownAddresses(networkId: networkId.rawValue).resourceAddresses.xrd

@@ -29,7 +29,7 @@ extension AdvancedFeesCustomization {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-				NavigationView {
+				NavigationView { // Required for the Keyboard Toolbar
 					VStack(spacing: .zero) {
 						Group {
 							Divider()
@@ -44,13 +44,11 @@ extension AdvancedFeesCustomization {
 									.padding,
 									binding: viewStore.binding(
 										get: \.focusField,
-										send: { .focusChanged($0) }
+										send: ViewAction.focusChanged
 									),
 									to: $focusField
 								)
 							)
-							.keyboardType(.decimalPad)
-							.multilineTextAlignment(.trailing)
 							.padding(.vertical, .medium1)
 
 							AppTextField(
@@ -65,15 +63,15 @@ extension AdvancedFeesCustomization {
 									.tipPercentage,
 									binding: viewStore.binding(
 										get: \.focusField,
-										send: { .focusChanged($0) }
+										send: ViewAction.focusChanged
 									),
 									to: $focusField
 								)
 							)
-							.keyboardType(.decimalPad)
-							.multilineTextAlignment(.trailing)
 							.padding(.bottom, .medium1)
 						}
+						.keyboardType(.decimalPad)
+						.multilineTextAlignment(.trailing)
 						.padding(.horizontal, .medium1)
 
 						FeesView(viewState: viewStore.feesViewState)
