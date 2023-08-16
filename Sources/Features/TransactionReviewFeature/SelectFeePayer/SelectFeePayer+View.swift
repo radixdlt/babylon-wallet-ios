@@ -31,7 +31,7 @@ extension SelectFeePayer {
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				VStack {
-					Text(L10n.TransactionReview.SelectFeePayer.navigationTitle)
+					Text(L10n.TransactionReview.CustomizeNetworkFeeSheet.SelectFeePayer.navigationTitle)
 						.textStyle(.sheetTitle)
 						.foregroundColor(.app.gray1)
 						.padding(.top, .medium3)
@@ -64,15 +64,6 @@ extension SelectFeePayer {
 						}
 						.padding(.horizontal, .medium1)
 						.padding(.bottom, .medium2)
-					}
-				}
-				.footer {
-					WithControlRequirements(
-						viewStore.selectedPayer,
-						forAction: { viewStore.send(.confirmedFeePayer($0)) }
-					) { action in
-						Button(L10n.TransactionReview.CustomizeNetworkFeeSheet.selectFeePayerButtonTitle, action: action)
-							.buttonStyle(.primaryRectangular)
 					}
 				}
 			}

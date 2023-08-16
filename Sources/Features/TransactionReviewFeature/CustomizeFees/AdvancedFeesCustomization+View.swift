@@ -34,7 +34,7 @@ extension AdvancedFeesCustomization {
 						Group {
 							Divider()
 							AppTextField(
-								primaryHeading: .init(text: L10n.TransactionReview.CustomizeNetworkFeeSheet.paddingField),
+								primaryHeading: .init(text: L10n.TransactionReview.CustomizeNetworkFeeSheet.paddingFieldLabel),
 								placeholder: "",
 								text: viewStore.binding(
 									get: \.paddingAmountStr,
@@ -53,7 +53,7 @@ extension AdvancedFeesCustomization {
 
 							AppTextField(
 								primaryHeading: .init(text: L10n.TransactionReview.CustomizeNetworkFeeSheet.tipFieldLabel),
-								subHeading: L10n.TransactionReview.CustomizeNetworkFeeSheet.tipFieldInfo(0),
+								subHeading: L10n.TransactionReview.CustomizeNetworkFeeSheet.tipFieldInfo,
 								placeholder: "",
 								text: viewStore.binding(
 									get: \.tipPercentageStr,

@@ -14,7 +14,7 @@ struct FeesView: View {
 	var body: some View {
 		VStack(spacing: .small1) {
 			HStack {
-				Text("Estimated transaction fees") // TODO: strings
+				Text(L10n.TransactionReview.CustomizeNetworkFeeSheet.feeBreakdownTitle) // TODO: strings
 					.textStyle(.body1Link)
 					.foregroundColor(.app.gray2)
 					.textCase(.uppercase)
@@ -40,12 +40,12 @@ struct FeesView: View {
 	func transactionFeeView(fee: String, isAdvancedMode: Bool) -> some SwiftUI.View {
 		HStack {
 			VStack(spacing: .zero) {
-				Text(L10n.TransactionReview.CustomizeNetworkFeeSheet.totalFee) // TODO: strings
+				Text(L10n.TransactionReview.CustomizeNetworkFeeSheet.totalFee)
 					.textStyle(.body1Link)
 					.foregroundColor(.app.gray2)
 					.textCase(.uppercase)
 				if isAdvancedMode {
-					Text(L10n.TransactionReview.CustomizeNetworkFeeSheet.TotalFee.info) // TODO: strings
+					Text(L10n.TransactionReview.CustomizeNetworkFeeSheet.TotalFee.info)
 						.textStyle(.body1Link)
 						.foregroundColor(.app.gray2)
 				}
