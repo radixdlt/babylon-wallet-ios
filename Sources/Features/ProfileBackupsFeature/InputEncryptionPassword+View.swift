@@ -73,6 +73,16 @@ extension InputEncryptionPassword {
 			// FIXME: String
 			isEncrypting ? "If you forget this password you will not be able to decrypt the wallet backup file. Use a secure, unique password. Back it up somewhere." : "Enter the password you chose when you originally encrypted this wallet backup file."
 		}
+
+		var imageName: String {
+			// FIXME: String
+			isEncrypting ? "square.and.arrow.up" : "square.and.arrow.down"
+		}
+
+		var nonConfirmingPasswordPlaceholder: String {
+			// FIXME: String
+			isEncrypting ? "Encryption password" : "Decryption password"
+		}
 	}
 
 	@MainActor
@@ -88,20 +98,24 @@ extension InputEncryptionPassword {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				ScrollView {
 					VStack(spacing: .medium2) {
+						Image(systemName: viewStore.imageName)
+							.resizable()
+							.frame(.medium)
+							.foregroundColor(.app.gray2)
+
 						// FIXME: Strings
 						Text(viewStore.title)
-							.foregroundColor(.app.gray1)
+							.foregroundColor(.app.gray2)
 							.textStyle(.body1Header)
 							.multilineTextAlignment(.leading)
 
 						Text(viewStore.subtitle)
-							.foregroundColor(.app.gray1)
+							.foregroundColor(.app.gray3)
 							.textStyle(.body1HighImportance)
 							.multilineTextAlignment(.leading)
 
 						AppTextField(
-							// FIXME: Strings
-							placeholder: "Encryption password",
+							placeholder: viewStore.nonConfirmingPasswordPlaceholder,
 							text: viewStore.binding(
 								get: \.inputtedEncryptionPassword,
 								send: { .passwordChanged($0) }

@@ -172,6 +172,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 		#if DEBUG
 		case debugOnlyCopyMnemonic
 		case debugOnlyMnemonicChanged(String)
+		case debugOnlyPasteMnemonic
 		#endif
 	}
 
@@ -343,6 +344,10 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			} else {
 				return .none
 			}
+
+		case .debugOnlyPasteMnemonic:
+			let toPaste = pasteboardClient.getString() ?? ""
+			return .send(.view(.debugOnlyMnemonicChanged(toPaste)))
 		#endif
 		}
 	}

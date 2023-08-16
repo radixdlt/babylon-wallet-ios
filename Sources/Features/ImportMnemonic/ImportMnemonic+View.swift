@@ -127,7 +127,13 @@ extension ImportMnemonic {
 								text: viewStore.binding(
 									get: { $0.debugOnlyMnemonicPhraseSingleField },
 									send: { .debugOnlyMnemonicChanged($0) }
-								)
+								),
+								innerAccessory: {
+									Button("Paste") {
+										viewStore.send(.debugOnlyPasteMnemonic)
+									}
+									.buttonStyle(.borderedProminent)
+								}
 							)
 							.padding(.horizontal, .medium2)
 							.padding(.bottom, .medium2)
