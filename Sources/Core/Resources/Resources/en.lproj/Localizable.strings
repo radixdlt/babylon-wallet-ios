@@ -326,10 +326,13 @@
 "transactionReview_unknownComponents" = "%d Unknown Components";
 "transactionReview_withdrawalsHeading" = "Withdrawing From";
 "transactionReview_xrdAmount" = "%@ XRD";
+"transactionReview_insufficientBalance" = "Insufficient Balance";
+"transactionReview_feePayerRequiredMessage" = "Fee Payer account required";
 "transactionReview_networkFee_heading" = "Transaction Fee";
 "transactionReview_networkFee_congestedText" = "The network is currently congested. Add a tip to speed up your transfer.";
 "transactionReview_networkFee_customizeButtonTitle" = "Customize";
 "transactionReview_customizeNetworkFeeSheet_normalMode_title" = "Customize Fees";
+"transactionReview_customizeNetworkFeeSheet_feeBreakdownTitle" = "Estimated Transaction Fees";
 "transactionReview_customizeNetworkFeeSheet_totalFee" = "Transaction Fee";
 "transactionReview_customizeNetworkFeeSheet_totalFee_info" = "(maximum to lock)";
 "transactionReview_customizeNetworkFeeSheet_advancedMode_title" = "Advanced Customize Fees";
@@ -339,8 +342,9 @@
 "transactionReview_customizeNetworkFeeSheet_changeButtonTitle" = "Change";
 "transactionReview_customizeNetworkFeeSheet_noneRequired" = "None required";
 "transactionReview_customizeNetworkFeeSheet_noneDue" = "None due";
-"transactionReview_customizeNetworkFeeSheet_selectFeePayerButtonTitle" = "Select Fee Payer";
+"transactionReview_customizeNetworkFeeSheet_selectFeePayer_navigationTitle" = "Select Fee Payer";
 "transactionReview_customizeNetworkFeeSheet_selectFeePayer_subtitle" = "Select an account to pay %@ XRD transaction fee";
+"transactionReview_customizeNetworkFeeSheet_selectFeePayer_selectAccountButtonTitle" = "Select Account";
 "transactionReview_customizeNetworkFeeSheet_viewNormalModeButtonTitle" = "View Normal Mode";
 "transactionReview_customizeNetworkFeeSheet_viewAdvancedModeButtonTitle" = "View Advanced Mode";
 "transactionReview_customizeNetworkFeeSheet_networkFee" = "Network Fee";
@@ -351,9 +355,9 @@
 "transactionReview_customizeNetworkFeeSheet_padding" = "Padding";
 "transactionReview_customizeNetworkFeeSheet_royalties" = "Royalties";
 "transactionReview_customizeNetworkFeeSheet_royaltyFee" = "Royalty fee";
-"transactionReview_customizeNetworkFeeSheet_paddingField" = "Adjust Fee Padding Amount (XRD)";
+"transactionReview_customizeNetworkFeeSheet_paddingFieldLabel" = "Adjust Fee Padding Amount (XRD)";
 "transactionReview_customizeNetworkFeeSheet_tipFieldLabel" = "Adjust Tip to Lock";
-"transactionReview_customizeNetworkFeeSheet_tipFieldInfo" = "(% of Execution + Finalization Fees)";
+"transactionReview_customizeNetworkFeeSheet_tipFieldInfo" = "(%% of Execution + Finalization Fees)";
 "transactionReview_customizeNetworkFeeSheet_selectFeePayer_warning" = "Please select a fee payer for the transaction fee";
 "transactionReview_customizeNetworkFeeSheet_insufficientBalance_warning" = "Insufficient balance to pay the transaction fee";
 "transactionReview_guarantees_title" = "Customize Guarantees";
@@ -363,10 +367,6 @@
 "transactionReview_guarantees_setGuaranteedMinimum" = "Set guaranteed minimum %%";
 "transactionReview_prepareForSigning_navigationTitle" = "Preparing Transaction";
 "transactionReview_prepareForSigning_body" = "Preparing transaction for signing";
-"transactionReview_selectFeePayer_navigationTitle" = "Select Fee Account";
-"transactionReview_selectFeePayer_selectAccount" = "Select Account:";
-"transactionReview_selectFeePayer_body" = "Please select an Account with enough XRD to pay 10 XRD fee for this transaction.";
-"transactionReview_selectFeePayer_confirmButton" = "Continue";
 "transactionReview_submitTransaction_displaySubmitting" = "Submitting";
 "transactionReview_submitTransaction_displaySubmittedUnknown" = "Submitted but not confirmed";
 "transactionReview_submitTransaction_displayRejected" = "Rejected";
