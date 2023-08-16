@@ -216,7 +216,7 @@ public struct ProfileBackups: Sendable, FeatureReducer {
 
 	public enum InternalAction: Sendable, Equatable {
 		case loadBackupProfileHeadersResult(ProfileSnapshot.HeaderList?)
-		case loadedProfileToEncrypt(ProfileSnapshot)
+		case loadedProfileSnapshotToExportAsPlaintext(ProfileSnapshot)
 		case loadThisDeviceIDResult(UUID?)
 		case loadPreferences(AppPreferences)
 	}
@@ -355,9 +355,8 @@ public struct ProfileBackups: Sendable, FeatureReducer {
 			state.preferences = preferences
 			return .none
 
-		case let .loadedProfileToEncrypt(snapshot):
-			state.profileFilePotentiallyEncrypted = .plaintext(snapshot)
-			return .none
+		case let .loadedProfileSnapshotToExportAsPlaintext(snapshot):
+			return showFileExporter(with: .plaintext(snapshot), &state)
 		}
 	}
 
@@ -404,8 +403,7 @@ public struct ProfileBackups: Sendable, FeatureReducer {
 
 		case let .destination(.presented(.inputEncryptionPassword(.delegate(.successfullyEncrypted(_, encrypted: encrypted))))):
 			state.destination = nil
-			state.profileFilePotentiallyEncrypted = .encrypted(encrypted)
-			return .none
+			return showFileExporter(with: .encrypted(encrypted), &state)
 
 		case .destination(.dismiss):
 			state.destination = nil
@@ -416,6 +414,12 @@ public struct ProfileBackups: Sendable, FeatureReducer {
 		}
 	}
 
+	private func showFileExporter(with file: ExportableProfileFile, _ state: inout State) -> EffectTask<Action> {
+		// This will trigger `fileExporter` to be shown
+		state.profileFilePotentiallyEncrypted = file
+		return .none
+	}
+
 	private func exportProfile(encrypt: Bool, state: inout State) -> EffectTask<Action> {
 		if encrypt {
 			state.destination = .inputEncryptionPassword(.init(mode: .loadThenEncrypt()))
@@ -424,7 +428,7 @@ public struct ProfileBackups: Sendable, FeatureReducer {
 			return .run { send in
 				do {
 					let snapshot = try await backupsClient.snapshotOfProfileForExport()
-					await send(.internal(.loadedProfileToEncrypt(snapshot)))
+					await send(.internal(.loadedProfileSnapshotToExportAsPlaintext(snapshot)))
 				} catch {
 					loggerGlobal.error("Failed to encrypt profile snapshot, error: \(error)")
 					errorQueue.schedule(error)

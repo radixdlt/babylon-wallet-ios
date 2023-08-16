@@ -56,12 +56,22 @@ extension InputEncryptionPassword {
 
 		var navigationTitle: LocalizedStringKey {
 			// FIXME: Strings
-			isEncrypting ? "Encrypt backup" : "Decrypt backup"
+			isEncrypting ? "Export backup" : "Import backup"
 		}
 
 		var continueButtonTitle: LocalizedStringKey {
 			// FIXME: Strings
-			isEncrypting ? "Encrypt" : "Decrypt"
+			isEncrypting ? "Encrypt backup" : "Decrypt backup"
+		}
+
+		var title: LocalizedStringKey {
+			// FIXME: String
+			isEncrypting ? "Encrypt backup before export" : "Decrypt backup to import"
+		}
+
+		var subtitle: LocalizedStringKey {
+			// FIXME: String
+			isEncrypting ? "If you forget this password you will not be able to decrypt the wallet backup file. Use a secure, unique password. Back it up somewhere." : "Enter the password you chose when you originally encrypted this wallet backup file."
 		}
 	}
 
@@ -79,13 +89,12 @@ extension InputEncryptionPassword {
 				ScrollView {
 					VStack(spacing: .medium2) {
 						// FIXME: Strings
-						Text("Input password")
+						Text(viewStore.title)
 							.foregroundColor(.app.gray1)
 							.textStyle(.body1Header)
 							.multilineTextAlignment(.leading)
 
-						// FIXME: Strings
-						Text("If you forget this password you will not be able to decrypt the wallet backup file. Use a secure, unique password. Back it up somewhere.")
+						Text(viewStore.subtitle)
 							.foregroundColor(.app.gray1)
 							.textStyle(.body1HighImportance)
 							.multilineTextAlignment(.leading)
@@ -108,7 +117,6 @@ extension InputEncryptionPassword {
 						)
 						#if os(iOS)
 						.textInputAutocapitalization(.never)
-						.keyboardType(.URL)
 						#endif // iOS
 						.autocorrectionDisabled()
 
@@ -132,7 +140,6 @@ extension InputEncryptionPassword {
 							)
 							#if os(iOS)
 							.textInputAutocapitalization(.never)
-							.keyboardType(.URL)
 							#endif // iOS
 							.autocorrectionDisabled()
 						}
