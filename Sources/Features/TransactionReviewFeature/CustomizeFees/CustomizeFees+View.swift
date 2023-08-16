@@ -33,7 +33,7 @@ extension CustomizeFees.State {
 				if transactionFee.totalFee.lockFee == .zero {
 					return L10n.TransactionReview.CustomizeNetworkFeeSheet.noneRequired
 				} else {
-					return L10n.TransactionReview.CustomizeNetworkFeeSheet.selectFeePayerButtonTitle
+					return L10n.TransactionReview.CustomizeNetworkFeeSheet.SelectFeePayer.selectAccountButtonTitle
 				}
 			}(),
 			insufficientBalanceMessage: {
