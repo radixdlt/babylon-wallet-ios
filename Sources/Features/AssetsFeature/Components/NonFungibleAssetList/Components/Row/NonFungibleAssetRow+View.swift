@@ -52,6 +52,8 @@ extension NonFungibleAssetList.Row.View {
 				Text(viewStore.resource.name ?? "")
 					.foregroundColor(.app.gray1)
 					.textStyle(.secondaryHeader)
+
+				Text("\(viewStore.nftCount)" + (viewStore.totalSupply.map { " of \($0)" } ?? ""))
 			}
 
 			Spacer()
