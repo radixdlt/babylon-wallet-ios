@@ -62,6 +62,7 @@ extension NonFungibleAssetList.Row.View {
 					} ?? "\(viewStore.nftCount)"
 				)
 				.font(.app.body2HighImportance)
+				.foregroundColor(.app.gray2)
 			}
 
 			Spacer()

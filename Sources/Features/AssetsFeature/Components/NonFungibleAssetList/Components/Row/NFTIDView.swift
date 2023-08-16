@@ -40,7 +40,10 @@ struct NFTIDView: View {
 				)
 				.padding(.bottom, .small1)
 			}
-			KeyValueView(key: L10n.AssetDetails.NFTDetails.id, value: id)
+			NFTFooterView(
+				name: name,
+				id: id
+			)
 		}
 	}
 
@@ -73,6 +76,28 @@ struct KeyValueView<ValueView: View>: View {
 				.multilineTextAlignment(.trailing)
 				.textStyle(.body1HighImportance)
 				.foregroundColor(.app.gray1)
+		}
+	}
+}
+
+// MARK: - NFTFooterView
+private struct NFTFooterView: View {
+	let name: String?
+	let id: String
+
+	var body: some View {
+		HStack(alignment: .top, spacing: 0) {
+			VStack(alignment: .leading, spacing: .small3) {
+				// FIXME: Strings - L10n.AssetDetails.L10n.AssetDetails.NFTDetails.nameUnknown
+				Text(name ?? "Unknown")
+					.multilineTextAlignment(.trailing)
+					.textStyle(.body1HighImportance)
+					.foregroundColor(.app.gray1)
+				Text(id)
+					.textStyle(.body2HighImportance)
+					.foregroundColor(.app.gray2)
+			}
+			Spacer(minLength: 0)
 		}
 	}
 }
