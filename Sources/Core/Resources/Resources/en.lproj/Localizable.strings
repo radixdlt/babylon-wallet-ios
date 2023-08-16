@@ -123,10 +123,10 @@
 "linkedConnectors_lastConnected" = "Last connected %@";
 "linkedConnectors_linkNewConnector" = "Link New Connector";
 "linkedConnectors_newConnection_title" = "Link New Connector";
-"linkedConnectors_newConnection_subtitle" = "Scan the QR code shown in the Radix Connector browser extension";
+"linkedConnectors_newConnection_subtitle" = "Open your Radix Connector extension\'s menu by clicking its icon in your list of browser extensions, and scan the QR code shown.";
 "linkedConnectors_newConnection_linking" = "Linking…";
 "linkedConnectors_nameNewConnector_title" = "Name New Connector";
-"linkedConnectors_nameNewConnector_subtitle" = "What would you like to call this Connector?";
+"linkedConnectors_nameNewConnector_subtitle" = "What would you like to call this Radix Connector installation?";
 "linkedConnectors_nameNewConnector_textFieldPlaceholder" = "e.g. Chrome on Personal Laptop";
 "linkedConnectors_nameNewConnector_textFieldHint" = "Name this connector e.g. ‘Chrome on MacBook Pro’";
 "linkedConnectors_nameNewConnector_saveLinkButtonTitle" = "Continue";
@@ -237,7 +237,7 @@
 "createPersona_explanation_thisWillBeShared" = "This will be shared with dApps you login to";
 "createPersona_introduction_title" = "Create a Persona";
 "createPersona_introduction_subtitle1" = "A Persona is an identity that you own and control. You can have as many as you like.";
-"createPersona_introduction_subtitle2" = "You will chosose a Persona when you login to dApps on Radix, and dApps may request access to personal information associated with that persona.";
+"createPersona_introduction_subtitle2" = "Personas are used to login to dApps on Radix. dApps may request access to personal information associated with your Persona, like your name or email address.";
 "createPersona_introduction_learnAboutPersonas" = "Learn about Personas";
 "createPersona_introduction_continue" = "Continue";
 "createPersona_nameNewPersona_subtitle" = "What would you like to call your Persona?";
@@ -441,7 +441,7 @@
 "importOlympiaAccounts_scanQR_instructions" = "Scan the QR code shown in the Export section of the Radix Desktop Wallet for Olympia.";
 "importOlympiaAccounts_scanQR_scannedLabel" = "Scanned: %d/%d";
 "importOlympiaAccounts_accountsToImport_title" = "Import Accounts";
-"importOlympiaAccounts_accountsToImport_subtitle" = "The following accounts will be imported to your new wallet.";
+"importOlympiaAccounts_accountsToImport_subtitle" = "The following accounts will be imported into this Radix Wallet.";
 "importOlympiaAccounts_accountsToImport_legacyAccount" = "Legacy Account";
 "importOlympiaAccounts_accountsToImport_ledgerAccount" = "Ledger (Legacy)";
 "importOlympiaAccounts_accountsToImport_unnamed" = "Unnamed";
@@ -451,11 +451,11 @@
 "importOlympiaAccounts_accountsToImport_buttonOneAcccount" = "Import 1 account";
 "importOlympiaAccounts_verifySeedPhrase_title" = "Verify With Your Seed Phrase";
 "importOlympiaAccounts_verifySeedPhrase_subtitle" = "To complete importing your accounts, please view your seed phrase in the Radix Desktop Wallet and enter the words here.";
-"importOlympiaAccounts_verifySeedPhrase_warning" = "This is a one-time process to import your accounts. Never give your seed phrase to anyone for any reason.";
+"importOlympiaAccounts_verifySeedPhrase_warning" = "This will give this Radix Wallet control of your accounts. Never give your seed phrase to anyone for any reason.";
 "importOlympiaAccounts_completion_title" = "Congratulations";
-"importOlympiaAccounts_completion_subtitleMultiple" = "You\'ve imported your accounts";
-"importOlympiaAccounts_completion_subtitleSingle" = "You\'ve imported your account";
-"importOlympiaAccounts_completion_explanation" = "They will live on the Radix Network and you can access them anytime in your Wallet.";
+"importOlympiaAccounts_completion_subtitleMultiple" = "You\'ve now imported these Accounts:";
+"importOlympiaAccounts_completion_subtitleSingle" = "You\'ve now imported this Account:";
+"importOlympiaAccounts_completion_explanation" = "Your Accounts live on the Radix Network and you can access them anytime in your Wallet.";
 "importOlympiaAccounts_completion_accountListButtonTitle" = "Continue to Account List";
 "importOlympiaAccounts_alreadyImported" = "Already imported";
 "importOlympiaAccounts_bip39passphrase" = "BIP39 passphrase";
@@ -482,7 +482,7 @@
 "splash_passcodeCheckFailedAlert_title" = "Warning";
 "splash_passcodeCheckFailedAlert_message" = "Passcode is not set up. Please update settings.";
 "transactionSigning_title" = "Approve Transaction";
-"transactionSigning_preparingTransaction" = "Preparing transaction…";
+"transactionSigning_preparingTransaction" = "Incoming Transaction";
 "transactionSigning_signTransactionButtonTitle" = "Approve Transaction";
 "transactionSigning_signingAndSubmittingTransaction" = "Submitting transaction…";
 "importMnemonic_navigationTitle" = "Import Seed Phrase";
@@ -608,7 +608,7 @@
 "addLedgerDevice_addDevice_continue" = "Continue";
 "addLedgerDevice_nameLedger_title" = "Name Your Ledger";
 "addLedgerDevice_nameLedger_subtitle" = "What would you like to call this Ledger device?";
-"addLedgerDevice_nameLedger_fieldHint" = "This will be displayed when you’re prompted to sign with this ledger";
+"addLedgerDevice_nameLedger_fieldHint" = "This will be displayed when you’re prompted to sign with this Ledger device.";
 "addLedgerDevice_nameLedger_detectedType" = "Detected type: %@";
 "addLedgerDevice_nameLedger_namePlaceholder" = "Green Ledger Nano S+";
 "addLedgerDevice_nameLedger_continueButtonTitle" = "Save and Continue";
