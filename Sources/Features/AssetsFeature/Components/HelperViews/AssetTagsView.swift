@@ -49,7 +49,7 @@ extension AssetTag {
 			return "Official Radix" // FIXME: Strings
 
 		case let .custom(string):
-			return string
+			return string.rawValue
 		}
 	}
 

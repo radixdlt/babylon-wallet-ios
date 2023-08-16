@@ -803,7 +803,7 @@ extension AccountPortfoliosClient {
 
 extension AccountPortfoliosClient {
 	@Sendable static func extractTags(item: GatewayAPI.StateEntityDetailsResponseItem) -> [AssetTag] {
-		item.metadata.tags?.map(AssetTag.init) ?? []
+		item.metadata.tags?.compactMap(NonEmptyString.init(rawValue:)).map(AssetTag.init) ?? []
 	}
 }
 
