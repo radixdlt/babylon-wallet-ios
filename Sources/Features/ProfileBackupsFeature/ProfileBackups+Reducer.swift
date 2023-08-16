@@ -28,7 +28,7 @@ extension EncryptedProfileSnapshot {
 	public func decrypt(password: String) throws -> ProfileSnapshot {
 		@Dependency(\.jsonDecoder) var jsonDecoder
 		let decryptionKey = keyDerivationScheme.kdf(password: password)
-		let decrypted = try encryptionScheme.decrypt(data: encryptedSnapshot, decryptionKey: decryptionKey)
+		let decrypted = try encryptionScheme.decrypt(data: encryptedSnapshot.data, decryptionKey: decryptionKey)
 		let decoded = try jsonDecoder().decode(ProfileSnapshot.self, from: decrypted)
 		return decoded
 	}

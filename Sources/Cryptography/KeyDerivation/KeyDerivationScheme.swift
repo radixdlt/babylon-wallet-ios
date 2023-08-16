@@ -8,12 +8,6 @@ public protocol KeyDeriving {
 	func kdf(password: String) -> SymmetricKey
 }
 
-extension Comparable where Self: RawRepresentable, RawValue: Comparable {
-	public static func < (rhs: Self, lhs: Self) -> Bool {
-		rhs.rawValue < lhs.rawValue
-	}
-}
-
 // MARK: - KeyDerivationScheme
 /// The KDF algorithm used to derive the decryption key from a user provided password.
 public enum KeyDerivationScheme: Sendable, Hashable, Codable, KeyDeriving {
@@ -61,7 +55,7 @@ public enum KeyDerivationScheme: Sendable, Hashable, Codable, KeyDeriving {
 }
 
 // MARK: - KDFVersion
-public enum KDFVersion: Int, Sendable, Hashable, Codable, Comparable {
+public enum KDFVersion: Int, Sendable, Hashable, Codable {
 	case version1 = 1
 }
 
