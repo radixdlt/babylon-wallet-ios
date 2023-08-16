@@ -6,7 +6,7 @@ extension ManifestBuilder {
 		networkID: NetworkID,
 		componentAddress: Address
 	) throws -> TransactionManifest {
-		try Self.make {
+		try make {
 			if includeLockFeeInstruction {
 				faucetLockFee()
 			}
