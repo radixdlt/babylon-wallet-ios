@@ -88,11 +88,12 @@ private struct NFTFooterView: View {
 	var body: some View {
 		HStack(alignment: .top, spacing: 0) {
 			VStack(alignment: .leading, spacing: .small3) {
-				// FIXME: Strings - L10n.AssetDetails.L10n.AssetDetails.NFTDetails.nameUnknown
-				Text(name ?? "Unknown")
-					.multilineTextAlignment(.trailing)
-					.textStyle(.body1HighImportance)
-					.foregroundColor(.app.gray1)
+				if let name {
+					Text(name)
+						.textStyle(.body1HighImportance)
+						.foregroundColor(.app.gray1)
+				}
+
 				Text(id)
 					.textStyle(.body2HighImportance)
 					.foregroundColor(.app.gray2)
