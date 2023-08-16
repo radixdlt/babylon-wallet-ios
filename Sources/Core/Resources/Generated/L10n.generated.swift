@@ -1559,8 +1559,12 @@ public enum L10n {
     public static let estimated = L10n.tr("Localizable", "transactionReview_estimated", fallback: "Estimated")
     /// Account
     public static let externalAccountName = L10n.tr("Localizable", "transactionReview_externalAccountName", fallback: "Account")
+    /// Fee Payer account required
+    public static let feePayerRequiredMessage = L10n.tr("Localizable", "transactionReview_feePayerRequiredMessage", fallback: "Fee Payer account required")
     /// Guaranteed
     public static let guaranteed = L10n.tr("Localizable", "transactionReview_guaranteed", fallback: "Guaranteed")
+    /// Insufficient Balance
+    public static let insufficientBalance = L10n.tr("Localizable", "transactionReview_insufficientBalance", fallback: "Insufficient Balance")
     /// Message
     public static let messageHeading = L10n.tr("Localizable", "transactionReview_messageHeading", fallback: "Message")
     /// Presenting
@@ -1590,6 +1594,8 @@ public enum L10n {
       public static let changeButtonTitle = L10n.tr("Localizable", "transactionReview_customizeNetworkFeeSheet_changeButtonTitle", fallback: "Change")
       /// Effective Tip
       public static let effectiveTip = L10n.tr("Localizable", "transactionReview_customizeNetworkFeeSheet_effectiveTip", fallback: "Effective Tip")
+      /// Estimated Transaction Fees
+      public static let feeBreakdownTitle = L10n.tr("Localizable", "transactionReview_customizeNetworkFeeSheet_feeBreakdownTitle", fallback: "Estimated Transaction Fees")
       /// Network Execution
       public static let networkExecution = L10n.tr("Localizable", "transactionReview_customizeNetworkFeeSheet_networkExecution", fallback: "Network Execution")
       /// Network Fee
@@ -1605,19 +1611,15 @@ public enum L10n {
       /// Padding
       public static let padding = L10n.tr("Localizable", "transactionReview_customizeNetworkFeeSheet_padding", fallback: "Padding")
       /// Adjust Fee Padding Amount (XRD)
-      public static let paddingField = L10n.tr("Localizable", "transactionReview_customizeNetworkFeeSheet_paddingField", fallback: "Adjust Fee Padding Amount (XRD)")
+      public static let paddingFieldLabel = L10n.tr("Localizable", "transactionReview_customizeNetworkFeeSheet_paddingFieldLabel", fallback: "Adjust Fee Padding Amount (XRD)")
       /// Pay fee from
       public static let payFeeFrom = L10n.tr("Localizable", "transactionReview_customizeNetworkFeeSheet_payFeeFrom", fallback: "Pay fee from")
       /// Royalties
       public static let royalties = L10n.tr("Localizable", "transactionReview_customizeNetworkFeeSheet_royalties", fallback: "Royalties")
       /// Royalty fee
       public static let royaltyFee = L10n.tr("Localizable", "transactionReview_customizeNetworkFeeSheet_royaltyFee", fallback: "Royalty fee")
-      /// Select Fee Payer
-      public static let selectFeePayerButtonTitle = L10n.tr("Localizable", "transactionReview_customizeNetworkFeeSheet_selectFeePayerButtonTitle", fallback: "Select Fee Payer")
-      /// (% of Execution + Finalization Fees)
-      public static func tipFieldInfo(_ p1: Int) -> String {
-        return L10n.tr("Localizable", "transactionReview_customizeNetworkFeeSheet_tipFieldInfo", p1, fallback: "(% of Execution + Finalization Fees)")
-      }
+      /// (%% of Execution + Finalization Fees)
+      public static let tipFieldInfo = L10n.tr("Localizable", "transactionReview_customizeNetworkFeeSheet_tipFieldInfo", fallback: "(%% of Execution + Finalization Fees)")
       /// Adjust Tip to Lock
       public static let tipFieldLabel = L10n.tr("Localizable", "transactionReview_customizeNetworkFeeSheet_tipFieldLabel", fallback: "Adjust Tip to Lock")
       /// Transaction Fee
@@ -1643,6 +1645,10 @@ public enum L10n {
         public static let title = L10n.tr("Localizable", "transactionReview_customizeNetworkFeeSheet_normalMode_title", fallback: "Customize Fees")
       }
       public enum SelectFeePayer {
+        /// Select Fee Payer
+        public static let navigationTitle = L10n.tr("Localizable", "transactionReview_customizeNetworkFeeSheet_selectFeePayer_navigationTitle", fallback: "Select Fee Payer")
+        /// Select Account
+        public static let selectAccountButtonTitle = L10n.tr("Localizable", "transactionReview_customizeNetworkFeeSheet_selectFeePayer_selectAccountButtonTitle", fallback: "Select Account")
         /// Select an account to pay %@ XRD transaction fee
         public static func subtitle(_ p1: Any) -> String {
           return L10n.tr("Localizable", "transactionReview_customizeNetworkFeeSheet_selectFeePayer_subtitle", String(describing: p1), fallback: "Select an account to pay %@ XRD transaction fee")
@@ -1680,16 +1686,6 @@ public enum L10n {
       public static let body = L10n.tr("Localizable", "transactionReview_prepareForSigning_body", fallback: "Preparing transaction for signing")
       /// Preparing Transaction
       public static let navigationTitle = L10n.tr("Localizable", "transactionReview_prepareForSigning_navigationTitle", fallback: "Preparing Transaction")
-    }
-    public enum SelectFeePayer {
-      /// Please select an Account with enough XRD to pay 10 XRD fee for this transaction.
-      public static let body = L10n.tr("Localizable", "transactionReview_selectFeePayer_body", fallback: "Please select an Account with enough XRD to pay 10 XRD fee for this transaction.")
-      /// Continue
-      public static let confirmButton = L10n.tr("Localizable", "transactionReview_selectFeePayer_confirmButton", fallback: "Continue")
-      /// Select Fee Account
-      public static let navigationTitle = L10n.tr("Localizable", "transactionReview_selectFeePayer_navigationTitle", fallback: "Select Fee Account")
-      /// Select Account:
-      public static let selectAccount = L10n.tr("Localizable", "transactionReview_selectFeePayer_selectAccount", fallback: "Select Account:")
     }
     public enum SubmitTransaction {
       /// Successfully committed
