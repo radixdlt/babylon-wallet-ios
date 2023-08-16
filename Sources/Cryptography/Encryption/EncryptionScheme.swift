@@ -13,7 +13,9 @@ public protocol VersionedEncryption {
 // MARK: - EncryptionScheme
 public enum EncryptionScheme: Sendable, Hashable, VersionedAlgorithm {
 	case version1
+}
 
+extension EncryptionScheme {
 	public init(version: Version) {
 		switch version {
 		case .version1: self = .version1
@@ -54,6 +56,7 @@ extension EncryptionScheme {
 
 // MARK: EncryptionScheme.Version1
 extension EncryptionScheme {
+	/// AES GCM 256 encryption
 	public struct Version1: VersionedEncryption {
 		public static let version = Version.version1
 		public static let description = "AESGCM-256"

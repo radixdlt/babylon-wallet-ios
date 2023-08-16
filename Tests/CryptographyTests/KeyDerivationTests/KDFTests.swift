@@ -7,7 +7,7 @@ final class KDFTests: TestCase {
 	}
 
 	func test_json_encoding() throws {
-		try XCTAssertJSONEncoding(KeyDerivationScheme.version1(), [
+		try XCTAssertJSONEncoding(KeyDerivationScheme.version1, [
 			"version": 1,
 			"description": "HKDFSHA256-with-UTF8-encoding-of-password-no-salt-no-info",
 		])
@@ -17,12 +17,12 @@ final class KDFTests: TestCase {
 		try XCTAssertJSONDecoding([
 			"version": 1,
 			"description": "HKDFSHA256-with-UTF8-encoding-of-password-no-salt-no-info",
-		], KeyDerivationScheme.version1())
+		], KeyDerivationScheme.version1)
 	}
 
 	func test_version1() throws {
 		func doTest(password: String, expected: String) {
-			let key = KeyDerivationScheme.version1().kdf(password: password)
+			let key = KeyDerivationScheme.version1.kdf(password: password)
 			XCTAssertEqual(key.hex, expected)
 		}
 
