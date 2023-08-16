@@ -188,8 +188,8 @@ public enum L10n {
       public static func detectedType(_ p1: Any) -> String {
         return L10n.tr("Localizable", "addLedgerDevice_nameLedger_detectedType", String(describing: p1), fallback: "Detected type: %@")
       }
-      /// This will be displayed when you’re prompted to sign with this ledger
-      public static let fieldHint = L10n.tr("Localizable", "addLedgerDevice_nameLedger_fieldHint", fallback: "This will be displayed when you’re prompted to sign with this ledger")
+      /// This will be displayed when you’re prompted to sign with this Ledger device.
+      public static let fieldHint = L10n.tr("Localizable", "addLedgerDevice_nameLedger_fieldHint", fallback: "This will be displayed when you’re prompted to sign with this Ledger device.")
       /// Green Ledger Nano S+
       public static let namePlaceholder = L10n.tr("Localizable", "addLedgerDevice_nameLedger_namePlaceholder", fallback: "Green Ledger Nano S+")
       /// What would you like to call this Ledger device?
@@ -680,8 +680,8 @@ public enum L10n {
       public static let learnAboutPersonas = L10n.tr("Localizable", "createPersona_introduction_learnAboutPersonas", fallback: "Learn about Personas")
       /// A Persona is an identity that you own and control. You can have as many as you like.
       public static let subtitle1 = L10n.tr("Localizable", "createPersona_introduction_subtitle1", fallback: "A Persona is an identity that you own and control. You can have as many as you like.")
-      /// You will chosose a Persona when you login to dApps on Radix, and dApps may request access to personal information associated with that persona.
-      public static let subtitle2 = L10n.tr("Localizable", "createPersona_introduction_subtitle2", fallback: "You will chosose a Persona when you login to dApps on Radix, and dApps may request access to personal information associated with that persona.")
+      /// Personas are used to login to dApps on Radix. dApps may request access to personal information associated with your Persona, like your name or email address.
+      public static let subtitle2 = L10n.tr("Localizable", "createPersona_introduction_subtitle2", fallback: "Personas are used to login to dApps on Radix. dApps may request access to personal information associated with your Persona, like your name or email address.")
       /// Create a Persona
       public static let title = L10n.tr("Localizable", "createPersona_introduction_title", fallback: "Create a Persona")
     }
@@ -1208,8 +1208,8 @@ public enum L10n {
       public static let newAddressLabel = L10n.tr("Localizable", "importOlympiaAccounts_accountsToImport_newAddressLabel", fallback: "New Address")
       /// Olympia Address (Obsolete)
       public static let olympiaAddressLabel = L10n.tr("Localizable", "importOlympiaAccounts_accountsToImport_olympiaAddressLabel", fallback: "Olympia Address (Obsolete)")
-      /// The following accounts will be imported to your new wallet.
-      public static let subtitle = L10n.tr("Localizable", "importOlympiaAccounts_accountsToImport_subtitle", fallback: "The following accounts will be imported to your new wallet.")
+      /// The following accounts will be imported into this Radix Wallet.
+      public static let subtitle = L10n.tr("Localizable", "importOlympiaAccounts_accountsToImport_subtitle", fallback: "The following accounts will be imported into this Radix Wallet.")
       /// Import Accounts
       public static let title = L10n.tr("Localizable", "importOlympiaAccounts_accountsToImport_title", fallback: "Import Accounts")
       /// Unnamed
@@ -1218,12 +1218,12 @@ public enum L10n {
     public enum Completion {
       /// Continue to Account List
       public static let accountListButtonTitle = L10n.tr("Localizable", "importOlympiaAccounts_completion_accountListButtonTitle", fallback: "Continue to Account List")
-      /// They will live on the Radix Network and you can access them anytime in your Wallet.
-      public static let explanation = L10n.tr("Localizable", "importOlympiaAccounts_completion_explanation", fallback: "They will live on the Radix Network and you can access them anytime in your Wallet.")
-      /// You've imported your accounts
-      public static let subtitleMultiple = L10n.tr("Localizable", "importOlympiaAccounts_completion_subtitleMultiple", fallback: "You've imported your accounts")
-      /// You've imported your account
-      public static let subtitleSingle = L10n.tr("Localizable", "importOlympiaAccounts_completion_subtitleSingle", fallback: "You've imported your account")
+      /// Your Accounts live on the Radix Network and you can access them anytime in your Wallet.
+      public static let explanation = L10n.tr("Localizable", "importOlympiaAccounts_completion_explanation", fallback: "Your Accounts live on the Radix Network and you can access them anytime in your Wallet.")
+      /// You've now imported these Accounts:
+      public static let subtitleMultiple = L10n.tr("Localizable", "importOlympiaAccounts_completion_subtitleMultiple", fallback: "You've now imported these Accounts:")
+      /// You've now imported this Account:
+      public static let subtitleSingle = L10n.tr("Localizable", "importOlympiaAccounts_completion_subtitleSingle", fallback: "You've now imported this Account:")
       /// Congratulations
       public static let title = L10n.tr("Localizable", "importOlympiaAccounts_completion_title", fallback: "Congratulations")
     }
@@ -1242,8 +1242,8 @@ public enum L10n {
       public static let subtitle = L10n.tr("Localizable", "importOlympiaAccounts_verifySeedPhrase_subtitle", fallback: "To complete importing your accounts, please view your seed phrase in the Radix Desktop Wallet and enter the words here.")
       /// Verify With Your Seed Phrase
       public static let title = L10n.tr("Localizable", "importOlympiaAccounts_verifySeedPhrase_title", fallback: "Verify With Your Seed Phrase")
-      /// This is a one-time process to import your accounts. Never give your seed phrase to anyone for any reason.
-      public static let warning = L10n.tr("Localizable", "importOlympiaAccounts_verifySeedPhrase_warning", fallback: "This is a one-time process to import your accounts. Never give your seed phrase to anyone for any reason.")
+      /// This will give this Radix Wallet control of your accounts. Never give your seed phrase to anyone for any reason.
+      public static let warning = L10n.tr("Localizable", "importOlympiaAccounts_verifySeedPhrase_warning", fallback: "This will give this Radix Wallet control of your accounts. Never give your seed phrase to anyone for any reason.")
     }
   }
   public enum ImportOlympiaLedgerAccounts {
@@ -1328,8 +1328,8 @@ public enum L10n {
     public enum NameNewConnector {
       /// Continue
       public static let saveLinkButtonTitle = L10n.tr("Localizable", "linkedConnectors_nameNewConnector_saveLinkButtonTitle", fallback: "Continue")
-      /// What would you like to call this Connector?
-      public static let subtitle = L10n.tr("Localizable", "linkedConnectors_nameNewConnector_subtitle", fallback: "What would you like to call this Connector?")
+      /// What would you like to call this Radix Connector installation?
+      public static let subtitle = L10n.tr("Localizable", "linkedConnectors_nameNewConnector_subtitle", fallback: "What would you like to call this Radix Connector installation?")
       /// Name this connector e.g. ‘Chrome on MacBook Pro’
       public static let textFieldHint = L10n.tr("Localizable", "linkedConnectors_nameNewConnector_textFieldHint", fallback: "Name this connector e.g. ‘Chrome on MacBook Pro’")
       /// e.g. Chrome on Personal Laptop
@@ -1340,8 +1340,8 @@ public enum L10n {
     public enum NewConnection {
       /// Linking…
       public static let linking = L10n.tr("Localizable", "linkedConnectors_newConnection_linking", fallback: "Linking…")
-      /// Scan the QR code shown in the Radix Connector browser extension
-      public static let subtitle = L10n.tr("Localizable", "linkedConnectors_newConnection_subtitle", fallback: "Scan the QR code shown in the Radix Connector browser extension")
+      /// Open your Radix Connector extension's menu by clicking its icon in your list of browser extensions, and scan the QR code shown.
+      public static let subtitle = L10n.tr("Localizable", "linkedConnectors_newConnection_subtitle", fallback: "Open your Radix Connector extension's menu by clicking its icon in your list of browser extensions, and scan the QR code shown.")
       /// Link New Connector
       public static let title = L10n.tr("Localizable", "linkedConnectors_newConnection_title", fallback: "Link New Connector")
     }
@@ -1711,8 +1711,8 @@ public enum L10n {
     }
   }
   public enum TransactionSigning {
-    /// Preparing transaction…
-    public static let preparingTransaction = L10n.tr("Localizable", "transactionSigning_preparingTransaction", fallback: "Preparing transaction…")
+    /// Incoming Transaction
+    public static let preparingTransaction = L10n.tr("Localizable", "transactionSigning_preparingTransaction", fallback: "Incoming Transaction")
     /// Submitting transaction…
     public static let signingAndSubmittingTransaction = L10n.tr("Localizable", "transactionSigning_signingAndSubmittingTransaction", fallback: "Submitting transaction…")
     /// Approve Transaction
