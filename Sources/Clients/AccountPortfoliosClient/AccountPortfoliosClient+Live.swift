@@ -321,7 +321,8 @@ extension AccountPortfoliosClient {
 			name: metadata?.name,
 			description: metadata?.description,
 			iconURL: metadata?.iconURL,
-			tokens: tokens
+			tokens: tokens,
+			totalSupply: metadata?.totalCount
 		)
 	}
 }

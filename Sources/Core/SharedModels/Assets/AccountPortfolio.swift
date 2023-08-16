@@ -82,19 +82,22 @@ extension AccountPortfolio {
 		public let description: String?
 		public let iconURL: URL?
 		public let tokens: IdentifiedArrayOf<NonFungibleToken>
+		public let totalSupply: Int64?
 
 		public init(
 			resourceAddress: ResourceAddress,
 			name: String? = nil,
 			description: String? = nil,
 			iconURL: URL? = nil,
-			tokens: IdentifiedArrayOf<NonFungibleToken> = []
+			tokens: IdentifiedArrayOf<NonFungibleToken> = [],
+			totalSupply: Int64? = nil
 		) {
 			self.resourceAddress = resourceAddress
 			self.name = name
 			self.description = description
 			self.iconURL = iconURL
 			self.tokens = tokens
+			self.totalSupply = totalSupply
 		}
 
 		public struct NonFungibleToken: Sendable, Hashable, Identifiable, Codable {
