@@ -55,6 +55,17 @@ extension GatewayAPIClient {
 }
 
 extension GatewayAPIClient {
+	@Sendable
+	public func getSingleEntityDetails(
+		_ address: String,
+		explictMetadata: Set<EntityMetadataKey> = []
+	) async throws -> GatewayAPI.StateEntityDetailsResponseItem {
+		guard let item = try await getEntityDetails([address], explictMetadata, nil).items.first else {
+			throw EmptyEntityDetailsResponse()
+		}
+		return item
+	}
+
 	/// Extracts the dApp definition from a component, if it has one
 	public func getDappDefinition(_ component: ComponentAddress) async throws -> GatewayAPI.EntityMetadataCollection {
 		let dappDefinitionAddress = try await getDappDefinitionAddress(component)

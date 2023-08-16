@@ -6,10 +6,15 @@ extension FungibleTokenDetails.State {
 		.init(
 			detailsContainerWithHeader: resource.detailsContainerWithHeaderViewState,
 			thumbnail: isXRD ? .xrd : .known(resource.iconURL),
-			description: resource.description,
-			resourceAddress: resource.resourceAddress,
-			behaviors: resource.behaviors,
-			tags: isXRD ? resource.tags + [.officialRadix] : resource.tags
+			details: .init(
+				description: resource.description,
+				resourceAddress: resource.resourceAddress,
+				validatorAddress: nil,
+				resourceName: nil,
+				currentSupply: resource.totalSupply?.format(), // FIXME: Check which format
+				behaviors: resource.behaviors,
+				tags: isXRD ? resource.tags + [.officialRadix] : resource.tags
+			)
 		)
 	}
 }
@@ -19,10 +24,7 @@ extension FungibleTokenDetails {
 	public struct ViewState: Equatable {
 		let detailsContainerWithHeader: DetailsContainerWithHeaderViewState
 		let thumbnail: TokenThumbnail.Content
-		let description: String?
-		let resourceAddress: ResourceAddress
-		let behaviors: [AssetBehavior]
-		let tags: [AssetTag]
+		let details: AssetResourceDetailsSection.ViewState
 	}
 
 	@MainActor
@@ -38,17 +40,7 @@ extension FungibleTokenDetails {
 				DetailsContainerWithHeaderView(viewState: viewStore.detailsContainerWithHeader) {
 					TokenThumbnail(viewStore.thumbnail, size: .veryLarge)
 				} detailsView: {
-					if let description = viewStore.description {
-						DetailsContainerWithHeaderViewMaker
-							.makeDescriptionView(description: description)
-					}
-					VStack(alignment: .leading, spacing: .medium3) {
-						KeyValueView(resourceAddress: viewStore.resourceAddress)
-
-						AssetBehaviorSection(behaviors: viewStore.behaviors)
-
-						AssetTagsSection(tags: viewStore.tags)
-					}
+					AssetResourceDetailsSection(viewState: viewStore.details)
 				} closeButtonAction: {
 					viewStore.send(.closeButtonTapped)
 				}

@@ -8,12 +8,16 @@ extension NonFungibleTokenDetails.State {
 			nonFungibleGlobalID: token.id,
 			name: token.name,
 			description: token.description,
-			resourceName: resource.name,
 			resourceThumbnail: resource.iconURL,
-			resourceDescription: resource.description,
-			resourceAddress: resource.resourceAddress,
-			behaviors: resource.behaviors,
-			tags: resource.tags
+			resourceDetails: .init(
+				description: resource.description,
+				resourceAddress: resource.resourceAddress,
+				validatorAddress: nil,
+				resourceName: resource.name,
+				currentSupply: nil, // FIXME: Find actual value
+				behaviors: resource.behaviors,
+				tags: resource.tags
+			)
 		)
 	}
 }
@@ -25,12 +29,8 @@ extension NonFungibleTokenDetails {
 		let nonFungibleGlobalID: NonFungibleGlobalId
 		let name: String?
 		let description: String?
-		let resourceName: String?
 		let resourceThumbnail: URL?
-		let resourceDescription: String?
-		let resourceAddress: ResourceAddress
-		let behaviors: [AssetBehavior]
-		let tags: [AssetTag]
+		let resourceDetails: AssetResourceDetailsSection.ViewState
 	}
 
 	@MainActor
@@ -50,9 +50,7 @@ extension NonFungibleTokenDetails {
 								NFTFullView(url: keyImage)
 							}
 
-							KeyValueView(key: L10n.AssetDetails.NFTDetails.id) {
-								AddressView(.identifier(.nonFungibleGlobalID(viewStore.nonFungibleGlobalID)))
-							}
+							KeyValueView(nonFungibleGlobalID: viewStore.nonFungibleGlobalID)
 
 							if let name = viewStore.name {
 								KeyValueView(key: L10n.AssetDetails.NFTDetails.name, value: name)
@@ -68,31 +66,7 @@ extension NonFungibleTokenDetails {
 							VStack(spacing: .medium1) {
 								NFTThumbnail(viewStore.resourceThumbnail, size: .veryLarge)
 
-								let divider = Color.app.gray4.frame(height: 1).padding(.horizontal, .medium1)
-								if let description = viewStore.resourceDescription {
-									divider
-									Text(description)
-										.textStyle(.body1Regular)
-										.frame(maxWidth: .infinity, alignment: .leading)
-										.padding(.horizontal, .large2)
-								}
-
-								divider
-
-								VStack(alignment: .leading, spacing: .medium3) {
-									KeyValueView(resourceAddress: viewStore.resourceAddress)
-
-									if let name = viewStore.resourceName {
-										KeyValueView(key: L10n.AssetDetails.NFTDetails.resourceName, value: name)
-									}
-
-									AssetBehaviorSection(behaviors: viewStore.behaviors)
-
-									AssetTagsSection(tags: viewStore.tags)
-								}
-								.padding(.horizontal, .large2)
-								.textStyle(.body1Regular)
-								.lineLimit(1)
+								AssetResourceDetailsSection(viewState: viewStore.resourceDetails)
 							}
 							.padding(.vertical, .medium1)
 						}

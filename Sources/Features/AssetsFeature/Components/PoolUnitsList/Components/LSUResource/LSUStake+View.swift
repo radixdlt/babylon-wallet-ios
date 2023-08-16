@@ -41,7 +41,7 @@ extension LSUStake {
 	public struct ViewState: Sendable, Equatable, Identifiable {
 		public var id: ValidatorAddress
 
-		let validatorNameViewState: ValidatorNameViewState
+		let validatorNameViewState: ValidatorNameView.ViewState
 
 		let liquidStakeUnit: PoolUnitResourceViewState?
 		let stakeClaimNFTs: StakeClaimNFTsViewState?
@@ -57,7 +57,7 @@ extension LSUStake {
 				send: Action.view
 			) { viewStore in
 				VStack(alignment: .leading, spacing: .medium1) {
-					LSUMaker.makeValidatorNameView(viewState: viewStore.validatorNameViewState)
+					ValidatorNameView(viewState: viewStore.validatorNameViewState)
 
 					if let liquidStakeUnitViewState = viewStore.liquidStakeUnit {
 						liquidStakeUnitView(viewState: liquidStakeUnitViewState)
@@ -157,7 +157,7 @@ extension LSUStake.State {
 				.map {
 					.init(
 						thumbnail: .xrd,
-						symbol: "XRD",
+						symbol: "XRD", // FIXME: Strings - or is this a placeholder?
 						tokenAmount: $0.format()
 					)
 				},
