@@ -49,18 +49,18 @@ struct NFTIDView: View {
 }
 
 // MARK: - KeyValueView
-struct KeyValueView<Content: View>: View {
+struct KeyValueView<ValueView: View>: View {
 	let key: String
-	let content: Content
+	let valueView: ValueView
 
-	init(key: String, value: String) where Content == Text {
+	init(key: String, value: String) where ValueView == Text {
 		self.key = key
-		self.content = Text(value)
+		self.valueView = Text(value)
 	}
 
-	init(key: String, @ViewBuilder content: () -> Content) {
+	init(key: String, @ViewBuilder valueView: () -> ValueView) {
 		self.key = key
-		self.content = content()
+		self.valueView = valueView()
 	}
 
 	var body: some View {
@@ -69,7 +69,7 @@ struct KeyValueView<Content: View>: View {
 				.textStyle(.body1Regular)
 				.foregroundColor(.app.gray2)
 			Spacer(minLength: 0)
-			content
+			valueView
 				.multilineTextAlignment(.trailing)
 				.textStyle(.body1HighImportance)
 				.foregroundColor(.app.gray1)
