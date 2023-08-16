@@ -6,8 +6,7 @@ extension InputEncryptionPassword.State {
 			inputtedEncryptionPassword: inputtedEncryptionPassword,
 			confirmedEncryptionPassword: confirmedEncryptionPassword,
 			focusedField: focusedField,
-			needToConfirm: needToConfirm,
-			controlState: (mode.isDecrypt && !inputtedEncryptionPassword.isEmpty) || (!inputtedEncryptionPassword.isEmpty && inputtedEncryptionPassword == confirmedEncryptionPassword) ? .enabled : .disabled
+			isEncrypting: isEncrypting
 		)
 	}
 }
@@ -18,8 +17,52 @@ extension InputEncryptionPassword {
 		let inputtedEncryptionPassword: String
 		let confirmedEncryptionPassword: String
 		let focusedField: State.Field?
-		let needToConfirm: Bool
-		let controlState: ControlState
+		let isEncrypting: Bool
+
+		var controlState: ControlState {
+			if isEncrypting {
+				return isConfirmingPasswordValid ? .enabled : .disabled
+			} else {
+				return isNonConfirmingPasswordValid ? .enabled : .disabled
+			}
+		}
+
+		var isNonConfirmingPasswordValid: Bool {
+			!inputtedEncryptionPassword.isEmpty
+		}
+
+		var isConfirmingPasswordValid: Bool {
+			guard isNonConfirmingPasswordValid else {
+				return false
+			}
+			return confirmedEncryptionPassword == inputtedEncryptionPassword
+		}
+
+		var confirmHint: Hint? {
+			guard needToConfirm else { return nil }
+			if inputtedEncryptionPassword.isEmpty || !confirmedEncryptionPassword.isEmpty && focusedField != .confirmPassword {
+				return nil
+			}
+			if !confirmedEncryptionPassword.isEmpty, confirmedEncryptionPassword != inputtedEncryptionPassword {
+				return .error("Passwords do not match")
+			}
+
+			return nil
+		}
+
+		var needToConfirm: Bool {
+			isEncrypting
+		}
+
+		var navigationTitle: LocalizedStringKey {
+			// FIXME: Strings
+			isEncrypting ? "Encrypt backup" : "Decrypt backup"
+		}
+
+		var continueButtonTitle: LocalizedStringKey {
+			// FIXME: Strings
+			isEncrypting ? "Encrypt" : "Decrypt"
+		}
 	}
 
 	@MainActor
@@ -36,16 +79,16 @@ extension InputEncryptionPassword {
 				ScrollView {
 					VStack(spacing: .medium2) {
 						// FIXME: Strings
-						Text("Encryption password")
+						Text("Input password")
 							.foregroundColor(.app.gray1)
-							.textStyle(.sheetTitle)
-							.multilineTextAlignment(.center)
+							.textStyle(.body1Header)
+							.multilineTextAlignment(.leading)
 
 						// FIXME: Strings
-						Text("Do not forget this")
+						Text("If you forget this password you will not be able to decrypt the wallet backup file. Use a secure, unique password. Back it up somewhere.")
 							.foregroundColor(.app.gray1)
-							.textStyle(.body1Regular)
-							.multilineTextAlignment(.center)
+							.textStyle(.body1HighImportance)
+							.multilineTextAlignment(.leading)
 
 						AppTextField(
 							// FIXME: Strings
@@ -77,6 +120,7 @@ extension InputEncryptionPassword {
 									get: \.confirmedEncryptionPassword,
 									send: { .passwordConfirmationChanged($0) }
 								),
+								hint: viewStore.confirmHint,
 								focus: .on(
 									.confirmPassword,
 									binding: viewStore.binding(
@@ -96,14 +140,15 @@ extension InputEncryptionPassword {
 					.padding([.bottom, .horizontal], .medium1)
 				}
 				.footer {
-					// FIXME: Strings
-					Button("Confirm") {
+					Button(viewStore.continueButtonTitle) {
 						viewStore.send(.confirmedEncryptionPassword)
 					}
 					.buttonStyle(.primaryRectangular)
 					.controlState(viewStore.controlState)
 				}
 				.onAppear { viewStore.send(.appeared) }
+				// FIXME: Strings
+				.navigationTitle(viewStore.navigationTitle)
 			}
 		}
 	}

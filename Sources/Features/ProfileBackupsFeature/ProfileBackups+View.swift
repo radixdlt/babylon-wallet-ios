@@ -55,8 +55,6 @@ extension ProfileBackups {
 					content: { store in
 						NavigationView {
 							InputEncryptionPassword.View(store: store)
-								// FIXME: Strings
-								.navigationTitle("Input password")
 						}
 					}
 				)

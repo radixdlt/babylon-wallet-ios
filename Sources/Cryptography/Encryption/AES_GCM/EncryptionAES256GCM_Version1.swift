@@ -1,6 +1,60 @@
 import CryptoKit
 import Prelude
 
+// MARK: - VersionedAlgorithm
+public protocol VersionedAlgorithm {
+	associatedtype Version: Comparable
+	static var version: Version { get }
+	static var description: String { get }
+}
+
+// MARK: - KeyDeriving
+public protocol KeyDeriving {
+	func kdf(password: String) -> SymmetricKey
+}
+
+extension Comparable where Self: RawRepresentable, RawValue: Comparable {
+	public static func < (rhs: Self, lhs: Self) -> Bool {
+		rhs.rawValue < lhs.rawValue
+	}
+}
+
+// MARK: - KeyDerivationScheme
+/// The KDF algorithm used to derive the decryption key from a user provided password.
+public enum KeyDerivationScheme: Sendable, Hashable, Codable, KeyDeriving {
+	case version1(Version1)
+	public static let `default`: Self = .version1(.init())
+
+	public func kdf(password: String) -> SymmetricKey {
+		switch self {
+		case let .version1(scheme): return scheme.kdf(password: password)
+		}
+	}
+}
+
+// MARK: - KDFVersion
+public enum KDFVersion: Int, Sendable, Hashable, Codable, Comparable {
+	case version1 = 1
+}
+
+// MARK: - KeyDerivationScheme.Version1
+extension KeyDerivationScheme {
+	/// A simple `HKDF` based scheme using UTF8 encoding of the password as input.
+	public struct Version1: Sendable, Hashable, Codable, KeyDeriving, VersionedAlgorithm {
+		public static let version = KDFVersion.version1
+		public static let description = "HKDFSHA256-with-UTF8-encoding-of-password-no-salt-no-info"
+		public init() {}
+
+		public func kdf(password: String) -> SymmetricKey {
+			let inputKeyMaterial = SymmetricKey(data: Data(password.utf8))
+			return HKDF<SHA256>.deriveKey(
+				inputKeyMaterial: inputKeyMaterial,
+				outputByteCount: SHA256.byteCount
+			)
+		}
+	}
+}
+
 // MARK: - Encrypting
 public protocol Encrypting: Codable {
 	func encrypt(data: Data, encryptionKey key: SymmetricKey) throws -> Data
@@ -21,17 +75,6 @@ extension Encrypting {
 public enum EncryptionScheme: Sendable, Hashable, Codable, Encrypting {
 	case aes(EncryptionAES256GCM)
 	public static let `default`: Self = .aes(.init())
-
-	// FIXME: Version me!!!!!
-	public static func kdf(password: String) -> SymmetricKey {
-		let inputKeyMaterial = SymmetricKey(data: Data(password.utf8))
-		return HKDF<SHA256>.deriveKey(
-			inputKeyMaterial: inputKeyMaterial,
-			//            salt: salt,
-			//            info: info,
-			outputByteCount: SHA256.byteCount
-		)
-	}
 }
 
 extension EncryptionScheme {
