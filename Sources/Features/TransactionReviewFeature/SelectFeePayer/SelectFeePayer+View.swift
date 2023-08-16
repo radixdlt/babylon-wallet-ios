@@ -35,20 +35,20 @@ extension SelectFeePayer {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				VStack {
 					VStack {
-						Text(L10n.TransactionReview.SelectFeePayer.navigationTitle)
+						Text(L10n.TransactionReview.CustomizeNetworkFeeSheet.SelectFeePayer.navigationTitle)
 							.textStyle(.sheetTitle)
 							.foregroundColor(.app.gray1)
 							.padding(.top, .medium3)
 							.padding(.horizontal, .medium1)
 							.padding(.bottom, .small2)
 
-						Text(L10n.TransactionReview.SelectFeePayer.body)
+						Text(L10n.TransactionReview.CustomizeNetworkFeeSheet.SelectFeePayer.subtitle(10))
 							.textStyle(.body1HighImportance)
 							.foregroundColor(.app.gray2)
 							.padding(.horizontal, .large3)
 							.padding(.bottom, .small1)
 
-						Text(L10n.TransactionReview.SelectFeePayer.selectAccount)
+						Text(L10n.TransactionReview.CustomizeNetworkFeeSheet.SelectFeePayer.selectAccountButtonTitle)
 							.textStyle(.body1HighImportance)
 							.foregroundColor(.app.gray2)
 							.padding(.horizontal, .large3)
@@ -74,16 +74,7 @@ extension SelectFeePayer {
 							.padding(.bottom, .medium2)
 						}
 					}
-					.navigationTitle(L10n.TransactionReview.SelectFeePayer.navigationTitle)
-				}
-				.footer {
-					WithControlRequirements(
-						viewStore.selectedPayer,
-						forAction: { viewStore.send(.confirmedFeePayer($0)) }
-					) { action in
-						Button(L10n.TransactionReview.SelectFeePayer.confirmButton, action: action)
-							.buttonStyle(.primaryRectangular)
-					}
+					.navigationTitle(L10n.TransactionReview.CustomizeNetworkFeeSheet.SelectFeePayer.navigationTitle)
 				}
 			}
 		}
