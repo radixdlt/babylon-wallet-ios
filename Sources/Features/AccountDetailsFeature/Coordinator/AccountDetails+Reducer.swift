@@ -82,6 +82,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 		case .task:
 			return .run { [address = state.account.address] send in
 				for try await accountUpdate in await accountsClient.accountUpdates(address) {
+					guard !Task.isCancelled else { return }
 					await send(.internal(.accountUpdated(accountUpdate)))
 				}
 			}
