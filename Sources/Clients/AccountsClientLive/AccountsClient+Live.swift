@@ -37,20 +37,10 @@ extension AccountsClient: DependencyKey {
 			getAccountsOnCurrentNetwork: getAccountsOnCurrentNetwork,
 			accountsOnCurrentNetwork: { await getProfileStore().accountValues() },
 			accountUpdates: { address in
-				AsyncThrowingStream { continuation in
-					Task {
-						do {
-							for try await updates in await getProfileStore().accountValues() {
-								if let update = updates.first(where: { $0.address == address }) {
-									continuation.yield(update)
-								}
-							}
-							continuation.finish()
-						} catch {
-							continuation.finish(throwing: error)
-						}
-					}
-				}.eraseToAnyAsyncSequence()
+				await getProfileStore().accountValues().compactMap {
+					$0.first { $0.address == address }
+				}
+				.eraseToAnyAsyncSequence()
 			},
 			getAccountsOnNetwork: getAccountsOnNetwork,
 			newVirtualAccount: { request in
