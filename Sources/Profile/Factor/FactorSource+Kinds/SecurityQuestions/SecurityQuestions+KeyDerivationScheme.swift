@@ -83,7 +83,7 @@ extension SecurityQuestionsFactorSource.KeyDerivationScheme {
 	/// A simple
 	public struct Version1: VersionedSecurityQuestionBasedKeyDerivation {
 		public static let version = Version.version1
-		public static var description: String { "CAP23-3-of-4-questions-correct-common-separators-forbidden" }
+		public static var description: String { "Lowercase-remove-common-separator-chars-utf8-encode" }
 
 		public static let minimumNumberOfQuestions = 4
 		public static let minimumNumberCorrectAnswers = 3
