@@ -10,7 +10,6 @@ public struct LSUStake: FeatureReducer {
 		let stake: AccountPortfolio.PoolUnitResources.RadixNetworkStake
 
 		var isSelected: Bool?
-
 		var stakeClaimSelections: [Bool]? = [false, true]
 
 		@PresentationState

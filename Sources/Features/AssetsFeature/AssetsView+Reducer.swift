@@ -173,7 +173,8 @@ public struct AssetsView: Sendable, FeatureReducer {
 							.map {
 								LSUStake.State(
 									stake: $0,
-									isSelected: state.mode.isSelection ? false : nil
+									isSelected: ($0.stakeUnitResource?.resourceAddress)
+										.flatMap(state.mode.nonXrdRowSelected)
 								)
 							}
 					)
@@ -184,7 +185,13 @@ public struct AssetsView: Sendable, FeatureReducer {
 				lsuResource: lsuResource,
 				poolUnits: .init(
 					uncheckedUniqueElements: portfolio.poolUnitResources.poolUnits
-						.map { .init(poolUnit: $0, isSelected: state.mode.isSelection ? false : nil) }
+						.map {
+							PoolUnit.State(
+								poolUnit: $0,
+								isSelected: state.mode
+									.nonXrdRowSelected($0.poolUnitResource.resourceAddress)
+							)
+						}
 				)
 			)
 			return .none
