@@ -5,25 +5,30 @@ import SwiftUI
 public struct PlainListRow<Icon: View>: View {
 	let isShowingChevron: Bool
 	let title: String
+	let subtitle: String?
 	let icon: Icon
 
 	public init(
 		title: String,
+		subtitle: String? = nil,
 		showChevron: Bool = true,
 		@ViewBuilder icon: () -> Icon
 	) {
 		self.isShowingChevron = showChevron
 		self.title = title
+		self.subtitle = subtitle
 		self.icon = icon()
 	}
 
 	public init(
 		_ content: AssetIcon.Content,
 		title: String,
+		subtitle: String? = nil,
 		showChevron: Bool = true
 	) where Icon == AssetIcon {
 		self.isShowingChevron = showChevron
 		self.title = title
+		self.subtitle = subtitle
 		self.icon = AssetIcon(content)
 	}
 
@@ -31,16 +36,21 @@ public struct PlainListRow<Icon: View>: View {
 		HStack(spacing: .zero) {
 			icon
 				.padding(.trailing, .medium3)
-			Text(title)
-				.textStyle(.secondaryHeader)
-				.foregroundColor(.app.gray1)
+			VStack(alignment: .leading, spacing: .zero) {
+				Text(title)
+					.textStyle(.secondaryHeader)
+					.foregroundColor(.app.gray1)
+				if let subtitle {
+					Text(subtitle)
+						.textStyle(.body2Regular)
+						.foregroundColor(.app.gray2)
+				}
+			}
 			Spacer(minLength: 0)
 			if isShowingChevron {
 				Image(asset: AssetResource.chevronRight)
 			}
 		}
-		.frame(height: .largeButtonHeight)
-		.padding(.horizontal, .medium3)
 	}
 }
 

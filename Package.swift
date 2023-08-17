@@ -40,6 +40,7 @@ package.addModules([
 			"AccountPortfoliosClient",
 			"CreateAuthKeyFeature",
 			"ShowQRFeature",
+			"OverlayWindowClient",
 		],
 		tests: .yes()
 	),
