@@ -60,6 +60,7 @@ extension LSUDetails {
 
 						AssetResourceDetailsSection(viewState: viewStore.resourceDetails)
 					}
+					.padding(.bottom, .medium1)
 				} closeButtonAction: {
 					viewStore.send(.closeButtonTapped)
 				}

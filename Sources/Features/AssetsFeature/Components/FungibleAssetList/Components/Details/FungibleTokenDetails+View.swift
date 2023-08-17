@@ -41,6 +41,7 @@ extension FungibleTokenDetails {
 					TokenThumbnail(viewStore.thumbnail, size: .veryLarge)
 				} detailsView: {
 					AssetResourceDetailsSection(viewState: viewStore.details)
+						.padding(.bottom, .medium1)
 				} closeButtonAction: {
 					viewStore.send(.closeButtonTapped)
 				}

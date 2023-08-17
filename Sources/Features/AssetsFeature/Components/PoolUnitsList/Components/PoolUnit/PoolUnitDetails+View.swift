@@ -48,14 +48,18 @@ extension PoolUnitDetails {
 					NFTThumbnail(viewStore.thumbnailURL, size: .veryLarge)
 				} detailsView: {
 					VStack(spacing: .medium1) {
+						AssetDetailsSeparator()
+
 						Text(L10n.Account.PoolUnits.Details.currentRedeemableValue)
 							.textStyle(.secondaryHeader)
 							.foregroundColor(.app.gray1)
 
 						PoolUnitResourcesView(resources: viewStore.resources)
+							.padding(.horizontal, .large2)
 
 						AssetResourceDetailsSection(viewState: viewStore.resourceDetails)
 					}
+					.padding(.bottom, .medium1)
 				} closeButtonAction: {
 					viewStore.send(.closeButtonTapped)
 				}
