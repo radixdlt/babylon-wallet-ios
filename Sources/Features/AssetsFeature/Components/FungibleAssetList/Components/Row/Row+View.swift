@@ -29,11 +29,7 @@ extension FungibleAssetList.Row {
 		}
 
 		public var body: some SwiftUI.View {
-			WithViewStore(
-				store,
-				observe: \.viewState,
-				send: FeatureAction.view
-			) { viewStore in
+			WithViewStore(store, observe: \.viewState, send: FeatureAction.view) { viewStore in
 				HStack(alignment: .center) {
 					HStack(spacing: .small1) {
 						TokenThumbnail(viewStore.thumbnail, size: .small)
