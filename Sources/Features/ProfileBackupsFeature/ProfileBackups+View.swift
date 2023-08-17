@@ -14,19 +14,51 @@ extension ProfileBackups {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
-				VStack(alignment: .leading, spacing: .medium3) {
-					if viewStore.shownInSettings {
-						isCloudProfileSyncEnabled(with: viewStore)
+				ScrollView {
+					VStack(alignment: .leading, spacing: .medium3) {
+						if viewStore.shownInSettings {
+							// FIXME: Strings
+							VStack(alignment: .leading, spacing: .medium2) {
+								Text("Backing up your wallet ensure you can recover access to your Accounts, Personas, and wallet settings on a new phone by re-entering your seed phrase(s).")
 
-						// FIXME: Strings
-						Button("Export Wallet Backup File") {
-							viewStore.send(.exportProfileButtonTapped)
+								Text("**For security, backups do not contain any seed phrases or private keys. You must write them down separatly.**")
+							}
+							.fixedSize(horizontal: false, vertical: true)
+
+							// FIXME: Strings
+							Text("Automatic Backups (recommended)")
+
+							isCloudProfileSyncEnabled(with: viewStore)
+								.background(Color.app.white)
 						}
-						.buttonStyle(.primaryRectangular)
+
+						backupsList(with: viewStore)
+
+						if viewStore.shownInSettings {
+							// FIXME: Strings
+							Text("Manual backups")
+
+							VStack {
+								// FIXME: Strings
+								Text("A manually exported wallet backup file may also be used for recovery, along with your seed phrase(s).")
+
+								Text("Only the **curent configuration** of your wallet is backed up with each manual export")
+
+								// FIXME: Strings
+								Button("Export Wallet Backup File") {
+									viewStore.send(.exportProfileButtonTapped)
+								}
+								.buttonStyle(.primaryRectangular)
+							}
+							.background(Color.app.white)
+						}
 					}
-					backupsList(with: viewStore)
+					.padding(.medium3)
+					.background(.app.gray5)
+					.foregroundColor(.app.gray2)
+					.textStyle(.body1HighImportance)
+					.multilineTextAlignment(.leading)
 				}
-				.padding(.medium3)
 				.alert(
 					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
 					state: /ProfileBackups.Destinations.State.confirmCloudSyncDisable,
@@ -93,65 +125,67 @@ extension ProfileBackups {
 extension ProfileBackups.View {
 	@MainActor
 	private func isCloudProfileSyncEnabled(with viewStore: ViewStoreOf<ProfileBackups>) -> some SwiftUI.View {
-		ToggleView(
-			title: L10n.IOSProfileBackup.ProfileSync.title,
-			subtitle: L10n.IOSProfileBackup.ProfileSync.subtitle,
-			isOn: viewStore.binding(
-				get: \.isCloudProfileSyncEnabled,
-				send: { .cloudProfileSyncToggled($0) }
+		HStack {
+			Image(asset: AssetResource.backups)
+
+			ToggleView(
+				title: L10n.IOSProfileBackup.ProfileSync.title,
+				subtitle: L10n.IOSProfileBackup.ProfileSync.subtitle,
+				isOn: viewStore.binding(
+					get: \.isCloudProfileSyncEnabled,
+					send: { .cloudProfileSyncToggled($0) }
+				)
 			)
-		)
+		}
 	}
 
 	@MainActor
 	private func backupsList(with viewStore: ViewStoreOf<ProfileBackups>) -> some SwiftUI.View {
-		ScrollView {
-			// TODO: This is speculative design, needs to be updated once we have the proper design
-			VStack(spacing: .medium1) {
-				if !viewStore.shownInSettings {
-					Button(L10n.IOSProfileBackup.importBackupWallet) {
-						viewStore.send(.tappedImportProfile)
-					}
-					.buttonStyle(.primaryRectangular)
+		// TODO: This is speculative design, needs to be updated once we have the proper design
+		VStack(spacing: .medium1) {
+			if !viewStore.shownInSettings {
+				Button(L10n.IOSProfileBackup.importBackupWallet) {
+					viewStore.send(.tappedImportProfile)
 				}
-
-				Separator()
-
-				HStack {
-					Text(L10n.IOSProfileBackup.cloudBackupWallet)
-						.textStyle(.body1Header)
-					Spacer()
-				}
-
-				if let backupProfileHeaders = viewStore.backupProfileHeaders {
-					Selection(
-						viewStore.binding(
-							get: \.selectedProfileHeader,
-							send: {
-								.selectedProfileHeader($0)
-							}
-						),
-						from: backupProfileHeaders
-					) { item in
-						cloudBackupDataCard(item, viewStore: viewStore)
-					}
-
-					if !viewStore.shownInSettings {
-						WithControlRequirements(
-							viewStore.selectedProfileHeader,
-							forAction: { viewStore.send(.tappedUseCloudBackup($0)) },
-							control: { action in
-								Button(L10n.IOSProfileBackup.useICloudBackup, action: action)
-									.buttonStyle(.primaryRectangular)
-							}
-						)
-					}
-				} else {
-					Text(L10n.IOSProfileBackup.noCloudBackup)
-				}
+				.buttonStyle(.primaryRectangular)
 			}
-			.padding(.horizontal, .medium3)
+
+			Separator()
+
+			HStack {
+				Text(L10n.IOSProfileBackup.cloudBackupWallet)
+					.textStyle(.body1Header)
+				Spacer()
+			}
+
+			if let backupProfileHeaders = viewStore.backupProfileHeaders {
+				Selection(
+					viewStore.binding(
+						get: \.selectedProfileHeader,
+						send: {
+							.selectedProfileHeader($0)
+						}
+					),
+					from: backupProfileHeaders
+				) { item in
+					cloudBackupDataCard(item, viewStore: viewStore)
+				}
+
+				if !viewStore.shownInSettings {
+					WithControlRequirements(
+						viewStore.selectedProfileHeader,
+						forAction: { viewStore.send(.tappedUseCloudBackup($0)) },
+						control: { action in
+							Button(L10n.IOSProfileBackup.useICloudBackup, action: action)
+								.buttonStyle(.primaryRectangular)
+						}
+					)
+				}
+			} else {
+				Text(L10n.IOSProfileBackup.noCloudBackup)
+			}
 		}
+		.padding(.horizontal, .medium3)
 	}
 
 	@MainActor

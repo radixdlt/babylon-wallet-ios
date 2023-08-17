@@ -373,7 +373,7 @@ public struct ProfileBackups: Sendable, FeatureReducer {
 	private func updateCloudSync(state: inout State, isEnabled: Bool) -> EffectTask<Action> {
 		state.preferences?.security.isCloudProfileSyncEnabled = isEnabled
 		return .fireAndForget {
-			try await appPreferencesClient.setIsCloudProfileSyncEnabled(false)
+			try await appPreferencesClient.setIsCloudProfileSyncEnabled(isEnabled)
 		}
 	}
 }
