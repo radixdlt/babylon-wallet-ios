@@ -25,7 +25,10 @@ struct PoolUnitResourceViewState: Identifiable, Equatable {
 }
 
 extension PoolUnitResourceViewState {
-	init(xrdAmount: String, isSelected: Bool?) {
+	init(
+		xrdAmount: String,
+		isSelected: Bool? = nil
+	) {
 		self.init(
 			thumbnail: .xrd,
 			symbol: "XRD",
