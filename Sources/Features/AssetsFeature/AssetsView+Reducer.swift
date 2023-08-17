@@ -224,11 +224,11 @@ extension AssetsView.State {
 		)
 
 		let stakeClaimNonFungibleResources = (poolUnitsList.lsuResource?.stakes)
-			.map {
-				$0.compactMap {
+			.map { stakes in
+				stakes.compactMap { stake in
 					guard
-						let resource = $0.stake.stakeClaimResource,
-						let selectedAssets = $0.selectedStakeClaimAssets,
+						let resource = stake.stake.stakeClaimResource,
+						let selectedAssets = stake.selectedStakeClaimAssets,
 						!selectedAssets.isEmpty
 					else {
 						return Mode.SelectedAssets.NonFungibleTokensPerResource?.none
@@ -243,17 +243,18 @@ extension AssetsView.State {
 					)
 				}
 			}
-		let nonFungibleResources = nonFungibleTokenList.rows.compactMap {
+		let nonFungibleResources = nonFungibleTokenList.rows.compactMap { row in
 			if
-				let selectedAssets = $0.selectedAssets,
+				let selectedAssets = row.selectedAssets,
 				!selectedAssets.isEmpty
 			{
-				let selected = $0.resource.tokens.filter { token in selectedAssets.contains(token.id) }
+				let resource = row.resource
+				let selected = resource.tokens.filter { token in selectedAssets.contains(token.id) }
 
 				return Mode.SelectedAssets.NonFungibleTokensPerResource(
-					resourceAddress: $0.resource.resourceAddress,
-					resourceImage: $0.resource.iconURL,
-					resourceName: $0.resource.name,
+					resourceAddress: resource.resourceAddress,
+					resourceImage: resource.iconURL,
+					resourceName: resource.name,
 					tokens: selected
 				)
 			}
