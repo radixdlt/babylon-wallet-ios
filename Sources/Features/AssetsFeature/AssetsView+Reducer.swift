@@ -170,11 +170,13 @@ public struct AssetsView: Sendable, FeatureReducer {
 				return .init(
 					stakes: .init(
 						uniqueElements: portfolio.poolUnitResources.radixNetworkStakes
-							.map {
+							.map { stake in
 								LSUStake.State(
-									stake: $0,
-									isSelected: ($0.stakeUnitResource?.resourceAddress)
-										.flatMap(state.mode.nonXrdRowSelected)
+									stake: stake,
+									isSelected: (stake.stakeUnitResource?.resourceAddress)
+										.flatMap(state.mode.nonXrdRowSelected),
+									selectedStakeClaimAssets: (stake.stakeClaimResource?.resourceAddress)
+										.flatMap(state.mode.nftRowSelectedAssets)
 								)
 							}
 					)

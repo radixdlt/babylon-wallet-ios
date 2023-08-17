@@ -185,7 +185,7 @@ extension LSUStake.State {
 										thumbnail: .xrd,
 										status: token.canBeClaimed ? .readyToClaim : .unstaking,
 										tokenAmount: (token.stakeClaimAmount ?? 0).format(),
-										isSelected: nil
+										isSelected: self.selectedStakeClaimAssets?.contains(token.id)
 									)
 								}
 						)

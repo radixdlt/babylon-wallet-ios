@@ -7,13 +7,15 @@ public struct LSUStake: FeatureReducer {
 			stake.validator.address.address
 		}
 
+		typealias AssetID = AccountPortfolio.NonFungibleResource.NonFungibleToken.ID
+
 		let stake: AccountPortfolio.PoolUnitResources.RadixNetworkStake
 
 		var isSelected: Bool?
-		var stakeClaimSelections: [Bool]? = [false, true]
+		var selectedStakeClaimAssets: OrderedSet<AssetID>?
 
 		@PresentationState
-		public var destination: Destinations.State?
+		var destination: Destinations.State?
 	}
 
 	public enum ViewAction: Sendable, Equatable {
@@ -85,7 +87,12 @@ public struct LSUStake: FeatureReducer {
 				return .none
 			}
 		case let .didTapStakeClaimNFT(at: index):
-			state.stakeClaimSelections?[index].toggle()
+			if
+				state.isSelected != nil,
+				let assetID = state.stake.stakeClaimResource?.tokens[index].id
+			{
+				state.selectedStakeClaimAssets?.toggle(assetID)
+			}
 
 			return .none
 		}

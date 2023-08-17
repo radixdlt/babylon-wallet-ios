@@ -41,12 +41,7 @@ extension LSUDetails {
 						LSUMaker.makeValidatorNameView(viewState: viewStore.validatorNameViewState)
 
 						PoolUnitResourcesView(
-							resources: .init(
-								.init(
-									xrdAmount: viewStore.redeemableTokenAmount,
-									isSelected: nil
-								)
-							)
+							resources: .init(.init(xrdAmount: viewStore.redeemableTokenAmount))
 						)
 
 						DetailsContainerWithHeaderViewMaker
