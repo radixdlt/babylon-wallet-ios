@@ -14,10 +14,6 @@ extension AccountsClient: DependencyKey {
 			try await getProfileStore().updating {
 				try $0.addAccount(request.account)
 			}
-
-			let t = await getProfileStore().accountValues().compactMap { accounts in
-				accounts.first { $0.address.address.isEmpty }
-			}.eraseToAnyAsyncSequence() // .first().erase
 		}
 
 		let getAccountsOnCurrentNetwork: GetAccountsOnCurrentNetwork = {

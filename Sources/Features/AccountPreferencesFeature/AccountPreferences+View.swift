@@ -1,88 +1,26 @@
-import CreateAuthKeyFeature
 import FeaturePrelude
-import ShowQRFeature
 
 extension AccountPreferences.State {
 	var viewState: AccountPreferences.ViewState {
 		.init(sections: [
 			.init(
-				id: .personalize, title: "Personalize this account",
+				id: .personalize,
+				title: "Personalize this account", // FIXME: strings
 				rows: .init(uncheckedUniqueElements: [.accountLabel(account)])
 			),
 			.init(
 				id: .development,
-				title: "Set development preferences",
+				title: "Set development preferences", // FIXME: strings
 				rows: .init(uncheckedUniqueElements: [.devAccountPreferneces()])
 			),
 		])
 	}
 }
 
-// MARK: - AccountPreferences.Section
-extension AccountPreferences {
-	public struct Section: Identifiable, Equatable {
-		public enum Kind: Equatable {
-			case personalize
-			case ledgerBehaviour
-			case development
-		}
-
-		public struct Row: Identifiable, Equatable {
-			public enum Kind: Equatable {
-				case accountLabel
-				case accountColor
-				case tags
-				case accountSecurity
-				case thirdPartyDeposits
-				case devPreferences
-			}
-
-			public let id: Kind
-			let title: String
-			let subtitle: String?
-			let icon: AssetIcon.Content
-		}
-
-		public let id: Kind
-		let title: String
-		let rows: IdentifiedArrayOf<Row>
-	}
-}
-
-extension AccountPreferences.Section.Row {
-	public static func accountLabel(_ account: Profile.Network.Account) -> Self {
-		.init(
-			id: .accountLabel,
-			title: "Account Label",
-			subtitle: account.displayName.rawValue,
-			icon: .asset(AssetResource.create)
-		)
-	}
-
-	// TODO: Pass the deposit mode
-	static func thirdPartyDeposits() -> Self {
-		.init(
-			id: .thirdPartyDeposits,
-			title: "Third-Party Deposits",
-			subtitle: "Accept all deposits",
-			icon: .asset(AssetResource.iconAcceptAirdrop)
-		)
-	}
-
-	static func devAccountPreferneces() -> Self {
-		.init(
-			id: .devPreferences,
-			title: "Dev Preferences",
-			subtitle: nil,
-			icon: .asset(AssetResource.generalSettings)
-		)
-	}
-}
-
 // MARK: - AccountPreferences.View
 extension AccountPreferences {
 	public struct ViewState: Equatable {
-		public var sections: [AccountPreferences.Section]
+		public var sections: [Section]
 	}
 
 	@MainActor
@@ -165,17 +103,63 @@ extension View {
 	}
 }
 
-// #if DEBUG
-// import SwiftUI // NB: necessary for previews to appear
-//
-// struct AccountPreferences_Preview: PreviewProvider {
-//	static var previews: some View {
-//		AccountPreferences.View(
-//			store: .init(
-//				initialState: .init(address: try! .init(validatingAddress: "account_tdx_c_1px26p5tyqq65809em2h4yjczxcxj776kaun6sv3dw66sc3wrm6")),
-//				reducer: AccountPreferences()
-//			)
-//		)
-//	}
-// }
-// #endif
+// MARK: - AccountPreferences.Section
+extension AccountPreferences {
+	public struct Section: Identifiable, Equatable {
+		public enum Kind: Equatable {
+			case personalize
+			case ledgerBehaviour
+			case development
+		}
+
+		public struct Row: Identifiable, Equatable {
+			public enum Kind: Equatable, Sendable {
+				case accountLabel
+				case accountColor
+				case tags
+				case accountSecurity
+				case thirdPartyDeposits
+				case devPreferences
+			}
+
+			public let id: Kind
+			let title: String
+			let subtitle: String?
+			let icon: AssetIcon.Content
+		}
+
+		public let id: Kind
+		let title: String
+		let rows: IdentifiedArrayOf<Row>
+	}
+}
+
+extension AccountPreferences.Section.Row {
+	public static func accountLabel(_ account: Profile.Network.Account) -> Self {
+		.init(
+			id: .accountLabel,
+			title: "Account Label", // FIXME: strings
+			subtitle: account.displayName.rawValue,
+			icon: .asset(AssetResource.create)
+		)
+	}
+
+	static func devAccountPreferneces() -> Self {
+		.init(
+			id: .devPreferences,
+			title: "Dev Preferences", // FIXME: strings
+			subtitle: nil,
+			icon: .asset(AssetResource.generalSettings)
+		)
+	}
+
+	// TODO: Pass the deposit mode
+	static func thirdPartyDeposits() -> Self {
+		.init(
+			id: .thirdPartyDeposits,
+			title: "Third-Party Deposits", // FIXME: strings
+			subtitle: "Accept all deposits", // FIXME: strings
+			icon: .asset(AssetResource.iconAcceptAirdrop)
+		)
+	}
+}

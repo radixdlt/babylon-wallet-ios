@@ -1,16 +1,5 @@
-import AccountPortfoliosClient
 import AccountsClient
-import CreateAuthKeyFeature
-import EngineKit
-import FaucetClient
 import FeaturePrelude
-import GatewayAPI
-import ShowQRFeature
-
-#if DEBUG
-// Manifest turning account into Dapp Definition type, debug action...
-import TransactionReviewFeature
-#endif // DEBUG
 
 // MARK: - AccountPreferences
 public struct AccountPreferences: Sendable, FeatureReducer {
@@ -33,7 +22,6 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 
 	public enum ViewAction: Sendable, Equatable {
 		case task
-		case appeared
 		case rowTapped(AccountPreferences.Section.Row.Kind)
 	}
 
@@ -91,15 +79,16 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 					await send(.internal(.accountUpdated(accountUpdate)))
 				}
 			}
+
 		case .rowTapped(.accountLabel):
 			state.destinations = .updateAccountLabel(.init(account: state.account))
 			return .none
+
 		case .rowTapped(.devPreferences):
 			state.destinations = .devPreferences(.init(address: state.account.address))
 			return .none
-		case .appeared:
-			return .none
-		default:
+
+		case .rowTapped:
 			return .none
 		}
 	}
@@ -111,7 +100,9 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 			case .updateAccountLabel(.delegate(.accountLabelUpdated)):
 				state.destinations = nil
 				return .none
-			default:
+			case .updateAccountLabel:
+				return .none
+			case .devPreferences:
 				return .none
 			}
 
