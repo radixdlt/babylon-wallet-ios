@@ -17,7 +17,7 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 	// MARK: - State
 
 	public struct State: Sendable, Hashable {
-		public let account: Profile.Network.Account
+		public var account: Profile.Network.Account
 
 		@PresentationState
 		var destinations: Destinations.State? = nil
@@ -32,11 +32,14 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 	// MARK: - Action
 
 	public enum ViewAction: Sendable, Equatable {
+		case task
 		case appeared
 		case rowTapped(AccountPreferences.Section.Row.Kind)
 	}
 
-	public enum InternalAction: Sendable, Equatable {}
+	public enum InternalAction: Sendable, Equatable {
+		case accountUpdated(Profile.Network.Account)
+	}
 
 	public enum ChildAction: Sendable, Equatable {
 		case destinations(PresentationAction<Destinations.Action>)
@@ -51,18 +54,25 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 	public struct Destinations: ReducerProtocol {
 		public enum State: Equatable, Hashable {
 			case updateAccountLabel(UpdateAccountLabel.State)
+			case devPreferences(DevAccountPreferences.State)
 		}
 
 		public enum Action: Equatable {
 			case updateAccountLabel(UpdateAccountLabel.Action)
+			case devPreferences(DevAccountPreferences.Action)
 		}
 
 		public var body: some ReducerProtocolOf<Self> {
 			Scope(state: /State.updateAccountLabel, action: /Action.updateAccountLabel) {
 				UpdateAccountLabel()
 			}
+			Scope(state: /State.devPreferences, action: /Action.devPreferences) {
+				DevAccountPreferences()
+			}
 		}
 	}
+
+	@Dependency(\.accountsClient) var accountsClient
 
 	public init() {}
 
@@ -75,8 +85,17 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
+		case .task:
+			return .run { [address = state.account.address] send in
+				for try await accountUpdate in await accountsClient.accountUpdates(address) {
+					await send(.internal(.accountUpdated(accountUpdate)))
+				}
+			}
 		case .rowTapped(.accountLabel):
-			state.destinations = .updateAccountLabel(.init(accountLabel: state.account.displayName.rawValue))
+			state.destinations = .updateAccountLabel(.init(account: state.account))
+			return .none
+		case .rowTapped(.devPreferences):
+			state.destinations = .devPreferences(.init(address: state.account.address))
 			return .none
 		case .appeared:
 			return .none
@@ -89,6 +108,9 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 		switch childAction {
 		case let .destinations(.presented(action)):
 			switch action {
+			case .updateAccountLabel(.delegate(.accountLabelUpdated)):
+				state.destinations = nil
+				return .none
 			default:
 				return .none
 			}
@@ -99,6 +121,10 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 	}
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
-		.none
+		switch internalAction {
+		case let .accountUpdated(updated):
+			state.account = updated
+			return .none
+		}
 	}
 }

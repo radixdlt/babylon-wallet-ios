@@ -5,10 +5,15 @@ import ShowQRFeature
 extension AccountPreferences.State {
 	var viewState: AccountPreferences.ViewState {
 		.init(sections: [
-			.init(id: .personalize, title: "Personalize this account", rows: .init(uncheckedUniqueElements: [.accountLabel(.previewValue0)])),
-			.init(id: .ledgerBehaviour, title: "Set how you want this account to work", rows: .init(uncheckedUniqueElements: [
-				.thirdPartyDeposits(),
-			])),
+			.init(
+				id: .personalize, title: "Personalize this account",
+				rows: .init(uncheckedUniqueElements: [.accountLabel(account)])
+			),
+			.init(
+				id: .development,
+				title: "Set development preferences",
+				rows: .init(uncheckedUniqueElements: [.devAccountPreferneces()])
+			),
 		])
 	}
 }
@@ -19,6 +24,7 @@ extension AccountPreferences {
 		public enum Kind: Equatable {
 			case personalize
 			case ledgerBehaviour
+			case development
 		}
 
 		public struct Row: Identifiable, Equatable {
@@ -28,11 +34,12 @@ extension AccountPreferences {
 				case tags
 				case accountSecurity
 				case thirdPartyDeposits
+				case devPreferences
 			}
 
 			public let id: Kind
 			let title: String
-			let subtitle: String
+			let subtitle: String?
 			let icon: AssetIcon.Content
 		}
 
@@ -59,6 +66,15 @@ extension AccountPreferences.Section.Row {
 			title: "Third-Party Deposits",
 			subtitle: "Accept all deposits",
 			icon: .asset(AssetResource.iconAcceptAirdrop)
+		)
+	}
+
+	static func devAccountPreferneces() -> Self {
+		.init(
+			id: .devPreferences,
+			title: "Dev Preferences",
+			subtitle: nil,
+			icon: .asset(AssetResource.generalSettings)
 		)
 	}
 }
@@ -100,6 +116,9 @@ extension AccountPreferences {
 						.textCase(nil)
 					}
 				}
+				.task {
+					viewStore.send(.task)
+				}
 				.destination(store: store)
 				.listStyle(.grouped)
 				.background(.app.gray4)
@@ -109,6 +128,8 @@ extension AccountPreferences {
 					.navigationBarTitleColor(.app.gray1)
 					.navigationBarTitleDisplayMode(.inline)
 					.navigationBarInlineTitleFont(.app.secondaryHeader)
+					.toolbarBackground(.app.background, for: .navigationBar)
+					.toolbarBackground(.visible, for: .navigationBar)
 				#endif // os(iOS)
 			}
 		}
@@ -120,6 +141,7 @@ extension View {
 	func destination(store: StoreOf<AccountPreferences>) -> some View {
 		let destinationStore = store.scope(state: \.$destinations, action: { .child(.destinations($0)) })
 		return updateAccountLabel(with: destinationStore)
+			.devAccountPreferences(with: destinationStore)
 	}
 
 	@MainActor
@@ -129,6 +151,16 @@ extension View {
 			state: /AccountPreferences.Destinations.State.updateAccountLabel,
 			action: AccountPreferences.Destinations.Action.updateAccountLabel,
 			destination: { UpdateAccountLabel.View(store: $0) }
+		)
+	}
+
+	@MainActor
+	func devAccountPreferences(with destinationStore: PresentationStoreOf<AccountPreferences.Destinations>) -> some View {
+		navigationDestination(
+			store: destinationStore,
+			state: /AccountPreferences.Destinations.State.devPreferences,
+			action: AccountPreferences.Destinations.Action.devPreferences,
+			destination: { DevAccountPreferences.View(store: $0) }
 		)
 	}
 }

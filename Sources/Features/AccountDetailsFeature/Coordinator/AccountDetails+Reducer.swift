@@ -21,6 +21,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 	}
 
 	public enum ViewAction: Sendable, Equatable {
+		case task
 		case backButtonTapped
 		case preferencesButtonTapped
 		case transferButtonTapped
@@ -35,6 +36,10 @@ public struct AccountDetails: Sendable, FeatureReducer {
 		case dismiss
 		case displayTransfer
 		case refresh(AccountAddress)
+	}
+
+	public enum InternalAction: Sendable, Equatable {
+		case accountUpdated(Profile.Network.Account)
 	}
 
 	public struct Destinations: Sendable, ReducerProtocol {
@@ -58,6 +63,8 @@ public struct AccountDetails: Sendable, FeatureReducer {
 		}
 	}
 
+	@Dependency(\.accountsClient) var accountsClient
+
 	public init() {}
 
 	public var body: some ReducerProtocolOf<Self> {
@@ -72,6 +79,12 @@ public struct AccountDetails: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
+		case .task:
+			return .run { [address = state.account.address] send in
+				for try await accountUpdate in await accountsClient.accountUpdates(address) {
+					await send(.internal(.accountUpdated(accountUpdate)))
+				}
+			}
 		case .backButtonTapped:
 			return .send(.delegate(.dismiss))
 
@@ -99,6 +112,14 @@ public struct AccountDetails: Sendable, FeatureReducer {
 			return .none
 
 		default:
+			return .none
+		}
+	}
+
+	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
+		switch internalAction {
+		case let .accountUpdated(account):
+			state.account = account
 			return .none
 		}
 	}

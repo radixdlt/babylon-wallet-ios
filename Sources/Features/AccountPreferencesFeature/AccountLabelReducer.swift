@@ -1,23 +1,48 @@
+import AccountsClient
 import FeaturePrelude
+import OverlayWindowClient
 
 // MARK: - UpdateAccountLabel
 public struct UpdateAccountLabel: FeatureReducer {
 	public struct State: Hashable, Sendable {
+		var account: Profile.Network.Account
 		var accountLabel: String
+
+		init(account: Profile.Network.Account) {
+			self.account = account
+			self.accountLabel = account.displayName.rawValue
+		}
 	}
 
 	public enum ViewAction: Equatable {
 		case accountLabelChanged(String)
-		case updateTapped
+		case updateTapped(NonEmpty<String>)
 	}
+
+	public enum DelegateAction: Equatable {
+		case accountLabelUpdated
+	}
+
+	@Dependency(\.accountsClient) var accountsClient
+	@Dependency(\.errorQueue) var errorQueue
+	@Dependency(\.overlayWindowClient) var overlayWindowClient
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case let .accountLabelChanged(label):
 			state.accountLabel = label
 			return .none
-		case .updateTapped:
-			return .none
+		case let .updateTapped(newLabel):
+			state.account.displayName = newLabel
+			return .run { [account = state.account] send in
+				do {
+					try await accountsClient.updateAccount(account)
+					overlayWindowClient.scheduleHUD(.init(kind: .operationSucceeded("Updated")))
+					await send(.delegate(.accountLabelUpdated))
+				} catch {
+					errorQueue.schedule(error)
+				}
+			}
 		}
 	}
 }
@@ -60,16 +85,26 @@ extension UpdateAccountLabel {
 						hint: viewStore.hint
 					)
 
-					Button("Update") {
-						viewStore.send(.updateTapped)
+					WithControlRequirements(
+						NonEmpty(viewStore.accountLabel),
+						forAction: { viewStore.send(.updateTapped($0)) }
+					) { action in
+						Button("Update") {
+							action()
+						}
+						.buttonStyle(.primaryRectangular)
+						.controlState(viewStore.updateButtonControlState)
 					}
-					.buttonStyle(.primaryRectangular)
-					.controlState(viewStore.updateButtonControlState)
 
 					Spacer()
 				}
-				.padding(.large1)
+				.padding(.large3)
 				.navigationTitle("Rename Account")
+				.navigationBarTitleColor(.app.gray1)
+				.navigationBarTitleDisplayMode(.inline)
+				.navigationBarInlineTitleFont(.app.secondaryHeader)
+				.toolbarBackground(.app.background, for: .navigationBar)
+				.toolbarBackground(.visible, for: .navigationBar)
 			}
 		}
 	}
