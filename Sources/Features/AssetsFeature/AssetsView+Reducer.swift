@@ -184,7 +184,7 @@ public struct AssetsView: Sendable, FeatureReducer {
 				lsuResource: lsuResource,
 				poolUnits: .init(
 					uncheckedUniqueElements: portfolio.poolUnitResources.poolUnits
-						.map { .init(poolUnit: $0) }
+						.map { .init(poolUnit: $0, isSelected: state.mode.isSelection ? false : nil) }
 				)
 			)
 			return .none
@@ -211,10 +211,20 @@ extension AssetsView.State {
 			return nil
 		}
 
-		let poolUnitTokens = poolUnitsList.lsuResource?.stakes.compactMap(selectedFungibleResource) ?? []
+		func selectedFungibleResource(_ row: PoolUnit.State) -> AccountPortfolio.FungibleResource? {
+			if row.isSelected == true {
+				return row.poolUnit.poolUnitResource
+			}
+			return nil
+		}
+
+		let lsuTokens = poolUnitsList.lsuResource?.stakes.compactMap(selectedFungibleResource) ?? []
+		let poolUnitTokens = poolUnitsList.poolUnits.compactMap(selectedFungibleResource) ?? []
 		let fungibleResources = AccountPortfolio.FungibleResources(
 			xrdResource: fungibleTokenList.xrdToken.flatMap(selectedFungibleResource),
-			nonXrdResources: fungibleTokenList.nonXrdTokens.compactMap(selectedFungibleResource) + poolUnitTokens
+			nonXrdResources: fungibleTokenList.nonXrdTokens.compactMap(selectedFungibleResource)
+				+ lsuTokens
+				+ poolUnitTokens
 		)
 
 		let nonFungibleResources = nonFungibleTokenList.rows.compactMap {

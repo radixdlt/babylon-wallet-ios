@@ -76,12 +76,12 @@ extension AccountPortfolio.PoolUnitResources.PoolUnit {
 				thumbnail: .xrd,
 				symbol: "XRD",
 				tokenAmount: redemptionValue(for: $0).format(),
-				isSelected: true
+				isSelected: nil
 			)
 		}
 
 		return .init(
-			rawValue: xrdResourceViewState.map { [$0] } ?? []
+			rawValue: (xrdResourceViewState.map { [$0] } ?? [])
 				+ poolResources.nonXrdResources.map {
 					PoolUnitResourceViewState(
 						thumbnail: .known($0.iconURL),
