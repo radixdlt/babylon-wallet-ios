@@ -9,18 +9,6 @@ public struct PlainListRow<Icon: View>: View {
 	let icon: Icon
 
 	public init(
-		title: String,
-		showChevron: Bool = true,
-		subtitle: String? = nil,
-		@ViewBuilder icon: () -> Icon
-	) {
-		self.isShowingChevron = showChevron
-		self.title = title
-		self.subtitle = subtitle
-		self.icon = icon()
-	}
-
-	public init(
 		_ content: AssetIcon.Content,
 		title: String,
 		subtitle: String? = nil,
@@ -28,10 +16,22 @@ public struct PlainListRow<Icon: View>: View {
 	) where Icon == AssetIcon {
 		self.init(
 			title: title,
-			showChevron: showChevron,
 			subtitle: subtitle,
+			showChevron: showChevron,
 			icon: { AssetIcon(content) }
 		)
+	}
+
+	public init(
+		title: String,
+		subtitle: String? = nil,
+		showChevron: Bool = true,
+		@ViewBuilder icon: () -> Icon
+	) {
+		self.isShowingChevron = showChevron
+		self.title = title
+		self.subtitle = subtitle
+		self.icon = icon()
 	}
 
 	public var body: some View {

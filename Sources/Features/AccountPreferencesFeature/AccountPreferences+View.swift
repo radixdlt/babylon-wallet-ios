@@ -148,7 +148,7 @@ extension AccountPreferences.Section.Row {
 			id: .devPreferences,
 			title: "Dev Preferences", // FIXME: strings
 			subtitle: nil,
-			icon: .asset(AssetResource.generalSettings)
+			icon: .asset(AssetResource.appSettings)
 		)
 	}
 
