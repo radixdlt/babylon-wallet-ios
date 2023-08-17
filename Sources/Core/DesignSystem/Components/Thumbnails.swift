@@ -241,6 +241,7 @@ public struct LoadableImage<Placeholder: View>: View {
 				Image(asset: AssetResource.brokenImagePlaceholder)
 					.resizable()
 					.aspectRatio(1, contentMode: .fit)
+					.frame(minWidth: .medium2, minHeight: .medium2)
 					.frame(maxWidth: .large1, maxHeight: .large1)
 
 				Spacer(minLength: .small2)
