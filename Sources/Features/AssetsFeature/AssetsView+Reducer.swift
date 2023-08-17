@@ -173,7 +173,7 @@ public struct AssetsView: Sendable, FeatureReducer {
 							.map { stake in
 								LSUStake.State(
 									stake: stake,
-									isSelected: (stake.stakeUnitResource?.resourceAddress)
+									isStakeSelected: (stake.stakeUnitResource?.resourceAddress)
 										.flatMap(state.mode.nonXrdRowSelected),
 									selectedStakeClaimAssets: (stake.stakeClaimResource?.resourceAddress)
 										.flatMap(state.mode.nftRowSelectedAssets)
@@ -214,7 +214,7 @@ extension AssetsView.State {
 		}
 
 		func selectedFungibleResource(_ row: LSUStake.State) -> AccountPortfolio.FungibleResource? {
-			if row.isSelected == true {
+			if row.isStakeSelected == true {
 				return row.stake.stakeUnitResource
 			}
 			return nil
@@ -228,7 +228,7 @@ extension AssetsView.State {
 		}
 
 		let lsuTokens = poolUnitsList.lsuResource?.stakes.compactMap(selectedFungibleResource) ?? []
-		let poolUnitTokens = poolUnitsList.poolUnits.compactMap(selectedFungibleResource) ?? []
+		let poolUnitTokens = poolUnitsList.poolUnits.compactMap(selectedFungibleResource)
 		let fungibleResources = AccountPortfolio.FungibleResources(
 			xrdResource: fungibleTokenList.xrdToken.flatMap(selectedFungibleResource),
 			nonXrdResources: fungibleTokenList.nonXrdTokens.compactMap(selectedFungibleResource)
@@ -278,12 +278,12 @@ extension AssetsView.State {
 				)
 			}
 			return nil
-		}
+		} + (stakeClaimNonFungibleResources ?? [])
 
 		guard
 			fungibleResources.xrdResource != nil
 			|| !fungibleResources.nonXrdResources.isEmpty
-			|| !(nonFungibleResources + (stakeClaimNonFungibleResources ?? [])).isEmpty
+			|| !nonFungibleResources.isEmpty
 		else {
 			return nil
 		}
@@ -291,7 +291,7 @@ extension AssetsView.State {
 		return .init(
 			fungibleResources: fungibleResources,
 			nonFungibleResources: IdentifiedArrayOf(
-				uniqueElements: nonFungibleResources + (stakeClaimNonFungibleResources ?? [])
+				uniqueElements: nonFungibleResources
 			),
 			disabledNFTs: mode.selectedAssets?.disabledNFTs ?? []
 		)

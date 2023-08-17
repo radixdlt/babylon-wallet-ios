@@ -11,7 +11,7 @@ public struct LSUStake: FeatureReducer {
 
 		let stake: AccountPortfolio.PoolUnitResources.RadixNetworkStake
 
-		var isSelected: Bool?
+		var isStakeSelected: Bool?
 		var selectedStakeClaimAssets: OrderedSet<AssetID>?
 
 		@PresentationState
@@ -62,8 +62,8 @@ public struct LSUStake: FeatureReducer {
 	) -> EffectTask<Action> {
 		switch viewAction {
 		case .didTap:
-			if state.isSelected != nil {
-				state.isSelected?.toggle()
+			if state.isStakeSelected != nil {
+				state.isStakeSelected?.toggle()
 
 				return .none
 			} else {
@@ -88,7 +88,7 @@ public struct LSUStake: FeatureReducer {
 			}
 		case let .didTapStakeClaimNFT(withID: id):
 			if
-				state.isSelected != nil,
+				state.isStakeSelected != nil,
 				let assetID = try? AccountPortfolio.NonFungibleResource.NonFungibleToken.ID(nonFungibleGlobalId: id)
 			{
 				state.selectedStakeClaimAssets?.toggle(assetID)

@@ -171,7 +171,7 @@ extension LSUStake.State {
 						thumbnail: .xrd,
 						symbol: "XRD",
 						tokenAmount: $0.format(),
-						isSelected: isSelected
+						isSelected: isStakeSelected
 					)
 				},
 			stakeClaimNFTs: .init(
