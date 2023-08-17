@@ -30,14 +30,19 @@ public struct ChooseQuestions: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public let availableQuestions: NonEmpty<OrderedSet<SecurityQuestion>>
 
-		public let selectionRequirement: SelectionRequirement = .exactly(CAP23.minimumNumberOfQuestions)
+		public let selectionRequirement: SelectionRequirement = .exactly(SecurityQuestionsFactorSource.KeyDerivationScheme.default.minimumNumberOfQuestions)
 		public var selectedQuestions: [SecurityQuestion]?
 
+		public let keyDerivationScheme: SecurityQuestionsFactorSource.KeyDerivationScheme
+
 		public init(
-			availableQuestions: NonEmpty<OrderedSet<SecurityQuestion>> = SecurityQuestionsFactorSource.defaultQuestions
+			availableQuestions: NonEmpty<OrderedSet<SecurityQuestion>> = SecurityQuestionsFactorSource.defaultQuestions,
+			keyDerivationScheme: SecurityQuestionsFactorSource.KeyDerivationScheme = .default
+
 		) {
 			self.availableQuestions = availableQuestions
 			self.selectedQuestions = nil
+			self.keyDerivationScheme = keyDerivationScheme
 		}
 	}
 

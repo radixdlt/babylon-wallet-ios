@@ -11,13 +11,13 @@ public struct InputEncryptionPassword: Sendable, FeatureReducer {
 			case decrypt(EncryptedProfileSnapshot)
 
 			case loadThenEncrypt(
-				kdfScheme: KeyDerivationScheme = .default,
+				kdfScheme: PasswordBasedKeyDerivationScheme = .default,
 				encryptionScheme: EncryptionScheme = .default
 			)
 
 			case encryptSpecific(
 				profileSnapshot: ProfileSnapshot,
-				kdfScheme: KeyDerivationScheme = .default,
+				kdfScheme: PasswordBasedKeyDerivationScheme = .default,
 				encryptionScheme: EncryptionScheme = .default
 			)
 
@@ -65,7 +65,7 @@ public struct InputEncryptionPassword: Sendable, FeatureReducer {
 
 		case loadProfileSnapshotToEncryptResult(
 			TaskResult<ProfileSnapshot>,
-			kdfScheme: KeyDerivationScheme,
+			kdfScheme: PasswordBasedKeyDerivationScheme,
 			encryptionScheme: EncryptionScheme
 		)
 	}

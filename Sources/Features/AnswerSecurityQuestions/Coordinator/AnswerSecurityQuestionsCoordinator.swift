@@ -19,6 +19,7 @@ public struct AnswerSecurityQuestionsCoordinator: Sendable, FeatureReducer {
 		public var questions: OrderedSet<SecurityQuestion>
 
 		public let purpose: Purpose
+		public let keyDerivationScheme: SecurityQuestionsFactorSource.KeyDerivationScheme
 		var root: Path.State
 		var path: StackState<Path.State> = .init()
 
@@ -28,11 +29,19 @@ public struct AnswerSecurityQuestionsCoordinator: Sendable, FeatureReducer {
 			case .encrypt:
 				self.questions = []
 				self.root = .chooseQuestions(.init())
+				self.keyDerivationScheme = .default
 
 			case let .decrypt(factorSource):
-				let questions = factorSource.sealedMnemonic.securityQuestions
+				let sealedMnemonic = factorSource.sealedMnemonic
+				let questions = sealedMnemonic.securityQuestions
+				let kdfScheme = sealedMnemonic.keyDerivationScheme
+				self.keyDerivationScheme = kdfScheme
 				self.questions = questions.rawValue
-				self.root = .answerQuestion(.init(question: questions.first, isLast: questions.count == 1))
+				self.root = .answerQuestion(.init(
+					keyDerivationScheme: kdfScheme,
+					question: questions.first,
+					isLast: questions.count == 1
+				))
 			}
 		}
 	}
@@ -136,6 +145,7 @@ public struct AnswerSecurityQuestionsCoordinator: Sendable, FeatureReducer {
 
 		if let nextQuestion = unansweredQuestions.first {
 			state.path.append(.answerQuestion(.init(
+				keyDerivationScheme: state.keyDerivationScheme,
 				question: nextQuestion,
 				isLast: unansweredQuestions.count == 1
 			)))

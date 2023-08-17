@@ -1,13 +1,13 @@
 @testable import Cryptography
 import TestingPrelude
 
-final class KDFTests: TestCase {
+final class PasswordBasedKeyDerivationTests: TestCase {
 	func test_version1_is_default() {
-		XCTAssertEqual(KeyDerivationScheme.default.version, .version1)
+		XCTAssertEqual(PasswordBasedKeyDerivationScheme.default.version, .version1)
 	}
 
 	func test_json_encoding() throws {
-		try XCTAssertJSONEncoding(KeyDerivationScheme.version1, [
+		try XCTAssertJSONEncoding(PasswordBasedKeyDerivationScheme.version1, [
 			"version": 1,
 			"description": "HKDFSHA256-with-UTF8-encoding-of-password-no-salt-no-info",
 		])
@@ -17,12 +17,12 @@ final class KDFTests: TestCase {
 		try XCTAssertJSONDecoding([
 			"version": 1,
 			"description": "HKDFSHA256-with-UTF8-encoding-of-password-no-salt-no-info",
-		], KeyDerivationScheme.version1)
+		], PasswordBasedKeyDerivationScheme.version1)
 	}
 
 	func test_version1() throws {
 		func doTest(password: String, expected: String) {
-			let key = KeyDerivationScheme.version1.kdf(password: password)
+			let key = PasswordBasedKeyDerivationScheme.version1.kdf(password: password)
 			XCTAssertEqual(key.hex, expected)
 		}
 

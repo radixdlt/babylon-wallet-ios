@@ -1,3 +1,4 @@
+import Cryptography
 @testable import RadixConnect
 import TestingPrelude
 
@@ -178,7 +179,7 @@ final class SignalingClientTests: TestCase {
 		line: UInt = #line
 	) async throws {
 		let encoded = try jsonEncoder.encode(payload)
-		let encrypted = try Self.encryptionKey.encrypt(data: encoded)
+		let encrypted = try EncryptionScheme.version1.encrypt(data: encoded, encryptionKey: Self.encryptionKey.symmetric)
 		let data = JSONValue.dictionary([
 			"requestId": .string(Self.requestId.rawValue),
 			"method": .string(method),
@@ -222,8 +223,8 @@ final class SignalingClientTests: TestCase {
 			XCTAssertEqual(decodedMessage["targetClientId"], .string(Self.remoteClientId.rawValue), file: file, line: line)
 
 			let encryptedPayload = try! HexCodable(hex: decodedMessage["encryptedPayload"]!.string!)
-			let decryptPayload = try! Self.encryptionKey.decrypt(data: encryptedPayload.data)
-			let decodedPayload = try! jsonDecoder.decode(JSONValue.self, from: decryptPayload)
+			let decryptedPayload = try EncryptionScheme.version1.decrypt(data: encryptedPayload.data, decryptionKey: Self.encryptionKey.symmetric)
+			let decodedPayload = try! jsonDecoder.decode(JSONValue.self, from: decryptedPayload)
 			XCTAssertEqual(decodedPayload, expectedPayload, file: file, line: line)
 			exp.fulfill()
 		}

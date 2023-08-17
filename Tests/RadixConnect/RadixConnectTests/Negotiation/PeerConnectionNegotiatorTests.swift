@@ -1,3 +1,4 @@
+import Cryptography
 @testable import RadixConnect
 import RadixConnectModels
 import TestingPrelude
@@ -308,7 +309,7 @@ final class PeerConnectionNegotiatorTests: TestCase {
 	func makeClientMessage(_ primitive: IdentifiedRTCPrimitive) throws -> JSONValue {
 		let requestId = SignalingClient.ClientMessage.RequestID.any.rawValue
 		let encoded = try jsonEncoder.encode(primitive.value.payload)
-		let encrypted = try Self.encryptionKey.encrypt(data: encoded)
+		let encrypted = try EncryptionScheme.version1.encrypt(data: encoded, encryptionKey: Self.encryptionKey.symmetric)
 		let data = JSONValue.dictionary([
 			"requestId": .string(requestId),
 			"method": .string(SignalingClient.ClientMessage.Method(from: primitive.value).rawValue),

@@ -9,7 +9,7 @@ public struct EncryptedProfileSnapshot: Sendable, Codable, Hashable {
 	public let encryptedSnapshot: HexCodable
 
 	/// The KDF algorithm which was used to derive the encryption key from the user provided password.
-	public let keyDerivationScheme: KeyDerivationScheme
+	public let keyDerivationScheme: PasswordBasedKeyDerivationScheme
 
 	/// The encryption algorithm which was used to produce `encryptedSnapshot` with the encryption key
 	/// derived using the `keyDerivationScheme`.
@@ -17,7 +17,7 @@ public struct EncryptedProfileSnapshot: Sendable, Codable, Hashable {
 
 	public init(
 		encryptedSnapshot: HexCodable,
-		keyDerivationScheme: KeyDerivationScheme,
+		keyDerivationScheme: PasswordBasedKeyDerivationScheme,
 		encryptionScheme: EncryptionScheme
 	) {
 		self.encryptedSnapshot = encryptedSnapshot

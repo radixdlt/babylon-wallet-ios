@@ -9,7 +9,7 @@ public struct SecurityQuestionsFactorSource: FactorSourceProtocol {
 	public var common: FactorSource.Common // We update `lastUsed`
 	public let sealedMnemonic: SealedMnemonic
 
-	internal init(
+	init(
 		id: ID,
 		common: FactorSource.Common,
 		sealedMnemonic: SealedMnemonic
@@ -56,18 +56,8 @@ public struct SecurityQuestion: Sendable, Hashable, Codable, Identifiable {
 // MARK: - SecurityQuestionAnswerAsEntropy
 public struct SecurityQuestionAnswerAsEntropy: Sendable, Hashable, Codable {
 	public let entropy: NonEmpty<HexCodable>
-	private init(entropy: NonEmpty<HexCodable>) {
+	public init(entropy: NonEmpty<HexCodable>) {
 		self.entropy = entropy
-	}
-
-	public static func from(_ answer: NonEmptyString) throws -> Self {
-		try from(CAP23.trimmedAnswer(freeformAnswer: answer))
-	}
-
-	public static func from(_ answer: CAP23.TrimmedAnswer) throws -> Self {
-		try .init(
-			entropy: CAP23.entropyFrom(freeformAnswer: answer)
-		)
 	}
 }
 

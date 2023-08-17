@@ -5,7 +5,7 @@ import TestingPrelude
 extension EncryptedProfileSnapshot {
 	public static func encrypt(snapshot: ProfileSnapshot, password: String) throws -> Self {
 		let snapshotJSON = try JSONEncoder.iso8601.encode(snapshot)
-		let kdfScheme = KeyDerivationScheme.default
+		let kdfScheme = PasswordBasedKeyDerivationScheme.default
 		let encryptionKey = kdfScheme.kdf(password: password)
 		let encryptionScheme = EncryptionScheme.default
 		let cipher = try encryptionScheme.encrypt(data: snapshotJSON, encryptionKey: encryptionKey)

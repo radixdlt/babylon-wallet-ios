@@ -11,7 +11,7 @@ public struct AnswerSecurityQuestionFreeform: Sendable, FeatureReducer {
 		public let question: SecurityQuestion
 		public var answer: NonEmptyString? = nil
 		public let isLast: Bool
-
+		public let keyDerivationScheme: SecurityQuestionsFactorSource.KeyDerivationScheme
 		public var answerToQuestion: AnswerToSecurityQuestion?
 		public var rawAnswerToQuestion: AbstractAnswerToSecurityQuestion<NonEmptyString>? {
 			guard let nonEmptyAnswer = answer else {
@@ -21,9 +21,11 @@ public struct AnswerSecurityQuestionFreeform: Sendable, FeatureReducer {
 		}
 
 		public init(
+			keyDerivationScheme: SecurityQuestionsFactorSource.KeyDerivationScheme,
 			question: SecurityQuestion,
 			isLast: Bool
 		) {
+			self.keyDerivationScheme = keyDerivationScheme
 			self.question = question
 			self.isLast = isLast
 		}
