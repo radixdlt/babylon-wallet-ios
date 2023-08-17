@@ -78,11 +78,11 @@ extension AccountDetails {
 						}
 					}
 				#endif
-					.sheet(
+					.navigationDestination(
 						store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
 						state: /AccountDetails.Destinations.State.preferences,
 						action: AccountDetails.Destinations.Action.preferences,
-						content: { AccountPreferences.View(store: $0) }
+						destination: { AccountPreferences.View(store: $0) }
 					)
 					.fullScreenCover(
 						store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
