@@ -1,3 +1,4 @@
+import EngineKit
 import FeaturePrelude
 import SharedModels
 
@@ -46,33 +47,4 @@ struct NFTIDView: View {
 
 	private let minImageAspect: CGFloat = 1
 	private let maxImageAspect: CGFloat = 16 / 9
-}
-
-// MARK: - KeyValueView
-struct KeyValueView<Content: View>: View {
-	let key: String
-	let content: Content
-
-	init(key: String, value: String) where Content == Text {
-		self.key = key
-		self.content = Text(value)
-	}
-
-	init(key: String, @ViewBuilder content: () -> Content) {
-		self.key = key
-		self.content = content()
-	}
-
-	var body: some View {
-		HStack(alignment: .top, spacing: 0) {
-			Text(key)
-				.textStyle(.body1Regular)
-				.foregroundColor(.app.gray2)
-			Spacer(minLength: 0)
-			content
-				.multilineTextAlignment(.trailing)
-				.textStyle(.body1HighImportance)
-				.foregroundColor(.app.gray1)
-		}
-	}
 }

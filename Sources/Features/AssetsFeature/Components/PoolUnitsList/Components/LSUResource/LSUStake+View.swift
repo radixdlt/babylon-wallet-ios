@@ -41,7 +41,7 @@ extension LSUStake {
 	public struct ViewState: Sendable, Equatable, Identifiable {
 		public var id: ValidatorAddress
 
-		let validatorNameViewState: ValidatorNameViewState
+		let validatorNameViewState: ValidatorNameView.ViewState
 
 		let liquidStakeUnit: PoolUnitResourceViewState?
 		let stakeClaimNFTs: StakeClaimNFTsViewState?
@@ -57,7 +57,7 @@ extension LSUStake {
 				send: Action.view
 			) { viewStore in
 				VStack(alignment: .leading, spacing: .medium1) {
-					LSUMaker.makeValidatorNameView(viewState: viewStore.validatorNameViewState)
+					ValidatorNameView(viewState: viewStore.validatorNameViewState)
 
 					if let liquidStakeUnitViewState = viewStore.liquidStakeUnit {
 						liquidStakeUnitView(viewState: liquidStakeUnitViewState)
@@ -107,19 +107,16 @@ extension LSUStake {
 					.stakeHeaderStyle
 
 				ForEach(viewState) { stakeClaimNFT in
-					HStack {
-						HStack(spacing: .small1) {
-							TokenThumbnail(
-								stakeClaimNFT.thumbnail,
-								size: .smallest
-							)
+					HStack(spacing: .zero) {
+						TokenThumbnail(stakeClaimNFT.thumbnail, size: .smallest)
+							.padding(.trailing, .small1)
 
-							Text(stakeClaimNFT.status.localized)
-								.foregroundColor(stakeClaimNFT.status.foregroundColor)
-								.textStyle(.body2HighImportance)
-						}
+						Text(stakeClaimNFT.status.localized)
+							.foregroundColor(stakeClaimNFT.status.foregroundColor)
+							.textStyle(.body2HighImportance)
+							.padding(.trailing, .small1)
 
-						Spacer()
+						Spacer(minLength: 0)
 
 						Text(stakeClaimNFT.tokenAmount)
 							.foregroundColor(.app.gray1)
@@ -157,7 +154,7 @@ extension LSUStake.State {
 				.map {
 					.init(
 						thumbnail: .xrd,
-						symbol: "XRD",
+						symbol: "XRD", // FIXME: Strings - or is this a placeholder?
 						tokenAmount: $0.format()
 					)
 				},

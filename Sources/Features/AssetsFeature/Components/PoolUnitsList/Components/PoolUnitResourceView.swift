@@ -1,59 +1,5 @@
 import FeaturePrelude
 
-// MARK: - PoolUnitResourceViewState
-struct PoolUnitResourceViewState: Identifiable, Equatable {
-	var id: String {
-		symbol
-	}
-
-	let thumbnail: TokenThumbnail.Content
-	let symbol: String
-	let tokenAmount: String
-}
-
-extension PoolUnitResourceViewState {
-	init(xrdAmount: String) {
-		self.init(
-			thumbnail: .xrd,
-			symbol: "XRD",
-			tokenAmount: xrdAmount
-		)
-	}
-}
-
-// MARK: - PoolUnitResourceView
-struct PoolUnitResourceView<NameView>: View where NameView: View {
-	let viewState: PoolUnitResourceViewState
-	let nameView: NameView
-
-	init(
-		viewState: PoolUnitResourceViewState,
-		@ViewBuilder nameView: () -> NameView
-	) {
-		self.viewState = viewState
-		self.nameView = nameView()
-	}
-
-	var body: some View {
-		HStack(spacing: .small1) {
-			TokenThumbnail(
-				viewState.thumbnail,
-				size: .small
-			)
-
-			HStack {
-				nameView
-
-				Spacer()
-
-				Text(viewState.tokenAmount)
-					.foregroundColor(.app.gray1)
-					.textStyle(.secondaryHeader)
-			}
-		}
-	}
-}
-
 // MARK: - PoolUnitResourcesView
 struct PoolUnitResourcesView: View {
 	let resources: NonEmpty<IdentifiedArrayOf<PoolUnitResourceViewState>>
@@ -75,5 +21,54 @@ struct PoolUnitResourcesView: View {
 			RoundedRectangle(cornerRadius: .small1)
 				.stroke(.app.gray4, lineWidth: 1)
 		)
+	}
+}
+
+// MARK: - PoolUnitResourceViewState
+struct PoolUnitResourceViewState: Identifiable, Equatable {
+	var id: String { symbol }
+
+	let thumbnail: TokenThumbnail.Content
+	let symbol: String
+	let tokenAmount: String
+}
+
+extension PoolUnitResourceViewState {
+	init(xrdAmount: String) {
+		self.init(
+			thumbnail: .xrd,
+			symbol: "XRD", // FIXME: Strings
+			tokenAmount: xrdAmount
+		)
+	}
+}
+
+// MARK: - PoolUnitResourceView
+struct PoolUnitResourceView<NameView>: View where NameView: View {
+	let viewState: PoolUnitResourceViewState
+	let nameView: NameView
+
+	init(
+		viewState: PoolUnitResourceViewState,
+		@ViewBuilder nameView: () -> NameView
+	) {
+		self.viewState = viewState
+		self.nameView = nameView()
+	}
+
+	var body: some View {
+		HStack(spacing: .zero) {
+			TokenThumbnail(viewState.thumbnail, size: .small)
+				.padding(.trailing, .small1)
+
+			nameView
+				.padding(.trailing, .small2)
+
+			Spacer(minLength: 0)
+
+			Text(viewState.tokenAmount)
+				.foregroundColor(.app.gray1)
+				.textStyle(.secondaryHeader)
+		}
 	}
 }

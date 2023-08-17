@@ -93,6 +93,10 @@ extension GatewayAPI.EntityMetadataCollection {
 		items[.description]?.asString
 	}
 
+	public var tags: [String]? {
+		items[.tags]?.asStringCollection
+	}
+
 	public var iconURL: URL? {
 		items[.iconURL]?.asURL
 	}
@@ -203,6 +207,7 @@ public enum EntityMetadataKey: String, CaseIterable {
 	case name
 	case symbol
 	case description
+	case tags
 	case iconURL = "icon_url"
 	case dappDefinition = "dapp_definition"
 	case validator
