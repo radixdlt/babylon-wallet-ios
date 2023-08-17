@@ -68,7 +68,7 @@ extension LSUStake {
 
 					if let stakeClaimNFTsViewState = viewStore.stakeClaimNFTs {
 						stakeClaimNFTsView(viewState: stakeClaimNFTsViewState) {
-							viewStore.send(.didTapStakeClaimNFT(at: $0))
+							viewStore.send(.didTapStakeClaimNFT(withID: $0))
 						}
 					}
 				}
@@ -107,7 +107,7 @@ extension LSUStake {
 
 		private func stakeClaimNFTsView(
 			viewState: ViewState.StakeClaimNFTsViewState,
-			handler: @escaping (Int) -> Void
+			handleTapGesture: @escaping (ViewState.StakeClaimNFTViewState.ID) -> Void
 		) -> some SwiftUI.View {
 			VStack(alignment: .leading, spacing: .medium1) {
 				Text(L10n.Account.PoolUnits.stakeClaimNFTs)
@@ -137,7 +137,7 @@ extension LSUStake {
 						}
 					}
 					.borderAround
-					.onTapGesture { handler(viewState.firstIndex(of: stakeClaimNFTViewState)!) }
+					.onTapGesture { handleTapGesture(stakeClaimNFTViewState.id) }
 				}
 			}
 		}
