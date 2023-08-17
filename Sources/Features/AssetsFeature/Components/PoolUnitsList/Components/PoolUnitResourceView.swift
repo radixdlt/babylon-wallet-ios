@@ -10,6 +10,18 @@ struct PoolUnitResourceViewState: Identifiable, Equatable {
 	let symbol: String
 	let tokenAmount: String
 	let isSelected: Bool?
+
+	init(
+		thumbnail: TokenThumbnail.Content,
+		symbol: String,
+		tokenAmount: String,
+		isSelected: Bool? = nil
+	) {
+		self.thumbnail = thumbnail
+		self.symbol = symbol
+		self.tokenAmount = tokenAmount
+		self.isSelected = isSelected
+	}
 }
 
 extension PoolUnitResourceViewState {

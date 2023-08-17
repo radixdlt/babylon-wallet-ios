@@ -75,8 +75,7 @@ extension AccountPortfolio.PoolUnitResources.PoolUnit {
 			PoolUnitResourceViewState(
 				thumbnail: .xrd,
 				symbol: "XRD",
-				tokenAmount: redemptionValue(for: $0).format(),
-				isSelected: nil
+				tokenAmount: redemptionValue(for: $0).format()
 			)
 		}
 
@@ -86,8 +85,7 @@ extension AccountPortfolio.PoolUnitResources.PoolUnit {
 					PoolUnitResourceViewState(
 						thumbnail: .known($0.iconURL),
 						symbol: $0.symbol ?? $0.name ?? L10n.Account.PoolUnits.unknownSymbolName,
-						tokenAmount: redemptionValue(for: $0).format(),
-						isSelected: nil
+						tokenAmount: redemptionValue(for: $0).format()
 					)
 				}
 		)! // Safe to unwrap, guaranteed to not be empty
