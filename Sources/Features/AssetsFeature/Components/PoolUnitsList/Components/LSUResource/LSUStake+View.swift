@@ -107,19 +107,16 @@ extension LSUStake {
 					.stakeHeaderStyle
 
 				ForEach(viewState) { stakeClaimNFT in
-					HStack {
-						HStack(spacing: .small1) {
-							TokenThumbnail(
-								stakeClaimNFT.thumbnail,
-								size: .smallest
-							)
+					HStack(spacing: .zero) {
+						TokenThumbnail(stakeClaimNFT.thumbnail, size: .smallest)
+							.padding(.trailing, .small1)
 
-							Text(stakeClaimNFT.status.localized)
-								.foregroundColor(stakeClaimNFT.status.foregroundColor)
-								.textStyle(.body2HighImportance)
-						}
+						Text(stakeClaimNFT.status.localized)
+							.foregroundColor(stakeClaimNFT.status.foregroundColor)
+							.textStyle(.body2HighImportance)
+							.padding(.trailing, .small1)
 
-						Spacer()
+						Spacer(minLength: 0)
 
 						Text(stakeClaimNFT.tokenAmount)
 							.foregroundColor(.app.gray1)
