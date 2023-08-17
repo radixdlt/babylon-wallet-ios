@@ -75,7 +75,7 @@ public struct TokenThumbnail: View {
 			Image(asset: AssetResource.xrd)
 				.resizable()
 		case let .known(url):
-			LoadableImage(url: url, size: .fixedSize(size), placeholders: .init(brokenImage: .standard)) {
+			LoadableImage(url: url, size: .fixedSize(size)) {
 				placeholder
 			}
 		case .unknown:
@@ -236,11 +236,14 @@ public struct LoadableImage<Placeholder: View>: View {
 				.frame(width: brokenImageSize.width, height: brokenImageSize.height)
 		case .brokenImage:
 			HStack(spacing: 0) {
-				Spacer(minLength: .small1)
+				Spacer(minLength: .small2)
 
 				Image(asset: AssetResource.brokenImagePlaceholder)
+					.resizable()
+					.aspectRatio(1, contentMode: .fit)
+					.frame(maxWidth: .large1, maxHeight: .large1)
 
-				Spacer(minLength: .small1)
+				Spacer(minLength: .small2)
 			}
 			.frame(width: brokenImageSize.width, height: brokenImageSize.height)
 			.background(.app.gray4)
