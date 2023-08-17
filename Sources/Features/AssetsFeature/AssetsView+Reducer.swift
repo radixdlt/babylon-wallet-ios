@@ -243,12 +243,13 @@ extension AssetsView.State {
 			return nil
 		}
 
-		let lsuClaimNonFungibleResources = (poolUnitsList.lsuResource?.stakes)
+		let stakeClaimNonFungibleResources = (poolUnitsList.lsuResource?.stakes)
 			.map {
 				$0.compactMap {
 					guard
 						let resource = $0.stake.stakeClaimResource,
-						let selectedAssets = $0.selectedStakeClaimAssets
+						let selectedAssets = $0.selectedStakeClaimAssets,
+						!selectedAssets.isEmpty
 					else {
 						return Mode.SelectedAssets.NonFungibleTokensPerResource?.none
 					}
@@ -263,7 +264,10 @@ extension AssetsView.State {
 				}
 			}
 		let nonFungibleResources = nonFungibleTokenList.rows.compactMap {
-			if let selectedAssets = $0.selectedAssets, !selectedAssets.isEmpty {
+			if
+				let selectedAssets = $0.selectedAssets,
+				!selectedAssets.isEmpty
+			{
 				let selected = $0.resource.tokens.filter { token in selectedAssets.contains(token.id) }
 
 				return Mode.SelectedAssets.NonFungibleTokensPerResource(
@@ -279,7 +283,7 @@ extension AssetsView.State {
 		guard
 			fungibleResources.xrdResource != nil
 			|| !fungibleResources.nonXrdResources.isEmpty
-			|| !(nonFungibleResources + (lsuClaimNonFungibleResources ?? [])).isEmpty
+			|| !(nonFungibleResources + (stakeClaimNonFungibleResources ?? [])).isEmpty
 		else {
 			return nil
 		}
@@ -287,7 +291,7 @@ extension AssetsView.State {
 		return .init(
 			fungibleResources: fungibleResources,
 			nonFungibleResources: IdentifiedArrayOf(
-				uniqueElements: nonFungibleResources + (lsuClaimNonFungibleResources ?? [])
+				uniqueElements: nonFungibleResources + (stakeClaimNonFungibleResources ?? [])
 			),
 			disabledNFTs: mode.selectedAssets?.disabledNFTs ?? []
 		)
