@@ -233,6 +233,7 @@ public struct LoadableImage<Placeholder: View>: View {
 		case let .asset(imageAsset):
 			Image(asset: imageAsset)
 				.resizable()
+				.frame(width: brokenImageSize.width, height: brokenImageSize.height)
 		case .brokenImage:
 			HStack(spacing: 0) {
 				Spacer(minLength: .small1)
@@ -241,10 +242,20 @@ public struct LoadableImage<Placeholder: View>: View {
 
 				Spacer(minLength: .small1)
 			}
-			.frame(height: .imagePlaceholderHeight)
+			.frame(width: brokenImageSize.width, height: brokenImageSize.height)
 			.background(.app.gray4)
 		case .standard:
 			placeholder
+				.frame(width: brokenImageSize.width, height: brokenImageSize.height)
+		}
+	}
+
+	private var brokenImageSize: (width: CGFloat?, height: CGFloat) {
+		switch sizingBehaviour {
+		case let .fixedSize(size, _):
+			return (size.frame.width, size.frame.height)
+		case .flexible:
+			return (nil, .imagePlaceholderHeight)
 		}
 	}
 }
@@ -253,11 +264,6 @@ public struct LoadableImage<Placeholder: View>: View {
 public enum LoadableImageSize: Equatable {
 	case fixedSize(HitTargetSize, mode: ImageResizingMode = .aspectFill)
 	case flexible(minAspect: CGFloat, maxAspect: CGFloat)
-
-	var isFixedSize: Bool {
-		if case .fixedSize = self { return true }
-		return false
-	}
 }
 
 // MARK: - LoadableImagePlaceholderBehaviour
