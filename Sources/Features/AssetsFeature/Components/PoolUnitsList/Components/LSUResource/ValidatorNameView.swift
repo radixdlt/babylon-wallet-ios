@@ -11,8 +11,9 @@ struct ValidatorNameView: View {
 	let viewState: ViewState
 
 	var body: some View {
-		HStack(spacing: .small1) {
+		HStack(spacing: .zero) {
 			NFTThumbnail(viewState.imageURL, size: .smallest)
+				.padding(.trailing, .small1)
 
 			Text(viewState.name)
 				.font(.app.body1Header)
