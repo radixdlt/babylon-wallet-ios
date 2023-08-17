@@ -44,8 +44,8 @@ extension AccountsClient: DependencyKey {
 								if let update = updates.first(where: { $0.address == address }) {
 									continuation.yield(update)
 								}
-								continuation.finish()
 							}
+							continuation.finish()
 						} catch {
 							continuation.finish(throwing: error)
 						}

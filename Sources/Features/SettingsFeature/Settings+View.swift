@@ -260,6 +260,8 @@ extension AppSettings.View {
 							.tappable {
 								viewStore.send(row.action)
 							}
+							.frame(height: .largeButtonHeight)
+							.padding(.horizontal, .medium3)
 							.withSeparator
 					}
 				}
