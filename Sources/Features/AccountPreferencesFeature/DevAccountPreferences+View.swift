@@ -93,7 +93,7 @@ extension DevAccountPreferences {
 					.onAppear {
 						viewStore.send(.appeared)
 					}
-					.navigationTitle(L10n.AccountSettings.title)
+					.navigationTitle("Dev Preferences")
 					.sheet(
 						store: store.destination,
 						state: /DevAccountPreferences.Destination.State.showQR,
@@ -124,6 +124,8 @@ extension DevAccountPreferences {
 					.navigationBarTitleColor(.app.gray1)
 					.navigationBarTitleDisplayMode(.inline)
 					.navigationBarInlineTitleFont(.app.secondaryHeader)
+					.toolbarBackground(.app.background, for: .navigationBar)
+					.toolbarBackground(.visible, for: .navigationBar)
 					#endif // os(iOS)
 				}
 			}

@@ -61,7 +61,6 @@ extension AccountPreferences {
 				.listStyle(.grouped)
 				.background(.app.gray4)
 				.navigationTitle(L10n.AccountSettings.title)
-
 				#if os(iOS)
 					.navigationBarTitleColor(.app.gray1)
 					.navigationBarTitleDisplayMode(.inline)
