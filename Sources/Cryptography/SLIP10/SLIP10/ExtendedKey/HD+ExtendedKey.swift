@@ -4,14 +4,14 @@ import Prelude
 // MARK: - HD.ExtendedKey
 extension HD {
 	public struct ExtendedKey<Curve>: Equatable where Curve: SLIP10CurveProtocol {
-		internal let key: Key
+		let key: Key
 
 		public let derivationPath: HD.Path
 
 		public let chainCode: ChainCode
 		public let fingerprint: Fingerprint
 
-		internal init(
+		init(
 			derivationPath: HD.Path,
 			key: Key,
 			chainCode: ChainCode,
@@ -27,7 +27,7 @@ extension HD {
 
 // MARK: - HD.ExtendedKey.Key
 extension HD.ExtendedKey {
-	internal enum Key: Equatable {
+	enum Key: Equatable {
 		case privateKey(Curve.PrivateKey)
 		case publicKeyOnly(Curve.PublicKey)
 
@@ -84,7 +84,7 @@ extension HD.ExtendedKey {
 }
 
 extension HD.ExtendedKey {
-	internal func keyAsData(forceSelectPublicKey: Bool) -> Data {
+	func keyAsData(forceSelectPublicKey: Bool) -> Data {
 		var serializedBytes: Data
 		switch (forceSelectPublicKey, key) {
 		case (false, let .privateKey(privateKey)):
@@ -102,13 +102,13 @@ extension HD.ExtendedKey {
 		return serializedBytes
 	}
 
-	internal func keyAsScalar(forceSelectPublicKey: Bool) -> BigUInt {
+	func keyAsScalar(forceSelectPublicKey: Bool) -> BigUInt {
 		BigUInt(keyAsData(forceSelectPublicKey: forceSelectPublicKey))
 	}
 }
 
 // MARK: - KeyToDerive
-internal enum KeyToDerive: Equatable {
+enum KeyToDerive: Equatable {
 	case derivePublicKeyOnly
 	case derivePrivateKey
 
@@ -120,7 +120,7 @@ internal enum KeyToDerive: Equatable {
 	}
 }
 
-internal func serializeByPrependingByteToReachKeyLength(
+func serializeByPrependingByteToReachKeyLength(
 	scalar: BigUInt,
 	keyLength targetBytecount: Int = 32,
 	prependingByte byteToPrepend: UInt8 = 0x00
@@ -200,7 +200,7 @@ extension HD.ExtendedKey {
 }
 
 extension HD.ExtendedKey {
-	internal func selecting(keyToDerive: KeyToDerive) throws -> Self {
+	func selecting(keyToDerive: KeyToDerive) throws -> Self {
 		let key: Key = try {
 			switch keyToDerive {
 			case .derivePublicKeyOnly:
@@ -262,7 +262,7 @@ extension HD.ExtendedKey {
 	}
 }
 
-internal func keyAndChainCode<Curve: SLIP10CurveProtocol>(
+func keyAndChainCode<Curve: SLIP10CurveProtocol>(
 	curve: Curve.Type,
 	hmacKeyData: Data,
 	s: @autoclosure () throws -> Data,

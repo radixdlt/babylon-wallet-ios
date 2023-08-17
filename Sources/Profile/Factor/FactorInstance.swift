@@ -107,7 +107,7 @@ extension FactorInstance {
 }
 
 extension FactorInstance.Badge {
-	internal enum Discriminator: String, Sendable, Equatable, Codable {
+	enum Discriminator: String, Sendable, Equatable, Codable {
 		case virtual = "virtualSource"
 	}
 
@@ -115,7 +115,7 @@ extension FactorInstance.Badge {
 		case discriminator, virtualSource
 	}
 
-	internal var discriminator: Discriminator {
+	var discriminator: Discriminator {
 		switch self {
 		case .virtual: return .virtual
 		}
@@ -149,7 +149,7 @@ extension FactorInstance.Badge {
 }
 
 extension FactorInstance.Badge.VirtualSource {
-	internal enum Discriminator: String, Sendable, Equatable, Codable {
+	enum Discriminator: String, Sendable, Equatable, Codable {
 		case hierarchicalDeterministic = "hierarchicalDeterministicPublicKey"
 	}
 
@@ -157,7 +157,7 @@ extension FactorInstance.Badge.VirtualSource {
 		case discriminator, hierarchicalDeterministicPublicKey
 	}
 
-	internal var discriminator: Discriminator {
+	var discriminator: Discriminator {
 		switch self {
 		case .hierarchicalDeterministic: return .hierarchicalDeterministic
 		}

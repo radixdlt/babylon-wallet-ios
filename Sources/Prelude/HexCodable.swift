@@ -140,7 +140,7 @@ extension HexCodable {
 #endif // DEBUG
 
 // MARK: - CodableViaHexCodable
-public typealias CodableViaHexCodable = EncodableViaHexCodable & DecodableViaHexCodable
+public typealias CodableViaHexCodable = DecodableViaHexCodable & EncodableViaHexCodable
 
 // MARK: - EncodableViaHexCodable
 public protocol EncodableViaHexCodable: Encodable {

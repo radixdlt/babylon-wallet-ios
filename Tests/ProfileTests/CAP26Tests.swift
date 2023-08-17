@@ -8,7 +8,7 @@ import TestingPrelude
 
 extension SLIP10CurveProtocol {
 	static var curveName: String {
-		Self.curve.rawValue
+		curve.rawValue
 	}
 }
 

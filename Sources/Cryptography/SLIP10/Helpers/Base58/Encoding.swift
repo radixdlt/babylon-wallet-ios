@@ -1,7 +1,7 @@
 import Foundation
 
 // MARK: - Encoding
-internal protocol Encoding {
+protocol Encoding {
 	static var baseAlphabets: String { get }
 	static var zeroAlphabet: Character { get }
 	static var base: Int { get }

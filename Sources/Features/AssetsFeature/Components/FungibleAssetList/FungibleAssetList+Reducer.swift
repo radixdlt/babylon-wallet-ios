@@ -3,6 +3,7 @@ import EngineKit
 import FeaturePrelude
 import SharedModels
 
+// MARK: - FungibleAssetList
 public struct FungibleAssetList: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public var xrdToken: Row.State?

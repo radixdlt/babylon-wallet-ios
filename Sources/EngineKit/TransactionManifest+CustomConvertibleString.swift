@@ -13,7 +13,7 @@ extension TransactionManifest {
 		public static let `default`: Self = .includeBlobsByByteCountOnly
 	}
 
-	internal static func toStringInstructions(
+	static func toStringInstructions(
 		_ instructions: Instructions,
 		separator: String = "\n",
 		argumentSeparator: String = "\n\t"
@@ -37,7 +37,7 @@ extension TransactionManifest {
 			.joined(separator: separator)
 	}
 
-	internal func toStringInstructions(
+	func toStringInstructions(
 		separator: String = "\n",
 		argumentSeparator: String = "\n\t"
 	) throws -> String {
@@ -48,7 +48,7 @@ extension TransactionManifest {
 		)
 	}
 
-	internal func toStringBlobs(
+	func toStringBlobs(
 		preamble: String = "BLOBS\n",
 		label: String = "BLOB\n",
 		formatting: BlobOutputFormat,

@@ -39,7 +39,7 @@ public struct FeaturesPreviewer<Feature>
 		resultFromDelegateAction: @escaping (Feature.DelegateAction) -> TaskResult<Feature.ResultFromFeature>?,
 		withReducer: @escaping (PreviewOfSomeFeatureReducer<Feature>) -> any ReducerProtocol<PreviewOfSomeFeatureReducer<Feature>.State, PreviewOfSomeFeatureReducer<Feature>.Action> = { $0._printChanges() }
 	) -> some Scene {
-		Self.action(
+		action(
 			wrapInNavigationView: wrapInNavigationView,
 			resultFromAction: {
 				switch $0 {

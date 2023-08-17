@@ -1,89 +1,36 @@
-import AccountPortfoliosClient
 import AccountsClient
-import CreateAuthKeyFeature
-import EngineKit
-import FaucetClient
 import FeaturePrelude
-import GatewayAPI
-import ShowQRFeature
-
-#if DEBUG
-// Manifest turning account into Dapp Definition type, debug action...
-import TransactionReviewFeature
-#endif // DEBUG
 
 // MARK: - AccountPreferences
 public struct AccountPreferences: Sendable, FeatureReducer {
 	// MARK: - State
 
 	public struct State: Sendable, Hashable {
-		public let address: AccountAddress
-		public var faucetButtonState: ControlState
+		public var account: Profile.Network.Account
 
 		@PresentationState
-		var destination: Destination.State? = nil
-
-		#if DEBUG
-		public var canCreateAuthSigningKey: Bool
-		public var canTurnIntoDappDefinitionAccountType: Bool
-		public var createFungibleTokenButtonState: ControlState
-		public var createNonFungibleTokenButtonState: ControlState
-		public var createMultipleFungibleTokenButtonState: ControlState
-		public var createMultipleNonFungibleTokenButtonState: ControlState
-		#endif
+		var destinations: Destinations.State? = nil
 
 		public init(
-			address: AccountAddress,
-			faucetButtonState: ControlState = .enabled
+			account: Profile.Network.Account
 		) {
-			self.address = address
-			self.faucetButtonState = faucetButtonState
-
-			#if DEBUG
-			self.canCreateAuthSigningKey = false
-			self.canTurnIntoDappDefinitionAccountType = false
-			self.createFungibleTokenButtonState = .enabled
-			self.createNonFungibleTokenButtonState = .enabled
-			self.createMultipleFungibleTokenButtonState = .enabled
-			self.createMultipleNonFungibleTokenButtonState = .enabled
-			#endif
+			self.account = account
 		}
 	}
 
 	// MARK: - Action
 
 	public enum ViewAction: Sendable, Equatable {
-		case appeared
-		case closeButtonTapped
-		case faucetButtonTapped
-
-		#if DEBUG
-		case turnIntoDappDefinitionAccountTypeButtonTapped
-		case createAndUploadAuthKeyButtonTapped
-		case createFungibleTokenButtonTapped
-		case createNonFungibleTokenButtonTapped
-		case createMultipleFungibleTokenButtonTapped
-		case createMultipleNonFungibleTokenButtonTapped
-		#endif // DEBUG
-
-		case qrCodeButtonTapped
+		case task
+		case rowTapped(AccountPreferences.Section.Row.Kind)
 	}
 
 	public enum InternalAction: Sendable, Equatable {
-		case isAllowedToUseFaucet(TaskResult<Bool>)
-		case callDone(updateControlState: WritableKeyPath<State, ControlState>, changeTo: ControlState = .enabled)
-		case refreshAccountCompleted(TaskResult<AccountPortfolio>)
-		case hideLoader(updateControlState: WritableKeyPath<State, ControlState>)
-		#if DEBUG
-		case createAuthKeyWithAccount(Profile.Network.Account)
-		case reviewTransaction(TransactionManifest)
-		case canCreateAuthSigningKey(Bool)
-		case canTurnIntoDappDefAccountType(Bool)
-		#endif // DEBUG
+		case accountUpdated(Profile.Network.Account)
 	}
 
 	public enum ChildAction: Sendable, Equatable {
-		case destination(PresentationAction<Destination.Action>)
+		case destinations(PresentationAction<Destinations.Action>)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -92,156 +39,71 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 
 	// MARK: - Destination
 
-	public struct Destination: ReducerProtocol {
+	public struct Destinations: ReducerProtocol {
 		public enum State: Equatable, Hashable {
-			case showQR(ShowQR.State)
-			#if DEBUG
-			case createAuthKey(CreateAuthKey.State)
-			case reviewTransaction(TransactionReview.State)
-			#endif // DEBUG
+			case updateAccountLabel(UpdateAccountLabel.State)
+			case devPreferences(DevAccountPreferences.State)
 		}
 
 		public enum Action: Equatable {
-			case showQR(ShowQR.Action)
-			#if DEBUG
-			case createAuthKey(CreateAuthKey.Action)
-			case reviewTransaction(TransactionReview.Action)
-			#endif // DEBUG
+			case updateAccountLabel(UpdateAccountLabel.Action)
+			case devPreferences(DevAccountPreferences.Action)
 		}
 
 		public var body: some ReducerProtocolOf<Self> {
-			Scope(state: /State.showQR, action: /Action.showQR) {
-				ShowQR()
+			Scope(state: /State.updateAccountLabel, action: /Action.updateAccountLabel) {
+				UpdateAccountLabel()
 			}
-			#if DEBUG
-			Scope(state: /State.createAuthKey, action: /Action.createAuthKey) {
-				CreateAuthKey()
+			Scope(state: /State.devPreferences, action: /Action.devPreferences) {
+				DevAccountPreferences()
 			}
-			Scope(state: /State.reviewTransaction, action: /Action.reviewTransaction) {
-				TransactionReview()
-			}
-			#endif // DEBUG
 		}
 	}
 
 	@Dependency(\.accountsClient) var accountsClient
-	@Dependency(\.faucetClient) var faucetClient
-	@Dependency(\.errorQueue) var errorQueue
-	@Dependency(\.accountPortfoliosClient) var accountPortfoliosClient
-
-	#if DEBUG
-	@Dependency(\.gatewayAPIClient) var gatewayAPIClient
-	#endif // DEBUG
 
 	public init() {}
 
 	public var body: some ReducerProtocolOf<Self> {
 		Reduce(core)
-			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
-				Destination()
+			.ifLet(\.$destinations, action: /Action.child .. ChildAction.destinations) {
+				Destinations()
 			}
 	}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
-		case .appeared:
-			return loadIsAllowedToUseFaucet(&state)
-			#if DEBUG
-				.concatenate(with: loadCanCreateAuthSigningKey(state))
-				.concatenate(with: loadCanTurnIntoDappDefAccountType(state))
-			#endif
-
-		case .closeButtonTapped:
-			return .run { send in
-				await send(.delegate(.dismiss))
+		case .task:
+			return .run { [address = state.account.address] send in
+				for try await accountUpdate in await accountsClient.accountUpdates(address) {
+					guard !Task.isCancelled else { return }
+					await send(.internal(.accountUpdated(accountUpdate)))
+				}
 			}
 
-		case .faucetButtonTapped:
-			return call(buttonState: \.faucetButtonState, into: &state) {
-				try await faucetClient.getFreeXRD(.init(recipientAccountAddress: $0))
-			}
-		#if DEBUG
-		case .createAndUploadAuthKeyButtonTapped:
-			return .run { [accountAddress = state.address] send in
-				let account = try await accountsClient.getAccountByAddress(accountAddress)
-				await send(.internal(.createAuthKeyWithAccount(account)))
-			}
+		case .rowTapped(.accountLabel):
+			state.destinations = .updateAccountLabel(.init(account: state.account))
+			return .none
 
-		case .turnIntoDappDefinitionAccountTypeButtonTapped:
-			return .run { [accountAddress = state.address] send in
-				let account = try await accountsClient.getAccountByAddress(accountAddress)
-				let manifest = try TransactionManifest.manifestMarkingAccountAsDappDefinitionType(account: account)
-				await send(.internal(.reviewTransaction(manifest)))
-			} catch: { error, _ in
-				loggerGlobal.warning("Failed to create manifest which turns account into dapp definition account type, error: \(error)")
-			}
+		case .rowTapped(.devPreferences):
+			state.destinations = .devPreferences(.init(address: state.account.address))
+			return .none
 
-		case .createFungibleTokenButtonTapped:
-			return .run { [accountAddress = state.address] send in
-				let account = try await accountsClient.getAccountByAddress(accountAddress)
-				let manifest = try ManifestBuilder.manifestForCreateFungibleToken(account: account.address, networkID: account.networkID)
-				await send(.internal(.reviewTransaction(manifest)))
-			} catch: { error, _ in
-				loggerGlobal.warning("Failed to create manifest which turns account into dapp definition account type, error: \(error)")
-			}
-
-		case .createNonFungibleTokenButtonTapped:
-			return call(buttonState: \.createNonFungibleTokenButtonState, into: &state) {
-				try await faucetClient.createNonFungibleToken(.init(
-					recipientAccountAddress: $0
-				))
-			}
-		case .createMultipleFungibleTokenButtonTapped:
-			return call(buttonState: \.createMultipleFungibleTokenButtonState, into: &state) {
-				try await faucetClient.createFungibleToken(.init(
-					recipientAccountAddress: $0,
-					numberOfTokens: 50
-				))
-			}
-		case .createMultipleNonFungibleTokenButtonTapped:
-			return call(buttonState: \.createMultipleNonFungibleTokenButtonState, into: &state) {
-				try await faucetClient.createNonFungibleToken(.init(
-					recipientAccountAddress: $0,
-					numberOfTokens: 10,
-					numberOfIds: 100
-				))
-			}
-		#endif
-
-		case .qrCodeButtonTapped:
-			state.destination = .showQR(.init(accountAddress: state.address))
+		case .rowTapped:
 			return .none
 		}
 	}
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
-		case let .destination(.presented(action)):
+		case let .destinations(.presented(action)):
 			switch action {
-			#if DEBUG
-			case let .createAuthKey(.delegate(.done(wasSuccessful))):
-				if case .createAuthKey = state.destination {
-					state.destination = nil
-				}
-				if wasSuccessful {
-					state.canCreateAuthSigningKey = false
-				}
+			case .updateAccountLabel(.delegate(.accountLabelUpdated)):
+				state.destinations = nil
 				return .none
-
-			case .reviewTransaction(.delegate(.transactionCompleted)), .reviewTransaction(.delegate(.failed)):
-				if case .reviewTransaction = state.destination {
-					state.destination = nil
-				}
+			case .updateAccountLabel:
 				return .none
-			#endif
-
-			case .showQR(.delegate(.dismiss)):
-				if case .showQR = state.destination {
-					state.destination = nil
-				}
-				return .none
-
-			default:
+			case .devPreferences:
 				return .none
 			}
 
@@ -252,129 +114,9 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
-		case let .isAllowedToUseFaucet(.success(value)):
-			state.faucetButtonState = value ? .enabled : .disabled
+		case let .accountUpdated(updated):
+			state.account = updated
 			return .none
-
-		case let .isAllowedToUseFaucet(.failure(error)):
-			state.faucetButtonState = .disabled
-			errorQueue.schedule(error)
-			return .none
-
-		case .refreshAccountCompleted:
-			state.faucetButtonState = .disabled
-			return .none
-
-		case let .hideLoader(controlStateKeyPath):
-			state[keyPath: controlStateKeyPath] = .enabled
-			return .none
-
-		case let .callDone(controlStateKeyPath, changeTo):
-			if controlStateKeyPath == \State.faucetButtonState {
-				return updateAccountPortfolio(state).concatenate(with: loadIsAllowedToUseFaucet(&state))
-			} else {
-				state[keyPath: controlStateKeyPath] = changeTo
-				return .none
-			}
-
-		#if DEBUG
-		case let .createAuthKeyWithAccount(account):
-			guard !account.hasAuthenticationSigningKey else {
-				return .none
-			}
-			state.destination = .createAuthKey(.init(entity: .account(account)))
-			return .none
-
-		case let .reviewTransaction(manifest):
-			state.destination = .reviewTransaction(.init(
-				transactionManifest: manifest,
-				nonce: .secureRandom(),
-				signTransactionPurpose: .internalManifest(.debugModifyAccount),
-				message: .none
-			))
-			return .none
-
-		case let .canCreateAuthSigningKey(canCreateAuthSigningKey):
-			state.canCreateAuthSigningKey = canCreateAuthSigningKey
-			return .none
-		case let .canTurnIntoDappDefAccountType(canTurnIntoDappDefAccountType):
-			state.canTurnIntoDappDefinitionAccountType = canTurnIntoDappDefAccountType
-			return .none
-		#endif
-		}
-	}
-
-	private func call(
-		buttonState: WritableKeyPath<State, ControlState>,
-		into state: inout State,
-		onSuccess: ControlState = .enabled,
-		call: @escaping @Sendable (AccountAddress) async throws -> Void
-	) -> EffectTask<Action> {
-		state[keyPath: buttonState] = .loading(.local)
-		return .run { [address = state.address] send in
-			try await call(address)
-			await send(.internal(.callDone(updateControlState: buttonState, changeTo: onSuccess)))
-		} catch: { error, send in
-			await send(.internal(.hideLoader(updateControlState: buttonState)))
-			if !Task.isCancelled {
-				errorQueue.schedule(error)
-			}
 		}
 	}
 }
-
-extension AccountPreferences {
-	private func updateAccountPortfolio(_ state: State) -> EffectTask<Action> {
-		.run { [address = state.address] send in
-			await send(.internal(.refreshAccountCompleted(
-				TaskResult { try await accountPortfoliosClient.fetchAccountPortfolio(address, true) }
-			)))
-		}
-	}
-
-	private func loadIsAllowedToUseFaucet(_ state: inout State) -> EffectTask<Action> {
-		state.faucetButtonState = .loading(.local)
-		return .run { [address = state.address] send in
-			await send(.internal(.isAllowedToUseFaucet(
-				TaskResult {
-					await faucetClient.isAllowedToUseFaucet(address)
-				}
-			)))
-		}
-	}
-
-	#if DEBUG
-	private func loadCanCreateAuthSigningKey(_ state: State) -> EffectTask<Action> {
-		.run { [address = state.address] send in
-			let account = try await accountsClient.getAccountByAddress(address)
-
-			await send(.internal(.canCreateAuthSigningKey(!account.hasAuthenticationSigningKey)))
-		}
-	}
-
-	private func loadCanTurnIntoDappDefAccountType(_ state: State) -> EffectTask<Action> {
-		.run { [address = state.address] send in
-
-			do {
-				let isDappDefinitionAccount: Bool = try await gatewayAPIClient
-					.getEntityMetadata(address.address, [.accountType])
-					.accountType == .dappDefinition
-
-				await send(.internal(.canTurnIntoDappDefAccountType(!isDappDefinitionAccount)))
-			} catch {}
-		}
-	}
-	#endif
-}
-
-#if DEBUG
-extension TransactionManifest {
-	fileprivate static func manifestMarkingAccountAsDappDefinitionType(
-		account: Profile.Network.Account
-	) throws -> TransactionManifest {
-		try ManifestBuilder()
-			.setAccountType(from: account.address.asGeneral(), type: "dapp definition")
-			.build(networkId: account.networkID.rawValue)
-	}
-}
-#endif
