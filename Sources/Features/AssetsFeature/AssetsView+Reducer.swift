@@ -206,42 +206,22 @@ extension AssetsView.State {
 	public var selectedAssets: Mode.SelectedAssets? {
 		guard case .selection = mode else { return nil }
 
-		func selectedFungibleResource(_ row: FungibleAssetList.Row.State) -> AccountPortfolio.FungibleResource? {
-			if row.isSelected == true {
-				return row.token
-			}
-			return nil
-		}
-
-		func selectedFungibleResource(_ row: LSUStake.State) -> AccountPortfolio.FungibleResource? {
-			if row.isStakeSelected == true {
-				return row.stake.stakeUnitResource
-			}
-			return nil
-		}
-
-		func selectedFungibleResource(_ row: PoolUnit.State) -> AccountPortfolio.FungibleResource? {
-			if row.isSelected == true {
-				return row.poolUnit.poolUnitResource
-			}
-			return nil
-		}
-
-		let lsuTokens = poolUnitsList.lsuResource?.stakes.compactMap(selectedFungibleResource) ?? []
-		let poolUnitTokens = poolUnitsList.poolUnits.compactMap(selectedFungibleResource)
+		let lsuTokens = poolUnitsList.lsuResource?.stakes
+			.map(SelectedResourceProvider.init)
+			.compactMap(\.selectedResource) ?? []
+		let poolUnitTokens = poolUnitsList.poolUnits
+			.map(SelectedResourceProvider.init)
+			.compactMap(\.selectedResource)
 		let fungibleResources = AccountPortfolio.FungibleResources(
-			xrdResource: fungibleTokenList.xrdToken.flatMap(selectedFungibleResource),
-			nonXrdResources: fungibleTokenList.nonXrdTokens.compactMap(selectedFungibleResource)
+			xrdResource: fungibleTokenList.xrdToken
+				.map(SelectedResourceProvider.init)
+				.flatMap(\.selectedResource),
+			nonXrdResources: fungibleTokenList.nonXrdTokens
+				.map(SelectedResourceProvider.init)
+				.compactMap(\.selectedResource)
 				+ lsuTokens
 				+ poolUnitTokens
 		)
-
-		func selectedNonFungibleResource(_ row: PoolUnit.State) -> AccountPortfolio.FungibleResource? {
-			if row.isSelected == true {
-				return row.poolUnit.poolUnitResource
-			}
-			return nil
-		}
 
 		let stakeClaimNonFungibleResources = (poolUnitsList.lsuResource?.stakes)
 			.map {
@@ -388,5 +368,38 @@ extension AssetsView.State {
 		func nftRowSelectedAssets(_ resource: ResourceAddress) -> OrderedSet<NonFungibleAssetList.Row.State.AssetID>? {
 			selectedAssets.map { $0.nonFungibleResources[id: resource]?.tokens.ids ?? [] }
 		}
+	}
+}
+
+// MARK: - SelectedResourceProvider
+private struct SelectedResourceProvider<Resource> {
+	let isSelected: Bool?
+	let resource: Resource?
+
+	var selectedResource: Resource? {
+		isSelected.flatMap { $0 ? resource : nil }
+	}
+}
+
+extension SelectedResourceProvider<AccountPortfolio.FungibleResource> {
+	init(with row: FungibleAssetList.Row.State) {
+		self.init(
+			isSelected: row.isSelected,
+			resource: row.token
+		)
+	}
+
+	init(with lsuStake: LSUStake.State) {
+		self.init(
+			isSelected: lsuStake.isStakeSelected,
+			resource: lsuStake.stake.stakeUnitResource
+		)
+	}
+
+	init(with poolUnit: PoolUnit.State) {
+		self.init(
+			isSelected: poolUnit.isSelected,
+			resource: poolUnit.poolUnit.poolUnitResource
+		)
 	}
 }
