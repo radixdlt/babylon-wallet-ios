@@ -142,8 +142,8 @@ extension NonFungibleAssetList.Row.View {
 }
 
 private extension NonFungibleAssetList.Row.ViewState {
-	var totalSupply: Int64? {
-		nil
+	var totalSupply: BigDecimal? {
+		resource.totalSupply
 	}
 
 	var nftCount: Int {
