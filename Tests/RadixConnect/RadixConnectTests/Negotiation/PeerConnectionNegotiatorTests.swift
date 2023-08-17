@@ -9,13 +9,13 @@ final class PeerConnectionNegotiatorTests: TestCase {
 	static let encryptionKey = try! SignalingClient.EncryptionKey(rawValue: .init(data: .deadbeef32Bytes))
 	lazy var jsonDecoder: JSONDecoder = {
 		let decoder = JSONDecoder()
-		decoder.userInfo[.clientMessageEncryptonKey] = Self.encryptionKey
+		decoder.userInfo[.clientMessageEncryptionKey] = Self.encryptionKey
 		return decoder
 	}()
 
 	lazy var jsonEncoder: JSONEncoder = {
 		let encoder = JSONEncoder()
-		encoder.userInfo[.clientMessageEncryptonKey] = Self.encryptionKey
+		encoder.userInfo[.clientMessageEncryptionKey] = Self.encryptionKey
 		return encoder
 	}()
 

@@ -167,7 +167,11 @@ public enum CAP23 {
 extension SecurityQuestionsFactorSource {
 	public struct SealedMnemonic: Sendable, Hashable, Codable {
 		public let securityQuestions: NonEmpty<OrderedSet<SecurityQuestion>>
+
+		/// The scheme used to encrypt the Security Questions factor source mnemonic using one combination
+		/// of answers to questions, one of many.
 		public let encryptionScheme: EncryptionScheme
+
 		public let encryptions: NonEmpty<OrderedSet<HexCodable>>
 	}
 }

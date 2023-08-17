@@ -364,7 +364,9 @@ public struct ProfileBackups: Sendable, FeatureReducer {
 
 	private func showImportMnemonic(state: inout State) {
 		state.destination = .importMnemonic(.init(
-			persistAsMnemonicKind: .intoKeychainOnly
+			isWordCountFixed: true,
+			persistAsMnemonicKind: .intoKeychainOnly,
+			wordCount: .twentyFour
 		))
 	}
 

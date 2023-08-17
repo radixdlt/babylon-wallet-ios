@@ -36,13 +36,13 @@ final class SignalingClientTests: TestCase {
 
 	var jsonDecoder: JSONDecoder = {
 		let decoder = JSONDecoder()
-		decoder.userInfo[.clientMessageEncryptonKey] = SignalingClientTests.encryptionKey
+		decoder.userInfo[.clientMessageEncryptionKey] = SignalingClientTests.encryptionKey
 		return decoder
 	}()
 
 	var jsonEncoder: JSONEncoder = {
 		let encoder = JSONEncoder()
-		encoder.userInfo[.clientMessageEncryptonKey] = SignalingClientTests.encryptionKey
+		encoder.userInfo[.clientMessageEncryptionKey] = SignalingClientTests.encryptionKey
 		return encoder
 	}()
 
