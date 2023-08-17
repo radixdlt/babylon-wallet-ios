@@ -37,7 +37,7 @@ public struct UpdateAccountLabel: FeatureReducer {
 			return .run { [account = state.account] send in
 				do {
 					try await accountsClient.updateAccount(account)
-					overlayWindowClient.scheduleHUD(.init(kind: .operationSucceeded("Updated")))
+					overlayWindowClient.scheduleHUD(.init(kind: .operationSucceeded("Updated"))) // FIXME: strings
 					await send(.delegate(.accountLabelUpdated))
 				} catch {
 					errorQueue.schedule(error)
