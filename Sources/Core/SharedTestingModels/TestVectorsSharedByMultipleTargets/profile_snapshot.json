@@ -1,5 +1,8 @@
 {
   "appPreferences" : {
+    "transaction" : {
+      "defaultDepositGuarantee" : "1"
+    },
     "display" : {
       "fiatCurrencyPriceTarget" : "usd",
       "isCurrencyAmountVisible" : true,
@@ -204,7 +207,7 @@
       "description" : "computer unit test",
       "id" : "BABE1442-3C98-41FF-AFB0-D0F5829B020D"
     },
-    "snapshotVersion" : 42
+    "snapshotVersion" : 43
   },
   "networks" : [
     {

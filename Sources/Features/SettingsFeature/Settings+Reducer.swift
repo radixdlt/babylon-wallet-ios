@@ -22,9 +22,8 @@ public struct Settings: Sendable, FeatureReducer {
 		public var shouldShowMigrateOlympiaButton: Bool
 		public var userHasNoP2PLinks: Bool? = nil
 
-		public init() {
-			@Dependency(\.userDefaultsClient) var userDefaultsClient: UserDefaultsClient
-			self.shouldShowMigrateOlympiaButton = !userDefaultsClient.hideMigrateOlympiaButtonKey
+		public init(showMigrateOlympiaButton: Bool = false) {
+			self.shouldShowMigrateOlympiaButton = showMigrateOlympiaButton
 		}
 	}
 
@@ -197,7 +196,7 @@ public struct Settings: Sendable, FeatureReducer {
 	private func hideImportOlympiaHeader(in state: inout State) -> EffectTask<Action> {
 		state.shouldShowMigrateOlympiaButton = false
 		return .run { _ in
-			await userDefaultsClient.setHideMigrateOlympiaButtonKey(true)
+			await userDefaultsClient.setHideMigrateOlympiaButton(true)
 		}
 	}
 }

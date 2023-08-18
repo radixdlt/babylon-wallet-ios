@@ -19,11 +19,11 @@ public struct UserDefaultsClient: Sendable {
 
 extension UserDefaultsClient {
 	private static let hideMigrateOlympiaButtonKey = "hideMigrateOlympiaButton"
-	public var hideMigrateOlympiaButtonKey: Bool {
+	public var hideMigrateOlympiaButton: Bool {
 		boolForKey(Self.hideMigrateOlympiaButtonKey)
 	}
 
-	public func setHideMigrateOlympiaButtonKey(_ value: Bool) async {
+	public func setHideMigrateOlympiaButton(_ value: Bool) async {
 		await setBool(value, Self.hideMigrateOlympiaButtonKey)
 	}
 }

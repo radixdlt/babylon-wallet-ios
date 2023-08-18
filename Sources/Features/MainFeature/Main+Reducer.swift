@@ -44,6 +44,7 @@ public struct Main: Sendable, FeatureReducer {
 
 	@Dependency(\.keychainClient) var keychainClient
 	@Dependency(\.appPreferencesClient) var appPreferencesClient
+	@Dependency(\.userDefaultsClient) var userDefaultsClient: UserDefaultsClient
 
 	public init() {}
 
@@ -60,7 +61,8 @@ public struct Main: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
 		case .home(.delegate(.displaySettings)):
-			state.destination = .settings(.init())
+			let showMigrateOlympiaButton = !userDefaultsClient.hideMigrateOlympiaButton
+			state.destination = .settings(.init(showMigrateOlympiaButton: showMigrateOlympiaButton))
 			return .none
 
 		case let .destination(.presented(.settings(.delegate(.deleteProfileAndFactorSources(keepInIcloudIfPresent))))):
