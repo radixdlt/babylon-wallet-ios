@@ -207,10 +207,10 @@ extension AssetsView.State {
 		guard case .selection = mode else { return nil }
 
 		let lsuTokens = poolUnitsList.lsuResource?.stakes
-			.map(SelectedResourceProvider.init)
+			.compactMap(SelectedResourceProvider.init)
 			.compactMap(\.selectedResource) ?? []
 		let poolUnitTokens = poolUnitsList.poolUnits
-			.map(SelectedResourceProvider.init)
+			.compactMap(SelectedResourceProvider.init)
 			.compactMap(\.selectedResource)
 		let fungibleResources = AccountPortfolio.FungibleResources(
 			xrdResource: fungibleTokenList.xrdToken
@@ -342,7 +342,7 @@ extension AssetsView.State {
 // MARK: - SelectedResourceProvider
 private struct SelectedResourceProvider<Resource> {
 	let isSelected: Bool?
-	let resource: Resource?
+	let resource: Resource
 
 	var selectedResource: Resource? {
 		isSelected.flatMap { $0 ? resource : nil }
@@ -357,17 +357,25 @@ extension SelectedResourceProvider<AccountPortfolio.FungibleResource> {
 		)
 	}
 
-	init(with lsuStake: LSUStake.State) {
+	init?(with lsuStake: LSUStake.State) {
+		guard let resource = lsuStake.stake.stakeUnitResource else {
+			return nil
+		}
+
 		self.init(
 			isSelected: lsuStake.isStakeSelected,
-			resource: lsuStake.stake.stakeUnitResource
+			resource: resource
 		)
 	}
 
-	init(with poolUnit: PoolUnit.State) {
+	init?(with poolUnit: PoolUnit.State) {
+		guard let resource = poolUnit.poolUnit.poolUnitResource else {
+			return nil
+		}
+
 		self.init(
 			isSelected: poolUnit.isSelected,
-			resource: poolUnit.poolUnit.poolUnitResource
+			resource: resource
 		)
 	}
 }
