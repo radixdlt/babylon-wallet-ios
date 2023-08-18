@@ -80,6 +80,7 @@ public enum AssetResource {
   public static let brokenImagePlaceholder = ImageAsset(name: "broken-image-placeholder")
   public static let nft = ImageAsset(name: "nft")
   public static let persona = ImageAsset(name: "persona")
+  public static let poolUnit = ImageAsset(name: "poolUnit")
   public static let token = ImageAsset(name: "token")
   public static let unknownComponent = ImageAsset(name: "unknown-component")
   public static let xrd = ImageAsset(name: "xrd")
