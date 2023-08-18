@@ -1,3 +1,4 @@
+import AppPreferencesClient
 import ComposableArchitecture
 import CryptoKit
 import EngineKit
@@ -43,17 +44,13 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			signTransactionPurpose: SigningPurpose.SignTransactionPurpose,
 			message: Message,
 			feeToAdd: BigDecimal = .temporaryStandardFee, // FIXME: use estimate from `analyze`
-			ephemeralNotaryPrivateKey: Curve25519.Signing.PrivateKey = .init(),
-			customizeGuarantees: TransactionReviewGuarantees.State? = nil
+			ephemeralNotaryPrivateKey: Curve25519.Signing.PrivateKey = .init()
 		) {
 			self.nonce = nonce
 			self.transactionManifest = transactionManifest
 			self.signTransactionPurpose = signTransactionPurpose
 			self.message = message
 			self.fee = feeToAdd
-			if let customizeGuarantees {
-				self.destination = .customizeGuarantees(customizeGuarantees)
-			}
 			self.ephemeralNotaryPrivateKey = ephemeralNotaryPrivateKey
 		}
 
