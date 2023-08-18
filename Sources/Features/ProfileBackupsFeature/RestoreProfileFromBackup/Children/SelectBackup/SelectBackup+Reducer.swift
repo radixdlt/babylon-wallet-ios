@@ -11,10 +11,7 @@ public struct SelectBackup: Sendable, FeatureReducer {
 		public var backupProfileHeaders: ProfileSnapshot.HeaderList?
 		public var selectedProfileHeader: ProfileSnapshot.Header?
 		public var isDisplayingFileImporter: Bool
-
 		public var thisDeviceID: UUID?
-
-		public var importedContent: Either<ProfileSnapshot, ProfileSnapshot.Header>?
 
 		@PresentationState
 		public var destination: Destinations.State?
@@ -45,12 +42,10 @@ public struct SelectBackup: Sendable, FeatureReducer {
 
 	public struct Destinations: Sendable, ReducerProtocol {
 		public enum State: Sendable, Hashable {
-			case importMnemonic(ImportMnemonic.State)
 			case inputEncryptionPassword(EncryptOrDecryptProfile.State)
 		}
 
 		public enum Action: Sendable, Equatable {
-			case importMnemonic(ImportMnemonic.Action)
 			case inputEncryptionPassword(EncryptOrDecryptProfile.Action)
 		}
 
@@ -58,19 +53,17 @@ public struct SelectBackup: Sendable, FeatureReducer {
 			Scope(state: /State.inputEncryptionPassword, action: /Action.inputEncryptionPassword) {
 				EncryptOrDecryptProfile()
 			}
-			Scope(state: /State.importMnemonic, action: /Action.importMnemonic) {
-				ImportMnemonic()
-			}
 		}
 	}
 
 	public enum InternalAction: Sendable, Equatable {
 		case loadBackupProfileHeadersResult(ProfileSnapshot.HeaderList?)
 		case loadThisDeviceIDResult(UUID?)
+		case snapshotWithHeaderNotFoundInCloud(ProfileSnapshot.Header)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
-		case profileImported
+		case selectedProfileSnapshot(ProfileSnapshot, isInCloud: Bool)
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -115,9 +108,17 @@ public struct SelectBackup: Sendable, FeatureReducer {
 			return .none
 
 		case let .tappedUseCloudBackup(profileHeader):
-			state.importedContent = .right(profileHeader)
-			showImportMnemonic(state: &state)
-			return .none
+			return .task {
+				do {
+					guard let snapshot = try await backupsClient.lookupProfileSnapshotByHeader(profileHeader) else {
+						return .internal(.snapshotWithHeaderNotFoundInCloud(profileHeader))
+					}
+					return .delegate(.selectedProfileSnapshot(snapshot, isInCloud: true))
+				} catch {
+					loggerGlobal.error("Failed to load profile snapshot with header, error: \(error), header: \(profileHeader)")
+					return .internal(.snapshotWithHeaderNotFoundInCloud(profileHeader))
+				}
+			}
 
 		case .dismissFileImporter:
 			state.isDisplayingFileImporter = false
@@ -141,7 +142,7 @@ public struct SelectBackup: Sendable, FeatureReducer {
 					return .none
 
 				case let .plaintext(snapshot):
-					importing(snapshot: snapshot, state: &state)
+					return .send(.delegate(.selectedProfileSnapshot(snapshot, isInCloud: false)))
 				}
 			} catch {
 				errorQueue.schedule(error)
@@ -149,11 +150,6 @@ public struct SelectBackup: Sendable, FeatureReducer {
 			}
 			return .none
 		}
-	}
-
-	private func importing(snapshot: ProfileSnapshot, state: inout State) {
-		state.importedContent = .left(snapshot)
-		showImportMnemonic(state: &state)
 	}
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
@@ -165,30 +161,15 @@ public struct SelectBackup: Sendable, FeatureReducer {
 		case let .loadThisDeviceIDResult(identifier):
 			state.thisDeviceID = identifier
 			return .none
+
+		case let .snapshotWithHeaderNotFoundInCloud(headerOfNonFoundProfile):
+			errorQueue.schedule(ProfileNotInCloudFound(header: headerOfNonFoundProfile))
+			return .none
 		}
 	}
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
-		case let .destination(.presented(.importMnemonic(.delegate(.savedInProfile(factorSource))))):
-			guard let importedContent = state.importedContent else {
-				assertionFailure("Imported mnemonic, but didn't import neither a snapshot or a profile header")
-				return .none
-			}
-			loggerGlobal.notice("Starting import snapshot process...")
-			return .run { [importedContent] send in
-				switch importedContent {
-				case let .left(snapshot):
-					loggerGlobal.notice("Importing snapshot...")
-					try await backupsClient.importProfileSnapshot(snapshot, factorSource.id)
-				case let .right(header):
-					try await backupsClient.importCloudProfile(header, factorSource.id)
-				}
-				await send(.delegate(.profileImported))
-			} catch: { error, _ in
-				errorQueue.schedule(error)
-			}
-
 		case .destination(.presented(.inputEncryptionPassword(.delegate(.dismiss)))):
 			state.destination = nil
 			return .none
@@ -196,8 +177,7 @@ public struct SelectBackup: Sendable, FeatureReducer {
 		case let .destination(.presented(.inputEncryptionPassword(.delegate(.successfullyDecrypted(_, decrypted))))):
 			state.destination = nil
 			overlayWindowClient.scheduleHUD(.init(kind: .decryptedProfile))
-			importing(snapshot: decrypted, state: &state)
-			return .none
+			return .send(.delegate(.selectedProfileSnapshot(decrypted, isInCloud: false)))
 
 		case .destination(.presented(.inputEncryptionPassword(.delegate(.successfullyEncrypted)))):
 			preconditionFailure("What? Encrypted? Expected to only have DECRYPTED. Incorrect implementation somewhere...")
@@ -211,12 +191,13 @@ public struct SelectBackup: Sendable, FeatureReducer {
 			return .none
 		}
 	}
+}
 
-	private func showImportMnemonic(state: inout State) {
-		state.destination = .importMnemonic(.init(
-			isWordCountFixed: true,
-			persistAsMnemonicKind: .intoKeychainOnly,
-			wordCount: .twentyFour
-		))
+// MARK: - ProfileNotInCloudFound
+struct ProfileNotInCloudFound: LocalizedError {
+	let header: ProfileSnapshot.Header
+	var errorDescription: String? {
+		// FIXME: Strings
+		"Unable to find wallet backup in cloud."
 	}
 }

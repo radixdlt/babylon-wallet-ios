@@ -17,14 +17,16 @@ extension BackupsClient: DependencyKey {
 
 		@Sendable
 		func importFor(
-			factorSourceID: FactorSourceID,
+			factorSourceIDs: Set<FactorSourceID>,
 			operation: () async throws -> Void
 		) async throws {
 			do {
 				try await operation()
 			} catch {
-				// revert the saved mnemonic
-				try? await secureStorageClient.deleteMnemonicByFactorSourceID(factorSourceID)
+				// revert the saved mnemonica
+				for factorSourceID in factorSourceIDs {
+					try? await secureStorageClient.deleteMnemonicByFactorSourceID(factorSourceID)
+				}
 				throw error
 			}
 		}
@@ -68,13 +70,16 @@ extension BackupsClient: DependencyKey {
 					return nil
 				}
 			},
-			importProfileSnapshot: { snapshot, factorSourceID in
-				try await importFor(factorSourceID: factorSourceID) {
+			lookupProfileSnapshotByHeader: { header in
+				try await secureStorageClient.loadProfileSnapshot(header.id)
+			},
+			importProfileSnapshot: { snapshot, factorSourceIDs in
+				try await importFor(factorSourceIDs: factorSourceIDs) {
 					try await getProfileStore().importProfileSnapshot(snapshot)
 				}
 			},
-			importCloudProfile: { header, factorSourceID in
-				try await importFor(factorSourceID: factorSourceID) {
+			importCloudProfile: { header, factorSourceIDs in
+				try await importFor(factorSourceIDs: factorSourceIDs) {
 					try await getProfileStore().importCloudProfileSnapshot(header)
 				}
 			},

@@ -352,6 +352,7 @@ package.addModules([
 			"BackupsClient",
 			"ImportMnemonicFeature",
 			"OverlayWindowClient",
+			"DeviceFactorSourceClient",
 		],
 		tests: .no
 	),
@@ -388,6 +389,7 @@ package.addModules([
 			"AppPreferencesClient",
 			"AuthorizedDAppsFeature",
 			"CacheClient",
+			"DeviceFactorSourceClient",
 			"DebugInspectProfileFeature",
 			"GatewayAPI",
 			"GatewaySettingsFeature",
@@ -807,11 +809,12 @@ package.addModules([
 	.client(
 		name: "DeviceFactorSourceClient",
 		dependencies: [
+			"AccountsClient",
 			"Cryptography",
 			"FactorSourcesClient",
 			"Profile",
+			"PersonasClient",
 			"SecureStorageClient",
-			"AccountsClient",
 		],
 		tests: .no
 	),

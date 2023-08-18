@@ -40,17 +40,7 @@ extension SelectBackup {
 						)
 					}
 				}
-				.sheet(
-					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-					state: /SelectBackup.Destinations.State.importMnemonic,
-					action: SelectBackup.Destinations.Action.importMnemonic,
-					content: { store in
-						NavigationView {
-							ImportMnemonic.View(store: store)
-								.navigationTitle(L10n.ImportMnemonic.navigationTitle)
-						}
-					}
-				)
+
 				.sheet(
 					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
 					state: /SelectBackup.Destinations.State.inputEncryptionPassword,

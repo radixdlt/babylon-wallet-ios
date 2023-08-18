@@ -1,4 +1,5 @@
 import CasePaths
+import Cryptography
 import EngineKit
 import Prelude
 
@@ -11,7 +12,7 @@ public struct DeviceFactorSource: FactorSourceProtocol {
 
 	public var hint: Hint // We update "name"
 
-	internal init(
+	init(
 		id: ID,
 		common: FactorSource.Common,
 		hint: Hint
@@ -39,11 +40,13 @@ extension DeviceFactorSource {
 
 		/// "iPhone SE 2nd gen"
 		public var model: Model // mutable because name gets `async` fetched and updated later.
+
+		public let mnemonicWordCount: BIP39.WordCount
 	}
 }
 
 extension DeviceFactorSource {
-	internal static func from(
+	static func from(
 		mnemonicWithPassphrase: MnemonicWithPassphrase,
 		model: Hint.Model = "",
 		name: String = "",
@@ -59,7 +62,7 @@ extension DeviceFactorSource {
 				addedOn: addedOn ?? date(),
 				lastUsedOn: lastUsedOn ?? date()
 			),
-			hint: .init(name: name, model: model)
+			hint: .init(name: name, model: model, mnemonicWordCount: mnemonicWithPassphrase.mnemonic.wordCount)
 		)
 	}
 
@@ -71,7 +74,7 @@ extension DeviceFactorSource {
 		lastUsedOn: Date? = nil
 	) throws -> Self {
 		@Dependency(\.date) var date
-		return try Self.from(
+		return try from(
 			mnemonicWithPassphrase: mnemonicWithPassphrase,
 			model: model,
 			name: name,
@@ -89,7 +92,7 @@ extension DeviceFactorSource {
 		lastUsedOn: Date? = nil
 	) throws -> Self {
 		@Dependency(\.date) var date
-		return try Self.from(
+		return try from(
 			mnemonicWithPassphrase: mnemonicWithPassphrase,
 			model: model,
 			name: name,

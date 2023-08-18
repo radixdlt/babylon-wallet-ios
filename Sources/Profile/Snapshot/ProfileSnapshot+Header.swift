@@ -152,7 +152,8 @@ extension ProfileSnapshot.Header.Version {
 	/// - 40: Changed Persona data/field format
 	/// - 41: Nickname is not optional
 	/// - 42: Change counter to not be factor source based.
-	public static let minimum: Self = 42
+	/// - 43: Added `mnemonicWordCount` in `hint` in `DeviceFactorSource`
+	public static let minimum: Self = 43
 }
 
 extension ProfileSnapshot.Header {

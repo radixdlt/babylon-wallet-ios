@@ -1,17 +1,7 @@
 import FeaturePrelude
 
-extension RestoreProfileFromBackupCoordinator.State {
-	var viewState: RestoreProfileFromBackupCoordinator.ViewState {
-		.init()
-	}
-}
-
 // MARK: - RestoreProfileFromBackupCoordinator.View
 extension RestoreProfileFromBackupCoordinator {
-	public struct ViewState: Equatable {
-		// TODO: declare some properties
-	}
-
 	@MainActor
 	public struct View: SwiftUI.View {
 		private let store: StoreOf<RestoreProfileFromBackupCoordinator>
@@ -21,33 +11,53 @@ extension RestoreProfileFromBackupCoordinator {
 		}
 
 		public var body: some SwiftUI.View {
-			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-				// TODO: implement
-				Text("Implement: RestoreProfileFromBackupCoordinator")
-					.background(Color.yellow)
-					.foregroundColor(.red)
-					.onAppear { viewStore.send(.appeared) }
+			NavigationStackStore(
+				store.scope(state: \.path, action: { .child(.path($0)) })
+			) {
+				path(for: store.scope(state: \.root, action: { .child(.root($0)) }))
+
+					// This is required to disable the animation of internal components during transition
+					.transaction { $0.animation = nil }
+			} destination: {
+				path(for: $0)
+			}
+		}
+
+		func path(
+			for store: StoreOf<RestoreProfileFromBackupCoordinator.Path>
+		) -> some SwiftUI.View {
+			SwitchStore(store) {
+				CaseLet(
+					state: /RestoreProfileFromBackupCoordinator.Path.State.selectBackup,
+					action: RestoreProfileFromBackupCoordinator.Path.Action.selectBackup,
+					then: { SelectBackup.View(store: $0) }
+				)
+				CaseLet(
+					state: /RestoreProfileFromBackupCoordinator.Path.State.importMnemonicsFlow,
+					action: RestoreProfileFromBackupCoordinator.Path.Action.importMnemonicsFlow,
+					then: { ImportMnemonicsFlowCoordinator.View(store: $0) }
+				)
 			}
 		}
 	}
 }
 
-#if DEBUG
-import SwiftUI // NB: necessary for previews to appear
-
-// MARK: - RestoreProfileFromBackup_Preview
-struct RestoreProfileFromBackup_Preview: PreviewProvider {
-	static var previews: some View {
-		RestoreProfileFromBackupCoordinator.View(
-			store: .init(
-				initialState: .previewValue,
-				reducer: RestoreProfileFromBackupCoordinator()
-			)
-		)
-	}
-}
-
-extension RestoreProfileFromBackupCoordinator.State {
-	public static let previewValue = Self()
-}
-#endif
+// #if DEBUG
+// import SwiftUI // NB: necessary for previews to appear
+//
+//// MARK: - RestoreProfileFromBackup_Preview
+// struct RestoreProfileFromBackup_Preview: PreviewProvider {
+//	static var previews: some View {
+//		RestoreProfileFromBackupCoordinator.View(
+//			store: .init(
+//				initialState: .previewValue,
+//				reducer: RestoreProfileFromBackupCoordinator()
+//			)
+//		)
+//	}
+// }
+//
+// extension RestoreProfileFromBackupCoordinator.State {
+//	public static let previewValue = Self()
+// }
+// #endif
