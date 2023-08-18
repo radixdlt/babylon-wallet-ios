@@ -20,7 +20,7 @@ public struct LSUStake: FeatureReducer {
 
 	public enum ViewAction: Sendable, Equatable {
 		case didTap
-		case didTapStakeClaimNFT(withID: String)
+		case didTapStakeClaimNFT(withID: ViewState.StakeClaimNFTViewState.ID)
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -87,11 +87,8 @@ public struct LSUStake: FeatureReducer {
 				return .none
 			}
 		case let .didTapStakeClaimNFT(withID: id):
-			if
-				state.isStakeSelected != nil,
-				let assetID = try? AccountPortfolio.NonFungibleResource.NonFungibleToken.ID(nonFungibleGlobalId: id)
-			{
-				state.selectedStakeClaimAssets?.toggle(assetID)
+			if state.isStakeSelected != nil {
+				state.selectedStakeClaimAssets?.toggle(id)
 			}
 
 			return .none

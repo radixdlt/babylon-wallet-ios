@@ -4,8 +4,8 @@ import FeaturePrelude
 extension LSUStake.ViewState {
 	typealias StakeClaimNFTsViewState = NonEmpty<IdentifiedArrayOf<StakeClaimNFTViewState>>
 
-	struct StakeClaimNFTViewState: Identifiable, Equatable {
-		let id: String
+	public struct StakeClaimNFTViewState: Identifiable, Equatable {
+		public let id: NonFungibleGlobalId
 
 		let thumbnail: TokenThumbnail.Content
 		let status: StakeClaimNFTStatus
@@ -178,7 +178,7 @@ extension LSUStake.State {
 							uncheckedUniqueElements: claimNFT.tokens
 								.map { token in
 									LSUStake.ViewState.StakeClaimNFTViewState(
-										id: token.id.asStr(),
+										id: token.id,
 										thumbnail: .xrd,
 										status: token.canBeClaimed ? .readyToClaim : .unstaking,
 										tokenAmount: (token.stakeClaimAmount ?? 0).format(),
