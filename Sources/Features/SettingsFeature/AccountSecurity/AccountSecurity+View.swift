@@ -41,11 +41,11 @@ extension AccountSecurity.View {
 						}
 					}
 
-//					if viewStore.hasLedgerHardwareWalletFactorSources {
-					isUsingVerboseLedgerMode(with: viewStore)
-						.padding(.horizontal, .medium3)
-						.withSeparator
-//					}
+					if viewStore.hasLedgerHardwareWalletFactorSources {
+						isUsingVerboseLedgerMode(with: viewStore)
+							.padding(.horizontal, .medium3)
+							.withSeparator
+					}
 
 					let row = importOlympiaRow
 					SettingsRow(row: row) {

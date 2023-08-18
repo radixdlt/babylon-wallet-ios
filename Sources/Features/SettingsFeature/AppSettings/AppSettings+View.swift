@@ -44,10 +44,12 @@ extension AppSettings {
 							isDeveloperModeEnabled(with: viewStore)
 								.withSeparator
 
+							#if canImport(UIKit)
 							if !RuntimeInfo.isAppStoreBuild {
 								exportLogs(with: viewStore)
 									.withSeparator
 							}
+							#endif
 
 							resetWallet(with: viewStore)
 								.withSeparator
@@ -101,6 +103,7 @@ extension AppSettings {
 			)
 		}
 
+		#if canImport(UIKit)
 		private func exportLogs(with viewStore: ViewStoreOf<AppSettings>) -> some SwiftUI.View {
 			HStack {
 				VStack(alignment: .leading, spacing: 0) {
@@ -125,6 +128,7 @@ extension AppSettings {
 			}
 			.frame(height: .largeButtonHeight)
 		}
+		#endif
 
 		private func resetWallet(with viewStore: ViewStoreOf<AppSettings>) -> some SwiftUI.View {
 			HStack {
@@ -190,6 +194,7 @@ extension URL: Identifiable {
 
 // MARK: - ShareView
 // TODO: This is alternative to `ShareLink`, which does not seem to work properly. Eventually we should make use of it instead of this wrapper.
+#if canImport(UIKit)
 struct ShareView: UIViewControllerRepresentable {
 	typealias UIViewControllerType = UIActivityViewController
 
@@ -201,6 +206,7 @@ struct ShareView: UIViewControllerRepresentable {
 
 	func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}
 }
+#endif
 
 #if DEBUG
 import SwiftUI // NB: necessary for previews to appear
