@@ -87,6 +87,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 	}
 
 	public enum InternalAction: Sendable, Equatable {
+		case defaultDepositGuaranteeLoaded(BigDecimal)
 		case previewLoaded(TaskResult<TransactionToReview>)
 		case addedTransactionFeeToSelectedPayerResult(TaskResult<TransactionManifest>)
 		case createTransactionReview(TransactionReview.TransactionContent)
@@ -136,6 +137,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		}
 	}
 
+	@Dependency(\.appPreferencesClient) var appPreferencesClient
 	@Dependency(\.transactionClient) var transactionClient
 	@Dependency(\.gatewayAPIClient) var gatewayAPIClient
 	@Dependency(\.accountsClient) var accountsClient
@@ -170,15 +172,19 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		switch viewAction {
 		case .appeared:
 			let manifest = state.transactionManifest
-			return .task { [feeToAdd = state.fee, nonce = state.nonce, message = state.message] in
-				await .internal(.previewLoaded(TaskResult {
+			return .run { [feeToAdd = state.fee, nonce = state.nonce, message = state.message] send in
+				let defaultDepositGuarantees = await appPreferencesClient.getPreferences().transaction.defaultDepositGuarantee
+				await send(.internal(.defaultDepositGuaranteeLoaded(defaultDepositGuarantees)))
+
+				let preview = await TaskResult {
 					try await transactionClient.getTransactionReview(.init(
 						manifestToSign: manifest,
 						message: message,
 						nonce: nonce,
 						feeToAdd: feeToAdd
 					))
-				}))
+				}
+				await send(.internal(.previewLoaded(preview)))
 			}
 
 		case .closeTapped:
@@ -413,6 +419,10 @@ public struct TransactionReview: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
+		case let .defaultDepositGuaranteeLoaded(defaultGuarantee):
+			// FIXME: Apply guarantee
+			return .none
+
 		case let .previewLoaded(.failure(error)):
 			return .send(.delegate(.failed(TransactionFailure.failedToPrepareTXReview(.failedToGenerateTXReview(error)))))
 
