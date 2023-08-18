@@ -36,8 +36,9 @@ extension AccountList.Row {
 		let tag: AccountTag?
 
 		let shouldShowSecurityPrompt: Bool
-		let nonFungibleResourcesCount: Int
 		let fungibleResourceIcons: FungibleResources
+		let nonFungibleResourcesCount: Int
+		let poolUnitsCount: Int
 
 		init(state: State) {
 			self.name = state.account.displayName.rawValue
@@ -52,8 +53,6 @@ extension AccountList.Row {
 			self.shouldShowSecurityPrompt = false // state.shouldShowSecurityPrompt
 
 			// Resources
-			self.nonFungibleResourcesCount = state.portfolio.wrappedValue?.nonFungibleResources.count ?? 0
-
 			self.fungibleResourceIcons = {
 				guard let fungibleResources = state.portfolio.wrappedValue?.fungibleResources else {
 					return .init(icons: [], additionalItemsText: nil)
@@ -69,6 +68,10 @@ extension AccountList.Row {
 
 				return .init(icons: icons.dropLast(hiddenCount), additionalItemsText: additionalItems)
 			}()
+
+			self.nonFungibleResourcesCount = state.portfolio.wrappedValue?.nonFungibleResources.count ?? 0
+
+			self.poolUnitsCount = (state.portfolio.wrappedValue?.poolUnitResources.radixNetworkStakes.count ?? 0) + (state.portfolio.wrappedValue?.poolUnitResources.poolUnits.count ?? 0)
 		}
 	}
 
@@ -143,7 +146,13 @@ extension AccountList.Row.View {
 				}
 			}
 
-			// TODO: Add PoolUnits when available
+			if viewStore.poolUnitsCount > 0 {
+				resourcesContainer(text: "\(viewStore.poolUnitsCount)") {
+					Image(asset: AssetResource.poolUnit)
+						.resizable()
+						.frame(Constants.iconSize)
+				}
+			}
 		}
 		.frame(height: Constants.iconSize.rawValue)
 		.shimmer(active: viewStore.isLoadingResources, config: .accountResourcesLoading)
