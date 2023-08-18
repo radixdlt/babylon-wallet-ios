@@ -1,4 +1,5 @@
 import FeaturePrelude
+import ImportMnemonicFeature
 
 extension ImportMnemonicsFlowCoordinator.State {
 	var viewState: ImportMnemonicsFlowCoordinator.ViewState {
@@ -21,13 +22,10 @@ extension ImportMnemonicsFlowCoordinator {
 		}
 
 		public var body: some SwiftUI.View {
-			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-				// TODO: implement
-				Text("Implement: ImportMnemonicsFlowCoordinator")
-					.background(Color.yellow)
-					.foregroundColor(.red)
-					.onAppear { viewStore.send(.appeared) }
-			}
+			IfLetStore(
+				store.scope(state: \.importingMnemonic, action: { .child(.importingMnemonic($0)) }),
+				then: { ImportMnemonic.View(store: $0) }
+			)
 		}
 	}
 }

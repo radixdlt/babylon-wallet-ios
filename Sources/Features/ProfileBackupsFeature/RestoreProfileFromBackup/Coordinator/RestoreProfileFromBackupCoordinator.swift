@@ -69,6 +69,9 @@ public struct RestoreProfileFromBackupCoordinator: Sendable, FeatureReducer {
 			state.path.append(.importMnemonicsFlow(.init(profileSnapshot: profileSnapshot)))
 			return .none
 
+		case let .path(.element(_, action: .importMnemonicsFlow(.delegate(.finishedImportingMnemonics)))):
+			fatalError("nice!")
+
 		default:
 			return .none
 		}

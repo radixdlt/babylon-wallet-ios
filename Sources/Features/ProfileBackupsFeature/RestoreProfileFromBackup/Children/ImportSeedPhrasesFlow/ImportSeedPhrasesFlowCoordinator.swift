@@ -1,6 +1,7 @@
 import Cryptography
 import DeviceFactorSourceClient
 import FeaturePrelude
+import ImportMnemonicFeature
 
 // MARK: - MnemonicToImport
 public struct MnemonicToImport: Sendable, Hashable {
@@ -44,9 +45,14 @@ public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public var mnemonicsLeftToImport: OrderedSet<MnemonicToImport> = []
 		public let profileSnapshot: ProfileSnapshot
+		public var importingMnemonic: ImportMnemonic.State?
 		public init(profileSnapshot: ProfileSnapshot) {
 			self.profileSnapshot = profileSnapshot
 		}
+	}
+
+	public enum ChildAction: Sendable, Equatable {
+		case importingMnemonic(ImportMnemonic.Action)
 	}
 
 	public enum ViewAction: Sendable, Equatable {
@@ -57,9 +63,20 @@ public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 		case loadControlledEntities(TaskResult<IdentifiedArrayOf<EntitiesControlledByFactorSource>>)
 	}
 
+	public enum DelegateAction: Sendable, Equatable {
+		case finishedImportingMnemonics
+	}
+
 	@Dependency(\.deviceFactorSourceClient) var deviceFactorSourceClient
 	@Dependency(\.errorQueue) var errorQueue
 	public init() {}
+
+	public var body: some ReducerProtocolOf<ImportMnemonicsFlowCoordinator> {
+		Reduce(core)
+			.ifLet(\.importingMnemonic, action: /Action.child .. ChildAction.importingMnemonic) {
+				ImportMnemonic()
+			}
+	}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
@@ -85,20 +102,40 @@ public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 				uncheckedUniqueElements: factorSourcesControllingEntities
 					.map(MnemonicToImport.init(entitiesControlledByFactorSource:))
 			)
+			return nextMnemonicIfNeeded(state: &state)
+		}
+	}
+
+	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+		switch childAction {
+		case let .importingMnemonic(.delegate(.notSavedInProfile(mnemonicWithPassphrase))):
+			// FIXME: uh, but actually should not throw....
+			let factorSourceID = try! FactorSourceID.FromHash(kind: .device, mnemonicWithPassphrase: mnemonicWithPassphrase)
+			state.mnemonicsLeftToImport.removeAll(where: { $0.factorSourceID == factorSourceID })
+			return nextMnemonicIfNeeded(state: &state)
+
+		case .importingMnemonic(.delegate(.savedInProfile(_))):
+			preconditionFailure("Incorrect impl")
+			return .none
+
+		default:
 			return .none
 		}
 	}
-}
 
-/*
- private func showImportMnemonic(state: inout State) {
-     state.destination = .importMnemonic(.init(
-         isWordCountFixed: true,
-         persistAsMnemonicKind: .intoKeychainOnly,
-         wordCount: .twentyFour
-     ))
- }
- */
+	private func nextMnemonicIfNeeded(state: inout State) -> EffectTask<Action> {
+		if let next = state.mnemonicsLeftToImport.first {
+			state.importingMnemonic = .init(
+				isWordCountFixed: true,
+				persistAsMnemonicKind: .intoKeychainOnly,
+				wordCount: next.mnemonicWordCount
+			)
+			return .none
+		} else {
+			return .send(.delegate(.finishedImportingMnemonics))
+		}
+	}
+}
 
 /*
  case let .destination(.presented(.importMnemonic(.delegate(.notSavedInProfile(factorSource))))):
