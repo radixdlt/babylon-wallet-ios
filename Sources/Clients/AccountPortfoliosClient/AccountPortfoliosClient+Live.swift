@@ -217,7 +217,7 @@ extension AccountPortfoliosClient {
 		let divisibility = details?.divisibility
 		let behaviors = (details?.roleAssignments).map(extractBehaviors) ?? []
 		let tags = extractTags(item: item)
-		let totalSupply = try details.map { try BigDecimal(fromString: $0.totalSupply) }
+		let totalSupply = details.flatMap { try? BigDecimal(fromString: $0.totalSupply) }
 		let metadata = resource.explicitMetadata
 
 		return AccountPortfolio.FungibleResource(
