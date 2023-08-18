@@ -90,6 +90,7 @@ extension AccountPortfolio {
 		public let behaviors: [AssetBehavior]
 		public let tags: [AssetTag]
 		public let tokens: IdentifiedArrayOf<NonFungibleToken>
+		public let totalSupply: BigDecimal?
 
 		public init(
 			resourceAddress: ResourceAddress,
@@ -98,7 +99,8 @@ extension AccountPortfolio {
 			iconURL: URL? = nil,
 			behaviors: [AssetBehavior] = [],
 			tags: [AssetTag] = [],
-			tokens: IdentifiedArrayOf<NonFungibleToken> = []
+			tokens: IdentifiedArrayOf<NonFungibleToken> = [],
+			totalSupply: BigDecimal? = nil
 		) {
 			self.resourceAddress = resourceAddress
 			self.name = name
@@ -107,6 +109,7 @@ extension AccountPortfolio {
 			self.behaviors = behaviors
 			self.tags = tags
 			self.tokens = tokens
+			self.totalSupply = totalSupply
 		}
 
 		public struct NonFungibleToken: Sendable, Hashable, Identifiable, Codable {

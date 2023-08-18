@@ -52,6 +52,10 @@ extension NonFungibleAssetList.Row.View {
 				Text(viewStore.resource.name ?? "")
 					.foregroundColor(.app.gray1)
 					.textStyle(.secondaryHeader)
+
+				Text(viewStore.supply)
+					.font(.app.body2HighImportance)
+					.foregroundColor(.app.gray2)
 			}
 
 			Spacer()
@@ -131,6 +135,15 @@ extension NonFungibleAssetList.Row.View {
 }
 
 private extension NonFungibleAssetList.Row.ViewState {
+	var supply: String {
+		resource.totalSupply.map {
+			L10n.AssetDetails.NFTDetails.ownedOfTotal(
+				nftCount,
+				Int($0)
+			)
+		} ?? "\(nftCount)"
+	}
+
 	var nftCount: Int {
 		resource.tokens.count
 	}
