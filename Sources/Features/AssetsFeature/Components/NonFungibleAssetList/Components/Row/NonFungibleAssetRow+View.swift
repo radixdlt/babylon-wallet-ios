@@ -53,7 +53,7 @@ extension NonFungibleAssetList.Row.View {
 					.foregroundColor(.app.gray1)
 					.textStyle(.secondaryHeader)
 
-				Text(viewStore.totalSupply)
+				Text(viewStore.supply)
 					.font(.app.body2HighImportance)
 					.foregroundColor(.app.gray2)
 			}
@@ -135,7 +135,7 @@ extension NonFungibleAssetList.Row.View {
 }
 
 private extension NonFungibleAssetList.Row.ViewState {
-	var totalSupply: String {
+	var supply: String {
 		resource.totalSupply.map {
 			L10n.AssetDetails.NFTDetails.ownedOfTotal(
 				nftCount,
