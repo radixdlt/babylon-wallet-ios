@@ -323,7 +323,7 @@ extension AccountPortfoliosClient {
 
 		let behaviors = (details?.roleAssignments).map(extractBehaviors) ?? []
 		let tags = extractTags(item: item)
-		let totalSupply = try details.map { try BigDecimal(fromString: $0.totalSupply) }
+		let totalSupply = details.flatMap { try? BigDecimal(fromString: $0.totalSupply) }
 
 		// Load the nftIds from the resource vault
 		let tokens = try await tokens(resource: resource)
