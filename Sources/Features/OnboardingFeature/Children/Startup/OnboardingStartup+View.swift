@@ -60,7 +60,7 @@ extension OnboardingStartup.View {
 				state: /OnboardingStartup.Destinations.State.restoreFromBackup,
 				action: OnboardingStartup.Destinations.Action.restoreFromBackup,
 				destination: {
-					ProfileBackups.View(store: $0)
+					RestoreProfileFromBackupCoordinator.View(store: $0)
 				}
 			)
 		}

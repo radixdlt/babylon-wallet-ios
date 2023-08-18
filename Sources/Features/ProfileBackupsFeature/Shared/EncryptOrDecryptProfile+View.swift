@@ -1,7 +1,7 @@
 import FeaturePrelude
 
-extension InputEncryptionPassword.State {
-	var viewState: InputEncryptionPassword.ViewState {
+extension EncryptOrDecryptProfile.State {
+	var viewState: EncryptOrDecryptProfile.ViewState {
 		.init(
 			inputtedEncryptionPassword: inputtedEncryptionPassword,
 			confirmedEncryptionPassword: confirmedEncryptionPassword,
@@ -11,8 +11,8 @@ extension InputEncryptionPassword.State {
 	}
 }
 
-// MARK: - InputEncryptionPassword.View
-extension InputEncryptionPassword {
+// MARK: - EncryptOrDecryptProfile.View
+extension EncryptOrDecryptProfile {
 	public struct ViewState: Equatable {
 		let inputtedEncryptionPassword: String
 		let confirmedEncryptionPassword: String
@@ -87,10 +87,10 @@ extension InputEncryptionPassword {
 
 	@MainActor
 	public struct View: SwiftUI.View {
-		private let store: StoreOf<InputEncryptionPassword>
+		private let store: StoreOf<EncryptOrDecryptProfile>
 		@FocusState private var focusedField: State.Field?
 
-		public init(store: StoreOf<InputEncryptionPassword>) {
+		public init(store: StoreOf<EncryptOrDecryptProfile>) {
 			self.store = store
 		}
 

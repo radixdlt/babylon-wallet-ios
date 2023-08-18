@@ -86,7 +86,7 @@ extension View {
 			.authorizedDapps(with: destinationStore)
 			.personas(with: destinationStore)
 			.generalSettings(with: destinationStore)
-			.profileBackups(with: destinationStore)
+			.backUpProfileSettings(with: destinationStore)
 			.ledgerHardwareWallets(with: destinationStore)
 			.mnemonics(with: destinationStore)
 		#if DEBUG
@@ -148,12 +148,12 @@ extension View {
 	}
 
 	@MainActor
-	private func profileBackups(with destinationStore: PresentationStoreOf<AppSettings.Destinations>) -> some View {
+	private func backUpProfileSettings(with destinationStore: PresentationStoreOf<AppSettings.Destinations>) -> some View {
 		navigationDestination(
 			store: destinationStore,
-			state: /AppSettings.Destinations.State.profileBackups,
-			action: AppSettings.Destinations.Action.profileBackups,
-			destination: { ProfileBackups.View(store: $0) }
+			state: /AppSettings.Destinations.State.backUpProfileSettings,
+			action: AppSettings.Destinations.Action.backUpProfileSettings,
+			destination: { BackUpProfileSettings.View(store: $0) }
 		)
 	}
 

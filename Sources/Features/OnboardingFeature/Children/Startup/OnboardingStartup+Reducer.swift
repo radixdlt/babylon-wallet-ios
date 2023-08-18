@@ -26,16 +26,16 @@ public struct OnboardingStartup: Sendable, FeatureReducer {
 
 	public struct Destinations: Sendable, ReducerProtocol {
 		public enum State: Sendable, Hashable {
-			case restoreFromBackup(ProfileBackups.State)
+			case restoreFromBackup(RestoreProfileFromBackupCoordinator.State)
 		}
 
 		public enum Action: Sendable, Equatable {
-			case restoreFromBackup(ProfileBackups.Action)
+			case restoreFromBackup(RestoreProfileFromBackupCoordinator.Action)
 		}
 
 		public var body: some ReducerProtocolOf<Self> {
 			Scope(state: /State.restoreFromBackup, action: /Action.restoreFromBackup) {
-				ProfileBackups()
+				RestoreProfileFromBackupCoordinator()
 			}
 		}
 	}
@@ -51,8 +51,9 @@ public struct OnboardingStartup: Sendable, FeatureReducer {
 		switch viewAction {
 		case .selectedNewWalletUser:
 			return .send(.delegate(.setupNewUser))
+
 		case .selectedRestoreFromBackup:
-			state.destination = .restoreFromBackup(.init(context: .onboarding))
+			state.destination = .restoreFromBackup(.init())
 			return .none
 		}
 	}
@@ -61,6 +62,7 @@ public struct OnboardingStartup: Sendable, FeatureReducer {
 		switch childAction {
 		case .destination(.presented(.restoreFromBackup(.delegate(.profileImported)))):
 			return .send(.delegate(.completed))
+
 		default:
 			return .none
 		}

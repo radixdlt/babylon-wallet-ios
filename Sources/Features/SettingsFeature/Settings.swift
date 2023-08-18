@@ -83,7 +83,7 @@ public struct AppSettings: Sendable, FeatureReducer {
 			case authorizedDapps(AuthorizedDapps.State)
 			case personas(PersonasCoordinator.State)
 			case generalSettings(GeneralSettings.State)
-			case profileBackups(ProfileBackups.State)
+			case backUpProfileSettings(BackUpProfileSettings.State)
 			case ledgerHardwareWallets(LedgerHardwareDevices.State)
 			case mnemonics(DisplayMnemonics.State)
 
@@ -101,7 +101,7 @@ public struct AppSettings: Sendable, FeatureReducer {
 			case authorizedDapps(AuthorizedDapps.Action)
 			case personas(PersonasCoordinator.Action)
 			case generalSettings(GeneralSettings.Action)
-			case profileBackups(ProfileBackups.Action)
+			case backUpProfileSettings(BackUpProfileSettings.Action)
 			case ledgerHardwareWallets(LedgerHardwareDevices.Action)
 			case mnemonics(DisplayMnemonics.Action)
 			case importOlympiaWalletCoordinator(ImportOlympiaWalletCoordinator.Action)
@@ -129,8 +129,8 @@ public struct AppSettings: Sendable, FeatureReducer {
 			Scope(state: /State.generalSettings, action: /Action.generalSettings) {
 				GeneralSettings()
 			}
-			Scope(state: /State.profileBackups, action: /Action.profileBackups) {
-				ProfileBackups()
+			Scope(state: /State.backUpProfileSettings, action: /Action.backUpProfileSettings) {
+				BackUpProfileSettings()
 			}
 			Scope(state: /State.ledgerHardwareWallets, action: /Action.ledgerHardwareWallets) {
 				LedgerHardwareDevices()
@@ -201,7 +201,7 @@ public struct AppSettings: Sendable, FeatureReducer {
 			return .none
 
 		case .profileBackupsButtonTapped:
-			state.destination = .profileBackups(.init(context: .settings))
+			state.destination = .backUpProfileSettings(.init())
 			return .none
 
 		case .ledgerHardwareWalletsButtonTapped:

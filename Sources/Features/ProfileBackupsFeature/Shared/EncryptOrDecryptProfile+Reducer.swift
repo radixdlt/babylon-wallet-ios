@@ -4,8 +4,8 @@ import OverlayWindowClient
 
 public typealias EncryptionPassword = String
 
-// MARK: - InputEncryptionPassword
-public struct InputEncryptionPassword: Sendable, FeatureReducer {
+// MARK: - EncryptOrDecryptProfile
+public struct EncryptOrDecryptProfile: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public enum Mode: Sendable, Hashable {
 			case decrypt(EncryptedProfileSnapshot)
