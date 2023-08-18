@@ -22,7 +22,6 @@ extension ImportMnemonicsFlowCoordinator {
 					IfLetStore(
 						store.scope(state: \.importingMnemonic, action: { .child(.importingMnemonic($0)) }),
 						then: {
-							//                            NavigationView {
 							ImportMnemonic.View(store: $0)
 								.navigationTitle(L10n.ImportMnemonic.navigationTitle)
 						}
