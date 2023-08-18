@@ -41,7 +41,7 @@ struct NFTIDView: View {
 				)
 				.padding(.bottom, .small1)
 			}
-			NFTFooterView(name: name, id: id)
+			NFTNameAndIDView(name: name, id: id)
 		}
 	}
 
@@ -49,8 +49,8 @@ struct NFTIDView: View {
 	private let maxImageAspect: CGFloat = 16 / 9
 }
 
-// MARK: - NFTFooterView
-private struct NFTFooterView: View {
+// MARK: - NFTNameAndIDView
+private struct NFTNameAndIDView: View {
 	let name: String?
 	let id: String
 
