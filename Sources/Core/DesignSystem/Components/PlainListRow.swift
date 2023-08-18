@@ -47,7 +47,7 @@ public struct PlainListRow<Icon: View>: View {
 				Image(asset: AssetResource.chevronRight)
 			}
 		}
-		.frame(minHeight: .largeButtonHeight)
+		.frame(minHeight: .settingsRowHeight)
 		.padding(.horizontal, .medium3)
 	}
 }

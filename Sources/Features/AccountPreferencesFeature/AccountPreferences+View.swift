@@ -42,6 +42,9 @@ extension AccountPreferences {
 									title: row.title,
 									subtitle: row.subtitle
 								)
+								.alignmentGuide(.listRowSeparatorLeading) { $0[.leading] + 16 }
+								.alignmentGuide(.listRowSeparatorTrailing) { $0[.trailing] - 16 }
+								.listRowInsets(EdgeInsets())
 								.onTapGesture {
 									viewStore.send(.rowTapped(row.id))
 								}
@@ -50,7 +53,12 @@ extension AccountPreferences {
 							Text(section.title)
 								.textStyle(.body1HighImportance)
 								.foregroundColor(.app.gray2)
+								.listRowInsets(.init(top: .small1, leading: .medium3, bottom: .medium3, trailing: .medium3))
+						} footer: {
+							Rectangle().fill().frame(height: 0)
+								.listRowInsets(EdgeInsets())
 						}
+						.listSectionSeparator(.hidden)
 						.textCase(nil)
 					}
 				}
@@ -59,6 +67,7 @@ extension AccountPreferences {
 				}
 				.destination(store: store)
 				.listStyle(.grouped)
+				.environment(\.defaultMinListHeaderHeight, 0)
 				.background(.app.gray4)
 				.navigationTitle(L10n.AccountSettings.title)
 				#if os(iOS)
