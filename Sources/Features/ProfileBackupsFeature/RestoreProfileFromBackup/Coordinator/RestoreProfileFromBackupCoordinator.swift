@@ -70,7 +70,7 @@ public struct RestoreProfileFromBackupCoordinator: Sendable, FeatureReducer {
 			return .none
 
 		default:
-			fatalError()
+			return .none
 		}
 	}
 }

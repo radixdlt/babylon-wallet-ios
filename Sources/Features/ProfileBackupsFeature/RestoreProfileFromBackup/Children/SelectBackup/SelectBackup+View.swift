@@ -15,20 +15,29 @@ extension SelectBackup {
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
 				ScrollView {
-					VStack {
+					VStack(spacing: .medium1) {
 						// FIXME: Strings
 						Text("Select a backup to recover your Radix Wallet. You will be asked to enter your seed phrase(s) to recover control of your Accounts and Personas.")
+							.textStyle(.body1Regular)
 
 						// FIXME: Strings
 						Text("Choose a backup on iCloud")
+							.textStyle(.body1Header)
 
 						backupsList(with: viewStore)
 
-						Button(L10n.IOSProfileBackup.importBackupWallet) {
+						Spacer(minLength: 0)
+
+						// FIXME: Strings
+						Button("Import from Backup File Instead") {
 							viewStore.send(.importFromFileInstead)
 						}
-						.buttonStyle(.primaryRectangular)
+						.buttonStyle(.secondaryRectangular(shouldExpand: true))
+
+						Spacer(minLength: 0)
 					}
+					.foregroundColor(.app.gray1)
+					.padding(.medium2)
 					.footer {
 						WithControlRequirements(
 							viewStore.selectedProfileHeader,

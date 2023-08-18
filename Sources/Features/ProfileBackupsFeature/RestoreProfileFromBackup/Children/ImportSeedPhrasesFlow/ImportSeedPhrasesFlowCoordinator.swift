@@ -6,16 +6,23 @@ import FeaturePrelude
 public struct MnemonicToImport: Sendable, Hashable {
 	public let factorSourceID: FactorSourceID.FromHash
 	public let mnemonicWordCount: BIP39.WordCount
+
+	/// As it currently stands we only ever have one "Babylon" `.device` factor source, and it is required
+	/// to be imported, any imported "Olympia" `device` factor source will be skippable.
+	public let isSkippable: Bool
+
 	public let controllingAccounts: [Profile.Network.Account]
 	public let controllingPersonas: [Profile.Network.Persona]
 
 	init(
 		factorSourceID: FactorSourceID.FromHash,
+		isSkippable: Bool,
 		mnemonicWordCount: BIP39.WordCount,
 		controllingAccounts: [Profile.Network.Account],
 		controllingPersonas: [Profile.Network.Persona]
 	) {
 		self.factorSourceID = factorSourceID
+		self.isSkippable = isSkippable
 		self.mnemonicWordCount = mnemonicWordCount
 		self.controllingAccounts = controllingAccounts
 		self.controllingPersonas = controllingPersonas
@@ -24,6 +31,7 @@ public struct MnemonicToImport: Sendable, Hashable {
 	init(entitiesControlledByFactorSource: EntitiesControlledByFactorSource) {
 		self.init(
 			factorSourceID: entitiesControlledByFactorSource.deviceFactorSource.id,
+			isSkippable: entitiesControlledByFactorSource.deviceFactorSource.supportsOlympia,
 			mnemonicWordCount: entitiesControlledByFactorSource.deviceFactorSource.hint.mnemonicWordCount,
 			controllingAccounts: entitiesControlledByFactorSource.accounts,
 			controllingPersonas: entitiesControlledByFactorSource.personas
