@@ -110,15 +110,13 @@ public struct AccountSecurity: Sendable, FeatureReducer {
 			return .none
 
 		case .defaultDepositGuaranteeButtonTapped:
-			state.destination = .depositGuarantees(.init())
+			let depositGuarantee = state.preferences?.transaction.defaultDepositGuarantee ?? 1
+			state.destination = .depositGuarantees(.init(depositGuarantee: depositGuarantee))
 			return .none
 
 		case let .useVerboseModeToggled(useVerboseMode):
 			state.preferences?.display.ledgerHQHardwareWalletSigningDisplayMode = useVerboseMode ? .verbose : .summary
-			guard let preferences = state.preferences else { return .none }
-			return .fireAndForget {
-				try await appPreferencesClient.updatePreferences(preferences)
-			}
+			return savePreferences(state: state)
 
 		case .importFromOlympiaWalletButtonTapped:
 			state.destination = .importOlympiaWallet(.init())
@@ -148,8 +146,22 @@ public struct AccountSecurity: Sendable, FeatureReducer {
 			}
 			return .none
 
+		case .destination(.dismiss):
+			if case let .depositGuarantees(depositGuarantees) = state.destination, let value = depositGuarantees.depositGuarantee {
+				state.preferences?.transaction.defaultDepositGuarantee = value
+				return savePreferences(state: state)
+			}
+			return .none
+
 		case .destination:
 			return .none
+		}
+	}
+
+	private func savePreferences(state: State) -> EffectTask<Action> {
+		guard let preferences = state.preferences else { return .none }
+		return .fireAndForget {
+			try await appPreferencesClient.updatePreferences(preferences)
 		}
 	}
 }
