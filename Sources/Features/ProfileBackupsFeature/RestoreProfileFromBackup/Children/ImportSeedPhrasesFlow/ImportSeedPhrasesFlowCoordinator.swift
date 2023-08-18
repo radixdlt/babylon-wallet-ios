@@ -56,7 +56,7 @@ public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 	}
 
 	public enum ViewAction: Sendable, Equatable {
-		case appeared
+		case onFirstTask
 	}
 
 	public enum InternalAction: Sendable, Equatable {
@@ -80,7 +80,7 @@ public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
-		case .appeared:
+		case .onFirstTask:
 			return .task { [snapshot = state.profileSnapshot] in
 				await .internal(.loadControlledEntities(TaskResult {
 					try await deviceFactorSourceClient.controlledEntities(snapshot)
@@ -136,25 +136,3 @@ public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 		}
 	}
 }
-
-/*
- case let .destination(.presented(.importMnemonic(.delegate(.notSavedInProfile(factorSource))))):
-     guard let importedContent = state.importedContent else {
-         assertionFailure("Imported mnemonic, but didn't import neither a snapshot or a profile header")
-         return .none
-     }
-     loggerGlobal.notice("Starting import snapshot process...")
-     return .run { [importedContent] send in
-         switch importedContent {
-         case let .left(snapshot):
-             loggerGlobal.notice("Importing snapshot...")
-             try await backupsClient.importProfileSnapshot(snapshot, factorSource.id)
-         case let .right(header):
-             try await backupsClient.importCloudProfile(header, factorSource.id)
-         }
-         await send(.delegate(.profileImported))
-     } catch: { error, _ in
-         errorQueue.schedule(error)
-     }
-
- */
