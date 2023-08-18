@@ -2,7 +2,6 @@ import AuthorizedDAppsFeature
 import FeaturePrelude
 import GatewayAPI
 import GatewaySettingsFeature
-import GeneralSettings
 import LedgerHardwareDevicesFeature
 import P2PLinksFeature
 import PersonasFeature
@@ -15,8 +14,8 @@ import SecureStorageClient
 import SecurityStructureConfigurationListFeature
 #endif
 
-// MARK: - AppSettings.View
-extension AppSettings {
+// MARK: - Settings.View
+extension Settings {
 	@MainActor
 	public struct View: SwiftUI.View {
 		private let store: Store
@@ -31,22 +30,46 @@ extension AppSettings {
 		let debugAppInfo: String
 		#endif
 		let shouldShowAddP2PLinkButton: Bool
+		let shouldShowMigrateOlympiaButton: Bool
 		let appVersion: String
 
-		init(state: AppSettings.State) {
+		init(state: Settings.State) {
 			#if DEBUG
 			let retCommitHash: String = buildInformation().version
 			self.debugAppInfo = "RET #\(retCommitHash), SS \(RadixConnectConstants.defaultSignalingServer.absoluteString)"
 			#endif
 
 			self.shouldShowAddP2PLinkButton = state.userHasNoP2PLinks ?? false
+			self.shouldShowMigrateOlympiaButton = state.shouldShowMigrateOlympiaButton
 			@Dependency(\.bundleInfo) var bundleInfo: BundleInfo
 			self.appVersion = L10n.Settings.appVersion(bundleInfo.shortVersion, bundleInfo.version)
 		}
 	}
 }
 
-extension AppSettings.View {
+// MARK: - SettingsRowModel
+struct SettingsRowModel<Feature: FeatureReducer>: Identifiable {
+	var id: String { title }
+
+	let title: String
+	var subtitle: String?
+	let icon: AssetIcon.Content
+	let action: Feature.ViewAction
+}
+
+// MARK: - SettingsRow
+struct SettingsRow<Feature: FeatureReducer>: View {
+	let row: SettingsRowModel<Feature>
+	let action: () -> Void
+
+	var body: some View {
+		PlainListRow(row.icon, title: row.title, subtitle: row.subtitle)
+			.tappable(action)
+			.withSeparator
+	}
+}
+
+extension Settings.View {
 	public var body: some View {
 		WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 			let destinationStore = store.scope(state: \.$destination, action: { .child(.destination($0)) })
@@ -67,238 +90,82 @@ extension AppSettings.View {
 
 // MARK: - Extensions
 
-extension AppSettings.State {
-	var viewState: AppSettings.ViewState {
+extension Settings.State {
+	var viewState: Settings.ViewState {
 		.init(state: self)
 	}
 }
 
-extension View {
-	// NB: this function is split out from the body so the compiler doesn't choke
-	// ("... compiler is unable to type-check this expression in reasonable time...").
-	//
-	// Maybe the new result builder performance improvements in Swift 5.8 will correct this.
+extension Settings.View {
 	@MainActor
-	fileprivate func navigationDestinations(with destinationStore: PresentationStoreOf<AppSettings.Destinations>) -> some View {
-		self
-			.manageP2PLinks(with: destinationStore)
-			.gatewaySettings(with: destinationStore)
-			.authorizedDapps(with: destinationStore)
-			.personas(with: destinationStore)
-			.generalSettings(with: destinationStore)
-			.profileBackups(with: destinationStore)
-			.ledgerHardwareWallets(with: destinationStore)
-			.mnemonics(with: destinationStore)
-		#if DEBUG
-			.importFromOlympiaLegacyWallet(with: destinationStore)
-			.factorSources(with: destinationStore)
-			.debugInspectProfile(with: destinationStore)
-			.securityStructureConfigs(with: destinationStore)
-		#endif // DEBUG
-	}
-
-	@MainActor
-	private func manageP2PLinks(with destinationStore: PresentationStoreOf<AppSettings.Destinations>) -> some View {
-		navigationDestination(
-			store: destinationStore,
-			state: /AppSettings.Destinations.State.manageP2PLinks,
-			action: AppSettings.Destinations.Action.manageP2PLinks,
-			destination: { P2PLinksFeature.View(store: $0) }
-		)
-	}
-
-	@MainActor
-	private func gatewaySettings(with destinationStore: PresentationStoreOf<AppSettings.Destinations>) -> some View {
-		navigationDestination(
-			store: destinationStore,
-			state: /AppSettings.Destinations.State.gatewaySettings,
-			action: AppSettings.Destinations.Action.gatewaySettings,
-			destination: { GatewaySettings.View(store: $0) }
-		)
-	}
-
-	@MainActor
-	private func authorizedDapps(with destinationStore: PresentationStoreOf<AppSettings.Destinations>) -> some View {
-		navigationDestination(
-			store: destinationStore,
-			state: /AppSettings.Destinations.State.authorizedDapps,
-			action: AppSettings.Destinations.Action.authorizedDapps,
-			destination: { AuthorizedDapps.View(store: $0) }
-		)
-	}
-
-	@MainActor
-	private func personas(with destinationStore: PresentationStoreOf<AppSettings.Destinations>) -> some View {
-		navigationDestination(
-			store: destinationStore,
-			state: /AppSettings.Destinations.State.personas,
-			action: AppSettings.Destinations.Action.personas,
-			destination: { PersonasCoordinator.View(store: $0) }
-		)
-	}
-
-	@MainActor
-	private func generalSettings(with destinationStore: PresentationStoreOf<AppSettings.Destinations>) -> some View {
-		navigationDestination(
-			store: destinationStore,
-			state: /AppSettings.Destinations.State.generalSettings,
-			action: AppSettings.Destinations.Action.generalSettings,
-			destination: { GeneralSettings.View(store: $0) }
-		)
-	}
-
-	@MainActor
-	private func profileBackups(with destinationStore: PresentationStoreOf<AppSettings.Destinations>) -> some View {
-		navigationDestination(
-			store: destinationStore,
-			state: /AppSettings.Destinations.State.profileBackups,
-			action: AppSettings.Destinations.Action.profileBackups,
-			destination: { ProfileBackups.View(store: $0) }
-		)
-	}
-
-	@MainActor
-	private func ledgerHardwareWallets(with destinationStore: PresentationStoreOf<AppSettings.Destinations>) -> some View {
-		navigationDestination(
-			store: destinationStore,
-			state: /AppSettings.Destinations.State.ledgerHardwareWallets,
-			action: AppSettings.Destinations.Action.ledgerHardwareWallets,
-			destination: {
-				LedgerHardwareDevices.View(store: $0)
-					.background(.app.gray5)
-					.navigationTitle(L10n.Settings.ledgerHardwareWallets)
-					.toolbarBackground(.visible, for: .navigationBar)
-			}
-		)
-	}
-
-	@MainActor
-	private func mnemonics(with destinationStore: PresentationStoreOf<AppSettings.Destinations>) -> some View {
-		navigationDestination(
-			store: destinationStore,
-			state: /AppSettings.Destinations.State.mnemonics,
-			action: AppSettings.Destinations.Action.mnemonics,
-			destination: { DisplayMnemonics.View(store: $0) }
-		)
-	}
-
-	#if DEBUG
-	@MainActor
-	private func importFromOlympiaLegacyWallet(with destinationStore: PresentationStoreOf<AppSettings.Destinations>) -> some View {
-		sheet(
-			store: destinationStore,
-			state: /AppSettings.Destinations.State.importOlympiaWalletCoordinator,
-			action: AppSettings.Destinations.Action.importOlympiaWalletCoordinator,
-			content: { ImportOlympiaWalletCoordinator.View(store: $0) }
-		)
-	}
-
-	@MainActor
-	private func factorSources(
-		with destinationStore: PresentationStoreOf<AppSettings.Destinations>
-	) -> some View {
-		navigationDestination(
-			store: destinationStore,
-			state: /AppSettings.Destinations.State.debugManageFactorSources,
-			action: AppSettings.Destinations.Action.debugManageFactorSources,
-			destination: { ManageFactorSources.View(store: $0) }
-		)
-	}
-
-	@MainActor
-	private func debugInspectProfile(
-		with destinationStore: PresentationStoreOf<AppSettings.Destinations>
-	) -> some View {
-		navigationDestination(
-			store: destinationStore,
-			state: /AppSettings.Destinations.State.debugInspectProfile,
-			action: AppSettings.Destinations.Action.debugInspectProfile,
-			destination: { DebugInspectProfile.View(store: $0) }
-		)
-	}
-
-	@MainActor
-	private func securityStructureConfigs(
-		with destinationStore: PresentationStoreOf<AppSettings.Destinations>
-	) -> some View {
-		navigationDestination(
-			store: destinationStore,
-			state: /AppSettings.Destinations.State.securityStructureConfigs,
-			action: AppSettings.Destinations.Action.securityStructureConfigs,
-			destination: { SecurityStructureConfigurationListCoordinator.View(store: $0) }
-		)
-	}
-	#endif
-}
-
-// MARK: - SettingsRowModel
-
-extension AppSettings.View {
-	struct RowModel: Identifiable {
-		var id: String { title }
-
-		let title: String
-		var subtitle: String?
-		let icon: AssetIcon.Content
-		let action: AppSettings.ViewAction
-	}
-
-	@MainActor
-	private func settingsView(viewStore: ViewStoreOf<AppSettings>) -> some View {
-		VStack(spacing: .zero) {
-			ScrollView {
-				VStack(spacing: .zero) {
+	private func settingsView(viewStore: ViewStoreOf<Settings>) -> some View {
+		ScrollView {
+			VStack(spacing: .zero) {
+				VStack(spacing: .medium3) {
 					if viewStore.shouldShowAddP2PLinkButton {
 						ConnectExtensionView {
 							viewStore.send(.addP2PLinkButtonTapped)
 						}
-						.padding(.medium3)
 					}
-
-					ForEach(settingsRows()) { row in
-						PlainListRow(row.icon, title: row.title)
-							.tappable {
-								viewStore.send(row.action)
-							}
-							.frame(height: .largeButtonHeight)
-							.padding(.horizontal, .medium3)
-							.withSeparator
+					if viewStore.shouldShowMigrateOlympiaButton {
+						MigrateOlympiaAccountsView {
+							viewStore.send(.importOlympiaButtonTapped)
+						} dismiss: {
+							viewStore.send(.dismissImportOlympiaHeaderButtonTapped)
+						}
+						.transition(headerTransition)
 					}
 				}
-				.padding(.bottom, .large3)
-				VStack(spacing: .zero) {
-					Text(viewStore.appVersion)
-						.foregroundColor(.app.gray2)
-						.textStyle(.body2Regular)
-						.padding(.bottom, .medium1)
+				.padding(.medium3)
 
-					#if DEBUG
-					Text(viewStore.debugAppInfo)
-						.foregroundColor(.app.gray2)
-						.textStyle(.body2Regular)
-						.padding(.bottom, .medium1)
-					#endif // DEBUG
+				ForEach(rows) { row in
+					SettingsRow(row: row) {
+						viewStore.send(row.action)
+					}
 				}
 			}
-			.onAppear {
-				viewStore.send(.appeared)
+			.padding(.bottom, .large3)
+
+			VStack(spacing: .zero) {
+				Text(viewStore.appVersion)
+					.foregroundColor(.app.gray2)
+					.textStyle(.body2Regular)
+					.padding(.bottom, .medium1)
+
+				#if DEBUG
+				Text(viewStore.debugAppInfo)
+					.foregroundColor(.app.gray2)
+					.textStyle(.body2Regular)
+					.padding(.bottom, .medium1)
+				#endif
 			}
+		}
+		.animation(.default, value: viewStore.shouldShowMigrateOlympiaButton)
+		.onAppear {
+			viewStore.send(.appeared)
 		}
 	}
 
+	private var headerTransition: AnyTransition {
+		.scale(scale: 0.8).combined(with: .opacity)
+	}
+
 	@MainActor
-	private func settingsRows() -> [RowModel] {
-		var models: [RowModel] = [
-			.init(
-				title: L10n.Settings.linkedConnectors,
-				icon: .asset(AssetResource.desktopConnections),
-				action: .manageP2PLinksButtonTapped
-			),
-			.init(
-				title: L10n.Settings.gateways,
-				icon: .asset(AssetResource.gateway),
-				action: .gatewaysButtonTapped
-			),
+	private var rows: [SettingsRowModel<Settings>] {
+		var visibleRows = normalRows
+		#if DEBUG
+		visibleRows.append(.init(
+			title: "Debug Settings",
+			icon: .asset(AssetResource.appSettings), // FIXME: Find
+			action: .debugButtonTapped
+		))
+		#endif
+		return visibleRows
+	}
+
+	@MainActor
+	private var normalRows: [SettingsRowModel<Settings>] {
+		[
 			.init(
 				title: L10n.Settings.authorizedDapps,
 				icon: .asset(AssetResource.authorizedDapps),
@@ -310,55 +177,105 @@ extension AppSettings.View {
 				action: .personasButtonTapped
 			),
 			.init(
+				title: "Account Security & Settings", // FIXME: Strings - L10n.Settings.appSettings
+				icon: .asset(AssetResource.accountSecurity),
+				action: .accountSecurityButtonTapped
+			),
+			.init(
 				title: L10n.Settings.appSettings,
-				icon: .asset(AssetResource.generalSettings),
-				action: .generalSettingsButtonTapped
-			),
-			.init(
-				title: L10n.Settings.backups,
-				subtitle: nil, // TODO: Determine, if possible, the date of last backup.
-				icon: .asset(AssetResource.backups),
-				action: .profileBackupsButtonTapped
-			),
-			.init(
-				title: L10n.Settings.ledgerHardwareWallets,
-				icon: .asset(AssetResource.ledger),
-				action: .ledgerHardwareWalletsButtonTapped
-			),
-			.init(
-				title: L10n.SeedPhrases.title,
-				icon: .asset(AssetResource.ellipsis),
-				action: .mnemonicsButtonTapped
+				icon: .asset(AssetResource.appSettings),
+				action: .appSettingsButtonTapped
 			),
 		]
-
-		#if DEBUG
-		models.append(contentsOf: [
-			.init(
-				title: L10n.Settings.importFromLegacyWallet,
-				icon: .asset(AssetResource.generalSettings),
-				action: .importFromOlympiaWalletButtonTapped
-			),
-			.init(
-				title: L10n.Settings.multiFactor,
-				icon: .systemImage("lock.square.stack.fill"),
-				action: .securityStructureConfigsButtonTapped
-			),
-			.init( // ONLY DEBUG EVER
-				title: "Factor sources",
-				icon: .systemImage("person.badge.key"),
-				action: .factorSourcesButtonTapped
-			),
-			.init( // ONLY DEBUG EVER
-				title: "Inspect profile",
-				icon: .systemImage("wallet.pass"),
-				action: .debugInspectProfileButtonTapped
-			),
-		])
-		#endif
-
-		return models
 	}
+}
+
+extension View {
+	@MainActor
+	fileprivate func navigationDestinations(with destinationStore: PresentationStoreOf<Settings.Destinations>) -> some View {
+		self
+			.importFromOlympiaLegacyWallet(with: destinationStore)
+			.manageP2PLinks(with: destinationStore)
+			.authorizedDapps(with: destinationStore)
+			.personas(with: destinationStore)
+			.accountSecurity(with: destinationStore)
+			.appSettings(with: destinationStore)
+		#if DEBUG
+			.debugSettings(with: destinationStore)
+		#endif
+	}
+
+	@MainActor
+	private func manageP2PLinks(with destinationStore: PresentationStoreOf<Settings.Destinations>) -> some View {
+		navigationDestination(
+			store: destinationStore,
+			state: /Settings.Destinations.State.manageP2PLinks,
+			action: Settings.Destinations.Action.manageP2PLinks,
+			destination: { P2PLinksFeature.View(store: $0) }
+		)
+	}
+
+	@MainActor
+	func importFromOlympiaLegacyWallet(with destinationStore: PresentationStoreOf<Settings.Destinations>) -> some View {
+		sheet(
+			store: destinationStore,
+			state: /Settings.Destinations.State.importOlympiaWallet,
+			action: Settings.Destinations.Action.importOlympiaWallet,
+			content: { ImportOlympiaWalletCoordinator.View(store: $0) }
+		)
+	}
+
+	@MainActor
+	private func authorizedDapps(with destinationStore: PresentationStoreOf<Settings.Destinations>) -> some View {
+		navigationDestination(
+			store: destinationStore,
+			state: /Settings.Destinations.State.authorizedDapps,
+			action: Settings.Destinations.Action.authorizedDapps,
+			destination: { AuthorizedDapps.View(store: $0) }
+		)
+	}
+
+	@MainActor
+	private func personas(with destinationStore: PresentationStoreOf<Settings.Destinations>) -> some View {
+		navigationDestination(
+			store: destinationStore,
+			state: /Settings.Destinations.State.personas,
+			action: Settings.Destinations.Action.personas,
+			destination: { PersonasCoordinator.View(store: $0) }
+		)
+	}
+
+	@MainActor
+	private func accountSecurity(with destinationStore: PresentationStoreOf<Settings.Destinations>) -> some View {
+		navigationDestination(
+			store: destinationStore,
+			state: /Settings.Destinations.State.accountSecurity,
+			action: Settings.Destinations.Action.accountSecurity,
+			destination: { AccountSecurity.View(store: $0) }
+		)
+	}
+
+	@MainActor
+	private func appSettings(with destinationStore: PresentationStoreOf<Settings.Destinations>) -> some View {
+		navigationDestination(
+			store: destinationStore,
+			state: /Settings.Destinations.State.appSettings,
+			action: Settings.Destinations.Action.appSettings,
+			destination: { AppSettings.View(store: $0) }
+		)
+	}
+
+	#if DEBUG
+	@MainActor
+	private func debugSettings(with destinationStore: PresentationStoreOf<Settings.Destinations>) -> some View {
+		navigationDestination(
+			store: destinationStore,
+			state: /Settings.Destinations.State.debugSettings,
+			action: Settings.Destinations.Action.debugSettings,
+			destination: { DebugSettings.View(store: $0) }
+		)
+	}
+	#endif
 }
 
 #if DEBUG
@@ -366,10 +283,10 @@ import SwiftUI // NB: necessary for previews to appear
 
 struct SettingsView_Previews: PreviewProvider {
 	static var previews: some View {
-		AppSettings.View(
+		Settings.View(
 			store: .init(
-				initialState: .init(),
-				reducer: AppSettings()
+				initialState: .init(showMigrateOlympiaButton: true),
+				reducer: Settings()
 			)
 		)
 	}
@@ -379,13 +296,11 @@ struct SettingsView_Previews: PreviewProvider {
 // MARK: - ConnectExtensionView
 struct ConnectExtensionView: View {
 	let action: () -> Void
-}
 
-extension ConnectExtensionView {
 	var body: some View {
 		VStack(spacing: .medium2) {
 			Image(asset: AssetResource.browsers)
-				.padding([.top, .horizontal], .medium1)
+				.padding(.horizontal, .medium1)
 
 			Text(L10n.Settings.LinkToConnectorHeader.title)
 				.textStyle(.body1Header)
@@ -403,19 +318,45 @@ extension ConnectExtensionView {
 					shouldExpand: true,
 					image: .init(asset: AssetResource.qrCodeScanner)
 				))
-				.padding([.bottom, .horizontal], .medium1)
+				.padding(.horizontal, .medium1)
 		}
+		.padding(.vertical, .medium1)
 		.background(Color.app.gray5)
 		.cornerRadius(.medium3)
 	}
 }
 
-#if DEBUG
-import SwiftUI // NB: necessary for previews to appear
+// MARK: - MigrateOlympiaAccountsView
+struct MigrateOlympiaAccountsView: View {
+	let action: () -> Void
+	let dismiss: () -> Void
 
-struct ConnectExtensionView_Previews: PreviewProvider {
-	static var previews: some View {
-		ConnectExtensionView {}
+	var body: some View {
+		VStack(spacing: .medium2) {
+			Text("Radix Olympia Desktop Wallet user?") // FIXME: Strings - L10n.Settings.MigrateOlympiaAccountHeader.title
+				.textStyle(.body1Header)
+				.foregroundColor(.app.gray1)
+				.padding(.horizontal, .medium2)
+
+			Text("Get started importing your Olympia accounts into your new Radix Wallet.") // FIXME: Strings - L10n.Settings.MigrateOlympiaAccountHeader.subtitle
+				.foregroundColor(.app.gray2)
+				.textStyle(.body2Regular)
+				.multilineTextAlignment(.center)
+				.padding(.horizontal, .medium1)
+
+			Button("Import Legacy Accounts", action: action) // FIXME: Strings - L10n.Settings.MigrateOlympiaAccountHeader.importLegacyAccounts
+				.buttonStyle(.secondaryRectangular(
+					shouldExpand: true,
+					image: .init(asset: AssetResource.qrCodeScanner) // FIXME: Pick asset
+				))
+				.padding(.horizontal, .medium1)
+		}
+		.padding(.vertical, .medium1)
+		.background(Color.app.gray5)
+		.cornerRadius(.medium3)
+		.overlay(alignment: .topTrailing) {
+			CloseButton(action: dismiss)
+				.offset(x: .small3, y: -.small3)
+		}
 	}
 }
-#endif
