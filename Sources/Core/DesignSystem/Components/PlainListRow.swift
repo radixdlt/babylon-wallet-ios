@@ -3,39 +3,41 @@ import SwiftUI
 
 // MARK: - PlainListRow
 public struct PlainListRow<Icon: View>: View {
-	let isShowingChevron: Bool
+	let accessory: ImageAsset?
 	let title: String
 	let subtitle: String?
-	let icon: Icon
+	let icon: Icon?
 
 	public init(
 		title: String,
 		subtitle: String? = nil,
-		showChevron: Bool = true,
+		accessory: ImageAsset? = AssetResource.chevronRight,
 		@ViewBuilder icon: () -> Icon
 	) {
-		self.isShowingChevron = showChevron
+		self.accessory = accessory
 		self.title = title
 		self.subtitle = subtitle
 		self.icon = icon()
 	}
 
 	public init(
-		_ content: AssetIcon.Content,
+		_ content: AssetIcon.Content?,
 		title: String,
 		subtitle: String? = nil,
-		showChevron: Bool = true
+		accessory: ImageAsset? = AssetResource.chevronRight
 	) where Icon == AssetIcon {
-		self.isShowingChevron = showChevron
+		self.accessory = accessory
 		self.title = title
 		self.subtitle = subtitle
-		self.icon = AssetIcon(content)
+		self.icon = content.map { AssetIcon($0) }
 	}
 
 	public var body: some View {
 		HStack(spacing: .zero) {
-			icon
-				.padding(.trailing, .medium3)
+			if let icon {
+				icon
+					.padding(.trailing, .medium3)
+			}
 			VStack(alignment: .leading, spacing: .zero) {
 				Text(title)
 					.textStyle(.secondaryHeader)
@@ -46,9 +48,9 @@ public struct PlainListRow<Icon: View>: View {
 						.foregroundColor(.app.gray2)
 				}
 			}
-			Spacer(minLength: 0)
-			if isShowingChevron {
-				Image(asset: AssetResource.chevronRight)
+			Spacer(minLength: .medium3)
+			if let accessory {
+				Image(asset: accessory)
 			}
 		}
 	}
@@ -84,8 +86,7 @@ struct PlainListRow_Previews: PreviewProvider {
 	static var previews: some View {
 		PlainListRow(
 			.asset(AssetResource.generalSettings),
-			title: "A title",
-			showChevron: true
+			title: "A title"
 		)
 	}
 }

@@ -28,30 +28,33 @@ extension UpdateAccountLabel {
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				VStack(alignment: .center, spacing: .medium1) {
-					AppTextField(
-						primaryHeading: "Enter a new label for this account", // FIXME: strings
-						placeholder: "Your account label", // FIXME: strings
-						text: viewStore.binding(
-							get: \.accountLabel,
-							send: { .accountLabelChanged($0) }
-						),
-						hint: viewStore.hint
-					)
+					VStack {
+						AppTextField(
+							primaryHeading: "Enter a new label for this account", // FIXME: strings
+							placeholder: "Your account label", // FIXME: strings
+							text: viewStore.binding(
+								get: \.accountLabel,
+								send: { .accountLabelChanged($0) }
+							),
+							hint: viewStore.hint
+						)
 
-					WithControlRequirements(
-						NonEmpty(viewStore.accountLabel),
-						forAction: { viewStore.send(.updateTapped($0)) }
-					) { action in
-						Button("Update") { // FIXME: strings
-							action()
+						WithControlRequirements(
+							NonEmpty(viewStore.accountLabel),
+							forAction: { viewStore.send(.updateTapped($0)) }
+						) { action in
+							Button("Update") { // FIXME: strings
+								action()
+							}
+							.buttonStyle(.primaryRectangular)
+							.controlState(viewStore.updateButtonControlState)
 						}
-						.buttonStyle(.primaryRectangular)
-						.controlState(viewStore.updateButtonControlState)
-					}
+					}.background(.app.background)
 
 					Spacer()
 				}
 				.padding(.large3)
+				.background(.app.gray2)
 				.navigationTitle("Rename Account") // FIXME: strings
 				.navigationBarTitleColor(.app.gray1)
 				.navigationBarTitleDisplayMode(.inline)

@@ -22,7 +22,7 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 
 	public enum ViewAction: Sendable, Equatable {
 		case task
-		case rowTapped(AccountPreferences.Section.Row.Kind)
+		case rowTapped(AccountPreferences.Section.SectionRow)
 	}
 
 	public enum InternalAction: Sendable, Equatable {
@@ -42,17 +42,22 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 	public struct Destinations: ReducerProtocol {
 		public enum State: Equatable, Hashable {
 			case updateAccountLabel(UpdateAccountLabel.State)
+			case thirdPartyDeposits(ThirdPartyDeposits.State)
 			case devPreferences(DevAccountPreferences.State)
 		}
 
 		public enum Action: Equatable {
 			case updateAccountLabel(UpdateAccountLabel.Action)
+			case thirdPartyDeposits(ThirdPartyDeposits.Action)
 			case devPreferences(DevAccountPreferences.Action)
 		}
 
 		public var body: some ReducerProtocolOf<Self> {
 			Scope(state: /State.updateAccountLabel, action: /Action.updateAccountLabel) {
 				UpdateAccountLabel()
+			}
+			Scope(state: /State.thirdPartyDeposits, action: /Action.thirdPartyDeposits) {
+				ThirdPartyDeposits()
 			}
 			Scope(state: /State.devPreferences, action: /Action.devPreferences) {
 				DevAccountPreferences()
@@ -81,12 +86,16 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 				}
 			}
 
-		case .rowTapped(.accountLabel):
+		case .rowTapped(.personalize(.accountLabel)):
 			state.destinations = .updateAccountLabel(.init(account: state.account))
 			return .none
 
-		case .rowTapped(.devPreferences):
+		case .rowTapped(.dev(.devPreferences)):
 			state.destinations = .devPreferences(.init(address: state.account.address))
+			return .none
+
+		case .rowTapped(.onLedger(.thirdPartyDeposits)):
+			state.destinations = .thirdPartyDeposits(.init(account: state.account))
 			return .none
 
 		case .rowTapped:
@@ -102,6 +111,8 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 				state.destinations = nil
 				return .none
 			case .updateAccountLabel:
+				return .none
+			case .thirdPartyDeposits:
 				return .none
 			case .devPreferences:
 				return .none
