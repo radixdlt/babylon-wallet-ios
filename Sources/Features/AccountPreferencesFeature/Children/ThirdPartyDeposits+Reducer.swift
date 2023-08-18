@@ -22,7 +22,7 @@ public struct ThirdPartyDeposits: FeatureReducer {
 
 	public enum ViewAction: Equatable {
 		case updateTapped
-		case rowTapped(ThirdPartyDeposits.State.RowKind)
+		case rowTapped(ThirdPartyDeposits.Section.Row)
 	}
 
 	public enum DelegateAction: Equatable {
@@ -37,13 +37,13 @@ public struct ThirdPartyDeposits: FeatureReducer {
 		switch viewAction {
 		case let .rowTapped(row):
 			switch row {
-			case .depositMode(.acceptAll):
+			case .depositsMode(.acceptAll):
 				state.depositMode = .acceptAll
-			case .depositMode(.acceptKnown):
+			case .depositsMode(.acceptKnown):
 				state.depositMode = .acceptKnown
-			case .depositMode(.denyAll):
+			case .depositsMode(.denyAll):
 				state.depositMode = .denyAll
-			case .allowDenyResources:
+			case .allowDenyAssets:
 				// navigate
 				return .none
 			}
