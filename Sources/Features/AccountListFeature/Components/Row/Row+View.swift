@@ -53,11 +53,16 @@ extension AccountList.Row {
 			self.shouldShowSecurityPrompt = false // state.shouldShowSecurityPrompt
 
 			// Resources
-			self.fungibleResourceIcons = {
-				guard let fungibleResources = state.portfolio.wrappedValue?.fungibleResources else {
-					return .init(icons: [], additionalItemsText: nil)
-				}
+			guard let portfolio = state.portfolio.wrappedValue else {
+				self.fungibleResourceIcons = .init(icons: [], additionalItemsText: nil)
+				self.nonFungibleResourcesCount = 0
+				self.poolUnitsCount = 0
 
+				return
+			}
+
+			self.fungibleResourceIcons = {
+				let fungibleResources = portfolio.fungibleResources
 				let xrdIcon: [TokenThumbnail.Content] = fungibleResources.xrdResource != nil ? [.xrd] : []
 
 				let otherIcons: [TokenThumbnail.Content] = fungibleResources.nonXrdResources
@@ -69,9 +74,10 @@ extension AccountList.Row {
 				return .init(icons: icons.dropLast(hiddenCount), additionalItemsText: additionalItems)
 			}()
 
-			self.nonFungibleResourcesCount = state.portfolio.wrappedValue?.nonFungibleResources.count ?? 0
+			self.nonFungibleResourcesCount = portfolio.nonFungibleResources.count
 
-			self.poolUnitsCount = (state.portfolio.wrappedValue?.poolUnitResources.radixNetworkStakes.count ?? 0) + (state.portfolio.wrappedValue?.poolUnitResources.poolUnits.count ?? 0)
+			self.poolUnitsCount = portfolio.poolUnitResources.radixNetworkStakes.count
+				+ portfolio.poolUnitResources.poolUnits.count
 		}
 	}
 
