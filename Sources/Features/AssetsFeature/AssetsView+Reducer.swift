@@ -210,7 +210,7 @@ extension AssetsView.State {
 			.compactMap(SelectedResourceProvider.init)
 			.compactMap(\.selectedResource) ?? []
 		let poolUnitTokens = poolUnitsList.poolUnits
-			.compactMap(SelectedResourceProvider.init)
+			.map(SelectedResourceProvider.init)
 			.compactMap(\.selectedResource)
 		let fungibleResources = AccountPortfolio.FungibleResources(
 			xrdResource: fungibleTokenList.xrdToken
@@ -368,14 +368,10 @@ extension SelectedResourceProvider<AccountPortfolio.FungibleResource> {
 		)
 	}
 
-	init?(with poolUnit: PoolUnit.State) {
-		guard let resource = poolUnit.poolUnit.poolUnitResource else {
-			return nil
-		}
-
+	init(with poolUnit: PoolUnit.State) {
 		self.init(
 			isSelected: poolUnit.isSelected,
-			resource: resource
+			resource: poolUnit.poolUnit.poolUnitResource
 		)
 	}
 }
