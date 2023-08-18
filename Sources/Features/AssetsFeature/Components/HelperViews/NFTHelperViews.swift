@@ -41,10 +41,7 @@ struct NFTIDView: View {
 				)
 				.padding(.bottom, .small1)
 			}
-			NFTFooterView(
-				name: name,
-				id: id
-			)
+			NFTFooterView(name: name, id: id)
 		}
 	}
 
@@ -58,19 +55,17 @@ private struct NFTFooterView: View {
 	let id: String
 
 	var body: some View {
-		HStack(alignment: .top, spacing: 0) {
-			VStack(alignment: .leading, spacing: .small3) {
-				if let name {
-					Text(name)
-						.textStyle(.body1HighImportance)
-						.foregroundColor(.app.gray1)
-				}
-
-				Text(id)
-					.textStyle(.body2HighImportance)
-					.foregroundColor(.app.gray2)
+		VStack(alignment: .leading, spacing: .small3) {
+			if let name {
+				Text(name)
+					.textStyle(.body1HighImportance)
+					.foregroundColor(.app.gray1)
 			}
-			Spacer(minLength: 0)
+
+			Text(id)
+				.textStyle(.body2HighImportance)
+				.foregroundColor(.app.gray2)
 		}
+		.flushedLeft
 	}
 }
