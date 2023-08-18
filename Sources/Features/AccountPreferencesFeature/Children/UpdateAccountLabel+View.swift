@@ -56,12 +56,18 @@ extension UpdateAccountLabel {
 				.padding(.large3)
 				.background(.app.gray2)
 				.navigationTitle("Rename Account") // FIXME: strings
-				.navigationBarTitleColor(.app.gray1)
-				.navigationBarTitleDisplayMode(.inline)
-				.navigationBarInlineTitleFont(.app.secondaryHeader)
-				.toolbarBackground(.app.background, for: .navigationBar)
-				.toolbarBackground(.visible, for: .navigationBar)
+				.defaultNavBarConfig()
 			}
 		}
+	}
+}
+
+extension View {
+	func defaultNavBarConfig() -> some View {
+		navigationBarTitleColor(.app.gray1)
+			.navigationBarTitleDisplayMode(.inline)
+			.navigationBarInlineTitleFont(.app.secondaryHeader)
+			.toolbarBackground(.app.background, for: .navigationBar)
+			.toolbarBackground(.visible, for: .navigationBar)
 	}
 }

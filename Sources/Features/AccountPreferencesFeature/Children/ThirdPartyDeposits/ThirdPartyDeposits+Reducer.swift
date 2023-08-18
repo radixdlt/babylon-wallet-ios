@@ -1,4 +1,5 @@
 import AccountsClient
+import EngineKit
 import FeaturePrelude
 import OverlayWindowClient
 
@@ -15,6 +16,9 @@ public struct ThirdPartyDeposits: FeatureReducer {
 		// TODO: should be derived/extracted from account
 		var depositMode: ThirdPartyDepositMode = .acceptAll
 
+		@PresentationState
+		var destinations: Destinations.State? = nil
+
 		init(account: Profile.Network.Account) {
 			self.account = account
 		}
@@ -29,9 +33,32 @@ public struct ThirdPartyDeposits: FeatureReducer {
 		case accountUpdated
 	}
 
-	@Dependency(\.accountsClient) var accountsClient
-	@Dependency(\.errorQueue) var errorQueue
-	@Dependency(\.overlayWindowClient) var overlayWindowClient
+	public enum ChildAction: Sendable, Equatable {
+		case destinations(PresentationAction<Destinations.Action>)
+	}
+
+	public struct Destinations: ReducerProtocol {
+		public enum State: Equatable, Hashable {
+			case allowDenyAssets(AllowDenyAssets.State)
+		}
+
+		public enum Action: Equatable {
+			case allowDenyAssets(AllowDenyAssets.Action)
+		}
+
+		public var body: some ReducerProtocolOf<Self> {
+			Scope(state: /State.allowDenyAssets, action: /Action.allowDenyAssets) {
+				AllowDenyAssets()
+			}
+		}
+	}
+
+	public var body: some ReducerProtocolOf<Self> {
+		Reduce(core)
+			.ifLet(\.$destinations, action: /Action.child .. ChildAction.destinations) {
+				Destinations()
+			}
+	}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
@@ -44,7 +71,8 @@ public struct ThirdPartyDeposits: FeatureReducer {
 			case .depositsMode(.denyAll):
 				state.depositMode = .denyAll
 			case .allowDenyAssets:
-				// navigate
+				let x = try! NonFungibleGlobalId(nonFungibleGlobalId: "resource_tdx_22_1nf86mfka4y70zxnlmq84uywdawj05e7x4n7levy0elez72lg73gc8e:#1#")
+				state.destinations = .allowDenyAssets(.init())
 				return .none
 			}
 			return .none

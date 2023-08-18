@@ -42,11 +42,8 @@ extension ThirdPartyDeposits {
 				})
 				.background(.app.gray4)
 				.navigationTitle("Third-party Deposits") // FIXME: strings
-				.navigationBarTitleColor(.app.gray1)
-				.navigationBarTitleDisplayMode(.inline)
-				.navigationBarInlineTitleFont(.app.secondaryHeader)
-				.toolbarBackground(.app.background, for: .navigationBar)
-				.toolbarBackground(.visible, for: .navigationBar)
+				.defaultNavBarConfig()
+				.destination(store: store)
 				.footer {
 					Button("Update", action: {}).buttonStyle(.primaryRectangular)
 				}
@@ -106,6 +103,24 @@ extension PreferenceSection.Row where SectionId == ThirdPartyDeposits.Section, R
 			title: "Allow/Deny specific assets", // FIXME: strings
 			subtitle: "Deny or allow third-party deposits of specific assets, ignoring the setting above", // FIXME: strings
 			icon: nil
+		)
+	}
+}
+
+extension View {
+	@MainActor
+	func destination(store: StoreOf<ThirdPartyDeposits>) -> some View {
+		let destinationStore = store.scope(state: \.$destinations, action: { .child(.destinations($0)) })
+		return allowDenyAssets(with: destinationStore)
+	}
+
+	@MainActor
+	func allowDenyAssets(with destinationStore: PresentationStoreOf<ThirdPartyDeposits.Destinations>) -> some View {
+		navigationDestination(
+			store: destinationStore,
+			state: /ThirdPartyDeposits.Destinations.State.allowDenyAssets,
+			action: ThirdPartyDeposits.Destinations.Action.allowDenyAssets,
+			destination: { AllowDenyAssets.View(store: $0) }
 		)
 	}
 }

@@ -51,6 +51,7 @@ struct PreferenceSection<SectionId: Hashable, RowId: Hashable>: View {
 					subtitle: row.subtitle,
 					accessory: viewState.mode.accessory(rowId: row.id)
 				)
+				.listRowInsets(EdgeInsets())
 				.onTapGesture {
 					onRowSelected(viewState.id, row.id)
 				}

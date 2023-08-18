@@ -53,6 +53,8 @@ public struct PlainListRow<Icon: View>: View {
 				Image(asset: accessory)
 			}
 		}
+		.frame(minHeight: .largeButtonHeight)
+		.padding(.horizontal, .medium3)
 	}
 }
 
