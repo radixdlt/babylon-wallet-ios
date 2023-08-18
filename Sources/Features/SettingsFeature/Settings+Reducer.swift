@@ -97,9 +97,11 @@ public struct Settings: Sendable, FeatureReducer {
 			Scope(state: /State.appSettings, action: /Action.appSettings) {
 				AppSettings()
 			}
+			#if DEBUG
 			Scope(state: /State.debugSettings, action: /Action.debugSettings) {
 				DebugSettings()
 			}
+			#endif
 		}
 	}
 

@@ -1,4 +1,3 @@
-#if DEBUG
 import DebugInspectProfileFeature
 import FeaturePrelude
 import SecurityStructureConfigurationListFeature
@@ -100,4 +99,3 @@ public struct DebugSettings: Sendable, FeatureReducer {
 		}
 	}
 }
-#endif

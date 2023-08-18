@@ -1,4 +1,3 @@
-#if DEBUG
 import DebugInspectProfileFeature
 import EngineKit
 import FeaturePrelude
@@ -110,4 +109,3 @@ private extension View {
 		)
 	}
 }
-#endif
