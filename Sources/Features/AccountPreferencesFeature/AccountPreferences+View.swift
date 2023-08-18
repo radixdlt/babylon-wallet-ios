@@ -42,8 +42,8 @@ extension AccountPreferences {
 									title: row.title,
 									subtitle: row.subtitle
 								)
-								.alignmentGuide(.listRowSeparatorLeading) { $0[.leading] + 16 }
-								.alignmentGuide(.listRowSeparatorTrailing) { $0[.trailing] - 16 }
+								.alignmentGuide(.listRowSeparatorLeading) { $0[.leading] + .medium3 }
+								.alignmentGuide(.listRowSeparatorTrailing) { $0[.trailing] - .medium3 }
 								.listRowInsets(EdgeInsets())
 								.onTapGesture {
 									viewStore.send(.rowTapped(row.id))
