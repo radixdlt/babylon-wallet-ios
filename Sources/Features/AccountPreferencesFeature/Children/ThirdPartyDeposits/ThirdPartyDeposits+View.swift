@@ -40,7 +40,7 @@ extension ThirdPartyDeposits {
 				PreferencesList(viewState: .init(sections: viewStore.sections), onRowSelected: { _, row in
 					viewStore.send(.rowTapped(row))
 				})
-				.background(.app.gray4)
+				.background(.app.gray5)
 				.navigationTitle("Third-party Deposits") // FIXME: strings
 				.defaultNavBarConfig()
 				.destination(store: store)

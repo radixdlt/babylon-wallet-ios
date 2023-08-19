@@ -45,7 +45,7 @@ extension AccountPreferences {
 					viewStore.send(.task)
 				}
 				.destination(store: store)
-				.background(.app.gray4)
+				.background(.app.gray5)
 				.navigationTitle(L10n.AccountSettings.title)
 				#if os(iOS)
 					.navigationBarTitleColor(.app.gray1)

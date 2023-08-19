@@ -49,12 +49,12 @@ extension UpdateAccountLabel {
 							.buttonStyle(.primaryRectangular)
 							.controlState(viewStore.updateButtonControlState)
 						}
-					}.background(.app.background)
-
+					}
+					.padding(.large3)
+					.background(.app.background)
 					Spacer()
 				}
-				.padding(.large3)
-				.background(.app.gray2)
+				.background(.app.gray5)
 				.navigationTitle("Rename Account") // FIXME: strings
 				.defaultNavBarConfig()
 			}

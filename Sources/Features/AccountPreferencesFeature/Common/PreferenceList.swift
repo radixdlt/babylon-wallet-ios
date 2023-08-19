@@ -52,6 +52,7 @@ struct PreferenceSection<SectionId: Hashable, RowId: Hashable>: View {
 					accessory: viewState.mode.accessory(rowId: row.id)
 				)
 				.listRowInsets(EdgeInsets())
+				.padding(.vertical, .small3)
 				.onTapGesture {
 					onRowSelected(viewState.id, row.id)
 				}
@@ -83,6 +84,7 @@ struct PreferencesList<SectionId: Hashable, RowId: Hashable>: View {
 				PreferenceSection(viewState: section, onRowSelected: onRowSelected)
 			}
 		}
+		.scrollContentBackground(.hidden)
 		.listStyle(.grouped)
 	}
 }

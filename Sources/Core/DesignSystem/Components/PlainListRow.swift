@@ -48,7 +48,7 @@ public struct PlainListRow<Icon: View>: View {
 						.foregroundColor(.app.gray2)
 				}
 			}
-			Spacer(minLength: .medium3)
+			Spacer(minLength: .medium1)
 			if let accessory {
 				Image(asset: accessory)
 			}

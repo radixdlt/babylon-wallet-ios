@@ -71,8 +71,7 @@ public struct ThirdPartyDeposits: FeatureReducer {
 			case .depositsMode(.denyAll):
 				state.depositMode = .denyAll
 			case .allowDenyAssets:
-				let x = try! NonFungibleGlobalId(nonFungibleGlobalId: "resource_tdx_22_1nf86mfka4y70zxnlmq84uywdawj05e7x4n7levy0elez72lg73gc8e:#1#")
-				state.destinations = .allowDenyAssets(.init())
+				state.destinations = .allowDenyAssets(.init(list: .deny))
 				return .none
 			}
 			return .none
