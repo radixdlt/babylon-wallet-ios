@@ -71,7 +71,7 @@ public struct ThirdPartyDeposits: FeatureReducer {
 			case .depositsMode(.denyAll):
 				state.depositMode = .denyAll
 			case .allowDenyAssets:
-				state.destinations = .allowDenyAssets(.init(list: .deny))
+				state.destinations = .allowDenyAssets(.init(list: .allow))
 				return .none
 			case .allowDepositors:
 				return .none

@@ -4,11 +4,11 @@ import FeaturePrelude
 public struct AddAsset: FeatureReducer {
 	public struct State: Hashable, Sendable {
 		var type: AllowDenyAssets.State.List
+
 		var resourceAddress: String
 		var resourceAddressFieldFocused: Bool = false
 
-		let currentAllowList: Set<ResourceAddress>
-		let currentDenyList: Set<ResourceAddress>
+		let alreadyAddedResources: Set<ResourceAddress>
 
 		var validatedResourceAddress: ResourceAddress? {
 			guard !resourceAddress.isEmpty else {
@@ -38,12 +38,15 @@ public struct AddAsset: FeatureReducer {
 		switch viewAction {
 		case let .addAssetTapped(resourceAddress):
 			return .send(.delegate(.addAsset(state.type, resourceAddress)))
+
 		case let .resourceAddressChanged(address):
 			state.resourceAddress = address
 			return .none
+
 		case let .addTypeChanged(type):
 			state.type = type
 			return .none
+
 		case let .focusChanged(focus):
 			state.resourceAddressFieldFocused = focus
 			return .none

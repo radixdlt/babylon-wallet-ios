@@ -66,8 +66,7 @@ public struct AllowDenyAssets: FeatureReducer {
 			state.destinations = .addAsset(.init(
 				type: state.list,
 				resourceAddress: "",
-				currentAllowList: state.allowList,
-				currentDenyList: state.denyList
+				alreadyAddedResources: state.allowList.union(state.denyList)
 			))
 			return .none
 		case let .assetRemove(resource):
@@ -81,10 +80,8 @@ public struct AllowDenyAssets: FeatureReducer {
 		case let .destinations(.presented(.addAsset(.delegate(.addAsset(list, newAsset))))):
 			switch list {
 			case .allow:
-				state.denyList.remove(newAsset)
 				state.allowList.insert(newAsset)
 			case .deny:
-				state.allowList.remove(newAsset)
 				state.denyList.insert(newAsset)
 			}
 			state.list = list
