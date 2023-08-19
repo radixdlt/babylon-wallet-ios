@@ -4,7 +4,8 @@ extension UpdateAccountLabel.State {
 	var viewState: UpdateAccountLabel.ViewState {
 		.init(
 			accountLabel: accountLabel,
-			updateButtonControlState: accountLabel.isEmpty ? .disabled : .enabled,
+			sanitizedName: sanitizedName,
+			updateButtonControlState: sanitizedName == nil ? .disabled : .enabled,
 			hint: accountLabel.isEmpty ? .error("Account label required") : nil // FIXME: strings
 		)
 	}
@@ -13,6 +14,7 @@ extension UpdateAccountLabel.State {
 extension UpdateAccountLabel {
 	public struct ViewState: Equatable {
 		let accountLabel: String
+		let sanitizedName: NonEmptyString?
 		let updateButtonControlState: ControlState
 		let hint: Hint?
 	}
@@ -27,20 +29,26 @@ extension UpdateAccountLabel {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-				VStack(alignment: .center, spacing: .medium1) {
-					VStack {
+				VStack {
+					VStack(alignment: .center, spacing: .medium1) {
+						let nameBinding = viewStore.binding(
+							get: \.accountLabel,
+							send: { .accountLabelChanged($0) }
+						)
 						AppTextField(
 							primaryHeading: "Enter a new label for this account", // FIXME: strings
 							placeholder: "Your account label", // FIXME: strings
-							text: viewStore.binding(
-								get: \.accountLabel,
-								send: { .accountLabelChanged($0) }
-							),
+							text: nameBinding,
 							hint: viewStore.hint
 						)
+						#if os(iOS)
+						.textFieldCharacterLimit(Profile.Network.Account.nameMaxLength, forText: nameBinding)
+						#endif
+						.keyboardType(.asciiCapable)
+						.autocorrectionDisabled()
 
 						WithControlRequirements(
-							NonEmpty(viewStore.accountLabel),
+							viewStore.sanitizedName,
 							forAction: { viewStore.send(.updateTapped($0)) }
 						) { action in
 							Button("Update") { // FIXME: strings
@@ -52,6 +60,7 @@ extension UpdateAccountLabel {
 					}
 					.padding(.large3)
 					.background(.app.background)
+
 					Spacer()
 				}
 				.background(.app.gray5)

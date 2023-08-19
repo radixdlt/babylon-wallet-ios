@@ -81,6 +81,12 @@ extension View {
 				.padding(.horizontal, horizontalPadding)
 		}
 	}
+
+	public func tappable(_ action: @escaping () -> Void) -> some View {
+		Button(action: action) {
+			self
+		}
+	}
 }
 
 // MARK: - PlainListRow_Previews

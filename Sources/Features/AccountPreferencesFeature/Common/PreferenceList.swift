@@ -51,11 +51,11 @@ struct PreferenceSection<SectionId: Hashable, RowId: Hashable>: View {
 					subtitle: row.subtitle,
 					accessory: viewState.mode.accessory(rowId: row.id)
 				)
-				.listRowInsets(EdgeInsets())
 				.padding(.vertical, .small3)
-				.onTapGesture {
+				.tappable {
 					onRowSelected(viewState.id, row.id)
 				}
+				.listRowInsets(EdgeInsets())
 			}
 		} header: {
 			if let title = viewState.title {

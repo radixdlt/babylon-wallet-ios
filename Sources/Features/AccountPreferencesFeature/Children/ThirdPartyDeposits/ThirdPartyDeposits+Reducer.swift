@@ -73,6 +73,8 @@ public struct ThirdPartyDeposits: FeatureReducer {
 			case .allowDenyAssets:
 				state.destinations = .allowDenyAssets(.init(list: .deny))
 				return .none
+			case .allowDepositors:
+				return .none
 			}
 			return .none
 		case .updateTapped:

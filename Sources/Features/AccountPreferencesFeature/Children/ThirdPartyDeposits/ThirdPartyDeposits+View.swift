@@ -18,6 +18,7 @@ extension ThirdPartyDeposits.State {
 				title: "",
 				rows: [.allowDenyAssets()]
 			),
+			.init(id: .allowDepositors, title: nil, rows: [.allowDepositors()]),
 		])
 	}
 }
@@ -57,14 +58,20 @@ extension ThirdPartyDeposits {
 	public enum Section: Hashable {
 		case depositsMode
 		case allowDenyAssets
+		case allowDepositors
 
 		public enum Row: Hashable {
 			case depositsMode(State.ThirdPartyDepositMode)
 			case allowDenyAssets(AllowDenyAssetsRow)
+			case allowDepositors(AllowDepositorsRow)
 		}
 
 		public enum AllowDenyAssetsRow: Hashable {
 			case allowDenyAssets
+		}
+
+		public enum AllowDepositorsRow: Hashable {
+			case allowDepositors
 		}
 	}
 }
@@ -102,6 +109,15 @@ extension PreferenceSection.Row where SectionId == ThirdPartyDeposits.Section, R
 			id: .allowDenyAssets(.allowDenyAssets),
 			title: "Allow/Deny specific assets", // FIXME: strings
 			subtitle: "Deny or allow third-party deposits of specific assets, ignoring the setting above", // FIXME: strings
+			icon: nil
+		)
+	}
+
+	static func allowDepositors() -> Self {
+		.init(
+			id: .allowDepositors(.allowDepositors),
+			title: "Allow specific depositors", // FIXME: strings
+			subtitle: "Allow certain third party depositors to deposit assets freely", // FIXME: strings
 			icon: nil
 		)
 	}
