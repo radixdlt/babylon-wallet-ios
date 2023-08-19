@@ -3,7 +3,13 @@ import EngineKit
 import FeaturePrelude
 import OverlayWindowClient
 
-// MARK: - UpdateAccountLabel
+// MARK: - DepositAddress
+public enum DepositAddress: Hashable, Sendable {
+	case resource(ResourceAddress)
+	case nftID(NonFungibleGlobalId)
+}
+
+// MARK: - ThirdPartyDeposits
 public struct ThirdPartyDeposits: FeatureReducer {
 	public struct State: Hashable, Sendable {
 		public enum ThirdPartyDepositMode: Hashable, Sendable {

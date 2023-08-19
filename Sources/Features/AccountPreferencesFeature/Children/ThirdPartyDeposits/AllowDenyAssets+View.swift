@@ -28,7 +28,7 @@ extension AllowDenyAssets {
 	public struct ViewState: Equatable {
 		let selectedList: State.List
 		let info: String
-		let resources: Set<ResourceAddress>
+		let resources: Set<DepositAddress>
 	}
 
 	@MainActor
@@ -71,7 +71,7 @@ extension AllowDenyAssets {
 											.textStyle(.body1HighImportance)
 											.foregroundColor(.app.gray1)
 										AddressView(
-											.address(.resource(row)),
+											row.ledgerIdentifiable,
 											isTappable: false
 										)
 										.foregroundColor(.app.gray2)
@@ -141,5 +141,16 @@ extension View {
 			state: /AllowDenyAssets.Destinations.State.confirmAssetDeletion,
 			action: AllowDenyAssets.Destinations.Action.confirmAssetDeletion
 		)
+	}
+}
+
+extension DepositAddress {
+	var ledgerIdentifiable: LedgerIdentifiable {
+		switch self {
+		case let .resource(address):
+			return .address(.resource(address))
+		case let .nftID(id):
+			return .address(.nonFungibleGlobalID(id))
+		}
 	}
 }

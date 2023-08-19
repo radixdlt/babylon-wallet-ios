@@ -55,6 +55,8 @@ extension LedgerIdentifiable {
 		case resource(ResourceAddress)
 		case component(ComponentAddress)
 		case validator(ValidatorAddress)
+		// Will be displayd with full ResourceAddress+NFTLocalID
+		case nonFungibleGlobalID(NonFungibleGlobalId)
 
 		public var address: String {
 			switch self {
@@ -68,6 +70,8 @@ extension LedgerIdentifiable {
 				return componentAddress.address
 			case let .validator(validatorAddress):
 				return validatorAddress.address
+			case let .nonFungibleGlobalID(id):
+				return id.asStr()
 			}
 		}
 
@@ -83,6 +87,8 @@ extension LedgerIdentifiable {
 				return "component"
 			case .validator:
 				return "component"
+			case .nonFungibleGlobalID:
+				return "resource"
 			}
 		}
 	}

@@ -1,6 +1,7 @@
 import EngineKit
 import FeaturePrelude
 
+// MARK: - AddAsset
 public struct AddAsset: FeatureReducer {
 	public struct State: Hashable, Sendable {
 		var type: AllowDenyAssets.State.List
@@ -8,36 +9,32 @@ public struct AddAsset: FeatureReducer {
 		var resourceAddress: String
 		var resourceAddressFieldFocused: Bool = false
 
-		let alreadyAddedResources: Set<ResourceAddress>
+		let alreadyAddedResources: Set<DepositAddress>
 
-		var validatedResourceAddress: ResourceAddress? {
+		var validatedResourceAddress: DepositAddress? {
 			guard !resourceAddress.isEmpty else {
 				return nil
 			}
 
-			guard let address = try? ResourceAddress(validatingAddress: resourceAddress) else {
-				return nil
-			}
-
-			return address
+			return .init(raw: resourceAddress)
 		}
 	}
 
 	public enum ViewAction: Hashable {
-		case addAssetTapped(ResourceAddress)
+		case addAssetTapped(DepositAddress)
 		case resourceAddressChanged(String)
 		case addTypeChanged(AllowDenyAssets.State.List)
 		case focusChanged(Bool)
 	}
 
 	public enum DelegateAction: Hashable {
-		case addAsset(AllowDenyAssets.State.List, ResourceAddress)
+		case addAddress(AllowDenyAssets.State.List, DepositAddress)
 	}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case let .addAssetTapped(resourceAddress):
-			return .send(.delegate(.addAsset(state.type, resourceAddress)))
+			return .send(.delegate(.addAddress(state.type, resourceAddress)))
 
 		case let .resourceAddressChanged(address):
 			state.resourceAddress = address
@@ -51,5 +48,21 @@ public struct AddAsset: FeatureReducer {
 			state.resourceAddressFieldFocused = focus
 			return .none
 		}
+	}
+}
+
+extension DepositAddress {
+	init?(raw: String) {
+		if let asResourceAddress = try? ResourceAddress(validatingAddress: raw) {
+			self = .resource(asResourceAddress)
+			return
+		}
+
+		if let asNFTId = try? NonFungibleGlobalId(nonFungibleGlobalId: raw) {
+			self = .nftID(asNFTId)
+			return
+		}
+
+		return nil
 	}
 }

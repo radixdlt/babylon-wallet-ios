@@ -7,12 +7,12 @@ extension AddAsset.State {
 			resourceAddress: resourceAddress,
 			selectList: type,
 			validatedResourceAddress: {
-				guard let validatedResourceAddress,
-				      !alreadyAddedResources.contains(validatedResourceAddress)
-				else {
-					return nil
+				if let validatedResourceAddress,
+				   !alreadyAddedResources.contains(validatedResourceAddress)
+				{
+					return validatedResourceAddress
 				}
-				return validatedResourceAddress
+				return nil
 			}(),
 			addressHint: {
 				guard !resourceAddressFieldFocused, !resourceAddress.isEmpty else {
@@ -38,7 +38,7 @@ extension AddAsset {
 	public struct ViewState: Equatable {
 		let resourceAddress: String
 		let selectList: AllowDenyAssets.State.List
-		let validatedResourceAddress: ResourceAddress?
+		let validatedResourceAddress: DepositAddress?
 		let addressHint: Hint?
 		let resourceAddressFieldFocused: Bool
 	}

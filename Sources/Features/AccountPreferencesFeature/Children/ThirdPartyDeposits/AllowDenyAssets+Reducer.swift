@@ -9,8 +9,8 @@ public struct AllowDenyAssets: FeatureReducer {
 			case deny
 		}
 
-		var allowList: Set<ResourceAddress> = []
-		var denyList: Set<ResourceAddress> = []
+		var allowList: Set<DepositAddress> = []
+		var denyList: Set<DepositAddress> = []
 		var list: List
 
 		@PresentationState
@@ -20,7 +20,7 @@ public struct AllowDenyAssets: FeatureReducer {
 	public enum ViewAction: Equatable {
 		case listChanged(State.List)
 		case addAssetTapped
-		case assetRemove(ResourceAddress)
+		case assetRemove(DepositAddress)
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -38,7 +38,7 @@ public struct AllowDenyAssets: FeatureReducer {
 			case confirmAssetDeletion(ConfirmDeletionAlert)
 
 			public enum ConfirmDeletionAlert: Sendable, Hashable {
-				case confirmTapped(ResourceAddress)
+				case confirmTapped(DepositAddress)
 				case cancelTapped
 			}
 		}
@@ -77,7 +77,7 @@ public struct AllowDenyAssets: FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
-		case let .destinations(.presented(.addAsset(.delegate(.addAsset(list, newAsset))))):
+		case let .destinations(.presented(.addAsset(.delegate(.addAddress(list, newAsset))))):
 			switch list {
 			case .allow:
 				state.allowList.insert(newAsset)
@@ -131,7 +131,7 @@ extension FeatureAction: Hashable where Feature.ViewAction: Hashable, Feature.Ch
 extension AlertState<AllowDenyAssets.Destinations.Action.ConfirmDeletionAlert> {
 	static func confirmAssetDeletion(
 		_ message: String,
-		resourceAddress: ResourceAddress
+		resourceAddress: DepositAddress
 	) -> AlertState {
 		AlertState {
 			TextState("Remove Asset")
