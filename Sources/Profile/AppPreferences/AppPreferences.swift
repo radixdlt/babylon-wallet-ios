@@ -10,6 +10,8 @@ public struct AppPreferences:
 	CustomStringConvertible,
 	CustomDumpReflectable
 {
+	public var transaction: Transaction
+
 	/// Controls e.g. if Profile Snapshot gets synced to iCloud or not.
 	public var security: Security
 
@@ -25,11 +27,13 @@ public struct AppPreferences:
 	public var gateways: Gateways
 
 	public init(
+		transaction: Transaction = .default,
 		security: Security = .default,
 		display: Display = .default,
 		p2pLinks: P2PLinks = [],
 		gateways: Gateways = .init(current: .default)
 	) {
+		self.transaction = transaction
 		self.security = security
 		self.display = display
 		self.p2pLinks = p2pLinks
@@ -44,6 +48,7 @@ extension AppPreferences {
 		.init(
 			self,
 			children: [
+				"transaction": transaction,
 				"security": security,
 				"display": display,
 				"p2pLinks": p2pLinks,
@@ -55,6 +60,7 @@ extension AppPreferences {
 
 	public var description: String {
 		"""
+		transaction: \(transaction),
 		security: \(security),
 		display: \(display),
 		p2pLinks: \(p2pLinks),

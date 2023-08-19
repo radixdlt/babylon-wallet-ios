@@ -11,12 +11,26 @@ extension FungibleAssetList {
 			public var isXRD: Bool
 			public var isSelected: Bool?
 
-			public init(xrdToken: AccountPortfolio.FungibleResource, isSelected: Bool? = nil) {
-				self.init(token: xrdToken, isXRD: true, isSelected: isSelected)
+			public init(
+				xrdToken: AccountPortfolio.FungibleResource,
+				isSelected: Bool? = nil
+			) {
+				self.init(
+					token: xrdToken,
+					isXRD: true,
+					isSelected: isSelected
+				)
 			}
 
-			public init(nonXRDToken: AccountPortfolio.FungibleResource, isSelected: Bool? = nil) {
-				self.init(token: nonXRDToken, isXRD: false, isSelected: isSelected)
+			public init(
+				nonXRDToken: AccountPortfolio.FungibleResource,
+				isSelected: Bool? = nil
+			) {
+				self.init(
+					token: nonXRDToken,
+					isXRD: false,
+					isSelected: isSelected
+				)
 			}
 
 			init(

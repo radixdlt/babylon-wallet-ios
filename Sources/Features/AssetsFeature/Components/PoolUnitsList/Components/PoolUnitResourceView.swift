@@ -1,48 +1,5 @@
 import FeaturePrelude
 
-// MARK: - PoolUnitResourcesView
-struct PoolUnitResourcesView: View {
-	let resources: NonEmpty<IdentifiedArrayOf<PoolUnitResourceViewState>>
-
-	var body: some View {
-		VStack(spacing: 1) {
-			ForEach(resources) { resource in
-				PoolUnitResourceView(viewState: resource) {
-					Text(resource.symbol)
-						.foregroundColor(.app.gray1)
-						.textStyle(.body2HighImportance)
-				}
-			}
-			.padding(.medium3)
-			.background(.app.white)
-		}
-		.background(.app.gray4)
-		.overlay(
-			RoundedRectangle(cornerRadius: .small1)
-				.stroke(.app.gray4, lineWidth: 1)
-		)
-	}
-}
-
-// MARK: - PoolUnitResourceViewState
-struct PoolUnitResourceViewState: Identifiable, Equatable {
-	var id: String { symbol }
-
-	let thumbnail: TokenThumbnail.Content
-	let symbol: String
-	let tokenAmount: String
-}
-
-extension PoolUnitResourceViewState {
-	init(xrdAmount: String) {
-		self.init(
-			thumbnail: .xrd,
-			symbol: "XRD", // FIXME: Strings
-			tokenAmount: xrdAmount
-		)
-	}
-}
-
 // MARK: - PoolUnitResourceView
 struct PoolUnitResourceView<NameView>: View where NameView: View {
 	let viewState: PoolUnitResourceViewState
@@ -69,6 +26,73 @@ struct PoolUnitResourceView<NameView>: View where NameView: View {
 			Text(viewState.tokenAmount)
 				.foregroundColor(.app.gray1)
 				.textStyle(.secondaryHeader)
+
+			if let isSelected = viewState.isSelected {
+				CheckmarkView(appearance: .dark, isChecked: isSelected)
+			}
 		}
+	}
+}
+
+// MARK: - PoolUnitResourcesView
+struct PoolUnitResourcesView: View {
+	let resources: NonEmpty<IdentifiedArrayOf<PoolUnitResourceViewState>>
+
+	var body: some View {
+		let strokeColor = Color.app.gray4
+
+		VStack(spacing: 1) {
+			ForEach(resources) { resource in
+				PoolUnitResourceView(viewState: resource) {
+					Text(resource.symbol)
+						.foregroundColor(.app.gray1)
+						.textStyle(.body2HighImportance)
+				}
+			}
+			.padding(.medium3)
+			.background(.app.white)
+		}
+		.background(strokeColor)
+		.overlay(
+			RoundedRectangle(cornerRadius: .small1)
+				.stroke(strokeColor, lineWidth: 1)
+		)
+	}
+}
+
+// MARK: - PoolUnitResourceViewState
+struct PoolUnitResourceViewState: Identifiable, Equatable {
+	var id: String { symbol }
+
+	let thumbnail: TokenThumbnail.Content
+	let symbol: String
+	let tokenAmount: String
+
+	let isSelected: Bool?
+
+	init(
+		thumbnail: TokenThumbnail.Content,
+		symbol: String,
+		tokenAmount: String,
+		isSelected: Bool? = nil
+	) {
+		self.thumbnail = thumbnail
+		self.symbol = symbol
+		self.tokenAmount = tokenAmount
+		self.isSelected = isSelected
+	}
+}
+
+extension PoolUnitResourceViewState {
+	init(
+		xrdAmount: String,
+		isSelected: Bool? = nil
+	) {
+		self.init(
+			thumbnail: .xrd,
+			symbol: "XRD", // FIXME: Strings
+			tokenAmount: xrdAmount,
+			isSelected: isSelected
+		)
 	}
 }

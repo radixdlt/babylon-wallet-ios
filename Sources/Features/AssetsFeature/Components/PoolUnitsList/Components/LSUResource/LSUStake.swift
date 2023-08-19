@@ -7,14 +7,20 @@ public struct LSUStake: FeatureReducer {
 			stake.validator.address.address
 		}
 
+		typealias AssetID = AccountPortfolio.NonFungibleResource.NonFungibleToken.ID
+
 		let stake: AccountPortfolio.PoolUnitResources.RadixNetworkStake
 
+		var isStakeSelected: Bool?
+		var selectedStakeClaimAssets: OrderedSet<AssetID>?
+
 		@PresentationState
-		public var destination: Destinations.State?
+		var destination: Destinations.State?
 	}
 
 	public enum ViewAction: Sendable, Equatable {
 		case didTap
+		case didTapStakeClaimNFT(withID: ViewState.StakeClaimNFTViewState.ID)
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -56,22 +62,34 @@ public struct LSUStake: FeatureReducer {
 	) -> EffectTask<Action> {
 		switch viewAction {
 		case .didTap:
-			guard
-				let resource = state.stake.stakeUnitResource,
-				let xrdRedemptionValue = state.stake.xrdRedemptionValue
-			else {
-				logger.fault("We should not be able to tap a stake in such state")
+			if state.isStakeSelected != nil {
+				state.isStakeSelected?.toggle()
+
+				return .none
+			} else {
+				guard
+					let resource = state.stake.stakeUnitResource,
+					let xrdRedemptionValue = state.stake.xrdRedemptionValue
+				else {
+					logger.fault("We should not be able to tap a stake in such state")
+
+					return .none
+				}
+
+				state.destination = .details(
+					.init(
+						validator: state.stake.validator,
+						stakeUnitResource: resource,
+						xrdRedemptionValue: xrdRedemptionValue
+					)
+				)
 
 				return .none
 			}
-
-			state.destination = .details(
-				.init(
-					validator: state.stake.validator,
-					stakeUnitResource: resource,
-					xrdRedemptionValue: xrdRedemptionValue
-				)
-			)
+		case let .didTapStakeClaimNFT(withID: id):
+			if state.isStakeSelected != nil {
+				state.selectedStakeClaimAssets?.toggle(id)
+			}
 
 			return .none
 		}

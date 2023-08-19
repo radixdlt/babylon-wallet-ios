@@ -10,6 +10,8 @@ public struct PoolUnit: Sendable, FeatureReducer {
 
 		let poolUnit: AccountPortfolio.PoolUnitResources.PoolUnit
 
+		var isSelected: Bool?
+
 		@PresentationState
 		var destination: Destinations.State?
 	}
@@ -55,9 +57,13 @@ public struct PoolUnit: Sendable, FeatureReducer {
 	) -> EffectTask<Action> {
 		switch viewAction {
 		case .didTap:
-			state.destination = .details(
-				.init(poolUnit: state.poolUnit)
-			)
+			if state.isSelected != nil {
+				state.isSelected?.toggle()
+			} else {
+				state.destination = .details(
+					.init(poolUnit: state.poolUnit)
+				)
+			}
 
 			return .none
 		}

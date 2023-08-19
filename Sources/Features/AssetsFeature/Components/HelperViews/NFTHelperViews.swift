@@ -41,10 +41,31 @@ struct NFTIDView: View {
 				)
 				.padding(.bottom, .small1)
 			}
-			KeyValueView(key: L10n.AssetDetails.NFTDetails.id, value: id)
+			NFTNameAndIDView(name: name, id: id)
 		}
 	}
 
 	private let minImageAspect: CGFloat = 1
 	private let maxImageAspect: CGFloat = 16 / 9
+}
+
+// MARK: - NFTNameAndIDView
+private struct NFTNameAndIDView: View {
+	let name: String?
+	let id: String
+
+	var body: some View {
+		VStack(alignment: .leading, spacing: .small3) {
+			if let name {
+				Text(name)
+					.textStyle(.body1HighImportance)
+					.foregroundColor(.app.gray1)
+			}
+
+			Text(id)
+				.textStyle(.body2HighImportance)
+				.foregroundColor(.app.gray2)
+		}
+		.flushedLeft
+	}
 }

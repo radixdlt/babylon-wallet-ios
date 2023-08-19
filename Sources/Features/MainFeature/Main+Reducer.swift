@@ -28,22 +28,23 @@ public struct Main: Sendable, FeatureReducer {
 
 	public struct Destinations: Sendable, ReducerProtocol {
 		public enum State: Sendable, Hashable {
-			case settings(AppSettings.State)
+			case settings(Settings.State)
 		}
 
 		public enum Action: Sendable, Equatable {
-			case settings(AppSettings.Action)
+			case settings(Settings.Action)
 		}
 
 		public var body: some ReducerProtocolOf<Self> {
 			Scope(state: /State.settings, action: /Action.settings) {
-				AppSettings()
+				Settings()
 			}
 		}
 	}
 
 	@Dependency(\.keychainClient) var keychainClient
 	@Dependency(\.appPreferencesClient) var appPreferencesClient
+	@Dependency(\.userDefaultsClient) var userDefaultsClient: UserDefaultsClient
 
 	public init() {}
 
@@ -51,7 +52,6 @@ public struct Main: Sendable, FeatureReducer {
 		Scope(state: \.home, action: /Action.child .. ChildAction.home) {
 			Home()
 		}
-
 		Reduce(core)
 			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
 				Destinations()
@@ -61,7 +61,8 @@ public struct Main: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
 		case .home(.delegate(.displaySettings)):
-			state.destination = .settings(.init())
+			let showMigrateOlympiaButton = !userDefaultsClient.hideMigrateOlympiaButton
+			state.destination = .settings(.init(showMigrateOlympiaButton: showMigrateOlympiaButton))
 			return .none
 
 		case let .destination(.presented(.settings(.delegate(.deleteProfileAndFactorSources(keepInIcloudIfPresent))))):

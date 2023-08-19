@@ -144,7 +144,7 @@ extension PreferenceSection.Row where RowId == AccountPreferences.Section.Sectio
 			id: .dev(.devPreferences),
 			title: "Dev Preferences", // FIXME: strings
 			subtitle: nil,
-			icon: .asset(AssetResource.generalSettings)
+			icon: .asset(AssetResource.appSettings)
 		)
 	}
 

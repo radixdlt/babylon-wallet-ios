@@ -86,5 +86,6 @@ struct PreferencesList<SectionId: Hashable, RowId: Hashable>: View {
 		}
 		.scrollContentBackground(.hidden)
 		.listStyle(.grouped)
+		.environment(\.defaultMinListHeaderHeight, 0)
 	}
 }

@@ -122,17 +122,11 @@ extension TransactionReviewGuarantee {
 
 						Separator()
 
-						HStack(spacing: .medium3) {
-							Text(L10n.TransactionReview.Guarantees.setGuaranteedMinimum)
-								.lineLimit(2)
-								.textStyle(.body2Header)
-								.foregroundColor(.app.gray1)
-
-							Spacer(minLength: 0)
-
-							let stepperStore = store.scope(state: \.percentageStepper) { .child(.percentageStepper($0)) }
-							MinimumPercentageStepper.View(store: stepperStore)
-						}
+						let stepperStore = store.scope(state: \.percentageStepper) { .child(.percentageStepper($0)) }
+						MinimumPercentageStepper.View(
+							store: stepperStore,
+							title: L10n.TransactionReview.Guarantees.setGuaranteedMinimum
+						)
 						.padding(.medium3)
 					}
 				}
