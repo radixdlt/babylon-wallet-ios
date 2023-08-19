@@ -38,19 +38,24 @@ public struct PlainListRow<Icon: View>: View {
 				icon
 					.padding(.trailing, .medium3)
 			}
+
 			VStack(alignment: .leading, spacing: .zero) {
 				Text(title)
 					.textStyle(.secondaryHeader)
 					.foregroundColor(.app.gray1)
+
 				if let subtitle {
 					Text(subtitle)
 						.textStyle(.body2Regular)
 						.foregroundColor(.app.gray2)
 				}
 			}
+
 			Spacer(minLength: .medium1)
 			if let accessory {
 				Image(asset: accessory)
+			} else {
+				EmptyView()
 			}
 		}
 		.frame(minHeight: .largeButtonHeight)
