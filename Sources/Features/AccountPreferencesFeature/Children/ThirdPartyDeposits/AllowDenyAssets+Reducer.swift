@@ -12,19 +12,27 @@ public struct AllowDenyAssets: FeatureReducer {
 		var allowList: Set<DepositAddress> = []
 		var denyList: Set<DepositAddress> = []
 		var list: List
+		var addressesList: ResourcesList.State
 
 		@PresentationState
 		var destinations: Destinations.State? = nil
+
+		init() {
+			self.allowList = []
+			self.denyList = []
+			self.list = .allow
+			self.addressesList = .init()
+			self.destinations = nil
+		}
 	}
 
 	public enum ViewAction: Equatable {
 		case listChanged(State.List)
-		case addAssetTapped
-		case assetRemove(DepositAddress)
 	}
 
 	public enum ChildAction: Sendable, Equatable {
 		case destinations(PresentationAction<Destinations.Action>)
+		case addressesList(ResourcesList.Action)
 	}
 
 	public struct Destinations: ReducerProtocol {
@@ -51,6 +59,10 @@ public struct AllowDenyAssets: FeatureReducer {
 	}
 
 	public var body: some ReducerProtocolOf<Self> {
+		Scope(state: \.addressesList, action: /Action.child .. ChildAction.addressesList) {
+			ResourcesList()
+		}
+
 		Reduce(core)
 			.ifLet(\.$destinations, action: /Action.child .. ChildAction.destinations) {
 				Destinations()
@@ -61,41 +73,38 @@ public struct AllowDenyAssets: FeatureReducer {
 		switch viewAction {
 		case let .listChanged(list):
 			state.list = list
-			return .none
-		case .addAssetTapped:
-			state.destinations = .addAsset(.init(
-				type: state.list,
-				resourceAddress: "",
-				alreadyAddedResources: state.allowList.union(state.denyList)
-			))
-			return .none
-		case let .assetRemove(resource):
-			state.destinations = .confirmAssetDeletion(.confirmAssetDeletion(state.list.removeConfirmationMessage, resourceAddress: resource))
+			switch list {
+			case .allow:
+				state.addressesList = .init(addresses: state.allowList)
+			case .deny:
+				state.addressesList = .init(addresses: state.denyList)
+			}
+
 			return .none
 		}
 	}
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
-		case let .destinations(.presented(.addAsset(.delegate(.addAddress(list, newAsset))))):
-			switch list {
-			case .allow:
-				state.allowList.insert(newAsset)
-			case .deny:
-				state.denyList.insert(newAsset)
-			}
-			state.list = list
-			state.destinations = nil
+		case .destinations:
 			return .none
-		case let .destinations(.presented(.confirmAssetDeletion(.confirmTapped(resource)))):
+		case let .addressesList(.delegate(.addressAdded(address))):
 			switch state.list {
 			case .allow:
-				state.allowList.remove(resource)
+				state.allowList.insert(address)
 			case .deny:
-				state.denyList.remove(resource)
+				state.denyList.insert(address)
 			}
 			return .none
-		case .destinations:
+		case let .addressesList(.delegate(.addressRemoved(address))):
+			switch state.list {
+			case .allow:
+				state.allowList.remove(address)
+			case .deny:
+				state.denyList.remove(address)
+			}
+			return .none
+		case .addressesList:
 			return .none
 		}
 	}
@@ -124,26 +133,6 @@ extension FeatureAction: Hashable where Feature.ViewAction: Hashable, Feature.Ch
 			hasher.combine(action)
 		case let .delegate(action):
 			hasher.combine(action)
-		}
-	}
-}
-
-extension AlertState<AllowDenyAssets.Destinations.Action.ConfirmDeletionAlert> {
-	static func confirmAssetDeletion(
-		_ message: String,
-		resourceAddress: DepositAddress
-	) -> AlertState {
-		AlertState {
-			TextState("Remove Asset")
-		} actions: {
-			ButtonState(role: .destructive, action: .confirmTapped(resourceAddress)) {
-				TextState(L10n.Common.remove)
-			}
-			ButtonState(role: .cancel, action: .cancelTapped) {
-				TextState(L10n.Common.cancel)
-			}
-		} message: {
-			TextState(message)
 		}
 	}
 }
