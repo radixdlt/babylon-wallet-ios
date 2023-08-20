@@ -4,7 +4,12 @@ import FeaturePrelude
 // MARK: - AddAsset
 public struct AddAsset: FeatureReducer {
 	public struct State: Hashable, Sendable {
-		var type: AllowDenyAssets.State.List
+		public enum Mode: Hashable, Sendable {
+			case allowDenyAssets(AllowDenyAssets.State.List)
+			case allowDepositors
+		}
+
+		var mode: Mode
 
 		var resourceAddress: String
 		var resourceAddressFieldFocused: Bool = false
@@ -28,20 +33,20 @@ public struct AddAsset: FeatureReducer {
 	}
 
 	public enum DelegateAction: Hashable {
-		case addAddress(AllowDenyAssets.State.List, DepositAddress)
+		case addAddress(State.Mode, DepositAddress)
 	}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case let .addAssetTapped(resourceAddress):
-			return .send(.delegate(.addAddress(state.type, resourceAddress)))
+			return .send(.delegate(.addAddress(state.mode, resourceAddress)))
 
 		case let .resourceAddressChanged(address):
 			state.resourceAddress = address
 			return .none
 
 		case let .addTypeChanged(type):
-			state.type = type
+			state.mode = .allowDenyAssets(type)
 			return .none
 
 		case let .focusChanged(focus):

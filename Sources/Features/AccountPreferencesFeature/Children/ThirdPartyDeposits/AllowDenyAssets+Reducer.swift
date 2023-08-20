@@ -14,15 +14,11 @@ public struct AllowDenyAssets: FeatureReducer {
 		var list: List
 		var addressesList: ResourcesList.State
 
-		@PresentationState
-		var destinations: Destinations.State? = nil
-
 		init() {
 			self.allowList = []
 			self.denyList = []
 			self.list = .allow
-			self.addressesList = .init()
-			self.destinations = nil
+			self.addressesList = .init(mode: .allowDenyAssets(.allow))
 		}
 	}
 
@@ -31,31 +27,7 @@ public struct AllowDenyAssets: FeatureReducer {
 	}
 
 	public enum ChildAction: Sendable, Equatable {
-		case destinations(PresentationAction<Destinations.Action>)
 		case addressesList(ResourcesList.Action)
-	}
-
-	public struct Destinations: ReducerProtocol {
-		public enum State: Equatable, Hashable {
-			case addAsset(AddAsset.State)
-			case confirmAssetDeletion(AlertState<Action.ConfirmDeletionAlert>)
-		}
-
-		public enum Action: Hashable {
-			case addAsset(AddAsset.Action)
-			case confirmAssetDeletion(ConfirmDeletionAlert)
-
-			public enum ConfirmDeletionAlert: Sendable, Hashable {
-				case confirmTapped(DepositAddress)
-				case cancelTapped
-			}
-		}
-
-		public var body: some ReducerProtocolOf<Self> {
-			Scope(state: /State.addAsset, action: /Action.addAsset) {
-				AddAsset()
-			}
-		}
 	}
 
 	public var body: some ReducerProtocolOf<Self> {
@@ -64,9 +36,6 @@ public struct AllowDenyAssets: FeatureReducer {
 		}
 
 		Reduce(core)
-			.ifLet(\.$destinations, action: /Action.child .. ChildAction.destinations) {
-				Destinations()
-			}
 	}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
@@ -75,9 +44,9 @@ public struct AllowDenyAssets: FeatureReducer {
 			state.list = list
 			switch list {
 			case .allow:
-				state.addressesList = .init(addresses: state.allowList)
+				state.addressesList = .init(addresses: state.allowList, mode: .allowDenyAssets(.allow))
 			case .deny:
-				state.addressesList = .init(addresses: state.denyList)
+				state.addressesList = .init(addresses: state.denyList, mode: .allowDenyAssets(.deny))
 			}
 
 			return .none
@@ -86,8 +55,6 @@ public struct AllowDenyAssets: FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
-		case .destinations:
-			return .none
 		case let .addressesList(.delegate(.addressAdded(address))):
 			switch state.list {
 			case .allow:

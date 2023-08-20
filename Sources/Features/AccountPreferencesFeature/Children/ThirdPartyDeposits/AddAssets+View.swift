@@ -5,7 +5,6 @@ extension AddAsset.State {
 	var viewState: AddAsset.ViewState {
 		.init(
 			resourceAddress: resourceAddress,
-			selectList: type,
 			validatedResourceAddress: {
 				if let validatedResourceAddress,
 				   !alreadyAddedResources.contains(validatedResourceAddress)
@@ -29,7 +28,8 @@ extension AddAsset.State {
 
 				return .none
 			}(),
-			resourceAddressFieldFocused: resourceAddressFieldFocused
+			resourceAddressFieldFocused: resourceAddressFieldFocused,
+			mode: mode
 		)
 	}
 }
@@ -37,10 +37,10 @@ extension AddAsset.State {
 extension AddAsset {
 	public struct ViewState: Equatable {
 		let resourceAddress: String
-		let selectList: AllowDenyAssets.State.List
 		let validatedResourceAddress: DepositAddress?
 		let addressHint: Hint?
 		let resourceAddressFieldFocused: Bool
+		let mode: AddAsset.State.Mode
 	}
 
 	@MainActor
@@ -60,11 +60,13 @@ extension AddAsset {
 						.flushedLeft
 					ScrollView {
 						VStack(spacing: .medium1) {
-							titleView
-							instructionsView
+							titleView(viewStore.mode.title)
+							instructionsView(viewStore.mode.instructions)
 
 							resourceAddressView(viewStore)
-							depositListSelectionView(viewStore)
+							if case .allowDenyAssets = viewStore.mode {
+								depositListSelectionView(viewStore)
+							}
 							addAssetButton(viewStore)
 						}
 						.padding([.horizontal, .bottom], .medium1)
@@ -83,15 +85,15 @@ extension AddAsset {
 
 extension AddAsset.View {
 	@ViewBuilder
-	var titleView: some SwiftUI.View {
-		Text("Add an Asset")
+	func titleView(_ text: String) -> some SwiftUI.View {
+		Text(text)
 			.textStyle(.sheetTitle)
 			.foregroundColor(.app.gray1)
 	}
 
 	@ViewBuilder
-	var instructionsView: some SwiftUI.View {
-		Text("Enter the asset’s resource address (starting with “reso”)")
+	func instructionsView(_ text: String) -> some SwiftUI.View {
+		Text(text)
 			.lineLimit(nil)
 			.textStyle(.body1Regular)
 			.foregroundColor(.app.gray1)
@@ -133,7 +135,7 @@ extension AddAsset.View {
 		HStack {
 			RadioButton(
 				appearance: .dark,
-				state: viewStore.selectList == type ? .selected : .unselected
+				state: viewStore.mode.allowDenyAssets == type ? .selected : .unselected
 			)
 			Text(type.selectionText)
 		}
@@ -150,7 +152,7 @@ extension AddAsset.View {
 				viewStore.send(.addAssetTapped($0))
 			},
 			control: { action in
-				Button("Add Asset", action: action)
+				Button(viewStore.mode.addButtonTitle, action: action)
 					.buttonStyle(.primaryRectangular)
 			}
 		)
@@ -164,6 +166,42 @@ extension AllowDenyAssets.State.List {
 			return "Allow Deposits"
 		case .deny:
 			return "Deny Deposits"
+		}
+	}
+}
+
+extension AddAsset.State.Mode {
+	var allowDenyAssets: AllowDenyAssets.State.List? {
+		guard case let .allowDenyAssets(type) = self else {
+			return nil
+		}
+		return type
+	}
+
+	var title: String {
+		switch self {
+		case .allowDenyAssets:
+			return "Add an Asset"
+		case .allowDepositors:
+			return "Add a Depositor Badge"
+		}
+	}
+
+	var instructions: String {
+		switch self {
+		case .allowDenyAssets:
+			return "Enter the asset’s resource address (starting with “reso”)"
+		case .allowDepositors:
+			return "Enter the badge’s resource address (starting with “reso”)"
+		}
+	}
+
+	var addButtonTitle: String {
+		switch self {
+		case .allowDenyAssets:
+			return "Add Asset"
+		case .allowDepositors:
+			return "Add Depositor Badge"
 		}
 	}
 }

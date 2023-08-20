@@ -5,6 +5,7 @@ import FeaturePrelude
 public struct ResourcesList: FeatureReducer {
 	public struct State: Hashable, Sendable {
 		var addresses: Set<DepositAddress> = []
+		var mode: AddAsset.State.Mode
 
 		@PresentationState
 		var destinations: Destinations.State? = nil
@@ -58,13 +59,13 @@ public struct ResourcesList: FeatureReducer {
 		switch viewAction {
 		case .addAssetTapped:
 			state.destinations = .addAsset(.init(
-				type: .allow,
+				mode: state.mode,
 				resourceAddress: "",
 				alreadyAddedResources: state.addresses
 			))
 			return .none
 		case let .assetRemove(resource):
-			state.destinations = .confirmAssetDeletion(.confirmAssetDeletion("remove", resourceAddress: resource))
+			state.destinations = .confirmAssetDeletion(.confirmAssetDeletion(state.mode.removeTitle, state.mode.removeConfirmationMessage, resourceAddress: resource))
 			return .none
 		}
 	}
@@ -84,24 +85,14 @@ public struct ResourcesList: FeatureReducer {
 	}
 }
 
-// extension AllowDepositors.State.List {
-//	var removeConfirmationMessage: String {
-//		switch self {
-//		case .allow:
-//			return "The asset will be removed from the allow list"
-//		case .deny:
-//			return "The asset will be removed from the deny list"
-//		}
-//	}
-// }
-
 extension AlertState<ResourcesList.Destinations.Action.ConfirmDeletionAlert> {
 	static func confirmAssetDeletion(
+		_ title: String,
 		_ message: String,
 		resourceAddress: DepositAddress
 	) -> AlertState {
 		AlertState {
-			TextState("Remove Asset")
+			TextState(title)
 		} actions: {
 			ButtonState(role: .destructive, action: .confirmTapped(resourceAddress)) {
 				TextState(L10n.Common.remove)
@@ -111,6 +102,28 @@ extension AlertState<ResourcesList.Destinations.Action.ConfirmDeletionAlert> {
 			}
 		} message: {
 			TextState(message)
+		}
+	}
+}
+
+extension AddAsset.State.Mode {
+	var removeTitle: String {
+		switch self {
+		case .allowDenyAssets:
+			return "Remove Asset"
+		case .allowDepositors:
+			return "Remove Depositor Badge"
+		}
+	}
+
+	var removeConfirmationMessage: String {
+		switch self {
+		case .allowDenyAssets(.allow):
+			return "The asset will be removed from the allow list"
+		case .allowDenyAssets(.deny):
+			return "The asset will be removed from the deny list"
+		case .allowDepositors:
+			return "The badge will be removed from the list"
 		}
 	}
 }
