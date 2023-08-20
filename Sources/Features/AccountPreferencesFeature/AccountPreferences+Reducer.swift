@@ -42,13 +42,13 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 	public struct Destinations: ReducerProtocol {
 		public enum State: Equatable, Hashable {
 			case updateAccountLabel(UpdateAccountLabel.State)
-			case thirdPartyDeposits(ThirdPartyDeposits.State)
+			case thirdPartyDeposits(ManageThirdPartyDeposits.State)
 			case devPreferences(DevAccountPreferences.State)
 		}
 
 		public enum Action: Equatable {
 			case updateAccountLabel(UpdateAccountLabel.Action)
-			case thirdPartyDeposits(ThirdPartyDeposits.Action)
+			case thirdPartyDeposits(ManageThirdPartyDeposits.Action)
 			case devPreferences(DevAccountPreferences.Action)
 		}
 
@@ -57,7 +57,7 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 				UpdateAccountLabel()
 			}
 			Scope(state: /State.thirdPartyDeposits, action: /Action.thirdPartyDeposits) {
-				ThirdPartyDeposits()
+				ManageThirdPartyDeposits()
 			}
 			Scope(state: /State.devPreferences, action: /Action.devPreferences) {
 				DevAccountPreferences()
@@ -107,7 +107,8 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 		switch childAction {
 		case let .destinations(.presented(action)):
 			switch action {
-			case .updateAccountLabel(.delegate(.accountLabelUpdated)):
+			case .updateAccountLabel(.delegate(.accountLabelUpdated)),
+			     .thirdPartyDeposits(.delegate(.accountUpdated)):
 				state.destinations = nil
 				return .none
 			case .updateAccountLabel:

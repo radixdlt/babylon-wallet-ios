@@ -3,24 +3,16 @@ import EngineKit
 import FeaturePrelude
 import OverlayWindowClient
 
-// MARK: - DepositAddress
-public enum DepositAddress: Hashable, Sendable {
-	case resource(ResourceAddress)
-	case nftID(NonFungibleGlobalId)
-}
+public typealias ThirdPartyDeposits = Profile.Network.Account.OnLedgerSettings.ThirdPartyDeposits
 
-// MARK: - ThirdPartyDeposits
-public struct ThirdPartyDeposits: FeatureReducer {
+// MARK: - ManageThirdPartyDeposits
+public struct ManageThirdPartyDeposits: FeatureReducer {
 	public struct State: Hashable, Sendable {
-		public enum ThirdPartyDepositMode: Hashable, Sendable {
-			case acceptAll
-			case acceptKnown
-			case denyAll
-		}
-
 		var account: Profile.Network.Account
-		// TODO: should be derived/extracted from account
-		var depositMode: ThirdPartyDepositMode = .acceptAll
+
+		var depositRule: ThirdPartyDeposits.DepositRule {
+			account.onLedgerSettings.thirdPartyDeposits.depositRule
+		}
 
 		@PresentationState
 		var destinations: Destinations.State? = nil
@@ -32,7 +24,7 @@ public struct ThirdPartyDeposits: FeatureReducer {
 
 	public enum ViewAction: Equatable {
 		case updateTapped
-		case rowTapped(ThirdPartyDeposits.Section.Row)
+		case rowTapped(ManageThirdPartyDeposits.Section.Row)
 	}
 
 	public enum DelegateAction: Equatable {
@@ -45,16 +37,22 @@ public struct ThirdPartyDeposits: FeatureReducer {
 
 	public struct Destinations: ReducerProtocol {
 		public enum State: Equatable, Hashable {
-			case allowDenyAssets(AllowDenyAssets.State)
+			case allowDenyAssets(ResourcesList.State)
+			case allowDepositors(ResourcesList.State)
 		}
 
 		public enum Action: Equatable {
-			case allowDenyAssets(AllowDenyAssets.Action)
+			case allowDenyAssets(ResourcesList.Action)
+			case allowDepositors(ResourcesList.Action)
 		}
 
 		public var body: some ReducerProtocolOf<Self> {
 			Scope(state: /State.allowDenyAssets, action: /Action.allowDenyAssets) {
-				AllowDenyAssets()
+				ResourcesList()
+			}
+
+			Scope(state: /State.allowDepositors, action: /Action.allowDepositors) {
+				ResourcesList()
 			}
 		}
 	}
@@ -70,20 +68,43 @@ public struct ThirdPartyDeposits: FeatureReducer {
 		switch viewAction {
 		case let .rowTapped(row):
 			switch row {
-			case .depositsMode(.acceptAll):
-				state.depositMode = .acceptAll
-			case .depositsMode(.acceptKnown):
-				state.depositMode = .acceptKnown
-			case .depositsMode(.denyAll):
-				state.depositMode = .denyAll
+			case let .depositRule(rule):
+				state.account.onLedgerSettings.thirdPartyDeposits.depositRule = rule
 			case .allowDenyAssets:
-				state.destinations = .allowDenyAssets(.init())
-				return .none
+				state.destinations = .allowDenyAssets(.init(
+					mode: .allowDenyAssets(.allow),
+					thirdPartyDeposits: state.account.onLedgerSettings.thirdPartyDeposits
+				))
 			case .allowDepositors:
-				return .none
+				state.destinations = .allowDepositors(.init(
+					mode: .allowDepositors,
+					thirdPartyDeposits: state.account.onLedgerSettings.thirdPartyDeposits
+				))
 			}
 			return .none
 		case .updateTapped:
+			@Dependency(\.accountsClient) var accountsClient
+			@Dependency(\.errorQueue) var errorQueue
+
+			return .run { [account = state.account] send in
+				do {
+					try await accountsClient.updateAccount(account)
+					// schedule tx
+					await send(.delegate(.accountUpdated))
+				} catch {
+					errorQueue.schedule(error)
+				}
+			}
+		}
+	}
+
+	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+		switch childAction {
+		case let .destinations(.presented(.allowDenyAssets(.delegate(.updated(thirdPartyDeposits))))),
+		     let .destinations(.presented(.allowDepositors(.delegate(.updated(thirdPartyDeposits))))):
+			state.account.onLedgerSettings.thirdPartyDeposits = thirdPartyDeposits
+			return .none
+		case .destinations:
 			return .none
 		}
 	}

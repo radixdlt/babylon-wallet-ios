@@ -4,14 +4,33 @@ import FeaturePrelude
 extension ResourcesList.State {
 	var viewState: ResourcesList.ViewState {
 		.init(
-			addresses: addresses
+			addresses: resourceAddresses,
+			info: {
+				switch mode {
+				case .allowDenyAssets(.allow) where resourceAddresses.isEmpty:
+					return "Add a specific asset by its resource address to allow all third-party deposits"
+				case .allowDenyAssets(.allow):
+					return "The following resource addresses may always be deposited to this account by third parties."
+				case .allowDenyAssets(.deny) where resourceAddresses.isEmpty:
+					return "Add a specific asset by its resource address to deny all third-party deposits"
+				case .allowDenyAssets(.deny):
+					return "The following resource addresses may never be deposited to this account by third parties."
+				case .allowDepositors where resourceAddresses.isEmpty:
+					return "Add a specific badge by its resource address to allow all deposits from its holder"
+				case .allowDepositors:
+					return "The holder of the following badges may always deposit accounts to this account."
+				}
+			}(),
+			mode: mode
 		)
 	}
 }
 
 extension ResourcesList {
 	public struct ViewState: Equatable {
-		let addresses: Set<DepositAddress>
+		let addresses: OrderedSet<ThirdPartyDeposits.DepositAddress>
+		let info: String
+		let mode: ResourcesListMode
 	}
 
 	@MainActor
@@ -24,9 +43,32 @@ extension ResourcesList {
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState) { viewStore in
 				VStack(spacing: .medium1) {
+					Group {
+						if case let .allowDenyAssets(exceptionRule) = viewStore.mode {
+							Picker(
+								"",
+								selection: viewStore.binding(
+									get: { _ in exceptionRule },
+									send: { .view(.exceptionListChanged($0)) }
+								)
+							) {
+								ForEach(ThirdPartyDeposits.DepositAddressExceptionRule.allCases, id: \.self) {
+									Text($0.text)
+								}
+							}
+							.pickerStyle(.segmented)
+						}
+
+						Text(viewStore.info)
+							.textStyle(.body1HighImportance)
+							.foregroundColor(.app.gray2)
+							.multilineTextAlignment(.center)
+					}
+					.padding(.horizontal, .medium1)
+
 					if !viewStore.addresses.isEmpty {
 						List {
-							ForEach(Array(viewStore.addresses), id: \.self) { row in
+							ForEach(viewStore.addresses, id: \.self) { row in
 								HStack {
 									TokenThumbnail(.xrd)
 										.padding(.trailing, .medium3)
@@ -58,10 +100,10 @@ extension ResourcesList {
 				.padding(.top, .medium1)
 				.background(.app.gray5)
 				.destination(store: store)
-				.navigationTitle("Allow/Deny Specific Assets")
+				.navigationTitle(viewStore.mode.navigationTitle)
 				.defaultNavBarConfig()
 				.footer {
-					Button("Add Asset", action: {
+					Button(viewStore.mode.addButtonTitle, action: {
 						viewStore.send(.view(.addAssetTapped))
 					}).buttonStyle(.primaryRectangular)
 				}
@@ -95,5 +137,36 @@ private extension View {
 			state: /ResourcesList.Destinations.State.confirmAssetDeletion,
 			action: ResourcesList.Destinations.Action.confirmAssetDeletion
 		)
+	}
+}
+
+extension ThirdPartyDeposits.DepositAddressExceptionRule {
+	var text: String {
+		switch self {
+		case .allow:
+			return "Allow"
+		case .deny:
+			return "Deny"
+		}
+	}
+}
+
+extension ResourcesListMode {
+	var addButtonTitle: String {
+		switch self {
+		case .allowDenyAssets:
+			return "Add Asset"
+		case .allowDepositors:
+			return "Add Depositor Badge"
+		}
+	}
+
+	var navigationTitle: String {
+		switch self {
+		case .allowDenyAssets:
+			return "Allow/Deny Specific Assets"
+		case .allowDepositors:
+			return "Allow Specific Depositors"
+		}
 	}
 }

@@ -1,11 +1,27 @@
 import EngineKit
 import FeaturePrelude
 
+// MARK: - ResourcesListMode
+public enum ResourcesListMode: Hashable, Sendable {
+	public typealias ExceptionRule = ThirdPartyDeposits.DepositAddressExceptionRule
+	case allowDenyAssets(ExceptionRule)
+	case allowDepositors
+}
+
 // MARK: - ResourcesList
 public struct ResourcesList: FeatureReducer {
 	public struct State: Hashable, Sendable {
-		var addresses: Set<DepositAddress> = []
-		var mode: AddAsset.State.Mode
+		var resourceAddresses: OrderedSet<ThirdPartyDeposits.DepositAddress> {
+			switch mode {
+			case let .allowDenyAssets(exception):
+				return thirdPartyDeposits.assetsExceptionList.filter { $0.value == exception }.keys
+			case .allowDepositors:
+				return thirdPartyDeposits.depositorsAllowList
+			}
+		}
+
+		var mode: ResourcesListMode
+		var thirdPartyDeposits: ThirdPartyDeposits
 
 		@PresentationState
 		var destinations: Destinations.State? = nil
@@ -13,7 +29,8 @@ public struct ResourcesList: FeatureReducer {
 
 	public enum ViewAction: Equatable {
 		case addAssetTapped
-		case assetRemove(DepositAddress)
+		case assetRemove(ThirdPartyDeposits.DepositAddress)
+		case exceptionListChanged(ThirdPartyDeposits.DepositAddressExceptionRule)
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -21,8 +38,7 @@ public struct ResourcesList: FeatureReducer {
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
-		case addressAdded(DepositAddress)
-		case addressRemoved(DepositAddress)
+		case updated(ThirdPartyDeposits)
 	}
 
 	public struct Destinations: ReducerProtocol {
@@ -36,7 +52,7 @@ public struct ResourcesList: FeatureReducer {
 			case confirmAssetDeletion(ConfirmDeletionAlert)
 
 			public enum ConfirmDeletionAlert: Sendable, Hashable {
-				case confirmTapped(DepositAddress)
+				case confirmTapped(ThirdPartyDeposits.DepositAddress)
 				case cancelTapped
 			}
 		}
@@ -61,11 +77,14 @@ public struct ResourcesList: FeatureReducer {
 			state.destinations = .addAsset(.init(
 				mode: state.mode,
 				resourceAddress: "",
-				alreadyAddedResources: state.addresses
+				alreadyAddedResources: state.resourceAddresses
 			))
 			return .none
 		case let .assetRemove(resource):
 			state.destinations = .confirmAssetDeletion(.confirmAssetDeletion(state.mode.removeTitle, state.mode.removeConfirmationMessage, resourceAddress: resource))
+			return .none
+		case let .exceptionListChanged(exception):
+			state.mode = .allowDenyAssets(exception)
 			return .none
 		}
 	}
@@ -73,12 +92,24 @@ public struct ResourcesList: FeatureReducer {
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
 		case let .destinations(.presented(.addAsset(.delegate(.addAddress(list, newAsset))))):
-			state.addresses.insert(newAsset)
+			switch list {
+			case .allowDenyAssets(.allow):
+				state.thirdPartyDeposits.assetsExceptionList[newAsset] = .allow
+			case .allowDenyAssets(.deny):
+				state.thirdPartyDeposits.assetsExceptionList[newAsset] = .deny
+			case .allowDepositors:
+				state.thirdPartyDeposits.depositorsAllowList.append(newAsset)
+			}
 			state.destinations = nil
-			return .send(.delegate(.addressAdded(newAsset)))
+			return .send(.delegate(.updated(state.thirdPartyDeposits)))
 		case let .destinations(.presented(.confirmAssetDeletion(.confirmTapped(resource)))):
-			state.addresses.remove(resource)
-			return .send(.delegate(.addressRemoved(resource)))
+			switch state.mode {
+			case .allowDenyAssets:
+				state.thirdPartyDeposits.assetsExceptionList.removeValue(forKey: resource)
+			case .allowDepositors:
+				state.thirdPartyDeposits.depositorsAllowList.remove(resource)
+			}
+			return .send(.delegate(.updated(state.thirdPartyDeposits)))
 		case .destinations:
 			return .none
 		}
@@ -89,7 +120,7 @@ extension AlertState<ResourcesList.Destinations.Action.ConfirmDeletionAlert> {
 	static func confirmAssetDeletion(
 		_ title: String,
 		_ message: String,
-		resourceAddress: DepositAddress
+		resourceAddress: ThirdPartyDeposits.DepositAddress
 	) -> AlertState {
 		AlertState {
 			TextState(title)
@@ -106,7 +137,7 @@ extension AlertState<ResourcesList.Destinations.Action.ConfirmDeletionAlert> {
 	}
 }
 
-extension AddAsset.State.Mode {
+extension ResourcesListMode {
 	var removeTitle: String {
 		switch self {
 		case .allowDenyAssets:

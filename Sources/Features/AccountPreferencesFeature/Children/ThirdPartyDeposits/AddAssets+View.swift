@@ -37,10 +37,10 @@ extension AddAsset.State {
 extension AddAsset {
 	public struct ViewState: Equatable {
 		let resourceAddress: String
-		let validatedResourceAddress: DepositAddress?
+		let validatedResourceAddress: ThirdPartyDeposits.DepositAddress?
 		let addressHint: Hint?
 		let resourceAddressFieldFocused: Bool
-		let mode: AddAsset.State.Mode
+		let mode: ResourcesListMode
 	}
 
 	@MainActor
@@ -124,23 +124,23 @@ extension AddAsset.View {
 
 	func depositListSelectionView(_ viewStore: ViewStoreOf<AddAsset>) -> some SwiftUI.View {
 		FlowLayout {
-			ForEach(AllowDenyAssets.State.List.allCases, id: \.self) {
-				depositSelectOptionView(type: $0, viewStore)
+			ForEach(ResourcesListMode.ExceptionRule.allCases, id: \.self) {
+				depositExceptionSelectionView($0, viewStore)
 			}
 		}
 	}
 
 	@ViewBuilder
-	func depositSelectOptionView(type: AllowDenyAssets.State.List, _ viewStore: ViewStoreOf<AddAsset>) -> some SwiftUI.View {
+	func depositExceptionSelectionView(_ exception: ResourcesListMode.ExceptionRule, _ viewStore: ViewStoreOf<AddAsset>) -> some SwiftUI.View {
 		HStack {
 			RadioButton(
 				appearance: .dark,
-				state: viewStore.mode.allowDenyAssets == type ? .selected : .unselected
+				state: viewStore.mode.allowDenyAssets == exception ? .selected : .unselected
 			)
-			Text(type.selectionText)
+			Text(exception.selectionText)
 		}
 		.onTapGesture {
-			viewStore.send(.addTypeChanged(type))
+			viewStore.send(.exceptionRuleChanged(exception))
 		}
 	}
 
@@ -159,7 +159,7 @@ extension AddAsset.View {
 	}
 }
 
-extension AllowDenyAssets.State.List {
+extension ResourcesListMode.ExceptionRule {
 	var selectionText: String {
 		switch self {
 		case .allow:
@@ -170,8 +170,8 @@ extension AllowDenyAssets.State.List {
 	}
 }
 
-extension AddAsset.State.Mode {
-	var allowDenyAssets: AllowDenyAssets.State.List? {
+extension ResourcesListMode {
+	var allowDenyAssets: ResourcesListMode.ExceptionRule? {
 		guard case let .allowDenyAssets(type) = self else {
 			return nil
 		}
@@ -193,15 +193,6 @@ extension AddAsset.State.Mode {
 			return "Enter the asset’s resource address (starting with “reso”)"
 		case .allowDepositors:
 			return "Enter the badge’s resource address (starting with “reso”)"
-		}
-	}
-
-	var addButtonTitle: String {
-		switch self {
-		case .allowDenyAssets:
-			return "Add Asset"
-		case .allowDepositors:
-			return "Add Depositor Badge"
 		}
 	}
 }

@@ -4,19 +4,14 @@ import FeaturePrelude
 // MARK: - AddAsset
 public struct AddAsset: FeatureReducer {
 	public struct State: Hashable, Sendable {
-		public enum Mode: Hashable, Sendable {
-			case allowDenyAssets(AllowDenyAssets.State.List)
-			case allowDepositors
-		}
-
-		var mode: Mode
+		var mode: ResourcesListMode
 
 		var resourceAddress: String
 		var resourceAddressFieldFocused: Bool = false
 
-		let alreadyAddedResources: Set<DepositAddress>
+		let alreadyAddedResources: OrderedSet<ThirdPartyDeposits.DepositAddress>
 
-		var validatedResourceAddress: DepositAddress? {
+		var validatedResourceAddress: ThirdPartyDeposits.DepositAddress? {
 			guard !resourceAddress.isEmpty else {
 				return nil
 			}
@@ -26,14 +21,14 @@ public struct AddAsset: FeatureReducer {
 	}
 
 	public enum ViewAction: Hashable {
-		case addAssetTapped(DepositAddress)
+		case addAssetTapped(ThirdPartyDeposits.DepositAddress)
 		case resourceAddressChanged(String)
-		case addTypeChanged(AllowDenyAssets.State.List)
+		case exceptionRuleChanged(ResourcesListMode.ExceptionRule)
 		case focusChanged(Bool)
 	}
 
 	public enum DelegateAction: Hashable {
-		case addAddress(State.Mode, DepositAddress)
+		case addAddress(ResourcesListMode, ThirdPartyDeposits.DepositAddress)
 	}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
@@ -45,8 +40,8 @@ public struct AddAsset: FeatureReducer {
 			state.resourceAddress = address
 			return .none
 
-		case let .addTypeChanged(type):
-			state.mode = .allowDenyAssets(type)
+		case let .exceptionRuleChanged(rule):
+			state.mode = .allowDenyAssets(rule)
 			return .none
 
 		case let .focusChanged(focus):
@@ -56,15 +51,15 @@ public struct AddAsset: FeatureReducer {
 	}
 }
 
-extension DepositAddress {
+extension ThirdPartyDeposits.DepositAddress {
 	init?(raw: String) {
 		if let asResourceAddress = try? ResourceAddress(validatingAddress: raw) {
-			self = .resource(asResourceAddress)
+			self = .resourceAddress(asResourceAddress)
 			return
 		}
 
 		if let asNFTId = try? NonFungibleGlobalId(nonFungibleGlobalId: raw) {
-			self = .nftID(asNFTId)
+			self = .nonFungibleGlobalID(asNFTId)
 			return
 		}
 

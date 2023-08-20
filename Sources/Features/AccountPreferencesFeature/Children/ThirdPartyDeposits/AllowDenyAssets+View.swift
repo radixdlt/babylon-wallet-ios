@@ -40,15 +40,15 @@ extension AllowDenyAssets {
 			WithViewStore(store, observe: \.viewState) { viewStore in
 				VStack(spacing: .medium1) {
 					Group {
-						Picker(
-							"What is your favorite color?",
-							selection: viewStore.binding(get: \.selectedList, send: { .view(.listChanged($0)) })
-						) {
-							ForEach(State.List.allCases, id: \.self) {
-								Text($0.text)
-							}
-						}
-						.pickerStyle(.segmented)
+//						Picker(
+//							"What is your favorite color?",
+//							selection: viewStore.binding(get: \.selectedList, send: { .view(.listChanged($0)) })
+//						) {
+//							ForEach(State.List.allCases, id: \.self) {
+//								Text($0.text)
+//							}
+//						}
+//						.pickerStyle(.segmented)
 
 						Text(viewStore.info)
 							.textStyle(.body1HighImportance)
@@ -67,23 +67,12 @@ extension AllowDenyAssets {
 	}
 }
 
-extension AllowDenyAssets.State.List {
-	var text: String {
-		switch self {
-		case .allow:
-			return "Allow"
-		case .deny:
-			return "Deny"
-		}
-	}
-}
-
-extension DepositAddress {
+extension ThirdPartyDeposits.DepositAddress {
 	var ledgerIdentifiable: LedgerIdentifiable {
 		switch self {
-		case let .resource(address):
+		case let .resourceAddress(address):
 			return .address(.resource(address))
-		case let .nftID(id):
+		case let .nonFungibleGlobalID(id):
 			return .address(.nonFungibleGlobalID(id))
 		}
 	}

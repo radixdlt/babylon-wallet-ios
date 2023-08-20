@@ -84,7 +84,7 @@ extension View {
 			store: destinationStore,
 			state: /AccountPreferences.Destinations.State.thirdPartyDeposits,
 			action: AccountPreferences.Destinations.Action.thirdPartyDeposits,
-			destination: { ThirdPartyDeposits.View(store: $0) }
+			destination: { ManageThirdPartyDeposits.View(store: $0) }
 		)
 	}
 

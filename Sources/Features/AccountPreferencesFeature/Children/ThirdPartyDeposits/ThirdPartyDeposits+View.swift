@@ -1,17 +1,17 @@
 import FeaturePrelude
 
-extension ThirdPartyDeposits.State {
-	var viewState: ThirdPartyDeposits.ViewState {
+extension ManageThirdPartyDeposits.State {
+	var viewState: ManageThirdPartyDeposits.ViewState {
 		.init(sections: [
 			.init(
-				id: .depositsMode,
+				id: .depositRules,
 				title: "Choose if you want to allow third-parties to directly deposit assets into your account. Deposits that you approve yourself in your Radix Wallet are always accepted.",
 				rows: [
 					.acceptAllMode(),
 					.acceptKnownMode(),
 					.denyAllMode(),
 				],
-				mode: .selection(.depositsMode(depositMode))
+				mode: .selection(.depositRule(depositRule))
 			),
 			.init(
 				id: .allowDenyAssets,
@@ -23,16 +23,16 @@ extension ThirdPartyDeposits.State {
 	}
 }
 
-extension ThirdPartyDeposits {
+extension ManageThirdPartyDeposits {
 	public struct ViewState: Equatable {
-		let sections: [PreferenceSection<ThirdPartyDeposits.Section, ThirdPartyDeposits.Section.Row>.ViewState]
+		let sections: [PreferenceSection<ManageThirdPartyDeposits.Section, ManageThirdPartyDeposits.Section.Row>.ViewState]
 	}
 
 	@MainActor
 	public struct View: SwiftUI.View {
-		let store: StoreOf<ThirdPartyDeposits>
+		let store: StoreOf<ManageThirdPartyDeposits>
 
-		init(store: StoreOf<ThirdPartyDeposits>) {
+		init(store: StoreOf<ManageThirdPartyDeposits>) {
 			self.store = store
 		}
 
@@ -46,22 +46,22 @@ extension ThirdPartyDeposits {
 				.defaultNavBarConfig()
 				.destination(store: store)
 				.footer {
-					Button("Update", action: {}).buttonStyle(.primaryRectangular)
+					Button("Update", action: { viewStore.send(.updateTapped) }).buttonStyle(.primaryRectangular)
 				}
 			}
 		}
 	}
 }
 
-// MARK: - ThirdPartyDeposits.Section
-extension ThirdPartyDeposits {
+// MARK: - ManageThirdPartyDeposits.Section
+extension ManageThirdPartyDeposits {
 	public enum Section: Hashable {
-		case depositsMode
+		case depositRules
 		case allowDenyAssets
 		case allowDepositors
 
 		public enum Row: Hashable {
-			case depositsMode(State.ThirdPartyDepositMode)
+			case depositRule(ThirdPartyDeposits.DepositRule)
 			case allowDenyAssets(AllowDenyAssetsRow)
 			case allowDepositors(AllowDepositorsRow)
 		}
@@ -76,10 +76,10 @@ extension ThirdPartyDeposits {
 	}
 }
 
-extension PreferenceSection.Row where SectionId == ThirdPartyDeposits.Section, RowId == ThirdPartyDeposits.Section.Row {
+extension PreferenceSection.Row where SectionId == ManageThirdPartyDeposits.Section, RowId == ManageThirdPartyDeposits.Section.Row {
 	static func acceptAllMode() -> Self {
 		.init(
-			id: .depositsMode(.acceptAll),
+			id: .depositRule(.acceptAll),
 			title: "Accept All", // FIXME: strings
 			subtitle: "Allow third parties to deposit any asset",
 			icon: .asset(AssetResource.iconAcceptAirdrop)
@@ -88,7 +88,7 @@ extension PreferenceSection.Row where SectionId == ThirdPartyDeposits.Section, R
 
 	static func acceptKnownMode() -> Self {
 		.init(
-			id: .depositsMode(.acceptKnown),
+			id: .depositRule(.acceptKnown),
 			title: "Only accept known", // FIXME: strings
 			subtitle: "Allow third parties to deposit only assets this account has held",
 			icon: .asset(AssetResource.iconAcceptKnownAirdrop)
@@ -97,7 +97,7 @@ extension PreferenceSection.Row where SectionId == ThirdPartyDeposits.Section, R
 
 	static func denyAllMode() -> Self {
 		.init(
-			id: .depositsMode(.denyAll),
+			id: .depositRule(.denyAll),
 			title: "Deny all", // FIXME: strings
 			subtitle: "Deny all third parties deposits", // FIXME: strings
 			icon: .asset(AssetResource.iconDeclineAirdrop)
@@ -125,18 +125,29 @@ extension PreferenceSection.Row where SectionId == ThirdPartyDeposits.Section, R
 
 extension View {
 	@MainActor
-	func destination(store: StoreOf<ThirdPartyDeposits>) -> some View {
+	func destination(store: StoreOf<ManageThirdPartyDeposits>) -> some View {
 		let destinationStore = store.scope(state: \.$destinations, action: { .child(.destinations($0)) })
 		return allowDenyAssets(with: destinationStore)
+			.allowDepositors(with: destinationStore)
 	}
 
 	@MainActor
-	func allowDenyAssets(with destinationStore: PresentationStoreOf<ThirdPartyDeposits.Destinations>) -> some View {
+	func allowDenyAssets(with destinationStore: PresentationStoreOf<ManageThirdPartyDeposits.Destinations>) -> some View {
 		navigationDestination(
 			store: destinationStore,
-			state: /ThirdPartyDeposits.Destinations.State.allowDenyAssets,
-			action: ThirdPartyDeposits.Destinations.Action.allowDenyAssets,
-			destination: { AllowDenyAssets.View(store: $0) }
+			state: /ManageThirdPartyDeposits.Destinations.State.allowDenyAssets,
+			action: ManageThirdPartyDeposits.Destinations.Action.allowDenyAssets,
+			destination: { ResourcesList.View(store: $0) }
+		)
+	}
+
+	@MainActor
+	func allowDepositors(with destinationStore: PresentationStoreOf<ManageThirdPartyDeposits.Destinations>) -> some View {
+		navigationDestination(
+			store: destinationStore,
+			state: /ManageThirdPartyDeposits.Destinations.State.allowDepositors,
+			action: ManageThirdPartyDeposits.Destinations.Action.allowDepositors,
+			destination: { ResourcesList.View(store: $0) }
 		)
 	}
 }
