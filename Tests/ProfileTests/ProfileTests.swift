@@ -524,6 +524,16 @@ final class ProfileTests: TestCase {
 			"account_tdx_21_12ya9jylskaa6gdrfr8nvve3pfc6wyhyw7eg83fwlc7fv2w0eanumcd"
 		)
 
+		XCTAssertEqual(
+			network.accounts[0].onLedgerSettings,
+			.init(thirdPartyDeposits: .init(
+				depositRule: .acceptAll,
+				assetsExceptionList: [:],
+				depositorsAllowList: []
+			)
+			)
+		)
+
 		// Account 1
 		XCTAssertEqual(
 			network.accounts[1].publicKey()?.compressedData.hex(),
@@ -539,6 +549,22 @@ final class ProfileTests: TestCase {
 			"account_tdx_21_12xg7tf7aup8lrxkvug0vzatntzww0c6jnntyj6yd4eg5920kpxpzvt"
 		)
 
+		XCTAssertEqual(
+			network.accounts[1].onLedgerSettings,
+			try .init(thirdPartyDeposits: .init(
+				depositRule: .acceptKnown,
+				assetsExceptionList: [
+					.resourceAddress(.init(stringLiteral: "resource_tdx_21_1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxsmgder")): .allow,
+					.nonFungibleGlobalID(.init(nonFungibleGlobalId: "resource_tdx_21_1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxsmgder:#1#")): .deny,
+				],
+				depositorsAllowList: [
+					.resourceAddress(.init(stringLiteral: "resource_tdx_21_1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxsmgder")),
+					.nonFungibleGlobalID(.init(nonFungibleGlobalId: "resource_tdx_21_1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxsmgder:#2#")),
+				]
+			)
+			)
+		)
+
 		// Account 2
 		XCTAssertEqual(
 			network.accounts[2].publicKey()?.compressedData.hex(),
@@ -552,6 +578,22 @@ final class ProfileTests: TestCase {
 		XCTAssertEqual(
 			network.accounts[2].address.address,
 			"account_tdx_21_12yth59wfyl8e4axupym0c96g9heuf5j06lv2lgc2cuapzlmj6alzzn"
+		)
+
+		XCTAssertEqual(
+			network.accounts[2].onLedgerSettings,
+			try .init(thirdPartyDeposits: .init(
+				depositRule: .denyAll,
+				assetsExceptionList: [
+					.resourceAddress(.init(stringLiteral: "resource_tdx_21_1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxsmgder")): .deny,
+					.nonFungibleGlobalID(.init(nonFungibleGlobalId: "resource_tdx_21_1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxsmgder:#1#")): .allow,
+				],
+				depositorsAllowList: [
+					.resourceAddress(.init(stringLiteral: "resource_tdx_21_1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxsmgder")),
+					.nonFungibleGlobalID(.init(nonFungibleGlobalId: "resource_tdx_21_1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxsmgder:#2#")),
+				]
+			)
+			)
 		)
 
 		// Persona 0
