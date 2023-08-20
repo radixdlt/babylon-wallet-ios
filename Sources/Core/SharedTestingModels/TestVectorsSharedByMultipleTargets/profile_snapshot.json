@@ -272,6 +272,17 @@
                 }
               }
             }
+          },
+          "onLedgerSettings": {
+              "thirdPartyDeposits": {
+                  "depositRule": "acceptAll",
+                  "assetsExceptionList": {
+                      "resource_tdx_21_1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxsmgder": "allow"
+                  },
+                  "depositorsAllowList": [
+                      "resource_tdx_21_1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxsmgder"
+                  ]
+              }
           }
         },
         {
@@ -334,6 +345,17 @@
                 }
               }
             }
+          },
+          "onLedgerSettings": {
+              "thirdPartyDeposits": {
+                  "depositRule": "acceptAll",
+                  "assetsExceptionList": {
+                      "resource_tdx_21_1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxsmgder": "allow"
+                  },
+                  "depositorsAllowList": [
+                      "resource_tdx_21_1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxsmgder"
+                  ]
+              }
           }
         },
         {
@@ -396,8 +418,19 @@
                 }
               }
             }
+          },
+          "onLedgerSettings": {
+              "thirdPartyDeposits": {
+                  "depositRule": "denyAll",
+                  "assetsExceptionList": {
+                      "resource_tdx_21_1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxsmgder": "deny"
+                  },
+                  "depositorsAllowList": [
+                      "resource_tdx_21_1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxsmgder"
+                  ]
+              }
           }
-        }
+        },
       ],
       "authorizedDapps" : [
         {
