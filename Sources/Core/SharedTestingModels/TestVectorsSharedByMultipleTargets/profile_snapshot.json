@@ -347,20 +347,28 @@
                   "depositRule": "acceptKnown",
                   "assetsExceptionList": [
                       {
-                          "resourceAddress" : [ "resource_tdx_21_1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxsmgder" ]
+                          "address": {
+                              "discriminator": "resourceAddress",
+                              "value": "resource_tdx_21_1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxsmgder"
+                          },
+                          "exceptionRule": "allow"
                       },
-                      "allow",
                       {
-                          "nonFungibleGlobalID" : [ "resource_tdx_21_1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxsmgder:#1#" ]
+                          "address" : {
+                              "discriminator": "nonFungibleGlobalID",
+                              "value": "resource_tdx_21_1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxsmgder:#1#"
+                          },
+                          "exceptionRule": "deny"
                       },
-                      "deny"
                   ],
                   "depositorsAllowList": [
                       {
-                          "resourceAddress" : [ "resource_tdx_21_1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxsmgder" ]
+                          "discriminator": "resourceAddress",
+                          "value": "resource_tdx_21_1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxsmgder"
                       },
                       {
-                          "nonFungibleGlobalID" : [ "resource_tdx_21_1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxsmgder:#2#" ]
+                          "discriminator": "nonFungibleGlobalID",
+                          "value": "resource_tdx_21_1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxsmgder:#2#"
                       },
                   ]
               }
@@ -432,20 +440,28 @@
                   "depositRule": "denyAll",
                   "assetsExceptionList": [
                       {
-                          "resourceAddress" : [ "resource_tdx_21_1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxsmgder" ]
+                          "address": {
+                              "discriminator": "resourceAddress",
+                              "value": "resource_tdx_21_1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxsmgder"
+                          },
+                          "exceptionRule": "deny"
                       },
-                      "deny",
                       {
-                          "nonFungibleGlobalID" : [ "resource_tdx_21_1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxsmgder:#1#" ]
+                          "address" : {
+                              "discriminator": "nonFungibleGlobalID",
+                              "value": "resource_tdx_21_1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxsmgder:#1#"
+                          },
+                          "exceptionRule": "allow"
                       },
-                      "allow"
                   ],
                   "depositorsAllowList": [
                       {
-                          "resourceAddress" : [ "resource_tdx_21_1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxsmgder" ]
+                          "discriminator": "resourceAddress",
+                          "value": "resource_tdx_21_1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxsmgder"
                       },
                       {
-                          "nonFungibleGlobalID" : [ "resource_tdx_21_1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxsmgder:#2#" ]
+                          "discriminator": "nonFungibleGlobalID",
+                          "value": "resource_tdx_21_1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxsmgder:#2#"
                       },
                   ]
               }
