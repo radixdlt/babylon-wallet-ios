@@ -29,6 +29,8 @@ public struct FungibleResourceAsset: Sendable, FeatureReducer {
 		// Total transfer sum for the transferred resource
 		public var totalTransferSum: BigDecimal
 
+		public var focused: Bool = false
+
 		init(resource: AccountPortfolio.FungibleResource, isXRD: Bool, totalTransferSum: BigDecimal = .zero) {
 			self.resource = resource
 			self.isXRD = isXRD
@@ -39,6 +41,7 @@ public struct FungibleResourceAsset: Sendable, FeatureReducer {
 	public enum ViewAction: Equatable, Sendable {
 		case amountChanged(String)
 		case maxAmountTapped
+		case focusChanged(Bool)
 		case removeTapped
 	}
 
@@ -66,6 +69,10 @@ public struct FungibleResourceAsset: Sendable, FeatureReducer {
 			state.transferAmount = remainingAmount
 			state.transferAmountStr = remainingAmount.droppingTrailingZeros.formatWithoutRounding()
 			return .send(.delegate(.amountChanged))
+
+		case let .focusChanged(focused):
+			state.focused = focused
+			return .none
 
 		case .removeTapped:
 			return .send(.delegate(.removed))
