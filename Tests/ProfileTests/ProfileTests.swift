@@ -528,7 +528,7 @@ final class ProfileTests: TestCase {
 			network.accounts[0].onLedgerSettings,
 			.init(thirdPartyDeposits: .init(
 				depositRule: .acceptAll,
-				assetsExceptionList: [:],
+				assetsExceptionList: [],
 				depositorsAllowList: []
 			)
 			)
@@ -550,19 +550,31 @@ final class ProfileTests: TestCase {
 		)
 
 		XCTAssertEqual(
-			network.accounts[1].onLedgerSettings,
-			try .init(thirdPartyDeposits: .init(
-				depositRule: .acceptKnown,
-				assetsExceptionList: [
-					.resourceAddress(.init(stringLiteral: "resource_tdx_21_1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxsmgder")): .allow,
-					.nonFungibleGlobalID(.init(nonFungibleGlobalId: "resource_tdx_21_1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxsmgder:#1#")): .deny,
-				],
-				depositorsAllowList: [
-					.resourceAddress(.init(stringLiteral: "resource_tdx_21_1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxsmgder")),
-					.nonFungibleGlobalID(.init(nonFungibleGlobalId: "resource_tdx_21_1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxsmgder:#2#")),
-				]
-			)
-			)
+			network.accounts[1].onLedgerSettings.thirdPartyDeposits.depositRule, .acceptKnown
+		)
+
+		XCTAssertEqual(
+			network.accounts[1].onLedgerSettings.thirdPartyDeposits.assetsExceptionList[0].address,
+			.resourceAddress(.init(stringLiteral: "resource_tdx_21_1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxsmgder"))
+		)
+		XCTAssertEqual(
+			network.accounts[1].onLedgerSettings.thirdPartyDeposits.assetsExceptionList[0].exceptionRule, .allow
+		)
+
+		XCTAssertEqual(
+			network.accounts[1].onLedgerSettings.thirdPartyDeposits.assetsExceptionList[1].address,
+			try .nonFungibleGlobalID(.init(nonFungibleGlobalId: "resource_tdx_21_1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxsmgder:#1#"))
+		)
+		XCTAssertEqual(
+			network.accounts[1].onLedgerSettings.thirdPartyDeposits.assetsExceptionList[1].exceptionRule, .deny
+		)
+
+		XCTAssertEqual(
+			network.accounts[1].onLedgerSettings.thirdPartyDeposits.depositorsAllowList,
+			try [
+				.resourceAddress(.init(stringLiteral: "resource_tdx_21_1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxsmgder")),
+				.nonFungibleGlobalID(.init(nonFungibleGlobalId: "resource_tdx_21_1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxsmgder:#2#")),
+			]
 		)
 
 		// Account 2
@@ -581,19 +593,31 @@ final class ProfileTests: TestCase {
 		)
 
 		XCTAssertEqual(
-			network.accounts[2].onLedgerSettings,
-			try .init(thirdPartyDeposits: .init(
-				depositRule: .denyAll,
-				assetsExceptionList: [
-					.resourceAddress(.init(stringLiteral: "resource_tdx_21_1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxsmgder")): .deny,
-					.nonFungibleGlobalID(.init(nonFungibleGlobalId: "resource_tdx_21_1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxsmgder:#1#")): .allow,
-				],
-				depositorsAllowList: [
-					.resourceAddress(.init(stringLiteral: "resource_tdx_21_1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxsmgder")),
-					.nonFungibleGlobalID(.init(nonFungibleGlobalId: "resource_tdx_21_1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxsmgder:#2#")),
-				]
-			)
-			)
+			network.accounts[2].onLedgerSettings.thirdPartyDeposits.depositRule, .denyAll
+		)
+
+		XCTAssertEqual(
+			network.accounts[2].onLedgerSettings.thirdPartyDeposits.assetsExceptionList[0].address,
+			.resourceAddress(.init(stringLiteral: "resource_tdx_21_1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxsmgder"))
+		)
+		XCTAssertEqual(
+			network.accounts[2].onLedgerSettings.thirdPartyDeposits.assetsExceptionList[0].exceptionRule, .deny
+		)
+
+		XCTAssertEqual(
+			network.accounts[2].onLedgerSettings.thirdPartyDeposits.assetsExceptionList[1].address,
+			try .nonFungibleGlobalID(.init(nonFungibleGlobalId: "resource_tdx_21_1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxsmgder:#1#"))
+		)
+		XCTAssertEqual(
+			network.accounts[2].onLedgerSettings.thirdPartyDeposits.assetsExceptionList[1].exceptionRule, .allow
+		)
+
+		XCTAssertEqual(
+			network.accounts[2].onLedgerSettings.thirdPartyDeposits.depositorsAllowList,
+			try [
+				.resourceAddress(.init(stringLiteral: "resource_tdx_21_1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxsmgder")),
+				.nonFungibleGlobalID(.init(nonFungibleGlobalId: "resource_tdx_21_1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxsmgder:#2#")),
+			]
 		)
 
 		// Persona 0

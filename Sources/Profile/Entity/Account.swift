@@ -87,71 +87,6 @@ extension Profile.Network {
 	}
 }
 
-// MARK: - Profile.Network.Account.OnLedgerSettings
-extension Profile.Network.Account {
-	public struct OnLedgerSettings: Hashable, Sendable, Codable {
-		/// Controls the ability of third-parties to deposit into this account
-		public var thirdPartyDeposits: ThirdPartyDeposits
-
-		public init(thirdPartyDeposits: ThirdPartyDeposits) {
-			self.thirdPartyDeposits = thirdPartyDeposits
-		}
-
-		/// The default value for newly created accounts.
-		/// After the account is created the OnLedgerSettings will be updated either by User or by syncing with the Ledger.
-		public static let `default` = Self(thirdPartyDeposits: .default)
-	}
-}
-
-// MARK: - Profile.Network.Account.OnLedgerSettings.ThirdPartyDeposits
-extension Profile.Network.Account.OnLedgerSettings {
-	public struct ThirdPartyDeposits: Hashable, Sendable, Codable {
-		/// The general deposit rule to apply
-		public enum DepositRule: String, Hashable, Sendable, Codable {
-			case acceptAll
-			case acceptKnown
-			case denyAll
-		}
-
-		/// The addresses that can be added as exception to the `DepositRule`
-		public enum DepositAddress: Hashable, Sendable, Codable {
-			case resourceAddress(ResourceAddress)
-			case nonFungibleGlobalID(NonFungibleGlobalId)
-		}
-
-		/// The exception kind for deposit address
-		public enum DepositAddressExceptionRule: String, Hashable, Sendable, Codable {
-			/// A resource can always be deposited in to the account by third-parties
-			case allow
-			/// A resource can never be deposited in to the account by third-parties
-			case deny
-		}
-
-		/// Controls the ability of thir-parties to deposit into this account
-		public var depositRule: DepositRule
-
-		/// Denies or allows third-party deposits of specific assets by ignoring the `depositMode`
-		public var assetsExceptionList: OrderedDictionary<DepositAddress, DepositAddressExceptionRule>
-
-		/// Allows certain third-party depositors to deposit assets freely.
-		/// Note: There is no `deny` counterpart for this.
-		public var depositorsAllowList: OrderedSet<DepositAddress>
-
-		public init(
-			depositRule: DepositRule,
-			assetsExceptionList: OrderedDictionary<DepositAddress, DepositAddressExceptionRule>,
-			depositorsAllowList: OrderedSet<DepositAddress>
-		) {
-			self.depositRule = depositRule
-			self.assetsExceptionList = assetsExceptionList
-			self.depositorsAllowList = depositorsAllowList
-		}
-
-		/// On Ledger default is `acceptAll` for deposit mode and empty lists
-		public static let `default` = Self(depositRule: .acceptAll, assetsExceptionList: [:], depositorsAllowList: [])
-	}
-}
-
 extension Profile.Network.Account {
 	/// Ephemeral, only used as arg passed to init.
 	public struct ExtraProperties: Sendable {
@@ -236,38 +171,5 @@ extension Profile.Network.Account {
 		"address": \(address),
 		"securityState": \(securityState)
 		"""
-	}
-}
-
-extension Profile.Network.Account.OnLedgerSettings.ThirdPartyDeposits.DepositAddress {
-	private enum CodingKeys: String, CodingKey {
-		case resourceAddress
-		case nonFungibleGlobalID
-	}
-
-	public init(from decoder: Decoder) throws {
-		let container = try decoder.container(keyedBy: CodingKeys.self)
-
-		if var resourceAddressContainer = try? container.nestedUnkeyedContainer(forKey: .resourceAddress) {
-			self = try .resourceAddress(.init(validatingAddress: resourceAddressContainer.decode(String.self)))
-		} else if var nftGlobalIDContainer = try? container.nestedUnkeyedContainer(forKey: .nonFungibleGlobalID) {
-			self = try .nonFungibleGlobalID(.init(nonFungibleGlobalId: nftGlobalIDContainer.decode(String.self)))
-		} else {
-			throw DecodingError.dataCorruptedError(forKey: .resourceAddress, in: container, debugDescription: "Invalid Badge Address")
-		}
-	}
-
-	public func encode(to encoder: Encoder) throws {
-		var container = encoder.container(keyedBy: CodingKeys.self)
-
-		switch self {
-		case let .resourceAddress(address):
-			var nestedContainer = container.nestedUnkeyedContainer(forKey: .resourceAddress)
-			try nestedContainer.encode(address.address)
-
-		case let .nonFungibleGlobalID(id):
-			var nestedContainer = container.nestedUnkeyedContainer(forKey: .nonFungibleGlobalID)
-			try nestedContainer.encode(id.asStr())
-		}
 	}
 }
