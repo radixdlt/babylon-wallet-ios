@@ -25,9 +25,9 @@ final class TransactionClientTests: TestCase {
 			reservedInstructions: []
 		)
 		let transaction = try TransactionFee(executionAnalysis: analysis)
-		XCTAssertNotNil(transaction.normal, "Expected default mode to be normal")
-		XCTAssertEqual(transaction.normal?.networkFee, 17.25)
-		XCTAssertEqual(transaction.normal?.royaltyFee, 10)
+		let normalMode = try XCTUnwrap(transaction.normal, "Expected default mode to be normal")
+		XCTAssertEqual(normalMode.networkFee, feeSummary.normalModeNetworkFee)
+		XCTAssertEqual(normalMode.royaltyFee, 10)
 		XCTAssertEqual(transaction.totalFee.lockFee, 27.25)
 		XCTAssertEqual(transaction.totalFee.displayedTotalFee, "27.25 XRD")
 	}
@@ -200,6 +200,23 @@ final class TransactionClientTests: TestCase {
 		XCTAssertEqual(transaction.advanced?.tipAmount, 2.0)
 		XCTAssertEqual(transaction.advanced?.total, 32.0)
 		XCTAssertEqual(transaction.totalFee.displayedTotalFee, "32 XRD")
+	}
+}
+
+extension ExecutionAnalysis {
+	var normalModeNetworkFee: BigDecimal {
+		let fee = try! feeSummary.executionCost
+			.add(other: feeSummary.finalizationCost)
+			.add(other: feeSummary.storageExpansionCost)
+			.mul(other: .init(value: "1.15"))
+			.sub(other: feeLocks.lock)
+
+		return try! .init(fromString: fee.asStr())
+	}
+
+	var normalMode: BigDecimal {
+		let remainingNonContingentLock =
+			return feeSummary.royaltyCost.
 	}
 }
 
