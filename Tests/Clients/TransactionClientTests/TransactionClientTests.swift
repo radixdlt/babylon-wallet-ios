@@ -8,219 +8,134 @@ import TransactionClient
 
 // MARK: - TransactionClientTests
 final class TransactionClientTests: TestCase {
-	let feeSummary = try! FeeSummary(
-		executionCost: .init(value: "5"),
-		finalizationCost: .init(value: "5"),
-		storageExpansionCost: .init(value: "5"),
-		royaltyCost: .init(value: "10")
+	let feeSummary = TransactionFee.FeeSummary(
+		executionCost: 5,
+		finalizationCost: 5,
+		storageExpansionCost: 5,
+		royaltyCost: 10
 	)
 
 	// MARK: - TransactionFee tests
 	func testNormalModeNoLocks() throws {
-		let noLocks = FeeLocks(lock: .zero(), contingentLock: .zero())
-		let analysis = ExecutionAnalysis(
-			feeLocks: noLocks,
-			feeSummary: feeSummary,
-			transactionTypes: [],
-			reservedInstructions: []
-		)
-		let transaction = try TransactionFee(executionAnalysis: analysis)
-		let normalMode = try XCTUnwrap(transaction.normal, "Expected default mode to be normal")
-		XCTAssertEqual(normalMode.networkFee, feeSummary.normalModeNetworkFee)
-		XCTAssertEqual(normalMode.royaltyFee, 10)
-		XCTAssertEqual(transaction.totalFee.lockFee, 27.25)
-		XCTAssertEqual(transaction.totalFee.displayedTotalFee, "27.25 XRD")
+		let noLocks = TransactionFee.FeeLocks(nonContingentLock: 0, contingentLock: 0)
+		let transaction = TransactionFee(feeSummary: feeSummary, feeLocks: noLocks)
+
+		try assertNormalModeFees(for: transaction)
 	}
 
 	func testNormalModeNonContingentLock_1() throws {
-		let feeLocks = try! FeeLocks(lock: .init(value: "5"), contingentLock: .zero())
-		let analysis = ExecutionAnalysis(
-			feeLocks: feeLocks,
-			feeSummary: feeSummary,
-			transactionTypes: [],
-			reservedInstructions: []
-		)
-		let transaction = try TransactionFee(executionAnalysis: analysis)
-		XCTAssertNotNil(transaction.normal, "Expected default mode to be normal")
-		XCTAssertEqual(transaction.normal?.networkFee, 12.25)
-		XCTAssertEqual(transaction.normal?.royaltyFee, 10)
-		XCTAssertEqual(transaction.totalFee.lockFee, 22.25)
-		XCTAssertEqual(transaction.totalFee.displayedTotalFee, "22.25 XRD")
+		let feeLocks = TransactionFee.FeeLocks(nonContingentLock: 5, contingentLock: 0)
+		let transaction = TransactionFee(feeSummary: feeSummary, feeLocks: feeLocks)
+
+		try assertNormalModeFees(for: transaction)
 	}
 
 	func testNormalModeNonContingentLock_2() throws {
-		let feeLocks = try! FeeLocks(lock: .init(value: "17.25"), contingentLock: .zero())
-		let analysis = ExecutionAnalysis(
-			feeLocks: feeLocks,
-			feeSummary: feeSummary,
-			transactionTypes: [],
-			reservedInstructions: []
-		)
-		let transaction = try TransactionFee(executionAnalysis: analysis)
-		XCTAssertNotNil(transaction.normal, "Expected default mode to be normal")
-		XCTAssertEqual(transaction.normal?.networkFee, 0)
-		XCTAssertEqual(transaction.normal?.royaltyFee, 10)
-		XCTAssertEqual(transaction.totalFee.lockFee, 10)
-		XCTAssertEqual(transaction.totalFee.displayedTotalFee, "10 XRD")
+		let feeLocks = TransactionFee.FeeLocks(nonContingentLock: 17.25, contingentLock: 0)
+		let transaction = TransactionFee(feeSummary: feeSummary, feeLocks: feeLocks)
+		try assertNormalModeFees(for: transaction)
 	}
 
-	func testNormalModeNonContingentLock_4() throws {
-		let feeLocks = try! FeeLocks(lock: .init(value: "27.25"), contingentLock: .zero())
-		let analysis = ExecutionAnalysis(
-			feeLocks: feeLocks,
-			feeSummary: feeSummary,
-			transactionTypes: [],
-			reservedInstructions: []
-		)
-		let transaction = try TransactionFee(executionAnalysis: analysis)
-		XCTAssertNotNil(transaction.normal, "Expected default mode to be normal")
-		XCTAssertEqual(transaction.normal?.networkFee, 0)
-		XCTAssertEqual(transaction.normal?.royaltyFee, 0)
-		XCTAssertEqual(transaction.totalFee.lockFee, 0)
-		XCTAssertEqual(transaction.totalFee.displayedTotalFee, "0 XRD")
+	func testNormalModeNonContingentLock_3() throws {
+		let feeLocks = TransactionFee.FeeLocks(nonContingentLock: 27.25, contingentLock: 0)
+		let transaction = TransactionFee(feeSummary: feeSummary, feeLocks: feeLocks)
+
+		try assertNormalModeFees(for: transaction)
 	}
 
 	func testNormalModeNonContingentLock_5() throws {
-		let feeLocks = try! FeeLocks(lock: .init(value: "100"), contingentLock: .zero())
-		let analysis = ExecutionAnalysis(
-			feeLocks: feeLocks,
-			feeSummary: feeSummary,
-			transactionTypes: [],
-			reservedInstructions: []
-		)
-		let transaction = try TransactionFee(executionAnalysis: analysis)
-		XCTAssertNotNil(transaction.normal, "Expected default mode to be normal")
-		XCTAssertEqual(transaction.normal?.networkFee, 0)
-		XCTAssertEqual(transaction.normal?.royaltyFee, 0)
-		XCTAssertEqual(transaction.totalFee.lockFee, 0)
-		XCTAssertEqual(transaction.totalFee.displayedTotalFee, "0 XRD")
+		let feeLocks = TransactionFee.FeeLocks(nonContingentLock: 100, contingentLock: 0)
+		let transaction = TransactionFee(feeSummary: feeSummary, feeLocks: feeLocks)
+
+		try assertNormalModeFees(for: transaction)
 	}
 
 	func testNormalMode_contingentLock() throws {
-		let feeLocks = try! FeeLocks(lock: .zero(), contingentLock: .init(value: "5"))
-		let analysis = ExecutionAnalysis(
-			feeLocks: feeLocks,
-			feeSummary: feeSummary,
-			transactionTypes: [],
-			reservedInstructions: []
-		)
-		let transaction = try TransactionFee(executionAnalysis: analysis)
-		XCTAssertNotNil(transaction.normal, "Expected default mode to be normal")
-		XCTAssertEqual(transaction.normal?.networkFee, 17.25)
-		XCTAssertEqual(transaction.normal?.royaltyFee, 10)
-		XCTAssertEqual(transaction.totalFee.lockFee, 27.25)
-		XCTAssertEqual(transaction.totalFee.displayedTotalFee, "22.25 - 27.25 XRD")
+		let feeLocks = TransactionFee.FeeLocks(nonContingentLock: 0, contingentLock: 5)
+		let transaction = TransactionFee(feeSummary: feeSummary, feeLocks: feeLocks)
+
+		try assertNormalModeFees(for: transaction)
 	}
 
 	func testNormalMode_contingentLock_with_nonContingentLock() throws {
-		let feeLocks = try! FeeLocks(lock: .init(value: "5"), contingentLock: .init(value: "5"))
-		let analysis = ExecutionAnalysis(
-			feeLocks: feeLocks,
-			feeSummary: feeSummary,
-			transactionTypes: [],
-			reservedInstructions: []
-		)
-		let transaction = try TransactionFee(executionAnalysis: analysis)
-		XCTAssertNotNil(transaction.normal, "Expected default mode to be normal")
-		XCTAssertEqual(transaction.normal?.networkFee, 12.25)
-		XCTAssertEqual(transaction.normal?.royaltyFee, 10)
-		XCTAssertEqual(transaction.totalFee.lockFee, 22.25)
-		XCTAssertEqual(transaction.totalFee.displayedTotalFee, "17.25 - 22.25 XRD")
+		let feeLocks = TransactionFee.FeeLocks(nonContingentLock: 5, contingentLock: 5)
+		let transaction = TransactionFee(feeSummary: feeSummary, feeLocks: feeLocks)
+
+		try assertNormalModeFees(for: transaction)
 	}
 
-	func testNormalMode_contingentLock_maxValue() throws {
-		let feeLocks = try! FeeLocks(lock: .init(value: "5"), contingentLock: .max())
-		let analysis = ExecutionAnalysis(
-			feeLocks: feeLocks,
-			feeSummary: feeSummary,
-			transactionTypes: [],
-			reservedInstructions: []
-		)
-		let transaction = try TransactionFee(executionAnalysis: analysis)
-		XCTAssertNotNil(transaction.normal, "Expected default mode to be normal")
-		XCTAssertEqual(transaction.normal?.networkFee, 12.25)
-		XCTAssertEqual(transaction.normal?.royaltyFee, 10)
-		XCTAssertEqual(transaction.totalFee.lockFee, 22.25)
-		XCTAssertEqual(transaction.totalFee.displayedTotalFee, "0 - 22.25 XRD")
+	func testNormalMode_contingentLock_bigValue() throws {
+		let feeLocks = TransactionFee.FeeLocks(nonContingentLock: 5, contingentLock: 100)
+		let transaction = TransactionFee(feeSummary: feeSummary, feeLocks: feeLocks)
+
+		try assertNormalModeFees(for: transaction)
 	}
 
-	func testNormalMode_contingentLock_with_nonContingentLock_max() throws {
-		let feeLocks = FeeLocks(lock: .max(), contingentLock: .max())
-		let analysis = ExecutionAnalysis(
-			feeLocks: feeLocks,
-			feeSummary: feeSummary,
-			transactionTypes: [],
-			reservedInstructions: []
-		)
-		let transaction = try TransactionFee(executionAnalysis: analysis)
-		XCTAssertNotNil(transaction.normal, "Expected default mode to be normal")
-		XCTAssertEqual(transaction.normal?.networkFee, 0)
-		XCTAssertEqual(transaction.normal?.royaltyFee, 0)
-		XCTAssertEqual(transaction.totalFee.lockFee, 0)
-		XCTAssertEqual(transaction.totalFee.displayedTotalFee, "0 XRD")
+	func testNormalMode_contingentLock_with_nonContingentLock_bigValue() throws {
+		let feeLocks = TransactionFee.FeeLocks(nonContingentLock: 100, contingentLock: 100)
+		let transaction = TransactionFee(feeSummary: feeSummary, feeLocks: feeLocks)
+
+		try assertNormalModeFees(for: transaction)
 	}
 
 	func testAdvancedMode() throws {
-		let locks = FeeLocks(lock: .max(), contingentLock: .max())
-		let analysis = ExecutionAnalysis(
-			feeLocks: locks,
-			feeSummary: feeSummary,
-			transactionTypes: [],
-			reservedInstructions: []
-		)
-		var transaction = try TransactionFee(executionAnalysis: analysis)
-		transaction.toggleMode()
+		let feeLocks = TransactionFee.FeeLocks(nonContingentLock: 100, contingentLock: 100)
+		var advancedMode = TransactionFee.AdvancedFeeCustomization(feeSummary: feeSummary)
+		advancedMode.tipPercentage = 10
 
-		XCTAssertNotNil(transaction.advanced, "Expected default mode to be advanced")
-		XCTAssertEqual(transaction.advanced?.paddingFee, 1.5)
-		XCTAssertEqual(transaction.advanced?.tipPercentage, 0)
-		XCTAssertEqual(transaction.advanced?.total, 26.50)
-		XCTAssertEqual(transaction.totalFee.displayedTotalFee, "26.5 XRD")
+		var transaction = TransactionFee(feeSummary: feeSummary, feeLocks: feeLocks, mode: .advanced(advancedMode))
+
+		let networkFee = feeSummary.executionCost + feeSummary.finalizationCost
+		let feesTotal = feeSummary.executionCost + feeSummary.finalizationCost + feeSummary.storageExpansionCost + feeSummary.royaltyCost
+		let defaultPaddingFee = networkFee * TransactionFee.PredefinedFeeConstants.networkFeeMultiplier
+
+		XCTAssertNotNil(transaction.advanced, "Expected to switch to advanced mode")
+		XCTAssertEqual(advancedMode.paddingFee, defaultPaddingFee)
+		XCTAssertEqual(advancedMode.tipPercentage, 10)
+		XCTAssertEqual(advancedMode.tipAmount, networkFee * 0.1)
+
+		let totalFee = feesTotal + advancedMode.paddingFee + advancedMode.tipAmount
+		XCTAssertEqual(transaction.totalFee, .init(min: totalFee, max: totalFee))
 	}
 
-	func testAdvancedMode_edit() throws {
-		let locks = FeeLocks(lock: .max(), contingentLock: .max())
-		let analysis = ExecutionAnalysis(
-			feeLocks: locks,
-			feeSummary: feeSummary,
-			transactionTypes: [],
-			reservedInstructions: []
-		)
-		var transaction = try TransactionFee(executionAnalysis: analysis)
-		transaction.toggleMode()
-
-		XCTAssertNotNil(transaction.advanced, "Expected default mode to be advanced")
-		var advanced = transaction.advanced!
-		advanced.paddingFee = 5
-		advanced.tipPercentage = 20
-		transaction.mode = .advanced(advanced)
-
-		XCTAssertEqual(transaction.advanced?.paddingFee, 5.0)
-		XCTAssertEqual(transaction.advanced?.tipPercentage, 20.0)
-		XCTAssertEqual(transaction.advanced?.tipAmount, 2.0)
-		XCTAssertEqual(transaction.advanced?.total, 32.0)
-		XCTAssertEqual(transaction.totalFee.displayedTotalFee, "32 XRD")
-	}
-}
-
-extension ExecutionAnalysis {
-	var normalModeNetworkFee: BigDecimal {
-		let fee = try! feeSummary.executionCost
-			.add(other: feeSummary.finalizationCost)
-			.add(other: feeSummary.storageExpansionCost)
-			.mul(other: .init(value: "1.15"))
-			.sub(other: feeLocks.lock)
-
-		return try! .init(fromString: fee.asStr())
-	}
-
-	var normalMode: BigDecimal {
-		let remainingNonContingentLock =
-			return feeSummary.royaltyCost.
+	func assertNormalModeFees(for transaction: TransactionFee) throws {
+		let normalMode = try XCTUnwrap(transaction.normal, "Expected default mode to be normal")
+		XCTAssertEqual(normalMode.networkFee, transaction.expectedNormalModeNetworkFee)
+		XCTAssertEqual(normalMode.royaltyFee, transaction.expectedNormalModeRoyaltyFee)
+		XCTAssertEqual(transaction.totalFee.lockFee, transaction.expectedNormalModeLockFee)
+		XCTAssertEqual(transaction.totalFee, transaction.expectedNormalModeTotalFee)
 	}
 }
 
 extension TransactionFee {
+	var normalModeNetworkFee: BigDecimal {
+		var networkFee = feeSummary.executionCost + feeSummary.finalizationCost + feeSummary.storageExpansionCost
+		networkFee += networkFee * PredefinedFeeConstants.networkFeeMultiplier
+		return networkFee
+	}
+
+	var expectedNormalModeNetworkFee: BigDecimal {
+		var networkFee = feeSummary.executionCost + feeSummary.finalizationCost + feeSummary.storageExpansionCost
+		networkFee += networkFee * PredefinedFeeConstants.networkFeeMultiplier
+
+		return networkFee.clampedDiff(feeLocks.nonContingentLock)
+	}
+
+	var expectedNormalModeRoyaltyFee: BigDecimal {
+		let remainingNonContingentLock = feeLocks.nonContingentLock.clampedDiff(normalModeNetworkFee)
+		return feeSummary.royaltyCost.clampedDiff(remainingNonContingentLock)
+	}
+
+	var expectedNormalModeLockFee: BigDecimal {
+		expectedNormalModeNetworkFee + expectedNormalModeRoyaltyFee
+	}
+
+	var expectedNormalModeTotalFee: TotalFee {
+		let maxFee = expectedNormalModeLockFee
+		let minFee = maxFee.clampedDiff(feeLocks.contingentLock)
+		return .init(min: minFee, max: maxFee)
+	}
+
 	var normal: TransactionFee.NormalFeeCustomization? {
 		guard case let .normal(normal) = self.mode else {
 			return nil

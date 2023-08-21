@@ -252,10 +252,10 @@ public struct FeePayerSelectionAmongstCandidates: Sendable, Hashable {
 // MARK: - TransactionFee
 public struct TransactionFee: Hashable, Sendable {
 	/// FeeSummary after transaction was analyzed
-	let feeSummary: FeeSummary
+	public let feeSummary: FeeSummary
 
 	/// FeeLocks after transaction was analyzed
-	let feeLocks: FeeLocks
+	public let feeLocks: FeeLocks
 
 	/// The calculaton mode
 	public var mode: Mode
@@ -264,6 +264,10 @@ public struct TransactionFee: Hashable, Sendable {
 		self.feeSummary = feeSummary
 		self.feeLocks = feeLocks
 		self.mode = mode
+	}
+
+	public init(feeSummary: FeeSummary, feeLocks: FeeLocks) {
+		self.init(feeSummary: feeSummary, feeLocks: feeLocks, mode: .normal(.init(feeSummary: feeSummary, feeLocks: feeLocks)))
 	}
 
 	public init(executionAnalysis: ExecutionAnalysis) throws {
@@ -281,8 +285,7 @@ public struct TransactionFee: Hashable, Sendable {
 
 		self.init(
 			feeSummary: feeSummary,
-			feeLocks: feeLocks,
-			mode: .normal(.init(feeSummary: feeSummary, feeLocks: feeLocks))
+			feeLocks: feeLocks
 		)
 	}
 }
@@ -318,9 +321,9 @@ extension TransactionFee {
 }
 
 extension TransactionFee {
-	enum PredefinedFeeConstants {
+	public enum PredefinedFeeConstants {
 		/// 15% margin is added here to make up for the ambiguity of the transaction preview estimate)
-		static let networkFeeMultiplier: BigDecimal = 0.15
+		public static let networkFeeMultiplier: BigDecimal = 0.15
 
 		// TODO: Add WalletFees table. Which is yet to be determined.
 	}
@@ -354,8 +357,8 @@ extension TransactionFee {
 	}
 
 	public struct FeeLocks: Hashable, Sendable {
-		let nonContingentLock: BigDecimal
-		let contingentLock: BigDecimal
+		public let nonContingentLock: BigDecimal
+		public let contingentLock: BigDecimal
 
 		public init(nonContingentLock: BigDecimal, contingentLock: BigDecimal) {
 			self.nonContingentLock = nonContingentLock
@@ -411,8 +414,13 @@ extension TransactionFee {
 	}
 
 	public struct TotalFee: Hashable, Sendable {
-		let min: BigDecimal
-		let max: BigDecimal
+		public let min: BigDecimal
+		public let max: BigDecimal
+
+		public init(min: BigDecimal, max: BigDecimal) {
+			self.min = min
+			self.max = max
+		}
 
 		public var lockFee: BigDecimal {
 			// We always lock the max amount
