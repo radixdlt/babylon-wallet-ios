@@ -317,6 +317,6 @@ struct ImportMnemonic_Preview: PreviewProvider {
 }
 
 extension ImportMnemonic.State {
-	public static let previewValue = Self(persistAsMnemonicKind: nil)
+	public static let previewValue = Self(persistStrategy: .intoKeychainOnly, mnemonicForFactorSourceKind: .offDevice)
 }
 #endif

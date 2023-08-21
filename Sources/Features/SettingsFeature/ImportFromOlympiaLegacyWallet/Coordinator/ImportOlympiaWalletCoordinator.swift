@@ -179,7 +179,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 		case .accountsToImport(.delegate(.continueImport)):
 			return continueImporting(in: &state)
 
-		case let .importMnemonic(.delegate(.notSavedInProfile(mnemonicWithPassphrase))):
+		case let .importMnemonic(.delegate(.persistedMnemonicInKeychainOnly(mnemonicWithPassphrase, _))):
 			return importedMnemonic(in: &state, mnemonicWithPassphrase: mnemonicWithPassphrase)
 
 		case let .importOlympiaLedgerAccountsAndFactorSources(.delegate(.completed(migratedAccounts))):
@@ -341,7 +341,8 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 				),
 				warning: L10n.ImportOlympiaAccounts.VerifySeedPhrase.warning,
 				isWordCountFixed: true,
-				persistAsMnemonicKind: nil,
+				persistStrategy: .intoKeychainOnly,
+				mnemonicForFactorSourceKind: .onDevice(.olympia),
 				wordCount: progress.previous.expectedMnemonicWordCount
 			))
 		)

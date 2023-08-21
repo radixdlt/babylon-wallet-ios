@@ -146,17 +146,6 @@ public struct UpdateFactorSourceLastUsedRequest: Sendable, Hashable {
 	}
 }
 
-// MARK: - MnemonicBasedFactorSourceKind
-public enum MnemonicBasedFactorSourceKind: Sendable, Hashable {
-	public enum OnDeviceMnemonicKind: Sendable, Hashable {
-		case babylon
-		case olympia
-	}
-
-	case onDevice(OnDeviceMnemonicKind)
-	case offDevice
-}
-
 // MARK: - SigningFactor
 public struct SigningFactor: Sendable, Hashable, Identifiable {
 	public typealias ID = FactorSourceID

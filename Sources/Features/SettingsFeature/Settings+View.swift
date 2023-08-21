@@ -201,7 +201,7 @@ extension View {
 			store: destinationStore,
 			state: /AppSettings.Destinations.State.debugManageFactorSources,
 			action: AppSettings.Destinations.Action.debugManageFactorSources,
-			destination: { ManageFactorSources.View(store: $0) }
+			destination: { DebugManageFactorSources.View(store: $0) }
 		)
 	}
 

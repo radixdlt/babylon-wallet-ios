@@ -108,13 +108,12 @@ public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
-		case let .importingMnemonic(.delegate(.notSavedInProfile(mnemonicWithPassphrase))):
-			// FIXME: uh, but actually should not throw....
-			let factorSourceID = try! FactorSourceID.FromHash(kind: .device, mnemonicWithPassphrase: mnemonicWithPassphrase)
+		case let .importingMnemonic(.delegate(.persistedMnemonicInKeychainOnly(_, factorSourceID))):
+
 			state.mnemonicsLeftToImport.removeAll(where: { $0.factorSourceID == factorSourceID })
 			return nextMnemonicIfNeeded(state: &state)
 
-		case .importingMnemonic(.delegate(.savedInProfile(_))):
+		case .importingMnemonic(.delegate(.persistedNewFactorSourceInProfile(_))), .importingMnemonic(.delegate(.doneViewing)):
 			preconditionFailure("Incorrect impl")
 			return .none
 
@@ -127,8 +126,8 @@ public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 		if let next = state.mnemonicsLeftToImport.first {
 			state.importingMnemonic = .init(
 				isWordCountFixed: true,
-				persistAsMnemonicKind: .intoKeychainOnly,
-				wordCount: next.mnemonicWordCount
+				persistStrategy: .intoKeychainOnly,
+				mnemonicForFactorSourceKind: next.mnemonicWordCount == .twelve ? .onDevice(.olympia) : .onDevice(.babylon)
 			)
 			return .none
 		} else {

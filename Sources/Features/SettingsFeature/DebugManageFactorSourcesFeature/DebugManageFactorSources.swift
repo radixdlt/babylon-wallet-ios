@@ -2,8 +2,8 @@ import AddLedgerFactorSourceFeature
 import FeaturePrelude
 import ImportMnemonicFeature
 
-// MARK: - ManageFactorSources
-public struct ManageFactorSources: Sendable, FeatureReducer {
+// MARK: - DebugManageFactorSources
+public struct DebugManageFactorSources: Sendable, FeatureReducer {
 	// MARK: State
 	public struct State: Sendable, Hashable {
 		public var factorSources: FactorSources?
@@ -78,15 +78,11 @@ public struct ManageFactorSources: Sendable, FeatureReducer {
 			}
 
 		case .importOlympiaMnemonicButtonTapped:
-			state.destination = .importMnemonic(.init(
-				persistAsMnemonicKind: .intoKeychainAndProfile(.onDevice(.olympia))
-			))
+			state.destination = .importMnemonic(.init(persistStrategy: .intoKeychainAndProfile, mnemonicForFactorSourceKind: .onDevice(.olympia)))
 			return .none
 
 		case .addOffDeviceMnemonicButtonTapped:
-			state.destination = .importMnemonic(.init(
-				persistAsMnemonicKind: .intoKeychainAndProfile(.offDevice)
-			))
+			state.destination = .importMnemonic(.init(persistStrategy: .intoKeychainAndProfile, mnemonicForFactorSourceKind: .offDevice))
 			return .none
 
 		case .addLedgerButtonTapped:
@@ -108,7 +104,7 @@ public struct ManageFactorSources: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
-		case .destination(.presented(.importMnemonic(.delegate(.savedInProfile)))):
+		case .destination(.presented(.importMnemonic(.delegate(.persistedNewFactorSourceInProfile(_))))):
 			state.destination = nil
 			return .none
 

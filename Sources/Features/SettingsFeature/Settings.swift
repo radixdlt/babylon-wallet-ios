@@ -90,7 +90,7 @@ public struct AppSettings: Sendable, FeatureReducer {
 			#if DEBUG
 			case importOlympiaWalletCoordinator(ImportOlympiaWalletCoordinator.State)
 			case debugInspectProfile(DebugInspectProfile.State)
-			case debugManageFactorSources(ManageFactorSources.State)
+			case debugManageFactorSources(DebugManageFactorSources.State)
 			case securityStructureConfigs(SecurityStructureConfigurationListCoordinator.State)
 			#endif
 		}
@@ -108,7 +108,7 @@ public struct AppSettings: Sendable, FeatureReducer {
 
 			#if DEBUG
 			case debugInspectProfile(DebugInspectProfile.Action)
-			case debugManageFactorSources(ManageFactorSources.Action)
+			case debugManageFactorSources(DebugManageFactorSources.Action)
 			case securityStructureConfigs(SecurityStructureConfigurationListCoordinator.Action)
 			#endif
 		}
@@ -147,7 +147,7 @@ public struct AppSettings: Sendable, FeatureReducer {
 				DebugInspectProfile()
 			}
 			Scope(state: /State.debugManageFactorSources, action: /Action.debugManageFactorSources) {
-				ManageFactorSources()
+				DebugManageFactorSources()
 			}
 			Scope(state: /State.securityStructureConfigs, action: /Action.securityStructureConfigs) {
 				SecurityStructureConfigurationListCoordinator()

@@ -63,7 +63,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			words.compactMap(\.completeWord)
 		}
 
-		public let persistMnemonicMode: PersistMnemonicMode?
+		public let persistStrategy: PersistStrategy?
 
 		public let isReadonlyMode: Bool
 		public let isWordCountFixed: Bool
@@ -80,8 +80,10 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 		@PresentationState
 		public var offDeviceMnemonicInfoPrompt: OffDeviceMnemonicInfo.State?
 
-		public enum PersistMnemonicMode: Sendable, Hashable {
-			case intoKeychainAndProfile(MnemonicBasedFactorSourceKind)
+		public let mnemonicForFactorSourceKind: MnemonicBasedFactorSourceKind
+
+		public enum PersistStrategy: Sendable, Hashable {
+			case intoKeychainAndProfile
 			case intoKeychainOnly
 		}
 
@@ -89,7 +91,8 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			header: Header? = nil,
 			warning: String? = nil,
 			isWordCountFixed: Bool = false,
-			persistAsMnemonicKind persistMnemonicMode: PersistMnemonicMode?,
+			persistStrategy: PersistStrategy?,
+			mnemonicForFactorSourceKind: MnemonicBasedFactorSourceKind,
 			language: BIP39.Language = .english,
 			wordCount: BIP39.WordCount = .twelve,
 			bip39Passphrase: String = "",
@@ -97,7 +100,8 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 		) {
 			precondition(wordCount.rawValue.isMultiple(of: ImportMnemonic.wordsPerRow))
 
-			self.persistMnemonicMode = persistMnemonicMode
+			self.persistStrategy = persistStrategy
+			self.mnemonicForFactorSourceKind = mnemonicForFactorSourceKind
 			self.language = language
 			self.bip39Passphrase = bip39Passphrase
 
@@ -113,13 +117,15 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 		public init(
 			header: Header? = nil,
 			warning: String? = nil,
-			mnemonicWithPassphrase: MnemonicWithPassphrase
+			mnemonicWithPassphrase: MnemonicWithPassphrase,
+			mnemonicForFactorSourceKind: MnemonicBasedFactorSourceKind
 		) {
 			self.header = header
 			self.warning = warning
 
 			let mnemonic = mnemonicWithPassphrase.mnemonic
-			self.persistMnemonicMode = nil
+			self.mnemonicForFactorSourceKind = mnemonicForFactorSourceKind
+			self.persistStrategy = nil
 			self.language = mnemonic.language
 			let isReadonlyMode = true
 			self.isReadonlyMode = isReadonlyMode
@@ -187,8 +193,8 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
-		case savedInProfile(FactorSource)
-		case notSavedInProfile(MnemonicWithPassphrase)
+		case persistedNewFactorSourceInProfile(FactorSource)
+		case persistedMnemonicInKeychainOnly(MnemonicWithPassphrase, FactorSourceID.FromHash)
 		case doneViewing
 	}
 
@@ -241,7 +247,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 
 		case let .offDeviceMnemonicInfoPrompt(.presented(.delegate(.done(label, mnemonicWithPassphrase)))):
 			state.offDeviceMnemonicInfoPrompt = nil
-			precondition(state.persistMnemonicMode == .intoKeychainAndProfile(.offDevice))
+			precondition(state.mnemonicForFactorSourceKind == .offDevice)
 			return .task {
 				await .internal(.saveFactorSourceResult(
 					TaskResult {
@@ -292,25 +298,33 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 				mnemonic: mnemonic,
 				passphrase: state.bip39Passphrase
 			)
-			guard let persistMnemonicMode = state.persistMnemonicMode else {
-				return .send(.delegate(.notSavedInProfile(mnemonicWithPassphrase)))
+			guard let persistStrategy = state.persistStrategy else {
+				let factorSourceID = try! FactorSourceID.FromHash(
+					kind: state.mnemonicForFactorSourceKind.factorSourceKind,
+					mnemonicWithPassphrase: mnemonicWithPassphrase
+				)
+				return .send(.delegate(.persistedMnemonicInKeychainOnly(mnemonicWithPassphrase, factorSourceID)))
 			}
 
-			switch persistMnemonicMode {
-			case let .intoKeychainAndProfile(.onDevice(onDeviceKind)):
-				return .task {
-					await .internal(.saveFactorSourceResult(
-						TaskResult {
-							try await factorSourcesClient.addOnDeviceFactorSource(
-								onDeviceMnemonicKind: onDeviceKind,
-								mnemonicWithPassphrase: mnemonicWithPassphrase
-							)
-						}
-					))
+			switch persistStrategy {
+			case .intoKeychainAndProfile:
+				switch state.mnemonicForFactorSourceKind {
+				case .offDevice:
+					state.offDeviceMnemonicInfoPrompt = .init(mnemonicWithPassphrase: mnemonicWithPassphrase)
+					return .none
+
+				case let .onDevice(onDeviceKind):
+					return .task {
+						await .internal(.saveFactorSourceResult(
+							TaskResult {
+								try await factorSourcesClient.addOnDeviceFactorSource(
+									onDeviceMnemonicKind: onDeviceKind,
+									mnemonicWithPassphrase: mnemonicWithPassphrase
+								)
+							}
+						))
+					}
 				}
-			case .intoKeychainAndProfile(.offDevice):
-				state.offDeviceMnemonicInfoPrompt = .init(mnemonicWithPassphrase: mnemonicWithPassphrase)
-				return .none
 			case .intoKeychainOnly:
 				return .task {
 					await .internal(.saveFactorSourceResult(
@@ -364,8 +378,8 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			loggerGlobal.error("Failed to save mnemonic in profile, error: \(error)")
 			return .none
 
-		case let .saveFactorSourceResult(.success(factorSourceID)):
-			return .send(.delegate(.savedInProfile(factorSourceID)))
+		case let .saveFactorSourceResult(.success(factorSource)):
+			return .send(.delegate(.persistedNewFactorSourceInProfile(factorSource)))
 		}
 	}
 }
