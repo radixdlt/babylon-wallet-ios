@@ -19,7 +19,7 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 	}
 
 	public enum ViewAction: Sendable, Equatable {
-		case appeared, inputMnemonic
+		case appeared, inputMnemonic, skip
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -67,6 +67,11 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 				persistStrategy: .intoKeychainOnly,
 				mnemonicForFactorSourceKind: state.mnemonicToImport.mnemonicWordCount == .twelve ? .onDevice(.olympia) : .onDevice(.babylon)
 			))
+			return .none
+
+		case .skip:
+			precondition(state.mnemonicToImport.isSkippable)
+			loggerGlobal.feature("TODO skip me")
 			return .none
 		}
 	}

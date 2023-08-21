@@ -2,14 +2,18 @@ import FeaturePrelude
 
 extension ImportMnemonicControllingAccounts.State {
 	var viewState: ImportMnemonicControllingAccounts.ViewState {
-		.init()
+		.init(isSkippable: mnemonicToImport.isSkippable)
 	}
 }
 
 // MARK: - ImportMnemonicControllingAccounts.View
 extension ImportMnemonicControllingAccounts {
 	public struct ViewState: Equatable {
-		// TODO: declare some properties
+		let isSkippable: Bool
+
+		var title: LocalizedStringKey {
+			isSkippable ? "The following Accounts are controlled by a seed phrase. To recover control, you must re-enter it." : "Your Personas and the following Accounts are controlled by your main seed phrase. To recover control, you must re-enter it."
+		}
 	}
 
 	@MainActor
@@ -22,11 +26,29 @@ extension ImportMnemonicControllingAccounts {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-				// TODO: implement
-				Text("Implement: ImportMnemonicControllingAccounts")
-					.background(Color.yellow)
-					.foregroundColor(.red)
-					.onAppear { viewStore.send(.appeared) }
+				VStack {
+					// FIXME: Strings
+					Text(viewStore.title)
+
+					if viewStore.isSkippable {
+						Button("Skip This Seed Phrase For Now") {
+							viewStore.send(.skip)
+						}
+					}
+
+					ScrollView {
+						ForEach(["A", "B"], id: \.self) {
+							Text("\($0)")
+						}
+					}
+				}
+				.footer {
+					// FIXME: Strings
+					Button("Enter This Seed Phrase") {
+						viewStore.send(.inputMnemonic)
+					}
+				}
+				.onAppear { viewStore.send(.appeared) }
 			}
 		}
 	}
