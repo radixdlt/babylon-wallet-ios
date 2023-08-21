@@ -3,9 +3,8 @@ import Foundation
 import Prelude
 
 // MARK: - FungibleResource
-public struct FungibleResource {
+public struct FungibleResource: Sendable, Hashable, Codable {
 	public let resourceAddress: ResourceAddress
-	public let amount: BigDecimal
 	public let divisibility: Int?
 	public let name: String?
 	public let symbol: String?
@@ -15,9 +14,8 @@ public struct FungibleResource {
 	public let tags: [AssetTag]
 	public let totalSupply: BigDecimal?
 
-	init(
+	public init(
 		resourceAddress: ResourceAddress,
-		amount: BigDecimal,
 		divisibility: Int?,
 		name: String?,
 		symbol: String?,
@@ -28,7 +26,6 @@ public struct FungibleResource {
 		totalSupply: BigDecimal?
 	) {
 		self.resourceAddress = resourceAddress
-		self.amount = amount
 		self.divisibility = divisibility
 		self.name = name
 		self.symbol = symbol
@@ -41,7 +38,7 @@ public struct FungibleResource {
 }
 
 // MARK: - NonFungibleResource
-public struct NonFungibleResource {
+public struct NonFungibleResource: Sendable, Hashable, Codable {
 	public let resourceAddress: ResourceAddress
 	public let name: String?
 	public let description: String?
@@ -50,7 +47,7 @@ public struct NonFungibleResource {
 	public let tags: [AssetTag]
 	public let totalSupply: BigDecimal?
 
-	init(
+	public init(
 		resourceAddress: ResourceAddress,
 		name: String?,
 		description: String?,

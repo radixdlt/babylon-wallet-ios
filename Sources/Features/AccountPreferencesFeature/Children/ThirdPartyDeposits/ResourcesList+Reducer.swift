@@ -1,5 +1,6 @@
 import EngineKit
 import FeaturePrelude
+import OnLedgerEntitiesClient
 
 // MARK: - ResourcesListMode
 public enum ResourcesListMode: Hashable, Sendable {
@@ -11,6 +12,12 @@ public enum ResourcesListMode: Hashable, Sendable {
 // MARK: - ResourcesList
 public struct ResourcesList: FeatureReducer {
 	public struct State: Hashable, Sendable {
+		struct Resource: Hashable, Sendable {
+			let iconURL: URL?
+			let name: String?
+			let address: ThirdPartyDeposits.DepositAddress
+		}
+
 		var resourceAddresses: OrderedSet<ThirdPartyDeposits.DepositAddress> {
 			switch mode {
 			case let .allowDenyAssets(exception):
@@ -20,14 +27,25 @@ public struct ResourcesList: FeatureReducer {
 			}
 		}
 
+		var allDepositorAddresses: OrderedSet<ThirdPartyDeposits.DepositAddress> {
+			switch mode {
+			case .allowDenyAssets:
+				return thirdPartyDeposits.assetsExceptionList.keys
+			case .allowDepositors:
+				return thirdPartyDeposits.depositorsAllowList
+			}
+		}
+
 		var mode: ResourcesListMode
 		var thirdPartyDeposits: ThirdPartyDeposits
+		var resources: [Resource]
 
 		@PresentationState
 		var destinations: Destinations.State? = nil
 	}
 
 	public enum ViewAction: Equatable {
+		case onAppeared
 		case addAssetTapped
 		case assetRemove(ThirdPartyDeposits.DepositAddress)
 		case exceptionListChanged(ThirdPartyDeposits.DepositAddressExceptionRule)
@@ -39,6 +57,11 @@ public struct ResourcesList: FeatureReducer {
 
 	public enum DelegateAction: Sendable, Equatable {
 		case updated(ThirdPartyDeposits)
+	}
+
+	public enum InternalAction: Sendable, Equatable {
+		case resourceLoaded(TaskResult<OnLedgerResource>, ThirdPartyDeposits.DepositAddress)
+		case resourcesLoaded(TaskResult<[OnLedgerResource]>)
 	}
 
 	public struct Destinations: ReducerProtocol {
@@ -64,6 +87,8 @@ public struct ResourcesList: FeatureReducer {
 		}
 	}
 
+	@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
+
 	public var body: some ReducerProtocolOf<Self> {
 		Reduce(core)
 			.ifLet(\.$destinations, action: /Action.child .. ChildAction.destinations) {
@@ -73,6 +98,13 @@ public struct ResourcesList: FeatureReducer {
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
+		case .onAppeared:
+			let addresses: [ResourceAddress] = state.allDepositorAddresses.map(\.resourceAddress)
+
+			return .run { send in
+				let loadResourcesResult = await TaskResult { try await onLedgerEntitiesClient.getResources(addresses) }
+				await send(.internal(.resourcesLoaded(loadResourcesResult)))
+			}
 		case .addAssetTapped:
 			state.destinations = .addAsset(.init(
 				mode: state.mode,
@@ -100,8 +132,13 @@ public struct ResourcesList: FeatureReducer {
 			case .allowDepositors:
 				state.thirdPartyDeposits.depositorsAllowList.append(newAsset)
 			}
+			// fetch the assest
 			state.destinations = nil
-			return .send(.delegate(.updated(state.thirdPartyDeposits)))
+			return .run { [thirdPartyDeposits = state.thirdPartyDeposits] send in
+				await send(.delegate(.updated(thirdPartyDeposits)))
+				let loadResourceResult = await TaskResult { try await onLedgerEntitiesClient.getResource(newAsset.resourceAddress) }
+				await send(.internal(.resourceLoaded(loadResourceResult, newAsset)))
+			}
 		case let .destinations(.presented(.confirmAssetDeletion(.confirmTapped(resource)))):
 			switch state.mode {
 			case .allowDenyAssets:
@@ -111,6 +148,39 @@ public struct ResourcesList: FeatureReducer {
 			}
 			return .send(.delegate(.updated(state.thirdPartyDeposits)))
 		case .destinations:
+			return .none
+		}
+	}
+
+	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
+		switch internalAction {
+		case let .resourceLoaded(.success(resource), newAsset):
+			switch resource {
+			case let .fungible(fungible):
+				state.resources.append(.init(iconURL: fungible.iconURL, name: fungible.name, address: newAsset))
+			case let .nonFungible(nonFungible):
+				state.resources.append(.init(iconURL: nonFungible.iconURL, name: nonFungible.name, address: newAsset))
+			}
+
+			return .none
+		case let .resourceLoaded(_, newAsset):
+			state.resources.append(.init(iconURL: nil, name: nil, address: newAsset))
+			return .none
+
+		case let .resourcesLoaded(.success(resources)):
+			state.resources = state.allDepositorAddresses.map { address in
+				let resourceDetails = resources.first { $0.resourceAddress == address.resourceAddress }
+				return .init(
+					iconURL: nil,
+					name: nil,
+					address: address
+				)
+			}
+			return .none
+		case .resourcesLoaded(.failure):
+			state.resources = state.allDepositorAddresses.map {
+				State.Resource(iconURL: nil, name: nil, address: $0)
+			}
 			return .none
 		}
 	}
@@ -155,6 +225,17 @@ extension ResourcesListMode {
 			return "The asset will be removed from the deny list"
 		case .allowDepositors:
 			return "The badge will be removed from the list"
+		}
+	}
+}
+
+extension ThirdPartyDeposits.DepositAddress {
+	var resourceAddress: ResourceAddress {
+		switch self {
+		case let .resourceAddress(address):
+			return address
+		case let .nonFungibleGlobalID(nonFungibleGlobalID):
+			return try! nonFungibleGlobalID.resourceAddress().asSpecific()
 		}
 	}
 }

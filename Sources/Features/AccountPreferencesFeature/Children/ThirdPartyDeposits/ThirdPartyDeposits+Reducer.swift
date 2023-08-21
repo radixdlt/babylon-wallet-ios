@@ -73,12 +73,14 @@ public struct ManageThirdPartyDeposits: FeatureReducer {
 			case .allowDenyAssets:
 				state.destinations = .allowDenyAssets(.init(
 					mode: .allowDenyAssets(.allow),
-					thirdPartyDeposits: state.account.onLedgerSettings.thirdPartyDeposits
+					thirdPartyDeposits: state.account.onLedgerSettings.thirdPartyDeposits,
+					resources: []
 				))
 			case .allowDepositors:
 				state.destinations = .allowDepositors(.init(
 					mode: .allowDepositors,
-					thirdPartyDeposits: state.account.onLedgerSettings.thirdPartyDeposits
+					thirdPartyDeposits: state.account.onLedgerSettings.thirdPartyDeposits,
+					resources: []
 				))
 			}
 			return .none

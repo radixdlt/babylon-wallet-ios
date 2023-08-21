@@ -97,6 +97,9 @@ extension ResourcesList {
 					}
 					Spacer()
 				}
+				.task {
+					viewStore.send(.view(.onAppeared))
+				}
 				.padding(.top, .medium1)
 				.background(.app.gray5)
 				.destination(store: store)
@@ -111,6 +114,12 @@ extension ResourcesList {
 		}
 	}
 }
+
+// extension ResourcesList.View {
+//    func resourceRow() -> some SwiftUI.View {
+//
+//    }
+// }
 
 private extension View {
 	@MainActor
@@ -167,6 +176,17 @@ extension ResourcesListMode {
 			return "Allow/Deny Specific Assets"
 		case .allowDepositors:
 			return "Allow Specific Depositors"
+		}
+	}
+}
+
+extension ThirdPartyDeposits.DepositAddress {
+	var ledgerIdentifiable: LedgerIdentifiable {
+		switch self {
+		case let .resourceAddress(address):
+			return .address(.resource(address))
+		case let .nonFungibleGlobalID(id):
+			return .address(.nonFungibleGlobalID(id))
 		}
 	}
 }
