@@ -21,7 +21,7 @@ extension Profile.Network.Account {
 extension Profile.Network.Account.OnLedgerSettings {
 	public struct ThirdPartyDeposits: Hashable, Sendable, Codable {
 		/// The general deposit rule to apply
-		public enum DepositRule: String, Hashable, Sendable, Codable {
+		public enum DepositRule: String, Hashable, Sendable, Codable, CaseIterable {
 			case acceptAll
 			case acceptKnown
 			case denyAll
@@ -34,7 +34,7 @@ extension Profile.Network.Account.OnLedgerSettings {
 		}
 
 		/// The exception kind for deposit address
-		public enum DepositAddressExceptionRule: String, Hashable, Sendable, Codable {
+		public enum DepositAddressExceptionRule: String, Hashable, Sendable, Codable, CaseIterable {
 			/// A resource can always be deposited in to the account by third-parties
 			case allow
 			/// A resource can never be deposited in to the account by third-parties
@@ -43,8 +43,13 @@ extension Profile.Network.Account.OnLedgerSettings {
 
 		/// The specific Asset exception rule
 		public struct AssetException: Hashable, Sendable, Codable {
-			let address: DepositAddress
-			let exceptionRule: DepositAddressExceptionRule
+			public let address: DepositAddress
+			public let exceptionRule: DepositAddressExceptionRule
+
+			public init(address: DepositAddress, exceptionRule: DepositAddressExceptionRule) {
+				self.address = address
+				self.exceptionRule = exceptionRule
+			}
 		}
 
 		/// Controls the ability of thir-parties to deposit into this account
