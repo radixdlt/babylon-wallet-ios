@@ -9,6 +9,7 @@ public struct AssetTransferMessage: Sendable, FeatureReducer {
 
 		public let kind: Kind = .public // only public is supported for now
 		public var message: String
+		public var focused: Bool = true
 
 		@PresentationState
 		public var destination: Destinations.State?
@@ -25,6 +26,7 @@ public struct AssetTransferMessage: Sendable, FeatureReducer {
 	public enum ViewAction: Sendable, Equatable {
 		case messageKindTapped
 		case removeMessageTapped
+		case focusChanged(Bool)
 		case messageChanged(String)
 	}
 
@@ -63,6 +65,10 @@ public struct AssetTransferMessage: Sendable, FeatureReducer {
 		switch viewAction {
 		case .messageKindTapped:
 			state.destination = .messageMode(.init())
+			return .none
+
+		case let .focusChanged(focused):
+			state.focused = focused
 			return .none
 
 		case .removeMessageTapped:

@@ -15,6 +15,12 @@ extension AssetTransferMessage {
 	}
 }
 
+extension ViewStore<AssetTransferMessage.State, AssetTransferMessage.ViewAction> {
+	var focusedBinding: Binding<Bool> {
+		binding(get: \.focused, send: ViewAction.focusChanged)
+	}
+}
+
 extension AssetTransferMessage.View {
 	public var body: some View {
 		WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
@@ -62,6 +68,7 @@ extension AssetTransferMessage.View {
 					.scrollContentBackground(.hidden) // Remove the default background to allow customization
 					.background(Color.containerContentBackground)
 					.roundedCorners(.bottom, strokeColor: focused ? .focusedBorderColor : .borderColor)
+					.bind(viewStore.focusedBinding, to: $focused)
 				}
 			}
 			.sheet(
