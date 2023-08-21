@@ -83,7 +83,7 @@ final class TransactionClientTests: TestCase {
 		var advancedMode = TransactionFee.AdvancedFeeCustomization(feeSummary: feeSummary)
 		advancedMode.tipPercentage = 10
 
-		var transaction = TransactionFee(feeSummary: feeSummary, feeLocks: feeLocks, mode: .advanced(advancedMode))
+		let transaction = TransactionFee(feeSummary: feeSummary, feeLocks: feeLocks, mode: .advanced(advancedMode))
 
 		let networkFee = feeSummary.executionCost + feeSummary.finalizationCost
 		let feesTotal = feeSummary.executionCost + feeSummary.finalizationCost + feeSummary.storageExpansionCost + feeSummary.royaltyCost
