@@ -36,6 +36,12 @@ extension AccountsClient: DependencyKey {
 			nextAccountIndex: nextAccountIndex,
 			getAccountsOnCurrentNetwork: getAccountsOnCurrentNetwork,
 			accountsOnCurrentNetwork: { await getProfileStore().accountValues() },
+			accountUpdates: { address in
+				await getProfileStore().accountValues().compactMap {
+					$0.first { $0.address == address }
+				}
+				.eraseToAnyAsyncSequence()
+			},
 			getAccountsOnNetwork: getAccountsOnNetwork,
 			newVirtualAccount: { request in
 				let networkID = request.networkID

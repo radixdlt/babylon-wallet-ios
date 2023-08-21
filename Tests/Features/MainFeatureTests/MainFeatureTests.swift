@@ -7,14 +7,13 @@ final class MainFeatureTests: TestCase {
 		// given
 		let store = TestStore(
 			initialState: Main.State(home: .previewValue),
-			reducer: Main()
+			reducer: Main().dependency(\.userDefaultsClient, .noop)
 		)
-		store.exhaustivity = .off
 
 		// when
 		await store.send(.child(.home(.delegate(.displaySettings)))) {
 			// then
-			$0.destination = .settings(.init())
+			$0.destination = .settings(.init(showMigrateOlympiaButton: true))
 		}
 
 		// when

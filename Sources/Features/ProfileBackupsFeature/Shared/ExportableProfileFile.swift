@@ -49,3 +49,18 @@ extension ExportableProfileFile {
 		}
 	}
 }
+
+import OverlayWindowClient
+extension OverlayWindowClient.Item.HUD {
+	public static let decryptedProfile = Self(
+		text: "Successfully decrypted wallet file.",
+		icon: .init(kind: .system("lock.open"))
+	)
+
+	public static func exportedProfile(encrypted: Bool) -> Self {
+		.init(
+			text: "Exported \(encrypted ? "encrypted " : "")wallet backup file",
+			icon: .init(kind: encrypted ? .system("lock.rectangle.stack") : .system("rectangle.stack"))
+		)
+	}
+}

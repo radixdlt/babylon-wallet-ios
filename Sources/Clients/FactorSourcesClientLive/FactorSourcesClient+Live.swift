@@ -134,7 +134,7 @@ extension FactorSourcesClient: DependencyKey {
 	public static let liveValue = Self.live()
 }
 
-internal func signingFactors(
+func signingFactors(
 	for entities: some Collection<EntityPotentiallyVirtual>,
 	from allFactorSources: IdentifiedArrayOf<FactorSource>,
 	signingPurpose: SigningPurpose

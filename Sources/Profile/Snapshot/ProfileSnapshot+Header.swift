@@ -153,7 +153,8 @@ extension ProfileSnapshot.Header.Version {
 	/// - 41: Nickname is not optional
 	/// - 42: Change counter to not be factor source based.
 	/// - 43: Added `mnemonicWordCount` in `hint` in `DeviceFactorSource`
-	public static let minimum: Self = 43
+	/// - 44: Added `transaction` setting inside `appPreferences` with `defaultDepositGuarantee` decimal value encoded as String
+	public static let minimum: Self = 44
 }
 
 extension ProfileSnapshot.Header {

@@ -18,7 +18,7 @@ extension FactorSource {
 		fromRoot hdRoot: HD.Root,
 		factorSourceKind: FactorSourceKind
 	) throws -> FactorSourceID.FromHash {
-		try Self.id(
+		try id(
 			publicKey: hdRoot.publicKeyForFactorSourceID(),
 			factorSourceKind: factorSourceKind
 		)
@@ -28,7 +28,7 @@ extension FactorSource {
 		fromMnemonicWithPassphrase mnemonicWithPassphrase: MnemonicWithPassphrase,
 		factorSourceKind: FactorSourceKind
 	) throws -> FactorSourceID.FromHash {
-		try Self.id(
+		try id(
 			fromRoot: mnemonicWithPassphrase.hdRoot(),
 			factorSourceKind: factorSourceKind
 		)
@@ -38,7 +38,7 @@ extension FactorSource {
 		fromPrivateHDFactorSource privateHDFactorSource: PrivateHDFactorSource,
 		factorSourceKind: FactorSourceKind
 	) throws -> FactorSourceID.FromHash {
-		try Self.id(
+		try id(
 			fromMnemonicWithPassphrase: privateHDFactorSource.mnemonicWithPassphrase,
 			factorSourceKind: factorSourceKind
 		)

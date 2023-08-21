@@ -9,9 +9,7 @@ struct DetailsContainerWithHeaderViewState: Equatable {
 }
 
 // MARK: - DetailsContainerWithHeaderView
-struct DetailsContainerWithHeaderView<ThumbnailView, DetailsView>: View
-	where ThumbnailView: View, DetailsView: View
-{
+struct DetailsContainerWithHeaderView<ThumbnailView: View, DetailsView: View>: View {
 	let viewState: DetailsContainerWithHeaderViewState
 	let closeButtonAction: () -> Void
 
@@ -33,15 +31,12 @@ struct DetailsContainerWithHeaderView<ThumbnailView, DetailsView>: View
 	var body: some View {
 		NavigationStack {
 			ScrollView {
-				Group {
+				VStack(spacing: .medium3) {
 					header(with: viewState)
 
-					DetailsContainerWithHeaderViewMaker.makeSeparator()
-
 					detailsView
-						.padding(.vertical, .medium3)
+						.padding(.bottom, .medium3)
 				}
-				.padding(.horizontal, .large2)
 			}
 			#if os(iOS)
 			.navigationBarTitle(viewState.title)
@@ -73,21 +68,5 @@ struct DetailsContainerWithHeaderView<ThumbnailView, DetailsView>: View
 				.font(.app.sectionHeader)
 		}
 		.padding(.vertical, .small2)
-	}
-}
-
-// MARK: - DetailsContainerWithHeaderViewMaker
-enum DetailsContainerWithHeaderViewMaker {
-	static func makeSeparator() -> some View {
-		Separator().padding(.horizontal, -.small2)
-	}
-
-	@ViewBuilder
-	static func makeDescriptionView(description: String) -> some View {
-		Text(description)
-			.textStyle(.body1Regular)
-			.frame(maxWidth: .infinity, alignment: .leading)
-
-		DetailsContainerWithHeaderViewMaker.makeSeparator()
 	}
 }

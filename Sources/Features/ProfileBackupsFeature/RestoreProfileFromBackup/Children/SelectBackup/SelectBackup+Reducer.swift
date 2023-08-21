@@ -176,7 +176,7 @@ public struct SelectBackup: Sendable, FeatureReducer {
 
 		case let .destination(.presented(.inputEncryptionPassword(.delegate(.successfullyDecrypted(_, decrypted))))):
 			state.destination = nil
-			overlayWindowClient.scheduleHUD(.init(kind: .decryptedProfile))
+			overlayWindowClient.scheduleHUD(.decryptedProfile)
 			return .send(.delegate(.selectedProfileSnapshot(decrypted, isInCloud: false)))
 
 		case .destination(.presented(.inputEncryptionPassword(.delegate(.successfullyEncrypted)))):

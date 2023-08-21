@@ -40,6 +40,7 @@ package.addModules([
 			"AccountPortfoliosClient",
 			"CreateAuthKeyFeature",
 			"ShowQRFeature",
+			"OverlayWindowClient",
 		],
 		tests: .yes()
 	),
@@ -225,15 +226,6 @@ package.addModules([
 		tests: .yes()
 	),
 	.feature(
-		name: "GeneralSettings",
-		dependencies: [
-			"CacheClient",
-			"AppPreferencesClient",
-			"FactorSourcesClient", // check if has any ledgers
-		],
-		tests: .no
-	),
-	.feature(
 		name: "HomeFeature",
 		dependencies: [
 			"AccountDetailsFeature",
@@ -394,7 +386,7 @@ package.addModules([
 			"GatewayAPI",
 			"GatewaySettingsFeature",
 			"ImportMnemonicFeature",
-			"GeneralSettings",
+			"FactorSourcesClient", // Check if user has any ledgers
 			"ImportLegacyWalletClient",
 			"P2PLinksFeature",
 			"PersonasFeature",
@@ -667,7 +659,9 @@ package.addModules([
 	),
 	.client(
 		name: "OverlayWindowClient",
-		dependencies: [],
+		dependencies: [
+			"DesignSystem", // please forgive me... only access to colors. I will be judge for all time for this!
+		],
 		tests: .no
 	),
 	.client(

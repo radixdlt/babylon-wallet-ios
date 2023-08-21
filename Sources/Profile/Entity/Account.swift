@@ -65,7 +65,7 @@ extension Profile.Network {
 		public var appearanceID: AppearanceID
 
 		/// A required non empty display name, used by presentation layer and sent to Dapps when requested.
-		public let displayName: NonEmpty<String>
+		public var displayName: NonEmpty<String>
 
 		public init(
 			networkID: NetworkID,

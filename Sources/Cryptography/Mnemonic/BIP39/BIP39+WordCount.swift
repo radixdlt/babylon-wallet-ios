@@ -46,29 +46,29 @@ extension BIP39.WordCount {
 // MARK: - Internal
 
 extension BIP39.WordCount {
-	internal static let checksumBitsPerWord = 3
+	static let checksumBitsPerWord = 3
 
-	internal var byteCount: Int {
+	var byteCount: Int {
 		let byteCount = Self.entropyInBitsFrom(wordCount: wordCount) / .bitsPerByte
 		return byteCount
 	}
 
-	internal static func wordCountFrom(entropyInBits: Int) -> Int {
+	static func wordCountFrom(entropyInBits: Int) -> Int {
 		Int(ceil(Double(entropyInBits) / Double(BIP39.WordList.sizeLog2)))
 	}
 
-	internal static func entropyInBitsFrom(wordCount: Int) -> Int {
+	static func entropyInBitsFrom(wordCount: Int) -> Int {
 		let ent = wordCount * BIP39.WordList.sizeLog2
 		let cs = checksumLengthInBits(wordCount: wordCount)
 		let bits = ent - cs
 		return bits
 	}
 
-	internal static func checksumLengthInBits(wordCount: Int) -> Int {
+	static func checksumLengthInBits(wordCount: Int) -> Int {
 		wordCount / BIP39.WordCount.checksumBitsPerWord
 	}
 
-	internal var checksumLengthInBits: Int {
+	var checksumLengthInBits: Int {
 		Self.checksumLengthInBits(wordCount: wordCount)
 	}
 }

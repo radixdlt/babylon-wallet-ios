@@ -347,7 +347,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 		case .debugOnlyCopyMnemonic:
 			if let mnemonic = state.mnemonic?.phrase.rawValue {
 				pasteboardClient.copyString(mnemonic)
-				overlayWindowClient.scheduleHUD(.init(kind: .copied))
+				overlayWindowClient.scheduleHUD(.copied)
 			}
 			return .none
 
