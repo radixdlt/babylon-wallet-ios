@@ -305,9 +305,3 @@ extension TransactionClient {
 		)
 	}
 }
-
-extension BigDecimal {
-	init(_ engineDecimal: EngineKit.Decimal) throws {
-		try self.init(fromString: engineDecimal.asStr())
-	}
-}

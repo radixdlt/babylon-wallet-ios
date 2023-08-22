@@ -32,19 +32,19 @@ extension SelectFeePayer {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				VStack {
 					Text(L10n.TransactionReview.CustomizeNetworkFeeSheet.SelectFeePayer.navigationTitle)
+						.multilineTextAlignment(.center)
 						.textStyle(.sheetTitle)
 						.foregroundColor(.app.gray1)
 						.padding(.top, .medium3)
 						.padding(.horizontal, .medium1)
 						.padding(.bottom, .small2)
-						.multilineTextAlignment(.center)
 
 					Text(L10n.TransactionReview.CustomizeNetworkFeeSheet.SelectFeePayer.subtitle(viewStore.fee))
+						.multilineTextAlignment(.center)
 						.textStyle(.body1HighImportance)
 						.foregroundColor(.app.gray2)
 						.padding(.horizontal, .large3)
 						.padding(.bottom, .small1)
-						.multilineTextAlignment(.center)
 
 					ScrollView {
 						VStack(spacing: .small1) {
@@ -104,7 +104,7 @@ enum SelectAccountToPayForFeeRow {
 					VStack(spacing: 0) {
 						SmallAccountCard(account: viewState.account)
 						HStack {
-							TokenBalanceView(viewState: .init(thumbnail: .xrd, name: "XRD", balance: viewState.xrdBalance))
+							TokenBalanceView(viewState: .init(thumbnail: .xrd, name: Constants.xrdTokenName, balance: viewState.xrdBalance))
 							RadioButton(
 								appearance: .dark,
 								state: isSelected ? .selected : .unselected

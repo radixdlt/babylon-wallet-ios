@@ -35,7 +35,7 @@ public struct CustomizeFees: FeatureReducer {
 	public enum ViewAction: Equatable, Sendable {
 		case changeFeePayerTapped
 		case toggleMode
-		case closed
+		case closeButtonTapped
 	}
 
 	public enum ChildAction: Equatable, Sendable {
@@ -92,7 +92,7 @@ public struct CustomizeFees: FeatureReducer {
 			state.feePayerSelection.transactionFee.toggleMode()
 			state.modeState = state.feePayerSelection.transactionFee.customizationModeState
 			return .send(.delegate(.updated(state.feePayerSelection)))
-		case .closed:
+		case .closeButtonTapped:
 			return .run { _ in
 				await dismiss()
 			}

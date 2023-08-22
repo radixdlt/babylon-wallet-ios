@@ -218,10 +218,11 @@ public struct ManifestReviewRequest: Sendable {
 
 // MARK: - FeePayerCandidate
 public struct FeePayerCandidate: Sendable, Hashable, Identifiable {
-	public let account: Profile.Network.Account
-	public let xrdBalance: BigDecimal
 	public typealias ID = Profile.Network.Account.ID
 	public var id: ID { account.id }
+
+	public let account: Profile.Network.Account
+	public let xrdBalance: BigDecimal
 }
 
 // MARK: - TransactionToReview
@@ -272,15 +273,15 @@ public struct TransactionFee: Hashable, Sendable {
 
 	public init(executionAnalysis: ExecutionAnalysis) throws {
 		let feeSummary: FeeSummary = try .init(
-			executionCost: .init(executionAnalysis.feeSummary.executionCost),
-			finalizationCost: .init(executionAnalysis.feeSummary.finalizationCost),
-			storageExpansionCost: .init(executionAnalysis.feeSummary.storageExpansionCost),
-			royaltyCost: .init(executionAnalysis.feeSummary.royaltyCost)
+			executionCost: executionAnalysis.feeSummary.executionCost.asBigDecimal(),
+			finalizationCost: executionAnalysis.feeSummary.finalizationCost.asBigDecimal(),
+			storageExpansionCost: executionAnalysis.feeSummary.storageExpansionCost.asBigDecimal(),
+			royaltyCost: executionAnalysis.feeSummary.royaltyCost.asBigDecimal()
 		)
 
 		let feeLocks: FeeLocks = try .init(
-			nonContingentLock: .init(executionAnalysis.feeLocks.lock),
-			contingentLock: .init(executionAnalysis.feeLocks.contingentLock)
+			nonContingentLock: executionAnalysis.feeLocks.lock.asBigDecimal(),
+			contingentLock: executionAnalysis.feeLocks.contingentLock.asBigDecimal()
 		)
 
 		self.init(
@@ -402,8 +403,11 @@ extension TransactionFee {
 		}
 
 		public init(feeSummary: FeeSummary, feeLocks: FeeLocks) {
-			var networkFee = feeSummary.executionCost + feeSummary.finalizationCost + feeSummary.storageExpansionCost
-			networkFee += networkFee * PredefinedFeeConstants.networkFeeMultiplier
+			let networkFee = (
+				feeSummary.executionCost +
+					feeSummary.finalizationCost +
+					feeSummary.storageExpansionCost
+			) * PredefinedFeeConstants.networkFeeMultiplier
 			let remainingNonContingentLock = feeLocks.nonContingentLock.clampedDiff(networkFee)
 
 			self.init(

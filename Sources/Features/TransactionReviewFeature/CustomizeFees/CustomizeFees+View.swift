@@ -67,7 +67,7 @@ extension CustomizeFees {
 				VStack(spacing: .zero) {
 					HStack {
 						CloseButton {
-							viewStore.send(.closed)
+							viewStore.send(.closeButtonTapped)
 						}
 						Spacer()
 					}

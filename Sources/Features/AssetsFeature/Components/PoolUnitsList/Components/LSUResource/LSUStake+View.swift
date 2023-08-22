@@ -157,7 +157,7 @@ extension LSUStake.State {
 				.map {
 					.init(
 						thumbnail: .xrd,
-						symbol: "XRD",
+						symbol: Constants.xrdTokenName,
 						tokenAmount: $0.format()
 					)
 				},

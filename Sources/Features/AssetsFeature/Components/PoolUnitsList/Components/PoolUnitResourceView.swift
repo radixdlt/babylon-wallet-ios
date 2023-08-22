@@ -15,7 +15,7 @@ extension PoolUnitResourceViewState {
 	init(xrdAmount: String) {
 		self.init(
 			thumbnail: .xrd,
-			symbol: "XRD",
+			symbol: Constants.xrdTokenName,
 			tokenAmount: xrdAmount
 		)
 	}

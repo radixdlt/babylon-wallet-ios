@@ -5,8 +5,8 @@ extension AdvancedFeesCustomization.State {
 	var viewState: AdvancedFeesCustomization.ViewState {
 		.init(
 			feesViewState: .init(feeViewStates: fees.viewStates, totalFee: fees.total, isAdvancedMode: true),
-			paddingAmountStr: paddingAmountStr,
-			tipPercentageStr: tipPercentageStr,
+			paddingAmount: paddingAmountStr,
+			tipPercentage: tipPercentageStr,
 			focusField: focusField
 		)
 	}
@@ -16,8 +16,8 @@ extension AdvancedFeesCustomization {
 	public struct ViewState: Equatable, Sendable {
 		let feesViewState: FeesView.ViewState
 
-		let paddingAmountStr: String
-		let tipPercentageStr: String
+		let paddingAmount: String
+		let tipPercentage: String
 		let focusField: State.FocusField?
 	}
 
@@ -37,7 +37,7 @@ extension AdvancedFeesCustomization {
 								primaryHeading: .init(text: L10n.TransactionReview.CustomizeNetworkFeeSheet.paddingFieldLabel),
 								placeholder: "",
 								text: viewStore.binding(
-									get: \.paddingAmountStr,
+									get: \.paddingAmount,
 									send: ViewAction.paddingAmountChanged
 								),
 								focus: .on(
@@ -56,7 +56,7 @@ extension AdvancedFeesCustomization {
 								subHeading: L10n.TransactionReview.CustomizeNetworkFeeSheet.tipFieldInfo,
 								placeholder: "",
 								text: viewStore.binding(
-									get: \.tipPercentageStr,
+									get: \.tipPercentage,
 									send: ViewAction.tipPercentageChanged
 								),
 								focus: .on(

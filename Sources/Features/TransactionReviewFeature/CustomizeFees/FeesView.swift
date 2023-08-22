@@ -14,7 +14,7 @@ struct FeesView: View {
 	var body: some View {
 		VStack(spacing: .small1) {
 			HStack {
-				Text(L10n.TransactionReview.CustomizeNetworkFeeSheet.feeBreakdownTitle) // TODO: strings
+				Text(L10n.TransactionReview.CustomizeNetworkFeeSheet.feeBreakdownTitle)
 					.textStyle(.body1Link)
 					.foregroundColor(.app.gray2)
 					.textCase(.uppercase)
@@ -74,9 +74,7 @@ struct FeesView: View {
 
 // MARK: - FeeViewState
 struct FeeViewState: Equatable, Sendable, Identifiable {
-	var id: String {
-		name
-	}
+	var id: String { name }
 
 	let name: String
 	let amount: BigDecimal
