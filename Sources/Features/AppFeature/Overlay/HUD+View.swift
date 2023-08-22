@@ -10,6 +10,12 @@ extension HUD.State {
 				text: "Copied",
 				icon: .init(kind: .system("checkmark.circle.fill"), foregroundColor: .app.green1)
 			)
+		case let .operationSucceeded(message):
+			return .init(
+				offset: offset,
+				text: message,
+				icon: .init(kind: .system("checkmark.circle.fill"), foregroundColor: .app.green1)
+			)
 		}
 	}
 }

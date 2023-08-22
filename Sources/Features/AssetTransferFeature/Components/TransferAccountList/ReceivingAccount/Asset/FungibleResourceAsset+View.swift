@@ -16,6 +16,12 @@ extension FungibleResourceAsset {
 	}
 }
 
+extension ViewStore<FungibleResourceAsset.State, FungibleResourceAsset.ViewAction> {
+	var focusedBinding: Binding<Bool> {
+		binding(get: \.focused, send: ViewAction.focusChanged)
+	}
+}
+
 extension FungibleResourceAsset.View {
 	public var body: some View {
 		WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
@@ -35,21 +41,13 @@ extension FungibleResourceAsset.View {
 							send: { .amountChanged($0) }
 						)
 					)
-					.toolbar {
-						ToolbarItemGroup(placement: .keyboard) {
-							Spacer()
-
-							Button(L10n.Common.done) {
-								focused = false
-							}
-						}
-					}
 					.keyboardType(.decimalPad)
 					.lineLimit(1)
 					.multilineTextAlignment(.trailing)
 					.foregroundColor(.app.gray1)
 					.textStyle(.sectionHeader)
 					.focused($focused)
+					.bind(viewStore.focusedBinding, to: $focused)
 				}
 
 				if viewStore.totalExceedsBalance {

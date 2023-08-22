@@ -15,6 +15,9 @@ public struct AccountsClient: Sendable {
 	/// value of Accounts when you switch network (if new active gateway is on a new network).
 	public var accountsOnCurrentNetwork: AccountsOnCurrentNetwork
 
+	/// Allows subscribing to any account updates
+	public var accountUpdates: AccountUpdates
+
 	public var newVirtualAccount: NewVirtualAccount
 
 	/// Saves a virtual account into the profile.
@@ -34,6 +37,7 @@ public struct AccountsClient: Sendable {
 		nextAccountIndex: @escaping NextAccountIndex,
 		getAccountsOnCurrentNetwork: @escaping GetAccountsOnCurrentNetwork,
 		accountsOnCurrentNetwork: @escaping AccountsOnCurrentNetwork,
+		accountUpdates: @escaping AccountUpdates,
 		getAccountsOnNetwork: @escaping GetAccountsOnNetwork,
 		newVirtualAccount: @escaping NewVirtualAccount,
 		saveVirtualAccount: @escaping SaveVirtualAccount,
@@ -46,6 +50,7 @@ public struct AccountsClient: Sendable {
 		self.getAccountsOnCurrentNetwork = getAccountsOnCurrentNetwork
 		self.getAccountsOnNetwork = getAccountsOnNetwork
 		self.accountsOnCurrentNetwork = accountsOnCurrentNetwork
+		self.accountUpdates = accountUpdates
 		self.newVirtualAccount = newVirtualAccount
 		self.saveVirtualAccount = saveVirtualAccount
 		self.getAccountByAddress = getAccountByAddress
@@ -61,6 +66,7 @@ extension AccountsClient {
 	public typealias GetAccountsOnNetwork = @Sendable (NetworkID) async throws -> Profile.Network.Accounts
 
 	public typealias AccountsOnCurrentNetwork = @Sendable () async -> AnyAsyncSequence<Profile.Network.Accounts>
+	public typealias AccountUpdates = @Sendable (AccountAddress) async -> AnyAsyncSequence<Profile.Network.Account>
 
 	public typealias NewVirtualAccount = @Sendable (NewAccountRequest) async throws -> Profile.Network.Account
 	public typealias SaveVirtualAccount = @Sendable (SaveAccountRequest) async throws -> Void

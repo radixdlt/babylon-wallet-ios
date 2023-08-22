@@ -8,9 +8,15 @@ extension PoolUnitDetails.State {
 			containerWithHeader: resource.detailsContainerWithHeaderViewState,
 			thumbnailURL: resource.iconURL,
 			resources: poolUnit.resourceViewStates,
-			description: resource.description,
-			resourceAddress: resource.resourceAddress,
-			currentSupply: resource.totalSupply?.format() ?? L10n.AssetDetails.supplyUnkown
+			resourceDetails: .init(
+				description: resource.description,
+				resourceAddress: resource.resourceAddress,
+				validatorAddress: nil,
+				resourceName: resource.name, // FIXME: Is this correct?
+				currentSupply: resource.totalSupply?.format() ?? L10n.AssetDetails.supplyUnkown,
+				behaviors: resource.behaviors,
+				tags: resource.tags
+			)
 		)
 	}
 }
@@ -20,13 +26,8 @@ extension PoolUnitDetails {
 	public struct ViewState: Equatable {
 		let containerWithHeader: DetailsContainerWithHeaderViewState
 		let thumbnailURL: URL?
-
 		let resources: NonEmpty<IdentifiedArrayOf<PoolUnitResourceViewState>>
-
-		let description: String?
-
-		let resourceAddress: ResourceAddress
-		let currentSupply: String
+		let resourceDetails: AssetResourceDetailsSection.ViewState
 	}
 
 	@MainActor
@@ -47,30 +48,18 @@ extension PoolUnitDetails {
 					NFTThumbnail(viewStore.thumbnailURL, size: .veryLarge)
 				} detailsView: {
 					VStack(spacing: .medium1) {
+						AssetDetailsSeparator()
+
 						Text(L10n.Account.PoolUnits.Details.currentRedeemableValue)
 							.textStyle(.secondaryHeader)
 							.foregroundColor(.app.gray1)
-						PoolUnitResourcesView(
-							resources: viewStore.resources
-						)
 
-						DetailsContainerWithHeaderViewMaker
-							.makeSeparator()
+						PoolUnitResourcesView(resources: viewStore.resources)
+							.padding(.horizontal, .large2)
 
-						if let description = viewStore.description {
-							DetailsContainerWithHeaderViewMaker
-								.makeDescriptionView(description: description)
-						}
-
-						VStack(spacing: .medium3) {
-							TokenDetailsPropertyViewMaker
-								.makeResourceAddress(address: viewStore.resourceAddress)
-							TokenDetailsPropertyView(
-								title: L10n.AssetDetails.currentSupply,
-								propertyView: Text(viewStore.currentSupply)
-							)
-						}
+						AssetResourceDetailsSection(viewState: viewStore.resourceDetails)
 					}
+					.padding(.bottom, .medium1)
 				} closeButtonAction: {
 					viewStore.send(.closeButtonTapped)
 				}

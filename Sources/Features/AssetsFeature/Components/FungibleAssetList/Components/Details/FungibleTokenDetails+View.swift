@@ -6,8 +6,15 @@ extension FungibleTokenDetails.State {
 		.init(
 			detailsContainerWithHeader: resource.detailsContainerWithHeaderViewState,
 			thumbnail: isXRD ? .xrd : .known(resource.iconURL),
-			description: resource.description,
-			resourceAddress: resource.resourceAddress
+			details: .init(
+				description: resource.description,
+				resourceAddress: resource.resourceAddress,
+				validatorAddress: nil,
+				resourceName: nil,
+				currentSupply: resource.totalSupply?.format(), // FIXME: Check which format
+				behaviors: resource.behaviors,
+				tags: isXRD ? resource.tags + [.officialRadix] : resource.tags
+			)
 		)
 	}
 }
@@ -17,8 +24,7 @@ extension FungibleTokenDetails {
 	public struct ViewState: Equatable {
 		let detailsContainerWithHeader: DetailsContainerWithHeaderViewState
 		let thumbnail: TokenThumbnail.Content
-		let description: String?
-		let resourceAddress: ResourceAddress
+		let details: AssetResourceDetailsSection.ViewState
 	}
 
 	@MainActor
@@ -34,14 +40,8 @@ extension FungibleTokenDetails {
 				DetailsContainerWithHeaderView(viewState: viewStore.detailsContainerWithHeader) {
 					TokenThumbnail(viewStore.thumbnail, size: .veryLarge)
 				} detailsView: {
-					if let description = viewStore.description {
-						DetailsContainerWithHeaderViewMaker
-							.makeDescriptionView(description: description)
-					}
-
-					TokenDetailsPropertyViewMaker.makeResourceAddress(
-						address: viewStore.resourceAddress
-					)
+					AssetResourceDetailsSection(viewState: viewStore.details)
+						.padding(.bottom, .medium1)
 				} closeButtonAction: {
 					viewStore.send(.closeButtonTapped)
 				}
@@ -57,7 +57,13 @@ struct FungibleTokenDetails_Preview: PreviewProvider {
 	static var previews: some View {
 		FungibleTokenDetails.View(
 			store: .init(
-				initialState: try! .init(resource: .init(resourceAddress: .init(validatingAddress: "resource_tdx_c_1qyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq40v2wv"), amount: .zero), isXRD: true),
+				initialState: try! .init(
+					resource: .init(
+						resourceAddress: .init(validatingAddress: "resource_tdx_c_1qyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq40v2wv"),
+						amount: .zero
+					),
+					isXRD: true
+				),
 				reducer: FungibleTokenDetails()
 			)
 		)

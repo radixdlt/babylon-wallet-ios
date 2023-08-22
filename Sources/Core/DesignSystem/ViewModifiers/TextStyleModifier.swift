@@ -93,17 +93,11 @@ extension View {
 	}
 
 	public func flushedLeft(padding: CGFloat) -> some View {
-		HStack(spacing: 0) {
-			self
-			Spacer(minLength: 0)
-		}
-		.padding(.leading, padding)
+		frame(maxWidth: .infinity, alignment: .leading)
+			.padding(.leading, padding)
 	}
 
 	public var flushedRight: some View {
-		HStack(spacing: 0) {
-			Spacer(minLength: 0)
-			self
-		}
+		frame(maxWidth: .infinity, alignment: .trailing)
 	}
 }

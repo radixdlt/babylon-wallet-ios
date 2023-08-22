@@ -5,42 +5,76 @@ import SwiftUI
 public struct PlainListRow<Icon: View>: View {
 	let isShowingChevron: Bool
 	let title: String
+	let subtitle: String?
 	let icon: Icon
 
 	public init(
+		_ content: AssetIcon.Content,
 		title: String,
+		subtitle: String? = nil,
+		showChevron: Bool = true
+	) where Icon == AssetIcon {
+		self.init(
+			title: title,
+			subtitle: subtitle,
+			showChevron: showChevron,
+			icon: { AssetIcon(content) }
+		)
+	}
+
+	public init(
+		title: String,
+		subtitle: String? = nil,
 		showChevron: Bool = true,
 		@ViewBuilder icon: () -> Icon
 	) {
 		self.isShowingChevron = showChevron
 		self.title = title
+		self.subtitle = subtitle
 		self.icon = icon()
-	}
-
-	public init(
-		_ content: AssetIcon.Content,
-		title: String,
-		showChevron: Bool = true
-	) where Icon == AssetIcon {
-		self.isShowingChevron = showChevron
-		self.title = title
-		self.icon = AssetIcon(content)
 	}
 
 	public var body: some View {
 		HStack(spacing: .zero) {
 			icon
 				.padding(.trailing, .medium3)
-			Text(title)
-				.textStyle(.secondaryHeader)
-				.foregroundColor(.app.gray1)
+
+			PlainListRowCore(title: title, subtitle: subtitle)
+
 			Spacer(minLength: 0)
+
 			if isShowingChevron {
 				Image(asset: AssetResource.chevronRight)
 			}
 		}
-		.frame(height: .largeButtonHeight)
+		.frame(minHeight: .settingsRowHeight)
 		.padding(.horizontal, .medium3)
+		.contentShape(Rectangle())
+	}
+}
+
+// MARK: - PlainListRowCore
+struct PlainListRowCore: View {
+	let title: String
+	let subtitle: String?
+
+	var body: some View {
+		VStack(alignment: .leading, spacing: .zero) {
+			Text(title)
+				.lineSpacing(-6)
+				.lineLimit(1)
+				.textStyle(.secondaryHeader)
+				.foregroundColor(.app.gray1)
+
+			if let subtitle {
+				Text(subtitle)
+					.lineSpacing(-4)
+					.lineLimit(2)
+					.minimumScaleFactor(0.8)
+					.textStyle(.body2Regular)
+					.foregroundColor(.app.gray2)
+			}
+		}
 	}
 }
 
@@ -73,7 +107,7 @@ extension View {
 struct PlainListRow_Previews: PreviewProvider {
 	static var previews: some View {
 		PlainListRow(
-			.asset(AssetResource.generalSettings),
+			.asset(AssetResource.appSettings),
 			title: "A title",
 			showChevron: true
 		)

@@ -6,7 +6,7 @@ public struct AssetIcon: View {
 	private let hitTargetSize: HitTargetSize
 	private let cornerRadius: CGFloat
 
-	public enum Content {
+	public enum Content: Equatable {
 		case asset(ImageAsset)
 		case systemImage(String)
 	}

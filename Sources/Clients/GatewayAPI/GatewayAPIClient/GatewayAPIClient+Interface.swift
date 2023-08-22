@@ -55,6 +55,17 @@ extension GatewayAPIClient {
 }
 
 extension GatewayAPIClient {
+	@Sendable
+	public func getSingleEntityDetails(
+		_ address: String,
+		explictMetadata: Set<EntityMetadataKey> = []
+	) async throws -> GatewayAPI.StateEntityDetailsResponseItem {
+		guard let item = try await getEntityDetails([address], explictMetadata, nil).items.first else {
+			throw EmptyEntityDetailsResponse()
+		}
+		return item
+	}
+
 	/// Extracts the dApp definition from a component, if it has one
 	public func getDappDefinition(_ component: ComponentAddress) async throws -> GatewayAPI.EntityMetadataCollection {
 		let dappDefinitionAddress = try await getDappDefinitionAddress(component)
@@ -132,5 +143,64 @@ extension GatewayAPI.EntityMetadataCollection {
 		}
 
 		return self
+	}
+}
+
+extension GatewayAPI.RoleKey {
+	public var parsedName: ParsedName? {
+		.init(rawValue: name)
+	}
+
+	public enum ParsedName: String, Hashable {
+		case minter
+		case burner
+		case withdrawer
+		case depositor
+		case recaller
+		case freezer
+		case nonFungibleDataUpdater = "non_fungible_data_updater"
+
+		case minterUpdater = "minter_updater"
+		case burnerUpdater = "burner_updater"
+		case withdrawerUpdater = "withdrawer_updater"
+		case depositorUpdater = "depositor_updater"
+		case recallerUpdater = "recaller_updater"
+		case freezerUpdater = "freezer_updater"
+		case nonFungibleDataUpdaterUpdater = "non_fungible_data_updater_updater"
+	}
+}
+
+extension GatewayAPI.ComponentEntityRoleAssignmentEntry {
+	public var parsedAssignment: ParsedAssignment? {
+		.init(assignment)
+	}
+
+	public enum ParsedAssignment: Hashable {
+		case owner
+		case denyAll
+		case allowAll
+		case protected
+		case otherExplicit
+
+		init?(_ assignment: GatewayAPI.ComponentEntityRoleAssignmentEntryAssignment) {
+			switch assignment.resolution {
+			case .owner:
+				guard assignment.explicitRule == nil else { return nil }
+				self = .owner
+			case .explicit:
+				guard let explicitRule = assignment.explicitRule?.value as? [String: Any] else { return nil }
+				guard let type = explicitRule["type"] as? String else { return nil }
+				switch type {
+				case "DenyAll":
+					self = .denyAll
+				case "AllowAll":
+					self = .allowAll
+				case "Protected":
+					self = .protected
+				default:
+					self = .otherExplicit
+				}
+			}
+		}
 	}
 }

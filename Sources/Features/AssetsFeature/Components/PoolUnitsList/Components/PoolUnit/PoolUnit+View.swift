@@ -6,6 +6,7 @@ extension PoolUnit {
 		let iconURL: URL?
 		let name: String
 		let resources: NonEmpty<IdentifiedArrayOf<PoolUnitResourceViewState>>
+		let isSelected: Bool?
 	}
 
 	public struct View: SwiftUI.View {
@@ -29,14 +30,20 @@ extension PoolUnit {
 					}
 					.padding(-.small3)
 
-					PoolUnitResourcesView(resources: viewStore.resources)
-						.padding(-.small2)
+					HStack {
+						PoolUnitResourcesView(resources: viewStore.resources)
+							.padding(-.small2)
+
+						if let isSelected = viewStore.isSelected {
+							CheckmarkView(appearance: .dark, isChecked: isSelected)
+						}
+					}
+					.onTapGesture { viewStore.send(.didTap) }
 				}
 				.padding(.medium1)
 				.background(.app.white)
 				.roundedCorners(radius: .small1)
 				.tokenRowShadow()
-				.onTapGesture { viewStore.send(.didTap) }
 			}
 			.sheet(
 				store: store.scope(
@@ -56,7 +63,8 @@ extension PoolUnit.State {
 		.init(
 			iconURL: poolUnit.poolUnitResource.iconURL,
 			name: poolUnit.poolUnitResource.name ?? L10n.Account.PoolUnits.unknownPoolUnitName,
-			resources: poolUnit.resourceViewStates
+			resources: poolUnit.resourceViewStates,
+			isSelected: isSelected
 		)
 	}
 }
@@ -72,7 +80,7 @@ extension AccountPortfolio.PoolUnitResources.PoolUnit {
 		}
 
 		return .init(
-			rawValue: xrdResourceViewState.map { [$0] } ?? []
+			rawValue: (xrdResourceViewState.map { [$0] } ?? [])
 				+ poolResources.nonXrdResources.map {
 					PoolUnitResourceViewState(
 						thumbnail: .known($0.iconURL),
