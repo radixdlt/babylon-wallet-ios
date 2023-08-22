@@ -29,12 +29,12 @@ public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 		public var body: some ReducerProtocolOf<Self> {
 			Scope(state: /State.importMnemonicControllingAccounts, action: /Action.importMnemonicControllingAccounts) {
 				ImportMnemonicControllingAccounts()
+					._printChanges()
 			}
 		}
 	}
 
 	public enum ChildAction: Sendable, Equatable {
-//		case importingMnemonicControllingAccounts(ImportMnemonicControllingAccounts.Action)
 		case destination(PresentationAction<Destinations.Action>)
 	}
 
@@ -55,12 +55,6 @@ public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 	@Dependency(\.errorQueue) var errorQueue
 	public init() {}
 
-//	public var body: some ReducerProtocolOf<ImportMnemonicsFlowCoordinator> {
-//		Reduce(core)
-//			.ifLet(\.importMnemonicControllingAccounts, action: /Action.child .. ChildAction.importMnemonicControllingAccounts) {
-	//                ImportMnemonicControllingAccounts()
-//			}
-//	}
 	public var body: some ReducerProtocolOf<Self> {
 		Reduce(core)
 			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
@@ -96,13 +90,14 @@ public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
 		case let .destination(.presented(.importMnemonicControllingAccounts(.delegate(.persistedMnemonicInKeychain(factorSourceID))))):
+			return finishedWith(factorSourceID: factorSourceID, state: &state)
 
-			state.mnemonicsLeftToImport.removeAll(where: { $0.factorSourceID.embed() == factorSourceID })
-			return nextMnemonicIfNeeded(state: &state)
+		case let .destination(.presented(.importMnemonicControllingAccounts(.delegate(.skippedMnemonic(factorSourceIDHash))))):
+			return finishedWith(factorSourceID: factorSourceIDHash.embed(), state: &state)
 
 		case .destination(.dismiss):
 			guard let destination = state.destination else {
-				return .none
+				return nextMnemonicIfNeeded(state: &state)
 			}
 
 			switch destination {
@@ -118,6 +113,11 @@ public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 		default:
 			return .none
 		}
+	}
+
+	private func finishedWith(factorSourceID: FactorSourceID, state: inout State) -> EffectTask<Action> {
+		state.mnemonicsLeftToImport.removeAll(where: { $0.factorSourceID.embed() == factorSourceID })
+		return nextMnemonicIfNeeded(state: &state)
 	}
 
 	private func nextMnemonicIfNeeded(state: inout State) -> EffectTask<Action> {

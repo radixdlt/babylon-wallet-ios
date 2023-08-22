@@ -28,6 +28,7 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 
 	public enum DelegateAction: Sendable, Equatable {
 		case persistedMnemonicInKeychain(FactorSource.ID)
+		case skippedMnemonic(FactorSourceID.FromHash)
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -80,7 +81,7 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 		case .skip:
 			precondition(state.entitiesControlledByFactorSource.isSkippable)
 			loggerGlobal.feature("TODO skip me")
-			return .none
+			return .send(.delegate(.skippedMnemonic(state.entitiesControlledByFactorSource.factorSourceID)))
 		}
 	}
 
@@ -116,6 +117,7 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
 		case .validated:
+
 			return .send(.delegate(.persistedMnemonicInKeychain(state.entitiesControlledByFactorSource.factorSourceID.embed())))
 		}
 	}
