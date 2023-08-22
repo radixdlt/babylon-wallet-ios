@@ -160,7 +160,7 @@ public struct BackUpProfileSettings: Sendable, FeatureReducer {
 			return .none
 
 		case let .profileExportResult(.success(exportedProfileURL)):
-			let didEncryptIt = exportedProfileURL.pathComponents.contains(.profileFileEncryptedPart)
+			let didEncryptIt = exportedProfileURL.absoluteString.contains(.profileFileEncryptedPart)
 			overlayWindowClient.scheduleHUD(.exportedProfile(encrypted: didEncryptIt))
 			loggerGlobal.notice("Profile successfully exported to: \(exportedProfileURL)")
 			return .none
