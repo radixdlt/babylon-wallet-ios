@@ -1,6 +1,7 @@
 import DisplayEntitiesControlledByMnemonicFeature
 import FeaturePrelude
 import ImportMnemonicFeature
+import OverlayWindowClient
 
 // MARK: - ImportMnemonicControllingAccounts
 public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
@@ -19,7 +20,7 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 	}
 
 	public enum InternalAction: Sendable, Equatable {
-		case validated
+		case validated(PrivateHDFactorSource)
 	}
 
 	public enum ViewAction: Sendable, Equatable {
@@ -55,6 +56,9 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 	}
 
 	@Dependency(\.errorQueue) var errorQueue
+	@Dependency(\.secureStorageClient) var secureStorageClient
+	@Dependency(\.overlayWindowClient) var overlayWindowClient
+
 	public init() {}
 
 	public var body: some ReducerProtocolOf<Self> {
@@ -98,10 +102,22 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 					mnemonicWithPassphrase: mnemonicWithPassphrase
 				)
 				guard factorSourceID == state.entitiesControlledByFactorSource.factorSourceID else {
-					fatalError("factor source ID mismatch")
+					// FIXME: Strings
+					overlayWindowClient.scheduleHUD(.init(
+						text: "Wrong mnemmonic",
+						icon: .init(
+							kind: .system("exclamationmark.octagon"),
+							foregroundColor: Color.app.red1
+						)
+					)
+					)
+					return .none
 				}
+
 				return validate(
-					mnemonic: mnemonicWithPassphrase, accounts: state.entitiesControlledByFactorSource.accounts
+					mnemonicWithPassphrase: mnemonicWithPassphrase,
+					accounts: state.entitiesControlledByFactorSource.accounts,
+					factorSource: state.entitiesControlledByFactorSource.deviceFactorSource
 				)
 
 			case .persistedMnemonicInKeychainOnly, .doneViewing, .persistedNewFactorSourceInProfile:
@@ -116,15 +132,23 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
-		case .validated:
+		case let .validated(privateHDFactorSource):
+			return .run { _ in
+				try await secureStorageClient.saveMnemonicForFactorSource(
+					privateHDFactorSource
+				)
+			} catch: { _, _ in
+				fatalError()
+			}
 
 			return .send(.delegate(.persistedMnemonicInKeychain(state.entitiesControlledByFactorSource.factorSourceID.embed())))
 		}
 	}
 
 	private func validate(
-		mnemonic: MnemonicWithPassphrase,
-		accounts: [Profile.Network.Account]
+		mnemonicWithPassphrase: MnemonicWithPassphrase,
+		accounts: [Profile.Network.Account],
+		factorSource: DeviceFactorSource
 	) -> EffectTask<Action> {
 		func fail(error: Swift.Error?) -> EffectTask<Action> {
 			loggerGlobal.error("Failed to validate all accounts against mnemonic, underlying error: \(String(describing: error))")
@@ -132,10 +156,16 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 			return .none
 		}
 		do {
-			guard try mnemonic.validatePublicKeysOf(accounts: accounts) else {
+			guard try mnemonicWithPassphrase.validatePublicKeysOf(accounts: accounts) else {
 				return fail(error: nil)
 			}
-			return .send(.internal(.validated))
+
+			let privateHDFactorSource = try PrivateHDFactorSource(
+				mnemonicWithPassphrase: mnemonicWithPassphrase,
+				factorSource: factorSource
+			)
+
+			return .send(.internal(.validated(privateHDFactorSource)))
 		} catch {
 			return fail(error: error)
 		}
