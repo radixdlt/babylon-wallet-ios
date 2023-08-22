@@ -4,18 +4,18 @@ import FeaturePrelude
 extension ResourcesList.State {
 	var viewState: ResourcesList.ViewState {
 		.init(
-			addresses: resourceAddresses,
+			resources: .init(uncheckedUniqueElements: resourcesForDisplay),
 			info: {
 				switch mode {
-				case .allowDenyAssets(.allow) where resourceAddresses.isEmpty:
+				case .allowDenyAssets(.allow) where resourcesForDisplay.isEmpty:
 					return "Add a specific asset by its resource address to allow all third-party deposits"
 				case .allowDenyAssets(.allow):
 					return "The following resource addresses may always be deposited to this account by third parties."
-				case .allowDenyAssets(.deny) where resourceAddresses.isEmpty:
+				case .allowDenyAssets(.deny) where resourcesForDisplay.isEmpty:
 					return "Add a specific asset by its resource address to deny all third-party deposits"
 				case .allowDenyAssets(.deny):
 					return "The following resource addresses may never be deposited to this account by third parties."
-				case .allowDepositors where resourceAddresses.isEmpty:
+				case .allowDepositors where resourcesForDisplay.isEmpty:
 					return "Add a specific badge by its resource address to allow all deposits from its holder"
 				case .allowDepositors:
 					return "The holder of the following badges may always deposit accounts to this account."
@@ -28,7 +28,7 @@ extension ResourcesList.State {
 
 extension ResourcesList {
 	public struct ViewState: Equatable {
-		let addresses: OrderedSet<ThirdPartyDeposits.DepositAddress>
+		let resources: IdentifiedArrayOf<State.Resource>
 		let info: String
 		let mode: ResourcesListMode
 	}
@@ -66,19 +66,19 @@ extension ResourcesList {
 					}
 					.padding(.horizontal, .medium1)
 
-					if !viewStore.addresses.isEmpty {
+					if !viewStore.resources.isEmpty {
 						List {
-							ForEach(viewStore.addresses, id: \.self) { row in
+							ForEach(viewStore.resources) { row in
 								HStack {
-									TokenThumbnail(.xrd)
+									TokenThumbnail(.known(row.iconURL))
 										.padding(.trailing, .medium3)
 
 									VStack(alignment: .leading, spacing: .zero) {
-										Text("XRD")
+										Text(row.name ?? "")
 											.textStyle(.body1HighImportance)
 											.foregroundColor(.app.gray1)
 										AddressView(
-											row.ledgerIdentifiable,
+											row.address.ledgerIdentifiable,
 											isTappable: false
 										)
 										.foregroundColor(.app.gray2)
@@ -86,7 +86,7 @@ extension ResourcesList {
 									Spacer()
 									AssetIcon(.asset(AssetResource.trash))
 										.onTapGesture {
-											viewStore.send(.view(.assetRemove(row)))
+											viewStore.send(.view(.assetRemove(row.address)))
 										}
 								}
 								.frame(minHeight: .largeButtonHeight)

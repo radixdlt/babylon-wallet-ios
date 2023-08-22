@@ -12,27 +12,32 @@ public enum ResourcesListMode: Hashable, Sendable {
 // MARK: - ResourcesList
 public struct ResourcesList: FeatureReducer {
 	public struct State: Hashable, Sendable {
-		struct Resource: Hashable, Sendable {
+		struct Resource: Hashable, Sendable, Identifiable {
+			var id: ThirdPartyDeposits.DepositAddress {
+				address
+			}
+
 			let iconURL: URL?
 			let name: String?
 			let address: ThirdPartyDeposits.DepositAddress
 		}
 
-		var resourceAddresses: OrderedSet<ThirdPartyDeposits.DepositAddress> {
+		var allDepositorAddresses: OrderedSet<ThirdPartyDeposits.DepositAddress> {
 			switch mode {
-			case let .allowDenyAssets(exception):
-				return thirdPartyDeposits.assetsExceptionList.filter { $0.value == exception }.keys
+			case .allowDenyAssets:
+				return OrderedSet(thirdPartyDeposits.assetsExceptionList.map(\.address))
 			case .allowDepositors:
 				return thirdPartyDeposits.depositorsAllowList
 			}
 		}
 
-		var allDepositorAddresses: OrderedSet<ThirdPartyDeposits.DepositAddress> {
+		var resourcesForDisplay: [Resource] {
 			switch mode {
-			case .allowDenyAssets:
-				return thirdPartyDeposits.assetsExceptionList.keys
+			case let .allowDenyAssets(exception):
+				let addresses = thirdPartyDeposits.assetsExceptionList.filter { $0.exceptionRule == exception }.map(\.address)
+				return resources.filter { addresses.contains($0.address) }
 			case .allowDepositors:
-				return thirdPartyDeposits.depositorsAllowList
+				return resources
 			}
 		}
 
@@ -60,8 +65,8 @@ public struct ResourcesList: FeatureReducer {
 	}
 
 	public enum InternalAction: Sendable, Equatable {
-		case resourceLoaded(TaskResult<OnLedgerResource>, ThirdPartyDeposits.DepositAddress)
-		case resourcesLoaded(TaskResult<[OnLedgerResource]>)
+		case resourceLoaded(TaskResult<OnLedgerEntity.Resource>, ThirdPartyDeposits.DepositAddress)
+		case resourcesLoaded(TaskResult<[OnLedgerEntity.Resource]>)
 	}
 
 	public struct Destinations: ReducerProtocol {
@@ -109,7 +114,7 @@ public struct ResourcesList: FeatureReducer {
 			state.destinations = .addAsset(.init(
 				mode: state.mode,
 				resourceAddress: "",
-				alreadyAddedResources: state.resourceAddresses
+				alreadyAddedResources: state.allDepositorAddresses
 			))
 			return .none
 		case let .assetRemove(resource):
@@ -124,14 +129,7 @@ public struct ResourcesList: FeatureReducer {
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
 		case let .destinations(.presented(.addAsset(.delegate(.addAddress(list, newAsset))))):
-			switch list {
-			case .allowDenyAssets(.allow):
-				state.thirdPartyDeposits.assetsExceptionList[newAsset] = .allow
-			case .allowDenyAssets(.deny):
-				state.thirdPartyDeposits.assetsExceptionList[newAsset] = .deny
-			case .allowDepositors:
-				state.thirdPartyDeposits.depositorsAllowList.append(newAsset)
-			}
+			state.mode = list
 			// fetch the assest
 			state.destinations = nil
 			return .run { [thirdPartyDeposits = state.thirdPartyDeposits] send in
@@ -140,12 +138,14 @@ public struct ResourcesList: FeatureReducer {
 				await send(.internal(.resourceLoaded(loadResourceResult, newAsset)))
 			}
 		case let .destinations(.presented(.confirmAssetDeletion(.confirmTapped(resource)))):
+			state.resources.removeAll(where: { $0.address == resource })
 			switch state.mode {
 			case .allowDenyAssets:
-				state.thirdPartyDeposits.assetsExceptionList.removeValue(forKey: resource)
+				state.thirdPartyDeposits.assetsExceptionList.removeAll(where: { $0.address == resource })
 			case .allowDepositors:
 				state.thirdPartyDeposits.depositorsAllowList.remove(resource)
 			}
+
 			return .send(.delegate(.updated(state.thirdPartyDeposits)))
 		case .destinations:
 			return .none
@@ -155,24 +155,44 @@ public struct ResourcesList: FeatureReducer {
 	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
 		case let .resourceLoaded(.success(resource), newAsset):
-			switch resource {
-			case let .fungible(fungible):
-				state.resources.append(.init(iconURL: fungible.iconURL, name: fungible.name, address: newAsset))
-			case let .nonFungible(nonFungible):
-				state.resources.append(.init(iconURL: nonFungible.iconURL, name: nonFungible.name, address: newAsset))
+			switch resource.resourceAddress.decodedKind {
+			case .globalFungibleResourceManager:
+				state.resources.append(.init(iconURL: resource.iconURL, name: resource.name, address: newAsset))
+			case .globalNonFungibleResourceManager:
+				state.resources.append(.init(iconURL: resource.iconURL, name: resource.name, address: newAsset))
+			default:
+				assertionFailure("Unexpectedly loaded a different kind of resource \(resource.resourceAddress.decodedKind)")
 			}
 
-			return .none
+			switch state.mode {
+			case .allowDenyAssets(.allow):
+				state.thirdPartyDeposits.assetsExceptionList.updateOrAppend(.init(address: newAsset, exceptionRule: .allow))
+			case .allowDenyAssets(.deny):
+				state.thirdPartyDeposits.assetsExceptionList.updateOrAppend(.init(address: newAsset, exceptionRule: .deny))
+			case .allowDepositors:
+				state.thirdPartyDeposits.depositorsAllowList.append(newAsset)
+			}
+
+			return .send(.delegate(.updated(state.thirdPartyDeposits)))
 		case let .resourceLoaded(_, newAsset):
 			state.resources.append(.init(iconURL: nil, name: nil, address: newAsset))
-			return .none
+
+			switch state.mode {
+			case .allowDenyAssets(.allow):
+				state.thirdPartyDeposits.assetsExceptionList.updateOrAppend(.init(address: newAsset, exceptionRule: .allow))
+			case .allowDenyAssets(.deny):
+				state.thirdPartyDeposits.assetsExceptionList.updateOrAppend(.init(address: newAsset, exceptionRule: .deny))
+			case .allowDepositors:
+				state.thirdPartyDeposits.depositorsAllowList.updateOrAppend(newAsset)
+			}
+			return .send(.delegate(.updated(state.thirdPartyDeposits)))
 
 		case let .resourcesLoaded(.success(resources)):
 			state.resources = state.allDepositorAddresses.map { address in
 				let resourceDetails = resources.first { $0.resourceAddress == address.resourceAddress }
 				return .init(
-					iconURL: nil,
-					name: nil,
+					iconURL: resourceDetails?.iconURL,
+					name: resourceDetails?.name,
 					address: address
 				)
 			}
@@ -237,5 +257,11 @@ extension ThirdPartyDeposits.DepositAddress {
 		case let .nonFungibleGlobalID(nonFungibleGlobalID):
 			return try! nonFungibleGlobalID.resourceAddress().asSpecific()
 		}
+	}
+}
+
+extension ThirdPartyDeposits.AssetException {
+	func updateExceptionRule(_ rule: ThirdPartyDeposits.DepositAddressExceptionRule) -> Self {
+		.init(address: address, exceptionRule: rule)
 	}
 }
