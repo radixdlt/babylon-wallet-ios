@@ -167,6 +167,11 @@ extension EncryptOrDecryptProfile {
 					.buttonStyle(.primaryRectangular)
 					.controlState(viewStore.controlState)
 				}
+				.alert(
+					store: store.destination,
+					state: /EncryptOrDecryptProfile.Destination.State.incorrectPasswordAlert,
+					action: EncryptOrDecryptProfile.Destination.Action.incorrectPasswordAlert
+				)
 				.onAppear { viewStore.send(.appeared) }
 				// FIXME: Strings
 				.navigationTitle(viewStore.navigationTitle)

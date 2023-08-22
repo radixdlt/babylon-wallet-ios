@@ -41,6 +41,9 @@ public struct EncryptOrDecryptProfile: Sendable, FeatureReducer {
 			}
 		}
 
+		@PresentationState
+		public var destination: Destination.State? = nil
+
 		public var mode: Mode
 		var focusedField: Field?
 		var inputtedEncryptionPassword: String = ""
@@ -60,6 +63,10 @@ public struct EncryptOrDecryptProfile: Sendable, FeatureReducer {
 		case confirmedEncryptionPassword
 	}
 
+	public enum ChildAction: Sendable, Equatable {
+		case destination(PresentationAction<Destination.Action>)
+	}
+
 	public enum InternalAction: Sendable, Equatable {
 		case focusTextField(State.Field?)
 
@@ -76,11 +83,46 @@ public struct EncryptOrDecryptProfile: Sendable, FeatureReducer {
 		case successfullyEncrypted(plaintext: ProfileSnapshot, encrypted: EncryptedProfileSnapshot)
 	}
 
+	// MARK: - Destination
+
+	public struct Destination: ReducerProtocol, Sendable, Equatable {
+		public enum State: Hashable, Sendable {
+			case incorrectPasswordAlert(AlertState<Action.IncorrectPasswordAlert>)
+		}
+
+		public enum Action: Equatable, Sendable {
+			case incorrectPasswordAlert(IncorrectPasswordAlert)
+
+			public enum IncorrectPasswordAlert: Sendable, Hashable {
+				case okTapped
+			}
+		}
+
+		public var body: some ReducerProtocolOf<Self> {
+			EmptyReducer()
+		}
+	}
+
 	@Dependency(\.jsonEncoder) var jsonEncoder
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.backupsClient) var backupsClient
 
-	public init() {}
+	public var body: some ReducerProtocolOf<Self> {
+		Reduce(core)
+			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
+				Destination()
+			}
+	}
+
+	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+		switch childAction {
+		case .destination(.presented(.incorrectPasswordAlert(.okTapped))):
+			state.destination = nil
+			return .none
+		default:
+			return .none
+		}
+	}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
@@ -134,7 +176,8 @@ public struct EncryptOrDecryptProfile: Sendable, FeatureReducer {
 					return .send(.delegate(.successfullyEncrypted(plaintext: snapshot, encrypted: encrypted)))
 				} catch {
 					loggerGlobal.error("Failed to encrypt profile snapshot, error: \(error)")
-					errorQueue.schedule(error)
+//					errorQueue.schedule(error)
+					state.destination = .incorrectPasswordAlert(encrypt: true)
 					return .none
 				}
 			case let .decrypt(encrypted):
@@ -143,7 +186,8 @@ public struct EncryptOrDecryptProfile: Sendable, FeatureReducer {
 					return .send(.delegate(.successfullyDecrypted(encrypted: encrypted, decrypted: decrypted)))
 				} catch {
 					loggerGlobal.error("Failed to encrypt profile snapshot, error: \(error)")
-					errorQueue.schedule(error)
+//					errorQueue.schedule(error)
+					state.destination = .incorrectPasswordAlert(encrypt: false)
 					return .none
 				}
 			}
@@ -186,5 +230,18 @@ public struct EncryptOrDecryptProfile: Sendable, FeatureReducer {
 			errorQueue.schedule(error)
 			return .none
 		}
+	}
+}
+
+extension EncryptOrDecryptProfile.Destination.State {
+	// FIXME: Strings
+	fileprivate static func incorrectPasswordAlert(encrypt: Bool) -> Self {
+		.incorrectPasswordAlert(.init(
+			title: { TextState("Incorrect password") },
+			actions: {
+				ButtonState(action: .okTapped, label: { TextState("OK") })
+			},
+			message: { TextState("Failed to \(encrypt ? "encrypt" : "decrypt") using provided password.") }
+		))
 	}
 }
