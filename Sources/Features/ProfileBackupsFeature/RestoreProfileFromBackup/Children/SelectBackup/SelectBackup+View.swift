@@ -26,28 +26,30 @@ extension SelectBackup {
 
 						backupsList(with: viewStore)
 
-						Spacer(minLength: 0)
-
 						// FIXME: Strings
 						Button("Import from Backup File Instead") {
 							viewStore.send(.importFromFileInstead)
 						}
-						.buttonStyle(.secondaryRectangular(shouldExpand: true))
-
-						Spacer(minLength: 0)
+						.foregroundColor(.app.blue2)
+						.font(.app.body1Header)
+						.frame(height: .standardButtonHeight)
+						.frame(maxWidth: .infinity)
+						.padding(.medium1)
+						.background(.app.white)
+						.cornerRadius(.small2)
 					}
 					.foregroundColor(.app.gray1)
 					.padding(.medium2)
-					.footer {
-						WithControlRequirements(
-							viewStore.selectedProfileHeader,
-							forAction: { viewStore.send(.tappedUseCloudBackup($0)) },
-							control: { action in
-								Button(L10n.IOSProfileBackup.useICloudBackup, action: action)
-									.buttonStyle(.primaryRectangular)
-							}
-						)
-					}
+				}
+				.footer {
+					WithControlRequirements(
+						viewStore.selectedProfileHeader,
+						forAction: { viewStore.send(.tappedUseCloudBackup($0)) },
+						control: { action in
+							Button(L10n.IOSProfileBackup.useICloudBackup, action: action)
+								.buttonStyle(.primaryRectangular)
+						}
+					)
 				}
 				.sheet(
 					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
@@ -95,7 +97,12 @@ extension SelectBackup.View {
 					cloudBackupDataCard(item, viewStore: viewStore)
 				}
 			} else {
-				Text(L10n.IOSProfileBackup.noCloudBackup)
+				// FIXME: Strings (update: `noCloudBackup`)
+				Text("No wallet backups available on current iCloud account")
+					.foregroundColor(.app.gray2)
+					.padding(.large1)
+					.background(.app.gray5)
+					.cornerRadius(.small1)
 			}
 		}
 		.padding(.horizontal, .medium3)
@@ -106,20 +113,18 @@ extension SelectBackup.View {
 		let header = item.value
 		let isVersionCompatible = header.isVersionCompatible()
 		let creatingDevice = header.creatingDevice.id == viewStore.thisDeviceID ? L10n.IOSProfileBackup.thisDevice : header.creatingDevice.description.rawValue
-		let lastUsedOnDevice = header.lastUsedOnDevice.id == viewStore.thisDeviceID ? L10n.IOSProfileBackup.thisDevice : header.lastUsedOnDevice.description.rawValue
+//		let lastUsedOnDevice = header.lastUsedOnDevice.id == viewStore.thisDeviceID ? L10n.IOSProfileBackup.thisDevice : header.lastUsedOnDevice.description.rawValue
 
 		return Card(action: item.action) {
 			HStack {
 				VStack(alignment: .leading, spacing: 0) {
-					// TODO: Proper fields to be updated based on the final UX
-					Text(L10n.IOSProfileBackup.creatingDevice(creatingDevice))
-						.foregroundColor(.app.gray1)
-						.textStyle(.secondaryHeader)
 					Group {
-						Text(L10n.IOSProfileBackup.creationDateLabel(formatDate(header.creationDate)))
-						Text(L10n.IOSProfileBackup.lastUsedOnDeviceLabel(lastUsedOnDevice))
+//						Text(L10n.IOSProfileBackup.creationDateLabel(formatDate(header.creationDate)))
+						// FIXME: Strings
+						Text("**Backup from**: \(creatingDevice)")
+						// FIXME: update bolding of 'label'?
 						Text(L10n.IOSProfileBackup.lastModifedDateLabel(formatDate(header.lastModified)))
-						Text(L10n.IOSProfileBackup.numberOfNetworksLabel(header.contentHint.numberOfNetworks))
+//						Text(L10n.IOSProfileBackup.numberOfNetworksLabel(header.contentHint.numberOfNetworks))
 						Text(L10n.IOSProfileBackup.totalAccountsNumberLabel(header.contentHint.numberOfAccountsOnAllNetworksInTotal))
 						Text(L10n.IOSProfileBackup.totalPersonasNumberLabel(header.contentHint.numberOfPersonasOnAllNetworksInTotal))
 					}
