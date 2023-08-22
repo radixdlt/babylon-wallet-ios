@@ -5,29 +5,34 @@ import FeaturePrelude
 public struct AddAsset: FeatureReducer {
 	public struct State: Hashable, Sendable {
 		var mode: ResourcesListMode
-		let alreadyAddedResources: OrderedSet<ThirdPartyDeposits.DepositAddress>
+		let alreadyAddedResources: OrderedSet<Resource.Address>
 
 		var resourceAddress: String = ""
 		var resourceAddressFieldFocused: Bool = false
 
-		var validatedResourceAddress: ThirdPartyDeposits.DepositAddress? {
+		var validatedResourceAddress: Resource.Address? {
 			guard !resourceAddress.isEmpty else {
 				return nil
 			}
 
-			return .init(raw: resourceAddress)
+			switch mode {
+			case let .allowDenyAssets(exceptionRule):
+				return try? .assetException(.init(address: .init(validatingAddress: resourceAddress), exceptionRule: exceptionRule))
+			case .allowDepositors:
+				return ThirdPartyDeposits.DepositorAddress(raw: resourceAddress).map { .allowedDepositor($0) }
+			}
 		}
 	}
 
 	public enum ViewAction: Hashable {
-		case addAssetTapped(ThirdPartyDeposits.DepositAddress)
+		case addAssetTapped(Resource.Address)
 		case resourceAddressChanged(String)
 		case exceptionRuleChanged(ResourcesListMode.ExceptionRule)
 		case focusChanged(Bool)
 	}
 
 	public enum DelegateAction: Hashable {
-		case addAddress(ResourcesListMode, ThirdPartyDeposits.DepositAddress)
+		case addAddress(ResourcesListMode, Resource.Address)
 	}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
@@ -50,7 +55,7 @@ public struct AddAsset: FeatureReducer {
 	}
 }
 
-extension ThirdPartyDeposits.DepositAddress {
+extension ThirdPartyDeposits.DepositorAddress {
 	init?(raw: String) {
 		if let asResourceAddress = try? ResourceAddress(validatingAddress: raw) {
 			self = .resourceAddress(asResourceAddress)

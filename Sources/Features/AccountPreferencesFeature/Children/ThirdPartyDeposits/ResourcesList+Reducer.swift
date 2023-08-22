@@ -9,32 +9,41 @@ public enum ResourcesListMode: Hashable, Sendable {
 	case allowDepositors
 }
 
+// MARK: - Resource
+public struct Resource: Hashable, Sendable, Identifiable {
+	public enum Address: Hashable, Sendable {
+		case assetException(ThirdPartyDeposits.AssetException)
+		case allowedDepositor(ThirdPartyDeposits.DepositorAddress)
+	}
+
+	public var id: Address {
+		address
+	}
+
+	let iconURL: URL?
+	let name: String?
+	let address: Address
+}
+
 // MARK: - ResourcesList
 public struct ResourcesList: FeatureReducer {
 	public struct State: Hashable, Sendable {
-		struct Resource: Hashable, Sendable, Identifiable {
-			var id: ThirdPartyDeposits.DepositAddress {
-				address
-			}
-
-			let iconURL: URL?
-			let name: String?
-			let address: ThirdPartyDeposits.DepositAddress
-		}
-
-		var allDepositorAddresses: OrderedSet<ThirdPartyDeposits.DepositAddress> {
+		var allDepositorAddresses: OrderedSet<Resource.Address> {
 			switch mode {
 			case .allowDenyAssets:
-				return OrderedSet(thirdPartyDeposits.assetsExceptionList.map(\.address))
+				return OrderedSet(thirdPartyDeposits.assetsExceptionList.map { .assetException($0) })
 			case .allowDepositors:
-				return thirdPartyDeposits.depositorsAllowList
+				return OrderedSet(thirdPartyDeposits.depositorsAllowList.map { .allowedDepositor($0) })
 			}
 		}
 
 		var resourcesForDisplay: [Resource] {
 			switch mode {
 			case let .allowDenyAssets(exception):
-				let addresses = thirdPartyDeposits.assetsExceptionList.filter { $0.exceptionRule == exception }.map(\.address)
+				let addresses: [Resource.Address] = thirdPartyDeposits.assetsExceptionList
+					.filter { $0.exceptionRule == exception }
+					.map { .assetException($0) }
+
 				return loadedResources.filter { addresses.contains($0.address) }
 			case .allowDepositors:
 				return loadedResources
@@ -43,7 +52,7 @@ public struct ResourcesList: FeatureReducer {
 
 		var mode: ResourcesListMode
 		var thirdPartyDeposits: ThirdPartyDeposits
-		var loadedResources: [Resource]
+		var loadedResources: [Resource] = []
 
 		@PresentationState
 		var destinations: Destinations.State? = nil
@@ -52,7 +61,7 @@ public struct ResourcesList: FeatureReducer {
 	public enum ViewAction: Equatable {
 		case onAppeared
 		case addAssetTapped
-		case assetRemove(ThirdPartyDeposits.DepositAddress)
+		case assetRemove(Resource.Address)
 		case exceptionListChanged(ThirdPartyDeposits.DepositAddressExceptionRule)
 	}
 
@@ -65,7 +74,7 @@ public struct ResourcesList: FeatureReducer {
 	}
 
 	public enum InternalAction: Sendable, Equatable {
-		case resourceLoaded(OnLedgerEntity.Resource?, ThirdPartyDeposits.DepositAddress)
+		case resourceLoaded(OnLedgerEntity.Resource?, Resource.Address)
 		case resourcesLoaded([OnLedgerEntity.Resource]?)
 	}
 
@@ -80,7 +89,7 @@ public struct ResourcesList: FeatureReducer {
 			case confirmAssetDeletion(ConfirmDeletionAlert)
 
 			public enum ConfirmDeletionAlert: Sendable, Hashable {
-				case confirmTapped(ThirdPartyDeposits.DepositAddress)
+				case confirmTapped(Resource.Address)
 				case cancelTapped
 			}
 		}
@@ -143,11 +152,11 @@ public struct ResourcesList: FeatureReducer {
 			}
 
 		case let .destinations(.presented(.confirmAssetDeletion(.confirmTapped(resource)))):
-			switch state.mode {
-			case .allowDenyAssets:
-				state.thirdPartyDeposits.assetsExceptionList.removeAll(where: { $0.address == resource })
-			case .allowDepositors:
-				state.thirdPartyDeposits.depositorsAllowList.remove(resource)
+			switch resource {
+			case let .assetException(resource):
+				state.thirdPartyDeposits.assetsExceptionList.removeAll(where: { $0.address == resource.address })
+			case let .allowedDepositor(depositorAddress):
+				state.thirdPartyDeposits.depositorsAllowList.remove(depositorAddress)
 			}
 
 			return .send(.delegate(.updated(state.thirdPartyDeposits)))
@@ -161,13 +170,11 @@ public struct ResourcesList: FeatureReducer {
 		case let .resourceLoaded(resource, newAsset):
 			state.loadedResources.append(.init(iconURL: resource?.iconURL, name: resource?.name, address: newAsset))
 
-			switch state.mode {
-			case .allowDenyAssets(.allow):
-				state.thirdPartyDeposits.assetsExceptionList.updateOrAppend(.init(address: newAsset, exceptionRule: .allow))
-			case .allowDenyAssets(.deny):
-				state.thirdPartyDeposits.assetsExceptionList.updateOrAppend(.init(address: newAsset, exceptionRule: .deny))
-			case .allowDepositors:
-				state.thirdPartyDeposits.depositorsAllowList.append(newAsset)
+			switch newAsset {
+			case let .assetException(resource):
+				state.thirdPartyDeposits.assetsExceptionList.updateOrAppend(resource)
+			case let .allowedDepositor(depositorAddress):
+				state.thirdPartyDeposits.depositorsAllowList.updateOrAppend(depositorAddress)
 			}
 
 			return .send(.delegate(.updated(state.thirdPartyDeposits)))
@@ -175,7 +182,7 @@ public struct ResourcesList: FeatureReducer {
 		case let .resourcesLoaded(resources):
 			guard let resources else {
 				state.loadedResources = state.allDepositorAddresses.map {
-					State.Resource(iconURL: nil, name: nil, address: $0)
+					Resource(iconURL: nil, name: nil, address: $0)
 				}
 				return .none
 			}
@@ -197,7 +204,7 @@ extension AlertState<ResourcesList.Destinations.Action.ConfirmDeletionAlert> {
 	static func confirmAssetDeletion(
 		_ title: String,
 		_ message: String,
-		resourceAddress: ThirdPartyDeposits.DepositAddress
+		resourceAddress: Resource.Address
 	) -> AlertState {
 		AlertState {
 			TextState(title)
@@ -210,6 +217,17 @@ extension AlertState<ResourcesList.Destinations.Action.ConfirmDeletionAlert> {
 			}
 		} message: {
 			TextState(message)
+		}
+	}
+}
+
+extension Resource.Address {
+	var resourceAddress: ResourceAddress {
+		switch self {
+		case let .assetException(resource):
+			return resource.address
+		case let .allowedDepositor(depositorAddress):
+			return depositorAddress.resourceAddress
 		}
 	}
 }
@@ -236,7 +254,7 @@ extension ResourcesListMode {
 	}
 }
 
-extension ThirdPartyDeposits.DepositAddress {
+extension ThirdPartyDeposits.DepositorAddress {
 	var resourceAddress: ResourceAddress {
 		switch self {
 		case let .resourceAddress(address):

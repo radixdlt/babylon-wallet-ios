@@ -28,7 +28,7 @@ extension ResourcesList.State {
 
 extension ResourcesList {
 	public struct ViewState: Equatable {
-		let resources: IdentifiedArrayOf<State.Resource>
+		let resources: IdentifiedArrayOf<Resource>
 		let info: String
 		let mode: ResourcesListMode
 	}
@@ -115,12 +115,6 @@ extension ResourcesList {
 	}
 }
 
-// extension ResourcesList.View {
-//    func resourceRow() -> some SwiftUI.View {
-//
-//    }
-// }
-
 private extension View {
 	@MainActor
 	func destination(store: StoreOf<ResourcesList>) -> some View {
@@ -180,13 +174,17 @@ extension ResourcesListMode {
 	}
 }
 
-extension ThirdPartyDeposits.DepositAddress {
+extension Resource.Address {
 	var ledgerIdentifiable: LedgerIdentifiable {
 		switch self {
-		case let .resourceAddress(address):
-			return .address(.resource(address))
-		case let .nonFungibleGlobalID(id):
-			return .address(.nonFungibleGlobalID(id))
+		case let .assetException(exception):
+			return .address(.resource(exception.address))
+
+		case let .allowedDepositor(.resourceAddress(resourceAddress)):
+			return .address(.resource(resourceAddress))
+
+		case let .allowedDepositor(.nonFungibleGlobalID(nonFungibleGlobalID)):
+			return .address(.nonFungibleGlobalID(nonFungibleGlobalID))
 		}
 	}
 }

@@ -101,10 +101,6 @@ public struct AccountDetails: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
-		case .destination(.presented(.preferences(.delegate(.dismiss)))):
-			state.destination = nil
-			return .none
-
 		case .destination(.presented(.transfer(.delegate(.dismissed)))):
 			state.destination = nil
 			return .none

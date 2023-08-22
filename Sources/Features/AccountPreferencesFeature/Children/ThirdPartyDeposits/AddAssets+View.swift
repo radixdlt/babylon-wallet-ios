@@ -37,7 +37,7 @@ extension AddAsset.State {
 extension AddAsset {
 	public struct ViewState: Equatable {
 		let resourceAddress: String
-		let validatedResourceAddress: ThirdPartyDeposits.DepositAddress?
+		let validatedResourceAddress: Resource.Address?
 		let addressHint: Hint?
 		let resourceAddressFieldFocused: Bool
 		let mode: ResourcesListMode

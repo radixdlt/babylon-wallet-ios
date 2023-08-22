@@ -38,9 +38,10 @@ extension AccountPreferences {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-				PreferencesList(viewState: .init(sections: viewStore.sections), onRowSelected: { _, rowId in
-					viewStore.send(.rowTapped(rowId))
-				})
+				PreferencesList(
+					viewState: .init(sections: viewStore.sections),
+					onRowSelected: { _, rowId in viewStore.send(.rowTapped(rowId)) }
+				)
 				.task {
 					viewStore.send(.viewAppeared)
 				}

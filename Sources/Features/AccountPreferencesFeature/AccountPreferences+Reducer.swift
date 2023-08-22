@@ -30,7 +30,6 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 	}
 
 	// MARK: - Destination
-
 	public struct Destinations: ReducerProtocol, Sendable {
 		public enum State: Equatable, Hashable {
 			case updateAccountLabel(UpdateAccountLabel.State)

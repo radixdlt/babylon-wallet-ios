@@ -70,20 +70,21 @@ public struct ManageThirdPartyDeposits: FeatureReducer {
 			switch row {
 			case let .depositRule(rule):
 				state.account.onLedgerSettings.thirdPartyDeposits.depositRule = rule
+
 			case .allowDenyAssets:
 				state.destinations = .allowDenyAssets(.init(
 					mode: .allowDenyAssets(.allow),
-					thirdPartyDeposits: state.account.onLedgerSettings.thirdPartyDeposits,
-					loadedResources: []
+					thirdPartyDeposits: state.account.onLedgerSettings.thirdPartyDeposits
 				))
+
 			case .allowDepositors:
 				state.destinations = .allowDepositors(.init(
 					mode: .allowDepositors,
-					thirdPartyDeposits: state.account.onLedgerSettings.thirdPartyDeposits,
-					loadedResources: []
+					thirdPartyDeposits: state.account.onLedgerSettings.thirdPartyDeposits
 				))
 			}
 			return .none
+
 		case .updateTapped:
 			@Dependency(\.accountsClient) var accountsClient
 			@Dependency(\.errorQueue) var errorQueue
@@ -91,7 +92,7 @@ public struct ManageThirdPartyDeposits: FeatureReducer {
 			return .run { [account = state.account] send in
 				do {
 					try await accountsClient.updateAccount(account)
-					// schedule tx
+					// TODO: schedule TX
 					await send(.delegate(.accountUpdated))
 				} catch {
 					errorQueue.schedule(error)
