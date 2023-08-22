@@ -42,7 +42,7 @@ extension AccountPreferences {
 					viewStore.send(.rowTapped(rowId))
 				})
 				.task {
-					viewStore.send(.task)
+					viewStore.send(.viewAppeared)
 				}
 				.destination(store: store)
 				.background(.app.gray5)

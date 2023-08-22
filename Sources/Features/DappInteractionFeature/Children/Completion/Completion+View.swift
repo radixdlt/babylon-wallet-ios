@@ -78,7 +78,7 @@ struct Completion_Preview: PreviewProvider {
 					)
 				)
 			}
-			.task {
+			.viewAppeared {
 				try? await Task.sleep(for: .seconds(2))
 				isPresented = true
 			}
