@@ -225,18 +225,59 @@ extension MnemonicWithPassphrase {
 	public func validatePublicKeysOf(
 		softwareAccounts: NonEmpty<OrderedSet<OlympiaAccountToMigrate>>
 	) throws -> Bool {
+		try validatePublicKeysOf(
+			accounts: softwareAccounts.map {
+				(
+					path: $0.path.fullPath,
+					expectedPublicKey: .ecdsaSecp256k1($0.publicKey)
+				)
+			}
+		)
+	}
+
+	@discardableResult
+	public func validatePublicKeysOf(
+		accounts: [Profile.Network.Account]
+	) throws -> Bool {
+		try validatePublicKeysOf(
+			accounts: accounts.flatMap { account in
+				try account.virtualHierarchicalDeterministicFactorInstances.map {
+					try (
+						path: $0.derivationPath.hdFullPath(),
+						expectedPublicKey: $0.publicKey
+					)
+				}
+			}
+		)
+	}
+
+	@discardableResult
+	public func validatePublicKeysOf(
+		accounts: [(path: HD.Path.Full, expectedPublicKey: SLIP10.PublicKey)]
+	) throws -> Bool {
 		let hdRoot = try self.hdRoot()
 
-		for olympiaAccount in softwareAccounts {
-			let path = olympiaAccount.path.fullPath
+		for account in accounts {
+			let path = account.0
+			let publicKey = account.1
 
-			let derivedPublicKey = try hdRoot.derivePrivateKey(
-				path: path,
-				curve: SECP256K1.self
-			).publicKey
+			let derivedPublicKey: SLIP10.PublicKey = try {
+				switch publicKey.curve {
+				case .secp256k1:
+					return try .ecdsaSecp256k1(hdRoot.derivePrivateKey(
+						path: path,
+						curve: SECP256K1.self
+					).publicKey)
+				case .curve25519:
+					return try .eddsaEd25519(hdRoot.derivePrivateKey(
+						path: path,
+						curve: Curve25519.self
+					).publicKey)
+				}
+			}()
 
-			guard derivedPublicKey == olympiaAccount.publicKey else {
-				throw ValidateOlympiaAccountsFailure.publicKeyMismatch
+			guard derivedPublicKey == publicKey else {
+				throw ValidateMnemonicAgainstEntities.publicKeyMismatch
 			}
 		}
 		// PublicKeys matches
@@ -244,7 +285,7 @@ extension MnemonicWithPassphrase {
 	}
 }
 
-// MARK: - ValidateOlympiaAccountsFailure
-enum ValidateOlympiaAccountsFailure: LocalizedError {
+// MARK: - ValidateMnemonicAgainstEntities
+enum ValidateMnemonicAgainstEntities: LocalizedError {
 	case publicKeyMismatch
 }

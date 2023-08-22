@@ -53,6 +53,7 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 		}
 	}
 
+	@Dependency(\.errorQueue) var errorQueue
 	public init() {}
 
 	public var body: some ReducerProtocolOf<Self> {
@@ -100,9 +101,6 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 					mnemonic: mnemonicWithPassphrase, accounts: state.entitiesControlledByFactorSource.accounts
 				)
 
-    //            state.mnemonicsLeftToImport.removeAll(where: { $0.factorSourceID == factorSourceID })
-    //            return nextMnemonicIfNeeded(state: &state)
-
 			case .persistedMnemonicInKeychainOnly, .doneViewing, .persistedNewFactorSourceInProfile:
 				preconditionFailure("Incorrect implementation")
 				return .none
@@ -124,7 +122,27 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 		mnemonic: MnemonicWithPassphrase,
 		accounts: [Profile.Network.Account]
 	) -> EffectTask<Action> {
-		fatalError()
-		return .send(.internal(.validated))
+		func fail(error: Swift.Error?) -> EffectTask<Action> {
+			loggerGlobal.error("Failed to validate all accounts against mnemonic, underlying error: \(String(describing: error))")
+			errorQueue.schedule(MnemonicDidNotValidateAllAccounts())
+			return .none
+		}
+		do {
+			guard try mnemonic.validatePublicKeysOf(accounts: accounts) else {
+				return fail(error: nil)
+			}
+			return .send(.internal(.validated))
+		} catch {
+			return fail(error: error)
+		}
+	}
+}
+
+// MARK: - MnemonicDidNotValidateAllAccounts
+struct MnemonicDidNotValidateAllAccounts: LocalizedError {
+	init() {}
+	var errorDescription: String? {
+		// FIXME: Strings
+		"Invalid seed phrase"
 	}
 }

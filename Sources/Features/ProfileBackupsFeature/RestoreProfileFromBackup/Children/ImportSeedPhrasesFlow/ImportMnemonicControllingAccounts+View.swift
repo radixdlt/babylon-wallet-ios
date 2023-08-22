@@ -43,7 +43,13 @@ extension ImportMnemonicControllingAccounts {
 						Button("Skip This Seed Phrase For Now") {
 							viewStore.send(.skip)
 						}
-						.buttonStyle(.secondaryRectangular)
+						.foregroundColor(.app.blue2)
+						.font(.app.body1Regular)
+						.frame(height: .standardButtonHeight)
+						.frame(maxWidth: .infinity)
+						.padding(.medium1)
+						.background(.app.white)
+						.cornerRadius(.small2)
 					}
 
 					ScrollView {
