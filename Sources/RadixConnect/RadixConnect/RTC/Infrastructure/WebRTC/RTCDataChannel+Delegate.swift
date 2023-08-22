@@ -1,3 +1,4 @@
+import Prelude
 import WebRTC
 
 // MARK: - RTCDataChannel + Sendable
@@ -35,5 +36,7 @@ extension RTCDataChannelAsyncDelegate {
 		receivedMessagesContinuation.yield(buffer.data)
 	}
 
-	func dataChannelDidChangeState(_ dataChannel: RTCDataChannel) {}
+	func dataChannelDidChangeState(_ dataChannel: RTCDataChannel) {
+		loggerGlobal.info("RTCDataChannel state changed to: \(dataChannel.readyState)")
+	}
 }

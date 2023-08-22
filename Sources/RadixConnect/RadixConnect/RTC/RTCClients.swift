@@ -116,8 +116,13 @@ extension RTCClients {
 		_ response: P2P.RTCOutgoingMessage.Response,
 		to origin: P2P.RTCRoute
 	) async throws {
-		guard let rtcClient = clients[origin.connectionId] else {
-			throw RTCClientDidCloseError()
+		guard let rtcClient = clients[origin.connectionId], await rtcClient.hasAnyActiveConnections() else {
+			loggerGlobal.info("RTCClients: No Active Peer Connection to send back message to, creating anew")
+			// missing client, create anew
+			try await connect(origin.connectionId, waitsForConnectionToBeEstablished: true)
+			try await clients[origin.connectionId]?.send(response: response, to: origin.peerConnectionId)
+			loggerGlobal.info("RTCClients: Did send message over freshly established PeerConnection")
+			return
 		}
 
 		try await rtcClient.send(
@@ -345,11 +350,11 @@ extension RTCClient {
 		response: P2P.RTCOutgoingMessage.Response,
 		to connectionIdOfOrigin: PeerConnectionID
 	) async throws {
-		guard let client = peerConnections[connectionIdOfOrigin] else {
+		guard let anyConnection = peerConnections.values.first else {
 			throw PeerConnectionDidCloseError()
 		}
 		let data = try JSONEncoder().encode(response)
-		try await client.sendData(data)
+		try await anyConnection.sendData(data)
 	}
 
 	// MARK: - Private

@@ -66,6 +66,7 @@ public final actor AsyncWebSocket: NSObject, SignalingTransport {
 
 		monitor.pathUpdateHandler = { [weak self] path in
 			guard let self else { return }
+			loggerGlobal.info("Internet Connection status changed to \(path.status)")
 			switch path.status {
 			case .unsatisfied:
 				Task {
