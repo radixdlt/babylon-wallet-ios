@@ -69,7 +69,8 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 		case .inputMnemonic:
 			state.destination = .importMnemonic(.init(
 				isWordCountFixed: true,
-				persistStrategy: nil
+				persistStrategy: nil,
+				wordCount: state.entitiesControlledByFactorSource.mnemonicWordCount
 			))
 			return .none
 
