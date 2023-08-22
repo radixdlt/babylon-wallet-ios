@@ -5,11 +5,10 @@ import FeaturePrelude
 public struct AddAsset: FeatureReducer {
 	public struct State: Hashable, Sendable {
 		var mode: ResourcesListMode
-
-		var resourceAddress: String
-		var resourceAddressFieldFocused: Bool = false
-
 		let alreadyAddedResources: OrderedSet<ThirdPartyDeposits.DepositAddress>
+
+		var resourceAddress: String = ""
+		var resourceAddressFieldFocused: Bool = false
 
 		var validatedResourceAddress: ThirdPartyDeposits.DepositAddress? {
 			guard !resourceAddress.isEmpty else {
