@@ -161,17 +161,17 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		switch viewAction {
 		case .appeared:
 			let manifest = state.transactionManifest
-			return .task { [nonce = state.nonce, message = state.message] in
+			return .run { [nonce = state.nonce, message = state.message] send in
 				let defaultDepositGuarantees = await appPreferencesClient.getPreferences().transaction.defaultDepositGuarantee
 				await send(.internal(.defaultDepositGuaranteeLoaded(defaultDepositGuarantees)))
 
-				await .internal(.previewLoaded(TaskResult {
+				let preview = await TaskResult {
 					try await transactionClient.getTransactionReview(.init(
 						manifestToSign: manifest,
 						message: message,
 						nonce: nonce
 					))
-				}))
+				}
 				await send(.internal(.previewLoaded(preview)))
 			}
 
