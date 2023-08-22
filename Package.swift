@@ -342,6 +342,8 @@ package.addModules([
 		dependencies: [
 			"AppPreferencesClient",
 			"BackupsClient",
+			"CacheClient",
+			"RadixConnectClient",
 			"ImportMnemonicFeature",
 			"OverlayWindowClient",
 			"DeviceFactorSourceClient",
@@ -726,7 +728,6 @@ package.addModules([
 		],
 		tests: .yes()
 	),
-
 	.client(
 		name: "PersonasClient",
 		dependencies: [
@@ -742,7 +743,6 @@ package.addModules([
 		],
 		tests: .yes()
 	),
-
 	.client(
 		name: "ProfileStore",
 		dependencies: [

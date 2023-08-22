@@ -19,6 +19,11 @@ extension BackUpProfileSettings {
 					.encryptBeforeExportChoiceAlert(with: store)
 					.encryptBeforeExportSheet(with: store)
 					.exportFileSheet(with: viewStore)
+					.confirmationDialog(
+						store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+						state: /BackUpProfileSettings.Destinations.State.deleteProfileConfirmationDialog,
+						action: BackUpProfileSettings.Destinations.Action.deleteProfileConfirmationDialog
+					)
 			}
 			.task { @MainActor in
 				await ViewStore(store.stateless).send(.view(.task)).finish()
@@ -60,6 +65,11 @@ extension BackUpProfileSettings.View {
 				}
 
 				Spacer(minLength: .large1)
+
+				// FIXME: Strings
+				section("Delete wallet") {
+					resetWallet(with: viewStore)
+				}
 			}
 		}
 		.background(Color.app.gray5)
@@ -100,6 +110,29 @@ extension BackUpProfileSettings.View {
 				)
 			)
 		}
+	}
+
+	private func resetWallet(with viewStore: ViewStoreOf<BackUpProfileSettings>) -> some SwiftUI.View {
+		HStack {
+			VStack(alignment: .leading, spacing: 0) {
+				Text(L10n.AppSettings.ResetWallet.title)
+					.foregroundColor(.app.gray1)
+					.textStyle(.body1HighImportance)
+
+				Text(L10n.AppSettings.ResetWallet.subtitle)
+					.foregroundColor(.app.gray2)
+					.textStyle(.body2Regular)
+					.fixedSize()
+			}
+
+			Spacer(minLength: 0)
+
+			Button(L10n.AppSettings.ResetWallet.buttonTitle) {
+				viewStore.send(.deleteProfileAndFactorSourcesButtonTapped)
+			}
+			.buttonStyle(.secondaryRectangular(isDestructive: true))
+		}
+		.frame(height: .largeButtonHeight)
 	}
 }
 

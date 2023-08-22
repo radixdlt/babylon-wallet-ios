@@ -1,9 +1,11 @@
 import AppPreferencesClient
 import BackupsClient
+import CacheClient
 import Cryptography
 import FeaturePrelude
 import ImportMnemonicFeature
 import OverlayWindowClient
+import RadixConnectClient
 
 // MARK: - BackUpProfileSettings
 public struct BackUpProfileSettings: Sendable, FeatureReducer {
@@ -43,6 +45,8 @@ public struct BackUpProfileSettings: Sendable, FeatureReducer {
 		case exportProfileButtonTapped
 		case dismissFileExporter
 		case profileExportResult(Result<URL, NSError>)
+
+		case deleteProfileAndFactorSourcesButtonTapped
 	}
 
 	public struct Destinations: Sendable, ReducerProtocol {
@@ -79,6 +83,8 @@ public struct BackUpProfileSettings: Sendable, FeatureReducer {
 		public enum State: Sendable, Hashable {
 			case confirmCloudSyncDisable(AlertState<Action.ConfirmCloudSyncDisable>)
 			case optionallyEncryptProfileBeforeExporting(AlertState<Action.SelectEncryptOrNot>)
+			case deleteProfileConfirmationDialog(ConfirmationDialogState<Action.DeleteProfileConfirmationDialogAction>)
+
 			case inputEncryptionPassword(EncryptOrDecryptProfile.State)
 		}
 
@@ -95,6 +101,14 @@ public struct BackUpProfileSettings: Sendable, FeatureReducer {
 			public enum SelectEncryptOrNot: Sendable, Hashable {
 				case encrypt
 				case doNotEncrypt
+			}
+
+			case deleteProfileConfirmationDialog(DeleteProfileConfirmationDialogAction)
+
+			public enum DeleteProfileConfirmationDialogAction: Sendable, Hashable {
+				case deleteProfile
+				case deleteProfileLocalKeepInICloudIfPresent
+				case cancel
 			}
 		}
 
@@ -120,9 +134,15 @@ public struct BackUpProfileSettings: Sendable, FeatureReducer {
 		case destination(PresentationAction<Destinations.Action>)
 	}
 
+	public enum DelegateAction: Sendable, Equatable {
+		case deleteProfileAndFactorSources(keepInICloudIfPresent: Bool)
+	}
+
 	@Dependency(\.errorQueue) var errorQueue
+	@Dependency(\.cacheClient) var cacheClient
 	@Dependency(\.backupsClient) var backupsClient
 	@Dependency(\.appPreferencesClient) var appPreferencesClient
+	@Dependency(\.radixConnectClient) var radixConnectClient
 	@Dependency(\.overlayWindowClient) var overlayWindowClient
 
 	public init() {}
@@ -136,6 +156,10 @@ public struct BackUpProfileSettings: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
+		case .deleteProfileAndFactorSourcesButtonTapped:
+			state.destination = .deleteProfileConfirmationDialog(.deleteProfileConfirmationDialog)
+			return .none
+
 		case let .cloudProfileSyncToggled(isEnabled):
 			if !isEnabled {
 				state.destination = Destinations.confirmCloudSyncDisableAlert
@@ -185,6 +209,18 @@ public struct BackUpProfileSettings: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
+		case let .destination(.presented(.deleteProfileConfirmationDialog(confirmationAction))):
+			switch confirmationAction {
+			case .deleteProfile:
+				return deleteProfile(keepInICloudIfPresent: false)
+
+			case .deleteProfileLocalKeepInICloudIfPresent:
+				return deleteProfile(keepInICloudIfPresent: true)
+
+			case .cancel:
+				return .none
+			}
+
 		case .destination(.presented(.optionallyEncryptProfileBeforeExporting(.doNotEncrypt))):
 			return exportProfile(encrypt: false, state: &state)
 
@@ -245,7 +281,33 @@ public struct BackUpProfileSettings: Sendable, FeatureReducer {
 			try await appPreferencesClient.setIsCloudProfileSyncEnabled(isEnabled)
 		}
 	}
+
+	private func deleteProfile(keepInICloudIfPresent: Bool) -> EffectTask<Action> {
+		.task {
+			cacheClient.removeAll()
+			await radixConnectClient.disconnectAndRemoveAll()
+			return .delegate(.deleteProfileAndFactorSources(keepInICloudIfPresent: keepInICloudIfPresent))
+		}
+	}
 }
 
 // MARK: - LackedPermissionToAccessSecurityScopedResource
 struct LackedPermissionToAccessSecurityScopedResource: Error {}
+
+extension ConfirmationDialogState<BackUpProfileSettings.Destinations.Action.DeleteProfileConfirmationDialogAction> {
+	static let deleteProfileConfirmationDialog = ConfirmationDialogState {
+		TextState(L10n.AppSettings.ResetWalletDialog.title)
+	} actions: {
+		ButtonState(role: .destructive, action: .deleteProfileLocalKeepInICloudIfPresent) {
+			TextState(L10n.AppSettings.ResetWalletDialog.resetButtonTitle)
+		}
+		ButtonState(role: .destructive, action: .deleteProfile) {
+			TextState(L10n.AppSettings.ResetWalletDialog.resetAndDeleteBackupButtonTitle)
+		}
+		ButtonState(role: .cancel, action: .cancel) {
+			TextState(L10n.Common.cancel)
+		}
+	} message: {
+		TextState(L10n.AppSettings.ResetWalletDialog.message)
+	}
+}

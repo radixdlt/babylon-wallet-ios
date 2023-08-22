@@ -50,9 +50,6 @@ extension AppSettings {
 									.withSeparator
 							}
 							#endif
-
-							resetWallet(with: viewStore)
-								.withSeparator
 						}
 						.padding(.horizontal, .medium3)
 					}
@@ -63,11 +60,6 @@ extension AppSettings {
 				.gatewaySettings(with: destinationStore)
 				.backUpProfileSettings(with: destinationStore)
 			}
-			.confirmationDialog(
-				store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-				state: /AppSettings.Destinations.State.deleteProfileConfirmationDialog,
-				action: AppSettings.Destinations.Action.deleteProfileConfirmationDialog
-			)
 		}
 
 		private var rows: [SettingsRowModel<AppSettings>] {
@@ -129,29 +121,6 @@ extension AppSettings {
 			.frame(height: .largeButtonHeight)
 		}
 		#endif
-
-		private func resetWallet(with viewStore: ViewStoreOf<AppSettings>) -> some SwiftUI.View {
-			HStack {
-				VStack(alignment: .leading, spacing: 0) {
-					Text(L10n.AppSettings.ResetWallet.title)
-						.foregroundColor(.app.gray1)
-						.textStyle(.body1HighImportance)
-
-					Text(L10n.AppSettings.ResetWallet.subtitle)
-						.foregroundColor(.app.gray2)
-						.textStyle(.body2Regular)
-						.fixedSize()
-				}
-
-				Spacer(minLength: 0)
-
-				Button(L10n.AppSettings.ResetWallet.buttonTitle) {
-					viewStore.send(.deleteProfileAndFactorSourcesButtonTapped)
-				}
-				.buttonStyle(.secondaryRectangular(isDestructive: true))
-			}
-			.frame(height: .largeButtonHeight)
-		}
 	}
 }
 
