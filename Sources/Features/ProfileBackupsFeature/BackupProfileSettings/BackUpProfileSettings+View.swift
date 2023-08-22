@@ -18,12 +18,8 @@ extension BackUpProfileSettings {
 					.disableCloudSyncConfirmationAlert(with: store)
 					.encryptBeforeExportChoiceAlert(with: store)
 					.encryptBeforeExportSheet(with: store)
+					.deleteProfileConfirmationDialog(with: store)
 					.exportFileSheet(with: viewStore)
-					.confirmationDialog(
-						store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-						state: /BackUpProfileSettings.Destinations.State.deleteProfileConfirmationDialog,
-						action: BackUpProfileSettings.Destinations.Action.deleteProfileConfirmationDialog
-					)
 			}
 			.task { @MainActor in
 				await ViewStore(store.stateless).send(.view(.task)).finish()
@@ -64,11 +60,23 @@ extension BackUpProfileSettings.View {
 					}
 				}
 
-				Spacer(minLength: .large1)
-
 				// FIXME: Strings
 				section("Delete wallet") {
-					resetWallet(with: viewStore)
+					VStack(alignment: .leading, spacing: .medium1) {
+						Text("You may delete your wallet. this will clear the Radix Wallet app, clears its contents, and delete any iCloud backup.")
+						Text("**Access to any Accounts or Personas will be permanently lost unless you have a manual backup file.**")
+
+						Button("Delete Wallet and iCloud Backup") {
+							viewStore.send(.deleteProfileAndFactorSourcesButtonTapped)
+						}
+						.foregroundColor(.app.white)
+						.font(.app.body1Header)
+						.frame(height: .standardButtonHeight)
+						.frame(maxWidth: .infinity)
+						.padding(.horizontal, .medium1)
+						.background(.app.red1)
+						.cornerRadius(.small2)
+					}
 				}
 			}
 		}
@@ -111,32 +119,18 @@ extension BackUpProfileSettings.View {
 			)
 		}
 	}
-
-	private func resetWallet(with viewStore: ViewStoreOf<BackUpProfileSettings>) -> some SwiftUI.View {
-		HStack {
-			VStack(alignment: .leading, spacing: 0) {
-				Text(L10n.AppSettings.ResetWallet.title)
-					.foregroundColor(.app.gray1)
-					.textStyle(.body1HighImportance)
-
-				Text(L10n.AppSettings.ResetWallet.subtitle)
-					.foregroundColor(.app.gray2)
-					.textStyle(.body2Regular)
-					.fixedSize()
-			}
-
-			Spacer(minLength: 0)
-
-			Button(L10n.AppSettings.ResetWallet.buttonTitle) {
-				viewStore.send(.deleteProfileAndFactorSourcesButtonTapped)
-			}
-			.buttonStyle(.secondaryRectangular(isDestructive: true))
-		}
-		.frame(height: .largeButtonHeight)
-	}
 }
 
 extension SwiftUI.View {
+	@MainActor
+	fileprivate func deleteProfileConfirmationDialog(with store: StoreOf<BackUpProfileSettings>) -> some SwiftUI.View {
+		confirmationDialog(
+			store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+			state: /BackUpProfileSettings.Destinations.State.deleteProfileConfirmationDialog,
+			action: BackUpProfileSettings.Destinations.Action.deleteProfileConfirmationDialog
+		)
+	}
+
 	@MainActor
 	fileprivate func disableCloudSyncConfirmationAlert(with store: StoreOf<BackUpProfileSettings>) -> some SwiftUI.View {
 		alert(
