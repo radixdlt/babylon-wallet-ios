@@ -407,7 +407,7 @@ extension TransactionFee {
 				feeSummary.executionCost +
 					feeSummary.finalizationCost +
 					feeSummary.storageExpansionCost
-			) * PredefinedFeeConstants.networkFeeMultiplier
+			) * (1 + PredefinedFeeConstants.networkFeeMultiplier) // add network multiplier on top
 			let remainingNonContingentLock = feeLocks.nonContingentLock.clampedDiff(networkFee)
 
 			self.init(

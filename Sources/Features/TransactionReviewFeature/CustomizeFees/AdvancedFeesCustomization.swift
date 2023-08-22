@@ -12,8 +12,8 @@ public struct AdvancedFeesCustomization: FeatureReducer {
 
 		var fees: TransactionFee.AdvancedFeeCustomization
 
-		var paddingAmountStr: String
-		var tipPercentageStr: String
+		var paddingAmount: String
+		var tipPercentage: String
 
 		var focusField: FocusField?
 
@@ -21,8 +21,8 @@ public struct AdvancedFeesCustomization: FeatureReducer {
 			fees: TransactionFee.AdvancedFeeCustomization
 		) {
 			self.fees = fees
-			self.paddingAmountStr = fees.paddingFee.format()
-			self.tipPercentageStr = fees.tipPercentage.format()
+			self.paddingAmount = fees.paddingFee.format()
+			self.tipPercentage = fees.tipPercentage.format()
 		}
 	}
 
@@ -39,20 +39,28 @@ public struct AdvancedFeesCustomization: FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case let .paddingAmountChanged(amount):
-			state.paddingAmountStr = amount
-			if let amount = try? BigDecimal(fromString: amount) {
-				state.fees.paddingFee = amount
-			}
+			state.paddingAmount = amount
+			updateDecimalField(&state, field: \.fees.paddingFee, value: amount)
 			return .send(.delegate(.updated(state.fees)))
 		case let .tipPercentageChanged(percentage):
-			state.tipPercentageStr = percentage
-			if let percentage = try? BigDecimal(fromString: percentage) {
-				state.fees.tipPercentage = percentage
-			}
+			state.tipPercentage = percentage
+			updateDecimalField(&state, field: \.fees.tipPercentage, value: percentage)
 			return .send(.delegate(.updated(state.fees)))
 		case let .focusChanged(field):
 			state.focusField = field
 			return .none
+		}
+	}
+
+	func updateDecimalField(
+		_ state: inout State,
+		field: WritableKeyPath<State, BigDecimal>,
+		value: String
+	) {
+		if value.isEmpty {
+			state[keyPath: field] = .zero
+		} else if let amount = try? BigDecimal(fromString: value) {
+			state[keyPath: field] = amount
 		}
 	}
 }

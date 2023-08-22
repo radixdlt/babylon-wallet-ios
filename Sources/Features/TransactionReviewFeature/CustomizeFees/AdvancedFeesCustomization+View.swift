@@ -5,8 +5,8 @@ extension AdvancedFeesCustomization.State {
 	var viewState: AdvancedFeesCustomization.ViewState {
 		.init(
 			feesViewState: .init(feeViewStates: fees.viewStates, totalFee: fees.total, isAdvancedMode: true),
-			paddingAmount: paddingAmountStr,
-			tipPercentage: tipPercentageStr,
+			paddingAmount: paddingAmount,
+			tipPercentage: tipPercentage,
 			focusField: focusField
 		)
 	}
