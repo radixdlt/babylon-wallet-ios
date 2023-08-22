@@ -32,10 +32,10 @@ extension DerivePublicKeys {
 						.padding(.vertical, .medium2)
 
 					Text(
-						viewStore.entityKind == .account
-							? L10n.CreateAccount.DerivePublicKeys.title
+						viewStore.entityKind == .identity
 							// FIXME: Strings - L10n.CreatePersona.DerivePublicKeys.title
-							: "Creating Persona"
+							? "Creating Persona"
+							: L10n.CreateAccount.DerivePublicKeys.title
 					)
 					.textStyle(.sheetTitle)
 					.foregroundColor(.app.gray1)
