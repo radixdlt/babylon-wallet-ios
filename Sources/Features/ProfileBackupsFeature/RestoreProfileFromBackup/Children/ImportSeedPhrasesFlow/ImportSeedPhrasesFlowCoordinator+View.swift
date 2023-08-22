@@ -22,7 +22,11 @@ extension ImportMnemonicsFlowCoordinator {
 						store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
 						state: /ImportMnemonicsFlowCoordinator.Destinations.State.importMnemonicControllingAccounts,
 						action: ImportMnemonicsFlowCoordinator.Destinations.Action.importMnemonicControllingAccounts,
-						content: { ImportMnemonicControllingAccounts.View(store: $0) }
+						content: { importStore in
+							NavigationView {
+								ImportMnemonicControllingAccounts.View(store: importStore)
+							}
+						}
 					)
 
 				//					IfLetStore(

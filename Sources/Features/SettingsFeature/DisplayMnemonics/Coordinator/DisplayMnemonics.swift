@@ -1,4 +1,5 @@
 import DeviceFactorSourceClient
+import DisplayEntitiesControlledByMnemonicFeature
 import FeaturePrelude
 import ImportMnemonicFeature
 import Profile
@@ -9,7 +10,7 @@ public struct DisplayMnemonics: Sendable, FeatureReducer {
 		@PresentationState
 		public var destination: Destinations.State? = nil
 
-		public var deviceFactorSources: IdentifiedArrayOf<DisplayMnemonicRow.State> = []
+		public var deviceFactorSources: IdentifiedArrayOf<DisplayEntitiesControlledByMnemonic.State> = []
 
 		public init() {}
 	}
@@ -23,7 +24,7 @@ public struct DisplayMnemonics: Sendable, FeatureReducer {
 	}
 
 	public enum ChildAction: Sendable, Equatable {
-		case row(id: DisplayMnemonicRow.State.ID, action: DisplayMnemonicRow.Action)
+		case row(id: DisplayEntitiesControlledByMnemonic.State.ID, action: DisplayEntitiesControlledByMnemonic.Action)
 		case destination(PresentationAction<Destinations.Action>)
 	}
 
@@ -53,7 +54,7 @@ public struct DisplayMnemonics: Sendable, FeatureReducer {
 	public var body: some ReducerProtocolOf<Self> {
 		Reduce(core)
 			.forEach(\.deviceFactorSources, action: /Action.child .. ChildAction.row) {
-				DisplayMnemonicRow()
+				DisplayEntitiesControlledByMnemonic()
 			}
 			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
 				Destinations()
@@ -75,7 +76,10 @@ public struct DisplayMnemonics: Sendable, FeatureReducer {
 		switch internalAction {
 		case let .loadedFactorSources(.success(entitiesForDeviceFactorSources)):
 			state.deviceFactorSources = .init(
-				uniqueElements: entitiesForDeviceFactorSources.map { .init(accountsForDeviceFactorSource: $0) },
+				uniqueElements: entitiesForDeviceFactorSources.map { .init(
+					accountsForDeviceFactorSource: $0,
+					displayRevealMnemonicLink: true
+				) },
 				id: \.id
 			)
 

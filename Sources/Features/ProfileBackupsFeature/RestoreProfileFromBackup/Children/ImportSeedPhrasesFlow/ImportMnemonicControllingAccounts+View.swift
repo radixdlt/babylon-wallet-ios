@@ -1,8 +1,9 @@
+import DisplayEntitiesControlledByMnemonicFeature
 import FeaturePrelude
 
 extension ImportMnemonicControllingAccounts.State {
 	var viewState: ImportMnemonicControllingAccounts.ViewState {
-		.init(isSkippable: mnemonicToImport.isSkippable)
+		.init(isSkippable: entitiesControlledByFactorSource.isSkippable)
 	}
 }
 
@@ -13,6 +14,10 @@ extension ImportMnemonicControllingAccounts {
 
 		var title: LocalizedStringKey {
 			isSkippable ? "The following Accounts are controlled by a seed phrase. To recover control, you must re-enter it." : "Your Personas and the following Accounts are controlled by your main seed phrase. To recover control, you must re-enter it."
+		}
+
+		var navigationTitle: LocalizedStringKey {
+			isSkippable ? "Seed Phrase Import" : "Main Seed Phrase"
 		}
 	}
 
@@ -34,20 +39,24 @@ extension ImportMnemonicControllingAccounts {
 						Button("Skip This Seed Phrase For Now") {
 							viewStore.send(.skip)
 						}
+						.buttonStyle(.secondaryRectangular)
 					}
 
 					ScrollView {
-						ForEach(["A", "B"], id: \.self) {
-							Text("\($0)")
-						}
+						DisplayEntitiesControlledByMnemonic.View(
+							store: store.scope(state: \.entities, action: { .child(.entities($0)) })
+						)
 					}
 				}
+				.padding(.horizontal, .medium3)
 				.footer {
 					// FIXME: Strings
 					Button("Enter This Seed Phrase") {
 						viewStore.send(.inputMnemonic)
 					}
+					.buttonStyle(.primaryRectangular)
 				}
+				.navigationTitle(viewStore.navigationTitle)
 				.onAppear { viewStore.send(.appeared) }
 			}
 		}

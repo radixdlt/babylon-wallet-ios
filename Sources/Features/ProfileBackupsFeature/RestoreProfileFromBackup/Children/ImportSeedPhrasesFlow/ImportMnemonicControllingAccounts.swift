@@ -1,16 +1,20 @@
+import DisplayEntitiesControlledByMnemonicFeature
 import FeaturePrelude
 import ImportMnemonicFeature
 
 // MARK: - ImportMnemonicControllingAccounts
 public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
-		public let mnemonicToImport: MnemonicToImport
+		public let entitiesControlledByFactorSource: EntitiesControlledByFactorSource
+
+		public let entities: DisplayEntitiesControlledByMnemonic.State
 
 		@PresentationState
 		public var destination: Destinations.State? = nil
 
-		public init(mnemonicToImport: MnemonicToImport) {
-			self.mnemonicToImport = mnemonicToImport
+		public init(entitiesControlledByFactorSource: EntitiesControlledByFactorSource) {
+			self.entitiesControlledByFactorSource = entitiesControlledByFactorSource
+			self.entities = .init(accountsForDeviceFactorSource: entitiesControlledByFactorSource, displayRevealMnemonicLink: false)
 		}
 	}
 
@@ -28,6 +32,7 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 
 	public enum ChildAction: Sendable, Equatable {
 		case destination(PresentationAction<Destinations.Action>)
+		case entities(DisplayEntitiesControlledByMnemonic.Action)
 	}
 
 	// MARK: - Destination
@@ -65,12 +70,12 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 			state.destination = .importMnemonic(.init(
 				isWordCountFixed: true,
 				persistStrategy: .intoKeychainOnly,
-				mnemonicForFactorSourceKind: state.mnemonicToImport.mnemonicWordCount == .twelve ? .onDevice(.olympia) : .onDevice(.babylon)
+				mnemonicForFactorSourceKind: state.entitiesControlledByFactorSource.deviceFactorSource.supportsOlympia ? .onDevice(.olympia) : .onDevice(.babylon)
 			))
 			return .none
 
 		case .skip:
-			precondition(state.mnemonicToImport.isSkippable)
+			precondition(state.entitiesControlledByFactorSource.isSkippable)
 			loggerGlobal.feature("TODO skip me")
 			return .none
 		}
@@ -81,11 +86,11 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 		case let .destination(.presented(
 			.importMnemonic(.delegate(.persistedMnemonicInKeychainOnly(mnemonicWithPassphrase, factorSourceID)))
 		)):
-			guard factorSourceID == state.mnemonicToImport.factorSourceID else {
+			guard factorSourceID == state.entitiesControlledByFactorSource.factorSourceID else {
 				fatalError("factor source ID mismatch")
 			}
 			return validate(
-				mnemonic: mnemonicWithPassphrase, accounts: state.mnemonicToImport.controllingAccounts
+				mnemonic: mnemonicWithPassphrase, accounts: state.entitiesControlledByFactorSource.accounts
 			)
 
 //            state.mnemonicsLeftToImport.removeAll(where: { $0.factorSourceID == factorSourceID })
@@ -99,7 +104,7 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
 		case .validated:
-			return .send(.delegate(.persistedMnemonicInKeychain(state.mnemonicToImport.factorSourceID.embed())))
+			return .send(.delegate(.persistedMnemonicInKeychain(state.entitiesControlledByFactorSource.factorSourceID.embed())))
 		}
 	}
 

@@ -1,7 +1,7 @@
 import FeaturePrelude
 
-// MARK: - DisplayMnemonicRow
-public struct DisplayMnemonicRow: Sendable, FeatureReducer {
+// MARK: - DisplayEntitiesControlledByMnemonic
+public struct DisplayEntitiesControlledByMnemonic: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable, Identifiable {
 		public typealias ID = EntitiesControlledByFactorSource.ID
 		public var id: ID { accountsForDeviceFactorSource.id }
@@ -9,9 +9,11 @@ public struct DisplayMnemonicRow: Sendable, FeatureReducer {
 		public var deviceFactorSource: DeviceFactorSource { accountsForDeviceFactorSource.deviceFactorSource }
 
 		public let accountsForDeviceFactorSource: EntitiesControlledByFactorSource
+		public let displayRevealMnemonicLink: Bool
 
-		public init(accountsForDeviceFactorSource: EntitiesControlledByFactorSource) {
+		public init(accountsForDeviceFactorSource: EntitiesControlledByFactorSource, displayRevealMnemonicLink: Bool) {
 			self.accountsForDeviceFactorSource = accountsForDeviceFactorSource
+			self.displayRevealMnemonicLink = displayRevealMnemonicLink
 		}
 	}
 

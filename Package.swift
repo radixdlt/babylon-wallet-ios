@@ -203,6 +203,13 @@ package.addModules([
 		tests: .no
 	),
 	.feature(
+		name: "DisplayEntitiesControlledByMnemonicFeature",
+		featureSuffixDroppedFromFolderName: true,
+		dependencies: [
+		],
+		tests: .no
+	),
+	.feature(
 		name: "EditPersonaFeature",
 		dependencies: [
 			"PersonasClient",
@@ -343,10 +350,11 @@ package.addModules([
 			"AppPreferencesClient",
 			"BackupsClient",
 			"CacheClient",
-			"RadixConnectClient",
+			"DeviceFactorSourceClient",
+			"DisplayEntitiesControlledByMnemonicFeature",
 			"ImportMnemonicFeature",
 			"OverlayWindowClient",
-			"DeviceFactorSourceClient",
+			"RadixConnectClient",
 		],
 		tests: .no
 	),
@@ -387,6 +395,7 @@ package.addModules([
 			"DebugInspectProfileFeature",
 			"GatewayAPI",
 			"GatewaySettingsFeature",
+			"DisplayEntitiesControlledByMnemonicFeature",
 			"ImportMnemonicFeature",
 			"FactorSourcesClient", // Check if user has any ledgers
 			"ImportLegacyWalletClient",

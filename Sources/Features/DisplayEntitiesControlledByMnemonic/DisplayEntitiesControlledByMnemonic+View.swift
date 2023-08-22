@@ -1,6 +1,6 @@
 import FeaturePrelude
 
-extension DisplayMnemonicRow.State {
+extension DisplayEntitiesControlledByMnemonic.State {
 	var connectedAccounts: String {
 		let accountsCount = accountsForDeviceFactorSource.accounts.count
 		if accountsCount == 1 {
@@ -11,38 +11,40 @@ extension DisplayMnemonicRow.State {
 	}
 }
 
-// MARK: - DisplayMnemonicRow.View
-extension DisplayMnemonicRow {
+// MARK: - DisplayEntitiesControlledByMnemonic.View
+extension DisplayEntitiesControlledByMnemonic {
 	@MainActor
 	public struct View: SwiftUI.View {
-		private let store: StoreOf<DisplayMnemonicRow>
+		private let store: StoreOf<DisplayEntitiesControlledByMnemonic>
 
-		public init(store: StoreOf<DisplayMnemonicRow>) {
+		public init(store: StoreOf<DisplayEntitiesControlledByMnemonic>) {
 			self.store = store
 		}
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
 				VStack(alignment: .leading) {
-					Button {
-						viewStore.send(.tapped)
-					} label: {
-						HStack {
-							Image(asset: AssetResource.signingKey)
-								.resizable()
-								.frame(.smallest)
+					if viewStore.displayRevealMnemonicLink {
+						Button {
+							viewStore.send(.tapped)
+						} label: {
+							HStack {
+								Image(asset: AssetResource.signingKey)
+									.resizable()
+									.frame(.smallest)
 
-							VStack(alignment: .leading) {
-								Text(L10n.SeedPhrases.SeedPhrase.reveal)
-									.textStyle(.body1Header)
-									.foregroundColor(.app.gray1)
-								Text(viewStore.connectedAccounts)
-									.textStyle(.body2Regular)
-									.foregroundColor(.app.gray2)
+								VStack(alignment: .leading) {
+									Text(L10n.SeedPhrases.SeedPhrase.reveal)
+										.textStyle(.body1Header)
+										.foregroundColor(.app.gray1)
+									Text(viewStore.connectedAccounts)
+										.textStyle(.body2Regular)
+										.foregroundColor(.app.gray2)
+								}
+
+								Spacer()
+								Image(asset: AssetResource.chevronRight)
 							}
-
-							Spacer()
-							Image(asset: AssetResource.chevronRight)
 						}
 					}
 
@@ -64,16 +66,16 @@ extension DisplayMnemonicRow {
 //// MARK: - DisplayMnemonicRow_Preview
 // struct DisplayMnemonicRow_Preview: PreviewProvider {
 //	static var previews: some View {
-//		DisplayMnemonicRow.View(
+//		DisplayEntitiesControlledByMnemonic.View(
 //			store: .init(
 //				initialState: .previewValue,
-//				reducer: DisplayMnemonicRow()
+//				reducer: DisplayEntitiesControlledByMnemonic()
 //			)
 //		)
 //	}
 // }
 //
-// extension DisplayMnemonicRow.State {
+// extension DisplayEntitiesControlledByMnemonic.State {
 //    public static let previewValue = Self(deviceFactorSource: )
 // }
 // #endif

@@ -3,47 +3,10 @@ import DeviceFactorSourceClient
 import FeaturePrelude
 import ImportMnemonicFeature
 
-// MARK: - MnemonicToImport
-public struct MnemonicToImport: Sendable, Hashable {
-	public let factorSourceID: FactorSourceID.FromHash
-	public let mnemonicWordCount: BIP39.WordCount
-
-	/// As it currently stands we only ever have one "Babylon" `.device` factor source, and it is required
-	/// to be imported, any imported "Olympia" `device` factor source will be skippable.
-	public let isSkippable: Bool
-
-	public let controllingAccounts: [Profile.Network.Account]
-	public let controllingPersonas: [Profile.Network.Persona]
-
-	init(
-		factorSourceID: FactorSourceID.FromHash,
-		isSkippable: Bool,
-		mnemonicWordCount: BIP39.WordCount,
-		controllingAccounts: [Profile.Network.Account],
-		controllingPersonas: [Profile.Network.Persona]
-	) {
-		self.factorSourceID = factorSourceID
-		self.isSkippable = isSkippable
-		self.mnemonicWordCount = mnemonicWordCount
-		self.controllingAccounts = controllingAccounts
-		self.controllingPersonas = controllingPersonas
-	}
-
-	init(entitiesControlledByFactorSource: EntitiesControlledByFactorSource) {
-		self.init(
-			factorSourceID: entitiesControlledByFactorSource.deviceFactorSource.id,
-			isSkippable: entitiesControlledByFactorSource.deviceFactorSource.supportsOlympia,
-			mnemonicWordCount: entitiesControlledByFactorSource.deviceFactorSource.hint.mnemonicWordCount,
-			controllingAccounts: entitiesControlledByFactorSource.accounts,
-			controllingPersonas: entitiesControlledByFactorSource.personas
-		)
-	}
-}
-
 // MARK: - ImportMnemonicsFlowCoordinator
 public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
-		public var mnemonicsLeftToImport: OrderedSet<MnemonicToImport> = []
+		public var mnemonicsLeftToImport: IdentifiedArrayOf<EntitiesControlledByFactorSource> = []
 		public let profileSnapshot: ProfileSnapshot
 
 		@PresentationState
@@ -124,10 +87,7 @@ public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 			return .none
 
 		case let .loadControlledEntities(.success(factorSourcesControllingEntities)):
-			state.mnemonicsLeftToImport = .init(
-				uncheckedUniqueElements: factorSourcesControllingEntities
-					.map(MnemonicToImport.init(entitiesControlledByFactorSource:))
-			)
+			state.mnemonicsLeftToImport = factorSourcesControllingEntities
 			return nextMnemonicIfNeeded(state: &state)
 		}
 	}
@@ -146,7 +106,7 @@ public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 
 	private func nextMnemonicIfNeeded(state: inout State) -> EffectTask<Action> {
 		if let next = state.mnemonicsLeftToImport.first {
-			state.destination = .importMnemonicControllingAccounts(.init(mnemonicToImport: next))
+			state.destination = .importMnemonicControllingAccounts(.init(entitiesControlledByFactorSource: next))
 			return .none
 		} else {
 			return .send(.delegate(.finishedImportingMnemonics))
