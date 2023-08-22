@@ -13,7 +13,6 @@ extension ImportMnemonicsFlowCoordinator {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: { $0 }) { viewStore in
-				//				ZStack {
 				Color.app.white
 					.onFirstTask { @MainActor in
 						await viewStore.send(.view(.onFirstTask)).finish()
@@ -28,17 +27,6 @@ extension ImportMnemonicsFlowCoordinator {
 							}
 						}
 					)
-
-				//					IfLetStore(
-				//						store.scope(
-				//                            state: \.importingMnemonicControllingAccounts,
-				//                            action: { .child(.importingMnemonicControllingAccounts($0)) }
-				//                        ),
-				//						then: {
-				//                            ImportMnemonicControllingAccounts.View(store: $0)
-				//								.navigationTitle(L10n.ImportMnemonic.navigationTitle)
-				//						}
-				//					)
 			}
 		}
 	}

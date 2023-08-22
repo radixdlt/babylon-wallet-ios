@@ -65,6 +65,8 @@ extension ImportMnemonicControllingAccounts {
 					content: { store_ in
 						NavigationView {
 							ImportMnemonic.View(store: store_)
+								// FIXME: Strings
+								.navigationTitle("Enter Seed Phrase")
 						}
 					}
 				)
