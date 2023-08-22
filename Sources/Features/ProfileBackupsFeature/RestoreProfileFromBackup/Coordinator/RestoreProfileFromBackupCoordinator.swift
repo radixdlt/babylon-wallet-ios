@@ -47,6 +47,7 @@ public struct RestoreProfileFromBackupCoordinator: Sendable, FeatureReducer {
 
 	public enum DelegateAction: Sendable, Equatable {
 		case profileImported
+		case failedToImportProfileDueToMnemonics
 	}
 
 	public init() {}
@@ -93,6 +94,10 @@ public struct RestoreProfileFromBackupCoordinator: Sendable, FeatureReducer {
 
 			 */
 			fatalError("nice!")
+
+		case .path(.element(_, action: .importMnemonicsFlow(.delegate(.failedToImportAllRequiredMnemonics)))):
+			state.path.removeLast()
+			return .send(.delegate(.failedToImportProfileDueToMnemonics))
 
 		default:
 			return .none

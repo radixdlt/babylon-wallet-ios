@@ -48,6 +48,7 @@ public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 
 	public enum DelegateAction: Sendable, Equatable {
 		case finishedImportingMnemonics
+		case failedToImportAllRequiredMnemonics
 	}
 
 	@Dependency(\.deviceFactorSourceClient) var deviceFactorSourceClient
@@ -98,6 +99,21 @@ public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 
 			state.mnemonicsLeftToImport.removeAll(where: { $0.factorSourceID.embed() == factorSourceID })
 			return nextMnemonicIfNeeded(state: &state)
+
+		case .destination(.dismiss):
+			guard let destination = state.destination else {
+				return .none
+			}
+
+			switch destination {
+			case let .importMnemonicControllingAccounts(substate):
+				if substate.entitiesControlledByFactorSource.isSkippable {
+					return nextMnemonicIfNeeded(state: &state)
+				} else {
+					// Skipped a non skippable by use of OS level gestures
+					return .send(.delegate(.failedToImportAllRequiredMnemonics))
+				}
+			}
 
 		default:
 			return .none

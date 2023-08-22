@@ -64,6 +64,9 @@ public struct OnboardingStartup: Sendable, FeatureReducer {
 		case .destination(.presented(.restoreFromBackup(.delegate(.profileImported)))):
 			return .send(.delegate(.completed))
 
+		case .destination(.presented(.restoreFromBackup(.delegate(.failedToImportProfileDueToMnemonics)))):
+			return .none
+
 		default:
 			return .none
 		}
