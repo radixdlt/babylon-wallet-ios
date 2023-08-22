@@ -19,7 +19,7 @@ public struct DisplayMnemonic: Sendable, FeatureReducer {
 	}
 
 	public enum InternalAction: Sendable, Equatable {
-		case loadMnemonicResult(TaskResult<MnemonicWithPassphrase?>, mnemonicBasedFactorSourceKind: MnemonicBasedFactorSourceKind)
+		case loadMnemonicResult(TaskResult<MnemonicWithPassphrase?>)
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -50,14 +50,14 @@ public struct DisplayMnemonic: Sendable, FeatureReducer {
 				let result = await TaskResult {
 					try await secureStorageClient.loadMnemonicByFactorSourceID(factorSourceID.embed(), .displaySeedPhrase)
 				}
-				return .internal(.loadMnemonicResult(result, mnemonicBasedFactorSourceKind: deviceFactorSource.cryptoParameters.supportsOlympia ? .onDevice(.olympia) : .onDevice(.babylon)))
+				return .internal(.loadMnemonicResult(result))
 			}
 		}
 	}
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
-		case let .loadMnemonicResult(.success(maybeMnemonicWithPassphrase), mnemonicBasedFactorSourceKind):
+		case let .loadMnemonicResult(.success(maybeMnemonicWithPassphrase)):
 			guard let mnemonicWithPassphrase = maybeMnemonicWithPassphrase else {
 				loggerGlobal.error("Mnemonic was nil")
 				return .send(.delegate(.failedToLoad))
@@ -65,12 +65,11 @@ public struct DisplayMnemonic: Sendable, FeatureReducer {
 
 			state.importMnemonic = .init(
 				warning: L10n.RevealSeedPhrase.warning,
-				mnemonicWithPassphrase: mnemonicWithPassphrase,
-				mnemonicForFactorSourceKind: mnemonicBasedFactorSourceKind
+				mnemonicWithPassphrase: mnemonicWithPassphrase
 			)
 			return .none
 
-		case let .loadMnemonicResult(.failure(error), _):
+		case let .loadMnemonicResult(.failure(error)):
 			loggerGlobal.error("Error loading mnemonic: \(error)")
 			return .send(.delegate(.failedToLoad))
 		}

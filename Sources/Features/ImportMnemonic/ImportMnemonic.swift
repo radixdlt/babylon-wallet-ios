@@ -80,11 +80,18 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 		@PresentationState
 		public var offDeviceMnemonicInfoPrompt: OffDeviceMnemonicInfo.State?
 
-		public let mnemonicForFactorSourceKind: MnemonicBasedFactorSourceKind
+		public struct PersistStrategy: Sendable, Hashable {
+			public enum Location: Sendable, Hashable {
+				case intoKeychainAndProfile
+				case intoKeychainOnly
+			}
 
-		public enum PersistStrategy: Sendable, Hashable {
-			case intoKeychainAndProfile
-			case intoKeychainOnly
+			public let mnemonicForFactorSourceKind: MnemonicBasedFactorSourceKind
+			public let location: Location
+			public init(mnemonicForFactorSourceKind: MnemonicBasedFactorSourceKind, location: Location) {
+				self.mnemonicForFactorSourceKind = mnemonicForFactorSourceKind
+				self.location = location
+			}
 		}
 
 		public init(
@@ -92,7 +99,6 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			warning: String? = nil,
 			isWordCountFixed: Bool = false,
 			persistStrategy: PersistStrategy?,
-			mnemonicForFactorSourceKind: MnemonicBasedFactorSourceKind,
 			language: BIP39.Language = .english,
 			wordCount: BIP39.WordCount = .twelve,
 			bip39Passphrase: String = "",
@@ -101,7 +107,6 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			precondition(wordCount.rawValue.isMultiple(of: ImportMnemonic.wordsPerRow))
 
 			self.persistStrategy = persistStrategy
-			self.mnemonicForFactorSourceKind = mnemonicForFactorSourceKind
 			self.language = language
 			self.bip39Passphrase = bip39Passphrase
 
@@ -117,14 +122,12 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 		public init(
 			header: Header? = nil,
 			warning: String? = nil,
-			mnemonicWithPassphrase: MnemonicWithPassphrase,
-			mnemonicForFactorSourceKind: MnemonicBasedFactorSourceKind
+			mnemonicWithPassphrase: MnemonicWithPassphrase
 		) {
 			self.header = header
 			self.warning = warning
 
 			let mnemonic = mnemonicWithPassphrase.mnemonic
-			self.mnemonicForFactorSourceKind = mnemonicForFactorSourceKind
 			self.persistStrategy = nil
 			self.language = mnemonic.language
 			let isReadonlyMode = true
@@ -195,6 +198,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 	public enum DelegateAction: Sendable, Equatable {
 		case persistedNewFactorSourceInProfile(FactorSource)
 		case persistedMnemonicInKeychainOnly(MnemonicWithPassphrase, FactorSourceID.FromHash)
+		case notPersisted(MnemonicWithPassphrase)
 		case doneViewing
 	}
 
@@ -247,7 +251,12 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 
 		case let .offDeviceMnemonicInfoPrompt(.presented(.delegate(.done(label, mnemonicWithPassphrase)))):
 			state.offDeviceMnemonicInfoPrompt = nil
-			precondition(state.mnemonicForFactorSourceKind == .offDevice)
+			guard let persistStrategy = state.persistStrategy else {
+				preconditionFailure("expected persistStrategy")
+				return .none
+			}
+			precondition(persistStrategy.mnemonicForFactorSourceKind == .offDevice)
+
 			return .task {
 				await .internal(.saveFactorSourceResult(
 					TaskResult {
@@ -299,16 +308,12 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 				passphrase: state.bip39Passphrase
 			)
 			guard let persistStrategy = state.persistStrategy else {
-				let factorSourceID = try! FactorSourceID.FromHash(
-					kind: state.mnemonicForFactorSourceKind.factorSourceKind,
-					mnemonicWithPassphrase: mnemonicWithPassphrase
-				)
-				return .send(.delegate(.persistedMnemonicInKeychainOnly(mnemonicWithPassphrase, factorSourceID)))
+				return .send(.delegate(.notPersisted(mnemonicWithPassphrase)))
 			}
 
-			switch persistStrategy {
+			switch persistStrategy.location {
 			case .intoKeychainAndProfile:
-				switch state.mnemonicForFactorSourceKind {
+				switch persistStrategy.mnemonicForFactorSourceKind {
 				case .offDevice:
 					state.offDeviceMnemonicInfoPrompt = .init(mnemonicWithPassphrase: mnemonicWithPassphrase)
 					return .none

@@ -17,9 +17,11 @@ public struct ManageSomeFactorSource<FactorSourceOfKind: BaseFactorSourceProtoco
 
 			case .offDeviceMnemonic:
 				self = .manageOffDeviceMnemonics(.init(
-					persistStrategy: .intoKeychainAndProfile,
-					mnemonicForFactorSourceKind: .offDevice
-				))
+					persistStrategy: .init(
+						mnemonicForFactorSourceKind: .offDevice,
+						location: .intoKeychainAndProfile
+					))
+				)
 
 			case .ledgerHQHardwareWallet:
 				fatalError("Should have handled Ledger by use of LedgerHardwareDevicesFeature")

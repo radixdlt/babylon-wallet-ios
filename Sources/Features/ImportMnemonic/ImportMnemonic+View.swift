@@ -301,22 +301,22 @@ extension View {
 	}
 }
 
-#if DEBUG
-import SwiftUI // NB: necessary for previews to appear
-
-// MARK: - ImportMnemonic_Preview
-struct ImportMnemonic_Preview: PreviewProvider {
-	static var previews: some View {
-		ImportMnemonic.View(
-			store: .init(
-				initialState: .previewValue,
-				reducer: ImportMnemonic()
-			)
-		)
-	}
-}
-
-extension ImportMnemonic.State {
-	public static let previewValue = Self(persistStrategy: .intoKeychainOnly, mnemonicForFactorSourceKind: .offDevice)
-}
-#endif
+// #if DEBUG
+// import SwiftUI // NB: necessary for previews to appear
+//
+//// MARK: - ImportMnemonic_Preview
+// struct ImportMnemonic_Preview: PreviewProvider {
+//	static var previews: some View {
+//		ImportMnemonic.View(
+//			store: .init(
+//				initialState: .previewValue,
+//				reducer: ImportMnemonic()
+//			)
+//		)
+//	}
+// }
+//
+// extension ImportMnemonic.State {
+//	public static let previewValue = Self(persistStrategy: .intoKeychainOnly, mnemonicForFactorSourceKind: .offDevice)
+// }
+// #endif

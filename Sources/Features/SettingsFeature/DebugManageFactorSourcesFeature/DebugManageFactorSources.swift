@@ -78,11 +78,11 @@ public struct DebugManageFactorSources: Sendable, FeatureReducer {
 			}
 
 		case .importOlympiaMnemonicButtonTapped:
-			state.destination = .importMnemonic(.init(persistStrategy: .intoKeychainAndProfile, mnemonicForFactorSourceKind: .onDevice(.olympia)))
+			state.destination = .importMnemonic(.init(persistStrategy: .init(mnemonicForFactorSourceKind: .onDevice(.olympia), location: .intoKeychainAndProfile)))
 			return .none
 
 		case .addOffDeviceMnemonicButtonTapped:
-			state.destination = .importMnemonic(.init(persistStrategy: .intoKeychainAndProfile, mnemonicForFactorSourceKind: .offDevice))
+			state.destination = .importMnemonic(.init(persistStrategy: .init(mnemonicForFactorSourceKind: .offDevice, location: .intoKeychainAndProfile)))
 			return .none
 
 		case .addLedgerButtonTapped:

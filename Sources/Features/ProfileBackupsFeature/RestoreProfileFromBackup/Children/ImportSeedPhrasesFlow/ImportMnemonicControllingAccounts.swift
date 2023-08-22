@@ -69,8 +69,7 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 		case .inputMnemonic:
 			state.destination = .importMnemonic(.init(
 				isWordCountFixed: true,
-				persistStrategy: .intoKeychainOnly,
-				mnemonicForFactorSourceKind: state.entitiesControlledByFactorSource.deviceFactorSource.supportsOlympia ? .onDevice(.olympia) : .onDevice(.babylon)
+				persistStrategy: nil
 			))
 			return .none
 
@@ -84,17 +83,29 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
 		case let .destination(.presented(
-			.importMnemonic(.delegate(.persistedMnemonicInKeychainOnly(mnemonicWithPassphrase, factorSourceID)))
+			.importMnemonic(.delegate(delegateAction))
 		)):
-			guard factorSourceID == state.entitiesControlledByFactorSource.factorSourceID else {
-				fatalError("factor source ID mismatch")
-			}
-			return validate(
-				mnemonic: mnemonicWithPassphrase, accounts: state.entitiesControlledByFactorSource.accounts
-			)
+			switch delegateAction {
+			case let .notPersisted(mnemonicWithPassphrase):
+				// FIXME: should always work... but please tidy up!
+				let factorSourceID = try! FactorSourceID.FromHash(
+					kind: .device,
+					mnemonicWithPassphrase: mnemonicWithPassphrase
+				)
+				guard factorSourceID == state.entitiesControlledByFactorSource.factorSourceID else {
+					fatalError("factor source ID mismatch")
+				}
+				return validate(
+					mnemonic: mnemonicWithPassphrase, accounts: state.entitiesControlledByFactorSource.accounts
+				)
 
-//            state.mnemonicsLeftToImport.removeAll(where: { $0.factorSourceID == factorSourceID })
-//            return nextMnemonicIfNeeded(state: &state)
+    //            state.mnemonicsLeftToImport.removeAll(where: { $0.factorSourceID == factorSourceID })
+    //            return nextMnemonicIfNeeded(state: &state)
+
+			case .persistedMnemonicInKeychainOnly, .doneViewing, .persistedNewFactorSourceInProfile:
+				preconditionFailure("Incorrect implementation")
+				return .none
+			}
 
 		default:
 			return .none
