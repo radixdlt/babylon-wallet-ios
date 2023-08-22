@@ -67,6 +67,9 @@ extension Profile.Network {
 		/// A required non empty display name, used by presentation layer and sent to Dapps when requested.
 		public var displayName: NonEmpty<String>
 
+		/// The on ledger synced settings for this account
+		public var onLedgerSettings: OnLedgerSettings
+
 		public init(
 			networkID: NetworkID,
 			address: EntityAddress,
@@ -78,6 +81,7 @@ extension Profile.Network {
 			self.address = address
 			self.securityState = securityState
 			self.appearanceID = extraProperties.appearanceID
+			self.onLedgerSettings = .default
 			self.displayName = displayName
 		}
 	}
