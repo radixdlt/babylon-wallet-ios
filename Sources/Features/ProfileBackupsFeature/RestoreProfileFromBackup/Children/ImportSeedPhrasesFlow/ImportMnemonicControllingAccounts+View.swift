@@ -1,5 +1,6 @@
 import DisplayEntitiesControlledByMnemonicFeature
 import FeaturePrelude
+import ImportMnemonicFeature
 
 extension ImportMnemonicControllingAccounts.State {
 	var viewState: ImportMnemonicControllingAccounts.ViewState {
@@ -13,7 +14,7 @@ extension ImportMnemonicControllingAccounts {
 		let isSkippable: Bool
 
 		var title: LocalizedStringKey {
-			isSkippable ? "The following Accounts are controlled by a seed phrase. To recover control, you must re-enter it." : "Your Personas and the following Accounts are controlled by your main seed phrase. To recover control, you must re-enter it."
+			isSkippable ? "The following **Accounts** are controlled by a seed phrase. To recover control, you must re-enter it." : "Your **Personas** and the following **Accounts** are controlled by your main seed phrase. To recover control, you must re-enter it."
 		}
 
 		var navigationTitle: LocalizedStringKey {
@@ -34,6 +35,9 @@ extension ImportMnemonicControllingAccounts {
 				VStack {
 					// FIXME: Strings
 					Text(viewStore.title)
+						.textStyle(.body1Regular)
+						.foregroundColor(.app.gray1)
+						.padding()
 
 					if viewStore.isSkippable {
 						Button("Skip This Seed Phrase For Now") {
@@ -48,6 +52,16 @@ extension ImportMnemonicControllingAccounts {
 						)
 					}
 				}
+				.sheet(
+					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+					state: /ImportMnemonicControllingAccounts.Destinations.State.importMnemonic,
+					action: ImportMnemonicControllingAccounts.Destinations.Action.importMnemonic,
+					content: { store_ in
+						NavigationView {
+							ImportMnemonic.View(store: store_)
+						}
+					}
+				)
 				.padding(.horizontal, .medium3)
 				.footer {
 					// FIXME: Strings
