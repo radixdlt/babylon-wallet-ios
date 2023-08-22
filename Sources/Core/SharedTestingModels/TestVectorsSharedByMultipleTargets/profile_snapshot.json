@@ -347,19 +347,9 @@
                   "depositRule": "acceptKnown",
                   "assetsExceptionList": [
                       {
-                          "address": {
-                              "discriminator": "resourceAddress",
-                              "value": "resource_tdx_21_1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxsmgder"
-                          },
-                          "exceptionRule": "allow"
-                      },
-                      {
-                          "address" : {
-                              "discriminator": "nonFungibleGlobalID",
-                              "value": "resource_tdx_21_1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxsmgder:#1#"
-                          },
+                          "address": "resource_tdx_21_1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxsmgder",
                           "exceptionRule": "deny"
-                      },
+                      }
                   ],
                   "depositorsAllowList": [
                       {
@@ -440,19 +430,9 @@
                   "depositRule": "denyAll",
                   "assetsExceptionList": [
                       {
-                          "address": {
-                              "discriminator": "resourceAddress",
-                              "value": "resource_tdx_21_1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxsmgder"
-                          },
-                          "exceptionRule": "deny"
-                      },
-                      {
-                          "address" : {
-                              "discriminator": "nonFungibleGlobalID",
-                              "value": "resource_tdx_21_1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxsmgder:#1#"
-                          },
+                          "address": "resource_tdx_21_1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxsmgder",
                           "exceptionRule": "allow"
-                      },
+                      }
                   ],
                   "depositorsAllowList": [
                       {

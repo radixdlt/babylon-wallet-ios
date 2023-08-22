@@ -23,6 +23,7 @@ public struct AssetTransfer: Sendable, FeatureReducer {
 	public enum ViewAction: Equatable, Sendable {
 		case closeButtonTapped
 		case addMessageTapped
+		case backgroundTapped
 		case sendTransferTapped
 	}
 
@@ -51,7 +52,22 @@ public struct AssetTransfer: Sendable, FeatureReducer {
 			state.message = .empty
 			return .none
 
+		case .backgroundTapped:
+			if state.message?.focused == true {
+				state.message?.focused = false
+			}
+
+			for id in state.accounts.receivingAccounts.ids {
+				for assetID in state.accounts.receivingAccounts[id: id]?.assets.ids ?? [] {
+					state.accounts.receivingAccounts[id: id]?.assets[id: assetID]?.unsetFocus()
+				}
+			}
+
+			return .none
+
 		case .sendTransferTapped:
+			state.message?.focused = false
+
 			return .run { [accounts = state.accounts, message = state.message?.message] send in
 				let manifest = try await createManifest(accounts)
 				await dappInteractionClient.addWalletInteraction(

@@ -555,18 +555,10 @@ final class ProfileTests: TestCase {
 
 		XCTAssertEqual(
 			network.accounts[1].onLedgerSettings.thirdPartyDeposits.assetsExceptionList[0].address,
-			.resourceAddress(.init(stringLiteral: "resource_tdx_21_1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxsmgder"))
+			.init(stringLiteral: "resource_tdx_21_1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxsmgder")
 		)
 		XCTAssertEqual(
-			network.accounts[1].onLedgerSettings.thirdPartyDeposits.assetsExceptionList[0].exceptionRule, .allow
-		)
-
-		XCTAssertEqual(
-			network.accounts[1].onLedgerSettings.thirdPartyDeposits.assetsExceptionList[1].address,
-			try .nonFungibleGlobalID(.init(nonFungibleGlobalId: "resource_tdx_21_1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxsmgder:#1#"))
-		)
-		XCTAssertEqual(
-			network.accounts[1].onLedgerSettings.thirdPartyDeposits.assetsExceptionList[1].exceptionRule, .deny
+			network.accounts[1].onLedgerSettings.thirdPartyDeposits.assetsExceptionList[0].exceptionRule, .deny
 		)
 
 		XCTAssertEqual(
@@ -598,18 +590,10 @@ final class ProfileTests: TestCase {
 
 		XCTAssertEqual(
 			network.accounts[2].onLedgerSettings.thirdPartyDeposits.assetsExceptionList[0].address,
-			.resourceAddress(.init(stringLiteral: "resource_tdx_21_1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxsmgder"))
+			.init(stringLiteral: "resource_tdx_21_1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxsmgder")
 		)
 		XCTAssertEqual(
-			network.accounts[2].onLedgerSettings.thirdPartyDeposits.assetsExceptionList[0].exceptionRule, .deny
-		)
-
-		XCTAssertEqual(
-			network.accounts[2].onLedgerSettings.thirdPartyDeposits.assetsExceptionList[1].address,
-			try .nonFungibleGlobalID(.init(nonFungibleGlobalId: "resource_tdx_21_1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxsmgder:#1#"))
-		)
-		XCTAssertEqual(
-			network.accounts[2].onLedgerSettings.thirdPartyDeposits.assetsExceptionList[1].exceptionRule, .allow
+			network.accounts[2].onLedgerSettings.thirdPartyDeposits.assetsExceptionList[0].exceptionRule, .allow
 		)
 
 		XCTAssertEqual(
