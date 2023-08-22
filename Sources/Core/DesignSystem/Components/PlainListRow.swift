@@ -49,6 +49,7 @@ public struct PlainListRow<Icon: View>: View {
 		}
 		.frame(minHeight: .settingsRowHeight)
 		.padding(.horizontal, .medium3)
+		.contentShape(Rectangle())
 	}
 }
 

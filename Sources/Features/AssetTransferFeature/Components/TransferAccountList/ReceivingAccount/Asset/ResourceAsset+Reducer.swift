@@ -1,5 +1,6 @@
 import FeaturePrelude
 
+// MARK: - ResourceAsset
 // Higher order reducer composing all types of assets that can be transferred
 public struct ResourceAsset: Sendable, FeatureReducer {
 	public enum State: Sendable, Hashable, Identifiable {
@@ -54,6 +55,15 @@ public struct ResourceAsset: Sendable, FeatureReducer {
 		switch viewAction {
 		case .removeTapped:
 			return .send(.delegate(.removed))
+		}
+	}
+}
+
+extension ResourceAsset.State {
+	mutating func unsetFocus() {
+		if case var .fungibleAsset(state) = self, state.focused {
+			state.focused = false
+			self = .fungibleAsset(state)
 		}
 	}
 }

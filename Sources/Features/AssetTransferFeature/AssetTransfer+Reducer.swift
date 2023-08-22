@@ -53,7 +53,16 @@ public struct AssetTransfer: Sendable, FeatureReducer {
 			return .none
 
 		case .backgroundTapped:
-			state.message?.focused = false
+			if state.message?.focused == true {
+				state.message?.focused = false
+			}
+
+			for id in state.accounts.receivingAccounts.ids {
+				for assetID in state.accounts.receivingAccounts[id: id]?.assets.ids ?? [] {
+					state.accounts.receivingAccounts[id: id]?.assets[id: assetID]?.unsetFocus()
+				}
+			}
+
 			return .none
 
 		case .sendTransferTapped:
