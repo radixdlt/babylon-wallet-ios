@@ -28,7 +28,7 @@ extension Profile.Network.Account.OnLedgerSettings {
 		}
 
 		/// The addresses that can be added as exception to the `DepositRule`
-		public enum DepositAddress: Hashable, Sendable, Codable {
+		public enum DepositorAddress: Hashable, Sendable, Codable {
 			case resourceAddress(ResourceAddress)
 			case nonFungibleGlobalID(NonFungibleGlobalId)
 		}
@@ -43,10 +43,10 @@ extension Profile.Network.Account.OnLedgerSettings {
 
 		/// The specific Asset exception rule
 		public struct AssetException: Hashable, Sendable, Codable {
-			public let address: DepositAddress
+			public let address: ResourceAddress
 			public let exceptionRule: DepositAddressExceptionRule
 
-			public init(address: DepositAddress, exceptionRule: DepositAddressExceptionRule) {
+			public init(address: ResourceAddress, exceptionRule: DepositAddressExceptionRule) {
 				self.address = address
 				self.exceptionRule = exceptionRule
 			}
@@ -60,12 +60,12 @@ extension Profile.Network.Account.OnLedgerSettings {
 
 		/// Allows certain third-party depositors to deposit assets freely.
 		/// Note: There is no `deny` counterpart for this.
-		public var depositorsAllowList: OrderedSet<DepositAddress>
+		public var depositorsAllowList: OrderedSet<DepositorAddress>
 
 		public init(
 			depositRule: DepositRule,
 			assetsExceptionList: OrderedSet<AssetException>,
-			depositorsAllowList: OrderedSet<DepositAddress>
+			depositorsAllowList: OrderedSet<DepositorAddress>
 		) {
 			self.depositRule = depositRule
 			self.assetsExceptionList = assetsExceptionList
@@ -89,7 +89,7 @@ extension Profile.Network.Account.OnLedgerSettings.ThirdPartyDeposits.AssetExcep
 	}
 }
 
-extension Profile.Network.Account.OnLedgerSettings.ThirdPartyDeposits.DepositAddress {
+extension Profile.Network.Account.OnLedgerSettings.ThirdPartyDeposits.DepositorAddress {
 	private enum CodingKeys: String, CodingKey {
 		case discriminator
 		case value
