@@ -101,6 +101,7 @@ extension PreferenceSection.Row where SectionId == ManageThirdPartyDeposits.Sect
 			id: .depositRule(.denyAll),
 			title: "Deny all", // FIXME: strings
 			subtitle: "Deny all third parties deposits", // FIXME: strings
+			hint: "This account will not be able to receive “air drops” or be used by a trusted contact to assist with account recovery.", // FIXME: strings
 			icon: .asset(AssetResource.iconDeclineAirdrop)
 		)
 	}
@@ -109,8 +110,7 @@ extension PreferenceSection.Row where SectionId == ManageThirdPartyDeposits.Sect
 		.init(
 			id: .allowDenyAssets(.allowDenyAssets),
 			title: "Allow/Deny specific assets", // FIXME: strings
-			subtitle: "Deny or allow third-party deposits of specific assets, ignoring the setting above", // FIXME: strings
-			icon: nil
+			subtitle: "Deny or allow third-party deposits of specific assets, ignoring the setting above"
 		)
 	}
 
@@ -118,8 +118,7 @@ extension PreferenceSection.Row where SectionId == ManageThirdPartyDeposits.Sect
 		.init(
 			id: .allowDepositors(.allowDepositors),
 			title: "Allow specific depositors", // FIXME: strings
-			subtitle: "Allow certain third party depositors to deposit assets freely", // FIXME: strings
-			icon: nil
+			subtitle: "Allow certain third party depositors to deposit assets freely"
 		)
 	}
 }

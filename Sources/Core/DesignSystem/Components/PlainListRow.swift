@@ -54,11 +54,16 @@ public struct PlainListRow<Icon: View>: View {
 }
 
 // MARK: - PlainListRowCore
-struct PlainListRowCore: View {
+public struct PlainListRowCore: View {
 	let title: String
 	let subtitle: String?
 
-	var body: some View {
+	public init(title: String, subtitle: String?) {
+		self.title = title
+		self.subtitle = subtitle
+	}
+
+	public var body: some View {
 		VStack(alignment: .leading, spacing: .zero) {
 			Text(title)
 				.lineSpacing(-6)
