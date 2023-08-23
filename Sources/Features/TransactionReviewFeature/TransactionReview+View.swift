@@ -31,14 +31,14 @@ extension TransactionReview.State {
 			viewControlState: viewControlState,
 			showDottedLine: (withdrawals != nil || message != .none) && deposits != nil,
 			rawTransaction: displayMode.rawTransaction,
-			showApproveButton: transactionManifestWithLockFee != nil,
-			canApproveTX: canApproveTX,
-			canToggleViewMode: reviewedTransaction != nil && reviewedTransaction != .nonConforming
+			showApproveButton: reviewedTransaction != nil,
+			canApproveTX: canApproveTX && reviewedTransaction?.feePayingValidation == .valid,
+			canToggleViewMode: reviewedTransaction != nil && reviewedTransaction?.transaction != .nonConforming
 		)
 	}
 
 	private var viewControlState: ControlState {
-		if transactionManifestWithLockFee == nil {
+		if reviewedTransaction == nil {
 			return .loading(.global(text: L10n.TransactionSigning.preparingTransaction))
 		} else {
 			return .enabled
@@ -99,13 +99,13 @@ extension TransactionReview {
 				VStack(spacing: 0) {
 					FixedSpacer(height: .medium2)
 
-					if let rawTransaction = viewStore.rawTransaction {
-						RawTransactionView(transaction: rawTransaction)
-							.padding(.bottom, .medium3)
-					} else {
-						VStack(spacing: 0) {
-							messageSection(with: viewStore.message)
+					VStack(spacing: 0) {
+						messageSection(with: viewStore.message)
 
+						if let rawTransaction = viewStore.rawTransaction {
+							RawTransactionView(transaction: rawTransaction)
+								.padding(.bottom, .medium3)
+						} else {
 							withdrawalsSection
 
 							usingDappsSection(
@@ -115,14 +115,14 @@ extension TransactionReview {
 							)
 
 							depositsSection
-
-							Separator()
-								.padding(.bottom, .medium1)
-
-							proofsSection
-
-							feeSection
 						}
+
+						Separator()
+							.padding(.bottom, .medium1)
+
+						proofsSection
+
+						feeSection
 					}
 
 					if viewStore.showApproveButton {
@@ -233,7 +233,7 @@ extension View {
 		let destinationStore = store.scope(state: \.$destination, action: { .child(.destination($0)) })
 		return customizeGuarantees(with: destinationStore)
 			.dApp(with: destinationStore)
-			.selectFeePayer(with: destinationStore)
+			.customizeFees(with: destinationStore)
 			.signing(with: destinationStore)
 			.submitting(with: destinationStore)
 	}
@@ -259,12 +259,12 @@ extension View {
 	}
 
 	@MainActor
-	private func selectFeePayer(with destinationStore: PresentationStoreOf<TransactionReview.Destinations>) -> some View {
+	private func customizeFees(with destinationStore: PresentationStoreOf<TransactionReview.Destinations>) -> some View {
 		sheet(
 			store: destinationStore,
-			state: /TransactionReview.Destinations.State.selectFeePayer,
-			action: TransactionReview.Destinations.Action.selectFeePayer,
-			content: { SelectFeePayer.View(store: $0) }
+			state: /TransactionReview.Destinations.State.customizeFees,
+			action: TransactionReview.Destinations.Action.customizeFees,
+			content: { CustomizeFees.View(store: $0) }
 		)
 	}
 

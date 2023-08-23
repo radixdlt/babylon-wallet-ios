@@ -21,6 +21,11 @@ public struct TransactionReceipt: Codable, Hashable {
     public private(set) var status: TransactionReceiptStatus?
     /** Fees paid, Only present if the `status` is not `Rejected`. */
     public private(set) var feeSummary: AnyCodable?
+    public private(set) var costingParameters: AnyCodable?
+    /** Only present if the `status` is not `Rejected`. */
+    public private(set) var feeDestination: AnyCodable?
+    /** Only present if the `status` is not `Rejected`. */
+    public private(set) var feeSource: AnyCodable?
     /** Transaction state updates (only present if status is Succeeded or Failed). */
     public private(set) var stateUpdates: AnyCodable?
     /** Information (number and active validator list) about new epoch if occured. */
@@ -32,9 +37,12 @@ public struct TransactionReceipt: Codable, Hashable {
     /** Error message (only present if status is `Failed` or `Rejected`) */
     public private(set) var errorMessage: String?
 
-    public init(status: TransactionReceiptStatus? = nil, feeSummary: AnyCodable? = nil, stateUpdates: AnyCodable? = nil, nextEpoch: AnyCodable? = nil, output: AnyCodable? = nil, events: AnyCodable? = nil, errorMessage: String? = nil) {
+    public init(status: TransactionReceiptStatus? = nil, feeSummary: AnyCodable? = nil, costingParameters: AnyCodable? = nil, feeDestination: AnyCodable? = nil, feeSource: AnyCodable? = nil, stateUpdates: AnyCodable? = nil, nextEpoch: AnyCodable? = nil, output: AnyCodable? = nil, events: AnyCodable? = nil, errorMessage: String? = nil) {
         self.status = status
         self.feeSummary = feeSummary
+        self.costingParameters = costingParameters
+        self.feeDestination = feeDestination
+        self.feeSource = feeSource
         self.stateUpdates = stateUpdates
         self.nextEpoch = nextEpoch
         self.output = output
@@ -45,6 +53,9 @@ public struct TransactionReceipt: Codable, Hashable {
     public enum CodingKeys: String, CodingKey, CaseIterable {
         case status
         case feeSummary = "fee_summary"
+        case costingParameters = "costing_parameters"
+        case feeDestination = "fee_destination"
+        case feeSource = "fee_source"
         case stateUpdates = "state_updates"
         case nextEpoch = "next_epoch"
         case output
@@ -58,6 +69,9 @@ public struct TransactionReceipt: Codable, Hashable {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encodeIfPresent(status, forKey: .status)
         try container.encodeIfPresent(feeSummary, forKey: .feeSummary)
+        try container.encodeIfPresent(costingParameters, forKey: .costingParameters)
+        try container.encodeIfPresent(feeDestination, forKey: .feeDestination)
+        try container.encodeIfPresent(feeSource, forKey: .feeSource)
         try container.encodeIfPresent(stateUpdates, forKey: .stateUpdates)
         try container.encodeIfPresent(nextEpoch, forKey: .nextEpoch)
         try container.encodeIfPresent(output, forKey: .output)

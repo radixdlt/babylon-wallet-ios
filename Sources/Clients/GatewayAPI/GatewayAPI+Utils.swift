@@ -256,3 +256,13 @@ extension GatewayAPI.LedgerState {
 		.init(stateVersion: stateVersion)
 	}
 }
+
+extension GatewayAPI.StateEntityDetailsResponseComponentDetails {
+	public func decodeState<State: Decodable>() throws -> State? {
+		guard let state else {
+			return nil
+		}
+		let data = try JSONSerialization.data(withJSONObject: state.value)
+		return try JSONDecoder().decode(State.self, from: data)
+	}
+}

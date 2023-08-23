@@ -154,7 +154,8 @@ extension ProfileSnapshot.Header.Version {
 	/// - 42: Change counter to not be factor source based.
 	/// - 43: Added `mnemonicWordCount` in `hint` in `DeviceFactorSource`
 	/// - 44: Added `transaction` setting inside `appPreferences` with `defaultDepositGuarantee` decimal value encoded as String
-	public static let minimum: Self = 44
+	/// - 45: Merge of 43 and 44.
+	public static let minimum: Self = 45
 }
 
 extension ProfileSnapshot.Header {

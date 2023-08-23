@@ -524,6 +524,16 @@ final class ProfileTests: TestCase {
 			"account_tdx_21_12ya9jylskaa6gdrfr8nvve3pfc6wyhyw7eg83fwlc7fv2w0eanumcd"
 		)
 
+		XCTAssertEqual(
+			network.accounts[0].onLedgerSettings,
+			.init(thirdPartyDeposits: .init(
+				depositRule: .acceptAll,
+				assetsExceptionList: [],
+				depositorsAllowList: []
+			)
+			)
+		)
+
 		// Account 1
 		XCTAssertEqual(
 			network.accounts[1].publicKey()?.compressedData.hex(),
@@ -539,6 +549,26 @@ final class ProfileTests: TestCase {
 			"account_tdx_21_12xg7tf7aup8lrxkvug0vzatntzww0c6jnntyj6yd4eg5920kpxpzvt"
 		)
 
+		XCTAssertEqual(
+			network.accounts[1].onLedgerSettings.thirdPartyDeposits.depositRule, .acceptKnown
+		)
+
+		XCTAssertEqual(
+			network.accounts[1].onLedgerSettings.thirdPartyDeposits.assetsExceptionList[0].address,
+			.init(stringLiteral: "resource_tdx_21_1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxsmgder")
+		)
+		XCTAssertEqual(
+			network.accounts[1].onLedgerSettings.thirdPartyDeposits.assetsExceptionList[0].exceptionRule, .deny
+		)
+
+		XCTAssertEqual(
+			network.accounts[1].onLedgerSettings.thirdPartyDeposits.depositorsAllowList,
+			try [
+				.resourceAddress(.init(stringLiteral: "resource_tdx_21_1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxsmgder")),
+				.nonFungibleGlobalID(.init(nonFungibleGlobalId: "resource_tdx_21_1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxsmgder:#2#")),
+			]
+		)
+
 		// Account 2
 		XCTAssertEqual(
 			network.accounts[2].publicKey()?.compressedData.hex(),
@@ -552,6 +582,26 @@ final class ProfileTests: TestCase {
 		XCTAssertEqual(
 			network.accounts[2].address.address,
 			"account_tdx_21_12yth59wfyl8e4axupym0c96g9heuf5j06lv2lgc2cuapzlmj6alzzn"
+		)
+
+		XCTAssertEqual(
+			network.accounts[2].onLedgerSettings.thirdPartyDeposits.depositRule, .denyAll
+		)
+
+		XCTAssertEqual(
+			network.accounts[2].onLedgerSettings.thirdPartyDeposits.assetsExceptionList[0].address,
+			.init(stringLiteral: "resource_tdx_21_1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxsmgder")
+		)
+		XCTAssertEqual(
+			network.accounts[2].onLedgerSettings.thirdPartyDeposits.assetsExceptionList[0].exceptionRule, .allow
+		)
+
+		XCTAssertEqual(
+			network.accounts[2].onLedgerSettings.thirdPartyDeposits.depositorsAllowList,
+			try [
+				.resourceAddress(.init(stringLiteral: "resource_tdx_21_1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxsmgder")),
+				.nonFungibleGlobalID(.init(nonFungibleGlobalId: "resource_tdx_21_1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxsmgder:#2#")),
+			]
 		)
 
 		// Persona 0

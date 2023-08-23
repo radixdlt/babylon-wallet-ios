@@ -34,6 +34,7 @@ public struct AppTextField<FocusValue: Hashable, Accessory: View, InnerAccessory
 	@Environment(\.isEnabled) var isEnabled: Bool
 
 	let primaryHeading: PrimaryHeading?
+	let subHeading: String?
 	let secondaryHeading: String?
 	let placeholder: String
 	let text: Binding<String>
@@ -45,6 +46,7 @@ public struct AppTextField<FocusValue: Hashable, Accessory: View, InnerAccessory
 
 	public init(
 		primaryHeading: PrimaryHeading? = nil,
+		subHeading: String? = nil,
 		secondaryHeading: String? = nil,
 		placeholder: String,
 		text: Binding<String>,
@@ -55,6 +57,7 @@ public struct AppTextField<FocusValue: Hashable, Accessory: View, InnerAccessory
 		@ViewBuilder innerAccessory: () -> InnerAccessory = { EmptyView() }
 	) {
 		self.primaryHeading = primaryHeading
+		self.subHeading = subHeading
 		self.secondaryHeading = secondaryHeading
 		self.placeholder = placeholder
 		self.text = text
@@ -67,6 +70,7 @@ public struct AppTextField<FocusValue: Hashable, Accessory: View, InnerAccessory
 
 	public init(
 		primaryHeading: PrimaryHeading? = nil,
+		subHeading: String? = nil,
 		secondaryHeading: String? = nil,
 		placeholder: String,
 		text: Binding<String>,
@@ -76,6 +80,7 @@ public struct AppTextField<FocusValue: Hashable, Accessory: View, InnerAccessory
 		@ViewBuilder innerAccessory: () -> InnerAccessory = { EmptyView() }
 	) where FocusValue == Never {
 		self.primaryHeading = primaryHeading
+		self.subHeading = subHeading
 		self.secondaryHeading = secondaryHeading
 		self.placeholder = placeholder
 		self.text = text
@@ -91,10 +96,18 @@ public struct AppTextField<FocusValue: Hashable, Accessory: View, InnerAccessory
 			VStack(alignment: .leading, spacing: .small3) {
 				HStack(spacing: 0) {
 					if let primaryHeading {
-						Text(primaryHeading.text)
-							.textStyle(primaryHeading.isProminent ? .body1HighImportance : .body2Regular)
-							.foregroundColor(primaryHeading.isProminent && isEnabled ? accentColor(border: false) : .app.gray2)
-							.multilineTextAlignment(.leading)
+						VStack(alignment: .leading, spacing: 0) {
+							Text(primaryHeading.text)
+								.textStyle(primaryHeading.isProminent ? .body1HighImportance : .body2Regular)
+								.foregroundColor(primaryHeading.isProminent && isEnabled ? accentColor(border: false) : .app.gray2)
+								.multilineTextAlignment(.leading)
+							if let subHeading {
+								Text(subHeading)
+									.textStyle(.body2Regular)
+									.foregroundColor(.app.gray2)
+									.multilineTextAlignment(.trailing)
+							}
+						}
 					}
 
 					Spacer(minLength: 0)
