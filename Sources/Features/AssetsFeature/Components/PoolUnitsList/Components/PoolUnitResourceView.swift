@@ -90,7 +90,7 @@ extension PoolUnitResourceViewState {
 	) {
 		self.init(
 			thumbnail: .xrd,
-			symbol: "XRD", // FIXME: Strings
+			symbol: Constants.xrdTokenName,
 			tokenAmount: xrdAmount,
 			isSelected: isSelected
 		)

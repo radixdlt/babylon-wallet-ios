@@ -26,23 +26,22 @@ extension TransactionReviewNetworkFee {
 
 						Spacer(minLength: 0)
 
-						Text("XRD \(viewStore.fee.format(maxPlaces: 1))") // TODO:  Revisit
+						Text(viewStore.reviewedTransaction.feePayerSelection.transactionFee.totalFee.displayedTotalFee)
 							.textStyle(.body1HighImportance)
 							.foregroundColor(.app.gray1)
 					}
 
-					if viewStore.isCongested {
-						Text(L10n.TransactionReview.NetworkFee.congestedText)
-							.textStyle(.body1Regular)
-							.foregroundColor(.app.alert)
+					if case .needsFeePayer = viewStore.reviewedTransaction.feePayingValidation {
+						WarningErrorView(text: L10n.TransactionReview.feePayerRequiredMessage, type: .warning)
+					} else if case .insufficientBalance = viewStore.reviewedTransaction.feePayingValidation {
+						WarningErrorView(text: L10n.TransactionReview.insufficientBalance, type: .error)
 					}
 
-					//	FIXME: Uncomment and implement
-					//	Button(L10n.TransactionReview.NetworkFee.customizeButtonTitle) {
-					//		viewStore.send(.customizeTapped)
-					//	}
-					//	.textStyle(.body1StandaloneLink)
-					//	.foregroundColor(.app.blue2)
+					Button(L10n.TransactionReview.NetworkFee.customizeButtonTitle) {
+						viewStore.send(.customizeTapped)
+					}
+					.textStyle(.body1StandaloneLink)
+					.foregroundColor(.app.blue2)
 				}
 			}
 			.padding(.horizontal, .medium3)

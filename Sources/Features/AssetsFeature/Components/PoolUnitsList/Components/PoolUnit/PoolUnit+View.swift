@@ -74,7 +74,7 @@ extension AccountPortfolio.PoolUnitResources.PoolUnit {
 		let xrdResourceViewState = poolResources.xrdResource.map {
 			PoolUnitResourceViewState(
 				thumbnail: .xrd,
-				symbol: "XRD",
+				symbol: Constants.xrdTokenName,
 				tokenAmount: redemptionValue(for: $0).format()
 			)
 		}

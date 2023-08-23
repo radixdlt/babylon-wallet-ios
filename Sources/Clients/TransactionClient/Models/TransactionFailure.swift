@@ -31,8 +31,6 @@ extension TransactionFailure {
 		switch self {
 		case let .failedToPrepareForTXSigning(error), let .failedToPrepareTXReview(.failedSigning(error)):
 			switch error {
-			case .failedToFindAccountWithEnoughFundsToLockFee:
-				return (errorKind: .failedToFindAccountWithEnoughFundsToLockFee, message: error.errorDescription)
 			case .failedToGetEpoch, .failedToLoadNotaryAndSigners, .failedToLoadNotaryPublicKey, .failedToLoadSignerPublicKeys, .failedToParseTXItIsProbablyInvalid:
 				return (errorKind: .failedToPrepareTransaction, message: error.errorDescription)
 			}
@@ -110,7 +108,6 @@ extension TransactionFailure {
 		case failedToLoadNotaryAndSigners
 		case failedToLoadNotaryPublicKey
 		case failedToLoadSignerPublicKeys
-		case failedToFindAccountWithEnoughFundsToLockFee
 
 		public var errorDescription: String? {
 			switch self {
@@ -124,8 +121,6 @@ extension TransactionFailure {
 				return "Failed to load signer public keys"
 			case .failedToLoadNotaryAndSigners:
 				return "Failed to load notary and signers"
-			case .failedToFindAccountWithEnoughFundsToLockFee:
-				return "Failed to find an account with enough funds to lock fee"
 			}
 		}
 	}
