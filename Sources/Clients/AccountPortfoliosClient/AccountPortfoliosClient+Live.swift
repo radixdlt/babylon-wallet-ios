@@ -414,8 +414,8 @@ extension AccountPortfoliosClient {
 				return nil
 			}
 
-			guard let validatorDetails = item.details?.component?.state?.validatorState else {
-				// Considered as not a validator, return nil
+			guard let state: GatewayAPI.ValidatorState = try? item.details?.component?.decodeState() else {
+				assertionFailure("Invalid validator state")
 				return nil
 			}
 
@@ -434,9 +434,9 @@ extension AccountPortfoliosClient {
 				.vault?
 				.vaults
 				.items
-				.first(where: { $0.vaultAddress == validatorDetails.stakeXRDVaultAddress })?.amount
+				.first(where: { $0.vaultAddress == state.stakeXRDVaultAddress })?.amount
 			else {
-				assertionFailure("Validtor XRD Resource didn't contain the \(validatorDetails.stakeXRDVaultAddress) vault ")
+				assertionFailure("Validtor XRD Resource didn't contain the \(state.stakeXRDVaultAddress) vault ")
 				return nil
 			}
 
@@ -475,7 +475,7 @@ extension AccountPortfoliosClient {
 				}
 
 				// Then validate that the validator is also referencing the candidate
-				guard validatorDetails.unstakeClaimTokenResourceAddress == stakeClaimNFTCandidate.resourceAddress else {
+				guard state.unstakeClaimTokenResourceAddress == stakeClaimNFTCandidate.resourceAddress else {
 					assertionFailure("Bad stake claim nft candidate, not declared by the validator")
 					return nil
 				}

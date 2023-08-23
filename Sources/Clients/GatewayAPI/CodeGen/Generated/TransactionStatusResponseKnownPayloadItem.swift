@@ -17,19 +17,19 @@ extension GatewayAPI {
 
 public struct TransactionStatusResponseKnownPayloadItem: Codable, Hashable {
 
-    /** Hex-encoded SHA-256 hash. */
-    public private(set) var payloadHashHex: String
+    /** Bech32m-encoded hash. */
+    public private(set) var payloadHash: String
     public private(set) var status: TransactionStatus
     public private(set) var errorMessage: String?
 
-    public init(payloadHashHex: String, status: TransactionStatus, errorMessage: String? = nil) {
-        self.payloadHashHex = payloadHashHex
+    public init(payloadHash: String, status: TransactionStatus, errorMessage: String? = nil) {
+        self.payloadHash = payloadHash
         self.status = status
         self.errorMessage = errorMessage
     }
 
     public enum CodingKeys: String, CodingKey, CaseIterable {
-        case payloadHashHex = "payload_hash_hex"
+        case payloadHash = "payload_hash"
         case status
         case errorMessage = "error_message"
     }
@@ -38,7 +38,7 @@ public struct TransactionStatusResponseKnownPayloadItem: Codable, Hashable {
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(payloadHashHex, forKey: .payloadHashHex)
+        try container.encode(payloadHash, forKey: .payloadHash)
         try container.encode(status, forKey: .status)
         try container.encodeIfPresent(errorMessage, forKey: .errorMessage)
     }
