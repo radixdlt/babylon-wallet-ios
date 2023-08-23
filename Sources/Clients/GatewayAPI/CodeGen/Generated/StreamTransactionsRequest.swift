@@ -41,9 +41,9 @@ public struct StreamTransactionsRequest: Codable, Hashable {
     public private(set) var eventsFilter: [StreamTransactionsRequestEventFilterItem]?
     /** Configures the order of returned result set. Defaults to `desc`. */
     public private(set) var order: Order?
-    public private(set) var optIns: TransactionCommittedDetailsOptIns?
+    public private(set) var optIns: TransactionDetailsOptIns?
 
-    public init(atLedgerState: LedgerStateSelector? = nil, cursor: String? = nil, limitPerPage: Int? = nil, fromLedgerState: LedgerStateSelector? = nil, kindFilter: KindFilter? = nil, manifestAccountsWithdrawnFromFilter: [String]? = nil, manifestAccountsDepositedIntoFilter: [String]? = nil, manifestResourcesFilter: [String]? = nil, affectedGlobalEntitiesFilter: [String]? = nil, eventsFilter: [StreamTransactionsRequestEventFilterItem]? = nil, order: Order? = nil, optIns: TransactionCommittedDetailsOptIns? = nil) {
+    public init(atLedgerState: LedgerStateSelector? = nil, cursor: String? = nil, limitPerPage: Int? = nil, fromLedgerState: LedgerStateSelector? = nil, kindFilter: KindFilter? = nil, manifestAccountsWithdrawnFromFilter: [String]? = nil, manifestAccountsDepositedIntoFilter: [String]? = nil, manifestResourcesFilter: [String]? = nil, affectedGlobalEntitiesFilter: [String]? = nil, eventsFilter: [StreamTransactionsRequestEventFilterItem]? = nil, order: Order? = nil, optIns: TransactionDetailsOptIns? = nil) {
         self.atLedgerState = atLedgerState
         self.cursor = cursor
         self.limitPerPage = limitPerPage
