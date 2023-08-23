@@ -1426,7 +1426,7 @@ extension ReviewedTransaction {
 
 			let totalXRDWithdraw = feePayerWithdraws.reduce(EngineKit.Decimal.zero()) { partialResult, resource in
 				if case let .fungible(resourceAddress, source) = resource, resourceAddress == xrdAddress {
-					return partialResult.add(other: source.amount)
+					return (try? partialResult.add(other: source.amount)) ?? partialResult
 				}
 				return partialResult
 			}
