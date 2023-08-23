@@ -7,6 +7,8 @@ import ImportMnemonicFeature
 public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public var mnemonicsLeftToImport: IdentifiedArrayOf<EntitiesControlledByFactorSource> = []
+		public var numberOfMnemonicsBeingAskedFor = 1
+		public var numberOfMneminicsImported = 0
 		public let profileSnapshot: ProfileSnapshot
 
 		@PresentationState
@@ -47,7 +49,7 @@ public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
-		case finishedImportingMnemonics
+		case finishedImportingMnemonics(skippedAnyMnemonic: Bool)
 		case failedToImportAllRequiredMnemonics
 	}
 
@@ -83,6 +85,7 @@ public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 
 		case let .loadControlledEntities(.success(factorSourcesControllingEntities)):
 			state.mnemonicsLeftToImport = factorSourcesControllingEntities
+			state.numberOfMnemonicsBeingAskedFor = factorSourcesControllingEntities.count
 			return nextMnemonicIfNeeded(state: &state)
 		}
 	}
@@ -95,6 +98,7 @@ public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 				return finishedWith(factorSourceID: factorSourceIDHash.embed(), state: &state)
 
 			case let .persistedMnemonicInKeychain(factorSourceID):
+				state.numberOfMneminicsImported += 1
 				return finishedWith(factorSourceID: factorSourceID, state: &state)
 
 			case .failedToSaveInKeychain:
@@ -131,7 +135,8 @@ public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 			state.destination = .importMnemonicControllingAccounts(.init(entitiesControlledByFactorSource: next))
 			return .none
 		} else {
-			return .send(.delegate(.finishedImportingMnemonics))
+			let skippedAnyMnemonic = state.numberOfMnemonicsBeingAskedFor != state.numberOfMneminicsImported
+			return .send(.delegate(.finishedImportingMnemonics(skippedAnyMnemonic: skippedAnyMnemonic)))
 		}
 	}
 }
