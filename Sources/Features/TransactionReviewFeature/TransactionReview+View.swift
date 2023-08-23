@@ -58,6 +58,11 @@ extension TransactionReview {
 		let showApproveButton: Bool
 		let canApproveTX: Bool
 		let canToggleViewMode: Bool
+
+		var approvalSliderControlState: ControlState {
+			// TODO: Is this the logic we want
+			canApproveTX ? viewControlState : .disabled
+		}
 	}
 
 	@MainActor
@@ -126,11 +131,11 @@ extension TransactionReview {
 					}
 
 					if viewStore.showApproveButton {
-						Button(L10n.TransactionReview.approveButtonTitle, asset: AssetResource.lock) {
+						ApprovalSlider(title: "Slide to Sign") { // FIXME: String - and remove old
 							viewStore.send(.approveTapped)
 						}
-						.controlState(viewStore.canApproveTX ? .enabled : .disabled)
-						.buttonStyle(.primaryRectangular)
+						.controlState(viewStore.approvalSliderControlState)
+						.padding(.horizontal, .medium3)
 						.padding(.bottom, .medium1)
 					}
 				}
