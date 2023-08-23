@@ -948,7 +948,7 @@ package.addModules([
 			"SharedModels",
 			"GatewaysClient",
 			.product(name: "WebRTC", package: "WebRTC") {
-				.package(url: "https://github.com/stasel/WebRTC", from: "110.0.0")
+				.package(url: "https://github.com/stasel/WebRTC", from: "116.0.0")
 			},
 		],
 		tests: .yes()
