@@ -2,7 +2,7 @@ import BigDecimal
 import Foundation
 
 extension BigDecimal {
-	// FIXME: This should not be used once we can get the actual fees
+	// Used for development purposes
 	public static let temporaryStandardFee: BigDecimal = 25
 }
 
@@ -176,5 +176,15 @@ extension BigDecimal {
 				return "Cannot create BigDecimal from just the decimal separator."
 			}
 		}
+	}
+}
+
+extension BigDecimal {
+	public var clamped: BigDecimal {
+		max(0, self)
+	}
+
+	public func clampedDiff(_ other: BigDecimal) -> BigDecimal {
+		(self - other).clamped
 	}
 }
