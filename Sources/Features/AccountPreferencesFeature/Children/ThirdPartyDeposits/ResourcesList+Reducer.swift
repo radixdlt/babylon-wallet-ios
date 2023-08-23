@@ -9,8 +9,8 @@ public enum ResourcesListMode: Hashable, Sendable {
 	case allowDepositors
 }
 
-// MARK: - Resource
-public struct Resource: Hashable, Sendable, Identifiable {
+// MARK: - ResourceViewState
+public struct ResourceViewState: Hashable, Sendable, Identifiable {
 	public enum Address: Hashable, Sendable {
 		case assetException(ThirdPartyDeposits.AssetException)
 		case allowedDepositor(ThirdPartyDeposits.DepositorAddress)
@@ -28,7 +28,7 @@ public struct Resource: Hashable, Sendable, Identifiable {
 // MARK: - ResourcesList
 public struct ResourcesList: FeatureReducer {
 	public struct State: Hashable, Sendable {
-		var allDepositorAddresses: OrderedSet<Resource.Address> {
+		var allDepositorAddresses: OrderedSet<ResourceViewState.Address> {
 			switch mode {
 			case .allowDenyAssets:
 				return OrderedSet(thirdPartyDeposits.assetsExceptionList.map { .assetException($0) })
@@ -37,10 +37,10 @@ public struct ResourcesList: FeatureReducer {
 			}
 		}
 
-		var resourcesForDisplay: [Resource] {
+		var resourcesForDisplay: [ResourceViewState] {
 			switch mode {
 			case let .allowDenyAssets(exception):
-				let addresses: [Resource.Address] = thirdPartyDeposits.assetsExceptionList
+				let addresses: [ResourceViewState.Address] = thirdPartyDeposits.assetsExceptionList
 					.filter { $0.exceptionRule == exception }
 					.map { .assetException($0) }
 
@@ -52,7 +52,7 @@ public struct ResourcesList: FeatureReducer {
 
 		var mode: ResourcesListMode
 		var thirdPartyDeposits: ThirdPartyDeposits
-		var loadedResources: [Resource] = []
+		var loadedResources: [ResourceViewState] = []
 
 		@PresentationState
 		var destinations: Destinations.State? = nil
@@ -61,7 +61,7 @@ public struct ResourcesList: FeatureReducer {
 	public enum ViewAction: Equatable {
 		case onAppeared
 		case addAssetTapped
-		case assetRemove(Resource.Address)
+		case assetRemove(ResourceViewState.Address)
 		case exceptionListChanged(ThirdPartyDeposits.DepositAddressExceptionRule)
 	}
 
@@ -74,7 +74,7 @@ public struct ResourcesList: FeatureReducer {
 	}
 
 	public enum InternalAction: Sendable, Equatable {
-		case resourceLoaded(OnLedgerEntity.Resource?, Resource.Address)
+		case resourceLoaded(OnLedgerEntity.Resource?, ResourceViewState.Address)
 		case resourcesLoaded([OnLedgerEntity.Resource]?)
 	}
 
@@ -89,7 +89,7 @@ public struct ResourcesList: FeatureReducer {
 			case confirmAssetDeletion(ConfirmDeletionAlert)
 
 			public enum ConfirmDeletionAlert: Sendable, Hashable {
-				case confirmTapped(Resource.Address)
+				case confirmTapped(ResourceViewState.Address)
 				case cancelTapped
 			}
 		}
@@ -182,7 +182,7 @@ public struct ResourcesList: FeatureReducer {
 		case let .resourcesLoaded(resources):
 			guard let resources else {
 				state.loadedResources = state.allDepositorAddresses.map {
-					Resource(iconURL: nil, name: nil, address: $0)
+					ResourceViewState(iconURL: nil, name: nil, address: $0)
 				}
 				return .none
 			}
@@ -204,7 +204,7 @@ extension AlertState<ResourcesList.Destinations.Action.ConfirmDeletionAlert> {
 	static func confirmAssetDeletion(
 		_ title: String,
 		_ message: String,
-		resourceAddress: Resource.Address
+		resourceAddress: ResourceViewState.Address
 	) -> AlertState {
 		AlertState {
 			TextState(title)
@@ -221,7 +221,7 @@ extension AlertState<ResourcesList.Destinations.Action.ConfirmDeletionAlert> {
 	}
 }
 
-extension Resource.Address {
+extension ResourceViewState.Address {
 	var resourceAddress: ResourceAddress {
 		switch self {
 		case let .assetException(resource):

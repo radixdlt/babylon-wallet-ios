@@ -5,12 +5,12 @@ import FeaturePrelude
 public struct AddAsset: FeatureReducer {
 	public struct State: Hashable, Sendable {
 		var mode: ResourcesListMode
-		let alreadyAddedResources: OrderedSet<Resource.Address>
+		let alreadyAddedResources: OrderedSet<ResourceViewState.Address>
 
 		var resourceAddress: String = ""
 		var resourceAddressFieldFocused: Bool = false
 
-		var validatedResourceAddress: Resource.Address? {
+		var validatedResourceAddress: ResourceViewState.Address? {
 			guard !resourceAddress.isEmpty else {
 				return nil
 			}
@@ -25,14 +25,14 @@ public struct AddAsset: FeatureReducer {
 	}
 
 	public enum ViewAction: Hashable {
-		case addAssetTapped(Resource.Address)
+		case addAssetTapped(ResourceViewState.Address)
 		case resourceAddressChanged(String)
 		case exceptionRuleChanged(ResourcesListMode.ExceptionRule)
 		case focusChanged(Bool)
 	}
 
 	public enum DelegateAction: Hashable {
-		case addAddress(ResourcesListMode, Resource.Address)
+		case addAddress(ResourcesListMode, ResourceViewState.Address)
 	}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {

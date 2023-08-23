@@ -28,7 +28,7 @@ extension ResourcesList.State {
 
 extension ResourcesList {
 	public struct ViewState: Equatable {
-		let resources: IdentifiedArrayOf<Resource>
+		let resources: IdentifiedArrayOf<ResourceViewState>
 		let info: String
 		let mode: ResourcesListMode
 	}
@@ -41,64 +41,16 @@ extension ResourcesList {
 		}
 
 		public var body: some SwiftUI.View {
-			WithViewStore(store, observe: \.viewState) { viewStore in
+			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				VStack(spacing: .medium1) {
-					Group {
-						if case let .allowDenyAssets(exceptionRule) = viewStore.mode {
-							Picker(
-								"",
-								selection: viewStore.binding(
-									get: { _ in exceptionRule },
-									send: { .view(.exceptionListChanged($0)) }
-								)
-							) {
-								ForEach(ThirdPartyDeposits.DepositAddressExceptionRule.allCases, id: \.self) {
-									Text($0.text)
-								}
-							}
-							.pickerStyle(.segmented)
-						}
-
-						Text(viewStore.info)
-							.textStyle(.body1HighImportance)
-							.foregroundColor(.app.gray2)
-							.multilineTextAlignment(.center)
-					}
-					.padding(.horizontal, .medium1)
-
+					headerView(viewStore)
 					if !viewStore.resources.isEmpty {
-						List {
-							ForEach(viewStore.resources) { row in
-								HStack {
-									TokenThumbnail(.known(row.iconURL))
-										.padding(.trailing, .medium3)
-
-									VStack(alignment: .leading, spacing: .zero) {
-										Text(row.name ?? "")
-											.textStyle(.body1HighImportance)
-											.foregroundColor(.app.gray1)
-										AddressView(
-											row.address.ledgerIdentifiable,
-											isTappable: false
-										)
-										.foregroundColor(.app.gray2)
-									}
-									Spacer()
-									AssetIcon(.asset(AssetResource.trash))
-										.onTapGesture {
-											viewStore.send(.view(.assetRemove(row.address)))
-										}
-								}
-								.frame(minHeight: .largeButtonHeight)
-							}
-						}
-						.scrollContentBackground(.hidden)
-						.listStyle(.grouped)
+						listView(viewStore)
 					}
 					Spacer()
 				}
 				.task {
-					viewStore.send(.view(.onAppeared))
+					viewStore.send(.onAppeared)
 				}
 				.padding(.top, .medium1)
 				.background(.app.gray5)
@@ -106,12 +58,79 @@ extension ResourcesList {
 				.navigationTitle(viewStore.mode.navigationTitle)
 				.defaultNavBarConfig()
 				.footer {
-					Button(viewStore.mode.addButtonTitle, action: {
-						viewStore.send(.view(.addAssetTapped))
-					}).buttonStyle(.primaryRectangular)
+					Button(viewStore.mode.addButtonTitle) {
+						viewStore.send(.addAssetTapped)
+					}
+					.buttonStyle(.primaryRectangular)
 				}
 			}
 		}
+	}
+}
+
+extension ResourcesList.View {
+	func headerView(_ viewStore: ViewStoreOf<ResourcesList>) -> some SwiftUI.View {
+		Group {
+			if case let .allowDenyAssets(exceptionRule) = viewStore.mode {
+				Picker(
+					"",
+					selection: viewStore.binding(
+						get: { _ in exceptionRule },
+						send: { .exceptionListChanged($0) }
+					)
+				) {
+					ForEach(ThirdPartyDeposits.DepositAddressExceptionRule.allCases, id: \.self) {
+						Text($0.text)
+					}
+				}
+				.pickerStyle(.segmented)
+			}
+
+			Text(viewStore.info)
+				.textStyle(.body1HighImportance)
+				.foregroundColor(.app.gray2)
+				.multilineTextAlignment(.center)
+		}
+		.padding(.horizontal, .medium1)
+	}
+
+	func listView(_ viewStore: ViewStoreOf<ResourcesList>) -> some SwiftUI.View {
+		List {
+			ForEach(viewStore.resources) { row in
+				resourceRowView(row, viewStore)
+			}
+		}
+		.scrollContentBackground(.hidden)
+		.listStyle(.grouped)
+	}
+
+	func resourceRowView(_ viewState: ResourceViewState, _ viewStore: ViewStoreOf<ResourcesList>) -> some SwiftUI.View {
+		HStack {
+			if case .globalNonFungibleResourceManager = viewState.address.resourceAddress.decodedKind {
+				NFTThumbnail(viewState.iconURL)
+			} else {
+				TokenThumbnail(.known(viewState.iconURL))
+			}
+
+			VStack(alignment: .leading, spacing: .zero) {
+				Text(viewState.name ?? "")
+					.textStyle(.body1HighImportance)
+					.foregroundColor(.app.gray1)
+				AddressView(
+					viewState.address.ledgerIdentifiable,
+					isTappable: false
+				)
+				.foregroundColor(.app.gray2)
+			}
+			.padding(.leading, .medium3)
+
+			Spacer()
+			AssetIcon(.asset(AssetResource.trash))
+				.onTapGesture {
+					viewStore.send(.assetRemove(viewState.address))
+				}
+		}
+		.frame(minHeight: .largeButtonHeight)
 	}
 }
 
@@ -147,9 +166,9 @@ extension ThirdPartyDeposits.DepositAddressExceptionRule {
 	var text: String {
 		switch self {
 		case .allow:
-			return "Allow"
+			return "Allow" // FIXME: Strings
 		case .deny:
-			return "Deny"
+			return "Deny" // FIXME: Strings
 		}
 	}
 }
@@ -158,23 +177,23 @@ extension ResourcesListMode {
 	var addButtonTitle: String {
 		switch self {
 		case .allowDenyAssets:
-			return "Add Asset"
+			return "Add Asset" // FIXME: Strings
 		case .allowDepositors:
-			return "Add Depositor Badge"
+			return "Add Depositor Badge" // FIXME: Strings
 		}
 	}
 
 	var navigationTitle: String {
 		switch self {
 		case .allowDenyAssets:
-			return "Allow/Deny Specific Assets"
+			return "Allow/Deny Specific Assets" // FIXME: Strings
 		case .allowDepositors:
-			return "Allow Specific Depositors"
+			return "Allow Specific Depositors" // FIXME: Strings
 		}
 	}
 }
 
-extension Resource.Address {
+extension ResourceViewState.Address {
 	var ledgerIdentifiable: LedgerIdentifiable {
 		switch self {
 		case let .assetException(exception):

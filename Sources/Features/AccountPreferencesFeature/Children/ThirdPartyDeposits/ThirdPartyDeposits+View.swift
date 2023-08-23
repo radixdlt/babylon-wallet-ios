@@ -38,9 +38,10 @@ extension ManageThirdPartyDeposits {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-				PreferencesList(viewState: .init(sections: viewStore.sections), onRowSelected: { _, row in
-					viewStore.send(.rowTapped(row))
-				})
+				PreferencesList(
+					viewState: .init(sections: viewStore.sections),
+					onRowSelected: { _, row in viewStore.send(.rowTapped(row)) }
+				)
 				.background(.app.gray5)
 				.navigationTitle("Third-party Deposits") // FIXME: strings
 				.defaultNavBarConfig()
