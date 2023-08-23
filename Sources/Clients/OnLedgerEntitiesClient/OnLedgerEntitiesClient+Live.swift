@@ -6,6 +6,10 @@ import SharedModels
 
 // MARK: - OnLedgerEntitiesClient + DependencyKey
 extension OnLedgerEntitiesClient: DependencyKey {
+	enum Error: Swift.Error {
+		case emptyResponse
+	}
+
 	public static let liveValue = Self.live()
 
 	public static func live(
@@ -13,7 +17,10 @@ extension OnLedgerEntitiesClient: DependencyKey {
 		Self(
 			getResources: getResources,
 			getResource: {
-				try await getResources(for: [$0]).first!
+				guard let resource = try await getResources(for: [$0]).first else {
+					throw Error.emptyResponse
+				}
+				return resource
 			}
 		)
 	}
@@ -49,6 +56,10 @@ extension OnLedgerEntitiesClient {
 
 	@Sendable
 	static func fetchEntites(for addresses: [Address]) async throws -> [OnLedgerEntity] {
+		guard !addresses.isEmpty else {
+			return []
+		}
+
 		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
 
 		let details = try await gatewayAPIClient.getEntityDetails(addresses.map(\.address), .resourceMetadataKeys, nil)
@@ -62,7 +73,7 @@ extension OnLedgerEntitiesClient {
 					symbol: $0.explicitMetadata?.symbol,
 					description: $0.explicitMetadata?.description,
 					iconURL: $0.explicitMetadata?.iconURL,
-					behaviors: [],
+					behaviors: $0.details?.fungible?.roleAssignments.extractBehaviors() ?? [],
 					tags: $0.extractTags(),
 					totalSupply: try? BigDecimal(fromString: fungibleDetails.totalSupply)
 				))
@@ -74,7 +85,7 @@ extension OnLedgerEntitiesClient {
 					symbol: nil,
 					description: $0.explicitMetadata?.description,
 					iconURL: $0.explicitMetadata?.iconURL,
-					behaviors: [],
+					behaviors: $0.details?.nonFungible?.roleAssignments.extractBehaviors() ?? [],
 					tags: $0.extractTags(),
 					totalSupply: try? BigDecimal(fromString: nonFungibleDetails.totalSupply)
 				))

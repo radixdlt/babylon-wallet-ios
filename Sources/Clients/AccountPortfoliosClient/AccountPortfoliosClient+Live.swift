@@ -217,7 +217,7 @@ extension AccountPortfoliosClient {
 
 		let resourceAddress = try ResourceAddress(validatingAddress: resource.resourceAddress)
 		let divisibility = details?.divisibility
-		let behaviors = (details?.roleAssignments).map(extractBehaviors) ?? []
+		let behaviors = details?.roleAssignments.extractBehaviors() ?? []
 		let tags = item.extractTags()
 		let totalSupply = details.flatMap { try? BigDecimal(fromString: $0.totalSupply) }
 		let metadata = resource.explicitMetadata
@@ -323,7 +323,7 @@ extension AccountPortfoliosClient {
 		let item = try await gatewayAPIClient.getSingleEntityDetails(resource.resourceAddress)
 		let details = item.details?.nonFungible
 
-		let behaviors = (details?.roleAssignments).map(extractBehaviors) ?? []
+		let behaviors = details?.roleAssignments.extractBehaviors() ?? []
 		let tags = item.extractTags()
 		let totalSupply = details.flatMap { try? BigDecimal(fromString: $0.totalSupply) }
 
@@ -537,96 +537,6 @@ extension AccountPortfoliosClient {
 }
 
 // MARK: - Endpoints
-
-extension AccountPortfoliosClient {
-	@Sendable static func extractBehaviors(assignments: GatewayAPI.ComponentEntityRoleAssignments) -> [AssetBehavior] {
-		typealias ParsedName = GatewayAPI.RoleKey.ParsedName
-
-		enum Assigned {
-			case none, someone, anyone, unknown
-		}
-
-		func findEntry(_ name: GatewayAPI.RoleKey.ParsedName) -> GatewayAPI.ComponentEntityRoleAssignmentEntry? {
-			assignments.entries.first { $0.roleKey.parsedName == name }
-		}
-
-		func performer(_ name: GatewayAPI.RoleKey.ParsedName) -> Assigned {
-			guard let assignment = findEntry(name)?.parsedAssignment else { return .unknown }
-			switch assignment {
-			case .allowAll: return .anyone
-			case .denyAll: return .none
-			case .protected, .otherExplicit, .owner: return .someone
-			}
-		}
-
-		func updaters(_ name: GatewayAPI.RoleKey.ParsedName) -> Assigned {
-			guard let updaters = findEntry(name)?.updaterRoles, !updaters.isEmpty else { return .none }
-
-			// Lookup the corresponding assignments, ignoring unknown and empty values
-			let updaterAssignments = Set(updaters.compactMap(\.parsedName).compactMap(findEntry).compactMap(\.parsedAssignment))
-
-			if updaterAssignments.isEmpty {
-				return .unknown
-			} else if updaterAssignments == [.denyAll] {
-				return .none
-			} else if updaterAssignments.contains(.allowAll) {
-				return .anyone
-			} else {
-				return .someone
-			}
-		}
-
-		var result: Set<AssetBehavior> = []
-
-		// Withdrawer and depositor areas are checked together, but we look at the performer and updater role types separately
-		let movers: Set = [performer(.withdrawer), performer(.depositor)]
-		if movers != [.anyone] {
-			result.insert(.movementRestricted)
-		} else {
-			let moverUpdaters: Set = [updaters(.withdrawer), updaters(.depositor)]
-			if moverUpdaters.contains(.anyone) {
-				result.insert(.movementRestrictableInFutureByAnyone)
-			} else if moverUpdaters.contains(.someone) {
-				result.insert(.movementRestrictableInFuture)
-			}
-		}
-
-		// Other names are checked individually, but without distinguishing between the role types
-		func addBehavior(for name: GatewayAPI.RoleKey.ParsedName, ifSomeone: AssetBehavior, ifAnyone: AssetBehavior) {
-			let either: Set = [performer(name), updaters(name)]
-			if either.contains(.anyone) {
-				result.insert(ifAnyone)
-			} else if either.contains(.someone) {
-				result.insert(ifSomeone)
-			}
-		}
-
-		addBehavior(for: .minter, ifSomeone: .supplyIncreasable, ifAnyone: .supplyIncreasableByAnyone)
-		addBehavior(for: .burner, ifSomeone: .supplyDecreasable, ifAnyone: .supplyDecreasableByAnyone)
-		addBehavior(for: .recaller, ifSomeone: .removableByThirdParty, ifAnyone: .removableByAnyone)
-		addBehavior(for: .freezer, ifSomeone: .freezableByThirdParty, ifAnyone: .freezableByAnyone)
-		addBehavior(for: .nonFungibleDataUpdater, ifSomeone: .nftDataChangeable, ifAnyone: .nftDataChangeableByAnyone)
-
-		// If there are no special behaviors, that means it's a "simple asset"
-		if result.isEmpty {
-			return [.simpleAsset]
-		}
-
-		// Finally we make some simplifying substitutions
-		func substitute(_ source: Set<AssetBehavior>, with target: AssetBehavior) {
-			if result.isSuperset(of: source) {
-				result.subtract(source)
-				result.insert(target)
-			}
-		}
-
-		// If supply is both increasable and decreasable, then it's "flexible"
-		substitute([.supplyIncreasableByAnyone, .supplyDecreasableByAnyone], with: .supplyFlexibleByAnyone)
-		substitute([.supplyIncreasable, .supplyDecreasable], with: .supplyFlexible)
-
-		return result.sorted()
-	}
-}
 
 extension Array where Element == AccountPortfolio.FungibleResource {
 	func sorted() async -> AccountPortfolio.FungibleResources {
