@@ -99,13 +99,13 @@ extension TransactionReview {
 				VStack(spacing: 0) {
 					FixedSpacer(height: .medium2)
 
-					if let rawTransaction = viewStore.rawTransaction {
-						RawTransactionView(transaction: rawTransaction)
-							.padding(.bottom, .medium3)
-					} else {
-						VStack(spacing: 0) {
-							messageSection(with: viewStore.message)
+					VStack(spacing: 0) {
+						messageSection(with: viewStore.message)
 
+						if let rawTransaction = viewStore.rawTransaction {
+							RawTransactionView(transaction: rawTransaction)
+								.padding(.bottom, .medium3)
+						} else {
 							withdrawalsSection
 
 							usingDappsSection(
@@ -115,14 +115,14 @@ extension TransactionReview {
 							)
 
 							depositsSection
-
-							Separator()
-								.padding(.bottom, .medium1)
-
-							proofsSection
-
-							feeSection
 						}
+
+						Separator()
+							.padding(.bottom, .medium1)
+
+						proofsSection
+
+						feeSection
 					}
 
 					if viewStore.showApproveButton {
