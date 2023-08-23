@@ -19,11 +19,11 @@ extension AddAsset.State {
 				}
 
 				guard let validatedAddress = validatedResourceAddress else {
-					return .error(L10n.AssetTransfer.ChooseReceivingAccount.invalidAddressError)
+					return .error("Invalid Address") // FIXME: Strings
 				}
 
 				if alreadyAddedResources.contains(validatedAddress) {
-					return .error(L10n.AssetTransfer.ChooseReceivingAccount.alreadyAddedError)
+					return .error("Resource already added") // FIXME: Strings
 				}
 
 				return .none
