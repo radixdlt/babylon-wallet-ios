@@ -1270,7 +1270,7 @@ extension TransactionType {
 						)
 						total = transfered
 						if let totalAmount = existingResource?.decimalSource.amount {
-							let sum = totalAmount.add(other: amount)
+							let sum = try totalAmount.add(other: amount)
 							total = .fungible(
 								resourceAddress: resourceAddress,
 								amount: .guaranteed(value: sum)
