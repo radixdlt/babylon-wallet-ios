@@ -7,6 +7,8 @@ import RadixConnectClient
 import RadixConnectModels
 import ROLAClient
 
+import EngineToolkit
+
 typealias RequestEnvelope = DappInteractionClient.RequestEnvelope
 
 // MARK: - DappInteractor
@@ -98,6 +100,18 @@ struct DappInteractor: Sendable, FeatureReducer {
 	func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .task:
+			Task {
+				await dappInteractionClient.addWalletInteraction(.transaction(.init(
+					send: .init(
+						version: .default,
+						transactionManifest: try! ManifestBuilder.manifestForCreateFungibleToken(
+							account: try! .init(validatingAddress: "account_tdx_22_12yr57p08yfrpuykjj7agcns9laza0qf77n7qz8y03ge3gmc3dcnj0h"),
+							networkID: .hammunet
+						),
+						message: "hello"
+					)
+				)))
+			}
 			return handleIncomingRequests()
 		case let .responseFailureAlert(action):
 			switch action {
