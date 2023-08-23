@@ -60,7 +60,7 @@ extension TransactionReview {
 		let canToggleViewMode: Bool
 
 		var approvalSliderControlState: ControlState {
-			// TODO: Is this the logic we want
+			// TODO: Is this the logic we want?
 			canApproveTX ? viewControlState : .disabled
 		}
 	}
@@ -77,9 +77,12 @@ extension TransactionReview {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				coreView(with: viewStore)
 					.controlState(viewStore.viewControlState)
-					.background(.app.gray5)
+					.background(.white)
 					.animation(.easeInOut, value: viewStore.isExpandedDappUsed)
 					.navigationTitle(L10n.TransactionReview.title)
+					.navigationBarInlineTitleFont(.app.secondaryHeader)
+					.navigationBarHideDivider()
+					.navigationBarTitleColor(.app.gray1)
 					.toolbar {
 						ToolbarItem(placement: .automatic) {
 							if viewStore.canToggleViewMode {
@@ -102,47 +105,56 @@ extension TransactionReview {
 		private func coreView(with viewStore: ViewStoreOf<TransactionReview>) -> some SwiftUI.View {
 			ScrollView(showsIndicators: false) {
 				VStack(spacing: 0) {
-					FixedSpacer(height: .medium2)
+					JaggedEdge(shadowColor: shadowColor, isTopEdge: true, padding: .medium1)
 
-					VStack(spacing: 0) {
-						messageSection(with: viewStore.message)
+					if let rawTransaction = viewStore.rawTransaction {
+						RawTransactionView(transaction: rawTransaction)
+					} else {
+						VStack(spacing: 0) {
+							VStack(spacing: .medium2) {
+								messageSection(with: viewStore.message)
 
-						if let rawTransaction = viewStore.rawTransaction {
-							RawTransactionView(transaction: rawTransaction)
-								.padding(.bottom, .medium3)
-						} else {
-							withdrawalsSection
+								withdrawalsSection
+							}
 
-							usingDappsSection(
-								expanded: viewStore.isExpandedDappUsed,
-								showDepositsHeading: viewStore.showDepositsHeading,
-								showDottedLine: viewStore.showDottedLine
-							)
+							usingDappsSection(for: viewStore)
 
 							depositsSection
 						}
+						.padding(.top, .medium1)
+						.padding(.horizontal, .medium3)
+						.padding(.bottom, .large2)
+					}
 
-						Separator()
-							.padding(.bottom, .medium1)
-
+					VStack(spacing: .medium1) {
 						proofsSection
 
 						feeSection
-					}
 
-					if viewStore.showApproveButton {
-						ApprovalSlider(title: "Slide to Sign") { // FIXME: String - and remove old
-							viewStore.send(.approveTapped)
+						if viewStore.showApprovalSlider {
+							ApprovalSlider(title: "Slide to Sign") { // FIXME: String - and remove old
+								viewStore.send(.approveTapped)
+							}
+							.controlState(viewStore.approvalSliderControlState)
+							.padding(.horizontal, .small3)
 						}
-						.controlState(viewStore.approvalSliderControlState)
-						.padding(.horizontal, .medium3)
-						.padding(.bottom, .medium1)
+					}
+					.frame(maxWidth: .infinity)
+					.padding(.vertical, .large3)
+					.padding(.horizontal, .large2)
+					.background {
+						VStack(spacing: 0) {
+							JaggedEdge(shadowColor: shadowColor, isTopEdge: false)
+							Color.white
+						}
 					}
 				}
+				.background(.app.gray5.gradient.shadow(.inner(color: shadowColor, radius: 15)))
 				.animation(.easeInOut, value: viewStore.canToggleViewMode ? viewStore.rawTransaction : nil)
-				.padding(.horizontal, .medium3)
 			}
 		}
+
+		private let shadowColor: Color = .app.gray2.opacity(0.4)
 
 		@ViewBuilder
 		private func messageSection(with message: String?) -> some SwiftUI.View {
