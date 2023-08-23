@@ -30,6 +30,7 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 	public enum DelegateAction: Sendable, Equatable {
 		case persistedMnemonicInKeychain(FactorSource.ID)
 		case skippedMnemonic(FactorSourceID.FromHash)
+		case failedToSaveInKeychain(FactorSourceID.FromHash)
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -133,15 +134,18 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
 		case let .validated(privateHDFactorSource):
-			return .run { _ in
-				try await secureStorageClient.saveMnemonicForFactorSource(
-					privateHDFactorSource
-				)
-			} catch: { _, _ in
-				fatalError()
+			return .task {
+				do {
+					try await secureStorageClient.saveMnemonicForFactorSource(
+						privateHDFactorSource
+					)
+					return .delegate(.persistedMnemonicInKeychain(privateHDFactorSource.factorSource.id.embed()))
+				} catch {
+					errorQueue.schedule(error)
+					loggerGlobal.error("Failed to saved mnemonic in keychain")
+					return .delegate(.failedToSaveInKeychain(privateHDFactorSource.factorSource.id))
+				}
 			}
-
-			return .send(.delegate(.persistedMnemonicInKeychain(state.entitiesControlledByFactorSource.factorSourceID.embed())))
 		}
 	}
 

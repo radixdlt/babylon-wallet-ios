@@ -89,11 +89,17 @@ public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
-		case let .destination(.presented(.importMnemonicControllingAccounts(.delegate(.persistedMnemonicInKeychain(factorSourceID))))):
-			return finishedWith(factorSourceID: factorSourceID, state: &state)
+		case let .destination(.presented(.importMnemonicControllingAccounts(.delegate(delegatAction)))):
+			switch delegatAction {
+			case let .skippedMnemonic(factorSourceIDHash):
+				return finishedWith(factorSourceID: factorSourceIDHash.embed(), state: &state)
 
-		case let .destination(.presented(.importMnemonicControllingAccounts(.delegate(.skippedMnemonic(factorSourceIDHash))))):
-			return finishedWith(factorSourceID: factorSourceIDHash.embed(), state: &state)
+			case let .persistedMnemonicInKeychain(factorSourceID):
+				return finishedWith(factorSourceID: factorSourceID, state: &state)
+
+			case .failedToSaveInKeychain:
+				return .send(.delegate(.failedToImportAllRequiredMnemonics))
+			}
 
 		case .destination(.dismiss):
 			guard let destination = state.destination else {

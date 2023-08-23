@@ -50,6 +50,8 @@ public struct RestoreProfileFromBackupCoordinator: Sendable, FeatureReducer {
 		case failedToImportProfileDueToMnemonics
 	}
 
+	@Dependency(\.backupsClient) var backupsClient
+	@Dependency(\.errorQueue) var errorQueue
 	public init() {}
 
 	public var body: some ReducerProtocolOf<Self> {
@@ -70,30 +72,20 @@ public struct RestoreProfileFromBackupCoordinator: Sendable, FeatureReducer {
 			state.path.append(.importMnemonicsFlow(.init(profileSnapshot: profileSnapshot)))
 			return .none
 
-		case let .path(.element(_, action: .importMnemonicsFlow(.delegate(.finishedImportingMnemonics)))):
+		case .path(.element(_, action: .importMnemonicsFlow(.delegate(.finishedImportingMnemonics)))):
+			loggerGlobal.notice("Starting import snapshot process...")
+			guard let profileSelection = state.profileSelection else {
+				preconditionFailure("Expected to have a profile")
+				return .none
+			}
 
-			/*
-			 case let .destination(.presented(.importMnemonic(.delegate(.notSavedInProfile(factorSource))))):
-			     guard let importedContent = state.importedContent else {
-			         assertionFailure("Imported mnemonic, but didn't import neither a snapshot or a profile header")
-			         return .none
-			     }
-			     loggerGlobal.notice("Starting import snapshot process...")
-			     return .run { [importedContent] send in
-			         switch importedContent {
-			         case let .left(snapshot):
-			             loggerGlobal.notice("Importing snapshot...")
-			             try await backupsClient.importProfileSnapshot(snapshot, factorSource.id)
-			         case let .right(header):
-			             try await backupsClient.importCloudProfile(header, factorSource.id)
-			         }
-			         await send(.delegate(.profileImported))
-			     } catch: { error, _ in
-			         errorQueue.schedule(error)
-			     }
-
-			 */
-			fatalError("nice!")
+			return .run { send in
+				loggerGlobal.notice("Importing snapshot...")
+				try await backupsClient.importSnapshot(profileSelection.snapshot, fromCloud: profileSelection.isInCloud)
+				await send(.delegate(.profileImported))
+			} catch: { error, _ in
+				errorQueue.schedule(error)
+			}
 
 		case .path(.element(_, action: .importMnemonicsFlow(.delegate(.failedToImportAllRequiredMnemonics)))):
 			state.path.removeLast()

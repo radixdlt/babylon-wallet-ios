@@ -37,3 +37,17 @@ extension BackupsClient {
 
 	public typealias LoadDeviceID = @Sendable () async -> UUID?
 }
+
+extension BackupsClient {
+	public func importSnapshot(
+		_ snapshot: ProfileSnapshot,
+		fromCloud: Bool
+	) async throws {
+		let factorSourceIDs = Set(snapshot.factorSources.elements.filter { $0.factorSourceKind == .device }.map(\.id))
+		if fromCloud {
+			try await self.importCloudProfile(snapshot.header, factorSourceIDs)
+		} else {
+			try await self.importProfileSnapshot(snapshot, factorSourceIDs)
+		}
+	}
+}

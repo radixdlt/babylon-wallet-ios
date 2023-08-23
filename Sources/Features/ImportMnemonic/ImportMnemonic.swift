@@ -133,7 +133,15 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			let isReadonlyMode = true
 			self.isReadonlyMode = isReadonlyMode
 			self.isWordCountFixed = true
-			self.words = .init(
+			self.words = Self.words(from: mnemonic, isReadonlyMode: isReadonlyMode)
+			self.bip39Passphrase = mnemonicWithPassphrase.passphrase
+		}
+
+		public static func words(
+			from mnemonic: Mnemonic,
+			isReadonlyMode: Bool
+		) -> Words {
+			.init(
 				uniqueElements: mnemonic.words
 					.enumerated()
 					.map {
@@ -153,7 +161,6 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 						)
 					}
 			)
-			self.bip39Passphrase = mnemonicWithPassphrase.passphrase
 		}
 
 		public struct Header: Sendable, Hashable {
@@ -359,6 +366,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 		case let .debugOnlyMnemonicChanged(mnemonic):
 			state.debugOnlyMnemonicPhraseSingleField = mnemonic
 			if let mnemonic = try? Mnemonic(phrase: mnemonic, language: state.language) {
+				state.words = State.words(from: mnemonic, isReadonlyMode: state.isReadonlyMode)
 				return .send(.view(.continueButtonTapped(mnemonic)))
 			} else {
 				return .none
