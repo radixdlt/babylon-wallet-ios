@@ -2,7 +2,7 @@ import EngineKit
 import FeaturePrelude
 
 // MARK: - AddAsset
-public struct AddAsset: FeatureReducer {
+public struct AddAsset: FeatureReducer, Sendable {
 	public struct State: Hashable, Sendable {
 		var mode: ResourcesListMode
 		let alreadyAddedResources: OrderedSet<ResourceViewState.Address>
@@ -24,16 +24,19 @@ public struct AddAsset: FeatureReducer {
 		}
 	}
 
-	public enum ViewAction: Hashable {
+	public enum ViewAction: Hashable, Sendable {
 		case addAssetTapped(ResourceViewState.Address)
 		case resourceAddressChanged(String)
 		case exceptionRuleChanged(ResourcesListMode.ExceptionRule)
 		case focusChanged(Bool)
+		case closeTapped
 	}
 
-	public enum DelegateAction: Hashable {
+	public enum DelegateAction: Hashable, Sendable {
 		case addAddress(ResourcesListMode, ResourceViewState.Address)
 	}
+
+	@Dependency(\.dismiss) var dismiss
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
@@ -51,6 +54,11 @@ public struct AddAsset: FeatureReducer {
 		case let .focusChanged(focus):
 			state.resourceAddressFieldFocused = focus
 			return .none
+
+		case .closeTapped:
+			return .run { _ in
+				await dismiss()
+			}
 		}
 	}
 }

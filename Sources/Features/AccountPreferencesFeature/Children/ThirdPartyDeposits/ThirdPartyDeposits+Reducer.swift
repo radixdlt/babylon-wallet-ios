@@ -6,7 +6,7 @@ import OverlayWindowClient
 public typealias ThirdPartyDeposits = Profile.Network.Account.OnLedgerSettings.ThirdPartyDeposits
 
 // MARK: - ManageThirdPartyDeposits
-public struct ManageThirdPartyDeposits: FeatureReducer {
+public struct ManageThirdPartyDeposits: FeatureReducer, Sendable {
 	public struct State: Hashable, Sendable {
 		var account: Profile.Network.Account
 
@@ -22,26 +22,26 @@ public struct ManageThirdPartyDeposits: FeatureReducer {
 		}
 	}
 
-	public enum ViewAction: Equatable {
+	public enum ViewAction: Equatable, Sendable {
 		case updateTapped
 		case rowTapped(ManageThirdPartyDeposits.Section.Row)
 	}
 
-	public enum DelegateAction: Equatable {
+	public enum DelegateAction: Equatable, Sendable {
 		case accountUpdated
 	}
 
-	public enum ChildAction: Sendable, Equatable {
+	public enum ChildAction: Equatable, Sendable {
 		case destinations(PresentationAction<Destinations.Action>)
 	}
 
-	public struct Destinations: ReducerProtocol {
-		public enum State: Equatable, Hashable {
+	public struct Destinations: ReducerProtocol, Sendable {
+		public enum State: Equatable, Hashable, Sendable {
 			case allowDenyAssets(ResourcesList.State)
 			case allowDepositors(ResourcesList.State)
 		}
 
-		public enum Action: Equatable {
+		public enum Action: Equatable, Sendable {
 			case allowDenyAssets(ResourcesList.Action)
 			case allowDepositors(ResourcesList.Action)
 		}

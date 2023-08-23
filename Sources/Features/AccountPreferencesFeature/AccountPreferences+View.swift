@@ -102,29 +102,29 @@ extension View {
 
 // MARK: - AccountPreferences.Section
 extension AccountPreferences {
-	public enum Section: Hashable {
+	public enum Section: Hashable, Sendable {
 		case personalize
 		case ledgerBehaviour
 		case development
 
-		public enum SectionRow: Hashable {
+		public enum SectionRow: Hashable, Sendable {
 			case personalize(PersonalizeRow)
 			case onLedger(OnLedgerBehaviourRow)
 			case dev(DevelopmentRow)
 		}
 
-		public enum PersonalizeRow: Hashable {
+		public enum PersonalizeRow: Hashable, Sendable {
 			case accountLabel
 			case accountColor
 			case tags
 		}
 
-		public enum OnLedgerBehaviourRow: Hashable {
+		public enum OnLedgerBehaviourRow: Hashable, Sendable {
 			case accountSecurity
 			case thirdPartyDeposits
 		}
 
-		public enum DevelopmentRow: Hashable {
+		public enum DevelopmentRow: Hashable, Sendable {
 			case devPreferences
 		}
 	}

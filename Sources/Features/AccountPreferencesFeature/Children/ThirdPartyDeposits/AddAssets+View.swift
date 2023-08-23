@@ -56,8 +56,9 @@ extension AddAsset {
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: Action.view) { viewStore in
 				VStack {
-					CloseButton(action: {})
+					CloseButton { viewStore.send(.closeTapped) }
 						.flushedLeft
+
 					ScrollView {
 						VStack(spacing: .medium1) {
 							titleView(viewStore.mode.title)
@@ -87,6 +88,7 @@ extension AddAsset.View {
 	@ViewBuilder
 	func titleView(_ text: String) -> some SwiftUI.View {
 		Text(text)
+			.multilineTextAlignment(.center)
 			.textStyle(.sheetTitle)
 			.foregroundColor(.app.gray1)
 	}
@@ -104,7 +106,7 @@ extension AddAsset.View {
 	@ViewBuilder
 	func resourceAddressView(_ viewStore: ViewStoreOf<AddAsset>) -> some SwiftUI.View {
 		AppTextField(
-			placeholder: "Resource Address",
+			placeholder: "Resource Address", // FIXME: Strings
 			text: viewStore.binding(
 				get: \.resourceAddress,
 				send: { .resourceAddressChanged($0) }
@@ -163,9 +165,9 @@ extension ResourcesListMode.ExceptionRule {
 	var selectionText: String {
 		switch self {
 		case .allow:
-			return "Allow Deposits"
+			return "Allow Deposits" // FIXME: Strings
 		case .deny:
-			return "Deny Deposits"
+			return "Deny Deposits" // FIXME: Strings
 		}
 	}
 }
@@ -181,18 +183,18 @@ extension ResourcesListMode {
 	var title: String {
 		switch self {
 		case .allowDenyAssets:
-			return "Add an Asset"
+			return "Add an Asset" // FIXME: Strings
 		case .allowDepositors:
-			return "Add a Depositor Badge"
+			return "Add a Depositor Badge" // FIXME: Strings
 		}
 	}
 
 	var instructions: String {
 		switch self {
 		case .allowDenyAssets:
-			return "Enter the asset’s resource address (starting with “reso”)"
+			return "Enter the asset’s resource address (starting with “reso”)" // FIXME: Strings
 		case .allowDepositors:
-			return "Enter the badge’s resource address (starting with “reso”)"
+			return "Enter the badge’s resource address (starting with “reso”)" // FIXME: Strings
 		}
 	}
 }

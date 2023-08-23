@@ -56,22 +56,22 @@ extension ManageThirdPartyDeposits {
 
 // MARK: - ManageThirdPartyDeposits.Section
 extension ManageThirdPartyDeposits {
-	public enum Section: Hashable {
+	public enum Section: Hashable, Sendable {
 		case depositRules
 		case allowDenyAssets
 		case allowDepositors
 
-		public enum Row: Hashable {
+		public enum Row: Hashable, Sendable {
 			case depositRule(ThirdPartyDeposits.DepositRule)
 			case allowDenyAssets(AllowDenyAssetsRow)
 			case allowDepositors(AllowDepositorsRow)
 		}
 
-		public enum AllowDenyAssetsRow: Hashable {
+		public enum AllowDenyAssetsRow: Hashable, Sendable {
 			case allowDenyAssets
 		}
 
-		public enum AllowDepositorsRow: Hashable {
+		public enum AllowDepositorsRow: Hashable, Sendable {
 			case allowDepositors
 		}
 	}

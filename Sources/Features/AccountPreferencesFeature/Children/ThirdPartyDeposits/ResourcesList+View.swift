@@ -8,17 +8,17 @@ extension ResourcesList.State {
 			info: {
 				switch mode {
 				case .allowDenyAssets(.allow) where resourcesForDisplay.isEmpty:
-					return "Add a specific asset by its resource address to allow all third-party deposits"
+					return "Add a specific asset by its resource address to allow all third-party deposits" // FIXME: Strings
 				case .allowDenyAssets(.allow):
-					return "The following resource addresses may always be deposited to this account by third parties."
+					return "The following resource addresses may always be deposited to this account by third parties." // FIXME: Strings
 				case .allowDenyAssets(.deny) where resourcesForDisplay.isEmpty:
-					return "Add a specific asset by its resource address to deny all third-party deposits"
+					return "Add a specific asset by its resource address to deny all third-party deposits" // FIXME: Strings
 				case .allowDenyAssets(.deny):
-					return "The following resource addresses may never be deposited to this account by third parties."
+					return "The following resource addresses may never be deposited to this account by third parties." // FIXME: Strings
 				case .allowDepositors where resourcesForDisplay.isEmpty:
-					return "Add a specific badge by its resource address to allow all deposits from its holder"
+					return "Add a specific badge by its resource address to allow all deposits from its holder." // FIXME: Strings
 				case .allowDepositors:
-					return "The holder of the following badges may always deposit accounts to this account."
+					return "The holder of the following badges may always deposit accounts to this account." // FIXME: Strings
 				}
 			}(),
 			mode: mode
@@ -69,6 +69,7 @@ extension ResourcesList {
 }
 
 extension ResourcesList.View {
+	@ViewBuilder
 	func headerView(_ viewStore: ViewStoreOf<ResourcesList>) -> some SwiftUI.View {
 		Group {
 			if case let .allowDenyAssets(exceptionRule) = viewStore.mode {
@@ -94,6 +95,7 @@ extension ResourcesList.View {
 		.padding(.horizontal, .medium1)
 	}
 
+	@ViewBuilder
 	func listView(_ viewStore: ViewStoreOf<ResourcesList>) -> some SwiftUI.View {
 		List {
 			ForEach(viewStore.resources) { row in
@@ -104,6 +106,7 @@ extension ResourcesList.View {
 		.listStyle(.grouped)
 	}
 
+	@ViewBuilder
 	func resourceRowView(_ viewState: ResourceViewState, _ viewStore: ViewStoreOf<ResourcesList>) -> some SwiftUI.View {
 		HStack {
 			if case .globalNonFungibleResourceManager = viewState.address.resourceAddress.decodedKind {

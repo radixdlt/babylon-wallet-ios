@@ -16,9 +16,7 @@ public struct ResourceViewState: Hashable, Sendable, Identifiable {
 		case allowedDepositor(ThirdPartyDeposits.DepositorAddress)
 	}
 
-	public var id: Address {
-		address
-	}
+	public var id: Address { address }
 
 	let iconURL: URL?
 	let name: String?
@@ -26,7 +24,7 @@ public struct ResourceViewState: Hashable, Sendable, Identifiable {
 }
 
 // MARK: - ResourcesList
-public struct ResourcesList: FeatureReducer {
+public struct ResourcesList: FeatureReducer, Sendable {
 	public struct State: Hashable, Sendable {
 		var allDepositorAddresses: OrderedSet<ResourceViewState.Address> {
 			switch mode {
@@ -58,37 +56,37 @@ public struct ResourcesList: FeatureReducer {
 		var destinations: Destinations.State? = nil
 	}
 
-	public enum ViewAction: Equatable {
+	public enum ViewAction: Equatable, Sendable {
 		case onAppeared
 		case addAssetTapped
 		case assetRemove(ResourceViewState.Address)
 		case exceptionListChanged(ThirdPartyDeposits.DepositAddressExceptionRule)
 	}
 
-	public enum ChildAction: Sendable, Equatable {
+	public enum ChildAction: Equatable, Sendable {
 		case destinations(PresentationAction<Destinations.Action>)
 	}
 
-	public enum DelegateAction: Sendable, Equatable {
+	public enum DelegateAction: Equatable, Sendable {
 		case updated(ThirdPartyDeposits)
 	}
 
-	public enum InternalAction: Sendable, Equatable {
+	public enum InternalAction: Equatable, Sendable {
 		case resourceLoaded(OnLedgerEntity.Resource?, ResourceViewState.Address)
 		case resourcesLoaded([OnLedgerEntity.Resource]?)
 	}
 
-	public struct Destinations: ReducerProtocol {
-		public enum State: Equatable, Hashable {
+	public struct Destinations: ReducerProtocol, Sendable {
+		public enum State: Equatable, Hashable, Sendable {
 			case addAsset(AddAsset.State)
 			case confirmAssetDeletion(AlertState<Action.ConfirmDeletionAlert>)
 		}
 
-		public enum Action: Hashable {
+		public enum Action: Hashable, Sendable {
 			case addAsset(AddAsset.Action)
 			case confirmAssetDeletion(ConfirmDeletionAlert)
 
-			public enum ConfirmDeletionAlert: Sendable, Hashable {
+			public enum ConfirmDeletionAlert: Hashable, Sendable {
 				case confirmTapped(ResourceViewState.Address)
 				case cancelTapped
 			}
@@ -146,12 +144,13 @@ public struct ResourcesList: FeatureReducer {
 			state.mode = mode
 			state.destinations = nil
 
-			return .run { [thirdPartyDeposits = state.thirdPartyDeposits] send in
+			return .run { send in
 				let loadResourceResult = try? await onLedgerEntitiesClient.getResource(newAsset.resourceAddress)
 				await send(.internal(.resourceLoaded(loadResourceResult, newAsset)))
 			}
 
 		case let .destinations(.presented(.confirmAssetDeletion(.confirmTapped(resource)))):
+			state.loadedResources.removeAll(where: { $0.address == resource })
 			switch resource {
 			case let .assetException(resource):
 				state.thirdPartyDeposits.assetsExceptionList.removeAll(where: { $0.address == resource.address })
@@ -236,20 +235,20 @@ extension ResourcesListMode {
 	var removeTitle: String {
 		switch self {
 		case .allowDenyAssets:
-			return "Remove Asset"
+			return "Remove Asset" // FIXME: Strings
 		case .allowDepositors:
-			return "Remove Depositor Badge"
+			return "Remove Depositor Badge" // FIXME: Strings
 		}
 	}
 
 	var removeConfirmationMessage: String {
 		switch self {
 		case .allowDenyAssets(.allow):
-			return "The asset will be removed from the allow list"
+			return "The asset will be removed from the allow list" // FIXME: Strings
 		case .allowDenyAssets(.deny):
-			return "The asset will be removed from the deny list"
+			return "The asset will be removed from the deny list" // FIXME: Strings
 		case .allowDepositors:
-			return "The badge will be removed from the list"
+			return "The badge will be removed from the list" // FIXME: Strings
 		}
 	}
 }
