@@ -27,17 +27,16 @@ extension ImportMnemonicsFlowCoordinator {
 						content: { importStore in
 							NavigationView {
 								ImportMnemonicControllingAccounts.View(store: importStore)
+									.toolbar {
+										ToolbarItem(placement: .navigationBarLeading) {
+											CloseButton {
+												viewStore.send(.view(.closeButtonTapped))
+											}
+										}
+									}
 							}
 						}
 					)
-					.toolbar {
-						ToolbarItem(placement: .navigationBarLeading) {
-							CloseButton {
-								viewStore.send(.view(.closeButtonTapped))
-							}
-							.foregroundColor(.app.white)
-						}
-					}
 			}
 		}
 	}
