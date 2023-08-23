@@ -41,7 +41,7 @@ public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 	}
 
 	public enum ViewAction: Sendable, Equatable {
-		case onFirstTask
+		case onFirstTask, closeButtonTapped
 	}
 
 	public enum InternalAction: Sendable, Equatable {
@@ -51,6 +51,7 @@ public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 	public enum DelegateAction: Sendable, Equatable {
 		case finishedImportingMnemonics(skippedAnyMnemonic: Bool)
 		case failedToImportAllRequiredMnemonics
+		case closeButtonTapped
 	}
 
 	@Dependency(\.deviceFactorSourceClient) var deviceFactorSourceClient
@@ -72,6 +73,8 @@ public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 					try await deviceFactorSourceClient.controlledEntities(snapshot)
 				}))
 			}
+		case .closeButtonTapped:
+			return .send(.delegate(.closeButtonTapped))
 		}
 	}
 
@@ -135,6 +138,7 @@ public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 			state.destination = .importMnemonicControllingAccounts(.init(entitiesControlledByFactorSource: next))
 			return .none
 		} else {
+			state.destination = nil
 			let skippedAnyMnemonic = state.numberOfMnemonicsBeingAskedFor != state.numberOfMneminicsImported
 			return .send(.delegate(.finishedImportingMnemonics(skippedAnyMnemonic: skippedAnyMnemonic)))
 		}

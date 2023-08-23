@@ -54,22 +54,22 @@ extension EncryptOrDecryptProfile {
 			isEncrypting
 		}
 
-		var navigationTitle: LocalizedStringKey {
+		var navigationTitle: String {
 			// FIXME: Strings
 			isEncrypting ? "Export backup" : "Import backup"
 		}
 
-		var continueButtonTitle: LocalizedStringKey {
+		var continueButtonTitle: String {
 			// FIXME: Strings
 			isEncrypting ? "Encrypt backup" : "Decrypt backup"
 		}
 
-		var title: LocalizedStringKey {
+		var title: String {
 			// FIXME: String
 			isEncrypting ? "Encrypt backup before export" : "Decrypt backup to import"
 		}
 
-		var subtitle: LocalizedStringKey {
+		var subtitle: String {
 			// FIXME: String
 			isEncrypting ? "If you forget this password you will not be able to decrypt the wallet backup file. Use a secure, unique password. Back it up somewhere." : "Enter the password you chose when you originally encrypted this wallet backup file."
 		}

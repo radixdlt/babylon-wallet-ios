@@ -17,7 +17,7 @@ extension ImportMnemonicControllingAccounts {
 			isSkippable ? "The following **Accounts** are controlled by a seed phrase. To recover control, you must re-enter it." : "Your **Personas** and the following **Accounts** are controlled by your main seed phrase. To recover control, you must re-enter it."
 		}
 
-		var navigationTitle: LocalizedStringKey {
+		var navigationTitle: String {
 			isSkippable ? "Seed Phrase Import" : "Main Seed Phrase"
 		}
 	}
@@ -52,12 +52,20 @@ extension ImportMnemonicControllingAccounts {
 						.cornerRadius(.small2)
 					}
 
-					ScrollView {
-						DisplayEntitiesControlledByMnemonic.View(
-							store: store.scope(state: \.entities, action: { .child(.entities($0)) })
-						)
-					}
+					DisplayEntitiesControlledByMnemonic.View(
+						store: store.scope(state: \.entities, action: { .child(.entities($0)) })
+					)
 				}
+				.padding(.horizontal, .medium3)
+				.footer {
+					// FIXME: Strings
+					Button("Enter This Seed Phrase") {
+						viewStore.send(.inputMnemonic)
+					}
+					.buttonStyle(.primaryRectangular)
+				}
+				.navigationTitle(viewStore.navigationTitle)
+				.onAppear { viewStore.send(.appeared) }
 				.sheet(
 					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
 					state: /ImportMnemonicControllingAccounts.Destinations.State.importMnemonic,
@@ -70,16 +78,6 @@ extension ImportMnemonicControllingAccounts {
 						}
 					}
 				)
-				.padding(.horizontal, .medium3)
-				.footer {
-					// FIXME: Strings
-					Button("Enter This Seed Phrase") {
-						viewStore.send(.inputMnemonic)
-					}
-					.buttonStyle(.primaryRectangular)
-				}
-				.navigationTitle(viewStore.navigationTitle)
-				.onAppear { viewStore.send(.appeared) }
 			}
 		}
 	}

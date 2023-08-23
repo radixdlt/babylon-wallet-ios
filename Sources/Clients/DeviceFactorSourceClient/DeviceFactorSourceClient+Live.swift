@@ -84,38 +84,34 @@ extension DeviceFactorSourceClient: DependencyKey {
 				do {
 					let deviceFactorSource = try await factorSourcesClient.getFactorSources().babylonDeviceFactorSources().sorted(by: \.lastUsedOn).first
 
-					let accounts = try await accountsClient.getAccountsOnCurrentNetwork()
-
-					guard let deviceFactorSource,
-					      let mnemonicWithPassphrase = try await secureStorageClient.loadMnemonicByFactorSourceID(
-					      	deviceFactorSource.id.embed(),
-					      	.checkingAccounts
-					      )
+					guard
+						let deviceFactorSource,
+						let mnemonicWithPassphrase = try await secureStorageClient
+						.loadMnemonicByFactorSourceID(
+							deviceFactorSource.id.embed(),
+							.checkingAccounts
+						)
 					else {
 						// Failed to find mnemonic for factor source
 						return true
 					}
 
-					@Sendable func hasControl(of account: Profile.Network.Account) -> Bool {
-						do {
-							switch account.securityState {
-							case let .unsecured(unsecuredEntityControl):
-								let factorInstance = unsecuredEntityControl.transactionSigning
-								let derivationPath = factorInstance.derivationPath
-								let hdRoot = try mnemonicWithPassphrase.hdRoot()
-								let privateKey = try hdRoot.derivePrivateKey(
-									path: derivationPath,
-									curve: factorInstance.publicKey.curve
-								)
-
-								return privateKey.publicKey() == factorInstance.publicKey
-							}
-						} catch {
-							return false
-						}
+					let accountsControlledByMainDeviceFactorSource = try await accountsClient.getAccountsOnCurrentNetwork().filter {
+						$0.virtualHierarchicalDeterministicFactorInstances.contains(where: { $0.factorSourceID == deviceFactorSource.id })
 					}
 
-					return !accounts.allSatisfy(hasControl)
+					do {
+						let hasControlOfAllAccounts = try mnemonicWithPassphrase.validatePublicKeysOf(accounts: accountsControlledByMainDeviceFactorSource)
+						if hasControlOfAllAccounts {
+							return false
+						} else {
+							return true
+						}
+					} catch {
+						// Account recover needed
+						return true
+					}
+
 				} catch {
 					loggerGlobal.error("Failure during check if wallet needs account recovery: \(String(describing: error))")
 					if error is KeychainAccess.Status {

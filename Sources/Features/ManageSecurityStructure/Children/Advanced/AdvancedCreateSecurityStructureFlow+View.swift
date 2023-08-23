@@ -199,8 +199,8 @@ struct FactorsForRoleButton<R: RoleProtocol>: SwiftUI.View {
 		self.action = action
 	}
 
-	var buttonTitle: LocalizedStringKey {
-		let none: LocalizedStringKey = "None set"
+	var buttonTitle: String {
+		let none = "None set"
 		guard
 			let roleOfTier
 		else {

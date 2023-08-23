@@ -78,7 +78,6 @@ public struct RestoreProfileFromBackupCoordinator: Sendable, FeatureReducer {
 				preconditionFailure("Expected to have a profile")
 				return .none
 			}
-
 			return .run { send in
 				loggerGlobal.notice("Importing snapshot...")
 				try await backupsClient.importSnapshot(profileSelection.snapshot, fromCloud: profileSelection.isInCloud)
@@ -90,6 +89,10 @@ public struct RestoreProfileFromBackupCoordinator: Sendable, FeatureReducer {
 		case .path(.element(_, action: .importMnemonicsFlow(.delegate(.failedToImportAllRequiredMnemonics)))):
 			state.path.removeLast()
 			return .send(.delegate(.failedToImportProfileDueToMnemonics))
+
+		case .path(.element(_, action: .importMnemonicsFlow(.delegate(.closeButtonTapped)))):
+			state.path.removeLast()
+			return .none
 
 		default:
 			return .none
