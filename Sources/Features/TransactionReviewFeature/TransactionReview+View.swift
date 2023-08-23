@@ -607,3 +607,26 @@ extension SimpleDappDetails.View {
 		}
 	}
 }
+
+#if DEBUG
+import SwiftUI // NB: necessary for previews to appear
+
+struct TransactionReview_Previews: PreviewProvider {
+	static var previews: some SwiftUI.View {
+		TransactionReview.View(
+			store: .init(initialState: .previewValue) {
+				TransactionReview()
+			}
+		)
+	}
+}
+
+extension TransactionReview.State {
+	public static let previewValue: Self = .init(
+		transactionManifest: .previewValue,
+		nonce: .zero,
+		signTransactionPurpose: .manifestFromDapp,
+		message: .none
+	)
+}
+#endif
