@@ -15,6 +15,7 @@ extension BackUpProfileSettings {
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
 				coreView(with: viewStore)
+					.cloudSyncTakesLongTimeAlert(with: store)
 					.disableCloudSyncConfirmationAlert(with: store)
 					.encryptBeforeExportChoiceAlert(with: store)
 					.encryptBeforeExportSheet(with: store)
@@ -128,6 +129,15 @@ extension SwiftUI.View {
 			store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
 			state: /BackUpProfileSettings.Destinations.State.deleteProfileConfirmationDialog,
 			action: BackUpProfileSettings.Destinations.Action.deleteProfileConfirmationDialog
+		)
+	}
+
+	@MainActor
+	fileprivate func cloudSyncTakesLongTimeAlert(with store: StoreOf<BackUpProfileSettings>) -> some SwiftUI.View {
+		alert(
+			store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+			state: /BackUpProfileSettings.Destinations.State.syncTakesLongTimeAlert,
+			action: BackUpProfileSettings.Destinations.Action.syncTakesLongTimeAlert
 		)
 	}
 

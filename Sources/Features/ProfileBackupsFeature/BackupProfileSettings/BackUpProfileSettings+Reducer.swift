@@ -82,6 +82,7 @@ public struct BackUpProfileSettings: Sendable, FeatureReducer {
 
 		public enum State: Sendable, Hashable {
 			case confirmCloudSyncDisable(AlertState<Action.ConfirmCloudSyncDisable>)
+			case syncTakesLongTimeAlert(AlertState<Action.SyncTakesLongTimeAlert>)
 			case optionallyEncryptProfileBeforeExporting(AlertState<Action.SelectEncryptOrNot>)
 			case deleteProfileConfirmationDialog(ConfirmationDialogState<Action.DeleteProfileConfirmationDialogAction>)
 
@@ -93,9 +94,14 @@ public struct BackUpProfileSettings: Sendable, FeatureReducer {
 			case optionallyEncryptProfileBeforeExporting(SelectEncryptOrNot)
 
 			case inputEncryptionPassword(EncryptOrDecryptProfile.Action)
+			case syncTakesLongTimeAlert(SyncTakesLongTimeAlert)
 
 			public enum ConfirmCloudSyncDisable: Sendable, Hashable {
 				case confirm
+			}
+
+			public enum SyncTakesLongTimeAlert: Sendable, Hashable {
+				case ok
 			}
 
 			public enum SelectEncryptOrNot: Sendable, Hashable {
@@ -221,6 +227,10 @@ public struct BackUpProfileSettings: Sendable, FeatureReducer {
 				return .none
 			}
 
+		case .destination(.presented(.syncTakesLongTimeAlert(.ok))):
+			state.destination = nil
+			return .none
+
 		case .destination(.presented(.optionallyEncryptProfileBeforeExporting(.doNotEncrypt))):
 			return exportProfile(encrypt: false, state: &state)
 
@@ -277,6 +287,9 @@ public struct BackUpProfileSettings: Sendable, FeatureReducer {
 
 	private func updateCloudSync(state: inout State, isEnabled: Bool) -> EffectTask<Action> {
 		state.preferences?.security.isCloudProfileSyncEnabled = isEnabled
+		if isEnabled {
+			state.destination = .cloudSyncTakesLongTimeAlert
+		}
 		return .fireAndForget {
 			try await appPreferencesClient.setIsCloudProfileSyncEnabled(isEnabled)
 		}
@@ -310,4 +323,15 @@ extension ConfirmationDialogState<BackUpProfileSettings.Destinations.Action.Dele
 	} message: {
 		TextState(L10n.AppSettings.ResetWalletDialog.message)
 	}
+}
+
+extension BackUpProfileSettings.Destinations.State {
+	// FIXME: Strings
+	fileprivate static let cloudSyncTakesLongTimeAlert = Self.syncTakesLongTimeAlert(.init(
+		title: { TextState("Enabling iCloud sync") },
+		actions: {
+			ButtonState(action: .ok, label: { TextState("OK") })
+		},
+		message: { TextState("iCloud sync is now enabled, but it might take up to an hour before your wallet data is uploaded to iCloud.") }
+	))
 }
