@@ -870,7 +870,7 @@ package.addModules([
 		name: "FeaturePrelude",
 		dependencies: [
 			.product(name: "ComposableArchitecture", package: "swift-composable-architecture") {
-				.package(url: "https://github.com/radixdlt/swift-composable-architecture", branch: "full-scope")
+				.package(url: "https://github.com/radixdlt/swift-composable-architecture", branch: "full-scope-1.1")
 			},
 			"DesignSystem",
 			"Resources",
@@ -904,7 +904,7 @@ package.addModules([
 			},
 			"Resources",
 			.product(name: "SwiftUINavigation", package: "swiftui-navigation") {
-				.package(url: "https://github.com/pointfreeco/swiftui-navigation", from: "0.7.1")
+				.package(url: "https://github.com/pointfreeco/swiftui-navigation", from: "1.0.0")
 			},
 			.product(name: "TextBuilder", package: "TextBuilder") {
 				.package(url: "https://github.com/davdroman/TextBuilder", from: "2.2.0")
@@ -1024,7 +1024,7 @@ package.addModules([
 		category: .testing,
 		dependencies: [
 			.product(name: "JSONTesting", package: "swift-json-testing") {
-				.package(url: "https://github.com/davdroman/swift-json-testing", from: "0.1.0")
+				.package(url: "https://github.com/kugel3/swift-json-testing", from: "0.1.0")
 			},
 		],
 		tests: .no
@@ -1090,19 +1090,19 @@ package.addModules([
 				.package(url: "https://github.com/JohnSundell/CollectionConcurrencyKit.git", from: "0.1.0")
 			},
 			.product(name: "CustomDump", package: "swift-custom-dump") {
-				.package(url: "https://github.com/pointfreeco/swift-custom-dump", from: "0.9.1")
+				.package(url: "https://github.com/pointfreeco/swift-custom-dump", from: "1.0.0")
 			},
 			.product(name: "Dependencies", package: "swift-dependencies") {
-				.package(url: "https://github.com/pointfreeco/swift-dependencies", from: "0.2.0")
+				.package(url: "https://github.com/pointfreeco/swift-dependencies", from: "1.0.0")
 			},
 			.product(name: "DependenciesAdditions", package: "swift-dependencies-additions") {
-				.package(url: "https://github.com/tgrapperon/swift-dependencies-additions", from: "0.3.0")
+				.package(url: "https://github.com/tgrapperon/swift-dependencies-additions", from: "1.0.0")
 			},
 			.product(name: "Either", package: "swift-either") {
 				.package(url: "https://github.com/pointfreeco/swift-either", branch: "main")
 			},
 			.product(name: "IdentifiedCollections", package: "swift-identified-collections") {
-				.package(url: "https://github.com/pointfreeco/swift-identified-collections", exact: "0.7.0")
+				.package(url: "https://github.com/pointfreeco/swift-identified-collections", from: "1.0.0")
 			},
 			.product(name: "KeychainAccess", package: "KeychainAccess") {
 				.package(url: "https://github.com/kishikawakatsumi/KeychainAccess", from: "4.2.2")
