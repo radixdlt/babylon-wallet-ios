@@ -55,13 +55,11 @@ public struct Home: Sendable, FeatureReducer {
 		public enum State: Sendable, Hashable {
 			case accountDetails(AccountDetails.State)
 			case createAccount(CreateAccountCoordinator.State)
-			case accountSecurity(Profile.Network.Account) // TODO: Use the proper state
 		}
 
 		public enum Action: Sendable, Equatable {
 			case accountDetails(AccountDetails.Action)
 			case createAccount(CreateAccountCoordinator.Action)
-			case accountSecurity(Int) // TODO: Use the proper action
 		}
 
 		public var body: some ReducerProtocolOf<Self> {
@@ -70,9 +68,6 @@ public struct Home: Sendable, FeatureReducer {
 			}
 			Scope(state: /State.createAccount, action: /Action.createAccount) {
 				CreateAccountCoordinator()
-			}
-			Scope(state: /State.accountSecurity, action: /Action.accountSecurity) {
-				EmptyReducer()
 			}
 		}
 	}
@@ -152,7 +147,8 @@ public struct Home: Sendable, FeatureReducer {
 			return .none
 
 		case let .accountList(.delegate(.displayAccountSecurity(account))):
-			state.destination = .accountSecurity(account)
+//			state.destination = .accountDetails(.init(for: account, destination: .preferences(.init(account: account))))
+			// TODO: Deep link
 			return .none
 
 		case .destination(.presented(.accountDetails(.delegate(.dismiss)))):
