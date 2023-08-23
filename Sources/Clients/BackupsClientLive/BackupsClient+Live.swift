@@ -23,7 +23,7 @@ extension BackupsClient: DependencyKey {
 			do {
 				try await operation()
 			} catch {
-				// revert the saved mnemonica
+				// revert the saved mnemonic
 				for factorSourceID in factorSourceIDs {
 					try? await secureStorageClient.deleteMnemonicByFactorSourceID(factorSourceID)
 				}
