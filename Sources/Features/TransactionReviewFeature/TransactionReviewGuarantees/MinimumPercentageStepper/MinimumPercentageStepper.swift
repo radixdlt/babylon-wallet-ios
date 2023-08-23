@@ -62,12 +62,6 @@ public struct MinimumPercentageStepper: FeatureReducer {
 	private let percentageDelta: BigDecimal = 0.1
 }
 
-extension BigDecimal {
-	fileprivate var clamped: BigDecimal {
-		max(0, self)
-	}
-}
-
 extension MinimumPercentageStepper.State {
 	var disableMinus: Bool {
 		value.map { $0 <= 0 } ?? false

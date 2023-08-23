@@ -32,9 +32,3 @@ extension SpecificAddress {
 		try .static(value: self.intoEngine())
 	}
 }
-
-extension BigDecimal {
-	public func intoEngine() throws -> EngineKit.Decimal {
-		try .init(value: toString())
-	}
-}

@@ -166,7 +166,7 @@ extension LSUStake.State {
 				.map {
 					.init(
 						thumbnail: .xrd,
-						symbol: "XRD", // FIXME: Strings - or is this a placeholder?
+						symbol: Constants.xrdTokenName,
 						tokenAmount: $0.format(),
 						isSelected: isStakeSelected
 					)
