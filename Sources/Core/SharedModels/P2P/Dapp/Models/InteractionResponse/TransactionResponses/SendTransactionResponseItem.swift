@@ -20,7 +20,8 @@ extension P2P.Dapp.Response.WalletInteractionSuccessResponse {
 		public func encode(to encoder: Encoder) throws {
 			var container = encoder.container(keyedBy: CodingKeys.self)
 			try container.encode(
-				transactionIntentHash.hex,
+				// Bech32m encoded transaction ID
+				transactionIntentHash.asStr(),
 				forKey: .transactionIntentHash
 			)
 		}
