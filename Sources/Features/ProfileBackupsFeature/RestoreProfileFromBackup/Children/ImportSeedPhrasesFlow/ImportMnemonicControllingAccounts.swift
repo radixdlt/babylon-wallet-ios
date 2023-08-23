@@ -134,6 +134,7 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
 		case let .validated(privateHDFactorSource):
+			state.destination = nil
 			return .task {
 				do {
 					try await secureStorageClient.saveMnemonicForFactorSource(
