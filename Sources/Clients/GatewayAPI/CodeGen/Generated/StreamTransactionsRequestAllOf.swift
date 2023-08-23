@@ -36,9 +36,9 @@ public struct StreamTransactionsRequestAllOf: Codable, Hashable {
     public private(set) var eventsFilter: [StreamTransactionsRequestEventFilterItem]?
     /** Configures the order of returned result set. Defaults to `desc`. */
     public private(set) var order: Order?
-    public private(set) var optIns: TransactionCommittedDetailsOptIns?
+    public private(set) var optIns: TransactionDetailsOptIns?
 
-    public init(fromLedgerState: LedgerStateSelector? = nil, kindFilter: KindFilter? = nil, manifestAccountsWithdrawnFromFilter: [String]? = nil, manifestAccountsDepositedIntoFilter: [String]? = nil, manifestResourcesFilter: [String]? = nil, affectedGlobalEntitiesFilter: [String]? = nil, eventsFilter: [StreamTransactionsRequestEventFilterItem]? = nil, order: Order? = nil, optIns: TransactionCommittedDetailsOptIns? = nil) {
+    public init(fromLedgerState: LedgerStateSelector? = nil, kindFilter: KindFilter? = nil, manifestAccountsWithdrawnFromFilter: [String]? = nil, manifestAccountsDepositedIntoFilter: [String]? = nil, manifestResourcesFilter: [String]? = nil, affectedGlobalEntitiesFilter: [String]? = nil, eventsFilter: [StreamTransactionsRequestEventFilterItem]? = nil, order: Order? = nil, optIns: TransactionDetailsOptIns? = nil) {
         self.fromLedgerState = fromLedgerState
         self.kindFilter = kindFilter
         self.manifestAccountsWithdrawnFromFilter = manifestAccountsWithdrawnFromFilter

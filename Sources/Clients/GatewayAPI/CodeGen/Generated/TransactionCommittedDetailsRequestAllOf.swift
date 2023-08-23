@@ -17,17 +17,17 @@ extension GatewayAPI {
 
 public struct TransactionCommittedDetailsRequestAllOf: Codable, Hashable {
 
-    /** Hex-encoded SHA-256 hash. */
-    public private(set) var intentHashHex: String
-    public private(set) var optIns: TransactionCommittedDetailsOptIns?
+    /** Bech32m-encoded hash. */
+    public private(set) var intentHash: String
+    public private(set) var optIns: TransactionDetailsOptIns?
 
-    public init(intentHashHex: String, optIns: TransactionCommittedDetailsOptIns? = nil) {
-        self.intentHashHex = intentHashHex
+    public init(intentHash: String, optIns: TransactionDetailsOptIns? = nil) {
+        self.intentHash = intentHash
         self.optIns = optIns
     }
 
     public enum CodingKeys: String, CodingKey, CaseIterable {
-        case intentHashHex = "intent_hash_hex"
+        case intentHash = "intent_hash"
         case optIns = "opt_ins"
     }
 
@@ -35,7 +35,7 @@ public struct TransactionCommittedDetailsRequestAllOf: Codable, Hashable {
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(intentHashHex, forKey: .intentHashHex)
+        try container.encode(intentHash, forKey: .intentHash)
         try container.encodeIfPresent(optIns, forKey: .optIns)
     }
 }

@@ -17,22 +17,22 @@ extension GatewayAPI {
 
 public struct TransactionStatusRequestAllOf: Codable, Hashable {
 
-    /** Hex-encoded SHA-256 hash. */
-    public private(set) var intentHashHex: String
+    /** Bech32m-encoded hash. */
+    public private(set) var intentHash: String
 
-    public init(intentHashHex: String) {
-        self.intentHashHex = intentHashHex
+    public init(intentHash: String) {
+        self.intentHash = intentHash
     }
 
     public enum CodingKeys: String, CodingKey, CaseIterable {
-        case intentHashHex = "intent_hash_hex"
+        case intentHash = "intent_hash"
     }
 
     // Encodable protocol methods
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(intentHashHex, forKey: .intentHashHex)
+        try container.encode(intentHash, forKey: .intentHash)
     }
 }
 
