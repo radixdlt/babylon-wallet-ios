@@ -30,9 +30,13 @@ public struct ApprovalSlider: View {
 					.foregroundColor(controlState.isDisabled ? .app.gray3 : .white)
 					.opacity(approved ? 0 : 1)
 
-				if !controlState.isDisabled {
+				if controlState.isDisabled {
+					if approved {
+						Color.app.gray4
+					}
+				} else {
 					Color.app.gradientPurple
-						.opacity(approved ? 1 : (triggered ? 0.5 : 0))
+						.opacity(triggeredOpacity)
 
 					LinearGradient(gradient: .approvalSlider, startPoint: .leading, endPoint: .trailing)
 						.mask { gradientMask(for: width) }
@@ -47,11 +51,15 @@ public struct ApprovalSlider: View {
 		.animation(.default, value: triggered)
 	}
 
-	private var triggered: Bool {
-		position > triggerPosition
+	private var triggeredOpacity: CGFloat {
+		if approved {
+			return 1
+		} else if triggered {
+			return 0.3
+		} else {
+			return 0
+		}
 	}
-
-	private let triggerPosition: CGFloat = 0.93
 
 	private let padding: CGFloat = 2
 
@@ -65,17 +73,20 @@ public struct ApprovalSlider: View {
 		Circle()
 			.fill(controlState.isDisabled ? .app.gray3 : .white)
 			.overlay {
-				switch controlState {
-				case .enabled:
-					Image(asset: AssetResource.radixIconWhite)
-						.renderingMode(.template)
-						.transition(transition)
-				case .loading:
+				if controlState.isLoading {
 					ProgressView()
-				case .disabled:
-					Image(asset: AssetResource.chevronRight)
-						.renderingMode(.template)
-						.transition(transition)
+				} else {
+					ZStack {
+						let showRadixIcon = triggered || approved
+						Image(asset: AssetResource.chevronRight)
+							.renderingMode(.template)
+							.opacity(showRadixIcon ? 0 : 1)
+							.scaleEffect(showRadixIcon ? 0.8 : 1)
+						Image(asset: AssetResource.radixIconWhite)
+							.renderingMode(.template)
+							.opacity(triggeredOpacity)
+							.scaleEffect(showRadixIcon ? 1 : 0.8)
+					}
 				}
 			}
 			.foregroundColor(controlState.isDisabled ? .app.gray4 : .app.blue2)
@@ -84,7 +95,11 @@ public struct ApprovalSlider: View {
 			.gesture(drag(width: width))
 	}
 
-	private let transition: AnyTransition = .scale(scale: 0.8).combined(with: .opacity)
+	private var triggered: Bool {
+		position > triggerPosition
+	}
+
+	private let triggerPosition: CGFloat = 0.93
 
 	private func drag(width: CGFloat) -> some Gesture {
 		DragGesture(minimumDistance: 0)
