@@ -75,15 +75,6 @@ extension SelectFeePayer {
 							.buttonStyle(.primaryRectangular)
 					}
 				}
-				.footer {
-					WithControlRequirements(
-						viewStore.selectedPayer,
-						forAction: { viewStore.send(.confirmedFeePayer($0)) }
-					) { action in
-						Button(L10n.TransactionReview.CustomizeNetworkFeeSheet.SelectFeePayer.selectAccountButtonTitle, action: action)
-							.buttonStyle(.primaryRectangular)
-					}
-				}
 			}
 		}
 	}
