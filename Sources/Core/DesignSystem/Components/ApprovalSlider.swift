@@ -3,47 +3,47 @@ import SwiftUI
 
 // MARK: - ApprovalSlider
 public struct ApprovalSlider: View {
+	@Environment(\.controlState) private var controlState
 	@State private var approved: Bool = false
 	@State private var position: CGFloat = 0
 
 	private let title: String
-	private let enabled: Bool
 	private let action: () -> Void
 
-	public init(title: String, enabled: Bool, action: @escaping () -> Void) {
+	public init(title: String, action: @escaping () -> Void) {
 		self.title = title
-		self.enabled = enabled
 		self.action = action
 	}
 
 	public var body: some View {
 		GeometryReader { proxy in
+			let width = proxy.size.width - .approveSliderHeight
 			ZStack {
-				let width = proxy.size.width - .approveSliderHeight
-
-				if enabled {
-					Color.app.blue2
-				} else {
+				if controlState.isDisabled {
 					Color.app.gray4
+				} else {
+					Color.app.blue2
 				}
-
-				Color.app.gradientPurple
-					.opacity(approved ? 1 : (triggered ? 0.5 : 0))
 
 				Text(title)
 					.textStyle(.body1Header)
-					.foregroundColor(enabled ? .white : .app.gray3)
+					.foregroundColor(controlState.isDisabled ? .app.gray3 : .white)
+					.opacity(approved ? 0 : 1)
 
-				LinearGradient(gradient: .approvalSlider, startPoint: .leading, endPoint: .trailing)
-					.mask { gradientMask(for: width) }
+				if !controlState.isDisabled {
+					Color.app.gradientPurple
+						.opacity(approved ? 1 : (triggered ? 0.5 : 0))
+
+					LinearGradient(gradient: .approvalSlider, startPoint: .leading, endPoint: .trailing)
+						.mask { gradientMask(for: width) }
+				}
 
 				handle(for: width)
-					.disabled(!enabled || approved)
 			}
 			.clipShape(Capsule(style: .circular))
 		}
 		.frame(height: .approveSliderHeight)
-		.animation(.default, value: enabled)
+		.animation(.default, value: controlState)
 		.animation(.default, value: triggered)
 	}
 
@@ -63,19 +63,22 @@ public struct ApprovalSlider: View {
 
 	private func handle(for width: CGFloat) -> some View {
 		Circle()
-			.fill(enabled ? .white : .app.gray3)
+			.fill(controlState.isDisabled ? .app.gray3 : .white)
 			.overlay {
-				if approved {
+				switch controlState {
+				case .enabled:
 					Image(asset: AssetResource.radixIconWhite)
 						.renderingMode(.template)
 						.transition(transition)
-				} else {
+				case .loading:
+					ProgressView()
+				case .disabled:
 					Image(asset: AssetResource.chevronRight)
 						.renderingMode(.template)
 						.transition(transition)
 				}
 			}
-			.foregroundColor(enabled ? .app.blue2 : .app.gray4)
+			.foregroundColor(controlState.isDisabled ? .app.gray4 : .app.blue2)
 			.padding(padding)
 			.offset(x: (position - 0.5) * width)
 			.gesture(drag(width: width))
@@ -86,6 +89,7 @@ public struct ApprovalSlider: View {
 	private func drag(width: CGFloat) -> some Gesture {
 		DragGesture(minimumDistance: 0)
 			.onChanged { gesture in
+				guard controlState.isEnabled else { return }
 				position = max(0, min(gesture.translation.width / width, 1))
 			}
 			.onEnded { gesture in
