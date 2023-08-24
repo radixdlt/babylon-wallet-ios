@@ -49,13 +49,14 @@ public struct ApprovalSlider: View {
 		.frame(height: .approveSliderHeight)
 		.animation(.default, value: controlState)
 		.animation(.default, value: triggered)
+		.animation(.interactiveSpring(), value: position)
 	}
 
 	private var triggeredOpacity: CGFloat {
 		if approved {
 			return 1
 		} else if triggered {
-			return 0.3
+			return 0.5
 		} else {
 			return 0
 		}
@@ -81,10 +82,13 @@ public struct ApprovalSlider: View {
 						Image(asset: AssetResource.chevronRight)
 							.renderingMode(.template)
 							.opacity(showRadixIcon ? 0 : 1)
-							.scaleEffect(showRadixIcon ? 0.8 : 1)
+							.rotationEffect(showRadixIcon ? .radians(0.5 * .pi) : .zero)
+							.offset(y: showRadixIcon ? 4 : 0)
+							.scaleEffect(showRadixIcon ? 1.2 : 1)
 						Image(asset: AssetResource.radixIconWhite)
 							.renderingMode(.template)
-							.opacity(triggeredOpacity)
+							.opacity(showRadixIcon ? 1 : 0)
+							.rotationEffect(showRadixIcon ? .zero : .radians(-0.5 * .pi))
 							.scaleEffect(showRadixIcon ? 1 : 0.8)
 					}
 				}
@@ -110,15 +114,13 @@ public struct ApprovalSlider: View {
 			.onEnded { gesture in
 				let now = gesture.translation.width
 				let end = gesture.predictedEndTranslation.width
-				withAnimation {
-					// You can either throw the handle to the right, or drop it very close to the end
-					if now > 0.7 * width && end > 1.5 * width || now > triggerPosition * width {
-						position = 1
-						approved = true
-						action()
-					} else {
-						position = 0
-					}
+				// You can either throw the handle to the right, or drop it very close to the end
+				if now > 0.7 * width && end > 1.5 * width || now > triggerPosition * width {
+					position = 1
+					approved = true
+					action()
+				} else {
+					position = 0
 				}
 			}
 	}
