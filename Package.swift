@@ -41,6 +41,7 @@ package.addModules([
 			"CreateAuthKeyFeature",
 			"ShowQRFeature",
 			"OverlayWindowClient",
+			"OnLedgerEntitiesClient",
 		],
 		tests: .yes()
 	),
@@ -463,6 +464,15 @@ package.addModules([
 			"EngineKit",
 		],
 		tests: .yes()
+	),
+	.client(
+		name: "OnLedgerEntitiesClient",
+		dependencies: [
+			"GatewayAPI",
+			"CacheClient",
+			"EngineKit",
+		],
+		tests: .no
 	),
 	.client(
 		name: "AppPreferencesClient",
