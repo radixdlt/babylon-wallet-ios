@@ -505,7 +505,6 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 }
 
 // MARK: - Helper methods
-
 extension ImportOlympiaWalletCoordinator {
 	private func migratableAccounts(
 		from scannedAccounts: AccountsToMigrate,
