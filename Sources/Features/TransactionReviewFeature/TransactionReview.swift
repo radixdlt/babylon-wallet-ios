@@ -241,6 +241,11 @@ public struct TransactionReview: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
+		case .withdrawals(.delegate(.showAsset)):
+			// FIXME: HANDLE
+			print("Tapped asset in withdrawals")
+			return .none
+
 		case let .dAppsUsed(.delegate(.openDapp(id))):
 			state.destination = .dApp(.init(dAppID: id))
 			return .none
