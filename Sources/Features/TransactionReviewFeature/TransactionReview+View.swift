@@ -252,6 +252,7 @@ extension View {
 		return customizeGuarantees(with: destinationStore)
 			.dApp(with: destinationStore)
 			.fungibleTokenDetails(with: destinationStore)
+			.nonFungibleTokenDetails(with: destinationStore)
 			.customizeFees(with: destinationStore)
 			.signing(with: destinationStore)
 			.submitting(with: destinationStore)
@@ -284,6 +285,16 @@ extension View {
 			state: /TransactionReview.Destinations.State.fungibleTokenDetails,
 			action: TransactionReview.Destinations.Action.fungibleTokenDetails,
 			content: { FungibleTokenDetails.View(store: $0) }
+		)
+	}
+
+	@MainActor
+	private func nonFungibleTokenDetails(with destinationStore: PresentationStoreOf<TransactionReview.Destinations>) -> some View {
+		sheet(
+			store: destinationStore,
+			state: /TransactionReview.Destinations.State.nonFungibleTokenDetails,
+			action: TransactionReview.Destinations.Action.nonFungibleTokenDetails,
+			content: { NonFungibleTokenDetails.View(store: $0) }
 		)
 	}
 

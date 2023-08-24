@@ -99,6 +99,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			case dApp(SimpleDappDetails.State)
 			case customizeFees(CustomizeFees.State)
 			case fungibleTokenDetails(FungibleTokenDetails.State)
+			case nonFungibleTokenDetails(NonFungibleTokenDetails.State)
 		}
 
 		public enum Action: Sendable, Equatable {
@@ -108,6 +109,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			case dApp(SimpleDappDetails.Action)
 			case customizeFees(CustomizeFees.Action)
 			case fungibleTokenDetails(FungibleTokenDetails.Action)
+			case nonFungibleTokenDetails(NonFungibleTokenDetails.Action)
 		}
 
 		public var body: some ReducerProtocolOf<Self> {
@@ -128,6 +130,9 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			}
 			Scope(state: /State.fungibleTokenDetails, action: /Action.fungibleTokenDetails) {
 				FungibleTokenDetails()
+			}
+			Scope(state: /State.nonFungibleTokenDetails, action: /Action.nonFungibleTokenDetails) {
+				NonFungibleTokenDetails()
 			}
 		}
 	}
