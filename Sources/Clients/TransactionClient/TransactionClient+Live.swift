@@ -64,7 +64,7 @@ extension TransactionClient {
 		}
 
 		@Sendable
-		func getTransactionSigners(_ request: BuildTransactionIntentRequest) async throws -> TransactionSigners {
+		func getTransactionSigners(_ request: GetTransactionSignersRequest) async throws -> TransactionSigners {
 			let myInvolvedEntities = try await myEntitiesInvolvedInTransaction(
 				networkID: request.networkID,
 				manifest: request.manifest
@@ -87,9 +87,8 @@ extension TransactionClient {
 		@Sendable
 		func feePayerSelectionAmongstCandidates(
 			_ manifest: TransactionManifest,
-			_ executionAnalysis: ExecutionAnalysis
+			transactionFee: TransactionFee
 		) async throws -> FeePayerSelectionAmongstCandidates {
-			let transactionFee = try TransactionFee(executionAnalysis: executionAnalysis)
 			let lockFee = transactionFee.totalFee.lockFee
 
 			let networkID = await gatewaysClient.getCurrentNetworkID()
@@ -160,21 +159,20 @@ extension TransactionClient {
 
 		let buildTransactionIntent: BuildTransactionIntent = { request in
 			let epoch = try await gatewayAPIClient.getEpoch()
-			let transactionSigners = try await getTransactionSigners(request)
 
 			let header = TransactionHeader(
 				networkId: request.networkID.rawValue,
 				startEpochInclusive: epoch.rawValue,
 				endEpochExclusive: (epoch + request.makeTransactionHeaderInput.epochWindow).rawValue,
 				nonce: request.nonce.rawValue,
-				notaryPublicKey: SLIP10.PublicKey.eddsaEd25519(transactionSigners.notaryPublicKey).intoEngine(),
-				notaryIsSignatory: transactionSigners.notaryIsSignatory,
+				notaryPublicKey: SLIP10.PublicKey.eddsaEd25519(request.transactionSigners.notaryPublicKey).intoEngine(),
+				notaryIsSignatory: request.transactionSigners.notaryIsSignatory,
 				tipPercentage: request.makeTransactionHeaderInput.tipPercentage
 			)
 
 			return .init(
 				intent: .init(header: header, manifest: request.manifest, message: request.message),
-				transactionSigners: transactionSigners
+				transactionSigners: request.transactionSigners
 			)
 		}
 
@@ -208,7 +206,22 @@ extension TransactionClient {
 		let getTransactionReview: GetTransactionReview = { request in
 			let networkID = await gatewaysClient.getCurrentNetworkID()
 
-			let transactionPreviewRequest = try await createTransactionPreviewRequest(for: request, networkID: networkID)
+			/// Get all transaction signers.
+			let transactionSigners = try await getTransactionSigners(.init(
+				networkID: networkID,
+				manifest: request.manifestToSign,
+				ephemeralNotaryPublicKey: request.ephemeralNotaryPublicKey
+			))
+
+			/// Get all of the expected signing factors.
+			let signingFactors = try await factorSourcesClient.getSigningFactors(.init(
+				networkID: networkID,
+				signers: .init(rawValue: Set(transactionSigners.intentSignerEntitiesOrEmpty()))!,
+				signingPurpose: .signTransaction(.manifestFromDapp)
+			))
+
+			/// Get the transaction preview
+			let transactionPreviewRequest = try await createTransactionPreviewRequest(for: request, networkID: networkID, transactionSigners: transactionSigners)
 			let transactionPreviewResponse = try await gatewayAPIClient.transactionPreview(transactionPreviewRequest)
 			guard transactionPreviewResponse.receipt.status == .succeeded else {
 				throw TransactionFailure.failedToPrepareTXReview(
@@ -217,19 +230,29 @@ extension TransactionClient {
 			}
 			let receiptBytes = try [UInt8](hex: transactionPreviewResponse.encodedReceipt)
 
+			/// Analyze the manifest
 			let analyzedManifestToReview = try request.manifestToSign.analyzeExecution(transactionReceipt: receiptBytes)
-			let feePayerSelection = try await feePayerSelectionAmongstCandidates(request.manifestToSign, analyzedManifestToReview)
+
+			/// Calculate the expecte transaction fee
+			let transactionFee = try TransactionFee(executionAnalysis: analyzedManifestToReview, signaturesCount: signingFactors.expectedSignatureCount)
+
+			/// Select the account that can pay the transaction fee
+			let feePayerSelection = try await feePayerSelectionAmongstCandidates(request.manifestToSign, transactionFee: transactionFee)
+
 			return TransactionToReview(
 				analyzedManifestToReview: analyzedManifestToReview,
 				networkID: networkID,
-				feePayerSelectionAmongstCandidates: feePayerSelection
+				feePayerSelectionAmongstCandidates: feePayerSelection,
+				transactionSigners: transactionSigners,
+				signingFactors: signingFactors
 			)
 		}
 
 		@Sendable
 		func createTransactionPreviewRequest(
 			for request: ManifestReviewRequest,
-			networkID: NetworkID
+			networkID: NetworkID,
+			transactionSigners: TransactionSigners
 		) async throws -> GatewayAPI.TransactionPreviewRequest {
 			let intent = try await buildTransactionIntent(.init(
 				networkID: gatewaysClient.getCurrentNetworkID(),
@@ -237,55 +260,14 @@ extension TransactionClient {
 				message: request.message,
 				nonce: request.nonce,
 				makeTransactionHeaderInput: request.makeTransactionHeaderInput,
-				ephemeralNotaryPublicKey: request.ephemeralNotaryPublicKey
+				transactionSigners: transactionSigners
 			))
 
 			return try .init(
 				rawManifest: request.manifestToSign,
 				header: intent.intent.header(),
-				transactionSigners: intent.transactionSigners
+				transactionSigners: transactionSigners
 			)
-		}
-
-		let prepareForSigning: PrepareForSigning = { request in
-			let transactionIntentWithSigners = try await buildTransactionIntent(.init(
-				networkID: request.networkID,
-				manifest: request.manifest,
-				message: request.message,
-				nonce: request.nonce,
-				makeTransactionHeaderInput: request.transactionHeader,
-				ephemeralNotaryPublicKey: request.ephemeralNotaryPublicKey
-			))
-
-			let entities = NonEmpty(
-				rawValue: Set(Array(transactionIntentWithSigners.transactionSigners.intentSignerEntitiesOrEmpty()))
-			)!
-
-			let signingFactors = try await factorSourcesClient.getSigningFactors(.init(
-				networkID: request.networkID,
-				signers: entities,
-				signingPurpose: request.purpose
-			))
-
-			func printSigners() {
-				for (factorSourceKind, signingFactorsOfKind) in signingFactors {
-					print("🔮 ~~~ SIGNINGFACTORS OF KIND: \(factorSourceKind) #\(signingFactorsOfKind.count) many: ~~~")
-					for signingFactor in signingFactorsOfKind {
-						let factorSource = signingFactor.factorSource
-						print("\t🔮 == Signers for factorSource: \(factorSource.id): ==")
-						for signer in signingFactor.signers {
-							let entity = signer.entity
-							print("\t\t🔮 * Entity: \(entity.displayName): *")
-							for factorInstance in signer.factorInstancesRequiredToSign {
-								print("\t\t\t🔮 * FactorInstance: \(String(describing: factorInstance.derivationPath)) \(factorInstance.publicKey)")
-							}
-						}
-					}
-				}
-			}
-			printSigners()
-
-			return .init(intent: transactionIntentWithSigners.intent, signingFactors: signingFactors)
 		}
 
 		let myInvolvedEntities: MyInvolvedEntities = { manifest in
@@ -300,7 +282,6 @@ extension TransactionClient {
 			getTransactionReview: getTransactionReview,
 			buildTransactionIntent: buildTransactionIntent,
 			notarizeTransaction: notarizeTransaction,
-			prepareForSigning: prepareForSigning,
 			myInvolvedEntities: myInvolvedEntities
 		)
 	}

@@ -1,5 +1,6 @@
 import Cryptography
 import EngineKit
+import FactorSourcesClient
 import GatewayAPI
 import Prelude
 import Profile
@@ -138,8 +139,7 @@ public struct BuildTransactionIntentRequest: Sendable {
 	public let manifest: TransactionManifest
 	public let message: Message
 	public let makeTransactionHeaderInput: MakeTransactionHeaderInput
-	public let isFaucetTransaction: Bool
-	public let ephemeralNotaryPublicKey: Curve25519.Signing.PublicKey
+	public let transactionSigners: TransactionSigners
 
 	public init(
 		networkID: NetworkID,
@@ -147,15 +147,26 @@ public struct BuildTransactionIntentRequest: Sendable {
 		message: Message,
 		nonce: Nonce = .secureRandom(),
 		makeTransactionHeaderInput: MakeTransactionHeaderInput,
-		isFaucetTransaction: Bool = false,
-		ephemeralNotaryPublicKey: Curve25519.Signing.PublicKey
+		transactionSigners: TransactionSigners
 	) {
 		self.networkID = networkID
 		self.manifest = manifest
 		self.message = message
 		self.nonce = nonce
 		self.makeTransactionHeaderInput = makeTransactionHeaderInput
-		self.isFaucetTransaction = isFaucetTransaction
+		self.transactionSigners = transactionSigners
+	}
+}
+
+// MARK: - GetTransactionSignersRequest
+public struct GetTransactionSignersRequest: Sendable, Hashable {
+	public let networkID: NetworkID
+	public let manifest: TransactionManifest
+	public let ephemeralNotaryPublicKey: Curve25519.Signing.PublicKey
+
+	public init(networkID: NetworkID, manifest: TransactionManifest, ephemeralNotaryPublicKey: Curve25519.Signing.PublicKey) {
+		self.networkID = networkID
+		self.manifest = manifest
 		self.ephemeralNotaryPublicKey = ephemeralNotaryPublicKey
 	}
 }
@@ -206,7 +217,7 @@ public struct ManifestReviewRequest: Sendable {
 		message: Message,
 		nonce: Nonce,
 		makeTransactionHeaderInput: MakeTransactionHeaderInput = .default,
-		ephemeralNotaryPublicKey: Curve25519.Signing.PublicKey = Curve25519.Signing.PrivateKey().publicKey
+		ephemeralNotaryPublicKey: Curve25519.Signing.PublicKey
 	) {
 		self.manifestToSign = manifestToSign
 		self.message = message
@@ -226,10 +237,13 @@ public struct FeePayerCandidate: Sendable, Hashable, Identifiable {
 }
 
 // MARK: - TransactionToReview
-public struct TransactionToReview: Sendable, Equatable {
+public struct TransactionToReview: Sendable, Hashable {
 	public let analyzedManifestToReview: ExecutionAnalysis
 	public let networkID: NetworkID
-	public let feePayerSelectionAmongstCandidates: FeePayerSelectionAmongstCandidates
+
+	public var feePayerSelectionAmongstCandidates: FeePayerSelectionAmongstCandidates
+	public var transactionSigners: TransactionSigners
+	public var signingFactors: SigningFactors
 }
 
 // MARK: - FeePayerSelectionAmongstCandidates
@@ -258,7 +272,7 @@ public struct TransactionFee: Hashable, Sendable {
 	/// FeeLocks after transaction was analyzed
 	public let feeLocks: FeeLocks
 
-	/// The calculaton mode
+	/// The calculation mode
 	public var mode: Mode
 
 	public init(feeSummary: FeeSummary, feeLocks: FeeLocks, mode: Mode) {
@@ -271,12 +285,19 @@ public struct TransactionFee: Hashable, Sendable {
 		self.init(feeSummary: feeSummary, feeLocks: feeLocks, mode: .normal(.init(feeSummary: feeSummary, feeLocks: feeLocks)))
 	}
 
-	public init(executionAnalysis: ExecutionAnalysis) throws {
+	public init(executionAnalysis: ExecutionAnalysis, signaturesCount: Int) throws {
+		// every transaction has a lockFee instruction.
+		let guaranteesFee: BigDecimal = try executionAnalysis.guranteesFee()
+		let signaturesFee = BigDecimal(signaturesCount) * PredefinedFeeConstants.signatureCost
+
 		let feeSummary: FeeSummary = try .init(
 			executionCost: executionAnalysis.feeSummary.executionCost.asBigDecimal(),
 			finalizationCost: executionAnalysis.feeSummary.finalizationCost.asBigDecimal(),
 			storageExpansionCost: executionAnalysis.feeSummary.storageExpansionCost.asBigDecimal(),
-			royaltyCost: executionAnalysis.feeSummary.royaltyCost.asBigDecimal()
+			royaltyCost: executionAnalysis.feeSummary.royaltyCost.asBigDecimal(),
+			guaranteesCost: guaranteesFee,
+			signaturesCost: signaturesFee,
+			lockFeeCost: PredefinedFeeConstants.lockFeeInstructionCost
 		)
 
 		let feeLocks: FeeLocks = try .init(
@@ -288,6 +309,39 @@ public struct TransactionFee: Hashable, Sendable {
 			feeSummary: feeSummary,
 			feeLocks: feeLocks
 		)
+	}
+
+	public mutating func updatingSignaturesCost(_ signaturesCount: Int) {
+		var feeSummary = feeSummary
+		feeSummary.signaturesCost = BigDecimal(signaturesCount) * PredefinedFeeConstants.signatureCost
+		let mode: Mode = {
+			switch self.mode {
+			case .normal:
+				return .normal(.init(feeSummary: feeSummary, feeLocks: feeLocks))
+			case .advanced:
+				return .advanced(.init(feeSummary: feeSummary))
+			}
+		}()
+		self = .init(feeSummary: feeSummary, feeLocks: feeLocks, mode: mode)
+	}
+}
+
+extension ExecutionAnalysis {
+	func guranteesFee() throws -> BigDecimal {
+		let transaction = try transactionTypes.transactionKind()
+		switch transaction {
+		case .nonConforming:
+			return .zero
+		case let .conforming(transaction):
+			return transaction.accountDeposits.flatMap(\.value).reduce(.zero) { result, resource in
+				switch resource {
+				case .fungible(_, .predicted):
+					return result + TransactionFee.PredefinedFeeConstants.fungibleGuaranteeInstructionCost
+				default:
+					return result
+				}
+			}
+		}
 	}
 }
 
@@ -326,7 +380,10 @@ extension TransactionFee {
 		/// 15% margin is added here to make up for the ambiguity of the transaction preview estimate)
 		public static let networkFeeMultiplier: BigDecimal = 0.15
 
-		// TODO: Add WalletFees table. Which is yet to be determined.
+		public static let lockFeeInstructionCost = try! BigDecimal(fromString: "0.09184043787434")
+		public static let fungibleGuaranteeInstructionCost = try! BigDecimal(fromString: "0.01199514744466")
+		public static let nonFungibleGuranteeInstructionCost = try! BigDecimal(fromString: "0.01283759744466")
+		public static let signatureCost = try! BigDecimal(fromString: "0.01200849179687")
 	}
 
 	public enum Mode: Hashable, Sendable {
@@ -340,20 +397,42 @@ extension TransactionFee {
 		public let storageExpansionCost: BigDecimal
 		public let royaltyCost: BigDecimal
 
+		public let guaranteesCost: BigDecimal
+		public let lockFeeCost: BigDecimal
+
+		/// Signatures cost be updated
+		public var signaturesCost: BigDecimal
+
+		public var totalExecutionCost: BigDecimal {
+			executionCost
+				+ guaranteesCost
+				+ signaturesCost
+				+ lockFeeCost
+		}
+
 		public var total: BigDecimal {
-			executionCost + finalizationCost + storageExpansionCost + royaltyCost
+			totalExecutionCost
+				+ finalizationCost
+				+ storageExpansionCost
+				+ royaltyCost
 		}
 
 		public init(
 			executionCost: BigDecimal,
 			finalizationCost: BigDecimal,
 			storageExpansionCost: BigDecimal,
-			royaltyCost: BigDecimal
+			royaltyCost: BigDecimal,
+			guaranteesCost: BigDecimal,
+			signaturesCost: BigDecimal,
+			lockFeeCost: BigDecimal
 		) {
 			self.executionCost = executionCost
 			self.finalizationCost = finalizationCost
 			self.storageExpansionCost = storageExpansionCost
 			self.royaltyCost = royaltyCost
+			self.guaranteesCost = guaranteesCost
+			self.signaturesCost = signaturesCost
+			self.lockFeeCost = lockFeeCost
 		}
 	}
 
@@ -368,14 +447,12 @@ extension TransactionFee {
 	}
 
 	public struct AdvancedFeeCustomization: Hashable, Sendable {
-		private let networkFee: BigDecimal
-
 		public let feeSummary: FeeSummary
 		public var paddingFee: BigDecimal
 		public var tipPercentage: BigDecimal
 
 		public var tipAmount: BigDecimal {
-			(tipPercentage / 100) * networkFee
+			(tipPercentage / 100) * (feeSummary.totalExecutionCost + feeSummary.finalizationCost)
 		}
 
 		public var total: BigDecimal {
@@ -384,9 +461,7 @@ extension TransactionFee {
 
 		public init(feeSummary: FeeSummary) {
 			self.feeSummary = feeSummary
-			// The networkFee is used to derive the base PaddingFee as well the tipAmount
-			self.networkFee = feeSummary.executionCost + feeSummary.finalizationCost
-			self.paddingFee = networkFee * PredefinedFeeConstants.networkFeeMultiplier
+			self.paddingFee = (feeSummary.totalExecutionCost + feeSummary.finalizationCost + feeSummary.storageExpansionCost) * PredefinedFeeConstants.networkFeeMultiplier
 			self.tipPercentage = .zero
 		}
 	}
@@ -404,9 +479,9 @@ extension TransactionFee {
 
 		public init(feeSummary: FeeSummary, feeLocks: FeeLocks) {
 			let networkFee = (
-				feeSummary.executionCost +
-					feeSummary.finalizationCost +
-					feeSummary.storageExpansionCost
+				feeSummary.totalExecutionCost
+					+ feeSummary.finalizationCost
+					+ feeSummary.storageExpansionCost
 			) * (1 + PredefinedFeeConstants.networkFeeMultiplier) // add network multiplier on top
 			let remainingNonContingentLock = feeLocks.nonContingentLock.clampedDiff(networkFee)
 
