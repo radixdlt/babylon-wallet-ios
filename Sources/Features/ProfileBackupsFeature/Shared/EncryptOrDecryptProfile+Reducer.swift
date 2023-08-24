@@ -176,7 +176,6 @@ public struct EncryptOrDecryptProfile: Sendable, FeatureReducer {
 					return .send(.delegate(.successfullyEncrypted(plaintext: snapshot, encrypted: encrypted)))
 				} catch {
 					loggerGlobal.error("Failed to encrypt profile snapshot, error: \(error)")
-//					errorQueue.schedule(error)
 					state.destination = .incorrectPasswordAlert(encrypt: true)
 					return .none
 				}
@@ -186,7 +185,6 @@ public struct EncryptOrDecryptProfile: Sendable, FeatureReducer {
 					return .send(.delegate(.successfullyDecrypted(encrypted: encrypted, decrypted: decrypted)))
 				} catch {
 					loggerGlobal.error("Failed to encrypt profile snapshot, error: \(error)")
-//					errorQueue.schedule(error)
 					state.destination = .incorrectPasswordAlert(encrypt: false)
 					return .none
 				}
