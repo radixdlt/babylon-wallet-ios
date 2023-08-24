@@ -100,18 +100,6 @@ struct DappInteractor: Sendable, FeatureReducer {
 	func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .task:
-			Task {
-				await dappInteractionClient.addWalletInteraction(.transaction(.init(
-					send: .init(
-						version: .default,
-						transactionManifest: try! ManifestBuilder.manifestForCreateFungibleToken(
-							account: try! .init(validatingAddress: "account_tdx_21_1282we8jeqchcx6kp20skhkz9j6cu8dr2gtfxwr7avptcand0cten8t"),
-							networkID: .enkinet
-						),
-						message: "hello world"
-					)
-				)))
-			}
 			return handleIncomingRequests()
 		case let .responseFailureAlert(action):
 			switch action {

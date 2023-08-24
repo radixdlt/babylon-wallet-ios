@@ -446,13 +446,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 						userAccounts: userAccounts,
 						networkID: networkID
 					),
-					dAppsUsed: .init(
-						isExpanded: false,
-						dApps: [
-							.init(id: .wallet, metadata: nil),
-						]
-					),
-					//					dAppsUsed:  try? extractUsedDapps(transaction),
+					dAppsUsed: try? extractUsedDapps(transaction),
 					deposits: try? extractDeposits(
 						transaction,
 						userAccounts: userAccounts,
