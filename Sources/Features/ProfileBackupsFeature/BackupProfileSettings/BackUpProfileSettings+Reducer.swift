@@ -69,11 +69,11 @@ public struct BackUpProfileSettings: Sendable, FeatureReducer {
 				TextState("Encrypt this backup with a password?")
 			},
 			actions: {
-				ButtonState(role: .destructive, action: .encrypt) {
+				ButtonState(action: .encrypt) {
 					// FIXME: Strings
 					TextState("Yes")
 				}
-				ButtonState(role: .destructive, action: .doNotEncrypt) {
+				ButtonState(action: .doNotEncrypt) {
 					// FIXME: Strings
 					TextState("No")
 				}
