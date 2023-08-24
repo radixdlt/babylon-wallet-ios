@@ -27,9 +27,8 @@ extension TransactionReview.State {
 				return nil
 			}(),
 			isExpandedDappUsed: dAppsUsed?.isExpanded == true,
-			paddingBelowMessage: message != .none && dAppsUsed == nil && (withdrawals != nil || deposits != nil),
-			paddingBelowWithdrawals: withdrawals != nil && deposits != nil && dAppsUsed == nil,
-			showDepositsHeading: deposits != nil,
+			hasMessageOrWithdrawals: message != .none || withdrawals != nil,
+			hasDeposits: deposits != nil,
 			viewControlState: viewControlState,
 			showDottedLine: (withdrawals != nil || message != .none) && deposits != nil,
 			rawTransaction: displayMode.rawTransaction,
@@ -53,9 +52,8 @@ extension TransactionReview {
 	public struct ViewState: Equatable {
 		let message: String?
 		let isExpandedDappUsed: Bool
-		let paddingBelowMessage: Bool
-		let paddingBelowWithdrawals: Bool
-		let showDepositsHeading: Bool
+		let hasMessageOrWithdrawals: Bool
+		let hasDeposits: Bool
 		let viewControlState: ControlState
 		let showDottedLine: Bool
 		let rawTransaction: String?
@@ -184,40 +182,26 @@ extension TransactionReview {
 		}
 
 		@ViewBuilder
-		private func usingDappsSection(
-			expanded: Bool,
-			showDepositsHeading: Bool,
-			showDottedLine: Bool
-		) -> some SwiftUI.View {
-			VStack(alignment: .trailing, spacing: .medium2) {
-//				let usedDappsStore = StoreOf<TransactionReviewDappsUsed>(initialState: .init(
-//					isExpanded: expanded,
-//					dApps: [] as IdentifiedArrayOf<TransactionReview.DappEntity>
-//				)) {
-//					TransactionReviewDappsUsed()
-//				}
-//
-//				TransactionReviewDappsUsed.View(store: usedDappsStore, isExpanded: expanded)
-//					.padding(.top, .medium2)
-
+		private func usingDappsSection(for viewStore: ViewStoreOf<TransactionReview>) -> some SwiftUI.View {
+			VStack(alignment: .trailing, spacing: 0) {
 				let usedDappsStore = store.scope(state: \.dAppsUsed) { .child(.dAppsUsed($0)) }
 				IfLetStore(usedDappsStore) { childStore in
-					TransactionReviewDappsUsed.View(store: childStore, isExpanded: expanded)
-						.padding(.top, .medium2)
-						.border(.black)
+					TransactionReviewDappsUsed.View(store: childStore, isExpanded: viewStore.isExpandedDappUsed)
+						.padding(.top, viewStore.hasMessageOrWithdrawals ? .medium2 : 0)
+						.padding(.bottom, viewStore.hasDeposits ? .medium2 : 0)
 				} else: {
-					if showDepositsHeading {
+					if viewStore.hasMessageOrWithdrawals, viewStore.hasDeposits {
 						FixedSpacer(height: .medium2)
 					}
 				}
 
-				if showDepositsHeading {
+				if viewStore.hasDeposits {
 					TransactionHeading(L10n.TransactionReview.depositsHeading)
 						.padding(.bottom, .small2)
 				}
 			}
 			.background(alignment: .trailing) {
-				if showDottedLine {
+				if viewStore.showDottedLine {
 					VLine()
 						.stroke(.app.gray3, style: .transactionReview)
 						.frame(width: 1)
