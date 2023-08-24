@@ -30,7 +30,6 @@ extension TransactionReview.State {
 			hasMessageOrWithdrawals: message != .none || withdrawals != nil,
 			hasDeposits: deposits != nil,
 			viewControlState: viewControlState,
-			showDottedLine: (withdrawals != nil || message != .none) && deposits != nil,
 			rawTransaction: displayMode.rawTransaction,
 			showApprovalSlider: reviewedTransaction != nil,
 			canApproveTX: canApproveTX && reviewedTransaction?.feePayingValidation == .valid,
@@ -55,7 +54,6 @@ extension TransactionReview {
 		let hasMessageOrWithdrawals: Bool
 		let hasDeposits: Bool
 		let viewControlState: ControlState
-		let showDottedLine: Bool
 		let rawTransaction: String?
 		let showApprovalSlider: Bool
 		let canApproveTX: Bool
@@ -201,7 +199,7 @@ extension TransactionReview {
 				}
 			}
 			.background(alignment: .trailing) {
-				if viewStore.showDottedLine {
+				if viewStore.hasMessageOrWithdrawals, viewStore.hasDeposits {
 					VLine()
 						.stroke(.app.gray3, style: .transactionReview)
 						.frame(width: 1)
