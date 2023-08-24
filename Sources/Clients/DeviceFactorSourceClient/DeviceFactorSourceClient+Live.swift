@@ -102,11 +102,7 @@ extension DeviceFactorSourceClient: DependencyKey {
 
 					do {
 						let hasControlOfAllAccounts = try mnemonicWithPassphrase.validatePublicKeysOf(accounts: accountsControlledByMainDeviceFactorSource)
-						if hasControlOfAllAccounts {
-							return false
-						} else {
-							return true
-						}
+						return !hasControlOfAllAccounts // if we dont have controll of ALL accounts, then recovery is needed.
 					} catch {
 						// Account recover needed
 						return true
