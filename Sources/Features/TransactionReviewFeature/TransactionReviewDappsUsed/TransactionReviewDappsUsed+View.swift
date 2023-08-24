@@ -48,7 +48,6 @@ extension TransactionReviewDappsUsed {
 					} label: {
 						HeadingLabel(isExpanded: isExpanded)
 					}
-					.background(.app.gray5)
 					.padding(.trailing, .medium3)
 
 					if isExpanded {

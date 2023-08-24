@@ -27,11 +27,13 @@ extension TransactionReview.State {
 				return nil
 			}(),
 			isExpandedDappUsed: dAppsUsed?.isExpanded == true,
+			paddingBelowMessage: message != .none && dAppsUsed == nil && (withdrawals != nil || deposits != nil),
+			paddingBelowWithdrawals: withdrawals != nil && deposits != nil && dAppsUsed == nil,
 			showDepositsHeading: deposits != nil,
 			viewControlState: viewControlState,
 			showDottedLine: (withdrawals != nil || message != .none) && deposits != nil,
 			rawTransaction: displayMode.rawTransaction,
-			showApproveButton: reviewedTransaction != nil,
+			showApprovalSlider: reviewedTransaction != nil,
 			canApproveTX: canApproveTX && reviewedTransaction?.feePayingValidation == .valid,
 			canToggleViewMode: reviewedTransaction != nil && reviewedTransaction?.transaction != .nonConforming
 		)
@@ -51,11 +53,13 @@ extension TransactionReview {
 	public struct ViewState: Equatable {
 		let message: String?
 		let isExpandedDappUsed: Bool
+		let paddingBelowMessage: Bool
+		let paddingBelowWithdrawals: Bool
 		let showDepositsHeading: Bool
 		let viewControlState: ControlState
 		let showDottedLine: Bool
 		let rawTransaction: String?
-		let showApproveButton: Bool
+		let showApprovalSlider: Bool
 		let canApproveTX: Bool
 		let canToggleViewMode: Bool
 
@@ -159,10 +163,11 @@ extension TransactionReview {
 		@ViewBuilder
 		private func messageSection(with message: String?) -> some SwiftUI.View {
 			if let message {
-				TransactionHeading(L10n.TransactionReview.messageHeading)
-					.padding(.bottom, .small2)
+				VStack(spacing: .small2) {
+					TransactionHeading(L10n.TransactionReview.messageHeading)
 
-				TransactionMessageView(message: message)
+					TransactionMessageView(message: message)
+				}
 			}
 		}
 
@@ -170,11 +175,11 @@ extension TransactionReview {
 		private var withdrawalsSection: some SwiftUI.View {
 			let withdrawalsStore = store.scope(state: \.withdrawals) { .child(.withdrawals($0)) }
 			IfLetStore(withdrawalsStore) { childStore in
-				TransactionHeading(L10n.TransactionReview.withdrawalsHeading)
-					.padding(.top, .medium2)
-					.padding(.bottom, .small2)
+				VStack(spacing: .small2) {
+					TransactionHeading(L10n.TransactionReview.withdrawalsHeading)
 
-				TransactionReviewAccounts.View(store: childStore)
+					TransactionReviewAccounts.View(store: childStore)
+				}
 			}
 		}
 
@@ -185,12 +190,25 @@ extension TransactionReview {
 			showDottedLine: Bool
 		) -> some SwiftUI.View {
 			VStack(alignment: .trailing, spacing: .medium2) {
+//				let usedDappsStore = StoreOf<TransactionReviewDappsUsed>(initialState: .init(
+//					isExpanded: expanded,
+//					dApps: [] as IdentifiedArrayOf<TransactionReview.DappEntity>
+//				)) {
+//					TransactionReviewDappsUsed()
+//				}
+//
+//				TransactionReviewDappsUsed.View(store: usedDappsStore, isExpanded: expanded)
+//					.padding(.top, .medium2)
+
 				let usedDappsStore = store.scope(state: \.dAppsUsed) { .child(.dAppsUsed($0)) }
 				IfLetStore(usedDappsStore) { childStore in
 					TransactionReviewDappsUsed.View(store: childStore, isExpanded: expanded)
 						.padding(.top, .medium2)
+						.border(.black)
 				} else: {
-					FixedSpacer(height: .medium2)
+					if showDepositsHeading {
+						FixedSpacer(height: .medium2)
+					}
 				}
 
 				if showDepositsHeading {
@@ -213,7 +231,6 @@ extension TransactionReview {
 			let depositsStore = store.scope(state: \.deposits) { .child(.deposits($0)) }
 			IfLetStore(depositsStore) { childStore in
 				TransactionReviewAccounts.View(store: childStore)
-					.padding(.bottom, .medium1)
 			}
 		}
 
@@ -222,9 +239,10 @@ extension TransactionReview {
 			let proofsStore = store.scope(state: \.proofs) { .child(.proofs($0)) }
 			IfLetStore(proofsStore) { childStore in
 				TransactionReviewProofs.View(store: childStore)
+					.padding(.bottom, .medium1)
 
 				Separator()
-					.padding(.bottom, .medium1)
+					.padding(.horizontal, -.small3)
 			}
 		}
 
@@ -354,6 +372,7 @@ struct RawTransactionView: SwiftUI.View {
 	var body: some SwiftUI.View {
 		Text(transaction)
 			.textStyle(.monospace)
+			.multilineTextAlignment(.leading)
 			.foregroundColor(.app.gray1)
 			.frame(
 				maxWidth: .infinity,
@@ -361,7 +380,6 @@ struct RawTransactionView: SwiftUI.View {
 				alignment: .topLeading
 			)
 			.padding()
-			.multilineTextAlignment(.leading)
 	}
 }
 
