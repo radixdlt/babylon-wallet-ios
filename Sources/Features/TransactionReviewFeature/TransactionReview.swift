@@ -5,6 +5,7 @@ import CryptoKit
 import EngineKit
 import FeaturePrelude
 import GatewayAPI
+import OnLedgerEntitiesClient
 import SigningFeature
 import TransactionClient
 
@@ -387,6 +388,9 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			return .none
 
 		case .fungibleTokenDetails:
+			return .none
+
+		case .nonFungibleTokenDetails:
 			return .none
 		}
 	}
