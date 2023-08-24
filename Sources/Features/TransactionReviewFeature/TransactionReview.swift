@@ -83,6 +83,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		case previewLoaded(TaskResult<TransactionToReview>)
 		case createTransactionReview(TransactionReview.TransactionContent)
 		case prepareForSigningResult(TaskResult<TransactionClient.PrepareForSiginingResponse>)
+		case loadedOnLedgerResource(TaskResult<OnLedgerEntity.Resource>)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -142,6 +143,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 	@Dependency(\.transactionClient) var transactionClient
 	@Dependency(\.gatewayAPIClient) var gatewayAPIClient
 	@Dependency(\.accountsClient) var accountsClient
+	@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
 	@Dependency(\.continuousClock) var clock
 	@Dependency(\.errorQueue) var errorQueue
 
@@ -247,10 +249,15 @@ public struct TransactionReview: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
-		case .withdrawals(.delegate(.showAsset)):
-			// FIXME: HANDLE
-			print("Tapped asset in withdrawals")
-			return .none
+		case let .withdrawals(.delegate(.showAsset(resource))),
+		     let .deposits(.delegate(.showAsset(resource))):
+
+			return .run { send in
+				let result = await TaskResult {
+					try await onLedgerEntitiesClient.getResource(resource)
+				}
+				await send(.internal(.loadedOnLedgerResource(result)))
+			}
 
 		case let .dAppsUsed(.delegate(.openDapp(id))):
 			state.destination = .dApp(.init(dAppID: id))
@@ -269,17 +276,6 @@ public struct TransactionReview: Sendable, FeatureReducer {
 
 			state.destination = .customizeGuarantees(.init(guarantees: .init(uniqueElements: guarantees)))
 
-			return .none
-
-		case .deposits(.delegate(.showAsset)):
-
-//			state.destination = .fungibleTokenDetails(.init(
-//				resource: <#T##AccountPortfolio.FungibleResource#>,
-//				isXRD: <#T##Bool#>
-//			))
-
-			// FIXME: HANDLE
-			print("Tapped asset in deposit")
 			return .none
 
 		case .networkFee(.delegate(.showCustomizeFees)):
@@ -477,6 +473,25 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			state.networkFee = content.networkFee
 			return .none
 
+		case let .loadedOnLedgerResource(.success(resource)):
+			print("Resource:\(resource.name) \(resource.symbol)")
+
+			switch resource.resourceAddress.decodedKind {
+			case .globalFungibleResourceManager:
+				break
+			case .globalNonFungibleResourceManager:
+				break
+			default:
+				struct WrongEntityType: Error { let type: EntityType }
+				errorQueue.schedule(WrongEntityType(type: resource.resourceAddress.decodedKind))
+			}
+
+			return .none
+
+		case let .loadedOnLedgerResource(.failure(error)):
+			errorQueue.schedule(error)
+			return .none
+
 		case let .prepareForSigningResult(.success(response)):
 			state.destination = .signing(.init(
 				factorsLeftToSignWith: response.signingFactors,
@@ -566,6 +581,8 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		}
 	}
 }
+
+// extension
 
 extension TransactionReview {
 	public struct TransactionContent: Sendable, Hashable {
@@ -744,6 +761,7 @@ extension TransactionReview {
 			}
 
 			return [.fungible(.init(
+				resource: resourceAddress,
 				amount: amount,
 				name: metadata.name,
 				symbol: metadata.symbol,
@@ -756,6 +774,7 @@ extension TransactionReview {
 			if isNewResource {
 				return try ids.map { id in
 					try Transfer.nonFungible(.init(
+						resource: resourceAddress,
 						resourceName: metadata.name,
 						resourceImage: metadata.thumbnail,
 						tokenID: id.toString().userFacingNonFungibleLocalID,
@@ -777,6 +796,7 @@ extension TransactionReview {
 				.nonFungibleIds
 				.map {
 					Transfer.nonFungible(.init(
+						resource: resourceAddress,
 						resourceName: metadata.name,
 						resourceImage: metadata.thumbnail,
 						tokenID: $0.nonFungibleId.userFacingNonFungibleLocalID,
@@ -855,6 +875,15 @@ extension TransactionReview {
 			}
 		}
 
+		public var resource: ResourceAddress {
+			switch self {
+			case let .fungible(details):
+				return details.resource
+			case let .nonFungible(details):
+				return details.resource
+			}
+		}
+
 		public var fungible: FungibleTransfer? {
 			get {
 				guard case let .fungible(details) = self else { return nil }
@@ -880,6 +909,7 @@ extension TransactionReview {
 
 	public struct FungibleTransfer: Sendable, Hashable {
 		public let id = Transfer.ID()
+		public let resource: ResourceAddress
 		public let amount: BigDecimal
 		public let name: String?
 		public let symbol: String?
@@ -890,6 +920,7 @@ extension TransactionReview {
 
 	public struct NonFungibleTransfer: Sendable, Hashable {
 		public let id = Transfer.ID()
+		public let resource: ResourceAddress
 		public let resourceName: String?
 		public let resourceImage: URL?
 		public let tokenID: String
