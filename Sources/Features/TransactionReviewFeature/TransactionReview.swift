@@ -251,16 +251,21 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		switch childAction {
 		case let .withdrawals(.delegate(.showAsset(assetTransfer))),
 		     let .deposits(.delegate(.showAsset(assetTransfer))):
-
+			let metadata = state.reviewedTransaction?.metadataForNewlyCreatedResource(assetTransfer.resource)
 			switch assetTransfer {
 			case let .fungible(transfer):
-				state.destination = .fungibleTokenDetails(.init(transfer: transfer))
+				state.destination = .fungibleTokenDetails(.init(transfer: transfer, metadata: metadata))
 			case let .nonFungible(transfer):
 				do {
-					state.destination = try .nonFungibleTokenDetails(.init(transfer: transfer))
+					state.destination = try .nonFungibleTokenDetails(.init(transfer: transfer, metadata: metadata))
 				} catch {
 					errorQueue.schedule(error)
 				}
+			}
+
+			if metadata != nil {
+				// Only newly created resources have metadata, if so it's pointless to call onLedgerEntitiesClient
+				return .none
 			}
 
 			return .run { send in
@@ -519,7 +524,6 @@ public struct TransactionReview: Sendable, FeatureReducer {
 
 		case let .loadedOnLedgerResource(_, .failure(error)):
 			loggerGlobal.warning("Failed to load on-ledger resource: \(error)")
-			errorQueue.schedule(error)
 			return .none
 
 		case let .prepareForSigningResult(.success(response)):
@@ -761,9 +765,9 @@ extension TransactionReview {
 		let metadata: (name: String?, symbol: String?, thumbnail: URL?) = await {
 			if let newResourceMetadata = metadataOfCreatedEntities?[resourceAddress.address] {
 				return (
-					newResourceMetadata["name"]??.string,
-					newResourceMetadata["symbol"]??.string,
-					newResourceMetadata["icon_url"]??.url
+					newResourceMetadata.name,
+					newResourceMetadata.symbol,
+					newResourceMetadata.iconURL
 				)
 			} else {
 				let remoteMetadata = try? await gatewayAPIClient.getEntityMetadata(resourceAddress.address, [.name, .symbol, .iconURL])
@@ -1560,5 +1564,12 @@ extension FeePayerSelectionAmongstCandidates {
 		}
 
 		return .valid
+	}
+}
+
+extension ReviewedTransaction {
+	func metadataForNewlyCreatedResource(_ resource: ResourceAddress) -> [String: MetadataValue?]? {
+		guard case let .conforming(conforming) = transaction else { return nil }
+		return conforming.metadataOfNewlyCreatedEntities[resource.address]
 	}
 }

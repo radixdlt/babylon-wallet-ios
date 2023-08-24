@@ -6,70 +6,51 @@ import Prelude
 import SharedModels
 
 extension NonFungibleTokenDetails.State {
-	/// Starting out, we only have the transfer
-	init(transfer: TransactionReview.NonFungibleTransfer) throws {
+	init(
+		transfer: TransactionReview.NonFungibleTransfer,
+		metadata: [String: MetadataValue?]? = nil,
+		resource: OnLedgerEntity.Resource? = nil
+	) throws {
 		try self.init(
-			token: .init(transfer: transfer),
-			resource: .init(transfer: transfer)
-		)
-	}
-
-	/// Later on we will have loaded the resource as well
-	init(transfer: TransactionReview.NonFungibleTransfer, resource: OnLedgerEntity.Resource) throws {
-		try self.init(
-			token: .init(transfer: transfer),
-			resource: .init(resource: resource)
+			token: .init(transfer: transfer, resource: resource),
+			resource: .init(transfer: transfer, metadata: metadata, resource: resource)
 		)
 	}
 }
 
 extension AccountPortfolio.NonFungibleResource {
-	/// Starting out, when we only have the transfer
-	init(transfer: TransactionReview.NonFungibleTransfer) {
+	init(
+		transfer: TransactionReview.NonFungibleTransfer,
+		metadata: [String: MetadataValue?]?,
+		resource: OnLedgerEntity.Resource?
+	) {
 		self.init(
 			resourceAddress: transfer.resource,
-			name: transfer.resourceName,
-			iconURL: transfer.resourceImage,
-			tokens: []
-		)
-	}
-
-	/// Later on we will have loaded the resource, so we have all the values we need
-	init(resource: OnLedgerEntity.Resource) {
-		self.init(
-			resourceAddress: resource.resourceAddress,
-			name: resource.name,
-			description: resource.description,
-			iconURL: resource.iconURL,
-			behaviors: resource.behaviors,
-			tags: resource.tags,
+			name: metadata?.name ?? resource?.name ?? transfer.resourceName,
+			description: metadata?.description ?? resource?.description,
+			iconURL: resource?.iconURL ?? metadata?.iconURL ?? transfer.resourceImage,
+			behaviors: resource?.behaviors ?? [],
+			tags: resource?.tags ?? [],
 			tokens: [],
-			totalSupply: resource.totalSupply
+			totalSupply: resource?.totalSupply
 		)
 	}
 }
 
 extension AccountPortfolio.NonFungibleResource.NonFungibleToken {
-	/// Starting out, when we only have the transfer
-	init(transfer: TransactionReview.NonFungibleTransfer) throws {
+	init(
+		transfer: TransactionReview.NonFungibleTransfer,
+		resource: OnLedgerEntity.Resource?
+	) throws {
 		try self.init(
 			id: transfer.nonFungibleGlobalId(),
-			name: transfer.tokenName
+			name: transfer.tokenName,
+			description: nil, // FIXME: FIND
+			keyImageURL: nil, // FIXME: FIND
+			metadata: [], // FIXME: FIND
+			stakeClaimAmount: nil,
+			canBeClaimed: false // FIXME: FIND
 		)
-	}
-
-	/// Later on we will have loaded the resource, so we have all the values we need
-	init(transfer: TransactionReview.NonFungibleTransfer, resource: OnLedgerEntity.Resource) throws {
-		fatalError()
-//		self.init(
-//			id: try .init(transfer: transfer),
-//			name: resource.name,
-//			description: resource.description,
-//			keyImageURL: transfer.,
-//			metadata: <#T##[AccountPortfolio.Metadata]#>,
-//			stakeClaimAmount: <#T##BigDecimal?#>,
-//			canBeClaimed: <#T##Bool#>
-//		)
 	}
 }
 
