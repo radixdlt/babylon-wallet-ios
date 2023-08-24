@@ -403,6 +403,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 				// FIXME: propagate/display error?
 			}
 		case .nonConforming:
+			state.networkFee = .init(reviewedTransaction: transactionToReview)
 			return showRawTransaction(&state)
 		}
 	}

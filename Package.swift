@@ -42,6 +42,7 @@ package.addModules([
 			"ShowQRFeature",
 			"OverlayWindowClient",
 			"OnLedgerEntitiesClient",
+			"DappInteractionClient",
 		],
 		tests: .yes()
 	),
