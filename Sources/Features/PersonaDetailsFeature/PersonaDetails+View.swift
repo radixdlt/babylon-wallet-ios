@@ -557,7 +557,7 @@ extension SimpleAuthDappDetails.View {
 
 					ForEach(elements) { element in
 						Card {
-							PlainListRow(title: title(element), showChevron: false) {
+							PlainListRow(title: title(element), accessory: nil) {
 								icon(element)
 							}
 						}
@@ -592,7 +592,7 @@ extension SimpleAuthDappDetails.View {
 
 				ForEach(personas) { persona in
 					Card {
-						PlainListRow(title: persona.displayName, showChevron: false) {
+						PlainListRow(title: persona.displayName, accessory: nil) {
 							PersonaThumbnail(persona.thumbnail)
 						}
 					}

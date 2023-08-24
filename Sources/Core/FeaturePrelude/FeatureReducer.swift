@@ -76,3 +76,19 @@ public typealias PresentationStoreOf<R: ReducerProtocol> = Store<PresentationSta
 public typealias ViewStoreOf<Feature: FeatureReducer> = ViewStore<Feature.ViewState, Feature.ViewAction>
 
 public typealias StackActionOf<R: ReducerProtocol> = StackAction<R.State, R.Action>
+
+// MARK: - FeatureAction + Hashable
+extension FeatureAction: Hashable where Feature.ViewAction: Hashable, Feature.ChildAction: Hashable, Feature.InternalAction: Hashable, Feature.DelegateAction: Hashable {
+	public func hash(into hasher: inout Hasher) {
+		switch self {
+		case let .view(action):
+			hasher.combine(action)
+		case let .internal(action):
+			hasher.combine(action)
+		case let .child(action):
+			hasher.combine(action)
+		case let .delegate(action):
+			hasher.combine(action)
+		}
+	}
+}
