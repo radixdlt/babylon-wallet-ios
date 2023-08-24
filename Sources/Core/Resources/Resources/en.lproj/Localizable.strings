@@ -357,6 +357,7 @@
 "transactionReview_customizeNetworkFeeSheet_padding" = "Padding";
 "transactionReview_customizeNetworkFeeSheet_royalties" = "Royalties";
 "transactionReview_customizeNetworkFeeSheet_royaltyFee" = "Royalty fee";
+"transactionReview_customizeNetworkFeeSheet_paidByDApps" = "Paid by dApps";
 "transactionReview_customizeNetworkFeeSheet_paddingFieldLabel" = "Adjust Fee Padding Amount (XRD)";
 "transactionReview_customizeNetworkFeeSheet_tipFieldLabel" = "Adjust Tip to Lock";
 "transactionReview_customizeNetworkFeeSheet_tipFieldInfo" = "(%% of Execution + Finalization Fees)";
