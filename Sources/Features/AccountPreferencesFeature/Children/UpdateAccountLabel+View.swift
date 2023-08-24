@@ -61,7 +61,7 @@ extension UpdateAccountLabel {
 					.padding(.large3)
 					.background(.app.background)
 
-					Spacer()
+					Spacer(minLength: 0)
 				}
 				.background(.app.gray5)
 				.navigationTitle("Rename Account") // FIXME: strings
