@@ -264,12 +264,10 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			}
 
 			return .run { send in
-				print("will loadedOnLedgerResource")
-
 				let result = await TaskResult {
-					try await onLedgerEntitiesClient.getResource(assetTransfer.resource)
+					try await Task.sleep(for: .seconds(2))
+					return try await onLedgerEntitiesClient.getResource(assetTransfer.resource)
 				}
-				print("did loadedOnLedgerResource")
 
 				await send(.internal(.loadedOnLedgerResource(assetTransfer, result)))
 			}
@@ -499,16 +497,14 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			return .none
 
 		case let .loadedOnLedgerResource(assetTransfer, .success(resource)):
-
-			print("LOADED:")
-			print(resource.description)
-
 			let kind = resource.resourceAddress.decodedKind
 			// Now we also have the resource and we can update the details view
 			switch (assetTransfer, kind) {
 			case let (.fungible(transfer), .globalFungibleResourceManager):
+				guard case .fungibleTokenDetails = state.destination else { return .none }
 				state.destination = .fungibleTokenDetails(.init(transfer: transfer, resource: resource))
 			case let (.nonFungible(transfer), .globalNonFungibleResourceManager):
+				guard case .nonFungibleTokenDetails = state.destination else { return .none }
 				do {
 					state.destination = try .nonFungibleTokenDetails(.init(transfer: transfer, resource: resource))
 				} catch {
@@ -522,10 +518,6 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			return .none
 
 		case let .loadedOnLedgerResource(_, .failure(error)):
-
-			print("LOADING failed:")
-			print(error)
-
 			loggerGlobal.warning("Failed to load on-ledger resource: \(error)")
 			errorQueue.schedule(error)
 			return .none

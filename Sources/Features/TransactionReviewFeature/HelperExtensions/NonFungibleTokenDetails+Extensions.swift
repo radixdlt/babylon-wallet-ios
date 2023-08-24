@@ -30,7 +30,7 @@ extension AccountPortfolio.NonFungibleResource {
 			resourceAddress: transfer.resource,
 			name: transfer.resourceName,
 			iconURL: transfer.resourceImage,
-			tokens: (try? NonFungibleToken(transfer: transfer)).map { [$0] } ?? []
+			tokens: []
 		)
 	}
 
