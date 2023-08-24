@@ -1,15 +1,20 @@
 // MARK: - TransferNFTView
 public struct TransferNFTView: View {
 	public let viewState: ViewState
+	public let onTap: (() -> Void)?
 
-	public init(viewState: ViewState) {
+	public init(viewState: ViewState, onTap: (() -> Void)? = nil) {
 		self.viewState = viewState
+		self.onTap = onTap
 	}
 
 	public var body: some View {
 		HStack(spacing: .small1) {
-			NFTThumbnail(viewState.thumbnail, size: .small)
-				.padding(.vertical, .small1)
+			if let onTap {
+				Button(action: onTap, label: thumb)
+			} else {
+				thumb()
+			}
 
 			VStack(alignment: .leading, spacing: 0) {
 				Text(viewState.tokenID)
@@ -26,6 +31,11 @@ public struct TransferNFTView: View {
 			Spacer(minLength: 0)
 		}
 		.padding(.horizontal, .medium3)
+	}
+
+	private func thumb() -> some View {
+		NFTThumbnail(viewState.thumbnail, size: .small)
+			.padding(.vertical, .small1)
 	}
 }
 

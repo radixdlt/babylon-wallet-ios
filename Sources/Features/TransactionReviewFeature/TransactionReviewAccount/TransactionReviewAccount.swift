@@ -24,6 +24,7 @@ public struct TransactionReviewAccounts: Sendable, FeatureReducer {
 
 	public enum DelegateAction: Sendable, Equatable {
 		case showCustomizeGuarantees
+		case showAsset
 	}
 
 	public init() {}
@@ -39,6 +40,15 @@ public struct TransactionReviewAccounts: Sendable, FeatureReducer {
 		switch viewAction {
 		case .customizeGuaranteesTapped:
 			return .send(.delegate(.showCustomizeGuarantees))
+		}
+	}
+
+	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+		switch childAction {
+		case .account(id: _, action: .delegate(.showAsset)):
+			return .send(.delegate(.showAsset))
+		case .account:
+			return .none
 		}
 	}
 }
@@ -58,6 +68,11 @@ public struct TransactionReviewAccount: Sendable, FeatureReducer {
 
 	public enum ViewAction: Sendable, Equatable {
 		case appeared
+		case assetTapped
+	}
+
+	public enum DelegateAction: Sendable, Equatable {
+		case showAsset
 	}
 
 	public init() {}
@@ -66,6 +81,8 @@ public struct TransactionReviewAccount: Sendable, FeatureReducer {
 		switch viewAction {
 		case .appeared:
 			return .none
+		case .assetTapped:
+			return .send(.delegate(.showAsset))
 		}
 	}
 }

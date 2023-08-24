@@ -1,4 +1,5 @@
 import AppPreferencesClient
+import AssetsFeature
 import ComposableArchitecture
 import CryptoKit
 import EngineKit
@@ -97,6 +98,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			case submitting(SubmitTransaction.State)
 			case dApp(SimpleDappDetails.State)
 			case customizeFees(CustomizeFees.State)
+			case fungibleTokenDetails(FungibleTokenDetails.State)
 		}
 
 		public enum Action: Sendable, Equatable {
@@ -105,6 +107,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			case submitting(SubmitTransaction.Action)
 			case dApp(SimpleDappDetails.Action)
 			case customizeFees(CustomizeFees.Action)
+			case fungibleTokenDetails(FungibleTokenDetails.Action)
 		}
 
 		public var body: some ReducerProtocolOf<Self> {
@@ -122,6 +125,9 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			}
 			Scope(state: /State.dApp, action: /Action.dApp) {
 				SimpleDappDetails()
+			}
+			Scope(state: /State.fungibleTokenDetails, action: /Action.fungibleTokenDetails) {
+				FungibleTokenDetails()
 			}
 		}
 	}
@@ -254,6 +260,17 @@ public struct TransactionReview: Sendable, FeatureReducer {
 
 			return .none
 
+		case .deposits(.delegate(.showAsset)):
+
+//			state.destination = .fungibleTokenDetails(.init(
+//				resource: <#T##AccountPortfolio.FungibleResource#>,
+//				isXRD: <#T##Bool#>
+//			))
+
+			// FIXME: HANDLE
+			print("Tapped asset in deposit")
+			return .none
+
 		case .networkFee(.delegate(.showCustomizeFees)):
 			guard let feePayerSelection = state.reviewedTransaction?.feePayerSelection else {
 				return .none
@@ -357,6 +374,9 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			return .none
 
 		case .dApp:
+			return .none
+
+		case .fungibleTokenDetails:
 			return .none
 		}
 	}

@@ -78,9 +78,13 @@ extension TransactionReviewAccount {
 					ForEach(viewStore.transfers) { transfer in
 						switch transfer {
 						case let .fungible(fungible):
-							TransactionReviewTokenView(viewState: .init(transfer: fungible))
+							TransactionReviewTokenView(viewState: .init(transfer: fungible)) {
+								viewStore.send(.assetTapped)
+							}
 						case let .nonFungible(nonFungible):
-							TransferNFTView(viewState: .init(transfer: nonFungible))
+							TransferNFTView(viewState: .init(transfer: nonFungible)) {
+								viewStore.send(.assetTapped)
+							}
 						}
 					}
 					.background(.app.gray5)

@@ -1,3 +1,4 @@
+import AssetsFeature
 import FeaturePrelude
 import Profile
 import SigningFeature
@@ -250,6 +251,7 @@ extension View {
 		let destinationStore = store.scope(state: \.$destination, action: { .child(.destination($0)) })
 		return customizeGuarantees(with: destinationStore)
 			.dApp(with: destinationStore)
+			.fungibleTokenDetails(with: destinationStore)
 			.customizeFees(with: destinationStore)
 			.signing(with: destinationStore)
 			.submitting(with: destinationStore)
@@ -272,6 +274,16 @@ extension View {
 			state: /TransactionReview.Destinations.State.dApp,
 			action: TransactionReview.Destinations.Action.dApp,
 			content: { SimpleDappDetails.View(store: $0) }
+		)
+	}
+
+	@MainActor
+	private func fungibleTokenDetails(with destinationStore: PresentationStoreOf<TransactionReview.Destinations>) -> some View {
+		sheet(
+			store: destinationStore,
+			state: /TransactionReview.Destinations.State.fungibleTokenDetails,
+			action: TransactionReview.Destinations.Action.fungibleTokenDetails,
+			content: { FungibleTokenDetails.View(store: $0) }
 		)
 	}
 
@@ -377,11 +389,20 @@ struct TransactionReviewTokenView: View {
 	}
 
 	let viewState: ViewState
+	let onTap: (() -> Void)?
+
+	init(viewState: ViewState, onTap: (() -> Void)? = nil) {
+		self.viewState = viewState
+		self.onTap = onTap
+	}
 
 	var body: some View {
 		HStack(spacing: .small1) {
-			TokenThumbnail(viewState.thumbnail, size: .small)
-				.padding(.vertical, .small1)
+			if let onTap {
+				Button(action: onTap, label: thumb)
+			} else {
+				thumb()
+			}
 
 			if let name = viewState.name {
 				Text(name)
@@ -421,6 +442,11 @@ struct TransactionReviewTokenView: View {
 			.padding(.vertical, .medium3)
 		}
 		.padding(.horizontal, .medium3)
+	}
+
+	private func thumb() -> some View {
+		TokenThumbnail(viewState.thumbnail, size: .small)
+			.padding(.vertical, .small1)
 	}
 }
 
