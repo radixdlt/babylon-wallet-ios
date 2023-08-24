@@ -117,7 +117,7 @@ extension FaucetClient: DependencyKey {
 		#if DEBUG
 		let createFungibleToken: CreateFungibleToken = { request in
 			let networkID = await gatewaysClient.getCurrentNetworkID()
-			let manifest = try try ManifestBuilder.manifestForCreateFungibleToken(
+			let manifest = try ManifestBuilder.manifestForCreateFungibleToken(
 				account: request.recipientAccountAddress,
 				networkID: networkID
 			)
@@ -175,25 +175,12 @@ extension FaucetClient: DependencyKey {
 
 private extension UserDefaultsClient {
 	func loadEpochForWhenLastUsedByAccountAddress() -> EpochForWhenLastUsedByAccountAddress {
-		@Dependency(\.jsonDecoder) var jsonDecoder
-		if
-			let data = self.dataForKey(epochForWhenLastUsedByAccountAddressKey),
-			let epochs = try? jsonDecoder().decode(EpochForWhenLastUsedByAccountAddress.self, from: data)
-		{
-			return epochs
-		} else {
-			return .init()
-		}
+		(try? loadCodable(key: epochForWhenLastUsedByAccountAddressKey)) ?? .init()
 	}
 
 	func saveEpochForWhenLastUsedByAccountAddress(_ value: EpochForWhenLastUsedByAccountAddress) async {
-		@Dependency(\.jsonEncoder) var jsonEncoder
-		do {
-			let data = try jsonEncoder().encode(value)
-			await self.setData(data, epochForWhenLastUsedByAccountAddressKey)
-		} catch {
-			// Not important enough to throw...
-		}
+		// not important enough to propagate error
+		try? await save(codable: value, forKey: epochForWhenLastUsedByAccountAddressKey)
 	}
 }
 

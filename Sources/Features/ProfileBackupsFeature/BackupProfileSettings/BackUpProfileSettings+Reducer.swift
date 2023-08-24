@@ -149,6 +149,7 @@ public struct BackUpProfileSettings: Sendable, FeatureReducer {
 	@Dependency(\.backupsClient) var backupsClient
 	@Dependency(\.appPreferencesClient) var appPreferencesClient
 	@Dependency(\.radixConnectClient) var radixConnectClient
+	@Dependency(\.userDefaultsClient) var userDefaultsClient
 	@Dependency(\.overlayWindowClient) var overlayWindowClient
 
 	public init() {}
@@ -297,6 +298,7 @@ public struct BackUpProfileSettings: Sendable, FeatureReducer {
 
 	private func deleteProfile(keepInICloudIfPresent: Bool) -> EffectTask<Action> {
 		.task {
+			await userDefaultsClient.removeAccountsThatNeedRecovery()
 			cacheClient.removeAll()
 			await radixConnectClient.disconnectAndRemoveAll()
 			return .delegate(.deleteProfileAndFactorSources(keepInICloudIfPresent: keepInICloudIfPresent))

@@ -46,7 +46,7 @@ extension FactorSourcesClient {
 	public typealias GetFactorSources = @Sendable () async throws -> FactorSources
 	public typealias FactorSourcesAsyncSequence = @Sendable () async -> AnyAsyncSequence<FactorSources>
 	public typealias AddPrivateHDFactorSource = @Sendable (AddPrivateHDFactorSourceRequest) async throws -> FactorSourceID
-	public typealias CheckIfHasOlympiaFactorSourceForAccounts = @Sendable (NonEmpty<OrderedSet<OlympiaAccountToMigrate>>) async -> FactorSourceID.FromHash?
+	public typealias CheckIfHasOlympiaFactorSourceForAccounts = @Sendable (BIP39.WordCount, NonEmpty<OrderedSet<OlympiaAccountToMigrate>>) async -> FactorSourceID.FromHash?
 	public typealias SaveFactorSource = @Sendable (FactorSource) async throws -> Void
 	public typealias UpdateFactorSource = @Sendable (FactorSource) async throws -> Void
 	public typealias GetSigningFactors = @Sendable (GetSigningFactorsRequest) async throws -> SigningFactors

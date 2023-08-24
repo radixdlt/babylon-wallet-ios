@@ -18,6 +18,24 @@ public struct UserDefaultsClient: Sendable {
 }
 
 extension UserDefaultsClient {
+	public func loadCodable<Model: Codable>(
+		key: Key, type: Model.Type = Model.self
+	) throws -> Model? {
+		@Dependency(\.jsonDecoder) var jsonDecoder
+		guard let data = self.dataForKey(key) else {
+			return nil
+		}
+		return try jsonDecoder().decode(Model.self, from: data)
+	}
+
+	public func save<Model: Codable>(codable model: Model, forKey key: Key) async throws {
+		@Dependency(\.jsonEncoder) var jsonEncoder
+		let data = try jsonEncoder().encode(model)
+		await self.setData(data, key)
+	}
+}
+
+extension UserDefaultsClient {
 	private static let hideMigrateOlympiaButtonKey = "hideMigrateOlympiaButton"
 	public var hideMigrateOlympiaButton: Bool {
 		boolForKey(Self.hideMigrateOlympiaButtonKey)

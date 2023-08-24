@@ -59,6 +59,7 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.secureStorageClient) var secureStorageClient
 	@Dependency(\.overlayWindowClient) var overlayWindowClient
+	@Dependency(\.userDefaultsClient) var userDefaultsClient
 
 	public init() {}
 
@@ -86,7 +87,17 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 		case .skip:
 			precondition(state.entitiesControlledByFactorSource.isSkippable)
 			loggerGlobal.feature("TODO skip me")
-			return .send(.delegate(.skippedMnemonic(state.entitiesControlledByFactorSource.factorSourceID)))
+			return .task { [accountsNeedingRecover = state.entitiesControlledByFactorSource.accounts, factorSourceID = state.entitiesControlledByFactorSource.factorSourceID] in
+				do {
+					try await userDefaultsClient.addAccountsThatNeedRecovery(
+						accounts: .init(uncheckedUniqueElements: accountsNeedingRecover.map(\.address))
+					)
+				} catch {
+					// not important enough to propagate error
+					loggerGlobal.error("Failed to add accounts that need recovery")
+				}
+				return .delegate(.skippedMnemonic(factorSourceID))
+			}
 		}
 	}
 
@@ -135,8 +146,17 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 		switch internalAction {
 		case let .validated(privateHDFactorSource):
 			state.destination = nil
-			return .task {
+			return .task { [accounts = state.entitiesControlledByFactorSource.accounts] in
 				do {
+					do {
+						try await userDefaultsClient.removeAccountsThatNeedRecoveryIfNeeded(
+							accounts: .init(uncheckedUniqueElements: accounts.map(\.address))
+						)
+					} catch {
+						// not important enough to propage error
+						loggerGlobal.error("Failed to remove addresses from list of those that need recovery")
+					}
+
 					try await secureStorageClient.saveMnemonicForFactorSource(
 						privateHDFactorSource
 					)

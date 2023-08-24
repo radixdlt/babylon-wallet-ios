@@ -13,10 +13,11 @@ extension AccountList {
 
 			public var portfolio: Loadable<AccountPortfolio>
 
-			public var shouldShowSecurityPrompt = false
+			public var needToBackupMnemonicForThisAccount = false
 			public let isLegacyAccount: Bool
 			public let isLedgerAccount: Bool
 			public var isDappDefinitionAccount: Bool = false
+			public var needToImportMnemonicForThisAccount = false
 
 			public init(
 				account: Profile.Network.Account
@@ -42,7 +43,7 @@ extension AccountList {
 
 		public enum InternalAction: Sendable, Equatable {
 			case accountPortfolioUpdate(AccountPortfolio)
-			case displaySecurityPrompting
+			case needToBackupMnemonicForThisAccount
 		}
 
 		public enum DelegateAction: Sendable, Equatable {
@@ -54,12 +55,16 @@ extension AccountList {
 		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
 		@Dependency(\.accountPortfoliosClient) var accountPortfoliosClient
 		@Dependency(\.factorSourcesClient) var factorSourcesClient
+		@Dependency(\.userDefaultsClient) var userDefaultsClient
 
 		public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 			switch viewAction {
 			case .task:
 				let accountAddress = state.account.address
 				state.portfolio = .loading
+				let accounts = userDefaultsClient.getAddressesOfAccountsThatNeedRecovery()
+				state.needToBackupMnemonicForThisAccount = accounts.contains(where: { $0 == accountAddress })
+
 				return .run { send in
 					for try await accountPortfolio in await accountPortfoliosClient.portfolioForAccount(accountAddress) {
 						guard !Task.isCancelled else {
@@ -77,8 +82,8 @@ extension AccountList {
 
 		public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 			switch internalAction {
-			case .displaySecurityPrompting:
-				state.shouldShowSecurityPrompt = true
+			case .needToBackupMnemonicForThisAccount:
+				state.needToBackupMnemonicForThisAccount = true
 				return .none
 			case let .accountPortfolioUpdate(portfolio):
 				state.isDappDefinitionAccount = portfolio.isDappDefintionAccountType
@@ -86,14 +91,14 @@ extension AccountList {
 				state.portfolio = .success(portfolio)
 
 				guard let xrdResource = portfolio.fungibleResources.xrdResource, xrdResource.amount > .zero else {
-					state.shouldShowSecurityPrompt = false
+					state.needToBackupMnemonicForThisAccount = false
 					return .none
 				}
 
 				switch state.account.securityState {
 				case let .unsecured(unsecuredEntityControl):
 					if unsecuredEntityControl.transactionSigning.factorSourceID.kind == .device {
-						return .send(.internal(.displaySecurityPrompting))
+						return .send(.internal(.needToBackupMnemonicForThisAccount))
 					} else {
 						return .none
 					}

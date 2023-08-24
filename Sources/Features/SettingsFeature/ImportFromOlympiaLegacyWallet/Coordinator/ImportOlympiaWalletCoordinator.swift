@@ -298,7 +298,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 		guard case let .foundAlreadyImported(progress) = state.progress else { return progressError(state.progress) }
 
 		if let softwareAccounts = progress.accountsToMigrate?.software {
-			return checkIfOlympiaFactorSourceAlreadyExists(softwareAccounts)
+			return checkIfOlympiaFactorSourceAlreadyExists(wordCount: progress.previous.expectedMnemonicWordCount, softwareAccounts)
 		}
 
 		state.progress = .migratedSoftwareAccounts(.init(
@@ -310,10 +310,11 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 	}
 
 	private func checkIfOlympiaFactorSourceAlreadyExists(
+		wordCount: BIP39.WordCount,
 		_ softwareAccounts: AccountsToMigrate
 	) -> EffectTask<Action> {
 		.task {
-			let idOfExistingFactorSource = await factorSourcesClient.checkIfHasOlympiaFactorSourceForAccounts(softwareAccounts)
+			let idOfExistingFactorSource = await factorSourcesClient.checkIfHasOlympiaFactorSourceForAccounts(wordCount, softwareAccounts)
 			return .internal(.checkedIfOlympiaFactorSourceAlreadyExists(idOfExistingFactorSource, softwareAccounts: softwareAccounts))
 		}
 	}
