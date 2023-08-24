@@ -105,10 +105,10 @@ struct DappInteractor: Sendable, FeatureReducer {
 					send: .init(
 						version: .default,
 						transactionManifest: try! ManifestBuilder.manifestForCreateFungibleToken(
-							account: try! .init(validatingAddress: "account_tdx_22_12yr57p08yfrpuykjj7agcns9laza0qf77n7qz8y03ge3gmc3dcnj0h"),
-							networkID: .hammunet
+							account: try! .init(validatingAddress: "account_tdx_21_1282we8jeqchcx6kp20skhkz9j6cu8dr2gtfxwr7avptcand0cten8t"),
+							networkID: .enkinet
 						),
-						message: "hello"
+						message: "hello world"
 					)
 				)))
 			}

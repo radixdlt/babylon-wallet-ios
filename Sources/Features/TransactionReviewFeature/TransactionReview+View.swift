@@ -400,26 +400,28 @@ struct TransactionReviewTokenView: View {
 	}
 
 	let viewState: ViewState
-	let onTap: (() -> Void)?
+	let onTap: () -> Void
+	let disabled: Bool
 
 	init(viewState: ViewState, onTap: (() -> Void)? = nil) {
 		self.viewState = viewState
-		self.onTap = onTap
+		self.onTap = onTap ?? {}
+		self.disabled = onTap == nil
 	}
 
 	var body: some View {
 		HStack(spacing: .small1) {
-			if let onTap {
-				Button(action: onTap, label: thumb)
-			} else {
-				thumb()
-			}
+			Button(action: onTap) {
+				TokenThumbnail(viewState.thumbnail, size: .small)
+					.padding(.vertical, .small1)
 
-			if let name = viewState.name {
-				Text(name)
-					.textStyle(.body2HighImportance)
-					.foregroundColor(.app.gray1)
+				if let name = viewState.name {
+					Text(name)
+						.textStyle(.body2HighImportance)
+						.foregroundColor(.app.gray1)
+				}
 			}
+			.disabled(disabled)
 
 			Spacer(minLength: 0)
 
@@ -453,11 +455,6 @@ struct TransactionReviewTokenView: View {
 			.padding(.vertical, .medium3)
 		}
 		.padding(.horizontal, .medium3)
-	}
-
-	private func thumb() -> some View {
-		TokenThumbnail(viewState.thumbnail, size: .small)
-			.padding(.vertical, .small1)
 	}
 }
 

@@ -430,6 +430,7 @@ package.addModules([
 		dependencies: [
 			"AuthorizedDappsClient",
 			"GatewayAPI",
+			"OnLedgerEntitiesClient",
 			"TransactionClient",
 			"SigningFeature",
 			"SubmitTransactionClient",

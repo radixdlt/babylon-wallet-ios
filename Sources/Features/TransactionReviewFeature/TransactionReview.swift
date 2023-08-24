@@ -83,7 +83,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		case previewLoaded(TaskResult<TransactionToReview>)
 		case createTransactionReview(TransactionReview.TransactionContent)
 		case prepareForSigningResult(TaskResult<TransactionClient.PrepareForSiginingResponse>)
-		case loadedOnLedgerResource(TaskResult<OnLedgerEntity.Resource>)
+		case loadedOnLedgerResource(Transfer, TaskResult<OnLedgerEntity.Resource>)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -249,14 +249,29 @@ public struct TransactionReview: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
-		case let .withdrawals(.delegate(.showAsset(resource))),
-		     let .deposits(.delegate(.showAsset(resource))):
+		case let .withdrawals(.delegate(.showAsset(assetTransfer))),
+		     let .deposits(.delegate(.showAsset(assetTransfer))):
+
+			switch assetTransfer {
+			case let .fungible(transfer):
+				state.destination = .fungibleTokenDetails(.init(transfer: transfer))
+			case let .nonFungible(transfer):
+				do {
+					state.destination = try .nonFungibleTokenDetails(.init(transfer: transfer))
+				} catch {
+					errorQueue.schedule(error)
+				}
+			}
 
 			return .run { send in
+				print("will loadedOnLedgerResource")
+
 				let result = await TaskResult {
-					try await onLedgerEntitiesClient.getResource(resource)
+					try await onLedgerEntitiesClient.getResource(assetTransfer.resource)
 				}
-				await send(.internal(.loadedOnLedgerResource(result)))
+				print("did loadedOnLedgerResource")
+
+				await send(.internal(.loadedOnLedgerResource(assetTransfer, result)))
 			}
 
 		case let .dAppsUsed(.delegate(.openDapp(id))):
@@ -383,7 +398,17 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		case .dApp:
 			return .none
 
+		case .fungibleTokenDetails(.delegate(.dismiss)):
+			guard case .fungibleTokenDetails = state.destination else { return .none }
+			state.destination = nil
+			return .none
+
 		case .fungibleTokenDetails:
+			return .none
+
+		case .nonFungibleTokenDetails(.delegate(.dismiss)):
+			guard case .nonFungibleTokenDetails = state.destination else { return .none }
+			state.destination = nil
 			return .none
 
 		case .nonFungibleTokenDetails:
@@ -424,7 +449,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 							.init(id: .wallet, metadata: nil),
 						]
 					),
-//					dAppsUsed:  try? extractUsedDapps(transaction),
+					//					dAppsUsed:  try? extractUsedDapps(transaction),
 					deposits: try? extractDeposits(
 						transaction,
 						userAccounts: userAccounts,
@@ -473,22 +498,35 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			state.networkFee = content.networkFee
 			return .none
 
-		case let .loadedOnLedgerResource(.success(resource)):
-			print("Resource:\(resource.name) \(resource.symbol)")
+		case let .loadedOnLedgerResource(assetTransfer, .success(resource)):
 
-			switch resource.resourceAddress.decodedKind {
-			case .globalFungibleResourceManager:
-				break
-			case .globalNonFungibleResourceManager:
-				break
+			print("LOADED:")
+			print(resource.description)
+
+			let kind = resource.resourceAddress.decodedKind
+			// Now we also have the resource and we can update the details view
+			switch (assetTransfer, kind) {
+			case let (.fungible(transfer), .globalFungibleResourceManager):
+				state.destination = .fungibleTokenDetails(.init(transfer: transfer, resource: resource))
+			case let (.nonFungible(transfer), .globalNonFungibleResourceManager):
+				do {
+					state.destination = try .nonFungibleTokenDetails(.init(transfer: transfer, resource: resource))
+				} catch {
+					errorQueue.schedule(error)
+				}
 			default:
-				struct WrongEntityType: Error { let type: EntityType }
-				errorQueue.schedule(WrongEntityType(type: resource.resourceAddress.decodedKind))
+				struct OnLedgerError: Error {}
+				errorQueue.schedule(OnLedgerError())
 			}
 
 			return .none
 
-		case let .loadedOnLedgerResource(.failure(error)):
+		case let .loadedOnLedgerResource(_, .failure(error)):
+
+			print("LOADING failed:")
+			print(error)
+
+			loggerGlobal.warning("Failed to load on-ledger resource: \(error)")
 			errorQueue.schedule(error)
 			return .none
 
@@ -582,8 +620,6 @@ public struct TransactionReview: Sendable, FeatureReducer {
 	}
 }
 
-// extension
-
 extension TransactionReview {
 	public struct TransactionContent: Sendable, Hashable {
 		let withdrawals: TransactionReviewAccounts.State?
@@ -635,10 +671,7 @@ extension TransactionReview {
 		let metadata = try? await gatewayAPIClient.getDappMetadata(dAppDefinitionAddress)
 			.validating(dAppComponent: component)
 
-		return DappEntity(
-			id: dAppDefinitionAddress,
-			metadata: .init(metadata: metadata)
-		)
+		return DappEntity(id: dAppDefinitionAddress, metadata: .init(metadata: metadata))
 	}
 
 	private func exctractProofs(_ transaction: TransactionType.GeneralTransaction) async throws -> TransactionReviewProofs.State? {
@@ -766,7 +799,7 @@ extension TransactionReview {
 				name: metadata.name,
 				symbol: metadata.symbol,
 				thumbnail: metadata.thumbnail,
-				isXRD: (try? resourceAddress.isXRD(on: networkID)) ?? false,
+				isXRD: resourceAddress.isXRD(on: networkID),
 				guarantee: guarantee()
 			))]
 		case let .nonFungible(_, _, .guaranteed(ids)),
