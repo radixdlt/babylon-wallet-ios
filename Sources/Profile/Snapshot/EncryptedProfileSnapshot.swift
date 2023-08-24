@@ -5,6 +5,11 @@ import Prelude
 /// An encryption of a `ProfileSnapshot` with crypto metadata about how it was encrypted, which can
 /// be used to decrypt it, given a user provided password.
 public struct EncryptedProfileSnapshot: Sendable, Codable, Hashable {
+	public typealias Version = Tagged<Self, UInt32>
+
+	/// JSON format version of this struct
+	public let version: Version
+
 	/// Encrypted JSON encoding of a `ProfileSnapshot`
 	public let encryptedSnapshot: HexCodable
 
@@ -16,14 +21,20 @@ public struct EncryptedProfileSnapshot: Sendable, Codable, Hashable {
 	public let encryptionScheme: EncryptionScheme
 
 	public init(
+		version: Version,
 		encryptedSnapshot: HexCodable,
 		keyDerivationScheme: PasswordBasedKeyDerivationScheme,
 		encryptionScheme: EncryptionScheme
 	) {
+		self.version = version
 		self.encryptedSnapshot = encryptedSnapshot
 		self.keyDerivationScheme = keyDerivationScheme
 		self.encryptionScheme = encryptionScheme
 	}
+}
+
+extension EncryptedProfileSnapshot.Version {
+	public static let current: Self = 1
 }
 
 extension EncryptedProfileSnapshot {

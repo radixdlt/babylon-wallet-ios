@@ -168,6 +168,7 @@ public struct EncryptOrDecryptProfile: Sendable, FeatureReducer {
 					let encryptedPayload = try encryptionScheme.encrypt(data: json, encryptionKey: encryptionKey)
 
 					let encrypted = EncryptedProfileSnapshot(
+						version: .current,
 						encryptedSnapshot: .init(data: encryptedPayload),
 						keyDerivationScheme: kdfScheme,
 						encryptionScheme: encryptionScheme

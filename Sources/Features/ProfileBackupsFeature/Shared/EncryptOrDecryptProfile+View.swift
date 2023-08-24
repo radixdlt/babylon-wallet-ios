@@ -54,29 +54,20 @@ extension EncryptOrDecryptProfile {
 			isEncrypting
 		}
 
-		var navigationTitle: String {
-			// FIXME: Strings
-			isEncrypting ? "Export backup" : "Import backup"
-		}
-
 		var continueButtonTitle: String {
 			// FIXME: Strings
-			isEncrypting ? "Encrypt backup" : "Decrypt backup"
+			"Continue"
 		}
 
 		var title: String {
 			// FIXME: String
-			isEncrypting ? "Encrypt backup before export" : "Decrypt backup to import"
+			let operation = isEncrypting ? "Encrypt" : "Decrypt"
+			return "\(operation) Wallet Backup File"
 		}
 
 		var subtitle: String {
 			// FIXME: String
-			isEncrypting ? "If you forget this password you will not be able to decrypt the wallet backup file. Use a secure, unique password. Back it up somewhere." : "Enter the password you chose when you originally encrypted this wallet backup file."
-		}
-
-		var imageName: String {
-			// FIXME: String
-			isEncrypting ? "square.and.arrow.up" : "square.and.arrow.down"
+			isEncrypting ? "Enter a password to encrypt this wallet backup file. You will be required to enter this password when recovering your Wallet from this file." : "Enter the password you chose when you originally encrypted this Wallet Backup file."
 		}
 
 		var nonConfirmingPasswordPlaceholder: String {
@@ -98,23 +89,17 @@ extension EncryptOrDecryptProfile {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				ScrollView {
 					VStack(spacing: .medium2) {
-						Image(systemName: viewStore.imageName)
-							.resizable()
-							.frame(.medium)
-							.foregroundColor(.app.gray2)
-
-						// FIXME: Strings
 						Text(viewStore.title)
-							.foregroundColor(.app.gray2)
-							.textStyle(.body1Header)
-							.multilineTextAlignment(.leading)
+							.lineLimit(2)
+							.textStyle(.sheetTitle)
+							.foregroundColor(.app.gray1)
 
 						Text(viewStore.subtitle)
-							.foregroundColor(.app.gray3)
-							.textStyle(.body1HighImportance)
-							.multilineTextAlignment(.leading)
+							.foregroundColor(.app.gray1)
+							.textStyle(.body1Regular)
 
 						AppTextField(
+							useSecureField: true,
 							placeholder: viewStore.nonConfirmingPasswordPlaceholder,
 							text: viewStore.binding(
 								get: \.inputtedEncryptionPassword,
@@ -135,8 +120,9 @@ extension EncryptOrDecryptProfile {
 						.autocorrectionDisabled()
 
 						if viewStore.needToConfirm {
+							// FIXME: Strings
 							AppTextField(
-								// FIXME: Strings
+								useSecureField: true,
 								placeholder: "Confirm password",
 								text: viewStore.binding(
 									get: \.confirmedEncryptionPassword,
@@ -173,8 +159,6 @@ extension EncryptOrDecryptProfile {
 					action: EncryptOrDecryptProfile.Destination.Action.incorrectPasswordAlert
 				)
 				.onAppear { viewStore.send(.appeared) }
-				// FIXME: Strings
-				.navigationTitle(viewStore.navigationTitle)
 			}
 		}
 	}
