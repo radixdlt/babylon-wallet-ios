@@ -13,9 +13,6 @@ public struct BackUpProfileSettings: Sendable, FeatureReducer {
 		public var preferences: AppPreferences?
 		public var backupProfileHeaders: ProfileSnapshot.HeaderList?
 		public var selectedProfileHeader: ProfileSnapshot.Header?
-		public var isDisplayingFileExporter: Bool {
-			profileFilePotentiallyEncrypted != nil
-		}
 
 		public var thisDeviceID: UUID?
 

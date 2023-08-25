@@ -1,8 +1,24 @@
 import FeaturePrelude
 import ImportMnemonicFeature
 
+extension BackUpProfileSettings.State {
+	var viewState: BackUpProfileSettings.ViewState {
+		.init(
+			isCloudProfileSyncEnabled: isCloudProfileSyncEnabled,
+			profileFilePotentiallyEncrypted: profileFilePotentiallyEncrypted
+		)
+	}
+}
+
 extension BackUpProfileSettings {
-	public typealias ViewState = State
+	public struct ViewState: Equatable {
+		let isCloudProfileSyncEnabled: Bool
+		let profileFilePotentiallyEncrypted: ExportableProfileFile?
+
+		public var isDisplayingFileExporter: Bool {
+			profileFilePotentiallyEncrypted != nil
+		}
+	}
 
 	@MainActor
 	public struct View: SwiftUI.View {
@@ -13,7 +29,7 @@ extension BackUpProfileSettings {
 		}
 
 		public var body: some SwiftUI.View {
-			WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
+			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				coreView(with: viewStore)
 					.cloudSyncTakesLongTimeAlert(with: store)
 					.disableCloudSyncConfirmationAlert(with: store)
@@ -39,7 +55,9 @@ extension BackUpProfileSettings.View {
 				// FIXME: Strings
 				VStack(alignment: .leading, spacing: .medium1) {
 					Text("Backing up your wallet ensure you can recover access to your Accounts, Personas, and wallet settings on a new phone by re-entering your seed phrase(s).")
-					Text("**For security, backups do not contain any seed phrases or private keys. You must write them down separatly.**")
+
+					Text("For security, backups do not contain any seed phrases or private keys. You must write them down separatly.")
+						.fontWeight(.bold)
 				}
 				.padding(.horizontal, .medium2)
 				.padding(.vertical, .small1)

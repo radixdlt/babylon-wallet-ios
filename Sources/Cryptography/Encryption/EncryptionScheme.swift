@@ -58,7 +58,7 @@ extension EncryptionScheme {
 extension EncryptionScheme {
 	/// AES GCM 256 encryption
 	public struct Version1: VersionedEncryption {
-		public static let version = Version.version1
+		public static let version: Version = .version1
 		public static let description = "AESGCM-256"
 
 		public static func encrypt(data: Data, encryptionKey key: SymmetricKey) throws -> Data {

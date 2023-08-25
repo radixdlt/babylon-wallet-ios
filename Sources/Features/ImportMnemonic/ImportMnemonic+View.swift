@@ -20,7 +20,7 @@ extension ImportMnemonic.State {
 			bip39Passphrase: bip39Passphrase
 		)
 		#if DEBUG
-		viewState.debugOnlyMnemonicPhraseSingleField = self.debugOnlyMnemonicPhraseSingleField
+		viewState.debugMnemonicPhraseSingleField = self.debugMnemonicPhraseSingleField
 		#endif
 		return viewState
 	}
@@ -45,7 +45,7 @@ extension ImportMnemonic {
 		let mnemonic: Mnemonic?
 		let bip39Passphrase: String
 		#if DEBUG
-		var debugOnlyMnemonicPhraseSingleField: String = ""
+		var debugMnemonicPhraseSingleField: String = ""
 		#endif
 	}
 }
@@ -117,7 +117,7 @@ extension ImportMnemonic {
 						#if DEBUG
 						if viewStore.isReadonlyMode {
 							Button("DEBUG ONLY Copy") {
-								viewStore.send(.debugOnlyCopyMnemonic)
+								viewStore.send(.debugCopyMnemonic)
 							}
 							.buttonStyle(.secondaryRectangular(isDestructive: true))
 							.padding(.bottom, .medium1)
@@ -125,12 +125,12 @@ extension ImportMnemonic {
 							AppTextField(
 								placeholder: "DEBUG ONLY paste mnemonic",
 								text: viewStore.binding(
-									get: { $0.debugOnlyMnemonicPhraseSingleField },
-									send: { .debugOnlyMnemonicChanged($0) }
+									get: { $0.debugMnemonicPhraseSingleField },
+									send: { .debugMnemonicChanged($0) }
 								),
 								innerAccessory: {
 									Button("Paste") {
-										viewStore.send(.debugOnlyPasteMnemonic)
+										viewStore.send(.debugPasteMnemonic)
 									}
 									.buttonStyle(.borderedProminent)
 								}

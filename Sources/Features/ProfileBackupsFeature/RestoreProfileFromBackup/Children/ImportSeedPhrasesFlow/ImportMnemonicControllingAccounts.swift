@@ -161,7 +161,7 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 			return .none
 		}
 		do {
-			guard try mnemonicWithPassphrase.validatePublicKeysOf(accounts: accounts) else {
+			guard try mnemonicWithPassphrase.validatePublicKeys(of: accounts) else {
 				return fail(error: nil)
 			}
 

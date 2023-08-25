@@ -39,12 +39,15 @@ extension ExportableProfileFile {
 
 	public func fileWrapper(configuration: WriteConfiguration) throws -> FileWrapper {
 		@Dependency(\.jsonEncoder) var jsonEncoder
+		var encoder = jsonEncoder()
+		// FIXME: Should we set skip escaping slashes for `jsonEncoder()` everywhere? Feels to risky to do that this close to release, so lets investigate later (thinking about Gateway...)
+		encoder.outputFormatting = [.withoutEscapingSlashes]
 		switch self {
 		case let .plaintext(plaintext):
-			let jsonData = try jsonEncoder().encode(plaintext)
+			let jsonData = try encoder.encode(plaintext)
 			return FileWrapper(regularFileWithContents: jsonData)
 		case let .encrypted(encryptedSnapshot):
-			let jsonData = try jsonEncoder().encode(encryptedSnapshot)
+			let jsonData = try encoder.encode(encryptedSnapshot)
 			return FileWrapper(regularFileWithContents: jsonData)
 		}
 	}

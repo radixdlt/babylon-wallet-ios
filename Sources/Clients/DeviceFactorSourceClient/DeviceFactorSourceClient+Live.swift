@@ -36,7 +36,7 @@ extension DeviceFactorSourceClient: DependencyKey {
 					accounts = try await accountsClient.getAccountsOnCurrentNetwork().elements
 				}
 
-				return accounts.map { EntityPotentiallyVirtual.account($0) } + personas.map { EntityPotentiallyVirtual.persona($0) }
+				return accounts.map(EntityPotentiallyVirtual.account) + personas.map(EntityPotentiallyVirtual.persona)
 
 			}()
 
@@ -101,7 +101,7 @@ extension DeviceFactorSourceClient: DependencyKey {
 					}
 
 					do {
-						let hasControlOfAllAccounts = try mnemonicWithPassphrase.validatePublicKeysOf(accounts: accountsControlledByMainDeviceFactorSource)
+						let hasControlOfAllAccounts = try mnemonicWithPassphrase.validatePublicKeys(of: accountsControlledByMainDeviceFactorSource)
 						return !hasControlOfAllAccounts // if we dont have controll of ALL accounts, then recovery is needed.
 					} catch {
 						// Account recover needed
