@@ -13,21 +13,23 @@ public struct AccountDetails: Sendable, FeatureReducer {
 		var account: Profile.Network.Account
 		var assets: AssetsView.State
 
-		public var needToBackupMnemonicForThisAccount: Bool
-		public var needToImportMnemonicForThisAccount: Bool
+		public enum CallToAction: Sendable, Hashable {
+			case needToBackupMnemonicForThisAccount
+			case needToImportMnemonicForThisAccount
+		}
+
+		public var callToAction: CallToAction?
 
 		@PresentationState
 		var destination: Destinations.State?
 
 		public init(
 			for account: Profile.Network.Account,
-			needToBackupMnemonicForThisAccount: Bool = false,
-			needToImportMnemonicForThisAccount: Bool = false
+			callToAction: CallToAction? = nil
 		) {
 			self.account = account
 			self.assets = AssetsView.State(account: account, mode: .normal)
-			self.needToBackupMnemonicForThisAccount = needToBackupMnemonicForThisAccount
-			self.needToImportMnemonicForThisAccount = needToImportMnemonicForThisAccount
+			self.callToAction = callToAction
 		}
 	}
 
@@ -114,13 +116,15 @@ public struct AccountDetails: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .task:
-			return .run { [address = state.account.address, export = state.needToBackupMnemonicForThisAccount, importFlow = state.needToImportMnemonicForThisAccount] send in
+			return .run { [address = state.account.address, callToAction = state.callToAction] send in
 
-				if export {
+				switch callToAction {
+				case .needToBackupMnemonicForThisAccount:
 					await send(.internal(.loadExport))
-				}
-				if importFlow {
+				case .needToImportMnemonicForThisAccount:
 					await send(.internal(.loadImport))
+				case .none:
+					break
 				}
 
 				for try await accountUpdate in await accountsClient.accountUpdates(address) {
@@ -140,12 +144,10 @@ public struct AccountDetails: Sendable, FeatureReducer {
 			return .none
 
 		case .exportMnemonicButtonTapped:
-			state.needToBackupMnemonicForThisAccount = true
-			return .none
+			return loadExport()
 
 		case .recoverMnemonicsButtonTapped:
-			state.needToImportMnemonicForThisAccount = true
-			return .none
+			return loadImport()
 		}
 	}
 
@@ -166,14 +168,24 @@ public struct AccountDetails: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
 		case .loadExport:
-			fatalError()
+			return loadImport()
 
 		case .loadImport:
-			fatalError()
+			return loadImport()
 
 		case let .accountUpdated(account):
 			state.account = account
 			return .none
 		}
+	}
+
+	private func loadExport() -> EffectTask<Action> {
+		loggerGlobal.feature("implement export")
+		return .none
+	}
+
+	private func loadImport() -> EffectTask<Action> {
+		loggerGlobal.feature("implement import")
+		return .none
 	}
 }

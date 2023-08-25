@@ -21,7 +21,12 @@ public struct AccountList: Sendable, FeatureReducer {
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
-		case displayAccountDetails(Profile.Network.Account)
+		case displayAccountDetails(
+			Profile.Network.Account,
+			needToBackupMnemonicForThisAccount: Bool,
+			needToImportMnemonicForThisAccount: Bool
+		)
+
 		case backUpMnemonic(controlling: Profile.Network.Account)
 		case importMnemonics(account: Profile.Network.Account)
 	}
@@ -39,8 +44,13 @@ public struct AccountList: Sendable, FeatureReducer {
 		switch childAction {
 		case let .account(_, action: .delegate(action)):
 			switch action {
-			case let .tapped(account):
-				return .send(.delegate(.displayAccountDetails(account)))
+			case let .tapped(account, needToBackupMnemonicForThisAccount, needToImportMnemonicForThisAccount):
+				return .send(.delegate(.displayAccountDetails(
+					account,
+					needToBackupMnemonicForThisAccount: needToBackupMnemonicForThisAccount,
+					needToImportMnemonicForThisAccount: needToImportMnemonicForThisAccount
+				)))
+
 			case let .backUpMnemonic(controllingAccount):
 				return .send(.delegate(.backUpMnemonic(controlling: controllingAccount)))
 			case let .importMnemonics(account):

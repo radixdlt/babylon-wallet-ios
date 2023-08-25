@@ -48,7 +48,11 @@ extension AccountList {
 		}
 
 		public enum DelegateAction: Sendable, Equatable {
-			case tapped(Profile.Network.Account)
+			case tapped(
+				Profile.Network.Account,
+				needToBackupMnemonicForThisAccount: Bool,
+				needToImportMnemonicForThisAccount: Bool
+			)
 			case backUpMnemonic(controlling: Profile.Network.Account)
 			case importMnemonics(Profile.Network.Account)
 		}
@@ -82,7 +86,11 @@ extension AccountList {
 				return .send(.delegate(.importMnemonics(state.account)))
 
 			case .tapped:
-				return .send(.delegate(.tapped(state.account)))
+				return .send(.delegate(.tapped(
+					state.account,
+					needToBackupMnemonicForThisAccount: state.needToBackupMnemonicForThisAccount,
+					needToImportMnemonicForThisAccount: state.needToImportMnemonicForThisAccount
+				)))
 			}
 		}
 

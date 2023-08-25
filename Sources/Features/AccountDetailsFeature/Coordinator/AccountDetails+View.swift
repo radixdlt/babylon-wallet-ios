@@ -11,7 +11,8 @@ extension AccountDetails.State {
 		.init(
 			accountAddress: account.address,
 			appearanceID: account.appearanceID,
-			displayName: account.displayName.rawValue
+			displayName: account.displayName.rawValue,
+			callToAction: callToAction
 		)
 	}
 }
@@ -22,6 +23,7 @@ extension AccountDetails {
 		let accountAddress: AccountAddress
 		let appearanceID: Profile.Network.Account.AppearanceID
 		let displayName: String
+		let callToAction: AccountDetails.State.CallToAction?
 	}
 
 	@MainActor
@@ -39,6 +41,15 @@ extension AccountDetails {
 						.foregroundColor(.app.whiteTransparent)
 						.textStyle(.body2HighImportance)
 						.padding(.bottom, .medium1)
+
+					if let callToAction = viewStore.callToAction {
+						switch callToAction {
+						case .needToBackupMnemonicForThisAccount:
+							Text("Need to export")
+						case .needToImportMnemonicForThisAccount:
+							Text("Need to import")
+						}
+					}
 
 					Button(L10n.Account.transfer, asset: AssetResource.transfer) {
 						viewStore.send(.transferButtonTapped)

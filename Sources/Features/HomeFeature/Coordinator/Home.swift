@@ -142,21 +142,29 @@ public struct Home: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
-		case let .accountList(.delegate(.displayAccountDetails(account))):
-			state.destination = .accountDetails(.init(for: account))
+		case let .accountList(.delegate(.displayAccountDetails(
+			account,
+			needToBackupMnemonicForThisAccount,
+			needToImportMnemonicForThisAccount
+		))):
+
+			state.destination = .accountDetails(.init(
+				for: account,
+				callToAction: needToImportMnemonicForThisAccount ? .needToImportMnemonicForThisAccount : (needToBackupMnemonicForThisAccount ? .needToBackupMnemonicForThisAccount : nil)
+			))
 			return .none
 
 		case let .accountList(.delegate(.backUpMnemonic(controllingAccount))):
 			state.destination = .accountDetails(.init(
 				for: controllingAccount,
-				needToBackupMnemonicForThisAccount: true
+				callToAction: .needToBackupMnemonicForThisAccount
 			))
 			return .none
 
 		case let .accountList(.delegate(.importMnemonics(account))):
 			state.destination = .accountDetails(.init(
 				for: account,
-				needToImportMnemonicForThisAccount: true
+				callToAction: .needToImportMnemonicForThisAccount
 			))
 			return .none
 
