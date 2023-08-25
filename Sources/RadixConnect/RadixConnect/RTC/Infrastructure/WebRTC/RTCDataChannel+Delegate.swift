@@ -18,10 +18,13 @@ final class RTCDataChannelAsyncDelegate: NSObject,
 	Sendable
 {
 	let receivedMessages: AsyncStream<Data>
+	let dataChannelReadyState: AsyncStream<DataChannelReadyState>
 	private let receivedMessagesContinuation: AsyncStream<Data>.Continuation
+	private let dataChannelReadyStateContinuation: AsyncStream<DataChannelReadyState>.Continuation
 
 	override init() {
 		(receivedMessages, receivedMessagesContinuation) = AsyncStream.streamWithContinuation()
+		(dataChannelReadyState, dataChannelReadyStateContinuation) = AsyncStream.streamWithContinuation()
 		super.init()
 	}
 
@@ -37,6 +40,23 @@ extension RTCDataChannelAsyncDelegate {
 	}
 
 	func dataChannelDidChangeState(_ dataChannel: RTCDataChannel) {
-		loggerGlobal.info("RTCDataChannel state changed to: \(dataChannel.readyState)")
+		dataChannelReadyStateContinuation.yield(.init(rtc: dataChannel.readyState))
+	}
+}
+
+extension DataChannelReadyState {
+	public init(rtc: RTCDataChannelState) {
+		switch rtc {
+		case .connecting:
+			self = .connecting
+		case .open:
+			self = .connected
+		case .closing:
+			self = .closing
+		case .closed:
+			self = .closed
+		@unknown default:
+			self = .closed
+		}
 	}
 }

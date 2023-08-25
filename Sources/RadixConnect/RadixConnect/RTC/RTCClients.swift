@@ -304,7 +304,7 @@ extension RTCClient {
 
 	func waitForFirstConnection() async throws {
 		_ = try await doAsync(withTimeout: Self.firstConnectionTimeout) {
-			try await self.peerConnectionNegotiator.negotiationResults.first().get()
+			_ = try await self.peerConnectionNegotiator.negotiationResults.first().get()
 		}
 	}
 
@@ -395,6 +395,15 @@ extension RTCClient {
 			.iceConnectionStates
 			.filter {
 				$0 == .disconnected
+			}
+			.map { _ in connection.id }
+			.subscribe(disconnectedPeerConnectionContinuation)
+
+		await connection
+			.dataChannelClient
+			.dataChannelReadyStates
+			.filter {
+				$0 == .closed
 			}
 			.map { _ in connection.id }
 			.subscribe(disconnectedPeerConnectionContinuation)

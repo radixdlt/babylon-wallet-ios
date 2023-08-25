@@ -151,6 +151,14 @@ extension PeerConnectionNegotiator {
 			}
 			.prefix(1)
 
+		let onDataChannelReady = await peerConnectionClient
+			.dataChannelClient
+			.dataChannelReadyStates
+			.filter {
+				$0 == .connected
+			}
+			.prefix(1)
+
 		_ = try await peerConnectionClient.onNegotiationNeeded.first()
 		log("Starting negotiation")
 
@@ -185,6 +193,7 @@ extension PeerConnectionNegotiator {
 		)
 
 		_ = try await onConnectionEstablished.collect()
+		_ = try await onDataChannelReady.collect()
 		log("Connection established")
 		iceExchangeTask.cancel()
 

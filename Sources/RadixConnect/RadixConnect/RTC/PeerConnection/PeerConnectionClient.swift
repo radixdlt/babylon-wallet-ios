@@ -8,14 +8,19 @@ public struct PeerConnectionClient: Sendable {
 	typealias ID = PeerConnectionID
 	let id: ID
 	private let iceConnectionStateSubject: AsyncCurrentValueSubject<ICEConnectionState>
+	private let dataChannelReadyStatesSubject: AsyncCurrentValueSubject<DataChannelReadyState>
 
 	var iceConnectionStates: AnyAsyncSequence<ICEConnectionState> {
 		iceConnectionStateSubject.share().eraseToAnyAsyncSequence()
 	}
 
+	var dataChannelReadyStates: AnyAsyncSequence<DataChannelReadyState> {
+		dataChannelReadyStatesSubject.share().eraseToAnyAsyncSequence()
+	}
+
 	private let peerConnection: PeerConnection
 	private let delegate: PeerConnectionDelegate
-	private let dataChannelClient: DataChannelClient
+	let dataChannelClient: DataChannelClient
 
 	init(id: ID, peerConnection: PeerConnection, delegate: PeerConnectionDelegate) throws {
 		self.id = id
@@ -24,6 +29,9 @@ public struct PeerConnectionClient: Sendable {
 		self.dataChannelClient = try peerConnection.createDataChannel()
 		let iceConnectionStateSubject = AsyncCurrentValueSubject<ICEConnectionState>(.new)
 		self.iceConnectionStateSubject = iceConnectionStateSubject
+		let dataChannelReadyStatesSubject = AsyncCurrentValueSubject<DataChannelReadyState>(.connecting)
+		self.dataChannelReadyStatesSubject = dataChannelReadyStatesSubject
+
 		Task {
 			for try await connectionUpdate in delegate.onIceConnectionState {
 				loggerGlobal.info("Ice connection state: \(connectionUpdate)")

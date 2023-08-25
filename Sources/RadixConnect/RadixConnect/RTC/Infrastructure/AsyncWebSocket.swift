@@ -107,12 +107,13 @@ extension AsyncWebSocket {
 	}
 
 	func cancel() async {
-		terminated = true
+		loggerGlobal.info("WebSocket: Terminate")
 		incomingMessagesContinuation.finish()
 		pingTask?.cancel()
 		invalidateSession()
 		monitor.cancel()
 		receiveMessagesTask?.cancel()
+		terminated = true
 	}
 }
 
