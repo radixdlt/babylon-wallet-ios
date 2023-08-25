@@ -57,8 +57,10 @@ public struct AccountDetails: Sendable, FeatureReducer {
 	public enum InternalAction: Sendable, Equatable {
 		case accountUpdated(Profile.Network.Account)
 
-		case loadExport
-		case loadImport
+		case loadMnemonic
+		case loadMnemonicResult(TaskResult<MnemonicWithPassphrase?>)
+
+		case loadImport; case loadedImport
 	}
 
 	public struct Destinations: Sendable, ReducerProtocol {
@@ -100,6 +102,8 @@ public struct AccountDetails: Sendable, FeatureReducer {
 	}
 
 	@Dependency(\.accountsClient) var accountsClient
+	@Dependency(\.errorQueue) var errorQueue
+	@Dependency(\.secureStorageClient) var secureStorageClient
 
 	public init() {}
 
@@ -120,9 +124,11 @@ public struct AccountDetails: Sendable, FeatureReducer {
 
 				switch callToAction {
 				case .needToBackupMnemonicForThisAccount:
-					await send(.internal(.loadExport))
+					await send(.internal(.loadMnemonic))
+
 				case .needToImportMnemonicForThisAccount:
 					await send(.internal(.loadImport))
+
 				case .none:
 					break
 				}
@@ -144,7 +150,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 			return .none
 
 		case .exportMnemonicButtonTapped:
-			return loadExport()
+			return loadExport(account: state.account)
 
 		case .recoverMnemonicsButtonTapped:
 			return loadImport()
@@ -167,11 +173,30 @@ public struct AccountDetails: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
-		case .loadExport:
-			return loadImport()
+		case .loadMnemonic:
+			return loadMnemonic(account: state.account)
 
 		case .loadImport:
 			return loadImport()
+
+		case let .loadMnemonicResult(.success(mnemonicWithPassphrase?)):
+			state.destination = .exportMnemonic(.init(
+				mnemonicWithPassphrase: mnemonicWithPassphrase
+			))
+
+			return .none
+
+		case let .loadMnemonicResult(.success(.none)):
+			loggerGlobal.error("Failed to load mnemonic to export? was nil..")
+			return .none
+
+		case let .loadMnemonicResult(.failure(error)):
+			loggerGlobal.error("Failed to load mnemonic to export")
+			errorQueue.schedule(error)
+			return .none
+
+		case .loadedImport:
+			return .none
 
 		case let .accountUpdated(account):
 			state.account = account
@@ -179,13 +204,25 @@ public struct AccountDetails: Sendable, FeatureReducer {
 		}
 	}
 
-	private func loadExport() -> EffectTask<Action> {
+	private func loadMnemonic(account: Profile.Network.Account) -> EffectTask<Action> {
 		loggerGlobal.feature("implement export")
-		return .none
+		let factorSourceID: FactorSourceID = {
+			switch account.securityState {
+			case let .unsecured(control): return control.transactionSigning.factorInstance.factorSourceID
+			}
+		}()
+		return .task {
+			let result = await TaskResult {
+				try await secureStorageClient.loadMnemonicByFactorSourceID(factorSourceID.embed(), .displaySeedPhrase)
+			}
+			return .internal(.loadMnemonicResult(result))
+		}
 	}
 
 	private func loadImport() -> EffectTask<Action> {
 		loggerGlobal.feature("implement import")
-		return .none
+		return .task {
+			.internal(.loadedImport)
+		}
 	}
 }
