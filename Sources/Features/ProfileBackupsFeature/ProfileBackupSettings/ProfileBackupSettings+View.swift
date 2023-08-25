@@ -183,9 +183,9 @@ extension SwiftUI.View {
 			store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
 			state: /ProfileBackupSettings.Destinations.State.inputEncryptionPassword,
 			action: ProfileBackupSettings.Destinations.Action.inputEncryptionPassword,
-			content: { store_ in
+			content: { childStore in
 				NavigationView {
-					EncryptOrDecryptProfile.View(store: store_)
+					EncryptOrDecryptProfile.View(store: childStore)
 				}
 			}
 		)
