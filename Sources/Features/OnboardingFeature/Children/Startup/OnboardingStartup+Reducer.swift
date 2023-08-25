@@ -17,7 +17,7 @@ public struct OnboardingStartup: Sendable, FeatureReducer {
 
 	public enum DelegateAction: Sendable, Equatable {
 		case setupNewUser
-		case completed
+		case completed(accountRecoveryIsNeeded: Bool)
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -26,16 +26,17 @@ public struct OnboardingStartup: Sendable, FeatureReducer {
 
 	public struct Destinations: Sendable, ReducerProtocol {
 		public enum State: Sendable, Hashable {
-			case restoreFromBackup(ProfileBackups.State)
+			case restoreFromBackup(RestoreProfileFromBackupCoordinator.State)
 		}
 
 		public enum Action: Sendable, Equatable {
-			case restoreFromBackup(ProfileBackups.Action)
+			case restoreFromBackup(RestoreProfileFromBackupCoordinator.Action)
 		}
 
 		public var body: some ReducerProtocolOf<Self> {
 			Scope(state: /State.restoreFromBackup, action: /Action.restoreFromBackup) {
-				ProfileBackups()
+				RestoreProfileFromBackupCoordinator()
+					._printChanges()
 			}
 		}
 	}
@@ -51,16 +52,21 @@ public struct OnboardingStartup: Sendable, FeatureReducer {
 		switch viewAction {
 		case .selectedNewWalletUser:
 			return .send(.delegate(.setupNewUser))
+
 		case .selectedRestoreFromBackup:
-			state.destination = .restoreFromBackup(.init(context: .onboarding))
+			state.destination = .restoreFromBackup(.init())
 			return .none
 		}
 	}
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
-		case .destination(.presented(.restoreFromBackup(.delegate(.profileImported)))):
-			return .send(.delegate(.completed))
+		case let .destination(.presented(.restoreFromBackup(.delegate(.profileImported(skippedAnyMnemonic))))):
+			return .send(.delegate(.completed(accountRecoveryIsNeeded: skippedAnyMnemonic)))
+
+		case .destination(.presented(.restoreFromBackup(.delegate(.failedToImportProfileDueToMnemonics)))):
+			return .none
+
 		default:
 			return .none
 		}

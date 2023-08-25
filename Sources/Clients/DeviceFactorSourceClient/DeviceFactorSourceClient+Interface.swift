@@ -10,19 +10,34 @@ public struct DeviceFactorSourceClient: Sendable {
 	public var signatureFromOnDeviceHD: SignatureFromOnDeviceHD
 	public var isAccountRecoveryNeeded: IsAccountRecoveryNeeded
 
+	// FIXME: Find a better home for this...
+
+	public var entitiesControlledByFactorSource: GetEntitiesControlledByFactorSource
+
+	/// Fetched accounts and personas on current network that are controlled by a device factor source, for every factor source in current profile
+	public var controlledEntities: GetControlledEntities
+
 	public init(
 		publicKeysFromOnDeviceHD: @escaping PublicKeysFromOnDeviceHD,
 		signatureFromOnDeviceHD: @escaping SignatureFromOnDeviceHD,
-		isAccountRecoveryNeeded: @escaping IsAccountRecoveryNeeded
+		isAccountRecoveryNeeded: @escaping IsAccountRecoveryNeeded,
+		entitiesControlledByFactorSource: @escaping GetEntitiesControlledByFactorSource,
+		controlledEntities: @escaping GetControlledEntities
 	) {
 		self.publicKeysFromOnDeviceHD = publicKeysFromOnDeviceHD
 		self.signatureFromOnDeviceHD = signatureFromOnDeviceHD
 		self.isAccountRecoveryNeeded = isAccountRecoveryNeeded
+
+		self.entitiesControlledByFactorSource = entitiesControlledByFactorSource
+		self.controlledEntities = controlledEntities
 	}
 }
 
 // MARK: DeviceFactorSourceClient.onDeviceHDPublicKey
 extension DeviceFactorSourceClient {
+	public typealias GetEntitiesControlledByFactorSource = @Sendable (DeviceFactorSource, ProfileSnapshot?) async throws -> EntitiesControlledByFactorSource
+	public typealias GetControlledEntities = @Sendable (ProfileSnapshot?) async throws -> IdentifiedArrayOf<EntitiesControlledByFactorSource>
+
 	public typealias PublicKeysFromOnDeviceHD = @Sendable (PublicKeysFromOnDeviceHDRequest) async throws -> [HierarchicalDeterministicPublicKey]
 	public typealias SignatureFromOnDeviceHD = @Sendable (SignatureFromOnDeviceHDRequest) async throws -> Cryptography.SignatureWithPublicKey
 	public typealias IsAccountRecoveryNeeded = @Sendable () async throws -> Bool

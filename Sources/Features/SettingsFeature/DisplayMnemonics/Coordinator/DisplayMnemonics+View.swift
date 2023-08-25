@@ -1,3 +1,4 @@
+import DisplayEntitiesControlledByMnemonicFeature
 import FeaturePrelude
 
 extension DisplayMnemonics.State {
@@ -38,7 +39,7 @@ extension DisplayMnemonics {
 							)
 						) { store in
 							VStack(spacing: .small2) {
-								DisplayMnemonicRow.View(store: store)
+								DisplayEntitiesControlledByMnemonic.View(store: store)
 								Separator()
 							}
 							.padding([.top, .horizontal], .medium3)

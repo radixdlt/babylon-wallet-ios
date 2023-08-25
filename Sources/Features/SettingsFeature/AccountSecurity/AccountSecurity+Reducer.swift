@@ -16,7 +16,11 @@ public struct AccountSecurity: Sendable, FeatureReducer {
 		public var preferences: AppPreferences? = nil
 		public var hasLedgerHardwareWalletFactorSources: Bool = false
 
-		public init() {}
+		public static let importOlympia = Self(destination: .importOlympiaWallet(.init()))
+
+		public init(destination: Destinations.State? = nil) {
+			self.destination = destination
+		}
 	}
 
 	// MARK: Action

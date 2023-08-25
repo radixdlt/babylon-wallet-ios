@@ -31,6 +31,8 @@ public struct AppTextField<FocusValue: Hashable, Accessory: View, InnerAccessory
 		}
 	}
 
+	public let useSecureField: Bool
+
 	@Environment(\.isEnabled) var isEnabled: Bool
 
 	let primaryHeading: PrimaryHeading?
@@ -45,6 +47,7 @@ public struct AppTextField<FocusValue: Hashable, Accessory: View, InnerAccessory
 	let innerAccesory: InnerAccessory
 
 	public init(
+		useSecureField: Bool = false,
 		primaryHeading: PrimaryHeading? = nil,
 		subHeading: String? = nil,
 		secondaryHeading: String? = nil,
@@ -56,6 +59,7 @@ public struct AppTextField<FocusValue: Hashable, Accessory: View, InnerAccessory
 		@ViewBuilder accessory: () -> Accessory = { EmptyView() },
 		@ViewBuilder innerAccessory: () -> InnerAccessory = { EmptyView() }
 	) {
+		self.useSecureField = useSecureField
 		self.primaryHeading = primaryHeading
 		self.subHeading = subHeading
 		self.secondaryHeading = secondaryHeading
@@ -69,6 +73,7 @@ public struct AppTextField<FocusValue: Hashable, Accessory: View, InnerAccessory
 	}
 
 	public init(
+		useSecureField: Bool = false,
 		primaryHeading: PrimaryHeading? = nil,
 		subHeading: String? = nil,
 		secondaryHeading: String? = nil,
@@ -79,6 +84,7 @@ public struct AppTextField<FocusValue: Hashable, Accessory: View, InnerAccessory
 		@ViewBuilder accessory: () -> Accessory = { EmptyView() },
 		@ViewBuilder innerAccessory: () -> InnerAccessory = { EmptyView() }
 	) where FocusValue == Never {
+		self.useSecureField = useSecureField
 		self.primaryHeading = primaryHeading
 		self.subHeading = subHeading
 		self.secondaryHeading = secondaryHeading
@@ -121,10 +127,16 @@ public struct AppTextField<FocusValue: Hashable, Accessory: View, InnerAccessory
 				}
 
 				HStack(spacing: .small2) {
-					TextField(
-						placeholder,
-						text: text.removeDuplicates()
-					)
+					Group {
+						if useSecureField {
+							SecureField(placeholder, text: text.removeDuplicates())
+						} else {
+							TextField(
+								placeholder,
+								text: text.removeDuplicates()
+							)
+						}
+					}
 					.modifier { view in
 						if let focus {
 							view

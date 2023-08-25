@@ -1,6 +1,7 @@
 import AccountsClient
 import ClientPrelude
 import EngineKit
+import PersonasClient
 import Profile
 import SecureStorageClient
 
@@ -13,6 +14,43 @@ extension DeviceFactorSourceClient: DependencyKey {
 
 	public static let liveValue: Self = {
 		@Dependency(\.secureStorageClient) var secureStorageClient
+		@Dependency(\.accountsClient) var accountsClient
+		@Dependency(\.personasClient) var personasClient
+		@Dependency(\.factorSourcesClient) var factorSourcesClient
+
+		let entitiesControlledByFactorSource: GetEntitiesControlledByFactorSource = { factorSource, maybeSnapshot in
+
+			let allEntities: [EntityPotentiallyVirtual] = try await {
+				let accounts: [Profile.Network.Account]
+				let personas: [Profile.Network.Persona]
+
+				// FIXME: Uh this aint pretty... but we are short on time.
+				if let overridingSnapshot = maybeSnapshot {
+					let networkID = Radix.Gateway.default.network.id
+					let profile = try Profile(snapshot: overridingSnapshot)
+					let network = try profile.network(id: networkID)
+					accounts = network.accounts.elements
+					personas = network.personas.elements
+				} else {
+					personas = try await personasClient.getPersonas().elements
+					accounts = try await accountsClient.getAccountsOnCurrentNetwork().elements
+				}
+
+				return accounts.map(EntityPotentiallyVirtual.account) + personas.map(EntityPotentiallyVirtual.persona)
+
+			}()
+
+			let entitiesForSource = allEntities.filter { entity in
+				switch entity.securityState {
+				case let .unsecured(unsecuredEntityControl):
+					return unsecuredEntityControl.transactionSigning.factorSourceID == factorSource.id
+				}
+			}
+			return EntitiesControlledByFactorSource(
+				entities: entitiesForSource,
+				deviceFactorSource: factorSource
+			)
+		}
 
 		return Self(
 			publicKeysFromOnDeviceHD: { request in
@@ -43,44 +81,33 @@ extension DeviceFactorSourceClient: DependencyKey {
 				return try privateKey.sign(hashOfMessage: request.hashedData)
 			},
 			isAccountRecoveryNeeded: {
-				@Dependency(\.accountsClient) var accountsClient
-				@Dependency(\.factorSourcesClient) var factorSourcesClient
-
 				do {
 					let deviceFactorSource = try await factorSourcesClient.getFactorSources().babylonDeviceFactorSources().sorted(by: \.lastUsedOn).first
 
-					let accounts = try await accountsClient.getAccountsOnCurrentNetwork()
-
-					guard let deviceFactorSource,
-					      let mnemonicWithPassphrase = try await secureStorageClient.loadMnemonicByFactorSourceID(
-					      	deviceFactorSource.id.embed(),
-					      	.checkingAccounts
-					      )
+					guard
+						let deviceFactorSource,
+						let mnemonicWithPassphrase = try await secureStorageClient
+						.loadMnemonicByFactorSourceID(
+							deviceFactorSource.id.embed(),
+							.checkingAccounts
+						)
 					else {
 						// Failed to find mnemonic for factor source
 						return true
 					}
 
-					@Sendable func hasControl(of account: Profile.Network.Account) -> Bool {
-						do {
-							switch account.securityState {
-							case let .unsecured(unsecuredEntityControl):
-								let factorInstance = unsecuredEntityControl.transactionSigning
-								let derivationPath = factorInstance.derivationPath
-								let hdRoot = try mnemonicWithPassphrase.hdRoot()
-								let privateKey = try hdRoot.derivePrivateKey(
-									path: derivationPath,
-									curve: factorInstance.publicKey.curve
-								)
-
-								return privateKey.publicKey() == factorInstance.publicKey
-							}
-						} catch {
-							return false
-						}
+					let accountsControlledByMainDeviceFactorSource = try await accountsClient.getAccountsOnCurrentNetwork().filter {
+						$0.virtualHierarchicalDeterministicFactorInstances.contains(where: { $0.factorSourceID == deviceFactorSource.id })
 					}
 
-					return !accounts.allSatisfy(hasControl)
+					do {
+						let hasControlOfAllAccounts = try mnemonicWithPassphrase.validatePublicKeys(of: accountsControlledByMainDeviceFactorSource)
+						return !hasControlOfAllAccounts // if we dont have controll of ALL accounts, then recovery is needed.
+					} catch {
+						// Account recover needed
+						return true
+					}
+
 				} catch {
 					loggerGlobal.error("Failure during check if wallet needs account recovery: \(String(describing: error))")
 					if error is KeychainAccess.Status {
@@ -88,9 +115,22 @@ extension DeviceFactorSourceClient: DependencyKey {
 					}
 					return true
 				}
+			},
+			entitiesControlledByFactorSource: entitiesControlledByFactorSource,
+			controlledEntities: { maybeOverridingSnapshot in
+				let sources: IdentifiedArrayOf<DeviceFactorSource> = try await {
+					// FIXME: Uh this aint pretty... but we are short on time.
+					if let overridingSnapshot = maybeOverridingSnapshot {
+						let profile = try Profile(snapshot: overridingSnapshot)
+						return IdentifiedArrayOf(uniqueElements: profile.factorSources.compactMap { $0.extract(DeviceFactorSource.self) })
+					} else {
+						return try await factorSourcesClient.getFactorSources(type: DeviceFactorSource.self)
+					}
+				}()
+				return try await IdentifiedArrayOf(uniqueElements: sources.asyncMap {
+					try await entitiesControlledByFactorSource($0, maybeOverridingSnapshot)
+				})
 			}
 		)
 	}()
 }
-
-import Cryptography

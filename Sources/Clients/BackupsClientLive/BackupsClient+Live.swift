@@ -17,19 +17,33 @@ extension BackupsClient: DependencyKey {
 
 		@Sendable
 		func importFor(
-			factorSourceID: FactorSourceID,
+			factorSourceIDs: Set<FactorSourceID>,
 			operation: () async throws -> Void
 		) async throws {
 			do {
 				try await operation()
 			} catch {
 				// revert the saved mnemonic
-				try? await secureStorageClient.deleteMnemonicByFactorSourceID(factorSourceID)
+				for factorSourceID in factorSourceIDs {
+					try? await secureStorageClient.deleteMnemonicByFactorSourceID(factorSourceID)
+				}
 				throw error
 			}
 		}
 
 		return Self(
+			snapshotOfProfileForExport: {
+				let profileStore = await getProfileStore()
+				let profileOutcome = await profileStore.getLoadProfileOutcome()
+				switch profileOutcome {
+				case .existingProfile:
+					return await profileStore.profile.snapshot()
+				default:
+					loggerGlobal.error("Expected to find persisted profile in ProfileStore, but was \(profileOutcome)")
+					struct NoPersistedProfile: Error {}
+					throw NoPersistedProfile()
+				}
+			},
 			loadProfileBackups: { () -> ProfileSnapshot.HeaderList? in
 				do {
 					let headers = try await secureStorageClient.loadProfileHeaderList()
@@ -56,13 +70,16 @@ extension BackupsClient: DependencyKey {
 					return nil
 				}
 			},
-			importProfileSnapshot: { snapshot, factorSourceID in
-				try await importFor(factorSourceID: factorSourceID) {
+			lookupProfileSnapshotByHeader: { header in
+				try await secureStorageClient.loadProfileSnapshot(header.id)
+			},
+			importProfileSnapshot: { snapshot, factorSourceIDs in
+				try await importFor(factorSourceIDs: factorSourceIDs) {
 					try await getProfileStore().importProfileSnapshot(snapshot)
 				}
 			},
-			importCloudProfile: { header, factorSourceID in
-				try await importFor(factorSourceID: factorSourceID) {
+			importCloudProfile: { header, factorSourceIDs in
+				try await importFor(factorSourceIDs: factorSourceIDs) {
 					try await getProfileStore().importCloudProfileSnapshot(header)
 				}
 			},

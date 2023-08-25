@@ -5,9 +5,9 @@ extension JSONEncoder: DependencyKey {
 	public typealias Value = @Sendable () -> JSONEncoder
 
 	public static let liveValue = { @Sendable in
-		let decoder = JSONEncoder()
-		decoder.dateEncodingStrategy = .iso8601
-		return decoder
+		let encoder = JSONEncoder()
+		encoder.dateEncodingStrategy = .iso8601
+		return encoder
 	}
 
 	public static var previewValue: Value { liveValue }

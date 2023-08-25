@@ -29,27 +29,33 @@ extension ManageSecurityStructureCoordinator {
 		func path(
 			for store: StoreOf<ManageSecurityStructureCoordinator.Path>
 		) -> some SwiftUI.View {
-			SwitchStore(store) {
-				CaseLet(
-					state: /ManageSecurityStructureCoordinator.Path.State.start,
-					action: ManageSecurityStructureCoordinator.Path.Action.start,
-					then: { ManageSecurityStructureStart.View(store: $0) }
-				)
-				CaseLet(
-					state: /ManageSecurityStructureCoordinator.Path.State.simpleSetupFlow,
-					action: ManageSecurityStructureCoordinator.Path.Action.simpleSetupFlow,
-					then: { SimpleManageSecurityStructureFlow.View(store: $0) }
-				)
-				CaseLet(
-					state: /ManageSecurityStructureCoordinator.Path.State.advancedSetupFlow,
-					action: ManageSecurityStructureCoordinator.Path.Action.advancedSetupFlow,
-					then: { AdvancedManageSecurityStructureFlow.View(store: $0) }
-				)
-				CaseLet(
-					state: /ManageSecurityStructureCoordinator.Path.State.nameStructure,
-					action: ManageSecurityStructureCoordinator.Path.Action.nameStructure,
-					then: { NameSecurityStructure.View(store: $0) }
-				)
+			SwitchStore(store) { state in
+				switch state {
+				case .start:
+					CaseLet(
+						state: /ManageSecurityStructureCoordinator.Path.State.start,
+						action: ManageSecurityStructureCoordinator.Path.Action.start,
+						then: { ManageSecurityStructureStart.View(store: $0) }
+					)
+				case .simpleSetupFlow:
+					CaseLet(
+						state: /ManageSecurityStructureCoordinator.Path.State.simpleSetupFlow,
+						action: ManageSecurityStructureCoordinator.Path.Action.simpleSetupFlow,
+						then: { SimpleManageSecurityStructureFlow.View(store: $0) }
+					)
+				case .advancedSetupFlow:
+					CaseLet(
+						state: /ManageSecurityStructureCoordinator.Path.State.advancedSetupFlow,
+						action: ManageSecurityStructureCoordinator.Path.Action.advancedSetupFlow,
+						then: { AdvancedManageSecurityStructureFlow.View(store: $0) }
+					)
+				case .nameStructure:
+					CaseLet(
+						state: /ManageSecurityStructureCoordinator.Path.State.nameStructure,
+						action: ManageSecurityStructureCoordinator.Path.Action.nameStructure,
+						then: { NameSecurityStructure.View(store: $0) }
+					)
+				}
 			}
 		}
 	}

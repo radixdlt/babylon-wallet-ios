@@ -152,8 +152,10 @@ extension ProfileSnapshot.Header.Version {
 	/// - 40: Changed Persona data/field format
 	/// - 41: Nickname is not optional
 	/// - 42: Change counter to not be factor source based.
-	/// - 44: Added OnLedgerSettings
-	public static let minimum: Self = 44
+	/// - 43: Added `mnemonicWordCount` in `hint` in `DeviceFactorSource`
+	/// - 44: Added `transaction` setting inside `appPreferences` with `defaultDepositGuarantee` decimal value encoded as String
+	/// - 45: Merge of 43 and 44.
+	public static let minimum: Self = 45
 }
 
 extension ProfileSnapshot.Header {

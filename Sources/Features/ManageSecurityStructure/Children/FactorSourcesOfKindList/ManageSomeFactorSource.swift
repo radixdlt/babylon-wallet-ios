@@ -4,7 +4,7 @@ import ImportMnemonicFeature
 import ManageTrustedContactFactorSourceFeature
 
 // MARK: - ManageSomeFactorSource
-public struct ManageSomeFactorSource<FactorSourceOfKind: BaseFactorSourceProtocol>: Sendable, FeatureReducer {
+public struct ManageSomeFactorSource<FactorSourceOfKind: BaseFactorSourceProtocol & Sendable>: Sendable, FeatureReducer {
 	public enum State: Sendable, Hashable {
 		case manageSecurityQuestions(AnswerSecurityQuestionsCoordinator.State)
 		case manageTrustedContact(ManageTrustedContactFactorSource.State)
@@ -16,7 +16,12 @@ public struct ManageSomeFactorSource<FactorSourceOfKind: BaseFactorSourceProtoco
 				fatalError("It is not possible to add another `device` factor source, bad application logic. Please make sure to disable any 'Add new' button if factor source kind is `device`.")
 
 			case .offDeviceMnemonic:
-				self = .manageOffDeviceMnemonics(.init(persistAsMnemonicKind: .offDevice))
+				self = .manageOffDeviceMnemonics(.init(
+					persistStrategy: .init(
+						mnemonicForFactorSourceKind: .offDevice,
+						location: .intoKeychainAndProfile
+					))
+				)
 
 			case .ledgerHQHardwareWallet:
 				fatalError("Should have handled Ledger by use of LedgerHardwareDevicesFeature")
@@ -79,7 +84,7 @@ public struct ManageSomeFactorSource<FactorSourceOfKind: BaseFactorSourceProtoco
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
-		case let .manageOffDeviceMnemonics(.delegate(.savedInProfile(factorSource))):
+		case let .manageOffDeviceMnemonics(.delegate(.persistedNewFactorSourceInProfile(factorSource))):
 			return delegateDone(factorSource: factorSource.extract(OffDeviceMnemonicFactorSource.self)!)
 
 		case let .manageTrustedContact(.delegate(.saveFactorSourceResult(.failure(error)))):

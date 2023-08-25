@@ -146,17 +146,6 @@ public struct UpdateFactorSourceLastUsedRequest: Sendable, Hashable {
 	}
 }
 
-// MARK: - MnemonicBasedFactorSourceKind
-public enum MnemonicBasedFactorSourceKind: Sendable, Hashable {
-	public enum OnDeviceMnemonicKind: Sendable, Hashable {
-		case babylon
-		case olympia
-	}
-
-	case onDevice(OnDeviceMnemonicKind)
-	case offDevice
-}
-
 // MARK: - SigningFactor
 public struct SigningFactor: Sendable, Hashable, Identifiable {
 	public typealias ID = FactorSourceID
@@ -209,9 +198,11 @@ extension FactorSourcesClient {
 
 	public func addOnDeviceFactorSource(
 		onDeviceMnemonicKind: MnemonicBasedFactorSourceKind.OnDeviceMnemonicKind,
-		mnemonicWithPassphrase: MnemonicWithPassphrase
+		mnemonicWithPassphrase: MnemonicWithPassphrase,
+		saveIntoProfile: Bool? = nil
 	) async throws -> FactorSource {
 		let isOlympiaCompatible = onDeviceMnemonicKind == .olympia
+		let shouldSaveIntoProfile: Bool = saveIntoProfile ?? isOlympiaCompatible
 
 		let factorSource: DeviceFactorSource = try isOlympiaCompatible
 			? .olympia(mnemonicWithPassphrase: mnemonicWithPassphrase)
@@ -220,7 +211,7 @@ extension FactorSourcesClient {
 		_ = try await addPrivateHDFactorSource(.init(
 			factorSource: factorSource.embed(),
 			mnemonicWithPasshprase: mnemonicWithPassphrase,
-			saveIntoProfile: isOlympiaCompatible
+			saveIntoProfile: shouldSaveIntoProfile
 		))
 
 		return factorSource.embed()
@@ -231,21 +222,62 @@ extension FactorSourcesClient {
 import Cryptography
 extension MnemonicWithPassphrase {
 	@discardableResult
-	public func validatePublicKeysOf(
-		softwareAccounts: NonEmpty<OrderedSet<OlympiaAccountToMigrate>>
+	public func validatePublicKeys(
+		of softwareAccounts: NonEmpty<OrderedSet<OlympiaAccountToMigrate>>
+	) throws -> Bool {
+		try validatePublicKeys(
+			of: softwareAccounts.map {
+				(
+					path: $0.path.fullPath,
+					expectedPublicKey: .ecdsaSecp256k1($0.publicKey)
+				)
+			}
+		)
+	}
+
+	@discardableResult
+	public func validatePublicKeys(
+		of accounts: [Profile.Network.Account]
+	) throws -> Bool {
+		try validatePublicKeys(
+			of: accounts.flatMap { account in
+				try account.virtualHierarchicalDeterministicFactorInstances.map {
+					try (
+						path: $0.derivationPath.hdFullPath(),
+						expectedPublicKey: $0.publicKey
+					)
+				}
+			}
+		)
+	}
+
+	@discardableResult
+	public func validatePublicKeys(
+		of accounts: [(path: HD.Path.Full, expectedPublicKey: SLIP10.PublicKey)]
 	) throws -> Bool {
 		let hdRoot = try self.hdRoot()
 
-		for olympiaAccount in softwareAccounts {
-			let path = olympiaAccount.path.fullPath
+		for account in accounts {
+			let path = account.0
+			let publicKey = account.1
 
-			let derivedPublicKey = try hdRoot.derivePrivateKey(
-				path: path,
-				curve: SECP256K1.self
-			).publicKey
+			let derivedPublicKey: SLIP10.PublicKey = try {
+				switch publicKey.curve {
+				case .secp256k1:
+					return try .ecdsaSecp256k1(hdRoot.derivePrivateKey(
+						path: path,
+						curve: SECP256K1.self
+					).publicKey)
+				case .curve25519:
+					return try .eddsaEd25519(hdRoot.derivePrivateKey(
+						path: path,
+						curve: Curve25519.self
+					).publicKey)
+				}
+			}()
 
-			guard derivedPublicKey == olympiaAccount.publicKey else {
-				throw ValidateOlympiaAccountsFailure.publicKeyMismatch
+			guard derivedPublicKey == publicKey else {
+				throw ValidateMnemonicAgainstEntities.publicKeyMismatch
 			}
 		}
 		// PublicKeys matches
@@ -253,7 +285,7 @@ extension MnemonicWithPassphrase {
 	}
 }
 
-// MARK: - ValidateOlympiaAccountsFailure
-enum ValidateOlympiaAccountsFailure: LocalizedError {
+// MARK: - ValidateMnemonicAgainstEntities
+enum ValidateMnemonicAgainstEntities: LocalizedError {
 	case publicKeyMismatch
 }

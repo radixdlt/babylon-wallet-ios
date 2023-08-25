@@ -56,22 +56,27 @@ extension CreateAccountCoordinator {
 			shouldDisplayNavBar: Bool
 		) -> some SwiftUI.View {
 			ZStack {
-				SwitchStore(store) {
-					CaseLet(
-						state: /CreateAccountCoordinator.Destinations.State.step1_nameAccount,
-						action: CreateAccountCoordinator.Destinations.Action.step1_nameAccount,
-						then: { NameAccount.View(store: $0) }
-					)
-					CaseLet(
-						state: /CreateAccountCoordinator.Destinations.State.step2_creationOfAccount,
-						action: CreateAccountCoordinator.Destinations.Action.step2_creationOfAccount,
-						then: { CreationOfAccount.View(store: $0) }
-					)
-					CaseLet(
-						state: /CreateAccountCoordinator.Destinations.State.step3_completion,
-						action: CreateAccountCoordinator.Destinations.Action.step3_completion,
-						then: { NewAccountCompletion.View(store: $0) }
-					)
+				SwitchStore(store) { state in
+					switch state {
+					case .step1_nameAccount:
+						CaseLet(
+							state: /CreateAccountCoordinator.Destinations.State.step1_nameAccount,
+							action: CreateAccountCoordinator.Destinations.Action.step1_nameAccount,
+							then: { NameAccount.View(store: $0) }
+						)
+					case .step2_creationOfAccount:
+						CaseLet(
+							state: /CreateAccountCoordinator.Destinations.State.step2_creationOfAccount,
+							action: CreateAccountCoordinator.Destinations.Action.step2_creationOfAccount,
+							then: { CreationOfAccount.View(store: $0) }
+						)
+					case .step3_completion:
+						CaseLet(
+							state: /CreateAccountCoordinator.Destinations.State.step3_completion,
+							action: CreateAccountCoordinator.Destinations.Action.step3_completion,
+							then: { NewAccountCompletion.View(store: $0) }
+						)
+					}
 				}
 			}
 			#if os(iOS)
