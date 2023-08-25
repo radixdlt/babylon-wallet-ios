@@ -23,7 +23,8 @@ public struct ProfileBackupSettings: Sendable, FeatureReducer {
 		@PresentationState
 		public var destination: Destinations.State?
 
-		public var profileFilePotentiallyEncrypted: ExportableProfileFile?
+		/// An exportable Profile file, either encrypted or plaintext.
+		public var profileFile: ExportableProfileFile?
 
 		public init(
 			backupProfileHeaders: ProfileSnapshot.HeaderList? = nil,
@@ -183,7 +184,7 @@ public struct ProfileBackupSettings: Sendable, FeatureReducer {
 			}
 
 		case .dismissFileExporter:
-			state.profileFilePotentiallyEncrypted = nil
+			state.profileFile = nil
 			return .none
 
 		case let .profileExportResult(.success(exportedProfileURL)):
@@ -261,7 +262,7 @@ public struct ProfileBackupSettings: Sendable, FeatureReducer {
 
 	private func showFileExporter(with file: ExportableProfileFile, _ state: inout State) -> EffectTask<Action> {
 		// This will trigger `fileExporter` to be shown
-		state.profileFilePotentiallyEncrypted = file
+		state.profileFile = file
 		return .none
 	}
 

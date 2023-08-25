@@ -5,7 +5,7 @@ extension ProfileBackupSettings.State {
 	var viewState: ProfileBackupSettings.ViewState {
 		.init(
 			isCloudProfileSyncEnabled: isCloudProfileSyncEnabled,
-			profileFilePotentiallyEncrypted: profileFilePotentiallyEncrypted
+			profileFile: profileFile
 		)
 	}
 }
@@ -13,10 +13,10 @@ extension ProfileBackupSettings.State {
 extension ProfileBackupSettings {
 	public struct ViewState: Equatable {
 		let isCloudProfileSyncEnabled: Bool
-		let profileFilePotentiallyEncrypted: ExportableProfileFile?
+		let profileFile: ExportableProfileFile?
 
 		public var isDisplayingFileExporter: Bool {
-			profileFilePotentiallyEncrypted != nil
+			profileFile != nil
 		}
 	}
 
@@ -204,14 +204,14 @@ extension SwiftUI.View {
 				get: \.isDisplayingFileExporter,
 				send: .dismissFileExporter
 			),
-			document: viewStore.profileFilePotentiallyEncrypted,
+			document: viewStore.profileFile,
 			contentType: .profile,
-			defaultFilename: viewStore.profileFilePotentiallyEncrypted.map {
-				switch $0 {
-				case .plaintext: return String.filenameProfileNotEncrypted
+			defaultFilename: {
+				switch viewStore.profileFile {
+				case .plaintext, .none: return String.filenameProfileNotEncrypted
 				case .encrypted: return String.filenameProfileEncrypted
 				}
-			} ?? String.filenameProfileNotEncrypted,
+			}(),
 			onCompletion: { viewStore.send(.profileExportResult($0.mapError { $0 as NSError })) }
 		)
 	}

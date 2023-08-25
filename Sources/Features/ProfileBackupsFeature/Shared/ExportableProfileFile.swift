@@ -5,6 +5,7 @@ import UniformTypeIdentifiers
 struct NoJSONDataFound: Error {}
 
 // MARK: - ExportableProfileFile
+/// An exportable (and thus importable) Profile file, either encrypted or plaintext.
 public enum ExportableProfileFile: FileDocument, Sendable, Hashable {
 	case plaintext(ProfileSnapshot)
 	case encrypted(EncryptedProfileSnapshot)
@@ -39,7 +40,7 @@ extension ExportableProfileFile {
 
 	public func fileWrapper(configuration: WriteConfiguration) throws -> FileWrapper {
 		@Dependency(\.jsonEncoder) var jsonEncoder
-		var encoder = jsonEncoder()
+		let encoder = jsonEncoder()
 		// FIXME: Should we set skip escaping slashes for `jsonEncoder()` everywhere? Feels to risky to do that this close to release, so lets investigate later (thinking about Gateway...)
 		encoder.outputFormatting = [.withoutEscapingSlashes]
 		switch self {
