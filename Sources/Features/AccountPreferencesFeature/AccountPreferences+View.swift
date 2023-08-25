@@ -6,12 +6,17 @@ extension AccountPreferences.State {
 			.init(
 				id: .personalize,
 				title: "Personalize this account", // FIXME: strings
-				rows: .init(uncheckedUniqueElements: [.accountLabel(account)])
+				rows: [.accountLabel(account)]
+			),
+			.init(
+				id: .ledgerBehaviour,
+				title: "Set how you want this account to work", // FIXME: strings
+				rows: [.thirdPartyDeposits()]
 			),
 			.init(
 				id: .development,
 				title: "Set development preferences", // FIXME: strings
-				rows: .init(uncheckedUniqueElements: [.devAccountPreferneces()])
+				rows: [.devAccountPreferneces()]
 			),
 		])
 	}
@@ -20,7 +25,7 @@ extension AccountPreferences.State {
 // MARK: - AccountPreferences.View
 extension AccountPreferences {
 	public struct ViewState: Equatable {
-		public var sections: [Section]
+		var sections: [PreferenceSection<AccountPreferences.Section, AccountPreferences.Section.SectionRow>.ViewState]
 	}
 
 	@MainActor
@@ -33,42 +38,15 @@ extension AccountPreferences {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-				List {
-					ForEach(viewStore.sections) { section in
-						SwiftUI.Section {
-							ForEach(section.rows) { row in
-								PlainListRow(
-									row.icon,
-									title: row.title,
-									subtitle: row.subtitle
-								)
-								.alignmentGuide(.listRowSeparatorLeading) { $0[.leading] + .medium3 }
-								.alignmentGuide(.listRowSeparatorTrailing) { $0[.trailing] - .medium3 }
-								.listRowInsets(EdgeInsets())
-								.onTapGesture {
-									viewStore.send(.rowTapped(row.id))
-								}
-							}
-						} header: {
-							Text(section.title)
-								.textStyle(.body1HighImportance)
-								.foregroundColor(.app.gray2)
-								.listRowInsets(.init(top: .small1, leading: .medium3, bottom: .medium3, trailing: .medium3))
-						} footer: {
-							Rectangle().fill().frame(height: 0)
-								.listRowInsets(EdgeInsets())
-						}
-						.listSectionSeparator(.hidden)
-						.textCase(nil)
-					}
-				}
+				PreferencesList(
+					viewState: .init(sections: viewStore.sections),
+					onRowSelected: { _, rowId in viewStore.send(.rowTapped(rowId)) }
+				)
 				.task {
-					viewStore.send(.task)
+					viewStore.send(.viewAppeared)
 				}
 				.destination(store: store)
-				.listStyle(.grouped)
-				.environment(\.defaultMinListHeaderHeight, 0)
-				.background(.app.gray4)
+				.background(.app.gray5)
 				.navigationTitle(L10n.AccountSettings.title)
 				#if os(iOS)
 					.navigationBarTitleColor(.app.gray1)
@@ -87,6 +65,7 @@ extension View {
 	func destination(store: StoreOf<AccountPreferences>) -> some View {
 		let destinationStore = store.scope(state: \.$destinations, action: { .child(.destinations($0)) })
 		return updateAccountLabel(with: destinationStore)
+			.thirdPartyDeposits(with: destinationStore)
 			.devAccountPreferences(with: destinationStore)
 	}
 
@@ -97,6 +76,16 @@ extension View {
 			state: /AccountPreferences.Destinations.State.updateAccountLabel,
 			action: AccountPreferences.Destinations.Action.updateAccountLabel,
 			destination: { UpdateAccountLabel.View(store: $0) }
+		)
+	}
+
+	@MainActor
+	func thirdPartyDeposits(with destinationStore: PresentationStoreOf<AccountPreferences.Destinations>) -> some View {
+		navigationDestination(
+			store: destinationStore,
+			state: /AccountPreferences.Destinations.State.thirdPartyDeposits,
+			action: AccountPreferences.Destinations.Action.thirdPartyDeposits,
+			destination: { ManageThirdPartyDeposits.View(store: $0) }
 		)
 	}
 
@@ -113,39 +102,38 @@ extension View {
 
 // MARK: - AccountPreferences.Section
 extension AccountPreferences {
-	public struct Section: Identifiable, Equatable {
-		public enum Kind: Equatable {
-			case personalize
-			case ledgerBehaviour
-			case development
+	public enum Section: Hashable, Sendable {
+		case personalize
+		case ledgerBehaviour
+		case development
+
+		public enum SectionRow: Hashable, Sendable {
+			case personalize(PersonalizeRow)
+			case onLedger(OnLedgerBehaviourRow)
+			case dev(DevelopmentRow)
 		}
 
-		public struct Row: Identifiable, Equatable {
-			public enum Kind: Equatable, Sendable {
-				case accountLabel
-				case accountColor
-				case tags
-				case accountSecurity
-				case thirdPartyDeposits
-				case devPreferences
-			}
-
-			public let id: Kind
-			let title: String
-			let subtitle: String?
-			let icon: AssetIcon.Content
+		public enum PersonalizeRow: Hashable, Sendable {
+			case accountLabel
+			case accountColor
+			case tags
 		}
 
-		public let id: Kind
-		let title: String
-		let rows: IdentifiedArrayOf<Row>
+		public enum OnLedgerBehaviourRow: Hashable, Sendable {
+			case accountSecurity
+			case thirdPartyDeposits
+		}
+
+		public enum DevelopmentRow: Hashable, Sendable {
+			case devPreferences
+		}
 	}
 }
 
-extension AccountPreferences.Section.Row {
-	public static func accountLabel(_ account: Profile.Network.Account) -> Self {
+extension PreferenceSection.Row where RowId == AccountPreferences.Section.SectionRow {
+	static func accountLabel(_ account: Profile.Network.Account) -> Self {
 		.init(
-			id: .accountLabel,
+			id: .personalize(.accountLabel),
 			title: "Account Label", // FIXME: strings
 			subtitle: account.displayName.rawValue,
 			icon: .asset(AssetResource.create)
@@ -154,7 +142,7 @@ extension AccountPreferences.Section.Row {
 
 	static func devAccountPreferneces() -> Self {
 		.init(
-			id: .devPreferences,
+			id: .dev(.devPreferences),
 			title: "Dev Preferences", // FIXME: strings
 			subtitle: nil,
 			icon: .asset(AssetResource.appSettings)
@@ -164,7 +152,7 @@ extension AccountPreferences.Section.Row {
 	// TODO: Pass the deposit mode
 	static func thirdPartyDeposits() -> Self {
 		.init(
-			id: .thirdPartyDeposits,
+			id: .onLedger(.thirdPartyDeposits),
 			title: "Third-Party Deposits", // FIXME: strings
 			subtitle: "Accept all deposits", // FIXME: strings
 			icon: .asset(AssetResource.iconAcceptAirdrop)

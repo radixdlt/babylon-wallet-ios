@@ -590,7 +590,7 @@ extension SimpleDappDetails.View {
 
 					ForEach(elements) { element in
 						Card {
-							PlainListRow(title: title(element), showChevron: false) {
+							PlainListRow(title: title(element), accessory: nil) {
 								icon(element)
 							}
 						}
