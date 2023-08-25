@@ -47,17 +47,22 @@ extension AnswerSecurityQuestionsCoordinator {
 		func path(
 			for store: StoreOf<AnswerSecurityQuestionsCoordinator.Path>
 		) -> some SwiftUI.View {
-			SwitchStore(store) {
-				CaseLet(
-					state: /AnswerSecurityQuestionsCoordinator.Path.State.chooseQuestions,
-					action: AnswerSecurityQuestionsCoordinator.Path.Action.chooseQuestions,
-					then: { ChooseQuestions.View(store: $0) }
-				)
-				CaseLet(
-					state: /AnswerSecurityQuestionsCoordinator.Path.State.answerQuestion,
-					action: AnswerSecurityQuestionsCoordinator.Path.Action.answerQuestion,
-					then: { AnswerSecurityQuestionFreeform.View(store: $0) }
-				)
+			SwitchStore(store) { state in
+				switch state {
+				case .chooseQuestions:
+					CaseLet(
+						state: /AnswerSecurityQuestionsCoordinator.Path.State.chooseQuestions,
+						action: AnswerSecurityQuestionsCoordinator.Path.Action.chooseQuestions,
+						then: { ChooseQuestions.View(store: $0) }
+					)
+
+				case .answerQuestion:
+					CaseLet(
+						state: /AnswerSecurityQuestionsCoordinator.Path.State.answerQuestion,
+						action: AnswerSecurityQuestionsCoordinator.Path.Action.answerQuestion,
+						then: { AnswerSecurityQuestionFreeform.View(store: $0) }
+					)
+				}
 			}
 		}
 	}

@@ -222,11 +222,11 @@ extension FactorSourcesClient {
 import Cryptography
 extension MnemonicWithPassphrase {
 	@discardableResult
-	public func validatePublicKeysOf(
-		softwareAccounts: NonEmpty<OrderedSet<OlympiaAccountToMigrate>>
+	public func validatePublicKeys(
+		of softwareAccounts: NonEmpty<OrderedSet<OlympiaAccountToMigrate>>
 	) throws -> Bool {
-		try validatePublicKeysOf(
-			accounts: softwareAccounts.map {
+		try validatePublicKeys(
+			of: softwareAccounts.map {
 				(
 					path: $0.path.fullPath,
 					expectedPublicKey: .ecdsaSecp256k1($0.publicKey)
@@ -236,11 +236,11 @@ extension MnemonicWithPassphrase {
 	}
 
 	@discardableResult
-	public func validatePublicKeysOf(
-		accounts: [Profile.Network.Account]
+	public func validatePublicKeys(
+		of accounts: [Profile.Network.Account]
 	) throws -> Bool {
-		try validatePublicKeysOf(
-			accounts: accounts.flatMap { account in
+		try validatePublicKeys(
+			of: accounts.flatMap { account in
 				try account.virtualHierarchicalDeterministicFactorInstances.map {
 					try (
 						path: $0.derivationPath.hdFullPath(),
@@ -252,14 +252,13 @@ extension MnemonicWithPassphrase {
 	}
 
 	@discardableResult
-	public func validatePublicKeysOf(
-		accounts: [(path: HD.Path.Full, expectedPublicKey: SLIP10.PublicKey)]
+	public func validatePublicKeys(
+		of accounts: [(path: HD.Path.Full, expectedPublicKey: SLIP10.PublicKey)]
 	) throws -> Bool {
 		let hdRoot = try self.hdRoot()
 
 		for account in accounts {
-			let path = account.0
-			let publicKey = account.1
+			let (path, publicKey) = account
 
 			let derivedPublicKey: SLIP10.PublicKey = try {
 				switch publicKey.curve {

@@ -79,7 +79,7 @@ extension OverlayWindowClient {
 
 				public init(
 					kind: Kind,
-					foregroundColor: Color = Color.app.green1
+					foregroundColor: Color = .app.green1
 				) {
 					self.kind = kind
 					self.foregroundColor = foregroundColor

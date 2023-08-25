@@ -92,7 +92,7 @@ extension FactorSourcesClient: DependencyKey {
 						guard let mnemonic = try await secureStorageClient.loadMnemonicByFactorSourceID(factorSourceID.embed(), .importOlympiaAccounts) else {
 							continue
 						}
-						guard (try? mnemonic.validatePublicKeysOf(softwareAccounts: softwareAccounts)) == true else {
+						guard (try? mnemonic.validatePublicKeys(of: softwareAccounts)) == true else {
 							continue
 						}
 						// YES Managed to validate all software accounts against existing factor source

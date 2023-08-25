@@ -16,7 +16,7 @@ public struct SelectBackup: Sendable, FeatureReducer {
 		@PresentationState
 		public var destination: Destinations.State?
 
-		public var profileFilePotentiallyEncrypted: ExportableProfileFile?
+		public var profileFile: ExportableProfileFile?
 
 		public init(
 			backupProfileHeaders: ProfileSnapshot.HeaderList? = nil,

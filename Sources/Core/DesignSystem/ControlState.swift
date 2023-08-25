@@ -7,8 +7,7 @@ public enum ControlState: Sendable, Hashable {
 	case disabled
 
 	public var isEnabled: Bool {
-		guard case .enabled = self else { return false }
-		return true
+		self == .enabled
 	}
 
 	public var isLoading: Bool {
@@ -17,8 +16,7 @@ public enum ControlState: Sendable, Hashable {
 	}
 
 	public var isDisabled: Bool {
-		guard case .disabled = self else { return false }
-		return true
+		self == .disabled
 	}
 }
 

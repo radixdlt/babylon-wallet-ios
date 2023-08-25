@@ -52,6 +52,9 @@ extension CGFloat {
 	public static let navigationBarHeight: Self = 50
 
 	/// 50
+	public static let approveSliderHeight: Self = 50
+
+	/// 50
 	public static let standardButtonHeight: Self = 50
 
 	/// 32

@@ -74,7 +74,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 		public let warning: String?
 
 		#if DEBUG
-		public var debugOnlyMnemonicPhraseSingleField = ""
+		public var debugMnemonicPhraseSingleField = ""
 		#endif
 
 		@PresentationState
@@ -186,9 +186,9 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 		case continueButtonTapped(Mnemonic)
 
 		#if DEBUG
-		case debugOnlyCopyMnemonic
-		case debugOnlyMnemonicChanged(String)
-		case debugOnlyPasteMnemonic
+		case debugCopyMnemonic
+		case debugMnemonicChanged(String)
+		case debugPasteMnemonic
 		#endif
 	}
 
@@ -356,14 +356,14 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			return .send(.delegate(.doneViewing))
 
 		#if DEBUG
-		case .debugOnlyCopyMnemonic:
+		case .debugCopyMnemonic:
 			if let mnemonic = state.mnemonic?.phrase.rawValue {
 				pasteboardClient.copyString(mnemonic)
 			}
 			return .none
 
-		case let .debugOnlyMnemonicChanged(mnemonic):
-			state.debugOnlyMnemonicPhraseSingleField = mnemonic
+		case let .debugMnemonicChanged(mnemonic):
+			state.debugMnemonicPhraseSingleField = mnemonic
 			if let mnemonic = try? Mnemonic(phrase: mnemonic, language: state.language) {
 				state.words = State.words(from: mnemonic, isReadonlyMode: state.isReadonlyMode)
 				return .send(.view(.continueButtonTapped(mnemonic)))
@@ -371,9 +371,9 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 				return .none
 			}
 
-		case .debugOnlyPasteMnemonic:
+		case .debugPasteMnemonic:
 			let toPaste = pasteboardClient.getString() ?? ""
-			return .send(.view(.debugOnlyMnemonicChanged(toPaste)))
+			return .send(.view(.debugMnemonicChanged(toPaste)))
 		#endif
 		}
 	}

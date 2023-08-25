@@ -14,27 +14,34 @@ extension CreateAuthKey {
 
 		public var body: some SwiftUI.View {
 			ZStack {
-				SwitchStore(store.scope(state: \.step)) {
-					CaseLet(
-						state: /CreateAuthKey.State.Step.getAuthKeyDerivationPath,
-						action: { CreateAuthKey.Action.child(.getAuthKeyDerivationPath($0)) },
-						then: { GetAuthKeyDerivationPath.View(store: $0) }
-					)
-					CaseLet(
-						state: /CreateAuthKey.State.Step.derivePublicKeys,
-						action: { CreateAuthKey.Action.child(.derivePublicKeys($0)) },
-						then: { DerivePublicKeys.View(store: $0) }
-					)
-					CaseLet(
-						state: /CreateAuthKey.State.Step.transactionReview,
-						action: { CreateAuthKey.Action.child(.transactionReview($0)) },
-						then: { store in
-							// FIXME: CreateAuthKey should use DappInteractionClient to schedule a transaction!!!
-							NavigationView {
-								TransactionReview.View(store: store)
+				SwitchStore(store.scope(state: \.step, action: Action.child)) { state in
+					switch state {
+					case .getAuthKeyDerivationPath:
+						CaseLet(
+							state: /CreateAuthKey.State.Step.getAuthKeyDerivationPath,
+							action: CreateAuthKey.ChildAction.getAuthKeyDerivationPath,
+							then: { GetAuthKeyDerivationPath.View(store: $0) }
+						)
+
+					case .derivePublicKeys:
+						CaseLet(
+							state: /CreateAuthKey.State.Step.derivePublicKeys,
+							action: CreateAuthKey.ChildAction.derivePublicKeys,
+							then: { DerivePublicKeys.View(store: $0) }
+						)
+
+					case .transactionReview:
+						CaseLet(
+							state: /CreateAuthKey.State.Step.transactionReview,
+							action: CreateAuthKey.ChildAction.transactionReview,
+							then: { store in
+								// FIXME: CreateAuthKey should use DappInteractionClient to schedule a transaction!!!
+								NavigationView {
+									TransactionReview.View(store: store)
+								}
 							}
-						}
-					)
+						)
+					}
 				}
 			}
 		}

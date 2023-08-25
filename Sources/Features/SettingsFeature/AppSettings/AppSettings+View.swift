@@ -58,7 +58,7 @@ extension AppSettings {
 				}
 				.manageP2PLinks(with: destinationStore)
 				.gatewaySettings(with: destinationStore)
-				.backUpProfileSettings(with: destinationStore)
+				.profileBackupSettings(with: destinationStore)
 			}
 		}
 
@@ -78,7 +78,7 @@ extension AppSettings {
 					title: L10n.Settings.backups,
 					subtitle: nil, // TODO: Determine, if possible, the date of last backup.
 					icon: .asset(AssetResource.backups),
-					action: .backUpProfileSettingsButtonTapped
+					action: .profileBackupSettingsButtonTapped
 				),
 			]
 		}
@@ -146,12 +146,12 @@ private extension View {
 	}
 
 	@MainActor
-	func backUpProfileSettings(with destinationStore: PresentationStoreOf<AppSettings.Destinations>) -> some View {
+	func profileBackupSettings(with destinationStore: PresentationStoreOf<AppSettings.Destinations>) -> some View {
 		navigationDestination(
 			store: destinationStore,
-			state: /AppSettings.Destinations.State.backUpProfileSettings,
-			action: AppSettings.Destinations.Action.backUpProfileSettings,
-			destination: { BackUpProfileSettings.View(store: $0) }
+			state: /AppSettings.Destinations.State.profileBackupSettings,
+			action: AppSettings.Destinations.Action.profileBackupSettings,
+			destination: { ProfileBackupSettings.View(store: $0) }
 		)
 	}
 }

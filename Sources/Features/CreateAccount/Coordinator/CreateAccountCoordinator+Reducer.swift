@@ -42,9 +42,6 @@ public struct CreateAccountCoordinator: Sendable, FeatureReducer {
 
 	public struct Destinations: Sendable, ReducerProtocol {
 		public enum State: Sendable, Hashable {
-			case step_first
-			case step_last
-
 			case step1_nameAccount(NameAccount.State)
 			case step2_creationOfAccount(CreationOfAccount.State)
 			case step3_completion(NewAccountCompletion.State)

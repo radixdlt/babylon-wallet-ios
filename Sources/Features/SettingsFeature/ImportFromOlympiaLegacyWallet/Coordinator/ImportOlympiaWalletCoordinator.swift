@@ -362,8 +362,8 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 		guard case let .checkedIfOlympiaFactorSourceAlreadyExists(progress) = state.progress else { return progressError(state.progress) }
 
 		do {
-			try mnemonicWithPassphrase.validatePublicKeysOf(
-				softwareAccounts: progress.softwareAccountsToMigrate
+			try mnemonicWithPassphrase.validatePublicKeys(
+				of: progress.softwareAccountsToMigrate
 			)
 
 			let privateHDFactorSource = try PrivateHDFactorSource(

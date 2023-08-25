@@ -7,15 +7,12 @@ import ImportMnemonicFeature
 import OverlayWindowClient
 import RadixConnectClient
 
-// MARK: - BackUpProfileSettings
-public struct BackUpProfileSettings: Sendable, FeatureReducer {
+// MARK: - ProfileBackupSettings
+public struct ProfileBackupSettings: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public var preferences: AppPreferences?
 		public var backupProfileHeaders: ProfileSnapshot.HeaderList?
 		public var selectedProfileHeader: ProfileSnapshot.Header?
-		public var isDisplayingFileExporter: Bool {
-			profileFilePotentiallyEncrypted != nil
-		}
 
 		public var thisDeviceID: UUID?
 
@@ -26,7 +23,8 @@ public struct BackUpProfileSettings: Sendable, FeatureReducer {
 		@PresentationState
 		public var destination: Destinations.State?
 
-		public var profileFilePotentiallyEncrypted: ExportableProfileFile?
+		/// An exportable Profile file, either encrypted or plaintext.
+		public var profileFile: ExportableProfileFile?
 
 		public init(
 			backupProfileHeaders: ProfileSnapshot.HeaderList? = nil,
@@ -149,12 +147,11 @@ public struct BackUpProfileSettings: Sendable, FeatureReducer {
 	@Dependency(\.backupsClient) var backupsClient
 	@Dependency(\.appPreferencesClient) var appPreferencesClient
 	@Dependency(\.radixConnectClient) var radixConnectClient
-	@Dependency(\.userDefaultsClient) var userDefaultsClient
 	@Dependency(\.overlayWindowClient) var overlayWindowClient
 
 	public init() {}
 
-	public var body: some ReducerProtocolOf<BackUpProfileSettings> {
+	public var body: some ReducerProtocolOf<ProfileBackupSettings> {
 		Reduce(core)
 			.ifLet(\.$destination, action: /Action.child .. /ChildAction.destination) {
 				Destinations()
@@ -187,7 +184,7 @@ public struct BackUpProfileSettings: Sendable, FeatureReducer {
 			}
 
 		case .dismissFileExporter:
-			state.profileFilePotentiallyEncrypted = nil
+			state.profileFile = nil
 			return .none
 
 		case let .profileExportResult(.success(exportedProfileURL)):
@@ -265,7 +262,7 @@ public struct BackUpProfileSettings: Sendable, FeatureReducer {
 
 	private func showFileExporter(with file: ExportableProfileFile, _ state: inout State) -> EffectTask<Action> {
 		// This will trigger `fileExporter` to be shown
-		state.profileFilePotentiallyEncrypted = file
+		state.profileFile = file
 		return .none
 	}
 
@@ -298,7 +295,6 @@ public struct BackUpProfileSettings: Sendable, FeatureReducer {
 
 	private func deleteProfile(keepInICloudIfPresent: Bool) -> EffectTask<Action> {
 		.task {
-			await userDefaultsClient.removeAccountsThatNeedRecovery()
 			cacheClient.removeAll()
 			await radixConnectClient.disconnectAndRemoveAll()
 			return .delegate(.deleteProfileAndFactorSources(keepInICloudIfPresent: keepInICloudIfPresent))
@@ -309,7 +305,7 @@ public struct BackUpProfileSettings: Sendable, FeatureReducer {
 // MARK: - LackedPermissionToAccessSecurityScopedResource
 struct LackedPermissionToAccessSecurityScopedResource: Error {}
 
-extension ConfirmationDialogState<BackUpProfileSettings.Destinations.Action.DeleteProfileConfirmationDialogAction> {
+extension ConfirmationDialogState<ProfileBackupSettings.Destinations.Action.DeleteProfileConfirmationDialogAction> {
 	static let deleteProfileConfirmationDialog = ConfirmationDialogState {
 		TextState(L10n.AppSettings.ResetWalletDialog.title)
 	} actions: {
@@ -327,7 +323,7 @@ extension ConfirmationDialogState<BackUpProfileSettings.Destinations.Action.Dele
 	}
 }
 
-extension BackUpProfileSettings.Destinations.State {
+extension ProfileBackupSettings.Destinations.State {
 	// FIXME: Strings
 	fileprivate static let cloudSyncTakesLongTimeAlert = Self.syncTakesLongTimeAlert(.init(
 		title: { TextState("Enabling iCloud sync") },

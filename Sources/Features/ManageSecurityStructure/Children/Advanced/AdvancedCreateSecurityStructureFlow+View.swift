@@ -201,11 +201,7 @@ struct FactorsForRoleButton<R: RoleProtocol>: SwiftUI.View {
 
 	var buttonTitle: String {
 		let none = "None set"
-		guard
-			let roleOfTier
-		else {
-			return none
-		}
+		guard let roleOfTier else { return none }
 
 		switch (roleOfTier.superAdminFactors.isEmpty, roleOfTier.thresholdFactors.isEmpty) {
 		case (true, true): return none

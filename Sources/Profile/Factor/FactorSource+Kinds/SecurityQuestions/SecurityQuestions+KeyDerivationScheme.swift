@@ -167,7 +167,7 @@ extension SecurityQuestionsFactorSource.KeyDerivationScheme {
 				}
 			}
 
-			func _multiPartyKeyExchangeBetweenAllCombinations(
+			func multiPartyKeyExchangeBetweenAllCombinations(
 				of privateKeys: NonEmpty<[Curve25519.KeyAgreement.PrivateKey]>,
 				minus: Int = 1
 			) throws -> NonEmpty<[Curve25519.KeyAgreement.PublicKey]> {
@@ -186,7 +186,7 @@ extension SecurityQuestionsFactorSource.KeyDerivationScheme {
 				of privateKeys: NonEmpty<[Curve25519.KeyAgreement.PrivateKey]>,
 				minus: Int = 1
 			) throws -> NonEmpty<[SymmetricKey]> {
-				try _multiPartyKeyExchangeBetweenAllCombinations(
+				try multiPartyKeyExchangeBetweenAllCombinations(
 					of: privateKeys,
 					minus: minus
 				).map { SymmetricKey(data: $0.rawRepresentation) }
