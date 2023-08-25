@@ -270,8 +270,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 
 			return .run { send in
 				let result = await TaskResult {
-					try await Task.sleep(for: .seconds(2))
-					return try await onLedgerEntitiesClient.getResource(assetTransfer.resource)
+					try await onLedgerEntitiesClient.getResource(assetTransfer.resource)
 				}
 
 				await send(.internal(.loadedOnLedgerResource(assetTransfer, result)))
