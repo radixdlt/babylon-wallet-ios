@@ -150,7 +150,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 			return .none
 
 		case .exportMnemonicButtonTapped:
-			return loadExport(account: state.account)
+			return loadMnemonic(account: state.account)
 
 		case .recoverMnemonicsButtonTapped:
 			return loadImport()
