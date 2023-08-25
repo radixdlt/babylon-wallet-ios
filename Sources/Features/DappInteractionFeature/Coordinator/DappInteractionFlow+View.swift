@@ -59,37 +59,50 @@ extension DappInteractionFlow {
 		func destination(
 			for store: StoreOf<DappInteractionFlow.Destinations>
 		) -> some SwiftUI.View {
-			SwitchStore(store.relay()) {
-				CaseLet(
-					state: /DappInteractionFlow.Destinations.MainState.login,
-					action: DappInteractionFlow.Destinations.MainAction.login,
-					then: { Login.View(store: $0) }
-				)
-				CaseLet(
-					state: /DappInteractionFlow.Destinations.MainState.accountPermission,
-					action: DappInteractionFlow.Destinations.MainAction.accountPermission,
-					then: { AccountPermission.View(store: $0) }
-				)
-				CaseLet(
-					state: /DappInteractionFlow.Destinations.MainState.chooseAccounts,
-					action: DappInteractionFlow.Destinations.MainAction.chooseAccounts,
-					then: { AccountPermissionChooseAccounts.View(store: $0) }
-				)
-				CaseLet(
-					state: /DappInteractionFlow.Destinations.MainState.personaDataPermission,
-					action: DappInteractionFlow.Destinations.MainAction.personaDataPermission,
-					then: { PersonaDataPermission.View(store: $0) }
-				)
-				CaseLet(
-					state: /DappInteractionFlow.Destinations.MainState.oneTimePersonaData,
-					action: DappInteractionFlow.Destinations.MainAction.oneTimePersonaData,
-					then: { OneTimePersonaData.View(store: $0) }
-				)
-				CaseLet(
-					state: /DappInteractionFlow.Destinations.MainState.reviewTransaction,
-					action: DappInteractionFlow.Destinations.MainAction.reviewTransaction,
-					then: { TransactionReview.View(store: $0) }
-				)
+			SwitchStore(store.relay()) { state in
+				switch state {
+				case .login:
+					CaseLet(
+						state: /DappInteractionFlow.Destinations.MainState.login,
+						action: DappInteractionFlow.Destinations.MainAction.login,
+						then: { Login.View(store: $0) }
+					)
+
+				case .accountPermission:
+					CaseLet(
+						state: /DappInteractionFlow.Destinations.MainState.accountPermission,
+						action: DappInteractionFlow.Destinations.MainAction.accountPermission,
+						then: { AccountPermission.View(store: $0) }
+					)
+
+				case .chooseAccounts:
+					CaseLet(
+						state: /DappInteractionFlow.Destinations.MainState.chooseAccounts,
+						action: DappInteractionFlow.Destinations.MainAction.chooseAccounts,
+						then: { AccountPermissionChooseAccounts.View(store: $0) }
+					)
+
+				case .personaDataPermission:
+					CaseLet(
+						state: /DappInteractionFlow.Destinations.MainState.personaDataPermission,
+						action: DappInteractionFlow.Destinations.MainAction.personaDataPermission,
+						then: { PersonaDataPermission.View(store: $0) }
+					)
+
+				case .oneTimePersonaData:
+					CaseLet(
+						state: /DappInteractionFlow.Destinations.MainState.oneTimePersonaData,
+						action: DappInteractionFlow.Destinations.MainAction.oneTimePersonaData,
+						then: { OneTimePersonaData.View(store: $0) }
+					)
+
+				case .reviewTransaction:
+					CaseLet(
+						state: /DappInteractionFlow.Destinations.MainState.reviewTransaction,
+						action: DappInteractionFlow.Destinations.MainAction.reviewTransaction,
+						then: { TransactionReview.View(store: $0) }
+					)
+				}
 			}
 		}
 	}

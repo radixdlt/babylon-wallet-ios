@@ -23,17 +23,21 @@ extension RestoreProfileFromBackupCoordinator {
 		func path(
 			for store: StoreOf<RestoreProfileFromBackupCoordinator.Path>
 		) -> some SwiftUI.View {
-			SwitchStore(store) {
-				CaseLet(
-					state: /RestoreProfileFromBackupCoordinator.Path.State.selectBackup,
-					action: RestoreProfileFromBackupCoordinator.Path.Action.selectBackup,
-					then: { SelectBackup.View(store: $0) }
-				)
-				CaseLet(
-					state: /RestoreProfileFromBackupCoordinator.Path.State.importMnemonicsFlow,
-					action: RestoreProfileFromBackupCoordinator.Path.Action.importMnemonicsFlow,
-					then: { ImportMnemonicsFlowCoordinator.View(store: $0) }
-				)
+			SwitchStore(store) { state in
+				switch state {
+				case .selectBackup:
+					CaseLet(
+						state: /RestoreProfileFromBackupCoordinator.Path.State.selectBackup,
+						action: RestoreProfileFromBackupCoordinator.Path.Action.selectBackup,
+						then: { SelectBackup.View(store: $0) }
+					)
+				case .importMnemonicsFlow:
+					CaseLet(
+						state: /RestoreProfileFromBackupCoordinator.Path.State.importMnemonicsFlow,
+						action: RestoreProfileFromBackupCoordinator.Path.Action.importMnemonicsFlow,
+						then: { ImportMnemonicsFlowCoordinator.View(store: $0) }
+					)
+				}
 			}
 		}
 	}
