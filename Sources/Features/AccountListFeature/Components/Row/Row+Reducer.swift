@@ -65,7 +65,7 @@ extension AccountList {
 				let accountAddress = state.account.address
 				state.portfolio = .loading
 				let accounts = userDefaultsClient.getAddressesOfAccountsThatNeedRecovery()
-				state.needToBackupMnemonicForThisAccount = accounts.contains(where: { $0 == accountAddress })
+				state.needToImportMnemonicForThisAccount = accounts.contains(where: { $0 == accountAddress })
 
 				return .run { send in
 					for try await accountPortfolio in await accountPortfoliosClient.portfolioForAccount(accountAddress) {

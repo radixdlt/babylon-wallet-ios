@@ -97,14 +97,14 @@ extension AccountDetails {
 				)
 				.sheet(
 					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-					state: /Home.Destinations.State.importMnemonics,
-					action: Home.Destinations.Action.importMnemonics,
+					state: /AccountDetails.Destinations.State.importMnemonics,
+					action: AccountDetails.Destinations.Action.importMnemonics,
 					content: { ImportMnemonicsFlowCoordinator.View(store: $0) }
 				)
 				.sheet(
 					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-					state: /Home.Destinations.State.importMnemonics,
-					action: Home.Destinations.Action.importMnemonics,
+					state: /AccountDetails.Destinations.State.importMnemonics,
+					action: AccountDetails.Destinations.Action.importMnemonics,
 					content: { ImportMnemonicsFlowCoordinator.View(store: $0) }
 				)
 			}

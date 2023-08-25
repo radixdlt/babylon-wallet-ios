@@ -117,7 +117,7 @@ extension AccountList.Row {
 						importMnemonicPromptView(viewStore)
 					}
 
-					if viewStore.needToBackupMnemonicForThisAccount {
+					if !viewStore.needToImportMnemonicForThisAccount, viewStore.needToBackupMnemonicForThisAccount {
 						backupMnemonicPromptView(viewStore)
 					}
 				}

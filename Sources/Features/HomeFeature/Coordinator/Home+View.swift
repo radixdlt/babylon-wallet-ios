@@ -7,7 +7,7 @@ import ProfileBackupsFeature
 
 extension Home.State {
 	var viewState: Home.ViewState {
-		.init(hasNotification: accountRecoveryIsNeeded)
+		.init(hasNotification: false) // we don't have any notification to show at the moment
 	}
 }
 
