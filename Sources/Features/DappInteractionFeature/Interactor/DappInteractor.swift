@@ -7,6 +7,8 @@ import RadixConnectClient
 import RadixConnectModels
 import ROLAClient
 
+import EngineToolkit
+
 typealias RequestEnvelope = DappInteractionClient.RequestEnvelope
 
 // MARK: - DappInteractor

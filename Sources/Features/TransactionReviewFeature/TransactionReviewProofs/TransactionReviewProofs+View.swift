@@ -43,8 +43,6 @@ extension TransactionReviewProofs {
 					}
 				}
 			}
-			.padding(.horizontal, .medium3)
-			.padding(.bottom, .medium1)
 		}
 
 		struct ProofView: SwiftUI.View {

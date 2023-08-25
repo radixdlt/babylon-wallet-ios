@@ -548,8 +548,7 @@ extension Array where Element == AccountPortfolio.FungibleResource {
 		let networkId = await gatewaysClient.getCurrentNetworkID()
 
 		for resource in self {
-			let isXRD = try? resource.resourceAddress.isXRD(on: networkId)
-			if isXRD == true {
+			if resource.resourceAddress.isXRD(on: networkId) {
 				xrdResource = resource
 			} else {
 				nonXrdResources.append(resource)

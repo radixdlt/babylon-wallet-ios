@@ -8,15 +8,18 @@ struct AssetBehaviorsView: View {
 
 	var body: some View {
 		if !behaviors.isEmpty {
-			Text(L10n.AssetDetails.behavior)
-				.textStyle(.body1Regular)
-				.foregroundColor(.app.gray2)
+			Group {
+				Text(L10n.AssetDetails.behavior)
+					.textStyle(.body1Regular)
+					.foregroundColor(.app.gray2)
 
-			VStack(alignment: .leading, spacing: .small1) {
-				ForEach(behaviors, id: \.self) { behavior in
-					AssetBehaviorRow(behavior: behavior)
+				VStack(alignment: .leading, spacing: .small1) {
+					ForEach(behaviors, id: \.self) { behavior in
+						AssetBehaviorRow(behavior: behavior)
+					}
 				}
 			}
+			.transition(.opacity.combined(with: .scale(scale: 0.8)))
 		}
 	}
 }

@@ -12,7 +12,6 @@ extension TransactionReviewNetworkFee {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
-
 				VStack(alignment: .leading, spacing: .small2) {
 					HStack {
 						Text(L10n.TransactionReview.NetworkFee.heading)
@@ -44,8 +43,6 @@ extension TransactionReviewNetworkFee {
 					.foregroundColor(.app.blue2)
 				}
 			}
-			.padding(.horizontal, .medium3)
-			.padding(.bottom, .medium1)
 		}
 	}
 }
