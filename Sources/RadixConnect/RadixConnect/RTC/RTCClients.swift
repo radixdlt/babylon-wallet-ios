@@ -285,7 +285,7 @@ extension RTCClient {
 
 extension RTCClient {
 	static var firstConnectionTimeout: Duration {
-		.seconds(10)
+		.seconds(30)
 	}
 
 	/// Cancel all of the related operations allowing this RTCClient to be deallocated.
