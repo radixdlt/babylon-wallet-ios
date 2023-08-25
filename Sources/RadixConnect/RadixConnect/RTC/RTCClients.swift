@@ -118,7 +118,7 @@ extension RTCClients {
 	) async throws {
 		guard let rtcClient = clients[origin.connectionId], await rtcClient.hasAnyActiveConnections() else {
 			loggerGlobal.info("RTCClients: No Active Peer Connection to send back message to, creating anew")
-			clients.removeValue(forKey: origin.connectionId)
+			await disconnectAndRemoveClient(origin.connectionId)
 			// missing client, create anew
 			try await connect(origin.connectionId, waitsForConnectionToBeEstablished: true)
 			try await clients[origin.connectionId]?.send(response: response, to: origin.peerConnectionId)
