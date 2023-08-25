@@ -242,6 +242,8 @@ package.addModules([
 			"AccountsClient",
 			"AppPreferencesClient",
 			"CreateAccountFeature",
+			"ImportMnemonicFeature",
+			"ProfileBackupsFeature", // actually only ImportMnemonicsFlowCoodinator, might split it out in future
 		],
 		tests: .yes()
 	),

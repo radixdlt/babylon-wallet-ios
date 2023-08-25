@@ -13,10 +13,10 @@ extension AccountList {
 
 			public var portfolio: Loadable<AccountPortfolio>
 
-			public var needToBackupMnemonicForThisAccount = false
 			public let isLegacyAccount: Bool
 			public let isLedgerAccount: Bool
 			public var isDappDefinitionAccount: Bool = false
+			public var needToBackupMnemonicForThisAccount = false
 			public var needToImportMnemonicForThisAccount = false
 
 			public init(
@@ -38,7 +38,8 @@ extension AccountList {
 		public enum ViewAction: Sendable, Equatable {
 			case tapped
 			case task
-			case securityPromptTapped
+			case backUpMnemonic
+			case importMnemonic
 		}
 
 		public enum InternalAction: Sendable, Equatable {
@@ -48,7 +49,8 @@ extension AccountList {
 
 		public enum DelegateAction: Sendable, Equatable {
 			case tapped(Profile.Network.Account)
-			case securityPromptTapped(Profile.Network.Account)
+			case backUpMnemonic(controlling: Profile.Network.Account)
+			case importMnemonics(Profile.Network.Account)
 		}
 
 		@Dependency(\.cacheClient) var cacheClient
@@ -73,8 +75,12 @@ extension AccountList {
 						await send(.internal(.accountPortfolioUpdate(accountPortfolio.nonEmptyVaults)))
 					}
 				}
-			case .securityPromptTapped:
-				return .send(.delegate(.securityPromptTapped(state.account)))
+			case .backUpMnemonic:
+				return .send(.delegate(.backUpMnemonic(controlling: state.account)))
+
+			case .importMnemonic:
+				return .send(.delegate(.importMnemonics(state.account)))
+
 			case .tapped:
 				return .send(.delegate(.tapped(state.account)))
 			}

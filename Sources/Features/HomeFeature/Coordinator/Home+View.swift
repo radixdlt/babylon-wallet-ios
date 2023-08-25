@@ -2,6 +2,8 @@ import AccountDetailsFeature
 import AccountListFeature
 import CreateAccountFeature
 import FeaturePrelude
+import ImportMnemonicFeature
+import ProfileBackupsFeature
 
 extension Home.State {
 	var viewState: Home.ViewState {

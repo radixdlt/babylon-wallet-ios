@@ -3,6 +3,8 @@ import AssetsFeature
 import AssetTransferFeature
 import EngineKit
 import FeaturePrelude
+import ImportMnemonicFeature
+import ProfileBackupsFeature
 
 extension AccountDetails.State {
 	var viewState: AccountDetails.ViewState {
@@ -92,6 +94,18 @@ extension AccountDetails {
 					state: /AccountDetails.Destinations.State.transfer,
 					action: AccountDetails.Destinations.Action.transfer,
 					content: { AssetTransfer.SheetView(store: $0) }
+				)
+				.sheet(
+					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+					state: /Home.Destinations.State.importMnemonics,
+					action: Home.Destinations.Action.importMnemonics,
+					content: { ImportMnemonicsFlowCoordinator.View(store: $0) }
+				)
+				.sheet(
+					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+					state: /Home.Destinations.State.importMnemonics,
+					action: Home.Destinations.Action.importMnemonics,
+					content: { ImportMnemonicsFlowCoordinator.View(store: $0) }
 				)
 			}
 		}

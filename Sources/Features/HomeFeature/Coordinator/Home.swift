@@ -146,9 +146,18 @@ public struct Home: Sendable, FeatureReducer {
 			state.destination = .accountDetails(.init(for: account))
 			return .none
 
-		case let .accountList(.delegate(.displayAccountSecurity(account))):
-//			state.destination = .accountDetails(.init(for: account, destination: .preferences(.init(account: account))))
-			// TODO: Deep link
+		case let .accountList(.delegate(.backUpMnemonic(controllingAccount))):
+			state.destination = .accountDetails(.init(
+				for: controllingAccount,
+				needToBackupMnemonicForThisAccount: true
+			))
+			return .none
+
+		case let .accountList(.delegate(.importMnemonics(account))):
+			state.destination = .accountDetails(.init(
+				for: account,
+				needToImportMnemonicForThisAccount: true
+			))
 			return .none
 
 		case .destination(.presented(.accountDetails(.delegate(.dismiss)))):

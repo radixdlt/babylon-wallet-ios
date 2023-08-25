@@ -35,7 +35,9 @@ extension AccountList.Row {
 
 		let tag: AccountTag?
 
-		let shouldShowSecurityPrompt: Bool
+		let needToBackupMnemonicForThisAccount: Bool
+		let needToImportMnemonicForThisAccount: Bool
+
 		let fungibleResourceIcons: FungibleResources
 		let nonFungibleResourcesCount: Int
 		let poolUnitsCount: Int
@@ -49,8 +51,10 @@ extension AccountList.Row {
 			self.tag = .init(state: state)
 
 			// Show the prompt if the account has any XRD
-			// FIXME: Enable back after apple review release
-			self.shouldShowSecurityPrompt = false // state.shouldShowSecurityPrompt
+			self.needToBackupMnemonicForThisAccount = state.needToBackupMnemonicForThisAccount
+
+			// Show the prompt if keychain does not contain the mnemonic for this account
+			self.needToImportMnemonicForThisAccount = state.needToImportMnemonicForThisAccount
 
 			// Resources
 			guard let portfolio = state.portfolio.wrappedValue else {
@@ -108,8 +112,13 @@ extension AccountList.Row {
 					}
 
 					ownedResourcesList(viewStore)
-					if viewStore.shouldShowSecurityPrompt {
-						securityPromptView(viewStore)
+
+					if viewStore.needToImportMnemonicForThisAccount {
+						importMnemonicPromptView(viewStore)
+					}
+
+					if viewStore.needToBackupMnemonicForThisAccount {
+						backupMnemonicPromptView(viewStore)
 					}
 				}
 				.padding(.horizontal, .medium1)
@@ -204,11 +213,28 @@ extension AccountList.Row.View {
 }
 
 extension AccountList.Row.View {
-	func securityPromptView(_ viewStore: ViewStoreOf<AccountList.Row>) -> some View {
+	func importMnemonicPromptView(_ viewStore: ViewStoreOf<AccountList.Row>) -> some View {
+		shieldPromptView(
+			text: "Recovery of seed phrase required", // FIXME: Strings
+			action: { viewStore.send(.importMnemonic) }
+		)
+	}
+
+	func backupMnemonicPromptView(_ viewStore: ViewStoreOf<AccountList.Row>) -> some View {
+		shieldPromptView(
+			text: "Back up this account's seed phrase", // FIXME: Strings
+			action: { viewStore.send(.backUpMnemonic) }
+		)
+	}
+
+	func shieldPromptView(
+		text: String,
+		action onTapGesture: @escaping () -> Void
+	) -> some View {
 		HStack {
 			Image(asset: AssetResource.homeAccountSecurity)
 
-			Text(L10n.HomePage.applySecuritySettings)
+			Text(text)
 				.foregroundColor(.white)
 				.textStyle(.body2HighImportance)
 
@@ -223,7 +249,7 @@ extension AccountList.Row.View {
 		.background(.app.whiteTransparent2)
 		.cornerRadius(.small2)
 		.onTapGesture {
-			viewStore.send(.securityPromptTapped)
+			onTapGesture()
 		}
 	}
 }

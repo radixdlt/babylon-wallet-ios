@@ -22,7 +22,8 @@ public struct AccountList: Sendable, FeatureReducer {
 
 	public enum DelegateAction: Sendable, Equatable {
 		case displayAccountDetails(Profile.Network.Account)
-		case displayAccountSecurity(Profile.Network.Account)
+		case backUpMnemonic(controlling: Profile.Network.Account)
+		case importMnemonics(account: Profile.Network.Account)
 	}
 
 	public init() {}
@@ -40,10 +41,10 @@ public struct AccountList: Sendable, FeatureReducer {
 			switch action {
 			case let .tapped(account):
 				return .send(.delegate(.displayAccountDetails(account)))
-			case .securityPromptTapped:
-				// FIXME: Enable back once `displayAccountSecurity` is implemented.
-				// return .send(.delegate(.displayAccountSecurity(account)))
-				return .none
+			case let .backUpMnemonic(controllingAccount):
+				return .send(.delegate(.backUpMnemonic(controlling: controllingAccount)))
+			case let .importMnemonics(account):
+				return .send(.delegate(.importMnemonics(account: account)))
 			}
 		case .account:
 			return .none
