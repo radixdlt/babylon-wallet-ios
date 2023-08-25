@@ -54,6 +54,9 @@ public struct AccountDetails: Sendable, FeatureReducer {
 
 	public enum InternalAction: Sendable, Equatable {
 		case accountUpdated(Profile.Network.Account)
+
+		case loadExport
+		case loadImport
 	}
 
 	public struct Destinations: Sendable, ReducerProtocol {
@@ -111,7 +114,15 @@ public struct AccountDetails: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .task:
-			return .run { [address = state.account.address] send in
+			return .run { [address = state.account.address, export = state.needToBackupMnemonicForThisAccount, importFlow = state.needToImportMnemonicForThisAccount] send in
+
+				if export {
+					await send(.internal(.loadExport))
+				}
+				if importFlow {
+					await send(.internal(.loadImport))
+				}
+
 				for try await accountUpdate in await accountsClient.accountUpdates(address) {
 					guard !Task.isCancelled else { return }
 					await send(.internal(.accountUpdated(accountUpdate)))
@@ -154,6 +165,12 @@ public struct AccountDetails: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
+		case .loadExport:
+			fatalError()
+
+		case .loadImport:
+			fatalError()
+
 		case let .accountUpdated(account):
 			state.account = account
 			return .none
