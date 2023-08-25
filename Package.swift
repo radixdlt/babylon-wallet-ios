@@ -428,8 +428,10 @@ package.addModules([
 	.feature(
 		name: "TransactionReviewFeature",
 		dependencies: [
+			"AssetsFeature",
 			"AuthorizedDappsClient",
 			"GatewayAPI",
+			"OnLedgerEntitiesClient",
 			"TransactionClient",
 			"SigningFeature",
 			"SubmitTransactionClient",
