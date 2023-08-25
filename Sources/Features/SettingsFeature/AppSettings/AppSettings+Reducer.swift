@@ -26,7 +26,7 @@ public struct AppSettings: Sendable, FeatureReducer {
 
 		case manageP2PLinksButtonTapped
 		case gatewaysButtonTapped
-		case backUpProfileSettingsButtonTapped
+		case profileBackupSettingsButtonTapped
 
 		case developerModeToggled(Bool)
 		case exportLogsTapped
@@ -51,13 +51,13 @@ public struct AppSettings: Sendable, FeatureReducer {
 		public enum State: Sendable, Hashable {
 			case manageP2PLinks(P2PLinksFeature.State)
 			case gatewaySettings(GatewaySettings.State)
-			case backUpProfileSettings(BackUpProfileSettings.State)
+			case profileBackupSettings(ProfileBackupSettings.State)
 		}
 
 		public enum Action: Sendable, Equatable {
 			case manageP2PLinks(P2PLinksFeature.Action)
 			case gatewaySettings(GatewaySettings.Action)
-			case backUpProfileSettings(BackUpProfileSettings.Action)
+			case profileBackupSettings(ProfileBackupSettings.Action)
 		}
 
 		public var body: some ReducerProtocolOf<Self> {
@@ -67,8 +67,8 @@ public struct AppSettings: Sendable, FeatureReducer {
 			Scope(state: /State.gatewaySettings, action: /Action.gatewaySettings) {
 				GatewaySettings()
 			}
-			Scope(state: /State.backUpProfileSettings, action: /Action.backUpProfileSettings) {
-				BackUpProfileSettings()
+			Scope(state: /State.profileBackupSettings, action: /Action.profileBackupSettings) {
+				ProfileBackupSettings()
 			}
 		}
 	}
@@ -102,8 +102,8 @@ public struct AppSettings: Sendable, FeatureReducer {
 			state.destination = .gatewaySettings(.init())
 			return .none
 
-		case .backUpProfileSettingsButtonTapped:
-			state.destination = .backUpProfileSettings(.init())
+		case .profileBackupSettingsButtonTapped:
+			state.destination = .profileBackupSettings(.init())
 			return .none
 
 		case let .developerModeToggled(isEnabled):
@@ -133,7 +133,7 @@ public struct AppSettings: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
-		case let .destination(.presented(.backUpProfileSettings(.delegate(.deleteProfileAndFactorSources(keepInICloudIfPresent))))):
+		case let .destination(.presented(.profileBackupSettings(.delegate(.deleteProfileAndFactorSources(keepInICloudIfPresent))))):
 			return .send(.delegate(.deleteProfileAndFactorSources(keepInICloudIfPresent: keepInICloudIfPresent)))
 
 		case .destination:

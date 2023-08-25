@@ -1,8 +1,8 @@
 import FeaturePrelude
 import ImportMnemonicFeature
 
-extension BackUpProfileSettings.State {
-	var viewState: BackUpProfileSettings.ViewState {
+extension ProfileBackupSettings.State {
+	var viewState: ProfileBackupSettings.ViewState {
 		.init(
 			isCloudProfileSyncEnabled: isCloudProfileSyncEnabled,
 			profileFilePotentiallyEncrypted: profileFilePotentiallyEncrypted
@@ -10,7 +10,7 @@ extension BackUpProfileSettings.State {
 	}
 }
 
-extension BackUpProfileSettings {
+extension ProfileBackupSettings {
 	public struct ViewState: Equatable {
 		let isCloudProfileSyncEnabled: Bool
 		let profileFilePotentiallyEncrypted: ExportableProfileFile?
@@ -22,9 +22,9 @@ extension BackUpProfileSettings {
 
 	@MainActor
 	public struct View: SwiftUI.View {
-		private let store: StoreOf<BackUpProfileSettings>
+		private let store: StoreOf<ProfileBackupSettings>
 
-		public init(store: StoreOf<BackUpProfileSettings>) {
+		public init(store: StoreOf<ProfileBackupSettings>) {
 			self.store = store
 		}
 
@@ -46,10 +46,10 @@ extension BackUpProfileSettings {
 	}
 }
 
-extension BackUpProfileSettings.View {
+extension ProfileBackupSettings.View {
 	@MainActor
 	@ViewBuilder
-	private func coreView(with viewStore: ViewStoreOf<BackUpProfileSettings>) -> some SwiftUI.View {
+	private func coreView(with viewStore: ViewStoreOf<ProfileBackupSettings>) -> some SwiftUI.View {
 		ScrollView {
 			VStack(alignment: .leading, spacing: .large3) {
 				// FIXME: Strings
@@ -124,7 +124,7 @@ extension BackUpProfileSettings.View {
 	}
 
 	@MainActor
-	private func isCloudProfileSyncEnabled(with viewStore: ViewStoreOf<BackUpProfileSettings>) -> some SwiftUI.View {
+	private func isCloudProfileSyncEnabled(with viewStore: ViewStoreOf<ProfileBackupSettings>) -> some SwiftUI.View {
 		HStack {
 			Image(asset: AssetResource.backups)
 
@@ -142,47 +142,47 @@ extension BackUpProfileSettings.View {
 
 extension SwiftUI.View {
 	@MainActor
-	fileprivate func deleteProfileConfirmationDialog(with store: StoreOf<BackUpProfileSettings>) -> some SwiftUI.View {
+	fileprivate func deleteProfileConfirmationDialog(with store: StoreOf<ProfileBackupSettings>) -> some SwiftUI.View {
 		confirmationDialog(
 			store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-			state: /BackUpProfileSettings.Destinations.State.deleteProfileConfirmationDialog,
-			action: BackUpProfileSettings.Destinations.Action.deleteProfileConfirmationDialog
+			state: /ProfileBackupSettings.Destinations.State.deleteProfileConfirmationDialog,
+			action: ProfileBackupSettings.Destinations.Action.deleteProfileConfirmationDialog
 		)
 	}
 
 	@MainActor
-	fileprivate func cloudSyncTakesLongTimeAlert(with store: StoreOf<BackUpProfileSettings>) -> some SwiftUI.View {
+	fileprivate func cloudSyncTakesLongTimeAlert(with store: StoreOf<ProfileBackupSettings>) -> some SwiftUI.View {
 		alert(
 			store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-			state: /BackUpProfileSettings.Destinations.State.syncTakesLongTimeAlert,
-			action: BackUpProfileSettings.Destinations.Action.syncTakesLongTimeAlert
+			state: /ProfileBackupSettings.Destinations.State.syncTakesLongTimeAlert,
+			action: ProfileBackupSettings.Destinations.Action.syncTakesLongTimeAlert
 		)
 	}
 
 	@MainActor
-	fileprivate func disableCloudSyncConfirmationAlert(with store: StoreOf<BackUpProfileSettings>) -> some SwiftUI.View {
+	fileprivate func disableCloudSyncConfirmationAlert(with store: StoreOf<ProfileBackupSettings>) -> some SwiftUI.View {
 		alert(
 			store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-			state: /BackUpProfileSettings.Destinations.State.confirmCloudSyncDisable,
-			action: BackUpProfileSettings.Destinations.Action.confirmCloudSyncDisable
+			state: /ProfileBackupSettings.Destinations.State.confirmCloudSyncDisable,
+			action: ProfileBackupSettings.Destinations.Action.confirmCloudSyncDisable
 		)
 	}
 
 	@MainActor
-	fileprivate func encryptBeforeExportChoiceAlert(with store: StoreOf<BackUpProfileSettings>) -> some SwiftUI.View {
+	fileprivate func encryptBeforeExportChoiceAlert(with store: StoreOf<ProfileBackupSettings>) -> some SwiftUI.View {
 		alert(
 			store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-			state: /BackUpProfileSettings.Destinations.State.optionallyEncryptProfileBeforeExporting,
-			action: BackUpProfileSettings.Destinations.Action.optionallyEncryptProfileBeforeExporting
+			state: /ProfileBackupSettings.Destinations.State.optionallyEncryptProfileBeforeExporting,
+			action: ProfileBackupSettings.Destinations.Action.optionallyEncryptProfileBeforeExporting
 		)
 	}
 
 	@MainActor
-	fileprivate func encryptBeforeExportSheet(with store: StoreOf<BackUpProfileSettings>) -> some SwiftUI.View {
+	fileprivate func encryptBeforeExportSheet(with store: StoreOf<ProfileBackupSettings>) -> some SwiftUI.View {
 		sheet(
 			store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-			state: /BackUpProfileSettings.Destinations.State.inputEncryptionPassword,
-			action: BackUpProfileSettings.Destinations.Action.inputEncryptionPassword,
+			state: /ProfileBackupSettings.Destinations.State.inputEncryptionPassword,
+			action: ProfileBackupSettings.Destinations.Action.inputEncryptionPassword,
 			content: { store_ in
 				NavigationView {
 					EncryptOrDecryptProfile.View(store: store_)
@@ -192,7 +192,7 @@ extension SwiftUI.View {
 	}
 
 	@MainActor
-	fileprivate func exportFileSheet(with viewStore: ViewStoreOf<BackUpProfileSettings>) -> some SwiftUI.View {
+	fileprivate func exportFileSheet(with viewStore: ViewStoreOf<ProfileBackupSettings>) -> some SwiftUI.View {
 		fileExporter(
 			isPresented: viewStore.binding(
 				get: \.isDisplayingFileExporter,

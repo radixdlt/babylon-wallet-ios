@@ -7,8 +7,8 @@ import ImportMnemonicFeature
 import OverlayWindowClient
 import RadixConnectClient
 
-// MARK: - BackUpProfileSettings
-public struct BackUpProfileSettings: Sendable, FeatureReducer {
+// MARK: - ProfileBackupSettings
+public struct ProfileBackupSettings: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public var preferences: AppPreferences?
 		public var backupProfileHeaders: ProfileSnapshot.HeaderList?
@@ -150,7 +150,7 @@ public struct BackUpProfileSettings: Sendable, FeatureReducer {
 
 	public init() {}
 
-	public var body: some ReducerProtocolOf<BackUpProfileSettings> {
+	public var body: some ReducerProtocolOf<ProfileBackupSettings> {
 		Reduce(core)
 			.ifLet(\.$destination, action: /Action.child .. /ChildAction.destination) {
 				Destinations()
@@ -304,7 +304,7 @@ public struct BackUpProfileSettings: Sendable, FeatureReducer {
 // MARK: - LackedPermissionToAccessSecurityScopedResource
 struct LackedPermissionToAccessSecurityScopedResource: Error {}
 
-extension ConfirmationDialogState<BackUpProfileSettings.Destinations.Action.DeleteProfileConfirmationDialogAction> {
+extension ConfirmationDialogState<ProfileBackupSettings.Destinations.Action.DeleteProfileConfirmationDialogAction> {
 	static let deleteProfileConfirmationDialog = ConfirmationDialogState {
 		TextState(L10n.AppSettings.ResetWalletDialog.title)
 	} actions: {
@@ -322,7 +322,7 @@ extension ConfirmationDialogState<BackUpProfileSettings.Destinations.Action.Dele
 	}
 }
 
-extension BackUpProfileSettings.Destinations.State {
+extension ProfileBackupSettings.Destinations.State {
 	// FIXME: Strings
 	fileprivate static let cloudSyncTakesLongTimeAlert = Self.syncTakesLongTimeAlert(.init(
 		title: { TextState("Enabling iCloud sync") },
