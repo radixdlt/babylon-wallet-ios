@@ -31,11 +31,7 @@ extension ProfileBackupSettings {
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				coreView(with: viewStore)
-					.cloudSyncTakesLongTimeAlert(with: store)
-					.disableCloudSyncConfirmationAlert(with: store)
-					.encryptBeforeExportChoiceAlert(with: store)
-					.encryptBeforeExportSheet(with: store)
-					.deleteProfileConfirmationDialog(with: store)
+					.destination(store: store)
 					.exportFileSheet(with: viewStore)
 			}
 			.task { @MainActor in
@@ -142,45 +138,55 @@ extension ProfileBackupSettings.View {
 
 extension SwiftUI.View {
 	@MainActor
-	fileprivate func deleteProfileConfirmationDialog(with store: StoreOf<ProfileBackupSettings>) -> some SwiftUI.View {
+	func destination(store: StoreOf<ProfileBackupSettings>) -> some View {
+		let destinationStore = store.scope(state: \.$destination, action: { .child(.destination($0)) })
+		return cloudSyncTakesLongTimeAlert(with: destinationStore)
+			.disableCloudSyncConfirmationAlert(with: destinationStore)
+			.encryptBeforeExportChoiceAlert(with: destinationStore)
+			.encryptBeforeExportSheet(with: destinationStore)
+			.deleteProfileConfirmationDialog(with: destinationStore)
+	}
+
+	@MainActor
+	fileprivate func deleteProfileConfirmationDialog(with destinationStore: PresentationStoreOf<ProfileBackupSettings.Destinations>) -> some SwiftUI.View {
 		confirmationDialog(
-			store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+			store: destinationStore,
 			state: /ProfileBackupSettings.Destinations.State.deleteProfileConfirmationDialog,
 			action: ProfileBackupSettings.Destinations.Action.deleteProfileConfirmationDialog
 		)
 	}
 
 	@MainActor
-	fileprivate func cloudSyncTakesLongTimeAlert(with store: StoreOf<ProfileBackupSettings>) -> some SwiftUI.View {
+	fileprivate func cloudSyncTakesLongTimeAlert(with destinationStore: PresentationStoreOf<ProfileBackupSettings.Destinations>) -> some SwiftUI.View {
 		alert(
-			store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+			store: destinationStore,
 			state: /ProfileBackupSettings.Destinations.State.syncTakesLongTimeAlert,
 			action: ProfileBackupSettings.Destinations.Action.syncTakesLongTimeAlert
 		)
 	}
 
 	@MainActor
-	fileprivate func disableCloudSyncConfirmationAlert(with store: StoreOf<ProfileBackupSettings>) -> some SwiftUI.View {
+	fileprivate func disableCloudSyncConfirmationAlert(with destinationStore: PresentationStoreOf<ProfileBackupSettings.Destinations>) -> some SwiftUI.View {
 		alert(
-			store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+			store: destinationStore,
 			state: /ProfileBackupSettings.Destinations.State.confirmCloudSyncDisable,
 			action: ProfileBackupSettings.Destinations.Action.confirmCloudSyncDisable
 		)
 	}
 
 	@MainActor
-	fileprivate func encryptBeforeExportChoiceAlert(with store: StoreOf<ProfileBackupSettings>) -> some SwiftUI.View {
+	fileprivate func encryptBeforeExportChoiceAlert(with destinationStore: PresentationStoreOf<ProfileBackupSettings.Destinations>) -> some SwiftUI.View {
 		alert(
-			store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+			store: destinationStore,
 			state: /ProfileBackupSettings.Destinations.State.optionallyEncryptProfileBeforeExporting,
 			action: ProfileBackupSettings.Destinations.Action.optionallyEncryptProfileBeforeExporting
 		)
 	}
 
 	@MainActor
-	fileprivate func encryptBeforeExportSheet(with store: StoreOf<ProfileBackupSettings>) -> some SwiftUI.View {
+	fileprivate func encryptBeforeExportSheet(with destinationStore: PresentationStoreOf<ProfileBackupSettings.Destinations>) -> some SwiftUI.View {
 		sheet(
-			store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+			store: destinationStore,
 			state: /ProfileBackupSettings.Destinations.State.inputEncryptionPassword,
 			action: ProfileBackupSettings.Destinations.Action.inputEncryptionPassword,
 			content: { childStore in
