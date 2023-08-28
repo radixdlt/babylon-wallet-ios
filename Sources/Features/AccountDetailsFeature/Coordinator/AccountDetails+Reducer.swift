@@ -162,6 +162,10 @@ public struct AccountDetails: Sendable, FeatureReducer {
 		case .assets(.child(.fungibleTokenList(.delegate))):
 			return .none
 
+		case .destination(.presented(.exportMnemonic(.delegate(.doneViewing)))):
+			state.destination = nil
+			return .none
+
 		default:
 			return .none
 		}

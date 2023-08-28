@@ -50,11 +50,13 @@ extension ImportMnemonic {
 		let bip39Passphrase: String
 		var showBackButton: Bool {
 			guard let readonlyMode, case .fromSettings = readonlyMode else { return false }
+			loggerGlobal.feature("show back button")
 			return true
 		}
 
 		var showCloseButton: Bool {
 			guard let readonlyMode, case .fromSettings = readonlyMode else { return false }
+			loggerGlobal.feature("show close button")
 			return true
 		}
 
@@ -165,6 +167,22 @@ extension ImportMnemonic {
 
 						footer(with: viewStore)
 					}
+					.toolbar {
+						if viewStore.showBackButton {
+							ToolbarItem(placement: .navigationBarLeading) {
+								BackButton {
+									viewStore.send(.backButtonTapped)
+								}
+							}
+						}
+						if viewStore.showCloseButton {
+							ToolbarItem(placement: .navigationBarLeading) {
+								CloseButton {
+									viewStore.send(.closeButtonTapped)
+								}
+							}
+						}
+					}
 					.redacted(reason: .privacy, if: viewStore.isHidingSecrets)
 					#if os(iOS)
 						.onReceive(NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification)) { _ in
@@ -174,18 +192,6 @@ extension ImportMnemonic {
 							viewStore.send(.scenePhase(.inactive))
 						}
 					#endif
-				}
-				.toolbar {
-					if viewStore.showBackButton {
-						BackButton {
-							viewStore.send(.backButtonTapped)
-						}
-					}
-					if viewStore.showCloseButton {
-						CloseButton {
-							viewStore.send(.closeButtonTapped)
-						}
-					}
 				}
 				.animation(.default, value: viewStore.wordCount)
 				.animation(.default, value: viewStore.isAdvancedMode)

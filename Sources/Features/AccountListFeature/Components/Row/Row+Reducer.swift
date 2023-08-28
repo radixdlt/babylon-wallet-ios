@@ -111,7 +111,8 @@ extension AccountList {
 
 				switch state.account.securityState {
 				case let .unsecured(unsecuredEntityControl):
-					if unsecuredEntityControl.transactionSigning.factorSourceID.kind == .device {
+					let hasAlreadyBackedUpMnemonic = userDefaultsClient.getFactorSourceIDOfBackedUpMnemonics().contains(unsecuredEntityControl.transactionSigning.factorSourceID)
+					if !hasAlreadyBackedUpMnemonic, unsecuredEntityControl.transactionSigning.factorSourceID.kind == .device {
 						return .send(.internal(.needToBackupMnemonicForThisAccount))
 					} else {
 						return .none
