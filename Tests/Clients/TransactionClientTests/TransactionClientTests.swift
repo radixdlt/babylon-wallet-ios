@@ -1,8 +1,9 @@
 import ClientPrelude
 import CryptoKit
 import EngineKit
+@testable import FactorSourcesClient
 import GatewaysClient
-import Profile
+@testable import Profile
 import TestingPrelude
 import TransactionClient
 
@@ -109,6 +110,201 @@ final class TransactionClientTests: TestCase {
 		XCTAssertEqual(normalMode.royaltyFee, transaction.expectedNormalModeRoyaltyFee)
 		XCTAssertEqual(transaction.totalFee.lockFee, transaction.expectedNormalModeLockFee)
 		XCTAssertEqual(transaction.totalFee, transaction.expectedNormalModeTotalFee)
+	}
+
+	func testSelectFeePayerTests() async throws {
+		var txFee = testTransactionFee()
+		let sut = TransactionClient.testValue
+
+		let accounts: [Profile.Network.Account] = [
+			.new(factorSource: .deviceOne, index: 0), // 0
+			.new(factorSource: .deviceOne, index: 1), // 1
+			.new(factorSource: .deviceTwo, index: 0), // 2
+			.new(factorSource: .ledgerTwo, index: 0), // 3
+			.new(factorSource: .ledgerTwo, index: 1), // 4
+			.new(factorSource: .ledgerTwo, index: 2), // 5
+		]
+
+		let signersAfterAnalysis = Array(accounts.prefix(2))
+		txFee.updateSignaturesCost(signersAfterAnalysis.count)
+		let defaultCandidates = signersAfterAnalysis.map { FeePayerCandidate(account: $0, xrdBalance: txFee.totalFee.lockFee / 2) }
+
+		let potentialCandidate1 = FeePayerCandidate(account: accounts[4], xrdBalance: txFee.totalFee.lockFee - TransactionFee.PredefinedFeeConstants.signatureCost)
+		let potentialCandidate2 = FeePayerCandidate(account: accounts[5], xrdBalance: txFee.totalFee.lockFee + 10)
+
+		let allFeePayerCandidates = defaultCandidates + [potentialCandidate1, potentialCandidate2]
+
+		let notary = Curve25519.Signing.PrivateKey()
+
+		let defaultSigners = TransactionSigners(
+			notaryPublicKey: notary.publicKey,
+			intentSigning: .intentSigners(
+				.init(rawValue: OrderedSet(signersAfterAnalysis.map { .account($0) }))!
+			)
+		)
+
+		let defaultFactors = signersAfterAnalysis.map(\.signingFactor)
+
+		let result = try await withDependencies {
+			$0.factorSourcesClient.getSigningFactors = { request in
+				try [.device: .init(rawValue: Set(request.signers.rawValue.map {
+					try SigningFactor(
+						factorSource: .deviceOne,
+						signer: .init(factorInstancesRequiredToSign: $0.virtualHierarchicalDeterministicFactorInstances, of: $0)
+					)
+				}))!]
+			}
+		} operation: {
+			try await TransactionClient.feePayerSelectionAmongstCandidates(
+				allFeePayerCandidates: .init(rawValue: .init(uncheckedUniqueElements: allFeePayerCandidates))!,
+				manifest: .init(instructions: .fromInstructions(instructions: [], networkId: NetworkID.enkinet.rawValue), blobs: []),
+				networkID: .enkinet,
+				transactionFee: txFee,
+				transactionSigners: defaultSigners,
+				signingFactors: [.device: .init(rawValue: Set(defaultFactors))!],
+				signingPurpose: .signTransaction(.manifestFromDapp),
+				involvedEntities: .init(
+					identitiesRequiringAuth: [],
+					accountsRequiringAuth: OrderedSet(signersAfterAnalysis),
+					accountsWithdrawnFrom: OrderedSet(signersAfterAnalysis),
+					accountsDepositedInto: OrderedSet(accounts.suffix(2))
+				)
+			)
+		}
+
+		let unwrapedResult = try XCTUnwrap(result)
+
+		/// Proper fee payer was determined
+		XCTAssertEqual(unwrapedResult.payer, potentialCandidate2)
+
+		let expectedSigners = defaultSigners.intentSignerEntitiesOrEmpty().union([.account(potentialCandidate2.account)])
+		/// The FeePayer signature was added to transactionSigners
+		XCTAssertEqual(
+			unwrapedResult.transactionSigners.intentSignerEntitiesOrEmpty(),
+			expectedSigners
+		)
+
+		let expectedfactorsForDevice = defaultFactors + [potentialCandidate2.account.signingFactor]
+		let expectedFactors: SigningFactors = [.device: .init(rawValue: Set(expectedfactorsForDevice))!]
+
+		/// The FeePayer signing factor was added
+		XCTAssertEqual(unwrapedResult.signingFactors, expectedFactors)
+
+		txFee.updateSignaturesCost(expectedFactors.expectedSignatureCount)
+		/// The lockFee was increased with the additional signature cost.
+		XCTAssertEqual(unwrapedResult.updatedFee.totalFee.lockFee, txFee.totalFee.lockFee)
+	}
+
+	private func testTransactionFee() -> TransactionFee {
+		.init(feeSummary: feeSummary, feeLocks: .init(nonContingentLock: .zero, contingentLock: .zero))
+	}
+}
+
+extension Profile.Network.Account {
+	var signingFactor: SigningFactor {
+		try! .init(
+			factorSource: .deviceOne,
+			signer: .init(factorInstancesRequiredToSign: virtualHierarchicalDeterministicFactorInstances, of: .account(self))
+		)
+	}
+}
+
+// MARK: - SigningFactor + Comparable
+extension SigningFactor: Comparable {
+	public static func < (lhs: Self, rhs: Self) -> Bool {
+		lhs.factorSource < rhs.factorSource
+	}
+}
+
+// MARK: - Profile.Network.Account + Comparable
+extension Profile.Network.Account: Comparable {
+	public static func < (lhs: Self, rhs: Self) -> Bool {
+		lhs.appearanceID.rawValue < rhs.appearanceID.rawValue
+	}
+}
+
+// MARK: - DeviceFactorSource + Comparable
+extension DeviceFactorSource: Comparable {
+	public static func < (lhs: Self, rhs: Self) -> Bool {
+		lhs.hint.name < rhs.hint.name
+	}
+}
+
+// MARK: - LedgerHardwareWalletFactorSource + Comparable
+extension LedgerHardwareWalletFactorSource: Comparable {
+	public static func < (lhs: Self, rhs: Self) -> Bool {
+		lhs.hint.name < rhs.hint.name
+	}
+}
+
+// MARK: - FactorSource + Comparable
+extension FactorSource: Comparable {
+	public static func < (lhs: Self, rhs: Self) -> Bool {
+		switch (lhs, rhs) {
+		case let (.device(l), .device(r)):
+			return l < r
+		case let (.ledger(l), .ledger(r)):
+			return l < r
+		default: return true
+		}
+	}
+}
+
+extension FactorSource {
+	static func device(_ name: String, olympiaCompat: Bool) -> Self {
+		withDependencies {
+			$0.date = .constant(.init(timeIntervalSince1970: 0))
+		} operation: {
+			let device = try! DeviceFactorSource(
+				id: .device(hash: Data.random(byteCount: 32)),
+				common: .init(
+					cryptoParameters: olympiaCompat ? .olympiaBackwardsCompatible : .babylon
+				),
+				hint: .init(name: name, model: "", mnemonicWordCount: .twentyFour)
+			)
+			return device.embed()
+		}
+	}
+
+	static func ledger(_ name: String, olympiaCompat: Bool) -> Self {
+		withDependencies {
+			$0.date = .constant(.init(timeIntervalSince1970: 0))
+		} operation: {
+			let ledger = try! LedgerHardwareWalletFactorSource(
+				id: .init(kind: .ledgerHQHardwareWallet, hash: Data.random(byteCount: 32)),
+				common: .init(
+					cryptoParameters: olympiaCompat ? .olympiaBackwardsCompatible : .babylon
+				),
+				hint: .init(name: .init(name), model: .nanoS)
+			)
+			return ledger.embed()
+		}
+	}
+
+	static let deviceOne = Self.device("One", olympiaCompat: true)
+	static let deviceTwo = Self.device("Two", olympiaCompat: false)
+	static let ledgerOne = Self.ledger("One", olympiaCompat: false)
+	static let ledgerTwo = Self.ledger("Two", olympiaCompat: true)
+}
+
+extension Profile.Network.Account {
+	static func new(factorSource: FactorSource, index: UInt32) -> Self {
+		try! .init(
+			networkID: .simulator, index: index,
+			factorInstance: .init(
+				factorSourceID: factorSource.id,
+				publicKey: .eddsaEd25519(Curve25519.Signing.PrivateKey().publicKey),
+				derivationPath: AccountDerivationPath.babylon(.init(
+					networkID: .simulator,
+					index: index,
+					keyKind: .transactionSigning
+				)).wrapAsDerivationPath()
+			),
+			displayName: "\(index)",
+			extraProperties: .init(
+				appearanceID: .fromIndex(Int(index))
+			)
+		)
 	}
 }
 

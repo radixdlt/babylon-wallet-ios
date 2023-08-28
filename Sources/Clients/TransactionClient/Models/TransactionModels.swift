@@ -223,6 +223,11 @@ public struct FeePayerCandidate: Sendable, Hashable, Identifiable {
 
 	public let account: Profile.Network.Account
 	public let xrdBalance: BigDecimal
+
+	public init(account: Profile.Network.Account, xrdBalance: BigDecimal) {
+		self.account = account
+		self.xrdBalance = xrdBalance
+	}
 }
 
 // MARK: - TransactionToReview
