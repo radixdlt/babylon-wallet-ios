@@ -116,6 +116,7 @@ public struct CustomizeFees: FeatureReducer {
 		case let .destination(.presented(.selectFeePayer(.delegate(.selected(selection))))):
 			let previousFeePayer = state.reviewedTransaction.feePayerSelection.selected
 			state.destination = nil
+			let feePayer = EntityPotentiallyVirtual.account(selection.account)
 
 			@Sendable
 			func replaceFeePayer(_ feePayer: FeePayerCandidate, _ reviewedTransaction: ReviewedTransaction, manifest: TransactionManifest) -> EffectTask<Action> {

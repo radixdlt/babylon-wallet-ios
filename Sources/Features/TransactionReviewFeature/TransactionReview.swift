@@ -263,7 +263,6 @@ public struct TransactionReview: Sendable, FeatureReducer {
 				return .none
 			}
 			state.destination = .customizeFees(.init(reviewedTransaction: reviewedTransaction, manifest: state.transactionManifest))
-
 			return .none
 
 		case let .destination(.presented(presentedAction)):
