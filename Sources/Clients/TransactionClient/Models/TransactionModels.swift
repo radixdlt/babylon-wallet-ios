@@ -285,7 +285,7 @@ public struct TransactionFee: Hashable, Sendable {
 		self.init(feeSummary: feeSummary, feeLocks: feeLocks, mode: .normal(.init(feeSummary: feeSummary, feeLocks: feeLocks)))
 	}
 
-	public init(executionAnalysis: ExecutionAnalysis, signaturesCount: Int, notaryIsSignatory: Bool) throws {
+	public init(executionAnalysis: ExecutionAnalysis, signaturesCount: Int, notaryIsSignatory: Bool, includeLockFee: Bool) throws {
 		let feeSummary: FeeSummary = try .init(
 			executionCost: executionAnalysis.feeSummary.executionCost.asBigDecimal(),
 			finalizationCost: executionAnalysis.feeSummary.finalizationCost.asBigDecimal(),
@@ -293,7 +293,7 @@ public struct TransactionFee: Hashable, Sendable {
 			royaltyCost: executionAnalysis.feeSummary.royaltyCost.asBigDecimal(),
 			guaranteesCost: executionAnalysis.guranteesFee(),
 			signaturesCost: PredefinedFeeConstants.signaturesCost(signaturesCount),
-			lockFeeCost: PredefinedFeeConstants.lockFeeInstructionCost,
+			lockFeeCost: includeLockFee ? PredefinedFeeConstants.lockFeeInstructionCost : .zero,
 			notarizingCost: PredefinedFeeConstants.notarizingCost(notaryIsSignatory)
 		)
 
@@ -321,6 +321,32 @@ public struct TransactionFee: Hashable, Sendable {
 			}
 		}()
 		self = .init(feeSummary: feeSummary, feeLocks: feeLocks, mode: mode)
+	}
+
+	public mutating func update(with feeSummaryField: WritableKeyPath<FeeSummary, BigDecimal>, amount: BigDecimal) {
+		var feeSummary = feeSummary
+		feeSummary[keyPath: feeSummaryField] = amount
+		let mode: Mode = {
+			switch self.mode {
+			case .normal:
+				return .normal(.init(feeSummary: feeSummary, feeLocks: feeLocks))
+			case .advanced:
+				return .advanced(.init(feeSummary: feeSummary, feeLocks: feeLocks))
+			}
+		}()
+		self = .init(feeSummary: feeSummary, feeLocks: feeLocks, mode: mode)
+	}
+
+	public mutating func addLockFeeCost() {
+		update(with: \.lockFeeCost, amount: PredefinedFeeConstants.lockFeeInstructionCost)
+	}
+
+	public mutating func updateNotarizingCost(_ notaryIsSignatory: Bool) {
+		update(with: \.notarizingCost, amount: PredefinedFeeConstants.notarizingCost(notaryIsSignatory))
+	}
+
+	public mutating func updateSignaturesCost(_ count: Int) {
+		update(with: \.signaturesCost, amount: PredefinedFeeConstants.signaturesCost(count))
 	}
 }
 
@@ -407,9 +433,8 @@ extension TransactionFee {
 		public let royaltyCost: BigDecimal
 
 		public let guaranteesCost: BigDecimal
-		public let lockFeeCost: BigDecimal
 
-		/// Signatures cost be updated
+		public var lockFeeCost: BigDecimal
 		public var signaturesCost: BigDecimal
 		public var notarizingCost: BigDecimal
 

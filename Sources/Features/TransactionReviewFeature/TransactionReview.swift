@@ -482,14 +482,29 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			guard let reviewedTransaction = state.reviewedTransaction else {
 				return .none
 			}
-			state.destination = .signing(.init(
-				factorsLeftToSignWith: reviewedTransaction.signingFactors,
-				signingPurposeWithPayload: .signTransaction(
-					ephemeralNotaryPrivateKey: state.ephemeralNotaryPrivateKey,
-					response,
-					origin: state.signTransactionPurpose
-				)
-			))
+			if !reviewedTransaction.signingFactors.isEmpty {
+				state.destination = .signing(.init(
+					factorsLeftToSignWith: reviewedTransaction.signingFactors,
+					signingPurposeWithPayload: .signTransaction(
+						ephemeralNotaryPrivateKey: state.ephemeralNotaryPrivateKey,
+						response,
+						origin: state.signTransactionPurpose
+					)
+				))
+			} else {
+				let notaryKey: SLIP10.PrivateKey = .curve25519(ephemeralNotaryPrivateKey)
+
+				transactionClient.notarizeTransaction(.init(intentSignatures: [reviewedTransaction.transactionSigners.notaryPublicKey], transactionIntent: response, notary: state.ephemeralNotaryPrivateKey.intoEn))
+
+				//                state.destination = .signing(.init(
+				//                    factorsLeftToSignWith: reviewedTransaction.signingFactors,
+				//                    signingPurposeWithPayload: .signTransaction(
+				//                        ephemeralNotaryPrivateKey: state.ephemeralNotaryPrivateKey,
+				//                        response,
+				//                        origin: state.signTransactionPurpose
+				//                    )
+				//                ))
+			}
 			return .none
 		case let .buildTransactionItentResult(.failure(error)):
 			errorQueue.schedule(error)

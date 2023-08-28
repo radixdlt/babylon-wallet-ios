@@ -85,12 +85,7 @@ extension TransactionClient {
 		}
 
 		@Sendable
-		func feePayerSelectionAmongstCandidates(
-			_ manifest: TransactionManifest,
-			transactionFee: TransactionFee
-		) async throws -> FeePayerSelectionAmongstCandidates {
-			let lockFee = transactionFee.totalFee.lockFee
-
+		func allFeePayerCandidates() async throws -> NonEmpty<IdentifiedArrayOf<FeePayerCandidate>> {
 			let networkID = await gatewaysClient.getCurrentNetworkID()
 			let allAccounts = try await accountsClient.getAccountsOnNetwork(networkID)
 			let allFeePayerCandidates = try await accountPortfoliosClient.fetchAccountPortfolios(allAccounts.map(\.address), true).compactMap { portfolio -> FeePayerCandidate? in
@@ -100,6 +95,7 @@ extension TransactionClient {
 					assertionFailure("Failed to find account or no balance, this should never happen.")
 					return nil
 				}
+
 				return FeePayerCandidate(
 					account: account,
 					xrdBalance: portfolio.fungibleResources.xrdResource?.amount ?? .zero
@@ -113,48 +109,94 @@ extension TransactionClient {
 				// Should not ever happen, user should have at least one account
 				throw NoFeePayerCandidates()
 			}
+			return allCandidates
+		}
 
-			let feePayer: FeePayerCandidate? = try? await {
-				guard lockFee > .zero else {
-					return nil
+		/// The result of selecting a fee payer.
+		/// In the case when the fee payer is not an account for which we do already have the signature - the fee, transactionSigners and signingFactors will be updated
+		/// to account for the new signature that is required to be added
+		typealias FeePayerSelectionResult = (payer: FeePayerCandidate, updatedFee: TransactionFee, transactionSigners: TransactionSigners, signingFactors: SigningFactors)?
+		@Sendable
+		func feePayerSelectionAmongstCandidates(
+			allFeePayerCandidates: NonEmpty<IdentifiedArrayOf<FeePayerCandidate>>,
+			manifest: TransactionManifest,
+			networkID: NetworkID,
+			transactionFee: TransactionFee,
+			transactionSigners: TransactionSigners,
+			signingFactors: SigningFactors
+		) async throws -> FeePayerSelectionResult {
+			let totalCost = transactionFee.totalFee.max
+			let allSignerEntities = transactionSigners.intentSignerEntitiesOrEmpty()
+
+			let myInvolvedEntities = try await myEntitiesInvolvedInTransaction(
+				networkID: networkID,
+				manifest: manifest
+			)
+
+			func findFeePayer(
+				amongst keyPath: KeyPath<MyEntitiesInvolvedInTransaction, OrderedSet<Profile.Network.Account>>,
+				includeSignaturesCost: Bool
+			) async throws -> FeePayerSelectionResult {
+				let accountsToCheck = myInvolvedEntities[keyPath: keyPath]
+				let candidates = allFeePayerCandidates.filter {
+					accountsToCheck.contains($0.account)
 				}
 
-				let myInvolvedEntities = try await myEntitiesInvolvedInTransaction(
-					networkID: networkID,
-					manifest: manifest
-				)
+				for candidate in candidates {
+					if transactionSigners.intentSignerEntitiesOrEmpty().contains(.account(candidate.account)) {
+						/// The cost of the fee payer signature is already accounted for.
+						if candidate.xrdBalance >= totalCost {
+							return (candidate, transactionFee, transactionSigners, signingFactors)
+						}
+					}
 
-				let candidatesWithEnoughFunds = allFeePayerCandidates.filter {
-					$0.xrdBalance >= lockFee
-				}
+					/// We do have the base fee calculated with the signatures cost for `accountsRequiringAuth`.
+					/// However, if we are to select a fee payer outside of the `accountsRequiringAuth` it is needed:
+					/// - Include the fee payer account as signer
+					/// - Update the signingFactors to contain the factors for the fee payer.
+					/// - Recalculate the fee by taking into account the new signature cost.
+					/// - Makes sure that the account can pay for the base fee + the fee for its signature.
 
-				func findFeePayer(
-					amongst keyPath: KeyPath<MyEntitiesInvolvedInTransaction, OrderedSet<Profile.Network.Account>>
-				) async throws -> FeePayerCandidate? {
-					let accountsToCheck = myInvolvedEntities[keyPath: keyPath]
-					return candidatesWithEnoughFunds.first { accountsToCheck.contains($0.account) }
-				}
+					let signerEntities = allSignerEntities + [.account(candidate.account)]
+					let candidateSigningFactors = try await factorSourcesClient.getSigningFactors(.init(
+						networkID: networkID,
+						signers: .init(rawValue: Set(signerEntities))!,
+						signingPurpose: .signTransaction(.manifestFromDapp)
+					))
 
-				// First try amonst `accountsWithdrawnFrom`
-				if let feePayer = try await findFeePayer(amongst: \.accountsWithdrawnFrom) {
-					loggerGlobal.debug("Find suitable fee payer in: 'accountsWithdrawnFrom', specifically: \(feePayer)")
-					return feePayer
+					var feeIncludingCandidate = transactionFee
+					feeIncludingCandidate.updateSignaturesCost(candidateSigningFactors.expectedSignatureCount)
+					if candidate.xrdBalance >= feeIncludingCandidate.totalFee.max {
+						let signers = TransactionSigners(
+							notaryPublicKey: transactionSigners.notaryPublicKey,
+							intentSigning: .intentSigners(.init(rawValue: .init(signerEntities))!)
+						)
+						return (candidate, feeIncludingCandidate, signers, candidateSigningFactors)
+					}
 				}
-				// no candiates amonst `accountsWithdrawnFrom` => fallback to `accountsRequiringAuth`
-				if let feePayer = try await findFeePayer(amongst: \.accountsRequiringAuth) {
-					loggerGlobal.debug("Find suitable fee payer in: 'accountsRequiringAuth', specifically: \(feePayer)")
-					return feePayer
-				}
-				// no candiates amonst `accountsRequiringAuth` => fallback to `accountsDepositedInto`
-				if let feePayer = try await findFeePayer(amongst: \.accountsDepositedInto) {
-					loggerGlobal.debug("Find suitable fee payer in: 'accountsDepositedInto', specifically: \(feePayer)")
-					return feePayer
-				}
-				loggerGlobal.debug("Did not find any suitable fee payer, retrieving candidates for user selection....")
 				return nil
-			}()
+			}
 
-			return .init(selected: feePayer, candidates: allCandidates, transactionFee: transactionFee)
+			// First try amongst `accountsWithdrawnFrom`
+			if let result = try await findFeePayer(amongst: \.accountsWithdrawnFrom, includeSignaturesCost: true) {
+				loggerGlobal.debug("Find suitable fee payer in: 'accountsWithdrawnFrom', specifically: \(result.payer)")
+				return result
+			}
+
+			// no candidates amongst `accountsWithdrawnFrom` => fallback to `accountsDepositedInto`
+			if let result = try await findFeePayer(amongst: \.accountsDepositedInto, includeSignaturesCost: true) {
+				loggerGlobal.debug("Find suitable fee payer in: 'accountsDepositedInto', specifically: \(result.payer)")
+				return result
+			}
+
+			// no candidates amongst `accountsDepositedInto` => fallback to `accountsRequiringAuth`
+			if let result = try await findFeePayer(amongst: \.accountsRequiringAuth, includeSignaturesCost: false) {
+				loggerGlobal.debug("Find suitable fee payer in: 'accountsRequiringAuth', specifically: \(result.payer)")
+				return result
+			}
+
+			loggerGlobal.debug("Did not find any suitable fee payer, retrieving candidates for user selection....")
+			return nil
 		}
 
 		let buildTransactionIntent: BuildTransactionIntent = { request in
@@ -213,18 +255,6 @@ extension TransactionClient {
 				ephemeralNotaryPublicKey: request.ephemeralNotaryPublicKey
 			))
 
-			/// Get all of the expected signing factors.
-			let signingFactors = try await {
-				if let nonEmpty = NonEmpty<Set<EntityPotentiallyVirtual>>(transactionSigners.intentSignerEntitiesOrEmpty()) {
-					return try await factorSourcesClient.getSigningFactors(.init(
-						networkID: networkID,
-						signers: nonEmpty,
-						signingPurpose: .signTransaction(.manifestFromDapp)
-					))
-				}
-				return [:]
-			}()
-
 			/// Get the transaction preview
 			let transactionPreviewRequest = try await createTransactionPreviewRequest(for: request, networkID: networkID, transactionSigners: transactionSigners)
 			let transactionPreviewResponse = try await gatewayAPIClient.transactionPreview(transactionPreviewRequest)
@@ -238,19 +268,62 @@ extension TransactionClient {
 			/// Analyze the manifest
 			let analyzedManifestToReview = try request.manifestToSign.analyzeExecution(transactionReceipt: receiptBytes)
 
-			/// Calculate the expecte transaction fee
+			/// Get all of the expected signing factors.
+			let signingFactors = try await {
+				if let nonEmpty = NonEmpty<Set<EntityPotentiallyVirtual>>(transactionSigners.intentSignerEntitiesOrEmpty()) {
+					return try await factorSourcesClient.getSigningFactors(.init(
+						networkID: networkID,
+						signers: nonEmpty,
+						signingPurpose: .signTransaction(.manifestFromDapp)
+					))
+				}
+				return [:]
+			}()
+
+			/// If notary is signatory, count the signature of the notary that will be added.
 			let signaturesCount = transactionSigners.notaryIsSignatory ? 1 : signingFactors.expectedSignatureCount
-			let transactionFee = try TransactionFee(executionAnalysis: analyzedManifestToReview, signaturesCount: signaturesCount, notaryIsSignatory: transactionSigners.notaryIsSignatory)
+			var transactionFee = try TransactionFee(
+				executionAnalysis: analyzedManifestToReview,
+				signaturesCount: signaturesCount,
+				notaryIsSignatory: transactionSigners.notaryIsSignatory,
+				includeLockFee: false // Calculate without LockFee cost. It is yet to be determined if LockFe will be added or not
+			)
+
+			let feePayerCandidates = try await allFeePayerCandidates()
+
+			if transactionFee.totalFee.lockFee == .zero {
+				/// No lockFee required
+				return .init(
+					analyzedManifestToReview: analyzedManifestToReview,
+					networkID: networkID,
+					feePayerSelectionAmongstCandidates: .init(selected: nil, candidates: feePayerCandidates, transactionFee: transactionFee),
+					transactionSigners: transactionSigners,
+					signingFactors: signingFactors
+				)
+			}
+
+			/// LockFee required
+			/// Total cost > `zero`, recalculate the total by adding lockFee cost.
+			transactionFee.addLockFeeCost()
+			/// Fee Payer is required, thus there will be a signature with user account added
+			transactionFee.updateNotarizingCost(false)
 
 			/// Select the account that can pay the transaction fee
-			let feePayerSelection = try await feePayerSelectionAmongstCandidates(request.manifestToSign, transactionFee: transactionFee)
+			let result = try await feePayerSelectionAmongstCandidates(
+				allFeePayerCandidates: feePayerCandidates,
+				manifest: request.manifestToSign,
+				networkID: networkID,
+				transactionFee: transactionFee,
+				transactionSigners: transactionSigners,
+				signingFactors: signingFactors
+			)
 
 			return TransactionToReview(
 				analyzedManifestToReview: analyzedManifestToReview,
 				networkID: networkID,
-				feePayerSelectionAmongstCandidates: feePayerSelection,
-				transactionSigners: transactionSigners,
-				signingFactors: signingFactors
+				feePayerSelectionAmongstCandidates: .init(selected: result?.payer, candidates: feePayerCandidates, transactionFee: result?.updatedFee ?? transactionFee),
+				transactionSigners: result?.transactionSigners ?? transactionSigners,
+				signingFactors: result?.signingFactors ?? signingFactors
 			)
 		}
 

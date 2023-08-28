@@ -116,7 +116,6 @@ public struct CustomizeFees: FeatureReducer {
 		case let .destination(.presented(.selectFeePayer(.delegate(.selected(selection))))):
 			let previousFeePayer = state.reviewedTransaction.feePayerSelection.selected
 			state.destination = nil
-			let feePayer = EntityPotentiallyVirtual.account(selection.account)
 
 			@Sendable
 			func replaceFeePayer(_ feePayer: FeePayerCandidate, _ reviewedTransaction: ReviewedTransaction, manifest: TransactionManifest) -> EffectTask<Action> {
@@ -149,8 +148,13 @@ public struct CustomizeFees: FeatureReducer {
 						))
 
 						reviewedTransaction.signingFactors = factors
-
 						reviewedTransaction.feePayerSelection.selected = selection
+						if previousFeePayer == nil, reviewedTransaction.feePayerSelection.transactionFee.totalFee.max == .zero {
+							/// THe case when NoFeePayer is required, but users chooses to add a FeePayer.
+							reviewedTransaction.feePayerSelection.transactionFee.addLockFeeCost()
+							reviewedTransaction.feePayerSelection.transactionFee.updateNotarizingCost(false)
+						}
+						reviewedTransaction.feePayerSelection.transactionFee.updateSignaturesCost(factors.expectedSignatureCount)
 						await send(.internal(.updated(.success(reviewedTransaction))))
 					} catch {
 						await send(.internal(.updated(.failure(error))))
@@ -171,10 +175,6 @@ public struct CustomizeFees: FeatureReducer {
 		switch internalAction {
 		case let .updated(.success(reviewedTransaction)):
 			state.reviewedTransaction = reviewedTransaction
-			state.reviewedTransaction.feePayerSelection.transactionFee.updatingSignaturesCost(
-				reviewedTransaction.signingFactors.expectedSignatureCount,
-				notaryIsSignatory: reviewedTransaction.transactionSigners.notaryIsSignatory
-			)
 			state.modeState = state.feePayerSelection.transactionFee.customizationModeState
 			return .send(.delegate(.updated(state.reviewedTransaction)))
 		case let .updated(.failure(error)):
