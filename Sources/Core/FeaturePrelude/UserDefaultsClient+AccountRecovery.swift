@@ -23,3 +23,21 @@ extension UserDefaultsClient {
 		await setData(nil, accountsThatNeedRecoveryKey)
 	}
 }
+
+import Profile
+private let mnemonicsUserClaimsToHaveBackedUpKey = "mnemonicsUserClaimsToHaveBackedUpKey"
+extension UserDefaultsClient {
+	public func addFactorSourceIDOfBackedUpMnemonic(_ factorSourceID: FactorSourceID.FromHash) async throws {
+		var ids = getFactorSourceIDOfBackedUpMnemonics()
+		ids.append(factorSourceID)
+		try await save(codable: ids, forKey: mnemonicsUserClaimsToHaveBackedUpKey)
+	}
+
+	public func getFactorSourceIDOfBackedUpMnemonics() -> OrderedSet<FactorSourceID.FromHash> {
+		(try? loadCodable(key: mnemonicsUserClaimsToHaveBackedUpKey)) ?? OrderedSet<FactorSourceID.FromHash>()
+	}
+
+	public func removeAllFactorSourceIDsOfBackedUpMnemonics() async {
+		await setData(nil, mnemonicsUserClaimsToHaveBackedUpKey)
+	}
+}

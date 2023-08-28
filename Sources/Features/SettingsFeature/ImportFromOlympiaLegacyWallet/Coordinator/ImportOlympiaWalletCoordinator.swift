@@ -136,6 +136,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 	@Dependency(\.dismiss) var dismiss
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.importLegacyWalletClient) var importLegacyWalletClient
+	@Dependency(\.userDefaultsClient) var userDefaultsClient
 
 	public init() {}
 
@@ -396,6 +397,13 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 					olympiaFactorSource: factorSource
 				)
 			)
+
+			do {
+				try await userDefaultsClient.addFactorSourceIDOfBackedUpMnemonic(factorSourceID)
+			} catch {
+				// Not import enought to throw
+				loggerGlobal.warning("Failed to save mnemonic as backed up, error: \(error)")
+			}
 
 			if let factorSource, let factorSourceToSave = migrated.factorSourceToSave {
 				guard try factorSourceToSave.id == FactorSource.id(

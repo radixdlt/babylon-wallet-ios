@@ -7,7 +7,7 @@ import ScreenshotPreventing
 extension ImportMnemonic.State {
 	var viewState: ImportMnemonic.ViewState {
 		var viewState = ImportMnemonic.ViewState(
-			isReadonlyMode: isReadonlyMode,
+			readonlyMode: readonlyMode?.context,
 			isWordCountFixed: isWordCountFixed,
 			isAdvancedMode: isAdvancedMode,
 			header: header,
@@ -33,7 +33,11 @@ extension ImportMnemonic.State {
 // MARK: - ImportMnemonic.ViewState
 extension ImportMnemonic {
 	public struct ViewState: Equatable {
-		let isReadonlyMode: Bool
+		var isReadonlyMode: Bool {
+			readonlyMode != nil
+		}
+
+		let readonlyMode: ImportMnemonic.State.ReadonlyMode.Context?
 		let isWordCountFixed: Bool
 		let isAdvancedMode: Bool
 		let header: State.Header?
@@ -44,6 +48,16 @@ extension ImportMnemonic {
 		let completedWords: [BIP39.Word]
 		let mnemonic: Mnemonic?
 		let bip39Passphrase: String
+		var showBackButton: Bool {
+			guard let readonlyMode, case .fromSettings = readonlyMode else { return false }
+			return true
+		}
+
+		var showCloseButton: Bool {
+			guard let readonlyMode, case .fromSettings = readonlyMode else { return false }
+			return true
+		}
+
 		#if DEBUG
 		var debugMnemonicPhraseSingleField: String = ""
 		#endif
@@ -161,21 +175,25 @@ extension ImportMnemonic {
 						}
 					#endif
 				}
+				.toolbar {
+					if viewStore.showBackButton {
+						BackButton {
+							viewStore.send(.backButtonTapped)
+						}
+					}
+					if viewStore.showCloseButton {
+						CloseButton {
+							viewStore.send(.closeButtonTapped)
+						}
+					}
+				}
 				.animation(.default, value: viewStore.wordCount)
 				.animation(.default, value: viewStore.isAdvancedMode)
 				.onAppear { viewStore.send(.appeared) }
 				#if !DEBUG && os(iOS)
 					.screenshotProtected(isProtected: true)
 				#endif // iOS
-					.sheet(
-						store: store.scope(
-							state: \.$offDeviceMnemonicInfoPrompt,
-							action: { .child(.offDeviceMnemonicInfoPrompt($0)) }
-						),
-						content: {
-							OffDeviceMnemonicInfo.View(store: $0)
-						}
-					)
+					.destination(store: store)
 			}
 		}
 
@@ -198,6 +216,37 @@ extension ImportMnemonic {
 				.padding(.horizontal, .large3)
 			}
 		}
+	}
+}
+
+extension SwiftUI.View {
+	@MainActor
+	func destination(store: StoreOf<ImportMnemonic>) -> some View {
+		let destinationStore = store.scope(state: \.$destination, action: { .child(.destination($0)) })
+		return
+			offDeviceMnemonicInfoSheet(with: destinationStore)
+				.markMnemonicAsBackedUpAlert(with: destinationStore)
+	}
+
+	@MainActor
+	fileprivate func markMnemonicAsBackedUpAlert(with destinationStore: PresentationStoreOf<ImportMnemonic.Destinations>) -> some SwiftUI.View {
+		alert(
+			store: destinationStore,
+			state: /ImportMnemonic.Destinations.State.markMnemonicAsBackedUp,
+			action: ImportMnemonic.Destinations.Action.markMnemonicAsBackedUp
+		)
+	}
+
+	@MainActor
+	fileprivate func offDeviceMnemonicInfoSheet(with destinationStore: PresentationStoreOf<ImportMnemonic.Destinations>) -> some SwiftUI.View {
+		sheet(
+			store: destinationStore,
+			state: /ImportMnemonic.Destinations.State.offDeviceMnemonicInfoPrompt,
+			action: ImportMnemonic.Destinations.Action.offDeviceMnemonicInfoPrompt,
+			content: { childStore in
+				OffDeviceMnemonicInfo.View(store: childStore)
+			}
+		)
 	}
 }
 

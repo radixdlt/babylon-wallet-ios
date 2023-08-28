@@ -42,14 +42,18 @@ extension AccountDetails {
 						.textStyle(.body2HighImportance)
 						.padding(.bottom, .medium1)
 
-					if let callToAction = viewStore.callToAction {
-						switch callToAction {
-						case .needToBackupMnemonicForThisAccount:
-							Text("Need to export")
-						case .needToImportMnemonicForThisAccount:
-							Text("Need to import")
+					Group {
+						if let callToAction = viewStore.callToAction {
+							switch callToAction {
+							case .needToBackupMnemonicForThisAccount:
+								exportMnemonicPromptView(viewStore)
+
+							case .needToImportMnemonicForThisAccount:
+								recoverMnemonicsPromptView(viewStore)
+							}
 						}
 					}
+					.padding(.medium1)
 
 					Button(L10n.Account.transfer, asset: AssetResource.transfer) {
 						viewStore.send(.transferButtonTapped)
@@ -106,11 +110,17 @@ extension AccountDetails {
 					action: AccountDetails.Destinations.Action.transfer,
 					content: { AssetTransfer.SheetView(store: $0) }
 				)
-				.sheet(
+				.fullScreenCover( /* Full Screen cover to not be able to use iOS dismiss gestures */
 					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-					state: /AccountDetails.Destinations.State.importMnemonics,
-					action: AccountDetails.Destinations.Action.importMnemonics,
-					content: { ImportMnemonicsFlowCoordinator.View(store: $0) }
+					state: /AccountDetails.Destinations.State.exportMnemonic,
+					action: AccountDetails.Destinations.Action.exportMnemonic,
+					content: { store_ in
+						NavigationView {
+							ImportMnemonic.View(store: store_)
+								// FIXME: Strings
+								.navigationTitle("Backup Seed Phrase")
+						}
+					}
 				)
 				.sheet(
 					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
@@ -120,6 +130,16 @@ extension AccountDetails {
 				)
 			}
 		}
+	}
+}
+
+extension View {
+	func recoverMnemonicsPromptView(_ viewStore: ViewStoreOf<AccountDetails>) -> some View {
+		importMnemonicPromptView { viewStore.send(.recoverMnemonicsButtonTapped) }
+	}
+
+	func exportMnemonicPromptView(_ viewStore: ViewStoreOf<AccountDetails>) -> some View {
+		backupMnemonicPromptView { viewStore.send(.exportMnemonicButtonTapped) }
 	}
 }
 

@@ -22,6 +22,9 @@ package.addModules([
 			"AssetTransferFeature",
 			"AccountPortfoliosClient",
 			"AssetsFeature",
+			"ImportMnemonicFeature",
+			"ProfileBackupsFeature",
+			"BackupsClient",
 		],
 		tests: .yes()
 	),
@@ -30,6 +33,7 @@ package.addModules([
 		dependencies: [
 			"AccountPortfoliosClient",
 			"FactorSourcesClient", // check if `device` or `ledger` controlled for security prompting
+			"AccountDetailsFeature", // "shield buttons"
 		],
 		tests: .no
 	),

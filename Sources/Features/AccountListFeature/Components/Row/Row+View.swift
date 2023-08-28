@@ -1,3 +1,4 @@
+import AccountDetailsFeature
 import EngineKit
 import FeaturePrelude
 
@@ -214,43 +215,11 @@ extension AccountList.Row.View {
 
 extension AccountList.Row.View {
 	func importMnemonicPromptView(_ viewStore: ViewStoreOf<AccountList.Row>) -> some View {
-		shieldPromptView(
-			text: "Recovery of seed phrase required", // FIXME: Strings
-			action: { viewStore.send(.importMnemonic) }
-		)
+		importMnemonicPromptView { viewStore.send(.importMnemonic) }
 	}
 
 	func backupMnemonicPromptView(_ viewStore: ViewStoreOf<AccountList.Row>) -> some View {
-		shieldPromptView(
-			text: "Back up this account's seed phrase", // FIXME: Strings
-			action: { viewStore.send(.backUpMnemonic) }
-		)
-	}
-
-	func shieldPromptView(
-		text: String,
-		action onTapGesture: @escaping () -> Void
-	) -> some View {
-		HStack {
-			Image(asset: AssetResource.homeAccountSecurity)
-
-			Text(text)
-				.foregroundColor(.white)
-				.textStyle(.body2HighImportance)
-
-			Spacer()
-
-			Circle()
-				.fill()
-				.foregroundColor(.red)
-				.frame(width: .small2, height: .small2)
-		}
-		.padding(.small2)
-		.background(.app.whiteTransparent2)
-		.cornerRadius(.small2)
-		.onTapGesture {
-			onTapGesture()
-		}
+		backupMnemonicPromptView { viewStore.send(.backUpMnemonic) }
 	}
 }
 

@@ -2,6 +2,7 @@ import AccountPortfoliosClient
 import AccountPreferencesFeature
 import AssetsFeature
 import AssetTransferFeature
+import BackupsClient
 import EngineKit
 import FeaturePrelude
 import ImportMnemonicFeature
@@ -58,9 +59,15 @@ public struct AccountDetails: Sendable, FeatureReducer {
 		case accountUpdated(Profile.Network.Account)
 
 		case loadMnemonic
-		case loadMnemonicResult(TaskResult<MnemonicWithPassphrase?>)
+		case loadMnemonicResult(TaskResult<MnemonicWithPassphraseAndFactorSourceInfo>)
 
-		case loadImport; case loadedImport
+		case loadImport
+		case loadProfileSnapshotForRecoverMnemonicsFlow(TaskResult<ProfileSnapshot>)
+	}
+
+	public struct MnemonicWithPassphraseAndFactorSourceInfo: Sendable, Hashable {
+		public let mnemonicWithPassphrase: MnemonicWithPassphrase
+		public let factorSourceKind: FactorSourceKind
 	}
 
 	public struct Destinations: Sendable, ReducerProtocol {
@@ -101,6 +108,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 		}
 	}
 
+	@Dependency(\.backupsClient) var backupsClient
 	@Dependency(\.accountsClient) var accountsClient
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.secureStorageClient) var secureStorageClient
@@ -120,19 +128,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .task:
-			return .run { [address = state.account.address, callToAction = state.callToAction] send in
-
-				switch callToAction {
-				case .needToBackupMnemonicForThisAccount:
-					await send(.internal(.loadMnemonic))
-
-				case .needToImportMnemonicForThisAccount:
-					await send(.internal(.loadImport))
-
-				case .none:
-					break
-				}
-
+			return .run { [address = state.account.address] send in
 				for try await accountUpdate in await accountsClient.accountUpdates(address) {
 					guard !Task.isCancelled else { return }
 					await send(.internal(.accountUpdated(accountUpdate)))
@@ -179,15 +175,14 @@ public struct AccountDetails: Sendable, FeatureReducer {
 		case .loadImport:
 			return loadImport()
 
-		case let .loadMnemonicResult(.success(mnemonicWithPassphrase?)):
+		case let .loadMnemonicResult(.success(mnemonicWithPassphraseAndFactorSourceInfo)):
+			loggerGlobal.feature("Successfully loaded mnemonic to export")
 			state.destination = .exportMnemonic(.init(
-				mnemonicWithPassphrase: mnemonicWithPassphrase
+				warning: L10n.RevealSeedPhrase.warning,
+				mnemonicWithPassphrase: mnemonicWithPassphraseAndFactorSourceInfo.mnemonicWithPassphrase,
+				readonlyMode: .init(context: .fromBackupPrompt, factorSourceKind: mnemonicWithPassphraseAndFactorSourceInfo.factorSourceKind)
 			))
 
-			return .none
-
-		case let .loadMnemonicResult(.success(.none)):
-			loggerGlobal.error("Failed to load mnemonic to export? was nil..")
 			return .none
 
 		case let .loadMnemonicResult(.failure(error)):
@@ -195,7 +190,13 @@ public struct AccountDetails: Sendable, FeatureReducer {
 			errorQueue.schedule(error)
 			return .none
 
-		case .loadedImport:
+		case let .loadProfileSnapshotForRecoverMnemonicsFlow(.success(profileSnapshot)):
+			state.destination = .importMnemonics(.init(profileSnapshot: profileSnapshot))
+			return .none
+
+		case let .loadProfileSnapshotForRecoverMnemonicsFlow(.failure(error)):
+			loggerGlobal.error("Failed to load Profile to export")
+			errorQueue.schedule(error)
 			return .none
 
 		case let .accountUpdated(account):
@@ -206,14 +207,23 @@ public struct AccountDetails: Sendable, FeatureReducer {
 
 	private func loadMnemonic(account: Profile.Network.Account) -> EffectTask<Action> {
 		loggerGlobal.feature("implement export")
-		let factorSourceID: FactorSourceID = {
+		let factorInstance: FactorInstance = {
 			switch account.securityState {
-			case let .unsecured(control): return control.transactionSigning.factorInstance.factorSourceID
+			case let .unsecured(control): return control.transactionSigning.factorInstance
 			}
 		}()
+		let factorSourceID = factorInstance.factorSourceID
 		return .task {
 			let result = await TaskResult {
-				try await secureStorageClient.loadMnemonicByFactorSourceID(factorSourceID.embed(), .displaySeedPhrase)
+				guard let mnemonicWithPassphrase = try await secureStorageClient.loadMnemonicByFactorSourceID(factorSourceID, .displaySeedPhrase) else {
+					loggerGlobal.error("Failed to find mnemonic with key: \(factorSourceID) which controls account: \(account)")
+					struct UnabledToFindExpectedMnemonic: Swift.Error {}
+					throw UnabledToFindExpectedMnemonic()
+				}
+				return MnemonicWithPassphraseAndFactorSourceInfo(
+					mnemonicWithPassphrase: mnemonicWithPassphrase,
+					factorSourceKind: factorInstance.factorSourceKind
+				)
 			}
 			return .internal(.loadMnemonicResult(result))
 		}
@@ -222,7 +232,8 @@ public struct AccountDetails: Sendable, FeatureReducer {
 	private func loadImport() -> EffectTask<Action> {
 		loggerGlobal.feature("implement import")
 		return .task {
-			.internal(.loadedImport)
+			let result = await TaskResult { try await backupsClient.snapshotOfProfileForExport() }
+			return .internal(.loadProfileSnapshotForRecoverMnemonicsFlow(result))
 		}
 	}
 }

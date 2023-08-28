@@ -76,8 +76,7 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 			return .none
 		case .inputMnemonic:
 			state.destination = .importMnemonic(.init(
-				// FIXME: Strings
-				warning: "For your safety, make sure no one is looking at your screen. Never give your seed phrase to anyone for any reason.",
+				warning: L10n.RevealSeedPhrase.warning,
 				isWordCountFixed: true,
 				persistStrategy: nil,
 				wordCount: state.entitiesControlledByFactorSource.mnemonicWordCount
@@ -156,6 +155,8 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 						// not important enough to propage error
 						loggerGlobal.error("Failed to remove addresses from list of those that need recovery")
 					}
+
+					await userDefaultsClient.removeAllFactorSourceIDsOfBackedUpMnemonics()
 
 					try await secureStorageClient.saveMnemonicForFactorSource(
 						privateHDFactorSource
