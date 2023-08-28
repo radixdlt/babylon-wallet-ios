@@ -285,19 +285,16 @@ public struct TransactionFee: Hashable, Sendable {
 		self.init(feeSummary: feeSummary, feeLocks: feeLocks, mode: .normal(.init(feeSummary: feeSummary, feeLocks: feeLocks)))
 	}
 
-	public init(executionAnalysis: ExecutionAnalysis, signaturesCount: Int) throws {
-		// every transaction has a lockFee instruction.
-		let guaranteesFee: BigDecimal = try executionAnalysis.guranteesFee()
-		let signaturesFee = BigDecimal(signaturesCount) * PredefinedFeeConstants.signatureCost
-
+	public init(executionAnalysis: ExecutionAnalysis, signaturesCount: Int, notaryIsSignatory: Bool) throws {
 		let feeSummary: FeeSummary = try .init(
 			executionCost: executionAnalysis.feeSummary.executionCost.asBigDecimal(),
 			finalizationCost: executionAnalysis.feeSummary.finalizationCost.asBigDecimal(),
 			storageExpansionCost: executionAnalysis.feeSummary.storageExpansionCost.asBigDecimal(),
 			royaltyCost: executionAnalysis.feeSummary.royaltyCost.asBigDecimal(),
-			guaranteesCost: guaranteesFee,
-			signaturesCost: signaturesFee,
-			lockFeeCost: PredefinedFeeConstants.lockFeeInstructionCost
+			guaranteesCost: executionAnalysis.guranteesFee(),
+			signaturesCost: PredefinedFeeConstants.signaturesCost(signaturesCount),
+			lockFeeCost: PredefinedFeeConstants.lockFeeInstructionCost,
+			notarizingCost: PredefinedFeeConstants.notarizingCost(notaryIsSignatory)
 		)
 
 		let feeLocks: FeeLocks = try .init(
@@ -311,15 +308,16 @@ public struct TransactionFee: Hashable, Sendable {
 		)
 	}
 
-	public mutating func updatingSignaturesCost(_ signaturesCount: Int) {
+	public mutating func updatingSignaturesCost(_ signaturesCount: Int, notaryIsSignatory: Bool) {
 		var feeSummary = feeSummary
-		feeSummary.signaturesCost = BigDecimal(signaturesCount) * PredefinedFeeConstants.signatureCost
+		feeSummary.signaturesCost = PredefinedFeeConstants.signaturesCost(signaturesCount)
+		feeSummary.notarizingCost = PredefinedFeeConstants.notarizingCost(notaryIsSignatory)
 		let mode: Mode = {
 			switch self.mode {
 			case .normal:
 				return .normal(.init(feeSummary: feeSummary, feeLocks: feeLocks))
 			case .advanced:
-				return .advanced(.init(feeSummary: feeSummary))
+				return .advanced(.init(feeSummary: feeSummary, feeLocks: feeLocks))
 			}
 		}()
 		self = .init(feeSummary: feeSummary, feeLocks: feeLocks, mode: mode)
@@ -361,7 +359,7 @@ extension TransactionFee {
 	public mutating func toggleMode() {
 		switch mode {
 		case .normal:
-			mode = .advanced(.init(feeSummary: feeSummary))
+			mode = .advanced(.init(feeSummary: feeSummary, feeLocks: feeLocks))
 		case .advanced:
 			mode = .normal(.init(feeSummary: feeSummary, feeLocks: feeLocks))
 		}
@@ -380,10 +378,21 @@ extension TransactionFee {
 		/// 15% margin is added here to make up for the ambiguity of the transaction preview estimate)
 		public static let networkFeeMultiplier: BigDecimal = 0.15
 
-		public static let lockFeeInstructionCost = try! BigDecimal(fromString: "0.09184043787434")
-		public static let fungibleGuaranteeInstructionCost = try! BigDecimal(fromString: "0.01199514744466")
-		public static let nonFungibleGuranteeInstructionCost = try! BigDecimal(fromString: "0.01283759744466")
-		public static let signatureCost = try! BigDecimal(fromString: "0.01200849179687")
+		/// Network fees -> https://radixdlt.atlassian.net/wiki/spaces/S/pages/3134783512/Manifest+Mutation+Cost+Addition+Estimates
+		public static let lockFeeInstructionCost = try! BigDecimal(fromString: "0.095483092333982841")
+		public static let fungibleGuaranteeInstructionCost = try! BigDecimal(fromString: "0.012001947444660947")
+		public static let nonFungibleGuranteeInstructionCost = try! BigDecimal(fromString: "0.012844397444660947")
+		public static let signatureCost = try! BigDecimal(fromString: "0.017839046256509498")
+		public static let notarizingCost = try! BigDecimal(fromString: "0.01322565755208264")
+		public static let notarizingCostWhenNotaryIsSignatory = try! BigDecimal(fromString: "0.01351365755208264")
+
+		public static func notarizingCost(_ notaryIsSignatory: Bool) -> BigDecimal {
+			notaryIsSignatory ? notarizingCostWhenNotaryIsSignatory : notarizingCost
+		}
+
+		public static func signaturesCost(_ signaturesCount: Int) -> BigDecimal {
+			BigDecimal(signaturesCount) * PredefinedFeeConstants.signatureCost
+		}
 	}
 
 	public enum Mode: Hashable, Sendable {
@@ -402,12 +411,14 @@ extension TransactionFee {
 
 		/// Signatures cost be updated
 		public var signaturesCost: BigDecimal
+		public var notarizingCost: BigDecimal
 
 		public var totalExecutionCost: BigDecimal {
 			executionCost
 				+ guaranteesCost
 				+ signaturesCost
 				+ lockFeeCost
+				+ notarizingCost
 		}
 
 		public var total: BigDecimal {
@@ -424,7 +435,8 @@ extension TransactionFee {
 			royaltyCost: BigDecimal,
 			guaranteesCost: BigDecimal,
 			signaturesCost: BigDecimal,
-			lockFeeCost: BigDecimal
+			lockFeeCost: BigDecimal,
+			notarizingCost: BigDecimal
 		) {
 			self.executionCost = executionCost
 			self.finalizationCost = finalizationCost
@@ -433,6 +445,7 @@ extension TransactionFee {
 			self.guaranteesCost = guaranteesCost
 			self.signaturesCost = signaturesCost
 			self.lockFeeCost = lockFeeCost
+			self.notarizingCost = notarizingCost
 		}
 	}
 
@@ -450,19 +463,23 @@ extension TransactionFee {
 		public let feeSummary: FeeSummary
 		public var paddingFee: BigDecimal
 		public var tipPercentage: BigDecimal
+		public let paidByDapps: BigDecimal
 
 		public var tipAmount: BigDecimal {
 			(tipPercentage / 100) * (feeSummary.totalExecutionCost + feeSummary.finalizationCost)
 		}
 
 		public var total: BigDecimal {
-			feeSummary.total + paddingFee + tipAmount
+			feeSummary.total + paddingFee + tipAmount + paidByDapps
 		}
 
-		public init(feeSummary: FeeSummary) {
+		public init(feeSummary: FeeSummary, feeLocks: FeeLocks) {
 			self.feeSummary = feeSummary
 			self.paddingFee = (feeSummary.totalExecutionCost + feeSummary.finalizationCost + feeSummary.storageExpansionCost) * PredefinedFeeConstants.networkFeeMultiplier
 			self.tipPercentage = .zero
+			var lock = feeLocks.nonContingentLock
+			lock.negate()
+			self.paidByDapps = lock
 		}
 	}
 

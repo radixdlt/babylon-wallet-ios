@@ -214,11 +214,16 @@ extension TransactionClient {
 			))
 
 			/// Get all of the expected signing factors.
-			let signingFactors = try await factorSourcesClient.getSigningFactors(.init(
-				networkID: networkID,
-				signers: .init(rawValue: Set(transactionSigners.intentSignerEntitiesOrEmpty()))!,
-				signingPurpose: .signTransaction(.manifestFromDapp)
-			))
+			let signingFactors = try await {
+				if let nonEmpty = NonEmpty<Set<EntityPotentiallyVirtual>>(transactionSigners.intentSignerEntitiesOrEmpty()) {
+					return try await factorSourcesClient.getSigningFactors(.init(
+						networkID: networkID,
+						signers: nonEmpty,
+						signingPurpose: .signTransaction(.manifestFromDapp)
+					))
+				}
+				return [:]
+			}()
 
 			/// Get the transaction preview
 			let transactionPreviewRequest = try await createTransactionPreviewRequest(for: request, networkID: networkID, transactionSigners: transactionSigners)
@@ -235,7 +240,7 @@ extension TransactionClient {
 
 			/// Calculate the expecte transaction fee
 			let signaturesCount = transactionSigners.notaryIsSignatory ? 1 : signingFactors.expectedSignatureCount
-			let transactionFee = try TransactionFee(executionAnalysis: analyzedManifestToReview, signaturesCount: signaturesCount)
+			let transactionFee = try TransactionFee(executionAnalysis: analyzedManifestToReview, signaturesCount: signaturesCount, notaryIsSignatory: transactionSigners.notaryIsSignatory)
 
 			/// Select the account that can pay the transaction fee
 			let feePayerSelection = try await feePayerSelectionAmongstCandidates(request.manifestToSign, transactionFee: transactionFee)

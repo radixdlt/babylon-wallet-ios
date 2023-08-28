@@ -75,6 +75,6 @@ extension Instruction {
 		address: Address,
 		fee: BigDecimal
 	) throws -> Instruction {
-		try .callMethod(address: .static(value: .init(address: address.address)), methodName: "lock_fee", args: .tupleValue(fields: [.decimalValue(value: .init(value: fee.toString()))]))
+		try .callMethod(address: .static(value: .init(address: address.address)), methodName: "lock_fee", args: .tupleValue(fields: [.decimalValue(value: fee.intoEngine())]))
 	}
 }

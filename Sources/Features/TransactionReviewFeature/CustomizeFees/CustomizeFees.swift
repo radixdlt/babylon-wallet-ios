@@ -171,8 +171,10 @@ public struct CustomizeFees: FeatureReducer {
 		switch internalAction {
 		case let .updated(.success(reviewedTransaction)):
 			state.reviewedTransaction = reviewedTransaction
-			print("signatures count \(reviewedTransaction.signingFactors.expectedSignatureCount)")
-			state.reviewedTransaction.feePayerSelection.transactionFee.updatingSignaturesCost(reviewedTransaction.signingFactors.expectedSignatureCount)
+			state.reviewedTransaction.feePayerSelection.transactionFee.updatingSignaturesCost(
+				reviewedTransaction.signingFactors.expectedSignatureCount,
+				notaryIsSignatory: reviewedTransaction.transactionSigners.notaryIsSignatory
+			)
 			state.modeState = state.feePayerSelection.transactionFee.customizationModeState
 			return .send(.delegate(.updated(state.reviewedTransaction)))
 		case let .updated(.failure(error)):
