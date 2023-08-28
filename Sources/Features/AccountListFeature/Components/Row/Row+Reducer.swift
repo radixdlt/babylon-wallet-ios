@@ -16,8 +16,15 @@ extension AccountList {
 			public let isLegacyAccount: Bool
 			public let isLedgerAccount: Bool
 			public var isDappDefinitionAccount: Bool = false
-			public var needToBackupMnemonicForThisAccount = false
-			public var needToImportMnemonicForThisAccount = false
+
+			public struct DeviceFactorSourceControlled: Sendable, Hashable {
+				public var needToBackupMnemonicForThisAccount = false
+				public var needToImportMnemonicForThisAccount = false
+			}
+
+			public var deviceFactorSourceControlled: DeviceFactorSourceControlled?
+
+			public var hasValue: Bool = false
 
 			public init(
 				account: Profile.Network.Account
@@ -32,6 +39,13 @@ extension AccountList {
 						return unsecuredEntityControl.transactionSigning.factorInstance.factorSourceID.kind == .ledgerHQHardwareWallet
 					}
 				}()
+
+				switch account.securityState {
+				case let .unsecured(unsecuredEntityControl):
+					if unsecuredEntityControl.transactionSigning.factorSourceID.kind == .device {
+						self.deviceFactorSourceControlled = .init()
+					}
+				}
 			}
 		}
 
@@ -44,7 +58,6 @@ extension AccountList {
 
 		public enum InternalAction: Sendable, Equatable {
 			case accountPortfolioUpdate(AccountPortfolio)
-			case needToBackupMnemonicForThisAccount
 		}
 
 		public enum DelegateAction: Sendable, Equatable {
@@ -66,10 +79,11 @@ extension AccountList {
 		public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 			switch viewAction {
 			case .task:
+
 				let accountAddress = state.account.address
 				state.portfolio = .loading
-				let accounts = userDefaultsClient.getAddressesOfAccountsThatNeedRecovery()
-				state.needToImportMnemonicForThisAccount = accounts.contains(where: { $0 == accountAddress })
+
+				checkIfCallActionIsNeeded(state: &state)
 
 				return .run { send in
 					for try await accountPortfolio in await accountPortfoliosClient.portfolioForAccount(accountAddress) {
@@ -88,36 +102,48 @@ extension AccountList {
 			case .tapped:
 				return .send(.delegate(.tapped(
 					state.account,
-					needToBackupMnemonicForThisAccount: state.needToBackupMnemonicForThisAccount,
-					needToImportMnemonicForThisAccount: state.needToImportMnemonicForThisAccount
+					needToBackupMnemonicForThisAccount: state.deviceFactorSourceControlled?.needToBackupMnemonicForThisAccount ?? false,
+					needToImportMnemonicForThisAccount: state.deviceFactorSourceControlled?.needToImportMnemonicForThisAccount ?? false
 				)))
 			}
 		}
 
 		public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 			switch internalAction {
-			case .needToBackupMnemonicForThisAccount:
-				state.needToBackupMnemonicForThisAccount = true
-				return .none
 			case let .accountPortfolioUpdate(portfolio):
+
 				state.isDappDefinitionAccount = portfolio.isDappDefintionAccountType
 				assert(portfolio.owner == state.account.address)
 				state.portfolio = .success(portfolio)
 
-				guard let xrdResource = portfolio.fungibleResources.xrdResource, xrdResource.amount > .zero else {
-					state.needToBackupMnemonicForThisAccount = false
-					return .none
-				}
-
-				switch state.account.securityState {
-				case let .unsecured(unsecuredEntityControl):
-					let hasAlreadyBackedUpMnemonic = userDefaultsClient.getFactorSourceIDOfBackedUpMnemonics().contains(unsecuredEntityControl.transactionSigning.factorSourceID)
-					if !hasAlreadyBackedUpMnemonic, unsecuredEntityControl.transactionSigning.factorSourceID.kind == .device {
-						return .send(.internal(.needToBackupMnemonicForThisAccount))
-					} else {
-						return .none
+				state.hasValue = {
+					guard let xrdResource = portfolio.fungibleResources.xrdResource, xrdResource.amount > .zero else {
+						return false
 					}
-				}
+					return true
+				}()
+
+				// FIXME: This is lazy code... we "piggyback" on the fact that `accountPortfolioUpdate` happens frequently.. as a means to update state.
+				checkIfCallActionIsNeeded(state: &state)
+
+				return .none
+			}
+		}
+
+		private func checkIfCallActionIsNeeded(state: inout State) {
+			guard state.deviceFactorSourceControlled != nil else { return }
+
+			let isRecoveryOfMnemonicNeeded = userDefaultsClient
+				.getAddressesOfAccountsThatNeedRecovery()
+				.contains(where: { $0 == state.account.address })
+
+			state.deviceFactorSourceControlled?.needToImportMnemonicForThisAccount = isRecoveryOfMnemonicNeeded
+
+			switch state.account.securityState {
+			case let .unsecured(unsecuredEntityControl):
+				let hasAlreadyBackedUpMnemonic = userDefaultsClient.getFactorSourceIDOfBackedUpMnemonics().contains(unsecuredEntityControl.transactionSigning.factorSourceID)
+
+				state.deviceFactorSourceControlled?.needToBackupMnemonicForThisAccount = !hasAlreadyBackedUpMnemonic
 			}
 		}
 	}

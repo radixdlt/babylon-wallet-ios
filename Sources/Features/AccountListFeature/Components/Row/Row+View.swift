@@ -52,10 +52,10 @@ extension AccountList.Row {
 			self.tag = .init(state: state)
 
 			// Show the prompt if the account has any XRD
-			self.needToBackupMnemonicForThisAccount = state.needToBackupMnemonicForThisAccount
+			self.needToBackupMnemonicForThisAccount = state.deviceFactorSourceControlled?.needToBackupMnemonicForThisAccount ?? false
 
 			// Show the prompt if keychain does not contain the mnemonic for this account
-			self.needToImportMnemonicForThisAccount = state.needToImportMnemonicForThisAccount
+			self.needToImportMnemonicForThisAccount = state.deviceFactorSourceControlled?.needToImportMnemonicForThisAccount ?? false
 
 			// Resources
 			guard let portfolio = state.portfolio.wrappedValue else {

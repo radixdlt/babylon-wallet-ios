@@ -83,7 +83,7 @@ public struct Home: Sendable, FeatureReducer {
 			Header()
 		}
 		Scope(state: \.accountList, action: /Action.child .. ChildAction.accountList) {
-			AccountList()
+			AccountList()._printChanges()
 		}
 		Reduce(core)
 			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
