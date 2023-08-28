@@ -57,7 +57,7 @@ public struct ResourcesList: FeatureReducer, Sendable {
 	}
 
 	public enum ViewAction: Equatable, Sendable {
-		case onAppeared
+		case task
 		case addAssetTapped
 		case assetRemove(ResourceViewState.Address)
 		case exceptionListChanged(ThirdPartyDeposits.DepositAddressExceptionRule)
@@ -110,7 +110,7 @@ public struct ResourcesList: FeatureReducer, Sendable {
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
-		case .onAppeared:
+		case .task:
 			let addresses: [ResourceAddress] = state.allDepositorAddresses.map(\.resourceAddress)
 			return .run { send in
 				let loadResourcesResult = try? await onLedgerEntitiesClient.getResources(addresses)
@@ -209,10 +209,10 @@ extension AlertState<ResourcesList.Destinations.Action.ConfirmDeletionAlert> {
 			TextState(title)
 		} actions: {
 			ButtonState(role: .destructive, action: .confirmTapped(resourceAddress)) {
-				TextState(L10n.Common.remove)
+				TextState("Remove") // FIXME: Strings
 			}
 			ButtonState(role: .cancel, action: .cancelTapped) {
-				TextState(L10n.Common.cancel)
+				TextState("Cancel") // FIXME: Strings
 			}
 		} message: {
 			TextState(message)

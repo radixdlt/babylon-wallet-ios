@@ -7,8 +7,6 @@ import TestingPrelude
 // MARK: - FactorSourcesCodableTests
 final class FactorSourcesCodableTests: TestCase {
 	func test_generate_vector() throws {
-		let networkID = NetworkID.kisharnet
-
 		let factorSources: [FactorSource] = try withDependencies {
 			$0.date = .constant(.init(timeIntervalSince1970: 1_690_801_871))
 		} operation: {
@@ -23,7 +21,7 @@ final class FactorSourcesCodableTests: TestCase {
 
 			var anyFactorSources: [any FactorSourceProtocol] = []
 
-			var babylon = try DeviceFactorSource.babylon(
+			let babylon = try DeviceFactorSource.babylon(
 				mnemonicWithPassphrase: mnemonicWithPassphrase,
 				model: "iPhone 16",
 				name: "New phone"
@@ -38,7 +36,7 @@ final class FactorSourcesCodableTests: TestCase {
 			)
 			anyFactorSources.append(olympia)
 
-			var ledger = try LedgerHardwareWalletFactorSource.model(
+			let ledger = try LedgerHardwareWalletFactorSource.model(
 				.nanoS,
 				name: "Orange",
 				deviceID: .init(.deadbeef32Bytes)

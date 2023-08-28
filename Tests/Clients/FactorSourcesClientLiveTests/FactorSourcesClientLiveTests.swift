@@ -103,7 +103,7 @@ extension FactorSource {
 				common: .init(
 					cryptoParameters: olympiaCompat ? .olympiaBackwardsCompatible : .babylon
 				),
-				hint: .init(name: name, model: "")
+				hint: .init(name: name, model: "", mnemonicWordCount: .twentyFour)
 			)
 			return device.embed()
 		}

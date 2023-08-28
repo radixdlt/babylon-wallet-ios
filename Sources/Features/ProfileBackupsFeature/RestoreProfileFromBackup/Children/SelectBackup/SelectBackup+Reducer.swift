@@ -1,43 +1,29 @@
 import AppPreferencesClient
 import BackupsClient
+import Cryptography
 import FeaturePrelude
 import ImportMnemonicFeature
+import OverlayWindowClient
 
-// MARK: - ProfileBackups
-public struct ProfileBackups: Sendable, FeatureReducer {
+// MARK: - SelectBackup
+public struct SelectBackup: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
-		public enum Context: Sendable, Hashable {
-			case onboarding
-			case settings
-		}
-
-		public var preferences: AppPreferences?
 		public var backupProfileHeaders: ProfileSnapshot.HeaderList?
 		public var selectedProfileHeader: ProfileSnapshot.Header?
 		public var isDisplayingFileImporter: Bool
 		public var thisDeviceID: UUID?
-		public var context: Context
-		public var importedContent: Either<ProfileSnapshot, ProfileSnapshot.Header>?
-
-		var isCloudProfileSyncEnabled: Bool {
-			preferences?.security.isCloudProfileSyncEnabled == true
-		}
-
-		var shownInSettings: Bool {
-			context == .settings
-		}
 
 		@PresentationState
 		public var destination: Destinations.State?
 
+		public var profileFile: ExportableProfileFile?
+
 		public init(
-			context: Context,
 			backupProfileHeaders: ProfileSnapshot.HeaderList? = nil,
 			selectedProfileHeader: ProfileSnapshot.Header? = nil,
 			isDisplayingFileImporter: Bool = false,
 			thisDeviceID: UUID? = nil
 		) {
-			self.context = context
 			self.backupProfileHeaders = backupProfileHeaders
 			self.selectedProfileHeader = selectedProfileHeader
 			self.isDisplayingFileImporter = isDisplayingFileImporter
@@ -47,47 +33,25 @@ public struct ProfileBackups: Sendable, FeatureReducer {
 
 	public enum ViewAction: Sendable, Equatable {
 		case task
-		case cloudProfileSyncToggled(Bool)
 		case selectedProfileHeader(ProfileSnapshot.Header?)
-		case tappedImportProfile
+		case importFromFileInstead
 		case dismissFileImporter
 		case profileImportResult(Result<URL, NSError>)
 		case tappedUseCloudBackup(ProfileSnapshot.Header)
 	}
 
 	public struct Destinations: Sendable, ReducerProtocol {
-		static let confirmCloudSyncDisableAlert: Self.State = .confirmCloudSyncDisable(.init(
-			title: {
-				// FIXME: strings
-				TextState("Disabling iCloud sync will delete the iCloud backup data(wallet data will still be kept on this iPhone), are you sure you want to disable iCloud sync?")
-			},
-			actions: {
-				ButtonState(role: .destructive, action: .confirm) {
-					TextState("Confirm")
-				}
-			}
-		))
-
 		public enum State: Sendable, Hashable {
-			case confirmCloudSyncDisable(AlertState<Action.ConfirmCloudSyncDisable>)
-			case importMnemonic(ImportMnemonic.State)
+			case inputEncryptionPassword(EncryptOrDecryptProfile.State)
 		}
 
 		public enum Action: Sendable, Equatable {
-			case confirmCloudSyncDisable(ConfirmCloudSyncDisable)
-			case importMnemonic(ImportMnemonic.Action)
-
-			public enum ConfirmCloudSyncDisable: Sendable, Hashable {
-				case confirm
-			}
+			case inputEncryptionPassword(EncryptOrDecryptProfile.Action)
 		}
 
 		public var body: some ReducerProtocol<State, Action> {
-			Scope(state: /State.confirmCloudSyncDisable, action: /Action.confirmCloudSyncDisable) {
-				EmptyReducer()
-			}
-			Scope(state: /State.importMnemonic, action: /Action.importMnemonic) {
-				ImportMnemonic()
+			Scope(state: /State.inputEncryptionPassword, action: /Action.inputEncryptionPassword) {
+				EncryptOrDecryptProfile()
 			}
 		}
 	}
@@ -95,11 +59,11 @@ public struct ProfileBackups: Sendable, FeatureReducer {
 	public enum InternalAction: Sendable, Equatable {
 		case loadBackupProfileHeadersResult(ProfileSnapshot.HeaderList?)
 		case loadThisDeviceIDResult(UUID?)
-		case loadPreferences(AppPreferences)
+		case snapshotWithHeaderNotFoundInCloud(ProfileSnapshot.Header)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
-		case profileImported
+		case selectedProfileSnapshot(ProfileSnapshot, isInCloud: Bool)
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -111,10 +75,11 @@ public struct ProfileBackups: Sendable, FeatureReducer {
 	@Dependency(\.jsonDecoder) var jsonDecoder
 	@Dependency(\.backupsClient) var backupsClient
 	@Dependency(\.appPreferencesClient) var appPreferencesClient
+	@Dependency(\.overlayWindowClient) var overlayWindowClient
 
 	public init() {}
 
-	public var body: some ReducerProtocolOf<ProfileBackups> {
+	public var body: some ReducerProtocolOf<SelectBackup> {
 		Reduce(core)
 			.ifLet(\.$destination, action: /Action.child .. /ChildAction.destination) {
 				Destinations()
@@ -123,14 +88,6 @@ public struct ProfileBackups: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
-		case let .cloudProfileSyncToggled(isEnabled):
-			if !isEnabled {
-				state.destination = Destinations.confirmCloudSyncDisableAlert
-				return .none
-			} else {
-				return updateCloudSync(state: &state, isEnabled: true)
-			}
-
 		case .task:
 			return .run { send in
 				await send(.internal(.loadThisDeviceIDResult(
@@ -140,13 +97,9 @@ public struct ProfileBackups: Sendable, FeatureReducer {
 				await send(.internal(.loadBackupProfileHeadersResult(
 					backupsClient.loadProfileBackups()
 				)))
-
-				await send(.internal(.loadPreferences(
-					appPreferencesClient.getPreferences()
-				)))
 			}
 
-		case .tappedImportProfile:
+		case .importFromFileInstead:
 			state.isDisplayingFileImporter = true
 			return .none
 
@@ -155,9 +108,17 @@ public struct ProfileBackups: Sendable, FeatureReducer {
 			return .none
 
 		case let .tappedUseCloudBackup(profileHeader):
-			state.importedContent = .right(profileHeader)
-			showImportMnemonic(state: &state)
-			return .none
+			return .task {
+				do {
+					guard let snapshot = try await backupsClient.lookupProfileSnapshotByHeader(profileHeader) else {
+						return .internal(.snapshotWithHeaderNotFoundInCloud(profileHeader))
+					}
+					return .delegate(.selectedProfileSnapshot(snapshot, isInCloud: true))
+				} catch {
+					loggerGlobal.error("Failed to load profile snapshot with header, error: \(error), header: \(profileHeader)")
+					return .internal(.snapshotWithHeaderNotFoundInCloud(profileHeader))
+				}
+			}
 
 		case .dismissFileImporter:
 			state.isDisplayingFileImporter = false
@@ -169,12 +130,23 @@ public struct ProfileBackups: Sendable, FeatureReducer {
 
 		case let .profileImportResult(.success(profileURL)):
 			do {
+				guard profileURL.startAccessingSecurityScopedResource() else {
+					throw LackedPermissionToAccessSecurityScopedResource()
+				}
+				defer { profileURL.stopAccessingSecurityScopedResource() }
 				let data = try dataReader.contentsOf(profileURL, options: .uncached)
-				let snapshot = try jsonDecoder().decode(ProfileSnapshot.self, from: data)
-				state.importedContent = .left(snapshot)
-				showImportMnemonic(state: &state)
+				let possiblyEncrypted = try ExportableProfileFile(data: data)
+				switch possiblyEncrypted {
+				case let .encrypted(encrypted):
+					state.destination = .inputEncryptionPassword(.init(mode: .decrypt(encrypted)))
+					return .none
+
+				case let .plaintext(snapshot):
+					return .send(.delegate(.selectedProfileSnapshot(snapshot, isInCloud: false)))
+				}
 			} catch {
 				errorQueue.schedule(error)
+				loggerGlobal.error("Failed to import profile, error: \(error)")
 			}
 			return .none
 		}
@@ -185,59 +157,47 @@ public struct ProfileBackups: Sendable, FeatureReducer {
 		case let .loadBackupProfileHeadersResult(profileHeaders):
 			state.backupProfileHeaders = profileHeaders
 			return .none
+
 		case let .loadThisDeviceIDResult(identifier):
 			state.thisDeviceID = identifier
 			return .none
-		case let .loadPreferences(preferences):
-			state.preferences = preferences
+
+		case let .snapshotWithHeaderNotFoundInCloud(headerOfNonFoundProfile):
+			errorQueue.schedule(ProfileNotInCloudFound(header: headerOfNonFoundProfile))
 			return .none
 		}
 	}
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
-		case let .destination(.presented(.importMnemonic(.delegate(.savedInProfile(factorSource))))):
-			guard let importedContent = state.importedContent else {
-				assertionFailure("Imported mnemonic, but didn't import neither a snapshot or a profile header")
-				return .none
-			}
-
-			return .run { [importedContent] send in
-				switch importedContent {
-				case let .left(snapshot):
-					try await backupsClient.importProfileSnapshot(snapshot, factorSource.id)
-				case let .right(header):
-					try await backupsClient.importCloudProfile(header, factorSource.id)
-				}
-				await send(.delegate(.profileImported))
-			} catch: { error, _ in
-				errorQueue.schedule(error)
-			}
-
-		case .destination(.presented(.confirmCloudSyncDisable(.confirm))):
+		case .destination(.presented(.inputEncryptionPassword(.delegate(.dismiss)))):
 			state.destination = nil
-			return updateCloudSync(state: &state, isEnabled: false)
+			return .none
+
+		case let .destination(.presented(.inputEncryptionPassword(.delegate(.successfullyDecrypted(_, decrypted))))):
+			state.destination = nil
+			overlayWindowClient.scheduleHUD(.decryptedProfile)
+			return .send(.delegate(.selectedProfileSnapshot(decrypted, isInCloud: false)))
+
+		case .destination(.presented(.inputEncryptionPassword(.delegate(.successfullyEncrypted)))):
+			preconditionFailure("What? Encrypted? Expected to only have DECRYPTED. Incorrect implementation somewhere...")
+			return .none
 
 		case .destination(.dismiss):
 			state.destination = nil
 			return .none
+
 		default:
 			return .none
 		}
 	}
-
-	private func showImportMnemonic(state: inout State) {
-		state.destination = .importMnemonic(.init(
-			persistAsMnemonicKind: .onDevice(.babylon)
-		))
-	}
-
-	private func updateCloudSync(state: inout State, isEnabled: Bool) -> EffectTask<Action> {
-		state.preferences?.security.isCloudProfileSyncEnabled = isEnabled
-		return .fireAndForget {
-			try await appPreferencesClient.setIsCloudProfileSyncEnabled(isEnabled)
-		}
-	}
 }
 
-extension ProfileBackups {}
+// MARK: - ProfileNotInCloudFound
+struct ProfileNotInCloudFound: LocalizedError {
+	let header: ProfileSnapshot.Header
+	var errorDescription: String? {
+		// FIXME: Strings
+		"Unable to find wallet backup in cloud."
+	}
+}

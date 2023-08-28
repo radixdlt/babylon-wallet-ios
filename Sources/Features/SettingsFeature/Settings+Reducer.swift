@@ -58,7 +58,6 @@ public struct Settings: Sendable, FeatureReducer {
 	public struct Destinations: Sendable, ReducerProtocol {
 		public enum State: Sendable, Hashable {
 			case manageP2PLinks(P2PLinksFeature.State)
-			case importOlympiaWallet(ImportOlympiaWalletCoordinator.State)
 
 			case authorizedDapps(AuthorizedDapps.State)
 			case personas(PersonasCoordinator.State)
@@ -69,7 +68,6 @@ public struct Settings: Sendable, FeatureReducer {
 
 		public enum Action: Sendable, Equatable {
 			case manageP2PLinks(P2PLinksFeature.Action)
-			case importOlympiaWallet(ImportOlympiaWalletCoordinator.Action)
 
 			case authorizedDapps(AuthorizedDapps.Action)
 			case personas(PersonasCoordinator.Action)
@@ -81,9 +79,6 @@ public struct Settings: Sendable, FeatureReducer {
 		public var body: some ReducerProtocolOf<Self> {
 			Scope(state: /State.manageP2PLinks, action: /Action.manageP2PLinks) {
 				P2PLinksFeature()
-			}
-			Scope(state: /State.importOlympiaWallet, action: /Action.importOlympiaWallet) {
-				ImportOlympiaWalletCoordinator()
 			}
 			Scope(state: /State.authorizedDapps, action: /Action.authorizedDapps) {
 				AuthorizedDapps()
@@ -131,7 +126,7 @@ public struct Settings: Sendable, FeatureReducer {
 			return .none
 
 		case .importOlympiaButtonTapped:
-			state.destination = .importOlympiaWallet(.init())
+			state.destination = .accountSecurity(.importOlympia)
 			return .none
 
 		case .dismissImportOlympiaHeaderButtonTapped:

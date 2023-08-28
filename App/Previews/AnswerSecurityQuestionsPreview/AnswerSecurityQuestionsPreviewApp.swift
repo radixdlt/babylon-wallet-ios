@@ -5,7 +5,7 @@ import FeaturesPreviewerFeature
 extension AnswerSecurityQuestionsCoordinator.State: EmptyInitializable {
 	public init() {
 		self.init(
-			/// expect: `"walk warrior drive idle maid cherry connect slide slide phrase tower ability trash entry almost follow erupt egg trash tennis omit wing course sugar"`
+			/// expect: `"anxiety hood wagon face actual burden slot knife express praise crew medal surface orbit disease car occur loop pink orient welcome current hedgehog afraid"`
 //			purpose: .encrypt
 			purpose: .decrypt(try! .fromJSON(json))
 		)
@@ -64,7 +64,7 @@ extension SecurityQuestionsFactorSource {
 private let json = """
  {
 	"common" :  {
-		"addedOn" : "2023-06-09T12:30:28Z",
+		"addedOn" : "2023-08-17T11:28:24Z",
 		"cryptoParameters" :  {
 			"supportedCurves" :  [
 				"curve25519"
@@ -73,16 +73,29 @@ private let json = """
 				"cap26"
 			]
 		},
-		"id" : "5eec63f760a8d15b4e544bf334f5532b61ce741c28aa24475f49c472f33ac29d0e",
-		"lastUsedOn" : "2023-06-09T12:30:28Z"
+		"flags" :  [
+		],
+		"lastUsedOn" : "2023-08-17T11:28:24Z"
+	},
+	"id" :  {
+		"body" : "1bd0a4477c874fd2b317896a2ac2af3e4cae51add1c617d7ab6d710f3639ddc1",
+		"kind" : "securityQuestions"
 	},
 	"sealedMnemonic" :  {
+		"encryptionScheme" :  {
+			"description" : "AESGCM-256",
+			"version" : 1
+		},
 		"encryptions" :  [
-			"df0056d91a2e9a0ed9337b666c737268e0f1ecd894de302774647ec63001149d80df8054906ef9432b01f9adc13782ad441efdf263dab355f7e841742e1d82779094f78e5ba54012294578dd864c3cc47b3a54bd95edd0116f0c0f9962849914a9109632742b5780b926249bda284fce2194ea3225278b0dee1ec317c6cdb5c3ef6b10bf939004b8e1cffa2fb00a0c7a24026cd844e84eb0334da318bae3681652d1f7d22913262773100b8c8d6dcd3a46d2",
-			"0eddb0d0af54f52941dde0889d01c41b204fcce8e2b01e03a1244239150387f186807114a51e1f642026c8af3fffda722df5359b8a0dd7aee8395d044bd211c919bc8b4ec4e0e0aa5b6692a45e025664dfeadc2ba5bd02f8e34caa3cd3a11efac0751e3266df33df3ea8b00dd7c903dff632bfacf3e02ab639a03c15526d4e7908d96c031fe6c1959778e990dcc55a4583207d579b5b0d4d60c66768791800bd5aaa20f70c20c9e6f013d28b145ab69b4fca",
-			"10414dd09216922a3b6b3e2e3398f2488e83bd13adc7f24cbbdf11161d3e72e8670ed307d25f2d55197e9e604877ec5c45056ddda681b86aa7e1fa79bcdbf5c5beeb67c8b9f69c824e67df3855ee5c5896d956925f25b47c948fb85d2ea516ed8e19fb9112aa84a4542878ef61856e7e00cece114cf87ab7a97e36472f07e66417b62f63eea2d2afaf847b10ce5d7a88bc0021511e55dd07d6ef1ff67b938cb4a825d5445439bd03a86947b44163138ef868",
-			"68d1701a00e36376a3365cf151eb032a4de5fd9e00944404ddb0b6761f607ef9fe6dc0327a1d8b1d1f83ce5103fa913187e1ab99d12d8706817d1f054e27c5e54871612f7b54cb0c6a097ee46b39200d1b1f2a322620f8469be01a00805031f469434eb4d18fcf89a7715c9f83d4579d751aea445afcece2cccd20a803aad9390b0d36434f6bf94336cc7560df0b7b41c787991869ee2c9f25f8d0e974267d792c546816a7ece807693a5688f936dd1b9106"
+			"83f49b1de8bab9037d618e68c2289e40df4a0738b23f5113ada824548cbd32237335a6955c2dd35c0343309ef04b9ebdd18fb37603bdbe5c66278b8294daa42e3d8a37c144c43e8b70ef18033281bfaefe61e1230c81f0a1a744064a653d5c8e3a774ef73a24a22c14f14a0604360c6d96834f611a45c331f0310cf4dda791be36a9a2f4f85cdc8bc308aae47817ddad2d101888a1c08fb0c881dbfa7b7d4cddbb2cade5d4d6ef45d82afa74b6cd01c8ab9c286f1df97182e4",
+			"e68a46e279694716bcf8c3b252fee9cfd3f69339e6082bb791778b7d1f9bc3df69b94a109806b29d78ec36da6e750eaede1f800efc95d4fa685a22b5b26e4c5f6afe05bd73a921fb04ff5e78661708092409deb2883c2184a82c4699899125d3bdc23bf8d336fbc773ccb266b82fec7b4dcac5d69a1f7cc77a6992efb66e7a158ae903c237daca1e455c25106ad7b6db82ab8c7a59c2d8b2c200e243d28c8d16d29b95bcc4652a0ef608518290d705989e603e997bc09c3d14",
+			"ddbfe02dd4281445afb25f9ad7f32b09e044d7fb1dec16f178736176bb1768ea85a601e086a2b75079c7159efbb6d8b04c26c4911d0d4f2c0132a0f6781832df31b43292366b317443998e0c7bc1663401d09b3bd252c06cc6c5214cddf20a9d0ea763aafa26d045ef544a5ad48b74bb97d94fbc008655f79564ff8c42f205735ff7f68d3258de7eeec7dc1bc185ed4e207e6f43224719ee8499f23442d53cadd9884d68154c6c9389b8c65c4b25ca94e89233c0487ac96c6a",
+			"b0817c887d863af233166cbc10aa2fc40c9065576dbe38c4f4e1abd477872879961d50055f20272e0da8fc6e36d6eb183c4f54da59fe1b7f3da4b7f2c288a7c50d1eab0c01314f2b80d9a71cddefb94f4cd6671b00ca30ccbfa93335d2511d892f37be190ac013c5e58f20b560aba49103a19bc54de7c416da089db3808215cb8772229a45de76c33066d9c4ddecd2acfd6e283b3078853e7d2ec6d305e6f18e077d35f6ca7d35e17b81fa5d0baeb3915277a46033db0c5f77"
 		],
+		"keyDerivationScheme" :  {
+			"description" : "Lowercase-remove-common-separator-chars-utf8-encode",
+			"version" : 1
+		},
 		"securityQuestions" :  [
 			 {
 				"id" : 0,

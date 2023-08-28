@@ -81,7 +81,7 @@ private extension View {
 			store: destinationStore,
 			state: /DebugSettings.Destinations.State.debugManageFactorSources,
 			action: DebugSettings.Destinations.Action.debugManageFactorSources,
-			destination: { ManageFactorSources.View(store: $0) }
+			destination: { DebugManageFactorSources.View(store: $0) }
 		)
 	}
 

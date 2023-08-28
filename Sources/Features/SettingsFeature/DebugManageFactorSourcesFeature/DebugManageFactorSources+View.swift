@@ -2,23 +2,23 @@ import AddLedgerFactorSourceFeature
 import FeaturePrelude
 import ImportMnemonicFeature
 
-extension ManageFactorSources.State {
-	var viewState: ManageFactorSources.ViewState {
+extension DebugManageFactorSources.State {
+	var viewState: DebugManageFactorSources.ViewState {
 		.init(factorSources: self.factorSources)
 	}
 }
 
-// MARK: - ManageFactorSources.View
-extension ManageFactorSources {
+// MARK: - DebugManageFactorSources.View
+extension DebugManageFactorSources {
 	public struct ViewState: Equatable {
 		public let factorSources: FactorSources?
 	}
 
 	@MainActor
 	public struct View: SwiftUI.View {
-		private let store: StoreOf<ManageFactorSources>
+		private let store: StoreOf<DebugManageFactorSources>
 
-		public init(store: StoreOf<ManageFactorSources>) {
+		public init(store: StoreOf<DebugManageFactorSources>) {
 			self.store = store
 		}
 
@@ -57,8 +57,8 @@ extension ManageFactorSources {
 				.navigationTitle("Factor Sources")
 				.sheet(
 					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-					state: /ManageFactorSources.Destinations.State.importMnemonic,
-					action: ManageFactorSources.Destinations.Action.importMnemonic,
+					state: /DebugManageFactorSources.Destinations.State.importMnemonic,
+					action: DebugManageFactorSources.Destinations.Action.importMnemonic,
 					content: { importMnemonicStore in
 						NavigationView {
 							// We depend on `.toolbar` to display buttons on top of
@@ -70,8 +70,8 @@ extension ManageFactorSources {
 				)
 				.sheet(
 					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-					state: /ManageFactorSources.Destinations.State.addLedger,
-					action: ManageFactorSources.Destinations.Action.addLedger,
+					state: /DebugManageFactorSources.Destinations.State.addLedger,
+					action: DebugManageFactorSources.Destinations.Action.addLedger,
 					content: { AddLedgerFactorSource.View(store: $0) }
 				)
 			}
@@ -102,19 +102,18 @@ extension FactorSourceView {
 #if DEBUG
 import SwiftUI // NB: necessary for previews to appear
 
-// MARK: - ManageFactorSources_Preview
-struct ManageFactorSources_Preview: PreviewProvider {
+struct DebugManageFactorSources_Preview: PreviewProvider {
 	static var previews: some View {
-		ManageFactorSources.View(
+		DebugManageFactorSources.View(
 			store: .init(
 				initialState: .previewValue,
-				reducer: ManageFactorSources()
+				reducer: DebugManageFactorSources()
 			)
 		)
 	}
 }
 
-extension ManageFactorSources.State {
+extension DebugManageFactorSources.State {
 	public static let previewValue = Self()
 }
 #endif

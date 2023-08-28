@@ -1,11 +1,9 @@
 import AppPreferencesClient
-import CacheClient
 import FeaturePrelude
 import GatewaySettingsFeature
 import Logging
 import P2PLinksFeature
 import ProfileBackupsFeature
-import RadixConnectClient
 
 // MARK: - AppSettings
 public struct AppSettings: Sendable, FeatureReducer {
@@ -28,12 +26,11 @@ public struct AppSettings: Sendable, FeatureReducer {
 
 		case manageP2PLinksButtonTapped
 		case gatewaysButtonTapped
-		case profileBackupsButtonTapped
+		case profileBackupSettingsButtonTapped
 
 		case developerModeToggled(Bool)
 		case exportLogsTapped
 		case exportLogsDismissed
-		case deleteProfileAndFactorSourcesButtonTapped
 	}
 
 	public enum InternalAction: Sendable, Equatable {
@@ -54,21 +51,13 @@ public struct AppSettings: Sendable, FeatureReducer {
 		public enum State: Sendable, Hashable {
 			case manageP2PLinks(P2PLinksFeature.State)
 			case gatewaySettings(GatewaySettings.State)
-			case profileBackups(ProfileBackups.State)
-			case deleteProfileConfirmationDialog(ConfirmationDialogState<Action.DeleteProfileConfirmationDialogAction>)
+			case profileBackupSettings(ProfileBackupSettings.State)
 		}
 
 		public enum Action: Sendable, Equatable {
 			case manageP2PLinks(P2PLinksFeature.Action)
 			case gatewaySettings(GatewaySettings.Action)
-			case profileBackups(ProfileBackups.Action)
-			case deleteProfileConfirmationDialog(DeleteProfileConfirmationDialogAction)
-
-			public enum DeleteProfileConfirmationDialogAction: Sendable, Hashable {
-				case deleteProfile
-				case deleteProfileLocalKeepInICloudIfPresent
-				case cancel
-			}
+			case profileBackupSettings(ProfileBackupSettings.Action)
 		}
 
 		public var body: some ReducerProtocolOf<Self> {
@@ -78,8 +67,8 @@ public struct AppSettings: Sendable, FeatureReducer {
 			Scope(state: /State.gatewaySettings, action: /Action.gatewaySettings) {
 				GatewaySettings()
 			}
-			Scope(state: /State.profileBackups, action: /Action.profileBackups) {
-				ProfileBackups()
+			Scope(state: /State.profileBackupSettings, action: /Action.profileBackupSettings) {
+				ProfileBackupSettings()
 			}
 		}
 	}
@@ -89,8 +78,6 @@ public struct AppSettings: Sendable, FeatureReducer {
 	public init() {}
 
 	@Dependency(\.appPreferencesClient) var appPreferencesClient
-	@Dependency(\.cacheClient) var cacheClient
-	@Dependency(\.radixConnectClient) var radixConnectClient
 
 	public var body: some ReducerProtocolOf<Self> {
 		Reduce(core)
@@ -115,8 +102,8 @@ public struct AppSettings: Sendable, FeatureReducer {
 			state.destination = .gatewaySettings(.init())
 			return .none
 
-		case .profileBackupsButtonTapped:
-			state.destination = .profileBackups(.init(context: .settings))
+		case .profileBackupSettingsButtonTapped:
+			state.destination = .profileBackupSettings(.init())
 			return .none
 
 		case let .developerModeToggled(isEnabled):
@@ -133,10 +120,6 @@ public struct AppSettings: Sendable, FeatureReducer {
 		case .exportLogsDismissed:
 			state.exportLogs = nil
 			return .none
-
-		case .deleteProfileAndFactorSourcesButtonTapped:
-			state.destination = .deleteProfileConfirmationDialog(.deleteProfileConfirmationDialog)
-			return .none
 		}
 	}
 
@@ -150,46 +133,11 @@ public struct AppSettings: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
-		case let .destination(.presented(.deleteProfileConfirmationDialog(confirmationAction))):
-			switch confirmationAction {
-			case .deleteProfile:
-				return deleteProfile(keepInICloudIfPresent: false)
-
-			case .deleteProfileLocalKeepInICloudIfPresent:
-				return deleteProfile(keepInICloudIfPresent: true)
-
-			case .cancel:
-				return .none
-			}
+		case let .destination(.presented(.profileBackupSettings(.delegate(.deleteProfileAndFactorSources(keepInICloudIfPresent))))):
+			return .send(.delegate(.deleteProfileAndFactorSources(keepInICloudIfPresent: keepInICloudIfPresent)))
 
 		case .destination:
 			return .none
 		}
-	}
-
-	private func deleteProfile(keepInICloudIfPresent: Bool) -> EffectTask<Action> {
-		.task {
-			cacheClient.removeAll()
-			await radixConnectClient.disconnectAndRemoveAll()
-			return .delegate(.deleteProfileAndFactorSources(keepInICloudIfPresent: keepInICloudIfPresent))
-		}
-	}
-}
-
-extension ConfirmationDialogState<AppSettings.Destinations.Action.DeleteProfileConfirmationDialogAction> {
-	static let deleteProfileConfirmationDialog = ConfirmationDialogState {
-		TextState(L10n.AppSettings.ResetWalletDialog.title)
-	} actions: {
-		ButtonState(role: .destructive, action: .deleteProfileLocalKeepInICloudIfPresent) {
-			TextState(L10n.AppSettings.ResetWalletDialog.resetButtonTitle)
-		}
-		ButtonState(role: .destructive, action: .deleteProfile) {
-			TextState(L10n.AppSettings.ResetWalletDialog.resetAndDeleteBackupButtonTitle)
-		}
-		ButtonState(role: .cancel, action: .cancel) {
-			TextState(L10n.Common.cancel)
-		}
-	} message: {
-		TextState(L10n.AppSettings.ResetWalletDialog.message)
 	}
 }

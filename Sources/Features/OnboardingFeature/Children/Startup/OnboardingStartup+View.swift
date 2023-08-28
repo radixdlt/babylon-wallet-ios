@@ -55,12 +55,12 @@ extension OnboardingStartup.View {
 					.buttonStyle(.primaryText())
 				}
 			}
-			.navigationDestination(
+			.sheet(
 				store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
 				state: /OnboardingStartup.Destinations.State.restoreFromBackup,
 				action: OnboardingStartup.Destinations.Action.restoreFromBackup,
-				destination: {
-					ProfileBackups.View(store: $0)
+				content: {
+					RestoreProfileFromBackupCoordinator.View(store: $0)
 				}
 			)
 		}

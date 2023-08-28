@@ -1,3 +1,4 @@
+import Cryptography
 import Foundation
 import Prelude
 import RadixConnectModels
@@ -42,6 +43,10 @@ extension SignalingClient.ClientMessage: Codable {
 		case requestId, method, targetClientId, encryptedPayload
 	}
 
+	private static let encryptionScheme = EncryptionScheme.version1
+
+	struct DecodeClientMessageEncryptionKeyFailure: Swift.Error {}
+
 	init(from decoder: Decoder) throws {
 		let container = try decoder.container(keyedBy: CodingKeys.self)
 
@@ -49,19 +54,27 @@ extension SignalingClient.ClientMessage: Codable {
 		self.targetClientId = try container.decode(RemoteClientID.self, forKey: .targetClientId)
 
 		// Extract the pre-configured EncryptionKey to be used to decode the payload
-		let encryptionKey = decoder.userInfo[.clientMessageEncryptonKey] as! SignalingClient.EncryptionKey
+		guard let decryptionKey = decoder.userInfo[.clientMessageEncryptionKey] as? SignalingClient.EncryptionKey else {
+			throw DecodeClientMessageEncryptionKeyFailure()
+		}
+
 		let encryptedPayload = try container.decode(HexCodable.self, forKey: .encryptedPayload)
-		let decryptedPyload = try encryptionKey.decrypt(data: encryptedPayload.data)
+
+		let decryptedPayload = try Self.encryptionScheme.decrypt(
+			data: encryptedPayload.data,
+			decryptionKey: decryptionKey.symmetric
+		)
+
 		let method = try container.decode(Method.self, forKey: .method)
 
 		// Based on the method, decode to specific RTCPrimitive
 		switch method {
 		case .offer:
-			self.primitive = try .offer(JSONDecoder().decode(RTCPrimitive.Offer.self, from: decryptedPyload))
+			self.primitive = try .offer(JSONDecoder().decode(RTCPrimitive.Offer.self, from: decryptedPayload))
 		case .answer:
-			self.primitive = try .answer(JSONDecoder().decode(RTCPrimitive.Answer.self, from: decryptedPyload))
+			self.primitive = try .answer(JSONDecoder().decode(RTCPrimitive.Answer.self, from: decryptedPayload))
 		case .iceCandidate:
-			self.primitive = try .iceCandidate(JSONDecoder().decode(RTCPrimitive.ICECandidate.self, from: decryptedPyload))
+			self.primitive = try .iceCandidate(JSONDecoder().decode(RTCPrimitive.ICECandidate.self, from: decryptedPayload))
 		}
 	}
 
@@ -72,9 +85,17 @@ extension SignalingClient.ClientMessage: Codable {
 		try container.encode(targetClientId, forKey: .targetClientId)
 
 		// Extract the pre-configured EncryptionKey to be used to decode the payload
-		let encryptionKey = encoder.userInfo[.clientMessageEncryptonKey] as! SignalingClient.EncryptionKey
+		guard let encryptionKey = encoder.userInfo[.clientMessageEncryptionKey] as? SignalingClient.EncryptionKey else {
+			throw DecodeClientMessageEncryptionKeyFailure()
+		}
+
 		let encodedPrimitive = try JSONEncoder().encode(primitive)
-		let encryptedPrimitive = try encryptionKey.encrypt(data: encodedPrimitive)
+
+		let encryptedPrimitive = try Self.encryptionScheme.encrypt(
+			data: encodedPrimitive,
+			encryptionKey: encryptionKey.symmetric
+		)
+
 		let payload = HexCodable(data: encryptedPrimitive)
 		try container.encode(payload, forKey: .encryptedPayload)
 

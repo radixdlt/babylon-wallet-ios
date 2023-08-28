@@ -8,15 +8,18 @@ struct AssetTagsView: View {
 
 	var body: some View {
 		if !tags.isEmpty {
-			Text(L10n.AssetDetails.tags)
-				.textStyle(.body1Regular)
-				.foregroundColor(.app.gray2)
+			Group {
+				Text(L10n.AssetDetails.tags)
+					.textStyle(.body1Regular)
+					.foregroundColor(.app.gray2)
 
-			FlowLayout(spacing: .small2) {
-				ForEach(tags, id: \.self) { tag in
-					AssetTagView(tag: tag)
+				FlowLayout(spacing: .small2) {
+					ForEach(tags, id: \.self) { tag in
+						AssetTagView(tag: tag)
+					}
 				}
 			}
+			.transition(.opacity.combined(with: .scale(scale: 0.8)))
 		}
 	}
 }

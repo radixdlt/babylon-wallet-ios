@@ -113,6 +113,7 @@ public enum AssetResource {
   public static let successCheckmark = ImageAsset(name: "success-checkmark")
   public static let transactionInProgress = ImageAsset(name: "transaction_in_progress")
   public static let warningError = ImageAsset(name: "warning_error")
+  public static let radixIconWhite = ImageAsset(name: "radix-icon-white")
 }
 // swiftlint:enable identifier_name line_length nesting type_body_length type_name
 

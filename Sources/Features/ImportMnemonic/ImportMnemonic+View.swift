@@ -6,7 +6,7 @@ import ScreenshotPreventing
 
 extension ImportMnemonic.State {
 	var viewState: ImportMnemonic.ViewState {
-		.init(
+		var viewState = ImportMnemonic.ViewState(
 			isReadonlyMode: isReadonlyMode,
 			isWordCountFixed: isWordCountFixed,
 			isAdvancedMode: isAdvancedMode,
@@ -19,6 +19,10 @@ extension ImportMnemonic.State {
 			mnemonic: mnemonic,
 			bip39Passphrase: bip39Passphrase
 		)
+		#if DEBUG
+		viewState.debugMnemonicPhraseSingleField = self.debugMnemonicPhraseSingleField
+		#endif
+		return viewState
 	}
 
 	var rowCount: Int {
@@ -40,6 +44,9 @@ extension ImportMnemonic {
 		let completedWords: [BIP39.Word]
 		let mnemonic: Mnemonic?
 		let bip39Passphrase: String
+		#if DEBUG
+		var debugMnemonicPhraseSingleField: String = ""
+		#endif
 	}
 }
 
@@ -107,12 +114,40 @@ extension ImportMnemonic {
 								.padding(.bottom, .medium2)
 						}
 
-						Button(viewStore.modeButtonTitle) {
-							viewStore.send(.toggleModeButtonTapped)
+						#if DEBUG
+						if viewStore.isReadonlyMode {
+							Button("DEBUG ONLY Copy") {
+								viewStore.send(.debugCopyMnemonic)
+							}
+							.buttonStyle(.secondaryRectangular(isDestructive: true))
+							.padding(.bottom, .medium1)
+						} else if viewStore.isAdvancedMode {
+							AppTextField(
+								placeholder: "DEBUG ONLY paste mnemonic",
+								text: viewStore.binding(
+									get: { $0.debugMnemonicPhraseSingleField },
+									send: { .debugMnemonicChanged($0) }
+								),
+								innerAccessory: {
+									Button("Paste") {
+										viewStore.send(.debugPasteMnemonic)
+									}
+									.buttonStyle(.borderedProminent)
+								}
+							)
+							.padding(.horizontal, .medium2)
+							.padding(.bottom, .medium2)
 						}
-						.buttonStyle(.blue)
-						.frame(height: .large1)
-						.padding(.bottom, .medium1)
+						#endif
+
+						if !viewStore.isReadonlyMode {
+							Button(viewStore.modeButtonTitle) {
+								viewStore.send(.toggleModeButtonTapped)
+							}
+							.buttonStyle(.blue)
+							.frame(height: .large1)
+							.padding(.bottom, .medium1)
+						}
 
 						footer(with: viewStore)
 					}
@@ -266,22 +301,22 @@ extension View {
 	}
 }
 
-#if DEBUG
-import SwiftUI // NB: necessary for previews to appear
-
-// MARK: - ImportMnemonic_Preview
-struct ImportMnemonic_Preview: PreviewProvider {
-	static var previews: some View {
-		ImportMnemonic.View(
-			store: .init(
-				initialState: .previewValue,
-				reducer: ImportMnemonic()
-			)
-		)
-	}
-}
-
-extension ImportMnemonic.State {
-	public static let previewValue = Self(persistAsMnemonicKind: nil)
-}
-#endif
+// #if DEBUG
+// import SwiftUI // NB: necessary for previews to appear
+//
+//// MARK: - ImportMnemonic_Preview
+// struct ImportMnemonic_Preview: PreviewProvider {
+//	static var previews: some View {
+//		ImportMnemonic.View(
+//			store: .init(
+//				initialState: .previewValue,
+//				reducer: ImportMnemonic()
+//			)
+//		)
+//	}
+// }
+//
+// extension ImportMnemonic.State {
+//	public static let previewValue = Self(persistStrategy: .intoKeychainOnly, mnemonicForFactorSourceKind: .offDevice)
+// }
+// #endif

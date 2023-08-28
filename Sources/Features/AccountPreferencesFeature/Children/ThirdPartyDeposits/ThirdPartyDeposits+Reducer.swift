@@ -9,11 +9,10 @@ public typealias ThirdPartyDeposits = Profile.Network.Account.OnLedgerSettings.T
 // MARK: - ManageThirdPartyDeposits
 public struct ManageThirdPartyDeposits: FeatureReducer, Sendable {
 	public struct State: Hashable, Sendable {
-		let account: Profile.Network.Account
+		var account: Profile.Network.Account
 
-		var thirdPartyDeposits: ThirdPartyDeposits
 		var depositRule: ThirdPartyDeposits.DepositRule {
-			thirdPartyDeposits.depositRule
+			account.onLedgerSettings.thirdPartyDeposits.depositRule
 		}
 
 		@PresentationState
@@ -21,7 +20,6 @@ public struct ManageThirdPartyDeposits: FeatureReducer, Sendable {
 
 		init(account: Profile.Network.Account) {
 			self.account = account
-			self.thirdPartyDeposits = account.onLedgerSettings.thirdPartyDeposits
 		}
 	}
 
@@ -74,18 +72,18 @@ public struct ManageThirdPartyDeposits: FeatureReducer, Sendable {
 		case let .rowTapped(row):
 			switch row {
 			case let .depositRule(rule):
-				state.thirdPartyDeposits.depositRule = rule
+				state.account.onLedgerSettings.thirdPartyDeposits.depositRule = rule
 
 			case .allowDenyAssets:
 				state.destinations = .allowDenyAssets(.init(
 					mode: .allowDenyAssets(.allow),
-					thirdPartyDeposits: state.thirdPartyDeposits
+					thirdPartyDeposits: state.account.onLedgerSettings.thirdPartyDeposits
 				))
 
 			case .allowDepositors:
 				state.destinations = .allowDepositors(.init(
 					mode: .allowDepositors,
-					thirdPartyDeposits: state.thirdPartyDeposits
+					thirdPartyDeposits: state.account.onLedgerSettings.thirdPartyDeposits
 				))
 			}
 			return .none
@@ -162,7 +160,7 @@ public struct ManageThirdPartyDeposits: FeatureReducer, Sendable {
 		switch childAction {
 		case let .destinations(.presented(.allowDenyAssets(.delegate(.updated(thirdPartyDeposits))))),
 		     let .destinations(.presented(.allowDepositors(.delegate(.updated(thirdPartyDeposits))))):
-			state.thirdPartyDeposits = thirdPartyDeposits
+			state.account.onLedgerSettings.thirdPartyDeposits = thirdPartyDeposits
 			return .none
 		case .destinations:
 			return .none

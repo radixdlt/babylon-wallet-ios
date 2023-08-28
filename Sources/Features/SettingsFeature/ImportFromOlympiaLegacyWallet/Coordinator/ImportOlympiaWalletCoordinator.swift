@@ -118,6 +118,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 			}
 			Scope(state: /State.importMnemonic, action: /Action.importMnemonic) {
 				ImportMnemonic()
+					._printChanges()
 			}
 			Scope(state: /State.importOlympiaLedgerAccountsAndFactorSources, action: /Action.importOlympiaLedgerAccountsAndFactorSources) {
 				ImportOlympiaLedgerAccountsAndFactorSources()
@@ -179,8 +180,12 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 		case .accountsToImport(.delegate(.continueImport)):
 			return continueImporting(in: &state)
 
-		case let .importMnemonic(.delegate(.notSavedInProfile(mnemonicWithPassphrase))):
+		case let .importMnemonic(.delegate(.notPersisted(mnemonicWithPassphrase))):
 			return importedMnemonic(in: &state, mnemonicWithPassphrase: mnemonicWithPassphrase)
+
+		case .importMnemonic(.delegate(.persistedMnemonicInKeychainOnly)), .importMnemonic(.delegate(.doneViewing)), .importMnemonic(.delegate(.persistedNewFactorSourceInProfile)):
+			preconditionFailure("Incorrect implementation")
+			return .none
 
 		case let .importOlympiaLedgerAccountsAndFactorSources(.delegate(.completed(migratedAccounts))):
 			return importedOlympiaLedgerAccountsAndFactorSources(in: &state, migratedAccounts: migratedAccounts)
@@ -341,7 +346,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 				),
 				warning: L10n.ImportOlympiaAccounts.VerifySeedPhrase.warning,
 				isWordCountFixed: true,
-				persistAsMnemonicKind: nil,
+				persistStrategy: nil,
 				wordCount: progress.previous.expectedMnemonicWordCount
 			))
 		)
@@ -356,8 +361,8 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 		guard case let .checkedIfOlympiaFactorSourceAlreadyExists(progress) = state.progress else { return progressError(state.progress) }
 
 		do {
-			try mnemonicWithPassphrase.validatePublicKeysOf(
-				softwareAccounts: progress.softwareAccountsToMigrate
+			try mnemonicWithPassphrase.validatePublicKeys(
+				of: progress.softwareAccountsToMigrate
 			)
 
 			let privateHDFactorSource = try PrivateHDFactorSource(
@@ -500,7 +505,6 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 }
 
 // MARK: - Helper methods
-
 extension ImportOlympiaWalletCoordinator {
 	private func migratableAccounts(
 		from scannedAccounts: AccountsToMigrate,

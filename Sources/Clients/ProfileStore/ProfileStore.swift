@@ -541,8 +541,6 @@ extension ProfileStore {
 				factorSource: factorSource
 			))
 
-			loggerGlobal.debug("Created new profile with factorSourceID: \(factorSource.id)")
-
 			@Dependency(\.date) var dateGenerator
 			@Dependency(\.uuid) var uuid
 
@@ -555,6 +553,8 @@ extension ProfileStore {
 				lastModified: dateGenerator.now,
 				contentHint: .init() // Empty initially
 			)
+
+			loggerGlobal.debug("Created new ephemeral profile with ID: \(header.id), and device factorSourceID: \(factorSource.id)")
 
 			return Profile(header: header, deviceFactorSource: factorSource)
 

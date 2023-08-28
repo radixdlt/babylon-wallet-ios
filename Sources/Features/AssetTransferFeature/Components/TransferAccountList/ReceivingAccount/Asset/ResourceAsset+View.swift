@@ -19,18 +19,22 @@ extension ResourceAsset.View {
 	public var body: some View {
 		WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
 			HStack {
-				SwitchStore(store) {
-					CaseLet(
-						state: /ResourceAsset.State.fungibleAsset,
-						action: { ResourceAsset.Action.child(.fungibleAsset($0)) },
-						then: { FungibleResourceAsset.View(store: $0) }
-					)
+				SwitchStore(store) { state in
+					switch state {
+					case .fungibleAsset:
+						CaseLet(
+							state: /ResourceAsset.State.fungibleAsset,
+							action: { ResourceAsset.Action.child(.fungibleAsset($0)) },
+							then: { FungibleResourceAsset.View(store: $0) }
+						)
 
-					CaseLet(
-						state: /ResourceAsset.State.nonFungibleAsset,
-						action: { ResourceAsset.Action.child(.nonFungibleAsset($0)) },
-						then: { NonFungibleResourceAsset.View(store: $0.actionless) }
-					)
+					case .nonFungibleAsset:
+						CaseLet(
+							state: /ResourceAsset.State.nonFungibleAsset,
+							action: { ResourceAsset.Action.child(.nonFungibleAsset($0)) },
+							then: { NonFungibleResourceAsset.View(store: $0.actionless) }
+						)
+					}
 				}
 				.background(.app.white)
 				.focused($focused)

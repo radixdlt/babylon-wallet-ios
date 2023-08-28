@@ -104,7 +104,7 @@ extension Color.App {
 
 	public var cardShadowBlack: Color { .black.opacity(0.15) }
 
-	// gradient
+	// Account gradient
 	public var account0green: Color { .init(hex: .account0green) }
 
 	public var account1pink: Color { .init(hex: .account1pink) }
@@ -126,6 +126,10 @@ extension Color.App {
 	public var account11green: Color { .init(hex: .account11green) }
 	public var account11blue1: Color { .init(hex: .account11blue1) }
 	public var account11pink: Color { .init(hex: .account11pink) }
+
+	// Approval gradient
+
+	public var gradientPurple: Color { .init(hex: 0xFF07E6) }
 }
 
 // MARK: - Color.Hex

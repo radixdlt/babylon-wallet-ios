@@ -114,7 +114,7 @@ final class ProfileTests: TestCase {
 		}
 	}
 
-	func test_new_profile() async throws {
+	func test_generate_profile_snapshot_test_vector() async throws {
 		continueAfterFailure = false
 
 		let curve25519FactorSourceMnemonic = try Mnemonic(
@@ -185,7 +185,10 @@ final class ProfileTests: TestCase {
 		profile.factorSources.append(offDeviceMnemonicFactorSource)
 		profile.factorSources.append(ledgerFactorSource)
 
-		func addNewAccount(_ name: NonEmptyString) throws -> Profile.Network.Account {
+		func addNewAccount(
+			_ name: NonEmptyString,
+			makeThirdPartyDeposit: (() throws -> Profile.Network.Account.OnLedgerSettings.ThirdPartyDeposits)? = nil
+		) throws -> Profile.Network.Account {
 			let _index: Int = {
 				do {
 					return try profile.network(id: networkID).accounts.count
@@ -223,6 +226,10 @@ final class ProfileTests: TestCase {
 				displayName: name,
 				extraProperties: .init(appearanceID: .fromIndex(Int(index)))
 			)
+
+			if let makeThirdPartyDeposit {
+				try account.onLedgerSettings.thirdPartyDeposits = makeThirdPartyDeposit()
+			}
 
 			if case var .unsecured(control) = account.securityState {
 				let path = try derivationPath.switching(keyKind: .authenticationSigning)
@@ -321,12 +328,40 @@ final class ProfileTests: TestCase {
 		let firstAccount = try addNewAccount("First")
 		XCTAssertEqual(try profile.network(id: networkID).accounts.count, 1)
 		XCTAssertEqual(try profile.network(id: networkID).accounts.first, firstAccount)
-		let secondAccount = try addNewAccount("Second")
+		let secondAccount = try addNewAccount("Second") {
+			try .init(
+				depositRule: .acceptKnown,
+				assetsExceptionList: [
+					.init(
+						address: .init(validatingAddress: "resource_tdx_21_1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxsmgder"),
+						exceptionRule: .deny
+					),
+				],
+				depositorsAllowList: [
+					.resourceAddress(.init(validatingAddress: "resource_tdx_21_1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxsmgder")),
+					.nonFungibleGlobalID(.init(nonFungibleGlobalId: "resource_tdx_21_1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxsmgder:#2#")),
+				]
+			)
+		}
 		XCTAssertEqual(try profile.network(id: networkID).accounts.count, 2)
 		XCTAssertEqual(try profile.network(id: networkID).accounts.first, firstAccount)
 		XCTAssertEqual(try profile.network(id: networkID).accounts.last!, secondAccount)
 
-		let thirdAccount = try addNewAccount("Third")
+		let thirdAccount = try addNewAccount("Third") {
+			try .init(
+				depositRule: .denyAll,
+				assetsExceptionList: [
+					.init(
+						address: .init(validatingAddress: "resource_tdx_21_1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxsmgder"),
+						exceptionRule: .allow
+					),
+				],
+				depositorsAllowList: [
+					.resourceAddress(.init(validatingAddress: "resource_tdx_21_1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxsmgder")),
+					.nonFungibleGlobalID(.init(nonFungibleGlobalId: "resource_tdx_21_1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxsmgder:#2#")),
+				]
+			)
+		}
 
 		let firstPersona = try withDependencies {
 			$0.uuid = .incrementing
@@ -461,7 +496,6 @@ final class ProfileTests: TestCase {
 			XCTAssertEqual(factorSource.hint.name, deviceFactorName)
 			XCTAssertEqual(factorSource.hint.model, deviceFactorModel)
 		}
-		let deviceFactorSource = profile.factorSources.babylonDevice
 
 		XCTAssertEqual(profile.networks.count, 1)
 		let networkID = gateway.network.id

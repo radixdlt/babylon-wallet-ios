@@ -137,8 +137,8 @@ public struct App: Sendable, FeatureReducer {
 		case .main(.delegate(.removedWallet)):
 			return goToOnboarding(state: &state)
 
-		case .onboardingCoordinator(.delegate(.completed)):
-			return goToMain(state: &state, accountRecoveryIsNeeded: false)
+		case let .onboardingCoordinator(.delegate(.completed(_, accountRecoveryIsNeeded))):
+			return goToMain(state: &state, accountRecoveryIsNeeded: accountRecoveryIsNeeded)
 
 		case let .splash(.delegate(.completed(loadProfileOutcome, accountRecoveryNeeded))):
 			switch loadProfileOutcome {

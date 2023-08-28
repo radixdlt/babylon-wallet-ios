@@ -54,8 +54,8 @@ struct SignalingClient: Sendable {
 		self.jsonEncoder = jsonEncoder
 		self.jsonDecoder = jsonDecoder
 		self.clientSource = clientSource
-		self.jsonDecoder.userInfo[.clientMessageEncryptonKey] = encryptionKey
-		self.jsonEncoder.userInfo[.clientMessageEncryptonKey] = encryptionKey
+		self.jsonDecoder.userInfo[.clientMessageEncryptionKey] = encryptionKey
+		self.jsonEncoder.userInfo[.clientMessageEncryptionKey] = encryptionKey
 
 		self.incomingMessages = transport
 			.incomingMessages

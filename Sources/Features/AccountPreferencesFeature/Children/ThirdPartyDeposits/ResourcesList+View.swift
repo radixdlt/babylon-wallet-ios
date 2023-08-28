@@ -47,10 +47,10 @@ extension ResourcesList {
 					if !viewStore.resources.isEmpty {
 						listView(viewStore)
 					}
-					Spacer()
+					Spacer(minLength: 0)
 				}
-				.task {
-					viewStore.send(.onAppeared)
+				.onFirstTask { @MainActor in
+					await viewStore.send(.task).finish()
 				}
 				.padding(.top, .medium1)
 				.background(.app.gray5)
@@ -74,7 +74,7 @@ extension ResourcesList.View {
 		Group {
 			if case let .allowDenyAssets(exceptionRule) = viewStore.mode {
 				Picker(
-					"",
+					"Select expcetion list",
 					selection: viewStore.binding(
 						get: { _ in exceptionRule },
 						send: { .exceptionListChanged($0) }
@@ -127,7 +127,8 @@ extension ResourcesList.View {
 			}
 			.padding(.leading, .medium3)
 
-			Spacer()
+			Spacer(minLength: 0)
+
 			AssetIcon(.asset(AssetResource.trash))
 				.onTapGesture {
 					viewStore.send(.assetRemove(viewState.address))
