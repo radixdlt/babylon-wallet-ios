@@ -13,7 +13,7 @@ public struct TransactionClient: Sendable, DependencyKey {
 // MARK: TransactionClient.SignAndSubmitTransaction
 extension TransactionClient {
 	public typealias GetTransactionReview = @Sendable (ManifestReviewRequest) async throws -> TransactionToReview
-	public typealias BuildTransactionIntent = @Sendable (BuildTransactionIntentRequest) async throws -> TransactionIntentWithSigners
+	public typealias BuildTransactionIntent = @Sendable (BuildTransactionIntentRequest) async throws -> TransactionIntent
 	public typealias NotarizeTransaction = @Sendable (NotarizeTransactionRequest) async throws -> NotarizeTransactionResponse
 
 	public typealias MyInvolvedEntities = @Sendable (TransactionManifest) async throws -> MyEntitiesInvolvedInTransaction

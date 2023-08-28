@@ -450,6 +450,7 @@ package.addModules([
 			"TransactionClient",
 			"SigningFeature",
 			"SubmitTransactionClient",
+			"Cryptography",
 		],
 		tests: .yes()
 	),

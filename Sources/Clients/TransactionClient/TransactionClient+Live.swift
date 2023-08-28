@@ -212,10 +212,7 @@ extension TransactionClient {
 				tipPercentage: request.makeTransactionHeaderInput.tipPercentage
 			)
 
-			return .init(
-				intent: .init(header: header, manifest: request.manifest, message: request.message),
-				transactionSigners: request.transactionSigners
-			)
+			return .init(header: header, manifest: request.manifest, message: request.message)
 		}
 
 		let notarizeTransaction: NotarizeTransaction = { request in
@@ -344,7 +341,7 @@ extension TransactionClient {
 
 			return try .init(
 				rawManifest: request.manifestToSign,
-				header: intent.intent.header(),
+				header: intent.header(),
 				transactionSigners: transactionSigners
 			)
 		}

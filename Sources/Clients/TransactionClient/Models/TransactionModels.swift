@@ -171,20 +171,6 @@ public struct GetTransactionSignersRequest: Sendable, Hashable {
 	}
 }
 
-// MARK: - TransactionIntentWithSigners
-public struct TransactionIntentWithSigners: Sendable, Hashable {
-	public let intent: TransactionIntent
-	public let transactionSigners: TransactionSigners
-
-	public init(
-		intent: TransactionIntent,
-		transactionSigners: TransactionSigners
-	) {
-		self.intent = intent
-		self.transactionSigners = transactionSigners
-	}
-}
-
 // MARK: - TransactionClient.Guarantee
 extension TransactionClient {
 	public struct Guarantee: Sendable, Hashable {

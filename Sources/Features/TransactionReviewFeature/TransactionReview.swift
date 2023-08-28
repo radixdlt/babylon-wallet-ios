@@ -1,6 +1,7 @@
 import AppPreferencesClient
 import AssetsFeature
 import ComposableArchitecture
+import Cryptography
 import CryptoKit
 import EngineKit
 import FactorSourcesClient
@@ -85,6 +86,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		case createTransactionReview(TransactionReview.TransactionContent)
 		case buildTransactionItentResult(TaskResult<TransactionIntent>)
 		case loadedOnLedgerResource(Transfer, TaskResult<OnLedgerEntity.Resource>)
+		case notarizeResult(TaskResult<NotarizeTransactionResponse>)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -241,7 +243,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 
 				return .task {
 					await .internal(.buildTransactionItentResult(TaskResult {
-						try await transactionClient.buildTransactionIntent(request).intent
+						try await transactionClient.buildTransactionIntent(request)
 					}))
 				}
 			} catch {
@@ -478,35 +480,44 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			loggerGlobal.warning("Failed to load on-ledger resource: \(error)")
 			return .none
 
-		case let .buildTransactionItentResult(.success(response)):
+		case let .buildTransactionItentResult(.success(intent)):
 			guard let reviewedTransaction = state.reviewedTransaction else {
 				return .none
 			}
-			if !reviewedTransaction.signingFactors.isEmpty {
-				state.destination = .signing(.init(
-					factorsLeftToSignWith: reviewedTransaction.signingFactors,
-					signingPurposeWithPayload: .signTransaction(
-						ephemeralNotaryPrivateKey: state.ephemeralNotaryPrivateKey,
-						response,
-						origin: state.signTransactionPurpose
-					)
-				))
-			} else {
-				let notaryKey: SLIP10.PrivateKey = .curve25519(ephemeralNotaryPrivateKey)
 
-				transactionClient.notarizeTransaction(.init(intentSignatures: [reviewedTransaction.transactionSigners.notaryPublicKey], transactionIntent: response, notary: state.ephemeralNotaryPrivateKey.intoEn))
+			if reviewedTransaction.transactionSigners.notaryIsSignatory {
+				let notaryKey: SLIP10.PrivateKey = .curve25519(state.ephemeralNotaryPrivateKey)
 
-				//                state.destination = .signing(.init(
-				//                    factorsLeftToSignWith: reviewedTransaction.signingFactors,
-				//                    signingPurposeWithPayload: .signTransaction(
-				//                        ephemeralNotaryPrivateKey: state.ephemeralNotaryPrivateKey,
-				//                        response,
-				//                        origin: state.signTransactionPurpose
-				//                    )
-				//                ))
+				/// Silently sign the transaction with notary keys.
+				return .run { send in
+					await send(.internal(.notarizeResult(TaskResult {
+						let signature = try notaryKey.sign(hashOfMessage: intent.hash().bytes().data).intoEngine()
+
+						return try await transactionClient.notarizeTransaction(.init(
+							intentSignatures: [signature],
+							transactionIntent: intent,
+							notary: notaryKey
+						))
+					})))
+				}
 			}
+
+			state.destination = .signing(.init(
+				factorsLeftToSignWith: reviewedTransaction.signingFactors,
+				signingPurposeWithPayload: .signTransaction(
+					ephemeralNotaryPrivateKey: state.ephemeralNotaryPrivateKey,
+					intent,
+					origin: state.signTransactionPurpose
+				)
+			))
 			return .none
-		case let .buildTransactionItentResult(.failure(error)):
+
+		case let .notarizeResult(.success(notarizedTX)):
+			state.destination = .submitting(.init(notarizedTX: notarizedTX))
+			return .none
+
+		case let .buildTransactionItentResult(.failure(error)),
+		     let .notarizeResult(.failure(error)):
 			errorQueue.schedule(error)
 			return .none
 		}
