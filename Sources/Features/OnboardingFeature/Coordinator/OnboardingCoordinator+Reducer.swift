@@ -18,7 +18,7 @@ public struct OnboardingCoordinator: Sendable, FeatureReducer {
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
-		case completed(Profile.Network.Account?)
+		case completed(Profile.Network.Account?, accountRecoveryIsNeeded: Bool)
 	}
 
 	public enum InternalAction: Sendable, Equatable {
@@ -48,7 +48,7 @@ public struct OnboardingCoordinator: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
 		case .commitEphemeralResult(.success):
-			return sendDelegateCompleted(state: state)
+			return sendDelegateCompleted(state: state, accountRecoveryIsNeeded: false)
 
 		case let .commitEphemeralResult(.failure(error)):
 			fatalError("Unable to use app, failed to commit profile, error: \(String(describing: error))")
@@ -65,8 +65,8 @@ public struct OnboardingCoordinator: Sendable, FeatureReducer {
 			)
 			return .none
 
-		case .startup(.delegate(.completed)):
-			return sendDelegateCompleted(state: state)
+		case let .startup(.delegate(.completed(accountRecoveryIsNeeded))):
+			return sendDelegateCompleted(state: state, accountRecoveryIsNeeded: accountRecoveryIsNeeded)
 
 		case .createAccountCoordinator(.delegate(.completed)):
 			return .task {
@@ -81,8 +81,8 @@ public struct OnboardingCoordinator: Sendable, FeatureReducer {
 		}
 	}
 
-	private func sendDelegateCompleted(state: State) -> EffectTask<Action> {
-		.send(.delegate(.completed(state.newAccount)))
+	private func sendDelegateCompleted(state: State, accountRecoveryIsNeeded: Bool) -> EffectTask<Action> {
+		.send(.delegate(.completed(state.newAccount, accountRecoveryIsNeeded: accountRecoveryIsNeeded)))
 	}
 }
 

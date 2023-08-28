@@ -1,4 +1,5 @@
 import CasePaths
+import Cryptography
 import EngineKit
 import Prelude
 
@@ -39,6 +40,8 @@ extension DeviceFactorSource {
 
 		/// "iPhone SE 2nd gen"
 		public var model: Model // mutable because name gets `async` fetched and updated later.
+
+		public let mnemonicWordCount: BIP39.WordCount
 	}
 }
 
@@ -59,7 +62,7 @@ extension DeviceFactorSource {
 				addedOn: addedOn ?? date(),
 				lastUsedOn: lastUsedOn ?? date()
 			),
-			hint: .init(name: name, model: model)
+			hint: .init(name: name, model: model, mnemonicWordCount: mnemonicWithPassphrase.mnemonic.wordCount)
 		)
 	}
 

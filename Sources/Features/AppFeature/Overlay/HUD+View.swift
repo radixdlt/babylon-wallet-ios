@@ -3,39 +3,16 @@ import OverlayWindowClient
 
 extension HUD.State {
 	var viewState: HUD.ViewState {
-		switch content.kind {
-		case .copied:
-			return .init(
-				offset: offset,
-				text: "Copied",
-				icon: .init(kind: .system("checkmark.circle.fill"), foregroundColor: .app.green1)
-			)
-		case let .operationSucceeded(message):
-			return .init(
-				offset: offset,
-				text: message,
-				icon: .init(kind: .system("checkmark.circle.fill"), foregroundColor: .app.green1)
-			)
-		}
+		.init(offset: offset, text: content.text, icon: content.icon)
 	}
 }
 
 // MARK: - HUD.View
 extension HUD {
 	struct ViewState: Equatable, Sendable {
-		struct Icon: Equatable {
-			enum Kind: Equatable {
-				case asset(ImageAsset)
-				case system(String)
-			}
-
-			let kind: Kind
-			let foregroundColor: Color
-		}
-
 		let offset: Double
 		let text: String
-		let icon: Icon?
+		let icon: OverlayWindowClient.Item.HUD.Icon?
 	}
 
 	struct View: SwiftUI.View {

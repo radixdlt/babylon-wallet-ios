@@ -75,6 +75,7 @@ extension CacheClient {
 extension CacheClient {
 	public enum Entry: Equatable {
 		case accountPortfolio(AccountQuantifier)
+		case onLedgerEntity(address: String)
 		case networkName(_ url: String)
 		case dAppMetadata(_ definitionAddress: String)
 		case dAppRequestMetadata(_ definitionAddress: String)
@@ -90,6 +91,8 @@ extension CacheClient {
 			switch self {
 			case let .accountPortfolio(address):
 				return "\(filesystemFolderPath)/accountPortfolio-\(address)"
+			case let .onLedgerEntity(address):
+				return "\(filesystemFolderPath)/onLedgerEntity-\(address)"
 			case let .networkName(url):
 				return "\(filesystemFolderPath)/networkName-\(url)"
 			case let .dAppMetadata(definitionAddress):
@@ -107,6 +110,8 @@ extension CacheClient {
 			switch self {
 			case .accountPortfolio:
 				return "AccountPortfolio"
+			case .onLedgerEntity:
+				return "OnLedgerEntity"
 			case .networkName:
 				return "NetworkName"
 			case .dAppMetadata:
@@ -126,7 +131,7 @@ extension CacheClient {
 
 		var lifetime: TimeInterval {
 			switch self {
-			case .accountPortfolio, .networkName:
+			case .accountPortfolio, .networkName, .onLedgerEntity:
 				return 300
 			case .dAppMetadata, .dAppRequestMetadata, .rolaDappVerificationMetadata, .rolaWellKnownFileVerification:
 				return 60

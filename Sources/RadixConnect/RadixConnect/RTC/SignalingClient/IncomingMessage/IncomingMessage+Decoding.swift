@@ -3,7 +3,7 @@ import Prelude
 import RadixConnectModels
 
 extension CodingUserInfoKey {
-	static let clientMessageEncryptonKey = CodingUserInfoKey(rawValue: "clientMessageEncryptonKey")!
+	static let clientMessageEncryptionKey = CodingUserInfoKey(rawValue: "clientMessageEncryptionKey")!
 }
 
 // MARK: - SignalingClient.IncomingMessage + Decodable

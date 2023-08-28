@@ -151,7 +151,7 @@ public extension FactorSourcesOfKindList {
 }
 
 extension FactorSource {
-	var generalHint: LocalizedStringKey {
+	var generalHint: String {
 		switch self {
 		case let .device(factor): return .init(factor.hint.name)
 		case let .ledger(factor): return .init(factor.hint.name)
@@ -184,7 +184,7 @@ extension View {
 @MainActor
 public struct FactorSourceRowView: View {
 	public struct ViewState: Equatable {
-		let description: LocalizedStringKey
+		let description: String
 		let addedOn: Date
 		let lastUsedOn: Date
 		let isFlaggedForDeletion: Bool
@@ -192,7 +192,7 @@ public struct FactorSourceRowView: View {
 
 		public init(
 			factorSource: FactorSource,
-			describe: (FactorSource) -> LocalizedStringKey
+			describe: (FactorSource) -> String
 		) {
 			self.kind = factorSource.kind
 			self.description = describe(factorSource)

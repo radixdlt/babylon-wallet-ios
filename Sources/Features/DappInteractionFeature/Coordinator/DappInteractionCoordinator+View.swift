@@ -8,17 +8,21 @@ extension DappInteractionCoordinator {
 
 		var body: some SwiftUI.View {
 			ZStack {
-				SwitchStore(store.scope(state: \.childState)) {
-					CaseLet(
-						state: /DappInteractionCoordinator.State.ChildState.loading,
-						action: { DappInteractionCoordinator.Action.child(.loading($0)) },
-						then: { DappInteractionLoading.View(store: $0) }
-					)
-					CaseLet(
-						state: /DappInteractionCoordinator.State.ChildState.flow,
-						action: { DappInteractionCoordinator.Action.child(.flow($0)) },
-						then: { DappInteractionFlow.View(store: $0) }
-					)
+				SwitchStore(store.scope(state: \.childState)) { state in
+					switch state {
+					case .loading:
+						CaseLet(
+							state: /DappInteractionCoordinator.State.ChildState.loading,
+							action: { DappInteractionCoordinator.Action.child(.loading($0)) },
+							then: { DappInteractionLoading.View(store: $0) }
+						)
+					case .flow:
+						CaseLet(
+							state: /DappInteractionCoordinator.State.ChildState.flow,
+							action: { DappInteractionCoordinator.Action.child(.flow($0)) },
+							then: { DappInteractionFlow.View(store: $0) }
+						)
+					}
 				}
 			}
 			.alert(

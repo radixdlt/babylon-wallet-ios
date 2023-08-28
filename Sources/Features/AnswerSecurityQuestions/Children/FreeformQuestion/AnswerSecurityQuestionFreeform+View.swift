@@ -17,18 +17,17 @@ public extension AnswerSecurityQuestionFreeform {
 		public let question: String
 		public let answer: String
 		public let buttonTitle: String
+		public let keyDerivationScheme: SecurityQuestionsFactorSource.KeyDerivationScheme
 		init(state: AnswerSecurityQuestionFreeform.State) {
 			question = state.question.question.rawValue
 			answer = state.answer.map(\.rawValue) ?? ""
 			// FIXME: Strings
 			buttonTitle = state.isLast ? "Submit" : "Next question"
+			keyDerivationScheme = state.keyDerivationScheme
 		}
 
 		var validAnswer: SecurityQuestionAnswerAsEntropy? {
-			guard let nonEmpty = NonEmptyString(rawValue: answer) else {
-				return nil
-			}
-			return try? .from(nonEmpty)
+			try? keyDerivationScheme.validateConversionToEntropyOf(answer: answer)
 		}
 	}
 
@@ -111,6 +110,7 @@ struct AnswerSecurityQuestionsFreeform_Preview: PreviewProvider {
 
 public extension AnswerSecurityQuestionFreeform.State {
 	static let previewValue = Self(
+		keyDerivationScheme: .default,
 		question: .init(
 			id: 0,
 			question: "What was the make and model of your first car?"

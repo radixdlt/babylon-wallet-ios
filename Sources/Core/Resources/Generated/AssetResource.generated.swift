@@ -42,6 +42,7 @@ public enum AssetResource {
   public static let supplyIncreasableByAnyone = ImageAsset(name: "supply-increasable-by-anyone")
   public static let supplyIncreasable = ImageAsset(name: "supply-increasable")
   public static let arrowBack = ImageAsset(name: "arrow-back")
+  public static let check = ImageAsset(name: "check")
   public static let checkmarkBig = ImageAsset(name: "checkmark-big")
   public static let checkmarkDarkSelected = ImageAsset(name: "checkmark-dark-selected")
   public static let checkmarkDarkUnselected = ImageAsset(name: "checkmark-dark-unselected")
@@ -58,6 +59,8 @@ public enum AssetResource {
   public static let ellipsis = ImageAsset(name: "ellipsis")
   public static let error = ImageAsset(name: "error")
   public static let iconAcceptAirdrop = ImageAsset(name: "icon-accept-airdrop")
+  public static let iconAcceptKnownAirdrop = ImageAsset(name: "icon-accept-known-airdrop")
+  public static let iconDeclineAirdrop = ImageAsset(name: "icon-decline-airdrop")
   public static let iconHardwareLedger = ImageAsset(name: "icon-hardware-ledger")
   public static let iconLinkOut = ImageAsset(name: "icon-link-out")
   public static let info = ImageAsset(name: "info")
@@ -110,6 +113,7 @@ public enum AssetResource {
   public static let successCheckmark = ImageAsset(name: "success-checkmark")
   public static let transactionInProgress = ImageAsset(name: "transaction_in_progress")
   public static let warningError = ImageAsset(name: "warning_error")
+  public static let radixIconWhite = ImageAsset(name: "radix-icon-white")
 }
 // swiftlint:enable identifier_name line_length nesting type_body_length type_name
 

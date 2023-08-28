@@ -9,14 +9,15 @@ import SharedModels
 public struct AccountDetails: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		var account: Profile.Network.Account
-		public var assets: AssetsView.State
+		var assets: AssetsView.State
 
 		@PresentationState
-		public var destination: Destinations.State?
+		var destination: Destinations.State?
 
-		public init(for account: Profile.Network.Account) {
+		public init(for account: Profile.Network.Account, destination: Destinations.State? = nil) {
 			self.account = account
 			self.assets = AssetsView.State(account: account, mode: .normal)
+			self.destination = destination
 		}
 	}
 
@@ -101,10 +102,6 @@ public struct AccountDetails: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
-		case .destination(.presented(.preferences(.delegate(.dismiss)))):
-			state.destination = nil
-			return .none
-
 		case .destination(.presented(.transfer(.delegate(.dismissed)))):
 			state.destination = nil
 			return .none

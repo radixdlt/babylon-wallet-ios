@@ -7,13 +7,17 @@ extension ChooseQuestions {
 		let selectionRequirement: SelectionRequirement
 		var selectedQuestions: [SecurityQuestion]?
 		var securityQuestionsToUse: NonEmpty<OrderedSet<SecurityQuestion>>?
-
+		let minimumNumberOfQuestions: Int
+		let minimumNumberCorrectAnswers: Int
 		init(state: ChooseQuestions.State) {
 			let selectionRequirement = state.selectionRequirement
 
 			self.availableQuestions = state.availableQuestions.elements
 			self.selectionRequirement = selectionRequirement
 			self.selectedQuestions = state.selectedQuestions
+			self.minimumNumberOfQuestions = state.keyDerivationScheme.minimumNumberOfQuestions
+			self.minimumNumberCorrectAnswers = state.keyDerivationScheme.minimumNumberCorrectAnswers
+
 			self.securityQuestionsToUse = {
 				guard let selected = selectedQuestions else { return nil }
 				return NonEmpty(rawValue: .init(uncheckedUniqueElements: selected))
@@ -42,7 +46,7 @@ extension ChooseQuestions {
 				ScrollView {
 					VStack(spacing: .small1) {
 						// FIXME: Strings
-						Text("Choose at least #\(CAP23.minimumNumberOfQuestions) security questions. You will only need to remember #\(CAP23.minimumNumberCorrectAnswers)")
+						Text("Choose at least #\(viewStore.minimumNumberOfQuestions) security questions. You will only need to remember #\(viewStore.minimumNumberCorrectAnswers)")
 							.font(.app.body1Header)
 						Selection(
 							selection,

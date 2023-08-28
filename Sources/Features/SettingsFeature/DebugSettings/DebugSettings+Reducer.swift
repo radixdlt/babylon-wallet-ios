@@ -35,13 +35,13 @@ public struct DebugSettings: Sendable, FeatureReducer {
 	public struct Destinations: Sendable, ReducerProtocol {
 		public enum State: Sendable, Hashable {
 			case debugInspectProfile(DebugInspectProfile.State)
-			case debugManageFactorSources(ManageFactorSources.State)
+			case debugManageFactorSources(DebugManageFactorSources.State)
 			case securityStructureConfigs(SecurityStructureConfigurationListCoordinator.State)
 		}
 
 		public enum Action: Sendable, Equatable {
 			case debugInspectProfile(DebugInspectProfile.Action)
-			case debugManageFactorSources(ManageFactorSources.Action)
+			case debugManageFactorSources(DebugManageFactorSources.Action)
 			case securityStructureConfigs(SecurityStructureConfigurationListCoordinator.Action)
 		}
 
@@ -50,7 +50,7 @@ public struct DebugSettings: Sendable, FeatureReducer {
 				DebugInspectProfile()
 			}
 			Scope(state: /State.debugManageFactorSources, action: /Action.debugManageFactorSources) {
-				ManageFactorSources()
+				DebugManageFactorSources()
 			}
 			Scope(state: /State.securityStructureConfigs, action: /Action.securityStructureConfigs) {
 				SecurityStructureConfigurationListCoordinator()

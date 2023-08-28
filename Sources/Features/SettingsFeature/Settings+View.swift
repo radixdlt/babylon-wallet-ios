@@ -194,7 +194,6 @@ extension View {
 	@MainActor
 	fileprivate func navigationDestinations(with destinationStore: PresentationStoreOf<Settings.Destinations>) -> some View {
 		self
-			.importFromOlympiaLegacyWallet(with: destinationStore)
 			.manageP2PLinks(with: destinationStore)
 			.authorizedDapps(with: destinationStore)
 			.personas(with: destinationStore)
@@ -212,16 +211,6 @@ extension View {
 			state: /Settings.Destinations.State.manageP2PLinks,
 			action: Settings.Destinations.Action.manageP2PLinks,
 			destination: { P2PLinksFeature.View(store: $0) }
-		)
-	}
-
-	@MainActor
-	func importFromOlympiaLegacyWallet(with destinationStore: PresentationStoreOf<Settings.Destinations>) -> some View {
-		sheet(
-			store: destinationStore,
-			state: /Settings.Destinations.State.importOlympiaWallet,
-			action: Settings.Destinations.Action.importOlympiaWallet,
-			content: { ImportOlympiaWalletCoordinator.View(store: $0) }
 		)
 	}
 

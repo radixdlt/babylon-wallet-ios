@@ -1,6 +1,7 @@
 import AsyncExtensions
 import ComposableArchitecture
 import Dependencies
+import DesignSystem
 import Resources
 import SwiftUI
 
@@ -63,16 +64,43 @@ extension OverlayWindowClient {
 		}
 
 		public struct HUD: Sendable, Hashable, Identifiable {
-			public enum Kind: Sendable, Hashable {
-				case copied
-				case operationSucceeded(String)
+			public let id = UUID()
+			public let text: String
+			public let icon: Icon?
+
+			public struct Icon: Hashable, Sendable {
+				public enum Kind: Hashable, Sendable {
+					case asset(ImageAsset)
+					case system(String)
+				}
+
+				public let kind: Kind
+				public let foregroundColor: Color
+
+				public init(
+					kind: Kind,
+					foregroundColor: Color = .app.green1
+				) {
+					self.kind = kind
+					self.foregroundColor = foregroundColor
+				}
 			}
 
-			public let id = UUID()
-			public let kind: Kind
+			// FIXME: Strings
+			public static let copied = Self(text: "Copied")
 
-			public init(kind: Kind) {
-				self.kind = kind
+			// FIXME: Strings
+			public static let updated = Self(text: "Updated")
+
+			public init(
+				text: String,
+				icon: Icon? = Icon(
+					kind: .system("checkmark.circle.fill"),
+					foregroundColor: Color.app.green1
+				)
+			) {
+				self.text = text
+				self.icon = icon
 			}
 		}
 

@@ -48,7 +48,6 @@ extension TransactionReviewDappsUsed {
 					} label: {
 						HeadingLabel(isExpanded: isExpanded)
 					}
-					.background(.app.gray5)
 					.padding(.trailing, .medium3)
 
 					if isExpanded {
@@ -57,10 +56,10 @@ extension TransactionReviewDappsUsed {
 								DappView(viewState: rowViewState) { id in
 									viewStore.send(.dappTapped(id))
 								}
+								.background(.app.gray5)
 							}
 						}
 						.transition(.opacity.combined(with: .scale(scale: 0.95)))
-						.background(.app.gray5)
 					}
 				}
 				.animation(.easeInOut, value: isExpanded)
@@ -77,6 +76,11 @@ extension TransactionReviewDappsUsed {
 						.foregroundColor(.app.gray2)
 					Image(asset: isExpanded ? AssetResource.chevronUp : AssetResource.chevronDown)
 						.renderingMode(.original)
+				}
+				.background {
+					Rectangle()
+						.fill(.app.gray5)
+						.blur(radius: 2)
 				}
 			}
 		}
@@ -115,6 +119,7 @@ extension TransactionReviewDappsUsed {
 
 					Spacer(minLength: 0)
 				}
+				.lineSpacing(0)
 				.textStyle(.body2HighImportance)
 				.foregroundColor(.app.gray2)
 				.multilineTextAlignment(.leading)

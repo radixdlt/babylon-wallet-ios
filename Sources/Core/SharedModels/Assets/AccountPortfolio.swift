@@ -127,9 +127,9 @@ extension AccountPortfolio {
 			public init(
 				id: NonFungibleGlobalId,
 				name: String?,
-				description: String?,
-				keyImageURL: URL?,
-				metadata: [Metadata],
+				description: String? = nil,
+				keyImageURL: URL? = nil,
+				metadata: [Metadata] = [],
 				stakeClaimAmount: BigDecimal? = nil,
 				canBeClaimed: Bool = false
 			) {

@@ -50,9 +50,6 @@ extension AppSettings {
 									.withSeparator
 							}
 							#endif
-
-							resetWallet(with: viewStore)
-								.withSeparator
 						}
 						.padding(.horizontal, .medium3)
 					}
@@ -61,13 +58,8 @@ extension AppSettings {
 				}
 				.manageP2PLinks(with: destinationStore)
 				.gatewaySettings(with: destinationStore)
-				.profileBackups(with: destinationStore)
+				.profileBackupSettings(with: destinationStore)
 			}
-			.confirmationDialog(
-				store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-				state: /AppSettings.Destinations.State.deleteProfileConfirmationDialog,
-				action: AppSettings.Destinations.Action.deleteProfileConfirmationDialog
-			)
 		}
 
 		private var rows: [SettingsRowModel<AppSettings>] {
@@ -86,7 +78,7 @@ extension AppSettings {
 					title: L10n.Settings.backups,
 					subtitle: nil, // TODO: Determine, if possible, the date of last backup.
 					icon: .asset(AssetResource.backups),
-					action: .profileBackupsButtonTapped
+					action: .profileBackupSettingsButtonTapped
 				),
 			]
 		}
@@ -129,29 +121,6 @@ extension AppSettings {
 			.frame(height: .largeButtonHeight)
 		}
 		#endif
-
-		private func resetWallet(with viewStore: ViewStoreOf<AppSettings>) -> some SwiftUI.View {
-			HStack {
-				VStack(alignment: .leading, spacing: 0) {
-					Text(L10n.AppSettings.ResetWallet.title)
-						.foregroundColor(.app.gray1)
-						.textStyle(.body1HighImportance)
-
-					Text(L10n.AppSettings.ResetWallet.subtitle)
-						.foregroundColor(.app.gray2)
-						.textStyle(.body2Regular)
-						.fixedSize()
-				}
-
-				Spacer(minLength: 0)
-
-				Button(L10n.AppSettings.ResetWallet.buttonTitle) {
-					viewStore.send(.deleteProfileAndFactorSourcesButtonTapped)
-				}
-				.buttonStyle(.secondaryRectangular(isDestructive: true))
-			}
-			.frame(height: .largeButtonHeight)
-		}
 	}
 }
 
@@ -177,12 +146,12 @@ private extension View {
 	}
 
 	@MainActor
-	func profileBackups(with destinationStore: PresentationStoreOf<AppSettings.Destinations>) -> some View {
+	func profileBackupSettings(with destinationStore: PresentationStoreOf<AppSettings.Destinations>) -> some View {
 		navigationDestination(
 			store: destinationStore,
-			state: /AppSettings.Destinations.State.profileBackups,
-			action: AppSettings.Destinations.Action.profileBackups,
-			destination: { ProfileBackups.View(store: $0) }
+			state: /AppSettings.Destinations.State.profileBackupSettings,
+			action: AppSettings.Destinations.Action.profileBackupSettings,
+			destination: { ProfileBackupSettings.View(store: $0) }
 		)
 	}
 }

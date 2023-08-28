@@ -21,7 +21,7 @@ extension OverlayWindowClient: DependencyKey {
 			))
 		}.subscribe(items)
 
-		pasteBoardClient.copyEvents().map { _ in Item.hud(.init(kind: .copied)) }.subscribe(items)
+		pasteBoardClient.copyEvents().map { _ in Item.hud(.copied) }.subscribe(items)
 
 		return .init(
 			scheduledItems: { items.eraseToAnyAsyncSequence() },

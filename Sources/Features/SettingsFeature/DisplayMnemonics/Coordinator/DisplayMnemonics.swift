@@ -1,16 +1,8 @@
-import FactorSourcesClient
+import DeviceFactorSourceClient
+import DisplayEntitiesControlledByMnemonicFeature
 import FeaturePrelude
 import ImportMnemonicFeature
 import Profile
-import SecureStorageClient
-
-// MARK: - AccountsForDeviceFactorSource
-public struct AccountsForDeviceFactorSource: Sendable, Hashable, Identifiable {
-	public typealias ID = FactorSourceID
-	public var id: ID { deviceFactorSource.id.embed() }
-	public let accounts: [Profile.Network.Account]
-	public let deviceFactorSource: DeviceFactorSource
-}
 
 // MARK: - DisplayMnemonics
 public struct DisplayMnemonics: Sendable, FeatureReducer {
@@ -18,7 +10,7 @@ public struct DisplayMnemonics: Sendable, FeatureReducer {
 		@PresentationState
 		public var destination: Destinations.State? = nil
 
-		public var deviceFactorSources: IdentifiedArrayOf<DisplayMnemonicRow.State> = []
+		public var deviceFactorSources: IdentifiedArrayOf<DisplayEntitiesControlledByMnemonic.State> = []
 
 		public init() {}
 	}
@@ -28,11 +20,11 @@ public struct DisplayMnemonics: Sendable, FeatureReducer {
 	}
 
 	public enum InternalAction: Sendable, Equatable {
-		case loadedFactorSources(TaskResult<IdentifiedArrayOf<AccountsForDeviceFactorSource>>)
+		case loadedFactorSources(TaskResult<IdentifiedArrayOf<EntitiesControlledByFactorSource>>)
 	}
 
 	public enum ChildAction: Sendable, Equatable {
-		case row(id: DisplayMnemonicRow.State.ID, action: DisplayMnemonicRow.Action)
+		case row(id: DisplayEntitiesControlledByMnemonic.State.ID, action: DisplayEntitiesControlledByMnemonic.Action)
 		case destination(PresentationAction<Destinations.Action>)
 	}
 
@@ -54,17 +46,15 @@ public struct DisplayMnemonics: Sendable, FeatureReducer {
 		}
 	}
 
-	@Dependency(\.accountsClient) var accountsClient
-	@Dependency(\.factorSourcesClient) var factorSourcesClient
-	@Dependency(\.secureStorageClient) var secureStorageClient
 	@Dependency(\.errorQueue) var errorQueue
+	@Dependency(\.deviceFactorSourceClient) var deviceFactorSourceClient
 
 	public init() {}
 
 	public var body: some ReducerProtocolOf<Self> {
 		Reduce(core)
 			.forEach(\.deviceFactorSources, action: /Action.child .. ChildAction.row) {
-				DisplayMnemonicRow()
+				DisplayEntitiesControlledByMnemonic()
 			}
 			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
 				Destinations()
@@ -74,15 +64,22 @@ public struct DisplayMnemonics: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .onFirstTask:
-			return load()
+			return .task {
+				await .internal(.loadedFactorSources(TaskResult {
+					try await deviceFactorSourceClient.controlledEntities(nil) // `nil` means read profile in ProfileStore, instead of using an overriding
+				}))
+			}
 		}
 	}
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
-		case let .loadedFactorSources(.success(accountsForDeviceFactorSources)):
+		case let .loadedFactorSources(.success(entitiesForDeviceFactorSources)):
 			state.deviceFactorSources = .init(
-				uniqueElements: accountsForDeviceFactorSources.map { .init(accountsForDeviceFactorSource: $0) },
+				uniqueElements: entitiesForDeviceFactorSources.map { .init(
+					accountsForDeviceFactorSource: $0,
+					displayRevealMnemonicLink: true
+				) },
 				id: \.id
 			)
 
@@ -114,33 +111,6 @@ public struct DisplayMnemonics: Sendable, FeatureReducer {
 			return .none
 
 		default: return .none
-		}
-	}
-}
-
-extension DisplayMnemonics {
-	private func load() -> EffectTask<Action> {
-		@Sendable func doLoad() async throws -> IdentifiedArrayOf<AccountsForDeviceFactorSource> {
-			let sources = try await factorSourcesClient.getFactorSources(type: DeviceFactorSource.self)
-			let accounts = try await accountsClient.getAccountsOnCurrentNetwork()
-			return IdentifiedArrayOf(uniqueElements: sources.map { factorSource in
-				let accountsForSource = accounts.filter { account in
-					switch account.securityState {
-					case let .unsecured(unsecuredEntityControl):
-						return unsecuredEntityControl.transactionSigning.factorSourceID == factorSource.id
-					}
-				}
-				return AccountsForDeviceFactorSource(
-					accounts: accountsForSource,
-					deviceFactorSource: factorSource
-				)
-			})
-		}
-
-		return .task {
-			await .internal(.loadedFactorSources(TaskResult {
-				try await doLoad()
-			}))
 		}
 	}
 }

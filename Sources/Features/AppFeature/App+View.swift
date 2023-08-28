@@ -16,24 +16,29 @@ extension App {
 
 		public var body: some SwiftUI.View {
 			ZStack {
-				SwitchStore(store.scope(state: \.root)) {
-					CaseLet(
-						state: /App.State.Root.main,
-						action: { App.Action.child(.main($0)) },
-						then: { Main.View(store: $0) }
-					)
+				SwitchStore(store.scope(state: \.root, action: Action.child)) { state in
+					switch state {
+					case .main:
+						CaseLet(
+							state: /App.State.Root.main,
+							action: App.ChildAction.main,
+							then: { Main.View(store: $0) }
+						)
 
-					CaseLet(
-						state: /App.State.Root.onboardingCoordinator,
-						action: { App.Action.child(.onboardingCoordinator($0)) },
-						then: { OnboardingCoordinator.View(store: $0) }
-					)
+					case .onboardingCoordinator:
+						CaseLet(
+							state: /App.State.Root.onboardingCoordinator,
+							action: App.ChildAction.onboardingCoordinator,
+							then: { OnboardingCoordinator.View(store: $0) }
+						)
 
-					CaseLet(
-						state: /App.State.Root.splash,
-						action: { App.Action.child(.splash($0)) },
-						then: { Splash.View(store: $0) }
-					)
+					case .splash:
+						CaseLet(
+							state: /App.State.Root.splash,
+							action: App.ChildAction.splash,
+							then: { Splash.View(store: $0) }
+						)
+					}
 				}
 				.tint(.app.gray1)
 				.alert(

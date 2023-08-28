@@ -24,28 +24,33 @@ extension ManageSomeFactorSource {
 		}
 
 		public var body: some SwiftUI.View {
-			SwitchStore(store) {
-				CaseLet(
-					state: /ManageSomeFactorSource.State.manageSecurityQuestions,
-					action: { ManageSomeFactorSource.Action.child(.manageSecurityQuestions($0)) },
-					then: {
-						AnswerSecurityQuestionsCoordinator.View(store: $0)
-					}
-				)
-				CaseLet(
-					state: /ManageSomeFactorSource.State.manageTrustedContact,
-					action: { ManageSomeFactorSource.Action.child(.manageTrustedContact($0)) },
-					then: {
-						ManageTrustedContactFactorSource.View(store: $0)
-					}
-				)
-				CaseLet(
-					state: /ManageSomeFactorSource.State.manageOffDeviceMnemonics,
-					action: { ManageSomeFactorSource.Action.child(.manageOffDeviceMnemonics($0)) },
-					then: {
-						ImportMnemonic.View(store: $0)
-					}
-				)
+			SwitchStore(store) { state in
+				switch state {
+				case .manageSecurityQuestions:
+					CaseLet(
+						state: /ManageSomeFactorSource.State.manageSecurityQuestions,
+						action: { ManageSomeFactorSource.Action.child(.manageSecurityQuestions($0)) },
+						then: {
+							AnswerSecurityQuestionsCoordinator.View(store: $0)
+						}
+					)
+				case .manageTrustedContact:
+					CaseLet(
+						state: /ManageSomeFactorSource.State.manageTrustedContact,
+						action: { ManageSomeFactorSource.Action.child(.manageTrustedContact($0)) },
+						then: {
+							ManageTrustedContactFactorSource.View(store: $0)
+						}
+					)
+				case .manageOffDeviceMnemonics:
+					CaseLet(
+						state: /ManageSomeFactorSource.State.manageOffDeviceMnemonics,
+						action: { ManageSomeFactorSource.Action.child(.manageOffDeviceMnemonics($0)) },
+						then: {
+							ImportMnemonic.View(store: $0)
+						}
+					)
+				}
 			}
 		}
 	}

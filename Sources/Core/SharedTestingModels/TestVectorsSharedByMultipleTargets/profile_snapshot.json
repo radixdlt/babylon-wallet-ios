@@ -1,8 +1,5 @@
 {
   "appPreferences" : {
-    "transaction" : {
-      "defaultDepositGuarantee" : "1"
-    },
     "display" : {
       "fiatCurrencyPriceTarget" : "usd",
       "isCurrencyAmountVisible" : true,
@@ -37,6 +34,9 @@
       "structureConfigurationReferences" : [
 
       ]
+    },
+    "transaction" : {
+      "defaultDepositGuarantee" : "1"
     }
   },
   "factorSources" : [
@@ -58,6 +58,7 @@
           "lastUsedOn" : "1970-01-01T00:00:00Z"
         },
         "hint" : {
+          "mnemonicWordCount" : 24,
           "model" : "computer",
           "name" : "unit test"
         },
@@ -88,6 +89,7 @@
           "lastUsedOn" : "1970-01-01T00:00:00Z"
         },
         "hint" : {
+          "mnemonicWordCount" : 12,
           "model" : "computer",
           "name" : "unit test"
         },
@@ -207,7 +209,7 @@
       "description" : "computer unit test",
       "id" : "BABE1442-3C98-41FF-AFB0-D0F5829B020D"
     },
-    "snapshotVersion" : 44
+    "snapshotVersion" : 45
   },
   "networks" : [
     {
@@ -217,6 +219,17 @@
           "appearanceID" : 0,
           "displayName" : "First",
           "networkID" : 33,
+          "onLedgerSettings" : {
+            "thirdPartyDeposits" : {
+              "assetsExceptionList" : [
+
+              ],
+              "depositorsAllowList" : [
+
+              ],
+              "depositRule" : "acceptAll"
+            }
+          },
           "securityState" : {
             "discriminator" : "unsecured",
             "unsecuredEntityControl" : {
@@ -272,13 +285,6 @@
                 }
               }
             }
-          },
-          "onLedgerSettings": {
-              "thirdPartyDeposits": {
-                  "depositRule": "acceptAll",
-                  "assetsExceptionList": [],
-                  "depositorsAllowList": []
-              }
           }
         },
         {
@@ -286,6 +292,27 @@
           "appearanceID" : 1,
           "displayName" : "Second",
           "networkID" : 33,
+          "onLedgerSettings" : {
+            "thirdPartyDeposits" : {
+              "assetsExceptionList" : [
+                {
+                  "address" : "resource_tdx_21_1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxsmgder",
+                  "exceptionRule" : "deny"
+                }
+              ],
+              "depositorsAllowList" : [
+                {
+                  "discriminator" : "resourceAddress",
+                  "value" : "resource_tdx_21_1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxsmgder"
+                },
+                {
+                  "discriminator" : "nonFungibleGlobalID",
+                  "value" : "resource_tdx_21_1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxsmgder:#2#"
+                }
+              ],
+              "depositRule" : "acceptKnown"
+            }
+          },
           "securityState" : {
             "discriminator" : "unsecured",
             "unsecuredEntityControl" : {
@@ -341,27 +368,6 @@
                 }
               }
             }
-          },
-          "onLedgerSettings": {
-              "thirdPartyDeposits": {
-                  "depositRule": "acceptKnown",
-                  "assetsExceptionList": [
-                      {
-                          "address": "resource_tdx_21_1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxsmgder",
-                          "exceptionRule": "deny"
-                      }
-                  ],
-                  "depositorsAllowList": [
-                      {
-                          "discriminator": "resourceAddress",
-                          "value": "resource_tdx_21_1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxsmgder"
-                      },
-                      {
-                          "discriminator": "nonFungibleGlobalID",
-                          "value": "resource_tdx_21_1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxsmgder:#2#"
-                      },
-                  ]
-              }
           }
         },
         {
@@ -369,6 +375,27 @@
           "appearanceID" : 2,
           "displayName" : "Third",
           "networkID" : 33,
+          "onLedgerSettings" : {
+            "thirdPartyDeposits" : {
+              "assetsExceptionList" : [
+                {
+                  "address" : "resource_tdx_21_1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxsmgder",
+                  "exceptionRule" : "allow"
+                }
+              ],
+              "depositorsAllowList" : [
+                {
+                  "discriminator" : "resourceAddress",
+                  "value" : "resource_tdx_21_1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxsmgder"
+                },
+                {
+                  "discriminator" : "nonFungibleGlobalID",
+                  "value" : "resource_tdx_21_1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxsmgder:#2#"
+                }
+              ],
+              "depositRule" : "denyAll"
+            }
+          },
           "securityState" : {
             "discriminator" : "unsecured",
             "unsecuredEntityControl" : {
@@ -424,29 +451,8 @@
                 }
               }
             }
-          },
-          "onLedgerSettings": {
-              "thirdPartyDeposits": {
-                  "depositRule": "denyAll",
-                  "assetsExceptionList": [
-                      {
-                          "address": "resource_tdx_21_1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxsmgder",
-                          "exceptionRule": "allow"
-                      }
-                  ],
-                  "depositorsAllowList": [
-                      {
-                          "discriminator": "resourceAddress",
-                          "value": "resource_tdx_21_1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxsmgder"
-                      },
-                      {
-                          "discriminator": "nonFungibleGlobalID",
-                          "value": "resource_tdx_21_1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxsmgder:#2#"
-                      },
-                  ]
-              }
           }
-        },
+        }
       ],
       "authorizedDapps" : [
         {

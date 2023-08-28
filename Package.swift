@@ -41,6 +41,7 @@ package.addModules([
 			"CreateAuthKeyFeature",
 			"ShowQRFeature",
 			"OverlayWindowClient",
+			"OnLedgerEntitiesClient",
 		],
 		tests: .yes()
 	),
@@ -203,6 +204,13 @@ package.addModules([
 		tests: .no
 	),
 	.feature(
+		name: "DisplayEntitiesControlledByMnemonicFeature",
+		featureSuffixDroppedFromFolderName: true,
+		dependencies: [
+		],
+		tests: .no
+	),
+	.feature(
 		name: "EditPersonaFeature",
 		dependencies: [
 			"PersonasClient",
@@ -243,6 +251,7 @@ package.addModules([
 		dependencies: [
 			"FactorSourcesClient", // saves into profile, if specified
 			"MnemonicClient",
+			"OverlayWindowClient",
 			.product(name: "ScreenshotPreventing", package: "ScreenshotPreventing-iOS", condition: .when(platforms: [.iOS])) {
 				.package(url: "https://github.com/Sajjon/ScreenshotPreventing-iOS.git", from: "0.0.1")
 			},
@@ -341,7 +350,12 @@ package.addModules([
 		dependencies: [
 			"AppPreferencesClient",
 			"BackupsClient",
+			"CacheClient",
+			"DeviceFactorSourceClient",
+			"DisplayEntitiesControlledByMnemonicFeature",
 			"ImportMnemonicFeature",
+			"OverlayWindowClient",
+			"RadixConnectClient",
 		],
 		tests: .no
 	),
@@ -378,9 +392,11 @@ package.addModules([
 			"AppPreferencesClient",
 			"AuthorizedDAppsFeature",
 			"CacheClient",
+			"DeviceFactorSourceClient",
 			"DebugInspectProfileFeature",
 			"GatewayAPI",
 			"GatewaySettingsFeature",
+			"DisplayEntitiesControlledByMnemonicFeature",
 			"ImportMnemonicFeature",
 			"FactorSourcesClient", // Check if user has any ledgers
 			"ImportLegacyWalletClient",
@@ -427,8 +443,10 @@ package.addModules([
 	.feature(
 		name: "TransactionReviewFeature",
 		dependencies: [
+			"AssetsFeature",
 			"AuthorizedDappsClient",
 			"GatewayAPI",
+			"OnLedgerEntitiesClient",
 			"TransactionClient",
 			"SigningFeature",
 			"SubmitTransactionClient",
@@ -463,6 +481,15 @@ package.addModules([
 			"EngineKit",
 		],
 		tests: .yes()
+	),
+	.client(
+		name: "OnLedgerEntitiesClient",
+		dependencies: [
+			"GatewayAPI",
+			"CacheClient",
+			"EngineKit",
+		],
+		tests: .no
 	),
 	.client(
 		name: "AppPreferencesClient",
@@ -655,7 +682,9 @@ package.addModules([
 	),
 	.client(
 		name: "OverlayWindowClient",
-		dependencies: [],
+		dependencies: [
+			"DesignSystem", // please forgive me... only access to colors. I will be judge for all time for this!
+		],
 		tests: .no
 	),
 	.client(
@@ -720,7 +749,6 @@ package.addModules([
 		],
 		tests: .yes()
 	),
-
 	.client(
 		name: "PersonasClient",
 		dependencies: [
@@ -736,7 +764,6 @@ package.addModules([
 		],
 		tests: .yes()
 	),
-
 	.client(
 		name: "ProfileStore",
 		dependencies: [
@@ -797,11 +824,12 @@ package.addModules([
 	.client(
 		name: "DeviceFactorSourceClient",
 		dependencies: [
+			"AccountsClient",
 			"Cryptography",
 			"FactorSourcesClient",
 			"Profile",
+			"PersonasClient",
 			"SecureStorageClient",
-			"AccountsClient",
 		],
 		tests: .no
 	),
