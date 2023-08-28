@@ -12,10 +12,11 @@ public struct CustomizeFees: FeatureReducer {
 		}
 
 		var feePayerSelection: FeePayerSelectionAmongstCandidates {
-			reviewedTransaction.feePayerSelectionAmongstCandidates
+			reviewedTransaction.feePayerSelection
 		}
 
-		var reviewedTransaction: TransactionToReview
+		var reviewedTransaction: ReviewedTransaction
+		let manifest: TransactionManifest
 		var modeState: CustomizationModeState
 
 		var feePayerAccount: Profile.Network.Account? {
@@ -30,10 +31,12 @@ public struct CustomizeFees: FeatureReducer {
 		public var destination: Destinations.State? = nil
 
 		init(
-			reviewedTransaction: TransactionToReview
+			reviewedTransaction: ReviewedTransaction,
+			manifest: TransactionManifest
 		) {
 			self.reviewedTransaction = reviewedTransaction
-			self.modeState = reviewedTransaction.feePayerSelectionAmongstCandidates.transactionFee.customizationModeState
+			self.manifest = manifest
+			self.modeState = reviewedTransaction.feePayerSelection.transactionFee.customizationModeState
 		}
 	}
 
@@ -50,11 +53,11 @@ public struct CustomizeFees: FeatureReducer {
 	}
 
 	public enum DelegateAction: Equatable, Sendable {
-		case updated(TransactionToReview)
+		case updated(ReviewedTransaction)
 	}
 
 	public enum InternalAction: Equatable, Sendable {
-		case factorsAndSignersUpdateResult(TaskResult<TransactionToReview>)
+		case updated(TaskResult<ReviewedTransaction>)
 	}
 
 	public struct Destinations: Sendable, ReducerProtocol {
@@ -98,7 +101,7 @@ public struct CustomizeFees: FeatureReducer {
 			state.destination = .selectFeePayer(.init(feePayerSelection: state.feePayerSelection))
 			return .none
 		case .toggleMode:
-			state.reviewedTransaction.feePayerSelectionAmongstCandidates.transactionFee.toggleMode()
+			state.reviewedTransaction.feePayerSelection.transactionFee.toggleMode()
 			state.modeState = state.feePayerSelection.transactionFee.customizationModeState
 			return .send(.delegate(.updated(state.reviewedTransaction)))
 		case .closeButtonTapped:
@@ -111,37 +114,67 @@ public struct CustomizeFees: FeatureReducer {
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
 		case let .destination(.presented(.selectFeePayer(.delegate(.selected(selection))))):
-			state.reviewedTransaction.feePayerSelectionAmongstCandidates.selected = selection
+			let previousFeePayer = state.reviewedTransaction.feePayerSelection.selected
 			state.destination = nil
 
-			return .run { [reviewedTransaction = state.reviewedTransaction, feePayer = EntityPotentiallyVirtual.account(selection.account)] send in
-				@Dependency(\.factorSourcesClient) var factorSourcesClient
-
-				if !reviewedTransaction.transactionSigners.intentSignerEntitiesOrEmpty().contains(feePayer) {
-					let newSigners = reviewedTransaction.transactionSigners.intentSignerEntitiesOrEmpty() + [feePayer]
-					let nonEmptySigners = NonEmpty(rawValue: OrderedSet(newSigners))!
-					// What to do on Failure? rever the fee payer?
-					let factors = try await factorSourcesClient.getSigningFactors(.init(
-						networkID: reviewedTransaction.networkID,
-						signers: .init(rawValue: Set(newSigners))!,
-						signingPurpose: .signTransaction(.manifestFromDapp)
-					))
+			@Sendable
+			func replaceFeePayer(_ feePayer: FeePayerCandidate, _ reviewedTransaction: ReviewedTransaction, manifest: TransactionManifest) -> EffectTask<Action> {
+				.run { send in
 					var reviewedTransaction = reviewedTransaction
-					reviewedTransaction.transactionSigners = .init(
-						notaryPublicKey: reviewedTransaction.transactionSigners.notaryPublicKey,
-						intentSigning: .intentSigners(.init(rawValue: OrderedSet(newSigners))!)
-					)
-					reviewedTransaction.signingFactors = factors
-					reviewedTransaction.feePayerSelectionAmongstCandidates.transactionFee.updatingSignaturesCost(factors.expectedSignatureCount)
+					var newSigners = OrderedSet(reviewedTransaction.transactionSigners.intentSignerEntitiesOrEmpty() + [.account(feePayer.account)])
 
-					await send(.internal(.factorsAndSignersUpdateResult(.success(reviewedTransaction))))
+					/// Remove the previous Fee Payer Signature if it is not required
+					if let previousFeePayer, !manifest.accountsRequiringAuth().contains(where: { $0.addressString() == previousFeePayer.account.address.address }) {
+						// removed, need to recalculate signing factors
+						newSigners.remove(.account(previousFeePayer.account))
+
+						let signers: TransactionSigners.IntentSigning = {
+							guard let nonEmpty = NonEmpty(rawValue: OrderedSet(newSigners)) else {
+								return .notaryIsSignatory
+							}
+							return TransactionSigners.IntentSigning.intentSigners(nonEmpty)
+						}()
+
+						reviewedTransaction.transactionSigners = .init(notaryPublicKey: reviewedTransaction.transactionSigners.notaryPublicKey, intentSigning: signers)
+					}
+
+					@Dependency(\.factorSourcesClient) var factorSourcesClient
+
+					do {
+						let factors = try await factorSourcesClient.getSigningFactors(.init(
+							networkID: reviewedTransaction.networkId,
+							signers: .init(rawValue: Set(newSigners))!,
+							signingPurpose: .signTransaction(.manifestFromDapp)
+						))
+
+						reviewedTransaction.signingFactors = factors
+
+						reviewedTransaction.feePayerSelection.selected = selection
+						await send(.internal(.updated(.success(reviewedTransaction))))
+					} catch {
+						await send(.internal(.updated(.failure(error))))
+					}
 				}
-				await send(.delegate(.updated(reviewedTransaction)))
 			}
+
+			return replaceFeePayer(selection, state.reviewedTransaction, manifest: state.manifest)
 		case let .advancedFeesCustomization(.delegate(.updated(advancedFees))):
-			state.reviewedTransaction.feePayerSelectionAmongstCandidates.transactionFee.mode = .advanced(advancedFees)
+			state.reviewedTransaction.feePayerSelection.transactionFee.mode = .advanced(advancedFees)
 			return .send(.delegate(.updated(state.reviewedTransaction)))
 		default:
+			return .none
+		}
+	}
+
+	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
+		switch internalAction {
+		case let .updated(.success(reviewedTransaction)):
+			state.reviewedTransaction = reviewedTransaction
+			print("signatures count \(reviewedTransaction.signingFactors.expectedSignatureCount)")
+			state.reviewedTransaction.feePayerSelection.transactionFee.updatingSignaturesCost(reviewedTransaction.signingFactors.expectedSignatureCount)
+			state.modeState = state.feePayerSelection.transactionFee.customizationModeState
+			return .send(.delegate(.updated(state.reviewedTransaction)))
+		case let .updated(.failure(error)):
 			return .none
 		}
 	}

@@ -29,7 +29,6 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		public var proofs: TransactionReviewProofs.State? = nil
 		public var networkFee: TransactionReviewNetworkFee.State? = nil
 		public let ephemeralNotaryPrivateKey: Curve25519.Signing.PrivateKey
-		public var transactionToReview: TransactionToReview?
 		public var canApproveTX: Bool = true
 
 		@PresentationState
@@ -219,8 +218,12 @@ public struct TransactionReview: Sendable, FeatureReducer {
 					manifest: manifest,
 					message: state.message,
 					makeTransactionHeaderInput: MakeTransactionHeaderInput(tipPercentage: tipPercentage),
-					transactionSigners: state.transactionToReview!.transactionSigners
+					transactionSigners: reviewedTransaction.transactionSigners
 				)
+
+				#if DEBUG
+				printSigners(reviewedTransaction)
+				#endif
 
 				return .task {
 					await .internal(.buildTransactionItentResult(TaskResult {
@@ -256,10 +259,10 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			return .none
 
 		case .networkFee(.delegate(.showCustomizeFees)):
-			guard let feePayerSelection = state.reviewedTransaction?.feePayerSelection else {
+			guard let reviewedTransaction = state.reviewedTransaction else {
 				return .none
 			}
-			state.destination = .customizeFees(.init(reviewedTransaction: state.transactionToReview!))
+			state.destination = .customizeFees(.init(reviewedTransaction: reviewedTransaction, manifest: state.transactionManifest))
 
 			return .none
 
@@ -294,7 +297,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			return .none
 
 		case let .customizeFees(.delegate(.updated(reviewedTransaction))):
-			state.transactionToReview = reviewedTransaction
+			state.reviewedTransaction = reviewedTransaction
 			if let reviewedTransaction = state.reviewedTransaction {
 				state.networkFee = .init(reviewedTransaction: reviewedTransaction)
 			}
@@ -373,11 +376,12 @@ public struct TransactionReview: Sendable, FeatureReducer {
 
 		case let .previewLoaded(.success(preview)):
 			do {
-				state.transactionToReview = preview
 				state.reviewedTransaction = try .init(
 					feePayerSelection: preview.feePayerSelectionAmongstCandidates,
 					networkId: preview.networkID,
-					transaction: preview.analyzedManifestToReview.transactionTypes.transactionKind()
+					transaction: preview.analyzedManifestToReview.transactionTypes.transactionKind(),
+					transactionSigners: preview.transactionSigners,
+					signingFactors: preview.signingFactors
 				)
 				return review(&state)
 			} catch {
@@ -394,11 +398,11 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			return .none
 
 		case let .buildTransactionItentResult(.success(response)):
-			guard let transactionToReview = state.transactionToReview else {
+			guard let reviewedTransaction = state.reviewedTransaction else {
 				return .none
 			}
 			state.destination = .signing(.init(
-				factorsLeftToSignWith: transactionToReview.signingFactors,
+				factorsLeftToSignWith: reviewedTransaction.signingFactors,
 				signingPurposeWithPayload: .signTransaction(
 					ephemeralNotaryPrivateKey: state.ephemeralNotaryPrivateKey,
 					response,
@@ -460,20 +464,21 @@ extension TransactionReview {
 	) throws -> TransactionManifest {
 		guard !guarantees.isEmpty else { return manifest }
 
-		let assertions: [IndexedAssertion] = try guarantees.map {
-			try .init(
-				index: $0.instructionIndex,
-				assertion: .amount(
-					resourceAddress: $0.resourceAddress.intoEngine(),
-					amount: $0.amount.intoEngine()
-				)
+		var manifest = manifest
+
+		/// Will be increased with each added guarantee to account for the difference in indexes from the initial manifest.
+		var indexInc = 1 // LockFee was added, start from 1
+		for guarantee in guarantees {
+			let guaranteeInstruction: Instruction = try .assertWorktopContains(
+				resourceAddress: guarantee.resourceAddress.intoEngine(),
+				amount: .init(value: guarantee.amount.toString())
 			)
+
+			manifest = try manifest.withInstructionAdded(guaranteeInstruction, at: Int(guarantee.instructionIndex) + indexInc)
+
+			indexInc += 1
 		}
-		return try manifest.modify(modifications: .init(
-			addAccessControllerProofs: [],
-			addLockFee: nil,
-			addAssertions: assertions
-		))
+		return manifest
 	}
 
 	func showRawTransaction(_ state: inout State) -> EffectTask<Action> {
@@ -488,33 +493,11 @@ extension TransactionReview {
 	}
 
 	func transactionManifestWithWalletInstructionsAdded(_ state: State) throws -> TransactionManifest {
-		let lockFee: LockFeeModification? = try {
-			guard let feePayerSelection = state.reviewedTransaction?.feePayerSelection,
-			      let feePayer = feePayerSelection.selected
-			else {
-				return nil
-			}
-			return try .init(
-				accountAddress: feePayer.account.address.intoEngine(),
-				amount: feePayerSelection.transactionFee.totalFee.lockFee.intoEngine()
-			)
-		}()
-
-		let assertions: [IndexedAssertion] = try state.allGuarantees.map {
-			try .init(
-				index: $0.instructionIndex,
-				assertion: .amount(
-					resourceAddress: $0.resourceAddress.intoEngine(),
-					amount: $0.amount.intoEngine()
-				)
-			)
+		var manifest = state.transactionManifest
+		if let feePayerSelection = state.reviewedTransaction?.feePayerSelection, let feePayer = feePayerSelection.selected {
+			manifest = try manifest.withLockFeeCallMethodAdded(address: feePayer.account.address.asGeneral(), fee: feePayerSelection.transactionFee.totalFee.lockFee)
 		}
-
-		return try state.transactionManifest.modify(modifications: .init(
-			addAccessControllerProofs: [],
-			addLockFee: lockFee,
-			addAssertions: assertions
-		))
+		return try addingGuarantees(to: manifest, guarantees: state.allGuarantees)
 	}
 
 	func delayedEffect(
@@ -1159,6 +1142,9 @@ public struct ReviewedTransaction: Hashable, Sendable {
 	var feePayerSelection: FeePayerSelectionAmongstCandidates
 	let networkId: NetworkID
 	let transaction: TransactionKind
+
+	var transactionSigners: TransactionSigners
+	var signingFactors: SigningFactors
 }
 
 // MARK: - FeeValidationOutcome
@@ -1222,5 +1208,22 @@ extension FeePayerSelectionAmongstCandidates {
 		}
 
 		return .valid
+	}
+}
+
+func printSigners(_ reviewedTransaction: ReviewedTransaction) {
+	for (factorSourceKind, signingFactorsOfKind) in reviewedTransaction.signingFactors {
+		print("🔮 ~~~ SIGNINGFACTORS OF KIND: \(factorSourceKind) #\(signingFactorsOfKind.count) many: ~~~")
+		for signingFactor in signingFactorsOfKind {
+			let factorSource = signingFactor.factorSource
+			print("\t🔮 == Signers for factorSource: \(factorSource.id): ==")
+			for signer in signingFactor.signers {
+				let entity = signer.entity
+				print("\t\t🔮 * Entity: \(entity.displayName): *")
+				for factorInstance in signer.factorInstancesRequiredToSign {
+					print("\t\t\t🔮 * FactorInstance: \(String(describing: factorInstance.derivationPath)) \(factorInstance.publicKey)")
+				}
+			}
+		}
 	}
 }

@@ -234,7 +234,8 @@ extension TransactionClient {
 			let analyzedManifestToReview = try request.manifestToSign.analyzeExecution(transactionReceipt: receiptBytes)
 
 			/// Calculate the expecte transaction fee
-			let transactionFee = try TransactionFee(executionAnalysis: analyzedManifestToReview, signaturesCount: signingFactors.expectedSignatureCount)
+			let signaturesCount = transactionSigners.notaryIsSignatory ? 1 : signingFactors.expectedSignatureCount
+			let transactionFee = try TransactionFee(executionAnalysis: analyzedManifestToReview, signaturesCount: signaturesCount)
 
 			/// Select the account that can pay the transaction fee
 			let feePayerSelection = try await feePayerSelectionAmongstCandidates(request.manifestToSign, transactionFee: transactionFee)
