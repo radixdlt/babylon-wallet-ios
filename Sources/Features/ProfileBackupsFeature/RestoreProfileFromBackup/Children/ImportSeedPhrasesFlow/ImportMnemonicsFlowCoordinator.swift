@@ -55,6 +55,7 @@ public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 	}
 
 	@Dependency(\.deviceFactorSourceClient) var deviceFactorSourceClient
+	@Dependency(\.userDefaultsClient) var userDefaultsClient
 	@Dependency(\.errorQueue) var errorQueue
 	public init() {}
 
@@ -70,7 +71,10 @@ public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 		case .onFirstTask:
 			return .task { [snapshot = state.profileSnapshot] in
 				await .internal(.loadControlledEntities(TaskResult {
-					try await deviceFactorSourceClient.controlledEntities(snapshot)
+					let ents = try await deviceFactorSourceClient.controlledEntities(snapshot)
+					return ents.filter { ent in
+						!userDefaultsClient.getFactorSourceIDOfBackedUpMnemonics().contains(ent.factorSourceID)
+					}
 				}))
 			}
 		case .closeButtonTapped:

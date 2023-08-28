@@ -166,6 +166,14 @@ public struct AccountDetails: Sendable, FeatureReducer {
 			state.destination = nil
 			return .none
 
+		case let .destination(.presented(.importMnemonics(.delegate(delegateAction)))):
+			switch delegateAction {
+			case .closeButtonTapped, .failedToImportAllRequiredMnemonics, .finishedImportingMnemonics:
+				break
+			}
+			state.destination = nil
+			return .none
+
 		default:
 			return .none
 		}
