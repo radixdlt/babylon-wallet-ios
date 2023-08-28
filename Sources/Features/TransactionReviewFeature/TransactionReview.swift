@@ -178,7 +178,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		switch viewAction {
 		case .appeared:
 			let manifest = state.transactionManifest
-			return .run { [nonce = state.nonce, message = state.message, notary = state.ephemeralNotaryPrivateKey.publicKey] send in
+			return .run { [nonce = state.nonce, message = state.message, notary = state.ephemeralNotaryPrivateKey.publicKey, purpose = state.signTransactionPurpose] send in
 				let defaultDepositGuarantees = await appPreferencesClient.getPreferences().transaction.defaultDepositGuarantee
 				await send(.internal(.defaultDepositGuaranteeLoaded(defaultDepositGuarantees)))
 
@@ -187,7 +187,8 @@ public struct TransactionReview: Sendable, FeatureReducer {
 						manifestToSign: manifest,
 						message: message,
 						nonce: nonce,
-						ephemeralNotaryPublicKey: notary
+						ephemeralNotaryPublicKey: notary,
+						signingPurpose: .signTransaction(purpose)
 					))
 				}
 				await send(.internal(.previewLoaded(preview)))
@@ -305,7 +306,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			guard let reviewedTransaction = state.reviewedTransaction else {
 				return .none
 			}
-			state.destination = .customizeFees(.init(reviewedTransaction: reviewedTransaction, manifest: state.transactionManifest))
+			state.destination = .customizeFees(.init(reviewedTransaction: reviewedTransaction, manifest: state.transactionManifest, signingPurpose: .signTransaction(state.signTransactionPurpose)))
 			return .none
 
 		case let .destination(.presented(presentedAction)):

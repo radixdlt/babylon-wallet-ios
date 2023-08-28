@@ -80,6 +80,7 @@ public struct CustomizeFees: FeatureReducer {
 	}
 
 	@Dependency(\.dismiss) var dismiss
+	@Dependency(\.errorQueue) var errorQueue
 
 	public var body: some ReducerProtocolOf<Self> {
 		Scope(state: \.modeState, action: /Action.child) {
@@ -182,6 +183,7 @@ public struct CustomizeFees: FeatureReducer {
 			state.modeState = state.feePayerSelection.transactionFee.customizationModeState
 			return .send(.delegate(.updated(state.reviewedTransaction)))
 		case let .updated(.failure(error)):
+			errorQueue.schedule(error)
 			return .none
 		}
 	}
