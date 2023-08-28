@@ -163,13 +163,7 @@ final class FaucetClientTests: TestCase {
 			$0.gatewayAPIClient.getEpoch = { currentEpoch }
 			$0.submitTXClient.submitTransaction = { _ in hash }
 			$0.transactionClient.buildTransactionIntent = { _ in
-				TransactionIntentWithSigners(
-					intent: .previewValue,
-					transactionSigners: .init(
-						notaryPublicKey: .previewValue,
-						intentSigning: .notaryIsSignatory
-					)
-				)
+				.previewValue
 			}
 			$0.transactionClient.notarizeTransaction = { _ in try NotarizeTransactionResponse(notarized: .init([]), txID: hash) }
 			$0.submitTXClient.hasTXBeenCommittedSuccessfully = { _ in }

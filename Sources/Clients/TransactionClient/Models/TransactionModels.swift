@@ -469,7 +469,7 @@ extension TransactionFee {
 		}
 
 		public var total: BigDecimal {
-			feeSummary.total + paddingFee + tipAmount + paidByDapps
+			max(feeSummary.total + paddingFee + tipAmount + paidByDapps, 0)
 		}
 
 		public init(feeSummary: FeeSummary, feeLocks: FeeLocks) {

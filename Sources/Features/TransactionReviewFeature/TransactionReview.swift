@@ -492,10 +492,8 @@ public struct TransactionReview: Sendable, FeatureReducer {
 				/// Silently sign the transaction with notary keys.
 				return .run { send in
 					await send(.internal(.notarizeResult(TaskResult {
-						let signature = try notaryKey.sign(hashOfMessage: intent.hash().bytes().data).intoEngine()
-
-						return try await transactionClient.notarizeTransaction(.init(
-							intentSignatures: [signature],
+						try await transactionClient.notarizeTransaction(.init(
+							intentSignatures: [],
 							transactionIntent: intent,
 							notary: notaryKey
 						))

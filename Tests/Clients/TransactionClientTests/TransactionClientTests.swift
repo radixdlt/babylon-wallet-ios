@@ -12,7 +12,11 @@ final class TransactionClientTests: TestCase {
 		executionCost: 5,
 		finalizationCost: 5,
 		storageExpansionCost: 5,
-		royaltyCost: 10
+		royaltyCost: 10,
+		guaranteesCost: 5,
+		signaturesCost: 5,
+		lockFeeCost: 5,
+		notarizingCost: 5
 	)
 
 	// MARK: - TransactionFee tests
@@ -37,7 +41,8 @@ final class TransactionClientTests: TestCase {
 	}
 
 	func testNormalModeNonContingentLock_3() throws {
-		let feeLocks = TransactionFee.FeeLocks(nonContingentLock: 27.25, contingentLock: 0)
+		// A non contingent lock that can pay for the whole lock fee
+		let feeLocks = TransactionFee.FeeLocks(nonContingentLock: 40.25, contingentLock: 0)
 		let transaction = TransactionFee(feeSummary: feeSummary, feeLocks: feeLocks)
 
 		try assertNormalModeFees(for: transaction)
@@ -79,22 +84,22 @@ final class TransactionClientTests: TestCase {
 	}
 
 	func testAdvancedMode() throws {
-		let feeLocks = TransactionFee.FeeLocks(nonContingentLock: 100, contingentLock: 100)
-		var advancedMode = TransactionFee.AdvancedFeeCustomization(feeSummary: feeSummary)
+		let feeLocks = TransactionFee.FeeLocks(nonContingentLock: 10, contingentLock: 0)
+		var advancedMode = TransactionFee.AdvancedFeeCustomization(feeSummary: feeSummary, feeLocks: feeLocks)
 		advancedMode.tipPercentage = 10
 
 		let transaction = TransactionFee(feeSummary: feeSummary, feeLocks: feeLocks, mode: .advanced(advancedMode))
 
-		let networkFee = feeSummary.executionCost + feeSummary.finalizationCost
-		let feesTotal = feeSummary.executionCost + feeSummary.finalizationCost + feeSummary.storageExpansionCost + feeSummary.royaltyCost
+		let networkFee = feeSummary.totalExecutionCost + feeSummary.finalizationCost + feeSummary.storageExpansionCost
+		let feesTotal = feeSummary.totalExecutionCost + feeSummary.finalizationCost + feeSummary.storageExpansionCost + feeSummary.royaltyCost
 		let defaultPaddingFee = networkFee * TransactionFee.PredefinedFeeConstants.networkFeeMultiplier
 
 		XCTAssertNotNil(transaction.advanced, "Expected to switch to advanced mode")
 		XCTAssertEqual(advancedMode.paddingFee, defaultPaddingFee)
 		XCTAssertEqual(advancedMode.tipPercentage, 10)
-		XCTAssertEqual(advancedMode.tipAmount, networkFee * 0.1)
+		XCTAssertEqual(advancedMode.tipAmount, (feeSummary.totalExecutionCost + feeSummary.finalizationCost) * 0.1)
 
-		let totalFee = feesTotal + advancedMode.paddingFee + advancedMode.tipAmount
+		let totalFee = feesTotal + advancedMode.paddingFee + advancedMode.tipAmount - feeLocks.nonContingentLock
 		XCTAssertEqual(transaction.totalFee, .init(min: totalFee, max: totalFee))
 	}
 
@@ -109,16 +114,20 @@ final class TransactionClientTests: TestCase {
 
 extension TransactionFee {
 	var normalModeNetworkFee: BigDecimal {
-		var networkFee = feeSummary.executionCost + feeSummary.finalizationCost + feeSummary.storageExpansionCost
+		var networkFee = feeSummary.executionCost
+			+ feeSummary.finalizationCost
+			+ feeSummary.storageExpansionCost
+			+ feeSummary.guaranteesCost
+			+ feeSummary.lockFeeCost
+			+ feeSummary.signaturesCost
+			+ feeSummary.notarizingCost
+
 		networkFee += networkFee * PredefinedFeeConstants.networkFeeMultiplier
 		return networkFee
 	}
 
 	var expectedNormalModeNetworkFee: BigDecimal {
-		var networkFee = feeSummary.executionCost + feeSummary.finalizationCost + feeSummary.storageExpansionCost
-		networkFee += networkFee * PredefinedFeeConstants.networkFeeMultiplier
-
-		return networkFee.clampedDiff(feeLocks.nonContingentLock)
+		normalModeNetworkFee.clampedDiff(feeLocks.nonContingentLock)
 	}
 
 	var expectedNormalModeRoyaltyFee: BigDecimal {
@@ -148,6 +157,12 @@ extension TransactionFee {
 			return nil
 		}
 		return advanced
+	}
+}
+
+extension TransactionFee.FeeSummary {
+	var networkFee: BigDecimal {
+		totalExecutionCost + finalizationCost + storageExpansionCost
 	}
 }
 
