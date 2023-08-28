@@ -197,19 +197,22 @@ public struct ManifestReviewRequest: Sendable {
 	public let nonce: Nonce
 	public let makeTransactionHeaderInput: MakeTransactionHeaderInput
 	public let ephemeralNotaryPublicKey: Curve25519.Signing.PublicKey
+	public let signingPurpose: SigningPurpose
 
 	public init(
 		manifestToSign: TransactionManifest,
 		message: Message,
 		nonce: Nonce,
 		makeTransactionHeaderInput: MakeTransactionHeaderInput = .default,
-		ephemeralNotaryPublicKey: Curve25519.Signing.PublicKey
+		ephemeralNotaryPublicKey: Curve25519.Signing.PublicKey,
+		signingPurpose: SigningPurpose
 	) {
 		self.manifestToSign = manifestToSign
 		self.message = message
 		self.nonce = nonce
 		self.makeTransactionHeaderInput = makeTransactionHeaderInput
 		self.ephemeralNotaryPublicKey = ephemeralNotaryPublicKey
+		self.signingPurpose = signingPurpose
 	}
 }
 
@@ -277,7 +280,7 @@ public struct TransactionFee: Hashable, Sendable {
 			finalizationCost: executionAnalysis.feeSummary.finalizationCost.asBigDecimal(),
 			storageExpansionCost: executionAnalysis.feeSummary.storageExpansionCost.asBigDecimal(),
 			royaltyCost: executionAnalysis.feeSummary.royaltyCost.asBigDecimal(),
-			guaranteesCost: executionAnalysis.guranteesFee(),
+			guaranteesCost: executionAnalysis.guranteesCost(),
 			signaturesCost: PredefinedFeeConstants.signaturesCost(signaturesCount),
 			lockFeeCost: includeLockFee ? PredefinedFeeConstants.lockFeeInstructionCost : .zero,
 			notarizingCost: PredefinedFeeConstants.notarizingCost(notaryIsSignatory)
@@ -292,21 +295,6 @@ public struct TransactionFee: Hashable, Sendable {
 			feeSummary: feeSummary,
 			feeLocks: feeLocks
 		)
-	}
-
-	public mutating func updatingSignaturesCost(_ signaturesCount: Int, notaryIsSignatory: Bool) {
-		var feeSummary = feeSummary
-		feeSummary.signaturesCost = PredefinedFeeConstants.signaturesCost(signaturesCount)
-		feeSummary.notarizingCost = PredefinedFeeConstants.notarizingCost(notaryIsSignatory)
-		let mode: Mode = {
-			switch self.mode {
-			case .normal:
-				return .normal(.init(feeSummary: feeSummary, feeLocks: feeLocks))
-			case .advanced:
-				return .advanced(.init(feeSummary: feeSummary, feeLocks: feeLocks))
-			}
-		}()
-		self = .init(feeSummary: feeSummary, feeLocks: feeLocks, mode: mode)
 	}
 
 	public mutating func update(with feeSummaryField: WritableKeyPath<FeeSummary, BigDecimal>, amount: BigDecimal) {
@@ -327,7 +315,7 @@ public struct TransactionFee: Hashable, Sendable {
 		update(with: \.lockFeeCost, amount: PredefinedFeeConstants.lockFeeInstructionCost)
 	}
 
-	public mutating func updateNotarizingCost(_ notaryIsSignatory: Bool) {
+	public mutating func updateNotarizingCost(notaryIsSignatory: Bool) {
 		update(with: \.notarizingCost, amount: PredefinedFeeConstants.notarizingCost(notaryIsSignatory))
 	}
 
@@ -337,7 +325,7 @@ public struct TransactionFee: Hashable, Sendable {
 }
 
 extension ExecutionAnalysis {
-	func guranteesFee() throws -> BigDecimal {
+	func guranteesCost() throws -> BigDecimal {
 		let transaction = try transactionTypes.transactionKind()
 		switch transaction {
 		case .nonConforming:
@@ -488,6 +476,8 @@ extension TransactionFee {
 			self.feeSummary = feeSummary
 			self.paddingFee = (feeSummary.totalExecutionCost + feeSummary.finalizationCost + feeSummary.storageExpansionCost) * PredefinedFeeConstants.networkFeeMultiplier
 			self.tipPercentage = .zero
+
+			/// NonContingent lock will pay for some of the fee.
 			var lock = feeLocks.nonContingentLock
 			lock.negate()
 			self.paidByDapps = lock

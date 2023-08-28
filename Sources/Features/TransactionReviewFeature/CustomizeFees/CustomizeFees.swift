@@ -15,8 +15,9 @@ public struct CustomizeFees: FeatureReducer {
 			reviewedTransaction.feePayerSelection
 		}
 
-		var reviewedTransaction: ReviewedTransaction
 		let manifest: TransactionManifest
+		let signingPurpose: SigningPurpose
+		var reviewedTransaction: ReviewedTransaction
 		var modeState: CustomizationModeState
 
 		var feePayerAccount: Profile.Network.Account? {
@@ -32,10 +33,12 @@ public struct CustomizeFees: FeatureReducer {
 
 		init(
 			reviewedTransaction: ReviewedTransaction,
-			manifest: TransactionManifest
+			manifest: TransactionManifest,
+			signingPurpose: SigningPurpose
 		) {
 			self.reviewedTransaction = reviewedTransaction
 			self.manifest = manifest
+			self.signingPurpose = signingPurpose
 			self.modeState = reviewedTransaction.feePayerSelection.transactionFee.customizationModeState
 		}
 	}
@@ -116,6 +119,7 @@ public struct CustomizeFees: FeatureReducer {
 		case let .destination(.presented(.selectFeePayer(.delegate(.selected(selection))))):
 			let previousFeePayer = state.reviewedTransaction.feePayerSelection.selected
 			state.destination = nil
+			let signingPurpose = state.signingPurpose
 
 			@Sendable
 			func replaceFeePayer(_ feePayer: FeePayerCandidate, _ reviewedTransaction: ReviewedTransaction, manifest: TransactionManifest) -> EffectTask<Action> {
@@ -144,15 +148,15 @@ public struct CustomizeFees: FeatureReducer {
 						let factors = try await factorSourcesClient.getSigningFactors(.init(
 							networkID: reviewedTransaction.networkId,
 							signers: .init(rawValue: Set(newSigners))!,
-							signingPurpose: .signTransaction(.manifestFromDapp)
+							signingPurpose: signingPurpose
 						))
 
 						reviewedTransaction.signingFactors = factors
 						reviewedTransaction.feePayerSelection.selected = selection
 						if previousFeePayer == nil, reviewedTransaction.feePayerSelection.transactionFee.totalFee.max == .zero {
-							/// THe case when NoFeePayer is required, but users chooses to add a FeePayer.
+							/// The case when no FeePayer is required, but users chooses to add a FeePayer.
 							reviewedTransaction.feePayerSelection.transactionFee.addLockFeeCost()
-							reviewedTransaction.feePayerSelection.transactionFee.updateNotarizingCost(false)
+							reviewedTransaction.feePayerSelection.transactionFee.updateNotarizingCost(notaryIsSignatory: false)
 						}
 						reviewedTransaction.feePayerSelection.transactionFee.updateSignaturesCost(factors.expectedSignatureCount)
 						await send(.internal(.updated(.success(reviewedTransaction))))

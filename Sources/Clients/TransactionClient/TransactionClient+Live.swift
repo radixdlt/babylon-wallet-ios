@@ -123,7 +123,8 @@ extension TransactionClient {
 			networkID: NetworkID,
 			transactionFee: TransactionFee,
 			transactionSigners: TransactionSigners,
-			signingFactors: SigningFactors
+			signingFactors: SigningFactors,
+			signingPurpose: SigningPurpose
 		) async throws -> FeePayerSelectionResult {
 			let totalCost = transactionFee.totalFee.max
 			let allSignerEntities = transactionSigners.intentSignerEntitiesOrEmpty()
@@ -161,7 +162,7 @@ extension TransactionClient {
 					let candidateSigningFactors = try await factorSourcesClient.getSigningFactors(.init(
 						networkID: networkID,
 						signers: .init(rawValue: Set(signerEntities))!,
-						signingPurpose: .signTransaction(.manifestFromDapp)
+						signingPurpose: signingPurpose
 					))
 
 					var feeIncludingCandidate = transactionFee
@@ -271,7 +272,7 @@ extension TransactionClient {
 					return try await factorSourcesClient.getSigningFactors(.init(
 						networkID: networkID,
 						signers: nonEmpty,
-						signingPurpose: .signTransaction(.manifestFromDapp)
+						signingPurpose: request.signingPurpose
 					))
 				}
 				return [:]
@@ -303,7 +304,7 @@ extension TransactionClient {
 			/// Total cost > `zero`, recalculate the total by adding lockFee cost.
 			transactionFee.addLockFeeCost()
 			/// Fee Payer is required, thus there will be a signature with user account added
-			transactionFee.updateNotarizingCost(false)
+			transactionFee.updateNotarizingCost(notaryIsSignatory: false)
 
 			/// Select the account that can pay the transaction fee
 			let result = try await feePayerSelectionAmongstCandidates(
@@ -312,7 +313,8 @@ extension TransactionClient {
 				networkID: networkID,
 				transactionFee: transactionFee,
 				transactionSigners: transactionSigners,
-				signingFactors: signingFactors
+				signingFactors: signingFactors,
+				signingPurpose: request.signingPurpose
 			)
 
 			return TransactionToReview(
