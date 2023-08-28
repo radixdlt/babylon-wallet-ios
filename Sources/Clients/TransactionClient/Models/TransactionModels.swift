@@ -537,3 +537,35 @@ extension TransactionFee {
 		}
 	}
 }
+
+extension TransactionFee {
+	#if DEBUG
+	public static var testValue: Self {
+		let feeSummary = TransactionFee.FeeSummary(
+			executionCost: 5,
+			finalizationCost: 5,
+			storageExpansionCost: 5,
+			royaltyCost: 10,
+			guaranteesCost: 5,
+			signaturesCost: 5,
+			lockFeeCost: 5,
+			notarizingCost: 5
+		)
+		return .init(feeSummary: feeSummary, feeLocks: .init(nonContingentLock: .zero, contingentLock: .zero))
+	}
+
+	public static var nonContingentLockPaying: Self {
+		let feeSummary = TransactionFee.FeeSummary(
+			executionCost: 5,
+			finalizationCost: 5,
+			storageExpansionCost: 5,
+			royaltyCost: 10,
+			guaranteesCost: 5,
+			signaturesCost: 5,
+			lockFeeCost: 5,
+			notarizingCost: 5
+		)
+		return .init(feeSummary: feeSummary, feeLocks: .init(nonContingentLock: 100, contingentLock: .zero))
+	}
+	#endif
+}

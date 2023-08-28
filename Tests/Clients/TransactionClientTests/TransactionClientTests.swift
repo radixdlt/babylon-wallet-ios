@@ -250,43 +250,6 @@ extension FactorSource: Comparable {
 	}
 }
 
-extension FactorSource {
-	static func device(_ name: String, olympiaCompat: Bool) -> Self {
-		withDependencies {
-			$0.date = .constant(.init(timeIntervalSince1970: 0))
-		} operation: {
-			let device = try! DeviceFactorSource(
-				id: .device(hash: Data.random(byteCount: 32)),
-				common: .init(
-					cryptoParameters: olympiaCompat ? .olympiaBackwardsCompatible : .babylon
-				),
-				hint: .init(name: name, model: "", mnemonicWordCount: .twentyFour)
-			)
-			return device.embed()
-		}
-	}
-
-	static func ledger(_ name: String, olympiaCompat: Bool) -> Self {
-		withDependencies {
-			$0.date = .constant(.init(timeIntervalSince1970: 0))
-		} operation: {
-			let ledger = try! LedgerHardwareWalletFactorSource(
-				id: .init(kind: .ledgerHQHardwareWallet, hash: Data.random(byteCount: 32)),
-				common: .init(
-					cryptoParameters: olympiaCompat ? .olympiaBackwardsCompatible : .babylon
-				),
-				hint: .init(name: .init(name), model: .nanoS)
-			)
-			return ledger.embed()
-		}
-	}
-
-	static let deviceOne = Self.device("One", olympiaCompat: true)
-	static let deviceTwo = Self.device("Two", olympiaCompat: false)
-	static let ledgerOne = Self.ledger("One", olympiaCompat: false)
-	static let ledgerTwo = Self.ledger("Two", olympiaCompat: true)
-}
-
 extension Profile.Network.Account {
 	static func new(factorSource: FactorSource, index: UInt32) -> Self {
 		try! .init(
