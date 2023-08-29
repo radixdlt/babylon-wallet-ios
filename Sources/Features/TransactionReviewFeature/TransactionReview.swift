@@ -177,18 +177,17 @@ public struct TransactionReview: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .appeared:
-			let manifest = state.transactionManifest
-			return .run { [nonce = state.nonce, message = state.message, notary = state.ephemeralNotaryPrivateKey.publicKey, purpose = state.signTransactionPurpose] send in
+			return .run { [state = state] send in
 				let defaultDepositGuarantees = await appPreferencesClient.getPreferences().transaction.defaultDepositGuarantee
 				await send(.internal(.defaultDepositGuaranteeLoaded(defaultDepositGuarantees)))
 
 				let preview = await TaskResult {
 					try await transactionClient.getTransactionReview(.init(
-						manifestToSign: manifest,
-						message: message,
-						nonce: nonce,
-						ephemeralNotaryPublicKey: notary,
-						signingPurpose: .signTransaction(purpose)
+						manifestToSign: state.transactionManifest,
+						message: state.message,
+						nonce: state.nonce,
+						ephemeralNotaryPublicKey: state.ephemeralNotaryPrivateKey.publicKey,
+						signingPurpose: .signTransaction(state.signTransactionPurpose)
 					))
 				}
 				await send(.internal(.previewLoaded(preview)))

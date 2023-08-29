@@ -244,12 +244,23 @@ extension TransactionClient {
 				involvedEntities: involvedEntites
 			)
 
+			guard let result else {
+				/// Didn't find any suitable default fee payer
+				return TransactionToReview(
+					analyzedManifestToReview: analyzedManifestToReview,
+					networkID: networkID,
+					feePayerSelectionAmongstCandidates: .init(selected: nil, candidates: feePayerCandidates, transactionFee: transactionFee),
+					transactionSigners: transactionSigners,
+					signingFactors: signingFactors
+				)
+			}
+
 			return TransactionToReview(
 				analyzedManifestToReview: analyzedManifestToReview,
 				networkID: networkID,
-				feePayerSelectionAmongstCandidates: .init(selected: result?.payer, candidates: feePayerCandidates, transactionFee: result?.updatedFee ?? transactionFee),
-				transactionSigners: result?.transactionSigners ?? transactionSigners,
-				signingFactors: result?.signingFactors ?? signingFactors
+				feePayerSelectionAmongstCandidates: .init(selected: result.payer, candidates: feePayerCandidates, transactionFee: result.updatedFee),
+				transactionSigners: result.transactionSigners,
+				signingFactors: result.signingFactors
 			)
 		}
 

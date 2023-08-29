@@ -279,7 +279,12 @@ public struct TransactionFee: Hashable, Sendable {
 		self.init(feeSummary: feeSummary, feeLocks: feeLocks, mode: .normal(.init(feeSummary: feeSummary, feeLocks: feeLocks)))
 	}
 
-	public init(executionAnalysis: ExecutionAnalysis, signaturesCount: Int, notaryIsSignatory: Bool, includeLockFee: Bool) throws {
+	public init(
+		executionAnalysis: ExecutionAnalysis,
+		signaturesCount: Int,
+		notaryIsSignatory: Bool,
+		includeLockFee: Bool
+	) throws {
 		let feeSummary: FeeSummary = try .init(
 			executionCost: executionAnalysis.feeSummary.executionCost.asBigDecimal(),
 			finalizationCost: executionAnalysis.feeSummary.finalizationCost.asBigDecimal(),
