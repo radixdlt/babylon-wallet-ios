@@ -17,7 +17,7 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 	// MARK: - Action
 
 	public enum ViewAction: Sendable, Equatable {
-		case viewAppeared
+		case task
 		case rowTapped(AccountPreferences.Section.SectionRow)
 	}
 
@@ -69,7 +69,7 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
-		case .viewAppeared:
+		case .task:
 			return .run { [address = state.account.address] send in
 				for try await accountUpdate in await accountsClient.accountUpdates(address) {
 					guard !Task.isCancelled else { return }

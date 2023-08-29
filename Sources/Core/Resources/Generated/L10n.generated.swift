@@ -327,6 +327,12 @@ public enum L10n {
       /// What are badges?
       public static let whatAreBadges = L10n.tr("Localizable", "assetDetails_badgeDetails_whatAreBadges", fallback: "What are badges?")
     }
+    public enum Behaviors {
+      /// Anyone can freeze this asset in place.
+      public static let canBeFrozeInFutureByAnyone = L10n.tr("Localizable", "assetDetails_behaviors_canBeFrozeInFutureByAnyone", fallback: "Anyone can freeze this asset in place.")
+      /// A third party can freeze this asset in place.
+      public static let canFreezeInFuture = L10n.tr("Localizable", "assetDetails_behaviors_canFreezeInFuture", fallback: "A third party can freeze this asset in place.")
+    }
     public enum HideAsset {
       /// Hide Asset
       public static let button = L10n.tr("Localizable", "assetDetails_hideAsset_button", fallback: "Hide Asset")
@@ -1612,6 +1618,8 @@ public enum L10n {
       public static let padding = L10n.tr("Localizable", "transactionReview_customizeNetworkFeeSheet_padding", fallback: "Padding")
       /// Adjust Fee Padding Amount (XRD)
       public static let paddingFieldLabel = L10n.tr("Localizable", "transactionReview_customizeNetworkFeeSheet_paddingFieldLabel", fallback: "Adjust Fee Padding Amount (XRD)")
+      /// Paid by dApps
+      public static let paidByDApps = L10n.tr("Localizable", "transactionReview_customizeNetworkFeeSheet_paidByDApps", fallback: "Paid by dApps")
       /// Pay fee from
       public static let payFeeFrom = L10n.tr("Localizable", "transactionReview_customizeNetworkFeeSheet_payFeeFrom", fallback: "Pay fee from")
       /// Royalties
