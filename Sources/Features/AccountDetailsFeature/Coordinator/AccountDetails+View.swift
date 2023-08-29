@@ -12,7 +12,8 @@ extension AccountDetails.State {
 			accountAddress: account.address,
 			appearanceID: account.appearanceID,
 			displayName: account.displayName.rawValue,
-			callToAction: callToAction
+			needToImportMnemonicForThisAccount: needToImportMnemonicForThisAccount,
+			needToBackupMnemonicForThisAccount: needToBackupMnemonicForThisAccount
 		)
 	}
 }
@@ -23,7 +24,8 @@ extension AccountDetails {
 		let accountAddress: AccountAddress
 		let appearanceID: Profile.Network.Account.AppearanceID
 		let displayName: String
-		let callToAction: AccountDetails.State.CallToAction?
+		let needToImportMnemonicForThisAccount: Bool
+		let needToBackupMnemonicForThisAccount: Bool
 	}
 
 	@MainActor
@@ -43,14 +45,11 @@ extension AccountDetails {
 						.padding(.bottom, .medium1)
 
 					Group {
-						if let callToAction = viewStore.callToAction {
-							switch callToAction {
-							case .needToBackupMnemonicForThisAccount:
-								exportMnemonicPromptView(viewStore)
-
-							case .needToImportMnemonicForThisAccount:
-								recoverMnemonicsPromptView(viewStore)
-							}
+						// Mutally exclusive to prompt user to recover and backup mnemonic.
+						if viewStore.needToImportMnemonicForThisAccount {
+							recoverMnemonicsPromptView(viewStore)
+						} else if viewStore.needToBackupMnemonicForThisAccount {
+							exportMnemonicPromptView(viewStore)
 						}
 					}
 					.padding(.medium1)

@@ -150,21 +150,22 @@ public struct Home: Sendable, FeatureReducer {
 
 			state.destination = .accountDetails(.init(
 				for: account,
-				callToAction: needToImportMnemonicForThisAccount ? .needToImportMnemonicForThisAccount : (needToBackupMnemonicForThisAccount ? .needToBackupMnemonicForThisAccount : nil)
+				needToImportMnemonicForThisAccount: needToImportMnemonicForThisAccount,
+				needToBackupMnemonicForThisAccount: needToBackupMnemonicForThisAccount
 			))
 			return .none
 
 		case let .accountList(.delegate(.backUpMnemonic(controllingAccount))):
 			state.destination = .accountDetails(.init(
 				for: controllingAccount,
-				callToAction: .needToBackupMnemonicForThisAccount
+				needToBackupMnemonicForThisAccount: true
 			))
 			return .none
 
 		case let .accountList(.delegate(.importMnemonics(account))):
 			state.destination = .accountDetails(.init(
 				for: account,
-				callToAction: .needToImportMnemonicForThisAccount
+				needToImportMnemonicForThisAccount: true
 			))
 			return .none
 

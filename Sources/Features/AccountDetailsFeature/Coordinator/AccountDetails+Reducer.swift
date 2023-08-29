@@ -14,12 +14,8 @@ public struct AccountDetails: Sendable, FeatureReducer {
 		var account: Profile.Network.Account
 		var assets: AssetsView.State
 
-		public enum CallToAction: Sendable, Hashable {
-			case needToBackupMnemonicForThisAccount
-			case needToImportMnemonicForThisAccount
-		}
-
-		public var callToAction: CallToAction?
+		public var needToImportMnemonicForThisAccount: Bool
+		public var needToBackupMnemonicForThisAccount: Bool
 
 		@PresentationState
 		var destination: Destinations.State?
@@ -33,11 +29,13 @@ public struct AccountDetails: Sendable, FeatureReducer {
 
 		public init(
 			for account: Profile.Network.Account,
-			callToAction: CallToAction? = nil
+			needToImportMnemonicForThisAccount: Bool = false,
+			needToBackupMnemonicForThisAccount: Bool = false
 		) {
 			self.account = account
 			self.assets = AssetsView.State(account: account, mode: .normal)
-			self.callToAction = callToAction
+			self.needToImportMnemonicForThisAccount = needToImportMnemonicForThisAccount
+			self.needToBackupMnemonicForThisAccount = needToBackupMnemonicForThisAccount
 		}
 	}
 
@@ -169,7 +167,14 @@ public struct AccountDetails: Sendable, FeatureReducer {
 		case .assets(.child(.fungibleTokenList(.delegate))):
 			return .none
 
-		case .destination(.presented(.exportMnemonic(.delegate(.doneViewing)))):
+		case let .destination(.presented(.exportMnemonic(.delegate(.doneViewing(markedMnemonicAsBackedUp))))):
+			if
+				let justBackedUp = markedMnemonicAsBackedUp,
+				state.needToBackupMnemonicForThisAccount,
+				justBackedUp
+			{
+				state.needToBackupMnemonicForThisAccount = false
+			}
 			state.destination = nil
 			return .none
 
@@ -177,13 +182,14 @@ public struct AccountDetails: Sendable, FeatureReducer {
 			switch delegateAction {
 			case .closeButtonTapped, .failedToImportAllRequiredMnemonics:
 				break
-			case let .finishedImportingMnemonics(skipped, imported):
+			case let .finishedImportingMnemonics(_, imported):
 				if
-					let cta = state.callToAction,
-					case .needToImportMnemonicForThisAccount = cta,
 					imported.contains(where: { $0.factorSourceID == state.deviceControlledFactorInstance.factorSourceID })
 				{
-					state.callToAction = nil
+					state.needToImportMnemonicForThisAccount = false
+
+					// It makes no sense to prompt user to back up a mnemonic she *just* imported.
+					state.needToBackupMnemonicForThisAccount = false
 				}
 			}
 			state.destination = nil

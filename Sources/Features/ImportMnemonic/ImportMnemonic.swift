@@ -229,7 +229,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 		case persistedNewFactorSourceInProfile(FactorSource)
 		case persistedMnemonicInKeychainOnly(MnemonicWithPassphrase, FactorSourceID.FromHash)
 		case notPersisted(MnemonicWithPassphrase)
-		case doneViewing
+		case doneViewing(markedMnemonicAsBackedUp: Bool? = nil) // `nil` means it was already marked as backed up
 	}
 
 	public struct Destinations: Sendable, ReducerProtocol {
@@ -329,7 +329,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 		case let .destination(.presented(.markMnemonicAsBackedUp(.userHaveBackedUp(factorSourceID)))):
 			return .run { send in
 				try await userDefaultsClient.addFactorSourceIDOfBackedUpMnemonic(factorSourceID)
-				await send(.delegate(.doneViewing))
+				await send(.delegate(.doneViewing(markedMnemonicAsBackedUp: true)))
 			} catch: { error, _ in
 				loggerGlobal.error("Failed to save mnemonic as backed up")
 				errorQueue.schedule(error)
@@ -337,7 +337,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 
 		case .destination(.presented(.markMnemonicAsBackedUp(.userHaveNotBackedUp))):
 			loggerGlobal.notice("User have not backed up")
-			return .send(.delegate(.doneViewing))
+			return .send(.delegate(.doneViewing(markedMnemonicAsBackedUp: false)))
 
 		default:
 			return .none
@@ -465,7 +465,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 
 		let listOfBackedUpMnemonics = userDefaultsClient.getFactorSourceIDOfBackedUpMnemonics()
 		if listOfBackedUpMnemonics.contains(factorSourceID) {
-			return .send(.delegate(.doneViewing)) // user has already marked this mnemonic as "backed up"
+			return .send(.delegate(.doneViewing(markedMnemonicAsBackedUp: nil))) // user has already marked this mnemonic as "backed up"
 		} else {
 			state.destination = .askUserIfSheHasBackedUpMnemonic(factorSourceID)
 			return .none
