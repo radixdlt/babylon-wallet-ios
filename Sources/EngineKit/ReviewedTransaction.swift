@@ -3,7 +3,19 @@ import Foundation
 
 // MARK: - TransactionKind
 public enum TransactionKind: Hashable, Sendable {
-	case conforming(TransactionType.GeneralTransaction)
+	public enum ConformingTransaction: Hashable, Sendable {
+		case general(TransactionType.GeneralTransaction)
+		case accountDepositSettings(TransactionType.AccountDepositSettings)
+
+		public var general: TransactionType.GeneralTransaction? {
+			guard case let .general(wrapped) = self else {
+				return nil
+			}
+			return wrapped
+		}
+	}
+
+	case conforming(ConformingTransaction)
 	case nonConforming
 }
 
@@ -14,8 +26,8 @@ extension [TransactionType] {
 			return .nonConforming
 		}
 
-		// First try to get the general transaction, if missing then convert the first transaction to general transaction
-		return try firstNonNil(\.generalTransaction).map(TransactionKind.conforming) ?? first!.transactionKind()
+		// First try to get the general transaction if present
+		return try firstNonNil(\.generalTransaction).map { .conforming(.general($0)) } ?? first!.transactionKind()
 	}
 }
 
@@ -52,6 +64,12 @@ extension TransactionType {
 		}
 	}
 
+	public struct AccountDepositSettings: Hashable, Sendable {
+		public let resourcePreferenceChanges: [AccountAddress: [ResourceAddress: ResourcePreferenceAction]]
+		public let defaultDepositRuleChanges: [AccountAddress: AccountDefaultDepositRule]
+		public let authorizedDepositorsChanges: [AccountAddress: AuthorizedDepositorsChanges]
+	}
+
 	public func transactionKind() throws -> TransactionKind {
 		switch self {
 		case let .simpleTransfer(from, to, transferred):
@@ -63,7 +81,7 @@ extension TransactionType {
 				partialResult[address.entityType(), default: []].append(address)
 			}
 
-			return .conforming(
+			return .conforming(.general(
 				.init(
 					accountProofs: [],
 					accountWithdraws: [from.addressString(): [transferred.toResourceTracker]],
@@ -73,7 +91,7 @@ extension TransactionType {
 					dataOfNewlyMintedNonFungibles: [:],
 					addressesOfNewlyCreatedEntities: []
 				)
-			)
+			))
 
 		case let .transfer(from, transfers):
 			var withdraws: [String: ResourceTracker] = [:]
@@ -132,7 +150,7 @@ extension TransactionType {
 				partialResult[address.entityType(), default: []].append(address)
 			}
 
-			return .conforming(
+			return .conforming(.general(
 				.init(
 					accountProofs: [],
 					accountWithdraws: [from.addressString(): Array(withdraws.values)],
@@ -142,9 +160,9 @@ extension TransactionType {
 					dataOfNewlyMintedNonFungibles: [:],
 					addressesOfNewlyCreatedEntities: []
 				)
-			)
+			))
 		case let .generalTransaction(accountProofs, accountWithdraws, accountDeposits, addressesInManifest, metadataOfNewlyCreatedEntities, dataOfNewlyMintedNonFungibles, addressesOfNewlyCreatedEntities):
-			return .conforming(
+			return .conforming(.general(
 				.init(
 					accountProofs: accountProofs,
 					accountWithdraws: accountWithdraws,
@@ -154,10 +172,30 @@ extension TransactionType {
 					dataOfNewlyMintedNonFungibles: dataOfNewlyMintedNonFungibles,
 					addressesOfNewlyCreatedEntities: addressesOfNewlyCreatedEntities
 				)
-			)
-		case .accountDepositSettings:
-			return .nonConforming
+			))
+		case let .accountDepositSettings(resourcePreferenceChanges, defaultDepositRuleChanges, authorizedDepositorsChanges):
+			return try .conforming(.accountDepositSettings(
+				.init(resourcePreferenceChanges: resourcePreferenceChanges.mapKeyValues(AccountAddress.init(validatingAddress:), fValue: {
+					try $0.mapKeys(ResourceAddress.init(validatingAddress:))
+				}),
+				defaultDepositRuleChanges: defaultDepositRuleChanges.mapKeys(AccountAddress.init(validatingAddress:)),
+				authorizedDepositorsChanges: authorizedDepositorsChanges.mapKeys(AccountAddress.init(validatingAddress:)))
+			))
 		}
+	}
+}
+
+extension Dictionary {
+	func mapKeys<U>(_ f: (Key) throws -> U) throws -> [U: Value] {
+		try .init(uniqueKeysWithValues: map {
+			try (f($0.key), $0.value)
+		})
+	}
+
+	func mapKeyValues<U, T>(_ fKey: (Key) throws -> U, fValue: (Value) throws -> T) throws -> [U: T] {
+		try .init(uniqueKeysWithValues: map {
+			try (fKey($0.key), fValue($0.value))
+		})
 	}
 }
 

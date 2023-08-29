@@ -12,14 +12,17 @@ public struct ManageThirdPartyDeposits: FeatureReducer, Sendable {
 		var account: Profile.Network.Account
 
 		var depositRule: ThirdPartyDeposits.DepositRule {
-			account.onLedgerSettings.thirdPartyDeposits.depositRule
+			thirdPartyDeposits.depositRule
 		}
+
+		var thirdPartyDeposits: ThirdPartyDeposits
 
 		@PresentationState
 		var destinations: Destinations.State? = nil
 
 		init(account: Profile.Network.Account) {
 			self.account = account
+			self.thirdPartyDeposits = account.onLedgerSettings.thirdPartyDeposits
 		}
 	}
 
@@ -72,18 +75,18 @@ public struct ManageThirdPartyDeposits: FeatureReducer, Sendable {
 		case let .rowTapped(row):
 			switch row {
 			case let .depositRule(rule):
-				state.account.onLedgerSettings.thirdPartyDeposits.depositRule = rule
+				state.thirdPartyDeposits.depositRule = rule
 
 			case .allowDenyAssets:
 				state.destinations = .allowDenyAssets(.init(
 					mode: .allowDenyAssets(.allow),
-					thirdPartyDeposits: state.account.onLedgerSettings.thirdPartyDeposits
+					thirdPartyDeposits: state.thirdPartyDeposits
 				))
 
 			case .allowDepositors:
 				state.destinations = .allowDepositors(.init(
 					mode: .allowDepositors,
-					thirdPartyDeposits: state.account.onLedgerSettings.thirdPartyDeposits
+					thirdPartyDeposits: state.thirdPartyDeposits
 				))
 			}
 			return .none
@@ -143,12 +146,11 @@ public struct ManageThirdPartyDeposits: FeatureReducer, Sendable {
 				}
 			}.build(networkId: state.account.networkID.rawValue)
 
+			state.account.onLedgerSettings.thirdPartyDeposits = localConfig
 			return .run { [account = state.account] _ in
 				do {
-					try await dappInteractionClient.addWalletInteraction(.transaction(.init(send: .init(version: .default, transactionManifest: manifest, message: "Update third party deposits"))))
-					// try await accountsClient.updateAccount(account)
-					// TODO: schedule TX
-					// await send(.delegate(.accountUpdated))
+					try await dappInteractionClient.addWalletInteraction(.transaction(.init(send: .init(version: .default, transactionManifest: manifest, message: nil))))
+					try await accountsClient.updateAccount(account)
 				} catch {
 					errorQueue.schedule(error)
 				}
@@ -160,7 +162,7 @@ public struct ManageThirdPartyDeposits: FeatureReducer, Sendable {
 		switch childAction {
 		case let .destinations(.presented(.allowDenyAssets(.delegate(.updated(thirdPartyDeposits))))),
 		     let .destinations(.presented(.allowDepositors(.delegate(.updated(thirdPartyDeposits))))):
-			state.account.onLedgerSettings.thirdPartyDeposits = thirdPartyDeposits
+			state.thirdPartyDeposits = thirdPartyDeposits
 			return .none
 		case .destinations:
 			return .none
@@ -235,9 +237,9 @@ extension ThirdPartyDeposits.DepositorAddress {
 	var manifestValue: ManifestBuilderValue {
 		switch self {
 		case let .resourceAddress(resourceAddress):
-			return try! .enumValue(discriminator: 0, fields: [.addressValue(value: resourceAddress.intoManifestBuilderAddress())])
+			return try! .enumValue(discriminator: 1, fields: [.addressValue(value: resourceAddress.intoManifestBuilderAddress())])
 		case let .nonFungibleGlobalID(nft):
-			return .enumValue(discriminator: 1, fields: [.nonFungibleLocalIdValue(value: nft.localId())])
+			return .enumValue(discriminator: 0, fields: [.nonFungibleLocalIdValue(value: nft.localId())])
 		}
 	}
 }
