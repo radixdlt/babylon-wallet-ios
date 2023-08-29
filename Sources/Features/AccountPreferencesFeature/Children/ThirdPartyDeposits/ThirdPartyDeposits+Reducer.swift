@@ -275,7 +275,7 @@ extension ManifestBuilder {
 		try callMethod(
 			address: account.intoManifestBuilderAddress(),
 			methodName: "add_authorized_depositor",
-			args: [depositorAddress.manifestValue]
+			args: [depositorAddress.manifestValue()]
 		)
 	}
 
@@ -286,18 +286,18 @@ extension ManifestBuilder {
 		try callMethod(
 			address: account.intoManifestBuilderAddress(),
 			methodName: "remove_authorized_depositor",
-			args: [depositorAddress.manifestValue]
+			args: [depositorAddress.manifestValue()]
 		)
 	}
 }
 
 extension ThirdPartyDeposits.DepositorAddress {
-	var manifestValue: ManifestBuilderValue {
+	func manifestValue() throws -> ManifestBuilderValue {
 		switch self {
 		case let .resourceAddress(resourceAddress):
-			return try! .enumValue(discriminator: 1, fields: [.addressValue(value: resourceAddress.intoManifestBuilderAddress())])
+			return try .enumValue(discriminator: 1, fields: [.addressValue(value: resourceAddress.intoManifestBuilderAddress())])
 		case let .nonFungibleGlobalID(nft):
-			return .enumValue(discriminator: 0, fields: [.nonFungibleLocalIdValue(value: nft.localId())])
+			return .enumValue(discriminator: 0, fields: [.tupleValue(fields: [.addressValue(value: .static(value: nft.resourceAddress())), .nonFungibleLocalIdValue(value: nft.localId())])])
 		}
 	}
 }

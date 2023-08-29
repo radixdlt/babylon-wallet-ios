@@ -56,7 +56,7 @@ extension AccountDepositSettingsChange {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				InnerCard {
 					SmallAccountCard(account: viewStore.account)
-					VStack {
+					VStack(spacing: .medium3) {
 						if let depositRuleChange = viewStore.depositRuleChange {
 							Text(depositRuleChange.string)
 								.foregroundColor(.app.gray1)
@@ -96,7 +96,7 @@ extension AccountDepositSettingsChange.State.ResourceChange.Change {
 		case .authorizedDepositorAdded:
 			return "Allow Depositor"
 		case .authorizedDepositorRemoved:
-			return "Claer Depositor"
+			return "Clear Depositor"
 		}
 	}
 }
