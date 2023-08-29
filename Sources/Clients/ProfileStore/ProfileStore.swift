@@ -636,15 +636,15 @@ struct EphemeralProfile: Sendable, Hashable {
 }
 
 extension UserDefaultsClient {
-	func getActiveProfileID() -> ProfileSnapshot.Header.ID? {
+	public func getActiveProfileID() -> ProfileSnapshot.Header.ID? {
 		stringForKey(.activeProfileID).flatMap(UUID.init(uuidString:))
 	}
 
-	func setActiveProfileID(_ id: ProfileSnapshot.Header.UsedDeviceInfo.ID) async {
+	public func setActiveProfileID(_ id: ProfileSnapshot.Header.UsedDeviceInfo.ID) async {
 		await setString(id.uuidString, .activeProfileID)
 	}
 
-	func removeActiveProfileID() async {
+	public func removeActiveProfileID() async {
 		await remove(.activeProfileID)
 	}
 }

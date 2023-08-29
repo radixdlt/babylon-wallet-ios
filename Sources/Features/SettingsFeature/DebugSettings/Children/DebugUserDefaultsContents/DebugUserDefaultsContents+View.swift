@@ -2,14 +2,14 @@ import FeaturePrelude
 
 extension DebugUserDefaultsContents.State {
 	var viewState: DebugUserDefaultsContents.ViewState {
-		.init()
+		.init(keyedValues: keyedValues)
 	}
 }
 
 // MARK: - DebugUserDefaultsContents.View
 extension DebugUserDefaultsContents {
 	public struct ViewState: Equatable {
-		// TODO: declare some properties
+		public let keyedValues: IdentifiedArrayOf<DebugUserDefaultsContents.State.KeyValues>
 	}
 
 	@MainActor
@@ -22,11 +22,20 @@ extension DebugUserDefaultsContents {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-				// TODO: implement
-				Text("Implement: DebugUserDefaultsContents")
-					.background(Color.yellow)
-					.foregroundColor(.red)
-					.onAppear { viewStore.send(.appeared) }
+				ScrollView {
+					Form {
+						ForEach(viewStore.keyedValues) { keyValue in
+							Section("\(keyValue.key.rawValue)") {
+								ForEach(keyValue.values, id: \.self) {
+									Text("\($0)")
+								}
+							}
+						}
+					}
+				}
+				.onAppear {
+					viewStore.send(.appeared)
+				}
 			}
 		}
 	}
