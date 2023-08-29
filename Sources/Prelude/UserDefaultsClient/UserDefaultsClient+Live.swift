@@ -17,8 +17,8 @@ extension UserDefaultsClient: DependencyKey {
 			setData: { userDefaults().set($0, forKey: $1.rawValue) },
 			setDouble: { userDefaults().set($0, forKey: $1.rawValue) },
 			setInteger: { userDefaults().set($0, forKey: $1.rawValue) },
-			removeAll: {
-				for key in Key.allCases {
+			removeAll: { exceptions in
+				for key in Set(Key.allCases).subtracting(exceptions) {
 					await removeValueForKey(key)
 				}
 			}

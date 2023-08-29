@@ -22,17 +22,42 @@ extension DebugUserDefaultsContents {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-				ScrollView {
+				VStack(alignment: .leading) {
 					Form {
 						ForEach(viewStore.keyedValues) { keyValue in
-							Section("\(keyValue.key.rawValue)") {
-								ForEach(keyValue.values, id: \.self) {
-									Text("\($0)")
+							VStack(alignment: .leading) {
+								Text("`\(keyValue.key.rawValue)`")
+									.textStyle(.body1Header)
+
+								if keyValue.values.isEmpty {
+									Text("NO VALUES FOR KEY")
+								} else {
+									VStack(alignment: .leading) {
+										ForEach(keyValue.values, id: \.self) { value in
+
+											HStack(spacing: .small1) {
+												Text("*")
+												Text("`\"\(value)\"`")
+												Spacer(minLength: 0)
+											}
+											.multilineTextAlignment(.leading)
+											.textStyle(.body2Regular)
+											.frame(maxWidth: .infinity)
+										}
+									}
 								}
 							}
+							.frame(maxWidth: .infinity)
 						}
 					}
+
+					Button("Delete All but Profile.ID") {
+						viewStore.send(.removeAllButtonTapped)
+					}
+					.padding()
+					.buttonStyle(.primaryRectangular(isDestructive: true))
 				}
+
 				.onAppear {
 					viewStore.send(.appeared)
 				}

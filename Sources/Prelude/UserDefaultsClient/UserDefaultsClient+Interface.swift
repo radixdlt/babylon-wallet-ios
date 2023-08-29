@@ -25,7 +25,7 @@ public struct UserDefaultsClient: Sendable {
 	public var setData: @Sendable (Data?, Key) async -> Void
 	public var setDouble: @Sendable (Double, Key) async -> Void
 	public var setInteger: @Sendable (Int, Key) async -> Void
-	public var removeAll: @Sendable () async -> Void
+	public var removeAll: @Sendable (Set<Key>) async -> Void
 }
 
 extension UserDefaultsClient {
@@ -47,6 +47,10 @@ extension UserDefaultsClient {
 }
 
 extension UserDefaultsClient {
+	public func removeAll(but exceptions: Set<Key> = []) async {
+		await removeAll(exceptions)
+	}
+
 	public var hideMigrateOlympiaButton: Bool {
 		boolForKey(.hideMigrateOlympiaButton)
 	}

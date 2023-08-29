@@ -40,7 +40,7 @@ extension UserDefaultsClient {
 		setData: { _, _ in },
 		setDouble: { _, _ in },
 		setInteger: { _, _ in },
-		removeAll: {}
+		removeAll: { _ in }
 	)
 
 	public mutating func override(bool: Bool, forKey key: Key) {

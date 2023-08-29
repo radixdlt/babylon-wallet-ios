@@ -20,6 +20,11 @@ public struct DebugUserDefaultsContents: Sendable, FeatureReducer {
 
 	public enum ViewAction: Sendable, Equatable {
 		case appeared
+		case removeAllButtonTapped
+	}
+
+	public enum InternalAction: Sendable, Equatable {
+		case removedAll
 	}
 
 	@Dependency(\.userDefaultsClient) var userDefaultsClient
@@ -28,14 +33,34 @@ public struct DebugUserDefaultsContents: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .appeared:
-			state.keyedValues = IdentifiedArrayOf(uniqueElements: UserDefaultsClient.Key.allCases.map {
-				DebugUserDefaultsContents.State.KeyValues(
-					key: $0,
-					values: $0.valuesForKey()
-				)
-			})
+			loadKeyValues(into: &state)
+			return .none
+
+		case .removeAllButtonTapped:
+			return .task {
+				await userDefaultsClient.removeAll(but: [.activeProfileID])
+				return .internal(.removedAll)
+			}
+		}
+	}
+
+	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
+		switch internalAction {
+		case .removedAll:
+			loadKeyValues(into: &state)
 			return .none
 		}
+	}
+
+	private func loadKeyValues(into state: inout State) {
+		loggerGlobal.feature("BEFORE keyedValues: \(state.keyedValues)")
+		state.keyedValues = IdentifiedArrayOf(uniqueElements: UserDefaultsClient.Key.allCases.map {
+			DebugUserDefaultsContents.State.KeyValues(
+				key: $0,
+				values: $0.valuesForKey()
+			)
+		})
+		loggerGlobal.feature("AFTER keyedValues: \(state.keyedValues)")
 	}
 }
 
