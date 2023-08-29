@@ -99,8 +99,13 @@ public struct ManageThirdPartyDeposits: FeatureReducer, Sendable {
 			}
 			return .none
 		case .updateTapped:
-			let (manifest, updatedAccount) = prepareForSubmission(state)
-			return submitTransaction(manifest, updatedAccount: updatedAccount)
+			do {
+				let (manifest, updatedAccount) = try prepareForSubmission(state)
+				return submitTransaction(manifest, updatedAccount: updatedAccount)
+			} catch {
+				errorQueue.schedule(error)
+				return .none
+			}
 		}
 	}
 
@@ -165,7 +170,7 @@ public struct ManageThirdPartyDeposits: FeatureReducer, Sendable {
 		}
 	}
 
-	private func prepareForSubmission(_ state: State) -> (manifest: TransactionManifest, account: Profile.Network.Account) {
+	private func prepareForSubmission(_ state: State) throws -> (manifest: TransactionManifest, account: Profile.Network.Account) {
 		// Are there any updates
 
 		let onLedgerConfig = state.account.onLedgerSettings.thirdPartyDeposits
@@ -195,7 +200,7 @@ public struct ManageThirdPartyDeposits: FeatureReducer, Sendable {
 
 		let accountAddress = state.account.address
 
-		let manifest = try! ManifestBuilder.make {
+		let manifest = try ManifestBuilder.make {
 			if let depositorRule {
 				ManifestBuilder.setDefaultDepositorRule(accountAddress, depositorRule)
 			}

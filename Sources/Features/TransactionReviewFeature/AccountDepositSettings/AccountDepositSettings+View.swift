@@ -61,7 +61,6 @@ extension AccountDepositSettingsChange {
 							Text(depositRuleChange.string)
 								.foregroundColor(.app.gray1)
 								.textStyle(.body1Regular)
-								.padding(.medium3)
 						}
 						ForEach(viewStore.resourceChanges) { resourceChange in
 							Separator()
@@ -73,10 +72,11 @@ extension AccountDepositSettingsChange {
 										.textStyle(.secondaryHeader)
 										.foregroundColor(.app.gray1)
 								}
-								.padding(.medium3)
 							}
 						}
 					}
+					.padding(.medium3)
+					.frame(maxWidth: .infinity)
 					.background(.app.gray5)
 				}
 			}

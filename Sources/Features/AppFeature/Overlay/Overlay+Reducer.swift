@@ -115,7 +115,8 @@ struct OverlayReducer: Sendable, FeatureReducer {
 	func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
 		case .destination(.dismiss):
-			return dismiss(&state)
+			return dismissItem(&state)
+
 		case let .destination(.presented(.alert(action))):
 			if let item = state.itemsQueue.first, case let .alert(state) = item {
 				overlayWindowClient.sendAlertAction(action, state.id)
@@ -123,7 +124,10 @@ struct OverlayReducer: Sendable, FeatureReducer {
 			return .none
 
 		case .hud(.presented(.delegate(.dismiss))):
-			return dismiss(&state)
+			return dismissHUD(&state)
+
+		case .hud(.dismiss):
+			return dismissHUD(&state)
 
 		default:
 			return .none
@@ -172,14 +176,20 @@ struct OverlayReducer: Sendable, FeatureReducer {
 			overlayWindowClient.sendAlertAction(action, state.id)
 		}
 
-		return dismiss(&state)
+		return dismissItem(&state)
 	}
 
-	private func dismiss(_ state: inout State) -> EffectTask<Action> {
+	private func dismissItem(_ state: inout State) -> EffectTask<Action> {
 		state.destination = nil
 		state.itemsQueue.removeFirst()
 		return setIsUserInteractionEnabled(&state, isEnabled: false)
 			.concatenate(with: showItemIfPossible(state: &state))
+	}
+
+	private func dismissHUD(_ state: inout State) -> EffectTask<Action> {
+		state.hud = nil
+		state.hudItemsQueue.removeFirst()
+		return showHUDIfAvailable(state: &state)
 	}
 
 	/// Sets the interaction enabled on the window, by implication this will also enable/disable the interaction
