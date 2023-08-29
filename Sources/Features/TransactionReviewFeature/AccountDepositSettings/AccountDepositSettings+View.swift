@@ -59,19 +59,22 @@ extension AccountDepositSettingsChange {
 					VStack {
 						if let depositRuleChange = viewStore.depositRuleChange {
 							Text(depositRuleChange.string)
+								.foregroundColor(.app.gray1)
+								.textStyle(.body1Regular)
 								.padding(.medium3)
 						}
 						ForEach(viewStore.resourceChanges) { resourceChange in
 							Separator()
-							HStack {
-								ResourceIconNameView(resource: resourceChange.resource)
-								Spacer(minLength: .zero)
-								Text(resourceChange.change.string)
-									.textStyle(.secondaryHeader)
-									.foregroundColor(.app.gray1)
+							Button(action: { viewStore.send(.assetTapped(resourceChange.resource)) }) {
+								HStack {
+									ResourceIconNameView(resource: resourceChange.resource)
+									Spacer(minLength: .zero)
+									Text(resourceChange.change.string)
+										.textStyle(.secondaryHeader)
+										.foregroundColor(.app.gray1)
+								}
+								.padding(.medium3)
 							}
-							// .frame(height: .largeButtonHeight)
-							.padding(.medium3)
 						}
 					}
 					.background(.app.gray5)
