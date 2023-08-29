@@ -26,9 +26,13 @@ extension UserDefaultsClient {
 
 extension UserDefaultsClient {
 	public func addFactorSourceIDOfBackedUpMnemonic(_ factorSourceID: FactorSourceID.FromHash) async throws {
+		print("adding \(factorSourceID) to mnemonicsUserClaimsToHaveBackedUp")
 		var ids = getFactorSourceIDOfBackedUpMnemonics()
+		print("READ mnemonicsUserClaimsToHaveBackedUp: \(ids)")
 		ids.append(factorSourceID)
+		print("UPDATED (not saved) mnemonicsUserClaimsToHaveBackedUp: \(ids)")
 		try await save(codable: ids, forKey: .mnemonicsUserClaimsToHaveBackedUp)
+		print("after save of mnemonicsUserClaimsToHaveBackedUp: \(getFactorSourceIDOfBackedUpMnemonics())")
 	}
 
 	public func getFactorSourceIDOfBackedUpMnemonics() -> OrderedSet<FactorSourceID.FromHash> {

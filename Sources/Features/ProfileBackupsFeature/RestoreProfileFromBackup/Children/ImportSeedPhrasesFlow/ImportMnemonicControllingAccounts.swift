@@ -156,7 +156,8 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 						loggerGlobal.error("Failed to remove addresses from list of those that need recovery")
 					}
 
-					await userDefaultsClient.removeAllFactorSourceIDsOfBackedUpMnemonics()
+					await userDefaultsClient.removeAccountsThatNeedRecoveryIfNeeded(accounts)
+					await userDefaultsClient.addFactorSourceIDOfBackedUpMnemonic(privateHDFactorSource.factorSource.id)
 
 					try await secureStorageClient.saveMnemonicForFactorSource(
 						privateHDFactorSource

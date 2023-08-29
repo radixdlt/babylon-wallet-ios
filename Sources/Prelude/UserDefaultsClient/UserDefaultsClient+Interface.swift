@@ -50,7 +50,9 @@ extension UserDefaultsClient {
 	public func removeAll(but exceptions: Set<Key> = []) async {
 		await removeAll(exceptions)
 	}
+}
 
+extension UserDefaultsClient {
 	public var hideMigrateOlympiaButton: Bool {
 		boolForKey(.hideMigrateOlympiaButton)
 	}
