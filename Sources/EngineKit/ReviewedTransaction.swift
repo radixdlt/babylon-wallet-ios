@@ -187,15 +187,21 @@ extension TransactionType {
 
 extension Dictionary {
 	func mapKeys<U>(_ f: (Key) throws -> U) throws -> [U: Value] {
-		try .init(uniqueKeysWithValues: map {
-			try (f($0.key), $0.value)
-		})
+		try .init(
+			map {
+				try (f($0.key), $0.value)
+			},
+			uniquingKeysWith: { first, _ in first }
+		)
 	}
 
 	func mapKeyValues<U, T>(_ fKey: (Key) throws -> U, fValue: (Value) throws -> T) throws -> [U: T] {
-		try .init(uniqueKeysWithValues: map {
-			try (fKey($0.key), fValue($0.value))
-		})
+		try .init(
+			map {
+				try (fKey($0.key), fValue($0.value))
+			},
+			uniquingKeysWith: { first, _ in first }
+		)
 	}
 }
 

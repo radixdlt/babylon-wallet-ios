@@ -86,6 +86,7 @@ extension AccountDepositSettingsChange {
 
 extension AccountDepositSettingsChange.State.ResourceChange.Change {
 	var string: String {
+		// FIXME: Strings
 		switch self {
 		case .resourcePreference(.remove):
 			return "Clear Exception"
@@ -103,6 +104,7 @@ extension AccountDepositSettingsChange.State.ResourceChange.Change {
 
 extension AccountDefaultDepositRule {
 	var string: String {
+		// FIXME: Strings
 		switch self {
 		case .accept:
 			return "Allow third parties to deposit any asset to this account."

@@ -220,7 +220,8 @@ public struct ManageThirdPartyDeposits: FeatureReducer, Sendable {
 			for depositorAddress in depositorAddressesToAdd {
 				ManifestBuilder.addAuthorizedDepositor(accountAddress, depositorAddress)
 			}
-		}.build(networkId: state.account.networkID.rawValue)
+		}
+		.build(networkId: state.account.networkID.rawValue)
 
 		var updatedAccount = state.account
 		updatedAccount.onLedgerSettings.thirdPartyDeposits = localConfig
