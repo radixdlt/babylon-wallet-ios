@@ -1,4 +1,5 @@
-"homePage_applySecuritySettings" = "Please back up your seed phrase";
+"homePage_securityPromptBackup" = "Please back up your seed phrase";
+"homePage_securityPromptRecover" = "Please recover your seed phrase";
 "homePage_backedUpMnemonicHeading" = "I have backed up this seed phrase";
 "homePage_createNewAccount" = "Create a New Account";
 "homePage_legacyAccountHeading" = "Legacy";
@@ -572,6 +573,8 @@
 "displayMnemonics_cautionAlert_revealButtonLabel" = "Reveal Seed Phrase";
 "displayMnemonics_cautionAlert_message" = "A seed phrase provides full control of its Accounts. Do not view in a public area. Back up the seed phrase words securely. Screenshots are disabled.";
 "displayMnemonics_seedPhrases" = "Seed Phrases";
+"displayMnemonics_connectedAccountsPersonasLabel_one" = "Connected to Personas and %d account";
+"displayMnemonics_connectedAccountsPersonasLabel_many" = "Connected to Personas and to %d accounts";
 "displayMnemonics_connectedAccountsLabel_one" = "Connected to %d account";
 "displayMnemonics_connectedAccountsLabel_many" = "Connected to %d accounts";
 "displayMnemonics_seedPhraseSecurityInfo" = "You are responsible for the security of your Seed Phrase";
@@ -615,12 +618,43 @@
 "addLedgerDevice_nameLedger_detectedType" = "Detected type: %@";
 "addLedgerDevice_nameLedger_namePlaceholder" = "Green Ledger Nano S+";
 "addLedgerDevice_nameLedger_continueButtonTitle" = "Save and Continue";
+"profileBackup_headerTitle" = "Backing up your wallet ensures that you can  recover access to your Accounts, Personas, and wallet settings on a new phone by re-entering your seed phrase(s).
+
+*For security, backups do not contain any seed phrases or private keys. You must write them down separately.*";
+"profileBackup_automaticBackups_title" = "Automatic Backups (recommended)";
+"profileBackup_manualBackups_title" = "Manual Backups";
+"profileBackup_manualBackups_subtitle" = "A manually exported wallet backup file may also be used for recovery, along with your seed phrase(s).
+
+Only the *current configuration* of your wallet is backed up with each manual export.";
+"profileBackup_manualBackups_exportButtonTitle" = "Export Wallet Backup File";
+"profileBackup_manualBackups_encryptBackupDialogTitle" = "Encrypt this backup with a password?";
+"profileBackup_manualBackups_successMessage" = "Exported wallet backup file";
+"profileBackup_manualBackups_encryptBackupDialogConfirm" = "Yes";
+"profileBackup_manualBackups_encryptBackupDialogDeny" = "No";
+"profileBackup_manualBackups_encryptBackupTitle" = "Encrypt Wallet Backup File";
+"profileBackup_manualBackups_encryptBackupSubtitle" = "Enter a password to encrypt this wallet backup file. You will be required to enter this password when recovering your Wallet from this file.";
+"profileBackup_manualBackups_enterPasswordPlaceholder" = "Enter password";
+"profileBackup_manualBackups_confirmPasswordPlaceholder" = "Confirm password";
+"profileBackup_manualBackups_passwordsMissmatchError" = "Passwords do not match";
+"profileBackup_deleteWallet_title" = "Delete Wallet";
+"profileBackup_deleteWalletDialog_message" = "WARNING. This will clear all contents of your Wallet. If you have no backup, you will lose access to your Accounts and Personas permanently.";
+"profileBackup_deleteWalletDialog_confirm" = "Delete Wallet";
+"androidProfileBackup_automaticBackups_enable" = "Enable Backup";
+"androidProfileBackup_automaticBackups_disable" = "Disable Backup";
 "androidProfileBackup_disabledText" = "Back up is turned off";
 "androidProfileBackup_lastBackedUp" = "Last Backed up: %@";
 "androidProfileBackup_noLastBackUp" = "Not backed up yet";
 "androidProfileBackup_openSystemBackupSettings" = "Open System Backup Settings";
 "androidProfileBackup_backupWalletData_title" = "Backup Wallet Data";
 "androidProfileBackup_backupWalletData_message" = "Warning: If disabled you might lose access to your Accounts and Personas.";
+"androidProfileBackup_automaticBackups_subtitle" = "Periodic system backups";
+"androidProfileBackup_deleteWallet_subtitle" = "You may delete your wallet. This will clear the Radix Wallet app, clears its contents, and delete any cloud backup.
+
+*Access to any Accounts or Personas will be permanently lost unless you have a manual backup file.*";
+"androidProfileBackup_deleteWallet_confirmButton" = "Delete Wallet";
+"iOSProfileBackup_automaticBackups_enable" = "Enable Backup to iCloud";
+"iOSProfileBackup_automaticBackups_disable" = "Disable Backup to iCloud";
+"iOSProfileBackup_automaticBackups_subtitle" = "Automatic continuous backups";
 "iOSProfileBackup_profileSync_title" = "Sync Wallet Data to iCloud";
 "iOSProfileBackup_profileSync_subtitle" = "Warning: If disabled you might lose access to your Accounts and Personas.";
 "iOSProfileBackup_navigationTitle" = "Wallet Data Backup";
@@ -637,3 +671,33 @@
 "iOSProfileBackup_totalAccountsNumberLabel" = "Number of Accounts: %d";
 "iOSProfileBackup_totalPersonasNumberLabel" = "Number of Personas: %d";
 "iOSProfileBackup_incompatibleWalletDataLabel" = "Incompatible Wallet data";
+"iOSProfileBackup_deleteWallet_subtitle" = "You may delete your wallet. This will clear the Radix Wallet app, clears its contents, and delete any iCloud backup.
+
+*Access to any Accounts or Personas will be permanently lost unless you have a manual backup file.*";
+"iOSProfileBackup_deleteWallet_confirmButton" = "Delete Wallet and iCloud Backup";
+"encryptProfileBackup_header_title" = "Encrypt Wallet Backup File";
+"encryptProfileBackup_header_subtitle" = "Enter a password to encrypt this wallet backup file. You will be required to enter this password when recovering your Wallet from this file.";
+"encryptProfileBackup_enterPasswordField_placeholder" = "Enter password";
+"encryptProfileBackup_confirmPasswordField_placeholder" = "Confirm password";
+"encryptProfileBackup_confirmPasswordField_error" = "Passwords do not match";
+"recoverProfileBackup_header_title" = "Recover Wallet From Backup";
+"recoverProfileBackup_header_subtitle" = "Select a backup to recover your Radix Wallet. You will be asked to enter your seed phrase(s) to recover control of your Accounts and Personas.";
+"androidRecoverProfileBackup_choose_title" = "Choose a backup";
+"iOSRecoverProfileBackup_choose_title" = "Choose a backup on iCloud";
+"iOSRecoverProfileBackup_noBackupsAvailable" = "No wallet backups available on current iCloud account";
+"androidRecoverProfileBackup_noBackupsAvailable" = "No wallet backups available";
+"recoverProfileBackup_backupFrom" = "*Backup from:* %@";
+"recoverProfileBackup_lastModified" = "*Last modified:* %@";
+"recoverProfileBackup_numberOfAccounts" = "*Number of accounts:* %d";
+"recoverProfileBackup_numberOfPersonas" = "*Number of personas:* %d";
+"recoverProfileBackup_importFileButton_title" = "Import from Backup File Instead";
+"recoverProfileBackup_incompatibleWalletDataLabel" = "Incompatible Wallet data";
+"recoverProfileBackup_passwordWrong" = "The password is wrong";
+"recoverSeedPhrase_header_titleMain" = "Main Seed Phrase Required";
+"recoverSeedPhrase_header_titleOther" = "Seed Phrase Required";
+"recoverSeedPhrase_header_subtitleMainSeedPhrase" = "Your *Personas* and the following *Accounts* are controlled by your main seed phrase. To recover control, you must re-enter it.";
+"recoverSeedPhrase_header_subtitleOtherSeedPhrase" = "The following *Accounts* are controlled by a seed phrase. To recover control, you must re-enter it.";
+"recoverSeedPhrase_skipButton" = "Skip This Seed Phrase For Now";
+"recoverSeedPhrase_enterButton" = "Enter This Seed Phrase";
+"enterSeedPhrase_header_title" = "Enter Seed Phrase";
+"enterSeedPhrase_warning" = "For your safety, make sure no one is looking at your screen. Never give your seed phrase to anyone for any reason.";
