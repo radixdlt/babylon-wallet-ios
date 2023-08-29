@@ -1,4 +1,5 @@
 import DisplayEntitiesControlledByMnemonicFeature
+import EngineKit
 import FeaturePrelude
 import ImportMnemonicFeature
 import OverlayWindowClient
@@ -156,8 +157,9 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 						loggerGlobal.error("Failed to remove addresses from list of those that need recovery")
 					}
 
-					await userDefaultsClient.removeAccountsThatNeedRecoveryIfNeeded(accounts)
-					await userDefaultsClient.addFactorSourceIDOfBackedUpMnemonic(privateHDFactorSource.factorSource.id)
+					let addresses: OrderedSet<AccountAddress> = .init(uncheckedUniqueElements: accounts.map(\.address))
+					try await userDefaultsClient.removeAccountsThatNeedRecoveryIfNeeded(accounts: addresses)
+					try await userDefaultsClient.addFactorSourceIDOfBackedUpMnemonic(privateHDFactorSource.factorSource.id)
 
 					try await secureStorageClient.saveMnemonicForFactorSource(
 						privateHDFactorSource
