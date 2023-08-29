@@ -28,15 +28,6 @@ struct PreferenceSection<SectionId: Hashable, RowId: Hashable>: View {
 		typealias SelectedRow = RowId
 		case selection(SelectedRow)
 		case disclosure
-
-		func accessory(rowId: RowId) -> ImageAsset? {
-			switch self {
-			case let .selection(selection):
-				return rowId == selection ? AssetResource.check : nil
-			case .disclosure:
-				return AssetResource.chevronRight
-			}
-		}
 	}
 
 	struct ViewState: Equatable {
@@ -79,25 +70,23 @@ struct PreferenceSection<SectionId: Hashable, RowId: Hashable>: View {
 								.padding(.top, .medium3)
 						}
 					}
+					.padding(.vertical, .small1)
 					.frame(minHeight: .settingsRowHeight)
 
-					Group {
-						Spacer()
-						if case let .selection(selection) = viewState.mode {
-							if row.id == selection {
-								Image(asset: AssetResource.check)
-							} else {
-								/// Put a placeholder for unselected items.
-								/// Note: `Spacer(minLength:)` does not work.
-								FixedSpacer(width: .medium1)
-							}
+					Spacer(minLength: 0)
+
+					if case let .selection(selection) = viewState.mode {
+						if row.id == selection {
+							Image(asset: AssetResource.check)
 						} else {
-							Image(asset: AssetResource.chevronRight)
+							/// Put a placeholder for unselected items.
+							FixedSpacer(width: .medium1)
 						}
+					} else {
+						Image(asset: AssetResource.chevronRight)
 					}
 				}
 				.padding(.horizontal, .medium3)
-				.padding(.vertical, .small1)
 				.contentShape(Rectangle())
 				.tappable {
 					onRowSelected(viewState.id, row.id)
@@ -109,8 +98,13 @@ struct PreferenceSection<SectionId: Hashable, RowId: Hashable>: View {
 				Text(title)
 					.textStyle(.body1HighImportance)
 					.foregroundColor(.app.gray2)
+					.listRowInsets(.init(top: .small1, leading: .medium3, bottom: .medium3, trailing: .medium3))
 			}
+		} footer: {
+			Rectangle().fill().frame(height: 0)
+				.listRowInsets(EdgeInsets())
 		}
+		.listSectionSeparator(.hidden)
 		.textCase(nil)
 	}
 }
