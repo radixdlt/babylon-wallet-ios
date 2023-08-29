@@ -858,26 +858,38 @@ extension TransactionReview {
 		}
 	}
 
+	/// Extracts and maps the account deposit setting changes and creates the AccountDepositSettings.State
 	func extractAccountDepositSettings(_ settings: TransactionType.AccountDepositSettings) async throws -> AccountDepositSettings.State {
 		let userAccounts = try await accountsClient.getAccountsOnCurrentNetwork()
 		let allAccountAddress = Set(settings.authorizedDepositorsChanges.keys).union(settings.defaultDepositRuleChanges.keys).union(settings.resourcePreferenceChanges.keys)
+		/// Collect all of the involved accounts
 		let validAccounts = allAccountAddress.compactMap { address in
 			userAccounts.first { $0.address == address }
 		}
 
+		/// For each account extract the changes
 		let depositSettingsChanges = try await validAccounts.asyncMap { account in
+			/// Extract possible DepositRule change
 			let depositRuleChange = settings.defaultDepositRuleChanges[account.address]
 
+			/// Extract all resource preference changes
 			let resourcePreferenceChanges = try await settings.resourcePreferenceChanges[account.address]?.asyncMap { resourcePreference in
-				try await AccountDepositSettingsChange.State.ResourceChange(resource: onLedgerEntitiesClient.getResource(resourcePreference.key), change: .resourcePreference(resourcePreference.value))
+				try await AccountDepositSettingsChange.State.ResourceChange(
+					resource: onLedgerEntitiesClient.getResource(resourcePreference.key),
+					change: .resourcePreference(resourcePreference.value)
+				)
 			} ?? []
 
+			/// Extract the depositor chanes
 			let authorizedDepositorChanges = try await {
 				if let depositorChanges = settings.authorizedDepositorsChanges[account.address] {
+					/// Match added depositors
 					let added = try await depositorChanges.added.asyncMap { resourceOrNonFungible in
 						let resourceAddress = try resourceOrNonFungible.resourceAddress()
 						return try await AccountDepositSettingsChange.State.ResourceChange(resource: onLedgerEntitiesClient.getResource(resourceAddress), change: .authorizedDepositorAdded)
 					}
+
+					/// Match removed depositors
 					let removed = try await depositorChanges.removed.asyncMap { resourceOrNonFungible in
 						let resourceAddress = try resourceOrNonFungible.resourceAddress()
 						return try await AccountDepositSettingsChange.State.ResourceChange(resource: onLedgerEntitiesClient.getResource(resourceAddress), change: .authorizedDepositorRemoved)

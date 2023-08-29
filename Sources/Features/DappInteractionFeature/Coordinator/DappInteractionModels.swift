@@ -31,7 +31,7 @@ extension DappMetadata {
 		case .request:
 			return L10n.DAppRequest.Metadata.unknownName
 		case .wallet:
-			return "Radix Wallet"
+			return "Radix Wallet" // FIXME: Strings
 		}
 	}
 }

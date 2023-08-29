@@ -173,30 +173,31 @@ public struct ManageThirdPartyDeposits: FeatureReducer, Sendable {
 	private func prepareForSubmission(_ state: State) throws -> (manifest: TransactionManifest, account: Profile.Network.Account) {
 		// Are there any updates
 
-		let onLedgerConfig = state.account.onLedgerSettings.thirdPartyDeposits
+		let inProfileConfig = state.account.onLedgerSettings.thirdPartyDeposits
 		let localConfig = state.thirdPartyDeposits
 
 		// 1. Deposit rule change
-		let depositorRule = onLedgerConfig.depositRule != localConfig.depositRule ? localConfig.depositRule : nil
+		let depositorRule: ThirdPartyDeposits.DepositRule? = inProfileConfig.depositRule != localConfig.depositRule ? localConfig.depositRule : nil
 
 		// 2. assetException changes:
-		let assetExceptionsToAddOrUpdate = localConfig.assetsExceptionList.filter { localException in
-			guard let onLedgerException = onLedgerConfig.assetsExceptionList.first(where: { $0.address == localException.address }) else {
+		let assetExceptionsToAddOrUpdate: [ThirdPartyDeposits.AssetException] = localConfig.assetsExceptionList.filter { localException in
+			guard let onLedgerException = inProfileConfig.assetsExceptionList.first(where: { $0.address == localException.address }) else {
 				// New exception to be added on Ledger
 				return true
 			}
 			// Exception rule did change
 			return onLedgerException.exceptionRule != localException.exceptionRule
 		}
-		let assetExceptionsToBeRemoved = onLedgerConfig
+
+		let assetExceptionsToBeRemoved: [ResourceAddress] = inProfileConfig
 			.assetsExceptionList
 			.filter {
 				!localConfig.assetsExceptionList.contains($0)
 			}.map(\.address)
 
 		// 3. Depositor allow list:
-		let depositorAddressesToAdd = localConfig.depositorsAllowList.filter { !onLedgerConfig.depositorsAllowList.contains($0) }
-		let depositorAddressesToRemove = onLedgerConfig.depositorsAllowList.filter { !localConfig.depositorsAllowList.contains($0) }
+		let depositorAddressesToAdd: [ThirdPartyDeposits.DepositorAddress] = localConfig.depositorsAllowList.filter { !inProfileConfig.depositorsAllowList.contains($0) }
+		let depositorAddressesToRemove: [ThirdPartyDeposits.DepositorAddress] = inProfileConfig.depositorsAllowList.filter { !localConfig.depositorsAllowList.contains($0) }
 
 		let accountAddress = state.account.address
 

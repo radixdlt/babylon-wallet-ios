@@ -7,7 +7,6 @@ import SubmitTransactionClient
 public struct TransactionStatusPolling: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public enum TXStatus: Sendable, Hashable {
-			case notYetSubmitted
 			case submitting
 			case submittedPending
 			case submittedUnknown
@@ -24,7 +23,7 @@ public struct TransactionStatusPolling: Sendable, FeatureReducer {
 
 		public init(
 			txID: TXID,
-			status: TXStatus = .notYetSubmitted,
+			status: TXStatus = .submitting,
 			disableInProgressDismissal: Bool = false
 		) {
 			self.txID = txID
@@ -83,7 +82,7 @@ public struct TransactionStatusPolling: Sendable, FeatureReducer {
 
 			return .none
 		case .faileToReceiveUpdates:
-			state.failureMessage = "Failed to get transaction status"
+			state.failureMessage = "Failed to get transaction status" // FIXME: Strings
 			return .none
 		}
 	}
@@ -108,7 +107,7 @@ extension TransactionStatusPolling.State.TXStatus {
 
 	var inProgress: Bool {
 		switch self {
-		case .notYetSubmitted, .submitting, .submittedPending, .submittedUnknown: return true
+		case .submitting, .submittedPending, .submittedUnknown: return true
 		case .committedFailure, .committedSuccessfully, .rejected: return false
 		}
 	}
@@ -116,14 +115,14 @@ extension TransactionStatusPolling.State.TXStatus {
 	var isSubmitted: Bool {
 		switch self {
 		case .rejected, .committedFailure, .submittedUnknown, .submittedPending, .committedSuccessfully: return true
-		case .submitting, .notYetSubmitted: return false
+		case .submitting: return false
 		}
 	}
 
 	var isCompletedWithFailure: Bool {
 		switch self {
 		case .rejected, .committedFailure: return true
-		case .notYetSubmitted, .submittedUnknown, .submittedPending, .committedSuccessfully, .submitting: return false
+		case .submittedUnknown, .submittedPending, .committedSuccessfully, .submitting: return false
 		}
 	}
 
