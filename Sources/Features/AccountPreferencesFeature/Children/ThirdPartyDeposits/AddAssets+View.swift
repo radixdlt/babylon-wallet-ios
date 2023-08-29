@@ -7,7 +7,7 @@ extension AddAsset.State {
 			resourceAddress: resourceAddress,
 			validatedResourceAddress: {
 				if let validatedResourceAddress,
-				   !alreadyAddedResources.contains(validatedResourceAddress)
+				   !alreadyAddedResources.contains(where: { $0.resourceAddress == validatedResourceAddress.resourceAddress })
 				{
 					return validatedResourceAddress
 				}
@@ -22,7 +22,7 @@ extension AddAsset.State {
 					return .error("Invalid Address") // FIXME: Strings
 				}
 
-				if alreadyAddedResources.contains(validatedAddress) {
+				if alreadyAddedResources.contains(where: { $0.resourceAddress == validatedAddress.resourceAddress }) {
 					return .error("Resource already added") // FIXME: Strings
 				}
 

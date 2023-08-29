@@ -85,7 +85,8 @@ extension Profile.Network.Account.OnLedgerSettings.ThirdPartyDeposits.AssetExcep
 	}
 
 	public static func == (lhs: Self, rhs: Self) -> Bool {
-		lhs.address == rhs.address
+		lhs.address == rhs.address &&
+			lhs.exceptionRule == rhs.exceptionRule
 	}
 }
 

@@ -53,8 +53,9 @@ public struct AccountDepositSettingsChange: Sendable, FeatureReducer {
 				case authorizedDepositorRemoved
 			}
 
-			public var id: OnLedgerEntity.Resource {
-				resource
+			public var id: Int {
+				// An Address can be present in both ResourcePreference and authorized depositor changes.
+				resource.hashValue + change.hashValue
 			}
 
 			public let resource: OnLedgerEntity.Resource
