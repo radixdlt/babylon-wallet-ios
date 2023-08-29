@@ -21,8 +21,27 @@ public struct DappInteractionClient: Sendable {
 }
 
 extension DappInteractionClient {
-	public typealias AddWalletInteraction = @Sendable (P2P.Dapp.Request.Items) async -> P2P.RTCOutgoingMessage.Response?
+	public enum Interaction: String, Sendable, Hashable {
+		case accountDepositSettings
+		case accountTransfer
+	}
+
+	public typealias AddWalletInteraction = @Sendable (_ items: P2P.Dapp.Request.Items, _ interaction: Interaction) async -> P2P.RTCOutgoingMessage.Response?
 	public typealias CompleteInteraction = @Sendable (P2P.RTCOutgoingMessage) async throws -> Void
+}
+
+extension P2P.Dapp.Request.ID {
+	public static func walletInteractionID(for interaction: DappInteractionClient.Interaction) -> Self {
+		"\(interaction.rawValue)_\(UUID().uuidString)"
+	}
+
+	public var isAccountDepositSettingsInteraction: Bool {
+		rawValue.hasPrefix(DappInteractionClient.Interaction.accountDepositSettings.rawValue)
+	}
+
+	public var isAccountAccountTransferInteraction: Bool {
+		rawValue.hasPrefix(DappInteractionClient.Interaction.accountTransfer.rawValue)
+	}
 }
 
 extension DappInteractionClient {

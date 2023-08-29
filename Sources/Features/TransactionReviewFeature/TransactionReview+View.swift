@@ -269,7 +269,6 @@ extension View {
 			.nonFungibleTokenDetails(with: destinationStore)
 			.customizeFees(with: destinationStore)
 			.signing(with: destinationStore)
-			.submitting(with: destinationStore)
 	}
 
 	@MainActor
@@ -329,16 +328,6 @@ extension View {
 			state: /TransactionReview.Destinations.State.signing,
 			action: TransactionReview.Destinations.Action.signing,
 			content: { Signing.SheetView(store: $0) }
-		)
-	}
-
-	@MainActor
-	private func submitting(with destinationStore: PresentationStoreOf<TransactionReview.Destinations>) -> some View {
-		sheet(
-			store: destinationStore,
-			state: /TransactionReview.Destinations.State.submitting,
-			action: TransactionReview.Destinations.Action.submitting,
-			content: { SubmitTransaction.View(store: $0) }
 		)
 	}
 }

@@ -220,35 +220,36 @@ public struct CreateAuthKey: Sendable, FeatureReducer {
 			loggerGlobal.notice("Successfully signed and submitted CreateAuthKey tx to gateway...txID: \(txID)")
 			return .none
 
-		case let .transactionReview(.delegate(.transactionCompleted(txID))):
-			loggerGlobal.notice("Successfully CreateAuthKey, txID: \(txID)")
-			guard let authenticationSigningFactorInstance = state.authenticationSigningFactorInstance else {
-				loggerGlobal.error("Expected authenticationSigningFactorInstance")
-				return .send(.delegate(.done(success: false)))
-			}
-
-			return .run { [entity = state.entity] send in
-				switch entity {
-				case var .account(account):
-					switch account.securityState {
-					case var .unsecured(entityControl):
-						assert(entityControl.authenticationSigning == nil)
-						entityControl.authenticationSigning = authenticationSigningFactorInstance
-						account.securityState = .unsecured(entityControl)
-						try await accountsClient.updateAccount(account)
-						await send(.internal(.finishedSettingFactorInstance))
-					}
-				case var .persona(persona):
-					switch persona.securityState {
-					case var .unsecured(entityControl):
-						assert(entityControl.authenticationSigning == nil)
-						entityControl.authenticationSigning = authenticationSigningFactorInstance
-						persona.securityState = .unsecured(entityControl)
-						try await personasClient.updatePersona(persona)
-						await send(.internal(.finishedSettingFactorInstance))
-					}
-				}
-			}
+            // FIXME: Update to use transaction client polling
+//		case let .transactionReview(.delegate(.transactionCompleted(txID))):
+//			loggerGlobal.notice("Successfully CreateAuthKey, txID: \(txID)")
+//			guard let authenticationSigningFactorInstance = state.authenticationSigningFactorInstance else {
+//				loggerGlobal.error("Expected authenticationSigningFactorInstance")
+//				return .send(.delegate(.done(success: false)))
+//			}
+//
+//			return .run { [entity = state.entity] send in
+//				switch entity {
+//				case var .account(account):
+//					switch account.securityState {
+//					case var .unsecured(entityControl):
+//						assert(entityControl.authenticationSigning == nil)
+//						entityControl.authenticationSigning = authenticationSigningFactorInstance
+//						account.securityState = .unsecured(entityControl)
+//						try await accountsClient.updateAccount(account)
+//						await send(.internal(.finishedSettingFactorInstance))
+//					}
+//				case var .persona(persona):
+//					switch persona.securityState {
+//					case var .unsecured(entityControl):
+//						assert(entityControl.authenticationSigning == nil)
+//						entityControl.authenticationSigning = authenticationSigningFactorInstance
+//						persona.securityState = .unsecured(entityControl)
+//						try await personasClient.updatePersona(persona)
+//						await send(.internal(.finishedSettingFactorInstance))
+//					}
+//				}
+//			}
 
 		default:
 			return .none

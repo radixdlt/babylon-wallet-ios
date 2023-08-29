@@ -11,7 +11,7 @@ extension DependencyValues {
 extension DappInteractionClient: TestDependencyKey {
 	public static let noop = Self(
 		interactions: AsyncLazySequence([]).eraseToAnyAsyncSequence(),
-		addWalletInteraction: { _ in .none },
+		addWalletInteraction: { _, _ in .none },
 		completeInteraction: { _ in }
 	)
 	public static let previewValue: Self = .noop

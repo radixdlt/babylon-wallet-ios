@@ -1,35 +1,22 @@
 import FeaturePrelude
 
-// extension DappMetadata {
-//	var name: String {
-//		switch self {
-//		case let .ledger(ledger):
-//			return ledger.name?.rawValue ?? L10n.DAppRequest.Metadata.unknownName
-//		case .request:
-//			return L10n.DAppRequest.Metadata.unknownName
-//		case .wallet:
-//			return "Radix Wallet"
-//		}
-//	}
-// }
-
 // MARK: - Completion.View
-extension Completion {
-	struct ViewState: Equatable {
-		let title: String
-		let subtitle: String
+extension DappInteractionSuccess {
+	public struct ViewState: Equatable {
+		public let title: String
+		public let subtitle: String
 
-		init(state: Completion.State) {
+		public init(state: DappInteractionSuccess.State) {
 			title = L10n.DAppRequest.Completion.title
 			subtitle = state.item.dappName
 		}
 	}
 
 	@MainActor
-	struct View: SwiftUI.View {
-		let store: StoreOf<Completion>
+	public struct View: SwiftUI.View {
+		public let store: StoreOf<DappInteractionSuccess>
 
-		var body: some SwiftUI.View {
+		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: ViewState.init, send: { .view($0) }) { viewStore in
 				WithNavigationBar {
 					viewStore.send(.closeButtonTapped)
@@ -52,9 +39,6 @@ extension Completion {
 			}
 			.presentationDragIndicator(.visible)
 			.presentationDetents([.height(.smallDetent)])
-			#if os(iOS)
-				.presentationBackground(.blur)
-			#endif
 		}
 	}
 }

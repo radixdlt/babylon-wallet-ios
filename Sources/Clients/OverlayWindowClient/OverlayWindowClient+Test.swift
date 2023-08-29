@@ -9,6 +9,7 @@ extension OverlayWindowClient: TestDependencyKey {
 		sendAlertAction: unimplemented("\(Self.self).sendAlertAction"),
 		setIsUserIteractionEnabled: unimplemented("\(Self.self).setIsUserIteractionEnabled"),
 		isUserInteractionEnabled: unimplemented("\(Self.self).isUserInteractionEnabled"),
-		scheduleDappInteractionSuccess: unimplemented("\(Self.self).isUserInteractionEnabled")
+		scheduleDappInteractionSuccess: unimplemented("\(Self.self).scheduleDappInteractionSuccess"),
+		scheduleTransactionPoll: unimplemented("\(Self.self).scheduleTransactionPoll")
 	)
 }

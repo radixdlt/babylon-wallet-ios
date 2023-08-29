@@ -9,6 +9,7 @@ import FeaturePrelude
 import GatewayAPI
 import OnLedgerEntitiesClient
 import SigningFeature
+import SubmitTransactionClient
 import TransactionClient
 
 // MARK: - TransactionReview
@@ -98,15 +99,12 @@ public struct TransactionReview: Sendable, FeatureReducer {
 	public enum DelegateAction: Sendable, Equatable {
 		case failed(TransactionFailure)
 		case signedTXAndSubmittedToGateway(TXID)
-		case transactionCompleted(TXID)
-		case userDismissedTransactionStatus
 	}
 
 	public struct Destinations: Sendable, ReducerProtocol {
 		public enum State: Sendable, Hashable {
 			case customizeGuarantees(TransactionReviewGuarantees.State)
 			case signing(Signing.State)
-			case submitting(SubmitTransaction.State)
 			case dApp(SimpleDappDetails.State)
 			case customizeFees(CustomizeFees.State)
 			case fungibleTokenDetails(FungibleTokenDetails.State)
@@ -116,7 +114,6 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		public enum Action: Sendable, Equatable {
 			case customizeGuarantees(TransactionReviewGuarantees.Action)
 			case signing(Signing.Action)
-			case submitting(SubmitTransaction.Action)
 			case dApp(SimpleDappDetails.Action)
 			case customizeFees(CustomizeFees.Action)
 			case fungibleTokenDetails(FungibleTokenDetails.Action)
@@ -132,9 +129,6 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			}
 			Scope(state: /State.signing, action: /Action.signing) {
 				Signing()
-			}
-			Scope(state: /State.submitting, action: /Action.submitting) {
-				SubmitTransaction()
 			}
 			Scope(state: /State.dApp, action: /Action.dApp) {
 				SimpleDappDetails()
@@ -325,11 +319,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		case .destination(.dismiss):
 			if case .signing = state.destination {
 				return cancelSigningEffect(state: &state)
-			} else if case .submitting = state.destination {
-				// This is used when tapping outside the Submitting sheet, no need to set destination to nil
-				return delayedEffect(for: .delegate(.userDismissedTransactionStatus))
 			}
-
 			return .none
 		default:
 			return .none
@@ -370,18 +360,17 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			return .none
 
 		case let .signing(.delegate(.finishedSigning(.signTransaction(notarizedTX, origin: _)))):
-			state.destination = .submitting(.init(notarizedTX: notarizedTX))
-			return .none
-//			return .task { [txID = notarizedTX.txID, notarized = notarizedTX.notarized] in
-//                await .internal(.submitTXResult(
-//                    TaskResult {
-//                        try await submitTXClient.submitTransaction(.init(
-//                            txID: txID,
-//                            compiledNotarizedTXIntent: notarized
-//                        ))
-//                    }
-//                ))
-//            }
+			state.destination = nil
+			return .task { [txID = notarizedTX.txID, notarized = notarizedTX.notarized] in
+				await .internal(.submitTXResult(
+					TaskResult {
+						try await submitTXClient.submitTransaction(.init(
+							txID: txID,
+							compiledNotarizedTXIntent: notarized
+						))
+					}
+				))
+			}
 
 		case .signing(.delegate(.finishedSigning(.signAuth(_)))):
 			state.canApproveTX = true
@@ -389,12 +378,6 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			return .none
 
 		case .signing:
-			return .none
-
-		case let .submitting(.delegate(action)):
-			return handleSubmittingActions(action, state: &state)
-
-		case .submitting:
 			return .none
 
 		case .dApp:
@@ -507,16 +490,27 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			return .none
 
 		case let .notarizeResult(.success(notarizedTX)):
-			state.destination = .submitting(.init(notarizedTX: notarizedTX, disableInProgressDismissal: !state.isTransactionInProgressDimissalAllowed))
-			return .none
+			return .task { [txID = notarizedTX.txID, notarized = notarizedTX.notarized] in
+				await .internal(.submitTXResult(
+					TaskResult {
+						try await submitTXClient.submitTransaction(.init(
+							txID: txID,
+							compiledNotarizedTXIntent: notarized
+						))
+					}
+				))
+			}
 
 		case let .buildTransactionItentResult(.failure(error)),
 		     let .notarizeResult(.failure(error)):
 			errorQueue.schedule(error)
 			return .none
+
 		case let .submitTXResult(.success(txID)):
 			return .send(.delegate(.signedTXAndSubmittedToGateway(txID)))
+
 		case let .submitTXResult(.failure(error)):
+			state.canApproveTX = true
 			errorQueue.schedule(error)
 			return .none
 		}
@@ -524,32 +518,6 @@ public struct TransactionReview: Sendable, FeatureReducer {
 }
 
 extension TransactionReview {
-	func handleSubmittingActions(_ action: SubmitTransaction.DelegateAction, state: inout State) -> EffectTask<Action> {
-		switch action {
-		case .failedToSubmit:
-			state.destination = nil
-			state.canApproveTX = true
-			return .none
-
-		case let .submittedButNotCompleted(txID):
-			return .send(.delegate(.signedTXAndSubmittedToGateway(txID)))
-
-		case let .manuallyDismiss(status, txID):
-			state.destination = nil
-			switch status {
-			case .committedFailure, .rejected:
-				return .send(.delegate(.failed(.failedToSubmit)))
-
-			case .committedSuccessfully:
-				return .send(.delegate(.transactionCompleted(txID)))
-			case .inProgress:
-				return .none
-			case .failedToReceiveStatusUpdate:
-				return .none
-			}
-		}
-	}
-
 	func review(_ state: inout State) -> EffectTask<Action> {
 		guard let transactionToReview = state.reviewedTransaction else {
 			assertionFailure("Bad implementation, expected `analyzedManifestToReview`")

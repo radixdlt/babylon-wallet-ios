@@ -148,7 +148,7 @@ public struct ManageThirdPartyDeposits: FeatureReducer, Sendable {
 
 			return .run { [account = state.account] _ in
 				do {
-					let result = await dappInteractionClient.addWalletInteraction(.transaction(.init(send: .init(version: .default, transactionManifest: manifest, message: nil))))
+					let result = await dappInteractionClient.addWalletInteraction(.transaction(.init(send: .init(version: .default, transactionManifest: manifest, message: nil))), .accountDepositSettings)
 					switch result {
 					case .dapp(.success):
 						var account = account

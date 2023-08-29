@@ -38,8 +38,6 @@ struct DappInteractionCoordinator: Sendable, FeatureReducer {
 
 	enum DelegateAction: Sendable, Equatable {
 		case submit(P2P.Dapp.Response, DappMetadata)
-		case dismiss(DappMetadata)
-		case dismissSilently
 	}
 
 	var body: some ReducerProtocolOf<Self> {
@@ -99,12 +97,6 @@ struct DappInteractionCoordinator: Sendable, FeatureReducer {
 
 		case let .flow(.delegate(.dismissWithFailure(error))):
 			return .send(.delegate(.submit(.failure(error), .request(state.interaction.metadata))))
-
-		case let .flow(.delegate(.dismissWithSuccess(dappMetadata))):
-			return .send(.delegate(.dismiss(dappMetadata)))
-
-		case .flow(.delegate(.dismiss)):
-			return .send(.delegate(.dismissSilently))
 
 		case let .flow(.delegate(.submit(response, dappMetadata))):
 			return .send(.delegate(.submit(.success(response), dappMetadata)))

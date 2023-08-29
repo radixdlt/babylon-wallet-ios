@@ -1,17 +1,17 @@
 import EngineKit
 import FeaturePrelude
 
-extension SubmitTransaction.State {
-	var viewState: SubmitTransaction.ViewState {
+extension TransactionStatusPolling.State {
+	var viewState: TransactionStatusPolling.ViewState {
 		.init(
-			txID: notarizedTX.txID,
+			txID: txID,
 			status: status,
 			disableDismiss: disableInProgressDismissal && status.inProgress
 		)
 	}
 }
 
-extension SubmitTransaction.State.TXStatus {
+extension TransactionStatusPolling.State.TXStatus {
 	var display: String {
 		switch self {
 		case .notYetSubmitted, .submitting: return L10n.TransactionReview.SubmitTransaction.displaySubmitting
@@ -24,10 +24,10 @@ extension SubmitTransaction.State.TXStatus {
 }
 
 // MARK: - SubmitTransaction.View
-extension SubmitTransaction {
+extension TransactionStatusPolling {
 	public struct ViewState: Equatable {
 		let txID: TXID
-		let status: SubmitTransaction.State.TXStatus
+		let status: TransactionStatusPolling.State.TXStatus
 		let disableDismiss: Bool
 	}
 
@@ -35,9 +35,9 @@ extension SubmitTransaction {
 	public struct View: SwiftUI.View {
 		@SwiftUI.State private var opacity: Double = 1.0
 
-		private let store: StoreOf<SubmitTransaction>
+		private let store: StoreOf<TransactionStatusPolling>
 
-		public init(store: StoreOf<SubmitTransaction>) {
+		public init(store: StoreOf<TransactionStatusPolling>) {
 			self.store = store
 		}
 
@@ -48,7 +48,7 @@ extension SubmitTransaction {
 						viewStore.send(.closeButtonTapped)
 					}
 				} content: {
-					VStack(spacing: .medium2) {
+					VStack(spacing: .small1) {
 						if viewStore.status.inProgress {
 							Image(asset: AssetResource.transactionInProgress)
 								.opacity(opacity)
@@ -62,39 +62,40 @@ extension SubmitTransaction {
 									opacity = 0.5
 								}
 
-							Text("Completing Transaction...")
-								.textStyle(.body1Regular) // FIXME: strings
+							Text("Completing Transaction...") // FIXME: strings
+								.textStyle(.body1Regular)
+								.foregroundColor(.app.gray1)
+
 						} else if viewStore.status.isCompletedSuccessfully {
 							Image(asset: AssetResource.successCheckmark)
 
-							Text("Success")
+							Text("Success") // FIXME: strings
 								.foregroundColor(.app.gray1)
 								.textStyle(.sheetTitle)
 
-							Text("Your transaction was successful")
-								.textStyle(.body1Regular) // FIXME: strings
+							Text("Your transaction was successful") // FIXME: strings
+								.textStyle(.body1Regular)
 						} else if viewStore.status.isCompletedWithFailure {
 							Image(asset: AssetResource.warningError)
 						}
 
 						HStack {
 							Text("Transaction ID: ") // FIXME: strings
+								.textStyle(.body1Regular)
+								.foregroundColor(.app.gray1)
 							AddressView(.identifier(.transaction(viewStore.txID)))
 						}
 					}
 					.padding(.horizontal, .medium2)
 					.padding(.bottom, .medium3)
 				}
-				.frame(maxWidth: .infinity)
+//				.frame(maxWidth: .infinity)
 				.onFirstTask { @MainActor in
 					viewStore.send(.appeared)
 				}
 				.presentationDragIndicator(.visible)
-				.presentationDetents([.fraction(0.4)])
+				.presentationDetents([.fraction(0.5)])
 				.interactiveDismissDisabled(viewStore.disableDismiss)
-				#if os(iOS)
-					.presentationBackground(.blur)
-				#endif
 			}
 		}
 	}

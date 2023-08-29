@@ -50,7 +50,6 @@ struct DappInteractor: Sendable, FeatureReducer {
 		case sentResponseToDapp(P2P.Dapp.Response, for: RequestEnvelope, DappMetadata)
 		case failedToSendResponseToDapp(P2P.Dapp.Response, for: RequestEnvelope, DappMetadata, reason: String)
 		case presentResponseFailureAlert(P2P.Dapp.Response, for: RequestEnvelope, DappMetadata, reason: String)
-		case presentResponseSuccessView(DappMetadata)
 		case presentInvalidRequest(DappInteractionClient.ValidatedDappRequest.Invalid, isDeveloperModeEnabled: Bool)
 	}
 
@@ -148,12 +147,15 @@ struct DappInteractor: Sendable, FeatureReducer {
 			dismissCurrentModalAndRequest(request, for: &state)
 			switch response {
 			case .success:
-				if case .transaction = request.request.items {
-					// Status is displayed in transactions status slide up
-					return .none
+				if case let .success(success) = response, case let .transaction(tx) = success.items {
+					overlayWindowClient.scheduleTransactionPoll(.init(
+						txID: tx.send.transactionIntentHash,
+						disableInProgressDismissal: response.id.isAccountDepositSettingsInteraction
+					))
 				} else {
-					return .send(.internal(.presentResponseSuccessView(dappMetadata)))
+					overlayWindowClient.scheduleDappInteractionSuccess(.init(dappName: dappMetadata.name))
 				}
+				return presentQueuedRequestIfNeededEffect(for: &state)
 			case .failure:
 				return delayedEffect(for: .internal(.presentQueuedRequestIfNeeded))
 			}
@@ -194,10 +196,6 @@ struct DappInteractor: Sendable, FeatureReducer {
 				message: { TextState(invalidReason.subtitle + "\n" + invalidReason.explanation(isDeveloperModeEnabled)) }
 			)
 			return .none
-
-		case let .presentResponseSuccessView(dappMetadata):
-			overlayWindowClient.scheduleDappInteractionSuccess(.init(dappName: dappMetadata.name))
-			return .none
 		}
 	}
 
@@ -205,17 +203,8 @@ struct DappInteractor: Sendable, FeatureReducer {
 		switch childAction {
 		case let .modal(.presented(.dappInteraction(.relay(request, .delegate(.submit(responseToDapp, dappMetadata)))))):
 			return sendResponseToDappEffect(responseToDapp, for: request, dappMetadata: dappMetadata)
-		case let .modal(.presented(.dappInteraction(.relay(request, .delegate(.dismiss(dappMetadata)))))):
-			dismissCurrentModalAndRequest(request, for: &state)
-			return .send(.internal(.presentResponseSuccessView(dappMetadata)))
-
-		case let .modal(.presented(.dappInteraction(.relay(request, .delegate(.dismissSilently))))):
-			dismissCurrentModalAndRequest(request, for: &state)
-			return delayedEffect(for: .internal(.presentQueuedRequestIfNeeded))
-
 		case .modal(.dismiss):
 			return delayedEffect(for: .internal(.presentQueuedRequestIfNeeded))
-
 		default:
 			return .none
 		}
@@ -241,45 +230,30 @@ struct DappInteractor: Sendable, FeatureReducer {
 		dappMetadata: DappMetadata
 	) -> EffectTask<Action> {
 		.run { send in
-
-			// In case of transaction response, sending it to the peer client is a silent operation.
-			// The success or failures is determined based on the transaction polling status.
-			let shouldSendBackResponse = {
-				if request.route != .wallet, case let .success(successResponse) = responseToDapp,
-				   case .transaction = successResponse.items
-				{
-					return true
-				}
-				return false
-			}()
-
 			do {
 				_ = try await dappInteractionClient.completeInteraction(.response(.dapp(responseToDapp), origin: request.route))
-				if !shouldSendBackResponse {
-					await send(.internal(
-						.sentResponseToDapp(
-							responseToDapp,
-							for: request,
-							dappMetadata
-						)
-					))
-				}
+				await send(.internal(
+					.sentResponseToDapp(
+						responseToDapp,
+						for: request,
+						dappMetadata
+					)
+				))
 			} catch {
-				if !shouldSendBackResponse {
-					await send(.internal(
-						.failedToSendResponseToDapp(
-							responseToDapp,
-							for: request,
-							dappMetadata,
-							reason: error.localizedDescription
-						)
-					))
-				}
+				await send(.internal(
+					.failedToSendResponseToDapp(
+						responseToDapp,
+						for: request,
+						dappMetadata,
+						reason: error.localizedDescription
+					)
+				))
 			}
 		}
 	}
 
 	func dismissCurrentModalAndRequest(_ request: RequestEnvelope, for state: inout State) {
+		print("dismissed current modal")
 		state.requestQueue.remove(request)
 		state.currentModal = nil
 	}
