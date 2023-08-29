@@ -3,6 +3,7 @@ import DappInteractionClient
 import EngineKit
 import FeaturePrelude
 import OverlayWindowClient
+import SubmitTransactionClient
 
 public typealias ThirdPartyDeposits = Profile.Network.Account.OnLedgerSettings.ThirdPartyDeposits
 
@@ -39,6 +40,10 @@ public struct ManageThirdPartyDeposits: FeatureReducer, Sendable {
 		case destinations(PresentationAction<Destinations.Action>)
 	}
 
+	public enum InternalAction: Equatable, Sendable {
+		case updated(Profile.Network.Account)
+	}
+
 	public struct Destinations: ReducerProtocol, Sendable {
 		public enum State: Equatable, Hashable, Sendable {
 			case allowDenyAssets(ResourcesList.State)
@@ -62,6 +67,9 @@ public struct ManageThirdPartyDeposits: FeatureReducer, Sendable {
 	}
 
 	@Dependency(\.dappInteractionClient) var dappInteractionClient
+	@Dependency(\.submitTXClient) var submitTXClient
+	@Dependency(\.accountsClient) var accountsClient
+	@Dependency(\.errorQueue) var errorQueue
 
 	public var body: some ReducerProtocolOf<Self> {
 		Reduce(core)
@@ -90,80 +98,9 @@ public struct ManageThirdPartyDeposits: FeatureReducer, Sendable {
 				))
 			}
 			return .none
-
 		case .updateTapped:
-			@Dependency(\.accountsClient) var accountsClient
-			@Dependency(\.errorQueue) var errorQueue
-
-			// Are there any updates
-
-			let onLedgerConfig = state.account.onLedgerSettings.thirdPartyDeposits
-			let localConfig = state.thirdPartyDeposits
-
-			// 1. Deposit rule change
-			let depositorRule = onLedgerConfig.depositRule != localConfig.depositRule ? localConfig.depositRule : nil
-
-			// 2. assetException changes:
-			let assetExceptionsToAddOrUpdate = localConfig.assetsExceptionList.filter { localException in
-				guard let onLedgerException = onLedgerConfig.assetsExceptionList.first(where: { $0.address == localException.address }) else {
-					// New exception to be added on Ledger
-					return true
-				}
-				// Exception rule did change
-				return onLedgerException.exceptionRule != localException.exceptionRule
-			}
-			let assetExceptionsToBeRemoved = onLedgerConfig
-				.assetsExceptionList
-				.filter {
-					!localConfig.assetsExceptionList.contains($0)
-				}.map(\.address)
-
-			// 3. Depositor allow list:
-			let depositorAddressesToAdd = localConfig.depositorsAllowList.filter { !onLedgerConfig.depositorsAllowList.contains($0) }
-			let depositorAddressesToRemove = onLedgerConfig.depositorsAllowList.filter { !localConfig.depositorsAllowList.contains($0) }
-
-			let accountAddress = state.account.address
-
-			let manifest = try! ManifestBuilder.make {
-				if let depositorRule {
-					ManifestBuilder.setDefaultDepositorRule(accountAddress, depositorRule)
-				}
-
-				for resourceAddress in assetExceptionsToBeRemoved {
-					ManifestBuilder.removeResourcePreference(accountAddress, resourceAddress)
-				}
-
-				for assetException in assetExceptionsToAddOrUpdate {
-					ManifestBuilder.setResourcePreference(accountAddress, assetException)
-				}
-
-				for depositorAddress in depositorAddressesToRemove {
-					ManifestBuilder.removeAuthorizedDepositor(accountAddress, depositorAddress)
-				}
-
-				for depositorAddress in depositorAddressesToAdd {
-					ManifestBuilder.addAuthorizedDepositor(accountAddress, depositorAddress)
-				}
-			}.build(networkId: state.account.networkID.rawValue)
-
-			return .run { [account = state.account] _ in
-				do {
-					let result = await dappInteractionClient.addWalletInteraction(.transaction(.init(send: .init(version: .default, transactionManifest: manifest, message: nil))), .accountDepositSettings)
-					switch result {
-					case .dapp(.success):
-						var account = account
-						account.onLedgerSettings.thirdPartyDeposits = localConfig
-						try await accountsClient.updateAccount(account)
-					case let .dapp(.failure(failure)):
-						if failure.errorType != .rejectedByUser {}
-					case .none:
-						break
-					}
-
-				} catch {
-					errorQueue.schedule(error)
-				}
-			}
+			let (manifest, updatedAccount) = prepareForSubmission(state)
+			return submitTransaction(manifest, updatedAccount: updatedAccount)
 		}
 	}
 
@@ -176,6 +113,113 @@ public struct ManageThirdPartyDeposits: FeatureReducer, Sendable {
 		case .destinations:
 			return .none
 		}
+	}
+
+	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
+		switch internalAction {
+		case let .updated(account):
+			state.account = account
+			state.thirdPartyDeposits = account.onLedgerSettings.thirdPartyDeposits
+			return .none
+		}
+	}
+
+	private func submitTransaction(_ manifest: TransactionManifest, updatedAccount: Profile.Network.Account) -> EffectTask<Action> {
+		.run { send in
+			do {
+				/// Wait for user to complete the interaction with Transaction Review
+				let result = await dappInteractionClient.addWalletInteraction(
+					.transaction(
+						.init(
+							send: .init(
+								version: .default,
+								transactionManifest: manifest,
+								message: nil
+							))
+					),
+					.accountDepositSettings
+				)
+
+				switch result {
+				case let .dapp(.success(success)):
+					if case let .transaction(tx) = success.items {
+						/// Wait for the transaction to be committed
+						let txID = tx.send.transactionIntentHash
+						try await submitTXClient.hasTXBeenCommittedSuccessfully(txID)
+						/// Safe to update the account to new state
+						try await accountsClient.updateAccount(updatedAccount)
+						await send(.internal(.updated(updatedAccount)))
+						return
+					}
+
+					assertionFailure("Not a transaction Response?")
+				case .dapp(.failure), .none:
+					/// Either user did dismiss the TransctionReview, or there was a failure.
+					/// Any failure message will be displayed in Transaction Review
+					break
+				}
+
+			} catch {
+				errorQueue.schedule(error)
+			}
+		}
+	}
+
+	private func prepareForSubmission(_ state: State) -> (manifest: TransactionManifest, account: Profile.Network.Account) {
+		// Are there any updates
+
+		let onLedgerConfig = state.account.onLedgerSettings.thirdPartyDeposits
+		let localConfig = state.thirdPartyDeposits
+
+		// 1. Deposit rule change
+		let depositorRule = onLedgerConfig.depositRule != localConfig.depositRule ? localConfig.depositRule : nil
+
+		// 2. assetException changes:
+		let assetExceptionsToAddOrUpdate = localConfig.assetsExceptionList.filter { localException in
+			guard let onLedgerException = onLedgerConfig.assetsExceptionList.first(where: { $0.address == localException.address }) else {
+				// New exception to be added on Ledger
+				return true
+			}
+			// Exception rule did change
+			return onLedgerException.exceptionRule != localException.exceptionRule
+		}
+		let assetExceptionsToBeRemoved = onLedgerConfig
+			.assetsExceptionList
+			.filter {
+				!localConfig.assetsExceptionList.contains($0)
+			}.map(\.address)
+
+		// 3. Depositor allow list:
+		let depositorAddressesToAdd = localConfig.depositorsAllowList.filter { !onLedgerConfig.depositorsAllowList.contains($0) }
+		let depositorAddressesToRemove = onLedgerConfig.depositorsAllowList.filter { !localConfig.depositorsAllowList.contains($0) }
+
+		let accountAddress = state.account.address
+
+		let manifest = try! ManifestBuilder.make {
+			if let depositorRule {
+				ManifestBuilder.setDefaultDepositorRule(accountAddress, depositorRule)
+			}
+
+			for resourceAddress in assetExceptionsToBeRemoved {
+				ManifestBuilder.removeResourcePreference(accountAddress, resourceAddress)
+			}
+
+			for assetException in assetExceptionsToAddOrUpdate {
+				ManifestBuilder.setResourcePreference(accountAddress, assetException)
+			}
+
+			for depositorAddress in depositorAddressesToRemove {
+				ManifestBuilder.removeAuthorizedDepositor(accountAddress, depositorAddress)
+			}
+
+			for depositorAddress in depositorAddressesToAdd {
+				ManifestBuilder.addAuthorizedDepositor(accountAddress, depositorAddress)
+			}
+		}.build(networkId: state.account.networkID.rawValue)
+
+		var updatedAccount = state.account
+		updatedAccount.onLedgerSettings.thirdPartyDeposits = localConfig
+		return (manifest, updatedAccount)
 	}
 }
 

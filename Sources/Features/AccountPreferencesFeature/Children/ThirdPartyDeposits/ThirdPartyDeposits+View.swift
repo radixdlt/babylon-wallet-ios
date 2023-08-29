@@ -19,13 +19,15 @@ extension ManageThirdPartyDeposits.State {
 				rows: [.allowDenyAssets()]
 			),
 			.init(id: .allowDepositors, title: nil, rows: [.allowDepositors()]),
-		])
+		],
+		updateButtonControlState: account.onLedgerSettings.thirdPartyDeposits == thirdPartyDeposits ? .disabled : .enabled)
 	}
 }
 
 extension ManageThirdPartyDeposits {
 	public struct ViewState: Equatable {
 		let sections: [PreferenceSection<ManageThirdPartyDeposits.Section, ManageThirdPartyDeposits.Section.Row>.ViewState]
+		let updateButtonControlState: ControlState
 	}
 
 	@MainActor
@@ -47,7 +49,11 @@ extension ManageThirdPartyDeposits {
 				.defaultNavBarConfig()
 				.destination(store: store)
 				.footer {
-					Button("Update", action: { viewStore.send(.updateTapped) }).buttonStyle(.primaryRectangular)
+					Button("Update") { // FIXME: strings
+						viewStore.send(.updateTapped)
+					}
+					.controlState(viewStore.updateButtonControlState)
+					.buttonStyle(.primaryRectangular)
 				}
 			}
 		}

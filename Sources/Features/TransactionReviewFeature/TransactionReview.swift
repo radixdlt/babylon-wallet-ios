@@ -374,7 +374,6 @@ public struct TransactionReview: Sendable, FeatureReducer {
 
 		case .signing(.delegate(.finishedSigning(.signAuth(_)))):
 			state.canApproveTX = true
-			assertionFailure("Did not expect to have sign auth data...")
 			return .none
 
 		case .signing:

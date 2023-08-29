@@ -43,6 +43,7 @@ package.addModules([
 			"OverlayWindowClient",
 			"OnLedgerEntitiesClient",
 			"DappInteractionClient",
+			"SubmitTransactionClient",
 		],
 		tests: .yes()
 	),
