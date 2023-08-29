@@ -61,9 +61,9 @@ extension AccountDepositSettingsChange {
 							Text(depositRuleChange.string)
 								.foregroundColor(.app.gray1)
 								.textStyle(.body1Regular)
+							Separator()
 						}
 						ForEach(viewStore.resourceChanges) { resourceChange in
-							Separator()
 							Button(action: { viewStore.send(.assetTapped(resourceChange.resource)) }) {
 								HStack {
 									ResourceIconNameView(resource: resourceChange.resource)
