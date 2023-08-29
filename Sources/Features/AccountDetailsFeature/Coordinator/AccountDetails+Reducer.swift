@@ -24,6 +24,13 @@ public struct AccountDetails: Sendable, FeatureReducer {
 		@PresentationState
 		var destination: Destinations.State?
 
+		fileprivate var deviceControlledFactorInstance: FactorInstance {
+			switch account.securityState {
+			case let .unsecured(control):
+				return control.transactionSigning.factorInstance
+			}
+		}
+
 		public init(
 			for account: Profile.Network.Account,
 			callToAction: CallToAction? = nil
@@ -146,7 +153,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 			return .none
 
 		case .exportMnemonicButtonTapped:
-			return loadMnemonic(account: state.account)
+			return loadMnemonic(state: state)
 
 		case .recoverMnemonicsButtonTapped:
 			return loadImport()
@@ -168,8 +175,16 @@ public struct AccountDetails: Sendable, FeatureReducer {
 
 		case let .destination(.presented(.importMnemonics(.delegate(delegateAction)))):
 			switch delegateAction {
-			case .closeButtonTapped, .failedToImportAllRequiredMnemonics, .finishedImportingMnemonics:
+			case .closeButtonTapped, .failedToImportAllRequiredMnemonics:
 				break
+			case let .finishedImportingMnemonics(skipped, imported):
+				if
+					let cta = state.callToAction,
+					case .needToImportMnemonicForThisAccount = cta,
+					imported.contains(where: { $0.factorSourceID == state.deviceControlledFactorInstance.factorSourceID })
+				{
+					state.callToAction = nil
+				}
 			}
 			state.destination = nil
 			return .none
@@ -182,7 +197,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
 		case .loadMnemonic:
-			return loadMnemonic(account: state.account)
+			return loadMnemonic(state: state)
 
 		case .loadImport:
 			return loadImport()
@@ -217,18 +232,14 @@ public struct AccountDetails: Sendable, FeatureReducer {
 		}
 	}
 
-	private func loadMnemonic(account: Profile.Network.Account) -> EffectTask<Action> {
+	private func loadMnemonic(state: State) -> EffectTask<Action> {
 		loggerGlobal.feature("implement export")
-		let factorInstance: FactorInstance = {
-			switch account.securityState {
-			case let .unsecured(control): return control.transactionSigning.factorInstance
-			}
-		}()
+		let factorInstance = state.deviceControlledFactorInstance
 		let factorSourceID = factorInstance.factorSourceID
 		return .task {
 			let result = await TaskResult {
 				guard let mnemonicWithPassphrase = try await secureStorageClient.loadMnemonicByFactorSourceID(factorSourceID, .displaySeedPhrase) else {
-					loggerGlobal.error("Failed to find mnemonic with key: \(factorSourceID) which controls account: \(account)")
+					loggerGlobal.error("Failed to find mnemonic with key: \(factorSourceID) which controls account: \(state.account)")
 					struct UnabledToFindExpectedMnemonic: Swift.Error {}
 					throw UnabledToFindExpectedMnemonic()
 				}
