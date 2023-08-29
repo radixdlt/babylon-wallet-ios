@@ -2,19 +2,30 @@ import Dependencies
 
 // MARK: - UserDefaultsClient
 public struct UserDefaultsClient: Sendable {
-	public typealias Key = String
+	public enum Key: String, Sendable, Hashable, CaseIterable {
+		case hideMigrateOlympiaButton
+		case epochForWhenLastUsedByAccountAddress
+
+		/// DO NOT CHANGE THIS KEY
+		case activeProfileID
+
+		case accountsThatNeedRecovery
+		case mnemonicsUserClaimsToHaveBackedUp
+	}
 
 	public var stringForKey: @Sendable (Key) -> String?
 	public var boolForKey: @Sendable (Key) -> Bool
 	public var dataForKey: @Sendable (Key) -> Data?
 	public var doubleForKey: @Sendable (Key) -> Double
 	public var integerForKey: @Sendable (Key) -> Int
-	public var remove: @Sendable (Key) async -> Void
+	public typealias RemoveValueForKey = @Sendable (Key) async -> Void
+	public var remove: RemoveValueForKey
 	public var setString: @Sendable (String, Key) async -> Void
 	public var setBool: @Sendable (Bool, Key) async -> Void
 	public var setData: @Sendable (Data?, Key) async -> Void
 	public var setDouble: @Sendable (Double, Key) async -> Void
 	public var setInteger: @Sendable (Int, Key) async -> Void
+	public var removeAll: @Sendable () async -> Void
 }
 
 extension UserDefaultsClient {
@@ -36,12 +47,11 @@ extension UserDefaultsClient {
 }
 
 extension UserDefaultsClient {
-	private static let hideMigrateOlympiaButtonKey = "hideMigrateOlympiaButton"
 	public var hideMigrateOlympiaButton: Bool {
-		boolForKey(Self.hideMigrateOlympiaButtonKey)
+		boolForKey(.hideMigrateOlympiaButton)
 	}
 
 	public func setHideMigrateOlympiaButton(_ value: Bool) async {
-		await setBool(value, Self.hideMigrateOlympiaButtonKey)
+		await setBool(value, .hideMigrateOlympiaButton)
 	}
 }

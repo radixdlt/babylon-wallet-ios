@@ -8,8 +8,6 @@ import SubmitTransactionClient
 import TransactionClient
 
 let minimumNumberOfEpochsPassedForFaucetToBeReused = 1
-// internal for tests
-let epochForWhenLastUsedByAccountAddressKey = "faucet.epochForWhenLastUsedByAccountAddressKey"
 
 // MARK: - FaucetClient + DependencyKey
 extension FaucetClient: DependencyKey {
@@ -175,12 +173,12 @@ extension FaucetClient: DependencyKey {
 
 private extension UserDefaultsClient {
 	func loadEpochForWhenLastUsedByAccountAddress() -> EpochForWhenLastUsedByAccountAddress {
-		(try? loadCodable(key: epochForWhenLastUsedByAccountAddressKey)) ?? .init()
+		(try? loadCodable(key: .epochForWhenLastUsedByAccountAddress)) ?? .init()
 	}
 
 	func saveEpochForWhenLastUsedByAccountAddress(_ value: EpochForWhenLastUsedByAccountAddress) async {
 		// not important enough to propagate error
-		try? await save(codable: value, forKey: epochForWhenLastUsedByAccountAddressKey)
+		try? await save(codable: value, forKey: .epochForWhenLastUsedByAccountAddress)
 	}
 }
 
