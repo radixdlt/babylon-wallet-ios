@@ -146,11 +146,20 @@ public struct ManageThirdPartyDeposits: FeatureReducer, Sendable {
 				}
 			}.build(networkId: state.account.networkID.rawValue)
 
-			state.account.onLedgerSettings.thirdPartyDeposits = localConfig
 			return .run { [account = state.account] _ in
 				do {
-					try await dappInteractionClient.addWalletInteraction(.transaction(.init(send: .init(version: .default, transactionManifest: manifest, message: nil))))
-					try await accountsClient.updateAccount(account)
+					let result = await dappInteractionClient.addWalletInteraction(.transaction(.init(send: .init(version: .default, transactionManifest: manifest, message: nil))))
+					switch result {
+					case .dapp(.success):
+						var account = account
+						account.onLedgerSettings.thirdPartyDeposits = localConfig
+						try await accountsClient.updateAccount(account)
+					case let .dapp(.failure(failure)):
+						if failure.errorType != .rejectedByUser {}
+					case .none:
+						break
+					}
+
 				} catch {
 					errorQueue.schedule(error)
 				}

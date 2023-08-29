@@ -1,17 +1,17 @@
 import FeaturePrelude
 
-extension DappMetadata {
-	var name: String {
-		switch self {
-		case let .ledger(ledger):
-			return ledger.name?.rawValue ?? L10n.DAppRequest.Metadata.unknownName
-		case .request:
-			return L10n.DAppRequest.Metadata.unknownName
-		case .wallet:
-			return "Radix Wallet"
-		}
-	}
-}
+// extension DappMetadata {
+//	var name: String {
+//		switch self {
+//		case let .ledger(ledger):
+//			return ledger.name?.rawValue ?? L10n.DAppRequest.Metadata.unknownName
+//		case .request:
+//			return L10n.DAppRequest.Metadata.unknownName
+//		case .wallet:
+//			return "Radix Wallet"
+//		}
+//	}
+// }
 
 // MARK: - Completion.View
 extension Completion {
@@ -21,7 +21,7 @@ extension Completion {
 
 		init(state: Completion.State) {
 			title = L10n.DAppRequest.Completion.title
-			subtitle = L10n.DAppRequest.Completion.subtitle(state.dappMetadata.name)
+			subtitle = state.item.dappName
 		}
 	}
 
@@ -58,35 +58,3 @@ extension Completion {
 		}
 	}
 }
-
-#if DEBUG
-import SwiftUI // NB: necessary for previews to appear
-
-// MARK: - Completion_Preview
-struct Completion_Preview: PreviewProvider {
-	static var previews: some SwiftUI.View {
-		WithState(initialValue: false) { $isPresented in
-			ZStack {
-				Color.red
-				Button("Present") { isPresented = true }
-			}
-			.sheet(isPresented: $isPresented) {
-				Completion.View(
-					store: .init(
-						initialState: .previewValue,
-						reducer: Completion()
-					)
-				)
-			}
-			.task {
-				try? await Task.sleep(for: .seconds(2))
-				isPresented = true
-			}
-		}
-	}
-}
-
-extension Completion.State {
-	static let previewValue: Self = .init(dappMetadata: .previewValue)
-}
-#endif

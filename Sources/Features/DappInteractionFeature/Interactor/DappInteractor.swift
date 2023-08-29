@@ -2,6 +2,7 @@ import AppPreferencesClient
 import DappInteractionClient
 import FeaturePrelude
 import GatewaysClient
+import OverlayWindowClient
 import RadixConnect
 import RadixConnectClient
 import RadixConnectModels
@@ -60,20 +61,15 @@ struct DappInteractor: Sendable, FeatureReducer {
 	struct Destinations: Sendable, ReducerProtocol {
 		enum State: Sendable, Hashable {
 			case dappInteraction(RelayState<RequestEnvelope, DappInteractionCoordinator.State>)
-			case dappInteractionCompletion(Completion.State)
 		}
 
 		enum Action: Sendable, Equatable {
 			case dappInteraction(RelayAction<RequestEnvelope, DappInteractionCoordinator.Action>)
-			case dappInteractionCompletion(Completion.Action)
 		}
 
 		var body: some ReducerProtocolOf<Self> {
 			Scope(state: /State.dappInteraction, action: /Action.dappInteraction) {
 				Relay { DappInteractionCoordinator() }
-			}
-			Scope(state: /State.dappInteractionCompletion, action: /Action.dappInteractionCompletion) {
-				Completion()
 			}
 		}
 	}
@@ -87,6 +83,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 	@Dependency(\.rolaClient) var rolaClient
 	@Dependency(\.appPreferencesClient) var appPreferencesClient
 	@Dependency(\.dappInteractionClient) var dappInteractionClient
+	@Dependency(\.overlayWindowClient) var overlayWindowClient
 
 	var body: some ReducerProtocolOf<Self> {
 		Reduce(core)
@@ -134,15 +131,6 @@ struct DappInteractor: Sendable, FeatureReducer {
 	func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
 		case let .receivedRequestFromDapp(request):
-
-			switch state.currentModal {
-			case .some(.dappInteractionCompletion):
-				// FIXME: this is a temporary hack, to solve bug where incoming requests
-				// are ignored since completion is believed to be shown, but is not.
-				state.currentModal = nil
-			default: break
-			}
-
 			if request.route == .wallet {
 				// dismiss current request, wallet request takes precedence
 				state.currentModal = nil
@@ -160,7 +148,12 @@ struct DappInteractor: Sendable, FeatureReducer {
 			dismissCurrentModalAndRequest(request, for: &state)
 			switch response {
 			case .success:
-				return .send(.internal(.presentResponseSuccessView(dappMetadata)))
+				if case .transaction = request.request.items {
+					// Status is displayed in transactions status slide up
+					return .none
+				} else {
+					return .send(.internal(.presentResponseSuccessView(dappMetadata)))
+				}
 			case .failure:
 				return delayedEffect(for: .internal(.presentQueuedRequestIfNeeded))
 			}
@@ -203,7 +196,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 			return .none
 
 		case let .presentResponseSuccessView(dappMetadata):
-			state.currentModal = .dappInteractionCompletion(.init(dappMetadata: dappMetadata))
+			overlayWindowClient.scheduleDappInteractionSuccess(.init(dappName: dappMetadata.name))
 			return .none
 		}
 	}
@@ -221,11 +214,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 			return delayedEffect(for: .internal(.presentQueuedRequestIfNeeded))
 
 		case .modal(.dismiss):
-			if case .dappInteractionCompletion = state.currentModal {
-				return delayedEffect(for: .internal(.presentQueuedRequestIfNeeded))
-			}
-
-			return .none
+			return delayedEffect(for: .internal(.presentQueuedRequestIfNeeded))
 
 		default:
 			return .none
@@ -255,8 +244,8 @@ struct DappInteractor: Sendable, FeatureReducer {
 
 			// In case of transaction response, sending it to the peer client is a silent operation.
 			// The success or failures is determined based on the transaction polling status.
-			let isTransactionResponse = {
-				if case let .success(successResponse) = responseToDapp,
+			let shouldSendBackResponse = {
+				if request.route != .wallet, case let .success(successResponse) = responseToDapp,
 				   case .transaction = successResponse.items
 				{
 					return true
@@ -266,7 +255,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 
 			do {
 				_ = try await dappInteractionClient.completeInteraction(.response(.dapp(responseToDapp), origin: request.route))
-				if !isTransactionResponse {
+				if !shouldSendBackResponse {
 					await send(.internal(
 						.sentResponseToDapp(
 							responseToDapp,
@@ -276,7 +265,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 					))
 				}
 			} catch {
-				if !isTransactionResponse {
+				if !shouldSendBackResponse {
 					await send(.internal(
 						.failedToSendResponseToDapp(
 							responseToDapp,

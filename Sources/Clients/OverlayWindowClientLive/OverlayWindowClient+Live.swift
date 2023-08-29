@@ -21,7 +21,7 @@ extension OverlayWindowClient: DependencyKey {
 			))
 		}.subscribe(items)
 
-		pasteBoardClient.copyEvents().map { _ in Item.hud(.copied) }.subscribe(items)
+		pasteBoardClient.copyEvents().map { _ in Item.dappInteractionSucess(.init(title: "sd", subtitle: "sds")) }.subscribe(items)
 
 		return .init(
 			scheduledItems: { items.eraseToAnyAsyncSequence() },
@@ -32,7 +32,10 @@ extension OverlayWindowClient: DependencyKey {
 			scheduleHUD: { items.send(.hud($0)) },
 			sendAlertAction: { action, id in alertActions.send((action, id)) },
 			setIsUserIteractionEnabled: { isUserInteractionEnabled.send($0) },
-			isUserInteractionEnabled: { isUserInteractionEnabled.eraseToAnyAsyncSequence() }
+			isUserInteractionEnabled: { isUserInteractionEnabled.eraseToAnyAsyncSequence() },
+			scheduleDappInteractionSuccess: { model in
+				items.send(.dappInteractionSucess(model))
+			}
 		)
 	}()
 }

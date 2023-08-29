@@ -31,11 +31,13 @@ struct OverlayReducer: Sendable, FeatureReducer {
 		public enum State: Sendable, Hashable {
 			case hud(HUD.State)
 			case alert(OverlayWindowClient.Item.AlertState)
+			case dappInteractionCompletion(Completion.State)
 		}
 
 		public enum Action: Sendable, Equatable {
 			case hud(HUD.Action)
 			case alert(OverlayWindowClient.Item.AlertAction)
+			case dappInteractionCompletion(Completion.Action)
 		}
 
 		public var body: some ReducerProtocol<State, Action> {
@@ -44,6 +46,10 @@ struct OverlayReducer: Sendable, FeatureReducer {
 			}
 			Scope(state: /State.alert, action: /Action.alert) {
 				EmptyReducer()
+			}
+
+			Scope(state: /State.dappInteractionCompletion, action: /Action.dappInteractionCompletion) {
+				Completion()
 			}
 		}
 	}
@@ -128,6 +134,9 @@ struct OverlayReducer: Sendable, FeatureReducer {
 			return .none
 		case let .alert(alert):
 			state.destination = .alert(alert)
+			return setIsUserInteractionEnabled(&state, isEnabled: true)
+		case let .dappInteractionSucess(item):
+			state.destination = .dappInteractionCompletion(.init(item: item))
 			return setIsUserInteractionEnabled(&state, isEnabled: true)
 		}
 	}

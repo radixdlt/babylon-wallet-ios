@@ -1,14 +1,15 @@
 import FeaturePrelude
+import OverlayWindowClient
 
 // MARK: - Completion
 struct Completion: Sendable, FeatureReducer {
 	struct State: Sendable, Hashable {
-		let dappMetadata: DappMetadata
+		let item: OverlayWindowClient.Item.DappInteractionSuccess
 
 		init(
-			dappMetadata: DappMetadata
+			item: OverlayWindowClient.Item.DappInteractionSuccess
 		) {
-			self.dappMetadata = dappMetadata
+			self.item = item
 		}
 	}
 

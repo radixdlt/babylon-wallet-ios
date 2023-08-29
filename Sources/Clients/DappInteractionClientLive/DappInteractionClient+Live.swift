@@ -11,6 +11,8 @@ import SharedModels
 extension DappInteractionClient: DependencyKey {
 	public static var liveValue: DappInteractionClient = {
 		let interactionsStream: AsyncPassthroughSubject<ValidatedDappRequest> = .init()
+		let interactionResponsesStream: AsyncPassthroughSubject<P2P.RTCOutgoingMessage.Response> = .init()
+
 		@Dependency(\.radixConnectClient) var radixConnectClient
 
 		Task {
@@ -28,10 +30,11 @@ extension DappInteractionClient: DependencyKey {
 			addWalletInteraction: { items in
 				@Dependency(\.gatewaysClient) var gatewaysClient
 
+				let id: P2P.Dapp.Request.ID = .init(UUID().uuidString)
 				let request = await ValidatedDappRequest.valid(.init(
 					route: .wallet,
 					request: .init(
-						id: .init(UUID().uuidString),
+						id: id,
 						items: items,
 						metadata: .init(
 							version: P2P.Dapp.currentVersion,
@@ -42,11 +45,21 @@ extension DappInteractionClient: DependencyKey {
 					)
 				))
 				interactionsStream.send(request)
+
+				return await interactionResponsesStream.first(where: {
+					switch $0 {
+					case let .dapp(response):
+						return response.id == id
+					}
+				})
 			},
 			completeInteraction: { message in
 				switch message {
-				case let .response(response, .rtc(route)):
-					try await radixConnectClient.sendResponse(response, route)
+				case let .response(response, route):
+					interactionResponsesStream.send(response)
+					if case let .rtc(rtcRoute) = route {
+						try await radixConnectClient.sendResponse(response, rtcRoute)
+					}
 				default:
 					break
 				}

@@ -39,6 +39,15 @@ extension P2P.Dapp {
 		case success(WalletInteractionSuccessResponse)
 		case failure(WalletInteractionFailureResponse)
 
+		public var id: P2P.Dapp.Request.ID {
+			switch self {
+			case let .success(response):
+				return response.interactionId
+			case let .failure(response):
+				return response.interactionId
+			}
+		}
+
 		public func encode(to encoder: Encoder) throws {
 			var container = encoder.container(keyedBy: CodingKeys.self)
 			switch self {

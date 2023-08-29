@@ -21,7 +21,7 @@ public struct DappInteractionClient: Sendable {
 }
 
 extension DappInteractionClient {
-	public typealias AddWalletInteraction = @Sendable (P2P.Dapp.Request.Items) async -> Void
+	public typealias AddWalletInteraction = @Sendable (P2P.Dapp.Request.Items) async -> P2P.RTCOutgoingMessage.Response?
 	public typealias CompleteInteraction = @Sendable (P2P.RTCOutgoingMessage) async throws -> Void
 }
 

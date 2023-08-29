@@ -25,6 +25,17 @@ extension OverlayReducer {
 					state: /OverlayReducer.Destinations.State.alert,
 					action: OverlayReducer.Destinations.Action.alert
 				)
+				.sheet(store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+				       state: /OverlayReducer.Destinations.State.dappInteractionCompletion,
+				       action: OverlayReducer.Destinations.Action.dappInteractionCompletion,
+				       content: { _ in
+				       	Text("Hello Sheet")
+				       		.presentationDragIndicator(.visible)
+				       		.presentationDetents([.fraction(0.4)])
+				       	#if os(iOS)
+				       		.presentationBackground(.blur)
+				       	#endif
+				       })
 				.task { viewStore.send(.task) }
 			}
 		}

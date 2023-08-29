@@ -180,6 +180,7 @@ package.addModules([
 			"TransactionReviewFeature",
 			"SigningFeature",
 			"DappInteractionClient",
+			"OverlayWindowClient",
 		],
 		tests: .yes()
 	),

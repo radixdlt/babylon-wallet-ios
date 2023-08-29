@@ -19,6 +19,8 @@ public struct OverlayWindowClient: Sendable {
 	/// Usually to be called from the Main Window.
 	public var scheduleHUD: ScheduleHUD
 
+	public var scheduleDappInteractionSuccess: ScheduleDappInteractionSuccess
+
 	/// This is meant to be used by the Overlay Window to send
 	/// back the actions from an Alert to the Main Window.
 	public var sendAlertAction: SendAlertAction
@@ -32,7 +34,8 @@ public struct OverlayWindowClient: Sendable {
 		scheduleHUD: @escaping ScheduleHUD,
 		sendAlertAction: @escaping SendAlertAction,
 		setIsUserIteractionEnabled: @escaping SetIsUserIteractionEnabled,
-		isUserInteractionEnabled: @escaping IsUserInteractionEnabled
+		isUserInteractionEnabled: @escaping IsUserInteractionEnabled,
+		scheduleDappInteractionSuccess: @escaping ScheduleDappInteractionSuccess
 	) {
 		self.scheduledItems = scheduledItems
 		self.scheduleAlert = scheduleAlert
@@ -40,6 +43,7 @@ public struct OverlayWindowClient: Sendable {
 		self.sendAlertAction = sendAlertAction
 		self.setIsUserIteractionEnabled = setIsUserIteractionEnabled
 		self.isUserInteractionEnabled = isUserInteractionEnabled
+		self.scheduleDappInteractionSuccess = scheduleDappInteractionSuccess
 	}
 }
 
@@ -51,11 +55,20 @@ extension OverlayWindowClient {
 
 	public typealias SetIsUserIteractionEnabled = @Sendable (Bool) -> Void
 	public typealias IsUserInteractionEnabled = @Sendable () -> AnyAsyncSequence<Bool>
+	public typealias ScheduleDappInteractionSuccess = @Sendable (Item.DappInteractionSuccess) -> Void
 }
 
 // MARK: OverlayWindowClient.Item
 extension OverlayWindowClient {
 	public enum Item: Sendable, Hashable {
+		public struct DappInteractionSuccess: Sendable, Hashable {
+			public let dappName: String
+
+			public init(dappName: String) {
+				self.dappName = dappName
+			}
+		}
+
 		public typealias AlertState = ComposableArchitecture.AlertState<AlertAction>
 		public enum AlertAction: Equatable {
 			case primaryButtonTapped
@@ -106,6 +119,7 @@ extension OverlayWindowClient {
 
 		case hud(HUD)
 		case alert(AlertState)
+		case dappInteractionSucess(DappInteractionSuccess)
 	}
 }
 
