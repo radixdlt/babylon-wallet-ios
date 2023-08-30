@@ -151,8 +151,7 @@ extension PeerConnectionNegotiator {
 			}
 			.prefix(1)
 
-		let onDataChannelReady = await peerConnectionClient
-			.dataChannelClient
+		let onDataChannelReady = peerConnectionClient
 			.dataChannelReadyStates
 			.filter {
 				$0 == .connected

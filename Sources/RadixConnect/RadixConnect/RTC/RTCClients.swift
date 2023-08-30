@@ -116,20 +116,20 @@ extension RTCClients {
 		_ response: P2P.RTCOutgoingMessage.Response,
 		to origin: P2P.RTCRoute
 	) async throws {
-		guard let rtcClient = clients[origin.connectionId], await rtcClient.hasAnyActiveConnections() else {
-			loggerGlobal.info("RTCClients: No Active Peer Connection to send back message to, creating anew")
-			await disconnectAndRemoveClient(origin.connectionId)
-			// missing client, create anew
-			try await connect(origin.connectionId, waitsForConnectionToBeEstablished: true)
-			try await clients[origin.connectionId]?.send(response: response, to: origin.peerConnectionId)
-			loggerGlobal.info("RTCClients: Did send message over freshly established PeerConnection")
-			return
-		}
-
-		try await rtcClient.send(
-			response: response,
-			to: origin.peerConnectionId
-		)
+		// guard let rtcClient = clients[origin.connectionId], await rtcClient.hasAnyActiveConnections() else {
+		loggerGlobal.info("RTCClients: No Active Peer Connection to send back message to, creating anew")
+		await disconnectAndRemoveClient(origin.connectionId)
+		// missing client, create anew
+		try await connect(origin.connectionId, waitsForConnectionToBeEstablished: true)
+		try await clients[origin.connectionId]?.send(response: response, to: origin.peerConnectionId)
+		loggerGlobal.info("RTCClients: Did send message over freshly established PeerConnection")
+//			return
+//		}
+//
+//		try await rtcClient.send(
+//			response: response,
+//			to: origin.peerConnectionId
+//		)
 	}
 
 	/// Sends a `request` using `strategy` to find suitable recipients or recipient.
@@ -399,8 +399,7 @@ extension RTCClient {
 			.map { _ in connection.id }
 			.subscribe(disconnectedPeerConnectionContinuation)
 
-		await connection
-			.dataChannelClient
+		connection
 			.dataChannelReadyStates
 			.filter {
 				$0 == .closed

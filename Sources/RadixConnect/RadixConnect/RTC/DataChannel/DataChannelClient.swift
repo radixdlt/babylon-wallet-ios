@@ -24,8 +24,8 @@ actor DataChannelClient {
 	// MARK: - Configuration
 	private let jsonDecoder: JSONDecoder = .init()
 	private let jsonEncoder: JSONEncoder = .init()
-	let dataChannel: DataChannel
-	let delegate: DataChannelDelegate
+	private let dataChannel: DataChannel
+	private let delegate: DataChannelDelegate
 	private let messageIDBuilder: @Sendable () -> Message.ID
 
 	// MARK: - Streams

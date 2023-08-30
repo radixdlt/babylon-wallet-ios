@@ -26,9 +26,11 @@ public struct PeerConnectionClient: Sendable {
 		self.id = id
 		self.peerConnection = peerConnection
 		self.delegate = delegate
-		self.dataChannelClient = try peerConnection.createDataChannel()
+		let dataChannelClient = try peerConnection.createDataChannel()
+		self.dataChannelClient = dataChannelClient
 		let iceConnectionStateSubject = AsyncCurrentValueSubject<ICEConnectionState>(.new)
 		self.iceConnectionStateSubject = iceConnectionStateSubject
+
 		let dataChannelReadyStatesSubject = AsyncCurrentValueSubject<DataChannelReadyState>(.connecting)
 		self.dataChannelReadyStatesSubject = dataChannelReadyStatesSubject
 
@@ -36,6 +38,12 @@ public struct PeerConnectionClient: Sendable {
 			for try await connectionUpdate in delegate.onIceConnectionState {
 				loggerGlobal.info("Ice connection state: \(connectionUpdate)")
 				iceConnectionStateSubject.send(connectionUpdate)
+			}
+		}
+
+		Task {
+			for try await stateUpdate in await dataChannelClient.dataChannelReadyStates {
+				dataChannelReadyStatesSubject.send(stateUpdate)
 			}
 		}
 	}
