@@ -1025,7 +1025,7 @@ package.addModules([
 		dependencies: [
 			"Cryptography",
 			.product(name: "EngineToolkit", package: "swift-engine-toolkit") {
-				.package(url: "https://github.com/radixdlt/swift-engine-toolkit", branch: "release/grape")
+				.package(url: "https://github.com/radixdlt/swift-engine-toolkit", branch: "release/rcnet-v3")
 			},
 		],
 		tests: .no
