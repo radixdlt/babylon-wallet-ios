@@ -8,3 +8,6 @@ extension TXID {
 		bytes().hex()
 	}
 }
+
+// MARK: Sendable
+extension TXID: @unchecked Sendable {}

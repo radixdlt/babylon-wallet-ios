@@ -56,7 +56,9 @@ extension DappInteractionClient: DependencyKey {
 			completeInteraction: { message in
 				switch message {
 				case let .response(response, route):
-					interactionResponsesSubject.send(response)
+					Task {
+						interactionResponsesSubject.send(response)
+					}
 					if case let .rtc(rtcRoute) = route {
 						try await radixConnectClient.sendResponse(response, rtcRoute)
 					}

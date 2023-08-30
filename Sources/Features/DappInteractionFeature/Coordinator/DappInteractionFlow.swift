@@ -522,15 +522,18 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			return .none // TODO: throw error (invalid response format)
 		}
 
-		return .run { [state] send in
-			// Save login date, data fields, and ongoing accounts to Profile
-			if let persona = state.persona {
-				// FIXME: handle error
-				try await updatePersona(persona, state, responseItems: response.items)
-			}
-
-			await send(.delegate(.submit(response, state.dappMetadata)))
-		}
+		loggerGlobal.error("TRACE: \(#file) \(#function) \(#line)")
+		return .send(.delegate(.submit(response, state.dappMetadata)))
+//		return .run { [state] send in
+//			// Save login date, data fields, and ongoing accounts to Profile
+//			if let persona = state.persona {
+//				// FIXME: handle error
+//				try await updatePersona(persona, state, responseItems: response.items)
+//			}
+//
+		//            loggerGlobal.error("TRACE: \(#file) \(#function) \(#line)")
+//			await send(.delegate(.submit(response, state.dappMetadata)))
+//		}
 	}
 
 	func updatePersona(

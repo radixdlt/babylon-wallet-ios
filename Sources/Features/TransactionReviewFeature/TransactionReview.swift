@@ -361,15 +361,16 @@ public struct TransactionReview: Sendable, FeatureReducer {
 
 		case let .signing(.delegate(.finishedSigning(.signTransaction(notarizedTX, origin: _)))):
 			state.destination = nil
-			return .task { [txID = notarizedTX.txID, notarized = notarizedTX.notarized] in
-				await .internal(.submitTXResult(
-					TaskResult {
-						try await submitTXClient.submitTransaction(.init(
-							txID: txID,
-							compiledNotarizedTXIntent: notarized
-						))
-					}
-				))
+			return .run { [txID = notarizedTX.txID, notarized = notarizedTX.notarized] send in
+				let task = await TaskResult {
+					try await submitTXClient.submitTransaction(.init(
+						txID: txID,
+						compiledNotarizedTXIntent: notarized
+					))
+				}
+				loggerGlobal.error("TRACE: \(#file) \(#function) \(#line)")
+				await send(.internal(.submitTXResult(task)))
+				loggerGlobal.error("TRACE: \(#file) \(#function) \(#line)")
 			}
 
 		case .signing(.delegate(.finishedSigning(.signAuth(_)))):
