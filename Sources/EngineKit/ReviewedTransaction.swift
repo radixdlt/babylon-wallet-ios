@@ -175,11 +175,14 @@ extension TransactionType {
 			))
 		case let .accountDepositSettings(resourcePreferenceChanges, defaultDepositRuleChanges, authorizedDepositorsChanges):
 			return try .conforming(.accountDepositSettings(
-				.init(resourcePreferenceChanges: resourcePreferenceChanges.mapKeyValues(AccountAddress.init(validatingAddress:), fValue: {
-					try $0.mapKeys(ResourceAddress.init(validatingAddress:))
-				}),
-				defaultDepositRuleChanges: defaultDepositRuleChanges.mapKeys(AccountAddress.init(validatingAddress:)),
-				authorizedDepositorsChanges: authorizedDepositorsChanges.mapKeys(AccountAddress.init(validatingAddress:)))
+				.init(
+					resourcePreferenceChanges: resourcePreferenceChanges.mapKeyValues(
+						AccountAddress.init(validatingAddress:),
+						fValue: { try $0.mapKeys(ResourceAddress.init(validatingAddress:)) }
+					),
+					defaultDepositRuleChanges: defaultDepositRuleChanges.mapKeys(AccountAddress.init(validatingAddress:)),
+					authorizedDepositorsChanges: authorizedDepositorsChanges.mapKeys(AccountAddress.init(validatingAddress:))
+				)
 			))
 		}
 	}
@@ -187,12 +190,7 @@ extension TransactionType {
 
 extension Dictionary {
 	func mapKeys<U>(_ f: (Key) throws -> U) throws -> [U: Value] {
-		try .init(
-			map {
-				try (f($0.key), $0.value)
-			},
-			uniquingKeysWith: { first, _ in first }
-		)
+		try mapKeyValues(f, fValue: { $0 })
 	}
 
 	func mapKeyValues<U, T>(_ fKey: (Key) throws -> U, fValue: (Value) throws -> T) throws -> [U: T] {

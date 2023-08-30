@@ -77,7 +77,6 @@ extension TransactionStatusPolling {
 					.padding(.horizontal, .medium2)
 					.padding(.bottom, .medium3)
 				}
-//				.frame(maxWidth: .infinity)
 				.onFirstTask { @MainActor in
 					viewStore.send(.appeared)
 				}

@@ -34,15 +34,13 @@ public struct TransactionStatusPolling: Sendable, FeatureReducer {
 
 	public enum InternalAction: Sendable, Equatable {
 		case statusUpdate(GatewayAPI.TransactionStatus)
-		case faileToReceiveUpdates
+		case failedToReceiveUpdates
 	}
 
 	public enum ViewAction: Sendable, Equatable {
 		case appeared
 		case closeButtonTapped
 	}
-
-	public enum DelegateAction: Sendable, Equatable {}
 
 	@Dependency(\.submitTXClient) var submitTXClient
 	@Dependency(\.dismiss) var dismiss
@@ -63,7 +61,7 @@ public struct TransactionStatusPolling: Sendable, FeatureReducer {
 				}
 			} catch: { error, send in
 				loggerGlobal.error("Failed to receive TX status update, error \(error)")
-				await send(.internal(.faileToReceiveUpdates))
+				await send(.internal(.failedToReceiveUpdates))
 			}
 
 		case .closeButtonTapped:
@@ -81,7 +79,7 @@ public struct TransactionStatusPolling: Sendable, FeatureReducer {
 			state.status = status
 
 			return .none
-		case .faileToReceiveUpdates:
+		case .failedToReceiveUpdates:
 			state.failureMessage = "Failed to get transaction status" // FIXME: Strings
 			return .none
 		}

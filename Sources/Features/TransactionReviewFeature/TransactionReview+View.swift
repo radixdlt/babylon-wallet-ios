@@ -233,8 +233,8 @@ extension TransactionReview {
 
 		@ViewBuilder
 		private var accountDepositSettingsSection: some SwiftUI.View {
-			let proofsStore = store.scope(state: \.accountDepositSettings) { .child(.accountDepositSettings($0)) }
-			IfLetStore(proofsStore) { childStore in
+			let accountDepositSettingsStore = store.scope(state: \.accountDepositSettings) { .child(.accountDepositSettings($0)) }
+			IfLetStore(accountDepositSettingsStore) { childStore in
 				AccountDepositSettings.View(store: childStore)
 					.padding(.bottom, .medium1)
 

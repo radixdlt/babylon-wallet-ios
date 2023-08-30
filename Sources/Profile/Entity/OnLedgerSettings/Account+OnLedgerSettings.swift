@@ -77,19 +77,6 @@ extension Profile.Network.Account.OnLedgerSettings {
 	}
 }
 
-/// Override default Hashable conformance to use only the Address for hashing and comparison,
-/// assuring that there is only one exception rule for a given Address in the Set.
-extension Profile.Network.Account.OnLedgerSettings.ThirdPartyDeposits.AssetException {
-	public func hash(into hasher: inout Hasher) {
-		hasher.combine(address)
-	}
-
-	public static func == (lhs: Self, rhs: Self) -> Bool {
-		lhs.address == rhs.address &&
-			lhs.exceptionRule == rhs.exceptionRule
-	}
-}
-
 extension Profile.Network.Account.OnLedgerSettings.ThirdPartyDeposits.DepositorAddress {
 	private enum CodingKeys: String, CodingKey {
 		case discriminator

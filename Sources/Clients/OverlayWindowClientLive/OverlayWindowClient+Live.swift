@@ -33,12 +33,8 @@ extension OverlayWindowClient: DependencyKey {
 			sendAlertAction: { action, id in alertActions.send((action, id)) },
 			setIsUserIteractionEnabled: { isUserInteractionEnabled.send($0) },
 			isUserInteractionEnabled: { isUserInteractionEnabled.eraseToAnyAsyncSequence() },
-			scheduleDappInteractionSuccess: { model in
-				items.send(.dappInteractionSucess(model))
-			},
-			scheduleTransactionPoll: { item in
-				items.send(.transactionPoll(item))
-			}
+			scheduleDappInteractionSuccess: { items.send(.dappInteractionSucess($0)) },
+			scheduleTransactionPoll: { items.send(.transactionPoll($0)) }
 		)
 	}()
 }

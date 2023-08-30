@@ -171,39 +171,42 @@ public struct ManageThirdPartyDeposits: FeatureReducer, Sendable {
 	}
 
 	private func prepareForSubmission(_ state: State) throws -> (manifest: TransactionManifest, account: Profile.Network.Account) {
-		// Are there any updates
-
 		let inProfileConfig = state.account.onLedgerSettings.thirdPartyDeposits
 		let localConfig = state.thirdPartyDeposits
 
-		// 1. Deposit rule change
-		let depositorRule: ThirdPartyDeposits.DepositRule? = inProfileConfig.depositRule != localConfig.depositRule ? localConfig.depositRule : nil
+		// 1. Deposit rule change:
+		let depositorRuleChange: ThirdPartyDeposits.DepositRule? = inProfileConfig.depositRule != localConfig.depositRule ? localConfig.depositRule : nil
 
 		// 2. assetException changes:
-		let assetExceptionsToAddOrUpdate: [ThirdPartyDeposits.AssetException] = localConfig.assetsExceptionList.filter { localException in
-			guard let onLedgerException = inProfileConfig.assetsExceptionList.first(where: { $0.address == localException.address }) else {
-				// New exception to be added on Ledger
-				return true
+		let assetExceptionsToAddOrUpdate: [ThirdPartyDeposits.AssetException] = localConfig
+			.assetsExceptionList
+			.filter { localException in
+				!inProfileConfig.assetsExceptionList.contains { inProfileException in
+					inProfileException.exceptionRule == localException.exceptionRule
+				}
 			}
-			// Exception rule did change
-			return onLedgerException.exceptionRule != localException.exceptionRule
-		}
 
 		let assetExceptionsToBeRemoved: [ResourceAddress] = inProfileConfig
 			.assetsExceptionList
 			.filter {
 				!localConfig.assetsExceptionList.contains($0)
-			}.map(\.address)
+			}
+			.map(\.address)
 
 		// 3. Depositor allow list:
-		let depositorAddressesToAdd: [ThirdPartyDeposits.DepositorAddress] = localConfig.depositorsAllowList.filter { !inProfileConfig.depositorsAllowList.contains($0) }
-		let depositorAddressesToRemove: [ThirdPartyDeposits.DepositorAddress] = inProfileConfig.depositorsAllowList.filter { !localConfig.depositorsAllowList.contains($0) }
+		let depositorAddressesToAdd: [ThirdPartyDeposits.DepositorAddress] = localConfig
+			.depositorsAllowList
+			.filter { !inProfileConfig.depositorsAllowList.contains($0) }
+
+		let depositorAddressesToRemove: [ThirdPartyDeposits.DepositorAddress] = inProfileConfig
+			.depositorsAllowList
+			.filter { !localConfig.depositorsAllowList.contains($0) }
 
 		let accountAddress = state.account.address
 
 		let manifest = try ManifestBuilder.make {
-			if let depositorRule {
-				ManifestBuilder.setDefaultDepositorRule(accountAddress, depositorRule)
+			if let depositorRuleChange {
+				ManifestBuilder.setDefaultDepositorRule(accountAddress, depositorRuleChange)
 			}
 
 			for resourceAddress in assetExceptionsToBeRemoved {
@@ -237,7 +240,7 @@ extension ManifestBuilder {
 	static let addAuthorizedDepositor = flip(addAuthorizedDepositor)
 	static let removeAuthorizedDepositor = flip(removeAuthorizedDepositor)
 
-	public func setDefaultDepositorRule(
+	func setDefaultDepositorRule(
 		for account: AccountAddress,
 		rule: ThirdPartyDeposits.DepositRule
 	) throws -> ManifestBuilder {
@@ -248,7 +251,7 @@ extension ManifestBuilder {
 		)
 	}
 
-	public func setResourcePreference(
+	func setResourcePreference(
 		for account: AccountAddress,
 		assetException: ThirdPartyDeposits.AssetException
 	) throws -> ManifestBuilder {
@@ -259,7 +262,7 @@ extension ManifestBuilder {
 		)
 	}
 
-	public func removeResourcePreference(
+	func removeResourcePreference(
 		for account: AccountAddress,
 		resource: ResourceAddress
 	) throws -> ManifestBuilder {
@@ -270,7 +273,7 @@ extension ManifestBuilder {
 		)
 	}
 
-	public func addAuthorizedDepositor(
+	func addAuthorizedDepositor(
 		for account: AccountAddress,
 		depositorAddress: ThirdPartyDeposits.DepositorAddress
 	) throws -> ManifestBuilder {
@@ -281,7 +284,7 @@ extension ManifestBuilder {
 		)
 	}
 
-	public func removeAuthorizedDepositor(
+	func removeAuthorizedDepositor(
 		for account: AccountAddress,
 		depositorAddress: ThirdPartyDeposits.DepositorAddress
 	) throws -> ManifestBuilder {
@@ -297,9 +300,20 @@ extension ThirdPartyDeposits.DepositorAddress {
 	func manifestValue() throws -> ManifestBuilderValue {
 		switch self {
 		case let .resourceAddress(resourceAddress):
-			return try .enumValue(discriminator: 1, fields: [.addressValue(value: resourceAddress.intoManifestBuilderAddress())])
+			return try .enumValue(
+				discriminator: 1,
+				fields: [.addressValue(value: resourceAddress.intoManifestBuilderAddress())]
+			)
 		case let .nonFungibleGlobalID(nft):
-			return .enumValue(discriminator: 0, fields: [.tupleValue(fields: [.addressValue(value: .static(value: nft.resourceAddress())), .nonFungibleLocalIdValue(value: nft.localId())])])
+			return .enumValue(
+				discriminator: 0,
+				fields: [
+					.tupleValue(fields: [
+						.addressValue(value: .static(value: nft.resourceAddress())),
+						.nonFungibleLocalIdValue(value: nft.localId()),
+					]),
+				]
+			)
 		}
 	}
 }

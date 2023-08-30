@@ -87,7 +87,7 @@ struct OverlayReducer: Sendable, FeatureReducer {
 		case let .scheduleItem(.hud(item)):
 			state.hudItemsQueue.append(item)
 			if state.hud == nil {
-				return showHUDItemIfAvailable(state: &state)
+				return showHUDItemIfQueued(state: &state)
 			}
 
 			// A HUD is force dismissed when next item comes in, AKA it is a lower priority.
@@ -104,7 +104,7 @@ struct OverlayReducer: Sendable, FeatureReducer {
 			return showItemIfPossible(state: &state)
 
 		case .showHUDIfAvailable:
-			return showHUDItemIfAvailable(state: &state)
+			return showHUDItemIfQueued(state: &state)
 		}
 	}
 
@@ -157,7 +157,7 @@ struct OverlayReducer: Sendable, FeatureReducer {
 		}
 	}
 
-	private func showHUDItemIfAvailable(state: inout State) -> EffectTask<Action> {
+	private func showHUDItemIfQueued(state: inout State) -> EffectTask<Action> {
 		guard !state.hudItemsQueue.isEmpty else {
 			return .none
 		}
@@ -185,7 +185,7 @@ struct OverlayReducer: Sendable, FeatureReducer {
 	private func dismissHUD(_ state: inout State) -> EffectTask<Action> {
 		state.hud = nil
 		state.hudItemsQueue.removeFirst()
-		return showHUDItemIfAvailable(state: &state)
+		return showHUDItemIfQueued(state: &state)
 	}
 
 	/// Sets the interaction enabled on the window, by implication this will also enable/disable the interaction
