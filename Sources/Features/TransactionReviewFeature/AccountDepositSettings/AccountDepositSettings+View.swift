@@ -61,7 +61,9 @@ extension AccountDepositSettingsChange {
 							Text(depositRuleChange.string)
 								.foregroundColor(.app.gray1)
 								.textStyle(.body1Regular)
-							Separator()
+							if !viewStore.resourceChanges.isEmpty {
+								Separator()
+							}
 						}
 						ForEach(viewStore.resourceChanges) { resourceChange in
 							Button(action: { viewStore.send(.assetTapped(resourceChange.resource)) }) {
