@@ -20,7 +20,8 @@ final class PeerConnectionNegotiatorTests: TestCase {
 	}()
 
 	// Shared clients
-	let dataChannelClient = DataChannelClient(dataChannel: DataChannelMock(), delegate: DataChannelDelegateMock())
+	let dataChannelDelegate = DataChannelDelegateMock()
+	lazy var dataChannelClient = DataChannelClient(dataChannel: DataChannelMock(), delegate: dataChannelDelegate)
 	let webSocketClient = MockWebSocketClient()
 	lazy var signalingClient = SignalingClient(encryptionKey: Self.encryptionKey,
 	                                           transport: webSocketClient)
@@ -193,6 +194,7 @@ final class PeerConnectionNegotiatorTests: TestCase {
 
 		// When ICEConnection state is connected the negotiation is completed
 		peerConnectionDelegate.sendICEConnectionStateEvent(.connected)
+		dataChannelDelegate.sendDataChannelReadyState(.connected)
 	}
 
 	/// Performs a failing negotiation flow for the given remoteClientId
