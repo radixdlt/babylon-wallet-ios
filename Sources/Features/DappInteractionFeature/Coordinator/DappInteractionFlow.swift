@@ -90,6 +90,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 		)
 		case presentPersonaNotFoundErrorAlert(reason: String)
 		case autofillOngoingResponseItemsIfPossible(AutofillOngoingResponseItemsPayload)
+		case update(DappInteractionFlow.Destinations.MainState)
 
 		struct AutofillOngoingResponseItemsPayload: Sendable, Equatable {
 			struct AccountsPayload: Sendable, Equatable {
@@ -247,6 +248,10 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 				)
 			}
 			return continueEffect(for: &state)
+
+		case let .update(destination):
+			state.path.append(destination)
+			return .none
 
 		case let .presentPersonaNotFoundErrorAlert(reason):
 			state.personaNotFoundErrorAlert = .init(
@@ -514,7 +519,10 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			if state.root == nil {
 				state.root = destination
 			} else if state.path.last != destination {
-				state.path.append(destination)
+				return .task {
+					try? await Task.sleep(for: .seconds(2))
+					return .internal(.update(destination))
+				}
 			}
 			return .none
 		} else {
