@@ -56,7 +56,7 @@ extension NetworkID {
 	public static let ansharnet: Self = 0x0D
 
 	/// Zabanet
-	/// Decimal value: 16
+	/// Decimal value: 14
 	public static let zabanet: Self = 0x0E
 
 	/// RDX Development - Semi-permanent Testnets (start with 0x2)
