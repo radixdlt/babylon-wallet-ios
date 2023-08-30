@@ -1327,6 +1327,7 @@ extension FeePayerSelectionAmongstCandidates {
 	}
 }
 
+#if DEBUG
 func printSigners(_ reviewedTransaction: ReviewedTransaction) {
 	for (factorSourceKind, signingFactorsOfKind) in reviewedTransaction.signingFactors {
 		print("🔮 ~~~ SIGNINGFACTORS OF KIND: \(factorSourceKind) #\(signingFactorsOfKind.count) many: ~~~")
@@ -1343,6 +1344,7 @@ func printSigners(_ reviewedTransaction: ReviewedTransaction) {
 		}
 	}
 }
+#endif // DEBUG
 
 extension ReviewedTransaction {
 	func metadataForNewlyCreatedResource(_ resource: ResourceAddress) -> [String: MetadataValue?]? {
