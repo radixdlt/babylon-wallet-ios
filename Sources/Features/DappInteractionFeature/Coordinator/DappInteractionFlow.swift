@@ -90,7 +90,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 		)
 		case presentPersonaNotFoundErrorAlert(reason: String)
 		case autofillOngoingResponseItemsIfPossible(AutofillOngoingResponseItemsPayload)
-		case update(DappInteractionFlow.Destinations.MainState)
+		case delayedAppendToPath(DappInteractionFlow.Destinations.MainState)
 
 		struct AutofillOngoingResponseItemsPayload: Sendable, Equatable {
 			struct AccountsPayload: Sendable, Equatable {
@@ -249,7 +249,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			}
 			return continueEffect(for: &state)
 
-		case let .update(destination):
+		case let .delayedAppendToPath(destination):
 			state.path.append(destination)
 			return .none
 
@@ -520,8 +520,9 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 				state.root = destination
 			} else if state.path.last != destination {
 				return .task {
-					try? await Task.sleep(for: .seconds(2))
-					return .internal(.update(destination))
+					/// For more information about that `sleep` and not setting it directly here please  check [this discussion in Slack](https://rdxworks.slack.com/archives/C03QFAWBRNX/p1693395346047829?thread_ts=1693388110.800679&cid=C03QFAWBRNX)
+					try? await Task.sleep(for: .seconds(0.1))
+					return .internal(.delayedAppendToPath(destination))
 				}
 			}
 			return .none
