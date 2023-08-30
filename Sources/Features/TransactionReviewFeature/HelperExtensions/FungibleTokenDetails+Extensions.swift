@@ -6,36 +6,30 @@ import OnLedgerEntitiesClient
 import Prelude
 import SharedModels
 
-extension FungibleTokenDetails.State {
-	init(
-		transfer: TransactionReview.FungibleTransfer,
-		metadata: [String: MetadataValue?]? = nil,
-		resource: OnLedgerEntity.Resource? = nil
-	) {
+extension AccountPortfolio.FungibleResource {
+	init(resourceAddress: ResourceAddress, amount: BigDecimal, metadata: [String: MetadataValue?]) {
 		self.init(
-			resource: .init(transfer: transfer, metadata: metadata, resource: resource),
-			isXRD: transfer.isXRD
+			resourceAddress: resourceAddress,
+			amount: amount,
+			name: metadata.name,
+			symbol: metadata.symbol,
+			description: metadata.description,
+			iconURL: metadata.iconURL
 		)
 	}
-}
 
-extension AccountPortfolio.FungibleResource {
-	init(
-		transfer: TransactionReview.FungibleTransfer,
-		metadata: [String: MetadataValue?]?,
-		resource: OnLedgerEntity.Resource? = nil
-	) {
+	init(amount: BigDecimal, onLedgerEntity: OnLedgerEntity.Resource) {
 		self.init(
-			resourceAddress: transfer.resource,
-			amount: transfer.amount,
-			divisibility: resource?.divisibility,
-			name: resource?.name ?? transfer.name,
-			symbol: resource?.symbol ?? transfer.symbol,
-			description: metadata?.description ?? resource?.description,
-			iconURL: resource?.iconURL ?? metadata?.iconURL ?? transfer.thumbnail,
-			behaviors: resource?.behaviors ?? [],
-			tags: resource?.tags ?? [],
-			totalSupply: resource?.totalSupply
+			resourceAddress: onLedgerEntity.resourceAddress,
+			amount: amount,
+			divisibility: onLedgerEntity.divisibility,
+			name: onLedgerEntity.name,
+			symbol: onLedgerEntity.symbol,
+			description: onLedgerEntity.description,
+			iconURL: onLedgerEntity.iconURL,
+			behaviors: onLedgerEntity.behaviors,
+			tags: onLedgerEntity.tags,
+			totalSupply: onLedgerEntity.totalSupply
 		)
 	}
 }

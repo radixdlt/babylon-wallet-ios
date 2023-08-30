@@ -1,64 +1,46 @@
 import AssetsFeature
+import EngineKit
 import EngineToolkit
 import Foundation
+import GatewayAPI
 import OnLedgerEntitiesClient
 import Prelude
 import SharedModels
 
-extension NonFungibleTokenDetails.State {
-	init(
-		transfer: TransactionReview.NonFungibleTransfer,
-		metadata: [String: MetadataValue?]? = nil,
-		resource: OnLedgerEntity.Resource? = nil
-	) throws {
-		try self.init(
-			token: .init(transfer: transfer, resource: resource),
-			resource: .init(transfer: transfer, metadata: metadata, resource: resource)
+extension AccountPortfolio.NonFungibleResource {
+	init(resourceAddress: ResourceAddress, metadata: [String: MetadataValue?]) {
+		self.init(
+			resourceAddress: resourceAddress,
+			name: metadata.name,
+			description: metadata.description,
+			iconURL: metadata.iconURL
 		)
 	}
-}
 
-extension AccountPortfolio.NonFungibleResource {
-	init(
-		transfer: TransactionReview.NonFungibleTransfer,
-		metadata: [String: MetadataValue?]?,
-		resource: OnLedgerEntity.Resource?
-	) {
+	init(onLedgerEntity: OnLedgerEntity.Resource, tokens: IdentifiedArrayOf<NonFungibleToken> = []) {
 		self.init(
-			resourceAddress: transfer.resource,
-			name: metadata?.name ?? resource?.name ?? transfer.resourceName,
-			description: metadata?.description ?? resource?.description,
-			iconURL: resource?.iconURL ?? metadata?.iconURL ?? transfer.resourceImage,
-			behaviors: resource?.behaviors ?? [],
-			tags: resource?.tags ?? [],
-			tokens: [],
-			totalSupply: resource?.totalSupply
+			resourceAddress: onLedgerEntity.resourceAddress,
+			name: onLedgerEntity.name,
+			description: onLedgerEntity.description,
+			iconURL: onLedgerEntity.iconURL,
+			behaviors: onLedgerEntity.behaviors,
+			tags: onLedgerEntity.tags,
+			tokens: tokens,
+			totalSupply: onLedgerEntity.totalSupply
 		)
 	}
 }
 
 extension AccountPortfolio.NonFungibleResource.NonFungibleToken {
-	init(
-		transfer: TransactionReview.NonFungibleTransfer,
-		resource: OnLedgerEntity.Resource?
-	) throws {
+	init(nftResponseItem: GatewayAPI.StateNonFungibleDetailsResponseItem) throws {
 		try self.init(
-			id: transfer.nonFungibleGlobalId(),
-			name: transfer.tokenName,
-			description: nil, // FIXME: FIND
-			keyImageURL: nil, // FIXME: FIND
-			metadata: [], // FIXME: FIND
+			id: .init(nonFungibleGlobalId: nftResponseItem.nonFungibleId),
+			name: nftResponseItem.details.name,
+			description: nftResponseItem.details.description,
+			keyImageURL: nftResponseItem.details.keyImageURL,
+			metadata: [], // FIXME: Find?
 			stakeClaimAmount: nil,
-			canBeClaimed: false // FIXME: FIND
-		)
-	}
-}
-
-extension TransactionReview.NonFungibleTransfer {
-	func nonFungibleGlobalId() throws -> NonFungibleGlobalId {
-		try .fromParts(
-			resourceAddress: resource.intoEngine(),
-			nonFungibleLocalId: nonFungibleLocalIdFromStr(string: tokenID)
+			canBeClaimed: false // FIXME: Find?
 		)
 	}
 }
