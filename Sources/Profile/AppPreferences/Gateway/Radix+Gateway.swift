@@ -24,10 +24,17 @@ extension Radix {
 }
 
 extension Radix.Gateway {
-	public static let `default` = Radix.Gateway.zabanet
+	public static var `default` = Radix.Gateway.zabanet
 }
 
 extension Radix.Gateway {
+	public static var mainnet: Self {
+		.init(
+			network: .mainnet,
+			url: URL(string: "https://zabanet-gateway.radixdlt.com")!
+		)
+	}
+
 	/// `"https://betanet.radixdlt.com"`
 	/// you can also use `"https://nebunet-gateway.radixdlt.com"`
 	public static var nebunet: Self {
