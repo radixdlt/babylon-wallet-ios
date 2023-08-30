@@ -81,13 +81,11 @@ extension GatewayAPIClient {
 		@Sendable
 		func makeRequest<Response>(
 			httpBodyData httpBody: Data?,
-			method: String = "POST",
 			responseType: Response.Type,
 			urlFromBase: @escaping @Sendable (URL) -> URL
 		) async throws -> Response where Response: Decodable {
 			try await makeRequest(
 				httpBodyData: httpBody,
-				method: method,
 				responseType: responseType,
 				baseURL: getCurrentBaseURL(),
 				urlFromBase: urlFromBase
@@ -97,12 +95,10 @@ extension GatewayAPIClient {
 		@Sendable
 		func makeRequest<Response>(
 			httpBodyData httpBody: Data?,
-			method: String = "POST",
 			urlFromBase: @escaping @Sendable (URL) -> URL
 		) async throws -> Response where Response: Decodable {
 			try await makeRequest(
 				httpBodyData: httpBody,
-				method: method,
 				responseType: Response.self,
 				urlFromBase: urlFromBase
 			)
