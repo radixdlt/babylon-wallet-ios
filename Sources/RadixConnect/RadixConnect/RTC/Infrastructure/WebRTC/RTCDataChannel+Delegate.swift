@@ -1,3 +1,4 @@
+import Prelude
 import WebRTC
 
 // MARK: - RTCDataChannel + Sendable
@@ -17,10 +18,13 @@ final class RTCDataChannelAsyncDelegate: NSObject,
 	Sendable
 {
 	let receivedMessages: AsyncStream<Data>
+	let dataChannelReadyStates: AsyncStream<DataChannelReadyState>
 	private let receivedMessagesContinuation: AsyncStream<Data>.Continuation
+	private let dataChannelReadyStatesContinuation: AsyncStream<DataChannelReadyState>.Continuation
 
 	override init() {
 		(receivedMessages, receivedMessagesContinuation) = AsyncStream.streamWithContinuation()
+		(dataChannelReadyStates, dataChannelReadyStatesContinuation) = AsyncStream.streamWithContinuation()
 		super.init()
 	}
 
@@ -35,5 +39,24 @@ extension RTCDataChannelAsyncDelegate {
 		receivedMessagesContinuation.yield(buffer.data)
 	}
 
-	func dataChannelDidChangeState(_ dataChannel: RTCDataChannel) {}
+	func dataChannelDidChangeState(_ dataChannel: RTCDataChannel) {
+		dataChannelReadyStatesContinuation.yield(.init(rtc: dataChannel.readyState))
+	}
+}
+
+extension DataChannelReadyState {
+	public init(rtc: RTCDataChannelState) {
+		switch rtc {
+		case .connecting:
+			self = .connecting
+		case .open:
+			self = .connected
+		case .closing:
+			self = .closing
+		case .closed:
+			self = .closed
+		@unknown default:
+			self = .closed
+		}
+	}
 }

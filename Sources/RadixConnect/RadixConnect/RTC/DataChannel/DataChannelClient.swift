@@ -14,6 +14,7 @@ protocol DataChannel: Sendable {
 /// This is only needed to make RTCDataChannelDelegate to have async API
 protocol DataChannelDelegate: Sendable {
 	var receivedMessages: AsyncStream<Data> { get }
+	var dataChannelReadyStates: AsyncStream<DataChannelReadyState> { get }
 	func cancel()
 }
 
@@ -28,6 +29,10 @@ actor DataChannelClient {
 	private let messageIDBuilder: @Sendable () -> Message.ID
 
 	// MARK: - Streams
+
+	var dataChannelReadyStates: AnyAsyncSequence<DataChannelReadyState> {
+		delegate.dataChannelReadyStates.share().eraseToAnyAsyncSequence()
+	}
 
 	private let incomingMessages: AnyAsyncSequence<Message>
 	private let incomingReceipts: AnyAsyncSequence<Message.Receipt>
