@@ -32,3 +32,49 @@ extension SpecificAddress {
 		try .static(value: self.intoEngine())
 	}
 }
+
+extension TransactionManifest {
+	public func withInstructionAdded(_ instruction: Instruction, at index: Int) throws -> TransactionManifest {
+		try .init(
+			instructions: instructions().withInstructionAdded(instruction, at: index),
+			blobs: blobs()
+		)
+	}
+
+	public func withLockFeeCallMethodAdded(
+		address: Address,
+		fee: BigDecimal = .temporaryStandardFee
+	) throws -> TransactionManifest {
+		try withInstructionAdded(
+			.lockFeeCall(address: address, fee: fee),
+			at: 0
+		)
+	}
+}
+
+extension Instructions {
+	public func withInstructionAdded(_ instruction: Instruction, at index: Int) throws -> Instructions {
+		var instructionList = self.instructionsList()
+		instructionList.insert(instruction, at: index)
+		return try .fromInstructions(instructions: instructionList, networkId: self.networkId())
+	}
+
+	public func withLockFeeCallMethodAdded(
+		address: Address,
+		fee: BigDecimal = .temporaryStandardFee
+	) throws -> Instructions {
+		try withInstructionAdded(
+			.lockFeeCall(address: address, fee: fee),
+			at: 0
+		)
+	}
+}
+
+extension Instruction {
+	static func lockFeeCall(
+		address: Address,
+		fee: BigDecimal
+	) throws -> Instruction {
+		try .callMethod(address: .static(value: .init(address: address.address)), methodName: "lock_fee", args: .tupleValue(fields: [.decimalValue(value: fee.intoEngine())]))
+	}
+}

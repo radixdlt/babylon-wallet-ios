@@ -53,18 +53,15 @@ extension FaucetClient: DependencyKey {
 
 			let ephemeralNotary = Curve25519.Signing.PrivateKey()
 
-			let builtTransactionIntentWithSigners = try await transactionClient.buildTransactionIntent(
+			let transactionIntent = try await transactionClient.buildTransactionIntent(
 				.init(
 					networkID: networkID,
 					manifest: manifest,
 					message: .none,
 					makeTransactionHeaderInput: .default,
-					isFaucetTransaction: true,
-					ephemeralNotaryPublicKey: ephemeralNotary.publicKey
+					transactionSigners: .init(notaryPublicKey: ephemeralNotary.publicKey, intentSigning: .notaryIsSignatory)
 				)
 			)
-
-			let transactionIntent = builtTransactionIntentWithSigners.intent
 
 			let notarized = try await transactionClient.notarizeTransaction(.init(
 				intentSignatures: [],
