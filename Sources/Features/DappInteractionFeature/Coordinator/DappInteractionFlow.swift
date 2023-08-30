@@ -49,6 +49,8 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 		var root: Destinations.State?
 		var path: StackState<Destinations.State> = .init()
 
+		var currentItem: DappInteractionFlow.State.AnyInteractionItem?
+
 		init?(
 			dappMetadata: DappMetadata,
 			interaction remoteInteraction: RemoteInteraction
@@ -58,6 +60,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 
 			if let interactionItems = NonEmpty(rawValue: OrderedSet<AnyInteractionItem>(for: remoteInteraction.erasedItems)) {
 				self.interactionItems = interactionItems
+				self.currentItem = interactionItems.first
 				self.root = Destinations.State(
 					for: interactionItems.first,
 					interaction: remoteInteraction,
@@ -113,8 +116,8 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 	}
 
 	struct Destinations: Sendable, ReducerProtocol {
-		typealias State = RelayState<DappInteractionFlow.State.AnyInteractionItem, MainState>
-		typealias Action = RelayAction<DappInteractionFlow.State.AnyInteractionItem, MainAction>
+		typealias State = MainState
+		typealias Action = MainAction
 
 		enum MainState: Sendable, Hashable {
 			case login(Login.State)
@@ -135,27 +138,25 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 		}
 
 		var body: some ReducerProtocolOf<Self> {
-			Relay {
-				EmptyReducer()
-					.ifCaseLet(/MainState.login, action: /MainAction.login) {
-						Login()
-					}
-					.ifCaseLet(/MainState.accountPermission, action: /MainAction.accountPermission) {
-						AccountPermission()
-					}
-					.ifCaseLet(/MainState.chooseAccounts, action: /MainAction.chooseAccounts) {
-						AccountPermissionChooseAccounts()
-					}
-					.ifCaseLet(/MainState.personaDataPermission, action: /MainAction.personaDataPermission) {
-						PersonaDataPermission()
-					}
-					.ifCaseLet(/MainState.oneTimePersonaData, action: /MainAction.oneTimePersonaData) {
-						OneTimePersonaData()
-					}
-					.ifCaseLet(/MainState.reviewTransaction, action: /MainAction.reviewTransaction) {
-						TransactionReview()
-					}
-			}
+			EmptyReducer()
+				.ifCaseLet(/MainState.login, action: /MainAction.login) {
+					Login()
+				}
+				.ifCaseLet(/MainState.accountPermission, action: /MainAction.accountPermission) {
+					AccountPermission()
+				}
+				.ifCaseLet(/MainState.chooseAccounts, action: /MainAction.chooseAccounts) {
+					AccountPermissionChooseAccounts()
+				}
+				.ifCaseLet(/MainState.personaDataPermission, action: /MainAction.personaDataPermission) {
+					PersonaDataPermission()
+				}
+				.ifCaseLet(/MainState.oneTimePersonaData, action: /MainAction.oneTimePersonaData) {
+					OneTimePersonaData()
+				}
+				.ifCaseLet(/MainState.reviewTransaction, action: /MainAction.reviewTransaction) {
+					TransactionReview()
+				}
 		}
 	}
 
@@ -378,7 +379,8 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			return dismissEffect(for: state, errorKind: errorKind, message: message)
 		}
 
-		guard let (item, action) = childAction.itemAndAction else { return .none }
+		guard let item = state.currentItem, let action = childAction.action else { return .none }
+
 		switch action {
 		case .login(.delegate(.failedToSignAuthChallenge)):
 			return dismissEffect(
@@ -503,6 +505,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 				persona: state.persona
 			)
 		{
+			state.currentItem = nextRequest
 			if state.root == nil {
 				state.root = destination
 			} else if state.path.last != destination {
@@ -523,17 +526,16 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 		}
 
 		loggerGlobal.error("TRACE: \(#file) \(#function) \(#line)")
-		return .send(.delegate(.submit(response, state.dappMetadata)))
-//		return .run { [state] send in
-//			// Save login date, data fields, and ongoing accounts to Profile
-//			if let persona = state.persona {
-//				// FIXME: handle error
-//				try await updatePersona(persona, state, responseItems: response.items)
-//			}
-//
-		//            loggerGlobal.error("TRACE: \(#file) \(#function) \(#line)")
-//			await send(.delegate(.submit(response, state.dappMetadata)))
-//		}
+		return .run { [state] send in
+			// Save login date, data fields, and ongoing accounts to Profile
+			if let persona = state.persona {
+				// FIXME: handle error
+				try await updatePersona(persona, state, responseItems: response.items)
+			}
+
+			loggerGlobal.error("TRACE: \(#file) \(#function) \(#line)")
+			await send(.delegate(.submit(response, state.dappMetadata)))
+		}
 	}
 
 	func updatePersona(
@@ -641,10 +643,10 @@ extension OrderedSet<DappInteractionFlow.State.AnyInteractionItem> {
 }
 
 extension DappInteractionFlow.ChildAction {
-	var itemAndAction: (DappInteractionFlow.State.AnyInteractionItem, DappInteractionFlow.Destinations.MainAction)? {
+	var action: DappInteractionFlow.Destinations.MainAction? {
 		switch self {
-		case let .root(.relay(item, action)), let .path(.element(_, .relay(item, action))):
-			return (item, action)
+		case let .root(action), let .path(.element(_, action)):
+			return action
 
 		case .path(.popFrom), .path(.push):
 			return nil
@@ -663,38 +665,38 @@ extension DappInteractionFlow.Destinations.State {
 		case .remote(.auth(.usePersona)):
 			return nil
 		case let .remote(.auth(.login(loginRequest))):
-			self = .relayed(anyItem, with: .login(.init(
+			self = .login(.init(
 				dappMetadata: dappMetadata,
 				loginRequest: loginRequest
-			)))
+			))
 
 		case let .local(.accountPermissionRequested(numberOfAccounts)):
-			self = .relayed(anyItem, with: .accountPermission(.init(
+			self = .accountPermission(.init(
 				dappMetadata: dappMetadata,
 				numberOfAccounts: numberOfAccounts
-			)))
+			))
 
 		case let .remote(.ongoingAccounts(item)):
-			self = .relayed(anyItem, with: .chooseAccounts(.init(
+			self = .chooseAccounts(.init(
 				challenge: item.challenge,
 				accessKind: .ongoing,
 				dappMetadata: dappMetadata,
 				numberOfAccounts: item.numberOfAccounts
-			)))
+			))
 
 		case let .remote(.oneTimeAccounts(item)):
-			self = .relayed(anyItem, with: .chooseAccounts(.init(
+			self = .chooseAccounts(.init(
 				challenge: item.challenge,
 				accessKind: .oneTime,
 				dappMetadata: dappMetadata,
 				numberOfAccounts: item.numberOfAccounts
-			)))
+			))
 
 		case let .remote(.oneTimePersonaData(item)):
-			self = .relayed(anyItem, with: .oneTimePersonaData(.init(
+			self = .oneTimePersonaData(.init(
 				dappMetadata: dappMetadata,
 				requested: item
-			)))
+			))
 
 		case let .remote(.ongoingPersonaData(item)):
 			guard let persona else {
@@ -702,21 +704,21 @@ extension DappInteractionFlow.Destinations.State {
 				return nil
 			}
 
-			self = .relayed(anyItem, with: .personaDataPermission(.init(
+			self = .personaDataPermission(.init(
 				dappMetadata: dappMetadata,
 				personaID: persona.id,
 				requested: item
-			)))
+			))
 
 		case let .remote(.send(item)):
-			self = .relayed(anyItem, with: .reviewTransaction(.init(
+			self = .reviewTransaction(.init(
 				transactionManifest: item.transactionManifest,
 				nonce: .secureRandom(),
 				signTransactionPurpose: .manifestFromDapp,
 				message: item.message.map {
 					Message.plainText(value: .init(mimeType: "text", message: .str(value: $0)))
 				} ?? .none
-			)))
+			))
 		}
 	}
 }

@@ -176,6 +176,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
 				Destinations()
 			}
+			._printChanges(.actionLabels)
 	}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
@@ -362,15 +363,16 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		case let .signing(.delegate(.finishedSigning(.signTransaction(notarizedTX, origin: _)))):
 			state.destination = nil
 			return .run { [txID = notarizedTX.txID, notarized = notarizedTX.notarized] send in
-				let task = await TaskResult {
+				loggerGlobal.error("TRACE: \(#file) \(#function) \(#line)")
+				let result = await TaskResult {
 					try await submitTXClient.submitTransaction(.init(
 						txID: txID,
 						compiledNotarizedTXIntent: notarized
 					))
 				}
+
 				loggerGlobal.error("TRACE: \(#file) \(#function) \(#line)")
-				await send(.internal(.submitTXResult(task)))
-				loggerGlobal.error("TRACE: \(#file) \(#function) \(#line)")
+				await send(.internal(.submitTXResult(result)))
 			}
 
 		case .signing(.delegate(.finishedSigning(.signAuth(_)))):
@@ -490,6 +492,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			return .none
 
 		case let .notarizeResult(.success(notarizedTX)):
+			loggerGlobal.error("TRACE: \(#file) \(#function) \(#line)")
 			return .task { [txID = notarizedTX.txID, notarized = notarizedTX.notarized] in
 				await .internal(.submitTXResult(
 					TaskResult {
@@ -507,6 +510,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			return .none
 
 		case let .submitTXResult(.success(txID)):
+			loggerGlobal.error("TRACE: \(#file) \(#function) \(#line)")
 			return .send(.delegate(.signedTXAndSubmittedToGateway(txID)))
 
 		case let .submitTXResult(.failure(error)):
