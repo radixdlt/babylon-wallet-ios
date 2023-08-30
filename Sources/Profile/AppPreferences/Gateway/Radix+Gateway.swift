@@ -24,7 +24,7 @@ extension Radix {
 }
 
 extension Radix.Gateway {
-	public static let `default` = Radix.Gateway.enkinet
+	public static let `default` = Radix.Gateway.zabanet
 }
 
 extension Radix.Gateway {
@@ -41,6 +41,13 @@ extension Radix.Gateway {
 		.init(
 			network: .kisharnet,
 			url: URL(string: "https://rcnet.radixdlt.com/")!
+		)
+	}
+
+	public static var zabanet: Self {
+		.init(
+			network: .zabanet,
+			url: URL(string: "https://zabanet-gateway.radixdlt.com")!
 		)
 	}
 
