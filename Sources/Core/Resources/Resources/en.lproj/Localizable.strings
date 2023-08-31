@@ -50,6 +50,8 @@
 "assetDetails_assetBehavior_canIncreaseSupply" = "The supply of this asset can be increased or decreased";
 "assetDetails_assetBehavior_canChangeName" = "Naming and information about this asset can be changed.";
 "assetDetails_assetBehavior_canRestrictMovement" = "Movement of this asset can be restricted in the future.";
+"assetDetails_behaviors_canFreezeInFuture" = "A third party can freeze this asset in place.";
+"assetDetails_behaviors_canBeFrozeInFutureByAnyone" = "Anyone can freeze this asset in place.";
 "assetDetails_hideAsset_title" = "Hide Asset";
 "assetDetails_hideAsset_message" = "Hide this asset in your Radix Wallet? You can always unhide it in your account settings.";
 "assetDetails_hideAsset_button" = "Hide Asset";
@@ -355,6 +357,7 @@
 "transactionReview_customizeNetworkFeeSheet_padding" = "Padding";
 "transactionReview_customizeNetworkFeeSheet_royalties" = "Royalties";
 "transactionReview_customizeNetworkFeeSheet_royaltyFee" = "Royalty fee";
+"transactionReview_customizeNetworkFeeSheet_paidByDApps" = "Paid by dApps";
 "transactionReview_customizeNetworkFeeSheet_paddingFieldLabel" = "Adjust Fee Padding Amount (XRD)";
 "transactionReview_customizeNetworkFeeSheet_tipFieldLabel" = "Adjust Tip to Lock";
 "transactionReview_customizeNetworkFeeSheet_tipFieldInfo" = "(%% of Execution + Finalization Fees)";

@@ -19,11 +19,15 @@ final class DataChannelMock: DataChannel {
 
 // MARK: - DataChannelDelegateMock
 final class DataChannelDelegateMock: DataChannelDelegate, Sendable {
+	let dataChannelReadyStates: AsyncStream<DataChannelReadyState>
+
 	let receivedMessages: AsyncStream<Data>
 	private let onMessageReceivedContinuation: AsyncStream<Data>.Continuation
+	private let dataChannelReadyStatesContinuation: AsyncStream<DataChannelReadyState>.Continuation
 
 	init() {
 		(receivedMessages, onMessageReceivedContinuation) = AsyncStream<Data>.streamWithContinuation()
+		(dataChannelReadyStates, dataChannelReadyStatesContinuation) = AsyncStream<DataChannelReadyState>.streamWithContinuation()
 	}
 
 	func receiveIncomingMessage(_ message: DataChannelClient.Message) throws {
@@ -32,4 +36,8 @@ final class DataChannelDelegateMock: DataChannelDelegate, Sendable {
 	}
 
 	func cancel() {}
+
+	func sendDataChannelReadyState(_ state: DataChannelReadyState) {
+		dataChannelReadyStatesContinuation.yield(state)
+	}
 }

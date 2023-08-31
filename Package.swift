@@ -457,6 +457,7 @@ package.addModules([
 			"TransactionClient",
 			"SigningFeature",
 			"SubmitTransactionClient",
+			"Cryptography",
 		],
 		tests: .yes()
 	),
@@ -983,7 +984,7 @@ package.addModules([
 			"SharedModels",
 			"GatewaysClient",
 			.product(name: "WebRTC", package: "WebRTC") {
-				.package(url: "https://github.com/stasel/WebRTC", from: "110.0.0")
+				.package(url: "https://github.com/stasel/WebRTC", from: "116.0.0")
 			},
 		],
 		tests: .yes()
@@ -1032,7 +1033,7 @@ package.addModules([
 		dependencies: [
 			"Cryptography",
 			.product(name: "EngineToolkit", package: "swift-engine-toolkit") {
-				.package(url: "https://github.com/radixdlt/swift-engine-toolkit", branch: "release/grape")
+				.package(url: "https://github.com/radixdlt/swift-engine-toolkit", branch: "release/rcnet-v3")
 			},
 		],
 		tests: .no

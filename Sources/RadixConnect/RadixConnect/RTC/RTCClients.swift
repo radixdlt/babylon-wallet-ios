@@ -116,8 +116,14 @@ extension RTCClients {
 		_ response: P2P.RTCOutgoingMessage.Response,
 		to origin: P2P.RTCRoute
 	) async throws {
-		guard let rtcClient = clients[origin.connectionId] else {
-			throw RTCClientDidCloseError()
+		guard let rtcClient = clients[origin.connectionId], await rtcClient.hasAnyActiveConnections() else {
+			loggerGlobal.info("RTCClients: No Active Peer Connection to send back message to, creating anew")
+			await disconnectAndRemoveClient(origin.connectionId)
+			// missing client, create anew
+			try await connect(origin.connectionId, waitsForConnectionToBeEstablished: true)
+			try await clients[origin.connectionId]?.send(response: response, to: origin.peerConnectionId)
+			loggerGlobal.info("RTCClients: Did send message over freshly established PeerConnection")
+			return
 		}
 
 		try await rtcClient.send(
@@ -279,7 +285,7 @@ extension RTCClient {
 
 extension RTCClient {
 	static var firstConnectionTimeout: Duration {
-		.seconds(10)
+		.seconds(30)
 	}
 
 	/// Cancel all of the related operations allowing this RTCClient to be deallocated.
@@ -298,7 +304,7 @@ extension RTCClient {
 
 	func waitForFirstConnection() async throws {
 		_ = try await doAsync(withTimeout: Self.firstConnectionTimeout) {
-			try await self.peerConnectionNegotiator.negotiationResults.first().get()
+			_ = try await self.peerConnectionNegotiator.negotiationResults.first().get()
 		}
 	}
 
@@ -345,11 +351,11 @@ extension RTCClient {
 		response: P2P.RTCOutgoingMessage.Response,
 		to connectionIdOfOrigin: PeerConnectionID
 	) async throws {
-		guard let client = peerConnections[connectionIdOfOrigin] else {
+		guard let anyConnection = peerConnections.values.first else {
 			throw PeerConnectionDidCloseError()
 		}
 		let data = try JSONEncoder().encode(response)
-		try await client.sendData(data)
+		try await anyConnection.sendData(data)
 	}
 
 	// MARK: - Private
@@ -389,6 +395,14 @@ extension RTCClient {
 			.iceConnectionStates
 			.filter {
 				$0 == .disconnected
+			}
+			.map { _ in connection.id }
+			.subscribe(disconnectedPeerConnectionContinuation)
+
+		connection
+			.dataChannelReadyStates
+			.filter {
+				$0 == .closed
 			}
 			.map { _ in connection.id }
 			.subscribe(disconnectedPeerConnectionContinuation)

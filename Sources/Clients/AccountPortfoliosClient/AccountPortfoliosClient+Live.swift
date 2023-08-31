@@ -644,7 +644,7 @@ extension AccountPortfolio.NonFungibleResource.NonFungibleToken.NFTData.Value {
 			}
 			self = .url(url)
 		case .u64:
-			guard let u64 = value.uint.map(UInt64.init) else {
+			guard let u64 = value.string.flatMap(UInt64.init) else {
 				return nil
 			}
 			self = .u64(u64)

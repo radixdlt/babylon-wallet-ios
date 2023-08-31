@@ -80,14 +80,12 @@ tags:
       collection {
         int64? total_count,
         string? next_cursor,
-        string? previous_cursor,
         T[] items
       }
       ```
 
       - `total_count` *(optional)* if present specifies the overall size of the underlying collection,
       - `next_cursor` *(optional)* if present indicates that the next chunk (page) exists and can be fetched using collection-specific endpoint and cursor value,
-      - `previous_cursor` *(optional)* if present indicates that the previous chunk (page) exists and can be fetched using collection-specific endpoint and cursor value,
       - `items` a chunk (page) of unerlying collection items.
   - name: Concepts
     x-displayName: Concepts
@@ -868,10 +866,6 @@ components:
           description: Total number of items in underlying collection, fragment of which is available in `items` collection.
           type: integer
           format: int64
-          nullable: true
-        previous_cursor:
-          description: If specified, contains a cursor to query previous page of the `items` collection.
-          type: string
           nullable: true
         next_cursor:
           description: If specified, contains a cursor to query next page of the `items` collection.

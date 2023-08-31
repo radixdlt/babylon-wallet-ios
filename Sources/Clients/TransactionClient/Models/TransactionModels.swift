@@ -1,5 +1,6 @@
 import Cryptography
 import EngineKit
+import FactorSourcesClient
 import GatewayAPI
 import Prelude
 import Profile
@@ -138,8 +139,7 @@ public struct BuildTransactionIntentRequest: Sendable {
 	public let manifest: TransactionManifest
 	public let message: Message
 	public let makeTransactionHeaderInput: MakeTransactionHeaderInput
-	public let isFaucetTransaction: Bool
-	public let ephemeralNotaryPublicKey: Curve25519.Signing.PublicKey
+	public let transactionSigners: TransactionSigners
 
 	public init(
 		networkID: NetworkID,
@@ -147,30 +147,27 @@ public struct BuildTransactionIntentRequest: Sendable {
 		message: Message,
 		nonce: Nonce = .secureRandom(),
 		makeTransactionHeaderInput: MakeTransactionHeaderInput,
-		isFaucetTransaction: Bool = false,
-		ephemeralNotaryPublicKey: Curve25519.Signing.PublicKey
+		transactionSigners: TransactionSigners
 	) {
 		self.networkID = networkID
 		self.manifest = manifest
 		self.message = message
 		self.nonce = nonce
 		self.makeTransactionHeaderInput = makeTransactionHeaderInput
-		self.isFaucetTransaction = isFaucetTransaction
-		self.ephemeralNotaryPublicKey = ephemeralNotaryPublicKey
+		self.transactionSigners = transactionSigners
 	}
 }
 
-// MARK: - TransactionIntentWithSigners
-public struct TransactionIntentWithSigners: Sendable, Hashable {
-	public let intent: TransactionIntent
-	public let transactionSigners: TransactionSigners
+// MARK: - GetTransactionSignersRequest
+public struct GetTransactionSignersRequest: Sendable, Hashable {
+	public let networkID: NetworkID
+	public let manifest: TransactionManifest
+	public let ephemeralNotaryPublicKey: Curve25519.Signing.PublicKey
 
-	public init(
-		intent: TransactionIntent,
-		transactionSigners: TransactionSigners
-	) {
-		self.intent = intent
-		self.transactionSigners = transactionSigners
+	public init(networkID: NetworkID, manifest: TransactionManifest, ephemeralNotaryPublicKey: Curve25519.Signing.PublicKey) {
+		self.networkID = networkID
+		self.manifest = manifest
+		self.ephemeralNotaryPublicKey = ephemeralNotaryPublicKey
 	}
 }
 
@@ -200,19 +197,22 @@ public struct ManifestReviewRequest: Sendable {
 	public let nonce: Nonce
 	public let makeTransactionHeaderInput: MakeTransactionHeaderInput
 	public let ephemeralNotaryPublicKey: Curve25519.Signing.PublicKey
+	public let signingPurpose: SigningPurpose
 
 	public init(
 		manifestToSign: TransactionManifest,
 		message: Message,
 		nonce: Nonce,
 		makeTransactionHeaderInput: MakeTransactionHeaderInput = .default,
-		ephemeralNotaryPublicKey: Curve25519.Signing.PublicKey = Curve25519.Signing.PrivateKey().publicKey
+		ephemeralNotaryPublicKey: Curve25519.Signing.PublicKey,
+		signingPurpose: SigningPurpose
 	) {
 		self.manifestToSign = manifestToSign
 		self.message = message
 		self.nonce = nonce
 		self.makeTransactionHeaderInput = makeTransactionHeaderInput
 		self.ephemeralNotaryPublicKey = ephemeralNotaryPublicKey
+		self.signingPurpose = signingPurpose
 	}
 }
 
@@ -223,13 +223,21 @@ public struct FeePayerCandidate: Sendable, Hashable, Identifiable {
 
 	public let account: Profile.Network.Account
 	public let xrdBalance: BigDecimal
+
+	public init(account: Profile.Network.Account, xrdBalance: BigDecimal) {
+		self.account = account
+		self.xrdBalance = xrdBalance
+	}
 }
 
 // MARK: - TransactionToReview
-public struct TransactionToReview: Sendable, Equatable {
+public struct TransactionToReview: Sendable, Hashable {
 	public let analyzedManifestToReview: ExecutionAnalysis
 	public let networkID: NetworkID
-	public let feePayerSelectionAmongstCandidates: FeePayerSelectionAmongstCandidates
+
+	public var feePayerSelectionAmongstCandidates: FeePayerSelectionAmongstCandidates
+	public var transactionSigners: TransactionSigners
+	public var signingFactors: SigningFactors
 }
 
 // MARK: - FeePayerSelectionAmongstCandidates
@@ -258,7 +266,7 @@ public struct TransactionFee: Hashable, Sendable {
 	/// FeeLocks after transaction was analyzed
 	public let feeLocks: FeeLocks
 
-	/// The calculaton mode
+	/// The calculation mode
 	public var mode: Mode
 
 	public init(feeSummary: FeeSummary, feeLocks: FeeLocks, mode: Mode) {
@@ -271,12 +279,21 @@ public struct TransactionFee: Hashable, Sendable {
 		self.init(feeSummary: feeSummary, feeLocks: feeLocks, mode: .normal(.init(feeSummary: feeSummary, feeLocks: feeLocks)))
 	}
 
-	public init(executionAnalysis: ExecutionAnalysis) throws {
+	public init(
+		executionAnalysis: ExecutionAnalysis,
+		signaturesCount: Int,
+		notaryIsSignatory: Bool,
+		includeLockFee: Bool
+	) throws {
 		let feeSummary: FeeSummary = try .init(
 			executionCost: executionAnalysis.feeSummary.executionCost.asBigDecimal(),
 			finalizationCost: executionAnalysis.feeSummary.finalizationCost.asBigDecimal(),
 			storageExpansionCost: executionAnalysis.feeSummary.storageExpansionCost.asBigDecimal(),
-			royaltyCost: executionAnalysis.feeSummary.royaltyCost.asBigDecimal()
+			royaltyCost: executionAnalysis.feeSummary.royaltyCost.asBigDecimal(),
+			guaranteesCost: executionAnalysis.guranteesCost(),
+			signaturesCost: PredefinedFeeConstants.signaturesCost(signaturesCount),
+			lockFeeCost: includeLockFee ? PredefinedFeeConstants.lockFeeInstructionCost : .zero,
+			notarizingCost: PredefinedFeeConstants.notarizingCost(notaryIsSignatory)
 		)
 
 		let feeLocks: FeeLocks = try .init(
@@ -288,6 +305,51 @@ public struct TransactionFee: Hashable, Sendable {
 			feeSummary: feeSummary,
 			feeLocks: feeLocks
 		)
+	}
+
+	public mutating func update(with feeSummaryField: WritableKeyPath<FeeSummary, BigDecimal>, amount: BigDecimal) {
+		var feeSummary = feeSummary
+		feeSummary[keyPath: feeSummaryField] = amount
+		let mode: Mode = {
+			switch self.mode {
+			case .normal:
+				return .normal(.init(feeSummary: feeSummary, feeLocks: feeLocks))
+			case .advanced:
+				return .advanced(.init(feeSummary: feeSummary, feeLocks: feeLocks))
+			}
+		}()
+		self = .init(feeSummary: feeSummary, feeLocks: feeLocks, mode: mode)
+	}
+
+	public mutating func addLockFeeCost() {
+		update(with: \.lockFeeCost, amount: PredefinedFeeConstants.lockFeeInstructionCost)
+	}
+
+	public mutating func updateNotarizingCost(notaryIsSignatory: Bool) {
+		update(with: \.notarizingCost, amount: PredefinedFeeConstants.notarizingCost(notaryIsSignatory))
+	}
+
+	public mutating func updateSignaturesCost(_ count: Int) {
+		update(with: \.signaturesCost, amount: PredefinedFeeConstants.signaturesCost(count))
+	}
+}
+
+extension ExecutionAnalysis {
+	func guranteesCost() throws -> BigDecimal {
+		let transaction = try transactionTypes.transactionKind()
+		switch transaction {
+		case .nonConforming:
+			return .zero
+		case let .conforming(transaction):
+			return transaction.accountDeposits.flatMap(\.value).reduce(.zero) { result, resource in
+				switch resource {
+				case .fungible(_, .predicted):
+					return result + TransactionFee.PredefinedFeeConstants.fungibleGuaranteeInstructionCost
+				default:
+					return result
+				}
+			}
+		}
 	}
 }
 
@@ -307,7 +369,7 @@ extension TransactionFee {
 	public mutating func toggleMode() {
 		switch mode {
 		case .normal:
-			mode = .advanced(.init(feeSummary: feeSummary))
+			mode = .advanced(.init(feeSummary: feeSummary, feeLocks: feeLocks))
 		case .advanced:
 			mode = .normal(.init(feeSummary: feeSummary, feeLocks: feeLocks))
 		}
@@ -326,7 +388,21 @@ extension TransactionFee {
 		/// 15% margin is added here to make up for the ambiguity of the transaction preview estimate)
 		public static let networkFeeMultiplier: BigDecimal = 0.15
 
-		// TODO: Add WalletFees table. Which is yet to be determined.
+		/// Network fees -> https://radixdlt.atlassian.net/wiki/spaces/S/pages/3134783512/Manifest+Mutation+Cost+Addition+Estimates
+		public static let lockFeeInstructionCost = try! BigDecimal(fromString: "0.095483092333982841")
+		public static let fungibleGuaranteeInstructionCost = try! BigDecimal(fromString: "0.012001947444660947")
+		public static let nonFungibleGuranteeInstructionCost = try! BigDecimal(fromString: "0.012844397444660947")
+		public static let signatureCost = try! BigDecimal(fromString: "0.017839046256509498")
+		public static let notarizingCost = try! BigDecimal(fromString: "0.01322565755208264")
+		public static let notarizingCostWhenNotaryIsSignatory = try! BigDecimal(fromString: "0.01351365755208264")
+
+		public static func notarizingCost(_ notaryIsSignatory: Bool) -> BigDecimal {
+			notaryIsSignatory ? notarizingCostWhenNotaryIsSignatory : notarizingCost
+		}
+
+		public static func signaturesCost(_ signaturesCount: Int) -> BigDecimal {
+			BigDecimal(signaturesCount) * PredefinedFeeConstants.signatureCost
+		}
 	}
 
 	public enum Mode: Hashable, Sendable {
@@ -340,20 +416,45 @@ extension TransactionFee {
 		public let storageExpansionCost: BigDecimal
 		public let royaltyCost: BigDecimal
 
+		public let guaranteesCost: BigDecimal
+
+		public var lockFeeCost: BigDecimal
+		public var signaturesCost: BigDecimal
+		public var notarizingCost: BigDecimal
+
+		public var totalExecutionCost: BigDecimal {
+			executionCost
+				+ guaranteesCost
+				+ signaturesCost
+				+ lockFeeCost
+				+ notarizingCost
+		}
+
 		public var total: BigDecimal {
-			executionCost + finalizationCost + storageExpansionCost + royaltyCost
+			totalExecutionCost
+				+ finalizationCost
+				+ storageExpansionCost
+				+ royaltyCost
 		}
 
 		public init(
 			executionCost: BigDecimal,
 			finalizationCost: BigDecimal,
 			storageExpansionCost: BigDecimal,
-			royaltyCost: BigDecimal
+			royaltyCost: BigDecimal,
+			guaranteesCost: BigDecimal,
+			signaturesCost: BigDecimal,
+			lockFeeCost: BigDecimal,
+			notarizingCost: BigDecimal
 		) {
 			self.executionCost = executionCost
 			self.finalizationCost = finalizationCost
 			self.storageExpansionCost = storageExpansionCost
 			self.royaltyCost = royaltyCost
+			self.guaranteesCost = guaranteesCost
+			self.signaturesCost = signaturesCost
+			self.lockFeeCost = lockFeeCost
+			self.notarizingCost = notarizingCost
 		}
 	}
 
@@ -368,26 +469,28 @@ extension TransactionFee {
 	}
 
 	public struct AdvancedFeeCustomization: Hashable, Sendable {
-		private let networkFee: BigDecimal
-
 		public let feeSummary: FeeSummary
 		public var paddingFee: BigDecimal
 		public var tipPercentage: BigDecimal
+		public let paidByDapps: BigDecimal
 
 		public var tipAmount: BigDecimal {
-			(tipPercentage / 100) * networkFee
+			(tipPercentage / 100) * (feeSummary.totalExecutionCost + feeSummary.finalizationCost)
 		}
 
 		public var total: BigDecimal {
-			feeSummary.total + paddingFee + tipAmount
+			max(feeSummary.total + paddingFee + tipAmount + paidByDapps, 0)
 		}
 
-		public init(feeSummary: FeeSummary) {
+		public init(feeSummary: FeeSummary, feeLocks: FeeLocks) {
 			self.feeSummary = feeSummary
-			// The networkFee is used to derive the base PaddingFee as well the tipAmount
-			self.networkFee = feeSummary.executionCost + feeSummary.finalizationCost
-			self.paddingFee = networkFee * PredefinedFeeConstants.networkFeeMultiplier
+			self.paddingFee = (feeSummary.totalExecutionCost + feeSummary.finalizationCost + feeSummary.storageExpansionCost) * PredefinedFeeConstants.networkFeeMultiplier
 			self.tipPercentage = .zero
+
+			/// NonContingent lock will pay for some of the fee.
+			var lock = feeLocks.nonContingentLock
+			lock.negate()
+			self.paidByDapps = lock
 		}
 	}
 
@@ -404,9 +507,9 @@ extension TransactionFee {
 
 		public init(feeSummary: FeeSummary, feeLocks: FeeLocks) {
 			let networkFee = (
-				feeSummary.executionCost +
-					feeSummary.finalizationCost +
-					feeSummary.storageExpansionCost
+				feeSummary.totalExecutionCost
+					+ feeSummary.finalizationCost
+					+ feeSummary.storageExpansionCost
 			) * (1 + PredefinedFeeConstants.networkFeeMultiplier) // add network multiplier on top
 			let remainingNonContingentLock = feeLocks.nonContingentLock.clampedDiff(networkFee)
 
@@ -438,4 +541,36 @@ extension TransactionFee {
 			return "\(max.format()) XRD"
 		}
 	}
+}
+
+extension TransactionFee {
+	#if DEBUG
+	public static var testValue: Self {
+		let feeSummary = TransactionFee.FeeSummary(
+			executionCost: 5,
+			finalizationCost: 5,
+			storageExpansionCost: 5,
+			royaltyCost: 10,
+			guaranteesCost: 5,
+			signaturesCost: 5,
+			lockFeeCost: 5,
+			notarizingCost: 5
+		)
+		return .init(feeSummary: feeSummary, feeLocks: .init(nonContingentLock: .zero, contingentLock: .zero))
+	}
+
+	public static var nonContingentLockPaying: Self {
+		let feeSummary = TransactionFee.FeeSummary(
+			executionCost: 5,
+			finalizationCost: 5,
+			storageExpansionCost: 5,
+			royaltyCost: 10,
+			guaranteesCost: 5,
+			signaturesCost: 5,
+			lockFeeCost: 5,
+			notarizingCost: 5
+		)
+		return .init(feeSummary: feeSummary, feeLocks: .init(nonContingentLock: 100, contingentLock: .zero))
+	}
+	#endif
 }
