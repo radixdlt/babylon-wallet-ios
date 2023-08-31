@@ -193,9 +193,9 @@
   ],
   "header" : {
     "contentHint" : {
-      "numberOfAccountsOnAllNetworksInTotal" : 6,
-      "numberOfNetworks" : 2,
-      "numberOfPersonasOnAllNetworksInTotal" : 3
+      "numberOfAccountsOnAllNetworksInTotal" : 3,
+      "numberOfNetworks" : 1,
+      "numberOfPersonasOnAllNetworksInTotal" : 2
     },
     "creatingDevice" : {
       "date" : "1970-01-01T00:00:00Z",

@@ -114,6 +114,7 @@ final class ProfileTests: TestCase {
 		}
 	}
 
+	// FIXME: Rewrite this whole test... which manually populates profile instead of using our production code!
 	func test_generate_profile_snapshot_test_vector() async throws {
 		continueAfterFailure = false
 
@@ -150,7 +151,19 @@ final class ProfileTests: TestCase {
 			)
 
 			let profile = Profile(
-				header: snapshotHeader,
+				header: .init(
+					creatingDevice: device,
+					lastUsedOnDevice: device,
+					id: stableUUID,
+					lastModified: stableDate,
+					// FIXME: we should not hard code these... actually we should rewrite this whole test... which manually populates profile instead of using our production code!
+					contentHint: .init(
+						numberOfAccountsOnAllNetworksInTotal: 3,
+						numberOfPersonasOnAllNetworksInTotal: 2,
+						numberOfNetworks: 1
+					),
+					snapshotVersion: .minimum
+				),
 				deviceFactorSource: babylonFactorSource,
 				appPreferences: .init(gateways: .init(current: gateway))
 			)
@@ -458,6 +471,10 @@ final class ProfileTests: TestCase {
 		)
 
 		let snapshot = profile.snapshot()
+
+		XCTAssertEqual(snapshot.networks.count, snapshot.header.contentHint.numberOfNetworks)
+		XCTAssertEqual(snapshot.header.contentHint.numberOfAccountsOnAllNetworksInTotal, profile.network?.accounts.count)
+		XCTAssertEqual(snapshot.header.contentHint.numberOfPersonasOnAllNetworksInTotal, profile.network?.personas.count)
 		let jsonEncoder = JSONEncoder.iso8601
 		XCTAssertNoThrow(try jsonEncoder.encode(snapshot))
 		// Uncomment the lines below to generate a new test vector
@@ -481,9 +498,9 @@ final class ProfileTests: TestCase {
 			id: .init(uuidString: "BABE1442-3C98-41FF-AFB0-D0F5829B020D")!,
 			lastModified: date,
 			contentHint: .init(
-				numberOfAccountsOnAllNetworksInTotal: 6,
-				numberOfPersonasOnAllNetworksInTotal: 3,
-				numberOfNetworks: 2
+				numberOfAccountsOnAllNetworksInTotal: 3,
+				numberOfPersonasOnAllNetworksInTotal: 2,
+				numberOfNetworks: 1
 			),
 			snapshotVersion: ProfileSnapshot.Header.Version.minimum
 		)
@@ -719,6 +736,18 @@ final class ProfileTests: TestCase {
 	}
 
 	func test_version_compatibility_check_ok() throws {
+		let snapshotHeader = ProfileSnapshot.Header(
+			creatingDevice: device,
+			lastUsedOnDevice: device,
+			id: stableUUID,
+			lastModified: stableDate,
+			contentHint: .init(
+				numberOfAccountsOnAllNetworksInTotal: 6,
+				numberOfPersonasOnAllNetworksInTotal: 3,
+				numberOfNetworks: 2
+			),
+			snapshotVersion: .minimum
+		)
 		XCTAssertNoThrow(
 			try snapshotHeader.validateCompatibility()
 		)
@@ -731,18 +760,6 @@ private let creatingDevice: NonEmptyString = "\(deviceFactorModel) \(deviceFacto
 private let stableDate = Date(timeIntervalSince1970: 0)
 private let stableUUID = UUID(uuidString: "BABE1442-3C98-41FF-AFB0-D0F5829B020D")!
 private let device: ProfileSnapshot.Header.UsedDeviceInfo = .init(description: creatingDevice, id: stableUUID, date: stableDate)
-private let snapshotHeader = ProfileSnapshot.Header(
-	creatingDevice: device,
-	lastUsedOnDevice: device,
-	id: stableUUID,
-	lastModified: stableDate,
-	contentHint: .init(
-		numberOfAccountsOnAllNetworksInTotal: 6,
-		numberOfPersonasOnAllNetworksInTotal: 3,
-		numberOfNetworks: 2
-	),
-	snapshotVersion: .minimum
-)
 
 extension EntityProtocol {
 	func publicKey() -> SLIP10.PublicKey? {
