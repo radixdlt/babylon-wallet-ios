@@ -55,6 +55,12 @@ extension Radix.Network {
 		displayDescription: "RCnet-V2 test network"
 	)
 
+	public static let zabanet = Self(
+		name: "zabanet",
+		id: .zabanet,
+		displayDescription: "RCnet-V3 test network"
+	)
+
 	public static let hammunet = Self(
 		name: "hammunet",
 		id: .hammunet,
@@ -83,6 +89,7 @@ extension Radix.Network {
 		.nebunet,
 		.kisharnet,
 		.ansharnet,
+		.zabanet,
 		.hammunet,
 		.enkinet,
 		.mardunet,

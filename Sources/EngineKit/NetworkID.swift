@@ -55,6 +55,10 @@ extension NetworkID {
 	/// https://github.com/radixdlt/babylon-node/blob/96be25b8fb4beacf80f22f22ef8ece9ce55b68b4/common/src/main/java/com/radixdlt/networks/Network.java#L98
 	public static let ansharnet: Self = 0x0D
 
+	/// Zabanet
+	/// Decimal value: 14
+	public static let zabanet: Self = 0x0E
+
 	/// RDX Development - Semi-permanent Testnets (start with 0x2)
 	// - gilganet = Integration, after Gilgamesh
 	// - enkinet = Misc Network 1, after Enki / Enkidu
@@ -102,7 +106,7 @@ extension NetworkID {
 	public typealias AllCases = [Self]
 
 	public static var allCases: [NetworkID] {
-		[.mainnet, .stokenet, .adapanet, .nebunet, .kisharnet, .gilganet, .enkinet, .hammunet, .nergalnet, .mardunet, .simulator]
+		[.mainnet, .stokenet, .adapanet, .nebunet, .kisharnet, .gilganet, .enkinet, .hammunet, .nergalnet, .mardunet, .zabanet, .simulator]
 	}
 
 	public static func all(but excluded: NetworkID) -> AllCases {
