@@ -33,9 +33,12 @@ extension AccountPortfolio.NonFungibleResource {
 }
 
 extension AccountPortfolio.NonFungibleResource.NonFungibleToken {
-	init(nftResponseItem: GatewayAPI.StateNonFungibleDetailsResponseItem) throws {
+	init(resourceAddress: ResourceAddress, nftResponseItem: GatewayAPI.StateNonFungibleDetailsResponseItem) throws {
 		try self.init(
-			id: .init(nonFungibleGlobalId: nftResponseItem.nonFungibleId),
+			id: .fromParts(
+				resourceAddress: resourceAddress.intoEngine(),
+				nonFungibleLocalId: .from(stringFormat: nftResponseItem.nonFungibleId)
+			),
 			name: nftResponseItem.details.name,
 			description: nftResponseItem.details.description,
 			keyImageURL: nftResponseItem.details.keyImageURL,

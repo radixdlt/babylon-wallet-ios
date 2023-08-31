@@ -787,7 +787,7 @@ extension TransactionReview {
 						try Transfer.nonFungible(
 							.init(
 								nonFungibleResource: .init(onLedgerEntity: onLedgerEntity),
-								token: .init(nftResponseItem: responseItem)
+								token: .init(resourceAddress: resourceAddress, nftResponseItem: responseItem)
 							)
 						)
 					}
