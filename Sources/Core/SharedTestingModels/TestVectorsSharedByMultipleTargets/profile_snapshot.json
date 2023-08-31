@@ -3,10 +3,10 @@
     "display" : {
       "fiatCurrencyPriceTarget" : "usd",
       "isCurrencyAmountVisible" : true,
-      "ledgerHQHardwareWalletSigningDisplayMode" : "verbose"
+      "ledgerHQHardwareWalletSigningDisplayMode" : "summary"
     },
     "gateways" : {
-      "current" : "https://zabanet-gateway.radixdlt.com",
+      "current" : "https://rcnet-v3.radixdlt.com/",
       "saved" : [
         {
           "network" : {
@@ -14,7 +14,7 @@
             "id" : 14,
             "name" : "zabanet"
           },
-          "url" : "https://zabanet-gateway.radixdlt.com"
+          "url" : "https://rcnet-v3.radixdlt.com/"
         }
       ]
     },
@@ -209,7 +209,7 @@
       "description" : "computer unit test",
       "id" : "BABE1442-3C98-41FF-AFB0-D0F5829B020D"
     },
-    "snapshotVersion" : 46
+    "snapshotVersion" : 47
   },
   "networks" : [
     {

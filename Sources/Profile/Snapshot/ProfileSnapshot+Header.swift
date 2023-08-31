@@ -156,7 +156,8 @@ extension ProfileSnapshot.Header.Version {
 	/// - 44: Added `transaction` setting inside `appPreferences` with `defaultDepositGuarantee` decimal value encoded as String
 	/// - 45: Merge of 43 and 44.
 	/// - 46: Change default gateway to `zabanet`
-	public static let minimum: Self = 46
+	/// - 47: Change default gateway to `rcnetv3`
+	public static let minimum: Self = 47
 }
 
 extension ProfileSnapshot.Header {

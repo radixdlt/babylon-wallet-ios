@@ -58,7 +58,10 @@ extension LedgerHardwareWalletFactorSource {
 	public enum SigningDisplayMode: String, Sendable, Hashable, Codable {
 		case verbose
 		case summary
-		public static let `default`: Self = .verbose
+
+		/// Ledger HQ has requested we default to not use `verbose`, see:
+		/// https://rdxworks.slack.com/archives/C031A0V1A1W/p1693461652669649
+		public static let `default`: Self = .summary
 	}
 }
 
