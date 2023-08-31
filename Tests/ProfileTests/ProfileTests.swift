@@ -498,9 +498,9 @@ final class ProfileTests: TestCase {
 			id: .init(uuidString: "BABE1442-3C98-41FF-AFB0-D0F5829B020D")!,
 			lastModified: date,
 			contentHint: .init(
-				numberOfAccountsOnAllNetworksInTotal: 6,
-				numberOfPersonasOnAllNetworksInTotal: 3,
-				numberOfNetworks: 2
+				numberOfAccountsOnAllNetworksInTotal: 3,
+				numberOfPersonasOnAllNetworksInTotal: 2,
+				numberOfNetworks: 1
 			),
 			snapshotVersion: ProfileSnapshot.Header.Version.minimum
 		)
