@@ -111,9 +111,9 @@ extension TransferNFTView.ViewState {
 	init(transfer: TransactionReview.NonFungibleTransfer) {
 		let token = transfer.token
 		self.init(
-			tokenID: token.id.asStr(),
+			tokenID: token.id.localId().toUserFacingString(),
 			tokenName: token.name,
-			thumbnail: token.keyImageURL
+			thumbnail: transfer.nonFungibleResource.iconURL
 		)
 	}
 }
