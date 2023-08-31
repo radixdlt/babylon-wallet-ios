@@ -80,7 +80,10 @@ extension ImportMnemonic.ViewState {
 	}
 
 	var isShowingPassphrase: Bool {
-		isAdvancedMode && !(isReadonlyMode && bip39Passphrase.isEmpty)
+		if isReadonlyMode, !bip39Passphrase.isEmpty {
+			return true
+		}
+		return isAdvancedMode && !(isReadonlyMode && bip39Passphrase.isEmpty)
 	}
 
 	var modeButtonTitle: String {
@@ -137,7 +140,7 @@ extension ImportMnemonic {
 							}
 							.buttonStyle(.secondaryRectangular(isDestructive: true))
 							.padding(.bottom, .medium1)
-						} else if viewStore.isAdvancedMode {
+						} else {
 							AppTextField(
 								placeholder: "DEBUG ONLY paste mnemonic",
 								text: viewStore.binding(
