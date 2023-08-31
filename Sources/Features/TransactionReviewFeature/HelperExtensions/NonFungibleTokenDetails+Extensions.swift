@@ -13,7 +13,8 @@ extension AccountPortfolio.NonFungibleResource {
 			resourceAddress: resourceAddress,
 			name: metadata.name,
 			description: metadata.description,
-			iconURL: metadata.iconURL
+			iconURL: metadata.iconURL,
+			tags: metadata.tags
 		)
 	}
 

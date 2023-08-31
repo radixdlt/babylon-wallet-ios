@@ -14,7 +14,8 @@ extension AccountPortfolio.FungibleResource {
 			name: metadata.name,
 			symbol: metadata.symbol,
 			description: metadata.description,
-			iconURL: metadata.iconURL
+			iconURL: metadata.iconURL,
+			tags: metadata.tags
 		)
 	}
 
