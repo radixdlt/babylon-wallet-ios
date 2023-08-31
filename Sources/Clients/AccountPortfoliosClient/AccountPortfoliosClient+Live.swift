@@ -306,7 +306,7 @@ extension AccountPortfoliosClient {
 							nonFungibleLocalId: .from(stringFormat: item.nonFungibleId)
 						),
 						name: details.name,
-						description: nil,
+						description: details.tokenDescription,
 						keyImageURL: details.keyImageURL,
 						metadata: [],
 						stakeClaimAmount: details.claimAmount,

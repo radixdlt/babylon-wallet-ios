@@ -33,6 +33,10 @@ extension Settings {
 		let shouldShowMigrateOlympiaButton: Bool
 		let appVersion: String
 
+		var showsSomeBanner: Bool {
+			shouldShowAddP2PLinkButton || shouldShowMigrateOlympiaButton
+		}
+
 		init(state: Settings.State) {
 			#if DEBUG
 			let retCommitHash: String = buildInformation().version
@@ -101,22 +105,24 @@ extension Settings.View {
 	private func settingsView(viewStore: ViewStoreOf<Settings>) -> some View {
 		ScrollView {
 			VStack(spacing: .zero) {
-				VStack(spacing: .medium3) {
-					if viewStore.shouldShowAddP2PLinkButton {
-						ConnectExtensionView {
-							viewStore.send(.addP2PLinkButtonTapped)
+				if viewStore.showsSomeBanner {
+					VStack(spacing: .medium3) {
+						if viewStore.shouldShowAddP2PLinkButton {
+							ConnectExtensionView {
+								viewStore.send(.addP2PLinkButtonTapped)
+							}
+						}
+						if viewStore.shouldShowMigrateOlympiaButton {
+							MigrateOlympiaAccountsView {
+								viewStore.send(.importOlympiaButtonTapped)
+							} dismiss: {
+								viewStore.send(.dismissImportOlympiaHeaderButtonTapped)
+							}
+							.transition(headerTransition)
 						}
 					}
-					if viewStore.shouldShowMigrateOlympiaButton {
-						MigrateOlympiaAccountsView {
-							viewStore.send(.importOlympiaButtonTapped)
-						} dismiss: {
-							viewStore.send(.dismissImportOlympiaHeaderButtonTapped)
-						}
-						.transition(headerTransition)
-					}
+					.padding(.medium3)
 				}
-				.padding(.medium3)
 
 				ForEach(rows) { row in
 					SettingsRow(row: row) {
