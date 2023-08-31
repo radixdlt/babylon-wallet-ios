@@ -231,7 +231,7 @@
       "location" : "https://github.com/radixdlt/swift-engine-toolkit",
       "state" : {
         "branch" : "release/rcnet-v3",
-        "revision" : "2f6fa524e0191acb3c25cc35966cd4d23039886a"
+        "revision" : "69e906bd55e5d5f667aa4ee49b31e9ce021f11d7"
       }
     },
     {
@@ -291,7 +291,7 @@
     {
       "identity" : "swift-numerics",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/apple/swift-numerics.git",
+      "location" : "https://github.com/apple/swift-numerics",
       "state" : {
         "revision" : "0a5bc04095a675662cf24757cc0640aa2204253b",
         "version" : "1.0.2"
@@ -338,8 +338,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/siteline/SwiftUI-Introspect",
       "state" : {
-        "revision" : "ccb973cfff703cba53fb88197413485c060eb26b",
-        "version" : "0.10.0"
+        "revision" : "121c146fe591b1320238d054ae35c81ffa45f45a",
+        "version" : "0.12.0"
       }
     },
     {
