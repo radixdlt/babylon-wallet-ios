@@ -24,7 +24,7 @@ extension Radix {
 }
 
 extension Radix.Gateway {
-	public static var `default` = Radix.Gateway.zabanet
+	public static var `default` = Radix.Gateway.rcnet
 }
 
 extension Radix.Gateway {
@@ -35,8 +35,13 @@ extension Radix.Gateway {
 		)
 	}
 
-	/// `"https://betanet.radixdlt.com"`
-	/// you can also use `"https://nebunet-gateway.radixdlt.com"`
+	public static var rcnet: Self {
+		.init(
+			network: .zabanet,
+			url: URL(string: "https://rcnet-v3.radixdlt.com/")!
+		)
+	}
+
 	public static var nebunet: Self {
 		.init(
 			network: .nebunet,

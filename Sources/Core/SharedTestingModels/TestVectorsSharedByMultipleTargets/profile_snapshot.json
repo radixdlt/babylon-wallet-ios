@@ -3,18 +3,18 @@
     "display" : {
       "fiatCurrencyPriceTarget" : "usd",
       "isCurrencyAmountVisible" : true,
-      "ledgerHQHardwareWalletSigningDisplayMode" : "verbose"
+      "ledgerHQHardwareWalletSigningDisplayMode" : "summary"
     },
     "gateways" : {
-      "current" : "https://enkinet-gateway.radixdlt.com",
+      "current" : "https://rcnet-v3.radixdlt.com/",
       "saved" : [
         {
           "network" : {
-            "displayDescription" : "Enkinet (Test Network)",
-            "id" : 33,
-            "name" : "enkinet"
+            "displayDescription" : "RCnet-V3 test network",
+            "id" : 14,
+            "name" : "zabanet"
           },
-          "url" : "https://enkinet-gateway.radixdlt.com"
+          "url" : "https://rcnet-v3.radixdlt.com/"
         }
       ]
     },
@@ -193,9 +193,9 @@
   ],
   "header" : {
     "contentHint" : {
-      "numberOfAccountsOnAllNetworksInTotal" : 6,
-      "numberOfNetworks" : 2,
-      "numberOfPersonasOnAllNetworksInTotal" : 3
+      "numberOfAccountsOnAllNetworksInTotal" : 3,
+      "numberOfNetworks" : 1,
+      "numberOfPersonasOnAllNetworksInTotal" : 2
     },
     "creatingDevice" : {
       "date" : "1970-01-01T00:00:00Z",
@@ -209,16 +209,16 @@
       "description" : "computer unit test",
       "id" : "BABE1442-3C98-41FF-AFB0-D0F5829B020D"
     },
-    "snapshotVersion" : 45
+    "snapshotVersion" : 47
   },
   "networks" : [
     {
       "accounts" : [
         {
-          "address" : "account_tdx_21_12ya9jylskaa6gdrfr8nvve3pfc6wyhyw7eg83fwlc7fv2w0eanumcd",
+          "address" : "account_tdx_e_12ypd8nyhsej537x3am8nnjzsef45ttmua5tf7f8lz2zds78dgg5qzx",
           "appearanceID" : 0,
           "displayName" : "First",
-          "networkID" : 33,
+          "networkID" : 14,
           "onLedgerSettings" : {
             "thirdPartyDeposits" : {
               "assetsExceptionList" : [
@@ -240,11 +240,11 @@
                     "discriminator" : "hierarchicalDeterministicPublicKey",
                     "hierarchicalDeterministicPublicKey" : {
                       "derivationPath" : {
-                        "path" : "m/44H/1022H/33H/525H/1678H/0H",
+                        "path" : "m/44H/1022H/14H/525H/1678H/0H",
                         "scheme" : "cap26"
                       },
                       "publicKey" : {
-                        "compressedData" : "7c0d862503c6662374e131b735d7a1fffc053820a5bc7674515fb24c8d97f25c",
+                        "compressedData" : "b009d846640efbe214c993898f9bb91db774f3eec07b8b93f73b5eb5671e7c90",
                         "curve" : "curve25519"
                       }
                     }
@@ -266,11 +266,11 @@
                     "discriminator" : "hierarchicalDeterministicPublicKey",
                     "hierarchicalDeterministicPublicKey" : {
                       "derivationPath" : {
-                        "path" : "m/44H/1022H/33H/525H/1460H/0H",
+                        "path" : "m/44H/1022H/14H/525H/1460H/0H",
                         "scheme" : "cap26"
                       },
                       "publicKey" : {
-                        "compressedData" : "d992d7ce1965d6cd460e0ca48c310f56dfbfde85fb56fd22cbedf4938bd36a23",
+                        "compressedData" : "f56e430cad47b779ba9aeda3069beed7080362598e9db31463c0bda03aebf901",
                         "curve" : "curve25519"
                       }
                     }
@@ -288,10 +288,10 @@
           }
         },
         {
-          "address" : "account_tdx_21_12xg7tf7aup8lrxkvug0vzatntzww0c6jnntyj6yd4eg5920kpxpzvt",
+          "address" : "account_tdx_e_1297s57xd0uurnguqga98negg7ffhlp4k9s7sy7w4xrt5dr0t53hny8",
           "appearanceID" : 1,
           "displayName" : "Second",
-          "networkID" : 33,
+          "networkID" : 14,
           "onLedgerSettings" : {
             "thirdPartyDeposits" : {
               "assetsExceptionList" : [
@@ -323,11 +323,11 @@
                     "discriminator" : "hierarchicalDeterministicPublicKey",
                     "hierarchicalDeterministicPublicKey" : {
                       "derivationPath" : {
-                        "path" : "m/44H/1022H/33H/525H/1678H/1H",
+                        "path" : "m/44H/1022H/14H/525H/1678H/1H",
                         "scheme" : "cap26"
                       },
                       "publicKey" : {
-                        "compressedData" : "5cfab91eed77cc5952de5e29d963b15a61925194bb05757b083190cabdf59080",
+                        "compressedData" : "18ad44b7784117e446bc262d8793fc930cad6c3dbaec153488a473c05cc753ff",
                         "curve" : "curve25519"
                       }
                     }
@@ -349,11 +349,11 @@
                     "discriminator" : "hierarchicalDeterministicPublicKey",
                     "hierarchicalDeterministicPublicKey" : {
                       "derivationPath" : {
-                        "path" : "m/44H/1022H/33H/525H/1460H/1H",
+                        "path" : "m/44H/1022H/14H/525H/1460H/1H",
                         "scheme" : "cap26"
                       },
                       "publicKey" : {
-                        "compressedData" : "daf0fe5b2fde6d1b0811c1096da58b593bc7afd9ae806751a5740b99aae6501c",
+                        "compressedData" : "410300fb542b9713058bab5bcf44cc423fe8264063c875285ef29bfaefee4c49",
                         "curve" : "curve25519"
                       }
                     }
@@ -371,10 +371,10 @@
           }
         },
         {
-          "address" : "account_tdx_21_12yth59wfyl8e4axupym0c96g9heuf5j06lv2lgc2cuapzlmj6alzzn",
+          "address" : "account_tdx_e_128vf0zqkezy053hxkfq3g6x8x05mst7lq2q8fqlltm0l2d3tytk848",
           "appearanceID" : 2,
           "displayName" : "Third",
-          "networkID" : 33,
+          "networkID" : 14,
           "onLedgerSettings" : {
             "thirdPartyDeposits" : {
               "assetsExceptionList" : [
@@ -406,11 +406,11 @@
                     "discriminator" : "hierarchicalDeterministicPublicKey",
                     "hierarchicalDeterministicPublicKey" : {
                       "derivationPath" : {
-                        "path" : "m/44H/1022H/33H/525H/1678H/2H",
+                        "path" : "m/44H/1022H/14H/525H/1678H/2H",
                         "scheme" : "cap26"
                       },
                       "publicKey" : {
-                        "compressedData" : "1cb848d3487b4cec061535a5ebaa9f83d0fd3ec845917fae372896e454618a9c",
+                        "compressedData" : "6891f60631cdf1f19ea07b5feff4473ea740c9a5fada93811e5443b8aa96301e",
                         "curve" : "curve25519"
                       }
                     }
@@ -432,11 +432,11 @@
                     "discriminator" : "hierarchicalDeterministicPublicKey",
                     "hierarchicalDeterministicPublicKey" : {
                       "derivationPath" : {
-                        "path" : "m/44H/1022H/33H/525H/1460H/2H",
+                        "path" : "m/44H/1022H/14H/525H/1460H/2H",
                         "scheme" : "cap26"
                       },
                       "publicKey" : {
-                        "compressedData" : "0e2dfaaff11aef66a7806d0fc09846b534b436476b3d3ab876d8824aa109dc4b",
+                        "compressedData" : "e8a91229c7278a716eb29993ec64df52f886b1afa4b9401cd76cac03db29357d",
                         "curve" : "curve25519"
                       }
                     }
@@ -458,15 +458,15 @@
         {
           "dAppDefinitionAddress" : "account_sim1cyvgx33089ukm2pl97pv4max0x40ruvfy4lt60yvya744cve475w0q",
           "displayName" : "RadiSwap",
-          "networkID" : 33,
+          "networkID" : 14,
           "referencesToAuthorizedPersonas" : [
             {
-              "identityAddress" : "identity_tdx_21_1225rkl8svrs5fdc8rcmc7dk8wy4n0dap8da6dn58hptv47w9hmha5p",
+              "identityAddress" : "identity_tdx_e_12fkwy8ydrxznewf2q6a2c774fxa4e2kv5rs8mmd0r8p3k4s8f8d3mp",
               "lastLogin" : "2001-01-01T00:00:00Z",
               "sharedAccounts" : {
                 "ids" : [
-                  "account_tdx_21_12xg7tf7aup8lrxkvug0vzatntzww0c6jnntyj6yd4eg5920kpxpzvt",
-                  "account_tdx_21_12yth59wfyl8e4axupym0c96g9heuf5j06lv2lgc2cuapzlmj6alzzn"
+                  "account_tdx_e_1297s57xd0uurnguqga98negg7ffhlp4k9s7sy7w4xrt5dr0t53hny8",
+                  "account_tdx_e_128vf0zqkezy053hxkfq3g6x8x05mst7lq2q8fqlltm0l2d3tytk848"
                 ],
                 "request" : {
                   "quantifier" : "exactly",
@@ -529,11 +529,11 @@
               }
             },
             {
-              "identityAddress" : "identity_tdx_21_12tljxea3s0mse52jmpvsphr0haqs86sung8d3qlhr763nxttj59650",
+              "identityAddress" : "identity_tdx_e_122m2mlkm25fleaprd2lz3ed02q2auggw0d7cs9zeyafsng8dl3qcu0",
               "lastLogin" : "2001-01-01T00:00:00Z",
               "sharedAccounts" : {
                 "ids" : [
-                  "account_tdx_21_12xg7tf7aup8lrxkvug0vzatntzww0c6jnntyj6yd4eg5920kpxpzvt"
+                  "account_tdx_e_1297s57xd0uurnguqga98negg7ffhlp4k9s7sy7w4xrt5dr0t53hny8"
                 ],
                 "request" : {
                   "quantifier" : "atLeast",
@@ -547,12 +547,12 @@
           ]
         }
       ],
-      "networkID" : 33,
+      "networkID" : 14,
       "personas" : [
         {
-          "address" : "identity_tdx_21_1225rkl8svrs5fdc8rcmc7dk8wy4n0dap8da6dn58hptv47w9hmha5p",
+          "address" : "identity_tdx_e_12fkwy8ydrxznewf2q6a2c774fxa4e2kv5rs8mmd0r8p3k4s8f8d3mp",
           "displayName" : "Satoshi",
-          "networkID" : 33,
+          "networkID" : 14,
           "personaData" : {
             "companyName" : {
               "id" : "00000000-0000-0000-0000-000000000002",
@@ -686,11 +686,11 @@
                     "discriminator" : "hierarchicalDeterministicPublicKey",
                     "hierarchicalDeterministicPublicKey" : {
                       "derivationPath" : {
-                        "path" : "m/44H/1022H/33H/618H/1678H/0H",
+                        "path" : "m/44H/1022H/14H/618H/1678H/0H",
                         "scheme" : "cap26"
                       },
                       "publicKey" : {
-                        "compressedData" : "82248fcd9d9d1923729634231d288b6b5c6a5d3dd0cd52d5c06d998c057b0460",
+                        "compressedData" : "1309188a0c42704e4a911f16f6a658513cee290d9e3a4f033875b55504221eeb",
                         "curve" : "curve25519"
                       }
                     }
@@ -712,11 +712,11 @@
                     "discriminator" : "hierarchicalDeterministicPublicKey",
                     "hierarchicalDeterministicPublicKey" : {
                       "derivationPath" : {
-                        "path" : "m/44H/1022H/33H/618H/1460H/0H",
+                        "path" : "m/44H/1022H/14H/618H/1460H/0H",
                         "scheme" : "cap26"
                       },
                       "publicKey" : {
-                        "compressedData" : "6372052faa5236121c97267eb800b16164b1082201d51106794e0e004928fb7e",
+                        "compressedData" : "22b66d9a894d31efc7fc316e80d31a48d0cf8aebd9bfb8d3ed692d25bf994666",
                         "curve" : "curve25519"
                       }
                     }
@@ -734,9 +734,9 @@
           }
         },
         {
-          "address" : "identity_tdx_21_12tljxea3s0mse52jmpvsphr0haqs86sung8d3qlhr763nxttj59650",
+          "address" : "identity_tdx_e_122m2mlkm25fleaprd2lz3ed02q2auggw0d7cs9zeyafsng8dl3qcu0",
           "displayName" : "Mrs Public",
-          "networkID" : 33,
+          "networkID" : 14,
           "personaData" : {
             "creditCards" : [
 
@@ -773,11 +773,11 @@
                     "discriminator" : "hierarchicalDeterministicPublicKey",
                     "hierarchicalDeterministicPublicKey" : {
                       "derivationPath" : {
-                        "path" : "m/44H/1022H/33H/618H/1678H/1H",
+                        "path" : "m/44H/1022H/14H/618H/1678H/1H",
                         "scheme" : "cap26"
                       },
                       "publicKey" : {
-                        "compressedData" : "133801ad4b98bd8925cd5d93fdfc3cae1965b48af51bbfe191e08d6a6911274b",
+                        "compressedData" : "c00858697875ea3eb6e2d8334d7a7f1a215269cb8097d08da30649d5eba9285b",
                         "curve" : "curve25519"
                       }
                     }
@@ -799,11 +799,11 @@
                     "discriminator" : "hierarchicalDeterministicPublicKey",
                     "hierarchicalDeterministicPublicKey" : {
                       "derivationPath" : {
-                        "path" : "m/44H/1022H/33H/618H/1460H/1H",
+                        "path" : "m/44H/1022H/14H/618H/1460H/1H",
                         "scheme" : "cap26"
                       },
                       "publicKey" : {
-                        "compressedData" : "016ee546e124c088d52541105f3a4e8469498a6942452fec2ab24e4f92b939df",
+                        "compressedData" : "68104bf832b5bb83600b51ddaf0701a13bdb2b55d625bc0ef14c74932340b2bc",
                         "curve" : "curve25519"
                       }
                     }
