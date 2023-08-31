@@ -24,12 +24,17 @@ extension Radix {
 }
 
 extension Radix.Gateway {
-	public static let `default` = Radix.Gateway.zabanet
+	public static let `default` = Radix.Gateway.rcnet
 }
 
 extension Radix.Gateway {
-	/// `"https://betanet.radixdlt.com"`
-	/// you can also use `"https://nebunet-gateway.radixdlt.com"`
+	public static var rcnet: Self {
+		.init(
+			network: .zabanet,
+			url: URL(string: "https://rcnet-v3.radixdlt.com/")!
+		)
+	}
+
 	public static var nebunet: Self {
 		.init(
 			network: .nebunet,
@@ -41,13 +46,6 @@ extension Radix.Gateway {
 		.init(
 			network: .kisharnet,
 			url: URL(string: "https://rcnet.radixdlt.com/")!
-		)
-	}
-
-	public static var zabanet: Self {
-		.init(
-			network: .zabanet,
-			url: URL(string: "https://zabanet-gateway.radixdlt.com")!
 		)
 	}
 
