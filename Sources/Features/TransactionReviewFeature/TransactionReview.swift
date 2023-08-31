@@ -20,9 +20,8 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		public let transactionManifest: TransactionManifest
 		public let message: Message
 		public let signTransactionPurpose: SigningPurpose.SignTransactionPurpose
-		public var networkID: NetworkID? {
-			reviewedTransaction?.networkId
-		}
+
+		public var networkID: NetworkID? { reviewedTransaction?.networkId }
 
 		public var reviewedTransaction: ReviewedTransaction? = nil
 
@@ -596,7 +595,7 @@ extension TransactionReview {
 	private func extractUserAccounts(_ transaction: TransactionType.GeneralTransaction) async throws -> [Account] {
 		let userAccounts = try await accountsClient.getAccountsOnCurrentNetwork()
 
-		return transaction.allAddress
+		return transaction.allAddresses
 			.compactMap {
 				try? AccountAddress(validatingAddress: $0.addressString())
 			}
@@ -613,10 +612,8 @@ extension TransactionReview {
 	}
 
 	private func extractUsedDapps(_ transaction: TransactionType.GeneralTransaction) async throws -> TransactionReviewDappsUsed.State? {
-		let dApps = try await transaction.allAddress
-			.filter {
-				$0.entityType() == .globalGenericComponent
-			}
+		let dApps = try await transaction.allAddresses
+			.filter { $0.entityType() == .globalGenericComponent }
 			.map { try $0.asSpecific() }
 			.asyncMap(extractDappInfo)
 
@@ -812,7 +809,7 @@ extension TransactionReview {
 								resourceAddress: resourceAddress.intoEngine(),
 								nonFungibleLocalId: id
 							),
-							name: nil
+							name: nil // FIXME: Can we get the name?
 						)
 					))
 				}
