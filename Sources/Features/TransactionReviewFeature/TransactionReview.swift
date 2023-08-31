@@ -81,7 +81,6 @@ public struct TransactionReview: Sendable, FeatureReducer {
 	}
 
 	public enum InternalAction: Sendable, Equatable {
-		case defaultDepositGuaranteeLoaded(BigDecimal)
 		case previewLoaded(TaskResult<TransactionToReview>)
 		case createTransactionReview(TransactionReview.TransactionContent)
 		case buildTransactionItentResult(TaskResult<TransactionIntent>)
@@ -177,9 +176,6 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		switch viewAction {
 		case .appeared:
 			return .run { [state = state] send in
-				let defaultDepositGuarantees = await appPreferencesClient.getPreferences().transaction.defaultDepositGuarantee
-				await send(.internal(.defaultDepositGuaranteeLoaded(defaultDepositGuarantees)))
-
 				let preview = await TaskResult {
 					try await transactionClient.getTransactionReview(.init(
 						manifestToSign: state.transactionManifest,
@@ -414,10 +410,6 @@ public struct TransactionReview: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
-		case let .defaultDepositGuaranteeLoaded(defaultGuarantee):
-			// FIXME: Apply guarantee
-			return .none
-
 		case let .previewLoaded(.failure(error)):
 			return .send(.delegate(.failed(TransactionFailure.failedToPrepareTXReview(.failedToGenerateTXReview(error)))))
 
@@ -691,6 +683,8 @@ extension TransactionReview {
 		userAccounts: [Account],
 		networkID: NetworkID
 	) async throws -> TransactionReviewAccounts.State? {
+		let defaultDepositGuarantee = await appPreferencesClient.getPreferences().transaction.defaultDepositGuarantee
+
 		var deposits: [Account: [Transfer]] = [:]
 
 		for (accountAddress, accountDeposits) in transaction.accountDeposits {
@@ -702,7 +696,8 @@ extension TransactionReview {
 					metadataOfCreatedEntities: transaction.metadataOfNewlyCreatedEntities,
 					createdEntities: transaction.addressesOfNewlyCreatedEntities,
 					networkID: networkID,
-					type: $0.transferType
+					type: $0.transferType,
+					defaultDepositGuarantee: defaultDepositGuarantee
 				)
 			}
 
@@ -727,7 +722,8 @@ extension TransactionReview {
 		metadataOfCreatedEntities: [String: [String: MetadataValue?]]?,
 		createdEntities: [EngineToolkit.Address],
 		networkID: NetworkID,
-		type: TransferType
+		type: TransferType,
+		defaultDepositGuarantee: BigDecimal = 1
 	) async throws -> [Transfer] {
 		let resourceAddress: ResourceAddress = try resourceQuantifier.resourceAddress.asSpecific()
 
