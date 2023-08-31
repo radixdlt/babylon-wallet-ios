@@ -177,6 +177,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 	@Dependency(\.personasClient) var personasClient
 	@Dependency(\.accountsClient) var accountsClient
 	@Dependency(\.authorizedDappsClient) var authorizedDappsClient
+	@Dependency(\.continuousClock) var clock
 
 	func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
@@ -521,7 +522,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			} else if state.path.last != destination {
 				return .task {
 					/// For more information about that `sleep` and not setting it directly here please check [this discussion in Slack](https://rdxworks.slack.com/archives/C03QFAWBRNX/p1693395346047829?thread_ts=1693388110.800679&cid=C03QFAWBRNX)
-					try? await Task.sleep(for: .milliseconds(100))
+					try? await clock.sleep(for: .milliseconds(100))
 					return .internal(.delayedAppendToPath(destination))
 				}
 			}

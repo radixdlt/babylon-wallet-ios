@@ -66,7 +66,8 @@ extension GatewayAPIClient {
 	// TODO: should be with(noop) — see GatewayAPIClient+Mock.swift for deets.
 	static let previewValueDappMetadataSuccess = update(previewValue) {
 		$0.getEntityMetadata = { @Sendable _, _ in
-			try await Task.sleep(for: .seconds(2))
+			@Dependency(\.continuousClock) var clock
+			try await clock.sleep(for: .seconds(2))
 			return GatewayAPI.EntityMetadataCollection(
 				items: []
 			)
@@ -76,7 +77,8 @@ extension GatewayAPIClient {
 	// TODO: should be with(noop) — see GatewayAPIClient+Mock.swift for deets.
 	static let previewValueDappMetadataFailure = update(previewValue) {
 		$0.getEntityMetadata = { @Sendable _, _ in
-			try await Task.sleep(for: .seconds(2))
+			@Dependency(\.continuousClock) var clock
+			try await clock.sleep(for: .seconds(2))
 			throw NoopError()
 		}
 	}
