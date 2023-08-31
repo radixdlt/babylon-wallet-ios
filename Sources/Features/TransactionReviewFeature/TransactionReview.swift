@@ -595,7 +595,7 @@ extension TransactionReview {
 	private func extractUserAccounts(_ transaction: TransactionType.GeneralTransaction) async throws -> [Account] {
 		let userAccounts = try await accountsClient.getAccountsOnCurrentNetwork()
 
-		return transaction.allAddresses
+		return transaction.allAddress
 			.compactMap {
 				try? AccountAddress(validatingAddress: $0.addressString())
 			}
@@ -612,7 +612,7 @@ extension TransactionReview {
 	}
 
 	private func extractUsedDapps(_ transaction: TransactionType.GeneralTransaction) async throws -> TransactionReviewDappsUsed.State? {
-		let dApps = try await transaction.allAddresses
+		let dApps = try await transaction.allAddress
 			.filter { $0.entityType() == .globalGenericComponent }
 			.map { try $0.asSpecific() }
 			.asyncMap(extractDappInfo)
