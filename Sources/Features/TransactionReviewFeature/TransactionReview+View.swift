@@ -134,7 +134,7 @@ extension TransactionReview {
 
 						if viewStore.showApprovalSlider {
 							ApprovalSlider(title: "Slide to Sign") { // FIXME: String - and remove old
-								viewStore.send(.approveTapped)
+								viewStore.send(.approvalSliderSlid)
 							}
 							.controlState(viewStore.approvalSliderControlState)
 							.padding(.horizontal, .small3)
@@ -294,7 +294,13 @@ extension View {
 			store: destinationStore,
 			state: /TransactionReview.Destinations.State.nonFungibleTokenDetails,
 			action: TransactionReview.Destinations.Action.nonFungibleTokenDetails,
-			content: { NonFungibleTokenDetails.View(store: $0) }
+			content: { detailsStore in
+				WithNavigationBar {
+					destinationStore.send(.dismiss)
+				} content: {
+					NonFungibleTokenDetails.View(store: detailsStore)
+				}
+			}
 		)
 	}
 

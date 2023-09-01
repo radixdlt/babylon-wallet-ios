@@ -13,15 +13,12 @@ extension NonFungibleAssetList {
 		public var body: some SwiftUI.View {
 			VStack(spacing: .medium1) {
 				ForEachStore(
-					store.scope(
-						state: \.rows,
-						action: { .child(.asset($0, $1)) }
-					),
+					store.scope(state: \.rows) { .child(.asset($0, $1)) },
 					content: { NonFungibleAssetList.Row.View(store: $0) }
 				)
 			}
 			.sheet(
-				store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+				store: store.scope(state: \.$destination) { .child(.destination($0)) },
 				state: /NonFungibleAssetList.Destinations.State.details,
 				action: NonFungibleAssetList.Destinations.Action.details,
 				content: { detailsStore in

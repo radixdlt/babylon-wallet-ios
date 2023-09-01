@@ -25,7 +25,6 @@ struct AssetResourceDetailsSection: View {
 					.textStyle(.body1Regular)
 					.frame(maxWidth: .infinity, alignment: .leading)
 					.padding(.horizontal, .large2)
-					.transition(transition)
 
 				AssetDetailsSeparator()
 			}
@@ -35,12 +34,10 @@ struct AssetResourceDetailsSection: View {
 
 				if let validatorAddress = viewState.validatorAddress {
 					KeyValueView(validatorAddress: validatorAddress)
-						.transition(transition)
 				}
 
 				if let resourceName = viewState.resourceName {
 					KeyValueView(key: "Name", value: resourceName) // FIXME: Strings - make a common name string for all asset details, remove the specific one(s)
-						.transition(transition)
 				}
 
 				if let currentSupply = viewState.currentSupply {
@@ -48,7 +45,6 @@ struct AssetResourceDetailsSection: View {
 						key: L10n.AssetDetails.currentSupply,
 						value: currentSupply
 					)
-					.transition(transition)
 				}
 
 				AssetBehaviorsView(behaviors: viewState.behaviors)
@@ -57,10 +53,7 @@ struct AssetResourceDetailsSection: View {
 			}
 			.padding(.horizontal, .large2)
 		}
-		.animation(.default, value: viewState)
 	}
-
-	private let transition: AnyTransition = .opacity.combined(with: .scale(scale: 0.8))
 }
 
 // MARK: - AssetDetailsSeparator
