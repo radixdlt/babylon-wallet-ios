@@ -45,21 +45,21 @@ extension NonFungibleAssetList.Row.View {
 	}
 
 	private func rowView(_ viewStore: ViewStoreOf<NonFungibleAssetList.Row>) -> some SwiftUI.View {
-		HStack {
+		HStack(spacing: .small1) {
 			NFTThumbnail(viewStore.resource.iconURL, size: .small)
 
 			VStack(alignment: .leading, spacing: .small2) {
 				Text(viewStore.resource.name ?? "")
 					.foregroundColor(.app.gray1)
+					.lineSpacing(-4)
 					.textStyle(.secondaryHeader)
 
 				Text(viewStore.supply)
 					.font(.app.body2HighImportance)
 					.foregroundColor(.app.gray2)
 			}
-
-			Spacer()
 		}
+		.frame(maxWidth: .infinity, alignment: .leading)
 		.padding(.horizontal, .medium1)
 		.frame(height: headerHeight)
 		.background(.app.white)
