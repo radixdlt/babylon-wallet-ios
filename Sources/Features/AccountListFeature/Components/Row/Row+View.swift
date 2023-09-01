@@ -4,13 +4,6 @@ import FeaturePrelude
 // MARK: - AccountList.Row.View
 extension AccountList.Row {
 	public struct ViewState: Equatable {
-		struct FungibleResources: Equatable {
-			static let maxNumberOfIcons = 5
-
-			let icons: [TokenThumbnail.Content]
-			let additionalItemsText: String?
-		}
-
 		let name: String
 		let address: AccountAddress
 		let appearanceID: Profile.Network.Account.AppearanceID
@@ -36,9 +29,13 @@ extension AccountList.Row {
 		let tag: AccountTag?
 
 		let shouldShowSecurityPrompt: Bool
-		let fungibleResourceIcons: FungibleResources
+		let fungibleResourceIcons: [TokenThumbnail.Content]
 		let nonFungibleResourcesCount: Int
 		let poolUnitsCount: Int
+
+		var showMoreFungibles: Bool {
+			nonFungibleResourcesCount == 0 && poolUnitsCount == 0
+		}
 
 		init(state: State) {
 			self.name = state.account.displayName.rawValue
@@ -54,25 +51,18 @@ extension AccountList.Row {
 
 			// Resources
 			guard let portfolio = state.portfolio.wrappedValue else {
-				self.fungibleResourceIcons = .init(icons: [], additionalItemsText: nil)
+				self.fungibleResourceIcons = []
 				self.nonFungibleResourcesCount = 0
 				self.poolUnitsCount = 0
 
 				return
 			}
 
-			self.fungibleResourceIcons = {
-				let fungibleResources = portfolio.fungibleResources
-				let xrdIcon: [TokenThumbnail.Content] = fungibleResources.xrdResource != nil ? [.xrd] : []
-
-				let otherIcons: [TokenThumbnail.Content] = fungibleResources.nonXrdResources
-					.map { .known($0.iconURL) }
-				let icons = xrdIcon + otherIcons
-				let hiddenCount = max(icons.count - FungibleResources.maxNumberOfIcons, 0)
-				let additionalItems = hiddenCount > 0 ? "+\(hiddenCount)" : nil
-
-				return .init(icons: icons.dropLast(hiddenCount), additionalItemsText: additionalItems)
-			}()
+			let fungibleResources = portfolio.fungibleResources
+			let xrdIcon: [TokenThumbnail.Content] = fungibleResources.xrdResource != nil ? [.xrd] : []
+			let otherIcons: [TokenThumbnail.Content] = fungibleResources.nonXrdResources
+				.map { .known($0.iconURL) }
+			self.fungibleResourceIcons = xrdIcon + otherIcons
 
 			self.nonFungibleResourcesCount = portfolio.nonFungibleResources.count
 
@@ -135,17 +125,27 @@ extension AccountList.Row.View {
 
 	// Crates the view of the account owned resources
 	func ownedResourcesList(_ viewStore: ViewStoreOf<AccountList.Row>) -> some View {
-		HStack(spacing: .medium1) {
-			if !viewStore.fungibleResourceIcons.icons.isEmpty {
-				resourcesContainer(
-					text: viewStore.fungibleResourceIcons.additionalItemsText
-				) {
-					fungibleResourcesList(viewStore)
+		HStack(spacing: .small1) {
+			if !viewStore.fungibleResourceIcons.isEmpty {
+				let icons = viewStore.fungibleResourceIcons
+				if viewStore.showMoreFungibles {
+					ViewThatFits(in: .horizontal) {
+						fungibleResourcesSection(icons, itemLimit: nil)
+						fungibleResourcesSection(icons, itemLimit: 10)
+					}
+					.layoutPriority(-100)
+				} else {
+					ViewThatFits(in: .horizontal) {
+						fungibleResourcesSection(icons, itemLimit: 5)
+						fungibleResourcesSection(icons, itemLimit: 4)
+						fungibleResourcesSection(icons, itemLimit: 3)
+					}
+					.layoutPriority(-100)
 				}
 			}
 
 			if viewStore.nonFungibleResourcesCount > 0 {
-				resourcesContainer(text: "\(viewStore.nonFungibleResourcesCount)") {
+				withLabel("\(viewStore.nonFungibleResourcesCount)") {
 					Image(asset: AssetResource.nft)
 						.resizable()
 						.frame(Constants.iconSize)
@@ -153,7 +153,7 @@ extension AccountList.Row.View {
 			}
 
 			if viewStore.poolUnitsCount > 0 {
-				resourcesContainer(text: "\(viewStore.poolUnitsCount)") {
+				withLabel("\(viewStore.poolUnitsCount)") {
 					Image(asset: AssetResource.poolUnit)
 						.resizable()
 						.frame(Constants.iconSize)
@@ -165,41 +165,47 @@ extension AccountList.Row.View {
 		.cornerRadius(Constants.iconSize.rawValue / 4)
 	}
 
-	// Resources container to display a combination of any View + additional text (aka +10)
-	private func resourcesContainer(text: String?, @ViewBuilder content: () -> some View) -> some View {
-		// Negative spacing, so that the text number starts from the last icon.
-		// Need to be sure that the background of the text is properly displayed.
-		HStack(spacing: -Constants.iconSize.rawValue) {
-			content()
-			if let text {
-				// The text background needs to go behind the `content`
-				textContainer(text).zIndex(-1)
+	@MainActor
+	private func fungibleResourcesSection(_ fungibles: [TokenThumbnail.Content], itemLimit: Int?) -> some View {
+		let displayedIconCount = min(fungibles.count, itemLimit ?? .max)
+		let displayedIcons = fungibles.prefix(displayedIconCount)
+		let hiddenCount = fungibles.count - displayedIconCount
+		let label = hiddenCount > 0 ? "+\(hiddenCount)" : nil
+
+		return HStack(alignment: .center, spacing: -Constants.iconSize.rawValue / 3) {
+			ForEach(displayedIcons.identifiablyEnumerated()) { item in
+				withLabel(item.offset == displayedIconCount - 1 ? label : nil, isFungible: true) {
+					TokenThumbnail(item.element, size: Constants.iconSize)
+				}
+				.zIndex(Double(-item.offset))
 			}
 		}
 	}
 
-	// The container displaying the resources number
-	private func textContainer(_ text: String) -> some View {
+	// Resources container to display a combination of any View + additional text. Tighten when used on round icons.
+	private func withLabel(_ text: String?, isFungible: Bool = false, content: () -> some View) -> some View {
+		Group {
+			if let text {
+				textContainer(text, tightenLeading: isFungible)
+					.overlay(alignment: .leading, content: content)
+			} else {
+				content()
+			}
+		}
+	}
+
+	// The container displaying the resources number.
+	private func textContainer(_ text: String, tightenLeading: Bool) -> some View {
 		Text(text)
+			.lineLimit(1)
+			.layoutPriority(100)
+			.textStyle(.resourceLabel)
 			.foregroundColor(.white)
-			.padding(.leading, Constants.iconSize.rawValue + 4) // Padding so that the text is visible
-			.padding(.trailing, 4)
-			.frame(
-				minWidth: Constants.iconSize.rawValue * 2,
-				minHeight: Constants.iconSize.rawValue
-			)
+			.padding(.horizontal, .small2)
+			.frame(minWidth: .medium1, minHeight: Constants.iconSize.rawValue)
+			.padding(.leading, Constants.iconSize.rawValue - (tightenLeading ? .small3 : 0))
 			.background(.app.whiteTransparent2)
 			.cornerRadius(Constants.iconSize.rawValue / 2)
-	}
-
-	// The list of fungible resources
-	private func fungibleResourcesList(_ viewStore: ViewStoreOf<AccountList.Row>) -> some View {
-		HStack(alignment: .center, spacing: -Constants.iconSize.rawValue / 3) {
-			ForEach(viewStore.fungibleResourceIcons.icons.identifiablyEnumerated()) { item in
-				TokenThumbnail(item.element, size: Constants.iconSize)
-					.zIndex(Double(-item.offset))
-			}
-		}
 	}
 }
 

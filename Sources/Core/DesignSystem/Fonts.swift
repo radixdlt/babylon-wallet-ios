@@ -20,6 +20,10 @@ extension SwiftUI.Font.App {
 		.custom(FontFamily.IBMPlexSans.semiBold, size: 18)
 	}
 
+	public var resourceLabel: SwiftUI.Font {
+		.custom(FontFamily.IBMPlexSans.semiBold, size: 11)
+	}
+
 	public var backButton: SwiftUI.Font {
 		.custom(FontFamily.IBMPlexSans.medium, size: 18)
 	}
