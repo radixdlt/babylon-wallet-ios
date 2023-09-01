@@ -324,9 +324,8 @@ public struct TransactionReview: Sendable, FeatureReducer {
 
 		case let .customizeFees(.delegate(.updated(reviewedTransaction))):
 			state.reviewedTransaction = reviewedTransaction
-			if let reviewedTransaction = state.reviewedTransaction {
-				state.networkFee = .init(reviewedTransaction: reviewedTransaction)
-			}
+			state.networkFee = .init(reviewedTransaction: reviewedTransaction)
+			// printFeePayerInfo()
 			return .none
 
 		case .customizeFees:
