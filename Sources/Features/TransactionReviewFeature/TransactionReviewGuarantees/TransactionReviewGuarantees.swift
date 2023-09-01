@@ -85,7 +85,7 @@ public struct TransactionReviewGuarantee: Sendable, FeatureReducer {
 			self.account = account
 			self.transfer = transfer
 
-			guard let guaranteed = transfer.guarantee?.amount, guaranteed >= 0 else {
+			guard let guaranteed = transfer.guarantee?.amount, guaranteed >= 0, transfer.fungibleResource.amount > 0 else {
 				return nil
 			}
 
