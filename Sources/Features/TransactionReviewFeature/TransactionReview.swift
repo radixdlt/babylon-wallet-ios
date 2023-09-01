@@ -36,6 +36,33 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		@PresentationState
 		public var destination: Destinations.State? = nil
 
+		public func printFeePayerInfo(line: UInt = #line, function: StaticString = #function) {
+			#if DEBUG
+			func doPrint(_ msg: String) {
+				loggerGlobal.critical("💃 \(function)#\(line) - \(msg)")
+			}
+			let intentSignersNonEmpty = reviewedTransaction?.transactionSigners.intentSignerEntitiesNonEmptyOrNil()
+			let feePayer = reviewedTransaction?.feePayerSelection.selected?.account
+
+			let notaryIsSignatory: Bool = reviewedTransaction?.transactionSigners.notaryIsSignatory == true
+			switch (intentSignersNonEmpty, feePayer) {
+			case (.none, .none):
+				doPrint("NO Feepayer or intentSigner - faucet TX⁈ (notaryIsSignatory: \(notaryIsSignatory)")
+				if !notaryIsSignatory {
+					assertionFailure("Should not happen")
+				}
+			case let (.some(_intentSigners), .some(feePayer)):
+				doPrint("Fee payer: \(feePayer.address), intentSigners: \(_intentSigners.map(\.address))")
+			case let (.some(_intentSigners), .none):
+				doPrint("‼️ NO Fee payer, but got intentSigners: \(_intentSigners.map(\.address)) ")
+				assertionFailure("Should not happen")
+			case let (.none, .some(feePayer)):
+				doPrint("‼️Fee payer: \(feePayer.address), but no intentSigners")
+				assertionFailure("Should not happen")
+			}
+			#endif
+		}
+
 		public init(
 			transactionManifest: TransactionManifest,
 			nonce: Nonce,
@@ -66,7 +93,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		case closeTapped
 		case showRawTransactionTapped
 
-		case approveTapped
+		case approveTransaction
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -199,8 +226,9 @@ public struct TransactionReview: Sendable, FeatureReducer {
 				return .none
 			}
 
-		case .approveTapped:
+		case .approveTransaction:
 			state.canApproveTX = false
+			state.printFeePayerInfo()
 			do {
 				let manifest = try transactionManifestWithWalletInstructionsAdded(state)
 				guard let reviewedTransaction = state.reviewedTransaction else {
@@ -271,16 +299,8 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			return .none
 
 		case .deposits(.delegate(.showCustomizeGuarantees)):
-			guard let deposits = state.deposits else { return .none } // TODO: Handle?
-
-			let guarantees = deposits.accounts
-				.flatMap { account -> [TransactionReviewGuarantee.State] in
-					account.transfers
-						.compactMap(\.fungible)
-						.filter { $0.guarantee != nil }
-						.compactMap { .init(account: account.account, transfer: $0) }
-				}
-
+			// TODO: Handle?
+			guard let guarantees = state.deposits?.accounts.customizableGuarantees, !guarantees.isEmpty else { return .none }
 			state.destination = .customizeGuarantees(.init(guarantees: .init(uniqueElements: guarantees)))
 
 			return .none
@@ -324,9 +344,13 @@ public struct TransactionReview: Sendable, FeatureReducer {
 
 		case let .customizeFees(.delegate(.updated(reviewedTransaction))):
 			state.reviewedTransaction = reviewedTransaction
+
+			// FIXME: Cyon: this looks wrong? Why are we only updating `state.networkFee` if `state.reviewedTransaction` WAS nil.
 			if let reviewedTransaction = state.reviewedTransaction {
 				state.networkFee = .init(reviewedTransaction: reviewedTransaction)
 			}
+
+			state.printFeePayerInfo()
 			return .none
 
 		case .customizeFees:
@@ -473,6 +497,17 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		     let .notarizeResult(.failure(error)):
 			errorQueue.schedule(error)
 			return .none
+		}
+	}
+}
+
+extension Collection<TransactionReviewAccount.State> {
+	var customizableGuarantees: [TransactionReviewGuarantee.State] {
+		flatMap { account in
+			account.transfers
+				.compactMap(\.fungible)
+				.filter { $0.guarantee != nil }
+				.compactMap { .init(account: account.account, transfer: $0) }
 		}
 	}
 }
@@ -672,7 +707,7 @@ extension TransactionReview {
 		let accounts = withdrawals.map {
 			TransactionReviewAccount.State(account: $0.key, transfers: .init(uniqueElements: $0.value))
 		}
-		return .init(accounts: .init(uniqueElements: accounts), showCustomizeGuarantees: false)
+		return .init(accounts: .init(uniqueElements: accounts), enableCustomizeGuarantees: false)
 	}
 
 	private func extractDeposits(
@@ -707,11 +742,8 @@ extension TransactionReview {
 
 		guard !reviewAccounts.isEmpty else { return nil }
 
-		let requiresGuarantees = reviewAccounts.contains { reviewAccount in
-			reviewAccount.transfers.contains { $0.fungible?.guarantee != nil }
-		}
-
-		return .init(accounts: .init(uniqueElements: reviewAccounts), showCustomizeGuarantees: requiresGuarantees)
+		let requiresGuarantees = !reviewAccounts.customizableGuarantees.isEmpty
+		return .init(accounts: .init(uniqueElements: reviewAccounts), enableCustomizeGuarantees: requiresGuarantees)
 	}
 
 	func transferInfo(
@@ -1316,3 +1348,16 @@ extension ReviewedTransaction {
 		return conforming.metadataOfNewlyCreatedEntities[resource.address]
 	}
 }
+
+#if DEBUG
+extension TransactionSigners {
+	func intentSignerEntitiesNonEmptyOrNil() -> NonEmpty<OrderedSet<EntityPotentiallyVirtual>>? {
+		switch intentSigning {
+		case let .intentSigners(signers) where !signers.isEmpty:
+			return NonEmpty(rawValue: OrderedSet(signers))
+		default:
+			return nil
+		}
+	}
+}
+#endif

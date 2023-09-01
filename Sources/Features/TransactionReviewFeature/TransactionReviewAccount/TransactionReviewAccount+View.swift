@@ -3,13 +3,13 @@ import FeaturePrelude
 
 extension TransactionReviewAccounts.State {
 	var viewState: TransactionReviewAccounts.ViewState {
-		.init(showCustomizeGuarantees: showCustomizeGuarantees)
+		.init(showCustomizeGuaranteesButton: enableCustomizeGuarantees)
 	}
 }
 
 extension TransactionReviewAccounts {
 	public struct ViewState: Equatable {
-		let showCustomizeGuarantees: Bool
+		let showCustomizeGuaranteesButton: Bool
 	}
 
 	@MainActor
@@ -32,7 +32,7 @@ extension TransactionReviewAccounts {
 							content: { TransactionReviewAccount.View(store: $0) }
 						)
 
-						if viewStore.showCustomizeGuarantees {
+						if viewStore.showCustomizeGuaranteesButton {
 							Button(L10n.TransactionReview.customizeGuaranteesButtonTitle) {
 								viewStore.send(.customizeGuaranteesTapped)
 							}
