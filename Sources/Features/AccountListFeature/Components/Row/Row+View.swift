@@ -38,7 +38,7 @@ extension AccountList.Row {
 		}
 
 		init(state: State) {
-			self.name = state.account.displayName.rawValue
+			self.name = state.account.displayName.rawValue + state.account.displayName.rawValue + state.account.displayName.rawValue
 			self.address = state.account.address
 			self.appearanceID = state.account.appearanceID
 			self.isLoadingResources = state.portfolio.isLoading
@@ -60,14 +60,12 @@ extension AccountList.Row {
 
 			let fungibleResources = portfolio.fungibleResources
 			let xrdIcon: [TokenThumbnail.Content] = fungibleResources.xrdResource != nil ? [.xrd] : []
-			let otherIcons: [TokenThumbnail.Content] = fungibleResources.nonXrdResources
-				.map { .known($0.iconURL) }
+			let otherIcons: [TokenThumbnail.Content] = fungibleResources.nonXrdResources.map { .known($0.iconURL) }
 			self.fungibleResourceIcons = xrdIcon + otherIcons
 
 			self.nonFungibleResourcesCount = portfolio.nonFungibleResources.count
 
-			self.poolUnitsCount = portfolio.poolUnitResources.radixNetworkStakes.count
-				+ portfolio.poolUnitResources.poolUnits.count
+			self.poolUnitsCount = portfolio.poolUnitResources.radixNetworkStakes.count + portfolio.poolUnitResources.poolUnits.count
 		}
 	}
 
@@ -83,7 +81,12 @@ extension AccountList.Row {
 			WithViewStore(store, observe: ViewState.init(state:), send: { .view($0) }) { viewStore in
 				VStack(alignment: .leading, spacing: .medium3) {
 					VStack(alignment: .leading, spacing: .zero) {
-						headerView(with: viewStore.name)
+						Text(viewStore.name)
+							.lineLimit(1)
+							.textStyle(.body1Header)
+							.foregroundColor(.app.white)
+							.frame(maxWidth: .infinity, alignment: .leading)
+
 						HStack {
 							AddressView(.address(.account(viewStore.address)))
 								.foregroundColor(.app.whiteTransparent)
@@ -98,6 +101,7 @@ extension AccountList.Row {
 					}
 
 					ownedResourcesList(viewStore)
+
 					if viewStore.shouldShowSecurityPrompt {
 						securityPromptView(viewStore)
 					}
@@ -264,21 +268,6 @@ public struct OffsetIdentified<Element>: Identifiable {
 
 	public let offset: Int
 	public let element: Element
-}
-
-extension AccountList.Row.View {
-	@ViewBuilder
-	private func headerView(
-		with name: String
-	) -> some SwiftUI.View {
-		HStack {
-			Text(name)
-				.foregroundColor(.app.white)
-				.textStyle(.body1Header)
-				.fixedSize()
-			Spacer()
-		}
-	}
 }
 
 extension AccountList.Row.ViewState.AccountTag {
