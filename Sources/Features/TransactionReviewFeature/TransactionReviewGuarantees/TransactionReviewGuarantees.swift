@@ -89,7 +89,7 @@ public struct TransactionReviewGuarantee: Sendable, FeatureReducer {
 				return nil
 			}
 
-			self.percentageStepper = .init(value: 100 * guaranteed / transfer.amount)
+			self.percentageStepper = .init(value: 100 * guaranteed / transfer.fungibleResource.amount)
 		}
 	}
 
@@ -119,7 +119,7 @@ public struct TransactionReviewGuarantee: Sendable, FeatureReducer {
 			}
 
 			let newMinimumDecimal = value * 0.01
-			let newAmount = newMinimumDecimal * state.transfer.amount
+			let newAmount = newMinimumDecimal * state.transfer.fungibleResource.amount
 			state.transfer.guarantee?.amount = newAmount
 
 			return .none
