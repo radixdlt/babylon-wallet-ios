@@ -147,13 +147,13 @@ private final class LocalNetworkAuthorization: NSObject, @unchecked Sendable {
 			case .setup, .ready, .cancelled:
 				break
 			case let .failed(error):
-				print(error.localizedDescription)
+				loggerGlobal.error("\(error.localizedDescription)")
 			case let .waiting(error):
-				print("Local network permission has been denied: \(error)")
+				loggerGlobal.error("Local network permission has been denied: \(error)")
 				self.reset()
 				self.completion?(false)
 			@unknown default:
-				print("Local network permission unknown state: \(String(describing: newState))")
+				loggerGlobal.notice("Local network permission unknown state: \(String(describing: newState))")
 			}
 		}
 
@@ -177,7 +177,7 @@ private final class LocalNetworkAuthorization: NSObject, @unchecked Sendable {
 extension LocalNetworkAuthorization: NetServiceDelegate {
 	func netServiceDidPublish(_ sender: NetService) {
 		self.reset()
-		print("Local network permission has been granted")
+		loggerGlobal.info("Local network permission has been granted")
 		completion?(true)
 	}
 }
