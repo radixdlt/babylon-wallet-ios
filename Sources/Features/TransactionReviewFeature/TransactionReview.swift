@@ -352,24 +352,14 @@ public struct TransactionReview: Sendable, FeatureReducer {
 
 		case let .customizeFees(.delegate(.updated(reviewedTransaction))):
 			state.reviewedTransaction = reviewedTransaction
-			// Cyon: this looks wrong? Why are we only updating `state.networkFee` if `state.reviewedTransaction` WAS nil.
+
+			// FIXME: Cyon: this looks wrong? Why are we only updating `state.networkFee` if `state.reviewedTransaction` WAS nil.
 			if let reviewedTransaction = state.reviewedTransaction {
 				state.networkFee = .init(reviewedTransaction: reviewedTransaction)
 			}
 
 			state.printFeePayerInfo()
 			return .none
-
-//            // Cyon so I decided to comment out the code above, and change to ALWAYS update state.networkFee
-//            state.networkFee = .init(reviewedTransaction: reviewedTransaction)
-//
-//            switch state.displayMode {
-//            case .review:
-//                return .none
-//            case .raw:
-//                // need to update the displayed manifest
-//                return showRawTransaction(&state)
-//            }
 
 		case .customizeFees:
 			return .none
