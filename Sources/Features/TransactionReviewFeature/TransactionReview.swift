@@ -36,6 +36,33 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		@PresentationState
 		public var destination: Destinations.State? = nil
 
+		public func printFeePayerInfo(line: UInt = #line, function: StaticString = #function) {
+			#if DEBUG
+			func doPrint(_ msg: String) {
+				loggerGlobal.critical("💃 \(function)#\(line) - \(msg)")
+			}
+			let intentSignersNonEmpty = reviewedTransaction?.transactionSigners.intentSignerEntitiesNonEmptyOrNil()
+			let feePayer = reviewedTransaction?.feePayerSelection.selected?.account
+
+			let notaryIsSignatory: Bool = reviewedTransaction?.transactionSigners.notaryIsSignatory == true
+			switch (intentSignersNonEmpty, feePayer) {
+			case (.none, .none):
+				doPrint("NO Feepayer or intentSigner - faucet TX⁈ (notaryIsSignatory: \(notaryIsSignatory)")
+				if !notaryIsSignatory {
+					assertionFailure("Should not happen")
+				}
+			case let (.some(_intentSigners), .some(feePayer)):
+				doPrint("Fee payer: \(feePayer.address), intentSigners: \(_intentSigners.map(\.address))")
+			case let (.some(_intentSigners), .none):
+				doPrint("‼️ NO Fee payer, but got intentSigners: \(_intentSigners.map(\.address)) ")
+				assertionFailure("Should not happen")
+			case let (.none, .some(feePayer)):
+				doPrint("‼️Fee payer: \(feePayer.address), but no intentSigners")
+				assertionFailure("Should not happen")
+			}
+			#endif
+		}
+
 		public init(
 			transactionManifest: TransactionManifest,
 			nonce: Nonce,
@@ -201,6 +228,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 
 		case .approveTransaction:
 			state.canApproveTX = false
+			state.printFeePayerInfo()
 			do {
 				let manifest = try transactionManifestWithWalletInstructionsAdded(state)
 				guard let reviewedTransaction = state.reviewedTransaction else {
@@ -324,10 +352,24 @@ public struct TransactionReview: Sendable, FeatureReducer {
 
 		case let .customizeFees(.delegate(.updated(reviewedTransaction))):
 			state.reviewedTransaction = reviewedTransaction
+			// Cyon: this looks wrong? Why are we only updating `state.networkFee` if `state.reviewedTransaction` WAS nil.
 			if let reviewedTransaction = state.reviewedTransaction {
 				state.networkFee = .init(reviewedTransaction: reviewedTransaction)
 			}
+
+			state.printFeePayerInfo()
 			return .none
+
+//            // Cyon so I decided to comment out the code above, and change to ALWAYS update state.networkFee
+//            state.networkFee = .init(reviewedTransaction: reviewedTransaction)
+//
+//            switch state.displayMode {
+//            case .review:
+//                return .none
+//            case .raw:
+//                // need to update the displayed manifest
+//                return showRawTransaction(&state)
+//            }
 
 		case .customizeFees:
 			return .none
@@ -1316,3 +1358,16 @@ extension ReviewedTransaction {
 		return conforming.metadataOfNewlyCreatedEntities[resource.address]
 	}
 }
+
+#if DEBUG
+extension TransactionSigners {
+	func intentSignerEntitiesNonEmptyOrNil() -> NonEmpty<OrderedSet<EntityPotentiallyVirtual>>? {
+		switch intentSigning {
+		case let .intentSigners(signers) where !signers.isEmpty:
+			return NonEmpty(rawValue: OrderedSet(signers))
+		default:
+			return nil
+		}
+	}
+}
+#endif
