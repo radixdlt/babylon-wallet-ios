@@ -86,7 +86,7 @@ extension TransactionFee.AdvancedFeeCustomization {
 		let base = IdentifiedArrayOf<FeeViewState>(uncheckedUniqueElements: [
 			.init(
 				name: L10n.TransactionReview.CustomizeNetworkFeeSheet.networkExecution,
-				amount: feeSummary.executionCost,
+				amount: feeSummary.totalExecutionCost,
 				isUserConfigurable: false
 			),
 			.init(
