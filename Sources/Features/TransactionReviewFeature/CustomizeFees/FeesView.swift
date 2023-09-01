@@ -84,16 +84,44 @@ struct FeeViewState: Equatable, Sendable, Identifiable {
 extension TransactionFee.AdvancedFeeCustomization {
 	var viewStates: IdentifiedArrayOf<FeeViewState> {
 		let base = IdentifiedArrayOf<FeeViewState>(uncheckedUniqueElements: [
-			.init(name: L10n.TransactionReview.CustomizeNetworkFeeSheet.networkExecution, amount: feeSummary.executionCost, isUserConfigurable: false),
-			.init(name: L10n.TransactionReview.CustomizeNetworkFeeSheet.networkFinalization, amount: feeSummary.finalizationCost, isUserConfigurable: false),
-			.init(name: L10n.TransactionReview.CustomizeNetworkFeeSheet.effectiveTip, amount: tipAmount, isUserConfigurable: true),
-			.init(name: L10n.TransactionReview.CustomizeNetworkFeeSheet.networkStorage, amount: feeSummary.storageExpansionCost, isUserConfigurable: false),
-			.init(name: L10n.TransactionReview.CustomizeNetworkFeeSheet.padding, amount: paddingFee, isUserConfigurable: true),
-			.init(name: L10n.TransactionReview.CustomizeNetworkFeeSheet.royalties, amount: feeSummary.royaltyCost, isUserConfigurable: false),
+			.init(
+				name: L10n.TransactionReview.CustomizeNetworkFeeSheet.networkExecution,
+				amount: feeSummary.executionCost,
+				isUserConfigurable: false
+			),
+			.init(
+				name: L10n.TransactionReview.CustomizeNetworkFeeSheet.networkFinalization,
+				amount: feeSummary.finalizationCost,
+				isUserConfigurable: false
+			),
+			.init(
+				name: L10n.TransactionReview.CustomizeNetworkFeeSheet.effectiveTip,
+				amount: tipAmount,
+				isUserConfigurable: true
+			),
+			.init(
+				name: L10n.TransactionReview.CustomizeNetworkFeeSheet.networkStorage,
+				amount: feeSummary.storageExpansionCost,
+				isUserConfigurable: false
+			),
+			.init(
+				name: L10n.TransactionReview.CustomizeNetworkFeeSheet.padding,
+				amount: paddingFee,
+				isUserConfigurable: true
+			),
+			.init(
+				name: L10n.TransactionReview.CustomizeNetworkFeeSheet.royalties,
+				amount: feeSummary.royaltyCost,
+				isUserConfigurable: false
+			),
 		])
 
 		if paidByDapps > .zero {
-			return base + [.init(name: L10n.TransactionReview.CustomizeNetworkFeeSheet.paidByDApps, amount: paidByDapps, isUserConfigurable: false)]
+			return base + [.init(
+				name: L10n.TransactionReview.CustomizeNetworkFeeSheet.paidByDApps,
+				amount: paidByDapps,
+				isUserConfigurable: false
+			)]
 		}
 		return base
 	}
