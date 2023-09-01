@@ -5,13 +5,13 @@ import FeaturePrelude
 // MARK: - TransactionReviewAccounts
 public struct TransactionReviewAccounts: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
-		public init(accounts: IdentifiedArrayOf<TransactionReviewAccount.State>, showCustomizeGuarantees: Bool) {
+		public init(accounts: IdentifiedArrayOf<TransactionReviewAccount.State>, enableCustomizeGuarantees: Bool) {
 			self.accounts = accounts
-			self.showCustomizeGuarantees = showCustomizeGuarantees
+			self.enableCustomizeGuarantees = enableCustomizeGuarantees
 		}
 
 		public var accounts: IdentifiedArrayOf<TransactionReviewAccount.State>
-		public let showCustomizeGuarantees: Bool
+		public let enableCustomizeGuarantees: Bool
 	}
 
 	public enum ViewAction: Sendable, Equatable {

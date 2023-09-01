@@ -271,16 +271,8 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			return .none
 
 		case .deposits(.delegate(.showCustomizeGuarantees)):
-			guard let deposits = state.deposits else { return .none } // TODO: Handle?
-
-			let guarantees = deposits.accounts
-				.flatMap { account -> [TransactionReviewGuarantee.State] in
-					account.transfers
-						.compactMap(\.fungible)
-						.filter { $0.guarantee != nil }
-						.compactMap { .init(account: account.account, transfer: $0) }
-				}
-
+			// TODO: Handle?
+			guard let guarantees = state.deposits?.accounts.customizableGuarantees, !guarantees.isEmpty else { return .none }
 			state.destination = .customizeGuarantees(.init(guarantees: .init(uniqueElements: guarantees)))
 
 			return .none
@@ -473,6 +465,17 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		     let .notarizeResult(.failure(error)):
 			errorQueue.schedule(error)
 			return .none
+		}
+	}
+}
+
+extension Collection<TransactionReviewAccount.State> {
+	var customizableGuarantees: [TransactionReviewGuarantee.State] {
+		flatMap { account in
+			account.transfers
+				.compactMap(\.fungible)
+				.filter { $0.guarantee != nil }
+				.compactMap { .init(account: account.account, transfer: $0) }
 		}
 	}
 }
@@ -672,7 +675,7 @@ extension TransactionReview {
 		let accounts = withdrawals.map {
 			TransactionReviewAccount.State(account: $0.key, transfers: .init(uniqueElements: $0.value))
 		}
-		return .init(accounts: .init(uniqueElements: accounts), showCustomizeGuarantees: false)
+		return .init(accounts: .init(uniqueElements: accounts), enableCustomizeGuarantees: false)
 	}
 
 	private func extractDeposits(
@@ -707,11 +710,8 @@ extension TransactionReview {
 
 		guard !reviewAccounts.isEmpty else { return nil }
 
-		let requiresGuarantees = reviewAccounts.contains { reviewAccount in
-			reviewAccount.transfers.contains { $0.fungible?.guarantee != nil }
-		}
-
-		return .init(accounts: .init(uniqueElements: reviewAccounts), showCustomizeGuarantees: requiresGuarantees)
+		let requiresGuarantees = !reviewAccounts.customizableGuarantees.isEmpty
+		return .init(accounts: .init(uniqueElements: reviewAccounts), enableCustomizeGuarantees: requiresGuarantees)
 	}
 
 	func transferInfo(
