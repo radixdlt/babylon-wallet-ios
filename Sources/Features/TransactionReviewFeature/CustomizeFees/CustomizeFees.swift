@@ -132,16 +132,18 @@ public struct CustomizeFees: FeatureReducer {
 					if let previousFeePayer, !manifest.accountsRequiringAuth().contains(where: { $0.addressString() == previousFeePayer.account.address.address }) {
 						// removed, need to recalculate signing factors
 						newSigners.remove(.account(previousFeePayer.account))
+					}
 
-						let signers: TransactionSigners.IntentSigning = {
+					// Update transaction signers
+					reviewedTransaction.transactionSigners = .init(
+						notaryPublicKey: reviewedTransaction.transactionSigners.notaryPublicKey,
+						intentSigning: {
 							guard let nonEmpty = NonEmpty(rawValue: OrderedSet(newSigners)) else {
 								return .notaryIsSignatory
 							}
 							return TransactionSigners.IntentSigning.intentSigners(nonEmpty)
 						}()
-
-						reviewedTransaction.transactionSigners = .init(notaryPublicKey: reviewedTransaction.transactionSigners.notaryPublicKey, intentSigning: signers)
-					}
+					)
 
 					@Dependency(\.factorSourcesClient) var factorSourcesClient
 
