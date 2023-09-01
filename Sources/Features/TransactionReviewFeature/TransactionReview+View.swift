@@ -134,7 +134,7 @@ extension TransactionReview {
 
 						if viewStore.showApprovalSlider {
 							ApprovalSlider(title: "Slide to Sign") { // FIXME: String - and remove old
-								viewStore.send(.approveTransaction)
+								viewStore.send(.approvalSliderSlid)
 							}
 							.controlState(viewStore.approvalSliderControlState)
 							.padding(.horizontal, .small3)
