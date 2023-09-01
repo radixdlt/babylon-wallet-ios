@@ -12,8 +12,8 @@ extension AccountDetails.State {
 			accountAddress: account.address,
 			appearanceID: account.appearanceID,
 			displayName: account.displayName.rawValue,
-			needToImportMnemonicForThisAccount: needToImportMnemonicForThisAccount,
-			needToBackupMnemonicForThisAccount: needToBackupMnemonicForThisAccount
+			needToImportMnemonicForThisAccount: importMnemonicPrompt.needed,
+			needToBackupMnemonicForThisAccount: exportMnemonicPrompt.needed
 		)
 	}
 }

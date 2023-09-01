@@ -9,13 +9,41 @@ import ImportMnemonicFeature
 import ProfileBackupsFeature
 import SharedModels
 
+// MARK: - ImportOrExportMnemonicForAccountPrompt
+public struct ImportOrExportMnemonicForAccountPrompt: Sendable, Hashable {
+	public let needed: Bool
+	public let deepLinkTo: Bool
+	public init(needed: Bool, deepLinkTo: Bool = false) {
+		self.needed = needed
+		self.deepLinkTo = deepLinkTo
+	}
+
+	public static let no = Self(needed: false, deepLinkTo: false)
+}
+
+// MARK: - ImportMnemonicForAccountPromptTag
+public enum ImportMnemonicForAccountPromptTag {}
+
+// MARK: - ExportMnemonicForAccountPromptTag
+public enum ExportMnemonicForAccountPromptTag {}
+public typealias ImportMnemonicPrompt = Tagged<ImportMnemonicForAccountPromptTag, ImportOrExportMnemonicForAccountPrompt>
+public typealias ExportMnemonicPrompt = Tagged<ExportMnemonicForAccountPromptTag, ImportOrExportMnemonicForAccountPrompt>
+
+extension Tagged where RawValue == ImportOrExportMnemonicForAccountPrompt {
+	public static var no: Self { .init(rawValue: .no) }
+	public init(needed: Bool, deepLinkTo: Bool = false) {
+		self.init(rawValue: .init(needed: needed, deepLinkTo: deepLinkTo))
+	}
+}
+
+// MARK: - AccountDetails
 public struct AccountDetails: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		var account: Profile.Network.Account
 		var assets: AssetsView.State
 
-		public var needToImportMnemonicForThisAccount: Bool
-		public var needToBackupMnemonicForThisAccount: Bool
+		public var importMnemonicPrompt: ImportMnemonicPrompt
+		public var exportMnemonicPrompt: ExportMnemonicPrompt
 
 		@PresentationState
 		var destination: Destinations.State?
@@ -29,13 +57,13 @@ public struct AccountDetails: Sendable, FeatureReducer {
 
 		public init(
 			for account: Profile.Network.Account,
-			needToImportMnemonicForThisAccount: Bool = false,
-			needToBackupMnemonicForThisAccount: Bool = false
+			importMnemonicPrompt: ImportMnemonicPrompt = .no,
+			exportMnemonicPrompt: ExportMnemonicPrompt = .no
 		) {
 			self.account = account
 			self.assets = AssetsView.State(account: account, mode: .normal)
-			self.needToImportMnemonicForThisAccount = needToImportMnemonicForThisAccount
-			self.needToBackupMnemonicForThisAccount = needToBackupMnemonicForThisAccount
+			self.importMnemonicPrompt = importMnemonicPrompt
+			self.exportMnemonicPrompt = exportMnemonicPrompt
 		}
 	}
 
@@ -133,12 +161,24 @@ public struct AccountDetails: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .task:
-			return .run { [address = state.account.address] send in
+			let effect: EffectTask<Action>
+
+			let runEffect = EffectTask<Action>.run { [address = state.account.address] send in
 				for try await accountUpdate in await accountsClient.accountUpdates(address) {
 					guard !Task.isCancelled else { return }
 					await send(.internal(.accountUpdated(accountUpdate)))
 				}
 			}
+
+			if state.importMnemonicPrompt.deepLinkTo {
+				effect = loadImport().concatenate(with: runEffect)
+			} else if state.exportMnemonicPrompt.deepLinkTo {
+				effect = loadMnemonic(state: state).concatenate(with: runEffect)
+			} else {
+				effect = runEffect
+			}
+			return effect
+
 		case .backButtonTapped:
 			return .send(.delegate(.dismiss))
 
@@ -170,10 +210,10 @@ public struct AccountDetails: Sendable, FeatureReducer {
 		case let .destination(.presented(.exportMnemonic(.delegate(.doneViewing(markedMnemonicAsBackedUp))))):
 			if
 				let justBackedUp = markedMnemonicAsBackedUp,
-				state.needToBackupMnemonicForThisAccount,
+				state.exportMnemonicPrompt.needed,
 				justBackedUp
 			{
-				state.needToBackupMnemonicForThisAccount = false
+				state.exportMnemonicPrompt = .no
 			}
 			state.destination = nil
 			return .none
@@ -186,10 +226,10 @@ public struct AccountDetails: Sendable, FeatureReducer {
 				if
 					imported.contains(where: { $0.factorSourceID == state.deviceControlledFactorInstance.factorSourceID })
 				{
-					state.needToImportMnemonicForThisAccount = false
+					state.importMnemonicPrompt = .no
 
 					// It makes no sense to prompt user to back up a mnemonic she *just* imported.
-					state.needToBackupMnemonicForThisAccount = false
+					state.exportMnemonicPrompt = .no
 				}
 			}
 			state.destination = nil

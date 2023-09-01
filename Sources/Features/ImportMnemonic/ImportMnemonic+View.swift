@@ -55,7 +55,7 @@ extension ImportMnemonic {
 		}
 
 		var showCloseButton: Bool {
-			guard let readonlyMode, case .fromSettings = readonlyMode else { return false }
+			guard let readonlyMode, case .fromBackupPrompt = readonlyMode else { return false }
 			loggerGlobal.feature("show close button")
 			return true
 		}
@@ -170,6 +170,7 @@ extension ImportMnemonic {
 
 						footer(with: viewStore)
 					}
+					.navigationBarBackButtonHidden() // need to be able to hook "back" button press
 					.toolbar {
 						if viewStore.showBackButton {
 							ToolbarItem(placement: .navigationBarLeading) {
