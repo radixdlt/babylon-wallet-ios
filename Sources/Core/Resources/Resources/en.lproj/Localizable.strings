@@ -96,6 +96,11 @@
 "accountSettings_thirdPartyDeposits_allowSpecificDepositors" = "Allow specific depositors";
 "accountSettings_thirdPartyDeposits_allowSpecificDepositorsSubtitle" = "Allow certain third party depositors to deposit assets freely";
 "accountSettings_thirdPartyDeposits_allowSpecificDepositorsButton" = "Add Depositor Badge";
+"accountSettings_specificAssetsDeposits_removeAsset" = "Remove Asset";
+"accountSettings_specificAssetsDeposits_removeAssetMessageDeny" = "The asset will be removed from the deny list";
+"accountSettings_specificAssetsDeposits_removeAssetMessageAllow" = "The asset will be removed from the allow list";
+"accountSettings_specificAssetsDeposits_removeDepositor" = "Remove Depositor";
+"accountSettings_specificAssetsDeposits_removeDepositorMessage" = "The depositor will be removed from the allow list";
 "accountSettings_specificAssetsDeposits" = "Allow/Deny Specific Assets";
 "accountSettings_specificAssetsDeposits_update" = "Update";
 "accountSettings_specificAssetsDeposits_allow" = "Allow";
