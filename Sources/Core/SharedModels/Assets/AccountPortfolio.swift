@@ -354,8 +354,7 @@ extension [AccountPortfolio.NonFungibleResource.NonFungibleToken.NFTData] {
 	}
 
 	public var keyImageURL: URL? {
-		guard let string = self[Field.keyImageURL]?.string else { return nil }
-		return URL(string: string)
+		self[.keyImageURL]?.url
 	}
 
 	public var tokenDescription: String? {
