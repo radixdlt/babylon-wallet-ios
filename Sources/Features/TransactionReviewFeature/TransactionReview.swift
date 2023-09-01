@@ -66,7 +66,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		case closeTapped
 		case showRawTransactionTapped
 
-		case approveTapped
+		case approveTransaction
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -199,7 +199,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 				return .none
 			}
 
-		case .approveTapped:
+		case .approveTransaction:
 			state.canApproveTX = false
 			do {
 				let manifest = try transactionManifestWithWalletInstructionsAdded(state)
