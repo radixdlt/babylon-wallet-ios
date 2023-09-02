@@ -69,7 +69,6 @@ extension AccountList.Row {
 		}
 	}
 
-	@MainActor
 	public struct View: SwiftUI.View {
 		private let store: StoreOf<AccountList.Row>
 
@@ -134,22 +133,20 @@ extension AccountList.Row.View {
 				let icons = viewStore.fungibleResourceIcons
 				if viewStore.showMoreFungibles {
 					ViewThatFits(in: .horizontal) {
-						fungibleResourcesSection(icons, itemLimit: nil)
-						fungibleResourcesSection(icons, itemLimit: 10)
+						FungibleResourcesSection(fungibles: icons, itemLimit: nil)
+						FungibleResourcesSection(fungibles: icons, itemLimit: 10)
 					}
-					.layoutPriority(-100)
 				} else {
 					ViewThatFits(in: .horizontal) {
-						fungibleResourcesSection(icons, itemLimit: 5)
-						fungibleResourcesSection(icons, itemLimit: 4)
-						fungibleResourcesSection(icons, itemLimit: 3)
+						FungibleResourcesSection(fungibles: icons, itemLimit: 5)
+						FungibleResourcesSection(fungibles: icons, itemLimit: 4)
+						FungibleResourcesSection(fungibles: icons, itemLimit: 3)
 					}
-					.layoutPriority(-100)
 				}
 			}
 
 			if viewStore.nonFungibleResourcesCount > 0 {
-				withLabel("\(viewStore.nonFungibleResourcesCount)") {
+				Labeled(text: "\(viewStore.nonFungibleResourcesCount)") {
 					Image(asset: AssetResource.nft)
 						.resizable()
 						.frame(Constants.iconSize)
@@ -157,7 +154,7 @@ extension AccountList.Row.View {
 			}
 
 			if viewStore.poolUnitsCount > 0 {
-				withLabel("\(viewStore.poolUnitsCount)") {
+				Labeled(text: "\(viewStore.poolUnitsCount)") {
 					Image(asset: AssetResource.poolUnit)
 						.resizable()
 						.frame(Constants.iconSize)
@@ -169,28 +166,36 @@ extension AccountList.Row.View {
 		.cornerRadius(Constants.iconSize.rawValue / 4)
 	}
 
-	@MainActor
-	private func fungibleResourcesSection(_ fungibles: [TokenThumbnail.Content], itemLimit: Int?) -> some View {
-		let displayedIconCount = min(fungibles.count, itemLimit ?? .max)
-		let displayedIcons = fungibles.prefix(displayedIconCount)
-		let hiddenCount = fungibles.count - displayedIconCount
-		let label = hiddenCount > 0 ? "+\(hiddenCount)" : nil
+	struct FungibleResourcesSection: View {
+		let fungibles: [TokenThumbnail.Content]
+		let itemLimit: Int?
 
-		return HStack(alignment: .center, spacing: -Constants.iconSize.rawValue / 3) {
-			ForEach(displayedIcons.identifiablyEnumerated()) { item in
-				withLabel(item.offset == displayedIconCount - 1 ? label : nil, isFungible: true) {
-					TokenThumbnail(item.element, size: Constants.iconSize)
+		var body: some View {
+			let displayedIconCount = min(fungibles.count, itemLimit ?? .max)
+			let displayedIcons = fungibles.prefix(displayedIconCount).identifiablyEnumerated()
+			let hiddenCount = fungibles.count - displayedIconCount
+			let label = hiddenCount > 0 ? "+\(hiddenCount)" : nil
+
+			HStack(alignment: .center, spacing: -Constants.iconSize.rawValue / 3) {
+				ForEach(displayedIcons) { item in
+					Labeled(text: item.offset == displayedIconCount - 1 ? label : nil, isFungible: true) {
+						TokenThumbnail(item.element, size: Constants.iconSize)
+					}
+					.zIndex(Double(-item.offset))
 				}
-				.zIndex(Double(-item.offset))
 			}
 		}
 	}
 
 	// Resources container to display a combination of any View + additional text. Tighten when used on round icons.
-	private func withLabel(_ text: String?, isFungible: Bool = false, content: () -> some View) -> some View {
-		Group {
+	struct Labeled<Content: View>: View {
+		let text: String?
+		var isFungible: Bool = false
+		let content: () -> Content
+
+		var body: some View {
 			if let text {
-				textContainer(text, tightenLeading: isFungible)
+				ResourceLabel(text: text, isFungible: isFungible)
 					.overlay(alignment: .leading, content: content)
 			} else {
 				content()
@@ -198,18 +203,22 @@ extension AccountList.Row.View {
 		}
 	}
 
-	// The container displaying the resources number.
-	private func textContainer(_ text: String, tightenLeading: Bool) -> some View {
-		Text(text)
-			.lineLimit(1)
-			.layoutPriority(100)
-			.textStyle(.resourceLabel)
-			.foregroundColor(.white)
-			.padding(.horizontal, .small2)
-			.frame(minWidth: .medium1, minHeight: Constants.iconSize.rawValue)
-			.padding(.leading, Constants.iconSize.rawValue - (tightenLeading ? .small3 : 0))
-			.background(.app.whiteTransparent2)
-			.cornerRadius(Constants.iconSize.rawValue / 2)
+	struct ResourceLabel: View {
+		let text: String
+		let isFungible: Bool
+
+		var body: some View {
+			Text(text)
+				.lineLimit(1)
+				.textStyle(.resourceLabel)
+				.fixedSize()
+				.foregroundColor(.white)
+				.padding(.horizontal, .small2)
+				.frame(minWidth: .medium1, minHeight: Constants.iconSize.rawValue)
+				.padding(.leading, Constants.iconSize.rawValue - (isFungible ? .small3 : 0))
+				.background(.app.whiteTransparent2)
+				.cornerRadius(Constants.iconSize.rawValue / 2)
+		}
 	}
 }
 
