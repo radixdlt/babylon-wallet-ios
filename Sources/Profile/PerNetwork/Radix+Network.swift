@@ -32,10 +32,6 @@ extension Radix {
 }
 
 extension Radix.Network {
-	public static let `default` = kisharnet
-}
-
-extension Radix.Network {
 	public typealias Name = Tagged<Self, String>
 
 	public static let nebunet = Self(
@@ -122,10 +118,6 @@ struct UnknownNetwork: Swift.Error, CustomStringConvertible {
 }
 
 extension Radix.Network {
-	public var isDefault: Bool {
-		id == Self.default.id
-	}
-
 	public var customDumpMirror: Mirror {
 		.init(
 			self,
