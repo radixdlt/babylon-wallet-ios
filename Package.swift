@@ -87,7 +87,6 @@ package.addModules([
 			"OnboardingFeature",
 			"OverlayWindowClient",
 			"CreateAccountFeature",
-			"NetworkSwitchingClient",
 			"GatewayAPI",
 			"SplashFeature",
 		],
