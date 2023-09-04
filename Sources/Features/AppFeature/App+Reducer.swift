@@ -108,31 +108,28 @@ public struct App: Sendable, FeatureReducer {
 		case .task:
 			let retBuildInfo = buildInformation()
 			print("EngineToolkit commit hash: \(retBuildInfo.version)")
-			return .run { send in
-
-				await withThrowingTaskGroup(of: Void.self) { group in
-
-					group.addTask {
-						for try await gateways in await gatewaysClient.gatewaysValues() {
-							loggerGlobal.critical("Changed network to: \(gateways.current)")
-							await send(.internal(.currentGatewayChanged(to: gateways.current)))
-						}
+			return .merge(
+				.run { send in
+					for try await gateways in await gatewaysClient.gatewaysValues() {
+						guard !Task.isCancelled else { return }
+						loggerGlobal.critical("Changed network to: \(gateways.current)")
+						await send(.internal(.currentGatewayChanged(to: gateways.current)))
 					}
-
-					group.addTask {
-						for try await error in errorQueue.errors() {
-							// Maybe instead we should listen here for the Profile.State change,
-							// and when it switches to `.ephemeral` we navigate to onboarding.
-							// For now, we react to the specific error, since the Profile.State is meant to be private.
-							if error is Profile.ProfileIsUsedOnAnotherDeviceError {
-								await send(.internal(.checkIfMainnetIsOnlineAndThenOnboardUser))
-								// A slight delay to allow any modal that may be shown to be dismissed.
-								try? await clock.sleep(for: .seconds(0.5))
-							}
+				},
+				.run { send in
+					for try await error in errorQueue.errors() {
+						guard !Task.isCancelled else { return }
+						// Maybe instead we should listen here for the Profile.State change,
+						// and when it switches to `.ephemeral` we navigate to onboarding.
+						// For now, we react to the specific error, since the Profile.State is meant to be private.
+						if error is Profile.ProfileIsUsedOnAnotherDeviceError {
+							await send(.internal(.checkIfMainnetIsOnlineAndThenOnboardUser))
+							// A slight delay to allow any modal that may be shown to be dismissed.
+							try? await clock.sleep(for: .seconds(0.5))
 						}
 					}
 				}
-			}
+			)
 
 		case .alert(.presented(.incompatibleProfileErrorAlert(.deleteWalletDataButtonTapped))):
 			return .run { send in

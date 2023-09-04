@@ -4,12 +4,10 @@ import SwiftUI
 extension View {
 	@ViewBuilder
 	public func showDeveloperDisclaimerBanner(showIsUsingTestnetBanner: Bool) -> some View {
-		if showIsUsingTestnetBanner {
-			VStack(spacing: 0) {
+		VStack(spacing: 0) {
+			if showIsUsingTestnetBanner {
 				DeveloperDisclaimerBanner()
-				self
 			}
-		} else {
 			self
 		}
 	}
