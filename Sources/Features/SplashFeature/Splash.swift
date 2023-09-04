@@ -1,5 +1,6 @@
 import DeviceFactorSourceClient
 import FeaturePrelude
+import GatewayAPI
 import LocalAuthenticationClient
 import OnboardingClient
 
@@ -36,9 +37,10 @@ public struct Splash: Sendable, FeatureReducer {
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
-		case completed(LoadProfileOutcome, accountRecoveryNeeded: Bool)
+		case completed(LoadProfileOutcome, accountRecoveryNeeded: Bool, isMainnetLive: Bool)
 	}
 
+	@Dependency(\.gatewayAPIClient) var gatewayAPIClient
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.continuousClock) var clock
 	@Dependency(\.localAuthenticationClient) var localAuthenticationClient
@@ -116,14 +118,27 @@ public struct Splash: Sendable, FeatureReducer {
 			if case .existingProfile = outcome {
 				return checkAccountRecoveryNeeded(outcome)
 			}
-			return .send(.delegate(.completed(outcome, accountRecoveryNeeded: false)))
+			return delegate(loadProfileOutcome: outcome, accountRecoveryNeeded: false)
 
 		case .accountRecoveryNeeded(_, .failure):
 			state.biometricsCheckFailed = true
 			return .none
 
 		case let .accountRecoveryNeeded(outcome, .success(recoveryNeeded)):
-			return .send(.delegate(.completed(outcome, accountRecoveryNeeded: recoveryNeeded)))
+			return delegate(loadProfileOutcome: outcome, accountRecoveryNeeded: recoveryNeeded)
+		}
+	}
+
+	func delegate(loadProfileOutcome: LoadProfileOutcome, accountRecoveryNeeded: Bool) -> EffectTask<Action> {
+		.run { send in
+			let isMainnetLive = await gatewayAPIClient.isMainnetOnline()
+			await send(.delegate(
+				.completed(
+					loadProfileOutcome,
+					accountRecoveryNeeded: accountRecoveryNeeded,
+					isMainnetLive: isMainnetLive
+				))
+			)
 		}
 	}
 

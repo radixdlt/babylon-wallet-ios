@@ -16,6 +16,7 @@ struct WalletApp: SwiftUI.App {
 					#if targetEnvironment(simulator)
 						.dependency(\.localAuthenticationClient.queryConfig) { .biometricsAndPasscodeSetUp }
 					#endif
+						.dependency(\.gatewayAPIClient.isMainnetOnline) { true }
 				)
 			)
 			#if os(macOS)

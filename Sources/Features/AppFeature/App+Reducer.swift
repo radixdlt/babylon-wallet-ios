@@ -1,7 +1,10 @@
 import AppPreferencesClient
+import CreateAccountFeature
 import EngineKit
 import FeaturePrelude
+import GatewayAPI
 import MainFeature
+import NetworkSwitchingClient
 import OnboardingClient
 import OnboardingFeature
 import SecureStorageClient
@@ -14,6 +17,7 @@ public struct App: Sendable, FeatureReducer {
 			case main(Main.State)
 			case onboardingCoordinator(OnboardingCoordinator.State)
 			case splash(Splash.State)
+			case onboardTestnetUserToMainnet(CreateAccountCoordinator.State)
 		}
 
 		public var root: Root
@@ -34,15 +38,17 @@ public struct App: Sendable, FeatureReducer {
 	}
 
 	public enum InternalAction: Sendable, Equatable {
+		case checkIfMainnetIsOnlineAndThenOnboardUser
 		case incompatibleProfileDeleted
 		case toMain(isAccountRecoveryNeeded: Bool)
-		case toOnboarding
+		case toOnboarding(isMainnetOnline: Bool)
 	}
 
 	public enum ChildAction: Sendable, Equatable {
 		case main(Main.Action)
 		case onboardingCoordinator(OnboardingCoordinator.Action)
 		case splash(Splash.Action)
+		case onboardTestnetUserToMainnet(CreateAccountCoordinator.Action)
 	}
 
 	public struct Alerts: Sendable, ReducerProtocol {
@@ -64,8 +70,10 @@ public struct App: Sendable, FeatureReducer {
 	}
 
 	@Dependency(\.continuousClock) var clock
+	@Dependency(\.gatewayAPIClient) var gatewayAPIClient
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.appPreferencesClient) var appPreferencesClient
+	@Dependency(\.networkSwitchingClient) var networkSwitchingClient
 
 	public init() {}
 
@@ -80,6 +88,9 @@ public struct App: Sendable, FeatureReducer {
 				}
 				.ifCaseLet(/State.Root.splash, action: /ChildAction.splash) {
 					Splash()
+				}
+				.ifCaseLet(/State.Root.onboardTestnetUserToMainnet, action: /ChildAction.onboardTestnetUserToMainnet) {
+					CreateAccountCoordinator()
 				}
 		}
 
@@ -100,7 +111,7 @@ public struct App: Sendable, FeatureReducer {
 					// and when it switches to `.ephemeral` we navigate to onboarding.
 					// For now, we react to the specific error, since the Profile.State is meant to be private.
 					if error is Profile.ProfileIsUsedOnAnotherDeviceError {
-						await send(.internal(.toOnboarding))
+						await send(.internal(.checkIfMainnetIsOnlineAndThenOnboardUser))
 						// A slight delay to allow any modal that may be shown to be dismissed.
 						try? await clock.sleep(for: .seconds(0.5))
 					}
@@ -124,30 +135,45 @@ public struct App: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
 		case .incompatibleProfileDeleted:
-			return goToOnboarding(state: &state)
+			return checkIfMainnetIsOnlineThenGoToOnboarding()
 		case let .toMain(isAccountRecoveryNeeded):
 			return goToMain(state: &state, accountRecoveryIsNeeded: isAccountRecoveryNeeded)
-		case .toOnboarding:
-			return goToOnboarding(state: &state)
+		case .checkIfMainnetIsOnlineAndThenOnboardUser:
+			return checkIfMainnetIsOnlineThenGoToOnboarding()
+		case let .toOnboarding(isMainnetOnline):
+			return goToOnboarding(state: &state, isMainnetLive: isMainnetOnline)
 		}
 	}
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
 		case .main(.delegate(.removedWallet)):
-			return goToOnboarding(state: &state)
+			return checkIfMainnetIsOnlineThenGoToOnboarding()
+
+		case let .onboardTestnetUserToMainnet(.delegate(onboardTestnetUserToMainnetDelegate)):
+			switch onboardTestnetUserToMainnetDelegate {
+			case .completed:
+				return .run { send in
+					_ = try? await networkSwitchingClient.switchTo(.mainnet)
+					await send(.internal(.toMain(isAccountRecoveryNeeded: false)))
+				}
+
+			case .dismissed:
+				assertionFailure("Expected to have created account on mainnet, but the create account flow got dismissed, it should NOT be dismissable.")
+				return goToMain(state: &state, accountRecoveryIsNeeded: false)
+			}
 
 		case let .onboardingCoordinator(.delegate(.completed(_, accountRecoveryIsNeeded))):
 			return goToMain(state: &state, accountRecoveryIsNeeded: accountRecoveryIsNeeded)
 
-		case let .splash(.delegate(.completed(loadProfileOutcome, accountRecoveryNeeded))):
+		case let .splash(.delegate(.completed(loadProfileOutcome, accountRecoveryNeeded, isMainnetLive))):
 			switch loadProfileOutcome {
 			case .newUser:
-				return goToOnboarding(state: &state)
+				return goToOnboarding(state: &state, isMainnetLive: isMainnetLive)
 
 			case let .usersExistingProfileCouldNotBeLoaded(.decodingFailure(_, error)):
 				errorQueue.schedule(error)
-				return goToOnboarding(state: &state)
+				return goToOnboarding(state: &state, isMainnetLive: isMainnetLive)
 
 			case let .usersExistingProfileCouldNotBeLoaded(.failedToCreateProfileFromSnapshot(failedToCreateProfileFromSnapshot)):
 				return incompatibleSnapshotData(version: failedToCreateProfileFromSnapshot.version, state: &state)
@@ -155,17 +181,33 @@ public struct App: Sendable, FeatureReducer {
 			case let .usersExistingProfileCouldNotBeLoaded(.profileVersionOutdated(_, version)):
 				return incompatibleSnapshotData(version: version, state: &state)
 
-			case .existingProfile:
-				return goToMain(state: &state, accountRecoveryIsNeeded: accountRecoveryNeeded)
+			case let .existingProfile(hasMainnetAccounts):
+				if !hasMainnetAccounts, isMainnetLive {
+					return onboardUserToMainnet(state: &state)
+				} else {
+					return goToMain(state: &state, accountRecoveryIsNeeded: accountRecoveryNeeded)
+				}
 
 			case let .usersExistingProfileCouldNotBeLoaded(failure: .profileUsedOnAnotherDevice(error)):
 				errorQueue.schedule(error)
-				return goToOnboarding(state: &state)
+				return goToOnboarding(state: &state, isMainnetLive: isMainnetLive)
 			}
 
 		default:
 			return .none
 		}
+	}
+
+	func checkIfMainnetIsOnlineThenGoToOnboarding() -> EffectTask<Action> {
+		.run { send in
+			let isMainnetOnline = await gatewayAPIClient.isMainnetOnline()
+			await send(.internal(.toOnboarding(isMainnetOnline: isMainnetOnline)))
+		}
+	}
+
+	func onboardUserToMainnet(state: inout State) -> EffectTask<Action> {
+		state.root = .onboardTestnetUserToMainnet(.init(config: .init(purpose: .firstAccountOnNewNetwork(.mainnet))))
+		return .none
 	}
 
 	func incompatibleSnapshotData(
@@ -191,8 +233,8 @@ public struct App: Sendable, FeatureReducer {
 		return .none
 	}
 
-	func goToOnboarding(state: inout State) -> EffectTask<Action> {
-		state.root = .onboardingCoordinator(.init())
+	func goToOnboarding(state: inout State, isMainnetLive: Bool) -> EffectTask<Action> {
+		state.root = .onboardingCoordinator(.init(isMainnetLive: isMainnetLive))
 		return .none
 	}
 }

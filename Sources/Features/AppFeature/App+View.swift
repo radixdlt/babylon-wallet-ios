@@ -1,4 +1,5 @@
 import AssetTransferFeature
+import CreateAccountFeature
 import FeaturePrelude
 import MainFeature
 import OnboardingFeature
@@ -37,6 +38,12 @@ extension App {
 							state: /App.State.Root.splash,
 							action: App.ChildAction.splash,
 							then: { Splash.View(store: $0) }
+						)
+					case .onboardTestnetUserToMainnet:
+						CaseLet(
+							state: /App.State.Root.onboardTestnetUserToMainnet,
+							action: App.ChildAction.onboardTestnetUserToMainnet,
+							then: { CreateAccountCoordinator.View(store: $0) }
 						)
 					}
 				}

@@ -7,7 +7,7 @@ public struct OnboardingCoordinator: Sendable, FeatureReducer {
 		case startup(OnboardingStartup.State)
 		case createAccountCoordinator(CreateAccountCoordinator.State)
 
-		public init() {
+		public init(isMainnetLive: Bool) {
 			self = .startup(.init())
 		}
 	}

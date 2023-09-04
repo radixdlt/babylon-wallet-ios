@@ -65,6 +65,9 @@ extension Profile {
 				personas: [],
 				authorizedDapps: []
 			)
+			if network.networkID == .mainnet {
+				loggerGlobal.feature("Creating mainnet 😎")
+			}
 			try networks.add(network)
 		}
 	}

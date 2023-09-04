@@ -67,7 +67,18 @@ public final actor ProfileStore {
 	}
 }
 
-// MARK: ProfileStore.ProfileState
+extension Profile {
+	public var hasMainnetAccounts: Bool {
+		do {
+			let onMainnet = try network(id: .mainnet)
+			return !onMainnet.accounts.isEmpty
+		} catch {
+			return false
+		}
+	}
+}
+
+// MARK: - ProfileStore.ProfileState
 extension ProfileStore {
 	/// The different possible states of Profile store. See
 	/// `changeState:to` in `ProfileStore` for state machines valid
@@ -140,8 +151,8 @@ extension ProfileStore {
 
 	public func getLoadProfileOutcome() async -> LoadProfileOutcome {
 		switch self.profileStateSubject.value {
-		case .persisted:
-			return .existingProfile
+		case let .persisted(profile):
+			return .existingProfile(hasMainnetAccounts: profile.hasMainnetAccounts)
 		case let .ephemeral(ephemeral):
 			if let error = ephemeral.loadFailure {
 				return .usersExistingProfileCouldNotBeLoaded(failure: error)
