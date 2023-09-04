@@ -7,6 +7,7 @@ extension GatewayAPIClient: TestDependencyKey {
 	public static let previewValue = Self.mock()
 
 	public static let testValue = Self(
+		isMainnetOnline: unimplemented("\(Self.self).isMainnetOnline"),
 		getNetworkName: unimplemented("\(Self.self).getNetworkName"),
 		getEpoch: unimplemented("\(Self.self).getEpoch"),
 		getEntityDetails: unimplemented("\(Self.self).getEntityDetails"),
@@ -30,6 +31,7 @@ extension GatewayAPIClient: TestDependencyKey {
 		txStatus: GatewayAPI.TransactionStatus? = nil
 	) -> Self {
 		.init(
+			isMainnetOnline: { true },
 			getNetworkName: { _ in .init("Nebunet") },
 			getEpoch: { .init(rawValue: 123) },
 			getEntityDetails: unimplemented("\(self).getEntityDetails"),

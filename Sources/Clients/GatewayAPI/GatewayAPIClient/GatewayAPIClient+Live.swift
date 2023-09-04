@@ -157,6 +157,20 @@ extension GatewayAPIClient {
 		}
 
 		return GatewayAPIClient(
+			isMainnetOnline: {
+				do {
+					return try await makeRequest(
+						responseType: IsMainnetOnlineResponse.self,
+						baseURL: URL(string: "https://mainnet-status.extratools.works")!,
+						timeoutInterval: 1
+					) {
+						$0
+					}.isMainnetLive
+				} catch {
+					loggerGlobal.notice("Failed to get mainnet is online status, error: \(error)")
+					return false
+				}
+			},
 			getNetworkName: { baseURL in
 				let response = try await makeRequest(
 					responseType: GatewayAPI.GatewayStatusResponse.self,
