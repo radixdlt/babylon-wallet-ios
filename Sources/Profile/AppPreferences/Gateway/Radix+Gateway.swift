@@ -56,13 +56,6 @@ extension Radix.Gateway {
 		)
 	}
 
-	public static var zabanet: Self {
-		.init(
-			network: .zabanet,
-			url: URL(string: "https://zabanet-gateway.radixdlt.com")!
-		)
-	}
-
 	public static var ansharnet: Self {
 		.init(
 			network: .ansharnet,
