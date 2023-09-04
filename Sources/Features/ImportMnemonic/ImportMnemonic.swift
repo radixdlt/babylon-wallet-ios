@@ -68,7 +68,6 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 		public let isReadonlyMode: Bool
 		public let isWordCountFixed: Bool
 		public var isAdvancedMode: Bool = false
-		public var isHidingSecrets: Bool = false
 
 		public let header: Header?
 		public let warning: String?
@@ -176,7 +175,6 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 
 	public enum ViewAction: Sendable, Equatable {
 		case appeared
-		case scenePhase(ScenePhase)
 
 		case toggleModeButtonTapped
 		case passphraseChanged(String)
@@ -284,14 +282,6 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 		switch viewAction {
 		case .appeared:
 			return focusNext(&state)
-
-		case .scenePhase(.background), .scenePhase(.inactive):
-			state.isHidingSecrets = true
-			return .none
-
-		case .scenePhase(.active), .scenePhase:
-			state.isHidingSecrets = false
-			return .none
 
 		case let .passphraseChanged(passphrase):
 			state.bip39Passphrase = passphrase
@@ -486,6 +476,3 @@ extension ImportMnemonic {
 		return word.word.rawValue
 	}
 }
-
-// MARK: - ScenePhase + Sendable
-extension ScenePhase: @unchecked Sendable {}

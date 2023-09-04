@@ -12,7 +12,6 @@ extension ImportMnemonic.State {
 			isAdvancedMode: isAdvancedMode,
 			header: header,
 			warning: warning,
-			isHidingSecrets: isHidingSecrets,
 			rowCount: rowCount,
 			wordCount: wordCount,
 			completedWords: completedWords,
@@ -38,7 +37,6 @@ extension ImportMnemonic {
 		let isAdvancedMode: Bool
 		let header: State.Header?
 		let warning: String?
-		let isHidingSecrets: Bool
 		let rowCount: Int
 		let wordCount: BIP39.WordCount
 		let completedWords: [BIP39.Word]
@@ -151,15 +149,6 @@ extension ImportMnemonic {
 
 						footer(with: viewStore)
 					}
-					.redacted(reason: .privacy, if: viewStore.isHidingSecrets)
-					#if os(iOS)
-						.onReceive(NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification)) { _ in
-							viewStore.send(.scenePhase(.active))
-						}
-						.onReceive(NotificationCenter.default.publisher(for: UIApplication.willResignActiveNotification)) { _ in
-							viewStore.send(.scenePhase(.inactive))
-						}
-					#endif
 				}
 				.animation(.default, value: viewStore.wordCount)
 				.animation(.default, value: viewStore.isAdvancedMode)
@@ -283,21 +272,6 @@ extension ImportMnemonic.View {
 			}
 		}
 		.padding([.horizontal, .bottom], .medium2)
-	}
-}
-
-extension View {
-	/// Conditionally adds a reason to apply a redaction to this view hierarchy.
-	///
-	/// Adding a redaction is an additive process: any redaction
-	/// provided will be added to the reasons provided by the parent.
-	@ViewBuilder
-	public func redacted(reason: RedactionReasons, if condition: @autoclosure () -> Bool) -> some View {
-		if condition() {
-			redacted(reason: reason)
-		} else {
-			self
-		}
 	}
 }
 

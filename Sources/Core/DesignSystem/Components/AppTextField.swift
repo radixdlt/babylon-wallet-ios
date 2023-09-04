@@ -146,7 +146,6 @@ public struct AppTextField<FocusValue: Hashable, Accessory: View, InnerAccessory
 							view
 						}
 					}
-					.privacySensitive()
 					.foregroundColor(isEnabled ? .app.gray1 : .app.gray2)
 					.textStyle(.body1Regular)
 					.alignmentGuide(.textFieldAlignment, computeValue: { $0[VerticalAlignment.center] })
