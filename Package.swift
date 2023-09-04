@@ -88,6 +88,7 @@ package.addModules([
 			"OverlayWindowClient",
 			"CreateAccountFeature",
 			"GatewayAPI",
+			"GatewaysClient",
 			"SplashFeature",
 		],
 		tests: .yes()

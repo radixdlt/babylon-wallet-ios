@@ -2,9 +2,14 @@ import Resources
 import SwiftUI
 
 extension View {
-	public func showDeveloperDisclaimerBanner() -> some View {
-		VStack(spacing: 0) {
-			DeveloperDisclaimerBanner()
+	@ViewBuilder
+	public func showDeveloperDisclaimerBanner(showIsUsingTestnetBanner: Bool) -> some View {
+		if showIsUsingTestnetBanner {
+			VStack(spacing: 0) {
+				DeveloperDisclaimerBanner()
+				self
+			}
+		} else {
 			self
 		}
 	}

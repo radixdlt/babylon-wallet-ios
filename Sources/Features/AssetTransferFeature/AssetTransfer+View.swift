@@ -81,12 +81,14 @@ extension AssetTransfer {
 		}
 
 		public var body: some SwiftUI.View {
-			WithNavigationBar {
-				ViewStore(store).send(.view(.closeButtonTapped))
-			} content: {
-				View(store: store)
+			WithViewStore(store, observe: { $0 }) { viewStore in
+				WithNavigationBar {
+					ViewStore(store).send(.view(.closeButtonTapped))
+				} content: {
+					View(store: store)
+				}
+				.showDeveloperDisclaimerBanner(showIsUsingTestnetBanner: viewStore.showIsUsingTestnetBanner)
 			}
-			.showDeveloperDisclaimerBanner()
 		}
 	}
 }

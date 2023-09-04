@@ -3,6 +3,7 @@ import CreateAccountFeature
 import EngineKit
 import FeaturePrelude
 import GatewayAPI
+import GatewaysClient
 import MainFeature
 import OnboardingClient
 import OnboardingFeature
@@ -20,13 +21,15 @@ public struct App: Sendable, FeatureReducer {
 		}
 
 		public var root: Root
+		public var showIsUsingTestnetBanner = false
 
 		@PresentationState
 		public var alert: Alerts.State?
 
-		public init(root: Root = .splash(.init())) {
+		public init(
+			root: Root = .splash(.init())
+		) {
 			self.root = root
-
 			loggerGlobal.info("App started")
 		}
 	}
@@ -41,6 +44,7 @@ public struct App: Sendable, FeatureReducer {
 		case incompatibleProfileDeleted
 		case toMain(isAccountRecoveryNeeded: Bool)
 		case toOnboarding(isMainnetOnline: Bool)
+		case currentGatewayChanged(to: Radix.Gateway)
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -70,6 +74,7 @@ public struct App: Sendable, FeatureReducer {
 
 	@Dependency(\.continuousClock) var clock
 	@Dependency(\.gatewayAPIClient) var gatewayAPIClient
+	@Dependency(\.gatewaysClient) var gatewaysClient
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.appPreferencesClient) var appPreferencesClient
 
@@ -104,14 +109,27 @@ public struct App: Sendable, FeatureReducer {
 			let retBuildInfo = buildInformation()
 			print("EngineToolkit commit hash: \(retBuildInfo.version)")
 			return .run { send in
-				for try await error in errorQueue.errors() {
-					// Maybe instead we should listen here for the Profile.State change,
-					// and when it switches to `.ephemeral` we navigate to onboarding.
-					// For now, we react to the specific error, since the Profile.State is meant to be private.
-					if error is Profile.ProfileIsUsedOnAnotherDeviceError {
-						await send(.internal(.checkIfMainnetIsOnlineAndThenOnboardUser))
-						// A slight delay to allow any modal that may be shown to be dismissed.
-						try? await clock.sleep(for: .seconds(0.5))
+
+				await withThrowingTaskGroup(of: Void.self) { group in
+
+					group.addTask {
+						for try await gateways in await gatewaysClient.gatewaysValues() {
+							loggerGlobal.critical("Changed network to: \(gateways.current)")
+							await send(.internal(.currentGatewayChanged(to: gateways.current)))
+						}
+					}
+
+					group.addTask {
+						for try await error in errorQueue.errors() {
+							// Maybe instead we should listen here for the Profile.State change,
+							// and when it switches to `.ephemeral` we navigate to onboarding.
+							// For now, we react to the specific error, since the Profile.State is meant to be private.
+							if error is Profile.ProfileIsUsedOnAnotherDeviceError {
+								await send(.internal(.checkIfMainnetIsOnlineAndThenOnboardUser))
+								// A slight delay to allow any modal that may be shown to be dismissed.
+								try? await clock.sleep(for: .seconds(0.5))
+							}
+						}
 					}
 				}
 			}
@@ -140,6 +158,9 @@ public struct App: Sendable, FeatureReducer {
 			return checkIfMainnetIsOnlineThenGoToOnboarding()
 		case let .toOnboarding(isMainnetOnline):
 			return goToOnboarding(state: &state, isMainnetLive: isMainnetOnline)
+		case let .currentGatewayChanged(currentGateway):
+			state.showIsUsingTestnetBanner = currentGateway.network.id != .mainnet
+			return .none
 		}
 	}
 
