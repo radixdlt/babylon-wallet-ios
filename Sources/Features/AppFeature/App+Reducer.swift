@@ -183,6 +183,7 @@ public struct App: Sendable, FeatureReducer {
 
 			case let .existingProfile(hasMainnetAccounts):
 				if !hasMainnetAccounts, isMainnetLive {
+					loggerGlobal.feature("mainnet is live, but has no accounts => onboarding existing user to mainnet")
 					return onboardUserToMainnet(state: &state)
 				} else {
 					return goToMain(state: &state, accountRecoveryIsNeeded: accountRecoveryNeeded)
