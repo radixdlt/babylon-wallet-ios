@@ -2,6 +2,7 @@ import ClientPrelude
 
 // MARK: - NetworkSwitchingClient
 public struct NetworkSwitchingClient: Sendable, DependencyKey {
+	public var hasMainnetEverBeenLive: HasMainnetEverBeenLive
 	public var getCurrentGateway: GetCurrentGateway
 	public var validateGatewayURL: ValidateGatewayURL
 	public var hasAccountOnNetwork: HasAccountOnNetwork
@@ -9,6 +10,7 @@ public struct NetworkSwitchingClient: Sendable, DependencyKey {
 }
 
 extension NetworkSwitchingClient {
+	public typealias HasMainnetEverBeenLive = @Sendable () async -> Bool
 	public typealias GetCurrentGateway = @Sendable () async -> Radix.Gateway
 	public typealias ValidateGatewayURL = @Sendable (URL) async throws -> Radix.Gateway?
 	public typealias HasAccountOnNetwork = @Sendable (Radix.Gateway) async throws -> Bool

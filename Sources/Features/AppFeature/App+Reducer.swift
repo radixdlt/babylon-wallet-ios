@@ -2,9 +2,9 @@ import AppPreferencesClient
 import CreateAccountFeature
 import EngineKit
 import FeaturePrelude
-import GatewayAPI
 import GatewaysClient
 import MainFeature
+import NetworkSwitchingClient
 import OnboardingClient
 import OnboardingFeature
 import SecureStorageClient
@@ -43,7 +43,7 @@ public struct App: Sendable, FeatureReducer {
 		case checkIfMainnetIsOnlineAndThenOnboardUser
 		case incompatibleProfileDeleted
 		case toMain(isAccountRecoveryNeeded: Bool)
-		case toOnboarding(isMainnetOnline: Bool)
+		case toOnboarding(hasMainnetEverBeenLive: Bool)
 		case currentGatewayChanged(to: Radix.Gateway)
 	}
 
@@ -73,7 +73,7 @@ public struct App: Sendable, FeatureReducer {
 	}
 
 	@Dependency(\.continuousClock) var clock
-	@Dependency(\.gatewayAPIClient) var gatewayAPIClient
+	@Dependency(\.networkSwitchingClient) var networkSwitchingClient
 	@Dependency(\.gatewaysClient) var gatewaysClient
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.appPreferencesClient) var appPreferencesClient
@@ -153,8 +153,8 @@ public struct App: Sendable, FeatureReducer {
 			return goToMain(state: &state, accountRecoveryIsNeeded: isAccountRecoveryNeeded)
 		case .checkIfMainnetIsOnlineAndThenOnboardUser:
 			return checkIfMainnetIsOnlineThenGoToOnboarding()
-		case let .toOnboarding(isMainnetOnline):
-			return goToOnboarding(state: &state, isMainnetLive: isMainnetOnline)
+		case let .toOnboarding(hasMainnetEverBeenLive):
+			return goToOnboarding(state: &state, hasMainnetEverBeenLive: hasMainnetEverBeenLive)
 		case let .currentGatewayChanged(currentGateway):
 			state.showIsUsingTestnetBanner = currentGateway.network.id != .mainnet
 			return .none
@@ -177,22 +177,22 @@ public struct App: Sendable, FeatureReducer {
 				return goToMain(state: &state, accountRecoveryIsNeeded: false)
 			}
 
-		case let .onboardingCoordinator(.delegate(.completed(accountRecoveryIsNeeded, hasMainnetAccounts, isMainnetLive))):
+		case let .onboardingCoordinator(.delegate(.completed(accountRecoveryIsNeeded, hasMainnetAccounts, hasMainnetEverBeenLive))):
 			return onboardUserToMainnetIfNeededElseGoToMain(
 				hasMainnetAccounts: hasMainnetAccounts,
-				isMainnetLive: isMainnetLive,
+				hasMainnetEverBeenLive: hasMainnetEverBeenLive,
 				accountRecoveryIsNeeded: accountRecoveryIsNeeded,
 				state: &state
 			)
 
-		case let .splash(.delegate(.completed(loadProfileOutcome, accountRecoveryNeeded, isMainnetLive))):
+		case let .splash(.delegate(.completed(loadProfileOutcome, accountRecoveryNeeded, hasMainnetEverBeenLive))):
 			switch loadProfileOutcome {
 			case .newUser:
-				return goToOnboarding(state: &state, isMainnetLive: isMainnetLive)
+				return goToOnboarding(state: &state, hasMainnetEverBeenLive: hasMainnetEverBeenLive)
 
 			case let .usersExistingProfileCouldNotBeLoaded(.decodingFailure(_, error)):
 				errorQueue.schedule(error)
-				return goToOnboarding(state: &state, isMainnetLive: isMainnetLive)
+				return goToOnboarding(state: &state, hasMainnetEverBeenLive: hasMainnetEverBeenLive)
 
 			case let .usersExistingProfileCouldNotBeLoaded(.failedToCreateProfileFromSnapshot(failedToCreateProfileFromSnapshot)):
 				return incompatibleSnapshotData(version: failedToCreateProfileFromSnapshot.version, state: &state)
@@ -203,14 +203,14 @@ public struct App: Sendable, FeatureReducer {
 			case let .existingProfile(hasMainnetAccounts):
 				return onboardUserToMainnetIfNeededElseGoToMain(
 					hasMainnetAccounts: hasMainnetAccounts,
-					isMainnetLive: isMainnetLive,
+					hasMainnetEverBeenLive: hasMainnetEverBeenLive,
 					accountRecoveryIsNeeded: accountRecoveryNeeded,
 					state: &state
 				)
 
 			case let .usersExistingProfileCouldNotBeLoaded(failure: .profileUsedOnAnotherDevice(error)):
 				errorQueue.schedule(error)
-				return goToOnboarding(state: &state, isMainnetLive: isMainnetLive)
+				return goToOnboarding(state: &state, hasMainnetEverBeenLive: hasMainnetEverBeenLive)
 			}
 
 		default:
@@ -220,11 +220,11 @@ public struct App: Sendable, FeatureReducer {
 
 	func onboardUserToMainnetIfNeededElseGoToMain(
 		hasMainnetAccounts: Bool,
-		isMainnetLive: Bool,
+		hasMainnetEverBeenLive: Bool,
 		accountRecoveryIsNeeded: Bool,
 		state: inout State
 	) -> EffectTask<Action> {
-		if !hasMainnetAccounts, isMainnetLive {
+		if !hasMainnetAccounts, hasMainnetEverBeenLive {
 			loggerGlobal.feature("mainnet is live, but has no accounts => onboarding existing user to mainnet")
 			return onboardUserToMainnet(state: &state)
 		} else {
@@ -234,8 +234,8 @@ public struct App: Sendable, FeatureReducer {
 
 	func checkIfMainnetIsOnlineThenGoToOnboarding() -> EffectTask<Action> {
 		.run { send in
-			let isMainnetOnline = await gatewayAPIClient.isMainnetOnline()
-			await send(.internal(.toOnboarding(isMainnetOnline: isMainnetOnline)))
+			let hasMainnetEverBeenLive = await networkSwitchingClient.hasMainnetEverBeenLive()
+			await send(.internal(.toOnboarding(hasMainnetEverBeenLive: hasMainnetEverBeenLive)))
 		}
 	}
 
@@ -267,9 +267,9 @@ public struct App: Sendable, FeatureReducer {
 		return .none
 	}
 
-	func goToOnboarding(state: inout State, isMainnetLive: Bool) -> EffectTask<Action> {
-		state.showIsUsingTestnetBanner = !isMainnetLive
-		state.root = .onboardingCoordinator(.init(isMainnetLive: isMainnetLive))
+	func goToOnboarding(state: inout State, hasMainnetEverBeenLive: Bool) -> EffectTask<Action> {
+		state.showIsUsingTestnetBanner = !hasMainnetEverBeenLive
+		state.root = .onboardingCoordinator(.init(hasMainnetEverBeenLive: hasMainnetEverBeenLive))
 		return .none
 	}
 }

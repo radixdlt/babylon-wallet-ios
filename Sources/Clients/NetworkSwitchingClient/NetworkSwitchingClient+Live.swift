@@ -22,6 +22,7 @@ extension NetworkSwitchingClient {
 		@Dependency(\.gatewaysClient) var gatewaysClient
 		@Dependency(\.accountsClient) var accountsClient
 		@Dependency(\.cacheClient) var cacheClient
+		@Dependency(\.userDefaultsClient) var userDefaultsClient
 
 		let getCurrentGateway: GetCurrentGateway = {
 			await gatewaysClient.getCurrentGateway()
@@ -66,6 +67,21 @@ extension NetworkSwitchingClient {
 		}
 
 		return Self(
+			hasMainnetEverBeenLive: {
+				if userDefaultsClient.hasMainnetEverBeenLive {
+					loggerGlobal.feature("mainnet has been online before, thus we count it as online")
+					return true
+				}
+				loggerGlobal.feature("Mainnet has never been online before, checking if it is online now")
+				let isLive = await gatewayAPIClient.isMainnetOnline()
+				if isLive {
+					loggerGlobal.feature("Mainnet is online, saving that is has been seen online...")
+					await userDefaultsClient.setMainnetIsLive()
+				} else {
+					loggerGlobal.feature("Mainnet is offline")
+				}
+				return isLive
+			},
 			getCurrentGateway: getCurrentGateway,
 			validateGatewayURL: validateGatewayURL,
 			hasAccountOnNetwork: hasAccountOnNetwork,

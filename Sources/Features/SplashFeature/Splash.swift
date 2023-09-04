@@ -2,6 +2,7 @@ import DeviceFactorSourceClient
 import FeaturePrelude
 import GatewayAPI
 import LocalAuthenticationClient
+import NetworkSwitchingClient
 import OnboardingClient
 
 // MARK: - Splash
@@ -37,10 +38,10 @@ public struct Splash: Sendable, FeatureReducer {
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
-		case completed(LoadProfileOutcome, accountRecoveryNeeded: Bool, isMainnetLive: Bool)
+		case completed(LoadProfileOutcome, accountRecoveryNeeded: Bool, hasMainnetEverBeenLive: Bool)
 	}
 
-	@Dependency(\.gatewayAPIClient) var gatewayAPIClient
+	@Dependency(\.networkSwitchingClient) var networkSwitchingClient
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.continuousClock) var clock
 	@Dependency(\.localAuthenticationClient) var localAuthenticationClient
@@ -131,12 +132,12 @@ public struct Splash: Sendable, FeatureReducer {
 
 	func delegate(loadProfileOutcome: LoadProfileOutcome, accountRecoveryNeeded: Bool) -> EffectTask<Action> {
 		.run { send in
-			let isMainnetLive = await gatewayAPIClient.isMainnetOnline()
+			let hasMainnetEverBeenLive = await networkSwitchingClient.hasMainnetEverBeenLive()
 			await send(.delegate(
 				.completed(
 					loadProfileOutcome,
 					accountRecoveryNeeded: accountRecoveryNeeded,
-					isMainnetLive: isMainnetLive
+					hasMainnetEverBeenLive: hasMainnetEverBeenLive
 				))
 			)
 		}
@@ -157,9 +158,9 @@ public struct Splash: Sendable, FeatureReducer {
 		.run { _ in
 			let durationInMS: Int
 			#if DEBUG
-			durationInMS = 200
+			durationInMS = 400
 			#else
-			durationInMS = 500
+			durationInMS = 750
 			#endif
 			try? await clock.sleep(for: .milliseconds(durationInMS))
 		}

@@ -11,6 +11,8 @@ public struct UserDefaultsClient: Sendable {
 
 		case accountsThatNeedRecovery
 		case mnemonicsUserClaimsToHaveBackedUp
+
+		case hasMainnetEverBeenLive
 	}
 
 	public var stringForKey: @Sendable (Key) -> String?
@@ -59,5 +61,13 @@ extension UserDefaultsClient {
 
 	public func setHideMigrateOlympiaButton(_ value: Bool) async {
 		await setBool(value, .hideMigrateOlympiaButton)
+	}
+
+	public var hasMainnetEverBeenLive: Bool {
+		boolForKey(.hasMainnetEverBeenLive)
+	}
+
+	public func setMainnetIsLive() async {
+		await setBool(true, .hasMainnetEverBeenLive)
 	}
 }

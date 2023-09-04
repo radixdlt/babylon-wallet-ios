@@ -13,7 +13,10 @@ struct WalletApp: SwiftUI.App {
 				store: Store(
 					initialState: App.State(),
 					reducer: App()
-						.dependency(\.gatewayAPIClient.isMainnetOnline) { true }
+						.dependency(\.gatewayAPIClient.isMainnetOnline) {
+							try? await Task.sleep(for: .milliseconds(300))
+							return true
+						}
 					#if targetEnvironment(simulator)
 						.dependency(\.localAuthenticationClient.queryConfig) { .biometricsAndPasscodeSetUp }
 					#endif

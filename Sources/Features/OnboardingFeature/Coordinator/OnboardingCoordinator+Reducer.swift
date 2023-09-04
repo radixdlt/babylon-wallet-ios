@@ -10,10 +10,10 @@ public struct OnboardingCoordinator: Sendable, FeatureReducer {
 		}
 
 		public var root: Root
-		public let isMainnetLive: Bool
+		public let hasMainnetEverBeenLive: Bool
 
-		public init(isMainnetLive: Bool) {
-			self.isMainnetLive = isMainnetLive
+		public init(hasMainnetEverBeenLive: Bool) {
+			self.hasMainnetEverBeenLive = hasMainnetEverBeenLive
 			self.root = .startup(.init())
 		}
 	}
@@ -72,7 +72,7 @@ public struct OnboardingCoordinator: Sendable, FeatureReducer {
 		case .startup(.delegate(.setupNewUser)):
 			state.root = .createAccountCoordinator(
 				.init(
-					config: .init(purpose: .firstAccountForNewProfile(mainnetIsLive: state.isMainnetLive))
+					config: .init(purpose: .firstAccountForNewProfile(mainnetIsLive: state.hasMainnetEverBeenLive))
 				)
 			)
 			return .none
@@ -105,7 +105,7 @@ public struct OnboardingCoordinator: Sendable, FeatureReducer {
 		.send(.delegate(.completed(
 			accountRecoveryIsNeeded: accountRecoveryIsNeeded,
 			hasMainnetAccounts: hasMainnetAccounts,
-			isMainnetLive: state.isMainnetLive
+			isMainnetLive: state.hasMainnetEverBeenLive
 		)))
 	}
 }

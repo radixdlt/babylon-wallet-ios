@@ -87,7 +87,7 @@ package.addModules([
 			"OnboardingFeature",
 			"OverlayWindowClient",
 			"CreateAccountFeature",
-			"GatewayAPI",
+			"NetworkSwitchingClient",
 			"GatewaysClient",
 			"SplashFeature",
 		],
@@ -447,7 +447,7 @@ package.addModules([
 			"DeviceFactorSourceClient",
 			"LocalAuthenticationClient",
 			"OnboardingClient",
-			"GatewayAPI",
+			"NetworkSwitchingClient",
 		],
 		tests: .yes()
 	),
