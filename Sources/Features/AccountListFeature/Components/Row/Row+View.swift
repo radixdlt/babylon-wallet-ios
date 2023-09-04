@@ -38,7 +38,7 @@ extension AccountList.Row {
 		}
 
 		init(state: State) {
-			self.name = state.account.displayName.rawValue + state.account.displayName.rawValue + state.account.displayName.rawValue
+			self.name = state.account.displayName.rawValue
 			self.address = state.account.address
 			self.appearanceID = state.account.appearanceID
 			self.isLoadingResources = state.portfolio.isLoading
