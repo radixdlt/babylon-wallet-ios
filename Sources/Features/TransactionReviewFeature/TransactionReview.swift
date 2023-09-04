@@ -283,7 +283,8 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			case let .fungible(transfer):
 				state.destination = .fungibleTokenDetails(.init(
 					resource: transfer.fungibleResource,
-					isXRD: transfer.isXRD
+					isXRD: transfer.isXRD,
+					context: .transfer
 				))
 			case let .nonFungible(transfer):
 				state.destination = .nonFungibleTokenDetails(.init(

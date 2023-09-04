@@ -5,7 +5,7 @@ extension PoolUnitDetails.State {
 	var viewState: PoolUnitDetails.ViewState {
 		let resource = poolUnit.poolUnitResource
 		return .init(
-			containerWithHeader: resource.detailsContainerWithHeaderViewState,
+			containerWithHeader: resource.detailsHeader(withAmount: true),
 			thumbnailURL: resource.iconURL,
 			resources: poolUnit.resourceViewStates,
 			resourceDetails: .init(
@@ -69,10 +69,10 @@ extension PoolUnitDetails {
 }
 
 extension AccountPortfolio.FungibleResource {
-	var detailsContainerWithHeaderViewState: DetailsContainerWithHeaderViewState {
+	func detailsHeader(withAmount showAmount: Bool) -> DetailsContainerWithHeaderViewState {
 		.init(
 			title: name ?? L10n.Account.PoolUnits.unknownPoolUnitName,
-			amount: amount.format(),
+			amount: showAmount ? amount.format() : nil,
 			symbol: symbol
 		)
 	}
