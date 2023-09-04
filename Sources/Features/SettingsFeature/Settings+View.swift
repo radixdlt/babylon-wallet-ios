@@ -267,7 +267,7 @@ extension View {
 			store: destinationStore,
 			state: /Settings.Destinations.State.debugSettings,
 			action: Settings.Destinations.Action.debugSettings,
-			destination: { DebugSettings.View(store: $0) }
+			destination: { DebugSettingsCoordinator.View(store: $0) }
 		)
 	}
 	#endif

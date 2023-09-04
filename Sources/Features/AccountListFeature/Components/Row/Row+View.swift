@@ -1,3 +1,4 @@
+import AccountDetailsFeature
 import EngineKit
 import FeaturePrelude
 
@@ -28,7 +29,9 @@ extension AccountList.Row {
 
 		let tag: AccountTag?
 
-		let shouldShowSecurityPrompt: Bool
+		let needToBackupMnemonicForThisAccount: Bool
+		let needToImportMnemonicForThisAccount: Bool
+
 		let fungibleResourceIcons: [TokenThumbnail.Content]
 		let nonFungibleResourcesCount: Int
 		let poolUnitsCount: Int
@@ -46,8 +49,10 @@ extension AccountList.Row {
 			self.tag = .init(state: state)
 
 			// Show the prompt if the account has any XRD
-			// FIXME: Enable back after apple review release
-			self.shouldShowSecurityPrompt = false // state.shouldShowSecurityPrompt
+			self.needToBackupMnemonicForThisAccount = state.deviceFactorSourceControlled?.needToBackupMnemonicForThisAccount ?? false
+
+			// Show the prompt if keychain does not contain the mnemonic for this account
+			self.needToImportMnemonicForThisAccount = state.deviceFactorSourceControlled?.needToImportMnemonicForThisAccount ?? false
 
 			// Resources
 			guard let portfolio = state.portfolio.wrappedValue else {
@@ -101,8 +106,12 @@ extension AccountList.Row {
 
 					ownedResourcesList(viewStore)
 
-					if viewStore.shouldShowSecurityPrompt {
-						securityPromptView(viewStore)
+					if viewStore.needToImportMnemonicForThisAccount {
+						importMnemonicPromptView(viewStore)
+					}
+
+					if !viewStore.needToImportMnemonicForThisAccount, viewStore.needToBackupMnemonicForThisAccount {
+						backupMnemonicPromptView(viewStore)
 					}
 				}
 				.padding(.horizontal, .medium1)
@@ -223,27 +232,12 @@ extension AccountList.Row.View {
 }
 
 extension AccountList.Row.View {
-	func securityPromptView(_ viewStore: ViewStoreOf<AccountList.Row>) -> some View {
-		HStack {
-			Image(asset: AssetResource.homeAccountSecurity)
+	func importMnemonicPromptView(_ viewStore: ViewStoreOf<AccountList.Row>) -> some View {
+		importMnemonicPromptView { viewStore.send(.importMnemonic) }
+	}
 
-			Text(L10n.HomePage.applySecuritySettings)
-				.foregroundColor(.white)
-				.textStyle(.body2HighImportance)
-
-			Spacer()
-
-			Circle()
-				.fill()
-				.foregroundColor(.red)
-				.frame(width: .small2, height: .small2)
-		}
-		.padding(.small2)
-		.background(.app.whiteTransparent2)
-		.cornerRadius(.small2)
-		.onTapGesture {
-			viewStore.send(.securityPromptTapped)
-		}
+	func backupMnemonicPromptView(_ viewStore: ViewStoreOf<AccountList.Row>) -> some View {
+		backupMnemonicPromptView { viewStore.send(.backUpMnemonic) }
 	}
 }
 

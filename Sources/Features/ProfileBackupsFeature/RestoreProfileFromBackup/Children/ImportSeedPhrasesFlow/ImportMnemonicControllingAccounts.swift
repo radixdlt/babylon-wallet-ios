@@ -1,4 +1,5 @@
 import DisplayEntitiesControlledByMnemonicFeature
+import EngineKit
 import FeaturePrelude
 import ImportMnemonicFeature
 import OverlayWindowClient
@@ -59,6 +60,7 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.secureStorageClient) var secureStorageClient
 	@Dependency(\.overlayWindowClient) var overlayWindowClient
+	@Dependency(\.userDefaultsClient) var userDefaultsClient
 
 	public init() {}
 
@@ -75,8 +77,7 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 			return .none
 		case .inputMnemonic:
 			state.destination = .importMnemonic(.init(
-				// FIXME: Strings
-				warning: "For your safety, make sure no one is looking at your screen. Never give your seed phrase to anyone for any reason.",
+				warning: L10n.RevealSeedPhrase.warning,
 				isWordCountFixed: true,
 				persistStrategy: nil,
 				wordCount: state.entitiesControlledByFactorSource.mnemonicWordCount
@@ -86,7 +87,17 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 		case .skip:
 			precondition(state.entitiesControlledByFactorSource.isSkippable)
 			loggerGlobal.feature("TODO skip me")
-			return .send(.delegate(.skippedMnemonic(state.entitiesControlledByFactorSource.factorSourceID)))
+			return .run { [accountsNeedingRecover = state.entitiesControlledByFactorSource.accounts, factorSourceID = state.entitiesControlledByFactorSource.factorSourceID] send in
+				do {
+					try await userDefaultsClient.addAccountsThatNeedRecovery(
+						accounts: .init(uncheckedUniqueElements: accountsNeedingRecover.map(\.address))
+					)
+				} catch {
+					// not important enough to propagate error
+					loggerGlobal.error("Failed to add accounts that need recovery, error: \(error)")
+				}
+				await send(.delegate(.skippedMnemonic(factorSourceID)))
+			}
 		}
 	}
 
@@ -135,17 +146,30 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 		switch internalAction {
 		case let .validated(privateHDFactorSource):
 			state.destination = nil
-			return .task {
+			return .run { [accounts = state.entitiesControlledByFactorSource.accounts] send in
 				do {
-					try await secureStorageClient.saveMnemonicForFactorSource(
-						privateHDFactorSource
+					try await userDefaultsClient.removeFromListOfAccountsThatNeedRecovery(
+						accounts: .init(uncheckedUniqueElements: accounts.map(\.address))
 					)
-					return .delegate(.persistedMnemonicInKeychain(privateHDFactorSource.factorSource.id.embed()))
 				} catch {
-					errorQueue.schedule(error)
-					loggerGlobal.error("Failed to saved mnemonic in keychain")
-					return .delegate(.failedToSaveInKeychain(privateHDFactorSource.factorSource.id))
+					// not important enough to propage error
+					loggerGlobal.error("Failed to remove addresses from list of those that need recovery, error: \(error)")
 				}
+
+				let addresses: OrderedSet<AccountAddress> = .init(uncheckedUniqueElements: accounts.map(\.address))
+				try await userDefaultsClient.removeFromListOfAccountsThatNeedRecovery(accounts: addresses)
+				try await userDefaultsClient.addFactorSourceIDOfBackedUpMnemonic(privateHDFactorSource.factorSource.id)
+
+				try await secureStorageClient.saveMnemonicForFactorSource(
+					privateHDFactorSource
+				)
+
+				await send(.delegate(.persistedMnemonicInKeychain(privateHDFactorSource.factorSource.id.embed())))
+
+			} catch: { error, send in
+				errorQueue.schedule(error)
+				loggerGlobal.error("Failed to saved mnemonic in keychain")
+				await send(.delegate(.failedToSaveInKeychain(privateHDFactorSource.factorSource.id)))
 			}
 		}
 	}

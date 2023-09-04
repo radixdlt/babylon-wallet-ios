@@ -8,8 +8,6 @@ import SubmitTransactionClient
 import TransactionClient
 
 let minimumNumberOfEpochsPassedForFaucetToBeReused = 1
-// internal for tests
-let epochForWhenLastUsedByAccountAddressKey = "faucet.epochForWhenLastUsedByAccountAddressKey"
 
 // MARK: - FaucetClient + DependencyKey
 extension FaucetClient: DependencyKey {
@@ -114,7 +112,7 @@ extension FaucetClient: DependencyKey {
 		#if DEBUG
 		let createFungibleToken: CreateFungibleToken = { request in
 			let networkID = await gatewaysClient.getCurrentNetworkID()
-			let manifest = try try ManifestBuilder.manifestForCreateFungibleToken(
+			let manifest = try ManifestBuilder.manifestForCreateFungibleToken(
 				account: request.recipientAccountAddress,
 				networkID: networkID
 			)
@@ -168,57 +166,4 @@ extension FaucetClient: DependencyKey {
 		)
 		#endif // DEBUG
 	}()
-}
-
-private extension UserDefaultsClient {
-	func loadEpochForWhenLastUsedByAccountAddress() -> EpochForWhenLastUsedByAccountAddress {
-		@Dependency(\.jsonDecoder) var jsonDecoder
-		if
-			let data = self.dataForKey(epochForWhenLastUsedByAccountAddressKey),
-			let epochs = try? jsonDecoder().decode(EpochForWhenLastUsedByAccountAddress.self, from: data)
-		{
-			return epochs
-		} else {
-			return .init()
-		}
-	}
-
-	func saveEpochForWhenLastUsedByAccountAddress(_ value: EpochForWhenLastUsedByAccountAddress) async {
-		@Dependency(\.jsonEncoder) var jsonEncoder
-		do {
-			let data = try jsonEncoder().encode(value)
-			await self.setData(data, epochForWhenLastUsedByAccountAddressKey)
-		} catch {
-			// Not important enough to throw...
-		}
-	}
-}
-
-// MARK: - EpochForWhenLastUsedByAccountAddress
-// internal for tests
-struct EpochForWhenLastUsedByAccountAddress: Codable, Hashable, Sendable {
-	struct EpochForAccount: Codable, Sendable, Hashable, Identifiable {
-		typealias ID = AccountAddress
-		var id: ID { accountAddress }
-		let accountAddress: AccountAddress
-		var epoch: Epoch
-	}
-
-	var epochForAccounts: IdentifiedArrayOf<EpochForAccount>
-	init(epochForAccounts: IdentifiedArrayOf<EpochForAccount> = .init()) {
-		self.epochForAccounts = epochForAccounts
-	}
-
-	mutating func update(epoch: Epoch, for id: AccountAddress) {
-		if var existing = epochForAccounts[id: id] {
-			existing.epoch = epoch
-			epochForAccounts[id: id] = existing
-		} else {
-			epochForAccounts.append(.init(accountAddress: id, epoch: epoch))
-		}
-	}
-
-	func getEpoch(for accountAddress: AccountAddress) -> Epoch? {
-		epochForAccounts[id: accountAddress]?.epoch
-	}
 }

@@ -72,7 +72,7 @@ public struct RestoreProfileFromBackupCoordinator: Sendable, FeatureReducer {
 			state.path.append(.importMnemonicsFlow(.init(profileSnapshot: profileSnapshot)))
 			return .none
 
-		case let .path(.element(_, action: .importMnemonicsFlow(.delegate(.finishedImportingMnemonics(skippedAnyMnemonic))))):
+		case let .path(.element(_, action: .importMnemonicsFlow(.delegate(.finishedImportingMnemonics(skipList, _))))):
 			loggerGlobal.notice("Starting import snapshot process...")
 			guard let profileSelection = state.profileSelection else {
 				preconditionFailure("Expected to have a profile")
@@ -81,7 +81,7 @@ public struct RestoreProfileFromBackupCoordinator: Sendable, FeatureReducer {
 			return .run { send in
 				loggerGlobal.notice("Importing snapshot...")
 				try await backupsClient.importSnapshot(profileSelection.snapshot, fromCloud: profileSelection.isInCloud)
-				await send(.delegate(.profileImported(skippedAnyMnemonic: skippedAnyMnemonic)))
+				await send(.delegate(.profileImported(skippedAnyMnemonic: !skipList.isEmpty)))
 			} catch: { error, _ in
 				errorQueue.schedule(error)
 			}

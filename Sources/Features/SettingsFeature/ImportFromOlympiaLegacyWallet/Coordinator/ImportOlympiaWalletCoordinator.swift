@@ -118,7 +118,6 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 			}
 			Scope(state: /State.importMnemonic, action: /Action.importMnemonic) {
 				ImportMnemonic()
-					._printChanges()
 			}
 			Scope(state: /State.importOlympiaLedgerAccountsAndFactorSources, action: /Action.importOlympiaLedgerAccountsAndFactorSources) {
 				ImportOlympiaLedgerAccountsAndFactorSources()
@@ -136,6 +135,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 	@Dependency(\.dismiss) var dismiss
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.importLegacyWalletClient) var importLegacyWalletClient
+	@Dependency(\.userDefaultsClient) var userDefaultsClient
 
 	public init() {}
 
@@ -298,7 +298,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 		guard case let .foundAlreadyImported(progress) = state.progress else { return progressError(state.progress) }
 
 		if let softwareAccounts = progress.accountsToMigrate?.software {
-			return checkIfOlympiaFactorSourceAlreadyExists(softwareAccounts)
+			return checkIfOlympiaFactorSourceAlreadyExists(wordCount: progress.previous.expectedMnemonicWordCount, softwareAccounts)
 		}
 
 		state.progress = .migratedSoftwareAccounts(.init(
@@ -310,10 +310,11 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 	}
 
 	private func checkIfOlympiaFactorSourceAlreadyExists(
+		wordCount: BIP39.WordCount,
 		_ softwareAccounts: AccountsToMigrate
 	) -> EffectTask<Action> {
 		.task {
-			let idOfExistingFactorSource = await factorSourcesClient.checkIfHasOlympiaFactorSourceForAccounts(softwareAccounts)
+			let idOfExistingFactorSource = await factorSourcesClient.checkIfHasOlympiaFactorSourceForAccounts(wordCount, softwareAccounts)
 			return .internal(.checkedIfOlympiaFactorSourceAlreadyExists(idOfExistingFactorSource, softwareAccounts: softwareAccounts))
 		}
 	}
@@ -395,6 +396,13 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 					olympiaFactorSource: factorSource
 				)
 			)
+
+			do {
+				try await userDefaultsClient.addFactorSourceIDOfBackedUpMnemonic(factorSourceID)
+			} catch {
+				// Not important enought to throw
+				loggerGlobal.warning("Failed to save mnemonic as backed up, error: \(error)")
+			}
 
 			if let factorSource, let factorSourceToSave = migrated.factorSourceToSave {
 				guard try factorSourceToSave.id == FactorSource.id(

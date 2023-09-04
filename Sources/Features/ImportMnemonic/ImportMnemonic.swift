@@ -39,7 +39,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 							wordCount: newWordCount,
 							language: language
 						),
-						isReadonlyMode: isReadonlyMode
+						isReadonlyMode: readonlyMode != nil
 					)
 				})
 			} else if delta < 0 {
@@ -65,19 +65,40 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 
 		public let persistStrategy: PersistStrategy?
 
-		public let isReadonlyMode: Bool
+		public let readonlyMode: ReadonlyMode?
 		public let isWordCountFixed: Bool
 		public var isAdvancedMode: Bool = false
 
 		public let header: Header?
 		public let warning: String?
 
+		public struct ReadonlyMode: Sendable, Hashable {
+			public enum Context: Sendable, Hashable {
+				case fromSettings
+				case fromBackupPrompt
+			}
+
+			public let context: Context
+
+			// FIXME: This aint pretty... but we are short on time, forgive me... we are putting WAY
+			// to much logic and responsibility into this reducer here... for when a mnemonic is displayed
+			// either from settings or from AccountDetails after user have pressed "Back up this mnemonic"
+			// prompt, we need to able to mark a mnemonic as "backed up by user", we do so by use of
+			// `FactorSourceID.FromHash` - which require a FactorSourceKind....
+			public let factorSourceKind: FactorSourceKind
+
+			public init(context: Context, factorSourceKind: FactorSourceKind) {
+				self.context = context
+				self.factorSourceKind = factorSourceKind
+			}
+		}
+
 		#if DEBUG
 		public var debugMnemonicPhraseSingleField = ""
 		#endif
 
 		@PresentationState
-		public var offDeviceMnemonicInfoPrompt: OffDeviceMnemonicInfo.State?
+		public var destination: Destinations.State?
 
 		public struct PersistStrategy: Sendable, Hashable {
 			public enum Location: Sendable, Hashable {
@@ -109,10 +130,12 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			self.language = language
 			self.bip39Passphrase = bip39Passphrase
 
-			self.isReadonlyMode = false
+			self.readonlyMode = nil
 			self.isWordCountFixed = isWordCountFixed
 			self.words = []
-			self.offDeviceMnemonicInfoPrompt = offDeviceMnemonicInfoPrompt
+			if let offDeviceMnemonicInfoPrompt {
+				self.destination = .offDeviceMnemonicInfoPrompt(offDeviceMnemonicInfoPrompt)
+			}
 			self.header = header
 			self.warning = warning
 			changeWordCount(by: wordCount.rawValue)
@@ -121,7 +144,8 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 		public init(
 			header: Header? = nil,
 			warning: String? = nil,
-			mnemonicWithPassphrase: MnemonicWithPassphrase
+			mnemonicWithPassphrase: MnemonicWithPassphrase,
+			readonlyMode: ReadonlyMode
 		) {
 			self.header = header
 			self.warning = warning
@@ -129,10 +153,9 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			let mnemonic = mnemonicWithPassphrase.mnemonic
 			self.persistStrategy = nil
 			self.language = mnemonic.language
-			let isReadonlyMode = true
-			self.isReadonlyMode = isReadonlyMode
+			self.readonlyMode = readonlyMode
 			self.isWordCountFixed = true
-			self.words = Self.words(from: mnemonic, isReadonlyMode: isReadonlyMode)
+			self.words = Self.words(from: mnemonic, isReadonlyMode: true)
 			self.bip39Passphrase = mnemonicWithPassphrase.passphrase
 		}
 
@@ -181,6 +204,8 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 		case addRowButtonTapped
 		case removeRowButtonTapped
 		case doneViewing
+		case closeButtonTapped
+		case backButtonTapped
 		case continueButtonTapped(Mnemonic)
 
 		#if DEBUG
@@ -196,7 +221,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 	}
 
 	public enum ChildAction: Sendable, Equatable {
-		case offDeviceMnemonicInfoPrompt(PresentationAction<OffDeviceMnemonicInfo.Action>)
+		case destination(PresentationAction<Destinations.Action>)
 		case word(id: ImportMnemonicWord.State.ID, child: ImportMnemonicWord.Action)
 	}
 
@@ -204,13 +229,41 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 		case persistedNewFactorSourceInProfile(FactorSource)
 		case persistedMnemonicInKeychainOnly(MnemonicWithPassphrase, FactorSourceID.FromHash)
 		case notPersisted(MnemonicWithPassphrase)
-		case doneViewing
+		case doneViewing(markedMnemonicAsBackedUp: Bool? = nil) // `nil` means it was already marked as backed up
+	}
+
+	public struct Destinations: Sendable, ReducerProtocol {
+		public enum State: Sendable, Hashable {
+			case offDeviceMnemonicInfoPrompt(OffDeviceMnemonicInfo.State)
+			case markMnemonicAsBackedUp(AlertState<Action.MarkMnemonicAsBackedUpOrNot>)
+		}
+
+		public enum Action: Sendable, Equatable {
+			case offDeviceMnemonicInfoPrompt(OffDeviceMnemonicInfo.Action)
+
+			case markMnemonicAsBackedUp(MarkMnemonicAsBackedUpOrNot)
+
+			public enum MarkMnemonicAsBackedUpOrNot: Sendable, Hashable {
+				case userHaveBackedUp(FactorSourceID.FromHash)
+				case userHaveNotBackedUp
+			}
+		}
+
+		public var body: some ReducerProtocol<State, Action> {
+			Scope(state: /State.markMnemonicAsBackedUp, action: /Action.markMnemonicAsBackedUp) {
+				EmptyReducer()
+			}
+			Scope(state: /State.offDeviceMnemonicInfoPrompt, action: /Action.offDeviceMnemonicInfoPrompt) {
+				OffDeviceMnemonicInfo()
+			}
+		}
 	}
 
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.mnemonicClient) var mnemonicClient
 	@Dependency(\.continuousClock) var clock
 	@Dependency(\.factorSourcesClient) var factorSourcesClient
+	@Dependency(\.userDefaultsClient) var userDefaultsClient
 
 	#if DEBUG
 	@Dependency(\.overlayWindowClient) var overlayWindowClient
@@ -224,8 +277,8 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			.forEach(\.words, action: /Action.child .. ChildAction.word) {
 				ImportMnemonicWord()
 			}
-			.ifLet(\.$offDeviceMnemonicInfoPrompt, action: /Action.child .. ChildAction.offDeviceMnemonicInfoPrompt) {
-				OffDeviceMnemonicInfo()
+			.ifLet(\.$destination, action: /Action.child .. /ChildAction.destination) {
+				Destinations()
 			}
 	}
 
@@ -254,8 +307,8 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 				&state
 			)
 
-		case let .offDeviceMnemonicInfoPrompt(.presented(.delegate(.done(label, mnemonicWithPassphrase)))):
-			state.offDeviceMnemonicInfoPrompt = nil
+		case let .destination(.presented(.offDeviceMnemonicInfoPrompt(.delegate(.done(label, mnemonicWithPassphrase))))):
+			state.destination = nil
 			guard let persistStrategy = state.persistStrategy else {
 				preconditionFailure("expected persistStrategy")
 				return .none
@@ -272,6 +325,19 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 					}
 				))
 			}
+
+		case let .destination(.presented(.markMnemonicAsBackedUp(.userHaveBackedUp(factorSourceID)))):
+			return .run { send in
+				try await userDefaultsClient.addFactorSourceIDOfBackedUpMnemonic(factorSourceID)
+				await send(.delegate(.doneViewing(markedMnemonicAsBackedUp: true)))
+			} catch: { error, _ in
+				loggerGlobal.error("Failed to save mnemonic as backed up")
+				errorQueue.schedule(error)
+			}
+
+		case .destination(.presented(.markMnemonicAsBackedUp(.userHaveNotBackedUp))):
+			loggerGlobal.notice("User have not backed up")
+			return .send(.delegate(.doneViewing(markedMnemonicAsBackedUp: false)))
 
 		default:
 			return .none
@@ -312,7 +378,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			case .intoKeychainAndProfile:
 				switch persistStrategy.mnemonicForFactorSourceKind {
 				case .offDevice:
-					state.offDeviceMnemonicInfoPrompt = .init(mnemonicWithPassphrase: mnemonicWithPassphrase)
+					state.destination = .offDeviceMnemonicInfoPrompt(.init(mnemonicWithPassphrase: mnemonicWithPassphrase))
 					return .none
 
 				case let .onDevice(onDeviceKind):
@@ -342,8 +408,16 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			}
 
 		case .doneViewing:
-			assert(state.isReadonlyMode)
-			return .send(.delegate(.doneViewing))
+			assert(state.readonlyMode != nil)
+			return markAsBackedUpIfNeeded(&state)
+
+		case .backButtonTapped:
+			assert(state.readonlyMode?.context == .fromSettings)
+			return markAsBackedUpIfNeeded(&state)
+
+		case .closeButtonTapped:
+			assert(state.readonlyMode?.context == .fromBackupPrompt)
+			return markAsBackedUpIfNeeded(&state)
 
 		#if DEBUG
 		case .debugCopyMnemonic:
@@ -355,7 +429,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 		case let .debugMnemonicChanged(mnemonic):
 			state.debugMnemonicPhraseSingleField = mnemonic
 			if let mnemonic = try? Mnemonic(phrase: mnemonic, language: state.language) {
-				state.words = State.words(from: mnemonic, isReadonlyMode: state.isReadonlyMode)
+				state.words = State.words(from: mnemonic, isReadonlyMode: state.readonlyMode != nil)
 				return .send(.view(.continueButtonTapped(mnemonic)))
 			} else {
 				return .none
@@ -365,6 +439,28 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			let toPaste = pasteboardClient.getString() ?? ""
 			return .send(.view(.debugMnemonicChanged(toPaste)))
 		#endif
+		}
+	}
+
+	private func markAsBackedUpIfNeeded(_ state: inout State) -> EffectTask<Action> {
+		guard
+			let readonlyMode = state.readonlyMode,
+			let mnemonic = state.mnemonic,
+			case let mnemonicWithPassphrase = MnemonicWithPassphrase(mnemonic: mnemonic, passphrase: state.bip39Passphrase),
+			let factorSourceID = try? FactorSourceID.FromHash(
+				kind: readonlyMode.factorSourceKind,
+				mnemonicWithPassphrase: mnemonicWithPassphrase
+			)
+		else {
+			return .none
+		}
+
+		let listOfBackedUpMnemonics = userDefaultsClient.getFactorSourceIDOfBackedUpMnemonics()
+		if listOfBackedUpMnemonics.contains(factorSourceID) {
+			return .send(.delegate(.doneViewing(markedMnemonicAsBackedUp: nil))) // user has already marked this mnemonic as "backed up"
+		} else {
+			state.destination = .askUserIfSheHasBackedUpMnemonic(factorSourceID)
+			return .none
 		}
 	}
 
@@ -474,5 +570,18 @@ extension ImportMnemonic {
 
 		}()
 		return word.word.rawValue
+	}
+}
+
+extension ImportMnemonic.Destinations.State {
+	fileprivate static func askUserIfSheHasBackedUpMnemonic(_ factorSourceID: FactorSourceID.FromHash) -> Self {
+		.markMnemonicAsBackedUp(.init(
+			title: { TextState("Backed up?") }, // FIXME: Strings
+			actions: {
+				ButtonState(action: .userHaveBackedUp(factorSourceID), label: { TextState("I have backed it up.") }) // FIXME: Strings
+				ButtonState(action: .userHaveNotBackedUp, label: { TextState("I have not backed it up.") }) // FIXME: Strings
+			},
+			message: { TextState("Have you backed up the Seed Phrase?") } // FIXME: Strings
+		))
 	}
 }

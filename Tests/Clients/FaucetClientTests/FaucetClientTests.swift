@@ -59,7 +59,7 @@ final class FaucetClientTests: TestCase {
 		await withDependencies {
 			$0.gatewayAPIClient.getEpoch = { .irrelevant }
 			$0.userDefaultsClient.dataForKey = { key in
-				XCTAssertEqual(key, epochForWhenLastUsedByAccountAddressKey)
+				XCTAssertEqual(key, .epochForWhenLastUsedByAccountAddress)
 				return nil
 			}
 		} operation: {
@@ -172,7 +172,7 @@ final class FaucetClientTests: TestCase {
 			$0.userDefaultsClient.setData = { maybeData, key in
 				do {
 					let data = try XCTUnwrap(maybeData)
-					XCTAssertEqual(key, epochForWhenLastUsedByAccountAddressKey)
+					XCTAssertEqual(key, .epochForWhenLastUsedByAccountAddress)
 					let json = try JSON(data: data)
 					try XCTAssertJSONDecoding(json, expectedEpochs)
 				} catch {

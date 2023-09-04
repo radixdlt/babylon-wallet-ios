@@ -2,7 +2,7 @@ import DebugInspectProfileFeature
 import FeaturePrelude
 import SecurityStructureConfigurationListFeature
 
-public struct DebugSettings: Sendable, FeatureReducer {
+public struct DebugSettingsCoordinator: Sendable, FeatureReducer {
 	public typealias Store = StoreOf<Self>
 
 	public init() {}
@@ -21,6 +21,7 @@ public struct DebugSettings: Sendable, FeatureReducer {
 	public enum ViewAction: Sendable, Equatable {
 		case factorSourcesButtonTapped
 		case debugInspectProfileButtonTapped
+		case debugUserDefaultsContentsButtonTapped
 		case securityStructureConfigsButtonTapped
 	}
 
@@ -34,18 +35,23 @@ public struct DebugSettings: Sendable, FeatureReducer {
 
 	public struct Destinations: Sendable, ReducerProtocol {
 		public enum State: Sendable, Hashable {
+			case debugUserDefaultsContents(DebugUserDefaultsContents.State)
 			case debugInspectProfile(DebugInspectProfile.State)
 			case debugManageFactorSources(DebugManageFactorSources.State)
 			case securityStructureConfigs(SecurityStructureConfigurationListCoordinator.State)
 		}
 
 		public enum Action: Sendable, Equatable {
+			case debugUserDefaultsContents(DebugUserDefaultsContents.Action)
 			case debugInspectProfile(DebugInspectProfile.Action)
 			case debugManageFactorSources(DebugManageFactorSources.Action)
 			case securityStructureConfigs(SecurityStructureConfigurationListCoordinator.Action)
 		}
 
 		public var body: some ReducerProtocolOf<Self> {
+			Scope(state: /State.debugUserDefaultsContents, action: /Action.debugUserDefaultsContents) {
+				DebugUserDefaultsContents()
+			}
 			Scope(state: /State.debugInspectProfile, action: /Action.debugInspectProfile) {
 				DebugInspectProfile()
 			}
@@ -54,7 +60,6 @@ public struct DebugSettings: Sendable, FeatureReducer {
 			}
 			Scope(state: /State.securityStructureConfigs, action: /Action.securityStructureConfigs) {
 				SecurityStructureConfigurationListCoordinator()
-					._printChanges()
 			}
 		}
 	}
@@ -87,6 +92,10 @@ public struct DebugSettings: Sendable, FeatureReducer {
 
 		case .securityStructureConfigsButtonTapped:
 			state.destination = .securityStructureConfigs(.init())
+			return .none
+
+		case .debugUserDefaultsContentsButtonTapped:
+			state.destination = .debugUserDefaultsContents(.init())
 			return .none
 		}
 	}

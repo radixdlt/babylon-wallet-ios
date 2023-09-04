@@ -22,7 +22,8 @@ extension UserDefaultsClient: TestDependencyKey {
 		setBool: unimplemented("\(Self.self).setBool"),
 		setData: unimplemented("\(Self.self).setData"),
 		setDouble: unimplemented("\(Self.self).setDouble"),
-		setInteger: unimplemented("\(Self.self).setInteger")
+		setInteger: unimplemented("\(Self.self).setInteger"),
+		removeAll: unimplemented("\(Self.self).removeAll")
 	)
 }
 
@@ -38,22 +39,23 @@ extension UserDefaultsClient {
 		setBool: { _, _ in },
 		setData: { _, _ in },
 		setDouble: { _, _ in },
-		setInteger: { _, _ in }
+		setInteger: { _, _ in },
+		removeAll: { _ in }
 	)
 
-	public mutating func override(bool: Bool, forKey key: String) {
+	public mutating func override(bool: Bool, forKey key: Key) {
 		boolForKey = { [self] in $0 == key ? bool : self.boolForKey(key) }
 	}
 
-	public mutating func override(data: Data, forKey key: String) {
+	public mutating func override(data: Data, forKey key: Key) {
 		dataForKey = { [self] in $0 == key ? data : self.dataForKey(key) }
 	}
 
-	public mutating func override(double: Double, forKey key: String) {
+	public mutating func override(double: Double, forKey key: Key) {
 		doubleForKey = { [self] in $0 == key ? double : self.doubleForKey(key) }
 	}
 
-	public mutating func override(integer: Int, forKey key: String) {
+	public mutating func override(integer: Int, forKey key: Key) {
 		integerForKey = { [self] in $0 == key ? integer : self.integerForKey(key) }
 	}
 }

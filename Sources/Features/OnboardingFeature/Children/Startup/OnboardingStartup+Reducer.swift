@@ -36,7 +36,6 @@ public struct OnboardingStartup: Sendable, FeatureReducer {
 		public var body: some ReducerProtocolOf<Self> {
 			Scope(state: /State.restoreFromBackup, action: /Action.restoreFromBackup) {
 				RestoreProfileFromBackupCoordinator()
-					._printChanges()
 			}
 		}
 	}

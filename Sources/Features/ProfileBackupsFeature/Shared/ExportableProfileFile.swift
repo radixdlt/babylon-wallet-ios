@@ -33,8 +33,15 @@ extension ExportableProfileFile {
 		@Dependency(\.jsonDecoder) var jsonDecoder
 		do {
 			self = try .plaintext(jsonDecoder().decode(ProfileSnapshot.self, from: data))
-		} catch {
-			self = try .encrypted(jsonDecoder().decode(EncryptedProfileSnapshot.self, from: data))
+		} catch let decodePlaintextError {
+			do {
+				self = try .encrypted(jsonDecoder().decode(EncryptedProfileSnapshot.self, from: data))
+			} catch {
+				loggerGlobal.error("Failed to decode imported profile file JSON as ProfileSnapshot, underlying error: \(decodePlaintextError)")
+
+				loggerGlobal.error("Failed to decode imported profile file JSON as EncryptedProfileSnapshot, underlying error: \(error)")
+				throw error
+			}
 		}
 	}
 
