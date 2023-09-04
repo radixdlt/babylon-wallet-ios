@@ -121,7 +121,7 @@ extension AccountList.Row {
 				.onTapGesture {
 					viewStore.send(.tapped)
 				}
-				.task { @MainActor in
+				.task {
 					await ViewStore(store.stateless).send(.view(.task)).finish()
 				}
 			}
