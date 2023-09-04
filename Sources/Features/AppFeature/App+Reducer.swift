@@ -1,6 +1,7 @@
 import AppPreferencesClient
 import EngineKit
 import FeaturePrelude
+import GatewaysClient
 import MainFeature
 import OnboardingClient
 import OnboardingFeature
@@ -21,6 +22,9 @@ public struct App: Sendable, FeatureReducer {
 		@PresentationState
 		public var alert: Alerts.State?
 
+		// FIXME: Not sure if the default value is right or wrong, maybe Optional?
+		var isMainnetSelected: Bool = true
+
 		public init(root: Root = .splash(.init())) {
 			self.root = root
 
@@ -37,6 +41,7 @@ public struct App: Sendable, FeatureReducer {
 		case incompatibleProfileDeleted
 		case toMain(isAccountRecoveryNeeded: Bool)
 		case toOnboarding
+		case mainnetSelected(Bool)
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -66,6 +71,7 @@ public struct App: Sendable, FeatureReducer {
 	@Dependency(\.continuousClock) var clock
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.appPreferencesClient) var appPreferencesClient
+	@Dependency(\.gatewaysClient) var gatewaysClient
 
 	public init() {}
 
@@ -94,18 +100,25 @@ public struct App: Sendable, FeatureReducer {
 		case .task:
 			let retBuildInfo = buildInformation()
 			print("EngineToolkit commit hash: \(retBuildInfo.version)")
-			return .run { send in
-				for try await error in errorQueue.errors() {
-					// Maybe instead we should listen here for the Profile.State change,
-					// and when it switches to `.ephemeral` we navigate to onboarding.
-					// For now, we react to the specific error, since the Profile.State is meant to be private.
-					if error is Profile.ProfileIsUsedOnAnotherDeviceError {
-						await send(.internal(.toOnboarding))
-						// A slight delay to allow any modal that may be shown to be dismissed.
-						try? await clock.sleep(for: .seconds(0.5))
+			return .merge(
+				.run { send in
+					for try await error in errorQueue.errors() {
+						// Maybe instead we should listen here for the Profile.State change,
+						// and when it switches to `.ephemeral` we navigate to onboarding.
+						// For now, we react to the specific error, since the Profile.State is meant to be private.
+						if error is Profile.ProfileIsUsedOnAnotherDeviceError {
+							await send(.internal(.toOnboarding))
+							// A slight delay to allow any modal that may be shown to be dismissed.
+							try? await clock.sleep(for: .seconds(0.5))
+						}
+					}
+				},
+				.run { send in
+					for try await gateways in await gatewaysClient.gatewaysValues() {
+						await send(.internal(.mainnetSelected(gateways.current.network.id == .mainnet)))
 					}
 				}
-			}
+			)
 
 		case .alert(.presented(.incompatibleProfileErrorAlert(.deleteWalletDataButtonTapped))):
 			return .run { send in
@@ -129,6 +142,9 @@ public struct App: Sendable, FeatureReducer {
 			return goToMain(state: &state, accountRecoveryIsNeeded: isAccountRecoveryNeeded)
 		case .toOnboarding:
 			return goToOnboarding(state: &state)
+		case let .mainnetSelected(isMainnetSelected):
+			state.isMainnetSelected = isMainnetSelected
+			return .none
 		}
 	}
 

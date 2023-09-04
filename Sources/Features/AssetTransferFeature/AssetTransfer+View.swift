@@ -86,7 +86,8 @@ extension AssetTransfer {
 			} content: {
 				View(store: store)
 			}
-			.showDeveloperDisclaimerBanner()
+			// FIXME: Use a proper state
+			.showDeveloperDisclaimerBanner(true)
 		}
 	}
 }
