@@ -112,7 +112,7 @@ public struct App: Sendable, FeatureReducer {
 				.run { send in
 					for try await gateways in await gatewaysClient.gatewaysValues() {
 						guard !Task.isCancelled else { return }
-						loggerGlobal.critical("Changed network to: \(gateways.current)")
+						loggerGlobal.notice("Changed network to: \(gateways.current)")
 						await send(.internal(.currentGatewayChanged(to: gateways.current)))
 					}
 				},
@@ -268,6 +268,7 @@ public struct App: Sendable, FeatureReducer {
 	}
 
 	func goToOnboarding(state: inout State, isMainnetLive: Bool) -> EffectTask<Action> {
+		state.showIsUsingTestnetBanner = !isMainnetLive
 		state.root = .onboardingCoordinator(.init(isMainnetLive: isMainnetLive))
 		return .none
 	}
