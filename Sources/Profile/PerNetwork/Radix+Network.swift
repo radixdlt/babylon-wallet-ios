@@ -32,7 +32,7 @@ extension Radix {
 }
 
 extension Radix.Network {
-	public static let `default` = kisharnet
+	public static let `default` = mainnet
 }
 
 extension Radix.Network {
