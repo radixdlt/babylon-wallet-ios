@@ -2,22 +2,18 @@ import FeaturePrelude
 
 extension TransactionReviewDappsUsed.State {
 	var viewState: TransactionReviewDappsUsed.ViewState {
-		let knownDapps = dApps.compactMap(\.knownDapp)
-		let unknownDappCount = dApps.count - knownDapps.count
-
-		if unknownDappCount == 0 {
-			return .init(rows: knownDapps)
-		} else {
-			return .init(rows: knownDapps + [.unknown(count: unknownDappCount)])
+		var dApps = knownDapps.map(\.knownDapp)
+		if unknownDapps > 0 {
+			dApps.append(.unknown(count: unknownDapps))
 		}
+		return .init(rows: dApps)
 	}
 }
 
 extension TransactionReview.DappEntity {
-	fileprivate var knownDapp: TransactionReviewDappsUsed.View.DappView.ViewState? {
-		guard let metadata else { return nil }
-		return .known(
-			name: metadata.name ?? L10n.TransactionReview.unknown,
+	fileprivate var knownDapp: TransactionReviewDappsUsed.View.DappView.ViewState {
+		.known(
+			name: metadata.name ?? "Unnamed dApp", // FIXME: Strings
 			thumbnail: metadata.thumbnail,
 			id: id
 		)

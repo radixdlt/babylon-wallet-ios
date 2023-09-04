@@ -305,7 +305,7 @@ extension DappInteractionClient.ValidatedDappRequest.Invalid {
 			return L10n.DAppRequest.ValidationOutcome.subtitleIncompatibleVersion
 		case .wrongNetworkID:
 			return L10n.DAppRequest.ValidationOutcome.subtitleWrongNetworkID
-		case .invalidOrigin, .invalidDappDefinitionAddress, .p2pError:
+		case .invalidOrigin, .invalidDappDefinitionAddress, .dAppValidationError, .p2pError:
 			return shortExplanation
 		}
 	}
@@ -331,7 +331,7 @@ extension DappInteractionClient.ValidatedDappRequest.Invalid {
 			return L10n.DAppRequest.ValidationOutcome.devExplanationInvalidOrigin(invalidURLString)
 		case let .invalidDappDefinitionAddress(invalidAddress):
 			return L10n.DAppRequest.ValidationOutcome.devExplanationInvalidDappDefinitionAddress(invalidAddress)
-		case .wrongNetworkID:
+		case .dAppValidationError, .wrongNetworkID:
 			return shortExplanation
 		case let .p2pError(message):
 			return message
@@ -352,6 +352,8 @@ extension DappInteractionClient.ValidatedDappRequest.Invalid {
 			return L10n.DAppRequest.ValidationOutcome.shortExplanationInvalidOrigin
 		case .invalidDappDefinitionAddress:
 			return L10n.DAppRequest.ValidationOutcome.shortExplanationInvalidDappDefinitionAddress
+		case .dAppValidationError:
+			return "Could not validate the dApp" // FIXME: Strings
 		case let .wrongNetworkID(ce, wallet):
 			return L10n.DAppRequest.RequestWrongNetworkAlert.message(ce, wallet)
 		case .p2pError:
@@ -370,11 +372,9 @@ extension DappInteractor {
 
 				switch incomingRequest {
 				case let .valid(requestEnvelope):
-					await send(.internal(.receivedRequestFromDapp(
-						requestEnvelope
-					)))
+					await send(.internal(.receivedRequestFromDapp(requestEnvelope)))
 				case let .invalid(invalid):
-					let isDeveloperModeEnabled = await appPreferencesClient.getPreferences().security.isDeveloperModeEnabled
+					let isDeveloperModeEnabled = await appPreferencesClient.isDeveloperModeEnabled()
 					await send(.internal(.presentInvalidRequest(invalid, isDeveloperModeEnabled: isDeveloperModeEnabled)))
 				}
 			}
