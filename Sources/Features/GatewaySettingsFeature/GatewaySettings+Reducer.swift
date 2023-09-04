@@ -199,9 +199,9 @@ public struct GatewaySettings: Sendable, FeatureReducer {
 
 		case let .createAccountOnNetworkBeforeSwitchingToIt(gateway):
 			state.destination = .createAccount(
-				.init(config: .init(
-					purpose: .firstAccountOnNewNetwork(gateway.network.id)
-				))
+				.init(
+					config: .init(purpose: .firstAccountOnNewNetwork(gateway.network.id))
+				)
 			)
 			return .none
 

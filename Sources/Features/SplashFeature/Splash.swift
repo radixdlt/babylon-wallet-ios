@@ -1,6 +1,7 @@
 import DeviceFactorSourceClient
 import FeaturePrelude
 import LocalAuthenticationClient
+import NetworkSwitchingClient
 import OnboardingClient
 
 // MARK: - Splash
@@ -45,6 +46,7 @@ public struct Splash: Sendable, FeatureReducer {
 	@Dependency(\.onboardingClient.loadProfile) var loadProfile
 	@Dependency(\.openURL) var openURL
 	@Dependency(\.deviceFactorSourceClient) var deviceFactorSourceClient
+	@Dependency(\.networkSwitchingClient.isMainnetLive) var isMainnetLive
 
 	public init() {}
 
@@ -56,7 +58,15 @@ public struct Splash: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .appeared:
-			return delay().concatenate(with: verifyPasscode())
+			return delay()
+				.concatenate(
+					with: .run { _ in
+						if await (try? isMainnetLive()) ?? false {
+							Radix.Gateway.default = .mainnet
+						}
+					}
+				)
+				.concatenate(with: verifyPasscode())
 
 		case .didTapToUnlock:
 			state.biometricsCheckFailed = false

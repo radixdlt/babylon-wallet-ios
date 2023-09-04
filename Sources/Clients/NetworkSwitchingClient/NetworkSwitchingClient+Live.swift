@@ -22,9 +22,17 @@ extension NetworkSwitchingClient {
 		@Dependency(\.gatewaysClient) var gatewaysClient
 		@Dependency(\.accountsClient) var accountsClient
 		@Dependency(\.cacheClient) var cacheClient
+		@Dependency(\.jsonDecoder) var jsonDecoder
 
 		let isMainnetLive: IsMainnetLive = {
-			false
+			struct Response: Decodable {
+				let isMainnetLive: Bool
+			}
+
+			let (data, _) = try await URLSession.shared.data(from: URL(string: "https://mainnet-status.extratools.works/")!)
+			let response = try jsonDecoder().decode(Response.self, from: data)
+
+			return response.isMainnetLive
 		}
 
 		let validateGatewayURL: ValidateGatewayURL = { newURL -> Radix.Gateway? in
