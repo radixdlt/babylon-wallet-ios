@@ -157,9 +157,9 @@ public struct Splash: Sendable, FeatureReducer {
 		.run { _ in
 			let durationInMS: Int
 			#if DEBUG
-			durationInMS = 200
+			durationInMS = 100
 			#else
-			durationInMS = 800
+			durationInMS = 500
 			#endif
 			try? await clock.sleep(for: .milliseconds(durationInMS))
 		}
