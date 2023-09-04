@@ -31,7 +31,7 @@ extension Radix.Gateway {
 	public static var mainnet: Self {
 		.init(
 			network: .mainnet,
-			url: URL(string: "https://zabanet-gateway.radixdlt.com")!
+			url: URL(string: "https://mainnet.radixdlt.com/")!
 		)
 	}
 

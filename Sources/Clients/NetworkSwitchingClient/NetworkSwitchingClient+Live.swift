@@ -29,7 +29,12 @@ extension NetworkSwitchingClient {
 				let isMainnetLive: Bool
 			}
 
-			let (data, _) = try await URLSession.shared.data(from: URL(string: "https://mainnet-status.extratools.works/")!)
+			let (data, _) = try await URLSession.shared.data(
+				for: .init(
+					url: URL(string: "https://mainnet-status.extratools.works/")!,
+					timeoutInterval: 0.7
+				)
+			)
 			let response = try jsonDecoder().decode(Response.self, from: data)
 
 			return response.isMainnetLive

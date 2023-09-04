@@ -437,6 +437,7 @@ package.addModules([
 			"DeviceFactorSourceClient",
 			"LocalAuthenticationClient",
 			"OnboardingClient",
+			"NetworkSwitchingClient",
 		],
 		tests: .yes()
 	),

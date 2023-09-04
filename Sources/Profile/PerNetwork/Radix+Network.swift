@@ -32,14 +32,14 @@ extension Radix {
 }
 
 extension Radix.Network {
-	public static let `default` = mainnet
+	public static let `default` = kisharnet
 }
 
 extension Radix.Network {
 	public typealias Name = Tagged<Self, String>
 
 	public static let mainnet = Self(
-		name: "main",
+		name: "mainnet",
 		id: .mainnet,
 		displayDescription: "Mainnet"
 	)
