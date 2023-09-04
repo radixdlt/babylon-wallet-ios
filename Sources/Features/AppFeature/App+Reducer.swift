@@ -163,8 +163,13 @@ public struct App: Sendable, FeatureReducer {
 				return goToMain(state: &state, accountRecoveryIsNeeded: false)
 			}
 
-		case let .onboardingCoordinator(.delegate(.completed(_, accountRecoveryIsNeeded))):
-			return goToMain(state: &state, accountRecoveryIsNeeded: accountRecoveryIsNeeded)
+		case let .onboardingCoordinator(.delegate(.completed(accountRecoveryIsNeeded, hasMainnetAccounts, isMainnetLive))):
+			return onboardUserToMainnetIfNeededElseGoToMain(
+				hasMainnetAccounts: hasMainnetAccounts,
+				isMainnetLive: isMainnetLive,
+				accountRecoveryIsNeeded: accountRecoveryIsNeeded,
+				state: &state
+			)
 
 		case let .splash(.delegate(.completed(loadProfileOutcome, accountRecoveryNeeded, isMainnetLive))):
 			switch loadProfileOutcome {
@@ -182,12 +187,12 @@ public struct App: Sendable, FeatureReducer {
 				return incompatibleSnapshotData(version: version, state: &state)
 
 			case let .existingProfile(hasMainnetAccounts):
-				if !hasMainnetAccounts, isMainnetLive {
-					loggerGlobal.feature("mainnet is live, but has no accounts => onboarding existing user to mainnet")
-					return onboardUserToMainnet(state: &state)
-				} else {
-					return goToMain(state: &state, accountRecoveryIsNeeded: accountRecoveryNeeded)
-				}
+				return onboardUserToMainnetIfNeededElseGoToMain(
+					hasMainnetAccounts: hasMainnetAccounts,
+					isMainnetLive: isMainnetLive,
+					accountRecoveryIsNeeded: accountRecoveryNeeded,
+					state: &state
+				)
 
 			case let .usersExistingProfileCouldNotBeLoaded(failure: .profileUsedOnAnotherDevice(error)):
 				errorQueue.schedule(error)
@@ -196,6 +201,20 @@ public struct App: Sendable, FeatureReducer {
 
 		default:
 			return .none
+		}
+	}
+
+	func onboardUserToMainnetIfNeededElseGoToMain(
+		hasMainnetAccounts: Bool,
+		isMainnetLive: Bool,
+		accountRecoveryIsNeeded: Bool,
+		state: inout State
+	) -> EffectTask<Action> {
+		if !hasMainnetAccounts, isMainnetLive {
+			loggerGlobal.feature("mainnet is live, but has no accounts => onboarding existing user to mainnet")
+			return onboardUserToMainnet(state: &state)
+		} else {
+			return goToMain(state: &state, accountRecoveryIsNeeded: accountRecoveryIsNeeded)
 		}
 	}
 

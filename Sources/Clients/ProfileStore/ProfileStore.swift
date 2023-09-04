@@ -67,18 +67,7 @@ public final actor ProfileStore {
 	}
 }
 
-extension Profile {
-	public var hasMainnetAccounts: Bool {
-		do {
-			let onMainnet = try network(id: .mainnet)
-			return !onMainnet.accounts.isEmpty
-		} catch {
-			return false
-		}
-	}
-}
-
-// MARK: - ProfileStore.ProfileState
+// MARK: ProfileStore.ProfileState
 extension ProfileStore {
 	/// The different possible states of Profile store. See
 	/// `changeState:to` in `ProfileStore` for state machines valid
@@ -199,9 +188,11 @@ extension ProfileStore {
 		}
 	}
 
-	public func commitEphemeral() async throws {
+	/// Returns `true` iff Profile contains any mainnet accounts
+	public func commitEphemeral() async throws -> Bool {
 		let ephemeral = try assertProfileStateIsEphemeral()
 		try await changeProfileSnapshot(to: ephemeral.profile.snapshot())
+		return ephemeral.profile.hasMainnetAccounts
 	}
 
 	/// If persisted: updates the in-memory across-the-app-used Profile and also
