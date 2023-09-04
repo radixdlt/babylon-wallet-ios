@@ -157,7 +157,7 @@ public struct Splash: Sendable, FeatureReducer {
 		.run { _ in
 			let durationInMS: Int
 			#if DEBUG
-			durationInMS = 100
+			durationInMS = 200
 			#else
 			durationInMS = 500
 			#endif
