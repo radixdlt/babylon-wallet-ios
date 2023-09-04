@@ -233,9 +233,8 @@ extension SwiftUI.View {
 	@MainActor
 	func destination(store: StoreOf<ImportMnemonic>) -> some View {
 		let destinationStore = store.scope(state: \.$destination, action: { .child(.destination($0)) })
-		return
-			offDeviceMnemonicInfoSheet(with: destinationStore)
-				.markMnemonicAsBackedUpAlert(with: destinationStore)
+		return offDeviceMnemonicInfoSheet(with: destinationStore)
+			.markMnemonicAsBackedUpAlert(with: destinationStore)
 	}
 
 	@MainActor

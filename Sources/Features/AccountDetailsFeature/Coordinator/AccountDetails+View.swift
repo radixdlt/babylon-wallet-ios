@@ -113,9 +113,9 @@ extension AccountDetails {
 					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
 					state: /AccountDetails.Destinations.State.exportMnemonic,
 					action: AccountDetails.Destinations.Action.exportMnemonic,
-					content: { store_ in
+					content: { childStore in
 						NavigationView {
-							ImportMnemonic.View(store: store_)
+							ImportMnemonic.View(store: childStore)
 								// FIXME: Strings
 								.navigationTitle("Backup Seed Phrase")
 						}

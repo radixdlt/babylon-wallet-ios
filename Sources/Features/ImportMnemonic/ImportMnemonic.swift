@@ -205,7 +205,9 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 		case passphraseChanged(String)
 		case addRowButtonTapped
 		case removeRowButtonTapped
-		case doneViewing; case closeButtonTapped; case backButtonTapped
+		case doneViewing
+		case closeButtonTapped
+		case backButtonTapped
 		case continueButtonTapped(Mnemonic)
 
 		#if DEBUG

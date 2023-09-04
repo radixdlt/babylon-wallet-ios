@@ -9,7 +9,7 @@ extension UserDefaultsClient {
 		try await save(codable: accounts, forKey: .accountsThatNeedRecovery)
 	}
 
-	public func removeAccountsThatNeedRecoveryIfNeeded(accounts toRemove: OrderedSet<AccountAddress>) async throws {
+	public func removeFromListOfAccountsThatNeedRecovery(accounts toRemove: OrderedSet<AccountAddress>) async throws {
 		var accounts = getAddressesOfAccountsThatNeedRecovery()
 		accounts.subtract(toRemove)
 		try await save(codable: accounts, forKey: .accountsThatNeedRecovery)

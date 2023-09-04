@@ -293,7 +293,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 		loggerGlobal.feature("implement export")
 		let factorInstance = state.deviceControlledFactorInstance
 		let factorSourceID = factorInstance.factorSourceID
-		return .task {
+		return .run { send in
 			let result = await TaskResult {
 				guard let mnemonicWithPassphrase = try await secureStorageClient.loadMnemonicByFactorSourceID(factorSourceID, .displaySeedPhrase) else {
 					loggerGlobal.error("Failed to find mnemonic with key: \(factorSourceID) which controls account: \(state.account)")
@@ -305,14 +305,14 @@ public struct AccountDetails: Sendable, FeatureReducer {
 					factorSourceKind: factorInstance.factorSourceKind
 				)
 			}
-			return .internal(.loadMnemonicResult(result))
+			await send(.internal(.loadMnemonicResult(result)))
 		}
 	}
 
 	private func loadImport() -> EffectTask<Action> {
-		.task {
+		.run { send in
 			let result = await TaskResult { try await backupsClient.snapshotOfProfileForExport() }
-			return .internal(.loadProfileSnapshotForRecoverMnemonicsFlow(result))
+			await send(.internal(.loadProfileSnapshotForRecoverMnemonicsFlow(result)))
 		}
 	}
 
@@ -321,61 +321,47 @@ public struct AccountDetails: Sendable, FeatureReducer {
 		@Dependency(\.accountPortfoliosClient) var accountPortfoliosClient
 		@Dependency(\.userDefaultsClient) var userDefaultsClient
 
-		let isRecoveryOfMnemonicNeeded = userDefaultsClient
+		if userDefaultsClient
 			.getAddressesOfAccountsThatNeedRecovery()
-			.contains(where: { $0 == state.account.address })
-
-		if isRecoveryOfMnemonicNeeded {
-			loggerGlobal.feature("import needed! Returnung...")
+			.contains(state.account.address)
+		{
+			// need to recover mnemonic since it has been previously skipped.
 			state.importMnemonicPrompt = .init(needed: true)
+
 			// do not care about export if import is needed
 			return .none
 		}
-		loggerGlobal.feature("import NOT needed, checking export")
 
-		let givenHasValueNeedToBackUpMnemonic: Bool = {
+		let mightNeedToBeBackedUp: Bool = {
 			switch state.account.securityState {
 			case let .unsecured(unsecuredEntityControl):
 				guard unsecuredEntityControl.transactionSigning.factorSourceID.kind == .device else {
+					// Ledger account, mnemonics do not apply...
 					return false
 				}
-				let hasAlreadyBackedUpMnemonic = userDefaultsClient.getFactorSourceIDOfBackedUpMnemonics().contains(unsecuredEntityControl.transactionSigning.factorSourceID)
 
-				if hasAlreadyBackedUpMnemonic {
-					loggerGlobal.feature("Has already backed up mnemonic")
-				}
-
-				return !hasAlreadyBackedUpMnemonic
+				// check if already backed up
+				return userDefaultsClient
+					.getFactorSourceIDOfBackedUpMnemonics()
+					.contains(unsecuredEntityControl.transactionSigning.factorSourceID)
 			}
 
 		}()
 
-		guard givenHasValueNeedToBackUpMnemonic else {
-			loggerGlobal.feature("Accout not controlled by mnemonic, or already backed up mnemonic")
+		guard mightNeedToBeBackedUp else {
 			return .none
 		}
 
-		loggerGlobal.feature("Export maybe needed (has not backed up mnemonic), checking if has value")
-
 		return .run { [address = state.account.address] send in
-			let hasValue: Bool = await {
-				do {
-					let portfolio = try await accountPortfoliosClient.fetchAccountPortfolio(address, false)
-					guard let xrdResource = portfolio.fungibleResources.xrdResource, xrdResource.amount > .zero else {
-						return false
-					}
-					return true
-				} catch {
-					return false
-				}
-			}()
-
-			if hasValue {
-				loggerGlobal.feature("send(.internal(.markBackupNeeded))")
-				await send(.internal(.markBackupNeeded))
-			} else {
-				loggerGlobal.feature("hasValue no value...")
+			guard
+				let portfolio = try? await accountPortfoliosClient.fetchAccountPortfolio(address, false),
+				let xrdResource = portfolio.fungibleResources.xrdResource, xrdResource.amount > .zero
+			else {
+				// no value
+				return
 			}
+
+			await send(.internal(.markBackupNeeded))
 		}
 	}
 }

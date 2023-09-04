@@ -257,9 +257,7 @@ extension MnemonicWithPassphrase {
 	) throws -> Bool {
 		let hdRoot = try self.hdRoot()
 
-		for account in accounts {
-			let (path, publicKey) = account
-
+		for (path, publicKey) in accounts {
 			let derivedPublicKey: SLIP10.PublicKey = try {
 				switch publicKey.curve {
 				case .secp256k1:

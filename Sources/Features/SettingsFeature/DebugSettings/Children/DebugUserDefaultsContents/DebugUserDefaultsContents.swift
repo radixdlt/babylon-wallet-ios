@@ -37,9 +37,9 @@ public struct DebugUserDefaultsContents: Sendable, FeatureReducer {
 			return .none
 
 		case .removeAllButtonTapped:
-			return .task {
+			return .run { send in
 				await userDefaultsClient.removeAll(but: [.activeProfileID])
-				return .internal(.removedAll)
+				await send(.internal(.removedAll))
 			}
 		}
 	}

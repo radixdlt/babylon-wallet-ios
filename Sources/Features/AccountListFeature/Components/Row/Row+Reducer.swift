@@ -118,12 +118,11 @@ extension AccountList {
 				assert(portfolio.owner == state.account.address)
 				state.portfolio = .success(portfolio)
 
-				state.hasValue = {
-					guard let xrdResource = portfolio.fungibleResources.xrdResource, xrdResource.amount > .zero else {
-						return false
-					}
-					return true
-				}()
+				if let xrdResource = portfolio.fungibleResources.xrdResource {
+					state.hasValue = xrdResource.amount > 0
+				} else {
+					state.hasValue = false
+				}
 
 				// FIXME: This is lazy code... we "piggyback" on the fact that `accountPortfolioUpdate` happens frequently.. as a means to update state.
 				checkIfCallActionIsNeeded(state: &state)
