@@ -63,7 +63,7 @@ public struct ConnectUsingSecrets: Sendable, FeatureReducer {
 					await send(.internal(.focusTextField(focus)))
 				} catch {
 					/* noop */
-					loggerGlobal.error("failed to sleep or task cancelled? error: \(String(describing: error))")
+					loggerGlobal.error("failed to sleep or task cancelled, error: \(String(describing: error))")
 				}
 			}
 			.cancellable(id: FocusFieldID.self)

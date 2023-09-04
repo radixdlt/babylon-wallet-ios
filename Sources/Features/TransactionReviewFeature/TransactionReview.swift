@@ -93,7 +93,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		case closeTapped
 		case showRawTransactionTapped
 
-		case approveTransaction
+		case approvalSliderSlid
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -226,7 +226,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 				return .none
 			}
 
-		case .approveTransaction:
+		case .approvalSliderSlid:
 			state.canApproveTX = false
 			state.printFeePayerInfo()
 			do {
@@ -344,12 +344,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 
 		case let .customizeFees(.delegate(.updated(reviewedTransaction))):
 			state.reviewedTransaction = reviewedTransaction
-
-			// FIXME: Cyon: this looks wrong? Why are we only updating `state.networkFee` if `state.reviewedTransaction` WAS nil.
-			if let reviewedTransaction = state.reviewedTransaction {
-				state.networkFee = .init(reviewedTransaction: reviewedTransaction)
-			}
-
+			state.networkFee = .init(reviewedTransaction: reviewedTransaction)
 			state.printFeePayerInfo()
 			return .none
 
