@@ -274,7 +274,13 @@ extension View {
 			store: destinationStore,
 			state: /TransactionReview.Destinations.State.dApp,
 			action: TransactionReview.Destinations.Action.dApp,
-			content: { SimpleDappDetails.View(store: $0) }
+			content: { detailsStore in
+				WithNavigationBar {
+					destinationStore.send(.dismiss)
+				} content: {
+					SimpleDappDetails.View(store: detailsStore)
+				}
+			}
 		)
 	}
 
