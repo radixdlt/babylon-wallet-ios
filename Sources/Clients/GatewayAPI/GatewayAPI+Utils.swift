@@ -159,6 +159,8 @@ extension GatewayAPI.EntityMetadataCollection {
 		case accountTypeNotDappDefinition
 		case missingClaimedEntities
 		case entityNotClaimed
+		case missingClaimedWebsites
+		case websiteNotClaimed
 		case dAppDefinitionNotReciprocating
 
 		public var description: String {
@@ -173,6 +175,10 @@ extension GatewayAPI.EntityMetadataCollection {
 				return "The dapp definition has no claimed_entities key"
 			case .entityNotClaimed:
 				return "The entity is not claimed by the dApp definition"
+			case .missingClaimedWebsites:
+				return "The dapp definition has no claimed_websites key"
+			case .websiteNotClaimed:
+				return "The website is not claimed by the dApp definition"
 			case .dAppDefinitionNotReciprocating:
 				return "This dApp definition does not point back to the dApp definition that claims to be associated with it"
 			}

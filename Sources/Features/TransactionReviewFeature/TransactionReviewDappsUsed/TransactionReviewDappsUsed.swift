@@ -4,11 +4,13 @@ import FeaturePrelude
 public struct TransactionReviewDappsUsed: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public var isExpanded: Bool
-		public var dApps: IdentifiedArrayOf<TransactionReview.DappEntity>
+		public var knownDapps: IdentifiedArrayOf<TransactionReview.DappEntity>
+		public var unknownDapps: Int
 
-		public init(isExpanded: Bool, dApps: IdentifiedArrayOf<TransactionReview.DappEntity>) {
+		public init(isExpanded: Bool, knownDapps: IdentifiedArrayOf<TransactionReview.DappEntity>, unknownDapps: Int) {
 			self.isExpanded = isExpanded
-			self.dApps = dApps
+			self.knownDapps = knownDapps
+			self.unknownDapps = unknownDapps
 		}
 	}
 
