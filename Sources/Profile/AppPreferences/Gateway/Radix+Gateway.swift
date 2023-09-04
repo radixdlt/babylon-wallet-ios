@@ -28,6 +28,13 @@ extension Radix.Gateway {
 }
 
 extension Radix.Gateway {
+	public static var mainnet: Self {
+		.init(
+			network: .mainnet,
+			url: URL(string: "https://mainnet.radixdlt.com/")!
+		)
+	}
+
 	public static var rcnet: Self {
 		.init(
 			network: .zabanet,

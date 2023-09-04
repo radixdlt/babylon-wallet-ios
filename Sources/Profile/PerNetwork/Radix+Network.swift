@@ -34,6 +34,12 @@ extension Radix {
 extension Radix.Network {
 	public typealias Name = Tagged<Self, String>
 
+	public static let mainnet = Self(
+		name: "mainnet",
+		id: .mainnet,
+		displayDescription: "Mainnet"
+	)
+
 	public static let nebunet = Self(
 		name: "nebunet",
 		id: .nebunet,
@@ -82,6 +88,7 @@ extension Radix.Network {
 
 extension Radix.Network {
 	fileprivate static let lookupSet: Set<Self> = [
+		.mainnet,
 		.nebunet,
 		.kisharnet,
 		.ansharnet,
