@@ -65,7 +65,11 @@ public struct DisplayMnemonic: Sendable, FeatureReducer {
 
 			state.importMnemonic = .init(
 				warning: L10n.RevealSeedPhrase.warning,
-				mnemonicWithPassphrase: mnemonicWithPassphrase
+				mnemonicWithPassphrase: mnemonicWithPassphrase,
+				readonlyMode: .init(
+					context: .fromSettings,
+					factorSourceKind: state.deviceFactorSource.factorSourceKind
+				)
 			)
 			return .none
 

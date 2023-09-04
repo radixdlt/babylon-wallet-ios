@@ -148,6 +148,7 @@ public struct ProfileBackupSettings: Sendable, FeatureReducer {
 	@Dependency(\.appPreferencesClient) var appPreferencesClient
 	@Dependency(\.radixConnectClient) var radixConnectClient
 	@Dependency(\.overlayWindowClient) var overlayWindowClient
+	@Dependency(\.userDefaultsClient) var userDefaultsClient
 
 	public init() {}
 
@@ -297,6 +298,7 @@ public struct ProfileBackupSettings: Sendable, FeatureReducer {
 		.task {
 			cacheClient.removeAll()
 			await radixConnectClient.disconnectAndRemoveAll()
+			await userDefaultsClient.removeAll()
 			return .delegate(.deleteProfileAndFactorSources(keepInICloudIfPresent: keepInICloudIfPresent))
 		}
 	}

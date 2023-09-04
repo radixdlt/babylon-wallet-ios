@@ -55,7 +55,7 @@ public struct FungibleResourceAsset: Sendable, FeatureReducer {
 		case let .amountChanged(transferAmountStr):
 			state.transferAmountStr = transferAmountStr
 
-			if let value = try? BigDecimal(localizedFromString: transferAmountStr), value > 0 {
+			if let value = try? BigDecimal(localizedFromString: transferAmountStr), value >= 0 {
 				state.transferAmount = value
 			} else {
 				state.transferAmount = nil

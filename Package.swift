@@ -22,6 +22,9 @@ package.addModules([
 			"AssetTransferFeature",
 			"AccountPortfoliosClient",
 			"AssetsFeature",
+			"ImportMnemonicFeature",
+			"ProfileBackupsFeature",
+			"BackupsClient",
 		],
 		tests: .yes()
 	),
@@ -30,6 +33,7 @@ package.addModules([
 		dependencies: [
 			"AccountPortfoliosClient",
 			"FactorSourcesClient", // check if `device` or `ledger` controlled for security prompting
+			"AccountDetailsFeature", // "shield buttons"
 		],
 		tests: .no
 	),
@@ -245,6 +249,8 @@ package.addModules([
 			"AccountsClient",
 			"AppPreferencesClient",
 			"CreateAccountFeature",
+			"ImportMnemonicFeature",
+			"ProfileBackupsFeature", // actually only ImportMnemonicsFlowCoodinator, might split it out in future
 		],
 		tests: .yes()
 	),
@@ -391,26 +397,27 @@ package.addModules([
 		dependencies: [
 			"AccountsClient",
 			"AddLedgerFactorSourceFeature",
-			"ImportOlympiaLedgerAccountsAndFactorSourcesFeature",
 			"AppPreferencesClient",
 			"AuthorizedDAppsFeature",
 			"CacheClient",
-			"DeviceFactorSourceClient",
 			"DebugInspectProfileFeature",
+			"DeviceFactorSourceClient",
+			"DisplayEntitiesControlledByMnemonicFeature",
+			"EditPersonaFeature",
+			"EngineKit",
+			"FactorSourcesClient", // Check if user has any ledgers
+			"FaucetClient", //  EpochForWhenLastUsedByAccountAddress
 			"GatewayAPI",
 			"GatewaySettingsFeature",
-			"DisplayEntitiesControlledByMnemonicFeature",
 			"ImportMnemonicFeature",
-			"FactorSourcesClient", // Check if user has any ledgers
+			"ImportOlympiaLedgerAccountsAndFactorSourcesFeature",
 			"ImportLegacyWalletClient",
 			"P2PLinksFeature",
 			"PersonasFeature",
 			"RadixConnectClient",
+			"ProfileBackupsFeature",
 			"ScanQRFeature",
 			"SecurityStructureConfigurationListFeature",
-			"EditPersonaFeature",
-			"ProfileBackupsFeature",
-			"EngineKit",
 		],
 		tests: .yes()
 	),

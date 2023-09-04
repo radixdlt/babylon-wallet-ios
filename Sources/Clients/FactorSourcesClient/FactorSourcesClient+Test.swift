@@ -28,7 +28,7 @@ extension FactorSourcesClient: TestDependencyKey {
 		getFactorSources: { throw NoopError() },
 		factorSourcesAsyncSequence: { AsyncLazySequence([]).eraseToAnyAsyncSequence() },
 		addPrivateHDFactorSource: { _ in throw NoopError() },
-		checkIfHasOlympiaFactorSourceForAccounts: { _ in nil },
+		checkIfHasOlympiaFactorSourceForAccounts: { _, _ in nil },
 		saveFactorSource: { _ in },
 		updateFactorSource: { _ in },
 		getSigningFactors: { _ in throw NoopError() },

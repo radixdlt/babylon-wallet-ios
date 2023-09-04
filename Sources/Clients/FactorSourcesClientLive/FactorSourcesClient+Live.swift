@@ -66,28 +66,38 @@ extension FactorSourcesClient: DependencyKey {
 
 				return factorSourceID
 			},
-			checkIfHasOlympiaFactorSourceForAccounts: { softwareAccounts -> FactorSourceID.FromHash? in
+			checkIfHasOlympiaFactorSourceForAccounts: { wordCount, softwareAccounts -> FactorSourceID.FromHash? in
 				guard softwareAccounts.allSatisfy({ $0.accountType == .software }) else {
 					assertionFailure("Unexpectedly received hardware account, unable to verify.")
 					return nil
 				}
 				do {
 					// Might be empty, if it is, we will just return nil (for-loop below not run).
-					let factorSourceIDs = try await getFactorSources()
+					let olympiaDeviceFactorSources: [DeviceFactorSource] = try await getFactorSources()
 						.filter(\.supportsOlympia)
 						.filter { $0.kind == .device }
-						.map(\.id)
+						.compactMap {
+							guard
+								let deviceFactorSource = try? $0.extract(as: DeviceFactorSource.self),
+								deviceFactorSource.hint.mnemonicWordCount == wordCount
+							else {
+								return nil
+							}
+							return deviceFactorSource
+						}
+
+					let factorSourceIDs = olympiaDeviceFactorSources.map(\.id)
 
 					for factorSourceID in factorSourceIDs {
-						guard let mnemonic = try await secureStorageClient.loadMnemonicByFactorSourceID(factorSourceID, .importOlympiaAccounts) else {
+						guard let mnemonic = try await secureStorageClient.loadMnemonicByFactorSourceID(factorSourceID.embed(), .importOlympiaAccounts) else {
 							continue
 						}
-						guard try mnemonic.validatePublicKeys(of: softwareAccounts) else {
+						guard (try? mnemonic.validatePublicKeys(of: softwareAccounts)) == true else {
 							continue
 						}
 						// YES Managed to validate all software accounts against existing factor source
 						loggerGlobal.debug("Existing factor source found for selected Olympia software accounts.")
-						return factorSourceID.extract(FactorSourceID.FromHash.self)
+						return factorSourceID
 					}
 
 					return nil // Did not find any Olympia `.device` factor sources
