@@ -145,6 +145,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 	@Dependency(\.accountsClient) var accountsClient
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.secureStorageClient) var secureStorageClient
+	@Dependency(\.continuousClock) var clock
 
 	public init() {}
 
@@ -161,23 +162,24 @@ public struct AccountDetails: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .task:
-			let effect: EffectTask<Action>
+			return .run { [state] send in
 
-			let runEffect = EffectTask<Action>.run { [address = state.account.address] send in
-				for try await accountUpdate in await accountsClient.accountUpdates(address) {
+				func delay() async {
+					// navigation bug if we try to "deep link" too fast..
+					try? await clock.sleep(for: .milliseconds(900))
+				}
+				if state.importMnemonicPrompt.deepLinkTo {
+					await delay()
+					await send(.internal(.loadImport))
+				} else if state.exportMnemonicPrompt.deepLinkTo {
+					await delay()
+					await send(.internal(.loadMnemonic))
+				}
+				for try await accountUpdate in await accountsClient.accountUpdates(state.account.address) {
 					guard !Task.isCancelled else { return }
 					await send(.internal(.accountUpdated(accountUpdate)))
 				}
 			}
-
-			if state.importMnemonicPrompt.deepLinkTo {
-				effect = loadImport().concatenate(with: runEffect)
-			} else if state.exportMnemonicPrompt.deepLinkTo {
-				effect = loadMnemonic(state: state).concatenate(with: runEffect)
-			} else {
-				effect = runEffect
-			}
-			return effect
 
 		case .backButtonTapped:
 			return .send(.delegate(.dismiss))
@@ -299,8 +301,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 	}
 
 	private func loadImport() -> EffectTask<Action> {
-		loggerGlobal.feature("implement import")
-		return .task {
+		.task {
 			let result = await TaskResult { try await backupsClient.snapshotOfProfileForExport() }
 			return .internal(.loadProfileSnapshotForRecoverMnemonicsFlow(result))
 		}
