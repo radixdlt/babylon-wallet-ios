@@ -31,7 +31,6 @@ public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 		public var body: some ReducerProtocolOf<Self> {
 			Scope(state: /State.importMnemonicControllingAccounts, action: /Action.importMnemonicControllingAccounts) {
 				ImportMnemonicControllingAccounts()
-					._printChanges()
 			}
 		}
 	}

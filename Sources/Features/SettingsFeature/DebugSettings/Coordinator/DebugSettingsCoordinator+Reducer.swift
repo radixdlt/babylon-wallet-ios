@@ -60,7 +60,6 @@ public struct DebugSettingsCoordinator: Sendable, FeatureReducer {
 			}
 			Scope(state: /State.securityStructureConfigs, action: /Action.securityStructureConfigs) {
 				SecurityStructureConfigurationListCoordinator()
-					._printChanges()
 			}
 		}
 	}

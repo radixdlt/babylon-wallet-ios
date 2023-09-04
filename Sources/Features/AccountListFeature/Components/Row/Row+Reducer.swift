@@ -112,6 +112,8 @@ extension AccountList {
 			switch internalAction {
 			case let .accountPortfolioUpdate(portfolio):
 
+				// FIXME: Refactor account security prompts to share logic between this reducer and AccountDetails
+
 				state.isDappDefinitionAccount = portfolio.isDappDefintionAccountType
 				assert(portfolio.owner == state.account.address)
 				state.portfolio = .success(portfolio)
@@ -130,6 +132,7 @@ extension AccountList {
 			}
 		}
 
+		// FIXME: Refactor account security prompts to share logic between this reducer and AccountDetails
 		private func checkIfCallActionIsNeeded(state: inout State) {
 			guard state.deviceFactorSourceControlled != nil else { return }
 

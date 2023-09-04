@@ -118,7 +118,6 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 			}
 			Scope(state: /State.importMnemonic, action: /Action.importMnemonic) {
 				ImportMnemonic()
-					._printChanges()
 			}
 			Scope(state: /State.importOlympiaLedgerAccountsAndFactorSources, action: /Action.importOlympiaLedgerAccountsAndFactorSources) {
 				ImportOlympiaLedgerAccountsAndFactorSources()

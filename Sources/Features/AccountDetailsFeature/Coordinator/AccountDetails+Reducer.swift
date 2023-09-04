@@ -89,6 +89,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 	}
 
 	public enum InternalAction: Sendable, Equatable {
+		case markBackupNeeded
 		case accountUpdated(Profile.Network.Account)
 
 		case loadMnemonic
@@ -218,7 +219,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 				state.exportMnemonicPrompt = .no
 			}
 			state.destination = nil
-			return .none
+			return checkAccountSecurityPromptStatus(state: &state)
 
 		case let .destination(.presented(.importMnemonics(.delegate(delegateAction)))):
 			switch delegateAction {
@@ -235,7 +236,11 @@ public struct AccountDetails: Sendable, FeatureReducer {
 				}
 			}
 			state.destination = nil
-			return .none
+			return checkAccountSecurityPromptStatus(state: &state)
+
+		case .destination(.dismiss):
+			loggerGlobal.feature("Dismissed child")
+			return checkAccountSecurityPromptStatus(state: &state)
 
 		default:
 			return .none
@@ -244,6 +249,10 @@ public struct AccountDetails: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
+		case .markBackupNeeded:
+			state.exportMnemonicPrompt = .init(needed: true)
+			return .none
+
 		case .loadMnemonic:
 			return loadMnemonic(state: state)
 
@@ -304,6 +313,69 @@ public struct AccountDetails: Sendable, FeatureReducer {
 		.task {
 			let result = await TaskResult { try await backupsClient.snapshotOfProfileForExport() }
 			return .internal(.loadProfileSnapshotForRecoverMnemonicsFlow(result))
+		}
+	}
+
+	// FIXME: Refactor account security prompts to share logic between this reducer and Row+Reducer (AccountList)
+	private func checkAccountSecurityPromptStatus(state: inout State) -> EffectTask<Action> {
+		@Dependency(\.accountPortfoliosClient) var accountPortfoliosClient
+		@Dependency(\.userDefaultsClient) var userDefaultsClient
+
+		let isRecoveryOfMnemonicNeeded = userDefaultsClient
+			.getAddressesOfAccountsThatNeedRecovery()
+			.contains(where: { $0 == state.account.address })
+
+		if isRecoveryOfMnemonicNeeded {
+			loggerGlobal.feature("import needed! Returnung...")
+			state.importMnemonicPrompt = .init(needed: true)
+			// do not care about export if import is needed
+			return .none
+		}
+		loggerGlobal.feature("import NOT needed, checking export")
+
+		let givenHasValueNeedToBackUpMnemonic: Bool = {
+			switch state.account.securityState {
+			case let .unsecured(unsecuredEntityControl):
+				guard unsecuredEntityControl.transactionSigning.factorSourceID.kind == .device else {
+					return false
+				}
+				let hasAlreadyBackedUpMnemonic = userDefaultsClient.getFactorSourceIDOfBackedUpMnemonics().contains(unsecuredEntityControl.transactionSigning.factorSourceID)
+
+				if hasAlreadyBackedUpMnemonic {
+					loggerGlobal.feature("Has already backed up mnemonic")
+				}
+
+				return !hasAlreadyBackedUpMnemonic
+			}
+
+		}()
+
+		guard givenHasValueNeedToBackUpMnemonic else {
+			loggerGlobal.feature("Accout not controlled by mnemonic, or already backed up mnemonic")
+			return .none
+		}
+
+		loggerGlobal.feature("Export maybe needed (has not backed up mnemonic), checking if has value")
+
+		return .run { [address = state.account.address] send in
+			let hasValue: Bool = await {
+				do {
+					let portfolio = try await accountPortfoliosClient.fetchAccountPortfolio(address, false)
+					guard let xrdResource = portfolio.fungibleResources.xrdResource, xrdResource.amount > .zero else {
+						return false
+					}
+					return true
+				} catch {
+					return false
+				}
+			}()
+
+			if hasValue {
+				loggerGlobal.feature("send(.internal(.markBackupNeeded))")
+				await send(.internal(.markBackupNeeded))
+			} else {
+				loggerGlobal.feature("hasValue no value...")
+			}
 		}
 	}
 }
