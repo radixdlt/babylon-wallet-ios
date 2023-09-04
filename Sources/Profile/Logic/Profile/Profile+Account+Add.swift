@@ -44,7 +44,8 @@ extension Profile {
 		try updateOnNetwork(network)
 	}
 
-	/// Saves an `Account` into the profile
+	/// Saves an `Account` into the profile, if this is the first mainnet account,
+	/// we will switch to mainnet
 	public mutating func addAccount(
 		_ account: Profile.Network.Account
 	) throws {
@@ -65,10 +66,18 @@ extension Profile {
 				personas: [],
 				authorizedDapps: []
 			)
-			if network.networkID == .mainnet {
-				loggerGlobal.feature("Creating mainnet 😎")
-			}
 			try networks.add(network)
+
+			if network.networkID == .mainnet {
+				loggerGlobal.feature("Creating first mainnet account 😎 switching to mainnet")
+				do {
+					try changeGateway(to: .mainnet)
+				} catch {
+					let errorMsg = "Failed to switch to mainnet, even though we just created a first mainnet account, error: \(error)"
+					loggerGlobal.critical(.init(stringLiteral: errorMsg))
+					assertionFailure(errorMsg) // for production, we will not crash
+				}
+			}
 		}
 	}
 }

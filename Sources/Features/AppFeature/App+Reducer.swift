@@ -4,7 +4,6 @@ import EngineKit
 import FeaturePrelude
 import GatewayAPI
 import MainFeature
-import NetworkSwitchingClient
 import OnboardingClient
 import OnboardingFeature
 import SecureStorageClient
@@ -73,7 +72,6 @@ public struct App: Sendable, FeatureReducer {
 	@Dependency(\.gatewayAPIClient) var gatewayAPIClient
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.appPreferencesClient) var appPreferencesClient
-	@Dependency(\.networkSwitchingClient) var networkSwitchingClient
 
 	public init() {}
 
@@ -153,10 +151,8 @@ public struct App: Sendable, FeatureReducer {
 		case let .onboardTestnetUserToMainnet(.delegate(onboardTestnetUserToMainnetDelegate)):
 			switch onboardTestnetUserToMainnetDelegate {
 			case .completed:
-				return .run { send in
-					_ = try? await networkSwitchingClient.switchTo(.mainnet)
-					await send(.internal(.toMain(isAccountRecoveryNeeded: false)))
-				}
+				// We should have switched to mainnet already, part of onboarding
+				return .send(.internal(.toMain(isAccountRecoveryNeeded: false)))
 
 			case .dismissed:
 				assertionFailure("Expected to have created account on mainnet, but the create account flow got dismissed, it should NOT be dismissable.")
