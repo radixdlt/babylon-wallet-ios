@@ -24,14 +24,18 @@ extension ChooseReceivingAccount {
 					return .none
 				}
 
-				guard let validateAccountAddress = state.validatedAccountAddress else {
+				switch state.validateManualAccountAddress() {
+				case .invalid:
 					return .error(L10n.AssetTransfer.ChooseReceivingAccount.invalidAddressError)
+				case .wrongNetwork:
+					return .error("Address is not valid on current network") // FIXME: Strings
+				case let .valid(validAddress):
+					if state.chooseAccounts.filteredAccounts.contains(where: { $0 == validAddress }) {
+						return .error(L10n.AssetTransfer.ChooseReceivingAccount.alreadyAddedError)
+					}
+					return .none
 				}
 
-				if state.chooseAccounts.filteredAccounts.contains(where: { $0 == validateAccountAddress }) {
-					return .error(L10n.AssetTransfer.ChooseReceivingAccount.alreadyAddedError)
-				}
-				return .none
 			}()
 			canSelectOwnAccount = manualAccountAddress.isEmpty
 		}

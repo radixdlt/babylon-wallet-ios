@@ -17,24 +17,37 @@ public struct ChooseReceivingAccount: Sendable, FeatureReducer {
 
 		var manualAccountAddressFocused: Bool = false
 
-		var validatedAccountAddress: AccountAddress? {
-			if !manualAccountAddress.isEmpty,
-			   !chooseAccounts.filteredAccounts.contains(where: { $0.address == manualAccountAddress })
-			{
-				guard
-					let addressOnSomeNetwork = try? AccountAddress(validatingAddress: manualAccountAddress),
-					let engineAddress = try? addressOnSomeNetwork.intoEngine()
-				else {
-					return nil
-				}
-				let networkOfAddress = engineAddress.networkId()
-				guard networkOfAddress == networkID.rawValue else {
-					loggerGlobal.warning("Manually inputted address is valid, but is on the WRONG network, inputted: \(networkOfAddress), but current network is: \(networkID.rawValue)")
-					return nil
-				}
-				return addressOnSomeNetwork
+		public enum AddressValidation: Sendable, Hashable {
+			case valid(AccountAddress)
+			case wrongNetwork(AccountAddress, incorrectNetwork: UInt8)
+			case invalid
+		}
+
+		func validateManualAccountAddress() -> AddressValidation {
+			guard !manualAccountAddress.isEmpty,
+			      !chooseAccounts.filteredAccounts.contains(where: { $0.address == manualAccountAddress })
+			else {
+				return .invalid
 			}
-			return nil
+			guard
+				let addressOnSomeNetwork = try? AccountAddress(validatingAddress: manualAccountAddress),
+				let engineAddress = try? addressOnSomeNetwork.intoEngine()
+			else {
+				return .invalid
+			}
+			let networkOfAddress = engineAddress.networkId()
+			guard networkOfAddress == networkID.rawValue else {
+				loggerGlobal.warning("Manually inputted address is valid, but is on the WRONG network, inputted: \(networkOfAddress), but current network is: \(networkID.rawValue)")
+				return .wrongNetwork(addressOnSomeNetwork, incorrectNetwork: networkOfAddress)
+			}
+			return .valid(addressOnSomeNetwork)
+		}
+
+		var validatedAccountAddress: AccountAddress? {
+			guard case let .valid(address) = validateManualAccountAddress() else {
+				return nil
+			}
+			return address
 		}
 
 		let networkID: NetworkID
