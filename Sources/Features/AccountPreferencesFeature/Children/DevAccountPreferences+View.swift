@@ -11,6 +11,7 @@ extension DevAccountPreferences.State {
 	var viewState: DevAccountPreferences.ViewState {
 		#if DEBUG
 		return .init(
+			isOnMainnet: isOnMainnet,
 			faucetButtonState: faucetButtonState,
 			canTurnIntoDappDefinitionAccounType: canTurnIntoDappDefinitionAccountType,
 			canCreateAuthSigningKey: canCreateAuthSigningKey,
@@ -28,6 +29,7 @@ extension DevAccountPreferences.State {
 // MARK: - AccountPreferences.View
 extension DevAccountPreferences {
 	public struct ViewState: Equatable {
+		public let isOnMainnet: Bool
 		public var faucetButtonState: ControlState
 
 		#if DEBUG
@@ -41,6 +43,7 @@ extension DevAccountPreferences {
 
 		#if DEBUG
 		public init(
+			isOnMainnet: Bool,
 			faucetButtonState: ControlState,
 			canTurnIntoDappDefinitionAccounType: Bool,
 			canCreateAuthSigningKey: Bool,
@@ -49,6 +52,7 @@ extension DevAccountPreferences {
 			createMultipleFungibleTokenButtonState: ControlState,
 			createMultipleNonFungibleTokenButtonState: ControlState
 		) {
+			self.isOnMainnet = isOnMainnet
 			self.faucetButtonState = faucetButtonState
 			self.canTurnIntoDappDefinitionAccounType = canTurnIntoDappDefinitionAccounType
 			self.canCreateAuthSigningKey = canCreateAuthSigningKey
@@ -76,7 +80,9 @@ extension DevAccountPreferences {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				NavigationStack {
 					VStack(alignment: .leading) {
-						faucetButton(with: viewStore)
+						if !viewStore.isOnMainnet {
+							faucetButton(with: viewStore)
+						}
 						#if DEBUG
 						turnIntoDappDefinitionAccountTypeButton(with: viewStore)
 						createAndUploadAuthKeyButton(with: viewStore)

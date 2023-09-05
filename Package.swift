@@ -44,6 +44,7 @@ package.addModules([
 			"AccountPortfoliosClient",
 			"CreateAuthKeyFeature",
 			"ShowQRFeature",
+			"GatewaysClient",
 			"OverlayWindowClient",
 			"OnLedgerEntitiesClient",
 		],

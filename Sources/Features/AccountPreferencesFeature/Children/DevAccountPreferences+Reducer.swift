@@ -5,6 +5,7 @@ import EngineKit
 import FaucetClient
 import FeaturePrelude
 import GatewayAPI
+import GatewaysClient
 import ShowQRFeature
 
 #if DEBUG
@@ -17,6 +18,7 @@ public struct DevAccountPreferences: Sendable, FeatureReducer {
 	// MARK: - State
 
 	public struct State: Sendable, Hashable {
+		public var isOnMainnet: Bool
 		public let address: AccountAddress
 		public var faucetButtonState: ControlState
 
@@ -33,9 +35,11 @@ public struct DevAccountPreferences: Sendable, FeatureReducer {
 		#endif
 
 		public init(
+			isOnMainnet: Bool = true, // safest to defalt to true and change to false, we REALLY do not wanna display the faucet button for mainnet
 			address: AccountAddress,
 			faucetButtonState: ControlState = .enabled
 		) {
+			self.isOnMainnet = isOnMainnet
 			self.address = address
 			self.faucetButtonState = faucetButtonState
 
@@ -70,6 +74,7 @@ public struct DevAccountPreferences: Sendable, FeatureReducer {
 	}
 
 	public enum InternalAction: Sendable, Equatable {
+		case currentNetwork(Radix.Network)
 		case isAllowedToUseFaucet(TaskResult<Bool>)
 		case callDone(updateControlState: WritableKeyPath<State, ControlState>, changeTo: ControlState = .enabled)
 		case refreshAccountCompleted(TaskResult<AccountPortfolio>)
@@ -128,6 +133,7 @@ public struct DevAccountPreferences: Sendable, FeatureReducer {
 	@Dependency(\.faucetClient) var faucetClient
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.accountPortfoliosClient) var accountPortfoliosClient
+	@Dependency(\.gatewaysClient) var gatewaysClient
 
 	#if DEBUG
 	@Dependency(\.gatewayAPIClient) var gatewayAPIClient
@@ -145,7 +151,8 @@ public struct DevAccountPreferences: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .appeared:
-			return loadIsAllowedToUseFaucet(&state)
+			return loadCurrentNetwork()
+				.concatenate(with: loadIsAllowedToUseFaucet(&state))
 			#if DEBUG
 				.concatenate(with: loadCanCreateAuthSigningKey(state))
 				.concatenate(with: loadCanTurnIntoDappDefAccountType(state))
@@ -252,6 +259,10 @@ public struct DevAccountPreferences: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
+		case let .currentNetwork(currentNetwork):
+			state.isOnMainnet = currentNetwork == .mainnet
+			return .none
+
 		case let .isAllowedToUseFaucet(.success(value)):
 			state.faucetButtonState = value ? .enabled : .disabled
 			return .none
@@ -329,6 +340,13 @@ extension DevAccountPreferences {
 			await send(.internal(.refreshAccountCompleted(
 				TaskResult { try await accountPortfoliosClient.fetchAccountPortfolio(address, true) }
 			)))
+		}
+	}
+
+	private func loadCurrentNetwork() -> EffectTask<Action> {
+		.run { send in
+			let currentGateway = await gatewaysClient.getCurrentGateway()
+			await send(.internal(.currentNetwork(currentGateway.network)))
 		}
 	}
 
