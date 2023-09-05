@@ -156,7 +156,14 @@ public struct App: Sendable, FeatureReducer {
 		case let .toOnboarding(hasMainnetEverBeenLive):
 			return goToOnboarding(state: &state, hasMainnetEverBeenLive: hasMainnetEverBeenLive)
 		case let .currentGatewayChanged(currentGateway):
-			state.showIsUsingTestnetBanner = currentGateway.network.id != .mainnet
+			switch state.root {
+			case .onboardTestnetUserToMainnet:
+				// Not pretty, but it works and is temporary.
+				// we cannot use `state.showIsUsingTestnetBanner = currentGateway.network.id != .mainnet` in this case because if the user just finished
+				break
+			default:
+				state.showIsUsingTestnetBanner = currentGateway.network.id != .mainnet
+			}
 			return .none
 		}
 	}
@@ -225,9 +232,10 @@ public struct App: Sendable, FeatureReducer {
 		state: inout State
 	) -> EffectTask<Action> {
 		if !hasMainnetAccounts, hasMainnetEverBeenLive {
+			loggerGlobal.notice("Mainnet has been live, but has no accounts => onboarding existing user to Mainnet")
+			state.root = .onboardTestnetUserToMainnet(.init(config: .init(purpose: .firstAccountOnNewNetwork(.mainnet))))
 			state.showIsUsingTestnetBanner = false
-			loggerGlobal.feature("mainnet is live, but has no accounts => onboarding existing user to mainnet")
-			return onboardUserToMainnet(state: &state)
+			return .none
 		} else {
 			return goToMain(state: &state, accountRecoveryIsNeeded: accountRecoveryIsNeeded)
 		}
@@ -238,11 +246,6 @@ public struct App: Sendable, FeatureReducer {
 			let hasMainnetEverBeenLive = await networkSwitchingClient.hasMainnetEverBeenLive()
 			await send(.internal(.toOnboarding(hasMainnetEverBeenLive: hasMainnetEverBeenLive)))
 		}
-	}
-
-	func onboardUserToMainnet(state: inout State) -> EffectTask<Action> {
-		state.root = .onboardTestnetUserToMainnet(.init(config: .init(purpose: .firstAccountOnNewNetwork(.mainnet))))
-		return .none
 	}
 
 	func incompatibleSnapshotData(
