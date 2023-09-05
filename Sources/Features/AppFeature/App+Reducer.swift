@@ -225,6 +225,7 @@ public struct App: Sendable, FeatureReducer {
 		state: inout State
 	) -> EffectTask<Action> {
 		if !hasMainnetAccounts, hasMainnetEverBeenLive {
+			state.showIsUsingTestnetBanner = false
 			loggerGlobal.feature("mainnet is live, but has no accounts => onboarding existing user to mainnet")
 			return onboardUserToMainnet(state: &state)
 		} else {
