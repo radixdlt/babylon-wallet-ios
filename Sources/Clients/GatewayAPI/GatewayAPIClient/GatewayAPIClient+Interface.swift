@@ -95,21 +95,21 @@ extension GatewayAPIClient {
 		validatingDappDefinitionAddress dappDefinitionAddress: DappDefinitionAddress? = nil,
 		validatingWebsite website: URL? = nil
 	) async throws -> GatewayAPI.EntityMetadataCollection {
-		let dappDefinition = try await getEntityMetadata(dappDefinition.address, [.accountType, .name, .description, .iconURL, .claimedEntities, .claimedWebsites, .dappDefinitions, .symbol])
+		let dappMetadata = try await getEntityMetadata(dappDefinition.address, [.accountType, .name, .description, .iconURL, .claimedEntities, .claimedWebsites, .dappDefinitions, .symbol])
 
-		try dappDefinition.validateAccountType()
+		try dappMetadata.validateAccountType()
 
 		if let component {
-			try dappDefinition.validate(dAppComponent: component)
+			try dappMetadata.validate(dAppComponent: component)
 		}
 		if let dappDefinitionAddress {
-			try dappDefinition.validate(dAppDefinitionAddress: dappDefinitionAddress)
+			try dappMetadata.validate(dAppDefinitionAddress: dappDefinitionAddress)
 		}
 		if let website {
-			try dappDefinition.validate(website: website)
+			try dappMetadata.validate(website: website)
 		}
 
-		return dappDefinition
+		return dappMetadata
 	}
 
 	// The maximum number of addresses the `getEntityDetails` can accept
