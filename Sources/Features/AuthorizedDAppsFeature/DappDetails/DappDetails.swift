@@ -14,6 +14,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 	@Dependency(\.openURL) var openURL
 	@Dependency(\.authorizedDappsClient) var authorizedDappsClient
 	@Dependency(\.cacheClient) var cacheClient
+	@Dependency(\.continuousClock) var clock
 
 	public struct FailedToLoadMetadata: Error, Hashable {}
 
@@ -330,7 +331,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 		let (dAppID, networkID) = (dApp.dAppDefinitionAddress, dApp.networkID)
 		return .run { send in
 			if let delay {
-				try await Task.sleep(for: delay)
+				try await clock.sleep(for: delay)
 			}
 			try await authorizedDappsClient.forgetAuthorizedDapp(dAppID, networkID)
 			await send(.delegate(.dAppForgotten))

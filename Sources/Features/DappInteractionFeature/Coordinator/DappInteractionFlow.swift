@@ -90,6 +90,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 		)
 		case presentPersonaNotFoundErrorAlert(reason: String)
 		case autofillOngoingResponseItemsIfPossible(AutofillOngoingResponseItemsPayload)
+		case delayedAppendToPath(DappInteractionFlow.Destinations.State)
 
 		struct AutofillOngoingResponseItemsPayload: Sendable, Equatable {
 			struct AccountsPayload: Sendable, Equatable {
@@ -176,6 +177,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 	@Dependency(\.personasClient) var personasClient
 	@Dependency(\.accountsClient) var accountsClient
 	@Dependency(\.authorizedDappsClient) var authorizedDappsClient
+	@Dependency(\.continuousClock) var clock
 
 	func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
@@ -247,6 +249,10 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 				)
 			}
 			return continueEffect(for: &state)
+
+		case let .delayedAppendToPath(destination):
+			state.path.append(destination)
+			return .none
 
 		case let .presentPersonaNotFoundErrorAlert(reason):
 			state.personaNotFoundErrorAlert = .init(
@@ -514,7 +520,11 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			if state.root == nil {
 				state.root = destination
 			} else if state.path.last != destination {
-				state.path.append(destination)
+				return .task {
+					/// For more information about that `sleep` and not setting it directly here please check [this discussion in Slack](https://rdxworks.slack.com/archives/C03QFAWBRNX/p1693395346047829?thread_ts=1693388110.800679&cid=C03QFAWBRNX)
+					try? await clock.sleep(for: .milliseconds(250))
+					return .internal(.delayedAppendToPath(destination))
+				}
 			}
 			return .none
 		} else {
