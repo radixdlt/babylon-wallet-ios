@@ -205,9 +205,6 @@ extension View {
 			.personas(with: destinationStore)
 			.accountSecurity(with: destinationStore)
 			.appSettings(with: destinationStore)
-		#if DEBUG
-			.debugSettings(with: destinationStore)
-		#endif
 	}
 
 	@MainActor
