@@ -12,25 +12,25 @@ private func makeLogger(
 ) -> Logger {
 	Logger(label: label) { _ in
 		// FIXME: Instead of this, we should differentiate by build flavour. Waiting on SPM to support proper build flavours.
-		if !RuntimeInfo.isAppStoreBuild {
-			let fileLogger: LogHandler = {
-				guard let path = Logger.logFilePath,
-				      let handler = try? FileLogHandler(label: label, localFile: path)
-				else {
-					return SwiftLogNoOpLogHandler()
-				}
-				return handler
-			}()
+		#if DEBUG
+		let fileLogger: LogHandler = {
+			guard let path = Logger.logFilePath,
+			      let handler = try? FileLogHandler(label: label, localFile: path)
+			else {
+				return SwiftLogNoOpLogHandler()
+			}
+			return handler
+		}()
 
-			var logger = ColorStreamLogHandler.standardOutput(
-				label: label,
-				logIconType: .rainbow
-			)
-			logger.logLevel = level
-			return MultiplexLogHandler([fileLogger, logger])
-		} else {
-			return SwiftLogNoOpLogHandler()
-		}
+		var logger = ColorStreamLogHandler.standardOutput(
+			label: label,
+			logIconType: .rainbow
+		)
+		logger.logLevel = level
+		return MultiplexLogHandler([fileLogger, logger])
+		#else
+		return SwiftLogNoOpLogHandler()
+		#endif
 	}
 }
 

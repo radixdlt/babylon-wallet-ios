@@ -111,7 +111,7 @@ struct WithControlRequirements_Previews: PreviewProvider {
 			.safeAreaInset(edge: .bottom, spacing: .zero) {
 				WithControlRequirements(
 					name.nilIfBlank,
-					forAction: { name in print("Hello \(name)!") }
+					forAction: { name in loggerGlobal.debug("Hello \(name)!") }
 				) { action in
 					Button("Submit", action: action)
 						.buttonStyle(.primaryRectangular)

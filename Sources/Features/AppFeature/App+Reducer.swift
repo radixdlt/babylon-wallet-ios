@@ -107,7 +107,7 @@ public struct App: Sendable, FeatureReducer {
 		switch viewAction {
 		case .task:
 			let retBuildInfo = buildInformation()
-			print("EngineToolkit commit hash: \(retBuildInfo.version)")
+			loggerGlobal.info("EngineToolkit commit hash: \(retBuildInfo.version)")
 			return .merge(
 				.run { send in
 					for try await gateways in await gatewaysClient.gatewaysValues() {

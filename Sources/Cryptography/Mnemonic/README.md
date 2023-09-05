@@ -65,13 +65,13 @@ let mnemonic = try Mnemonic(wordCount: .twentyFour, language: .english) // gener
 
 // Use caution when accessing `phrase`, `words`, `seed` and `entropy`, these are hyper sensitive and should in general not be printed.
 
-print(mnemonic.phrase) // "oxygen depth gain embrace scrap hub turkey laptop tilt venue whisper boil tree vacuum expire two box wheat own system fence swallow mistake soda"
+log(mnemonic.phrase) // "oxygen depth gain embrace scrap hub turkey laptop tilt venue whisper boil tree vacuum expire two box wheat own system fence swallow mistake soda"
 
 let entropy = mnemonic.entropy() // CSPRNG generated entopy used to create the mnemonic
 let seed = try mnemonic.seed(passphrase: "cerberus") // for HD wallets
 
-print(mnemonic.language) // "English"
-print(mnemonic.wordCount) // "24 words."
+log(mnemonic.language) // "English"
+log(mnemonic.wordCount) // "24 words."
 ```
 
 ### Generate new
