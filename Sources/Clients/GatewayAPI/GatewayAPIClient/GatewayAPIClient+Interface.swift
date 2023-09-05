@@ -7,7 +7,7 @@ public typealias ResourceIdentifier = String
 // MARK: - GatewayAPIClient
 public struct GatewayAPIClient: Sendable, DependencyKey {
 	// MARK: Request
-	public var isMainnetOnline: IsMainnetOnline
+	public var isMainnetLive: IsMainnetLive
 	public var getNetworkName: GetNetworkName
 	public var getEpoch: GetEpoch
 
@@ -32,7 +32,7 @@ public struct GatewayAPIClient: Sendable, DependencyKey {
 }
 
 extension GatewayAPIClient {
-	public typealias IsMainnetOnline = @Sendable () async -> Bool
+	public typealias IsMainnetLive = @Sendable () async -> Bool
 
 	public typealias GetNetworkName = @Sendable (URL) async throws -> Radix.Network.Name
 	public typealias GetEpoch = @Sendable () async throws -> Epoch

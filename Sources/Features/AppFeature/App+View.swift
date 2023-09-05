@@ -57,7 +57,7 @@ extension App {
 					.task { @MainActor in
 						await ViewStore(store.stateless).send(.view(.task)).finish()
 					}
-					.showDeveloperDisclaimerBanner(showIsUsingTestnetBanner: viewStore.showIsUsingTestnetBanner)
+					.showDeveloperDisclaimerBanner(viewStore.showIsUsingTestnetBanner)
 					.presentsLoadingViewOverlay()
 				}
 			}

@@ -157,7 +157,7 @@ extension GatewayAPIClient {
 		}
 
 		return GatewayAPIClient(
-			isMainnetOnline: {
+			isMainnetLive: {
 				do {
 					return try await makeRequest(
 						responseType: IsMainnetOnlineResponse.self,

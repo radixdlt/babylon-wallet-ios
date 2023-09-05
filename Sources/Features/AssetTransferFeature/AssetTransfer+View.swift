@@ -87,7 +87,7 @@ extension AssetTransfer {
 				} content: {
 					View(store: store)
 				}
-				.showDeveloperDisclaimerBanner(showIsUsingTestnetBanner: viewStore.showIsUsingTestnetBanner)
+				.showDeveloperDisclaimerBanner(viewStore.showIsUsingTestnetBanner)
 			}
 		}
 	}
