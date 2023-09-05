@@ -57,8 +57,8 @@ extension GatewayAPIClient {
 	public typealias TransactionPreview = @Sendable (GatewayAPI.TransactionPreviewRequest) async throws -> GatewayAPI.TransactionPreviewResponse
 }
 
-// MARK: - IsMainnetOnlineResponse
-public struct IsMainnetOnlineResponse: Decodable, Sendable, Hashable {
+// MARK: - IsMainnetLiveResponse
+public struct IsMainnetLiveResponse: Decodable, Sendable, Hashable {
 	public let isMainnetLive: Bool
 	public init(isMainnetLive: Bool) {
 		self.isMainnetLive = isMainnetLive

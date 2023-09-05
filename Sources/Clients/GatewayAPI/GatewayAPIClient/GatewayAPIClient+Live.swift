@@ -160,7 +160,7 @@ extension GatewayAPIClient {
 			isMainnetLive: {
 				do {
 					return try await makeRequest(
-						responseType: IsMainnetOnlineResponse.self,
+						responseType: IsMainnetLiveResponse.self,
 						baseURL: URL(string: "https://mainnet-status.extratools.works")!,
 						timeoutInterval: 1
 					) {
