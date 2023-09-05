@@ -90,7 +90,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 		)
 		case presentPersonaNotFoundErrorAlert(reason: String)
 		case autofillOngoingResponseItemsIfPossible(AutofillOngoingResponseItemsPayload)
-		case delayedAppendToPath(DappInteractionFlow.Destinations.MainState)
+		case delayedAppendToPath(DappInteractionFlow.Destinations.State)
 
 		struct AutofillOngoingResponseItemsPayload: Sendable, Equatable {
 			struct AccountsPayload: Sendable, Equatable {
