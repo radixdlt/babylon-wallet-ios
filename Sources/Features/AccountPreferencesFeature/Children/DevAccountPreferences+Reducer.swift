@@ -35,7 +35,7 @@ public struct DevAccountPreferences: Sendable, FeatureReducer {
 		#endif
 
 		public init(
-			isOnMainnet: Bool = true, // safest to defalt to true and change to false, we REALLY do not wanna display the faucet button for mainnet
+			isOnMainnet: Bool = true, // safest to default to true and change to false, we REALLY do not wanna display the faucet button for mainnet
 			address: AccountAddress,
 			faucetButtonState: ControlState = .enabled
 		) {

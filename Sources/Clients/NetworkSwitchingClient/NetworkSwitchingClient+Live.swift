@@ -65,7 +65,7 @@ extension NetworkSwitchingClient {
 		return Self(
 			hasMainnetEverBeenLive: {
 				if userDefaultsClient.hasMainnetEverBeenLive {
-					loggerGlobal.debug("mainnet has been live before, thus we count it as live")
+					loggerGlobal.debug("Mainnet has been live before..")
 					return true
 				}
 				loggerGlobal.debug("Mainnet has never been live before, checking if it is live now")
