@@ -389,12 +389,12 @@ extension TransactionFee {
 		public static let networkFeeMultiplier: BigDecimal = 0.15
 
 		/// Network fees -> https://radixdlt.atlassian.net/wiki/spaces/S/pages/3134783512/Manifest+Mutation+Cost+Addition+Estimates
-		public static let lockFeeInstructionCost = try! BigDecimal(fromString: "0.095483092333982841")
-		public static let fungibleGuaranteeInstructionCost = try! BigDecimal(fromString: "0.012001947444660947")
-		public static let nonFungibleGuranteeInstructionCost = try! BigDecimal(fromString: "0.012844397444660947")
-		public static let signatureCost = try! BigDecimal(fromString: "0.017839046256509498")
-		public static let notarizingCost = try! BigDecimal(fromString: "0.01322565755208264")
-		public static let notarizingCostWhenNotaryIsSignatory = try! BigDecimal(fromString: "0.01351365755208264")
+		public static let lockFeeInstructionCost = try! BigDecimal(fromString: "0.08581566997")
+		public static let fungibleGuaranteeInstructionCost = try! BigDecimal(fromString: "0.00908532837")
+		public static let nonFungibleGuranteeInstructionCost = try! BigDecimal(fromString: "0.00954602837")
+		public static let signatureCost = try! BigDecimal(fromString: "0.01109974758")
+		public static let notarizingCost = try! BigDecimal(fromString: "0.0081393944")
+		public static let notarizingCostWhenNotaryIsSignatory = try! BigDecimal(fromString: "0.0084273944")
 
 		public static func notarizingCost(_ notaryIsSignatory: Bool) -> BigDecimal {
 			notaryIsSignatory ? notarizingCostWhenNotaryIsSignatory : notarizingCost
