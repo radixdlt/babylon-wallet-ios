@@ -51,7 +51,7 @@ final class SplashFeatureTests: TestCase {
 
 	func test__GIVEN__splash_appeared__WHEN__biometrics_configured__THEN__notifies_delegate_with_profile_result() async throws {
 		try await assertNotifiesDelegateWithLoadProfileOutcome(.newUser)
-		try await assertNotifiesDelegateWithLoadProfileOutcome(.existingProfile)
+		try await assertNotifiesDelegateWithLoadProfileOutcome(.existingProfile(hasMainnetAccounts: false))
 
 		/// Profile load failure
 		try await assertNotifiesDelegateWithLoadProfileOutcome(
@@ -95,7 +95,7 @@ final class SplashFeatureTests: TestCase {
 		if case .existingProfile = outcome {
 			await store.receive(.internal(.accountRecoveryNeeded(outcome, .success(false))))
 		}
-		await store.receive(.delegate(.completed(outcome, accountRecoveryNeeded: false)))
+		await store.receive(.delegate(.completed(outcome, accountRecoveryNeeded: false, hasMainnetEverBeenLive: false)))
 	}
 }
 
