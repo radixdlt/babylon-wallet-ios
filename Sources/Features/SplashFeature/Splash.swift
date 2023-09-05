@@ -119,18 +119,18 @@ public struct Splash: Sendable, FeatureReducer {
 			if case .existingProfile = outcome {
 				return checkAccountRecoveryNeeded(outcome)
 			}
-			return delegate(loadProfileOutcome: outcome, accountRecoveryNeeded: false)
+			return delegateCompleted(loadProfileOutcome: outcome, accountRecoveryNeeded: false)
 
 		case .accountRecoveryNeeded(_, .failure):
 			state.biometricsCheckFailed = true
 			return .none
 
 		case let .accountRecoveryNeeded(outcome, .success(recoveryNeeded)):
-			return delegate(loadProfileOutcome: outcome, accountRecoveryNeeded: recoveryNeeded)
+			return delegateCompleted(loadProfileOutcome: outcome, accountRecoveryNeeded: recoveryNeeded)
 		}
 	}
 
-	func delegate(loadProfileOutcome: LoadProfileOutcome, accountRecoveryNeeded: Bool) -> EffectTask<Action> {
+	func delegateCompleted(loadProfileOutcome: LoadProfileOutcome, accountRecoveryNeeded: Bool) -> EffectTask<Action> {
 		.run { send in
 			let hasMainnetEverBeenLive = await networkSwitchingClient.hasMainnetEverBeenLive()
 			await send(.delegate(

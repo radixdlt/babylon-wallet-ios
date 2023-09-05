@@ -83,7 +83,7 @@ extension AssetTransfer {
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: { $0 }) { viewStore in
 				WithNavigationBar {
-					ViewStore(store).send(.view(.closeButtonTapped))
+					viewStore.send(.view(.closeButtonTapped))
 				} content: {
 					View(store: store)
 				}

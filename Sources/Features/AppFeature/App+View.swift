@@ -55,7 +55,7 @@ extension App {
 						action: App.Alerts.Action.incompatibleProfileErrorAlert
 					)
 					.task { @MainActor in
-						await ViewStore(store.stateless).send(.view(.task)).finish()
+						await viewStore.send(.view(.task)).finish()
 					}
 					.showDeveloperDisclaimerBanner(viewStore.showIsUsingTestnetBanner)
 					.presentsLoadingViewOverlay()
