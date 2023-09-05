@@ -28,7 +28,7 @@ final class SplashFeatureTests: TestCase {
 		// when
 		await store.send(.view(.appeared))
 
-		await clock.advance(by: .seconds(0.2))
+		await clock.advance(by: .seconds(0.4))
 		await store.receive(.internal(.passcodeConfigResult(.success(authBiometricsConfig)))) {
 			$0.passcodeCheckFailedAlert = .init(
 				title: { .init(L10n.Splash.PasscodeCheckFailedAlert.title) },
@@ -83,13 +83,14 @@ final class SplashFeatureTests: TestCase {
 			$0.deviceFactorSourceClient.isAccountRecoveryNeeded = {
 				false
 			}
+			$0.networkSwitchingClient.hasMainnetEverBeenLive = { false }
 		}
 
 		// when
 		await store.send(.view(.appeared))
 
 		// then
-		await clock.advance(by: .seconds(0.2))
+		await clock.advance(by: .seconds(0.4))
 		await store.receive(.internal(.passcodeConfigResult(.success(authBiometricsConfig))))
 		await store.receive(.internal(.loadProfileOutcome(outcome)))
 		if case .existingProfile = outcome {
