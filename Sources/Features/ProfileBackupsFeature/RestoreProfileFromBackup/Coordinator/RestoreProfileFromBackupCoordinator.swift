@@ -40,6 +40,10 @@ public struct RestoreProfileFromBackupCoordinator: Sendable, FeatureReducer {
 		}
 	}
 
+	public enum InternalAction: Sendable, Equatable {
+		case delayedAppendToPath(RestoreProfileFromBackupCoordinator.Path.State)
+	}
+
 	public enum ChildAction: Sendable, Equatable {
 		case root(Path.Action)
 		case path(StackActionOf<Path>)
@@ -52,6 +56,7 @@ public struct RestoreProfileFromBackupCoordinator: Sendable, FeatureReducer {
 
 	@Dependency(\.backupsClient) var backupsClient
 	@Dependency(\.errorQueue) var errorQueue
+	@Dependency(\.continuousClock) var clock
 	public init() {}
 
 	public var body: some ReducerProtocolOf<Self> {
@@ -65,12 +70,24 @@ public struct RestoreProfileFromBackupCoordinator: Sendable, FeatureReducer {
 			}
 	}
 
+	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
+		switch internalAction {
+		case let .delayedAppendToPath(destination):
+			state.path.append(destination)
+			return .none
+		}
+	}
+
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
 		case let .root(.selectBackup(.delegate(.selectedProfileSnapshot(profileSnapshot, isInCloud)))):
 			state.profileSelection = .init(snapshot: profileSnapshot, isInCloud: isInCloud)
-			state.path.append(.importMnemonicsFlow(.init(profileSnapshot: profileSnapshot)))
-			return .none
+			return .run { send in
+				try? await clock.sleep(for: .milliseconds(300))
+				await send(.internal(.delayedAppendToPath(
+					.importMnemonicsFlow(.init(profileSnapshot: profileSnapshot)
+					))))
+			}
 
 		case let .path(.element(_, action: .importMnemonicsFlow(.delegate(.finishedImportingMnemonics(skipList, _))))):
 			loggerGlobal.notice("Starting import snapshot process...")

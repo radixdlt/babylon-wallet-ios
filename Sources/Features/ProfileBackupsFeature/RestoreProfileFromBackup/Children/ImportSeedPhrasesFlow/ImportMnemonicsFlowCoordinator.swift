@@ -64,6 +64,7 @@ public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 	@Dependency(\.deviceFactorSourceClient) var deviceFactorSourceClient
 	@Dependency(\.userDefaultsClient) var userDefaultsClient
 	@Dependency(\.errorQueue) var errorQueue
+	@Dependency(\.continuousClock) var clock
 	public init() {}
 
 	public var body: some ReducerProtocolOf<Self> {
@@ -79,6 +80,7 @@ public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 			return .task { [snapshot = state.profileSnapshot] in
 				await .internal(.loadControlledEntities(TaskResult {
 					let ents = try await deviceFactorSourceClient.controlledEntities(snapshot)
+					try? await clock.sleep(for: .milliseconds(200))
 					return ents.filter { ent in
 						!userDefaultsClient.getFactorSourceIDOfBackedUpMnemonics().contains(ent.factorSourceID)
 					}
