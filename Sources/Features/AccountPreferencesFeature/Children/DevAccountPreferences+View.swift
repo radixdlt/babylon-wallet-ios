@@ -21,7 +21,7 @@ extension DevAccountPreferences.State {
 			createMultipleNonFungibleTokenButtonState: createMultipleNonFungibleTokenButtonState
 		)
 		#else
-		return .init(faucetButtonState: faucetButtonState)
+		return .init(isOnMainnet: isOnMainnet, faucetButtonState: faucetButtonState)
 		#endif // DEBUG
 	}
 }
@@ -62,7 +62,8 @@ extension DevAccountPreferences {
 			self.createMultipleNonFungibleTokenButtonState = createMultipleNonFungibleTokenButtonState
 		}
 		#else
-		public init(faucetButtonState: ControlState) {
+		public init(isOnMainnet: Bool, faucetButtonState: ControlState) {
+			self.isOnMainnet = isOnMainnet
 			self.faucetButtonState = faucetButtonState
 		}
 		#endif // DEBUG
