@@ -66,7 +66,7 @@ extension App {
 				.task { @MainActor in
 					await viewStore.send(.task).finish()
 				}
-				.showDeveloperDisclaimerBanner(viewStore.showIsUsingTestnetBanner)
+				.showDeveloperDisclaimerBanner(false)
 				.presentsLoadingViewOverlay()
 			}
 		}
