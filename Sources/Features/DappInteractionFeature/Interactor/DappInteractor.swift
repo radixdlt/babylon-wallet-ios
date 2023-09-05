@@ -198,7 +198,14 @@ struct DappInteractor: Sendable, FeatureReducer {
 						TextState(L10n.Common.cancel)
 					}
 				},
-				message: { TextState(invalidReason.subtitle + "\n" + invalidReason.explanation(isDeveloperModeEnabled)) }
+				message: {
+					let explanation = invalidReason.explanation(isDeveloperModeEnabled)
+					if explanation == invalidReason.subtitle {
+						return TextState(invalidReason.subtitle)
+					} else {
+						return TextState(invalidReason.subtitle + "\n" + explanation)
+					}
+				}
 			)
 			return .none
 
