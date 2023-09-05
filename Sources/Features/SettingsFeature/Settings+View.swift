@@ -137,13 +137,6 @@ extension Settings.View {
 					.foregroundColor(.app.gray2)
 					.textStyle(.body2Regular)
 					.padding(.bottom, .medium1)
-
-				#if DEBUG
-				Text(viewStore.debugAppInfo)
-					.foregroundColor(.app.gray2)
-					.textStyle(.body2Regular)
-					.padding(.bottom, .medium1)
-				#endif
 			}
 		}
 		.animation(.default, value: viewStore.shouldShowMigrateOlympiaButton)
@@ -159,13 +152,6 @@ extension Settings.View {
 	@MainActor
 	private var rows: [SettingsRowModel<Settings>] {
 		var visibleRows = normalRows
-		#if DEBUG
-		visibleRows.append(.init(
-			title: "Debug Settings",
-			icon: .asset(AssetResource.appSettings), // FIXME: Find
-			action: .debugButtonTapped
-		))
-		#endif
 		return visibleRows
 	}
 
