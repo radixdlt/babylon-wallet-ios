@@ -1,5 +1,6 @@
 import NonEmpty
 import OrderedCollections
+import Prelude
 import SwiftUI
 
 // MARK: - SelectionItem
