@@ -22,10 +22,14 @@ final class AppFeatureTests: TestCase {
 		let store = TestStore(
 			initialState: App.State(root: .main(.previewValue)),
 			reducer: App()
-		)
+		) {
+			$0.gatewaysClient.gatewaysValues = { AsyncLazySequence([.init(current: .default)]).eraseToAnyAsyncSequence() }
+			$0.networkSwitchingClient.hasMainnetEverBeenLive = { false }
+		}
 		// when
-		await store.send(.child(.main(.delegate(.removedWallet)))) {
-			// then
+		await store.send(.child(.main(.delegate(.removedWallet))))
+		await store.receive(.internal(.toOnboarding(hasMainnetEverBeenLive: false))) {
+			$0.showIsUsingTestnetBanner = true
 			$0.root = .onboardingCoordinator(.init(hasMainnetEverBeenLive: false))
 		}
 	}
@@ -63,11 +67,16 @@ final class AppFeatureTests: TestCase {
 		) {
 			$0.errorQueue = .liveValue
 			$0.continuousClock = clock
+			$0.gatewaysClient.gatewaysValues = { AsyncLazySequence([.init(current: .default)]).eraseToAnyAsyncSequence() }
+			$0.networkSwitchingClient.hasMainnetEverBeenLive = { false }
 		}
 
 		let viewTask = await store.send(.view(.task))
 
 		// then
+		await store.receive(.internal(.currentGatewayChanged(to: .default))) {
+			$0.showIsUsingTestnetBanner = true
+		}
 		await store.send(.child(.splash(.delegate(.completed(.newUser, accountRecoveryNeeded: false, hasMainnetEverBeenLive: false))))) {
 			$0.root = .onboardingCoordinator(.init(hasMainnetEverBeenLive: false))
 		}
@@ -167,6 +176,8 @@ final class AppFeatureTests: TestCase {
 		) {
 			$0.errorQueue = .liveValue
 			$0.continuousClock = clock
+			$0.gatewaysClient.gatewaysValues = { AsyncLazySequence([.init(current: .default)]).eraseToAnyAsyncSequence() }
+			$0.networkSwitchingClient.hasMainnetEverBeenLive = { false }
 			$0.appPreferencesClient.deleteProfileAndFactorSources = { _ in
 				profileDeletedExpectation.fulfill()
 			}
@@ -180,6 +191,9 @@ final class AppFeatureTests: TestCase {
 
 		let outcome = LoadProfileOutcome.usersExistingProfileCouldNotBeLoaded(failure: .profileVersionOutdated(json: Data([0xDE, 0xAD]), version: badVersion))
 
+		await store.receive(.internal(.currentGatewayChanged(to: .default))) {
+			$0.showIsUsingTestnetBanner = true
+		}
 		await store.send(.child(.splash(.delegate(.completed(outcome, accountRecoveryNeeded: false, hasMainnetEverBeenLive: false))))) {
 			$0.alert = .incompatibleProfileErrorAlert(
 				.init(
@@ -197,7 +211,8 @@ final class AppFeatureTests: TestCase {
 		await store.send(.view(.alert(.presented(.incompatibleProfileErrorAlert(.deleteWalletDataButtonTapped))))) {
 			$0.alert = nil
 		}
-		await store.receive(.internal(.incompatibleProfileDeleted)) {
+		await store.receive(.internal(.incompatibleProfileDeleted))
+		await store.receive(.internal(.toOnboarding(hasMainnetEverBeenLive: false))) {
 			$0.root = .onboardingCoordinator(.init(hasMainnetEverBeenLive: false))
 		}
 
