@@ -576,12 +576,12 @@ extension ImportMnemonic {
 extension ImportMnemonic.Destinations.State {
 	fileprivate static func askUserIfSheHasBackedUpMnemonic(_ factorSourceID: FactorSourceID.FromHash) -> Self {
 		.markMnemonicAsBackedUp(.init(
-			title: { TextState("Backed up?") }, // FIXME: Strings
+			title: { TextState("Confirm Backup") }, // FIXME: Strings
 			actions: {
-				ButtonState(action: .userHaveBackedUp(factorSourceID), label: { TextState("I have backed it up.") }) // FIXME: Strings
-				ButtonState(action: .userHaveNotBackedUp, label: { TextState("I have not backed it up.") }) // FIXME: Strings
+				ButtonState(action: .userHaveBackedUp(factorSourceID), label: { TextState("Yes, I have backed it up") }) // FIXME: Strings
+				ButtonState(action: .userHaveNotBackedUp, label: { TextState("No, not yet") }) // FIXME: Strings
 			},
-			message: { TextState("Have you backed up the Seed Phrase?") } // FIXME: Strings
+			message: { TextState("Are you sure you have securely written down this seed phrase? You will need it to recover access if you lose your phone.") } // FIXME: Strings
 		))
 	}
 }
