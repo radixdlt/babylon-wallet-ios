@@ -21,13 +21,31 @@ public struct ChooseReceivingAccount: Sendable, FeatureReducer {
 			if !manualAccountAddress.isEmpty,
 			   !chooseAccounts.filteredAccounts.contains(where: { $0.address == manualAccountAddress })
 			{
-				return try? AccountAddress(validatingAddress: manualAccountAddress)
+				guard
+					let addressOnSomeNetwork = try? AccountAddress(validatingAddress: manualAccountAddress),
+					let engineAddress = try? addressOnSomeNetwork.intoEngine()
+				else {
+					return nil
+				}
+				let networkOfAddress = engineAddress.networkId()
+				guard networkOfAddress == networkID.rawValue else {
+					loggerGlobal.warning("Manually inputted address is valid, but is on the WRONG network, inputted: \(networkOfAddress), but current network is: \(networkID.rawValue)")
+					return nil
+				}
+				return addressOnSomeNetwork
 			}
 			return nil
 		}
 
+		let networkID: NetworkID
+
 		@PresentationState
 		var destination: Destinations.State? = nil
+
+		public init(networkID: NetworkID, chooseAccounts: ChooseAccounts.State) {
+			self.networkID = networkID
+			self.chooseAccounts = chooseAccounts
+		}
 	}
 
 	public enum ViewAction: Sendable, Equatable {
