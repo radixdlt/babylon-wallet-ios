@@ -1,6 +1,8 @@
 import DeviceFactorSourceClient
 import FeaturePrelude
+import GatewayAPI
 import LocalAuthenticationClient
+import NetworkSwitchingClient
 import OnboardingClient
 
 // MARK: - Splash
@@ -36,9 +38,10 @@ public struct Splash: Sendable, FeatureReducer {
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
-		case completed(LoadProfileOutcome, accountRecoveryNeeded: Bool)
+		case completed(LoadProfileOutcome, accountRecoveryNeeded: Bool, hasMainnetEverBeenLive: Bool)
 	}
 
+	@Dependency(\.networkSwitchingClient) var networkSwitchingClient
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.continuousClock) var clock
 	@Dependency(\.localAuthenticationClient) var localAuthenticationClient
@@ -116,14 +119,27 @@ public struct Splash: Sendable, FeatureReducer {
 			if case .existingProfile = outcome {
 				return checkAccountRecoveryNeeded(outcome)
 			}
-			return .send(.delegate(.completed(outcome, accountRecoveryNeeded: false)))
+			return delegateCompleted(loadProfileOutcome: outcome, accountRecoveryNeeded: false)
 
 		case .accountRecoveryNeeded(_, .failure):
 			state.biometricsCheckFailed = true
 			return .none
 
 		case let .accountRecoveryNeeded(outcome, .success(recoveryNeeded)):
-			return .send(.delegate(.completed(outcome, accountRecoveryNeeded: recoveryNeeded)))
+			return delegateCompleted(loadProfileOutcome: outcome, accountRecoveryNeeded: recoveryNeeded)
+		}
+	}
+
+	func delegateCompleted(loadProfileOutcome: LoadProfileOutcome, accountRecoveryNeeded: Bool) -> EffectTask<Action> {
+		.run { send in
+			let hasMainnetEverBeenLive = await networkSwitchingClient.hasMainnetEverBeenLive()
+			await send(.delegate(
+				.completed(
+					loadProfileOutcome,
+					accountRecoveryNeeded: accountRecoveryNeeded,
+					hasMainnetEverBeenLive: hasMainnetEverBeenLive
+				))
+			)
 		}
 	}
 
@@ -142,9 +158,9 @@ public struct Splash: Sendable, FeatureReducer {
 		.run { _ in
 			let durationInMS: Int
 			#if DEBUG
-			durationInMS = 200
+			durationInMS = 400
 			#else
-			durationInMS = 800
+			durationInMS = 750
 			#endif
 			try? await clock.sleep(for: .milliseconds(durationInMS))
 		}

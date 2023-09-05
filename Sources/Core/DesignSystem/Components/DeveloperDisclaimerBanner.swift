@@ -2,9 +2,12 @@ import Resources
 import SwiftUI
 
 extension View {
-	public func showDeveloperDisclaimerBanner() -> some View {
+	@ViewBuilder
+	public func showDeveloperDisclaimerBanner(_ show: Bool) -> some View {
 		VStack(spacing: 0) {
-			DeveloperDisclaimerBanner()
+			if show {
+				DeveloperDisclaimerBanner()
+			}
 			self
 		}
 	}

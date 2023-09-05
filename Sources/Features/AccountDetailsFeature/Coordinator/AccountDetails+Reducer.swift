@@ -341,9 +341,11 @@ public struct AccountDetails: Sendable, FeatureReducer {
 				}
 
 				// check if already backed up
-				return userDefaultsClient
+				let isAlreadyBackedUp = userDefaultsClient
 					.getFactorSourceIDOfBackedUpMnemonics()
 					.contains(unsecuredEntityControl.transactionSigning.factorSourceID)
+
+				return !isAlreadyBackedUp
 			}
 
 		}()

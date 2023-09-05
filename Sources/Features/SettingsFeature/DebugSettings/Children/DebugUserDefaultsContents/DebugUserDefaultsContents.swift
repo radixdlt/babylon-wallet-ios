@@ -68,6 +68,8 @@ extension UserDefaultsClient.Key {
 	func valuesForKey() -> [String] {
 		@Dependency(\.userDefaultsClient) var userDefaultsClient
 		switch self {
+		case .hasMainnetEverBeenLive:
+			return [userDefaultsClient.hasMainnetEverBeenLive].map(String.init(describing:))
 		case .accountsThatNeedRecovery:
 			return userDefaultsClient.getAddressesOfAccountsThatNeedRecovery().map(\.address)
 		case .activeProfileID:

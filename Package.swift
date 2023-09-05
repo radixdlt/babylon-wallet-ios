@@ -44,6 +44,7 @@ package.addModules([
 			"AccountPortfoliosClient",
 			"CreateAuthKeyFeature",
 			"ShowQRFeature",
+			"GatewaysClient",
 			"OverlayWindowClient",
 			"OnLedgerEntitiesClient",
 		],
@@ -86,6 +87,9 @@ package.addModules([
 			"MainFeature",
 			"OnboardingFeature",
 			"OverlayWindowClient",
+			"CreateAccountFeature",
+			"NetworkSwitchingClient",
+			"GatewaysClient",
 			"SplashFeature",
 		],
 		tests: .yes()
@@ -444,6 +448,7 @@ package.addModules([
 			"DeviceFactorSourceClient",
 			"LocalAuthenticationClient",
 			"OnboardingClient",
+			"NetworkSwitchingClient",
 		],
 		tests: .yes()
 	),
