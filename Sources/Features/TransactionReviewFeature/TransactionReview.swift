@@ -731,12 +731,6 @@ extension TransactionReview {
 
 		for (accountAddress, accountDeposits) in transaction.accountDeposits {
 			let account = try userAccounts.account(for: .init(validatingAddress: accountAddress))
-			print("••• accountDeposits", accountDeposits.count)
-
-			print("•• metadataOfNewlyCreatedEntities:", transaction.metadataOfNewlyCreatedEntities)
-			print("•• dataOfNewlyMintedNonFungibles:", transaction.dataOfNewlyMintedNonFungibles)
-			print("•• createdEntities", transaction.addressesOfNewlyCreatedEntities.count)
-
 			let transfers = try await accountDeposits.asyncFlatMap {
 				try await transferInfo(
 					resourceQuantifier: $0,
@@ -773,24 +767,10 @@ extension TransactionReview {
 	) async throws -> [Transfer] {
 		let resourceAddress: ResourceAddress = try resourceQuantifier.resourceAddress.asSpecific()
 
-		if let metadataOfCreatedEntities {
-			if metadataOfCreatedEntities.isEmpty {
-				print("••• metadataOfCreatedEntities is EMPTY")
-			} else {
-				for (key, value) in metadataOfCreatedEntities {
-					print("••• \(key):", value)
-				}
-			}
-		} else {
-			print("••• metadataOfCreatedEntities is NIL")
-		}
-
 		func resourceInfo() async throws -> Either<OnLedgerEntity.Resource, [String: MetadataValue?]> {
 			if let newlyCreatedMetadata = metadataOfCreatedEntities?[resourceAddress.address] {
-				print("••• NEW RESOURCE")
 				return .right(newlyCreatedMetadata)
 			} else {
-				print("••• EXISTING RESOURCE")
 				return try await .left(onLedgerEntitiesClient.getResource(resourceAddress))
 			}
 		}
@@ -799,16 +779,13 @@ extension TransactionReview {
 
 		func tokenInfo(_ ids: [NonFungibleLocalId], for resourceAddress: ResourceAddress) async throws -> [NonFungibleToken] {
 			if let tokenData = dataOfNewlyMintedNonFungibles[resourceAddress.address] {
-				print("••• NEW TOKENS")
 				return try extractTokenInfo(tokenData, for: resourceAddress)
 			} else {
-				print("••• EXISTING TOKENS")
 				return try await existingTokenInfo(ids, for: resourceAddress)
 			}
 		}
 
 		func newTokenInfo(_ ids: [NonFungibleLocalId], for resourceAddress: ResourceAddress) throws -> [NonFungibleToken] {
-			print("••• NEW TOKENS ")
 			guard let tokenData = dataOfNewlyMintedNonFungibles[resourceAddress.address] else {
 				struct MissingNewlyMintedNFTData: Error {}
 				throw MissingNewlyMintedNFTData()
