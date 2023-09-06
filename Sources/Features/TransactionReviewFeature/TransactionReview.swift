@@ -702,6 +702,7 @@ extension TransactionReview {
 				try await transferInfo(
 					resourceQuantifier: $0,
 					metadataOfCreatedEntities: transaction.metadataOfNewlyCreatedEntities,
+					dataOfNewlyMintedNonFungibles: transaction.dataOfNewlyMintedNonFungibles,
 					createdEntities: transaction.addressesOfNewlyCreatedEntities,
 					networkID: networkID,
 					type: .exact
@@ -730,11 +731,11 @@ extension TransactionReview {
 
 		for (accountAddress, accountDeposits) in transaction.accountDeposits {
 			let account = try userAccounts.account(for: .init(validatingAddress: accountAddress))
-
 			let transfers = try await accountDeposits.asyncFlatMap {
 				try await transferInfo(
 					resourceQuantifier: $0,
 					metadataOfCreatedEntities: transaction.metadataOfNewlyCreatedEntities,
+					dataOfNewlyMintedNonFungibles: transaction.dataOfNewlyMintedNonFungibles,
 					createdEntities: transaction.addressesOfNewlyCreatedEntities,
 					networkID: networkID,
 					type: $0.transferType,
@@ -758,6 +759,7 @@ extension TransactionReview {
 	func transferInfo(
 		resourceQuantifier: ResourceTracker,
 		metadataOfCreatedEntities: [String: [String: MetadataValue?]]?,
+		dataOfNewlyMintedNonFungibles: [String: [NonFungibleLocalId: [UInt8]]],
 		createdEntities: [EngineToolkit.Address],
 		networkID: NetworkID,
 		type: TransferType,
@@ -765,7 +767,7 @@ extension TransactionReview {
 	) async throws -> [Transfer] {
 		let resourceAddress: ResourceAddress = try resourceQuantifier.resourceAddress.asSpecific()
 
-		func getTransferInfo() async throws -> Either<OnLedgerEntity.Resource, [String: MetadataValue?]> {
+		func resourceInfo() async throws -> Either<OnLedgerEntity.Resource, [String: MetadataValue?]> {
 			if let newlyCreatedMetadata = metadataOfCreatedEntities?[resourceAddress.address] {
 				return .right(newlyCreatedMetadata)
 			} else {
@@ -773,12 +775,62 @@ extension TransactionReview {
 			}
 		}
 
+		typealias NonFungibleToken = AccountPortfolio.NonFungibleResource.NonFungibleToken
+
+		func tokenInfo(_ ids: [NonFungibleLocalId], for resourceAddress: ResourceAddress) async throws -> [NonFungibleToken] {
+			if let tokenData = dataOfNewlyMintedNonFungibles[resourceAddress.address] {
+				return try extractTokenInfo(tokenData, for: resourceAddress)
+			} else {
+				return try await existingTokenInfo(ids, for: resourceAddress)
+			}
+		}
+
+		func newTokenInfo(_ ids: [NonFungibleLocalId], for resourceAddress: ResourceAddress) throws -> [NonFungibleToken] {
+			guard let tokenData = dataOfNewlyMintedNonFungibles[resourceAddress.address] else {
+				struct MissingNewlyMintedNFTData: Error {}
+				throw MissingNewlyMintedNFTData()
+			}
+			return try extractTokenInfo(tokenData, for: resourceAddress)
+		}
+
+		func extractTokenInfo(_ tokenData: [NonFungibleLocalId: [UInt8]], for resourceAddress: ResourceAddress) throws -> [NonFungibleToken] {
+			try tokenData.map { id, _ in
+				try .init(
+					id: .fromParts(resourceAddress: resourceAddress.intoEngine(), nonFungibleLocalId: id),
+					name: nil
+				)
+			}
+		}
+
+		func existingTokenInfo(_ ids: [NonFungibleLocalId], for resourceAddress: ResourceAddress) async throws -> [NonFungibleToken] {
+			// A non-fungible resource existing on ledger
+			let maximumNFTIDChunkSize = 29
+
+			var result: [NonFungibleToken] = []
+			for idChunk in ids.chunks(ofCount: maximumNFTIDChunkSize) {
+				let tokens = try await gatewayAPIClient.getNonFungibleData(.init(
+					resourceAddress: resourceAddress.address,
+					nonFungibleIds: idChunk.map {
+						try $0.toString()
+					}
+				))
+				.nonFungibleIds
+				.map { responseItem in
+					try NonFungibleToken(resourceAddress: resourceAddress, nftResponseItem: responseItem)
+				}
+
+				result.append(contentsOf: tokens)
+			}
+
+			return result
+		}
+
 		switch resourceQuantifier {
 		case let .fungible(_, source):
 			let amount = try BigDecimal(fromString: source.amount.asStr())
 			let isXRD = resourceAddress.isXRD(on: networkID)
 
-			switch try await getTransferInfo() {
+			switch try await resourceInfo() {
 			case let .left(onLedgerEntity):
 				// A fungible resource existing on ledger
 				func guarantee() -> TransactionClient.Guarantee? {
@@ -810,51 +862,39 @@ extension TransactionReview {
 		case let .nonFungible(_, _, .guaranteed(ids)),
 		     let .nonFungible(_, _, ids: .predicted(instructionIndex: _, value: ids)):
 
-			switch try await getTransferInfo() {
+			let result: [Transfer]
+
+			switch try await resourceInfo() {
 			case let .left(onLedgerEntity):
 				// A non-fungible resource existing on ledger
-				let maximumNFTIDChunkSize = 29
 
-				var result: [Transfer] = []
-				for idChunk in ids.chunks(ofCount: maximumNFTIDChunkSize) {
-					let tokens = try await gatewayAPIClient.getNonFungibleData(.init(
-						resourceAddress: resourceAddress.address,
-						nonFungibleIds: idChunk.map {
-							try $0.toString()
-						}
-					))
-					.nonFungibleIds
-					.map { responseItem in
-						try Transfer.nonFungible(
-							.init(
-								nonFungibleResource: .init(onLedgerEntity: onLedgerEntity),
-								token: .init(resourceAddress: resourceAddress, nftResponseItem: responseItem)
-							)
-						)
-					}
+				let resource: AccountPortfolio.NonFungibleResource = .init(onLedgerEntity: onLedgerEntity)
 
-					result.append(contentsOf: tokens)
+				// Existing or newly minted tokens
+				result = try await tokenInfo(ids, for: resourceAddress).map { token in
+					.nonFungible(.init(nonFungibleResource: resource, token: token))
 				}
-				return result
 
 			case let .right(newEntityMetadata):
 				// A newly created non-fungible resource
-				return try ids.map { id in
-					try .nonFungible(.init(
-						nonFungibleResource: .init(
-							resourceAddress: resourceAddress,
-							metadata: newEntityMetadata
-						),
-						token: .init(
-							id: .fromParts(
-								resourceAddress: resourceAddress.intoEngine(),
-								nonFungibleLocalId: id
-							),
-							name: nil // FIXME: Can we get the name?
-						)
-					))
+
+				let resource: AccountPortfolio.NonFungibleResource = .init(
+					resourceAddress: resourceAddress,
+					metadata: newEntityMetadata
+				)
+
+				// Newly minted tokens
+				result = try newTokenInfo(ids, for: resourceAddress).map { token in
+					.nonFungible(.init(nonFungibleResource: resource, token: token))
 				}
 			}
+
+			guard result.count == ids.count else {
+				struct FailedToGetDataForAllNFTs: Error {}
+				throw FailedToGetDataForAllNFTs()
+			}
+
+			return result
 		}
 	}
 }

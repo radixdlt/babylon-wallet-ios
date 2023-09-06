@@ -199,6 +199,7 @@ extension TransactionReview {
 						.padding(.bottom, .small2)
 				}
 			}
+			.frame(maxWidth: .infinity, alignment: .trailing)
 			.background(alignment: .trailing) {
 				if viewStore.hasMessageOrWithdrawals, viewStore.hasDeposits {
 					VLine()
