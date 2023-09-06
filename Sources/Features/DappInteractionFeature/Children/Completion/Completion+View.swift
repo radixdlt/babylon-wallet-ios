@@ -32,10 +32,8 @@ extension Completion {
 		@Environment(\.dismiss) var dismiss
 
 		var body: some SwiftUI.View {
-			WithViewStore(store, observe: ViewState.init, send: { .view($0) }) { viewStore in
-				WithNavigationBar {
-					dismiss()
-				} content: {
+			WithViewStore(store, observe: ViewState.init, send: absurd) { viewStore in
+				WithNavigationBar(closeAction: dismiss.callAsFunction) {
 					VStack(spacing: .medium2) {
 						Image(asset: AssetResource.successCheckmark)
 
