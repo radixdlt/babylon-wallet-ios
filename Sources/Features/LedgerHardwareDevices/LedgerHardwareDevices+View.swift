@@ -32,6 +32,8 @@ extension LedgerHardwareDevices {
 			self.context = state.context
 		}
 
+		var loadedEmptyLedgersList: Bool { ledgers == .success([]) }
+
 		var ledgersArray: [LedgerHardwareWalletFactorSource]? { .init(ledgers.wrappedValue ?? []) }
 
 		var navigationTitle: String? {
@@ -104,10 +106,13 @@ extension LedgerHardwareDevices {
 							.padding(.horizontal, .medium1)
 							.padding(.bottom, .medium1)
 
-						Button(L10n.LedgerHardwareDevices.addNewLedger) {
-							viewStore.send(.addNewLedgerButtonTapped)
+						if viewStore.ledgers == .success([]) {
+							addLedgerButton(viewStore: viewStore)
+								.buttonStyle(.primaryRectangular(shouldExpand: false))
+						} else {
+							addLedgerButton(viewStore: viewStore)
+								.buttonStyle(.secondaryRectangular(shouldExpand: false))
 						}
-						.buttonStyle(.secondaryRectangular(shouldExpand: false))
 
 						Spacer(minLength: 0)
 					}
@@ -128,6 +133,12 @@ extension LedgerHardwareDevices {
 				}
 			}
 			.destinations(with: store)
+		}
+
+		private func addLedgerButton(viewStore: ViewStoreOf<LedgerHardwareDevices>) -> some SwiftUI.View {
+			Button(L10n.LedgerHardwareDevices.addNewLedger) {
+				viewStore.send(.addNewLedgerButtonTapped)
+			}
 		}
 
 		@ViewBuilder
