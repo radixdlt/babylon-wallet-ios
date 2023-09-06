@@ -75,8 +75,7 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 			return .none
 		case .inputMnemonic:
 			state.destination = .importMnemonic(.init(
-				// FIXME: Strings
-				warning: "For your safety, make sure no one is looking at your screen. Never give your seed phrase to anyone for any reason.",
+				warning: L10n.EnterSeedPhrase.warning,
 				isWordCountFixed: true,
 				persistStrategy: nil,
 				wordCount: state.entitiesControlledByFactorSource.mnemonicWordCount

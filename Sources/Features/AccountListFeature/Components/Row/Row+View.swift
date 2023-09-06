@@ -208,7 +208,7 @@ extension AccountList.Row.View {
 		HStack {
 			Image(asset: AssetResource.homeAccountSecurity)
 
-			Text(L10n.HomePage.applySecuritySettings)
+			Text(L10n.HomePage.securityPromptBackup)
 				.foregroundColor(.white)
 				.textStyle(.body2HighImportance)
 

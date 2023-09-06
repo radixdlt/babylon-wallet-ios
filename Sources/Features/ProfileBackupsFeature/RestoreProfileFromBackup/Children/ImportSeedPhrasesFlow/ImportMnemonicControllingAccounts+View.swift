@@ -13,12 +13,16 @@ extension ImportMnemonicControllingAccounts {
 	public struct ViewState: Equatable {
 		let isSkippable: Bool
 
-		var title: LocalizedStringKey {
-			isSkippable ? "The following **Accounts** are controlled by a seed phrase. To recover control, you must re-enter it." : "Your **Personas** and the following **Accounts** are controlled by your main seed phrase. To recover control, you must re-enter it."
+		var title: String {
+			isSkippable
+				? L10n.RecoverSeedPhrase.Header.subtitleOtherSeedPhrase
+				: L10n.RecoverSeedPhrase.Header.subtitleMainSeedPhrase
 		}
 
 		var navigationTitle: String {
-			isSkippable ? "Seed Phrase Import" : "Main Seed Phrase"
+			isSkippable
+				? L10n.RecoverSeedPhrase.Header.titleOther
+				: L10n.RecoverSeedPhrase.Header.titleMain
 		}
 	}
 
@@ -40,7 +44,7 @@ extension ImportMnemonicControllingAccounts {
 						.padding()
 
 					if viewStore.isSkippable {
-						Button("Skip This Seed Phrase For Now") {
+						Button(L10n.RecoverSeedPhrase.skipButton) {
 							viewStore.send(.skip)
 						}
 						.foregroundColor(.app.blue2)
@@ -58,8 +62,7 @@ extension ImportMnemonicControllingAccounts {
 				}
 				.padding(.horizontal, .medium3)
 				.footer {
-					// FIXME: Strings
-					Button("Enter This Seed Phrase") {
+					Button(L10n.RecoverSeedPhrase.enterButton) {
 						viewStore.send(.inputMnemonic)
 					}
 					.buttonStyle(.primaryRectangular)
@@ -73,8 +76,7 @@ extension ImportMnemonicControllingAccounts {
 					content: { store_ in
 						NavigationView {
 							ImportMnemonic.View(store: store_)
-								// FIXME: Strings
-								.navigationTitle("Enter Seed Phrase")
+								.navigationTitle(L10n.EnterSeedPhrase.Header.title)
 						}
 					}
 				)

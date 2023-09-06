@@ -8,13 +8,13 @@ extension ResourcesList.State {
 			info: {
 				switch mode {
 				case .allowDenyAssets(.allow) where resourcesForDisplay.isEmpty:
-					return "Add a specific asset by its resource address to allow all third-party deposits" // FIXME: Strings
+					return L10n.AccountSettings.SpecificAssetsDeposits.emptyAllowAll
 				case .allowDenyAssets(.allow):
-					return "The following resource addresses may always be deposited to this account by third parties." // FIXME: Strings
+					return L10n.AccountSettings.SpecificAssetsDeposits.allowInfo
 				case .allowDenyAssets(.deny) where resourcesForDisplay.isEmpty:
-					return "Add a specific asset by its resource address to deny all third-party deposits" // FIXME: Strings
+					return L10n.AccountSettings.SpecificAssetsDeposits.emptyDenyAll
 				case .allowDenyAssets(.deny):
-					return "The following resource addresses may never be deposited to this account by third parties." // FIXME: Strings
+					return L10n.AccountSettings.SpecificAssetsDeposits.denyInfo
 				case .allowDepositors where resourcesForDisplay.isEmpty:
 					return "Add a specific badge by its resource address to allow all deposits from its holder." // FIXME: Strings
 				case .allowDepositors:
@@ -74,7 +74,7 @@ extension ResourcesList.View {
 		Group {
 			if case let .allowDenyAssets(exceptionRule) = viewStore.mode {
 				Picker(
-					"Select expcetion list",
+					"Select expcetion list", // FIXME: Strings
 					selection: viewStore.binding(
 						get: { _ in exceptionRule },
 						send: { .exceptionListChanged($0) }
@@ -169,9 +169,9 @@ extension ThirdPartyDeposits.DepositAddressExceptionRule {
 	var text: String {
 		switch self {
 		case .allow:
-			return "Allow" // FIXME: Strings
+			return L10n.AccountSettings.SpecificAssetsDeposits.allow
 		case .deny:
-			return "Deny" // FIXME: Strings
+			return L10n.AccountSettings.SpecificAssetsDeposits.deny
 		}
 	}
 }
@@ -180,18 +180,18 @@ extension ResourcesListMode {
 	var addButtonTitle: String {
 		switch self {
 		case .allowDenyAssets:
-			return "Add Asset" // FIXME: Strings
+			return L10n.AccountSettings.SpecificAssetsDeposits.addAnAssetButton
 		case .allowDepositors:
-			return "Add Depositor Badge" // FIXME: Strings
+			return L10n.AccountSettings.ThirdPartyDeposits.allowSpecificDepositorsButton
 		}
 	}
 
 	var navigationTitle: String {
 		switch self {
 		case .allowDenyAssets:
-			return "Allow/Deny Specific Assets" // FIXME: Strings
+			return L10n.AccountSettings.specificAssetsDeposits
 		case .allowDepositors:
-			return "Allow Specific Depositors" // FIXME: Strings
+			return L10n.AccountSettings.ThirdPartyDeposits.allowSpecificDepositors
 		}
 	}
 }
