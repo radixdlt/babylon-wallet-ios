@@ -13,10 +13,12 @@ extension ImportMnemonicControllingAccounts {
 	public struct ViewState: Equatable {
 		let isSkippable: Bool
 
-		var title: String {
-			isSkippable
-				? L10n.RecoverSeedPhrase.Header.subtitleOtherSeedPhrase
-				: L10n.RecoverSeedPhrase.Header.subtitleMainSeedPhrase
+		var title: LocalizedStringKey {
+			.init(
+				isSkippable
+					? L10n.RecoverSeedPhrase.Header.subtitleOtherSeedPhrase
+					: L10n.RecoverSeedPhrase.Header.subtitleMainSeedPhrase
+			)
 		}
 
 		var navigationTitle: String {

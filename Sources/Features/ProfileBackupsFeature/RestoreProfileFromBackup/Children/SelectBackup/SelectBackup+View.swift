@@ -114,7 +114,7 @@ extension SelectBackup.View {
 			HStack {
 				VStack(alignment: .leading, spacing: 0) {
 					Group {
-						Text(L10n.RecoverProfileBackup.backupFrom(creatingDevice))
+						Text(.init(L10n.RecoverProfileBackup.backupFrom(creatingDevice)))
 						// FIXME: update bolding of 'label'?
 						Text(L10n.IOSProfileBackup.lastModifedDateLabel(formatDate(header.lastModified)))
 //						Text(L10n.IOSProfileBackup.numberOfNetworksLabel(header.contentHint.numberOfNetworks))

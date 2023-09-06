@@ -64,8 +64,8 @@ extension ProfileBackupSettings.View {
 
 				section(L10n.ProfileBackup.ManualBackups.title) {
 					VStack(alignment: .leading, spacing: .medium1) {
-						Text(L10n.ProfileBackup.ManualBackups.subtitle)
-						Button(L10n.ProfileBackup.ManualBackups.exportButtonTitle) {
+						Text(.init(L10n.ProfileBackup.ManualBackups.subtitle))
+						Button(.init(L10n.ProfileBackup.ManualBackups.exportButtonTitle)) {
 							viewStore.send(.exportProfileButtonTapped)
 						}
 						.buttonStyle(.secondaryRectangular(shouldExpand: true))
@@ -74,7 +74,7 @@ extension ProfileBackupSettings.View {
 
 				section(L10n.ProfileBackup.DeleteWallet.title) {
 					VStack(alignment: .leading, spacing: .medium1) {
-						Text(L10n.IOSProfileBackup.DeleteWallet.subtitle)
+						Text(.init(L10n.IOSProfileBackup.DeleteWallet.subtitle))
 
 						Button(L10n.IOSProfileBackup.DeleteWallet.confirmButton) {
 							viewStore.send(.deleteProfileAndFactorSourcesButtonTapped)
