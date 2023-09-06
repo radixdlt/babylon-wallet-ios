@@ -4,7 +4,7 @@ import FeaturePrelude
 extension FungibleTokenDetails.State {
 	var viewState: FungibleTokenDetails.ViewState {
 		.init(
-			detailsContainerWithHeader: resource.detailsContainerWithHeaderViewState,
+			detailsHeader: resource.detailsHeader(withAmount: context == .portfolio),
 			thumbnail: isXRD ? .xrd : .known(resource.iconURL),
 			details: .init(
 				description: resource.description,
@@ -22,7 +22,7 @@ extension FungibleTokenDetails.State {
 // MARK: - FungibleTokenDetails.View
 extension FungibleTokenDetails {
 	public struct ViewState: Equatable {
-		let detailsContainerWithHeader: DetailsContainerWithHeaderViewState
+		let detailsHeader: DetailsContainerWithHeaderViewState
 		let thumbnail: TokenThumbnail.Content
 		let details: AssetResourceDetailsSection.ViewState
 	}
@@ -37,7 +37,7 @@ extension FungibleTokenDetails {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-				DetailsContainerWithHeaderView(viewState: viewStore.detailsContainerWithHeader) {
+				DetailsContainerWithHeaderView(viewState: viewStore.detailsHeader) {
 					TokenThumbnail(viewStore.thumbnail, size: .veryLarge)
 				} detailsView: {
 					AssetResourceDetailsSection(viewState: viewStore.details)
@@ -62,7 +62,8 @@ struct FungibleTokenDetails_Preview: PreviewProvider {
 						resourceAddress: .init(validatingAddress: "resource_tdx_c_1qyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq40v2wv"),
 						amount: .zero
 					),
-					isXRD: true
+					isXRD: true,
+					context: .portfolio
 				),
 				reducer: FungibleTokenDetails()
 			)

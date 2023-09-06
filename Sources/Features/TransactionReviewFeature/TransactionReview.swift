@@ -283,7 +283,8 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			case let .fungible(transfer):
 				state.destination = .fungibleTokenDetails(.init(
 					resource: transfer.fungibleResource,
-					isXRD: transfer.isXRD
+					isXRD: transfer.isXRD,
+					context: .transfer
 				))
 			case let .nonFungible(transfer):
 				state.destination = .nonFungibleTokenDetails(.init(
@@ -648,15 +649,28 @@ extension TransactionReview {
 			.asyncMap(extractDappInfo)
 
 		guard !dApps.isEmpty else { return nil }
-		return TransactionReviewDappsUsed.State(isExpanded: true, dApps: .init(uniqueElements: Set(dApps)))
+
+		let knownDapps = Set(dApps.compacted())
+
+		return TransactionReviewDappsUsed.State(
+			isExpanded: true,
+			knownDapps: .init(uniqueElements: knownDapps),
+			unknownDapps: dApps.count(of: nil)
+		)
 	}
 
-	private func extractDappInfo(_ component: ComponentAddress) async throws -> DappEntity {
-		let dAppDefinitionAddress = try await gatewayAPIClient.getDappDefinitionAddress(component)
-		let metadata = try? await gatewayAPIClient.getDappMetadata(dAppDefinitionAddress)
-			.validating(dAppComponent: component)
-
-		return DappEntity(id: dAppDefinitionAddress, metadata: .init(metadata: metadata))
+	private func extractDappInfo(_ component: ComponentAddress) async -> DappEntity? {
+		do {
+			let dAppDefinitionAddress = try await gatewayAPIClient.getDappDefinitionAddress(component)
+			let metadata = try await gatewayAPIClient.getDappMetadata(
+				dAppDefinitionAddress,
+				validatingDappComponent: component
+			)
+			return DappEntity(id: dAppDefinitionAddress, metadata: .init(metadata: metadata))
+		} catch {
+			loggerGlobal.info("Failed to extract dApp definition from \(component.address): \(error)")
+			return nil
+		}
 	}
 
 	private func exctractProofs(_ transaction: TransactionType.GeneralTransaction) async throws -> TransactionReviewProofs.State? {
@@ -855,7 +869,7 @@ extension TransactionReview {
 
 	public struct DappEntity: Sendable, Identifiable, Hashable {
 		public let id: DappDefinitionAddress
-		public let metadata: EntityMetadata?
+		public let metadata: EntityMetadata
 	}
 
 	public struct EntityMetadata: Sendable, Hashable {
@@ -1164,7 +1178,7 @@ public struct SimpleDappDetails: Sendable, FeatureReducer {
 	/// Loads any fungible and non-fungible resources associated with the dApp
 	private func loadResources(
 		metadata: GatewayAPI.EntityMetadataCollection,
-		validated dappDefinitionAddress: DappDefinitionAddress
+		validated dAppDefinitionAddress: DappDefinitionAddress
 	) async -> Loadable<SimpleDappDetails.State.Resources> {
 		guard let claimedEntities = metadata.claimedEntities, !claimedEntities.isEmpty else {
 			return .idle
@@ -1173,8 +1187,7 @@ public struct SimpleDappDetails: Sendable, FeatureReducer {
 		let result = await TaskResult {
 			let allResourceItems = try await gatewayAPIClient.fetchResourceDetails(claimedEntities, explicitMetadata: .resourceMetadataKeys)
 				.items
-				// FIXME: Uncomment this when when we can rely on dApps conforming to the standards
-				// .filter { $0.metadata.dappDefinition == dAppDefinitionAddress.address }
+				.filter { (try? $0.metadata.validate(dAppDefinitionAddress: dAppDefinitionAddress)) != nil }
 				.compactMap {
 					try $0.resourceDetails()
 				}
@@ -1209,9 +1222,7 @@ public struct SimpleDappDetails: Sendable, FeatureReducer {
 		for dApp: DappDefinitionAddress,
 		validating dAppDefinitionAddress: DappDefinitionAddress
 	) async throws -> State.AssociatedDapp {
-		let metadata = try await gatewayAPIClient.getEntityMetadata(dApp.address, [.name, .iconURL])
-		// FIXME: Uncomment this when when we can rely on dApps conforming to the standards
-		// .validating(dAppDefinitionAddress: dAppDefinitionAddress)
+		let metadata = try await gatewayAPIClient.getDappMetadata(dApp, validatingDappDefinitionAddress: dAppDefinitionAddress)
 		guard let name = metadata.name else {
 			throw GatewayAPI.EntityMetadataCollection.MetadataError.missingName
 		}

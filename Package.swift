@@ -578,6 +578,7 @@ package.addModules([
 			"GatewaysClient",
 			"AppPreferencesClient",
 			"DappInteractionClient",
+			"ROLAClient",
 		],
 		tests: .no
 	),
