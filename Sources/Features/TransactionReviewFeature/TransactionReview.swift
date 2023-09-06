@@ -825,36 +825,6 @@ extension TransactionReview {
 			return result
 		}
 
-		/*
-
-		 RESOURCE METADATA FROM LEDGER - token ids and data from getFungibleData
-
-		 - Existing resource, existing tokens:
-		 createdEntities: []
-		 metadataOfCreatedEntities: [:]
-		 dataOfNewlyMintedNonFungibles: [:]
-		 getFungibleData: FULL
-
-		 RESOURCE METADATA FROM LEDGER - token ids from dataOfNewlyMintedNonFungibles?
-
-		 - Existing resource, new tokens:
-		 createdEntities: []
-		 metadataOfCreatedEntities: [:]
-		 dataOfNewlyMintedNonFungibles: [local ID]
-		 getFungibleData: []
-
-		 ---
-
-		 RESOURCE METADATA FROM metadataOfCreatedEntities - token ids from dataOfNewlyMintedNonFungibles?
-
-		 - New resource, new tokens:
-		 createdEntities: [yes]
-		 metadataOfCreatedEntities: [resource metadata]
-		 dataOfNewlyMintedNonFungibles: [local ID+]
-		 getFungibleData: []
-
-		 */
-
 		switch resourceQuantifier {
 		case let .fungible(_, source):
 			let amount = try BigDecimal(fromString: source.amount.asStr())
