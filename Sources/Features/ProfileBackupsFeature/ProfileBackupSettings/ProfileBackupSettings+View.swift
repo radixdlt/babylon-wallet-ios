@@ -65,7 +65,7 @@ extension ProfileBackupSettings.View {
 				section(L10n.ProfileBackup.ManualBackups.title) {
 					VStack(alignment: .leading, spacing: .medium1) {
 						Text(.init(L10n.ProfileBackup.ManualBackups.subtitle))
-						Button(.init(L10n.ProfileBackup.ManualBackups.exportButtonTitle)) {
+						Button(L10n.ProfileBackup.ManualBackups.exportButtonTitle) {
 							viewStore.send(.exportProfileButtonTapped)
 						}
 						.buttonStyle(.secondaryRectangular(shouldExpand: true))
