@@ -79,9 +79,9 @@ extension GatewayAPIClient {
 
 	/// Extracts the dApp definition address from a component, if one is present
 	public func getDappDefinitionAddress(_ component: ComponentAddress) async throws -> DappDefinitionAddress {
-		let entityMetadata = try await getEntityMetadata(component.address, [.dappDefinition])
+		let entityMetadata = try await getEntityMetadata(component.address, [.dappDefinition, .dappDefinitions])
 
-		guard let dappDefinitionAddressString = entityMetadata.dappDefinition else {
+		guard let dappDefinitionAddressString = entityMetadata.dappDefinition ?? entityMetadata.dappDefinitions?.first else {
 			throw GatewayAPI.EntityMetadataCollection.MetadataError.missingDappDefinition
 		}
 
