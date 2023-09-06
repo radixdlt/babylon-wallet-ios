@@ -36,7 +36,7 @@ extension View {
 
 	public func backupMnemonicPromptView(action: @escaping () -> Void) -> some View {
 		shieldPromptView(
-			text: "Back up this account's seed phrase", // FIXME: Strings
+			text: "Back up this Account's seed phrase", // FIXME: Strings
 			action: action
 		)
 	}
