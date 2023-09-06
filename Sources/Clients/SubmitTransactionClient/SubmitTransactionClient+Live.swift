@@ -83,14 +83,22 @@ extension SubmitTransactionClient: DependencyKey {
 				// RET prints when convertManifest is called, when it is removed, this can be moved down
 				// inline inside `print`.
 				let txIntentString = intent.description(lookupNetworkName: { try? Radix.Network.lookupBy(id: $0).name.rawValue })
-				print("\n\n🔮 DEBUG TRANSACTION START 🔮a")
-				print("TXID: \(txID.asStr())")
-				print("TransactionIntent: \(txIntentString)")
-				print("\n\nINTENT SIGNATURES: \(intentSignatures.map { "\npublicKey: \($0.publicKey?.bytes.hex ?? "")\nsig: \($0.signature.bytes.hex)" }.joined(separator: "\n"))")
-				print("\nNOTARY SIGNATURE: \(notarySignature)")
-				print("\n\nCOMPILED TX INTENT:\n\(request.compiledNotarizedTXIntent.hex)")
-				print("\n\nCOMPILED NOTARIZED INTENT:\n\(request.compiledNotarizedTXIntent.hex)")
-				print("\n\n\n🔮 DEBUG TRANSACTION END 🔮\n\n")
+				loggerGlobal.debug("\n\n🔮 DEBUG TRANSACTION START 🔮")
+				loggerGlobal.debug("TXID: \(txID.asStr())")
+				let tooManyBytesToPrint = 6000 // competely arbitrarily chosen should not take long time to print is the point...
+				if txIntentString.count < tooManyBytesToPrint {
+					loggerGlobal.debug("TransactionIntent: \(txIntentString)")
+				} else {
+					loggerGlobal.debug("TransactionIntent <Manifest too big, header only> \(intent.header().description(lookupNetworkName: { try? Radix.Network.lookupBy(id: $0).name.rawValue }))")
+				}
+				loggerGlobal.debug("\n\nINTENT SIGNATURES: \(intentSignatures.map { "\npublicKey: \($0.publicKey?.bytes.hex ?? "")\nsig: \($0.signature.bytes.hex)" }.joined(separator: "\n"))")
+				loggerGlobal.debug("\nNOTARY SIGNATURE: \(notarySignature.bytes.hex)")
+				if request.compiledNotarizedTXIntent.count < tooManyBytesToPrint {
+					loggerGlobal.debug("\n\nCOMPILED NOTARIZED INTENT:\n\(request.compiledNotarizedTXIntent.hex)")
+				} else {
+					loggerGlobal.debug("\n\nCOMPILED NOTARIZED INTENT: <TOO BIG TO PRINT>")
+				}
+				loggerGlobal.debug("\n\n\n🔮 DEBUG TRANSACTION END 🔮\n\n")
 			}
 
 			@Dependency(\.transactionClient) var transactionClient
@@ -99,7 +107,10 @@ extension SubmitTransactionClient: DependencyKey {
 			let changedAccounts: [Profile.Network.Account.EntityAddress]?
 			do {
 				let decompiledNotarized = try NotarizedTransaction.decompile(compiledNotarizedTransaction: request.compiledNotarizedTXIntent)
+
+				#if DEBUG
 				debugPrintTX(decompiledNotarized)
+				#endif
 
 				let manifest = decompiledNotarized.signedIntent().intent().manifest()
 

@@ -132,3 +132,43 @@ extension DependencyValues {
 		set { self[FaucetClient.self] = newValue }
 	}
 }
+
+extension UserDefaultsClient {
+	public func loadEpochForWhenLastUsedByAccountAddress() -> EpochForWhenLastUsedByAccountAddress {
+		(try? loadCodable(key: .epochForWhenLastUsedByAccountAddress)) ?? .init()
+	}
+
+	public func saveEpochForWhenLastUsedByAccountAddress(_ value: EpochForWhenLastUsedByAccountAddress) async {
+		// not important enough to propagate error
+		try? await save(codable: value, forKey: .epochForWhenLastUsedByAccountAddress)
+	}
+}
+
+// MARK: - EpochForWhenLastUsedByAccountAddress
+// internal for tests
+public struct EpochForWhenLastUsedByAccountAddress: Codable, Hashable, Sendable {
+	public struct EpochForAccount: Codable, Sendable, Hashable, Identifiable {
+		public typealias ID = AccountAddress
+		public var id: ID { accountAddress }
+		public let accountAddress: AccountAddress
+		public var epoch: Epoch
+	}
+
+	public var epochForAccounts: IdentifiedArrayOf<EpochForAccount>
+	public init(epochForAccounts: IdentifiedArrayOf<EpochForAccount> = .init()) {
+		self.epochForAccounts = epochForAccounts
+	}
+
+	public mutating func update(epoch: Epoch, for id: AccountAddress) {
+		if var existing = epochForAccounts[id: id] {
+			existing.epoch = epoch
+			epochForAccounts[id: id] = existing
+		} else {
+			epochForAccounts.append(.init(accountAddress: id, epoch: epoch))
+		}
+	}
+
+	public func getEpoch(for accountAddress: AccountAddress) -> Epoch? {
+		epochForAccounts[id: accountAddress]?.epoch
+	}
+}

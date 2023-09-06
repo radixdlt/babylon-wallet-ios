@@ -7,8 +7,9 @@ public struct AssetTransfer: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public var accounts: TransferAccountList.State
 		public var message: AssetTransferMessage.State?
-
+		public let showIsUsingTestnetBanner: Bool
 		public init(from account: Profile.Network.Account) {
+			self.showIsUsingTestnetBanner = account.networkID != .mainnet
 			self.accounts = .init(fromAccount: account)
 			self.message = nil
 		}

@@ -64,6 +64,10 @@ extension AppPreferencesClient {
 			try mutateDisplay(&preferences.display)
 		}
 	}
+
+	public func isDeveloperModeEnabled() async -> Bool {
+		await extractProfileSnapshot().appPreferences.security.isDeveloperModeEnabled
+	}
 }
 
 // MARK: AppPreferencesClient.Error

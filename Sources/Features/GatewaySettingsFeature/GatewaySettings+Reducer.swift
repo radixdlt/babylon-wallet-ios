@@ -115,21 +115,36 @@ public struct GatewaySettings: Sendable, FeatureReducer {
 
 		case let .removeGateway(.presented(action)):
 			switch action {
-			case let .removeButtonTapped(gateway):
+			case let .removeButtonTapped(gatewayState):
+				guard gatewayState.gateway != .mainnet else {
+					assertionFailure("Incorrect implementation, should be impossible to remove mainnet.")
+					return .none
+				}
 				guard let currentGateway = state.currentGateway else { return .none }
 
-				switch gateway.gateway {
+				switch gatewayState.gateway {
 				case currentGateway:
-					guard let firstPredefined = state.gatewayList.gateways.first(where: { !$0.canBeDeleted })?.gateway else {
+
+					// FIXME: Mainnet simply once mainnet is online....
+					let containsMainnet = state.gatewayList.gateways.map(\.gateway).contains(.mainnet)
+					let newCurrent: Radix.Gateway? = {
+						if containsMainnet {
+							return Radix.Gateway.mainnet
+						} else {
+							return Radix.Gateway.default
+						}
+					}()
+
+					guard let newCurrent else {
 						return .none
 					}
 
-					state.gatewayForRemoval = gateway.gateway
-					return switchToGateway(&state, gateway: firstPredefined)
+					state.gatewayForRemoval = gatewayState.gateway
+					return switchToGateway(&state, gateway: newCurrent)
 
 				default:
 					return .run { _ in
-						try await gatewaysClient.removeGateway(gateway.gateway)
+						try await gatewaysClient.removeGateway(gatewayState.gateway)
 					}
 				}
 
@@ -160,13 +175,24 @@ public struct GatewaySettings: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
 		case let .gatewaysLoadedResult(.success(gateways)):
+			let containsMainnet = gateways.all.contains(Radix.Gateway.mainnet)
+			func canBeDeleted(_ gateway: Radix.Gateway) -> Bool {
+				guard gateways.all.count > 1 else {
+					return false
+				}
+				if containsMainnet {
+					return gateway != .mainnet
+				} else {
+					return gateway != .default
+				}
+			}
 			state.currentGateway = gateways.current
 			state.gatewayList = .init(gateways: .init(
 				uniqueElements: gateways.all.elements.map {
 					GatewayRow.State(
 						gateway: $0,
 						isSelected: gateways.current.id == $0.id,
-						canBeDeleted: !$0.isDefault
+						canBeDeleted: canBeDeleted($0)
 					)
 				}
 				.sorted(by: { !$0.canBeDeleted && $1.canBeDeleted })

@@ -32,3 +32,8 @@ public enum ICEConnectionState: String, Sendable {
 public enum SignalingState: String, Sendable, Hashable, Codable {
 	case closed, stable, haveLocalOffer, haveLocalPrAnswer, haveRemoteOffer, haveRemotePrAnswer
 }
+
+// MARK: - DataChannelReadyState
+public enum DataChannelReadyState: String, Sendable {
+	case closed, closing, connecting, connected
+}

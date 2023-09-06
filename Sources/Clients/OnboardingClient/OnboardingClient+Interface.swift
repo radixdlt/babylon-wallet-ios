@@ -4,6 +4,8 @@ import Profile
 // MARK: - OnboardingClient
 public struct OnboardingClient: Sendable {
 	public var loadProfile: LoadProfile
+
+	/// Returns `true` iff Profile contains any mainnet accounts
 	public var commitEphemeral: CommitEphemeral
 
 	public init(
@@ -17,5 +19,7 @@ public struct OnboardingClient: Sendable {
 
 extension OnboardingClient {
 	public typealias LoadProfile = @Sendable () async -> LoadProfileOutcome
-	public typealias CommitEphemeral = @Sendable () async throws -> Void
+
+	/// Returns `true` iff Profile contains any mainnet accounts
+	public typealias CommitEphemeral = @Sendable () async throws -> Bool
 }

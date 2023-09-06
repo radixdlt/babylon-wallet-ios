@@ -1,8 +1,10 @@
 import AppPreferencesClient
 import AssetsFeature
 import ComposableArchitecture
+import Cryptography
 import CryptoKit
 import EngineKit
+import FactorSourcesClient
 import FeaturePrelude
 import GatewayAPI
 import OnLedgerEntitiesClient
@@ -18,9 +20,8 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		public let transactionManifest: TransactionManifest
 		public let message: Message
 		public let signTransactionPurpose: SigningPurpose.SignTransactionPurpose
-		public var networkID: NetworkID? {
-			reviewedTransaction?.networkId
-		}
+
+		public var networkID: NetworkID? { reviewedTransaction?.networkId }
 
 		public var reviewedTransaction: ReviewedTransaction? = nil
 
@@ -34,6 +35,33 @@ public struct TransactionReview: Sendable, FeatureReducer {
 
 		@PresentationState
 		public var destination: Destinations.State? = nil
+
+		public func printFeePayerInfo(line: UInt = #line, function: StaticString = #function) {
+			#if DEBUG
+			func doPrint(_ msg: String) {
+				loggerGlobal.critical("💃 \(function)#\(line) - \(msg)")
+			}
+			let intentSignersNonEmpty = reviewedTransaction?.transactionSigners.intentSignerEntitiesNonEmptyOrNil()
+			let feePayer = reviewedTransaction?.feePayerSelection.selected?.account
+
+			let notaryIsSignatory: Bool = reviewedTransaction?.transactionSigners.notaryIsSignatory == true
+			switch (intentSignersNonEmpty, feePayer) {
+			case (.none, .none):
+				doPrint("NO Feepayer or intentSigner - faucet TX⁈ (notaryIsSignatory: \(notaryIsSignatory)")
+				if !notaryIsSignatory {
+					assertionFailure("Should not happen")
+				}
+			case let (.some(_intentSigners), .some(feePayer)):
+				doPrint("Fee payer: \(feePayer.address), intentSigners: \(_intentSigners.map(\.address))")
+			case let (.some(_intentSigners), .none):
+				doPrint("‼️ NO Fee payer, but got intentSigners: \(_intentSigners.map(\.address)) ")
+				assertionFailure("Should not happen")
+			case let (.none, .some(feePayer)):
+				doPrint("‼️Fee payer: \(feePayer.address), but no intentSigners")
+				assertionFailure("Should not happen")
+			}
+			#endif
+		}
 
 		public init(
 			transactionManifest: TransactionManifest,
@@ -65,7 +93,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		case closeTapped
 		case showRawTransactionTapped
 
-		case approveTapped
+		case approvalSliderSlid
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -79,11 +107,10 @@ public struct TransactionReview: Sendable, FeatureReducer {
 	}
 
 	public enum InternalAction: Sendable, Equatable {
-		case defaultDepositGuaranteeLoaded(BigDecimal)
 		case previewLoaded(TaskResult<TransactionToReview>)
 		case createTransactionReview(TransactionReview.TransactionContent)
-		case prepareForSigningResult(TaskResult<TransactionClient.PrepareForSiginingResponse>)
-		case loadedOnLedgerResource(Transfer, TaskResult<OnLedgerEntity.Resource>)
+		case buildTransactionItentResult(TaskResult<TransactionIntent>)
+		case notarizeResult(TaskResult<NotarizeTransactionResponse>)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -174,16 +201,14 @@ public struct TransactionReview: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .appeared:
-			let manifest = state.transactionManifest
-			return .run { [nonce = state.nonce, message = state.message] send in
-				let defaultDepositGuarantees = await appPreferencesClient.getPreferences().transaction.defaultDepositGuarantee
-				await send(.internal(.defaultDepositGuaranteeLoaded(defaultDepositGuarantees)))
-
+			return .run { [state = state] send in
 				let preview = await TaskResult {
 					try await transactionClient.getTransactionReview(.init(
-						manifestToSign: manifest,
-						message: message,
-						nonce: nonce
+						manifestToSign: state.transactionManifest,
+						message: state.message,
+						nonce: state.nonce,
+						ephemeralNotaryPublicKey: state.ephemeralNotaryPrivateKey.publicKey,
+						signingPurpose: .signTransaction(state.signTransactionPurpose)
 					))
 				}
 				await send(.internal(.previewLoaded(preview)))
@@ -201,8 +226,9 @@ public struct TransactionReview: Sendable, FeatureReducer {
 				return .none
 			}
 
-		case .approveTapped:
+		case .approvalSliderSlid:
 			state.canApproveTX = false
+			state.printFeePayerInfo()
 			do {
 				let manifest = try transactionManifestWithWalletInstructionsAdded(state)
 				guard let reviewedTransaction = state.reviewedTransaction else {
@@ -225,19 +251,21 @@ public struct TransactionReview: Sendable, FeatureReducer {
 					}
 				}()
 
-				let request = TransactionClient.PrepareForSigningRequest(
-					nonce: state.nonce,
+				let request = BuildTransactionIntentRequest(
+					networkID: networkID,
 					manifest: manifest,
 					message: state.message,
-					networkID: networkID,
-					feePayer: reviewedTransaction.feePayerSelection.selected?.account,
-					purpose: .signTransaction(state.signTransactionPurpose),
-					ephemeralNotaryPublicKey: state.ephemeralNotaryPrivateKey.publicKey,
-					transactionHeader: .init(tipPercentage: tipPercentage)
+					makeTransactionHeaderInput: MakeTransactionHeaderInput(tipPercentage: tipPercentage),
+					transactionSigners: reviewedTransaction.transactionSigners
 				)
+
+				#if DEBUG
+				printSigners(reviewedTransaction)
+				#endif
+
 				return .task {
-					await .internal(.prepareForSigningResult(TaskResult {
-						try await transactionClient.prepareForSigning(request)
+					await .internal(.buildTransactionItentResult(TaskResult {
+						try await transactionClient.buildTransactionIntent(request)
 					}))
 				}
 			} catch {
@@ -251,56 +279,38 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		switch childAction {
 		case let .withdrawals(.delegate(.showAsset(assetTransfer))),
 		     let .deposits(.delegate(.showAsset(assetTransfer))):
-			let metadata = state.reviewedTransaction?.metadataForNewlyCreatedResource(assetTransfer.resource)
 			switch assetTransfer {
 			case let .fungible(transfer):
-				state.destination = .fungibleTokenDetails(.init(transfer: transfer, metadata: metadata))
+				state.destination = .fungibleTokenDetails(.init(
+					resource: transfer.fungibleResource,
+					isXRD: transfer.isXRD,
+					context: .transfer
+				))
 			case let .nonFungible(transfer):
-				do {
-					state.destination = try .nonFungibleTokenDetails(.init(transfer: transfer, metadata: metadata))
-				} catch {
-					errorQueue.schedule(error)
-				}
+				state.destination = .nonFungibleTokenDetails(.init(
+					token: transfer.token,
+					resource: transfer.nonFungibleResource
+				))
 			}
 
-			if metadata != nil {
-				// Only newly created resources have metadata, if so it's pointless to call onLedgerEntitiesClient
-				return .none
-			}
-
-			return .run { send in
-				let result = await TaskResult {
-					try await onLedgerEntitiesClient.getResource(assetTransfer.resource)
-				}
-
-				await send(.internal(.loadedOnLedgerResource(assetTransfer, result)))
-			}
+			return .none
 
 		case let .dAppsUsed(.delegate(.openDapp(id))):
 			state.destination = .dApp(.init(dAppID: id))
 			return .none
 
 		case .deposits(.delegate(.showCustomizeGuarantees)):
-			guard let deposits = state.deposits else { return .none } // TODO: Handle?
-
-			let guarantees = deposits.accounts
-				.flatMap { account -> [TransactionReviewGuarantee.State] in
-					account.transfers
-						.compactMap(\.fungible)
-						.filter { $0.guarantee != nil }
-						.compactMap { .init(account: account.account, transfer: $0) }
-				}
-
+			// TODO: Handle?
+			guard let guarantees = state.deposits?.accounts.customizableGuarantees, !guarantees.isEmpty else { return .none }
 			state.destination = .customizeGuarantees(.init(guarantees: .init(uniqueElements: guarantees)))
 
 			return .none
 
 		case .networkFee(.delegate(.showCustomizeFees)):
-			guard let feePayerSelection = state.reviewedTransaction?.feePayerSelection else {
+			guard let reviewedTransaction = state.reviewedTransaction else {
 				return .none
 			}
-			state.destination = .customizeFees(.init(feePayerSelection: feePayerSelection))
-
+			state.destination = .customizeFees(.init(reviewedTransaction: reviewedTransaction, manifest: state.transactionManifest, signingPurpose: .signTransaction(state.signTransactionPurpose)))
 			return .none
 
 		case let .destination(.presented(presentedAction)):
@@ -333,11 +343,10 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		case .customizeGuarantees:
 			return .none
 
-		case let .customizeFees(.delegate(.updated(feePayerSelection))):
-			state.reviewedTransaction?.feePayerSelection = feePayerSelection
-			if let reviewedTransaction = state.reviewedTransaction {
-				state.networkFee = .init(reviewedTransaction: reviewedTransaction)
-			}
+		case let .customizeFees(.delegate(.updated(reviewedTransaction))):
+			state.reviewedTransaction = reviewedTransaction
+			state.networkFee = .init(reviewedTransaction: reviewedTransaction)
+			state.printFeePayerInfo()
 			return .none
 
 		case .customizeFees:
@@ -418,13 +427,89 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		}
 	}
 
-	private func cancelSigningEffect(state: inout State) -> EffectTask<Action> {
-		loggerGlobal.notice("Cancelled signing")
-		state.canApproveTX = true
-		return .none
-	}
+	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
+		switch internalAction {
+		case let .previewLoaded(.failure(error)):
+			return .send(.delegate(.failed(TransactionFailure.failedToPrepareTXReview(.failedToGenerateTXReview(error)))))
 
-	private func review(_ state: inout State) -> EffectTask<Action> {
+		case let .previewLoaded(.success(preview)):
+			do {
+				state.reviewedTransaction = try .init(
+					feePayerSelection: preview.feePayerSelectionAmongstCandidates,
+					networkId: preview.networkID,
+					transaction: preview.analyzedManifestToReview.transactionTypes.transactionKind(),
+					transactionSigners: preview.transactionSigners,
+					signingFactors: preview.signingFactors
+				)
+				return review(&state)
+			} catch {
+				errorQueue.schedule(error)
+				return .none
+			}
+
+		case let .createTransactionReview(content):
+			state.withdrawals = content.withdrawals
+			state.dAppsUsed = content.dAppsUsed
+			state.deposits = content.deposits
+			state.proofs = content.proofs
+			state.networkFee = content.networkFee
+			return .none
+
+		case let .buildTransactionItentResult(.success(intent)):
+			guard let reviewedTransaction = state.reviewedTransaction else {
+				return .none
+			}
+
+			if reviewedTransaction.transactionSigners.notaryIsSignatory {
+				let notaryKey: SLIP10.PrivateKey = .curve25519(state.ephemeralNotaryPrivateKey)
+
+				/// Silently sign the transaction with notary keys.
+				return .run { send in
+					await send(.internal(.notarizeResult(TaskResult {
+						try await transactionClient.notarizeTransaction(.init(
+							intentSignatures: [],
+							transactionIntent: intent,
+							notary: notaryKey
+						))
+					})))
+				}
+			}
+
+			state.destination = .signing(.init(
+				factorsLeftToSignWith: reviewedTransaction.signingFactors,
+				signingPurposeWithPayload: .signTransaction(
+					ephemeralNotaryPrivateKey: state.ephemeralNotaryPrivateKey,
+					intent,
+					origin: state.signTransactionPurpose
+				)
+			))
+			return .none
+
+		case let .notarizeResult(.success(notarizedTX)):
+			state.destination = .submitting(.init(notarizedTX: notarizedTX))
+			return .none
+
+		case let .buildTransactionItentResult(.failure(error)),
+		     let .notarizeResult(.failure(error)):
+			errorQueue.schedule(error)
+			return .none
+		}
+	}
+}
+
+extension Collection<TransactionReviewAccount.State> {
+	var customizableGuarantees: [TransactionReviewGuarantee.State] {
+		flatMap { account in
+			account.transfers
+				.compactMap(\.fungible)
+				.filter { $0.guarantee != nil }
+				.compactMap { .init(account: account.account, transfer: $0) }
+		}
+	}
+}
+
+extension TransactionReview {
+	func review(_ state: inout State) -> EffectTask<Action> {
 		guard let transactionToReview = state.reviewedTransaction else {
 			assertionFailure("Bad implementation, expected `analyzedManifestToReview`")
 			return .none
@@ -464,97 +549,27 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
-		switch internalAction {
-		case let .defaultDepositGuaranteeLoaded(defaultGuarantee):
-			// FIXME: Apply guarantee
-			return .none
-
-		case let .previewLoaded(.failure(error)):
-			return .send(.delegate(.failed(TransactionFailure.failedToPrepareTXReview(.failedToGenerateTXReview(error)))))
-
-		case let .previewLoaded(.success(preview)):
-			do {
-				state.reviewedTransaction = try .init(
-					feePayerSelection: preview.feePayerSelectionAmongstCandidates,
-					networkId: preview.networkID,
-					transaction: preview.analyzedManifestToReview.transactionTypes.transactionKind()
-				)
-				return review(&state)
-			} catch {
-				errorQueue.schedule(error)
-				return .none
-			}
-
-		case let .createTransactionReview(content):
-			state.withdrawals = content.withdrawals
-			state.dAppsUsed = content.dAppsUsed
-			state.deposits = content.deposits
-			state.proofs = content.proofs
-			state.networkFee = content.networkFee
-			return .none
-
-		case let .loadedOnLedgerResource(assetTransfer, .success(resource)):
-			let kind = resource.resourceAddress.decodedKind
-			// Now we also have the resource and we can update the details view
-			switch (assetTransfer, kind) {
-			case let (.fungible(transfer), .globalFungibleResourceManager):
-				guard case .fungibleTokenDetails = state.destination else { return .none }
-				state.destination = .fungibleTokenDetails(.init(transfer: transfer, resource: resource))
-			case let (.nonFungible(transfer), .globalNonFungibleResourceManager):
-				guard case .nonFungibleTokenDetails = state.destination else { return .none }
-				do {
-					state.destination = try .nonFungibleTokenDetails(.init(transfer: transfer, resource: resource))
-				} catch {
-					errorQueue.schedule(error)
-				}
-			default:
-				struct OnLedgerError: Error {}
-				errorQueue.schedule(OnLedgerError())
-			}
-
-			return .none
-
-		case let .loadedOnLedgerResource(_, .failure(error)):
-			loggerGlobal.warning("Failed to load on-ledger resource: \(error)")
-			return .none
-
-		case let .prepareForSigningResult(.success(response)):
-			state.destination = .signing(.init(
-				factorsLeftToSignWith: response.signingFactors,
-				signingPurposeWithPayload: .signTransaction(
-					ephemeralNotaryPrivateKey: state.ephemeralNotaryPrivateKey,
-					response.intent,
-					origin: state.signTransactionPurpose
-				)
-			))
-			return .none
-		case let .prepareForSigningResult(.failure(error)):
-			errorQueue.schedule(error)
-			return .none
-		}
-	}
-
 	public func addingGuarantees(
 		to manifest: TransactionManifest,
 		guarantees: [TransactionClient.Guarantee]
 	) throws -> TransactionManifest {
 		guard !guarantees.isEmpty else { return manifest }
 
-		let assertions: [IndexedAssertion] = try guarantees.map {
-			try .init(
-				index: $0.instructionIndex,
-				assertion: .amount(
-					resourceAddress: $0.resourceAddress.intoEngine(),
-					amount: $0.amount.intoEngine()
-				)
+		var manifest = manifest
+
+		/// Will be increased with each added guarantee to account for the difference in indexes from the initial manifest.
+		var indexInc = 1 // LockFee was added, start from 1
+		for guarantee in guarantees {
+			let guaranteeInstruction: Instruction = try .assertWorktopContains(
+				resourceAddress: guarantee.resourceAddress.intoEngine(),
+				amount: .init(value: guarantee.amount.toString())
 			)
+
+			manifest = try manifest.withInstructionAdded(guaranteeInstruction, at: Int(guarantee.instructionIndex) + indexInc)
+
+			indexInc += 1
 		}
-		return try manifest.modify(modifications: .init(
-			addAccessControllerProofs: [],
-			addLockFee: nil,
-			addAssertions: assertions
-		))
+		return manifest
 	}
 
 	func showRawTransaction(_ state: inout State) -> EffectTask<Action> {
@@ -569,33 +584,11 @@ public struct TransactionReview: Sendable, FeatureReducer {
 	}
 
 	func transactionManifestWithWalletInstructionsAdded(_ state: State) throws -> TransactionManifest {
-		let lockFee: LockFeeModification? = try {
-			guard let feePayerSelection = state.reviewedTransaction?.feePayerSelection,
-			      let feePayer = feePayerSelection.selected
-			else {
-				return nil
-			}
-			return try .init(
-				accountAddress: feePayer.account.address.intoEngine(),
-				amount: feePayerSelection.transactionFee.totalFee.lockFee.intoEngine()
-			)
-		}()
-
-		let assertions: [IndexedAssertion] = try state.allGuarantees.map {
-			try .init(
-				index: $0.instructionIndex,
-				assertion: .amount(
-					resourceAddress: $0.resourceAddress.intoEngine(),
-					amount: $0.amount.intoEngine()
-				)
-			)
+		var manifest = state.transactionManifest
+		if let feePayerSelection = state.reviewedTransaction?.feePayerSelection, let feePayer = feePayerSelection.selected {
+			manifest = try manifest.withLockFeeCallMethodAdded(address: feePayer.account.address.asGeneral(), fee: feePayerSelection.transactionFee.totalFee.lockFee)
 		}
-
-		return try state.transactionManifest.modify(modifications: .init(
-			addAccessControllerProofs: [],
-			addLockFee: lockFee,
-			addAssertions: assertions
-		))
+		return try addingGuarantees(to: manifest, guarantees: state.allGuarantees)
 	}
 
 	func delayedEffect(
@@ -606,6 +599,12 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			try await clock.sleep(for: delay)
 			return action
 		}
+	}
+
+	func cancelSigningEffect(state: inout State) -> EffectTask<Action> {
+		loggerGlobal.notice("Cancelled signing")
+		state.canApproveTX = true
+		return .none
 	}
 }
 
@@ -645,22 +644,33 @@ extension TransactionReview {
 
 	private func extractUsedDapps(_ transaction: TransactionType.GeneralTransaction) async throws -> TransactionReviewDappsUsed.State? {
 		let dApps = try await transaction.allAddress
-			.filter {
-				$0.entityType() == .globalGenericComponent
-			}
+			.filter { $0.entityType() == .globalGenericComponent }
 			.map { try $0.asSpecific() }
 			.asyncMap(extractDappInfo)
 
 		guard !dApps.isEmpty else { return nil }
-		return TransactionReviewDappsUsed.State(isExpanded: true, dApps: .init(uniqueElements: Set(dApps)))
+
+		let knownDapps = Set(dApps.compacted())
+
+		return TransactionReviewDappsUsed.State(
+			isExpanded: true,
+			knownDapps: .init(uniqueElements: knownDapps),
+			unknownDapps: dApps.count(of: nil)
+		)
 	}
 
-	private func extractDappInfo(_ component: ComponentAddress) async throws -> DappEntity {
-		let dAppDefinitionAddress = try await gatewayAPIClient.getDappDefinitionAddress(component)
-		let metadata = try? await gatewayAPIClient.getDappMetadata(dAppDefinitionAddress)
-			.validating(dAppComponent: component)
-
-		return DappEntity(id: dAppDefinitionAddress, metadata: .init(metadata: metadata))
+	private func extractDappInfo(_ component: ComponentAddress) async -> DappEntity? {
+		do {
+			let dAppDefinitionAddress = try await gatewayAPIClient.getDappDefinitionAddress(component)
+			let metadata = try await gatewayAPIClient.getDappMetadata(
+				dAppDefinitionAddress,
+				validatingDappComponent: component
+			)
+			return DappEntity(id: dAppDefinitionAddress, metadata: .init(metadata: metadata))
+		} catch {
+			loggerGlobal.info("Failed to extract dApp definition from \(component.address): \(error)")
+			return nil
+		}
 	}
 
 	private func exctractProofs(_ transaction: TransactionType.GeneralTransaction) async throws -> TransactionReviewProofs.State? {
@@ -706,7 +716,7 @@ extension TransactionReview {
 		let accounts = withdrawals.map {
 			TransactionReviewAccount.State(account: $0.key, transfers: .init(uniqueElements: $0.value))
 		}
-		return .init(accounts: .init(uniqueElements: accounts), showCustomizeGuarantees: false)
+		return .init(accounts: .init(uniqueElements: accounts), enableCustomizeGuarantees: false)
 	}
 
 	private func extractDeposits(
@@ -714,6 +724,8 @@ extension TransactionReview {
 		userAccounts: [Account],
 		networkID: NetworkID
 	) async throws -> TransactionReviewAccounts.State? {
+		let defaultDepositGuarantee = await appPreferencesClient.getPreferences().transaction.defaultDepositGuarantee
+
 		var deposits: [Account: [Transfer]] = [:]
 
 		for (accountAddress, accountDeposits) in transaction.accountDeposits {
@@ -725,7 +737,8 @@ extension TransactionReview {
 					metadataOfCreatedEntities: transaction.metadataOfNewlyCreatedEntities,
 					createdEntities: transaction.addressesOfNewlyCreatedEntities,
 					networkID: networkID,
-					type: $0.transferType
+					type: $0.transferType,
+					defaultDepositGuarantee: defaultDepositGuarantee
 				)
 			}
 
@@ -738,11 +751,8 @@ extension TransactionReview {
 
 		guard !reviewAccounts.isEmpty else { return nil }
 
-		let requiresGuarantees = reviewAccounts.contains { reviewAccount in
-			reviewAccount.transfers.contains { $0.fungible?.guarantee != nil }
-		}
-
-		return .init(accounts: .init(uniqueElements: reviewAccounts), showCustomizeGuarantees: requiresGuarantees)
+		let requiresGuarantees = !reviewAccounts.customizableGuarantees.isEmpty
+		return .init(accounts: .init(uniqueElements: reviewAccounts), enableCustomizeGuarantees: requiresGuarantees)
 	}
 
 	func transferInfo(
@@ -750,86 +760,101 @@ extension TransactionReview {
 		metadataOfCreatedEntities: [String: [String: MetadataValue?]]?,
 		createdEntities: [EngineToolkit.Address],
 		networkID: NetworkID,
-		type: TransferType
+		type: TransferType,
+		defaultDepositGuarantee: BigDecimal = 1
 	) async throws -> [Transfer] {
 		let resourceAddress: ResourceAddress = try resourceQuantifier.resourceAddress.asSpecific()
-		let isNewResource = createdEntities.contains(resourceQuantifier.resourceAddress)
 
-		let metadata: (name: String?, symbol: String?, thumbnail: URL?) = await {
-			if let newResourceMetadata = metadataOfCreatedEntities?[resourceAddress.address] {
-				return (
-					newResourceMetadata.name,
-					newResourceMetadata.symbol,
-					newResourceMetadata.iconURL
-				)
+		func getTransferInfo() async throws -> Either<OnLedgerEntity.Resource, [String: MetadataValue?]> {
+			if let newlyCreatedMetadata = metadataOfCreatedEntities?[resourceAddress.address] {
+				return .right(newlyCreatedMetadata)
 			} else {
-				let remoteMetadata = try? await gatewayAPIClient.getEntityMetadata(resourceAddress.address, [.name, .symbol, .iconURL])
-
-				return (
-					remoteMetadata?.name,
-					remoteMetadata?.symbol,
-					remoteMetadata?.iconURL
-				)
+				return try await .left(onLedgerEntitiesClient.getResource(resourceAddress))
 			}
-		}()
+		}
 
 		switch resourceQuantifier {
 		case let .fungible(_, source):
 			let amount = try BigDecimal(fromString: source.amount.asStr())
+			let isXRD = resourceAddress.isXRD(on: networkID)
 
-			func guarantee() -> TransactionClient.Guarantee? {
-				guard case let .predicted(instructionIndex, _) = source, !isNewResource else { return nil }
-				return .init(amount: amount, instructionIndex: instructionIndex, resourceAddress: resourceAddress)
+			switch try await getTransferInfo() {
+			case let .left(onLedgerEntity):
+				// A fungible resource existing on ledger
+				func guarantee() -> TransactionClient.Guarantee? {
+					guard case let .predicted(instructionIndex, _) = source else { return nil }
+					let guaranteedAmount = defaultDepositGuarantee * amount
+					return .init(amount: guaranteedAmount, instructionIndex: instructionIndex, resourceAddress: resourceAddress)
+				}
+
+				return [.fungible(.init(
+					fungibleResource: .init(
+						amount: amount,
+						onLedgerEntity: onLedgerEntity
+					),
+					isXRD: isXRD,
+					guarantee: guarantee()
+				))]
+
+			case let .right(newEntityMetadata):
+				// A newly created fungible resource
+				return [.fungible(.init(
+					fungibleResource: .init(
+						resourceAddress: resourceAddress,
+						amount: amount,
+						metadata: newEntityMetadata
+					),
+					isXRD: isXRD
+				))]
 			}
-
-			return [.fungible(.init(
-				resource: resourceAddress,
-				amount: amount,
-				name: metadata.name,
-				symbol: metadata.symbol,
-				thumbnail: metadata.thumbnail,
-				isXRD: resourceAddress.isXRD(on: networkID),
-				guarantee: guarantee()
-			))]
 		case let .nonFungible(_, _, .guaranteed(ids)),
 		     let .nonFungible(_, _, ids: .predicted(instructionIndex: _, value: ids)):
-			if isNewResource {
-				return try ids.map { id in
-					try Transfer.nonFungible(.init(
-						resource: resourceAddress,
-						resourceName: metadata.name,
-						resourceImage: metadata.thumbnail,
-						tokenID: id.toString().userFacingNonFungibleLocalID,
-						tokenName: nil
+
+			switch try await getTransferInfo() {
+			case let .left(onLedgerEntity):
+				// A non-fungible resource existing on ledger
+				let maximumNFTIDChunkSize = 29
+
+				var result: [Transfer] = []
+				for idChunk in ids.chunks(ofCount: maximumNFTIDChunkSize) {
+					let tokens = try await gatewayAPIClient.getNonFungibleData(.init(
+						resourceAddress: resourceAddress.address,
+						nonFungibleIds: idChunk.map {
+							try $0.toString()
+						}
 					))
-				}
-			}
-
-			let maximumNFTIDChunkSize = 29
-
-			var result: [Transfer] = []
-			for idChunk in ids.chunks(ofCount: maximumNFTIDChunkSize) {
-				let tokens = try await gatewayAPIClient.getNonFungibleData(.init(
-					resourceAddress: resourceAddress.address,
-					nonFungibleIds: idChunk.map {
-						try $0.toString()
+					.nonFungibleIds
+					.map { responseItem in
+						try Transfer.nonFungible(
+							.init(
+								nonFungibleResource: .init(onLedgerEntity: onLedgerEntity),
+								token: .init(resourceAddress: resourceAddress, nftResponseItem: responseItem)
+							)
+						)
 					}
-				))
-				.nonFungibleIds
-				.map {
-					Transfer.nonFungible(.init(
-						resource: resourceAddress,
-						resourceName: metadata.name,
-						resourceImage: metadata.thumbnail,
-						tokenID: $0.nonFungibleId.userFacingNonFungibleLocalID,
-						tokenName: nil
+
+					result.append(contentsOf: tokens)
+				}
+				return result
+
+			case let .right(newEntityMetadata):
+				// A newly created non-fungible resource
+				return try ids.map { id in
+					try .nonFungible(.init(
+						nonFungibleResource: .init(
+							resourceAddress: resourceAddress,
+							metadata: newEntityMetadata
+						),
+						token: .init(
+							id: .fromParts(
+								resourceAddress: resourceAddress.intoEngine(),
+								nonFungibleLocalId: id
+							),
+							name: nil // FIXME: Can we get the name?
+						)
 					))
 				}
-
-				result.append(contentsOf: tokens)
 			}
-
-			return result
 		}
 	}
 }
@@ -844,7 +869,7 @@ extension TransactionReview {
 
 	public struct DappEntity: Sendable, Identifiable, Hashable {
 		public let id: DappDefinitionAddress
-		public let metadata: EntityMetadata?
+		public let metadata: EntityMetadata
 	}
 
 	public struct EntityMetadata: Sendable, Hashable {
@@ -900,9 +925,9 @@ extension TransactionReview {
 		public var resource: ResourceAddress {
 			switch self {
 			case let .fungible(details):
-				return details.resource
+				return details.fungibleResource.resourceAddress
 			case let .nonFungible(details):
-				return details.resource
+				return details.nonFungibleResource.resourceAddress
 			}
 		}
 
@@ -931,22 +956,15 @@ extension TransactionReview {
 
 	public struct FungibleTransfer: Sendable, Hashable {
 		public let id = Transfer.ID()
-		public let resource: ResourceAddress
-		public let amount: BigDecimal
-		public let name: String?
-		public let symbol: String?
-		public let thumbnail: URL?
+		public let fungibleResource: AccountPortfolio.FungibleResource
 		public let isXRD: Bool
 		public var guarantee: TransactionClient.Guarantee?
 	}
 
 	public struct NonFungibleTransfer: Sendable, Hashable {
 		public let id = Transfer.ID()
-		public let resource: ResourceAddress
-		public let resourceName: String?
-		public let resourceImage: URL?
-		public let tokenID: String
-		public let tokenName: String?
+		public let nonFungibleResource: AccountPortfolio.NonFungibleResource
+		public let token: AccountPortfolio.NonFungibleResource.NonFungibleToken
 	}
 }
 
@@ -998,39 +1016,12 @@ extension Collection where Element: Equatable {
 }
 
 extension ResourceTracker {
-	public var decimalSource: DecimalSource {
-		switch self {
-		case let .fungible(_, amount):
-			return amount
-		case let .nonFungible(_, amount, _):
-			return amount
-		}
-	}
-
 	var transferType: TransactionReview.TransferType {
 		switch decimalSource {
 		case .guaranteed:
 			return .exact
 		case let .predicted(instructionIndex, _):
 			return .estimated(instructionIndex: instructionIndex)
-		}
-	}
-
-	public var resourceAddress: EngineToolkit.Address {
-		switch self {
-		case let .fungible(address, _):
-			return address
-		case let .nonFungible(address, _, _):
-			return address
-		}
-	}
-
-	var ids: [NonFungibleLocalId]? {
-		switch self {
-		case .fungible:
-			return nil
-		case let .nonFungible(_, _, source):
-			return source.ids
 		}
 	}
 }
@@ -1187,7 +1178,7 @@ public struct SimpleDappDetails: Sendable, FeatureReducer {
 	/// Loads any fungible and non-fungible resources associated with the dApp
 	private func loadResources(
 		metadata: GatewayAPI.EntityMetadataCollection,
-		validated dappDefinitionAddress: DappDefinitionAddress
+		validated dAppDefinitionAddress: DappDefinitionAddress
 	) async -> Loadable<SimpleDappDetails.State.Resources> {
 		guard let claimedEntities = metadata.claimedEntities, !claimedEntities.isEmpty else {
 			return .idle
@@ -1196,8 +1187,7 @@ public struct SimpleDappDetails: Sendable, FeatureReducer {
 		let result = await TaskResult {
 			let allResourceItems = try await gatewayAPIClient.fetchResourceDetails(claimedEntities, explicitMetadata: .resourceMetadataKeys)
 				.items
-				// FIXME: Uncomment this when when we can rely on dApps conforming to the standards
-				// .filter { $0.metadata.dappDefinition == dAppDefinitionAddress.address }
+				.filter { (try? $0.metadata.validate(dAppDefinitionAddress: dAppDefinitionAddress)) != nil }
 				.compactMap {
 					try $0.resourceDetails()
 				}
@@ -1232,9 +1222,7 @@ public struct SimpleDappDetails: Sendable, FeatureReducer {
 		for dApp: DappDefinitionAddress,
 		validating dAppDefinitionAddress: DappDefinitionAddress
 	) async throws -> State.AssociatedDapp {
-		let metadata = try await gatewayAPIClient.getEntityMetadata(dApp.address, [.name, .iconURL])
-		// FIXME: Uncomment this when when we can rely on dApps conforming to the standards
-		// .validating(dAppDefinitionAddress: dAppDefinitionAddress)
+		let metadata = try await gatewayAPIClient.getDappMetadata(dApp, validatingDappDefinitionAddress: dAppDefinitionAddress)
 		guard let name = metadata.name else {
 			throw GatewayAPI.EntityMetadataCollection.MetadataError.missingName
 		}
@@ -1272,228 +1260,9 @@ public struct ReviewedTransaction: Hashable, Sendable {
 	var feePayerSelection: FeePayerSelectionAmongstCandidates
 	let networkId: NetworkID
 	let transaction: TransactionKind
-}
 
-// MARK: - TransactionKind
-public enum TransactionKind: Hashable, Sendable {
-	case conforming(TransactionType.GeneralTransaction)
-	case nonConforming
-}
-
-extension [TransactionType] {
-	fileprivate func transactionKind() throws -> TransactionKind {
-		// Empty array means non conforming transaction. ET was not able to map it to any type
-		guard !isEmpty else {
-			return .nonConforming
-		}
-
-		// First try to get the general transaction, if missing then convert the first transaction to general transaction
-		return try firstNonNil(\.generalTransaction).map(TransactionKind.conforming) ?? first!.transactionKind()
-	}
-}
-
-/// This is kinda temporary conversion of all transaction types into GeneralTransaction, until(not sure if needed) we will want to
-/// have specific UI for different transaction types
-extension TransactionType {
-	var generalTransaction: GeneralTransaction? {
-		if case let .generalTransaction(accountProofs, accountWithdraws, accountDeposits, addressesInManifest, metadataOfNewlyCreatedEntities, dataOfNewlyMintedNonFungibles, addressesOfNewlyCreatedEntities) = self {
-			return .init(
-				accountProofs: accountProofs,
-				accountWithdraws: accountWithdraws,
-				accountDeposits: accountDeposits,
-				addressesInManifest: addressesInManifest,
-				metadataOfNewlyCreatedEntities: metadataOfNewlyCreatedEntities,
-				dataOfNewlyMintedNonFungibles: dataOfNewlyMintedNonFungibles,
-				addressesOfNewlyCreatedEntities: addressesOfNewlyCreatedEntities
-			)
-		}
-
-		return nil
-	}
-
-	public struct GeneralTransaction: Hashable, Sendable {
-		let accountProofs: [EngineToolkit.Address]
-		let accountWithdraws: [String: [ResourceTracker]]
-		let accountDeposits: [String: [ResourceTracker]]
-		let addressesInManifest: [EngineToolkit.EntityType: [EngineToolkit.Address]]
-		let metadataOfNewlyCreatedEntities: [String: [String: MetadataValue?]]
-		let dataOfNewlyMintedNonFungibles: [String: [NonFungibleLocalId: [UInt8]]]
-		let addressesOfNewlyCreatedEntities: [EngineToolkit.Address]
-
-		var allAddress: [EngineToolkit.Address] {
-			addressesInManifest.flatMap(\.value)
-		}
-	}
-
-	fileprivate func transactionKind() throws -> TransactionKind {
-		switch self {
-		case let .simpleTransfer(from, to, transferred):
-			let addressesInManifest = [
-				from,
-				to,
-				transferred.resourceAddress,
-			].reduce(into: [EngineToolkit.EntityType: [EngineToolkit.Address]]()) { partialResult, address in
-				partialResult[address.entityType(), default: []].append(address)
-			}
-
-			return .conforming(
-				.init(
-					accountProofs: [],
-					accountWithdraws: [from.addressString(): [transferred.toResourceTracker]],
-					accountDeposits: [to.addressString(): [transferred.toResourceTracker]],
-					addressesInManifest: addressesInManifest,
-					metadataOfNewlyCreatedEntities: [:],
-					dataOfNewlyMintedNonFungibles: [:],
-					addressesOfNewlyCreatedEntities: []
-				)
-			)
-
-		case let .transfer(from, transfers):
-			var withdraws: [String: ResourceTracker] = [:]
-			var deposits: [String: [ResourceTracker]] = [:]
-			var allAddresses: Set<EngineToolkit.Address> = [from]
-
-			for (address, resouceTransfers) in transfers {
-				let accountAddress = try EngineToolkit.Address(address: address)
-				allAddresses.insert(accountAddress)
-
-				for (rawResourceAddress, resource) in resouceTransfers {
-					let resourceAddress = try EngineToolkit.Address(address: rawResourceAddress)
-					allAddresses.insert(resourceAddress)
-
-					let existingResource = withdraws[rawResourceAddress]
-					var total: ResourceTracker
-					let transfered: ResourceTracker
-
-					switch resource {
-					case let .amount(amount):
-						transfered = .fungible(
-							resourceAddress: resourceAddress,
-							amount: .guaranteed(value: amount)
-						)
-						total = transfered
-						if let totalAmount = existingResource?.decimalSource.amount {
-							let sum = try totalAmount.add(other: amount)
-							total = .fungible(
-								resourceAddress: resourceAddress,
-								amount: .guaranteed(value: sum)
-							)
-						}
-					case let .ids(ids):
-						transfered = try! .nonFungible(
-							resourceAddress: resourceAddress,
-							amount: .guaranteed(value: .init(value: "\(ids.count)")),
-							ids: .guaranteed(value: ids)
-						)
-						total = transfered
-						if let allIds = existingResource?.ids {
-							let sum = allIds + ids
-							total = try! .nonFungible(
-								resourceAddress: resourceAddress,
-								amount: .guaranteed(value: .init(value: "\(sum.count)")),
-								ids: .guaranteed(value: sum)
-							)
-						}
-					}
-
-					withdraws[rawResourceAddress] = total
-					deposits[address, default: []].append(transfered)
-				}
-			}
-
-			let addressesInManifest = allAddresses.reduce(into: [EngineToolkit.EntityType: [EngineToolkit.Address]]()) { partialResult, address in
-				partialResult[address.entityType(), default: []].append(address)
-			}
-
-			return .conforming(
-				.init(
-					accountProofs: [],
-					accountWithdraws: [from.addressString(): Array(withdraws.values)],
-					accountDeposits: deposits,
-					addressesInManifest: addressesInManifest,
-					metadataOfNewlyCreatedEntities: [:],
-					dataOfNewlyMintedNonFungibles: [:],
-					addressesOfNewlyCreatedEntities: []
-				)
-			)
-		case let .generalTransaction(accountProofs, accountWithdraws, accountDeposits, addressesInManifest, metadataOfNewlyCreatedEntities, dataOfNewlyMintedNonFungibles, addressesOfNewlyCreatedEntities):
-			return .conforming(
-				.init(
-					accountProofs: accountProofs,
-					accountWithdraws: accountWithdraws,
-					accountDeposits: accountDeposits,
-					addressesInManifest: addressesInManifest,
-					metadataOfNewlyCreatedEntities: metadataOfNewlyCreatedEntities,
-					dataOfNewlyMintedNonFungibles: dataOfNewlyMintedNonFungibles,
-					addressesOfNewlyCreatedEntities: addressesOfNewlyCreatedEntities
-				)
-			)
-		case .accountDepositSettings:
-			return .nonConforming
-		}
-	}
-}
-
-extension ResourceSpecifier {
-	var amount: EngineKit.Decimal? {
-		if case let .amount(_, amount) = self {
-			return amount
-		}
-
-		return nil
-	}
-
-	var ids: [NonFungibleLocalId]? {
-		if case let .ids(_, ids) = self {
-			return ids
-		}
-		return nil
-	}
-
-	var resourceAddress: EngineToolkit.Address {
-		switch self {
-		case let .amount(resourceAddress, _):
-			return resourceAddress
-		case let .ids(resourceAddress, _):
-			return resourceAddress
-		}
-	}
-
-	var toResourceTracker: ResourceTracker {
-		switch self {
-		case let .amount(resourceAddress, amount):
-			return .fungible(resourceAddress: resourceAddress, amount: .guaranteed(value: amount))
-		case let .ids(resourceAddress, ids):
-			return try! .nonFungible(resourceAddress: resourceAddress, amount: .guaranteed(value: .init(value: "\(ids.count)")), ids: .guaranteed(value: ids))
-		}
-	}
-}
-
-extension MetadataValue {
-	var string: String? {
-		if case let .stringValue(value) = self {
-			return value
-		}
-		return nil
-	}
-
-	var url: URL? {
-		if case let .urlValue(value) = self {
-			return URL(string: value)
-		}
-		return nil
-	}
-}
-
-extension DecimalSource {
-	var amount: EngineKit.Decimal {
-		switch self {
-		case let .guaranteed(value):
-			return value
-		case let .predicted(_, value):
-			return value
-		}
-	}
+	var transactionSigners: TransactionSigners
+	var signingFactors: SigningFactors
 }
 
 // MARK: - FeeValidationOutcome
@@ -1560,9 +1329,41 @@ extension FeePayerSelectionAmongstCandidates {
 	}
 }
 
+#if DEBUG
+func printSigners(_ reviewedTransaction: ReviewedTransaction) {
+	for (factorSourceKind, signingFactorsOfKind) in reviewedTransaction.signingFactors {
+		loggerGlobal.debug("🔮 ~~~ SIGNINGFACTORS OF KIND: \(factorSourceKind) #\(signingFactorsOfKind.count) many: ~~~")
+		for signingFactor in signingFactorsOfKind {
+			let factorSource = signingFactor.factorSource
+			loggerGlobal.debug("\t🔮 == Signers for factorSource: \(factorSource.id): ==")
+			for signer in signingFactor.signers {
+				let entity = signer.entity
+				loggerGlobal.debug("\t\t🔮 * Entity: \(entity.displayName): *")
+				for factorInstance in signer.factorInstancesRequiredToSign {
+					loggerGlobal.debug("\t\t\t🔮 * FactorInstance: \(String(describing: factorInstance.derivationPath)) \(factorInstance.publicKey)")
+				}
+			}
+		}
+	}
+}
+#endif // DEBUG
+
 extension ReviewedTransaction {
 	func metadataForNewlyCreatedResource(_ resource: ResourceAddress) -> [String: MetadataValue?]? {
 		guard case let .conforming(conforming) = transaction else { return nil }
 		return conforming.metadataOfNewlyCreatedEntities[resource.address]
 	}
 }
+
+#if DEBUG
+extension TransactionSigners {
+	func intentSignerEntitiesNonEmptyOrNil() -> NonEmpty<OrderedSet<EntityPotentiallyVirtual>>? {
+		switch intentSigning {
+		case let .intentSigners(signers) where !signers.isEmpty:
+			return NonEmpty(rawValue: OrderedSet(signers))
+		default:
+			return nil
+		}
+	}
+}
+#endif

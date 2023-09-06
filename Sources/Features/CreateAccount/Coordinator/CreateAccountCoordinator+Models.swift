@@ -31,12 +31,12 @@ public enum CreateAccountNavigationButtonCTA: Sendable, Equatable {
 extension CreateAccountConfig {
 	public init(purpose: CreateAccountPurpose) {
 		switch purpose {
-		case .firstAccountForNewProfile:
+		case let .firstAccountForNewProfile(mainnetIsLive):
 			self.init(
 				isFirstAccount: true,
 				canBeDismissed: false,
 				navigationButtonCTA: .goHome,
-				specificNetworkID: nil
+				specificNetworkID: mainnetIsLive ? .mainnet : nil
 			)
 		case let .firstAccountOnNewNetwork(specificNetworkID):
 			self.init(
@@ -66,7 +66,7 @@ extension CreateAccountConfig {
 
 // MARK: - CreateAccountPurpose
 public enum CreateAccountPurpose {
-	case firstAccountForNewProfile
+	case firstAccountForNewProfile(mainnetIsLive: Bool)
 	case firstAccountOnNewNetwork(NetworkID)
 	case newAccountDuringDappInteraction
 	case newAccountFromHome

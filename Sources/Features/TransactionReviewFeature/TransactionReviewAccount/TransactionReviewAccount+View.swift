@@ -3,13 +3,13 @@ import FeaturePrelude
 
 extension TransactionReviewAccounts.State {
 	var viewState: TransactionReviewAccounts.ViewState {
-		.init(showCustomizeGuarantees: showCustomizeGuarantees)
+		.init(showCustomizeGuaranteesButton: enableCustomizeGuarantees)
 	}
 }
 
 extension TransactionReviewAccounts {
 	public struct ViewState: Equatable {
-		let showCustomizeGuarantees: Bool
+		let showCustomizeGuaranteesButton: Bool
 	}
 
 	@MainActor
@@ -32,7 +32,7 @@ extension TransactionReviewAccounts {
 							content: { TransactionReviewAccount.View(store: $0) }
 						)
 
-						if viewStore.showCustomizeGuarantees {
+						if viewStore.showCustomizeGuaranteesButton {
 							Button(L10n.TransactionReview.customizeGuaranteesButtonTitle) {
 								viewStore.send(.customizeGuaranteesTapped)
 							}
@@ -96,10 +96,11 @@ extension TransactionReviewAccount {
 
 extension TransactionReviewTokenView.ViewState {
 	init(transfer: TransactionReview.FungibleTransfer) {
+		let resource = transfer.fungibleResource
 		self.init(
-			name: transfer.symbol ?? transfer.name ?? L10n.TransactionReview.unknown,
-			thumbnail: transfer.isXRD ? .xrd : .known(transfer.thumbnail),
-			amount: transfer.amount,
+			name: resource.symbol ?? resource.name ?? L10n.TransactionReview.unknown,
+			thumbnail: transfer.isXRD ? .xrd : .known(resource.iconURL),
+			amount: resource.amount,
 			guaranteedAmount: transfer.guarantee?.amount,
 			fiatAmount: nil
 		)
@@ -108,10 +109,11 @@ extension TransactionReviewTokenView.ViewState {
 
 extension TransferNFTView.ViewState {
 	init(transfer: TransactionReview.NonFungibleTransfer) {
+		let token = transfer.token
 		self.init(
-			tokenID: transfer.tokenID,
-			tokenName: transfer.tokenName,
-			thumbnail: transfer.resourceImage
+			tokenID: token.id.localId().toUserFacingString(),
+			tokenName: token.name,
+			thumbnail: transfer.nonFungibleResource.iconURL
 		)
 	}
 }

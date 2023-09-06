@@ -22,11 +22,15 @@ final class AppFeatureTests: TestCase {
 		let store = TestStore(
 			initialState: App.State(root: .main(.previewValue)),
 			reducer: App()
-		)
+		) {
+			$0.gatewaysClient.gatewaysValues = { AsyncLazySequence([.init(current: .default)]).eraseToAnyAsyncSequence() }
+			$0.networkSwitchingClient.hasMainnetEverBeenLive = { false }
+		}
 		// when
-		await store.send(.child(.main(.delegate(.removedWallet)))) {
-			// then
-			$0.root = .onboardingCoordinator(.init())
+		await store.send(.child(.main(.delegate(.removedWallet))))
+		await store.receive(.internal(.toOnboarding(hasMainnetEverBeenLive: false))) {
+			$0.showIsUsingTestnetBanner = true
+			$0.root = .onboardingCoordinator(.init(hasMainnetEverBeenLive: false))
 		}
 	}
 
@@ -47,7 +51,7 @@ final class AppFeatureTests: TestCase {
 		}
 
 		// THEN: navigate to main
-		await store.send(.child(.splash(.delegate(.completed(.existingProfile, accountRecoveryNeeded: accountRecoveryNeeded))))) {
+		await store.send(.child(.splash(.delegate(.completed(.existingProfile(hasMainnetAccounts: false), accountRecoveryNeeded: accountRecoveryNeeded, hasMainnetEverBeenLive: false))))) {
 			$0.root = .main(.init(home: .init(accountRecoveryIsNeeded: accountRecoveryNeeded)))
 		}
 
@@ -63,13 +67,18 @@ final class AppFeatureTests: TestCase {
 		) {
 			$0.errorQueue = .liveValue
 			$0.continuousClock = clock
+			$0.gatewaysClient.gatewaysValues = { AsyncLazySequence([.init(current: .default)]).eraseToAnyAsyncSequence() }
+			$0.networkSwitchingClient.hasMainnetEverBeenLive = { false }
 		}
 
 		let viewTask = await store.send(.view(.task))
 
 		// then
-		await store.send(.child(.splash(.delegate(.completed(.newUser, accountRecoveryNeeded: false))))) {
-			$0.root = .onboardingCoordinator(.init())
+		await store.receive(.internal(.currentGatewayChanged(to: .default))) {
+			$0.showIsUsingTestnetBanner = true
+		}
+		await store.send(.child(.splash(.delegate(.completed(.newUser, accountRecoveryNeeded: false, hasMainnetEverBeenLive: false))))) {
+			$0.root = .onboardingCoordinator(.init(hasMainnetEverBeenLive: false))
 		}
 
 		await clock.run() // fast-forward clock to the end of time
@@ -85,6 +94,8 @@ final class AppFeatureTests: TestCase {
 		) {
 			$0.errorQueue = .liveValue
 			$0.continuousClock = clock
+			$0.gatewaysClient.gatewaysValues = { AsyncLazySequence([.init(current: .default)]).eraseToAnyAsyncSequence() }
+			$0.networkSwitchingClient.hasMainnetEverBeenLive = { false }
 		}
 
 		let viewTask = await store.send(.view(.task))
@@ -98,8 +109,11 @@ final class AppFeatureTests: TestCase {
 		let outcome = LoadProfileOutcome.usersExistingProfileCouldNotBeLoaded(failure: failure)
 
 		// then
-		await store.send(.child(.splash(.delegate(.completed(outcome, accountRecoveryNeeded: false))))) {
-			$0.root = .onboardingCoordinator(.init())
+		await store.receive(.internal(.currentGatewayChanged(to: .default))) {
+			$0.showIsUsingTestnetBanner = true
+		}
+		await store.send(.child(.splash(.delegate(.completed(outcome, accountRecoveryNeeded: false, hasMainnetEverBeenLive: false))))) {
+			$0.root = .onboardingCoordinator(.init(hasMainnetEverBeenLive: false))
 		}
 
 		await clock.run() // fast-forward clock to the end of time
@@ -117,6 +131,8 @@ final class AppFeatureTests: TestCase {
 		) {
 			$0.errorQueue = .liveValue
 			$0.continuousClock = clock
+			$0.gatewaysClient.gatewaysValues = { AsyncLazySequence([.init(current: .default)]).eraseToAnyAsyncSequence() }
+			$0.networkSwitchingClient.hasMainnetEverBeenLive = { false }
 		}
 		store.exhaustivity = .off
 		let viewTask = await store.send(.view(.task))
@@ -129,7 +145,8 @@ final class AppFeatureTests: TestCase {
 						Profile.FailedToCreateProfileFromSnapshot(version: 0, error: NoopError())
 					)
 				),
-				accountRecoveryNeeded: false
+				accountRecoveryNeeded: false,
+				hasMainnetEverBeenLive: false
 			)
 		))))
 
@@ -138,9 +155,10 @@ final class AppFeatureTests: TestCase {
 			expectationProfileGotDeleted.fulfill()
 		}
 		await store.send(.view(.alert(.presented(.incompatibleProfileErrorAlert(.deleteWalletDataButtonTapped)))))
-		await store.receive(.internal(.incompatibleProfileDeleted)) {
+		await store.receive(.internal(.incompatibleProfileDeleted))
+		await store.receive(.internal(.toOnboarding(hasMainnetEverBeenLive: false))) {
 			// ➡️ ... and onboard user
-			$0.root = .onboardingCoordinator(.init())
+			$0.root = .onboardingCoordinator(.init(hasMainnetEverBeenLive: false))
 		}
 
 		await viewTask.cancel()
@@ -158,6 +176,8 @@ final class AppFeatureTests: TestCase {
 		) {
 			$0.errorQueue = .liveValue
 			$0.continuousClock = clock
+			$0.gatewaysClient.gatewaysValues = { AsyncLazySequence([.init(current: .default)]).eraseToAnyAsyncSequence() }
+			$0.networkSwitchingClient.hasMainnetEverBeenLive = { false }
 			$0.appPreferencesClient.deleteProfileAndFactorSources = { _ in
 				profileDeletedExpectation.fulfill()
 			}
@@ -171,7 +191,10 @@ final class AppFeatureTests: TestCase {
 
 		let outcome = LoadProfileOutcome.usersExistingProfileCouldNotBeLoaded(failure: .profileVersionOutdated(json: Data([0xDE, 0xAD]), version: badVersion))
 
-		await store.send(.child(.splash(.delegate(.completed(outcome, accountRecoveryNeeded: false))))) {
+		await store.receive(.internal(.currentGatewayChanged(to: .default))) {
+			$0.showIsUsingTestnetBanner = true
+		}
+		await store.send(.child(.splash(.delegate(.completed(outcome, accountRecoveryNeeded: false, hasMainnetEverBeenLive: false))))) {
 			$0.alert = .incompatibleProfileErrorAlert(
 				.init(
 					title: { TextState("Wallet Data is Incompatible") },
@@ -188,8 +211,9 @@ final class AppFeatureTests: TestCase {
 		await store.send(.view(.alert(.presented(.incompatibleProfileErrorAlert(.deleteWalletDataButtonTapped))))) {
 			$0.alert = nil
 		}
-		await store.receive(.internal(.incompatibleProfileDeleted)) {
-			$0.root = .onboardingCoordinator(.init())
+		await store.receive(.internal(.incompatibleProfileDeleted))
+		await store.receive(.internal(.toOnboarding(hasMainnetEverBeenLive: false))) {
+			$0.root = .onboardingCoordinator(.init(hasMainnetEverBeenLive: false))
 		}
 
 		await fulfillment(of: [profileDeletedExpectation], timeout: 1.0)

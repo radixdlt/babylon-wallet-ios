@@ -207,6 +207,7 @@ extension TransferAccountList {
 	private func navigateToChooseAccounts(_ state: inout State, id: ReceivingAccount.State.ID) -> EffectTask<Action> {
 		let filteredAccounts = state.receivingAccounts.compactMap(\.account?.left?.address) + [state.fromAccount.address]
 		let chooseAccount: ChooseReceivingAccount.State = .init(
+			networkID: state.fromAccount.networkID,
 			chooseAccounts: .init(
 				selectionRequirement: .exactly(1),
 				filteredAccounts: filteredAccounts,

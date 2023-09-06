@@ -1,3 +1,4 @@
+import Prelude
 import Resources
 import SwiftUI
 
@@ -91,7 +92,7 @@ public struct SelectionList_Preview: View {
 			} else {
 				Text("Result: nil")
 			}
-			WithControlRequirements(selection, forAction: { print($0) }) { action in
+			WithControlRequirements(selection, forAction: { loggerGlobal.debug("\(String(describing: $0))") }) { action in
 				Button("Continue", action: action).buttonStyle(.primaryRectangular)
 			}
 		}

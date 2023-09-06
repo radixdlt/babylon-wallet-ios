@@ -33,6 +33,7 @@ struct AssetBehaviorRow: View {
 			Image(asset: behavior.icon)
 
 			Text(behavior.description)
+				.lineLimit(2)
 				.textStyle(.body2Regular)
 				.foregroundColor(.app.gray1)
 		}

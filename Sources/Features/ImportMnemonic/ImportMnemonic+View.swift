@@ -7,12 +7,11 @@ import ScreenshotPreventing
 extension ImportMnemonic.State {
 	var viewState: ImportMnemonic.ViewState {
 		var viewState = ImportMnemonic.ViewState(
-			isReadonlyMode: isReadonlyMode,
+			readonlyMode: readonlyMode?.context,
 			isWordCountFixed: isWordCountFixed,
 			isAdvancedMode: isAdvancedMode,
 			header: header,
 			warning: warning,
-			isHidingSecrets: isHidingSecrets,
 			rowCount: rowCount,
 			wordCount: wordCount,
 			completedWords: completedWords,
@@ -33,17 +32,32 @@ extension ImportMnemonic.State {
 // MARK: - ImportMnemonic.ViewState
 extension ImportMnemonic {
 	public struct ViewState: Equatable {
-		let isReadonlyMode: Bool
+		var isReadonlyMode: Bool {
+			readonlyMode != nil
+		}
+
+		let readonlyMode: ImportMnemonic.State.ReadonlyMode.Context?
 		let isWordCountFixed: Bool
 		let isAdvancedMode: Bool
 		let header: State.Header?
 		let warning: String?
-		let isHidingSecrets: Bool
 		let rowCount: Int
 		let wordCount: BIP39.WordCount
 		let completedWords: [BIP39.Word]
 		let mnemonic: Mnemonic?
 		let bip39Passphrase: String
+		var showBackButton: Bool {
+			guard let readonlyMode, case .fromSettings = readonlyMode else { return false }
+			loggerGlobal.feature("show back button")
+			return true
+		}
+
+		var showCloseButton: Bool {
+			guard let readonlyMode, case .fromBackupPrompt = readonlyMode else { return false }
+			loggerGlobal.feature("show close button")
+			return true
+		}
+
 		#if DEBUG
 		var debugMnemonicPhraseSingleField: String = ""
 		#endif
@@ -64,7 +78,10 @@ extension ImportMnemonic.ViewState {
 	}
 
 	var isShowingPassphrase: Bool {
-		isAdvancedMode && !(isReadonlyMode && bip39Passphrase.isEmpty)
+		if isReadonlyMode, !bip39Passphrase.isEmpty {
+			return true
+		}
+		return isAdvancedMode && !(isReadonlyMode && bip39Passphrase.isEmpty)
 	}
 
 	var modeButtonTitle: String {
@@ -121,7 +138,7 @@ extension ImportMnemonic {
 							}
 							.buttonStyle(.secondaryRectangular(isDestructive: true))
 							.padding(.bottom, .medium1)
-						} else if viewStore.isAdvancedMode {
+						} else {
 							AppTextField(
 								placeholder: "DEBUG ONLY paste mnemonic",
 								text: viewStore.binding(
@@ -151,15 +168,23 @@ extension ImportMnemonic {
 
 						footer(with: viewStore)
 					}
-					.redacted(reason: .privacy, if: viewStore.isHidingSecrets)
-					#if os(iOS)
-						.onReceive(NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification)) { _ in
-							viewStore.send(.scenePhase(.active))
+					.navigationBarBackButtonHidden() // need to be able to hook "back" button press
+					.toolbar {
+						if viewStore.showBackButton {
+							ToolbarItem(placement: .navigationBarLeading) {
+								BackButton {
+									viewStore.send(.backButtonTapped)
+								}
+							}
 						}
-						.onReceive(NotificationCenter.default.publisher(for: UIApplication.willResignActiveNotification)) { _ in
-							viewStore.send(.scenePhase(.inactive))
+						if viewStore.showCloseButton {
+							ToolbarItem(placement: .navigationBarLeading) {
+								CloseButton {
+									viewStore.send(.closeButtonTapped)
+								}
+							}
 						}
-					#endif
+					}
 				}
 				.animation(.default, value: viewStore.wordCount)
 				.animation(.default, value: viewStore.isAdvancedMode)
@@ -167,15 +192,7 @@ extension ImportMnemonic {
 				#if !DEBUG && os(iOS)
 					.screenshotProtected(isProtected: true)
 				#endif // iOS
-					.sheet(
-						store: store.scope(
-							state: \.$offDeviceMnemonicInfoPrompt,
-							action: { .child(.offDeviceMnemonicInfoPrompt($0)) }
-						),
-						content: {
-							OffDeviceMnemonicInfo.View(store: $0)
-						}
-					)
+					.destination(store: store)
 			}
 		}
 
@@ -198,6 +215,36 @@ extension ImportMnemonic {
 				.padding(.horizontal, .large3)
 			}
 		}
+	}
+}
+
+extension SwiftUI.View {
+	@MainActor
+	func destination(store: StoreOf<ImportMnemonic>) -> some View {
+		let destinationStore = store.scope(state: \.$destination, action: { .child(.destination($0)) })
+		return offDeviceMnemonicInfoSheet(with: destinationStore)
+			.markMnemonicAsBackedUpAlert(with: destinationStore)
+	}
+
+	@MainActor
+	fileprivate func markMnemonicAsBackedUpAlert(with destinationStore: PresentationStoreOf<ImportMnemonic.Destinations>) -> some SwiftUI.View {
+		alert(
+			store: destinationStore,
+			state: /ImportMnemonic.Destinations.State.markMnemonicAsBackedUp,
+			action: ImportMnemonic.Destinations.Action.markMnemonicAsBackedUp
+		)
+	}
+
+	@MainActor
+	fileprivate func offDeviceMnemonicInfoSheet(with destinationStore: PresentationStoreOf<ImportMnemonic.Destinations>) -> some SwiftUI.View {
+		sheet(
+			store: destinationStore,
+			state: /ImportMnemonic.Destinations.State.offDeviceMnemonicInfoPrompt,
+			action: ImportMnemonic.Destinations.Action.offDeviceMnemonicInfoPrompt,
+			content: { childStore in
+				OffDeviceMnemonicInfo.View(store: childStore)
+			}
+		)
 	}
 }
 
@@ -283,21 +330,6 @@ extension ImportMnemonic.View {
 			}
 		}
 		.padding([.horizontal, .bottom], .medium2)
-	}
-}
-
-extension View {
-	/// Conditionally adds a reason to apply a redaction to this view hierarchy.
-	///
-	/// Adding a redaction is an additive process: any redaction
-	/// provided will be added to the reasons provided by the parent.
-	@ViewBuilder
-	public func redacted(reason: RedactionReasons, if condition: @autoclosure () -> Bool) -> some View {
-		if condition() {
-			redacted(reason: reason)
-		} else {
-			self
-		}
 	}
 }
 

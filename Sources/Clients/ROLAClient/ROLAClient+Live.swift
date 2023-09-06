@@ -53,34 +53,15 @@ extension ROLAClient {
 
 		return Self(
 			performDappDefinitionVerification: { metadata async throws in
-
-				let metadataCollection = try await cacheClient.withCaching(
+				_ = try await cacheClient.withCaching(
 					cacheEntry: .rolaDappVerificationMetadata(metadata.dAppDefinitionAddress.address),
 					request: {
-						try await gatewayAPIClient.getEntityMetadata(metadata.dAppDefinitionAddress.address, [.accountType, .relatedWebsites])
+						try await gatewayAPIClient.getDappMetadata(
+							metadata.dAppDefinitionAddress,
+							validatingWebsite: metadata.origin.url
+						)
 					}
 				)
-
-				let dict: [EntityMetadataKey: String] = .init(
-					uniqueKeysWithValues: metadataCollection.items.compactMap { item in
-						guard let key = EntityMetadataKey(rawValue: item.key),
-						      let value = item.value.asString else { return nil }
-						return (key: key, value: value)
-					}
-				)
-
-				let dAppDefinitionMetadata = DappDefinitionMetadata(
-					accountType: dict[.accountType],
-					relatedWebsites: dict[.relatedWebsites]
-				)
-
-				guard dAppDefinitionMetadata.accountType == GatewayAPI.EntityMetadataCollection.AccountType.dappDefinition.rawValue else {
-					throw ROLAFailure.wrongAccountType
-				}
-
-				guard dAppDefinitionMetadata.relatedWebsites == metadata.origin.urlString.rawValue else {
-					throw ROLAFailure.unknownWebsite
-				}
 			},
 			performWellKnownFileCheck: { metadata async throws in
 				@Dependency(\.urlSession) var urlSession
