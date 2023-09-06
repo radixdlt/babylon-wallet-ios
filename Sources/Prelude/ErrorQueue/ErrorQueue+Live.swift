@@ -18,9 +18,10 @@ extension ErrorQueue: DependencyKey {
 
 				if
 					case let nsError = error as NSError,
+					nsError.domain == NSURLErrorDomain,
 					nsError.code == NSURLErrorCancelled
 				{
-					loggerGlobal.warning("Suppressed NSError with code NSURLErrorCancelled, i.e. preventing scheduling of this error on the ErrorQueue")
+					loggerGlobal.warning("Suppressed NSError with domain `NSURLErrorDomain`, i.e. preventing scheduling of this error on the ErrorQueue. \nDetails: code: \(nsError.code) - description: \"\(nsError.localizedDescription)\"")
 					return
 				}
 
