@@ -29,6 +29,7 @@ extension Completion {
 	struct View: SwiftUI.View {
 		let store: StoreOf<Completion>
 
+		// FIXME: use dismiss dependency, when TCA 1.1.0
 		@Environment(\.dismiss) var dismiss
 
 		var body: some SwiftUI.View {
