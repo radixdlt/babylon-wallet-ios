@@ -541,6 +541,7 @@ extension TransactionReview {
 				// FIXME: propagate/display error?
 			}
 		case .nonConforming:
+			state.networkFee = .init(reviewedTransaction: transactionToReview)
 			return showRawTransaction(&state)
 		}
 	}
