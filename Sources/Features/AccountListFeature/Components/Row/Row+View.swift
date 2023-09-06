@@ -137,36 +137,46 @@ extension AccountList.Row.View {
 
 	// Crates the view of the account owned resources
 	func ownedResourcesList(_ viewStore: ViewStoreOf<AccountList.Row>) -> some View {
-		HStack(spacing: .small1) {
-			if !viewStore.fungibleResourceIcons.isEmpty {
-				let icons = viewStore.fungibleResourceIcons
-				if viewStore.showMoreFungibles {
-					ViewThatFits(in: .horizontal) {
-						FungibleResourcesSection(fungibles: icons, itemLimit: nil)
-						FungibleResourcesSection(fungibles: icons, itemLimit: 10)
-					}
-				} else {
-					ViewThatFits(in: .horizontal) {
-						FungibleResourcesSection(fungibles: icons, itemLimit: 5)
-						FungibleResourcesSection(fungibles: icons, itemLimit: 4)
-						FungibleResourcesSection(fungibles: icons, itemLimit: 3)
+		GeometryReader { proxy in
+			HStack(spacing: .small1) {
+				if !viewStore.fungibleResourceIcons.isEmpty {
+					// FIXME: Workaround to avoid ViewThatFits
+					let limit = viewStore.state.itemLimit(
+						iconSize: Constants.iconSize.rawValue,
+						width: proxy.size.width
+					)
+
+					FungibleResourcesSection(fungibles: viewStore.fungibleResourceIcons, itemLimit: limit)
+
+					// FIXME: ViewThatFits is better, but it causes issues with @MainActor, which probably shouldn't be used in the first place
+					//	if viewStore.showMoreFungibles {
+					//		ViewThatFits(in: .horizontal) {
+					//			FungibleResourcesSection(fungibles: icons, itemLimit: nil)
+					//			FungibleResourcesSection(fungibles: icons, itemLimit: 10)
+					//		}
+					//	} else {
+					//		ViewThatFits(in: .horizontal) {
+					//			FungibleResourcesSection(fungibles: icons, itemLimit: 5)
+					//			FungibleResourcesSection(fungibles: icons, itemLimit: 4)
+					//			FungibleResourcesSection(fungibles: icons, itemLimit: 3)
+					//		}
+					//	}
+				}
+
+				if viewStore.nonFungibleResourcesCount > 0 {
+					Labeled(text: "\(viewStore.nonFungibleResourcesCount)") {
+						Image(asset: AssetResource.nft)
+							.resizable()
+							.frame(Constants.iconSize)
 					}
 				}
-			}
 
-			if viewStore.nonFungibleResourcesCount > 0 {
-				Labeled(text: "\(viewStore.nonFungibleResourcesCount)") {
-					Image(asset: AssetResource.nft)
-						.resizable()
-						.frame(Constants.iconSize)
-				}
-			}
-
-			if viewStore.poolUnitsCount > 0 {
-				Labeled(text: "\(viewStore.poolUnitsCount)") {
-					Image(asset: AssetResource.poolUnit)
-						.resizable()
-						.frame(Constants.iconSize)
+				if viewStore.poolUnitsCount > 0 {
+					Labeled(text: "\(viewStore.poolUnitsCount)") {
+						Image(asset: AssetResource.poolUnit)
+							.resizable()
+							.frame(Constants.iconSize)
+					}
 				}
 			}
 		}
@@ -238,6 +248,51 @@ extension AccountList.Row.View {
 
 	func backupMnemonicPromptView(_ viewStore: ViewStoreOf<AccountList.Row>) -> some View {
 		backupMnemonicPromptView { viewStore.send(.backUpMnemonic) }
+	}
+}
+
+// FIXME: Workaround to avoid ViewThatFits
+extension AccountList.Row.ViewState {
+	func itemLimit(iconSize: CGFloat, width: CGFloat) -> Int? {
+		itemLimit(trying: showMoreFungibles ? [nil, 10] : [5, 4, 3], iconSize: iconSize, width: width)
+	}
+
+	func itemLimit(trying limits: [Int?], iconSize: CGFloat, width: CGFloat) -> Int? {
+		for limit in limits {
+			if usedWidth(itemLimit: limit, iconSize: iconSize) < width {
+				return limit
+			}
+		}
+
+		return 3
+	}
+
+	func usedWidth(itemLimit: Int?, iconSize: CGFloat) -> CGFloat {
+		let items = min(fungibleResourceIcons.count, itemLimit ?? .max)
+		let showFungibleLabel = fungibleResourceIcons.count > items
+
+		let hasItems = items > 0
+		let hasPoolUnits = poolUnitsCount > 0
+		let hasNFTs = nonFungibleResourcesCount > 0
+		let sections = (hasItems ? 1 : 0) + (hasPoolUnits ? 1 : 0) + (hasNFTs ? 1 : 0)
+
+		var width: CGFloat = 0
+
+		if hasItems {
+			let extraWidth = 2 * iconSize / 3
+			width += iconSize + CGFloat(items - 1) * extraWidth
+		}
+		if showFungibleLabel {
+			width += iconSize
+		}
+		if hasPoolUnits {
+			width += iconSize + .medium1
+		}
+		if hasNFTs {
+			width += iconSize + .medium1
+		}
+
+		return width + max(CGFloat(sections - 1) * .small1, 0)
 	}
 }
 
