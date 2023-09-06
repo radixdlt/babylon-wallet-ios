@@ -9,6 +9,7 @@ struct AssetResourceDetailsSection: View {
 	struct ViewState: Equatable {
 		let description: String?
 		let resourceAddress: ResourceAddress
+		let isXRD: Bool
 		let validatorAddress: ValidatorAddress?
 		let resourceName: String?
 		let currentSupply: String?
@@ -47,7 +48,7 @@ struct AssetResourceDetailsSection: View {
 					)
 				}
 
-				AssetBehaviorsView(behaviors: viewState.behaviors)
+				AssetBehaviorsView(behaviors: viewState.behaviors, isXRD: viewState.isXRD)
 
 				AssetTagsView(tags: viewState.tags)
 			}

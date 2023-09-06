@@ -5,6 +5,7 @@ import SharedModels
 // MARK: - AssetBehaviorsView
 struct AssetBehaviorsView: View {
 	let behaviors: [AssetBehavior]
+	let isXRD: Bool
 
 	var body: some View {
 		if !behaviors.isEmpty {
@@ -15,7 +16,7 @@ struct AssetBehaviorsView: View {
 
 				VStack(alignment: .leading, spacing: .small1) {
 					ForEach(behaviors, id: \.self) { behavior in
-						AssetBehaviorRow(behavior: behavior)
+						AssetBehaviorRow(behavior: behavior, isXRD: isXRD)
 					}
 				}
 			}
@@ -27,12 +28,13 @@ struct AssetBehaviorsView: View {
 // MARK: - AssetBehaviorRow
 struct AssetBehaviorRow: View {
 	let behavior: AssetBehavior
+	let isXRD: Bool
 
 	var body: some View {
 		HStack(spacing: .medium3) {
 			Image(asset: behavior.icon)
 
-			Text(behavior.description)
+			Text(behavior.text(isXRD: isXRD))
 				.lineLimit(2)
 				.textStyle(.body2Regular)
 				.foregroundColor(.app.gray1)
@@ -41,7 +43,7 @@ struct AssetBehaviorRow: View {
 }
 
 extension AssetBehavior {
-	public var description: String {
+	public func text(isXRD: Bool) -> String {
 		switch self {
 		case .simpleAsset:
 			return L10n.AccountSettings.Behaviors.simpleAsset
@@ -54,7 +56,11 @@ extension AssetBehavior {
 		case .supplyDecreasableByAnyone:
 			return L10n.AccountSettings.Behaviors.supplyDecreasableByAnyone
 		case .supplyFlexible:
-			return L10n.AccountSettings.Behaviors.supplyFlexible
+			if isXRD {
+				return "Only the Radix Network may increase or decrease the supply of XRD." // FIXME: Strings
+			} else {
+				return L10n.AccountSettings.Behaviors.supplyFlexible
+			}
 		case .supplyFlexibleByAnyone:
 			return L10n.AccountSettings.Behaviors.supplyFlexibleByAnyone
 		case .movementRestricted:

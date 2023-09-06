@@ -11,6 +11,7 @@ extension PoolUnitDetails.State {
 			resourceDetails: .init(
 				description: resource.description,
 				resourceAddress: resource.resourceAddress,
+				isXRD: false,
 				validatorAddress: nil,
 				resourceName: resource.name, // FIXME: Is this correct?
 				currentSupply: resource.totalSupply?.format() ?? L10n.AssetDetails.supplyUnkown,
