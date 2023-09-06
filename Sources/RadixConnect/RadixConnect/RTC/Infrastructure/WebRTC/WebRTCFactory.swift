@@ -27,23 +27,12 @@ struct WebRTCFactory: PeerConnectionFactory {
 			)
 		}
 
-		#if DEBUG
-
-		return [
-			// UDP
-			at("turn:turn-dev-udp.rdx-works-main.extratools.works:80?transport=udp"),
-			// TCP
-			at("turn:turn-dev-tcp.rdx-works-main.extratools.works:80?transport=tcp"),
-		]
-		#else
-
 		return [
 			// UDP
 			at("turn:turn-udp.radixdlt.com:80?transport=udp"),
 			// TCP
 			at("turn:turn-tcp.radixdlt.com:80?transport=tcp"),
 		]
-		#endif
 	}()
 
 	static let ICEServers: [RTCIceServer] = [

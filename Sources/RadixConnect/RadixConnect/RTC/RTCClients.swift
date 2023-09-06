@@ -54,9 +54,10 @@ public actor RTCClients {
 
 	// MARK: - Initializers
 
-	init(peerConnectionFactory: PeerConnectionFactory,
-	     signalingServerBaseURL: URL = SignalingClient.default)
-	{
+	init(
+		peerConnectionFactory: PeerConnectionFactory,
+		signalingServerBaseURL: URL = SignalingClient.default
+	) {
 		self.peerConnectionFactory = peerConnectionFactory
 		self.signalingServerBaseURL = signalingServerBaseURL
 	}

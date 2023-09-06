@@ -3,8 +3,17 @@ import Prelude
 import RadixConnectModels
 
 extension SignalingClient {
-	init(password: ConnectionPassword, source: ClientSource = .wallet, baseURL: URL = SignalingClient.prodSignalingServer) throws {
-		let connectionURL = try Self.signalingServerURL(connectionPassword: password, source: source, baseURL: baseURL)
+	init(
+		password: ConnectionPassword,
+		source: ClientSource = .wallet,
+		baseURL: URL
+	) throws {
+		let connectionURL = try Self.signalingServerURL(
+			connectionPassword: password,
+			source: source,
+			baseURL: baseURL
+		)
+
 		let webSocket = AsyncWebSocket(url: connectionURL)
 		let encryptionKey = try EncryptionKey(.init(data: password.data.data))
 
@@ -14,9 +23,6 @@ extension SignalingClient {
 
 /// Connection URL
 extension SignalingClient {
-	static let prodSignalingServer = RadixConnectConstants.prodSignalingServer
-	static let devSignalingServer = RadixConnectConstants.devSignalingServer
-
 	static let `default` = RadixConnectConstants.defaultSignalingServer
 }
 
