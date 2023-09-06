@@ -5,10 +5,17 @@ import ProfileBackupsFeature
 
 extension AppSettings.State {
 	var viewState: AppSettings.ViewState {
-		.init(
-			isDeveloperModeEnabled: preferences?.security.isDeveloperModeEnabled ?? false,
+		let isDeveloperModeEnabled = preferences?.security.isDeveloperModeEnabled ?? false
+		#if DEBUG
+		return .init(
+			isDeveloperModeEnabled: isDeveloperModeEnabled,
 			isExportingLogs: exportLogs
 		)
+		#else
+		return .init(
+			isDeveloperModeEnabled: isDeveloperModeEnabled
+		)
+		#endif // DEBUG
 	}
 }
 
@@ -16,7 +23,17 @@ extension AppSettings.State {
 extension AppSettings {
 	public struct ViewState: Equatable {
 		let isDeveloperModeEnabled: Bool
+		#if DEBUG
 		let isExportingLogs: URL?
+		init(isDeveloperModeEnabled: Bool, isExportingLogs: URL?) {
+			self.isDeveloperModeEnabled = isDeveloperModeEnabled
+			self.isExportingLogs = isExportingLogs
+		}
+		#else
+		init(isDeveloperModeEnabled: Bool) {
+			self.isDeveloperModeEnabled = isDeveloperModeEnabled
+		}
+		#endif // DEBUG
 	}
 
 	@MainActor
@@ -44,11 +61,9 @@ extension AppSettings {
 							isDeveloperModeEnabled(with: viewStore)
 								.withSeparator
 
-							#if canImport(UIKit)
-							if !RuntimeInfo.isAppStoreBuild {
-								exportLogs(with: viewStore)
-									.withSeparator
-							}
+							#if DEBUG && canImport(UIKit)
+							exportLogs(with: viewStore)
+								.withSeparator
 							#endif
 						}
 						.padding(.horizontal, .medium3)
@@ -95,7 +110,7 @@ extension AppSettings {
 			)
 		}
 
-		#if canImport(UIKit)
+		#if DEBUG && canImport(UIKit)
 		private func exportLogs(with viewStore: ViewStoreOf<AppSettings>) -> some SwiftUI.View {
 			HStack {
 				VStack(alignment: .leading, spacing: 0) {

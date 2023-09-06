@@ -886,6 +886,7 @@ package.addModules([
 	.core(
 		name: "DesignSystem",
 		dependencies: [
+			"Prelude",
 			"GatewaysClient",
 			"URLFormatterClient",
 			"QRGeneratorClient",

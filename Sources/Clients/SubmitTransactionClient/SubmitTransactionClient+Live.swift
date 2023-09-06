@@ -83,22 +83,22 @@ extension SubmitTransactionClient: DependencyKey {
 				// RET prints when convertManifest is called, when it is removed, this can be moved down
 				// inline inside `print`.
 				let txIntentString = intent.description(lookupNetworkName: { try? Radix.Network.lookupBy(id: $0).name.rawValue })
-				print("\n\n🔮 DEBUG TRANSACTION START 🔮")
-				print("TXID: \(txID.asStr())")
+				loggerGlobal.debug("\n\n🔮 DEBUG TRANSACTION START 🔮")
+				loggerGlobal.debug("TXID: \(txID.asStr())")
 				let tooManyBytesToPrint = 6000 // competely arbitrarily chosen should not take long time to print is the point...
 				if txIntentString.count < tooManyBytesToPrint {
-					print("TransactionIntent: \(txIntentString)")
+					loggerGlobal.debug("TransactionIntent: \(txIntentString)")
 				} else {
-					print("TransactionIntent <Manifest too big, header only> \(intent.header().description(lookupNetworkName: { try? Radix.Network.lookupBy(id: $0).name.rawValue }))")
+					loggerGlobal.debug("TransactionIntent <Manifest too big, header only> \(intent.header().description(lookupNetworkName: { try? Radix.Network.lookupBy(id: $0).name.rawValue }))")
 				}
-				print("\n\nINTENT SIGNATURES: \(intentSignatures.map { "\npublicKey: \($0.publicKey?.bytes.hex ?? "")\nsig: \($0.signature.bytes.hex)" }.joined(separator: "\n"))")
-				print("\nNOTARY SIGNATURE: \(notarySignature.bytes.hex)")
+				loggerGlobal.debug("\n\nINTENT SIGNATURES: \(intentSignatures.map { "\npublicKey: \($0.publicKey?.bytes.hex ?? "")\nsig: \($0.signature.bytes.hex)" }.joined(separator: "\n"))")
+				loggerGlobal.debug("\nNOTARY SIGNATURE: \(notarySignature.bytes.hex)")
 				if request.compiledNotarizedTXIntent.count < tooManyBytesToPrint {
-					print("\n\nCOMPILED NOTARIZED INTENT:\n\(request.compiledNotarizedTXIntent.hex)")
+					loggerGlobal.debug("\n\nCOMPILED NOTARIZED INTENT:\n\(request.compiledNotarizedTXIntent.hex)")
 				} else {
-					print("\n\nCOMPILED NOTARIZED INTENT: <TOO BIG TO PRINT>")
+					loggerGlobal.debug("\n\nCOMPILED NOTARIZED INTENT: <TOO BIG TO PRINT>")
 				}
-				print("\n\n\n🔮 DEBUG TRANSACTION END 🔮\n\n")
+				loggerGlobal.debug("\n\n\n🔮 DEBUG TRANSACTION END 🔮\n\n")
 			}
 
 			@Dependency(\.transactionClient) var transactionClient

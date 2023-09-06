@@ -1321,15 +1321,15 @@ extension FeePayerSelectionAmongstCandidates {
 #if DEBUG
 func printSigners(_ reviewedTransaction: ReviewedTransaction) {
 	for (factorSourceKind, signingFactorsOfKind) in reviewedTransaction.signingFactors {
-		print("🔮 ~~~ SIGNINGFACTORS OF KIND: \(factorSourceKind) #\(signingFactorsOfKind.count) many: ~~~")
+		loggerGlobal.debug("🔮 ~~~ SIGNINGFACTORS OF KIND: \(factorSourceKind) #\(signingFactorsOfKind.count) many: ~~~")
 		for signingFactor in signingFactorsOfKind {
 			let factorSource = signingFactor.factorSource
-			print("\t🔮 == Signers for factorSource: \(factorSource.id): ==")
+			loggerGlobal.debug("\t🔮 == Signers for factorSource: \(factorSource.id): ==")
 			for signer in signingFactor.signers {
 				let entity = signer.entity
-				print("\t\t🔮 * Entity: \(entity.displayName): *")
+				loggerGlobal.debug("\t\t🔮 * Entity: \(entity.displayName): *")
 				for factorInstance in signer.factorInstancesRequiredToSign {
-					print("\t\t\t🔮 * FactorInstance: \(String(describing: factorInstance.derivationPath)) \(factorInstance.publicKey)")
+					loggerGlobal.debug("\t\t\t🔮 * FactorInstance: \(String(describing: factorInstance.derivationPath)) \(factorInstance.publicKey)")
 				}
 			}
 		}
