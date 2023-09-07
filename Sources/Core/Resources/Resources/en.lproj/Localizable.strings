@@ -281,7 +281,7 @@
 "dAppRequest_login_titleKnownDapp" = "Login Request";
 "dAppRequest_login_subtitleKnownDapp" = "%@ is requesting that you login with a Persona.";
 "dAppRequest_login_titleNewDapp" = "New Login Request";
-"dAppRequest_login_subtitleNewDapp" = "%@ is requesting that you login for the *first time* with a Persona.";
+"dAppRequest_login_subtitleNewDapp" = "%@ is requesting that you login for the **first time** with a Persona.";
 "dAppRequest_login_choosePersona" = "Choose a Persona";
 "dAppRequest_login_lastLoginWasOn" = "Your last login was on %@";
 "dAppRequest_login_continue" = "Continue";
@@ -291,7 +291,7 @@
 "dAppRequest_accountPermission_numberOfAccountsExactly" = "%d accounts";
 "dAppRequest_accountPermission_numberOfAccountsExactlyOne" = "1 account";
 "dAppRequest_accountPermission_continue" = "Continue";
-"dAppRequest_accountPermission_subtitle" = "*%@* is requesting permission to *always* be able to view Account information when you login with this Persona.";
+"dAppRequest_accountPermission_subtitle" = "**%@** is requesting permission to **always** be able to view Account information when you login with this Persona.";
 "dAppRequest_accountPermission_updateInSettingsExplanation" = "You can update this permission in wallet settings for this dApp at any time.";
 "dAppRequest_chooseAccounts_createNewAccount" = "Create a New Account";
 "dAppRequest_chooseAccounts_successMessage" = "You are now connected to %@. You can change your preferences for this dApp in wallet settings at any time.";
@@ -299,23 +299,23 @@
 "dAppRequest_chooseAccounts_verificationErrorTitle" = "DApp error";
 "dAppRequest_chooseAccounts_continue" = "Continue";
 "dAppRequest_chooseAccountsOneTime_title" = "Account Request";
-"dAppRequest_chooseAccountsOneTime_subtitleAtLeast" = "*%@* is making a one-time request for at least %d accounts.";
-"dAppRequest_chooseAccountsOneTime_subtitleAtLeastZero" = "*%@* is making a one-time request for any number of accounts.";
-"dAppRequest_chooseAccountsOneTime_subtitleAtLeastOne" = "*%@* is making a one-time request for at least 1 account.";
-"dAppRequest_chooseAccountsOneTime_subtitleExactly" = "*%@* is making a one-time request for at least %d accounts.";
-"dAppRequest_chooseAccountsOneTime_subtitleExactlyOne" = "*%@* is making a one-time request for 1 account.";
+"dAppRequest_chooseAccountsOneTime_subtitleAtLeast" = "**%@** is making a one-time request for at least %d accounts.";
+"dAppRequest_chooseAccountsOneTime_subtitleAtLeastZero" = "**%@** is making a one-time request for any number of accounts.";
+"dAppRequest_chooseAccountsOneTime_subtitleAtLeastOne" = "**%@** is making a one-time request for at least 1 account.";
+"dAppRequest_chooseAccountsOneTime_subtitleExactly" = "**%@** is making a one-time request for at least %d accounts.";
+"dAppRequest_chooseAccountsOneTime_subtitleExactlyOne" = "**%@** is making a one-time request for 1 account.";
 "dAppRequest_chooseAccountsOngoing_title" = "Account Permission";
-"dAppRequest_chooseAccountsOngoing_subtitleAtLeast" = "Choose at least %d accounts you wish to use with *%@*.";
-"dAppRequest_chooseAccountsOngoing_subtitleAtLeastZero" = "Choose any accounts you wish to use with *%@*.";
-"dAppRequest_chooseAccountsOngoing_subtitleAtLeastOne" = "Choose at least 1 account you wish to use with *%@*.";
-"dAppRequest_chooseAccountsOngoing_subtitleExactly" = "Choose %d accounts you wish to use with *%@*.";
-"dAppRequest_chooseAccountsOngoing_subtitleExactlyOne" = "Choose 1 account you wish to use with *%@*.";
+"dAppRequest_chooseAccountsOngoing_subtitleAtLeast" = "Choose at least %d accounts you wish to use with **%@**.";
+"dAppRequest_chooseAccountsOngoing_subtitleAtLeastZero" = "Choose any accounts you wish to use with **%@**.";
+"dAppRequest_chooseAccountsOngoing_subtitleAtLeastOne" = "Choose at least 1 account you wish to use with **%@**.";
+"dAppRequest_chooseAccountsOngoing_subtitleExactly" = "Choose %d accounts you wish to use with **%@**.";
+"dAppRequest_chooseAccountsOngoing_subtitleExactlyOne" = "Choose 1 account you wish to use with **%@**.";
 "dAppRequest_personalDataOneTime_title" = "One-Time Data Request";
 "dAppRequest_personalDataOneTime_chooseDataToProvide" = "Choose the data to provide";
-"dAppRequest_personalDataOneTime_subtitle" = "*%@* is requesting that you provide some pieces of personal data *just one time*";
+"dAppRequest_personalDataOneTime_subtitle" = "**%@** is requesting that you provide some pieces of personal data **just one time**";
 "dAppRequest_personalDataOneTime_continue" = "Continue";
 "dAppRequest_personalDataPermission_title" = "Personal Data Permission";
-"dAppRequest_personalDataPermission_subtitle" = "*%@* is requesting permission to *always* be able to view the following personal data when you login with this Persona.";
+"dAppRequest_personalDataPermission_subtitle" = "**%@** is requesting permission to **always** be able to view the following personal data when you login with this Persona.";
 "dAppRequest_personalDataPermission_updateInSettingsExplanation" = "You can update this permission in your Settings at any time.";
 "dAppRequest_personalDataPermission_continue" = "Continue";
 "dAppRequest_validationOutcome_subtitleBadContent" = "Invalid content";
@@ -651,12 +651,12 @@
 "addLedgerDevice_nameLedger_continueButtonTitle" = "Save and Continue";
 "profileBackup_headerTitle" = "Backing up your wallet ensures that you can  recover access to your Accounts, Personas, and wallet settings on a new phone by re-entering your seed phrase(s).
 
-*For security, backups do not contain any seed phrases or private keys. You must write them down separately.*";
+**For security, backups do not contain any seed phrases or private keys. You must write them down separately.**";
 "profileBackup_automaticBackups_title" = "Automatic Backups (recommended)";
 "profileBackup_manualBackups_title" = "Manual Backups";
 "profileBackup_manualBackups_subtitle" = "A manually exported wallet backup file may also be used for recovery, along with your seed phrase(s).
 
-Only the *current configuration* of your wallet is backed up with each manual export.";
+Only the **current configuration** of your wallet is backed up with each manual export.";
 "profileBackup_manualBackups_exportButtonTitle" = "Export Wallet Backup File";
 "profileBackup_manualBackups_encryptBackupDialogTitle" = "Encrypt this backup with a password?";
 "profileBackup_manualBackups_successMessage" = "Exported wallet backup file";
@@ -681,7 +681,7 @@ Only the *current configuration* of your wallet is backed up with each manual ex
 "androidProfileBackup_automaticBackups_subtitle" = "Periodic system backups";
 "androidProfileBackup_deleteWallet_subtitle" = "You may delete your wallet. This will clear the Radix Wallet app, clears its contents, and delete any cloud backup.
 
-*Access to any Accounts or Personas will be permanently lost unless you have a manual backup file.*";
+**Access to any Accounts or Personas will be permanently lost unless you have a manual backup file.**";
 "androidProfileBackup_deleteWallet_confirmButton" = "Delete Wallet";
 "iOSProfileBackup_automaticBackups_enable" = "Enable Backup to iCloud";
 "iOSProfileBackup_automaticBackups_disable" = "Disable Backup to iCloud";
@@ -704,7 +704,7 @@ Only the *current configuration* of your wallet is backed up with each manual ex
 "iOSProfileBackup_incompatibleWalletDataLabel" = "Incompatible Wallet data";
 "iOSProfileBackup_deleteWallet_subtitle" = "You may delete your wallet. This will clear the Radix Wallet app, clears its contents, and delete any iCloud backup.
 
-*Access to any Accounts or Personas will be permanently lost unless you have a manual backup file.*";
+**Access to any Accounts or Personas will be permanently lost unless you have a manual backup file.**";
 "iOSProfileBackup_deleteWallet_confirmButton" = "Delete Wallet and iCloud Backup";
 "encryptProfileBackup_header_title" = "Encrypt Wallet Backup File";
 "encryptProfileBackup_header_subtitle" = "Enter a password to encrypt this wallet backup file. You will be required to enter this password when recovering your Wallet from this file.";
@@ -717,17 +717,17 @@ Only the *current configuration* of your wallet is backed up with each manual ex
 "iOSRecoverProfileBackup_choose_title" = "Choose a backup on iCloud";
 "iOSRecoverProfileBackup_noBackupsAvailable" = "No wallet backups available on current iCloud account";
 "androidRecoverProfileBackup_noBackupsAvailable" = "No wallet backups available";
-"recoverProfileBackup_backupFrom" = "*Backup from:* %@";
-"recoverProfileBackup_lastModified" = "*Last modified:* %@";
-"recoverProfileBackup_numberOfAccounts" = "*Number of accounts:* %d";
-"recoverProfileBackup_numberOfPersonas" = "*Number of personas:* %d";
+"recoverProfileBackup_backupFrom" = "**Backup from:** %@";
+"recoverProfileBackup_lastModified" = "**Last modified:** %@";
+"recoverProfileBackup_numberOfAccounts" = "**Number of accounts:** %d";
+"recoverProfileBackup_numberOfPersonas" = "**Number of personas:** %d";
 "recoverProfileBackup_importFileButton_title" = "Import from Backup File Instead";
 "recoverProfileBackup_incompatibleWalletDataLabel" = "Incompatible Wallet data";
 "recoverProfileBackup_passwordWrong" = "The password is wrong";
 "recoverSeedPhrase_header_titleMain" = "Main Seed Phrase Required";
 "recoverSeedPhrase_header_titleOther" = "Seed Phrase Required";
-"recoverSeedPhrase_header_subtitleMainSeedPhrase" = "Your *Personas* and the following *Accounts* are controlled by your main seed phrase. To recover control, you must re-enter it.";
-"recoverSeedPhrase_header_subtitleOtherSeedPhrase" = "The following *Accounts* are controlled by a seed phrase. To recover control, you must re-enter it.";
+"recoverSeedPhrase_header_subtitleMainSeedPhrase" = "Your **Personas** and the following **Accounts** are controlled by your main seed phrase. To recover control, you must re-enter it.";
+"recoverSeedPhrase_header_subtitleOtherSeedPhrase" = "The following **Accounts** are controlled by a seed phrase. To recover control, you must re-enter it.";
 "recoverSeedPhrase_skipButton" = "Skip This Seed Phrase For Now";
 "recoverSeedPhrase_enterButton" = "Enter This Seed Phrase";
 "enterSeedPhrase_header_title" = "Enter Seed Phrase";
