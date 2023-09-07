@@ -109,7 +109,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 	}
 
 	enum DelegateAction: Sendable, Equatable {
-		case dismissWithFailure(P2P.Dapp.Response.WalletInteractionFailureResponse) // same for failure!
+		case dismissWithFailure(P2P.Dapp.Response.WalletInteractionFailureResponse)
 		case dismissWithSuccess(DappMetadata, TXID)
 		case submit(P2P.Dapp.Response.WalletInteractionSuccessResponse, DappMetadata)
 		case dismiss
