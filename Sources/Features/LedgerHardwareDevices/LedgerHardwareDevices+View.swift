@@ -106,7 +106,7 @@ extension LedgerHardwareDevices {
 							.padding(.horizontal, .medium1)
 							.padding(.bottom, .medium1)
 
-						if viewStore.ledgers == .success([]) {
+						if viewStore.loadedEmptyLedgersList {
 							addLedgerButton(viewStore: viewStore)
 								.buttonStyle(.primaryRectangular(shouldExpand: false))
 						} else {
@@ -149,7 +149,7 @@ extension LedgerHardwareDevices {
 					Card(.app.gray5) {
 						Text(L10n.LedgerHardwareDevices.subtitleNoLedgers)
 							.textStyle(.secondaryHeader)
-							.foregroundColor(viewStore.ledgers == .success([]) ? .app.gray2 : .clear)
+							.foregroundColor(viewStore.loadedEmptyLedgersList ? .app.gray2 : .clear)
 							.padding(.horizontal, .large2)
 							.padding(.vertical, .large2 + .small3)
 					}
