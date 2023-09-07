@@ -17,7 +17,8 @@ extension DappMetadata {
 // MARK: - Completion.View
 extension Completion {
 	struct ViewState: Equatable {
-		let txID: TXID
+		/// `nil` is a valid value for Persona Data requests
+		let txID: TXID?
 		let title: String
 		let subtitle: String
 
@@ -50,9 +51,11 @@ extension Completion {
 							.textStyle(.body1Regular)
 							.multilineTextAlignment(.center)
 
-						HStack {
-							Text(L10n.TransactionReview.SubmitTransaction.txID)
-							AddressView(.identifier(.transaction(viewStore.txID)))
+						if let txID = viewStore.txID {
+							HStack {
+								Text(L10n.TransactionReview.SubmitTransaction.txID)
+								AddressView(.identifier(.transaction(txID)))
+							}
 						}
 					}
 					.padding(.horizontal, .medium2)
@@ -96,6 +99,9 @@ struct Completion_Preview: PreviewProvider {
 }
 
 extension Completion.State {
-	static let previewValue: Self = .init(dappMetadata: .previewValue)
+	static let previewValue: Self = .init(
+		txID: nil,
+		dappMetadata: .previewValue
+	)
 }
 #endif

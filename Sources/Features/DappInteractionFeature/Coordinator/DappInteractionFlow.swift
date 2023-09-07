@@ -109,8 +109,8 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 	}
 
 	enum DelegateAction: Sendable, Equatable {
-		case dismissWithFailure(P2P.Dapp.Response.WalletInteractionFailureResponse)
-		case dismissWithSuccess(DappMetadata)
+		case dismissWithFailure(P2P.Dapp.Response.WalletInteractionFailureResponse) // same for failure!
+		case dismissWithSuccess(DappMetadata, TXID)
 		case submit(P2P.Dapp.Response.WalletInteractionSuccessResponse, DappMetadata)
 		case dismiss
 	}
@@ -421,8 +421,8 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 		case let .reviewTransaction(.delegate(.signedTXAndSubmittedToGateway(txID))):
 			return handleSignAndSubmitTX(item, txID)
 
-		case .reviewTransaction(.delegate(.transactionCompleted)):
-			return .send(.delegate(.dismissWithSuccess(state.dappMetadata)))
+		case let .reviewTransaction(.delegate(.transactionCompleted(txID))):
+			return .send(.delegate(.dismissWithSuccess(state.dappMetadata, txID)))
 
 		case .reviewTransaction(.delegate(.userDismissedTransactionStatus)):
 			return .send(.delegate(.dismiss))
