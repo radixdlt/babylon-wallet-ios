@@ -36,7 +36,7 @@ extension UpdateAccountLabel {
 							send: { .accountLabelChanged($0) }
 						)
 						AppTextField(
-							primaryHeading: "Enter a new label for this account", // FIXME: strings
+							primaryHeading: .init(text: L10n.AccountSettings.RenameAccount.subtitle),
 							placeholder: "Your account label", // FIXME: strings
 							text: nameBinding,
 							hint: viewStore.hint
@@ -51,7 +51,7 @@ extension UpdateAccountLabel {
 							viewStore.sanitizedName,
 							forAction: { viewStore.send(.updateTapped($0)) }
 						) { action in
-							Button("Update") { // FIXME: strings
+							Button(L10n.AccountSettings.SpecificAssetsDeposits.update) {
 								action()
 							}
 							.buttonStyle(.primaryRectangular)
@@ -64,7 +64,7 @@ extension UpdateAccountLabel {
 					Spacer(minLength: 0)
 				}
 				.background(.app.gray5)
-				.navigationTitle("Rename Account") // FIXME: strings
+				.navigationTitle(L10n.AccountSettings.RenameAccount.title)
 				.defaultNavBarConfig()
 			}
 		}

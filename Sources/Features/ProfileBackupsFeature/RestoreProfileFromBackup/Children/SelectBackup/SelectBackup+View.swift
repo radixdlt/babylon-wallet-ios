@@ -16,18 +16,15 @@ extension SelectBackup {
 			WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
 				ScrollView {
 					VStack(spacing: .medium1) {
-						// FIXME: Strings
-						Text("Select a backup to recover your Radix Wallet. You will be asked to enter your seed phrase(s) to recover control of your Accounts and Personas.")
+						Text(L10n.RecoverProfileBackup.Header.subtitle)
 							.textStyle(.body1Regular)
 
-						// FIXME: Strings
-						Text("Choose a backup on iCloud")
+						Text(L10n.IOSRecoverProfileBackup.Choose.title)
 							.textStyle(.body1Header)
 
 						backupsList(with: viewStore)
 
-						// FIXME: Strings
-						Button("Import from Backup File Instead") {
+						Button(L10n.RecoverProfileBackup.ImportFileButton.title) {
 							viewStore.send(.importFromFileInstead)
 						}
 						.foregroundColor(.app.blue2)
@@ -73,8 +70,7 @@ extension SelectBackup {
 			.task { @MainActor in
 				await ViewStore(store.stateless).send(.view(.task)).finish()
 			}
-			// FIXME: Strings
-			.navigationTitle("Recover Wallet from Backup")
+			.navigationTitle(L10n.RecoverProfileBackup.Header.title)
 		}
 	}
 }
@@ -97,8 +93,7 @@ extension SelectBackup.View {
 					cloudBackupDataCard(item, viewStore: viewStore)
 				}
 			} else {
-				// FIXME: Strings (update: `noCloudBackup`)
-				Text("No wallet backups available on current iCloud account")
+				Text(L10n.IOSRecoverProfileBackup.noBackupsAvailable)
 					.foregroundColor(.app.gray2)
 					.padding(.large1)
 					.background(.app.gray5)
@@ -119,9 +114,7 @@ extension SelectBackup.View {
 			HStack {
 				VStack(alignment: .leading, spacing: 0) {
 					Group {
-//						Text(L10n.IOSProfileBackup.creationDateLabel(formatDate(header.creationDate)))
-						// FIXME: Strings
-						Text("**Backup from**: \(creatingDevice)")
+						Text(.init(L10n.RecoverProfileBackup.backupFrom(creatingDevice)))
 						// FIXME: update bolding of 'label'?
 						Text(L10n.IOSProfileBackup.lastModifedDateLabel(formatDate(header.lastModified)))
 //						Text(L10n.IOSProfileBackup.numberOfNetworksLabel(header.contentHint.numberOfNetworks))
