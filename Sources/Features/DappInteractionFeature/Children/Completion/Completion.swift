@@ -11,19 +11,4 @@ struct Completion: Sendable, FeatureReducer {
 			self.dappMetadata = dappMetadata
 		}
 	}
-
-	enum ViewAction: Sendable, Equatable {
-		case closeButtonTapped
-	}
-
-	@Dependency(\.dismiss) var dismiss
-
-	func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
-		switch viewAction {
-		case .closeButtonTapped:
-			return .fireAndForget {
-				await dismiss()
-			}
-		}
-	}
 }

@@ -7,14 +7,30 @@ import SplashFeature
 
 extension App.State {
 	var viewState: App.ViewState {
-		.init(showIsUsingTestnetBanner: showIsUsingTestnetBanner)
+		.init(
+			isOnMainnet: isOnMainnet,
+			hasMainnetEverBeenLive: hasMainnetEverBeenLive,
+			isCurrentlyOnboardingUserToMainnet: isCurrentlyOnboardingUserToMainnet
+		)
 	}
 }
 
 // MARK: - App.View
 extension App {
 	public struct ViewState: Equatable {
-		let showIsUsingTestnetBanner: Bool
+		let isOnMainnet: Bool
+		let hasMainnetEverBeenLive: Bool
+		let isCurrentlyOnboardingUserToMainnet: Bool
+
+		var showIsUsingTestnetBanner: Bool {
+			guard hasMainnetEverBeenLive else {
+				return false
+			}
+			guard !isCurrentlyOnboardingUserToMainnet else {
+				return false
+			}
+			return !isOnMainnet
+		}
 	}
 
 	@MainActor

@@ -29,11 +29,12 @@ extension Completion {
 	struct View: SwiftUI.View {
 		let store: StoreOf<Completion>
 
+		// FIXME: use dismiss dependency, when TCA 1.1.0
+		@Environment(\.dismiss) var dismiss
+
 		var body: some SwiftUI.View {
-			WithViewStore(store, observe: ViewState.init, send: { .view($0) }) { viewStore in
-				WithNavigationBar {
-					viewStore.send(.closeButtonTapped)
-				} content: {
+			WithViewStore(store, observe: ViewState.init) { viewStore in
+				WithNavigationBar(closeAction: dismiss.callAsFunction) {
 					VStack(spacing: .medium2) {
 						Image(asset: AssetResource.successCheckmark)
 
