@@ -5,7 +5,7 @@ public enum RadixConnectConstants {}
 
 extension RadixConnectConstants {
 	/// Connection URL
-	public static let prodSignalingServer = URL(string: "wss://signaling-server-rcnet.radixdlt.com")!
+	public static let prodSignalingServer = URL(string: "wss://signaling-server.radixdlt.com")!
 
 	public static let devSignalingServer = URL(string: "wss://signaling-server-dev.rdx-works-main.extratools.works")!
 

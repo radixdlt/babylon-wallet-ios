@@ -16,15 +16,32 @@ struct WebRTCFactory: PeerConnectionFactory {
 	}()
 
 	static let turnServers: [RTCIceServer] = {
+		func at(_ urlString: String) -> RTCIceServer {
+			RTCIceServer(
+				urlStrings: [
+					urlString,
+				],
+				username: "username",
+				credential: "password",
+				tlsCertPolicy: .insecureNoCheck // FIXME: change this?
+			)
+		}
+
 		#if DEBUG
-		[
-			RTCIceServer(urlStrings: ["turn:turn-dev-udp.rdx-works-main.extratools.works:80?transport=udp"], username: "username", credential: "password", tlsCertPolicy: .insecureNoCheck),
-			RTCIceServer(urlStrings: ["turn:turn-dev-tcp.rdx-works-main.extratools.works:80?transport=tcp"], username: "username", credential: "password", tlsCertPolicy: .insecureNoCheck),
+
+		return [
+			// UDP
+			at("turn:turn-dev-udp.rdx-works-main.extratools.works:80?transport=udp"),
+			// TCP
+			at("turn:turn-dev-tcp.rdx-works-main.extratools.works:80?transport=tcp"),
 		]
 		#else
-		[
-			RTCIceServer(urlStrings: ["turn:turn-rcnet-udp.radixdlt.com:80?transport=udp"], username: "username", credential: "password", tlsCertPolicy: .insecureNoCheck),
-			RTCIceServer(urlStrings: ["turn:turn-rcnet-tcp.radixdlt.com:80?transport=tcp"], username: "username", credential: "password", tlsCertPolicy: .insecureNoCheck),
+
+		return [
+			// UDP
+			at("turn:turn-udp.radixdlt.com:80?transport=udp"),
+			// TCP
+			at("turn:turn-tcp.radixdlt.com:80?transport=tcp"),
 		]
 		#endif
 	}()
