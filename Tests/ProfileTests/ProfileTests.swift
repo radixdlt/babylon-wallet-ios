@@ -562,17 +562,17 @@ final class ProfileTests: TestCase {
 		// Account 0
 		XCTAssertEqual(
 			network.accounts[0].publicKey()?.compressedData.hex(),
-			"390f5d05f6f4ce18a5a049e713ad098773b7cc0ca0c530c6422742579633f9b8"
+			"f56e430cad47b779ba9aeda3069beed7080362598e9db31463c0bda03aebf901"
 		)
 
 		XCTAssertEqual(
 			network.accounts[0].authPublicKey()?.compressedData.hex(),
-			"920847d21c0db9f3d04e8f80ec6e8c3657404c38089f0673d9b14da5e40906e4"
+			"b009d846640efbe214c993898f9bb91db774f3eec07b8b93f73b5eb5671e7c90"
 		)
 
 		XCTAssertEqual(
 			network.accounts[0].address.address,
-			"account_tdx_22_128aph4j6zjqzhslfwqvryx829dwfxfflh0vamyca3425f78uul5rxf"
+			"account_tdx_e_12ypd8nyhsej537x3am8nnjzsef45ttmua5tf7f8lz2zds78dgg5qzx"
 		)
 
 		XCTAssertEqual(
@@ -588,16 +588,16 @@ final class ProfileTests: TestCase {
 		// Account 1
 		XCTAssertEqual(
 			network.accounts[1].publicKey()?.compressedData.hex(),
-			"fe12a293195513e2f0dc326521ef08a78e3ae743e34c46228bb231cc2e96dac8"
+			"410300fb542b9713058bab5bcf44cc423fe8264063c875285ef29bfaefee4c49"
 		)
 		XCTAssertEqual(
 			network.accounts[1].authPublicKey()?.compressedData.hex(),
-			"6d0fff607c4a1da5bd363aa93263680527b5dea0fad7c96fae9e29b9ce649e1d"
+			"18ad44b7784117e446bc262d8793fc930cad6c3dbaec153488a473c05cc753ff"
 		)
 
 		XCTAssertEqual(
 			network.accounts[1].address.address,
-			"account_tdx_22_12yktr4z690lpn874q2zrdggqrjrcqp0zynx629kxy4gfufzw23d3f6"
+			"account_tdx_e_1297s57xd0uurnguqga98negg7ffhlp4k9s7sy7w4xrt5dr0t53hny8"
 		)
 
 		XCTAssertEqual(
@@ -623,16 +623,16 @@ final class ProfileTests: TestCase {
 		// Account 2
 		XCTAssertEqual(
 			network.accounts[2].publicKey()?.compressedData.hex(),
-			"16220c8187c43a82ebba61b2428370c6816f05e6417190185f22bb5ed214fbdf"
+			"e8a91229c7278a716eb29993ec64df52f886b1afa4b9401cd76cac03db29357d"
 		)
 		XCTAssertEqual(
 			network.accounts[2].authPublicKey()?.compressedData.hex(),
-			"4cc7fee56f3688d75a694ced33f41364ef94fc3ac2415a5ef7a0d699faa45ef5"
+			"6891f60631cdf1f19ea07b5feff4473ea740c9a5fada93811e5443b8aa96301e"
 		)
 
 		XCTAssertEqual(
 			network.accounts[2].address.address,
-			"account_tdx_22_12ya2hy3wsmrm88svkeugan753f5atlhk3dzz09n9gm46qvx69rjqcm"
+			"account_tdx_e_128vf0zqkezy053hxkfq3g6x8x05mst7lq2q8fqlltm0l2d3tytk848"
 		)
 
 		XCTAssertEqual(
@@ -658,31 +658,31 @@ final class ProfileTests: TestCase {
 		// Persona 0
 		XCTAssertEqual(
 			network.personas[0].publicKey()?.compressedData.hex(),
-			"cb5f31fee2b66013a6476bd4bf37bf6bf229404a6db1567db317ed0ba5334358"
+			"22b66d9a894d31efc7fc316e80d31a48d0cf8aebd9bfb8d3ed692d25bf994666"
 		)
 		XCTAssertEqual(
 			network.personas[0].authPublicKey()?.compressedData.hex(),
-			"55ad07a9e836ead171cdb3b1d62fe5405d89dcb42559fb67f6851f5438e98859"
+			"1309188a0c42704e4a911f16f6a658513cee290d9e3a4f033875b55504221eeb"
 		)
 
 		XCTAssertEqual(
 			network.personas[0].address.address,
-			"identity_tdx_22_12g5xajl295tda2vym7tqtw4l5ftssp97fe5j9ga9wqpy7hjpe8ncmn"
+			"identity_tdx_e_12fkwy8ydrxznewf2q6a2c774fxa4e2kv5rs8mmd0r8p3k4s8f8d3mp"
 		)
 
 		// Persona 1
 		XCTAssertEqual(
 			network.personas[1].publicKey()?.compressedData.hex(),
-			"8620fd68dd9c594ff2477ee17189d32d79751915b21aa43e3f19b72a2f4404e3"
+			"68104bf832b5bb83600b51ddaf0701a13bdb2b55d625bc0ef14c74932340b2bc"
 		)
 		XCTAssertEqual(
 			network.personas[1].authPublicKey()?.compressedData.hex(),
-			"9ba8a618d9f3f6fac1e5a8067193bef5d64f94ad13ec0af1fcb4095f953ff836"
+			"c00858697875ea3eb6e2d8334d7a7f1a215269cb8097d08da30649d5eba9285b"
 		)
 
 		XCTAssertEqual(
 			network.personas[1].address.address,
-			"identity_tdx_22_12tmdjpyjwr8qk2fpvzk655cga5jl54f8lzn570wga6wmfl3aulu5ju"
+			"identity_tdx_e_122m2mlkm25fleaprd2lz3ed02q2auggw0d7cs9zeyafsng8dl3qcu0"
 		)
 
 		XCTAssertEqual(profile.appPreferences.p2pLinks.links.count, 2)
@@ -708,8 +708,8 @@ final class ProfileTests: TestCase {
 		XCTAssertEqual(
 			network.authorizedDapps[0].referencesToAuthorizedPersonas[0].sharedAccounts?.ids.map(\.address),
 			[
-				"account_tdx_22_12yktr4z690lpn874q2zrdggqrjrcqp0zynx629kxy4gfufzw23d3f6",
-				"account_tdx_22_12ya2hy3wsmrm88svkeugan753f5atlhk3dzz09n9gm46qvx69rjqcm",
+				"account_tdx_e_1297s57xd0uurnguqga98negg7ffhlp4k9s7sy7w4xrt5dr0t53hny8",
+				"account_tdx_e_128vf0zqkezy053hxkfq3g6x8x05mst7lq2q8fqlltm0l2d3tytk848",
 			]
 		)
 	}
