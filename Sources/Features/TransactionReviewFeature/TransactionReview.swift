@@ -90,7 +90,6 @@ public struct TransactionReview: Sendable, FeatureReducer {
 
 	public enum ViewAction: Sendable, Equatable {
 		case appeared
-		case closeTapped
 		case showRawTransactionTapped
 
 		case approvalSliderSlid
@@ -213,9 +212,6 @@ public struct TransactionReview: Sendable, FeatureReducer {
 				}
 				await send(.internal(.previewLoaded(preview)))
 			}
-
-		case .closeTapped:
-			return .none
 
 		case .showRawTransactionTapped:
 			switch state.displayMode {
@@ -545,6 +541,7 @@ extension TransactionReview {
 				// FIXME: propagate/display error?
 			}
 		case .nonConforming:
+			state.networkFee = .init(reviewedTransaction: transactionToReview)
 			return showRawTransaction(&state)
 		}
 	}
