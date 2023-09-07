@@ -533,6 +533,10 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 	}
 
 	func finishInteractionFlow(_ state: State) -> EffectTask<Action> {
+		loggerGlobal.critical("finishInteractionFlow START")
+		defer {
+			loggerGlobal.critical("finishInteractionFlow END (fail? success?)")
+		}
 		guard let response = P2P.Dapp.Response.WalletInteractionSuccessResponse(
 			for: state.remoteInteraction,
 			with: state.responseItems.values.compactMap(/State.AnyInteractionResponseItem.remote)
@@ -542,12 +546,18 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 
 		return .run { [state] send in
 			// Save login date, data fields, and ongoing accounts to Profile
+
 			if let persona = state.persona {
 				// FIXME: handle error
+				loggerGlobal.critical("finishInteractionFlow calling updatePersona")
 				try await updatePersona(persona, state, responseItems: response.items)
+			} else {
+				loggerGlobal.critical("finishInteractionFlow no persona")
 			}
 
+			loggerGlobal.critical("finishInteractionFlow delegate submit")
 			await send(.delegate(.submit(response, state.dappMetadata)))
+			loggerGlobal.critical("finishInteractionFlow delegate submit DONE")
 		}
 	}
 
@@ -556,6 +566,10 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 		_ state: State,
 		responseItems: P2P.Dapp.Response.WalletInteractionSuccessResponse.Items
 	) async throws {
+		loggerGlobal.critical("updatePersona START")
+		defer {
+			loggerGlobal.critical("updatePersona END (fail? success?)")
+		}
 		let networkID = await gatewaysClient.getCurrentNetworkID()
 		var authorizedDapp = state.authorizedDapp ?? .init(
 			networkID: networkID,
@@ -569,6 +583,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 		)
 		// This extraction is really verbose right now, but it should become a lot simpler with native case paths
 		let sharedAccountsInfo: (P2P.Dapp.Request.NumberOfAccounts, [P2P.Dapp.Response.WalletAccount])? = unwrap(
+			// request
 			{
 				switch state.remoteInteraction.items {
 				case let .request(.authorized(items)):
@@ -577,6 +592,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 					return nil
 				}
 			}(),
+			// response
 			{
 				switch responseItems {
 				case let .request(.authorized(items)):
@@ -586,6 +602,27 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 				}
 			}()
 		)
+
+		let sharedPersonaDataInfo: (P2P.Dapp.Request.PersonaDataRequestItem, P2P.Dapp.Response.WalletInteractionSuccessResponse.PersonaDataRequestResponseItem)? = unwrap(
+			// request
+			{
+				switch state.remoteInteraction.items {
+				case let .request(.authorized(items)):
+					return items.ongoingPersonaData
+				default: return nil
+				}
+			}(),
+			// response
+			{
+				switch responseItems {
+				case let .request(.authorized(items)):
+					return items.ongoingPersonaData
+				default:
+					return nil
+				}
+			}()
+		)
+
 		let sharedAccounts: Profile.Network.AuthorizedDapp.AuthorizedPersonaSimple.SharedAccounts?
 		if let (numberOfAccounts, accounts) = sharedAccountsInfo {
 			sharedAccounts = try .init(
@@ -595,6 +632,19 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 		} else {
 			sharedAccounts = nil
 		}
+
+		let sharedPersonaData: Profile.Network.AuthorizedDapp.AuthorizedPersonaSimple.SharedPersonaData
+		if let (requestedPersonaData, providedPersonData) = sharedPersonaDataInfo {
+			sharedPersonaData = try Profile.Network.AuthorizedDapp.AuthorizedPersonaSimple.SharedPersonaData(
+				requested: requestedPersonaData,
+				persona: persona,
+				provided: providedPersonData
+			)
+		} else {
+			// Empty, not sharing anything
+			sharedPersonaData = .init()
+		}
+
 		@Dependency(\.date) var now
 		let authorizedPersona: Profile.Network.AuthorizedDapp.AuthorizedPersonaSimple = {
 			if var authorizedPersona = state.authorizedPersona {
@@ -608,12 +658,14 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 					identityAddress: persona.address,
 					lastLogin: now(),
 					sharedAccounts: sharedAccounts,
-					sharedPersonaData: .init()
+					sharedPersonaData: sharedPersonaData
 				)
 			}
 		}()
 		authorizedDapp.referencesToAuthorizedPersonas[id: authorizedPersona.id] = authorizedPersona
+		loggerGlobal.critical("calling authorizedDappsClient.updateOrAddAuthorizedDapp")
 		try await authorizedDappsClient.updateOrAddAuthorizedDapp(authorizedDapp)
+		loggerGlobal.critical("authorizedDappsClient.updateOrAddAuthorizedDapp DONE")
 	}
 
 	func goBackEffect(for state: inout State) -> EffectTask<Action> {
@@ -804,3 +856,107 @@ extension DappInteractionFlow.State {
 		return item.ongoingPersonaData
 	}
 }
+
+extension Profile.Network.AuthorizedDapp.AuthorizedPersonaSimple.SharedPersonaData {
+	init(
+		requested: P2P.Dapp.Request.PersonaDataRequestItem,
+		persona: Profile.Network.Persona,
+		provided: P2P.Dapp.Response.WalletInteractionSuccessResponse.PersonaDataRequestResponseItem
+	) throws {
+		func extractSharedCollection<PersonaDataElement>(
+			personaDataEntryKind: PersonaData.Entry.Kind,
+			personaData personaDataKeyPath: KeyPath<PersonaData, PersonaData.CollectionOfIdentifiedEntries<PersonaDataElement>>,
+			provided providedKeyPath: KeyPath<P2P.Dapp.Response.WalletInteractionSuccessResponse.PersonaDataRequestResponseItem, OrderedSet<PersonaDataElement>?>,
+			requested requestedKeyPath: KeyPath<P2P.Dapp.Request.PersonaDataRequestItem, RequestedNumber?>
+		) throws -> SharedCollection?
+			where
+			PersonaDataElement: Sendable & Hashable & Codable & BasePersonaDataEntryProtocol
+		{
+			guard let numberOfRequestedElements = requested[keyPath: requestedKeyPath] else {
+				// Incoming Dapp request did not ask for access to this kind
+				return nil
+			}
+
+			let entriesSavedInPersona = persona.personaData[keyPath: personaDataKeyPath]
+
+			guard let providedEntries = provided[keyPath: providedKeyPath] else {
+				throw SavedPersonaDataInPersonaDoesNotContainRequestedPersonaData(kind: personaDataEntryKind)
+			}
+
+			let numberOfEntriesShared = entriesSavedInPersona.count
+
+			switch numberOfRequestedElements.quantifier {
+			case .atLeast:
+				let min = numberOfRequestedElements.quantity
+				guard numberOfEntriesShared >= min else {
+					throw SavedPersonaDataInPersonaNumberOfEntriesSharedHasDiscrepancyWithRequested(
+						requestedNumber: numberOfRequestedElements,
+						numberOfEntriesShared: numberOfEntriesShared
+					)
+				}
+			// OK
+			case .exactly:
+				let expectedQuantity = numberOfRequestedElements.quantity
+				guard numberOfEntriesShared == expectedQuantity else {
+					throw SavedPersonaDataInPersonaNumberOfEntriesSharedHasDiscrepancyWithRequested(
+						requestedNumber: numberOfRequestedElements,
+						numberOfEntriesShared: numberOfEntriesShared
+					)
+				}
+				// OK
+			}
+			guard Set(entriesSavedInPersona.map(\.value)).isSuperset(of: Set(providedEntries.elements)) else {
+				throw SavedPersonaDataInPersonaDoesNotMatchWalletInteractionResponseItem()
+			}
+			return try Profile.Network.AuthorizedDapp.AuthorizedPersonaSimple.SharedPersonaData.SharedCollection(
+				ids: OrderedSet(validating: entriesSavedInPersona.map(\.id)),
+				forRequest: numberOfRequestedElements
+			)
+		}
+
+		try self.init(
+			name: { () -> PersonaDataEntryID? in
+				guard requested.isRequestingName == true else { return nil }
+				guard let nameIDSavedInPersona = persona.personaData.name?.id else { throw MissingRequestedPersonaData(kind: .fullName) }
+				guard provided.name == persona.personaData.name?.value else { throw SavedPersonaDataInPersonaDoesNotMatchWalletInteractionResponseItem() }
+				return nameIDSavedInPersona
+			}(),
+			dateOfBirth: nil, // FIXME: When P2P.Dapp.Requests and Response support it
+			companyName: nil, // FIXME: When P2P.Dapp.Requests and Response support it
+			emailAddresses: extractSharedCollection(
+				personaDataEntryKind: .emailAddress,
+				personaData: \.emailAddresses,
+				provided: \.emailAddresses,
+				requested: \.numberOfRequestedEmailAddresses
+			),
+			phoneNumbers: extractSharedCollection(
+				personaDataEntryKind: .phoneNumber,
+				personaData: \.phoneNumbers,
+				provided: \.phoneNumbers,
+				requested: \.numberOfRequestedPhoneNumbers
+			),
+			urls: nil, // FIXME: When P2P.Dapp.Requests and Response support it
+			postalAddresses: nil, // FIXME: When P2P.Dapp.Requests and Response support it
+			creditCards: nil // FIXME: When P2P.Dapp.Requests and Response support it
+		)
+	}
+}
+
+// MARK: - MissingRequestedPersonaData
+struct MissingRequestedPersonaData: Swift.Error {
+	let kind: PersonaData.Entry.Kind
+}
+
+// MARK: - SavedPersonaDataInPersonaNumberOfEntriesSharedHasDiscrepancyWithRequested
+struct SavedPersonaDataInPersonaNumberOfEntriesSharedHasDiscrepancyWithRequested: Swift.Error {
+	let requestedNumber: RequestedNumber
+	let numberOfEntriesShared: Int
+}
+
+// MARK: - SavedPersonaDataInPersonaDoesNotContainRequestedPersonaData
+struct SavedPersonaDataInPersonaDoesNotContainRequestedPersonaData: Swift.Error {
+	let kind: PersonaData.Entry.Kind
+}
+
+// MARK: - SavedPersonaDataInPersonaDoesNotMatchWalletInteractionResponseItem
+struct SavedPersonaDataInPersonaDoesNotMatchWalletInteractionResponseItem: Swift.Error {}

@@ -157,6 +157,7 @@ struct OneTimePersonaData: Sendable, FeatureReducer {
 			return .none
 
 		case let .destination(.presented(.editPersona(.delegate(.personaSaved(persona))))):
+			loggerGlobal.critical("editPersona delegate personaSaved")
 			return .send(.delegate(.personaUpdated(persona)))
 
 		case .destination(.presented(.createPersona(.delegate(.completed)))):
