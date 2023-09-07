@@ -863,6 +863,39 @@ extension Profile.Network.AuthorizedDapp.AuthorizedPersonaSimple.SharedPersonaDa
 		persona: Profile.Network.Persona,
 		provided: P2P.Dapp.Response.WalletInteractionSuccessResponse.PersonaDataRequestResponseItem
 	) throws {
+		func extractField<PersonaDataEntry>(
+			personaDataEntryKind: PersonaData.Entry.Kind,
+			isRequested isRequestedKeyPath: KeyPath<P2P.Dapp.Request.PersonaDataRequestItem, Bool?>,
+			personaData personaDataKeyPath: KeyPath<PersonaData, PersonaData.IdentifiedEntry<PersonaDataEntry>?>,
+			provided providedKeyPath: KeyPath<P2P.Dapp.Response.WalletInteractionSuccessResponse.PersonaDataRequestResponseItem, PersonaDataEntry?>
+		) throws -> PersonaDataEntryID? where PersonaDataEntry: Hashable & PersonaDataEntryProtocol {
+			// Check if incoming Dapp requested this persona data entry kind
+			guard requested[keyPath: isRequestedKeyPath] == true else { return nil }
+
+			// Check if PersonaData in Persona contains the entry
+			guard let entrySavedInPersona = persona.personaData[keyPath: personaDataKeyPath] else {
+				loggerGlobal.error("PersonaData in Persona does not contain expected requested persona data entry of kind: \(personaDataEntryKind)")
+				throw MissingRequestedPersonaData(kind: personaDataEntryKind)
+			}
+
+			// Check if response we are about to send back to dapp contains a value of expected kind
+			guard let providedEntry = provided[keyPath: providedKeyPath] else {
+				loggerGlobal.error("Discrepancy, the response we are about to send back to dapp does not contain the requested persona data entry of kind: \(personaDataEntryKind)")
+				throw PersonaDataEntryNotFoundInResponse(kind: personaDataEntryKind)
+			}
+
+			// Check if response we are about to send back equals to the one saved in Profile
+			guard providedEntry == entrySavedInPersona.value else {
+				loggerGlobal.error("Discrepancy, the value of the persona data entry does not match what is saved in profile: [response to dapp]: '\(providedEntry)' != '\(entrySavedInPersona.value)' [saved in Profile]")
+				throw SavedPersonaDataInPersonaDoesNotMatchWalletInteractionResponseItem(
+					kind: personaDataEntryKind
+				)
+			}
+
+			// Return the id of the entry
+			return entrySavedInPersona.id
+		}
+
 		func extractSharedCollection<PersonaDataElement>(
 			personaDataEntryKind: PersonaData.Entry.Kind,
 			personaData personaDataKeyPath: KeyPath<PersonaData, PersonaData.CollectionOfIdentifiedEntries<PersonaDataElement>>,
@@ -872,42 +905,29 @@ extension Profile.Network.AuthorizedDapp.AuthorizedPersonaSimple.SharedPersonaDa
 			where
 			PersonaDataElement: Sendable & Hashable & Codable & BasePersonaDataEntryProtocol
 		{
+			// Check if incoming Dapp requests the persona data entry kind
 			guard let numberOfRequestedElements = requested[keyPath: requestedKeyPath] else {
 				// Incoming Dapp request did not ask for access to this kind
 				return nil
 			}
 
+			// Read out the entries saved in persona (could have been just updated, part of the flow)
 			let entriesSavedInPersona = persona.personaData[keyPath: personaDataKeyPath]
 
+			// Ensure the response we plan to send back to Dapp contains the persona data entries as well (else discrepancy in DappInteractionFlow)
 			guard let providedEntries = provided[keyPath: providedKeyPath] else {
+				loggerGlobal.error("Discrepancy in DappInteractionFlow, Dapp requests access to persona data entry of kind: \(personaDataEntryKind), specifically: \(numberOfRequestedElements) many, which where in fact found in PersonaData saved in Persona, however, the response we are aboutto send back to Dapp does not contain it.")
 				throw SavedPersonaDataInPersonaDoesNotContainRequestedPersonaData(kind: personaDataEntryKind)
 			}
 
-			let numberOfEntriesShared = entriesSavedInPersona.count
+			// Check all entries in response are found in persona
+			guard Set(entriesSavedInPersona.map(\.value)).isSuperset(of: Set(providedEntries)) else {
+				loggerGlobal.error("Discrepancy in DappInteractionFlow, response back to dapp contains entries which are not in PersonaData in Persona.")
+				throw SavedPersonaDataInPersonaDoesNotMatchWalletInteractionResponseItem(
+					kind: personaDataEntryKind
+				)
+			}
 
-			switch numberOfRequestedElements.quantifier {
-			case .atLeast:
-				let min = numberOfRequestedElements.quantity
-				guard numberOfEntriesShared >= min else {
-					throw SavedPersonaDataInPersonaNumberOfEntriesSharedHasDiscrepancyWithRequested(
-						requestedNumber: numberOfRequestedElements,
-						numberOfEntriesShared: numberOfEntriesShared
-					)
-				}
-			// OK
-			case .exactly:
-				let expectedQuantity = numberOfRequestedElements.quantity
-				guard numberOfEntriesShared == expectedQuantity else {
-					throw SavedPersonaDataInPersonaNumberOfEntriesSharedHasDiscrepancyWithRequested(
-						requestedNumber: numberOfRequestedElements,
-						numberOfEntriesShared: numberOfEntriesShared
-					)
-				}
-				// OK
-			}
-			guard Set(entriesSavedInPersona.map(\.value)).isSuperset(of: Set(providedEntries.elements)) else {
-				throw SavedPersonaDataInPersonaDoesNotMatchWalletInteractionResponseItem()
-			}
 			return try Profile.Network.AuthorizedDapp.AuthorizedPersonaSimple.SharedPersonaData.SharedCollection(
 				ids: OrderedSet(validating: entriesSavedInPersona.map(\.id)),
 				forRequest: numberOfRequestedElements
@@ -915,12 +935,12 @@ extension Profile.Network.AuthorizedDapp.AuthorizedPersonaSimple.SharedPersonaDa
 		}
 
 		try self.init(
-			name: { () -> PersonaDataEntryID? in
-				guard requested.isRequestingName == true else { return nil }
-				guard let nameIDSavedInPersona = persona.personaData.name?.id else { throw MissingRequestedPersonaData(kind: .fullName) }
-				guard provided.name == persona.personaData.name?.value else { throw SavedPersonaDataInPersonaDoesNotMatchWalletInteractionResponseItem() }
-				return nameIDSavedInPersona
-			}(),
+			name: extractField(
+				personaDataEntryKind: .fullName,
+				isRequested: \.isRequestingName,
+				personaData: \.name,
+				provided: \.name
+			),
 			dateOfBirth: nil, // FIXME: When P2P.Dapp.Requests and Response support it
 			companyName: nil, // FIXME: When P2P.Dapp.Requests and Response support it
 			emailAddresses: extractSharedCollection(
@@ -959,4 +979,11 @@ struct SavedPersonaDataInPersonaDoesNotContainRequestedPersonaData: Swift.Error 
 }
 
 // MARK: - SavedPersonaDataInPersonaDoesNotMatchWalletInteractionResponseItem
-struct SavedPersonaDataInPersonaDoesNotMatchWalletInteractionResponseItem: Swift.Error {}
+struct SavedPersonaDataInPersonaDoesNotMatchWalletInteractionResponseItem: Swift.Error {
+	let kind: PersonaData.Entry.Kind
+}
+
+// MARK: - PersonaDataEntryNotFoundInResponse
+struct PersonaDataEntryNotFoundInResponse: Swift.Error {
+	let kind: PersonaData.Entry.Kind
+}
