@@ -157,7 +157,8 @@ extension ProfileSnapshot.Header.Version {
 	/// - 45: Merge of 43 and 44.
 	/// - 46: Change default gateway to `zabanet`
 	/// - 47: Change default gateway to `rcnetv3`
-	public static let minimum: Self = 47
+	/// - 48: Change default gateway to `hammunet` (temp `rcnetv3.1`)
+	public static let minimum: Self = 48
 }
 
 extension ProfileSnapshot.Header {
