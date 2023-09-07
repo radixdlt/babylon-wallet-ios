@@ -532,7 +532,7 @@ extension DappInteractionFlow {
 					return nil
 				}
 
-				return .init(
+				return try? .init(
 					personaDataRequested: personaDataRequested,
 					responseItem: responseItem
 				)
@@ -551,7 +551,61 @@ extension DappInteractionFlow.InternalAction.AutofillOngoingResponseItemsPayload
 	struct PersonaDataPayload: Sendable, Equatable {
 		var personaDataRequested: P2P.Dapp.Request.PersonaDataRequestItem
 		var responseItem: P2P.Dapp.Response.WalletInteractionSuccessResponse.PersonaDataRequestResponseItem
+
+		init(
+			personaDataRequested: P2P.Dapp.Request.PersonaDataRequestItem,
+			responseItem: P2P.Dapp.Response.WalletInteractionSuccessResponse.PersonaDataRequestResponseItem
+		) throws {
+			if personaDataRequested.isRequestingName == true {
+				guard responseItem.name != nil else {
+					throw RequiredPersonaDataFieldsNotPresentInResponse(
+						missingEntryKind: .fullName
+					)
+				}
+			}
+
+			if let numberOfRequestedEmailAddresses = personaDataRequested.numberOfRequestedEmailAddresses {
+				guard
+					let emailAddresses = responseItem.emailAddresses,
+					emailAddresses.satisfies(numberOfRequestedEmailAddresses)
+				else {
+					throw RequiredPersonaDataFieldsNotPresentInResponse(
+						missingEntryKind: .emailAddress
+					)
+				}
+			}
+
+			if let numberOfRequestedPhoneNumbers = personaDataRequested.numberOfRequestedPhoneNumbers {
+				guard
+					let phoneNumbers = responseItem.phoneNumbers,
+					phoneNumbers.satisfies(numberOfRequestedPhoneNumbers)
+				else {
+					throw RequiredPersonaDataFieldsNotPresentInResponse(
+						missingEntryKind: .phoneNumber
+					)
+				}
+			}
+
+			self.personaDataRequested = personaDataRequested
+			self.responseItem = responseItem
+		}
 	}
+}
+
+extension OrderedSet where Element: PersonaDataEntryProtocol {
+	func satisfies(_ requestedNumber: RequestedNumber) -> Bool {
+		switch requestedNumber.quantifier {
+		case .atLeast:
+			return count >= requestedNumber.quantity
+		case .exactly:
+			return count == requestedNumber.quantity
+		}
+	}
+}
+
+// MARK: - RequiredPersonaDataFieldsNotPresentInResponse
+struct RequiredPersonaDataFieldsNotPresentInResponse: Swift.Error {
+	let missingEntryKind: PersonaData.Entry.Kind
 }
 
 private func tryingToAutofillingPersonaData(
@@ -843,11 +897,13 @@ extension DappInteractionFlow {
 			// Save login date, data fields, and ongoing accounts to Profile
 
 			if let persona = state.persona {
-				// FIXME: handle error
-				loggerGlobal.critical("finishInteractionFlow calling updatePersona")
-				try await updatePersona(persona, state, responseItems: response.items)
-			} else {
-				loggerGlobal.critical("finishInteractionFlow no persona")
+				do {
+					// FIXME: handle error
+					loggerGlobal.critical("finishInteractionFlow calling updatePersona")
+					try await updatePersona(persona, state, responseItems: response.items)
+				} catch {
+					loggerGlobal.critical("Failed to update persona, error: \(error)")
+				}
 			}
 
 			loggerGlobal.critical("finishInteractionFlow delegate submit")
@@ -862,9 +918,6 @@ extension DappInteractionFlow {
 		responseItems: P2P.Dapp.Response.WalletInteractionSuccessResponse.Items
 	) async throws {
 		loggerGlobal.critical("updatePersona START")
-		defer {
-			loggerGlobal.critical("updatePersona END (fail? success?)")
-		}
 		let networkID = await gatewaysClient.getCurrentNetworkID()
 		var authorizedDapp = state.authorizedDapp ?? .init(
 			networkID: networkID,
