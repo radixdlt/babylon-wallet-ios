@@ -6,6 +6,7 @@ import BackupsClient
 import EngineKit
 import FeaturePrelude
 import ImportMnemonicFeature
+import NetworkSwitchingClient
 import ProfileBackupsFeature
 import SharedModels
 
@@ -89,6 +90,8 @@ public struct AccountDetails: Sendable, FeatureReducer {
 	}
 
 	public enum InternalAction: Sendable, Equatable {
+		case transfer(hasMainnetEverBeenLive: Bool)
+
 		case markBackupNeeded
 		case accountUpdated(Profile.Network.Account)
 
@@ -147,6 +150,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.secureStorageClient) var secureStorageClient
 	@Dependency(\.continuousClock) var clock
+	@Dependency(\.networkSwitchingClient) var networkSwitchingClient
 
 	public init() {}
 
@@ -190,8 +194,10 @@ public struct AccountDetails: Sendable, FeatureReducer {
 			return .none
 
 		case .transferButtonTapped:
-			state.destination = .transfer(AssetTransfer.State(from: state.account))
-			return .none
+			return .run { send in
+				let hasMainnetEverBeenLive = await networkSwitchingClient.hasMainnetEverBeenLive()
+				await send(.internal(.transfer(hasMainnetEverBeenLive: hasMainnetEverBeenLive)))
+			}
 
 		case .exportMnemonicButtonTapped:
 			return loadMnemonic(state: state)
@@ -249,6 +255,13 @@ public struct AccountDetails: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
+		case let .transfer(hasMainnetEverBeenLive):
+			state.destination = .transfer(.init(
+				from: state.account,
+				hasMainnetEverBeenLive: hasMainnetEverBeenLive
+			))
+			return .none
+
 		case .markBackupNeeded:
 			state.exportMnemonicPrompt = .init(needed: true)
 			return .none
