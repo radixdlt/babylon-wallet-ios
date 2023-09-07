@@ -310,8 +310,8 @@ public enum L10n {
       public static let confirmButton = L10n.tr("Localizable", "androidProfileBackup_deleteWallet_confirmButton", fallback: "Delete Wallet")
       /// You may delete your wallet. This will clear the Radix Wallet app, clears its contents, and delete any cloud backup.
       /// 
-      /// *Access to any Accounts or Personas will be permanently lost unless you have a manual backup file.*
-      public static let subtitle = L10n.tr("Localizable", "androidProfileBackup_deleteWallet_subtitle", fallback: "You may delete your wallet. This will clear the Radix Wallet app, clears its contents, and delete any cloud backup.\n\n*Access to any Accounts or Personas will be permanently lost unless you have a manual backup file.*")
+      /// **Access to any Accounts or Personas will be permanently lost unless you have a manual backup file.**
+      public static let subtitle = L10n.tr("Localizable", "androidProfileBackup_deleteWallet_subtitle", fallback: "You may delete your wallet. This will clear the Radix Wallet app, clears its contents, and delete any cloud backup.\n\n**Access to any Accounts or Personas will be permanently lost unless you have a manual backup file.**")
     }
   }
   public enum AndroidRecoverProfileBackup {
@@ -806,9 +806,9 @@ public enum L10n {
       }
       /// 1 account
       public static let numberOfAccountsExactlyOne = L10n.tr("Localizable", "dAppRequest_accountPermission_numberOfAccountsExactlyOne", fallback: "1 account")
-      /// *%@* is requesting permission to *always* be able to view Account information when you login with this Persona.
+      /// **%@** is requesting permission to **always** be able to view Account information when you login with this Persona.
       public static func subtitle(_ p1: Any) -> String {
-        return L10n.tr("Localizable", "dAppRequest_accountPermission_subtitle", String(describing: p1), fallback: "*%@* is requesting permission to *always* be able to view Account information when you login with this Persona.")
+        return L10n.tr("Localizable", "dAppRequest_accountPermission_subtitle", String(describing: p1), fallback: "**%@** is requesting permission to **always** be able to view Account information when you login with this Persona.")
       }
       /// Account Permission
       public static let title = L10n.tr("Localizable", "dAppRequest_accountPermission_title", fallback: "Account Permission")
@@ -830,49 +830,49 @@ public enum L10n {
       public static let verificationErrorTitle = L10n.tr("Localizable", "dAppRequest_chooseAccounts_verificationErrorTitle", fallback: "DApp error")
     }
     public enum ChooseAccountsOneTime {
-      /// *%@* is making a one-time request for at least %d accounts.
+      /// **%@** is making a one-time request for at least %d accounts.
       public static func subtitleAtLeast(_ p1: Any, _ p2: Int) -> String {
-        return L10n.tr("Localizable", "dAppRequest_chooseAccountsOneTime_subtitleAtLeast", String(describing: p1), p2, fallback: "*%@* is making a one-time request for at least %d accounts.")
+        return L10n.tr("Localizable", "dAppRequest_chooseAccountsOneTime_subtitleAtLeast", String(describing: p1), p2, fallback: "**%@** is making a one-time request for at least %d accounts.")
       }
-      /// *%@* is making a one-time request for at least 1 account.
+      /// **%@** is making a one-time request for at least 1 account.
       public static func subtitleAtLeastOne(_ p1: Any) -> String {
-        return L10n.tr("Localizable", "dAppRequest_chooseAccountsOneTime_subtitleAtLeastOne", String(describing: p1), fallback: "*%@* is making a one-time request for at least 1 account.")
+        return L10n.tr("Localizable", "dAppRequest_chooseAccountsOneTime_subtitleAtLeastOne", String(describing: p1), fallback: "**%@** is making a one-time request for at least 1 account.")
       }
-      /// *%@* is making a one-time request for any number of accounts.
+      /// **%@** is making a one-time request for any number of accounts.
       public static func subtitleAtLeastZero(_ p1: Any) -> String {
-        return L10n.tr("Localizable", "dAppRequest_chooseAccountsOneTime_subtitleAtLeastZero", String(describing: p1), fallback: "*%@* is making a one-time request for any number of accounts.")
+        return L10n.tr("Localizable", "dAppRequest_chooseAccountsOneTime_subtitleAtLeastZero", String(describing: p1), fallback: "**%@** is making a one-time request for any number of accounts.")
       }
-      /// *%@* is making a one-time request for at least %d accounts.
+      /// **%@** is making a one-time request for at least %d accounts.
       public static func subtitleExactly(_ p1: Any, _ p2: Int) -> String {
-        return L10n.tr("Localizable", "dAppRequest_chooseAccountsOneTime_subtitleExactly", String(describing: p1), p2, fallback: "*%@* is making a one-time request for at least %d accounts.")
+        return L10n.tr("Localizable", "dAppRequest_chooseAccountsOneTime_subtitleExactly", String(describing: p1), p2, fallback: "**%@** is making a one-time request for at least %d accounts.")
       }
-      /// *%@* is making a one-time request for 1 account.
+      /// **%@** is making a one-time request for 1 account.
       public static func subtitleExactlyOne(_ p1: Any) -> String {
-        return L10n.tr("Localizable", "dAppRequest_chooseAccountsOneTime_subtitleExactlyOne", String(describing: p1), fallback: "*%@* is making a one-time request for 1 account.")
+        return L10n.tr("Localizable", "dAppRequest_chooseAccountsOneTime_subtitleExactlyOne", String(describing: p1), fallback: "**%@** is making a one-time request for 1 account.")
       }
       /// Account Request
       public static let title = L10n.tr("Localizable", "dAppRequest_chooseAccountsOneTime_title", fallback: "Account Request")
     }
     public enum ChooseAccountsOngoing {
-      /// Choose at least %d accounts you wish to use with *%@*.
+      /// Choose at least %d accounts you wish to use with **%@**.
       public static func subtitleAtLeast(_ p1: Int, _ p2: Any) -> String {
-        return L10n.tr("Localizable", "dAppRequest_chooseAccountsOngoing_subtitleAtLeast", p1, String(describing: p2), fallback: "Choose at least %d accounts you wish to use with *%@*.")
+        return L10n.tr("Localizable", "dAppRequest_chooseAccountsOngoing_subtitleAtLeast", p1, String(describing: p2), fallback: "Choose at least %d accounts you wish to use with **%@**.")
       }
-      /// Choose at least 1 account you wish to use with *%@*.
+      /// Choose at least 1 account you wish to use with **%@**.
       public static func subtitleAtLeastOne(_ p1: Any) -> String {
-        return L10n.tr("Localizable", "dAppRequest_chooseAccountsOngoing_subtitleAtLeastOne", String(describing: p1), fallback: "Choose at least 1 account you wish to use with *%@*.")
+        return L10n.tr("Localizable", "dAppRequest_chooseAccountsOngoing_subtitleAtLeastOne", String(describing: p1), fallback: "Choose at least 1 account you wish to use with **%@**.")
       }
-      /// Choose any accounts you wish to use with *%@*.
+      /// Choose any accounts you wish to use with **%@**.
       public static func subtitleAtLeastZero(_ p1: Any) -> String {
-        return L10n.tr("Localizable", "dAppRequest_chooseAccountsOngoing_subtitleAtLeastZero", String(describing: p1), fallback: "Choose any accounts you wish to use with *%@*.")
+        return L10n.tr("Localizable", "dAppRequest_chooseAccountsOngoing_subtitleAtLeastZero", String(describing: p1), fallback: "Choose any accounts you wish to use with **%@**.")
       }
-      /// Choose %d accounts you wish to use with *%@*.
+      /// Choose %d accounts you wish to use with **%@**.
       public static func subtitleExactly(_ p1: Int, _ p2: Any) -> String {
-        return L10n.tr("Localizable", "dAppRequest_chooseAccountsOngoing_subtitleExactly", p1, String(describing: p2), fallback: "Choose %d accounts you wish to use with *%@*.")
+        return L10n.tr("Localizable", "dAppRequest_chooseAccountsOngoing_subtitleExactly", p1, String(describing: p2), fallback: "Choose %d accounts you wish to use with **%@**.")
       }
-      /// Choose 1 account you wish to use with *%@*.
+      /// Choose 1 account you wish to use with **%@**.
       public static func subtitleExactlyOne(_ p1: Any) -> String {
-        return L10n.tr("Localizable", "dAppRequest_chooseAccountsOngoing_subtitleExactlyOne", String(describing: p1), fallback: "Choose 1 account you wish to use with *%@*.")
+        return L10n.tr("Localizable", "dAppRequest_chooseAccountsOngoing_subtitleExactlyOne", String(describing: p1), fallback: "Choose 1 account you wish to use with **%@**.")
       }
       /// Account Permission
       public static let title = L10n.tr("Localizable", "dAppRequest_chooseAccountsOngoing_title", fallback: "Account Permission")
@@ -898,9 +898,9 @@ public enum L10n {
       public static func subtitleKnownDapp(_ p1: Any) -> String {
         return L10n.tr("Localizable", "dAppRequest_login_subtitleKnownDapp", String(describing: p1), fallback: "%@ is requesting that you login with a Persona.")
       }
-      /// %@ is requesting that you login for the *first time* with a Persona.
+      /// %@ is requesting that you login for the **first time** with a Persona.
       public static func subtitleNewDapp(_ p1: Any) -> String {
-        return L10n.tr("Localizable", "dAppRequest_login_subtitleNewDapp", String(describing: p1), fallback: "%@ is requesting that you login for the *first time* with a Persona.")
+        return L10n.tr("Localizable", "dAppRequest_login_subtitleNewDapp", String(describing: p1), fallback: "%@ is requesting that you login for the **first time** with a Persona.")
       }
       /// Login Request
       public static let titleKnownDapp = L10n.tr("Localizable", "dAppRequest_login_titleKnownDapp", fallback: "Login Request")
@@ -926,9 +926,9 @@ public enum L10n {
       public static let chooseDataToProvide = L10n.tr("Localizable", "dAppRequest_personalDataOneTime_chooseDataToProvide", fallback: "Choose the data to provide")
       /// Continue
       public static let `continue` = L10n.tr("Localizable", "dAppRequest_personalDataOneTime_continue", fallback: "Continue")
-      /// *%@* is requesting that you provide some pieces of personal data *just one time*
+      /// **%@** is requesting that you provide some pieces of personal data **just one time**
       public static func subtitle(_ p1: Any) -> String {
-        return L10n.tr("Localizable", "dAppRequest_personalDataOneTime_subtitle", String(describing: p1), fallback: "*%@* is requesting that you provide some pieces of personal data *just one time*")
+        return L10n.tr("Localizable", "dAppRequest_personalDataOneTime_subtitle", String(describing: p1), fallback: "**%@** is requesting that you provide some pieces of personal data **just one time**")
       }
       /// One-Time Data Request
       public static let title = L10n.tr("Localizable", "dAppRequest_personalDataOneTime_title", fallback: "One-Time Data Request")
@@ -936,9 +936,9 @@ public enum L10n {
     public enum PersonalDataPermission {
       /// Continue
       public static let `continue` = L10n.tr("Localizable", "dAppRequest_personalDataPermission_continue", fallback: "Continue")
-      /// *%@* is requesting permission to *always* be able to view the following personal data when you login with this Persona.
+      /// **%@** is requesting permission to **always** be able to view the following personal data when you login with this Persona.
       public static func subtitle(_ p1: Any) -> String {
-        return L10n.tr("Localizable", "dAppRequest_personalDataPermission_subtitle", String(describing: p1), fallback: "*%@* is requesting permission to *always* be able to view the following personal data when you login with this Persona.")
+        return L10n.tr("Localizable", "dAppRequest_personalDataPermission_subtitle", String(describing: p1), fallback: "**%@** is requesting permission to **always** be able to view the following personal data when you login with this Persona.")
       }
       /// Personal Data Permission
       public static let title = L10n.tr("Localizable", "dAppRequest_personalDataPermission_title", fallback: "Personal Data Permission")
@@ -1260,8 +1260,8 @@ public enum L10n {
       public static let confirmButton = L10n.tr("Localizable", "iOSProfileBackup_deleteWallet_confirmButton", fallback: "Delete Wallet and iCloud Backup")
       /// You may delete your wallet. This will clear the Radix Wallet app, clears its contents, and delete any iCloud backup.
       /// 
-      /// *Access to any Accounts or Personas will be permanently lost unless you have a manual backup file.*
-      public static let subtitle = L10n.tr("Localizable", "iOSProfileBackup_deleteWallet_subtitle", fallback: "You may delete your wallet. This will clear the Radix Wallet app, clears its contents, and delete any iCloud backup.\n\n*Access to any Accounts or Personas will be permanently lost unless you have a manual backup file.*")
+      /// **Access to any Accounts or Personas will be permanently lost unless you have a manual backup file.**
+      public static let subtitle = L10n.tr("Localizable", "iOSProfileBackup_deleteWallet_subtitle", fallback: "You may delete your wallet. This will clear the Radix Wallet app, clears its contents, and delete any iCloud backup.\n\n**Access to any Accounts or Personas will be permanently lost unless you have a manual backup file.**")
     }
     public enum ProfileSync {
       /// Warning: If disabled you might lose access to your Accounts and Personas.
@@ -1555,8 +1555,8 @@ public enum L10n {
   public enum ProfileBackup {
     /// Backing up your wallet ensures that you can  recover access to your Accounts, Personas, and wallet settings on a new phone by re-entering your seed phrase(s).
     /// 
-    /// *For security, backups do not contain any seed phrases or private keys. You must write them down separately.*
-    public static let headerTitle = L10n.tr("Localizable", "profileBackup_headerTitle", fallback: "Backing up your wallet ensures that you can  recover access to your Accounts, Personas, and wallet settings on a new phone by re-entering your seed phrase(s).\n\n*For security, backups do not contain any seed phrases or private keys. You must write them down separately.*")
+    /// **For security, backups do not contain any seed phrases or private keys. You must write them down separately.**
+    public static let headerTitle = L10n.tr("Localizable", "profileBackup_headerTitle", fallback: "Backing up your wallet ensures that you can  recover access to your Accounts, Personas, and wallet settings on a new phone by re-entering your seed phrase(s).\n\n**For security, backups do not contain any seed phrases or private keys. You must write them down separately.**")
     public enum AutomaticBackups {
       /// Automatic Backups (recommended)
       public static let title = L10n.tr("Localizable", "profileBackup_automaticBackups_title", fallback: "Automatic Backups (recommended)")
@@ -1592,8 +1592,8 @@ public enum L10n {
       public static let passwordsMissmatchError = L10n.tr("Localizable", "profileBackup_manualBackups_passwordsMissmatchError", fallback: "Passwords do not match")
       /// A manually exported wallet backup file may also be used for recovery, along with your seed phrase(s).
       /// 
-      /// Only the *current configuration* of your wallet is backed up with each manual export.
-      public static let subtitle = L10n.tr("Localizable", "profileBackup_manualBackups_subtitle", fallback: "A manually exported wallet backup file may also be used for recovery, along with your seed phrase(s).\n\nOnly the *current configuration* of your wallet is backed up with each manual export.")
+      /// Only the **current configuration** of your wallet is backed up with each manual export.
+      public static let subtitle = L10n.tr("Localizable", "profileBackup_manualBackups_subtitle", fallback: "A manually exported wallet backup file may also be used for recovery, along with your seed phrase(s).\n\nOnly the **current configuration** of your wallet is backed up with each manual export.")
       /// Exported wallet backup file
       public static let successMessage = L10n.tr("Localizable", "profileBackup_manualBackups_successMessage", fallback: "Exported wallet backup file")
       /// Manual Backups
@@ -1601,23 +1601,23 @@ public enum L10n {
     }
   }
   public enum RecoverProfileBackup {
-    /// *Backup from:* %@
+    /// **Backup from:** %@
     public static func backupFrom(_ p1: Any) -> String {
-      return L10n.tr("Localizable", "recoverProfileBackup_backupFrom", String(describing: p1), fallback: "*Backup from:* %@")
+      return L10n.tr("Localizable", "recoverProfileBackup_backupFrom", String(describing: p1), fallback: "**Backup from:** %@")
     }
     /// Incompatible Wallet data
     public static let incompatibleWalletDataLabel = L10n.tr("Localizable", "recoverProfileBackup_incompatibleWalletDataLabel", fallback: "Incompatible Wallet data")
-    /// *Last modified:* %@
+    /// **Last modified:** %@
     public static func lastModified(_ p1: Any) -> String {
-      return L10n.tr("Localizable", "recoverProfileBackup_lastModified", String(describing: p1), fallback: "*Last modified:* %@")
+      return L10n.tr("Localizable", "recoverProfileBackup_lastModified", String(describing: p1), fallback: "**Last modified:** %@")
     }
-    /// *Number of accounts:* %d
+    /// **Number of accounts:** %d
     public static func numberOfAccounts(_ p1: Int) -> String {
-      return L10n.tr("Localizable", "recoverProfileBackup_numberOfAccounts", p1, fallback: "*Number of accounts:* %d")
+      return L10n.tr("Localizable", "recoverProfileBackup_numberOfAccounts", p1, fallback: "**Number of accounts:** %d")
     }
-    /// *Number of personas:* %d
+    /// **Number of personas:** %d
     public static func numberOfPersonas(_ p1: Int) -> String {
-      return L10n.tr("Localizable", "recoverProfileBackup_numberOfPersonas", p1, fallback: "*Number of personas:* %d")
+      return L10n.tr("Localizable", "recoverProfileBackup_numberOfPersonas", p1, fallback: "**Number of personas:** %d")
     }
     /// The password is wrong
     public static let passwordWrong = L10n.tr("Localizable", "recoverProfileBackup_passwordWrong", fallback: "The password is wrong")
@@ -1638,10 +1638,10 @@ public enum L10n {
     /// Skip This Seed Phrase For Now
     public static let skipButton = L10n.tr("Localizable", "recoverSeedPhrase_skipButton", fallback: "Skip This Seed Phrase For Now")
     public enum Header {
-      /// Your *Personas* and the following *Accounts* are controlled by your main seed phrase. To recover control, you must re-enter it.
-      public static let subtitleMainSeedPhrase = L10n.tr("Localizable", "recoverSeedPhrase_header_subtitleMainSeedPhrase", fallback: "Your *Personas* and the following *Accounts* are controlled by your main seed phrase. To recover control, you must re-enter it.")
-      /// The following *Accounts* are controlled by a seed phrase. To recover control, you must re-enter it.
-      public static let subtitleOtherSeedPhrase = L10n.tr("Localizable", "recoverSeedPhrase_header_subtitleOtherSeedPhrase", fallback: "The following *Accounts* are controlled by a seed phrase. To recover control, you must re-enter it.")
+      /// Your **Personas** and the following **Accounts** are controlled by your main seed phrase. To recover control, you must re-enter it.
+      public static let subtitleMainSeedPhrase = L10n.tr("Localizable", "recoverSeedPhrase_header_subtitleMainSeedPhrase", fallback: "Your **Personas** and the following **Accounts** are controlled by your main seed phrase. To recover control, you must re-enter it.")
+      /// The following **Accounts** are controlled by a seed phrase. To recover control, you must re-enter it.
+      public static let subtitleOtherSeedPhrase = L10n.tr("Localizable", "recoverSeedPhrase_header_subtitleOtherSeedPhrase", fallback: "The following **Accounts** are controlled by a seed phrase. To recover control, you must re-enter it.")
       /// Main Seed Phrase Required
       public static let titleMain = L10n.tr("Localizable", "recoverSeedPhrase_header_titleMain", fallback: "Main Seed Phrase Required")
       /// Seed Phrase Required
