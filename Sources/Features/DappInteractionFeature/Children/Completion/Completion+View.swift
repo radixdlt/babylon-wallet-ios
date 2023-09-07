@@ -39,7 +39,7 @@ extension Completion {
 		var body: some SwiftUI.View {
 			WithViewStore(store, observe: ViewState.init) { viewStore in
 				WithNavigationBar(closeAction: dismiss.callAsFunction) {
-					VStack(spacing: .small2) {
+					VStack(spacing: .small3) {
 						Image(asset: AssetResource.successCheckmark)
 
 						Text(viewStore.title)
@@ -59,6 +59,7 @@ extension Completion {
 						}
 					}
 					.padding(.horizontal, .medium2)
+					.padding(.bottom, .small3)
 				}
 			}
 			.presentationDragIndicator(.visible)
