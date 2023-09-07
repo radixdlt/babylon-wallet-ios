@@ -100,6 +100,8 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			}
 
 			var ongoingAccountsPayload: AccountsPayload?
+
+			var ongoingPersonaDataPayload: PersonaDataPayload?
 		}
 	}
 
@@ -239,14 +241,25 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			return autofillOngoingResponseItemsIfPossibleEffect(for: state)
 
 		case let .autofillOngoingResponseItemsIfPossible(payload):
+			loggerGlobal.critical("autofillOngoingResponseItemsIfPossible")
 			if let ongoingAccountsWithoutProofOfOwnership = payload.ongoingAccountsPayload {
-				state.responseItems[.local(.accountPermissionRequested(ongoingAccountsWithoutProofOfOwnership.numberOfAccountsRequested))] = .local(.accountPermissionGranted)
+				let numberOfAccountsRequested = ongoingAccountsWithoutProofOfOwnership.numberOfAccountsRequested
+				let local = DappInteractionFlow.State.LocalInteractionItem.accountPermissionRequested(numberOfAccountsRequested)
+
+				// Update state for `local` responseItems
+				state.responseItems[.local(local)] = .local(.accountPermissionGranted)
+
+				// Update state for `remote` responseItems
 				setAccountsResponse(
 					to: ongoingAccountsWithoutProofOfOwnership.requestItem,
 					accessKind: .ongoing,
 					chosenAccounts: .withoutProofOfOwnership(.init(uniqueElements: ongoingAccountsWithoutProofOfOwnership.accounts)),
 					into: &state
 				)
+			}
+
+			if let ongoingPersonaData = payload.ongoingPersonaDataPayload {
+				state.responseItems[.remote(.ongoingPersonaData(ongoingPersonaData.personaDataRequested))] = .remote(.ongoingPersonaData(ongoingPersonaData.responseItem))
 			}
 			return continueEffect(for: &state)
 
@@ -273,7 +286,9 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			return .none
 		}
 	}
+}
 
+extension DappInteractionFlow {
 	func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		func handleLogin(
 			_ item: State.AnyInteractionItem,
@@ -487,12 +502,292 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 				)
 			}()
 
+			payload.ongoingPersonaDataPayload = try await { () async throws -> InternalAction.AutofillOngoingResponseItemsPayload.PersonaDataPayload? in
+
+				guard
+					let personaDataRequested = state.ongoingPersonaDataRequestItem,
+					let authorizedPersonaID = state.authorizedPersona?.id,
+					let sharedPersonaData = state.authorizedPersona?.sharedPersonaData
+				else {
+					return nil
+				}
+
+				let allPersonas = try await personasClient.getPersonas()
+				guard let persona = allPersonas[id: authorizedPersonaID] else { return nil }
+
+				guard let personaDataToAutofillWith = try? tryingToAutofillingPersonaData(
+					request: personaDataRequested,
+					previous: sharedPersonaData,
+					current: persona
+				) else {
+					return nil
+				}
+
+				guard
+					let responseItem = try? P2P.Dapp.Response.WalletInteractionSuccessResponse.PersonaDataRequestResponseItem(
+						personaDataRequested: personaDataRequested,
+						personaData: personaDataToAutofillWith
+					)
+				else {
+					return nil
+				}
+
+				return .init(
+					personaDataRequested: personaDataRequested,
+					responseItem: responseItem
+				)
+
+			}()
+
 			await send(.internal(.autofillOngoingResponseItemsIfPossible(payload)))
 		} catch: { error, _ in
 			loggerGlobal.warning("Unable to autofill ongoing response, error: \(error)")
 		}
 	}
+}
 
+// MARK: - DappInteractionFlow.InternalAction.AutofillOngoingResponseItemsPayload.PersonaDataPayload
+extension DappInteractionFlow.InternalAction.AutofillOngoingResponseItemsPayload {
+	struct PersonaDataPayload: Sendable, Equatable {
+		var personaDataRequested: P2P.Dapp.Request.PersonaDataRequestItem
+		var responseItem: P2P.Dapp.Response.WalletInteractionSuccessResponse.PersonaDataRequestResponseItem
+	}
+}
+
+private func tryingToAutofillingPersonaData(
+	request: P2P.Dapp.Request.PersonaDataRequestItem,
+	previous: Profile.Network.AuthorizedDapp.AuthorizedPersonaSimple.SharedPersonaData,
+	current: Profile.Network.Persona
+) throws -> PersonaData {
+	let previousIDs = Set(previous.entryIDs)
+	let currentIDS = Set(current.personaData.entries.map(\.id))
+	guard currentIDS.isSuperset(of: previousIDs) else {
+		throw MissingPersonaDataFields()
+	}
+	func extractEntry<T>(
+		_ keyPath: KeyPath<PersonaData, PersonaData.IdentifiedEntry<T>?>
+	) -> PersonaData.IdentifiedEntry<T>?
+		where T: BasePersonaDataEntryProtocol
+	{
+		guard let entry = current.personaData[keyPath: keyPath] else {
+			return nil
+		}
+		guard previousIDs.contains(entry.id) else {
+			return nil
+		}
+		return entry
+	}
+
+	func extractEntries<T>(
+		inProfile keyPath: KeyPath<PersonaData, PersonaData.CollectionOfIdentifiedEntries<T>>,
+		previous prevKeyPath: KeyPath<Profile.Network.AuthorizedDapp.AuthorizedPersonaSimple.SharedPersonaData, Profile.Network.AuthorizedDapp.AuthorizedPersonaSimple.SharedPersonaData.SharedCollection?>,
+		request requestKeyPath: KeyPath<P2P.Dapp.Request.PersonaDataRequestItem, RequestedNumber?>
+	) throws -> PersonaData.CollectionOfIdentifiedEntries<T> where T: BasePersonaDataEntryProtocol {
+		guard let requestedNumber = request[keyPath: requestKeyPath] else {
+			return .init()
+		}
+
+		let collectionOfIdentifiedEntires = current.personaData[keyPath: keyPath]
+
+		guard let previouslyShared = previous[keyPath: prevKeyPath] else {
+			return .init()
+		}
+
+		guard previouslyShared.request == requestedNumber else { return .init() }
+
+		return try .init(collection: collectionOfIdentifiedEntires.collection.filter {
+			previouslyShared.ids.contains($0.id)
+		})
+	}
+
+	return try .init(
+		name: extractEntry(\.name),
+		dateOfBirth: extractEntry(\.dateOfBirth),
+		companyName: extractEntry(\.companyName),
+		emailAddresses: extractEntries(
+			inProfile: \.emailAddresses,
+			previous: \.emailAddresses,
+			request: \.numberOfRequestedEmailAddresses
+		),
+		phoneNumbers: extractEntries(
+			inProfile: \.phoneNumbers,
+			previous: \.phoneNumbers,
+			request: \.numberOfRequestedPhoneNumbers
+		),
+		urls: .init(), // FIXME: When P2P.Dapp.Requests and Response support it
+		postalAddresses: .init(), // FIXME: When P2P.Dapp.Requests and Response support it
+		creditCards: .init() // FIXME: When P2P.Dapp.Requests and Response support it
+	)
+}
+
+// MARK: - MissingPersonaDataFields
+struct MissingPersonaDataFields: Swift.Error {}
+
+extension Profile.Network.AuthorizedDapp.AuthorizedPersonaSimple.SharedPersonaData {
+	init(
+		requested: P2P.Dapp.Request.PersonaDataRequestItem,
+		persona: Profile.Network.Persona,
+		provided: P2P.Dapp.Response.WalletInteractionSuccessResponse.PersonaDataRequestResponseItem
+	) throws {
+		func extractField<PersonaDataEntry>(
+			personaDataEntryKind: PersonaData.Entry.Kind,
+			isRequested isRequestedKeyPath: KeyPath<P2P.Dapp.Request.PersonaDataRequestItem, Bool?>,
+			personaData personaDataKeyPath: KeyPath<PersonaData, PersonaData.IdentifiedEntry<PersonaDataEntry>?>,
+			provided providedKeyPath: KeyPath<P2P.Dapp.Response.WalletInteractionSuccessResponse.PersonaDataRequestResponseItem, PersonaDataEntry?>
+		) throws -> PersonaDataEntryID? where PersonaDataEntry: Hashable & PersonaDataEntryProtocol {
+			// Check if incoming Dapp requested this persona data entry kind
+			guard requested[keyPath: isRequestedKeyPath] == true else { return nil }
+
+			// Check if PersonaData in Persona contains the entry
+			guard let entrySavedInPersona = persona.personaData[keyPath: personaDataKeyPath] else {
+				loggerGlobal.error("PersonaData in Persona does not contain expected requested persona data entry of kind: \(personaDataEntryKind)")
+				throw MissingRequestedPersonaData(kind: personaDataEntryKind)
+			}
+
+			// Check if response we are about to send back to dapp contains a value of expected kind
+			guard let providedEntry = provided[keyPath: providedKeyPath] else {
+				loggerGlobal.error("Discrepancy, the response we are about to send back to dapp does not contain the requested persona data entry of kind: \(personaDataEntryKind)")
+				throw PersonaDataEntryNotFoundInResponse(kind: personaDataEntryKind)
+			}
+
+			// Check if response we are about to send back equals to the one saved in Profile
+			guard providedEntry == entrySavedInPersona.value else {
+				loggerGlobal.error("Discrepancy, the value of the persona data entry does not match what is saved in profile: [response to dapp]: '\(providedEntry)' != '\(entrySavedInPersona.value)' [saved in Profile]")
+				throw SavedPersonaDataInPersonaDoesNotMatchWalletInteractionResponseItem(
+					kind: personaDataEntryKind
+				)
+			}
+
+			// Return the id of the entry
+			return entrySavedInPersona.id
+		}
+
+		func extractSharedCollection<PersonaDataElement>(
+			personaDataEntryKind: PersonaData.Entry.Kind,
+			personaData personaDataKeyPath: KeyPath<PersonaData, PersonaData.CollectionOfIdentifiedEntries<PersonaDataElement>>,
+			provided providedKeyPath: KeyPath<P2P.Dapp.Response.WalletInteractionSuccessResponse.PersonaDataRequestResponseItem, OrderedSet<PersonaDataElement>?>,
+			requested requestedKeyPath: KeyPath<P2P.Dapp.Request.PersonaDataRequestItem, RequestedNumber?>
+		) throws -> SharedCollection?
+			where
+			PersonaDataElement: Sendable & Hashable & Codable & BasePersonaDataEntryProtocol
+		{
+			// Check if incoming Dapp requests the persona data entry kind
+			guard
+				let numberOfRequestedElements = requested[keyPath: requestedKeyPath],
+				numberOfRequestedElements.quantity > 0
+			else {
+				// Incoming Dapp request did not ask for access to this kind
+				return nil
+			}
+
+			// Read out the entries saved in persona (could have been just updated, part of the flow)
+			let entriesSavedInPersona = persona.personaData[keyPath: personaDataKeyPath]
+
+			// Ensure the response we plan to send back to Dapp contains the persona data entries as well (else discrepancy in DappInteractionFlow)
+			guard let providedEntries = provided[keyPath: providedKeyPath] else {
+				loggerGlobal.error("Discrepancy in DappInteractionFlow, Dapp requests access to persona data entry of kind: \(personaDataEntryKind), specifically: \(numberOfRequestedElements) many, which where in fact found in PersonaData saved in Persona, however, the response we are aboutto send back to Dapp does not contain it.")
+				throw SavedPersonaDataInPersonaDoesNotContainRequestedPersonaData(kind: personaDataEntryKind)
+			}
+
+			// Check all entries in response are found in persona
+			guard Set(entriesSavedInPersona.map(\.value)).isSuperset(of: Set(providedEntries)) else {
+				loggerGlobal.error("Discrepancy in DappInteractionFlow, response back to dapp contains entries which are not in PersonaData in Persona.")
+				throw SavedPersonaDataInPersonaDoesNotMatchWalletInteractionResponseItem(
+					kind: personaDataEntryKind
+				)
+			}
+
+			return try Profile.Network.AuthorizedDapp.AuthorizedPersonaSimple.SharedPersonaData.SharedCollection(
+				ids: OrderedSet(validating: entriesSavedInPersona.map(\.id)),
+				forRequest: numberOfRequestedElements
+			)
+		}
+
+		try self.init(
+			name: extractField(
+				personaDataEntryKind: .fullName,
+				isRequested: \.isRequestingName,
+				personaData: \.name,
+				provided: \.name
+			),
+			dateOfBirth: nil, // FIXME: When P2P.Dapp.Requests and Response support it
+			companyName: nil, // FIXME: When P2P.Dapp.Requests and Response support it
+			emailAddresses: extractSharedCollection(
+				personaDataEntryKind: .emailAddress,
+				personaData: \.emailAddresses,
+				provided: \.emailAddresses,
+				requested: \.numberOfRequestedEmailAddresses
+			),
+			phoneNumbers: extractSharedCollection(
+				personaDataEntryKind: .phoneNumber,
+				personaData: \.phoneNumbers,
+				provided: \.phoneNumbers,
+				requested: \.numberOfRequestedPhoneNumbers
+			),
+			urls: nil, // FIXME: When P2P.Dapp.Requests and Response support it
+			postalAddresses: nil, // FIXME: When P2P.Dapp.Requests and Response support it
+			creditCards: nil // FIXME: When P2P.Dapp.Requests and Response support it
+		)
+	}
+}
+
+extension P2P.Dapp.Response.WalletInteractionSuccessResponse.PersonaDataRequestResponseItem {
+	init(
+		personaDataRequested requested: P2P.Dapp.Request.PersonaDataRequestItem,
+		personaData: PersonaData
+	) throws {
+		func extractEntry<T>(
+			_ personaDataKeyPath: KeyPath<PersonaData, PersonaData.IdentifiedEntry<T>?>,
+			isRequested isRequestedKeyPath: KeyPath<P2P.Dapp.Request.PersonaDataRequestItem, Bool?>
+		) -> T? where T: PersonaDataEntryProtocol {
+			// Check if incoming Dapp requested this persona data entry kind
+			guard requested[keyPath: isRequestedKeyPath] == true else { return nil }
+			guard let personaDataEntry = personaData[keyPath: personaDataKeyPath] else { return nil }
+			return personaDataEntry.value
+		}
+
+		func extractEntries<T>(
+			_ personaDataKeyPath: KeyPath<PersonaData, PersonaData.CollectionOfIdentifiedEntries<T>>,
+			requested requestedKeyPath: KeyPath<P2P.Dapp.Request.PersonaDataRequestItem, RequestedNumber?>
+		) throws -> OrderedSet<T>? where T: Hashable & PersonaDataEntryProtocol {
+			// Check if incoming Dapp requests the persona data entry kind
+			guard
+				let numberOfRequestedElements = requested[keyPath: requestedKeyPath],
+				numberOfRequestedElements.quantity > 0
+			else {
+				// Incoming Dapp request did not ask for access to this kind
+				return nil
+			}
+			let personaDataEntries = personaData[keyPath: personaDataKeyPath]
+			let set = try OrderedSet<T>(validating: personaDataEntries.map(\.value))
+			let expectedQuantity = numberOfRequestedElements.quantity
+			switch numberOfRequestedElements.quantifier {
+			case .atLeast:
+				guard set.count >= expectedQuantity else {
+					return nil
+				}
+			case .exactly:
+				guard set.count == expectedQuantity else {
+					return nil
+				}
+			}
+			return set
+		}
+
+		try self.init(
+			name: extractEntry(\.name, isRequested: \.isRequestingName),
+			dateOfBirth: nil, // FIXME: When P2P.Dapp.Requests and Response support it
+			companyName: nil, // FIXME: When P2P.Dapp.Requests and Response support it
+			emailAddresses: extractEntries(\.emailAddresses, requested: \.numberOfRequestedEmailAddresses),
+			phoneNumbers: extractEntries(\.phoneNumbers, requested: \.numberOfRequestedPhoneNumbers),
+			urls: nil, // FIXME: When P2P.Dapp.Requests and Response support it
+			postalAddresses: nil, // FIXME: When P2P.Dapp.Requests and Response support it
+			creditCards: nil // FIXME: When P2P.Dapp.Requests and Response support it
+		)
+	}
+}
+
+extension DappInteractionFlow {
 	func setAccountsResponse(
 		to item: State.AnyInteractionItem,
 		accessKind: AccountPermissionChooseAccounts.State.AccessKind,
@@ -854,111 +1149,6 @@ extension DappInteractionFlow.State {
 			return nil
 		}
 		return item.ongoingPersonaData
-	}
-}
-
-extension Profile.Network.AuthorizedDapp.AuthorizedPersonaSimple.SharedPersonaData {
-	init(
-		requested: P2P.Dapp.Request.PersonaDataRequestItem,
-		persona: Profile.Network.Persona,
-		provided: P2P.Dapp.Response.WalletInteractionSuccessResponse.PersonaDataRequestResponseItem
-	) throws {
-		func extractField<PersonaDataEntry>(
-			personaDataEntryKind: PersonaData.Entry.Kind,
-			isRequested isRequestedKeyPath: KeyPath<P2P.Dapp.Request.PersonaDataRequestItem, Bool?>,
-			personaData personaDataKeyPath: KeyPath<PersonaData, PersonaData.IdentifiedEntry<PersonaDataEntry>?>,
-			provided providedKeyPath: KeyPath<P2P.Dapp.Response.WalletInteractionSuccessResponse.PersonaDataRequestResponseItem, PersonaDataEntry?>
-		) throws -> PersonaDataEntryID? where PersonaDataEntry: Hashable & PersonaDataEntryProtocol {
-			// Check if incoming Dapp requested this persona data entry kind
-			guard requested[keyPath: isRequestedKeyPath] == true else { return nil }
-
-			// Check if PersonaData in Persona contains the entry
-			guard let entrySavedInPersona = persona.personaData[keyPath: personaDataKeyPath] else {
-				loggerGlobal.error("PersonaData in Persona does not contain expected requested persona data entry of kind: \(personaDataEntryKind)")
-				throw MissingRequestedPersonaData(kind: personaDataEntryKind)
-			}
-
-			// Check if response we are about to send back to dapp contains a value of expected kind
-			guard let providedEntry = provided[keyPath: providedKeyPath] else {
-				loggerGlobal.error("Discrepancy, the response we are about to send back to dapp does not contain the requested persona data entry of kind: \(personaDataEntryKind)")
-				throw PersonaDataEntryNotFoundInResponse(kind: personaDataEntryKind)
-			}
-
-			// Check if response we are about to send back equals to the one saved in Profile
-			guard providedEntry == entrySavedInPersona.value else {
-				loggerGlobal.error("Discrepancy, the value of the persona data entry does not match what is saved in profile: [response to dapp]: '\(providedEntry)' != '\(entrySavedInPersona.value)' [saved in Profile]")
-				throw SavedPersonaDataInPersonaDoesNotMatchWalletInteractionResponseItem(
-					kind: personaDataEntryKind
-				)
-			}
-
-			// Return the id of the entry
-			return entrySavedInPersona.id
-		}
-
-		func extractSharedCollection<PersonaDataElement>(
-			personaDataEntryKind: PersonaData.Entry.Kind,
-			personaData personaDataKeyPath: KeyPath<PersonaData, PersonaData.CollectionOfIdentifiedEntries<PersonaDataElement>>,
-			provided providedKeyPath: KeyPath<P2P.Dapp.Response.WalletInteractionSuccessResponse.PersonaDataRequestResponseItem, OrderedSet<PersonaDataElement>?>,
-			requested requestedKeyPath: KeyPath<P2P.Dapp.Request.PersonaDataRequestItem, RequestedNumber?>
-		) throws -> SharedCollection?
-			where
-			PersonaDataElement: Sendable & Hashable & Codable & BasePersonaDataEntryProtocol
-		{
-			// Check if incoming Dapp requests the persona data entry kind
-			guard let numberOfRequestedElements = requested[keyPath: requestedKeyPath] else {
-				// Incoming Dapp request did not ask for access to this kind
-				return nil
-			}
-
-			// Read out the entries saved in persona (could have been just updated, part of the flow)
-			let entriesSavedInPersona = persona.personaData[keyPath: personaDataKeyPath]
-
-			// Ensure the response we plan to send back to Dapp contains the persona data entries as well (else discrepancy in DappInteractionFlow)
-			guard let providedEntries = provided[keyPath: providedKeyPath] else {
-				loggerGlobal.error("Discrepancy in DappInteractionFlow, Dapp requests access to persona data entry of kind: \(personaDataEntryKind), specifically: \(numberOfRequestedElements) many, which where in fact found in PersonaData saved in Persona, however, the response we are aboutto send back to Dapp does not contain it.")
-				throw SavedPersonaDataInPersonaDoesNotContainRequestedPersonaData(kind: personaDataEntryKind)
-			}
-
-			// Check all entries in response are found in persona
-			guard Set(entriesSavedInPersona.map(\.value)).isSuperset(of: Set(providedEntries)) else {
-				loggerGlobal.error("Discrepancy in DappInteractionFlow, response back to dapp contains entries which are not in PersonaData in Persona.")
-				throw SavedPersonaDataInPersonaDoesNotMatchWalletInteractionResponseItem(
-					kind: personaDataEntryKind
-				)
-			}
-
-			return try Profile.Network.AuthorizedDapp.AuthorizedPersonaSimple.SharedPersonaData.SharedCollection(
-				ids: OrderedSet(validating: entriesSavedInPersona.map(\.id)),
-				forRequest: numberOfRequestedElements
-			)
-		}
-
-		try self.init(
-			name: extractField(
-				personaDataEntryKind: .fullName,
-				isRequested: \.isRequestingName,
-				personaData: \.name,
-				provided: \.name
-			),
-			dateOfBirth: nil, // FIXME: When P2P.Dapp.Requests and Response support it
-			companyName: nil, // FIXME: When P2P.Dapp.Requests and Response support it
-			emailAddresses: extractSharedCollection(
-				personaDataEntryKind: .emailAddress,
-				personaData: \.emailAddresses,
-				provided: \.emailAddresses,
-				requested: \.numberOfRequestedEmailAddresses
-			),
-			phoneNumbers: extractSharedCollection(
-				personaDataEntryKind: .phoneNumber,
-				personaData: \.phoneNumbers,
-				provided: \.phoneNumbers,
-				requested: \.numberOfRequestedPhoneNumbers
-			),
-			urls: nil, // FIXME: When P2P.Dapp.Requests and Response support it
-			postalAddresses: nil, // FIXME: When P2P.Dapp.Requests and Response support it
-			creditCards: nil // FIXME: When P2P.Dapp.Requests and Response support it
-		)
 	}
 }
 
