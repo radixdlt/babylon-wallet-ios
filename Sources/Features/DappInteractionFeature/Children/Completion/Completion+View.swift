@@ -1,3 +1,4 @@
+import EngineKit
 import FeaturePrelude
 
 extension DappMetadata {
@@ -16,10 +17,12 @@ extension DappMetadata {
 // MARK: - Completion.View
 extension Completion {
 	struct ViewState: Equatable {
+		let txID: TXID
 		let title: String
 		let subtitle: String
 
 		init(state: Completion.State) {
+			txID = state.txID
 			title = L10n.DAppRequest.Completion.title
 			subtitle = L10n.DAppRequest.Completion.subtitle(state.dappMetadata.name)
 		}
@@ -46,6 +49,11 @@ extension Completion {
 							.foregroundColor(.app.gray1)
 							.textStyle(.body1Regular)
 							.multilineTextAlignment(.center)
+
+						HStack {
+							Text(L10n.TransactionReview.SubmitTransaction.txID)
+							AddressView(.identifier(.transaction(viewStore.txID)))
+						}
 					}
 					.padding(.horizontal, .medium2)
 					.padding(.bottom, .medium3)
