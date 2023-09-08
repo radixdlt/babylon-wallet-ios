@@ -9,8 +9,7 @@ extension App.State {
 	var viewState: App.ViewState {
 		.init(
 			isOnMainnet: isOnMainnet,
-			hasMainnetEverBeenLive: hasMainnetEverBeenLive,
-			isCurrentlyOnboardingUserToMainnet: isCurrentlyOnboardingUserToMainnet
+			hasMainnetEverBeenLive: hasMainnetEverBeenLive
 		)
 	}
 }
@@ -20,13 +19,9 @@ extension App {
 	public struct ViewState: Equatable {
 		let isOnMainnet: Bool
 		let hasMainnetEverBeenLive: Bool
-		let isCurrentlyOnboardingUserToMainnet: Bool
 
 		var showIsUsingTestnetBanner: Bool {
 			guard hasMainnetEverBeenLive else {
-				return false
-			}
-			guard !isCurrentlyOnboardingUserToMainnet else {
 				return false
 			}
 			return !isOnMainnet
@@ -65,11 +60,11 @@ extension App {
 							action: App.ChildAction.splash,
 							then: { Splash.View(store: $0) }
 						)
-					case .onboardTestnetUserToMainnet:
+					case .decommissioned:
 						CaseLet(
-							state: /App.State.Root.onboardTestnetUserToMainnet,
-							action: App.ChildAction.onboardTestnetUserToMainnet,
-							then: { CreateAccountCoordinator.View(store: $0) }
+							state: /App.State.Root.decommissioned,
+							action: App.ChildAction.decommissioned,
+							then: { Decommissioned.View(store: $0) }
 						)
 					}
 				}

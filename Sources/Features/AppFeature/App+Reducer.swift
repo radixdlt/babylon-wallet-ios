@@ -17,19 +17,14 @@ public struct App: Sendable, FeatureReducer {
 			case main(Main.State)
 			case onboardingCoordinator(OnboardingCoordinator.State)
 			case splash(Splash.State)
-			case onboardTestnetUserToMainnet(CreateAccountCoordinator.State)
+
+			/// When mainnet is live, prevent Beta (Preview) app from being used
+			case decommissioned(Decommissioned.State)
 		}
 
 		public var root: Root
 		public var isOnMainnet = false
 		public var hasMainnetEverBeenLive = false
-
-		public var isCurrentlyOnboardingUserToMainnet: Bool {
-			switch root {
-			case .onboardTestnetUserToMainnet: return true
-			case .main, .onboardingCoordinator, .splash: return false
-			}
-		}
 
 		@PresentationState
 		public var alert: Alerts.State?
@@ -59,7 +54,7 @@ public struct App: Sendable, FeatureReducer {
 		case main(Main.Action)
 		case onboardingCoordinator(OnboardingCoordinator.Action)
 		case splash(Splash.Action)
-		case onboardTestnetUserToMainnet(CreateAccountCoordinator.Action)
+		case decommissioned(Decommissioned.Action)
 	}
 
 	public struct Alerts: Sendable, ReducerProtocol {
@@ -100,8 +95,8 @@ public struct App: Sendable, FeatureReducer {
 				.ifCaseLet(/State.Root.splash, action: /ChildAction.splash) {
 					Splash()
 				}
-				.ifCaseLet(/State.Root.onboardTestnetUserToMainnet, action: /ChildAction.onboardTestnetUserToMainnet) {
-					CreateAccountCoordinator()
+				.ifCaseLet(/State.Root.decommissioned, action: /ChildAction.decommissioned) {
+					Decommissioned()
 				}
 		}
 
@@ -174,21 +169,9 @@ public struct App: Sendable, FeatureReducer {
 		case .main(.delegate(.removedWallet)):
 			return checkIfMainnetIsOnlineThenGoToOnboarding()
 
-		case let .onboardTestnetUserToMainnet(.delegate(onboardTestnetUserToMainnetDelegate)):
-			switch onboardTestnetUserToMainnetDelegate {
-			case .completed:
-				// We should have switched to mainnet already, part of onboarding
-				return .send(.internal(.toMain(isAccountRecoveryNeeded: false)))
-
-			case .dismissed:
-				assertionFailure("Expected to have created account on mainnet, but the create account flow got dismissed, it should NOT be dismissable.")
-				return goToMain(state: &state, accountRecoveryIsNeeded: false)
-			}
-
-		case let .onboardingCoordinator(.delegate(.completed(accountRecoveryIsNeeded, hasMainnetAccounts, hasMainnetEverBeenLive))):
+		case let .onboardingCoordinator(.delegate(.completed(accountRecoveryIsNeeded, _, hasMainnetEverBeenLive))):
 			state.hasMainnetEverBeenLive = hasMainnetEverBeenLive
 			return onboardUserToMainnetIfNeededElseGoToMain(
-				hasMainnetAccounts: hasMainnetAccounts,
 				hasMainnetEverBeenLive: hasMainnetEverBeenLive,
 				accountRecoveryIsNeeded: accountRecoveryIsNeeded,
 				state: &state
@@ -210,9 +193,8 @@ public struct App: Sendable, FeatureReducer {
 			case let .usersExistingProfileCouldNotBeLoaded(.profileVersionOutdated(_, version)):
 				return incompatibleSnapshotData(version: version, state: &state)
 
-			case let .existingProfile(hasMainnetAccounts):
+			case .existingProfile:
 				return onboardUserToMainnetIfNeededElseGoToMain(
-					hasMainnetAccounts: hasMainnetAccounts,
 					hasMainnetEverBeenLive: hasMainnetEverBeenLive,
 					accountRecoveryIsNeeded: accountRecoveryNeeded,
 					state: &state
@@ -229,14 +211,13 @@ public struct App: Sendable, FeatureReducer {
 	}
 
 	func onboardUserToMainnetIfNeededElseGoToMain(
-		hasMainnetAccounts: Bool,
 		hasMainnetEverBeenLive: Bool,
 		accountRecoveryIsNeeded: Bool,
 		state: inout State
 	) -> EffectTask<Action> {
-		if !hasMainnetAccounts, hasMainnetEverBeenLive {
-			loggerGlobal.notice("Mainnet has been live, but has no accounts => onboarding existing user to Mainnet")
-			state.root = .onboardTestnetUserToMainnet(.init(config: .init(purpose: .firstAccountOnNewNetwork(.mainnet))))
+		if hasMainnetEverBeenLive {
+			loggerGlobal.notice("Mainnet has been live: preventing user from using the app, forcing them to install Radix Wallet from AppStore")
+			state.root = .decommissioned(.init())
 			return .none
 		} else {
 			return goToMain(state: &state, accountRecoveryIsNeeded: accountRecoveryIsNeeded)
