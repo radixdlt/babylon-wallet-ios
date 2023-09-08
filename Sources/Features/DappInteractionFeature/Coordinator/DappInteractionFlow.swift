@@ -103,6 +103,12 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 
 			var ongoingPersonaDataPayload: PersonaDataPayload?
 		}
+
+		case failedToUpdatePersonaAtEndOfFlow(
+			persona: Profile.Network.Persona,
+			response: P2P.Dapp.Response.WalletInteractionSuccessResponse,
+			metadata: DappMetadata
+		)
 	}
 
 	enum ChildAction: Sendable, Equatable {
@@ -224,6 +230,11 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 
 	func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
+		case let .failedToUpdatePersonaAtEndOfFlow(_, response, dappMetadata):
+			// FIXME: Figure out if we wanna do something differently... we FAILED to save the persona
+			// into profile... yet still we are responding back to dapp with it.
+			return .send(.delegate(.submit(response, dappMetadata)))
+
 		case let .usePersona(item, persona, authorizedDapp, authorizedPersona):
 			state.persona = persona
 			state.authorizedDapp = authorizedDapp
@@ -592,6 +603,18 @@ extension DappInteractionFlow.InternalAction.AutofillOngoingResponseItemsPayload
 				}
 			}
 
+			// FIXME: Handle dateOfBirth
+			// FIXME: Handle companyName
+			// FIXME: Handle urls
+			// FIXME: Handle postalAddresses
+			// FIXME: Handle creditCards
+
+			// The only purpose of this switch is to make sure we get a compilation error when we add a new PersonaData.Entry kind, so
+			// we do not forget to handle it here.
+			switch PersonaData.Entry.Kind.fullName {
+			case .fullName, .dateOfBirth, .companyName, .emailAddress, .phoneNumber, .url, .postalAddress, .creditCard: break
+			}
+
 			self.personaDataRequested = personaDataRequested
 			self.responseItem = responseItem
 		}
@@ -904,17 +927,20 @@ extension DappInteractionFlow {
 
 			if let persona = state.persona {
 				do {
-					// FIXME: handle error
 					loggerGlobal.critical("finishInteractionFlow calling updatePersona")
 					try await updatePersona(persona, state, responseItems: response.items)
 				} catch {
 					loggerGlobal.critical("Failed to update persona, error: \(error)")
+					await send(.internal(.failedToUpdatePersonaAtEndOfFlow(
+						persona: persona,
+						response: response,
+						metadata: state.dappMetadata
+					)))
+					return
 				}
 			}
 
-			loggerGlobal.critical("finishInteractionFlow delegate submit")
 			await send(.delegate(.submit(response, state.dappMetadata)))
-			loggerGlobal.critical("finishInteractionFlow delegate submit DONE")
 		}
 	}
 
