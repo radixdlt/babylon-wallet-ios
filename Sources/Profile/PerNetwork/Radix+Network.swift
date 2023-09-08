@@ -43,7 +43,7 @@ extension Radix.Network {
 	public static let stokenet = Self(
 		name: "stokenet",
 		id: .stokenet,
-		displayDescription: "Babylon stokenet"
+		displayDescription: "Stokenet"
 	)
 
 	public static let nebunet = Self(
