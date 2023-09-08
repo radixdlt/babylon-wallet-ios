@@ -1,7 +1,7 @@
 import FeaturePrelude
 
 extension Decommissioned.State {
-	var viewState: Decomissioned.ViewState {
+	var viewState: Decommissioned.ViewState {
 		.init()
 	}
 }
