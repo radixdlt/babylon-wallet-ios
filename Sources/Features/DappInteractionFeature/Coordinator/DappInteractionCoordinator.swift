@@ -1,3 +1,4 @@
+import EngineKit
 import FeaturePrelude
 
 struct DappInteractionCoordinator: Sendable, FeatureReducer {
@@ -38,7 +39,7 @@ struct DappInteractionCoordinator: Sendable, FeatureReducer {
 
 	enum DelegateAction: Sendable, Equatable {
 		case submit(P2P.Dapp.Response, DappMetadata)
-		case dismiss(DappMetadata)
+		case dismiss(DappMetadata, TXID)
 		case dismissSilently
 	}
 
@@ -100,8 +101,8 @@ struct DappInteractionCoordinator: Sendable, FeatureReducer {
 		case let .flow(.delegate(.dismissWithFailure(error))):
 			return .send(.delegate(.submit(.failure(error), .request(state.interaction.metadata))))
 
-		case let .flow(.delegate(.dismissWithSuccess(dappMetadata))):
-			return .send(.delegate(.dismiss(dappMetadata)))
+		case let .flow(.delegate(.dismissWithSuccess(dappMetadata, txID))):
+			return .send(.delegate(.dismiss(dappMetadata, txID)))
 
 		case .flow(.delegate(.dismiss)):
 			return .send(.delegate(.dismissSilently))
