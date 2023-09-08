@@ -15,10 +15,11 @@ extension Decommissioned {
 				// TODO: implement
 				VStack(alignment: .center) {
 					VStack(alignment: .center, spacing: .small1) {
-						Text("Preview of wallet has ended") // FIXME: Strings
+						Text("Preview of Wallet Has Ended") // FIXME: Strings
 							.textStyle(.sectionHeader)
 						Text("Uninstall this app and download the Radix Wallet app from App Store.") // FIXME: Strings
 							.textStyle(.body1HighImportance)
+							.multilineTextAlignment(.center)
 					}
 					.foregroundColor(.white)
 
