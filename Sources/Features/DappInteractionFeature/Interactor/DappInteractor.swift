@@ -1,14 +1,12 @@
 import AppPreferencesClient
 import DappInteractionClient
+import EngineKit
 import FeaturePrelude
 import GatewaysClient
 import RadixConnect
 import RadixConnectClient
 import RadixConnectModels
 import ROLAClient
-
-import EngineKit
-import EngineToolkit
 
 typealias RequestEnvelope = DappInteractionClient.RequestEnvelope
 
