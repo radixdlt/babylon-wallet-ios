@@ -14,9 +14,9 @@ extension Decommissioned {
 
 	@MainActor
 	public struct View: SwiftUI.View {
-		private let store: StoreOf<Decomissioned>
+		private let store: StoreOf<Decommissioned>
 
-		public init(store: StoreOf<Decomissioned>) {
+		public init(store: StoreOf<Decommissioned>) {
 			self.store = store
 		}
 
@@ -41,7 +41,7 @@ struct Decommissioned_Preview: PreviewProvider {
 		Decommissioned.View(
 			store: .init(
 				initialState: .previewValue,
-				reducer: Decomissioned()
+				reducer: Decommissioned()
 			)
 		)
 	}
