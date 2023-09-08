@@ -95,6 +95,7 @@ extension Radix.Network {
 extension Radix.Network {
 	fileprivate static let lookupSet: Set<Self> = [
 		.mainnet,
+		.stokenet,
 		.nebunet,
 		.kisharnet,
 		.ansharnet,
