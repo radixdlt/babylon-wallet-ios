@@ -21,7 +21,11 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 
 		public enum Mode: Sendable, Hashable {
 			case general(Profile.Network.Persona, dApps: IdentifiedArrayOf<DappInfo>)
-			case dApp(Profile.Network.AuthorizedDappDetailed, persona: Profile.Network.AuthorizedPersonaDetailed)
+
+			case dApp(
+				Profile.Network.AuthorizedDappDetailed,
+				persona: Profile.Network.AuthorizedPersonaDetailed
+			)
 
 			var id: Profile.Network.Persona.ID {
 				switch self {

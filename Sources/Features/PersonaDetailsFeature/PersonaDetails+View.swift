@@ -267,7 +267,7 @@ private extension PersonaDetails.State {
 			return .init(
 				dAppInfo: dAppInfo,
 				personaName: persona.displayName.rawValue,
-				personaData: nil
+				personaData: persona.sharedPersonaData
 			)
 		case let .general(persona, _):
 			return .init(
@@ -324,11 +324,12 @@ extension PersonaDetails.View {
 			) {
 				self.dAppInfo = dAppInfo
 				self.personaName = personaName
-				self.dateOfBirth = personaData?.dateOfBirth?.value.date
-				self.companyName = personaData?.companyName?.value.name
 				self.fullName = personaData?.name?.value.formatted
 				self.emailAddresses = personaData?.emailAddresses.map(\.value.email)
 				self.phoneNumbers = personaData?.phoneNumbers.map(\.value.number)
+
+				self.dateOfBirth = personaData?.dateOfBirth?.value.date
+				self.companyName = personaData?.companyName?.value.name
 				self.urls = personaData?.urls.map(\.value.url)
 				self.postalAddresses = personaData?.postalAddresses.map(\.value)
 				self.creditCards = personaData?.creditCards.map(\.value)
@@ -357,31 +358,31 @@ extension PersonaDetails.View {
 						} else {
 							Text(L10n.AuthorizedDapps.PersonaDetails.personalDataSharingDescription(dAppInfo.name))
 								.textBlock
+
+							if let fullName = viewStore.fullName {
+								VPair(
+									heading: L10n.AuthorizedDapps.PersonaDetails.fullName,
+									item: fullName
+								)
+								Separator()
+							}
+
+							if let phoneNumber = viewStore.phoneNumbers?.first {
+								VPair(
+									heading: L10n.AuthorizedDapps.PersonaDetails.phoneNumber,
+									item: phoneNumber
+								)
+								Separator()
+							}
+
+							if let emailAddress = viewStore.emailAddresses?.first {
+								VPair(
+									heading: L10n.AuthorizedDapps.PersonaDetails.emailAddress,
+									item: emailAddress
+								)
+								Separator()
+							}
 						}
-					}
-
-					if let fullName = viewStore.fullName {
-						VPair(
-							heading: L10n.AuthorizedDapps.PersonaDetails.fullName,
-							item: fullName
-						)
-						Separator()
-					}
-
-					if let phoneNumber = viewStore.phoneNumbers?.first {
-						VPair(
-							heading: L10n.AuthorizedDapps.PersonaDetails.phoneNumber,
-							item: phoneNumber
-						)
-						Separator()
-					}
-
-					if let emailAddress = viewStore.emailAddresses?.first {
-						VPair(
-							heading: L10n.AuthorizedDapps.PersonaDetails.emailAddress,
-							item: emailAddress
-						)
-						Separator()
 					}
 				}
 				.padding(.horizontal, .medium1)

@@ -987,7 +987,7 @@ extension DappInteractionFlow {
 			sharedAccounts = nil
 		}
 
-		let sharedPersonaData: Profile.Network.AuthorizedDapp.AuthorizedPersonaSimple.SharedPersonaData
+		let sharedPersonaData: Profile.Network.AuthorizedDapp.AuthorizedPersonaSimple.SharedPersonaData?
 		if let (requestedPersonaData, providedPersonData) = sharedPersonaDataInfo {
 			sharedPersonaData = try Profile.Network.AuthorizedDapp.AuthorizedPersonaSimple.SharedPersonaData(
 				requested: requestedPersonaData,
@@ -995,8 +995,7 @@ extension DappInteractionFlow {
 				provided: providedPersonData
 			)
 		} else {
-			// Empty, not sharing anything
-			sharedPersonaData = .init()
+			sharedPersonaData = nil
 		}
 
 		@Dependency(\.date) var now
@@ -1006,13 +1005,16 @@ extension DappInteractionFlow {
 				if let sharedAccounts {
 					authorizedPersona.sharedAccounts = sharedAccounts
 				}
+				if let sharedPersonaData {
+					authorizedPersona.sharedPersonaData = sharedPersonaData
+				}
 				return authorizedPersona
 			} else {
 				return .init(
 					identityAddress: persona.address,
 					lastLogin: now(),
 					sharedAccounts: sharedAccounts,
-					sharedPersonaData: sharedPersonaData
+					sharedPersonaData: sharedPersonaData ?? .init()
 				)
 			}
 		}()
