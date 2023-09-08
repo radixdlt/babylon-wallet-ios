@@ -187,7 +187,7 @@ extension AccountPortfolio.PoolUnitResources {
 			let poolUnitTotalSupply = poolUnitResource.totalSupply ?? .one
 			let unroundedRedemptionValue = poolUnitResource.amount * resource.amount / poolUnitTotalSupply
 			return resource.divisibility
-				.map { unroundedRedemptionValue.format(maxPlaces: UInt($0)) }
+				.map { unroundedRedemptionValue.format(maxPlaces: UInt(min(8, $0))) }
 				?? (unroundedRedemptionValue.format())
 		}
 	}
