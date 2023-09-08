@@ -4,6 +4,7 @@ import Foundation
 extension BigDecimal {
 	// Used for development purposes
 	public static let temporaryStandardFee: BigDecimal = 25
+	public static let defaultMaxPlaces: UInt = 8
 }
 
 extension BigDecimal {
@@ -16,9 +17,14 @@ extension BigDecimal {
 
 	/// Formats the number for human consumtion
 	public func format(
-		maxPlaces maxPlacesNonNegative: UInt = 8,
+		maxPlaces maxPlacesNonNegative: UInt = BigDecimal.defaultMaxPlaces,
 		locale: Locale = .autoupdatingCurrent
 	) -> String {
+		let maxPlacesNonNegative = min(
+			BigDecimal.defaultMaxPlaces,
+			maxPlacesNonNegative
+		)
+
 		// N.B. We cannot use `Local.current.decimalSeperator` here because
 		// `github.com/Zollerbo1/BigDecimal` package **hardcodes** usage of
 		// the decimal separator ".", see this line here:
