@@ -1080,7 +1080,7 @@ extension NonFungibleLocalIdVecSource {
 public struct TransactionReviewFailure: LocalizedError {
 	public let underylying: Swift.Error
 	public var errorDescription: String? {
-		var msg = "A proposed transaction could not be processed"
+		var msg = "A proposed transaction could not be processed" // FIXME: Strings source: https://rdxworks.slack.com/archives/C031A0V1A1W/p1694087946050189?thread_ts=1694085688.749539&cid=C031A0V1A1W
 		#if DEBUG
 		msg += "\n\n[DEBUG] Underlying error: \(String(describing: underylying))"
 		#endif
