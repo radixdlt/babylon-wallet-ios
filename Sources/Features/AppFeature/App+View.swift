@@ -19,7 +19,6 @@ extension App {
 	public struct ViewState: Equatable {
 		let isOnMainnet: Bool
 		let hasMainnetEverBeenLive: Bool
-		let isCurrentlyOnboardingUserToMainnet: Bool
 
 		var showIsUsingTestnetBanner: Bool {
 			guard hasMainnetEverBeenLive else {
