@@ -4,7 +4,7 @@ import Foundation
 extension BigDecimal {
 	// Used for development purposes
 	public static let temporaryStandardFee: BigDecimal = 25
-	public static let defaultMaxPlaces: UInt = 8
+	public static let defaultMaxPlacesFormattted: UInt = 8
 }
 
 extension BigDecimal {
@@ -17,11 +17,11 @@ extension BigDecimal {
 
 	/// Formats the number for human consumtion
 	public func format(
-		maxPlaces maxPlacesNonNegative: UInt = BigDecimal.defaultMaxPlaces,
+		maxPlaces maxPlacesNonNegative: UInt = BigDecimal.defaultMaxPlacesFormattted,
 		locale: Locale = .autoupdatingCurrent
 	) -> String {
 		let maxPlacesNonNegative = min(
-			BigDecimal.defaultMaxPlaces,
+			BigDecimal.defaultMaxPlacesFormattted,
 			maxPlacesNonNegative
 		)
 
