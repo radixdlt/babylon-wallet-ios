@@ -34,6 +34,7 @@ extension TransactionReview.State {
 			rawTransaction: displayMode.rawTransaction,
 			showApprovalSlider: reviewedTransaction != nil,
 			canApproveTX: canApproveTX && reviewedTransaction?.feePayingValidation == .valid,
+			sliderResetDate: sliderResetDate,
 			canToggleViewMode: reviewedTransaction != nil && reviewedTransaction?.transaction != .nonConforming
 		)
 	}
@@ -58,6 +59,7 @@ extension TransactionReview {
 		let rawTransaction: String?
 		let showApprovalSlider: Bool
 		let canApproveTX: Bool
+		let sliderResetDate: Date
 		let canToggleViewMode: Bool
 
 		var approvalSliderControlState: ControlState {
@@ -133,7 +135,7 @@ extension TransactionReview {
 						feeSection
 
 						if viewStore.showApprovalSlider {
-							ApprovalSlider(title: "Slide to Sign") { // FIXME: String - and remove old
+							ApprovalSlider(title: "Slide to Sign", resetDate: viewStore.sliderResetDate) { // FIXME: String - and remove old
 								viewStore.send(.approvalSliderSlid)
 							}
 							.controlState(viewStore.approvalSliderControlState)

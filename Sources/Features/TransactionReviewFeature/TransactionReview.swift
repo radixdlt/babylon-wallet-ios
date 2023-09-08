@@ -32,6 +32,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		public var networkFee: TransactionReviewNetworkFee.State? = nil
 		public let ephemeralNotaryPrivateKey: Curve25519.Signing.PrivateKey
 		public var canApproveTX: Bool = true
+		var sliderResetDate: Date = .now
 
 		@PresentationState
 		public var destination: Destinations.State? = nil
@@ -61,6 +62,10 @@ public struct TransactionReview: Sendable, FeatureReducer {
 				assertionFailure("Should not happen")
 			}
 			#endif
+		}
+
+		public mutating func resetSlider() {
+			sliderResetDate = .now
 		}
 
 		public init(
@@ -356,6 +361,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			loggerGlobal.error("Failed sign tx")
 			state.destination = nil
 			state.canApproveTX = true
+			state.resetSlider()
 			return .none
 
 		case let .signing(.delegate(.finishedSigning(.signTransaction(notarizedTX, origin: _)))):
@@ -376,6 +382,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		case .submitting(.delegate(.failedToSubmit)):
 			state.destination = nil
 			state.canApproveTX = true
+			state.resetSlider()
 			loggerGlobal.error("Failed to submit tx")
 			return .none
 
@@ -603,6 +610,7 @@ extension TransactionReview {
 	func cancelSigningEffect(state: inout State) -> EffectTask<Action> {
 		loggerGlobal.notice("Cancelled signing")
 		state.canApproveTX = true
+		state.resetSlider()
 		return .none
 	}
 }
