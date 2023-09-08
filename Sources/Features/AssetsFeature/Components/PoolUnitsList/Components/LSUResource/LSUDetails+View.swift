@@ -11,6 +11,7 @@ extension LSUDetails.State {
 			resourceDetails: .init(
 				description: stakeUnitResource.description,
 				resourceAddress: stakeUnitResource.resourceAddress,
+				isXRD: false,
 				validatorAddress: validator.address,
 				resourceName: stakeUnitResource.name, // TODO: Is this correct?
 				currentSupply: validator.xrdVaultBalance.format(),

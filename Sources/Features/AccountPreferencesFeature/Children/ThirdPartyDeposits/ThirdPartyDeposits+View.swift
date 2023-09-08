@@ -5,7 +5,7 @@ extension ManageThirdPartyDeposits.State {
 		.init(sections: [
 			.init(
 				id: .depositRules,
-				title: "Choose if you want to allow third-parties to directly deposit assets into your account. Deposits that you approve yourself in your Radix Wallet are always accepted.",
+				title: L10n.AccountSettings.ThirdPartyDeposits.text,
 				rows: [
 					.acceptAllMode(),
 					.acceptKnownMode(),
@@ -43,11 +43,14 @@ extension ManageThirdPartyDeposits {
 					onRowSelected: { _, row in viewStore.send(.rowTapped(row)) }
 				)
 				.background(.app.gray5)
-				.navigationTitle("Third-party Deposits") // FIXME: strings
+				.navigationTitle(L10n.AccountSettings.thirdPartyDeposits)
 				.defaultNavBarConfig()
 				.destination(store: store)
 				.footer {
-					Button("Update", action: { viewStore.send(.updateTapped) }).buttonStyle(.primaryRectangular)
+					Button(L10n.AccountSettings.SpecificAssetsDeposits.update) {
+						viewStore.send(.updateTapped)
+					}
+					.buttonStyle(.primaryRectangular)
 				}
 			}
 		}
@@ -81,8 +84,8 @@ extension PreferenceSection.Row where SectionId == ManageThirdPartyDeposits.Sect
 	static func acceptAllMode() -> Self {
 		.init(
 			id: .depositRule(.acceptAll),
-			title: "Accept All", // FIXME: strings
-			subtitle: "Allow third parties to deposit any asset",
+			title: L10n.AccountSettings.ThirdPartyDeposits.acceptAll,
+			subtitle: L10n.AccountSettings.ThirdPartyDeposits.acceptAllSubtitle,
 			icon: .asset(AssetResource.iconAcceptAirdrop)
 		)
 	}
@@ -90,8 +93,8 @@ extension PreferenceSection.Row where SectionId == ManageThirdPartyDeposits.Sect
 	static func acceptKnownMode() -> Self {
 		.init(
 			id: .depositRule(.acceptKnown),
-			title: "Only accept known", // FIXME: strings
-			subtitle: "Allow third parties to deposit only assets this account has held",
+			title: L10n.AccountSettings.ThirdPartyDeposits.onlyKnown,
+			subtitle: L10n.AccountSettings.ThirdPartyDeposits.onlyKnownSubtitle,
 			icon: .asset(AssetResource.iconAcceptKnownAirdrop)
 		)
 	}
@@ -99,9 +102,9 @@ extension PreferenceSection.Row where SectionId == ManageThirdPartyDeposits.Sect
 	static func denyAllMode() -> Self {
 		.init(
 			id: .depositRule(.denyAll),
-			title: "Deny all", // FIXME: strings
-			subtitle: "Deny all third parties deposits", // FIXME: strings
-			hint: "This account will not be able to receive “air drops” or be used by a trusted contact to assist with account recovery.", // FIXME: strings
+			title: L10n.AccountSettings.ThirdPartyDeposits.denyAll,
+			subtitle: L10n.AccountSettings.ThirdPartyDeposits.denyAllSubtitle,
+			hint: L10n.AccountSettings.ThirdPartyDeposits.denyAllWarning,
 			icon: .asset(AssetResource.iconDeclineAirdrop)
 		)
 	}
@@ -109,16 +112,16 @@ extension PreferenceSection.Row where SectionId == ManageThirdPartyDeposits.Sect
 	static func allowDenyAssets() -> Self {
 		.init(
 			id: .allowDenyAssets(.allowDenyAssets),
-			title: "Allow/Deny specific assets", // FIXME: strings
-			subtitle: "Deny or allow third-party deposits of specific assets, ignoring the setting above"
+			title: L10n.AccountSettings.specificAssetsDeposits,
+			subtitle: L10n.AccountSettings.ThirdPartyDeposits.allowDenySpecificSubtitle
 		)
 	}
 
 	static func allowDepositors() -> Self {
 		.init(
 			id: .allowDepositors(.allowDepositors),
-			title: "Allow specific depositors", // FIXME: strings
-			subtitle: "Allow certain third party depositors to deposit assets freely"
+			title: L10n.AccountSettings.ThirdPartyDeposits.allowSpecificDepositors,
+			subtitle: L10n.AccountSettings.ThirdPartyDeposits.allowSpecificDepositorsSubtitle
 		)
 	}
 }

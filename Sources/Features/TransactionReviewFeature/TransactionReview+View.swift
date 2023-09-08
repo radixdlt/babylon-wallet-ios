@@ -199,6 +199,7 @@ extension TransactionReview {
 						.padding(.bottom, .small2)
 				}
 			}
+			.frame(maxWidth: .infinity, alignment: .trailing)
 			.background(alignment: .trailing) {
 				if viewStore.hasMessageOrWithdrawals, viewStore.hasDeposits {
 					VLine()
@@ -515,7 +516,7 @@ extension SimpleDappDetails {
 
 	public struct ViewState: Equatable {
 		let title: String
-		let description: String
+		let description: String?
 		let domain: URL?
 		let thumbnail: URL?
 		let address: DappDefinitionAddress
@@ -556,7 +557,7 @@ private extension SimpleDappDetails.State {
 	var viewState: SimpleDappDetails.ViewState {
 		.init(
 			title: metadata?.name ?? L10n.DAppRequest.Metadata.unknownName,
-			description: metadata?.description ?? L10n.AuthorizedDapps.DAppDetails.missingDescription,
+			description: metadata?.description,
 			domain: metadata?.claimedWebsites?.first,
 			thumbnail: metadata?.iconURL,
 			address: dAppID,
@@ -579,11 +580,13 @@ extension SimpleDappDetails.View {
 				VStack(alignment: .leading, spacing: .medium2) {
 					Separator()
 
-					Text(viewStore.description)
-						.textBlock
-						.flushedLeft
+					if let description = viewStore.description {
+						Text(description)
+							.textBlock
+							.flushedLeft
 
-					Separator()
+						Separator()
+					}
 
 					HStack(spacing: 0) {
 						Text(L10n.AuthorizedDapps.DAppDetails.dAppDefinition)

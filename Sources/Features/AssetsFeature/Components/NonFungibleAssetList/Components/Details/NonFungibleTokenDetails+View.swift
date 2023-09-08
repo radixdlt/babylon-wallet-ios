@@ -12,6 +12,7 @@ extension NonFungibleTokenDetails.State {
 			resourceDetails: .init(
 				description: resource.description,
 				resourceAddress: resource.resourceAddress,
+				isXRD: false,
 				validatorAddress: nil,
 				resourceName: resource.name,
 				currentSupply: nil, // FIXME: Find actual value

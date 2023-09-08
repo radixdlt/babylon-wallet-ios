@@ -9,6 +9,7 @@ extension FungibleTokenDetails.State {
 			details: .init(
 				description: resource.description,
 				resourceAddress: resource.resourceAddress,
+				isXRD: isXRD,
 				validatorAddress: nil,
 				resourceName: nil,
 				currentSupply: resource.totalSupply?.format(), // FIXME: Check which format

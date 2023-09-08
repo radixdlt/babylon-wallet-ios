@@ -32,14 +32,12 @@ extension LedgerHardwareDevices {
 			self.context = state.context
 		}
 
+		var loadedEmptyLedgersList: Bool { ledgers == .success([]) }
+
 		var ledgersArray: [LedgerHardwareWalletFactorSource]? { .init(ledgers.wrappedValue ?? []) }
 
-		var navigationTitle: String {
-			if allowSelection {
-				return L10n.LedgerHardwareDevices.navigationTitleAllowSelection
-			} else {
-				return L10n.LedgerHardwareDevices.navigationTitleGeneral
-			}
+		var navigationTitle: String? {
+			allowSelection ? nil : L10n.LedgerHardwareDevices.navigationTitleGeneral
 		}
 
 		var subtitle: String? {
@@ -49,7 +47,11 @@ extension LedgerHardwareDevices {
 			case .failure:
 				return L10n.LedgerHardwareDevices.subtitleFailure
 			case .success([]):
-				return L10n.LedgerHardwareDevices.subtitleNoLedgers
+				if allowSelection {
+					return L10n.LedgerHardwareDevices.subtitleSelectLedgerExisting
+				} else {
+					return L10n.LedgerHardwareDevices.subtitleNoLedgers
+				}
 			case .success:
 				if allowSelection {
 					return L10n.LedgerHardwareDevices.subtitleSelectLedger
@@ -78,15 +80,9 @@ extension LedgerHardwareDevices {
 									.frame(.medium)
 									.padding(.vertical, .medium2)
 
-								Text(viewStore.navigationTitle)
+								Text(L10n.LedgerHardwareDevices.navigationTitleAllowSelection)
 									.textStyle(.sheetTitle)
 									.foregroundColor(.app.gray1)
-									.padding(.bottom, .medium1)
-							} else {
-								Text(L10n.LedgerHardwareDevices.subtitleAllLedgers)
-									.textStyle(.body1HighImportance)
-									.foregroundColor(.app.gray2)
-									.padding(.vertical, .medium1)
 							}
 
 							if let subtitle = viewStore.subtitle {
@@ -94,7 +90,7 @@ extension LedgerHardwareDevices {
 									.foregroundColor(.app.gray1)
 									.textStyle(.secondaryHeader)
 									.padding(.horizontal, .medium1)
-									.padding(.bottom, .medium1)
+									.padding(.vertical, .medium1)
 							}
 
 							//        FIXME: Uncomment and implement
@@ -104,16 +100,19 @@ extension LedgerHardwareDevices {
 							//        .buttonStyle(.info)
 							//        .flushedLeft
 						}
-						.multilineTextAlignment(.center)
+						.multilineTextAlignment(.leading)
 
 						ledgerList(viewStore: viewStore)
 							.padding(.horizontal, .medium1)
 							.padding(.bottom, .medium1)
 
-						Button(L10n.LedgerHardwareDevices.addNewLedger) {
-							viewStore.send(.addNewLedgerButtonTapped)
+						if viewStore.loadedEmptyLedgersList {
+							addLedgerButton(viewStore: viewStore)
+								.buttonStyle(.primaryRectangular(shouldExpand: false))
+						} else {
+							addLedgerButton(viewStore: viewStore)
+								.buttonStyle(.secondaryRectangular(shouldExpand: false))
 						}
-						.buttonStyle(.secondaryRectangular(shouldExpand: false))
 
 						Spacer(minLength: 0)
 					}
@@ -136,12 +135,25 @@ extension LedgerHardwareDevices {
 			.destinations(with: store)
 		}
 
+		private func addLedgerButton(viewStore: ViewStoreOf<LedgerHardwareDevices>) -> some SwiftUI.View {
+			Button(L10n.LedgerHardwareDevices.addNewLedger) {
+				viewStore.send(.addNewLedgerButtonTapped)
+			}
+		}
+
 		@ViewBuilder
 		private func ledgerList(viewStore: ViewStoreOf<LedgerHardwareDevices>) -> some SwiftUI.View {
 			switch viewStore.ledgers {
 			case .idle, .loading, .failure, .success([]):
-				// We are already showing `subtitleNoLedgers` in the header
-				EmptyView()
+				if viewStore.allowSelection {
+					Card(.app.gray5) {
+						Text(L10n.LedgerHardwareDevices.subtitleNoLedgers)
+							.textStyle(.secondaryHeader)
+							.foregroundColor(viewStore.loadedEmptyLedgersList ? .app.gray2 : .clear)
+							.padding(.horizontal, .large2)
+							.padding(.vertical, .large2 + .small3)
+					}
+				}
 
 			case let .success(ledgers):
 				VStack(spacing: .medium1) {

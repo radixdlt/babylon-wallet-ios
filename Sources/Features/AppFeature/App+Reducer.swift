@@ -21,7 +21,15 @@ public struct App: Sendable, FeatureReducer {
 		}
 
 		public var root: Root
-		public var showIsUsingTestnetBanner = false
+		public var isOnMainnet = false
+		public var hasMainnetEverBeenLive = false
+
+		public var isCurrentlyOnboardingUserToMainnet: Bool {
+			switch root {
+			case .onboardTestnetUserToMainnet: return true
+			case .main, .onboardingCoordinator, .splash: return false
+			}
+		}
 
 		@PresentationState
 		public var alert: Alerts.State?
@@ -156,14 +164,7 @@ public struct App: Sendable, FeatureReducer {
 		case let .toOnboarding(hasMainnetEverBeenLive):
 			return goToOnboarding(state: &state, hasMainnetEverBeenLive: hasMainnetEverBeenLive)
 		case let .currentGatewayChanged(currentGateway):
-			switch state.root {
-			case .onboardTestnetUserToMainnet:
-				// Not pretty, but it works and is temporary.
-				// we cannot use `state.showIsUsingTestnetBanner = currentGateway.network.id != .mainnet` in this case because if the user just finished
-				break
-			default:
-				state.showIsUsingTestnetBanner = currentGateway.network.id != .mainnet
-			}
+			state.isOnMainnet = currentGateway.network == .mainnet
 			return .none
 		}
 	}
@@ -185,6 +186,7 @@ public struct App: Sendable, FeatureReducer {
 			}
 
 		case let .onboardingCoordinator(.delegate(.completed(accountRecoveryIsNeeded, hasMainnetAccounts, hasMainnetEverBeenLive))):
+			state.hasMainnetEverBeenLive = hasMainnetEverBeenLive
 			return onboardUserToMainnetIfNeededElseGoToMain(
 				hasMainnetAccounts: hasMainnetAccounts,
 				hasMainnetEverBeenLive: hasMainnetEverBeenLive,
@@ -193,6 +195,7 @@ public struct App: Sendable, FeatureReducer {
 			)
 
 		case let .splash(.delegate(.completed(loadProfileOutcome, accountRecoveryNeeded, hasMainnetEverBeenLive))):
+			state.hasMainnetEverBeenLive = hasMainnetEverBeenLive
 			switch loadProfileOutcome {
 			case .newUser:
 				return goToOnboarding(state: &state, hasMainnetEverBeenLive: hasMainnetEverBeenLive)
@@ -234,7 +237,6 @@ public struct App: Sendable, FeatureReducer {
 		if !hasMainnetAccounts, hasMainnetEverBeenLive {
 			loggerGlobal.notice("Mainnet has been live, but has no accounts => onboarding existing user to Mainnet")
 			state.root = .onboardTestnetUserToMainnet(.init(config: .init(purpose: .firstAccountOnNewNetwork(.mainnet))))
-			state.showIsUsingTestnetBanner = false
 			return .none
 		} else {
 			return goToMain(state: &state, accountRecoveryIsNeeded: accountRecoveryIsNeeded)
@@ -272,7 +274,7 @@ public struct App: Sendable, FeatureReducer {
 	}
 
 	func goToOnboarding(state: inout State, hasMainnetEverBeenLive: Bool) -> EffectTask<Action> {
-		state.showIsUsingTestnetBanner = !hasMainnetEverBeenLive
+		state.hasMainnetEverBeenLive = hasMainnetEverBeenLive
 		state.root = .onboardingCoordinator(.init(hasMainnetEverBeenLive: hasMainnetEverBeenLive))
 		return .none
 	}

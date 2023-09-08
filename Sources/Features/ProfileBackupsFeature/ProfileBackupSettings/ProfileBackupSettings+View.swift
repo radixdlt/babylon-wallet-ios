@@ -58,30 +58,25 @@ extension ProfileBackupSettings.View {
 				.padding(.horizontal, .medium2)
 				.padding(.vertical, .small1)
 
-				// FIXME: Strings
-				section("Automatic Backups (recommended)") {
+				section(L10n.ProfileBackup.AutomaticBackups.title) {
 					isCloudProfileSyncEnabled(with: viewStore)
 				}
 
-				// FIXME: Strings
-				section("Manual backups") {
+				section(L10n.ProfileBackup.ManualBackups.title) {
 					VStack(alignment: .leading, spacing: .medium1) {
-						Text("A manually exported wallet backup file may also be used for recovery, along with your seed phrase(s).")
-						Text("Only the **curent configuration** of your wallet is backed up with each manual export")
-						Button("Export Wallet Backup File") {
+						Text(.init(L10n.ProfileBackup.ManualBackups.subtitle))
+						Button(L10n.ProfileBackup.ManualBackups.exportButtonTitle) {
 							viewStore.send(.exportProfileButtonTapped)
 						}
 						.buttonStyle(.secondaryRectangular(shouldExpand: true))
 					}
 				}
 
-				// FIXME: Strings
-				section("Delete wallet") {
+				section(L10n.ProfileBackup.DeleteWallet.title) {
 					VStack(alignment: .leading, spacing: .medium1) {
-						Text("You may delete your wallet. this will clear the Radix Wallet app, clears its contents, and delete any iCloud backup.")
-						Text("**Access to any Accounts or Personas will be permanently lost unless you have a manual backup file.**")
+						Text(.init(L10n.IOSProfileBackup.DeleteWallet.subtitle))
 
-						Button("Delete Wallet and iCloud Backup") {
+						Button(L10n.IOSProfileBackup.DeleteWallet.confirmButton) {
 							viewStore.send(.deleteProfileAndFactorSourcesButtonTapped)
 						}
 						.foregroundColor(.app.white)
@@ -104,7 +99,7 @@ extension ProfileBackupSettings.View {
 	@MainActor
 	@ViewBuilder
 	private func section(
-		_ title: LocalizedStringKey,
+		_ title: String,
 		@ViewBuilder content: () -> some SwiftUI.View
 	) -> some SwiftUI.View {
 		VStack(alignment: .leading, spacing: .small1) {
