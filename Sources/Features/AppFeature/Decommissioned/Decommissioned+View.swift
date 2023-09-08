@@ -23,10 +23,29 @@ extension Decommissioned {
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				// TODO: implement
-				Text("The Preview of Radix wallet has ended. Uninstall this app and download the Radix Wallet app from App Store.")
-					.background(Color.yellow)
-					.foregroundColor(.red)
-					.onAppear { viewStore.send(.appeared) }
+				VStack(alignment: .center) {
+					VStack(alignment: .center, spacing: .small1) {
+						Text("Preview of wallet has ended")
+							.textStyle(.sectionHeader)
+						Text("Uninstall this app and download the Radix Wallet app from App Store.")
+							.textStyle(.body1HighImportance)
+					}
+					.foregroundColor(.white)
+
+					// So that the square root in background image is visible
+					Spacer(minLength: .huge2)
+
+					Button("Open AppStore") {
+						viewStore.send(.openAppStore)
+					}
+					.buttonStyle(.primaryRectangular)
+				}
+				.padding(.large1)
+				.background(
+					Image(asset: AssetResource.splash)
+						.resizable()
+						.scaledToFill()
+				)
 			}
 		}
 	}
