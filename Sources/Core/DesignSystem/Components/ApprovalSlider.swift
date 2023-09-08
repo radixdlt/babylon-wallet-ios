@@ -19,16 +19,12 @@ public struct ApprovalSlider: View {
 		GeometryReader { proxy in
 			let width = proxy.size.width - .approveSliderHeight
 			ZStack {
-				if controlState.isDisabled {
-					Color.app.gray4
-				} else {
-					Color.app.blue2
-				}
+				background
 
 				Text(title)
 					.textStyle(.body1Header)
 					.foregroundColor(controlState.isDisabled ? .app.gray3 : .white)
-					.opacity(approved ? 0 : 1)
+					.opacity(textOpacity)
 
 				if controlState.isDisabled {
 					if approved {
@@ -50,6 +46,14 @@ public struct ApprovalSlider: View {
 		.animation(.default, value: controlState)
 		.animation(.default, value: triggered)
 		.animation(.interactiveSpring(), value: position)
+	}
+
+	private var background: Color {
+		controlState.isDisabled ? .app.gray4 : .app.blue2
+	}
+
+	private var textOpacity: CGFloat {
+		min(2 - 3 * position, 1)
 	}
 
 	private var triggeredOpacity: CGFloat {
