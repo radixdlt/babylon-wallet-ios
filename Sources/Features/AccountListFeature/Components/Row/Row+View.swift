@@ -237,6 +237,7 @@ extension AccountList.Row.View {
 				.padding(.leading, Constants.iconSize.rawValue - (isFungible ? .small3 : 0))
 				.background(.app.whiteTransparent2)
 				.cornerRadius(Constants.iconSize.rawValue / 2)
+				.layoutPriority(100)
 		}
 	}
 }
@@ -252,7 +253,7 @@ extension AccountList.Row.View {
 }
 
 // FIXME: Workaround to avoid ViewThatFits
-extension AccountList.Row.ViewState {
+private extension AccountList.Row.ViewState {
 	func itemLimit(iconSize: CGFloat, width: CGFloat) -> Int? {
 		itemLimit(trying: showMoreFungibles ? [nil, 10] : [5, 4, 3], iconSize: iconSize, width: width)
 	}
@@ -268,10 +269,11 @@ extension AccountList.Row.ViewState {
 	}
 
 	func usedWidth(itemLimit: Int?, iconSize: CGFloat) -> CGFloat {
-		let items = min(fungibleResourceIcons.count, itemLimit ?? .max)
-		let showFungibleLabel = fungibleResourceIcons.count > items
+		let itemsShown = min(fungibleResourceIcons.count, itemLimit ?? .max)
+		let itemsNotShown = fungibleResourceIcons.count - itemsShown
+		let showFungibleLabel = itemsNotShown > 0
 
-		let hasItems = items > 0
+		let hasItems = itemsShown > 0
 		let hasPoolUnits = poolUnitsCount > 0
 		let hasNFTs = nonFungibleResourcesCount > 0
 		let sections = (hasItems ? 1 : 0) + (hasPoolUnits ? 1 : 0) + (hasNFTs ? 1 : 0)
@@ -280,19 +282,36 @@ extension AccountList.Row.ViewState {
 
 		if hasItems {
 			let extraWidth = 2 * iconSize / 3
-			width += iconSize + CGFloat(items - 1) * extraWidth
+			width += iconSize + CGFloat(itemsShown - 1) * extraWidth
 		}
 		if showFungibleLabel {
-			width += iconSize
+			width += fungibleLabelWidthForCount(itemsNotShown)
 		}
 		if hasPoolUnits {
-			width += iconSize + .medium1
+			width += iconSize + labelWidthForCount(poolUnitsCount)
 		}
 		if hasNFTs {
-			width += iconSize + .medium1
+			width += iconSize + labelWidthForCount(nonFungibleResourcesCount)
 		}
 
 		return width + max(CGFloat(sections - 1) * .small1, 0)
+	}
+
+	func fungibleLabelWidthForCount(_ count: Int) -> CGFloat {
+		labelWidthForCount(count) + (count <= 9 ? 2 : .small3)
+	}
+
+	func labelWidthForCount(_ count: Int) -> CGFloat {
+		switch count {
+		case ...9:
+			return .medium1
+		case ...99:
+			return .large3
+		case ...999:
+			return .large2 + .small3
+		default:
+			return .large1
+		}
 	}
 }
 
