@@ -1,17 +1,7 @@
 import FeaturePrelude
 
-extension Decommissioned.State {
-	var viewState: Decommissioned.ViewState {
-		.init()
-	}
-}
-
 // MARK: - Decommissioned.View
 extension Decommissioned {
-	public struct ViewState: Equatable {
-		// TODO: declare some properties
-	}
-
 	@MainActor
 	public struct View: SwiftUI.View {
 		private let store: StoreOf<Decommissioned>
@@ -21,13 +11,13 @@ extension Decommissioned {
 		}
 
 		public var body: some SwiftUI.View {
-			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
+			WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
 				// TODO: implement
 				VStack(alignment: .center) {
 					VStack(alignment: .center, spacing: .small1) {
-						Text("Preview of wallet has ended")
+						Text("Preview of wallet has ended") // FIXME: Strings
 							.textStyle(.sectionHeader)
-						Text("Uninstall this app and download the Radix Wallet app from App Store.")
+						Text("Uninstall this app and download the Radix Wallet app from App Store.") // FIXME: Strings
 							.textStyle(.body1HighImportance)
 					}
 					.foregroundColor(.white)
@@ -35,7 +25,7 @@ extension Decommissioned {
 					// So that the square root in background image is visible
 					Spacer(minLength: .huge2)
 
-					Button("Open AppStore") {
+					Button("Open AppStore") { // FIXME: Strings
 						viewStore.send(.openAppStore)
 					}
 					.buttonStyle(.primaryRectangular)
