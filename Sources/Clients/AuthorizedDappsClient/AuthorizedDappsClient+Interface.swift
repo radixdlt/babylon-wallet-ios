@@ -36,7 +36,7 @@ extension AuthorizedDappsClient {
 	public typealias DetailsForAuthorizedDapp = @Sendable (Profile.Network.AuthorizedDapp) async throws -> Profile.Network.AuthorizedDappDetailed
 	public typealias AddAuthorizedDapp = @Sendable (Profile.Network.AuthorizedDapp) async throws -> Void
 	public typealias UpdateOrAddAuthorizedDapp = @Sendable (Profile.Network.AuthorizedDapp) async throws -> Void
-	public typealias ForgetAuthorizedDapp = @Sendable (Profile.Network.AuthorizedDapp.ID, NetworkID) async throws -> Void
+	public typealias ForgetAuthorizedDapp = @Sendable (Profile.Network.AuthorizedDapp.ID, NetworkID?) async throws -> Void
 	public typealias UpdateAuthorizedDapp = @Sendable (Profile.Network.AuthorizedDapp) async throws -> Void
 	public typealias DeauthorizePersonaFromDapp = @Sendable (Profile.Network.Persona.ID, Profile.Network.AuthorizedDapp.ID, NetworkID) async throws -> Void
 }

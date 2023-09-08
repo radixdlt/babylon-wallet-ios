@@ -515,22 +515,28 @@ extension DappInteractionFlow {
 				let allPersonas = try await personasClient.getPersonas()
 				guard let persona = allPersonas[id: authorizedPersonaID] else { return nil }
 
+				loggerGlobal.critical("tryingToAutofillingPersonaData...")
 				guard let personaDataToAutofillWith = try? tryingToAutofillingPersonaData(
 					request: personaDataRequested,
 					previous: sharedPersonaData,
 					current: persona
 				) else {
+					loggerGlobal.critical("tryingToAutofillingPersonaData nil!")
 					return nil
 				}
+				loggerGlobal.critical("tryingToAutofillingPersonaData not nil")
 
+				loggerGlobal.critical("responseItem...")
 				guard
 					let responseItem = try? P2P.Dapp.Response.WalletInteractionSuccessResponse.PersonaDataRequestResponseItem(
 						personaDataRequested: personaDataRequested,
 						personaData: personaDataToAutofillWith
 					)
 				else {
+					loggerGlobal.critical("responseItem nil")
 					return nil
 				}
+				loggerGlobal.critical("responseItem not nil")
 
 				return try? .init(
 					personaDataRequested: personaDataRequested,
@@ -1112,6 +1118,7 @@ extension DappInteractionFlow.Destinations.State {
 			)))
 
 		case let .remote(.ongoingPersonaData(item)):
+			loggerGlobal.critical("relaying personaDataPermission")
 			guard let persona else {
 				assertionFailure("Persona data request requires a persona.")
 				return nil
