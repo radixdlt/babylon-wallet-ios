@@ -54,11 +54,11 @@ extension SubmitTransaction {
 								opacity = 0.5
 							}
 
-						Text("Completing Transaction...")
-							.textStyle(.body1Regular) // FIXME: strings
+						Text(L10n.Transaction.Status.Completing.text)
+							.textStyle(.body1Regular)
 
 						HStack {
-							Text("Transaction ID: ") // FIXME: strings
+							Text(L10n.TransactionReview.SubmitTransaction.txID)
 							AddressView(.identifier(.transaction(viewStore.txID)))
 						}
 					}

@@ -1,3 +1,4 @@
+import EngineKit
 import FeaturePrelude
 
 extension DappMetadata {
@@ -16,10 +17,13 @@ extension DappMetadata {
 // MARK: - Completion.View
 extension Completion {
 	struct ViewState: Equatable {
+		/// `nil` is a valid value for Persona Data requests
+		let txID: TXID?
 		let title: String
 		let subtitle: String
 
 		init(state: Completion.State) {
+			txID = state.txID
 			title = L10n.DAppRequest.Completion.title
 			subtitle = L10n.DAppRequest.Completion.subtitle(state.dappMetadata.name)
 		}
@@ -35,7 +39,7 @@ extension Completion {
 		var body: some SwiftUI.View {
 			WithViewStore(store, observe: ViewState.init) { viewStore in
 				WithNavigationBar(closeAction: dismiss.callAsFunction) {
-					VStack(spacing: .medium2) {
+					VStack(spacing: .small3) {
 						Image(asset: AssetResource.successCheckmark)
 
 						Text(viewStore.title)
@@ -46,9 +50,16 @@ extension Completion {
 							.foregroundColor(.app.gray1)
 							.textStyle(.body1Regular)
 							.multilineTextAlignment(.center)
+
+						if let txID = viewStore.txID {
+							HStack {
+								Text(L10n.TransactionReview.SubmitTransaction.txID)
+								AddressView(.identifier(.transaction(txID)))
+							}
+						}
 					}
 					.padding(.horizontal, .medium2)
-					.padding(.bottom, .medium3)
+					.padding(.bottom, .small3)
 				}
 			}
 			.presentationDragIndicator(.visible)
@@ -88,6 +99,9 @@ struct Completion_Preview: PreviewProvider {
 }
 
 extension Completion.State {
-	static let previewValue: Self = .init(dappMetadata: .previewValue)
+	static let previewValue: Self = .init(
+		txID: nil,
+		dappMetadata: .previewValue
+	)
 }
 #endif
