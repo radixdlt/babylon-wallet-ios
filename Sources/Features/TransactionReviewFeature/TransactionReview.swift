@@ -311,7 +311,11 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			guard let reviewedTransaction = state.reviewedTransaction else {
 				return .none
 			}
-			state.destination = .customizeFees(.init(reviewedTransaction: reviewedTransaction, manifest: state.transactionManifest, signingPurpose: .signTransaction(state.signTransactionPurpose)))
+			state.destination = .customizeFees(.init(
+				reviewedTransaction: reviewedTransaction,
+				manifest: state.transactionManifest,
+				signingPurpose: .signTransaction(state.signTransactionPurpose)
+			))
 			return .none
 
 		case let .destination(.presented(presentedAction)):
@@ -319,7 +323,8 @@ public struct TransactionReview: Sendable, FeatureReducer {
 
 		case .destination(.dismiss):
 			if case .signing = state.destination {
-				return cancelSigningEffect(state: &state)
+				loggerGlobal.notice("Cancelled signing")
+				return resetToApprovable(&state)
 			} else if case .submitting = state.destination {
 				// This is used when tapping outside the Submitting sheet, no need to set destination to nil
 				return delayedEffect(for: .delegate(.userDismissedTransactionStatus))
@@ -354,21 +359,18 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			return .none
 
 		case .signing(.delegate(.cancelSigning)):
-			state.destination = nil
-			return cancelSigningEffect(state: &state)
+			loggerGlobal.notice("Cancelled signing")
+			return resetToApprovable(&state)
 
 		case .signing(.delegate(.failedToSign)):
 			loggerGlobal.error("Failed sign tx")
-			state.destination = nil
-			state.canApproveTX = true
-			state.resetSlider()
-			return .none
+			return resetToApprovable(&state)
 
 		case let .signing(.delegate(.finishedSigning(.signTransaction(notarizedTX, origin: _)))):
 			state.destination = .submitting(.init(notarizedTX: notarizedTX))
 			return .none
 
-		case .signing(.delegate(.finishedSigning(.signAuth(_)))):
+		case .signing(.delegate(.finishedSigning(.signAuth))):
 			state.canApproveTX = true
 			assertionFailure("Did not expect to have sign auth data...")
 			return .none
@@ -380,11 +382,8 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			return .send(.delegate(.signedTXAndSubmittedToGateway(txID)))
 
 		case .submitting(.delegate(.failedToSubmit)):
-			state.destination = nil
-			state.canApproveTX = true
-			state.resetSlider()
 			loggerGlobal.error("Failed to submit tx")
-			return .none
+			return resetToApprovable(&state)
 
 		case .submitting(.delegate(.failedToReceiveStatusUpdate)):
 			state.destination = nil
@@ -607,8 +606,8 @@ extension TransactionReview {
 		}
 	}
 
-	func cancelSigningEffect(state: inout State) -> EffectTask<Action> {
-		loggerGlobal.notice("Cancelled signing")
+	func resetToApprovable(_ state: inout State) -> EffectTask<Action> {
+		state.destination = nil
 		state.canApproveTX = true
 		state.resetSlider()
 		return .none
