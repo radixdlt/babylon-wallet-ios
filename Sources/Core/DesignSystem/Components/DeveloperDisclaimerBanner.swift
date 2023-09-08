@@ -4,10 +4,12 @@ import SwiftUI
 extension View {
 	@ViewBuilder
 	public func showDeveloperDisclaimerBanner(_ show: Bool) -> some View {
-		VStack(spacing: 0) {
-			if show {
+		if show {
+			VStack(spacing: 0) {
 				DeveloperDisclaimerBanner()
+				self
 			}
+		} else {
 			self
 		}
 	}
