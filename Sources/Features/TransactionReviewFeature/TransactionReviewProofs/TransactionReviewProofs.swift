@@ -22,6 +22,7 @@ public struct TransactionReviewProofs: Sendable, FeatureReducer {
 		case .infoTapped:
 			return .none
 		case let .proofTapped(id):
+			// FIXME: Handle tap
 			return .none
 		}
 	}
