@@ -183,10 +183,12 @@ extension AccountPortfolio.PoolUnitResources {
 			self.poolResources = poolResources
 		}
 
-		public func redemptionValue(for resource: AccountPortfolio.FungibleResource) -> BigDecimal {
+		public func redemptionValue(for resource: AccountPortfolio.FungibleResource) -> String {
 			let poolUnitTotalSupply = poolUnitResource.totalSupply ?? .one
 			let unroundedRedemptionValue = poolUnitResource.amount * resource.amount / poolUnitTotalSupply
-			return resource.divisibility.map { unroundedRedemptionValue.withPrecision($0) } ?? unroundedRedemptionValue
+			return resource.divisibility
+				.map { unroundedRedemptionValue.format(maxPlaces: UInt($0)) }
+				?? (unroundedRedemptionValue.format())
 		}
 	}
 
