@@ -426,6 +426,8 @@ public struct TransactionReview: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
 		case let .previewLoaded(.failure(error)):
+			loggerGlobal.error("Transaction preview failed, error: \(error)")
+			errorQueue.schedule(TransactionReviewFailure(underylying: error))
 			return .send(.delegate(.failed(TransactionFailure.failedToPrepareTXReview(.failedToGenerateTXReview(error)))))
 
 		case let .previewLoaded(.success(preview)):
@@ -1071,6 +1073,18 @@ extension NonFungibleLocalIdVecSource {
 		case let .predicted(_, value):
 			return value
 		}
+	}
+}
+
+// MARK: - TransactionReviewFailure
+public struct TransactionReviewFailure: LocalizedError {
+	public let underylying: Swift.Error
+	public var errorDescription: String? {
+		var msg = "A proposed transaction could not be processed"
+		#if DEBUG
+		msg += "\n\n[DEBUG] Underlying error: \(String(describing: underylying))"
+		#endif
+		return msg
 	}
 }
 
