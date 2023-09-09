@@ -60,13 +60,7 @@ extension GatewayAPIClient {
 				urlRequest.timeoutInterval = timeoutInterval
 			}
 
-			if url.lastPathComponent == "submit" {
-				loggerGlobal.error("TRACE: Sending submit request through URLSession")
-			}
 			let (data, urlResponse) = try await urlSession.data(for: urlRequest)
-			if url.lastPathComponent == "submit" {
-				loggerGlobal.error("TRACE: Received response for request sent through URLSession")
-			}
 
 			guard let httpURLResponse = urlResponse as? HTTPURLResponse else {
 				throw ExpectedHTTPURLResponse()

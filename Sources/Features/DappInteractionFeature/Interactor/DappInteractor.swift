@@ -144,22 +144,16 @@ struct DappInteractor: Sendable, FeatureReducer {
 			return presentQueuedRequestIfNeededEffect(for: &state)
 
 		case let .sentResponseToDapp(response, for: request, dappMetadata):
-			loggerGlobal.error("TRACE: \(#file) \(#function) \(#line)")
 			dismissCurrentModalAndRequest(request, for: &state)
-			loggerGlobal.error("TRACE: \(#file) \(#function) \(#line)")
 			switch response {
 			case .success:
 				if case let .success(success) = response, case let .transaction(tx) = success.items {
-					loggerGlobal.error("TRACE: \(#file) \(#function) \(#line)")
 					overlayWindowClient.scheduleTransactionPoll(.init(
 						txID: tx.send.transactionIntentHash,
 						disableInProgressDismissal: response.id.isAccountDepositSettingsInteraction
 					))
-					loggerGlobal.error("TRACE: \(#file) \(#function) \(#line)")
 				} else {
-					loggerGlobal.error("TRACE: \(#file) \(#function) \(#line)")
 					overlayWindowClient.scheduleDappInteractionSuccess(.init(dappName: dappMetadata.name))
-					loggerGlobal.error("TRACE: \(#file) \(#function) \(#line)")
 				}
 				return presentQueuedRequestIfNeededEffect(for: &state)
 			case .failure:
@@ -208,7 +202,6 @@ struct DappInteractor: Sendable, FeatureReducer {
 	func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
 		case let .modal(.presented(.dappInteraction(.relay(request, .delegate(.submit(responseToDapp, dappMetadata)))))):
-			loggerGlobal.error("TRACE: \(#file) \(#function) \(#line)")
 			return sendResponseToDappEffect(responseToDapp, for: request, dappMetadata: dappMetadata)
 		case .modal(.dismiss):
 			return delayedEffect(for: .internal(.presentQueuedRequestIfNeeded))
@@ -236,49 +229,31 @@ struct DappInteractor: Sendable, FeatureReducer {
 		for request: RequestEnvelope,
 		dappMetadata: DappMetadata
 	) -> EffectTask<Action> {
-		.run(operation: { _ in
-			loggerGlobal.error("TRACE: \(#file) \(#function) \(#line)")
-			_ = try await dappInteractionClient.completeInteraction(.response(.dapp(responseToDapp), origin: request.route))
-			loggerGlobal.error("TRACE: \(#file) \(#function) \(#line)")
-		}).concatenate(with:
-			.send(.internal(
-				.sentResponseToDapp(
-					responseToDapp,
-					for: request,
-					dappMetadata
-				)
-			))
-		)
-
-//		.run { send in
-//			do {
-		//                loggerGlobal.error("TRACE: \(#file) \(#function) \(#line)")
-		//                await send(.internal(
-		//                    .sentResponseToDapp(
-		//                        responseToDapp,
-		//                        for: request,
-		//                        dappMetadata
-		//                    )
-		//                ))
-		//                loggerGlobal.error("TRACE: \(#file) \(#function) \(#line)")
-//				_ = try await dappInteractionClient.completeInteraction(.response(.dapp(responseToDapp), origin: request.route))
-		//                loggerGlobal.error("TRACE: \(#file) \(#function) \(#line)")
-//
-		//                loggerGlobal.error("TRACE: \(#file) \(#function) \(#line)")
-//			} catch {
-//				await send(.internal(
-//					.failedToSendResponseToDapp(
-//						responseToDapp,
-//						for: request,
-//						dappMetadata,
-//						reason: error.localizedDescription
-//					)
-//				))
-//			}
-//		}
+		.run { send in
+			do {
+				_ = try await dappInteractionClient.completeInteraction(.response(.dapp(responseToDapp), origin: request.route))
+				await send(.internal(
+					.sentResponseToDapp(
+						responseToDapp,
+						for: request,
+						dappMetadata
+					)
+				))
+			} catch {
+				await send(.internal(
+					.failedToSendResponseToDapp(
+						responseToDapp,
+						for: request,
+						dappMetadata,
+						reason: error.localizedDescription
+					)
+				))
+			}
+		}
 	}
 
 	func dismissCurrentModalAndRequest(_ request: RequestEnvelope, for state: inout State) {
+		print("dismissed current modal")
 		state.requestQueue.remove(request)
 		state.currentModal = nil
 	}
