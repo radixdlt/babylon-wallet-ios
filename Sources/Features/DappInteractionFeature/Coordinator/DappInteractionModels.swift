@@ -24,19 +24,6 @@ enum DappMetadata: Sendable, Hashable {
 }
 
 extension DappMetadata {
-	public var name: String {
-		switch self {
-		case let .ledger(ledger):
-			return ledger.name?.rawValue ?? L10n.DAppRequest.Metadata.unknownName
-		case .request:
-			return L10n.DAppRequest.Metadata.unknownName
-		case .wallet:
-			return "Radix Wallet" // FIXME: Strings
-		}
-	}
-}
-
-extension DappMetadata {
 	static let wallet: Wallet = .init()
 	struct Wallet: Sendable, Hashable {
 		let origin: DappOrigin = .wallet

@@ -1,14 +1,12 @@
 import AppPreferencesClient
 import DappInteractionClient
+import EngineKit
 import FeaturePrelude
 import GatewaysClient
-import OverlayWindowClient
 import RadixConnect
 import RadixConnectClient
 import RadixConnectModels
 import ROLAClient
-
-import EngineToolkit
 
 typealias RequestEnvelope = DappInteractionClient.RequestEnvelope
 
@@ -47,10 +45,28 @@ struct DappInteractor: Sendable, FeatureReducer {
 	enum InternalAction: Sendable, Equatable {
 		case receivedRequestFromDapp(RequestEnvelope)
 		case presentQueuedRequestIfNeeded
-		case sentResponseToDapp(P2P.Dapp.Response, for: RequestEnvelope, DappMetadata)
-		case failedToSendResponseToDapp(P2P.Dapp.Response, for: RequestEnvelope, DappMetadata, reason: String)
-		case presentResponseFailureAlert(P2P.Dapp.Response, for: RequestEnvelope, DappMetadata, reason: String)
-		case presentInvalidRequest(DappInteractionClient.ValidatedDappRequest.Invalid, isDeveloperModeEnabled: Bool)
+		case sentResponseToDapp(
+			P2P.Dapp.Response,
+			for: RequestEnvelope,
+			DappMetadata,
+			TXID?
+		)
+		case failedToSendResponseToDapp(
+			P2P.Dapp.Response,
+			for: RequestEnvelope,
+			DappMetadata,
+			reason: String
+		)
+		case presentResponseFailureAlert(
+			P2P.Dapp.Response,
+			for: RequestEnvelope,
+			DappMetadata, reason: String
+		)
+		case presentResponseSuccessView(DappMetadata, TXID?)
+		case presentInvalidRequest(
+			DappInteractionClient.ValidatedDappRequest.Invalid,
+			isDeveloperModeEnabled: Bool
+		)
 	}
 
 	enum ChildAction: Sendable, Equatable {
@@ -60,15 +76,20 @@ struct DappInteractor: Sendable, FeatureReducer {
 	struct Destinations: Sendable, ReducerProtocol {
 		enum State: Sendable, Hashable {
 			case dappInteraction(RelayState<RequestEnvelope, DappInteractionCoordinator.State>)
+			case dappInteractionCompletion(Completion.State)
 		}
 
 		enum Action: Sendable, Equatable {
 			case dappInteraction(RelayAction<RequestEnvelope, DappInteractionCoordinator.Action>)
+			case dappInteractionCompletion(Completion.Action)
 		}
 
 		var body: some ReducerProtocolOf<Self> {
 			Scope(state: /State.dappInteraction, action: /Action.dappInteraction) {
 				Relay { DappInteractionCoordinator() }
+			}
+			Scope(state: /State.dappInteractionCompletion, action: /Action.dappInteractionCompletion) {
+				Completion()
 			}
 		}
 	}
@@ -82,7 +103,6 @@ struct DappInteractor: Sendable, FeatureReducer {
 	@Dependency(\.rolaClient) var rolaClient
 	@Dependency(\.appPreferencesClient) var appPreferencesClient
 	@Dependency(\.dappInteractionClient) var dappInteractionClient
-	@Dependency(\.overlayWindowClient) var overlayWindowClient
 
 	var body: some ReducerProtocolOf<Self> {
 		Reduce(core)
@@ -130,6 +150,15 @@ struct DappInteractor: Sendable, FeatureReducer {
 	func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
 		case let .receivedRequestFromDapp(request):
+
+			switch state.currentModal {
+			case .some(.dappInteractionCompletion):
+				// FIXME: this is a temporary hack, to solve bug where incoming requests
+				// are ignored since completion is believed to be shown, but is not.
+				state.currentModal = nil
+			default: break
+			}
+
 			if request.route == .wallet {
 				// dismiss current request, wallet request takes precedence
 				state.currentModal = nil
@@ -143,19 +172,11 @@ struct DappInteractor: Sendable, FeatureReducer {
 		case .presentQueuedRequestIfNeeded:
 			return presentQueuedRequestIfNeededEffect(for: &state)
 
-		case let .sentResponseToDapp(response, for: request, dappMetadata):
+		case let .sentResponseToDapp(response, for: request, dappMetadata, txID):
 			dismissCurrentModalAndRequest(request, for: &state)
 			switch response {
 			case .success:
-				if case let .success(success) = response, case let .transaction(tx) = success.items {
-					overlayWindowClient.scheduleTransactionPoll(.init(
-						txID: tx.send.transactionIntentHash,
-						disableInProgressDismissal: response.id.isAccountDepositSettingsInteraction
-					))
-				} else {
-					overlayWindowClient.scheduleDappInteractionSuccess(.init(dappName: dappMetadata.name))
-				}
-				return presentQueuedRequestIfNeededEffect(for: &state)
+				return .send(.internal(.presentResponseSuccessView(dappMetadata, txID)))
 			case .failure:
 				return delayedEffect(for: .internal(.presentQueuedRequestIfNeeded))
 			}
@@ -193,7 +214,23 @@ struct DappInteractor: Sendable, FeatureReducer {
 						TextState(L10n.Common.cancel)
 					}
 				},
-				message: { TextState(invalidReason.subtitle + "\n" + invalidReason.explanation(isDeveloperModeEnabled)) }
+				message: {
+					let explanation = invalidReason.explanation(isDeveloperModeEnabled)
+					if explanation == invalidReason.subtitle {
+						return TextState(invalidReason.subtitle)
+					} else {
+						return TextState(invalidReason.subtitle + "\n" + explanation)
+					}
+				}
+			)
+			return .none
+
+		case let .presentResponseSuccessView(dappMetadata, txID):
+			state.currentModal = .dappInteractionCompletion(
+				.init(
+					txID: txID,
+					dappMetadata: dappMetadata
+				)
 			)
 			return .none
 		}
@@ -203,8 +240,21 @@ struct DappInteractor: Sendable, FeatureReducer {
 		switch childAction {
 		case let .modal(.presented(.dappInteraction(.relay(request, .delegate(.submit(responseToDapp, dappMetadata)))))):
 			return sendResponseToDappEffect(responseToDapp, for: request, dappMetadata: dappMetadata)
-		case .modal(.dismiss):
+		case let .modal(.presented(.dappInteraction(.relay(request, .delegate(.dismiss(dappMetadata, txID)))))):
+			dismissCurrentModalAndRequest(request, for: &state)
+			return .send(.internal(.presentResponseSuccessView(dappMetadata, txID)))
+
+		case let .modal(.presented(.dappInteraction(.relay(request, .delegate(.dismissSilently))))):
+			dismissCurrentModalAndRequest(request, for: &state)
 			return delayedEffect(for: .internal(.presentQueuedRequestIfNeeded))
+
+		case .modal(.dismiss):
+			if case .dappInteractionCompletion = state.currentModal {
+				return delayedEffect(for: .internal(.presentQueuedRequestIfNeeded))
+			}
+
+			return .none
+
 		default:
 			return .none
 		}
@@ -230,30 +280,47 @@ struct DappInteractor: Sendable, FeatureReducer {
 		dappMetadata: DappMetadata
 	) -> EffectTask<Action> {
 		.run { send in
+
+			// In case of transaction response, sending it to the peer client is a silent operation.
+			// The success or failures is determined based on the transaction polling status.
+			let txID: TXID? = {
+				if case let .success(successResponse) = responseToDapp,
+				   case let .transaction(txID) = successResponse.items
+				{
+					return txID.send.transactionIntentHash
+				}
+				return nil
+			}()
+			let isTransactionResponse = txID != nil
+
 			do {
 				_ = try await dappInteractionClient.completeInteraction(.response(.dapp(responseToDapp), origin: request.route))
-				await send(.internal(
-					.sentResponseToDapp(
-						responseToDapp,
-						for: request,
-						dappMetadata
-					)
-				))
+				if !isTransactionResponse {
+					await send(.internal(
+						.sentResponseToDapp(
+							responseToDapp,
+							for: request,
+							dappMetadata,
+							txID
+						)
+					))
+				}
 			} catch {
-				await send(.internal(
-					.failedToSendResponseToDapp(
-						responseToDapp,
-						for: request,
-						dappMetadata,
-						reason: error.localizedDescription
-					)
-				))
+				if !isTransactionResponse {
+					await send(.internal(
+						.failedToSendResponseToDapp(
+							responseToDapp,
+							for: request,
+							dappMetadata,
+							reason: error.localizedDescription
+						)
+					))
+				}
 			}
 		}
 	}
 
 	func dismissCurrentModalAndRequest(_ request: RequestEnvelope, for state: inout State) {
-		print("dismissed current modal")
 		state.requestQueue.remove(request)
 		state.currentModal = nil
 	}
@@ -268,7 +335,7 @@ extension DappInteractionClient.ValidatedDappRequest.Invalid {
 			return L10n.DAppRequest.ValidationOutcome.subtitleIncompatibleVersion
 		case .wrongNetworkID:
 			return L10n.DAppRequest.ValidationOutcome.subtitleWrongNetworkID
-		case .invalidOrigin, .invalidDappDefinitionAddress, .p2pError:
+		case .invalidOrigin, .invalidDappDefinitionAddress, .dAppValidationError, .p2pError:
 			return shortExplanation
 		}
 	}
@@ -294,7 +361,7 @@ extension DappInteractionClient.ValidatedDappRequest.Invalid {
 			return L10n.DAppRequest.ValidationOutcome.devExplanationInvalidOrigin(invalidURLString)
 		case let .invalidDappDefinitionAddress(invalidAddress):
 			return L10n.DAppRequest.ValidationOutcome.devExplanationInvalidDappDefinitionAddress(invalidAddress)
-		case .wrongNetworkID:
+		case .dAppValidationError, .wrongNetworkID:
 			return shortExplanation
 		case let .p2pError(message):
 			return message
@@ -315,6 +382,8 @@ extension DappInteractionClient.ValidatedDappRequest.Invalid {
 			return L10n.DAppRequest.ValidationOutcome.shortExplanationInvalidOrigin
 		case .invalidDappDefinitionAddress:
 			return L10n.DAppRequest.ValidationOutcome.shortExplanationInvalidDappDefinitionAddress
+		case .dAppValidationError:
+			return "Could not validate the dApp" // FIXME: Strings
 		case let .wrongNetworkID(ce, wallet):
 			return L10n.DAppRequest.RequestWrongNetworkAlert.message(ce, wallet)
 		case .p2pError:
@@ -333,11 +402,9 @@ extension DappInteractor {
 
 				switch incomingRequest {
 				case let .valid(requestEnvelope):
-					await send(.internal(.receivedRequestFromDapp(
-						requestEnvelope
-					)))
+					await send(.internal(.receivedRequestFromDapp(requestEnvelope)))
 				case let .invalid(invalid):
-					let isDeveloperModeEnabled = await appPreferencesClient.getPreferences().security.isDeveloperModeEnabled
+					let isDeveloperModeEnabled = await appPreferencesClient.isDeveloperModeEnabled()
 					await send(.internal(.presentInvalidRequest(invalid, isDeveloperModeEnabled: isDeveloperModeEnabled)))
 				}
 			}

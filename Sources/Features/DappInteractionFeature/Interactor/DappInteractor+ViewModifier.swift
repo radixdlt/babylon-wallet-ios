@@ -35,6 +35,12 @@ extension DappInteractor {
 					.transition(.move(edge: .bottom))
 					.animation(.linear, value: viewStore.currentModal)
 				}
+				.sheet(
+					store: store.scope(state: \.$currentModal, action: { .child(.modal($0)) }),
+					state: /DappInteractor.Destinations.State.dappInteractionCompletion,
+					action: DappInteractor.Destinations.Action.dappInteractionCompletion,
+					content: { Completion.View(store: $0) }
+				)
 				.alert(
 					store: store.scope(
 						state: \.$invalidRequestAlert,

@@ -2,7 +2,6 @@ import AsyncExtensions
 import ComposableArchitecture
 import Dependencies
 import DesignSystem
-import EngineKit
 import Resources
 import SwiftUI
 
@@ -20,10 +19,6 @@ public struct OverlayWindowClient: Sendable {
 	/// Usually to be called from the Main Window.
 	public var scheduleHUD: ScheduleHUD
 
-	public var scheduleDappInteractionSuccess: ScheduleDappInteractionSuccess
-
-	public var scheduleTransactionPoll: ScheduleTransactionPoll
-
 	/// This is meant to be used by the Overlay Window to send
 	/// back the actions from an Alert to the Main Window.
 	public var sendAlertAction: SendAlertAction
@@ -37,9 +32,7 @@ public struct OverlayWindowClient: Sendable {
 		scheduleHUD: @escaping ScheduleHUD,
 		sendAlertAction: @escaping SendAlertAction,
 		setIsUserIteractionEnabled: @escaping SetIsUserIteractionEnabled,
-		isUserInteractionEnabled: @escaping IsUserInteractionEnabled,
-		scheduleDappInteractionSuccess: @escaping ScheduleDappInteractionSuccess,
-		scheduleTransactionPoll: @escaping ScheduleTransactionPoll
+		isUserInteractionEnabled: @escaping IsUserInteractionEnabled
 	) {
 		self.scheduledItems = scheduledItems
 		self.scheduleAlert = scheduleAlert
@@ -47,8 +40,6 @@ public struct OverlayWindowClient: Sendable {
 		self.sendAlertAction = sendAlertAction
 		self.setIsUserIteractionEnabled = setIsUserIteractionEnabled
 		self.isUserInteractionEnabled = isUserInteractionEnabled
-		self.scheduleDappInteractionSuccess = scheduleDappInteractionSuccess
-		self.scheduleTransactionPoll = scheduleTransactionPoll
 	}
 }
 
@@ -56,8 +47,6 @@ extension OverlayWindowClient {
 	public typealias ScheduleAlert = @Sendable (Item.AlertState) async -> Item.AlertAction
 	public typealias ScheduleHUD = @Sendable (Item.HUD) -> Void
 	public typealias SendAlertAction = @Sendable (Item.AlertAction, Item.AlertState.ID) -> Void
-	public typealias ScheduleDappInteractionSuccess = @Sendable (Item.DappInteractionSuccess) -> Void
-	public typealias ScheduleTransactionPoll = @Sendable (Item.TransactionPoll) -> Void
 	public typealias ScheduledItems = @Sendable () -> AnyAsyncSequence<Item>
 
 	public typealias SetIsUserIteractionEnabled = @Sendable (Bool) -> Void
@@ -67,24 +56,6 @@ extension OverlayWindowClient {
 // MARK: OverlayWindowClient.Item
 extension OverlayWindowClient {
 	public enum Item: Sendable, Hashable {
-		public struct DappInteractionSuccess: Sendable, Hashable {
-			public let dappName: String
-
-			public init(dappName: String) {
-				self.dappName = dappName
-			}
-		}
-
-		public struct TransactionPoll: Sendable, Hashable {
-			public let txID: TXID
-			public let disableInProgressDismissal: Bool
-
-			public init(txID: TXID, disableInProgressDismissal: Bool = false) {
-				self.txID = txID
-				self.disableInProgressDismissal = disableInProgressDismissal
-			}
-		}
-
 		public typealias AlertState = ComposableArchitecture.AlertState<AlertAction>
 		public enum AlertAction: Equatable {
 			case primaryButtonTapped
@@ -135,8 +106,6 @@ extension OverlayWindowClient {
 
 		case hud(HUD)
 		case alert(AlertState)
-		case dappInteractionSucess(DappInteractionSuccess)
-		case transactionPoll(TransactionPoll)
 	}
 }
 

@@ -5,9 +5,6 @@ import SwiftUI
 struct OverlayReducer: Sendable, FeatureReducer {
 	struct State: Hashable, Sendable {
 		var itemsQueue: OrderedSet<OverlayWindowClient.Item> = []
-		/// A HUD can be shown on top of any other item that is presented.
-		/// Maybe this will be extented in the future to support other kinds of items.
-		var hudItemsQueue: OrderedSet<OverlayWindowClient.Item.HUD> = []
 
 		var isPresenting: Bool {
 			destination != nil
@@ -15,9 +12,6 @@ struct OverlayReducer: Sendable, FeatureReducer {
 
 		@PresentationState
 		public var destination: Destinations.State?
-
-		@PresentationState
-		public var hud: HUD.State?
 	}
 
 	enum ViewAction: Sendable, Equatable {
@@ -26,34 +20,30 @@ struct OverlayReducer: Sendable, FeatureReducer {
 
 	enum InternalAction: Sendable, Equatable {
 		case scheduleItem(OverlayWindowClient.Item)
-		case showHUDIfAvailable
+		case showNextItemIfPossible
 	}
 
 	enum ChildAction: Sendable, Equatable {
 		case destination(PresentationAction<Destinations.Action>)
-		case hud(PresentationAction<HUD.Action>)
 	}
 
 	public struct Destinations: Sendable, ReducerProtocol {
 		public enum State: Sendable, Hashable {
+			case hud(HUD.State)
 			case alert(OverlayWindowClient.Item.AlertState)
-			case dappInteractionSuccess(DappInteractionSuccess.State)
-			case transactionPoll(TransactionStatusPolling.State)
 		}
 
 		public enum Action: Sendable, Equatable {
+			case hud(HUD.Action)
 			case alert(OverlayWindowClient.Item.AlertAction)
-			case dappInteractionSuccess(DappInteractionSuccess.Action)
-			case transactionPoll(TransactionStatusPolling.Action)
 		}
 
 		public var body: some ReducerProtocol<State, Action> {
-			Scope(state: /State.dappInteractionSuccess, action: /Action.dappInteractionSuccess) {
-				DappInteractionSuccess()
+			Scope(state: /State.hud, action: /Action.hud) {
+				HUD()
 			}
-
-			Scope(state: /State.transactionPoll, action: /Action.transactionPoll) {
-				TransactionStatusPolling()
+			Scope(state: /State.alert, action: /Action.alert) {
+				EmptyReducer()
 			}
 		}
 	}
@@ -65,9 +55,6 @@ struct OverlayReducer: Sendable, FeatureReducer {
 		Reduce(core)
 			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
 				Destinations()
-			}
-			.ifLet(\.$hud, action: /Action.child .. ChildAction.hud) {
-				HUD()
 			}
 	}
 
@@ -84,46 +71,25 @@ struct OverlayReducer: Sendable, FeatureReducer {
 
 	func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
-		case let .scheduleItem(.hud(item)):
-			state.hudItemsQueue.append(item)
-			if state.hud == nil {
-				return showHUDItemIfQueued(state: &state)
-			}
-
-			// A HUD is force dismissed when next item comes in, AKA it is a lower priority.
-			state.hud = nil
-			state.hudItemsQueue.removeFirst()
-			return .run { send in
-				// Hacky - A very minor delay is needed before showing the next item is a HUD.
-				try await clock.sleep(for: .milliseconds(100))
-				await send(.internal(.showHUDIfAvailable))
-			}
-
-		case let .scheduleItem(item):
-			state.itemsQueue.append(item)
+		case let .scheduleItem(event):
+			state.itemsQueue.append(event)
 			return showItemIfPossible(state: &state)
-
-		case .showHUDIfAvailable:
-			return showHUDItemIfQueued(state: &state)
+		case .showNextItemIfPossible:
+			return showItemIfPossible(state: &state)
 		}
 	}
 
 	func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
 		case .destination(.dismiss):
-			return dismissItem(&state)
-
+			return dismiss(&state)
 		case let .destination(.presented(.alert(action))):
 			if let item = state.itemsQueue.first, case let .alert(state) = item {
 				overlayWindowClient.sendAlertAction(action, state.id)
 			}
 			return .none
-
-		case .hud(.presented(.delegate(.dismiss))):
-			return dismissHUD(&state)
-
-		case .hud(.dismiss):
-			return dismissHUD(&state)
+		case .destination(.presented(.hud(.delegate(.dismiss)))):
+			return dismiss(&state)
 
 		default:
 			return .none
@@ -131,39 +97,39 @@ struct OverlayReducer: Sendable, FeatureReducer {
 	}
 
 	private func showItemIfPossible(state: inout State) -> EffectTask<Action> {
-		guard !state.itemsQueue.isEmpty, !state.isPresenting else {
+		guard !state.itemsQueue.isEmpty else {
 			return .none
 		}
 
-		guard !state.isPresenting else {
-			return .none
+		if state.isPresenting {
+			guard let presentedItem = state.itemsQueue.first else {
+				return .none
+			}
+
+			if case .hud = presentedItem {
+				// A HUD is force dismissed when next item comes in, AKA it is a lower priority.
+				state.destination = nil
+				state.itemsQueue.removeFirst()
+				return .run { send in
+					// Hacky - A very minor delay is needed before showing the next item is a HUD.
+					try await clock.sleep(for: .milliseconds(100))
+					await send(.internal(.showNextItemIfPossible))
+				}
+			} else {
+				return .none
+			}
 		}
 
 		let nextItem = state.itemsQueue[0]
 
 		switch nextItem {
+		case let .hud(hud):
+			state.destination = .hud(.init(content: hud))
+			return .none
 		case let .alert(alert):
 			state.destination = .alert(alert)
 			return setIsUserInteractionEnabled(&state, isEnabled: true)
-		case let .dappInteractionSucess(item):
-			state.destination = .dappInteractionSuccess(.init(item: item))
-			return setIsUserInteractionEnabled(&state, isEnabled: true)
-		case let .transactionPoll(item):
-			state.destination = .transactionPoll(.init(txID: item.txID, disableInProgressDismissal: item.disableInProgressDismissal))
-			return setIsUserInteractionEnabled(&state, isEnabled: true)
-		case .hud:
-			// Handled separately
-			return .none
 		}
-	}
-
-	private func showHUDItemIfQueued(state: inout State) -> EffectTask<Action> {
-		guard !state.hudItemsQueue.isEmpty else {
-			return .none
-		}
-
-		state.hud = .init(content: state.hudItemsQueue[0])
-		return .none
 	}
 
 	private func dismissAlert(state: inout State, withAction action: OverlayWindowClient.Item.AlertAction) -> EffectTask<Action> {
@@ -172,20 +138,14 @@ struct OverlayReducer: Sendable, FeatureReducer {
 			overlayWindowClient.sendAlertAction(action, state.id)
 		}
 
-		return dismissItem(&state)
+		return dismiss(&state)
 	}
 
-	private func dismissItem(_ state: inout State) -> EffectTask<Action> {
+	private func dismiss(_ state: inout State) -> EffectTask<Action> {
 		state.destination = nil
 		state.itemsQueue.removeFirst()
 		return setIsUserInteractionEnabled(&state, isEnabled: false)
 			.concatenate(with: showItemIfPossible(state: &state))
-	}
-
-	private func dismissHUD(_ state: inout State) -> EffectTask<Action> {
-		state.hud = nil
-		state.hudItemsQueue.removeFirst()
-		return showHUDItemIfQueued(state: &state)
 	}
 
 	/// Sets the interaction enabled on the window, by implication this will also enable/disable the interaction
