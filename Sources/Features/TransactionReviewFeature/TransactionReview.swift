@@ -9,7 +9,6 @@ import FeaturePrelude
 import GatewayAPI
 import OnLedgerEntitiesClient
 import SigningFeature
-import SubmitTransactionClient
 import TransactionClient
 
 // MARK: - TransactionReview
@@ -17,7 +16,6 @@ public struct TransactionReview: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public var displayMode: DisplayMode = .review
 
-		public let isTransactionInProgressDimissalAllowed: Bool
 		public let nonce: Nonce
 		public let transactionManifest: TransactionManifest
 		public let message: Message
@@ -41,14 +39,12 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		public var destination: Destinations.State? = nil
 
 		public init(
-			isTransactionInProgressDimissalAllowed: Bool = true,
 			transactionManifest: TransactionManifest,
 			nonce: Nonce,
 			signTransactionPurpose: SigningPurpose.SignTransactionPurpose,
 			message: Message,
 			ephemeralNotaryPrivateKey: Curve25519.Signing.PrivateKey = .init()
 		) {
-			self.isTransactionInProgressDimissalAllowed = isTransactionInProgressDimissalAllowed
 			self.nonce = nonce
 			self.transactionManifest = transactionManifest
 			self.signTransactionPurpose = signTransactionPurpose
@@ -93,18 +89,20 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		case buildTransactionItentResult(TaskResult<TransactionIntent>)
 		case loadedOnLedgerResource(Transfer, TaskResult<OnLedgerEntity.Resource>)
 		case notarizeResult(TaskResult<NotarizeTransactionResponse>)
-		case submitTXResult(TaskResult<TXID>)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
 		case failed(TransactionFailure)
 		case signedTXAndSubmittedToGateway(TXID)
+		case transactionCompleted(TXID)
+		case userDismissedTransactionStatus
 	}
 
 	public struct Destinations: Sendable, ReducerProtocol {
 		public enum State: Sendable, Hashable {
 			case customizeGuarantees(TransactionReviewGuarantees.State)
 			case signing(Signing.State)
+			case submitting(SubmitTransaction.State)
 			case dApp(SimpleDappDetails.State)
 			case customizeFees(CustomizeFees.State)
 			case fungibleTokenDetails(FungibleTokenDetails.State)
@@ -114,6 +112,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		public enum Action: Sendable, Equatable {
 			case customizeGuarantees(TransactionReviewGuarantees.Action)
 			case signing(Signing.Action)
+			case submitting(SubmitTransaction.Action)
 			case dApp(SimpleDappDetails.Action)
 			case customizeFees(CustomizeFees.Action)
 			case fungibleTokenDetails(FungibleTokenDetails.Action)
@@ -129,6 +128,9 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			}
 			Scope(state: /State.signing, action: /Action.signing) {
 				Signing()
+			}
+			Scope(state: /State.submitting, action: /Action.submitting) {
+				SubmitTransaction()
 			}
 			Scope(state: /State.dApp, action: /Action.dApp) {
 				SimpleDappDetails()
@@ -149,7 +151,6 @@ public struct TransactionReview: Sendable, FeatureReducer {
 	@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
 	@Dependency(\.continuousClock) var clock
 	@Dependency(\.errorQueue) var errorQueue
-	@Dependency(\.submitTXClient) var submitTXClient
 
 	public init() {}
 
@@ -319,7 +320,11 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		case .destination(.dismiss):
 			if case .signing = state.destination {
 				return cancelSigningEffect(state: &state)
+			} else if case .submitting = state.destination {
+				// This is used when tapping outside the Submitting sheet, no need to set destination to nil
+				return delayedEffect(for: .delegate(.userDismissedTransactionStatus))
 			}
+
 			return .none
 		default:
 			return .none
@@ -360,23 +365,47 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			return .none
 
 		case let .signing(.delegate(.finishedSigning(.signTransaction(notarizedTX, origin: _)))):
-			state.destination = nil
-			return .task { [txID = notarizedTX.txID, notarized = notarizedTX.notarized] in
-				await .internal(.submitTXResult(
-					TaskResult {
-						try await submitTXClient.submitTransaction(.init(
-							txID: txID,
-							compiledNotarizedTXIntent: notarized
-						))
-					}
-				))
-			}
+			state.destination = .submitting(.init(notarizedTX: notarizedTX))
+			return .none
 
 		case .signing(.delegate(.finishedSigning(.signAuth(_)))):
 			state.canApproveTX = true
+			assertionFailure("Did not expect to have sign auth data...")
 			return .none
 
 		case .signing:
+			return .none
+
+		case let .submitting(.delegate(.submittedButNotCompleted(txID))):
+			return .send(.delegate(.signedTXAndSubmittedToGateway(txID)))
+
+		case .submitting(.delegate(.failedToSubmit)):
+			state.destination = nil
+			state.canApproveTX = true
+			loggerGlobal.error("Failed to submit tx")
+			return .none
+
+		case .submitting(.delegate(.failedToReceiveStatusUpdate)):
+			state.destination = nil
+			loggerGlobal.error("Failed to receive status update")
+			return .none
+
+		case .submitting(.delegate(.submittedTransactionFailed)):
+			state.destination = nil
+			state.canApproveTX = true
+			loggerGlobal.error("Submitted TX failed")
+			return .send(.delegate(.failed(.failedToSubmit)))
+
+		case let .submitting(.delegate(.committedSuccessfully(txID))):
+			state.destination = nil
+			return delayedEffect(for: .delegate(.transactionCompleted(txID)))
+
+		case .submitting(.delegate(.manuallyDismiss)):
+			// This is used when the close button is pressed, we have to manually
+			state.destination = nil
+			return delayedEffect(for: .delegate(.userDismissedTransactionStatus))
+
+		case .submitting:
 			return .none
 
 		case .dApp:
@@ -489,27 +518,11 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			return .none
 
 		case let .notarizeResult(.success(notarizedTX)):
-			return .task { [txID = notarizedTX.txID, notarized = notarizedTX.notarized] in
-				await .internal(.submitTXResult(
-					TaskResult {
-						try await submitTXClient.submitTransaction(.init(
-							txID: txID,
-							compiledNotarizedTXIntent: notarized
-						))
-					}
-				))
-			}
+			state.destination = .submitting(.init(notarizedTX: notarizedTX))
+			return .none
 
 		case let .buildTransactionItentResult(.failure(error)),
 		     let .notarizeResult(.failure(error)):
-			errorQueue.schedule(error)
-			return .none
-
-		case let .submitTXResult(.success(txID)):
-			return .send(.delegate(.signedTXAndSubmittedToGateway(txID)))
-
-		case let .submitTXResult(.failure(error)):
-			state.canApproveTX = true
 			errorQueue.schedule(error)
 			return .none
 		}
@@ -560,7 +573,7 @@ extension TransactionReview {
 					dAppsUsed: nil,
 					deposits: nil,
 					proofs: nil,
-					accountDepositSettings: extractChangesToAccountDepositSettings(depositSettings),
+					accountDepositSettings: extractAccountDepositSettings(depositSettings),
 					networkFee: .init(reviewedTransaction: transactionToReview)
 				)
 				await send(.internal(.createTransactionReview(content)))
@@ -858,50 +871,29 @@ extension TransactionReview {
 		}
 	}
 
-	/// Extracts and maps the account deposit setting changes and creates the AccountDepositSettings.State
-	func extractChangesToAccountDepositSettings(_ settings: TransactionType.AccountDepositSettings) async throws -> AccountDepositSettings.State {
+	func extractAccountDepositSettings(_ settings: TransactionType.AccountDepositSettings) async throws -> AccountDepositSettings.State {
 		let userAccounts = try await accountsClient.getAccountsOnCurrentNetwork()
-		let involvedAccountAddresses = Set(settings.authorizedDepositorsChanges.keys)
-			.union(settings.defaultDepositRuleChanges.keys)
-			.union(settings.resourcePreferenceChanges.keys)
-
-		/// Collect all of the involved accounts
-		let involvedAccounts = involvedAccountAddresses.compactMap { address in
+		let allAccountAddress = Set(settings.authorizedDepositorsChanges.keys).union(settings.defaultDepositRuleChanges.keys).union(settings.resourcePreferenceChanges.keys)
+		let validAccounts = allAccountAddress.compactMap { address in
 			userAccounts.first { $0.address == address }
 		}
 
-		/// For each account extract the changes
-		let depositSettingsChanges = try await involvedAccounts.asyncMap { account in
-			/// Extract possible DepositRule change
+		let depositSettingsChanges = try await validAccounts.asyncMap { account in
 			let depositRuleChange = settings.defaultDepositRuleChanges[account.address]
 
-			/// Extract all resource preference changes
 			let resourcePreferenceChanges = try await settings.resourcePreferenceChanges[account.address]?.asyncMap { resourcePreference in
-				try await AccountDepositSettingsChange.State.ResourceChange(
-					resource: onLedgerEntitiesClient.getResource(resourcePreference.key),
-					change: .resourcePreference(resourcePreference.value)
-				)
+				try await AccountDepositSettingsChange.State.ResourceChange(resource: onLedgerEntitiesClient.getResource(resourcePreference.key), change: .resourcePreference(resourcePreference.value))
 			} ?? []
 
-			/// Extract the depositor chanes
 			let authorizedDepositorChanges = try await {
 				if let depositorChanges = settings.authorizedDepositorsChanges[account.address] {
-					/// Match added depositors
 					let added = try await depositorChanges.added.asyncMap { resourceOrNonFungible in
 						let resourceAddress = try resourceOrNonFungible.resourceAddress()
-						return try await AccountDepositSettingsChange.State.ResourceChange(
-							resource: onLedgerEntitiesClient.getResource(resourceAddress),
-							change: .authorizedDepositorAdded
-						)
+						return try await AccountDepositSettingsChange.State.ResourceChange(resource: onLedgerEntitiesClient.getResource(resourceAddress), change: .authorizedDepositorAdded)
 					}
-
-					/// Match removed depositors
 					let removed = try await depositorChanges.removed.asyncMap { resourceOrNonFungible in
 						let resourceAddress = try resourceOrNonFungible.resourceAddress()
-						return try await AccountDepositSettingsChange.State.ResourceChange(
-							resource: onLedgerEntitiesClient.getResource(resourceAddress),
-							change: .authorizedDepositorRemoved
-						)
+						return try await AccountDepositSettingsChange.State.ResourceChange(resource: onLedgerEntitiesClient.getResource(resourceAddress), change: .authorizedDepositorRemoved)
 					}
 
 					return added + removed
