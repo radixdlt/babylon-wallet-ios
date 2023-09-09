@@ -59,7 +59,7 @@ extension DappInteractionFlow {
 		func destination(
 			for store: StoreOf<DappInteractionFlow.Destinations>
 		) -> some SwiftUI.View {
-			SwitchStore(store) { state in
+			SwitchStore(store.relay()) { state in
 				switch state {
 				case .login:
 					CaseLet(

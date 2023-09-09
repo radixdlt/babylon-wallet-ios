@@ -30,7 +30,7 @@ extension DappInteractor {
 						store.scope(state: \.$currentModal, action: { .child(.modal($0)) }),
 						state: /DappInteractor.Destinations.State.dappInteraction,
 						action: DappInteractor.Destinations.Action.dappInteraction,
-						then: { DappInteractionCoordinator.View(store: $0) }
+						then: { DappInteractionCoordinator.View(store: $0.relay()) }
 					)
 					.transition(.move(edge: .bottom))
 					.animation(.linear, value: viewStore.currentModal)

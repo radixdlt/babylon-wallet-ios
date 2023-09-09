@@ -17,8 +17,6 @@ struct DappInteractor: Sendable, FeatureReducer {
 	struct State: Sendable, Hashable {
 		var requestQueue: OrderedSet<RequestEnvelope> = []
 
-		var currentRequest: RequestEnvelope?
-
 		@PresentationState
 		var currentModal: Destinations.State?
 
@@ -61,16 +59,16 @@ struct DappInteractor: Sendable, FeatureReducer {
 
 	struct Destinations: Sendable, ReducerProtocol {
 		enum State: Sendable, Hashable {
-			case dappInteraction(DappInteractionCoordinator.State)
+			case dappInteraction(RelayState<RequestEnvelope, DappInteractionCoordinator.State>)
 		}
 
 		enum Action: Sendable, Equatable {
-			case dappInteraction(DappInteractionCoordinator.Action)
+			case dappInteraction(RelayAction<RequestEnvelope, DappInteractionCoordinator.Action>)
 		}
 
 		var body: some ReducerProtocolOf<Self> {
 			Scope(state: /State.dappInteraction, action: /Action.dappInteraction) {
-				DappInteractionCoordinator()
+				Relay { DappInteractionCoordinator() }
 			}
 		}
 	}
@@ -209,10 +207,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 
 	func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
-		case let .modal(.presented(.dappInteraction(.delegate(.submit(responseToDapp, dappMetadata))))):
-			guard let request = state.currentRequest else {
-				return .none
-			}
+		case let .modal(.presented(.dappInteraction(.relay(request, .delegate(.submit(responseToDapp, dappMetadata)))))):
 			loggerGlobal.error("TRACE: \(#file) \(#function) \(#line)")
 			return sendResponseToDappEffect(responseToDapp, for: request, dappMetadata: dappMetadata)
 		case .modal(.dismiss):
@@ -231,8 +226,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 		else {
 			return .none
 		}
-		state.currentRequest = next
-		state.currentModal = .dappInteraction(.init(interaction: next.request))
+		state.currentModal = .dappInteraction(.relayed(next, with: .init(interaction: next.request)))
 
 		return .none
 	}
@@ -242,35 +236,46 @@ struct DappInteractor: Sendable, FeatureReducer {
 		for request: RequestEnvelope,
 		dappMetadata: DappMetadata
 	) -> EffectTask<Action> {
-		.run { send in
-			do {
-				loggerGlobal.error("TRACE: \(#file) \(#function) \(#line)")
-				_ = try await dappInteractionClient.completeInteraction(.response(.dapp(responseToDapp), origin: request.route))
-				loggerGlobal.error("TRACE: \(#file) \(#function) \(#line)")
+		.run(operation: { _ in
+			loggerGlobal.error("TRACE: \(#file) \(#function) \(#line)")
+			_ = try await dappInteractionClient.completeInteraction(.response(.dapp(responseToDapp), origin: request.route))
+			loggerGlobal.error("TRACE: \(#file) \(#function) \(#line)")
+		}).concatenate(with:
+			.send(.internal(
+				.sentResponseToDapp(
+					responseToDapp,
+					for: request,
+					dappMetadata
+				)
+			))
+		)
 
-				loggerGlobal.error("TRACE: \(#file) \(#function) \(#line)")
-				await MainActor.run {
-					send(.internal(
-						.sentResponseToDapp(
-							responseToDapp,
-							for: request,
-							dappMetadata
-						)
-					))
-				}
-			} catch {
-				await MainActor.run {
-					send(.internal(
-						.failedToSendResponseToDapp(
-							responseToDapp,
-							for: request,
-							dappMetadata,
-							reason: error.localizedDescription
-						)
-					))
-				}
-			}
-		}
+//		.run { send in
+//			do {
+		//                loggerGlobal.error("TRACE: \(#file) \(#function) \(#line)")
+		//                await send(.internal(
+		//                    .sentResponseToDapp(
+		//                        responseToDapp,
+		//                        for: request,
+		//                        dappMetadata
+		//                    )
+		//                ))
+		//                loggerGlobal.error("TRACE: \(#file) \(#function) \(#line)")
+//				_ = try await dappInteractionClient.completeInteraction(.response(.dapp(responseToDapp), origin: request.route))
+		//                loggerGlobal.error("TRACE: \(#file) \(#function) \(#line)")
+//
+		//                loggerGlobal.error("TRACE: \(#file) \(#function) \(#line)")
+//			} catch {
+//				await send(.internal(
+//					.failedToSendResponseToDapp(
+//						responseToDapp,
+//						for: request,
+//						dappMetadata,
+//						reason: error.localizedDescription
+//					)
+//				))
+//			}
+//		}
 	}
 
 	func dismissCurrentModalAndRequest(_ request: RequestEnvelope, for state: inout State) {
