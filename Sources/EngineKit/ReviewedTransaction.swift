@@ -286,6 +286,13 @@ extension MetadataValue {
 		return nil
 	}
 
+	public var stringArray: [String]? {
+		if case let .stringArrayValue(value) = self {
+			return value
+		}
+		return nil
+	}
+
 	public var url: URL? {
 		if case let .urlValue(value) = self {
 			return URL(string: value)

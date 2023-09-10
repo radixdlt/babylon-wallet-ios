@@ -29,7 +29,7 @@ import ClientPrelude
 ///                  do {
 ///                      self.laConfig = try await LocalAuthenticationClient.live().queryConfig()
 ///                  } catch {
-///                      print("User cancelled LA config query or failed, error: \(String(describing: error))")
+///                      log("User cancelled LA config query or failed, error: \(String(describing: error))")
 ///                  }
 ///              }
 ///          }

@@ -1,11 +1,38 @@
 import AssetTransferFeature
+import CreateAccountFeature
 import FeaturePrelude
 import MainFeature
 import OnboardingFeature
 import SplashFeature
 
+extension App.State {
+	var viewState: App.ViewState {
+		.init(
+			isOnMainnet: isOnMainnet,
+			hasMainnetEverBeenLive: hasMainnetEverBeenLive,
+			isCurrentlyOnboardingUserToMainnet: isCurrentlyOnboardingUserToMainnet
+		)
+	}
+}
+
 // MARK: - App.View
 extension App {
+	public struct ViewState: Equatable {
+		let isOnMainnet: Bool
+		let hasMainnetEverBeenLive: Bool
+		let isCurrentlyOnboardingUserToMainnet: Bool
+
+		var showIsUsingTestnetBanner: Bool {
+			guard hasMainnetEverBeenLive else {
+				return false
+			}
+			guard !isCurrentlyOnboardingUserToMainnet else {
+				return false
+			}
+			return !isOnMainnet
+		}
+	}
+
 	@MainActor
 	public struct View: SwiftUI.View {
 		private let store: StoreOf<App>
@@ -15,7 +42,7 @@ extension App {
 		}
 
 		public var body: some SwiftUI.View {
-			ZStack {
+			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				SwitchStore(store.scope(state: \.root, action: Action.child)) { state in
 					switch state {
 					case .main:
@@ -38,6 +65,12 @@ extension App {
 							action: App.ChildAction.splash,
 							then: { Splash.View(store: $0) }
 						)
+					case .onboardTestnetUserToMainnet:
+						CaseLet(
+							state: /App.State.Root.onboardTestnetUserToMainnet,
+							action: App.ChildAction.onboardTestnetUserToMainnet,
+							then: { CreateAccountCoordinator.View(store: $0) }
+						)
 					}
 				}
 				.tint(.app.gray1)
@@ -47,9 +80,9 @@ extension App {
 					action: App.Alerts.Action.incompatibleProfileErrorAlert
 				)
 				.task { @MainActor in
-					await ViewStore(store.stateless).send(.view(.task)).finish()
+					await viewStore.send(.task).finish()
 				}
-				.showDeveloperDisclaimerBanner()
+				.showDeveloperDisclaimerBanner(viewStore.showIsUsingTestnetBanner)
 				.presentsLoadingViewOverlay()
 			}
 		}

@@ -50,30 +50,25 @@ public struct ProfileBackupSettings: Sendable, FeatureReducer {
 	public struct Destinations: Sendable, ReducerProtocol {
 		static let confirmCloudSyncDisableAlert: Self.State = .confirmCloudSyncDisable(.init(
 			title: {
-				// FIXME: Strings
-				TextState("Disabling iCloud sync will delete the iCloud backup data(wallet data will still be kept on this iPhone), are you sure you want to disable iCloud sync?")
+				TextState(L10n.AppSettings.ConfirmCloudSyncDisableAlert.title)
 			},
 			actions: {
 				ButtonState(role: .destructive, action: .confirm) {
-					// FIXME: Strings
-					TextState("Confirm")
+					TextState(L10n.Common.confirm)
 				}
 			}
 		))
 
 		static let optionallyEncryptProfileBeforeExportingAlert: Self.State = .optionallyEncryptProfileBeforeExporting(.init(
 			title: {
-				// FIXME: Strings
-				TextState("Encrypt this backup with a password?")
+				TextState(L10n.ProfileBackup.ManualBackups.encryptBackupDialogTitle)
 			},
 			actions: {
 				ButtonState(action: .encrypt) {
-					// FIXME: Strings
-					TextState("Yes")
+					TextState(L10n.ProfileBackup.ManualBackups.encryptBackupDialogConfirm)
 				}
 				ButtonState(action: .doNotEncrypt) {
-					// FIXME: Strings
-					TextState("No")
+					TextState(L10n.ProfileBackup.ManualBackups.encryptBackupDialogDeny)
 				}
 			}
 		))
@@ -148,6 +143,7 @@ public struct ProfileBackupSettings: Sendable, FeatureReducer {
 	@Dependency(\.appPreferencesClient) var appPreferencesClient
 	@Dependency(\.radixConnectClient) var radixConnectClient
 	@Dependency(\.overlayWindowClient) var overlayWindowClient
+	@Dependency(\.userDefaultsClient) var userDefaultsClient
 
 	public init() {}
 
@@ -297,6 +293,7 @@ public struct ProfileBackupSettings: Sendable, FeatureReducer {
 		.task {
 			cacheClient.removeAll()
 			await radixConnectClient.disconnectAndRemoveAll()
+			await userDefaultsClient.removeAll()
 			return .delegate(.deleteProfileAndFactorSources(keepInICloudIfPresent: keepInICloudIfPresent))
 		}
 	}
@@ -328,7 +325,7 @@ extension ProfileBackupSettings.Destinations.State {
 	fileprivate static let cloudSyncTakesLongTimeAlert = Self.syncTakesLongTimeAlert(.init(
 		title: { TextState("Enabling iCloud sync") },
 		actions: {
-			ButtonState(action: .ok, label: { TextState("OK") })
+			ButtonState(action: .ok, label: { TextState(L10n.Common.ok) })
 		},
 		message: { TextState("iCloud sync is now enabled, but it might take up to an hour before your wallet data is uploaded to iCloud.") }
 	))

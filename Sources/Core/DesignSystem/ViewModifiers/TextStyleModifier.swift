@@ -5,6 +5,7 @@ public enum TextStyle {
 	case sheetTitle
 	case sectionHeader
 	case secondaryHeader
+	case resourceLabel
 	case body1Header
 	case body1HighImportance
 	case body1Regular
@@ -25,6 +26,7 @@ extension TextStyle {
 		case .sheetTitle: return .app.sheetTitle
 		case .sectionHeader: return .app.sectionHeader
 		case .secondaryHeader: return .app.secondaryHeader
+		case .resourceLabel: return .app.resourceLabel
 		case .body1Header: return .app.body1Header
 		case .body1HighImportance: return .app.body1HighImportance
 		case .body1Regular: return .app.body1Regular
@@ -42,7 +44,7 @@ extension TextStyle {
 
 	var lineSpacing: CGFloat {
 		switch self {
-		case .sheetTitle:
+		case .sheetTitle, .resourceLabel:
 			return 0
 		case .sectionHeader, .secondaryHeader, .body1Header,
 		     .body1HighImportance, .body1Regular, .body1StandaloneLink, .body1Link:

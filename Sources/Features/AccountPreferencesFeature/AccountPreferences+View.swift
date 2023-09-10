@@ -8,11 +8,12 @@ extension AccountPreferences.State {
 				title: "Personalize this account", // FIXME: strings
 				rows: [.accountLabel(account)]
 			),
-			.init(
-				id: .ledgerBehaviour,
-				title: "Set how you want this account to work", // FIXME: strings
-				rows: [.thirdPartyDeposits()]
-			),
+			// FIXME: Re-introduce Third Party Deposit once https://github.com/radixdlt/babylon-wallet-ios/pull/692 PR has fixed the TCA Send bug it introduces
+//			.init(
+//				id: .onLedgerBehaviour,
+//				title: "Set how you want this account to work", // FIXME: strings
+//				rows: [.thirdPartyDeposits()]
+//			),
 			.init(
 				id: .development,
 				title: "Set development preferences", // FIXME: strings
@@ -43,7 +44,7 @@ extension AccountPreferences {
 					onRowSelected: { _, rowId in viewStore.send(.rowTapped(rowId)) }
 				)
 				.task {
-					viewStore.send(.viewAppeared)
+					viewStore.send(.task)
 				}
 				.destination(store: store)
 				.background(.app.gray5)
@@ -104,7 +105,7 @@ extension View {
 extension AccountPreferences {
 	public enum Section: Hashable, Sendable {
 		case personalize
-		case ledgerBehaviour
+		case onLedgerBehaviour
 		case development
 
 		public enum SectionRow: Hashable, Sendable {

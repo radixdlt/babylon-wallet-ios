@@ -230,8 +230,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/radixdlt/swift-engine-toolkit",
       "state" : {
-        "branch" : "release/grape",
-        "revision" : "393020d99ba233cf518413e43e5998921568465a"
+        "revision" : "4ded56afc8a8a55ffeadbdce16dbb5789ab4d664",
+        "version" : "0.12.1-293dd4c"
       }
     },
     {
@@ -291,7 +291,7 @@
     {
       "identity" : "swift-numerics",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/apple/swift-numerics.git",
+      "location" : "https://github.com/apple/swift-numerics",
       "state" : {
         "revision" : "0a5bc04095a675662cf24757cc0640aa2204253b",
         "version" : "1.0.2"
@@ -338,8 +338,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/siteline/SwiftUI-Introspect",
       "state" : {
-        "revision" : "ccb973cfff703cba53fb88197413485c060eb26b",
-        "version" : "0.10.0"
+        "revision" : "121c146fe591b1320238d054ae35c81ffa45f45a",
+        "version" : "0.12.0"
       }
     },
     {
@@ -374,8 +374,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/stasel/WebRTC",
       "state" : {
-        "revision" : "28dd8570a3482d46b90ce4e924e8ff1d17614e78",
-        "version" : "110.0.0"
+        "revision" : "c487cd3e567ca0b58c59496475f1ca6f0572aec6",
+        "version" : "116.0.0"
       }
     },
     {

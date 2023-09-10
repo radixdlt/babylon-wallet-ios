@@ -17,7 +17,7 @@ public struct OnboardingStartup: Sendable, FeatureReducer {
 
 	public enum DelegateAction: Sendable, Equatable {
 		case setupNewUser
-		case completed(accountRecoveryIsNeeded: Bool)
+		case completed(accountRecoveryIsNeeded: Bool, hasMainnetAccounts: Bool)
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -36,7 +36,6 @@ public struct OnboardingStartup: Sendable, FeatureReducer {
 		public var body: some ReducerProtocolOf<Self> {
 			Scope(state: /State.restoreFromBackup, action: /Action.restoreFromBackup) {
 				RestoreProfileFromBackupCoordinator()
-					._printChanges()
 			}
 		}
 	}
@@ -61,8 +60,11 @@ public struct OnboardingStartup: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
-		case let .destination(.presented(.restoreFromBackup(.delegate(.profileImported(skippedAnyMnemonic))))):
-			return .send(.delegate(.completed(accountRecoveryIsNeeded: skippedAnyMnemonic)))
+		case let .destination(.presented(.restoreFromBackup(.delegate(.profileImported(skippedAnyMnemonic, hasMainnetAccounts))))):
+			return .send(.delegate(.completed(
+				accountRecoveryIsNeeded: skippedAnyMnemonic,
+				hasMainnetAccounts: hasMainnetAccounts
+			)))
 
 		case .destination(.presented(.restoreFromBackup(.delegate(.failedToImportProfileDueToMnemonics)))):
 			return .none

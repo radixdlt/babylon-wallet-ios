@@ -27,6 +27,16 @@ final class ROLAClientTests: TestCase {
 		)
 	}
 
+	private func entityMetadata(
+		origin: String,
+		accountType: String
+	) -> GatewayAPI.EntityMetadataCollection {
+		.init(items: [
+			.init(key: "account_type", value: .init(rawHex: "", programmaticJson: "", typed: .stringValue(.init(type: .string, value: accountType))), isLocked: false, lastUpdatedAtStateVersion: 0),
+			.init(key: "claimed_websites", value: .init(rawHex: "", programmaticJson: "", typed: .originArrayValue(.init(type: .originArray, values: [origin]))), isLocked: false, lastUpdatedAtStateVersion: 0),
+		])
+	}
+
 	private func json(dAppDefinitionAddress: DappDefinitionAddress) -> JSON {
 		[
 			"dApps": [
@@ -167,10 +177,7 @@ final class ROLAClientTests: TestCase {
 		let origin = "https://origin.com"
 		let metadata = metadata(origin: origin, dAppDefinitionAddress: dAppDefinitionAddress)
 		let accountType = "dapp definition"
-		let metadataCollection = GatewayAPI.EntityMetadataCollection(items: [
-			.init(key: "account_type", value: .init(rawHex: "", programmaticJson: "", typed: .stringValue(.init(type: .string, value: accountType))), isLocked: false, lastUpdatedAtStateVersion: 0),
-			.init(key: "related_websites", value: .init(rawHex: "", programmaticJson: "", typed: .stringValue(.init(type: .string, value: origin))), isLocked: false, lastUpdatedAtStateVersion: 0),
-		])
+		let metadataCollection = entityMetadata(origin: origin, accountType: accountType)
 
 		// when
 		try await withDependencies {
@@ -187,13 +194,9 @@ final class ROLAClientTests: TestCase {
 		let origin = "https://origin.com"
 		let metadata = metadata(origin: origin, dAppDefinitionAddress: dAppDefinitionAddress)
 		let wrongAccountType = "wrong account type"
+		let metadataCollection = entityMetadata(origin: origin, accountType: wrongAccountType)
 
-		let metadataCollection = GatewayAPI.EntityMetadataCollection(items: [
-			.init(key: "account_type", value: .init(rawHex: "", programmaticJson: "", typed: .stringValue(.init(type: .string, value: wrongAccountType))), isLocked: false, lastUpdatedAtStateVersion: 0),
-			.init(key: "related_websites", value: .init(rawHex: "", programmaticJson: "", typed: .stringValue(.init(type: .string, value: origin))), isLocked: false, lastUpdatedAtStateVersion: 0),
-		])
-
-		let expectedError = ROLAFailure.wrongAccountType
+		let expectedError = GatewayAPI.EntityMetadataCollection.MetadataError.accountTypeNotDappDefinition
 
 		// when
 		await withDependencies {
@@ -205,7 +208,7 @@ final class ROLAClientTests: TestCase {
 				try await sut.performDappDefinitionVerification(metadata)
 				XCTFail("Expected error: wrongAccountType")
 			} catch {
-				XCTAssertEqual(error as? ROLAFailure, expectedError)
+				XCTAssertEqual(error as? GatewayAPI.EntityMetadataCollection.MetadataError, expectedError)
 			}
 		}
 	}
@@ -216,13 +219,9 @@ final class ROLAClientTests: TestCase {
 		let originFromDapp = "https://someotherorigin.com"
 		let metadata = metadata(origin: originFromDapp, dAppDefinitionAddress: dAppDefinitionAddress)
 		let accountType = "dapp definition"
+		let metadataCollection = entityMetadata(origin: origin, accountType: accountType)
 
-		let metadataCollection = GatewayAPI.EntityMetadataCollection(items: [
-			.init(key: "account_type", value: .init(rawHex: "", programmaticJson: "", typed: .stringValue(.init(type: .string, value: accountType))), isLocked: false, lastUpdatedAtStateVersion: 0),
-			.init(key: "related_websites", value: .init(rawHex: "", programmaticJson: "", typed: .stringValue(.init(type: .string, value: origin))), isLocked: false, lastUpdatedAtStateVersion: 0),
-		])
-
-		let expectedError = ROLAFailure.unknownWebsite
+		let expectedError = GatewayAPI.EntityMetadataCollection.MetadataError.websiteNotClaimed
 
 		// when
 		await withDependencies {
@@ -234,7 +233,8 @@ final class ROLAClientTests: TestCase {
 				try await sut.performDappDefinitionVerification(metadata)
 				XCTFail("Expected error: unknownWebsite")
 			} catch {
-				XCTAssertEqual(error as? ROLAFailure, expectedError)
+				print("• error", error)
+				XCTAssertEqual(error as? GatewayAPI.EntityMetadataCollection.MetadataError, expectedError)
 			}
 		}
 	}

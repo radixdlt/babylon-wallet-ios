@@ -13,7 +13,7 @@ import SecureStorageClient
 /// and if user has enabled: the keychain item syncs to iCloud
 /// as well.
 ///
-/// This actor is meant **not** meant to be used directly by the
+/// This actor is **not** meant to be used directly by the
 /// apps reducers, but rather always indirectly, via the live
 /// implementations of a set of clients (dependencies), e.g.:
 /// * AccountsClient
@@ -140,8 +140,8 @@ extension ProfileStore {
 
 	public func getLoadProfileOutcome() async -> LoadProfileOutcome {
 		switch self.profileStateSubject.value {
-		case .persisted:
-			return .existingProfile
+		case let .persisted(profile):
+			return .existingProfile(hasMainnetAccounts: profile.hasMainnetAccounts)
 		case let .ephemeral(ephemeral):
 			if let error = ephemeral.loadFailure {
 				return .usersExistingProfileCouldNotBeLoaded(failure: error)
@@ -188,9 +188,11 @@ extension ProfileStore {
 		}
 	}
 
-	public func commitEphemeral() async throws {
+	/// Returns `true` iff Profile contains any mainnet accounts
+	public func commitEphemeral() async throws -> Bool {
 		let ephemeral = try assertProfileStateIsEphemeral()
 		try await changeProfileSnapshot(to: ephemeral.profile.snapshot())
+		return ephemeral.profile.hasMainnetAccounts
 	}
 
 	/// If persisted: updates the in-memory across-the-app-used Profile and also
@@ -636,17 +638,15 @@ struct EphemeralProfile: Sendable, Hashable {
 }
 
 extension UserDefaultsClient {
-	static let activeProfileID = "profile.activeProfileID"
-
-	func getActiveProfileID() -> ProfileSnapshot.Header.ID? {
-		stringForKey(Self.activeProfileID).flatMap(UUID.init(uuidString:))
+	public func getActiveProfileID() -> ProfileSnapshot.Header.ID? {
+		stringForKey(.activeProfileID).flatMap(UUID.init(uuidString:))
 	}
 
-	func setActiveProfileID(_ id: ProfileSnapshot.Header.UsedDeviceInfo.ID) async {
-		await setString(id.uuidString, Self.activeProfileID)
+	public func setActiveProfileID(_ id: ProfileSnapshot.Header.UsedDeviceInfo.ID) async {
+		await setString(id.uuidString, .activeProfileID)
 	}
 
-	func removeActiveProfileID() async {
-		await remove(Self.activeProfileID)
+	public func removeActiveProfileID() async {
+		await remove(.activeProfileID)
 	}
 }

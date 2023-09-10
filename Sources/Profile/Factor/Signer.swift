@@ -48,7 +48,8 @@ public struct Signer: Sendable, Hashable, Identifiable {
 // MARK: - EntityPotentiallyVirtual
 public enum EntityPotentiallyVirtual: Sendable, Hashable, EntityBaseProtocol, Identifiable {
 	public typealias ID = String
-	public var id: ID {
+	public var id: ID { address }
+	public var address: String {
 		switch self {
 		case let .account(entity): return entity.address.address
 		case let .persona(entity): return entity.address.address

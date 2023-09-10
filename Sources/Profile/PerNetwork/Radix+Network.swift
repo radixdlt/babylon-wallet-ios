@@ -32,11 +32,13 @@ extension Radix {
 }
 
 extension Radix.Network {
-	public static let `default` = kisharnet
-}
-
-extension Radix.Network {
 	public typealias Name = Tagged<Self, String>
+
+	public static let mainnet = Self(
+		name: "mainnet",
+		id: .mainnet,
+		displayDescription: "Mainnet"
+	)
 
 	public static let nebunet = Self(
 		name: "nebunet",
@@ -53,6 +55,12 @@ extension Radix.Network {
 		name: "ansharnet",
 		id: .ansharnet,
 		displayDescription: "RCnet-V2 test network"
+	)
+
+	public static let zabanet = Self(
+		name: "zabanet",
+		id: .zabanet,
+		displayDescription: "RCnet-V3 test network"
 	)
 
 	public static let hammunet = Self(
@@ -80,9 +88,11 @@ extension Radix.Network {
 
 extension Radix.Network {
 	fileprivate static let lookupSet: Set<Self> = [
+		.mainnet,
 		.nebunet,
 		.kisharnet,
 		.ansharnet,
+		.zabanet,
 		.hammunet,
 		.enkinet,
 		.mardunet,
@@ -115,10 +125,6 @@ struct UnknownNetwork: Swift.Error, CustomStringConvertible {
 }
 
 extension Radix.Network {
-	public var isDefault: Bool {
-		id == Self.default.id
-	}
-
 	public var customDumpMirror: Mirror {
 		.init(
 			self,

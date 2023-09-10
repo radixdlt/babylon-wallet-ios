@@ -12,7 +12,7 @@ INPUTDIR=$PWD
 # using https://github.com/radixdlt/babylon-gateway/blob/develop/src/RadixDlt.NetworkGateway.GatewayApi/gateway-api-schema.yaml
 # commit 0836c93 from 2023-03-17
 PROJECT_NAME=Gateway
-SWAGGER_TEMPLATE="$INPUTDIR/gateway-api-spec.yml"
+SWAGGER_TEMPLATE="$INPUTDIR/gateway-api-schema.yml"
 OUTPUTDIR="$INPUTDIR/.."
 DESTINATION="$OUTPUTDIR/Generated"
 

@@ -5,12 +5,13 @@ extension PoolUnitDetails.State {
 	var viewState: PoolUnitDetails.ViewState {
 		let resource = poolUnit.poolUnitResource
 		return .init(
-			containerWithHeader: resource.detailsContainerWithHeaderViewState,
+			containerWithHeader: resource.detailsHeader(withAmount: true),
 			thumbnailURL: resource.iconURL,
 			resources: poolUnit.resourceViewStates,
 			resourceDetails: .init(
 				description: resource.description,
 				resourceAddress: resource.resourceAddress,
+				isXRD: false,
 				validatorAddress: nil,
 				resourceName: resource.name, // FIXME: Is this correct?
 				currentSupply: resource.totalSupply?.format() ?? L10n.AssetDetails.supplyUnkown,
@@ -69,10 +70,10 @@ extension PoolUnitDetails {
 }
 
 extension AccountPortfolio.FungibleResource {
-	var detailsContainerWithHeaderViewState: DetailsContainerWithHeaderViewState {
+	func detailsHeader(withAmount showAmount: Bool) -> DetailsContainerWithHeaderViewState {
 		.init(
 			title: name ?? L10n.Account.PoolUnits.unknownPoolUnitName,
-			amount: amount.format(),
+			amount: showAmount ? amount.format() : nil,
 			symbol: symbol
 		)
 	}

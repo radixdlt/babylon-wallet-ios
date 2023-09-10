@@ -153,12 +153,11 @@ public struct FactorsForRole<R: RoleProtocol>: Sendable, FeatureReducer {
 								TextState("Decrease security")
 							}
 							ButtonState(role: .none, action: .discardChanges) {
-								// FIXME: strings
-								TextState("Discard changes")
+								TextState(L10n.AccountSettings.ThirdPartyDeposits.discardChanges)
 							}
 							ButtonState(role: .cancel, action: .cancel) {
 								// FIXME: strings
-								TextState("Cancel")
+								TextState(L10n.Common.cancel)
 							}
 						},
 						message: {

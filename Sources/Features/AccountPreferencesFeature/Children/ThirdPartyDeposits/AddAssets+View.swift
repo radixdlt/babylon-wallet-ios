@@ -19,7 +19,7 @@ extension AddAsset.State {
 				}
 
 				guard let validatedAddress = validatedResourceAddress else {
-					return .error("Invalid Address") // FIXME: Strings
+					return .error(L10n.AssetTransfer.ChooseReceivingAccount.invalidAddressError)
 				}
 
 				if alreadyAddedResources.contains(where: { $0.resourceAddress == validatedAddress.resourceAddress }) {
@@ -106,7 +106,7 @@ extension AddAsset.View {
 	@ViewBuilder
 	func resourceAddressView(_ viewStore: ViewStoreOf<AddAsset>) -> some SwiftUI.View {
 		AppTextField(
-			placeholder: "Resource Address", // FIXME: Strings
+			placeholder: L10n.AccountSettings.SpecificAssetsDeposits.addAnAssetInputHint,
 			text: viewStore.binding(
 				get: \.resourceAddress,
 				send: { .resourceAddressChanged($0) }
@@ -165,9 +165,9 @@ extension ResourcesListMode.ExceptionRule {
 	var selectionText: String {
 		switch self {
 		case .allow:
-			return "Allow Deposits" // FIXME: Strings
+			return L10n.AccountSettings.SpecificAssetsDeposits.addAnAssetAllow
 		case .deny:
-			return "Deny Deposits" // FIXME: Strings
+			return L10n.AccountSettings.SpecificAssetsDeposits.addAnAssetDeny
 		}
 	}
 }
@@ -183,18 +183,18 @@ extension ResourcesListMode {
 	var title: String {
 		switch self {
 		case .allowDenyAssets:
-			return "Add an Asset" // FIXME: Strings
+			return L10n.AccountSettings.SpecificAssetsDeposits.addAnAssetTitle
 		case .allowDepositors:
-			return "Add a Depositor Badge" // FIXME: Strings
+			return L10n.AccountSettings.ThirdPartyDeposits.addDepositorTitle
 		}
 	}
 
 	var instructions: String {
 		switch self {
 		case .allowDenyAssets:
-			return "Enter the asset’s resource address (starting with “reso”)" // FIXME: Strings
+			return L10n.AccountSettings.SpecificAssetsDeposits.addAnAssetSubtitle
 		case .allowDepositors:
-			return "Enter the badge’s resource address (starting with “reso”)" // FIXME: Strings
+			return L10n.AccountSettings.ThirdPartyDeposits.addDepositorSubtitle
 		}
 	}
 }

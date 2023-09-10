@@ -155,7 +155,11 @@ extension ProfileSnapshot.Header.Version {
 	/// - 43: Added `mnemonicWordCount` in `hint` in `DeviceFactorSource`
 	/// - 44: Added `transaction` setting inside `appPreferences` with `defaultDepositGuarantee` decimal value encoded as String
 	/// - 45: Merge of 43 and 44.
-	public static let minimum: Self = 45
+	/// - 46: Change default gateway to `zabanet`
+	/// - 47: Change default gateway to `rcnetv3`
+	/// - 48: Change default gateway to `hammunet` (temp `rcnetv3.1`)
+	/// - 49: Change default gateway to `rcnetv3` (now: `rcnetv3.1`)
+	public static let minimum: Self = 49
 }
 
 extension ProfileSnapshot.Header {

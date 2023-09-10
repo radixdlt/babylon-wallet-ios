@@ -79,26 +79,67 @@ struct FeeViewState: Equatable, Sendable, Identifiable {
 	let name: String
 	let amount: BigDecimal
 	let isUserConfigurable: Bool
+	init(name: String, amount: BigDecimal, isUserConfigurable: Bool = false) {
+		self.name = name
+		self.amount = amount
+		self.isUserConfigurable = isUserConfigurable
+	}
 }
 
 extension TransactionFee.AdvancedFeeCustomization {
 	var viewStates: IdentifiedArrayOf<FeeViewState> {
-		.init(uncheckedUniqueElements: [
-			.init(name: L10n.TransactionReview.CustomizeNetworkFeeSheet.networkExecution, amount: feeSummary.executionCost, isUserConfigurable: false),
-			.init(name: L10n.TransactionReview.CustomizeNetworkFeeSheet.networkFinalization, amount: feeSummary.finalizationCost, isUserConfigurable: false),
-			.init(name: L10n.TransactionReview.CustomizeNetworkFeeSheet.effectiveTip, amount: tipAmount, isUserConfigurable: true),
-			.init(name: L10n.TransactionReview.CustomizeNetworkFeeSheet.networkStorage, amount: feeSummary.storageExpansionCost, isUserConfigurable: false),
-			.init(name: L10n.TransactionReview.CustomizeNetworkFeeSheet.padding, amount: paddingFee, isUserConfigurable: true),
-			.init(name: L10n.TransactionReview.CustomizeNetworkFeeSheet.royalties, amount: feeSummary.royaltyCost, isUserConfigurable: false),
+		var displayedFees = IdentifiedArrayOf<FeeViewState>(uncheckedUniqueElements: [
+			.init(
+				name: L10n.TransactionReview.CustomizeNetworkFeeSheet.networkExecution,
+				amount: feeSummary.totalExecutionCost
+			),
+			.init(
+				name: L10n.TransactionReview.CustomizeNetworkFeeSheet.networkFinalization,
+				amount: feeSummary.finalizationCost
+			),
+			.init(
+				name: L10n.TransactionReview.CustomizeNetworkFeeSheet.effectiveTip,
+				amount: tipAmount,
+				isUserConfigurable: true
+			),
+			.init(
+				name: L10n.TransactionReview.CustomizeNetworkFeeSheet.networkStorage,
+				amount: feeSummary.storageExpansionCost
+			),
+			.init(
+				name: L10n.TransactionReview.CustomizeNetworkFeeSheet.padding,
+				amount: paddingFee,
+				isUserConfigurable: true
+			),
+			.init(
+				name: L10n.TransactionReview.CustomizeNetworkFeeSheet.royalties,
+				amount: feeSummary.royaltyCost
+			),
 		])
+
+		if paidByDapps > .zero {
+			displayedFees.append(
+				.init(
+					name: L10n.TransactionReview.CustomizeNetworkFeeSheet.paidByDApps,
+					amount: paidByDapps
+				)
+			)
+		}
+		return displayedFees
 	}
 }
 
 extension TransactionFee.NormalFeeCustomization {
 	var viewStates: IdentifiedArrayOf<FeeViewState> {
 		.init(uncheckedUniqueElements: [
-			.init(name: L10n.TransactionReview.CustomizeNetworkFeeSheet.networkFee, amount: networkFee, isUserConfigurable: false),
-			.init(name: L10n.TransactionReview.CustomizeNetworkFeeSheet.royaltyFee, amount: royaltyFee, isUserConfigurable: false),
+			.init(
+				name: L10n.TransactionReview.CustomizeNetworkFeeSheet.networkFee,
+				amount: networkFee
+			),
+			.init(
+				name: L10n.TransactionReview.CustomizeNetworkFeeSheet.royaltyFee,
+				amount: royaltyFee
+			),
 		])
 	}
 }

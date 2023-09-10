@@ -36,7 +36,6 @@ extension EntityType: CaseIterable {
 			.globalVirtualEd25519Identity,
 			.globalVirtualSecp256k1Account,
 			.globalVirtualSecp256k1Identity,
-			.internalAccount,
 			.internalFungibleVault,
 			.internalGenericComponent,
 			.internalKeyValueStore,
@@ -82,7 +81,7 @@ public enum EntityEntityType: SpecificEntityType {
 
 // MARK: - AccountEntityType
 public enum AccountEntityType: SpecificEntityType {
-	public static let addressSpace: Set<EntityType> = [.globalAccount, .internalAccount, .globalVirtualEd25519Account, .globalVirtualSecp256k1Account]
+	public static let addressSpace: Set<EntityType> = [.globalAccount, .globalVirtualEd25519Account, .globalVirtualSecp256k1Account]
 }
 
 // MARK: - IdentityEntityType

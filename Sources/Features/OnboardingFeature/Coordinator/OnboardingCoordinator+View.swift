@@ -12,18 +12,18 @@ extension OnboardingCoordinator {
 		}
 
 		public var body: some SwiftUI.View {
-			SwitchStore(store) { state in
+			SwitchStore(store.scope(state: \.root, action: Action.child)) { state in
 				switch state {
 				case .startup:
 					CaseLet(
-						state: /OnboardingCoordinator.State.startup,
-						action: { OnboardingCoordinator.Action.child(.startup($0)) },
+						state: /OnboardingCoordinator.State.Root.startup,
+						action: OnboardingCoordinator.ChildAction.startup,
 						then: { OnboardingStartup.View(store: $0) }
 					)
 				case .createAccountCoordinator:
 					CaseLet(
-						state: /OnboardingCoordinator.State.createAccountCoordinator,
-						action: { OnboardingCoordinator.Action.child(.createAccountCoordinator($0)) },
+						state: /OnboardingCoordinator.State.Root.createAccountCoordinator,
+						action: OnboardingCoordinator.ChildAction.createAccountCoordinator,
 						then: {
 							CreateAccountCoordinator.View(store: $0)
 								.padding(.top, .medium3)

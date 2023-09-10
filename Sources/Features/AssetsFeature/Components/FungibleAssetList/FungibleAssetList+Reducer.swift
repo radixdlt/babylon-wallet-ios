@@ -66,12 +66,12 @@ public struct FungibleAssetList: Sendable, FeatureReducer {
 		case .destination:
 			return .none
 		case let .xrdRow(.delegate(.selected(token))):
-			state.destination = .details(.init(resource: token, isXRD: true))
+			state.destination = .details(.init(resource: token, isXRD: true, context: .portfolio))
 			return .none
 		case .xrdRow:
 			return .none
 		case let .nonXRDRow(_, .delegate(.selected(token))):
-			state.destination = .details(.init(resource: token, isXRD: false))
+			state.destination = .details(.init(resource: token, isXRD: false, context: .portfolio))
 			return .none
 		case .nonXRDRow:
 			return .none

@@ -44,10 +44,12 @@ final class RTCPeerConnectionAsyncDelegate:
 // MARK: RTCPeerConnectionDelegate
 extension RTCPeerConnectionAsyncDelegate: RTCPeerConnectionDelegate {
 	func peerConnectionShouldNegotiate(_ peerConnection: RTCPeerConnection) {
+		loggerGlobal.info("RTCPeerConnection negatiation needed")
 		onNegotiationNeededContinuation.yield(())
 	}
 
 	func peerConnection(_ peerConnection: RTCPeerConnection, didChange stateChanged: RTCSignalingState) {
+		loggerGlobal.info("RTCPeerConnection Signaling state changed to: \(stateChanged)")
 		onSignalingStateContinuation.yield(.init(from: stateChanged))
 	}
 
@@ -75,12 +77,12 @@ extension RTCPeerConnectionAsyncDelegate: RTCPeerConnectionDelegate {
 
 	func peerConnection(_ peerConnection: RTCPeerConnection, didOpen dataChannel: RTCDataChannel) {
 		loggerGlobal.trace("\(Self.self).\(#function) is ignored")
-		loggerGlobal.trace("RTCPeerConnection did open DataChannel \(dataChannel.channelId)")
+		loggerGlobal.info("RTCPeerConnection did open DataChannel \(dataChannel.channelId)")
 	}
 
 	func peerConnection(_ peerConnection: RTCPeerConnection, didChange newState: RTCIceGatheringState) {
 		loggerGlobal.trace("\(Self.self).\(#function) is ignored")
-		loggerGlobal.trace("RTCPeerConnection did change ICEGatheringState to \(newState)")
+		loggerGlobal.info("RTCPeerConnection did change ICEGatheringState to \(newState)")
 	}
 }
 

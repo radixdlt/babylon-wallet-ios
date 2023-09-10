@@ -77,6 +77,8 @@ public enum L10n {
     public static let showAssetsSubtitle = L10n.tr("Localizable", "accountSettings_showAssetsSubtitle", fallback: "Select which tags to show for assets in this Account")
     /// Show Account QR Code
     public static let showQR = L10n.tr("Localizable", "accountSettings_showQR", fallback: "Show Account QR Code")
+    /// Allow/Deny Specific Assets
+    public static let specificAssetsDeposits = L10n.tr("Localizable", "accountSettings_specificAssetsDeposits", fallback: "Allow/Deny Specific Assets")
     /// Third-party Deposits
     public static let thirdPartyDeposits = L10n.tr("Localizable", "accountSettings_thirdPartyDeposits", fallback: "Third-party Deposits")
     /// Account Settings
@@ -143,17 +145,75 @@ public enum L10n {
       /// Asset creators can add tags to them. You can choose which tags you want to see in this Account.
       public static let text = L10n.tr("Localizable", "accountSettings_showAssets_text", fallback: "Asset creators can add tags to them. You can choose which tags you want to see in this Account.")
     }
+    public enum SpecificAssetsDeposits {
+      /// Allow Deposits
+      public static let addAnAssetAllow = L10n.tr("Localizable", "accountSettings_specificAssetsDeposits_addAnAssetAllow", fallback: "Allow Deposits")
+      /// Add Asset
+      public static let addAnAssetButton = L10n.tr("Localizable", "accountSettings_specificAssetsDeposits_addAnAssetButton", fallback: "Add Asset")
+      /// Deny Deposit
+      public static let addAnAssetDeny = L10n.tr("Localizable", "accountSettings_specificAssetsDeposits_addAnAssetDeny", fallback: "Deny Deposit")
+      /// Resource Address
+      public static let addAnAssetInputHint = L10n.tr("Localizable", "accountSettings_specificAssetsDeposits_addAnAssetInputHint", fallback: "Resource Address")
+      /// Enter the asset’s resource address (starting with “reso”)
+      public static let addAnAssetSubtitle = L10n.tr("Localizable", "accountSettings_specificAssetsDeposits_addAnAssetSubtitle", fallback: "Enter the asset’s resource address (starting with “reso”)")
+      /// Add an Asset
+      public static let addAnAssetTitle = L10n.tr("Localizable", "accountSettings_specificAssetsDeposits_addAnAssetTitle", fallback: "Add an Asset")
+      /// Allow
+      public static let allow = L10n.tr("Localizable", "accountSettings_specificAssetsDeposits_allow", fallback: "Allow")
+      /// The following resource addresses may always be deposited to this account by third parties.
+      public static let allowInfo = L10n.tr("Localizable", "accountSettings_specificAssetsDeposits_allowInfo", fallback: "The following resource addresses may always be deposited to this account by third parties.")
+      /// Deny
+      public static let deny = L10n.tr("Localizable", "accountSettings_specificAssetsDeposits_deny", fallback: "Deny")
+      /// The following resource addresses may never be deposited to this account by third parties.
+      public static let denyInfo = L10n.tr("Localizable", "accountSettings_specificAssetsDeposits_denyInfo", fallback: "The following resource addresses may never be deposited to this account by third parties.")
+      /// Add a specific asset by its resource address to allow all third-party deposits
+      public static let emptyAllowAll = L10n.tr("Localizable", "accountSettings_specificAssetsDeposits_emptyAllowAll", fallback: "Add a specific asset by its resource address to allow all third-party deposits")
+      /// Add a specific asset by its resource address to deny all third-party deposits
+      public static let emptyDenyAll = L10n.tr("Localizable", "accountSettings_specificAssetsDeposits_emptyDenyAll", fallback: "Add a specific asset by its resource address to deny all third-party deposits")
+      /// Remove Asset
+      public static let removeAsset = L10n.tr("Localizable", "accountSettings_specificAssetsDeposits_removeAsset", fallback: "Remove Asset")
+      /// The asset will be removed from the allow list
+      public static let removeAssetMessageAllow = L10n.tr("Localizable", "accountSettings_specificAssetsDeposits_removeAssetMessageAllow", fallback: "The asset will be removed from the allow list")
+      /// The asset will be removed from the deny list
+      public static let removeAssetMessageDeny = L10n.tr("Localizable", "accountSettings_specificAssetsDeposits_removeAssetMessageDeny", fallback: "The asset will be removed from the deny list")
+      /// Remove Depositor
+      public static let removeDepositor = L10n.tr("Localizable", "accountSettings_specificAssetsDeposits_removeDepositor", fallback: "Remove Depositor")
+      /// The depositor will be removed from the allow list
+      public static let removeDepositorMessage = L10n.tr("Localizable", "accountSettings_specificAssetsDeposits_removeDepositorMessage", fallback: "The depositor will be removed from the allow list")
+      /// Update
+      public static let update = L10n.tr("Localizable", "accountSettings_specificAssetsDeposits_update", fallback: "Update")
+    }
     public enum ThirdPartyDeposits {
       /// Accept all deposits
       public static let acceptAll = L10n.tr("Localizable", "accountSettings_thirdPartyDeposits_acceptAll", fallback: "Accept all deposits")
       /// Allow third-parties to deposit any asset
       public static let acceptAllSubtitle = L10n.tr("Localizable", "accountSettings_thirdPartyDeposits_acceptAllSubtitle", fallback: "Allow third-parties to deposit any asset")
+      /// Enter the badge’s resource address (starting with “reso”)
+      public static let addDepositorSubtitle = L10n.tr("Localizable", "accountSettings_thirdPartyDeposits_addDepositorSubtitle", fallback: "Enter the badge’s resource address (starting with “reso”)")
+      /// Add a Depositor Badge
+      public static let addDepositorTitle = L10n.tr("Localizable", "accountSettings_thirdPartyDeposits_addDepositorTitle", fallback: "Add a Depositor Badge")
+      /// Allow/Deny specific assets
+      public static let allowDenySpecific = L10n.tr("Localizable", "accountSettings_thirdPartyDeposits_allowDenySpecific", fallback: "Allow/Deny specific assets")
+      /// Deny or allow third-party deposits of specific assets, ignoring the setting above
+      public static let allowDenySpecificSubtitle = L10n.tr("Localizable", "accountSettings_thirdPartyDeposits_allowDenySpecificSubtitle", fallback: "Deny or allow third-party deposits of specific assets, ignoring the setting above")
+      /// Allow specific depositors
+      public static let allowSpecificDepositors = L10n.tr("Localizable", "accountSettings_thirdPartyDeposits_allowSpecificDepositors", fallback: "Allow specific depositors")
+      /// Add Depositor Badge
+      public static let allowSpecificDepositorsButton = L10n.tr("Localizable", "accountSettings_thirdPartyDeposits_allowSpecificDepositorsButton", fallback: "Add Depositor Badge")
+      /// Allow certain third party depositors to deposit assets freely
+      public static let allowSpecificDepositorsSubtitle = L10n.tr("Localizable", "accountSettings_thirdPartyDeposits_allowSpecificDepositorsSubtitle", fallback: "Allow certain third party depositors to deposit assets freely")
       /// Deny all
       public static let denyAll = L10n.tr("Localizable", "accountSettings_thirdPartyDeposits_denyAll", fallback: "Deny all")
       /// Deny all third-party deposits
       public static let denyAllSubtitle = L10n.tr("Localizable", "accountSettings_thirdPartyDeposits_denyAllSubtitle", fallback: "Deny all third-party deposits")
       /// This account will not be able to receive "air drops" or be used by a trusted contact to assist with account recovery.
       public static let denyAllWarning = L10n.tr("Localizable", "accountSettings_thirdPartyDeposits_denyAllWarning", fallback: "This account will not be able to receive \"air drops\" or be used by a trusted contact to assist with account recovery.")
+      /// Discard Changes
+      public static let discardChanges = L10n.tr("Localizable", "accountSettings_thirdPartyDeposits_discardChanges", fallback: "Discard Changes")
+      /// Are you sure you want to discard changes?
+      public static let discardMessage = L10n.tr("Localizable", "accountSettings_thirdPartyDeposits_discardMessage", fallback: "Are you sure you want to discard changes?")
+      /// Keep Editing
+      public static let keepEditing = L10n.tr("Localizable", "accountSettings_thirdPartyDeposits_keepEditing", fallback: "Keep Editing")
       /// Only accept known
       public static let onlyKnown = L10n.tr("Localizable", "accountSettings_thirdPartyDeposits_onlyKnown", fallback: "Only accept known")
       /// Allow third-parties to deposit only assets this Account already holds
@@ -231,11 +291,35 @@ public enum L10n {
     public static let noLastBackUp = L10n.tr("Localizable", "androidProfileBackup_noLastBackUp", fallback: "Not backed up yet")
     /// Open System Backup Settings
     public static let openSystemBackupSettings = L10n.tr("Localizable", "androidProfileBackup_openSystemBackupSettings", fallback: "Open System Backup Settings")
+    public enum AutomaticBackups {
+      /// Disable Backup
+      public static let disable = L10n.tr("Localizable", "androidProfileBackup_automaticBackups_disable", fallback: "Disable Backup")
+      /// Enable Backup
+      public static let enable = L10n.tr("Localizable", "androidProfileBackup_automaticBackups_enable", fallback: "Enable Backup")
+      /// Periodic system backups
+      public static let subtitle = L10n.tr("Localizable", "androidProfileBackup_automaticBackups_subtitle", fallback: "Periodic system backups")
+    }
     public enum BackupWalletData {
       /// Warning: If disabled you might lose access to your Accounts and Personas.
       public static let message = L10n.tr("Localizable", "androidProfileBackup_backupWalletData_message", fallback: "Warning: If disabled you might lose access to your Accounts and Personas.")
       /// Backup Wallet Data
       public static let title = L10n.tr("Localizable", "androidProfileBackup_backupWalletData_title", fallback: "Backup Wallet Data")
+    }
+    public enum DeleteWallet {
+      /// Delete Wallet
+      public static let confirmButton = L10n.tr("Localizable", "androidProfileBackup_deleteWallet_confirmButton", fallback: "Delete Wallet")
+      /// You may delete your wallet. This will clear the Radix Wallet app, clears its contents, and delete any cloud backup.
+      /// 
+      /// **Access to any Accounts or Personas will be permanently lost unless you have a manual backup file.**
+      public static let subtitle = L10n.tr("Localizable", "androidProfileBackup_deleteWallet_subtitle", fallback: "You may delete your wallet. This will clear the Radix Wallet app, clears its contents, and delete any cloud backup.\n\n**Access to any Accounts or Personas will be permanently lost unless you have a manual backup file.**")
+    }
+  }
+  public enum AndroidRecoverProfileBackup {
+    /// No wallet backups available
+    public static let noBackupsAvailable = L10n.tr("Localizable", "androidRecoverProfileBackup_noBackupsAvailable", fallback: "No wallet backups available")
+    public enum Choose {
+      /// Choose a backup
+      public static let title = L10n.tr("Localizable", "androidRecoverProfileBackup_choose_title", fallback: "Choose a backup")
     }
   }
   public enum AppSettings {
@@ -326,6 +410,12 @@ public enum L10n {
       public static let noBadges = L10n.tr("Localizable", "assetDetails_badgeDetails_noBadges", fallback: "You have no badges")
       /// What are badges?
       public static let whatAreBadges = L10n.tr("Localizable", "assetDetails_badgeDetails_whatAreBadges", fallback: "What are badges?")
+    }
+    public enum Behaviors {
+      /// Anyone can freeze this asset in place.
+      public static let canBeFrozeInFutureByAnyone = L10n.tr("Localizable", "assetDetails_behaviors_canBeFrozeInFutureByAnyone", fallback: "Anyone can freeze this asset in place.")
+      /// A third party can freeze this asset in place.
+      public static let canFreezeInFuture = L10n.tr("Localizable", "assetDetails_behaviors_canFreezeInFuture", fallback: "A third party can freeze this asset in place.")
     }
     public enum HideAsset {
       /// Hide Asset
@@ -510,6 +600,10 @@ public enum L10n {
     public enum DeviceNotSecureAlert {
       /// Do you want to continue?
       public static let message = L10n.tr("Localizable", "biometrics_deviceNotSecureAlert_message", fallback: "Do you want to continue?")
+      /// Open Settings
+      public static let openSettings = L10n.tr("Localizable", "biometrics_deviceNotSecureAlert_openSettings", fallback: "Open Settings")
+      /// Quit
+      public static let quit = L10n.tr("Localizable", "biometrics_deviceNotSecureAlert_quit", fallback: "Quit")
       /// Your device is not secured
       public static let title = L10n.tr("Localizable", "biometrics_deviceNotSecureAlert_title", fallback: "Your device is not secured")
     }
@@ -712,9 +806,9 @@ public enum L10n {
       }
       /// 1 account
       public static let numberOfAccountsExactlyOne = L10n.tr("Localizable", "dAppRequest_accountPermission_numberOfAccountsExactlyOne", fallback: "1 account")
-      /// *%@* is requesting permission to *always* be able to view Account information when you login with this Persona.
+      /// **%@** is requesting permission to **always** be able to view Account information when you login with this Persona.
       public static func subtitle(_ p1: Any) -> String {
-        return L10n.tr("Localizable", "dAppRequest_accountPermission_subtitle", String(describing: p1), fallback: "*%@* is requesting permission to *always* be able to view Account information when you login with this Persona.")
+        return L10n.tr("Localizable", "dAppRequest_accountPermission_subtitle", String(describing: p1), fallback: "**%@** is requesting permission to **always** be able to view Account information when you login with this Persona.")
       }
       /// Account Permission
       public static let title = L10n.tr("Localizable", "dAppRequest_accountPermission_title", fallback: "Account Permission")
@@ -736,49 +830,49 @@ public enum L10n {
       public static let verificationErrorTitle = L10n.tr("Localizable", "dAppRequest_chooseAccounts_verificationErrorTitle", fallback: "DApp error")
     }
     public enum ChooseAccountsOneTime {
-      /// *%@* is making a one-time request for at least %d accounts.
+      /// **%@** is making a one-time request for at least %d accounts.
       public static func subtitleAtLeast(_ p1: Any, _ p2: Int) -> String {
-        return L10n.tr("Localizable", "dAppRequest_chooseAccountsOneTime_subtitleAtLeast", String(describing: p1), p2, fallback: "*%@* is making a one-time request for at least %d accounts.")
+        return L10n.tr("Localizable", "dAppRequest_chooseAccountsOneTime_subtitleAtLeast", String(describing: p1), p2, fallback: "**%@** is making a one-time request for at least %d accounts.")
       }
-      /// *%@* is making a one-time request for at least 1 account.
+      /// **%@** is making a one-time request for at least 1 account.
       public static func subtitleAtLeastOne(_ p1: Any) -> String {
-        return L10n.tr("Localizable", "dAppRequest_chooseAccountsOneTime_subtitleAtLeastOne", String(describing: p1), fallback: "*%@* is making a one-time request for at least 1 account.")
+        return L10n.tr("Localizable", "dAppRequest_chooseAccountsOneTime_subtitleAtLeastOne", String(describing: p1), fallback: "**%@** is making a one-time request for at least 1 account.")
       }
-      /// *%@* is making a one-time request for any number of accounts.
+      /// **%@** is making a one-time request for any number of accounts.
       public static func subtitleAtLeastZero(_ p1: Any) -> String {
-        return L10n.tr("Localizable", "dAppRequest_chooseAccountsOneTime_subtitleAtLeastZero", String(describing: p1), fallback: "*%@* is making a one-time request for any number of accounts.")
+        return L10n.tr("Localizable", "dAppRequest_chooseAccountsOneTime_subtitleAtLeastZero", String(describing: p1), fallback: "**%@** is making a one-time request for any number of accounts.")
       }
-      /// *%@* is making a one-time request for at least %d accounts.
+      /// **%@** is making a one-time request for at least %d accounts.
       public static func subtitleExactly(_ p1: Any, _ p2: Int) -> String {
-        return L10n.tr("Localizable", "dAppRequest_chooseAccountsOneTime_subtitleExactly", String(describing: p1), p2, fallback: "*%@* is making a one-time request for at least %d accounts.")
+        return L10n.tr("Localizable", "dAppRequest_chooseAccountsOneTime_subtitleExactly", String(describing: p1), p2, fallback: "**%@** is making a one-time request for at least %d accounts.")
       }
-      /// *%@* is making a one-time request for 1 account.
+      /// **%@** is making a one-time request for 1 account.
       public static func subtitleExactlyOne(_ p1: Any) -> String {
-        return L10n.tr("Localizable", "dAppRequest_chooseAccountsOneTime_subtitleExactlyOne", String(describing: p1), fallback: "*%@* is making a one-time request for 1 account.")
+        return L10n.tr("Localizable", "dAppRequest_chooseAccountsOneTime_subtitleExactlyOne", String(describing: p1), fallback: "**%@** is making a one-time request for 1 account.")
       }
       /// Account Request
       public static let title = L10n.tr("Localizable", "dAppRequest_chooseAccountsOneTime_title", fallback: "Account Request")
     }
     public enum ChooseAccountsOngoing {
-      /// Choose at least %d accounts you wish to use with *%@*.
+      /// Choose at least %d accounts you wish to use with **%@**.
       public static func subtitleAtLeast(_ p1: Int, _ p2: Any) -> String {
-        return L10n.tr("Localizable", "dAppRequest_chooseAccountsOngoing_subtitleAtLeast", p1, String(describing: p2), fallback: "Choose at least %d accounts you wish to use with *%@*.")
+        return L10n.tr("Localizable", "dAppRequest_chooseAccountsOngoing_subtitleAtLeast", p1, String(describing: p2), fallback: "Choose at least %d accounts you wish to use with **%@**.")
       }
-      /// Choose at least 1 account you wish to use with *%@*.
+      /// Choose at least 1 account you wish to use with **%@**.
       public static func subtitleAtLeastOne(_ p1: Any) -> String {
-        return L10n.tr("Localizable", "dAppRequest_chooseAccountsOngoing_subtitleAtLeastOne", String(describing: p1), fallback: "Choose at least 1 account you wish to use with *%@*.")
+        return L10n.tr("Localizable", "dAppRequest_chooseAccountsOngoing_subtitleAtLeastOne", String(describing: p1), fallback: "Choose at least 1 account you wish to use with **%@**.")
       }
-      /// Choose any accounts you wish to use with *%@*.
+      /// Choose any accounts you wish to use with **%@**.
       public static func subtitleAtLeastZero(_ p1: Any) -> String {
-        return L10n.tr("Localizable", "dAppRequest_chooseAccountsOngoing_subtitleAtLeastZero", String(describing: p1), fallback: "Choose any accounts you wish to use with *%@*.")
+        return L10n.tr("Localizable", "dAppRequest_chooseAccountsOngoing_subtitleAtLeastZero", String(describing: p1), fallback: "Choose any accounts you wish to use with **%@**.")
       }
-      /// Choose %d accounts you wish to use with *%@*.
+      /// Choose %d accounts you wish to use with **%@**.
       public static func subtitleExactly(_ p1: Int, _ p2: Any) -> String {
-        return L10n.tr("Localizable", "dAppRequest_chooseAccountsOngoing_subtitleExactly", p1, String(describing: p2), fallback: "Choose %d accounts you wish to use with *%@*.")
+        return L10n.tr("Localizable", "dAppRequest_chooseAccountsOngoing_subtitleExactly", p1, String(describing: p2), fallback: "Choose %d accounts you wish to use with **%@**.")
       }
-      /// Choose 1 account you wish to use with *%@*.
+      /// Choose 1 account you wish to use with **%@**.
       public static func subtitleExactlyOne(_ p1: Any) -> String {
-        return L10n.tr("Localizable", "dAppRequest_chooseAccountsOngoing_subtitleExactlyOne", String(describing: p1), fallback: "Choose 1 account you wish to use with *%@*.")
+        return L10n.tr("Localizable", "dAppRequest_chooseAccountsOngoing_subtitleExactlyOne", String(describing: p1), fallback: "Choose 1 account you wish to use with **%@**.")
       }
       /// Account Permission
       public static let title = L10n.tr("Localizable", "dAppRequest_chooseAccountsOngoing_title", fallback: "Account Permission")
@@ -804,9 +898,9 @@ public enum L10n {
       public static func subtitleKnownDapp(_ p1: Any) -> String {
         return L10n.tr("Localizable", "dAppRequest_login_subtitleKnownDapp", String(describing: p1), fallback: "%@ is requesting that you login with a Persona.")
       }
-      /// %@ is requesting that you login for the *first time* with a Persona.
+      /// %@ is requesting that you login for the **first time** with a Persona.
       public static func subtitleNewDapp(_ p1: Any) -> String {
-        return L10n.tr("Localizable", "dAppRequest_login_subtitleNewDapp", String(describing: p1), fallback: "%@ is requesting that you login for the *first time* with a Persona.")
+        return L10n.tr("Localizable", "dAppRequest_login_subtitleNewDapp", String(describing: p1), fallback: "%@ is requesting that you login for the **first time** with a Persona.")
       }
       /// Login Request
       public static let titleKnownDapp = L10n.tr("Localizable", "dAppRequest_login_titleKnownDapp", fallback: "Login Request")
@@ -832,9 +926,9 @@ public enum L10n {
       public static let chooseDataToProvide = L10n.tr("Localizable", "dAppRequest_personalDataOneTime_chooseDataToProvide", fallback: "Choose the data to provide")
       /// Continue
       public static let `continue` = L10n.tr("Localizable", "dAppRequest_personalDataOneTime_continue", fallback: "Continue")
-      /// *%@* is requesting that you provide some pieces of personal data *just one time*
+      /// **%@** is requesting that you provide some pieces of personal data **just one time**
       public static func subtitle(_ p1: Any) -> String {
-        return L10n.tr("Localizable", "dAppRequest_personalDataOneTime_subtitle", String(describing: p1), fallback: "*%@* is requesting that you provide some pieces of personal data *just one time*")
+        return L10n.tr("Localizable", "dAppRequest_personalDataOneTime_subtitle", String(describing: p1), fallback: "**%@** is requesting that you provide some pieces of personal data **just one time**")
       }
       /// One-Time Data Request
       public static let title = L10n.tr("Localizable", "dAppRequest_personalDataOneTime_title", fallback: "One-Time Data Request")
@@ -842,9 +936,9 @@ public enum L10n {
     public enum PersonalDataPermission {
       /// Continue
       public static let `continue` = L10n.tr("Localizable", "dAppRequest_personalDataPermission_continue", fallback: "Continue")
-      /// *%@* is requesting permission to *always* be able to view the following personal data when you login with this Persona.
+      /// **%@** is requesting permission to **always** be able to view the following personal data when you login with this Persona.
       public static func subtitle(_ p1: Any) -> String {
-        return L10n.tr("Localizable", "dAppRequest_personalDataPermission_subtitle", String(describing: p1), fallback: "*%@* is requesting permission to *always* be able to view the following personal data when you login with this Persona.")
+        return L10n.tr("Localizable", "dAppRequest_personalDataPermission_subtitle", String(describing: p1), fallback: "**%@** is requesting permission to **always** be able to view the following personal data when you login with this Persona.")
       }
       /// Personal Data Permission
       public static let title = L10n.tr("Localizable", "dAppRequest_personalDataPermission_title", fallback: "Personal Data Permission")
@@ -929,6 +1023,16 @@ public enum L10n {
         return L10n.tr("Localizable", "displayMnemonics_connectedAccountsLabel_one", p1, fallback: "Connected to %d account")
       }
     }
+    public enum ConnectedAccountsPersonasLabel {
+      /// Connected to Personas and to %d accounts
+      public static func many(_ p1: Int) -> String {
+        return L10n.tr("Localizable", "displayMnemonics_connectedAccountsPersonasLabel_many", p1, fallback: "Connected to Personas and to %d accounts")
+      }
+      /// Connected to Personas and %d account
+      public static func one(_ p1: Int) -> String {
+        return L10n.tr("Localizable", "displayMnemonics_connectedAccountsPersonasLabel_one", p1, fallback: "Connected to Personas and %d account")
+      }
+    }
   }
   public enum EditPersona {
     /// Add a Field
@@ -960,6 +1064,32 @@ public enum L10n {
       public static let invalidEmailAddress = L10n.tr("Localizable", "editPersona_error_invalidEmailAddress", fallback: "Invalid email address")
       /// Required field for this dApp
       public static let requiredByDapp = L10n.tr("Localizable", "editPersona_error_requiredByDapp", fallback: "Required field for this dApp")
+    }
+  }
+  public enum EncryptProfileBackup {
+    public enum ConfirmPasswordField {
+      /// Passwords do not match
+      public static let error = L10n.tr("Localizable", "encryptProfileBackup_confirmPasswordField_error", fallback: "Passwords do not match")
+      /// Confirm password
+      public static let placeholder = L10n.tr("Localizable", "encryptProfileBackup_confirmPasswordField_placeholder", fallback: "Confirm password")
+    }
+    public enum EnterPasswordField {
+      /// Enter password
+      public static let placeholder = L10n.tr("Localizable", "encryptProfileBackup_enterPasswordField_placeholder", fallback: "Enter password")
+    }
+    public enum Header {
+      /// Enter a password to encrypt this wallet backup file. You will be required to enter this password when recovering your Wallet from this file.
+      public static let subtitle = L10n.tr("Localizable", "encryptProfileBackup_header_subtitle", fallback: "Enter a password to encrypt this wallet backup file. You will be required to enter this password when recovering your Wallet from this file.")
+      /// Encrypt Wallet Backup File
+      public static let title = L10n.tr("Localizable", "encryptProfileBackup_header_title", fallback: "Encrypt Wallet Backup File")
+    }
+  }
+  public enum EnterSeedPhrase {
+    /// For your safety, make sure no one is looking at your screen. Never give your seed phrase to anyone for any reason.
+    public static let warning = L10n.tr("Localizable", "enterSeedPhrase_warning", fallback: "For your safety, make sure no one is looking at your screen. Never give your seed phrase to anyone for any reason.")
+    public enum Header {
+      /// Enter Seed Phrase
+      public static let title = L10n.tr("Localizable", "enterSeedPhrase_header_title", fallback: "Enter Seed Phrase")
     }
   }
   public enum Error {
@@ -1041,14 +1171,16 @@ public enum L10n {
     }
   }
   public enum HomePage {
-    /// Please back up your seed phrase
-    public static let applySecuritySettings = L10n.tr("Localizable", "homePage_applySecuritySettings", fallback: "Please back up your seed phrase")
     /// I have backed up this seed phrase
     public static let backedUpMnemonicHeading = L10n.tr("Localizable", "homePage_backedUpMnemonicHeading", fallback: "I have backed up this seed phrase")
     /// Create a New Account
     public static let createNewAccount = L10n.tr("Localizable", "homePage_createNewAccount", fallback: "Create a New Account")
     /// Legacy
     public static let legacyAccountHeading = L10n.tr("Localizable", "homePage_legacyAccountHeading", fallback: "Legacy")
+    /// Please back up your seed phrase
+    public static let securityPromptBackup = L10n.tr("Localizable", "homePage_securityPromptBackup", fallback: "Please back up your seed phrase")
+    /// Please recover your seed phrase
+    public static let securityPromptRecover = L10n.tr("Localizable", "homePage_securityPromptRecover", fallback: "Please recover your seed phrase")
     /// Welcome. Here are all your Accounts on the Radix Network.
     public static let subtitle = L10n.tr("Localizable", "homePage_subtitle", fallback: "Welcome. Here are all your Accounts on the Radix Network.")
     /// Radix Wallet
@@ -1115,11 +1247,35 @@ public enum L10n {
     }
     /// Use iCloud Backup Data
     public static let useICloudBackup = L10n.tr("Localizable", "iOSProfileBackup_useICloudBackup", fallback: "Use iCloud Backup Data")
+    public enum AutomaticBackups {
+      /// Disable Backup to iCloud
+      public static let disable = L10n.tr("Localizable", "iOSProfileBackup_automaticBackups_disable", fallback: "Disable Backup to iCloud")
+      /// Enable Backup to iCloud
+      public static let enable = L10n.tr("Localizable", "iOSProfileBackup_automaticBackups_enable", fallback: "Enable Backup to iCloud")
+      /// Automatic continuous backups
+      public static let subtitle = L10n.tr("Localizable", "iOSProfileBackup_automaticBackups_subtitle", fallback: "Automatic continuous backups")
+    }
+    public enum DeleteWallet {
+      /// Delete Wallet and iCloud Backup
+      public static let confirmButton = L10n.tr("Localizable", "iOSProfileBackup_deleteWallet_confirmButton", fallback: "Delete Wallet and iCloud Backup")
+      /// You may delete your wallet. This will clear the Radix Wallet app, clears its contents, and delete any iCloud backup.
+      /// 
+      /// **Access to any Accounts or Personas will be permanently lost unless you have a manual backup file.**
+      public static let subtitle = L10n.tr("Localizable", "iOSProfileBackup_deleteWallet_subtitle", fallback: "You may delete your wallet. This will clear the Radix Wallet app, clears its contents, and delete any iCloud backup.\n\n**Access to any Accounts or Personas will be permanently lost unless you have a manual backup file.**")
+    }
     public enum ProfileSync {
       /// Warning: If disabled you might lose access to your Accounts and Personas.
       public static let subtitle = L10n.tr("Localizable", "iOSProfileBackup_profileSync_subtitle", fallback: "Warning: If disabled you might lose access to your Accounts and Personas.")
       /// Sync Wallet Data to iCloud
       public static let title = L10n.tr("Localizable", "iOSProfileBackup_profileSync_title", fallback: "Sync Wallet Data to iCloud")
+    }
+  }
+  public enum IOSRecoverProfileBackup {
+    /// No wallet backups available on current iCloud account
+    public static let noBackupsAvailable = L10n.tr("Localizable", "iOSRecoverProfileBackup_noBackupsAvailable", fallback: "No wallet backups available on current iCloud account")
+    public enum Choose {
+      /// Choose a backup on iCloud
+      public static let title = L10n.tr("Localizable", "iOSRecoverProfileBackup_choose_title", fallback: "Choose a backup on iCloud")
     }
   }
   public enum ImportMnemonic {
@@ -1396,6 +1552,102 @@ public enum L10n {
     /// What is a Persona?
     public static let whatIsPersona = L10n.tr("Localizable", "personas_whatIsPersona", fallback: "What is a Persona?")
   }
+  public enum ProfileBackup {
+    /// Backing up your wallet ensures that you can  recover access to your Accounts, Personas, and wallet settings on a new phone by re-entering your seed phrase(s).
+    /// 
+    /// **For security, backups do not contain any seed phrases or private keys. You must write them down separately.**
+    public static let headerTitle = L10n.tr("Localizable", "profileBackup_headerTitle", fallback: "Backing up your wallet ensures that you can  recover access to your Accounts, Personas, and wallet settings on a new phone by re-entering your seed phrase(s).\n\n**For security, backups do not contain any seed phrases or private keys. You must write them down separately.**")
+    public enum AutomaticBackups {
+      /// Automatic Backups (recommended)
+      public static let title = L10n.tr("Localizable", "profileBackup_automaticBackups_title", fallback: "Automatic Backups (recommended)")
+    }
+    public enum DeleteWallet {
+      /// Delete Wallet
+      public static let title = L10n.tr("Localizable", "profileBackup_deleteWallet_title", fallback: "Delete Wallet")
+    }
+    public enum DeleteWalletDialog {
+      /// Delete Wallet
+      public static let confirm = L10n.tr("Localizable", "profileBackup_deleteWalletDialog_confirm", fallback: "Delete Wallet")
+      /// WARNING. This will clear all contents of your Wallet. If you have no backup, you will lose access to your Accounts and Personas permanently.
+      public static let message = L10n.tr("Localizable", "profileBackup_deleteWalletDialog_message", fallback: "WARNING. This will clear all contents of your Wallet. If you have no backup, you will lose access to your Accounts and Personas permanently.")
+    }
+    public enum ManualBackups {
+      /// Confirm password
+      public static let confirmPasswordPlaceholder = L10n.tr("Localizable", "profileBackup_manualBackups_confirmPasswordPlaceholder", fallback: "Confirm password")
+      /// Yes
+      public static let encryptBackupDialogConfirm = L10n.tr("Localizable", "profileBackup_manualBackups_encryptBackupDialogConfirm", fallback: "Yes")
+      /// No
+      public static let encryptBackupDialogDeny = L10n.tr("Localizable", "profileBackup_manualBackups_encryptBackupDialogDeny", fallback: "No")
+      /// Encrypt this backup with a password?
+      public static let encryptBackupDialogTitle = L10n.tr("Localizable", "profileBackup_manualBackups_encryptBackupDialogTitle", fallback: "Encrypt this backup with a password?")
+      /// Enter a password to encrypt this wallet backup file. You will be required to enter this password when recovering your Wallet from this file.
+      public static let encryptBackupSubtitle = L10n.tr("Localizable", "profileBackup_manualBackups_encryptBackupSubtitle", fallback: "Enter a password to encrypt this wallet backup file. You will be required to enter this password when recovering your Wallet from this file.")
+      /// Encrypt Wallet Backup File
+      public static let encryptBackupTitle = L10n.tr("Localizable", "profileBackup_manualBackups_encryptBackupTitle", fallback: "Encrypt Wallet Backup File")
+      /// Enter password
+      public static let enterPasswordPlaceholder = L10n.tr("Localizable", "profileBackup_manualBackups_enterPasswordPlaceholder", fallback: "Enter password")
+      /// Export Wallet Backup File
+      public static let exportButtonTitle = L10n.tr("Localizable", "profileBackup_manualBackups_exportButtonTitle", fallback: "Export Wallet Backup File")
+      /// Passwords do not match
+      public static let passwordsMissmatchError = L10n.tr("Localizable", "profileBackup_manualBackups_passwordsMissmatchError", fallback: "Passwords do not match")
+      /// A manually exported wallet backup file may also be used for recovery, along with your seed phrase(s).
+      /// 
+      /// Only the **current configuration** of your wallet is backed up with each manual export.
+      public static let subtitle = L10n.tr("Localizable", "profileBackup_manualBackups_subtitle", fallback: "A manually exported wallet backup file may also be used for recovery, along with your seed phrase(s).\n\nOnly the **current configuration** of your wallet is backed up with each manual export.")
+      /// Exported wallet backup file
+      public static let successMessage = L10n.tr("Localizable", "profileBackup_manualBackups_successMessage", fallback: "Exported wallet backup file")
+      /// Manual Backups
+      public static let title = L10n.tr("Localizable", "profileBackup_manualBackups_title", fallback: "Manual Backups")
+    }
+  }
+  public enum RecoverProfileBackup {
+    /// **Backup from:** %@
+    public static func backupFrom(_ p1: Any) -> String {
+      return L10n.tr("Localizable", "recoverProfileBackup_backupFrom", String(describing: p1), fallback: "**Backup from:** %@")
+    }
+    /// Incompatible Wallet data
+    public static let incompatibleWalletDataLabel = L10n.tr("Localizable", "recoverProfileBackup_incompatibleWalletDataLabel", fallback: "Incompatible Wallet data")
+    /// **Last modified:** %@
+    public static func lastModified(_ p1: Any) -> String {
+      return L10n.tr("Localizable", "recoverProfileBackup_lastModified", String(describing: p1), fallback: "**Last modified:** %@")
+    }
+    /// **Number of accounts:** %d
+    public static func numberOfAccounts(_ p1: Int) -> String {
+      return L10n.tr("Localizable", "recoverProfileBackup_numberOfAccounts", p1, fallback: "**Number of accounts:** %d")
+    }
+    /// **Number of personas:** %d
+    public static func numberOfPersonas(_ p1: Int) -> String {
+      return L10n.tr("Localizable", "recoverProfileBackup_numberOfPersonas", p1, fallback: "**Number of personas:** %d")
+    }
+    /// The password is wrong
+    public static let passwordWrong = L10n.tr("Localizable", "recoverProfileBackup_passwordWrong", fallback: "The password is wrong")
+    public enum Header {
+      /// Select a backup to recover your Radix Wallet. You will be asked to enter your seed phrase(s) to recover control of your Accounts and Personas.
+      public static let subtitle = L10n.tr("Localizable", "recoverProfileBackup_header_subtitle", fallback: "Select a backup to recover your Radix Wallet. You will be asked to enter your seed phrase(s) to recover control of your Accounts and Personas.")
+      /// Recover Wallet From Backup
+      public static let title = L10n.tr("Localizable", "recoverProfileBackup_header_title", fallback: "Recover Wallet From Backup")
+    }
+    public enum ImportFileButton {
+      /// Import from Backup File Instead
+      public static let title = L10n.tr("Localizable", "recoverProfileBackup_importFileButton_title", fallback: "Import from Backup File Instead")
+    }
+  }
+  public enum RecoverSeedPhrase {
+    /// Enter This Seed Phrase
+    public static let enterButton = L10n.tr("Localizable", "recoverSeedPhrase_enterButton", fallback: "Enter This Seed Phrase")
+    /// Skip This Seed Phrase For Now
+    public static let skipButton = L10n.tr("Localizable", "recoverSeedPhrase_skipButton", fallback: "Skip This Seed Phrase For Now")
+    public enum Header {
+      /// Your **Personas** and the following **Accounts** are controlled by your main seed phrase. To recover control, you must re-enter it.
+      public static let subtitleMainSeedPhrase = L10n.tr("Localizable", "recoverSeedPhrase_header_subtitleMainSeedPhrase", fallback: "Your **Personas** and the following **Accounts** are controlled by your main seed phrase. To recover control, you must re-enter it.")
+      /// The following **Accounts** are controlled by a seed phrase. To recover control, you must re-enter it.
+      public static let subtitleOtherSeedPhrase = L10n.tr("Localizable", "recoverSeedPhrase_header_subtitleOtherSeedPhrase", fallback: "The following **Accounts** are controlled by a seed phrase. To recover control, you must re-enter it.")
+      /// Main Seed Phrase Required
+      public static let titleMain = L10n.tr("Localizable", "recoverSeedPhrase_header_titleMain", fallback: "Main Seed Phrase Required")
+      /// Seed Phrase Required
+      public static let titleOther = L10n.tr("Localizable", "recoverSeedPhrase_header_titleOther", fallback: "Seed Phrase Required")
+    }
+  }
   public enum RevealSeedPhrase {
     /// Passphrase
     public static let passphrase = L10n.tr("Localizable", "revealSeedPhrase_passphrase", fallback: "Passphrase")
@@ -1612,6 +1864,8 @@ public enum L10n {
       public static let padding = L10n.tr("Localizable", "transactionReview_customizeNetworkFeeSheet_padding", fallback: "Padding")
       /// Adjust Fee Padding Amount (XRD)
       public static let paddingFieldLabel = L10n.tr("Localizable", "transactionReview_customizeNetworkFeeSheet_paddingFieldLabel", fallback: "Adjust Fee Padding Amount (XRD)")
+      /// Paid by dApps
+      public static let paidByDApps = L10n.tr("Localizable", "transactionReview_customizeNetworkFeeSheet_paidByDApps", fallback: "Paid by dApps")
       /// Pay fee from
       public static let payFeeFrom = L10n.tr("Localizable", "transactionReview_customizeNetworkFeeSheet_payFeeFrom", fallback: "Pay fee from")
       /// Royalties

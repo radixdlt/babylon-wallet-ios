@@ -209,10 +209,10 @@ extension AlertState<ResourcesList.Destinations.Action.ConfirmDeletionAlert> {
 			TextState(title)
 		} actions: {
 			ButtonState(role: .destructive, action: .confirmTapped(resourceAddress)) {
-				TextState("Remove") // FIXME: Strings
+				TextState(L10n.Common.remove)
 			}
 			ButtonState(role: .cancel, action: .cancelTapped) {
-				TextState("Cancel") // FIXME: Strings
+				TextState(L10n.Common.cancel)
 			}
 		} message: {
 			TextState(message)
@@ -235,18 +235,18 @@ extension ResourcesListMode {
 	var removeTitle: String {
 		switch self {
 		case .allowDenyAssets:
-			return "Remove Asset" // FIXME: Strings
+			return L10n.AccountSettings.SpecificAssetsDeposits.removeAsset
 		case .allowDepositors:
-			return "Remove Depositor Badge" // FIXME: Strings
+			return L10n.AccountSettings.SpecificAssetsDeposits.removeDepositor
 		}
 	}
 
 	var removeConfirmationMessage: String {
 		switch self {
 		case .allowDenyAssets(.allow):
-			return "The asset will be removed from the allow list" // FIXME: Strings
+			return L10n.AccountSettings.SpecificAssetsDeposits.removeAssetMessageAllow
 		case .allowDenyAssets(.deny):
-			return "The asset will be removed from the deny list" // FIXME: Strings
+			return L10n.AccountSettings.SpecificAssetsDeposits.removeAssetMessageDeny
 		case .allowDepositors:
 			return "The badge will be removed from the list" // FIXME: Strings
 		}

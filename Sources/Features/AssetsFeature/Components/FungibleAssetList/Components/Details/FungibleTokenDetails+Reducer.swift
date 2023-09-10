@@ -5,10 +5,17 @@ public struct FungibleTokenDetails: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		let resource: AccountPortfolio.FungibleResource
 		let isXRD: Bool
+		let context: Context
 
-		public init(resource: AccountPortfolio.FungibleResource, isXRD: Bool) {
+		public init(resource: AccountPortfolio.FungibleResource, isXRD: Bool, context: Context) {
 			self.resource = resource
 			self.isXRD = isXRD
+			self.context = context
+		}
+
+		public enum Context: Equatable, Sendable {
+			case transfer
+			case portfolio
 		}
 	}
 

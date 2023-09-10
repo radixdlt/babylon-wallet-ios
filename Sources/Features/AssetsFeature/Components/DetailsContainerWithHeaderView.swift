@@ -4,7 +4,7 @@ import SwiftUI
 // MARK: - DetailsContainerWithHeaderViewState
 struct DetailsContainerWithHeaderViewState: Equatable {
 	let title: String
-	let amount: String
+	let amount: String?
 	let symbol: String?
 }
 
@@ -61,11 +61,13 @@ struct DetailsContainerWithHeaderView<ThumbnailView: View, DetailsView: View>: V
 		VStack(spacing: .medium3) {
 			thumbnailView
 
-			Text(viewState.amount)
-				.font(.app.sheetTitle)
-				.kerning(-0.5)
-				+ Text((viewState.symbol).map { " " + $0 } ?? "")
-				.font(.app.sectionHeader)
+			if let amount = viewState.amount {
+				Text(amount)
+					.font(.app.sheetTitle)
+					.kerning(-0.5)
+					+ Text((viewState.symbol).map { " " + $0 } ?? "")
+					.font(.app.sectionHeader)
+			}
 		}
 		.padding(.vertical, .small2)
 	}

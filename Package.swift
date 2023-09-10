@@ -22,6 +22,10 @@ package.addModules([
 			"AssetTransferFeature",
 			"AccountPortfoliosClient",
 			"AssetsFeature",
+			"ImportMnemonicFeature",
+			"ProfileBackupsFeature",
+			"BackupsClient",
+			"NetworkSwitchingClient",
 		],
 		tests: .yes()
 	),
@@ -30,6 +34,7 @@ package.addModules([
 		dependencies: [
 			"AccountPortfoliosClient",
 			"FactorSourcesClient", // check if `device` or `ledger` controlled for security prompting
+			"AccountDetailsFeature", // "shield buttons"
 		],
 		tests: .no
 	),
@@ -40,6 +45,7 @@ package.addModules([
 			"AccountPortfoliosClient",
 			"CreateAuthKeyFeature",
 			"ShowQRFeature",
+			"GatewaysClient",
 			"OverlayWindowClient",
 			"OnLedgerEntitiesClient",
 			"DappInteractionClient",
@@ -84,6 +90,9 @@ package.addModules([
 			"MainFeature",
 			"OnboardingFeature",
 			"OverlayWindowClient",
+			"CreateAccountFeature",
+			"NetworkSwitchingClient",
+			"GatewaysClient",
 			"SplashFeature",
 		],
 		tests: .yes()
@@ -245,6 +254,8 @@ package.addModules([
 			"AccountsClient",
 			"AppPreferencesClient",
 			"CreateAccountFeature",
+			"ImportMnemonicFeature",
+			"ProfileBackupsFeature", // actually only ImportMnemonicsFlowCoodinator, might split it out in future
 		],
 		tests: .yes()
 	),
@@ -391,26 +402,27 @@ package.addModules([
 		dependencies: [
 			"AccountsClient",
 			"AddLedgerFactorSourceFeature",
-			"ImportOlympiaLedgerAccountsAndFactorSourcesFeature",
 			"AppPreferencesClient",
 			"AuthorizedDAppsFeature",
 			"CacheClient",
-			"DeviceFactorSourceClient",
 			"DebugInspectProfileFeature",
+			"DeviceFactorSourceClient",
+			"DisplayEntitiesControlledByMnemonicFeature",
+			"EditPersonaFeature",
+			"EngineKit",
+			"FactorSourcesClient", // Check if user has any ledgers
+			"FaucetClient", //  EpochForWhenLastUsedByAccountAddress
 			"GatewayAPI",
 			"GatewaySettingsFeature",
-			"DisplayEntitiesControlledByMnemonicFeature",
 			"ImportMnemonicFeature",
-			"FactorSourcesClient", // Check if user has any ledgers
+			"ImportOlympiaLedgerAccountsAndFactorSourcesFeature",
 			"ImportLegacyWalletClient",
 			"P2PLinksFeature",
 			"PersonasFeature",
 			"RadixConnectClient",
+			"ProfileBackupsFeature",
 			"ScanQRFeature",
 			"SecurityStructureConfigurationListFeature",
-			"EditPersonaFeature",
-			"ProfileBackupsFeature",
-			"EngineKit",
 		],
 		tests: .yes()
 	),
@@ -440,6 +452,7 @@ package.addModules([
 			"DeviceFactorSourceClient",
 			"LocalAuthenticationClient",
 			"OnboardingClient",
+			"NetworkSwitchingClient",
 		],
 		tests: .yes()
 	),
@@ -569,6 +582,7 @@ package.addModules([
 			"GatewaysClient",
 			"AppPreferencesClient",
 			"DappInteractionClient",
+			"ROLAClient",
 		],
 		tests: .no
 	),
@@ -877,6 +891,7 @@ package.addModules([
 	.core(
 		name: "DesignSystem",
 		dependencies: [
+			"Prelude",
 			"GatewaysClient",
 			"URLFormatterClient",
 			"QRGeneratorClient",
@@ -980,7 +995,7 @@ package.addModules([
 			"SharedModels",
 			"GatewaysClient",
 			.product(name: "WebRTC", package: "WebRTC") {
-				.package(url: "https://github.com/stasel/WebRTC", from: "110.0.0")
+				.package(url: "https://github.com/stasel/WebRTC", from: "116.0.0")
 			},
 		],
 		tests: .yes()
@@ -1029,7 +1044,7 @@ package.addModules([
 		dependencies: [
 			"Cryptography",
 			.product(name: "EngineToolkit", package: "swift-engine-toolkit") {
-				.package(url: "https://github.com/radixdlt/swift-engine-toolkit", branch: "release/grape")
+				.package(url: "https://github.com/radixdlt/swift-engine-toolkit", exact: "0.12.1-293dd4c")
 			},
 		],
 		tests: .no

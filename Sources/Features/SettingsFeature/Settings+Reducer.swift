@@ -63,7 +63,7 @@ public struct Settings: Sendable, FeatureReducer {
 			case personas(PersonasCoordinator.State)
 			case accountSecurity(AccountSecurity.State)
 			case appSettings(AppSettings.State)
-			case debugSettings(DebugSettings.State)
+			case debugSettings(DebugSettingsCoordinator.State)
 		}
 
 		public enum Action: Sendable, Equatable {
@@ -73,7 +73,7 @@ public struct Settings: Sendable, FeatureReducer {
 			case personas(PersonasCoordinator.Action)
 			case accountSecurity(AccountSecurity.Action)
 			case appSettings(AppSettings.Action)
-			case debugSettings(DebugSettings.Action)
+			case debugSettings(DebugSettingsCoordinator.Action)
 		}
 
 		public var body: some ReducerProtocolOf<Self> {
@@ -94,7 +94,7 @@ public struct Settings: Sendable, FeatureReducer {
 			}
 			#if DEBUG
 			Scope(state: /State.debugSettings, action: /Action.debugSettings) {
-				DebugSettings()
+				DebugSettingsCoordinator()
 			}
 			#endif
 		}

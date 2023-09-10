@@ -12,6 +12,7 @@ extension NonFungibleTokenDetails.State {
 			resourceDetails: .init(
 				description: resource.description,
 				resourceAddress: resource.resourceAddress,
+				isXRD: false,
 				validatorAddress: nil,
 				resourceName: resource.name,
 				currentSupply: nil, // FIXME: Find actual value
@@ -60,16 +61,13 @@ extension NonFungibleTokenDetails {
 						.frame(maxWidth: .infinity, alignment: .leading)
 						.padding(.horizontal, .large2)
 
-						ZStack {
-							Color.app.gray5.edgesIgnoringSafeArea(.bottom)
+						VStack(spacing: .medium1) {
+							NFTThumbnail(viewStore.resourceThumbnail, size: .veryLarge)
 
-							VStack(spacing: .medium1) {
-								NFTThumbnail(viewStore.resourceThumbnail, size: .veryLarge)
-
-								AssetResourceDetailsSection(viewState: viewStore.resourceDetails)
-							}
-							.padding(.vertical, .medium1)
+							AssetResourceDetailsSection(viewState: viewStore.resourceDetails)
 						}
+						.padding(.vertical, .medium1)
+						.background(.app.gray5, ignoresSafeAreaEdges: .bottom)
 					}
 					.padding(.top, .small1)
 				}

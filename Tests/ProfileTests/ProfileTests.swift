@@ -8,7 +8,7 @@ import TestingPrelude
 
 // MARK: - ProfileTests
 final class ProfileTests: TestCase {
-	let gateway = Radix.Gateway.enkinet
+	let gateway = Radix.Gateway.default
 
 	func test_p2p_client_eq() throws {
 		let pw = try ConnectionPassword(.init(.deadbeef32Bytes))
@@ -114,6 +114,7 @@ final class ProfileTests: TestCase {
 		}
 	}
 
+	// FIXME: Rewrite this whole test... which manually populates profile instead of using our production code!
 	func test_generate_profile_snapshot_test_vector() async throws {
 		continueAfterFailure = false
 
@@ -150,7 +151,19 @@ final class ProfileTests: TestCase {
 			)
 
 			let profile = Profile(
-				header: snapshotHeader,
+				header: .init(
+					creatingDevice: device,
+					lastUsedOnDevice: device,
+					id: stableUUID,
+					lastModified: stableDate,
+					// FIXME: we should not hard code these... actually we should rewrite this whole test... which manually populates profile instead of using our production code!
+					contentHint: .init(
+						numberOfAccountsOnAllNetworksInTotal: 3,
+						numberOfPersonasOnAllNetworksInTotal: 2,
+						numberOfNetworks: 1
+					),
+					snapshotVersion: .minimum
+				),
 				deviceFactorSource: babylonFactorSource,
 				appPreferences: .init(gateways: .init(current: gateway))
 			)
@@ -458,6 +471,10 @@ final class ProfileTests: TestCase {
 		)
 
 		let snapshot = profile.snapshot()
+
+		XCTAssertEqual(snapshot.networks.count, snapshot.header.contentHint.numberOfNetworks)
+		XCTAssertEqual(snapshot.header.contentHint.numberOfAccountsOnAllNetworksInTotal, profile.network?.accounts.count)
+		XCTAssertEqual(snapshot.header.contentHint.numberOfPersonasOnAllNetworksInTotal, profile.network?.personas.count)
 		let jsonEncoder = JSONEncoder.iso8601
 		XCTAssertNoThrow(try jsonEncoder.encode(snapshot))
 		// Uncomment the lines below to generate a new test vector
@@ -481,9 +498,9 @@ final class ProfileTests: TestCase {
 			id: .init(uuidString: "BABE1442-3C98-41FF-AFB0-D0F5829B020D")!,
 			lastModified: date,
 			contentHint: .init(
-				numberOfAccountsOnAllNetworksInTotal: 6,
-				numberOfPersonasOnAllNetworksInTotal: 3,
-				numberOfNetworks: 2
+				numberOfAccountsOnAllNetworksInTotal: 3,
+				numberOfPersonasOnAllNetworksInTotal: 2,
+				numberOfNetworks: 1
 			),
 			snapshotVersion: ProfileSnapshot.Header.Version.minimum
 		)
@@ -545,17 +562,17 @@ final class ProfileTests: TestCase {
 		// Account 0
 		XCTAssertEqual(
 			network.accounts[0].publicKey()?.compressedData.hex(),
-			"d992d7ce1965d6cd460e0ca48c310f56dfbfde85fb56fd22cbedf4938bd36a23"
+			"f56e430cad47b779ba9aeda3069beed7080362598e9db31463c0bda03aebf901"
 		)
 
 		XCTAssertEqual(
 			network.accounts[0].authPublicKey()?.compressedData.hex(),
-			"7c0d862503c6662374e131b735d7a1fffc053820a5bc7674515fb24c8d97f25c"
+			"b009d846640efbe214c993898f9bb91db774f3eec07b8b93f73b5eb5671e7c90"
 		)
 
 		XCTAssertEqual(
 			network.accounts[0].address.address,
-			"account_tdx_21_12ya9jylskaa6gdrfr8nvve3pfc6wyhyw7eg83fwlc7fv2w0eanumcd"
+			"account_tdx_e_12ypd8nyhsej537x3am8nnjzsef45ttmua5tf7f8lz2zds78dgg5qzx"
 		)
 
 		XCTAssertEqual(
@@ -571,16 +588,16 @@ final class ProfileTests: TestCase {
 		// Account 1
 		XCTAssertEqual(
 			network.accounts[1].publicKey()?.compressedData.hex(),
-			"daf0fe5b2fde6d1b0811c1096da58b593bc7afd9ae806751a5740b99aae6501c"
+			"410300fb542b9713058bab5bcf44cc423fe8264063c875285ef29bfaefee4c49"
 		)
 		XCTAssertEqual(
 			network.accounts[1].authPublicKey()?.compressedData.hex(),
-			"5cfab91eed77cc5952de5e29d963b15a61925194bb05757b083190cabdf59080"
+			"18ad44b7784117e446bc262d8793fc930cad6c3dbaec153488a473c05cc753ff"
 		)
 
 		XCTAssertEqual(
 			network.accounts[1].address.address,
-			"account_tdx_21_12xg7tf7aup8lrxkvug0vzatntzww0c6jnntyj6yd4eg5920kpxpzvt"
+			"account_tdx_e_1297s57xd0uurnguqga98negg7ffhlp4k9s7sy7w4xrt5dr0t53hny8"
 		)
 
 		XCTAssertEqual(
@@ -606,16 +623,16 @@ final class ProfileTests: TestCase {
 		// Account 2
 		XCTAssertEqual(
 			network.accounts[2].publicKey()?.compressedData.hex(),
-			"0e2dfaaff11aef66a7806d0fc09846b534b436476b3d3ab876d8824aa109dc4b"
+			"e8a91229c7278a716eb29993ec64df52f886b1afa4b9401cd76cac03db29357d"
 		)
 		XCTAssertEqual(
 			network.accounts[2].authPublicKey()?.compressedData.hex(),
-			"1cb848d3487b4cec061535a5ebaa9f83d0fd3ec845917fae372896e454618a9c"
+			"6891f60631cdf1f19ea07b5feff4473ea740c9a5fada93811e5443b8aa96301e"
 		)
 
 		XCTAssertEqual(
 			network.accounts[2].address.address,
-			"account_tdx_21_12yth59wfyl8e4axupym0c96g9heuf5j06lv2lgc2cuapzlmj6alzzn"
+			"account_tdx_e_128vf0zqkezy053hxkfq3g6x8x05mst7lq2q8fqlltm0l2d3tytk848"
 		)
 
 		XCTAssertEqual(
@@ -641,31 +658,31 @@ final class ProfileTests: TestCase {
 		// Persona 0
 		XCTAssertEqual(
 			network.personas[0].publicKey()?.compressedData.hex(),
-			"6372052faa5236121c97267eb800b16164b1082201d51106794e0e004928fb7e"
+			"22b66d9a894d31efc7fc316e80d31a48d0cf8aebd9bfb8d3ed692d25bf994666"
 		)
 		XCTAssertEqual(
 			network.personas[0].authPublicKey()?.compressedData.hex(),
-			"82248fcd9d9d1923729634231d288b6b5c6a5d3dd0cd52d5c06d998c057b0460"
+			"1309188a0c42704e4a911f16f6a658513cee290d9e3a4f033875b55504221eeb"
 		)
 
 		XCTAssertEqual(
 			network.personas[0].address.address,
-			"identity_tdx_21_1225rkl8svrs5fdc8rcmc7dk8wy4n0dap8da6dn58hptv47w9hmha5p"
+			"identity_tdx_e_12fkwy8ydrxznewf2q6a2c774fxa4e2kv5rs8mmd0r8p3k4s8f8d3mp"
 		)
 
 		// Persona 1
 		XCTAssertEqual(
 			network.personas[1].publicKey()?.compressedData.hex(),
-			"016ee546e124c088d52541105f3a4e8469498a6942452fec2ab24e4f92b939df"
+			"68104bf832b5bb83600b51ddaf0701a13bdb2b55d625bc0ef14c74932340b2bc"
 		)
 		XCTAssertEqual(
 			network.personas[1].authPublicKey()?.compressedData.hex(),
-			"133801ad4b98bd8925cd5d93fdfc3cae1965b48af51bbfe191e08d6a6911274b"
+			"c00858697875ea3eb6e2d8334d7a7f1a215269cb8097d08da30649d5eba9285b"
 		)
 
 		XCTAssertEqual(
 			network.personas[1].address.address,
-			"identity_tdx_21_12tljxea3s0mse52jmpvsphr0haqs86sung8d3qlhr763nxttj59650"
+			"identity_tdx_e_122m2mlkm25fleaprd2lz3ed02q2auggw0d7cs9zeyafsng8dl3qcu0"
 		)
 
 		XCTAssertEqual(profile.appPreferences.p2pLinks.links.count, 2)
@@ -691,8 +708,8 @@ final class ProfileTests: TestCase {
 		XCTAssertEqual(
 			network.authorizedDapps[0].referencesToAuthorizedPersonas[0].sharedAccounts?.ids.map(\.address),
 			[
-				"account_tdx_21_12xg7tf7aup8lrxkvug0vzatntzww0c6jnntyj6yd4eg5920kpxpzvt",
-				"account_tdx_21_12yth59wfyl8e4axupym0c96g9heuf5j06lv2lgc2cuapzlmj6alzzn",
+				"account_tdx_e_1297s57xd0uurnguqga98negg7ffhlp4k9s7sy7w4xrt5dr0t53hny8",
+				"account_tdx_e_128vf0zqkezy053hxkfq3g6x8x05mst7lq2q8fqlltm0l2d3tytk848",
 			]
 		)
 	}
@@ -719,6 +736,18 @@ final class ProfileTests: TestCase {
 	}
 
 	func test_version_compatibility_check_ok() throws {
+		let snapshotHeader = ProfileSnapshot.Header(
+			creatingDevice: device,
+			lastUsedOnDevice: device,
+			id: stableUUID,
+			lastModified: stableDate,
+			contentHint: .init(
+				numberOfAccountsOnAllNetworksInTotal: 6,
+				numberOfPersonasOnAllNetworksInTotal: 3,
+				numberOfNetworks: 2
+			),
+			snapshotVersion: .minimum
+		)
 		XCTAssertNoThrow(
 			try snapshotHeader.validateCompatibility()
 		)
@@ -731,18 +760,6 @@ private let creatingDevice: NonEmptyString = "\(deviceFactorModel) \(deviceFacto
 private let stableDate = Date(timeIntervalSince1970: 0)
 private let stableUUID = UUID(uuidString: "BABE1442-3C98-41FF-AFB0-D0F5829B020D")!
 private let device: ProfileSnapshot.Header.UsedDeviceInfo = .init(description: creatingDevice, id: stableUUID, date: stableDate)
-private let snapshotHeader = ProfileSnapshot.Header(
-	creatingDevice: device,
-	lastUsedOnDevice: device,
-	id: stableUUID,
-	lastModified: stableDate,
-	contentHint: .init(
-		numberOfAccountsOnAllNetworksInTotal: 6,
-		numberOfPersonasOnAllNetworksInTotal: 3,
-		numberOfNetworks: 2
-	),
-	snapshotVersion: .minimum
-)
 
 extension EntityProtocol {
 	func publicKey() -> SLIP10.PublicKey? {

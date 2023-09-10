@@ -4,6 +4,7 @@ import SwiftUI
 public struct PrimaryRectangularButtonStyle: ButtonStyle {
 	@Environment(\.controlState) var controlState
 
+	let shouldExpand: Bool
 	let height: CGFloat
 	let isDestructive: Bool
 
@@ -12,9 +13,9 @@ public struct PrimaryRectangularButtonStyle: ButtonStyle {
 			configuration.label
 				.foregroundColor(foregroundColor)
 				.font(.app.body1Header)
-				.frame(maxWidth: .infinity)
+				.frame(maxWidth: shouldExpand ? .infinity : nil)
 				.frame(height: height)
-				.padding([.leading, .trailing], .small2)
+				.padding(.horizontal, shouldExpand ? .small2 : .medium1)
 				.background(backgroundColor)
 				.cornerRadius(.small2)
 				.brightness(configuration.isPressed ? -0.1 : 0)
@@ -54,9 +55,10 @@ extension ButtonStyle where Self == PrimaryRectangularButtonStyle {
 	public static var primaryRectangular: Self { .primaryRectangular() }
 
 	public static func primaryRectangular(
+		shouldExpand: Bool = true,
 		height: CGFloat = .standardButtonHeight,
 		isDestructive: Bool = false
 	) -> Self {
-		Self(height: height, isDestructive: isDestructive)
+		Self(shouldExpand: shouldExpand, height: height, isDestructive: isDestructive)
 	}
 }

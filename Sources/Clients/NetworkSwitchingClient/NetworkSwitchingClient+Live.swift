@@ -22,10 +22,7 @@ extension NetworkSwitchingClient {
 		@Dependency(\.gatewaysClient) var gatewaysClient
 		@Dependency(\.accountsClient) var accountsClient
 		@Dependency(\.cacheClient) var cacheClient
-
-		let getCurrentGateway: GetCurrentGateway = {
-			await gatewaysClient.getCurrentGateway()
-		}
+		@Dependency(\.userDefaultsClient) var userDefaultsClient
 
 		let validateGatewayURL: ValidateGatewayURL = { newURL -> Radix.Gateway? in
 			let currentURL = await gatewaysClient.getGatewayAPIEndpointBaseURL()
@@ -66,7 +63,21 @@ extension NetworkSwitchingClient {
 		}
 
 		return Self(
-			getCurrentGateway: getCurrentGateway,
+			hasMainnetEverBeenLive: {
+				if userDefaultsClient.hasMainnetEverBeenLive {
+					loggerGlobal.debug("Mainnet has been live before..")
+					return true
+				}
+				loggerGlobal.debug("Mainnet has never been live before, checking if it is live now")
+				let isLive = await gatewayAPIClient.isMainnetLive()
+				if isLive {
+					loggerGlobal.notice("Mainnet is live, saving that is has been seen to be live...")
+					await userDefaultsClient.setMainnetIsLive()
+				} else {
+					loggerGlobal.notice("Mainnet is not live")
+				}
+				return isLive
+			},
 			validateGatewayURL: validateGatewayURL,
 			hasAccountOnNetwork: hasAccountOnNetwork,
 			switchTo: switchTo

@@ -66,6 +66,7 @@ public final actor AsyncWebSocket: NSObject, SignalingTransport {
 
 		monitor.pathUpdateHandler = { [weak self] path in
 			guard let self else { return }
+			loggerGlobal.info("Internet Connection status changed to \(path.status)")
 			switch path.status {
 			case .unsatisfied:
 				Task {
@@ -106,12 +107,13 @@ extension AsyncWebSocket {
 	}
 
 	func cancel() async {
-		terminated = true
+		loggerGlobal.info("WebSocket: Terminate")
 		incomingMessagesContinuation.finish()
 		pingTask?.cancel()
 		invalidateSession()
 		monitor.cancel()
 		receiveMessagesTask?.cancel()
+		terminated = true
 	}
 }
 

@@ -44,7 +44,7 @@ extension EncryptOrDecryptProfile {
 				return nil
 			}
 			if !confirmedEncryptionPassword.isEmpty, confirmedEncryptionPassword != inputtedEncryptionPassword {
-				return .error("Passwords do not match")
+				return .error(L10n.EncryptProfileBackup.ConfirmPasswordField.error)
 			}
 
 			return nil
@@ -55,8 +55,7 @@ extension EncryptOrDecryptProfile {
 		}
 
 		var continueButtonTitle: String {
-			// FIXME: Strings
-			"Continue"
+			L10n.Common.continue
 		}
 
 		var title: String {
@@ -67,7 +66,7 @@ extension EncryptOrDecryptProfile {
 
 		var subtitle: String {
 			// FIXME: String
-			isEncrypting ? "Enter a password to encrypt this wallet backup file. You will be required to enter this password when recovering your Wallet from this file." : "Enter the password you chose when you originally encrypted this Wallet Backup file."
+			isEncrypting ? L10n.EncryptProfileBackup.Header.subtitle : "Enter the password you chose when you originally encrypted this Wallet Backup file."
 		}
 
 		var nonConfirmingPasswordPlaceholder: String {
@@ -123,7 +122,7 @@ extension EncryptOrDecryptProfile {
 							// FIXME: Strings
 							AppTextField(
 								useSecureField: true,
-								placeholder: "Confirm password",
+								placeholder: L10n.EncryptProfileBackup.ConfirmPasswordField.placeholder,
 								text: viewStore.binding(
 									get: \.confirmedEncryptionPassword,
 									send: { .passwordConfirmationChanged($0) }

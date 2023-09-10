@@ -45,16 +45,16 @@ extension PersonaData {
 		}
 
 		public var formatted: String {
-			let components: [String] = {
+			let firstLine = {
 				switch variant {
 				case .western: return [givenNames, familyName]
 				case .eastern: return [familyName, givenNames]
 				}
-			}()
+			}().joined(separator: " ")
 
-			let firstLine = components.joined(separator: " ")
 			return """
-			\(firstLine)"\n"\(nickname)
+			\(firstLine)
+			"\(nickname)"
 			"""
 		}
 	}

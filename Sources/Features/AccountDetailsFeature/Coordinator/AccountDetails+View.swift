@@ -3,13 +3,17 @@ import AssetsFeature
 import AssetTransferFeature
 import EngineKit
 import FeaturePrelude
+import ImportMnemonicFeature
+import ProfileBackupsFeature
 
 extension AccountDetails.State {
 	var viewState: AccountDetails.ViewState {
 		.init(
 			accountAddress: account.address,
 			appearanceID: account.appearanceID,
-			displayName: account.displayName.rawValue
+			displayName: account.displayName.rawValue,
+			needToImportMnemonicForThisAccount: importMnemonicPrompt.needed,
+			needToBackupMnemonicForThisAccount: exportMnemonicPrompt.needed
 		)
 	}
 }
@@ -20,6 +24,8 @@ extension AccountDetails {
 		let accountAddress: AccountAddress
 		let appearanceID: Profile.Network.Account.AppearanceID
 		let displayName: String
+		let needToImportMnemonicForThisAccount: Bool
+		let needToBackupMnemonicForThisAccount: Bool
 	}
 
 	@MainActor
@@ -37,6 +43,16 @@ extension AccountDetails {
 						.foregroundColor(.app.whiteTransparent)
 						.textStyle(.body2HighImportance)
 						.padding(.bottom, .medium1)
+
+					Group {
+						// Mutally exclusive to prompt user to recover and backup mnemonic.
+						if viewStore.needToImportMnemonicForThisAccount {
+							recoverMnemonicsPromptView(viewStore)
+						} else if viewStore.needToBackupMnemonicForThisAccount {
+							exportMnemonicPromptView(viewStore)
+						}
+					}
+					.padding(.medium1)
 
 					Button(L10n.Account.transfer, asset: AssetResource.transfer) {
 						viewStore.send(.transferButtonTapped)
@@ -93,8 +109,36 @@ extension AccountDetails {
 					action: AccountDetails.Destinations.Action.transfer,
 					content: { AssetTransfer.SheetView(store: $0) }
 				)
+				.fullScreenCover( /* Full Screen cover to not be able to use iOS dismiss gestures */
+					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+					state: /AccountDetails.Destinations.State.exportMnemonic,
+					action: AccountDetails.Destinations.Action.exportMnemonic,
+					content: { childStore in
+						NavigationView {
+							ImportMnemonic.View(store: childStore)
+								// FIXME: Strings
+								.navigationTitle("Backup Seed Phrase")
+						}
+					}
+				)
+				.sheet(
+					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+					state: /AccountDetails.Destinations.State.importMnemonics,
+					action: AccountDetails.Destinations.Action.importMnemonics,
+					content: { ImportMnemonicsFlowCoordinator.View(store: $0) }
+				)
 			}
 		}
+	}
+}
+
+extension View {
+	func recoverMnemonicsPromptView(_ viewStore: ViewStoreOf<AccountDetails>) -> some View {
+		importMnemonicPromptView { viewStore.send(.recoverMnemonicsButtonTapped) }
+	}
+
+	func exportMnemonicPromptView(_ viewStore: ViewStoreOf<AccountDetails>) -> some View {
+		backupMnemonicPromptView { viewStore.send(.exportMnemonicButtonTapped) }
 	}
 }
 

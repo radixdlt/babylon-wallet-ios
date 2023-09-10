@@ -4,13 +4,14 @@ import FeaturePrelude
 extension LSUDetails.State {
 	var viewState: LSUDetails.ViewState {
 		.init(
-			containerWithHeader: stakeUnitResource.detailsContainerWithHeaderViewState,
+			containerWithHeader: stakeUnitResource.detailsHeader(withAmount: true),
 			thumbnailURL: stakeUnitResource.iconURL,
 			validatorNameViewState: .init(with: validator),
 			redeemableTokenAmount: .init(.init(xrdAmount: xrdRedemptionValue.format())),
 			resourceDetails: .init(
 				description: stakeUnitResource.description,
 				resourceAddress: stakeUnitResource.resourceAddress,
+				isXRD: false,
 				validatorAddress: validator.address,
 				resourceName: stakeUnitResource.name, // TODO: Is this correct?
 				currentSupply: validator.xrdVaultBalance.format(),

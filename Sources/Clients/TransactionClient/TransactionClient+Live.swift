@@ -244,12 +244,23 @@ extension TransactionClient {
 				involvedEntities: involvedEntites
 			)
 
+			guard let result else {
+				/// Didn't find any suitable default fee payer
+				return TransactionToReview(
+					analyzedManifestToReview: analyzedManifestToReview,
+					networkID: networkID,
+					feePayerSelectionAmongstCandidates: .init(selected: nil, candidates: feePayerCandidates, transactionFee: transactionFee),
+					transactionSigners: transactionSigners,
+					signingFactors: signingFactors
+				)
+			}
+
 			return TransactionToReview(
 				analyzedManifestToReview: analyzedManifestToReview,
 				networkID: networkID,
-				feePayerSelectionAmongstCandidates: .init(selected: result?.payer, candidates: feePayerCandidates, transactionFee: result?.updatedFee ?? transactionFee),
-				transactionSigners: result?.transactionSigners ?? transactionSigners,
-				signingFactors: result?.signingFactors ?? signingFactors
+				feePayerSelectionAmongstCandidates: .init(selected: result.payer, candidates: feePayerCandidates, transactionFee: result.updatedFee),
+				transactionSigners: result.transactionSigners,
+				signingFactors: result.signingFactors
 			)
 		}
 
@@ -387,23 +398,23 @@ extension TransactionClient {
 
 		// First try amongst `accountsWithdrawnFrom`
 		if let result = try await findFeePayer(amongst: \.accountsWithdrawnFrom, includeSignaturesCost: true) {
-			loggerGlobal.debug("Find suitable fee payer in: 'accountsWithdrawnFrom', specifically: \(result.payer)")
+			loggerGlobal.debug("Found suitable fee payer in: 'accountsWithdrawnFrom', specifically: \(result.payer)")
 			return result
 		}
 
 		// no candidates amongst `accountsWithdrawnFrom` => fallback to `accountsDepositedInto`
 		if let result = try await findFeePayer(amongst: \.accountsDepositedInto, includeSignaturesCost: true) {
-			loggerGlobal.debug("Find suitable fee payer in: 'accountsDepositedInto', specifically: \(result.payer)")
+			loggerGlobal.debug("Found suitable fee payer in: 'accountsDepositedInto', specifically: \(result.payer)")
 			return result
 		}
 
 		// no candidates amongst `accountsDepositedInto` => fallback to `accountsRequiringAuth`
 		if let result = try await findFeePayer(amongst: \.accountsRequiringAuth, includeSignaturesCost: false) {
-			loggerGlobal.debug("Find suitable fee payer in: 'accountsRequiringAuth', specifically: \(result.payer)")
+			loggerGlobal.debug("Found suitable fee payer in: 'accountsRequiringAuth', specifically: \(result.payer)")
 			return result
 		}
 
-		loggerGlobal.debug("Did not find any suitable fee payer, retrieving candidates for user selection....")
+		loggerGlobal.notice("Did not find any suitable fee payer, retrieving candidates for user selection....")
 		return nil
 	}
 }

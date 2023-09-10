@@ -1,7 +1,30 @@
 import FeaturePrelude
 
+extension AssetTransfer.State {
+	var viewState: AssetTransfer.ViewState {
+		.init(
+			canSendTransferRequest: canSendTransferRequest,
+			message: message,
+			isMainnetAccount: isMainnetAccount,
+			hasMainnetEverBeenLive: hasMainnetEverBeenLive
+		)
+	}
+}
+
 extension AssetTransfer {
-	public typealias ViewState = State
+	public struct ViewState: Equatable {
+		let canSendTransferRequest: Bool
+		let message: AssetTransferMessage.State?
+		let isMainnetAccount: Bool
+		let hasMainnetEverBeenLive: Bool
+
+		var showIsUsingTestnetBanner: Bool {
+			guard hasMainnetEverBeenLive else {
+				return false
+			}
+			return !isMainnetAccount
+		}
+	}
 
 	@MainActor
 	public struct View: SwiftUI.View {
@@ -15,7 +38,7 @@ extension AssetTransfer {
 
 extension AssetTransfer.View {
 	public var body: some View {
-		WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
+		WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 			ScrollView {
 				VStack(spacing: .medium3) {
 					headerView(viewStore)
@@ -81,12 +104,14 @@ extension AssetTransfer {
 		}
 
 		public var body: some SwiftUI.View {
-			WithNavigationBar {
-				ViewStore(store).send(.view(.closeButtonTapped))
-			} content: {
-				View(store: store)
+			WithViewStore(store, observe: \.viewState) { viewStore in
+				WithNavigationBar {
+					viewStore.send(.view(.closeButtonTapped))
+				} content: {
+					View(store: store)
+				}
+				.showDeveloperDisclaimerBanner(viewStore.showIsUsingTestnetBanner)
 			}
-			.showDeveloperDisclaimerBanner()
 		}
 	}
 }

@@ -97,7 +97,7 @@ extension FactorInstance {
 
 extension FactorInstance {
 	public var factorSourceKind: FactorSourceKind {
-		id.factorSourceKind
+		factorSourceID.factorSourceKind
 	}
 
 	/// Tries to unwrap this factor instance's badge as virtual hierarchical deterministic one.
