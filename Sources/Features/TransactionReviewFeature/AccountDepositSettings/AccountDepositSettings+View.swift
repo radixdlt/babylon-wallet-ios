@@ -32,7 +32,16 @@ extension AccountDepositSettings {
 
 extension AccountDepositSettingsChange.State {
 	var viewState: AccountDepositSettingsChange.ViewState {
-		.init(account: account, resourceChanges: resourceChanges, depositRuleChange: depositRuleChange)
+		.init(
+			account: account,
+			resourcePreferenceChanges: .init(uncheckedUniqueElements: resourceChanges.map {
+				ResourceChangeView.ViewState(resource: $0.resource, changeDescription: $0.change.description)
+			}),
+			allowedDepositorChanges: .init(uncheckedUniqueElements: allowedDepositorChanges.map {
+				ResourceChangeView.ViewState(resource: $0.resource, changeDescription: $0.change.description)
+			}),
+			depositRuleChange: depositRuleChange
+		)
 	}
 }
 
@@ -40,8 +49,13 @@ extension AccountDepositSettingsChange.State {
 extension AccountDepositSettingsChange {
 	public struct ViewState: Equatable {
 		let account: Profile.Network.Account
-		let resourceChanges: IdentifiedArrayOf<AccountDepositSettingsChange.State.ResourceChange>
+		let resourcePreferenceChanges: IdentifiedArrayOf<ResourceChangeView.ViewState>
+		let allowedDepositorChanges: IdentifiedArrayOf<ResourceChangeView.ViewState>
 		let depositRuleChange: AccountDefaultDepositRule?
+
+		var hasChanges: Bool {
+			!resourcePreferenceChanges.isEmpty || !allowedDepositorChanges.isEmpty
+		}
 	}
 
 	@MainActor
@@ -61,19 +75,18 @@ extension AccountDepositSettingsChange {
 							Text(depositRuleChange.string)
 								.foregroundColor(.app.gray1)
 								.textStyle(.body1Regular)
-							if !viewStore.resourceChanges.isEmpty {
+							if viewStore.hasChanges {
 								Separator()
 							}
 						}
-						ForEach(viewStore.resourceChanges) { resourceChange in
-							Button(action: { viewStore.send(.assetTapped(resourceChange.resource)) }) {
-								HStack {
-									ResourceIconNameView(resource: resourceChange.resource)
-									Spacer(minLength: .zero)
-									Text(resourceChange.change.string)
-										.textStyle(.secondaryHeader)
-										.foregroundColor(.app.gray1)
-								}
+						ForEach(viewStore.resourcePreferenceChanges) { viewState in
+							ResourceChangeView(viewState: viewState) {
+								viewStore.send(.assetTapped($0))
+							}
+						}
+						ForEach(viewStore.allowedDepositorChanges) { viewState in
+							ResourceChangeView(viewState: viewState) {
+								viewStore.send(.assetTapped($0))
 							}
 						}
 					}
@@ -86,19 +99,53 @@ extension AccountDepositSettingsChange {
 	}
 }
 
-extension AccountDepositSettingsChange.State.ResourceChange.Change {
-	var string: String {
+// MARK: - ResourceChangeView
+struct ResourceChangeView: View {
+	struct ViewState: Equatable, Identifiable {
+		var id: OnLedgerEntity.Resource {
+			resource
+		}
+
+		let resource: OnLedgerEntity.Resource
+		let changeDescription: String
+	}
+
+	let viewState: ViewState
+	let onTapped: (OnLedgerEntity.Resource) -> Void
+
+	var body: some View {
+		Button(action: { onTapped(viewState.resource) }) {
+			HStack {
+				ResourceIconNameView(resource: viewState.resource)
+				Spacer(minLength: .zero)
+				Text(viewState.changeDescription)
+					.textStyle(.secondaryHeader)
+					.foregroundColor(.app.gray1)
+			}
+		}
+	}
+}
+
+extension ResourcePreferenceAction {
+	var description: String {
 		// FIXME: Strings
 		switch self {
-		case .resourcePreference(.remove):
+		case .remove:
 			return "Clear Exception"
-		case .resourcePreference(.set(.allowed)):
+		case .set(.allowed):
 			return "Allow"
-		case .resourcePreference(.set(.disallowed)):
+		case .set(.disallowed):
 			return "Disallow"
-		case .authorizedDepositorAdded:
-			return "Allow Depositor"
-		case .authorizedDepositorRemoved:
+		}
+	}
+}
+
+extension AccountDepositSettingsChange.State.AllowedDepositorChange.Change {
+	var description: String {
+		switch self {
+		case .added:
+			return "Add Depositor"
+		case .removed:
 			return "Clear Depositor"
 		}
 	}

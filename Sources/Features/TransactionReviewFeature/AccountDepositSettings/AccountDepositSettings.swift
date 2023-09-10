@@ -46,36 +46,22 @@ public struct AccountDepositSettings: Sendable, FeatureReducer {
 // MARK: - AccountDepositSettingsChange
 public struct AccountDepositSettingsChange: Sendable, FeatureReducer {
 	public struct State: Sendable, Identifiable, Hashable {
-		public struct ResourceChange: Sendable, Identifiable, Hashable {
-			public enum Change: Sendable, Hashable {
-				case resourcePreference(ResourcePreferenceAction)
-				case authorizedDepositorAdded
-				case authorizedDepositorRemoved
-			}
-
-			public var id: Int {
-				// An Address can be present in both ResourcePreference and authorized depositor changes.
-				resource.hashValue + change.hashValue
-			}
-
-			public let resource: OnLedgerEntity.Resource
-			public let change: Change
-
-			public init(resource: OnLedgerEntity.Resource, change: Change) {
-				self.resource = resource
-				self.change = change
-			}
-		}
-
 		public var id: AccountAddress.ID { account.address.id }
 		public let account: Profile.Network.Account
-		public let resourceChanges: IdentifiedArrayOf<ResourceChange>
+		public let resourceChanges: IdentifiedArrayOf<ResourcePreferenceChange>
+		public let allowedDepositorChanges: IdentifiedArrayOf<AllowedDepositorChange>
 		public let depositRuleChange: AccountDefaultDepositRule?
 
-		public init(account: Profile.Network.Account, depositRuleChange: AccountDefaultDepositRule?, resourceChanges: IdentifiedArrayOf<ResourceChange>) {
+		public init(
+			account: Profile.Network.Account,
+			depositRuleChange: AccountDefaultDepositRule?,
+			resourceChanges: IdentifiedArrayOf<ResourcePreferenceChange>,
+			allowedDepositorChanges: IdentifiedArrayOf<AllowedDepositorChange>
+		) {
 			self.account = account
 			self.depositRuleChange = depositRuleChange
 			self.resourceChanges = resourceChanges
+			self.allowedDepositorChanges = allowedDepositorChanges
 		}
 	}
 
@@ -93,6 +79,41 @@ public struct AccountDepositSettingsChange: Sendable, FeatureReducer {
 		switch viewAction {
 		case let .assetTapped(asset):
 			return .send(.delegate(.showAsset(asset)))
+		}
+	}
+}
+
+extension AccountDepositSettingsChange.State {
+	public struct ResourcePreferenceChange: Sendable, Identifiable, Hashable {
+		public var id: OnLedgerEntity.Resource {
+			resource
+		}
+
+		public let resource: OnLedgerEntity.Resource
+		public let change: ResourcePreferenceAction
+
+		public init(resource: OnLedgerEntity.Resource, preferenceChange: ResourcePreferenceAction) {
+			self.resource = resource
+			self.change = preferenceChange
+		}
+	}
+
+	public struct AllowedDepositorChange: Sendable, Identifiable, Hashable {
+		public enum Change: Sendable, Hashable {
+			case added
+			case removed
+		}
+
+		public var id: OnLedgerEntity.Resource {
+			resource
+		}
+
+		public let resource: OnLedgerEntity.Resource
+		public let change: Change
+
+		public init(resource: OnLedgerEntity.Resource, change: Change) {
+			self.resource = resource
+			self.change = change
 		}
 	}
 }

@@ -873,7 +873,9 @@ extension TransactionReview {
 
 	func extractAccountDepositSettings(_ settings: TransactionType.AccountDepositSettings) async throws -> AccountDepositSettings.State {
 		let userAccounts = try await accountsClient.getAccountsOnCurrentNetwork()
-		let allAccountAddress = Set(settings.authorizedDepositorsChanges.keys).union(settings.defaultDepositRuleChanges.keys).union(settings.resourcePreferenceChanges.keys)
+		let allAccountAddress = Set(settings.authorizedDepositorsChanges.keys)
+			.union(settings.defaultDepositRuleChanges.keys)
+			.union(settings.resourcePreferenceChanges.keys)
 		let validAccounts = allAccountAddress.compactMap { address in
 			userAccounts.first { $0.address == address }
 		}
@@ -881,19 +883,30 @@ extension TransactionReview {
 		let depositSettingsChanges = try await validAccounts.asyncMap { account in
 			let depositRuleChange = settings.defaultDepositRuleChanges[account.address]
 
-			let resourcePreferenceChanges = try await settings.resourcePreferenceChanges[account.address]?.asyncMap { resourcePreference in
-				try await AccountDepositSettingsChange.State.ResourceChange(resource: onLedgerEntitiesClient.getResource(resourcePreference.key), change: .resourcePreference(resourcePreference.value))
-			} ?? []
+			let resourcePreferenceChanges = try await settings
+				.resourcePreferenceChanges[account.address]?
+				.asyncMap { resourcePreference in
+					try await AccountDepositSettingsChange.State.ResourcePreferenceChange(
+						resource: onLedgerEntitiesClient.getResource(resourcePreference.key),
+						preferenceChange: resourcePreference.value
+					)
+				} ?? []
 
 			let authorizedDepositorChanges = try await {
 				if let depositorChanges = settings.authorizedDepositorsChanges[account.address] {
 					let added = try await depositorChanges.added.asyncMap { resourceOrNonFungible in
 						let resourceAddress = try resourceOrNonFungible.resourceAddress()
-						return try await AccountDepositSettingsChange.State.ResourceChange(resource: onLedgerEntitiesClient.getResource(resourceAddress), change: .authorizedDepositorAdded)
+						return try await AccountDepositSettingsChange.State.AllowedDepositorChange(
+							resource: onLedgerEntitiesClient.getResource(resourceAddress),
+							change: .added
+						)
 					}
 					let removed = try await depositorChanges.removed.asyncMap { resourceOrNonFungible in
 						let resourceAddress = try resourceOrNonFungible.resourceAddress()
-						return try await AccountDepositSettingsChange.State.ResourceChange(resource: onLedgerEntitiesClient.getResource(resourceAddress), change: .authorizedDepositorRemoved)
+						return try await AccountDepositSettingsChange.State.AllowedDepositorChange(
+							resource: onLedgerEntitiesClient.getResource(resourceAddress),
+							change: .removed
+						)
 					}
 
 					return added + removed
@@ -904,7 +917,8 @@ extension TransactionReview {
 			return AccountDepositSettingsChange.State(
 				account: account,
 				depositRuleChange: depositRuleChange,
-				resourceChanges: IdentifiedArray(uncheckedUniqueElements: resourcePreferenceChanges + authorizedDepositorChanges)
+				resourceChanges: IdentifiedArray(uncheckedUniqueElements: resourcePreferenceChanges),
+				allowedDepositorChanges: IdentifiedArray(uncheckedUniqueElements: authorizedDepositorChanges)
 			)
 		}
 
