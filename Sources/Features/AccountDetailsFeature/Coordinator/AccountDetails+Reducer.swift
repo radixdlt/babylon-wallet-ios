@@ -94,6 +94,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 
 		case markBackupNeeded
 		case accountUpdated(Profile.Network.Account)
+		case portfolioLoaded(AccountPortfolio)
 
 		case loadMnemonic
 		case loadMnemonicResult(TaskResult<MnemonicWithPassphraseAndFactorSourceInfo>)
@@ -146,6 +147,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 	}
 
 	@Dependency(\.backupsClient) var backupsClient
+	@Dependency(\.accountPortfoliosClient) var accountPortfoliosClient
 	@Dependency(\.accountsClient) var accountsClient
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.secureStorageClient) var secureStorageClient
@@ -168,7 +170,6 @@ public struct AccountDetails: Sendable, FeatureReducer {
 		switch viewAction {
 		case .task:
 			return .run { [state] send in
-
 				func delay() async {
 					// navigation bug if we try to "deep link" too fast..
 					try? await clock.sleep(for: .milliseconds(900))
@@ -232,9 +233,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 			case .closeButtonTapped, .failedToImportAllRequiredMnemonics:
 				break
 			case let .finishedImportingMnemonics(_, imported):
-				if
-					imported.contains(where: { $0.factorSourceID == state.deviceControlledFactorInstance.factorSourceID })
-				{
+				if imported.contains(where: { $0.factorSourceID == state.deviceControlledFactorInstance.factorSourceID }) {
 					state.importMnemonicPrompt = .no
 
 					// It makes no sense to prompt user to back up a mnemonic she *just* imported.
@@ -299,6 +298,10 @@ public struct AccountDetails: Sendable, FeatureReducer {
 		case let .accountUpdated(account):
 			state.account = account
 			return .none
+
+		case let .portfolioLoaded(portfolio):
+			state.assets.updatePortfolio(to: portfolio)
+			return .none
 		}
 	}
 
@@ -331,7 +334,6 @@ public struct AccountDetails: Sendable, FeatureReducer {
 
 	// FIXME: Refactor account security prompts to share logic between this reducer and Row+Reducer (AccountList)
 	private func checkAccountSecurityPromptStatus(state: inout State) -> EffectTask<Action> {
-		@Dependency(\.accountPortfoliosClient) var accountPortfoliosClient
 		@Dependency(\.userDefaultsClient) var userDefaultsClient
 
 		if userDefaultsClient
@@ -360,7 +362,6 @@ public struct AccountDetails: Sendable, FeatureReducer {
 
 				return !isAlreadyBackedUp
 			}
-
 		}()
 
 		guard mightNeedToBeBackedUp else {
@@ -368,15 +369,15 @@ public struct AccountDetails: Sendable, FeatureReducer {
 		}
 
 		return .run { [address = state.account.address] send in
-			guard
-				let portfolio = try? await accountPortfoliosClient.fetchAccountPortfolio(address, false),
-				let xrdResource = portfolio.fungibleResources.xrdResource, xrdResource.amount > .zero
-			else {
-				// no value
-				return
+			guard let portfolio = try? await accountPortfoliosClient.fetchAccountPortfolio(address, false) else { return }
+
+			let xrdResource = portfolio.fungibleResources.xrdResource
+
+			if let xrdResource, xrdResource.amount > .zero {
+				await send(.internal(.markBackupNeeded))
 			}
 
-			await send(.internal(.markBackupNeeded))
+			await send(.internal(.portfolioLoaded(portfolio.nonEmptyVaults)))
 		}
 	}
 }

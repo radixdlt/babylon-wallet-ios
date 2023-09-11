@@ -76,7 +76,7 @@ public struct AssetsView: Sendable, FeatureReducer {
 	}
 
 	public enum InternalAction: Sendable, Equatable {
-		case portfolioUpdated(AccountPortfolio)
+		case updatePortfolio(AccountPortfolio)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -105,11 +105,9 @@ public struct AssetsView: Sendable, FeatureReducer {
 		switch viewAction {
 		case .task:
 			return .run { [address = state.account.address] send in
-				for try await portfolio in await accountPortfoliosClient.portfolioForAccount(address) {
-					guard !Task.isCancelled else {
-						return
-					}
-					await send(.internal(.portfolioUpdated(portfolio.nonEmptyVaults)))
+				for try await portfolio in await accountPortfoliosClient.portfolioForAccount(address).debounce(for: .seconds(0.1)) {
+					guard !Task.isCancelled else { return }
+					await send(.internal(.updatePortfolio(portfolio.nonEmptyVaults)))
 				}
 			}
 		case let .didSelectList(kind):
@@ -128,66 +126,72 @@ public struct AssetsView: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
-		case let .portfolioUpdated(portfolio):
-			let xrd = portfolio.fungibleResources.xrdResource.map { token in
+		case let .updatePortfolio(portfolio):
+			state.updatePortfolio(to: portfolio)
+			return .none
+		}
+	}
+}
+
+extension AssetsView.State {
+	public mutating func updatePortfolio(to portfolio: AccountPortfolio) {
+		let xrd = portfolio.fungibleResources.xrdResource.map { token in
+			FungibleAssetList.Row.State(
+				xrdToken: token,
+				isSelected: mode.xrdRowSelected
+			)
+		}
+		let nonXrd = portfolio.fungibleResources.nonXrdResources
+			.map { token in
 				FungibleAssetList.Row.State(
-					xrdToken: token,
-					isSelected: state.mode.xrdRowSelected
+					nonXRDToken: token,
+					isSelected: mode.nonXrdRowSelected(token.resourceAddress)
 				)
 			}
-			let nonXrd = portfolio.fungibleResources.nonXrdResources
-				.map { token in
-					FungibleAssetList.Row.State(
-						nonXRDToken: token,
-						isSelected: state.mode.nonXrdRowSelected(token.resourceAddress)
-					)
-				}
-			let nfts = portfolio.nonFungibleResources.map { resource in
-				NonFungibleAssetList.Row.State(
-					resource: resource,
-					disabled: state.mode.selectedAssets?.disabledNFTs ?? [],
-					selectedAssets: state.mode.nftRowSelectedAssets(resource.resourceAddress)
-				)
+		let nfts = portfolio.nonFungibleResources.map { resource in
+			NonFungibleAssetList.Row.State(
+				resource: resource,
+				disabled: mode.selectedAssets?.disabledNFTs ?? [],
+				selectedAssets: mode.nftRowSelectedAssets(resource.resourceAddress)
+			)
+		}
+
+		fungibleTokenList = .init(xrdToken: xrd, nonXrdTokens: .init(uniqueElements: nonXrd))
+		nonFungibleTokenList = .init(rows: .init(uniqueElements: nfts))
+
+		let lsuResource: LSUResource.State? = {
+			guard !portfolio.poolUnitResources.radixNetworkStakes.isEmpty else {
+				return nil
 			}
-
-			state.fungibleTokenList = .init(xrdToken: xrd, nonXrdTokens: .init(uniqueElements: nonXrd))
-			state.nonFungibleTokenList = .init(rows: .init(uniqueElements: nfts))
-
-			let lsuResource: LSUResource.State? = {
-				guard !portfolio.poolUnitResources.radixNetworkStakes.isEmpty else {
-					return nil
-				}
-				return .init(
-					stakes: .init(
-						uniqueElements: portfolio.poolUnitResources.radixNetworkStakes
-							.map { stake in
-								LSUStake.State(
-									stake: stake,
-									isStakeSelected: (stake.stakeUnitResource?.resourceAddress)
-										.flatMap(state.mode.nonXrdRowSelected),
-									selectedStakeClaimAssets: (stake.stakeClaimResource?.resourceAddress)
-										.flatMap(state.mode.nftRowSelectedAssets)
-								)
-							}
-					)
-				)
-			}()
-
-			state.poolUnitsList = .init(
-				lsuResource: lsuResource,
-				poolUnits: .init(
-					uncheckedUniqueElements: portfolio.poolUnitResources.poolUnits
-						.map {
-							PoolUnit.State(
-								poolUnit: $0,
-								isSelected: state.mode
-									.nonXrdRowSelected($0.poolUnitResource.resourceAddress)
+			return .init(
+				stakes: .init(
+					uniqueElements: portfolio.poolUnitResources.radixNetworkStakes
+						.map { stake in
+							LSUStake.State(
+								stake: stake,
+								isStakeSelected: (stake.stakeUnitResource?.resourceAddress)
+									.flatMap(mode.nonXrdRowSelected),
+								selectedStakeClaimAssets: (stake.stakeClaimResource?.resourceAddress)
+									.flatMap(mode.nftRowSelectedAssets)
 							)
 						}
 				)
 			)
-			return .none
-		}
+		}()
+
+		poolUnitsList = .init(
+			lsuResource: lsuResource,
+			poolUnits: .init(
+				uncheckedUniqueElements: portfolio.poolUnitResources.poolUnits
+					.map {
+						PoolUnit.State(
+							poolUnit: $0,
+							isSelected: mode
+								.nonXrdRowSelected($0.poolUnitResource.resourceAddress)
+						)
+					}
+			)
+		)
 	}
 }
 
