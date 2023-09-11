@@ -2,63 +2,52 @@ import AuthorizedDAppsFeature
 import FeaturePrelude
 import LedgerHardwareDevicesFeature
 
-extension AccountSecurity.State {
-	var viewState: AccountSecurity.ViewState {
-		.init(hasLedgerHardwareWalletFactorSources: hasLedgerHardwareWalletFactorSources)
-	}
-}
-
 // MARK: - AccountSecurity.View
 extension AccountSecurity {
-	public struct ViewState: Equatable {
-		let hasLedgerHardwareWalletFactorSources: Bool
-	}
-
 	@MainActor
 	public struct View: SwiftUI.View {
 		private let store: Store
+		private let destinationStore: PresentationStoreOf<Destinations>
 
 		public init(store: Store) {
 			self.store = store
+			self.destinationStore = store.scope(state: \.$destination, action: { .child(.destination($0)) })
 		}
 	}
 }
 
 extension AccountSecurity.View {
 	public var body: some View {
-		WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-			let destinationStore = store.scope(state: \.$destination, action: { .child(.destination($0)) })
-			ScrollView {
-				VStack(spacing: .zero) {
-					ForEach(rows) { row in
-						SettingsRow(row: row) {
-							viewStore.send(row.action)
-						}
-					}
-
-					let row = importOlympiaRow
+		ScrollView {
+			VStack(spacing: .zero) {
+				ForEach(rows) { row in
 					SettingsRow(row: row) {
-						viewStore.send(row.action)
+						store.send(.view(row.action))
 					}
 				}
+
+				let row = importOlympiaRow
+				SettingsRow(row: row) {
+					store.send(.view(row.action))
+				}
 			}
-			.onAppear {
-				viewStore.send(.appeared)
-			}
-			.navigationTitle("Account Security") // FIXME: Strings - L10n.Settings.AccountSecurity.title
-			#if os(iOS)
-				.navigationBarTitleColor(.app.gray1)
-				.navigationBarTitleDisplayMode(.inline)
-				.navigationBarInlineTitleFont(.app.secondaryHeader)
-			#endif
-				.mnemonics(with: destinationStore)
-				.ledgerHardwareWallets(with: destinationStore)
-				.depositGuarantees(with: destinationStore)
-				.importFromOlympiaLegacyWallet(with: destinationStore)
-				.tint(.app.gray1)
-				.foregroundColor(.app.gray1)
 		}
-		.presentsLoadingViewOverlay()
+		.onAppear {
+			store.send(.view(.appeared))
+		}
+		.navigationTitle("Account Security") // FIXME: Strings - L10n.Settings.AccountSecurity.title
+		#if os(iOS)
+			.navigationBarTitleColor(.app.gray1)
+			.navigationBarTitleDisplayMode(.inline)
+			.navigationBarInlineTitleFont(.app.secondaryHeader)
+		#endif
+			.mnemonics(with: destinationStore)
+			.ledgerHardwareWallets(with: destinationStore)
+			.depositGuarantees(with: destinationStore)
+			.importFromOlympiaLegacyWallet(with: destinationStore)
+			.tint(.app.gray1)
+			.foregroundColor(.app.gray1)
+			.presentsLoadingViewOverlay()
 	}
 
 	@MainActor
