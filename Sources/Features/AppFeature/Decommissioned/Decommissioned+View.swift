@@ -11,31 +11,30 @@ extension Decommissioned {
 		}
 
 		public var body: some SwiftUI.View {
-			WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
-				// TODO: implement
-				VStack(alignment: .center) {
-					VStack(alignment: .center, spacing: .small1) {
-						Text("Preview of wallet has ended") // FIXME: Strings
-							.textStyle(.sectionHeader)
-						Text("Uninstall this app and download the Radix Wallet app from App Store.") // FIXME: Strings
-							.textStyle(.body1HighImportance)
-					}
-					.foregroundColor(.white)
-
-					// So that the square root in background image is visible
-					Spacer(minLength: .huge2)
-
-					Button("Open AppStore") { // FIXME: Strings
-						viewStore.send(.openAppStore)
-					}
-					.buttonStyle(.primaryRectangular)
+			VStack(alignment: .center) {
+				VStack(alignment: .center, spacing: .small1) {
+					Text("Preview of Wallet Has Ended") // FIXME: Strings
+						.textStyle(.sectionHeader)
+					Text("Uninstall this app and download the Radix Wallet app from App Store.") // FIXME: Strings
+						.textStyle(.body1HighImportance)
+						.multilineTextAlignment(.center)
 				}
-				.padding(.large1)
-				.background(
-					Image(asset: AssetResource.splash)
-						.resizable()
-						.scaledToFill()
-				)
+				.foregroundColor(.white)
+
+				Spacer(minLength: .huge2)
+
+				Button("Open AppStore") { // FIXME: Strings
+					store.send(.view(.openAppStore))
+				}
+				.buttonStyle(.primaryRectangular)
+			}
+			.padding(.large1)
+			.background {
+				Image(asset: AssetResource.splash)
+					.resizable()
+					.scaledToFill()
+					.padding(-1) // Workaround for a weird SwiftUI bug
+					.edgesIgnoringSafeArea(.all)
 			}
 		}
 	}
