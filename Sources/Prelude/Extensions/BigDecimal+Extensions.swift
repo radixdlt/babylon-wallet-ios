@@ -4,6 +4,7 @@ import Foundation
 extension BigDecimal {
 	// Used for development purposes
 	public static let temporaryStandardFee: BigDecimal = 25
+	public static let defaultMaxPlacesFormattted: UInt = 8
 }
 
 extension BigDecimal {
@@ -16,7 +17,8 @@ extension BigDecimal {
 
 	/// Formats the number for human consumtion
 	public func format(
-		maxPlaces maxPlacesNonNegative: UInt = 8,
+		maxPlaces maxPlacesNonNegative: UInt = BigDecimal.defaultMaxPlacesFormattted,
+		divisibility: Int? = nil,
 		locale: Locale = .autoupdatingCurrent
 	) -> String {
 		// N.B. We cannot use `Local.current.decimalSeperator` here because
@@ -34,7 +36,22 @@ extension BigDecimal {
 		}
 
 		let integerPart = String(components[0])
-		let decimalPart = String(components[1])
+		let decimalComponents = components[1]
+		let decimalPart = {
+			guard let divisibility else {
+				return decimalComponents
+			}
+
+			guard divisibility > .zero else {
+				return ""
+			}
+
+			return decimalComponents.prefix(divisibility)
+		}()
+
+		guard !decimalPart.isEmpty else {
+			return integerPart
+		}
 
 		let numberOfDecimalDigits = max(1, Int(maxPlacesNonNegative) - integerPart.count)
 
