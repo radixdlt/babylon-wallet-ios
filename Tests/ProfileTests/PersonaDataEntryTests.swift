@@ -8,6 +8,19 @@ import SharedTestingModels
 import SwiftUI
 import TestingPrelude
 
+extension PersonaData.IdentifiedEntry {
+	init(
+		id: ID? = nil,
+		value: Value
+	) {
+		@Dependency(\.uuid) var uuid
+		self.init(
+			id: id ?? uuid(),
+			value: value
+		)
+	}
+}
+
 // MARK: - PersonaFieldTests
 final class PersonaFieldTests: TestCase {
 	func test_name_western() throws {
