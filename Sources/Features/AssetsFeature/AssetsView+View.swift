@@ -67,7 +67,7 @@ extension AssetsView {
 						.ignoresSafeArea(edges: .bottom)
 				}
 				.onFirstTask { @MainActor in
-					await viewStore.send(.task).finish()
+					viewStore.send(.task)
 				}
 			}
 		}
