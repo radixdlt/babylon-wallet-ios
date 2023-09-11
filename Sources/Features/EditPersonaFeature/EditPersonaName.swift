@@ -3,32 +3,39 @@ import FeaturePrelude
 // MARK: - EditPersonaName
 public struct EditPersonaName: FeatureReducer, EmptyInitializable {
 	public struct State: Sendable, Hashable {
+		let id: PersonaDataEntryID
 		var family: EditPersonaDynamicField.State
 		var given: EditPersonaDynamicField.State
 		var nickName: EditPersonaDynamicField.State
 		var variant: PersonaData.Name.Variant
 
 		init(
+			entryID: PersonaDataEntryID?,
 			with name: PersonaData.Name,
 			isRequestedByDapp: Bool
 		) {
+			@Dependency(\.uuid) var uuid
+			self.id = entryID ?? uuid()
 			self.family = EditPersonaDynamicField.State(
-				id: .familyName,
+				behaviour: .familyName,
+				entryID: id, // Uh.. terrible, but we are gonne refactor this whole thing anyway
 				text: name.familyName,
 				isRequiredByDapp: isRequestedByDapp,
-				showsName: true
+				showsTitle: true
 			)
 			self.given = EditPersonaDynamicField.State(
-				id: .givenNames,
+				behaviour: .givenNames,
+				entryID: id, // Uh.. terrible, but we are gonne refactor this whole thing anyway
 				text: name.givenNames,
 				isRequiredByDapp: isRequestedByDapp,
-				showsName: true
+				showsTitle: true
 			)
 			self.nickName = EditPersonaDynamicField.State(
-				id: .nickName,
+				behaviour: .nickName,
+				entryID: id, // Uh.. terrible, but we are gonne refactor this whole thing anyway
 				text: name.nickname,
 				isRequiredByDapp: isRequestedByDapp,
-				showsName: true
+				showsTitle: true
 			)
 
 			self.variant = name.variant

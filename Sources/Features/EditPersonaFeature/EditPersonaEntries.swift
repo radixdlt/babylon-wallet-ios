@@ -11,26 +11,38 @@ public struct EditPersonaEntries: Sendable, FeatureReducer {
 		init(with personaData: PersonaData, mode: EditPersona.State.Mode) {
 			let required = mode.requiredEntries
 
-			self.name = (personaData.name?.value).map {
-				.entry(name: $0, isRequestedByDapp: required.contains(.fullName))
+			self.name = personaData.name.map {
+				.entry(entryID: $0.id, name: $0.value, isRequestedByDapp: required.contains(.fullName))
 			}
+
 			self.emailAddress = (personaData.emailAddresses.first).flatMap {
-				try? .singleFieldEntry(.emailAddress, text: $0.value.email, isRequestedByDapp: required.contains(.emailAddress))
+				try? .singleFieldEntry(
+					entryID: $0.id,
+					.emailAddress,
+					text: $0.value.email,
+					isRequestedByDapp: required.contains(.emailAddress)
+				)
 			}
+
 			self.phoneNumber = (personaData.phoneNumbers.first).flatMap {
-				try? .singleFieldEntry(.phoneNumber, text: $0.value.number, isRequestedByDapp: required.contains(.phoneNumber))
+				try? .singleFieldEntry(
+					entryID: $0.id,
+					.phoneNumber,
+					text: $0.value.number,
+					isRequestedByDapp: required.contains(.phoneNumber)
+				)
 			}
 
 			for kind in required {
 				switch kind {
 				case .fullName where self.name == nil:
-					self.name = .entry(isRequestedByDapp: true)
+					self.name = .entry(entryID: nil, name: .default, isRequestedByDapp: true)
 
 				case .emailAddress where self.emailAddress == nil:
-					self.emailAddress = try? .singleFieldEntry(kind, isRequestedByDapp: true)
+					self.emailAddress = try? .singleFieldEntry(entryID: nil, kind, isRequestedByDapp: true)
 
 				case .phoneNumber where self.phoneNumber == nil:
-					self.phoneNumber = try? .singleFieldEntry(kind, isRequestedByDapp: true)
+					self.phoneNumber = try? .singleFieldEntry(entryID: nil, kind, isRequestedByDapp: true)
 
 				default:
 					continue

@@ -66,16 +66,20 @@ extension AuthorizedDappsClient {
 			struct PersonaIDMismatch: Swift.Error {}
 			throw PersonaIDMismatch()
 		}
+		loggerGlobal.feature("current personaData: \(personaCurrent.personaData)")
+		loggerGlobal.feature("updated personaData: \(personaUpdated.personaData)")
 		let identityAddress = personaCurrent.address
 		let dApps = try await getAuthorizedDapps()
 
 		// We only care about the updated persona
 		let idsOfEntriesToKeep = Set(personaUpdated.personaData.entries.map(\.id))
+		loggerGlobal.feature("idsOfEntriesToKeep: \(idsOfEntriesToKeep)")
 
 		for authorizedDapp in dApps {
 			var updatedAuthedDapp = authorizedDapp
 			for personaSimple in authorizedDapp.referencesToAuthorizedPersonas {
 				guard personaSimple.identityAddress == identityAddress else {
+					loggerGlobal.feature("irrevant personaSimple...")
 					// irrelvant Persona
 					continue
 				}
@@ -84,13 +88,17 @@ extension AuthorizedDappsClient {
 
 				guard !idsOfEntriesToDelete.isEmpty else {
 					// No old entries needs to be deleted.
+					loggerGlobal.feature("no ID to delete")
 					continue
 				}
+				loggerGlobal.feature("idsOfEntriesToDelete: \(idsOfEntriesToDelete)")
 
 				loggerGlobal.notice("Pruning stale PersonaData entries with IDs: \(idsOfEntriesToDelete), for persona: \(personaUpdated.address) (\(personaUpdated.displayName.rawValue)), for Dapp: \(authorizedDapp)")
 				var authorizedPersonaSimple = personaSimple
 
+				loggerGlobal.feature("BEFORE REMOVE authorizedPersonaSimple.sharedPersonaData: \(authorizedPersonaSimple.sharedPersonaData)")
 				authorizedPersonaSimple.sharedPersonaData.remove(ids: idsOfEntriesToDelete)
+				loggerGlobal.feature("AFTER REMOVE authorizedPersonaSimple.sharedPersonaData: \(authorizedPersonaSimple.sharedPersonaData)")
 
 				// Write back to `updatedAuthedDapp`
 				updatedAuthedDapp.referencesToAuthorizedPersonas[id: authorizedPersonaSimple.id] = authorizedPersonaSimple
@@ -114,6 +122,8 @@ extension AuthorizedDappsClient {
 			if updatedAuthedDapp != authorizedDapp {
 				// Write back `updatedAuthedDapp` to Profile only if changes were needed
 				try await updateAuthorizedDapp(updatedAuthedDapp)
+			} else {
+				loggerGlobal.feature("nothing to do... skipped updating authorizedDapp")
 			}
 		}
 	}
