@@ -485,7 +485,6 @@ extension DappInteractionFlow {
 		for state: State
 	) -> EffectTask<Action> {
 		.run { [state] send in
-			loggerGlobal.feature("autofillOngoingResponseItemsIfPossibleEffect START")
 			var payload = InternalAction.AutofillOngoingResponseItemsPayload()
 
 			payload.ongoingAccountsPayload = try await { () async throws -> InternalAction.AutofillOngoingResponseItemsPayload.AccountsPayload? in
@@ -520,7 +519,6 @@ extension DappInteractionFlow {
 					let authorizedPersonaID = state.authorizedPersona?.id,
 					let sharedPersonaData = state.authorizedPersona?.sharedPersonaData
 				else {
-					loggerGlobal.feature("initial unwraps nil")
 					return nil
 				}
 
@@ -533,7 +531,6 @@ extension DappInteractionFlow {
 						personaData: persona.personaData
 					)
 				else {
-					loggerGlobal.feature("responseItem nil")
 					return nil
 				}
 
@@ -545,7 +542,7 @@ extension DappInteractionFlow {
 					),
 					sharedPersonaData.entryIDs.isSuperset(of: updatedSharedPersonaData.entryIDs)
 				else {
-					loggerGlobal.feature("Cannot autofill, have not shared fields earlier")
+					loggerGlobal.debug("Cannot autofill, have not shared fields earlier")
 					return nil
 				}
 
@@ -554,7 +551,7 @@ extension DappInteractionFlow {
 					responseItem: responseItem
 				)
 
-				loggerGlobal.feature("Autofilling with: \(personaDataPayload.responseItem)")
+				loggerGlobal.info("Autofilling with: \(personaDataPayload.responseItem)")
 
 				return personaDataPayload
 			}()
@@ -571,56 +568,6 @@ extension DappInteractionFlow.InternalAction.AutofillOngoingResponseItemsPayload
 	struct PersonaDataPayload: Sendable, Equatable {
 		var personaDataRequested: P2P.Dapp.Request.PersonaDataRequestItem
 		var responseItem: P2P.Dapp.Response.WalletInteractionSuccessResponse.PersonaDataRequestResponseItem
-
-//		init(
-//			personaDataRequested: P2P.Dapp.Request.PersonaDataRequestItem,
-//			responseItem: P2P.Dapp.Response.WalletInteractionSuccessResponse.PersonaDataRequestResponseItem
-//		) throws {
-//			if personaDataRequested.isRequestingName == true {
-//				guard responseItem.name != nil else {
-//					throw RequiredPersonaDataFieldsNotPresentInResponse(
-//						missingEntryKind: .fullName
-//					)
-//				}
-//			}
-//
-//			if let numberOfRequestedEmailAddresses = personaDataRequested.numberOfRequestedEmailAddresses {
-//				guard
-//					let emailAddresses = responseItem.emailAddresses,
-//					emailAddresses.satisfies(numberOfRequestedEmailAddresses)
-//				else {
-//					throw RequiredPersonaDataFieldsNotPresentInResponse(
-//						missingEntryKind: .emailAddress
-//					)
-//				}
-//			}
-//
-//			if let numberOfRequestedPhoneNumbers = personaDataRequested.numberOfRequestedPhoneNumbers {
-//				guard
-//					let phoneNumbers = responseItem.phoneNumbers,
-//					phoneNumbers.satisfies(numberOfRequestedPhoneNumbers)
-//				else {
-//					throw RequiredPersonaDataFieldsNotPresentInResponse(
-//						missingEntryKind: .phoneNumber
-//					)
-//				}
-//			}
-//
-//			// FIXME: Handle dateOfBirth
-//			// FIXME: Handle companyName
-//			// FIXME: Handle urls
-//			// FIXME: Handle postalAddresses
-//			// FIXME: Handle creditCards
-//
-//			// The only purpose of this switch is to make sure we get a compilation error when we add a new PersonaData.Entry kind, so
-//			// we do not forget to handle it here.
-//			switch PersonaData.Entry.Kind.fullName {
-//			case .fullName, .dateOfBirth, .companyName, .emailAddress, .phoneNumber, .url, .postalAddress, .creditCard: break
-//			}
-//
-//			self.personaDataRequested = personaDataRequested
-//			self.responseItem = responseItem
-//		}
 	}
 }
 
@@ -943,7 +890,7 @@ extension DappInteractionFlow {
 				persona: persona,
 				provided: providedPersonData
 			)
-			loggerGlobal.feature("updated persona to: \(String(describing: sharedPersonaData))")
+			loggerGlobal.debug("updated persona to: \(String(describing: sharedPersonaData))")
 		} else {
 			sharedPersonaData = nil
 		}
