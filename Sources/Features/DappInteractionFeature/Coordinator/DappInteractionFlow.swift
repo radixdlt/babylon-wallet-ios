@@ -526,28 +526,22 @@ extension DappInteractionFlow {
 				let allPersonas = try await personasClient.getPersonas()
 				guard let persona = allPersonas[id: authorizedPersonaID] else { return nil }
 
-				loggerGlobal.critical("tryingToAutofillingPersonaData...")
 				guard let personaDataToAutofillWith = try? tryingToAutofillingPersonaData(
 					request: personaDataRequested,
 					previous: sharedPersonaData,
 					current: persona
 				) else {
-					loggerGlobal.critical("tryingToAutofillingPersonaData nil!")
 					return nil
 				}
-				loggerGlobal.critical("tryingToAutofillingPersonaData not nil")
 
-				loggerGlobal.critical("responseItem...")
 				guard
 					let responseItem = try? P2P.Dapp.Response.WalletInteractionSuccessResponse.PersonaDataRequestResponseItem(
 						personaDataRequested: personaDataRequested,
 						personaData: personaDataToAutofillWith
 					)
 				else {
-					loggerGlobal.critical("responseItem nil")
 					return nil
 				}
-				loggerGlobal.critical("responseItem not nil")
 
 				return try? .init(
 					personaDataRequested: personaDataRequested,
@@ -621,7 +615,7 @@ extension DappInteractionFlow.InternalAction.AutofillOngoingResponseItemsPayload
 	}
 }
 
-extension OrderedSet where Element: PersonaDataEntryProtocol {
+extension Collection where Element: PersonaDataEntryProtocol {
 	func satisfies(_ requestedNumber: RequestedNumber) -> Bool {
 		switch requestedNumber.quantifier {
 		case .atLeast:
@@ -647,6 +641,7 @@ private func tryingToAutofillingPersonaData(
 	guard currentIDS.isSuperset(of: previousIDs) else {
 		throw MissingPersonaDataFields()
 	}
+
 	func extractEntry<T>(
 		_ keyPath: KeyPath<PersonaData, PersonaData.IdentifiedEntry<T>?>
 	) -> PersonaData.IdentifiedEntry<T>?
@@ -842,19 +837,12 @@ extension P2P.Dapp.Response.WalletInteractionSuccessResponse.PersonaDataRequestR
 				return nil
 			}
 			let personaDataEntries = personaData[keyPath: personaDataKeyPath]
-			let set = try OrderedSet<T>(validating: personaDataEntries.map(\.value))
-			let expectedQuantity = numberOfRequestedElements.quantity
-			switch numberOfRequestedElements.quantifier {
-			case .atLeast:
-				guard set.count >= expectedQuantity else {
-					return nil
-				}
-			case .exactly:
-				guard set.count == expectedQuantity else {
-					return nil
-				}
+			let personaDataEntriesOrderedSet = try OrderedSet<T>(validating: personaDataEntries.map(\.value))
+
+			guard personaDataEntriesOrderedSet.satisfies(numberOfRequestedElements) else {
+				return nil
 			}
-			return set
+			return personaDataEntriesOrderedSet
 		}
 
 		try self.init(
@@ -911,10 +899,6 @@ extension DappInteractionFlow {
 	}
 
 	func finishInteractionFlow(_ state: State) -> EffectTask<Action> {
-		loggerGlobal.critical("finishInteractionFlow START")
-		defer {
-			loggerGlobal.critical("finishInteractionFlow END (fail? success?)")
-		}
 		guard let response = P2P.Dapp.Response.WalletInteractionSuccessResponse(
 			for: state.remoteInteraction,
 			with: state.responseItems.values.compactMap(/State.AnyInteractionResponseItem.remote)
@@ -927,10 +911,8 @@ extension DappInteractionFlow {
 
 			if let persona = state.persona {
 				do {
-					loggerGlobal.critical("finishInteractionFlow calling updatePersona")
 					try await updatePersona(persona, state, responseItems: response.items)
 				} catch {
-					loggerGlobal.critical("Failed to update persona, error: \(error)")
 					await send(.internal(.failedToUpdatePersonaAtEndOfFlow(
 						persona: persona,
 						response: response,
@@ -949,7 +931,6 @@ extension DappInteractionFlow {
 		_ state: State,
 		responseItems: P2P.Dapp.Response.WalletInteractionSuccessResponse.Items
 	) async throws {
-		loggerGlobal.critical("updatePersona START")
 		let networkID = await gatewaysClient.getCurrentNetworkID()
 		var authorizedDapp = state.authorizedDapp ?? .init(
 			networkID: networkID,
@@ -1045,9 +1026,7 @@ extension DappInteractionFlow {
 			}
 		}()
 		authorizedDapp.referencesToAuthorizedPersonas[id: authorizedPersona.id] = authorizedPersona
-		loggerGlobal.critical("calling authorizedDappsClient.updateOrAddAuthorizedDapp")
 		try await authorizedDappsClient.updateOrAddAuthorizedDapp(authorizedDapp)
-		loggerGlobal.critical("authorizedDappsClient.updateOrAddAuthorizedDapp DONE")
 	}
 
 	func goBackEffect(for state: inout State) -> EffectTask<Action> {
