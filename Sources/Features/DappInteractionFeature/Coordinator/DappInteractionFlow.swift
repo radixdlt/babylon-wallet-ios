@@ -485,6 +485,7 @@ extension DappInteractionFlow {
 		for state: State
 	) -> EffectTask<Action> {
 		.run { [state] send in
+			loggerGlobal.feature("autofillOngoingResponseItemsIfPossibleEffect START")
 			var payload = InternalAction.AutofillOngoingResponseItemsPayload()
 
 			payload.ongoingAccountsPayload = try await { () async throws -> InternalAction.AutofillOngoingResponseItemsPayload.AccountsPayload? in
@@ -519,34 +520,43 @@ extension DappInteractionFlow {
 					let authorizedPersonaID = state.authorizedPersona?.id,
 					let sharedPersonaData = state.authorizedPersona?.sharedPersonaData
 				else {
+					loggerGlobal.feature("initial unwraps nil")
 					return nil
 				}
 
 				let allPersonas = try await personasClient.getPersonas()
 				guard let persona = allPersonas[id: authorizedPersonaID] else { return nil }
 
-				guard let personaDataToAutofillWith = try? tryingToAutofillingPersonaData(
-					request: personaDataRequested,
-					previous: sharedPersonaData,
-					current: persona
-				) else {
+				guard
+					let responseItem = try? P2P.Dapp.Response.WalletInteractionSuccessResponse.PersonaDataRequestResponseItem(
+						personaDataRequested: personaDataRequested,
+						personaData: persona.personaData
+					)
+				else {
+					loggerGlobal.feature("responseItem nil")
 					return nil
 				}
 
 				guard
-					let responseItem = try? P2P.Dapp.Response.WalletInteractionSuccessResponse.PersonaDataRequestResponseItem(
-						personaDataRequested: personaDataRequested,
-						personaData: personaDataToAutofillWith
-					)
+					let updatedSharedPersonaData = try? Profile.Network.AuthorizedDapp.AuthorizedPersonaSimple.SharedPersonaData(
+						requested: personaDataRequested,
+						persona: persona,
+						provided: responseItem
+					),
+					sharedPersonaData.entryIDs.isSuperset(of: updatedSharedPersonaData.entryIDs)
 				else {
+					loggerGlobal.feature("Cannot autofill, have not shared fields earlier")
 					return nil
 				}
 
-				return try? .init(
+				let personaDataPayload = InternalAction.AutofillOngoingResponseItemsPayload.PersonaDataPayload(
 					personaDataRequested: personaDataRequested,
 					responseItem: responseItem
 				)
 
+				loggerGlobal.feature("Autofilling with: \(personaDataPayload.responseItem)")
+
+				return personaDataPayload
 			}()
 
 			await send(.internal(.autofillOngoingResponseItemsIfPossible(payload)))
@@ -562,55 +572,55 @@ extension DappInteractionFlow.InternalAction.AutofillOngoingResponseItemsPayload
 		var personaDataRequested: P2P.Dapp.Request.PersonaDataRequestItem
 		var responseItem: P2P.Dapp.Response.WalletInteractionSuccessResponse.PersonaDataRequestResponseItem
 
-		init(
-			personaDataRequested: P2P.Dapp.Request.PersonaDataRequestItem,
-			responseItem: P2P.Dapp.Response.WalletInteractionSuccessResponse.PersonaDataRequestResponseItem
-		) throws {
-			if personaDataRequested.isRequestingName == true {
-				guard responseItem.name != nil else {
-					throw RequiredPersonaDataFieldsNotPresentInResponse(
-						missingEntryKind: .fullName
-					)
-				}
-			}
-
-			if let numberOfRequestedEmailAddresses = personaDataRequested.numberOfRequestedEmailAddresses {
-				guard
-					let emailAddresses = responseItem.emailAddresses,
-					emailAddresses.satisfies(numberOfRequestedEmailAddresses)
-				else {
-					throw RequiredPersonaDataFieldsNotPresentInResponse(
-						missingEntryKind: .emailAddress
-					)
-				}
-			}
-
-			if let numberOfRequestedPhoneNumbers = personaDataRequested.numberOfRequestedPhoneNumbers {
-				guard
-					let phoneNumbers = responseItem.phoneNumbers,
-					phoneNumbers.satisfies(numberOfRequestedPhoneNumbers)
-				else {
-					throw RequiredPersonaDataFieldsNotPresentInResponse(
-						missingEntryKind: .phoneNumber
-					)
-				}
-			}
-
-			// FIXME: Handle dateOfBirth
-			// FIXME: Handle companyName
-			// FIXME: Handle urls
-			// FIXME: Handle postalAddresses
-			// FIXME: Handle creditCards
-
-			// The only purpose of this switch is to make sure we get a compilation error when we add a new PersonaData.Entry kind, so
-			// we do not forget to handle it here.
-			switch PersonaData.Entry.Kind.fullName {
-			case .fullName, .dateOfBirth, .companyName, .emailAddress, .phoneNumber, .url, .postalAddress, .creditCard: break
-			}
-
-			self.personaDataRequested = personaDataRequested
-			self.responseItem = responseItem
-		}
+//		init(
+//			personaDataRequested: P2P.Dapp.Request.PersonaDataRequestItem,
+//			responseItem: P2P.Dapp.Response.WalletInteractionSuccessResponse.PersonaDataRequestResponseItem
+//		) throws {
+//			if personaDataRequested.isRequestingName == true {
+//				guard responseItem.name != nil else {
+//					throw RequiredPersonaDataFieldsNotPresentInResponse(
+//						missingEntryKind: .fullName
+//					)
+//				}
+//			}
+//
+//			if let numberOfRequestedEmailAddresses = personaDataRequested.numberOfRequestedEmailAddresses {
+//				guard
+//					let emailAddresses = responseItem.emailAddresses,
+//					emailAddresses.satisfies(numberOfRequestedEmailAddresses)
+//				else {
+//					throw RequiredPersonaDataFieldsNotPresentInResponse(
+//						missingEntryKind: .emailAddress
+//					)
+//				}
+//			}
+//
+//			if let numberOfRequestedPhoneNumbers = personaDataRequested.numberOfRequestedPhoneNumbers {
+//				guard
+//					let phoneNumbers = responseItem.phoneNumbers,
+//					phoneNumbers.satisfies(numberOfRequestedPhoneNumbers)
+//				else {
+//					throw RequiredPersonaDataFieldsNotPresentInResponse(
+//						missingEntryKind: .phoneNumber
+//					)
+//				}
+//			}
+//
+//			// FIXME: Handle dateOfBirth
+//			// FIXME: Handle companyName
+//			// FIXME: Handle urls
+//			// FIXME: Handle postalAddresses
+//			// FIXME: Handle creditCards
+//
+//			// The only purpose of this switch is to make sure we get a compilation error when we add a new PersonaData.Entry kind, so
+//			// we do not forget to handle it here.
+//			switch PersonaData.Entry.Kind.fullName {
+//			case .fullName, .dateOfBirth, .companyName, .emailAddress, .phoneNumber, .url, .postalAddress, .creditCard: break
+//			}
+//
+//			self.personaDataRequested = personaDataRequested
+//			self.responseItem = responseItem
+//		}
 	}
 }
 
@@ -628,73 +638,6 @@ extension Collection where Element: PersonaDataEntryProtocol {
 // MARK: - RequiredPersonaDataFieldsNotPresentInResponse
 struct RequiredPersonaDataFieldsNotPresentInResponse: Swift.Error {
 	let missingEntryKind: PersonaData.Entry.Kind
-}
-
-private func tryingToAutofillingPersonaData(
-	request: P2P.Dapp.Request.PersonaDataRequestItem,
-	previous: Profile.Network.AuthorizedDapp.AuthorizedPersonaSimple.SharedPersonaData,
-	current: Profile.Network.Persona
-) throws -> PersonaData {
-	let previousIDs = Set(previous.entryIDs)
-	let currentIDS = Set(current.personaData.entries.map(\.id))
-	guard currentIDS.isSuperset(of: previousIDs) else {
-		throw MissingPersonaDataFields()
-	}
-
-	func extractEntry<T>(
-		_ keyPath: KeyPath<PersonaData, PersonaData.IdentifiedEntry<T>?>
-	) -> PersonaData.IdentifiedEntry<T>?
-		where T: BasePersonaDataEntryProtocol
-	{
-		guard let entry = current.personaData[keyPath: keyPath] else {
-			return nil
-		}
-		guard previousIDs.contains(entry.id) else {
-			return nil
-		}
-		return entry
-	}
-
-	func extractEntries<T>(
-		inProfile keyPath: KeyPath<PersonaData, PersonaData.CollectionOfIdentifiedEntries<T>>,
-		previous prevKeyPath: KeyPath<Profile.Network.AuthorizedDapp.AuthorizedPersonaSimple.SharedPersonaData, Profile.Network.AuthorizedDapp.AuthorizedPersonaSimple.SharedPersonaData.SharedCollection?>,
-		request requestKeyPath: KeyPath<P2P.Dapp.Request.PersonaDataRequestItem, RequestedNumber?>
-	) throws -> PersonaData.CollectionOfIdentifiedEntries<T> where T: BasePersonaDataEntryProtocol {
-		guard let requestedNumber = request[keyPath: requestKeyPath] else {
-			return .init()
-		}
-
-		let collectionOfIdentifiedEntires = current.personaData[keyPath: keyPath]
-
-		guard let previouslyShared = previous[keyPath: prevKeyPath] else {
-			return .init()
-		}
-
-		guard previouslyShared.request == requestedNumber else { return .init() }
-
-		return try .init(collection: collectionOfIdentifiedEntires.collection.filter {
-			previouslyShared.ids.contains($0.id)
-		})
-	}
-
-	return try .init(
-		name: extractEntry(\.name),
-		dateOfBirth: extractEntry(\.dateOfBirth),
-		companyName: extractEntry(\.companyName),
-		emailAddresses: extractEntries(
-			inProfile: \.emailAddresses,
-			previous: \.emailAddresses,
-			request: \.numberOfRequestedEmailAddresses
-		),
-		phoneNumbers: extractEntries(
-			inProfile: \.phoneNumbers,
-			previous: \.phoneNumbers,
-			request: \.numberOfRequestedPhoneNumbers
-		),
-		urls: .init(), // FIXME: When P2P.Dapp.Requests and Response support it
-		postalAddresses: .init(), // FIXME: When P2P.Dapp.Requests and Response support it
-		creditCards: .init() // FIXME: When P2P.Dapp.Requests and Response support it
-	)
 }
 
 // MARK: - MissingPersonaDataFields
@@ -1000,6 +943,7 @@ extension DappInteractionFlow {
 				persona: persona,
 				provided: providedPersonData
 			)
+			loggerGlobal.feature("updated persona to: \(String(describing: sharedPersonaData))")
 		} else {
 			sharedPersonaData = nil
 		}
