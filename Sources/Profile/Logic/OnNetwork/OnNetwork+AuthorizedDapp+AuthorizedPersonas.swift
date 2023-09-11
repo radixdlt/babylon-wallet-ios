@@ -87,11 +87,14 @@ extension Profile.Network {
 				}(),
 				sharedPersonaData: {
 					let full = persona.personaData
+					let fullIDs = Set(full.entries.map(\.id))
 					let shared = simple.sharedPersonaData
+					let sharedIDs = shared.entryIDs
+
 					guard
-						Set(full.entries.map(\.id))
-						.isSuperset(of: shared.entryIDs)
+						fullIDs.isSuperset(of: sharedIDs)
 					else {
+						loggerGlobal.error("Profile discrepancy - most likely caused by incorrect implementation of DappInteractionFlow and updating of shared persona data. \n\nDetails [persona.personaData.ids] \(fullIDs) != \(sharedIDs) [simple.sharedPersonaData]\n\npersona.personaData: \(persona.personaData)\n\nsimple.sharedPersonaData:\(shared)")
 						throw AuthorizedDappReferencesFieldIDThatDoesNotExist()
 					}
 

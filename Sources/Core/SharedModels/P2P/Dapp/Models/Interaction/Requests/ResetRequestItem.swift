@@ -1,6 +1,6 @@
 import Prelude
 
-// MARK: - P2P.Dapp.Request.OneTimeAccountsRequestItem
+// MARK: - P2P.Dapp.Request.ResetRequestItem
 extension P2P.Dapp.Request {
 	public struct ResetRequestItem: Sendable, Hashable, Decodable {
 		public let accounts: Bool

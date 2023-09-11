@@ -40,7 +40,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		public func printFeePayerInfo(line: UInt = #line, function: StaticString = #function) {
 			#if DEBUG
 			func doPrint(_ msg: String) {
-				loggerGlobal.critical("💃 \(function)#\(line) - \(msg)")
+				loggerGlobal.info("\(function)#\(line) - \(msg)")
 			}
 			let intentSignersNonEmpty = reviewedTransaction?.transactionSigners.intentSignerEntitiesNonEmptyOrNil()
 			let feePayer = reviewedTransaction?.feePayerSelection.selected?.account

@@ -1,7 +1,7 @@
 import FeaturePrelude
 
-// MARK: - EditPersonaFieldID
-public protocol EditPersonaFieldID: Sendable, Hashable, Comparable {
+// MARK: - EditPersonaFieldKindBehaviour
+public protocol EditPersonaFieldKindBehaviour: Sendable, Hashable, Comparable {
 	var title: String { get }
 	#if os(iOS)
 	var contentType: UITextContentType? { get }
@@ -11,25 +11,29 @@ public protocol EditPersonaFieldID: Sendable, Hashable, Comparable {
 }
 
 // MARK: - EditPersonaField
-public struct EditPersonaField<ID: EditPersonaFieldID>: Sendable, FeatureReducer, EmptyInitializable {
-	public struct State: Sendable, Hashable, Identifiable {
-		public let id: ID
+public struct EditPersonaField<Behaviour: EditPersonaFieldKindBehaviour>: Sendable, FeatureReducer, EmptyInitializable {
+	public struct State: Sendable, Hashable {
+		public let behaviour: Behaviour
+		public let entryID: PersonaDataEntryID
 		let isRequestedByDapp: Bool
-		let showsName: Bool
+		let showsTitle: Bool
 
 		@Validation<String, String>
 		public var input: String?
 
 		private init(
-			id: ID,
+			behaviour: Behaviour,
+			entryID: PersonaDataEntryID?,
 			input: Validation<String, String>,
 			isRequestedByDapp: Bool,
-			showsName: Bool
+			showsTitle: Bool
 		) {
-			self.id = id
+			@Dependency(\.uuid) var uuid
+			self.entryID = entryID ?? uuid()
+			self.behaviour = behaviour
 			self._input = input
 			self.isRequestedByDapp = isRequestedByDapp
-			self.showsName = showsName
+			self.showsTitle = showsTitle
 		}
 	}
 
@@ -52,8 +56,8 @@ public struct EditPersonaField<ID: EditPersonaFieldID>: Sendable, FeatureReducer
 
 public typealias EditPersonaStaticField = EditPersonaField<EditPersona.State.StaticFieldID>
 
-// MARK: - EditPersona.State.StaticFieldID + EditPersonaFieldID
-extension EditPersona.State.StaticFieldID: EditPersonaFieldID {
+// MARK: - EditPersona.State.StaticFieldID + EditPersonaFieldKindBehaviour
+extension EditPersona.State.StaticFieldID: EditPersonaFieldKindBehaviour {
 	public var title: String {
 		switch self {
 		case .personaLabel: return L10n.AuthorizedDapps.PersonaDetails.personaLabelHeading
@@ -83,18 +87,20 @@ extension EditPersona.State.StaticFieldID: EditPersonaFieldID {
 
 extension EditPersonaStaticField.State {
 	public init(
-		id: ID,
+		behaviour: Behaviour,
+		entryID: PersonaDataEntryID?,
 		initial: String?
 	) {
 		self.init(
-			id: id,
+			behaviour: behaviour,
+			entryID: entryID,
 			input: .init(
 				wrappedValue: initial,
 				onNil: L10n.EditPersona.Error.blank,
 				rules: [.if(\.isBlank, error: L10n.EditPersona.Error.blank)]
 			),
 			isRequestedByDapp: false,
-			showsName: true
+			showsTitle: true
 		)
 	}
 }
@@ -117,8 +123,8 @@ public enum DynamicFieldID: Hashable, Sendable {
 	case creditCard
 }
 
-// MARK: EditPersonaFieldID
-extension DynamicFieldID: EditPersonaFieldID {
+// MARK: EditPersonaFieldKindBehaviour
+extension DynamicFieldID: EditPersonaFieldKindBehaviour {
 	// FIXME: Localize
 	public var title: String {
 		switch self {
@@ -203,20 +209,22 @@ extension PersonaData.Entry.Kind: Comparable {
 
 extension EditPersonaDynamicField.State {
 	public init(
-		id: ID,
+		behaviour: Behaviour,
+		entryID: PersonaDataEntryID?,
 		text: String?,
 		isRequiredByDapp: Bool,
-		showsName: Bool
+		showsTitle: Bool
 	) {
 		self.init(
-			id: id,
+			behaviour: behaviour,
+			entryID: entryID,
 			input: .init(
 				wrappedValue: text,
 				onNil: nil,
 				rules: []
 			),
 			isRequestedByDapp: isRequiredByDapp,
-			showsName: showsName
+			showsTitle: showsTitle
 		)
 	}
 }

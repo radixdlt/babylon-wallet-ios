@@ -16,11 +16,10 @@ extension PersonaData {
 		public var value: Value
 
 		public init(
-			id: ID? = nil,
+			id: ID,
 			value: Value
 		) {
-			@Dependency(\.uuid) var uuid
-			self.id = id ?? uuid()
+			self.id = id
 			self.value = value
 		}
 

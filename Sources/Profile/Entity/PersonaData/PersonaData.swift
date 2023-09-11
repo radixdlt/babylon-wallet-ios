@@ -79,52 +79,55 @@ extension PersonaData {
 }
 
 extension PersonaData {
-	public static let previewValue: Self = try! .init(
-		name: .init(value: .init(
-			variant: .eastern,
-			familyName: "Nakamoto",
-			givenNames: "Satoshi",
-			nickname: "Bitcoin"
-		)),
-		dateOfBirth: .init(value: .init(year: 2009, month: 1, day: 3)),
-		companyName: .init(value: .init(name: "Bitcoin")),
-		emailAddresses: .init(collection: [
-			.init(value: .init(email: "satoshi@nakamoto.bitcoin")),
-			.init(value: .init(email: "be.your@own.bank")),
-		]),
-		phoneNumbers: .init(collection: [
-			.init(value: .init(number: "21000000")),
-			.init(value: .init(number: "123456789")),
-		]),
-		urls: .init(collection: [
-			.init(value: .init(url: "bitcoin.org")),
-			.init(value: .init(url: "https://github.com/bitcoin-core/secp256k1")),
-		]),
-		postalAddresses: .init(collection: [
-			.init(value: .init(validating: [
-				.postalCode("21 000 000"),
-				.prefecture("SHA256"), .countySlashCity("Hashtown"),
-				.furtherDivisionsLine0("Sound money street"),
-				.furtherDivisionsLine1(""),
-				.countryOrRegion(.japan),
-			])),
-			.init(value: .init(validating: [
-				.streetLine0("Copthall House"),
-				.streetLine1("King street"),
-				.townSlashCity("Newcastle-under-Lyme"),
-				.county("Newcastle"),
-				.postcode("ST5 1UE"),
-				.countryOrRegion(.unitedKingdom),
-			])),
-		]),
-		creditCards: .init(collection: [
-			.init(value: .init(
-				expiry: .init(year: 2142, month: 12),
-				holder: "Satoshi Nakamoto",
-				number: "0000 0000 2100 0000",
-				cvc: 512
-			)
-			),
-		])
-	)
+	public static var previewValue: Self {
+		@Dependency(\.uuid) var uuid
+
+		return try! Self(
+			name: .init(id: uuid(), value: .init(
+				variant: .eastern,
+				familyName: "Nakamoto",
+				givenNames: "Satoshi",
+				nickname: "Bitcoin"
+			)),
+			dateOfBirth: .init(id: uuid(), value: .init(year: 2009, month: 1, day: 3)),
+			companyName: .init(id: uuid(), value: .init(name: "Bitcoin")),
+			emailAddresses: .init(collection: [
+				.init(id: uuid(), value: .init(email: "satoshi@nakamoto.bitcoin")),
+				.init(id: uuid(), value: .init(email: "be.your@own.bank")),
+			]),
+			phoneNumbers: .init(collection: [
+				.init(id: uuid(), value: .init(number: "21000000")),
+				.init(id: uuid(), value: .init(number: "123456789")),
+			]),
+			urls: .init(collection: [
+				.init(id: uuid(), value: .init(url: "bitcoin.org")),
+				.init(id: uuid(), value: .init(url: "https://github.com/bitcoin-core/secp256k1")),
+			]),
+			postalAddresses: .init(collection: [
+				.init(id: uuid(), value: .init(validating: [
+					.postalCode("21 000 000"),
+					.prefecture("SHA256"), .countySlashCity("Hashtown"),
+					.furtherDivisionsLine0("Sound money street"),
+					.furtherDivisionsLine1(""),
+					.countryOrRegion(.japan),
+				])),
+				.init(id: uuid(), value: .init(validating: [
+					.streetLine0("Copthall House"),
+					.streetLine1("King street"),
+					.townSlashCity("Newcastle-under-Lyme"),
+					.county("Newcastle"),
+					.postcode("ST5 1UE"),
+					.countryOrRegion(.unitedKingdom),
+				])),
+			]),
+			creditCards: .init(collection: [
+				.init(id: uuid(), value: .init(
+					expiry: .init(year: 2142, month: 12),
+					holder: "Satoshi Nakamoto",
+					number: "0000 0000 2100 0000",
+					cvc: 512
+				)),
+			])
+		)
+	}
 }

@@ -1,3 +1,4 @@
+import AuthorizedDappsClient
 import FeaturePrelude
 import PersonasClient
 import Prelude
@@ -15,19 +16,38 @@ extension EditPersona {
 			var personaData = PersonaData()
 
 			personaData.name = name.map {
-				.init(value: .init(
-					variant: $0.variant,
-					familyName: $0.family.input ?? "",
-					givenNames: $0.given.input ?? "",
-					nickname: $0.nickName.input ?? ""
-				))
+				.init(
+					id: $0.id,
+					value: .init(
+						variant: $0.variant,
+						familyName: $0.family.input ?? "",
+						givenNames: $0.given.input ?? "",
+						nickname: $0.nickName.input ?? ""
+					)
+				)
 			}
 
-			personaData.emailAddresses = (emailAddress?.input)
-				.flatMap { try? .init(collection: [.init(value: .init(email: $0))]) } ?? .init()
+			if let emailState = emailAddress, let emailAddress = emailState.input {
+				personaData.emailAddresses = (try? .init(
+					collection: [
+						.init(
+							id: emailState.entryID,
+							value: .init(email: emailAddress)
+						),
+					]
+				)) ?? .init()
+			}
 
-			personaData.phoneNumbers = (phoneNumber?.input)
-				.flatMap { try? .init(collection: [.init(value: .init(number: $0))]) } ?? .init()
+			if let phoneState = phoneNumber, let phoneNumber = phoneState.input {
+				personaData.phoneNumbers = (try? .init(
+					collection: [
+						.init(
+							id: phoneState.entryID,
+							value: .init(number: phoneNumber)
+						),
+					]
+				)) ?? .init()
+			}
 
 			return personaData
 		}
@@ -66,7 +86,8 @@ public struct EditPersona: Sendable, FeatureReducer {
 			self.persona = persona
 			self.entries = .init(with: persona.personaData, mode: mode)
 			self.labelField = EditPersonaStaticField.State(
-				id: .personaLabel,
+				behaviour: .personaLabel,
+				entryID: persona.personaData.name?.id,
 				initial: persona.displayName.rawValue
 			)
 		}
@@ -114,6 +135,7 @@ public struct EditPersona: Sendable, FeatureReducer {
 	public init() {}
 
 	@Dependency(\.dismiss) var dismiss
+	@Dependency(\.authorizedDappsClient) var authorizedDappsClient
 	@Dependency(\.personasClient) var personasClient
 	@Dependency(\.errorQueue) var errorQueue
 
@@ -158,6 +180,10 @@ public struct EditPersona: Sendable, FeatureReducer {
 		case let .saveButtonTapped(output):
 			return .run { [state] send in
 				let updatedPersona = state.persona.updated(with: output)
+				try await authorizedDappsClient.removeBrokenReferencesToSharedPersonaData(
+					personaCurrent: state.persona,
+					personaUpdated: updatedPersona
+				)
 				try await personasClient.updatePersona(updatedPersona)
 				await send(.delegate(.personaSaved(updatedPersona)))
 				await dismiss()
@@ -181,13 +207,16 @@ public struct EditPersona: Sendable, FeatureReducer {
 			for kind in fieldsToAdd {
 				switch kind {
 				case .fullName:
-					state.entries.name = .entry()
+					state.entries.name = .entry(
+						entryID: nil,
+						name: .default
+					)
 
 				case .emailAddress:
-					state.entries.emailAddress = try? .singleFieldEntry(kind)
+					state.entries.emailAddress = try? .singleFieldEntry(entryID: nil, kind)
 
 				case .phoneNumber:
-					state.entries.phoneNumber = try? .singleFieldEntry(kind)
+					state.entries.phoneNumber = try? .singleFieldEntry(entryID: nil, kind)
 
 				default:
 					continue
@@ -200,6 +229,15 @@ public struct EditPersona: Sendable, FeatureReducer {
 			return .none
 		}
 	}
+}
+
+extension PersonaData.Name {
+	static let `default` = Self(
+		variant: .western,
+		familyName: "",
+		givenNames: "",
+		nickname: ""
+	)
 }
 
 extension EditPersona.State {
@@ -242,7 +280,7 @@ extension PersonaData.Entry {
 		case let .name(entryModel): return entryModel.description
 		case let .emailAddress(entryModel): return entryModel.email
 		case let .phoneNumber(entryModel): return entryModel.number
-		default: fatalError()
+		default: fatalError("Add support for new PersonaData entry kinds")
 		}
 	}
 }
@@ -250,26 +288,52 @@ extension PersonaData.Entry {
 extension EditPersonaEntry<EditPersonaDynamicField>.State {
 	struct NotApplicableError: Error {}
 
-	static func singleFieldEntry(_ kind: PersonaData.Entry.Kind, text: String = "", isRequestedByDapp: Bool = false) throws -> Self {
+	static func singleFieldEntry(
+		entryID: PersonaDataEntryID?,
+		_ kind: PersonaData.Entry.Kind,
+		text: String = "",
+		isRequestedByDapp: Bool = false
+	) throws -> Self {
 		switch kind {
 		case .fullName, .dateOfBirth, .companyName, .url, .postalAddress, .creditCard:
 			throw NotApplicableError()
+
 		case .emailAddress:
-			return .init(kind: .emailAddress, field: .emailAddress, text: text, isRequestedByDapp: isRequestedByDapp)
+			return .init(
+				entryID: entryID,
+				kind: .emailAddress,
+				field: .emailAddress,
+				text: text,
+				isRequestedByDapp: isRequestedByDapp
+			)
+
 		case .phoneNumber:
-			return .init(kind: .phoneNumber, field: .phoneNumber, text: text, isRequestedByDapp: isRequestedByDapp)
+			return .init(
+				entryID: entryID,
+				kind: .phoneNumber,
+				field: .phoneNumber,
+				text: text,
+				isRequestedByDapp: isRequestedByDapp
+			)
 		}
 	}
 
-	private init(kind: PersonaData.Entry.Kind, field: DynamicFieldID, text: String, isRequestedByDapp: Bool) {
+	private init(
+		entryID: PersonaDataEntryID?,
+		kind: PersonaData.Entry.Kind,
+		field: DynamicFieldID,
+		text: String,
+		isRequestedByDapp: Bool
+	) {
 		self.init(
 			kind: kind,
 			isRequestedByDapp: isRequestedByDapp,
 			content: .init(
-				id: field,
+				behaviour: field,
+				entryID: entryID,
 				text: text,
 				isRequiredByDapp: isRequestedByDapp,
-				showsName: false
+				showsTitle: false
 			)
 		)
 	}
@@ -277,13 +341,18 @@ extension EditPersonaEntry<EditPersonaDynamicField>.State {
 
 extension EditPersonaEntry<EditPersonaName>.State {
 	static func entry(
-		name: PersonaData.Name = .init(variant: .western, familyName: "", givenNames: "", nickname: ""),
+		entryID: PersonaDataEntryID?,
+		name: PersonaData.Name,
 		isRequestedByDapp: Bool = false
 	) -> Self {
 		.init(
 			kind: .fullName,
 			isRequestedByDapp: isRequestedByDapp,
-			content: .init(with: name, isRequestedByDapp: isRequestedByDapp)
+			content: .init(
+				entryID: entryID,
+				with: name,
+				isRequestedByDapp: isRequestedByDapp
+			)
 		)
 	}
 }

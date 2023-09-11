@@ -20,8 +20,10 @@ extension AuthorizedDappsClient: DependencyKey {
 					_ = try $0.addAuthorizedDapp(newDapp)
 				}
 			},
-			forgetAuthorizedDapp: { toForget, networkID in
-				try await getProfileStore().updating {
+			forgetAuthorizedDapp: { toForget, maybeNetworkID in
+				let currentNetworkID = await getProfileStore().profile.networkID
+				let networkID = maybeNetworkID ?? currentNetworkID
+				return try await getProfileStore().updating {
 					_ = try $0.forgetAuthorizedDapp(toForget, on: networkID)
 				}
 			},
