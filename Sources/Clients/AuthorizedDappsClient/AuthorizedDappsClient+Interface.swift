@@ -69,28 +69,50 @@ extension AuthorizedDappsClient {
 		let identityAddress = personaCurrent.address
 		let dApps = try await getAuthorizedDapps()
 
-		// We only care about the update persona
+		// We only care about the updated persona
 		let idsOfEntriesToKeep = Set(personaUpdated.personaData.entries.map(\.id))
 
 		for authedDapp in dApps {
 			var updatedAuthedDapp = authedDapp
 			for personaSimple in authedDapp.referencesToAuthorizedPersonas {
 				guard personaSimple.identityAddress == identityAddress else {
+					// irrelvant Persona
 					continue
 				}
-				let sharedData = personaSimple.sharedPersonaData
-				let idsOfEntriesToDelete = sharedData.entryIDs.subtracting(idsOfEntriesToKeep)
+				// Relevant Persona => check if there are any old PersonaData entries that needs deleting
+				let idsOfEntriesToDelete = personaSimple.sharedPersonaData.entryIDs.subtracting(idsOfEntriesToKeep)
 
 				guard !idsOfEntriesToDelete.isEmpty else {
+					// No old entries needs to be deleted.
 					continue
 				}
 
+				loggerGlobal.notice("Pruning stale PersonaData entries with IDs: \(idsOfEntriesToDelete), for persona: \(personaUpdated.address) (\(personaUpdated.displayName.rawValue)), for Dapp: \(authedDapp)")
 				var authorizedPersonaSimple = personaSimple
 
 				authorizedPersonaSimple.sharedPersonaData.remove(ids: idsOfEntriesToDelete)
+
+				// Write back to `updatedAuthedDapp`
 				updatedAuthedDapp.referencesToAuthorizedPersonas[id: authorizedPersonaSimple.id] = authorizedPersonaSimple
+
+				// Soundness check
+				if
+					!Set(personaUpdated.personaData.entries.map(\.id))
+					.isSuperset(
+						of:
+						updatedAuthedDapp
+							.referencesToAuthorizedPersonas[id: authorizedPersonaSimple.id]!
+							.sharedPersonaData
+							.entryIDs
+					)
+				{
+					let errMsg = "Incorrect implementation, failed to prune stale PersonaData entries for authorizedDapp"
+					assertionFailure(errMsg)
+					loggerGlobal.error(.init(stringLiteral: errMsg))
+				}
 			}
 			if updatedAuthedDapp != authedDapp {
+				// Write back `updatedAuthedDapp` to Profile only if changes were needed
 				try await updateAuthorizedDapp(updatedAuthedDapp)
 			}
 		}
