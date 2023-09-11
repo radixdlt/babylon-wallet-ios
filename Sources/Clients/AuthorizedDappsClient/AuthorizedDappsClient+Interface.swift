@@ -72,9 +72,9 @@ extension AuthorizedDappsClient {
 		// We only care about the updated persona
 		let idsOfEntriesToKeep = Set(personaUpdated.personaData.entries.map(\.id))
 
-		for authedDapp in dApps {
-			var updatedAuthedDapp = authedDapp
-			for personaSimple in authedDapp.referencesToAuthorizedPersonas {
+		for authorizedDapp in dApps {
+			var updatedAuthedDapp = authorizedDapp
+			for personaSimple in authorizedDapp.referencesToAuthorizedPersonas {
 				guard personaSimple.identityAddress == identityAddress else {
 					// irrelvant Persona
 					continue
@@ -87,7 +87,7 @@ extension AuthorizedDappsClient {
 					continue
 				}
 
-				loggerGlobal.notice("Pruning stale PersonaData entries with IDs: \(idsOfEntriesToDelete), for persona: \(personaUpdated.address) (\(personaUpdated.displayName.rawValue)), for Dapp: \(authedDapp)")
+				loggerGlobal.notice("Pruning stale PersonaData entries with IDs: \(idsOfEntriesToDelete), for persona: \(personaUpdated.address) (\(personaUpdated.displayName.rawValue)), for Dapp: \(authorizedDapp)")
 				var authorizedPersonaSimple = personaSimple
 
 				authorizedPersonaSimple.sharedPersonaData.remove(ids: idsOfEntriesToDelete)
@@ -111,7 +111,7 @@ extension AuthorizedDappsClient {
 					loggerGlobal.error(.init(stringLiteral: errMsg))
 				}
 			}
-			if updatedAuthedDapp != authedDapp {
+			if updatedAuthedDapp != authorizedDapp {
 				// Write back `updatedAuthedDapp` to Profile only if changes were needed
 				try await updateAuthorizedDapp(updatedAuthedDapp)
 			}
@@ -136,7 +136,8 @@ extension Profile.Network.AuthorizedDapp.AuthorizedPersonaSimple.SharedPersonaDa
 					self[keyPath: keyPath] = nil
 				}
 			case .exactly:
-				// must delete whole collection since requested quantity is no longer fulfilled.
+				// Must delete whole collection since requested quantity is no longer fulfilled,
+				// since we **just** deleted the id from `ids`.
 				self[keyPath: keyPath] = nil
 			}
 		}
