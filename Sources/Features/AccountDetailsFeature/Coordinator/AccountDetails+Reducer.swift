@@ -362,19 +362,13 @@ public struct AccountDetails: Sendable, FeatureReducer {
 
 				return !isAlreadyBackedUp
 			}
-
 		}()
 
 		guard mightNeedToBeBackedUp else {
 			return .none
 		}
 
-		return reloadPortfolioAndCheckIfBackupIsNeeded(address: state.account.address)
-	}
-
-	/// Reloads the portfolio and sets Backup Needed if necessary
-	private func reloadPortfolioAndCheckIfBackupIsNeeded(address: AccountAddress) -> EffectTask<Action> {
-		.run { send in
+		return .run { [address = state.account.address] send in
 			guard let portfolio = try? await accountPortfoliosClient.fetchAccountPortfolio(address, false) else { return }
 
 			let xrdResource = portfolio.fungibleResources.xrdResource
