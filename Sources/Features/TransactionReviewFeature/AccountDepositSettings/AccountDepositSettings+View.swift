@@ -57,7 +57,7 @@ struct AccountDepositSettingsChangeView: View {
 		Card {
 			InnerCard {
 				SmallAccountCard(account: viewState.account)
-				VStack(spacing: .medium3) {
+				VStack(spacing: .medium2) {
 					if let depositRuleChange = viewState.depositRuleChange {
 						Text(depositRuleChange.string)
 							.foregroundColor(.app.gray1)

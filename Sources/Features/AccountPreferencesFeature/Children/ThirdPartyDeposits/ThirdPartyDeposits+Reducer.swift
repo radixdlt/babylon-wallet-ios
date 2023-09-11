@@ -88,13 +88,15 @@ public struct ManageThirdPartyDeposits: FeatureReducer, Sendable {
 			case .allowDenyAssets:
 				state.destinations = .allowDenyAssets(.init(
 					mode: .allowDenyAssets(.allow),
-					thirdPartyDeposits: state.thirdPartyDeposits
+					thirdPartyDeposits: state.thirdPartyDeposits,
+					networkID: state.account.networkID
 				))
 
 			case .allowDepositors:
 				state.destinations = .allowDepositors(.init(
 					mode: .allowDepositors,
-					thirdPartyDeposits: state.thirdPartyDeposits
+					thirdPartyDeposits: state.thirdPartyDeposits,
+					networkID: state.account.networkID
 				))
 			}
 			return .none

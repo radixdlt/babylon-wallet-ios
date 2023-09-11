@@ -50,6 +50,7 @@ public struct ResourcesList: FeatureReducer, Sendable {
 
 		var mode: ResourcesListMode
 		var thirdPartyDeposits: ThirdPartyDeposits
+		let networkID: NetworkID
 		var loadedResources: [ResourceViewState] = []
 
 		@PresentationState
@@ -120,7 +121,8 @@ public struct ResourcesList: FeatureReducer, Sendable {
 		case .addAssetTapped:
 			state.destinations = .addAsset(.init(
 				mode: state.mode,
-				alreadyAddedResources: state.allDepositorAddresses
+				alreadyAddedResources: state.allDepositorAddresses,
+				networkID: state.networkID
 			))
 			return .none
 
