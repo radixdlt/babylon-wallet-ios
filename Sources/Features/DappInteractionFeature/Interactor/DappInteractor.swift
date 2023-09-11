@@ -38,7 +38,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 		}
 
 		enum InvalidRequestAlertAction: Sendable, Hashable {
-			case ok
+			case ok(P2P.RTCOutgoingMessage.Response, origin: P2P.Route)
 		}
 	}
 
@@ -64,7 +64,9 @@ struct DappInteractor: Sendable, FeatureReducer {
 		)
 		case presentResponseSuccessView(DappMetadata, TXID?)
 		case presentInvalidRequest(
-			DappInteractionClient.ValidatedDappRequest.Invalid,
+			P2P.Dapp.RequestUnvalidated,
+			reason: DappInteractionClient._ValidatedDappRequest.InvalidRequestReason,
+			route: P2P.Route,
 			isDeveloperModeEnabled: Bool
 		)
 	}
@@ -132,8 +134,15 @@ struct DappInteractor: Sendable, FeatureReducer {
 			switch action {
 			case .dismiss:
 				return .none
-			case .presented(.ok):
-				return .send(.internal(.presentQueuedRequestIfNeeded))
+			case let .presented(.ok(response, route)):
+				return .run { send in
+					do {
+						try await dappInteractionClient.completeInteraction(.response(response, origin: route))
+					} catch {
+						errorQueue.schedule(error)
+					}
+					await send(.internal(.presentQueuedRequestIfNeeded))
+				}
 			}
 
 		case .moveToBackground:
@@ -206,20 +215,29 @@ struct DappInteractor: Sendable, FeatureReducer {
 			)
 			return .none
 
-		case let .presentInvalidRequest(invalidReason, isDeveloperModeEnabled):
+		case let .presentInvalidRequest(invalidRequest, reason, route, isDeveloperModeEnabled):
+			let response = P2P.Dapp.Response.WalletInteractionFailureResponse(
+				interactionId: invalidRequest.id,
+				errorType: reason.interactionResponseError,
+				message: reason.explanation(isDeveloperModeEnabled)
+			)
+
 			state.invalidRequestAlert = .init(
 				title: { TextState(L10n.Error.DappRequest.invalidRequest) },
 				actions: {
-					ButtonState(role: .cancel, action: .ok) {
+					ButtonState(
+						role: .cancel,
+						action: .ok(.dapp(.failure(response)), origin: route)
+					) {
 						TextState(L10n.Common.cancel)
 					}
 				},
 				message: {
-					let explanation = invalidReason.explanation(isDeveloperModeEnabled)
-					if explanation == invalidReason.subtitle {
-						return TextState(invalidReason.subtitle)
+					let explanation = reason.explanation(isDeveloperModeEnabled)
+					if explanation == reason.subtitle {
+						return TextState(reason.subtitle)
 					} else {
-						return TextState(invalidReason.subtitle + "\n" + explanation)
+						return TextState(reason.subtitle + "\n" + explanation)
 					}
 				}
 			)
@@ -326,7 +344,24 @@ struct DappInteractor: Sendable, FeatureReducer {
 	}
 }
 
-extension DappInteractionClient.ValidatedDappRequest.Invalid {
+extension DappInteractionClient._ValidatedDappRequest.InvalidRequestReason {
+	var interactionResponseError: P2P.Dapp.Response.WalletInteractionFailureResponse.ErrorType {
+		switch self {
+		case .incompatibleVersion:
+			return .incompatibleVersion
+		case .wrongNetworkID:
+			return .wrongNetwork
+		case .invalidDappDefinitionAddress:
+			return .unknownDappDefinitionAddress
+		case .invalidOrigin:
+			return .invalidOriginURL
+		case .dAppValidationError:
+			return .unknownDappDefinitionAddress
+		case .badContent:
+			return .invalidRequest
+		}
+	}
+
 	var subtitle: String {
 		switch self {
 		case .badContent(.numberOfAccountsInvalid):
@@ -335,7 +370,7 @@ extension DappInteractionClient.ValidatedDappRequest.Invalid {
 			return L10n.DAppRequest.ValidationOutcome.subtitleIncompatibleVersion
 		case .wrongNetworkID:
 			return L10n.DAppRequest.ValidationOutcome.subtitleWrongNetworkID
-		case .invalidOrigin, .invalidDappDefinitionAddress, .dAppValidationError, .p2pError:
+		case .invalidOrigin, .invalidDappDefinitionAddress, .dAppValidationError:
 			return shortExplanation
 		}
 	}
@@ -363,8 +398,6 @@ extension DappInteractionClient.ValidatedDappRequest.Invalid {
 			return L10n.DAppRequest.ValidationOutcome.devExplanationInvalidDappDefinitionAddress(invalidAddress)
 		case .dAppValidationError, .wrongNetworkID:
 			return shortExplanation
-		case let .p2pError(message):
-			return message
 		}
 	}
 
@@ -386,8 +419,6 @@ extension DappInteractionClient.ValidatedDappRequest.Invalid {
 			return "Could not validate the dApp" // FIXME: Strings
 		case let .wrongNetworkID(ce, wallet):
 			return L10n.DAppRequest.RequestWrongNetworkAlert.message(ce, wallet)
-		case .p2pError:
-			return L10n.DAppRequest.ValidationOutcome.shortExplanationP2PError
 		}
 	}
 }
@@ -400,12 +431,22 @@ extension DappInteractor {
 					return
 				}
 
-				switch incomingRequest {
-				case let .valid(requestEnvelope):
-					await send(.internal(.receivedRequestFromDapp(requestEnvelope)))
-				case let .invalid(invalid):
-					let isDeveloperModeEnabled = await appPreferencesClient.isDeveloperModeEnabled()
-					await send(.internal(.presentInvalidRequest(invalid, isDeveloperModeEnabled: isDeveloperModeEnabled)))
+				do {
+					let validatedRequest = try incomingRequest.get()
+					switch validatedRequest.request {
+					case let .valid(request):
+						await send(.internal(.receivedRequestFromDapp(.init(route: validatedRequest.route, request: request))))
+					case let .invalid(invalidRequest, reason):
+						let isDeveloperModeEnabled = await appPreferencesClient.isDeveloperModeEnabled()
+						await send(.internal(.presentInvalidRequest(
+							invalidRequest,
+							reason: reason,
+							route: validatedRequest.route,
+							isDeveloperModeEnabled: isDeveloperModeEnabled
+						)))
+					}
+				} catch {
+					errorQueue.schedule(error)
 				}
 			}
 		} catch: { error, _ in
