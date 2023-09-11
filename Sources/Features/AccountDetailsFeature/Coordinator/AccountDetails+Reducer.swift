@@ -181,7 +181,14 @@ public struct AccountDetails: Sendable, FeatureReducer {
 					await send(.internal(.loadMnemonic))
 				}
 				for try await accountUpdate in await accountsClient.accountUpdates(state.account.address) {
-					guard !Task.isCancelled else { return }
+					print("• accountUpdates UPDATE 1")
+
+					guard !Task.isCancelled else {
+						print("• accountUpdates CANCELLED")
+						return
+					}
+					print("• accountUpdates UPDATE 2")
+
 					await send(.internal(.accountUpdated(accountUpdate)))
 				}
 			}
@@ -232,9 +239,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 			case .closeButtonTapped, .failedToImportAllRequiredMnemonics:
 				break
 			case let .finishedImportingMnemonics(_, imported):
-				if
-					imported.contains(where: { $0.factorSourceID == state.deviceControlledFactorInstance.factorSourceID })
-				{
+				if imported.contains(where: { $0.factorSourceID == state.deviceControlledFactorInstance.factorSourceID }) {
 					state.importMnemonicPrompt = .no
 
 					// It makes no sense to prompt user to back up a mnemonic she *just* imported.
@@ -297,6 +302,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 			return .none
 
 		case let .accountUpdated(account):
+			print("• CASE accountUpdated", account.address.address)
 			state.account = account
 			return .none
 		}
