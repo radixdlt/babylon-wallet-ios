@@ -42,7 +42,7 @@ jobs:
 
       - name: "Unit tests (debug)"
         run: >-
-          xcodebuild test -workspace App/BabylonWallet.xcodeproj/project.xcworkspace  -scheme Test -destination 'platform=iOS Simulator,name=iPhone14,OS=13.7'
+          xcodebuild test -workspace App/BabylonWallet.xcodeproj/project.xcworkspace  -scheme 'Unit Test' -destination 'platform=iOS Simulator,name=iPhone14,OS=13.7'
 
       - name: "Build and archive (release)"
         run: bundle exec fastlane ios build --env ios.beta
