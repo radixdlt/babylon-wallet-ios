@@ -42,5 +42,5 @@ jobs:
 
       - name: "Unit tests (debug)"
         run: |
-          fastlane scan
+          bundle exec fastlane scan
           # xcodebuild test -workspace App/BabylonWallet.xcodeproj/project.xcworkspace  -scheme 'Unit Test' -destination 'platform=iOS Simulator,name=iPhone14,OS=13.7'
