@@ -82,7 +82,7 @@ extension P2P.ConnectorExtension.Request {
 					self.signers = signers
 					self.ledgerDevice = ledgerDevice
 					self.compiledTransactionIntent = compiledTransactionIntent
-					self.mode = "verbose"
+					self.mode = "summary"
 					self.displayHash = displayHash
 				}
 			}
