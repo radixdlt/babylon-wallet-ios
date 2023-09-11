@@ -8,12 +8,11 @@ extension AccountPreferences.State {
 				title: "Personalize this account", // FIXME: strings
 				rows: [.accountLabel(account)]
 			),
-			// FIXME: Re-introduce Third Party Deposit once https://github.com/radixdlt/babylon-wallet-ios/pull/692 PR has fixed the TCA Send bug it introduces
-//			.init(
-//				id: .onLedgerBehaviour,
-//				title: "Set how you want this account to work", // FIXME: strings
-//				rows: [.thirdPartyDeposits()]
-//			),
+			.init(
+				id: .onLedgerBehaviour,
+				title: "Set how you want this account to work", // FIXME: strings
+				rows: [.thirdPartyDeposits()]
+			),
 			.init(
 				id: .development,
 				title: "Set development preferences", // FIXME: strings

@@ -12,41 +12,34 @@ extension AccountDepositSettings {
 		}
 
 		public var body: some SwiftUI.View {
-			WithViewStore(store, observe: { $0 }, send: { .view($0) }) { _ in
-				Card {
-					VStack(spacing: .small1) {
-						ForEachStore(
-							store.scope(
-								state: \.accounts,
-								action: { .child(.account(id: $0, action: $1)) }
-							),
-							content: { AccountDepositSettingsChange.View(store: $0) }
-						)
+			WithViewStore(store, observe: { $0 }) { viewStore in
+				VStack(spacing: .small1) {
+					ForEach(viewStore.accounts) {
+						AccountDepositSettingsChangeView(viewState: .init(from: $0))
 					}
-					.padding(.small1)
 				}
 			}
 		}
 	}
 }
 
-extension AccountDepositSettingsChange.State {
-	var viewState: AccountDepositSettingsChange.ViewState {
-		.init(
-			account: account,
-			resourcePreferenceChanges: .init(uncheckedUniqueElements: resourceChanges.map {
+extension AccountDepositSettingsChangeView.ViewState {
+	init(from settingsChange: AccountDepositSettingsChange) {
+		self.init(
+			account: settingsChange.account,
+			resourcePreferenceChanges: .init(uncheckedUniqueElements: settingsChange.resourceChanges.map {
 				ResourceChangeView.ViewState(resource: $0.resource, changeDescription: $0.change.description)
 			}),
-			allowedDepositorChanges: .init(uncheckedUniqueElements: allowedDepositorChanges.map {
+			allowedDepositorChanges: .init(uncheckedUniqueElements: settingsChange.allowedDepositorChanges.map {
 				ResourceChangeView.ViewState(resource: $0.resource, changeDescription: $0.change.description)
 			}),
-			depositRuleChange: depositRuleChange
+			depositRuleChange: settingsChange.depositRuleChange
 		)
 	}
 }
 
-// MARK: - TransactionReviewAccount.View
-extension AccountDepositSettingsChange {
+// MARK: - AccountDepositSettingsChangeView
+struct AccountDepositSettingsChangeView: View {
 	public struct ViewState: Equatable {
 		let account: Profile.Network.Account
 		let resourcePreferenceChanges: IdentifiedArrayOf<ResourceChangeView.ViewState>
@@ -58,43 +51,33 @@ extension AccountDepositSettingsChange {
 		}
 	}
 
-	@MainActor
-	public struct View: SwiftUI.View {
-		private let store: StoreOf<AccountDepositSettingsChange>
+	let viewState: ViewState
 
-		public init(store: StoreOf<AccountDepositSettingsChange>) {
-			self.store = store
-		}
-
-		public var body: some SwiftUI.View {
-			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-				InnerCard {
-					SmallAccountCard(account: viewStore.account)
-					VStack(spacing: .medium3) {
-						if let depositRuleChange = viewStore.depositRuleChange {
-							Text(depositRuleChange.string)
-								.foregroundColor(.app.gray1)
-								.textStyle(.body1Regular)
-							if viewStore.hasChanges {
-								Separator()
-							}
-						}
-						ForEach(viewStore.resourcePreferenceChanges) { viewState in
-							ResourceChangeView(viewState: viewState) {
-								viewStore.send(.assetTapped($0))
-							}
-						}
-						ForEach(viewStore.allowedDepositorChanges) { viewState in
-							ResourceChangeView(viewState: viewState) {
-								viewStore.send(.assetTapped($0))
-							}
+	public var body: some SwiftUI.View {
+		Card {
+			InnerCard {
+				SmallAccountCard(account: viewState.account)
+				VStack(spacing: .medium3) {
+					if let depositRuleChange = viewState.depositRuleChange {
+						Text(depositRuleChange.string)
+							.foregroundColor(.app.gray1)
+							.textStyle(.body1Regular)
+						if viewState.hasChanges {
+							Separator()
 						}
 					}
-					.padding(.medium3)
-					.frame(maxWidth: .infinity)
-					.background(.app.gray5)
+					ForEach(viewState.resourcePreferenceChanges) { viewState in
+						ResourceChangeView(viewState: viewState)
+					}
+					ForEach(viewState.allowedDepositorChanges) { viewState in
+						ResourceChangeView(viewState: viewState)
+					}
 				}
+				.padding(.medium3)
+				.frame(maxWidth: .infinity)
+				.background(.app.gray5)
 			}
+			.padding(.small1)
 		}
 	}
 }
@@ -111,17 +94,14 @@ struct ResourceChangeView: View {
 	}
 
 	let viewState: ViewState
-	let onTapped: (OnLedgerEntity.Resource) -> Void
 
 	var body: some View {
-		Button(action: { onTapped(viewState.resource) }) {
-			HStack {
-				ResourceIconNameView(resource: viewState.resource)
-				Spacer(minLength: .zero)
-				Text(viewState.changeDescription)
-					.textStyle(.secondaryHeader)
-					.foregroundColor(.app.gray1)
-			}
+		HStack {
+			ResourceIconNameView(resource: viewState.resource)
+			Spacer(minLength: .zero)
+			Text(viewState.changeDescription)
+				.textStyle(.secondaryHeader)
+				.foregroundColor(.app.gray1)
 		}
 	}
 }
@@ -140,7 +120,7 @@ extension ResourcePreferenceAction {
 	}
 }
 
-extension AccountDepositSettingsChange.State.AllowedDepositorChange.Change {
+extension AccountDepositSettingsChange.AllowedDepositorChange.Change {
 	var description: String {
 		switch self {
 		case .added:
