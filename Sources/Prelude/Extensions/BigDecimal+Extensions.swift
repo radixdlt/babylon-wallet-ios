@@ -18,13 +18,9 @@ extension BigDecimal {
 	/// Formats the number for human consumtion
 	public func format(
 		maxPlaces maxPlacesNonNegative: UInt = BigDecimal.defaultMaxPlacesFormattted,
+		divisibility: Int? = nil,
 		locale: Locale = .autoupdatingCurrent
 	) -> String {
-		let maxPlacesNonNegative = min(
-			BigDecimal.defaultMaxPlacesFormattted,
-			maxPlacesNonNegative
-		)
-
 		// N.B. We cannot use `Local.current.decimalSeperator` here because
 		// `github.com/Zollerbo1/BigDecimal` package **hardcodes** usage of
 		// the decimal separator ".", see this line here:
@@ -40,7 +36,11 @@ extension BigDecimal {
 		}
 
 		let integerPart = String(components[0])
-		let decimalPart = String(components[1])
+		let decimalComponents = components[1]
+		let decimalPart = String(
+			divisibility.map { decimalComponents.prefix($0 + 1) }
+				?? decimalComponents
+		)
 
 		let numberOfDecimalDigits = max(1, Int(maxPlacesNonNegative) - integerPart.count)
 
