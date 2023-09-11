@@ -180,13 +180,11 @@ public struct EditPersona: Sendable, FeatureReducer {
 		case let .saveButtonTapped(output):
 			return .run { [state] send in
 				let updatedPersona = state.persona.updated(with: output)
-				loggerGlobal.critical("calling personasClient.updatePersona")
 				try await authorizedDappsClient.removeBrokenReferencesToSharedPersonaData(
 					personaCurrent: state.persona,
 					personaUpdated: updatedPersona
 				)
 				try await personasClient.updatePersona(updatedPersona)
-				loggerGlobal.critical("personasClient.updatePersona DONE => delegating")
 				await send(.delegate(.personaSaved(updatedPersona)))
 				await dismiss()
 			} catch: { error, _ in

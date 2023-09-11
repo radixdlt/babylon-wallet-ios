@@ -252,7 +252,6 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			return autofillOngoingResponseItemsIfPossibleEffect(for: state)
 
 		case let .autofillOngoingResponseItemsIfPossible(payload):
-			loggerGlobal.critical("autofillOngoingResponseItemsIfPossible")
 			if let ongoingAccountsWithoutProofOfOwnership = payload.ongoingAccountsPayload {
 				let numberOfAccountsRequested = ongoingAccountsWithoutProofOfOwnership.numberOfAccountsRequested
 				let local = DappInteractionFlow.State.LocalInteractionItem.accountPermissionRequested(numberOfAccountsRequested)
@@ -1125,7 +1124,6 @@ extension DappInteractionFlow.Destinations.State {
 			)))
 
 		case let .remote(.ongoingPersonaData(item)):
-			loggerGlobal.critical("relaying personaDataPermission")
 			guard let persona else {
 				assertionFailure("Persona data request requires a persona.")
 				return nil

@@ -94,7 +94,7 @@ extension Profile.Network {
 					guard
 						fullIDs.isSuperset(of: sharedIDs)
 					else {
-						loggerGlobal.critical("Profile discrepancy - most likely caused by incorrect implementation of DappInteractionFlow and updating of shared persona data. \n\nDetails [persona.personaData.ids] \(fullIDs) != \(sharedIDs) [simple.sharedPersonaData]\n\npersona.personaData: \(persona.personaData)\n\nsimple.sharedPersonaData:\(shared)")
+						loggerGlobal.error("Profile discrepancy - most likely caused by incorrect implementation of DappInteractionFlow and updating of shared persona data. \n\nDetails [persona.personaData.ids] \(fullIDs) != \(sharedIDs) [simple.sharedPersonaData]\n\npersona.personaData: \(persona.personaData)\n\nsimple.sharedPersonaData:\(shared)")
 						throw AuthorizedDappReferencesFieldIDThatDoesNotExist()
 					}
 

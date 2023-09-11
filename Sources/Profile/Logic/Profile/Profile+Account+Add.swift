@@ -69,7 +69,6 @@ extension Profile {
 			try networks.add(network)
 
 			if network.networkID == .mainnet {
-				loggerGlobal.feature("Creating first mainnet account 😎 switching to mainnet")
 				do {
 					try changeGateway(to: .mainnet)
 				} catch {
