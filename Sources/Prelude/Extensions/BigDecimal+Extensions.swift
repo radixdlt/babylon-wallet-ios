@@ -37,10 +37,21 @@ extension BigDecimal {
 
 		let integerPart = String(components[0])
 		let decimalComponents = components[1]
-		let decimalPart = String(
-			divisibility.map { decimalComponents.prefix($0 + 1) }
-				?? decimalComponents
-		)
+		let decimalPart = {
+			guard let divisibility else {
+				return decimalComponents
+			}
+
+			guard divisibility > .zero else {
+				return ""
+			}
+
+			return decimalComponents.prefix(divisibility)
+		}()
+
+		guard !decimalPart.isEmpty else {
+			return integerPart
+		}
 
 		let numberOfDecimalDigits = max(1, Int(maxPlacesNonNegative) - integerPart.count)
 
