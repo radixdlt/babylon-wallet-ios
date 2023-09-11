@@ -35,6 +35,13 @@ extension Radix.Gateway {
 		)
 	}
 
+	public static var stokenet: Self {
+		.init(
+			network: .stokenet,
+			url: URL(string: "babylon-stokenet-gateway.radixdlt.com/")!
+		)
+	}
+
 	public static var rcnet: Self {
 		.init(
 			network: .zabanet,

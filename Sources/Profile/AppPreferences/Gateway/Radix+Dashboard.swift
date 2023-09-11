@@ -31,6 +31,8 @@ extension Radix.Dashboard {
 			return .rcnetV2
 		case .zabanet:
 			return .rcnetV3
+		case .stokenet:
+			return .stokenet
 		default:
 			return .rcnet
 		}
@@ -53,6 +55,12 @@ extension Radix.Dashboard {
 	public static var rcnetV3: Self {
 		.init(
 			url: URL(string: "https://rcnet-v3-dashboard.radixdlt.com/")!
+		)
+	}
+
+	public static var stokenet: Self {
+		.init(
+			url: URL(string: "https://stokenet-dashboard.radixdlt.com/")!
 		)
 	}
 

@@ -1,13 +1,12 @@
 import AppPreferencesClient
 import DappInteractionClient
+import EngineKit
 import FeaturePrelude
 import GatewaysClient
 import RadixConnect
 import RadixConnectClient
 import RadixConnectModels
 import ROLAClient
-
-import EngineToolkit
 
 typealias RequestEnvelope = DappInteractionClient.RequestEnvelope
 
@@ -46,11 +45,28 @@ struct DappInteractor: Sendable, FeatureReducer {
 	enum InternalAction: Sendable, Equatable {
 		case receivedRequestFromDapp(RequestEnvelope)
 		case presentQueuedRequestIfNeeded
-		case sentResponseToDapp(P2P.Dapp.Response, for: RequestEnvelope, DappMetadata)
-		case failedToSendResponseToDapp(P2P.Dapp.Response, for: RequestEnvelope, DappMetadata, reason: String)
-		case presentResponseFailureAlert(P2P.Dapp.Response, for: RequestEnvelope, DappMetadata, reason: String)
-		case presentResponseSuccessView(DappMetadata)
-		case presentInvalidRequest(DappInteractionClient.ValidatedDappRequest.Invalid, isDeveloperModeEnabled: Bool)
+		case sentResponseToDapp(
+			P2P.Dapp.Response,
+			for: RequestEnvelope,
+			DappMetadata,
+			TXID?
+		)
+		case failedToSendResponseToDapp(
+			P2P.Dapp.Response,
+			for: RequestEnvelope,
+			DappMetadata,
+			reason: String
+		)
+		case presentResponseFailureAlert(
+			P2P.Dapp.Response,
+			for: RequestEnvelope,
+			DappMetadata, reason: String
+		)
+		case presentResponseSuccessView(DappMetadata, TXID?)
+		case presentInvalidRequest(
+			DappInteractionClient.ValidatedDappRequest.Invalid,
+			isDeveloperModeEnabled: Bool
+		)
 	}
 
 	enum ChildAction: Sendable, Equatable {
@@ -156,11 +172,11 @@ struct DappInteractor: Sendable, FeatureReducer {
 		case .presentQueuedRequestIfNeeded:
 			return presentQueuedRequestIfNeededEffect(for: &state)
 
-		case let .sentResponseToDapp(response, for: request, dappMetadata):
+		case let .sentResponseToDapp(response, for: request, dappMetadata, txID):
 			dismissCurrentModalAndRequest(request, for: &state)
 			switch response {
 			case .success:
-				return .send(.internal(.presentResponseSuccessView(dappMetadata)))
+				return .send(.internal(.presentResponseSuccessView(dappMetadata, txID)))
 			case .failure:
 				return delayedEffect(for: .internal(.presentQueuedRequestIfNeeded))
 			}
@@ -209,8 +225,13 @@ struct DappInteractor: Sendable, FeatureReducer {
 			)
 			return .none
 
-		case let .presentResponseSuccessView(dappMetadata):
-			state.currentModal = .dappInteractionCompletion(.init(dappMetadata: dappMetadata))
+		case let .presentResponseSuccessView(dappMetadata, txID):
+			state.currentModal = .dappInteractionCompletion(
+				.init(
+					txID: txID,
+					dappMetadata: dappMetadata
+				)
+			)
 			return .none
 		}
 	}
@@ -219,9 +240,9 @@ struct DappInteractor: Sendable, FeatureReducer {
 		switch childAction {
 		case let .modal(.presented(.dappInteraction(.relay(request, .delegate(.submit(responseToDapp, dappMetadata)))))):
 			return sendResponseToDappEffect(responseToDapp, for: request, dappMetadata: dappMetadata)
-		case let .modal(.presented(.dappInteraction(.relay(request, .delegate(.dismiss(dappMetadata)))))):
+		case let .modal(.presented(.dappInteraction(.relay(request, .delegate(.dismiss(dappMetadata, txID)))))):
 			dismissCurrentModalAndRequest(request, for: &state)
-			return .send(.internal(.presentResponseSuccessView(dappMetadata)))
+			return .send(.internal(.presentResponseSuccessView(dappMetadata, txID)))
 
 		case let .modal(.presented(.dappInteraction(.relay(request, .delegate(.dismissSilently))))):
 			dismissCurrentModalAndRequest(request, for: &state)
@@ -262,14 +283,15 @@ struct DappInteractor: Sendable, FeatureReducer {
 
 			// In case of transaction response, sending it to the peer client is a silent operation.
 			// The success or failures is determined based on the transaction polling status.
-			let isTransactionResponse = {
+			let txID: TXID? = {
 				if case let .success(successResponse) = responseToDapp,
-				   case .transaction = successResponse.items
+				   case let .transaction(txID) = successResponse.items
 				{
-					return true
+					return txID.send.transactionIntentHash
 				}
-				return false
+				return nil
 			}()
+			let isTransactionResponse = txID != nil
 
 			do {
 				_ = try await dappInteractionClient.completeInteraction(.response(.dapp(responseToDapp), origin: request.route))
@@ -278,7 +300,8 @@ struct DappInteractor: Sendable, FeatureReducer {
 						.sentResponseToDapp(
 							responseToDapp,
 							for: request,
-							dappMetadata
+							dappMetadata,
+							txID
 						)
 					))
 				}
