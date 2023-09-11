@@ -37,7 +37,7 @@ extension UpdateAccountLabel {
 						)
 						AppTextField(
 							primaryHeading: .init(text: L10n.AccountSettings.RenameAccount.subtitle),
-							placeholder: "Your account label", // FIXME: strings
+							placeholder: "",
 							text: nameBinding,
 							hint: viewStore.hint
 						)

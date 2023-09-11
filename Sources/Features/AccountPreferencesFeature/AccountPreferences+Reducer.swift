@@ -31,13 +31,13 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 
 	// MARK: - Destination
 	public struct Destinations: ReducerProtocol, Sendable {
-		public enum State: Equatable, Hashable {
+		public enum State: Hashable, Sendable {
 			case updateAccountLabel(UpdateAccountLabel.State)
 			case thirdPartyDeposits(ManageThirdPartyDeposits.State)
 			case devPreferences(DevAccountPreferences.State)
 		}
 
-		public enum Action: Equatable {
+		public enum Action: Equatable, Sendable {
 			case updateAccountLabel(UpdateAccountLabel.Action)
 			case thirdPartyDeposits(ManageThirdPartyDeposits.Action)
 			case devPreferences(DevAccountPreferences.Action)

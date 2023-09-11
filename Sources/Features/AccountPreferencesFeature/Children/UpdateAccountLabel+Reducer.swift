@@ -3,7 +3,7 @@ import FeaturePrelude
 import OverlayWindowClient
 
 // MARK: - UpdateAccountLabel
-public struct UpdateAccountLabel: FeatureReducer {
+public struct UpdateAccountLabel: FeatureReducer, Sendable {
 	public struct State: Hashable, Sendable {
 		var account: Profile.Network.Account
 		var accountLabel: String
@@ -16,12 +16,12 @@ public struct UpdateAccountLabel: FeatureReducer {
 		}
 	}
 
-	public enum ViewAction: Equatable {
+	public enum ViewAction: Equatable, Sendable {
 		case accountLabelChanged(String)
 		case updateTapped(NonEmptyString)
 	}
 
-	public enum DelegateAction: Equatable {
+	public enum DelegateAction: Equatable, Sendable {
 		case accountLabelUpdated
 	}
 
