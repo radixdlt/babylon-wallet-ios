@@ -40,6 +40,12 @@ extension Radix.Network {
 		displayDescription: "Mainnet"
 	)
 
+	public static let stokenet = Self(
+		name: "stokenet",
+		id: .stokenet,
+		displayDescription: "Stokenet"
+	)
+
 	public static let nebunet = Self(
 		name: "nebunet",
 		id: .nebunet,
@@ -89,6 +95,7 @@ extension Radix.Network {
 extension Radix.Network {
 	fileprivate static let lookupSet: Set<Self> = [
 		.mainnet,
+		.stokenet,
 		.nebunet,
 		.kisharnet,
 		.ansharnet,
