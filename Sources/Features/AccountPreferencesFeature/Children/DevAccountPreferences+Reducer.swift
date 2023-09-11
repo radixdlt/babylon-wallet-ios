@@ -235,8 +235,7 @@ public struct DevAccountPreferences: Sendable, FeatureReducer {
 				}
 				return .none
 
-			// FIXME: Update to use TX Polling
-			case .reviewTransaction(.delegate(.signedTXAndSubmittedToGateway)), .reviewTransaction(.delegate(.failed)):
+			case .reviewTransaction(.delegate(.transactionCompleted)), .reviewTransaction(.delegate(.failed)):
 				if case .reviewTransaction = state.destination {
 					state.destination = nil
 				}
