@@ -4,10 +4,7 @@ import LedgerHardwareDevicesFeature
 
 extension AccountSecurity.State {
 	var viewState: AccountSecurity.ViewState {
-		.init(
-			hasLedgerHardwareWalletFactorSources: hasLedgerHardwareWalletFactorSources,
-			useVerboseLedgerDisplayMode: (preferences?.display.ledgerHQHardwareWalletSigningDisplayMode ?? .default) == .verbose
-		)
+		.init(hasLedgerHardwareWalletFactorSources: hasLedgerHardwareWalletFactorSources)
 	}
 }
 
@@ -15,8 +12,6 @@ extension AccountSecurity.State {
 extension AccountSecurity {
 	public struct ViewState: Equatable {
 		let hasLedgerHardwareWalletFactorSources: Bool
-		/// only to be displayed if `hasLedgerHardwareWalletFactorSources` is true
-		let useVerboseLedgerDisplayMode: Bool
 	}
 
 	@MainActor
@@ -39,12 +34,6 @@ extension AccountSecurity.View {
 						SettingsRow(row: row) {
 							viewStore.send(row.action)
 						}
-					}
-
-					if viewStore.hasLedgerHardwareWalletFactorSources {
-						isUsingVerboseLedgerMode(with: viewStore)
-							.padding(.horizontal, .medium3)
-							.withSeparator
 					}
 
 					let row = importOlympiaRow
@@ -70,18 +59,6 @@ extension AccountSecurity.View {
 				.foregroundColor(.app.gray1)
 		}
 		.presentsLoadingViewOverlay()
-	}
-
-	private func isUsingVerboseLedgerMode(with viewStore: ViewStoreOf<AccountSecurity>) -> some SwiftUI.View {
-		ToggleView(
-			icon: AssetResource.ledger, // FIXME: icon?
-			title: "Verbose Ledger Signing", // FIXME: STrings - wait for update to L10n.AppSettings.VerboseLedgerMode.title,
-			subtitle: L10n.AppSettings.VerboseLedgerMode.subtitle,
-			isOn: viewStore.binding(
-				get: \.useVerboseLedgerDisplayMode,
-				send: { .useVerboseModeToggled($0) }
-			)
-		)
 	}
 
 	@MainActor

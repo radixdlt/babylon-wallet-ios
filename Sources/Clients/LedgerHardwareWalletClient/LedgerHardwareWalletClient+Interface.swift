@@ -26,20 +26,17 @@ public struct SignTransactionWithLedgerRequest: Sendable, Hashable {
 	public let signers: NonEmpty<IdentifiedArrayOf<Signer>>
 	public let ledger: LedgerHardwareWalletFactorSource
 	public let transactionIntent: TransactionIntent
-	public let ledgerTXDisplayMode: P2P.ConnectorExtension.Request.LedgerHardwareWallet.Request.SignTransaction.Mode
 	public let displayHashOnLedgerDisplay: Bool
 
 	public init(
 		ledger: LedgerHardwareWalletFactorSource,
 		signers: NonEmpty<IdentifiedArrayOf<Signer>>,
 		transactionIntent: TransactionIntent,
-		ledgerTXDisplayMode: P2P.ConnectorExtension.Request.LedgerHardwareWallet.Request.SignTransaction.Mode,
 		displayHashOnLedgerDisplay: Bool
 	) {
 		self.signers = signers
 		self.ledger = ledger
 		self.transactionIntent = transactionIntent
-		self.ledgerTXDisplayMode = ledgerTXDisplayMode
 		self.displayHashOnLedgerDisplay = displayHashOnLedgerDisplay
 	}
 }

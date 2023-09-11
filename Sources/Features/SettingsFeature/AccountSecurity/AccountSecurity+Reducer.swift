@@ -31,7 +31,6 @@ public struct AccountSecurity: Sendable, FeatureReducer {
 		case mnemonicsButtonTapped
 		case defaultDepositGuaranteeButtonTapped
 		case ledgerHardwareWalletsButtonTapped
-		case useVerboseModeToggled(Bool)
 		case importFromOlympiaWalletButtonTapped
 	}
 
@@ -117,10 +116,6 @@ public struct AccountSecurity: Sendable, FeatureReducer {
 			let depositGuarantee = state.preferences?.transaction.defaultDepositGuarantee ?? 1
 			state.destination = .depositGuarantees(.init(depositGuarantee: depositGuarantee))
 			return .none
-
-		case let .useVerboseModeToggled(useVerboseMode):
-			state.preferences?.display.ledgerHQHardwareWalletSigningDisplayMode = useVerboseMode ? .verbose : .summary
-			return savePreferences(state: state)
 
 		case .importFromOlympiaWalletButtonTapped:
 			state.destination = .importOlympiaWallet(.init())
