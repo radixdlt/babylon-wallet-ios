@@ -57,4 +57,94 @@ extension AuthorizedDappsClient {
 	) async throws -> IdentifiedArrayOf<Profile.Network.AuthorizedDapp> {
 		try await getAuthorizedDapps().filter { $0.referencesToAuthorizedPersonas.ids.contains(id) }
 	}
+
+	public func removeBrokenReferencesToSharedPersonaData(
+		personaCurrent: Profile.Network.Persona,
+		personaUpdated: Profile.Network.Persona
+	) async throws {
+		guard personaCurrent.id == personaUpdated.id else {
+			struct PersonaIDMismatch: Swift.Error {}
+			throw PersonaIDMismatch()
+		}
+		let identityAddress = personaCurrent.address
+		let dApps = try await getAuthorizedDapps()
+
+		// We only care about the update persona
+		let idsOfEntriesToKeep = Set(personaUpdated.personaData.entries.map(\.id))
+
+		for authedDapp in dApps {
+			var updatedAuthedDapp = authedDapp
+			for personaSimple in authedDapp.referencesToAuthorizedPersonas {
+				guard personaSimple.identityAddress == identityAddress else {
+					continue
+				}
+				let sharedData = personaSimple.sharedPersonaData
+				let idsOfEntriesToDelete = sharedData.entryIDs.subtracting(idsOfEntriesToKeep)
+
+				guard !idsOfEntriesToDelete.isEmpty else {
+					continue
+				}
+
+				var authorizedPersonaSimple = personaSimple
+
+				authorizedPersonaSimple.sharedPersonaData.remove(ids: idsOfEntriesToDelete)
+				updatedAuthedDapp.referencesToAuthorizedPersonas[id: authorizedPersonaSimple.id] = authorizedPersonaSimple
+			}
+			if updatedAuthedDapp != authedDapp {
+				try await updateAuthorizedDapp(updatedAuthedDapp)
+			}
+		}
+	}
+}
+
+extension Profile.Network.AuthorizedDapp.AuthorizedPersonaSimple.SharedPersonaData {
+	private mutating func remove(id: PersonaDataEntryID) {
+		func removeCollectionIfNeeded(
+			at keyPath: WritableKeyPath<Self, Profile.Network.AuthorizedDapp.AuthorizedPersonaSimple.SharedPersonaData.SharedCollection?>
+		) {
+			guard
+				var collection = self[keyPath: keyPath],
+				collection.ids.contains(id)
+			else { return }
+			collection.ids.remove(id)
+			switch collection.request.quantifier {
+			case .atLeast:
+				if collection.ids.count < collection.request.quantity {
+					// must delete whole collection since requested quantity is no longer fulfilled.
+					self[keyPath: keyPath] = nil
+				}
+			case .exactly:
+				// must delete whole collection since requested quantity is no longer fulfilled.
+				self[keyPath: keyPath] = nil
+			}
+		}
+
+		func removeEntryIfNeeded(
+			at keyPath: WritableKeyPath<Self, PersonaDataEntryID?>
+		) {
+			guard self[keyPath: keyPath] == id else { return }
+			self[keyPath: keyPath] = nil
+		}
+
+		removeEntryIfNeeded(at: \.name)
+		removeEntryIfNeeded(at: \.dateOfBirth)
+		removeEntryIfNeeded(at: \.companyName)
+		removeCollectionIfNeeded(at: \.emailAddresses)
+		removeCollectionIfNeeded(at: \.phoneNumbers)
+		removeCollectionIfNeeded(at: \.urls)
+		removeCollectionIfNeeded(at: \.postalAddresses)
+		removeCollectionIfNeeded(at: \.creditCards)
+
+		// The only purpose of this switch is to make sure we get a compilation error when we add a new PersonaData.Entry kind, so
+		// we do not forget to handle it here.
+		switch PersonaData.Entry.Kind.fullName {
+		case .fullName, .dateOfBirth, .companyName, .emailAddress, .phoneNumber, .url, .postalAddress, .creditCard: break
+		}
+	}
+
+	mutating func remove(ids: Set<PersonaDataEntryID>) {
+		ids.forEach {
+			remove(id: $0)
+		}
+	}
 }

@@ -1,3 +1,4 @@
+import AuthorizedDappsClient
 import FeaturePrelude
 import PersonasClient
 import Prelude
@@ -114,6 +115,7 @@ public struct EditPersona: Sendable, FeatureReducer {
 	public init() {}
 
 	@Dependency(\.dismiss) var dismiss
+	@Dependency(\.authorizedDappsClient) var authorizedDappsClient
 	@Dependency(\.personasClient) var personasClient
 	@Dependency(\.errorQueue) var errorQueue
 
@@ -159,6 +161,10 @@ public struct EditPersona: Sendable, FeatureReducer {
 			return .run { [state] send in
 				let updatedPersona = state.persona.updated(with: output)
 				loggerGlobal.critical("calling personasClient.updatePersona")
+				try await authorizedDappsClient.removeBrokenReferencesToSharedPersonaData(
+					personaCurrent: state.persona,
+					personaUpdated: updatedPersona
+				)
 				try await personasClient.updatePersona(updatedPersona)
 				loggerGlobal.critical("personasClient.updatePersona DONE => delegating")
 				await send(.delegate(.personaSaved(updatedPersona)))
