@@ -94,6 +94,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 
 		case markBackupNeeded
 		case accountUpdated(Profile.Network.Account)
+		case portfolioLoaded(AccountPortfolio)
 
 		case loadMnemonic
 		case loadMnemonicResult(TaskResult<MnemonicWithPassphraseAndFactorSourceInfo>)
@@ -146,6 +147,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 	}
 
 	@Dependency(\.backupsClient) var backupsClient
+	@Dependency(\.accountPortfoliosClient) var accountPortfoliosClient
 	@Dependency(\.accountsClient) var accountsClient
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.secureStorageClient) var secureStorageClient
@@ -168,7 +170,6 @@ public struct AccountDetails: Sendable, FeatureReducer {
 		switch viewAction {
 		case .task:
 			return .run { [state] send in
-
 				func delay() async {
 					// navigation bug if we try to "deep link" too fast..
 					try? await clock.sleep(for: .milliseconds(900))
@@ -181,14 +182,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 					await send(.internal(.loadMnemonic))
 				}
 				for try await accountUpdate in await accountsClient.accountUpdates(state.account.address) {
-					print("• accountUpdates UPDATE 1")
-
-					guard !Task.isCancelled else {
-						print("• accountUpdates CANCELLED")
-						return
-					}
-					print("• accountUpdates UPDATE 2")
-
+					guard !Task.isCancelled else { return }
 					await send(.internal(.accountUpdated(accountUpdate)))
 				}
 			}
@@ -302,8 +296,11 @@ public struct AccountDetails: Sendable, FeatureReducer {
 			return .none
 
 		case let .accountUpdated(account):
-			print("• CASE accountUpdated", account.address.address)
 			state.account = account
+			return reloadPortfolio(address: account.address)
+
+		case let .portfolioLoaded(portfolio):
+			state.assets.updatePortfolio(to: portfolio)
 			return .none
 		}
 	}
@@ -337,7 +334,6 @@ public struct AccountDetails: Sendable, FeatureReducer {
 
 	// FIXME: Refactor account security prompts to share logic between this reducer and Row+Reducer (AccountList)
 	private func checkAccountSecurityPromptStatus(state: inout State) -> EffectTask<Action> {
-		@Dependency(\.accountPortfoliosClient) var accountPortfoliosClient
 		@Dependency(\.userDefaultsClient) var userDefaultsClient
 
 		if userDefaultsClient
@@ -373,16 +369,21 @@ public struct AccountDetails: Sendable, FeatureReducer {
 			return .none
 		}
 
-		return .run { [address = state.account.address] send in
-			guard
-				let portfolio = try? await accountPortfoliosClient.fetchAccountPortfolio(address, false),
-				let xrdResource = portfolio.fungibleResources.xrdResource, xrdResource.amount > .zero
-			else {
-				// no value
-				return
+		return reloadPortfolio(address: state.account.address)
+	}
+
+	/// Reloads the portfolio and sets Backup Needed if necessary
+	private func reloadPortfolio(address: AccountAddress) -> EffectTask<Action> {
+		.run { send in
+			guard let portfolio = try? await accountPortfoliosClient.fetchAccountPortfolio(address, false) else { return }
+
+			let xrdResource = portfolio.fungibleResources.xrdResource
+
+			if let xrdResource, xrdResource.amount > .zero {
+				await send(.internal(.markBackupNeeded))
 			}
 
-			await send(.internal(.markBackupNeeded))
+			await send(.internal(.portfolioLoaded(portfolio.nonEmptyVaults)))
 		}
 	}
 }
