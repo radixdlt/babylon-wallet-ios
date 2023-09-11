@@ -20,13 +20,16 @@ public struct SubmitTransaction: Sendable, FeatureReducer {
 		public let notarizedTX: NotarizeTransactionResponse
 		public var status: TXStatus
 		public var hasDelegatedThatTXHasBeenSubmitted = false
+		public let dismissalDisabled: Bool
 
 		public init(
 			notarizedTX: NotarizeTransactionResponse,
-			status: TXStatus = .notYetSubmitted
+			status: TXStatus = .notYetSubmitted,
+			dismissalDisabled: Bool = false
 		) {
 			self.notarizedTX = notarizedTX
 			self.status = status
+			self.dismissalDisabled = dismissalDisabled
 		}
 	}
 
@@ -68,6 +71,7 @@ public struct SubmitTransaction: Sendable, FeatureReducer {
 				))
 			}
 		case .closeButtonTapped:
+			guard !state.dismissalDisabled else { return .none }
 			// FIXME: For some reason, the dismiss dependency does not work here
 			return .send(.delegate(.manuallyDismiss))
 		}

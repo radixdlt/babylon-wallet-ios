@@ -730,7 +730,8 @@ extension DappInteractionFlow.Destinations.State {
 				signTransactionPurpose: .manifestFromDapp,
 				message: item.message.map {
 					Message.plainText(value: .init(mimeType: "text", message: .str(value: $0)))
-				} ?? .none
+				} ?? .none,
+				waitsForTransactionToBeComitted: interaction.id.isWalletAccountDepositSettingsInteraction
 			)))
 		}
 	}

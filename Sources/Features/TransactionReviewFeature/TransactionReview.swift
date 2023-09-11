@@ -20,6 +20,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		public let transactionManifest: TransactionManifest
 		public let message: Message
 		public let signTransactionPurpose: SigningPurpose.SignTransactionPurpose
+		public let waitsForTransactionToBeComitted: Bool
 
 		public var networkID: NetworkID? { reviewedTransaction?.networkId }
 
@@ -69,13 +70,15 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			nonce: Nonce,
 			signTransactionPurpose: SigningPurpose.SignTransactionPurpose,
 			message: Message,
-			ephemeralNotaryPrivateKey: Curve25519.Signing.PrivateKey = .init()
+			ephemeralNotaryPrivateKey: Curve25519.Signing.PrivateKey = .init(),
+			waitsForTransactionToBeComitted: Bool = false
 		) {
 			self.nonce = nonce
 			self.transactionManifest = transactionManifest
 			self.signTransactionPurpose = signTransactionPurpose
 			self.message = message
 			self.ephemeralNotaryPrivateKey = ephemeralNotaryPrivateKey
+			self.waitsForTransactionToBeComitted = waitsForTransactionToBeComitted
 		}
 
 		public enum DisplayMode: Sendable, Hashable {
@@ -364,7 +367,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			return .none
 
 		case let .signing(.delegate(.finishedSigning(.signTransaction(notarizedTX, origin: _)))):
-			state.destination = .submitting(.init(notarizedTX: notarizedTX))
+			state.destination = .submitting(.init(notarizedTX: notarizedTX, dismissalDisabled: state.waitsForTransactionToBeComitted))
 			return .none
 
 		case .signing(.delegate(.finishedSigning(.signAuth(_)))):
@@ -490,7 +493,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			return .none
 
 		case let .notarizeResult(.success(notarizedTX)):
-			state.destination = .submitting(.init(notarizedTX: notarizedTX))
+			state.destination = .submitting(.init(notarizedTX: notarizedTX, dismissalDisabled: state.waitsForTransactionToBeComitted))
 			return .none
 
 		case let .buildTransactionItentResult(.failure(error)),

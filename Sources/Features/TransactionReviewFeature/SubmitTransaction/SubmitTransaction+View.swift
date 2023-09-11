@@ -3,7 +3,7 @@ import FeaturePrelude
 
 extension SubmitTransaction.State {
 	var viewState: SubmitTransaction.ViewState {
-		.init(txID: notarizedTX.txID, status: status)
+		.init(txID: notarizedTX.txID, status: status, dismissalDisabled: dismissalDisabled)
 	}
 }
 
@@ -24,6 +24,7 @@ extension SubmitTransaction {
 	public struct ViewState: Equatable {
 		let txID: TXID
 		let status: SubmitTransaction.State.TXStatus
+		let dismissalDisabled: Bool
 	}
 
 	@MainActor
@@ -68,6 +69,7 @@ extension SubmitTransaction {
 				.onFirstTask { @MainActor in
 					viewStore.send(.appeared)
 				}
+				.interactiveDismissDisabled(viewStore.dismissalDisabled)
 				.presentationDragIndicator(.visible)
 				.presentationDetents([.height(.smallDetent)])
 				#if os(iOS)
