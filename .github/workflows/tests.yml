@@ -42,4 +42,4 @@ jobs:
 
       - name: "Unit tests (debug)"
         run: |
-          xcodebuild -scheme "Unit Tests" -destination 'platform=iOS Simulator,name=iPhone 14,OS=16.4' clean build test
+          xcodebuild -scheme "Unit Tests" -destination 'platform=iOS Simulator,name=iPhone 14,OS=16.4' -skipPackagePluginValidation clean build test
