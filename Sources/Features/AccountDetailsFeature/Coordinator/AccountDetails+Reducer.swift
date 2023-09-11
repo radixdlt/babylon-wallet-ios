@@ -297,7 +297,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 
 		case let .accountUpdated(account):
 			state.account = account
-			return reloadPortfolio(address: account.address, checkIfBackupIsNeeded: false)
+			return .none
 
 		case let .portfolioLoaded(portfolio):
 			state.assets.updatePortfolio(to: portfolio)
@@ -369,17 +369,17 @@ public struct AccountDetails: Sendable, FeatureReducer {
 			return .none
 		}
 
-		return reloadPortfolio(address: state.account.address, checkIfBackupIsNeeded: true)
+		return reloadPortfolioAndCheckIfBackupIsNeeded(address: state.account.address)
 	}
 
 	/// Reloads the portfolio and sets Backup Needed if necessary
-	private func reloadPortfolio(address: AccountAddress, checkIfBackupIsNeeded: Bool) -> EffectTask<Action> {
+	private func reloadPortfolioAndCheckIfBackupIsNeeded(address: AccountAddress) -> EffectTask<Action> {
 		.run { send in
 			guard let portfolio = try? await accountPortfoliosClient.fetchAccountPortfolio(address, false) else { return }
 
 			let xrdResource = portfolio.fungibleResources.xrdResource
 
-			if checkIfBackupIsNeeded, let xrdResource, xrdResource.amount > .zero {
+			if let xrdResource, xrdResource.amount > .zero {
 				await send(.internal(.markBackupNeeded))
 			}
 
