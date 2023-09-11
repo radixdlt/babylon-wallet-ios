@@ -2,8 +2,7 @@
   "appPreferences" : {
     "display" : {
       "fiatCurrencyPriceTarget" : "usd",
-      "isCurrencyAmountVisible" : true,
-      "ledgerHQHardwareWalletSigningDisplayMode" : "summary"
+      "isCurrencyAmountVisible" : true
     },
     "gateways" : {
       "current" : "https://rcnet-v3.radixdlt.com/",
@@ -209,7 +208,7 @@
       "description" : "computer unit test",
       "id" : "BABE1442-3C98-41FF-AFB0-D0F5829B020D"
     },
-    "snapshotVersion" : 49
+    "snapshotVersion" : 100
   },
   "networks" : [
     {

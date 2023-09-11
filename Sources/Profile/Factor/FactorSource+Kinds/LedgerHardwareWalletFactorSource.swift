@@ -47,21 +47,12 @@ extension LedgerHardwareWalletFactorSource {
 	}
 }
 
-// MARK: - LedgerHardwareWalletFactorSource
+// MARK: LedgerHardwareWalletFactorSource.DeviceModel
 extension LedgerHardwareWalletFactorSource {
 	public enum DeviceModel: String, Sendable, Hashable, Codable {
 		case nanoS
 		case nanoSPlus = "nanoS+"
 		case nanoX
-	}
-
-	public enum SigningDisplayMode: String, Sendable, Hashable, Codable {
-		case verbose
-		case summary
-
-		/// Ledger HQ has requested we default to not use `verbose`, see:
-		/// https://rdxworks.slack.com/archives/C031A0V1A1W/p1693461652669649
-		public static let `default`: Self = .summary
 	}
 }
 

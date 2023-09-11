@@ -14,7 +14,6 @@ public struct AccountSecurity: Sendable, FeatureReducer {
 		@PresentationState
 		public var destination: Destinations.State? = nil
 		public var preferences: AppPreferences? = nil
-		public var hasLedgerHardwareWalletFactorSources: Bool = false
 
 		public static let importOlympia = Self(destination: .importOlympiaWallet(.init()))
 
@@ -31,13 +30,11 @@ public struct AccountSecurity: Sendable, FeatureReducer {
 		case mnemonicsButtonTapped
 		case defaultDepositGuaranteeButtonTapped
 		case ledgerHardwareWalletsButtonTapped
-		case useVerboseModeToggled(Bool)
 		case importFromOlympiaWalletButtonTapped
 	}
 
 	public enum InternalAction: Sendable, Equatable {
 		case loadPreferences(AppPreferences)
-		case hasLedgerHardwareWalletFactorSourcesLoaded(Bool)
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -94,15 +91,6 @@ public struct AccountSecurity: Sendable, FeatureReducer {
 			return .run { send in
 				let preferences = await appPreferencesClient.getPreferences()
 				await send(.internal(.loadPreferences(preferences)))
-
-				do {
-					let ledgers = try await factorSourcesClient.getFactorSources(type: LedgerHardwareWalletFactorSource.self)
-					await send(.internal(.hasLedgerHardwareWalletFactorSourcesLoaded(!ledgers.isEmpty)))
-				} catch {
-					loggerGlobal.warning("Failed to load ledgers, error: \(error)")
-					// OK to display it...
-					await send(.internal(.hasLedgerHardwareWalletFactorSourcesLoaded(true)))
-				}
 			}
 
 		case .mnemonicsButtonTapped:
@@ -118,10 +106,6 @@ public struct AccountSecurity: Sendable, FeatureReducer {
 			state.destination = .depositGuarantees(.init(depositGuarantee: depositGuarantee))
 			return .none
 
-		case let .useVerboseModeToggled(useVerboseMode):
-			state.preferences?.display.ledgerHQHardwareWalletSigningDisplayMode = useVerboseMode ? .verbose : .summary
-			return savePreferences(state: state)
-
 		case .importFromOlympiaWalletButtonTapped:
 			state.destination = .importOlympiaWallet(.init())
 			return .none
@@ -132,10 +116,6 @@ public struct AccountSecurity: Sendable, FeatureReducer {
 		switch internalAction {
 		case let .loadPreferences(preferences):
 			state.preferences = preferences
-			return .none
-
-		case let .hasLedgerHardwareWalletFactorSourcesLoaded(hasLedgerHardwareWalletFactorSources):
-			state.hasLedgerHardwareWalletFactorSources = hasLedgerHardwareWalletFactorSources
 			return .none
 		}
 	}

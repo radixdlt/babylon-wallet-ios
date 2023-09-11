@@ -55,13 +55,10 @@ public struct SignWithFactorSourcesOfKindLedger: SignWithFactorSourcesOfKindRedu
 	) async throws -> Set<SignatureOfEntity> {
 		switch state.signingPurposeWithPayload {
 		case let .signTransaction(_, intent, _):
-			let ledgerTXDisplayMode: LedgerHardwareWalletFactorSource.SigningDisplayMode = await appPreferencesClient.getPreferences().display.ledgerHQHardwareWalletSigningDisplayMode
-
 			return try await ledgerHardwareWalletClient.signTransaction(.init(
 				ledger: ledger,
 				signers: signers,
 				transactionIntent: intent,
-				ledgerTXDisplayMode: ledgerTXDisplayMode.mode,
 				displayHashOnLedgerDisplay: false
 			))
 		case let .signAuth(authToSign):
@@ -72,16 +69,6 @@ public struct SignWithFactorSourcesOfKindLedger: SignWithFactorSourcesOfKindRedu
 				origin: authToSign.input.origin,
 				dAppDefinitionAddress: authToSign.input.dAppDefinitionAddress
 			))
-		}
-	}
-}
-
-extension LedgerHardwareWalletFactorSource.SigningDisplayMode {
-	// seperation so that we do not accidentally break profile or RadixConnect
-	var mode: P2P.ConnectorExtension.Request.LedgerHardwareWallet.Request.SignTransaction.Mode {
-		switch self {
-		case .verbose: return .verbose
-		case .summary: return .summary
 		}
 	}
 }

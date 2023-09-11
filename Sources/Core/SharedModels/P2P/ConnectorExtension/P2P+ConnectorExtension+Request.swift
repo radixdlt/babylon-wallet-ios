@@ -71,23 +71,18 @@ extension P2P.ConnectorExtension.Request {
 				public let ledgerDevice: P2P.LedgerHardwareWallet.LedgerDevice
 				public let compiledTransactionIntent: HexCodable
 				public let displayHash: Bool
-				public let mode: Mode
-				public enum Mode: String, Sendable, Hashable, Encodable {
-					case verbose
-					case summary
-				}
+				public let mode: String
 
 				public init(
 					signers: [P2P.LedgerHardwareWallet.KeyParameters],
 					ledgerDevice: P2P.LedgerHardwareWallet.LedgerDevice,
 					compiledTransactionIntent: HexCodable,
-					displayHash: Bool,
-					mode: Mode
+					displayHash: Bool
 				) {
 					self.signers = signers
 					self.ledgerDevice = ledgerDevice
 					self.compiledTransactionIntent = compiledTransactionIntent
-					self.mode = mode
+					self.mode = "summary"
 					self.displayHash = displayHash
 				}
 			}

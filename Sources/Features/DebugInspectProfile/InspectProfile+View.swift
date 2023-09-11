@@ -339,7 +339,6 @@ extension DisplayView {
 			#if os(macOS)
 				.font(.title)
 			#endif // os(macOS)
-			Labeled("Ledger Signing Display Mode", value: display.ledgerHQHardwareWalletSigningDisplayMode.rawValue)
 			Labeled("Currency", value: display.fiatCurrencyPriceTarget.rawValue)
 		}
 		.padding(.leading, leadingPadding)

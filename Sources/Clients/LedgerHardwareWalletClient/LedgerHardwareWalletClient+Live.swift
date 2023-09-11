@@ -135,8 +135,7 @@ extension LedgerHardwareWalletClient: DependencyKey {
 							signers: request.signers.flatMap(\.keyParams),
 							ledgerDevice: request.ledger.device(),
 							compiledTransactionIntent: .init(data: compiledTransactionIntent.data),
-							displayHash: request.displayHashOnLedgerDisplay,
-							mode: request.ledgerTXDisplayMode
+							displayHash: request.displayHashOnLedgerDisplay
 						)),
 						responseCasePath: /P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.signTransaction
 					)
