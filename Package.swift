@@ -870,7 +870,7 @@ package.addModules([
 		name: "FeaturePrelude",
 		dependencies: [
 			.product(name: "ComposableArchitecture", package: "swift-composable-architecture") {
-				.package(url: "https://github.com/radixdlt/swift-composable-architecture", branch: "full-scope-1.1")
+				.package(url: "https://github.com/radixdlt/swift-composable-architecture", branch: "full-scope-1.2")
 			},
 			"DesignSystem",
 			"Resources",
