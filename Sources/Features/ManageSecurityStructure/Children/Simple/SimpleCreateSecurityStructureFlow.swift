@@ -210,7 +210,7 @@ public struct SimpleManageSecurityStructureFlow: Sendable, FeatureReducer {
 							recoveryRole: .single(simpleFactorConfig.singleRecoveryFactor, for: .recovery),
 							confirmationRole: .single(simpleFactorConfig.singleConfirmationFactor, for: .confirmation)
 						)
-						await send(.creatingNew(config: config))
+						return .creatingNew(config: config)
 					}
 					await send(.delegate(.updatedOrCreatedSecurityStructure(taskResult)))
 				}

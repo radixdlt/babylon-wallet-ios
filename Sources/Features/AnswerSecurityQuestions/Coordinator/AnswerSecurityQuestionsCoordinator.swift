@@ -167,7 +167,7 @@ public struct AnswerSecurityQuestionsCoordinator: Sendable, FeatureReducer {
 
 						let mnemonic = try factorSource.decrypt(answersToQuestions: answers)
 
-						await send(.decrypted(mnemonic))
+						return .decrypted(mnemonic)
 
 					case .encrypt:
 						let mnemonic = try mnemonicClient.generate(.twentyFour, .english)
@@ -180,7 +180,7 @@ public struct AnswerSecurityQuestionsCoordinator: Sendable, FeatureReducer {
 
 						try await factorSourcesClient.saveFactorSource(securityQuestionsFactorSource.embed())
 
-						await send(.encrypted(securityQuestionsFactorSource))
+						return .encrypted(securityQuestionsFactorSource)
 					}
 				}
 				await send(.delegate(.done(taskResult)))
