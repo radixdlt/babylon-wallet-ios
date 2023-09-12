@@ -102,17 +102,15 @@ public struct DerivePublicKeys: Sendable, FeatureReducer {
 			switch state.factorSourceOption {
 			case .device:
 				return .run { send in
-					do {
-						let babylonFactorSource = try await factorSourcesClient
-							.getFactorSources()
-							.babylonDeviceFactorSources()
-							.first // FIXME: should only have one babylon factor source, which should be in keychain, clean this up.
+					let babylonFactorSource = try await factorSourcesClient
+						.getFactorSources()
+						.babylonDeviceFactorSources()
+						.first // FIXME: should only have one babylon factor source, which should be in keychain, clean this up.
 
-						await send(.internal(.loadedDeviceFactorSource(babylonFactorSource)))
-					} catch {
-						loggerGlobal.error("Failed to load factor source, error: \(error)")
-						await send(.delegate(.failedToDerivePublicKey))
-					}
+					await send(.internal(.loadedDeviceFactorSource(babylonFactorSource)))
+				} catch: { error, send in
+					loggerGlobal.error("Failed to load factor source, error: \(error)")
+					await send(.delegate(.failedToDerivePublicKey))
 				}
 
 			case let .specific(factorSource):
@@ -193,18 +191,16 @@ extension DerivePublicKeys {
 		state: State
 	) -> EffectTask<Action> {
 		.run { send in
-			do {
-				try await send(_deriveWith(
-					deviceFactorSource: deviceFactorSource,
-					derivationPaths: derivationPaths,
-					networkID: networkID,
-					loadMnemonicPurpose: loadMnemonicPurpose,
-					state: state
-				))
-			} catch {
-				loggerGlobal.error("Failed to derive or cast public key, error: \(error)")
-				await send(.delegate(.failedToDerivePublicKey))
-			}
+			try await send(_deriveWith(
+				deviceFactorSource: deviceFactorSource,
+				derivationPaths: derivationPaths,
+				networkID: networkID,
+				loadMnemonicPurpose: loadMnemonicPurpose,
+				state: state
+			))
+		} catch: { error, send in
+			loggerGlobal.error("Failed to derive or cast public key, error: \(error)")
+			await send(.delegate(.failedToDerivePublicKey))
 		}
 	}
 
