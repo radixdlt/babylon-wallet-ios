@@ -65,7 +65,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 		case presentResponseSuccessView(DappMetadata, TXID?)
 		case presentInvalidRequest(
 			P2P.Dapp.RequestUnvalidated,
-			reason: DappInteractionClient._ValidatedDappRequest.InvalidRequestReason,
+			reason: DappInteractionClient.ValidatedDappRequest.InvalidRequestReason,
 			route: P2P.Route,
 			isDeveloperModeEnabled: Bool
 		)
@@ -344,7 +344,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 	}
 }
 
-extension DappInteractionClient._ValidatedDappRequest.InvalidRequestReason {
+extension DappInteractionClient.ValidatedDappRequest.InvalidRequestReason {
 	var interactionResponseError: P2P.Dapp.Response.WalletInteractionFailureResponse.ErrorType {
 		switch self {
 		case .incompatibleVersion:
