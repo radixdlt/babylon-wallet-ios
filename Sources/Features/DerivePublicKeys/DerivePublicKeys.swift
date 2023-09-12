@@ -230,17 +230,15 @@ extension DerivePublicKeys {
 		state: State
 	) -> EffectTask<Action> {
 		.run { send in
-			do {
-				try await send(_deriveWith(
-					ledger: ledger,
-					derivationPaths: derivationPaths,
-					networkID: networkID,
-					state: state
-				))
-			} catch {
-				loggerGlobal.error("Failed to derive or cast public key, error: \(error)")
-				await send(.delegate(.failedToDerivePublicKey))
-			}
+			try await send(_deriveWith(
+				ledger: ledger,
+				derivationPaths: derivationPaths,
+				networkID: networkID,
+				state: state
+			))
+		} catch: { error, send in
+			loggerGlobal.error("Failed to derive or cast public key, error: \(error)")
+			await send(.delegate(.failedToDerivePublicKey))
 		}
 	}
 
