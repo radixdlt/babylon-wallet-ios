@@ -25,16 +25,6 @@ extension DappInteractionClient: DependencyKey {
 			}
 		}
 
-		@Sendable
-		func completeInteraction(_ message: P2P.RTCOutgoingMessage) async throws {
-			switch message {
-			case let .response(response, .rtc(route)):
-				try await radixConnectClient.sendResponse(response, route)
-			default:
-				break
-			}
-		}
-
 		return .init(
 			interactions: interactionsSubject.share().eraseToAnyAsyncSequence(),
 			addWalletInteraction: { items in
@@ -56,7 +46,14 @@ extension DappInteractionClient: DependencyKey {
 				)
 				interactionsSubject.send(.success(request))
 			},
-			completeInteraction: completeInteraction
+			completeInteraction: { message in
+				switch message {
+				case let .response(response, .rtc(route)):
+					try await radixConnectClient.sendResponse(response, route)
+				default:
+					break
+				}
+			}
 		)
 	}()
 }
