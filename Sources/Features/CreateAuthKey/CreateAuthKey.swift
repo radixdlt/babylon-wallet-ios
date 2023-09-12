@@ -34,7 +34,7 @@ public struct GetAuthKeyDerivationPath: Sendable, FeatureReducer {
 				Color.white
 			}
 			.onFirstTask { @MainActor in
-				ViewStore(store.stateless).send(.view(.onFirstTask))
+				store.send(.view(.onFirstTask))
 			}
 		}
 	}

@@ -54,7 +54,7 @@ extension DappInteractor {
 					)
 				)
 				.task {
-					await ViewStore(store.stateless).send(.view(.task)).finish()
+					await store.send(.view(.task)).finish()
 				}
 				#if os(iOS)
 				.onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in

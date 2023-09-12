@@ -34,7 +34,7 @@ extension CreatePersonaCoordinator {
 								if viewStore.shouldDisplayNavBar {
 									ToolbarItem(placement: .navigationBarLeading) {
 										CloseButton {
-											ViewStore(store.stateless).send(.view(.closeButtonTapped))
+											store.send(.view(.closeButtonTapped))
 										}
 									}
 								}

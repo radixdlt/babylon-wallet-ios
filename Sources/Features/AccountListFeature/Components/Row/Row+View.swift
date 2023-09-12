@@ -122,7 +122,7 @@ extension AccountList.Row {
 					viewStore.send(.tapped)
 				}
 				.task {
-					await ViewStore(store.stateless).send(.view(.task)).finish()
+					await store.send(.view(.task)).finish()
 				}
 			}
 		}

@@ -47,7 +47,7 @@ extension NewConnection {
 				.toolbar {
 					ToolbarItem(placement: .primaryAction) {
 						CloseButton {
-							ViewStore(store.stateless).send(.view(.closeButtonTapped))
+							store.send(.view(.closeButtonTapped))
 						}
 					}
 				}

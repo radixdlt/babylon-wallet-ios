@@ -28,7 +28,7 @@ extension GatewayList {
 			}
 			.buttonStyle(.tappableRowStyle)
 			.onAppear {
-				ViewStore(store.stateless).send(.view(.appeared))
+				store.send(.view(.appeared))
 			}
 		}
 	}

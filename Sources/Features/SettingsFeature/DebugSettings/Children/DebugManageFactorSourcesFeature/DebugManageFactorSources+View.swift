@@ -52,7 +52,7 @@ extension DebugManageFactorSources {
 				}
 				.padding([.horizontal, .bottom], .medium1)
 				.task { @MainActor in
-					await ViewStore(store.stateless).send(.view(.task)).finish()
+					await store.send(.view(.task)).finish()
 				}
 				.navigationTitle("Factor Sources")
 				.sheet(

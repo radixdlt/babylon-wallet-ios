@@ -19,7 +19,7 @@ extension AnswerSecurityQuestionsCoordinator {
 					.toolbar {
 						ToolbarItem(placement: .navigationBarLeading) {
 							CloseButton {
-								ViewStore(store.stateless).send(.view(.closeButtonTapped))
+								store.send(.view(.closeButtonTapped))
 							}
 						}
 					}
@@ -33,7 +33,7 @@ extension AnswerSecurityQuestionsCoordinator {
 					.toolbar {
 						ToolbarItem(placement: .navigationBarLeading) {
 							BackButton {
-								ViewStore(store.stateless).send(.view(.backButtonTapped))
+								store.send(.view(.backButtonTapped))
 							}
 						}
 					}

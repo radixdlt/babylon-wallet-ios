@@ -18,7 +18,7 @@ extension CameraPermission {
 						action: { .view(.permissionDeniedAlert($0)) }
 					)
 				)
-				.onAppear { ViewStore(store.stateless).send(.view(.appeared)) }
+				.onAppear { store.send(.view(.appeared)) }
 		}
 	}
 }

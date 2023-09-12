@@ -33,7 +33,7 @@ extension CreateAccountCoordinator {
 								if viewStore.shouldDisplayNavBar {
 									ToolbarItem(placement: .primaryAction) {
 										CloseButton {
-											ViewStore(store.stateless).send(.view(.closeButtonTapped))
+											store.send(.view(.closeButtonTapped))
 										}
 									}
 								}

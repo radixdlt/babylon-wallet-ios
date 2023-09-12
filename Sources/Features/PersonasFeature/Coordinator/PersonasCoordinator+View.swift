@@ -19,7 +19,7 @@ extension PersonasCoordinator {
 					action: { .child(.personaList($0)) }
 				)
 			)
-			.onAppear { ViewStore(store.stateless).send(.view(.appeared)) }
+			.onAppear { store.send(.view(.appeared)) }
 			.destination(store: store)
 		}
 	}

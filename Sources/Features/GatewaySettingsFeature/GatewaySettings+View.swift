@@ -23,7 +23,7 @@ extension GatewaySettings {
 					coreView(with: viewStore)
 						.padding(.bottom, .medium1)
 						.navigationTitle(L10n.Gateways.title)
-						.task { @MainActor in await ViewStore(store.stateless).send(.view(.task)).finish() }
+						.task { @MainActor in await store.send(.view(.task)).finish() }
 						.alert(
 							store: store.scope(
 								state: \.$removeGatewayAlert,

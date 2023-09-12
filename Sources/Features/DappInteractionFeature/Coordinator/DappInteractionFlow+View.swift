@@ -23,7 +23,7 @@ extension DappInteractionFlow {
 						.toolbar {
 							ToolbarItem(placement: .navigationBarLeading) {
 								CloseButton {
-									ViewStore(store.stateless).send(.view(.closeButtonTapped))
+									store.send(.view(.closeButtonTapped))
 								}
 							}
 						}
@@ -38,7 +38,7 @@ extension DappInteractionFlow {
 					.toolbar {
 						ToolbarItem(placement: .navigationBarLeading) {
 							BackButton {
-								ViewStore(store.stateless).send(.view(.backButtonTapped))
+								store.send(.view(.backButtonTapped))
 							}
 						}
 					}
@@ -47,7 +47,7 @@ extension DappInteractionFlow {
 			#if os(iOS)
 			.navigationTransition(.slide, interactivity: .disabled)
 			#endif
-			.onAppear { ViewStore(store.stateless).send(.view(.appeared)) }
+			.onAppear { store.send(.view(.appeared)) }
 			.alert(
 				store: store.scope(
 					state: \.$personaNotFoundErrorAlert,
