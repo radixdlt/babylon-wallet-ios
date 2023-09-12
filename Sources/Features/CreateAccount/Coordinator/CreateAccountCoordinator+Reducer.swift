@@ -24,17 +24,15 @@ public struct CreateAccountCoordinator: Sendable, FeatureReducer {
 		}
 
 		var shouldDisplayNavBar: Bool {
+			if case let .step2_creationOfAccount(creationOfAccount) = path.last {
+				return creationOfAccount.isCreatingLedgerAccount
+			}
+
 			guard config.canBeDismissed else {
 				return false
 			}
-			if let last = path.last {
-				if case .step3_completion = last {
-					return false
-				} else if case let .step2_creationOfAccount(creationOfAccount) = last {
-					return creationOfAccount.isCreatingLedgerAccount
-				} else {
-					return true
-				}
+			if case .step3_completion = path.last {
+				return false
 			}
 			return true
 		}
