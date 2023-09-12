@@ -325,7 +325,7 @@ struct TestScenario: Decodable, Equatable {
 }
 
 // MARK: - TestGroup
-struct TestGroup: Decodable, Equatable {
+private struct TestGroup: Decodable, Equatable {
 	let groupId: Int
 	let entropy: Data
 	let seed: Data
@@ -356,7 +356,7 @@ struct TestGroup: Decodable, Equatable {
 }
 
 // MARK: - TestFile
-struct TestFile: Decodable, Equatable {
+private struct TestFile: Decodable, Equatable {
 	let createdOn: String
 	let author: String
 	let info: String

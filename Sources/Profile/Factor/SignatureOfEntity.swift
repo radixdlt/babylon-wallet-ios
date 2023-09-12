@@ -6,13 +6,13 @@ public struct SignatureOfEntity: Sendable, Hashable {
 	public let signerEntity: EntityPotentiallyVirtual
 	public let derivationPath: DerivationPath
 	public let factorSourceID: FactorSourceID
-	public let signatureWithPublicKey: SignatureWithPublicKey
+	public let signatureWithPublicKey: Cryptography.SignatureWithPublicKey
 
 	public init(
 		signerEntity: EntityPotentiallyVirtual,
 		derivationPath: DerivationPath,
 		factorSourceID: FactorSourceID,
-		signatureWithPublicKey: SignatureWithPublicKey
+		signatureWithPublicKey: Cryptography.SignatureWithPublicKey
 	) {
 		self.signerEntity = signerEntity
 		self.derivationPath = derivationPath

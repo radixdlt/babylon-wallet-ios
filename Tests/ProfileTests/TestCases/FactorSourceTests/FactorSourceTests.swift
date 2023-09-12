@@ -75,6 +75,10 @@ final class FactorSourceTests: TestCase {
 			phrase: "spirit bird issue club alcohol flock skull health lemon judge piece eyebrow",
 			language: .english
 		)
+		let deviceFactorModel: DeviceFactorSource.Hint.Model = "computer"
+		let deviceFactorName = "unit test"
+		let stableDate = Date.now
+		let stableUUID = UUID()
 		try withDependencies {
 			$0.date = .constant(stableDate)
 			$0.uuid = .constant(stableUUID)

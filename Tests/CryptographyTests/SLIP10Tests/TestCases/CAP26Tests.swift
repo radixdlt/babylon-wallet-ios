@@ -236,7 +236,7 @@ extension KeyKind {
 }
 
 // MARK: - TestGroup
-struct TestGroup: Sendable, Hashable, Codable {
+private struct TestGroup: Sendable, Hashable, Codable {
 	let mnemonic: String
 	let network: Network
 	let curve: String
