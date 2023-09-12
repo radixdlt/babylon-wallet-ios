@@ -115,7 +115,7 @@ public struct Settings: Sendable, FeatureReducer {
 			}
 	}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .appeared:
 			// We don't need to load the accounts if they have dismissed the olympia header before
@@ -154,7 +154,7 @@ public struct Settings: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .loadedP2PLinks(clients):
 			state.userHasNoP2PLinks = clients.isEmpty
@@ -172,7 +172,7 @@ public struct Settings: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case let .destination(.presented(.appSettings(.delegate(.deleteProfileAndFactorSources(keepInICloudIfPresent))))):
 			return .send(.delegate(.deleteProfileAndFactorSources(keepInICloudIfPresent: keepInICloudIfPresent)))
@@ -190,7 +190,7 @@ public struct Settings: Sendable, FeatureReducer {
 		}
 	}
 
-	private func hideImportOlympiaHeader(in state: inout State) -> EffectTask<Action> {
+	private func hideImportOlympiaHeader(in state: inout State) -> Effect<Action> {
 		state.shouldShowMigrateOlympiaButton = false
 		return .run { _ in
 			await userDefaultsClient.setHideMigrateOlympiaButton(true)
@@ -200,7 +200,7 @@ public struct Settings: Sendable, FeatureReducer {
 
 // MARK: Private
 extension Settings {
-	private func loadP2PLinks(andAccounts loadAccounts: Bool = false) -> EffectTask<Action> {
+	private func loadP2PLinks(andAccounts loadAccounts: Bool = false) -> Effect<Action> {
 		.run { send in
 			await send(.internal(.loadedP2PLinks(
 				p2pLinksClient.getP2PLinks()

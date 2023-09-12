@@ -63,7 +63,7 @@ public struct SecurityStructureConfigurationListCoordinator: Sendable, FeatureRe
 			}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .loadDetailsForSecurityStructureResult(.success(config)):
 			state.destination = .manageSecurityStructureCoordinator(.init(mode: .existing(config)))
@@ -75,7 +75,7 @@ public struct SecurityStructureConfigurationListCoordinator: Sendable, FeatureRe
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case .configList(.delegate(.createNewStructure)):
 			state.destination = .manageSecurityStructureCoordinator(.init())

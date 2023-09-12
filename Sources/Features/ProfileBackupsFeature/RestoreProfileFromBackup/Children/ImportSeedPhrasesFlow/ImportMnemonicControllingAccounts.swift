@@ -71,7 +71,7 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 			}
 	}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .appeared:
 			return .none
@@ -101,7 +101,7 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case let .destination(.presented(
 			.importMnemonic(.delegate(delegateAction))
@@ -142,7 +142,7 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .validated(privateHDFactorSource):
 			state.destination = nil
@@ -178,8 +178,8 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 		mnemonicWithPassphrase: MnemonicWithPassphrase,
 		accounts: [Profile.Network.Account],
 		factorSource: DeviceFactorSource
-	) -> EffectTask<Action> {
-		func fail(error: Swift.Error?) -> EffectTask<Action> {
+	) -> Effect<Action> {
+		func fail(error: Swift.Error?) -> Effect<Action> {
 			loggerGlobal.error("Failed to validate all accounts against mnemonic, underlying error: \(String(describing: error))")
 			errorQueue.schedule(MnemonicDidNotValidateAllAccounts())
 			return .none

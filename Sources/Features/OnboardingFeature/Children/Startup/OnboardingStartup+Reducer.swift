@@ -47,7 +47,7 @@ public struct OnboardingStartup: Sendable, FeatureReducer {
 			}
 	}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .selectedNewWalletUser:
 			return .send(.delegate(.setupNewUser))
@@ -58,7 +58,7 @@ public struct OnboardingStartup: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case let .destination(.presented(.restoreFromBackup(.delegate(.profileImported(skippedAnyMnemonic, hasMainnetAccounts))))):
 			return .send(.delegate(.completed(

@@ -80,7 +80,7 @@ public struct P2PLinksFeature: Sendable, FeatureReducer {
 			}
 	}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .task:
 			return .run { send in
@@ -94,7 +94,7 @@ public struct P2PLinksFeature: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .loadLinksResult(.success(linksFromProfile)):
 			state.links = .init(
@@ -126,7 +126,7 @@ public struct P2PLinksFeature: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case let .connection(id, .delegate(.deleteConnection)):
 			state.destination = .removeConnection(.confirmRemoval(id: id))

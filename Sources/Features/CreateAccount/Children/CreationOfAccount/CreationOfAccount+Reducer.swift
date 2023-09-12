@@ -80,7 +80,7 @@ public struct CreationOfAccount: Sendable, FeatureReducer {
 		Reduce(core)
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .createAccountResult(.failure(error)):
 			errorQueue.schedule(error)
@@ -97,7 +97,7 @@ public struct CreationOfAccount: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case let .step0_chooseLedger(.delegate(.choseLedger(ledger))):
 			state.step = .step1_derivePublicKeys(.init(

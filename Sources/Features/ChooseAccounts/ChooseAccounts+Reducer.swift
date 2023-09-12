@@ -72,7 +72,7 @@ public struct ChooseAccounts: Sendable, FeatureReducer {
 			}
 	}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .appeared:
 			return loadAccounts()
@@ -89,7 +89,7 @@ public struct ChooseAccounts: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .loadAccountsResult(.success(accounts)):
 			// Uniqueness is guaranteed as per `Profile.Network.Accounts`
@@ -104,7 +104,7 @@ public struct ChooseAccounts: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case .destination(.presented(.createAccount(.delegate(.completed)))):
 			return loadAccounts()
@@ -114,7 +114,7 @@ public struct ChooseAccounts: Sendable, FeatureReducer {
 		}
 	}
 
-	private func loadAccounts() -> EffectTask<Action> {
+	private func loadAccounts() -> Effect<Action> {
 		.run { send in
 			let result = await TaskResult {
 				try await accountsClient.getAccountsOnCurrentNetwork()

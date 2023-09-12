@@ -101,7 +101,7 @@ public struct AssetsView: Sendable, FeatureReducer {
 		Reduce(core)
 	}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .task:
 			return .run { [address = state.account.address] send in
@@ -124,7 +124,7 @@ public struct AssetsView: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .updatePortfolio(portfolio):
 			state.updatePortfolio(to: portfolio)

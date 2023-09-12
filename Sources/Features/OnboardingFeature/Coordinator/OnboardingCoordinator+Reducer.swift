@@ -53,7 +53,7 @@ public struct OnboardingCoordinator: Sendable, FeatureReducer {
 		Reduce(core)
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .commitEphemeralResult(.success(hasMainnetAccounts)):
 			return sendDelegateCompleted(
@@ -67,7 +67,7 @@ public struct OnboardingCoordinator: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case .startup(.delegate(.setupNewUser)):
 			state.root = .createAccountCoordinator(
@@ -101,7 +101,7 @@ public struct OnboardingCoordinator: Sendable, FeatureReducer {
 		state: State,
 		accountRecoveryIsNeeded: Bool,
 		hasMainnetAccounts: Bool
-	) -> EffectTask<Action> {
+	) -> Effect<Action> {
 		.send(.delegate(.completed(
 			accountRecoveryIsNeeded: accountRecoveryIsNeeded,
 			hasMainnetAccounts: hasMainnetAccounts,

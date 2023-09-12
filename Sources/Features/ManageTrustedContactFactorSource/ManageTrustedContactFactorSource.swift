@@ -108,7 +108,7 @@ public struct ManageTrustedContactFactorSource: Sendable, FeatureReducer {
 			}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case let .destination(.presented(.scanAccountAddress(.delegate(.scanned(addressStringScanned))))):
 			var addressStringScanned = addressStringScanned
@@ -123,7 +123,7 @@ public struct ManageTrustedContactFactorSource: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case let .radixAddressChanged(radixAddress):
 			state.radixAddress = radixAddress

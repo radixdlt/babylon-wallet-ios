@@ -166,7 +166,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 			}
 	}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .task:
 			return .run { [state] send in
@@ -208,7 +208,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case .destination(.presented(.transfer(.delegate(.dismissed)))):
 			state.destination = nil
@@ -252,7 +252,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .transfer(hasMainnetEverBeenLive):
 			state.destination = .transfer(.init(
@@ -305,7 +305,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 		}
 	}
 
-	private func loadMnemonic(state: State) -> EffectTask<Action> {
+	private func loadMnemonic(state: State) -> Effect<Action> {
 		loggerGlobal.feature("implement export")
 		let factorInstance = state.deviceControlledFactorInstance
 		let factorSourceID = factorInstance.factorSourceID
@@ -325,7 +325,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 		}
 	}
 
-	private func loadImport() -> EffectTask<Action> {
+	private func loadImport() -> Effect<Action> {
 		.run { send in
 			let result = await TaskResult { try await backupsClient.snapshotOfProfileForExport() }
 			await send(.internal(.loadProfileSnapshotForRecoverMnemonicsFlow(result)))
@@ -333,7 +333,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 	}
 
 	// FIXME: Refactor account security prompts to share logic between this reducer and Row+Reducer (AccountList)
-	private func checkAccountSecurityPromptStatus(state: inout State) -> EffectTask<Action> {
+	private func checkAccountSecurityPromptStatus(state: inout State) -> Effect<Action> {
 		@Dependency(\.userDefaultsClient) var userDefaultsClient
 
 		if userDefaultsClient

@@ -111,7 +111,7 @@ public struct App: Sendable, FeatureReducer {
 			}
 	}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .task:
 			let retBuildInfo = buildInformation()
@@ -153,7 +153,7 @@ public struct App: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case .incompatibleProfileDeleted:
 			return checkIfMainnetIsOnlineThenGoToOnboarding()
@@ -169,7 +169,7 @@ public struct App: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case .main(.delegate(.removedWallet)):
 			return checkIfMainnetIsOnlineThenGoToOnboarding()
@@ -233,7 +233,7 @@ public struct App: Sendable, FeatureReducer {
 		hasMainnetEverBeenLive: Bool,
 		accountRecoveryIsNeeded: Bool,
 		state: inout State
-	) -> EffectTask<Action> {
+	) -> Effect<Action> {
 		if !hasMainnetAccounts, hasMainnetEverBeenLive {
 			loggerGlobal.notice("Mainnet has been live, but has no accounts => onboarding existing user to Mainnet")
 			state.root = .onboardTestnetUserToMainnet(.init(config: .init(purpose: .firstAccountOnNewNetwork(.mainnet))))
@@ -243,7 +243,7 @@ public struct App: Sendable, FeatureReducer {
 		}
 	}
 
-	func checkIfMainnetIsOnlineThenGoToOnboarding() -> EffectTask<Action> {
+	func checkIfMainnetIsOnlineThenGoToOnboarding() -> Effect<Action> {
 		.run { send in
 			let hasMainnetEverBeenLive = await networkSwitchingClient.hasMainnetEverBeenLive()
 			await send(.internal(.toOnboarding(hasMainnetEverBeenLive: hasMainnetEverBeenLive)))
@@ -253,7 +253,7 @@ public struct App: Sendable, FeatureReducer {
 	func incompatibleSnapshotData(
 		version: ProfileSnapshot.Header.Version,
 		state: inout State
-	) -> EffectTask<Action> {
+	) -> Effect<Action> {
 		state.alert = .incompatibleProfileErrorAlert(
 			.init(
 				title: { TextState(L10n.Splash.IncompatibleProfileVersionAlert.title) },
@@ -268,12 +268,12 @@ public struct App: Sendable, FeatureReducer {
 		return .none
 	}
 
-	func goToMain(state: inout State, accountRecoveryIsNeeded: Bool) -> EffectTask<Action> {
+	func goToMain(state: inout State, accountRecoveryIsNeeded: Bool) -> Effect<Action> {
 		state.root = .main(.init(home: .init(accountRecoveryIsNeeded: accountRecoveryIsNeeded)))
 		return .none
 	}
 
-	func goToOnboarding(state: inout State, hasMainnetEverBeenLive: Bool) -> EffectTask<Action> {
+	func goToOnboarding(state: inout State, hasMainnetEverBeenLive: Bool) -> Effect<Action> {
 		state.hasMainnetEverBeenLive = hasMainnetEverBeenLive
 		state.root = .onboardingCoordinator(.init(hasMainnetEverBeenLive: hasMainnetEverBeenLive))
 		return .none

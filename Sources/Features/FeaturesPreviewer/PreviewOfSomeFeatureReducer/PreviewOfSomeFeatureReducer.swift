@@ -37,7 +37,7 @@ public struct PreviewOfSomeFeatureReducer<Feature>: FeatureReducer where Feature
 		Reduce(core)
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case let .previewOf(action):
 			if let result = resultFromAction(action) {

@@ -94,7 +94,7 @@ public struct ManageSecurityStructureCoordinator: Sendable, FeatureReducer {
 			}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case .root(.start(.delegate(.simpleFlow))):
 			state.path.append(.simpleSetupFlow(.init()))
@@ -138,7 +138,7 @@ public struct ManageSecurityStructureCoordinator: Sendable, FeatureReducer {
 		}
 	}
 
-	func updatedOrCreatedSecurityStructure(result: TaskResult<SecurityStructureProduct>, _ state: inout State) -> EffectTask<Action> {
+	func updatedOrCreatedSecurityStructure(result: TaskResult<SecurityStructureProduct>, _ state: inout State) -> Effect<Action> {
 		switch result {
 		case let .success(product):
 			switch product {

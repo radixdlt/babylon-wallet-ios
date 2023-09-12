@@ -99,7 +99,7 @@ public struct CreateAccountCoordinator: Sendable, FeatureReducer {
 }
 
 extension CreateAccountCoordinator {
-	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .closeButtonTapped:
 			assert(state.config.canBeDismissed)
@@ -112,7 +112,7 @@ extension CreateAccountCoordinator {
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case let .root(.step1_nameAccount(.delegate(.proceed(accountName, useLedgerAsFactorSource)))):
 			state.path.append(.step2_creationOfAccount(.init(

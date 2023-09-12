@@ -54,7 +54,7 @@ public struct PoolUnit: Sendable, FeatureReducer {
 	public func reduce(
 		into state: inout State,
 		viewAction: ViewAction
-	) -> EffectTask<Action> {
+	) -> Effect<Action> {
 		switch viewAction {
 		case .didTap:
 			if state.isSelected != nil {

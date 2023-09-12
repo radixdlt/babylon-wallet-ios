@@ -62,7 +62,7 @@ protocol SignWithFactorSourcesOfKindReducer:
 }
 
 extension SignWithFactorSourcesOfKindReducer {
-	func signWithSigningFactors(of state: State) -> EffectTask<Action> {
+	func signWithSigningFactors(of state: State) -> Effect<Action> {
 		.run { [signingFactors = state.signingFactors] send in
 			var allSignatures = Set<SignatureOfEntity>()
 			for signingFactor in signingFactors {

@@ -59,7 +59,7 @@ public struct LSUStake: FeatureReducer {
 	public func reduce(
 		into state: inout State,
 		viewAction: ViewAction
-	) -> EffectTask<Action> {
+	) -> Effect<Action> {
 		switch viewAction {
 		case .didTap:
 			if state.isStakeSelected != nil {

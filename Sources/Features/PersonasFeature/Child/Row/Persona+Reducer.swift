@@ -40,7 +40,7 @@ public struct Persona: Sendable, FeatureReducer {
 
 	public init() {}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .tapped:
 			return .send(.delegate(.openDetails))

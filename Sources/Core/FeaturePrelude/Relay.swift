@@ -54,7 +54,7 @@ public struct Relay<
 		self.mainReducer = mainReducer()
 	}
 
-	public func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
+	public func reduce(into state: inout State, action: Action) -> Effect<Action> {
 		switch action {
 		case let .relay(relayedState, mainAction):
 			return mainReducer.reduce(into: &state.mainState, action: mainAction).map {

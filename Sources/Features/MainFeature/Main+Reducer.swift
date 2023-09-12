@@ -58,7 +58,7 @@ public struct Main: Sendable, FeatureReducer {
 			}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case .home(.delegate(.displaySettings)):
 			let showMigrateOlympiaButton = !userDefaultsClient.hideMigrateOlympiaButton

@@ -25,7 +25,7 @@ public struct LSUResource: Sendable, FeatureReducer {
 			)
 	}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .isExpandedToggled:
 			state.isExpanded.toggle()

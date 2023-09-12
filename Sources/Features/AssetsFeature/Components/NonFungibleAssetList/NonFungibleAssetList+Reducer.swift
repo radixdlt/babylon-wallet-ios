@@ -49,7 +49,7 @@ public struct NonFungibleAssetList: Sendable, FeatureReducer {
 			}
 	}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .closeDetailsTapped:
 			state.destination = nil
@@ -57,7 +57,7 @@ public struct NonFungibleAssetList: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case let .asset(rowID, .delegate(.open(localID))):
 			guard let row = state.rows[id: rowID] else {

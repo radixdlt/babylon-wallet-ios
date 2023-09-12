@@ -27,7 +27,7 @@ public struct SignWithFactorSourcesOfKindLedger: SignWithFactorSourcesOfKindRedu
 
 	public init() {}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .onFirstTask:
 			return signWithSigningFactors(of: state)
@@ -40,7 +40,7 @@ public struct SignWithFactorSourcesOfKindLedger: SignWithFactorSourcesOfKindRedu
 	public func reduce(
 		into state: inout State,
 		internalAction: InternalAction
-	) -> EffectTask<Action> {
+	) -> Effect<Action> {
 		switch internalAction {
 		case let .signingWithFactor(currentLedger):
 			state.currentSigningFactor = currentLedger

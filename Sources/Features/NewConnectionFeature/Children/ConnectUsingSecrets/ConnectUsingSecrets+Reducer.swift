@@ -52,7 +52,7 @@ public struct ConnectUsingSecrets: Sendable, FeatureReducer {
 		case connect
 	}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .appeared:
 			return .send(.view(.textFieldFocused(.connectionName)))
@@ -89,7 +89,7 @@ public struct ConnectUsingSecrets: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case .establishConnectionResult(.success):
 			state.isConnecting = false

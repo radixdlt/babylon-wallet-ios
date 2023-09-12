@@ -24,7 +24,7 @@ struct AccountPermission: Sendable, FeatureReducer {
 		case continueButtonTapped
 	}
 
-	func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .appeared:
 			return .none

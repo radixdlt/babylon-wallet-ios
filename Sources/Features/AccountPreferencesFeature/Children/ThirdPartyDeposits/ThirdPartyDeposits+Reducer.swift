@@ -64,7 +64,7 @@ public struct ManageThirdPartyDeposits: FeatureReducer, Sendable {
 			}
 	}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case let .rowTapped(row):
 			switch row {
@@ -101,7 +101,7 @@ public struct ManageThirdPartyDeposits: FeatureReducer, Sendable {
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case let .destinations(.presented(.allowDenyAssets(.delegate(.updated(thirdPartyDeposits))))),
 		     let .destinations(.presented(.allowDepositors(.delegate(.updated(thirdPartyDeposits))))):

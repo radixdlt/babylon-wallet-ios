@@ -58,7 +58,7 @@ struct OverlayReducer: Sendable, FeatureReducer {
 			}
 	}
 
-	func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .task:
 			return .run { send in
@@ -69,7 +69,7 @@ struct OverlayReducer: Sendable, FeatureReducer {
 		}
 	}
 
-	func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
+	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .scheduleItem(event):
 			state.itemsQueue.append(event)
@@ -79,7 +79,7 @@ struct OverlayReducer: Sendable, FeatureReducer {
 		}
 	}
 
-	func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+	func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case .destination(.dismiss):
 			return dismiss(&state)
@@ -96,7 +96,7 @@ struct OverlayReducer: Sendable, FeatureReducer {
 		}
 	}
 
-	private func showItemIfPossible(state: inout State) -> EffectTask<Action> {
+	private func showItemIfPossible(state: inout State) -> Effect<Action> {
 		guard !state.itemsQueue.isEmpty else {
 			return .none
 		}
@@ -132,7 +132,7 @@ struct OverlayReducer: Sendable, FeatureReducer {
 		}
 	}
 
-	private func dismissAlert(state: inout State, withAction action: OverlayWindowClient.Item.AlertAction) -> EffectTask<Action> {
+	private func dismissAlert(state: inout State, withAction action: OverlayWindowClient.Item.AlertAction) -> Effect<Action> {
 		let item = state.itemsQueue[0]
 		if case let .alert(state) = item {
 			overlayWindowClient.sendAlertAction(action, state.id)
@@ -141,7 +141,7 @@ struct OverlayReducer: Sendable, FeatureReducer {
 		return dismiss(&state)
 	}
 
-	private func dismiss(_ state: inout State) -> EffectTask<Action> {
+	private func dismiss(_ state: inout State) -> Effect<Action> {
 		state.destination = nil
 		state.itemsQueue.removeFirst()
 		return setIsUserInteractionEnabled(&state, isEnabled: false)
@@ -150,7 +150,7 @@ struct OverlayReducer: Sendable, FeatureReducer {
 
 	/// Sets the interaction enabled on the window, by implication this will also enable/disable the interaction
 	/// with the main app window. When showing an Alert, we don't want users to be able to interact with the main app window for example.
-	private func setIsUserInteractionEnabled(_ state: inout State, isEnabled: Bool) -> EffectTask<Action> {
+	private func setIsUserInteractionEnabled(_ state: inout State, isEnabled: Bool) -> Effect<Action> {
 		overlayWindowClient.setIsUserIteractionEnabled(isEnabled)
 		return .none
 	}

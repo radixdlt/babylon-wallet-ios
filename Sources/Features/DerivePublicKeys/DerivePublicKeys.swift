@@ -96,7 +96,7 @@ public struct DerivePublicKeys: Sendable, FeatureReducer {
 
 	public init() {}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .onFirstTask:
 			switch state.factorSourceOption {
@@ -128,7 +128,7 @@ public struct DerivePublicKeys: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .loadedDeviceFactorSource(factorSource):
 			return deriveWith(deviceFactorSource: factorSource, state)
@@ -147,7 +147,7 @@ extension DerivePublicKeys {
 	private func deriveWith(
 		deviceFactorSource: DeviceFactorSource,
 		_ state: State
-	) -> EffectTask<Action> {
+	) -> Effect<Action> {
 		withDerivationPath(
 			state: state,
 			hdFactorSource: deviceFactorSource,
@@ -167,7 +167,7 @@ extension DerivePublicKeys {
 	private func deriveWith(
 		ledgerFactorSource: LedgerHardwareWalletFactorSource,
 		_ state: State
-	) -> EffectTask<Action> {
+	) -> Effect<Action> {
 		withDerivationPath(
 			state: state,
 			hdFactorSource: ledgerFactorSource,
@@ -189,7 +189,7 @@ extension DerivePublicKeys {
 		networkID: NetworkID,
 		loadMnemonicPurpose: SecureStorageClient.LoadMnemonicPurpose,
 		state: State
-	) -> EffectTask<Action> {
+	) -> Effect<Action> {
 		.run { send in
 			try await send(_deriveWith(
 				deviceFactorSource: deviceFactorSource,
@@ -228,7 +228,7 @@ extension DerivePublicKeys {
 		derivationPaths: [DerivationPath],
 		networkID: NetworkID,
 		state: State
-	) -> EffectTask<Action> {
+	) -> Effect<Action> {
 		.run { send in
 			try await send(_deriveWith(
 				ledger: ledger,
@@ -272,7 +272,7 @@ extension DerivePublicKeys {
 		hdFactorSource: Source,
 		knownPaths deriveWithKnownDerivationPaths: @escaping @Sendable ([DerivationPath], NetworkID, SecureStorageClient.LoadMnemonicPurpose) async throws -> Action,
 		calculating calculatedDerivationPath: @escaping @Sendable (DerivationPath, NetworkID, SecureStorageClient.LoadMnemonicPurpose) -> Action
-	) -> EffectTask<Action> {
+	) -> Effect<Action> {
 		switch state.derivationsPathOption {
 		case let .knownPaths(derivationPaths, networkID):
 			let loadMnemonicPurpose: SecureStorageClient.LoadMnemonicPurpose = {

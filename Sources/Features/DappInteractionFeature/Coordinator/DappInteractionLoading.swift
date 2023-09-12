@@ -46,7 +46,7 @@ struct DappInteractionLoading: Sendable, FeatureReducer {
 			.ifLet(\.$errorAlert, action: /Action.view .. ViewAction.errorAlert)
 	}
 
-	func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .appeared:
 			return metadataLoadingEffect(with: &state)
@@ -64,7 +64,7 @@ struct DappInteractionLoading: Sendable, FeatureReducer {
 		}
 	}
 
-	func metadataLoadingEffect(with state: inout State) -> EffectTask<Action> {
+	func metadataLoadingEffect(with state: inout State) -> Effect<Action> {
 		state.isLoading = true
 
 		if state.interaction.metadata.origin == .wallet {
@@ -117,7 +117,7 @@ struct DappInteractionLoading: Sendable, FeatureReducer {
 		}
 	}
 
-	func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
+	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .dappMetadataLoadingResult(.success(dappMetadata)):
 			state.isLoading = false

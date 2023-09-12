@@ -42,7 +42,7 @@ public struct DisplayMnemonic: Sendable, FeatureReducer {
 			}
 	}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .onFirstTask:
 			return .run { [deviceFactorSource = state.deviceFactorSource] send in
@@ -55,7 +55,7 @@ public struct DisplayMnemonic: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .loadMnemonicResult(.success(maybeMnemonicWithPassphrase)):
 			guard let mnemonicWithPassphrase = maybeMnemonicWithPassphrase else {
@@ -79,7 +79,7 @@ public struct DisplayMnemonic: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case .importMnemonic(.delegate(.doneViewing)):
 			state.importMnemonic = nil

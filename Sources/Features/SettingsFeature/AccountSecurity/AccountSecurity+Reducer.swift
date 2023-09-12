@@ -85,7 +85,7 @@ public struct AccountSecurity: Sendable, FeatureReducer {
 			}
 	}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .appeared:
 			return .run { send in
@@ -112,7 +112,7 @@ public struct AccountSecurity: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .loadPreferences(preferences):
 			state.preferences = preferences
@@ -120,7 +120,7 @@ public struct AccountSecurity: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case let .destination(.presented(.importOlympiaWallet(.delegate(.finishedMigration(gotoAccountList))))):
 			state.destination = nil
@@ -142,7 +142,7 @@ public struct AccountSecurity: Sendable, FeatureReducer {
 		}
 	}
 
-	private func savePreferences(state: State) -> EffectTask<Action> {
+	private func savePreferences(state: State) -> Effect<Action> {
 		guard let preferences = state.preferences else { return .none }
 		return .run { _ in
 			try await appPreferencesClient.updatePreferences(preferences)

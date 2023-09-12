@@ -61,7 +61,7 @@ public struct DisplayMnemonics: Sendable, FeatureReducer {
 			}
 	}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .onFirstTask:
 			return .run { send in
@@ -72,7 +72,7 @@ public struct DisplayMnemonics: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .loadedFactorSources(.success(entitiesForDeviceFactorSources)):
 			state.deviceFactorSources = .init(
@@ -92,7 +92,7 @@ public struct DisplayMnemonics: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case let .row(id, action: .delegate(.openDetails)):
 			guard let deviceFactorSource = state.deviceFactorSources[id: id]?.deviceFactorSource else {

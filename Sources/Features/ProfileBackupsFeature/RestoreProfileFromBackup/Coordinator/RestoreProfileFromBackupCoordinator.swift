@@ -70,7 +70,7 @@ public struct RestoreProfileFromBackupCoordinator: Sendable, FeatureReducer {
 			}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .delayedAppendToPath(destination):
 			state.path.append(destination)
@@ -78,7 +78,7 @@ public struct RestoreProfileFromBackupCoordinator: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case let .root(.selectBackup(.delegate(.selectedProfileSnapshot(profileSnapshot, isInCloud)))):
 			state.profileSelection = .init(snapshot: profileSnapshot, isInCloud: isInCloud)

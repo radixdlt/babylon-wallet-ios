@@ -148,7 +148,7 @@ public struct DevAccountPreferences: Sendable, FeatureReducer {
 			}
 	}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .appeared:
 			return loadCurrentNetwork()
@@ -221,7 +221,7 @@ public struct DevAccountPreferences: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case let .destination(.presented(action)):
 			switch action {
@@ -257,7 +257,7 @@ public struct DevAccountPreferences: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .currentNetwork(currentNetwork):
 			state.isOnMainnet = currentNetwork == .mainnet
@@ -320,7 +320,7 @@ public struct DevAccountPreferences: Sendable, FeatureReducer {
 		into state: inout State,
 		onSuccess: ControlState = .enabled,
 		call: @escaping @Sendable (AccountAddress) async throws -> Void
-	) -> EffectTask<Action> {
+	) -> Effect<Action> {
 		state[keyPath: buttonState] = .loading(.local)
 		return .run { [address = state.address] send in
 			try await call(address)
@@ -335,7 +335,7 @@ public struct DevAccountPreferences: Sendable, FeatureReducer {
 }
 
 extension DevAccountPreferences {
-	private func updateAccountPortfolio(_ state: State) -> EffectTask<Action> {
+	private func updateAccountPortfolio(_ state: State) -> Effect<Action> {
 		.run { [address = state.address] send in
 			await send(.internal(.refreshAccountCompleted(
 				TaskResult { try await accountPortfoliosClient.fetchAccountPortfolio(address, true) }
@@ -343,14 +343,14 @@ extension DevAccountPreferences {
 		}
 	}
 
-	private func loadCurrentNetwork() -> EffectTask<Action> {
+	private func loadCurrentNetwork() -> Effect<Action> {
 		.run { send in
 			let currentGateway = await gatewaysClient.getCurrentGateway()
 			await send(.internal(.currentNetwork(currentGateway.network)))
 		}
 	}
 
-	private func loadIsAllowedToUseFaucet(_ state: inout State) -> EffectTask<Action> {
+	private func loadIsAllowedToUseFaucet(_ state: inout State) -> Effect<Action> {
 		state.faucetButtonState = .loading(.local)
 		return .run { [address = state.address] send in
 			await send(.internal(.isAllowedToUseFaucet(
@@ -362,7 +362,7 @@ extension DevAccountPreferences {
 	}
 
 	#if DEBUG
-	private func loadCanCreateAuthSigningKey(_ state: State) -> EffectTask<Action> {
+	private func loadCanCreateAuthSigningKey(_ state: State) -> Effect<Action> {
 		.run { [address = state.address] send in
 			let account = try await accountsClient.getAccountByAddress(address)
 
@@ -370,7 +370,7 @@ extension DevAccountPreferences {
 		}
 	}
 
-	private func loadCanTurnIntoDappDefAccountType(_ state: State) -> EffectTask<Action> {
+	private func loadCanTurnIntoDappDefAccountType(_ state: State) -> Effect<Action> {
 		.run { [address = state.address] send in
 
 			do {

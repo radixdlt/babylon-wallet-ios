@@ -82,7 +82,7 @@ public struct TransferAccountList: Sendable, FeatureReducer {
 			}
 	}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .addAccountTapped:
 			state.receivingAccounts.append(.empty(canBeRemovedWhenEmpty: true))
@@ -90,7 +90,7 @@ public struct TransferAccountList: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case let .receivingAccount(id: id, action: action):
 			switch action {
@@ -167,7 +167,7 @@ extension TransferAccountList {
 		_ selectedAssets: AssetsView.State.Mode.SelectedAssets,
 		id: ReceivingAccount.State.ID,
 		state: inout State
-	) -> EffectTask<Action> {
+	) -> Effect<Action> {
 		let alreadyAddedAssets = state.receivingAccounts[id: id]?.assets ?? []
 
 		var assets: IdentifiedArrayOf<ResourceAsset.State> = []
@@ -204,7 +204,7 @@ extension TransferAccountList {
 		return .none
 	}
 
-	private func navigateToChooseAccounts(_ state: inout State, id: ReceivingAccount.State.ID) -> EffectTask<Action> {
+	private func navigateToChooseAccounts(_ state: inout State, id: ReceivingAccount.State.ID) -> Effect<Action> {
 		let filteredAccounts = state.receivingAccounts.compactMap(\.account?.left?.address) + [state.fromAccount.address]
 		let chooseAccount: ChooseReceivingAccount.State = .init(
 			networkID: state.fromAccount.networkID,
@@ -220,7 +220,7 @@ extension TransferAccountList {
 		return .none
 	}
 
-	private func navigateToSelectAssets(_ state: inout State, id: ReceivingAccount.State.ID) -> EffectTask<Action> {
+	private func navigateToSelectAssets(_ state: inout State, id: ReceivingAccount.State.ID) -> Effect<Action> {
 		guard let assets = state.receivingAccounts[id: id]?.assets else {
 			return .none
 		}

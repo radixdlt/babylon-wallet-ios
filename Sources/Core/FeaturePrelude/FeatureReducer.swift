@@ -21,9 +21,9 @@ public protocol FeatureReducer: Reducer where State: Sendable & Hashable, Action
 	associatedtype ChildAction: Sendable & Equatable = Never
 	associatedtype DelegateAction: Sendable & Equatable = Never
 
-	func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action>
-	func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action>
-	func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action>
+	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action>
+	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action>
+	func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action>
 
 	associatedtype ViewState: Equatable = Never
 	associatedtype View: SwiftUI.View
@@ -44,7 +44,7 @@ extension Reducer where Self: FeatureReducer {
 		Reduce(core)
 	}
 
-	public func core(state: inout State, action: Action) -> EffectTask<Action> {
+	public func core(state: inout State, action: Action) -> Effect<Action> {
 		switch action {
 		case let .view(viewAction):
 			return reduce(into: &state, viewAction: viewAction)
@@ -57,15 +57,15 @@ extension Reducer where Self: FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		.none
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		.none
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		.none
 	}
 }

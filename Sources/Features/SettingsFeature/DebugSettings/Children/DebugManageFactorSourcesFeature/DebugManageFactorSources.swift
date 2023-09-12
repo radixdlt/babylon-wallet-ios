@@ -63,7 +63,7 @@ public struct DebugManageFactorSources: Sendable, FeatureReducer {
 			}
 	}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .task:
 			return .run { send in
@@ -91,7 +91,7 @@ public struct DebugManageFactorSources: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .loadFactorSourcesResult(.success(factorSources)):
 			state.factorSources = factorSources
@@ -102,7 +102,7 @@ public struct DebugManageFactorSources: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case .destination(.presented(.importMnemonic(.delegate(.persistedNewFactorSourceInProfile(_))))):
 			state.destination = nil

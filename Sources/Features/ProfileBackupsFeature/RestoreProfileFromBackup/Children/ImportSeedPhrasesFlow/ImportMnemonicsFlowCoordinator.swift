@@ -74,7 +74,7 @@ public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 			}
 	}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .onFirstTask:
 			return .run { [snapshot = state.profileSnapshot] send in
@@ -91,7 +91,7 @@ public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .loadControlledEntities(.failure(error)):
 			// FIXME: Error handling...?
@@ -105,7 +105,7 @@ public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case let .destination(.presented(.importMnemonicControllingAccounts(.delegate(delegatAction)))):
 			switch delegatAction {
@@ -141,12 +141,12 @@ public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 		}
 	}
 
-	private func finishedWith(factorSourceID: FactorSourceID, state: inout State) -> EffectTask<Action> {
+	private func finishedWith(factorSourceID: FactorSourceID, state: inout State) -> Effect<Action> {
 		state.mnemonicsLeftToImport.removeAll(where: { $0.factorSourceID.embed() == factorSourceID })
 		return nextMnemonicIfNeeded(state: &state)
 	}
 
-	private func nextMnemonicIfNeeded(state: inout State) -> EffectTask<Action> {
+	private func nextMnemonicIfNeeded(state: inout State) -> Effect<Action> {
 		if let next = state.mnemonicsLeftToImport.first {
 			state.destination = .importMnemonicControllingAccounts(.init(entitiesControlledByFactorSource: next))
 			return .none

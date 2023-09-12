@@ -91,7 +91,7 @@ public struct SimpleManageSecurityStructureFlow: Sendable, FeatureReducer {
 	private func choseConfirmerOfNewPhone(
 		_ factorSource: SecurityQuestionsFactorSource,
 		_ state: inout State
-	) -> EffectTask<Action> {
+	) -> Effect<Action> {
 		switch state.mode {
 		case var .new(new):
 			new.confirmerOfNewPhone = factorSource
@@ -108,7 +108,7 @@ public struct SimpleManageSecurityStructureFlow: Sendable, FeatureReducer {
 	private func choseLostPhoneHelper(
 		_ factorSource: TrustedContactFactorSource,
 		_ state: inout State
-	) -> EffectTask<Action> {
+	) -> Effect<Action> {
 		switch state.mode {
 		case var .new(new):
 			new.lostPhoneHelper = factorSource
@@ -122,7 +122,7 @@ public struct SimpleManageSecurityStructureFlow: Sendable, FeatureReducer {
 		return .none
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case let .modalDestinations(.presented(.listConfirmerOfNewPhone(.delegate(.choseFactorSource(secQFS))))):
 			return choseConfirmerOfNewPhone(secQFS, &state)
@@ -134,7 +134,7 @@ public struct SimpleManageSecurityStructureFlow: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case let .changedNumberOfDaysUntilAutoConfirmation(delayAsString):
 

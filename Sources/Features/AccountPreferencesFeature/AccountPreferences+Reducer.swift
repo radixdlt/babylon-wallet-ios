@@ -67,7 +67,7 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 			}
 	}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .task:
 			return .run { [address = state.account.address] send in
@@ -82,7 +82,7 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case let .destinations(.presented(action)):
 			return onDestinationAction(action, &state)
@@ -91,7 +91,7 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .accountUpdated(updated):
 			state.account = updated
@@ -101,7 +101,7 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 }
 
 extension AccountPreferences {
-	func destination(for row: AccountPreferences.Section.SectionRow, _ state: inout State) -> EffectTask<Action> {
+	func destination(for row: AccountPreferences.Section.SectionRow, _ state: inout State) -> Effect<Action> {
 		switch row {
 		case .personalize(.accountLabel):
 			state.destinations = .updateAccountLabel(.init(account: state.account))
@@ -126,7 +126,7 @@ extension AccountPreferences {
 		}
 	}
 
-	func onDestinationAction(_ action: AccountPreferences.Destinations.Action, _ state: inout State) -> EffectTask<Action> {
+	func onDestinationAction(_ action: AccountPreferences.Destinations.Action, _ state: inout State) -> Effect<Action> {
 		switch action {
 		case .updateAccountLabel(.delegate(.accountLabelUpdated)),
 		     .thirdPartyDeposits(.delegate(.accountUpdated)):

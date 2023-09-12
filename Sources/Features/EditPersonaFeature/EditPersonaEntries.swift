@@ -70,7 +70,7 @@ public struct EditPersonaEntries: Sendable, FeatureReducer {
 			}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case .name(.delegate(.delete)):
 			state.name = nil

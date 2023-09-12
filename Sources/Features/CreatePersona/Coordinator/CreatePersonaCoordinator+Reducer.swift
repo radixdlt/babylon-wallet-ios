@@ -104,7 +104,7 @@ public struct CreatePersonaCoordinator: Sendable, FeatureReducer {
 }
 
 extension CreatePersonaCoordinator {
-	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .closeButtonTapped:
 			return .run { send in
@@ -114,7 +114,7 @@ extension CreatePersonaCoordinator {
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case .root(.step0_introduction(.delegate(.done))):
 			state.path.append(.step1_newPersonaInfo(.init(config: state.config)))

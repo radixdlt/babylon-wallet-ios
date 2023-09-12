@@ -84,7 +84,7 @@ struct OneTimePersonaData: Sendable, FeatureReducer {
 			}
 	}
 
-	func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .task:
 			return .run { send in
@@ -125,7 +125,7 @@ struct OneTimePersonaData: Sendable, FeatureReducer {
 		}
 	}
 
-	func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
+	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .isFirstPersonaOnAnyNetwork(isFirstPersonaOnAnyNetwork):
 			state.isFirstPersonaOnAnyNetwork = isFirstPersonaOnAnyNetwork
@@ -145,7 +145,7 @@ struct OneTimePersonaData: Sendable, FeatureReducer {
 		}
 	}
 
-	func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+	func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case let .persona(id, .delegate(.edit)):
 			if let persona = state.personas[id: id] {
@@ -168,7 +168,7 @@ struct OneTimePersonaData: Sendable, FeatureReducer {
 		}
 	}
 
-	func checkIfFirstPersonaByUserEver() -> EffectTask<Action> {
+	func checkIfFirstPersonaByUserEver() -> Effect<Action> {
 		.run { send in
 			let hasAnyPersonaOnAnyNetwork = await personasClient.hasAnyPersonaOnAnyNetwork()
 			let isFirstPersonaOnAnyNetwork = !hasAnyPersonaOnAnyNetwork

@@ -89,7 +89,7 @@ public struct AdvancedManageSecurityStructureFlow: Sendable, FeatureReducer {
 			}
 	}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case let .changedNumberOfDaysUntilAutoConfirmation(delayAsString):
 
@@ -124,7 +124,7 @@ public struct AdvancedManageSecurityStructureFlow: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case let .destination(.presented(.factorsForPrimaryRole(.delegate(.confirmedRoleWithFactors(primaryRole))))):
 			state.primaryRole = primaryRole

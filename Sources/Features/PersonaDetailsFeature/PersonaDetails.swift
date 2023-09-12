@@ -153,7 +153,7 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 			}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case let .destination(.presented(.editPersona(.delegate(.personaSaved(persona))))):
 			guard persona.id == state.mode.id else { return .none }
@@ -190,7 +190,7 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .appeared:
 			guard case let .general(_, dApps) = state.mode else { return .none }
@@ -248,7 +248,7 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .personaToCreateAuthKeyForFetched(persona):
 			state.destination = .createAuthKey(.init(entity: .persona(persona)))
@@ -324,7 +324,7 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 		into state: inout State,
 		onSuccess: ControlState,
 		call: @escaping @Sendable (IdentityAddress) async throws -> Void
-	) -> EffectTask<Action> {
+	) -> Effect<Action> {
 		state[keyPath: buttonState] = .loading(.local)
 		return .run { [address = state.mode.id] send in
 			try await call(address)
@@ -450,7 +450,7 @@ public struct SimpleAuthDappDetails: Sendable, FeatureReducer {
 
 	public init() {}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .appeared:
 			state.$metadata = .loading
@@ -475,7 +475,7 @@ public struct SimpleAuthDappDetails: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .metadataLoaded(metadata):
 			state.$metadata = metadata

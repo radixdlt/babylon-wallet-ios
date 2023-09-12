@@ -202,7 +202,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			}
 	}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .appeared:
 			return .run { [state = state] send in
@@ -276,7 +276,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case let .withdrawals(.delegate(.showAsset(assetTransfer))),
 		     let .deposits(.delegate(.showAsset(assetTransfer))):
@@ -336,7 +336,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, presentedAction: Destinations.Action) -> EffectTask<Action> {
+	public func reduce(into state: inout State, presentedAction: Destinations.Action) -> Effect<Action> {
 		switch presentedAction {
 		case let .customizeGuarantees(.delegate(.applyGuarantees(guarantees))):
 			for transfer in guarantees.map(\.transfer) {
@@ -429,7 +429,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .previewLoaded(.failure(error)):
 			loggerGlobal.error("Transaction preview failed, error: \(error)")
@@ -513,7 +513,7 @@ extension Collection<TransactionReviewAccount.State> {
 }
 
 extension TransactionReview {
-	func review(_ state: inout State) -> EffectTask<Action> {
+	func review(_ state: inout State) -> Effect<Action> {
 		guard let transactionToReview = state.reviewedTransaction else {
 			assertionFailure("Bad implementation, expected `analyzedManifestToReview`")
 			return .none
@@ -577,7 +577,7 @@ extension TransactionReview {
 		return manifest
 	}
 
-	func showRawTransaction(_ state: inout State) -> EffectTask<Action> {
+	func showRawTransaction(_ state: inout State) -> Effect<Action> {
 		do {
 			let manifest = try transactionManifestWithWalletInstructionsAdded(state)
 			let rawTransaction = try manifest.instructions().asStr()
@@ -599,14 +599,14 @@ extension TransactionReview {
 	func delayedEffect(
 		delay: Duration = .seconds(0.3),
 		for action: Action
-	) -> EffectTask<Action> {
+	) -> Effect<Action> {
 		.run { send in
 			try await clock.sleep(for: delay)
 			await send(action)
 		}
 	}
 
-	func resetToApprovable(_ state: inout State) -> EffectTask<Action> {
+	func resetToApprovable(_ state: inout State) -> Effect<Action> {
 		state.destination = nil
 		state.canApproveTX = true
 		state.resetSlider()
@@ -1185,7 +1185,7 @@ public struct SimpleDappDetails: Sendable, FeatureReducer {
 
 	public init() {}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .appeared:
 			state.$metadata = .loading
@@ -1209,7 +1209,7 @@ public struct SimpleDappDetails: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .metadataLoaded(metadata):
 			state.$metadata = metadata

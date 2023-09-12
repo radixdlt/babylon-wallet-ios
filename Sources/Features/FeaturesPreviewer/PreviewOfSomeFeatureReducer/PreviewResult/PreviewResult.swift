@@ -47,7 +47,7 @@ public struct PreviewResult<ResultFromFeature>: FeatureReducer where ResultFromF
 
 	public init() {}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case let .showJSONToggled(showJSON):
 			state.isShowingJSON = showJSON

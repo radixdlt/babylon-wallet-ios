@@ -61,7 +61,7 @@ public struct AssetTransferMessage: Sendable, FeatureReducer {
 			}
 	}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .messageKindTapped:
 			state.destination = .messageMode(.init())

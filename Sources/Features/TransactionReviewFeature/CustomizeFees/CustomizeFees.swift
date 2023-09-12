@@ -99,7 +99,7 @@ public struct CustomizeFees: FeatureReducer {
 			}
 	}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .changeFeePayerTapped:
 			state.destination = .selectFeePayer(.init(feePayerSelection: state.feePayerSelection))
@@ -115,7 +115,7 @@ public struct CustomizeFees: FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case let .destination(.presented(.selectFeePayer(.delegate(.selected(selection))))):
 			let previousFeePayer = state.reviewedTransaction.feePayerSelection.selected
@@ -123,7 +123,7 @@ public struct CustomizeFees: FeatureReducer {
 			let signingPurpose = state.signingPurpose
 
 			@Sendable
-			func replaceFeePayer(_ feePayer: FeePayerCandidate, _ reviewedTransaction: ReviewedTransaction, manifest: TransactionManifest) -> EffectTask<Action> {
+			func replaceFeePayer(_ feePayer: FeePayerCandidate, _ reviewedTransaction: ReviewedTransaction, manifest: TransactionManifest) -> Effect<Action> {
 				.run { send in
 					var reviewedTransaction = reviewedTransaction
 					var newSigners = OrderedSet(reviewedTransaction.transactionSigners.intentSignerEntitiesOrEmpty() + [.account(feePayer.account)])
@@ -178,7 +178,7 @@ public struct CustomizeFees: FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .updated(.success(reviewedTransaction)):
 			state.reviewedTransaction = reviewedTransaction

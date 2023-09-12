@@ -108,7 +108,7 @@ public struct ResourcesList: FeatureReducer, Sendable {
 			}
 	}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .task:
 			let addresses: [ResourceAddress] = state.allDepositorAddresses.map(\.resourceAddress)
@@ -138,7 +138,7 @@ public struct ResourcesList: FeatureReducer, Sendable {
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case let .destinations(.presented(.addAsset(.delegate(.addAddress(mode, newAsset))))):
 			state.mode = mode
@@ -164,7 +164,7 @@ public struct ResourcesList: FeatureReducer, Sendable {
 		}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .resourceLoaded(resource, newAsset):
 			state.loadedResources.append(.init(iconURL: resource?.iconURL, name: resource?.name, address: newAsset))

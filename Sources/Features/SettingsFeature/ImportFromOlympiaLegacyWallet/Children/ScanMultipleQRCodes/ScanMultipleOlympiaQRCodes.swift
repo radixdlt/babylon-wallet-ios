@@ -60,7 +60,7 @@ public struct ScanMultipleOlympiaQRCodes: Sendable, FeatureReducer {
 		Reduce(core)
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case let .scanQR(.delegate(.scanned(qrString))):
 			guard let unparsed = NonEmptyString(qrString) else {
@@ -106,14 +106,14 @@ public struct ScanMultipleOlympiaQRCodes: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .scannedParsedOlympiaWalletToMigrate(olympiaWallet):
 			return .send(.delegate(.finishedScanning(olympiaWallet)))
 		}
 	}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .appeared:
 			return .send(.delegate(.viewAppeared))

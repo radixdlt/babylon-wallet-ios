@@ -105,7 +105,7 @@ struct AccountPermissionChooseAccounts: Sendable, FeatureReducer {
 			}
 	}
 
-	func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case let .continueButtonTapped(selectedAccounts):
 			let selectedAccounts = IdentifiedArray(uncheckedUniqueElements: selectedAccounts.map(\.account))
@@ -143,7 +143,7 @@ struct AccountPermissionChooseAccounts: Sendable, FeatureReducer {
 		}
 	}
 
-	func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
+	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .proveAccountOwnership(signingFactors, authenticationDataToSignForChallenge):
 			state.destination = .signing(.init(
@@ -154,7 +154,7 @@ struct AccountPermissionChooseAccounts: Sendable, FeatureReducer {
 		}
 	}
 
-	func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+	func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		let selectedAccounts = (state.chooseAccounts.selectedAccounts ?? []).map(\.account)
 
 		switch childAction {
@@ -211,7 +211,7 @@ struct AccountPermissionChooseAccounts: Sendable, FeatureReducer {
 		}
 	}
 
-	private func cancelSigningEffect(state: inout State) -> EffectTask<Action> {
+	private func cancelSigningEffect(state: inout State) -> Effect<Action> {
 		// FIXME: How to cancel?
 		loggerGlobal.error("Cancelled signing")
 		return .none

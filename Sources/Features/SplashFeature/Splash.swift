@@ -56,7 +56,7 @@ public struct Splash: Sendable, FeatureReducer {
 			.ifLet(\.$passcodeCheckFailedAlert, action: /Action.view .. ViewAction.passcodeCheckFailedAlert)
 	}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .appeared:
 			return delay().concatenate(with: verifyPasscode())
@@ -85,7 +85,7 @@ public struct Splash: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .passcodeConfigResult(result):
 			let config = try? result.value
@@ -130,7 +130,7 @@ public struct Splash: Sendable, FeatureReducer {
 		}
 	}
 
-	func delegateCompleted(loadProfileOutcome: LoadProfileOutcome, accountRecoveryNeeded: Bool) -> EffectTask<Action> {
+	func delegateCompleted(loadProfileOutcome: LoadProfileOutcome, accountRecoveryNeeded: Bool) -> Effect<Action> {
 		.run { send in
 			let hasMainnetEverBeenLive = await networkSwitchingClient.hasMainnetEverBeenLive()
 			await send(.delegate(
@@ -143,7 +143,7 @@ public struct Splash: Sendable, FeatureReducer {
 		}
 	}
 
-	func checkAccountRecoveryNeeded(_ loadProfileOutcome: LoadProfileOutcome) -> EffectTask<Action> {
+	func checkAccountRecoveryNeeded(_ loadProfileOutcome: LoadProfileOutcome) -> Effect<Action> {
 		.run { send in
 			await send(.internal(.accountRecoveryNeeded(
 				loadProfileOutcome,
@@ -154,7 +154,7 @@ public struct Splash: Sendable, FeatureReducer {
 		}
 	}
 
-	private func delay() -> EffectTask<Action> {
+	private func delay() -> Effect<Action> {
 		.run { _ in
 			let durationInMS: Int
 			#if DEBUG
@@ -166,7 +166,7 @@ public struct Splash: Sendable, FeatureReducer {
 		}
 	}
 
-	private func verifyPasscode() -> EffectTask<Action> {
+	private func verifyPasscode() -> Effect<Action> {
 		.run { send in
 			await send(.internal(.passcodeConfigResult(
 				TaskResult {
