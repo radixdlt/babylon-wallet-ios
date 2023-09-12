@@ -15,7 +15,7 @@ extension NonFungibleTokenDetails.State {
 				isXRD: false,
 				validatorAddress: nil,
 				resourceName: resource.name,
-				currentSupply: nil, // FIXME: Find actual value
+				currentSupply: resource.totalSupply?.format(),
 				behaviors: resource.behaviors,
 				tags: resource.tags
 			)
@@ -55,6 +55,10 @@ extension NonFungibleTokenDetails {
 
 							if let name = viewStore.name {
 								KeyValueView(key: L10n.AssetDetails.NFTDetails.name, value: name)
+							}
+
+							if let currentSupply = viewStore.resourceDetails.currentSupply {
+								KeyValueView(key: L10n.AssetDetails.currentSupply, value: currentSupply)
 							}
 						}
 						.lineLimit(1)
