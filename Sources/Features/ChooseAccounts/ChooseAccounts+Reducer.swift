@@ -115,11 +115,11 @@ public struct ChooseAccounts: Sendable, FeatureReducer {
 	}
 
 	private func loadAccounts() -> EffectTask<Action> {
-		.task {
+		.run { send in
 			let result = await TaskResult {
 				try await accountsClient.getAccountsOnCurrentNetwork()
 			}
-			return .internal(.loadAccountsResult(result))
+			await send(.internal(.loadAccountsResult(result)))
 		}
 	}
 }

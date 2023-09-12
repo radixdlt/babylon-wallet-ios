@@ -146,11 +146,11 @@ struct DappInteractor: Sendable, FeatureReducer {
 			}
 
 		case .moveToBackground:
-			return .fireAndForget {
+			return .run { _ in
 				await radixConnectClient.disconnectAll()
 			}
 		case .moveToForeground:
-			return .fireAndForget {
+			return .run { _ in
 				_ = await radixConnectClient.loadFromProfileAndConnectAll()
 			}
 		}
@@ -458,9 +458,9 @@ extension DappInteractor {
 		delay: Duration = .seconds(0.75),
 		for action: Action
 	) -> EffectTask<Action> {
-		.task {
+		.run { send in
 			try await clock.sleep(for: delay)
-			return action
+			await send(action)
 		}
 	}
 }

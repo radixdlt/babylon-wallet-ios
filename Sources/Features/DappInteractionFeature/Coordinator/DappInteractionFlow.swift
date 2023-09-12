@@ -775,10 +775,10 @@ extension DappInteractionFlow {
 			if state.root == nil {
 				state.root = destination
 			} else if state.path.last != destination {
-				return .task {
+				return .run { send in
 					/// For more information about that `sleep` and not setting it directly here please check [this discussion in Slack](https://rdxworks.slack.com/archives/C03QFAWBRNX/p1693395346047829?thread_ts=1693388110.800679&cid=C03QFAWBRNX)
 					try? await clock.sleep(for: .milliseconds(250))
-					return .internal(.delayedAppendToPath(destination))
+					await send(.internal(.delayedAppendToPath(destination)))
 				}
 			}
 			return .none

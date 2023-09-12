@@ -208,14 +208,14 @@ public struct GatewaySettings: Sendable, FeatureReducer {
 				// weird state, should not happen
 				return .none
 			}
-			return .task {
+			return .run { send in
 				if hasAccountsOnNetwork {
 					let result = await TaskResult {
 						try await networkSwitchingClient.switchTo(newGateway)
 					}
-					return .internal(.switchToGatewayResult(result))
+					await send(.internal(.switchToGatewayResult(result)))
 				} else {
-					return .internal(.createAccountOnNetworkBeforeSwitchingToIt(newGateway))
+					await send(.internal(.createAccountOnNetworkBeforeSwitchingToIt(newGateway)))
 				}
 			}
 
@@ -277,11 +277,11 @@ public struct GatewaySettings: Sendable, FeatureReducer {
 				// weird state, should not happen
 				return .none
 			}
-			return .task {
+			return .run { send in
 				let result = await TaskResult {
 					try await networkSwitchingClient.switchTo(newGateway)
 				}
-				return .internal(.switchToGatewayResult(result))
+				await send(.internal(.switchToGatewayResult(result)))
 			}
 
 		case .destination(.presented(.slideUpPanel(.delegate(.dismiss)))):
@@ -328,11 +328,11 @@ private extension GatewaySettings {
 		}
 
 		state.validatedNewGatewayToSwitchTo = gateway
-		return .task {
+		return .run { send in
 			let result = await TaskResult {
 				try await networkSwitchingClient.hasAccountOnNetwork(gateway)
 			}
-			return .internal(.hasAccountsResult(result))
+			await send(.internal(.hasAccountsResult(result)))
 		}
 	}
 }

@@ -201,12 +201,12 @@ public struct LedgerHardwareDevices: Sendable, FeatureReducer {
 
 	private func updateLedgersEffect(state: inout State) -> EffectTask<Action> {
 		state.$ledgers = .loading
-		return .task {
+		return .run { send in
 			let result = await TaskResult {
 				let ledgers = try await factorSourcesClient.getFactorSources(type: LedgerHardwareWalletFactorSource.self)
 				return IdentifiedArray(uniqueElements: ledgers)
 			}
-			return .internal(.loadedLedgers(result))
+			await send(.internal(.loadedLedgers(result)))
 		}
 	}
 

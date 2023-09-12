@@ -47,11 +47,11 @@ public struct SecurityStructureConfigurationList: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .task:
-			return .task {
+			return .run { send in
 				let configs = await appPreferencesClient.getPreferences().security.structureConfigurationReferences
-				return .internal(.configsLoaded(.init(
+				await send(.internal(.configsLoaded(.init(
 					uncheckedUniqueElements: configs.map(SecurityStructureConfigurationRow.State.init))
-				))
+				)))
 			}
 		case .createNewStructure:
 			return .send(.delegate(.createNewStructure))

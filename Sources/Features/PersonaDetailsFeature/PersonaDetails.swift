@@ -194,8 +194,8 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 		switch viewAction {
 		case .appeared:
 			guard case let .general(_, dApps) = state.mode else { return .none }
-			return .task {
-				await .internal(.dAppsUpdated(addingDappMetadata(to: dApps)))
+			return .run { send in
+				await send(.internal(.dAppsUpdated(addingDappMetadata(to: dApps))))
 			}
 
 		#if DEBUG
@@ -456,7 +456,7 @@ public struct SimpleAuthDappDetails: Sendable, FeatureReducer {
 			state.$metadata = .loading
 			state.$resources = .loading
 			let dAppID = state.dApp.dAppDefinitionAddress
-			return .task {
+			return .run { send in
 				let result = await TaskResult {
 					try await cacheClient.withCaching(
 						cacheEntry: .dAppMetadata(dAppID.address),
@@ -465,11 +465,11 @@ public struct SimpleAuthDappDetails: Sendable, FeatureReducer {
 						}
 					)
 				}
-				return .internal(.metadataLoaded(.init(result: result)))
+				await send(.internal(.metadataLoaded(.init(result: result))))
 			}
 
 		case let .openURLTapped(url):
-			return .fireAndForget {
+			return .run { _ in
 				await openURL(url)
 			}
 		}

@@ -105,27 +105,27 @@ extension UserDefaultsClient {
       doubleForKey: userDefaults.double(forKey:),
       integerForKey: userDefaults.integer(forKey:),
       remove: { key in
-        .fireAndForget {
+        .run { _ in
           userDefaults.removeObject(forKey: key)
         }
       },
       setBool: { value, key in
-        .fireAndForget {
+        .run { _ in
           userDefaults.set(value, forKey: key)
         }
       },
       setData: { data, key in
-        .fireAndForget {
+        .run { _ in
           userDefaults.set(data, forKey: key)
         }
       },
       setDouble: { value, key in
-        .fireAndForget {
+        .run { _ in
           userDefaults.set(value, forKey: key)
         }
       },
       setInteger: { value, key in
-        .fireAndForget {
+        .run { _ in
           userDefaults.set(value, forKey: key)
         }
       }

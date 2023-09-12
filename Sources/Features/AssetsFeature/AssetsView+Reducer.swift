@@ -114,7 +114,7 @@ public struct AssetsView: Sendable, FeatureReducer {
 			state.activeAssetKind = kind
 			return .none
 		case .pullToRefreshStarted:
-			return .fireAndForget { [address = state.account.address] in
+			return .run { [address = state.account.address] _ in
 				_ = try await accountPortfoliosClient.fetchAccountPortfolio(address, true)
 			}
 		case let .chooseButtonTapped(items):

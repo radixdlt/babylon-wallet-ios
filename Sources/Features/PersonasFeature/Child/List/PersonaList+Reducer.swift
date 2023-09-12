@@ -114,9 +114,9 @@ public struct PersonaList: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
 		case .persona(id: let id, action: .delegate(.openDetails)):
-			return .task {
+			return .run { send in
 				let persona = try await personasClient.getPersona(id: id)
-				return .delegate(.openDetails(persona))
+				await send(.delegate(.openDetails(persona)))
 			}
 
 		case .persona:

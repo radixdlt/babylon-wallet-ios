@@ -189,10 +189,10 @@ struct Login: Sendable, FeatureReducer {
 	}
 
 	func checkIfFirstPersonaByUserEver() -> EffectTask<Action> {
-		.task {
+		.run { send in
 			let hasAnyPersonaOnAnyNetwork = await personasClient.hasAnyPersonaOnAnyNetwork()
 			let isFirstPersonaOnAnyNetwork = !hasAnyPersonaOnAnyNetwork
-			return .internal(.isFirstPersonaOnAnyNetwork(isFirstPersonaOnAnyNetwork))
+			await send(.internal(.isFirstPersonaOnAnyNetwork(isFirstPersonaOnAnyNetwork)))
 		}
 	}
 }

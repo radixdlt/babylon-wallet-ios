@@ -192,7 +192,7 @@ public struct FactorsForRole<R: RoleProtocol>: Sendable, FeatureReducer {
 				return .none
 
 			case .discardChanges:
-				return .fireAndForget {
+				return .run { _ in
 					await dismiss()
 				}
 
