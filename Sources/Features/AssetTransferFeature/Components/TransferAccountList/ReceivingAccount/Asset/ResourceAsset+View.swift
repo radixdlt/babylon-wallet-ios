@@ -23,14 +23,14 @@ extension ResourceAsset.View {
 					switch state {
 					case .fungibleAsset:
 						CaseLet(
-							state: /ResourceAsset.State.fungibleAsset,
+							/ResourceAsset.State.fungibleAsset,
 							action: { ResourceAsset.Action.child(.fungibleAsset($0)) },
 							then: { FungibleResourceAsset.View(store: $0) }
 						)
 
 					case .nonFungibleAsset:
 						CaseLet(
-							state: /ResourceAsset.State.nonFungibleAsset,
+							/ResourceAsset.State.nonFungibleAsset,
 							action: { ResourceAsset.Action.child(.nonFungibleAsset($0)) },
 							then: { NonFungibleResourceAsset.View(store: $0.actionless) }
 						)

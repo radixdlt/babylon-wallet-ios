@@ -17,13 +17,13 @@ extension CreationOfAccount {
 					switch state {
 					case .step0_chooseLedger:
 						CaseLet(
-							state: /CreationOfAccount.State.Step.step0_chooseLedger,
+							/CreationOfAccount.State.Step.step0_chooseLedger,
 							action: CreationOfAccount.ChildAction.step0_chooseLedger,
 							then: { LedgerHardwareDevices.View(store: $0) }
 						)
 					case .step1_derivePublicKeys:
 						CaseLet(
-							state: /CreationOfAccount.State.Step.step1_derivePublicKeys,
+							/CreationOfAccount.State.Step.step1_derivePublicKeys,
 							action: CreationOfAccount.ChildAction.step1_derivePublicKeys,
 							then: { DerivePublicKeys.View(store: $0) }
 						)

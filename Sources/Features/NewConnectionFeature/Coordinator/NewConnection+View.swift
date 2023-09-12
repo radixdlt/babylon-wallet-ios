@@ -18,7 +18,7 @@ extension NewConnection {
 						switch state {
 						case .localNetworkPermission:
 							CaseLet(
-								state: /NewConnection.State.localNetworkPermission,
+								/NewConnection.State.localNetworkPermission,
 								action: { NewConnection.Action.child(.localNetworkPermission($0)) },
 								then: {
 									LocalNetworkPermission.View(store: $0)
@@ -27,7 +27,7 @@ extension NewConnection {
 							)
 						case .scanQR:
 							CaseLet(
-								state: /NewConnection.State.scanQR,
+								/NewConnection.State.scanQR,
 								action: { NewConnection.Action.child(.scanQR($0)) },
 								then: {
 									ScanQRCoordinator.View(store: $0)
@@ -36,7 +36,7 @@ extension NewConnection {
 							)
 						case .connectUsingSecrets:
 							CaseLet(
-								state: /NewConnection.State.connectUsingSecrets,
+								/NewConnection.State.connectUsingSecrets,
 								action: { NewConnection.Action.child(.connectUsingSecrets($0)) },
 								then: { ConnectUsingSecrets.View(store: $0) }
 							)

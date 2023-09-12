@@ -51,14 +51,14 @@ extension AnswerSecurityQuestionsCoordinator {
 				switch state {
 				case .chooseQuestions:
 					CaseLet(
-						state: /AnswerSecurityQuestionsCoordinator.Path.State.chooseQuestions,
+						/AnswerSecurityQuestionsCoordinator.Path.State.chooseQuestions,
 						action: AnswerSecurityQuestionsCoordinator.Path.Action.chooseQuestions,
 						then: { ChooseQuestions.View(store: $0) }
 					)
 
 				case .answerQuestion:
 					CaseLet(
-						state: /AnswerSecurityQuestionsCoordinator.Path.State.answerQuestion,
+						/AnswerSecurityQuestionsCoordinator.Path.State.answerQuestion,
 						action: AnswerSecurityQuestionsCoordinator.Path.Action.answerQuestion,
 						then: { AnswerSecurityQuestionFreeform.View(store: $0) }
 					)

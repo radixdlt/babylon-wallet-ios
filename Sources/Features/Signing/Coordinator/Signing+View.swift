@@ -16,14 +16,14 @@ extension Signing {
 				switch state {
 				case .signWithDeviceFactors:
 					CaseLet(
-						state: /Signing.State.Step.signWithDeviceFactors,
+						/Signing.State.Step.signWithDeviceFactors,
 						action: Signing.ChildAction.signWithDeviceFactors,
 						then: { SignWithFactorSourcesOfKindDevice.View(store: $0) }
 					)
 
 				case .signWithLedgerFactors:
 					CaseLet(
-						state: /Signing.State.Step.signWithLedgerFactors,
+						/Signing.State.Step.signWithLedgerFactors,
 						action: Signing.ChildAction.signWithLedgerFactors,
 						then: { SignWithFactorSourcesOfKindLedger.View(store: $0) }
 					)

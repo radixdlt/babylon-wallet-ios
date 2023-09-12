@@ -16,13 +16,13 @@ extension OnboardingCoordinator {
 				switch state {
 				case .startup:
 					CaseLet(
-						state: /OnboardingCoordinator.State.Root.startup,
+						/OnboardingCoordinator.State.Root.startup,
 						action: OnboardingCoordinator.ChildAction.startup,
 						then: { OnboardingStartup.View(store: $0) }
 					)
 				case .createAccountCoordinator:
 					CaseLet(
-						state: /OnboardingCoordinator.State.Root.createAccountCoordinator,
+						/OnboardingCoordinator.State.Root.createAccountCoordinator,
 						action: OnboardingCoordinator.ChildAction.createAccountCoordinator,
 						then: {
 							CreateAccountCoordinator.View(store: $0)

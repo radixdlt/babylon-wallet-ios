@@ -13,14 +13,14 @@ extension PreviewOfSomeFeatureReducer {
 					switch state {
 					case .previewOf:
 						CaseLet(
-							state: /F.State.previewOf,
+							/F.State.previewOf,
 							action: { F.Action.child(.previewOf($0)) },
 							then: { Feature.View(store: $0) }
 						)
 
 					case .previewResult:
 						CaseLet(
-							state: /F.State.previewResult,
+							/F.State.previewResult,
 							action: { F.Action.child(.previewResult($0)) },
 							then: { PreviewResult<Feature.ResultFromFeature>.View(store: $0) }
 						)

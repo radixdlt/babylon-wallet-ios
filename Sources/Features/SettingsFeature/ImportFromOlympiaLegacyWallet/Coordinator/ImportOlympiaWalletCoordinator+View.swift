@@ -47,25 +47,25 @@ extension ImportOlympiaWalletCoordinator.Path {
 				switch state {
 				case .accountsToImport:
 					CaseLet(
-						state: /State.accountsToImport,
+						/State.accountsToImport,
 						action: Action.accountsToImport,
 						then: { AccountsToImport.View(store: $0) }
 					)
 				case .importMnemonic:
 					CaseLet(
-						state: /State.importMnemonic,
+						/State.importMnemonic,
 						action: Action.importMnemonic,
 						then: { ImportMnemonic.View(store: $0) }
 					)
 				case .importOlympiaLedgerAccountsAndFactorSources:
 					CaseLet(
-						state: /State.importOlympiaLedgerAccountsAndFactorSources,
+						/State.importOlympiaLedgerAccountsAndFactorSources,
 						action: Action.importOlympiaLedgerAccountsAndFactorSources,
 						then: { ImportOlympiaLedgerAccountsAndFactorSources.View(store: $0) }
 					)
 				case .completion:
 					CaseLet(
-						state: /State.completion,
+						/State.completion,
 						action: Action.completion,
 						then: { CompletionMigrateOlympiaAccountsToBabylon.View(store: $0) }
 					)

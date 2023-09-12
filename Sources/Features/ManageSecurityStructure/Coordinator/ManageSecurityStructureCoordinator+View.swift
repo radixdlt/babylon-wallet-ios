@@ -33,25 +33,25 @@ extension ManageSecurityStructureCoordinator {
 				switch state {
 				case .start:
 					CaseLet(
-						state: /ManageSecurityStructureCoordinator.Path.State.start,
+						/ManageSecurityStructureCoordinator.Path.State.start,
 						action: ManageSecurityStructureCoordinator.Path.Action.start,
 						then: { ManageSecurityStructureStart.View(store: $0) }
 					)
 				case .simpleSetupFlow:
 					CaseLet(
-						state: /ManageSecurityStructureCoordinator.Path.State.simpleSetupFlow,
+						/ManageSecurityStructureCoordinator.Path.State.simpleSetupFlow,
 						action: ManageSecurityStructureCoordinator.Path.Action.simpleSetupFlow,
 						then: { SimpleManageSecurityStructureFlow.View(store: $0) }
 					)
 				case .advancedSetupFlow:
 					CaseLet(
-						state: /ManageSecurityStructureCoordinator.Path.State.advancedSetupFlow,
+						/ManageSecurityStructureCoordinator.Path.State.advancedSetupFlow,
 						action: ManageSecurityStructureCoordinator.Path.Action.advancedSetupFlow,
 						then: { AdvancedManageSecurityStructureFlow.View(store: $0) }
 					)
 				case .nameStructure:
 					CaseLet(
-						state: /ManageSecurityStructureCoordinator.Path.State.nameStructure,
+						/ManageSecurityStructureCoordinator.Path.State.nameStructure,
 						action: ManageSecurityStructureCoordinator.Path.Action.nameStructure,
 						then: { NameSecurityStructure.View(store: $0) }
 					)

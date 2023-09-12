@@ -15,13 +15,13 @@ extension ScanQRCoordinator {
 				switch state {
 				case .cameraPermission:
 					CaseLet(
-						state: /ScanQRCoordinator.State.Step.cameraPermission,
+						/ScanQRCoordinator.State.Step.cameraPermission,
 						action: { ScanQRCoordinator.Action.child(.cameraPermission($0)) },
 						then: { CameraPermission.View(store: $0) }
 					)
 				case .scanQR:
 					CaseLet(
-						state: /ScanQRCoordinator.State.Step.scanQR,
+						/ScanQRCoordinator.State.Step.scanQR,
 						action: { ScanQRCoordinator.Action.child(.scanQR($0)) },
 						then: { ScanQR.View(store: $0) }
 					)
