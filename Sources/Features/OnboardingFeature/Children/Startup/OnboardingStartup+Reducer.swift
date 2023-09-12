@@ -24,7 +24,7 @@ public struct OnboardingStartup: Sendable, FeatureReducer {
 		case destination(PresentationAction<Destinations.Action>)
 	}
 
-	public struct Destinations: Sendable, ReducerProtocol {
+	public struct Destinations: Sendable, Reducer {
 		public enum State: Sendable, Hashable {
 			case restoreFromBackup(RestoreProfileFromBackupCoordinator.State)
 		}
@@ -33,14 +33,14 @@ public struct OnboardingStartup: Sendable, FeatureReducer {
 			case restoreFromBackup(RestoreProfileFromBackupCoordinator.Action)
 		}
 
-		public var body: some ReducerProtocolOf<Self> {
+		public var body: some ReducerOf<Self> {
 			Scope(state: /State.restoreFromBackup, action: /Action.restoreFromBackup) {
 				RestoreProfileFromBackupCoordinator()
 			}
 		}
 	}
 
-	public var body: some ReducerProtocolOf<Self> {
+	public var body: some ReducerOf<Self> {
 		Reduce(core)
 			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
 				Destinations()

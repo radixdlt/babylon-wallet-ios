@@ -79,7 +79,7 @@ public struct ChooseReceivingAccount: Sendable, FeatureReducer {
 		case handleResult(ReceivingAccount.State.Account)
 	}
 
-	public struct Destinations: Sendable, ReducerProtocol {
+	public struct Destinations: Sendable, Reducer {
 		public enum State: Sendable, Hashable {
 			case scanAccountAddress(ScanQRCoordinator.State)
 		}
@@ -88,7 +88,7 @@ public struct ChooseReceivingAccount: Sendable, FeatureReducer {
 			case scanAccountAddress(ScanQRCoordinator.Action)
 		}
 
-		public var body: some ReducerProtocolOf<Self> {
+		public var body: some ReducerOf<Self> {
 			Scope(state: /State.scanAccountAddress, action: /Action.scanAccountAddress) {
 				ScanQRCoordinator()
 			}
@@ -97,7 +97,7 @@ public struct ChooseReceivingAccount: Sendable, FeatureReducer {
 
 	public init() {}
 
-	public var body: some ReducerProtocolOf<Self> {
+	public var body: some ReducerOf<Self> {
 		Scope(state: \.chooseAccounts, action: /Action.child .. ChildAction.chooseAccounts) {
 			ChooseAccounts()
 		}

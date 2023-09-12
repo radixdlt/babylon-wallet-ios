@@ -37,7 +37,7 @@ public struct AdvancedManageSecurityStructureFlow: Sendable, FeatureReducer {
 		}
 	}
 
-	public struct Destinations: Sendable, ReducerProtocol {
+	public struct Destinations: Sendable, Reducer {
 		public enum State: Sendable, Hashable {
 			case factorsForPrimaryRole(FactorsForRole<PrimaryRoleTag>.State)
 			case factorsForRecoveryRole(FactorsForRole<RecoveryRoleTag>.State)
@@ -50,7 +50,7 @@ public struct AdvancedManageSecurityStructureFlow: Sendable, FeatureReducer {
 			case factorsForConfirmationRole(FactorsForRole<ConfirmationRoleTag>.Action)
 		}
 
-		public var body: some ReducerProtocolOf<Self> {
+		public var body: some ReducerOf<Self> {
 			Scope(state: /State.factorsForPrimaryRole, action: /Action.factorsForPrimaryRole) {
 				FactorsForRole<PrimaryRoleTag>()
 			}
@@ -82,7 +82,7 @@ public struct AdvancedManageSecurityStructureFlow: Sendable, FeatureReducer {
 
 	public init() {}
 
-	public var body: some ReducerProtocolOf<Self> {
+	public var body: some ReducerOf<Self> {
 		Reduce(core)
 			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
 				Destinations()

@@ -42,7 +42,7 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 		}
 	}
 
-	public struct Destinations: ReducerProtocol {
+	public struct Destinations: Reducer {
 		public enum State: Sendable, Hashable {
 			case noP2PLink(AlertState<NoP2PLinkAlert>)
 			case addNewP2PLink(NewConnection.State)
@@ -55,7 +55,7 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 			case nameLedgerAndDerivePublicKeys(NameLedgerAndDerivePublicKeys.Action)
 		}
 
-		public var body: some ReducerProtocolOf<Self> {
+		public var body: some ReducerOf<Self> {
 			Scope(state: /State.addNewP2PLink, action: /Action.addNewP2PLink) {
 				NewConnection()
 			}
@@ -109,7 +109,7 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 
 	public init() {}
 
-	public var body: some ReducerProtocolOf<ImportOlympiaLedgerAccountsAndFactorSources> {
+	public var body: some ReducerOf<ImportOlympiaLedgerAccountsAndFactorSources> {
 		Reduce(core)
 			.ifLet(\.$destinations, action: /Action.child .. ChildAction.destinations) {
 				Destinations()
@@ -435,7 +435,7 @@ public struct NameLedgerAndDerivePublicKeys: Sendable, FeatureReducer {
 
 	public init() {}
 
-	public var body: some ReducerProtocolOf<Self> {
+	public var body: some ReducerOf<Self> {
 		Reduce(core)
 			.ifLet(\.nameLedger, action: /Action.child .. ChildAction.nameLedger) {
 				NameLedgerFactorSource()

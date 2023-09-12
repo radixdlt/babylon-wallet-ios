@@ -21,7 +21,7 @@ public struct EditPersonaEntry<ContentReducer>: FeatureReducer where ContentRedu
 		case delete
 	}
 
-	public var body: some ReducerProtocolOf<Self> {
+	public var body: some ReducerOf<Self> {
 		Reduce(core)
 
 		Scope(state: \.content, action: /Action.child .. ChildAction.content) {

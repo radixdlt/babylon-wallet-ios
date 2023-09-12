@@ -29,7 +29,7 @@ public struct SecurityStructureConfigurationList: Sendable, FeatureReducer {
 	@Dependency(\.appPreferencesClient) var appPreferencesClient
 	public init() {}
 
-	public var body: some ReducerProtocolOf<Self> {
+	public var body: some ReducerOf<Self> {
 		Reduce(core)
 			.forEach(\.configs, action: /Action.child .. ChildAction.config) {
 				SecurityStructureConfigurationRow()

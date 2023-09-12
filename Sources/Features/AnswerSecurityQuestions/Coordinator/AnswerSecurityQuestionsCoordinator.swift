@@ -64,7 +64,7 @@ public struct AnswerSecurityQuestionsCoordinator: Sendable, FeatureReducer {
 		case path(StackActionOf<Path>)
 	}
 
-	public struct Path: Sendable, ReducerProtocol {
+	public struct Path: Sendable, Reducer {
 		public enum State: Sendable, Hashable {
 			case chooseQuestions(ChooseQuestions.State)
 			case answerQuestion(AnswerSecurityQuestionFreeform.State)
@@ -85,7 +85,7 @@ public struct AnswerSecurityQuestionsCoordinator: Sendable, FeatureReducer {
 			case answerQuestion(AnswerSecurityQuestionFreeform.Action)
 		}
 
-		public var body: some ReducerProtocolOf<Self> {
+		public var body: some ReducerOf<Self> {
 			Scope(state: /State.chooseQuestions, action: /Action.chooseQuestions) {
 				ChooseQuestions()
 			}
@@ -100,7 +100,7 @@ public struct AnswerSecurityQuestionsCoordinator: Sendable, FeatureReducer {
 
 	public init() {}
 
-	public var body: some ReducerProtocolOf<Self> {
+	public var body: some ReducerOf<Self> {
 		Scope(state: \.root, action: /Action.child .. ChildAction.root) {
 			Path()
 		}

@@ -137,7 +137,7 @@ public struct CreateAuthKey: Sendable, FeatureReducer {
 
 	public init() {}
 
-	public var body: some ReducerProtocolOf<Self> {
+	public var body: some ReducerOf<Self> {
 		Scope(state: \.step, action: /.self) {
 			Scope(
 				state: /State.Step.getAuthKeyDerivationPath,

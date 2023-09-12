@@ -18,7 +18,7 @@ public struct RestoreProfileFromBackupCoordinator: Sendable, FeatureReducer {
 		}
 	}
 
-	public struct Path: Sendable, Hashable, ReducerProtocol {
+	public struct Path: Sendable, Hashable, Reducer {
 		public enum State: Sendable, Hashable {
 			case selectBackup(SelectBackup.State)
 			case importMnemonicsFlow(ImportMnemonicsFlowCoordinator.State)
@@ -29,7 +29,7 @@ public struct RestoreProfileFromBackupCoordinator: Sendable, FeatureReducer {
 			case importMnemonicsFlow(ImportMnemonicsFlowCoordinator.Action)
 		}
 
-		public var body: some ReducerProtocolOf<Self> {
+		public var body: some ReducerOf<Self> {
 			Scope(state: /State.selectBackup, action: /Action.selectBackup) {
 				SelectBackup()
 			}
@@ -59,7 +59,7 @@ public struct RestoreProfileFromBackupCoordinator: Sendable, FeatureReducer {
 	@Dependency(\.continuousClock) var clock
 	public init() {}
 
-	public var body: some ReducerProtocolOf<Self> {
+	public var body: some ReducerOf<Self> {
 		Scope(state: \.root, action: /Action.child .. ChildAction.root) {
 			Path()
 		}

@@ -39,7 +39,7 @@ public struct OnboardingCoordinator: Sendable, FeatureReducer {
 
 	public init() {}
 
-	public var body: some ReducerProtocolOf<Self> {
+	public var body: some ReducerOf<Self> {
 		Scope(state: \.root, action: /Action.child) {
 			EmptyReducer()
 				.ifCaseLet(/State.Root.startup, action: /ChildAction.startup) {

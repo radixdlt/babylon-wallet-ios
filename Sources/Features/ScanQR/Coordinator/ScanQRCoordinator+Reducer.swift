@@ -40,7 +40,7 @@ public struct ScanQRCoordinator: Sendable, FeatureReducer {
 	@Dependency(\.continuousClock) var clock
 	public init() {}
 
-	public var body: some ReducerProtocolOf<Self> {
+	public var body: some ReducerOf<Self> {
 		Scope(state: \.step, action: /.self) {
 			Scope(state: /State.Step.cameraPermission, action: /Action.child .. ChildAction.cameraPermission) {
 				CameraPermission()

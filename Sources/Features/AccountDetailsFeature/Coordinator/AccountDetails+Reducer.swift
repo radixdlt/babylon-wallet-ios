@@ -108,7 +108,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 		public let factorSourceKind: FactorSourceKind
 	}
 
-	public struct Destinations: Sendable, ReducerProtocol {
+	public struct Destinations: Sendable, Reducer {
 		public enum State: Sendable, Hashable {
 			case preferences(AccountPreferences.State)
 			case transfer(AssetTransfer.State)
@@ -129,7 +129,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 			case importMnemonics(ImportMnemonicsFlowCoordinator.Action)
 		}
 
-		public var body: some ReducerProtocol<State, Action> {
+		public var body: some Reducer<State, Action> {
 			Scope(state: /State.preferences, action: /Action.preferences) {
 				AccountPreferences()
 			}
@@ -156,7 +156,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 
 	public init() {}
 
-	public var body: some ReducerProtocolOf<Self> {
+	public var body: some ReducerOf<Self> {
 		Scope(state: \.assets, action: /Action.child .. ChildAction.assets) {
 			AssetsView()
 		}

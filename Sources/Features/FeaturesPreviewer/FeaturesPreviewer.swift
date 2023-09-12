@@ -9,7 +9,7 @@ public struct FeaturesPreviewer<Feature>
 	public static func action(
 		wrapInNavigationView: Bool = false,
 		resultFromAction: @escaping (Feature.Action) -> TaskResult<Feature.ResultFromFeature>?,
-		withReducer: (PreviewOfSomeFeatureReducer<Feature>) -> any ReducerProtocol<PreviewOfSomeFeatureReducer<Feature>.State, PreviewOfSomeFeatureReducer<Feature>.Action> = { $0._printChanges() }
+		withReducer: (PreviewOfSomeFeatureReducer<Feature>) -> any Reducer<PreviewOfSomeFeatureReducer<Feature>.State, PreviewOfSomeFeatureReducer<Feature>.Action> = { $0._printChanges() }
 	) -> some Scene {
 		WindowGroup {
 			let store = Store(
@@ -37,7 +37,7 @@ public struct FeaturesPreviewer<Feature>
 	public static func delegateAction(
 		wrapInNavigationView: Bool = false,
 		resultFromDelegateAction: @escaping (Feature.DelegateAction) -> TaskResult<Feature.ResultFromFeature>?,
-		withReducer: @escaping (PreviewOfSomeFeatureReducer<Feature>) -> any ReducerProtocol<PreviewOfSomeFeatureReducer<Feature>.State, PreviewOfSomeFeatureReducer<Feature>.Action> = { $0._printChanges() }
+		withReducer: @escaping (PreviewOfSomeFeatureReducer<Feature>) -> any Reducer<PreviewOfSomeFeatureReducer<Feature>.State, PreviewOfSomeFeatureReducer<Feature>.Action> = { $0._printChanges() }
 	) -> some Scene {
 		action(
 			wrapInNavigationView: wrapInNavigationView,

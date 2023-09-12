@@ -31,7 +31,7 @@ public struct DefaultDepositGuarantees: Sendable, FeatureReducer {
 
 	// MARK: Reducer
 
-	public var body: some ReducerProtocolOf<Self> {
+	public var body: some ReducerOf<Self> {
 		Scope(state: \.percentageStepper, action: /Action.child .. /ChildAction.percentageStepper) {
 			MinimumPercentageStepper()
 		}

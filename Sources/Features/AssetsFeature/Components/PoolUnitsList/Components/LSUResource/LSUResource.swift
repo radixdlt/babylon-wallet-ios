@@ -16,7 +16,7 @@ public struct LSUResource: Sendable, FeatureReducer {
 		case stake(id: LSUStake.State.ID, action: LSUStake.Action)
 	}
 
-	public var body: some ReducerProtocolOf<Self> {
+	public var body: some ReducerOf<Self> {
 		Reduce(core)
 			.forEach(
 				\.stakes,

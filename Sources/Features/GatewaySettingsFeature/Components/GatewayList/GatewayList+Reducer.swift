@@ -27,7 +27,7 @@ public struct GatewayList: Sendable, FeatureReducer {
 
 	public init() {}
 
-	public var body: some ReducerProtocolOf<Self> {
+	public var body: some ReducerOf<Self> {
 		Reduce(core)
 			.forEach(\.gateways, action: /Action.child .. ChildAction.gateway) {
 				GatewayRow()

@@ -35,7 +35,7 @@ public struct ManageThirdPartyDeposits: FeatureReducer, Sendable {
 		case destinations(PresentationAction<Destinations.Action>)
 	}
 
-	public struct Destinations: ReducerProtocol, Sendable {
+	public struct Destinations: Reducer, Sendable {
 		public enum State: Equatable, Hashable, Sendable {
 			case allowDenyAssets(ResourcesList.State)
 			case allowDepositors(ResourcesList.State)
@@ -46,7 +46,7 @@ public struct ManageThirdPartyDeposits: FeatureReducer, Sendable {
 			case allowDepositors(ResourcesList.Action)
 		}
 
-		public var body: some ReducerProtocolOf<Self> {
+		public var body: some ReducerOf<Self> {
 			Scope(state: /State.allowDenyAssets, action: /Action.allowDenyAssets) {
 				ResourcesList()
 			}
@@ -57,7 +57,7 @@ public struct ManageThirdPartyDeposits: FeatureReducer, Sendable {
 		}
 	}
 
-	public var body: some ReducerProtocolOf<Self> {
+	public var body: some ReducerOf<Self> {
 		Reduce(core)
 			.ifLet(\.$destinations, action: /Action.child .. ChildAction.destinations) {
 				Destinations()

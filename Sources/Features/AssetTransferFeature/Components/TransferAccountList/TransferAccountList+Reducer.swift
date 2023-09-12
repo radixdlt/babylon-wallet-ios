@@ -46,7 +46,7 @@ public struct TransferAccountList: Sendable, FeatureReducer {
 		case canSendTransferRequest(Bool)
 	}
 
-	public struct Destinations: Sendable, ReducerProtocol {
+	public struct Destinations: Sendable, Reducer {
 		public typealias State = RelayState<ReceivingAccount.State.ID, MainState>
 		public typealias Action = RelayAction<ReceivingAccount.State.ID, MainAction>
 
@@ -60,7 +60,7 @@ public struct TransferAccountList: Sendable, FeatureReducer {
 			case addAsset(AssetsView.Action)
 		}
 
-		public var body: some ReducerProtocolOf<Self> {
+		public var body: some ReducerOf<Self> {
 			Relay {
 				Scope(state: /MainState.chooseAccount, action: /MainAction.chooseAccount) {
 					ChooseReceivingAccount()
@@ -72,7 +72,7 @@ public struct TransferAccountList: Sendable, FeatureReducer {
 		}
 	}
 
-	public var body: some ReducerProtocolOf<Self> {
+	public var body: some ReducerOf<Self> {
 		Reduce(core)
 			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
 				Destinations()

@@ -41,7 +41,7 @@ public struct P2PLinksFeature: Sendable, FeatureReducer {
 
 	// MARK: Destinations
 
-	public struct Destinations: Sendable, ReducerProtocol {
+	public struct Destinations: Sendable, Reducer {
 		public enum State: Sendable, Hashable {
 			case newConnection(NewConnection.State)
 			case removeConnection(AlertState<Action.RemoveConnection>)
@@ -56,7 +56,7 @@ public struct P2PLinksFeature: Sendable, FeatureReducer {
 			}
 		}
 
-		public var body: some ReducerProtocolOf<Self> {
+		public var body: some ReducerOf<Self> {
 			Scope(state: /State.newConnection, action: /Action.newConnection) {
 				NewConnection()
 			}
@@ -70,7 +70,7 @@ public struct P2PLinksFeature: Sendable, FeatureReducer {
 
 	public init() {}
 
-	public var body: some ReducerProtocolOf<Self> {
+	public var body: some ReducerOf<Self> {
 		Reduce(core)
 			.forEach(\.links, action: /Action.child .. ChildAction.connection) {
 				P2PLinkRow()

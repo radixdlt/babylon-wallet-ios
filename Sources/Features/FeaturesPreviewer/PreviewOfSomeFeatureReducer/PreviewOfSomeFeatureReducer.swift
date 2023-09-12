@@ -26,7 +26,7 @@ public struct PreviewOfSomeFeatureReducer<Feature>: FeatureReducer where Feature
 		self.resultFromAction = resultFromAction
 	}
 
-	public var body: some ReducerProtocolOf<Self> {
+	public var body: some ReducerOf<Self> {
 		Scope(state: /F.State.previewOf, action: /F.Action.child .. ChildAction.previewOf) {
 			Feature()
 		}

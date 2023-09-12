@@ -36,7 +36,7 @@ public struct TransactionReviewGuarantees: Sendable, FeatureReducer {
 
 	public init() {}
 
-	public var body: some ReducerProtocolOf<TransactionReviewGuarantees> {
+	public var body: some ReducerOf<TransactionReviewGuarantees> {
 		Reduce(core)
 			.forEach(\.guarantees, action: /Action.child .. /ChildAction.guarantee) {
 				TransactionReviewGuarantee()
@@ -103,7 +103,7 @@ public struct TransactionReviewGuarantee: Sendable, FeatureReducer {
 
 	public init() {}
 
-	public var body: some ReducerProtocolOf<Self> {
+	public var body: some ReducerOf<Self> {
 		Scope(state: \.percentageStepper, action: /Action.child .. /ChildAction.percentageStepper) {
 			MinimumPercentageStepper()
 		}

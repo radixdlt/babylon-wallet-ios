@@ -50,7 +50,7 @@ struct OneTimePersonaData: Sendable, FeatureReducer {
 		case continueButtonTapped(P2P.Dapp.Request.Response)
 	}
 
-	struct Destinations: Sendable, ReducerProtocol {
+	struct Destinations: Sendable, Reducer {
 		enum State: Sendable, Hashable {
 			case editPersona(EditPersona.State)
 			case createPersona(CreatePersonaCoordinator.State)
@@ -61,7 +61,7 @@ struct OneTimePersonaData: Sendable, FeatureReducer {
 			case createPersona(CreatePersonaCoordinator.Action)
 		}
 
-		var body: some ReducerProtocolOf<Self> {
+		var body: some ReducerOf<Self> {
 			Scope(state: /State.editPersona, action: /Action.editPersona) {
 				EditPersona()
 			}
@@ -74,7 +74,7 @@ struct OneTimePersonaData: Sendable, FeatureReducer {
 	@Dependency(\.personasClient) var personasClient
 	@Dependency(\.errorQueue) var errorQueue
 
-	var body: some ReducerProtocolOf<Self> {
+	var body: some ReducerOf<Self> {
 		Reduce(core)
 			.forEach(\.personas, action: /Action.child .. ChildAction.persona) {
 				PersonaDataPermissionBox()

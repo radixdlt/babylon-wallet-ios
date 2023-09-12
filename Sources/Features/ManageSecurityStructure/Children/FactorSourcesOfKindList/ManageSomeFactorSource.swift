@@ -50,7 +50,7 @@ public struct ManageSomeFactorSource<FactorSourceOfKind: BaseFactorSourceProtoco
 	}
 
 	public init() {}
-	public var body: some ReducerProtocolOf<Self> {
+	public var body: some ReducerOf<Self> {
 		Scope(
 			state: /ManageSomeFactorSource.State.manageOffDeviceMnemonics,
 			action: /Action.child .. ChildAction.manageOffDeviceMnemonics

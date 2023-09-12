@@ -3,7 +3,7 @@ import EngineKit
 import FactorSourcesClient
 import FeaturePrelude
 
-public struct SignWithFactorSourcesOfKindDevice: SignWithFactorSourcesOfKindReducerProtocol {
+public struct SignWithFactorSourcesOfKindDevice: SignWithFactorSourcesOfKindReducer {
 	public typealias Factor = DeviceFactorSource
 	public typealias State = SignWithFactorSourcesOfKindState<Factor>
 	public enum ViewAction: SignWithFactorSourcesOfKindViewActionProtocol {

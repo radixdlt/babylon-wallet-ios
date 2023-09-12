@@ -57,7 +57,7 @@ public struct EditPersonaEntries: Sendable, FeatureReducer {
 		case phoneNumber(EditPersonaEntry<EditPersonaDynamicField>.Action)
 	}
 
-	public var body: some ReducerProtocolOf<Self> {
+	public var body: some ReducerOf<Self> {
 		Reduce(core)
 			.ifLet(\.name, action: /Action.child .. ChildAction.name) {
 				EditPersonaEntry<EditPersonaName>()

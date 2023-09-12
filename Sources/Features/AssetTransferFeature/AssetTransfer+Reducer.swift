@@ -43,7 +43,7 @@ public struct AssetTransfer: Sendable, FeatureReducer {
 		case dismissed
 	}
 
-	public var body: some ReducerProtocolOf<Self> {
+	public var body: some ReducerOf<Self> {
 		Scope(state: \.accounts, action: /Action.child .. ChildAction.accounts) {
 			TransferAccountList()
 		}

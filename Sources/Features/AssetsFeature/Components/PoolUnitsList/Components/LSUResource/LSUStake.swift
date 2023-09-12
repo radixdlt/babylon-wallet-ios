@@ -27,7 +27,7 @@ public struct LSUStake: FeatureReducer {
 		case destination(PresentationAction<Destinations.Action>)
 	}
 
-	public struct Destinations: Sendable, ReducerProtocol {
+	public struct Destinations: Sendable, Reducer {
 		public enum State: Sendable, Hashable {
 			case details(LSUDetails.State)
 		}
@@ -36,7 +36,7 @@ public struct LSUStake: FeatureReducer {
 			case details(LSUDetails.Action)
 		}
 
-		public var body: some ReducerProtocolOf<Self> {
+		public var body: some ReducerOf<Self> {
 			Scope(
 				state: /State.details,
 				action: /Action.details,
@@ -47,7 +47,7 @@ public struct LSUStake: FeatureReducer {
 
 	@Dependency(\.logger) var logger
 
-	public var body: some ReducerProtocolOf<Self> {
+	public var body: some ReducerOf<Self> {
 		Reduce(core)
 			.ifLet(
 				\.$destination,

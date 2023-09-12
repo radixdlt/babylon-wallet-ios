@@ -97,7 +97,7 @@ public struct DevAccountPreferences: Sendable, FeatureReducer {
 
 	// MARK: - Destination
 
-	public struct Destination: ReducerProtocol {
+	public struct Destination: Reducer {
 		public enum State: Equatable, Hashable {
 			case showQR(ShowQR.State)
 			#if DEBUG
@@ -114,7 +114,7 @@ public struct DevAccountPreferences: Sendable, FeatureReducer {
 			#endif // DEBUG
 		}
 
-		public var body: some ReducerProtocolOf<Self> {
+		public var body: some ReducerOf<Self> {
 			Scope(state: /State.showQR, action: /Action.showQR) {
 				ShowQR()
 			}
@@ -141,7 +141,7 @@ public struct DevAccountPreferences: Sendable, FeatureReducer {
 
 	public init() {}
 
-	public var body: some ReducerProtocolOf<Self> {
+	public var body: some ReducerOf<Self> {
 		Reduce(core)
 			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
 				Destination()

@@ -19,7 +19,7 @@ public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 		}
 	}
 
-	public struct Destinations: Sendable, ReducerProtocol {
+	public struct Destinations: Sendable, Reducer {
 		public enum State: Sendable, Hashable {
 			case importMnemonicControllingAccounts(ImportMnemonicControllingAccounts.State)
 		}
@@ -28,7 +28,7 @@ public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 			case importMnemonicControllingAccounts(ImportMnemonicControllingAccounts.Action)
 		}
 
-		public var body: some ReducerProtocolOf<Self> {
+		public var body: some ReducerOf<Self> {
 			Scope(state: /State.importMnemonicControllingAccounts, action: /Action.importMnemonicControllingAccounts) {
 				ImportMnemonicControllingAccounts()
 			}
@@ -67,7 +67,7 @@ public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 	@Dependency(\.continuousClock) var clock
 	public init() {}
 
-	public var body: some ReducerProtocolOf<Self> {
+	public var body: some ReducerOf<Self> {
 		Reduce(core)
 			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
 				Destinations()

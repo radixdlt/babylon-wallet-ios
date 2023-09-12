@@ -14,7 +14,7 @@ public struct DebugManageFactorSources: Sendable, FeatureReducer {
 		public init() {}
 	}
 
-	public struct Destinations: Sendable, ReducerProtocol {
+	public struct Destinations: Sendable, Reducer {
 		public enum State: Sendable, Hashable {
 			case importMnemonic(ImportMnemonic.State)
 			case addLedger(AddLedgerFactorSource.State)
@@ -25,7 +25,7 @@ public struct DebugManageFactorSources: Sendable, FeatureReducer {
 			case addLedger(AddLedgerFactorSource.Action)
 		}
 
-		public var body: some ReducerProtocolOf<Self> {
+		public var body: some ReducerOf<Self> {
 			Scope(state: /State.importMnemonic, action: /Action.importMnemonic) {
 				ImportMnemonic()
 			}
@@ -56,7 +56,7 @@ public struct DebugManageFactorSources: Sendable, FeatureReducer {
 
 	public init() {}
 
-	public var body: some ReducerProtocolOf<Self> {
+	public var body: some ReducerOf<Self> {
 		Reduce(core)
 			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
 				Destinations()

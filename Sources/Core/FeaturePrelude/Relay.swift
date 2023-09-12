@@ -42,7 +42,7 @@ public struct Relay<
 	MainState,
 	MainAction,
 	MainReducer
->: ReducerProtocol where MainReducer: ReducerProtocol<MainState, MainAction> {
+>: Reducer where MainReducer: Reducer<MainState, MainAction> {
 	public typealias State = RelayState<RelayedState, MainState>
 	public typealias Action = RelayAction<RelayedState, MainAction>
 

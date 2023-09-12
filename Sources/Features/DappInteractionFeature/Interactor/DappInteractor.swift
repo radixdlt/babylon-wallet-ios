@@ -75,7 +75,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 		case modal(PresentationAction<Destinations.Action>)
 	}
 
-	struct Destinations: Sendable, ReducerProtocol {
+	struct Destinations: Sendable, Reducer {
 		enum State: Sendable, Hashable {
 			case dappInteraction(RelayState<RequestEnvelope, DappInteractionCoordinator.State>)
 			case dappInteractionCompletion(Completion.State)
@@ -86,7 +86,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 			case dappInteractionCompletion(Completion.Action)
 		}
 
-		var body: some ReducerProtocolOf<Self> {
+		var body: some ReducerOf<Self> {
 			Scope(state: /State.dappInteraction, action: /Action.dappInteraction) {
 				Relay { DappInteractionCoordinator() }
 			}
@@ -106,7 +106,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 	@Dependency(\.appPreferencesClient) var appPreferencesClient
 	@Dependency(\.dappInteractionClient) var dappInteractionClient
 
-	var body: some ReducerProtocolOf<Self> {
+	var body: some ReducerOf<Self> {
 		Reduce(core)
 			.ifLet(\.$currentModal, action: /Action.child .. ChildAction.modal) {
 				Destinations()

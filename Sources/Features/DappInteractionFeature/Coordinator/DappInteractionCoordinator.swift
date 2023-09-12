@@ -43,7 +43,7 @@ struct DappInteractionCoordinator: Sendable, FeatureReducer {
 		case dismissSilently
 	}
 
-	var body: some ReducerProtocolOf<Self> {
+	var body: some ReducerOf<Self> {
 		Scope(state: \.childState, action: /.self) {
 			Scope(state: /State.ChildState.loading, action: /Action.child .. ChildAction.loading) {
 				DappInteractionLoading()

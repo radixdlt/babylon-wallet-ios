@@ -232,7 +232,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 		case doneViewing(markedMnemonicAsBackedUp: Bool? = nil) // `nil` means it was already marked as backed up
 	}
 
-	public struct Destinations: Sendable, ReducerProtocol {
+	public struct Destinations: Sendable, Reducer {
 		public enum State: Sendable, Hashable {
 			case offDeviceMnemonicInfoPrompt(OffDeviceMnemonicInfo.State)
 			case markMnemonicAsBackedUp(AlertState<Action.MarkMnemonicAsBackedUpOrNot>)
@@ -249,7 +249,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			}
 		}
 
-		public var body: some ReducerProtocol<State, Action> {
+		public var body: some Reducer<State, Action> {
 			Scope(state: /State.markMnemonicAsBackedUp, action: /Action.markMnemonicAsBackedUp) {
 				EmptyReducer()
 			}
@@ -272,7 +272,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 
 	public init() {}
 
-	public var body: some ReducerProtocolOf<Self> {
+	public var body: some ReducerOf<Self> {
 		Reduce(core)
 			.forEach(\.words, action: /Action.child .. ChildAction.word) {
 				ImportMnemonicWord()

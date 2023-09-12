@@ -47,7 +47,7 @@ public struct AppSettings: Sendable, FeatureReducer {
 
 	// MARK: Destinations
 
-	public struct Destinations: Sendable, ReducerProtocol {
+	public struct Destinations: Sendable, Reducer {
 		public enum State: Sendable, Hashable {
 			case manageP2PLinks(P2PLinksFeature.State)
 			case gatewaySettings(GatewaySettings.State)
@@ -60,7 +60,7 @@ public struct AppSettings: Sendable, FeatureReducer {
 			case profileBackupSettings(ProfileBackupSettings.Action)
 		}
 
-		public var body: some ReducerProtocolOf<Self> {
+		public var body: some ReducerOf<Self> {
 			Scope(state: /State.manageP2PLinks, action: /Action.manageP2PLinks) {
 				P2PLinksFeature()
 			}
@@ -79,7 +79,7 @@ public struct AppSettings: Sendable, FeatureReducer {
 
 	@Dependency(\.appPreferencesClient) var appPreferencesClient
 
-	public var body: some ReducerProtocolOf<Self> {
+	public var body: some ReducerOf<Self> {
 		Reduce(core)
 			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
 				Destinations()

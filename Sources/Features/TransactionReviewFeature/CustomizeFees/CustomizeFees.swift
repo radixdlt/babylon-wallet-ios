@@ -63,7 +63,7 @@ public struct CustomizeFees: FeatureReducer {
 		case updated(TaskResult<ReviewedTransaction>)
 	}
 
-	public struct Destinations: Sendable, ReducerProtocol {
+	public struct Destinations: Sendable, Reducer {
 		public enum State: Sendable, Hashable {
 			case selectFeePayer(SelectFeePayer.State)
 		}
@@ -72,7 +72,7 @@ public struct CustomizeFees: FeatureReducer {
 			case selectFeePayer(SelectFeePayer.Action)
 		}
 
-		public var body: some ReducerProtocolOf<Self> {
+		public var body: some ReducerOf<Self> {
 			Scope(state: /State.selectFeePayer, action: /Action.selectFeePayer) {
 				SelectFeePayer()
 			}
@@ -82,7 +82,7 @@ public struct CustomizeFees: FeatureReducer {
 	@Dependency(\.dismiss) var dismiss
 	@Dependency(\.errorQueue) var errorQueue
 
-	public var body: some ReducerProtocolOf<Self> {
+	public var body: some ReducerOf<Self> {
 		Scope(state: \.modeState, action: /Action.child) {
 			EmptyReducer()
 				.ifCaseLet(/State.CustomizationModeState.normal, action: /ChildAction.normalFeesCustomization) {

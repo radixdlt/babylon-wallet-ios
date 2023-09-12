@@ -23,7 +23,7 @@ public struct IntroductionToPersonas: Sendable, FeatureReducer {
 
 	public init() {}
 
-	public var body: some ReducerProtocolOf<Self> {
+	public var body: some ReducerOf<Self> {
 		EmptyReducer()
 			.ifLet(\.$infoPanel, action: /Action.child .. ChildAction.infoPanel) {
 				SlideUpPanel()

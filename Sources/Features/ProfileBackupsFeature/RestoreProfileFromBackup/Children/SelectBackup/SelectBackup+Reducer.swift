@@ -40,7 +40,7 @@ public struct SelectBackup: Sendable, FeatureReducer {
 		case tappedUseCloudBackup(ProfileSnapshot.Header)
 	}
 
-	public struct Destinations: Sendable, ReducerProtocol {
+	public struct Destinations: Sendable, Reducer {
 		public enum State: Sendable, Hashable {
 			case inputEncryptionPassword(EncryptOrDecryptProfile.State)
 		}
@@ -49,7 +49,7 @@ public struct SelectBackup: Sendable, FeatureReducer {
 			case inputEncryptionPassword(EncryptOrDecryptProfile.Action)
 		}
 
-		public var body: some ReducerProtocol<State, Action> {
+		public var body: some Reducer<State, Action> {
 			Scope(state: /State.inputEncryptionPassword, action: /Action.inputEncryptionPassword) {
 				EncryptOrDecryptProfile()
 			}
@@ -79,7 +79,7 @@ public struct SelectBackup: Sendable, FeatureReducer {
 
 	public init() {}
 
-	public var body: some ReducerProtocolOf<SelectBackup> {
+	public var body: some ReducerOf<SelectBackup> {
 		Reduce(core)
 			.ifLet(\.$destination, action: /Action.child .. /ChildAction.destination) {
 				Destinations()

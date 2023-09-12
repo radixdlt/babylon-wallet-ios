@@ -4,7 +4,7 @@ import FeaturePrelude
 import LedgerHardwareWalletClient
 
 // MARK: - SignWithFactorSourcesOfKindLedger
-public struct SignWithFactorSourcesOfKindLedger: SignWithFactorSourcesOfKindReducerProtocol {
+public struct SignWithFactorSourcesOfKindLedger: SignWithFactorSourcesOfKindReducer {
 	public typealias Factor = LedgerHardwareWalletFactorSource
 	public typealias State = SignWithFactorSourcesOfKindState<Factor>
 

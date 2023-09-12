@@ -47,7 +47,7 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 
 	// MARK: Destinations
 
-	public struct Destinations: Sendable, ReducerProtocol {
+	public struct Destinations: Sendable, Reducer {
 		public enum State: Sendable, Hashable {
 			case ledgerAlreadyExistsAlert(AlertState<Never>)
 			case nameLedger(NameLedgerFactorSource.State)
@@ -58,7 +58,7 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 			case nameLedger(NameLedgerFactorSource.Action)
 		}
 
-		public var body: some ReducerProtocolOf<Self> {
+		public var body: some ReducerOf<Self> {
 			Scope(state: /State.nameLedger, action: /Action.nameLedger) {
 				NameLedgerFactorSource()
 			}
@@ -74,7 +74,7 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 
 	public init() {}
 
-	public var body: some ReducerProtocolOf<Self> {
+	public var body: some ReducerOf<Self> {
 		Reduce(core)
 			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
 				Destinations()

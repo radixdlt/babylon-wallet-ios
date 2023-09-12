@@ -55,7 +55,7 @@ public struct Settings: Sendable, FeatureReducer {
 		case deleteProfileAndFactorSources(keepInICloudIfPresent: Bool)
 	}
 
-	public struct Destinations: Sendable, ReducerProtocol {
+	public struct Destinations: Sendable, Reducer {
 		public enum State: Sendable, Hashable {
 			case manageP2PLinks(P2PLinksFeature.State)
 
@@ -76,7 +76,7 @@ public struct Settings: Sendable, FeatureReducer {
 			case debugSettings(DebugSettingsCoordinator.Action)
 		}
 
-		public var body: some ReducerProtocolOf<Self> {
+		public var body: some ReducerOf<Self> {
 			Scope(state: /State.manageP2PLinks, action: /Action.manageP2PLinks) {
 				P2PLinksFeature()
 			}
@@ -108,7 +108,7 @@ public struct Settings: Sendable, FeatureReducer {
 	@Dependency(\.dismiss) var dismiss
 	@Dependency(\.userDefaultsClient) var userDefaultsClient
 
-	public var body: some ReducerProtocolOf<Self> {
+	public var body: some ReducerOf<Self> {
 		Reduce(core)
 			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
 				Destinations()

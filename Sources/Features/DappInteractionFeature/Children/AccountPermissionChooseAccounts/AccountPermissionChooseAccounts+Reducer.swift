@@ -73,7 +73,7 @@ struct AccountPermissionChooseAccounts: Sendable, FeatureReducer {
 		case failedToProveOwnership(of: [Profile.Network.Account])
 	}
 
-	struct Destinations: Sendable, ReducerProtocol {
+	struct Destinations: Sendable, Reducer {
 		enum State: Sendable, Hashable {
 			case signing(Signing.State)
 		}
@@ -82,7 +82,7 @@ struct AccountPermissionChooseAccounts: Sendable, FeatureReducer {
 			case signing(Signing.Action)
 		}
 
-		var body: some ReducerProtocolOf<Self> {
+		var body: some ReducerOf<Self> {
 			Scope(state: /State.signing, action: /Action.signing) {
 				Signing()
 			}
@@ -94,7 +94,7 @@ struct AccountPermissionChooseAccounts: Sendable, FeatureReducer {
 	@Dependency(\.rolaClient) var rolaClient
 	@Dependency(\.factorSourcesClient) var factorSourcesClient
 
-	var body: some ReducerProtocolOf<Self> {
+	var body: some ReducerOf<Self> {
 		Scope(state: \.chooseAccounts, action: /Action.child .. ChildAction.chooseAccounts) {
 			ChooseAccounts()
 		}

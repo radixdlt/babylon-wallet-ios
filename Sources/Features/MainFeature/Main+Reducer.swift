@@ -26,7 +26,7 @@ public struct Main: Sendable, FeatureReducer {
 		case removedWallet
 	}
 
-	public struct Destinations: Sendable, ReducerProtocol {
+	public struct Destinations: Sendable, Reducer {
 		public enum State: Sendable, Hashable {
 			case settings(Settings.State)
 		}
@@ -35,7 +35,7 @@ public struct Main: Sendable, FeatureReducer {
 			case settings(Settings.Action)
 		}
 
-		public var body: some ReducerProtocolOf<Self> {
+		public var body: some ReducerOf<Self> {
 			Scope(state: /State.settings, action: /Action.settings) {
 				Settings()
 			}
@@ -48,7 +48,7 @@ public struct Main: Sendable, FeatureReducer {
 
 	public init() {}
 
-	public var body: some ReducerProtocolOf<Self> {
+	public var body: some ReducerOf<Self> {
 		Scope(state: \.home, action: /Action.child .. ChildAction.home) {
 			Home()
 		}

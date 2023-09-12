@@ -41,7 +41,7 @@ struct DappInteractionLoading: Sendable, FeatureReducer {
 	@Dependency(\.cacheClient) var cacheClient
 	@Dependency(\.appPreferencesClient) var appPreferencesClient
 
-	var body: some ReducerProtocolOf<Self> {
+	var body: some ReducerOf<Self> {
 		Reduce(core)
 			.ifLet(\.$errorAlert, action: /Action.view .. ViewAction.errorAlert)
 	}

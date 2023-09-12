@@ -116,7 +116,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 
 	// MARK: - Destination
 
-	public struct Destination: ReducerProtocol {
+	public struct Destination: Reducer {
 		public enum State: Equatable, Hashable {
 			case personaDetails(PersonaDetails.State)
 			case confirmDisconnectAlert(AlertState<Action.ConfirmDisconnectAlert>)
@@ -132,7 +132,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 			}
 		}
 
-		public var body: some ReducerProtocolOf<Self> {
+		public var body: some ReducerOf<Self> {
 			Scope(state: /State.personaDetails, action: /Action.personaDetails) {
 				PersonaDetails()
 			}
@@ -143,7 +143,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 
 	public init() {}
 
-	public var body: some ReducerProtocolOf<Self> {
+	public var body: some ReducerOf<Self> {
 		Scope(state: \.personaList, action: /Action.child .. ChildAction.personas) {
 			PersonaList()
 		}

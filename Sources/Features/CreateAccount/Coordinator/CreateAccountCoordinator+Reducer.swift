@@ -40,7 +40,7 @@ public struct CreateAccountCoordinator: Sendable, FeatureReducer {
 		}
 	}
 
-	public struct Destinations: Sendable, ReducerProtocol {
+	public struct Destinations: Sendable, Reducer {
 		public enum State: Sendable, Hashable {
 			case step1_nameAccount(NameAccount.State)
 			case step2_creationOfAccount(CreationOfAccount.State)
@@ -53,7 +53,7 @@ public struct CreateAccountCoordinator: Sendable, FeatureReducer {
 			case step3_completion(NewAccountCompletion.Action)
 		}
 
-		public var body: some ReducerProtocolOf<Self> {
+		public var body: some ReducerOf<Self> {
 			Scope(state: /State.step1_nameAccount, action: /Action.step1_nameAccount) {
 				NameAccount()
 			}
@@ -87,7 +87,7 @@ public struct CreateAccountCoordinator: Sendable, FeatureReducer {
 
 	public init() {}
 
-	public var body: some ReducerProtocolOf<Self> {
+	public var body: some ReducerOf<Self> {
 		Reduce(core)
 			.ifLet(\.root, action: /Action.child .. ChildAction.root) {
 				Destinations()

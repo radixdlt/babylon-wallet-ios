@@ -41,7 +41,7 @@ public struct AccountSecurity: Sendable, FeatureReducer {
 		case destination(PresentationAction<Destinations.Action>)
 	}
 
-	public struct Destinations: Sendable, ReducerProtocol {
+	public struct Destinations: Sendable, Reducer {
 		public enum State: Sendable, Hashable {
 			case mnemonics(DisplayMnemonics.State)
 			case ledgerHardwareWallets(LedgerHardwareDevices.State)
@@ -56,7 +56,7 @@ public struct AccountSecurity: Sendable, FeatureReducer {
 			case importOlympiaWallet(ImportOlympiaWalletCoordinator.Action)
 		}
 
-		public var body: some ReducerProtocolOf<Self> {
+		public var body: some ReducerOf<Self> {
 			Scope(state: /State.mnemonics, action: /Action.mnemonics) {
 				DisplayMnemonics()
 			}
@@ -78,7 +78,7 @@ public struct AccountSecurity: Sendable, FeatureReducer {
 	@Dependency(\.dismiss) var dismiss
 	@Dependency(\.factorSourcesClient) var factorSourcesClient
 
-	public var body: some ReducerProtocolOf<Self> {
+	public var body: some ReducerOf<Self> {
 		Reduce(core)
 			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
 				Destinations()

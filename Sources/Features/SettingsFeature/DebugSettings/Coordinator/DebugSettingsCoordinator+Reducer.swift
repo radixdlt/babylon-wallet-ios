@@ -33,7 +33,7 @@ public struct DebugSettingsCoordinator: Sendable, FeatureReducer {
 		case destination(PresentationAction<Destinations.Action>)
 	}
 
-	public struct Destinations: Sendable, ReducerProtocol {
+	public struct Destinations: Sendable, Reducer {
 		public enum State: Sendable, Hashable {
 			case debugUserDefaultsContents(DebugUserDefaultsContents.State)
 			case debugInspectProfile(DebugInspectProfile.State)
@@ -48,7 +48,7 @@ public struct DebugSettingsCoordinator: Sendable, FeatureReducer {
 			case securityStructureConfigs(SecurityStructureConfigurationListCoordinator.Action)
 		}
 
-		public var body: some ReducerProtocolOf<Self> {
+		public var body: some ReducerOf<Self> {
 			Scope(state: /State.debugUserDefaultsContents, action: /Action.debugUserDefaultsContents) {
 				DebugUserDefaultsContents()
 			}
@@ -70,7 +70,7 @@ public struct DebugSettingsCoordinator: Sendable, FeatureReducer {
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.dismiss) var dismiss
 
-	public var body: some ReducerProtocolOf<Self> {
+	public var body: some ReducerOf<Self> {
 		Reduce(core)
 			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
 				Destinations()

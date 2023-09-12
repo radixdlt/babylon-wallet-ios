@@ -27,7 +27,7 @@ struct OverlayReducer: Sendable, FeatureReducer {
 		case destination(PresentationAction<Destinations.Action>)
 	}
 
-	public struct Destinations: Sendable, ReducerProtocol {
+	public struct Destinations: Sendable, Reducer {
 		public enum State: Sendable, Hashable {
 			case hud(HUD.State)
 			case alert(OverlayWindowClient.Item.AlertState)
@@ -38,7 +38,7 @@ struct OverlayReducer: Sendable, FeatureReducer {
 			case alert(OverlayWindowClient.Item.AlertAction)
 		}
 
-		public var body: some ReducerProtocol<State, Action> {
+		public var body: some Reducer<State, Action> {
 			Scope(state: /State.hud, action: /Action.hud) {
 				HUD()
 			}
@@ -51,7 +51,7 @@ struct OverlayReducer: Sendable, FeatureReducer {
 	@Dependency(\.overlayWindowClient) var overlayWindowClient
 	@Dependency(\.continuousClock) var clock
 
-	var body: some ReducerProtocolOf<Self> {
+	var body: some ReducerOf<Self> {
 		Reduce(core)
 			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
 				Destinations()

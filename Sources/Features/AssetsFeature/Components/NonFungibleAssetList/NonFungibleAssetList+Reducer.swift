@@ -21,7 +21,7 @@ public struct NonFungibleAssetList: Sendable, FeatureReducer {
 		case destination(PresentationAction<Destinations.Action>)
 	}
 
-	public struct Destinations: Sendable, ReducerProtocol {
+	public struct Destinations: Sendable, Reducer {
 		public enum State: Sendable, Hashable {
 			case details(NonFungibleTokenDetails.State)
 		}
@@ -30,7 +30,7 @@ public struct NonFungibleAssetList: Sendable, FeatureReducer {
 			case details(NonFungibleTokenDetails.Action)
 		}
 
-		public var body: some ReducerProtocolOf<Self> {
+		public var body: some ReducerOf<Self> {
 			Scope(state: /State.details, action: /Action.details) {
 				NonFungibleTokenDetails()
 			}
@@ -39,7 +39,7 @@ public struct NonFungibleAssetList: Sendable, FeatureReducer {
 
 	public init() {}
 
-	public var body: some ReducerProtocolOf<Self> {
+	public var body: some ReducerOf<Self> {
 		Reduce(core)
 			.forEach(\.rows, action: /Action.child .. ChildAction.asset) {
 				NonFungibleAssetList.Row()

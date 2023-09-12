@@ -30,7 +30,7 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 	}
 
 	// MARK: - Destination
-	public struct Destinations: ReducerProtocol, Sendable {
+	public struct Destinations: Reducer, Sendable {
 		public enum State: Equatable, Hashable {
 			case updateAccountLabel(UpdateAccountLabel.State)
 			case thirdPartyDeposits(ManageThirdPartyDeposits.State)
@@ -43,7 +43,7 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 			case devPreferences(DevAccountPreferences.Action)
 		}
 
-		public var body: some ReducerProtocolOf<Self> {
+		public var body: some ReducerOf<Self> {
 			Scope(state: /State.updateAccountLabel, action: /Action.updateAccountLabel) {
 				UpdateAccountLabel()
 			}
@@ -60,7 +60,7 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 
 	public init() {}
 
-	public var body: some ReducerProtocolOf<Self> {
+	public var body: some ReducerOf<Self> {
 		Reduce(core)
 			.ifLet(\.$destinations, action: /Action.child .. ChildAction.destinations) {
 				Destinations()

@@ -123,7 +123,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 		case dismiss
 	}
 
-	struct Destinations: Sendable, ReducerProtocol {
+	struct Destinations: Sendable, Reducer {
 		typealias State = RelayState<DappInteractionFlow.State.AnyInteractionItem, MainState>
 		typealias Action = RelayAction<DappInteractionFlow.State.AnyInteractionItem, MainAction>
 
@@ -145,7 +145,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			case reviewTransaction(TransactionReview.Action)
 		}
 
-		var body: some ReducerProtocolOf<Self> {
+		var body: some ReducerOf<Self> {
 			Relay {
 				EmptyReducer()
 					.ifCaseLet(/MainState.login, action: /MainAction.login) {
@@ -170,7 +170,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 		}
 	}
 
-	var body: some ReducerProtocolOf<Self> {
+	var body: some ReducerOf<Self> {
 		Reduce(core)
 			.ifLet(\.root, action: /Action.child .. ChildAction.root) {
 				Destinations()

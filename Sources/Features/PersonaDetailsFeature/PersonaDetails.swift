@@ -109,7 +109,7 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 
 	// MARK: - Destination
 
-	public struct Destination: ReducerProtocol {
+	public struct Destination: Reducer {
 		public enum State: Hashable {
 			case editPersona(EditPersona.State)
 			case createAuthKey(CreateAuthKey.State)
@@ -131,7 +131,7 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 			}
 		}
 
-		public var body: some ReducerProtocolOf<Self> {
+		public var body: some ReducerOf<Self> {
 			Scope(state: /State.editPersona, action: /Action.editPersona) {
 				EditPersona()
 			}
@@ -146,7 +146,7 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 
 	// MARK: - Reducer
 
-	public var body: some ReducerProtocolOf<Self> {
+	public var body: some ReducerOf<Self> {
 		Reduce(core)
 			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
 				Destination()

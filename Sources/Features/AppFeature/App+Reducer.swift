@@ -62,7 +62,7 @@ public struct App: Sendable, FeatureReducer {
 		case onboardTestnetUserToMainnet(CreateAccountCoordinator.Action)
 	}
 
-	public struct Alerts: Sendable, ReducerProtocol {
+	public struct Alerts: Sendable, Reducer {
 		public enum State: Sendable, Hashable {
 			case incompatibleProfileErrorAlert(AlertState<Action.IncompatibleProfileErrorAlertAction>)
 		}
@@ -75,7 +75,7 @@ public struct App: Sendable, FeatureReducer {
 			}
 		}
 
-		public var body: some ReducerProtocolOf<Self> {
+		public var body: some ReducerOf<Self> {
 			EmptyReducer()
 		}
 	}
@@ -88,7 +88,7 @@ public struct App: Sendable, FeatureReducer {
 
 	public init() {}
 
-	public var body: some ReducerProtocolOf<Self> {
+	public var body: some ReducerOf<Self> {
 		Scope(state: \.root, action: /Action.child) {
 			EmptyReducer()
 				.ifCaseLet(/State.Root.main, action: /ChildAction.main) {

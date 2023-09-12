@@ -44,7 +44,7 @@ public struct PersonasCoordinator: Sendable, FeatureReducer {
 
 	// MARK: - Destination
 
-	public struct Destination: ReducerProtocol {
+	public struct Destination: Reducer {
 		public enum State: Equatable, Hashable {
 			case createPersonaCoordinator(CreatePersonaCoordinator.State)
 			case personaDetails(PersonaDetails.State)
@@ -55,7 +55,7 @@ public struct PersonasCoordinator: Sendable, FeatureReducer {
 			case personaDetails(PersonaDetails.Action)
 		}
 
-		public var body: some ReducerProtocolOf<Self> {
+		public var body: some ReducerOf<Self> {
 			Scope(state: /State.createPersonaCoordinator, action: /Action.createPersonaCoordinator) {
 				CreatePersonaCoordinator()
 			}
@@ -73,7 +73,7 @@ public struct PersonasCoordinator: Sendable, FeatureReducer {
 
 	public init() {}
 
-	public var body: some ReducerProtocolOf<Self> {
+	public var body: some ReducerOf<Self> {
 		Scope(state: \.personaList, action: /Action.child .. ChildAction.personaList) {
 			PersonaList()
 		}

@@ -47,7 +47,7 @@ public struct ProfileBackupSettings: Sendable, FeatureReducer {
 		case deleteProfileAndFactorSourcesButtonTapped
 	}
 
-	public struct Destinations: Sendable, ReducerProtocol {
+	public struct Destinations: Sendable, Reducer {
 		static let confirmCloudSyncDisableAlert: Self.State = .confirmCloudSyncDisable(.init(
 			title: {
 				TextState(L10n.AppSettings.ConfirmCloudSyncDisableAlert.title)
@@ -111,7 +111,7 @@ public struct ProfileBackupSettings: Sendable, FeatureReducer {
 			}
 		}
 
-		public var body: some ReducerProtocol<State, Action> {
+		public var body: some Reducer<State, Action> {
 			Scope(state: /State.confirmCloudSyncDisable, action: /Action.confirmCloudSyncDisable) {
 				EmptyReducer()
 			}
@@ -147,7 +147,7 @@ public struct ProfileBackupSettings: Sendable, FeatureReducer {
 
 	public init() {}
 
-	public var body: some ReducerProtocolOf<ProfileBackupSettings> {
+	public var body: some ReducerOf<ProfileBackupSettings> {
 		Reduce(core)
 			.ifLet(\.$destination, action: /Action.child .. /ChildAction.destination) {
 				Destinations()

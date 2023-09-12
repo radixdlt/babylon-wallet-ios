@@ -45,7 +45,7 @@ public struct CreationOfPersona: Sendable, FeatureReducer {
 
 	public init() {}
 
-	public var body: some ReducerProtocolOf<Self> {
+	public var body: some ReducerOf<Self> {
 		Scope(
 			state: \.derivePublicKeys,
 			action: /Action.child .. ChildAction.derivePublicKeys

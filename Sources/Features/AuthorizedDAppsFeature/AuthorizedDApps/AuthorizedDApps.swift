@@ -47,7 +47,7 @@ public struct AuthorizedDapps: Sendable, FeatureReducer {
 
 	public init() {}
 
-	public var body: some ReducerProtocolOf<Self> {
+	public var body: some ReducerOf<Self> {
 		Reduce(core)
 			.ifLet(\.$presentedDapp, action: /Action.child .. ChildAction.presentedDapp) {
 				DappDetails()

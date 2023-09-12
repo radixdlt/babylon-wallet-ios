@@ -54,7 +54,7 @@ public struct EditPersonaName: FeatureReducer, EmptyInitializable {
 
 	public init() {}
 
-	public var body: some ReducerProtocolOf<Self> {
+	public var body: some ReducerOf<Self> {
 		Scope(
 			state: \.family,
 			action: /Action.child .. ChildAction.family,

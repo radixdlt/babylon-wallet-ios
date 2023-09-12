@@ -28,7 +28,7 @@ public struct DisplayMnemonics: Sendable, FeatureReducer {
 		case destination(PresentationAction<Destinations.Action>)
 	}
 
-	public struct Destinations: Sendable, Equatable, ReducerProtocol {
+	public struct Destinations: Sendable, Equatable, Reducer {
 		public enum State: Sendable, Hashable {
 			case displayMnemonic(DisplayMnemonic.State)
 		}
@@ -39,7 +39,7 @@ public struct DisplayMnemonics: Sendable, FeatureReducer {
 
 		public init() {}
 
-		public var body: some ReducerProtocolOf<Self> {
+		public var body: some ReducerOf<Self> {
 			Scope(state: /State.displayMnemonic, action: /Action.displayMnemonic) {
 				DisplayMnemonic()
 			}
@@ -51,7 +51,7 @@ public struct DisplayMnemonics: Sendable, FeatureReducer {
 
 	public init() {}
 
-	public var body: some ReducerProtocolOf<Self> {
+	public var body: some ReducerOf<Self> {
 		Reduce(core)
 			.forEach(\.deviceFactorSources, action: /Action.child .. ChildAction.row) {
 				DisplayEntitiesControlledByMnemonic()

@@ -38,7 +38,7 @@ public struct AssetTransferMessage: Sendable, FeatureReducer {
 		case destination(PresentationAction<Destinations.Action>)
 	}
 
-	public struct Destinations: Sendable, ReducerProtocol {
+	public struct Destinations: Sendable, Reducer {
 		public enum State: Sendable, Hashable {
 			case messageMode(MessageMode.State)
 		}
@@ -47,14 +47,14 @@ public struct AssetTransferMessage: Sendable, FeatureReducer {
 			case messageMode(MessageMode.Action)
 		}
 
-		public var body: some ReducerProtocolOf<Self> {
+		public var body: some ReducerOf<Self> {
 			Scope(state: /State.messageMode, action: /Action.messageMode) {
 				MessageMode()
 			}
 		}
 	}
 
-	public var body: some ReducerProtocolOf<Self> {
+	public var body: some ReducerOf<Self> {
 		Reduce(core)
 			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
 				Destinations()

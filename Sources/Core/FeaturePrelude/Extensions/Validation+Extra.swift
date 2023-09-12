@@ -100,7 +100,7 @@ struct TCAValidationPreview: PreviewProvider {
 	}
 }
 
-struct TCAValidation: ReducerProtocol {
+struct TCAValidation: Reducer {
 	struct State: Hashable {
 		@Validation<String, String>(
 			onNil: "Cannot be nil",

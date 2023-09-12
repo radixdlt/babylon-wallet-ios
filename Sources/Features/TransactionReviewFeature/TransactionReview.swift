@@ -124,7 +124,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		case userDismissedTransactionStatus
 	}
 
-	public struct Destinations: Sendable, ReducerProtocol {
+	public struct Destinations: Sendable, Reducer {
 		public enum State: Sendable, Hashable {
 			case customizeGuarantees(TransactionReviewGuarantees.State)
 			case signing(Signing.State)
@@ -145,7 +145,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			case nonFungibleTokenDetails(NonFungibleTokenDetails.Action)
 		}
 
-		public var body: some ReducerProtocolOf<Self> {
+		public var body: some ReducerOf<Self> {
 			Scope(state: /State.customizeGuarantees, action: /Action.customizeGuarantees) {
 				TransactionReviewGuarantees()
 			}
@@ -180,7 +180,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 
 	public init() {}
 
-	public var body: some ReducerProtocolOf<Self> {
+	public var body: some ReducerOf<Self> {
 		Reduce(core)
 			.ifLet(\.networkFee, action: /Action.child .. ChildAction.networkFee) {
 				TransactionReviewNetworkFee()

@@ -42,8 +42,8 @@ public struct SignWithFactorSourcesOfKindState<Factor: FactorSourceProtocol>:
 	}
 }
 
-// MARK: - SignWithFactorSourcesOfKindReducerProtocol
-protocol SignWithFactorSourcesOfKindReducerProtocol:
+// MARK: - SignWithFactorSourcesOfKindReducer
+protocol SignWithFactorSourcesOfKindReducer:
 	Sendable,
 	FeatureReducer
 	where
@@ -61,7 +61,7 @@ protocol SignWithFactorSourcesOfKindReducerProtocol:
 	) async throws -> Set<SignatureOfEntity>
 }
 
-extension SignWithFactorSourcesOfKindReducerProtocol {
+extension SignWithFactorSourcesOfKindReducer {
 	func signWithSigningFactors(of state: State) -> EffectTask<Action> {
 		.run { [signingFactors = state.signingFactors] send in
 			var allSignatures = Set<SignatureOfEntity>()

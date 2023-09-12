@@ -46,7 +46,7 @@ public struct ReceivingAccount: Sendable, FeatureReducer {
 		case row(id: ResourceAsset.State.ID, child: ResourceAsset.Action)
 	}
 
-	public var body: some ReducerProtocolOf<Self> {
+	public var body: some ReducerOf<Self> {
 		Reduce(core)
 			.forEach(\.assets, action: /Action.child .. ChildAction.row) {
 				ResourceAsset()

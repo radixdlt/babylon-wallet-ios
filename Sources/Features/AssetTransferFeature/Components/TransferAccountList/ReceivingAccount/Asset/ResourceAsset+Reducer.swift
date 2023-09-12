@@ -32,7 +32,7 @@ public struct ResourceAsset: Sendable, FeatureReducer {
 		case removeTapped
 	}
 
-	public var body: some ReducerProtocolOf<Self> {
+	public var body: some ReducerOf<Self> {
 		Reduce(core)
 			.ifCaseLet(/State.fungibleAsset, action: /Action.child .. ChildAction.fungibleAsset) {
 				FungibleResourceAsset()

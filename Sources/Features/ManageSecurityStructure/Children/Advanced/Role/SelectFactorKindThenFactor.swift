@@ -34,7 +34,7 @@ public struct SelectFactorKindThenFactor: Sendable, FeatureReducer {
 
 	public init() {}
 
-	public var body: some ReducerProtocolOf<Self> {
+	public var body: some ReducerOf<Self> {
 		Reduce(core)
 			.ifLet(\.$factorSourceOfKind, action: /Action.child .. ChildAction.factorSourceOfKind) {
 				FactorSourcesOfKindList<FactorSource>()

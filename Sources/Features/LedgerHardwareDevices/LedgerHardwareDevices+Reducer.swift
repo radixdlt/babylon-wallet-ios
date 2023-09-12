@@ -72,7 +72,7 @@ public struct LedgerHardwareDevices: Sendable, FeatureReducer {
 
 	// MARK: - Destination
 
-	public struct Destinations: Sendable, ReducerProtocol {
+	public struct Destinations: Sendable, Reducer {
 		public enum State: Sendable, Hashable {
 			case noP2PLink(AlertState<NoP2PLinkAlert>)
 			case addNewP2PLink(NewConnection.State)
@@ -85,7 +85,7 @@ public struct LedgerHardwareDevices: Sendable, FeatureReducer {
 			case addNewLedger(AddLedgerFactorSource.Action)
 		}
 
-		public var body: some ReducerProtocolOf<Self> {
+		public var body: some ReducerOf<Self> {
 			Scope(state: /State.addNewP2PLink, action: /Action.addNewP2PLink) {
 				NewConnection()
 			}
@@ -104,7 +104,7 @@ public struct LedgerHardwareDevices: Sendable, FeatureReducer {
 
 	public init() {}
 
-	public var body: some ReducerProtocolOf<Self> {
+	public var body: some ReducerOf<Self> {
 		Reduce(core)
 			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
 				Destinations()

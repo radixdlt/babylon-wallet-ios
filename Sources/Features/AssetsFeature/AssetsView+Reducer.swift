@@ -88,7 +88,7 @@ public struct AssetsView: Sendable, FeatureReducer {
 
 	public init() {}
 
-	public var body: some ReducerProtocolOf<Self> {
+	public var body: some ReducerOf<Self> {
 		Scope(state: \.fungibleTokenList, action: /Action.child .. ChildAction.fungibleTokenList) {
 			FungibleAssetList()
 		}

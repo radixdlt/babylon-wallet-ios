@@ -45,7 +45,7 @@ public struct GatewaySettings: Sendable, FeatureReducer {
 		case destination(PresentationAction<Destinations.Action>)
 	}
 
-	public struct Destinations: Sendable, ReducerProtocol {
+	public struct Destinations: Sendable, Reducer {
 		public enum State: Sendable, Hashable {
 			case addNewGateway(AddNewGateway.State)
 			case createAccount(CreateAccountCoordinator.State)
@@ -58,7 +58,7 @@ public struct GatewaySettings: Sendable, FeatureReducer {
 			case slideUpPanel(SlideUpPanel.Action)
 		}
 
-		public var body: some ReducerProtocolOf<Self> {
+		public var body: some ReducerOf<Self> {
 			Scope(state: /State.addNewGateway, action: /Action.addNewGateway) {
 				AddNewGateway()
 			}
@@ -89,7 +89,7 @@ public struct GatewaySettings: Sendable, FeatureReducer {
 
 	public init() {}
 
-	public var body: some ReducerProtocolOf<Self> {
+	public var body: some ReducerOf<Self> {
 		Scope(state: \.gatewayList, action: /Action.child .. ChildAction.gatewayList) {
 			GatewayList()
 		}

@@ -29,7 +29,7 @@ public struct TransactionReviewAccounts: Sendable, FeatureReducer {
 
 	public init() {}
 
-	public var body: some ReducerProtocolOf<Self> {
+	public var body: some ReducerOf<Self> {
 		Reduce(core)
 			.forEach(\.accounts, action: /Action.child .. ChildAction.account) {
 				TransactionReviewAccount()

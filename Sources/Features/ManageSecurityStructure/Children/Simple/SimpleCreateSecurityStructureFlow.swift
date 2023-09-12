@@ -55,7 +55,7 @@ public struct SimpleManageSecurityStructureFlow: Sendable, FeatureReducer {
 		case modalDestinations(PresentationAction<ModalDestinations.Action>)
 	}
 
-	public struct ModalDestinations: Sendable, ReducerProtocol {
+	public struct ModalDestinations: Sendable, Reducer {
 		public enum State: Sendable, Hashable {
 			case listConfirmerOfNewPhone(ListConfirmerOfNewPhone.State)
 			case listLostPhoneHelper(ListLostPhoneHelper.State)
@@ -66,7 +66,7 @@ public struct SimpleManageSecurityStructureFlow: Sendable, FeatureReducer {
 			case listLostPhoneHelper(ListLostPhoneHelper.Action)
 		}
 
-		public var body: some ReducerProtocolOf<Self> {
+		public var body: some ReducerOf<Self> {
 			Scope(state: /State.listConfirmerOfNewPhone, action: /Action.listConfirmerOfNewPhone) {
 				ListConfirmerOfNewPhone()
 			}
@@ -81,7 +81,7 @@ public struct SimpleManageSecurityStructureFlow: Sendable, FeatureReducer {
 
 	public init() {}
 
-	public var body: some ReducerProtocolOf<Self> {
+	public var body: some ReducerOf<Self> {
 		Reduce(core)
 			.ifLet(\.$modalDestinations, action: /Action.child .. ChildAction.modalDestinations) {
 				ModalDestinations()
