@@ -144,7 +144,7 @@ public struct AccountSecurity: Sendable, FeatureReducer {
 
 	private func savePreferences(state: State) -> EffectTask<Action> {
 		guard let preferences = state.preferences else { return .none }
-		return .fireAndForget {
+		return .run { _ in
 			try await appPreferencesClient.updatePreferences(preferences)
 		}
 	}

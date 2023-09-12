@@ -109,7 +109,7 @@ public struct AppSettings: Sendable, FeatureReducer {
 		case let .developerModeToggled(isEnabled):
 			state.preferences?.security.isDeveloperModeEnabled = isEnabled
 			guard let preferences = state.preferences else { return .none }
-			return .fireAndForget {
+			return .run { _ in
 				try await appPreferencesClient.updatePreferences(preferences)
 			}
 

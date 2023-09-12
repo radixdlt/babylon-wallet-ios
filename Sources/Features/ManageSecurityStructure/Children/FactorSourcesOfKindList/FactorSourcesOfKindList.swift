@@ -186,7 +186,7 @@ public struct FactorSourcesOfKindList<FactorSourceOfKind: Sendable & Hashable>: 
 				}
 				state.idOfFactorSourceToFlagForDeletionUponSuccessfulCreationOfNew = nil
 				state.factorSources.removeAll(where: { $0.id.embed() == idOfFactorSourceToFlagForDeletionUponSuccessfulCreationOfNew })
-				return .fireAndForget {
+				return .run { _ in
 					try await factorSourcesClient.flagFactorSourceForDeletion(
 						idOfFactorSourceToFlagForDeletionUponSuccessfulCreationOfNew
 					)

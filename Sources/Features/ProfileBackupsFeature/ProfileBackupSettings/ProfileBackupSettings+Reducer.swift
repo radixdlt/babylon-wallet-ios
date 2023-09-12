@@ -284,7 +284,7 @@ public struct ProfileBackupSettings: Sendable, FeatureReducer {
 		if isEnabled {
 			state.destination = .cloudSyncTakesLongTimeAlert
 		}
-		return .fireAndForget {
+		return .run { _ in
 			try await appPreferencesClient.setIsCloudProfileSyncEnabled(isEnabled)
 		}
 	}

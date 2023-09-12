@@ -172,7 +172,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 			}
 
 		case let .openURLTapped(url):
-			return .fireAndForget {
+			return .run { _ in
 				await openURL(url)
 			}
 

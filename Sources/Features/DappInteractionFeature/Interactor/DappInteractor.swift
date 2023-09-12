@@ -137,11 +137,11 @@ struct DappInteractor: Sendable, FeatureReducer {
 			}
 
 		case .moveToBackground:
-			return .fireAndForget {
+			return .run { _ in
 				await radixConnectClient.disconnectAll()
 			}
 		case .moveToForeground:
-			return .fireAndForget {
+			return .run { _ in
 				_ = await radixConnectClient.loadFromProfileAndConnectAll()
 			}
 		}

@@ -1203,7 +1203,7 @@ public struct SimpleDappDetails: Sendable, FeatureReducer {
 			}
 
 		case let .openURLTapped(url):
-			return .fireAndForget {
+			return .run { _ in
 				await openURL(url)
 			}
 		}
