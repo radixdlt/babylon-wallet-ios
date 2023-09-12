@@ -417,9 +417,9 @@ extension DappInteractor {
 		delay: Duration = .seconds(0.75),
 		for action: Action
 	) -> EffectTask<Action> {
-		.task {
+		.run { send in
 			try await clock.sleep(for: delay)
-			return action
+			await send(action)
 		}
 	}
 }

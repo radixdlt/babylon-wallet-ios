@@ -198,7 +198,7 @@ public struct SimpleManageSecurityStructureFlow: Sendable, FeatureReducer {
 				precondition(new.lostPhoneHelper == simpleFactorConfig.singleRecoveryFactor)
 				precondition(new.confirmerOfNewPhone == simpleFactorConfig.singleConfirmationFactor)
 
-				return .task {
+				return .run { send in
 					let taskResult = await TaskResult { () async throws -> SecurityStructureProduct in
 						let primary = try await factorSourcesClient.getFactorSources(type: DeviceFactorSource.self).filter {
 							!$0.supportsOlympia
@@ -210,9 +210,9 @@ public struct SimpleManageSecurityStructureFlow: Sendable, FeatureReducer {
 							recoveryRole: .single(simpleFactorConfig.singleRecoveryFactor, for: .recovery),
 							confirmationRole: .single(simpleFactorConfig.singleConfirmationFactor, for: .confirmation)
 						)
-						return .creatingNew(config: config)
+						await send(.creatingNew(config: config))
 					}
-					return .delegate(.updatedOrCreatedSecurityStructure(taskResult))
+					await send(.delegate(.updatedOrCreatedSecurityStructure(taskResult)))
 				}
 
 			case let .existing(structureToUpdate):

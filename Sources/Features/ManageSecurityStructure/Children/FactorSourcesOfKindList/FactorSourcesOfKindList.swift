@@ -214,7 +214,7 @@ public struct FactorSourcesOfKindList<FactorSourceOfKind: Sendable & Hashable>: 
 	}
 
 	private func updateFactorSourcesEffect(state: inout State) -> EffectTask<Action> {
-		.task { [selectedID = state.selectedFactorSourceID, kind = state.kind] in
+		.run { [selectedID = state.selectedFactorSourceID, kind = state.kind] send in
 			let result = await TaskResult {
 				let all = try await factorSourcesClient.getFactorSources(matching: {
 					$0.kind == kind
@@ -233,7 +233,7 @@ public struct FactorSourcesOfKindList<FactorSourceOfKind: Sendable & Hashable>: 
 				}
 				return IdentifiedArrayOf<FactorSourceOfKind>.init(uncheckedUniqueElements: filteredType)
 			}
-			return .internal(.loadedFactorSources(result))
+			await send(.internal(.loadedFactorSources(result)))
 		}
 	}
 }

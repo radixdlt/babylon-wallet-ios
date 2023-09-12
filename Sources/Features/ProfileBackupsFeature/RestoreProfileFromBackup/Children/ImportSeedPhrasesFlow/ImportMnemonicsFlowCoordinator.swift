@@ -77,14 +77,14 @@ public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .onFirstTask:
-			return .task { [snapshot = state.profileSnapshot] in
-				await .internal(.loadControlledEntities(TaskResult {
+			return .run { send in [snapshot = state.profileSnapshot] in
+				await send(.internal(.loadControlledEntities(TaskResult {
 					let ents = try await deviceFactorSourceClient.controlledEntities(snapshot)
 					try? await clock.sleep(for: .milliseconds(200))
 					return ents.filter { ent in
 						!userDefaultsClient.getFactorSourceIDOfBackedUpMnemonics().contains(ent.factorSourceID)
 					}
-				}))
+				})))
 			}
 		case .closeButtonTapped:
 			return .send(.delegate(.closeButtonTapped))

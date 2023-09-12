@@ -159,7 +159,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 			state.$metadata = .loading
 			state.$resources = .loading
 			let dAppID = state.dApp.dAppDefinitionAddress
-			return .task {
+			return .run { send in
 				let result = await TaskResult {
 					try await cacheClient.withCaching(
 						cacheEntry: .dAppMetadata(dAppID.address),
@@ -168,7 +168,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 						}
 					)
 				}
-				return .internal(.metadataLoaded(.init(result: result)))
+				await send(.internal(.metadataLoaded(.init(result: result))))
 			}
 
 		case let .openURLTapped(url):

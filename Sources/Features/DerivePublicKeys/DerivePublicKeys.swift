@@ -101,17 +101,17 @@ public struct DerivePublicKeys: Sendable, FeatureReducer {
 		case .onFirstTask:
 			switch state.factorSourceOption {
 			case .device:
-				return .task {
+				return .run { send in
 					do {
 						let babylonFactorSource = try await factorSourcesClient
 							.getFactorSources()
 							.babylonDeviceFactorSources()
 							.first // FIXME: should only have one babylon factor source, which should be in keychain, clean this up.
 
-						return .internal(.loadedDeviceFactorSource(babylonFactorSource))
+						await send(.internal(.loadedDeviceFactorSource(babylonFactorSource)))
 					} catch {
 						loggerGlobal.error("Failed to load factor source, error: \(error)")
-						return .delegate(.failedToDerivePublicKey)
+						await send(.delegate(.failedToDerivePublicKey))
 					}
 				}
 
@@ -192,18 +192,18 @@ extension DerivePublicKeys {
 		loadMnemonicPurpose: SecureStorageClient.LoadMnemonicPurpose,
 		state: State
 	) -> EffectTask<Action> {
-		.task {
+		.run { send in
 			do {
-				return try await _deriveWith(
+				try await send(_deriveWith(
 					deviceFactorSource: deviceFactorSource,
 					derivationPaths: derivationPaths,
 					networkID: networkID,
 					loadMnemonicPurpose: loadMnemonicPurpose,
 					state: state
-				)
+				))
 			} catch {
 				loggerGlobal.error("Failed to derive or cast public key, error: \(error)")
-				return .delegate(.failedToDerivePublicKey)
+				await send(.delegate(.failedToDerivePublicKey))
 			}
 		}
 	}
@@ -233,17 +233,17 @@ extension DerivePublicKeys {
 		networkID: NetworkID,
 		state: State
 	) -> EffectTask<Action> {
-		.task {
+		.run { send in
 			do {
-				return try await _deriveWith(
+				try await send(_deriveWith(
 					ledger: ledger,
 					derivationPaths: derivationPaths,
 					networkID: networkID,
 					state: state
-				)
+				))
 			} catch {
 				loggerGlobal.error("Failed to derive or cast public key, error: \(error)")
-				return .delegate(.failedToDerivePublicKey)
+				await send(.delegate(.failedToDerivePublicKey))
 			}
 		}
 	}

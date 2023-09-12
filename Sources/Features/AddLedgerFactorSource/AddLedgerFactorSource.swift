@@ -124,12 +124,12 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 
 	private func sendAddLedgerRequestEffect(_ state: inout State) -> EffectTask<Action> {
 		state.isWaitingForResponseFromLedger = true
-		return .task {
+		return .run { send in
 			let result = await TaskResult {
 				try await ledgerHardwareWalletClient.getDeviceInfo()
 			}
 
-			return .internal(.getDeviceInfoResult(result))
+			await send(.internal(.getDeviceInfoResult(result)))
 		}
 	}
 

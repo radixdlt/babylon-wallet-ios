@@ -44,12 +44,12 @@ public struct CameraPermission: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .appeared:
-			return .task {
+			return .run { send in
 				let allowed = await cameraPermissionClient.getCameraAccess()
 				if allowed {
-					return .delegate(.permissionResponse(true))
+					await send(.delegate(.permissionResponse(true)))
 				} else {
-					return .internal(.displayPermissionDeniedAlert)
+					await send(.internal(.displayPermissionDeniedAlert))
 				}
 			}
 		case let .permissionDeniedAlert(.presented(action)):

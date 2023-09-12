@@ -122,7 +122,7 @@ public struct ManageSecurityStructureCoordinator: Sendable, FeatureReducer {
 
 		case let .path(.element(_, action: .nameStructure(.delegate(.updateOrCreateSecurityStructure(structure))))):
 
-			return .task { [isUpdatingExisting = state.mode != .new] in
+			return .run { [isUpdatingExisting = state.mode != .new] send in
 				let taskResult = await TaskResult {
 					let configReference = structure.asReference()
 					try await appPreferencesClient.updating { preferences in
@@ -131,7 +131,7 @@ public struct ManageSecurityStructureCoordinator: Sendable, FeatureReducer {
 					}
 					return structure
 				}
-				return .delegate(.done(taskResult))
+				await send(.delegate(.done(taskResult)))
 			}
 
 		default: return .none

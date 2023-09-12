@@ -65,10 +65,10 @@ public struct ScanQRCoordinator: Sendable, FeatureReducer {
 		switch childAction {
 		case let .cameraPermission(.delegate(.permissionResponse(allowed))):
 			if allowed {
-				return .task {
+				return .run { send in
 					// FIXME: temporary hack to try to solve some navigation issues
 					try await clock.sleep(for: .milliseconds(900))
-					return .internal(.proceedWithScan)
+					await send(.internal(.proceedWithScan))
 				}
 			} else {
 				return .send(.delegate(.dismiss))

@@ -64,10 +64,10 @@ public struct DisplayMnemonics: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .onFirstTask:
-			return .task {
-				await .internal(.loadedFactorSources(TaskResult {
+			return .run { send in
+				await send(.internal(.loadedFactorSources(TaskResult {
 					try await deviceFactorSourceClient.controlledEntities(nil) // `nil` means read profile in ProfileStore, instead of using an overriding
-				}))
+				})))
 			}
 		}
 	}

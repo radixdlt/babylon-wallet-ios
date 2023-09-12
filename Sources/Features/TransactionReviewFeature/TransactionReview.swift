@@ -264,10 +264,10 @@ public struct TransactionReview: Sendable, FeatureReducer {
 				printSigners(reviewedTransaction)
 				#endif
 
-				return .task {
-					await .internal(.buildTransactionItentResult(TaskResult {
+				return .run { send in
+					await send(.internal(.buildTransactionItentResult(TaskResult {
 						try await transactionClient.buildTransactionIntent(request)
-					}))
+					})))
 				}
 			} catch {
 				errorQueue.schedule(error)
@@ -600,9 +600,9 @@ extension TransactionReview {
 		delay: Duration = .seconds(0.3),
 		for action: Action
 	) -> EffectTask<Action> {
-		.task {
+		.run { send in
 			try await clock.sleep(for: delay)
-			return action
+			await send(action)
 		}
 	}
 
@@ -1190,7 +1190,7 @@ public struct SimpleDappDetails: Sendable, FeatureReducer {
 		case .appeared:
 			state.$metadata = .loading
 			state.$resources = .loading
-			return .task { [dAppID = state.dAppID] in
+			return .run { [dAppID = state.dAppID] send in
 				let result = await TaskResult {
 					try await cacheClient.withCaching(
 						cacheEntry: .dAppMetadata(dAppID.address),
@@ -1199,7 +1199,7 @@ public struct SimpleDappDetails: Sendable, FeatureReducer {
 						}
 					)
 				}
-				return .internal(.metadataLoaded(.init(result: result)))
+				await send(.internal(.metadataLoaded(.init(result: result))))
 			}
 
 		case let .openURLTapped(url):
