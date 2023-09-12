@@ -32,7 +32,7 @@ extension TransactionReviewGuarantees {
 
 						//	FIXME: Uncomment and implement
 						//	Button(L10n.TransactionReview.Guarantees.howDoGuaranteesWork) {
-						//		ViewStore(store).send(.view(.infoTapped))
+						//		store.send(.view(.infoTapped))
 						//	}
 						//	.buttonStyle(.info)
 						//	.padding(.horizontal, .large2)
@@ -79,7 +79,7 @@ extension TransactionReviewGuarantees {
 				.toolbar {
 					ToolbarItem(placement: .cancellationAction) {
 						CloseButton {
-							ViewStore(store).send(.view(.closeTapped))
+							store.send(.view(.closeTapped))
 						}
 					}
 				}

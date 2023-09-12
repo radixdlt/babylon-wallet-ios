@@ -46,7 +46,7 @@ extension ScanMultipleOlympiaQRCodes {
 				Spacer(minLength: 0)
 			}
 			.onAppear {
-				ViewStore(store).send(.view(.appeared))
+				store.send(.view(.appeared))
 			}
 		}
 	}

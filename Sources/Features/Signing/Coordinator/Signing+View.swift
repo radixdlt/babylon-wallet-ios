@@ -43,7 +43,7 @@ extension Signing {
 
 		public var body: some SwiftUI.View {
 			WithNavigationBar {
-				ViewStore(store).send(.view(.closeButtonTapped))
+				store.send(.view(.closeButtonTapped))
 			} content: {
 				View(store: store)
 			}

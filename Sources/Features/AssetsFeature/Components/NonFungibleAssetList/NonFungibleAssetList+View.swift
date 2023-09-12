@@ -23,7 +23,7 @@ extension NonFungibleAssetList {
 				action: NonFungibleAssetList.Destinations.Action.details,
 				content: { detailsStore in
 					WithNavigationBar {
-						ViewStore(store).send(.view(.closeDetailsTapped))
+						store.send(.view(.closeDetailsTapped))
 					} content: {
 						NonFungibleTokenDetails.View(store: detailsStore)
 					}

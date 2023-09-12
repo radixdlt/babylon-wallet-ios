@@ -36,7 +36,7 @@ extension GatewaySettings {
 							action: Destinations.Action.addNewGateway,
 							content: { addGatewayStore in
 								WithNavigationBar {
-									ViewStore(addGatewayStore).send(.view(.closeButtonTapped))
+									addGatewayStore.send(.view(.closeButtonTapped))
 								} content: {
 									AddNewGateway.View(store: addGatewayStore)
 								}

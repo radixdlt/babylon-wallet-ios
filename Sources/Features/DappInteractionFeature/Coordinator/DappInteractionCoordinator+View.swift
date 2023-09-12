@@ -8,7 +8,7 @@ extension DappInteractionCoordinator {
 
 		var body: some SwiftUI.View {
 			ZStack {
-				SwitchStore(store.scope(state: \.childState)) { state in
+				SwitchStore(store.scope(state: \.childState, action: { $0 })) { state in
 					switch state {
 					case .loading:
 						CaseLet(

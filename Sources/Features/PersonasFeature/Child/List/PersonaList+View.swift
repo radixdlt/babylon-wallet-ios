@@ -60,7 +60,7 @@ public struct PersonaListCoreView: View {
 			}
 		}
 		.task {
-			ViewStore(store).send(.view(.task))
+			store.send(.view(.task))
 		}
 	}
 }
