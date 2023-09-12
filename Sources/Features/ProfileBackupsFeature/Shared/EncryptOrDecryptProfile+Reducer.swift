@@ -162,15 +162,10 @@ public struct EncryptOrDecryptProfile: Sendable, FeatureReducer {
 				return .send(.delegate(.dismiss))
 
 			case let .encryptSpecific(snapshot, kdfScheme, encryptionScheme):
-				let encryptionKey = kdfScheme.kdf(password: password)
 				do {
-					let json = try jsonEncoder().encode(snapshot)
-					let encryptedPayload = try encryptionScheme.encrypt(data: json, encryptionKey: encryptionKey)
-
-					let encrypted = EncryptedProfileSnapshot(
-						version: .current,
-						encryptedSnapshot: .init(data: encryptedPayload),
-						keyDerivationScheme: kdfScheme,
+					let encrypted = try snapshot.encrypt(
+						password: password,
+						kdfScheme: kdfScheme,
 						encryptionScheme: encryptionScheme
 					)
 
@@ -208,7 +203,9 @@ public struct EncryptOrDecryptProfile: Sendable, FeatureReducer {
 			return .none
 		}
 	}
+}
 
+extension EncryptOrDecryptProfile {
 	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
 		case let .focusTextField(focus):
