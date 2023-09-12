@@ -112,6 +112,7 @@ public struct SelectBackup: Sendable, FeatureReducer {
 				do {
 					guard let snapshot = try await backupsClient.lookupProfileSnapshotByHeader(profileHeader) else {
 						await send(.internal(.snapshotWithHeaderNotFoundInCloud(profileHeader)))
+						return
 					}
 					await send(.delegate(.selectedProfileSnapshot(snapshot, isInCloud: true)))
 				} catch {
