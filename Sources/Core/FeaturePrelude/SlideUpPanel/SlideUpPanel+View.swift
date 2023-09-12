@@ -94,7 +94,7 @@ struct SlideUpPanel_Preview: PreviewProvider {
 		SlideUpPanel.View(
 			store: .init(
 				initialState: .previewValue,
-				reducer: SlideUpPanel()
+				reducer: SlideUpPanel.init
 			)
 		)
 	}

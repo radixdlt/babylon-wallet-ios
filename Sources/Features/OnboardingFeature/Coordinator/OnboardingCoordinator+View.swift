@@ -43,7 +43,7 @@ struct Onboarding_Preview: PreviewProvider {
 		OnboardingCoordinator.View(
 			store: .init(
 				initialState: .previewValue,
-				reducer: OnboardingCoordinator()
+				reducer: OnboardingCoordinator.init
 			)
 		)
 	}

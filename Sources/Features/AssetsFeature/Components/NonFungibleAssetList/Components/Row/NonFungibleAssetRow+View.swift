@@ -189,7 +189,7 @@ struct NonFungibleRow_Preview: PreviewProvider {
 		NonFungibleAssetList.Row.View(
 			store: .init(
 				initialState: .previewValue,
-				reducer: NonFungibleAssetList.Row()
+				reducer: NonFungibleAssetList.Row.init
 			)
 		)
 	}

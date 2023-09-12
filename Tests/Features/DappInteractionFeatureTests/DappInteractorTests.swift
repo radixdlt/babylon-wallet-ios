@@ -12,7 +12,7 @@
 //
 //		let store = TestStore(
 //			initialState: DappInteractor.State(),
-//			reducer: DappInteractor()
+//			reducer: DappInteractor.init
 //		) {
 //			$0.radixConnectClient.loadFromProfileAndConnectAll = {
 //				await clientsWasLoaded.setValue(true)
@@ -71,7 +71,7 @@
 //				unfinishedRequestsFromClient: .init(),
 //				currentRequest: currentRequest
 //			),
-//			reducer: DappInteractor()
+//			reducer: DappInteractor.init
 //		) {
 //			$0.getCurrentGateway.getCurrentNetworkID = { .simulator }
 //			$0.radixConnectClient.sendMessageReadReceipt = { _, _ in /* do nothing */ }
@@ -124,7 +124,7 @@
 //			initialState: DappInteractor.State(
 //				unfinishedRequestsFromClient: .init()
 //			),
-//			reducer: DappInteractor()
+//			reducer: DappInteractor.init
 //		) {
 //			$0.gatewaysClient.getCurrentGateway = { currentGateway }
 //			$0.errorQueue.schedule = {

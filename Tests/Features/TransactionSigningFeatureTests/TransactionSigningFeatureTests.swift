@@ -55,7 +55,7 @@
 //			initialState: TransactionSigning.State(
 //				transactionManifestWithoutLockFee: mockManifestWithoutLockFee
 //			),
-//			reducer: TransactionSigning()
+//			reducer: TransactionSigning.init
 //		) {
 //			$0.gatewaysClient.getCurrentGateway = { .nebunet }
 //			$0.transactionClient.addLockFeeInstructionToManifest = { _ in throw transactionError }
@@ -75,7 +75,7 @@
 //			initialState: TransactionSigning.State(
 //				transactionManifestWithoutLockFee: mockManifestWithoutLockFee
 //			),
-//			reducer: TransactionSigning()
+//			reducer: TransactionSigning.init
 //		) {
 //			$0.gatewaysClient.getCurrentGateway = { .nebunet }
 //			$0.transactionClient.addLockFeeInstructionToManifest = { [self] _ in (mockManifestWithLockFee, 10) }

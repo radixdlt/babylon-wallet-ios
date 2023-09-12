@@ -115,7 +115,7 @@ struct GatewaySettings_Preview: PreviewProvider {
 		GatewaySettings.View(
 			store: .init(
 				initialState: .previewValue,
-				reducer: GatewaySettings()
+				reducer: GatewaySettings.init
 			)
 		)
 	}

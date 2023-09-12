@@ -84,7 +84,7 @@ struct GatewayRow_Preview: PreviewProvider {
 		GatewayRow.View(
 			store: .init(
 				initialState: .previewValue2,
-				reducer: GatewayRow()
+				reducer: GatewayRow.init
 			)
 		)
 	}

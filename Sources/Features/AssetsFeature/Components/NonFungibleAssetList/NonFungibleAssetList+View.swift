@@ -41,7 +41,7 @@ struct NonFungibleTokenList_Preview: PreviewProvider {
 		NonFungibleAssetList.View(
 			store: .init(
 				initialState: .init(rows: []),
-				reducer: NonFungibleAssetList()
+				reducer: NonFungibleAssetList.init
 			)
 		)
 	}

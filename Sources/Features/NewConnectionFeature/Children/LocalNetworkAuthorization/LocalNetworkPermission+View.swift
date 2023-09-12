@@ -32,7 +32,7 @@ extension LocalNetworkPermission {
 			LocalNetworkPermission.View(
 				store: .init(
 					initialState: .previewValue,
-					reducer: LocalNetworkPermission()
+					reducer: LocalNetworkPermission.init
 				)
 			)
 		}

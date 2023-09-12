@@ -57,7 +57,7 @@ struct CreateAuthKey_Preview: PreviewProvider {
 		CreateAuthKey.View(
 			store: .init(
 				initialState: .previewValue,
-				reducer: CreateAuthKey()
+				reducer: CreateAuthKey.init
 			)
 		)
 	}

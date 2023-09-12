@@ -13,7 +13,7 @@ final class SplashFeatureTests: TestCase {
 
 		let store = TestStore(
 			initialState: Splash.State(),
-			reducer: Splash()
+			reducer: Splash.init
 		) {
 			$0.localAuthenticationClient = LocalAuthenticationClient {
 				authBiometricsConfig
@@ -71,7 +71,7 @@ final class SplashFeatureTests: TestCase {
 		let clock = TestClock()
 		let store = TestStore(
 			initialState: Splash.State(),
-			reducer: Splash()
+			reducer: Splash.init
 		) {
 			$0.localAuthenticationClient = LocalAuthenticationClient {
 				authBiometricsConfig

@@ -140,7 +140,7 @@ struct EditPersona_Preview: PreviewProvider {
 				initialState: .previewValue(
 					mode: .edit
 				),
-				reducer: EditPersona()
+				reducer: EditPersona.init
 			)
 		)
 		.previewDisplayName("dApp Mode")
@@ -148,7 +148,7 @@ struct EditPersona_Preview: PreviewProvider {
 		EditPersona.View(
 			store: .init(
 				initialState: .previewValue(mode: .edit),
-				reducer: EditPersona()
+				reducer: EditPersona.init
 			)
 		)
 		.previewDisplayName("Edit Mode")

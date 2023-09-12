@@ -89,7 +89,7 @@ struct P2PLinksFeature_Preview: PreviewProvider {
 			P2PLinksFeature.View(
 				store: .init(
 					initialState: .previewValue,
-					reducer: P2PLinksFeature()
+					reducer: P2PLinksFeature.init
 				)
 			)
 			#if os(iOS)

@@ -81,7 +81,7 @@ struct NewConnection_Preview: PreviewProvider {
 		NewConnection.View(
 			store: .init(
 				initialState: .previewValue,
-				reducer: NewConnection()
+				reducer: NewConnection.init
 			)
 		)
 	}

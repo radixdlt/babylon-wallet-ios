@@ -31,7 +31,7 @@ struct CameraPermission_Preview: PreviewProvider {
 		CameraPermission.View(
 			store: .init(
 				initialState: .previewValue,
-				reducer: CameraPermission()
+				reducer: CameraPermission.init
 			)
 		)
 	}

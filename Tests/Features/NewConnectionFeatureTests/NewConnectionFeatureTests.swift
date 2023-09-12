@@ -11,7 +11,7 @@ final class NewConnectionTests: TestCase {
 			// GIVEN
 			// initial state
 			initialState: NewConnection.State.scanQR(.init(scanInstructions: scanInstruction, step: .scanQR(.init(scanInstructions: scanInstruction)))),
-			reducer: NewConnection()
+			reducer: NewConnection.init
 		)
 		let password = ConnectionPassword.placeholder
 
@@ -39,7 +39,7 @@ final class NewConnectionTests: TestCase {
 			initialState: NewConnection.State.connectUsingSecrets(
 				ConnectUsingSecrets.State(connectionPassword: .placeholder)
 			),
-			reducer: NewConnection()
+			reducer: NewConnection.init
 		)
 		let connectedClient = P2PLink(connectionPassword: .placeholder, displayName: "name")
 
@@ -55,7 +55,7 @@ final class NewConnectionTests: TestCase {
 			initialState: NewConnection.State.connectUsingSecrets(
 				ConnectUsingSecrets.State(connectionPassword: connection.connectionPassword)
 			),
-			reducer: NewConnection()
+			reducer: NewConnection.init
 		)
 
 		await store.send(.view(.closeButtonTapped))
@@ -71,7 +71,7 @@ final class NewConnectionTests: TestCase {
 			initialState: NewConnection.State.connectUsingSecrets(
 				ConnectUsingSecrets.State(connectionPassword: password)
 			),
-			reducer: NewConnection()
+			reducer: NewConnection.init
 		) {
 			$0.continuousClock = clock
 		}

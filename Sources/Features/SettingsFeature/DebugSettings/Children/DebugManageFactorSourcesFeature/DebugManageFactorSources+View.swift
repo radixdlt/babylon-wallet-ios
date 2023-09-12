@@ -107,7 +107,7 @@ struct DebugManageFactorSources_Preview: PreviewProvider {
 		DebugManageFactorSources.View(
 			store: .init(
 				initialState: .previewValue,
-				reducer: DebugManageFactorSources()
+				reducer: DebugManageFactorSources.init
 			)
 		)
 	}

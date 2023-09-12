@@ -77,7 +77,7 @@ struct AnswerSecurityQuestionsCoordinator_Preview: PreviewProvider {
 		AnswerSecurityQuestionsCoordinator.View(
 			store: .init(
 				initialState: .previewValue,
-				reducer: AnswerSecurityQuestionsCoordinator()
+				reducer: AnswerSecurityQuestionsCoordinator.init
 			)
 		)
 	}

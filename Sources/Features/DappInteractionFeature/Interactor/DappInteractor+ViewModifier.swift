@@ -5,7 +5,7 @@ extension View {
 		self.presentsDappInteractions(
 			store: .init(
 				initialState: .init(),
-				reducer: DappInteractor()
+				reducer: DappInteractor.init
 			)
 		)
 	}
@@ -75,7 +75,7 @@ struct DappInteractionHook_Previews: PreviewProvider {
 		Color.red.presentsDappInteractions(
 			store: .init(
 				initialState: .init(),
-				reducer: DappInteractor()
+				reducer: DappInteractor.init
 			)
 		)
 	}

@@ -48,15 +48,16 @@ struct DappInteractionCoordinator_Previews: PreviewProvider {
 					interaction: .previewValueAllRequests(
 						auth: .login(.withoutChallenge)
 					)
-				),
-				reducer: DappInteractionCoordinator()
+				)
+			) {
+				DappInteractionCoordinator()
 					.dependency(\.accountsClient, .previewValueTwoAccounts())
-//					.dependency(\.authorizedDappsClient, .previewValueOnePersona())
+					//  .dependency(\.authorizedDappsClient, .previewValueOnePersona())
 					.dependency(\.personasClient, .previewValueTwoPersonas(existing: true))
 					.dependency(\.personasClient, .previewValueTwoPersonas(existing: false))
 					.dependency(\.gatewayAPIClient, .previewValueDappMetadataSuccess)
 					.dependency(\.gatewayAPIClient, .previewValueDappMetadataFailure)
-			)
+			}
 		)
 		.presentsLoadingViewOverlay()
 	}

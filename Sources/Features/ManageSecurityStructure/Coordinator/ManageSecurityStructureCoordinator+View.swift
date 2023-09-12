@@ -70,7 +70,7 @@ struct ManageSecurityStructure_Preview: PreviewProvider {
 		ManageSecurityStructureCoordinator.View(
 			store: .init(
 				initialState: .previewValue,
-				reducer: ManageSecurityStructureCoordinator()
+				reducer: ManageSecurityStructureCoordinator.init
 			)
 		)
 	}

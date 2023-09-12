@@ -63,7 +63,7 @@ extension OffDeviceMnemonicInfo {
 //		OffDeviceMnemonicInfo.View(
 //			store: .init(
 //				initialState: .previewValue,
-//				reducer: OffDeviceMnemonicInfo()
+//				reducer: OffDeviceMnemonicInfo.init
 //			)
 //		)
 //	}

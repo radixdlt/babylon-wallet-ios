@@ -370,7 +370,7 @@ struct Row_Preview: PreviewProvider {
 		AccountList.Row.View(
 			store: .init(
 				initialState: .previewValue,
-				reducer: AccountList.Row()
+				reducer: AccountList.Row.init
 			)
 		)
 	}

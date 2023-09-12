@@ -39,7 +39,7 @@ struct ScannQR_Preview: PreviewProvider {
 		ScanQRCoordinator.View(
 			store: .init(
 				initialState: .previewValue,
-				reducer: ScanQRCoordinator()
+				reducer: ScanQRCoordinator.init
 			)
 		)
 	}

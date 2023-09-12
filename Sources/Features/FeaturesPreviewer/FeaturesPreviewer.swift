@@ -13,22 +13,19 @@ public struct FeaturesPreviewer<Feature>
 	) -> some Scene {
 		WindowGroup {
 			let store = Store(
-				initialState: PreviewOfSomeFeatureReducer<Feature>.State(),
-				reducer: Reduce(withReducer(
+				initialState: PreviewOfSomeFeatureReducer<Feature>.State()
+			) {
+				Reduce(withReducer(
 					PreviewOfSomeFeatureReducer<Feature>(resultFromAction: resultFromAction)
 				))
-			)
+			}
 
 			if wrapInNavigationView {
 				NavigationView {
-					PreviewOfSomeFeatureReducer<Feature>.View(
-						store: store
-					)
+					PreviewOfSomeFeatureReducer<Feature>.View(store: store)
 				}
 			} else {
-				PreviewOfSomeFeatureReducer<Feature>.View(
-					store: store
-				)
+				PreviewOfSomeFeatureReducer<Feature>.View(store: store)
 			}
 		}
 	}

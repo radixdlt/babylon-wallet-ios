@@ -65,7 +65,7 @@ extension ManageSomeFactorSource {
 //		ManageSomeFactorSource.View(
 //			store: .init(
 //				initialState: .previewValue,
-//				reducer: ManageSomeFactorSource()
+//				reducer: ManageSomeFactorSource.init
 //			)
 //		)
 //	}

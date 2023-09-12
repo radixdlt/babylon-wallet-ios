@@ -92,7 +92,7 @@ struct AddNewGateway_Preview: PreviewProvider {
 		AddNewGateway.View(
 			store: .init(
 				initialState: .previewValue,
-				reducer: AddNewGateway()
+				reducer: AddNewGateway.init
 			)
 		)
 	}

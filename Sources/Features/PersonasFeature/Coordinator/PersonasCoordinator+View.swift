@@ -63,7 +63,7 @@ struct PersonasCoordinator_Preview: PreviewProvider {
 		PersonasCoordinator.View(
 			store: .init(
 				initialState: .previewValue,
-				reducer: PersonasCoordinator()
+				reducer: PersonasCoordinator.init
 			)
 		)
 	}

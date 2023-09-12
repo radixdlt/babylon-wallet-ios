@@ -192,7 +192,7 @@ struct CompletionMigrateOlympiaAccountsToBabylon_Preview: PreviewProvider {
 		CompletionMigrateOlympiaAccountsToBabylon.View(
 			store: .init(
 				initialState: .previewValue,
-				reducer: { CompletionMigrateOlympiaAccountsToBabylon() }
+				reducer: CompletionMigrateOlympiaAccountsToBabylon.init
 			)
 		)
 	}

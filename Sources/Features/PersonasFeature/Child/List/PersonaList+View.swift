@@ -74,7 +74,7 @@ struct Personas_Preview: PreviewProvider {
 		PersonaList.View(
 			store: .init(
 				initialState: .previewValue,
-				reducer: PersonaList()
+				reducer: PersonaList.init
 			)
 		)
 	}

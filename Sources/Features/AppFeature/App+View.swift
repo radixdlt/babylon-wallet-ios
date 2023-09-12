@@ -95,13 +95,12 @@ import SwiftUI // NB: necessary for previews to appear
 struct AppView_Previews: PreviewProvider {
 	static var previews: some View {
 		App.View(
-			store: .init(
-				initialState: .init(),
-				reducer: App()
+			store: .init(initialState: .init()) {
+				App()
 					.dependency(\.localAuthenticationClient.queryConfig) {
 						.biometricsAndPasscodeSetUp
 					}
-			)
+			}
 		)
 	}
 }

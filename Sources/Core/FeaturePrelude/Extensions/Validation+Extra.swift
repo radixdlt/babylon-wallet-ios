@@ -94,7 +94,7 @@ struct TCAValidationPreview: PreviewProvider {
 		TCAValidation.View(
 			store: Store(
 				initialState: TCAValidation.State(),
-				reducer: TCAValidation()
+				reducer: TCAValidation.init
 			)
 		)
 	}

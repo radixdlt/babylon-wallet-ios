@@ -84,7 +84,7 @@ struct ImportOlympiaWalletCoordinator_Preview: PreviewProvider {
 		ImportOlympiaWalletCoordinator.View(
 			store: .init(
 				initialState: .previewValue,
-				reducer: ImportOlympiaWalletCoordinator()
+				reducer: ImportOlympiaWalletCoordinator.init
 			)
 		)
 	}

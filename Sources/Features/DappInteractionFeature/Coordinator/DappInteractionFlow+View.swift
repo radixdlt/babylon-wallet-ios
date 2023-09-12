@@ -119,13 +119,14 @@ struct DappInteraction_Preview: PreviewProvider {
 				initialState: .init(
 					dappMetadata: .previewValue,
 					interaction: .previewValueAllRequests()
-				)!,
-				reducer: DappInteractionFlow()
+				)!
+			) {
+				DappInteractionFlow()
 					.dependency(\.accountsClient, .previewValueTwoAccounts())
-//					.dependency(\.authorizedDappsClient, .previewValueOnePersona())
+					//  .dependency(\.authorizedDappsClient, .previewValueOnePersona())
 					.dependency(\.personasClient, .previewValueTwoPersonas(existing: true))
 					.dependency(\.personasClient, .previewValueTwoPersonas(existing: false))
-			)
+			}
 		)
 	}
 }

@@ -9,7 +9,7 @@ final class AccountDetailsFeatureTests: TestCase {
 			initialState: AccountDetails.State(
 				for: .previewValue0
 			),
-			reducer: AccountDetails()
+			reducer: AccountDetails.init
 		)
 
 		// when
@@ -27,7 +27,7 @@ final class AccountDetailsFeatureTests: TestCase {
 //			initialState: AccountDetails.State(
 //				for: AccountList.Row.State(account: account)
 //			),
-//			reducer: AccountDetails()
+//			reducer: AccountDetails.init
 //		)
 //
 //		// when
@@ -45,7 +45,7 @@ final class AccountDetailsFeatureTests: TestCase {
 //		let initialState = AccountDetails.State(for: accountListRowState)
 //		let store = TestStore(
 //			initialState: initialState,
-//			reducer: AccountDetails()
+//			reducer: AccountDetails.init
 //		)
 //
 //		// when

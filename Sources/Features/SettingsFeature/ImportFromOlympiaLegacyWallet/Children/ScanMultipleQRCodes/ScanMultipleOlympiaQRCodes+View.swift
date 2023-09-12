@@ -61,7 +61,7 @@ struct ScanMultipleOlympiaQRCodes_Preview: PreviewProvider {
 		ScanMultipleOlympiaQRCodes.View(
 			store: .init(
 				initialState: .previewValue,
-				reducer: ScanMultipleOlympiaQRCodes()
+				reducer: ScanMultipleOlympiaQRCodes.init
 			)
 		)
 	}

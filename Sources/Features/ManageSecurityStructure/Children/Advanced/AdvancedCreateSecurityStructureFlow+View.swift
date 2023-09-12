@@ -248,7 +248,7 @@ struct FactorsForRoleButton<R: RoleProtocol>: SwiftUI.View {
 //		AdvancedManageSecurityStructureFlow.View(
 //			store: .init(
 //				initialState: .previewValue,
-//				reducer: AdvancedManageSecurityStructureFlow()
+//				reducer: AdvancedManageSecurityStructureFlow.init
 //			)
 //		)
 //	}

@@ -52,7 +52,7 @@ extension RestoreProfileFromBackupCoordinator {
 //		RestoreProfileFromBackupCoordinator.View(
 //			store: .init(
 //				initialState: .previewValue,
-//				reducer: RestoreProfileFromBackupCoordinator()
+//				reducer: RestoreProfileFromBackupCoordinator.init
 //			)
 //		)
 //	}

@@ -43,7 +43,7 @@ struct GatewayList_Preview: PreviewProvider {
 		GatewayList.View(
 			store: .init(
 				initialState: .previewValue,
-				reducer: GatewayList()
+				reducer: GatewayList.init
 			)
 		)
 	}
