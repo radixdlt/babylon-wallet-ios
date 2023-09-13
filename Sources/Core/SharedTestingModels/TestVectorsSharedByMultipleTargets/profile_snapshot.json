@@ -29,7 +29,7 @@
     ],
     "security" : {
       "isCloudProfileSyncEnabled" : true,
-      "isDeveloperModeEnabled" : true,
+      "isDeveloperModeEnabled" : false,
       "structureConfigurationReferences" : [
 
       ]
