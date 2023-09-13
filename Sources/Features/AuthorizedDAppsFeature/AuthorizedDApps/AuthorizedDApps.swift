@@ -36,6 +36,7 @@ public struct AuthorizedDapps: Sendable, FeatureReducer {
 		case loadedDapps(TaskResult<Profile.Network.AuthorizedDapps>)
 		case loadedThumbnail(URL, dApp: Profile.Network.AuthorizedDapp.ID)
 		case presentDappDetails(DappDetails.State)
+		case failedToGetDetailsOfDapp(id: Profile.Network.AuthorizedDapp.ID)
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -56,17 +57,16 @@ public struct AuthorizedDapps: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .appeared:
-			return .task {
-				await loadAuthorizedDapps()
-			}
+			return loadAuthorizedDapps()
 
 		case let .didSelectDapp(dAppID):
 			return .run { send in
 				let details = try await authorizedDappsClient.getDetailedDapp(dAppID)
 				let presentedDappState = DappDetails.State(dApp: details)
 				await send(.internal(.presentDappDetails(presentedDappState)))
-			} catch: { error, _ in
+			} catch: { error, send in
 				errorQueue.schedule(error)
+				await send(.internal(.failedToGetDetailsOfDapp(id: dAppID)))
 			}
 		}
 	}
@@ -86,6 +86,19 @@ public struct AuthorizedDapps: Sendable, FeatureReducer {
 					}
 				}
 			}
+
+		case let .failedToGetDetailsOfDapp(dappId):
+			#if DEBUG
+			return .run { _ in
+				loggerGlobal.notice("DEBUG ONLY deleting authorized dapp since we failed to load detailed info about it")
+				try? await authorizedDappsClient.forgetAuthorizedDapp(dappId, nil)
+
+			}.concatenate(with: loadAuthorizedDapps())
+			#else
+			// FIXME: Should we have to handle this, this is a discrepancy bug..
+			return .none
+			#endif
+
 		case let .loadedDapps(.failure(error)):
 			errorQueue.schedule(error)
 			return .none
@@ -103,18 +116,19 @@ public struct AuthorizedDapps: Sendable, FeatureReducer {
 		case .presentedDapp(.presented(.delegate(.dAppForgotten))):
 			return .run { send in
 				await send(.child(.presentedDapp(.dismiss)))
-				await send(loadAuthorizedDapps())
-			}
+			}.concatenate(with: loadAuthorizedDapps())
 
 		case .presentedDapp:
 			return .none
 		}
 	}
 
-	private func loadAuthorizedDapps() async -> Action {
-		let result = await TaskResult {
-			try await authorizedDappsClient.getAuthorizedDapps()
+	private func loadAuthorizedDapps() -> EffectTask<Action> {
+		.run { send in
+			let result = await TaskResult {
+				try await authorizedDappsClient.getAuthorizedDapps()
+			}
+			await send(.internal(.loadedDapps(result)))
 		}
-		return .internal(.loadedDapps(result))
 	}
 }

@@ -5,12 +5,12 @@ import SharedModels
 
 // MARK: - DappInteractionClient
 public struct DappInteractionClient: Sendable {
-	public let interactions: AnyAsyncSequence<ValidatedDappRequest>
+	public let interactions: AnyAsyncSequence<Result<ValidatedDappRequest, Error>>
 	public let addWalletInteraction: AddWalletInteraction
 	public let completeInteraction: CompleteInteraction
 
 	public init(
-		interactions: AnyAsyncSequence<ValidatedDappRequest>,
+		interactions: AnyAsyncSequence<Result<ValidatedDappRequest, Error>>,
 		addWalletInteraction: @escaping AddWalletInteraction,
 		completeInteraction: @escaping CompleteInteraction
 	) {
@@ -55,18 +55,27 @@ extension DappInteractionClient {
 		}
 	}
 
-	public enum ValidatedDappRequest: Sendable, Hashable {
-		case valid(RequestEnvelope)
-		case invalid(Invalid)
+	public struct ValidatedDappRequest: Sendable, Hashable {
+		public let route: P2P.Route
+		public let request: Request
 
-		public enum Invalid: Sendable, Hashable {
+		public init(route: P2P.Route, request: Request) {
+			self.route = route
+			self.request = request
+		}
+
+		public enum Request: Sendable, Hashable {
+			case valid(P2P.Dapp.Request)
+			case invalid(request: P2P.Dapp.RequestUnvalidated, reason: InvalidRequestReason)
+		}
+
+		public enum InvalidRequestReason: Sendable, Hashable {
 			case incompatibleVersion(connectorExtensionSent: P2P.Dapp.Version, walletUses: P2P.Dapp.Version)
 			case wrongNetworkID(connectorExtensionSent: NetworkID, walletUses: NetworkID)
 			case invalidDappDefinitionAddress(gotStringWhichIsAnInvalidAccountAddress: String)
 			case invalidOrigin(invalidURLString: String)
 			case dAppValidationError
 			case badContent(BadContent)
-			case p2pError(String)
 			public enum BadContent: Sendable, Hashable {
 				case numberOfAccountsInvalid
 			}

@@ -62,7 +62,7 @@ public struct TransactionReviewGuarantees: Sendable, FeatureReducer {
 			}
 
 		case .closeTapped:
-			return .fireAndForget {
+			return .run { _ in
 				await dismiss()
 			}
 		}

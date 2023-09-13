@@ -159,7 +159,7 @@ public struct AnswerSecurityQuestionsCoordinator: Sendable, FeatureReducer {
 			)!
 			precondition(answers.count == state.questions.count)
 
-			return .task { [purpose = state.purpose] in
+			return .run { [purpose = state.purpose] send in
 				let taskResult = await TaskResult { () -> State.Purpose.AnswersResult in
 					switch purpose {
 					case let .decrypt(factorSource):
@@ -183,7 +183,7 @@ public struct AnswerSecurityQuestionsCoordinator: Sendable, FeatureReducer {
 						return .encrypted(securityQuestionsFactorSource)
 					}
 				}
-				return .delegate(.done(taskResult))
+				await send(.delegate(.done(taskResult)))
 			}
 		}
 	}

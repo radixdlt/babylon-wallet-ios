@@ -151,15 +151,15 @@ extension Profile.Network.AuthorizedDapp {
 		{
 			public typealias SharedCollection = Shared<PersonaDataEntryID>
 
-			public let name: PersonaDataEntryID?
-			public let dateOfBirth: PersonaDataEntryID?
-			public let companyName: PersonaDataEntryID?
+			public var name: PersonaDataEntryID?
+			public var dateOfBirth: PersonaDataEntryID?
+			public var companyName: PersonaDataEntryID?
 
-			public let emailAddresses: SharedCollection?
-			public let phoneNumbers: SharedCollection?
-			public let urls: SharedCollection?
-			public let postalAddresses: SharedCollection?
-			public let creditCards: SharedCollection?
+			public var emailAddresses: SharedCollection?
+			public var phoneNumbers: SharedCollection?
+			public var urls: SharedCollection?
+			public var postalAddresses: SharedCollection?
+			public var creditCards: SharedCollection?
 
 			public var entryIDs: Set<PersonaDataEntryID> {
 				var ids: [PersonaDataEntryID] = [
@@ -217,7 +217,7 @@ extension Profile.Network.AuthorizedDapp {
 		{
 			public typealias Number = RequestedNumber
 			public let request: Number
-			public private(set) var ids: OrderedSet<ID>
+			public var ids: OrderedSet<ID>
 
 			public init(
 				ids: OrderedSet<ID>,

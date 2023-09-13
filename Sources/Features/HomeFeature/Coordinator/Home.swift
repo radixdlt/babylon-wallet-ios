@@ -96,9 +96,7 @@ public struct Home: Sendable, FeatureReducer {
 		case .task:
 			return .run { send in
 				for try await accounts in await accountsClient.accountsOnCurrentNetwork() {
-					guard !Task.isCancelled else {
-						return
-					}
+					guard !Task.isCancelled else { return }
 					await send(.internal(.accountsLoadedResult(.success(accounts))))
 				}
 			} catch: { error, _ in

@@ -339,7 +339,6 @@ extension DisplayView {
 			#if os(macOS)
 				.font(.title)
 			#endif // os(macOS)
-			Labeled("Ledger Signing Display Mode", value: display.ledgerHQHardwareWalletSigningDisplayMode.rawValue)
 			Labeled("Currency", value: display.fiatCurrencyPriceTarget.rawValue)
 		}
 		.padding(.leading, leadingPadding)
@@ -400,7 +399,7 @@ extension P2PLinksView {
 public struct AuthorizedDappsView: IndentedView {
 	public let authorizedDapps: Profile.Network.AuthorizedDapps
 	public let indentation: Indentation
-	public let getDetailedAuthorizedDapp: (Profile.Network.AuthorizedDapp) -> Profile.Network.AuthorizedDappDetailed
+	public let getDetailedAuthorizedDapp: (Profile.Network.AuthorizedDapp) -> Profile.Network.AuthorizedDappDetailed?
 }
 
 extension AuthorizedDappsView {
@@ -418,7 +417,7 @@ extension AuthorizedDappsView {
 					AuthorizedDappView(
 						authorizedDapp: authorizedDapp,
 						indentation: inOneLevel,
-						authorizedPersonas: getDetailedAuthorizedDapp(authorizedDapp).detailedAuthorizedPersonas
+						authorizedPersonas: getDetailedAuthorizedDapp(authorizedDapp)?.detailedAuthorizedPersonas
 					)
 				}
 			}
@@ -431,7 +430,7 @@ extension AuthorizedDappsView {
 public struct AuthorizedDappView: IndentedView {
 	public let authorizedDapp: Profile.Network.AuthorizedDapp
 	public let indentation: Indentation
-	public let authorizedPersonas: IdentifiedArrayOf<Profile.Network.AuthorizedPersonaDetailed>
+	public let authorizedPersonas: IdentifiedArrayOf<Profile.Network.AuthorizedPersonaDetailed>?
 }
 
 extension AuthorizedDappView {
@@ -439,11 +438,16 @@ extension AuthorizedDappView {
 		VStack(alignment: .leading, spacing: indentation.spacing) {
 			Labeled("Name", value: String(describing: authorizedDapp.displayName))
 			Labeled("Dapp def address", value: String(describing: authorizedDapp.dAppDefinitionAddress))
-			ForEach(authorizedPersonas) {
-				DappAuthorizedPersonaView(
-					detailedAuthorizedPersona: $0,
-					indentation: inOneLevel
-				)
+
+			if let authorizedPersonas {
+				ForEach(authorizedPersonas) {
+					DappAuthorizedPersonaView(
+						detailedAuthorizedPersona: $0,
+						indentation: inOneLevel
+					)
+				}
+			} else {
+				Text("No authorized personas")
 			}
 		}
 		.padding(.leading, leadingPadding)
@@ -596,7 +600,7 @@ extension ProfileNetworkView {
 				authorizedDapps: network.authorizedDapps,
 				indentation: inOneLevel
 			) {
-				try! network.detailsForAuthorizedDapp($0)
+				try? network.detailsForAuthorizedDapp($0)
 			}
 		}
 		.padding(.leading, leadingPadding)

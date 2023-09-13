@@ -130,7 +130,7 @@ struct AccountPermissionChooseAccounts: Sendable, FeatureReducer {
 				dAppDefinitionAddress: state.dappMetadata.dAppDefinitionAddress
 			)
 
-			return .task {
+			return .run { send in
 				let dataToSign = try rolaClient.authenticationDataToSignForChallenge(createAuthPayloadRequest)
 				let networkID = await accountsClient.getCurrentNetworkID()
 				let signingFactors = try await factorSourcesClient.getSigningFactors(.init(
@@ -138,7 +138,7 @@ struct AccountPermissionChooseAccounts: Sendable, FeatureReducer {
 					signers: signers,
 					signingPurpose: .signAuth
 				))
-				return .internal(.proveAccountOwnership(signingFactors, dataToSign))
+				await send(.internal(.proveAccountOwnership(signingFactors, dataToSign)))
 			}
 		}
 	}

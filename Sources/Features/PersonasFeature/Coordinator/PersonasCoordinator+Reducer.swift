@@ -124,11 +124,11 @@ public struct PersonasCoordinator: Sendable, FeatureReducer {
 			return .none
 
 		case let .personaList(.delegate(.openDetails(persona))):
-			return .task {
+			return .run { send in
 				let dApps = try await authorizedDappsClient.getDappsAuthorizedByPersona(persona.id)
 					.map(PersonaDetails.State.DappInfo.init)
 				let personaDetailsState = PersonaDetails.State(.general(persona, dApps: .init(uniqueElements: dApps)))
-				return .internal(.loadedPersonaDetails(personaDetailsState))
+				await send(.internal(.loadedPersonaDetails(personaDetailsState)))
 			}
 
 		case .personaList:
@@ -154,10 +154,10 @@ public struct PersonasCoordinator: Sendable, FeatureReducer {
 
 extension PersonasCoordinator {
 	func checkIfFirstPersonaByUserEver() -> EffectTask<Action> {
-		.task {
+		.run { send in
 			let hasAnyPersonaOnAnyNetwork = await personasClient.hasAnyPersonaOnAnyNetwork()
 			let isFirstPersonaOnAnyNetwork = !hasAnyPersonaOnAnyNetwork
-			return .internal(.isFirstPersonaOnAnyNetwork(isFirstPersonaOnAnyNetwork))
+			await send(.internal(.isFirstPersonaOnAnyNetwork(isFirstPersonaOnAnyNetwork)))
 		}
 	}
 }

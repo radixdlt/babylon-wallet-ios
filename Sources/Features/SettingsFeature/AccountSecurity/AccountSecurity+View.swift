@@ -2,86 +2,52 @@ import AuthorizedDAppsFeature
 import FeaturePrelude
 import LedgerHardwareDevicesFeature
 
-extension AccountSecurity.State {
-	var viewState: AccountSecurity.ViewState {
-		.init(
-			hasLedgerHardwareWalletFactorSources: hasLedgerHardwareWalletFactorSources,
-			useVerboseLedgerDisplayMode: (preferences?.display.ledgerHQHardwareWalletSigningDisplayMode ?? .default) == .verbose
-		)
-	}
-}
-
 // MARK: - AccountSecurity.View
 extension AccountSecurity {
-	public struct ViewState: Equatable {
-		let hasLedgerHardwareWalletFactorSources: Bool
-		/// only to be displayed if `hasLedgerHardwareWalletFactorSources` is true
-		let useVerboseLedgerDisplayMode: Bool
-	}
-
 	@MainActor
 	public struct View: SwiftUI.View {
 		private let store: Store
+		private let destinationStore: PresentationStoreOf<Destinations>
 
 		public init(store: Store) {
 			self.store = store
+			self.destinationStore = store.scope(state: \.$destination, action: { .child(.destination($0)) })
 		}
 	}
 }
 
 extension AccountSecurity.View {
 	public var body: some View {
-		WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-			let destinationStore = store.scope(state: \.$destination, action: { .child(.destination($0)) })
-			ScrollView {
-				VStack(spacing: .zero) {
-					ForEach(rows) { row in
-						SettingsRow(row: row) {
-							viewStore.send(row.action)
-						}
-					}
-
-					if viewStore.hasLedgerHardwareWalletFactorSources {
-						isUsingVerboseLedgerMode(with: viewStore)
-							.padding(.horizontal, .medium3)
-							.withSeparator
-					}
-
-					let row = importOlympiaRow
+		ScrollView {
+			VStack(spacing: .zero) {
+				ForEach(rows) { row in
 					SettingsRow(row: row) {
-						viewStore.send(row.action)
+						store.send(.view(row.action))
 					}
 				}
-			}
-			.onAppear {
-				viewStore.send(.appeared)
-			}
-			.navigationTitle("Account Security") // FIXME: Strings - L10n.Settings.AccountSecurity.title
-			#if os(iOS)
-				.navigationBarTitleColor(.app.gray1)
-				.navigationBarTitleDisplayMode(.inline)
-				.navigationBarInlineTitleFont(.app.secondaryHeader)
-			#endif
-				.mnemonics(with: destinationStore)
-				.ledgerHardwareWallets(with: destinationStore)
-				.depositGuarantees(with: destinationStore)
-				.importFromOlympiaLegacyWallet(with: destinationStore)
-				.tint(.app.gray1)
-				.foregroundColor(.app.gray1)
-		}
-		.presentsLoadingViewOverlay()
-	}
 
-	private func isUsingVerboseLedgerMode(with viewStore: ViewStoreOf<AccountSecurity>) -> some SwiftUI.View {
-		ToggleView(
-			icon: AssetResource.ledger, // FIXME: icon?
-			title: "Verbose Ledger Signing", // FIXME: STrings - wait for update to L10n.AppSettings.VerboseLedgerMode.title,
-			subtitle: L10n.AppSettings.VerboseLedgerMode.subtitle,
-			isOn: viewStore.binding(
-				get: \.useVerboseLedgerDisplayMode,
-				send: { .useVerboseModeToggled($0) }
-			)
-		)
+				let row = importOlympiaRow
+				SettingsRow(row: row) {
+					store.send(.view(row.action))
+				}
+			}
+		}
+		.onAppear {
+			store.send(.view(.appeared))
+		}
+		.navigationTitle("Account Security") // FIXME: Strings - L10n.Settings.AccountSecurity.title
+		#if os(iOS)
+			.navigationBarTitleColor(.app.gray1)
+			.navigationBarTitleDisplayMode(.inline)
+			.navigationBarInlineTitleFont(.app.secondaryHeader)
+		#endif
+			.mnemonics(with: destinationStore)
+			.ledgerHardwareWallets(with: destinationStore)
+			.depositGuarantees(with: destinationStore)
+			.importFromOlympiaLegacyWallet(with: destinationStore)
+			.tint(.app.gray1)
+			.foregroundColor(.app.gray1)
+			.presentsLoadingViewOverlay()
 	}
 
 	@MainActor

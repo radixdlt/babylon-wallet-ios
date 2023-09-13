@@ -45,12 +45,12 @@ public struct DisplayMnemonic: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .onFirstTask:
-			return .task { [deviceFactorSource = state.deviceFactorSource] in
+			return .run { [deviceFactorSource = state.deviceFactorSource] send in
 				let factorSourceID = deviceFactorSource.id
 				let result = await TaskResult {
 					try await secureStorageClient.loadMnemonicByFactorSourceID(factorSourceID.embed(), .displaySeedPhrase)
 				}
-				return .internal(.loadMnemonicResult(result))
+				await send(.internal(.loadMnemonicResult(result)))
 			}
 		}
 	}

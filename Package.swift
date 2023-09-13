@@ -778,6 +778,7 @@ package.addModules([
 		name: "PersonasClientLive",
 		dependencies: [
 			"PersonasClient",
+			"AuthorizedDappsClient", // Need to update persisted shared persona data if a persona data entry is deleted, so we do not have broken references.
 			"ProfileStore",
 		],
 		tests: .yes()

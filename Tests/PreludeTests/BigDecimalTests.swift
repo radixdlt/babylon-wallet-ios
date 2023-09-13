@@ -215,4 +215,45 @@ final class BigDecimalTests: TestCase {
 		try doTest("0.99999999999999999", expected: "$1")
 		try doTest("0.00000000000000001", expected: "$0")
 	}
+
+	func test_format_bigdecimal_with_divisibility() throws {
+		func doTest(_ bigDecimalString: String, divisibility: Int, expected: String, line: UInt = #line) throws {
+			let locale = Locale(identifier: "en_US_POSIX")
+			let bigDecimal = try BigDecimal(fromString: bigDecimalString)
+			XCTAssertEqual(bigDecimal.format(divisibility: divisibility, locale: locale), expected, line: line)
+		}
+
+		/// Big divisibility does not affect the basic result
+		try doTest("57896044618658097711785492504343953926634992332820282019728", divisibility: 18, expected: "57896044618658097711785492504343953926634992332820282019728")
+		try doTest("57896044618658097711785492504343953926634992332820282019728.0", divisibility: 18, expected: "57896044618658097711785492504343953926634992332820282019728")
+
+		try doTest(
+			"57896044618658097711785492504343953926634992332820282019728.792003956564819968",
+			divisibility: 18,
+			expected: "57896044618658097711785492504343953926634992332820282019728.8"
+		) // rounded `0.79` -> `0.80`
+		try doTest("1000000000.1", divisibility: 18, expected: "1000000000.1")
+		try doTest("1000000000", divisibility: 18, expected: "1000000000")
+		try doTest("1000.1234", divisibility: 18, expected: "1000.1234")
+		try doTest("1000.5", divisibility: 18, expected: "1000.5")
+		try doTest("0.1234567", divisibility: 18, expected: "0.1234567")
+		try doTest("0.4321", divisibility: 18, expected: "0.4321")
+		try doTest("0.99999999999999999", divisibility: 18, expected: "1")
+		try doTest("0.00000000000000001", divisibility: 18, expected: "0")
+		try doTest("0", divisibility: 18, expected: "0")
+		try doTest("1", divisibility: 18, expected: "1")
+		try doTest("0.0", divisibility: 18, expected: "0")
+		try doTest("1.0", divisibility: 18, expected: "1")
+
+		/// Zero divisibility.
+		/// Specifying decimal places for a resource with divisibility zero is actually invalid. No transaction will succeed with such value
+		try doTest("0.99999999999999999", divisibility: 0, expected: "0")
+		try doTest("1.99999999999999999", divisibility: 0, expected: "1")
+		/// Minimal divisibility
+		try doTest("1.99999999999999999", divisibility: 1, expected: "1.9")
+		/// Divisibility < Max formatted digits
+		try doTest("1.12345678", divisibility: 4, expected: "1.1234")
+		/// Max formatted digits
+		try doTest("1.12345678", divisibility: 8, expected: "1.1234568")
+	}
 }

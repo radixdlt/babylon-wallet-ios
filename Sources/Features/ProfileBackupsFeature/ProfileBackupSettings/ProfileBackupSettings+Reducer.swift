@@ -284,17 +284,17 @@ public struct ProfileBackupSettings: Sendable, FeatureReducer {
 		if isEnabled {
 			state.destination = .cloudSyncTakesLongTimeAlert
 		}
-		return .fireAndForget {
+		return .run { _ in
 			try await appPreferencesClient.setIsCloudProfileSyncEnabled(isEnabled)
 		}
 	}
 
 	private func deleteProfile(keepInICloudIfPresent: Bool) -> EffectTask<Action> {
-		.task {
+		.run { send in
 			cacheClient.removeAll()
 			await radixConnectClient.disconnectAndRemoveAll()
 			await userDefaultsClient.removeAll()
-			return .delegate(.deleteProfileAndFactorSources(keepInICloudIfPresent: keepInICloudIfPresent))
+			await send(.delegate(.deleteProfileAndFactorSources(keepInICloudIfPresent: keepInICloudIfPresent)))
 		}
 	}
 }

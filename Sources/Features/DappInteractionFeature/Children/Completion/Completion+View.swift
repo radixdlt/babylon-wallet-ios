@@ -9,7 +9,7 @@ extension DappMetadata {
 		case .request:
 			return L10n.DAppRequest.Metadata.unknownName
 		case .wallet:
-			return "Radix Wallet"
+			return "Radix Wallet" // FIXME: Strings
 		}
 	}
 }
@@ -23,9 +23,9 @@ extension Completion {
 		let subtitle: String
 
 		init(state: Completion.State) {
-			txID = state.txID
-			title = L10n.DAppRequest.Completion.title
-			subtitle = L10n.DAppRequest.Completion.subtitle(state.dappMetadata.name)
+			self.txID = state.txID
+			self.title = L10n.DAppRequest.Completion.title
+			self.subtitle = L10n.DAppRequest.Completion.subtitle(state.dappMetadata.name)
 		}
 	}
 

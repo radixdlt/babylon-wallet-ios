@@ -13,13 +13,13 @@ extension EditPersonaField {
 		#endif
 
 		init(state: State) {
-			self.primaryHeading = state.showsName ? state.id.title : ""
+			self.primaryHeading = state.showsTitle ? state.behaviour.title : ""
 			self._input = state.$input
 			self.inputHint = (state.$input.errors?.first).map { .error($0) }
 			#if os(iOS)
-			self.capitalization = state.id.capitalization
-			self.keyboardType = state.id.keyboardType
-			self.contentType = state.id.contentType
+			self.capitalization = state.behaviour.capitalization
+			self.keyboardType = state.behaviour.keyboardType
+			self.contentType = state.behaviour.contentType
 			#endif
 		}
 	}

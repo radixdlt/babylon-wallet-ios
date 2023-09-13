@@ -34,6 +34,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		public var networkFee: TransactionReviewNetworkFee.State? = nil
 		public let ephemeralNotaryPrivateKey: Curve25519.Signing.PrivateKey
 		public var canApproveTX: Bool = true
+		var sliderResetDate: Date = .now
 
 		@PresentationState
 		public var destination: Destinations.State? = nil
@@ -41,7 +42,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		public func printFeePayerInfo(line: UInt = #line, function: StaticString = #function) {
 			#if DEBUG
 			func doPrint(_ msg: String) {
-				loggerGlobal.critical("💃 \(function)#\(line) - \(msg)")
+				loggerGlobal.info("\(function)#\(line) - \(msg)")
 			}
 			let intentSignersNonEmpty = reviewedTransaction?.transactionSigners.intentSignerEntitiesNonEmptyOrNil()
 			let feePayer = reviewedTransaction?.feePayerSelection.selected?.account
@@ -63,6 +64,10 @@ public struct TransactionReview: Sendable, FeatureReducer {
 				assertionFailure("Should not happen")
 			}
 			#endif
+		}
+
+		public mutating func resetSlider() {
+			sliderResetDate = .now
 		}
 
 		public init(
@@ -267,10 +272,10 @@ public struct TransactionReview: Sendable, FeatureReducer {
 				printSigners(reviewedTransaction)
 				#endif
 
-				return .task {
-					await .internal(.buildTransactionItentResult(TaskResult {
+				return .run { send in
+					await send(.internal(.buildTransactionItentResult(TaskResult {
 						try await transactionClient.buildTransactionIntent(request)
-					}))
+					})))
 				}
 			} catch {
 				errorQueue.schedule(error)
@@ -314,7 +319,11 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			guard let reviewedTransaction = state.reviewedTransaction else {
 				return .none
 			}
-			state.destination = .customizeFees(.init(reviewedTransaction: reviewedTransaction, manifest: state.transactionManifest, signingPurpose: .signTransaction(state.signTransactionPurpose)))
+			state.destination = .customizeFees(.init(
+				reviewedTransaction: reviewedTransaction,
+				manifest: state.transactionManifest,
+				signingPurpose: .signTransaction(state.signTransactionPurpose)
+			))
 			return .none
 
 		case let .destination(.presented(presentedAction)):
@@ -322,7 +331,8 @@ public struct TransactionReview: Sendable, FeatureReducer {
 
 		case .destination(.dismiss):
 			if case .signing = state.destination {
-				return cancelSigningEffect(state: &state)
+				loggerGlobal.notice("Cancelled signing")
+				return resetToApprovable(&state)
 			} else if case .submitting = state.destination {
 				// This is used when tapping outside the Submitting sheet, no need to set destination to nil
 				return delayedEffect(for: .delegate(.userDismissedTransactionStatus))
@@ -357,20 +367,18 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			return .none
 
 		case .signing(.delegate(.cancelSigning)):
-			state.destination = nil
-			return cancelSigningEffect(state: &state)
+			loggerGlobal.notice("Cancelled signing")
+			return resetToApprovable(&state)
 
 		case .signing(.delegate(.failedToSign)):
 			loggerGlobal.error("Failed sign tx")
-			state.destination = nil
-			state.canApproveTX = true
-			return .none
+			return resetToApprovable(&state)
 
 		case let .signing(.delegate(.finishedSigning(.signTransaction(notarizedTX, origin: _)))):
 			state.destination = .submitting(.init(notarizedTX: notarizedTX, dismissalDisabled: state.waitsForTransactionToBeComitted))
 			return .none
 
-		case .signing(.delegate(.finishedSigning(.signAuth(_)))):
+		case .signing(.delegate(.finishedSigning(.signAuth))):
 			state.canApproveTX = true
 			assertionFailure("Did not expect to have sign auth data...")
 			return .none
@@ -382,10 +390,8 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			return .send(.delegate(.signedTXAndSubmittedToGateway(txID)))
 
 		case .submitting(.delegate(.failedToSubmit)):
-			state.destination = nil
-			state.canApproveTX = true
 			loggerGlobal.error("Failed to submit tx")
-			return .none
+			return resetToApprovable(&state)
 
 		case .submitting(.delegate(.failedToReceiveStatusUpdate)):
 			state.destination = nil
@@ -619,15 +625,16 @@ extension TransactionReview {
 		delay: Duration = .seconds(0.3),
 		for action: Action
 	) -> EffectTask<Action> {
-		.task {
+		.run { send in
 			try await clock.sleep(for: delay)
-			return action
+			await send(action)
 		}
 	}
 
-	func cancelSigningEffect(state: inout State) -> EffectTask<Action> {
-		loggerGlobal.notice("Cancelled signing")
+	func resetToApprovable(_ state: inout State) -> EffectTask<Action> {
+		state.destination = nil
 		state.canApproveTX = true
+		state.resetSlider()
 		return .none
 	}
 }
@@ -1274,7 +1281,7 @@ public struct SimpleDappDetails: Sendable, FeatureReducer {
 		case .appeared:
 			state.$metadata = .loading
 			state.$resources = .loading
-			return .task { [dAppID = state.dAppID] in
+			return .run { [dAppID = state.dAppID] send in
 				let result = await TaskResult {
 					try await cacheClient.withCaching(
 						cacheEntry: .dAppMetadata(dAppID.address),
@@ -1283,11 +1290,11 @@ public struct SimpleDappDetails: Sendable, FeatureReducer {
 						}
 					)
 				}
-				return .internal(.metadataLoaded(.init(result: result)))
+				await send(.internal(.metadataLoaded(.init(result: result))))
 			}
 
 		case let .openURLTapped(url):
-			return .fireAndForget {
+			return .run { _ in
 				await openURL(url)
 			}
 		}

@@ -267,7 +267,7 @@ private extension PersonaDetails.State {
 			return .init(
 				dAppInfo: dAppInfo,
 				personaName: persona.displayName.rawValue,
-				personaData: nil
+				personaData: persona.sharedPersonaData
 			)
 		case let .general(persona, _):
 			return .init(
@@ -284,15 +284,6 @@ private extension PersonaDetails.State {
 			name: dApp.displayName?.rawValue ?? L10n.DAppRequest.Metadata.unknownName,
 			isSharingNothing: persona.sharedPersonaData.entries.isEmpty
 		)
-	}
-}
-
-private extension PersonaDetails.View.InfoSection.ViewState {
-	init(
-		dAppInfo: DappInfo?,
-		personaName: String
-	) {
-		fatalError()
 	}
 }
 
@@ -324,11 +315,12 @@ extension PersonaDetails.View {
 			) {
 				self.dAppInfo = dAppInfo
 				self.personaName = personaName
-				self.dateOfBirth = personaData?.dateOfBirth?.value.date
-				self.companyName = personaData?.companyName?.value.name
 				self.fullName = personaData?.name?.value.formatted
 				self.emailAddresses = personaData?.emailAddresses.map(\.value.email)
 				self.phoneNumbers = personaData?.phoneNumbers.map(\.value.number)
+
+				self.dateOfBirth = personaData?.dateOfBirth?.value.date
+				self.companyName = personaData?.companyName?.value.name
 				self.urls = personaData?.urls.map(\.value.url)
 				self.postalAddresses = personaData?.postalAddresses.map(\.value)
 				self.creditCards = personaData?.creditCards.map(\.value)

@@ -236,11 +236,11 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 			scannedAccounts: scanned
 		))
 
-		return .task {
+		return .run { send in
 			let alreadyImported = await importLegacyWalletClient.findAlreadyImportedIfAny(scanned)
 			let networkID = await factorSourcesClient.getCurrentNetworkID()
 			let existingAccounts = await (try? accountsClient.getAccountsOnNetwork(networkID).count) ?? 0
-			return .internal(.foundAlreadyImportedOlympiaSoftwareAccounts(networkID, alreadyImported, existingAccounts: existingAccounts))
+			await send(.internal(.foundAlreadyImportedOlympiaSoftwareAccounts(networkID, alreadyImported, existingAccounts: existingAccounts)))
 		}
 	}
 
@@ -313,9 +313,9 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 		wordCount: BIP39.WordCount,
 		_ softwareAccounts: AccountsToMigrate
 	) -> EffectTask<Action> {
-		.task {
+		.run { send in
 			let idOfExistingFactorSource = await factorSourcesClient.checkIfHasOlympiaFactorSourceForAccounts(wordCount, softwareAccounts)
-			return .internal(.checkedIfOlympiaFactorSourceAlreadyExists(idOfExistingFactorSource, softwareAccounts: softwareAccounts))
+			await send(.internal(.checkedIfOlympiaFactorSourceAlreadyExists(idOfExistingFactorSource, softwareAccounts: softwareAccounts)))
 		}
 	}
 
