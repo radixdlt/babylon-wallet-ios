@@ -143,7 +143,7 @@ public struct ManageTrustedContactFactorSource: Sendable, FeatureReducer {
 			return .none
 
 		case let .continueButtonTapped(accountAddress, emailAddress, name):
-			return .task {
+			return .run { send in
 				let result = await TaskResult {
 					let factorSource = TrustedContactFactorSource.from(
 						radixAddress: accountAddress,
@@ -153,7 +153,7 @@ public struct ManageTrustedContactFactorSource: Sendable, FeatureReducer {
 					try await factorSourcesClient.saveFactorSource(factorSource.embed())
 					return factorSource
 				}
-				return .delegate(.saveFactorSourceResult(result))
+				await send(.delegate(.saveFactorSourceResult(result)))
 			}
 		}
 	}

@@ -156,7 +156,7 @@ public struct EditPersona: Sendable, FeatureReducer {
 		switch viewAction {
 		case .closeButtonTapped:
 			guard state.hasChanges() else {
-				return .fireAndForget {
+				return .run { _ in
 					await dismiss()
 				}
 			}
@@ -201,7 +201,7 @@ public struct EditPersona: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
 		case .destination(.presented(.closeConfirmationDialog(.discardChanges))):
-			return .fireAndForget { await dismiss() }
+			return .run { _ in await dismiss() }
 
 		case let .destination(.presented(.addFields(.delegate(.addEntryKinds(fieldsToAdd))))):
 			for kind in fieldsToAdd {

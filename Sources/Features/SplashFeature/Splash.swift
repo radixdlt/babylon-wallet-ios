@@ -63,8 +63,8 @@ public struct Splash: Sendable, FeatureReducer {
 
 		case .didTapToUnlock:
 			state.biometricsCheckFailed = false
-			return .task {
-				await .internal(.loadProfileOutcome(loadProfile()))
+			return .run { send in
+				await send(.internal(.loadProfileOutcome(loadProfile())))
 			}
 
 		case let .passcodeCheckFailedAlert(.presented(action)):
@@ -111,8 +111,8 @@ public struct Splash: Sendable, FeatureReducer {
 				return .none
 			}
 
-			return .task {
-				await .internal(.loadProfileOutcome(loadProfile()))
+			return .run { send in
+				await send(.internal(.loadProfileOutcome(loadProfile())))
 			}
 
 		case let .loadProfileOutcome(outcome):
@@ -144,13 +144,13 @@ public struct Splash: Sendable, FeatureReducer {
 	}
 
 	func checkAccountRecoveryNeeded(_ loadProfileOutcome: LoadProfileOutcome) -> EffectTask<Action> {
-		.task {
-			await .internal(.accountRecoveryNeeded(
+		.run { send in
+			await send(.internal(.accountRecoveryNeeded(
 				loadProfileOutcome,
 				.init {
 					try await deviceFactorSourceClient.isAccountRecoveryNeeded()
 				}
-			))
+			)))
 		}
 	}
 

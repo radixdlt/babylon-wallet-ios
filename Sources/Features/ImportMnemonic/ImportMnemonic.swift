@@ -315,15 +315,15 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			}
 			precondition(persistStrategy.mnemonicForFactorSourceKind == .offDevice)
 
-			return .task {
-				await .internal(.saveFactorSourceResult(
+			return .run { send in
+				await send(.internal(.saveFactorSourceResult(
 					TaskResult {
 						try await factorSourcesClient.addOffDeviceFactorSource(
 							mnemonicWithPassphrase: mnemonicWithPassphrase,
 							label: label
 						)
 					}
-				))
+				)))
 			}
 
 		case let .destination(.presented(.markMnemonicAsBackedUp(.userHaveBackedUp(factorSourceID)))):
@@ -382,20 +382,20 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 					return .none
 
 				case let .onDevice(onDeviceKind):
-					return .task {
-						await .internal(.saveFactorSourceResult(
+					return .run { send in
+						await send(.internal(.saveFactorSourceResult(
 							TaskResult {
 								try await factorSourcesClient.addOnDeviceFactorSource(
 									onDeviceMnemonicKind: onDeviceKind,
 									mnemonicWithPassphrase: mnemonicWithPassphrase
 								)
 							}
-						))
+						)))
 					}
 				}
 			case .intoKeychainOnly:
-				return .task {
-					await .internal(.saveFactorSourceResult(
+				return .run { send in
+					await send(.internal(.saveFactorSourceResult(
 						TaskResult {
 							try await factorSourcesClient.addOnDeviceFactorSource(
 								onDeviceMnemonicKind: .babylon,
@@ -403,7 +403,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 								saveIntoProfile: false
 							)
 						}
-					))
+					)))
 				}
 			}
 
