@@ -21,30 +21,36 @@ extension AssetsView {
 						if viewStore.isLoadingResources {
 							ProgressView()
 								.padding(.small1)
-						}
-
-						switch viewStore.activeAssetKind {
-						case .fungible:
-							FungibleAssetList.View(
-								store: store.scope(
-									state: \.fungibleTokenList,
-									action: { .child(.fungibleTokenList($0)) }
+						} else {
+							switch viewStore.activeAssetKind {
+							case .fungible:
+								IfLetStore(
+									store.scope(
+										state: \.fungibleTokenList,
+										action: { .child(.fungibleTokenList($0)) }
+									),
+									then: { FungibleAssetList.View(store: $0) },
+									else: { EmptyAssetListView.fungibleResources }
 								)
-							)
-						case .nonFungible:
-							NonFungibleAssetList.View(
-								store: store.scope(
-									state: \.nonFungibleTokenList,
-									action: { .child(.nonFungibleTokenList($0)) }
+							case .nonFungible:
+								IfLetStore(
+									store.scope(
+										state: \.nonFungibleTokenList,
+										action: { .child(.nonFungibleTokenList($0)) }
+									),
+									then: { NonFungibleAssetList.View(store: $0) },
+									else: { EmptyAssetListView.nonFungibleResources }
 								)
-							)
-						case .poolUnits:
-							PoolUnitsList.View(
-								store: store.scope(
-									state: \.poolUnitsList,
-									action: { .child(.poolUnitsList($0)) }
+							case .poolUnits:
+								IfLetStore(
+									store.scope(
+										state: \.poolUnitsList,
+										action: { .child(.poolUnitsList($0)) }
+									),
+									then: { PoolUnitsList.View(store: $0) },
+									else: { EmptyAssetListView.poolUnits }
 								)
-							)
+							}
 						}
 					}
 					.padding(.bottom, .medium1)
