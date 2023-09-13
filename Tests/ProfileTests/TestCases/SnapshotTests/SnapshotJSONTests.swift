@@ -88,7 +88,7 @@ public struct SnapshotTestVector: Codable, Equatable {
 // MARK: - SnapshotJSONTests
 final class SnapshotJSONTests: TestCase {
 	func test_generate() throws {
-		let jsonDecoder = JSONDecoder()
+		let jsonDecoder = JSONDecoder.iso8601
 		let plaintextSnapshot = try jsonDecoder.decode(ProfileSnapshot.self, from: plaintext.data(using: .utf8)!)
 
 		let vector = try SnapshotTestVector.encrypting(
