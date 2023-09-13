@@ -35,7 +35,7 @@ extension NonFungibleAssetList {
 
 		public init() {}
 
-		public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+		public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 			switch viewAction {
 			case let .assetTapped(localID):
 				guard !state.disabled.contains(localID) else { return .none }

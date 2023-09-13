@@ -45,7 +45,7 @@ public struct ScanQR: Sendable, FeatureReducer {
 
 	public init() {}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		#if os(macOS) || (os(iOS) && targetEnvironment(simulator))
 		case let .macInputQRContentChanged(manualQRContent):

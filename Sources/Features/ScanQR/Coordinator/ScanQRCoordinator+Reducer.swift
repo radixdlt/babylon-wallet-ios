@@ -40,7 +40,7 @@ public struct ScanQRCoordinator: Sendable, FeatureReducer {
 	@Dependency(\.continuousClock) var clock
 	public init() {}
 
-	public var body: some ReducerProtocolOf<Self> {
+	public var body: some ReducerOf<Self> {
 		Scope(state: \.step, action: /.self) {
 			Scope(state: /State.Step.cameraPermission, action: /Action.child .. ChildAction.cameraPermission) {
 				CameraPermission()
@@ -53,7 +53,7 @@ public struct ScanQRCoordinator: Sendable, FeatureReducer {
 		Reduce(core)
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case .proceedWithScan:
 			state.step = .scanQR(.init(scanInstructions: state.scanInstructions))
@@ -61,7 +61,7 @@ public struct ScanQRCoordinator: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case let .cameraPermission(.delegate(.permissionResponse(allowed))):
 			if allowed {

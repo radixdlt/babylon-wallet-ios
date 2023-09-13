@@ -30,7 +30,7 @@ public struct DebugUserDefaultsContents: Sendable, FeatureReducer {
 	@Dependency(\.userDefaultsClient) var userDefaultsClient
 	public init() {}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .appeared:
 			loadKeyValues(into: &state)
@@ -44,7 +44,7 @@ public struct DebugUserDefaultsContents: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case .removedAll:
 			loadKeyValues(into: &state)

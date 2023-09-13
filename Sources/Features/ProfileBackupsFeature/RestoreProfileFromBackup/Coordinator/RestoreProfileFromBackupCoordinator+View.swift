@@ -27,13 +27,13 @@ extension RestoreProfileFromBackupCoordinator {
 				switch state {
 				case .selectBackup:
 					CaseLet(
-						state: /RestoreProfileFromBackupCoordinator.Path.State.selectBackup,
+						/RestoreProfileFromBackupCoordinator.Path.State.selectBackup,
 						action: RestoreProfileFromBackupCoordinator.Path.Action.selectBackup,
 						then: { SelectBackup.View(store: $0) }
 					)
 				case .importMnemonicsFlow:
 					CaseLet(
-						state: /RestoreProfileFromBackupCoordinator.Path.State.importMnemonicsFlow,
+						/RestoreProfileFromBackupCoordinator.Path.State.importMnemonicsFlow,
 						action: RestoreProfileFromBackupCoordinator.Path.Action.importMnemonicsFlow,
 						then: { ImportMnemonicsFlowCoordinator.View(store: $0) }
 					)
@@ -52,7 +52,7 @@ extension RestoreProfileFromBackupCoordinator {
 //		RestoreProfileFromBackupCoordinator.View(
 //			store: .init(
 //				initialState: .previewValue,
-//				reducer: RestoreProfileFromBackupCoordinator()
+//				reducer: RestoreProfileFromBackupCoordinator.init
 //			)
 //		)
 //	}

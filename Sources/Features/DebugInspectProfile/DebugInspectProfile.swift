@@ -35,7 +35,7 @@ public struct DebugInspectProfile: Sendable, FeatureReducer {
 	@Dependency(\.pasteboardClient) var pasteboardClient
 	public init() {}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .toggleModeButtonTapped:
 			state.mode.toggle()

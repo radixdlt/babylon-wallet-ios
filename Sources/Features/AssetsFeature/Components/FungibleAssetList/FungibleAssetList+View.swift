@@ -61,7 +61,7 @@ struct FungibleTokenList_Preview: PreviewProvider {
 		FungibleAssetList.View(
 			store: .init(
 				initialState: .init(),
-				reducer: FungibleAssetList()
+				reducer: FungibleAssetList.init
 			)
 		)
 	}

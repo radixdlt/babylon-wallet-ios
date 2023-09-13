@@ -28,7 +28,7 @@ public struct DisplayMnemonics: Sendable, FeatureReducer {
 		case destination(PresentationAction<Destinations.Action>)
 	}
 
-	public struct Destinations: Sendable, Equatable, ReducerProtocol {
+	public struct Destinations: Sendable, Equatable, Reducer {
 		public enum State: Sendable, Hashable {
 			case displayMnemonic(DisplayMnemonic.State)
 		}
@@ -39,7 +39,7 @@ public struct DisplayMnemonics: Sendable, FeatureReducer {
 
 		public init() {}
 
-		public var body: some ReducerProtocolOf<Self> {
+		public var body: some ReducerOf<Self> {
 			Scope(state: /State.displayMnemonic, action: /Action.displayMnemonic) {
 				DisplayMnemonic()
 			}
@@ -51,7 +51,7 @@ public struct DisplayMnemonics: Sendable, FeatureReducer {
 
 	public init() {}
 
-	public var body: some ReducerProtocolOf<Self> {
+	public var body: some ReducerOf<Self> {
 		Reduce(core)
 			.forEach(\.deviceFactorSources, action: /Action.child .. ChildAction.row) {
 				DisplayEntitiesControlledByMnemonic()
@@ -61,7 +61,7 @@ public struct DisplayMnemonics: Sendable, FeatureReducer {
 			}
 	}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .onFirstTask:
 			return .run { send in
@@ -72,7 +72,7 @@ public struct DisplayMnemonics: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .loadedFactorSources(.success(entitiesForDeviceFactorSources)):
 			state.deviceFactorSources = .init(
@@ -92,7 +92,7 @@ public struct DisplayMnemonics: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case let .row(id, action: .delegate(.openDetails)):
 			guard let deviceFactorSource = state.deviceFactorSources[id: id]?.deviceFactorSource else {

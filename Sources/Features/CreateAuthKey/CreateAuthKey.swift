@@ -34,7 +34,7 @@ public struct GetAuthKeyDerivationPath: Sendable, FeatureReducer {
 				Color.white
 			}
 			.onFirstTask { @MainActor in
-				ViewStore(store.stateless).send(.view(.onFirstTask))
+				store.send(.view(.onFirstTask))
 			}
 		}
 	}
@@ -42,7 +42,7 @@ public struct GetAuthKeyDerivationPath: Sendable, FeatureReducer {
 	@Dependency(\.factorSourcesClient) var factorSourcesClient
 
 	public init() {}
-	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .onFirstTask:
 
@@ -137,7 +137,7 @@ public struct CreateAuthKey: Sendable, FeatureReducer {
 
 	public init() {}
 
-	public var body: some ReducerProtocolOf<Self> {
+	public var body: some ReducerOf<Self> {
 		Scope(state: \.step, action: /.self) {
 			Scope(
 				state: /State.Step.getAuthKeyDerivationPath,
@@ -162,7 +162,7 @@ public struct CreateAuthKey: Sendable, FeatureReducer {
 		Reduce(core)
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .createdManifestForAuthKeyCreation(manifest, authenticationSigningFactorInstance):
 			state.step = .transactionReview(.init(
@@ -179,7 +179,7 @@ public struct CreateAuthKey: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case .getAuthKeyDerivationPath(.delegate(.failedToFindFactorSource)):
 			return .send(.delegate(.done(success: false)))

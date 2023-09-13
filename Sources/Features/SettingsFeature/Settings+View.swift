@@ -281,7 +281,7 @@ struct SettingsView_Previews: PreviewProvider {
 		Settings.View(
 			store: .init(
 				initialState: .init(showMigrateOlympiaButton: true),
-				reducer: Settings()
+				reducer: Settings.init
 			)
 		)
 	}

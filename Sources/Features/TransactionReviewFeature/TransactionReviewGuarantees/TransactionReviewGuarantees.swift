@@ -36,7 +36,7 @@ public struct TransactionReviewGuarantees: Sendable, FeatureReducer {
 
 	public init() {}
 
-	public var body: some ReducerProtocolOf<TransactionReviewGuarantees> {
+	public var body: some ReducerOf<TransactionReviewGuarantees> {
 		Reduce(core)
 			.forEach(\.guarantees, action: /Action.child .. /ChildAction.guarantee) {
 				TransactionReviewGuarantee()
@@ -46,7 +46,7 @@ public struct TransactionReviewGuarantees: Sendable, FeatureReducer {
 			}
 	}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .infoTapped:
 			// FIXME: For mainnet
@@ -103,14 +103,14 @@ public struct TransactionReviewGuarantee: Sendable, FeatureReducer {
 
 	public init() {}
 
-	public var body: some ReducerProtocolOf<Self> {
+	public var body: some ReducerOf<Self> {
 		Scope(state: \.percentageStepper, action: /Action.child .. /ChildAction.percentageStepper) {
 			MinimumPercentageStepper()
 		}
 		Reduce(core)
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case .percentageStepper(.delegate(.valueChanged)):
 			guard let value = state.percentageStepper.value else {

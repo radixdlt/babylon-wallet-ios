@@ -60,7 +60,7 @@ struct P2PLinkRow_Preview: PreviewProvider {
 				initialState: .init(link:
 					.init(connectionPassword: .placeholder, displayName: "Test")
 				),
-				reducer: P2PLinkRow()
+				reducer: P2PLinkRow.init
 			)
 		)
 	}

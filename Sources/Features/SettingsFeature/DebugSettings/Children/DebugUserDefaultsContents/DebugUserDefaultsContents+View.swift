@@ -75,7 +75,7 @@ struct DebugUserDefaultsContents_Preview: PreviewProvider {
 		DebugUserDefaultsContents.View(
 			store: .init(
 				initialState: .previewValue,
-				reducer: DebugUserDefaultsContents()
+				reducer: DebugUserDefaultsContents.init
 			)
 		)
 	}

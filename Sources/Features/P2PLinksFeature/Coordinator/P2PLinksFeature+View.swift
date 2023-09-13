@@ -62,7 +62,7 @@ extension P2PLinksFeature {
 				}
 				.navigationTitle(L10n.LinkedConnectors.title)
 				.task { @MainActor in
-					await ViewStore(store.stateless).send(.view(.task)).finish()
+					await store.send(.view(.task)).finish()
 				}
 				.sheet(
 					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
@@ -89,7 +89,7 @@ struct P2PLinksFeature_Preview: PreviewProvider {
 			P2PLinksFeature.View(
 				store: .init(
 					initialState: .previewValue,
-					reducer: P2PLinksFeature()
+					reducer: P2PLinksFeature.init
 				)
 			)
 			#if os(iOS)

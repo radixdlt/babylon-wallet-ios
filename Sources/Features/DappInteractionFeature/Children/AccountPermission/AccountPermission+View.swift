@@ -84,7 +84,7 @@ struct AccountPermission_Preview: PreviewProvider {
 			AccountPermission.View(
 				store: .init(
 					initialState: .previewValue,
-					reducer: AccountPermission()
+					reducer: AccountPermission.init
 				)
 			)
 			#if os(iOS)

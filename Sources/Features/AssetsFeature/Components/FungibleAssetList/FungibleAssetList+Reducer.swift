@@ -27,7 +27,7 @@ public struct FungibleAssetList: Sendable, FeatureReducer {
 		case nonXRDRow(FungibleAssetList.Row.State.ID, FungibleAssetList.Row.Action)
 	}
 
-	public struct Destinations: Sendable, ReducerProtocol {
+	public struct Destinations: Sendable, Reducer {
 		public enum State: Sendable, Hashable {
 			case details(FungibleTokenDetails.State)
 		}
@@ -36,7 +36,7 @@ public struct FungibleAssetList: Sendable, FeatureReducer {
 			case details(FungibleTokenDetails.Action)
 		}
 
-		public var body: some ReducerProtocolOf<Self> {
+		public var body: some ReducerOf<Self> {
 			Scope(state: /State.details, action: /Action.details) {
 				FungibleTokenDetails()
 			}
@@ -45,7 +45,7 @@ public struct FungibleAssetList: Sendable, FeatureReducer {
 
 	public init() {}
 
-	public var body: some ReducerProtocolOf<Self> {
+	public var body: some ReducerOf<Self> {
 		Reduce(core)
 			.ifLet(\.xrdToken, action: /Action.child .. ChildAction.xrdRow) {
 				FungibleAssetList.Row()
@@ -58,7 +58,7 @@ public struct FungibleAssetList: Sendable, FeatureReducer {
 			}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case .destination(.presented(.details(.delegate(.dismiss)))):
 			state.destination = nil

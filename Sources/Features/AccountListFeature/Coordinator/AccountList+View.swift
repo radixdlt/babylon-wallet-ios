@@ -32,7 +32,7 @@ struct AccountList_Preview: PreviewProvider {
 		AccountList.View(
 			store: .init(
 				initialState: .previewValue,
-				reducer: AccountList()
+				reducer: AccountList.init
 			)
 		)
 	}

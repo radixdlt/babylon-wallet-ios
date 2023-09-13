@@ -27,7 +27,7 @@ public struct SecurityStructureConfigurationListCoordinator: Sendable, FeatureRe
 
 	// MARK: - Destination
 
-	public struct Destination: ReducerProtocol {
+	public struct Destination: Reducer {
 		public enum State: Equatable, Hashable {
 			case manageSecurityStructureCoordinator(ManageSecurityStructureCoordinator.State)
 		}
@@ -36,7 +36,7 @@ public struct SecurityStructureConfigurationListCoordinator: Sendable, FeatureRe
 			case manageSecurityStructureCoordinator(ManageSecurityStructureCoordinator.Action)
 		}
 
-		public var body: some ReducerProtocolOf<Self> {
+		public var body: some ReducerOf<Self> {
 			Scope(
 				state: /State.manageSecurityStructureCoordinator,
 				action: /Action.manageSecurityStructureCoordinator
@@ -53,7 +53,7 @@ public struct SecurityStructureConfigurationListCoordinator: Sendable, FeatureRe
 
 	public init() {}
 
-	public var body: some ReducerProtocolOf<Self> {
+	public var body: some ReducerOf<Self> {
 		Scope(state: \.configList, action: /Action.child .. ChildAction.configList) {
 			SecurityStructureConfigurationList()
 		}
@@ -63,7 +63,7 @@ public struct SecurityStructureConfigurationListCoordinator: Sendable, FeatureRe
 			}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .loadDetailsForSecurityStructureResult(.success(config)):
 			state.destination = .manageSecurityStructureCoordinator(.init(mode: .existing(config)))
@@ -75,7 +75,7 @@ public struct SecurityStructureConfigurationListCoordinator: Sendable, FeatureRe
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case .configList(.delegate(.createNewStructure)):
 			state.destination = .manageSecurityStructureCoordinator(.init())

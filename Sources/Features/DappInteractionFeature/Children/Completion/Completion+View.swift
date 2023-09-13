@@ -86,7 +86,7 @@ struct Completion_Preview: PreviewProvider {
 				Completion.View(
 					store: .init(
 						initialState: .previewValue,
-						reducer: Completion()
+						reducer: Completion.init
 					)
 				)
 			}

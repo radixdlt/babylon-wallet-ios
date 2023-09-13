@@ -29,21 +29,21 @@ public struct TransactionReviewAccounts: Sendable, FeatureReducer {
 
 	public init() {}
 
-	public var body: some ReducerProtocolOf<Self> {
+	public var body: some ReducerOf<Self> {
 		Reduce(core)
 			.forEach(\.accounts, action: /Action.child .. ChildAction.account) {
 				TransactionReviewAccount()
 			}
 	}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .customizeGuaranteesTapped:
 			return .send(.delegate(.showCustomizeGuarantees))
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case .account(id: _, action: .delegate(.showAsset(let transfer))):
 			return .send(.delegate(.showAsset(transfer)))
@@ -77,7 +77,7 @@ public struct TransactionReviewAccount: Sendable, FeatureReducer {
 
 	public init() {}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .appeared:
 			return .none

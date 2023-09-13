@@ -26,7 +26,7 @@ struct PersonaDataPermissionBox: Sendable, FeatureReducer {
 		case edit
 	}
 
-	func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .editButtonTapped:
 			return .send(.delegate(.edit))

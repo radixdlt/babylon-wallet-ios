@@ -92,7 +92,7 @@ public struct FactorSourcesOfKindList<FactorSourceOfKind: Sendable & Hashable>: 
 
 	// MARK: - Destination
 
-	public struct Destinations: Sendable, ReducerProtocol {
+	public struct Destinations: Sendable, Reducer {
 		public enum State: Sendable, Hashable {
 			case addNewFactorSource(ManageSomeFactorSource<FactorSourceOfKind>.State)
 			case existingFactorSourceWillBeDeletedConfirmationDialog(ConfirmationDialogState<DeleteExistingFactorSourceConfirmationDialogAction>)
@@ -105,7 +105,7 @@ public struct FactorSourcesOfKindList<FactorSourceOfKind: Sendable & Hashable>: 
 
 		public init() {}
 
-		public var body: some ReducerProtocolOf<Self> {
+		public var body: some ReducerOf<Self> {
 			Scope(state: /State.addNewFactorSource, action: /Action.addNewFactorSource) {
 				ManageSomeFactorSource<FactorSourceOfKind>()
 			}
@@ -119,14 +119,14 @@ public struct FactorSourcesOfKindList<FactorSourceOfKind: Sendable & Hashable>: 
 
 	public init() {}
 
-	public var body: some ReducerProtocolOf<Self> {
+	public var body: some ReducerOf<Self> {
 		Reduce(core)
 			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
 				Destinations()
 			}
 	}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .onFirstTask:
 			return updateFactorSourcesEffect(state: &state)
@@ -156,7 +156,7 @@ public struct FactorSourcesOfKindList<FactorSourceOfKind: Sendable & Hashable>: 
 		}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .loadedFactorSources(.success(loadedFactors)):
 			if let existing = state.factorSources.first {
@@ -173,7 +173,7 @@ public struct FactorSourcesOfKindList<FactorSourceOfKind: Sendable & Hashable>: 
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case let .destination(.presented(.addNewFactorSource(.delegate(newFactorSourceAction)))):
 			switch newFactorSourceAction {
@@ -213,7 +213,7 @@ public struct FactorSourcesOfKindList<FactorSourceOfKind: Sendable & Hashable>: 
 		}
 	}
 
-	private func updateFactorSourcesEffect(state: inout State) -> EffectTask<Action> {
+	private func updateFactorSourcesEffect(state: inout State) -> Effect<Action> {
 		.run { [selectedID = state.selectedFactorSourceID, kind = state.kind] send in
 			let result = await TaskResult {
 				let all = try await factorSourcesClient.getFactorSources(matching: {

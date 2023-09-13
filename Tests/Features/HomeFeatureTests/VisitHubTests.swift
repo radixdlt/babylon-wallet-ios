@@ -6,7 +6,7 @@ final class VisitHubTests: TestCase {
 	func testVisitHubButtonTapped() async {
 		let store = TestStore(
 			initialState: VisitHub.State(),
-			reducer: VisitHub()
+			reducer: VisitHub.init
 		)
 
 		await store.send(.view(.visitHubButtonTapped))

@@ -143,7 +143,7 @@ struct ScanQR_Preview: PreviewProvider {
 		ScanQR.View(
 			store: .init(
 				initialState: .previewValue,
-				reducer: ScanQR()
+				reducer: ScanQR.init
 			)
 		)
 	}

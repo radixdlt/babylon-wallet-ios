@@ -22,7 +22,7 @@ public final class SceneDelegate: NSObject, UIWindowSceneDelegate, ObservableObj
 		let overlayView = OverlayReducer.View(
 			store: .init(
 				initialState: .init(),
-				reducer: OverlayReducer()
+				reducer: OverlayReducer.init
 			))
 
 		let overlayWindow = UIWindow(windowScene: scene)

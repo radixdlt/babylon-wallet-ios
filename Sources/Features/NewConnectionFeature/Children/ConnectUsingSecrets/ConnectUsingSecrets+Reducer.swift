@@ -47,10 +47,12 @@ public struct ConnectUsingSecrets: Sendable, FeatureReducer {
 
 	public init() {}
 
-	private enum FocusFieldID {}
-	private enum ConnectID {}
+	private enum CancellableID: Hashable {
+		case focusField
+		case connect
+	}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .appeared:
 			return .send(.view(.textFieldFocused(.connectionName)))
@@ -66,7 +68,7 @@ public struct ConnectUsingSecrets: Sendable, FeatureReducer {
 					loggerGlobal.error("failed to sleep or task cancelled, error: \(String(describing: error))")
 				}
 			}
-			.cancellable(id: FocusFieldID.self)
+			.cancellable(id: CancellableID.focusField)
 
 		case let .nameOfConnectionChanged(connectionName):
 			state.nameOfConnection = connectionName.trimmingNewlines()
@@ -77,16 +79,17 @@ public struct ConnectUsingSecrets: Sendable, FeatureReducer {
 			state.isConnecting = true
 			return .run { send in
 				await send(.internal(.establishConnectionResult(
-					TaskResult(catching: {
+					TaskResult {
 						try await radixConnectClient.addP2PWithPassword(connectionPassword)
 						return connectionPassword
-					})
+					}
 				)))
-			}.cancellable(id: ConnectID.self)
+			}
+			.cancellable(id: CancellableID.connect)
 		}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case .establishConnectionResult(.success):
 			state.isConnecting = false
@@ -106,7 +109,10 @@ public struct ConnectUsingSecrets: Sendable, FeatureReducer {
 			return .none
 
 		case .cancelOngoingEffects:
-			return .cancel(ids: [FocusFieldID.self, ConnectID.self])
+			return .merge(
+				.cancel(id: CancellableID.connect),
+				.cancel(id: CancellableID.focusField)
+			)
 		}
 	}
 }

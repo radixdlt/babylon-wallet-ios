@@ -46,7 +46,7 @@ extension ScanMultipleOlympiaQRCodes {
 				Spacer(minLength: 0)
 			}
 			.onAppear {
-				ViewStore(store).send(.view(.appeared))
+				store.send(.view(.appeared))
 			}
 		}
 	}
@@ -61,7 +61,7 @@ struct ScanMultipleOlympiaQRCodes_Preview: PreviewProvider {
 		ScanMultipleOlympiaQRCodes.View(
 			store: .init(
 				initialState: .previewValue,
-				reducer: ScanMultipleOlympiaQRCodes()
+				reducer: ScanMultipleOlympiaQRCodes.init
 			)
 		)
 	}

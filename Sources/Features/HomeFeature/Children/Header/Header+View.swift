@@ -50,7 +50,7 @@ struct Header_Preview: PreviewProvider {
 				Header.View(
 					store: .init(
 						initialState: .previewValue,
-						reducer: Header()
+						reducer: Header.init
 					)
 				)
 			}

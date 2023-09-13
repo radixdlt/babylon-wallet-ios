@@ -118,7 +118,7 @@ extension OneTimePersonaData {
 //			OneTimePersonaData.View(
 //				store: Store(
 //					initialState: .previewValue,
-//					reducer: OneTimePersonaData()
+//					reducer: OneTimePersonaData.init
 //				) {
 //					$0.personasClient.getPersonas = { @Sendable in
 //						[.previewValue0, .previewValue1]

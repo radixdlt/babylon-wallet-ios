@@ -94,13 +94,13 @@ struct TCAValidationPreview: PreviewProvider {
 		TCAValidation.View(
 			store: Store(
 				initialState: TCAValidation.State(),
-				reducer: TCAValidation()
+				reducer: TCAValidation.init
 			)
 		)
 	}
 }
 
-struct TCAValidation: ReducerProtocol {
+struct TCAValidation: Reducer {
 	struct State: Hashable {
 		@Validation<String, String>(
 			onNil: "Cannot be nil",
@@ -116,7 +116,7 @@ struct TCAValidation: ReducerProtocol {
 		case nameTextFieldChanged(String)
 	}
 
-	func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
+	func reduce(into state: inout State, action: Action) -> Effect<Action> {
 		switch action {
 		case let .nameTextFieldChanged(name):
 			state.name = name

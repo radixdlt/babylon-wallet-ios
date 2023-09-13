@@ -146,7 +146,7 @@ private enum Constants {
 //					entity: .previewValue0,
 //					config: .init(purpose: .newAccountFromHome)
 //				),
-//				reducer: NewEntityCompletion()
+//				reducer: NewEntityCompletion.init
 //			)
 //		)
 //	}

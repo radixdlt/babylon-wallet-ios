@@ -34,7 +34,7 @@ public struct ManageSecurityStructureCoordinator: Sendable, FeatureReducer {
 		}
 	}
 
-	public struct Path: Sendable, Hashable, ReducerProtocol {
+	public struct Path: Sendable, Hashable, Reducer {
 		public enum State: Sendable, Hashable {
 			case start(ManageSecurityStructureStart.State)
 			case simpleSetupFlow(SimpleManageSecurityStructureFlow.State)
@@ -54,7 +54,7 @@ public struct ManageSecurityStructureCoordinator: Sendable, FeatureReducer {
 			case nameStructure(NameSecurityStructure.Action)
 		}
 
-		public var body: some ReducerProtocolOf<Self> {
+		public var body: some ReducerOf<Self> {
 			Scope(state: /State.start, action: /Action.start) {
 				ManageSecurityStructureStart()
 			}
@@ -83,7 +83,7 @@ public struct ManageSecurityStructureCoordinator: Sendable, FeatureReducer {
 	@Dependency(\.appPreferencesClient) var appPreferencesClient
 	public init() {}
 
-	public var body: some ReducerProtocolOf<Self> {
+	public var body: some ReducerOf<Self> {
 		Scope(state: \.root, action: /Action.child .. ChildAction.root) {
 			Path()
 		}
@@ -94,7 +94,7 @@ public struct ManageSecurityStructureCoordinator: Sendable, FeatureReducer {
 			}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case .root(.start(.delegate(.simpleFlow))):
 			state.path.append(.simpleSetupFlow(.init()))
@@ -138,7 +138,7 @@ public struct ManageSecurityStructureCoordinator: Sendable, FeatureReducer {
 		}
 	}
 
-	func updatedOrCreatedSecurityStructure(result: TaskResult<SecurityStructureProduct>, _ state: inout State) -> EffectTask<Action> {
+	func updatedOrCreatedSecurityStructure(result: TaskResult<SecurityStructureProduct>, _ state: inout State) -> Effect<Action> {
 		switch result {
 		case let .success(product):
 			switch product {

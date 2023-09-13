@@ -34,7 +34,7 @@ extension CreatePersonaCoordinator {
 								if viewStore.shouldDisplayNavBar {
 									ToolbarItem(placement: .navigationBarLeading) {
 										CloseButton {
-											ViewStore(store.stateless).send(.view(.closeButtonTapped))
+											store.send(.view(.closeButtonTapped))
 										}
 									}
 								}
@@ -61,28 +61,28 @@ extension CreatePersonaCoordinator {
 					switch state {
 					case .step0_introduction:
 						CaseLet(
-							state: /CreatePersonaCoordinator.Destinations.State.step0_introduction,
+							/CreatePersonaCoordinator.Destinations.State.step0_introduction,
 							action: CreatePersonaCoordinator.Destinations.Action.step0_introduction,
 							then: { IntroductionToPersonas.View(store: $0) }
 						)
 
 					case .step1_newPersonaInfo:
 						CaseLet(
-							state: /CreatePersonaCoordinator.Destinations.State.step1_newPersonaInfo,
+							/CreatePersonaCoordinator.Destinations.State.step1_newPersonaInfo,
 							action: CreatePersonaCoordinator.Destinations.Action.step1_newPersonaInfo,
 							then: { NewPersonaInfo.View(store: $0) }
 						)
 
 					case .step2_creationOfPersona:
 						CaseLet(
-							state: /CreatePersonaCoordinator.Destinations.State.step2_creationOfPersona,
+							/CreatePersonaCoordinator.Destinations.State.step2_creationOfPersona,
 							action: CreatePersonaCoordinator.Destinations.Action.step2_creationOfPersona,
 							then: { CreationOfPersona.View(store: $0) }
 						)
 
 					case .step3_completion:
 						CaseLet(
-							state: /CreatePersonaCoordinator.Destinations.State.step3_completion,
+							/CreatePersonaCoordinator.Destinations.State.step3_completion,
 							action: CreatePersonaCoordinator.Destinations.Action.step3_completion,
 							then: { NewPersonaCompletion.View(store: $0) }
 						)

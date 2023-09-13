@@ -11,12 +11,13 @@ struct WalletApp: SwiftUI.App {
 		WindowGroup {
 			App.View(
 				store: Store(
-					initialState: App.State(),
-					reducer: App()
+					initialState: App.State()
+				) {
+					App()
 					#if targetEnvironment(simulator)
 						.dependency(\.localAuthenticationClient.queryConfig) { .biometricsAndPasscodeSetUp }
 					#endif
-				)
+				}
 			)
 			#if os(macOS)
 			.frame(minWidth: 1020, maxWidth: .infinity, minHeight: 512, maxHeight: .infinity)

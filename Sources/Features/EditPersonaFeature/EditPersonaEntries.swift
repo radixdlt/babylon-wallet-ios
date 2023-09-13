@@ -57,7 +57,7 @@ public struct EditPersonaEntries: Sendable, FeatureReducer {
 		case phoneNumber(EditPersonaEntry<EditPersonaDynamicField>.Action)
 	}
 
-	public var body: some ReducerProtocolOf<Self> {
+	public var body: some ReducerOf<Self> {
 		Reduce(core)
 			.ifLet(\.name, action: /Action.child .. ChildAction.name) {
 				EditPersonaEntry<EditPersonaName>()
@@ -70,7 +70,7 @@ public struct EditPersonaEntries: Sendable, FeatureReducer {
 			}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case .name(.delegate(.delete)):
 			state.name = nil
