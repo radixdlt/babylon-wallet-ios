@@ -208,45 +208,48 @@ extension AssetsView.State {
 	/// Computed property of currently selected assets
 	public var selectedAssets: Mode.SelectedAssets? {
 		guard case .selection = mode else { return nil }
-		return nil
-//
-//		let lsuTokens = poolUnitsList?.lsuResource?.stakes
-//			.compactMap(SelectedResourceProvider.init)
-//			.compactMap(\.selectedResource) ?? []
-//		let poolUnitTokens = poolUnitsList?.poolUnits
-//			.map(SelectedResourceProvider.init)
-//			.compactMap(\.selectedResource)
-//		let fungibleResources = AccountPortfolio.FungibleResources(
-//			xrdResource: fungibleTokenList.xrdToken
-//				.map(SelectedResourceProvider.init)
-//				.flatMap(\.selectedResource),
-//			nonXrdResources: fungibleTokenList.nonXrdTokens
-//				.map(SelectedResourceProvider.init)
-//				.compactMap(\.selectedResource)
-//				+ lsuTokens
-//				+ poolUnitTokens
-//		)
-//
-//		let stakeClaimNonFungibleResources = (poolUnitsList?.lsuResource?.stakes)
-//			.map { $0.compactMap(NonFungibleTokensPerResourceProvider.init) } ?? []
-//		let nonFungibleResources = (
-//			nonFungibleTokenList?.rows.compactMap(NonFungibleTokensPerResourceProvider.init)
-//				+ stakeClaimNonFungibleResources
-//		).compactMap(\.nonFungibleTokensPerResource)
-//
-//		guard
-//			fungibleResources.xrdResource != nil
-//			|| !fungibleResources.nonXrdResources.isEmpty
-//			|| !nonFungibleResources.isEmpty
-//		else {
-//			return nil
-//		}
-//
-//		return .init(
-//			fungibleResources: fungibleResources,
-//			nonFungibleResources: IdentifiedArrayOf(uniqueElements: nonFungibleResources),
-//			disabledNFTs: mode.selectedAssets?.disabledNFTs ?? []
-//		)
+
+		let selectedLsuTokens = poolUnitsList?.lsuResource?.stakes
+			.compactMap(SelectedResourceProvider.init)
+			.compactMap(\.selectedResource) ?? []
+		let selectedPoolUnitTokens = poolUnitsList?.poolUnits
+			.map(SelectedResourceProvider.init)
+			.compactMap(\.selectedResource) ?? []
+
+		let selectedXRDResource = fungibleTokenList?.xrdToken
+			.map(SelectedResourceProvider.init)
+			.flatMap(\.selectedResource)
+
+		let selectedNonXrdResources = fungibleTokenList?.nonXrdTokens
+			.map(SelectedResourceProvider.init)
+			.compactMap(\.selectedResource) ?? []
+
+		let selectedStakeClaimNonFungibleResources = (poolUnitsList?.lsuResource?.stakes)
+			.map { $0.compactMap(NonFungibleTokensPerResourceProvider.init) } ?? []
+		let selectedNonFungibleResources = nonFungibleTokenList?.rows.compactMap(NonFungibleTokensPerResourceProvider.init) ?? []
+
+		let selectedFungibleResources = AccountPortfolio.FungibleResources(
+			xrdResource: selectedXRDResource,
+			nonXrdResources: selectedNonXrdResources + selectedLsuTokens + selectedPoolUnitTokens
+		)
+
+		let selectedNonFungibleTokensPerResource = (
+			selectedNonFungibleResources + selectedStakeClaimNonFungibleResources
+		).compactMap(\.nonFungibleTokensPerResource)
+
+		guard
+			selectedFungibleResources.xrdResource != nil
+			|| !selectedFungibleResources.nonXrdResources.isEmpty
+			|| !selectedNonFungibleTokensPerResource.isEmpty
+		else {
+			return nil
+		}
+
+		return .init(
+			fungibleResources: selectedFungibleResources,
+			nonFungibleResources: IdentifiedArrayOf(uniqueElements: selectedNonFungibleTokensPerResource),
+			disabledNFTs: mode.selectedAssets?.disabledNFTs ?? []
+		)
 	}
 
 	public var chooseButtonTitle: String {
