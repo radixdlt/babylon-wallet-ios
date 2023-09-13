@@ -1,4 +1,3 @@
-import AuthorizedDAppsFeature
 import FeaturePrelude
 import LedgerHardwareDevicesFeature
 import TransactionReviewFeature

@@ -117,17 +117,6 @@ package.addModules([
 		tests: .no
 	),
 	.feature(
-		name: "AuthorizedDAppsFeature",
-		dependencies: [
-			"AuthorizedDappsClient",
-			"CacheClient",
-			"EditPersonaFeature",
-			"PersonasFeature",
-			"GatewayAPI",
-		],
-		tests: .no
-	),
-	.feature(
 		name: "ChooseAccountsFeature",
 		featureSuffixDroppedFromFolderName: true,
 		dependencies: [
@@ -342,25 +331,6 @@ package.addModules([
 		tests: .yes()
 	),
 	.feature(
-		name: "PersonasFeature",
-		dependencies: [
-			"PersonaDetailsFeature",
-			"CreatePersonaFeature",
-			"PersonasClient",
-		],
-		tests: .yes()
-	),
-	.feature(
-		name: "PersonaDetailsFeature",
-		dependencies: [
-			"AuthorizedDappsClient",
-			"EditPersonaFeature",
-			"CreateAuthKeyFeature",
-			"GatewayAPI",
-		],
-		tests: .no
-	),
-	.feature(
 		name: "ProfileBackupsFeature",
 		dependencies: [
 			"AppPreferencesClient",
@@ -404,8 +374,10 @@ package.addModules([
 			"AccountsClient",
 			"AddLedgerFactorSourceFeature",
 			"AppPreferencesClient",
-			"AuthorizedDAppsFeature",
+			"AuthorizedDappsClient",
 			"CacheClient",
+			"CreateAuthKeyFeature",
+			"CreatePersonaFeature",
 			"DebugInspectProfileFeature",
 			"DeviceFactorSourceClient",
 			"DisplayEntitiesControlledByMnemonicFeature",
@@ -419,7 +391,7 @@ package.addModules([
 			"ImportOlympiaLedgerAccountsAndFactorSourcesFeature",
 			"ImportLegacyWalletClient",
 			"P2PLinksFeature",
-			"PersonasFeature",
+			"PersonasClient",
 			"RadixConnectClient",
 			"ProfileBackupsFeature",
 			"ScanQRFeature",

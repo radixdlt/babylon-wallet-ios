@@ -1,6 +1,6 @@
 import EditPersonaFeature
 import FeaturesPreviewerFeature
-import PersonaDetailsFeature
+import SettingsFeature
 import SwiftUI
 
 // MARK: - PersonaDetailsPreviewApp

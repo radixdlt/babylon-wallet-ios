@@ -3,8 +3,6 @@ import CacheClient
 import EngineKit
 import FeaturePrelude
 import GatewayAPI
-import PersonaDetailsFeature
-import PersonasFeature
 
 // MARK: - DappDetails
 public struct DappDetails: Sendable, FeatureReducer {
@@ -342,7 +340,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 }
 
 extension GatewayAPI.StateEntityDetailsResponseItem {
-	var resourceDetails: DappDetails.State.Resources.ResourceDetails? {
+	fileprivate var resourceDetails: DappDetails.State.Resources.ResourceDetails? {
 		guard let fungibility else { return nil }
 		return try? .init(address: .init(validatingAddress: address),
 		                  fungibility: fungibility,

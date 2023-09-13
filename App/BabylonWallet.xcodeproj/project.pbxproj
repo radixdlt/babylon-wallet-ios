@@ -31,6 +31,7 @@
 		838EDEB62A4D6C68005902C4 /* OverlayWindowClientLive in Frameworks */ = {isa = PBXBuildFile; productRef = 838EDEB52A4D6C68005902C4 /* OverlayWindowClientLive */; };
 		83B9D894294CAEBA00C4582D /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 83B9D897294CAEBA00C4582D /* InfoPlist.strings */; };
 		83B9D895294CAEBA00C4582D /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 83B9D897294CAEBA00C4582D /* InfoPlist.strings */; };
+		A42CA7222AB1F6C1006AF264 /* SettingsFeature in Frameworks */ = {isa = PBXBuildFile; productRef = A42CA7212AB1F6C1006AF264 /* SettingsFeature */; };
 		A43E8A3D2A1658B000642E44 /* QRGeneratorClientLive in Frameworks */ = {isa = PBXBuildFile; productRef = A43E8A3C2A1658B000642E44 /* QRGeneratorClientLive */; };
 		A45AB03129FD96530097F5E1 /* URLFormatterClientLive in Frameworks */ = {isa = PBXBuildFile; productRef = A45AB03029FD96530097F5E1 /* URLFormatterClientLive */; };
 		A4DD048329FABBC20052FCB0 /* URLFormatterClientLive in Frameworks */ = {isa = PBXBuildFile; productRef = A4DD048229FABBC20052FCB0 /* URLFormatterClientLive */; };
@@ -42,7 +43,6 @@
 		AEEB60242A5EA5CB0045F153 /* PersonaDetailsPreviewApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEEB60232A5EA5CB0045F153 /* PersonaDetailsPreviewApp.swift */; };
 		AEEB60282A5EA5CC0045F153 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AEEB60272A5EA5CC0045F153 /* Assets.xcassets */; };
 		AEEB602C2A5EA5CC0045F153 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AEEB602B2A5EA5CC0045F153 /* Preview Assets.xcassets */; };
-		AEEB60342A5EA5E40045F153 /* PersonaDetailsFeature in Frameworks */ = {isa = PBXBuildFile; productRef = AEEB60332A5EA5E40045F153 /* PersonaDetailsFeature */; };
 		AEEB60362A5EA6430045F153 /* FeaturesPreviewerFeature in Frameworks */ = {isa = PBXBuildFile; productRef = AEEB60352A5EA6430045F153 /* FeaturesPreviewerFeature */; };
 		AEF35A712A7C111800D14583 /* URLFormatterClientLive in Frameworks */ = {isa = PBXBuildFile; productRef = AEF35A702A7C111800D14583 /* URLFormatterClientLive */; };
 		D5B1769F29267C1F00AAE13B /* AppIcon.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D5B1769E29267C1F00AAE13B /* AppIcon.xcassets */; };
@@ -185,8 +185,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A42CA7222AB1F6C1006AF264 /* SettingsFeature in Frameworks */,
 				AEEB60362A5EA6430045F153 /* FeaturesPreviewerFeature in Frameworks */,
-				AEEB60342A5EA5E40045F153 /* PersonaDetailsFeature in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -592,8 +592,8 @@
 			);
 			name = PersonaDetailsPreview;
 			packageProductDependencies = (
-				AEEB60332A5EA5E40045F153 /* PersonaDetailsFeature */,
 				AEEB60352A5EA6430045F153 /* FeaturesPreviewerFeature */,
+				A42CA7212AB1F6C1006AF264 /* SettingsFeature */,
 			);
 			productName = PersonaDetailsPreview;
 			productReference = AEEB60212A5EA5CB0045F153 /* PersonaDetailsPreview.app */;
@@ -4795,6 +4795,10 @@
 			isa = XCSwiftPackageProductDependency;
 			productName = OverlayWindowClientLive;
 		};
+		A42CA7212AB1F6C1006AF264 /* SettingsFeature */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = SettingsFeature;
+		};
 		A43E8A3A2A1658A800642E44 /* QRGeneratorClientLive */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = QRGeneratorClientLive;
@@ -4822,10 +4826,6 @@
 		AE68BE322A77F10E006024B8 /* AssetsFeature */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = AssetsFeature;
-		};
-		AEEB60332A5EA5E40045F153 /* PersonaDetailsFeature */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = PersonaDetailsFeature;
 		};
 		AEEB60352A5EA6430045F153 /* FeaturesPreviewerFeature */ = {
 			isa = XCSwiftPackageProductDependency;
