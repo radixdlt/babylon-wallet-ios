@@ -1,5 +1,5 @@
 import FeatureTestingPrelude
-@testable import PersonasFeature
+@testable import SettingsFeature
 
 @MainActor
 final class PersonasFeatureTests: TestCase {}

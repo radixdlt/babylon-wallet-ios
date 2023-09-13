@@ -1,11 +1,9 @@
 import AppPreferencesClient
-import AuthorizedDAppsFeature
 import FeaturePrelude
 import GatewayAPI
 import ImportLegacyWalletClient
 import LedgerHardwareDevicesFeature
 import P2PLinksFeature
-import PersonasFeature
 
 // MARK: - Settings
 public struct Settings: Sendable, FeatureReducer {

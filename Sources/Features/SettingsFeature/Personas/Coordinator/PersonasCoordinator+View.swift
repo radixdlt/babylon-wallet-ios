@@ -1,6 +1,5 @@
 import CreatePersonaFeature
 import FeaturePrelude
-import PersonaDetailsFeature
 
 // MARK: - PersonasCoordinator.View
 extension PersonasCoordinator {

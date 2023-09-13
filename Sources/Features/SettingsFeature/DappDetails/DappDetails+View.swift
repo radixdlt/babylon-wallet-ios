@@ -1,6 +1,4 @@
 import FeaturePrelude
-import PersonaDetailsFeature
-import PersonasFeature
 
 // MARK: - View
 

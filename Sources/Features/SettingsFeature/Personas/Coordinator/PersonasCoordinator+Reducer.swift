@@ -1,6 +1,5 @@
 import CreatePersonaFeature
 import FeaturePrelude
-import PersonaDetailsFeature
 import PersonasClient
 
 // MARK: - PersonasCoordinator
