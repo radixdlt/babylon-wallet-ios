@@ -108,16 +108,15 @@ public struct SelectBackup: Sendable, FeatureReducer {
 			return .none
 
 		case let .tappedUseCloudBackup(profileHeader):
-			return .task {
-				do {
-					guard let snapshot = try await backupsClient.lookupProfileSnapshotByHeader(profileHeader) else {
-						return .internal(.snapshotWithHeaderNotFoundInCloud(profileHeader))
-					}
-					return .delegate(.selectedProfileSnapshot(snapshot, isInCloud: true))
-				} catch {
-					loggerGlobal.error("Failed to load profile snapshot with header, error: \(error), header: \(profileHeader)")
-					return .internal(.snapshotWithHeaderNotFoundInCloud(profileHeader))
+			return .run { send in
+				guard let snapshot = try await backupsClient.lookupProfileSnapshotByHeader(profileHeader) else {
+					await send(.internal(.snapshotWithHeaderNotFoundInCloud(profileHeader)))
+					return
 				}
+				await send(.delegate(.selectedProfileSnapshot(snapshot, isInCloud: true)))
+			} catch: { error, send in
+				loggerGlobal.error("Failed to load profile snapshot with header, error: \(error), header: \(profileHeader)")
+				await send(.internal(.snapshotWithHeaderNotFoundInCloud(profileHeader)))
 			}
 
 		case .dismissFileImporter:

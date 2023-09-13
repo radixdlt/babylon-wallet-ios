@@ -92,12 +92,12 @@ public struct AddNewGateway: Sendable, FeatureReducer {
 				return .none
 			}
 
-			return .task {
+			return .run { send in
 				let result = await TaskResult {
 					let _ = try await gatewaysClient.addGateway(gateway)
 					return Unit.instance
 				}
-				return .internal(.addGatewayResult(result))
+				await send(.internal(.addGatewayResult(result)))
 			}
 
 		case let .gatewayValidationResult(.failure(error)):
@@ -115,11 +115,11 @@ public struct AddNewGateway: Sendable, FeatureReducer {
 
 		case let .validateNewGateway(url):
 			state.addGatewayButtonState = .loading(.local)
-			return .task {
+			return .run { send in
 				let result = await TaskResult {
 					try await networkSwitchingClient.validateGatewayURL(url)
 				}
-				return .internal(.gatewayValidationResult(result))
+				await send(.internal(.gatewayValidationResult(result)))
 			}
 		}
 	}

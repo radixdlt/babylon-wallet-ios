@@ -80,11 +80,11 @@ public struct NewConnection: Sendable, FeatureReducer {
 			}
 
 		case let .scanQR(.delegate(.scanned(qrString))):
-			return .task {
+			return .run { send in
 				let result = await TaskResult {
 					try ConnectionPassword(.init(hex: qrString))
 				}
-				return .internal(.connectionPasswordFromStringResult(result))
+				await send(.internal(.connectionPasswordFromStringResult(result)))
 			}
 
 		case let .connectUsingSecrets(.delegate(.connected(connection))):

@@ -83,9 +83,9 @@ public struct P2PLinksFeature: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .task:
-			return .task {
+			return .run { send in
 				let result = await TaskResult { try await radixConnectClient.getP2PLinks() }
-				return .internal(.loadLinksResult(result))
+				await send(.internal(.loadLinksResult(result)))
 			}
 
 		case .addNewConnectionButtonTapped:
@@ -134,13 +134,13 @@ public struct P2PLinksFeature: Sendable, FeatureReducer {
 
 		case let .destination(.presented(.newConnection(.delegate(.newConnection(connectedClient))))):
 			state.destination = nil
-			return .task {
+			return .run { send in
 				let result = await TaskResult {
 					try await radixConnectClient.storeP2PLink(connectedClient)
 				}
 				.map { connectedClient }
 
-				return .internal(.saveNewConnectionResult(result))
+				await send(.internal(.saveNewConnectionResult(result)))
 			}
 
 		case .destination(.presented(.newConnection(.delegate(.dismiss)))):
@@ -148,12 +148,12 @@ public struct P2PLinksFeature: Sendable, FeatureReducer {
 			return .none
 
 		case let .destination(.presented(.removeConnection(.removeTapped(id)))):
-			return .task {
+			return .run { send in
 				let result = await TaskResult {
 					try await radixConnectClient.deleteP2PLinkByPassword(id)
 					return id
 				}
-				return .internal(.deleteConnectionResult(result))
+				await send(.internal(.deleteConnectionResult(result)))
 			}
 
 		default:

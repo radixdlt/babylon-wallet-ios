@@ -85,11 +85,11 @@ public struct OnboardingCoordinator: Sendable, FeatureReducer {
 			)
 
 		case .createAccountCoordinator(.delegate(.completed)):
-			return .task {
+			return .run { send in
 				let result = await TaskResult<HasMainnetAccounts> {
 					try await onboardingClient.commitEphemeral()
 				}
-				return .internal(.commitEphemeralResult(result))
+				await send(.internal(.commitEphemeralResult(result)))
 			}
 
 		default:

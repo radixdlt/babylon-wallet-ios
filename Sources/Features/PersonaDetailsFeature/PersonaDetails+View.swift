@@ -287,15 +287,6 @@ private extension PersonaDetails.State {
 	}
 }
 
-private extension PersonaDetails.View.InfoSection.ViewState {
-	init(
-		dAppInfo: DappInfo?,
-		personaName: String
-	) {
-		fatalError()
-	}
-}
-
 // MARK: - PersonaDetails.View.InfoSection
 extension PersonaDetails.View {
 	@MainActor
@@ -358,31 +349,31 @@ extension PersonaDetails.View {
 						} else {
 							Text(L10n.AuthorizedDapps.PersonaDetails.personalDataSharingDescription(dAppInfo.name))
 								.textBlock
-
-							if let fullName = viewStore.fullName {
-								VPair(
-									heading: L10n.AuthorizedDapps.PersonaDetails.fullName,
-									item: fullName
-								)
-								Separator()
-							}
-
-							if let phoneNumber = viewStore.phoneNumbers?.first {
-								VPair(
-									heading: L10n.AuthorizedDapps.PersonaDetails.phoneNumber,
-									item: phoneNumber
-								)
-								Separator()
-							}
-
-							if let emailAddress = viewStore.emailAddresses?.first {
-								VPair(
-									heading: L10n.AuthorizedDapps.PersonaDetails.emailAddress,
-									item: emailAddress
-								)
-								Separator()
-							}
 						}
+					}
+
+					if let fullName = viewStore.fullName {
+						VPair(
+							heading: L10n.AuthorizedDapps.PersonaDetails.fullName,
+							item: fullName
+						)
+						Separator()
+					}
+
+					if let phoneNumber = viewStore.phoneNumbers?.first {
+						VPair(
+							heading: L10n.AuthorizedDapps.PersonaDetails.phoneNumber,
+							item: phoneNumber
+						)
+						Separator()
+					}
+
+					if let emailAddress = viewStore.emailAddresses?.first {
+						VPair(
+							heading: L10n.AuthorizedDapps.PersonaDetails.emailAddress,
+							item: emailAddress
+						)
+						Separator()
 					}
 				}
 				.padding(.horizontal, .medium1)

@@ -21,7 +21,7 @@ public struct TransactionReviewRawTransaction: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .closeTapped:
-			return .fireAndForget {
+			return .run { _ in
 				await dismiss()
 			}
 		}

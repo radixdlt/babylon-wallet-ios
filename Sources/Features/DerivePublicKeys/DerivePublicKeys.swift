@@ -101,18 +101,16 @@ public struct DerivePublicKeys: Sendable, FeatureReducer {
 		case .onFirstTask:
 			switch state.factorSourceOption {
 			case .device:
-				return .task {
-					do {
-						let babylonFactorSource = try await factorSourcesClient
-							.getFactorSources()
-							.babylonDeviceFactorSources()
-							.first // FIXME: should only have one babylon factor source, which should be in keychain, clean this up.
+				return .run { send in
+					let babylonFactorSource = try await factorSourcesClient
+						.getFactorSources()
+						.babylonDeviceFactorSources()
+						.first // FIXME: should only have one babylon factor source, which should be in keychain, clean this up.
 
-						return .internal(.loadedDeviceFactorSource(babylonFactorSource))
-					} catch {
-						loggerGlobal.error("Failed to load factor source, error: \(error)")
-						return .delegate(.failedToDerivePublicKey)
-					}
+					await send(.internal(.loadedDeviceFactorSource(babylonFactorSource)))
+				} catch: { error, send in
+					loggerGlobal.error("Failed to load factor source, error: \(error)")
+					await send(.delegate(.failedToDerivePublicKey))
 				}
 
 			case let .specific(factorSource):
@@ -192,19 +190,17 @@ extension DerivePublicKeys {
 		loadMnemonicPurpose: SecureStorageClient.LoadMnemonicPurpose,
 		state: State
 	) -> EffectTask<Action> {
-		.task {
-			do {
-				return try await _deriveWith(
-					deviceFactorSource: deviceFactorSource,
-					derivationPaths: derivationPaths,
-					networkID: networkID,
-					loadMnemonicPurpose: loadMnemonicPurpose,
-					state: state
-				)
-			} catch {
-				loggerGlobal.error("Failed to derive or cast public key, error: \(error)")
-				return .delegate(.failedToDerivePublicKey)
-			}
+		.run { send in
+			try await send(_deriveWith(
+				deviceFactorSource: deviceFactorSource,
+				derivationPaths: derivationPaths,
+				networkID: networkID,
+				loadMnemonicPurpose: loadMnemonicPurpose,
+				state: state
+			))
+		} catch: { error, send in
+			loggerGlobal.error("Failed to derive or cast public key, error: \(error)")
+			await send(.delegate(.failedToDerivePublicKey))
 		}
 	}
 
@@ -233,18 +229,16 @@ extension DerivePublicKeys {
 		networkID: NetworkID,
 		state: State
 	) -> EffectTask<Action> {
-		.task {
-			do {
-				return try await _deriveWith(
-					ledger: ledger,
-					derivationPaths: derivationPaths,
-					networkID: networkID,
-					state: state
-				)
-			} catch {
-				loggerGlobal.error("Failed to derive or cast public key, error: \(error)")
-				return .delegate(.failedToDerivePublicKey)
-			}
+		.run { send in
+			try await send(_deriveWith(
+				ledger: ledger,
+				derivationPaths: derivationPaths,
+				networkID: networkID,
+				state: state
+			))
+		} catch: { error, send in
+			loggerGlobal.error("Failed to derive or cast public key, error: \(error)")
+			await send(.delegate(.failedToDerivePublicKey))
 		}
 	}
 

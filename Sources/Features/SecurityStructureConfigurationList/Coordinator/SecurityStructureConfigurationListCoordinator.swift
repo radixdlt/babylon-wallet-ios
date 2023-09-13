@@ -83,11 +83,11 @@ public struct SecurityStructureConfigurationListCoordinator: Sendable, FeatureRe
 
 		case let .configList(.delegate(.displayDetails(configReference))):
 
-			return .task {
+			return .run { send in
 				let taskResult = await TaskResult {
 					try await appPreferencesClient.getDetailsOfSecurityStructure(configReference)
 				}
-				return .internal(.loadDetailsForSecurityStructureResult(taskResult))
+				await send(.internal(.loadDetailsForSecurityStructureResult(taskResult)))
 			}
 
 		case let .destination(.presented(.manageSecurityStructureCoordinator(.delegate(.done(.success(config)))))):
