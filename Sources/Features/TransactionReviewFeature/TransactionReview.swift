@@ -591,7 +591,10 @@ extension TransactionReview {
 	func transactionManifestWithWalletInstructionsAdded(_ state: State) throws -> TransactionManifest {
 		var manifest = state.transactionManifest
 		if let feePayerSelection = state.reviewedTransaction?.feePayerSelection, let feePayer = feePayerSelection.selected {
-			manifest = try manifest.withLockFeeCallMethodAdded(address: feePayer.account.address.asGeneral(), fee: feePayerSelection.transactionFee.totalFee.lockFee)
+			manifest = try manifest.withLockFeeCallMethodAdded(
+				address: feePayer.account.address.asGeneral(),
+				fee: feePayerSelection.transactionFee.totalFee.lockFee
+			)
 		}
 		return try addingGuarantees(to: manifest, guarantees: state.allGuarantees)
 	}
