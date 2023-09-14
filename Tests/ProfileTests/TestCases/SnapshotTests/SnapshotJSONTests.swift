@@ -87,19 +87,6 @@ public struct SnapshotTestVector: Codable, Equatable {
 
 // MARK: - SnapshotJSONTests
 final class SnapshotJSONTests: TestCase {
-	func test_read_dir() throws {
-		let path = "file:///Users/alexandercyon/Developer/Babylon/Wallet-iOS/Tests/CryptographyTests/TestVectors"
-		let url = URL(filePath: path)
-		//        let cont = try FileManager.default.contentsOfDirectory(
-		//            at: url,
-		//            includingPropertiesForKeys: nil,
-		//            options: [.skipsHiddenFiles]
-		//        )
-		let cont = try FileManager.default.contentsOfDirectory(atPath: path)
-		XCTAssertEqual(cont.count, 3)
-		print(cont)
-	}
-
 	func test_generate() throws {
 		let jsonDecoder = JSONDecoder.iso8601
 		let plaintextSnapshot = try jsonDecoder.decode(ProfileSnapshot.self, from: plaintext.data(using: .utf8)!)
@@ -121,10 +108,12 @@ final class SnapshotJSONTests: TestCase {
 	}
 
 	func test_profile_snapshots_decode_json() throws {
-		let vector: SnapshotTestVector = try readTestFixture(
-			bundleType: self,
+		try testFixture(
+			bundle: .module,
 			jsonName: "profile_snapshot_test_version_100"
-		)
+		) { (vector: SnapshotTestVector) in
+			XCTAssertEqual(vector.snapshotVersion, 100)
+		}
 	}
 
 	func test_manually_assembled() throws {
