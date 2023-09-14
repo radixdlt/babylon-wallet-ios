@@ -13,6 +13,17 @@ For _fastlane_ installation instructions, see [Installing _fastlane_](https://do
 
 # Available Actions
 
+### cyon
+
+```sh
+[bundle exec] fastlane cyon
+```
+
+
+
+----
+
+
 ## iOS
 
 ### ios build

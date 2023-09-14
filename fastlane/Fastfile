@@ -165,6 +165,23 @@ private_lane :create_gh_release do |options|
     )
 end
 
+lane :cyon do |options|
+    print("STARTING CHANGELOG GEN:")
+    sh('git fetch --tags')
+    flavour = "Beta"
+    most_recent_tags = sh("git tag | grep '" + flavour + "' | sort -r | head -2").split("\n")
+    git_commits_range_for_changelog = most_recent_tags.map { |tag| sh("git rev-list --abbrev-commit -n 1 " + tag).strip }
+    print(git_commits_range_for_changelog)
+    rev_changelog = changelog_from_git_commits(
+      between: git_commits_range_for_changelog,
+      pretty: "- %s"
+    )
+    
+    print("🔮🔮🔮🔮 SUCCESSFULLY GENERATED Changelog 🔮🔮🔮🔮\n\n")
+    print(rev_changelog)
+    print("\n\n🔮🔮🔮🔮 END OF Changelog PRINT 🔮🔮🔮🔮")
+end
+
 private_lane :register_new_device do |options|
     name = prompt(text: "Device name: ")
     udid = prompt(text: "Device UDID: ")
