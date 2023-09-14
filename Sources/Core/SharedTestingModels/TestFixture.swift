@@ -64,4 +64,46 @@ extension XCTestCase {
 
 		try testFunction(test)
 	}
+
+	public func XCTAssertAllEqual<Element: Equatable>(
+		_ elements: some BidirectionalCollection<Element>,
+		file: StaticString = #filePath,
+		line: UInt = #line
+	) {
+		guard elements.count >= 2 else { return }
+		switch elements.count {
+		case 0: return
+		case 1: return
+		case 2: XCTAssertEqual(elements.first!, elements.last!, file: file, line: line)
+		default:
+			let head = elements.first!
+			let tail = elements.dropFirst()
+			for index in tail.indices {
+				let other = elements[index]
+				XCTAssertEqual(
+					other, head,
+					"Element at \(index) not equal to first element",
+					file: file, line: line
+				)
+			}
+		}
+	}
+
+	public func XCTAssertAllEqual<Element: Equatable>(
+		_ elements: some BidirectionalCollection<Element>,
+		_ head: Element,
+		file: StaticString = #filePath,
+		line: UInt = #line
+	) {
+		XCTAssertAllEqual([head] + elements)
+	}
+
+	public func XCTAssertAllEqual<Element: Equatable>(
+		_ elements: some BidirectionalCollection<Element>,
+		_ args: Element...,
+		file: StaticString = #filePath,
+		line: UInt = #line
+	) {
+		XCTAssertAllEqual(elements + args)
+	}
 }

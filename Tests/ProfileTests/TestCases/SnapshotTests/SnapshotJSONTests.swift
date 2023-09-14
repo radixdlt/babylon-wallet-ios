@@ -42,6 +42,16 @@ public struct SnapshotTestVector: Codable, Equatable {
 		encryptedSnapshots: [EncryptedSnapshotWithPassword],
 		plaintext: ProfileSnapshot
 	) throws {
+		self.snapshotVersion = plaintext.header.snapshotVersion
+		self.mnemonics = mnemonics
+		self.encryptedSnapshots = encryptedSnapshots
+		self.plaintext = plaintext
+		try validate()
+	}
+
+	/// Returns the decrypted ProfileSnapshots which are all proven to be equal to `self.plaintext`
+	@discardableResult
+	public func validate() throws -> [ProfileSnapshot] {
 		let decryptions = try encryptedSnapshots.map { try $0.decrypted() }
 		guard decryptions.allSatisfy({ $0 == plaintext }) else {
 			struct EncryptedSnapshotDoesNotEqualPlaintext: Error {}
@@ -53,10 +63,7 @@ public struct SnapshotTestVector: Codable, Equatable {
 			struct MissingMnemonic: Error {}
 			throw MissingMnemonic()
 		}
-		self.snapshotVersion = plaintext.header.snapshotVersion
-		self.mnemonics = mnemonics
-		self.encryptedSnapshots = encryptedSnapshots
-		self.plaintext = plaintext
+		return decryptions
 	}
 
 	public static func encrypting(
@@ -105,14 +112,22 @@ final class SnapshotJSONTests: TestCase {
 				"babylon",
 			]
 		)
+
+		try XCTAssertJSONCoding(vector)
 	}
 
-	func test_profile_snapshots_decode_json() throws {
+	func test_profile_snapshot_version_100() throws {
 		try testFixture(
 			bundle: .module,
 			jsonName: "profile_snapshot_test_version_100"
 		) { (vector: SnapshotTestVector) in
-			XCTAssertEqual(vector.snapshotVersion, 100)
+			let decryptedSnapshots = try vector.validate()
+			XCTAssertAllEqual(
+				decryptedSnapshots.map(\.header.snapshotVersion),
+				vector.plaintext.header.snapshotVersion,
+				100
+			)
+			try XCTAssertJSONCoding(vector, encoder: jsonEncoder, decoder: jsonDecoder)
 		}
 	}
 
@@ -123,7 +138,6 @@ final class SnapshotJSONTests: TestCase {
 			"open sesame",
 			"babylon",
 		]
-		let jsonDecoder = JSONDecoder.iso8601
 
 		let plaintextSnapshot = try jsonDecoder.decode(ProfileSnapshot.self, from: plaintext.data(using: .utf8)!)
 		let encryptedSnapshotsJSONStrings: [String] = [
@@ -153,12 +167,17 @@ final class SnapshotJSONTests: TestCase {
 			plaintext: plaintextSnapshot
 		)
 
+		let vectorJSON = try jsonEncoder.encode(vector)
+		let _ = String(data: vectorJSON, encoding: .utf8)!
+	}
+
+	lazy var jsonEncoder: JSONEncoder = {
 		let jsonEncoder = JSONEncoder.iso8601
 		jsonEncoder.outputFormatting = [.prettyPrinted, .withoutEscapingSlashes]
-		let vectorJSON = try jsonEncoder.encode(vector)
-		let vectorJSONString = String(data: vectorJSON, encoding: .utf8)!
-		print(String(describing: vectorJSONString))
-	}
+		return jsonEncoder
+	}()
+
+	lazy var jsonDecoder: JSONDecoder = .iso8601
 }
 
 private let mnemomics: [MnemonicWithPassphrase] = try! [
