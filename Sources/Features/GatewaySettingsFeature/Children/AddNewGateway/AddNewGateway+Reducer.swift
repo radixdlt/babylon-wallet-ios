@@ -43,7 +43,7 @@ public struct AddNewGateway: Sendable, FeatureReducer {
 
 	public init() {}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .appeared:
 			return .run { send in
@@ -80,7 +80,7 @@ public struct AddNewGateway: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .focusTextField(focus):
 			state.focusedField = focus
@@ -126,7 +126,7 @@ public struct AddNewGateway: Sendable, FeatureReducer {
 }
 
 private extension AddNewGateway {
-	func handle(_ error: Error, state: inout State) -> EffectTask<Action> {
+	func handle(_ error: Error, state: inout State) -> Effect<Action> {
 		state.errorText = L10n.Gateways.AddNewGateway.errorNoGatewayFound
 		state.addGatewayButtonState = .disabled
 		errorQueue.schedule(error)

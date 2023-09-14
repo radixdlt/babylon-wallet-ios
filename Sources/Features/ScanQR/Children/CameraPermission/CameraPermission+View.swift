@@ -18,7 +18,7 @@ extension CameraPermission {
 						action: { .view(.permissionDeniedAlert($0)) }
 					)
 				)
-				.onAppear { ViewStore(store.stateless).send(.view(.appeared)) }
+				.onAppear { store.send(.view(.appeared)) }
 		}
 	}
 }
@@ -31,7 +31,7 @@ struct CameraPermission_Preview: PreviewProvider {
 		CameraPermission.View(
 			store: .init(
 				initialState: .previewValue,
-				reducer: CameraPermission()
+				reducer: CameraPermission.init
 			)
 		)
 	}

@@ -54,7 +54,7 @@ public struct SubmitTransaction: Sendable, FeatureReducer {
 
 	public init() {}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .appeared:
 			return .run { [txID = state.notarizedTX.txID, notarized = state.notarizedTX.notarized] send in
@@ -73,7 +73,7 @@ public struct SubmitTransaction: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .submitTXResult(.failure(error)):
 			errorQueue.schedule(error)

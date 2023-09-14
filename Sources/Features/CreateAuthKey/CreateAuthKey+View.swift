@@ -18,21 +18,21 @@ extension CreateAuthKey {
 					switch state {
 					case .getAuthKeyDerivationPath:
 						CaseLet(
-							state: /CreateAuthKey.State.Step.getAuthKeyDerivationPath,
+							/CreateAuthKey.State.Step.getAuthKeyDerivationPath,
 							action: CreateAuthKey.ChildAction.getAuthKeyDerivationPath,
 							then: { GetAuthKeyDerivationPath.View(store: $0) }
 						)
 
 					case .derivePublicKeys:
 						CaseLet(
-							state: /CreateAuthKey.State.Step.derivePublicKeys,
+							/CreateAuthKey.State.Step.derivePublicKeys,
 							action: CreateAuthKey.ChildAction.derivePublicKeys,
 							then: { DerivePublicKeys.View(store: $0) }
 						)
 
 					case .transactionReview:
 						CaseLet(
-							state: /CreateAuthKey.State.Step.transactionReview,
+							/CreateAuthKey.State.Step.transactionReview,
 							action: CreateAuthKey.ChildAction.transactionReview,
 							then: { store in
 								// FIXME: CreateAuthKey should use DappInteractionClient to schedule a transaction!!!
@@ -57,7 +57,7 @@ struct CreateAuthKey_Preview: PreviewProvider {
 		CreateAuthKey.View(
 			store: .init(
 				initialState: .previewValue,
-				reducer: CreateAuthKey()
+				reducer: CreateAuthKey.init
 			)
 		)
 	}

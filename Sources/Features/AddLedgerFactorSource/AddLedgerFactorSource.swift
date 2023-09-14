@@ -47,7 +47,7 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 
 	// MARK: Destinations
 
-	public struct Destinations: Sendable, ReducerProtocol {
+	public struct Destinations: Sendable, Reducer {
 		public enum State: Sendable, Hashable {
 			case ledgerAlreadyExistsAlert(AlertState<Never>)
 			case nameLedger(NameLedgerFactorSource.State)
@@ -58,7 +58,7 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 			case nameLedger(NameLedgerFactorSource.Action)
 		}
 
-		public var body: some ReducerProtocolOf<Self> {
+		public var body: some ReducerOf<Self> {
 			Scope(state: /State.nameLedger, action: /Action.nameLedger) {
 				NameLedgerFactorSource()
 			}
@@ -74,14 +74,14 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 
 	public init() {}
 
-	public var body: some ReducerProtocolOf<Self> {
+	public var body: some ReducerOf<Self> {
 		Reduce(core)
 			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
 				Destinations()
 			}
 	}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .sendAddLedgerRequestButtonTapped:
 			return sendAddLedgerRequestEffect(&state)
@@ -91,7 +91,7 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case let .destination(.presented(.nameLedger(.delegate(.complete(ledger))))):
 			return completeWithLedgerEffect(ledger)
@@ -102,7 +102,7 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .getDeviceInfoResult(.success(ledgerDeviceInfo)):
 			return gotDeviceEffect(ledgerDeviceInfo, in: &state)
@@ -122,7 +122,7 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 
 	// MARK: Helper methods
 
-	private func sendAddLedgerRequestEffect(_ state: inout State) -> EffectTask<Action> {
+	private func sendAddLedgerRequestEffect(_ state: inout State) -> Effect<Action> {
 		state.isWaitingForResponseFromLedger = true
 		return .run { send in
 			let result = await TaskResult {
@@ -133,7 +133,7 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 		}
 	}
 
-	private func gotDeviceEffect(_ ledgerDeviceInfo: DeviceInfo, in state: inout State) -> EffectTask<Action> {
+	private func gotDeviceEffect(_ ledgerDeviceInfo: DeviceInfo, in state: inout State) -> Effect<Action> {
 		state.isWaitingForResponseFromLedger = false
 		loggerGlobal.notice("Successfully received response from CE! \(ledgerDeviceInfo) ✅")
 		return .run { send in
@@ -152,14 +152,14 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 		}
 	}
 
-	private func failedToGetDevice(_ state: inout State, error: Swift.Error) -> EffectTask<Action> {
+	private func failedToGetDevice(_ state: inout State, error: Swift.Error) -> Effect<Action> {
 		state.isWaitingForResponseFromLedger = false
 		loggerGlobal.error("Failed to get ledger device info: \(error)")
 		errorQueue.schedule(error)
 		return .none
 	}
 
-	private func completeWithLedgerEffect(_ ledger: LedgerHardwareWalletFactorSource) -> EffectTask<Action> {
+	private func completeWithLedgerEffect(_ ledger: LedgerHardwareWalletFactorSource) -> Effect<Action> {
 		.run { send in
 			try await factorSourcesClient.saveFactorSource(ledger.embed())
 			loggerGlobal.notice("Added Ledger factor source! ✅ ")
@@ -209,7 +209,7 @@ public struct NameLedgerFactorSource: Sendable, FeatureReducer {
 	@Dependency(\.errorQueue) var errorQueue
 	public init() {}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case let .ledgerNameChanged(name):
 			state.ledgerName = name

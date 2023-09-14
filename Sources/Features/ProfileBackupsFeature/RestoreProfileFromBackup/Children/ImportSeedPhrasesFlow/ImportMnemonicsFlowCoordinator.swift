@@ -19,7 +19,7 @@ public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 		}
 	}
 
-	public struct Destinations: Sendable, ReducerProtocol {
+	public struct Destinations: Sendable, Reducer {
 		public enum State: Sendable, Hashable {
 			case importMnemonicControllingAccounts(ImportMnemonicControllingAccounts.State)
 		}
@@ -28,7 +28,7 @@ public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 			case importMnemonicControllingAccounts(ImportMnemonicControllingAccounts.Action)
 		}
 
-		public var body: some ReducerProtocolOf<Self> {
+		public var body: some ReducerOf<Self> {
 			Scope(state: /State.importMnemonicControllingAccounts, action: /Action.importMnemonicControllingAccounts) {
 				ImportMnemonicControllingAccounts()
 			}
@@ -67,14 +67,14 @@ public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 	@Dependency(\.continuousClock) var clock
 	public init() {}
 
-	public var body: some ReducerProtocolOf<Self> {
+	public var body: some ReducerOf<Self> {
 		Reduce(core)
 			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
 				Destinations()
 			}
 	}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .onFirstTask:
 			return .run { [snapshot = state.profileSnapshot] send in
@@ -91,7 +91,7 @@ public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .loadControlledEntities(.failure(error)):
 			// FIXME: Error handling...?
@@ -105,7 +105,7 @@ public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case let .destination(.presented(.importMnemonicControllingAccounts(.delegate(delegatAction)))):
 			switch delegatAction {
@@ -141,12 +141,12 @@ public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 		}
 	}
 
-	private func finishedWith(factorSourceID: FactorSourceID, state: inout State) -> EffectTask<Action> {
+	private func finishedWith(factorSourceID: FactorSourceID, state: inout State) -> Effect<Action> {
 		state.mnemonicsLeftToImport.removeAll(where: { $0.factorSourceID.embed() == factorSourceID })
 		return nextMnemonicIfNeeded(state: &state)
 	}
 
-	private func nextMnemonicIfNeeded(state: inout State) -> EffectTask<Action> {
+	private func nextMnemonicIfNeeded(state: inout State) -> Effect<Action> {
 		if let next = state.mnemonicsLeftToImport.first {
 			state.destination = .importMnemonicControllingAccounts(.init(entitiesControlledByFactorSource: next))
 			return .none

@@ -24,7 +24,7 @@ extension SignWithFactorSourcesOfKindDevice {
 		public var body: some SwiftUI.View {
 			Color.app.background
 				.onFirstTask { @MainActor in
-					await ViewStore(store).send(.view(.onFirstTask)).finish()
+					await store.send(.view(.onFirstTask)).finish()
 				}
 				.navigationTitle(L10n.Signing.SignatureRequest.title)
 		}

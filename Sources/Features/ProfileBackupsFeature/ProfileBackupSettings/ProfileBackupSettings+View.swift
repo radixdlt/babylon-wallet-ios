@@ -35,7 +35,7 @@ extension ProfileBackupSettings {
 					.exportFileSheet(with: viewStore)
 			}
 			.task { @MainActor in
-				await ViewStore(store.stateless).send(.view(.task)).finish()
+				await store.send(.view(.task)).finish()
 			}
 			.navigationTitle(L10n.Settings.backups)
 		}

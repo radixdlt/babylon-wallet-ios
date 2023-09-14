@@ -30,7 +30,7 @@ final class CustomizeFeePayerTests: TestCase {
 //			manifest: manifestStub,
 //			signingPurpose: .signTransaction(.internalManifest(.transfer))
 //		)
-//		let sut = TestStore(initialState: state, reducer: CustomizeFees()) {
+//		let sut = TestStore(initialState: state, reducer: CustomizeFees.init) {
 //			$0.factorSourcesClient.getSigningFactors = { request in
 //				try [.device: .init(rawValue: Set(request.signers.rawValue.map {
 //					try SigningFactor(

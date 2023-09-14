@@ -128,7 +128,7 @@ extension NewPersonaInfo.View {
 //		NameNewEntity<Profile.Network.Account>.View(
 //			store: .init(
 //				initialState: .init(isFirst: true),
-//				reducer: NameNewEntity()
+//				reducer: NameNewEntity.init
 //			)
 //		)
 //	}

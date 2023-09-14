@@ -122,7 +122,7 @@ extension AccountList.Row {
 					viewStore.send(.tapped)
 				}
 				.task {
-					await ViewStore(store.stateless).send(.view(.task)).finish()
+					await store.send(.view(.task)).finish()
 				}
 			}
 		}
@@ -370,7 +370,7 @@ struct Row_Preview: PreviewProvider {
 		AccountList.Row.View(
 			store: .init(
 				initialState: .previewValue,
-				reducer: AccountList.Row()
+				reducer: AccountList.Row.init
 			)
 		)
 	}

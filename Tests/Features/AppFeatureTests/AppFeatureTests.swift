@@ -21,7 +21,7 @@ final class AppFeatureTests: TestCase {
 		// given
 		let store = TestStore(
 			initialState: App.State(root: .main(.previewValue)),
-			reducer: App()
+			reducer: App.init
 		) {
 			$0.gatewaysClient.gatewaysValues = { AsyncLazySequence([.init(current: .default)]).eraseToAnyAsyncSequence() }
 			$0.networkSwitchingClient.hasMainnetEverBeenLive = { false }
@@ -40,7 +40,7 @@ final class AppFeatureTests: TestCase {
 		let clock = TestClock()
 		let store = TestStore(
 			initialState: App.State(root: .splash(.init())),
-			reducer: App()
+			reducer: App.init
 		) {
 			$0.errorQueue.errors = { AsyncLazySequence([]).eraseToAnyAsyncSequence() }
 			$0.continuousClock = clock
@@ -63,7 +63,7 @@ final class AppFeatureTests: TestCase {
 		let clock = TestClock()
 		let store = TestStore(
 			initialState: App.State(root: .splash(.init())),
-			reducer: App()
+			reducer: App.init
 		) {
 			$0.errorQueue = .liveValue
 			$0.continuousClock = clock
@@ -89,7 +89,7 @@ final class AppFeatureTests: TestCase {
 		let clock = TestClock()
 		let store = TestStore(
 			initialState: App.State(root: .splash(.init())),
-			reducer: App()
+			reducer: App.init
 		) {
 			$0.errorQueue = .liveValue
 			$0.continuousClock = clock
@@ -125,7 +125,7 @@ final class AppFeatureTests: TestCase {
 		let store = TestStore(
 			// 🫴 GIVEN splash
 			initialState: App.State(root: .splash(.init())),
-			reducer: App()
+			reducer: App.init
 		) {
 			$0.errorQueue = .liveValue
 			$0.continuousClock = clock
@@ -170,7 +170,7 @@ final class AppFeatureTests: TestCase {
 		let clock = TestClock()
 		let store = TestStore(
 			initialState: App.State(root: .splash(.init())),
-			reducer: App()
+			reducer: App.init
 		) {
 			$0.errorQueue = .liveValue
 			$0.continuousClock = clock

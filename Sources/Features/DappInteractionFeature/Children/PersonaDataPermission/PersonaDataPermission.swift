@@ -43,7 +43,7 @@ struct PersonaDataPermission: Sendable, FeatureReducer {
 		case continueButtonTapped(P2P.Dapp.Request.Response)
 	}
 
-	struct Destinations: Sendable, ReducerProtocol {
+	struct Destinations: Sendable, Reducer {
 		enum State: Sendable, Hashable {
 			case editPersona(EditPersona.State)
 		}
@@ -52,7 +52,7 @@ struct PersonaDataPermission: Sendable, FeatureReducer {
 			case editPersona(EditPersona.Action)
 		}
 
-		var body: some ReducerProtocolOf<Self> {
+		var body: some ReducerOf<Self> {
 			Scope(state: /State.editPersona, action: /Action.editPersona) {
 				EditPersona()
 			}
@@ -62,7 +62,7 @@ struct PersonaDataPermission: Sendable, FeatureReducer {
 	@Dependency(\.personasClient) var personasClient
 	@Dependency(\.errorQueue) var errorQueue
 
-	var body: some ReducerProtocolOf<Self> {
+	var body: some ReducerOf<Self> {
 		Reduce(core)
 			.ifLet(\.persona, action: /Action.child .. ChildAction.persona) {
 				PersonaDataPermissionBox()
@@ -72,7 +72,7 @@ struct PersonaDataPermission: Sendable, FeatureReducer {
 			}
 	}
 
-	func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .task:
 			return .run { send in
@@ -91,7 +91,7 @@ struct PersonaDataPermission: Sendable, FeatureReducer {
 		}
 	}
 
-	func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
+	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .personasLoaded(personas):
 			if let persona = personas[id: state.personaID] {
@@ -101,7 +101,7 @@ struct PersonaDataPermission: Sendable, FeatureReducer {
 		}
 	}
 
-	func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+	func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case .persona(.delegate(.edit)):
 			if let persona = state.persona {

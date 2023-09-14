@@ -52,12 +52,11 @@ import SwiftUI // NB: necessary for previews to appear
 struct DappInteractionLoading_Preview: PreviewProvider {
 	static var previews: some View {
 		DappInteractionLoading.View(
-			store: .init(
-				initialState: .previewValue,
-				reducer: DappInteractionLoading()
+			store: .init(initialState: .previewValue) {
+				DappInteractionLoading()
 					.dependency(\.gatewayAPIClient, .previewValueDappMetadataFailure)
 					.dependency(\.gatewayAPIClient, .previewValueDappMetadataSuccess)
-			)
+			}
 		)
 		.presentsLoadingViewOverlay()
 	}

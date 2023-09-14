@@ -26,7 +26,7 @@ struct HUD: FeatureReducer {
 
 	@Dependency(\.continuousClock) var clock
 
-	func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .animationCompletion:
 			if state.offset == State.hiddenOffset {
@@ -44,7 +44,7 @@ struct HUD: FeatureReducer {
 		}
 	}
 
-	func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
+	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case .autoDimiss:
 			state.offset = State.hiddenOffset

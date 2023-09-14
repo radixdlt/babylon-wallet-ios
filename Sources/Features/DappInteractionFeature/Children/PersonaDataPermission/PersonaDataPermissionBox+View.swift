@@ -110,7 +110,7 @@ extension PersonaDataPermissionBox {
 //						persona: .previewValue0,
 //						requiredFieldIDs: [.givenName, .emailAddress]
 //					),
-//					reducer: PersonaDataPermissionBox()
+//					reducer: PersonaDataPermissionBox.init
 //				),
 //				action: { isSelected.toggle() }
 //			) {

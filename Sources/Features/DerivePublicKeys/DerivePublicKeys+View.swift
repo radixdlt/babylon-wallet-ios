@@ -75,7 +75,7 @@ extension DerivePublicKeys {
 //		DerivePublicKeys.View(
 //			store: .init(
 //				initialState: .previewValue,
-//				reducer: DerivePublicKeys()
+//				reducer: DerivePublicKeys.init
 //			)
 //		)
 //	}

@@ -85,7 +85,7 @@ public struct EncryptOrDecryptProfile: Sendable, FeatureReducer {
 
 	// MARK: - Destination
 
-	public struct Destination: ReducerProtocol, Sendable, Equatable {
+	public struct Destination: Reducer, Sendable, Equatable {
 		public enum State: Hashable, Sendable {
 			case incorrectPasswordAlert(AlertState<Action.IncorrectPasswordAlert>)
 		}
@@ -98,7 +98,7 @@ public struct EncryptOrDecryptProfile: Sendable, FeatureReducer {
 			}
 		}
 
-		public var body: some ReducerProtocolOf<Self> {
+		public var body: some ReducerOf<Self> {
 			EmptyReducer()
 		}
 	}
@@ -107,14 +107,14 @@ public struct EncryptOrDecryptProfile: Sendable, FeatureReducer {
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.backupsClient) var backupsClient
 
-	public var body: some ReducerProtocolOf<Self> {
+	public var body: some ReducerOf<Self> {
 		Reduce(core)
 			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
 				Destination()
 			}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case .destination(.presented(.incorrectPasswordAlert(.okTapped))):
 			state.destination = nil
@@ -124,7 +124,7 @@ public struct EncryptOrDecryptProfile: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .appeared:
 			return .run { [mode = state.mode] send in
@@ -203,10 +203,8 @@ public struct EncryptOrDecryptProfile: Sendable, FeatureReducer {
 			return .none
 		}
 	}
-}
 
-extension EncryptOrDecryptProfile {
-	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .focusTextField(focus):
 			state.focusedField = focus

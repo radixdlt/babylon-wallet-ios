@@ -42,7 +42,7 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 		}
 	}
 
-	public struct Destinations: ReducerProtocol {
+	public struct Destinations: Reducer {
 		public enum State: Sendable, Hashable {
 			case noP2PLink(AlertState<NoP2PLinkAlert>)
 			case addNewP2PLink(NewConnection.State)
@@ -55,7 +55,7 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 			case nameLedgerAndDerivePublicKeys(NameLedgerAndDerivePublicKeys.Action)
 		}
 
-		public var body: some ReducerProtocolOf<Self> {
+		public var body: some ReducerOf<Self> {
 			Scope(state: /State.addNewP2PLink, action: /Action.addNewP2PLink) {
 				NewConnection()
 			}
@@ -109,14 +109,14 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 
 	public init() {}
 
-	public var body: some ReducerProtocolOf<ImportOlympiaLedgerAccountsAndFactorSources> {
+	public var body: some ReducerOf<ImportOlympiaLedgerAccountsAndFactorSources> {
 		Reduce(core)
 			.ifLet(\.$destinations, action: /Action.child .. ChildAction.destinations) {
 				Destinations()
 			}
 	}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .onFirstTask:
 			return checkP2PLinkEffect()
@@ -142,7 +142,7 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 		}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .hasAConnectorExtension(isConnected):
 			state.hasAConnectorExtension = isConnected
@@ -203,7 +203,7 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case let .destinations(.presented(.noP2PLink(noP2PLinkAction))):
 			switch noP2PLinkAction {
@@ -269,7 +269,7 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 // MARK: Helper methods
 
 extension ImportOlympiaLedgerAccountsAndFactorSources {
-	private func checkP2PLinkEffect() -> EffectTask<Action> {
+	private func checkP2PLinkEffect() -> Effect<Action> {
 		.run { send in
 			for try await isConnected in await ledgerHardwareWalletClient.isConnectedToAnyConnectorExtension() {
 				guard !Task.isCancelled else { return }
@@ -284,7 +284,7 @@ extension ImportOlympiaLedgerAccountsAndFactorSources {
 		derivedPublicKeys: [HierarchicalDeterministicPublicKey],
 		ledgerID: LedgerHardwareWalletFactorSource.ID,
 		olympiaAccountsToValidate: Set<OlympiaAccountToMigrate>
-	) -> EffectTask<Action> {
+	) -> Effect<Action> {
 		.run { send in
 			do {
 				let validation = try await validate(derivedPublicKeys: derivedPublicKeys, olympiaAccountsToValidate: olympiaAccountsToValidate)
@@ -347,7 +347,7 @@ extension ImportOlympiaLedgerAccountsAndFactorSources {
 	private func migrateOlympiaHardwareAccounts(
 		ledgerID: LedgerHardwareWalletFactorSource.ID,
 		validatedAccountsToMigrate olympiaAccounts: NonEmpty<Set<OlympiaAccountToMigrate>>
-	) -> EffectTask<Action> {
+	) -> Effect<Action> {
 		loggerGlobal.notice("Converting hardware accounts to babylon...")
 		return .run { send in
 			// Migrates and saved all accounts to Profile
@@ -435,7 +435,7 @@ public struct NameLedgerAndDerivePublicKeys: Sendable, FeatureReducer {
 
 	public init() {}
 
-	public var body: some ReducerProtocolOf<Self> {
+	public var body: some ReducerOf<Self> {
 		Reduce(core)
 			.ifLet(\.nameLedger, action: /Action.child .. ChildAction.nameLedger) {
 				NameLedgerFactorSource()
@@ -445,7 +445,7 @@ public struct NameLedgerAndDerivePublicKeys: Sendable, FeatureReducer {
 			}
 	}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .closeButtonTapped:
 			return .run { _ in
@@ -454,7 +454,7 @@ public struct NameLedgerAndDerivePublicKeys: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case let .nameLedger(.delegate(.complete(ledger))):
 			return saveNewLedger(ledger)
@@ -470,7 +470,7 @@ public struct NameLedgerAndDerivePublicKeys: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .savedNewLedger(ledger):
 			state.showDerivePublicKeys(using: ledger)
@@ -478,7 +478,7 @@ public struct NameLedgerAndDerivePublicKeys: Sendable, FeatureReducer {
 		}
 	}
 
-	private func saveNewLedger(_ ledger: LedgerHardwareWalletFactorSource) -> EffectTask<Action> {
+	private func saveNewLedger(_ ledger: LedgerHardwareWalletFactorSource) -> Effect<Action> {
 		.run { send in
 			try await factorSourcesClient.saveFactorSource(ledger.embed())
 			loggerGlobal.notice("Saved Ledger factor source! ✅")

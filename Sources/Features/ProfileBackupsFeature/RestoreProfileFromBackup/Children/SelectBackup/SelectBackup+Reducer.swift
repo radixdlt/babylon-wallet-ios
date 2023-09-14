@@ -40,7 +40,7 @@ public struct SelectBackup: Sendable, FeatureReducer {
 		case tappedUseCloudBackup(ProfileSnapshot.Header)
 	}
 
-	public struct Destinations: Sendable, ReducerProtocol {
+	public struct Destinations: Sendable, Reducer {
 		public enum State: Sendable, Hashable {
 			case inputEncryptionPassword(EncryptOrDecryptProfile.State)
 		}
@@ -49,7 +49,7 @@ public struct SelectBackup: Sendable, FeatureReducer {
 			case inputEncryptionPassword(EncryptOrDecryptProfile.Action)
 		}
 
-		public var body: some ReducerProtocol<State, Action> {
+		public var body: some Reducer<State, Action> {
 			Scope(state: /State.inputEncryptionPassword, action: /Action.inputEncryptionPassword) {
 				EncryptOrDecryptProfile()
 			}
@@ -79,14 +79,14 @@ public struct SelectBackup: Sendable, FeatureReducer {
 
 	public init() {}
 
-	public var body: some ReducerProtocolOf<SelectBackup> {
+	public var body: some ReducerOf<SelectBackup> {
 		Reduce(core)
 			.ifLet(\.$destination, action: /Action.child .. /ChildAction.destination) {
 				Destinations()
 			}
 	}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .task:
 			return .run { send in
@@ -151,7 +151,7 @@ public struct SelectBackup: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .loadBackupProfileHeadersResult(profileHeaders):
 			state.backupProfileHeaders = profileHeaders
@@ -167,7 +167,7 @@ public struct SelectBackup: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case .destination(.presented(.inputEncryptionPassword(.delegate(.dismiss)))):
 			state.destination = nil

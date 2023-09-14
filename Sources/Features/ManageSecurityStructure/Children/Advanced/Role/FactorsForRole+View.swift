@@ -291,7 +291,7 @@ public struct FactorsListView: SwiftUI.View {
 //		FactorsForRole.View(
 //			store: .init(
 //				initialState: .previewValue,
-//				reducer: FactorsForRole()
+//				reducer: FactorsForRole.init
 //			)
 //		)
 //	}

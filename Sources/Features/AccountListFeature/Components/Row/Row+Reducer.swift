@@ -76,7 +76,7 @@ extension AccountList {
 		@Dependency(\.factorSourcesClient) var factorSourcesClient
 		@Dependency(\.userDefaultsClient) var userDefaultsClient
 
-		public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+		public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 			switch viewAction {
 			case .task:
 
@@ -108,7 +108,7 @@ extension AccountList {
 			}
 		}
 
-		public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
+		public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 			switch internalAction {
 			case let .accountPortfolioUpdate(portfolio):
 

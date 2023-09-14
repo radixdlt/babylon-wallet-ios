@@ -69,7 +69,7 @@ extension DisplayEntitiesControlledByMnemonic {
 //		DisplayEntitiesControlledByMnemonic.View(
 //			store: .init(
 //				initialState: .previewValue,
-//				reducer: DisplayEntitiesControlledByMnemonic()
+//				reducer: DisplayEntitiesControlledByMnemonic.init
 //			)
 //		)
 //	}

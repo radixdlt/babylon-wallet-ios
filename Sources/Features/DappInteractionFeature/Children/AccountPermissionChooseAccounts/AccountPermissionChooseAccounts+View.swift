@@ -97,7 +97,7 @@ struct ChooseAccounts_Preview: PreviewProvider {
 			AccountPermissionChooseAccounts.View(
 				store: .init(
 					initialState: .previewValue,
-					reducer: AccountPermissionChooseAccounts()
+					reducer: AccountPermissionChooseAccounts.init
 				)
 			)
 			#if os(iOS)

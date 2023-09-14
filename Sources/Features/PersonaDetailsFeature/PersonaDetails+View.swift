@@ -35,7 +35,7 @@ extension PersonaDetails.View {
 					PersonaThumbnail(viewStore.thumbnail, size: .veryLarge)
 						.padding(.vertical, .large2)
 
-					InfoSection(store: store.actionless)
+					InfoSection(store: store)
 
 					#if DEBUG
 					VStack {
@@ -333,7 +333,7 @@ extension PersonaDetails.View {
 			}
 		}
 
-		let store: Store<PersonaDetails.State, Never>
+		let store: StoreOf<PersonaDetails>
 
 		var body: some View {
 			WithViewStore(store, observe: \.infoSectionViewState) { viewStore in

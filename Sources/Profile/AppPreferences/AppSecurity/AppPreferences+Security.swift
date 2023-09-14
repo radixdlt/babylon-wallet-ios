@@ -16,7 +16,7 @@ extension AppPreferences {
 		public init(
 			structureConfigurationReferences: IdentifiedArrayOf<SecurityStructureConfigurationReference> = [],
 			isCloudProfileSyncEnabled: Bool = true,
-			isDeveloperModeEnabled: Bool = true
+			isDeveloperModeEnabled: Bool = false
 		) {
 			self.structureConfigurationReferences = structureConfigurationReferences
 			self.isCloudProfileSyncEnabled = isCloudProfileSyncEnabled

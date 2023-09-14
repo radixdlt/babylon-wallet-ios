@@ -28,7 +28,7 @@ extension GatewayList {
 			}
 			.buttonStyle(.tappableRowStyle)
 			.onAppear {
-				ViewStore(store.stateless).send(.view(.appeared))
+				store.send(.view(.appeared))
 			}
 		}
 	}
@@ -43,7 +43,7 @@ struct GatewayList_Preview: PreviewProvider {
 		GatewayList.View(
 			store: .init(
 				initialState: .previewValue,
-				reducer: GatewayList()
+				reducer: GatewayList.init
 			)
 		)
 	}

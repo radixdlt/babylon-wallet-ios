@@ -38,7 +38,7 @@ public struct AddAsset: FeatureReducer, Sendable {
 
 	@Dependency(\.dismiss) var dismiss
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case let .addAssetTapped(resourceAddress):
 			return .send(.delegate(.addAddress(state.mode, resourceAddress)))

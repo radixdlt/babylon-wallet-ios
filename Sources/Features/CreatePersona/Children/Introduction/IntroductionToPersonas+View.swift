@@ -85,7 +85,7 @@ extension IntroductionToPersonas {
 //			IntroductionToEntity<Profile.Network.Persona>.View(
 //				store: .init(
 //					initialState: .init(),
-//					reducer: IntroductionToEntity()
+//					reducer: IntroductionToEntity.init
 //				)
 //			)
 //			#if os(iOS)

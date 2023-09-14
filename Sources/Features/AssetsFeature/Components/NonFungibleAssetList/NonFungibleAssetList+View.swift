@@ -23,7 +23,7 @@ extension NonFungibleAssetList {
 				action: NonFungibleAssetList.Destinations.Action.details,
 				content: { detailsStore in
 					WithNavigationBar {
-						ViewStore(store).send(.view(.closeDetailsTapped))
+						store.send(.view(.closeDetailsTapped))
 					} content: {
 						NonFungibleTokenDetails.View(store: detailsStore)
 					}
@@ -41,7 +41,7 @@ struct NonFungibleTokenList_Preview: PreviewProvider {
 		NonFungibleAssetList.View(
 			store: .init(
 				initialState: .init(rows: []),
-				reducer: NonFungibleAssetList()
+				reducer: NonFungibleAssetList.init
 			)
 		)
 	}

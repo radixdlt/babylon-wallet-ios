@@ -67,11 +67,10 @@ import SwiftUI // NB: necessary for previews to appear
 struct SplashView_Previews: PreviewProvider {
 	static var previews: some View {
 		Splash.View(
-			store: .init(
-				initialState: .previewValue,
-				reducer: Splash()
+			store: .init(initialState: .previewValue) {
+				Splash()
 					.dependency(\.continuousClock, ImmediateClock())
-			)
+			}
 		)
 	}
 }

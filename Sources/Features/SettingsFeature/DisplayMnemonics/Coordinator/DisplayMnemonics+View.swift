@@ -93,7 +93,7 @@ struct DisplayMnemonics_Preview: PreviewProvider {
 		DisplayMnemonics.View(
 			store: .init(
 				initialState: .previewValue,
-				reducer: DisplayMnemonics()
+				reducer: DisplayMnemonics.init
 			)
 		)
 	}

@@ -29,7 +29,7 @@ public struct UpdateAccountLabel: FeatureReducer {
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.overlayWindowClient) var overlayWindowClient
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case let .accountLabelChanged(label):
 			state.accountLabel = label

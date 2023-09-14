@@ -32,7 +32,7 @@ public struct ResourceAsset: Sendable, FeatureReducer {
 		case removeTapped
 	}
 
-	public var body: some ReducerProtocolOf<Self> {
+	public var body: some ReducerOf<Self> {
 		Reduce(core)
 			.ifCaseLet(/State.fungibleAsset, action: /Action.child .. ChildAction.fungibleAsset) {
 				FungibleResourceAsset()
@@ -42,7 +42,7 @@ public struct ResourceAsset: Sendable, FeatureReducer {
 			}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case let .fungibleAsset(.delegate(action)):
 			return .send(.delegate(.fungibleAsset(action)))
@@ -51,7 +51,7 @@ public struct ResourceAsset: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .removeTapped:
 			return .send(.delegate(.removed))

@@ -62,7 +62,7 @@ public struct ManageTrustedContactFactorSource: Sendable, FeatureReducer {
 		}
 	}
 
-	public struct Destinations: Sendable, ReducerProtocol {
+	public struct Destinations: Sendable, Reducer {
 		public enum State: Sendable, Hashable {
 			case scanAccountAddress(ScanQRCoordinator.State)
 		}
@@ -71,7 +71,7 @@ public struct ManageTrustedContactFactorSource: Sendable, FeatureReducer {
 			case scanAccountAddress(ScanQRCoordinator.Action)
 		}
 
-		public var body: some ReducerProtocolOf<Self> {
+		public var body: some ReducerOf<Self> {
 			Scope(state: /State.scanAccountAddress, action: /Action.scanAccountAddress) {
 				ScanQRCoordinator()
 			}
@@ -101,14 +101,14 @@ public struct ManageTrustedContactFactorSource: Sendable, FeatureReducer {
 	@Dependency(\.factorSourcesClient) var factorSourcesClient
 	public init() {}
 
-	public var body: some ReducerProtocolOf<Self> {
+	public var body: some ReducerOf<Self> {
 		Reduce(core)
 			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
 				Destinations()
 			}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case let .destination(.presented(.scanAccountAddress(.delegate(.scanned(addressStringScanned))))):
 			var addressStringScanned = addressStringScanned
@@ -123,7 +123,7 @@ public struct ManageTrustedContactFactorSource: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case let .radixAddressChanged(radixAddress):
 			state.radixAddress = radixAddress

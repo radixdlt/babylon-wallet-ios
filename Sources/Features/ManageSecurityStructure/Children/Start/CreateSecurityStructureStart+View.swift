@@ -75,7 +75,7 @@ struct ManageSecurityStructureStart_Preview: PreviewProvider {
 		ManageSecurityStructureStart.View(
 			store: .init(
 				initialState: .previewValue,
-				reducer: ManageSecurityStructureStart()
+				reducer: ManageSecurityStructureStart.init
 			)
 		)
 	}

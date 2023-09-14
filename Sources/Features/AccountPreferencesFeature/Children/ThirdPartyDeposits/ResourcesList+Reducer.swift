@@ -76,7 +76,7 @@ public struct ResourcesList: FeatureReducer, Sendable {
 		case resourcesLoaded([OnLedgerEntity.Resource]?)
 	}
 
-	public struct Destinations: ReducerProtocol, Sendable {
+	public struct Destinations: Reducer, Sendable {
 		public enum State: Equatable, Hashable, Sendable {
 			case addAsset(AddAsset.State)
 			case confirmAssetDeletion(AlertState<Action.ConfirmDeletionAlert>)
@@ -92,7 +92,7 @@ public struct ResourcesList: FeatureReducer, Sendable {
 			}
 		}
 
-		public var body: some ReducerProtocolOf<Self> {
+		public var body: some ReducerOf<Self> {
 			Scope(state: /State.addAsset, action: /Action.addAsset) {
 				AddAsset()
 			}
@@ -101,14 +101,14 @@ public struct ResourcesList: FeatureReducer, Sendable {
 
 	@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
 
-	public var body: some ReducerProtocolOf<Self> {
+	public var body: some ReducerOf<Self> {
 		Reduce(core)
 			.ifLet(\.$destinations, action: /Action.child .. ChildAction.destinations) {
 				Destinations()
 			}
 	}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .task:
 			let addresses: [ResourceAddress] = state.allDepositorAddresses.map(\.resourceAddress)
@@ -138,7 +138,7 @@ public struct ResourcesList: FeatureReducer, Sendable {
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case let .destinations(.presented(.addAsset(.delegate(.addAddress(mode, newAsset))))):
 			state.mode = mode
@@ -164,7 +164,7 @@ public struct ResourcesList: FeatureReducer, Sendable {
 		}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .resourceLoaded(resource, newAsset):
 			state.loadedResources.append(.init(iconURL: resource?.iconURL, name: resource?.name, address: newAsset))
