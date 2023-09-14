@@ -10,6 +10,7 @@ extension EngineToolkit.Decimal {
 extension BigDecimal {
 	static let EngineKitDecimalPrecision = 18
 	public func intoEngine() throws -> EngineToolkit.Decimal {
-		try .init(value: self.toString(withPrecision: Self.EngineKitDecimalPrecision))
+		let value = withPrecision(Self.EngineKitDecimalPrecision).droppingTrailingZeros.toString()
+		return try .init(value: value)
 	}
 }

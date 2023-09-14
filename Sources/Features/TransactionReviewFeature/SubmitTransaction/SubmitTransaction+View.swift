@@ -6,7 +6,7 @@ extension SubmitTransaction.State {
 		.init(
 			txID: notarizedTX.txID,
 			status: status,
-			dismissalDisabled: dismissalDisabled && status.isInProgress
+			dismissalDisabled: inProgressDismissalDisabled && status.isInProgress
 		)
 	}
 }
@@ -19,7 +19,7 @@ extension SubmitTransaction.State.TXStatus {
 		case .rejected: return L10n.TransactionReview.SubmitTransaction.displayRejected
 		case .committedFailure: return L10n.TransactionReview.SubmitTransaction.displayFailed
 		case .committedSuccessfully: return L10n.TransactionReview.SubmitTransaction.displayCommitted
-		case .failedToGetStatus: return "Failed to Poll status"
+		case .failedToGetStatus: return L10n.Error.TransactionFailure.pollStatus
 		}
 	}
 }
@@ -48,25 +48,14 @@ extension SubmitTransaction {
 					viewStore.send(.closeButtonTapped)
 				} content: {
 					VStack(spacing: .medium2) {
-						if viewStore.status.isCompletedWithFailure {
+						if viewStore.status.failed {
 							Image(asset: AssetResource.warningError)
-							Text("Something Went Wrong")
+							Text(L10n.Transaction.Status.Failure.title)
 								.foregroundColor(.app.gray1)
 								.textStyle(.sheetTitle)
 								.multilineTextAlignment(.center)
 
 							Text(viewStore.status.display)
-								.foregroundColor(.app.gray1)
-								.textStyle(.body1Regular)
-								.multilineTextAlignment(.center)
-						} else if viewStore.status == .failedToGetStatus {
-							Image(asset: AssetResource.warningError)
-							Text("Something Went Wrong")
-								.foregroundColor(.app.gray1)
-								.textStyle(.sheetTitle)
-								.multilineTextAlignment(.center)
-
-							Text("Failed to get transaction status")
 								.foregroundColor(.app.gray1)
 								.textStyle(.body1Regular)
 								.multilineTextAlignment(.center)
@@ -98,7 +87,8 @@ extension SubmitTransaction {
 				.onFirstTask { @MainActor in
 					viewStore.send(.appeared)
 				}
-				.interactiveDismissDisabled(viewStore.dismissalDisabled)
+				.alert(store: store.scope(state: \.$dismissTransactionAlert, action: { .view(.dismissTransactionAlert($0)) }))
+				.interactiveDismissDisabled(true)
 				.presentationDragIndicator(.visible)
 				.presentationDetents([.fraction(0.66)])
 				#if os(iOS)

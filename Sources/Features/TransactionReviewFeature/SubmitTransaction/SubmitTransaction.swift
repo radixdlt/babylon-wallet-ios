@@ -21,16 +21,19 @@ public struct SubmitTransaction: Sendable, FeatureReducer {
 		public let notarizedTX: NotarizeTransactionResponse
 		public var status: TXStatus
 		public var hasDelegatedThatTXHasBeenSubmitted = false
-		public let dismissalDisabled: Bool
+		public let inProgressDismissalDisabled: Bool
+
+		@PresentationState
+		var dismissTransactionAlert: AlertState<ViewAction.DismissAlertAction>?
 
 		public init(
 			notarizedTX: NotarizeTransactionResponse,
 			status: TXStatus = .notYetSubmitted,
-			dismissalDisabled: Bool = false
+			inProgressDismissalDisabled: Bool = false
 		) {
 			self.notarizedTX = notarizedTX
 			self.status = status
-			self.dismissalDisabled = dismissalDisabled
+			self.inProgressDismissalDisabled = inProgressDismissalDisabled
 		}
 	}
 
@@ -42,6 +45,12 @@ public struct SubmitTransaction: Sendable, FeatureReducer {
 	public enum ViewAction: Sendable, Equatable {
 		case appeared
 		case closeButtonTapped
+		case dismissTransactionAlert(PresentationAction<DismissAlertAction>)
+
+		public enum DismissAlertAction: Sendable, Equatable {
+			case cancel
+			case confirm
+		}
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -50,13 +59,18 @@ public struct SubmitTransaction: Sendable, FeatureReducer {
 		case submittedButNotCompleted(TXID)
 		case submittedTransactionFailed
 		case committedSuccessfully(TXID)
-		case manuallyDismiss(State.TXStatus)
+		case manuallyDismiss
 	}
 
 	@Dependency(\.submitTXClient) var submitTXClient
 	@Dependency(\.errorQueue) var errorQueue
 
 	public init() {}
+
+	public var body: some ReducerOf<Self> {
+		Reduce(core)
+			.ifLet(\.$dismissTransactionAlert, action: /Action.view .. ViewAction.dismissTransactionAlert)
+	}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
@@ -72,9 +86,26 @@ public struct SubmitTransaction: Sendable, FeatureReducer {
 				)))
 			}
 		case .closeButtonTapped:
-			guard !state.dismissalDisabled else { return .none }
-			// FIXME: For some reason, the dismiss dependency does not work here
-			return .send(.delegate(.manuallyDismiss(state.status)))
+			if state.status.isInProgress {
+				if state.inProgressDismissalDisabled {
+					state.dismissTransactionAlert = .init(title: .init("Dismiss"), message: .init("This transaction requires to be completed"))
+				} else {
+					state.dismissTransactionAlert = .init(title: .init(""),
+					                                      message: TextState(L10n.Transaction.Status.Dismiss.Dialog.message),
+					                                      primaryButton: .destructive(.init(L10n.Common.confirm), action: .send(.confirm)),
+					                                      secondaryButton: .cancel(.init(L10n.Common.cancel), action: .send(.cancel)))
+				}
+				return .none
+			}
+
+			return .send(.delegate(.manuallyDismiss))
+
+		case .dismissTransactionAlert(.presented(.confirm)):
+			return .send(.delegate(.manuallyDismiss))
+		case .dismissTransactionAlert(.presented(.cancel)):
+			return .none
+		case .dismissTransactionAlert(.dismiss):
+			return .none
 		}
 	}
 
@@ -166,6 +197,13 @@ extension SubmitTransaction.State.TXStatus {
 		switch self {
 		case .notYetSubmitted, .submitting, .submittedUnknown, .submittedPending: return true
 		case .committedFailure, .committedSuccessfully, .rejected, .failedToGetStatus: return false
+		}
+	}
+
+	var failed: Bool {
+		switch self {
+		case .rejected, .committedFailure, .failedToGetStatus: return true
+		case .notYetSubmitted, .submittedUnknown, .submittedPending, .committedSuccessfully, .submitting: return false
 		}
 	}
 }

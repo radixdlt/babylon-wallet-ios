@@ -375,7 +375,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			return resetToApprovable(&state)
 
 		case let .signing(.delegate(.finishedSigning(.signTransaction(notarizedTX, origin: _)))):
-			state.destination = .submitting(.init(notarizedTX: notarizedTX, dismissalDisabled: state.waitsForTransactionToBeComitted))
+			state.destination = .submitting(.init(notarizedTX: notarizedTX, inProgressDismissalDisabled: state.waitsForTransactionToBeComitted))
 			return .none
 
 		case .signing(.delegate(.finishedSigning(.signAuth))):
@@ -393,17 +393,21 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			loggerGlobal.error("Failed to submit tx")
 			return resetToApprovable(&state)
 
+		case .submitting(.delegate(.failedToReceiveStatusUpdate)):
+			loggerGlobal.error("Failed to receive status update")
+			return .none
+
+		case .submitting(.delegate(.submittedTransactionFailed)):
+			loggerGlobal.error("Submitted TX failed")
+			return resetToApprovable(&state).concatenate(with: .send(.delegate(.failed(.failedToSubmit))))
+
 		case let .submitting(.delegate(.committedSuccessfully(txID))):
 			state.destination = nil
 			return delayedEffect(for: .delegate(.transactionCompleted(txID)))
 
-		case let .submitting(.delegate(.manuallyDismiss(status))):
+		case .submitting(.delegate(.manuallyDismiss)):
 			// This is used when the close button is pressed, we have to manually
 			state.destination = nil
-			if status.isCompletedWithFailure {
-				state.canApproveTX = true
-				return resetToApprovable(&state).concatenate(with: .send(.delegate(.failed(.failedToSubmit))))
-			}
 			return delayedEffect(for: .delegate(.userDismissedTransactionStatus))
 
 		case .submitting:
@@ -492,7 +496,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			return .none
 
 		case let .notarizeResult(.success(notarizedTX)):
-			state.destination = .submitting(.init(notarizedTX: notarizedTX, dismissalDisabled: state.waitsForTransactionToBeComitted))
+			state.destination = .submitting(.init(notarizedTX: notarizedTX, inProgressDismissalDisabled: state.waitsForTransactionToBeComitted))
 			return .none
 
 		case let .buildTransactionItentResult(.failure(error)),
