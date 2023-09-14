@@ -121,14 +121,15 @@ private_lane :create_gh_release do |options|
     sh('git fetch --tags')
     flavour = options.fetch(:flavour)
     is_prerelease = options.fetch(:is_prerelease)
-    most_recent_tags = sh("git tag | grep '" + flavour + "' | sort -r | head -2").split("\n")
-    git_commits_range_for_changelog = most_recent_tags.map { |tag| sh("git rev-list -n 1 " + tag) }
+    
 
+    most_recent_tags = sh("git tag | grep '" + flavour + "' | sort -r | head -2").split("\n")
+    git_commits_range_for_changelog = most_recent_tags.map { |tag| sh("git rev-list --abbrev-commit -n 1 " + tag).strip }
     rev_changelog = changelog_from_git_commits(
       between: git_commits_range_for_changelog,
-      pretty: "- %s",
-      merge_commit_filtering: 'exclude_merges'
+      pretty: "- %s"
     )
+
     dependencies = read_json(
         json_path: ENV['SWIFT_PACKAGE_RESOLVED_PATH']
     )[:pins]
@@ -163,23 +164,6 @@ private_lane :create_gh_release do |options|
         description: release_description,
         is_prerelease: is_prerelease
     )
-end
-
-lane :cyon do |options|
-    print("STARTING CHANGELOG GEN:")
-    sh('git fetch --tags')
-    flavour = "Beta"
-    most_recent_tags = sh("git tag | grep '" + flavour + "' | sort -r | head -2").split("\n")
-    git_commits_range_for_changelog = most_recent_tags.map { |tag| sh("git rev-list --abbrev-commit -n 1 " + tag).strip }
-    print(git_commits_range_for_changelog)
-    rev_changelog = changelog_from_git_commits(
-      between: git_commits_range_for_changelog,
-      pretty: "- %s"
-    )
-    
-    print("🔮🔮🔮🔮 SUCCESSFULLY GENERATED Changelog 🔮🔮🔮🔮\n\n")
-    print(rev_changelog)
-    print("\n\n🔮🔮🔮🔮 END OF Changelog PRINT 🔮🔮🔮🔮")
 end
 
 private_lane :register_new_device do |options|
