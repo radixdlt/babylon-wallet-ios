@@ -17,12 +17,7 @@ extension BigDecimal {
 		fiatCurrency.sign + format(locale: locale)
 	}
 
-	/// Formats the number for human consumtion
-	public func format(
-		maxPlaces maxPlacesNonNegative: UInt = BigDecimal.defaultMaxPlacesFormattted,
-		divisibility: Int? = nil,
-		locale: Locale = .autoupdatingCurrent
-	) -> String {
+	public func integerAndDecimalPart(withDivisibility divisibility: Int?) -> (String, String?) {
 		// N.B. We cannot use `Local.current.decimalSeperator` here because
 		// `github.com/Zollerbo1/BigDecimal` package **hardcodes** usage of
 		// the decimal separator ".", see this line here:
@@ -35,12 +30,13 @@ extension BigDecimal {
 			),
 			components.count == 2
 		else {
-			return stringRepresentation
+			return (stringRepresentation, nil)
 		}
 
 		let integerPart = String(components[0])
+
 		let decimalComponents = components[1]
-		let decimalPart = {
+		let decimalPart = String({
 			guard let divisibility else {
 				return decimalComponents
 			}
@@ -50,9 +46,19 @@ extension BigDecimal {
 			}
 
 			return decimalComponents.prefix(divisibility)
-		}()
+		}())
 
-		guard !decimalPart.isEmpty else {
+		return (integerPart, decimalPart.isEmpty ? nil : decimalPart)
+	}
+
+	/// Formats the number for human consumtion
+	public func format(
+		maxPlaces maxPlacesNonNegative: UInt = BigDecimal.defaultMaxPlacesFormattted,
+		divisibility: Int? = nil,
+		locale: Locale = .autoupdatingCurrent
+	) -> String {
+		let (integerPart, decimalPart) = integerAndDecimalPart(withDivisibility: divisibility)
+		guard let decimalPart else {
 			return integerPart
 		}
 
