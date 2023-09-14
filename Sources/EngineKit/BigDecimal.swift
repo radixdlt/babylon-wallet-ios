@@ -12,7 +12,7 @@ extension EngineToolkit.Decimal {
 }
 
 extension BigDecimal {
-	public func asDecimal(withDivisibility divisibility: UInt) throws -> EngineToolkit.Decimal {
+	public func asDecimal(withDivisibility divisibility: Int? = nil) throws -> EngineToolkit.Decimal {
 		let stringRepresentation = String(describing: self)
 
 		guard
@@ -25,7 +25,7 @@ extension BigDecimal {
 		}
 
 		let integerPart = String(integerAndDecimalParts[0])
-		let decimalPart = String(integerAndDecimalParts[1].prefix(Int(divisibility)))
+		let decimalPart = String(integerAndDecimalParts[1].prefix(divisibility ?? 18))
 
 		return try .init(
 			value: [

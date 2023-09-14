@@ -80,7 +80,7 @@ extension Instruction {
 			methodName: "lock_fee",
 			args: .tupleValue(
 				fields: [
-					.decimalValue(value: fee.asDecimal(withDivisibility: 18)),
+					.decimalValue(value: fee.asDecimal()),
 				]
 			)
 		)
