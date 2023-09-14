@@ -48,8 +48,13 @@ platform :ios do
         tag = "%s#%s-%s" % [app_version, build_number, ENV['FLAVOUR']]
         add_git_tag(tag: tag)
         push_to_git_remote
+
         if ENV['FLAVOUR'] == "Beta"
-            create_beta_gh_release
+            create_gh_release(flavour: "Beta", is_prerelease: true)
+        end
+
+        if ENV['FLAVOUR'] == "Release"
+            create_gh_release(flavour: "Release", is_prerelease: false)
         end
     end
 
@@ -112,12 +117,15 @@ platform :mac do
     end
 end
 
-private_lane :create_beta_gh_release do
+private_lane :create_gh_release do |options|
     sh('git fetch --tags')
-    most_recent_tags = sh("git tag | grep 'Beta' | sort -r | head -2").split("\n")
-    last_tag = most_recent_tags[0]
+    flavour = options.fetch(:flavour)
+    is_prerelease = options.fetch(:is_prerelease)
+    most_recent_tags = sh("git tag | grep '" + flavour + "' | sort -r | head -2").split("\n")
+    git_commits_range_for_changelog = most_recent_tags.map { |tag| sh("git rev-list -n 1 " + tag) }
+
     rev_changelog = changelog_from_git_commits(
-      between: most_recent_tags,
+      between: git_commits_range_for_changelog,
       pretty: "- %s",
       merge_commit_filtering: 'exclude_merges'
     )
@@ -125,7 +133,19 @@ private_lane :create_beta_gh_release do
         json_path: ENV['SWIFT_PACKAGE_RESOLVED_PATH']
     )[:pins]
 
-    core_deps = ["converse", "swift-engine-toolkit", "swift-profile", "bite", "mnemonic", "slip10", "swift-composable-architecture"]
+    core_deps = [
+        "swift-composable-architecture", 
+        "swift-engine-toolkit", 
+        "webrtc",
+        "k1", 
+        "keychainaccess", 
+        "asyncextensions", 
+        "swift-algorithms", 
+        "swift-async-algorithms", 
+        "swift-dependencies-additions", 
+        "swiftui-navigation"
+    ]
+
     versions = Hash.new
     dependencies.each do |child|
         if core_deps.include? child[:identity]
@@ -134,13 +154,14 @@ private_lane :create_beta_gh_release do
     end
     versions_string = versions.map { |k, v| "- #{k}: #{v}" }.join("\n")
     release_description = "**Dependencies**: \n" + versions_string + "\n\n**Changelog**: \n" + rev_changelog
-
+    last_tag = most_recent_tags[0]
     set_github_release(
         repository_name: ENV['REPO_NAME'],
         api_token: ENV['GIT_TOKEN'] ,
         name: last_tag,
         tag_name: last_tag,
-        description: release_description
+        description: release_description,
+        is_prerelease: is_prerelease
     )
 end
 
