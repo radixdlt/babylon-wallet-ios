@@ -29,17 +29,17 @@ final class CustomizeFeePayerTests: TestCase {
 			manifest: manifestStub,
 			signingPurpose: .signTransaction(.internalManifest(.transfer))
 		)
-
-		let sut = TestStore(initialState: state, reducer: CustomizeFees()) {
-			$0.date = .constant(.init(timeIntervalSince1970: 0))
-			$0.factorSourcesClient.getSigningFactors = { request in
-				try [.device: .init(rawValue: Set(request.signers.rawValue.map {
-					try SigningFactor(
-						factorSource: .device(.babylon(mnemonicWithPassphrase: .testValue)),
-						signer: .init(factorInstancesRequiredToSign: $0.virtualHierarchicalDeterministicFactorInstances, of: $0)
-					)
-				}))!]
-			}
+		let sut = TestStore(initialState: state) {
+			CustomizeFees()
+				.dependency(\.date, .constant(.init(timeIntervalSince1970: 0)))
+				.dependency(\.factorSourcesClient.getSigningFactors) { request in
+					try [.device: .init(rawValue: Set(request.signers.rawValue.map {
+						try SigningFactor(
+							factorSource: .device(.babylon(mnemonicWithPassphrase: .testValue)),
+							signer: .init(factorInstancesRequiredToSign: $0.virtualHierarchicalDeterministicFactorInstances, of: $0)
+						)
+					}))!]
+				}
 		}
 
 		let selectedFeePayer = FeePayerCandidate(account: .previewValue1, xrdBalance: 20)
