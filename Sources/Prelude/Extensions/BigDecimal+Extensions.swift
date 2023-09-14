@@ -34,9 +34,8 @@ extension BigDecimal {
 		}
 
 		let integerPart = String(components[0])
-
-		let decimalComponents = components[1]
 		let decimalPart = String({
+			let decimalComponents = components[1]
 			guard let divisibility else {
 				return decimalComponents
 			}

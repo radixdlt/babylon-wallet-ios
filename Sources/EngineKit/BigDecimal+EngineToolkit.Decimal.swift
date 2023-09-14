@@ -3,6 +3,7 @@ import Prelude
 
 extension EngineToolkit.Decimal {
 	public static let integerAndDecimalPartsSeparator = "."
+	public static let maxDivisibility = 18
 }
 
 extension EngineToolkit.Decimal {
@@ -13,7 +14,9 @@ extension EngineToolkit.Decimal {
 
 extension BigDecimal {
 	public func asDecimal(withDivisibility divisibility: Int? = nil) throws -> EngineToolkit.Decimal {
-		let (integerPart, decimalPart) = integerAndDecimalPart(withDivisibility: divisibility ?? 18)
+		let (integerPart, decimalPart) = integerAndDecimalPart(
+			withDivisibility: divisibility ?? EngineToolkit.Decimal.maxDivisibility
+		)
 
 		return try .init(
 			value: [
