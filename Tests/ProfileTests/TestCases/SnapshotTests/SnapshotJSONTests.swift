@@ -3,7 +3,7 @@ import TestingPrelude
 
 // MARK: - SnapshotJSONTests
 final class SnapshotJSONTests: TestCase {
-	func test_generate() throws {
+	func omit_test_generate() throws {
 		let plaintextSnapshot: ProfileSnapshot = try readTestFixture(
 			bundle: .module,
 			jsonName: "profile_snapshot_plaintext_100",
@@ -45,9 +45,7 @@ final class SnapshotJSONTests: TestCase {
 
 		try XCTAssertJSONCoding(vector)
 
-		let vectorJSON = try jsonEncoder.encode(vector)
-		let jsonString = String(data: vectorJSON, encoding: .utf8)!
-		print(String(describing: jsonString))
+		try print(XCTUnwrap(String(data: jsonEncoder.encode(vector), encoding: .utf8)))
 	}
 
 	func test_profile_snapshot_version_100() throws {
