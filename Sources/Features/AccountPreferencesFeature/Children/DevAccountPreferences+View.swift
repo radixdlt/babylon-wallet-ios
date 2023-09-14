@@ -262,7 +262,7 @@ struct AccountPreferences_Preview: PreviewProvider {
 		DevAccountPreferences.View(
 			store: .init(
 				initialState: .init(address: try! .init(validatingAddress: "account_tdx_c_1px26p5tyqq65809em2h4yjczxcxj776kaun6sv3dw66sc3wrm6")),
-				reducer: DevAccountPreferences()
+				reducer: DevAccountPreferences.init
 			)
 		)
 	}

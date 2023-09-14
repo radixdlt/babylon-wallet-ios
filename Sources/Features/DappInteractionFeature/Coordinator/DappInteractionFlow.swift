@@ -123,7 +123,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 		case dismiss
 	}
 
-	struct Destinations: Sendable, ReducerProtocol {
+	struct Destinations: Sendable, Reducer {
 		typealias State = RelayState<DappInteractionFlow.State.AnyInteractionItem, MainState>
 		typealias Action = RelayAction<DappInteractionFlow.State.AnyInteractionItem, MainAction>
 
@@ -145,7 +145,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			case reviewTransaction(TransactionReview.Action)
 		}
 
-		var body: some ReducerProtocolOf<Self> {
+		var body: some ReducerOf<Self> {
 			Relay {
 				EmptyReducer()
 					.ifCaseLet(/MainState.login, action: /MainAction.login) {
@@ -170,7 +170,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 		}
 	}
 
-	var body: some ReducerProtocolOf<Self> {
+	var body: some ReducerOf<Self> {
 		Reduce(core)
 			.ifLet(\.root, action: /Action.child .. ChildAction.root) {
 				Destinations()
@@ -187,7 +187,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 	@Dependency(\.authorizedDappsClient) var authorizedDappsClient
 	@Dependency(\.continuousClock) var clock
 
-	func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .appeared:
 			guard let usePersonaRequestItem = state.usePersonaRequestItem else {
@@ -228,7 +228,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 		}
 	}
 
-	func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
+	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .failedToUpdatePersonaAtEndOfFlow(_, response, dappMetadata):
 			// FIXME: Figure out if we wanna do something differently... we FAILED to save the persona
@@ -299,14 +299,14 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 }
 
 extension DappInteractionFlow {
-	func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+	func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		func handleLogin(
 			_ item: State.AnyInteractionItem,
 			_ persona: Profile.Network.Persona,
 			_ authorizedDapp: Profile.Network.AuthorizedDapp?,
 			_ authorizedPersona: Profile.Network.AuthorizedDapp.AuthorizedPersonaSimple?,
 			_ signedAuthChallenge: SignedAuthChallenge?
-		) -> EffectTask<Action> {
+		) -> Effect<Action> {
 			state.persona = persona
 			state.authorizedDapp = authorizedDapp
 			state.authorizedPersona = authorizedPersona
@@ -343,7 +343,7 @@ extension DappInteractionFlow {
 			return autofillOngoingResponseItemsIfPossibleEffect(for: state)
 		}
 
-		func handleAccountPermission(_ item: State.AnyInteractionItem) -> EffectTask<Action> {
+		func handleAccountPermission(_ item: State.AnyInteractionItem) -> Effect<Action> {
 			let responseItem: State.AnyInteractionResponseItem = .local(.accountPermissionGranted)
 			state.responseItems[item] = responseItem
 			return continueEffect(for: &state)
@@ -353,7 +353,7 @@ extension DappInteractionFlow {
 			_ item: State.AnyInteractionItem,
 			_ choseAccounts: AccountPermissionChooseAccountsResult,
 			_ accessKind: AccountPermissionChooseAccounts.State.AccessKind
-		) -> EffectTask<Action> {
+		) -> Effect<Action> {
 			setAccountsResponse(
 				to: item,
 				accessKind: accessKind,
@@ -366,7 +366,7 @@ extension DappInteractionFlow {
 		func handlePersonaUpdated(
 			_ state: inout State,
 			_ persona: Profile.Network.Persona
-		) -> EffectTask<Action> {
+		) -> Effect<Action> {
 			guard state.persona?.id == persona.id else {
 				return .none
 			}
@@ -399,14 +399,14 @@ extension DappInteractionFlow {
 		func handleSignAndSubmitTX(
 			_ item: State.AnyInteractionItem,
 			_ txID: TXID
-		) -> EffectTask<Action> {
+		) -> Effect<Action> {
 			state.responseItems[item] = .remote(.send(.init(txID: txID)))
 			return continueEffect(for: &state)
 		}
 
 		func handleSignAndSubmitTXFailed(
 			_ error: TransactionFailure
-		) -> EffectTask<Action> {
+		) -> Effect<Action> {
 			let (errorKind, message) = error.errorKindAndMessage
 			return dismissEffect(for: state, errorKind: errorKind, message: message)
 		}
@@ -483,7 +483,7 @@ extension DappInteractionFlow {
 
 	func autofillOngoingResponseItemsIfPossibleEffect(
 		for state: State
-	) -> EffectTask<Action> {
+	) -> Effect<Action> {
 		.run { [state] send in
 			var payload = InternalAction.AutofillOngoingResponseItemsPayload()
 
@@ -762,7 +762,7 @@ extension DappInteractionFlow {
 		}
 	}
 
-	func continueEffect(for state: inout State) -> EffectTask<Action> {
+	func continueEffect(for state: inout State) -> Effect<Action> {
 		if
 			let nextRequest = state.interactionItems.first(where: { state.responseItems[$0] == nil }),
 			let destination = Destinations.State(
@@ -787,7 +787,7 @@ extension DappInteractionFlow {
 		}
 	}
 
-	func finishInteractionFlow(_ state: State) -> EffectTask<Action> {
+	func finishInteractionFlow(_ state: State) -> Effect<Action> {
 		guard let response = P2P.Dapp.Response.WalletInteractionSuccessResponse(
 			for: state.remoteInteraction,
 			with: state.responseItems.values.compactMap(/State.AnyInteractionResponseItem.remote)
@@ -919,7 +919,7 @@ extension DappInteractionFlow {
 		try await authorizedDappsClient.updateOrAddAuthorizedDapp(authorizedDapp)
 	}
 
-	func goBackEffect(for state: inout State) -> EffectTask<Action> {
+	func goBackEffect(for state: inout State) -> Effect<Action> {
 		state.responseItems.removeLast()
 		state.path.removeLast()
 		return .none
@@ -929,7 +929,7 @@ extension DappInteractionFlow {
 		for state: State,
 		errorKind: P2P.Dapp.Response.WalletInteractionFailureResponse.ErrorType,
 		message: String?
-	) -> EffectTask<Action> {
+	) -> Effect<Action> {
 		.send(.delegate(.dismissWithFailure(.init(
 			interactionId: state.remoteInteraction.id,
 			errorType: errorKind,

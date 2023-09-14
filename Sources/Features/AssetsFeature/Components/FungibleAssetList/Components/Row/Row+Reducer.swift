@@ -52,7 +52,7 @@ extension FungibleAssetList {
 			case selected(AccountPortfolio.FungibleResource)
 		}
 
-		public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+		public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 			switch viewAction {
 			case .tapped:
 				if state.isSelected != nil {

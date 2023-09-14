@@ -120,7 +120,7 @@ struct ChooseQuestions_Preview: PreviewProvider {
 		ChooseQuestions.View(
 			store: .init(
 				initialState: .previewValue,
-				reducer: ChooseQuestions()
+				reducer: ChooseQuestions.init
 			)
 		)
 	}

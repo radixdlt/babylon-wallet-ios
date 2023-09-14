@@ -85,7 +85,7 @@ extension CustomizeFees {
 								switch state {
 								case .normal:
 									CaseLet(
-										state: /CustomizeFees.State.CustomizationModeState.normal,
+										/CustomizeFees.State.CustomizationModeState.normal,
 										action: CustomizeFees.ChildAction.normalFeesCustomization,
 										then: {
 											NormalFeesCustomization.View(store: $0)
@@ -93,7 +93,7 @@ extension CustomizeFees {
 									)
 								case .advanced:
 									CaseLet(
-										state: /CustomizeFees.State.CustomizationModeState.advanced,
+										/CustomizeFees.State.CustomizationModeState.advanced,
 										action: CustomizeFees.ChildAction.advancedFeesCustomization,
 										then: {
 											AdvancedFeesCustomization.View(store: $0)

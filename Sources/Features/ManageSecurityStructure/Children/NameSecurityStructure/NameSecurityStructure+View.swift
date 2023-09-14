@@ -60,7 +60,7 @@ extension NameSecurityStructure {
 //		NameSecurityStructure.View(
 //			store: .init(
 //				initialState: .previewValue,
-//				reducer: NameSecurityStructure()
+//				reducer: NameSecurityStructure.init
 //			)
 //		)
 //	}

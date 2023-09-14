@@ -96,7 +96,7 @@ extension ImportMnemonicControllingAccounts {
 //		ImportMnemonicControllingAccounts.View(
 //			store: .init(
 //				initialState: .previewValue,
-//				reducer: ImportMnemonicControllingAccounts()
+//				reducer: ImportMnemonicControllingAccounts.init
 //			)
 //		)
 //	}

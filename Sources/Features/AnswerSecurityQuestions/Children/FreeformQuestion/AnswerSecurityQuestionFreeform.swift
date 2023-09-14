@@ -42,7 +42,7 @@ public struct AnswerSecurityQuestionFreeform: Sendable, FeatureReducer {
 
 	public init() {}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case let .answerChanged(answer):
 			state.answer = NonEmpty(answer)

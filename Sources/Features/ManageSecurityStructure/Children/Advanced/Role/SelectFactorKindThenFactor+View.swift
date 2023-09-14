@@ -70,7 +70,7 @@ extension SelectFactorKindThenFactor {
 //		SelectFactorKindThenFactor.View(
 //			store: .init(
 //				initialState: .previewValue,
-//				reducer: SelectFactorKindThenFactor()
+//				reducer: SelectFactorKindThenFactor.init
 //			)
 //		)
 //	}

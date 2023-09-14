@@ -54,7 +54,7 @@ public struct EditPersonaName: FeatureReducer, EmptyInitializable {
 
 	public init() {}
 
-	public var body: some ReducerProtocolOf<Self> {
+	public var body: some ReducerOf<Self> {
 		Scope(
 			state: \.family,
 			action: /Action.child .. ChildAction.family,
@@ -75,7 +75,7 @@ public struct EditPersonaName: FeatureReducer, EmptyInitializable {
 		Reduce(core)
 	}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case let .variantPick(variant):
 			state.variant = variant

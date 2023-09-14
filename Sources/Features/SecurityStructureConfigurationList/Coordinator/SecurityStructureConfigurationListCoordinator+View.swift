@@ -50,7 +50,7 @@ extension View {
 //		SecurityStructureConfigurationListCoordinator.View(
 //			store: .init(
 //				initialState: .previewValue,
-//				reducer: SecurityStructureConfigurationListCoordinator()
+//				reducer: SecurityStructureConfigurationListCoordinator.init
 //			)
 //		)
 //	}

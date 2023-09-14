@@ -85,7 +85,7 @@ struct PersonaDataPermission_Preview: PreviewProvider {
 			PersonaDataPermission.View(
 				store: .init(
 					initialState: .previewValue,
-					reducer: PersonaDataPermission()
+					reducer: PersonaDataPermission.init
 				) {
 					$0.personasClient.getPersonas = { @Sendable in
 						[.previewValue0, .previewValue1]

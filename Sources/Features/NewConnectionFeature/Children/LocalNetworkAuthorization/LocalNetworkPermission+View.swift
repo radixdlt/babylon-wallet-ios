@@ -18,7 +18,7 @@ extension LocalNetworkPermission {
 						action: { .view(.permissionDeniedAlert($0)) }
 					)
 				)
-				.onAppear { ViewStore(store.stateless).send(.view(.appeared)) }
+				.onAppear { store.send(.view(.appeared)) }
 		}
 	}
 }
@@ -32,7 +32,7 @@ extension LocalNetworkPermission {
 			LocalNetworkPermission.View(
 				store: .init(
 					initialState: .previewValue,
-					reducer: LocalNetworkPermission()
+					reducer: LocalNetworkPermission.init
 				)
 			)
 		}

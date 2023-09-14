@@ -67,7 +67,7 @@ struct SecurityStructureConfigurationList_Preview: PreviewProvider {
 		SecurityStructureConfigurationList.View(
 			store: .init(
 				initialState: .previewValue,
-				reducer: SecurityStructureConfigurationList()
+				reducer: SecurityStructureConfigurationList.init
 			)
 		)
 	}

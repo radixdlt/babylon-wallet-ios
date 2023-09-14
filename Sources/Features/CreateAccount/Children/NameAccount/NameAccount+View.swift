@@ -133,7 +133,7 @@ extension NameAccount.View {
 //		NameAccount.View(
 //			store: .init(
 //				initialState: .init(isFirst: true),
-//				reducer: NameNewEntity()
+//				reducer: NameNewEntity.init
 //			)
 //		)
 //	}

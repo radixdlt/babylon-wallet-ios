@@ -51,7 +51,7 @@ public struct Home: Sendable, FeatureReducer {
 		case displaySettings
 	}
 
-	public struct Destinations: Sendable, ReducerProtocol {
+	public struct Destinations: Sendable, Reducer {
 		public enum State: Sendable, Hashable {
 			case accountDetails(AccountDetails.State)
 			case createAccount(CreateAccountCoordinator.State)
@@ -62,7 +62,7 @@ public struct Home: Sendable, FeatureReducer {
 			case createAccount(CreateAccountCoordinator.Action)
 		}
 
-		public var body: some ReducerProtocolOf<Self> {
+		public var body: some ReducerOf<Self> {
 			Scope(state: /State.accountDetails, action: /Action.accountDetails) {
 				AccountDetails()
 			}
@@ -78,7 +78,7 @@ public struct Home: Sendable, FeatureReducer {
 
 	public init() {}
 
-	public var body: some ReducerProtocolOf<Self> {
+	public var body: some ReducerOf<Self> {
 		Scope(state: \.header, action: /Action.child .. ChildAction.header) {
 			Header()
 		}
@@ -91,7 +91,7 @@ public struct Home: Sendable, FeatureReducer {
 			}
 	}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .task:
 			return .run { send in
@@ -121,7 +121,7 @@ public struct Home: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .accountsLoadedResult(.success(accounts)):
 			state.accountList = .init(accounts: accounts)
@@ -138,7 +138,7 @@ public struct Home: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case let .accountList(.delegate(.displayAccountDetails(
 			account,

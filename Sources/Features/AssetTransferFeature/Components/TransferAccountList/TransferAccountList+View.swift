@@ -71,22 +71,21 @@ extension TransferAccountList.View {
 
 	private func destinations(_ store: StoreOf<TransferAccountList.Destinations>) -> some View {
 		SwitchStore(store.relay()) { state in
-
 			switch state {
 			case .chooseAccount:
 				CaseLet(
-					state: /TransferAccountList.Destinations.MainState.chooseAccount,
+					/TransferAccountList.Destinations.MainState.chooseAccount,
 					action: TransferAccountList.Destinations.MainAction.chooseAccount,
 					then: { ChooseReceivingAccount.View(store: $0) }
 				)
 
 			case .addAsset:
 				CaseLet(
-					state: /TransferAccountList.Destinations.MainState.addAsset,
+					/TransferAccountList.Destinations.MainState.addAsset,
 					action: TransferAccountList.Destinations.MainAction.addAsset,
 					then: { assetsStore in
 						WithNavigationBar {
-							ViewStore(assetsStore).send(.view(.closeButtonTapped))
+							assetsStore.send(.view(.closeButtonTapped))
 						} content: {
 							AssetsView.View(store: assetsStore)
 								.navigationTitle(L10n.AssetTransfer.AddAssets.navigationTitle)

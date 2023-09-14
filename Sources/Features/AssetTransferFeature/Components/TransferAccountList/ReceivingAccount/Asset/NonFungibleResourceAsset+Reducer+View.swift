@@ -19,8 +19,8 @@ extension NonFungibleResourceAsset {
 
 	@MainActor
 	public struct View: SwiftUI.View {
-		private let store: Store<NonFungibleResourceAsset.State, Never>
-		public init(store: Store<NonFungibleResourceAsset.State, Never>) {
+		private let store: StoreOf<NonFungibleResourceAsset>
+		public init(store: StoreOf<NonFungibleResourceAsset>) {
 			self.store = store
 		}
 	}

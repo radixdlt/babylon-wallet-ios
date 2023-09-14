@@ -116,7 +116,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 
 	// MARK: - Destination
 
-	public struct Destination: ReducerProtocol {
+	public struct Destination: Reducer {
 		public enum State: Equatable, Hashable {
 			case personaDetails(PersonaDetails.State)
 			case confirmDisconnectAlert(AlertState<Action.ConfirmDisconnectAlert>)
@@ -132,7 +132,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 			}
 		}
 
-		public var body: some ReducerProtocolOf<Self> {
+		public var body: some ReducerOf<Self> {
 			Scope(state: /State.personaDetails, action: /Action.personaDetails) {
 				PersonaDetails()
 			}
@@ -143,7 +143,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 
 	public init() {}
 
-	public var body: some ReducerProtocolOf<Self> {
+	public var body: some ReducerOf<Self> {
 		Scope(state: \.personaList, action: /Action.child .. ChildAction.personas) {
 			PersonaList()
 		}
@@ -153,7 +153,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 			}
 	}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .appeared:
 			state.$metadata = .loading
@@ -194,7 +194,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case let .destination(.presented(destinationAction)):
 			switch destinationAction {
@@ -227,7 +227,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .metadataLoaded(metadata):
 			state.$metadata = metadata
@@ -315,7 +315,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 		return .init(address: dApp, name: name, iconURL: metadata.iconURL)
 	}
 
-	private func update(dAppID: DappDefinitionAddress, dismissPersonaDetails: Bool) -> EffectTask<Action> {
+	private func update(dAppID: DappDefinitionAddress, dismissPersonaDetails: Bool) -> Effect<Action> {
 		.run { send in
 			let updatedDapp = try await authorizedDappsClient.getDetailedDapp(dAppID)
 			await send(.internal(.dAppUpdated(updatedDapp)))
@@ -327,7 +327,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 		}
 	}
 
-	private func disconnectDappEffect(dApp: Profile.Network.AuthorizedDappDetailed, delay: Duration? = .zero) -> EffectTask<Action> {
+	private func disconnectDappEffect(dApp: Profile.Network.AuthorizedDappDetailed, delay: Duration? = .zero) -> Effect<Action> {
 		let (dAppID, networkID) = (dApp.dAppDefinitionAddress, dApp.networkID)
 		return .run { send in
 			if let delay {

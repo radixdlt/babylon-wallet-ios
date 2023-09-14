@@ -3,7 +3,7 @@ import EngineKit
 import FactorSourcesClient
 import FeaturePrelude
 
-public struct SignWithFactorSourcesOfKindDevice: SignWithFactorSourcesOfKindReducerProtocol {
+public struct SignWithFactorSourcesOfKindDevice: SignWithFactorSourcesOfKindReducer {
 	public typealias Factor = DeviceFactorSource
 	public typealias State = SignWithFactorSourcesOfKindState<Factor>
 	public enum ViewAction: SignWithFactorSourcesOfKindViewActionProtocol {
@@ -26,7 +26,7 @@ public struct SignWithFactorSourcesOfKindDevice: SignWithFactorSourcesOfKindRedu
 	@Dependency(\.deviceFactorSourceClient) var deviceFactorSourceClient
 	public init() {}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .onFirstTask:
 			return signWithSigningFactors(of: state)
@@ -36,7 +36,7 @@ public struct SignWithFactorSourcesOfKindDevice: SignWithFactorSourcesOfKindRedu
 	public func reduce(
 		into state: inout State,
 		internalAction: InternalAction
-	) -> EffectTask<Action> {
+	) -> Effect<Action> {
 		switch internalAction {
 		case let .signingWithFactor(factor):
 			state.currentSigningFactor = factor

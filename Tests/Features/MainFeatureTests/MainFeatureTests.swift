@@ -5,10 +5,10 @@ import FeatureTestingPrelude
 final class MainFeatureTests: TestCase {
 	func test_displayAndDismissSettings() async {
 		// given
-		let store = TestStore(
-			initialState: Main.State(home: .previewValue),
-			reducer: Main().dependency(\.userDefaultsClient, .noop)
-		)
+		let store = TestStore(initialState: Main.State(home: .previewValue)) {
+			Main()
+				.dependency(\.userDefaultsClient, .noop)
+		}
 
 		// when
 		await store.send(.child(.home(.delegate(.displaySettings)))) {

@@ -67,7 +67,7 @@ struct VisitHub_Preview: PreviewProvider {
 		VisitHub.View(
 			store: .init(
 				initialState: .previewValue,
-				reducer: VisitHub()
+				reducer: VisitHub.init
 			)
 		)
 	}

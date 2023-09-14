@@ -232,7 +232,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 		case doneViewing(markedMnemonicAsBackedUp: Bool? = nil) // `nil` means it was already marked as backed up
 	}
 
-	public struct Destinations: Sendable, ReducerProtocol {
+	public struct Destinations: Sendable, Reducer {
 		public enum State: Sendable, Hashable {
 			case offDeviceMnemonicInfoPrompt(OffDeviceMnemonicInfo.State)
 			case markMnemonicAsBackedUp(AlertState<Action.MarkMnemonicAsBackedUpOrNot>)
@@ -249,7 +249,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			}
 		}
 
-		public var body: some ReducerProtocol<State, Action> {
+		public var body: some Reducer<State, Action> {
 			Scope(state: /State.markMnemonicAsBackedUp, action: /Action.markMnemonicAsBackedUp) {
 				EmptyReducer()
 			}
@@ -272,7 +272,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 
 	public init() {}
 
-	public var body: some ReducerProtocolOf<Self> {
+	public var body: some ReducerOf<Self> {
 		Reduce(core)
 			.forEach(\.words, action: /Action.child .. ChildAction.word) {
 				ImportMnemonicWord()
@@ -282,7 +282,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case let .word(id, child: .delegate(.lookupWord(input))):
 			let lookUpResult = lookup(input: input, state)
@@ -344,7 +344,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .appeared:
 			return focusNext(&state)
@@ -442,7 +442,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 		}
 	}
 
-	private func markAsBackedUpIfNeeded(_ state: inout State) -> EffectTask<Action> {
+	private func markAsBackedUpIfNeeded(_ state: inout State) -> Effect<Action> {
 		guard
 			let readonlyMode = state.readonlyMode,
 			let mnemonic = state.mnemonic,
@@ -464,7 +464,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .focusNext(id):
 			state.idOfWordWithTextFieldFocus = id
@@ -497,7 +497,7 @@ extension ImportMnemonic {
 		id: ImportMnemonicWord.State.ID,
 		input: String,
 		_ state: inout State
-	) -> EffectTask<Action> {
+	) -> Effect<Action> {
 		state.words[id: id]?.value = .complete(text: input, word: word, completion: completion)
 		return focusNext(&state)
 	}
@@ -507,7 +507,7 @@ extension ImportMnemonic {
 		input: String,
 		_ state: inout State,
 		lookupResult: BIP39.WordList.LookupResult
-	) -> EffectTask<Action> {
+	) -> Effect<Action> {
 		switch lookupResult {
 		case let .known(.ambigous(candidates, nonEmptyInput)):
 			state.words[id: id]?.autocompletionCandidates = .init(input: nonEmptyInput, candidates: candidates)
@@ -527,7 +527,7 @@ extension ImportMnemonic {
 		}
 	}
 
-	private func focusNext(_ state: inout State) -> EffectTask<Action> {
+	private func focusNext(_ state: inout State) -> Effect<Action> {
 		if let current = state.idOfWordWithTextFieldFocus {
 			state.words[id: current]?.resignFocus()
 		}

@@ -16,7 +16,7 @@ public struct LSUResource: Sendable, FeatureReducer {
 		case stake(id: LSUStake.State.ID, action: LSUStake.Action)
 	}
 
-	public var body: some ReducerProtocolOf<Self> {
+	public var body: some ReducerOf<Self> {
 		Reduce(core)
 			.forEach(
 				\.stakes,
@@ -25,7 +25,7 @@ public struct LSUResource: Sendable, FeatureReducer {
 			)
 	}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .isExpandedToggled:
 			state.isExpanded.toggle()

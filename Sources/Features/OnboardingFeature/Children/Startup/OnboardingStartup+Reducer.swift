@@ -24,7 +24,7 @@ public struct OnboardingStartup: Sendable, FeatureReducer {
 		case destination(PresentationAction<Destinations.Action>)
 	}
 
-	public struct Destinations: Sendable, ReducerProtocol {
+	public struct Destinations: Sendable, Reducer {
 		public enum State: Sendable, Hashable {
 			case restoreFromBackup(RestoreProfileFromBackupCoordinator.State)
 		}
@@ -33,21 +33,21 @@ public struct OnboardingStartup: Sendable, FeatureReducer {
 			case restoreFromBackup(RestoreProfileFromBackupCoordinator.Action)
 		}
 
-		public var body: some ReducerProtocolOf<Self> {
+		public var body: some ReducerOf<Self> {
 			Scope(state: /State.restoreFromBackup, action: /Action.restoreFromBackup) {
 				RestoreProfileFromBackupCoordinator()
 			}
 		}
 	}
 
-	public var body: some ReducerProtocolOf<Self> {
+	public var body: some ReducerOf<Self> {
 		Reduce(core)
 			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
 				Destinations()
 			}
 	}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .selectedNewWalletUser:
 			return .send(.delegate(.setupNewUser))
@@ -58,7 +58,7 @@ public struct OnboardingStartup: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case let .destination(.presented(.restoreFromBackup(.delegate(.profileImported(skippedAnyMnemonic, hasMainnetAccounts))))):
 			return .send(.delegate(.completed(

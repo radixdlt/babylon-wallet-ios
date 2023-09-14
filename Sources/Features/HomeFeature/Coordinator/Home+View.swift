@@ -121,7 +121,7 @@ struct HomeView_Previews: PreviewProvider {
 		Home.View(
 			store: .init(
 				initialState: .previewValue,
-				reducer: Home()
+				reducer: Home.init
 			)
 		)
 	}

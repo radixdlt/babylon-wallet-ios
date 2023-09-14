@@ -23,7 +23,7 @@ extension GatewaySettings {
 					coreView(with: viewStore)
 						.padding(.bottom, .medium1)
 						.navigationTitle(L10n.Gateways.title)
-						.task { @MainActor in await ViewStore(store.stateless).send(.view(.task)).finish() }
+						.task { @MainActor in await store.send(.view(.task)).finish() }
 						.alert(
 							store: store.scope(
 								state: \.$removeGatewayAlert,
@@ -36,7 +36,7 @@ extension GatewaySettings {
 							action: Destinations.Action.addNewGateway,
 							content: { addGatewayStore in
 								WithNavigationBar {
-									ViewStore(addGatewayStore).send(.view(.closeButtonTapped))
+									addGatewayStore.send(.view(.closeButtonTapped))
 								} content: {
 									AddNewGateway.View(store: addGatewayStore)
 								}
@@ -115,7 +115,7 @@ struct GatewaySettings_Preview: PreviewProvider {
 		GatewaySettings.View(
 			store: .init(
 				initialState: .previewValue,
-				reducer: GatewaySettings()
+				reducer: GatewaySettings.init
 			)
 		)
 	}

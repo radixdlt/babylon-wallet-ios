@@ -231,7 +231,7 @@ extension View {
 //		ChooseLedgerHardwareDevice.View(
 //			store: .init(
 //				initialState: .previewValue,
-//				reducer: ChooseLedgerHardwareDevice()
+//				reducer: ChooseLedgerHardwareDevice.init
 //			)
 //		)
 //	}

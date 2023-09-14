@@ -72,7 +72,7 @@ public struct LedgerHardwareDevices: Sendable, FeatureReducer {
 
 	// MARK: - Destination
 
-	public struct Destinations: Sendable, ReducerProtocol {
+	public struct Destinations: Sendable, Reducer {
 		public enum State: Sendable, Hashable {
 			case noP2PLink(AlertState<NoP2PLinkAlert>)
 			case addNewP2PLink(NewConnection.State)
@@ -85,7 +85,7 @@ public struct LedgerHardwareDevices: Sendable, FeatureReducer {
 			case addNewLedger(AddLedgerFactorSource.Action)
 		}
 
-		public var body: some ReducerProtocolOf<Self> {
+		public var body: some ReducerOf<Self> {
 			Scope(state: /State.addNewP2PLink, action: /Action.addNewP2PLink) {
 				NewConnection()
 			}
@@ -104,14 +104,14 @@ public struct LedgerHardwareDevices: Sendable, FeatureReducer {
 
 	public init() {}
 
-	public var body: some ReducerProtocolOf<Self> {
+	public var body: some ReducerOf<Self> {
 		Reduce(core)
 			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
 				Destinations()
 			}
 	}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .onFirstTask:
 			return .merge(updateLedgersEffect(state: &state), checkP2PLinkEffect())
@@ -131,7 +131,7 @@ public struct LedgerHardwareDevices: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .loadedLedgers(result):
 			state.$ledgers = .init(result: result)
@@ -152,7 +152,7 @@ public struct LedgerHardwareDevices: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case let .destination(.presented(.noP2PLink(alertAction))):
 			switch alertAction {
@@ -199,7 +199,7 @@ public struct LedgerHardwareDevices: Sendable, FeatureReducer {
 		}
 	}
 
-	private func updateLedgersEffect(state: inout State) -> EffectTask<Action> {
+	private func updateLedgersEffect(state: inout State) -> Effect<Action> {
 		state.$ledgers = .loading
 		return .run { send in
 			let result = await TaskResult {
@@ -210,7 +210,7 @@ public struct LedgerHardwareDevices: Sendable, FeatureReducer {
 		}
 	}
 
-	private func checkP2PLinkEffect() -> EffectTask<Action> {
+	private func checkP2PLinkEffect() -> Effect<Action> {
 		.run { send in
 			for try await isConnected in await ledgerHardwareWalletClient.isConnectedToAnyConnectorExtension() {
 				guard !Task.isCancelled else { return }
@@ -221,7 +221,7 @@ public struct LedgerHardwareDevices: Sendable, FeatureReducer {
 		}
 	}
 
-	private func performActionRequiringP2PEffect(_ action: ActionRequiringP2P, in state: inout State) -> EffectTask<Action> {
+	private func performActionRequiringP2PEffect(_ action: ActionRequiringP2P, in state: inout State) -> Effect<Action> {
 		// If we don't have a connection, we remember what we were trying to do and then ask if they want to link one
 		guard state.hasAConnectorExtension else {
 			state.pendingAction = action

@@ -64,7 +64,7 @@ public struct AnswerSecurityQuestionsCoordinator: Sendable, FeatureReducer {
 		case path(StackActionOf<Path>)
 	}
 
-	public struct Path: Sendable, ReducerProtocol {
+	public struct Path: Sendable, Reducer {
 		public enum State: Sendable, Hashable {
 			case chooseQuestions(ChooseQuestions.State)
 			case answerQuestion(AnswerSecurityQuestionFreeform.State)
@@ -85,7 +85,7 @@ public struct AnswerSecurityQuestionsCoordinator: Sendable, FeatureReducer {
 			case answerQuestion(AnswerSecurityQuestionFreeform.Action)
 		}
 
-		public var body: some ReducerProtocolOf<Self> {
+		public var body: some ReducerOf<Self> {
 			Scope(state: /State.chooseQuestions, action: /Action.chooseQuestions) {
 				ChooseQuestions()
 			}
@@ -100,7 +100,7 @@ public struct AnswerSecurityQuestionsCoordinator: Sendable, FeatureReducer {
 
 	public init() {}
 
-	public var body: some ReducerProtocolOf<Self> {
+	public var body: some ReducerOf<Self> {
 		Scope(state: \.root, action: /Action.child .. ChildAction.root) {
 			Path()
 		}
@@ -111,7 +111,7 @@ public struct AnswerSecurityQuestionsCoordinator: Sendable, FeatureReducer {
 			}
 	}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .closeButtonTapped:
 			return dismissEffect(for: state, errorKind: .rejectedByUser)
@@ -120,7 +120,7 @@ public struct AnswerSecurityQuestionsCoordinator: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case
 			let .root(.chooseQuestions(.delegate(.choseQuestions(chosenQuestions)))):
@@ -137,7 +137,7 @@ public struct AnswerSecurityQuestionsCoordinator: Sendable, FeatureReducer {
 		}
 	}
 
-	func answerNextQuestion(_ state: inout State) -> EffectTask<Action> {
+	func answerNextQuestion(_ state: inout State) -> Effect<Action> {
 		let answers = ([state.root] + state.path).compactMap(\.answerToQuestion)
 		let unansweredQuestions = state.questions.filter { question in
 			!answers.contains(where: { $0.question == question })
@@ -188,7 +188,7 @@ public struct AnswerSecurityQuestionsCoordinator: Sendable, FeatureReducer {
 		}
 	}
 
-	func goBackEffect(for state: inout State) -> EffectTask<Action> {
+	func goBackEffect(for state: inout State) -> Effect<Action> {
 		state.path.removeLast()
 		return .none
 	}
@@ -196,7 +196,7 @@ public struct AnswerSecurityQuestionsCoordinator: Sendable, FeatureReducer {
 	func dismissEffect(
 		for state: State,
 		errorKind: Error
-	) -> EffectTask<Action> {
+	) -> Effect<Action> {
 		.send(.delegate(.done(.failure(errorKind))))
 	}
 

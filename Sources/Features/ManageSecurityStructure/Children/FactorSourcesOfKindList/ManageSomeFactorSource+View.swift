@@ -28,7 +28,7 @@ extension ManageSomeFactorSource {
 				switch state {
 				case .manageSecurityQuestions:
 					CaseLet(
-						state: /ManageSomeFactorSource.State.manageSecurityQuestions,
+						/ManageSomeFactorSource.State.manageSecurityQuestions,
 						action: { ManageSomeFactorSource.Action.child(.manageSecurityQuestions($0)) },
 						then: {
 							AnswerSecurityQuestionsCoordinator.View(store: $0)
@@ -36,7 +36,7 @@ extension ManageSomeFactorSource {
 					)
 				case .manageTrustedContact:
 					CaseLet(
-						state: /ManageSomeFactorSource.State.manageTrustedContact,
+						/ManageSomeFactorSource.State.manageTrustedContact,
 						action: { ManageSomeFactorSource.Action.child(.manageTrustedContact($0)) },
 						then: {
 							ManageTrustedContactFactorSource.View(store: $0)
@@ -44,7 +44,7 @@ extension ManageSomeFactorSource {
 					)
 				case .manageOffDeviceMnemonics:
 					CaseLet(
-						state: /ManageSomeFactorSource.State.manageOffDeviceMnemonics,
+						/ManageSomeFactorSource.State.manageOffDeviceMnemonics,
 						action: { ManageSomeFactorSource.Action.child(.manageOffDeviceMnemonics($0)) },
 						then: {
 							ImportMnemonic.View(store: $0)
@@ -65,7 +65,7 @@ extension ManageSomeFactorSource {
 //		ManageSomeFactorSource.View(
 //			store: .init(
 //				initialState: .previewValue,
-//				reducer: ManageSomeFactorSource()
+//				reducer: ManageSomeFactorSource.init
 //			)
 //		)
 //	}

@@ -66,14 +66,14 @@ struct Login: Sendable, FeatureReducer {
 	@Dependency(\.rolaClient) var rolaClient
 	@Dependency(\.deviceFactorSourceClient) var deviceFactorSourceClient
 
-	var body: some ReducerProtocolOf<Self> {
+	var body: some ReducerOf<Self> {
 		Reduce(core)
 			.ifLet(\.$createPersonaCoordinator, action: /Action.child .. ChildAction.createPersonaCoordinator) {
 				CreatePersonaCoordinator()
 			}
 	}
 
-	func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .appeared:
 			return loadPersonas(state: &state).concatenate(with: checkIfFirstPersonaByUserEver())
@@ -117,7 +117,7 @@ struct Login: Sendable, FeatureReducer {
 		}
 	}
 
-	func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
+	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .isFirstPersonaOnAnyNetwork(isFirstPersonaOnAnyNetwork):
 			state.isFirstPersonaOnAnyNetwork = isFirstPersonaOnAnyNetwork
@@ -151,7 +151,7 @@ struct Login: Sendable, FeatureReducer {
 		}
 	}
 
-	func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+	func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case .createPersonaCoordinator(.presented(.delegate(.completed))):
 			state.isFirstPersonaOnAnyNetwork = false
@@ -162,7 +162,7 @@ struct Login: Sendable, FeatureReducer {
 		}
 	}
 
-	func loadPersonas(state: inout State) -> EffectTask<Action> {
+	func loadPersonas(state: inout State) -> Effect<Action> {
 		.run { [dAppDefinitionAddress = state.dappMetadata.dAppDefinitionAddress] send in
 			let personas = try await personasClient.getPersonas()
 			let authorizedDapps = try await authorizedDappsClient.getAuthorizedDapps()
@@ -188,7 +188,7 @@ struct Login: Sendable, FeatureReducer {
 		}
 	}
 
-	func checkIfFirstPersonaByUserEver() -> EffectTask<Action> {
+	func checkIfFirstPersonaByUserEver() -> Effect<Action> {
 		.run { send in
 			let hasAnyPersonaOnAnyNetwork = await personasClient.hasAnyPersonaOnAnyNetwork()
 			let isFirstPersonaOnAnyNetwork = !hasAnyPersonaOnAnyNetwork

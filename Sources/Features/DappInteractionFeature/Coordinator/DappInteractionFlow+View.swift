@@ -23,7 +23,7 @@ extension DappInteractionFlow {
 						.toolbar {
 							ToolbarItem(placement: .navigationBarLeading) {
 								CloseButton {
-									ViewStore(store.stateless).send(.view(.closeButtonTapped))
+									store.send(.view(.closeButtonTapped))
 								}
 							}
 						}
@@ -38,7 +38,7 @@ extension DappInteractionFlow {
 					.toolbar {
 						ToolbarItem(placement: .navigationBarLeading) {
 							BackButton {
-								ViewStore(store.stateless).send(.view(.backButtonTapped))
+								store.send(.view(.backButtonTapped))
 							}
 						}
 					}
@@ -47,7 +47,7 @@ extension DappInteractionFlow {
 			#if os(iOS)
 			.navigationTransition(.slide, interactivity: .disabled)
 			#endif
-			.onAppear { ViewStore(store.stateless).send(.view(.appeared)) }
+			.onAppear { store.send(.view(.appeared)) }
 			.alert(
 				store: store.scope(
 					state: \.$personaNotFoundErrorAlert,
@@ -63,42 +63,42 @@ extension DappInteractionFlow {
 				switch state {
 				case .login:
 					CaseLet(
-						state: /DappInteractionFlow.Destinations.MainState.login,
+						/DappInteractionFlow.Destinations.MainState.login,
 						action: DappInteractionFlow.Destinations.MainAction.login,
 						then: { Login.View(store: $0) }
 					)
 
 				case .accountPermission:
 					CaseLet(
-						state: /DappInteractionFlow.Destinations.MainState.accountPermission,
+						/DappInteractionFlow.Destinations.MainState.accountPermission,
 						action: DappInteractionFlow.Destinations.MainAction.accountPermission,
 						then: { AccountPermission.View(store: $0) }
 					)
 
 				case .chooseAccounts:
 					CaseLet(
-						state: /DappInteractionFlow.Destinations.MainState.chooseAccounts,
+						/DappInteractionFlow.Destinations.MainState.chooseAccounts,
 						action: DappInteractionFlow.Destinations.MainAction.chooseAccounts,
 						then: { AccountPermissionChooseAccounts.View(store: $0) }
 					)
 
 				case .personaDataPermission:
 					CaseLet(
-						state: /DappInteractionFlow.Destinations.MainState.personaDataPermission,
+						/DappInteractionFlow.Destinations.MainState.personaDataPermission,
 						action: DappInteractionFlow.Destinations.MainAction.personaDataPermission,
 						then: { PersonaDataPermission.View(store: $0) }
 					)
 
 				case .oneTimePersonaData:
 					CaseLet(
-						state: /DappInteractionFlow.Destinations.MainState.oneTimePersonaData,
+						/DappInteractionFlow.Destinations.MainState.oneTimePersonaData,
 						action: DappInteractionFlow.Destinations.MainAction.oneTimePersonaData,
 						then: { OneTimePersonaData.View(store: $0) }
 					)
 
 				case .reviewTransaction:
 					CaseLet(
-						state: /DappInteractionFlow.Destinations.MainState.reviewTransaction,
+						/DappInteractionFlow.Destinations.MainState.reviewTransaction,
 						action: DappInteractionFlow.Destinations.MainAction.reviewTransaction,
 						then: { TransactionReview.View(store: $0) }
 					)
@@ -119,13 +119,14 @@ struct DappInteraction_Preview: PreviewProvider {
 				initialState: .init(
 					dappMetadata: .previewValue,
 					interaction: .previewValueAllRequests()
-				)!,
-				reducer: DappInteractionFlow()
+				)!
+			) {
+				DappInteractionFlow()
 					.dependency(\.accountsClient, .previewValueTwoAccounts())
-//					.dependency(\.authorizedDappsClient, .previewValueOnePersona())
+					//  .dependency(\.authorizedDappsClient, .previewValueOnePersona())
 					.dependency(\.personasClient, .previewValueTwoPersonas(existing: true))
 					.dependency(\.personasClient, .previewValueTwoPersonas(existing: false))
-			)
+			}
 		)
 	}
 }

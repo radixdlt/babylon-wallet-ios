@@ -46,7 +46,7 @@ struct MainView_Previews: PreviewProvider {
 		Main.View(
 			store: .init(
 				initialState: .previewValue,
-				reducer: Main()
+				reducer: Main.init
 			)
 		)
 	}

@@ -43,7 +43,7 @@ public struct AssetTransfer: Sendable, FeatureReducer {
 		case dismissed
 	}
 
-	public var body: some ReducerProtocolOf<Self> {
+	public var body: some ReducerOf<Self> {
 		Scope(state: \.accounts, action: /Action.child .. ChildAction.accounts) {
 			TransferAccountList()
 		}
@@ -53,7 +53,7 @@ public struct AssetTransfer: Sendable, FeatureReducer {
 			}
 	}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .addMessageTapped:
 			state.message = .empty
@@ -99,7 +99,7 @@ public struct AssetTransfer: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case .message(.delegate(.removed)):
 			state.message = nil

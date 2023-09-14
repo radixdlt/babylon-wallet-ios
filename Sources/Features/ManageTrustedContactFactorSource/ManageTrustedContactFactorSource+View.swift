@@ -199,7 +199,7 @@ struct ManageTrustedContactFactorSource_Preview: PreviewProvider {
 		ManageTrustedContactFactorSource.View(
 			store: .init(
 				initialState: .previewValue,
-				reducer: ManageTrustedContactFactorSource()
+				reducer: ManageTrustedContactFactorSource.init
 			)
 		)
 	}

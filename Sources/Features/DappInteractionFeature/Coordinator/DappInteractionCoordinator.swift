@@ -43,7 +43,7 @@ struct DappInteractionCoordinator: Sendable, FeatureReducer {
 		case dismissSilently
 	}
 
-	var body: some ReducerProtocolOf<Self> {
+	var body: some ReducerOf<Self> {
 		Scope(state: \.childState, action: /.self) {
 			Scope(state: /State.ChildState.loading, action: /Action.child .. ChildAction.loading) {
 				DappInteractionLoading()
@@ -56,7 +56,7 @@ struct DappInteractionCoordinator: Sendable, FeatureReducer {
 			.ifLet(\.$errorAlert, action: /Action.view .. ViewAction.malformedInteractionErrorAlert)
 	}
 
-	func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case let .malformedInteractionErrorAlert(.presented(action)):
 			switch action {
@@ -73,7 +73,7 @@ struct DappInteractionCoordinator: Sendable, FeatureReducer {
 		}
 	}
 
-	func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+	func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case let .loading(.delegate(.dappMetadataLoaded(dappMetadata))):
 			if let flowState = DappInteractionFlow.State(dappMetadata: dappMetadata, interaction: state.interaction) {

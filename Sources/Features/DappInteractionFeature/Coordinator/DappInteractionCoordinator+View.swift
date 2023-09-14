@@ -8,17 +8,17 @@ extension DappInteractionCoordinator {
 
 		var body: some SwiftUI.View {
 			ZStack {
-				SwitchStore(store.scope(state: \.childState)) { state in
+				SwitchStore(store.scope(state: \.childState, action: { $0 })) { state in
 					switch state {
 					case .loading:
 						CaseLet(
-							state: /DappInteractionCoordinator.State.ChildState.loading,
+							/DappInteractionCoordinator.State.ChildState.loading,
 							action: { DappInteractionCoordinator.Action.child(.loading($0)) },
 							then: { DappInteractionLoading.View(store: $0) }
 						)
 					case .flow:
 						CaseLet(
-							state: /DappInteractionCoordinator.State.ChildState.flow,
+							/DappInteractionCoordinator.State.ChildState.flow,
 							action: { DappInteractionCoordinator.Action.child(.flow($0)) },
 							then: { DappInteractionFlow.View(store: $0) }
 						)
@@ -48,15 +48,16 @@ struct DappInteractionCoordinator_Previews: PreviewProvider {
 					interaction: .previewValueAllRequests(
 						auth: .login(.withoutChallenge)
 					)
-				),
-				reducer: DappInteractionCoordinator()
+				)
+			) {
+				DappInteractionCoordinator()
 					.dependency(\.accountsClient, .previewValueTwoAccounts())
-//					.dependency(\.authorizedDappsClient, .previewValueOnePersona())
+					//  .dependency(\.authorizedDappsClient, .previewValueOnePersona())
 					.dependency(\.personasClient, .previewValueTwoPersonas(existing: true))
 					.dependency(\.personasClient, .previewValueTwoPersonas(existing: false))
 					.dependency(\.gatewayAPIClient, .previewValueDappMetadataSuccess)
 					.dependency(\.gatewayAPIClient, .previewValueDappMetadataFailure)
-			)
+			}
 		)
 		.presentsLoadingViewOverlay()
 	}
