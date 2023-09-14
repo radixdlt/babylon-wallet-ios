@@ -36,12 +36,12 @@ public struct CameraPermission: Sendable, FeatureReducer {
 
 	public init() {}
 
-	public var body: some ReducerProtocolOf<Self> {
+	public var body: some ReducerOf<Self> {
 		Reduce(core)
 			.ifLet(\.$permissionDeniedAlert, action: /Action.view .. ViewAction.permissionDeniedAlert)
 	}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .appeared:
 			return .run { send in
@@ -69,7 +69,7 @@ public struct CameraPermission: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case .displayPermissionDeniedAlert:
 			state.permissionDeniedAlert = .init(

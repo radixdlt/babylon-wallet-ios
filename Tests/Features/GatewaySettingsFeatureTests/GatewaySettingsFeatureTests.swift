@@ -24,7 +24,7 @@ final class GatewaySettingsFeatureTests: TestCase {
 		)
 		let store = TestStore(
 			initialState: GatewaySettings.State(),
-			reducer: GatewaySettings()
+			reducer: GatewaySettings.init
 		) {
 			$0.gatewaysClient.getAllGateways = {
 				.init(rawValue: .init(uniqueElements: otherGateways))!
@@ -59,7 +59,7 @@ final class GatewaySettingsFeatureTests: TestCase {
 		// given
 		let store = TestStore(
 			initialState: AddNewGateway.State(),
-			reducer: AddNewGateway()
+			reducer: AddNewGateway.init
 		)
 		let validURL = URL.previewValue.absoluteString
 
@@ -85,7 +85,7 @@ final class GatewaySettingsFeatureTests: TestCase {
 		// given
 		let store = TestStore(
 			initialState: GatewaySettings.State(),
-			reducer: GatewaySettings()
+			reducer: GatewaySettings.init
 		) {
 			$0.errorQueue.schedule = { _ in }
 		}
@@ -135,7 +135,7 @@ final class GatewaySettingsFeatureTests: TestCase {
 		let isGatewayRemoved = ActorIsolated<Bool>(false)
 		let store = TestStore(
 			initialState: initialState,
-			reducer: GatewaySettings()
+			reducer: GatewaySettings.init
 		) {
 			$0.gatewaysClient.removeGateway = { _ in
 				await isGatewayRemoved.setValue(true)
@@ -186,7 +186,7 @@ final class GatewaySettingsFeatureTests: TestCase {
 		// given
 		let store = TestStore(
 			initialState: GatewaySettings.State(),
-			reducer: GatewaySettings()
+			reducer: GatewaySettings.init
 		)
 		store.exhaustivity = .off
 
@@ -206,7 +206,7 @@ final class GatewaySettingsFeatureTests: TestCase {
 
 		let store = TestStore(
 			initialState: initialState,
-			reducer: AddNewGateway()
+			reducer: AddNewGateway.init
 		) {
 			$0.networkSwitchingClient.validateGatewayURL = { _ in .previewValue }
 			$0.gatewaysClient.addGateway = { _ in }

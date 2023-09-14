@@ -45,7 +45,7 @@ public struct CreationOfPersona: Sendable, FeatureReducer {
 
 	public init() {}
 
-	public var body: some ReducerProtocolOf<Self> {
+	public var body: some ReducerOf<Self> {
 		Scope(
 			state: \.derivePublicKeys,
 			action: /Action.child .. ChildAction.derivePublicKeys
@@ -56,7 +56,7 @@ public struct CreationOfPersona: Sendable, FeatureReducer {
 		Reduce(core)
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .createPersonaResult(.failure(error)):
 			errorQueue.schedule(error)
@@ -67,7 +67,7 @@ public struct CreationOfPersona: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case let .derivePublicKeys(.delegate(.derivedPublicKeys(
 			hdKeys,

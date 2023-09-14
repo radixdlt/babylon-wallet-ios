@@ -34,7 +34,7 @@ public struct SelectFactorKindThenFactor: Sendable, FeatureReducer {
 
 	public init() {}
 
-	public var body: some ReducerProtocolOf<Self> {
+	public var body: some ReducerOf<Self> {
 		Reduce(core)
 			.ifLet(\.$factorSourceOfKind, action: /Action.child .. ChildAction.factorSourceOfKind) {
 				FactorSourcesOfKindList<FactorSource>()
@@ -44,7 +44,7 @@ public struct SelectFactorKindThenFactor: Sendable, FeatureReducer {
 			}
 	}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case let .selected(kind):
 			switch kind {
@@ -57,7 +57,7 @@ public struct SelectFactorKindThenFactor: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case let .factorSourceOfKind(.presented(.delegate(.choseFactorSource(factorSource)))):
 			state.factorSourceOfKind = nil

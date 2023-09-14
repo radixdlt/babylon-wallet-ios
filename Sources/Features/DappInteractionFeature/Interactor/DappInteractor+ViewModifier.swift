@@ -5,7 +5,7 @@ extension View {
 		self.presentsDappInteractions(
 			store: .init(
 				initialState: .init(),
-				reducer: DappInteractor()
+				reducer: DappInteractor.init
 			)
 		)
 	}
@@ -23,9 +23,9 @@ extension DappInteractor {
 		let store: StoreOf<DappInteractor>
 
 		func body(content: Content) -> some SwiftUI.View {
-			WithViewStore(store) { viewStore in
-				ZStack {
-					content
+			ZStack {
+				content
+				WithViewStore(store, observe: { $0.currentModal }) { viewStore in
 					IfLetStore(
 						store.scope(state: \.$currentModal, action: { .child(.modal($0)) }),
 						state: /DappInteractor.Destinations.State.dappInteraction,
@@ -33,38 +33,38 @@ extension DappInteractor {
 						then: { DappInteractionCoordinator.View(store: $0.relay()) }
 					)
 					.transition(.move(edge: .bottom))
-					.animation(.linear, value: viewStore.currentModal)
+					.animation(.linear, value: viewStore.state)
 				}
-				.sheet(
-					store: store.scope(state: \.$currentModal, action: { .child(.modal($0)) }),
-					state: /DappInteractor.Destinations.State.dappInteractionCompletion,
-					action: DappInteractor.Destinations.Action.dappInteractionCompletion,
-					content: { Completion.View(store: $0) }
-				)
-				.alert(
-					store: store.scope(
-						state: \.$invalidRequestAlert,
-						action: { .view(.invalidRequestAlert($0)) }
-					)
-				)
-				.alert(
-					store: store.scope(
-						state: \.$responseFailureAlert,
-						action: { .view(.responseFailureAlert($0)) }
-					)
-				)
-				.task {
-					await ViewStore(store.stateless).send(.view(.task)).finish()
-				}
-				#if os(iOS)
-				.onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in
-					viewStore.send(.view(.moveToForeground))
-				}
-				.onReceive(NotificationCenter.default.publisher(for: UIApplication.didEnterBackgroundNotification)) { _ in
-					viewStore.send(.view(.moveToBackground))
-				}
-				#endif
 			}
+			.sheet(
+				store: store.scope(state: \.$currentModal, action: { .child(.modal($0)) }),
+				state: /DappInteractor.Destinations.State.dappInteractionCompletion,
+				action: DappInteractor.Destinations.Action.dappInteractionCompletion,
+				content: { Completion.View(store: $0) }
+			)
+			.alert(
+				store: store.scope(
+					state: \.$invalidRequestAlert,
+					action: { .view(.invalidRequestAlert($0)) }
+				)
+			)
+			.alert(
+				store: store.scope(
+					state: \.$responseFailureAlert,
+					action: { .view(.responseFailureAlert($0)) }
+				)
+			)
+			.task {
+				await store.send(.view(.task)).finish()
+			}
+			#if os(iOS)
+			.onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in
+				store.send(.view(.moveToForeground))
+			}
+			.onReceive(NotificationCenter.default.publisher(for: UIApplication.didEnterBackgroundNotification)) { _ in
+				store.send(.view(.moveToBackground))
+			}
+			#endif
 		}
 	}
 }
@@ -75,7 +75,7 @@ struct DappInteractionHook_Previews: PreviewProvider {
 		Color.red.presentsDappInteractions(
 			store: .init(
 				initialState: .init(),
-				reducer: DappInteractor()
+				reducer: DappInteractor.init
 			)
 		)
 	}

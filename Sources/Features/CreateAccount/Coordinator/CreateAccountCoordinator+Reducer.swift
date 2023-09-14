@@ -40,7 +40,7 @@ public struct CreateAccountCoordinator: Sendable, FeatureReducer {
 		}
 	}
 
-	public struct Destinations: Sendable, ReducerProtocol {
+	public struct Destinations: Sendable, Reducer {
 		public enum State: Sendable, Hashable {
 			case step1_nameAccount(NameAccount.State)
 			case step2_creationOfAccount(CreationOfAccount.State)
@@ -53,7 +53,7 @@ public struct CreateAccountCoordinator: Sendable, FeatureReducer {
 			case step3_completion(NewAccountCompletion.Action)
 		}
 
-		public var body: some ReducerProtocolOf<Self> {
+		public var body: some ReducerOf<Self> {
 			Scope(state: /State.step1_nameAccount, action: /Action.step1_nameAccount) {
 				NameAccount()
 			}
@@ -87,7 +87,7 @@ public struct CreateAccountCoordinator: Sendable, FeatureReducer {
 
 	public init() {}
 
-	public var body: some ReducerProtocolOf<Self> {
+	public var body: some ReducerOf<Self> {
 		Reduce(core)
 			.ifLet(\.root, action: /Action.child .. ChildAction.root) {
 				Destinations()
@@ -99,7 +99,7 @@ public struct CreateAccountCoordinator: Sendable, FeatureReducer {
 }
 
 extension CreateAccountCoordinator {
-	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .closeButtonTapped:
 			assert(state.config.canBeDismissed)
@@ -112,7 +112,7 @@ extension CreateAccountCoordinator {
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case let .root(.step1_nameAccount(.delegate(.proceed(accountName, useLedgerAsFactorSource)))):
 			state.path.append(.step2_creationOfAccount(.init(

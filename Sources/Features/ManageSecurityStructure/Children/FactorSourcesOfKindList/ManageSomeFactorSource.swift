@@ -50,7 +50,7 @@ public struct ManageSomeFactorSource<FactorSourceOfKind: BaseFactorSourceProtoco
 	}
 
 	public init() {}
-	public var body: some ReducerProtocolOf<Self> {
+	public var body: some ReducerOf<Self> {
 		Scope(
 			state: /ManageSomeFactorSource.State.manageOffDeviceMnemonics,
 			action: /Action.child .. ChildAction.manageOffDeviceMnemonics
@@ -75,14 +75,14 @@ public struct ManageSomeFactorSource<FactorSourceOfKind: BaseFactorSourceProtoco
 		Reduce(core)
 	}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .appeared:
 			return .none
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case let .manageOffDeviceMnemonics(.delegate(.persistedNewFactorSourceInProfile(factorSource))):
 			return delegateDone(factorSource: factorSource.extract(OffDeviceMnemonicFactorSource.self)!)
@@ -109,7 +109,7 @@ public struct ManageSomeFactorSource<FactorSourceOfKind: BaseFactorSourceProtoco
 		}
 	}
 
-	func delegateDone(factorSource: some FactorSourceProtocol) -> EffectTask<Action> {
+	func delegateDone(factorSource: some FactorSourceProtocol) -> Effect<Action> {
 		if let factorSourceOfKind = factorSource as? FactorSourceOfKind {
 			return .send(.delegate(.done(.success(factorSourceOfKind))))
 		} else if FactorSourceOfKind.self == FactorSource.self {

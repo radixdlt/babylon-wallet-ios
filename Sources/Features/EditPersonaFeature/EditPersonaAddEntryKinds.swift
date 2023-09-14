@@ -26,7 +26,7 @@ public struct EditPersonaAddEntryKinds: Sendable, FeatureReducer {
 
 	@Dependency(\.dismiss) var dismiss
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .closeButtonTapped:
 			return .run { _ in await dismiss() }

@@ -151,7 +151,7 @@ struct AccountDetails_Preview: PreviewProvider {
 			AccountDetails.View(
 				store: .init(
 					initialState: .init(for: .previewValue0),
-					reducer: AccountDetails()
+					reducer: AccountDetails.init
 				)
 			)
 			#if os(iOS)

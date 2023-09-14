@@ -19,7 +19,7 @@ extension AnswerSecurityQuestionsCoordinator {
 					.toolbar {
 						ToolbarItem(placement: .navigationBarLeading) {
 							CloseButton {
-								ViewStore(store.stateless).send(.view(.closeButtonTapped))
+								store.send(.view(.closeButtonTapped))
 							}
 						}
 					}
@@ -33,7 +33,7 @@ extension AnswerSecurityQuestionsCoordinator {
 					.toolbar {
 						ToolbarItem(placement: .navigationBarLeading) {
 							BackButton {
-								ViewStore(store.stateless).send(.view(.backButtonTapped))
+								store.send(.view(.backButtonTapped))
 							}
 						}
 					}
@@ -51,14 +51,14 @@ extension AnswerSecurityQuestionsCoordinator {
 				switch state {
 				case .chooseQuestions:
 					CaseLet(
-						state: /AnswerSecurityQuestionsCoordinator.Path.State.chooseQuestions,
+						/AnswerSecurityQuestionsCoordinator.Path.State.chooseQuestions,
 						action: AnswerSecurityQuestionsCoordinator.Path.Action.chooseQuestions,
 						then: { ChooseQuestions.View(store: $0) }
 					)
 
 				case .answerQuestion:
 					CaseLet(
-						state: /AnswerSecurityQuestionsCoordinator.Path.State.answerQuestion,
+						/AnswerSecurityQuestionsCoordinator.Path.State.answerQuestion,
 						action: AnswerSecurityQuestionsCoordinator.Path.Action.answerQuestion,
 						then: { AnswerSecurityQuestionFreeform.View(store: $0) }
 					)
@@ -77,7 +77,7 @@ struct AnswerSecurityQuestionsCoordinator_Preview: PreviewProvider {
 		AnswerSecurityQuestionsCoordinator.View(
 			store: .init(
 				initialState: .previewValue,
-				reducer: AnswerSecurityQuestionsCoordinator()
+				reducer: AnswerSecurityQuestionsCoordinator.init
 			)
 		)
 	}

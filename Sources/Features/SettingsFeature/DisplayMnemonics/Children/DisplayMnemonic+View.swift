@@ -57,7 +57,7 @@ extension DisplayMnemonic {
 //		DisplayMnemonic.View(
 //			store: .init(
 //				initialState: .previewValue,
-//				reducer: DisplayMnemonic()
+//				reducer: DisplayMnemonic.init
 //			)
 //		)
 //	}

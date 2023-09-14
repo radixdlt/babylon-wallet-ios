@@ -36,7 +36,7 @@ public struct AdvancedFeesCustomization: FeatureReducer {
 		case updated(TransactionFee.AdvancedFeeCustomization)
 	}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case let .paddingAmountChanged(amount):
 			state.paddingAmount = amount

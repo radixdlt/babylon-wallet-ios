@@ -123,15 +123,14 @@ struct Login_Preview: PreviewProvider {
 	static var previews: some SwiftUI.View {
 		NavigationStack {
 			Login.View(
-				store: .init(
-					initialState: .previewValue,
-					reducer: Login()
+				store: .init(initialState: .previewValue) {
+					Login()
 						.dependency(\.accountsClient, .previewValueTwoAccounts())
 						// FIXME: fix previews with PersonaData
-//						.dependency(\.authorizedDappsClient, .previewValueOnePersona())
+						//  .dependency(\.authorizedDappsClient, .previewValueOnePersona())
 						.dependency(\.personasClient, .previewValueTwoPersonas(existing: true))
 						.dependency(\.personasClient, .previewValueTwoPersonas(existing: false))
-				)
+				}
 			)
 			#if os(iOS)
 			.toolbar(.visible, for: .navigationBar)

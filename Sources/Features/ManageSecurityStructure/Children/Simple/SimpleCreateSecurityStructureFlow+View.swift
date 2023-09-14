@@ -173,7 +173,7 @@ extension View {
 //		SimpleManageSecurityStructureFlow.View(
 //			store: .init(
 //				initialState: .previewValue,
-//				reducer: SimpleManageSecurityStructureFlow()
+//				reducer: SimpleManageSecurityStructureFlow.init
 //			)
 //		)
 //	}

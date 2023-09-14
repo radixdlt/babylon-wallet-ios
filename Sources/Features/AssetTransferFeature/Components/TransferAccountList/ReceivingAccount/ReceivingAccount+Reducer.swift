@@ -46,14 +46,14 @@ public struct ReceivingAccount: Sendable, FeatureReducer {
 		case row(id: ResourceAsset.State.ID, child: ResourceAsset.Action)
 	}
 
-	public var body: some ReducerProtocolOf<Self> {
+	public var body: some ReducerOf<Self> {
 		Reduce(core)
 			.forEach(\.assets, action: /Action.child .. ChildAction.row) {
 				ResourceAsset()
 			}
 	}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .removeTapped:
 			return .send(.delegate(.remove))
@@ -64,7 +64,7 @@ public struct ReceivingAccount: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case let .row(id: id, child: .delegate(.removed)):
 			state.assets.remove(id: id)

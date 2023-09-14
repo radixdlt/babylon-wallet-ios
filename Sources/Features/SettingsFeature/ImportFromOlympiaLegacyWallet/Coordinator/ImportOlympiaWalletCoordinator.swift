@@ -97,7 +97,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 
 	// MARK: Path
 
-	public struct Path: Sendable, ReducerProtocol {
+	public struct Path: Sendable, Reducer {
 		public enum State: Sendable, Hashable {
 			case accountsToImport(AccountsToImport.State)
 			case importMnemonic(ImportMnemonic.State)
@@ -112,7 +112,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 			case completion(CompletionMigrateOlympiaAccountsToBabylon.Action)
 		}
 
-		public var body: some ReducerProtocolOf<Self> {
+		public var body: some ReducerOf<Self> {
 			Scope(state: /State.accountsToImport, action: /Action.accountsToImport) {
 				AccountsToImport()
 			}
@@ -139,7 +139,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 
 	public init() {}
 
-	public var body: some ReducerProtocolOf<Self> {
+	public var body: some ReducerOf<Self> {
 		Scope(state: \.scanQR, action: /Action.child .. ChildAction.scanQR) {
 			ScanMultipleOlympiaQRCodes()
 		}
@@ -149,14 +149,14 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 			}
 	}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .closeButtonTapped:
 			return .run { _ in await dismiss() }
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case .scanQR(.delegate(.viewAppeared)):
 			return scanViewAppeared(in: &state)
@@ -172,7 +172,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, pathAction: Path.Action) -> EffectTask<Action> {
+	public func reduce(into state: inout State, pathAction: Path.Action) -> Effect<Action> {
 		switch pathAction {
 		case .accountsToImport(.delegate(.viewAppeared)):
 			return accountsToImportViewAppeared(in: &state)
@@ -201,7 +201,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .foundAlreadyImportedOlympiaSoftwareAccounts(networkID, alreadyImported, existingAccounts):
 			return foundAlreadyImportedAccounts(in: &state, networkID: networkID, alreadyImported: alreadyImported, existingAccounts: existingAccounts)
@@ -218,7 +218,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 
 	private func scanViewAppeared(
 		in state: inout State
-	) -> EffectTask<Action> {
+	) -> Effect<Action> {
 		state.progress = .start
 		state.scanQR.reset()
 		return .none
@@ -227,7 +227,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 	private func finishedScanning(
 		in state: inout State,
 		olympiaWallet: ScannedParsedOlympiaWalletToMigrate
-	) -> EffectTask<Action> {
+	) -> Effect<Action> {
 		guard case .start = state.progress else { return progressError(state.progress) }
 
 		let scanned = olympiaWallet.accounts
@@ -249,7 +249,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 		networkID: NetworkID,
 		alreadyImported: Set<OlympiaAccountToMigrate.ID>,
 		existingAccounts: Int
-	) -> EffectTask<Action> {
+	) -> Effect<Action> {
 		guard case let .scannedQR(progress) = state.progress else { return progressError(state.progress) }
 
 		let scannedAccounts: NonEmptyArray<MigratableAccount>
@@ -281,7 +281,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 
 	private func accountsToImportViewAppeared(
 		in state: inout State
-	) -> EffectTask<Action> {
+	) -> Effect<Action> {
 		if case let .checkedIfOlympiaFactorSourceAlreadyExists(progress) = state.progress {
 			// This happens if the user steps back from ImportMnemonic to AccountsToImport
 			state.progress = .foundAlreadyImported(progress.previous)
@@ -294,7 +294,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 
 	private func continueImporting(
 		in state: inout State
-	) -> EffectTask<Action> {
+	) -> Effect<Action> {
 		guard case let .foundAlreadyImported(progress) = state.progress else { return progressError(state.progress) }
 
 		if let softwareAccounts = progress.accountsToMigrate?.software {
@@ -312,7 +312,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 	private func checkIfOlympiaFactorSourceAlreadyExists(
 		wordCount: BIP39.WordCount,
 		_ softwareAccounts: AccountsToMigrate
-	) -> EffectTask<Action> {
+	) -> Effect<Action> {
 		.run { send in
 			let idOfExistingFactorSource = await factorSourcesClient.checkIfHasOlympiaFactorSourceForAccounts(wordCount, softwareAccounts)
 			await send(.internal(.checkedIfOlympiaFactorSourceAlreadyExists(idOfExistingFactorSource, softwareAccounts: softwareAccounts)))
@@ -323,7 +323,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 		in state: inout State,
 		idOfExistingFactorSource: FactorSourceID.FromHash?,
 		softwareAccounts: AccountsToMigrate
-	) -> EffectTask<Action> {
+	) -> Effect<Action> {
 		guard case let .foundAlreadyImported(progress) = state.progress else { return progressError(state.progress) }
 
 		state.progress = .checkedIfOlympiaFactorSourceAlreadyExists(.init(
@@ -358,7 +358,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 	private func importedMnemonic(
 		in state: inout State,
 		mnemonicWithPassphrase: MnemonicWithPassphrase
-	) -> EffectTask<Action> {
+	) -> Effect<Action> {
 		guard case let .checkedIfOlympiaFactorSourceAlreadyExists(progress) = state.progress else { return progressError(state.progress) }
 
 		do {
@@ -386,7 +386,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 		_ olympiaAccounts: AccountsToMigrate,
 		factorSourceID: FactorSourceID.FromHash,
 		factorSource: PrivateHDFactorSource?
-	) -> EffectTask<Action> {
+	) -> Effect<Action> {
 		.run { send in
 			// Migrates and saved all accounts to Profile
 			let migrated = try await importLegacyWalletClient.migrateOlympiaSoftwareAccountsToBabylon(
@@ -449,7 +449,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 	public func migratedSoftwareAccountsToBabylon(
 		in state: inout State,
 		softwareAccounts: MigratedSoftwareAccounts
-	) -> EffectTask<Action> {
+	) -> Effect<Action> {
 		guard case let .checkedIfOlympiaFactorSourceAlreadyExists(progress) = state.progress else { return progressError(state.progress) }
 
 		state.progress = .migratedSoftwareAccounts(.init(
@@ -462,7 +462,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 
 	private func migrateHardwareAccounts(
 		in state: inout State
-	) -> EffectTask<Action> {
+	) -> Effect<Action> {
 		guard case let .migratedSoftwareAccounts(progress) = state.progress else { return progressError(state.progress) }
 
 		if let hardwareAccounts = progress.previous.accountsToMigrate?.hardware {
@@ -487,7 +487,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 	private func importedOlympiaLedgerAccountsAndFactorSources(
 		in state: inout State,
 		migratedAccounts: MigratedAccounts
-	) -> EffectTask<Action> {
+	) -> Effect<Action> {
 		guard case let .migratedSoftwareAccounts(progress) = state.progress else { return progressError(state.progress) }
 
 		state.path.append(
@@ -503,7 +503,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 	private func cancelOlympiaLedgerAccountsAndFactorSources(
 		in state: inout State,
 		failure: ImportOlympiaLedgerAccountsAndFactorSources.DelegateAction.Failure
-	) -> EffectTask<Action> {
+	) -> Effect<Action> {
 		guard case .migratedSoftwareAccounts = state.progress else { return progressError(state.progress) }
 
 		return .run { _ in
@@ -544,13 +544,13 @@ extension ImportOlympiaWalletCoordinator {
 		return nonEmpty
 	}
 
-	private func progressError(_ progress: Progress, line: Int = #line) -> EffectTask<Action> {
+	private func progressError(_ progress: Progress, line: Int = #line) -> Effect<Action> {
 		loggerGlobal.error("Implementation error. Incorrect progress value at line \(line): \(progress)")
 		assertionFailure("Implementation error. Incorrect progress value at line \(line): \(progress)")
 		return .run { _ in await dismiss() }
 	}
 
-	private func generalError(_ error: Error) -> EffectTask<Action> {
+	private func generalError(_ error: Error) -> Effect<Action> {
 		loggerGlobal.error("ImportOlympiaWalletCoordinator failed with error: \(error)")
 		errorQueue.schedule(error)
 		return .run { _ in await dismiss() }

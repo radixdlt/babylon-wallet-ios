@@ -66,7 +66,7 @@ struct FungibleTokenDetails_Preview: PreviewProvider {
 					isXRD: true,
 					context: .portfolio
 				),
-				reducer: FungibleTokenDetails()
+				reducer: FungibleTokenDetails.init
 			)
 		)
 	}

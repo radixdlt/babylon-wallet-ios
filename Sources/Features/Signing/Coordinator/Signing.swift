@@ -96,7 +96,7 @@ public struct Signing: Sendable, FeatureReducer {
 
 	public init() {}
 
-	public var body: some ReducerProtocolOf<Self> {
+	public var body: some ReducerOf<Self> {
 		Scope(state: \.step, action: /.self) {
 			Scope(
 				state: /State.Step.signWithDeviceFactors,
@@ -115,14 +115,14 @@ public struct Signing: Sendable, FeatureReducer {
 		Reduce(self.core)
 	}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .closeButtonTapped:
 			return .send(.delegate(.cancelSigning))
 		}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case .finishedSigningWithAllFactors:
 			switch state.signingPurposeWithPayload {
@@ -163,7 +163,7 @@ public struct Signing: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case
 			let .signWithDeviceFactors(.delegate(.done(factors, signatures))),
@@ -183,7 +183,7 @@ public struct Signing: Sendable, FeatureReducer {
 		signingFactors: NonEmpty<Set<SigningFactor>>,
 		signatures: Set<SignatureOfEntity>,
 		_ state: inout State
-	) -> EffectTask<Action> {
+	) -> Effect<Action> {
 		state.signatures.append(contentsOf: signatures)
 		let kind = signingFactors.first.factorSource.kind
 		precondition(signingFactors.allSatisfy { $0.factorSource.kind == kind })
@@ -197,7 +197,7 @@ public struct Signing: Sendable, FeatureReducer {
 		}.concatenate(with: proceedWithNextFactorSource(&state))
 	}
 
-	private func proceedWithNextFactorSource(_ state: inout State) -> EffectTask<Action> {
+	private func proceedWithNextFactorSource(_ state: inout State) -> Effect<Action> {
 		guard let nextStep = Self.nextStep(
 			factorsLeftToSignWith: state.factorsLeftToSignWith,
 			signingPurposeWithPayload: state.signingPurposeWithPayload

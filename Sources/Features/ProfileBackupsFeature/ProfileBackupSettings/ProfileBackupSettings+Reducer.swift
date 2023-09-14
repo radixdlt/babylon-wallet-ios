@@ -47,7 +47,7 @@ public struct ProfileBackupSettings: Sendable, FeatureReducer {
 		case deleteProfileAndFactorSourcesButtonTapped
 	}
 
-	public struct Destinations: Sendable, ReducerProtocol {
+	public struct Destinations: Sendable, Reducer {
 		static let confirmCloudSyncDisableAlert: Self.State = .confirmCloudSyncDisable(.init(
 			title: {
 				TextState(L10n.AppSettings.ConfirmCloudSyncDisableAlert.title)
@@ -111,7 +111,7 @@ public struct ProfileBackupSettings: Sendable, FeatureReducer {
 			}
 		}
 
-		public var body: some ReducerProtocol<State, Action> {
+		public var body: some Reducer<State, Action> {
 			Scope(state: /State.confirmCloudSyncDisable, action: /Action.confirmCloudSyncDisable) {
 				EmptyReducer()
 			}
@@ -147,14 +147,14 @@ public struct ProfileBackupSettings: Sendable, FeatureReducer {
 
 	public init() {}
 
-	public var body: some ReducerProtocolOf<ProfileBackupSettings> {
+	public var body: some ReducerOf<ProfileBackupSettings> {
 		Reduce(core)
 			.ifLet(\.$destination, action: /Action.child .. /ChildAction.destination) {
 				Destinations()
 			}
 	}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .deleteProfileAndFactorSourcesButtonTapped:
 			state.destination = .deleteProfileConfirmationDialog(.deleteProfileConfirmationDialog)
@@ -196,7 +196,7 @@ public struct ProfileBackupSettings: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .loadPreferences(preferences):
 			state.preferences = preferences
@@ -207,7 +207,7 @@ public struct ProfileBackupSettings: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case let .destination(.presented(.deleteProfileConfirmationDialog(confirmationAction))):
 			switch confirmationAction {
@@ -256,13 +256,13 @@ public struct ProfileBackupSettings: Sendable, FeatureReducer {
 		}
 	}
 
-	private func showFileExporter(with file: ExportableProfileFile, _ state: inout State) -> EffectTask<Action> {
+	private func showFileExporter(with file: ExportableProfileFile, _ state: inout State) -> Effect<Action> {
 		// This will trigger `fileExporter` to be shown
 		state.profileFile = file
 		return .none
 	}
 
-	private func exportProfile(encrypt: Bool, state: inout State) -> EffectTask<Action> {
+	private func exportProfile(encrypt: Bool, state: inout State) -> Effect<Action> {
 		if encrypt {
 			state.destination = .inputEncryptionPassword(.init(mode: .loadThenEncrypt()))
 			return .none
@@ -279,7 +279,7 @@ public struct ProfileBackupSettings: Sendable, FeatureReducer {
 		}
 	}
 
-	private func updateCloudSync(state: inout State, isEnabled: Bool) -> EffectTask<Action> {
+	private func updateCloudSync(state: inout State, isEnabled: Bool) -> Effect<Action> {
 		state.preferences?.security.isCloudProfileSyncEnabled = isEnabled
 		if isEnabled {
 			state.destination = .cloudSyncTakesLongTimeAlert
@@ -289,7 +289,7 @@ public struct ProfileBackupSettings: Sendable, FeatureReducer {
 		}
 	}
 
-	private func deleteProfile(keepInICloudIfPresent: Bool) -> EffectTask<Action> {
+	private func deleteProfile(keepInICloudIfPresent: Bool) -> Effect<Action> {
 		.run { send in
 			cacheClient.removeAll()
 			await radixConnectClient.disconnectAndRemoveAll()

@@ -43,7 +43,7 @@ public struct EditPersonaField<Behaviour: EditPersonaFieldKindBehaviour>: Sendab
 		case inputFieldChanged(String)
 	}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case let .inputFieldChanged(input):
 			state.input = input

@@ -41,7 +41,7 @@ struct ___VARIABLE_featureName____Preview: PreviewProvider {
 		___VARIABLE_featureName___.View(
 			store: .init(
 				initialState: .previewValue,
-				reducer: ___VARIABLE_featureName___()
+				reducer: ___VARIABLE_featureName___.init
 			)
 		)
 	}

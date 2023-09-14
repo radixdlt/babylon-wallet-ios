@@ -102,7 +102,7 @@ struct AnswerSecurityQuestionsFreeform_Preview: PreviewProvider {
 		AnswerSecurityQuestionFreeform.View(
 			store: .init(
 				initialState: .previewValue,
-				reducer: AnswerSecurityQuestionFreeform()
+				reducer: AnswerSecurityQuestionFreeform.init
 			)
 		)
 	}

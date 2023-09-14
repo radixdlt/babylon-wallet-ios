@@ -47,27 +47,27 @@ extension App {
 					switch state {
 					case .main:
 						CaseLet(
-							state: /App.State.Root.main,
+							/App.State.Root.main,
 							action: App.ChildAction.main,
 							then: { Main.View(store: $0) }
 						)
 
 					case .onboardingCoordinator:
 						CaseLet(
-							state: /App.State.Root.onboardingCoordinator,
+							/App.State.Root.onboardingCoordinator,
 							action: App.ChildAction.onboardingCoordinator,
 							then: { OnboardingCoordinator.View(store: $0) }
 						)
 
 					case .splash:
 						CaseLet(
-							state: /App.State.Root.splash,
+							/App.State.Root.splash,
 							action: App.ChildAction.splash,
 							then: { Splash.View(store: $0) }
 						)
 					case .onboardTestnetUserToMainnet:
 						CaseLet(
-							state: /App.State.Root.onboardTestnetUserToMainnet,
+							/App.State.Root.onboardTestnetUserToMainnet,
 							action: App.ChildAction.onboardTestnetUserToMainnet,
 							then: { CreateAccountCoordinator.View(store: $0) }
 						)
@@ -95,13 +95,12 @@ import SwiftUI // NB: necessary for previews to appear
 struct AppView_Previews: PreviewProvider {
 	static var previews: some View {
 		App.View(
-			store: .init(
-				initialState: .init(),
-				reducer: App()
+			store: .init(initialState: .init()) {
+				App()
 					.dependency(\.localAuthenticationClient.queryConfig) {
 						.biometricsAndPasscodeSetUp
 					}
-			)
+			}
 		)
 	}
 }

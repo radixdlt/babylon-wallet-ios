@@ -121,7 +121,7 @@ struct AssetsView_Preview: PreviewProvider {
 					poolUnitsList: .init(),
 					mode: .normal
 				),
-				reducer: AssetsView()
+				reducer: AssetsView.init
 			)
 		)
 	}

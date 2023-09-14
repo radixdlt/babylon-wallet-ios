@@ -57,7 +57,7 @@ public struct NewPersonaInfo: Sendable, FeatureReducer {
 
 	public init() {}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .appeared:
 			return .run { send in
@@ -87,7 +87,7 @@ public struct NewPersonaInfo: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .focusTextField(focus):
 			state.focusedInputField = focus

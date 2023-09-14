@@ -18,7 +18,7 @@ public struct RestoreProfileFromBackupCoordinator: Sendable, FeatureReducer {
 		}
 	}
 
-	public struct Path: Sendable, Hashable, ReducerProtocol {
+	public struct Path: Sendable, Hashable, Reducer {
 		public enum State: Sendable, Hashable {
 			case selectBackup(SelectBackup.State)
 			case importMnemonicsFlow(ImportMnemonicsFlowCoordinator.State)
@@ -29,7 +29,7 @@ public struct RestoreProfileFromBackupCoordinator: Sendable, FeatureReducer {
 			case importMnemonicsFlow(ImportMnemonicsFlowCoordinator.Action)
 		}
 
-		public var body: some ReducerProtocolOf<Self> {
+		public var body: some ReducerOf<Self> {
 			Scope(state: /State.selectBackup, action: /Action.selectBackup) {
 				SelectBackup()
 			}
@@ -59,7 +59,7 @@ public struct RestoreProfileFromBackupCoordinator: Sendable, FeatureReducer {
 	@Dependency(\.continuousClock) var clock
 	public init() {}
 
-	public var body: some ReducerProtocolOf<Self> {
+	public var body: some ReducerOf<Self> {
 		Scope(state: \.root, action: /Action.child .. ChildAction.root) {
 			Path()
 		}
@@ -70,7 +70,7 @@ public struct RestoreProfileFromBackupCoordinator: Sendable, FeatureReducer {
 			}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .delayedAppendToPath(destination):
 			state.path.append(destination)
@@ -78,7 +78,7 @@ public struct RestoreProfileFromBackupCoordinator: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case let .root(.selectBackup(.delegate(.selectedProfileSnapshot(profileSnapshot, isInCloud)))):
 			state.profileSelection = .init(snapshot: profileSnapshot, isInCloud: isInCloud)

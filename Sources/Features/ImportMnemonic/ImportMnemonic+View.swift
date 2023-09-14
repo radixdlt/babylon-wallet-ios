@@ -342,7 +342,7 @@ extension ImportMnemonic.View {
 //		ImportMnemonic.View(
 //			store: .init(
 //				initialState: .previewValue,
-//				reducer: ImportMnemonic()
+//				reducer: ImportMnemonic.init
 //			)
 //		)
 //	}

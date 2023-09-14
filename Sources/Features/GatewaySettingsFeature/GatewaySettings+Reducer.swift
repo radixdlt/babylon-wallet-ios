@@ -45,7 +45,7 @@ public struct GatewaySettings: Sendable, FeatureReducer {
 		case destination(PresentationAction<Destinations.Action>)
 	}
 
-	public struct Destinations: Sendable, ReducerProtocol {
+	public struct Destinations: Sendable, Reducer {
 		public enum State: Sendable, Hashable {
 			case addNewGateway(AddNewGateway.State)
 			case createAccount(CreateAccountCoordinator.State)
@@ -58,7 +58,7 @@ public struct GatewaySettings: Sendable, FeatureReducer {
 			case slideUpPanel(SlideUpPanel.Action)
 		}
 
-		public var body: some ReducerProtocolOf<Self> {
+		public var body: some ReducerOf<Self> {
 			Scope(state: /State.addNewGateway, action: /Action.addNewGateway) {
 				AddNewGateway()
 			}
@@ -89,7 +89,7 @@ public struct GatewaySettings: Sendable, FeatureReducer {
 
 	public init() {}
 
-	public var body: some ReducerProtocolOf<Self> {
+	public var body: some ReducerOf<Self> {
 		Scope(state: \.gatewayList, action: /Action.child .. ChildAction.gatewayList) {
 			GatewayList()
 		}
@@ -101,7 +101,7 @@ public struct GatewaySettings: Sendable, FeatureReducer {
 			}
 	}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .task:
 			return .run { send in
@@ -172,7 +172,7 @@ public struct GatewaySettings: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .gatewaysLoadedResult(.success(gateways)):
 			let containsMainnet = gateways.all.contains(Radix.Gateway.mainnet)
@@ -252,7 +252,7 @@ public struct GatewaySettings: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case let .gatewayList(.delegate(action)):
 			switch action {
@@ -313,13 +313,13 @@ extension AlertState<GatewaySettings.ViewAction.RemoveGatewayAction> {
 }
 
 private extension GatewaySettings {
-	func skipSwitching(_ state: inout State) -> EffectTask<Action> {
+	func skipSwitching(_ state: inout State) -> Effect<Action> {
 		state.destination = nil
 		state.validatedNewGatewayToSwitchTo = nil
 		return .none
 	}
 
-	func switchToGateway(_ state: inout State, gateway: Radix.Gateway) -> EffectTask<Action> {
+	func switchToGateway(_ state: inout State, gateway: Radix.Gateway) -> Effect<Action> {
 		guard
 			let current = state.currentGateway,
 			current.id != gateway.id

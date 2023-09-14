@@ -27,7 +27,7 @@ public struct P2PLinkRow: Sendable, FeatureReducer {
 
 	private enum ConnectionUpdateTasksID {}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .deleteConnectionButtonTapped:
 			return .send(.delegate(.deleteConnection))

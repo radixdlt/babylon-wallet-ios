@@ -88,7 +88,7 @@ public struct AssetsView: Sendable, FeatureReducer {
 
 	public init() {}
 
-	public var body: some ReducerProtocolOf<Self> {
+	public var body: some ReducerOf<Self> {
 		Reduce(core)
 			.ifLet(\.fungibleTokenList, action: /Action.child .. ChildAction.fungibleTokenList) {
 				FungibleAssetList()
@@ -101,7 +101,7 @@ public struct AssetsView: Sendable, FeatureReducer {
 			}
 	}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .task:
 			state.isLoadingResources = true
@@ -125,7 +125,7 @@ public struct AssetsView: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .updatePortfolio(portfolio):
 			state.updatePortfolio(to: portfolio)

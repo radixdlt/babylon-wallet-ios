@@ -114,7 +114,7 @@ public struct EditPersona: Sendable, FeatureReducer {
 		case personaSaved(Profile.Network.Persona)
 	}
 
-	public struct Destinations: Sendable, ReducerProtocol {
+	public struct Destinations: Sendable, Reducer {
 		public enum State: Sendable, Hashable {
 			case closeConfirmationDialog(ConfirmationDialogState<ViewAction.CloseConfirmationDialogAction>)
 			case addFields(EditPersonaAddEntryKinds.State)
@@ -125,7 +125,7 @@ public struct EditPersona: Sendable, FeatureReducer {
 			case addFields(EditPersonaAddEntryKinds.Action)
 		}
 
-		public var body: some ReducerProtocolOf<Self> {
+		public var body: some ReducerOf<Self> {
 			Scope(state: /State.addFields, action: /Action.addFields) {
 				EditPersonaAddEntryKinds()
 			}
@@ -139,7 +139,7 @@ public struct EditPersona: Sendable, FeatureReducer {
 	@Dependency(\.personasClient) var personasClient
 	@Dependency(\.errorQueue) var errorQueue
 
-	public var body: some ReducerProtocolOf<Self> {
+	public var body: some ReducerOf<Self> {
 		Scope(state: \.labelField, action: /Action.child .. ChildAction.labelField) {
 			EditPersonaField()
 		}
@@ -152,7 +152,7 @@ public struct EditPersona: Sendable, FeatureReducer {
 			}
 	}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .closeButtonTapped:
 			guard state.hasChanges() else {
@@ -198,7 +198,7 @@ public struct EditPersona: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case .destination(.presented(.closeConfirmationDialog(.discardChanges))):
 			return .run { _ in await dismiss() }

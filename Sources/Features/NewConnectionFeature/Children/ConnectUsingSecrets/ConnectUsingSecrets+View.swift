@@ -96,7 +96,7 @@ struct ConnectUsingPassword_Preview: PreviewProvider {
 		ConnectUsingSecrets.View(
 			store: .init(
 				initialState: .previewValue,
-				reducer: ConnectUsingSecrets()
+				reducer: ConnectUsingSecrets.init
 			)
 		)
 	}

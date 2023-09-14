@@ -75,7 +75,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 		case modal(PresentationAction<Destinations.Action>)
 	}
 
-	struct Destinations: Sendable, ReducerProtocol {
+	struct Destinations: Sendable, Reducer {
 		enum State: Sendable, Hashable {
 			case dappInteraction(RelayState<RequestEnvelope, DappInteractionCoordinator.State>)
 			case dappInteractionCompletion(Completion.State)
@@ -86,7 +86,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 			case dappInteractionCompletion(Completion.Action)
 		}
 
-		var body: some ReducerProtocolOf<Self> {
+		var body: some ReducerOf<Self> {
 			Scope(state: /State.dappInteraction, action: /Action.dappInteraction) {
 				Relay { DappInteractionCoordinator() }
 			}
@@ -106,7 +106,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 	@Dependency(\.appPreferencesClient) var appPreferencesClient
 	@Dependency(\.dappInteractionClient) var dappInteractionClient
 
-	var body: some ReducerProtocolOf<Self> {
+	var body: some ReducerOf<Self> {
 		Reduce(core)
 			.ifLet(\.$currentModal, action: /Action.child .. ChildAction.modal) {
 				Destinations()
@@ -115,7 +115,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 			.ifLet(\.$invalidRequestAlert, action: /Action.view .. ViewAction.invalidRequestAlert)
 	}
 
-	func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .task:
 			return handleIncomingRequests()
@@ -156,7 +156,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 		}
 	}
 
-	func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
+	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .receivedRequestFromDapp(request):
 
@@ -254,7 +254,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 		}
 	}
 
-	func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+	func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case let .modal(.presented(.dappInteraction(.relay(request, .delegate(.submit(responseToDapp, dappMetadata)))))):
 			return sendResponseToDappEffect(responseToDapp, for: request, dappMetadata: dappMetadata)
@@ -280,7 +280,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 
 	func presentQueuedRequestIfNeededEffect(
 		for state: inout State
-	) -> EffectTask<Action> {
+	) -> Effect<Action> {
 		guard
 			let next = state.requestQueue.first,
 			state.currentModal == nil
@@ -296,7 +296,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 		_ responseToDapp: P2P.Dapp.Response,
 		for request: RequestEnvelope,
 		dappMetadata: DappMetadata
-	) -> EffectTask<Action> {
+	) -> Effect<Action> {
 		.run { send in
 
 			// In case of transaction response, sending it to the peer client is a silent operation.
@@ -424,7 +424,7 @@ extension DappInteractionClient.ValidatedDappRequest.InvalidRequestReason {
 }
 
 extension DappInteractor {
-	func handleIncomingRequests() -> EffectTask<Action> {
+	func handleIncomingRequests() -> Effect<Action> {
 		.run { send in
 			for try await incomingRequest in dappInteractionClient.interactions {
 				guard !Task.isCancelled else {
@@ -457,7 +457,7 @@ extension DappInteractor {
 	func delayedEffect(
 		delay: Duration = .seconds(0.75),
 		for action: Action
-	) -> EffectTask<Action> {
+	) -> Effect<Action> {
 		.run { send in
 			try await clock.sleep(for: delay)
 			await send(action)

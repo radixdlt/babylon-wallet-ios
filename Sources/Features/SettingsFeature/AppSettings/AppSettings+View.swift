@@ -201,7 +201,7 @@ struct AppSettings_Preview: PreviewProvider {
 		AppSettings.View(
 			store: .init(
 				initialState: .previewValue,
-				reducer: AppSettings()
+				reducer: AppSettings.init
 			)
 		)
 	}
