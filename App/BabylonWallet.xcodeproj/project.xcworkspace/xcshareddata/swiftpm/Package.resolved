@@ -77,8 +77,7 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/Sajjon/K1.git",
       "state" : {
-        "revision" : "9e6c2716b2e6b306d38ca5ec85ff6c16ea148ad1",
-        "version" : "0.3.8"
+        "revision" : "7defdc448b10a21c1de3f32686c36483750c71c9"
       }
     },
     {

@@ -148,9 +148,11 @@ private_lane :create_gh_release do |options|
     ]
 
     versions = Hash.new
-    dependencies.each do |child|
-        if core_deps.include? child[:identity]
-            versions[child[:identity]] = child[:state][:version]
+    dependencies.each do |child_dict|
+        child = child_dict[:identity]
+        if core_deps.include? child
+            print(child_dict)
+            versions[child] = child_dict[:state][:version]
         end
     end
     versions_string = versions.map { |k, v| "- #{k}: #{v}" }.join("\n")
@@ -164,6 +166,71 @@ private_lane :create_gh_release do |options|
         description: release_description,
         is_prerelease: is_prerelease
     )
+end
+
+lane :cyon do |options|
+    json_path = ENV['SWIFT_PACKAGE_RESOLVED_PATH']
+    print("json_path: " + json_path)
+    dependencies = read_json(
+        json_path: json_path
+    )[:pins]
+
+    core_deps = [
+        { :at => "swift-composable-architecture" },
+        { :at => "swift-engine-toolkit" },
+        { :at => "webrtc" },
+        { :at => "k1" },
+        { :at => "asyncextensions" },
+        { :at => "swift-algorithms" },
+        { :at => "swift-async-algorithms" },
+        { :at => "swift-dependencies-additions" },
+        { :at => "swiftui-navigation" },
+        { :at => "keychainaccess", :v_prefixed_tag => true },
+    ]
+
+    versions = Hash.new
+    dependencies.each do |child_dict|
+        child = child_dict[:identity]
+        maybe_relevant_child = core_deps.detect { |h| 
+            identity = h[:at]
+            identity.include? child 
+        }
+        is_child_relevant = maybe_relevant_child.nil? == false
+        if is_child_relevant
+
+            print(child_dict)
+            print("\n\n")
+            child_state_dict = child_dict[:state]
+            child_git_repo = child_dict[:location]
+            if child_git_repo.end_with?(".git")
+                child_git_repo = child_git_repo[0...-4] # remove ".git"
+            end
+
+            rev = child_state_dict[:revision]
+            abbreviated_rev = rev[0, 7] # 7 first
+
+            maybe_version = child_state_dict[:version]
+            maybe_branch = child_state_dict[:branch]
+            is_version_nil = maybe_version.nil?
+            is_branch_nil = maybe_branch.nil?
+
+
+            maybe_version_or_branch_string = !is_version_nil ? maybe_version : maybe_branch
+            is_version_or_branch_nil = maybe_version_or_branch_string.nil?
+            child_visible_string =  !is_version_or_branch_nil ? "#{maybe_version_or_branch_string} (#{abbreviated_rev})" : "commit (specified): #{rev}"
+            child_link_commit = "#{child_git_repo}/commit/#{rev}"
+            child_link_branch = "#{child_git_repo}/tree/#{maybe_branch}"
+
+            should_prefix_tag_with__v = maybe_relevant_child[:v_prefixed_tag]
+            tag = should_prefix_tag_with__v ? "v#{maybe_version}" : maybe_version
+            child_link_version = "#{child_git_repo}/releases/tag/#{tag}"
+            child_link = !is_version_nil ? child_link_version : (!is_branch_nil ? child_link_branch : child_link_commit)
+            child_hyperlink = "[#{child_visible_string}](#{child_link})"
+            versions[child] = child_hyperlink
+        end
+    end
+    versions_string = versions.map { |k, v| "- #{k}: #{v}" }.join("\n")
+    print(versions_string)
 end
 
 private_lane :register_new_device do |options|
