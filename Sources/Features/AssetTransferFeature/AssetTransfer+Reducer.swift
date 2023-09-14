@@ -174,14 +174,14 @@ extension AssetTransfer {
 				try ManifestBuilder.withdrawAmount(
 					accounts.fromAccount.address.intoEngine(),
 					resource.address.intoEngine(),
-					resource.totalTransferAmount.intoEngine()
+					resource.totalTransferAmount.asDecimal(withDivisibility: 18)
 				)
 
 				for account in resource.accounts {
 					let bucket = ManifestBuilderBucket.unique
 					try ManifestBuilder.takeFromWorktop(
 						resource.address.intoEngine(),
-						account.amount.intoEngine(),
+						account.amount.asDecimal(withDivisibility: 18),
 						bucket
 					)
 					try ManifestBuilder.accountTryDepositOrAbort(

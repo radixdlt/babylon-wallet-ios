@@ -5,6 +5,8 @@ extension BigDecimal {
 	// Used for development purposes
 	public static let temporaryStandardFee: BigDecimal = 25
 	public static let defaultMaxPlacesFormattted: UInt = 8
+
+	public static let integerAndDecimalPartsSeparator = "."
 }
 
 extension BigDecimal {
@@ -25,11 +27,12 @@ extension BigDecimal {
 		// `github.com/Zollerbo1/BigDecimal` package **hardcodes** usage of
 		// the decimal separator ".", see this line here:
 		// https://github.com/Zollerboy1/BigDecimal/blob/main/Sources/BigDecimal/BigDecimal.swift#L469
-		let separatorRequiredByBigDecimalLib = "."
 		let stringRepresentation = String(describing: self)
 
 		guard
-			case let components = stringRepresentation.split(separator: separatorRequiredByBigDecimalLib),
+			case let components = stringRepresentation.split(
+				separator: Self.integerAndDecimalPartsSeparator
+			),
 			components.count == 2
 		else {
 			return stringRepresentation
