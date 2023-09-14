@@ -65,3 +65,12 @@ extension Profile.Network.AuthorizedDapp.AuthorizedPersonaSimple.SharedPersonaDa
 		)
 	}
 }
+
+extension MnemonicWithPassphrase {
+	func deviceFactorSourceID() throws -> FactorSource.ID.FromHash {
+		try FactorSource.ID.FromHash(
+			kind: .device,
+			mnemonicWithPassphrase: self
+		)
+	}
+}
