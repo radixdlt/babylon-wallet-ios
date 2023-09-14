@@ -49,6 +49,15 @@ extension SnapshotTestVector {
 	}
 }
 
+// MARK: - FactorSourceNotFound
+struct FactorSourceNotFound: Error {}
+
+// MARK: - MnemonicNotFound
+struct MnemonicNotFound: Error {}
+
+// MARK: - PublicKeyDiscrepancy
+struct PublicKeyDiscrepancy: Error {}
+
 extension SnapshotTestVector {
 	/// Returns the decrypted ProfileSnapshots which are all proven to be equal to `self.plaintext`
 	@discardableResult
@@ -64,7 +73,47 @@ extension SnapshotTestVector {
 			struct MissingMnemonic: Error {}
 			throw MissingMnemonic()
 		}
+
+		try validateAllEntitiesWithMnemonics()
+
 		return decryptions
+	}
+
+	public func validateAllEntitiesWithMnemonics() throws {
+		for network in plaintext.networks.values {
+			func validate<Entity: EntityProtocol>(_ entity: Entity) throws {
+				switch entity.securityState {
+				case let .unsecured(entityControl):
+					let txSignFactorInstance = entityControl.transactionSigning
+					let factorSourceID = txSignFactorInstance.factorSourceID.embed()
+					guard factorSourceID.kind == .device else { return }
+					guard
+						let factorSource = plaintext.factorSources.first(where: { $0.id == factorSourceID })
+					else {
+						throw FactorSourceNotFound()
+					}
+					guard
+						let mnemonic = mnemonics.first(where: { $0.factorSourceID == factorSourceID })
+					else {
+						print(mnemonics.map(\.factorSourceID))
+
+						throw MnemonicNotFound()
+					}
+
+					let publicKey = try mnemonic.mnemonicWithPassphrase.hdRoot().derivePublicKey(
+						path: txSignFactorInstance.derivationPath,
+						curve: txSignFactorInstance.derivationPath.curveForScheme
+					)
+
+					guard publicKey == txSignFactorInstance.publicKey else {
+						throw PublicKeyDiscrepancy()
+					}
+					// all good
+				}
+			}
+			try network.accounts.forEach(validate(_:))
+			try network.personas.forEach(validate(_:))
+		}
 	}
 
 	public static func encrypting(
