@@ -393,24 +393,17 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			loggerGlobal.error("Failed to submit tx")
 			return resetToApprovable(&state)
 
-		case .submitting(.delegate(.failedToReceiveStatusUpdate)):
-			state.destination = nil
-			loggerGlobal.error("Failed to receive status update")
-			return .none
-
-		case .submitting(.delegate(.submittedTransactionFailed)):
-			state.destination = nil
-			state.canApproveTX = true
-			loggerGlobal.error("Submitted TX failed")
-			return .send(.delegate(.failed(.failedToSubmit)))
-
 		case let .submitting(.delegate(.committedSuccessfully(txID))):
 			state.destination = nil
 			return delayedEffect(for: .delegate(.transactionCompleted(txID)))
 
-		case .submitting(.delegate(.manuallyDismiss)):
+		case let .submitting(.delegate(.manuallyDismiss(status))):
 			// This is used when the close button is pressed, we have to manually
 			state.destination = nil
+			if status.isCompletedWithFailure {
+				state.canApproveTX = true
+				return resetToApprovable(&state).concatenate(with: .send(.delegate(.failed(.failedToSubmit))))
+			}
 			return delayedEffect(for: .delegate(.userDismissedTransactionStatus))
 
 		case .submitting:

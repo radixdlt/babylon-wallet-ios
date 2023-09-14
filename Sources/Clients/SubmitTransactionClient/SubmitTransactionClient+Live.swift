@@ -37,14 +37,28 @@ extension SubmitTransactionClient: DependencyKey {
 									error: .init(pollAttempts: pollCount)
 								))
 							))
-
 						} else {
 							pollCount += 1
 						}
 					}
 					try? await clock.sleep(for: .seconds(pollStrategy.sleepDuration))
-					let status = try await pollTransactionStatus()
-					statusSubject.send(.init(txID: txID, result: .success(status)))
+					do {
+						let status = try await pollTransactionStatus()
+						statusSubject.send(.init(txID: txID, result: .success(status)))
+					} catch {
+						loggerGlobal.error("Failed to poll transaction status: \(error.localizedDescription)")
+						switch error {
+						case is BadHTTPResponseCode, is BadHTTPResponseCode, is ResponseDecodingError:
+							/// Terminate polling, GW returned wrong response
+							await statusSubject.send(.init(
+								txID: txID,
+								result: .failure(.failedToGetTransactionStatus(txID: txID, error: .init(pollAttempts: pollCountHolder.value)))
+							))
+						default:
+							/// Continue polling, the poll failed due to internal URLSession error.
+							break
+						}
+					}
 				}
 			}
 
@@ -227,5 +241,9 @@ public struct FailedToGetTransactionStatus: Sendable, LocalizedError, Equatable 
 	public let pollAttempts: Int
 	public var errorDescription: String? {
 		"\(Self.self)(afterPollAttempts: \(String(describing: pollAttempts))"
+	}
+
+	public init(pollAttempts: Int) {
+		self.pollAttempts = pollAttempts
 	}
 }

@@ -122,7 +122,7 @@ public struct ManageThirdPartyDeposits: FeatureReducer, Sendable {
 		}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .updated(account):
 			state.account = account
@@ -131,7 +131,7 @@ public struct ManageThirdPartyDeposits: FeatureReducer, Sendable {
 		}
 	}
 
-	private func submitTransaction(_ manifest: TransactionManifest, updatedAccount: Profile.Network.Account) -> EffectTask<Action> {
+	private func submitTransaction(_ manifest: TransactionManifest, updatedAccount: Profile.Network.Account) -> Effect<Action> {
 		.run { send in
 			do {
 				/// Wait for user to complete the interaction with Transaction Review
@@ -167,7 +167,7 @@ public struct ManageThirdPartyDeposits: FeatureReducer, Sendable {
 				}
 
 			} catch {
-				errorQueue.schedule(error)
+				// errorQueue.schedule(error)
 			}
 		}
 	}

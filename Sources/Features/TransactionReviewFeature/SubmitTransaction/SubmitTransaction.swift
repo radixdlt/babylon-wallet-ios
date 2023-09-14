@@ -15,6 +15,7 @@ public struct SubmitTransaction: Sendable, FeatureReducer {
 			case committedSuccessfully
 			case committedFailure
 			case rejected
+			case failedToGetStatus
 		}
 
 		public let notarizedTX: NotarizeTransactionResponse
@@ -35,7 +36,7 @@ public struct SubmitTransaction: Sendable, FeatureReducer {
 
 	public enum InternalAction: Sendable, Equatable {
 		case submitTXResult(TaskResult<TXID>)
-		case statusUpdate(GatewayAPI.TransactionStatus)
+		case statusUpdate(Result<GatewayAPI.TransactionStatus, TransactionPollingFailure>)
 	}
 
 	public enum ViewAction: Sendable, Equatable {
@@ -49,7 +50,7 @@ public struct SubmitTransaction: Sendable, FeatureReducer {
 		case submittedButNotCompleted(TXID)
 		case submittedTransactionFailed
 		case committedSuccessfully(TXID)
-		case manuallyDismiss
+		case manuallyDismiss(State.TXStatus)
 	}
 
 	@Dependency(\.submitTXClient) var submitTXClient
@@ -73,7 +74,7 @@ public struct SubmitTransaction: Sendable, FeatureReducer {
 		case .closeButtonTapped:
 			guard !state.dismissalDisabled else { return .none }
 			// FIXME: For some reason, the dismiss dependency does not work here
-			return .send(.delegate(.manuallyDismiss))
+			return .send(.delegate(.manuallyDismiss(state.status)))
 		}
 	}
 
@@ -91,29 +92,34 @@ public struct SubmitTransaction: Sendable, FeatureReducer {
 						loggerGlobal.warning("Received update for wrong txID, incorrect impl of `submitTXClient`?")
 						continue
 					}
-					try await send(.internal(.statusUpdate(update.result.get())))
+					await send(.internal(.statusUpdate(update.result)))
 				}
 			} catch: { error, send in
-				errorQueue.schedule(error)
 				loggerGlobal.error("Failed to receive TX status update, error \(error)")
-				await send(.delegate(.failedToReceiveStatusUpdate))
+				await send(.internal(.statusUpdate(.failure(.failedToGetTransactionStatus(txID: txID, error: .init(pollAttempts: 0))))))
 			}
 
 		case let .statusUpdate(update):
-			let status = update.stateStatus
-			loggerGlobal.debug("Got TX status update: \(String(describing: status))")
-			state.status = status
-			if status.isCompletedSuccessfully {
-				return .send(.delegate(.committedSuccessfully(state.notarizedTX.txID)))
-			} else if status.isCompletedWithFailure {
-				return .send(.delegate(.submittedTransactionFailed))
-			} else if status.isSubmitted {
-				if !state.hasDelegatedThatTXHasBeenSubmitted {
-					defer { state.hasDelegatedThatTXHasBeenSubmitted = true }
-					return .send(.delegate(.submittedButNotCompleted(state.notarizedTX.txID)))
+			switch update {
+			case let .success(status):
+				let stateStatus = status.stateStatus
+				state.status = stateStatus
+				if stateStatus.isCompletedSuccessfully {
+					return .send(.delegate(.committedSuccessfully(state.notarizedTX.txID)))
+				} else if stateStatus.isCompletedWithFailure {
+					return .send(.delegate(.submittedTransactionFailed))
+				} else if stateStatus.isSubmitted {
+					if !state.hasDelegatedThatTXHasBeenSubmitted {
+						defer { state.hasDelegatedThatTXHasBeenSubmitted = true }
+						return .send(.delegate(.submittedButNotCompleted(state.notarizedTX.txID)))
+					}
 				}
+				return .none
+			case .failure:
+				/// Need to show failure
+				state.status = .failedToGetStatus
+				return .none
 			}
-			return .none
 		}
 	}
 }
@@ -137,7 +143,7 @@ extension SubmitTransaction.State.TXStatus {
 
 	var isSubmitted: Bool {
 		switch self {
-		case .rejected, .committedFailure, .submittedUnknown, .submittedPending, .committedSuccessfully: return true
+		case .failedToGetStatus, .rejected, .committedFailure, .submittedUnknown, .submittedPending, .committedSuccessfully: return true
 		case .submitting, .notYetSubmitted: return false
 		}
 	}
@@ -145,7 +151,7 @@ extension SubmitTransaction.State.TXStatus {
 	var isCompletedWithFailure: Bool {
 		switch self {
 		case .rejected, .committedFailure: return true
-		case .notYetSubmitted, .submittedUnknown, .submittedPending, .committedSuccessfully, .submitting: return false
+		case .failedToGetStatus, .notYetSubmitted, .submittedUnknown, .submittedPending, .committedSuccessfully, .submitting: return false
 		}
 	}
 
@@ -154,5 +160,12 @@ extension SubmitTransaction.State.TXStatus {
 			return false
 		}
 		return true
+	}
+
+	var isInProgress: Bool {
+		switch self {
+		case .notYetSubmitted, .submitting, .submittedUnknown, .submittedPending: return true
+		case .committedFailure, .committedSuccessfully, .rejected, .failedToGetStatus: return false
+		}
 	}
 }
