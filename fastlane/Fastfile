@@ -129,33 +129,9 @@ private_lane :create_gh_release do |options|
       between: git_commits_range_for_changelog,
       pretty: "- %s"
     )
-
-    dependencies = read_json(
-        json_path: ENV['SWIFT_PACKAGE_RESOLVED_PATH']
-    )[:pins]
-
-    core_deps = [
-        "swift-composable-architecture", 
-        "swift-engine-toolkit", 
-        "webrtc",
-        "k1", 
-        "keychainaccess", 
-        "asyncextensions", 
-        "swift-algorithms", 
-        "swift-async-algorithms", 
-        "swift-dependencies-additions", 
-        "swiftui-navigation"
-    ]
-
-    versions = Hash.new
-    dependencies.each do |child_dict|
-        child = child_dict[:identity]
-        if core_deps.include? child
-            print(child_dict)
-            versions[child] = child_dict[:state][:version]
-        end
-    end
-    versions_string = versions.map { |k, v| "- #{k}: #{v}" }.join("\n")
+  
+    versions_string = dependencies_with_hyperlinks()
+  
     release_description = "**Dependencies**: \n" + versions_string + "\n\n**Changelog**: \n" + rev_changelog
     last_tag = most_recent_tags[0]
     set_github_release(
@@ -168,9 +144,8 @@ private_lane :create_gh_release do |options|
     )
 end
 
-lane :cyon do |options|
+private_lane :dependencies_with_hyperlinks do |options|
     json_path = ENV['SWIFT_PACKAGE_RESOLVED_PATH']
-    print("json_path: " + json_path)
     dependencies = read_json(
         json_path: json_path
     )[:pins]
@@ -197,9 +172,6 @@ lane :cyon do |options|
         }
         is_child_relevant = maybe_relevant_child.nil? == false
         if is_child_relevant
-
-            print(child_dict)
-            print("\n\n")
             child_state_dict = child_dict[:state]
             child_git_repo = child_dict[:location]
             if child_git_repo.end_with?(".git")
@@ -229,8 +201,7 @@ lane :cyon do |options|
             versions[child] = child_hyperlink
         end
     end
-    versions_string = versions.map { |k, v| "- #{k}: #{v}" }.join("\n")
-    print(versions_string)
+    versions.map { |k, v| "- #{k}: #{v}" }.join("\n")
 end
 
 private_lane :register_new_device do |options|
