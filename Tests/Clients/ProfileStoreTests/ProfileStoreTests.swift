@@ -35,49 +35,49 @@ final class ProfileStoreTests: TestCase {
 			}
 		} operation: {
 			let t0 = Task {
-				await ProfileStore.shared()
+				await ProfileStore.shared
 			}
 			await Task.yield()
-			var profile = await ProfileStore.shared().profile
+			var profile = await ProfileStore.shared.profile
 			await Task.yield()
 			let t1 = Task {
-				await ProfileStore.shared()
+				await ProfileStore.shared
 			}
 			let t2 = Task {
-				await ProfileStore.shared()
+				await ProfileStore.shared
 			}
 			await Task.yield()
-			profile = await ProfileStore.shared().profile
+			profile = await ProfileStore.shared.profile
 			await Task.yield()
 			let t3 = Task {
-				await ProfileStore.shared()
+				await ProfileStore.shared
 			}
 			await Task.yield()
-			try await ProfileStore.shared().update(profile: profile)
+			try await ProfileStore.shared.update(profile: profile)
 			await Task.yield()
 			let t4 = Task {
-				await ProfileStore.shared()
+				await ProfileStore.shared
 			}
 			let t5 = Task {
-				await ProfileStore.shared()
+				await ProfileStore.shared
 			}
 			await Task.yield()
-			profile = await ProfileStore.shared().profile
+			profile = await ProfileStore.shared.profile
 			await Task.yield()
 			let t6 = Task {
-				await ProfileStore.shared()
+				await ProfileStore.shared
 			}
 			let t7 = Task {
-				await ProfileStore.shared()
+				await ProfileStore.shared
 			}
 			await Task.yield()
-			try await ProfileStore.shared().update(profile: profile)
+			try await ProfileStore.shared.update(profile: profile)
 			await Task.yield()
 			let t8 = Task {
-				await ProfileStore.shared()
+				await ProfileStore.shared
 			}
 			let t9 = Task {
-				await ProfileStore.shared()
+				await ProfileStore.shared
 			}
 
 			let tasks = [t0, t1, t2, t3, t4, t5, t6, t7, t8, t9]

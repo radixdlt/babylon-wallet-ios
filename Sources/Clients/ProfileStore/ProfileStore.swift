@@ -49,8 +49,10 @@ public final actor ProfileStore {
 	@Dependency(\.userDefaultsClient) var userDefaultsClient
 
 	private static let managedAtomicLazyRef = ManagedAtomicLazyReference<ProfileStore>()
-	public static func shared() async -> ProfileStore {
-		await managedAtomicLazyRef.storeIfNilThenLoad(ProfileStore())
+	public static var shared: ProfileStore {
+		get async {
+			await managedAtomicLazyRef.storeIfNilThenLoad(ProfileStore())
+		}
 	}
 
 	/// Current Profile
