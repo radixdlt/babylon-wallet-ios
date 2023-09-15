@@ -10,6 +10,8 @@ import SwiftUI
 public struct AddressView: View {
 	let identifiable: LedgerIdentifiable
 	let isTappable: Bool
+	public typealias VerifyAddressOnLedger = () -> Void
+	let verifyAddressOnLedger: VerifyAddressOnLedger?
 	private let format: AddressFormat
 	private let action: Action
 
@@ -22,10 +24,12 @@ public struct AddressView: View {
 
 	public init(
 		_ identifiable: LedgerIdentifiable,
-		isTappable: Bool = true
+		isTappable: Bool = true,
+		verifyAddressOnLedger: VerifyAddressOnLedger? = nil
 	) {
 		self.identifiable = identifiable
 		self.isTappable = isTappable
+		self.verifyAddressOnLedger = verifyAddressOnLedger
 
 		switch identifiable {
 		case .address:
@@ -74,9 +78,20 @@ extension AddressView {
 				}
 
 				if case let .address(.account(accountAddress)) = identifiable {
-					Button(L10n.AddressAction.showAccountQR, asset: AssetResource.qrCodeScanner) {
+					Button(
+						L10n.AddressAction.showAccountQR,
+						asset: AssetResource.qrCodeScanner
+					) {
 						showQR(for: accountAddress)
 					}
+				}
+
+				if let verifyAddressOnLedger {
+					Button(
+						"Verify address on Ledger", // FIXME: Strings
+						asset: AssetResource.ledger,
+						action: verifyAddressOnLedger
+					)
 				}
 			}
 		}

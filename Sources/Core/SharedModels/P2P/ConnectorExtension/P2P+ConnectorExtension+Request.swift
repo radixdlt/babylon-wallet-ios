@@ -43,6 +43,7 @@ extension P2P.ConnectorExtension.Request {
 			case derivePublicKeys(DerivePublicKeys)
 			case signTransaction(SignTransaction)
 			case signChallenge(SignAuthChallenge)
+			case deriveAndDisplayAddress(DeriveAndDisplayAddress)
 
 			public var discriminator: P2P.LedgerHardwareWallet.Discriminator {
 				switch self {
@@ -50,6 +51,7 @@ extension P2P.ConnectorExtension.Request {
 				case .getDeviceInfo: return .getDeviceInfo
 				case .signTransaction: return .signTransaction
 				case .signChallenge: return .signChallenge
+				case .deriveAndDisplayAddress: return .deriveAndDisplayAddress
 				}
 			}
 
@@ -108,6 +110,18 @@ extension P2P.ConnectorExtension.Request {
 					self.dAppDefinitionAddress = dAppDefinitionAddress
 				}
 			}
+
+			public struct DeriveAndDisplayAddress: Sendable, Hashable, Encodable {
+				public let keyParameters: P2P.LedgerHardwareWallet.KeyParameters
+				public let ledgerDevice: P2P.LedgerHardwareWallet.LedgerDevice
+				public init(
+					keyParameters: P2P.LedgerHardwareWallet.KeyParameters,
+					ledgerDevice: P2P.LedgerHardwareWallet.LedgerDevice
+				) {
+					self.keyParameters = keyParameters
+					self.ledgerDevice = ledgerDevice
+				}
+			}
 		}
 
 		private typealias CodingKeys = P2P.LedgerHardwareWallet.CodingKeys
@@ -125,6 +139,8 @@ extension P2P.ConnectorExtension.Request {
 			case let .signTransaction(request):
 				try request.encode(to: encoder)
 			case let .signChallenge(request):
+				try request.encode(to: encoder)
+			case let .deriveAndDisplayAddress(request):
 				try request.encode(to: encoder)
 			}
 		}

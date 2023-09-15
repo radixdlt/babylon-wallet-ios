@@ -35,6 +35,8 @@ package.addModules([
 			"AccountPortfoliosClient",
 			"FactorSourcesClient", // check if `device` or `ledger` controlled for security prompting
 			"AccountDetailsFeature", // "shield buttons"
+			"LedgerHardwareWalletClient", // Verify address on Ledger
+			"OverlayWindowClient",
 		],
 		tests: .no
 	),

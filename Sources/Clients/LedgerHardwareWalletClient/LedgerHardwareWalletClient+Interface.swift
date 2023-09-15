@@ -11,12 +11,16 @@ public struct LedgerHardwareWalletClient: Sendable {
 	public var derivePublicKeys: DerivePublicKeys
 	public var signTransaction: SignTransaction
 	public var signAuthChallenge: SignAuthChallenge
+	public var deriveAndDisplayAddress: DeriveAndDisplayAddress
 }
 
 extension LedgerHardwareWalletClient {
 	public typealias IsConnectedToAnyConnectorExtension = @Sendable () async -> AnyAsyncSequence<Bool>
 	public typealias GetDeviceInfo = @Sendable () async throws -> P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.GetDeviceInfo
 	public typealias DerivePublicKeys = @Sendable ([P2P.LedgerHardwareWallet.KeyParameters], LedgerHardwareWalletFactorSource) async throws -> [HierarchicalDeterministicPublicKey]
+
+	public typealias DeriveAndDisplayAddress = @Sendable (P2P.LedgerHardwareWallet.KeyParameters, LedgerHardwareWalletFactorSource) async throws -> (HierarchicalDeterministicPublicKey, String)
+
 	public typealias SignTransaction = @Sendable (SignTransactionWithLedgerRequest) async throws -> Set<SignatureOfEntity>
 	public typealias SignAuthChallenge = @Sendable (SignAuthChallengeWithLedgerRequest) async throws -> Set<SignatureOfEntity>
 }
@@ -61,5 +65,64 @@ public struct SignAuthChallengeWithLedgerRequest: Sendable, Hashable {
 		self.challenge = challenge
 		self.origin = origin
 		self.dAppDefinitionAddress = dAppDefinitionAddress
+	}
+}
+
+// MARK: - FailedToFindLedger
+struct FailedToFindLedger: LocalizedError {
+	let factorSourceID: FactorSourceID
+	var errorDescription: String? {
+		#if DEBUG
+		"Failed to find ledger with ID: \(factorSourceID)"
+		#else
+		"Failed to find ledger" // FIXME: Strings
+		#endif
+	}
+}
+
+extension LedgerHardwareWalletClient {
+	@discardableResult
+	public func verifyAddress(of account: Profile.Network.Account) async throws -> String {
+		@Dependency(\.factorSourcesClient) var factorSourcesClient
+		switch account.securityState {
+		case let .unsecured(unsecuredEntityControl):
+			let signTXFactorInstance = unsecuredEntityControl.transactionSigning
+			let factorSourceID = signTXFactorInstance.factorSourceID.embed()
+			guard let ledger = try await factorSourcesClient.getFactorSource(
+				id: factorSourceID,
+				as: LedgerHardwareWalletFactorSource.self
+			) else {
+				throw FailedToFindLedger(factorSourceID: factorSourceID)
+			}
+			let keyParams = P2P.LedgerHardwareWallet.KeyParameters(
+				curve: signTXFactorInstance.derivationPath.curveForScheme.toLedger(),
+				derivationPath: signTXFactorInstance.derivationPath.path
+			)
+
+			let (derivedKey, address) = try await deriveAndDisplayAddress(keyParams, ledger)
+
+			if derivedKey != signTXFactorInstance.hierarchicalDeterministicPublicKey {
+				let errMsg = "Re-derived public key on Ledger does not matched the transactionSigning factor instance of the account. \(derivedKey) != \(signTXFactorInstance.hierarchicalDeterministicPublicKey)"
+				loggerGlobal.error(.init(stringLiteral: errMsg))
+				assertionFailure(errMsg)
+			}
+
+			return address
+		}
+	}
+}
+
+extension SLIP10.Curve {
+	public func toLedger() -> P2P.LedgerHardwareWallet.KeyParameters.Curve {
+		switch self {
+		case .curve25519: return .curve25519
+		case .secp256k1: return .secp256k1
+		}
+	}
+}
+
+extension P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.DerivedPublicKey {
+	public func hdPubKey() throws -> HierarchicalDeterministicPublicKey {
+		try .init(curve: self.curve, key: self.publicKey.data, path: self.derivationPath)
 	}
 }

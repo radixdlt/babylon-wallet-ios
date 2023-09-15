@@ -29,6 +29,7 @@ extension AccountList.Row {
 
 		let tag: AccountTag?
 
+		let isLedgerAccount: Bool
 		let needToBackupMnemonicForThisAccount: Bool
 		let needToImportMnemonicForThisAccount: Bool
 
@@ -47,6 +48,7 @@ extension AccountList.Row {
 			self.isLoadingResources = state.portfolio.isLoading
 
 			self.tag = .init(state: state)
+			self.isLedgerAccount = state.isLedgerAccount
 
 			// Show the prompt if the account has any XRD
 			self.needToBackupMnemonicForThisAccount = state.deviceFactorSourceControlled?.needToBackupMnemonicForThisAccount ?? false
@@ -92,9 +94,14 @@ extension AccountList.Row {
 							.frame(maxWidth: .infinity, alignment: .leading)
 
 						HStack {
-							AddressView(.address(.account(viewStore.address)))
-								.foregroundColor(.app.whiteTransparent)
-								.textStyle(.body2HighImportance)
+							AddressView(
+								.address(.account(viewStore.address)),
+								verifyAddressOnLedger: viewStore.isLedgerAccount ? {
+									viewStore.send(.verifyAddressOnLedger)
+								} : nil
+							)
+							.foregroundColor(.app.whiteTransparent)
+							.textStyle(.body2HighImportance)
 
 							if let tag = viewStore.tag {
 								Text("•")

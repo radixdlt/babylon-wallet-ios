@@ -219,6 +219,10 @@ public struct HierarchicalDeterministicFactorInstance: Sendable, Hashable, Codab
 	public let publicKey: SLIP10.PublicKey
 	public let derivationPath: DerivationPath
 
+	public var hierarchicalDeterministicPublicKey: HierarchicalDeterministicPublicKey {
+		HierarchicalDeterministicPublicKey(publicKey: publicKey, derivationPath: derivationPath)
+	}
+
 	public var factorInstance: FactorInstance {
 		.init(
 			factorSourceID: factorSourceID.embed(),
