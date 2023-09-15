@@ -360,8 +360,6 @@ extension AlertState<PersonaDetails.Destination.Action.ConfirmForgetAlert> {
 }
 
 // MARK: - SimpleAuthDappDetails
-// FIXME: Remove and make settings use stacks
-
 public struct SimpleAuthDappDetails: Sendable, FeatureReducer {
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.gatewayAPIClient) var gatewayAPIClient

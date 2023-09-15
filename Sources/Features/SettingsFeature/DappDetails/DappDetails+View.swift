@@ -76,15 +76,15 @@ extension DappDetails.View {
 private extension DappDetails.State {
 	var viewState: DappDetails.ViewState {
 		.init(
-			title: dApp.displayName?.rawValue ?? L10n.DAppRequest.Metadata.unknownName,
+			title: dApp?.displayName?.rawValue ?? L10n.DAppRequest.Metadata.unknownName,
 			description: metadata?.description,
 			domain: metadata?.claimedWebsites?.first,
 			thumbnail: metadata?.iconURL,
-			address: dApp.dAppDefinitionAddress,
+			address: dAppDefinitionAddress,
 			fungibles: resources?.fungible,
 			nonFungibles: resources?.nonFungible,
 			associatedDapps: associatedDapps,
-			hasPersonas: !personaList.personas.isEmpty
+			hasPersonas: (personaList?.personas.isEmpty).map(!) ?? false
 		)
 	}
 }
@@ -209,7 +209,9 @@ extension DappDetails.View {
 		let hasPersonas: Bool
 
 		var body: some View {
-			if hasPersonas {
+			let personasStore = store.scope(state: \.personaList) { .child(.personas($0)) }
+
+			IfLetStore(personasStore) { childStore in
 				Text(L10n.AuthorizedDapps.DAppDetails.personasHeading)
 					.sectionHeading
 					.flushedLeft
@@ -219,9 +221,8 @@ extension DappDetails.View {
 				Separator()
 					.padding(.bottom, .small2)
 
-				let personasStore = store.scope(state: \.personaList) { .child(.personas($0)) }
-				PersonaListCoreView(store: personasStore)
-			} else {
+				PersonaListCoreView(store: childStore)
+			} else: {
 				Text(L10n.AuthorizedDapps.DAppDetails.noPersonasHeading)
 					.sectionHeading
 					.flushedLeft

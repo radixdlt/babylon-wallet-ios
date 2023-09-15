@@ -1191,8 +1191,6 @@ public struct TransactionReviewFailure: LocalizedError {
 }
 
 // MARK: - SimpleDappDetails
-// FIXME: Remove and make settings use stacks
-
 public struct SimpleDappDetails: Sendable, FeatureReducer {
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.gatewayAPIClient) var gatewayAPIClient

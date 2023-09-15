@@ -1,5 +1,6 @@
 import AuthorizedDappsClient
 import CacheClient
+import EditPersonaFeature
 import EngineKit
 import FeaturePrelude
 import GatewayAPI
@@ -21,7 +22,49 @@ public struct DappDetails: Sendable, FeatureReducer {
 	// MARK: State
 
 	public struct State: Sendable, Hashable {
-		public var dApp: Profile.Network.AuthorizedDappDetailed
+		public enum Mode: Sendable, Hashable {
+			case general(DappDefinitionAddress)
+			case authorized(Profile.Network.AuthorizedDappDetailed, PersonaList.State?)
+
+			public var isAuthorized: Bool {
+				guard case .authorized = self else { return false }
+				return true
+			}
+		}
+
+		public var mode: Mode
+
+		public var dAppDefinitionAddress: DappDefinitionAddress {
+			switch mode {
+			case let .general(id): return id
+			case let .authorized(dApp, _): return dApp.dAppDefinitionAddress
+			}
+		}
+
+		public var personaList: PersonaList.State? {
+			get {
+				guard case let .authorized(_, personas) = mode else { return nil }
+				return personas
+			}
+			set {
+				assert(mode.isAuthorized, "Should only be accessed in authorized mode")
+				guard case let .authorized(dApp, _) = mode else { return }
+				mode = .authorized(dApp, newValue)
+			}
+		}
+
+		public var dApp: Profile.Network.AuthorizedDappDetailed? {
+			get {
+				guard case let .authorized(dApp, _) = mode else { return nil }
+				return dApp
+			}
+			set {
+				assert(mode.isAuthorized, "Should only be accessed in authorized mode")
+				assert(newValue != nil, "Should never be set to nil")
+				guard let dApp = newValue, case .authorized = mode else { return }
+				mode = .authorized(dApp, .init(dApp: dApp))
+			}
+		}
 
 		@Loadable
 		public var metadata: GatewayAPI.EntityMetadataCollection? = nil
@@ -32,24 +75,37 @@ public struct DappDetails: Sendable, FeatureReducer {
 		@Loadable
 		public var associatedDapps: [AssociatedDapp]? = nil
 
-		public var personaList: PersonaList.State
-
 		@PresentationState
 		public var destination: Destination.State? = nil
 
+		// Authorized dApp
 		public init(
 			dApp: Profile.Network.AuthorizedDappDetailed,
+			personas: PersonaList.State? = nil,
 			metadata: GatewayAPI.EntityMetadataCollection? = nil,
 			resources: Resources? = nil,
 			associatedDapps: [AssociatedDapp]? = nil,
-			personaDetails: PersonaDetails.State? = nil,
 			destination: Destination.State? = nil
 		) {
-			self.dApp = dApp
+			self.mode = .authorized(dApp, personas)
 			self.metadata = metadata
 			self.resources = resources
 			self.associatedDapps = associatedDapps
-			self.personaList = .init(dApp: dApp)
+			self.destination = destination
+		}
+
+		// General
+		public init(
+			dAppDefinitionAddress: DappDefinitionAddress,
+			metadata: GatewayAPI.EntityMetadataCollection? = nil,
+			resources: Resources? = nil,
+			associatedDapps: [AssociatedDapp]? = nil,
+			destination: Destination.State? = nil
+		) {
+			self.mode = .general(dAppDefinitionAddress)
+			self.metadata = metadata
+			self.resources = resources
+			self.associatedDapps = associatedDapps
 			self.destination = destination
 		}
 
@@ -142,10 +198,10 @@ public struct DappDetails: Sendable, FeatureReducer {
 	public init() {}
 
 	public var body: some ReducerOf<Self> {
-		Scope(state: \.personaList, action: /Action.child .. ChildAction.personas) {
-			PersonaList()
-		}
 		Reduce(core)
+			.ifLet(\.personaList, action: /Action.child .. ChildAction.personas) {
+				PersonaList()
+			}
 			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
 				Destination()
 			}
@@ -156,13 +212,13 @@ public struct DappDetails: Sendable, FeatureReducer {
 		case .appeared:
 			state.$metadata = .loading
 			state.$resources = .loading
-			let dAppID = state.dApp.dAppDefinitionAddress
+			let address = state.dAppDefinitionAddress.address
 			return .run { send in
 				let result = await TaskResult {
 					try await cacheClient.withCaching(
-						cacheEntry: .dAppMetadata(dAppID.address),
+						cacheEntry: .dAppMetadata(address),
 						request: {
-							try await gatewayAPIClient.getEntityMetadata(dAppID.address, .dappMetadataKeys)
+							try await gatewayAPIClient.getEntityMetadata(address, .dappMetadataKeys)
 						}
 					)
 				}
@@ -197,15 +253,17 @@ public struct DappDetails: Sendable, FeatureReducer {
 		case let .destination(.presented(destinationAction)):
 			switch destinationAction {
 			case .personaDetails(.delegate(.personaDeauthorized)):
-				let dAppID = state.dApp.dAppDefinitionAddress
+				let dAppID = state.dAppDefinitionAddress
 				return update(dAppID: dAppID, dismissPersonaDetails: true)
 
 			case .personaDetails(.delegate(.personaChanged)):
-				let dAppID = state.dApp.dAppDefinitionAddress
+				let dAppID = state.dAppDefinitionAddress
 				return update(dAppID: dAppID, dismissPersonaDetails: false)
 
 			case .confirmDisconnectAlert(.confirmTapped):
-				return disconnectDappEffect(dApp: state.dApp)
+				assert(state.mode.isAuthorized, "Should only be accessed in authorized mode")
+				guard let networkID = state.dApp?.networkID else { return .none }
+				return disconnectDappEffect(dAppID: state.dAppDefinitionAddress, networkID: networkID)
 
 			default:
 				return .none
@@ -215,8 +273,9 @@ public struct DappDetails: Sendable, FeatureReducer {
 			return .none
 
 		case let .personas(.delegate(.openDetails(persona))):
-			guard let detailedPersona = state.dApp.detailedAuthorizedPersonas[id: persona.id] else { return .none }
-			let personaDetailsState = PersonaDetails.State(.dApp(state.dApp, persona: detailedPersona))
+			assert(state.mode.isAuthorized, "Should only be accessed in authorized mode")
+			guard let dApp = state.dApp, let detailedPersona = dApp.detailedAuthorizedPersonas[id: persona.id] else { return .none }
+			let personaDetailsState = PersonaDetails.State(.dApp(dApp, persona: detailedPersona))
 			state.destination = .personaDetails(personaDetailsState)
 			return .none
 
@@ -230,7 +289,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 		case let .metadataLoaded(metadata):
 			state.$metadata = metadata
 
-			let dAppDefinitionAddress = state.dApp.dAppDefinitionAddress
+			let dAppDefinitionAddress = state.dAppDefinitionAddress
 			return .run { send in
 				let resources = await metadata.flatMap { await loadResources(metadata: $0, validated: dAppDefinitionAddress) }
 				await send(.internal(.resourcesLoaded(resources)))
@@ -248,10 +307,11 @@ public struct DappDetails: Sendable, FeatureReducer {
 			return .none
 
 		case let .dAppUpdated(dApp):
-			assert(dApp.dAppDefinitionAddress == state.dApp.dAppDefinitionAddress, "dAppUpdated called with wrong dApp")
+			assert(state.mode.isAuthorized, "Should only be accessed in authorized mode")
+			assert(dApp.dAppDefinitionAddress == state.dAppDefinitionAddress, "dAppUpdated called with wrong dApp")
 			guard !dApp.detailedAuthorizedPersonas.isEmpty else {
 				// FIXME: Without this delay, the screen is never dismissed
-				return disconnectDappEffect(dApp: state.dApp, delay: .milliseconds(500))
+				return disconnectDappEffect(dAppID: dApp.dAppDefinitionAddress, networkID: dApp.networkID, delay: .milliseconds(500))
 			}
 			state.dApp = dApp
 
@@ -325,9 +385,8 @@ public struct DappDetails: Sendable, FeatureReducer {
 		}
 	}
 
-	private func disconnectDappEffect(dApp: Profile.Network.AuthorizedDappDetailed, delay: Duration? = .zero) -> Effect<Action> {
-		let (dAppID, networkID) = (dApp.dAppDefinitionAddress, dApp.networkID)
-		return .run { send in
+	private func disconnectDappEffect(dAppID: DappDefinitionAddress, networkID: NetworkID, delay: Duration? = .zero) -> Effect<Action> {
+		.run { send in
 			if let delay {
 				try await clock.sleep(for: delay)
 			}
