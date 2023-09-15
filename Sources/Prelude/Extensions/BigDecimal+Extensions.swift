@@ -6,6 +6,10 @@ extension BigDecimal {
 	public static let temporaryStandardFee: BigDecimal = 25
 	public static let defaultMaxPlacesFormattted: UInt = 8
 
+	// N.B. We cannot use `Local.current.decimalSeperator` here because
+	// `github.com/Zollerbo1/BigDecimal` package **hardcodes** usage of
+	// the decimal separator ".", see this line here:
+	// https://github.com/Zollerboy1/BigDecimal/blob/main/Sources/BigDecimal/BigDecimal.swift#L469
 	public static let integerAndDecimalPartsSeparator = "."
 }
 
@@ -18,10 +22,6 @@ extension BigDecimal {
 	}
 
 	public func integerAndDecimalPart(withDivisibility divisibility: Int?) -> (String, String?) {
-		// N.B. We cannot use `Local.current.decimalSeperator` here because
-		// `github.com/Zollerbo1/BigDecimal` package **hardcodes** usage of
-		// the decimal separator ".", see this line here:
-		// https://github.com/Zollerboy1/BigDecimal/blob/main/Sources/BigDecimal/BigDecimal.swift#L469
 		let stringRepresentation = String(describing: self)
 
 		guard
