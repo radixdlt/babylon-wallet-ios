@@ -18,6 +18,7 @@ extension ManifestBuilder {
 	public static let withdrawTokens = flip(withdrawNonFungiblesFromAccount)
 	public static let takeFromWorktop = flip(takeFromWorktop)
 	public static let accountTryDepositOrAbort = flip(accountTryDepositOrAbort)
+	public static let accountDeposit = flip(accountDeposit)
 	public static let takeNonFungiblesFromWorktop = flip(takeNonFungiblesFromWorktop)
 	public static let setOwnerKeys = flip(setOwnerKeys)
 
@@ -40,6 +41,14 @@ extension ManifestBuilder {
 
 		public static func buildOptional(_ component: Instructions?) -> Instructions {
 			component ?? []
+		}
+
+		public static func buildEither(first component: Instructions) -> Instructions {
+			component
+		}
+
+		public static func buildEither(second component: Instructions) -> Instructions {
+			component
 		}
 	}
 

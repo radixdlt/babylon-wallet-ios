@@ -137,6 +137,7 @@ extension AssetTransfer {
 		struct PerAccountAmount: Identifiable {
 			var id: AccountAddress
 			var amount: BigDecimal
+			var isUserAccount: Bool
 		}
 
 		var id: ResourceAddress {
@@ -152,6 +153,7 @@ extension AssetTransfer {
 		struct PerAccountTokens: Identifiable {
 			var id: AccountAddress
 			var tokens: IdentifiedArrayOf<AccountPortfolio.NonFungibleResource.NonFungibleToken>
+			var isUserAccount: Bool
 		}
 
 		var id: ResourceAddress {
@@ -187,11 +189,19 @@ extension AssetTransfer {
 						account.amount.intoEngine(),
 						bucket
 					)
-					try ManifestBuilder.accountTryDepositOrAbort(
-						account.id.intoEngine(),
-						nil,
-						bucket
-					)
+
+					if account.isUserAccount {
+						try ManifestBuilder.accountDeposit(
+							account.id.intoEngine(),
+							bucket
+						)
+					} else {
+						try ManifestBuilder.accountTryDepositOrAbort(
+							account.id.intoEngine(),
+							nil,
+							bucket
+						)
+					}
 				}
 			}
 
@@ -211,11 +221,19 @@ extension AssetTransfer {
 						localIds,
 						bucket
 					)
-					try ManifestBuilder.accountTryDepositOrAbort(
-						account.id.intoEngine(),
-						nil,
-						bucket
-					)
+
+					if account.isUserAccount {
+						try ManifestBuilder.accountDeposit(
+							account.id.intoEngine(),
+							bucket
+						)
+					} else {
+						try ManifestBuilder.accountTryDepositOrAbort(
+							account.id.intoEngine(),
+							nil,
+							bucket
+						)
+					}
 				}
 			}
 		}
@@ -228,7 +246,7 @@ extension AssetTransfer {
 		var resources: IdentifiedArrayOf<InvolvedFungibleResource> = []
 
 		for receivingAccount in receivingAccounts {
-			guard let accountAddress = receivingAccount.account?.id else {
+			guard let account = receivingAccount.account else {
 				continue
 			}
 			for fungibleAsset in receivingAccount.assets.compactMap(/ResourceAsset.State.fungibleAsset) {
@@ -236,8 +254,9 @@ extension AssetTransfer {
 					continue
 				}
 				let accountTransfer = InvolvedFungibleResource.PerAccountAmount(
-					id: accountAddress,
-					amount: transferAmount
+					id: account.address,
+					amount: transferAmount,
+					isUserAccount: account.isUserAccount
 				)
 
 				if resources[id: fungibleAsset.resource.resourceAddress] != nil {
@@ -261,19 +280,32 @@ extension AssetTransfer {
 		var resources: IdentifiedArrayOf<InvolvedNonFungibleResource> = []
 
 		for receivingAccount in receivingAccounts {
-			guard let accountAddress = receivingAccount.account?.id else {
+			guard let account = receivingAccount.account else {
 				continue
 			}
+
+			let accountAddress = account.address
 
 			for nonFungibleAsset in receivingAccount.assets.compactMap(/ResourceAsset.State.nonFungibleAsset) {
 				if resources[id: nonFungibleAsset.resourceAddress] != nil {
 					if resources[id: nonFungibleAsset.resourceAddress]?.accounts[id: accountAddress] != nil {
 						resources[id: nonFungibleAsset.resourceAddress]?.accounts[id: accountAddress]?.tokens.append(nonFungibleAsset.nftToken)
 					} else {
-						resources[id: nonFungibleAsset.resourceAddress]?.accounts.append(.init(id: accountAddress, tokens: [nonFungibleAsset.nftToken]))
+						resources[id: nonFungibleAsset.resourceAddress]?.accounts.append(.init(
+							id: accountAddress,
+							tokens: [nonFungibleAsset.nftToken],
+							isUserAccount: account.isUserAccount
+						))
 					}
 				} else {
-					resources.append(.init(address: nonFungibleAsset.resourceAddress, accounts: [.init(id: accountAddress, tokens: [nonFungibleAsset.nftToken])]))
+					resources.append(.init(
+						address: nonFungibleAsset.resourceAddress,
+						accounts: [.init(
+							id: accountAddress,
+							tokens: [nonFungibleAsset.nftToken],
+							isUserAccount: account.isUserAccount
+						)]
+					))
 				}
 			}
 		}
