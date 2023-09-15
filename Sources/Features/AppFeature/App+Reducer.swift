@@ -34,7 +34,9 @@ public struct App: Sendable, FeatureReducer {
 		@PresentationState
 		public var alert: Alerts.State?
 
-		public init(root: Root = .splash(.init())) {
+		public init(
+			root: Root = .splash(.init())
+		) {
 			self.root = root
 			loggerGlobal.info("App started")
 		}
