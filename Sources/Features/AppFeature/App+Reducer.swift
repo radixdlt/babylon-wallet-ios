@@ -20,16 +20,21 @@ public struct App: Sendable, FeatureReducer {
 			case onboardTestnetUserToMainnet(CreateAccountCoordinator.State)
 		}
 
-		public var root: Root
+		public var root: Root {
+			didSet {
+				switch root {
+				case .onboardTestnetUserToMainnet, .onboardingCoordinator:
+					self.isCurrentlyOnboardingUser = true
+				case .main, .splash:
+					self.isCurrentlyOnboardingUser = false
+				}
+			}
+		}
+
 		public var isOnMainnet = false
 		public var hasMainnetEverBeenLive = false
 
-		public var isCurrentlyOnboardingUserToMainnet: Bool {
-			switch root {
-			case .onboardTestnetUserToMainnet: return true
-			case .main, .onboardingCoordinator, .splash: return false
-			}
-		}
+		public var isCurrentlyOnboardingUser = false
 
 		@PresentationState
 		public var alert: Alerts.State?
