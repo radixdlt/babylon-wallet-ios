@@ -441,16 +441,14 @@ struct TransactionReviewTokenView: View {
 			Spacer(minLength: 0)
 
 			VStack(alignment: .trailing, spacing: 0) {
-				HStack(spacing: .small2) {
-					if viewState.guaranteedAmount != nil {
-						Text(L10n.TransactionReview.estimated)
-							.textStyle(.body2HighImportance)
-							.foregroundColor(.app.gray1)
-					}
-					Text(viewState.amount.format())
-						.textStyle(.secondaryHeader)
+				if viewState.guaranteedAmount != nil {
+					Text(L10n.TransactionReview.estimated)
+						.textStyle(.body2HighImportance)
+						.foregroundColor(.app.gray1)
 				}
-				.foregroundColor(.app.gray1)
+				Text(viewState.amount.format())
+					.textStyle(.secondaryHeader)
+					.foregroundColor(.app.gray1)
 
 				if let fiatAmount = viewState.fiatAmount {
 					// Text(fiatAmount.formatted(.currency(code: "USD")))
