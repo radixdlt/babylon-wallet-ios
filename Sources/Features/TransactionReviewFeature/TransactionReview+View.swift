@@ -123,6 +123,8 @@ extension TransactionReview {
 							usingDappsSection(for: viewStore)
 
 							depositsSection
+
+							accountDepositSettingsSection
 						}
 						.padding(.top, .medium1)
 						.padding(.horizontal, .medium3)
@@ -226,6 +228,21 @@ extension TransactionReview {
 			IfLetStore(proofsStore) { childStore in
 				TransactionReviewProofs.View(store: childStore)
 					.padding(.bottom, .medium1)
+
+				Separator()
+					.padding(.horizontal, -.small3)
+			}
+		}
+
+		@ViewBuilder
+		private var accountDepositSettingsSection: some SwiftUI.View {
+			let accountDepositSettingsStore = store.scope(state: \.accountDepositSettings) { .child(.accountDepositSettings($0)) }
+			IfLetStore(accountDepositSettingsStore) { childStore in
+				VStack(spacing: .small2) {
+					TransactionHeading("Account Deposit Settings")
+					AccountDepositSettings.View(store: childStore)
+						.padding(.bottom, .medium1)
+				}
 
 				Separator()
 					.padding(.horizontal, -.small3)

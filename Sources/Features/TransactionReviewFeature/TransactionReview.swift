@@ -20,6 +20,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		public let transactionManifest: TransactionManifest
 		public let message: Message
 		public let signTransactionPurpose: SigningPurpose.SignTransactionPurpose
+		public let waitsForTransactionToBeComitted: Bool
 
 		public var networkID: NetworkID? { reviewedTransaction?.networkId }
 
@@ -29,6 +30,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		public var dAppsUsed: TransactionReviewDappsUsed.State? = nil
 		public var deposits: TransactionReviewAccounts.State? = nil
 		public var proofs: TransactionReviewProofs.State? = nil
+		public var accountDepositSettings: AccountDepositSettings.State? = nil
 		public var networkFee: TransactionReviewNetworkFee.State? = nil
 		public let ephemeralNotaryPrivateKey: Curve25519.Signing.PrivateKey
 		public var canApproveTX: Bool = true
@@ -73,13 +75,15 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			nonce: Nonce,
 			signTransactionPurpose: SigningPurpose.SignTransactionPurpose,
 			message: Message,
-			ephemeralNotaryPrivateKey: Curve25519.Signing.PrivateKey = .init()
+			ephemeralNotaryPrivateKey: Curve25519.Signing.PrivateKey = .init(),
+			waitsForTransactionToBeComitted: Bool = false
 		) {
 			self.nonce = nonce
 			self.transactionManifest = transactionManifest
 			self.signTransactionPurpose = signTransactionPurpose
 			self.message = message
 			self.ephemeralNotaryPrivateKey = ephemeralNotaryPrivateKey
+			self.waitsForTransactionToBeComitted = waitsForTransactionToBeComitted
 		}
 
 		public enum DisplayMode: Sendable, Hashable {
@@ -105,6 +109,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		case deposits(TransactionReviewAccounts.Action)
 		case dAppsUsed(TransactionReviewDappsUsed.Action)
 		case proofs(TransactionReviewProofs.Action)
+		case accountDepositSettings(AccountDepositSettings.Action)
 		case networkFee(TransactionReviewNetworkFee.Action)
 
 		case destination(PresentationAction<Destinations.Action>)
@@ -196,6 +201,9 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			}
 			.ifLet(\.proofs, action: /Action.child .. ChildAction.proofs) {
 				TransactionReviewProofs()
+			}
+			.ifLet(\.accountDepositSettings, action: /Action.child .. ChildAction.accountDepositSettings) {
+				AccountDepositSettings()
 			}
 			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
 				Destinations()
@@ -367,7 +375,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			return resetToApprovable(&state)
 
 		case let .signing(.delegate(.finishedSigning(.signTransaction(notarizedTX, origin: _)))):
-			state.destination = .submitting(.init(notarizedTX: notarizedTX))
+			state.destination = .submitting(.init(notarizedTX: notarizedTX, inProgressDismissalDisabled: state.waitsForTransactionToBeComitted))
 			return .none
 
 		case .signing(.delegate(.finishedSigning(.signAuth))):
@@ -386,15 +394,12 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			return resetToApprovable(&state)
 
 		case .submitting(.delegate(.failedToReceiveStatusUpdate)):
-			state.destination = nil
 			loggerGlobal.error("Failed to receive status update")
 			return .none
 
 		case .submitting(.delegate(.submittedTransactionFailed)):
-			state.destination = nil
-			state.canApproveTX = true
 			loggerGlobal.error("Submitted TX failed")
-			return .send(.delegate(.failed(.failedToSubmit)))
+			return resetToApprovable(&state).concatenate(with: .send(.delegate(.failed(.failedToSubmit))))
 
 		case let .submitting(.delegate(.committedSuccessfully(txID))):
 			state.destination = nil
@@ -455,6 +460,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			state.withdrawals = content.withdrawals
 			state.dAppsUsed = content.dAppsUsed
 			state.deposits = content.deposits
+			state.accountDepositSettings = content.accountDepositSettings
 			state.proofs = content.proofs
 			state.networkFee = content.networkFee
 			return .none
@@ -490,7 +496,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			return .none
 
 		case let .notarizeResult(.success(notarizedTX)):
-			state.destination = .submitting(.init(notarizedTX: notarizedTX))
+			state.destination = .submitting(.init(notarizedTX: notarizedTX, inProgressDismissalDisabled: state.waitsForTransactionToBeComitted))
 			return .none
 
 		case let .buildTransactionItentResult(.failure(error)),
@@ -524,7 +530,7 @@ extension TransactionReview {
 		}
 
 		switch transactionToReview.transaction {
-		case let .conforming(transaction):
+		case let .conforming(.general(transaction)):
 			return .run { send in
 				let userAccounts = try await extractUserAccounts(transaction)
 
@@ -541,6 +547,22 @@ extension TransactionReview {
 						networkID: networkID
 					),
 					proofs: try? exctractProofs(transaction),
+					accountDepositSettings: nil,
+					networkFee: .init(reviewedTransaction: transactionToReview)
+				)
+				await send(.internal(.createTransactionReview(content)))
+			} catch: { error, _ in
+				loggerGlobal.error("Failed to extract user accounts, error: \(error)")
+				// FIXME: propagate/display error?
+			}
+		case let .conforming(.accountDepositSettings(depositSettings)):
+			return .run { send in
+				let content = try await TransactionReview.TransactionContent(
+					withdrawals: nil,
+					dAppsUsed: nil,
+					deposits: nil,
+					proofs: nil,
+					accountDepositSettings: extractAccountDepositSettings(depositSettings),
 					networkFee: .init(reviewedTransaction: transactionToReview)
 				)
 				await send(.internal(.createTransactionReview(content)))
@@ -623,6 +645,7 @@ extension TransactionReview {
 		let dAppsUsed: TransactionReviewDappsUsed.State?
 		let deposits: TransactionReviewAccounts.State?
 		let proofs: TransactionReviewProofs.State?
+		let accountDepositSettings: AccountDepositSettings.State?
 		let networkFee: TransactionReviewNetworkFee.State?
 	}
 
@@ -904,6 +927,71 @@ extension TransactionReview {
 			}
 
 			return result
+		}
+	}
+
+	func extractAccountDepositSettings(_ settings: TransactionType.AccountDepositSettings) async throws -> AccountDepositSettings.State {
+		let userAccounts = try await accountsClient.getAccountsOnCurrentNetwork()
+		let allAccountAddress = Set(settings.authorizedDepositorsChanges.keys)
+			.union(settings.defaultDepositRuleChanges.keys)
+			.union(settings.resourcePreferenceChanges.keys)
+		let validAccounts = allAccountAddress.compactMap { address in
+			userAccounts.first { $0.address == address }
+		}
+
+		let depositSettingsChanges = try await validAccounts.asyncMap { account in
+			let depositRuleChange = settings.defaultDepositRuleChanges[account.address]
+
+			let resourcePreferenceChanges = try await settings
+				.resourcePreferenceChanges[account.address]?
+				.asyncMap { resourcePreference in
+					try await AccountDepositSettingsChange.ResourcePreferenceChange(
+						resource: onLedgerEntitiesClient.getResource(resourcePreference.key),
+						preferenceChange: resourcePreference.value
+					)
+				} ?? []
+
+			let authorizedDepositorChanges = try await {
+				if let depositorChanges = settings.authorizedDepositorsChanges[account.address] {
+					let added = try await depositorChanges.added.asyncMap { resourceOrNonFungible in
+						let resourceAddress = try resourceOrNonFungible.resourceAddress()
+						return try await AccountDepositSettingsChange.AllowedDepositorChange(
+							resource: onLedgerEntitiesClient.getResource(resourceAddress),
+							change: .added
+						)
+					}
+					let removed = try await depositorChanges.removed.asyncMap { resourceOrNonFungible in
+						let resourceAddress = try resourceOrNonFungible.resourceAddress()
+						return try await AccountDepositSettingsChange.AllowedDepositorChange(
+							resource: onLedgerEntitiesClient.getResource(resourceAddress),
+							change: .removed
+						)
+					}
+
+					return added + removed
+				}
+				return []
+			}()
+
+			return AccountDepositSettingsChange(
+				account: account,
+				depositRuleChange: depositRuleChange,
+				resourceChanges: IdentifiedArray(uncheckedUniqueElements: resourcePreferenceChanges),
+				allowedDepositorChanges: IdentifiedArray(uncheckedUniqueElements: authorizedDepositorChanges)
+			)
+		}
+
+		return .init(accounts: IdentifiedArray(uncheckedUniqueElements: depositSettingsChanges))
+	}
+}
+
+extension ResourceOrNonFungible {
+	func resourceAddress() throws -> ResourceAddress {
+		switch self {
+		case let .resource(address):
+			return try address.asSpecific()
+		case let .nonFungible(globalID):
+			return try globalID.resourceAddress().asSpecific()
 		}
 	}
 }
@@ -1336,9 +1424,10 @@ enum FeeValidationOutcome {
 extension ReviewedTransaction {
 	var feePayingValidation: FeeValidationOutcome {
 		switch transaction {
-		case .nonConforming:
+		case .nonConforming, .conforming(.accountDepositSettings):
 			return feePayerSelection.validate
-		case let .conforming(generalTransaction):
+
+		case let .conforming(.general(generalTransaction)):
 			guard let feePayer = feePayerSelection.selected,
 			      let feePayerWithdraws = generalTransaction.accountWithdraws[feePayer.account.address.address]
 			else {
@@ -1411,7 +1500,7 @@ func printSigners(_ reviewedTransaction: ReviewedTransaction) {
 
 extension ReviewedTransaction {
 	func metadataForNewlyCreatedResource(_ resource: ResourceAddress) -> [String: MetadataValue?]? {
-		guard case let .conforming(conforming) = transaction else { return nil }
+		guard case let .conforming(.general(conforming)) = transaction else { return nil }
 		return conforming.metadataOfNewlyCreatedEntities[resource.address]
 	}
 }

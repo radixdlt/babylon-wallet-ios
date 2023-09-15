@@ -6,21 +6,54 @@ public struct AddAsset: FeatureReducer, Sendable {
 	public struct State: Hashable, Sendable {
 		var mode: ResourcesListMode
 		let alreadyAddedResources: OrderedSet<ResourceViewState.Address>
+		let networkID: NetworkID
 
 		var resourceAddress: String = ""
 		var resourceAddressFieldFocused: Bool = false
 
-		var validatedResourceAddress: ResourceViewState.Address? {
-			guard !resourceAddress.isEmpty else {
-				return nil
+		public enum AddressValidation: Sendable, Hashable {
+			case valid(ResourceViewState.Address)
+			case wrongNetwork(ResourceViewState.Address, incorrectNetwork: UInt8)
+			case alreadyAdded
+			case invalid
+
+			var validAddress: ResourceViewState.Address? {
+				guard case let .valid(address) = self else {
+					return nil
+				}
+
+				return address
 			}
+		}
+
+		var validatedResourceAddress: AddressValidation {
+			guard !resourceAddress.isEmpty else {
+				return .invalid
+			}
+
+			let address: ResourceViewState.Address?
 
 			switch mode {
 			case let .allowDenyAssets(exceptionRule):
-				return try? .assetException(.init(address: .init(validatingAddress: resourceAddress), exceptionRule: exceptionRule))
+				address = try? .assetException(.init(address: .init(validatingAddress: resourceAddress), exceptionRule: exceptionRule))
 			case .allowDepositors:
-				return ThirdPartyDeposits.DepositorAddress(raw: resourceAddress).map { .allowedDepositor($0) }
+				address = ThirdPartyDeposits.DepositorAddress(raw: resourceAddress).map { .allowedDepositor($0) }
 			}
+
+			guard let address, let engineAddress = try? address.resourceAddress.intoEngine() else {
+				return .invalid
+			}
+
+			guard engineAddress.networkId() == networkID.rawValue else {
+				// On wrong network
+				return .wrongNetwork(address, incorrectNetwork: engineAddress.networkId())
+			}
+
+			guard !alreadyAddedResources.contains(where: { $0.resourceAddress == address.resourceAddress }) else {
+				return .alreadyAdded
+			}
+
+			return .valid(address)
 		}
 	}
 

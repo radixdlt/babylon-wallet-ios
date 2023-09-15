@@ -128,6 +128,7 @@ extension ResourcesList.View {
 			.padding(.leading, .medium3)
 
 			Spacer(minLength: 0)
+
 			AssetIcon(.asset(AssetResource.trash))
 				.onTapGesture {
 					viewStore.send(.assetRemove(viewState.address))

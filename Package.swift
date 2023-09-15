@@ -48,6 +48,8 @@ package.addModules([
 			"GatewaysClient",
 			"OverlayWindowClient",
 			"OnLedgerEntitiesClient",
+			"DappInteractionClient",
+			"SubmitTransactionClient",
 		],
 		tests: .yes()
 	),
@@ -188,6 +190,7 @@ package.addModules([
 			"TransactionReviewFeature",
 			"SigningFeature",
 			"DappInteractionClient",
+			"OverlayWindowClient",
 		],
 		tests: .yes()
 	),
@@ -783,10 +786,14 @@ package.addModules([
 	.client(
 		name: "ProfileStore",
 		dependencies: [
+			.product(
+				name: "Atomics",
+				package: "swift-atomics"
+			),
+			"DeviceFactorSourceClient", // FIXME: break out to `BaseProfileClient` or similar
+			"MnemonicClient",
 			"Profile",
 			"SecureStorageClient",
-			"MnemonicClient",
-			"DeviceFactorSourceClient", // FIXME: break out to `BaseProfileClient` or similar
 		],
 		tests: .yes()
 	),
@@ -937,9 +944,6 @@ package.addModules([
 		dependencies: [
 			"SharedModels",
 		],
-		resources: [
-			.process("TestVectorsSharedByMultipleTargets/"),
-		],
 		tests: .no
 	),
 	.core(
@@ -962,11 +966,15 @@ package.addModules([
 	.module(
 		name: "Profile",
 		dependencies: [
+			.product(
+				name: "ComposableArchitecture",
+				// actually just CasePaths
+				package: "swift-composable-architecture"
+			),
 			"Cryptography",
 			"EngineKit",
 			"RadixConnectModels",
 			"Resources",
-			.product(name: "ComposableArchitecture", package: "swift-composable-architecture"), // actually just CasePaths
 		],
 		tests: .yes(
 			dependencies: [
@@ -1070,6 +1078,9 @@ package.addModules([
 			},
 			.product(name: "AsyncExtensions", package: "AsyncExtensions") {
 				.package(url: "https://github.com/sideeffect-io/AsyncExtensions", from: "0.5.1")
+			},
+			.product(name: "Atomics", package: "swift-atomics") {
+				.package(url: "https://github.com/apple/swift-atomics", exact: "1.1.0")
 			},
 			.product(name: "BigInt", package: "BigInt") {
 				.package(url: "https://github.com/attaswift/BigInt", from: "5.3.0")

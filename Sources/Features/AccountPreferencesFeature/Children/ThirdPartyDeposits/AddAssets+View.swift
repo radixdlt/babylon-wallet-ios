@@ -5,28 +5,22 @@ extension AddAsset.State {
 	var viewState: AddAsset.ViewState {
 		.init(
 			resourceAddress: resourceAddress,
-			validatedResourceAddress: {
-				if let validatedResourceAddress,
-				   !alreadyAddedResources.contains(validatedResourceAddress)
-				{
-					return validatedResourceAddress
-				}
-				return nil
-			}(),
+			validatedResourceAddress: validatedResourceAddress.validAddress,
 			addressHint: {
 				guard !resourceAddressFieldFocused, !resourceAddress.isEmpty else {
 					return .none
 				}
 
-				guard let validatedAddress = validatedResourceAddress else {
+				switch validatedResourceAddress {
+				case .valid:
+					return .none
+				case .wrongNetwork:
+					return .error("Address is not valid on current network") // FIXME: Strings
+				case .alreadyAdded:
+					return .error("Resource already added") // FIXME: Strings
+				case .invalid:
 					return .error(L10n.AssetTransfer.ChooseReceivingAccount.invalidAddressError)
 				}
-
-				if alreadyAddedResources.contains(validatedAddress) {
-					return .error("Resource already added") // FIXME: Strings
-				}
-
-				return .none
 			}(),
 			resourceAddressFieldFocused: resourceAddressFieldFocused,
 			mode: mode

@@ -340,7 +340,7 @@ extension ExecutionAnalysis {
 		switch transaction {
 		case .nonConforming:
 			return .zero
-		case let .conforming(transaction):
+		case let .conforming(.general(transaction)):
 			return transaction.accountDeposits.flatMap(\.value).reduce(.zero) { result, resource in
 				switch resource {
 				case .fungible(_, .predicted):
@@ -349,6 +349,8 @@ extension ExecutionAnalysis {
 					return result
 				}
 			}
+		case .conforming:
+			return .zero
 		}
 	}
 }

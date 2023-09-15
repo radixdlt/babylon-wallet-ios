@@ -45,4 +45,39 @@ extension EncryptedProfileSnapshot {
 		let decoded = try jsonDecoder().decode(ProfileSnapshot.self, from: decrypted)
 		return decoded
 	}
+
+	public static func encrypting(
+		_ snapshot: ProfileSnapshot,
+		password: String,
+		kdfScheme: PasswordBasedKeyDerivationScheme,
+		encryptionScheme: EncryptionScheme
+	) throws -> Self {
+		try snapshot.encrypt(password: password, kdfScheme: kdfScheme, encryptionScheme: encryptionScheme)
+	}
+}
+
+extension ProfileSnapshot {
+	public func encrypt(
+		password: String,
+		kdfScheme: PasswordBasedKeyDerivationScheme,
+		encryptionScheme: EncryptionScheme
+	) throws -> EncryptedProfileSnapshot {
+		@Dependency(\.jsonEncoder) var jsonEncoder
+
+		let encryptionKey = kdfScheme.kdf(password: password)
+
+		let json = try jsonEncoder().encode(self)
+
+		let encryptedPayload = try encryptionScheme.encrypt(
+			data: json,
+			encryptionKey: encryptionKey
+		)
+
+		return .init(
+			version: .current,
+			encryptedSnapshot: .init(data: encryptedPayload),
+			keyDerivationScheme: kdfScheme,
+			encryptionScheme: encryptionScheme
+		)
+	}
 }

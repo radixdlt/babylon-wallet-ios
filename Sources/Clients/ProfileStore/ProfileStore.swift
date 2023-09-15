@@ -1,4 +1,5 @@
 import AsyncExtensions
+import Atomics
 import ClientPrelude
 import Cryptography
 import MnemonicClient
@@ -47,15 +48,10 @@ public final actor ProfileStore {
 	@Dependency(\.secureStorageClient) var secureStorageClient
 	@Dependency(\.userDefaultsClient) var userDefaultsClient
 
-	private static let _shared = ActorIsolated<ProfileStore?>(nil)
+	private static let managedAtomicLazyRef = ManagedAtomicLazyReference<ProfileStore>()
 	public static var shared: ProfileStore {
 		get async {
-			if let shared = await _shared.value {
-				return shared
-			}
-			let shared = await ProfileStore()
-			await _shared.setValue(shared)
-			return shared
+			await managedAtomicLazyRef.storeIfNilThenLoad(ProfileStore())
 		}
 	}
 
