@@ -137,7 +137,10 @@ extension TransactionReview {
 						feeSection
 
 						if viewStore.showApprovalSlider {
-							ApprovalSlider(title: "Slide to Sign", resetDate: viewStore.sliderResetDate) { // FIXME: String - and remove old
+							ApprovalSlider(
+								title: L10n.TransactionReview.slideToSign,
+								resetDate: viewStore.sliderResetDate
+							) {
 								viewStore.send(.approvalSliderSlid)
 							}
 							.controlState(viewStore.approvalSliderControlState)
