@@ -118,6 +118,8 @@ public enum L10n {
       public static let supplyFlexible = L10n.tr("Localizable", "accountSettings_behaviors_supplyFlexible", fallback: "The supply of this asset can be increased or decreased.")
       /// Anyone can increase or decrease the supply of this asset.
       public static let supplyFlexibleByAnyone = L10n.tr("Localizable", "accountSettings_behaviors_supplyFlexibleByAnyone", fallback: "Anyone can increase or decrease the supply of this asset.")
+      /// Only the Radix Network may increase or decrease the supply of XRD.
+      public static let supplyFlexibleXrd = L10n.tr("Localizable", "accountSettings_behaviors_supplyFlexibleXrd", fallback: "Only the Radix Network may increase or decrease the supply of XRD.")
       /// The supply of this asset can be increased.
       public static let supplyIncreasable = L10n.tr("Localizable", "accountSettings_behaviors_supplyIncreasable", fallback: "The supply of this asset can be increased.")
       /// Anyone can increase the supply of this asset.
@@ -388,9 +390,9 @@ public enum L10n {
       }
       /// You have no NFTs
       public static let noNfts = L10n.tr("Localizable", "assetDetails_NFTDetails_noNfts", fallback: "You have no NFTs")
-      /// %d of %d
+      /// %d NFTs of total supply %d
       public static func ownedOfTotal(_ p1: Int, _ p2: Int) -> String {
-        return L10n.tr("Localizable", "assetDetails_NFTDetails_ownedOfTotal", p1, p2, fallback: "%d of %d")
+        return L10n.tr("Localizable", "assetDetails_NFTDetails_ownedOfTotal", p1, p2, fallback: "%d NFTs of total supply %d")
       }
       /// Name
       public static let resourceName = L10n.tr("Localizable", "assetDetails_NFTDetails_resourceName", fallback: "Name")
@@ -700,8 +702,8 @@ public enum L10n {
     public enum NameNewAccount {
       /// Continue
       public static let `continue` = L10n.tr("Localizable", "createAccount_nameNewAccount_continue", fallback: "Continue")
-      /// This can be changed any time
-      public static let explanation = L10n.tr("Localizable", "createAccount_nameNewAccount_explanation", fallback: "This can be changed any time")
+      /// This can be changed any time.
+      public static let explanation = L10n.tr("Localizable", "createAccount_nameNewAccount_explanation", fallback: "This can be changed any time.")
       /// e.g. My Main Account
       public static let placeholder = L10n.tr("Localizable", "createAccount_nameNewAccount_placeholder", fallback: "e.g. My Main Account")
       /// What would you like to call your Account?
@@ -736,8 +738,8 @@ public enum L10n {
     public enum NameNewEntity {
       /// Your Account lives on the Radix Network and you can access it any time in your Wallet.
       public static let explanation = L10n.tr("Localizable", "createEntity_nameNewEntity_explanation", fallback: "Your Account lives on the Radix Network and you can access it any time in your Wallet.")
-      /// You will be asked to sign transactions with the Ledger device you select
-      public static let ledgerSubtitle = L10n.tr("Localizable", "createEntity_nameNewEntity_ledgerSubtitle", fallback: "You will be asked to sign transactions with the Ledger device you select")
+      /// You will be asked to sign transactions with the Ledger device you select.
+      public static let ledgerSubtitle = L10n.tr("Localizable", "createEntity_nameNewEntity_ledgerSubtitle", fallback: "You will be asked to sign transactions with the Ledger device you select.")
       /// Create with Ledger Hardware Wallet
       public static let ledgerTitle = L10n.tr("Localizable", "createEntity_nameNewEntity_ledgerTitle", fallback: "Create with Ledger Hardware Wallet")
     }
@@ -806,9 +808,9 @@ public enum L10n {
       }
       /// 1 account
       public static let numberOfAccountsExactlyOne = L10n.tr("Localizable", "dAppRequest_accountPermission_numberOfAccountsExactlyOne", fallback: "1 account")
-      /// **%@** is requesting permission to **always** be able to view Account information when you login with this Persona.
+      /// **%@** is requesting permission to *always* be able to view Account information when you login with this Persona.
       public static func subtitle(_ p1: Any) -> String {
-        return L10n.tr("Localizable", "dAppRequest_accountPermission_subtitle", String(describing: p1), fallback: "**%@** is requesting permission to **always** be able to view Account information when you login with this Persona.")
+        return L10n.tr("Localizable", "dAppRequest_accountPermission_subtitle", String(describing: p1), fallback: "**%@** is requesting permission to *always* be able to view Account information when you login with this Persona.")
       }
       /// Account Permission
       public static let title = L10n.tr("Localizable", "dAppRequest_accountPermission_title", fallback: "Account Permission")
@@ -842,9 +844,9 @@ public enum L10n {
       public static func subtitleAtLeastZero(_ p1: Any) -> String {
         return L10n.tr("Localizable", "dAppRequest_chooseAccountsOneTime_subtitleAtLeastZero", String(describing: p1), fallback: "**%@** is making a one-time request for any number of accounts.")
       }
-      /// **%@** is making a one-time request for at least %d accounts.
+      /// *%@* is making a one-time request for at least %d accounts.
       public static func subtitleExactly(_ p1: Any, _ p2: Int) -> String {
-        return L10n.tr("Localizable", "dAppRequest_chooseAccountsOneTime_subtitleExactly", String(describing: p1), p2, fallback: "**%@** is making a one-time request for at least %d accounts.")
+        return L10n.tr("Localizable", "dAppRequest_chooseAccountsOneTime_subtitleExactly", String(describing: p1), p2, fallback: "*%@* is making a one-time request for at least %d accounts.")
       }
       /// **%@** is making a one-time request for 1 account.
       public static func subtitleExactlyOne(_ p1: Any) -> String {
@@ -1523,6 +1525,14 @@ public enum L10n {
     public static let newUser = L10n.tr("Localizable", "onboarding_newUser", fallback: "I'm a New Radix Wallet User")
     /// Restore Wallet from Backup
     public static let restoreFromBackup = L10n.tr("Localizable", "onboarding_restoreFromBackup", fallback: "Restore Wallet from Backup")
+    public enum Eula {
+      /// Accept
+      public static let accept = L10n.tr("Localizable", "onboarding_eula_accept", fallback: "Accept")
+      /// To proceed, you must accept the user terms below.
+      public static let headerSubtitle = L10n.tr("Localizable", "onboarding_eula_headerSubtitle", fallback: "To proceed, you must accept the user terms below.")
+      /// User Terms
+      public static let headerTitle = L10n.tr("Localizable", "onboarding_eula_headerTitle", fallback: "User Terms")
+    }
     public enum Step1 {
       /// Your direct connection to the Radix Network
       public static let subtitle = L10n.tr("Localizable", "onboarding_step1_subtitle", fallback: "Your direct connection to the Radix Network")
@@ -1687,6 +1697,8 @@ public enum L10n {
     }
   }
   public enum Settings {
+    /// Account Security & Settings
+    public static let accountSecurityAndSettings = L10n.tr("Localizable", "settings_accountSecurityAndSettings", fallback: "Account Security & Settings")
     /// App Settings
     public static let appSettings = L10n.tr("Localizable", "settings_appSettings", fallback: "App Settings")
     /// Version: %@ build #%@
@@ -1715,6 +1727,14 @@ public enum L10n {
     public static let personas = L10n.tr("Localizable", "settings_personas", fallback: "Personas")
     /// Settings
     public static let title = L10n.tr("Localizable", "settings_title", fallback: "Settings")
+    public enum ImportFromLegacyWalletHeader {
+      /// Import Legacy Accounts
+      public static let importLegacyAccounts = L10n.tr("Localizable", "settings_importFromLegacyWalletHeader_importLegacyAccounts", fallback: "Import Legacy Accounts")
+      /// Get started importing your Olympia accounts into your new Radix Wallet
+      public static let subtitle = L10n.tr("Localizable", "settings_importFromLegacyWalletHeader_subtitle", fallback: "Get started importing your Olympia accounts into your new Radix Wallet")
+      /// Radix Olympia Desktop Wallet user?
+      public static let title = L10n.tr("Localizable", "settings_importFromLegacyWalletHeader_title", fallback: "Radix Olympia Desktop Wallet user?")
+    }
     public enum LinkToConnectorHeader {
       /// Link to Connector
       public static let linkToConnector = L10n.tr("Localizable", "settings_linkToConnectorHeader_linkToConnector", fallback: "Link to Connector")
@@ -1825,8 +1845,12 @@ public enum L10n {
     public static let rawTransactionTitle = L10n.tr("Localizable", "transactionReview_rawTransactionTitle", fallback: "Raw Transaction")
     /// Sending to
     public static let sendingToHeading = L10n.tr("Localizable", "transactionReview_sendingToHeading", fallback: "Sending to")
-    /// Review Transaction
-    public static let title = L10n.tr("Localizable", "transactionReview_title", fallback: "Review Transaction")
+    /// Slide to Sign
+    public static let slideToSign = L10n.tr("Localizable", "transactionReview_slideToSign", fallback: "Slide to Sign")
+    /// Review Your Transaction
+    public static let title = L10n.tr("Localizable", "transactionReview_title", fallback: "Review Your Transaction")
+    /// Review Your Transfer
+    public static let transferTitle = L10n.tr("Localizable", "transactionReview_transferTitle", fallback: "Review Your Transfer")
     /// Unknown
     public static let unknown = L10n.tr("Localizable", "transactionReview_unknown", fallback: "Unknown")
     /// %d Unknown Components

@@ -183,7 +183,7 @@ extension Settings.View {
 				action: .personasButtonTapped
 			),
 			.init(
-				title: "Account Security & Settings", // FIXME: Strings - L10n.Settings.appSettings
+				title: L10n.Settings.accountSecurityAndSettings,
 				icon: .asset(AssetResource.accountSecurity),
 				action: .accountSecurityButtonTapped
 			),
@@ -328,23 +328,26 @@ struct MigrateOlympiaAccountsView: View {
 
 	var body: some View {
 		VStack(spacing: .medium2) {
-			Text("Radix Olympia Desktop Wallet user?") // FIXME: Strings - L10n.Settings.MigrateOlympiaAccountHeader.title
+			Text(L10n.Settings.ImportFromLegacyWalletHeader.title)
 				.textStyle(.body1Header)
 				.foregroundColor(.app.gray1)
 				.padding(.horizontal, .medium2)
 
-			Text("Get started importing your Olympia accounts into your new Radix Wallet.") // FIXME: Strings - L10n.Settings.MigrateOlympiaAccountHeader.subtitle
+			Text(L10n.Settings.ImportFromLegacyWalletHeader.subtitle)
 				.foregroundColor(.app.gray2)
 				.textStyle(.body2Regular)
 				.multilineTextAlignment(.center)
 				.padding(.horizontal, .medium1)
 
-			Button("Import Legacy Accounts", action: action) // FIXME: Strings - L10n.Settings.MigrateOlympiaAccountHeader.importLegacyAccounts
-				.buttonStyle(.secondaryRectangular(
-					shouldExpand: true,
-					image: .init(asset: AssetResource.qrCodeScanner) // FIXME: Pick asset
-				))
-				.padding(.horizontal, .medium1)
+			Button(
+				L10n.Settings.ImportFromLegacyWalletHeader.importLegacyAccounts,
+				action: action
+			)
+			.buttonStyle(.secondaryRectangular(
+				shouldExpand: true,
+				image: .init(asset: AssetResource.qrCodeScanner) // FIXME: Pick asset
+			))
+			.padding(.horizontal, .medium1)
 		}
 		.padding(.vertical, .medium1)
 		.background(Color.app.gray5)
