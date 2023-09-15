@@ -48,6 +48,8 @@ package.addModules([
 			"GatewaysClient",
 			"OverlayWindowClient",
 			"OnLedgerEntitiesClient",
+			"DappInteractionClient",
+			"SubmitTransactionClient",
 		],
 		tests: .yes()
 	),
@@ -188,6 +190,7 @@ package.addModules([
 			"TransactionReviewFeature",
 			"SigningFeature",
 			"DappInteractionClient",
+			"OverlayWindowClient",
 		],
 		tests: .yes()
 	),

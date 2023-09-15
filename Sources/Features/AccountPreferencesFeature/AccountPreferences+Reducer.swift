@@ -37,7 +37,7 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 			case devPreferences(DevAccountPreferences.State)
 		}
 
-		public enum Action: Equatable {
+		public enum Action: Equatable, Sendable {
 			case updateAccountLabel(UpdateAccountLabel.Action)
 			case thirdPartyDeposits(ManageThirdPartyDeposits.Action)
 			case devPreferences(DevAccountPreferences.Action)

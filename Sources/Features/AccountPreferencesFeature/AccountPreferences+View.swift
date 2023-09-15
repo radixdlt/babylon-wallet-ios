@@ -5,15 +5,14 @@ extension AccountPreferences.State {
 		.init(sections: [
 			.init(
 				id: .personalize,
-				title: "Personalize this account", // FIXME: strings
+				title: L10n.AccountSettings.personalizeHeading,
 				rows: [.accountLabel(account)]
 			),
-			// FIXME: Re-introduce Third Party Deposit once https://github.com/radixdlt/babylon-wallet-ios/pull/692 PR has fixed the TCA Send bug it introduces
-//			.init(
-//				id: .onLedgerBehaviour,
-//				title: "Set how you want this account to work", // FIXME: strings
-//				rows: [.thirdPartyDeposits()]
-//			),
+			.init(
+				id: .onLedgerBehaviour,
+				title: L10n.AccountSettings.setBehaviorHeading,
+				rows: [.thirdPartyDeposits(account.onLedgerSettings.thirdPartyDeposits.depositRule)]
+			),
 			.init(
 				id: .development,
 				title: "Set development preferences", // FIXME: strings
@@ -135,9 +134,18 @@ extension PreferenceSection.Row where RowId == AccountPreferences.Section.Sectio
 	static func accountLabel(_ account: Profile.Network.Account) -> Self {
 		.init(
 			id: .personalize(.accountLabel),
-			title: "Account Label", // FIXME: strings
+			title: L10n.AccountSettings.accountLabel,
 			subtitle: account.displayName.rawValue,
 			icon: .asset(AssetResource.create)
+		)
+	}
+
+	static func thirdPartyDeposits(_ rule: ThirdPartyDeposits.DepositRule) -> Self {
+		.init(
+			id: .onLedger(.thirdPartyDeposits),
+			title: L10n.AccountSettings.thirdPartyDeposits,
+			subtitle: rule.text,
+			icon: .asset(AssetResource.iconAcceptAirdrop)
 		)
 	}
 
@@ -149,14 +157,17 @@ extension PreferenceSection.Row where RowId == AccountPreferences.Section.Sectio
 			icon: .asset(AssetResource.appSettings)
 		)
 	}
+}
 
-	// TODO: Pass the deposit mode
-	static func thirdPartyDeposits() -> Self {
-		.init(
-			id: .onLedger(.thirdPartyDeposits),
-			title: "Third-Party Deposits", // FIXME: strings
-			subtitle: "Accept all deposits", // FIXME: strings
-			icon: .asset(AssetResource.iconAcceptAirdrop)
-		)
+extension ThirdPartyDeposits.DepositRule {
+	var text: String {
+		switch self {
+		case .acceptAll:
+			return L10n.AccountSettings.ThirdPartyDeposits.acceptAll
+		case .acceptKnown:
+			return L10n.AccountSettings.ThirdPartyDeposits.onlyKnown
+		case .denyAll:
+			return L10n.AccountSettings.ThirdPartyDeposits.denyAll
+		}
 	}
 }

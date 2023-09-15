@@ -73,9 +73,11 @@ extension GatewayAPIClient {
 				throw BadHTTPResponseCode(got: httpURLResponse.statusCode)
 			}
 
-			let response = try jsonDecoder.decode(Response.self, from: data)
-
-			return response
+			do {
+				return try jsonDecoder.decode(Response.self, from: data)
+			} catch {
+				throw ResponseDecodingError(receivedData: data, error: error)
+			}
 		}
 
 		@Sendable

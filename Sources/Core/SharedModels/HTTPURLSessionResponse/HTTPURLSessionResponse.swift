@@ -15,3 +15,14 @@ public struct BadHTTPResponseCode: Swift.Error {
 		self.got = got
 	}
 }
+
+// MARK: - ResponseDecodingError
+public struct ResponseDecodingError: Swift.Error {
+	public let receivedData: Data
+	public let error: Error
+
+	public init(receivedData: Data, error: Error) {
+		self.receivedData = receivedData
+		self.error = error
+	}
+}
