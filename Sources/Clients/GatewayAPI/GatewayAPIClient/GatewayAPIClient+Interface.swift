@@ -6,7 +6,7 @@ public typealias ResourceIdentifier = String
 
 // MARK: - GatewayAPIClient
 public struct GatewayAPIClient: Sendable, DependencyKey {
-	public static var configuration: String?
+	public static var buildConfiguration: String?
 
 	// MARK: Request
 	public var isMainnetLive: IsMainnetLive

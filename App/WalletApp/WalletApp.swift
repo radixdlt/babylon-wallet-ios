@@ -11,7 +11,21 @@ struct WalletApp: SwiftUI.App {
 		WindowGroup {
 			App.View(
 				store: Store(
-					initialState: App.State()
+					initialState: App.State(
+						buildConfiguration: {
+							#if BETA
+							return "BETA"
+							#elseif ALPHA
+							return "ALPHA"
+							#elseif DEV
+							return "DEV"
+							#elseif PREALPHA
+							return "PREALPHA"
+							#elseif RELEASE
+							return "RELEASE"
+							#endif
+						}()
+					)
 				) {
 					App()
 					#if targetEnvironment(simulator)
@@ -23,22 +37,6 @@ struct WalletApp: SwiftUI.App {
 			.frame(minWidth: 1020, maxWidth: .infinity, minHeight: 512, maxHeight: .infinity)
 			#endif
 			.environment(\.colorScheme, .light) // TODO: implement dark mode and remove this
-			.task {
-				// maybe we can inject it with regular .dependency()?
-				#if BETA
-				GatewayAPIClient.configuration = "BETA"
-				#elseif ALPHA
-				GatewayAPIClient.configuration = "ALPHA"
-				#elseif DEV
-				GatewayAPIClient.configuration = "DEV"
-				#elseif PREALPHA
-				GatewayAPIClient.configuration = "PREALPHA"
-				#elseif RELEASE
-				GatewayAPIClient.configuration = "RELEASE"
-				#endif
-			}
 		}
 	}
 }
-
-import GatewayAPI
