@@ -1,6 +1,8 @@
 import AppPreferencesClient
+import EngineKit
 import FactorSourcesClient
 import FeaturePrelude
+import ImportLegacyWalletClient
 import LedgerHardwareDevicesFeature
 
 public struct AccountSecurity: Sendable, FeatureReducer {
@@ -14,6 +16,12 @@ public struct AccountSecurity: Sendable, FeatureReducer {
 		@PresentationState
 		public var destination: Destinations.State? = nil
 		public var preferences: AppPreferences? = nil
+
+		public var canImportOlympiaWallet = false
+
+		#if DEBUG
+		public var nonMainnetNetwork: Radix.Network?
+		#endif
 
 		public static let importOlympia = Self(destination: .importOlympiaWallet(.init()))
 
@@ -35,6 +43,7 @@ public struct AccountSecurity: Sendable, FeatureReducer {
 
 	public enum InternalAction: Sendable, Equatable {
 		case loadPreferences(AppPreferences)
+		case loadedCurrentNetworkID(NetworkID, isDeveloperModeEnabled: Bool)
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -91,6 +100,14 @@ public struct AccountSecurity: Sendable, FeatureReducer {
 			return .run { send in
 				let preferences = await appPreferencesClient.getPreferences()
 				await send(.internal(.loadPreferences(preferences)))
+
+				let currentNetworkID = await factorSourcesClient.getCurrentNetworkID()
+				await send(.internal(
+					.loadedCurrentNetworkID(
+						currentNetworkID,
+						isDeveloperModeEnabled: preferences.security.isDeveloperModeEnabled
+					))
+				)
 			}
 
 		case .mnemonicsButtonTapped:
@@ -116,6 +133,22 @@ public struct AccountSecurity: Sendable, FeatureReducer {
 		switch internalAction {
 		case let .loadPreferences(preferences):
 			state.preferences = preferences
+			return .none
+		case let .loadedCurrentNetworkID(currentNetworkID, isDeveloperModeEnabled):
+
+			#if DEBUG
+			if
+				currentNetworkID != .mainnet,
+				let nonMainnetNetwork = try? Radix.Network.lookupBy(id: currentNetworkID)
+			{
+				state.nonMainnetNetwork = nonMainnetNetwork
+			}
+			#endif
+
+			state.canImportOlympiaWallet = ImportLegacyWalletClient.canImportOlympiaWallet(
+				currentNetworkID: currentNetworkID,
+				isDeveloperModeEnabled: isDeveloperModeEnabled
+			)
 			return .none
 		}
 	}

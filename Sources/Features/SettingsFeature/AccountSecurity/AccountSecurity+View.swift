@@ -2,8 +2,29 @@ import AuthorizedDAppsFeature
 import FeaturePrelude
 import LedgerHardwareDevicesFeature
 
+extension AccountSecurity.State {
+	var viewState: AccountSecurity.ViewState {
+		.init(state: self)
+	}
+}
+
 // MARK: - AccountSecurity.View
 extension AccountSecurity {
+	public struct ViewState: Equatable {
+		public let canImportOlympiaWallet: Bool
+
+		#if DEBUG
+		public var nonMainnetNetwork: Radix.Network?
+		#endif
+
+		init(state: AccountSecurity.State) {
+			self.canImportOlympiaWallet = state.canImportOlympiaWallet
+			#if DEBUG
+			self.nonMainnetNetwork = state.nonMainnetNetwork
+			#endif
+		}
+	}
+
 	@MainActor
 	public struct View: SwiftUI.View {
 		private let store: Store
@@ -18,36 +39,39 @@ extension AccountSecurity {
 
 extension AccountSecurity.View {
 	public var body: some View {
-		ScrollView {
-			VStack(spacing: .zero) {
-				ForEach(rows) { row in
-					SettingsRow(row: row) {
-						store.send(.view(row.action))
+		WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
+			ScrollView {
+				VStack(spacing: .zero) {
+					ForEach(rows) { row in
+						SettingsRow(row: row) {
+							store.send(.view(row.action))
+						}
+					}
+
+					if let row = importOlympiaRow(with: viewStore) {
+						SettingsRow(row: row) {
+							store.send(.view(row.action))
+						}
 					}
 				}
-
-				let row = importOlympiaRow
-				SettingsRow(row: row) {
-					store.send(.view(row.action))
-				}
 			}
+			.onAppear {
+				store.send(.view(.appeared))
+			}
+			.navigationTitle("Account Security") // FIXME: Strings - L10n.Settings.AccountSecurity.title
+			#if os(iOS)
+				.navigationBarTitleColor(.app.gray1)
+				.navigationBarTitleDisplayMode(.inline)
+				.navigationBarInlineTitleFont(.app.secondaryHeader)
+			#endif
+				.mnemonics(with: destinationStore)
+				.ledgerHardwareWallets(with: destinationStore)
+				.depositGuarantees(with: destinationStore)
+				.importFromOlympiaLegacyWallet(with: destinationStore)
+				.tint(.app.gray1)
+				.foregroundColor(.app.gray1)
+				.presentsLoadingViewOverlay()
 		}
-		.onAppear {
-			store.send(.view(.appeared))
-		}
-		.navigationTitle("Account Security") // FIXME: Strings - L10n.Settings.AccountSecurity.title
-		#if os(iOS)
-			.navigationBarTitleColor(.app.gray1)
-			.navigationBarTitleDisplayMode(.inline)
-			.navigationBarInlineTitleFont(.app.secondaryHeader)
-		#endif
-			.mnemonics(with: destinationStore)
-			.ledgerHardwareWallets(with: destinationStore)
-			.depositGuarantees(with: destinationStore)
-			.importFromOlympiaLegacyWallet(with: destinationStore)
-			.tint(.app.gray1)
-			.foregroundColor(.app.gray1)
-			.presentsLoadingViewOverlay()
 	}
 
 	@MainActor
@@ -73,9 +97,22 @@ extension AccountSecurity.View {
 	}
 
 	@MainActor
-	private var importOlympiaRow: SettingsRowModel<AccountSecurity> {
-		.init(
+	private func importOlympiaRow(
+		with viewStore: ViewStoreOf<AccountSecurity>
+	) -> SettingsRowModel<AccountSecurity>? {
+		guard viewStore.canImportOlympiaWallet else {
+			return nil
+		}
+
+		var subtitle: String? = nil
+		#if DEBUG
+		if let nonMainnetNetwork = viewStore.nonMainnetNetwork {
+			subtitle = "[DEBUG ONLY] Into network: '\(nonMainnetNetwork.name)'"
+		}
+		#endif
+		return .init(
 			title: L10n.Settings.importFromLegacyWallet,
+			subtitle: subtitle,
 			icon: .asset(AssetResource.appSettings),
 			action: .importFromOlympiaWalletButtonTapped
 		)

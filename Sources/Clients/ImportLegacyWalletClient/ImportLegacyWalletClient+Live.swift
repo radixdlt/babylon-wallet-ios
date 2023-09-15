@@ -1,4 +1,5 @@
 import AccountsClient
+import AppPreferencesClient
 import ClientPrelude
 import Cryptography
 import EngineKit
@@ -11,14 +12,25 @@ extension ImportLegacyWalletClient: DependencyKey {
 
 	public static let liveValue: Self = {
 		@Dependency(\.accountsClient) var accountsClient
+		@Dependency(\.appPreferencesClient) var appPreferencesClient
 		@Dependency(\.factorSourcesClient) var factorSourcesClient
 
 		@Sendable func migrate(
 			accounts: NonEmpty<Set<OlympiaAccountToMigrate>>,
 			factorSouceID: FactorSourceID.FromHash
 		) async throws -> (accounts: NonEmpty<OrderedSet<MigratedAccount>>, networkID: NetworkID) {
+			guard
+				let networkID = await networkIDForOlympiaAccountsToImportInto(
+					currentNetworkID: factorSourcesClient.getCurrentNetworkID(),
+					isDeveloperModeEnabled: appPreferencesClient.isDeveloperModeEnabled()
+				)
+			else {
+				struct NotPermittedToImportOlympiaAccountsToTestnet: Swift.Error {}
+				throw NotPermittedToImportOlympiaAccountsToTestnet()
+			}
+
 			let sortedOlympia = accounts.sorted(by: \.addressIndex)
-			let networkID = await factorSourcesClient.getCurrentNetworkID()
+
 			let accountIndexBase = await accountsClient.nextAccountIndex(networkID)
 
 			var accountOffset: HD.Path.Component.Child.Value = 0
@@ -68,6 +80,29 @@ extension ImportLegacyWalletClient: DependencyKey {
 		}
 
 		return Self(
+			shouldShowImportWalletShortcutInSettings: {
+				@Dependency(\.userDefaultsClient) var userDefaultsClient
+
+				let shouldHide = userDefaultsClient.hideMigrateOlympiaButton
+				guard !shouldHide else {
+					return false
+				}
+
+				do {
+					let accounts = try await accountsClient.getAccountsOnCurrentNetwork()
+					if accounts.contains(where: \.isOlympiaAccount) {
+						await userDefaultsClient.setHideMigrateOlympiaButton(true)
+						return false
+					}
+				} catch {
+					loggerGlobal.warning("Failed to load accounts, error: \(error)")
+				}
+
+				return await canImportOlympiaWallet(
+					currentNetworkID: factorSourcesClient.getCurrentNetworkID(),
+					isDeveloperModeEnabled: appPreferencesClient.isDeveloperModeEnabled()
+				)
+			},
 			parseHeaderFromQRCode: {
 				let header = try CAP33.deserializeHeader(payload: $0)
 				loggerGlobal.notice("Scanned Olympia QR found header: \(header)")
