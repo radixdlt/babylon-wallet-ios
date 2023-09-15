@@ -52,11 +52,14 @@ extension GatewayAPIClient {
 				urlRequest.httpBody = httpBody
 			}
 
+			let v = (Bundle.main.infoDictionary?["CFBundleShortVersionString"] as! String)
+				+ "#" + (Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as! String)
+				+ (configuration.map { "-" + $0 } ?? "")
 			urlRequest.allHTTPHeaderFields = [
 				"accept": "application/json",
 				"Content-Type": "application/json",
 				"RDX-Client-Name": "iOS Wallet",
-				"RDX-Client-Version": Bundle.main.infoDictionary?["CFBundleShortVersionString"] as! String,
+				"RDX-Client-Version": v,
 			]
 			if let timeoutInterval {
 				urlRequest.timeoutInterval = timeoutInterval
