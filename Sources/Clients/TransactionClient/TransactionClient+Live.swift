@@ -190,6 +190,10 @@ extension TransactionClient {
 			/// Analyze the manifest
 			let analyzedManifestToReview = try request.manifestToSign.analyzeExecution(transactionReceipt: receiptBytes)
 
+			guard analyzedManifestToReview.reservedInstructions.isEmpty else {
+				throw TransactionFailure.failedToPrepareTXReview(.manifestWithReservedInstructions(analyzedManifestToReview.reservedInstructions))
+			}
+
 			/// Get all of the expected signing factors.
 			let signingFactors = try await {
 				if let nonEmpty = NonEmpty<Set<EntityPotentiallyVirtual>>(transactionSigners.intentSignerEntitiesOrEmpty()) {
