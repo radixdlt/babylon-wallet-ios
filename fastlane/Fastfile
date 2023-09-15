@@ -155,6 +155,7 @@ private_lane :dependencies_with_hyperlinks do |options|
         { :at => "swift-engine-toolkit" },
         { :at => "webrtc" },
         { :at => "k1" },
+        { :at => "swift-atomics" },
         { :at => "asyncextensions" },
         { :at => "swift-algorithms" },
         { :at => "swift-async-algorithms" },
