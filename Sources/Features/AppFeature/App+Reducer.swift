@@ -2,7 +2,6 @@ import AppPreferencesClient
 import CreateAccountFeature
 import EngineKit
 import FeaturePrelude
-import GatewayAPI
 import GatewaysClient
 import MainFeature
 import NetworkSwitchingClient
@@ -35,12 +34,8 @@ public struct App: Sendable, FeatureReducer {
 		@PresentationState
 		public var alert: Alerts.State?
 
-		public init(
-			root: Root = .splash(.init()),
-			buildConfiguration: String
-		) {
+		public init(root: Root = .splash(.init())) {
 			self.root = root
-			GatewayAPIClient.buildConfiguration = buildConfiguration
 			loggerGlobal.info("App started")
 		}
 	}
