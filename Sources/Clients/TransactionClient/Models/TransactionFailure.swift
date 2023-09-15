@@ -1,5 +1,5 @@
-
 import ClientPrelude
+import EngineKit
 
 // MARK: - TransactionFailure
 public enum TransactionFailure: Sendable, LocalizedError, Equatable {
@@ -51,6 +51,9 @@ extension TransactionFailure {
 		case .failedToSubmit:
 			return (errorKind: .failedToSubmitTransaction, message: nil)
 
+		case .failedToPrepareTXReview(.manifestWithReservedInstructions):
+			return (errorKind: .failedToPrepareTransaction, message: self.errorDescription)
+
 //		case let .failedToSubmit(error):
 //			switch error {
 //			case .failedToSubmitTX:
@@ -82,6 +85,7 @@ extension TransactionFailure {
 		case failedToRetrieveTXReceipt(String)
 		case failedToExtractTXReceiptBytes(Error)
 		case failedToGenerateTXReview(Error)
+		case manifestWithReservedInstructions([ReservedInstruction])
 
 		public var errorDescription: String? {
 			switch self {
@@ -95,6 +99,8 @@ extension TransactionFailure {
 				return "ET failed to generate TX review: \(error.localizedDescription)"
 			case let .failedToRetrieveTXReceipt(message):
 				return "Failed to retrive TX receipt from gateway: \(message)"
+			case .manifestWithReservedInstructions:
+				return "Transaction Manifest contains forbidden instructions"
 			}
 		}
 	}
