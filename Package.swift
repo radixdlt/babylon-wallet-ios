@@ -941,9 +941,6 @@ package.addModules([
 		dependencies: [
 			"SharedModels",
 		],
-		resources: [
-			.process("TestVectorsSharedByMultipleTargets/"),
-		],
 		tests: .no
 	),
 	.core(
