@@ -55,6 +55,8 @@ extension GatewayAPIClient {
 			urlRequest.allHTTPHeaderFields = [
 				"accept": "application/json",
 				"Content-Type": "application/json",
+				"RDX-Client-Name": "iOS Wallet",
+				"RDX-Client-Version": rdxClientVersion ?? "UNKNOWN",
 			]
 			if let timeoutInterval {
 				urlRequest.timeoutInterval = timeoutInterval
