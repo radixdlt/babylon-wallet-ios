@@ -323,15 +323,12 @@ public struct DappDetails: Sendable, FeatureReducer {
 	private func loadResources(
 		metadata: GatewayAPI.EntityMetadataCollection,
 		validated dAppDefinitionAddress: DappDefinitionAddress
-	) async -> Loadable<DappDetails.State.Resources> {
-		guard let claimedEntities = metadata.claimedEntities, !claimedEntities.isEmpty else {
-			return .idle
-		}
-
+	) async -> Loadable<State.Resources> {
+		guard let claimedEntities = metadata.claimedEntities, !claimedEntities.isEmpty else { return .idle }
 		let result = await TaskResult {
 			let allResourceItems = try await gatewayAPIClient.fetchResourceDetails(claimedEntities, explicitMetadata: .resourceMetadataKeys)
 				.items
-				.filter { $0.metadata.dappDefinition == dAppDefinitionAddress.address }
+				.filter { (try? $0.metadata.validate(dAppDefinitionAddress: dAppDefinitionAddress)) != nil }
 				.compactMap(\.resourceDetails)
 
 			return State.Resources(fungible: allResourceItems.filter { $0.fungibility == .fungible },
@@ -364,9 +361,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 		for dApp: DappDefinitionAddress,
 		validating dAppDefinitionAddress: DappDefinitionAddress
 	) async throws -> State.AssociatedDapp {
-		let metadata = try await gatewayAPIClient.getEntityMetadata(dApp.address, [.name, .iconURL])
-		// FIXME: Uncomment this when when we can rely on dApps conforming to the standards
-		// .validating(dAppDefinitionAddress: dAppDefinitionAddress)
+		let metadata = try await gatewayAPIClient.getDappMetadata(dApp, validatingDappDefinitionAddress: dAppDefinitionAddress)
 		guard let name = metadata.name else {
 			throw GatewayAPI.EntityMetadataCollection.MetadataError.missingName
 		}
@@ -401,12 +396,16 @@ public struct DappDetails: Sendable, FeatureReducer {
 extension GatewayAPI.StateEntityDetailsResponseItem {
 	fileprivate var resourceDetails: DappDetails.State.Resources.ResourceDetails? {
 		guard let fungibility else { return nil }
-		return try? .init(address: .init(validatingAddress: address),
-		                  fungibility: fungibility,
-		                  name: metadata.name ?? L10n.AuthorizedDapps.DAppDetails.unknownTokenName,
-		                  symbol: metadata.symbol,
-		                  description: metadata.description,
-		                  iconURL: metadata.iconURL)
+		guard let address = try? ResourceAddress(validatingAddress: address) else {
+			loggerGlobal.warning("Failed to extract ResourceDetails for \(address)")
+			return nil
+		}
+		return .init(address: address,
+		             fungibility: fungibility,
+		             name: metadata.name ?? L10n.AuthorizedDapps.DAppDetails.unknownTokenName,
+		             symbol: metadata.symbol,
+		             description: metadata.description,
+		             iconURL: metadata.iconURL)
 	}
 
 	private var fungibility: DappDetails.State.Resources.ResourceDetails.Fungibility? {
