@@ -26,7 +26,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 
 		public enum Mode: Sendable, Hashable {
 			case general
-			case authorized(Profile.Network.AuthorizedDappDetailed, PersonaList.State?)
+			case authorized(Profile.Network.AuthorizedDappDetailed, PersonaList.State)
 
 			public var isAuthorized: Bool {
 				guard case .authorized = self else { return false }
@@ -43,7 +43,8 @@ public struct DappDetails: Sendable, FeatureReducer {
 			}
 			set {
 				assert(mode.isAuthorized, "Should only be accessed in authorized mode")
-				guard case let .authorized(dApp, _) = mode else { return }
+				assert(newValue != nil, "Should never be set to nil")
+				guard let newValue, case let .authorized(dApp, _) = mode else { return }
 				mode = .authorized(dApp, newValue)
 			}
 		}
@@ -76,14 +77,13 @@ public struct DappDetails: Sendable, FeatureReducer {
 		// Authorized dApp
 		public init(
 			dApp: Profile.Network.AuthorizedDappDetailed,
-			personas: PersonaList.State? = nil,
 			metadata: GatewayAPI.EntityMetadataCollection? = nil,
 			resources: Resources? = nil,
 			associatedDapps: [AssociatedDapp]? = nil,
 			destination: Destination.State? = nil
 		) {
 			self.dAppDefinitionAddress = dApp.dAppDefinitionAddress
-			self.mode = .authorized(dApp, personas)
+			self.mode = .authorized(dApp, .init(dApp: dApp))
 			self.metadata = metadata
 			self.resources = resources
 			self.associatedDapps = associatedDapps
