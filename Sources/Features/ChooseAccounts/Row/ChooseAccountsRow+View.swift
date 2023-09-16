@@ -4,16 +4,24 @@ import FeaturePrelude
 // MARK: - ChooseAccountsRow.View
 extension ChooseAccountsRow {
 	struct ViewState: Equatable {
-		let appearanceID: Profile.Network.Account.AppearanceID
-		let name: String
-		let address: AccountAddress
+		let account: Profile.Network.Account
 		let mode: ChooseAccountsRow.State.Mode
 
 		init(state: ChooseAccountsRow.State) {
-			appearanceID = state.account.appearanceID
-			name = state.account.displayName.rawValue
-			address = state.account.address
-			mode = state.mode
+			self.mode = state.mode
+			self.account = state.account
+		}
+
+		var name: String {
+			account.displayName.rawValue
+		}
+
+		var appearanceID: Profile.Network.Account.AppearanceID {
+			account.appearanceID
+		}
+
+		var address: AccountAddress {
+			account.address
 		}
 	}
 
@@ -31,7 +39,7 @@ extension ChooseAccountsRow {
 							.foregroundColor(.app.white)
 							.textStyle(.body1Header)
 
-						AddressView(.address(.account(viewState.address)))
+						AddressView(.address(of: viewState.account))
 							.foregroundColor(.app.whiteTransparent)
 							.textStyle(.body2HighImportance)
 					}
