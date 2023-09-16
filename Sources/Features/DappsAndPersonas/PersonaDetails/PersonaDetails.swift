@@ -235,7 +235,7 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 			return .none
 
 		case let .dAppLoaded(dApp):
-			state.destination = .dAppDetails(.init(dApp: dApp, tappablePersonas: false))
+			state.destination = .dAppDetails(.init(dApp: dApp, context: .personaDetails))
 			return .none
 		}
 	}

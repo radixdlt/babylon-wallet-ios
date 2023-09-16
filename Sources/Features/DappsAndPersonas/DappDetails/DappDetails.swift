@@ -22,14 +22,24 @@ public struct DappDetails: Sendable, FeatureReducer {
 	// MARK: State
 
 	public struct State: Sendable, Hashable {
+		public enum Context: Sendable, Hashable {
+			case general
+			case settings(SettingsContext)
+
+			public enum SettingsContext: Sendable, Hashable {
+				case personaDetails
+				case authorizedDapps
+			}
+		}
+
+		public let context: Context
+
 		public let dAppDefinitionAddress: DappDefinitionAddress
 
 		// This will only be non-nil if the dApp is in fact authorized
 		public var authorizedDapp: Profile.Network.AuthorizedDappDetailed?
 
 		public var personaList: PersonaList.State
-
-		public let tappablePersonas: Bool
 
 		@Loadable
 		public var metadata: GatewayAPI.EntityMetadataCollection? = nil
@@ -46,16 +56,16 @@ public struct DappDetails: Sendable, FeatureReducer {
 		// Authorized dApp
 		public init(
 			dApp: Profile.Network.AuthorizedDappDetailed,
-			tappablePersonas: Bool,
+			context: Context.SettingsContext,
 			metadata: GatewayAPI.EntityMetadataCollection? = nil,
 			resources: Resources? = nil,
 			associatedDapps: [AssociatedDapp]? = nil,
 			destination: Destination.State? = nil
 		) {
+			self.context = .settings(context)
 			self.dAppDefinitionAddress = dApp.dAppDefinitionAddress
 			self.authorizedDapp = dApp
 			self.personaList = .init(dApp: dApp)
-			self.tappablePersonas = tappablePersonas
 			self.metadata = metadata
 			self.resources = resources
 			self.associatedDapps = associatedDapps
@@ -70,10 +80,10 @@ public struct DappDetails: Sendable, FeatureReducer {
 			associatedDapps: [AssociatedDapp]? = nil,
 			destination: Destination.State? = nil
 		) {
+			self.context = .general
 			self.dAppDefinitionAddress = dAppDefinitionAddress
 			self.authorizedDapp = nil
 			self.personaList = .init() // TODO: Check reloading behaviour
-			self.tappablePersonas = false
 			self.metadata = metadata
 			self.resources = resources
 			self.associatedDapps = associatedDapps

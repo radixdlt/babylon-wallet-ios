@@ -21,6 +21,7 @@ extension DappDetails {
 		let fungibles: [State.Resources.ResourceDetails]?
 		let nonFungibles: [State.Resources.ResourceDetails]?
 		let associatedDapps: [State.AssociatedDapp]?
+		let showForgetDapp: Bool
 		let tappablePersonas: Bool
 	}
 }
@@ -45,12 +46,14 @@ extension DappDetails.View {
 					Personas(store: personasStore, tappablePersonas: viewStore.tappablePersonas)
 						.background(.app.gray5)
 
-					Button(L10n.AuthorizedDapps.ForgetDappAlert.title) {
-						viewStore.send(.forgetThisDappTapped)
+					if viewStore.showForgetDapp {
+						Button(L10n.AuthorizedDapps.ForgetDappAlert.title) {
+							viewStore.send(.forgetThisDappTapped)
+						}
+						.buttonStyle(.primaryRectangular(isDestructive: true))
+						.padding([.horizontal, .top], .medium3)
+						.padding(.bottom, .large2)
 					}
-					.buttonStyle(.primaryRectangular(isDestructive: true))
-					.padding([.horizontal, .top], .medium3)
-					.padding(.bottom, .large2)
 				}
 				.onAppear {
 					viewStore.send(.appeared)
@@ -85,7 +88,8 @@ private extension DappDetails.State {
 			fungibles: resources?.fungible,
 			nonFungibles: resources?.nonFungible,
 			associatedDapps: associatedDapps,
-			tappablePersonas: tappablePersonas
+			showForgetDapp: context != .general,
+			tappablePersonas: context == .settings(.authorizedDapps)
 		)
 	}
 }
