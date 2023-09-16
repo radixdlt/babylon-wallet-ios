@@ -3,6 +3,7 @@ import AssetsFeature
 import ComposableArchitecture
 import Cryptography
 import CryptoKit
+import DappsAndPersonasFeature
 import EngineKit
 import FactorSourcesClient
 import FeaturePrelude
@@ -137,7 +138,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			case customizeGuarantees(TransactionReviewGuarantees.State)
 			case signing(Signing.State)
 			case submitting(SubmitTransaction.State)
-			case dApp(SimpleDappDetails.State)
+			case dApp(DappDetails.State)
 			case customizeFees(CustomizeFees.State)
 			case fungibleTokenDetails(FungibleTokenDetails.State)
 			case nonFungibleTokenDetails(NonFungibleTokenDetails.State)
@@ -147,7 +148,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			case customizeGuarantees(TransactionReviewGuarantees.Action)
 			case signing(Signing.Action)
 			case submitting(SubmitTransaction.Action)
-			case dApp(SimpleDappDetails.Action)
+			case dApp(DappDetails.Action)
 			case customizeFees(CustomizeFees.Action)
 			case fungibleTokenDetails(FungibleTokenDetails.Action)
 			case nonFungibleTokenDetails(NonFungibleTokenDetails.Action)
@@ -167,7 +168,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 				SubmitTransaction()
 			}
 			Scope(state: /State.dApp, action: /Action.dApp) {
-				SimpleDappDetails()
+				DappDetails()
 			}
 			Scope(state: /State.fungibleTokenDetails, action: /Action.fungibleTokenDetails) {
 				FungibleTokenDetails()
@@ -309,8 +310,8 @@ public struct TransactionReview: Sendable, FeatureReducer {
 
 			return .none
 
-		case let .dAppsUsed(.delegate(.openDapp(id))):
-			state.destination = .dApp(.init(dAppID: id))
+		case let .dAppsUsed(.delegate(.openDapp(dAppID))):
+			state.destination = .dApp(.init(dAppDefinitionAddress: dAppID))
 			return .none
 
 		case .deposits(.delegate(.showCustomizeGuarantees)):
@@ -1239,222 +1240,6 @@ public struct TransactionReviewFailure: LocalizedError {
 		msg += "\n\n[DEBUG] Underlying error: \(String(describing: underylying))"
 		#endif
 		return msg
-	}
-}
-
-// MARK: - SimpleDappDetails
-public struct SimpleDappDetails: Sendable, FeatureReducer {
-	@Dependency(\.errorQueue) var errorQueue
-	@Dependency(\.gatewayAPIClient) var gatewayAPIClient
-	@Dependency(\.openURL) var openURL
-	@Dependency(\.cacheClient) var cacheClient
-
-	public struct FailedToLoadMetadata: Error, Hashable {}
-
-	public typealias Store = StoreOf<Self>
-
-	// MARK: State
-
-	public struct State: Sendable, Hashable {
-		public var dAppID: DappDefinitionAddress
-
-		@Loadable
-		public var metadata: GatewayAPI.EntityMetadataCollection? = nil
-
-		@Loadable
-		public var resources: Resources? = nil
-
-		@Loadable
-		public var associatedDapps: [AssociatedDapp]? = nil
-
-		public init(
-			dAppID: DappDefinitionAddress,
-			metadata: GatewayAPI.EntityMetadataCollection? = nil,
-			resources: Resources? = nil,
-			associatedDapps: [AssociatedDapp]? = nil
-		) {
-			self.dAppID = dAppID
-			self.metadata = metadata
-			self.resources = resources
-			self.associatedDapps = associatedDapps
-		}
-
-		public struct Resources: Hashable, Sendable {
-			public var fungible: [ResourceDetails]
-			public var nonFungible: [ResourceDetails]
-
-			// TODO: This should be consolidated with other types that represent resources
-			public struct ResourceDetails: Identifiable, Hashable, Sendable {
-				public var id: ResourceAddress { address }
-
-				public let address: ResourceAddress
-				public let fungibility: Fungibility
-				public let name: String
-				public let symbol: String?
-				public let description: String?
-				public let iconURL: URL?
-
-				public enum Fungibility: Hashable, Sendable {
-					case fungible
-					case nonFungible
-				}
-			}
-		}
-
-		// TODO: This should be consolidated with other types that represent resources
-		public struct AssociatedDapp: Identifiable, Hashable, Sendable {
-			public var id: DappDefinitionAddress { address }
-
-			public let address: DappDefinitionAddress
-			public let name: String
-			public let iconURL: URL?
-		}
-	}
-
-	// MARK: Action
-
-	public enum ViewAction: Sendable, Equatable {
-		case appeared
-		case openURLTapped(URL)
-	}
-
-	public enum InternalAction: Sendable, Equatable {
-		case metadataLoaded(Loadable<GatewayAPI.EntityMetadataCollection>)
-		case resourcesLoaded(Loadable<State.Resources>)
-		case associatedDappsLoaded(Loadable<[State.AssociatedDapp]>)
-	}
-
-	// MARK: - Destination
-
-	// MARK: Reducer
-
-	public init() {}
-
-	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
-		switch viewAction {
-		case .appeared:
-			state.$metadata = .loading
-			state.$resources = .loading
-			return .run { [dAppID = state.dAppID] send in
-				let result = await TaskResult {
-					try await cacheClient.withCaching(
-						cacheEntry: .dAppMetadata(dAppID.address),
-						request: {
-							try await gatewayAPIClient.getEntityMetadata(dAppID.address, .dappMetadataKeys)
-						}
-					)
-				}
-				await send(.internal(.metadataLoaded(.init(result: result))))
-			}
-
-		case let .openURLTapped(url):
-			return .run { _ in
-				await openURL(url)
-			}
-		}
-	}
-
-	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
-		switch internalAction {
-		case let .metadataLoaded(metadata):
-			state.$metadata = metadata
-
-			let dAppDefinitionAddress = state.dAppID
-			return .run { send in
-				let resources = await metadata.flatMap { await loadResources(metadata: $0, validated: dAppDefinitionAddress) }
-				await send(.internal(.resourcesLoaded(resources)))
-
-				let associatedDapps = await metadata.flatMap { await loadDapps(metadata: $0, validated: dAppDefinitionAddress) }
-				await send(.internal(.associatedDappsLoaded(associatedDapps)))
-			}
-
-		case let .resourcesLoaded(resources):
-			state.$resources = resources
-			return .none
-
-		case let .associatedDappsLoaded(dApps):
-			state.$associatedDapps = dApps
-			return .none
-		}
-	}
-
-	/// Loads any fungible and non-fungible resources associated with the dApp
-	private func loadResources(
-		metadata: GatewayAPI.EntityMetadataCollection,
-		validated dAppDefinitionAddress: DappDefinitionAddress
-	) async -> Loadable<SimpleDappDetails.State.Resources> {
-		guard let claimedEntities = metadata.claimedEntities, !claimedEntities.isEmpty else {
-			return .idle
-		}
-
-		let result = await TaskResult {
-			let allResourceItems = try await gatewayAPIClient.fetchResourceDetails(claimedEntities, explicitMetadata: .resourceMetadataKeys)
-				.items
-				.filter { (try? $0.metadata.validate(dAppDefinitionAddress: dAppDefinitionAddress)) != nil }
-				.compactMap {
-					try $0.resourceDetails()
-				}
-
-			return State.Resources(fungible: allResourceItems.filter { $0.fungibility == .fungible },
-			                       nonFungible: allResourceItems.filter { $0.fungibility == .nonFungible })
-		}
-
-		return .init(result: result)
-	}
-
-	/// Loads any other dApps associated with the dApp
-	private func loadDapps(
-		metadata: GatewayAPI.EntityMetadataCollection,
-		validated dappDefinitionAddress: DappDefinitionAddress
-	) async -> Loadable<[State.AssociatedDapp]> {
-		let dAppDefinitions = try? metadata.dappDefinitions?.compactMap(DappDefinitionAddress.init)
-		guard let dAppDefinitions else { return .idle }
-
-		let associatedDapps = await dAppDefinitions.parallelMap { dApp in
-			try? await extractDappInfo(for: dApp, validating: dappDefinitionAddress)
-		}
-		.compactMap { $0 }
-
-		guard !associatedDapps.isEmpty else { return .idle }
-
-		return .success(associatedDapps)
-	}
-
-	/// Helper function that loads and extracts dApp info for a given dApp, validating that it points back to the dApp of this screen
-	private func extractDappInfo(
-		for dApp: DappDefinitionAddress,
-		validating dAppDefinitionAddress: DappDefinitionAddress
-	) async throws -> State.AssociatedDapp {
-		let metadata = try await gatewayAPIClient.getDappMetadata(dApp, validatingDappDefinitionAddress: dAppDefinitionAddress)
-		guard let name = metadata.name else {
-			throw GatewayAPI.EntityMetadataCollection.MetadataError.missingName
-		}
-		return .init(address: dApp, name: name, iconURL: metadata.iconURL)
-	}
-}
-
-extension GatewayAPI.StateEntityDetailsResponseItem {
-	func resourceDetails() throws -> SimpleDappDetails.State.Resources.ResourceDetails? {
-		guard let fungibility else { return nil }
-		let address = try ResourceAddress(validatingAddress: address)
-		return .init(address: address,
-		             fungibility: fungibility,
-		             name: metadata.name ?? L10n.AuthorizedDapps.DAppDetails.unknownTokenName,
-		             symbol: metadata.symbol,
-		             description: metadata.description,
-		             iconURL: metadata.iconURL)
-	}
-
-	private var fungibility: SimpleDappDetails.State.Resources.ResourceDetails.Fungibility? {
-		guard let details else { return nil }
-		switch details {
-		case .fungibleResource:
-			return .fungible
-		case .nonFungibleResource:
-			return .nonFungible
-		case .fungibleVault, .nonFungibleVault, .package, .component:
-			return nil
-		}
 	}
 }
 
