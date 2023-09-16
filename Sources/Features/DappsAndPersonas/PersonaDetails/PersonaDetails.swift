@@ -1,5 +1,4 @@
 import AuthorizedDappsClient
-import CreateAuthKeyFeature
 import EditPersonaFeature
 import EngineKit
 import FeaturePrelude
@@ -54,23 +53,8 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 			mode.id
 		}
 
-		#if DEBUG
-		public var canCreateAuthKey: Bool
-		#endif
-
 		public init(_ mode: Mode) {
 			self.mode = mode
-
-			#if DEBUG
-			let hasAuthenticationSigningKey: Bool
-			switch mode {
-			case let .general(persona, _):
-				hasAuthenticationSigningKey = persona.hasAuthenticationSigningKey
-			case let .dApp(_, persona):
-				hasAuthenticationSigningKey = persona.hasAuthenticationSigningKey
-			}
-			self.canCreateAuthKey = !hasAuthenticationSigningKey
-			#endif
 		}
 	}
 
@@ -83,9 +67,6 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 		case editPersonaTapped
 		case editAccountSharingTapped
 		case deauthorizePersonaTapped
-		#if DEBUG
-		case createAndUploadAuthKeyButtonTapped
-		#endif
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -103,7 +84,6 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 		case dAppsUpdated(IdentifiedArrayOf<State.DappInfo>)
 		case callDone(updateControlState: WritableKeyPath<State, ControlState>, changeTo: ControlState)
 		case hideLoader(updateControlState: WritableKeyPath<State, ControlState>)
-		case personaToCreateAuthKeyForFetched(Profile.Network.Persona)
 		case dAppLoaded(Profile.Network.AuthorizedDappDetailed)
 	}
 
@@ -112,7 +92,6 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 	public struct Destination: Reducer {
 		public enum State: Hashable {
 			case editPersona(EditPersona.State)
-			case createAuthKey(CreateAuthKey.State)
 			case dAppDetails(SimpleAuthDappDetails.State)
 
 			case confirmForgetAlert(AlertState<Action.ConfirmForgetAlert>)
@@ -120,7 +99,6 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 
 		public enum Action: Equatable {
 			case editPersona(EditPersona.Action)
-			case createAuthKey(CreateAuthKey.Action)
 			case dAppDetails(SimpleAuthDappDetails.Action)
 
 			case confirmForgetAlert(ConfirmForgetAlert)
@@ -134,9 +112,6 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 		public var body: some ReducerOf<Self> {
 			Scope(state: /State.editPersona, action: /Action.editPersona) {
 				EditPersona()
-			}
-			Scope(state: /State.createAuthKey, action: /Action.createAuthKey) {
-				CreateAuthKey()
 			}
 			Scope(state: /State.dAppDetails, action: /Action.dAppDetails) {
 				SimpleAuthDappDetails()
@@ -178,13 +153,6 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 				errorQueue.schedule(error)
 			}
 
-		case let .destination(.presented(.createAuthKey(.delegate(.done(wasSuccessful))))):
-			#if DEBUG
-			state.canCreateAuthKey = false
-			#endif
-			state.destination = nil
-			return .none
-
 		case .destination:
 			return .none
 		}
@@ -197,19 +165,6 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 			return .run { send in
 				await send(.internal(.dAppsUpdated(addingDappMetadata(to: dApps))))
 			}
-
-		#if DEBUG
-		case .createAndUploadAuthKeyButtonTapped:
-			let identityAddress = state.identityAddress
-			return .run { send in
-				let persona = try await personasClient.getPersona(id: identityAddress)
-				await send(.internal(.personaToCreateAuthKeyForFetched(persona)))
-			} catch: { error, _ in
-				loggerGlobal.error("Could not get persona with address: \(identityAddress), error: \(error)")
-				errorQueue.schedule(error)
-			}
-			return .none
-		#endif
 
 		case let .accountTapped(address):
 			return .none
@@ -250,10 +205,6 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
-		case let .personaToCreateAuthKeyForFetched(persona):
-			state.destination = .createAuthKey(.init(entity: .persona(persona)))
-			return .none
-
 		case let .editablePersonaFetched(persona):
 			switch state.mode {
 			case .general:

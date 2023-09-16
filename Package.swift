@@ -190,7 +190,6 @@ package.addModules([
 		dependencies: [
 			"AuthorizedDappsClient",
 			"AssetsFeature",
-			"CreateAuthKeyFeature",
 			"CacheClient",
 			"CreatePersonaFeature",
 			"EditPersonaFeature",
@@ -392,7 +391,6 @@ package.addModules([
 			"AppPreferencesClient",
 			"AuthorizedDappsClient",
 			"CacheClient",
-			"CreateAuthKeyFeature",
 			"CreatePersonaFeature",
 			"DappsAndPersonasFeature",
 			"DebugInspectProfileFeature",
