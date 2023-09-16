@@ -185,6 +185,22 @@ package.addModules([
 		tests: .yes()
 	),
 	.feature(
+		name: "DappsAndPersonasFeature",
+		featureSuffixDroppedFromFolderName: true,
+		dependencies: [
+			"AuthorizedDappsClient",
+			"AssetsFeature",
+			"CreateAuthKeyFeature",
+			"CacheClient",
+			"CreatePersonaFeature",
+			"EditPersonaFeature",
+			"EngineKit",
+			"GatewayAPI",
+			"PersonasClient",
+		],
+		tests: .no
+	),
+	.feature(
 		name: "DebugInspectProfileFeature",
 		featureSuffixDroppedFromFolderName: true,
 		dependencies: [
@@ -378,6 +394,7 @@ package.addModules([
 			"CacheClient",
 			"CreateAuthKeyFeature",
 			"CreatePersonaFeature",
+			"DappsAndPersonasFeature",
 			"DebugInspectProfileFeature",
 			"DeviceFactorSourceClient",
 			"DisplayEntitiesControlledByMnemonicFeature",
