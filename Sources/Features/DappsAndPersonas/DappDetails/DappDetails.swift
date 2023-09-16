@@ -25,13 +25,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 		public let dAppDefinitionAddress: DappDefinitionAddress
 
 		// This will only be non-nil if the dApp is in fact authorized
-		public var dApp: Profile.Network.AuthorizedDappDetailed? {
-			didSet {
-				if let dApp {
-					personaList = .init(dApp: dApp)
-				}
-			}
-		}
+		public var authorizedDapp: Profile.Network.AuthorizedDappDetailed?
 
 		public var personaList: PersonaList.State
 
@@ -59,7 +53,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 			destination: Destination.State? = nil
 		) {
 			self.dAppDefinitionAddress = dApp.dAppDefinitionAddress
-			self.dApp = dApp
+			self.authorizedDapp = dApp
 			self.personaList = .init(dApp: dApp)
 			self.tappablePersonas = tappablePersonas
 			self.metadata = metadata
@@ -77,7 +71,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 			destination: Destination.State? = nil
 		) {
 			self.dAppDefinitionAddress = dAppDefinitionAddress
-			self.dApp = nil
+			self.authorizedDapp = nil
 			self.personaList = .init() // TODO: Check reloading behaviour
 			self.tappablePersonas = false
 			self.metadata = metadata
@@ -189,17 +183,25 @@ public struct DappDetails: Sendable, FeatureReducer {
 		case .appeared:
 			state.$metadata = .loading
 			state.$resources = .loading
-			let address = state.dAppDefinitionAddress.address
+			let dAppID = state.dAppDefinitionAddress
+			let checkForAuthorizedDapp = state.authorizedDapp == nil
 			return .run { send in
+				if checkForAuthorizedDapp {
+					let authorizedDapp = try await authorizedDappsClient.getDetailedDapp(dAppID)
+					await send(.internal(.dAppUpdated(authorizedDapp)))
+				}
+
 				let result = await TaskResult {
 					try await cacheClient.withCaching(
-						cacheEntry: .dAppMetadata(address),
+						cacheEntry: .dAppMetadata(dAppID.address),
 						request: {
-							try await gatewayAPIClient.getEntityMetadata(address, .dappMetadataKeys)
+							try await gatewayAPIClient.getEntityMetadata(dAppID.address, .dappMetadataKeys)
 						}
 					)
 				}
 				await send(.internal(.metadataLoaded(.init(result: result))))
+			} catch: { error, _ in
+				errorQueue.schedule(error)
 			}
 
 		case let .openURLTapped(url):
@@ -238,8 +240,8 @@ public struct DappDetails: Sendable, FeatureReducer {
 				return update(dAppID: dAppID, dismissPersonaDetails: false)
 
 			case .confirmDisconnectAlert(.confirmTapped):
-				assert(state.dApp != nil, "Can only disconnect a dApp that has been authorized")
-				guard let networkID = state.dApp?.networkID else { return .none }
+				assert(state.authorizedDapp != nil, "Can only disconnect a dApp that has been authorized")
+				guard let networkID = state.authorizedDapp?.networkID else { return .none }
 				return disconnectDappEffect(dAppID: state.dAppDefinitionAddress, networkID: networkID)
 
 			default:
@@ -250,7 +252,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 			return .none
 
 		case let .personas(.delegate(.openDetails(persona))):
-			guard let dApp = state.dApp, let detailedPersona = dApp.detailedAuthorizedPersonas[id: persona.id] else { return .none }
+			guard let dApp = state.authorizedDapp, let detailedPersona = dApp.detailedAuthorizedPersonas[id: persona.id] else { return .none }
 			let personaDetailsState = PersonaDetails.State(.dApp(dApp, persona: detailedPersona))
 			state.destination = .personaDetails(personaDetailsState)
 			return .none
@@ -288,7 +290,8 @@ public struct DappDetails: Sendable, FeatureReducer {
 				// FIXME: Without this delay, the screen is never dismissed
 				return disconnectDappEffect(dAppID: dApp.dAppDefinitionAddress, networkID: dApp.networkID, delay: .milliseconds(500))
 			}
-			state.dApp = dApp
+			state.authorizedDapp = dApp
+			state.personaList = .init(dApp: dApp)
 
 			return .none
 		}
