@@ -1,4 +1,5 @@
 import AppPreferencesClient
+import DappsAndPersonasFeature
 import FeaturePrelude
 import GatewayAPI
 import ImportLegacyWalletClient

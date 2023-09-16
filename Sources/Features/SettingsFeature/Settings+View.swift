@@ -1,3 +1,4 @@
+import DappsAndPersonasFeature
 import FeaturePrelude
 import GatewayAPI
 import GatewaySettingsFeature
