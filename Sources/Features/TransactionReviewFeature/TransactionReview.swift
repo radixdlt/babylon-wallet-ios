@@ -659,12 +659,12 @@ extension TransactionReview {
 			.compactMap {
 				try? AccountAddress(validatingAddress: $0.addressString())
 			}
-			.map { address in
+			.map { (address: AccountAddress) in
 				let userAccount = userAccounts.first { userAccount in
-					userAccount.address == address
+					userAccount.address.address == address.address
 				}
 				if let userAccount {
-					return .user(.init(address: userAccount.address, label: userAccount.displayName, appearanceID: userAccount.appearanceID))
+					return .user(userAccount)
 				} else {
 					return .external(address, approved: false)
 				}
@@ -1019,7 +1019,7 @@ extension TransactionReview {
 	}
 
 	public enum Account: Sendable, Hashable {
-		case user(Profile.Network.AccountForDisplay)
+		case user(Profile.Network.Account)
 		case external(AccountAddress, approved: Bool)
 
 		var address: AccountAddress {

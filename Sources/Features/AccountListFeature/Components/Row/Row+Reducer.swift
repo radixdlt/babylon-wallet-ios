@@ -56,12 +56,10 @@ extension AccountList {
 			case task
 			case backUpMnemonic
 			case importMnemonic
-			case verifyAddressOnLedger
 		}
 
 		public enum InternalAction: Sendable, Equatable {
 			case accountPortfolioUpdate(AccountPortfolio)
-			case verifyAddressOnLedgerResult(TaskResult<String>)
 		}
 
 		public enum DelegateAction: Sendable, Equatable {
@@ -79,8 +77,6 @@ extension AccountList {
 		@Dependency(\.accountPortfoliosClient) var accountPortfoliosClient
 		@Dependency(\.factorSourcesClient) var factorSourcesClient
 		@Dependency(\.userDefaultsClient) var userDefaultsClient
-		@Dependency(\.ledgerHardwareWalletClient) var ledgerHardwareWalletClient
-		@Dependency(\.overlayWindowClient) var overlayWindowClient
 
 		public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 			switch viewAction {
@@ -105,14 +101,6 @@ extension AccountList {
 			case .importMnemonic:
 				return .send(.delegate(.importMnemonics(state.account)))
 
-			case .verifyAddressOnLedger:
-				return .run { [account = state.account] send in
-					let result = await TaskResult {
-						try await ledgerHardwareWalletClient.verifyAddress(of: account)
-					}
-					await send(.internal(.verifyAddressOnLedgerResult(result)))
-				}
-
 			case .tapped:
 				return .send(.delegate(.tapped(
 					state.account,
@@ -124,22 +112,6 @@ extension AccountList {
 
 		public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 			switch internalAction {
-			case let .verifyAddressOnLedgerResult(.failure(error)):
-				loggerGlobal.error("Failed to verify address on Ledger, error: \(error)")
-				return .none
-
-			case let .verifyAddressOnLedgerResult(.success(addressDerivedOnLedger)):
-				if addressDerivedOnLedger == state.account.address.address {
-					overlayWindowClient.scheduleHUD(.init(
-						text: "Address verified",
-						icon: .init(
-							kind: .system("checkmark.seal.fill"),
-							foregroundColor: Color.app.green1
-						)
-					))
-				}
-				return .none
-
 			case let .accountPortfolioUpdate(portfolio):
 
 				// FIXME: Refactor account security prompts to share logic between this reducer and AccountDetails

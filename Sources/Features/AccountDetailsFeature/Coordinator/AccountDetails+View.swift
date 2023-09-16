@@ -13,7 +13,8 @@ extension AccountDetails.State {
 			appearanceID: account.appearanceID,
 			displayName: account.displayName.rawValue,
 			needToImportMnemonicForThisAccount: importMnemonicPrompt.needed,
-			needToBackupMnemonicForThisAccount: exportMnemonicPrompt.needed
+			needToBackupMnemonicForThisAccount: exportMnemonicPrompt.needed,
+			isLedgerAccount: account.isLedgerAccount
 		)
 	}
 }
@@ -26,6 +27,7 @@ extension AccountDetails {
 		let displayName: String
 		let needToImportMnemonicForThisAccount: Bool
 		let needToBackupMnemonicForThisAccount: Bool
+		let isLedgerAccount: Bool
 	}
 
 	@MainActor
@@ -39,7 +41,7 @@ extension AccountDetails {
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				VStack(spacing: .zero) {
-					AddressView(.address(.account(viewStore.accountAddress)))
+					AddressView(.address(.account(viewStore.accountAddress, isLedgerHWAccount: viewStore.isLedgerAccount)))
 						.foregroundColor(.app.whiteTransparent)
 						.textStyle(.body2HighImportance)
 						.padding(.bottom, .medium1)

@@ -95,10 +95,7 @@ extension AccountList.Row {
 
 						HStack {
 							AddressView(
-								.address(.account(viewStore.address)),
-								verifyAddressOnLedger: viewStore.isLedgerAccount ? {
-									viewStore.send(.verifyAddressOnLedger)
-								} : nil
+								.address(.account(viewStore.address, isLedgerHWAccount: viewStore.isLedgerAccount))
 							)
 							.foregroundColor(.app.whiteTransparent)
 							.textStyle(.body2HighImportance)

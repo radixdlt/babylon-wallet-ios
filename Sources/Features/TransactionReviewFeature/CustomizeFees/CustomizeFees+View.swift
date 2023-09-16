@@ -156,7 +156,7 @@ extension CustomizeFees {
 				if let feePayer = viewStore.feePayer?.account {
 					SmallAccountCard(
 						feePayer.displayName.rawValue,
-						identifiable: .address(.account(feePayer.address)),
+						identifiable: .address(of: feePayer),
 						gradient: .init(feePayer.appearanceID)
 					)
 					.cornerRadius(.small1)

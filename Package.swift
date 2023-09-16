@@ -884,6 +884,8 @@ package.addModules([
 			"DesignSystem",
 			"Resources",
 			"SharedModels",
+			"LedgerHardwareWalletClient",
+			"OverlayWindowClient",
 		],
 		tests: .yes()
 	),

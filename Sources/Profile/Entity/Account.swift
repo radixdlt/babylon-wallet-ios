@@ -138,6 +138,13 @@ extension Profile.Network.Account {
 		}
 		return false
 	}
+
+	public var isLedgerAccount: Bool {
+		switch self.securityState {
+		case let .unsecured(control):
+			return control.transactionSigning.factorSourceID.kind == .ledgerHQHardwareWallet
+		}
+	}
 }
 
 // MARK: - WrongEntityInDerivationPath

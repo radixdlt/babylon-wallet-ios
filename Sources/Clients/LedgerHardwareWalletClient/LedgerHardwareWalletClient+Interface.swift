@@ -82,6 +82,13 @@ struct FailedToFindLedger: LocalizedError {
 
 extension LedgerHardwareWalletClient {
 	@discardableResult
+	public func verifyAddress(of accountAddress: AccountAddress) async throws -> String {
+		@Dependency(\.accountsClient) var accountsClient
+		let account = try await accountsClient.getAccountByAddress(accountAddress)
+		return try await verifyAddress(of: account)
+	}
+
+	@discardableResult
 	public func verifyAddress(of account: Profile.Network.Account) async throws -> String {
 		@Dependency(\.factorSourcesClient) var factorSourcesClient
 		switch account.securityState {

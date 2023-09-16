@@ -1,5 +1,7 @@
 import EngineKit
 import GatewaysClient
+import LedgerHardwareWalletClient
+import OverlayWindowClient
 import Prelude
 import QRGeneratorClient
 import Resources
@@ -10,8 +12,6 @@ import SwiftUI
 public struct AddressView: View {
 	let identifiable: LedgerIdentifiable
 	let isTappable: Bool
-	public typealias VerifyAddressOnLedger = () -> Void
-	let verifyAddressOnLedger: VerifyAddressOnLedger?
 	private let format: AddressFormat
 	private let action: Action
 
@@ -25,11 +25,10 @@ public struct AddressView: View {
 	public init(
 		_ identifiable: LedgerIdentifiable,
 		isTappable: Bool = true,
-		verifyAddressOnLedger: VerifyAddressOnLedger? = nil
+		isLedgerAccount: Bool = false
 	) {
 		self.identifiable = identifiable
 		self.isTappable = isTappable
-		self.verifyAddressOnLedger = verifyAddressOnLedger
 
 		switch identifiable {
 		case .address:
@@ -77,21 +76,24 @@ extension AddressView {
 					viewOnRadixDashboard()
 				}
 
-				if case let .address(.account(accountAddress)) = identifiable {
+				if case let .address(.account(accountAddress, isLedgerHWAccount)) = identifiable {
 					Button(
 						L10n.AddressAction.showAccountQR,
 						asset: AssetResource.qrCodeScanner
 					) {
 						showQR(for: accountAddress)
 					}
-				}
 
-				if let verifyAddressOnLedger {
-					Button(
-						"Verify address on Ledger", // FIXME: Strings
-						asset: AssetResource.ledger,
-						action: verifyAddressOnLedger
-					)
+					if isLedgerHWAccount {
+						Button(
+							"Verify Address on Ledger", // FIXME: Strings
+							asset: AssetResource.ledger
+						) {
+							Task {
+								await verifyAddressOnLedger(accountAddress)
+							}
+						}
+					}
 				}
 			}
 		}
@@ -118,6 +120,28 @@ extension AddressView {
 			case .nonFungibleGlobalID:
 				return L10n.AddressAction.copyNftId
 			}
+		}
+	}
+
+	func verifyAddressOnLedger(_ accountAddress: AccountAddress) async {
+		@Dependency(\.ledgerHardwareWalletClient) var ledgerHardwareWalletClient
+		@Dependency(\.overlayWindowClient) var overlayWindowClient
+		do {
+			let addressDerivedOnLedger = try await ledgerHardwareWalletClient.verifyAddress(of: accountAddress)
+
+			if addressDerivedOnLedger == accountAddress.address {
+				overlayWindowClient.scheduleHUD(.init(
+					text: "Address verified",
+					icon: .init(
+						kind: .system("checkmark.seal.fill"),
+						foregroundColor: Color.app.green1
+					)
+				))
+			} else {
+				loggerGlobal.error("Mismatch in address, [ledger deriverd] \(addressDerivedOnLedger) != \(accountAddress.address) [expected]")
+			}
+		} catch {
+			loggerGlobal.error("Failed to verifyAddress on Ledger, error: \(error)")
 		}
 	}
 }

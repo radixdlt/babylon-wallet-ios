@@ -6,6 +6,10 @@ public enum LedgerIdentifiable: Sendable {
 	case address(Address)
 	case identifier(Identifier)
 
+	public static func address(of account: Profile.Network.Account) -> Self {
+		.address(.account(account.address, isLedgerHWAccount: account.isLedgerAccount))
+	}
+
 	public var address: String {
 		switch self {
 		case let .address(address):
@@ -50,7 +54,7 @@ extension LedgerIdentifiable {
 	}
 
 	public enum Address: Sendable {
-		case account(AccountAddress)
+		case account(AccountAddress, isLedgerHWAccount: Bool = false)
 		case package(PackageAddress)
 		case resource(ResourceAddress)
 		case component(ComponentAddress)
@@ -60,7 +64,7 @@ extension LedgerIdentifiable {
 
 		public var address: String {
 			switch self {
-			case let .account(accountAddress):
+			case let .account(accountAddress, _):
 				return accountAddress.address
 			case let .package(packageAddress):
 				return packageAddress.address
