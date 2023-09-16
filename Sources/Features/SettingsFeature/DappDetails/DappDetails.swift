@@ -22,8 +22,10 @@ public struct DappDetails: Sendable, FeatureReducer {
 	// MARK: State
 
 	public struct State: Sendable, Hashable {
+		public let dAppDefinitionAddress: DappDefinitionAddress
+
 		public enum Mode: Sendable, Hashable {
-			case general(DappDefinitionAddress)
+			case general
 			case authorized(Profile.Network.AuthorizedDappDetailed, PersonaList.State?)
 
 			public var isAuthorized: Bool {
@@ -33,13 +35,6 @@ public struct DappDetails: Sendable, FeatureReducer {
 		}
 
 		public var mode: Mode
-
-		public var dAppDefinitionAddress: DappDefinitionAddress {
-			switch mode {
-			case let .general(id): return id
-			case let .authorized(dApp, _): return dApp.dAppDefinitionAddress
-			}
-		}
 
 		public var personaList: PersonaList.State? {
 			get {
@@ -87,6 +82,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 			associatedDapps: [AssociatedDapp]? = nil,
 			destination: Destination.State? = nil
 		) {
+			self.dAppDefinitionAddress = dApp.dAppDefinitionAddress
 			self.mode = .authorized(dApp, personas)
 			self.metadata = metadata
 			self.resources = resources
@@ -102,7 +98,8 @@ public struct DappDetails: Sendable, FeatureReducer {
 			associatedDapps: [AssociatedDapp]? = nil,
 			destination: Destination.State? = nil
 		) {
-			self.mode = .general(dAppDefinitionAddress)
+			self.dAppDefinitionAddress = dAppDefinitionAddress
+			self.mode = .general
 			self.metadata = metadata
 			self.resources = resources
 			self.associatedDapps = associatedDapps
