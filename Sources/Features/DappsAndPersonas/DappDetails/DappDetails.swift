@@ -24,43 +24,18 @@ public struct DappDetails: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public let dAppDefinitionAddress: DappDefinitionAddress
 
-		public enum Mode: Sendable, Hashable {
-			case general
-			case authorized(Profile.Network.AuthorizedDappDetailed, PersonaList.State)
-
-			public var isAuthorized: Bool {
-				guard case .authorized = self else { return false }
-				return true
-			}
-		}
-
-		public var mode: Mode
-
-		public var personaList: PersonaList.State? {
-			get {
-				guard case let .authorized(_, personas) = mode else { return nil }
-				return personas
-			}
-			set {
-				assert(mode.isAuthorized, "Should only be accessed in authorized mode")
-				assert(newValue != nil, "Should never be set to nil")
-				guard let newValue, case let .authorized(dApp, _) = mode else { return }
-				mode = .authorized(dApp, newValue)
-			}
-		}
-
+		// This will only be non-nil if the dApp is in fact authorized
 		public var dApp: Profile.Network.AuthorizedDappDetailed? {
-			get {
-				guard case let .authorized(dApp, _) = mode else { return nil }
-				return dApp
-			}
-			set {
-				assert(mode.isAuthorized, "Should only be accessed in authorized mode")
-				assert(newValue != nil, "Should never be set to nil")
-				guard let dApp = newValue, case .authorized = mode else { return }
-				mode = .authorized(dApp, .init(dApp: dApp))
+			didSet {
+				if let dApp {
+					personaList = .init(dApp: dApp)
+				}
 			}
 		}
+
+		public var personaList: PersonaList.State
+
+		public let tappablePersonas: Bool
 
 		@Loadable
 		public var metadata: GatewayAPI.EntityMetadataCollection? = nil
@@ -77,13 +52,16 @@ public struct DappDetails: Sendable, FeatureReducer {
 		// Authorized dApp
 		public init(
 			dApp: Profile.Network.AuthorizedDappDetailed,
+			tappablePersonas: Bool,
 			metadata: GatewayAPI.EntityMetadataCollection? = nil,
 			resources: Resources? = nil,
 			associatedDapps: [AssociatedDapp]? = nil,
 			destination: Destination.State? = nil
 		) {
 			self.dAppDefinitionAddress = dApp.dAppDefinitionAddress
-			self.mode = .authorized(dApp, .init(dApp: dApp))
+			self.dApp = dApp
+			self.personaList = .init(dApp: dApp)
+			self.tappablePersonas = tappablePersonas
 			self.metadata = metadata
 			self.resources = resources
 			self.associatedDapps = associatedDapps
@@ -99,7 +77,9 @@ public struct DappDetails: Sendable, FeatureReducer {
 			destination: Destination.State? = nil
 		) {
 			self.dAppDefinitionAddress = dAppDefinitionAddress
-			self.mode = .general
+			self.dApp = nil
+			self.personaList = .init() // TODO: Check reloading behaviour
+			self.tappablePersonas = false
 			self.metadata = metadata
 			self.resources = resources
 			self.associatedDapps = associatedDapps
@@ -195,10 +175,10 @@ public struct DappDetails: Sendable, FeatureReducer {
 	public init() {}
 
 	public var body: some ReducerOf<Self> {
+		Scope(state: \.personaList, action: /Action.child .. ChildAction.personas) {
+			PersonaList()
+		}
 		Reduce(core)
-			.ifLet(\.personaList, action: /Action.child .. ChildAction.personas) {
-				PersonaList()
-			}
 			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
 				Destination()
 			}
@@ -258,7 +238,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 				return update(dAppID: dAppID, dismissPersonaDetails: false)
 
 			case .confirmDisconnectAlert(.confirmTapped):
-				assert(state.mode.isAuthorized, "Should only be accessed in authorized mode")
+				assert(state.dApp != nil, "Can only disconnect a dApp that has been authorized")
 				guard let networkID = state.dApp?.networkID else { return .none }
 				return disconnectDappEffect(dAppID: state.dAppDefinitionAddress, networkID: networkID)
 
@@ -270,7 +250,6 @@ public struct DappDetails: Sendable, FeatureReducer {
 			return .none
 
 		case let .personas(.delegate(.openDetails(persona))):
-			assert(state.mode.isAuthorized, "Should only be accessed in authorized mode")
 			guard let dApp = state.dApp, let detailedPersona = dApp.detailedAuthorizedPersonas[id: persona.id] else { return .none }
 			let personaDetailsState = PersonaDetails.State(.dApp(dApp, persona: detailedPersona))
 			state.destination = .personaDetails(personaDetailsState)
@@ -304,7 +283,6 @@ public struct DappDetails: Sendable, FeatureReducer {
 			return .none
 
 		case let .dAppUpdated(dApp):
-			assert(state.mode.isAuthorized, "Should only be accessed in authorized mode")
 			assert(dApp.dAppDefinitionAddress == state.dAppDefinitionAddress, "dAppUpdated called with wrong dApp")
 			guard !dApp.detailedAuthorizedPersonas.isEmpty else {
 				// FIXME: Without this delay, the screen is never dismissed

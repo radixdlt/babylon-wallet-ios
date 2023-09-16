@@ -5,18 +5,28 @@ extension Persona {
 	@MainActor
 	public struct View: SwiftUI.View {
 		private let store: StoreOf<Persona>
+		private let tappable: Bool
 
-		public init(store: StoreOf<Persona>) {
+		public init(store: StoreOf<Persona>, tappable: Bool) {
 			self.store = store
+			self.tappable = tappable
 		}
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
-				Card {
-					viewStore.send(.tapped)
-				} contents: {
-					PlainListRow(title: viewStore.displayName) {
-						PersonaThumbnail(viewStore.thumbnail)
+				if tappable {
+					Card {
+						viewStore.send(.tapped)
+					} contents: {
+						PlainListRow(title: viewStore.displayName) {
+							PersonaThumbnail(viewStore.thumbnail)
+						}
+					}
+				} else {
+					Card {
+						PlainListRow(title: viewStore.displayName, accessory: nil) {
+							PersonaThumbnail(viewStore.thumbnail)
+						}
 					}
 				}
 			}
@@ -36,7 +46,8 @@ struct Persona_Preview: PreviewProvider {
 			store: .init(
 				initialState: .previewValue,
 				reducer: Persona.init
-			)
+			),
+			tappable: true
 		)
 	}
 }
