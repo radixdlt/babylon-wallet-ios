@@ -21,7 +21,7 @@ extension DappDetails {
 		let fungibles: [State.Resources.ResourceDetails]?
 		let nonFungibles: [State.Resources.ResourceDetails]?
 		let associatedDapps: [State.AssociatedDapp]?
-		let hasPersonas: Bool
+		let tappablePersonas: Bool
 	}
 }
 
@@ -41,7 +41,8 @@ extension DappDetails.View {
 
 					NonFungiblesListList(store: store)
 
-					Personas(store: store, hasPersonas: viewStore.hasPersonas)
+					let personasStore = store.scope(state: \.personaList) { .child(.personas($0)) }
+					Personas(store: personasStore, tappablePersonas: viewStore.tappablePersonas)
 						.background(.app.gray5)
 
 					Button(L10n.AuthorizedDapps.ForgetDappAlert.title) {
@@ -84,7 +85,7 @@ private extension DappDetails.State {
 			fungibles: resources?.fungible,
 			nonFungibles: resources?.nonFungible,
 			associatedDapps: associatedDapps,
-			hasPersonas: (personaList?.personas.isEmpty).map(!) ?? false
+			tappablePersonas: tappablePersonas
 		)
 	}
 }
@@ -205,29 +206,37 @@ extension DappDetails.View {
 
 	@MainActor
 	struct Personas: View {
-		let store: StoreOf<DappDetails>
-		let hasPersonas: Bool
+		struct ViewState: Equatable {
+			let hasPersonas: Bool
+
+			init(state: PersonaList.State) {
+				self.hasPersonas = !state.personas.isEmpty
+			}
+		}
+
+		let store: StoreOf<PersonaList>
+		let tappablePersonas: Bool
 
 		var body: some View {
-			let personasStore = store.scope(state: \.personaList) { .child(.personas($0)) }
+			WithViewStore(store, observe: ViewState.init) { viewStore in
+				if viewStore.hasPersonas {
+					Text(L10n.AuthorizedDapps.DAppDetails.personasHeading)
+						.sectionHeading
+						.flushedLeft
+						.padding(.horizontal, .medium1)
+						.padding(.vertical, .small2)
 
-			IfLetStore(personasStore) { childStore in
-				Text(L10n.AuthorizedDapps.DAppDetails.personasHeading)
-					.sectionHeading
-					.flushedLeft
-					.padding(.horizontal, .medium1)
-					.padding(.vertical, .small2)
+					Separator()
+						.padding(.bottom, .small2)
 
-				Separator()
-					.padding(.bottom, .small2)
-
-				PersonaListCoreView(store: childStore)
-			} else: {
-				Text(L10n.AuthorizedDapps.DAppDetails.noPersonasHeading)
-					.sectionHeading
-					.flushedLeft
-					.padding(.horizontal, .medium1)
-					.padding(.vertical, .small2)
+					PersonaListCoreView(store: store, tappable: tappablePersonas)
+				} else {
+					Text(L10n.AuthorizedDapps.DAppDetails.noPersonasHeading)
+						.sectionHeading
+						.flushedLeft
+						.padding(.horizontal, .medium1)
+						.padding(.vertical, .small2)
+				}
 			}
 		}
 	}

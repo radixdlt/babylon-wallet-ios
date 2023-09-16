@@ -62,7 +62,7 @@ public struct AuthorizedDapps: Sendable, FeatureReducer {
 		case let .didSelectDapp(dAppID):
 			return .run { send in
 				let dApp = try await authorizedDappsClient.getDetailedDapp(dAppID)
-				let presentedDappState = DappDetails.State(dApp: dApp)
+				let presentedDappState = DappDetails.State(dApp: dApp, tappablePersonas: true)
 				await send(.internal(.presentDappDetails(presentedDappState)))
 			} catch: { error, send in
 				errorQueue.schedule(error)
