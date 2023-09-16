@@ -449,6 +449,7 @@ package.addModules([
 		dependencies: [
 			"AssetsFeature",
 			"AuthorizedDappsClient",
+			"DappsAndPersonasFeature",
 			"GatewayAPI",
 			"OnLedgerEntitiesClient",
 			"TransactionClient",

@@ -76,7 +76,7 @@ extension DappDetails.View {
 private extension DappDetails.State {
 	var viewState: DappDetails.ViewState {
 		.init(
-			title: dApp?.displayName?.rawValue ?? L10n.DAppRequest.Metadata.unknownName,
+			title: dApp?.displayName?.rawValue ?? metadata?.name ?? L10n.DAppRequest.Metadata.unknownName,
 			description: metadata?.description,
 			domain: metadata?.claimedWebsites?.first,
 			thumbnail: metadata?.iconURL,
