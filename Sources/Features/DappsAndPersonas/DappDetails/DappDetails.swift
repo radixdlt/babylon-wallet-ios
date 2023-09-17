@@ -196,8 +196,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 			let dAppID = state.dAppDefinitionAddress
 			let checkForAuthorizedDapp = state.authorizedDapp == nil
 			return .run { send in
-				if checkForAuthorizedDapp {
-					let authorizedDapp = try await authorizedDappsClient.getDetailedDapp(dAppID)
+				if checkForAuthorizedDapp, let authorizedDapp = try? await authorizedDappsClient.getDetailedDapp(dAppID) {
 					await send(.internal(.dAppUpdated(authorizedDapp)))
 				}
 
