@@ -195,6 +195,7 @@ package.addModules([
 			"EditPersonaFeature",
 			"EngineKit",
 			"GatewayAPI",
+			"OnLedgerEntitiesClient",
 			"PersonasClient",
 		],
 		tests: .no

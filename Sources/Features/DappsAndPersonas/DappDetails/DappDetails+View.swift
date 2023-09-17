@@ -1,3 +1,4 @@
+import AssetsFeature
 import FeaturePrelude
 
 // MARK: - View
@@ -64,6 +65,12 @@ extension DappDetails.View {
 					state: /DappDetails.Destination.State.personaDetails,
 					action: DappDetails.Destination.Action.personaDetails,
 					destination: { PersonaDetails.View(store: $0) }
+				)
+				.navigationDestination(
+					store: store.destination,
+					state: /DappDetails.Destination.State.nonFungibleDetails,
+					action: DappDetails.Destination.Action.nonFungibleDetails,
+					destination: { NonFungibleTokenDetails.View(store: $0) }
 				)
 				.alert(
 					store: store.destination,
