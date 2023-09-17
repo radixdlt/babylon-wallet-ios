@@ -1,9 +1,11 @@
+import AssetsFeature
 import AuthorizedDappsClient
 import CacheClient
 import EditPersonaFeature
 import EngineKit
 import FeaturePrelude
 import GatewayAPI
+import OnLedgerEntitiesClient
 
 // MARK: - DappDetails
 public struct DappDetails: Sendable, FeatureReducer {
@@ -14,6 +16,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 	@Dependency(\.authorizedDappsClient) var authorizedDappsClient
 	@Dependency(\.cacheClient) var cacheClient
 	@Dependency(\.continuousClock) var clock
+	@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
 
 	public struct FailedToLoadMetadata: Error, Hashable {}
 
@@ -154,11 +157,13 @@ public struct DappDetails: Sendable, FeatureReducer {
 	public struct Destination: Reducer {
 		public enum State: Equatable, Hashable {
 			case personaDetails(PersonaDetails.State)
+			case nonFungibleDetails(NonFungibleTokenDetails.State)
 			case confirmDisconnectAlert(AlertState<Action.ConfirmDisconnectAlert>)
 		}
 
 		public enum Action: Equatable {
 			case personaDetails(PersonaDetails.Action)
+			case nonFungibleDetails(NonFungibleTokenDetails.Action)
 			case confirmDisconnectAlert(ConfirmDisconnectAlert)
 
 			public enum ConfirmDisconnectAlert: Sendable, Equatable {
@@ -170,6 +175,9 @@ public struct DappDetails: Sendable, FeatureReducer {
 		public var body: some ReducerOf<Self> {
 			Scope(state: /State.personaDetails, action: /Action.personaDetails) {
 				PersonaDetails()
+			}
+			Scope(state: /State.nonFungibleDetails, action: /Action.nonFungibleDetails) {
+				NonFungibleTokenDetails()
 			}
 		}
 	}
@@ -223,6 +231,48 @@ public struct DappDetails: Sendable, FeatureReducer {
 			return .none
 
 		case let .nonFungibleTapped(address):
+			print("• nonFungibleTapped", address)
+
+			let resource = state.resources?.nonFungible.first { $0.address == address }
+
+			guard let resource else { return .none } // TODO: Show error?
+
+			let details: AccountPortfolio.NonFungibleResource = .init(
+				resourceAddress: resource.address,
+				name: resource.name,
+				description: resource.description,
+				iconURL: resource.iconURL,
+				behaviors: [],
+				tags: [],
+				tokens: [],
+				totalSupply: nil
+			)
+
+			state.destination = .nonFungibleDetails(.init(token: nil, resource: details))
+
+			return .run { _ in
+				let entity = try await onLedgerEntitiesClient.getResource(address)
+				let resource: AccountPortfolio.NonFungibleResource = .init(onLedgerEntity: entity)
+
+//				let response = try await gatewayAPIClient.getNonFungibleData(.init(
+//					resourceAddress: address.address,
+//					nonFungibleIds: [""]
+//				))
+//
+//				guard let item = response.nonFungibleIds.first else {
+//					struct FailedToGetFungibleData: Error {}
+//					throw FailedToGetFungibleData()
+//				}
+//
+//				let token: AccountPortfolio.NonFungibleResource.NonFungibleToken = try .init(
+//					resourceAddress: address,
+//					nftID: <#T##NonFungibleLocalId#>,
+//					nftData: item.details
+//				)
+			}
+
+//			state.destination = .nonFungibleDetails(.init(token: nil, resource: resource))
+
 			// TODO: Handle this
 			return .none
 
