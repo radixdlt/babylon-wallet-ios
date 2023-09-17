@@ -42,10 +42,19 @@ extension AccountPortfolio {
 	}
 
 	public struct FungibleResource: Sendable, Hashable, Identifiable, Codable {
-		public var id: ResourceAddress { resourceAddress }
-
-		public let resourceAddress: ResourceAddress
+		public var id: ResourceAddress { resource.id }
 		public let amount: BigDecimal
+		public let resource: FungibleResourceBase
+
+		public init(amount: BigDecimal, resource: FungibleResourceBase) {
+			self.amount = amount
+			self.resource = resource
+		}
+	}
+
+	public struct FungibleResourceBase: Sendable, Hashable, Identifiable, Codable {
+		public var id: ResourceAddress { resourceAddress }
+		public let resourceAddress: ResourceAddress
 		public let divisibility: Int?
 		public let name: String?
 		public let symbol: String?
@@ -58,7 +67,6 @@ extension AccountPortfolio {
 
 		public init(
 			resourceAddress: ResourceAddress,
-			amount: BigDecimal,
 			divisibility: Int? = nil,
 			name: String? = nil,
 			symbol: String? = nil,
@@ -69,7 +77,6 @@ extension AccountPortfolio {
 			totalSupply: BigDecimal? = nil
 		) {
 			self.resourceAddress = resourceAddress
-			self.amount = amount
 			self.divisibility = divisibility
 			self.name = name
 			self.symbol = symbol
@@ -112,7 +119,9 @@ extension AccountPortfolio {
 			self.totalSupply = totalSupply
 		}
 
-		public struct NonFungibleToken: Sendable, Hashable, Identifiable, Codable {
+		public typealias NonFungibleToken = NonFungibleTokenBase
+
+		public struct NonFungibleTokenBase: Sendable, Hashable, Identifiable, Codable {
 			public let id: NonFungibleGlobalId
 			public let name: String?
 			public let description: String?
@@ -184,9 +193,9 @@ extension AccountPortfolio.PoolUnitResources {
 		}
 
 		public func redemptionValue(for resource: AccountPortfolio.FungibleResource) -> String {
-			let poolUnitTotalSupply = poolUnitResource.totalSupply ?? .one
+			let poolUnitTotalSupply = poolUnitResource.resource.totalSupply ?? .one
 			let unroundedRedemptionValue = poolUnitResource.amount * resource.amount / poolUnitTotalSupply
-			return unroundedRedemptionValue.format(divisibility: resource.divisibility)
+			return unroundedRedemptionValue.format(divisibility: resource.resource.divisibility)
 		}
 	}
 
@@ -221,7 +230,7 @@ extension AccountPortfolio.PoolUnitResources {
 			guard let stakeUnitResource else {
 				return nil
 			}
-			return (stakeUnitResource.amount * validator.xrdVaultBalance) / (stakeUnitResource.totalSupply ?? .one)
+			return (stakeUnitResource.amount * validator.xrdVaultBalance) / (stakeUnitResource.resource.totalSupply ?? .one)
 		}
 
 		public init(validator: Validator, stakeUnitResource: AccountPortfolio.FungibleResource?, stakeClaimResource: AccountPortfolio.NonFungibleResource?) {
