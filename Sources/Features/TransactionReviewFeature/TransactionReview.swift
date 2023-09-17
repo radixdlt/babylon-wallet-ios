@@ -429,11 +429,6 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		case .fungibleTokenDetails:
 			return .none
 
-		case .nonFungibleTokenDetails(.delegate(.dismiss)):
-			guard case .nonFungibleTokenDetails = state.destination else { return .none }
-			state.destination = nil
-			return .none
-
 		case .nonFungibleTokenDetails:
 			return .none
 		}
