@@ -900,7 +900,11 @@ extension TransactionReview {
 				))
 				.nonFungibleIds
 				.map { responseItem in
-					try NonFungibleToken(resourceAddress: resourceAddress, nftResponseItem: responseItem)
+					try NonFungibleToken(
+						resourceAddress: resourceAddress,
+						nftID: .from(stringFormat: responseItem.nonFungibleId),
+						nftData: responseItem.details
+					)
 				}
 
 				result.append(contentsOf: tokens)
