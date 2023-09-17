@@ -61,7 +61,7 @@ extension NonFungibleTokenDetails {
 		}
 
 		public var body: some SwiftUI.View {
-			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
+			WithViewStore(store, observe: \.viewState) { viewStore in
 				ScrollView(showsIndicators: false) {
 					VStack(spacing: .medium1) {
 						if let tokenDetails = viewStore.tokenDetails {

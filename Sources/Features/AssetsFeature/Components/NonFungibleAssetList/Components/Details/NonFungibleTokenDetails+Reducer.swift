@@ -12,20 +12,5 @@ public struct NonFungibleTokenDetails: Sendable, FeatureReducer {
 		}
 	}
 
-//	public enum ViewAction: Sendable, Equatable {
-//		case closeButtonTapped
-//	}
-
-//	public enum DelegateAction: Sendable, Equatable {
-//		case dismiss
-//	}
-
 	public init() {}
-
-//	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
-//		switch viewAction {
-//		case .closeButtonTapped:
-//			return .send(.delegate(.dismiss))
-//		}
-//	}
 }
