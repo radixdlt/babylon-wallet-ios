@@ -142,6 +142,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 			case personaDetails(PersonaDetails.State)
 			case fungibleDetails(FungibleTokenDetails.State)
 			case nonFungibleDetails(NonFungibleTokenDetails.State)
+			case dappDetails(DappDetails.State)
 			case confirmDisconnectAlert(AlertState<Action.ConfirmDisconnectAlert>)
 		}
 
@@ -149,6 +150,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 			case personaDetails(PersonaDetails.Action)
 			case fungibleDetails(FungibleTokenDetails.Action)
 			case nonFungibleDetails(NonFungibleTokenDetails.Action)
+			case dappDetails(DappDetails.Action)
 			case confirmDisconnectAlert(ConfirmDisconnectAlert)
 
 			public enum ConfirmDisconnectAlert: Sendable, Equatable {
@@ -171,6 +173,14 @@ public struct DappDetails: Sendable, FeatureReducer {
 	}
 
 	// MARK: Reducer
+
+	struct MissingResource: LocalizedError {
+		let address: ResourceAddress
+
+		var errorDescription: String {
+			"Missing resource: \(address)"
+		}
+	}
 
 	public init() {}
 
@@ -215,59 +225,26 @@ public struct DappDetails: Sendable, FeatureReducer {
 			}
 
 		case let .fungibleTapped(address):
-			// TODO: Handle this
+			guard let resource = state.resources?.fungible[id: address] else {
+				errorQueue.schedule(MissingResource(address: address))
+				return .none
+			}
+
+			// FIXME: Can a dApp be associated with XRD
+			state.destination = .fungibleDetails(.init(resource: resource, isXRD: false))
 			return .none
 
 		case let .nonFungibleTapped(address):
-			print("• nonFungibleTapped", address)
-
-//			state.destination = .nonFungibleDetails(.init(resource: <#T##OnLedgerEntity.Resource#>))
-
-//			let resource = state.resources?.nonFungible.first { $0.address == address }
-
-//			guard let resource else { return .none } // TODO: Show error?
-
-//			let details: AccountPortfolio.NonFungibleResource = .init(
-//				resourceAddress: resource.address,
-//				name: resource.name,
-//				description: resource.description,
-//				iconURL: resource.iconURL,
-//				behaviors: [],
-//				tags: [],
-//				tokens: [],
-//				totalSupply: nil
-//			)
-//
-//			state.destination = .nonFungibleDetails(.init(token: nil, resource: details))
-
-			return .run { _ in
-//				let entity = try await onLedgerEntitiesClient.getResource(address)
-//				let resource: AccountPortfolio.NonFungibleResource = .init(onLedgerEntity: entity)
-
-//				let response = try await gatewayAPIClient.getNonFungibleData(.init(
-//					resourceAddress: address.address,
-//					nonFungibleIds: [""]
-//				))
-//
-//				guard let item = response.nonFungibleIds.first else {
-//					struct FailedToGetFungibleData: Error {}
-//					throw FailedToGetFungibleData()
-//				}
-//
-//				let token: AccountPortfolio.NonFungibleResource.NonFungibleToken = try .init(
-//					resourceAddress: address,
-//					nftID: <#T##NonFungibleLocalId#>,
-//					nftData: item.details
-//				)
+			guard let resource = state.resources?.nonFungible[id: address] else {
+				errorQueue.schedule(MissingResource(address: address))
+				return .none
 			}
 
-//			state.destination = .nonFungibleDetails(.init(token: nil, resource: resource))
-
-			// TODO: Handle this
+			state.destination = .nonFungibleDetails(.init(resource: resource))
 			return .none
 
 		case let .dAppTapped(address):
-			// TODO: Handle this
+			state.destination = .dappDetails(.init(dAppDefinitionAddress: address))
 			return .none
 
 		case .forgetThisDappTapped:
@@ -357,10 +334,10 @@ public struct DappDetails: Sendable, FeatureReducer {
 		let result = await TaskResult {
 			let items = try await onLedgerEntitiesClient.getResources(resources)
 				.filter { $0.dappDefinitions?.contains(dAppDefinitionAddress) == true }
-			let array: IdentifiedArray = .init(items) { $1 }
+			let fungible: IdentifiedArray = .init(items.filter { $0.fungibility == .fungible }) { $1 }
+			let nonFungible: IdentifiedArray = .init(items.filter { $0.fungibility == .nonFungible }) { $1 }
 
-			return State.Resources(fungible: array.filter { $0.fungibility == .fungible },
-			                       nonFungible: array.filter { $0.fungibility == .nonFungible })
+			return State.Resources(fungible: fungible, nonFungible: nonFungible)
 		}
 
 		return .init(result: result)
