@@ -85,7 +85,7 @@ extension AddressView {
 						showQR(for: accountAddress)
 					}
 
-					if isLedgerHWAccount, false /* disabled until request works on Ledger https://rdxworks.slack.com/archives/C031A0V1A1W/p1694805108750789 */ {
+					if isLedgerHWAccount {
 						Button(
 							"Verify Address with Ledger", // FIXME: Strings
 							asset: AssetResource.ledger
