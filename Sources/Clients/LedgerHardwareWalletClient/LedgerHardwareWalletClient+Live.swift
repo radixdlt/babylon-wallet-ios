@@ -14,6 +14,7 @@ extension LedgerHardwareWalletClient: DependencyKey {
 	public static let liveValue: Self = {
 		@Dependency(\.radixConnectClient) var radixConnectClient
 
+		@Dependency(\.overlayWindowClient) var overlayWindowClient
 		@Sendable func makeRequest<Response: Sendable>(
 			_ request: P2P.ConnectorExtension.Request.LedgerHardwareWallet.Request,
 			responseCasePath: CasePath<P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success, Response>
@@ -51,6 +52,26 @@ extension LedgerHardwareWalletClient: DependencyKey {
 					}
 				case let .failure(errorFromConnectorExtension):
 					loggerGlobal.warning("Error from CE? \(errorFromConnectorExtension)")
+
+					switch errorFromConnectorExtension.code {
+					case .generic: break
+					case .blindSigningNotEnabledButRequired:
+						_ = await overlayWindowClient.scheduleAlert(.init(
+							title: {
+								TextState(
+									"Failed"
+								)
+							},
+							actions: {
+								ButtonState(label: {
+									TextState("OK")
+								})
+							}, message: {
+								TextState("Blind signing required but not enabled.")
+							}
+						)
+						)
+					}
 				}
 
 				clientsLeftToReceiveAnswerFrom -= 1

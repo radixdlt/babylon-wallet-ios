@@ -30,9 +30,30 @@ extension P2P.ConnectorExtension.Response {
 }
 
 extension P2P.ConnectorExtension.Response.LedgerHardwareWallet {
-	public struct Failure: Swift.Error, Sendable, Hashable, Decodable {
-		public let code: Int // enum?
+	public struct Failure: LocalizedError, Sendable, Hashable, Decodable {
+		public enum Reason: Int, Sendable, Hashable, Decodable {
+			case generic = 0
+			case blindSigningNotEnabledButRequired = 1
+			public var userFacingErrorDescription: String {
+				switch self {
+				case .generic:
+					return "Unknown" // FIXME: Strings
+				case .blindSigningNotEnabledButRequired:
+					return "Blind signing not enabled but required" // FIXME: Strings
+				}
+			}
+		}
+
+		public let code: Reason
 		public let message: String
+		public var errorDescription: String? {
+			var description = code.userFacingErrorDescription
+			#if DEBUG
+			return "[DEBUG ONLY] \(description)\nmessage from Ledger: '\(message)'"
+			#else
+			return description
+			#endif
+		}
 	}
 
 	public enum Success: Sendable, Hashable {
