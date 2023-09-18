@@ -221,6 +221,7 @@ extension AccountPortfoliosClient {
 		let tags = item.extractTags()
 		let totalSupply = details.flatMap { try? BigDecimal(fromString: $0.totalSupply) }
 		let metadata = resource.explicitMetadata
+		let dappDefinitions = metadata?.dappDefinitions?.compactMap { try? DappDefinitionAddress(validatingAddress: $0) }
 
 		return AccountPortfolio.FungibleResource(
 			resource: .init(
@@ -232,7 +233,8 @@ extension AccountPortfoliosClient {
 				iconURL: metadata?.iconURL,
 				behaviors: behaviors,
 				tags: tags,
-				totalSupply: totalSupply
+				totalSupply: totalSupply,
+				dappDefinitions: dappDefinitions
 			),
 			amount: amount
 		)
@@ -562,24 +564,25 @@ extension Array where Element == AccountPortfolio.FungibleResource {
 		}
 
 		let sortedNonXrdResources = nonXrdResources.sorted { lhs, rhs in
-//			if lhs.amount > .zero && rhs.amount > .zero {
-//				return lhs.amount > rhs.amount // Sort descending by amount
-//			}
-//			if lhs.amount != .zero || rhs.amount != .zero {
-//				return lhs.amount != .zero
-//			}
-//
-//			if let lhsSymbol = lhs.symbol, let rhsSymbol = rhs.symbol {
-//				return lhsSymbol < rhsSymbol // Sort alphabetically by symbol
-//			}
-//			if lhs.symbol != nil || rhs.symbol != nil {
-//				return lhs.symbol != nil
-//			}
-//
-//			if let lhsName = lhs.name, let rhsName = rhs.name {
-//				return lhsName < rhsName // Sort alphabetically by name
-//			}
-			lhs.resourceAddress.address < rhs.resourceAddress.address // Sort by address
+			if lhs.amount > .zero && rhs.amount > .zero {
+				return lhs.amount > rhs.amount // Sort descending by amount
+			}
+			if lhs.amount != .zero || rhs.amount != .zero {
+				return lhs.amount != .zero
+			}
+
+			if let lhsSymbol = lhs.symbol, let rhsSymbol = rhs.symbol {
+				return lhsSymbol < rhsSymbol // Sort alphabetically by symbol
+			}
+			if lhs.symbol != nil || rhs.symbol != nil {
+				return lhs.symbol != nil
+			}
+
+			if let lhsName = lhs.name, let rhsName = rhs.name {
+				return lhsName < rhsName // Sort alphabetically by name
+			}
+
+			return lhs.resourceAddress.address < rhs.resourceAddress.address // Sort by address
 		}
 
 		return .init(xrdResource: xrdResource, nonXrdResources: sortedNonXrdResources)

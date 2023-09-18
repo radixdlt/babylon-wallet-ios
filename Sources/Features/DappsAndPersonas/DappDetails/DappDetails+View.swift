@@ -19,8 +19,6 @@ extension DappDetails {
 		let domain: URL?
 		let thumbnail: URL?
 		let address: DappDefinitionAddress
-		let fungibles: [State.Resources.ResourceDetails]?
-		let nonFungibles: [State.Resources.ResourceDetails]?
 		let associatedDapps: [State.AssociatedDapp]?
 		let showForgetDapp: Bool
 		let tappablePersonas: Bool
@@ -69,15 +67,17 @@ extension DappDetails.View {
 				.sheet(
 					store: store.destination,
 					state: /DappDetails.Destination.State.fungibleDetails,
-					action: DappDetails.Destination.Action.fungibleDetails,
-					destination: { FungibleTokenDetails.View(store: $0) }
-				)
+					action: DappDetails.Destination.Action.fungibleDetails
+				) {
+					FungibleTokenDetails.View(store: $0)
+				}
 				.sheet(
 					store: store.destination,
 					state: /DappDetails.Destination.State.nonFungibleDetails,
-					action: DappDetails.Destination.Action.nonFungibleDetails,
-					destination: { NonFungibleTokenDetails.View(store: $0) }
-				)
+					action: DappDetails.Destination.Action.nonFungibleDetails
+				) {
+					NonFungibleTokenDetails.View(store: $0)
+				}
 				.alert(
 					store: store.destination,
 					state: /DappDetails.Destination.State.confirmDisconnectAlert,
@@ -98,12 +98,16 @@ private extension DappDetails.State {
 			domain: metadata?.claimedWebsites?.first,
 			thumbnail: metadata?.iconURL,
 			address: dAppDefinitionAddress,
-			fungibles: resources?.fungible,
-			nonFungibles: resources?.nonFungible,
 			associatedDapps: associatedDapps,
 			showForgetDapp: context != .general,
 			tappablePersonas: context == .settings(.authorizedDapps)
 		)
+	}
+}
+
+extension OnLedgerEntity.Resource {
+	var title: String {
+		name ?? symbol ?? L10n.DAppRequest.Metadata.unknownName
 	}
 }
 

@@ -94,25 +94,8 @@ public struct DappDetails: Sendable, FeatureReducer {
 		}
 
 		public struct Resources: Hashable, Sendable {
-			public var fungible: [ResourceDetails]
-			public var nonFungible: [ResourceDetails]
-
-			// TODO: This should be consolidated with other types that represent resources
-			public struct ResourceDetails: Identifiable, Hashable, Sendable {
-				public var id: ResourceAddress { address }
-
-				public let address: ResourceAddress
-				public let fungibility: Fungibility
-				public let name: String
-				public let symbol: String?
-				public let description: String?
-				public let iconURL: URL?
-
-				public enum Fungibility: Hashable, Sendable {
-					case fungible
-					case nonFungible
-				}
-			}
+			public var fungible: [OnLedgerEntity.Resource]
+			public var nonFungible: [OnLedgerEntity.Resource]
 		}
 
 		// TODO: This should be consolidated with other types that represent resources
@@ -238,7 +221,9 @@ public struct DappDetails: Sendable, FeatureReducer {
 		case let .nonFungibleTapped(address):
 			print("• nonFungibleTapped", address)
 
-			let resource = state.resources?.nonFungible.first { $0.address == address }
+//			state.destination = .nonFungibleDetails(.init(resource: <#T##OnLedgerEntity.Resource#>))
+
+//			let resource = state.resources?.nonFungible.first { $0.address == address }
 
 //			guard let resource else { return .none } // TODO: Show error?
 
@@ -366,15 +351,14 @@ public struct DappDetails: Sendable, FeatureReducer {
 		metadata: GatewayAPI.EntityMetadataCollection,
 		validated dAppDefinitionAddress: DappDefinitionAddress
 	) async -> Loadable<State.Resources> {
-		guard let claimedEntities = metadata.claimedEntities, !claimedEntities.isEmpty else { return .idle }
-		let result = await TaskResult {
-			let allResourceItems = try await gatewayAPIClient.fetchResourceDetails(claimedEntities, explicitMetadata: .resourceMetadataKeys)
-				.items
-				.filter { (try? $0.metadata.validate(dAppDefinitionAddress: dAppDefinitionAddress)) != nil }
-				.compactMap(\.resourceDetails)
+		let resources = metadata.claimedEntities?.compactMap { try? ResourceAddress(validatingAddress: $0) } ?? []
+		guard !resources.isEmpty else { return .idle }
 
-			return State.Resources(fungible: allResourceItems.filter { $0.fungibility == .fungible },
-			                       nonFungible: allResourceItems.filter { $0.fungibility == .nonFungible })
+		let result = await TaskResult {
+			let items = try await onLedgerEntitiesClient.getResources(resources)
+				.filter { $0.dappDefinitions?.contains(dAppDefinitionAddress) == true }
+			return State.Resources(fungible: items.filter { $0.fungibility == .fungible },
+			                       nonFungible: items.filter { $0.fungibility == .nonFungible })
 		}
 
 		return .init(result: result)
@@ -435,33 +419,21 @@ public struct DappDetails: Sendable, FeatureReducer {
 	}
 }
 
-extension GatewayAPI.StateEntityDetailsResponseItem {
-	fileprivate var resourceDetails: DappDetails.State.Resources.ResourceDetails? {
-		guard let fungibility else { return nil }
-		guard let address = try? ResourceAddress(validatingAddress: address) else {
-			loggerGlobal.warning("Failed to extract ResourceDetails for \(address)")
-			return nil
-		}
-		return .init(address: address,
-		             fungibility: fungibility,
-		             name: metadata.name ?? L10n.AuthorizedDapps.DAppDetails.unknownTokenName,
-		             symbol: metadata.symbol,
-		             description: metadata.description,
-		             iconURL: metadata.iconURL)
-	}
-
-	private var fungibility: DappDetails.State.Resources.ResourceDetails.Fungibility? {
-		guard let details else { return nil }
-		switch details {
-		case .fungibleResource:
-			return .fungible
-		case .nonFungibleResource:
-			return .nonFungible
-		case .fungibleVault, .nonFungibleVault, .package, .component:
-			return nil
-		}
-	}
-}
+// extension GatewayAPI.StateEntityDetailsResponseItem {
+//	fileprivate var resourceDetails: DappDetails.State.Resources.ResourceDetails? {
+//		guard let fungibility else { return nil }
+//		guard let address = try? ResourceAddress(validatingAddress: address) else {
+//			loggerGlobal.warning("Failed to extract ResourceDetails for \(address)")
+//			return nil
+//		}
+//		return .init(address: address,
+//		             fungibility: fungibility,
+//		             name: metadata.name ?? L10n.AuthorizedDapps.DAppDetails.unknownTokenName,
+//		             symbol: metadata.symbol,
+//		             description: metadata.description,
+//		             iconURL: metadata.iconURL)
+//	}
+// }
 
 extension AlertState<DappDetails.Destination.Action.ConfirmDisconnectAlert> {
 	static var confirmDisconnect: AlertState {
