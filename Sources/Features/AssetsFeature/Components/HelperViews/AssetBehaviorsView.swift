@@ -57,7 +57,7 @@ extension AssetBehavior {
 			return L10n.AccountSettings.Behaviors.supplyDecreasableByAnyone
 		case .supplyFlexible:
 			if isXRD {
-				return "Only the Radix Network may increase or decrease the supply of XRD." // FIXME: Strings
+				return L10n.AccountSettings.Behaviors.supplyFlexibleXrd
 			} else {
 				return L10n.AccountSettings.Behaviors.supplyFlexible
 			}

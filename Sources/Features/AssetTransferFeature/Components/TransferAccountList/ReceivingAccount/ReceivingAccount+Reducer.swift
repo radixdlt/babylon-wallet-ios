@@ -111,6 +111,14 @@ extension ReceivingAccount.State.Account {
 			return address
 		}
 	}
+
+	var isUserAccount: Bool {
+		guard case .left = self else {
+			return false
+		}
+
+		return true
+	}
 }
 
 // MARK: - ReceivingAccount.State.Account + Identifiable

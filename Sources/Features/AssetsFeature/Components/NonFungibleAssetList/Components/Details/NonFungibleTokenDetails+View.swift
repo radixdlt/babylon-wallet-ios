@@ -56,10 +56,6 @@ extension NonFungibleTokenDetails {
 							if let name = viewStore.name {
 								KeyValueView(key: L10n.AssetDetails.NFTDetails.name, value: name)
 							}
-
-							if let currentSupply = viewStore.resourceDetails.currentSupply {
-								KeyValueView(key: L10n.AssetDetails.currentSupply, value: currentSupply)
-							}
 						}
 						.lineLimit(1)
 						.frame(maxWidth: .infinity, alignment: .leading)
