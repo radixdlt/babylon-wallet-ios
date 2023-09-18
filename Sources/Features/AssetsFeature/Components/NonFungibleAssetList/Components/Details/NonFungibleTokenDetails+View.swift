@@ -23,7 +23,7 @@ extension NonFungibleTokenDetails.ViewState.TokenDetails {
 }
 
 extension AssetResourceDetailsSection.ViewState {
-	init(resource: AccountPortfolio.NonFungibleResource) {
+	init(resource: OnLedgerEntity.Resource) {
 		self.init(
 			description: resource.description,
 			resourceAddress: resource.resourceAddress,

@@ -42,86 +42,45 @@ extension AccountPortfolio {
 	}
 
 	public struct FungibleResource: Sendable, Hashable, Identifiable, Codable {
-		public var id: ResourceAddress { resource.id }
+		public let resource: OnLedgerEntity.Resource
 		public let amount: BigDecimal
-		public let resource: FungibleResourceBase
 
-		public init(amount: BigDecimal, resource: FungibleResourceBase) {
-			self.amount = amount
-			self.resource = resource
-		}
-	}
-
-	public struct FungibleResourceBase: Sendable, Hashable, Identifiable, Codable {
 		public var id: ResourceAddress { resourceAddress }
-		public let resourceAddress: ResourceAddress
-		public let divisibility: Int?
-		public let name: String?
-		public let symbol: String?
-		public let description: String?
-		public let iconURL: URL?
-		public let behaviors: [AssetBehavior]
-		public let tags: [AssetTag]
-		public let totalSupply: BigDecimal?
-		// TBD: Add the rest of required metadata fields
+		public var resourceAddress: ResourceAddress { resource.resourceAddress }
+		public var name: String? { resource.name }
+		public var symbol: String? { resource.symbol }
+		public var description: String? { resource.description }
+		public var iconURL: URL? { resource.iconURL }
+		public var behaviors: [AssetBehavior] { resource.behaviors }
+		public var tags: [AssetTag] { resource.tags }
+		public var totalSupply: BigDecimal? { resource.totalSupply }
 
-		public init(
-			resourceAddress: ResourceAddress,
-			divisibility: Int? = nil,
-			name: String? = nil,
-			symbol: String? = nil,
-			description: String? = nil,
-			iconURL: URL? = nil,
-			behaviors: [AssetBehavior] = [],
-			tags: [AssetTag] = [],
-			totalSupply: BigDecimal? = nil
-		) {
-			self.resourceAddress = resourceAddress
-			self.divisibility = divisibility
-			self.name = name
-			self.symbol = symbol
-			self.description = description
-			self.iconURL = iconURL
-			self.behaviors = behaviors
-			self.tags = tags
-			self.totalSupply = totalSupply
+		public init(resource: OnLedgerEntity.Resource, amount: BigDecimal) {
+			self.resource = resource
+			self.amount = amount
 		}
 	}
 
 	public struct NonFungibleResource: Sendable, Hashable, Identifiable, Codable {
-		public var id: ResourceAddress { resourceAddress }
-		public let resourceAddress: ResourceAddress
-		public let name: String?
-		public let description: String?
-		public let iconURL: URL?
-		public let behaviors: [AssetBehavior]
-		public let tags: [AssetTag]
+		public let resource: OnLedgerEntity.Resource
 		public let tokens: IdentifiedArrayOf<NonFungibleToken>
-		public let totalSupply: BigDecimal?
 
-		public init(
-			resourceAddress: ResourceAddress,
-			name: String? = nil,
-			description: String? = nil,
-			iconURL: URL? = nil,
-			behaviors: [AssetBehavior] = [],
-			tags: [AssetTag] = [],
-			tokens: IdentifiedArrayOf<NonFungibleToken> = [],
-			totalSupply: BigDecimal? = nil
-		) {
-			self.resourceAddress = resourceAddress
-			self.name = name
-			self.description = description
-			self.iconURL = iconURL
-			self.behaviors = behaviors
-			self.tags = tags
+		public var id: ResourceAddress { resourceAddress }
+		public var resourceAddress: ResourceAddress { resource.resourceAddress }
+		public var name: String? { resource.name }
+		public var symbol: String? { resource.symbol }
+		public var description: String? { resource.description }
+		public var iconURL: URL? { resource.iconURL }
+		public var behaviors: [AssetBehavior] { resource.behaviors }
+		public var tags: [AssetTag] { resource.tags }
+		public var totalSupply: BigDecimal? { resource.totalSupply }
+
+		public init(resource: OnLedgerEntity.Resource, tokens: IdentifiedArrayOf<NonFungibleToken>) {
+			self.resource = resource
 			self.tokens = tokens
-			self.totalSupply = totalSupply
 		}
 
-		public typealias NonFungibleToken = NonFungibleTokenBase
-
-		public struct NonFungibleTokenBase: Sendable, Hashable, Identifiable, Codable {
+		public struct NonFungibleToken: Sendable, Hashable, Identifiable, Codable {
 			public let id: NonFungibleGlobalId
 			public let name: String?
 			public let description: String?

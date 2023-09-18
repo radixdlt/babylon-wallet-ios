@@ -4,7 +4,7 @@ import FeaturePrelude
 extension FungibleTokenDetails.State {
 	var viewState: FungibleTokenDetails.ViewState {
 		.init(
-			detailsHeader: resource.detailsHeader(withAmount: context == .portfolio),
+			detailsHeader: detailsHeader,
 			thumbnail: isXRD ? .xrd : .known(resource.iconURL),
 			details: .init(
 				description: resource.description,
@@ -16,6 +16,14 @@ extension FungibleTokenDetails.State {
 				behaviors: resource.behaviors,
 				tags: isXRD ? resource.tags + [.officialRadix] : resource.tags
 			)
+		)
+	}
+
+	var detailsHeader: DetailsContainerWithHeaderViewState {
+		.init(
+			title: resource.name ?? L10n.Account.PoolUnits.unknownPoolUnitName,
+			amount: amount?.format(),
+			symbol: resource.symbol
 		)
 	}
 }
@@ -50,25 +58,3 @@ extension FungibleTokenDetails {
 		}
 	}
 }
-
-#if DEBUG
-import SwiftUI // NB: necessary for previews to appear
-
-struct FungibleTokenDetails_Preview: PreviewProvider {
-	static var previews: some View {
-		FungibleTokenDetails.View(
-			store: .init(
-				initialState: try! .init(
-					resource: .init(
-						resourceAddress: .init(validatingAddress: "resource_tdx_c_1qyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq40v2wv"),
-						amount: .zero
-					),
-					isXRD: true,
-					context: .portfolio
-				),
-				reducer: FungibleTokenDetails.init
-			)
-		)
-	}
-}
-#endif
