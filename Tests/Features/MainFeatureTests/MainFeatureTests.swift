@@ -13,7 +13,7 @@ final class MainFeatureTests: TestCase {
 		// when
 		await store.send(.child(.home(.delegate(.displaySettings)))) {
 			// then
-			$0.destination = .settings(.init(showMigrateOlympiaButton: true))
+			$0.destination = .settings(.init())
 		}
 
 		// when

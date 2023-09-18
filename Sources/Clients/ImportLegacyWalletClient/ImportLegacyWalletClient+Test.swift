@@ -12,6 +12,7 @@ extension DependencyValues {
 // MARK: - ImportLegacyWalletClient + TestDependencyKey
 extension ImportLegacyWalletClient: TestDependencyKey {
 	public static let previewValue = Self(
+		shouldShowImportWalletShortcutInSettings: { false },
 		parseHeaderFromQRCode: { _ in throw NoopError() },
 		parseLegacyWalletFromQRCodes: { _ in throw NoopError() },
 		migrateOlympiaSoftwareAccountsToBabylon: { _ in throw NoopError() },
@@ -20,6 +21,7 @@ extension ImportLegacyWalletClient: TestDependencyKey {
 	)
 
 	public static let testValue = Self(
+		shouldShowImportWalletShortcutInSettings: unimplemented("\(Self.self).shouldShowImportWalletShortcutInSettings"),
 		parseHeaderFromQRCode: unimplemented("\(Self.self).parseHeaderFromQRCode"),
 		parseLegacyWalletFromQRCodes: unimplemented("\(Self.self).parseLegacyWalletFromQRCodes"),
 		migrateOlympiaSoftwareAccountsToBabylon: unimplemented("\(Self.self).migrateOlympiaSoftwareAccountsToBabylon"),

@@ -10,7 +10,7 @@ extension App.State {
 		.init(
 			isOnMainnet: isOnMainnet,
 			hasMainnetEverBeenLive: hasMainnetEverBeenLive,
-			isCurrentlyOnboardingUserToMainnet: isCurrentlyOnboardingUserToMainnet
+			isCurrentlyOnboardingUser: isCurrentlyOnboardingUser
 		)
 	}
 }
@@ -20,15 +20,16 @@ extension App {
 	public struct ViewState: Equatable {
 		let isOnMainnet: Bool
 		let hasMainnetEverBeenLive: Bool
-		let isCurrentlyOnboardingUserToMainnet: Bool
+		let isCurrentlyOnboardingUser: Bool
 
 		var showIsUsingTestnetBanner: Bool {
 			guard hasMainnetEverBeenLive else {
 				return false
 			}
-			guard !isCurrentlyOnboardingUserToMainnet else {
+			if isCurrentlyOnboardingUser {
 				return false
 			}
+
 			return !isOnMainnet
 		}
 	}

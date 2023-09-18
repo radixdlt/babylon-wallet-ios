@@ -42,6 +42,26 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 		case migratedSoftwareAccounts(MigratedSoftwareAccounts)
 		case completion
 
+		enum Discriminator: String {
+			case start
+			case scannedQR
+			case foundAlreadyImported
+			case checkedIfOlympiaFactorSourceAlreadyExists
+			case migratedSoftwareAccounts
+			case completion
+		}
+
+		var discriminator: Discriminator {
+			switch self {
+			case .start: return .start
+			case .scannedQR: return .scannedQR
+			case .foundAlreadyImported: return .foundAlreadyImported
+			case .checkedIfOlympiaFactorSourceAlreadyExists: return .checkedIfOlympiaFactorSourceAlreadyExists
+			case .migratedSoftwareAccounts: return .migratedSoftwareAccounts
+			case .completion: return .completion
+			}
+		}
+
 		struct ScannedQR: Sendable, Hashable {
 			let expectedMnemonicWordCount: BIP39.WordCount
 			let scannedAccounts: AccountsToMigrate
@@ -450,7 +470,12 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 		in state: inout State,
 		softwareAccounts: MigratedSoftwareAccounts
 	) -> Effect<Action> {
-		guard case let .checkedIfOlympiaFactorSourceAlreadyExists(progress) = state.progress else { return progressError(state.progress) }
+		guard
+			case let .checkedIfOlympiaFactorSourceAlreadyExists(progress) = state.progress
+		else {
+			loggerGlobal.critical("Expected state to have been 'checkedIfOlympiaFactorSourceAlreadyExists' but it was: \(state.progress.discriminator)")
+			return progressError(state.progress)
+		}
 
 		state.progress = .migratedSoftwareAccounts(.init(
 			previous: progress.previous,
