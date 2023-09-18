@@ -1034,7 +1034,8 @@ extension DappInteractionFlow.Destinations.State {
 				message: item.message.map {
 					Message.plainText(value: .init(mimeType: "text", message: .str(value: $0)))
 				} ?? .none,
-				waitsForTransactionToBeComitted: interaction.id.isWalletAccountDepositSettingsInteraction
+				waitsForTransactionToBeComitted: interaction.id.isWalletAccountDepositSettingsInteraction,
+				isWalletTransaction: interaction.id.isWalletInteraction
 			)))
 		}
 	}

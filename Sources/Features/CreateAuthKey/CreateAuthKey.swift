@@ -169,7 +169,8 @@ public struct CreateAuthKey: Sendable, FeatureReducer {
 				transactionManifest: manifest,
 				nonce: .secureRandom(),
 				signTransactionPurpose: .internalManifest(.uploadAuthKey),
-				message: .none
+				message: .none,
+				isWalletTransaction: true
 			))
 			state.authenticationSigningFactorInstance = authenticationSigningFactorInstance
 			return .none
