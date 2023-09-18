@@ -42,6 +42,10 @@ extension P2P.Dapp.Request.ID {
 	public var isWalletAccountTransferInteraction: Bool {
 		rawValue.hasPrefix(DappInteractionClient.WalletInteraction.accountTransfer.rawValue)
 	}
+
+	public var isWalletInteraction: Bool {
+		isWalletAccountTransferInteraction || isWalletAccountDepositSettingsInteraction
+	}
 }
 
 extension DappInteractionClient {
