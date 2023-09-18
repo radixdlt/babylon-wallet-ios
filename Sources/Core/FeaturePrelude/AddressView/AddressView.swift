@@ -25,8 +25,7 @@ public struct AddressView: View {
 
 	public init(
 		_ identifiable: LedgerIdentifiable,
-		isTappable: Bool = true,
-		isLedgerAccount: Bool = false
+		isTappable: Bool = true
 	) {
 		self.identifiable = identifiable
 		self.isTappable = isTappable
