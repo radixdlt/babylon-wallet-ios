@@ -19,7 +19,7 @@ final class LedgerModelTests: TestCase {
 			interactionID: "32b94cc3-2418-4964-9877-b3cd1d66a007",
 			discriminator: .derivePublicKeys,
 			response: .success(
-				.derivePublicKeys([])
+				.derivePublicKeys([.init(curve: "curve25519", derivationPath: "testPath", publicKey: "03e6e5f34b265cca342ac711e68b5df9d839bc722e0b004f471539867d179d57c8")])
 			)
 		)
 
