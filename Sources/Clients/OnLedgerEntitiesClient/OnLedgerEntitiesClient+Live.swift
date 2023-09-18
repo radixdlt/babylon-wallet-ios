@@ -62,36 +62,45 @@ extension OnLedgerEntitiesClient {
 
 		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
 
-		let details = try await gatewayAPIClient.getEntityDetails(addresses.map(\.address), .resourceMetadataKeys, nil)
-		return try details.items.compactMap {
-			switch $0.details {
-			case let .fungibleResource(fungibleDetails):
-				return try .resource(.init(
-					resourceAddress: .init(validatingAddress: $0.address),
-					divisibility: fungibleDetails.divisibility,
-					name: $0.explicitMetadata?.name,
-					symbol: $0.explicitMetadata?.symbol,
-					description: $0.explicitMetadata?.description,
-					iconURL: $0.explicitMetadata?.iconURL,
-					behaviors: $0.details?.fungible?.roleAssignments.extractBehaviors() ?? [],
-					tags: $0.extractTags(),
-					totalSupply: try? BigDecimal(fromString: fungibleDetails.totalSupply)
-				))
-			case let .nonFungibleResource(nonFungibleDetails):
-				return try .resource(.init(
-					resourceAddress: .init(validatingAddress: $0.address),
-					divisibility: nil,
-					name: $0.explicitMetadata?.name,
-					symbol: nil,
-					description: $0.explicitMetadata?.description,
-					iconURL: $0.explicitMetadata?.iconURL,
-					behaviors: $0.details?.nonFungible?.roleAssignments.extractBehaviors() ?? [],
-					tags: $0.extractTags(),
-					totalSupply: try? BigDecimal(fromString: nonFungibleDetails.totalSupply)
-				))
-			default:
-				return nil
-			}
+		return try await gatewayAPIClient
+			.getEntityDetails(addresses.map(\.address), .resourceMetadataKeys, nil)
+			.items
+			.compactMap(createEntity)
+	}
+
+	@Sendable
+	static func createEntity(from item: GatewayAPI.StateEntityDetailsResponseItem) throws -> OnLedgerEntity? {
+		let dappDefinitions = item.metadata.dappDefinitions?.compactMap { try? DappDefinitionAddress(validatingAddress: $0) }
+
+		switch item.details {
+		case let .fungibleResource(fungibleDetails):
+			return try .resource(.init(
+				resourceAddress: .init(validatingAddress: item.address),
+				divisibility: fungibleDetails.divisibility,
+				name: item.explicitMetadata?.name,
+				symbol: item.explicitMetadata?.symbol,
+				description: item.explicitMetadata?.description,
+				iconURL: item.explicitMetadata?.iconURL,
+				behaviors: item.details?.fungible?.roleAssignments.extractBehaviors() ?? [],
+				tags: item.extractTags(),
+				totalSupply: try? BigDecimal(fromString: fungibleDetails.totalSupply),
+				dappDefinitions: dappDefinitions
+			))
+		case let .nonFungibleResource(nonFungibleDetails):
+			return try .resource(.init(
+				resourceAddress: .init(validatingAddress: item.address),
+				divisibility: nil,
+				name: item.explicitMetadata?.name,
+				symbol: nil,
+				description: item.explicitMetadata?.description,
+				iconURL: item.explicitMetadata?.iconURL,
+				behaviors: item.details?.nonFungible?.roleAssignments.extractBehaviors() ?? [],
+				tags: item.extractTags(),
+				totalSupply: try? BigDecimal(fromString: nonFungibleDetails.totalSupply),
+				dappDefinitions: dappDefinitions
+			))
+		default:
+			return nil
 		}
 	}
 }
