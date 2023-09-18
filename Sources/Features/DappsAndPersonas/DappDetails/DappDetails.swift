@@ -94,8 +94,8 @@ public struct DappDetails: Sendable, FeatureReducer {
 		}
 
 		public struct Resources: Hashable, Sendable {
-			public var fungible: [OnLedgerEntity.Resource]
-			public var nonFungible: [OnLedgerEntity.Resource]
+			public var fungible: IdentifiedArrayOf<OnLedgerEntity.Resource>
+			public var nonFungible: IdentifiedArrayOf<OnLedgerEntity.Resource>
 		}
 
 		// TODO: This should be consolidated with other types that represent resources
@@ -357,8 +357,10 @@ public struct DappDetails: Sendable, FeatureReducer {
 		let result = await TaskResult {
 			let items = try await onLedgerEntitiesClient.getResources(resources)
 				.filter { $0.dappDefinitions?.contains(dAppDefinitionAddress) == true }
-			return State.Resources(fungible: items.filter { $0.fungibility == .fungible },
-			                       nonFungible: items.filter { $0.fungibility == .nonFungible })
+			let array: IdentifiedArray = .init(items) { $1 }
+
+			return State.Resources(fungible: array.filter { $0.fungibility == .fungible },
+			                       nonFungible: array.filter { $0.fungibility == .nonFungible })
 		}
 
 		return .init(result: result)

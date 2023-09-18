@@ -105,11 +105,11 @@ private extension DappDetails.State {
 	}
 
 	var fungibles: [OnLedgerEntity.Resource] {
-		resources?.fungible ?? []
+		resources?.fungible.elements ?? []
 	}
 
 	var nonFungibles: [OnLedgerEntity.Resource] {
-		resources?.nonFungible ?? []
+		resources?.nonFungible.elements ?? []
 	}
 }
 
