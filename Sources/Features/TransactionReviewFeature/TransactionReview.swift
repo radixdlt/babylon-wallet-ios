@@ -291,20 +291,13 @@ public struct TransactionReview: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
-		case let .withdrawals(.delegate(.showAsset(assetTransfer))),
-		     let .deposits(.delegate(.showAsset(assetTransfer))):
-			switch assetTransfer {
-			case let .fungible(transfer):
-				state.destination = .fungibleTokenDetails(.init(
-					resource: transfer.fungibleResource,
-					amount: nil,
-					isXRD: transfer.isXRD
-				))
-			case let .nonFungible(transfer):
-				state.destination = .nonFungibleTokenDetails(.init(
-					resource: transfer.nonFungibleResource,
-					token: transfer.token
-				))
+		case let .withdrawals(.delegate(.showAsset(transfer))),
+		     let .deposits(.delegate(.showAsset(transfer))):
+			switch transfer.details {
+			case let .fungible(details):
+				state.destination = .fungibleTokenDetails(.init(resource: transfer.resource, isXRD: details.isXRD))
+			case let .nonFungible(details):
+				state.destination = .nonFungibleTokenDetails(.init(resource: transfer.resource, token: details))
 			}
 
 			return .none
@@ -351,10 +344,9 @@ public struct TransactionReview: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, presentedAction: Destinations.Action) -> Effect<Action> {
 		switch presentedAction {
-		case let .customizeGuarantees(.delegate(.applyGuarantees(guarantees))):
-			for transfer in guarantees.map(\.transfer) {
-				guard let guarantee = transfer.guarantee else { continue }
-				state.applyGuarantee(guarantee, transferID: transfer.id)
+		case let .customizeGuarantees(.delegate(.applyGuarantees(guaranteeStates))):
+			for guaranteeState in guaranteeStates {
+				state.applyGuarantee(guaranteeState.guarantee, transferID: guaranteeState.id)
 			}
 
 			return .none
@@ -510,10 +502,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 extension Collection<TransactionReviewAccount.State> {
 	var customizableGuarantees: [TransactionReviewGuarantee.State] {
 		flatMap { account in
-			account.transfers
-				.compactMap(\.fungible)
-				.filter { $0.guarantee != nil }
-				.compactMap { .init(account: account.account, transfer: $0) }
+			account.transfers.compactMap { .init(account: account.account, transfer: $0) }
 		}
 	}
 }
@@ -866,7 +855,7 @@ extension TransactionReview {
 			let amount = try BigDecimal(fromString: source.amount.asStr())
 
 			switch try await resourceInfo() {
-			case let .left(onLedgerEntity):
+			case let .left(resource):
 				// A fungible resource existing on ledger
 				let isXRD = resourceAddress.isXRD(on: networkID)
 
@@ -876,21 +865,29 @@ extension TransactionReview {
 					return .init(amount: guaranteedAmount, instructionIndex: instructionIndex, resourceAddress: resourceAddress)
 				}
 
-				return [.fungible(.init(
-					fungibleResource: onLedgerEntity,
+				let details: Transfer.Details.Fungible = .init(
 					isXRD: isXRD,
 					amount: amount,
 					guarantee: guarantee()
-				))]
+				)
+
+				return [.init(resource: resource, details: .fungible(details))]
 
 			case let .right(newEntityMetadata):
 				// A newly created fungible resource
 
-				return [.fungible(.init(
-					fungibleResource: .init(resourceAddress: resourceAddress, metadata: newEntityMetadata),
+				let resource: OnLedgerEntity.Resource = .init(
+					resourceAddress: resourceAddress,
+					metadata: newEntityMetadata
+				)
+
+				let details: Transfer.Details.Fungible = .init(
 					isXRD: false,
-					amount: amount
-				))]
+					amount: amount,
+					guarantee: nil
+				)
+
+				return [.init(resource: resource, details: .fungible(details))]
 			}
 		case let .nonFungible(_, _, .guaranteed(ids)),
 		     let .nonFungible(_, _, ids: .predicted(instructionIndex: _, value: ids)):
@@ -898,12 +895,12 @@ extension TransactionReview {
 			let result: [Transfer]
 
 			switch try await resourceInfo() {
-			case let .left(onLedgerEntity):
+			case let .left(resource):
 				// A non-fungible resource existing on ledger
 
 				// Existing or newly minted tokens
 				result = try await tokenInfo(ids, for: resourceAddress).map { token in
-					.nonFungible(.init(nonFungibleResource: onLedgerEntity, token: token))
+					.init(resource: resource, details: .nonFungible(token))
 				}
 
 			case let .right(newEntityMetadata):
@@ -913,7 +910,7 @@ extension TransactionReview {
 
 				// Newly minted tokens
 				result = try newTokenInfo(ids, for: resourceAddress).map { token in
-					.nonFungible(.init(nonFungibleResource: resource, token: token))
+					.init(resource: resource, details: .nonFungible(token))
 				}
 			}
 
@@ -1040,54 +1037,7 @@ extension TransactionReview {
 		}
 	}
 
-	public enum Transfer: Sendable, Identifiable, Hashable {
-		public typealias ID = Tagged<Self, UUID>
-
-		case fungible(FungibleTransfer)
-		case nonFungible(NonFungibleTransfer)
-
-		public var id: ID {
-			switch self {
-			case let .fungible(details):
-				return details.id
-			case let .nonFungible(details):
-				return details.id
-			}
-		}
-
-		public var resource: ResourceAddress {
-			switch self {
-			case let .fungible(details):
-				return details.fungibleResource.resourceAddress
-			case let .nonFungible(details):
-				return details.nonFungibleResource.resourceAddress
-			}
-		}
-
-		public var fungible: FungibleTransfer? {
-			get {
-				guard case let .fungible(details) = self else { return nil }
-				return details
-			}
-			set {
-				guard case .fungible = self, let newValue else { return }
-				self = .fungible(newValue)
-			}
-		}
-
-		public var nonFungible: NonFungibleTransfer? {
-			get {
-				guard case let .nonFungible(details) = self else { return nil }
-				return details
-			}
-			set {
-				guard case .nonFungible = self, let newValue else { return }
-				self = .nonFungible(newValue)
-			}
-		}
-	}
-
-	public struct FungibleTransfer: Sendable, Hashable {
+	public struct FungibleTransfer_: Sendable, Hashable {
 		public let id = Transfer.ID()
 		public let fungibleResource: OnLedgerEntity.Resource
 		public let isXRD: Bool
@@ -1095,21 +1045,55 @@ extension TransactionReview {
 		public var guarantee: TransactionClient.Guarantee?
 	}
 
-	public struct NonFungibleTransfer: Sendable, Hashable {
+	public struct NonFungibleTransfer_: Sendable, Hashable {
 		public let id = Transfer.ID()
 		public let nonFungibleResource: OnLedgerEntity.Resource
 		public let token: AccountPortfolio.NonFungibleResource.NonFungibleToken
+	}
+
+	public struct Transfer: Sendable, Identifiable, Hashable {
+		public typealias ID = Tagged<Self, UUID>
+
+		public let id = ID()
+		public let resource: OnLedgerEntity.Resource
+		public var details: Details
+
+		public enum Details: Sendable, Hashable {
+			case fungible(Fungible)
+			case nonFungible(NonFungible)
+
+			public struct Fungible: Sendable, Hashable {
+				public let isXRD: Bool
+				public let amount: BigDecimal
+				public var guarantee: TransactionClient.Guarantee?
+			}
+
+			public typealias NonFungible = AccountPortfolio.NonFungibleResource.NonFungibleToken
+		}
+
+		/// The guarantee, for a fungible resource
+		public var fungibleGuarantee: TransactionClient.Guarantee? {
+			get {
+				guard case let .fungible(fungible) = details else { return nil }
+				return fungible.guarantee
+			}
+			set {
+				guard case var .fungible(fungible) = details else { return }
+				fungible.guarantee = newValue
+				details = .fungible(fungible)
+			}
+		}
 	}
 }
 
 extension TransactionReview.State {
 	public var allGuarantees: [TransactionClient.Guarantee] {
-		deposits?.accounts.flatMap { $0.transfers.compactMap(\.fungible?.guarantee) } ?? []
+		deposits?.accounts.flatMap { $0.transfers.compactMap(\.fungibleGuarantee) } ?? []
 	}
 
 	public mutating func applyGuarantee(_ updated: TransactionClient.Guarantee, transferID: TransactionReview.Transfer.ID) {
 		guard let accountID = accountID(for: transferID) else { return }
-		deposits?.accounts[id: accountID]?.transfers[id: transferID]?.fungible?.guarantee = updated
+		deposits?.accounts[id: accountID]?.transfers[id: transferID]?.fungibleGuarantee = updated
 	}
 
 	private func accountID(for transferID: TransactionReview.Transfer.ID) -> AccountAddress.ID? {
