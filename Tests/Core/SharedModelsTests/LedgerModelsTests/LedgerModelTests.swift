@@ -19,7 +19,7 @@ final class LedgerModelTests: TestCase {
 			interactionID: "32b94cc3-2418-4964-9877-b3cd1d66a007",
 			discriminator: .derivePublicKeys,
 			response: .success(
-				.derivePublicKeys([.init(curve: "curve25519", derivationPath: "testPath", publicKey: "03e6e5f34b265cca342ac711e68b5df9d839bc722e0b004f471539867d179d57c8")])
+				.derivePublicKeys([])
 			)
 		)
 
@@ -54,6 +54,50 @@ final class LedgerModelTests: TestCase {
 					id: .init(hex: "41ac202687326a4fc6cb677e9fd92d08b91ce46c669950d58790d4d5e583adc0"),
 					model: .nanoS
 				))
+			)
+		)
+
+		// Decode assocated value
+		try XCTAssertJSONDecoding(
+			json,
+			expected
+		)
+
+		// Decode enum
+		try XCTAssertJSONDecoding(
+			json,
+			P2P.ConnectorExtension.Response.ledgerHardwareWallet(expected)
+		)
+	}
+
+	func test_decode_deriveAndDisplayAddress() throws {
+		let json: JSON = [
+			"success": [
+				"address": "account_tdx_e_128gdgkz846vyznldh6n6xcg3lpsx6r9g7j3rhrxuqa4q7kp52435zx",
+				"derivedKey": [
+					"curve": "curve25519",
+					"publicKey": "59faefda7f27792630f54711a79b63de5fa55c45f7e701992d13f4a662954df8",
+					"derivationPath": "m/44H/1022H/14H/525H/1460H/3H",
+				],
+			],
+			"interactionId": "010F97C0-1542-4690-A044-0406C2E6F157",
+			"discriminator": "deriveAndDisplayAddress",
+		]
+
+		let expected = P2P.ConnectorExtension.Response.LedgerHardwareWallet(
+			interactionID: "010F97C0-1542-4690-A044-0406C2E6F157",
+			discriminator: .deriveAndDisplayAddress,
+			response: .success(
+				.deriveAndDisplayAddress(
+					.init(
+						derivedKey: .init(
+							curve: "curve25519",
+							derivationPath: "m/44H/1022H/14H/525H/1460H/3H",
+							publicKey: "59faefda7f27792630f54711a79b63de5fa55c45f7e701992d13f4a662954df8"
+						),
+						address: "account_tdx_e_128gdgkz846vyznldh6n6xcg3lpsx6r9g7j3rhrxuqa4q7kp52435zx"
+					)
+				)
 			)
 		)
 

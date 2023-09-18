@@ -56,7 +56,7 @@ extension P2P.ConnectorExtension.Response.LedgerHardwareWallet {
 		}
 
 		public struct DerivedAddress: Sendable, Hashable, Decodable {
-			public let derivedPublicKey: DerivedPublicKey
+			public let derivedKey: DerivedPublicKey
 			public let address: String
 		}
 

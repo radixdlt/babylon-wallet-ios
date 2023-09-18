@@ -175,7 +175,7 @@ extension LedgerHardwareWalletClient: DependencyKey {
 					responseCasePath: /P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.deriveAndDisplayAddress
 				)
 
-				return try (response.derivedPublicKey.hdPubKey(), address: response.address)
+				return try (response.derivedKey.hdPubKey(), address: response.address)
 			}
 		)
 	}()
