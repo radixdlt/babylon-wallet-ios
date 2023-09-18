@@ -174,7 +174,8 @@ extension Instruction: Hashable {
 		     (.dropAuthZoneProofs, .dropAuthZoneProofs),
 		     (.dropAuthZoneRegularProofs, .dropAuthZoneRegularProofs),
 		     (.dropAuthZoneSignatureProofs, .dropAuthZoneSignatureProofs),
-		     (.dropAllProofs, .dropAllProofs):
+		     (.dropAllProofs, .dropAllProofs),
+		     (.dropNamedProofs, .dropNamedProofs):
 			return true
 		case let (.pushToAuthZone(lhs), .pushToAuthZone(rhs)):
 			return lhs == rhs
@@ -190,6 +191,8 @@ extension Instruction: Hashable {
 			return lhs == rhs
 		case let (.dropProof(lhs), .dropProof(rhs)):
 			return lhs == rhs
+		case let (.assertWorktopContainsAny(lhs), .assertWorktopContainsAny(rhs)):
+			return lhs == rhs
 		case let (.createProofFromBucketOfAmount(lhsBucketId, lhsAmount), .createProofFromBucketOfAmount(rhsBucketId, rhsAmount)):
 			return lhsBucketId == rhsBucketId && lhsAmount == rhsAmount
 		case let (.createProofFromBucketOfNonFungibles(lhsBucketId, lhsIds), .createProofFromBucketOfNonFungibles(rhsBucketId, rhsIds)):
@@ -202,6 +205,10 @@ extension Instruction: Hashable {
 		     let (.callRoyaltyMethod(lhsAddress, lhsMethodName, lhsArgs), .callRoyaltyMethod(rhsAddress, rhsMethodName, rhsArgs)),
 		     let (.callMetadataMethod(lhsAddress, lhsMethodName, lhsArgs), .callMetadataMethod(rhsAddress, rhsMethodName, rhsArgs)),
 		     let (.callRoleAssignmentMethod(lhsAddress, lhsMethodName, lhsArgs), .callRoleAssignmentMethod(rhsAddress, rhsMethodName, rhsArgs)):
+			return lhsAddress == rhsAddress && lhsMethodName == rhsMethodName && lhsArgs == rhsArgs
+		case let (.allocateGlobalAddress(lhsPackageAddress, lhsbBlueprintName), .allocateGlobalAddress(rhsPackageAddress, rhsBlueprintName)):
+			return lhsPackageAddress == rhsPackageAddress && lhsbBlueprintName == rhsBlueprintName
+		case let (.callDirectVaultMethod(lhsAddress, lhsMethodName, lhsArgs), .callDirectVaultMethod(rhsAddress, rhsMethodName, rhsArgs)):
 			return lhsAddress == rhsAddress && lhsMethodName == rhsMethodName && lhsArgs == rhsArgs
 		default:
 			return false
