@@ -157,12 +157,14 @@ public struct DappDetails: Sendable, FeatureReducer {
 	public struct Destination: Reducer {
 		public enum State: Equatable, Hashable {
 			case personaDetails(PersonaDetails.State)
+			case fungibleDetails(FungibleTokenDetails.State)
 			case nonFungibleDetails(NonFungibleTokenDetails.State)
 			case confirmDisconnectAlert(AlertState<Action.ConfirmDisconnectAlert>)
 		}
 
 		public enum Action: Equatable {
 			case personaDetails(PersonaDetails.Action)
+			case fungibleDetails(FungibleTokenDetails.Action)
 			case nonFungibleDetails(NonFungibleTokenDetails.Action)
 			case confirmDisconnectAlert(ConfirmDisconnectAlert)
 
@@ -175,6 +177,9 @@ public struct DappDetails: Sendable, FeatureReducer {
 		public var body: some ReducerOf<Self> {
 			Scope(state: /State.personaDetails, action: /Action.personaDetails) {
 				PersonaDetails()
+			}
+			Scope(state: /State.fungibleDetails, action: /Action.fungibleDetails) {
+				FungibleTokenDetails()
 			}
 			Scope(state: /State.nonFungibleDetails, action: /Action.nonFungibleDetails) {
 				NonFungibleTokenDetails()

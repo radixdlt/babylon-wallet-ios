@@ -66,7 +66,13 @@ extension DappDetails.View {
 					action: DappDetails.Destination.Action.personaDetails,
 					destination: { PersonaDetails.View(store: $0) }
 				)
-				.navigationDestination(
+				.sheet(
+					store: store.destination,
+					state: /DappDetails.Destination.State.fungibleDetails,
+					action: DappDetails.Destination.Action.fungibleDetails,
+					destination: { FungibleTokenDetails.View(store: $0) }
+				)
+				.sheet(
 					store: store.destination,
 					state: /DappDetails.Destination.State.nonFungibleDetails,
 					action: DappDetails.Destination.Action.nonFungibleDetails,
