@@ -5,6 +5,12 @@ extension BigDecimal {
 	// Used for development purposes
 	public static let temporaryStandardFee: BigDecimal = 25
 	public static let defaultMaxPlacesFormattted: UInt = 8
+
+	// N.B. We cannot use `Local.current.decimalSeperator` here because
+	// `github.com/Zollerbo1/BigDecimal` package **hardcodes** usage of
+	// the decimal separator ".", see this line here:
+	// https://github.com/Zollerboy1/BigDecimal/blob/main/Sources/BigDecimal/BigDecimal.swift#L469
+	public static let integerAndDecimalPartsSeparator = "."
 }
 
 extension BigDecimal {
@@ -15,29 +21,21 @@ extension BigDecimal {
 		fiatCurrency.sign + format(locale: locale)
 	}
 
-	/// Formats the number for human consumtion
-	public func format(
-		maxPlaces maxPlacesNonNegative: UInt = BigDecimal.defaultMaxPlacesFormattted,
-		divisibility: Int? = nil,
-		locale: Locale = .autoupdatingCurrent
-	) -> String {
-		// N.B. We cannot use `Local.current.decimalSeperator` here because
-		// `github.com/Zollerbo1/BigDecimal` package **hardcodes** usage of
-		// the decimal separator ".", see this line here:
-		// https://github.com/Zollerboy1/BigDecimal/blob/main/Sources/BigDecimal/BigDecimal.swift#L469
-		let separatorRequiredByBigDecimalLib = "."
+	public func integerAndDecimalPart(withDivisibility divisibility: Int?) -> (String, String?) {
 		let stringRepresentation = String(describing: self)
 
 		guard
-			case let components = stringRepresentation.split(separator: separatorRequiredByBigDecimalLib),
+			case let components = stringRepresentation.split(
+				separator: Self.integerAndDecimalPartsSeparator
+			),
 			components.count == 2
 		else {
-			return stringRepresentation
+			return (stringRepresentation, nil)
 		}
 
 		let integerPart = String(components[0])
-		let decimalComponents = components[1]
-		let decimalPart = {
+		let decimalPart = String({
+			let decimalComponents = components[1]
 			guard let divisibility else {
 				return decimalComponents
 			}
@@ -47,9 +45,19 @@ extension BigDecimal {
 			}
 
 			return decimalComponents.prefix(divisibility)
-		}()
+		}())
 
-		guard !decimalPart.isEmpty else {
+		return (integerPart, decimalPart.isEmpty ? nil : decimalPart)
+	}
+
+	/// Formats the number for human consumtion
+	public func format(
+		maxPlaces maxPlacesNonNegative: UInt = BigDecimal.defaultMaxPlacesFormattted,
+		divisibility: Int? = nil,
+		locale: Locale = .autoupdatingCurrent
+	) -> String {
+		let (integerPart, decimalPart) = integerAndDecimalPart(withDivisibility: divisibility)
+		guard let decimalPart else {
 			return integerPart
 		}
 

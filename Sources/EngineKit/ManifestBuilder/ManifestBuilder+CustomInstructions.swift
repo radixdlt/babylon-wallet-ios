@@ -58,16 +58,6 @@ extension Instructions {
 		instructionList.insert(instruction, at: index)
 		return try .fromInstructions(instructions: instructionList, networkId: self.networkId())
 	}
-
-	public func withLockFeeCallMethodAdded(
-		address: Address,
-		fee: BigDecimal = .temporaryStandardFee
-	) throws -> Instructions {
-		try withInstructionAdded(
-			.lockFeeCall(address: address, fee: fee),
-			at: 0
-		)
-	}
 }
 
 extension Instruction {
@@ -75,6 +65,14 @@ extension Instruction {
 		address: Address,
 		fee: BigDecimal
 	) throws -> Instruction {
-		try .callMethod(address: .static(value: .init(address: address.address)), methodName: "lock_fee", args: .tupleValue(fields: [.decimalValue(value: fee.intoEngine())]))
+		try .callMethod(
+			address: .static(value: .init(address: address.address)),
+			methodName: "lock_fee",
+			args: .tupleValue(
+				fields: [
+					.decimalValue(value: fee.asDecimal()),
+				]
+			)
+		)
 	}
 }

@@ -146,6 +146,7 @@ extension AssetTransfer {
 
 		let address: ResourceAddress
 		let totalTransferAmount: BigDecimal
+		let divisibility: Int?
 		var accounts: IdentifiedArrayOf<PerAccountAmount>
 	}
 
@@ -179,14 +180,14 @@ extension AssetTransfer {
 				try ManifestBuilder.withdrawAmount(
 					accounts.fromAccount.address.intoEngine(),
 					resource.address.intoEngine(),
-					resource.totalTransferAmount.intoEngine()
+					resource.totalTransferAmount.asDecimal(withDivisibility: resource.divisibility)
 				)
 
 				for account in resource.accounts {
 					let bucket = ManifestBuilderBucket.unique
 					try ManifestBuilder.takeFromWorktop(
 						resource.address.intoEngine(),
-						account.amount.intoEngine(),
+						account.amount.asDecimal(withDivisibility: resource.divisibility),
 						bucket
 					)
 
@@ -265,6 +266,7 @@ extension AssetTransfer {
 					resources.append(.init(
 						address: fungibleAsset.resource.resourceAddress,
 						totalTransferAmount: fungibleAsset.totalTransferSum,
+						divisibility: fungibleAsset.resource.divisibility,
 						accounts: [accountTransfer]
 					))
 				}
