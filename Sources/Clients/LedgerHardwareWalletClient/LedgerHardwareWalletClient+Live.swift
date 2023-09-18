@@ -3,6 +3,7 @@ import ComposableArchitecture // actually CasePaths... but CI fails if we do `im
 import Cryptography
 import EngineKit
 import FactorSourcesClient
+import OverlayWindowClient
 import struct Profile.Signer
 import RadixConnectClient
 import ROLAClient
@@ -56,22 +57,10 @@ extension LedgerHardwareWalletClient: DependencyKey {
 					switch errorFromConnectorExtension.code {
 					case .generic: break
 					case .blindSigningNotEnabledButRequired:
-						_ = await overlayWindowClient.scheduleAlert(.init(
-							title: {
-								TextState(
-									"Failed"
-								)
-							},
-							actions: {
-								ButtonState(label: {
-									TextState("OK")
-								})
-							}, message: {
-								TextState("Blind signing required but not enabled.")
-							}
-						)
-						)
+						overlayWindowClient.scheduleHUD(.init(text: errorFromConnectorExtension.localizedDescription, icon: .init(kind: .asset(AssetResource.error), foregroundColor: Color.app.red1)))
 					}
+
+					throw errorFromConnectorExtension
 				}
 
 				clientsLeftToReceiveAnswerFrom -= 1
