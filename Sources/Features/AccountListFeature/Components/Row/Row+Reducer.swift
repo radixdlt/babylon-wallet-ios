@@ -2,8 +2,6 @@ import AccountPortfoliosClient
 import EngineKit
 import FactorSourcesClient
 import FeaturePrelude
-import LedgerHardwareWalletClient
-import OverlayWindowClient
 
 // MARK: - AccountList.Row
 extension AccountList {

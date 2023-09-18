@@ -127,9 +127,10 @@ extension AddressView {
 		@Dependency(\.ledgerHardwareWalletClient) var ledgerHardwareWalletClient
 		@Dependency(\.overlayWindowClient) var overlayWindowClient
 		do {
-			let addressDerivedOnLedger = try await ledgerHardwareWalletClient.verifyAddress(of: accountAddress)
+			let outcome = try await ledgerHardwareWalletClient.verifyAddress(of: accountAddress)
 
-			if addressDerivedOnLedger == accountAddress.address {
+			switch outcome {
+			case .verifiedSame:
 				overlayWindowClient.scheduleHUD(.init(
 					text: "Address verified",
 					icon: .init(
@@ -137,11 +138,35 @@ extension AddressView {
 						foregroundColor: Color.app.green1
 					)
 				))
-			} else {
-				loggerGlobal.error("Mismatch in address, [ledger deriverd] \(addressDerivedOnLedger) != \(accountAddress.address) [expected]")
+
+			case let .mismatch(discrepancy):
+				let reason: String = {
+					switch discrepancy {
+					case .addressMismatch:
+						return "Invalid! Addresses do not match" // FIXME: Strings
+					case .publicKeyMismatch:
+						return "Invalid! Neither addresses nor public keys match" // FIXME: Strings
+					}
+				}()
+				loggerGlobal.critical("Discrepancy invalid ledger account, reason: \(reason)")
+				overlayWindowClient.scheduleHUD(.init(
+					text: reason,
+					icon: .init(
+						kind: .asset(AssetResource.error),
+						foregroundColor: Color.app.red1
+					)
+				))
 			}
+
 		} catch {
-			loggerGlobal.error("Failed to verifyAddress on Ledger, error: \(error)")
+			loggerGlobal.error("Verify Address request failed, error: \(error)")
+			overlayWindowClient.scheduleHUD(.init(
+				text: "Verify Address request failed.", // FIXME: Strings
+				icon: .init(
+					kind: .asset(AssetResource.error),
+					foregroundColor: Color.app.red1
+				)
+			))
 		}
 	}
 }

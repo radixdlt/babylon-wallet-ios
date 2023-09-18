@@ -25,6 +25,18 @@ extension LedgerHardwareWalletClient {
 	public typealias SignAuthChallenge = @Sendable (SignAuthChallengeWithLedgerRequest) async throws -> Set<SignatureOfEntity>
 }
 
+// MARK: - VerifyAddressOutcome
+public enum VerifyAddressOutcome: Sendable, Hashable {
+	public enum Mismatch: Sendable, Hashable {
+		case publicKeyMismatch
+		case addressMismatch
+	}
+
+	/// Either addresses do not match, or public key do not match.
+	case mismatch(Mismatch)
+	case verifiedSame
+}
+
 // MARK: - SignTransactionWithLedgerRequest
 public struct SignTransactionWithLedgerRequest: Sendable, Hashable {
 	public let signers: NonEmpty<IdentifiedArrayOf<Signer>>
@@ -82,14 +94,14 @@ struct FailedToFindLedger: LocalizedError {
 
 extension LedgerHardwareWalletClient {
 	@discardableResult
-	public func verifyAddress(of accountAddress: AccountAddress) async throws -> String {
+	public func verifyAddress(of accountAddress: AccountAddress) async throws -> VerifyAddressOutcome {
 		@Dependency(\.accountsClient) var accountsClient
 		let account = try await accountsClient.getAccountByAddress(accountAddress)
 		return try await verifyAddress(of: account)
 	}
 
 	@discardableResult
-	public func verifyAddress(of account: Profile.Network.Account) async throws -> String {
+	public func verifyAddress(of account: Profile.Network.Account) async throws -> VerifyAddressOutcome {
 		@Dependency(\.factorSourcesClient) var factorSourcesClient
 		switch account.securityState {
 		case let .unsecured(unsecuredEntityControl):
@@ -111,10 +123,16 @@ extension LedgerHardwareWalletClient {
 			if derivedKey != signTXFactorInstance.hierarchicalDeterministicPublicKey {
 				let errMsg = "Re-derived public key on Ledger does not matched the transactionSigning factor instance of the account. \(derivedKey) != \(signTXFactorInstance.hierarchicalDeterministicPublicKey)"
 				loggerGlobal.error(.init(stringLiteral: errMsg))
-				assertionFailure(errMsg)
+				return .mismatch(.publicKeyMismatch)
 			}
 
-			return address
+			if address != account.address.address {
+				let errMsg = "Re-derived Address on Ledger does not matched the account. \(address) != \(account.address.address)"
+				loggerGlobal.error(.init(stringLiteral: errMsg))
+				return .mismatch(.addressMismatch)
+			}
+
+			return .verifiedSame
 		}
 	}
 }
