@@ -23,7 +23,8 @@ public enum OnLedgerEntity: Sendable, Hashable, Codable {
 
 // MARK: OnLedgerEntity.Resource
 extension OnLedgerEntity {
-	public struct Resource: Sendable, Hashable, Codable {
+	public struct Resource: Sendable, Hashable, Codable, Identifiable {
+		public var id: ResourceAddress { resourceAddress }
 		public let resourceAddress: ResourceAddress
 		public let divisibility: Int?
 		public let name: String?

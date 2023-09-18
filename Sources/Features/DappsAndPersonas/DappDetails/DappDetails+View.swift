@@ -103,6 +103,14 @@ private extension DappDetails.State {
 			tappablePersonas: context == .settings(.authorizedDapps)
 		)
 	}
+
+	var fungibles: [OnLedgerEntity.Resource] {
+		resources?.fungible ?? []
+	}
+
+	var nonFungibles: [OnLedgerEntity.Resource] {
+		resources?.nonFungible ?? []
+	}
 }
 
 extension OnLedgerEntity.Resource {
@@ -169,8 +177,8 @@ extension DappDetails.View {
 		let store: StoreOf<DappDetails>
 
 		var body: some View {
-			WithViewStore(store, observe: \.viewState.fungibles, send: { .view($0) }) { viewStore in
-				ListWithHeading(heading: L10n.AuthorizedDapps.DAppDetails.tokens, elements: viewStore.state, title: \.name) { resource in
+			WithViewStore(store, observe: \.fungibles, send: { .view($0) }) { viewStore in
+				ListWithHeading(heading: L10n.AuthorizedDapps.DAppDetails.tokens, elements: viewStore.state, title: \.title) { resource in
 					TokenThumbnail(.known(resource.iconURL), size: .small)
 				} action: { id in
 					viewStore.send(.fungibleTapped(id))
@@ -184,8 +192,8 @@ extension DappDetails.View {
 		let store: StoreOf<DappDetails>
 
 		var body: some View {
-			WithViewStore(store, observe: \.viewState.nonFungibles, send: { .view($0) }) { viewStore in
-				ListWithHeading(heading: L10n.AuthorizedDapps.DAppDetails.nfts, elements: viewStore.state, title: \.name) { resource in
+			WithViewStore(store, observe: \.nonFungibles, send: { .view($0) }) { viewStore in
+				ListWithHeading(heading: L10n.AuthorizedDapps.DAppDetails.nfts, elements: viewStore.state, title: \.title) { resource in
 					NFTThumbnail(resource.iconURL, size: .small)
 				} action: { id in
 					viewStore.send(.nonFungibleTapped(id))
@@ -197,13 +205,13 @@ extension DappDetails.View {
 	@MainActor
 	struct ListWithHeading<Element: Identifiable, Icon: View>: View {
 		let heading: String
-		let elements: [Element]?
+		let elements: [Element]
 		let title: (Element) -> String
 		let icon: (Element) -> Icon
 		let action: (Element.ID) -> Void
 
 		var body: some View {
-			if let elements, !elements.isEmpty {
+			if !elements.isEmpty {
 				VStack(alignment: .leading, spacing: .medium3) {
 					Text(heading)
 						.sectionHeading
