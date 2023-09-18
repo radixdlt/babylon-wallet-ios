@@ -51,7 +51,7 @@ struct FeesView: View {
 				}
 			}
 			Spacer()
-			Text(fee)
+			Text(L10n.TransactionReview.xrdAmount(fee))
 				.textStyle(.body1Header)
 				.foregroundColor(.app.gray1)
 		}
