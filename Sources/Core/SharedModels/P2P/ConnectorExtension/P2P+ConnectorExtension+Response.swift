@@ -40,6 +40,7 @@ extension P2P.ConnectorExtension.Response.LedgerHardwareWallet {
 		case derivePublicKeys([DerivedPublicKey])
 		case signTransaction([SignatureOfSigner])
 		case signChallenge([SignatureOfSigner])
+		case deriveAndDisplayAddress(DerivedAddress)
 
 		public struct GetDeviceInfo: Sendable, Hashable, Decodable {
 			public let id: HexCodable32Bytes
@@ -52,6 +53,11 @@ extension P2P.ConnectorExtension.Response.LedgerHardwareWallet {
 				self.id = id
 				self.model = model
 			}
+		}
+
+		public struct DerivedAddress: Sendable, Hashable, Decodable {
+			public let derivedKey: DerivedPublicKey
+			public let address: String
 		}
 
 		public struct DerivedPublicKey: Sendable, Hashable, Decodable {
@@ -119,6 +125,11 @@ extension P2P.ConnectorExtension.Response.LedgerHardwareWallet {
 		case .signChallenge:
 			self.response = try decodeResponse {
 				Success.signChallenge($0)
+			}
+
+		case .deriveAndDisplayAddress:
+			self.response = try decodeResponse {
+				Success.deriveAndDisplayAddress($0)
 			}
 		}
 	}

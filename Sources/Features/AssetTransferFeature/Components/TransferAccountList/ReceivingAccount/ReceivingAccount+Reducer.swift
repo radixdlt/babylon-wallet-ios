@@ -88,7 +88,7 @@ extension ReceivingAccount.State.Account {
 	var identifer: LedgerIdentifiable {
 		switch self {
 		case let .left(account):
-			return .address(.account(account.address))
+			return .address(of: account)
 		case let .right(address):
 			return .address(.account(address))
 		}

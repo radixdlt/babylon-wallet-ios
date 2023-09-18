@@ -24,7 +24,8 @@ extension LedgerHardwareWalletClient: TestDependencyKey {
 			[]
 		},
 		signTransaction: { _ in [] },
-		signAuthChallenge: { _ in [] }
+		signAuthChallenge: { _ in [] },
+		deriveAndDisplayAddress: { _, _ in throw NoopError() }
 	)
 
 	public static let testValue = Self(
@@ -32,6 +33,7 @@ extension LedgerHardwareWalletClient: TestDependencyKey {
 		getDeviceInfo: unimplemented("\(Self.self).getDeviceInfo"),
 		derivePublicKeys: unimplemented("\(Self.self).derivePublicKeys"),
 		signTransaction: unimplemented("\(Self.self).signTransaction"),
-		signAuthChallenge: unimplemented("\(Self.self).signAuthChallenge")
+		signAuthChallenge: unimplemented("\(Self.self).signAuthChallenge"),
+		deriveAndDisplayAddress: unimplemented("\(Self.self).deriveAndDisplayAddress")
 	)
 }

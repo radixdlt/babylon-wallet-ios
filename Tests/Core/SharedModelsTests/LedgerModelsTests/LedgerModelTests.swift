@@ -69,4 +69,48 @@ final class LedgerModelTests: TestCase {
 			P2P.ConnectorExtension.Response.ledgerHardwareWallet(expected)
 		)
 	}
+
+	func test_decode_deriveAndDisplayAddress() throws {
+		let json: JSON = [
+			"success": [
+				"address": "account_tdx_e_128gdgkz846vyznldh6n6xcg3lpsx6r9g7j3rhrxuqa4q7kp52435zx",
+				"derivedKey": [
+					"curve": "curve25519",
+					"publicKey": "59faefda7f27792630f54711a79b63de5fa55c45f7e701992d13f4a662954df8",
+					"derivationPath": "m/44H/1022H/14H/525H/1460H/3H",
+				],
+			],
+			"interactionId": "010F97C0-1542-4690-A044-0406C2E6F157",
+			"discriminator": "deriveAndDisplayAddress",
+		]
+
+		let expected = P2P.ConnectorExtension.Response.LedgerHardwareWallet(
+			interactionID: "010F97C0-1542-4690-A044-0406C2E6F157",
+			discriminator: .deriveAndDisplayAddress,
+			response: .success(
+				.deriveAndDisplayAddress(
+					.init(
+						derivedKey: .init(
+							curve: "curve25519",
+							derivationPath: "m/44H/1022H/14H/525H/1460H/3H",
+							publicKey: "59faefda7f27792630f54711a79b63de5fa55c45f7e701992d13f4a662954df8"
+						),
+						address: "account_tdx_e_128gdgkz846vyznldh6n6xcg3lpsx6r9g7j3rhrxuqa4q7kp52435zx"
+					)
+				)
+			)
+		)
+
+		// Decode assocated value
+		try XCTAssertJSONDecoding(
+			json,
+			expected
+		)
+
+		// Decode enum
+		try XCTAssertJSONDecoding(
+			json,
+			P2P.ConnectorExtension.Response.ledgerHardwareWallet(expected)
+		)
+	}
 }

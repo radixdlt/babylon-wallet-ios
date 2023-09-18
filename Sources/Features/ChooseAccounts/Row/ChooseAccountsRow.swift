@@ -3,7 +3,7 @@ import FeaturePrelude
 // MARK: - ChooseAccountsRow
 public enum ChooseAccountsRow {
 	public struct State: Sendable, Hashable {
-		public enum Mode {
+		public enum Mode: Sendable, Hashable {
 			case checkmark
 			case radioButton
 		}

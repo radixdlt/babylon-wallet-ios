@@ -165,6 +165,17 @@ extension LedgerHardwareWalletClient: DependencyKey {
 						responseCasePath: /P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.signChallenge
 					)
 				}
+			},
+			deriveAndDisplayAddress: { keyParams, factorSource in
+				let response = try await makeRequest(
+					.deriveAndDisplayAddress(.init(
+						keyParameters: keyParams,
+						ledgerDevice: factorSource.device()
+					)),
+					responseCasePath: /P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.deriveAndDisplayAddress
+				)
+
+				return try (response.derivedKey.hdPubKey(), address: response.address)
 			}
 		)
 	}()
@@ -244,12 +255,6 @@ extension HierarchicalDeterministicPublicKey {
 	}
 }
 
-extension P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.DerivedPublicKey {
-	public func hdPubKey() throws -> HierarchicalDeterministicPublicKey {
-		try .init(curve: self.curve, key: self.publicKey.data, path: self.derivationPath)
-	}
-}
-
 extension P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.SignatureOfSigner {
 	struct Validated: Sendable, Hashable {
 		public let signature: Cryptography.SignatureWithPublicKey
@@ -291,18 +296,9 @@ extension Signer {
 	var keyParams: [P2P.LedgerHardwareWallet.KeyParameters] {
 		factorInstancesRequiredToSign.compactMap {
 			P2P.LedgerHardwareWallet.KeyParameters(
-				curve: $0.publicKey.curve.cast(),
+				curve: $0.publicKey.curve.toLedger(),
 				derivationPath: $0.derivationPath.path
 			)
-		}
-	}
-}
-
-extension SLIP10.Curve {
-	fileprivate func cast() -> P2P.LedgerHardwareWallet.KeyParameters.Curve {
-		switch self {
-		case .curve25519: return .curve25519
-		case .secp256k1: return .secp256k1
 		}
 	}
 }

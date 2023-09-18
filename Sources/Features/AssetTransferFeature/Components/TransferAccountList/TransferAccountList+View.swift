@@ -25,7 +25,7 @@ extension TransferAccountList.View {
 
 					SmallAccountCard(
 						viewStore.fromAccount.displayName.rawValue,
-						identifiable: .address(.account(viewStore.fromAccount.address)),
+						identifiable: .address(of: viewStore.fromAccount),
 						gradient: .init(viewStore.fromAccount.appearanceID)
 					)
 					.cornerRadius(.small1)

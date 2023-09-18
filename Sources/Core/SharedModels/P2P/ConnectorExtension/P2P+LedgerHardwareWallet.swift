@@ -18,6 +18,7 @@ extension P2P {
 			case derivePublicKeys
 			case signTransaction
 			case signChallenge
+			case deriveAndDisplayAddress
 		}
 
 		// N.B. these *might* have the exact same JSON representation as

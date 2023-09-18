@@ -1,5 +1,7 @@
 import EngineKit
 import GatewaysClient
+import LedgerHardwareWalletClient
+import OverlayWindowClient
 import Prelude
 import QRGeneratorClient
 import Resources
@@ -17,6 +19,7 @@ public struct AddressView: View {
 	@Dependency(\.openURL) var openURL
 	@Dependency(\.pasteboardClient) var pasteboardClient
 	@Dependency(\.qrGeneratorClient) var qrGeneratorClient
+	@Dependency(\.ledgerHardwareWalletClient) var ledgerHardwareWalletClient
 
 	@State private var qrCodeContent: AccountAddress? = nil
 
@@ -73,9 +76,21 @@ extension AddressView {
 					viewOnRadixDashboard()
 				}
 
-				if case let .address(.account(accountAddress)) = identifiable {
-					Button(L10n.AddressAction.showAccountQR, asset: AssetResource.qrCodeScanner) {
+				if case let .address(.account(accountAddress, isLedgerHWAccount)) = identifiable {
+					Button(
+						L10n.AddressAction.showAccountQR,
+						asset: AssetResource.qrCodeScanner
+					) {
 						showQR(for: accountAddress)
+					}
+
+					if isLedgerHWAccount {
+						Button(
+							"Verify Address with Ledger", // FIXME: Strings
+							asset: AssetResource.ledger
+						) {
+							verifyAddressOnLedger(accountAddress)
+						}
 					}
 				}
 			}
@@ -104,6 +119,10 @@ extension AddressView {
 				return L10n.AddressAction.copyNftId
 			}
 		}
+	}
+
+	func verifyAddressOnLedger(_ accountAddress: AccountAddress) {
+		ledgerHardwareWalletClient.verifyAddress(of: accountAddress)
 	}
 }
 

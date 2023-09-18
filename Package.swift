@@ -35,6 +35,7 @@ package.addModules([
 			"AccountPortfoliosClient",
 			"FactorSourcesClient", // check if `device` or `ledger` controlled for security prompting
 			"AccountDetailsFeature", // "shield buttons"
+			"LedgerHardwareWalletClient", // Verify Address with Ledger
 		],
 		tests: .no
 	),
@@ -673,6 +674,7 @@ package.addModules([
 			"ROLAClient", // calc expected hashed message for signAuth for validation
 			"RadixConnectClient",
 			"FactorSourcesClient", // FIXME: move models to lower level package
+			"OverlayWindowClient", // HUD for if Verify Address with Ledger outcome
 		],
 		tests: .no
 	),
@@ -883,6 +885,8 @@ package.addModules([
 			"DesignSystem",
 			"Resources",
 			"SharedModels",
+			"LedgerHardwareWalletClient",
+			"OverlayWindowClient",
 		],
 		tests: .yes()
 	),
