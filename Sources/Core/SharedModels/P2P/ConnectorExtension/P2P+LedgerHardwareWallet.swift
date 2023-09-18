@@ -8,7 +8,7 @@ extension P2P {
 			case interactionID = "interactionId"
 			case discriminator
 			case success
-			case failure
+			case error
 		}
 
 		public typealias InteractionId = Tagged<Self, String>

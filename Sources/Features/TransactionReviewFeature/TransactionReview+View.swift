@@ -82,7 +82,7 @@ extension TransactionReview {
 					.controlState(viewStore.viewControlState)
 					.background(.white)
 					.animation(.easeInOut, value: viewStore.isExpandedDappUsed)
-					.navigationTitle(L10n.TransactionReview.title)
+					.navigationTitle("Review Transaction") // FIXME: Strings - revert to L10n.TransactionReview.title when that fits
 					.navigationBarInlineTitleFont(.app.secondaryHeader)
 					.navigationBarHideDivider()
 					.navigationBarTitleColor(.app.gray1)

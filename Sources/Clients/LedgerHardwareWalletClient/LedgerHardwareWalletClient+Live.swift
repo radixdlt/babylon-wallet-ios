@@ -3,6 +3,7 @@ import ComposableArchitecture // actually CasePaths... but CI fails if we do `im
 import Cryptography
 import EngineKit
 import FactorSourcesClient
+import OverlayWindowClient
 import struct Profile.Signer
 import RadixConnectClient
 import ROLAClient
@@ -14,6 +15,7 @@ extension LedgerHardwareWalletClient: DependencyKey {
 	public static let liveValue: Self = {
 		@Dependency(\.radixConnectClient) var radixConnectClient
 
+		@Dependency(\.overlayWindowClient) var overlayWindowClient
 		@Sendable func makeRequest<Response: Sendable>(
 			_ request: P2P.ConnectorExtension.Request.LedgerHardwareWallet.Request,
 			responseCasePath: CasePath<P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success, Response>
@@ -51,6 +53,23 @@ extension LedgerHardwareWalletClient: DependencyKey {
 					}
 				case let .failure(errorFromConnectorExtension):
 					loggerGlobal.warning("Error from CE? \(errorFromConnectorExtension)")
+
+					switch errorFromConnectorExtension.code {
+					case .generic: break
+					case .blindSigningNotEnabledButRequired:
+						_ = await overlayWindowClient.scheduleAlert(
+							.init(
+								title: {
+									TextState("Could Not Sign") // FIXME: Strings
+								},
+								message: {
+									TextState("Transaction could not be signed. To sign complex transactions, please enable either \"blind signing\" or \"verbose mode\" in the Radix app on your Ledger device.") // FIXME: Strings
+								}
+							)
+						)
+					}
+
+					throw errorFromConnectorExtension
 				}
 
 				clientsLeftToReceiveAnswerFrom -= 1

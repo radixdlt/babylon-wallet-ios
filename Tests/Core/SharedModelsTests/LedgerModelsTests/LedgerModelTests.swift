@@ -2,6 +2,38 @@
 import TestingPrelude
 
 final class LedgerModelTests: TestCase {
+	func test_decode_error_response() throws {
+		let json: JSON = [
+			"error": [
+				"message": "6e38",
+				"code": 1,
+			],
+			"interactionId": "59052FDF-4211-4ED1-871A-C5EFC642677F",
+			"discriminator": "signTransaction",
+		]
+
+		let expected = P2P.ConnectorExtension.Response.LedgerHardwareWallet(
+			interactionID: "59052FDF-4211-4ED1-871A-C5EFC642677F",
+			discriminator: .signTransaction,
+			response: .failure(.init(
+				code: .blindSigningNotEnabledButRequired,
+				message: "6e38"
+			))
+		)
+
+		// Decode assocated value
+		try XCTAssertJSONDecoding(
+			json,
+			expected
+		)
+
+		// Decode enum
+		try XCTAssertJSONDecoding(
+			json,
+			P2P.ConnectorExtension.Response.ledgerHardwareWallet(expected)
+		)
+	}
+
 	func test_decode_derivePublicKeys() throws {
 		let json: JSON = [
 			"success": [

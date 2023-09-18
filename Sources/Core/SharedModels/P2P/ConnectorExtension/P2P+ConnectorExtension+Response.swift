@@ -29,12 +29,51 @@ extension P2P.ConnectorExtension.Response {
 	}
 }
 
+// MARK: - P2P.ConnectorExtension.Response.LedgerHardwareWallet.Failure
 extension P2P.ConnectorExtension.Response.LedgerHardwareWallet {
-	public struct Failure: Swift.Error, Sendable, Hashable, Decodable {
-		public let code: Int // enum?
-		public let message: String
-	}
+	public struct Failure: LocalizedError, Sendable, Hashable, Decodable {
+		public enum Reason: Int, Sendable, Hashable, Decodable {
+			case generic = 0
+			case blindSigningNotEnabledButRequired = 1
+			public var userFacingErrorDescription: String {
+				switch self {
+				case .generic:
+					return "Unknown" // FIXME: Strings
+				case .blindSigningNotEnabledButRequired:
+					return "Blind signing not enabled but required" // FIXME: Strings
+				}
+			}
+		}
 
+		public let code: Reason
+		public let message: String
+		public var errorDescription: String? {
+			var description = code.userFacingErrorDescription
+			#if DEBUG
+			return "[DEBUG ONLY] \(description)\nmessage from Ledger: '\(message)'"
+			#else
+			return description
+			#endif
+		}
+
+		public enum CodingKeys: CodingKey {
+			case code
+			case message
+		}
+	}
+}
+
+extension P2P.ConnectorExtension.Response.LedgerHardwareWallet.Failure {
+	public init(from decoder: Decoder) throws {
+		let container = try decoder.container(keyedBy: CodingKeys.self)
+		let codeRaw = try container.decode(Reason.RawValue.self, forKey: .code)
+		let code = Reason(rawValue: codeRaw) ?? .generic
+		let message = try container.decode(String.self, forKey: .message)
+		self.init(code: code, message: message)
+	}
+}
+
+extension P2P.ConnectorExtension.Response.LedgerHardwareWallet {
 	public enum Success: Sendable, Hashable {
 		case getDeviceInfo(GetDeviceInfo)
 		case derivePublicKeys([DerivedPublicKey])
@@ -106,7 +145,7 @@ extension P2P.ConnectorExtension.Response.LedgerHardwareWallet {
 				let success = try container.decode(T.self, forKey: .success)
 				return .success(embed(success))
 			} catch {
-				return try .failure(container.decode(Failure.self, forKey: .failure))
+				return try .failure(container.decode(Failure.self, forKey: .error))
 			}
 		}
 		switch discriminator {
