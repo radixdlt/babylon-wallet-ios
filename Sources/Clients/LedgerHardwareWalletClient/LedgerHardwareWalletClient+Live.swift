@@ -57,7 +57,17 @@ extension LedgerHardwareWalletClient: DependencyKey {
 					switch errorFromConnectorExtension.code {
 					case .generic: break
 					case .blindSigningNotEnabledButRequired:
-						overlayWindowClient.scheduleHUD(.init(text: errorFromConnectorExtension.localizedDescription, icon: .init(kind: .asset(AssetResource.error), foregroundColor: Color.app.red1)))
+						_ = await overlayWindowClient.scheduleAlert(
+							.init(
+								title: {
+									TextState("Sign with Ledger failed")
+								},
+
+								message: {
+									TextState("The transaction you signed requires Blind Signing to be Enabled on your Ledger device, but it's disabled.\n\nGo to Settings -> Blind Signing on your Ledger to enabled it.\n\nThen press retry button.")
+								}
+							)
+						)
 					}
 
 					throw errorFromConnectorExtension
