@@ -301,7 +301,8 @@ public struct DevAccountPreferences: Sendable, FeatureReducer {
 				transactionManifest: manifest,
 				nonce: .secureRandom(),
 				signTransactionPurpose: .internalManifest(.debugModifyAccount),
-				message: .none
+				message: .none,
+				isWalletTransaction: true
 			))
 			return .none
 

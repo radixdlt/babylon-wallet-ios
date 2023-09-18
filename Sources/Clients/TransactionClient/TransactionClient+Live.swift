@@ -190,7 +190,8 @@ extension TransactionClient {
 			/// Analyze the manifest
 			let analyzedManifestToReview = try request.manifestToSign.analyzeExecution(transactionReceipt: receiptBytes)
 
-			guard analyzedManifestToReview.reservedInstructions.isEmpty else {
+			/// Transactions created outside of the Wallet are not allowed to use reserved instructions
+			if !request.isWalletTransaction, !analyzedManifestToReview.reservedInstructions.isEmpty {
 				throw TransactionFailure.failedToPrepareTXReview(.manifestWithReservedInstructions(analyzedManifestToReview.reservedInstructions))
 			}
 

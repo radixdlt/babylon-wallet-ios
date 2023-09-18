@@ -21,6 +21,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		public let message: Message
 		public let signTransactionPurpose: SigningPurpose.SignTransactionPurpose
 		public let waitsForTransactionToBeComitted: Bool
+		public let isWalletTransaction: Bool
 
 		public var networkID: NetworkID? { reviewedTransaction?.networkId }
 
@@ -76,7 +77,8 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			signTransactionPurpose: SigningPurpose.SignTransactionPurpose,
 			message: Message,
 			ephemeralNotaryPrivateKey: Curve25519.Signing.PrivateKey = .init(),
-			waitsForTransactionToBeComitted: Bool = false
+			waitsForTransactionToBeComitted: Bool = false,
+			isWalletTransaction: Bool
 		) {
 			self.nonce = nonce
 			self.transactionManifest = transactionManifest
@@ -84,6 +86,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			self.message = message
 			self.ephemeralNotaryPrivateKey = ephemeralNotaryPrivateKey
 			self.waitsForTransactionToBeComitted = waitsForTransactionToBeComitted
+			self.isWalletTransaction = isWalletTransaction
 		}
 
 		public enum DisplayMode: Sendable, Hashable {
@@ -220,7 +223,8 @@ public struct TransactionReview: Sendable, FeatureReducer {
 						message: state.message,
 						nonce: state.nonce,
 						ephemeralNotaryPublicKey: state.ephemeralNotaryPrivateKey.publicKey,
-						signingPurpose: .signTransaction(state.signTransactionPurpose)
+						signingPurpose: .signTransaction(state.signTransactionPurpose),
+						isWalletTransaction: state.isWalletTransaction
 					))
 				}
 				await send(.internal(.previewLoaded(preview)))

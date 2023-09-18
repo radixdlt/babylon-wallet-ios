@@ -707,7 +707,8 @@ extension TransactionReview.State {
 		transactionManifest: .previewValue,
 		nonce: .zero,
 		signTransactionPurpose: .manifestFromDapp,
-		message: .none
+		message: .none,
+		isWalletTransaction: false
 	)
 }
 #endif

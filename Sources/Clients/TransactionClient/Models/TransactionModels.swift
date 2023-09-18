@@ -198,6 +198,7 @@ public struct ManifestReviewRequest: Sendable {
 	public let makeTransactionHeaderInput: MakeTransactionHeaderInput
 	public let ephemeralNotaryPublicKey: Curve25519.Signing.PublicKey
 	public let signingPurpose: SigningPurpose
+	public let isWalletTransaction: Bool
 
 	public init(
 		manifestToSign: TransactionManifest,
@@ -205,7 +206,8 @@ public struct ManifestReviewRequest: Sendable {
 		nonce: Nonce,
 		makeTransactionHeaderInput: MakeTransactionHeaderInput = .default,
 		ephemeralNotaryPublicKey: Curve25519.Signing.PublicKey,
-		signingPurpose: SigningPurpose
+		signingPurpose: SigningPurpose,
+		isWalletTransaction: Bool
 	) {
 		self.manifestToSign = manifestToSign
 		self.message = message
@@ -213,6 +215,7 @@ public struct ManifestReviewRequest: Sendable {
 		self.makeTransactionHeaderInput = makeTransactionHeaderInput
 		self.ephemeralNotaryPublicKey = ephemeralNotaryPublicKey
 		self.signingPurpose = signingPurpose
+		self.isWalletTransaction = isWalletTransaction
 	}
 }
 
