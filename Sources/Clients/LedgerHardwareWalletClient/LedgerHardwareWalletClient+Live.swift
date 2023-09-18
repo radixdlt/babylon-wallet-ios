@@ -60,11 +60,11 @@ extension LedgerHardwareWalletClient: DependencyKey {
 						_ = await overlayWindowClient.scheduleAlert(
 							.init(
 								title: {
-									TextState("Sign with Ledger failed")
+									TextState("Sign with Ledger failed") // FIXME: Strings
 								},
 
 								message: {
-									TextState("The transaction you signed requires Blind Signing to be Enabled on your Ledger device, but it's disabled.\n\nGo to Settings -> Blind Signing on your Ledger to enabled it.\n\nThen press retry button.")
+									TextState("The transaction you signed requires Blind Signing to be Enabled on your Ledger device, but it's disabled.\n\nGo to Settings -> Blind Signing on your Ledger to enabled it.\n\nThen press retry button.") // FIXME: Strings
 								}
 							)
 						)
