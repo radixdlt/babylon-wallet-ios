@@ -1,8 +1,8 @@
 import AsyncExtensions
 import ComposableArchitecture
 import Dependencies
-import DesignSystem
-import Resources
+@_exported import DesignSystem
+@_exported import Resources
 import SwiftUI
 
 // MARK: - OverlayWindowClient

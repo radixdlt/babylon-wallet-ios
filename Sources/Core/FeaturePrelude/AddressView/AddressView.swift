@@ -19,6 +19,7 @@ public struct AddressView: View {
 	@Dependency(\.openURL) var openURL
 	@Dependency(\.pasteboardClient) var pasteboardClient
 	@Dependency(\.qrGeneratorClient) var qrGeneratorClient
+	@Dependency(\.ledgerHardwareWalletClient) var ledgerHardwareWalletClient
 
 	@State private var qrCodeContent: AccountAddress? = nil
 
@@ -86,12 +87,10 @@ extension AddressView {
 
 					if isLedgerHWAccount, false /* disabled until request works on Ledger https://rdxworks.slack.com/archives/C031A0V1A1W/p1694805108750789 */ {
 						Button(
-							"Verify Address on Ledger", // FIXME: Strings
+							"Verify Address with Ledger", // FIXME: Strings
 							asset: AssetResource.ledger
 						) {
-							Task {
-								await verifyAddressOnLedger(accountAddress)
-							}
+							verifyAddressOnLedger(accountAddress)
 						}
 					}
 				}
@@ -123,51 +122,8 @@ extension AddressView {
 		}
 	}
 
-	func verifyAddressOnLedger(_ accountAddress: AccountAddress) async {
-		@Dependency(\.ledgerHardwareWalletClient) var ledgerHardwareWalletClient
-		@Dependency(\.overlayWindowClient) var overlayWindowClient
-		do {
-			let outcome = try await ledgerHardwareWalletClient.verifyAddress(of: accountAddress)
-
-			switch outcome {
-			case .verifiedSame:
-				overlayWindowClient.scheduleHUD(.init(
-					text: "Address verified",
-					icon: .init(
-						kind: .system("checkmark.seal.fill"),
-						foregroundColor: Color.app.green1
-					)
-				))
-
-			case let .mismatch(discrepancy):
-				let reason: String = {
-					switch discrepancy {
-					case .addressMismatch:
-						return "Invalid! Addresses do not match" // FIXME: Strings
-					case .publicKeyMismatch:
-						return "Invalid! Neither addresses nor public keys match" // FIXME: Strings
-					}
-				}()
-				loggerGlobal.critical("Discrepancy invalid ledger account, reason: \(reason)")
-				overlayWindowClient.scheduleHUD(.init(
-					text: reason,
-					icon: .init(
-						kind: .asset(AssetResource.error),
-						foregroundColor: Color.app.red1
-					)
-				))
-			}
-
-		} catch {
-			loggerGlobal.error("Verify Address request failed, error: \(error)")
-			overlayWindowClient.scheduleHUD(.init(
-				text: "Verify Address request failed.", // FIXME: Strings
-				icon: .init(
-					kind: .asset(AssetResource.error),
-					foregroundColor: Color.app.red1
-				)
-			))
-		}
+	func verifyAddressOnLedger(_ accountAddress: AccountAddress) {
+		ledgerHardwareWalletClient.verifyAddress(of: accountAddress)
 	}
 }
 

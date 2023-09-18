@@ -2,6 +2,7 @@ import ClientPrelude
 import Cryptography
 import EngineKit
 import FactorSourcesClient
+import OverlayWindowClient
 import struct Profile.Signer
 
 // MARK: - LedgerHardwareWalletClient
@@ -93,11 +94,54 @@ struct FailedToFindLedger: LocalizedError {
 }
 
 extension LedgerHardwareWalletClient {
-	@discardableResult
-	public func verifyAddress(of accountAddress: AccountAddress) async throws -> VerifyAddressOutcome {
+	public func verifyAddress(of accountAddress: AccountAddress) {
 		@Dependency(\.accountsClient) var accountsClient
-		let account = try await accountsClient.getAccountByAddress(accountAddress)
-		return try await verifyAddress(of: account)
+		@Dependency(\.overlayWindowClient) var overlayWindowClient
+		Task {
+			do {
+				let account = try await accountsClient.getAccountByAddress(accountAddress)
+				let outcome = try await verifyAddress(of: account)
+
+				switch outcome {
+				case .verifiedSame:
+					overlayWindowClient.scheduleHUD(.init(
+						text: "Address verified",
+						icon: .init(
+							kind: .system("checkmark.seal.fill"),
+							foregroundColor: Color.app.green1
+						)
+					))
+
+				case let .mismatch(discrepancy):
+					let reason: String = {
+						switch discrepancy {
+						case .addressMismatch:
+							return "Verify address mismatched addresses" // FIXME: Strings
+						case .publicKeyMismatch:
+							return "Verify address bad response" // FIXME: Strings
+						}
+					}()
+					loggerGlobal.critical("Discrepancy invalid ledger account, reason: \(reason)")
+					overlayWindowClient.scheduleHUD(.init(
+						text: reason,
+						icon: .init(
+							kind: .asset(AssetResource.error),
+							foregroundColor: Color.app.red1
+						)
+					))
+				}
+
+			} catch {
+				loggerGlobal.error("Verify address request failed, error: \(error)")
+				overlayWindowClient.scheduleHUD(.init(
+					text: "Verify address request failed", // FIXME: Strings
+					icon: .init(
+						kind: .asset(AssetResource.error),
+						foregroundColor: Color.app.red1
+					)
+				))
+			}
+		}
 	}
 
 	@discardableResult
