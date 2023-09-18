@@ -1,21 +1,17 @@
 import FeaturePrelude
+import SharedModels
 
 // MARK: - FungibleTokenDetails
 public struct FungibleTokenDetails: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
-		let resource: AccountPortfolio.FungibleResource
+		let resource: OnLedgerEntity.Resource
+		let amount: BigDecimal?
 		let isXRD: Bool
-		let context: Context
 
-		public init(resource: AccountPortfolio.FungibleResource, isXRD: Bool, context: Context) {
+		public init(resource: OnLedgerEntity.Resource, amount: BigDecimal? = nil, isXRD: Bool) {
 			self.resource = resource
+			self.amount = amount
 			self.isXRD = isXRD
-			self.context = context
-		}
-
-		public enum Context: Equatable, Sendable {
-			case transfer
-			case portfolio
 		}
 	}
 

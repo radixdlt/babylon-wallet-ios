@@ -298,13 +298,13 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			case let .fungible(transfer):
 				state.destination = .fungibleTokenDetails(.init(
 					resource: transfer.fungibleResource,
-					isXRD: transfer.isXRD,
-					context: .transfer
+					amount: nil,
+					isXRD: transfer.isXRD
 				))
 			case let .nonFungible(transfer):
 				state.destination = .nonFungibleTokenDetails(.init(
-					token: transfer.token,
-					resource: transfer.nonFungibleResource
+					resource: transfer.nonFungibleResource,
+					token: transfer.token
 				))
 			}
 
@@ -911,11 +911,12 @@ extension TransactionReview {
 		switch resourceQuantifier {
 		case let .fungible(_, source):
 			let amount = try BigDecimal(fromString: source.amount.asStr())
-			let isXRD = resourceAddress.isXRD(on: networkID)
 
 			switch try await resourceInfo() {
 			case let .left(onLedgerEntity):
 				// A fungible resource existing on ledger
+				let isXRD = resourceAddress.isXRD(on: networkID)
+
 				func guarantee() -> TransactionClient.Guarantee? {
 					guard case let .predicted(instructionIndex, _) = source else { return nil }
 					let guaranteedAmount = defaultDepositGuarantee * amount
@@ -928,23 +929,19 @@ extension TransactionReview {
 				}
 
 				return [.fungible(.init(
-					fungibleResource: .init(
-						amount: amount,
-						onLedgerEntity: onLedgerEntity
-					),
+					fungibleResource: onLedgerEntity,
 					isXRD: isXRD,
+					amount: amount,
 					guarantee: guarantee()
 				))]
 
 			case let .right(newEntityMetadata):
 				// A newly created fungible resource
+
 				return [.fungible(.init(
-					fungibleResource: .init(
-						resourceAddress: resourceAddress,
-						amount: amount,
-						metadata: newEntityMetadata
-					),
-					isXRD: isXRD
+					fungibleResource: .init(resourceAddress: resourceAddress, metadata: newEntityMetadata),
+					isXRD: false,
+					amount: amount
 				))]
 			}
 		case let .nonFungible(_, _, .guaranteed(ids)),
@@ -956,20 +953,15 @@ extension TransactionReview {
 			case let .left(onLedgerEntity):
 				// A non-fungible resource existing on ledger
 
-				let resource: AccountPortfolio.NonFungibleResource = .init(onLedgerEntity: onLedgerEntity)
-
 				// Existing or newly minted tokens
 				result = try await tokenInfo(ids, for: resourceAddress).map { token in
-					.nonFungible(.init(nonFungibleResource: resource, token: token))
+					.nonFungible(.init(nonFungibleResource: onLedgerEntity, token: token))
 				}
 
 			case let .right(newEntityMetadata):
 				// A newly created non-fungible resource
 
-				let resource: AccountPortfolio.NonFungibleResource = .init(
-					resourceAddress: resourceAddress,
-					metadata: newEntityMetadata
-				)
+				let resource = OnLedgerEntity.Resource(resourceAddress: resourceAddress, metadata: newEntityMetadata)
 
 				// Newly minted tokens
 				result = try newTokenInfo(ids, for: resourceAddress).map { token in
@@ -1149,14 +1141,15 @@ extension TransactionReview {
 
 	public struct FungibleTransfer: Sendable, Hashable {
 		public let id = Transfer.ID()
-		public let fungibleResource: AccountPortfolio.FungibleResource
+		public let fungibleResource: OnLedgerEntity.Resource
 		public let isXRD: Bool
+		public let amount: BigDecimal
 		public var guarantee: TransactionClient.Guarantee?
 	}
 
 	public struct NonFungibleTransfer: Sendable, Hashable {
 		public let id = Transfer.ID()
-		public let nonFungibleResource: AccountPortfolio.NonFungibleResource
+		public let nonFungibleResource: OnLedgerEntity.Resource
 		public let token: AccountPortfolio.NonFungibleResource.NonFungibleToken
 	}
 }

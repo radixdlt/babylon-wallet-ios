@@ -100,7 +100,7 @@ extension TransactionReviewTokenView.ViewState {
 		self.init(
 			name: resource.symbol ?? resource.name ?? L10n.TransactionReview.unknown,
 			thumbnail: transfer.isXRD ? .xrd : .known(resource.iconURL),
-			amount: resource.amount,
+			amount: transfer.amount,
 			guaranteedAmount: transfer.guarantee?.amount,
 			fiatAmount: nil
 		)

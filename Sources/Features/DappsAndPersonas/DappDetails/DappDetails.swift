@@ -235,24 +235,24 @@ public struct DappDetails: Sendable, FeatureReducer {
 
 			let resource = state.resources?.nonFungible.first { $0.address == address }
 
-			guard let resource else { return .none } // TODO: Show error?
+//			guard let resource else { return .none } // TODO: Show error?
 
-			let details: AccountPortfolio.NonFungibleResource = .init(
-				resourceAddress: resource.address,
-				name: resource.name,
-				description: resource.description,
-				iconURL: resource.iconURL,
-				behaviors: [],
-				tags: [],
-				tokens: [],
-				totalSupply: nil
-			)
-
-			state.destination = .nonFungibleDetails(.init(token: nil, resource: details))
+//			let details: AccountPortfolio.NonFungibleResource = .init(
+//				resourceAddress: resource.address,
+//				name: resource.name,
+//				description: resource.description,
+//				iconURL: resource.iconURL,
+//				behaviors: [],
+//				tags: [],
+//				tokens: [],
+//				totalSupply: nil
+//			)
+//
+//			state.destination = .nonFungibleDetails(.init(token: nil, resource: details))
 
 			return .run { _ in
-				let entity = try await onLedgerEntitiesClient.getResource(address)
-				let resource: AccountPortfolio.NonFungibleResource = .init(onLedgerEntity: entity)
+//				let entity = try await onLedgerEntitiesClient.getResource(address)
+//				let resource: AccountPortfolio.NonFungibleResource = .init(onLedgerEntity: entity)
 
 //				let response = try await gatewayAPIClient.getNonFungibleData(.init(
 //					resourceAddress: address.address,

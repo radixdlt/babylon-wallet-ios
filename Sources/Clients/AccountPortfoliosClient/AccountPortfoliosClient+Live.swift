@@ -223,16 +223,18 @@ extension AccountPortfoliosClient {
 		let metadata = resource.explicitMetadata
 
 		return AccountPortfolio.FungibleResource(
-			resourceAddress: resourceAddress,
-			amount: amount,
-			divisibility: divisibility,
-			name: metadata?.name,
-			symbol: metadata?.symbol,
-			description: metadata?.description,
-			iconURL: metadata?.iconURL,
-			behaviors: behaviors,
-			tags: tags,
-			totalSupply: totalSupply
+			resource: .init(
+				resourceAddress: resourceAddress,
+				divisibility: divisibility,
+				name: metadata?.name,
+				symbol: metadata?.symbol,
+				description: metadata?.description,
+				iconURL: metadata?.iconURL,
+				behaviors: behaviors,
+				tags: tags,
+				totalSupply: totalSupply
+			),
+			amount: amount
 		)
 	}
 
@@ -332,14 +334,18 @@ extension AccountPortfoliosClient {
 		let metadata = resource.explicitMetadata
 
 		return try AccountPortfolio.NonFungibleResource(
-			resourceAddress: .init(validatingAddress: resource.resourceAddress),
-			name: metadata?.name,
-			description: metadata?.description,
-			iconURL: metadata?.iconURL,
-			behaviors: behaviors,
-			tags: tags,
-			tokens: tokens,
-			totalSupply: totalSupply
+			resource: .init(
+				resourceAddress: .init(validatingAddress: resource.resourceAddress),
+				divisibility: nil, // FIXME: Find?
+				name: metadata?.name,
+				symbol: metadata?.symbol,
+				description: metadata?.description,
+				iconURL: metadata?.iconURL,
+				behaviors: behaviors,
+				tags: tags,
+				totalSupply: totalSupply
+			),
+			tokens: tokens
 		)
 	}
 }
@@ -556,24 +562,24 @@ extension Array where Element == AccountPortfolio.FungibleResource {
 		}
 
 		let sortedNonXrdResources = nonXrdResources.sorted { lhs, rhs in
-			if lhs.amount > .zero && rhs.amount > .zero {
-				return lhs.amount > rhs.amount // Sort descending by amount
-			}
-			if lhs.amount != .zero || rhs.amount != .zero {
-				return lhs.amount != .zero
-			}
-
-			if let lhsSymbol = lhs.symbol, let rhsSymbol = rhs.symbol {
-				return lhsSymbol < rhsSymbol // Sort alphabetically by symbol
-			}
-			if lhs.symbol != nil || rhs.symbol != nil {
-				return lhs.symbol != nil
-			}
-
-			if let lhsName = lhs.name, let rhsName = rhs.name {
-				return lhsName < rhsName // Sort alphabetically by name
-			}
-			return lhs.resourceAddress.address < rhs.resourceAddress.address // Sort by address
+//			if lhs.amount > .zero && rhs.amount > .zero {
+//				return lhs.amount > rhs.amount // Sort descending by amount
+//			}
+//			if lhs.amount != .zero || rhs.amount != .zero {
+//				return lhs.amount != .zero
+//			}
+//
+//			if let lhsSymbol = lhs.symbol, let rhsSymbol = rhs.symbol {
+//				return lhsSymbol < rhsSymbol // Sort alphabetically by symbol
+//			}
+//			if lhs.symbol != nil || rhs.symbol != nil {
+//				return lhs.symbol != nil
+//			}
+//
+//			if let lhsName = lhs.name, let rhsName = rhs.name {
+//				return lhsName < rhsName // Sort alphabetically by name
+//			}
+			lhs.resourceAddress.address < rhs.resourceAddress.address // Sort by address
 		}
 
 		return .init(xrdResource: xrdResource, nonXrdResources: sortedNonXrdResources)

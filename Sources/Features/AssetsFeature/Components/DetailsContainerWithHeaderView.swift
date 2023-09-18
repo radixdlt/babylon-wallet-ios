@@ -8,6 +8,16 @@ struct DetailsContainerWithHeaderViewState: Equatable {
 	let symbol: String?
 }
 
+extension DetailsContainerWithHeaderViewState {
+	init(resource: AccountPortfolio.FungibleResource) {
+		self.init(
+			title: resource.name ?? L10n.Account.PoolUnits.unknownPoolUnitName,
+			amount: resource.amount.format(),
+			symbol: resource.symbol
+		)
+	}
+}
+
 // MARK: - DetailsContainerWithHeaderView
 struct DetailsContainerWithHeaderView<ThumbnailView: View, DetailsView: View>: View {
 	let viewState: DetailsContainerWithHeaderViewState

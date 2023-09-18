@@ -36,14 +36,14 @@ extension OnLedgerEntity {
 
 		public init(
 			resourceAddress: ResourceAddress,
-			divisibility: Int?,
-			name: String?,
-			symbol: String?,
-			description: String?,
-			iconURL: URL?,
-			behaviors: [AssetBehavior],
-			tags: [AssetTag],
-			totalSupply: BigDecimal?
+			divisibility: Int? = nil,
+			name: String? = nil,
+			symbol: String? = nil,
+			description: String? = nil,
+			iconURL: URL? = nil,
+			behaviors: [AssetBehavior] = [],
+			tags: [AssetTag] = [],
+			totalSupply: BigDecimal? = nil
 		) {
 			self.resourceAddress = resourceAddress
 			self.divisibility = divisibility

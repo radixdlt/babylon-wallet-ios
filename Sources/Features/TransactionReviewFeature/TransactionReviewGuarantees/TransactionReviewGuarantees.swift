@@ -85,11 +85,11 @@ public struct TransactionReviewGuarantee: Sendable, FeatureReducer {
 			self.account = account
 			self.transfer = transfer
 
-			guard let guaranteed = transfer.guarantee?.amount, guaranteed >= 0, transfer.fungibleResource.amount > 0 else {
+			guard let guaranteed = transfer.guarantee?.amount, guaranteed >= 0, transfer.amount > 0 else {
 				return nil
 			}
 
-			self.percentageStepper = .init(value: 100 * guaranteed / transfer.fungibleResource.amount)
+			self.percentageStepper = .init(value: 100 * guaranteed / transfer.amount)
 		}
 	}
 
@@ -119,7 +119,7 @@ public struct TransactionReviewGuarantee: Sendable, FeatureReducer {
 			}
 
 			let newMinimumDecimal = value * 0.01
-			let newAmount = newMinimumDecimal * state.transfer.fungibleResource.amount
+			let newAmount = newMinimumDecimal * state.transfer.amount
 			state.transfer.guarantee?.amount = newAmount
 
 			return .none

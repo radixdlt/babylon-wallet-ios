@@ -4,7 +4,7 @@ import FeaturePrelude
 extension LSUDetails.State {
 	var viewState: LSUDetails.ViewState {
 		.init(
-			containerWithHeader: stakeUnitResource.detailsHeader(withAmount: true),
+			containerWithHeader: .init(resource: stakeUnitResource),
 			thumbnailURL: stakeUnitResource.iconURL,
 			validatorNameViewState: .init(with: validator),
 			redeemableTokenAmount: .init(.init(xrdAmount: xrdRedemptionValue.format())),
