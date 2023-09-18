@@ -47,6 +47,7 @@ extension AccountPortfolio {
 
 		public var id: ResourceAddress { resourceAddress }
 		public var resourceAddress: ResourceAddress { resource.resourceAddress }
+		public var divisibility: Int? { resource.divisibility }
 		public var name: String? { resource.name }
 		public var symbol: String? { resource.symbol }
 		public var description: String? { resource.description }
