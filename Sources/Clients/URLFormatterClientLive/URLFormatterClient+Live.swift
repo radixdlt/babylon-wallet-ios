@@ -13,7 +13,7 @@ extension URLFormatterClient: DependencyKey {
 				makeURL(url: url, imageServiceURL: imageServiceURL, size: size)
 			},
 			generalImage: { url in
-				makeURL(url: url, imageServiceURL: imageServiceURL)
+				makeURL(url: url, imageServiceURL: imageServiceURL, size: maxFlexibleSize)
 			}
 		)
 	}
@@ -24,15 +24,11 @@ extension URLFormatterClient: DependencyKey {
 	public static let defaultImageServiceURL = URL(string: "https://image-service.radixdlt.com")!
 	#endif
 
-	private static func makeURL(url: URL, imageServiceURL: URL, size: CGSize? = nil) -> URL {
+	private static func makeURL(url: URL, imageServiceURL: URL, size: CGSize) -> URL {
 		let originItem = URLQueryItem(name: "imageOrigin", value: url.absoluteString)
-		var queryItems = [originItem]
-		if let size {
-			let sizeItem = URLQueryItem(name: "imageSize", value: imageSizeString(size: size))
-			queryItems.append(sizeItem)
-		}
+		let sizeItem = URLQueryItem(name: "imageSize", value: imageSizeString(size: size))
 
-		return imageServiceURL.appending(queryItems: queryItems)
+		return imageServiceURL.appending(queryItems: [originItem, sizeItem])
 	}
 
 	private static func imageSizeString(size: CGSize) -> String {
@@ -43,4 +39,6 @@ extension URLFormatterClient: DependencyKey {
 
 	/// The minimum length of the sides, in pixels, of a requested image
 	private static let minSize: Int = 64
+
+	private static let maxFlexibleSize = CGSize(width: 1024, height: 1024)
 }
