@@ -8,9 +8,16 @@ import SplashFeature
 extension App.State {
 	var viewState: App.ViewState {
 		.init(
-			isOnMainnet: isOnMainnet,
-			hasMainnetEverBeenLive: hasMainnetEverBeenLive,
-			isCurrentlyOnboardingUser: isCurrentlyOnboardingUser
+			showIsUsingTestnetBanner: {
+				guard hasMainnetEverBeenLive else {
+					return false
+				}
+				if isCurrentlyOnboardingUser {
+					return false
+				}
+
+				return !isOnMainnet
+			}()
 		)
 	}
 }
@@ -18,20 +25,7 @@ extension App.State {
 // MARK: - App.View
 extension App {
 	public struct ViewState: Equatable {
-		let isOnMainnet: Bool
-		let hasMainnetEverBeenLive: Bool
-		let isCurrentlyOnboardingUser: Bool
-
-		var showIsUsingTestnetBanner: Bool {
-			guard hasMainnetEverBeenLive else {
-				return false
-			}
-			if isCurrentlyOnboardingUser {
-				return false
-			}
-
-			return !isOnMainnet
-		}
+		let showIsUsingTestnetBanner: Bool
 	}
 
 	@MainActor
@@ -81,7 +75,7 @@ extension App {
 					action: App.Alerts.Action.incompatibleProfileErrorAlert
 				)
 				.task { @MainActor in
-					await viewStore.send(.task).finish()
+					await store.send(.view(.task)).finish()
 				}
 				.showDeveloperDisclaimerBanner(viewStore.showIsUsingTestnetBanner)
 				.presentsLoadingViewOverlay()
