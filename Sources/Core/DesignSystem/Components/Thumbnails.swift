@@ -101,7 +101,7 @@ public struct NFTThumbnail: View {
 	}
 
 	public var body: some View {
-		LoadableImage(url: url, size: .fixedSize(size), placeholders: .init(loading: .color(.app.gray1))) {
+		LoadableImage(url: url, size: .fixedSize(size)) {
 			Image(asset: AssetResource.nft)
 				.resizable()
 		}
@@ -144,9 +144,14 @@ public struct LoadableImage<Placeholder: View>: View {
 		placeholders placeholderBehaviour: LoadableImagePlaceholderBehaviour = .default,
 		placeholder: () -> Placeholder
 	) {
-		if let url, !url.isVectorImage, case let .fixedSize(hitTargetSize, _) = sizingBehaviour {
+		if let url, !url.isVectorImage {
 			@Dependency(\.urlFormatterClient) var urlFormatterClient
-			self.url = urlFormatterClient.fixedSizeImage(url, Screen.pixelScale * hitTargetSize.frame)
+			switch sizingBehaviour {
+			case let .fixedSize(hitTargetSize, _):
+				self.url = urlFormatterClient.fixedSizeImage(url, Screen.pixelScale * hitTargetSize.frame)
+			case .flexible:
+				self.url = urlFormatterClient.generalImage(url)
+			}
 		} else {
 			self.url = url
 		}
@@ -278,7 +283,7 @@ public struct LoadableImagePlaceholderBehaviour {
 	public static let `default`: Self = .init()
 
 	/// `standard` refers to the placeholder supplied when creating the `LoadableImage`
-	public init(loading: LoadingPlaceholder = .standard, brokenImage: BrokenImagePlaceholder = .brokenImage) {
+	public init(loading: LoadingPlaceholder = .color(.clear), brokenImage: BrokenImagePlaceholder = .brokenImage) {
 		self.loading = loading
 		self.brokenImage = brokenImage
 	}
