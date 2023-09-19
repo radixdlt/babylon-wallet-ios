@@ -10,7 +10,7 @@ final class AssetTests: TestCase {
 
 		let globalId = try NonFungibleGlobalId.fromParts(resourceAddress: resourceAddress.intoEngine(), nonFungibleLocalId: localId)
 		let sut = AccountPortfolio.NonFungibleResource(
-			resourceAddress: resourceAddress,
+			resource: .init(resourceAddress: resourceAddress),
 			tokens: [.init(id: globalId, name: nil, description: nil, keyImageURL: nil, metadata: [])]
 		)
 		let expectedGlobalID = try NonFungibleGlobalId.fromParts(resourceAddress: resourceAddress.intoEngine(), nonFungibleLocalId: localId)
