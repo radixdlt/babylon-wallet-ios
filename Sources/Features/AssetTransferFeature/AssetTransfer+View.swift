@@ -4,10 +4,15 @@ extension AssetTransfer.State {
 	var viewState: AssetTransfer.ViewState {
 		.init(
 			canSendTransferRequest: canSendTransferRequest,
-			message: message,
-			isMainnetAccount: isMainnetAccount,
-			hasMainnetEverBeenLive: hasMainnetEverBeenLive
+			message: message
 		)
+	}
+
+	var showIsUsingTestnetBanner: Bool {
+		guard hasMainnetEverBeenLive else {
+			return false
+		}
+		return !isMainnetAccount
 	}
 }
 
@@ -15,15 +20,6 @@ extension AssetTransfer {
 	public struct ViewState: Equatable {
 		let canSendTransferRequest: Bool
 		let message: AssetTransferMessage.State?
-		let isMainnetAccount: Bool
-		let hasMainnetEverBeenLive: Bool
-
-		var showIsUsingTestnetBanner: Bool {
-			guard hasMainnetEverBeenLive else {
-				return false
-			}
-			return !isMainnetAccount
-		}
 	}
 
 	@MainActor
@@ -104,14 +100,13 @@ extension AssetTransfer {
 		}
 
 		public var body: some SwiftUI.View {
-			WithViewStore(store, observe: \.viewState) { viewStore in
-				WithNavigationBar {
-					viewStore.send(.view(.closeButtonTapped))
-				} content: {
-					View(store: store)
-				}
-				.showDeveloperDisclaimerBanner(viewStore.showIsUsingTestnetBanner)
+			let bannerStore = store.scope(state: \.showIsUsingTestnetBanner, action: actionless)
+			WithNavigationBar {
+				store.send(.view(.closeButtonTapped))
+			} content: {
+				View(store: store)
 			}
+			.showDeveloperDisclaimerBanner(bannerStore)
 		}
 	}
 }

@@ -6,34 +6,20 @@ import OnboardingFeature
 import SplashFeature
 
 extension App.State {
-	var viewState: App.ViewState {
-		.init(
-			isOnMainnet: isOnMainnet,
-			hasMainnetEverBeenLive: hasMainnetEverBeenLive,
-			isCurrentlyOnboardingUser: isCurrentlyOnboardingUser
-		)
+	public var showIsUsingTestnetBanner: Bool {
+		guard hasMainnetEverBeenLive else {
+			return false
+		}
+		if isCurrentlyOnboardingUser {
+			return false
+		}
+
+		return !isOnMainnet
 	}
 }
 
 // MARK: - App.View
 extension App {
-	public struct ViewState: Equatable {
-		let isOnMainnet: Bool
-		let hasMainnetEverBeenLive: Bool
-		let isCurrentlyOnboardingUser: Bool
-
-		var showIsUsingTestnetBanner: Bool {
-			guard hasMainnetEverBeenLive else {
-				return false
-			}
-			if isCurrentlyOnboardingUser {
-				return false
-			}
-
-			return !isOnMainnet
-		}
-	}
-
 	@MainActor
 	public struct View: SwiftUI.View {
 		private let store: StoreOf<App>
@@ -43,49 +29,48 @@ extension App {
 		}
 
 		public var body: some SwiftUI.View {
-			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-				SwitchStore(store.scope(state: \.root, action: Action.child)) { state in
-					switch state {
-					case .main:
-						CaseLet(
-							/App.State.Root.main,
-							action: App.ChildAction.main,
-							then: { Main.View(store: $0) }
-						)
+			let bannerStore = store.scope(state: \.showIsUsingTestnetBanner, action: actionless)
+			SwitchStore(store.scope(state: \.root, action: Action.child)) { state in
+				switch state {
+				case .main:
+					CaseLet(
+						/App.State.Root.main,
+						action: App.ChildAction.main,
+						then: { Main.View(store: $0) }
+					)
 
-					case .onboardingCoordinator:
-						CaseLet(
-							/App.State.Root.onboardingCoordinator,
-							action: App.ChildAction.onboardingCoordinator,
-							then: { OnboardingCoordinator.View(store: $0) }
-						)
+				case .onboardingCoordinator:
+					CaseLet(
+						/App.State.Root.onboardingCoordinator,
+						action: App.ChildAction.onboardingCoordinator,
+						then: { OnboardingCoordinator.View(store: $0) }
+					)
 
-					case .splash:
-						CaseLet(
-							/App.State.Root.splash,
-							action: App.ChildAction.splash,
-							then: { Splash.View(store: $0) }
-						)
-					case .onboardTestnetUserToMainnet:
-						CaseLet(
-							/App.State.Root.onboardTestnetUserToMainnet,
-							action: App.ChildAction.onboardTestnetUserToMainnet,
-							then: { CreateAccountCoordinator.View(store: $0) }
-						)
-					}
+				case .splash:
+					CaseLet(
+						/App.State.Root.splash,
+						action: App.ChildAction.splash,
+						then: { Splash.View(store: $0) }
+					)
+				case .onboardTestnetUserToMainnet:
+					CaseLet(
+						/App.State.Root.onboardTestnetUserToMainnet,
+						action: App.ChildAction.onboardTestnetUserToMainnet,
+						then: { CreateAccountCoordinator.View(store: $0) }
+					)
 				}
-				.tint(.app.gray1)
-				.alert(
-					store: store.scope(state: \.$alert, action: { .view(.alert($0)) }),
-					state: /App.Alerts.State.incompatibleProfileErrorAlert,
-					action: App.Alerts.Action.incompatibleProfileErrorAlert
-				)
-				.task { @MainActor in
-					await viewStore.send(.task).finish()
-				}
-				.showDeveloperDisclaimerBanner(viewStore.showIsUsingTestnetBanner)
-				.presentsLoadingViewOverlay()
 			}
+			.tint(.app.gray1)
+			.alert(
+				store: store.scope(state: \.$alert, action: { .view(.alert($0)) }),
+				state: /App.Alerts.State.incompatibleProfileErrorAlert,
+				action: App.Alerts.Action.incompatibleProfileErrorAlert
+			)
+			.task { @MainActor in
+				await store.send(.view(.task)).finish()
+			}
+			.showDeveloperDisclaimerBanner(bannerStore)
+			.presentsLoadingViewOverlay()
 		}
 	}
 }

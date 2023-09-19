@@ -31,7 +31,7 @@ final class AppFeatureTests: TestCase {
 		await store.receive(.internal(.toOnboarding(hasMainnetEverBeenLive: false))) {
 			$0.root = .onboardingCoordinator(.init(hasMainnetEverBeenLive: false))
 		}
-		XCTAssertFalse(store.state.viewState.showIsUsingTestnetBanner)
+		XCTAssertFalse(store.state.showIsUsingTestnetBanner)
 	}
 
 	func test_splash__GIVEN__an_existing_profile__WHEN__existing_profile_loaded__THEN__we_navigate_to_main() async throws {
@@ -75,7 +75,7 @@ final class AppFeatureTests: TestCase {
 
 		// then
 		await store.receive(.internal(.currentGatewayChanged(to: .default)))
-		XCTAssertFalse(store.state.viewState.showIsUsingTestnetBanner)
+		XCTAssertFalse(store.state.showIsUsingTestnetBanner)
 		await store.send(.child(.splash(.delegate(.completed(.newUser, accountRecoveryNeeded: false, hasMainnetEverBeenLive: false))))) {
 			$0.root = .onboardingCoordinator(.init(hasMainnetEverBeenLive: false))
 		}
@@ -109,7 +109,7 @@ final class AppFeatureTests: TestCase {
 
 		// then
 		await store.receive(.internal(.currentGatewayChanged(to: .default)))
-		XCTAssertFalse(store.state.viewState.showIsUsingTestnetBanner)
+		XCTAssertFalse(store.state.showIsUsingTestnetBanner)
 		await store.send(.child(.splash(.delegate(.completed(outcome, accountRecoveryNeeded: false, hasMainnetEverBeenLive: false))))) {
 			$0.root = .onboardingCoordinator(.init(hasMainnetEverBeenLive: false))
 		}
@@ -190,7 +190,7 @@ final class AppFeatureTests: TestCase {
 		let outcome = LoadProfileOutcome.usersExistingProfileCouldNotBeLoaded(failure: .profileVersionOutdated(json: Data([0xDE, 0xAD]), version: badVersion))
 
 		await store.receive(.internal(.currentGatewayChanged(to: .default)))
-		XCTAssertFalse(store.state.viewState.showIsUsingTestnetBanner)
+		XCTAssertFalse(store.state.showIsUsingTestnetBanner)
 		await store.send(.child(.splash(.delegate(.completed(outcome, accountRecoveryNeeded: false, hasMainnetEverBeenLive: false))))) {
 			$0.alert = .incompatibleProfileErrorAlert(
 				.init(

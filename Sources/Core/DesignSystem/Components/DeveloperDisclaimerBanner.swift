@@ -1,12 +1,15 @@
+import ComposableArchitecture
 import Resources
 import SwiftUI
 
 extension View {
-	@ViewBuilder
-	public func showDeveloperDisclaimerBanner(_ show: Bool) -> some View {
+	@MainActor
+	public func showDeveloperDisclaimerBanner(_ store: Store<Bool, Never>) -> some View {
 		VStack(spacing: 0) {
-			if show {
-				DeveloperDisclaimerBanner()
+			WithViewStore(store, observe: { $0 }) { viewStore in
+				if viewStore.state {
+					DeveloperDisclaimerBanner()
+				}
 			}
 			self
 		}
@@ -14,8 +17,8 @@ extension View {
 }
 
 // MARK: - DeveloperDisclaimerBanner
-struct DeveloperDisclaimerBanner: View {
-	var body: some View {
+public struct DeveloperDisclaimerBanner: View {
+	public var body: some View {
 		Text(L10n.Common.developerDisclaimerText)
 			.frame(maxWidth: .infinity, alignment: .center)
 			.padding(.small3)
@@ -23,5 +26,5 @@ struct DeveloperDisclaimerBanner: View {
 			.textStyle(.body2HighImportance)
 	}
 
-	init() {}
+	public init() {}
 }

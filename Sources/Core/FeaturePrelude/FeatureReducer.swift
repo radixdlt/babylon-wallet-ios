@@ -92,3 +92,6 @@ extension FeatureAction: Hashable where Feature.ViewAction: Hashable, Feature.Ch
 		}
 	}
 }
+
+/// For scoping to an actionless childstore
+public func actionless<T>(never: Never) -> T {}
