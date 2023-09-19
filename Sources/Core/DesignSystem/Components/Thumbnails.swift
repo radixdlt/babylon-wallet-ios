@@ -182,9 +182,9 @@ public struct LoadableImage<Placeholder: View>: View {
 					brokenImageView
 					if let error = state.error {
 						if url.isVectorImage {
-							let _ = loggerGlobal.warning("Could not load thumbnail \(url): \(error)")
-						} else {
 							let _ = loggerGlobal.warning("Vector images are not supported \(url): \(error)")
+						} else {
+							let _ = loggerGlobal.warning("Could not load thumbnail \(url): \(error)")
 						}
 					}
 				}
