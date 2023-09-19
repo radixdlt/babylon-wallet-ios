@@ -1,12 +1,15 @@
+import ComposableArchitecture
 import Resources
 import SwiftUI
 
 extension View {
-	@ViewBuilder
-	public func showDeveloperDisclaimerBanner(_ show: Bool) -> some View {
+	@MainActor
+	public func showDeveloperDisclaimerBanner(_ store: Store<Bool, Never>) -> some View {
 		VStack(spacing: 0) {
-			if show {
-				DeveloperDisclaimerBanner()
+			WithViewStore(store, observe: { $0 }) { viewStore in
+				if viewStore.state {
+					DeveloperDisclaimerBanner()
+				}
 			}
 			self
 		}

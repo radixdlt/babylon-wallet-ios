@@ -6,28 +6,20 @@ import OnboardingFeature
 import SplashFeature
 
 extension App.State {
-	var viewState: App.ViewState {
-		.init(
-			showIsUsingTestnetBanner: {
-				guard hasMainnetEverBeenLive else {
-					return false
-				}
-				if isCurrentlyOnboardingUser {
-					return false
-				}
+	var showIsUsingTestnetBanner: Bool {
+		guard hasMainnetEverBeenLive else {
+			return false
+		}
+		if isCurrentlyOnboardingUser {
+			return false
+		}
 
-				return !isOnMainnet
-			}()
-		)
+		return !isOnMainnet
 	}
 }
 
 // MARK: - App.View
 extension App {
-	public struct ViewState: Equatable {
-		let showIsUsingTestnetBanner: Bool
-	}
-
 	@MainActor
 	public struct View: SwiftUI.View {
 		private let store: StoreOf<App>
@@ -37,21 +29,7 @@ extension App {
 		}
 
 		public var body: some SwiftUI.View {
-			VStack(spacing: 0) {
-				conditionalBannerView
-				appView
-			}
-		}
-
-		private var conditionalBannerView: some SwiftUI.View {
-			WithViewStore(store, observe: \.viewState) { viewStore in
-				if viewStore.showIsUsingTestnetBanner {
-					DeveloperDisclaimerBanner()
-				}
-			}
-		}
-
-		private var appView: some SwiftUI.View {
+			let bannerStore = store.scope(state: \.showIsUsingTestnetBanner, action: actionless)
 			SwitchStore(store.scope(state: \.root, action: Action.child)) { state in
 				switch state {
 				case .main:
@@ -92,6 +70,7 @@ extension App {
 				await store.send(.view(.task)).finish()
 			}
 			.presentsLoadingViewOverlay()
+			.showDeveloperDisclaimerBanner(bannerStore)
 		}
 	}
 }
