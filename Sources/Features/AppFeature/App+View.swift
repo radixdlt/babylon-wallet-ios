@@ -69,8 +69,8 @@ extension App {
 			.task { @MainActor in
 				await store.send(.view(.task)).finish()
 			}
-			.presentsLoadingViewOverlay()
 			.showDeveloperDisclaimerBanner(bannerStore)
+			.presentsLoadingViewOverlay()
 		}
 	}
 }
