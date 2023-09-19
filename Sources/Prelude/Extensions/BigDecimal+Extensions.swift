@@ -242,47 +242,23 @@ extension BigDecimal {
 	}
 
 	/// If the number is larger than or equal to a trillion/billion/million, it is scaled down and the unit provided
-	public func usingUnit() -> (scaled: BigDecimal, unit: String?) {
+	public func scaledWithUnit() -> (scaled: BigDecimal, unit: String?) {
 		do {
 			let trillion = try BigDecimal(fromString: "1E12")
 			let billion = try BigDecimal(fromString: "1E9")
 			let million = try BigDecimal(fromString: "1E6")
 
-			if self >= trillion {
+			if magnitude >= trillion {
 				return (self / trillion, "T")
-			} else if self >= billion {
+			} else if magnitude >= billion {
 				return (self / billion, "B")
-			} else if self >= million {
+			} else if magnitude >= million {
 				return (self / million, "M")
 			}
 		} catch {
 			assertionFailure("This is impossible, since the constructors will not fails")
 		}
 		return (self, nil)
-	}
-
-	private func parts() -> (sign: String, integer: String, decimal: String?) {
-		var absoluteIntegerValue = integerValue.magnitude.description
-
-		let signString = sign == .minus ? "-" : ""
-
-		if scale >= absoluteIntegerValue.count {
-			// Only decimals
-
-			let after = String(repeating: "0", count: scale - absoluteIntegerValue.count) + absoluteIntegerValue
-			return (signString, "0", after)
-		} else {
-			let location = absoluteIntegerValue.count - scale
-			if location > absoluteIntegerValue.count {
-				let zeros = String(repeating: "0", count: location - absoluteIntegerValue.count)
-				return (signString, absoluteIntegerValue + zeros, nil)
-			} else {
-				let afterLength = absoluteIntegerValue.count - location
-				let after = absoluteIntegerValue.suffix(afterLength)
-				absoluteIntegerValue.removeLast(afterLength)
-				return (signString, absoluteIntegerValue, String(after))
-			}
-		}
 	}
 
 	// d = 2, p = 3
@@ -299,50 +275,111 @@ extension BigDecimal {
 		divisibility: UInt? = nil,
 		locale: Locale = .autoupdatingCurrent
 	) -> String {
-		let (sign, integerPart, decimalPart) = parts()
-		// If decimal part is nil or empty, just return the signed integer
-		guard var decimalPart, !decimalPart.isEmpty else { return sign + integerPart }
-		// An asset should not be displayed with more decimals than its divisibility merits
-		let places = min(maxPlaces, divisibility ?? .max)
-
-		if decimalPart.count >
-
-//		guard decimalPart.count > places else { return sign + integerPart +  }
-
-//		let decimalPart = rawDecimalPart?.drop { $0 == "0" }
-
-		let decimalSeparator = locale.decimalSeparator ?? "."
-
-		return sign + integerPart + decimalSeparator + decimalPart
+		let (scaledDown, unit) = scaledWithUnit()
+		let formatted = scaledDown.new_format_without_unit(maxPlaces: maxPlaces, divisibility: divisibility, locale: locale)
+		if let unit {
+			return formatted + " " + unit
+		} else {
+			return formatted
+		}
 	}
 
-	/// Outputs a locale respecting string, without rounding.
-	public func new_formatWithoutRounding(locale: Locale = .autoupdatingCurrent) -> String {
-		var absoluteIntegerValue = self.integerValue.magnitude.description
-
-		let (before, after): (String, String) = {
-			if self.scale >= absoluteIntegerValue.count {
-				let after = String(repeating: "0", count: self.scale - absoluteIntegerValue.count) + absoluteIntegerValue
-				return ("0", after)
-			} else {
-				let location = absoluteIntegerValue.count - self.scale
-				if location > absoluteIntegerValue.count {
-					let zeros = String(repeating: "0", count: location - absoluteIntegerValue.count)
-					return (absoluteIntegerValue + zeros, "")
-				} else {
-					let afterLength = absoluteIntegerValue.count - location
-					let after = absoluteIntegerValue.suffix(afterLength)
-					absoluteIntegerValue.removeLast(afterLength)
-					return (absoluteIntegerValue, String(after))
-				}
-			}
-		}()
-
-		let sign = self.sign == .minus ? "-" : ""
-
+	/// Formats the number for human consumtion
+	public func new_format_without_unit_(
+		maxPlaces: UInt = BigDecimal.defaultMaxPlacesFormattted,
+		divisibility: UInt? = nil,
+		locale: Locale = .autoupdatingCurrent
+	) -> String {
+		// The magnitude of the underlying integer value, as a string
+		let magnitude = integerValue.magnitude.description
+		let signString = sign == .minus ? "-" : ""
 		let decimalSeparator = locale.decimalSeparator ?? "."
 
-		return sign + (after.isEmpty ? before : "\(before)\(decimalSeparator)\(after)")
+		if scale >= magnitude.count {
+			// Below 1 case. Pad magnitude part with leading zeros as needed
+			let decimalPart = String(repeating: "0", count: scale - magnitude.count) + magnitude
+			// Trim trailing zeros
+			let trimmedDecimalPart = String(decimalPart.drop { $0 == "0" })
+			if trimmedDecimalPart.isEmpty {
+				// No non-zero decimals, no need for sign
+				return "0"
+			} else {
+				return signString + "0" + decimalSeparator + trimmedDecimalPart // TODO: Round
+			}
+		} else {
+			let location = magnitude.count - scale
+			if location > magnitude.count {
+				// Integer case. Pad magnitude with trailing zeros
+				let zeros = String(repeating: "0", count: location - magnitude.count)
+				return signString + magnitude + zeros
+			} else {
+				// General case
+				let decimalCount = magnitude.count - location
+				// Move decimals
+				let integerPart = String(magnitude.dropLast(decimalCount))
+				let trimmedDecimalPart = String(magnitude.suffix(decimalCount).drop { $0 == "0" }) // TODO: Trim and Round
+				if trimmedDecimalPart.isEmpty {
+					return signString + integerPart
+				} else {
+					return signString + integerPart + decimalSeparator + trimmedDecimalPart
+				}
+			}
+		}
+	}
+
+	public func new_format_without_unit(
+		maxPlaces: UInt = BigDecimal.defaultMaxPlacesFormattted,
+		divisibility: UInt? = nil,
+		locale: Locale = .autoupdatingCurrent
+	) -> String {
+		// An asset should not be displayed with more decimals than its divisibility merits
+		let maxDecimals = min(maxPlaces, divisibility ?? .max)
+		let decimalSeparator = locale.decimalSeparator ?? "."
+		let (sign, integerPart, decimalPart) = parts()
+
+		guard var decimalPart else {
+			// No decimals, return the integer part, with a sign if non-zero
+			return integerPart.map { sign + $0 } ?? "0"
+		}
+		if decimalPart.count > maxDecimals {
+			// Round the decimal part
+		}
+
+		// Trim the decimal part
+		while decimalPart.hasSuffix("0") {
+			decimalPart.removeLast()
+		}
+
+		if decimalPart.isEmpty {}
+
+		return ""
+	}
+
+	private func parts() -> (sign: String, integerPart: String?, decimalPart: String?) {
+		// The magnitude of the underlying integer value, as a string
+		let magnitude = integerValue.magnitude.description
+		let signString = sign == .minus ? "-" : ""
+		let integerPart, decimalPart: String?
+
+		if scale >= magnitude.count {
+			// No integer part. Pad magnitude part with leading zeros as needed to get decimal part.
+			integerPart = nil
+			decimalPart = String(repeating: "0", count: scale - magnitude.count) + magnitude
+		} else {
+			let location = magnitude.count - scale
+			if location > magnitude.count {
+				// No decimal part. Pad magnitude part with trailing zeros as needed to get integer part.
+				integerPart = magnitude + String(repeating: "0", count: location - magnitude.count)
+				decimalPart = nil
+			} else {
+				// General case. Take the last digits as decimals.
+				let decimalCount = magnitude.count - location
+				integerPart = String(magnitude.dropLast(decimalCount))
+				decimalPart = String(magnitude.suffix(decimalCount))
+			}
+		}
+
+		return (signString, integerPart, decimalPart)
 	}
 }
 
