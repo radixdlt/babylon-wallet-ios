@@ -12,10 +12,12 @@ extension URLFormatterClient: TestDependencyKey {
 	public static let previewValue: Self = .noop
 
 	public static let testValue = Self(
-		fixedSizeImage: unimplemented("\(Self.self).fixedSize")
+		fixedSizeImage: unimplemented("\(Self.self).fixedSize"),
+		generalImage: unimplemented("\(Self.self).general")
 	)
 
 	public static let noop = Self(
-		fixedSizeImage: { url, _ in url }
+		fixedSizeImage: { url, _ in url },
+		generalImage: { url in url }
 	)
 }
