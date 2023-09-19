@@ -6,7 +6,7 @@ import OnboardingFeature
 import SplashFeature
 
 extension App.State {
-	var showIsUsingTestnetBanner: Bool {
+	public var showIsUsingTestnetBanner: Bool {
 		guard hasMainnetEverBeenLive else {
 			return false
 		}
