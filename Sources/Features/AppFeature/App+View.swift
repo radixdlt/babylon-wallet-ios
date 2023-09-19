@@ -37,7 +37,7 @@ extension App {
 		}
 
 		public var body: some SwiftUI.View {
-			VStack {
+			VStack(spacing: 0) {
 				conditionalBannerView
 				appView
 			}
