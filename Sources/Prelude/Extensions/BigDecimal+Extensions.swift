@@ -205,6 +205,148 @@ extension BigDecimal {
 }
 
 extension BigDecimal {
+	public func new_format(
+		fiatCurrency: FiatCurrency,
+		locale: Locale = .autoupdatingCurrent
+	) -> String {
+		fiatCurrency.sign + format(locale: locale)
+	}
+
+	public func new_integerAndDecimalPart(withDivisibility divisibility: Int?) -> (String, String?) {
+		let stringRepresentation = String(describing: self)
+
+		guard
+			case let components = stringRepresentation.split(
+				separator: Self.integerAndDecimalPartsSeparator
+			),
+			components.count == 2
+		else {
+			return (stringRepresentation, nil)
+		}
+
+		let integerPart = String(components[0])
+		let decimalPart = String({
+			let decimalComponents = components[1]
+			guard let divisibility else {
+				return decimalComponents
+			}
+
+			guard divisibility > .zero else {
+				return ""
+			}
+
+			return decimalComponents.prefix(divisibility)
+		}())
+
+		return (integerPart, decimalPart.isEmpty ? nil : decimalPart)
+	}
+
+	/// If the number is larger than or equal to a trillion/billion/million, it is scaled down and the unit provided
+	public func usingUnit() -> (scaled: BigDecimal, unit: String?) {
+		do {
+			let trillion = try BigDecimal(fromString: "1E12")
+			let billion = try BigDecimal(fromString: "1E9")
+			let million = try BigDecimal(fromString: "1E6")
+
+			if self >= trillion {
+				return (self / trillion, "T")
+			} else if self >= billion {
+				return (self / billion, "B")
+			} else if self >= million {
+				return (self / million, "M")
+			}
+		} catch {
+			assertionFailure("This is impossible, since the constructors will not fails")
+		}
+		return (self, nil)
+	}
+
+	private func parts() -> (sign: String, integer: String, decimal: String?) {
+		var absoluteIntegerValue = integerValue.magnitude.description
+
+		let signString = sign == .minus ? "-" : ""
+
+		if scale >= absoluteIntegerValue.count {
+			// Only decimals
+
+			let after = String(repeating: "0", count: scale - absoluteIntegerValue.count) + absoluteIntegerValue
+			return (signString, "0", after)
+		} else {
+			let location = absoluteIntegerValue.count - scale
+			if location > absoluteIntegerValue.count {
+				let zeros = String(repeating: "0", count: location - absoluteIntegerValue.count)
+				return (signString, absoluteIntegerValue + zeros, nil)
+			} else {
+				let afterLength = absoluteIntegerValue.count - location
+				let after = absoluteIntegerValue.suffix(afterLength)
+				absoluteIntegerValue.removeLast(afterLength)
+				return (signString, absoluteIntegerValue, String(after))
+			}
+		}
+	}
+
+	// d = 2, p = 3
+	// 0.01
+
+	/*
+	 0.44449
+
+	 */
+
+	/// Formats the number for human consumtion
+	public func new_format(
+		maxPlaces: UInt = BigDecimal.defaultMaxPlacesFormattted,
+		divisibility: UInt? = nil,
+		locale: Locale = .autoupdatingCurrent
+	) -> String {
+		let (sign, integerPart, decimalPart) = parts()
+		// If decimal part is nil or empty, just return the signed integer
+		guard var decimalPart, !decimalPart.isEmpty else { return sign + integerPart }
+		// An asset should not be displayed with more decimals than its divisibility merits
+		let places = min(maxPlaces, divisibility ?? .max)
+
+		if decimalPart.count >
+
+//		guard decimalPart.count > places else { return sign + integerPart +  }
+
+//		let decimalPart = rawDecimalPart?.drop { $0 == "0" }
+
+		let decimalSeparator = locale.decimalSeparator ?? "."
+
+		return sign + integerPart + decimalSeparator + decimalPart
+	}
+
+	/// Outputs a locale respecting string, without rounding.
+	public func new_formatWithoutRounding(locale: Locale = .autoupdatingCurrent) -> String {
+		var absoluteIntegerValue = self.integerValue.magnitude.description
+
+		let (before, after): (String, String) = {
+			if self.scale >= absoluteIntegerValue.count {
+				let after = String(repeating: "0", count: self.scale - absoluteIntegerValue.count) + absoluteIntegerValue
+				return ("0", after)
+			} else {
+				let location = absoluteIntegerValue.count - self.scale
+				if location > absoluteIntegerValue.count {
+					let zeros = String(repeating: "0", count: location - absoluteIntegerValue.count)
+					return (absoluteIntegerValue + zeros, "")
+				} else {
+					let afterLength = absoluteIntegerValue.count - location
+					let after = absoluteIntegerValue.suffix(afterLength)
+					absoluteIntegerValue.removeLast(afterLength)
+					return (absoluteIntegerValue, String(after))
+				}
+			}
+		}()
+
+		let sign = self.sign == .minus ? "-" : ""
+
+		let decimalSeparator = locale.decimalSeparator ?? "."
+
+		return sign + (after.isEmpty ? before : "\(before)\(decimalSeparator)\(after)")
+	}
+}
+
+extension BigDecimal {
 	public var clamped: BigDecimal {
 		max(0, self)
 	}
