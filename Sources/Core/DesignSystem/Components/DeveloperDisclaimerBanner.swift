@@ -14,8 +14,8 @@ extension View {
 }
 
 // MARK: - DeveloperDisclaimerBanner
-public struct DeveloperDisclaimerBanner: View {
-	public var body: some View {
+struct DeveloperDisclaimerBanner: View {
+	var body: some View {
 		Text(L10n.Common.developerDisclaimerText)
 			.frame(maxWidth: .infinity, alignment: .center)
 			.padding(.small3)
@@ -23,5 +23,5 @@ public struct DeveloperDisclaimerBanner: View {
 			.textStyle(.body2HighImportance)
 	}
 
-	public init() {}
+	init() {}
 }

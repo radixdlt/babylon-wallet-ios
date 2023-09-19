@@ -37,6 +37,21 @@ extension App {
 		}
 
 		public var body: some SwiftUI.View {
+			VStack {
+				conditionalBannerView
+				appView
+			}
+		}
+
+		private var conditionalBannerView: some SwiftUI.View {
+			WithViewStore(store, observe: \.viewState) { viewStore in
+				if viewStore.showIsUsingTestnetBanner {
+					DeveloperDisclaimerBanner()
+				}
+			}
+		}
+
+		private var appView: some SwiftUI.View {
 			SwitchStore(store.scope(state: \.root, action: Action.child)) { state in
 				switch state {
 				case .main:
@@ -75,13 +90,6 @@ extension App {
 			)
 			.task { @MainActor in
 				await store.send(.view(.task)).finish()
-			}
-			.overlay(alignment: .top) {
-				WithViewStore(store, observe: \.viewState) { viewStore in
-					if viewStore.showIsUsingTestnetBanner {
-						DeveloperDisclaimerBanner()
-					}
-				}
 			}
 			.presentsLoadingViewOverlay()
 		}
