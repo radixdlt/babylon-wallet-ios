@@ -39,10 +39,10 @@ extension NonFungibleAssetList.Row.View {
 //						componentView(with: viewStore, asset: item, index: index)
 //					}
 				}
-				.padding(.horizontal, .medium3)
-				.task { @MainActor in
-					await viewStore.send(.task).finish()
+				.onAppear {
+					viewStore.send(.didAppear)
 				}
+				.padding(.horizontal, .medium3)
 			}
 		}
 	}
@@ -141,7 +141,7 @@ extension NonFungibleAssetList.Row.View {
 private extension NonFungibleAssetList.Row.ViewState {
 	var supply: String {
 		// Load total supply async.
-		resourceDetails.totalSupply.wrappedValue?.map {
+		resource.resource.totalSupply.map {
 			L10n.AssetDetails.NFTDetails.ownedOfTotal(
 				nftCount,
 				Int($0)

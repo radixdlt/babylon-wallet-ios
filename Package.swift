@@ -113,6 +113,7 @@ package.addModules([
 		name: "AssetsFeature",
 		dependencies: [
 			"AccountPortfoliosClient",
+			"OnLedgerEntitiesClient",
 		],
 		tests: .no
 	),

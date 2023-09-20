@@ -11,11 +11,23 @@ extension NonFungibleAssetList {
 		}
 
 		public var body: some SwiftUI.View {
-			VStack(spacing: .medium1) {
+			LazyVStack(spacing: .medium1) {
 				ForEachStore(
 					store.scope(state: \.rows) { .child(.asset($0, $1)) },
-					content: { NonFungibleAssetList.Row.View(store: $0) }
+					content: {
+						NonFungibleAssetList.Row.View(store: $0)
+					}
 				)
+			}
+			.task { @MainActor in
+				await ViewStore(store, observe: { $0 }).send(.view(.task)).finish()
+			}
+			.overlay(alignment: .bottom) {
+				WithViewStore(store.scope(state: \.isLoadingResources, action: actionless), observe: { $0 }) { viewStore in
+					if viewStore.state {
+						ProgressView()
+					}
+				}
 			}
 			.sheet(
 				store: store.scope(state: \.$destination) { .child(.destination($0)) },
@@ -40,7 +52,7 @@ struct NonFungibleTokenList_Preview: PreviewProvider {
 	static var previews: some View {
 		NonFungibleAssetList.View(
 			store: .init(
-				initialState: .init(rows: []),
+				initialState: .init(resources: []),
 				reducer: NonFungibleAssetList.init
 			)
 		)

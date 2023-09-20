@@ -1,6 +1,5 @@
 import EngineKit
 import FeaturePrelude
-import OnLedgerEntitiesClient
 
 extension NonFungibleAssetList {
 	public struct Row: Sendable, FeatureReducer {
@@ -13,8 +12,6 @@ extension NonFungibleAssetList {
 			public var isExpanded = false
 			public var disabled: Set<AssetID> = []
 			public var selectedAssets: OrderedSet<AssetID>?
-
-			public var resourceDetails: Loadable<OnLedgerEntity.Resource> = .idle
 
 			public init(
 				resource: AccountPortfolio.NonFungibleResource,
@@ -30,29 +27,21 @@ extension NonFungibleAssetList {
 		public enum ViewAction: Sendable, Equatable {
 			case isExpandedToggled
 			case assetTapped(State.AssetID)
-			case task
-		}
-
-		public enum InternalAction: Sendable, Equatable {
-			case resourceDetailsLoaded(TaskResult<OnLedgerEntity.Resource>)
+			case didAppear
 		}
 
 		public enum DelegateAction: Sendable, Equatable {
 			case open(NonFungibleGlobalId)
+			case didAppear(ResourceAddress)
 		}
-
-		@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
 
 		public init() {}
 
 		public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 			switch viewAction {
-			case .task:
-				state.resourceDetails = .loading
-				return .run { [resourceAddres = state.resource.resource.resourceAddress] send in
-					let result = await TaskResult { try await onLedgerEntitiesClient.getResource(resourceAddres) }
-					await send(.internal(.resourceDetailsLoaded(result)))
-				}
+			case .didAppear:
+				return .send(.delegate(.didAppear(state.resource.resourceAddress)))
+
 			case let .assetTapped(localID):
 				guard !state.disabled.contains(localID) else { return .none }
 				if state.selectedAssets != nil {
@@ -67,17 +56,6 @@ extension NonFungibleAssetList {
 
 			case .isExpandedToggled:
 				state.isExpanded.toggle()
-				return .none
-			}
-		}
-
-		public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
-			switch internalAction {
-			case let .resourceDetailsLoaded(.success(resource)):
-				state.resourceDetails = .success(resource)
-				return .none
-			case let .resourceDetailsLoaded(.failure(err)):
-				state.resourceDetails = .failure(err)
 				return .none
 			}
 		}

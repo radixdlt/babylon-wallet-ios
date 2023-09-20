@@ -163,7 +163,7 @@ extension AssetsView.State {
 		}
 
 		if !nfts.isEmpty {
-			nonFungibleTokenList = .init(rows: .init(uniqueElements: nfts))
+			nonFungibleTokenList = .init(resources: portfolio.nonFungibleResources)
 		}
 
 		let lsuResource: LSUResource.State? = {
