@@ -205,169 +205,30 @@ extension BigDecimal {
 }
 
 extension BigDecimal {
-	public static func round(_ decimalPart: String, to count: Int) -> String {
-		// An asset should not be displayed with more decimals than its divisibility merits
-		guard decimalPart.count > count else { return decimalPart }
-
-		// We look closer at the first decimalCount digits, plus the next digit after
-		var result = decimalPart.prefix(count + 1)
-
-		/// Removes the last digit, then returns `true` if the remaining number should be rounded up
-		func shouldRoundUp() -> Bool {
-			guard let nextAfter = Int(String(result.removeLast())) else { return false } // Can't fail
-			print("  \(result) [\(nextAfter)] Should round up: \(nextAfter > 4)")
-			return nextAfter > 4
-		}
-
-		func roundUp() {
-			guard let final = Int(String(result.removeLast())) else { return } // Can't fail
-			print("  \(result) [\(final)] Rounding up: \(final + 1)")
-
-			let newFinal = final + 1
-			if newFinal == 10 {
-				roundUp()
-			} else {
-				result = result + String(newFinal)
-			}
-		}
-
-		if shouldRoundUp() {
-			roundUp()
-		}
-
-		return String(result)
-	}
-
-	public func new_format(
-		fiatCurrency: FiatCurrency,
-		locale: Locale = .autoupdatingCurrent
-	) -> String {
-		fiatCurrency.sign + format(locale: locale)
-	}
-
-	public func new_integerAndDecimalPart(withDivisibility divisibility: Int?) -> (String, String?) {
-		let stringRepresentation = String(describing: self)
-
-		guard
-			case let components = stringRepresentation.split(
-				separator: Self.integerAndDecimalPartsSeparator
-			),
-			components.count == 2
-		else {
-			return (stringRepresentation, nil)
-		}
-
-		let integerPart = String(components[0])
-		let decimalPart = String({
-			let decimalComponents = components[1]
-			guard let divisibility else {
-				return decimalComponents
-			}
-
-			guard divisibility > .zero else {
-				return ""
-			}
-
-			return decimalComponents.prefix(divisibility)
-		}())
-
-		return (integerPart, decimalPart.isEmpty ? nil : decimalPart)
-	}
-
-	/// If the number is larger than or equal to a trillion/billion/million, it is scaled down and the unit provided
-	public func scaledWithUnit() -> (scaled: BigDecimal, unit: String?) {
-		do {
-			let trillion = try BigDecimal(fromString: "1E12")
-			let billion = try BigDecimal(fromString: "1E9")
-			let million = try BigDecimal(fromString: "1E6")
-
-			if magnitude >= 100 * trillion {
-				return (self / trillion, "T")
-			} else if magnitude >= 100 * billion {
-				return (self / billion, "B")
-			} else if magnitude >= 100 * million {
-				return (self / million, "M")
-			}
-		} catch {
-			assertionFailure("This is impossible, since the constructors will not fail")
-		}
-		return (self, nil)
-	}
-
-	// d = 2, p = 3
-	// 0.01
-
-	/*
-	 0.44449
-
-	 */
-
-	/// Formats the number for human consumtion
 	public func new_format(
 		maxPlaces: UInt = BigDecimal.defaultMaxPlacesFormattted,
-		divisibility: UInt? = nil,
-		locale: Locale = .autoupdatingCurrent
-	) -> String {
-		let (scaledDown, unit) = scaledWithUnit()
-		let formatted = scaledDown.new_format_without_unit(maxPlaces: maxPlaces, divisibility: divisibility, locale: locale)
-		if let unit {
-			return formatted + " " + unit
-		} else {
-			return formatted
-		}
-	}
-
-	/// Formats the number for human consumtion
-	public func new_format_without_unit_(
-		maxPlaces: UInt = BigDecimal.defaultMaxPlacesFormattted,
-		divisibility: UInt? = nil,
-		locale: Locale = .autoupdatingCurrent
-	) -> String {
-		// The magnitude of the underlying integer value, as a string
-		let magnitude = integerValue.magnitude.description
-		let signString = sign == .minus ? "-" : ""
-		let decimalSeparator = locale.decimalSeparator ?? "."
-
-		if scale >= magnitude.count {
-			// Below 1 case. Pad magnitude part with leading zeros as needed
-			let decimalPart = String(repeating: "0", count: scale - magnitude.count) + magnitude
-			// Trim trailing zeros
-			let trimmedDecimalPart = String(decimalPart.drop { $0 == "0" })
-			if trimmedDecimalPart.isEmpty {
-				// No non-zero decimals, no need for sign
-				return "0"
-			} else {
-				return signString + "0" + decimalSeparator + trimmedDecimalPart // TODO: Round
-			}
-		} else {
-			let location = magnitude.count - scale
-			if location > magnitude.count {
-				// Integer case. Pad magnitude with trailing zeros
-				let zeros = String(repeating: "0", count: location - magnitude.count)
-				return signString + magnitude + zeros
-			} else {
-				// General case
-				let decimalCount = magnitude.count - location
-				// Move decimals
-				let integerPart = String(magnitude.dropLast(decimalCount))
-				let trimmedDecimalPart = String(magnitude.suffix(decimalCount).drop { $0 == "0" }) // TODO: Trim and Round
-				if trimmedDecimalPart.isEmpty {
-					return signString + integerPart
-				} else {
-					return signString + integerPart + decimalSeparator + trimmedDecimalPart
-				}
-			}
-		}
-	}
-
-	public func new_format_without_unit(
-		maxPlaces: UInt = BigDecimal.defaultMaxPlacesFormattted,
-		divisibility: UInt? = nil,
 		locale: Locale = .autoupdatingCurrent
 	) -> String {
 		let signPart = sign == .minus ? "-" : ""
-		var integerPart, decimalPart: String
+		var (integerPart, decimalPart) = parts()
 		let separator = locale.decimalSeparator ?? "."
+		var suffix: String? = nil
+
+		round(integerPart: &integerPart, decimalPart: &decimalPart, suffix: &suffix, toPlaces: maxPlaces)
+		trim(decimalPart: &decimalPart)
+
+		let suffixPart = suffix.map { " " + $0 } ?? ""
+		if !decimalPart.isEmpty {
+			return signPart + integerPart + separator + decimalPart + suffixPart
+		} else if integerPart != "0" {
+			return signPart + integerPart + suffixPart
+		} else {
+			return "0"
+		}
+	}
+
+	private func parts() -> (integerPart: String, decimalPart: String) {
+		let integerPart, decimalPart: String
 
 		// The magnitude of the underlying integer value, as a string
 		let magnitude = integerValue.magnitude.description
@@ -390,68 +251,78 @@ extension BigDecimal {
 			}
 		}
 
-		// An asset should not be displayed with more decimals than its divisibility merits
-		let decimalCount = Int(min(maxPlaces, divisibility ?? .max))
-
-		round(integerPart: &integerPart, decimalPart: &decimalPart, toPlaces: decimalCount)
-		trim(decimalPart: &decimalPart)
-
-		if !decimalPart.isEmpty {
-			return signPart + integerPart + separator + decimalPart
-		} else if integerPart != "0" {
-			return signPart + integerPart
-		} else {
-			return "0"
-		}
+		return (integerPart, decimalPart)
 	}
 
-	// Round the decimal part up or down as needed, and potentially also the integer part,
-	private func round(integerPart: inout String, decimalPart: inout String, toPlaces maxPlaces: Int) {
+	/// Round the decimal part up or down as needed, potentially adjusting integer part. `suffix` refers to M, B or T, for millions, billions or trillions
+	private func round(integerPart: inout String, decimalPart: inout String, suffix: inout String?, toPlaces maxPlaces: UInt) {
+		// Check if we even need to do any rounding
+		guard integerPart.count + decimalPart.count > maxPlaces else { return }
+
 		// We look closer at the first decimalCount digits, plus the next digit after
-		guard decimalPart.count > maxPlaces else { return }
-		var decimals = decimalPart.prefix(maxPlaces + 1)
+		decimalPart = String(decimalPart.prefix(Int(maxPlaces + 1)))
 
 		// Remove and examine the "next after" digit, to determine if we need to round
-		let nextAfter = Int(String(decimals.removeLast())) // This is optional, but can't fail for a string of numbers
+		let nextAfter = Int(String(decimalPart.removeLast())) // This is an optional, but it can't fail for a string of numbers
 		guard let nextAfter, nextAfter > 4 else { return }
-		print("\(decimals) [\(nextAfter)] Should round up: \(nextAfter > 4)")
-
-		// This will only get called if we run out of decimals and need to resort to the integer part
-		func increaseIntegerPart() {
-			var updated = ""
-
-			// We go through the integer part from right to left
-			while !integerPart.isEmpty {
-				guard let lastDigit = Int(String(integerPart.removeLast())) else { break } // Can't fail
-				if lastDigit == 9 {
-				} else {
-					updated.insert(contentsOf: String(lastDigit + 1), at: updated.startIndex)
-					break
-				}
-			}
-
-			integerPart = integerPart + updated
-		}
 
 		// This is a function because if (and only if) the number ends in a 9, we need to recurse
 		func roundUp() {
-			guard let final = Int(String(decimals.removeLast())) else { return } // Can't fail
-			print("\(decimals) [\(final)] Rounding up: \(final + 1)")
+			guard !decimalPart.isEmpty else {
+				// When we run out of decimals we need to increase the integer part by 1
+				increaseIntegerPart(integerPart: &integerPart, decimalPart: &decimalPart, suffix: &suffix, maxPlaces: maxPlaces)
+				return
+			}
+			// Remove the last digit
+			guard let final = Int(String(decimalPart.removeLast())) else { return } // Can't fail
 
 			if final < 9 {
 				// We simply increase the last digit and finish
-				decimals.append(contentsOf: String(final + 1))
-			} else if decimals.isEmpty {
-				// We ran out of decimals, so we need to
-				increaseIntegerPart()
+				decimalPart.append(contentsOf: String(final + 1))
 			} else {
 				roundUp()
 			}
 		}
 
 		roundUp()
+	}
 
-		decimalPart = String(decimals)
+	private func increaseIntegerPart(integerPart: inout String, decimalPart: inout String, suffix: inout String?, maxPlaces: UInt) {
+		var updated = ""
+		// We go through the number from right to left
+		while true {
+			guard let final = Int(String(integerPart.removeLast())) else { break } // Can't fail
+			if final < 9 {
+				// We simply increase the current digit, at it to updated and finish
+				updated.insert(contentsOf: String(final + 1), at: updated.startIndex)
+				break
+			} else if integerPart.isEmpty {
+				// When ran out of digits, and the last one was 9, we add 10 at the front
+				updated.insert(contentsOf: "10", at: updated.startIndex)
+				// Now we will need to remove a decimal, but that decimal must be a zero so no need to round up
+				if integerPart.count + decimalPart.count <= maxPlaces {
+					print("••• COUNT •••••••••••••••••••••• error \(description)")
+					print("integer: \(integerPart)")
+					print("decimal: \(decimalPart)")
+					print("•••q•••••••••••••••••••••• error")
+				}
+
+				if decimalPart.last != "0" {
+					print("••• LAST •••••••••••••••••••••• error \(description)")
+					print("integer: \(integerPart)")
+					print("decimal: \(decimalPart)")
+					print("•••q•••••••••••••••••••••• error")
+				}
+
+				decimalPart.removeLast()
+				break
+			} else {
+				// The last digit was 9, so we add a 0 and continue increasing the next digit
+				updated.insert("0", at: updated.startIndex)
+			}
+		}
+
+		integerPart.append(contentsOf: updated)
 	}
 
 	// Trim the decimal part as needed
