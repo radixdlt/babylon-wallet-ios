@@ -112,11 +112,6 @@ platform :mac do
     end
 end
 
-lane :cyon do |options|
-    Dotenv.load ".env.ios.beta"
-    changelog = rev_changelog(flavour: ENV['FLAVOUR'])
-end
-
 private_lane :rev_changelog do |options|
     sh('git fetch --tags')
     flavour = options.fetch(:flavour).delete_prefix('"').delete_suffix('"') # if accidentally included

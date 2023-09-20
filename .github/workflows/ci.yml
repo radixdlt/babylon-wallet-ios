@@ -112,7 +112,7 @@ jobs:
         run: bundle exec fastlane ios tests
 
       - name: "Build and archive (release)"
-        run: bundle exec fastlane ios build --env ios.beta
+        run: bundle exec fastlane ios build
 
   snyk_online_monitor:
     name: "Snyk monitoring"
