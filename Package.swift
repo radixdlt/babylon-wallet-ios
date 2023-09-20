@@ -498,7 +498,7 @@ package.addModules([
 			"CacheClient",
 			"EngineKit",
 		],
-		tests: .yes()
+		tests: .no
 	),
 	.client(
 		name: "OnLedgerEntitiesClient",
