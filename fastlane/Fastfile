@@ -113,7 +113,8 @@ platform :mac do
 end
 
 lane :cyon do |options|
-    changelog = rev_changelog(flavour: "Beta")
+    Dotenv.load ".env.ios.beta"
+    changelog = rev_changelog(flavour: ENV['FLAVOUR'])
 end
 
 private_lane :rev_changelog do |options|
