@@ -210,30 +210,23 @@ extension AccountPortfoliosClient {
 			}
 		}()
 
-		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
-
-		let item = try await gatewayAPIClient.getSingleEntityDetails(resource.resourceAddress)
-		let details = item.details?.fungible
-
 		let resourceAddress = try ResourceAddress(validatingAddress: resource.resourceAddress)
-		let divisibility = details?.divisibility
-		let behaviors = details?.roleAssignments.extractBehaviors() ?? []
-		let tags = item.extractTags()
-		let totalSupply = details.flatMap { try? BigDecimal(fromString: $0.totalSupply) }
 		let metadata = resource.explicitMetadata
+		// Should be extracted from explicitMetadata
+		//        let tags = item.extractTags()
 		let dappDefinitions = metadata?.dappDefinitions?.compactMap { try? DappDefinitionAddress(validatingAddress: $0) }
 
 		return AccountPortfolio.FungibleResource(
 			resource: .init(
 				resourceAddress: resourceAddress,
-				divisibility: divisibility,
+				divisibility: nil,
 				name: metadata?.name,
 				symbol: metadata?.symbol,
 				description: metadata?.description,
 				iconURL: metadata?.iconURL,
-				behaviors: behaviors,
-				tags: tags,
-				totalSupply: totalSupply,
+				behaviors: [],
+				tags: [],
+				totalSupply: nil,
 				dappDefinitions: dappDefinitions
 			),
 			amount: amount
@@ -284,56 +277,53 @@ extension AccountPortfoliosClient {
 			return firstPageItems + additionalItems
 		}
 
-		@Sendable
-		func tokens(
-			resource: GatewayAPI.NonFungibleResourcesCollectionItemVaultAggregated
-		) async throws -> IdentifiedArrayOf<AccountPortfolio.NonFungibleResource.NonFungibleToken> {
-			let nftIDs = try await getAllTokens(resource: resource)
+		// Tokens should be loaded lazily
+//		@Sendable
+//		func tokens(
+//			resource: GatewayAPI.NonFungibleResourcesCollectionItemVaultAggregated
+//		) async throws -> IdentifiedArrayOf<AccountPortfolio.NonFungibleResource.NonFungibleToken> {
+//
+//
+//			// https://rdxworks.slack.com/archives/C02MTV9602H/p1681155601557349
+//			let maximumNFTIDChunkSize = 29
+//
+//			var result: IdentifiedArrayOf<AccountPortfolio.NonFungibleResource.NonFungibleToken> = []
+//			for nftIDChunk in nftIDs.chunks(ofCount: maximumNFTIDChunkSize) {
+//				let tokens = try await gatewayAPIClient.getNonFungibleData(.init(
+//					atLedgerState: ledgerState.selector,
+//					resourceAddress: resource.resourceAddress,
+//					nonFungibleIds: Array(nftIDChunk)
+//				))
+//				.nonFungibleIds
+//				.map { item in
+//					let details = item.details
+//					let canBeClaimed = details.claimEpoch.map { UInt64(ledgerState.epoch) >= $0 } ?? false
+//					return try AccountPortfolio.NonFungibleResource.NonFungibleToken(
+//						id: .fromParts(
+//							resourceAddress: .init(address: resource.resourceAddress),
+//							nonFungibleLocalId: .from(stringFormat: item.nonFungibleId)
+//						),
+//						name: details.name,
+//						description: details.tokenDescription,
+//						keyImageURL: details.keyImageURL,
+//						metadata: [],
+//						stakeClaimAmount: details.claimAmount,
+//						canBeClaimed: canBeClaimed
+//					)
+//				}
+//
+//				result.append(contentsOf: tokens)
+//			}
+//
+//			return result
+//		}
 
-			// https://rdxworks.slack.com/archives/C02MTV9602H/p1681155601557349
-			let maximumNFTIDChunkSize = 29
-
-			var result: IdentifiedArrayOf<AccountPortfolio.NonFungibleResource.NonFungibleToken> = []
-			for nftIDChunk in nftIDs.chunks(ofCount: maximumNFTIDChunkSize) {
-				let tokens = try await gatewayAPIClient.getNonFungibleData(.init(
-					atLedgerState: ledgerState.selector,
-					resourceAddress: resource.resourceAddress,
-					nonFungibleIds: Array(nftIDChunk)
-				))
-				.nonFungibleIds
-				.map { item in
-					let details = item.details
-					let canBeClaimed = details.claimEpoch.map { UInt64(ledgerState.epoch) >= $0 } ?? false
-					return try AccountPortfolio.NonFungibleResource.NonFungibleToken(
-						id: .fromParts(
-							resourceAddress: .init(address: resource.resourceAddress),
-							nonFungibleLocalId: .from(stringFormat: item.nonFungibleId)
-						),
-						name: details.name,
-						description: details.tokenDescription,
-						keyImageURL: details.keyImageURL,
-						metadata: [],
-						stakeClaimAmount: details.claimAmount,
-						canBeClaimed: canBeClaimed
-					)
-				}
-
-				result.append(contentsOf: tokens)
-			}
-
-			return result
-		}
-
-		let item = try await gatewayAPIClient.getSingleEntityDetails(resource.resourceAddress)
-		let details = item.details?.nonFungible
-
-		let behaviors = details?.roleAssignments.extractBehaviors() ?? []
-		let tags = item.extractTags()
-		let totalSupply = details.flatMap { try? BigDecimal(fromString: $0.totalSupply) }
-
-		// Load the nftIds from the resource vault
-		let tokens = try await tokens(resource: resource)
+		// Get all user owned nft ids, but do not fetch the related data.
+		let nftIDs = try await getAllTokens(resource: resource)
 		let metadata = resource.explicitMetadata
+
+		// Should be extracted from explicit metadata
+		// let tags = item.extractTags()
 
 		return try AccountPortfolio.NonFungibleResource(
 			resource: .init(
@@ -343,11 +333,11 @@ extension AccountPortfoliosClient {
 				symbol: metadata?.symbol,
 				description: metadata?.description,
 				iconURL: metadata?.iconURL,
-				behaviors: behaviors,
-				tags: tags,
-				totalSupply: totalSupply
+				behaviors: [],
+				tags: [],
+				totalSupply: nil
 			),
-			tokens: tokens
+			tokens: nftIDs
 		)
 	}
 }

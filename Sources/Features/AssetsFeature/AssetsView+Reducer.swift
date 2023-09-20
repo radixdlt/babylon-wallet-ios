@@ -397,14 +397,16 @@ private struct NonFungibleTokensPerResourceProvider {
 				return nil
 			}
 
-			let selected = resource.tokens.filter { token in selectedStakeClaimAssets.contains(token.id) }
+			return nil
 
-			return .init(
-				resourceAddress: resource.resourceAddress,
-				resourceImage: resource.iconURL,
-				resourceName: resource.name,
-				tokens: selected
-			)
+//			let selected = resource.tokens.filter { token in selectedStakeClaimAssets.contains(token.id) }
+//
+//			return .init(
+//				resourceAddress: resource.resourceAddress,
+//				resourceImage: resource.iconURL,
+//				resourceName: resource.name,
+//				tokens: selected
+//			)
 		}
 	}
 }

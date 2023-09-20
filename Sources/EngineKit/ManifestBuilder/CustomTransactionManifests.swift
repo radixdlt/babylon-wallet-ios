@@ -24,7 +24,7 @@ extension ManifestBuilder {
 			.createFungibleResourceManager(
 				ownerRole: .none,
 				trackTotalSupply: true,
-				divisibility: 10,
+				divisibility: 1,
 				initialSupply: .init(value: "100000"),
 				resourceRoles: .init(mintRoles: nil, burnRoles: nil, freezeRoles: nil, recallRoles: nil, withdrawRoles: nil, depositRoles: nil),
 				metadata: .init(

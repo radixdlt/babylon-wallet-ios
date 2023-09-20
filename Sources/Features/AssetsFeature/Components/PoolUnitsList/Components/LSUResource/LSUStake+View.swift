@@ -171,23 +171,24 @@ extension LSUStake.State {
 						isSelected: isStakeSelected
 					)
 				},
-			stakeClaimNFTs: .init(
-				rawValue: stake.stakeClaimResource
-					.map { claimNFT in
-						.init(
-							uncheckedUniqueElements: claimNFT.tokens
-								.map { token in
-									LSUStake.ViewState.StakeClaimNFTViewState(
-										id: token.id,
-										thumbnail: .xrd,
-										status: token.canBeClaimed ? .readyToClaim : .unstaking,
-										tokenAmount: (token.stakeClaimAmount ?? 0).format(),
-										isSelected: self.selectedStakeClaimAssets?.contains(token.id)
-									)
-								}
-						)
-					} ?? []
-			)
+			stakeClaimNFTs: nil
+			//                .init(
+//				rawValue: stake.stakeClaimResource
+//					.map { claimNFT in
+//						.init(
+//							uncheckedUniqueElements: claimNFT.tokens
+//								.map { token in
+//									LSUStake.ViewState.StakeClaimNFTViewState(
+//										id: token.id,
+//										thumbnail: .xrd,
+//										status: token.canBeClaimed ? .readyToClaim : .unstaking,
+//										tokenAmount: (token.stakeClaimAmount ?? 0).format(),
+//										isSelected: self.selectedStakeClaimAssets?.contains(token.id)
+//									)
+//								}
+//						)
+//					} ?? []
+//			)
 		)
 	}
 }

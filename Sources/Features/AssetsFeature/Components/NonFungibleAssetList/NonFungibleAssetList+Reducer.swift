@@ -64,12 +64,12 @@ public struct NonFungibleAssetList: Sendable, FeatureReducer {
 				loggerGlobal.warning("Selected row does not exist \(rowID)")
 				return .none
 			}
-			guard let token = row.resource.tokens[id: localID] else {
-				loggerGlobal.warning("Selected token does not exist: \(localID)")
-				return .none
-			}
-
-			state.destination = .details(.init(resource: row.resource.resource, token: token))
+//			guard let token = row.resource.tokens[id: localID] else {
+//				loggerGlobal.warning("Selected token does not exist: \(localID)")
+//				return .none
+//			}
+//
+//			state.destination = .details(.init(resource: row.resource.resource, token: token))
 			return .none
 
 		case .asset:

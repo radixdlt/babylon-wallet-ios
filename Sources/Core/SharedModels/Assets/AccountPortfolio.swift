@@ -64,7 +64,7 @@ extension AccountPortfolio {
 
 	public struct NonFungibleResource: Sendable, Hashable, Identifiable, Codable {
 		public let resource: OnLedgerEntity.Resource
-		public let tokens: IdentifiedArrayOf<NonFungibleToken>
+		public let tokens: [String]
 
 		public var id: ResourceAddress { resourceAddress }
 		public var resourceAddress: ResourceAddress { resource.resourceAddress }
@@ -76,7 +76,7 @@ extension AccountPortfolio {
 		public var tags: [AssetTag] { resource.tags }
 		public var totalSupply: BigDecimal? { resource.totalSupply }
 
-		public init(resource: OnLedgerEntity.Resource, tokens: IdentifiedArrayOf<NonFungibleToken>) {
+		public init(resource: OnLedgerEntity.Resource, tokens: [String]) {
 			self.resource = resource
 			self.tokens = tokens
 		}

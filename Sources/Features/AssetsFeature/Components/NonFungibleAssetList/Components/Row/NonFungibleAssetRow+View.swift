@@ -28,16 +28,16 @@ extension NonFungibleAssetList.Row.View {
 				StackedViewsLayout(isExpanded: viewStore.isExpanded) {
 					rowView(viewStore)
 						.zIndex(.infinity)
-					ForEach(
-						Array(
-							assetsToDisplay(viewStore)
-								.sorted(by: \.localId)
-								.enumerated()
-						),
-						id: \.element
-					) { index, item in
-						componentView(with: viewStore, asset: item, index: index)
-					}
+//					ForEach(
+//						Array(
+//							assetsToDisplay(viewStore)
+//								.sorted(by: \.localId)
+//								.enumerated()
+//						),
+//						id: \.element
+//					) { index, item in
+//						componentView(with: viewStore, asset: item, index: index)
+//					}
 				}
 				.padding(.horizontal, .medium3)
 			}
@@ -70,12 +70,13 @@ extension NonFungibleAssetList.Row.View {
 		}
 	}
 
-	private func assetsToDisplay(_ viewStore: ViewStoreOf<NonFungibleAssetList.Row>) -> IdentifiedArrayOf<AccountPortfolio.NonFungibleResource.NonFungibleToken> {
-		if !viewStore.isExpanded {
-			return IdentifiedArrayOf(uniqueElements: viewStore.resource.tokens.prefix(Constants.collapsedCardsCount))
-		}
-		return viewStore.resource.tokens
-	}
+//
+//	private func assetsToDisplay(_ viewStore: ViewStoreOf<NonFungibleAssetList.Row>) -> IdentifiedArrayOf<AccountPortfolio.NonFungibleResource.NonFungibleToken> {
+//		if !viewStore.isExpanded {
+//			return IdentifiedArrayOf(uniqueElements: viewStore.resource.tokens.prefix(Constants.collapsedCardsCount))
+//		}
+//		return viewStore.resource.tokens
+//	}
 
 	private var headerHeight: CGFloat { HitTargetSize.small.frame.height + 2 * .medium1 }
 }

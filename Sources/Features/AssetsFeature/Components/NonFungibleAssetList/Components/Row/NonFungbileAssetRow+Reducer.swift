@@ -40,11 +40,11 @@ extension NonFungibleAssetList {
 			case let .assetTapped(localID):
 				guard !state.disabled.contains(localID) else { return .none }
 				if state.selectedAssets != nil {
-					guard let token = state.resource.tokens[id: localID] else {
-						loggerGlobal.warning("Selected a missing token")
-						return .none
-					}
-					state.selectedAssets?.toggle(token.id)
+//					guard let token = state.resource.tokens[id: localID] else {
+//						loggerGlobal.warning("Selected a missing token")
+//						return .none
+//					}
+//					state.selectedAssets?.toggle(token.id)
 					return .none
 				}
 				return .send(.delegate(.open(localID)))
