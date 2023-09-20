@@ -205,27 +205,51 @@ extension BigDecimal {
 }
 
 extension BigDecimal {
-	public struct Digits {
+	public func formatted_(
+		maxPlaces: UInt = BigDecimal.defaultMaxPlacesFormattted,
+		locale: Locale = .autoupdatingCurrent
+	) -> String {
+		// The magnitude of the underlying integer value as a string - i.e. all the digits
+		let magnitude = integerValue.magnitude.description
+		let integers = magnitude.count - scale
+		var digits = Digits(sign: sign, string: magnitude, integers: integers)
+		digits.normalize(maxPlaces: maxPlaces)
+
+		return digits.formattedString(separator: locale.decimalSeparator ?? ".")
+	}
+
+	// A helper type for formatting BigDecimal
+	private struct Digits {
 		var sign: BigInt.Sign
 		var string: String
 		var integers: Int
-		var multiplier: Multiplier
+		var multiplier: Multiplier = .one
 
-		public init(sign: BigInt.Sign, string: String, integers: Int) {
-			self.sign = sign
-			self.string = string
-			self.integers = integers
-			self.multiplier = .one
+		fileprivate mutating func normalize(maxPlaces: UInt) {
+			normalizeInteger()
+			round(toPlaces: maxPlaces)
+			string.trimTrailingZeros()
+			print("   -> d: \(string) [\(integers)]")
+			applySuitableMultiplier(maxPlaces: maxPlaces)
+			print("   -> m: \(string) [\(integers)] [[\(multiplier)]]")
 		}
 
-		/// Applies a new multiplier
-		public mutating func applyMultiplier(_ newMultiplier: Multiplier) {
-			integers -= newMultiplier.rawValue - multiplier.rawValue
-			multiplier = newMultiplier
+		/// Returns a formatted string, with the given separator
+		fileprivate func formattedString(separator: String) -> String {
+			guard string.count > 0 else { return "0" }
+
+			let signPart = sign == .minus ? "-" : ""
+			// Check if we have any decimals
+			guard integers < string.count else {
+				return signPart + string + .zeros(length: integers - string.count) + multiplierSuffix
+			}
+
+			let (integerPart, decimalPart) = string.split(after: integers)
+			return signPart + integerPart + separator + decimalPart + multiplierSuffix
 		}
 
 		/// Normalise digits so that they start with at least one zero before the separator, for numbers < 1
-		public mutating func normalize() {
+		private mutating func normalizeInteger() {
 			if integers < 1 {
 				string.padWithLeadingZeros(count: 1 - integers)
 				integers = 1
@@ -233,7 +257,7 @@ extension BigDecimal {
 		}
 
 		/// Rounds the number douwn to the given number of places (meaning total digits)
-		public mutating func round(toPlaces maxPlaces: UInt) {
+		private mutating func round(toPlaces maxPlaces: UInt) {
 			// Check if we even need to do any rounding
 			let superfluousDigits = string.count - Int(maxPlaces)
 			guard superfluousDigits > 0 else { return }
@@ -271,18 +295,13 @@ extension BigDecimal {
 			roundUp()
 		}
 
-		/// Returns a formatted string, with the given separator
-		public func formattedString(separator: String) -> String {
-			guard string.count > 0 else { return "0" }
+		private mutating func applySuitableMultiplier(maxPlaces: UInt) {
+			/// The first multiplier that makes all the integers fit
+			let newMultiplier = Multiplier.allCases.dropLast().first { integers - $0.rawValue <= Int(maxPlaces) } ?? .trillion
 
-			let signPart = sign == .minus ? "-" : ""
-			// Check if we have any decimals
-			guard integers < string.count else {
-				return signPart + string + .zeros(length: integers - string.count) + multiplierSuffix
-			}
-
-			let (integerPart, decimalPart) = string.split(after: integers)
-			return signPart + integerPart + separator + decimalPart + multiplierSuffix
+			// Applies the new multiplier
+			integers -= newMultiplier.rawValue - multiplier.rawValue
+			multiplier = newMultiplier
 		}
 
 		public enum Multiplier: Int, CaseIterable {
@@ -298,43 +317,10 @@ extension BigDecimal {
 			}
 		}
 	}
-
-	public func new_format(
-		maxPlaces: UInt = BigDecimal.defaultMaxPlacesFormattted,
-		locale: Locale = .autoupdatingCurrent
-	) -> String {
-		// The magnitude of the underlying integer value as a string - i.e. all the digits
-		let magnitude = integerValue.magnitude.description
-		let integers = magnitude.count - scale
-		var digits = Digits(sign: sign, string: magnitude, integers: integers)
-		print("   -> D: \(digits.string) [\(digits.integers)]")
-		digits.normalize()
-		print("   -> n: \(digits.string) [\(digits.integers)]")
-		digits.round(toPlaces: maxPlaces)
-		print("   -> r: \(digits.string) [\(digits.integers)]")
-		digits.string.trimTrailingZeros()
-		print("   -> t: \(digits.string) [\(digits.integers)]")
-		digits.applyMultiplier(.million)
-		print("   -> m: \(digits.string) [\(digits.integers)]")
-
-//		for multiplier in Multiplier.allCases {
-//			if digits.integers <= maxPlaces {
-//
-//			}
-//
-//			digits.multiplier = multiplier
-//			if let result = result() {
-//				return result + multiplierPart()
-//			}
-//		}
-
-		let separator = locale.decimalSeparator ?? "."
-		return digits.formattedString(separator: separator)
-	}
 }
 
-extension String {
-	fileprivate func split(after lengthOfFirstPart: Int) -> (String, String) {
+private extension String {
+	func split(after lengthOfFirstPart: Int) -> (String, String) {
 		let lengthOfSecondPart = count - lengthOfFirstPart
 		assert(lengthOfSecondPart >= 0)
 		return (String(dropLast(lengthOfSecondPart)), String(suffix(lengthOfSecondPart)))
