@@ -205,31 +205,49 @@ extension BigDecimal {
 }
 
 extension BigDecimal {
+	struct Digits {
+		var string: String
+		var integers: Int
+		var count: Int { string.count }
+
+		func withSeparator(_ separator: String, after charactersBeforeSeparator: Int) -> String {
+			assert(charactersBeforeSeparator < count)
+//			let padded = string + .zeroPadding(length: max(charactersBeforeSeparator - count, 0))
+//
+			let before = String(string.prefix(charactersBeforeSeparator))
+			let after = String(string.suffix(count - charactersBeforeSeparator))
+			return before + separator + after
+		}
+	}
+
 	public func new_format(
 		maxPlaces: UInt = BigDecimal.defaultMaxPlacesFormattted,
 		locale: Locale = .autoupdatingCurrent
 	) -> String {
 		let signPart = sign == .minus ? "-" : ""
-		var (integerPart, decimalPart) = parts()
+		var digits = digits()
 		let separator = locale.decimalSeparator ?? "."
-		var suffix: String? = nil
 
-		var digits = (integerPart + decimalPart)
-		let addedLeadingOne = round(digits: &digits, toPlaces: maxPlaces)
+		// The Digits type tracks the number of integers, since we round without regard for decimal separator position
+		round(digits: &digits, toPlaces: maxPlaces)
 
-		trim(decimalPart: &decimalPart)
+		if digits.integers > maxPlaces {
+			if digits.integers > 12 {
+				// 1,234,234,333,234.2343242342
+				// 12342343
+				// 1 . 2342343
 
-		let suffixPart = suffix.map { " " + $0 } ?? ""
-		if !decimalPart.isEmpty {
-			return signPart + integerPart + separator + decimalPart + suffixPart
-		} else if integerPart != "0" {
-			return signPart + integerPart + suffixPart
-		} else {
-			return "0"
+				return signPart + digits.withSeparator(separator, after: digits.integers - 12) + " T"
+			} else if digits.integers > 9 {
+				// 34234333234.2343242342
+				// 34234333
+				// 34 234333
+				return signPart + digits.withSeparator(separator, after: digits.integers - 9) + " B"
+			} else if digits.count > 8 {}
 		}
 	}
 
-	private func parts() -> (integerPart: String, decimalPart: String) {
+	private func digits() -> Digits {
 		let integerPart, decimalPart: String
 
 		// The magnitude of the underlying integer value, as a string
@@ -238,12 +256,12 @@ extension BigDecimal {
 		if scale >= magnitude.count {
 			// No integer part. Pad magnitude part with leading zeros as needed to get decimal part.
 			integerPart = "0"
-			decimalPart = zeroPadding(length: scale - magnitude.count) + magnitude
+			decimalPart = .zeroPadding(length: scale - magnitude.count) + magnitude
 		} else {
 			let location = magnitude.count - scale
 			if location > magnitude.count {
 				// No decimal part. Pad magnitude part with trailing zeros as needed to get integer part.
-				integerPart = magnitude + zeroPadding(length: location - magnitude.count)
+				integerPart = magnitude + .zeroPadding(length: location - magnitude.count)
 				decimalPart = ""
 			} else {
 				// General case. Take the last digits as decimals.
@@ -253,37 +271,34 @@ extension BigDecimal {
 			}
 		}
 
-		return (integerPart, decimalPart)
+		return Digits(string: integerPart + decimalPart, integers: integerPart.count)
 	}
 
 	/// Rounds the sequence of digits, ignoring trailing zeros and not taking decimal position into account.
-	/// Returns `true` if it had to add a leading "1"
-	private func round(digits: inout String, toPlaces maxPlaces: UInt) -> Bool {
+	private func round(digits: inout Digits, toPlaces maxPlaces: UInt) {
 		// Check if we even need to do any rounding
 		let superfluousDigits = digits.count - Int(maxPlaces)
-		guard superfluousDigits > 0 else { return false }
+		guard superfluousDigits > 0 else { return }
 
-		// We remove the superfluous digits, except the one following the last one we are keeping
-		digits.removeLast(superfluousDigits - 1)
+		// We remove the superfluous digits, except the one that follows the last one we will be keeping
+		digits.string.removeLast(superfluousDigits - 1)
 
 		// Remove and examine the "following" digit (it's optional, but is only nil for non-digits)
-		let following = Int(String(digits.removeLast()))
+		let following = Int(String(digits.string.removeLast()))
 
 		// If it's not 5 or higher, we don't need to do any rounding
-		guard let following, following > 4 else { return false }
-
-		var addedLeadingOne = false
+		guard let following, following > 4 else { return }
 
 		func roundUp() {
 			// Remove the least significant digit
-			guard let leastSignificant = Int(String(digits.removeLast())) else { return } // Can't fail
+			guard let leastSignificant = Int(String(digits.string.removeLast())) else { return } // Can't fail
 
 			if leastSignificant == 9 {
 				// The last digit is "9", we might need to recurse
-				guard !digits.isEmpty else {
+				guard !digits.string.isEmpty else {
 					// We ran out of digits so we add a leading "1" and finish.
-					digits = "1"
-					addedLeadingOne = true
+					digits.string = "1"
+					digits.integers += 1
 					return
 				}
 
@@ -291,20 +306,15 @@ extension BigDecimal {
 				roundUp()
 			} else {
 				// We simply increase the last digit and finish
-				digits.append(contentsOf: String(leastSignificant + 1))
+				digits.string.append(contentsOf: String(leastSignificant + 1))
 			}
 		}
 
 		roundUp()
 
-		// We pad the result back up to maxPlaces digits
-		digits.append(contentsOf: zeroPadding(length: Int(maxPlaces) - digits.count))
-
-		return addedLeadingOne
-	}
-
-	private func zeroPadding(length: Int) -> String {
-		String(repeating: "0", count: length)
+//		// We pad the result back up to maxPlaces digits
+//		let missingDigits = Int(maxPlaces) - digits.count
+//		digits.string.append(contentsOf: zeroPadding(length: missingDigits))
 	}
 
 	// Trim the decimal part as needed
@@ -312,6 +322,12 @@ extension BigDecimal {
 		while decimalPart.hasSuffix("0") {
 			decimalPart.removeLast()
 		}
+	}
+}
+
+private extension String {
+	static func zeroPadding(length: Int) -> String {
+		String(repeating: "0", count: length)
 	}
 }
 
