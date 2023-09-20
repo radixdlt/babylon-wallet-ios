@@ -112,9 +112,9 @@ platform :mac do
     end
 end
 
-private_lane :rev_changelog do |options|
+
+def rev_changelog(flavour)
     sh('git fetch --tags')
-    flavour = options.fetch(:flavour).delete_prefix('"').delete_suffix('"') # if accidentally included
     most_recent_tags = sh("git tag | grep #{flavour} | sort -r | head -2").split("\n")
     git_commits_range_for_changelog = most_recent_tags.map { |tag| sh("git rev-list --abbrev-commit -n 1 #{tag}").strip }
     rev_changelog = changelog_from_git_commits(
@@ -122,6 +122,12 @@ private_lane :rev_changelog do |options|
       pretty: "- %s"
     )
 end
+
+lane :cyon do |options|
+    Dotenv.load ".env.ios.beta"
+    changelog = rev_changelog(ENV['FLAVOUR'])
+end
+
 
 private_lane :create_gh_release do |options|
     flavour = options.fetch(:flavour).delete_prefix('"').delete_suffix('"') # if accidentally included
@@ -136,8 +142,8 @@ private_lane :create_gh_release do |options|
         name: last_tag,
         tag_name: last_tag,
         description: release_description,
-        is_draft: true, # We also mark as DRAFT and then promote it once approved by Apple.
-        is_prerelease: flavour == "Beta"
+        is_draft: true, # We mark all flavours as DRAFT and then promote them once approved by Apple.
+        is_prerelease: flavour.include? "Beta"
     )
 end
 
