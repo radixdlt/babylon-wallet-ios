@@ -17,6 +17,8 @@ extension Radix {
 extension Radix.Dashboard {
 	public static func dashboard(forNetwork network: Radix.Network) -> Self {
 		switch network {
+		case .mainnet:
+			return .mainnet
 		case .nebunet:
 			return .rcnet
 		case .kisharnet:
@@ -34,12 +36,19 @@ extension Radix.Dashboard {
 		case .stokenet:
 			return .stokenet
 		default:
-			return .rcnet
+			// What else to default to..?
+			return .mainnet
 		}
 	}
 }
 
 extension Radix.Dashboard {
+	public static var mainnet: Self {
+		.init(
+			url: URL(string: "https://dashboard.radixdlt.com/")!
+		)
+	}
+
 	public static var rcnet: Self {
 		.init(
 			url: URL(string: "https://rcnet-dashboard.radixdlt.com/")!
