@@ -319,7 +319,10 @@ extension AccountPortfoliosClient {
 //		}
 
 		// Get all user owned nft ids, but do not fetch the related data.
-		let nftIDs = try await getAllTokens(resource: resource)
+		let nftIDs = try await getAllTokens(resource: resource).map {
+			try NonFungibleGlobalId.fromParts(resourceAddress: .init(address: resource.resourceAddress), nonFungibleLocalId: .from(stringFormat: $0))
+		}
+
 		let metadata = resource.explicitMetadata
 
 		// Should be extracted from explicit metadata

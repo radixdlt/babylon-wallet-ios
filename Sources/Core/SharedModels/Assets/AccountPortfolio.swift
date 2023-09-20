@@ -64,7 +64,7 @@ extension AccountPortfolio {
 
 	public struct NonFungibleResource: Sendable, Hashable, Identifiable, Codable {
 		public let resource: OnLedgerEntity.Resource
-		public let tokens: [String]
+		public let tokens: [NonFungibleGlobalId]
 
 		public var id: ResourceAddress { resourceAddress }
 		public var resourceAddress: ResourceAddress { resource.resourceAddress }
@@ -76,7 +76,7 @@ extension AccountPortfolio {
 		public var tags: [AssetTag] { resource.tags }
 		public var totalSupply: BigDecimal? { resource.totalSupply }
 
-		public init(resource: OnLedgerEntity.Resource, tokens: [String]) {
+		public init(resource: OnLedgerEntity.Resource, tokens: [NonFungibleGlobalId]) {
 			self.resource = resource
 			self.tokens = tokens
 		}
@@ -340,6 +340,28 @@ extension [AccountPortfolio.NonFungibleResource.NonFungibleToken.NFTData] {
 
 	public var claimAmount: BigDecimal? {
 		self[.claimAmount]?.decimal
+	}
+}
+
+extension AccountPortfolio.NonFungibleResource {
+	enum CodingKeys: CodingKey {
+		case resource
+		case tokens
+	}
+
+	public init(from decoder: Decoder) throws {
+		let container = try decoder.container(keyedBy: CodingKeys.self)
+		try self.init(
+			resource: container.decode(OnLedgerEntity.Resource.self, forKey: .resource),
+			tokens: container.decode([String].self, forKey: .tokens).map(NonFungibleGlobalId.init(nonFungibleGlobalId:))
+		)
+	}
+
+	public func encode(to encoder: Encoder) throws {
+		var container = encoder.container(keyedBy: CodingKeys.self)
+
+		try container.encode(resource, forKey: .resource)
+		try container.encode(tokens.map { $0.asStr() }, forKey: .tokens)
 	}
 }
 
