@@ -206,13 +206,80 @@ extension BigDecimal {
 
 extension BigDecimal {
 	public struct Digits {
+		var sign: BigInt.Sign
 		var string: String
 		var integers: Int
-		var multiplier: Multiplier = .one
-		var count: Int { string.count }
 
-		enum Multiplier {
-			case one, million, billion, trillion
+		private(set) var multiplier: Multiplier = .one
+
+		mutating func apply(multiplier newMultiplier: Multiplier) {
+			integers -= newMultiplier.rawValue - multiplier.rawValue
+			multiplier = newMultiplier
+		}
+
+		mutating func round(toPlaces maxPlaces: UInt) {
+			// Check if we even need to do any rounding
+			let superfluousDigits = string.count - Int(maxPlaces)
+			guard superfluousDigits > 0 else { return }
+
+			// We remove the superfluous digits, except one - it helps us decide to round or not
+			string.removeLast(superfluousDigits - 1)
+
+			// Remove and examine the "following" digit (it's an optional, but is only nil for non-digits)
+			let following = Int(String(string.removeLast()))
+
+			// If it's not 5 or higher, we don't need to do any rounding
+			guard let following, following > 4 else { return }
+
+			func roundUp() {
+				// Remove the least significant digit
+				guard let leastSignificant = Int(String(string.removeLast())) else { return } // Can't fail
+
+				if leastSignificant == 9 {
+					// The last digit is "9", we might need to recurse
+					guard !string.isEmpty else {
+						// We ran out of digits so we add a leading "1" and finish.
+						string = "1"
+						integers += 1
+						return
+					}
+
+					// We need to recurse. Note that we are not replacing the removed digit, because it is "0"
+					roundUp()
+				} else {
+					// We simply increase the last digit and finish
+					string.append(contentsOf: String(leastSignificant + 1))
+				}
+			}
+
+			roundUp()
+		}
+
+		func formattedString(separator: String) -> String {
+			guard string.count > 0 else { return "0" }
+
+			let signPart = sign == .minus ? "-" : ""
+
+			guard integers < string.count else {
+				// No decimals
+				return signPart + string + .zeros(length: integers - string.count) + multiplierSuffix
+			}
+
+			let (integerPart, decimalPart) = string.split(after: integers)
+			return signPart + integerPart + separator + decimalPart + multiplierSuffix
+		}
+
+		enum Multiplier: Int, CaseIterable {
+			case one = 0, million = 6, billion = 9, trillion = 12
+		}
+
+		private var multiplierSuffix: String {
+			switch multiplier {
+			case .one: return ""
+			case .million: return " M"
+			case .billion: return " B"
+			case .trillion: return " T"
+			}
 		}
 	}
 
@@ -220,12 +287,10 @@ extension BigDecimal {
 		maxPlaces: UInt = BigDecimal.defaultMaxPlacesFormattted,
 		locale: Locale = .autoupdatingCurrent
 	) -> String {
-		let signPart = sign == .minus ? "-" : ""
-
 		// The magnitude of the underlying integer value as a string - i.e. all the digits
 		let magnitude = integerValue.magnitude.description
 		let integers = magnitude.count - scale
-		var digits = Digits(string: magnitude, integers: integers)
+		var digits = Digits(sign: sign, string: magnitude, integers: integers)
 
 		print("   -> D: \(digits.string) [\(digits.integers)]")
 
@@ -237,35 +302,31 @@ extension BigDecimal {
 
 		print("   -> n: \(digits.string) [\(digits.integers)]")
 
-		let separator = locale.decimalSeparator ?? "."
-
 		// The Digits type needs to track the number of integers, because we round without regard for decimal separator position
 		round(digits: &digits, toPlaces: maxPlaces)
 		print("   -> r: \(digits.string) [\(digits.integers)]")
 		digits.string.trimTrailingZeros()
 		print("   -> t: \(digits.string) [\(digits.integers)]")
 
-		func multiplierPart(digits: Digits) -> String {
-			switch digits.multiplier {
-			case .one: return ""
-			case .million: return " M"
-			case .billion: return " B"
-			case .trillion: return " T"
-			}
-		}
+//		for multiplier in Multiplier.allCases {
+//			if digits.integers <= maxPlaces {
+//
+//			}
+//
+//			digits.multiplier = multiplier
+//			if let result = result() {
+//				return result + multiplierPart()
+//			}
+//		}
 
-		if digits.count > digits.integers {
-			let (integerPart, decimalPart) = digits.string.split(after: digits.integers)
-			return integerPart + separator + decimalPart
-		} else {
-			return digits.string + .zeros(length: digits.integers - digits.count)
-		}
+		let separator = locale.decimalSeparator ?? "."
+		return digits.formattedString(separator: separator)
 	}
 
 	/// Rounds the sequence of digits, ignoring trailing zeros and not taking decimal position into account.
 	private func round(digits: inout Digits, toPlaces maxPlaces: UInt) {
 		// Check if we even need to do any rounding
-		let superfluousDigits = digits.count - Int(maxPlaces)
+		let superfluousDigits = digits.string.count - Int(maxPlaces)
 		guard superfluousDigits > 0 else { return }
 
 		// We remove the superfluous digits, except one - it helps us decide to round or not
@@ -275,10 +336,7 @@ extension BigDecimal {
 		let following = Int(String(digits.string.removeLast()))
 
 		// If it's not 5 or higher, we don't need to do any rounding
-		guard let following, following > 4 else {
-			print("    •")
-			return
-		}
+		guard let following, following > 4 else { return }
 
 		func roundUp() {
 			// Remove the least significant digit
