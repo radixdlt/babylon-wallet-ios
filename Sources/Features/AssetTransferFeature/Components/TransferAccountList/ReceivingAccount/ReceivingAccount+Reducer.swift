@@ -119,6 +119,14 @@ extension ReceivingAccount.State.Account {
 
 		return true
 	}
+
+	var isLedgerAccount: Bool {
+		guard case let .left(account) = self else {
+			return false
+		}
+
+		return account.isLedgerAccount
+	}
 }
 
 // MARK: - ReceivingAccount.State.Account + Identifiable
