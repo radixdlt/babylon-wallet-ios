@@ -13,7 +13,7 @@ platform :ios do
 
     desc "Builds and archives the app"
     lane :build do
-        Dotenv.load ".env.ios."
+        Dotenv.load ".env.ios.release"
         install_distribution_certificates
         build_app
     end
