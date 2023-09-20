@@ -268,6 +268,8 @@ extension ManifestValue: Hashable {
 			return lhs == rhs
 		case let (.nonFungibleLocalIdValue(lhs), .nonFungibleLocalIdValue(rhs)):
 			return lhs == rhs
+		case let (.addressReservationValue(lhs), .addressReservationValue(rhs)):
+			return lhs == rhs
 		default:
 			return false
 		}
