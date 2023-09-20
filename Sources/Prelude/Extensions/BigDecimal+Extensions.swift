@@ -227,45 +227,23 @@ extension BigDecimal {
 		let integers = magnitude.count - scale
 		var digits = Digits(string: magnitude, integers: integers)
 
+		print("   -> D: \(digits.string) [\(digits.integers)]")
+
 		// Normalise digits so that we start with at least one zero before the separator, for numbers < 1
 		if integers < 1 {
 			digits.string.padWithLeadingZeros(count: 1 - integers)
 			digits.integers = 1
 		}
-		/*
-		 0.123456789
-		  >  0 123456789 : 1
-		  >  0 1234568 : 1
-		 0.4321
-		  >  0 4321 : 1
-		  >  0 4321 : 1
-		 0.0000000000001
-		  >  0 0000000000001 : 1
-		  >  0 : 1
-		 0.9999999999999
-		  >  0 9999999999999 : 1
-		  >  1 : 1
-		 1,000
-		  >  1000 : 4
-		  >  1000 : 4
-		 1,000.01
-		  >  1000 01 : 4
-		  >  1000 01 : 4
-		 1,000.123456789
-		  >  1000 123456789 : 4
-		  >  1000 1235 : 4
-		 1,000,000.1234
-		  >  1000000 1 : 7
-		 10,000,000.1234
-		  >  10000000 : 8
-		 999.999999999943
-		  >  1000 : 4
-		  */
+
+		print("   -> n: \(digits.string) [\(digits.integers)]")
 
 		let separator = locale.decimalSeparator ?? "."
 
-		// The Digits type needs to track the number of integers, since we round without regard for decimal separator position
+		// The Digits type needs to track the number of integers, because we round without regard for decimal separator position
 		round(digits: &digits, toPlaces: maxPlaces)
+		print("   -> r: \(digits.string) [\(digits.integers)]")
+		digits.string.trimTrailingZeros()
+		print("   -> t: \(digits.string) [\(digits.integers)]")
 
 		func multiplierPart(digits: Digits) -> String {
 			switch digits.multiplier {
@@ -297,7 +275,10 @@ extension BigDecimal {
 		let following = Int(String(digits.string.removeLast()))
 
 		// If it's not 5 or higher, we don't need to do any rounding
-		guard let following, following > 4 else { return }
+		guard let following, following > 4 else {
+			print("    •")
+			return
+		}
 
 		func roundUp() {
 			// Remove the least significant digit
