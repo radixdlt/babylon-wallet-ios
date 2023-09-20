@@ -98,16 +98,6 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "AccountPortfolioFetcherClientTests"
-               BuildableName = "AccountPortfolioFetcherClientTests"
-               BlueprintName = "AccountPortfolioFetcherClientTests"
-               ReferencedContainer = "container:">
-            </BuildableReference>
-         </TestableReference>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
                BlueprintIdentifier = "AccountPreferencesFeatureTests"
                BuildableName = "AccountPreferencesFeatureTests"
                BlueprintName = "AccountPreferencesFeatureTests"
@@ -121,16 +111,6 @@
                BlueprintIdentifier = "AccountsClientLiveTests"
                BuildableName = "AccountsClientLiveTests"
                BlueprintName = "AccountsClientLiveTests"
-               ReferencedContainer = "container:">
-            </BuildableReference>
-         </TestableReference>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "AggregatedValueFeatureTests"
-               BuildableName = "AggregatedValueFeatureTests"
-               BlueprintName = "AggregatedValueFeatureTests"
                ReferencedContainer = "container:">
             </BuildableReference>
          </TestableReference>
@@ -168,16 +148,6 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "AssetsViewFeatureTests"
-               BuildableName = "AssetsViewFeatureTests"
-               BlueprintName = "AssetsViewFeatureTests"
-               ReferencedContainer = "container:">
-            </BuildableReference>
-         </TestableReference>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
                BlueprintIdentifier = "AuthorizedDappsClientLiveTests"
                BuildableName = "AuthorizedDappsClientLiveTests"
                BlueprintName = "AuthorizedDappsClientLiveTests"
@@ -191,16 +161,6 @@
                BlueprintIdentifier = "CacheClientTests"
                BuildableName = "CacheClientTests"
                BlueprintName = "CacheClientTests"
-               ReferencedContainer = "container:">
-            </BuildableReference>
-         </TestableReference>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "CreateEntityFeatureTests"
-               BuildableName = "CreateEntityFeatureTests"
-               BlueprintName = "CreateEntityFeatureTests"
                ReferencedContainer = "container:">
             </BuildableReference>
          </TestableReference>
@@ -238,26 +198,6 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "EngineToolkitClientTests"
-               BuildableName = "EngineToolkitClientTests"
-               BlueprintName = "EngineToolkitClientTests"
-               ReferencedContainer = "container:">
-            </BuildableReference>
-         </TestableReference>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "EngineToolkitTests"
-               BuildableName = "EngineToolkitTests"
-               BlueprintName = "EngineToolkitTests"
-               ReferencedContainer = "container:">
-            </BuildableReference>
-         </TestableReference>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
                BlueprintIdentifier = "FactorSourcesClientLiveTests"
                BuildableName = "FactorSourcesClientLiveTests"
                BlueprintName = "FactorSourcesClientLiveTests"
@@ -281,16 +221,6 @@
                BlueprintIdentifier = "FeaturePreludeTests"
                BuildableName = "FeaturePreludeTests"
                BlueprintName = "FeaturePreludeTests"
-               ReferencedContainer = "container:">
-            </BuildableReference>
-         </TestableReference>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "FungibleTokenListFeatureTests"
-               BuildableName = "FungibleTokenListFeatureTests"
-               BlueprintName = "FungibleTokenListFeatureTests"
                ReferencedContainer = "container:">
             </BuildableReference>
          </TestableReference>
@@ -371,16 +301,6 @@
                BlueprintIdentifier = "NewConnectionFeatureTests"
                BuildableName = "NewConnectionFeatureTests"
                BlueprintName = "NewConnectionFeatureTests"
-               ReferencedContainer = "container:">
-            </BuildableReference>
-         </TestableReference>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "NonFungibleTokenListFeatureTests"
-               BuildableName = "NonFungibleTokenListFeatureTests"
-               BlueprintName = "NonFungibleTokenListFeatureTests"
                ReferencedContainer = "container:">
             </BuildableReference>
          </TestableReference>
@@ -571,16 +491,6 @@
                BlueprintIdentifier = "TransactionReviewFeatureTests"
                BuildableName = "TransactionReviewFeatureTests"
                BlueprintName = "TransactionReviewFeatureTests"
-               ReferencedContainer = "container:">
-            </BuildableReference>
-         </TestableReference>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "TransactionSigningFeatureTests"
-               BuildableName = "TransactionSigningFeatureTests"
-               BlueprintName = "TransactionSigningFeatureTests"
                ReferencedContainer = "container:">
             </BuildableReference>
          </TestableReference>
