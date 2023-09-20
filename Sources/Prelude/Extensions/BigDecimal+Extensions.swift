@@ -221,12 +221,51 @@ extension BigDecimal {
 		locale: Locale = .autoupdatingCurrent
 	) -> String {
 		let signPart = sign == .minus ? "-" : ""
-		var digits = digits()
+
+		// The magnitude of the underlying integer value as a string - i.e. all the digits
+		let magnitude = integerValue.magnitude.description
+		let integers = magnitude.count - scale
+		var digits = Digits(string: magnitude, integers: integers)
+
+		// Normalise digits so that we start with at least one zero before the separator, for numbers < 1
+		if integers < 1 {
+			digits.string.padWithLeadingZeros(count: 1 - integers)
+			digits.integers = 1
+		}
+		/*
+		 0.123456789
+		  >  0 123456789 : 1
+		  >  0 1234568 : 1
+		 0.4321
+		  >  0 4321 : 1
+		  >  0 4321 : 1
+		 0.0000000000001
+		  >  0 0000000000001 : 1
+		  >  0 : 1
+		 0.9999999999999
+		  >  0 9999999999999 : 1
+		  >  1 : 1
+		 1,000
+		  >  1000 : 4
+		  >  1000 : 4
+		 1,000.01
+		  >  1000 01 : 4
+		  >  1000 01 : 4
+		 1,000.123456789
+		  >  1000 123456789 : 4
+		  >  1000 1235 : 4
+		 1,000,000.1234
+		  >  1000000 1 : 7
+		 10,000,000.1234
+		  >  10000000 : 8
+		 999.999999999943
+		  >  1000 : 4
+		  */
+
 		let separator = locale.decimalSeparator ?? "."
-		//
 
 		// The Digits type needs to track the number of integers, since we round without regard for decimal separator position
-		round(digits: &digits, toPlaces: places)
+		round(digits: &digits, toPlaces: maxPlaces)
 
 		func multiplierPart(digits: Digits) -> String {
 			switch digits.multiplier {
@@ -237,41 +276,16 @@ extension BigDecimal {
 			}
 		}
 
-		if digits.integers == 0 {
-		} else {}
-
-		switch digits.integers {
-		case ..<0:
-			// Pad with zero + . + zeros
-			break
-		case 0:
-			// Pad with zero + .
-			break
-		default:
-			if digits.integers > maxPlaces {
-				fatalError()
-			} else {}
+		if digits.count > digits.integers {
+			let (integerPart, decimalPart) = digits.string.split(after: digits.integers)
+			return integerPart + separator + decimalPart
+		} else {
+			return digits.string + .zeros(length: digits.integers - digits.count)
 		}
-
-		return ""
-	}
-
-	private func digits() -> Digits {
-		// The magnitude of the underlying integer value as a string - i.e. all the digits
-		let magnitude = integerValue.magnitude.description
-
-		guard self >= 0.1 else {
-			// Pad the decimal string with zeros
-			return .init(string: .zeros(length: scale - magnitude.count), integers: 0)
-		}
-
-		return .init(string: magnitude, integers: magnitude.count - scale)
 	}
 
 	/// Rounds the sequence of digits, ignoring trailing zeros and not taking decimal position into account.
 	private func round(digits: inout Digits, toPlaces maxPlaces: UInt) {
-//		let maxPlaces = digits.integers == 0 ? maxPlaces - 1 :
-
 		// Check if we even need to do any rounding
 		let superfluousDigits = digits.count - Int(maxPlaces)
 		guard superfluousDigits > 0 else { return }
@@ -315,6 +329,10 @@ extension String {
 		let lengthOfSecondPart = count - lengthOfFirstPart
 		assert(lengthOfSecondPart >= 0)
 		return (String(dropLast(lengthOfSecondPart)), String(suffix(lengthOfSecondPart)))
+	}
+
+	mutating func padWithLeadingZeros(count: Int) {
+		insert(contentsOf: String.zeros(length: count), at: startIndex)
 	}
 
 	mutating func padWithTrailingZeros(to length: Int) {
