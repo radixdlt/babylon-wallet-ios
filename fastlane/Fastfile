@@ -143,7 +143,7 @@ private_lane :create_gh_release do |options|
         tag_name: last_tag,
         description: release_description,
         is_draft: true, # We mark all flavours as DRAFT and then promote them once approved by Apple.
-        is_prerelease: flavour.include? "Beta"
+        is_prerelease: flavour.include?("Beta")
     )
 end
 
