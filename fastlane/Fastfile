@@ -123,12 +123,6 @@ def rev_changelog(flavour)
     )
 end
 
-lane :cyon do |options|
-    Dotenv.load ".env.ios.beta"
-    changelog = rev_changelog(ENV['FLAVOUR'])
-end
-
-
 private_lane :create_gh_release do |options|
     flavour = options.fetch(:flavour).delete_prefix('"').delete_suffix('"') # if accidentally included
     changelog = rev_changelog(flavour)
