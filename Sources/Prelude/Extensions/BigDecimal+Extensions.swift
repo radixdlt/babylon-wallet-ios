@@ -214,7 +214,9 @@ extension BigDecimal {
 		let separator = locale.decimalSeparator ?? "."
 		var suffix: String? = nil
 
-		round(integerPart: &integerPart, decimalPart: &decimalPart, suffix: &suffix, toPlaces: maxPlaces)
+		var digits = (integerPart + decimalPart)
+		let addedLeadingOne = round(digits: &digits, toPlaces: maxPlaces)
+
 		trim(decimalPart: &decimalPart)
 
 		let suffixPart = suffix.map { " " + $0 } ?? ""
@@ -236,12 +238,12 @@ extension BigDecimal {
 		if scale >= magnitude.count {
 			// No integer part. Pad magnitude part with leading zeros as needed to get decimal part.
 			integerPart = "0"
-			decimalPart = String(repeating: "0", count: scale - magnitude.count) + magnitude
+			decimalPart = zeroPadding(length: scale - magnitude.count) + magnitude
 		} else {
 			let location = magnitude.count - scale
 			if location > magnitude.count {
 				// No decimal part. Pad magnitude part with trailing zeros as needed to get integer part.
-				integerPart = magnitude + String(repeating: "0", count: location - magnitude.count)
+				integerPart = magnitude + zeroPadding(length: location - magnitude.count)
 				decimalPart = ""
 			} else {
 				// General case. Take the last digits as decimals.
@@ -254,75 +256,55 @@ extension BigDecimal {
 		return (integerPart, decimalPart)
 	}
 
-	/// Round the decimal part up or down as needed, potentially adjusting integer part. `suffix` refers to M, B or T, for millions, billions or trillions
-	private func round(integerPart: inout String, decimalPart: inout String, suffix: inout String?, toPlaces maxPlaces: UInt) {
+	/// Rounds the sequence of digits, ignoring trailing zeros and not taking decimal position into account.
+	/// Returns `true` if it had to add a leading "1"
+	private func round(digits: inout String, toPlaces maxPlaces: UInt) -> Bool {
 		// Check if we even need to do any rounding
-		guard integerPart.count + decimalPart.count > maxPlaces else { return }
+		let superfluousDigits = digits.count - Int(maxPlaces)
+		guard superfluousDigits > 0 else { return false }
 
-		// We look closer at the first decimalCount digits, plus the next digit after
-		decimalPart = String(decimalPart.prefix(Int(maxPlaces + 1)))
+		// We remove the superfluous digits, except the one following the last one we are keeping
+		digits.removeLast(superfluousDigits - 1)
 
-		// Remove and examine the "next after" digit, to determine if we need to round
-		let nextAfter = Int(String(decimalPart.removeLast())) // This is an optional, but it can't fail for a string of numbers
-		guard let nextAfter, nextAfter > 4 else { return }
+		// Remove and examine the "following" digit (it's optional, but is only nil for non-digits)
+		let following = Int(String(digits.removeLast()))
 
-		// This is a function because if (and only if) the number ends in a 9, we need to recurse
+		// If it's not 5 or higher, we don't need to do any rounding
+		guard let following, following > 4 else { return false }
+
+		var addedLeadingOne = false
+
 		func roundUp() {
-			guard !decimalPart.isEmpty else {
-				// When we run out of decimals we need to increase the integer part by 1
-				increaseIntegerPart(integerPart: &integerPart, decimalPart: &decimalPart, suffix: &suffix, maxPlaces: maxPlaces)
-				return
-			}
-			// Remove the last digit
-			guard let final = Int(String(decimalPart.removeLast())) else { return } // Can't fail
+			// Remove the least significant digit
+			guard let leastSignificant = Int(String(digits.removeLast())) else { return } // Can't fail
 
-			if final < 9 {
-				// We simply increase the last digit and finish
-				decimalPart.append(contentsOf: String(final + 1))
-			} else {
+			if leastSignificant == 9 {
+				// The last digit is "9", we might need to recurse
+				guard !digits.isEmpty else {
+					// We ran out of digits so we add a leading "1" and finish.
+					digits = "1"
+					addedLeadingOne = true
+					return
+				}
+
+				// We need to recurse. Note that we are not replacing the removed digit because it is "0"
 				roundUp()
+			} else {
+				// We simply increase the last digit and finish
+				digits.append(contentsOf: String(leastSignificant + 1))
 			}
 		}
 
 		roundUp()
+
+		// We pad the result back up to maxPlaces digits
+		digits.append(contentsOf: zeroPadding(length: Int(maxPlaces) - digits.count))
+
+		return addedLeadingOne
 	}
 
-	private func increaseIntegerPart(integerPart: inout String, decimalPart: inout String, suffix: inout String?, maxPlaces: UInt) {
-		var updated = ""
-		// We go through the number from right to left
-		while true {
-			guard let final = Int(String(integerPart.removeLast())) else { break } // Can't fail
-			if final < 9 {
-				// We simply increase the current digit, at it to updated and finish
-				updated.insert(contentsOf: String(final + 1), at: updated.startIndex)
-				break
-			} else if integerPart.isEmpty {
-				// When ran out of digits, and the last one was 9, we add 10 at the front
-				updated.insert(contentsOf: "10", at: updated.startIndex)
-				// Now we will need to remove a decimal, but that decimal must be a zero so no need to round up
-				if integerPart.count + decimalPart.count <= maxPlaces {
-					print("••• COUNT •••••••••••••••••••••• error \(description)")
-					print("integer: \(integerPart)")
-					print("decimal: \(decimalPart)")
-					print("•••q•••••••••••••••••••••• error")
-				}
-
-				if decimalPart.last != "0" {
-					print("••• LAST •••••••••••••••••••••• error \(description)")
-					print("integer: \(integerPart)")
-					print("decimal: \(decimalPart)")
-					print("•••q•••••••••••••••••••••• error")
-				}
-
-				decimalPart.removeLast()
-				break
-			} else {
-				// The last digit was 9, so we add a 0 and continue increasing the next digit
-				updated.insert("0", at: updated.startIndex)
-			}
-		}
-
-		integerPart.append(contentsOf: updated)
+	private func zeroPadding(length: Int) -> String {
+		String(repeating: "0", count: length)
 	}
 
 	// Trim the decimal part as needed
