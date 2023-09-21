@@ -135,17 +135,17 @@ def size_of_file_at(filePath)
 end
 
 private_lane :create_gh_release do |options|
-    sh('git fetch --tags')
-    most_recent_tags = sh("git tag | grep #{flavour} | sort -r | head -2").split("\n")
+    flavour = options.fetch(:flavour).delete_prefix('"').delete_suffix('"') # if accidentally included
     
-
     ipaPath = lane_context[SharedValues::IPA_OUTPUT_PATH]
     dsymPath = lane_context[SharedValues::DSYM_OUTPUT_PATH]
     print("\n\n\n🔮🔮🔮🔮🔮🔮\nCYON: dsymPath: '#{dsymPath}'\nipaPath: '#{ipaPath}'\n🔮🔮🔮🔮🔮🔮\n\n")
     size_of_file_at(ipaPath)
     size_of_file_at(dsymPath)
 
-    flavour = options.fetch(:flavour).delete_prefix('"').delete_suffix('"') # if accidentally included
+    sh('git fetch --tags')
+    most_recent_tags = sh("git tag | grep #{flavour} | sort -r | head -2").split("\n")
+
     changelog = rev_changelog(flavour, most_recent_tags)
     versions_string = dependencies_with_hyperlinks()
 
