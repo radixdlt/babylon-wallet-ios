@@ -41,9 +41,16 @@ platform :ios do
             build_number: build_number
         )
         build_app
-        upload_to_testflight(
-            api_key: api_key
-        )
+
+        # exportOptionsPlistName = "ExportOptions.plist"
+        # exportOptionsPlistPath = "./#{exportOptionsPlistName}"
+        # # Manually set export options https://docs.fastlane.tools/actions/build_app/
+        # export_options(exportOptionsPlistPath)
+
+
+        # upload_to_testflight(
+        #     api_key: api_key
+        # )
 
         flavour = ENV['FLAVOUR']
         tag = "%s#%s-%s" % [app_version, build_number, flavour]
@@ -123,7 +130,20 @@ def rev_changelog(flavour)
     )
 end
 
+def size_of_file_at(filePath)
+    size = File.size(filePath)
+    print("\n🔮🔮🔮\nCYON: size of: '#{filePath}' is: '#{size}'\n🔮🔮🔮\n")
+
+end
+
 private_lane :create_gh_release do |options|
+
+    ipaPath = lane_context[SharedValues::IPA_OUTPUT_PATH]
+    dsymPath = lane_context[SharedValues::DSYM_OUTPUT_PATH]
+    print("\n\n\n🔮🔮🔮🔮🔮🔮\nCYON: dsymPath: '#{dsymPath}'\nipaPath: '#{ipaPath}'\n🔮🔮🔮🔮🔮🔮\n\n")
+    size_of_file_at(ipaPath)
+    size_of_file_at(dsymPath)
+
     flavour = options.fetch(:flavour).delete_prefix('"').delete_suffix('"') # if accidentally included
     changelog = rev_changelog(flavour)
     versions_string = dependencies_with_hyperlinks()
@@ -137,7 +157,8 @@ private_lane :create_gh_release do |options|
         tag_name: last_tag,
         description: release_description,
         is_draft: true, # We mark all flavours as DRAFT and then promote them once approved by Apple.
-        is_prerelease: flavour.include?("Beta")
+        is_prerelease: flavour.include?("Beta"),
+        upload_assets: [dsymPath, ipaPath]
     )
 end
 
