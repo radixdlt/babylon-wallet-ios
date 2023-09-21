@@ -229,9 +229,7 @@ extension BigDecimal {
 			normalizeInteger()
 			round(toPlaces: maxPlaces)
 			string.trimTrailingZeros()
-			print("   -> d: \(string) [\(integers)]")
 			applySuitableMultiplier(maxPlaces: maxPlaces)
-			print("   -> m: \(string) [\(integers)] [[\(multiplier)]]")
 		}
 
 		/// Returns a formatted string, with the given separator
@@ -328,12 +326,6 @@ private extension String {
 
 	mutating func padWithLeadingZeros(count: Int) {
 		insert(contentsOf: String.zeros(length: count), at: startIndex)
-	}
-
-	mutating func padWithTrailingZeros(to length: Int) {
-		let padding = length - count
-		assert(padding >= 0)
-		append(contentsOf: String.zeros(length: length))
 	}
 
 	mutating func trimTrailingZeros() {
