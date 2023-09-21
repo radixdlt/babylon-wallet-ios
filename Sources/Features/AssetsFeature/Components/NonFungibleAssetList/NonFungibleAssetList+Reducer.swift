@@ -84,13 +84,13 @@ public struct NonFungibleAssetList: Sendable, FeatureReducer {
 			case let .success(loadedResources):
 				do {
 					let newResources = try loadedResources.map { loadedResource in
-						guard let tokens = state.resources.first(where: { $0.resourceAddress == loadedResource.resourceAddress })?.tokens else {
+						guard let resource = state.resources.first(where: { $0.resourceAddress == loadedResource.resourceAddress }) else {
 							// Should not happen, but still
 							struct InvalidLoad: Error {}
 							throw InvalidLoad()
 						}
 
-						return NonFungibleAssetList.Row.State(resource: .init(resource: loadedResource, tokens: tokens), selectedAssets: [])
+						return NonFungibleAssetList.Row.State(resource: .init(resource: loadedResource, tokens: resource.tokens, atLedgerState: resource.atLedgerState), selectedAssets: [])
 					}
 					state.loadedPages += 1
 					state.rows.append(contentsOf: newResources)
@@ -108,17 +108,13 @@ public struct NonFungibleAssetList: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
-		case let .asset(rowID, .delegate(.open(localID))):
+		case let .asset(rowID, .delegate(.open(token))):
 			guard let row = state.rows[id: rowID] else {
 				loggerGlobal.warning("Selected row does not exist \(rowID)")
 				return .none
 			}
-//			guard let token = row.resource.tokens[id: localID] else {
-//				loggerGlobal.warning("Selected token does not exist: \(localID)")
-//				return .none
-//			}
-//
-//			state.destination = .details(.init(resource: row.resource.resource, token: token))
+
+			//	state.destination = .details(.init(resource: row.resource.resource, token: token))
 			return .none
 
 		case let .asset(rowID, .delegate(.didAppear)):

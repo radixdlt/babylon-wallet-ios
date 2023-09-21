@@ -9,10 +9,27 @@ import SharedModels
 public struct OnLedgerEntitiesClient: Sendable {
 	public let getResources: GetResources
 	public let getResource: GetResource
+	public let getNonFungibleTokenData: GetNonFungibleTokenData
 }
 
 // MARK: - OnLedgerEntitiesClient.GetResources
 extension OnLedgerEntitiesClient {
 	public typealias GetResources = @Sendable ([ResourceAddress]) async throws -> [OnLedgerEntity.Resource]
 	public typealias GetResource = @Sendable (ResourceAddress) async throws -> OnLedgerEntity.Resource
+	public typealias GetNonFungibleTokenData = @Sendable (GetNonFungibleTokenDataRequest) async throws -> [OnLedgerEntity.NonFungibleToken]
+}
+
+// MARK: OnLedgerEntitiesClient.GetNonFungibleTokenDataRequest
+extension OnLedgerEntitiesClient {
+	public struct GetNonFungibleTokenDataRequest: Sendable {
+		public let atLedgerState: AtLedgerState
+		public let resource: ResourceAddress
+		public let nonFungibleIds: [NonFungibleGlobalId]
+
+		public init(atLedgerState: AtLedgerState, resource: ResourceAddress, nonFungibleIds: [NonFungibleGlobalId]) {
+			self.atLedgerState = atLedgerState
+			self.resource = resource
+			self.nonFungibleIds = nonFungibleIds
+		}
+	}
 }

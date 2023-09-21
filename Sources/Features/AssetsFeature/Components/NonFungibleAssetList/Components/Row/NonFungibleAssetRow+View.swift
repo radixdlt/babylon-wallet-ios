@@ -28,16 +28,27 @@ extension NonFungibleAssetList.Row.View {
 				StackedViewsLayout(isExpanded: viewStore.isExpanded) {
 					rowView(viewStore)
 						.zIndex(.infinity)
-//					ForEach(
-//						Array(
-//							assetsToDisplay(viewStore)
-//								.sorted(by: \.localId)
-//								.enumerated()
-//						),
-//						id: \.element
-//					) { index, item in
-//						componentView(with: viewStore, asset: item, index: index)
-//					}
+					if viewStore.isExpanded {
+						LazyVStack {
+							ForEach(
+								Array(
+									assetsToDisplay(viewStore)
+										.enumerated()
+								),
+								id: \.element
+							) { index, item in
+								componentView(with: viewStore, asset: item, index: index)
+									.onAppear {
+										viewStore.send(.onTokenDidAppear(index: index))
+									}
+							}
+						}
+						.overlay(alignment: .bottom) {
+							if viewStore.isLoadingResources {
+								ProgressView()
+							}
+						}
+					}
 				}
 				.onAppear {
 					viewStore.send(.didAppear)
@@ -73,13 +84,12 @@ extension NonFungibleAssetList.Row.View {
 		}
 	}
 
-//
-//	private func assetsToDisplay(_ viewStore: ViewStoreOf<NonFungibleAssetList.Row>) -> IdentifiedArrayOf<AccountPortfolio.NonFungibleResource.NonFungibleToken> {
+	private func assetsToDisplay(_ viewStore: ViewStoreOf<NonFungibleAssetList.Row>) -> IdentifiedArrayOf<OnLedgerEntity.NonFungibleToken> {
 //		if !viewStore.isExpanded {
-//			return IdentifiedArrayOf(uniqueElements: viewStore.resource.tokens.prefix(Constants.collapsedCardsCount))
+//			return IdentifiedArrayOf(uniqueElements: viewStore.loadedTokens.prefix(Constants.collapsedCardsCount))
 //		}
-//		return viewStore.resource.tokens
-//	}
+		viewStore.loadedTokens
+	}
 
 	private var headerHeight: CGFloat { HitTargetSize.small.frame.height + 2 * .medium1 }
 }
@@ -89,7 +99,7 @@ extension NonFungibleAssetList.Row.View {
 	@ViewBuilder
 	fileprivate func componentView(
 		with viewStore: ViewStoreOf<NonFungibleAssetList.Row>,
-		asset: AccountPortfolio.NonFungibleResource.NonFungibleToken,
+		asset: OnLedgerEntity.NonFungibleToken,
 		index: Int
 	) -> some View {
 		let isDisabled = viewStore.disabled.contains(asset.id)
@@ -208,7 +218,8 @@ extension NonFungibleAssetList.Row.State {
 
 	private static let previewResource = AccountPortfolio.NonFungibleResource(
 		resource: .init(resourceAddress: previewResourceAddress),
-		tokens: []
+		tokens: [],
+		atLedgerState: .init(version: 0)
 	)
 
 	private static let previewResourceAddress = try! ResourceAddress(validatingAddress: "resource_tdx_c_1qyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq40v2wv")

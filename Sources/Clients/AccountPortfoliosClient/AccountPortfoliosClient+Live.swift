@@ -292,7 +292,7 @@ extension AccountPortfoliosClient {
 //				let tokens = try await gatewayAPIClient.getNonFungibleData(.init(
 //					atLedgerState: ledgerState.selector,
 //					resourceAddress: resource.resourceAddress,
-//					nonFungibleIds: Array(nftIDChunk)
+		//                    nonFungibleIds: Array(nftIDChunk.map { $0.localId().toString()})
 //				))
 //				.nonFungibleIds
 //				.map { item in
@@ -340,7 +340,8 @@ extension AccountPortfoliosClient {
 				tags: [],
 				totalSupply: nil
 			),
-			tokens: nftIDs
+			tokens: nftIDs,
+			atLedgerState: .init(version: ledgerState.stateVersion)
 		)
 	}
 }

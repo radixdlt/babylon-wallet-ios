@@ -829,22 +829,22 @@ extension TransactionReview {
 
 			var result: [NonFungibleToken] = []
 			for idChunk in ids.chunks(ofCount: maximumNFTIDChunkSize) {
-				let tokens = try await gatewayAPIClient.getNonFungibleData(.init(
-					resourceAddress: resourceAddress.address,
-					nonFungibleIds: idChunk.map {
-						try $0.toString()
-					}
-				))
-				.nonFungibleIds
-				.map { responseItem in
-					try NonFungibleToken(
-						resourceAddress: resourceAddress,
-						nftID: .from(stringFormat: responseItem.nonFungibleId),
-						nftData: responseItem.details
-					)
-				}
+//				let tokens = try await gatewayAPIClient.getNonFungibleData(.init(
+//					resourceAddress: resourceAddress.address,
+//					nonFungibleIds: idChunk.map {
+//						try $0.toString()
+//					}
+//				))
+//				.nonFungibleIds
+//				.map { responseItem in
+//					try NonFungibleToken(
+//						resourceAddress: resourceAddress,
+//						nftID: .from(stringFormat: responseItem.nonFungibleId),
+//						nftData: responseItem.details
+//					)
+//				}
 
-				result.append(contentsOf: tokens)
+				// result.append(contentsOf: tokens)
 			}
 
 			return result

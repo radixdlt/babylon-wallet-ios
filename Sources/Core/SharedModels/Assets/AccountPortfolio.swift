@@ -65,6 +65,7 @@ extension AccountPortfolio {
 	public struct NonFungibleResource: Sendable, Hashable, Identifiable, Codable {
 		public let resource: OnLedgerEntity.Resource
 		public let tokens: [NonFungibleGlobalId]
+		public let atLedgerState: AtLedgerState
 
 		public var id: ResourceAddress { resourceAddress }
 		public var resourceAddress: ResourceAddress { resource.resourceAddress }
@@ -76,9 +77,10 @@ extension AccountPortfolio {
 		public var tags: [AssetTag] { resource.tags }
 		public var totalSupply: BigDecimal? { resource.totalSupply }
 
-		public init(resource: OnLedgerEntity.Resource, tokens: [NonFungibleGlobalId]) {
+		public init(resource: OnLedgerEntity.Resource, tokens: [NonFungibleGlobalId], atLedgerState: AtLedgerState) {
 			self.resource = resource
 			self.tokens = tokens
+			self.atLedgerState = atLedgerState
 		}
 
 		public struct NonFungibleToken: Sendable, Hashable, Identifiable, Codable {
@@ -347,13 +349,15 @@ extension AccountPortfolio.NonFungibleResource {
 	enum CodingKeys: CodingKey {
 		case resource
 		case tokens
+		case atLedgerState
 	}
 
 	public init(from decoder: Decoder) throws {
 		let container = try decoder.container(keyedBy: CodingKeys.self)
 		try self.init(
 			resource: container.decode(OnLedgerEntity.Resource.self, forKey: .resource),
-			tokens: container.decode([String].self, forKey: .tokens).map(NonFungibleGlobalId.init(nonFungibleGlobalId:))
+			tokens: container.decode([String].self, forKey: .tokens).map(NonFungibleGlobalId.init(nonFungibleGlobalId:)),
+			atLedgerState: container.decode(AtLedgerState.self, forKey: .atLedgerState)
 		)
 	}
 
@@ -362,6 +366,7 @@ extension AccountPortfolio.NonFungibleResource {
 
 		try container.encode(resource, forKey: .resource)
 		try container.encode(tokens.map { $0.asStr() }, forKey: .tokens)
+		try container.encode(atLedgerState, forKey: .atLedgerState)
 	}
 }
 
