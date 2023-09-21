@@ -42,9 +42,9 @@ platform :ios do
             build_number: build_number
         )
 
-        build_app(export_options: {
+        build_app(
             include_symbols: true
-        })
+        )
 
         upload_to_testflight(
             api_key: api_key
