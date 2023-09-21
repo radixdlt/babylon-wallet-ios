@@ -29,33 +29,31 @@ platform :ios do
     lane :deploy do |options|
         install_distribution_certificates
 
-        # api_key = app_store_connect_api_key
-        # app_version = read_common_config(key: "APP_VERSION")
-        # build_number = latest_testflight_build_number(
-        #     version: app_version,
-        #     app_identifier: read_env_config(key: "PRODUCT_BUNDLE_IDENTIFIER"),
-        #     initial_build_number: 0
-        # ) + 1
-        # increment_build_number(
-        #     xcodeproj: ENV['PROJ_PATH'],
-        #     build_number: build_number
-        # )
-        build_app
+        api_key = app_store_connect_api_key
+        app_version = read_common_config(key: "APP_VERSION")
+        build_number = latest_testflight_build_number(
+            version: app_version,
+            app_identifier: read_env_config(key: "PRODUCT_BUNDLE_IDENTIFIER"),
+            initial_build_number: 0
+        ) + 1
+        
+        increment_build_number(
+            xcodeproj: ENV['PROJ_PATH'],
+            build_number: build_number
+        )
 
-        # exportOptionsPlistName = "ExportOptions.plist"
-        # exportOptionsPlistPath = "./#{exportOptionsPlistName}"
-        # # Manually set export options https://docs.fastlane.tools/actions/build_app/
-        # export_options(exportOptionsPlistPath)
+        build_app(export_options: {
+            include_symbols: true
+        })
 
-
-        # upload_to_testflight(
-        #     api_key: api_key
-        # )
+        upload_to_testflight(
+            api_key: api_key
+        )
 
         flavour = ENV['FLAVOUR']
-        # tag = "%s#%s-%s" % [app_version, build_number, flavour]
-        # add_git_tag(tag: tag)
-        # push_to_git_remote
+        tag = "%s#%s-%s" % [app_version, build_number, flavour]
+        add_git_tag(tag: tag)
+        push_to_git_remote
 
         create_gh_release(flavour: flavour)
     end
@@ -128,20 +126,12 @@ def rev_changelog(flavour, most_recent_tags)
     )
 end
 
-def size_of_file_at(filePath)
-    size = File.size(filePath)
-    print("\n🔮🔮🔮\nCYON: size of: '#{filePath}' is: '#{size}'\n🔮🔮🔮\n")
-
-end
 
 private_lane :create_gh_release do |options|
     flavour = options.fetch(:flavour).delete_prefix('"').delete_suffix('"') # if accidentally included
     
     ipaPath = lane_context[SharedValues::IPA_OUTPUT_PATH]
     dsymPath = lane_context[SharedValues::DSYM_OUTPUT_PATH]
-    print("\n\n\n🔮🔮🔮🔮🔮🔮\nCYON: dsymPath: '#{dsymPath}'\nipaPath: '#{ipaPath}'\n🔮🔮🔮🔮🔮🔮\n\n")
-    size_of_file_at(ipaPath)
-    size_of_file_at(dsymPath)
 
     sh('git fetch --tags')
     most_recent_tags = sh("git tag | grep #{flavour} | sort -r | head -2").split("\n")
@@ -152,13 +142,10 @@ private_lane :create_gh_release do |options|
     release_description = "**Dependencies**: \n#{versions_string}\n\n**Changelog**: \n#{changelog}"
     last_tag = most_recent_tags[0]
 
-    timenow = Time.now.utc
-    timestring = timenow.strftime("%k:%M")
-
     set_github_release(
         repository_name: ENV['REPO_NAME'],
         api_token: ENV['GIT_TOKEN'] ,
-        name: "CYON-#{timestring}",
+        name: last_tag,
         tag_name: last_tag,
         description: release_description,
         is_draft: true, # We mark all flavours as DRAFT and then promote them once approved by Apple.
