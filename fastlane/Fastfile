@@ -120,8 +120,7 @@ platform :mac do
 end
 
 
-def rev_changelog(flavour)
-    most_recent_tags = sh("git tag | grep #{flavour} | sort -r | head -2").split("\n")
+def rev_changelog(flavour, most_recent_tags)
     git_commits_range_for_changelog = most_recent_tags.map { |tag| sh("git rev-list --abbrev-commit -n 1 #{tag}").strip }
     rev_changelog = changelog_from_git_commits(
       between: git_commits_range_for_changelog,
@@ -137,6 +136,8 @@ end
 
 private_lane :create_gh_release do |options|
     sh('git fetch --tags')
+    most_recent_tags = sh("git tag | grep #{flavour} | sort -r | head -2").split("\n")
+    
 
     ipaPath = lane_context[SharedValues::IPA_OUTPUT_PATH]
     dsymPath = lane_context[SharedValues::DSYM_OUTPUT_PATH]
@@ -145,7 +146,7 @@ private_lane :create_gh_release do |options|
     size_of_file_at(dsymPath)
 
     flavour = options.fetch(:flavour).delete_prefix('"').delete_suffix('"') # if accidentally included
-    changelog = rev_changelog(flavour)
+    changelog = rev_changelog(flavour, most_recent_tags)
     versions_string = dependencies_with_hyperlinks()
 
     release_description = "**Dependencies**: \n#{versions_string}\n\n**Changelog**: \n#{changelog}"
