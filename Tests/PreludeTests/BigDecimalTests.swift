@@ -449,6 +449,29 @@ final class BigDecimalTests: TestCase {
 		try doTest("1.0", expected: "1")
 	}
 
+	func test_format_grouping_separator() throws {
+		func doTest(_ bigDecimalString: String, expected: String, line: UInt = #line) throws {
+			let locale = Locale(identifier: "en_US_POSIX")
+			let bigDecimal = try BigDecimal(fromString: bigDecimalString)
+			let actual = bigDecimal.formatted(roundedTo: 8, locale: locale, usingGroupingSeparator: true)
+			XCTAssertEqual(actual, expected, line: line)
+		}
+
+		try doTest("123456789", expected: "123.45679 M")
+		try doTest("12345678", expected: "12.345678 M")
+		try doTest("1234567", expected: "1.234567 M")
+
+		try doTest("123456", expected: "123,456")
+		try doTest("12345", expected: "12,345")
+		try doTest("1234", expected: "1,234")
+		try doTest("123", expected: "123")
+
+		try doTest("123456.4321", expected: "123,456.43")
+		try doTest("12345.4321", expected: "12,345.432")
+		try doTest("1234.4321", expected: "1,234.4321")
+		try doTest("123.4321", expected: "123.4321")
+	}
+
 	func test_format_bigdecimal_with_currency() throws {
 		func doTest(_ bigDecimalString: String, expected: String, line: UInt = #line) throws {
 			let locale = Locale(identifier: "en_US_POSIX")

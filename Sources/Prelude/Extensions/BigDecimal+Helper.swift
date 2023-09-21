@@ -12,7 +12,7 @@ extension BigDecimal {
 		private var integers: Int
 		private var multiplier: Multiplier = .one
 
-		static func format(decimal: BigDecimal, maxPlaces: Int, decimalSeparator: String) -> String {
+		static func format(decimal: BigDecimal, maxPlaces: Int, decimalSeparator: String, groupingSeparator: String?) -> String {
 			var helper = Helper(decimal: decimal)
 			helper.normalizeInteger()
 			let digitsToRemove = helper.digits.count - maxPlaces
@@ -34,7 +34,7 @@ extension BigDecimal {
 				return helper.formattedString(decimalSeparator: decimalSeparator) + "e\(exponent)"
 			}
 
-			return helper.formattedString(decimalSeparator: decimalSeparator)
+			return helper.formattedString(decimalSeparator: decimalSeparator, groupingSeparator: groupingSeparator)
 		}
 
 		static func reduceDecimals(_ decimal: inout BigDecimal, maxDecimals: Int, byRounding: Bool) throws {
@@ -50,7 +50,7 @@ extension BigDecimal {
 				helper.digits.trimTrailingZeros()
 			}
 
-			let string = helper.formattedString(decimalSeparator: BigDecimal.machineReadableDecimalPartsSeparator)
+			let string = helper.machineReadableString()
 			decimal = try BigDecimal(fromString: string)
 		}
 
@@ -62,17 +62,30 @@ extension BigDecimal {
 
 		// Helper instance methods
 
+		/// Returns a machine readable formatted string
+		private func machineReadableString() -> String {
+			formattedString(decimalSeparator: BigDecimal.machineReadableDecimalPartsSeparator)
+		}
+
 		/// Returns a formatted string, with the given separator
-		private func formattedString(decimalSeparator: String) -> String {
+		private func formattedString(decimalSeparator: String, groupingSeparator: String? = nil) -> String {
 			guard digits.count > 0 else { return "0" }
 
 			let signPart = sign == .minus ? "-" : ""
 			// Check if we have any decimals
 			guard integers < digits.count else {
-				return signPart + digits + .zeros(length: integers - digits.count) + multiplierSuffix
+				// No decimals, the digits all represent the integer part
+				var integerPart = digits
+				if let groupingSeparator {
+					integerPart.insertGroupingSeparatorInInteger(groupingSeparator)
+				}
+				return signPart + integerPart + .zeros(length: integers - digits.count) + multiplierSuffix
 			}
 
-			let (integerPart, decimalPart) = digits.split(after: integers)
+			var (integerPart, decimalPart) = digits.split(after: integers)
+			if let groupingSeparator {
+				integerPart.insertGroupingSeparatorInInteger(groupingSeparator)
+			}
 			return signPart + integerPart + decimalSeparator + decimalPart + multiplierSuffix
 		}
 
@@ -169,6 +182,16 @@ private extension String {
 	mutating func trimTrailingZeros() {
 		while hasSuffix("0") {
 			removeLast()
+		}
+	}
+
+	mutating func insertGroupingSeparatorInInteger(_ separator: String) {
+		let digits = count
+		let separatorCount = (digits - 1) / 3
+		guard separatorCount > 0 else { return }
+		for i in 1 ... separatorCount {
+			let location = index(startIndex, offsetBy: digits - 3 * i)
+			insert(contentsOf: separator, at: location)
 		}
 	}
 

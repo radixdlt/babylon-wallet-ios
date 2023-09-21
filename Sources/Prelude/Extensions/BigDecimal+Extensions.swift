@@ -49,9 +49,15 @@ extension BigDecimal {
 	/// A human readable, locale respecting string, rounded to the provided number of digits (including both the integral and decimal parts)
 	public func formatted(
 		roundedTo maxPlaces: UInt = BigDecimal.defaultMaxPlacesFormattted,
-		locale: Locale = .autoupdatingCurrent
+		locale: Locale = .autoupdatingCurrent,
+		usingGroupingSeparator: Bool = false
 	) -> String {
-		Helper.format(decimal: self, maxPlaces: Int(maxPlaces), decimalSeparator: locale.decimalSeparator ?? ".")
+		Helper.format(
+			decimal: self,
+			maxPlaces: Int(maxPlaces),
+			decimalSeparator: locale.decimalSeparator ?? ".",
+			groupingSeparator: usingGroupingSeparator ? locale.groupingSeparator : nil
+		)
 	}
 }
 
