@@ -114,9 +114,15 @@ extension BigDecimal {
 			roundUp()
 		}
 
+		// Use e.g. millions starting from 1 million
 		private func suitableMultiplier(maxPlaces: Int) -> Multiplier? {
-			/// The first multiplier that makes all the integers fit
-			Multiplier.allCases.first { integers - $0.rawValue <= maxPlaces }
+			let allowedRange = integers - maxPlaces ..< integers
+			return .allCases.last { allowedRange.contains($0.rawValue) }
+		}
+
+		// Using the smallest multiplier that fits all integers
+		private func suitableMultiplierCommentStyle(maxPlaces: Int) -> Multiplier? {
+			.allCases.first { integers - $0.rawValue <= maxPlaces }
 		}
 
 		private mutating func applyMultiplier(_ newMultiplier: Multiplier) {

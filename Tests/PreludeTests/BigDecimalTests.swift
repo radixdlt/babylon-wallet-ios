@@ -288,8 +288,13 @@ final class BigDecimalTests: TestCase {
 		func doTest(_ bigDecimalString: String, expected: String, line: UInt = #line) throws {
 			let locale = Locale(identifier: "en_US_POSIX")
 			let bigDecimal = try BigDecimal(fromString: bigDecimalString)
-			let result = bigDecimal.formatted(locale: locale)
-			XCTAssertEqual(result, expected, line: line)
+			let actual = bigDecimal.formatted(roundedTo: 8, locale: locale)
+
+			if actual != expected {
+				print("Got \(actual) but expected \(expected)")
+			}
+
+			XCTAssertEqual(actual, expected, line: line)
 		}
 
 		try doTest("0.123456789", expected: "0.1234568")
@@ -299,9 +304,9 @@ final class BigDecimalTests: TestCase {
 		try doTest("1000", expected: "1000")
 		try doTest("1000.01", expected: "1000.01")
 		try doTest("1000.123456789", expected: "1000.1235")
-		try doTest("1000000.1234", expected: "1000000.1")
-		try doTest("10000000.1234", expected: "10000000")
-		try doTest("10000000.5234", expected: "10000001")
+		try doTest("1000000.1234", expected: "1.0000001 M")
+		try doTest("10000000.1234", expected: "10 M")
+		try doTest("10000000.5234", expected: "10.000001 M")
 		try doTest("999.999999999943", expected: "1000")
 
 		try doTest("-0.123456789", expected: "-0.1234568")
@@ -311,9 +316,9 @@ final class BigDecimalTests: TestCase {
 		try doTest("-1000", expected: "-1000")
 		try doTest("-1000.01", expected: "-1000.01")
 		try doTest("-1000.123456789", expected: "-1000.1235")
-		try doTest("-1000000.1234", expected: "-1000000.1")
-		try doTest("-10000000.1234", expected: "-10000000")
-		try doTest("-10000000.5234", expected: "-10000001")
+		try doTest("-1000000.1234", expected: "-1.0000001 M")
+		try doTest("-10000000.1234", expected: "-10 M")
+		try doTest("-10000000.5234", expected: "-10.000001 M")
 		try doTest("-999.999999999943", expected: "-1000")
 
 		// No suffix
@@ -323,42 +328,26 @@ final class BigDecimalTests: TestCase {
 		try doTest("1112.22111222111222333222333", expected: "1112.2211")
 		try doTest("11122.2111222111222333222333", expected: "11122.211")
 		try doTest("111222.111222111222333222333", expected: "111222.11")
-		try doTest("1112221.11222111222333222333", expected: "1112221.1")
-		try doTest("11122211.1222111222333222333", expected: "11122211")
 
 		// Million
+		try doTest("1112221.11222111222333222333", expected: "1.1122211 M")
+		try doTest("11122211.1222111222333222333", expected: "11.122211 M")
 		try doTest("111222111.222111222333222333", expected: "111.22211 M")
-		try doTest("1112221112.22111222333222333", expected: "1112.2211 M")
-		try doTest("11122211122.2111222333222333", expected: "11122.211 M")
 
-		// Million (alt)
-		try doTest("111222111222.111222333222333", expected: "111222.11 M")
-		try doTest("1112221112221.11222333222333", expected: "1112221.1 M")
-		try doTest("11122211122211.1222333222333", expected: "11122211 M")
+		// Billion
+		try doTest("1112221112.22111222333222333", expected: "1.1122211 B")
+		try doTest("11122211122.2111222333222333", expected: "11.122211 B")
+		try doTest("111222111222.111222333222333", expected: "111.22211 B")
 
-//		// Billion
-//		try doTest("111222111222.111222333222333", expected: "111.22211 B")
-//		try doTest("1112221112221.11222333222333", expected: "1112.2211 B")
-//		try doTest("11122211122211.1222333222333", expected: "11122.211 B")
-
-		// Billion (alt)
-		try doTest("111222111222111.222333222333", expected: "111222.11 B")
-		try doTest("1112221112221112.22333222333", expected: "1112221.1 B")
-		try doTest("11122211122211122.2333222333", expected: "11122211 B")
-
-//		// Trillion
-//		try doTest("111222111222111.222333222333", expected: "111.22211 T")
-//		try doTest("1112221112221112.22333222333", expected: "1112.2211 T")
-//		try doTest("11122211122211122.2333222333", expected: "11122.211 T")
-
+		// Trillion
+		try doTest("1112221112221.11222333222333", expected: "1.1122211 T")
+		try doTest("11122211122211.1222333222333", expected: "11.122211 T")
+		try doTest("111222111222111.222333222333", expected: "111.22211 T")
+		try doTest("1112221112221112.22333222333", expected: "1112.2211 T")
+		try doTest("11122211122211122.2333222333", expected: "11122.211 T")
 		try doTest("111222111222111222.333222333", expected: "111222.11 T")
 		try doTest("1112221112221112223.33222333", expected: "1112221.1 T")
 		try doTest("11122211122211122233.3222333", expected: "11122211 T")
-
-		try doTest("12000000", expected: "12000000")
-		try doTest("1230000", expected: "1230000")
-		try doTest("120000", expected: "120000")
-		try doTest("12345678", expected: "12345678")
 
 		// Actually too large, but I guess we have to show them anyway
 		try doTest("111222111222111222333.222333", expected: "111222111 T")
@@ -377,67 +366,65 @@ final class BigDecimalTests: TestCase {
 		try doTest("99999999999999999999999999.9", expected: "100000000000000 T")
 		try doTest("999999999999999999999999999", expected: "1000000000000000 T")
 
-//		print("Million -")
-//		try doTest("99999994", expected: "99.999994 M")
-//		try doTest("999999956", expected: "999.99996 M")
-//		try doTest("9999999462", expected: "9999.9995 M")
-//
-//		print("Million")
-//		try doTest("100123454", expected: "100.12345 M")
-//		try doTest("1000123446", expected: "1000.1234 M")
-//		try doTest("10001234462", expected: "10001.234 M")
-//
-//		print("Million +")
-//		try doTest("100123456", expected: "100.12346 M")
-//		try doTest("1000123450", expected: "1000.1235 M")
-//		try doTest("10000123500", expected: "10000.124 M")
-//
-//		print("Billion -")
-//		try doTest("9999999900", expected: "9999.9999 M")
-//		try doTest("9999999900", expected: "9999.9999 B")
-//		try doTest("9999999900", expected: "9999.9999 B")
-//		try doTest("9999999500", expected: "9999.9999 B")
-//		try doTest("9999999400", expected: "9999.9999 B")
-//		try doTest("9999999000", expected: "9999.9999 B")
-//
-//		print("Billion")
-//		try doTest("10000012445.678", expected: "100.00012 B")
-//		try doTest("10000012445.678", expected: "100.00012 B")
-//		try doTest("10000012445.678", expected: "100.00012 B")
-//		try doTest("10000002445.678", expected: "100.00002 B")
-//		try doTest("10000002445.678", expected: "100.00002 B")
-//
-//		print("Billion +")
-//		try doTest("10000012545.678", expected: "100.00013 B")
-//		try doTest("10000012545.678", expected: "100.00013 B")
-//		try doTest("10000012545.678", expected: "100.00013 B")
-//		try doTest("10000002545.678", expected: "100.00003 B")
-//		try doTest("10000002545.678", expected: "100.00003 B")
-//		try doTest("10000000055.678", expected: "100 B")
-//
-//		print("Trillion -")
-//		try doTest("999999999900.00", expected: "100 T")
-//		try doTest("999999999000.00", expected: "100 T")
-//		try doTest("999999990000.00", expected: "100 T")
-//		try doTest("999999950000.00", expected: "100 T")
-//		try doTest("999999940000.00", expected: "99.999994 T")
-//		try doTest("999999900000.00", expected: "99.999990 T")
-//
-//		print("Trillion")
-//		try doTest("10000012445678.9", expected: "100.00012 T")
-//		try doTest("10000012445678.92", expected: "100.00012 T")
-//		try doTest("10000012445678.923", expected: "100.00012 T")
-//		try doTest("10000002445678.9", expected: "100.00002 T")
-//		try doTest("10000000445678.92", expected: "100 T")
-//		try doTest("10000000045678.923", expected: "100 T")
-//
-//		print("Trillion +")
-//		try doTest("10000012545678", expected: "100.00013 T")
-//		try doTest("10000012545678.2", expected: "100.00013 T")
-//		try doTest("10000012545678.23", expected: "100.00013 T")
-//		try doTest("10000002545678", expected: "100.00003 T")
-//		try doTest("10000002545678.2", expected: "100.00003 T")
-//		try doTest("10000000055678.23", expected: "100 T")
+		try doTest("99999994", expected: "99.999994 M")
+		try doTest("999999956", expected: "999.99996 M")
+
+		try doTest("9999999462", expected: "9.9999995 B")
+		try doTest("100123454", expected: "100.12345 M")
+		try doTest("1000123446", expected: "1.0001234 B")
+		try doTest("10001234462", expected: "10.001234 B")
+
+		try doTest("100123456", expected: "100.12346 M")
+		try doTest("1000123450", expected: "1.0001235 B")
+		try doTest("10000123500", expected: "10.000124 B")
+
+		try doTest("9999999900", expected: "9.9999999 B")
+		try doTest("9999999900", expected: "9.9999999 B")
+		try doTest("9999999900", expected: "9.9999999 B")
+		try doTest("9999999500", expected: "9.9999995 B")
+		try doTest("9999999400", expected: "9.9999994 B")
+		try doTest("9999999000", expected: "9.999999 B")
+
+		try doTest("10000012445.678", expected: "10.000012 B")
+		try doTest("10000012445.678", expected: "10.000012 B")
+		try doTest("10000012445.678", expected: "10.000012 B")
+		try doTest("10000002445.678", expected: "10.000002 B")
+		try doTest("10000002445.678", expected: "10.000002 B")
+
+		try doTest("10000012545.678", expected: "10.000013 B")
+		try doTest("10000012545.678", expected: "10.000013 B")
+		try doTest("10000012545.678", expected: "10.000013 B")
+		try doTest("10000002545.678", expected: "10.000003 B")
+		try doTest("10000002545.678", expected: "10.000003 B")
+		try doTest("10000000055.678", expected: "10 B")
+
+		try doTest("999999999900.00", expected: "1 T")
+		try doTest("999999999000.00", expected: "1 T")
+		try doTest("999999990000.00", expected: "999.99999 B")
+		try doTest("999999950000.00", expected: "999.99995 B")
+		try doTest("999999940000.00", expected: "999.99994 B")
+		try doTest("999999900000.00", expected: "999.9999 B")
+
+		try doTest("9999999999900.00", expected: "10 T")
+		try doTest("9999999999000.00", expected: "10 T")
+		try doTest("9999999990000.00", expected: "10 T")
+		try doTest("9999999950000.00", expected: "10 T")
+		try doTest("9999999940000.00", expected: "9.9999999 T")
+		try doTest("9999999900000.00", expected: "9.9999999 T")
+
+		try doTest("10000012445678.9", expected: "10.000012 T")
+		try doTest("10000012445678.92", expected: "10.000012 T")
+		try doTest("10000012445678.923", expected: "10.000012 T")
+		try doTest("10000002445678.9", expected: "10.000002 T")
+		try doTest("10000000445678.92", expected: "10 T")
+		try doTest("10000000045678.923", expected: "10 T")
+
+		try doTest("10000012545678", expected: "10.000013 T")
+		try doTest("10000012545678.2", expected: "10.000013 T")
+		try doTest("10000012545678.23", expected: "10.000013 T")
+		try doTest("10000002545678", expected: "10.000003 T")
+		try doTest("10000002545678.2", expected: "10.000003 T")
+		try doTest("10000000055678.23", expected: "10 T")
 
 		try doTest("01434.234", expected: "1434.234")
 		try doTest("1434.234", expected: "1434.234")
@@ -449,10 +436,10 @@ final class BigDecimalTests: TestCase {
 		try doTest("0.00100", expected: "0.001")
 		try doTest("0.001000", expected: "0.001")
 
-		try doTest("57896044618.658097719968", expected: "57896.045 M")
-		try doTest("1000000000.1", expected: "1000 M")
-		try doTest("999999999.1", expected: "1000 M")
-		try doTest("1000000000", expected: "1000 M")
+		try doTest("57896044618.658097719968", expected: "57.896045 B")
+		try doTest("1000000000.1", expected: "1 B")
+		try doTest("999999999.1", expected: "1 B")
+		try doTest("1000000000", expected: "1 B")
 
 		try doTest("1000.1234", expected: "1000.1234")
 		try doTest("1000.5", expected: "1000.5")
