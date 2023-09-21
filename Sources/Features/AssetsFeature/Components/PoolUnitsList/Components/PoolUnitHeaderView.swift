@@ -20,12 +20,13 @@ struct PoolUnitHeaderView<NameView>: View where NameView: View {
 	}
 
 	var body: some View {
-		HStack(spacing: .medium2) {
+		HStack(spacing: .zero) {
 			NFTThumbnail(viewState.iconURL, size: .small)
+				.padding(.trailing, .medium2)
 
 			nameView
 
-			Spacer()
+			Spacer(minLength: 0)
 		}
 	}
 }
