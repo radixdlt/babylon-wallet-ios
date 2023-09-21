@@ -51,8 +51,7 @@ extension BigDecimal {
 		roundedTo maxPlaces: UInt = BigDecimal.defaultMaxPlacesFormattted,
 		locale: Locale = .autoupdatingCurrent
 	) -> String {
-		// If the number is too big to be formatted to maxPlaces, we use trillions and show all digits
-		Helper.format(decimal: self, maxPlaces: Int(maxPlaces), fallback: .trillion, decimalSeparator: locale.decimalSeparator ?? ".")
+		Helper.format(decimal: self, maxPlaces: Int(maxPlaces), decimalSeparator: locale.decimalSeparator ?? ".")
 	}
 }
 

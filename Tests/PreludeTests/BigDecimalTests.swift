@@ -289,11 +289,6 @@ final class BigDecimalTests: TestCase {
 			let locale = Locale(identifier: "en_US_POSIX")
 			let bigDecimal = try BigDecimal(fromString: bigDecimalString)
 			let actual = bigDecimal.formatted(roundedTo: 8, locale: locale)
-
-			if actual != expected {
-				print("Got \(actual) but expected \(expected)")
-			}
-
 			XCTAssertEqual(actual, expected, line: line)
 		}
 
@@ -349,22 +344,22 @@ final class BigDecimalTests: TestCase {
 		try doTest("1112221112221112223.33222333", expected: "1112221.1 T")
 		try doTest("11122211122211122233.3222333", expected: "11122211 T")
 
-		// Actually too large, but I guess we have to show them anyway
-		try doTest("111222111222111222333.222333", expected: "111222111 T")
-		try doTest("1112221112221112223332.22333", expected: "1112221112 T")
-		try doTest("11122211122211122233322.2333", expected: "11122211122 T")
-		try doTest("111222111222111222333222.333", expected: "111222111222 T")
-		try doTest("1112221112221112223332223.33", expected: "1112221112221 T")
-		try doTest("11122211122211122233322233.3", expected: "11122211122211 T")
-		try doTest("111222111222111222333222333", expected: "111222111222111 T")
+		// Too large, we have to use engineering notation
+		try doTest("111222111222111222333.222333", expected: "1.112e20")
+		try doTest("1112221112221112223332.22333", expected: "1.112e21")
+		try doTest("11122211122211122233322.2333", expected: "1.112e22")
+		try doTest("111222111222111222333222.333", expected: "1.112e23")
+		try doTest("1112221112221112223332223.33", expected: "1.112e24")
+		try doTest("11122211122211122233322233.3", expected: "1.112e25")
+		try doTest("111222111222111222333222333", expected: "1.112e26")
 
-		try doTest("999999999999999999999.922333", expected: "1000000000 T")
-		try doTest("9999999999999999999999.92333", expected: "10000000000 T")
-		try doTest("99999999999999999999999.9333", expected: "100000000000 T")
-		try doTest("999999999999999999999999.933", expected: "1000000000000 T")
-		try doTest("9999999999999999999999999.93", expected: "10000000000000 T")
-		try doTest("99999999999999999999999999.9", expected: "100000000000000 T")
-		try doTest("999999999999999999999999999", expected: "1000000000000000 T")
+		try doTest("999999999999999999999.922333", expected: "1e21")
+		try doTest("9999999999999999999999.92333", expected: "1e22")
+		try doTest("99999999999999999999999.9333", expected: "1e23")
+		try doTest("999999999999999999999999.933", expected: "1e24")
+		try doTest("9999999999999999999999999.93", expected: "1e25")
+		try doTest("99999999999999999999999999.9", expected: "1e26")
+		try doTest("999999999999999999999999999", expected: "1e27")
 
 		try doTest("99999994", expected: "99.999994 M")
 		try doTest("999999956", expected: "999.99996 M")

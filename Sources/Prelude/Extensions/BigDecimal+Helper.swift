@@ -5,12 +5,14 @@ import Foundation
 extension BigDecimal {
 	// A helper type for formatting BigDecimal
 	struct Helper {
+		static let maxPlacesForEngineeringNotation = 4
+
 		private var sign: BigInt.Sign
 		private var digits: String
 		private var integers: Int
 		private var multiplier: Multiplier = .one
 
-		static func format(decimal: BigDecimal, maxPlaces: Int, fallback: Multiplier, decimalSeparator: String) -> String {
+		static func format(decimal: BigDecimal, maxPlaces: Int, decimalSeparator: String) -> String {
 			var helper = Helper(decimal: decimal)
 			helper.normalizeInteger()
 			let digitsToRemove = helper.digits.count - maxPlaces
@@ -20,10 +22,16 @@ extension BigDecimal {
 			if let newMultiplier = helper.suitableMultiplier(maxPlaces: maxPlaces) {
 				helper.applyMultiplier(newMultiplier)
 			} else {
-				helper = Helper(decimal: decimal)
-				// We only get here if there are more integers than the biggest multiplier can handle
-				helper.round(byRemoving: helper.digits.count - helper.integers + fallback.rawValue)
-				helper.applyMultiplier(fallback)
+				if maxPlaces < maxPlacesForEngineeringNotation {
+					// if maxPlaces is too low, we might have removed too many digits already, need to start over
+					helper = .init(decimal: decimal)
+				}
+				// If the number is too big to be formatted to maxPlaces, we use engineering notation
+				helper.round(byRemoving: helper.digits.count - maxPlacesForEngineeringNotation)
+				let exponent = helper.integers - 1
+				// Normalise the mantissa
+				helper.integers = 1
+				return helper.formattedString(decimalSeparator: decimalSeparator) + "e\(exponent)"
 			}
 
 			return helper.formattedString(decimalSeparator: decimalSeparator)
@@ -120,7 +128,7 @@ extension BigDecimal {
 			return .allCases.last { allowedRange.contains($0.rawValue) }
 		}
 
-		// Using the smallest multiplier that fits all integers
+		// Using the smallest multiplier that fits all integers - not used currently
 		private func suitableMultiplierCommentStyle(maxPlaces: Int) -> Multiplier? {
 			.allCases.first { integers - $0.rawValue <= maxPlaces }
 		}
