@@ -209,31 +209,37 @@ extension BigDecimal {
 		maxPlaces: UInt = BigDecimal.defaultMaxPlacesFormattted,
 		locale: Locale = .autoupdatingCurrent
 	) -> String {
-		// The magnitude of the underlying integer value as a string - i.e. all the digits
-		let magnitude = integerValue.magnitude.description
-		let integers = magnitude.count - scale
-		var digits = Digits(sign: sign, string: magnitude, integers: integers)
-		digits.normalize(maxPlaces: maxPlaces)
-
-		return digits.formattedString(separator: locale.decimalSeparator ?? ".")
+		// If we can't format to maxPlaces, we fall back on just using trillions and ignoring length
+		Digits(decimal: self, maxPlaces: maxPlaces, fallback: .trillion)
+			.formattedString(separator: locale.decimalSeparator ?? ".")
 	}
 
 	// A helper type for formatting BigDecimal
 	private struct Digits {
-		var sign: BigInt.Sign
-		var string: String
-		var integers: Int
-		var multiplier: Multiplier = .one
+		private var sign: BigInt.Sign
+		private var string: String
+		private var integers: Int
+		private var multiplier: Multiplier = .one
 
-		fileprivate mutating func normalize(maxPlaces: UInt) {
+		public init(decimal: BigDecimal, maxPlaces: UInt, fallback: Multiplier) {
+			self.init(decimal: decimal)
 			normalizeInteger()
 			round(toPlaces: maxPlaces)
 			string.trimTrailingZeros()
-			applySuitableMultiplier(maxPlaces: maxPlaces)
+
+			guard let newMultiplier = suitableMultiplier(maxPlaces: maxPlaces) else {
+				self = Digits(decimal: decimal)
+				// We only get here if there are more integers than the biggest multiplier can handle
+				round(toPlaces: UInt(integers - fallback.rawValue))
+				applyMultiplier(fallback)
+				return
+			}
+
+			applyMultiplier(newMultiplier)
 		}
 
 		/// Returns a formatted string, with the given separator
-		fileprivate func formattedString(separator: String) -> String {
+		public func formattedString(separator: String) -> String {
 			guard string.count > 0 else { return "0" }
 
 			let signPart = sign == .minus ? "-" : ""
@@ -244,6 +250,12 @@ extension BigDecimal {
 
 			let (integerPart, decimalPart) = string.split(after: integers)
 			return signPart + integerPart + separator + decimalPart + multiplierSuffix
+		}
+
+		private init(decimal: BigDecimal) {
+			self.sign = decimal.sign
+			self.string = decimal.integerValue.magnitude.description
+			self.integers = string.count - decimal.scale
 		}
 
 		/// Normalise digits so that they start with at least one zero before the separator, for numbers < 1
@@ -293,11 +305,12 @@ extension BigDecimal {
 			roundUp()
 		}
 
-		private mutating func applySuitableMultiplier(maxPlaces: UInt) {
+		private func suitableMultiplier(maxPlaces: UInt) -> Multiplier? {
 			/// The first multiplier that makes all the integers fit
-			let newMultiplier = Multiplier.allCases.dropLast().first { integers - $0.rawValue <= Int(maxPlaces) } ?? .trillion
+			Multiplier.allCases.first { integers - $0.rawValue <= Int(maxPlaces) }
+		}
 
-			// Applies the new multiplier
+		private mutating func applyMultiplier(_ newMultiplier: Multiplier) {
 			integers -= newMultiplier.rawValue - multiplier.rawValue
 			multiplier = newMultiplier
 		}
@@ -314,6 +327,8 @@ extension BigDecimal {
 			case .trillion: return " T"
 			}
 		}
+
+		struct NumberTooLong: Error {}
 	}
 }
 
