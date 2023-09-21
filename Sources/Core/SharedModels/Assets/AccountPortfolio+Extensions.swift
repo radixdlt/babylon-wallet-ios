@@ -10,9 +10,7 @@ extension AccountPortfolio.NonFungibleResource.NonFungibleToken {
 			name: nftData.name,
 			description: nftData.description,
 			keyImageURL: nftData.keyImageURL,
-			metadata: [], // FIXME: Find?
-			stakeClaimAmount: nil,
-			canBeClaimed: false // FIXME: Find?
+			stakeClaimAmount: nil
 		)
 	}
 }

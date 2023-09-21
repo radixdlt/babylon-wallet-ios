@@ -70,7 +70,7 @@ extension OnLedgerEntitiesClient {
 
 	@Sendable
 	static func createEntity(from item: GatewayAPI.StateEntityDetailsResponseItem) throws -> OnLedgerEntity? {
-		let dappDefinitions = item.metadata.dappDefinitions?.compactMap { try? DappDefinitionAddress(validatingAddress: $0) }
+		let dappDefinitions = item.explicitMetadata?.dappDefinitions?.compactMap { try? DappDefinitionAddress(validatingAddress: $0) }
 
 		switch item.details {
 		case let .fungibleResource(fungibleDetails):
@@ -82,7 +82,7 @@ extension OnLedgerEntitiesClient {
 				description: item.explicitMetadata?.description,
 				iconURL: item.explicitMetadata?.iconURL,
 				behaviors: item.details?.fungible?.roleAssignments.extractBehaviors() ?? [],
-				tags: item.extractTags(),
+				tags: item.explicitMetadata?.extractTags() ?? [],
 				totalSupply: try? BigDecimal(fromString: fungibleDetails.totalSupply),
 				dappDefinitions: dappDefinitions
 			))
@@ -95,7 +95,7 @@ extension OnLedgerEntitiesClient {
 				description: item.explicitMetadata?.description,
 				iconURL: item.explicitMetadata?.iconURL,
 				behaviors: item.details?.nonFungible?.roleAssignments.extractBehaviors() ?? [],
-				tags: item.extractTags(),
+				tags: item.explicitMetadata?.extractTags() ?? [],
 				totalSupply: try? BigDecimal(fromString: nonFungibleDetails.totalSupply),
 				dappDefinitions: dappDefinitions
 			))

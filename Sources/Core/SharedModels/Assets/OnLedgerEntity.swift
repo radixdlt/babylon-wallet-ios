@@ -73,4 +73,19 @@ extension OnLedgerEntity {
 			self.dappDefinitions = dappDefinitions
 		}
 	}
+
+	/// A simple type that represents an associated dApp
+	public struct AssociatedDapp: Identifiable, Hashable, Sendable {
+		public var id: DappDefinitionAddress { address }
+
+		public let address: DappDefinitionAddress
+		public let name: String
+		public let iconURL: URL?
+
+		public init(address: DappDefinitionAddress, name: String, iconURL: URL? = nil) {
+			self.address = address
+			self.name = name
+			self.iconURL = iconURL
+		}
+	}
 }

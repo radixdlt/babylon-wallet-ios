@@ -212,14 +212,13 @@ extension AccountPortfoliosClient {
 
 		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
 
-		let item = try await gatewayAPIClient.getSingleEntityDetails(resource.resourceAddress)
-		let details = item.details?.fungible
-
 		let resourceAddress = try ResourceAddress(validatingAddress: resource.resourceAddress)
+
+		let details = try await gatewayAPIClient.getSingleEntityDetails(resourceAddress.address).details?.fungible
 		let divisibility = details?.divisibility
 		let behaviors = details?.roleAssignments.extractBehaviors() ?? []
-		let tags = item.extractTags()
 		let totalSupply = details.flatMap { try? BigDecimal(fromString: $0.totalSupply) }
+
 		let metadata = resource.explicitMetadata
 		let dappDefinitions = metadata?.dappDefinitions?.compactMap { try? DappDefinitionAddress(validatingAddress: $0) }
 
@@ -232,7 +231,7 @@ extension AccountPortfoliosClient {
 				description: metadata?.description,
 				iconURL: metadata?.iconURL,
 				behaviors: behaviors,
-				tags: tags,
+				tags: metadata?.extractTags() ?? [],
 				totalSupply: totalSupply,
 				dappDefinitions: dappDefinitions
 			),
@@ -312,7 +311,6 @@ extension AccountPortfoliosClient {
 						name: details.name,
 						description: details.tokenDescription,
 						keyImageURL: details.keyImageURL,
-						metadata: [],
 						stakeClaimAmount: details.claimAmount,
 						canBeClaimed: canBeClaimed
 					)
@@ -323,28 +321,25 @@ extension AccountPortfoliosClient {
 
 			return result
 		}
+		let resourceAddress = try ResourceAddress(validatingAddress: resource.resourceAddress)
 
-		let item = try await gatewayAPIClient.getSingleEntityDetails(resource.resourceAddress)
-		let details = item.details?.nonFungible
-
+		let details = try await gatewayAPIClient.getSingleEntityDetails(resourceAddress.address).details?.nonFungible
 		let behaviors = details?.roleAssignments.extractBehaviors() ?? []
-		let tags = item.extractTags()
 		let totalSupply = details.flatMap { try? BigDecimal(fromString: $0.totalSupply) }
 
 		// Load the nftIds from the resource vault
 		let tokens = try await tokens(resource: resource)
 		let metadata = resource.explicitMetadata
 
-		return try AccountPortfolio.NonFungibleResource(
+		return AccountPortfolio.NonFungibleResource(
 			resource: .init(
-				resourceAddress: .init(validatingAddress: resource.resourceAddress),
-				divisibility: nil, // FIXME: Find?
+				resourceAddress: resourceAddress,
 				name: metadata?.name,
 				symbol: metadata?.symbol,
 				description: metadata?.description,
 				iconURL: metadata?.iconURL,
 				behaviors: behaviors,
-				tags: tags,
+				tags: metadata?.extractTags() ?? [],
 				totalSupply: totalSupply
 			),
 			tokens: tokens

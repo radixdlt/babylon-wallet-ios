@@ -232,7 +232,8 @@ public enum EntityMetadataKey: String, CaseIterable {
 
 extension Set<EntityMetadataKey> {
 	public static var resourceMetadataKeys: Set<EntityMetadataKey> {
-		[.name, .symbol, .description, .iconURL, .validator, .pool, .accountType, .dappDefinition]
+//		[.name, .symbol, .description, .iconURL, .validator, .pool, .accountType, .tags, .dappDefinition, .dappDefinitions]
+		[.name, .symbol, .iconURL, .validator, .pool, .accountType, .tags, .dappDefinition, .dappDefinitions]
 	}
 
 	public static var poolUnitMetadataKeys: Set<EntityMetadataKey> {

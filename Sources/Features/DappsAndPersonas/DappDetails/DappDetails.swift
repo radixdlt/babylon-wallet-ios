@@ -51,7 +51,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 		public var resources: Resources? = nil
 
 		@Loadable
-		public var associatedDapps: [AssociatedDapp]? = nil
+		public var associatedDapps: [OnLedgerEntity.AssociatedDapp]? = nil
 
 		@PresentationState
 		public var destination: Destination.State? = nil
@@ -62,7 +62,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 			context: Context.SettingsContext,
 			metadata: GatewayAPI.EntityMetadataCollection? = nil,
 			resources: Resources? = nil,
-			associatedDapps: [AssociatedDapp]? = nil,
+			associatedDapps: [OnLedgerEntity.AssociatedDapp]? = nil,
 			destination: Destination.State? = nil
 		) {
 			self.context = .settings(context)
@@ -80,13 +80,13 @@ public struct DappDetails: Sendable, FeatureReducer {
 			dAppDefinitionAddress: DappDefinitionAddress,
 			metadata: GatewayAPI.EntityMetadataCollection? = nil,
 			resources: Resources? = nil,
-			associatedDapps: [AssociatedDapp]? = nil,
+			associatedDapps: [OnLedgerEntity.AssociatedDapp]? = nil,
 			destination: Destination.State? = nil
 		) {
 			self.context = .general
 			self.dAppDefinitionAddress = dAppDefinitionAddress
 			self.authorizedDapp = nil
-			self.personaList = .init() // TODO: Check reloading behaviour
+			self.personaList = .init()
 			self.metadata = metadata
 			self.resources = resources
 			self.associatedDapps = associatedDapps
@@ -96,15 +96,6 @@ public struct DappDetails: Sendable, FeatureReducer {
 		public struct Resources: Hashable, Sendable {
 			public var fungible: IdentifiedArrayOf<OnLedgerEntity.Resource>
 			public var nonFungible: IdentifiedArrayOf<OnLedgerEntity.Resource>
-		}
-
-		// TODO: This should be consolidated with other types that represent resources
-		public struct AssociatedDapp: Identifiable, Hashable, Sendable {
-			public var id: DappDefinitionAddress { address }
-
-			public let address: DappDefinitionAddress
-			public let name: String
-			public let iconURL: URL?
 		}
 	}
 
@@ -126,7 +117,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 	public enum InternalAction: Sendable, Equatable {
 		case metadataLoaded(Loadable<GatewayAPI.EntityMetadataCollection>)
 		case resourcesLoaded(Loadable<State.Resources>)
-		case associatedDappsLoaded(Loadable<[State.AssociatedDapp]>)
+		case associatedDappsLoaded(Loadable<[OnLedgerEntity.AssociatedDapp]>)
 		case dAppUpdated(Profile.Network.AuthorizedDappDetailed)
 	}
 
@@ -347,7 +338,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 	private func loadDapps(
 		metadata: GatewayAPI.EntityMetadataCollection,
 		validated dappDefinitionAddress: DappDefinitionAddress
-	) async -> Loadable<[State.AssociatedDapp]> {
+	) async -> Loadable<[OnLedgerEntity.AssociatedDapp]> {
 		let dAppDefinitions = try? metadata.dappDefinitions?.compactMap(DappDefinitionAddress.init)
 		guard let dAppDefinitions else { return .idle }
 
@@ -365,7 +356,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 	private func extractDappInfo(
 		for dApp: DappDefinitionAddress,
 		validating dAppDefinitionAddress: DappDefinitionAddress
-	) async throws -> State.AssociatedDapp {
+	) async throws -> OnLedgerEntity.AssociatedDapp {
 		let metadata = try await gatewayAPIClient.getDappMetadata(dApp, validatingDappDefinitionAddress: dAppDefinitionAddress)
 		guard let name = metadata.name else {
 			throw GatewayAPI.EntityMetadataCollection.MetadataError.missingName
@@ -397,22 +388,6 @@ public struct DappDetails: Sendable, FeatureReducer {
 		}
 	}
 }
-
-// extension GatewayAPI.StateEntityDetailsResponseItem {
-//	fileprivate var resourceDetails: DappDetails.State.Resources.ResourceDetails? {
-//		guard let fungibility else { return nil }
-//		guard let address = try? ResourceAddress(validatingAddress: address) else {
-//			loggerGlobal.warning("Failed to extract ResourceDetails for \(address)")
-//			return nil
-//		}
-//		return .init(address: address,
-//		             fungibility: fungibility,
-//		             name: metadata.name ?? L10n.AuthorizedDapps.DAppDetails.unknownTokenName,
-//		             symbol: metadata.symbol,
-//		             description: metadata.description,
-//		             iconURL: metadata.iconURL)
-//	}
-// }
 
 extension AlertState<DappDetails.Destination.Action.ConfirmDisconnectAlert> {
 	static var confirmDisconnect: AlertState {
