@@ -48,6 +48,8 @@ extension LSUDetails {
 				send: LSUDetails.Action.view
 			) { viewStore in
 				DetailsContainerWithHeaderView(viewState: viewStore.containerWithHeader) {
+					viewStore.send(.closeButtonTapped)
+				} thumbnailView: {
 					NFTThumbnail(viewStore.thumbnailURL, size: .veryLarge)
 				} detailsView: {
 					VStack(spacing: .medium1) {
@@ -66,8 +68,6 @@ extension LSUDetails {
 						AssetResourceDetailsSection(viewState: viewStore.resourceDetails)
 					}
 					.padding(.bottom, .medium1)
-				} closeButtonAction: {
-					viewStore.send(.closeButtonTapped)
 				}
 			}
 		}

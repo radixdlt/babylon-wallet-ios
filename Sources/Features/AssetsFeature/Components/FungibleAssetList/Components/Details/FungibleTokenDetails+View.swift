@@ -47,12 +47,12 @@ extension FungibleTokenDetails {
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				DetailsContainerWithHeaderView(viewState: viewStore.detailsHeader) {
+					viewStore.send(.closeButtonTapped)
+				} thumbnailView: {
 					TokenThumbnail(viewStore.thumbnail, size: .veryLarge)
 				} detailsView: {
 					AssetResourceDetailsSection(viewState: viewStore.details)
 						.padding(.bottom, .medium1)
-				} closeButtonAction: {
-					viewStore.send(.closeButtonTapped)
 				}
 			}
 		}

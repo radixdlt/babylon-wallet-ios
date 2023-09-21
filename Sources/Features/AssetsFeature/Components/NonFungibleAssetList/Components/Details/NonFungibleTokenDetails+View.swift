@@ -62,7 +62,9 @@ extension NonFungibleTokenDetails {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState) { viewStore in
-				ScrollView(showsIndicators: false) {
+				DetailsContainer(title: viewStore.resourceDetails.resourceName ?? "") {
+					store.send(.view(.closeButtonTapped))
+				} contents: {
 					VStack(spacing: .medium1) {
 						if let tokenDetails = viewStore.tokenDetails {
 							VStack(spacing: .medium3) {

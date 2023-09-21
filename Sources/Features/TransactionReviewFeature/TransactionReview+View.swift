@@ -324,13 +324,7 @@ extension View {
 			store: destinationStore,
 			state: /TransactionReview.Destinations.State.nonFungibleTokenDetails,
 			action: TransactionReview.Destinations.Action.nonFungibleTokenDetails,
-			content: { detailsStore in
-				WithNavigationBar {
-					destinationStore.send(.dismiss)
-				} content: {
-					NonFungibleTokenDetails.View(store: detailsStore)
-				}
-			}
+			content: { NonFungibleTokenDetails.View(store: $0) }
 		)
 	}
 

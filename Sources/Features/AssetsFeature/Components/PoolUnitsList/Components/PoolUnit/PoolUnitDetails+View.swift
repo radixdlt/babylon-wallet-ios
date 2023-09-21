@@ -46,6 +46,8 @@ extension PoolUnitDetails {
 				send: PoolUnitDetails.Action.view
 			) { viewStore in
 				DetailsContainerWithHeaderView(viewState: viewStore.containerWithHeader) {
+					viewStore.send(.closeButtonTapped)
+				} thumbnailView: {
 					NFTThumbnail(viewStore.thumbnailURL, size: .veryLarge)
 				} detailsView: {
 					VStack(spacing: .medium1) {
@@ -61,8 +63,6 @@ extension PoolUnitDetails {
 						AssetResourceDetailsSection(viewState: viewStore.resourceDetails)
 					}
 					.padding(.bottom, .medium1)
-				} closeButtonAction: {
-					viewStore.send(.closeButtonTapped)
 				}
 			}
 		}

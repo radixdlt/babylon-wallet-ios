@@ -67,17 +67,15 @@ extension DappDetails.View {
 				.sheet(
 					store: store.destination,
 					state: /DappDetails.Destination.State.fungibleDetails,
-					action: DappDetails.Destination.Action.fungibleDetails
-				) {
-					FungibleTokenDetails.View(store: $0)
-				}
+					action: DappDetails.Destination.Action.fungibleDetails,
+					content: { FungibleTokenDetails.View(store: $0) }
+				)
 				.sheet(
 					store: store.destination,
 					state: /DappDetails.Destination.State.nonFungibleDetails,
-					action: DappDetails.Destination.Action.nonFungibleDetails
-				) {
-					NonFungibleTokenDetails.View(store: $0)
-				}
+					action: DappDetails.Destination.Action.nonFungibleDetails,
+					content: { NonFungibleTokenDetails.View(store: $0) }
+				)
 				.alert(
 					store: store.destination,
 					state: /DappDetails.Destination.State.confirmDisconnectAlert,
