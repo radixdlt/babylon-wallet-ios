@@ -2,6 +2,16 @@ import BigDecimal
 import Foundation
 
 extension BigDecimal {
+	public mutating func truncateToDivisibility(_ divisibility: UInt) {
+//		print("Decimals: \()")
+
+		let digits = integerValue.magnitude.description
+	}
+
+	mutating func roundToDivisibility(_ divisibility: UInt) {}
+}
+
+extension BigDecimal {
 	// Used for development purposes
 	public static let temporaryStandardFee: BigDecimal = 25
 	public static let defaultMaxPlacesFormattted: UInt = 8

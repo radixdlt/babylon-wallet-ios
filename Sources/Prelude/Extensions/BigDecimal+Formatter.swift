@@ -34,32 +34,61 @@ extension BigDecimal {
 		locale: Locale = .autoupdatingCurrent
 	) -> String {
 		// If the number is too big to be formatted to maxPlaces, we use trillions and show all digits
-		Formatter(decimal: self, maxPlaces: Int(maxPlaces), fallback: .trillion)
+		Helper(decimal: self, maxPlaces: Int(maxPlaces), fallback: .trillion)
 			.formattedString(decimalSeparator: locale.decimalSeparator ?? ".")
 	}
 
 	// A helper type for formatting BigDecimal
-	private struct Formatter {
+	private struct Helper {
 		private var sign: BigInt.Sign
 		private var digits: String
 		private var integers: Int
 		private var multiplier: Multiplier = .one
 
+		static func format(decimal: BigDecimal, maxPlaces: Int, fallback: Multiplier) -> String {
+			var helper = Helper(decimal: decimal)
+			helper.normalizeInteger()
+			helper.round(byRemoving: helper.digits.count - maxPlaces)
+			helper.digits.trimTrailingZeros()
+
+			if let newMultiplier = helper.suitableMultiplier(maxPlaces: maxPlaces) {
+				helper.applyMultiplier(newMultiplier)
+			} else {
+				helper = Helper(decimal: decimal)
+				// We only get here if there are more integers than the biggest multiplier can handle
+				helper.round(byRemoving: helper.digits.count - helper.integers + fallback.rawValue)
+				helper.applyMultiplier(fallback)
+			}
+
+			return helper.formattedString(decimalSeparator: ".")
+		}
+
 		init(decimal: BigDecimal, maxPlaces: Int, fallback: Multiplier) {
 			self.init(decimal: decimal)
 			normalizeInteger()
-			round(toPlaces: maxPlaces)
+			round(byRemoving: digits.count - maxPlaces)
 			digits.trimTrailingZeros()
 
 			guard let newMultiplier = suitableMultiplier(maxPlaces: maxPlaces) else {
-				self = Formatter(decimal: decimal)
+				self = Helper(decimal: decimal)
 				// We only get here if there are more integers than the biggest multiplier can handle
-				round(toPlaces: integers - fallback.rawValue)
+				round(byRemoving: digits.count - integers + fallback.rawValue)
 				applyMultiplier(fallback)
 				return
 			}
 
 			applyMultiplier(newMultiplier)
+		}
+
+		static func round(decimal: BigDecimal, maxDecimals: Int) throws -> BigDecimal {
+			var helper = Helper(decimal: decimal)
+			helper.normalizeInteger()
+			let decimalCount = max(0, decimal.scale)
+			helper.round(byRemoving: decimalCount - maxDecimals)
+			helper.digits.trimTrailingZeros()
+			let string = helper.formattedString(decimalSeparator: BigDecimal.machineReadableDecimalPartsSeparator)
+
+			return try BigDecimal(fromString: string)
 		}
 
 		/// Returns a formatted string, with the given separator
@@ -90,10 +119,9 @@ extension BigDecimal {
 			}
 		}
 
-		/// Rounds the number douwn to the given number of places (meaning total digits)
-		private mutating func round(toPlaces maxPlaces: Int) {
+		private mutating func round(byRemoving placesToRemove: Int) {
 			// Check if we even need to do any rounding
-			let superfluousDigits = digits.count - maxPlaces
+			let superfluousDigits = placesToRemove
 			guard superfluousDigits > 0 else { return }
 
 			// We remove the superfluous digits, except one - it helps us decide to round or not
