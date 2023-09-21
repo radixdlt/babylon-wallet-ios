@@ -53,9 +53,9 @@ platform :ios do
         # )
 
         flavour = ENV['FLAVOUR']
-        tag = "%s#%s-%s" % [app_version, build_number, flavour]
-        add_git_tag(tag: tag)
-        push_to_git_remote
+        # tag = "%s#%s-%s" % [app_version, build_number, flavour]
+        # add_git_tag(tag: tag)
+        # push_to_git_remote
 
         create_gh_release(flavour: flavour)
     end
@@ -121,7 +121,6 @@ end
 
 
 def rev_changelog(flavour)
-    sh('git fetch --tags')
     most_recent_tags = sh("git tag | grep #{flavour} | sort -r | head -2").split("\n")
     git_commits_range_for_changelog = most_recent_tags.map { |tag| sh("git rev-list --abbrev-commit -n 1 #{tag}").strip }
     rev_changelog = changelog_from_git_commits(
@@ -137,6 +136,7 @@ def size_of_file_at(filePath)
 end
 
 private_lane :create_gh_release do |options|
+    sh('git fetch --tags')
 
     ipaPath = lane_context[SharedValues::IPA_OUTPUT_PATH]
     dsymPath = lane_context[SharedValues::DSYM_OUTPUT_PATH]
@@ -150,10 +150,14 @@ private_lane :create_gh_release do |options|
 
     release_description = "**Dependencies**: \n#{versions_string}\n\n**Changelog**: \n#{changelog}"
     last_tag = most_recent_tags[0]
+
+    timenow = Time.now.utc
+    timestring = timenow.strftime("%k:%M")
+
     set_github_release(
         repository_name: ENV['REPO_NAME'],
         api_token: ENV['GIT_TOKEN'] ,
-        name: last_tag,
+        name: "CYON-#{timestring}",
         tag_name: last_tag,
         description: release_description,
         is_draft: true, # We mark all flavours as DRAFT and then promote them once approved by Apple.
