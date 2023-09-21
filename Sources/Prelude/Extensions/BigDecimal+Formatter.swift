@@ -4,17 +4,25 @@ import Foundation
 // MARK: Formatting and parsing of human readable strings
 
 extension BigDecimal {
-//	public init?(
-//		formattedString: String,
-//		locale: Locale = .autoupdatingCurrent
-//	) {
-//
-//
-//		self.init(fromString: formattedString)
-//	}
+	public init(
+		formattedString: String,
+		locale: Locale = .autoupdatingCurrent
+	) throws {
+		var string = formattedString
+		// If the locale recognizes a grouping separator, we strip that from the string
+		if let groupingSeparator = locale.groupingSeparator {
+			string.replace(groupingSeparator, with: "")
+		}
+		// If the locale recognizes a decimal separator that is different from the machine readable one, we replace it with that
+		if let decimalSeparator = locale.decimalSeparator, decimalSeparator != Self.machineReadableDecimalPartsSeparator {
+			string.replace(decimalSeparator, with: Self.machineReadableDecimalPartsSeparator)
+		}
+
+		try self.init(fromString: string)
+	}
 
 	/// A human readable, locale respecting but unrounded string
-	public func formattedUnrounded(
+	public func formattedWithoutRounding(
 		locale: Locale = .autoupdatingCurrent
 	) -> String {
 		formatted(roundedTo: UInt(Int.max), locale: locale)

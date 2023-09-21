@@ -173,18 +173,33 @@ final class BigDecimalTests: TestCase {
 		}
 	}
 
+	func test_parse_formatted_bigdecimal() throws {
+		func doTest(_ formattedString: String, locale: Locale, expected: BigDecimal, line: UInt = #line) throws {
+			let result = try BigDecimal(formattedString: formattedString, locale: locale)
+			XCTAssertEqual(result, expected, line: line)
+		}
+		let spanish = Locale(identifier: "es")
+		let us = Locale(identifier: "en_US_POSIX")
+		try doTest("1,001", locale: spanish, expected: BigDecimal(fromString: "1.001"))
+		try doTest("1,001", locale: us, expected: BigDecimal(fromString: "1001"))
+		try doTest("1.001,45", locale: spanish, expected: BigDecimal(fromString: "1001.45"))
+		try doTest("1.001,45", locale: us, expected: BigDecimal(fromString: "1.00145"))
+	}
+
 	func test_format_bigdecimal() throws {
 		func doTest(_ bigDecimalString: String, expected: String, line: UInt = #line) throws {
 			let locale = Locale(identifier: "en_US_POSIX")
 			let bigDecimal = try BigDecimal(fromString: bigDecimalString)
-//			let result = bigDecimal.formatted(locale: locale)
+			let result = bigDecimal.formatted(locale: locale)
 
-			print("-----")
-			print("In: \(bigDecimalString)")
-			print("BD: \(bigDecimal.description)")
-			print("FM: \(bigDecimal.formattedUnrounded(locale: locale))")
+//			print("-----")
+//			print("In: \(bigDecimalString)")
+//			print("BD: \(bigDecimal.description)")
+//			let formatted = bigDecimal.formattedWithoutRounding(locale: Locale(identifier: "se"))
+//			print("FM: \(formatted)")
+//			let roundtripped = try BigDecimal(formattedString: formatted)
 
-//			XCTAssertEqual(result, expected, line: line)
+			XCTAssertEqual(result, expected, line: line)
 		}
 
 		try doTest("0.123456789", expected: "0.1234568")

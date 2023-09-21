@@ -10,7 +10,7 @@ extension BigDecimal {
 	// `github.com/Zollerbo1/BigDecimal` package **hardcodes** usage of
 	// the decimal separator ".", see this line here:
 	// https://github.com/Zollerboy1/BigDecimal/blob/main/Sources/BigDecimal/BigDecimal.swift#L469
-	public static let integerAndDecimalPartsSeparator = "."
+	public static let machineReadableDecimalPartsSeparator = "."
 }
 
 extension BigDecimal {
@@ -26,7 +26,7 @@ extension BigDecimal {
 
 		guard
 			case let components = stringRepresentation.split(
-				separator: Self.integerAndDecimalPartsSeparator
+				separator: Self.machineReadableDecimalPartsSeparator
 			),
 			components.count == 2
 		else {
