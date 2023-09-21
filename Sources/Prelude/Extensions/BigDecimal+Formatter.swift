@@ -1,14 +1,33 @@
 import BigDecimal
 import Foundation
 
+// MARK: Formatting and parsing of human readable strings
+
 extension BigDecimal {
+//	public init?(
+//		formattedString: String,
+//		locale: Locale = .autoupdatingCurrent
+//	) {
+//
+//
+//		self.init(fromString: formattedString)
+//	}
+
+	/// A human readable, locale respecting but unrounded string
+	public func formattedUnrounded(
+		locale: Locale = .autoupdatingCurrent
+	) -> String {
+		formatted(roundedTo: UInt(Int.max), locale: locale)
+	}
+
+	/// A human readable, locale respecting string, rounded to the provided number of digits (including both the integral and decimal parts)
 	public func formatted(
-		maxPlaces: UInt = BigDecimal.defaultMaxPlacesFormattted,
+		roundedTo maxPlaces: UInt = BigDecimal.defaultMaxPlacesFormattted,
 		locale: Locale = .autoupdatingCurrent
 	) -> String {
 		// If the number is too big to be formatted to maxPlaces, we use trillions and show all digits
-		Formatter(decimal: self, maxPlaces: maxPlaces, fallback: .trillion)
-			.formattedString(separator: locale.decimalSeparator ?? ".")
+		Formatter(decimal: self, maxPlaces: Int(maxPlaces), fallback: .trillion)
+			.formattedString(decimalSeparator: locale.decimalSeparator ?? ".")
 	}
 
 	// A helper type for formatting BigDecimal
@@ -18,7 +37,7 @@ extension BigDecimal {
 		private var integers: Int
 		private var multiplier: Multiplier = .one
 
-		public init(decimal: BigDecimal, maxPlaces: UInt, fallback: Multiplier) {
+		init(decimal: BigDecimal, maxPlaces: Int, fallback: Multiplier) {
 			self.init(decimal: decimal)
 			normalizeInteger()
 			round(toPlaces: maxPlaces)
@@ -27,7 +46,7 @@ extension BigDecimal {
 			guard let newMultiplier = suitableMultiplier(maxPlaces: maxPlaces) else {
 				self = Formatter(decimal: decimal)
 				// We only get here if there are more integers than the biggest multiplier can handle
-				round(toPlaces: UInt(integers - fallback.rawValue))
+				round(toPlaces: integers - fallback.rawValue)
 				applyMultiplier(fallback)
 				return
 			}
@@ -36,7 +55,7 @@ extension BigDecimal {
 		}
 
 		/// Returns a formatted string, with the given separator
-		public func formattedString(separator: String) -> String {
+		func formattedString(decimalSeparator: String) -> String {
 			guard digits.count > 0 else { return "0" }
 
 			let signPart = sign == .minus ? "-" : ""
@@ -46,7 +65,7 @@ extension BigDecimal {
 			}
 
 			let (integerPart, decimalPart) = digits.split(after: integers)
-			return signPart + integerPart + separator + decimalPart + multiplierSuffix
+			return signPart + integerPart + decimalSeparator + decimalPart + multiplierSuffix
 		}
 
 		private init(decimal: BigDecimal) {
@@ -55,7 +74,7 @@ extension BigDecimal {
 			self.integers = digits.count - decimal.scale
 		}
 
-		/// Normalise digits so that they start with at least one zero before the separator, for numbers < 1
+		/// Normalise digits so that they start with at least one zero before the decimal separator, for numbers < 1
 		private mutating func normalizeInteger() {
 			if integers < 1 {
 				digits.padWithLeadingZeros(count: 1 - integers)
@@ -64,9 +83,9 @@ extension BigDecimal {
 		}
 
 		/// Rounds the number douwn to the given number of places (meaning total digits)
-		private mutating func round(toPlaces maxPlaces: UInt) {
+		private mutating func round(toPlaces maxPlaces: Int) {
 			// Check if we even need to do any rounding
-			let superfluousDigits = digits.count - Int(maxPlaces)
+			let superfluousDigits = digits.count - maxPlaces
 			guard superfluousDigits > 0 else { return }
 
 			// We remove the superfluous digits, except one - it helps us decide to round or not
@@ -102,9 +121,9 @@ extension BigDecimal {
 			roundUp()
 		}
 
-		private func suitableMultiplier(maxPlaces: UInt) -> Multiplier? {
+		private func suitableMultiplier(maxPlaces: Int) -> Multiplier? {
 			/// The first multiplier that makes all the integers fit
-			Multiplier.allCases.first { integers - $0.rawValue <= Int(maxPlaces) }
+			Multiplier.allCases.first { integers - $0.rawValue <= maxPlaces }
 		}
 
 		private mutating func applyMultiplier(_ newMultiplier: Multiplier) {
