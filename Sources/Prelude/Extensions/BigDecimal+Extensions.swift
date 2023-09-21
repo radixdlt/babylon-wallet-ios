@@ -2,10 +2,57 @@ import BigDecimal
 import Foundation
 
 extension BigDecimal {
-	public mutating func truncateToDivisibility(_ divisibility: UInt) {}
+	// MARK: Truncation and rounding
+
+	public mutating func truncateToDivisibility(_ divisibility: UInt) {
+		do {
+			try Helper.reduceDecimals(&self, maxDecimals: Int(divisibility), byRounding: false)
+		} catch {
+			loggerGlobal.warning("BigDecimal: Rounding \(self) to \(divisibility) decimals failed: \(error)")
+		}
+	}
 
 	public mutating func roundToDivisibility(_ divisibility: UInt) {
-		self = Helper.round(decimal: self, maxDecimals: Int(divisibility))
+		do {
+			try Helper.reduceDecimals(&self, maxDecimals: Int(divisibility), byRounding: true)
+		} catch {
+			loggerGlobal.warning("BigDecimal: Truncating \(self) to \(divisibility) decimals failed: \(error)")
+		}
+	}
+
+	// MARK: Parsing and formatting for human readable strings
+
+	public init(
+		formattedString: String,
+		locale: Locale = .autoupdatingCurrent
+	) throws {
+		var string = formattedString
+		// If the locale recognizes a grouping separator, we strip that from the string
+		if let groupingSeparator = locale.groupingSeparator {
+			string.replace(groupingSeparator, with: "")
+		}
+		// If the locale recognizes a decimal separator that is different from the machine readable one, we replace it with that
+		if let decimalSeparator = locale.decimalSeparator, decimalSeparator != Self.machineReadableDecimalPartsSeparator {
+			string.replace(decimalSeparator, with: Self.machineReadableDecimalPartsSeparator)
+		}
+
+		try self.init(fromString: string)
+	}
+
+	/// A human readable, locale respecting but unrounded string
+	public func formattedWithoutRounding(
+		locale: Locale = .autoupdatingCurrent
+	) -> String {
+		formatted(roundedTo: UInt(Int.max), locale: locale)
+	}
+
+	/// A human readable, locale respecting string, rounded to the provided number of digits (including both the integral and decimal parts)
+	public func formatted(
+		roundedTo maxPlaces: UInt = BigDecimal.defaultMaxPlacesFormattted,
+		locale: Locale = .autoupdatingCurrent
+	) -> String {
+		// If the number is too big to be formatted to maxPlaces, we use trillions and show all digits
+		Helper.format(decimal: self, maxPlaces: Int(maxPlaces), fallback: .trillion, decimalSeparator: locale.decimalSeparator ?? ".")
 	}
 }
 

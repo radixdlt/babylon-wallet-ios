@@ -1,42 +1,8 @@
 import BigDecimal
 import Foundation
 
-// MARK: Formatting and parsing of human readable strings
-
+// MARK: - BigDecimal.Helper
 extension BigDecimal {
-	public init(
-		formattedString: String,
-		locale: Locale = .autoupdatingCurrent
-	) throws {
-		var string = formattedString
-		// If the locale recognizes a grouping separator, we strip that from the string
-		if let groupingSeparator = locale.groupingSeparator {
-			string.replace(groupingSeparator, with: "")
-		}
-		// If the locale recognizes a decimal separator that is different from the machine readable one, we replace it with that
-		if let decimalSeparator = locale.decimalSeparator, decimalSeparator != Self.machineReadableDecimalPartsSeparator {
-			string.replace(decimalSeparator, with: Self.machineReadableDecimalPartsSeparator)
-		}
-
-		try self.init(fromString: string)
-	}
-
-	/// A human readable, locale respecting but unrounded string
-	public func formattedWithoutRounding(
-		locale: Locale = .autoupdatingCurrent
-	) -> String {
-		formatted(roundedTo: UInt(Int.max), locale: locale)
-	}
-
-	/// A human readable, locale respecting string, rounded to the provided number of digits (including both the integral and decimal parts)
-	public func formatted(
-		roundedTo maxPlaces: UInt = BigDecimal.defaultMaxPlacesFormattted,
-		locale: Locale = .autoupdatingCurrent
-	) -> String {
-		// If the number is too big to be formatted to maxPlaces, we use trillions and show all digits
-		Helper.format(decimal: self, maxPlaces: Int(maxPlaces), fallback: .trillion, decimalSeparator: locale.decimalSeparator ?? ".")
-	}
-
 	// A helper type for formatting BigDecimal
 	struct Helper {
 		private var sign: BigInt.Sign
@@ -46,9 +12,14 @@ extension BigDecimal {
 
 		static func format(decimal: BigDecimal, maxPlaces: Int, fallback: Multiplier, decimalSeparator: String) -> String {
 			var helper = Helper(decimal: decimal)
-			do {
-				try helper.normalise(maxPlaces: maxPlaces)
-			} catch {
+			helper.normalizeInteger()
+			let digitsToRemove = helper.digits.count - maxPlaces
+			helper.round(byRemoving: digitsToRemove)
+			helper.digits.trimTrailingZeros()
+
+			if let newMultiplier = helper.suitableMultiplier(maxPlaces: maxPlaces) {
+				helper.applyMultiplier(newMultiplier)
+			} else {
 				helper = Helper(decimal: decimal)
 				// We only get here if there are more integers than the biggest multiplier can handle
 				helper.round(byRemoving: helper.digits.count - helper.integers + fallback.rawValue)
@@ -58,16 +29,21 @@ extension BigDecimal {
 			return helper.formattedString(decimalSeparator: decimalSeparator)
 		}
 
-		static func round(decimal: BigDecimal, maxDecimals: Int) -> BigDecimal {
+		static func reduceDecimals(_ decimal: inout BigDecimal, maxDecimals: Int, byRounding: Bool) throws {
 			var helper = Helper(decimal: decimal)
 			let decimalCount = max(0, decimal.scale)
-			helper.normalise(byRemoving: decimalCount - maxDecimals)
-			let string = helper.formattedString(decimalSeparator: BigDecimal.machineReadableDecimalPartsSeparator)
-			guard let result = try? BigDecimal(fromString: string) else {
-				return decimal
+			let decimalsToRemove = max(0, decimalCount - maxDecimals)
+			guard decimalsToRemove > 0 else { return }
+			if byRounding {
+				helper.round(byRemoving: decimalsToRemove)
+				helper.digits.trimTrailingZeros()
+			} else {
+				helper.digits.removeLast(decimalsToRemove)
+				helper.digits.trimTrailingZeros()
 			}
 
-			return result
+			let string = helper.formattedString(decimalSeparator: BigDecimal.machineReadableDecimalPartsSeparator)
+			decimal = try BigDecimal(fromString: string)
 		}
 
 		private init(decimal: BigDecimal) {
@@ -77,20 +53,6 @@ extension BigDecimal {
 		}
 
 		// Helper instance methods
-
-		private mutating func normalise(maxPlaces: Int) throws {
-			normalizeInteger()
-			round(byRemoving: digits.count - maxPlaces)
-			digits.trimTrailingZeros()
-			guard let newMultiplier = suitableMultiplier(maxPlaces: maxPlaces) else { throw NumberTooLong() }
-			applyMultiplier(newMultiplier)
-		}
-
-		private mutating func normalise(byRemoving decimalsToRemove: Int) {
-			normalizeInteger()
-			round(byRemoving: decimalsToRemove)
-			digits.trimTrailingZeros()
-		}
 
 		/// Returns a formatted string, with the given separator
 		private func formattedString(decimalSeparator: String) -> String {
