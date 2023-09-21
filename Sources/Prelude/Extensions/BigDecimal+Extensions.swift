@@ -41,9 +41,10 @@ extension BigDecimal {
 
 	/// A human readable, locale respecting but unrounded string
 	public func formattedWithoutRounding(
-		locale: Locale = .autoupdatingCurrent
+		locale: Locale = .autoupdatingCurrent,
+		usingGroupingSeparator: Bool = false
 	) -> String {
-		formatted(roundedTo: UInt(Int.max), locale: locale)
+		formatted(roundedTo: UInt(Int.max), locale: locale, usingGroupingSeparator: usingGroupingSeparator)
 	}
 
 	/// A human readable, locale respecting string, rounded to the provided number of digits (including both the integral and decimal parts)

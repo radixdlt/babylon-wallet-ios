@@ -76,16 +76,12 @@ extension BigDecimal {
 			guard integers < digits.count else {
 				// No decimals, the digits all represent the integer part
 				var integerPart = digits
-				if let groupingSeparator {
-					integerPart.insertGroupingSeparatorInInteger(groupingSeparator)
-				}
+				integerPart.insertGroupingSeparatorInInteger(groupingSeparator)
 				return signPart + integerPart + .zeros(length: integers - digits.count) + multiplierSuffix
 			}
 
 			var (integerPart, decimalPart) = digits.split(after: integers)
-			if let groupingSeparator {
-				integerPart.insertGroupingSeparatorInInteger(groupingSeparator)
-			}
+			integerPart.insertGroupingSeparatorInInteger(groupingSeparator)
 			return signPart + integerPart + decimalSeparator + decimalPart + multiplierSuffix
 		}
 
@@ -185,10 +181,10 @@ private extension String {
 		}
 	}
 
-	mutating func insertGroupingSeparatorInInteger(_ separator: String) {
+	mutating func insertGroupingSeparatorInInteger(_ separator: String?) {
 		let digits = count
 		let separatorCount = (digits - 1) / 3
-		guard separatorCount > 0 else { return }
+		guard let separator, separatorCount > 0 else { return }
 		for i in 1 ... separatorCount {
 			let location = index(startIndex, offsetBy: digits - 3 * i)
 			insert(contentsOf: separator, at: location)
