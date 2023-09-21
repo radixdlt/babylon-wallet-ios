@@ -2,13 +2,11 @@ import BigDecimal
 import Foundation
 
 extension BigDecimal {
-	public mutating func truncateToDivisibility(_ divisibility: UInt) {
-//		print("Decimals: \()")
+	public mutating func truncateToDivisibility(_ divisibility: UInt) {}
 
-		let digits = integerValue.magnitude.description
+	public mutating func roundToDivisibility(_ divisibility: UInt) {
+		self = Helper.round(decimal: self, maxDecimals: Int(divisibility))
 	}
-
-	mutating func roundToDivisibility(_ divisibility: UInt) {}
 }
 
 extension BigDecimal {

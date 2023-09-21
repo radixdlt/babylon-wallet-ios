@@ -34,65 +34,66 @@ extension BigDecimal {
 		locale: Locale = .autoupdatingCurrent
 	) -> String {
 		// If the number is too big to be formatted to maxPlaces, we use trillions and show all digits
-		Helper(decimal: self, maxPlaces: Int(maxPlaces), fallback: .trillion)
-			.formattedString(decimalSeparator: locale.decimalSeparator ?? ".")
+		Helper.format(decimal: self, maxPlaces: Int(maxPlaces), fallback: .trillion, decimalSeparator: locale.decimalSeparator ?? ".")
 	}
 
 	// A helper type for formatting BigDecimal
-	private struct Helper {
+	struct Helper {
 		private var sign: BigInt.Sign
 		private var digits: String
 		private var integers: Int
 		private var multiplier: Multiplier = .one
 
-		static func format(decimal: BigDecimal, maxPlaces: Int, fallback: Multiplier) -> String {
+		static func format(decimal: BigDecimal, maxPlaces: Int, fallback: Multiplier, decimalSeparator: String) -> String {
 			var helper = Helper(decimal: decimal)
-			helper.normalizeInteger()
-			helper.round(byRemoving: helper.digits.count - maxPlaces)
-			helper.digits.trimTrailingZeros()
-
-			if let newMultiplier = helper.suitableMultiplier(maxPlaces: maxPlaces) {
-				helper.applyMultiplier(newMultiplier)
-			} else {
+			do {
+				try helper.normalise(maxPlaces: maxPlaces)
+			} catch {
 				helper = Helper(decimal: decimal)
 				// We only get here if there are more integers than the biggest multiplier can handle
 				helper.round(byRemoving: helper.digits.count - helper.integers + fallback.rawValue)
 				helper.applyMultiplier(fallback)
 			}
 
-			return helper.formattedString(decimalSeparator: ".")
+			return helper.formattedString(decimalSeparator: decimalSeparator)
 		}
 
-		init(decimal: BigDecimal, maxPlaces: Int, fallback: Multiplier) {
-			self.init(decimal: decimal)
+		static func round(decimal: BigDecimal, maxDecimals: Int) -> BigDecimal {
+			var helper = Helper(decimal: decimal)
+			let decimalCount = max(0, decimal.scale)
+			helper.normalise(byRemoving: decimalCount - maxDecimals)
+			let string = helper.formattedString(decimalSeparator: BigDecimal.machineReadableDecimalPartsSeparator)
+			guard let result = try? BigDecimal(fromString: string) else {
+				return decimal
+			}
+
+			return result
+		}
+
+		private init(decimal: BigDecimal) {
+			self.sign = decimal.sign
+			self.digits = decimal.integerValue.magnitude.description
+			self.integers = digits.count - decimal.scale
+		}
+
+		// Helper instance methods
+
+		private mutating func normalise(maxPlaces: Int) throws {
 			normalizeInteger()
 			round(byRemoving: digits.count - maxPlaces)
 			digits.trimTrailingZeros()
-
-			guard let newMultiplier = suitableMultiplier(maxPlaces: maxPlaces) else {
-				self = Helper(decimal: decimal)
-				// We only get here if there are more integers than the biggest multiplier can handle
-				round(byRemoving: digits.count - integers + fallback.rawValue)
-				applyMultiplier(fallback)
-				return
-			}
-
+			guard let newMultiplier = suitableMultiplier(maxPlaces: maxPlaces) else { throw NumberTooLong() }
 			applyMultiplier(newMultiplier)
 		}
 
-		static func round(decimal: BigDecimal, maxDecimals: Int) throws -> BigDecimal {
-			var helper = Helper(decimal: decimal)
-			helper.normalizeInteger()
-			let decimalCount = max(0, decimal.scale)
-			helper.round(byRemoving: decimalCount - maxDecimals)
-			helper.digits.trimTrailingZeros()
-			let string = helper.formattedString(decimalSeparator: BigDecimal.machineReadableDecimalPartsSeparator)
-
-			return try BigDecimal(fromString: string)
+		private mutating func normalise(byRemoving decimalsToRemove: Int) {
+			normalizeInteger()
+			round(byRemoving: decimalsToRemove)
+			digits.trimTrailingZeros()
 		}
 
 		/// Returns a formatted string, with the given separator
-		func formattedString(decimalSeparator: String) -> String {
+		private func formattedString(decimalSeparator: String) -> String {
 			guard digits.count > 0 else { return "0" }
 
 			let signPart = sign == .minus ? "-" : ""
@@ -103,12 +104,6 @@ extension BigDecimal {
 
 			let (integerPart, decimalPart) = digits.split(after: integers)
 			return signPart + integerPart + decimalSeparator + decimalPart + multiplierSuffix
-		}
-
-		private init(decimal: BigDecimal) {
-			self.sign = decimal.sign
-			self.digits = decimal.integerValue.magnitude.description
-			self.integers = digits.count - decimal.scale
 		}
 
 		/// Normalise digits so that they start with at least one zero before the decimal separator, for numbers < 1

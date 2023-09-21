@@ -173,6 +173,66 @@ final class BigDecimalTests: TestCase {
 		}
 	}
 
+	func test_round_bigdecimal() throws {
+		func doTest(_ bigDecimalString: String, divisibility: UInt, expected expectedString: String, line: UInt = #line) throws {
+			let locale = Locale(identifier: "en_US_POSIX")
+			let bigDecimal = try BigDecimal(fromString: bigDecimalString)
+			let expected = try BigDecimal(fromString: expectedString)
+
+			var result = bigDecimal
+			result.roundToDivisibility(divisibility)
+			XCTAssertEqual(result, expected, line: line)
+		}
+
+		try doTest("1000.123456789", divisibility: 0, expected: "1000")
+		try doTest("1000.123456789", divisibility: 1, expected: "1000.1")
+		try doTest("1000.123456789", divisibility: 2, expected: "1000.12")
+		try doTest("1000.123456789", divisibility: 3, expected: "1000.123")
+		try doTest("1000.123456789", divisibility: 4, expected: "1000.1235")
+		try doTest("1000.123456789", divisibility: 5, expected: "1000.12346")
+		try doTest("1000.123456789", divisibility: 20, expected: "1000.123456789")
+
+		try doTest("1234568.123456789", divisibility: 0, expected: "1234568")
+		try doTest("1234568.123456789", divisibility: 1, expected: "1234568.1")
+		try doTest("1234568.123456789", divisibility: 2, expected: "1234568.12")
+		try doTest("1234568.123456789", divisibility: 3, expected: "1234568.123")
+		try doTest("1234568.123456789", divisibility: 4, expected: "1234568.1235")
+		try doTest("1234568.123456789", divisibility: 5, expected: "1234568.12346")
+		try doTest("1234568.123456789", divisibility: 20, expected: "1234568.123456789")
+
+		try doTest("1234568456.123456789", divisibility: 0, expected: "1234568456")
+		try doTest("1234568456.123456789", divisibility: 1, expected: "1234568456.1")
+		try doTest("1234568456.123456789", divisibility: 2, expected: "1234568456.12")
+		try doTest("1234568456.123456789", divisibility: 3, expected: "1234568456.123")
+		try doTest("1234568456.123456789", divisibility: 4, expected: "1234568456.1235")
+		try doTest("1234568456.123456789", divisibility: 5, expected: "1234568456.12346")
+		try doTest("1234568456.123456789", divisibility: 20, expected: "1234568456.123456789")
+
+		try doTest("9999999.9999999", divisibility: 0, expected: "10000000")
+		try doTest("9999999.9999999", divisibility: 1, expected: "10000000")
+		try doTest("9999999.9999999", divisibility: 2, expected: "10000000")
+		try doTest("9999999.9999999", divisibility: 3, expected: "10000000")
+		try doTest("9999999.9999999", divisibility: 4, expected: "10000000")
+		try doTest("9999999.9999999", divisibility: 5, expected: "10000000")
+		try doTest("9999999.9999999", divisibility: 20, expected: "9999999.9999999")
+
+		try doTest("999999.9999999", divisibility: 0, expected: "1000000")
+		try doTest("999999.9999999", divisibility: 1, expected: "1000000")
+		try doTest("999999.9999999", divisibility: 2, expected: "1000000")
+		try doTest("999999.9999999", divisibility: 3, expected: "1000000")
+		try doTest("999999.9999999", divisibility: 4, expected: "1000000")
+		try doTest("999999.9999999", divisibility: 5, expected: "1000000")
+		try doTest("999999.9999999", divisibility: 20, expected: "999999.9999999")
+
+		try doTest("1000.12000", divisibility: 0, expected: "1000")
+		try doTest("1000.12000", divisibility: 1, expected: "1000.1")
+		try doTest("1000.12000", divisibility: 2, expected: "1000.12")
+		try doTest("1000.12000", divisibility: 3, expected: "1000.12")
+		try doTest("1000.12000", divisibility: 4, expected: "1000.12")
+		try doTest("1000.12000", divisibility: 5, expected: "1000.12")
+		try doTest("1000.12000", divisibility: 20, expected: "1000.12")
+	}
+
 	func test_parse_formatted_bigdecimal() throws {
 		func doTest(_ formattedString: String, locale: Locale, expected: BigDecimal, line: UInt = #line) throws {
 			let result = try BigDecimal(formattedString: formattedString, locale: locale)
