@@ -120,7 +120,7 @@ end
 
 def rev_changelog(flavour, most_recent_tags)
     git_commits_range_for_changelog = most_recent_tags.map { |tag| sh("git rev-list --abbrev-commit -n 1 #{tag}").strip }
-    rev_changelog = changelog_from_git_commits(
+    changelog_from_git_commits(
       between: git_commits_range_for_changelog,
       pretty: "- %s"
     )
@@ -202,7 +202,7 @@ private_lane :create_gh_release do |options|
     changelog = rev_changelog(flavour, most_recent_tags)
     versions_string = dependencies_with_hyperlinks()
 
-    release_description = "**Dependencies**: \n" + versions_string + "\n\n**Changelog**: \n" + rev_changelog
+    release_description = "**Dependencies**: \n" + versions_string + "\n\n**Changelog**: \n" + changelog
     last_tag = most_recent_tags[0]
 
     timenow = Time.now.utc
