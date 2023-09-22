@@ -916,7 +916,7 @@ extension TransactionReview {
 						amount: guaranteedAmount,
 						instructionIndex: instructionIndex,
 						resourceAddress: resourceAddress,
-						resourceDivisibility: onLedgerEntity.divisibility
+						resourceDivisibility: resource.divisibility
 					)
 				}
 
@@ -1090,20 +1090,6 @@ extension TransactionReview {
 				return approved
 			}
 		}
-	}
-
-	public struct FungibleTransfer_: Sendable, Hashable {
-		public let id = Transfer.ID()
-		public let fungibleResource: OnLedgerEntity.Resource
-		public let isXRD: Bool
-		public let amount: BigDecimal
-		public var guarantee: TransactionClient.Guarantee?
-	}
-
-	public struct NonFungibleTransfer_: Sendable, Hashable {
-		public let id = Transfer.ID()
-		public let nonFungibleResource: OnLedgerEntity.Resource
-		public let token: AccountPortfolio.NonFungibleResource.NonFungibleToken
 	}
 
 	public struct Transfer: Sendable, Identifiable, Hashable {
