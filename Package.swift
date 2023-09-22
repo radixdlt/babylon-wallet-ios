@@ -44,13 +44,13 @@ package.addModules([
 		dependencies: [
 			"FaucetClient",
 			"AccountPortfoliosClient",
-			"CreateAuthKeyFeature",
 			"ShowQRFeature",
 			"GatewaysClient",
 			"OverlayWindowClient",
 			"OnLedgerEntitiesClient",
 			"DappInteractionClient",
 			"SubmitTransactionClient",
+			"TransactionReviewFeature",
 		],
 		tests: .yes()
 	),
@@ -122,16 +122,6 @@ package.addModules([
 		dependencies: [
 			"AccountsClient",
 			"CreateAccountFeature",
-		],
-		tests: .no
-	),
-	.feature(
-		name: "CreateAuthKeyFeature",
-		featureSuffixDroppedFromFolderName: true,
-		dependencies: [
-			"TransactionReviewFeature",
-			"DerivePublicKeysFeature",
-			"ROLAClient",
 		],
 		tests: .no
 	),
