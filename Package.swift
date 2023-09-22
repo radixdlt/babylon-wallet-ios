@@ -412,6 +412,7 @@ package.addModules([
 			"ProfileBackupsFeature",
 			"ScanQRFeature",
 			"SecurityStructureConfigurationListFeature",
+			"TransactionReviewFeature",
 		],
 		tests: .yes()
 	),
