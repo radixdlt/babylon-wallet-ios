@@ -131,7 +131,14 @@ private_lane :create_gh_release do |options|
     flavour = options.fetch(:flavour).delete_prefix('"').delete_suffix('"') # if accidentally included
     
     ipaPath = lane_context[SharedValues::IPA_OUTPUT_PATH]
-    dsymPath = lane_context[SharedValues::DSYM_OUTPUT_PATH]
+    dsymPath = lane_context[SharedValues::DSYM_OUTPUT_PATH] 
+    if dsymPath.nil?
+        puts "\n⚠️ Radix: Warning dsymPath is nil ⚠️ Will be unable to upload dsym\n"
+    end
+    if dsymPath.blank?
+        puts "\n⚠️ Radix: Warning dsymPath is blank ⚠️ Will be unable to upload dsym\n"
+        dsymPath = nil # nil is filtered away below
+    end
 
     sh('git fetch --tags')
     most_recent_tags = sh("git tag | grep #{flavour} | sort -r | head -2").split("\n")
