@@ -85,6 +85,7 @@ extension NonFungibleAssetList.Row.View {
 	}
 
 	private func assetsToDisplay(_ viewStore: ViewStoreOf<NonFungibleAssetList.Row>) -> IdentifiedArrayOf<OnLedgerEntity.NonFungibleToken> {
+		// Put in placeholder items?
 //		if !viewStore.isExpanded {
 //			return IdentifiedArrayOf(uniqueElements: viewStore.loadedTokens.prefix(Constants.collapsedCardsCount))
 //		}

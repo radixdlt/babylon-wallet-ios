@@ -6,7 +6,6 @@ extension NonFungibleAssetList {
 	public struct Row: Sendable, FeatureReducer {
 		public struct State: Sendable, Hashable, Identifiable {
 			public var id: ResourceAddress { resource.resourceAddress }
-
 			public typealias AssetID = AccountPortfolio.NonFungibleResource.NonFungibleToken.ID
 
 			public let resource: AccountPortfolio.NonFungibleResource
