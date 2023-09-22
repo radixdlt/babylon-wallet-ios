@@ -8,7 +8,9 @@ extension BigDecimal {
 		static let maxPlacesForEngineeringNotation = 4
 
 		private var sign: BigInt.Sign
+		/// All the digits in the number, without separators
 		private var digits: String
+		/// How many of the digits represent the integer part
 		private var integers: Int
 		private var multiplier: Multiplier = .one
 
@@ -21,34 +23,30 @@ extension BigDecimal {
 
 			if let newMultiplier = helper.suitableMultiplier(maxPlaces: maxPlaces) {
 				helper.applyMultiplier(newMultiplier)
+				return helper.formattedString(decimalSeparator: decimalSeparator, groupingSeparator: groupingSeparator)
 			} else {
-				if maxPlaces < maxPlacesForEngineeringNotation {
-					// if maxPlaces is too low, we might have removed too many digits already, need to start over
-					helper = .init(decimal: decimal)
-				}
-				// If the number is too big to be formatted to maxPlaces, we use engineering notation
+				// It may have happened that we removed too many digits, so we reset the helper
+				helper = .init(decimal: decimal)
 				helper.round(byRemoving: helper.digits.count - maxPlacesForEngineeringNotation)
 				let exponent = helper.integers - 1
 				// Normalise the mantissa
 				helper.integers = 1
 				return helper.formattedString(decimalSeparator: decimalSeparator) + "e\(exponent)"
 			}
-
-			return helper.formattedString(decimalSeparator: decimalSeparator, groupingSeparator: groupingSeparator)
 		}
 
 		static func reduceDecimals(_ decimal: inout BigDecimal, maxDecimals: Int, byRounding: Bool) throws {
-			var helper = Helper(decimal: decimal)
 			let decimalCount = max(0, decimal.scale)
 			let decimalsToRemove = max(0, decimalCount - maxDecimals)
 			guard decimalsToRemove > 0 else { return }
+
+			var helper = Helper(decimal: decimal)
 			if byRounding {
 				helper.round(byRemoving: decimalsToRemove)
-				helper.digits.trimTrailingZeros()
 			} else {
 				helper.digits.removeLast(decimalsToRemove)
-				helper.digits.trimTrailingZeros()
 			}
+			helper.digits.trimTrailingZeros()
 
 			let string = helper.machineReadableString()
 			decimal = try BigDecimal(fromString: string)
@@ -101,11 +99,11 @@ extension BigDecimal {
 			// We remove the superfluous digits, except one - it helps us decide to round or not
 			digits.removeLast(superfluousDigits - 1)
 
-			// Remove and examine the "following" digit (it's an optional, but is only nil for non-digits)
-			let following = Int(String(digits.removeLast()))
+			// Remove and examine the digit after the last kept digit (it's an optional, but is only nil for non-digits)
+			let digitAfterLast = Int(String(digits.removeLast()))
 
 			// If it's not 5 or higher, we don't need to do any rounding
-			guard let following, following > 4 else { return }
+			guard let digitAfterLast, digitAfterLast > 4 else { return }
 
 			func roundUp() {
 				// Remove the least significant digit
