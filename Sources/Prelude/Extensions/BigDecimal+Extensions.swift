@@ -2,21 +2,26 @@ import BigDecimal
 import Foundation
 
 extension BigDecimal {
+	enum FormattingError: Error {
+		case truncationFailed(BigDecimal, divisibility: UInt, underlyingError: Error)
+		case roundingFailed(BigDecimal, divisibility: UInt, underlyingError: Error)
+	}
+
 	// MARK: Truncation and rounding
 
-	public mutating func truncateToDivisibility(_ divisibility: UInt) {
+	public mutating func truncateToDivisibility(_ divisibility: UInt) throws {
 		do {
 			try Helper.reduceDecimals(&self, maxDecimals: Int(divisibility), byRounding: false)
 		} catch {
-			loggerGlobal.warning("BigDecimal: Rounding \(self) to \(divisibility) decimals failed: \(error)")
+			throw FormattingError.truncationFailed(self, divisibility: divisibility, underlyingError: error)
 		}
 	}
 
-	public mutating func roundToDivisibility(_ divisibility: UInt) {
+	public mutating func roundToDivisibility(_ divisibility: UInt) throws {
 		do {
 			try Helper.reduceDecimals(&self, maxDecimals: Int(divisibility), byRounding: true)
 		} catch {
-			loggerGlobal.warning("BigDecimal: Truncating \(self) to \(divisibility) decimals failed: \(error)")
+			throw FormattingError.roundingFailed(self, divisibility: divisibility, underlyingError: error)
 		}
 	}
 

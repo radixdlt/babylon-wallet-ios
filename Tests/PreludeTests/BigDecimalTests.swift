@@ -177,7 +177,7 @@ final class BigDecimalTests: TestCase {
 		func doTest(_ bigDecimalString: String, divisibility: UInt, expected expectedString: String, line: UInt = #line) throws {
 			let expected = try BigDecimal(fromString: expectedString)
 			var actual = try BigDecimal(fromString: bigDecimalString)
-			actual.roundToDivisibility(divisibility)
+			try actual.roundToDivisibility(divisibility)
 			XCTAssertEqual(actual, expected, line: line)
 		}
 
@@ -226,7 +226,7 @@ final class BigDecimalTests: TestCase {
 		func doTest(_ bigDecimalString: String, divisibility: UInt, expected expectedString: String, line: UInt = #line) throws {
 			let expected = try BigDecimal(fromString: expectedString)
 			var actual = try BigDecimal(fromString: bigDecimalString)
-			actual.truncateToDivisibility(divisibility)
+			try actual.truncateToDivisibility(divisibility)
 			XCTAssertEqual(actual, expected, line: line)
 		}
 
