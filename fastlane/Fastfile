@@ -139,7 +139,7 @@ private_lane :create_gh_release do |options|
     changelog = rev_changelog(flavour, most_recent_tags)
     versions_string = dependencies_with_hyperlinks()
 
-    release_description = "**Dependencies**: \n#{versions_string}\n\n**Changelog**: \n#{changelog}"
+    release_description = "**Dependencies**: \n" + versions_string + "\n\n**Changelog**: \n" + rev_changelog
     last_tag = most_recent_tags[0]
 
     set_github_release(
