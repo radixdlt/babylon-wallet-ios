@@ -10,8 +10,10 @@ extension BigDecimal {
 		private var sign: BigInt.Sign
 		/// All the digits in the number, without separators
 		private var digits: String
-		/// How many of the digits represent the integer part
-		private var integerCount: Int
+		/// The exponent of the BigDecimal, if it were to be written in Scientific notation with normalised mantissa, i.e. m ∈ [1, 10)
+		/// Add 1 to the exponent to get the number of integers in a number represented by `digits`
+		private var exponent: Int
+
 		private var multiplier: Multiplier = .one
 
 		static func format(decimal: BigDecimal, maxPlaces: Int, decimalSeparator: String, groupingSeparator: String?) -> String {
@@ -28,10 +30,10 @@ extension BigDecimal {
 				// It may have happened that we removed too many digits, so we reset the helper
 				helper = .init(decimal: decimal)
 				helper.round(byRemoving: helper.digits.count - maxPlacesForEngineeringNotation)
-				let exponent = helper.integerCount - 1
+				let shownExponent = helper.exponent
 				// Normalise the mantissa
-				helper.integerCount = 1
-				return helper.formattedString(decimalSeparator: decimalSeparator) + "e\(exponent)"
+				helper.exponent = 0
+				return helper.formattedString(decimalSeparator: decimalSeparator) + "e\(shownExponent)"
 			}
 		}
 
@@ -55,7 +57,7 @@ extension BigDecimal {
 		private init(decimal: BigDecimal) {
 			self.sign = decimal.sign
 			self.digits = decimal.integerValue.magnitude.description
-			self.integerCount = digits.count - decimal.scale
+			self.exponent = digits.count - decimal.scale - 1
 		}
 
 		// Helper instance methods
@@ -70,6 +72,7 @@ extension BigDecimal {
 			guard digits.count > 0 else { return "0" }
 
 			let signPart = sign == .minus ? "-" : ""
+			let integerCount = exponent + 1
 			// Check if we have any decimals
 			guard integerCount < digits.count else {
 				// No decimals, the digits all represent the integer part
@@ -85,9 +88,9 @@ extension BigDecimal {
 
 		/// Normalise digits so that they start with at least one zero before the decimal separator, for numbers < 1
 		private mutating func normalizeInteger() {
-			if integerCount < 1 {
-				digits.padWithLeadingZeros(count: 1 - integerCount)
-				integerCount = 1
+			if exponent < 0 {
+				digits.padWithLeadingZeros(count: -exponent)
+				exponent = 0
 			}
 		}
 
@@ -114,7 +117,7 @@ extension BigDecimal {
 					guard !digits.isEmpty else {
 						// We ran out of digits so we add a leading "1" and finish.
 						digits = "1"
-						integerCount += 1
+						exponent += 1
 						return
 					}
 
@@ -131,17 +134,13 @@ extension BigDecimal {
 
 		// Use e.g. millions starting from 1 million
 		private func suitableMultiplier(maxPlaces: Int) -> Multiplier? {
+			let integerCount = exponent + 1
 			let allowedRange = integerCount - maxPlaces ..< integerCount
 			return .allCases.last { allowedRange.contains($0.rawValue) }
 		}
 
-		// Using the smallest multiplier that fits all integers - not used currently
-		private func suitableMultiplierCommentStyle(maxPlaces: Int) -> Multiplier? {
-			.allCases.first { integerCount - $0.rawValue <= maxPlaces }
-		}
-
 		private mutating func applyMultiplier(_ newMultiplier: Multiplier) {
-			integerCount -= newMultiplier.rawValue - multiplier.rawValue
+			exponent -= newMultiplier.rawValue - multiplier.rawValue
 			multiplier = newMultiplier
 		}
 
