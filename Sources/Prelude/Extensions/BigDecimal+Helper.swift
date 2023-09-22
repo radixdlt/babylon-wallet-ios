@@ -11,7 +11,7 @@ extension BigDecimal {
 		/// All the digits in the number, without separators
 		private var digits: String
 		/// How many of the digits represent the integer part
-		private var integers: Int
+		private var integerCount: Int
 		private var multiplier: Multiplier = .one
 
 		static func format(decimal: BigDecimal, maxPlaces: Int, decimalSeparator: String, groupingSeparator: String?) -> String {
@@ -28,9 +28,9 @@ extension BigDecimal {
 				// It may have happened that we removed too many digits, so we reset the helper
 				helper = .init(decimal: decimal)
 				helper.round(byRemoving: helper.digits.count - maxPlacesForEngineeringNotation)
-				let exponent = helper.integers - 1
+				let exponent = helper.integerCount - 1
 				// Normalise the mantissa
-				helper.integers = 1
+				helper.integerCount = 1
 				return helper.formattedString(decimalSeparator: decimalSeparator) + "e\(exponent)"
 			}
 		}
@@ -55,7 +55,7 @@ extension BigDecimal {
 		private init(decimal: BigDecimal) {
 			self.sign = decimal.sign
 			self.digits = decimal.integerValue.magnitude.description
-			self.integers = digits.count - decimal.scale
+			self.integerCount = digits.count - decimal.scale
 		}
 
 		// Helper instance methods
@@ -71,23 +71,23 @@ extension BigDecimal {
 
 			let signPart = sign == .minus ? "-" : ""
 			// Check if we have any decimals
-			guard integers < digits.count else {
+			guard integerCount < digits.count else {
 				// No decimals, the digits all represent the integer part
 				var integerPart = digits
 				integerPart.insertGroupingSeparatorInInteger(groupingSeparator)
-				return signPart + integerPart + .zeros(length: integers - digits.count) + multiplierSuffix
+				return signPart + integerPart + .zeros(length: integerCount - digits.count) + multiplierSuffix
 			}
 
-			var (integerPart, decimalPart) = digits.split(after: integers)
+			var (integerPart, decimalPart) = digits.split(after: integerCount)
 			integerPart.insertGroupingSeparatorInInteger(groupingSeparator)
 			return signPart + integerPart + decimalSeparator + decimalPart + multiplierSuffix
 		}
 
 		/// Normalise digits so that they start with at least one zero before the decimal separator, for numbers < 1
 		private mutating func normalizeInteger() {
-			if integers < 1 {
-				digits.padWithLeadingZeros(count: 1 - integers)
-				integers = 1
+			if integerCount < 1 {
+				digits.padWithLeadingZeros(count: 1 - integerCount)
+				integerCount = 1
 			}
 		}
 
@@ -100,10 +100,10 @@ extension BigDecimal {
 			digits.removeLast(superfluousDigits - 1)
 
 			// Remove and examine the digit after the last kept digit (it's an optional, but is only nil for non-digits)
-			let digitAfterLast = Int(String(digits.removeLast()))
+			let roundingDigit = Int(String(digits.removeLast()))
 
 			// If it's not 5 or higher, we don't need to do any rounding
-			guard let digitAfterLast, digitAfterLast > 4 else { return }
+			guard let roundingDigit, roundingDigit > 4 else { return }
 
 			func roundUp() {
 				// Remove the least significant digit
@@ -114,7 +114,7 @@ extension BigDecimal {
 					guard !digits.isEmpty else {
 						// We ran out of digits so we add a leading "1" and finish.
 						digits = "1"
-						integers += 1
+						integerCount += 1
 						return
 					}
 
@@ -131,17 +131,17 @@ extension BigDecimal {
 
 		// Use e.g. millions starting from 1 million
 		private func suitableMultiplier(maxPlaces: Int) -> Multiplier? {
-			let allowedRange = integers - maxPlaces ..< integers
+			let allowedRange = integerCount - maxPlaces ..< integerCount
 			return .allCases.last { allowedRange.contains($0.rawValue) }
 		}
 
 		// Using the smallest multiplier that fits all integers - not used currently
 		private func suitableMultiplierCommentStyle(maxPlaces: Int) -> Multiplier? {
-			.allCases.first { integers - $0.rawValue <= maxPlaces }
+			.allCases.first { integerCount - $0.rawValue <= maxPlaces }
 		}
 
 		private mutating func applyMultiplier(_ newMultiplier: Multiplier) {
-			integers -= newMultiplier.rawValue - multiplier.rawValue
+			integerCount -= newMultiplier.rawValue - multiplier.rawValue
 			multiplier = newMultiplier
 		}
 
