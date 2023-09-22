@@ -438,8 +438,8 @@
 "biometrics_prompt_importOlympiaAccounts" = "Check if seed phrase already exists.";
 "biometrics_prompt_checkingAccounts" = "Checking accounts.";
 "biometrics_prompt_updateAccountMetadata" = "Update account metadata.";
-"biometrics_deviceNotSecureAlert_title" = "Your device is not secured";
-"biometrics_deviceNotSecureAlert_message" = "Do you want to continue?";
+"biometrics_deviceNotSecureAlert_title" = "Unsecured Device";
+"biometrics_deviceNotSecureAlert_message" = "Your device currently has no device access security set, such as biometrics or a PIN. The Radix Wallet requires this to be set for your security.";
 "biometrics_deviceNotSecureAlert_openSettings" = "Open Settings";
 "biometrics_deviceNotSecureAlert_quit" = "Quit";
 "common_account" = "Account";
