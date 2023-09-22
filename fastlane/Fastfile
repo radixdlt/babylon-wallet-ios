@@ -150,7 +150,7 @@ private_lane :create_gh_release do |options|
         description: release_description,
         is_draft: true, # We mark all flavours as DRAFT and then promote them once approved by Apple.
         is_prerelease: flavour.include?("Beta"),
-        upload_assets: [dsymPath, ipaPath]
+        upload_assets: [dsymPath, ipaPath].compact
     )
 end
 
