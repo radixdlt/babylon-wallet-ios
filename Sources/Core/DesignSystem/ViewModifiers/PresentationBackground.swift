@@ -49,17 +49,6 @@ private struct PresentationBackgroundModifier: ViewModifier {
 				// add the background view at the very back of the container hierarchy
 				containerView.insertSubview(backgroundView, at: 0)
 
-				// TODO: @davdroman find a way to make this work post betanet v2, otherwise
-				// settle for current workaround which is near perfect anyway.
-//				sheetPresentationController.swizzle(
-//					original: #selector(UIPresentationController.presentationTransitionWillBegin),
-//					swizzled: #selector(UIPresentationController.swizzled_presentationTransitionWillBegin)
-//				)
-//				sheetPresentationController.additionalPresentationAnimation = {
-//					viewController.transitionCoordinator?.animate(alongsideTransition: { context in
-//						backgroundView.alpha = 1
-//					})
-//				}
 				// Workaround for now
 				// rudimentarily dims in background view
 				backgroundView.alpha = 0

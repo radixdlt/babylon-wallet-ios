@@ -282,8 +282,9 @@ public struct TransactionReview: Sendable, FeatureReducer {
 					})))
 				}
 			} catch {
+				loggerGlobal.critical("Failed to add instruction to add instructions to manifest, error: \(error)")
 				errorQueue.schedule(error)
-				return .none
+				return resetToApprovable(&state)
 			}
 		}
 	}
@@ -593,7 +594,7 @@ extension TransactionReview {
 		for guarantee in guarantees {
 			let guaranteeInstruction: Instruction = try .assertWorktopContains(
 				resourceAddress: guarantee.resourceAddress.intoEngine(),
-				amount: .init(value: guarantee.amount.toString())
+				amount: guarantee.amount.asDecimal(withDivisibility: guarantee.resourceDivisibility)
 			)
 
 			manifest = try manifest.withInstructionAdded(guaranteeInstruction, at: Int(guarantee.instructionIndex) + indexInc)
@@ -617,14 +618,60 @@ extension TransactionReview {
 	func transactionManifestWithWalletInstructionsAdded(_ state: State) throws -> TransactionManifest {
 		var manifest = state.transactionManifest
 		if let feePayerSelection = state.reviewedTransaction?.feePayerSelection, let feePayer = feePayerSelection.selected {
-			manifest = try manifest.withLockFeeCallMethodAdded(
-				address: feePayer.account.address.asGeneral(),
-				fee: feePayerSelection.transactionFee.totalFee.lockFee
-			)
+			do {
+				manifest = try manifest.withLockFeeCallMethodAdded(
+					address: feePayer.account.address.asGeneral(),
+					fee: feePayerSelection.transactionFee.totalFee.lockFee
+				)
+			} catch {
+				loggerGlobal.error("Failed to add lock fee, error: \(error)")
+				throw FailedToAddLockFee(underlyingError: error)
+			}
 		}
-		return try addingGuarantees(to: manifest, guarantees: state.allGuarantees)
+		do {
+			return try addingGuarantees(to: manifest, guarantees: state.allGuarantees)
+		} catch {
+			loggerGlobal.error("Failed to add guarantee, error: \(error)")
+			throw FailedToAddGuarantee(underlyingError: error)
+		}
+	}
+}
+
+// MARK: - FailedToAddLockFee
+public struct FailedToAddLockFee: LocalizedError {
+	public let underlyingError: Swift.Error
+	public init(underlyingError: Swift.Error) {
+		self.underlyingError = underlyingError
 	}
 
+	public var errorDescription: String? {
+		let base = "Failed to add Transaction Fee, try a different amount of fee payer." // FIXME: Strings
+		#if DEBUG
+		return base + "\n[DEBUG ONLY]: \(String(describing: underlyingError))"
+		#else
+		return base
+		#endif
+	}
+}
+
+// MARK: - FailedToAddGuarantee
+public struct FailedToAddGuarantee: LocalizedError {
+	public let underlyingError: Swift.Error
+	public init(underlyingError: Swift.Error) {
+		self.underlyingError = underlyingError
+	}
+
+	public var errorDescription: String? {
+		let base = "Failed to add Guarantee, try a different percentage, or try skip adding a guarantee." // FIXME: Strings
+		#if DEBUG
+		return base + "\n[DEBUG ONLY]: \(String(describing: underlyingError))"
+		#else
+		return base
+		#endif
+	}
+}
+
+extension TransactionReview {
 	func delayedEffect(
 		delay: Duration = .seconds(0.3),
 		for action: Action
@@ -872,7 +919,12 @@ extension TransactionReview {
 				func guarantee() -> TransactionClient.Guarantee? {
 					guard case let .predicted(instructionIndex, _) = source else { return nil }
 					let guaranteedAmount = defaultDepositGuarantee * amount
-					return .init(amount: guaranteedAmount, instructionIndex: instructionIndex, resourceAddress: resourceAddress)
+					return .init(
+						amount: guaranteedAmount,
+						instructionIndex: instructionIndex,
+						resourceAddress: resourceAddress,
+						resourceDivisibility: onLedgerEntity.divisibility
+					)
 				}
 
 				return [.fungible(.init(
