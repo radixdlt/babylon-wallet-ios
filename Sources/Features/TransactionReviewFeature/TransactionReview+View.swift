@@ -507,14 +507,6 @@ extension StrokeStyle {
 	static let transactionReview = StrokeStyle(lineWidth: 2, dash: [5, 5])
 }
 
-extension Button where Label == Image {
-	public init(asset: ImageAsset, action: @escaping () -> Void) {
-		self.init(action: action) {
-			Image(asset: asset)
-		}
-	}
-}
-
 #if DEBUG
 import SwiftUI // NB: necessary for previews to appear
 
