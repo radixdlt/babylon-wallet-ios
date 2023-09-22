@@ -59,9 +59,7 @@ extension EditPersona {
 							EditPersonaField.View(
 								store: store.scope(
 									state: \.labelField,
-									action: (/Action.child
-										.. EditPersona.ChildAction.labelField
-									).embed
+									action: (/Action.child .. EditPersona.ChildAction.labelField).embed
 								)
 							)
 
@@ -77,9 +75,7 @@ extension EditPersona {
 							EditPersonaEntries.View(
 								store: store.scope(
 									state: \.entries,
-									action: (/Action.child
-										.. EditPersona.ChildAction.personaData
-									).embed
+									action: (/Action.child .. EditPersona.ChildAction.personaData).embed
 								)
 							)
 

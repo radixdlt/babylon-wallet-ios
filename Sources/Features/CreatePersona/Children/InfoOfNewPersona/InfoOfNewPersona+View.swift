@@ -12,6 +12,7 @@ extension NewPersonaInfo {
 		public let titleText: String
 		public let subtitleText: String
 		public let entityName: String
+		public let hint: Hint?
 		public let sanitizedNameRequirement: SanitizedNameRequirement?
 		public let focusedInputField: State.InputField?
 
@@ -25,12 +26,19 @@ extension NewPersonaInfo {
 			self.titleText = L10n.CreatePersona.Introduction.title
 			self.subtitleText = L10n.CreatePersona.NameNewPersona.subtitle
 			self.entityName = state.inputtedName
+
+			let defaultHint: Hint = .info(L10n.CreateEntity.NameNewEntity.explanation)
 			if let sanitizedName = state.sanitizedName {
-				self.sanitizedNameRequirement = .init(
-					sanitizedName: sanitizedName
-				)
+				if sanitizedName.count > Profile.Network.Account.nameMaxLength {
+					self.sanitizedNameRequirement = nil
+					self.hint = .error("Account label too long") // FIXME: Strings (duplicate)
+				} else {
+					self.sanitizedNameRequirement = .init(sanitizedName: sanitizedName)
+					self.hint = defaultHint
+				}
 			} else {
 				self.sanitizedNameRequirement = nil
+				self.hint = defaultHint
 			}
 			self.focusedInputField = state.focusedInputField
 		}
@@ -63,7 +71,7 @@ extension NewPersonaInfo {
 								AppTextField(
 									placeholder: viewStore.namePlaceholder,
 									text: nameBinding,
-									hint: .info(L10n.CreateEntity.NameNewEntity.explanation),
+									hint: viewStore.hint,
 									focus: .on(
 										.personaName,
 										binding: viewStore.binding(
@@ -73,9 +81,6 @@ extension NewPersonaInfo {
 										to: $focusedInputField
 									)
 								)
-								#if os(iOS)
-								.textFieldCharacterLimit(Profile.Network.Account.nameMaxLength, forText: nameBinding)
-								#endif
 								.autocorrectionDisabled()
 							}
 						}
