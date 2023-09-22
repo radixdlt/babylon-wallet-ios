@@ -13,6 +13,7 @@ extension NameAccount {
 		public let subtitleText: String
 		public let entityName: String
 		public let sanitizedNameRequirement: SanitizedNameRequirement?
+		public let hint: Hint?
 		public let useLedgerAsFactorSource: Bool
 
 		public struct SanitizedNameRequirement: Equatable {
@@ -28,8 +29,14 @@ extension NameAccount {
 			self.entityName = state.inputtedName
 			if let sanitizedName = state.sanitizedName {
 				self.sanitizedNameRequirement = .init(sanitizedName: sanitizedName)
+				if sanitizedName.count > Profile.Network.Account.nameMaxLength {
+					self.hint = .error("Account label too long") // FIXME: Strings (duplicate)
+				} else {
+					self.hint = nil
+				}
 			} else {
 				self.sanitizedNameRequirement = nil
+				self.hint = nil
 			}
 		}
 	}
@@ -59,11 +66,9 @@ extension NameAccount {
 
 						AppTextField(
 							placeholder: viewStore.namePlaceholder,
-							text: nameBinding
+							text: nameBinding,
+							hint: viewStore.hint
 						)
-						#if os(iOS)
-						.textFieldCharacterLimit(Profile.Network.Account.nameMaxLength, forText: nameBinding)
-						#endif
 						.keyboardType(.asciiCapable)
 						.autocorrectionDisabled()
 						.padding(.bottom, .medium3)

@@ -2,12 +2,25 @@ import FeaturePrelude
 
 extension UpdateAccountLabel.State {
 	var viewState: UpdateAccountLabel.ViewState {
-		.init(
+		let (controlState, hint) = hintAndControlState
+		return .init(
 			accountLabel: accountLabel,
 			sanitizedName: sanitizedName,
-			updateButtonControlState: sanitizedName == nil ? .disabled : .enabled,
-			hint: accountLabel.isEmpty ? .error("Account label required") : nil // FIXME: strings
+			updateButtonControlState: controlState,
+			hint: hint
 		)
+	}
+
+	private var hintAndControlState: (ControlState, Hint?) {
+		if let sanitizedName {
+			if sanitizedName.count > Profile.Network.Account.nameMaxLength {
+				return (.disabled, .error("Account label too long")) // FIXME: Strings (duplicate)
+			}
+		} else {
+			return (.disabled, .error("Account label required")) // FIXME: Strings (duplicate)
+		}
+
+		return (.enabled, nil)
 	}
 }
 
@@ -41,9 +54,6 @@ extension UpdateAccountLabel {
 							text: nameBinding,
 							hint: viewStore.hint
 						)
-						#if os(iOS)
-						.textFieldCharacterLimit(Profile.Network.Account.nameMaxLength, forText: nameBinding)
-						#endif
 						.keyboardType(.asciiCapable)
 						.autocorrectionDisabled()
 
