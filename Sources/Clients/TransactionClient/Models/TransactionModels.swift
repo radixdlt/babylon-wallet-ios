@@ -177,15 +177,18 @@ extension TransactionClient {
 		public var amount: BigDecimal
 		public var instructionIndex: UInt64
 		public var resourceAddress: ResourceAddress
+		public var resourceDivisibility: Int?
 
 		public init(
 			amount: BigDecimal,
 			instructionIndex: UInt64,
-			resourceAddress: ResourceAddress
+			resourceAddress: ResourceAddress,
+			resourceDivisibility: Int?
 		) {
 			self.amount = amount
 			self.instructionIndex = instructionIndex
 			self.resourceAddress = resourceAddress
+			self.resourceDivisibility = resourceDivisibility
 		}
 	}
 }

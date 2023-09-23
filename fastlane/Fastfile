@@ -42,7 +42,7 @@ platform :ios do
             build_number: build_number
         )
 
-        build_app(
+        build_ios_app(
             include_symbols: true
         )
 
@@ -120,25 +120,78 @@ end
 
 def rev_changelog(flavour, most_recent_tags)
     git_commits_range_for_changelog = most_recent_tags.map { |tag| sh("git rev-list --abbrev-commit -n 1 #{tag}").strip }
-    rev_changelog = changelog_from_git_commits(
+    changelog_from_git_commits(
       between: git_commits_range_for_changelog,
       pretty: "- %s"
     )
+end
+
+def exist_at_path?(filePath)
+    return false if filePath.nil?
+    if File.exists?(filePath)
+        puts "🗃️ Found file at '#{filePath} size: '#{File.size(filePath)}'"
+        return true
+    elsif Dir.exist?(filePath)
+        puts "🗃️ Found Directory at '#{filePath}'"
+        return true
+    end
+    puts "🤷‍♂️ Found no file or dir at '#{filePath}'\n"
+   
+    false
+end
+
+private_lane :locate_dsym do |options|
+    puts "👀 SharedValues::DSYM_OUTPUT_PATH]: '#{lane_context[SharedValues::DSYM_OUTPUT_PATH]}'"
+    puts "👀 SharedValues::DSYM_ZIP_PATH]: '#{lane_context[SharedValues::DSYM_ZIP_PATH]}'"
+   
+    dsymPathUsed = nil
+
+    if exist_at_path?(lane_context[SharedValues::DSYM_OUTPUT_PATH])
+        puts "✅ Found DSYMs at '#{lane_context[SharedValues::DSYM_OUTPUT_PATH]}' ✅"
+        dsymPathUsed = lane_context[SharedValues::DSYM_OUTPUT_PATH] 
+    else
+        if exist_at_path?(lane_context[SharedValues::DSYM_ZIP_PATH])
+            puts "\nDSYM_OUTPUT_PATH was nil but found file at DSYM_ZIP_PATH, using it...✅\n"
+            dsymPathUsed = DSYM_ZIP_PATH
+        else
+            puts "\n⚠️ Radix: Warning neither DSYM_OUTPUT_PATH nor DSYM_ZIP_PATH exists, calling `dzym_zip` ⚠️\n"
+            dsym_zip(all: true)
+            if exist_at_path?(lane_context[SharedValues::DSYM_OUTPUT_PATH])
+                puts "\n✅ Successfully fixed DSYM by using dsym_zip, using 'DSYM_OUTPUT_PATH' ✅\n"
+                dsymPathUsed = lane_context[SharedValues::DSYM_OUTPUT_PATH]
+            elsif exist_at_path?(lane_context[SharedValues::DSYM_ZIP_PATH])
+                puts "\n✅ Successfully fixed DSYM by using dsym_zip, using 'DSYM_ZIP_PATH' ✅\n"
+                dsymPathUsed = lane_context[SharedValues::DSYM_ZIP_PATH]
+            else
+                puts "\ndsym_zip attempt failed ❌, trying last resort manual read from archive path\n"
+                archive = lane_context[SharedValues::XCODEBUILD_ARCHIVE]
+                puts "\n🗂️: '#{archive}'\n"
+                if exist_at_path?(archive)
+                    dsymPathInArchive = "#{archive}/dSYMs/Radix Wallet.app.dSYM"
+                    if Dir.exist?(dsymPathInArchive) || exist_at_path?(dsymPathInArchive)
+                        puts "\n✅ Last resort saved us, found dsym in archive ✅\n"
+                        dsymPathUsed = dsymPathInArchive
+                    else
+                        puts "\n⚠️ unable to find dsym in archive, thus last resort failed.\n"
+                    end
+                else
+                    puts "\n⚠️ failed to archive..., thus last resort failed.\n"
+                end
+                puts "\n☣️ failed to fix DSYM, we have none :/ ☣️\n"
+            end
+        end
+    end
+
+    dsymPathUsed
 end
 
 
 private_lane :create_gh_release do |options|
     flavour = options.fetch(:flavour).delete_prefix('"').delete_suffix('"') # if accidentally included
     
-    ipaPath = lane_context[SharedValues::IPA_OUTPUT_PATH]
-    dsymPath = lane_context[SharedValues::DSYM_OUTPUT_PATH] 
-    if dsymPath.nil?
-        puts "\n⚠️ Radix: Warning dsymPath is nil ⚠️ Will be unable to upload dsym\n"
-    end
-    if dsymPath.blank?
-        puts "\n⚠️ Radix: Warning dsymPath is blank ⚠️ Will be unable to upload dsym\n"
-        dsymPath = nil # nil is filtered away below
-    end
+    puts "👀 SharedValues::IPA_OUTPUT_PATH]: '#{lane_context[SharedValues::IPA_OUTPUT_PATH]}'\n"
+
+    dsymPathUsed = locate_dsym()
 
     sh('git fetch --tags')
     most_recent_tags = sh("git tag | grep #{flavour} | sort -r | head -2").split("\n")
@@ -146,7 +199,7 @@ private_lane :create_gh_release do |options|
     changelog = rev_changelog(flavour, most_recent_tags)
     versions_string = dependencies_with_hyperlinks()
 
-    release_description = "**Dependencies**: \n" + versions_string + "\n\n**Changelog**: \n" + rev_changelog
+    release_description = "**Dependencies**: \n" + versions_string + "\n\n**Changelog**: \n" + changelog
     last_tag = most_recent_tags[0]
 
     set_github_release(
@@ -157,7 +210,7 @@ private_lane :create_gh_release do |options|
         description: release_description,
         is_draft: true, # We mark all flavours as DRAFT and then promote them once approved by Apple.
         is_prerelease: flavour.include?("Beta"),
-        upload_assets: [dsymPath, ipaPath].compact
+        upload_assets: [dsymPathUsed, lane_context[SharedValues::IPA_OUTPUT_PATH]].compact
     )
 end
 

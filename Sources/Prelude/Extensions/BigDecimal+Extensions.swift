@@ -2,6 +2,72 @@ import BigDecimal
 import Foundation
 
 extension BigDecimal {
+	enum FormattingError: Error {
+		case truncationFailed(BigDecimal, divisibility: UInt, underlyingError: Error)
+		case roundingFailed(BigDecimal, divisibility: UInt, underlyingError: Error)
+	}
+
+	// MARK: Truncation and rounding
+
+	public mutating func truncateToDivisibility(_ divisibility: UInt) throws {
+		do {
+			try Helper.reduceDecimals(&self, maxDecimals: Int(divisibility), byRounding: false)
+		} catch {
+			throw FormattingError.truncationFailed(self, divisibility: divisibility, underlyingError: error)
+		}
+	}
+
+	public mutating func roundToDivisibility(_ divisibility: UInt) throws {
+		do {
+			try Helper.reduceDecimals(&self, maxDecimals: Int(divisibility), byRounding: true)
+		} catch {
+			throw FormattingError.roundingFailed(self, divisibility: divisibility, underlyingError: error)
+		}
+	}
+
+	// MARK: Parsing and formatting for human readable strings
+
+	public init(
+		formattedString: String,
+		locale: Locale = .autoupdatingCurrent
+	) throws {
+		var string = formattedString
+		// If the locale recognizes a grouping separator, we strip that from the string
+		if let groupingSeparator = locale.groupingSeparator {
+			string.replace(groupingSeparator, with: "")
+		}
+		// If the locale recognizes a decimal separator that is different from the machine readable one, we replace it with that
+		if let decimalSeparator = locale.decimalSeparator, decimalSeparator != Self.machineReadableDecimalPartsSeparator {
+			string.replace(decimalSeparator, with: Self.machineReadableDecimalPartsSeparator)
+		}
+
+		try self.init(fromString: string)
+	}
+
+	/// A human readable, locale respecting but unrounded string
+	public func formattedWithoutRounding(
+		locale: Locale = .autoupdatingCurrent,
+		usingGroupingSeparator: Bool = false
+	) -> String {
+		formatted(roundedTo: UInt(Int.max), locale: locale, usingGroupingSeparator: usingGroupingSeparator)
+	}
+
+	/// A human readable, locale respecting string, rounded to the provided number of digits (including both the integral and decimal parts)
+	public func formatted(
+		roundedTo maxPlaces: UInt = BigDecimal.defaultMaxPlacesFormattted,
+		locale: Locale = .autoupdatingCurrent,
+		usingGroupingSeparator: Bool = false
+	) -> String {
+		Helper.format(
+			decimal: self,
+			maxPlaces: Int(maxPlaces),
+			decimalSeparator: locale.decimalSeparator ?? ".",
+			groupingSeparator: usingGroupingSeparator ? locale.groupingSeparator : nil
+		)
+	}
+}
+
+extension BigDecimal {
 	// Used for development purposes
 	public static let temporaryStandardFee: BigDecimal = 25
 	public static let defaultMaxPlacesFormattted: UInt = 8
@@ -10,7 +76,7 @@ extension BigDecimal {
 	// `github.com/Zollerbo1/BigDecimal` package **hardcodes** usage of
 	// the decimal separator ".", see this line here:
 	// https://github.com/Zollerboy1/BigDecimal/blob/main/Sources/BigDecimal/BigDecimal.swift#L469
-	public static let integerAndDecimalPartsSeparator = "."
+	public static let machineReadableDecimalPartsSeparator = "."
 }
 
 extension BigDecimal {
@@ -26,7 +92,7 @@ extension BigDecimal {
 
 		guard
 			case let components = stringRepresentation.split(
-				separator: Self.integerAndDecimalPartsSeparator
+				separator: Self.machineReadableDecimalPartsSeparator
 			),
 			components.count == 2
 		else {
