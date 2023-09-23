@@ -56,7 +56,7 @@ extension PersonaData {
 			let quotedNicknameOrEmpty: String? = nickname.nilIfEmpty.map { "\"\($0)\"" }
 
 			return [
-				firstLine.nilIfEmpty,
+				firstLine.nilIfEmptyWhenTrimmed,
 				quotedNicknameOrEmpty,
 			]
 			.compactMap { $0 }
@@ -68,5 +68,9 @@ extension PersonaData {
 extension String {
 	var nilIfEmpty: String? {
 		isEmpty ? nil : self
+	}
+
+	var nilIfEmptyWhenTrimmed: String? {
+		trimmingWhitespace().nilIfEmpty
 	}
 }
