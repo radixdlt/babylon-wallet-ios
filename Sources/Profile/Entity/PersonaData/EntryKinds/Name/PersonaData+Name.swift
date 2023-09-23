@@ -46,20 +46,19 @@ extension PersonaData {
 		}
 
 		public var formatted: String {
-			let firstLine = {
+			let names = {
 				switch variant {
 				case .western: return [givenNames, familyName]
 				case .eastern: return [familyName, givenNames]
 				}
-			}().joined(separator: " ")
-
-			let quotedNicknameOrEmpty: String? = nickname.nilIfEmpty.map { "\"\($0)\"" }
+			}().compactMap { NonEmptyString($0) }
 
 			return [
-				firstLine.nilIfEmptyWhenTrimmed,
-				quotedNicknameOrEmpty,
+				NonEmptyString(names.joined(separator: " ")),
+				NonEmptyString(maybeString: nickname.nilIfEmpty.map { "\"\($0)\"" }),
 			]
 			.compactMap { $0 }
+			.map(\.rawValue)
 			.joined(separator: "\n")
 		}
 	}
@@ -68,9 +67,5 @@ extension PersonaData {
 extension String {
 	var nilIfEmpty: String? {
 		isEmpty ? nil : self
-	}
-
-	var nilIfEmptyWhenTrimmed: String? {
-		trimmingWhitespace().nilIfEmpty
 	}
 }
