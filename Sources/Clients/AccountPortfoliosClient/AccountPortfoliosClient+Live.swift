@@ -212,27 +212,30 @@ extension AccountPortfoliosClient {
 
 		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
 
-		let item = try await gatewayAPIClient.getSingleEntityDetails(resource.resourceAddress)
-		let details = item.details?.fungible
-
 		let resourceAddress = try ResourceAddress(validatingAddress: resource.resourceAddress)
+
+		let details = try await gatewayAPIClient.getSingleEntityDetails(resourceAddress.address).details?.fungible
 		let divisibility = details?.divisibility
 		let behaviors = details?.roleAssignments.extractBehaviors() ?? []
-		let tags = item.extractTags()
 		let totalSupply = details.flatMap { try? BigDecimal(fromString: $0.totalSupply) }
+
 		let metadata = resource.explicitMetadata
+		let dappDefinitions = metadata?.dappDefinitions?.compactMap { try? DappDefinitionAddress(validatingAddress: $0) }
 
 		return AccountPortfolio.FungibleResource(
-			resourceAddress: resourceAddress,
-			amount: amount,
-			divisibility: divisibility,
-			name: metadata?.name,
-			symbol: metadata?.symbol,
-			description: metadata?.description,
-			iconURL: metadata?.iconURL,
-			behaviors: behaviors,
-			tags: tags,
-			totalSupply: totalSupply
+			resource: .init(
+				resourceAddress: resourceAddress,
+				divisibility: divisibility,
+				name: metadata?.name,
+				symbol: metadata?.symbol,
+				description: metadata?.description,
+				iconURL: metadata?.iconURL,
+				behaviors: behaviors,
+				tags: metadata?.extractTags() ?? [],
+				totalSupply: totalSupply,
+				dappDefinitions: dappDefinitions
+			),
+			amount: amount
 		)
 	}
 
@@ -308,7 +311,6 @@ extension AccountPortfoliosClient {
 						name: details.name,
 						description: details.tokenDescription,
 						keyImageURL: details.keyImageURL,
-						metadata: [],
 						stakeClaimAmount: details.claimAmount,
 						canBeClaimed: canBeClaimed
 					)
@@ -319,27 +321,28 @@ extension AccountPortfoliosClient {
 
 			return result
 		}
+		let resourceAddress = try ResourceAddress(validatingAddress: resource.resourceAddress)
 
-		let item = try await gatewayAPIClient.getSingleEntityDetails(resource.resourceAddress)
-		let details = item.details?.nonFungible
-
+		let details = try await gatewayAPIClient.getSingleEntityDetails(resourceAddress.address).details?.nonFungible
 		let behaviors = details?.roleAssignments.extractBehaviors() ?? []
-		let tags = item.extractTags()
 		let totalSupply = details.flatMap { try? BigDecimal(fromString: $0.totalSupply) }
 
 		// Load the nftIds from the resource vault
 		let tokens = try await tokens(resource: resource)
 		let metadata = resource.explicitMetadata
 
-		return try AccountPortfolio.NonFungibleResource(
-			resourceAddress: .init(validatingAddress: resource.resourceAddress),
-			name: metadata?.name,
-			description: metadata?.description,
-			iconURL: metadata?.iconURL,
-			behaviors: behaviors,
-			tags: tags,
-			tokens: tokens,
-			totalSupply: totalSupply
+		return AccountPortfolio.NonFungibleResource(
+			resource: .init(
+				resourceAddress: resourceAddress,
+				name: metadata?.name,
+				symbol: metadata?.symbol,
+				description: metadata?.description,
+				iconURL: metadata?.iconURL,
+				behaviors: behaviors,
+				tags: metadata?.extractTags() ?? [],
+				totalSupply: totalSupply
+			),
+			tokens: tokens
 		)
 	}
 }
@@ -573,6 +576,7 @@ extension Array where Element == AccountPortfolio.FungibleResource {
 			if let lhsName = lhs.name, let rhsName = rhs.name {
 				return lhsName < rhsName // Sort alphabetically by name
 			}
+
 			return lhs.resourceAddress.address < rhs.resourceAddress.address // Sort by address
 		}
 

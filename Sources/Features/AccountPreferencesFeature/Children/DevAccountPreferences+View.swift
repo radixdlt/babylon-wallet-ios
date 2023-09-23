@@ -1,4 +1,3 @@
-import CreateAuthKeyFeature
 import FeaturePrelude
 import ShowQRFeature
 
@@ -86,7 +85,6 @@ extension DevAccountPreferences {
 						}
 						#if DEBUG
 						turnIntoDappDefinitionAccountTypeButton(with: viewStore)
-						createAndUploadAuthKeyButton(with: viewStore)
 						createFungibleTokenButton(with: viewStore)
 						// TODO: Re-enable. With new manifest builder that is not easy to handle.
 						// createNonFungibleTokenButton(with: viewStore)
@@ -110,13 +108,6 @@ extension DevAccountPreferences {
 					}
 					#if DEBUG
 					.sheet(
-							store: store.destination,
-							state: /DevAccountPreferences.Destination.State.createAuthKey,
-							action: DevAccountPreferences.Destination.Action.createAuthKey
-						) { store in
-							CreateAuthKey.View(store: store)
-						}
-						.sheet(
 							store: store.destination,
 							state: /DevAccountPreferences.Destination.State.reviewTransaction,
 							action: DevAccountPreferences.Destination.Action.reviewTransaction
@@ -180,15 +171,6 @@ extension DevAccountPreferences.View {
 		}
 		.buttonStyle(.secondaryRectangular(shouldExpand: true))
 		.controlState(viewStore.canTurnIntoDappDefinitionAccounType ? .enabled : .disabled)
-	}
-
-	@ViewBuilder
-	private func createAndUploadAuthKeyButton(with viewStore: ViewStoreOf<DevAccountPreferences>) -> some View {
-		Button("Create & Upload Auth Key") {
-			viewStore.send(.createAndUploadAuthKeyButtonTapped)
-		}
-		.buttonStyle(.secondaryRectangular(shouldExpand: true))
-		.controlState(viewStore.canCreateAuthSigningKey ? .enabled : .disabled)
 	}
 
 	@ViewBuilder

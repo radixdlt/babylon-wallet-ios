@@ -23,7 +23,7 @@ extension PersonaList {
 						Separator()
 							.padding(.bottom, .small2)
 
-						PersonaListCoreView(store: store)
+						PersonaListCoreView(store: store, tappable: true)
 					}
 
 					Button(L10n.Personas.createNewPersona) {
@@ -42,9 +42,11 @@ extension PersonaList {
 // MARK: - PersonaListCoreView
 public struct PersonaListCoreView: View {
 	private let store: StoreOf<PersonaList>
+	private let tappable: Bool
 
-	public init(store: StoreOf<PersonaList>) {
+	public init(store: StoreOf<PersonaList>, tappable: Bool) {
 		self.store = store
+		self.tappable = tappable
 	}
 
 	public var body: some View {
@@ -55,7 +57,7 @@ public struct PersonaListCoreView: View {
 					action: { .child(.persona(id: $0, action: $1)) }
 				)
 			) {
-				Persona.View(store: $0)
+				Persona.View(store: $0, tappable: tappable)
 					.padding(.horizontal, .medium3)
 			}
 		}

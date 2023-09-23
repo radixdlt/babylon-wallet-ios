@@ -1,4 +1,5 @@
 import FeaturePrelude
+import TransactionClient
 
 // MARK: - TransactionReviewGuarantees
 public struct TransactionReviewGuarantees: Sendable, FeatureReducer {
@@ -72,24 +73,27 @@ public struct TransactionReviewGuarantees: Sendable, FeatureReducer {
 // MARK: - TransactionReviewGuarantee
 public struct TransactionReviewGuarantee: Sendable, FeatureReducer {
 	public struct State: Identifiable, Sendable, Hashable {
-		public var id: TransactionReview.Transfer.ID { transfer.id }
+		public let id: TransactionReview.Transfer.ID
 		public let account: TransactionReview.Account
+		public let resource: OnLedgerEntity.Resource
+		public let details: TransactionReview.Transfer.Details.Fungible
 
-		public var transfer: TransactionReview.FungibleTransfer
+		public var guarantee: TransactionClient.Guarantee
 		public var percentageStepper: MinimumPercentageStepper.State
 
-		public init?(
+		init?(
 			account: TransactionReview.Account,
-			transfer: TransactionReview.FungibleTransfer
+			transfer: TransactionReview.Transfer
 		) {
+			guard case let .fungible(details) = transfer.details, details.amount > 0 else { return nil }
+			guard let guarantee = details.guarantee, guarantee.amount >= 0 else { return nil }
+
+			self.id = transfer.id
 			self.account = account
-			self.transfer = transfer
-
-			guard let guaranteed = transfer.guarantee?.amount, guaranteed >= 0, transfer.fungibleResource.amount > 0 else {
-				return nil
-			}
-
-			self.percentageStepper = .init(value: 100 * guaranteed / transfer.fungibleResource.amount)
+			self.resource = transfer.resource
+			self.details = details
+			self.guarantee = guarantee
+			self.percentageStepper = .init(value: 100 * guarantee.amount / details.amount)
 		}
 	}
 
@@ -114,13 +118,13 @@ public struct TransactionReviewGuarantee: Sendable, FeatureReducer {
 		switch childAction {
 		case .percentageStepper(.delegate(.valueChanged)):
 			guard let value = state.percentageStepper.value else {
-				state.transfer.guarantee?.amount = 0
+				state.guarantee.amount = 0
 				return .none
 			}
 
 			let newMinimumDecimal = value * 0.01
-			let newAmount = newMinimumDecimal * state.transfer.fungibleResource.amount
-			state.transfer.guarantee?.amount = newAmount
+			let newAmount = newMinimumDecimal * state.details.amount
+			state.guarantee.amount = newAmount
 
 			return .none
 

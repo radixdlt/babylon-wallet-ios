@@ -1,6 +1,5 @@
 import AccountPortfoliosClient
 import AccountsClient
-import CreateAuthKeyFeature
 import EngineKit
 import FaucetClient
 import FeaturePrelude
@@ -63,7 +62,6 @@ public struct DevAccountPreferences: Sendable, FeatureReducer {
 
 		#if DEBUG
 		case turnIntoDappDefinitionAccountTypeButtonTapped
-		case createAndUploadAuthKeyButtonTapped
 		case createFungibleTokenButtonTapped
 		case createNonFungibleTokenButtonTapped
 		case createMultipleFungibleTokenButtonTapped
@@ -80,7 +78,6 @@ public struct DevAccountPreferences: Sendable, FeatureReducer {
 		case refreshAccountCompleted(TaskResult<AccountPortfolio>)
 		case hideLoader(updateControlState: WritableKeyPath<State, ControlState>)
 		#if DEBUG
-		case createAuthKeyWithAccount(Profile.Network.Account)
 		case reviewTransaction(TransactionManifest)
 		case canCreateAuthSigningKey(Bool)
 		case canTurnIntoDappDefAccountType(Bool)
@@ -101,7 +98,6 @@ public struct DevAccountPreferences: Sendable, FeatureReducer {
 		public enum State: Equatable, Hashable {
 			case showQR(ShowQR.State)
 			#if DEBUG
-			case createAuthKey(CreateAuthKey.State)
 			case reviewTransaction(TransactionReview.State)
 			#endif // DEBUG
 		}
@@ -109,7 +105,6 @@ public struct DevAccountPreferences: Sendable, FeatureReducer {
 		public enum Action: Equatable {
 			case showQR(ShowQR.Action)
 			#if DEBUG
-			case createAuthKey(CreateAuthKey.Action)
 			case reviewTransaction(TransactionReview.Action)
 			#endif // DEBUG
 		}
@@ -119,9 +114,6 @@ public struct DevAccountPreferences: Sendable, FeatureReducer {
 				ShowQR()
 			}
 			#if DEBUG
-			Scope(state: /State.createAuthKey, action: /Action.createAuthKey) {
-				CreateAuthKey()
-			}
 			Scope(state: /State.reviewTransaction, action: /Action.reviewTransaction) {
 				TransactionReview()
 			}
@@ -168,12 +160,6 @@ public struct DevAccountPreferences: Sendable, FeatureReducer {
 				try await faucetClient.getFreeXRD(.init(recipientAccountAddress: $0))
 			}
 		#if DEBUG
-		case .createAndUploadAuthKeyButtonTapped:
-			return .run { [accountAddress = state.address] send in
-				let account = try await accountsClient.getAccountByAddress(accountAddress)
-				await send(.internal(.createAuthKeyWithAccount(account)))
-			}
-
 		case .turnIntoDappDefinitionAccountTypeButtonTapped:
 			return .run { [accountAddress = state.address] send in
 				let account = try await accountsClient.getAccountByAddress(accountAddress)
@@ -226,15 +212,6 @@ public struct DevAccountPreferences: Sendable, FeatureReducer {
 		case let .destination(.presented(action)):
 			switch action {
 			#if DEBUG
-			case let .createAuthKey(.delegate(.done(wasSuccessful))):
-				if case .createAuthKey = state.destination {
-					state.destination = nil
-				}
-				if wasSuccessful {
-					state.canCreateAuthSigningKey = false
-				}
-				return .none
-
 			case .reviewTransaction(.delegate(.transactionCompleted)), .reviewTransaction(.delegate(.failed)):
 				if case .reviewTransaction = state.destination {
 					state.destination = nil
@@ -289,13 +266,6 @@ public struct DevAccountPreferences: Sendable, FeatureReducer {
 			}
 
 		#if DEBUG
-		case let .createAuthKeyWithAccount(account):
-			guard !account.hasAuthenticationSigningKey else {
-				return .none
-			}
-			state.destination = .createAuthKey(.init(entity: .account(account)))
-			return .none
-
 		case let .reviewTransaction(manifest):
 			state.destination = .reviewTransaction(.init(
 				transactionManifest: manifest,

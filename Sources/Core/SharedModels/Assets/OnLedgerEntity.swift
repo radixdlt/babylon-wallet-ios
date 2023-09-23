@@ -23,7 +23,8 @@ public enum OnLedgerEntity: Sendable, Hashable, Codable {
 
 // MARK: OnLedgerEntity.Resource
 extension OnLedgerEntity {
-	public struct Resource: Sendable, Hashable, Codable {
+	public struct Resource: Sendable, Hashable, Codable, Identifiable {
+		public var id: ResourceAddress { resourceAddress }
 		public let resourceAddress: ResourceAddress
 		public let divisibility: Int?
 		public let name: String?
@@ -33,17 +34,32 @@ extension OnLedgerEntity {
 		public let behaviors: [AssetBehavior]
 		public let tags: [AssetTag]
 		public let totalSupply: BigDecimal?
+		public let dappDefinitions: [DappDefinitionAddress]?
+
+		public var fungibility: Fungibility {
+			if case .globalFungibleResourceManager = resourceAddress.decodedKind {
+				return .fungible
+			} else {
+				return .nonFungible
+			}
+		}
+
+		public enum Fungibility {
+			case fungible
+			case nonFungible
+		}
 
 		public init(
 			resourceAddress: ResourceAddress,
-			divisibility: Int?,
-			name: String?,
-			symbol: String?,
-			description: String?,
-			iconURL: URL?,
-			behaviors: [AssetBehavior],
-			tags: [AssetTag],
-			totalSupply: BigDecimal?
+			divisibility: Int? = nil,
+			name: String? = nil,
+			symbol: String? = nil,
+			description: String? = nil,
+			iconURL: URL? = nil,
+			behaviors: [AssetBehavior] = [],
+			tags: [AssetTag] = [],
+			totalSupply: BigDecimal? = nil,
+			dappDefinitions: [DappDefinitionAddress]? = nil
 		) {
 			self.resourceAddress = resourceAddress
 			self.divisibility = divisibility
@@ -54,6 +70,22 @@ extension OnLedgerEntity {
 			self.behaviors = behaviors
 			self.tags = tags
 			self.totalSupply = totalSupply
+			self.dappDefinitions = dappDefinitions
+		}
+	}
+
+	/// A simple type that represents an associated dApp
+	public struct AssociatedDapp: Identifiable, Hashable, Sendable {
+		public var id: DappDefinitionAddress { address }
+
+		public let address: DappDefinitionAddress
+		public let name: String
+		public let iconURL: URL?
+
+		public init(address: DappDefinitionAddress, name: String, iconURL: URL? = nil) {
+			self.address = address
+			self.name = name
+			self.iconURL = iconURL
 		}
 	}
 }

@@ -3,6 +3,7 @@ import AssetsFeature
 import ComposableArchitecture
 import Cryptography
 import CryptoKit
+import DappsAndPersonasFeature
 import EngineKit
 import FactorSourcesClient
 import FeaturePrelude
@@ -137,7 +138,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			case customizeGuarantees(TransactionReviewGuarantees.State)
 			case signing(Signing.State)
 			case submitting(SubmitTransaction.State)
-			case dApp(SimpleDappDetails.State)
+			case dApp(DappDetails.State)
 			case customizeFees(CustomizeFees.State)
 			case fungibleTokenDetails(FungibleTokenDetails.State)
 			case nonFungibleTokenDetails(NonFungibleTokenDetails.State)
@@ -147,7 +148,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			case customizeGuarantees(TransactionReviewGuarantees.Action)
 			case signing(Signing.Action)
 			case submitting(SubmitTransaction.Action)
-			case dApp(SimpleDappDetails.Action)
+			case dApp(DappDetails.Action)
 			case customizeFees(CustomizeFees.Action)
 			case fungibleTokenDetails(FungibleTokenDetails.Action)
 			case nonFungibleTokenDetails(NonFungibleTokenDetails.Action)
@@ -167,7 +168,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 				SubmitTransaction()
 			}
 			Scope(state: /State.dApp, action: /Action.dApp) {
-				SimpleDappDetails()
+				DappDetails()
 			}
 			Scope(state: /State.fungibleTokenDetails, action: /Action.fungibleTokenDetails) {
 				FungibleTokenDetails()
@@ -291,26 +292,19 @@ public struct TransactionReview: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
-		case let .withdrawals(.delegate(.showAsset(assetTransfer))),
-		     let .deposits(.delegate(.showAsset(assetTransfer))):
-			switch assetTransfer {
-			case let .fungible(transfer):
-				state.destination = .fungibleTokenDetails(.init(
-					resource: transfer.fungibleResource,
-					isXRD: transfer.isXRD,
-					context: .transfer
-				))
-			case let .nonFungible(transfer):
-				state.destination = .nonFungibleTokenDetails(.init(
-					token: transfer.token,
-					resource: transfer.nonFungibleResource
-				))
+		case let .withdrawals(.delegate(.showAsset(transfer))),
+		     let .deposits(.delegate(.showAsset(transfer))):
+			switch transfer.details {
+			case let .fungible(details):
+				state.destination = .fungibleTokenDetails(.init(resource: transfer.resource, isXRD: details.isXRD))
+			case let .nonFungible(details):
+				state.destination = .nonFungibleTokenDetails(.init(resource: transfer.resource, token: details))
 			}
 
 			return .none
 
-		case let .dAppsUsed(.delegate(.openDapp(id))):
-			state.destination = .dApp(.init(dAppID: id))
+		case let .dAppsUsed(.delegate(.openDapp(dAppID))):
+			state.destination = .dApp(.init(dAppDefinitionAddress: dAppID))
 			return .none
 
 		case .deposits(.delegate(.showCustomizeGuarantees)):
@@ -351,10 +345,9 @@ public struct TransactionReview: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, presentedAction: Destinations.Action) -> Effect<Action> {
 		switch presentedAction {
-		case let .customizeGuarantees(.delegate(.applyGuarantees(guarantees))):
-			for transfer in guarantees.map(\.transfer) {
-				guard let guarantee = transfer.guarantee else { continue }
-				state.applyGuarantee(guarantee, transferID: transfer.id)
+		case let .customizeGuarantees(.delegate(.applyGuarantees(guaranteeStates))):
+			for guaranteeState in guaranteeStates {
+				state.applyGuarantee(guaranteeState.guarantee, transferID: guaranteeState.id)
 			}
 
 			return .none
@@ -422,7 +415,6 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			return .none
 
 		case .fungibleTokenDetails(.delegate(.dismiss)):
-			guard case .fungibleTokenDetails = state.destination else { return .none }
 			state.destination = nil
 			return .none
 
@@ -430,7 +422,6 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			return .none
 
 		case .nonFungibleTokenDetails(.delegate(.dismiss)):
-			guard case .nonFungibleTokenDetails = state.destination else { return .none }
 			state.destination = nil
 			return .none
 
@@ -515,10 +506,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 extension Collection<TransactionReviewAccount.State> {
 	var customizableGuarantees: [TransactionReviewGuarantee.State] {
 		flatMap { account in
-			account.transfers
-				.compactMap(\.fungible)
-				.filter { $0.guarantee != nil }
-				.compactMap { .init(account: account.account, transfer: $0) }
+			account.transfers.compactMap { .init(account: account.account, transfer: $0) }
 		}
 	}
 }
@@ -899,7 +887,11 @@ extension TransactionReview {
 				))
 				.nonFungibleIds
 				.map { responseItem in
-					try NonFungibleToken(resourceAddress: resourceAddress, nftResponseItem: responseItem)
+					try NonFungibleToken(
+						resourceAddress: resourceAddress,
+						nftID: .from(stringFormat: responseItem.nonFungibleId),
+						nftData: responseItem.details
+					)
 				}
 
 				result.append(contentsOf: tokens)
@@ -911,11 +903,12 @@ extension TransactionReview {
 		switch resourceQuantifier {
 		case let .fungible(_, source):
 			let amount = try BigDecimal(fromString: source.amount.asStr())
-			let isXRD = resourceAddress.isXRD(on: networkID)
 
 			switch try await resourceInfo() {
-			case let .left(onLedgerEntity):
+			case let .left(resource):
 				// A fungible resource existing on ledger
+				let isXRD = resourceAddress.isXRD(on: networkID)
+
 				func guarantee() -> TransactionClient.Guarantee? {
 					guard case let .predicted(instructionIndex, _) = source else { return nil }
 					let guaranteedAmount = defaultDepositGuarantee * amount
@@ -923,29 +916,33 @@ extension TransactionReview {
 						amount: guaranteedAmount,
 						instructionIndex: instructionIndex,
 						resourceAddress: resourceAddress,
-						resourceDivisibility: onLedgerEntity.divisibility
+						resourceDivisibility: resource.divisibility
 					)
 				}
 
-				return [.fungible(.init(
-					fungibleResource: .init(
-						amount: amount,
-						onLedgerEntity: onLedgerEntity
-					),
+				let details: Transfer.Details.Fungible = .init(
 					isXRD: isXRD,
+					amount: amount,
 					guarantee: guarantee()
-				))]
+				)
+
+				return [.init(resource: resource, details: .fungible(details))]
 
 			case let .right(newEntityMetadata):
 				// A newly created fungible resource
-				return [.fungible(.init(
-					fungibleResource: .init(
-						resourceAddress: resourceAddress,
-						amount: amount,
-						metadata: newEntityMetadata
-					),
-					isXRD: isXRD
-				))]
+
+				let resource: OnLedgerEntity.Resource = .init(
+					resourceAddress: resourceAddress,
+					metadata: newEntityMetadata
+				)
+
+				let details: Transfer.Details.Fungible = .init(
+					isXRD: false,
+					amount: amount,
+					guarantee: nil
+				)
+
+				return [.init(resource: resource, details: .fungible(details))]
 			}
 		case let .nonFungible(_, _, .guaranteed(ids)),
 		     let .nonFungible(_, _, ids: .predicted(instructionIndex: _, value: ids)):
@@ -953,27 +950,22 @@ extension TransactionReview {
 			let result: [Transfer]
 
 			switch try await resourceInfo() {
-			case let .left(onLedgerEntity):
+			case let .left(resource):
 				// A non-fungible resource existing on ledger
-
-				let resource: AccountPortfolio.NonFungibleResource = .init(onLedgerEntity: onLedgerEntity)
 
 				// Existing or newly minted tokens
 				result = try await tokenInfo(ids, for: resourceAddress).map { token in
-					.nonFungible(.init(nonFungibleResource: resource, token: token))
+					.init(resource: resource, details: .nonFungible(token))
 				}
 
 			case let .right(newEntityMetadata):
 				// A newly created non-fungible resource
 
-				let resource: AccountPortfolio.NonFungibleResource = .init(
-					resourceAddress: resourceAddress,
-					metadata: newEntityMetadata
-				)
+				let resource = OnLedgerEntity.Resource(resourceAddress: resourceAddress, metadata: newEntityMetadata)
 
 				// Newly minted tokens
 				result = try newTokenInfo(ids, for: resourceAddress).map { token in
-					.nonFungible(.init(nonFungibleResource: resource, token: token))
+					.init(resource: resource, details: .nonFungible(token))
 				}
 			}
 
@@ -1100,75 +1092,49 @@ extension TransactionReview {
 		}
 	}
 
-	public enum Transfer: Sendable, Identifiable, Hashable {
+	public struct Transfer: Sendable, Identifiable, Hashable {
 		public typealias ID = Tagged<Self, UUID>
 
-		case fungible(FungibleTransfer)
-		case nonFungible(NonFungibleTransfer)
+		public let id = ID()
+		public let resource: OnLedgerEntity.Resource
+		public var details: Details
 
-		public var id: ID {
-			switch self {
-			case let .fungible(details):
-				return details.id
-			case let .nonFungible(details):
-				return details.id
+		public enum Details: Sendable, Hashable {
+			case fungible(Fungible)
+			case nonFungible(NonFungible)
+
+			public struct Fungible: Sendable, Hashable {
+				public let isXRD: Bool
+				public let amount: BigDecimal
+				public var guarantee: TransactionClient.Guarantee?
 			}
+
+			public typealias NonFungible = AccountPortfolio.NonFungibleResource.NonFungibleToken
 		}
 
-		public var resource: ResourceAddress {
-			switch self {
-			case let .fungible(details):
-				return details.fungibleResource.resourceAddress
-			case let .nonFungible(details):
-				return details.nonFungibleResource.resourceAddress
-			}
-		}
-
-		public var fungible: FungibleTransfer? {
+		/// The guarantee, for a fungible resource
+		public var fungibleGuarantee: TransactionClient.Guarantee? {
 			get {
-				guard case let .fungible(details) = self else { return nil }
-				return details
+				guard case let .fungible(fungible) = details else { return nil }
+				return fungible.guarantee
 			}
 			set {
-				guard case .fungible = self, let newValue else { return }
-				self = .fungible(newValue)
+				guard case var .fungible(fungible) = details else { return }
+				fungible.guarantee = newValue
+				details = .fungible(fungible)
 			}
 		}
-
-		public var nonFungible: NonFungibleTransfer? {
-			get {
-				guard case let .nonFungible(details) = self else { return nil }
-				return details
-			}
-			set {
-				guard case .nonFungible = self, let newValue else { return }
-				self = .nonFungible(newValue)
-			}
-		}
-	}
-
-	public struct FungibleTransfer: Sendable, Hashable {
-		public let id = Transfer.ID()
-		public let fungibleResource: AccountPortfolio.FungibleResource
-		public let isXRD: Bool
-		public var guarantee: TransactionClient.Guarantee?
-	}
-
-	public struct NonFungibleTransfer: Sendable, Hashable {
-		public let id = Transfer.ID()
-		public let nonFungibleResource: AccountPortfolio.NonFungibleResource
-		public let token: AccountPortfolio.NonFungibleResource.NonFungibleToken
 	}
 }
 
 extension TransactionReview.State {
 	public var allGuarantees: [TransactionClient.Guarantee] {
-		deposits?.accounts.flatMap { $0.transfers.compactMap(\.fungible?.guarantee) } ?? []
+		deposits?.accounts.flatMap { $0.transfers.compactMap(\.fungibleGuarantee) } ?? []
 	}
 
 	public mutating func applyGuarantee(_ updated: TransactionClient.Guarantee, transferID: TransactionReview.Transfer.ID) {
 		guard let accountID = accountID(for: transferID) else { return }
-		deposits?.accounts[id: accountID]?.transfers[id: transferID]?.fungible?.guarantee = updated
+		deposits?.accounts[id: accountID]?.transfers[id: transferID]?.fungibleGuarantee = updated
 	}
 
 	private func accountID(for transferID: TransactionReview.Transfer.ID) -> AccountAddress.ID? {
@@ -1239,224 +1205,6 @@ public struct TransactionReviewFailure: LocalizedError {
 		msg += "\n\n[DEBUG] Underlying error: \(String(describing: underylying))"
 		#endif
 		return msg
-	}
-}
-
-// MARK: - SimpleDappDetails
-// FIXME: Remove and make settings use stacks
-
-public struct SimpleDappDetails: Sendable, FeatureReducer {
-	@Dependency(\.errorQueue) var errorQueue
-	@Dependency(\.gatewayAPIClient) var gatewayAPIClient
-	@Dependency(\.openURL) var openURL
-	@Dependency(\.cacheClient) var cacheClient
-
-	public struct FailedToLoadMetadata: Error, Hashable {}
-
-	public typealias Store = StoreOf<Self>
-
-	// MARK: State
-
-	public struct State: Sendable, Hashable {
-		public var dAppID: DappDefinitionAddress
-
-		@Loadable
-		public var metadata: GatewayAPI.EntityMetadataCollection? = nil
-
-		@Loadable
-		public var resources: Resources? = nil
-
-		@Loadable
-		public var associatedDapps: [AssociatedDapp]? = nil
-
-		public init(
-			dAppID: DappDefinitionAddress,
-			metadata: GatewayAPI.EntityMetadataCollection? = nil,
-			resources: Resources? = nil,
-			associatedDapps: [AssociatedDapp]? = nil
-		) {
-			self.dAppID = dAppID
-			self.metadata = metadata
-			self.resources = resources
-			self.associatedDapps = associatedDapps
-		}
-
-		public struct Resources: Hashable, Sendable {
-			public var fungible: [ResourceDetails]
-			public var nonFungible: [ResourceDetails]
-
-			// TODO: This should be consolidated with other types that represent resources
-			public struct ResourceDetails: Identifiable, Hashable, Sendable {
-				public var id: ResourceAddress { address }
-
-				public let address: ResourceAddress
-				public let fungibility: Fungibility
-				public let name: String
-				public let symbol: String?
-				public let description: String?
-				public let iconURL: URL?
-
-				public enum Fungibility: Hashable, Sendable {
-					case fungible
-					case nonFungible
-				}
-			}
-		}
-
-		// TODO: This should be consolidated with other types that represent resources
-		public struct AssociatedDapp: Identifiable, Hashable, Sendable {
-			public var id: DappDefinitionAddress { address }
-
-			public let address: DappDefinitionAddress
-			public let name: String
-			public let iconURL: URL?
-		}
-	}
-
-	// MARK: Action
-
-	public enum ViewAction: Sendable, Equatable {
-		case appeared
-		case openURLTapped(URL)
-	}
-
-	public enum InternalAction: Sendable, Equatable {
-		case metadataLoaded(Loadable<GatewayAPI.EntityMetadataCollection>)
-		case resourcesLoaded(Loadable<State.Resources>)
-		case associatedDappsLoaded(Loadable<[State.AssociatedDapp]>)
-	}
-
-	// MARK: - Destination
-
-	// MARK: Reducer
-
-	public init() {}
-
-	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
-		switch viewAction {
-		case .appeared:
-			state.$metadata = .loading
-			state.$resources = .loading
-			return .run { [dAppID = state.dAppID] send in
-				let result = await TaskResult {
-					try await cacheClient.withCaching(
-						cacheEntry: .dAppMetadata(dAppID.address),
-						request: {
-							try await gatewayAPIClient.getEntityMetadata(dAppID.address, .dappMetadataKeys)
-						}
-					)
-				}
-				await send(.internal(.metadataLoaded(.init(result: result))))
-			}
-
-		case let .openURLTapped(url):
-			return .run { _ in
-				await openURL(url)
-			}
-		}
-	}
-
-	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
-		switch internalAction {
-		case let .metadataLoaded(metadata):
-			state.$metadata = metadata
-
-			let dAppDefinitionAddress = state.dAppID
-			return .run { send in
-				let resources = await metadata.flatMap { await loadResources(metadata: $0, validated: dAppDefinitionAddress) }
-				await send(.internal(.resourcesLoaded(resources)))
-
-				let associatedDapps = await metadata.flatMap { await loadDapps(metadata: $0, validated: dAppDefinitionAddress) }
-				await send(.internal(.associatedDappsLoaded(associatedDapps)))
-			}
-
-		case let .resourcesLoaded(resources):
-			state.$resources = resources
-			return .none
-
-		case let .associatedDappsLoaded(dApps):
-			state.$associatedDapps = dApps
-			return .none
-		}
-	}
-
-	/// Loads any fungible and non-fungible resources associated with the dApp
-	private func loadResources(
-		metadata: GatewayAPI.EntityMetadataCollection,
-		validated dAppDefinitionAddress: DappDefinitionAddress
-	) async -> Loadable<SimpleDappDetails.State.Resources> {
-		guard let claimedEntities = metadata.claimedEntities, !claimedEntities.isEmpty else {
-			return .idle
-		}
-
-		let result = await TaskResult {
-			let allResourceItems = try await gatewayAPIClient.fetchResourceDetails(claimedEntities, explicitMetadata: .resourceMetadataKeys)
-				.items
-				.filter { (try? $0.metadata.validate(dAppDefinitionAddress: dAppDefinitionAddress)) != nil }
-				.compactMap {
-					try $0.resourceDetails()
-				}
-
-			return State.Resources(fungible: allResourceItems.filter { $0.fungibility == .fungible },
-			                       nonFungible: allResourceItems.filter { $0.fungibility == .nonFungible })
-		}
-
-		return .init(result: result)
-	}
-
-	/// Loads any other dApps associated with the dApp
-	private func loadDapps(
-		metadata: GatewayAPI.EntityMetadataCollection,
-		validated dappDefinitionAddress: DappDefinitionAddress
-	) async -> Loadable<[State.AssociatedDapp]> {
-		let dAppDefinitions = try? metadata.dappDefinitions?.compactMap(DappDefinitionAddress.init)
-		guard let dAppDefinitions else { return .idle }
-
-		let associatedDapps = await dAppDefinitions.parallelMap { dApp in
-			try? await extractDappInfo(for: dApp, validating: dappDefinitionAddress)
-		}
-		.compactMap { $0 }
-
-		guard !associatedDapps.isEmpty else { return .idle }
-
-		return .success(associatedDapps)
-	}
-
-	/// Helper function that loads and extracts dApp info for a given dApp, validating that it points back to the dApp of this screen
-	private func extractDappInfo(
-		for dApp: DappDefinitionAddress,
-		validating dAppDefinitionAddress: DappDefinitionAddress
-	) async throws -> State.AssociatedDapp {
-		let metadata = try await gatewayAPIClient.getDappMetadata(dApp, validatingDappDefinitionAddress: dAppDefinitionAddress)
-		guard let name = metadata.name else {
-			throw GatewayAPI.EntityMetadataCollection.MetadataError.missingName
-		}
-		return .init(address: dApp, name: name, iconURL: metadata.iconURL)
-	}
-}
-
-extension GatewayAPI.StateEntityDetailsResponseItem {
-	func resourceDetails() throws -> SimpleDappDetails.State.Resources.ResourceDetails? {
-		guard let fungibility else { return nil }
-		let address = try ResourceAddress(validatingAddress: address)
-		return .init(address: address,
-		             fungibility: fungibility,
-		             name: metadata.name ?? L10n.AuthorizedDapps.DAppDetails.unknownTokenName,
-		             symbol: metadata.symbol,
-		             description: metadata.description,
-		             iconURL: metadata.iconURL)
-	}
-
-	private var fungibility: SimpleDappDetails.State.Resources.ResourceDetails.Fungibility? {
-		guard let details else { return nil }
-		switch details {
-		case .fungibleResource:
-			return .fungible
-		case .nonFungibleResource:
-			return .nonFungible
-		case .fungibleVault, .nonFungibleVault, .package, .component:
-			return nil
-		}
 	}
 }
 

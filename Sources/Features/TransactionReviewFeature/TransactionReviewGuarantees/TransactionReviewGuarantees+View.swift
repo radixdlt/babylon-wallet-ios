@@ -91,9 +91,9 @@ extension TransactionReviewGuarantees {
 extension TransactionReviewGuarantee.State {
 	var viewState: TransactionReviewGuarantee.ViewState {
 		.init(
-			id: transfer.id,
+			id: id,
 			account: account,
-			token: .init(transfer: transfer)
+			token: .init(resource: resource, details: details)
 		)
 	}
 }

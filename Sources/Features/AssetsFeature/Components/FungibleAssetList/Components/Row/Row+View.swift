@@ -59,18 +59,3 @@ extension FungibleAssetList.Row {
 		}
 	}
 }
-
-#if DEBUG
-import SwiftUI // NB: necessary for previews to appear
-
-struct Row_Preview: PreviewProvider {
-	static var previews: some View {
-		FungibleAssetList.Row.View(
-			store: .init(
-				initialState: try! .init(xrdToken: .init(resourceAddress: .init(validatingAddress: "resource_tdx_c_1qyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq40v2wv"), amount: .zero)),
-				reducer: FungibleAssetList.Row.init
-			)
-		)
-	}
-}
-#endif

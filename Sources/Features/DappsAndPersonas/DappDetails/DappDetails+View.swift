@@ -1,6 +1,5 @@
+import AssetsFeature
 import FeaturePrelude
-import PersonaDetailsFeature
-import PersonasFeature
 
 // MARK: - View
 
@@ -20,10 +19,9 @@ extension DappDetails {
 		let domain: URL?
 		let thumbnail: URL?
 		let address: DappDefinitionAddress
-		let fungibles: [State.Resources.ResourceDetails]?
-		let nonFungibles: [State.Resources.ResourceDetails]?
-		let associatedDapps: [State.AssociatedDapp]?
-		let hasPersonas: Bool
+		let associatedDapps: [OnLedgerEntity.AssociatedDapp]?
+		let showForgetDapp: Bool
+		let tappablePersonas: Bool
 	}
 }
 
@@ -43,15 +41,18 @@ extension DappDetails.View {
 
 					NonFungiblesListList(store: store)
 
-					Personas(store: store, hasPersonas: viewStore.hasPersonas)
+					let personasStore = store.scope(state: \.personaList) { .child(.personas($0)) }
+					Personas(store: personasStore, tappablePersonas: viewStore.tappablePersonas)
 						.background(.app.gray5)
 
-					Button(L10n.AuthorizedDapps.ForgetDappAlert.title) {
-						viewStore.send(.forgetThisDappTapped)
+					if viewStore.showForgetDapp {
+						Button(L10n.AuthorizedDapps.ForgetDappAlert.title) {
+							viewStore.send(.forgetThisDappTapped)
+						}
+						.buttonStyle(.primaryRectangular(isDestructive: true))
+						.padding([.horizontal, .top], .medium3)
+						.padding(.bottom, .large2)
 					}
-					.buttonStyle(.primaryRectangular(isDestructive: true))
-					.padding([.horizontal, .top], .medium3)
-					.padding(.bottom, .large2)
 				}
 				.onAppear {
 					viewStore.send(.appeared)
@@ -62,6 +63,18 @@ extension DappDetails.View {
 					state: /DappDetails.Destination.State.personaDetails,
 					action: DappDetails.Destination.Action.personaDetails,
 					destination: { PersonaDetails.View(store: $0) }
+				)
+				.sheet(
+					store: store.destination,
+					state: /DappDetails.Destination.State.fungibleDetails,
+					action: DappDetails.Destination.Action.fungibleDetails,
+					content: { FungibleTokenDetails.View(store: $0) }
+				)
+				.sheet(
+					store: store.destination,
+					state: /DappDetails.Destination.State.nonFungibleDetails,
+					action: DappDetails.Destination.Action.nonFungibleDetails,
+					content: { NonFungibleTokenDetails.View(store: $0) }
 				)
 				.alert(
 					store: store.destination,
@@ -78,16 +91,29 @@ extension DappDetails.View {
 private extension DappDetails.State {
 	var viewState: DappDetails.ViewState {
 		.init(
-			title: dApp.displayName?.rawValue ?? L10n.DAppRequest.Metadata.unknownName,
+			title: authorizedDapp?.displayName?.rawValue ?? metadata?.name ?? L10n.DAppRequest.Metadata.unknownName,
 			description: metadata?.description,
 			domain: metadata?.claimedWebsites?.first,
 			thumbnail: metadata?.iconURL,
-			address: dApp.dAppDefinitionAddress,
-			fungibles: resources?.fungible,
-			nonFungibles: resources?.nonFungible,
+			address: dAppDefinitionAddress,
 			associatedDapps: associatedDapps,
-			hasPersonas: !personaList.personas.isEmpty
+			showForgetDapp: context != .general,
+			tappablePersonas: context == .settings(.authorizedDapps)
 		)
+	}
+
+	var fungibles: [OnLedgerEntity.Resource] {
+		resources?.fungible.elements ?? []
+	}
+
+	var nonFungibles: [OnLedgerEntity.Resource] {
+		resources?.nonFungible.elements ?? []
+	}
+}
+
+extension OnLedgerEntity.Resource {
+	var title: String {
+		name ?? symbol ?? L10n.DAppRequest.Metadata.unknownName
 	}
 }
 
@@ -149,8 +175,8 @@ extension DappDetails.View {
 		let store: StoreOf<DappDetails>
 
 		var body: some View {
-			WithViewStore(store, observe: \.viewState.fungibles, send: { .view($0) }) { viewStore in
-				ListWithHeading(heading: L10n.AuthorizedDapps.DAppDetails.tokens, elements: viewStore.state, title: \.name) { resource in
+			WithViewStore(store, observe: \.fungibles, send: { .view($0) }) { viewStore in
+				ListWithHeading(heading: L10n.AuthorizedDapps.DAppDetails.tokens, elements: viewStore.state, title: \.title) { resource in
 					TokenThumbnail(.known(resource.iconURL), size: .small)
 				} action: { id in
 					viewStore.send(.fungibleTapped(id))
@@ -164,8 +190,8 @@ extension DappDetails.View {
 		let store: StoreOf<DappDetails>
 
 		var body: some View {
-			WithViewStore(store, observe: \.viewState.nonFungibles, send: { .view($0) }) { viewStore in
-				ListWithHeading(heading: L10n.AuthorizedDapps.DAppDetails.nfts, elements: viewStore.state, title: \.name) { resource in
+			WithViewStore(store, observe: \.nonFungibles, send: { .view($0) }) { viewStore in
+				ListWithHeading(heading: L10n.AuthorizedDapps.DAppDetails.nfts, elements: viewStore.state, title: \.title) { resource in
 					NFTThumbnail(resource.iconURL, size: .small)
 				} action: { id in
 					viewStore.send(.nonFungibleTapped(id))
@@ -177,13 +203,13 @@ extension DappDetails.View {
 	@MainActor
 	struct ListWithHeading<Element: Identifiable, Icon: View>: View {
 		let heading: String
-		let elements: [Element]?
+		let elements: [Element]
 		let title: (Element) -> String
 		let icon: (Element) -> Icon
 		let action: (Element.ID) -> Void
 
 		var body: some View {
-			if let elements, !elements.isEmpty {
+			if !elements.isEmpty {
 				VStack(alignment: .leading, spacing: .medium3) {
 					Text(heading)
 						.sectionHeading
@@ -207,28 +233,37 @@ extension DappDetails.View {
 
 	@MainActor
 	struct Personas: View {
-		let store: StoreOf<DappDetails>
-		let hasPersonas: Bool
+		struct ViewState: Equatable {
+			let hasPersonas: Bool
+
+			init(state: PersonaList.State) {
+				self.hasPersonas = !state.personas.isEmpty
+			}
+		}
+
+		let store: StoreOf<PersonaList>
+		let tappablePersonas: Bool
 
 		var body: some View {
-			if hasPersonas {
-				Text(L10n.AuthorizedDapps.DAppDetails.personasHeading)
-					.sectionHeading
-					.flushedLeft
-					.padding(.horizontal, .medium1)
-					.padding(.vertical, .small2)
+			WithViewStore(store, observe: ViewState.init) { viewStore in
+				if viewStore.hasPersonas {
+					Text(L10n.AuthorizedDapps.DAppDetails.personasHeading)
+						.sectionHeading
+						.flushedLeft
+						.padding(.horizontal, .medium1)
+						.padding(.vertical, .small2)
 
-				Separator()
-					.padding(.bottom, .small2)
+					Separator()
+						.padding(.bottom, .small2)
 
-				let personasStore = store.scope(state: \.personaList) { .child(.personas($0)) }
-				PersonaListCoreView(store: personasStore)
-			} else {
-				Text(L10n.AuthorizedDapps.DAppDetails.noPersonasHeading)
-					.sectionHeading
-					.flushedLeft
-					.padding(.horizontal, .medium1)
-					.padding(.vertical, .small2)
+					PersonaListCoreView(store: store, tappable: tappablePersonas)
+				} else {
+					Text(L10n.AuthorizedDapps.DAppDetails.noPersonasHeading)
+						.sectionHeading
+						.flushedLeft
+						.padding(.horizontal, .medium1)
+						.padding(.vertical, .small2)
+				}
 			}
 		}
 	}

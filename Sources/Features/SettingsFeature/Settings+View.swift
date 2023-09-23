@@ -1,10 +1,9 @@
-import AuthorizedDAppsFeature
+import DappsAndPersonasFeature
 import FeaturePrelude
 import GatewayAPI
 import GatewaySettingsFeature
 import LedgerHardwareDevicesFeature
 import P2PLinksFeature
-import PersonasFeature
 import ProfileBackupsFeature
 #if DEBUG
 import DebugInspectProfileFeature

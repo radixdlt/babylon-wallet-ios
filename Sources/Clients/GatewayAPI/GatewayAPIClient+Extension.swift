@@ -193,9 +193,9 @@ extension GatewayAPIClient {
 	}
 }
 
-extension GatewayAPI.StateEntityDetailsResponseItem {
+extension GatewayAPI.EntityMetadataCollection {
 	@Sendable public func extractTags() -> [AssetTag] {
-		metadata.tags?.compactMap(NonEmptyString.init(rawValue:)).map(AssetTag.init) ?? []
+		tags?.compactMap(NonEmptyString.init(rawValue:)).map(AssetTag.init) ?? []
 	}
 }
 

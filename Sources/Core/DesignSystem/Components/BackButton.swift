@@ -2,7 +2,7 @@ import Resources
 import SwiftUI
 
 // MARK: - BackButton
-public struct BackButton: View {
+public struct BackButton: SwiftUI.View {
 	let action: () -> Void
 
 	public init(action: @escaping () -> Void) {
@@ -11,7 +11,7 @@ public struct BackButton: View {
 }
 
 extension BackButton {
-	public var body: some View {
+	public var body: some SwiftUI.View {
 		Button(action: action) {
 			Image(asset: AssetResource.arrowBack).tint(.app.gray1)
 		}

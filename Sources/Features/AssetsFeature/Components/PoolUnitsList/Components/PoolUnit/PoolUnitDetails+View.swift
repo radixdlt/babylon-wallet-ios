@@ -5,7 +5,7 @@ extension PoolUnitDetails.State {
 	var viewState: PoolUnitDetails.ViewState {
 		let resource = poolUnit.poolUnitResource
 		return .init(
-			containerWithHeader: resource.detailsHeader(withAmount: true),
+			containerWithHeader: .init(resource: resource),
 			thumbnailURL: resource.iconURL,
 			resources: poolUnit.resourceViewStates,
 			resourceDetails: .init(
@@ -46,6 +46,8 @@ extension PoolUnitDetails {
 				send: PoolUnitDetails.Action.view
 			) { viewStore in
 				DetailsContainerWithHeaderView(viewState: viewStore.containerWithHeader) {
+					viewStore.send(.closeButtonTapped)
+				} thumbnailView: {
 					NFTThumbnail(viewStore.thumbnailURL, size: .veryLarge)
 				} detailsView: {
 					VStack(spacing: .medium1) {
@@ -61,20 +63,8 @@ extension PoolUnitDetails {
 						AssetResourceDetailsSection(viewState: viewStore.resourceDetails)
 					}
 					.padding(.bottom, .medium1)
-				} closeButtonAction: {
-					viewStore.send(.closeButtonTapped)
 				}
 			}
 		}
-	}
-}
-
-extension AccountPortfolio.FungibleResource {
-	func detailsHeader(withAmount showAmount: Bool) -> DetailsContainerWithHeaderViewState {
-		.init(
-			title: name ?? L10n.Account.PoolUnits.unknownPoolUnitName,
-			amount: showAmount ? amount.format() : nil,
-			symbol: symbol
-		)
 	}
 }

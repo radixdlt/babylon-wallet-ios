@@ -44,13 +44,13 @@ package.addModules([
 		dependencies: [
 			"FaucetClient",
 			"AccountPortfoliosClient",
-			"CreateAuthKeyFeature",
 			"ShowQRFeature",
 			"GatewaysClient",
 			"OverlayWindowClient",
 			"OnLedgerEntitiesClient",
 			"DappInteractionClient",
 			"SubmitTransactionClient",
+			"TransactionReviewFeature",
 		],
 		tests: .yes()
 	),
@@ -117,32 +117,11 @@ package.addModules([
 		tests: .no
 	),
 	.feature(
-		name: "AuthorizedDAppsFeature",
-		dependencies: [
-			"AuthorizedDappsClient",
-			"CacheClient",
-			"EditPersonaFeature",
-			"PersonasFeature",
-			"GatewayAPI",
-		],
-		tests: .no
-	),
-	.feature(
 		name: "ChooseAccountsFeature",
 		featureSuffixDroppedFromFolderName: true,
 		dependencies: [
 			"AccountsClient",
 			"CreateAccountFeature",
-		],
-		tests: .no
-	),
-	.feature(
-		name: "CreateAuthKeyFeature",
-		featureSuffixDroppedFromFolderName: true,
-		dependencies: [
-			"TransactionReviewFeature",
-			"DerivePublicKeysFeature",
-			"ROLAClient",
 		],
 		tests: .no
 	),
@@ -194,6 +173,22 @@ package.addModules([
 			"OverlayWindowClient",
 		],
 		tests: .yes()
+	),
+	.feature(
+		name: "DappsAndPersonasFeature",
+		featureSuffixDroppedFromFolderName: true,
+		dependencies: [
+			"AuthorizedDappsClient",
+			"AssetsFeature",
+			"CacheClient",
+			"CreatePersonaFeature",
+			"EditPersonaFeature",
+			"EngineKit",
+			"GatewayAPI",
+			"OnLedgerEntitiesClient",
+			"PersonasClient",
+		],
+		tests: .no
 	),
 	.feature(
 		name: "DebugInspectProfileFeature",
@@ -342,25 +337,6 @@ package.addModules([
 		tests: .yes()
 	),
 	.feature(
-		name: "PersonasFeature",
-		dependencies: [
-			"PersonaDetailsFeature",
-			"CreatePersonaFeature",
-			"PersonasClient",
-		],
-		tests: .yes()
-	),
-	.feature(
-		name: "PersonaDetailsFeature",
-		dependencies: [
-			"AuthorizedDappsClient",
-			"EditPersonaFeature",
-			"CreateAuthKeyFeature",
-			"GatewayAPI",
-		],
-		tests: .no
-	),
-	.feature(
 		name: "ProfileBackupsFeature",
 		dependencies: [
 			"AppPreferencesClient",
@@ -404,8 +380,10 @@ package.addModules([
 			"AccountsClient",
 			"AddLedgerFactorSourceFeature",
 			"AppPreferencesClient",
-			"AuthorizedDAppsFeature",
+			"AuthorizedDappsClient",
 			"CacheClient",
+			"CreatePersonaFeature",
+			"DappsAndPersonasFeature",
 			"DebugInspectProfileFeature",
 			"DeviceFactorSourceClient",
 			"DisplayEntitiesControlledByMnemonicFeature",
@@ -419,11 +397,12 @@ package.addModules([
 			"ImportOlympiaLedgerAccountsAndFactorSourcesFeature",
 			"ImportLegacyWalletClient",
 			"P2PLinksFeature",
-			"PersonasFeature",
+			"PersonasClient",
 			"RadixConnectClient",
 			"ProfileBackupsFeature",
 			"ScanQRFeature",
 			"SecurityStructureConfigurationListFeature",
+			"TransactionReviewFeature",
 		],
 		tests: .yes()
 	),
@@ -462,6 +441,7 @@ package.addModules([
 		dependencies: [
 			"AssetsFeature",
 			"AuthorizedDappsClient",
+			"DappsAndPersonasFeature",
 			"GatewayAPI",
 			"OnLedgerEntitiesClient",
 			"TransactionClient",

@@ -42,74 +42,43 @@ extension AccountPortfolio {
 	}
 
 	public struct FungibleResource: Sendable, Hashable, Identifiable, Codable {
-		public var id: ResourceAddress { resourceAddress }
-
-		public let resourceAddress: ResourceAddress
+		public let resource: OnLedgerEntity.Resource
 		public let amount: BigDecimal
-		public let divisibility: Int?
-		public let name: String?
-		public let symbol: String?
-		public let description: String?
-		public let iconURL: URL?
-		public let behaviors: [AssetBehavior]
-		public let tags: [AssetTag]
-		public let totalSupply: BigDecimal?
-		// TBD: Add the rest of required metadata fields
 
-		public init(
-			resourceAddress: ResourceAddress,
-			amount: BigDecimal,
-			divisibility: Int? = nil,
-			name: String? = nil,
-			symbol: String? = nil,
-			description: String? = nil,
-			iconURL: URL? = nil,
-			behaviors: [AssetBehavior] = [],
-			tags: [AssetTag] = [],
-			totalSupply: BigDecimal? = nil
-		) {
-			self.resourceAddress = resourceAddress
+		public var id: ResourceAddress { resourceAddress }
+		public var resourceAddress: ResourceAddress { resource.resourceAddress }
+		public var divisibility: Int? { resource.divisibility }
+		public var name: String? { resource.name }
+		public var symbol: String? { resource.symbol }
+		public var description: String? { resource.description }
+		public var iconURL: URL? { resource.iconURL }
+		public var behaviors: [AssetBehavior] { resource.behaviors }
+		public var tags: [AssetTag] { resource.tags }
+		public var totalSupply: BigDecimal? { resource.totalSupply }
+
+		public init(resource: OnLedgerEntity.Resource, amount: BigDecimal) {
+			self.resource = resource
 			self.amount = amount
-			self.divisibility = divisibility
-			self.name = name
-			self.symbol = symbol
-			self.description = description
-			self.iconURL = iconURL
-			self.behaviors = behaviors
-			self.tags = tags
-			self.totalSupply = totalSupply
 		}
 	}
 
 	public struct NonFungibleResource: Sendable, Hashable, Identifiable, Codable {
-		public var id: ResourceAddress { resourceAddress }
-		public let resourceAddress: ResourceAddress
-		public let name: String?
-		public let description: String?
-		public let iconURL: URL?
-		public let behaviors: [AssetBehavior]
-		public let tags: [AssetTag]
+		public let resource: OnLedgerEntity.Resource
 		public let tokens: IdentifiedArrayOf<NonFungibleToken>
-		public let totalSupply: BigDecimal?
 
-		public init(
-			resourceAddress: ResourceAddress,
-			name: String? = nil,
-			description: String? = nil,
-			iconURL: URL? = nil,
-			behaviors: [AssetBehavior] = [],
-			tags: [AssetTag] = [],
-			tokens: IdentifiedArrayOf<NonFungibleToken> = [],
-			totalSupply: BigDecimal? = nil
-		) {
-			self.resourceAddress = resourceAddress
-			self.name = name
-			self.description = description
-			self.iconURL = iconURL
-			self.behaviors = behaviors
-			self.tags = tags
+		public var id: ResourceAddress { resourceAddress }
+		public var resourceAddress: ResourceAddress { resource.resourceAddress }
+		public var name: String? { resource.name }
+		public var symbol: String? { resource.symbol }
+		public var description: String? { resource.description }
+		public var iconURL: URL? { resource.iconURL }
+		public var behaviors: [AssetBehavior] { resource.behaviors }
+		public var tags: [AssetTag] { resource.tags }
+		public var totalSupply: BigDecimal? { resource.totalSupply }
+
+		public init(resource: OnLedgerEntity.Resource, tokens: IdentifiedArrayOf<NonFungibleToken>) {
+			self.resource = resource
 			self.tokens = tokens
-			self.totalSupply = totalSupply
 		}
 
 		public struct NonFungibleToken: Sendable, Hashable, Identifiable, Codable {
@@ -184,9 +153,9 @@ extension AccountPortfolio.PoolUnitResources {
 		}
 
 		public func redemptionValue(for resource: AccountPortfolio.FungibleResource) -> String {
-			let poolUnitTotalSupply = poolUnitResource.totalSupply ?? .one
+			let poolUnitTotalSupply = poolUnitResource.resource.totalSupply ?? .one
 			let unroundedRedemptionValue = poolUnitResource.amount * resource.amount / poolUnitTotalSupply
-			return unroundedRedemptionValue.format(divisibility: resource.divisibility)
+			return unroundedRedemptionValue.format(divisibility: resource.resource.divisibility)
 		}
 	}
 
@@ -221,7 +190,7 @@ extension AccountPortfolio.PoolUnitResources {
 			guard let stakeUnitResource else {
 				return nil
 			}
-			return (stakeUnitResource.amount * validator.xrdVaultBalance) / (stakeUnitResource.totalSupply ?? .one)
+			return (stakeUnitResource.amount * validator.xrdVaultBalance) / (stakeUnitResource.resource.totalSupply ?? .one)
 		}
 
 		public init(validator: Validator, stakeUnitResource: AccountPortfolio.FungibleResource?, stakeClaimResource: AccountPortfolio.NonFungibleResource?) {

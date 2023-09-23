@@ -76,15 +76,8 @@ extension TransactionReviewAccount {
 					SmallAccountCard(account: viewStore.account)
 
 					ForEach(viewStore.transfers) { transfer in
-						switch transfer {
-						case let .fungible(details):
-							TransactionReviewTokenView(viewState: .init(transfer: details)) {
-								viewStore.send(.transferTapped(transfer))
-							}
-						case let .nonFungible(details):
-							TransferNFTView(viewState: .init(transfer: details)) {
-								viewStore.send(.transferTapped(transfer))
-							}
+						TransactionReviewResourceView(transfer: transfer) {
+							viewStore.send(.transferTapped(transfer))
 						}
 					}
 					.background(.app.gray5)
@@ -94,26 +87,40 @@ extension TransactionReviewAccount {
 	}
 }
 
+// MARK: - TransactionReviewResourceView
+struct TransactionReviewResourceView: View {
+	let transfer: TransactionReview.Transfer
+	let onTap: () -> Void
+
+	var body: some View {
+		switch transfer.details {
+		case let .fungible(details):
+			let viewState = TransactionReviewTokenView.ViewState(resource: transfer.resource, details: details)
+			TransactionReviewTokenView(viewState: viewState, onTap: onTap)
+		case let .nonFungible(details):
+			TransferNFTView(viewState: .init(resource: transfer.resource, details: details), onTap: onTap)
+		}
+	}
+}
+
 extension TransactionReviewTokenView.ViewState {
-	init(transfer: TransactionReview.FungibleTransfer) {
-		let resource = transfer.fungibleResource
+	init(resource: OnLedgerEntity.Resource, details: TransactionReview.Transfer.Details.Fungible) {
 		self.init(
 			name: resource.symbol ?? resource.name ?? L10n.TransactionReview.unknown,
-			thumbnail: transfer.isXRD ? .xrd : .known(resource.iconURL),
-			amount: resource.amount,
-			guaranteedAmount: transfer.guarantee?.amount,
+			thumbnail: details.isXRD ? .xrd : .known(resource.iconURL),
+			amount: details.amount,
+			guaranteedAmount: details.guarantee?.amount,
 			fiatAmount: nil
 		)
 	}
 }
 
 extension TransferNFTView.ViewState {
-	init(transfer: TransactionReview.NonFungibleTransfer) {
-		let token = transfer.token
+	init(resource: OnLedgerEntity.Resource, details: TransactionReview.Transfer.Details.NonFungible) {
 		self.init(
-			tokenID: token.id.localId().toUserFacingString(),
-			tokenName: token.name,
-			thumbnail: transfer.nonFungibleResource.iconURL
+			tokenID: details.id.localId().toUserFacingString(),
+			tokenName: details.name,
+			thumbnail: resource.iconURL
 		)
 	}
 }

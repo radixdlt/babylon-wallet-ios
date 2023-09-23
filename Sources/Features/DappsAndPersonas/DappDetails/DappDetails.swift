@@ -1,10 +1,11 @@
+import AssetsFeature
 import AuthorizedDappsClient
 import CacheClient
+import EditPersonaFeature
 import EngineKit
 import FeaturePrelude
 import GatewayAPI
-import PersonaDetailsFeature
-import PersonasFeature
+import OnLedgerEntitiesClient
 
 // MARK: - DappDetails
 public struct DappDetails: Sendable, FeatureReducer {
@@ -15,6 +16,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 	@Dependency(\.authorizedDappsClient) var authorizedDappsClient
 	@Dependency(\.cacheClient) var cacheClient
 	@Dependency(\.continuousClock) var clock
+	@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
 
 	public struct FailedToLoadMetadata: Error, Hashable {}
 
@@ -23,7 +25,24 @@ public struct DappDetails: Sendable, FeatureReducer {
 	// MARK: State
 
 	public struct State: Sendable, Hashable {
-		public var dApp: Profile.Network.AuthorizedDappDetailed
+		public enum Context: Sendable, Hashable {
+			case general
+			case settings(SettingsContext)
+
+			public enum SettingsContext: Sendable, Hashable {
+				case personaDetails
+				case authorizedDapps
+			}
+		}
+
+		public let context: Context
+
+		public let dAppDefinitionAddress: DappDefinitionAddress
+
+		// This will only be non-nil if the dApp is in fact authorized
+		public var authorizedDapp: Profile.Network.AuthorizedDappDetailed?
+
+		public var personaList: PersonaList.State
 
 		@Loadable
 		public var metadata: GatewayAPI.EntityMetadataCollection? = nil
@@ -32,58 +51,51 @@ public struct DappDetails: Sendable, FeatureReducer {
 		public var resources: Resources? = nil
 
 		@Loadable
-		public var associatedDapps: [AssociatedDapp]? = nil
-
-		public var personaList: PersonaList.State
+		public var associatedDapps: [OnLedgerEntity.AssociatedDapp]? = nil
 
 		@PresentationState
 		public var destination: Destination.State? = nil
 
+		// Authorized dApp
 		public init(
 			dApp: Profile.Network.AuthorizedDappDetailed,
+			context: Context.SettingsContext,
 			metadata: GatewayAPI.EntityMetadataCollection? = nil,
 			resources: Resources? = nil,
-			associatedDapps: [AssociatedDapp]? = nil,
-			personaDetails: PersonaDetails.State? = nil,
+			associatedDapps: [OnLedgerEntity.AssociatedDapp]? = nil,
 			destination: Destination.State? = nil
 		) {
-			self.dApp = dApp
+			self.context = .settings(context)
+			self.dAppDefinitionAddress = dApp.dAppDefinitionAddress
+			self.authorizedDapp = dApp
+			self.personaList = .init(dApp: dApp)
 			self.metadata = metadata
 			self.resources = resources
 			self.associatedDapps = associatedDapps
-			self.personaList = .init(dApp: dApp)
+			self.destination = destination
+		}
+
+		// General
+		public init(
+			dAppDefinitionAddress: DappDefinitionAddress,
+			metadata: GatewayAPI.EntityMetadataCollection? = nil,
+			resources: Resources? = nil,
+			associatedDapps: [OnLedgerEntity.AssociatedDapp]? = nil,
+			destination: Destination.State? = nil
+		) {
+			self.context = .general
+			self.dAppDefinitionAddress = dAppDefinitionAddress
+			self.authorizedDapp = nil
+			self.personaList = .init()
+			self.metadata = metadata
+			self.resources = resources
+			self.associatedDapps = associatedDapps
 			self.destination = destination
 		}
 
 		public struct Resources: Hashable, Sendable {
-			public var fungible: [ResourceDetails]
-			public var nonFungible: [ResourceDetails]
-
-			// TODO: This should be consolidated with other types that represent resources
-			public struct ResourceDetails: Identifiable, Hashable, Sendable {
-				public var id: ResourceAddress { address }
-
-				public let address: ResourceAddress
-				public let fungibility: Fungibility
-				public let name: String
-				public let symbol: String?
-				public let description: String?
-				public let iconURL: URL?
-
-				public enum Fungibility: Hashable, Sendable {
-					case fungible
-					case nonFungible
-				}
-			}
-		}
-
-		// TODO: This should be consolidated with other types that represent resources
-		public struct AssociatedDapp: Identifiable, Hashable, Sendable {
-			public var id: DappDefinitionAddress { address }
-
-			public let address: DappDefinitionAddress
-			public let name: String
-			public let iconURL: URL?
+			public var fungible: IdentifiedArrayOf<OnLedgerEntity.Resource>
+			public var nonFungible: IdentifiedArrayOf<OnLedgerEntity.Resource>
 		}
 	}
 
@@ -105,7 +117,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 	public enum InternalAction: Sendable, Equatable {
 		case metadataLoaded(Loadable<GatewayAPI.EntityMetadataCollection>)
 		case resourcesLoaded(Loadable<State.Resources>)
-		case associatedDappsLoaded(Loadable<[State.AssociatedDapp]>)
+		case associatedDappsLoaded(Loadable<[OnLedgerEntity.AssociatedDapp]>)
 		case dAppUpdated(Profile.Network.AuthorizedDappDetailed)
 	}
 
@@ -119,11 +131,17 @@ public struct DappDetails: Sendable, FeatureReducer {
 	public struct Destination: Reducer {
 		public enum State: Equatable, Hashable {
 			case personaDetails(PersonaDetails.State)
+			case fungibleDetails(FungibleTokenDetails.State)
+			case nonFungibleDetails(NonFungibleTokenDetails.State)
+			case dappDetails(DappDetails.State)
 			case confirmDisconnectAlert(AlertState<Action.ConfirmDisconnectAlert>)
 		}
 
 		public enum Action: Equatable {
 			case personaDetails(PersonaDetails.Action)
+			case fungibleDetails(FungibleTokenDetails.Action)
+			case nonFungibleDetails(NonFungibleTokenDetails.Action)
+			case dappDetails(DappDetails.Action)
 			case confirmDisconnectAlert(ConfirmDisconnectAlert)
 
 			public enum ConfirmDisconnectAlert: Sendable, Equatable {
@@ -136,10 +154,24 @@ public struct DappDetails: Sendable, FeatureReducer {
 			Scope(state: /State.personaDetails, action: /Action.personaDetails) {
 				PersonaDetails()
 			}
+			Scope(state: /State.fungibleDetails, action: /Action.fungibleDetails) {
+				FungibleTokenDetails()
+			}
+			Scope(state: /State.nonFungibleDetails, action: /Action.nonFungibleDetails) {
+				NonFungibleTokenDetails()
+			}
 		}
 	}
 
 	// MARK: Reducer
+
+	struct MissingResource: LocalizedError {
+		let address: ResourceAddress
+
+		var errorDescription: String {
+			"Missing resource: \(address)"
+		}
+	}
 
 	public init() {}
 
@@ -158,8 +190,13 @@ public struct DappDetails: Sendable, FeatureReducer {
 		case .appeared:
 			state.$metadata = .loading
 			state.$resources = .loading
-			let dAppID = state.dApp.dAppDefinitionAddress
+			let dAppID = state.dAppDefinitionAddress
+			let checkForAuthorizedDapp = state.authorizedDapp == nil
 			return .run { send in
+				if checkForAuthorizedDapp, let authorizedDapp = try? await authorizedDappsClient.getDetailedDapp(dAppID) {
+					await send(.internal(.dAppUpdated(authorizedDapp)))
+				}
+
 				let result = await TaskResult {
 					try await cacheClient.withCaching(
 						cacheEntry: .dAppMetadata(dAppID.address),
@@ -169,6 +206,8 @@ public struct DappDetails: Sendable, FeatureReducer {
 					)
 				}
 				await send(.internal(.metadataLoaded(.init(result: result))))
+			} catch: { error, _ in
+				errorQueue.schedule(error)
 			}
 
 		case let .openURLTapped(url):
@@ -177,15 +216,26 @@ public struct DappDetails: Sendable, FeatureReducer {
 			}
 
 		case let .fungibleTapped(address):
-			// TODO: Handle this
+			guard let resource = state.resources?.fungible[id: address] else {
+				errorQueue.schedule(MissingResource(address: address))
+				return .none
+			}
+
+			// FIXME: Can a dApp be associated with XRD
+			state.destination = .fungibleDetails(.init(resource: resource, isXRD: false))
 			return .none
 
 		case let .nonFungibleTapped(address):
-			// TODO: Handle this
+			guard let resource = state.resources?.nonFungible[id: address] else {
+				errorQueue.schedule(MissingResource(address: address))
+				return .none
+			}
+
+			state.destination = .nonFungibleDetails(.init(resource: resource))
 			return .none
 
 		case let .dAppTapped(address):
-			// TODO: Handle this
+			state.destination = .dappDetails(.init(dAppDefinitionAddress: address))
 			return .none
 
 		case .forgetThisDappTapped:
@@ -199,15 +249,25 @@ public struct DappDetails: Sendable, FeatureReducer {
 		case let .destination(.presented(destinationAction)):
 			switch destinationAction {
 			case .personaDetails(.delegate(.personaDeauthorized)):
-				let dAppID = state.dApp.dAppDefinitionAddress
+				let dAppID = state.dAppDefinitionAddress
 				return update(dAppID: dAppID, dismissPersonaDetails: true)
 
 			case .personaDetails(.delegate(.personaChanged)):
-				let dAppID = state.dApp.dAppDefinitionAddress
+				let dAppID = state.dAppDefinitionAddress
 				return update(dAppID: dAppID, dismissPersonaDetails: false)
 
+			case .fungibleDetails(.delegate(.dismiss)):
+				state.destination = nil
+				return .none
+
+			case .nonFungibleDetails(.delegate(.dismiss)):
+				state.destination = nil
+				return .none
+
 			case .confirmDisconnectAlert(.confirmTapped):
-				return disconnectDappEffect(dApp: state.dApp)
+				assert(state.authorizedDapp != nil, "Can only disconnect a dApp that has been authorized")
+				guard let networkID = state.authorizedDapp?.networkID else { return .none }
+				return disconnectDappEffect(dAppID: state.dAppDefinitionAddress, networkID: networkID)
 
 			default:
 				return .none
@@ -217,8 +277,8 @@ public struct DappDetails: Sendable, FeatureReducer {
 			return .none
 
 		case let .personas(.delegate(.openDetails(persona))):
-			guard let detailedPersona = state.dApp.detailedAuthorizedPersonas[id: persona.id] else { return .none }
-			let personaDetailsState = PersonaDetails.State(.dApp(state.dApp, persona: detailedPersona))
+			guard let dApp = state.authorizedDapp, let detailedPersona = dApp.detailedAuthorizedPersonas[id: persona.id] else { return .none }
+			let personaDetailsState = PersonaDetails.State(.dApp(dApp, persona: detailedPersona))
 			state.destination = .personaDetails(personaDetailsState)
 			return .none
 
@@ -232,7 +292,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 		case let .metadataLoaded(metadata):
 			state.$metadata = metadata
 
-			let dAppDefinitionAddress = state.dApp.dAppDefinitionAddress
+			let dAppDefinitionAddress = state.dAppDefinitionAddress
 			return .run { send in
 				let resources = await metadata.flatMap { await loadResources(metadata: $0, validated: dAppDefinitionAddress) }
 				await send(.internal(.resourcesLoaded(resources)))
@@ -250,12 +310,13 @@ public struct DappDetails: Sendable, FeatureReducer {
 			return .none
 
 		case let .dAppUpdated(dApp):
-			assert(dApp.dAppDefinitionAddress == state.dApp.dAppDefinitionAddress, "dAppUpdated called with wrong dApp")
+			assert(dApp.dAppDefinitionAddress == state.dAppDefinitionAddress, "dAppUpdated called with wrong dApp")
 			guard !dApp.detailedAuthorizedPersonas.isEmpty else {
 				// FIXME: Without this delay, the screen is never dismissed
-				return disconnectDappEffect(dApp: state.dApp, delay: .milliseconds(500))
+				return disconnectDappEffect(dAppID: dApp.dAppDefinitionAddress, networkID: dApp.networkID, delay: .milliseconds(500))
 			}
-			state.dApp = dApp
+			state.authorizedDapp = dApp
+			state.personaList = .init(dApp: dApp)
 
 			return .none
 		}
@@ -265,19 +326,17 @@ public struct DappDetails: Sendable, FeatureReducer {
 	private func loadResources(
 		metadata: GatewayAPI.EntityMetadataCollection,
 		validated dAppDefinitionAddress: DappDefinitionAddress
-	) async -> Loadable<DappDetails.State.Resources> {
-		guard let claimedEntities = metadata.claimedEntities, !claimedEntities.isEmpty else {
-			return .idle
-		}
+	) async -> Loadable<State.Resources> {
+		let resources = metadata.claimedEntities?.compactMap { try? ResourceAddress(validatingAddress: $0) } ?? []
+		guard !resources.isEmpty else { return .idle }
 
 		let result = await TaskResult {
-			let allResourceItems = try await gatewayAPIClient.fetchResourceDetails(claimedEntities, explicitMetadata: .resourceMetadataKeys)
-				.items
-				.filter { $0.metadata.dappDefinition == dAppDefinitionAddress.address }
-				.compactMap(\.resourceDetails)
+			let items = try await onLedgerEntitiesClient.getResources(resources)
+				.filter { $0.dappDefinitions?.contains(dAppDefinitionAddress) == true }
+			let fungible: IdentifiedArray = .init(items.filter { $0.fungibility == .fungible }) { $1 }
+			let nonFungible: IdentifiedArray = .init(items.filter { $0.fungibility == .nonFungible }) { $1 }
 
-			return State.Resources(fungible: allResourceItems.filter { $0.fungibility == .fungible },
-			                       nonFungible: allResourceItems.filter { $0.fungibility == .nonFungible })
+			return State.Resources(fungible: fungible, nonFungible: nonFungible)
 		}
 
 		return .init(result: result)
@@ -287,7 +346,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 	private func loadDapps(
 		metadata: GatewayAPI.EntityMetadataCollection,
 		validated dappDefinitionAddress: DappDefinitionAddress
-	) async -> Loadable<[State.AssociatedDapp]> {
+	) async -> Loadable<[OnLedgerEntity.AssociatedDapp]> {
 		let dAppDefinitions = try? metadata.dappDefinitions?.compactMap(DappDefinitionAddress.init)
 		guard let dAppDefinitions else { return .idle }
 
@@ -305,10 +364,8 @@ public struct DappDetails: Sendable, FeatureReducer {
 	private func extractDappInfo(
 		for dApp: DappDefinitionAddress,
 		validating dAppDefinitionAddress: DappDefinitionAddress
-	) async throws -> State.AssociatedDapp {
-		let metadata = try await gatewayAPIClient.getEntityMetadata(dApp.address, [.name, .iconURL])
-		// FIXME: Uncomment this when when we can rely on dApps conforming to the standards
-		// .validating(dAppDefinitionAddress: dAppDefinitionAddress)
+	) async throws -> OnLedgerEntity.AssociatedDapp {
+		let metadata = try await gatewayAPIClient.getDappMetadata(dApp, validatingDappDefinitionAddress: dAppDefinitionAddress)
 		guard let name = metadata.name else {
 			throw GatewayAPI.EntityMetadataCollection.MetadataError.missingName
 		}
@@ -327,9 +384,8 @@ public struct DappDetails: Sendable, FeatureReducer {
 		}
 	}
 
-	private func disconnectDappEffect(dApp: Profile.Network.AuthorizedDappDetailed, delay: Duration? = .zero) -> Effect<Action> {
-		let (dAppID, networkID) = (dApp.dAppDefinitionAddress, dApp.networkID)
-		return .run { send in
+	private func disconnectDappEffect(dAppID: DappDefinitionAddress, networkID: NetworkID, delay: Duration? = .zero) -> Effect<Action> {
+		.run { send in
 			if let delay {
 				try await clock.sleep(for: delay)
 			}
@@ -337,30 +393,6 @@ public struct DappDetails: Sendable, FeatureReducer {
 			await send(.delegate(.dAppForgotten))
 		} catch: { error, _ in
 			errorQueue.schedule(error)
-		}
-	}
-}
-
-extension GatewayAPI.StateEntityDetailsResponseItem {
-	var resourceDetails: DappDetails.State.Resources.ResourceDetails? {
-		guard let fungibility else { return nil }
-		return try? .init(address: .init(validatingAddress: address),
-		                  fungibility: fungibility,
-		                  name: metadata.name ?? L10n.AuthorizedDapps.DAppDetails.unknownTokenName,
-		                  symbol: metadata.symbol,
-		                  description: metadata.description,
-		                  iconURL: metadata.iconURL)
-	}
-
-	private var fungibility: DappDetails.State.Resources.ResourceDetails.Fungibility? {
-		guard let details else { return nil }
-		switch details {
-		case .fungibleResource:
-			return .fungible
-		case .nonFungibleResource:
-			return .nonFungible
-		case .fungibleVault, .nonFungibleVault, .package, .component:
-			return nil
 		}
 	}
 }

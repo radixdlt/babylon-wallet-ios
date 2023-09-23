@@ -3,12 +3,12 @@ import FeaturePrelude
 // MARK: - NonFungibleTokenDetails
 public struct NonFungibleTokenDetails: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
-		public let token: AccountPortfolio.NonFungibleResource.NonFungibleToken
-		public let resource: AccountPortfolio.NonFungibleResource
+		public let resource: OnLedgerEntity.Resource
+		public let token: AccountPortfolio.NonFungibleResource.NonFungibleToken?
 
-		public init(token: AccountPortfolio.NonFungibleResource.NonFungibleToken, resource: AccountPortfolio.NonFungibleResource) {
-			self.token = token
+		public init(resource: OnLedgerEntity.Resource, token: AccountPortfolio.NonFungibleResource.NonFungibleToken? = nil) {
 			self.resource = resource
+			self.token = token
 		}
 	}
 
