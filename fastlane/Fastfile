@@ -55,6 +55,9 @@ platform :ios do
         add_git_tag(tag: tag)
         push_to_git_remote
 
+        # We dont wanna do GH releases for Alpha or PreAlpha
+        return if flavour.include?("Alpha")
+
         create_gh_release(flavour: flavour)
     end
 
