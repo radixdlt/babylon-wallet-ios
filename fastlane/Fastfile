@@ -56,9 +56,10 @@ platform :ios do
         push_to_git_remote
 
         # We dont wanna do GH releases for Alpha or PreAlpha
-        return if flavour.include?("Alpha")
+        if flavour.include?("Beta") || flavour.include?("Release")
+            create_gh_release(flavour: flavour)
+        end
 
-        create_gh_release(flavour: flavour)
     end
 
     desc "Installs distribution certificates"
