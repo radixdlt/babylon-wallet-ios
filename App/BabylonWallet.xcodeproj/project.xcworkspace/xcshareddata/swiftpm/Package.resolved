@@ -239,8 +239,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/radixdlt/swift-engine-toolkit",
       "state" : {
-        "revision" : "4ded56afc8a8a55ffeadbdce16dbb5789ab4d664",
-        "version" : "0.12.1-293dd4c"
+        "revision" : "ebeae384e21caf31e74d804455683bb85f96906e",
+        "version" : "1.0.0-8651223"
       }
     },
     {
