@@ -184,7 +184,13 @@ extension TransactionType {
 					authorizedDepositorsChanges: authorizedDepositorsChanges.mapKeys(AccountAddress.init(validatingAddress:))
 				)
 			))
+		case .stakeTransaction, .unstakeTransaction, .claimStakeTransaction:
+			throw UnsupportedTransactionType(type: self)
 		}
+	}
+
+	struct UnsupportedTransactionType: Error {
+		let type: TransactionType
 	}
 }
 
