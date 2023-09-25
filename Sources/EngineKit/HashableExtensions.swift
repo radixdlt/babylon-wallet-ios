@@ -425,8 +425,8 @@ extension EngineToolkit.Address: Hashable {
 // MARK: - TransactionIntent + Hashable
 extension TransactionIntent: Hashable {
 	public static func == (lhs: EngineToolkit.Intent, rhs: EngineToolkit.Intent) -> Bool {
-		lhs.header() == rhs.header() &&
-			lhs.manifest() == rhs.manifest()
+		lhs.header() == rhs.header()
+			&& lhs.manifest() == rhs.manifest()
 	}
 
 	public func hash(into hasher: inout Hasher) {
@@ -438,10 +438,10 @@ extension TransactionIntent: Hashable {
 // MARK: - ExecutionAnalysis + Hashable
 extension ExecutionAnalysis: Hashable {
 	public static func == (lhs: ExecutionAnalysis, rhs: ExecutionAnalysis) -> Bool {
-		lhs.feeLocks == rhs.feeLocks &&
-			lhs.feeSummary == rhs.feeSummary &&
-			lhs.transactionTypes == rhs.transactionTypes &&
-			lhs.reservedInstructions == rhs.reservedInstructions
+		lhs.feeLocks == rhs.feeLocks
+			&& lhs.feeSummary == rhs.feeSummary
+			&& lhs.transactionTypes == rhs.transactionTypes
+			&& lhs.reservedInstructions == rhs.reservedInstructions
 	}
 
 	public func hash(into hasher: inout Hasher) {
@@ -467,17 +467,17 @@ extension FeeLocks: Hashable {
 // MARK: - FeeSummary + Hashable
 extension FeeSummary: Hashable {
 	public static func == (lhs: FeeSummary, rhs: FeeSummary) -> Bool {
-		lhs.executionCost == rhs.executionCost &&
-			lhs.finalizationCost == rhs.finalizationCost &&
-			lhs.royaltyCost == rhs.royaltyCost &&
-			lhs.storageExpansionCost == rhs.storageExpansionCost
+		lhs.executionCost == rhs.executionCost
+			&& lhs.finalizationCost == rhs.finalizationCost
+			&& lhs.royaltyCost == rhs.royaltyCost
+			&& lhs.storageExpansionCost == rhs.storageExpansionCost
 	}
 
 	public func hash(into hasher: inout Hasher) {
-		hasher.combine(self.executionCost)
-		hasher.combine(self.finalizationCost)
-		hasher.combine(self.royaltyCost)
-		hasher.combine(self.storageExpansionCost)
+		hasher.combine(executionCost)
+		hasher.combine(finalizationCost)
+		hasher.combine(royaltyCost)
+		hasher.combine(storageExpansionCost)
 	}
 }
 
@@ -559,6 +559,15 @@ extension TransactionType: Hashable {
 			hasher.combine(resourcePreferenceChanges)
 			hasher.combine(defaultDepositRuleChanges)
 			hasher.combine(authorizedDepositorsChanges)
+		case let .stakeTransaction(stakes: stakes):
+			hasher.combine("stakeTransaction")
+			hasher.combine(stakes)
+		case let .unstakeTransaction(unstakes: unstakes):
+			hasher.combine("unstakeTransaction")
+			hasher.combine(unstakes)
+		case let .claimStakeTransaction(claims: claims):
+			hasher.combine("claimStakeTransaction")
+			hasher.combine(claims)
 		}
 	}
 }
@@ -662,6 +671,82 @@ extension DecimalSource: Hashable {
 			hasher.combine(instructionIndex)
 			hasher.combine(value)
 		}
+	}
+}
+
+// MARK: - StakeInformation + Hashable
+extension StakeInformation: Hashable {
+	public static func == (lhs: StakeInformation, rhs: StakeInformation) -> Bool {
+		lhs.fromAccount == rhs.fromAccount
+			&& lhs.validatorAddress == rhs.validatorAddress
+			&& lhs.stakeUnitResource == rhs.stakeUnitResource
+			&& lhs.stakeUnitAmount == rhs.stakeUnitAmount
+			&& lhs.stakedXrd == rhs.stakedXrd
+	}
+
+	public func hash(into hasher: inout Hasher) {
+		hasher.combine(fromAccount)
+		hasher.combine(validatorAddress)
+		hasher.combine(stakeUnitResource)
+		hasher.combine(stakeUnitAmount)
+		hasher.combine(stakedXrd)
+	}
+}
+
+// MARK: - UnstakeInformation + Hashable
+extension UnstakeInformation: Hashable {
+	public static func == (lhs: UnstakeInformation, rhs: UnstakeInformation) -> Bool {
+		lhs.fromAccount == rhs.fromAccount
+			&& lhs.stakeUnitAddress == rhs.stakeUnitAddress
+			&& lhs.stakeUnitAmount == rhs.stakeUnitAmount
+			&& lhs.validatorAddress == rhs.validatorAddress
+			&& lhs.claimNftResource == rhs.claimNftResource
+			&& lhs.claimNftLocalId == rhs.claimNftLocalId
+			&& lhs.claimNftData == rhs.claimNftData
+	}
+
+	public func hash(into hasher: inout Hasher) {
+		hasher.combine(fromAccount)
+		hasher.combine(stakeUnitAddress)
+		hasher.combine(stakeUnitAmount)
+		hasher.combine(validatorAddress)
+		hasher.combine(claimNftResource)
+		hasher.combine(claimNftLocalId)
+		hasher.combine(claimNftData)
+	}
+}
+
+// MARK: - UnstakeData + Hashable
+extension UnstakeData: Hashable {
+	public static func == (lhs: UnstakeData, rhs: UnstakeData) -> Bool {
+		lhs.name == rhs.name
+			&& lhs.claimEpoch == rhs.claimEpoch
+			&& lhs.claimAmount == rhs.claimAmount
+	}
+
+	public func hash(into hasher: inout Hasher) {
+		hasher.combine(name)
+		hasher.combine(claimEpoch)
+		hasher.combine(claimAmount)
+	}
+}
+
+// MARK: - ClaimStakeInformation + Hashable
+extension ClaimStakeInformation: Hashable {
+	public static func == (lhs: ClaimStakeInformation, rhs: ClaimStakeInformation) -> Bool {
+		lhs.fromAccount == rhs.fromAccount
+			&& lhs.validatorAddress == rhs.validatorAddress
+			&& lhs.claimNftResource == rhs.claimNftResource
+			&& lhs.claimNftLocalIds == rhs.claimNftLocalIds
+			&& lhs.claimedXrd == rhs.claimedXrd
+	}
+
+	public func hash(into hasher: inout Hasher) {
+		hasher.combine(fromAccount)
+		hasher.combine(validatorAddress)
+		hasher.combine(claimNftResource)
+		hasher.combine(claimNftLocalIds)
+		hasher.combine(claimedXrd)
 	}
 }
 
