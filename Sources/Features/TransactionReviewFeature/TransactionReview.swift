@@ -397,7 +397,11 @@ public struct TransactionReview: Sendable, FeatureReducer {
 
 		case .submitting(.delegate(.submittedTransactionFailed)):
 			loggerGlobal.error("Submitted TX failed")
-			return resetToApprovable(&state).concatenate(with: .send(.delegate(.failed(.failedToSubmit))))
+
+			return resetToApprovable(
+				&state,
+				shouldNilDestination: false // we wanna stay on TX Fail screen until user dismisses
+			)
 
 		case let .submitting(.delegate(.committedSuccessfully(txID))):
 			state.destination = nil
@@ -670,8 +674,13 @@ extension TransactionReview {
 		}
 	}
 
-	func resetToApprovable(_ state: inout State) -> Effect<Action> {
-		state.destination = nil
+	func resetToApprovable(
+		_ state: inout State,
+		shouldNilDestination: Bool = true
+	) -> Effect<Action> {
+		if shouldNilDestination {
+			state.destination = nil
+		}
 		state.canApproveTX = true
 		state.resetSlider()
 		return .none
