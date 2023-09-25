@@ -324,13 +324,7 @@ extension View {
 			store: destinationStore,
 			state: /TransactionReview.Destinations.State.nonFungibleTokenDetails,
 			action: TransactionReview.Destinations.Action.nonFungibleTokenDetails,
-			content: { detailsStore in
-				WithNavigationBar {
-					destinationStore.send(.dismiss)
-				} content: {
-					NonFungibleTokenDetails.View(store: detailsStore)
-				}
-			}
+			content: { NonFungibleTokenDetails.View(store: $0) }
 		)
 	}
 
@@ -511,14 +505,6 @@ public struct TransactionReviewInfoButton: View {
 
 extension StrokeStyle {
 	static let transactionReview = StrokeStyle(lineWidth: 2, dash: [5, 5])
-}
-
-extension Button where Label == Image {
-	public init(asset: ImageAsset, action: @escaping () -> Void) {
-		self.init(action: action) {
-			Image(asset: asset)
-		}
-	}
 }
 
 #if DEBUG

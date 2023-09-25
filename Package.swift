@@ -44,13 +44,13 @@ package.addModules([
 		dependencies: [
 			"FaucetClient",
 			"AccountPortfoliosClient",
-			"CreateAuthKeyFeature",
 			"ShowQRFeature",
 			"GatewaysClient",
 			"OverlayWindowClient",
 			"OnLedgerEntitiesClient",
 			"DappInteractionClient",
 			"SubmitTransactionClient",
+			"TransactionReviewFeature",
 		],
 		tests: .yes()
 	),
@@ -113,7 +113,6 @@ package.addModules([
 		name: "AssetsFeature",
 		dependencies: [
 			"AccountPortfoliosClient",
-			"OnLedgerEntitiesClient",
 		],
 		tests: .no
 	),
@@ -123,16 +122,6 @@ package.addModules([
 		dependencies: [
 			"AccountsClient",
 			"CreateAccountFeature",
-		],
-		tests: .no
-	),
-	.feature(
-		name: "CreateAuthKeyFeature",
-		featureSuffixDroppedFromFolderName: true,
-		dependencies: [
-			"TransactionReviewFeature",
-			"DerivePublicKeysFeature",
-			"ROLAClient",
 		],
 		tests: .no
 	),
@@ -413,6 +402,7 @@ package.addModules([
 			"ProfileBackupsFeature",
 			"ScanQRFeature",
 			"SecurityStructureConfigurationListFeature",
+			"TransactionReviewFeature",
 		],
 		tests: .yes()
 	),
@@ -488,7 +478,7 @@ package.addModules([
 			"CacheClient",
 			"EngineKit",
 		],
-		tests: .yes()
+		tests: .no
 	),
 	.client(
 		name: "OnLedgerEntitiesClient",

@@ -16,7 +16,7 @@ struct ValidatorNameView: View {
 				.padding(.trailing, .small1)
 
 			Text(viewState.name)
-				.font(.app.body1Header)
+				.textStyle(.body1Header)
 
 			Spacer(minLength: 0)
 		}

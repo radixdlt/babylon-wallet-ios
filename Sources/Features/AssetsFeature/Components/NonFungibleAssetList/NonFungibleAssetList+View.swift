@@ -23,13 +23,7 @@ extension NonFungibleAssetList {
 				store: store.scope(state: \.$destination) { .child(.destination($0)) },
 				state: /NonFungibleAssetList.Destinations.State.details,
 				action: NonFungibleAssetList.Destinations.Action.details,
-				content: { detailsStore in
-					WithNavigationBar {
-						store.send(.view(.closeDetailsTapped))
-					} content: {
-						NonFungibleTokenDetails.View(store: detailsStore)
-					}
-				}
+				content: { NonFungibleTokenDetails.View(store: $0) }
 			)
 		}
 	}

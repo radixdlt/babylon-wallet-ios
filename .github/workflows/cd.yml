@@ -43,12 +43,7 @@ jobs:
       - uses: webfactory/ssh-agent@v0.6.0
         with:
           ssh-private-key: |
-            ${{ secrets.SWIFT_PROFILE_SSH_KEY }}
-            ${{ secrets.SLIP_10_SSH_KEY }}
-            ${{ secrets.MNEMONIC_SSH_KEY }}
             ${{ secrets.SWIFT_ENGINE_TOOLKIT_SSH_KEY }}
-            ${{ secrets.CONVERSE_SSH_KEY }}
-            ${{ secrets.BITE_SSH_KEY }}
             ${{ secrets.FASTLANE_MATCH_REPO_SSH_KEY }}
 
       - name: Config local env

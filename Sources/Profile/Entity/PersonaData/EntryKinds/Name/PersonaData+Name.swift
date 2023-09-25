@@ -1,6 +1,7 @@
 import CasePaths
 import Prelude
 
+// MARK: - PersonaData.Name
 extension PersonaData {
 	public struct Name: Sendable, Hashable, Codable, PersonaDataEntryProtocol, CustomStringConvertible {
 		public static var casePath: CasePath<PersonaData.Entry, Self> = /PersonaData.Entry.name
@@ -45,17 +46,26 @@ extension PersonaData {
 		}
 
 		public var formatted: String {
-			let firstLine = {
+			let names = {
 				switch variant {
 				case .western: return [givenNames, familyName]
 				case .eastern: return [familyName, givenNames]
 				}
-			}().joined(separator: " ")
+			}().compactMap { NonEmptyString($0) }
 
-			return """
-			\(firstLine)
-			"\(nickname)"
-			"""
+			return [
+				NonEmptyString(names.joined(separator: " ")),
+				NonEmptyString(maybeString: nickname.nilIfEmpty.map { "\"\($0)\"" }),
+			]
+			.compactMap { $0 }
+			.map(\.rawValue)
+			.joined(separator: "\n")
 		}
+	}
+}
+
+extension String {
+	var nilIfEmpty: String? {
+		isEmpty ? nil : self
 	}
 }

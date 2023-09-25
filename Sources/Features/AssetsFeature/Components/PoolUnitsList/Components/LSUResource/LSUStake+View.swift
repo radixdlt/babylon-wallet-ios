@@ -53,11 +53,7 @@ extension LSUStake {
 		let store: StoreOf<LSUStake>
 
 		public var body: some SwiftUI.View {
-			WithViewStore(
-				store,
-				observe: \.viewState,
-				send: Action.view
-			) { viewStore in
+			WithViewStore(store, observe: \.viewState, send: Action.view) { viewStore in
 				VStack(alignment: .leading, spacing: .medium1) {
 					ValidatorNameView(viewState: viewStore.validatorNameViewState)
 

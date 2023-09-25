@@ -49,8 +49,9 @@ extension LSUResource {
 			with viewStore: ViewStore<ViewState, ViewAction>
 		) -> some SwiftUI.View {
 			PoolUnitHeaderView(viewState: .init(iconURL: viewStore.iconURL)) {
-				VStack(alignment: .leading) {
+				VStack(alignment: .leading, spacing: .small3) {
 					Text(L10n.Account.PoolUnits.lsuResourceHeader)
+						.lineSpacing(-12)
 						.foregroundColor(.app.gray1)
 						.textStyle(.secondaryHeader)
 
