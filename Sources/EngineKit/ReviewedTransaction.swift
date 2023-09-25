@@ -185,12 +185,8 @@ extension TransactionType {
 				)
 			))
 		case .stakeTransaction, .unstakeTransaction, .claimStakeTransaction:
-			throw UnsupportedTransactionType(type: self)
+			return .nonConforming
 		}
-	}
-
-	struct UnsupportedTransactionType: Error {
-		let type: TransactionType
 	}
 }
 
