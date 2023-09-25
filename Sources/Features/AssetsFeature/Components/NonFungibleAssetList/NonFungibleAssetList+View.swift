@@ -19,16 +19,6 @@ extension NonFungibleAssetList {
 					}
 				)
 			}
-			.task { @MainActor in
-				await ViewStore(store, observe: { $0 }).send(.view(.task)).finish()
-			}
-			.overlay(alignment: .bottom) {
-				WithViewStore(store.scope(state: \.isLoadingResources, action: actionless), observe: { $0 }) { viewStore in
-					if viewStore.state {
-						ProgressView()
-					}
-				}
-			}
 			.sheet(
 				store: store.scope(state: \.$destination) { .child(.destination($0)) },
 				state: /NonFungibleAssetList.Destinations.State.details,

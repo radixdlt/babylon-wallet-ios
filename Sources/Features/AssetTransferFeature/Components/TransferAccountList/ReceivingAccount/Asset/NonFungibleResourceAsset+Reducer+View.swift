@@ -10,7 +10,7 @@ public struct NonFungibleResourceAsset: Sendable, FeatureReducer {
 		public let resourceImage: URL?
 		public let resourceName: String?
 		public let resourceAddress: ResourceAddress
-		public let nftToken: AccountPortfolio.NonFungibleResource.NonFungibleToken
+		public let nftToken: OnLedgerEntity.NonFungibleToken
 	}
 }
 

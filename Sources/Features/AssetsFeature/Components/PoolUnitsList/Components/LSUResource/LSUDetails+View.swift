@@ -5,18 +5,18 @@ extension LSUDetails.State {
 	var viewState: LSUDetails.ViewState {
 		.init(
 			containerWithHeader: .init(resource: stakeUnitResource),
-			thumbnailURL: stakeUnitResource.iconURL,
+			thumbnailURL: stakeUnitResource.metadata.iconURL,
 			validatorNameViewState: .init(with: validator),
 			redeemableTokenAmount: .init(.init(xrdAmount: xrdRedemptionValue.format())),
 			resourceDetails: .init(
-				description: stakeUnitResource.description,
+				description: .idle, // stakeUnitResource.metadata.description,
 				resourceAddress: stakeUnitResource.resourceAddress,
 				isXRD: false,
 				validatorAddress: validator.address,
-				resourceName: stakeUnitResource.name, // TODO: Is this correct?
-				currentSupply: validator.xrdVaultBalance.format(),
-				behaviors: stakeUnitResource.behaviors,
-				tags: stakeUnitResource.tags
+				resourceName: .idle, // stakeUnitResource.metadata.name, // TODO: Is this correct?
+				currentSupply: .idle, // validator.xrdVaultBalance.format(),
+				behaviors: .idle, // [],
+				tags: .idle // stakeUnitResource.metadata.tags
 			)
 		)
 	}
@@ -28,9 +28,7 @@ extension LSUDetails {
 		let thumbnailURL: URL?
 
 		let validatorNameViewState: ValidatorNameView.ViewState
-
 		let redeemableTokenAmount: NonEmpty<IdentifiedArrayOf<PoolUnitResourceViewState>>
-
 		let resourceDetails: AssetResourceDetailsSection.ViewState
 	}
 
@@ -79,8 +77,8 @@ extension ValidatorNameView.ViewState {
 		with validator: AccountPortfolio.PoolUnitResources.RadixNetworkStake.Validator
 	) {
 		self.init(
-			imageURL: validator.iconURL,
-			name: validator.name ?? L10n.Account.PoolUnits.unknownValidatorName
+			imageURL: validator.metadata.iconURL,
+			name: validator.metadata.name ?? L10n.Account.PoolUnits.unknownValidatorName
 		)
 	}
 }

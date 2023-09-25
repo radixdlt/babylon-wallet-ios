@@ -153,7 +153,7 @@ extension AssetTransfer {
 	private struct InvolvedNonFungibleResource: Identifiable {
 		struct PerAccountTokens: Identifiable {
 			var id: AccountAddress
-			var tokens: IdentifiedArrayOf<AccountPortfolio.NonFungibleResource.NonFungibleToken>
+			var tokens: IdentifiedArrayOf<OnLedgerEntity.NonFungibleToken>
 			var isUserAccount: Bool
 		}
 
@@ -164,7 +164,7 @@ extension AssetTransfer {
 		let address: ResourceAddress
 		var accounts: IdentifiedArrayOf<PerAccountTokens>
 
-		var allTokens: [AccountPortfolio.NonFungibleResource.NonFungibleToken] {
+		var allTokens: [OnLedgerEntity.NonFungibleToken] {
 			accounts.flatMap(\.tokens)
 		}
 	}
@@ -263,12 +263,12 @@ extension AssetTransfer {
 				if resources[id: fungibleAsset.resource.resourceAddress] != nil {
 					resources[id: fungibleAsset.resource.resourceAddress]?.accounts.append(accountTransfer)
 				} else {
-					resources.append(.init(
-						address: fungibleAsset.resource.resourceAddress,
-						totalTransferAmount: fungibleAsset.totalTransferSum,
-						divisibility: fungibleAsset.resource.divisibility,
-						accounts: [accountTransfer]
-					))
+//					resources.append(.init(
+//						address: fungibleAsset.resource.resourceAddress,
+//						totalTransferAmount: fungibleAsset.totalTransferSum,
+//						divisibility: fungibleAsset.resource.divisibility,
+//						accounts: [accountTransfer]
+//					))
 				}
 			}
 		}

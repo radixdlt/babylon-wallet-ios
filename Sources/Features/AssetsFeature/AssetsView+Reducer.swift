@@ -277,13 +277,13 @@ extension AssetsView.State {
 				public let resourceAddress: ResourceAddress
 				public let resourceImage: URL?
 				public let resourceName: String?
-				public var tokens: IdentifiedArrayOf<AccountPortfolio.NonFungibleResource.NonFungibleToken>
+				public var tokens: IdentifiedArrayOf<OnLedgerEntity.NonFungibleToken>
 
 				public init(
 					resourceAddress: ResourceAddress,
 					resourceImage: URL?,
 					resourceName: String?,
-					tokens: IdentifiedArrayOf<AccountPortfolio.NonFungibleResource.NonFungibleToken>
+					tokens: IdentifiedArrayOf<OnLedgerEntity.NonFungibleToken>
 				) {
 					self.resourceAddress = resourceAddress
 					self.resourceImage = resourceImage
@@ -385,7 +385,7 @@ extension SelectedResourceProvider<AccountPortfolio.FungibleResource> {
 
 // MARK: - NonFungibleTokensPerResourceProvider
 private struct NonFungibleTokensPerResourceProvider {
-	let selectedAssetIDs: OrderedSet<AccountPortfolio.NonFungibleResource.NonFungibleToken.ID>?
+	let selectedAssetIDs: OrderedSet<OnLedgerEntity.NonFungibleToken.ID>?
 	let resource: AccountPortfolio.NonFungibleResource?
 
 	var nonFungibleTokensPerResource: AssetsView.State.Mode.SelectedAssets.NonFungibleTokensPerResource? {

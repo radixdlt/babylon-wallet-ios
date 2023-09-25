@@ -4,9 +4,9 @@ import FeaturePrelude
 public struct NonFungibleTokenDetails: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public let resource: OnLedgerEntity.Resource
-		public let token: AccountPortfolio.NonFungibleResource.NonFungibleToken?
+		public let token: OnLedgerEntity.NonFungibleToken?
 
-		public init(resource: OnLedgerEntity.Resource, token: AccountPortfolio.NonFungibleResource.NonFungibleToken? = nil) {
+		public init(resource: OnLedgerEntity.Resource, token: OnLedgerEntity.NonFungibleToken? = nil) {
 			self.resource = resource
 			self.token = token
 		}

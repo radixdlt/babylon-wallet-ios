@@ -12,7 +12,7 @@ extension NonFungibleTokenDetails.State {
 }
 
 extension NonFungibleTokenDetails.ViewState.TokenDetails {
-	init(token: AccountPortfolio.NonFungibleResource.NonFungibleToken) {
+	init(token: OnLedgerEntity.NonFungibleToken) {
 		self.init(
 			keyImage: token.keyImageURL,
 			nonFungibleGlobalID: token.id,
@@ -25,14 +25,14 @@ extension NonFungibleTokenDetails.ViewState.TokenDetails {
 extension AssetResourceDetailsSection.ViewState {
 	init(resource: OnLedgerEntity.Resource) {
 		self.init(
-			description: resource.description,
+			description: .success(resource.description),
 			resourceAddress: resource.resourceAddress,
 			isXRD: false,
 			validatorAddress: nil,
-			resourceName: resource.name,
-			currentSupply: resource.totalSupply?.format(),
-			behaviors: resource.behaviors,
-			tags: resource.tags
+			resourceName: .success(resource.name),
+			currentSupply: .success(resource.totalSupply?.format()),
+			behaviors: .success(resource.behaviors),
+			tags: .success(resource.tags)
 		)
 	}
 }

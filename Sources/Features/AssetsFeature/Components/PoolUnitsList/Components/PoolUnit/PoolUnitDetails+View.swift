@@ -6,17 +6,17 @@ extension PoolUnitDetails.State {
 		let resource = poolUnit.poolUnitResource
 		return .init(
 			containerWithHeader: .init(resource: resource),
-			thumbnailURL: resource.iconURL,
+			thumbnailURL: resource.metadata.iconURL,
 			resources: poolUnit.resourceViewStates,
 			resourceDetails: .init(
-				description: resource.description,
+				description: .idle, // resource.metadata.description,
 				resourceAddress: resource.resourceAddress,
 				isXRD: false,
 				validatorAddress: nil,
-				resourceName: resource.name, // FIXME: Is this correct?
-				currentSupply: resource.totalSupply?.format() ?? L10n.AssetDetails.supplyUnkown,
-				behaviors: resource.behaviors,
-				tags: resource.tags
+				resourceName: .idle, // resource.metadata.name, // FIXME: Is this correct?
+				currentSupply: .idle, // resource.totalSupply?.format() ?? L10n.AssetDetails.supplyUnkown,
+				behaviors: .idle,
+				tags: .idle // resource.metadata.tags
 			)
 		)
 	}

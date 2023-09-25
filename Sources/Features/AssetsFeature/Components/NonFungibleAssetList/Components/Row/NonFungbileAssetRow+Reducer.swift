@@ -6,7 +6,7 @@ extension NonFungibleAssetList {
 	public struct Row: Sendable, FeatureReducer {
 		public struct State: Sendable, Hashable, Identifiable {
 			public var id: ResourceAddress { resource.resourceAddress }
-			public typealias AssetID = AccountPortfolio.NonFungibleResource.NonFungibleToken.ID
+			public typealias AssetID = OnLedgerEntity.NonFungibleToken.ID
 
 			public let resource: AccountPortfolio.NonFungibleResource
 			public var loadedTokens: IdentifiedArrayOf<OnLedgerEntity.NonFungibleToken> = []
@@ -56,7 +56,7 @@ extension NonFungibleAssetList {
 						try await onLedgerEntitiesClient.getNonFungibleTokenData(.init(
 							atLedgerState: resource.atLedgerState,
 							resource: resource.resourceAddress,
-							nonFungibleIds: Array(resource.tokens.prefix(10))
+							nonFungibleIds: Array(resource.nonFungibleIds.prefix(10))
 						)
 						)
 					}
@@ -88,7 +88,7 @@ extension NonFungibleAssetList {
 						try await onLedgerEntitiesClient.getNonFungibleTokenData(.init(
 							atLedgerState: resource.atLedgerState,
 							resource: resource.resourceAddress,
-							nonFungibleIds: Array(resource.tokens.prefix(10))
+							nonFungibleIds: Array(resource.nonFungibleIds.prefix(10))
 						)
 						)
 					}
@@ -119,21 +119,19 @@ extension NonFungibleAssetList {
 		}
 
 		func loadResources(_ state: inout State) -> Effect<Action> {
-			guard !state.isLoadingResources, state.loadedTokens.count < state.resource.tokens.count else {
+			guard !state.isLoadingResources, state.loadedTokens.count < state.resource.nonFungibleIds.count else {
 				return .none
 			}
 
-			loggerGlobal.error("Loading tokens \(state.loadedTokens.count) vs \(state.resource.tokens.count)")
-
 			let pageSize = 7
 
-			let diff = state.resource.tokens.count - state.loadedTokens.count
+			let diff = state.resource.nonFungibleIds.count - state.resource.nonFungibleIds.count
 			let tokens = {
 				if diff < pageSize {
-					return state.resource.tokens.suffix(diff)
+					return state.resource.nonFungibleIds.suffix(diff)
 				}
 				let pageStartIndex = state.loadedTokens.count
-				return state.resource.tokens[pageStartIndex ..< pageStartIndex + pageSize]
+				return state.resource.nonFungibleIds[pageStartIndex ..< pageStartIndex + pageSize]
 			}()
 
 			let pageIndex = state.loadedPages + 1

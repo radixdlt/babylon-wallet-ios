@@ -11,9 +11,9 @@ struct DetailsContainerWithHeaderViewState: Equatable {
 extension DetailsContainerWithHeaderViewState {
 	init(resource: AccountPortfolio.FungibleResource) {
 		self.init(
-			title: resource.name ?? L10n.Account.PoolUnits.unknownPoolUnitName,
+			title: resource.metadata.name ?? L10n.Account.PoolUnits.unknownPoolUnitName,
 			amount: resource.amount.format(),
-			symbol: resource.symbol
+			symbol: resource.metadata.symbol
 		)
 	}
 }

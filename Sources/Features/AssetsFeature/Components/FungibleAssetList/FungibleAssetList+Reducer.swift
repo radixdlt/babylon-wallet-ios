@@ -1,6 +1,7 @@
 import AccountPortfoliosClient
 import EngineKit
 import FeaturePrelude
+import OnLedgerEntitiesClient
 import SharedModels
 
 // MARK: - FungibleAssetList
@@ -43,6 +44,8 @@ public struct FungibleAssetList: Sendable, FeatureReducer {
 		}
 	}
 
+	@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
+
 	public init() {}
 
 	public var body: some ReducerOf<Self> {
@@ -66,12 +69,12 @@ public struct FungibleAssetList: Sendable, FeatureReducer {
 		case .destination:
 			return .none
 		case let .xrdRow(.delegate(.selected(token))):
-			state.destination = .details(.init(resource: token.resource, amount: token.amount, isXRD: true))
+			state.destination = .details(.init(resourceAddress: token.resourceAddress, prefetchedPortfolioResource: token, isXRD: true))
 			return .none
 		case .xrdRow:
 			return .none
 		case let .nonXRDRow(_, .delegate(.selected(token))):
-			state.destination = .details(.init(resource: token.resource, amount: token.amount, isXRD: false))
+			state.destination = .details(.init(resourceAddress: token.resourceAddress, prefetchedPortfolioResource: token, isXRD: false))
 			return .none
 		case .nonXRDRow:
 			return .none

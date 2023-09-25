@@ -295,7 +295,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		     let .deposits(.delegate(.showAsset(transfer))):
 			switch transfer.details {
 			case let .fungible(details):
-				state.destination = .fungibleTokenDetails(.init(resource: transfer.resource, isXRD: details.isXRD))
+				state.destination = .fungibleTokenDetails(.init(resourceAddress: transfer.resource.resourceAddress, resource: .success(transfer.resource), isXRD: details.isXRD))
 			case let .nonFungible(details):
 				state.destination = .nonFungibleTokenDetails(.init(resource: transfer.resource, token: details))
 			}
@@ -796,7 +796,7 @@ extension TransactionReview {
 			}
 		}
 
-		typealias NonFungibleToken = AccountPortfolio.NonFungibleResource.NonFungibleToken
+		typealias NonFungibleToken = OnLedgerEntity.NonFungibleToken
 
 		func tokenInfo(_ ids: [NonFungibleLocalId], for resourceAddress: ResourceAddress) async throws -> [NonFungibleToken] {
 			if let tokenData = dataOfNewlyMintedNonFungibles[resourceAddress.address] {
@@ -1048,7 +1048,7 @@ extension TransactionReview {
 	public struct NonFungibleTransfer_: Sendable, Hashable {
 		public let id = Transfer.ID()
 		public let nonFungibleResource: OnLedgerEntity.Resource
-		public let token: AccountPortfolio.NonFungibleResource.NonFungibleToken
+		public let token: OnLedgerEntity.NonFungibleToken
 	}
 
 	public struct Transfer: Sendable, Identifiable, Hashable {
@@ -1068,7 +1068,7 @@ extension TransactionReview {
 				public var guarantee: TransactionClient.Guarantee?
 			}
 
-			public typealias NonFungible = AccountPortfolio.NonFungibleResource.NonFungibleToken
+			public typealias NonFungible = OnLedgerEntity.NonFungibleToken
 		}
 
 		/// The guarantee, for a fungible resource

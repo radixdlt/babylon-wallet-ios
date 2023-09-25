@@ -231,7 +231,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 			}
 
 			// FIXME: Can a dApp be associated with XRD
-			state.destination = .fungibleDetails(.init(resource: resource, isXRD: false))
+			state.destination = .fungibleDetails(.init(resourceAddress: address, resource: .success(resource), isXRD: false))
 			return .none
 
 		case let .nonFungibleTapped(address):

@@ -211,25 +211,12 @@ extension AccountPortfoliosClient {
 		}()
 
 		let resourceAddress = try ResourceAddress(validatingAddress: resource.resourceAddress)
-		let metadata = resource.explicitMetadata
-		// Should be extracted from explicitMetadata
-		//        let tags = item.extractTags()
-		let dappDefinitions = metadata?.dappDefinitions?.compactMap { try? DappDefinitionAddress(validatingAddress: $0) }
 
 		return AccountPortfolio.FungibleResource(
-			resource: .init(
-				resourceAddress: resourceAddress,
-				divisibility: nil,
-				name: metadata?.name,
-				symbol: metadata?.symbol,
-				description: metadata?.description,
-				iconURL: metadata?.iconURL,
-				behaviors: [],
-				tags: [],
-				totalSupply: nil,
-				dappDefinitions: dappDefinitions
-			),
-			amount: amount
+			resourceAddress: resourceAddress,
+			atLedgerState: .init(version: ledgerState.stateVersion),
+			amount: amount,
+			metadata: .init(resource.explicitMetadata)
 		)
 	}
 
@@ -281,13 +268,13 @@ extension AccountPortfoliosClient {
 //		@Sendable
 //		func tokens(
 //			resource: GatewayAPI.NonFungibleResourcesCollectionItemVaultAggregated
-//		) async throws -> IdentifiedArrayOf<AccountPortfolio.NonFungibleResource.NonFungibleToken> {
+//		) async throws -> IdentifiedArrayOf<OnLedgerEntity.NonFungibleToken> {
 //
 //
 //			// https://rdxworks.slack.com/archives/C02MTV9602H/p1681155601557349
 //			let maximumNFTIDChunkSize = 29
 //
-//			var result: IdentifiedArrayOf<AccountPortfolio.NonFungibleResource.NonFungibleToken> = []
+//			var result: IdentifiedArrayOf<OnLedgerEntity.NonFungibleToken> = []
 //			for nftIDChunk in nftIDs.chunks(ofCount: maximumNFTIDChunkSize) {
 //				let tokens = try await gatewayAPIClient.getNonFungibleData(.init(
 //					atLedgerState: ledgerState.selector,
@@ -298,7 +285,7 @@ extension AccountPortfoliosClient {
 //				.map { item in
 //					let details = item.details
 //					let canBeClaimed = details.claimEpoch.map { UInt64(ledgerState.epoch) >= $0 } ?? false
-//					return try AccountPortfolio.NonFungibleResource.NonFungibleToken(
+//					return try OnLedgerEntity.NonFungibleToken(
 //						id: .fromParts(
 //							resourceAddress: .init(address: resource.resourceAddress),
 //							nonFungibleLocalId: .from(stringFormat: item.nonFungibleId)
@@ -323,25 +310,24 @@ extension AccountPortfoliosClient {
 			try NonFungibleGlobalId.fromParts(resourceAddress: .init(address: resource.resourceAddress), nonFungibleLocalId: .from(stringFormat: $0))
 		}
 
-		let metadata = resource.explicitMetadata
-
-		// Should be extracted from explicit metadata
-		// let tags = item.extractTags()
-
 		return try AccountPortfolio.NonFungibleResource(
-			resource: .init(
-				resourceAddress: .init(validatingAddress: resource.resourceAddress),
-				divisibility: nil, // FIXME: Find?
-				name: metadata?.name,
-				symbol: metadata?.symbol,
-				description: metadata?.description,
-				iconURL: metadata?.iconURL,
-				behaviors: [],
-				tags: [],
-				totalSupply: nil
-			),
-			tokens: nftIDs,
-			atLedgerState: .init(version: ledgerState.stateVersion)
+			resourceAddress: .init(validatingAddress: resource.resourceAddress),
+			atLedgerState: .init(version: ledgerState.stateVersion),
+			nonFungibleIds: nftIDs,
+			metadata: .init(resource.explicitMetadata)
+		)
+	}
+}
+
+extension AccountPortfolio.ResourceMetadata {
+	public init(_ raw: GatewayAPI.EntityMetadataCollection?) {
+		self.init(
+			name: raw?.name,
+			symbol: raw?.symbol,
+			description: raw?.description,
+			iconURL: raw?.iconURL,
+			tags: raw?.tags?.compactMap(NonEmptyString.init(rawValue:)).map { AssetTag($0) } ?? [],
+			dappDefinitions: raw?.dappDefinitions?.compactMap { try? DappDefinitionAddress(validatingAddress: $0) }
 		)
 	}
 }
@@ -446,9 +432,7 @@ extension AccountPortfoliosClient {
 			let validator = try AccountPortfolio.PoolUnitResources.RadixNetworkStake.Validator(
 				address: validatorAddress,
 				xrdVaultBalance: .init(fromString: xrdStakeVaultBalance),
-				name: item.explicitMetadata?.name,
-				description: item.explicitMetadata?.description,
-				iconURL: item.explicitMetadata?.iconURL
+				metadata: .init(item.explicitMetadata)
 			)
 
 			let stakeUnitFungibleResource: AccountPortfolio.FungibleResource? = try await { () -> AccountPortfolio.FungibleResource? in
@@ -558,23 +542,23 @@ extension Array where Element == AccountPortfolio.FungibleResource {
 		}
 
 		let sortedNonXrdResources = nonXrdResources.sorted { lhs, rhs in
-			if lhs.amount > .zero && rhs.amount > .zero {
+			if lhs.amount > .zero, rhs.amount > .zero {
 				return lhs.amount > rhs.amount // Sort descending by amount
 			}
-			if lhs.amount != .zero || rhs.amount != .zero {
-				return lhs.amount != .zero
-			}
-
-			if let lhsSymbol = lhs.symbol, let rhsSymbol = rhs.symbol {
-				return lhsSymbol < rhsSymbol // Sort alphabetically by symbol
-			}
-			if lhs.symbol != nil || rhs.symbol != nil {
-				return lhs.symbol != nil
-			}
-
-			if let lhsName = lhs.name, let rhsName = rhs.name {
-				return lhsName < rhsName // Sort alphabetically by name
-			}
+//			if lhs.amount != .zero || rhs.amount != .zero {
+//				return lhs.amount != .zero
+//			}
+//
+			//            if let lhsSymbol = lhs.metadata.symbol, let rhsSymbol = rhs.metadata.symbol {
+//				return lhsSymbol < rhsSymbol // Sort alphabetically by symbol
+//			}
+//			if lhs.symbol != nil || rhs.symbol != nil {
+//				return lhs.symbol != nil
+//			}
+//
+			//            if let lhsName = lhs.metadata.name, let rhsName = rhs.metadata.name {
+//				return lhsName < rhsName // Sort alphabetically by name
+//			}
 
 			return lhs.resourceAddress.address < rhs.resourceAddress.address // Sort by address
 		}
@@ -586,7 +570,7 @@ extension Array where Element == AccountPortfolio.FungibleResource {
 extension Array where Element == AccountPortfolio.NonFungibleResource {
 	func sorted() -> AccountPortfolio.NonFungibleResources {
 		sorted { lhs, rhs in
-			switch (lhs.name, rhs.name) {
+			switch (lhs.metadata.name, rhs.metadata.name) {
 			case let (.some(lhsName), .some(rhsName)):
 				return lhsName < rhsName
 			case (nil, .some):
@@ -612,53 +596,6 @@ extension AccountPortfolio.PoolUnitResources {
 	// Will be used to filter out those from the general fungible resources list.
 	fileprivate var nonFungibleResourceAddresses: [String] {
 		radixNetworkStakes.compactMap(\.stakeClaimResource?.resourceAddress.address)
-	}
-}
-
-extension GatewayAPI.StateNonFungibleDetailsResponseItem {
-	public typealias NFTData = AccountPortfolio.NonFungibleResource.NonFungibleToken.NFTData
-	public var details: [NFTData] {
-		data?.programmaticJson.dictionary?["fields"]?.array?.compactMap {
-			guard let dict = $0.dictionary,
-			      let value = dict["value"],
-			      let type = dict["kind"]?.string.flatMap(GatewayAPI.MetadataValueType.init),
-			      let field = dict["field_name"]?.string.flatMap(NFTData.Field.init),
-			      let value = NFTData.Value(type: type, value: value)
-			else {
-				return nil
-			}
-
-			return .init(field: field, value: value)
-		} ?? []
-	}
-}
-
-extension AccountPortfolio.NonFungibleResource.NonFungibleToken.NFTData.Value {
-	public init?(type: GatewayAPI.MetadataValueType, value: JSONValue) {
-		switch type {
-		case .string:
-			guard let str = value.string else {
-				return nil
-			}
-			self = .string(str)
-		case .url:
-			guard let url = value.string.flatMap(URL.init) else {
-				return nil
-			}
-			self = .url(url)
-		case .u64:
-			guard let u64 = value.string.flatMap(UInt64.init) else {
-				return nil
-			}
-			self = .u64(u64)
-		case .decimal:
-			guard let decimal = try? value.string.map(BigDecimal.init(fromString:)) else {
-				return nil
-			}
-			self = .decimal(decimal)
-		default:
-			return nil
-		}
 	}
 }
 

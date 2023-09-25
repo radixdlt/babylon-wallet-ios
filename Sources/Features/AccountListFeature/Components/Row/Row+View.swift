@@ -67,7 +67,7 @@ extension AccountList.Row {
 
 			let fungibleResources = portfolio.fungibleResources
 			let xrdIcon: [TokenThumbnail.Content] = fungibleResources.xrdResource != nil ? [.xrd] : []
-			let otherIcons: [TokenThumbnail.Content] = fungibleResources.nonXrdResources.map { .known($0.iconURL) }
+			let otherIcons: [TokenThumbnail.Content] = fungibleResources.nonXrdResources.map { .known($0.metadata.iconURL) }
 			self.fungibleResourceIcons = xrdIcon + otherIcons
 
 			self.nonFungibleResourcesCount = portfolio.nonFungibleResources.count

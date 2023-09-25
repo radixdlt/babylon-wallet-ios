@@ -7,7 +7,7 @@ public struct LSUStake: FeatureReducer {
 			stake.validator.address.address
 		}
 
-		typealias AssetID = AccountPortfolio.NonFungibleResource.NonFungibleToken.ID
+		typealias AssetID = OnLedgerEntity.NonFungibleToken.ID
 
 		let stake: AccountPortfolio.PoolUnitResources.RadixNetworkStake
 

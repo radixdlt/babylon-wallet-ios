@@ -61,8 +61,8 @@ extension PoolUnit {
 extension PoolUnit.State {
 	var viewState: PoolUnit.ViewState {
 		.init(
-			iconURL: poolUnit.poolUnitResource.iconURL,
-			name: poolUnit.poolUnitResource.name ?? L10n.Account.PoolUnits.unknownPoolUnitName,
+			iconURL: poolUnit.poolUnitResource.metadata.iconURL,
+			name: poolUnit.poolUnitResource.metadata.name ?? L10n.Account.PoolUnits.unknownPoolUnitName,
 			resources: poolUnit.resourceViewStates,
 			isSelected: isSelected
 		)
@@ -83,8 +83,8 @@ extension AccountPortfolio.PoolUnitResources.PoolUnit {
 			rawValue: (xrdResourceViewState.map { [$0] } ?? [])
 				+ poolResources.nonXrdResources.map {
 					PoolUnitResourceViewState(
-						thumbnail: .known($0.iconURL),
-						symbol: $0.symbol ?? $0.name ?? L10n.Account.PoolUnits.unknownSymbolName,
+						thumbnail: .known($0.metadata.iconURL),
+						symbol: $0.metadata.symbol ?? $0.metadata.name ?? L10n.Account.PoolUnits.unknownSymbolName,
 						tokenAmount: redemptionValue(for: $0)
 					)
 				}

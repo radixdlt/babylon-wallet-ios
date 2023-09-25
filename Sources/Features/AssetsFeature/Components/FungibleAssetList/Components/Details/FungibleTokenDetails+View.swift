@@ -5,25 +5,31 @@ extension FungibleTokenDetails.State {
 	var viewState: FungibleTokenDetails.ViewState {
 		.init(
 			detailsHeader: detailsHeader,
-			thumbnail: isXRD ? .xrd : .known(resource.iconURL),
+			thumbnail: {
+				let iconURL = .success(prefetchedPortfolioResource?.metadata.iconURL) ?? resource.iconURL
+				return isXRD ? .success(.xrd) : iconURL.map { .known($0) }
+			}(),
 			details: .init(
 				description: resource.description,
-				resourceAddress: resource.resourceAddress,
+				resourceAddress: resourceAddress,
 				isXRD: isXRD,
 				validatorAddress: nil,
 				resourceName: nil,
-				currentSupply: resource.totalSupply?.format(), // FIXME: Check which format
+				currentSupply: resource.totalSupply.map { $0?.format() }, // FIXME: Check which format
 				behaviors: resource.behaviors,
-				tags: isXRD ? resource.tags + [.officialRadix] : resource.tags
+				tags: {
+					let tags = .success(prefetchedPortfolioResource?.metadata.tags ?? []) ?? resource.tags
+					return isXRD ? tags.map { $0 + [.officialRadix] } : tags
+				}()
 			)
 		)
 	}
 
 	var detailsHeader: DetailsContainerWithHeaderViewState {
 		.init(
-			title: resource.name ?? L10n.Account.PoolUnits.unknownPoolUnitName,
-			amount: amount?.format(),
-			symbol: resource.symbol
+			title: prefetchedPortfolioResource?.metadata.name ?? L10n.Account.PoolUnits.unknownPoolUnitName,
+			amount: prefetchedPortfolioResource?.amount.format(),
+			symbol: prefetchedPortfolioResource?.metadata.symbol
 		)
 	}
 }
@@ -32,7 +38,7 @@ extension FungibleTokenDetails.State {
 extension FungibleTokenDetails {
 	public struct ViewState: Equatable {
 		let detailsHeader: DetailsContainerWithHeaderViewState
-		let thumbnail: TokenThumbnail.Content
+		let thumbnail: Loadable<TokenThumbnail.Content>
 		let details: AssetResourceDetailsSection.ViewState
 	}
 
@@ -47,12 +53,15 @@ extension FungibleTokenDetails {
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				DetailsContainerWithHeaderView(viewState: viewStore.detailsHeader) {
-					TokenThumbnail(viewStore.thumbnail, size: .veryLarge)
+					TokenThumbnail(viewStore.thumbnail.wrappedValue ?? .unknown, size: .veryLarge)
 				} detailsView: {
 					AssetResourceDetailsSection(viewState: viewStore.details)
 						.padding(.bottom, .medium1)
 				} closeButtonAction: {
 					viewStore.send(.closeButtonTapped)
+				}
+				.task { @MainActor in
+					await viewStore.send(.task).finish()
 				}
 			}
 		}

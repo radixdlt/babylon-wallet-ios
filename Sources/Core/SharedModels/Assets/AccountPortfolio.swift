@@ -26,6 +26,31 @@ public struct AccountPortfolio: Sendable, Hashable, Codable {
 }
 
 extension AccountPortfolio {
+	public struct ResourceMetadata: Sendable, Hashable, Codable {
+		public let name: String?
+		public let symbol: String?
+		public let description: String?
+		public let iconURL: URL?
+		public let tags: [AssetTag]
+		public let dappDefinitions: [DappDefinitionAddress]?
+
+		public init(
+			name: String? = nil,
+			symbol: String? = nil,
+			description: String? = nil,
+			iconURL: URL? = nil,
+			tags: [AssetTag] = [],
+			dappDefinitions: [DappDefinitionAddress]? = nil
+		) {
+			self.name = name
+			self.symbol = symbol
+			self.description = description
+			self.iconURL = iconURL
+			self.tags = tags
+			self.dappDefinitions = dappDefinitions
+		}
+	}
+
 	public typealias NonFungibleResources = [NonFungibleResource]
 
 	public struct FungibleResources: Sendable, Hashable, Codable {
@@ -42,76 +67,48 @@ extension AccountPortfolio {
 	}
 
 	public struct FungibleResource: Sendable, Hashable, Identifiable, Codable {
-		public let resource: OnLedgerEntity.Resource
+		public var id: ResourceAddress {
+			resourceAddress
+		}
+
+		public let resourceAddress: ResourceAddress
+		public let atLedgerState: AtLedgerState
 		public let amount: BigDecimal
+		public let metadata: ResourceMetadata
 
-		public var id: ResourceAddress { resourceAddress }
-		public var resourceAddress: ResourceAddress { resource.resourceAddress }
-		public var divisibility: Int? { resource.divisibility }
-		public var name: String? { resource.name }
-		public var symbol: String? { resource.symbol }
-		public var description: String? { resource.description }
-		public var iconURL: URL? { resource.iconURL }
-		public var behaviors: [AssetBehavior] { resource.behaviors }
-		public var tags: [AssetTag] { resource.tags }
-		public var totalSupply: BigDecimal? { resource.totalSupply }
-
-		public init(resource: OnLedgerEntity.Resource, amount: BigDecimal) {
-			self.resource = resource
+		public init(
+			resourceAddress: ResourceAddress,
+			atLedgerState: AtLedgerState,
+			amount: BigDecimal,
+			metadata: ResourceMetadata
+		) {
+			self.resourceAddress = resourceAddress
+			self.atLedgerState = atLedgerState
 			self.amount = amount
+			self.metadata = metadata
 		}
 	}
 
 	public struct NonFungibleResource: Sendable, Hashable, Identifiable, Codable {
-		public let resource: OnLedgerEntity.Resource
-		public let tokens: [NonFungibleGlobalId]
-		public let atLedgerState: AtLedgerState
-
-		public var id: ResourceAddress { resourceAddress }
-		public var resourceAddress: ResourceAddress { resource.resourceAddress }
-		public var name: String? { resource.name }
-		public var symbol: String? { resource.symbol }
-		public var description: String? { resource.description }
-		public var iconURL: URL? { resource.iconURL }
-		public var behaviors: [AssetBehavior] { resource.behaviors }
-		public var tags: [AssetTag] { resource.tags }
-		public var totalSupply: BigDecimal? { resource.totalSupply }
-
-		public init(resource: OnLedgerEntity.Resource, tokens: [NonFungibleGlobalId], atLedgerState: AtLedgerState) {
-			self.resource = resource
-			self.tokens = tokens
-			self.atLedgerState = atLedgerState
+		public var id: ResourceAddress {
+			resourceAddress
 		}
 
-		public struct NonFungibleToken: Sendable, Hashable, Identifiable, Codable {
-			public let id: NonFungibleGlobalId
-			public let name: String?
-			public let description: String?
-			public let keyImageURL: URL?
-			public let metadata: [Metadata]
+		public let resourceAddress: ResourceAddress
+		public let atLedgerState: AtLedgerState
+		public let nonFungibleIds: [NonFungibleGlobalId]
+		public let metadata: ResourceMetadata
 
-			// The claim amount if the it is a stake claim nft
-			public let stakeClaimAmount: BigDecimal?
-			// Indication that stake unit amount can be claimed if it is stake claim nft
-			public let canBeClaimed: Bool
-
-			public init(
-				id: NonFungibleGlobalId,
-				name: String?,
-				description: String? = nil,
-				keyImageURL: URL? = nil,
-				metadata: [Metadata] = [],
-				stakeClaimAmount: BigDecimal? = nil,
-				canBeClaimed: Bool = false
-			) {
-				self.id = id
-				self.name = name
-				self.description = description
-				self.keyImageURL = keyImageURL
-				self.metadata = metadata
-				self.stakeClaimAmount = stakeClaimAmount
-				self.canBeClaimed = canBeClaimed
-			}
+		public init(
+			resourceAddress: ResourceAddress,
+			atLedgerState: AtLedgerState,
+			nonFungibleIds: [NonFungibleGlobalId],
+			metadata: ResourceMetadata
+		) {
+			self.resourceAddress = resourceAddress
+			self.atLedgerState = atLedgerState
+			self.nonFungibleIds = nonFungibleIds
+			self.metadata = metadata
 		}
 	}
 
@@ -122,17 +119,6 @@ extension AccountPortfolio {
 		public init(radixNetworkStakes: [RadixNetworkStake], poolUnits: [PoolUnit]) {
 			self.radixNetworkStakes = radixNetworkStakes
 			self.poolUnits = poolUnits
-		}
-	}
-
-	public struct Metadata: Sendable, Hashable, Identifiable, Codable {
-		public var id: String { key }
-		public let key: String
-		public let value: String
-
-		public init(key: String, value: String) {
-			self.key = key
-			self.value = value
 		}
 	}
 }
@@ -155,9 +141,10 @@ extension AccountPortfolio.PoolUnitResources {
 		}
 
 		public func redemptionValue(for resource: AccountPortfolio.FungibleResource) -> String {
-			let poolUnitTotalSupply = poolUnitResource.resource.totalSupply ?? .one
-			let unroundedRedemptionValue = poolUnitResource.amount * resource.amount / poolUnitTotalSupply
-			return unroundedRedemptionValue.format(divisibility: resource.resource.divisibility)
+			fatalError()
+//			let poolUnitTotalSupply = poolUnitResource.resource.totalSupply ?? .one
+//			let unroundedRedemptionValue = poolUnitResource.amount * resource.amount / poolUnitTotalSupply
+//			return unroundedRedemptionValue.format(divisibility: resource.resource.divisibility)
 		}
 	}
 
@@ -165,22 +152,16 @@ extension AccountPortfolio.PoolUnitResources {
 		public struct Validator: Sendable, Hashable, Codable {
 			public let address: ValidatorAddress
 			public let xrdVaultBalance: BigDecimal
-			public let name: String?
-			public let description: String?
-			public let iconURL: URL?
+			public let metadata: AccountPortfolio.ResourceMetadata
 
 			public init(
 				address: ValidatorAddress,
 				xrdVaultBalance: BigDecimal,
-				name: String? = nil,
-				description: String? = nil,
-				iconURL: URL? = nil
+				metadata: AccountPortfolio.ResourceMetadata
 			) {
 				self.address = address
 				self.xrdVaultBalance = xrdVaultBalance
-				self.name = name
-				self.description = description
-				self.iconURL = iconURL
+				self.metadata = metadata
 			}
 		}
 
@@ -192,7 +173,8 @@ extension AccountPortfolio.PoolUnitResources {
 			guard let stakeUnitResource else {
 				return nil
 			}
-			return (stakeUnitResource.amount * validator.xrdVaultBalance) / (stakeUnitResource.resource.totalSupply ?? .one)
+			fatalError()
+			// return (stakeUnitResource.amount * validator.xrdVaultBalance) / (stakeUnitResource.resource.totalSupply ?? .one)
 		}
 
 		public init(validator: Validator, stakeUnitResource: AccountPortfolio.FungibleResource?, stakeClaimResource: AccountPortfolio.NonFungibleResource?) {
@@ -253,157 +235,34 @@ extension AccountPortfolio.FungibleResource {
 
 extension AccountPortfolio.NonFungibleResource {
 	public var nonEmpty: Self? {
-		tokens.isEmpty ? nil : self
-	}
-}
-
-// MARK: - AccountPortfolio.NonFungibleResource.NonFungibleToken.NFTData
-extension AccountPortfolio.NonFungibleResource.NonFungibleToken {
-	public struct NFTData: Sendable, Hashable, Codable {
-		public enum Field: String, Sendable, Hashable, Codable {
-			case name
-			case description
-			case keyImageURL = "key_image_url"
-			case claimEpoch = "claim_epoch"
-			case claimAmount = "claim_amount"
-		}
-
-		public enum Value: Sendable, Hashable, Codable {
-			case string(String)
-			case url(URL)
-			case decimal(BigDecimal)
-			case u64(UInt64)
-
-			var string: String? {
-				guard case let .string(str) = self else {
-					return nil
-				}
-				return str
-			}
-
-			var url: URL? {
-				guard case let .url(url) = self else {
-					return nil
-				}
-				return url
-			}
-
-			var u64: UInt64? {
-				guard case let .u64(u64) = self else {
-					return nil
-				}
-				return u64
-			}
-
-			var decimal: BigDecimal? {
-				guard case let .decimal(decimal) = self else {
-					return nil
-				}
-				return decimal
-			}
-		}
-
-		public let field: Field
-		public let value: Value
-
-		public init(field: Field, value: Value) {
-			self.field = field
-			self.value = value
-		}
-	}
-}
-
-extension [AccountPortfolio.NonFungibleResource.NonFungibleToken.NFTData] {
-	public typealias Field = Self.Element.Field
-
-	public subscript(field: Field) -> Self.Element.Value? {
-		first { $0.field == field }?.value
-	}
-
-	public var name: String? {
-		self[.name]?.string
-	}
-
-	public var keyImageURL: URL? {
-		if let string = self[.keyImageURL]?.string {
-			return URL(string: string)
-		} else {
-			return self[.keyImageURL]?.url
-		}
-	}
-
-	public var tokenDescription: String? {
-		self[.description]?.string
-	}
-
-	public var claimEpoch: UInt64? {
-		self[.claimEpoch]?.u64
-	}
-
-	public var claimAmount: BigDecimal? {
-		self[.claimAmount]?.decimal
+		nonFungibleIds.isEmpty ? nil : self
 	}
 }
 
 extension AccountPortfolio.NonFungibleResource {
 	enum CodingKeys: CodingKey {
-		case resource
-		case tokens
+		case resourceAddress
 		case atLedgerState
-	}
-
-	public init(from decoder: Decoder) throws {
-		let container = try decoder.container(keyedBy: CodingKeys.self)
-		try self.init(
-			resource: container.decode(OnLedgerEntity.Resource.self, forKey: .resource),
-			tokens: container.decode([String].self, forKey: .tokens).map(NonFungibleGlobalId.init(nonFungibleGlobalId:)),
-			atLedgerState: container.decode(AtLedgerState.self, forKey: .atLedgerState)
-		)
-	}
-
-	public func encode(to encoder: Encoder) throws {
-		var container = encoder.container(keyedBy: CodingKeys.self)
-
-		try container.encode(resource, forKey: .resource)
-		try container.encode(tokens.map { $0.asStr() }, forKey: .tokens)
-		try container.encode(atLedgerState, forKey: .atLedgerState)
-	}
-}
-
-extension AccountPortfolio.NonFungibleResource.NonFungibleToken {
-	enum CodingKeys: CodingKey {
-		case id
-		case name
-		case description
-		case keyImageURL
+		case tokens
 		case metadata
-		case stakeClaimAmount
-		case claimEpoch
-		case canBeClaimed
 	}
 
 	public init(from decoder: Decoder) throws {
 		let container = try decoder.container(keyedBy: CodingKeys.self)
-
 		try self.init(
-			id: .init(nonFungibleGlobalId: container.decode(String.self, forKey: .id)),
-			name: container.decodeIfPresent(String.self, forKey: .name),
-			description: container.decodeIfPresent(String.self, forKey: .description),
-			keyImageURL: container.decodeIfPresent(URL.self, forKey: .keyImageURL),
-			metadata: container.decode([AccountPortfolio.Metadata].self, forKey: .metadata),
-			stakeClaimAmount: container.decodeIfPresent(BigDecimal.self, forKey: .stakeClaimAmount),
-			canBeClaimed: container.decode(Bool.self, forKey: .canBeClaimed)
+			resourceAddress: container.decode(ResourceAddress.self, forKey: .resourceAddress),
+			atLedgerState: container.decode(AtLedgerState.self, forKey: .atLedgerState),
+			nonFungibleIds: container.decode([String].self, forKey: .tokens).map(NonFungibleGlobalId.init(nonFungibleGlobalId:)),
+			metadata: container.decode(AccountPortfolio.ResourceMetadata.self, forKey: .metadata)
 		)
 	}
 
 	public func encode(to encoder: Encoder) throws {
 		var container = encoder.container(keyedBy: CodingKeys.self)
-		try container.encode(id.asStr(), forKey: .id)
-		try container.encodeIfPresent(name, forKey: .name)
-		try container.encodeIfPresent(description, forKey: .description)
-		try container.encodeIfPresent(keyImageURL, forKey: .keyImageURL)
+
+		try container.encode(resourceAddress, forKey: .resourceAddress)
+		try container.encode(atLedgerState, forKey: .atLedgerState)
+		try container.encode(nonFungibleIds.map { $0.asStr() }, forKey: .tokens)
 		try container.encode(metadata, forKey: .metadata)
-		try container.encodeIfPresent(stakeClaimAmount, forKey: .stakeClaimAmount)
-		try container.encode(canBeClaimed, forKey: .canBeClaimed)
 	}
 }

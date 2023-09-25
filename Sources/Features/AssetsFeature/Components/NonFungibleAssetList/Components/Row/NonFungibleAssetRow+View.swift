@@ -22,7 +22,7 @@ extension NonFungibleAssetList.Row.View {
 			observe: identity,
 			send: NonFungibleAssetList.Row.Action.view
 		) { viewStore in
-			if viewStore.resource.tokens.isEmpty {
+			if viewStore.resource.nonFungibleIds.isEmpty {
 				EmptyView()
 			} else {
 				StackedViewsLayout(isExpanded: viewStore.isExpanded) {
@@ -60,15 +60,15 @@ extension NonFungibleAssetList.Row.View {
 
 	private func rowView(_ viewStore: ViewStoreOf<NonFungibleAssetList.Row>) -> some SwiftUI.View {
 		HStack(spacing: .small1) {
-			NFTThumbnail(viewStore.resource.iconURL, size: .small)
+			NFTThumbnail(viewStore.resource.metadata.iconURL, size: .small)
 
 			VStack(alignment: .leading, spacing: .small2) {
-				Text(viewStore.resource.name ?? "")
+				Text(viewStore.resource.metadata.name ?? "")
 					.foregroundColor(.app.gray1)
 					.lineSpacing(-4)
 					.textStyle(.secondaryHeader)
 
-				Text(viewStore.supply)
+				Text("\(viewStore.resource.nonFungibleIds.count)")
 					.font(.app.body2HighImportance)
 					.foregroundColor(.app.gray2)
 			}
@@ -121,11 +121,11 @@ extension NonFungibleAssetList.Row.View {
 		.background(.app.white)
 		.roundedCorners(
 			.bottom,
-			radius: viewStore.isExpanded && index != (viewStore.nftCount - 1) ? .zero : .small1
+			radius: viewStore.isExpanded && index != (viewStore.loadedTokens.count - 1) ? .zero : .small1
 		)
 		.tokenRowShadow(!viewStore.isExpanded)
 		.scaleEffect(scale(isExpanded: viewStore.isExpanded, index: index))
-		.zIndex(reversedZIndex(count: viewStore.nftCount, index: index))
+		.zIndex(reversedZIndex(count: viewStore.loadedTokens.count, index: index))
 		.onTapGesture { viewStore.send(.assetTapped(asset.id)) }
 	}
 
@@ -146,22 +146,6 @@ extension NonFungibleAssetList.Row.View {
 		 	return NSLocalizedString(L10n.AssetDetails.NFTDetails.nftPlural(viewStore.containers.count), comment: "Number of NFTs owned")
 		 }
 		 */
-	}
-}
-
-private extension NonFungibleAssetList.Row.ViewState {
-	var supply: String {
-		// Load total supply async.
-		resource.resource.totalSupply.map {
-			L10n.AssetDetails.NFTDetails.ownedOfTotal(
-				nftCount,
-				Int($0)
-			)
-		} ?? "\(nftCount)"
-	}
-
-	var nftCount: Int {
-		resource.tokens.count
 	}
 }
 
@@ -197,37 +181,33 @@ extension NonFungibleAssetList.Row.View {
 	}
 }
 
-#if DEBUG
-import SwiftUI // NB: necessary for previews to appear
+// #if DEBUG
+// import SwiftUI // NB: necessary for previews to appear
+//
+// struct NonFungibleRow_Preview: PreviewProvider {
+//	static var previews: some View {
+//		NonFungibleAssetList.Row.View(
+//			store: .init(
+//				initialState: .previewValue,
+//				reducer: NonFungibleAssetList.Row.init
+//			)
+//		)
+//	}
+// }
+//
+// extension NonFungibleAssetList.Row.State {
+//	private static let previewResource = AccountPortfolio.NonFungibleResource(
+//        resourceAddress: previewResourceAddress,
+//		atLedgerState: .init(version: 0),
+//        nonFungibleIds: [],
+//        metadata: .init()
+//	)
+//
+//	private static let previewResourceAddress = try! ResourceAddress(validatingAddress: "resource_tdx_c_1qyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq40v2wv")
+// }
+// #endif
 
-struct NonFungibleRow_Preview: PreviewProvider {
-	static var previews: some View {
-		NonFungibleAssetList.Row.View(
-			store: .init(
-				initialState: .previewValue,
-				reducer: NonFungibleAssetList.Row.init
-			)
-		)
-	}
-}
-
-extension NonFungibleAssetList.Row.State {
-	public static let previewValue = Self(
-		resource: previewResource,
-		selectedAssets: nil
-	)
-
-	private static let previewResource = AccountPortfolio.NonFungibleResource(
-		resource: .init(resourceAddress: previewResourceAddress),
-		tokens: [],
-		atLedgerState: .init(version: 0)
-	)
-
-	private static let previewResourceAddress = try! ResourceAddress(validatingAddress: "resource_tdx_c_1qyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq40v2wv")
-}
-#endif
-
-extension AccountPortfolio.NonFungibleResource.NonFungibleToken {
+extension OnLedgerEntity.NonFungibleToken {
 	fileprivate var localId: NonFungibleLocalId {
 		id.localId()
 	}

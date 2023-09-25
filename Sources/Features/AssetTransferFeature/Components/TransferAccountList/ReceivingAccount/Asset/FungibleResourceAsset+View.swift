@@ -27,8 +27,8 @@ extension FungibleResourceAsset.View {
 		WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
 			VStack(alignment: .trailing) {
 				HStack {
-					TokenThumbnail(viewStore.isXRD ? .xrd : .known(viewStore.resource.iconURL), size: .smallest)
-					if let name = viewStore.resource.name {
+					TokenThumbnail(viewStore.isXRD ? .xrd : .known(viewStore.resource.metadata.iconURL), size: .smallest)
+					if let name = viewStore.resource.metadata.name {
 						Text(name)
 							.textStyle(.body2HighImportance)
 							.foregroundColor(.app.gray1)

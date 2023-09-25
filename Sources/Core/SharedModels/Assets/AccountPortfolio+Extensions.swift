@@ -1,6 +1,6 @@
 import Foundation
 
-extension AccountPortfolio.NonFungibleResource.NonFungibleToken {
+extension OnLedgerEntity.NonFungibleToken {
 	public init(resourceAddress: ResourceAddress, nftID: NonFungibleLocalId, nftData: [NFTData]) throws {
 		try self.init(
 			id: .fromParts(

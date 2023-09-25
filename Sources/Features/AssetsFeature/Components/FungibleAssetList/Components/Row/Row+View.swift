@@ -3,8 +3,8 @@ import FeaturePrelude
 extension FungibleAssetList.Row.State {
 	var viewState: FungibleAssetList.Row.ViewState {
 		.init(
-			thumbnail: isXRD ? .xrd : .known(token.iconURL),
-			symbol: token.symbol ?? token.name ?? "",
+			thumbnail: isXRD ? .xrd : .known(token.metadata.iconURL),
+			symbol: token.metadata.symbol ?? token.metadata.name ?? "",
 			tokenAmount: token.amount.format(),
 			isSelected: isSelected
 		)

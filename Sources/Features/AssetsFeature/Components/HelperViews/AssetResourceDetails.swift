@@ -7,28 +7,28 @@ struct AssetResourceDetailsSection: View {
 	let viewState: ViewState
 
 	struct ViewState: Equatable {
-		let description: String?
+		let description: Loadable<String?>
 		let resourceAddress: ResourceAddress
 		let isXRD: Bool
 		let validatorAddress: ValidatorAddress?
-		let resourceName: String?
-		let currentSupply: String?
-		let behaviors: [AssetBehavior]
-		let tags: [AssetTag]
+		let resourceName: Loadable<String?>?
+		let currentSupply: Loadable<String?>
+		let behaviors: Loadable<[AssetBehavior]>
+		let tags: Loadable<[AssetTag]>
 	}
 
 	var body: some View {
 		VStack(alignment: .leading, spacing: .medium1) {
 			AssetDetailsSeparator()
 
-			if let description = viewState.description {
-				Text(description)
+			loadable(viewState.description) { description in
+				Text(description ?? "unknown")
 					.textStyle(.body1Regular)
 					.frame(maxWidth: .infinity, alignment: .leading)
-					.padding(.horizontal, .large2)
-
-				AssetDetailsSeparator()
 			}
+			.padding(.horizontal, .large2)
+
+			AssetDetailsSeparator()
 
 			VStack(alignment: .leading, spacing: .medium3) {
 				KeyValueView(resourceAddress: viewState.resourceAddress)
@@ -38,21 +38,45 @@ struct AssetResourceDetailsSection: View {
 				}
 
 				if let resourceName = viewState.resourceName {
-					KeyValueView(key: "Name", value: resourceName) // FIXME: Strings - make a common name string for all asset details, remove the specific one(s)
+					loadable(resourceName) { value in
+						KeyValueView(
+							key: "Name",
+							value: value ?? ""
+						) // FIXME: Strings - make a common name string for all asset details, remove the specific one(s)
+					}
 				}
 
-				if let currentSupply = viewState.currentSupply {
-					KeyValueView(
-						key: L10n.AssetDetails.currentSupply,
-						value: currentSupply
-					)
+				loadable(viewState.currentSupply) { supply in
+					KeyValueView(key: L10n.AssetDetails.currentSupply, value: supply ?? "")
 				}
 
-				AssetBehaviorsView(behaviors: viewState.behaviors, isXRD: viewState.isXRD)
+				loadable(viewState.behaviors) { value in
+					AssetBehaviorsView(behaviors: value, isXRD: viewState.isXRD)
+				}
 
-				AssetTagsView(tags: viewState.tags)
+				loadable(viewState.tags) { _ in
+					AssetTagsView(tags: viewState.tags.wrappedValue ?? [])
+				}
 			}
 			.padding(.horizontal, .large2)
+		}
+	}
+}
+
+extension View {
+	@ViewBuilder
+	func loadable<T>(_ loadable: Loadable<T>, @ViewBuilder successContent: (T) -> some View) -> some View {
+		switch loadable {
+		case .idle, .loading:
+			Spacer()
+				.frame(height: .large1)
+				.background(.app.gray4)
+				.shimmer(active: true, config: .accountResourcesLoading)
+				.cornerRadius(.small1)
+		case let .success(value):
+			successContent(value)
+		case let .failure(error):
+			fatalError()
 		}
 	}
 }
