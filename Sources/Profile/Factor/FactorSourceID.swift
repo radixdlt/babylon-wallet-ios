@@ -92,6 +92,12 @@ extension FactorSourceID {
 }
 
 extension FactorSourceID.FromHash {
+	/// NEVER EVER CHANGE THIS! If you do, users apps will be unable to load the Mnemonic
+	/// from keychain!
+	public var keychainKey: String {
+		"\(kind):\(body.data.hex())"
+	}
+
 	public init(kind: FactorSourceKind, hash: some DataProtocol) throws {
 		try self.init(kind: kind, body: .init(data: Data(hash)))
 	}

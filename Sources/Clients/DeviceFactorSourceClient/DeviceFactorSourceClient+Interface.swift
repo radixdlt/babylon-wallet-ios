@@ -147,7 +147,7 @@ extension DeviceFactorSourceClient {
 		let factorSourceID = deviceFactorSource.id
 
 		guard
-			let loadedMnemonicWithPassphrase = try await secureStorageClient.loadMnemonicByFactorSourceID(factorSourceID.embed(), purpose.loadMnemonicPurpose)
+			let loadedMnemonicWithPassphrase = try await secureStorageClient.loadMnemonicByFactorSourceID(factorSourceID, purpose.loadMnemonicPurpose)
 		else {
 			throw FailedToDeviceFactorSourceForSigning()
 		}
