@@ -1038,7 +1038,7 @@ package.addModules([
 				.package(url: "https://github.com/radixdlt/swift-engine-toolkit", exact: "1.0.0-8651223")
 			},
 		],
-		tests: .no
+		tests: .yes()
 	),
 	.module(
 		name: "ClientTestingPrelude",
