@@ -15,7 +15,7 @@ final class FactorSourceTests: TestCase {
 			curve: Curve25519.self
 		)
 		let factorSourceID = try FactorSource.id(fromRoot: root, factorSourceKind: .device)
-		guard factorSourceID.description == "device:4af22ea955d53263a712d897a797df8388e13b8e7b3f30d7d7da88028b724d60" else {
+		guard factorSourceID.keychainKey == "device:4af22ea955d53263a712d897a797df8388e13b8e7b3f30d7d7da88028b724d60" else {
 			fatalError("CRITICAL UNIT TEST FAILURE - LOSS OF FUNDS POSSIBLE.")
 		}
 	}
