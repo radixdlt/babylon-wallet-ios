@@ -415,6 +415,16 @@
 "transactionReview_submitTransaction_txID" = "Transaction ID";
 "transactionReview_submitTransaction_status" = "Status";
 "transactionReview_submitTransaction_navigationTitle" = "Submitting Transaction";
+"transactionReview_accountDepositSettings_title" = "Review New Deposit Settings";
+"transactionReview_accountDepositSettings_subtitle" = "Third-party deposit setting";
+"transactionReview_accountDepositSettings_acceptAllRule" = "Allow third parties to deposit *any asset* to this account.";
+"transactionReview_accountDepositSettings_acceptKnownRule" = "Allow third parties to deposit *only assets this account has already held*.";
+"transactionReview_accountDepositSettings_denyAllRule" = "*Disallow* all deposits from third parties without your consent.";
+"transactionReview_accountDepositSettings_assetChangeAllow" = "Allow";
+"transactionReview_accountDepositSettings_assetChangeDisallow" = "Disallow";
+"transactionReview_accountDepositSettings_assetChangeClear" = "Clear Exception";
+"transactionReview_accountDepositSettings_depositorChangeAdd" = "Add Depositor";
+"transactionReview_accountDepositSettings_depositorChangeRemove" = "Remove Depositor";
 "transaction_status_completing_text" = "Completing Transaction…";
 "transaction_status_success_title" = "Success";
 "transaction_status_success_text" = "Your transaction was successful";
@@ -427,6 +437,9 @@
 "addressAction_noWebBrowserInstalled" = "There is no web browser installed in this device";
 "addressAction_viewOnDashboard" = "View on Radix Dashboard";
 "addressAction_showAccountQR" = "Show Address QR Code";
+"addressAction_verifyAddressLedger" = "Verify Address with Ledger";
+"addressAction_verifyAddressLedger_success" = "Address verified";
+"addressAction_verifyAddressLedger_error" = "Verify address request failed";
 "addressAction_qrCodeView_qrCodeLabel" = "QR code for an account";
 "addressAction_qrCodeView_failureLabel" = "Could not create QR code";
 "biometrics_prompt_title" = "Authenticate to continue";
