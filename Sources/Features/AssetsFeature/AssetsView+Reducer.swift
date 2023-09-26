@@ -53,7 +53,7 @@ public struct AssetsView: Sendable, FeatureReducer {
 		) {
 			self.account = account
 			self.assetKinds = assetKinds
-			self.activeAssetKind = assetKinds.first
+			self.activeAssetKind = .nonFungible
 			self.fungibleTokenList = fungibleTokenList
 			self.nonFungibleTokenList = nonFungibleTokenList
 			self.poolUnitsList = poolUnitsList

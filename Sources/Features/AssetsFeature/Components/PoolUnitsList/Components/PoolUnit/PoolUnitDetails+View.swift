@@ -10,14 +10,14 @@ extension PoolUnitDetails.State {
 			thumbnailURL: resource.metadata.iconURL,
 			resources: PoolUnitResourceViewState.resourcesViewState(poolUnit: poolUnit, loadedPoolResources: loadedPoolResources),
 			resourceDetails: .init(
-				description: loadedPoolUnitResource.map { $0! }.resourceMetadata.description,
+				description: loadedPoolUnitResource.map { $0?.resourceMetadata.description },
 				resourceAddress: resource.resourceAddress,
 				isXRD: false,
 				validatorAddress: nil,
-				resourceName: .idle, // resource.metadata.name, // FIXME: Is this correct?
-				currentSupply: .idle, // resource.totalSupply?.format() ?? L10n.AssetDetails.supplyUnkown,
-				behaviors: .idle,
-				tags: .idle // resource.metadata.tags
+				resourceName: loadedPoolUnitResource.map { $0?.resourceMetadata.name }, // FIXME: Is this correct?
+				currentSupply: loadedPoolUnitResource.map { $0?.totalSupply?.format() ?? L10n.AssetDetails.supplyUnkown },
+				behaviors: loadedPoolUnitResource.map { $0?.behaviors ?? [] },
+				tags: loadedPoolUnitResource.map { $0?.resourceMetadata.tags ?? [] }
 			)
 		)
 	}

@@ -11,7 +11,7 @@ extension NonFungibleTokenDetails.State {
 				resourceAddress: resourceAddress,
 				isXRD: false,
 				validatorAddress: nil,
-				resourceName: .success(token?.data.name),
+				resourceName: resource.resourceMetadata.name,
 				currentSupply: resource.totalSupply.map { $0?.format() },
 				behaviors: resource.behaviors,
 				tags: prefetchedPortfolioResource.map { .success($0.metadata.tags) } ?? resource.resourceMetadata.tags

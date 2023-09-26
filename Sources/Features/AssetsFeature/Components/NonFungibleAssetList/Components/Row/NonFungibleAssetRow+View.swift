@@ -38,7 +38,6 @@ extension NonFungibleAssetList.Row.View {
 							) { index, item in
 								componentView(with: viewStore, asset: item, index: index)
 									.onAppear {
-										print("view appeared \(index)")
 										viewStore.send(.onTokenDidAppear(index: index))
 									}
 							}
