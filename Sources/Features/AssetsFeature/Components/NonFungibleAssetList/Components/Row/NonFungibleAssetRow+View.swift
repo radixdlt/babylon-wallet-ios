@@ -32,21 +32,20 @@ extension NonFungibleAssetList.Row.View {
 						LazyVStack {
 							ForEach(
 								Array(
-									assetsToDisplay(viewStore)
-										.enumerated()
+									viewStore.loadedTokens.enumerated()
 								),
 								id: \.element
 							) { index, item in
 								componentView(with: viewStore, asset: item, index: index)
 									.onAppear {
+										print("view appeared \(index)")
 										viewStore.send(.onTokenDidAppear(index: index))
 									}
 							}
 						}
-						.overlay(alignment: .bottom) {
-							if viewStore.isLoadingResources {
-								ProgressView()
-							}
+					} else {
+						ForEach(0 ..< Constants.collapsedCardsCount) { index in
+							collapsedPlaceholderView(index)
 						}
 					}
 				}
@@ -98,6 +97,21 @@ extension NonFungibleAssetList.Row.View {
 // MARK: - Private Computed Properties
 extension NonFungibleAssetList.Row.View {
 	@ViewBuilder
+	fileprivate func collapsedPlaceholderView(_ index: Int) -> some View {
+		Spacer()
+			// .padding(.medium1)
+			.frame(maxWidth: .infinity, minHeight: headerHeight)
+			.background(.app.white)
+			.roundedCorners(
+				.bottom,
+				radius: .small1
+			)
+			.tokenRowShadow(true)
+			.scaleEffect(scale(isExpanded: false, index: index))
+			.zIndex(reversedZIndex(count: Constants.collapsedCardsCount, index: index))
+	}
+
+	@ViewBuilder
 	fileprivate func componentView(
 		with viewStore: ViewStoreOf<NonFungibleAssetList.Row>,
 		asset: OnLedgerEntity.NonFungibleToken,
@@ -121,11 +135,8 @@ extension NonFungibleAssetList.Row.View {
 		.background(.app.white)
 		.roundedCorners(
 			.bottom,
-			radius: viewStore.isExpanded && index != (viewStore.loadedTokens.count - 1) ? .zero : .small1
+			radius: index != (viewStore.loadedTokens.count - 1) ? .zero : .small1
 		)
-		.tokenRowShadow(!viewStore.isExpanded)
-		.scaleEffect(scale(isExpanded: viewStore.isExpanded, index: index))
-		.zIndex(reversedZIndex(count: viewStore.loadedTokens.count, index: index))
 		.onTapGesture { viewStore.send(.assetTapped(asset.id)) }
 	}
 

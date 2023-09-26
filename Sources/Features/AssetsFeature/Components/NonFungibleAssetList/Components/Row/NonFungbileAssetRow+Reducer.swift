@@ -5,6 +5,8 @@ import OnLedgerEntitiesClient
 extension NonFungibleAssetList {
 	public struct Row: Sendable, FeatureReducer {
 		public struct State: Sendable, Hashable, Identifiable {
+			static let pageSize = OnLedgerEntitiesClient.maximumNFTIDChunkSize
+
 			public var id: ResourceAddress { resource.resourceAddress }
 			public typealias AssetID = OnLedgerEntity.NonFungibleToken.ID
 
@@ -51,17 +53,7 @@ extension NonFungibleAssetList {
 		public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 			switch viewAction {
 			case .task:
-				return .run { [resource = state.resource] send in
-					let result = await TaskResult {
-						try await onLedgerEntitiesClient.getNonFungibleTokenData(.init(
-							atLedgerState: resource.atLedgerState,
-							resource: resource.resourceAddress,
-							nonFungibleIds: Array(resource.nonFungibleIds.prefix(10))
-						)
-						)
-					}
-					await send(.internal(.tokensLoaded(result)))
-				}
+				return .none
 			case .didAppear:
 				return .send(.delegate(.didAppear(state.resource.resourceAddress)))
 
@@ -83,20 +75,15 @@ extension NonFungibleAssetList {
 
 			case .isExpandedToggled:
 				state.isExpanded.toggle()
-				return .run { [resource = state.resource] send in
-					let result = await TaskResult {
-						try await onLedgerEntitiesClient.getNonFungibleTokenData(.init(
-							atLedgerState: resource.atLedgerState,
-							resource: resource.resourceAddress,
-							nonFungibleIds: Array(resource.nonFungibleIds.prefix(10))
-						)
-						)
-					}
-					await send(.internal(.tokensLoaded(result)))
+				guard state.isExpanded, state.loadedTokens.isEmpty else {
+					return .none
 				}
+				return fetchTokens(
+					for: state.resource,
+					Array(state.resource.nonFungibleIds.prefix(2 * State.pageSize))
+				)
 			case let .onTokenDidAppear(index: index):
-				// is Last
-				guard index == (state.loadedTokens.count - 1) else {
+				guard index == state.loadedTokens.count - State.pageSize else {
 					return .none
 				}
 
@@ -118,23 +105,32 @@ extension NonFungibleAssetList {
 			}
 		}
 
+		private func fetchTokens(for resource: AccountPortfolio.NonFungibleResource, _ ids: [NonFungibleGlobalId]) -> Effect<Action> {
+			.run { send in
+				let result = await TaskResult {
+					try await onLedgerEntitiesClient.getNonFungibleTokenData(.init(
+						atLedgerState: resource.atLedgerState,
+						resource: resource.resourceAddress,
+						nonFungibleIds: ids
+					))
+				}
+				await send(.internal(.tokensLoaded(result)))
+			}
+		}
+
 		func loadResources(_ state: inout State) -> Effect<Action> {
-			guard !state.isLoadingResources, state.loadedTokens.count < state.resource.nonFungibleIds.count else {
+			let diff = state.resource.nonFungibleIds.count - state.loadedTokens.count
+			guard !state.isLoadingResources, diff > 0 else {
 				return .none
 			}
 
-			let pageSize = 7
-
-			let diff = state.resource.nonFungibleIds.count - state.resource.nonFungibleIds.count
 			let tokens = {
-				if diff < pageSize {
+				if diff < State.pageSize {
 					return state.resource.nonFungibleIds.suffix(diff)
 				}
 				let pageStartIndex = state.loadedTokens.count
-				return state.resource.nonFungibleIds[pageStartIndex ..< pageStartIndex + pageSize]
+				return state.resource.nonFungibleIds[pageStartIndex ..< pageStartIndex + State.pageSize]
 			}()
-
-			let pageIndex = state.loadedPages + 1
 
 			state.isLoadingResources = true
 			return .run { [resource = state.resource] send in

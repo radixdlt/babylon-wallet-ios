@@ -6,6 +6,8 @@ import SharedModels
 
 // MARK: - OnLedgerEntitiesClient + DependencyKey
 extension OnLedgerEntitiesClient: DependencyKey {
+	public static let maximumNFTIDChunkSize = 29
+
 	enum Error: Swift.Error {
 		case emptyResponse
 	}
@@ -61,30 +63,34 @@ extension OnLedgerEntitiesClient {
 
 	static func fetchNonFungibleData(_ request: GetNonFungibleTokenDataRequest) async throws -> [OnLedgerEntity] {
 		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
-
-		let response = try await gatewayAPIClient.getNonFungibleData(.init(
-			atLedgerState: request.atLedgerState.selector,
-			resourceAddress: request.resource.address,
-			nonFungibleIds: Array(request.nonFungibleIds.map { try $0.localId().toString() })
-		))
-		let ledgerState = response.ledgerState
+		let response = try await request.nonFungibleIds
+			.chunks(ofCount: maximumNFTIDChunkSize)
+			.parallelMap { ids in
+				try await gatewayAPIClient.getNonFungibleData(.init(
+					atLedgerState: request.atLedgerState.selector,
+					resourceAddress: request.resource.address,
+					nonFungibleIds: Array(ids.map { try $0.localId().toString() })
+				))
+			}
 
 		return try response
-			.nonFungibleIds
-			.map { item in
-				let details = item.details
-				let canBeClaimed = details.claimEpoch.map { UInt64(ledgerState.epoch) >= $0 } ?? false
-				return try OnLedgerEntity.nonFungibleToken(.init(
-					id: .fromParts(
-						resourceAddress: .init(address: request.resource.address),
-						nonFungibleLocalId: .from(stringFormat: item.nonFungibleId)
-					),
-					name: details.name,
-					description: details.tokenDescription,
-					keyImageURL: details.keyImageURL,
-					stakeClaimAmount: details.claimAmount,
-					canBeClaimed: canBeClaimed
-				))
+			.flatMap { item in
+				let ledgerState = item.ledgerState
+				return try item.nonFungibleIds.map { id in
+					let details = id.details
+					let canBeClaimed = details.claimEpoch.map { UInt64(ledgerState.epoch) >= $0 } ?? false
+					return try OnLedgerEntity.nonFungibleToken(.init(
+						id: .fromParts(
+							resourceAddress: .init(address: request.resource.address),
+							nonFungibleLocalId: .from(stringFormat: id.nonFungibleId)
+						),
+						name: details.name,
+						description: details.tokenDescription,
+						keyImageURL: details.keyImageURL,
+						stakeClaimAmount: details.claimAmount,
+						canBeClaimed: canBeClaimed
+					))
+				}
 			}
 	}
 

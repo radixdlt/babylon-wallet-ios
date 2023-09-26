@@ -264,50 +264,11 @@ extension AccountPortfoliosClient {
 			return firstPageItems + additionalItems
 		}
 
-		// Tokens should be loaded lazily
-//		@Sendable
-//		func tokens(
-//			resource: GatewayAPI.NonFungibleResourcesCollectionItemVaultAggregated
-//		) async throws -> IdentifiedArrayOf<OnLedgerEntity.NonFungibleToken> {
-//
-//
-//			// https://rdxworks.slack.com/archives/C02MTV9602H/p1681155601557349
-//			let maximumNFTIDChunkSize = 29
-//
-//			var result: IdentifiedArrayOf<OnLedgerEntity.NonFungibleToken> = []
-//			for nftIDChunk in nftIDs.chunks(ofCount: maximumNFTIDChunkSize) {
-//				let tokens = try await gatewayAPIClient.getNonFungibleData(.init(
-//					atLedgerState: ledgerState.selector,
-//					resourceAddress: resource.resourceAddress,
-		//                    nonFungibleIds: Array(nftIDChunk.map { $0.localId().toString()})
-//				))
-//				.nonFungibleIds
-//				.map { item in
-//					let details = item.details
-//					let canBeClaimed = details.claimEpoch.map { UInt64(ledgerState.epoch) >= $0 } ?? false
-//					return try OnLedgerEntity.NonFungibleToken(
-//						id: .fromParts(
-//							resourceAddress: .init(address: resource.resourceAddress),
-//							nonFungibleLocalId: .from(stringFormat: item.nonFungibleId)
-//						),
-//						name: details.name,
-//						description: details.tokenDescription,
-//						keyImageURL: details.keyImageURL,
-//						metadata: [],
-//						stakeClaimAmount: details.claimAmount,
-//						canBeClaimed: canBeClaimed
-//					)
-//				}
-//
-//				result.append(contentsOf: tokens)
-//			}
-//
-//			return result
-//		}
-
 		// Get all user owned nft ids, but do not fetch the related data.
 		let nftIDs = try await getAllTokens(resource: resource).map {
 			try NonFungibleGlobalId.fromParts(resourceAddress: .init(address: resource.resourceAddress), nonFungibleLocalId: .from(stringFormat: $0))
+		}.sorted {
+			$0.localId().id < $1.localId().id
 		}
 
 		return try AccountPortfolio.NonFungibleResource(
