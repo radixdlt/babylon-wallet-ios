@@ -263,12 +263,12 @@ extension AssetTransfer {
 				if resources[id: fungibleAsset.resource.resourceAddress] != nil {
 					resources[id: fungibleAsset.resource.resourceAddress]?.accounts.append(accountTransfer)
 				} else {
-//					resources.append(.init(
-//						address: fungibleAsset.resource.resourceAddress,
-//						totalTransferAmount: fungibleAsset.totalTransferSum,
-//						divisibility: fungibleAsset.resource.divisibility,
-//						accounts: [accountTransfer]
-//					))
+					resources.append(.init(
+						address: fungibleAsset.resource.resourceAddress,
+						totalTransferAmount: fungibleAsset.totalTransferSum,
+						divisibility: 18,
+						accounts: [accountTransfer]
+					))
 				}
 			}
 		}

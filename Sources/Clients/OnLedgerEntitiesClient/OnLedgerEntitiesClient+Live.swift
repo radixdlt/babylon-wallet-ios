@@ -138,7 +138,7 @@ extension OnLedgerEntitiesClient {
 				description: item.explicitMetadata?.description,
 				iconURL: item.explicitMetadata?.iconURL,
 				behaviors: item.details?.fungible?.roleAssignments.extractBehaviors() ?? [],
-				tags: item.extractTags(),
+				tags: item.explicitMetadata?.extractTags() ?? [],
 				totalSupply: try? BigDecimal(fromString: fungibleDetails.totalSupply),
 				dappDefinitions: dappDefinitions
 			))
@@ -151,13 +151,19 @@ extension OnLedgerEntitiesClient {
 				description: item.explicitMetadata?.description,
 				iconURL: item.explicitMetadata?.iconURL,
 				behaviors: item.details?.nonFungible?.roleAssignments.extractBehaviors() ?? [],
-				tags: item.extractTags(),
+				tags: item.explicitMetadata?.extractTags() ?? [],
 				totalSupply: try? BigDecimal(fromString: nonFungibleDetails.totalSupply),
 				dappDefinitions: dappDefinitions
 			))
 		default:
 			return nil
 		}
+	}
+}
+
+extension GatewayAPI.EntityMetadataCollection {
+	@Sendable public func extractTags() -> [AssetTag] {
+		tags?.compactMap(NonEmptyString.init(rawValue:)).map(AssetTag.init) ?? []
 	}
 }
 

@@ -862,7 +862,8 @@ extension TransactionReview {
 				func guarantee() -> TransactionClient.Guarantee? {
 					guard case let .predicted(instructionIndex, _) = source else { return nil }
 					let guaranteedAmount = defaultDepositGuarantee * amount
-					return .init(amount: guaranteedAmount, instructionIndex: instructionIndex, resourceAddress: resourceAddress)
+					fatalError()
+					// return .init(amount: guaranteedAmount, instructionIndex: instructionIndex, resourceAddress: resourceAddress)
 				}
 
 				let details: Transfer.Details.Fungible = .init(

@@ -1,24 +1,15 @@
 import FeaturePrelude
-import OnLedgerEntitiesClient
 
-// MARK: - NonFungibleAssetList
 public struct NonFungibleAssetList: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
-		public var rows: IdentifiedArrayOf<NonFungibleAssetList.Row.State> = []
-
-		public let resources: AccountPortfolio.NonFungibleResources
+		public var rows: IdentifiedArrayOf<NonFungibleAssetList.Row.State>
 
 		@PresentationState
 		public var destination: Destinations.State?
-		public var isLoadingResources: Bool = true
 
-		public init(resources: AccountPortfolio.NonFungibleResources) {
-			self.resources = resources
+		public init(rows: IdentifiedArrayOf<NonFungibleAssetList.Row.State>) {
+			self.rows = rows
 		}
-	}
-
-	public enum ViewAction: Sendable, Equatable {
-		case closeDetailsTapped
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -42,8 +33,6 @@ public struct NonFungibleAssetList: Sendable, FeatureReducer {
 		}
 	}
 
-	@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
-
 	public init() {}
 
 	public var body: some ReducerOf<Self> {
@@ -56,27 +45,27 @@ public struct NonFungibleAssetList: Sendable, FeatureReducer {
 			}
 	}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
-		switch viewAction {
-		case .closeDetailsTapped:
-			state.destination = nil
-			return .none
-		}
-	}
-
 	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
-		case let .asset(rowID, .delegate(.open(token))):
+		case let .asset(rowID, .delegate(.open(localID))):
 			guard let row = state.rows[id: rowID] else {
 				loggerGlobal.warning("Selected row does not exist \(rowID)")
 				return .none
 			}
-
-			//	state.destination = .details(.init(resource: row.resource.resource, token: token))
+//			guard let token = row.resource.tokens[id: localID] else {
+//				loggerGlobal.warning("Selected token does not exist: \(localID)")
+//				return .none
+//			}
+//
+//			state.destination = .details(.init(resource: row.resource.resource, token: token))
 			return .none
 
 		case .asset:
 			return .none
+
+//		case .destination(.presented(.details(.delegate(.dismiss)))):
+//			state.destination = nil
+//			return .none
 
 		case .destination:
 			return .none

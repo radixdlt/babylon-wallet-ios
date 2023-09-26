@@ -117,7 +117,7 @@ struct AssetsView_Preview: PreviewProvider {
 				initialState: .init(
 					account: .previewValue0,
 					fungibleTokenList: .init(),
-					nonFungibleTokenList: .init(resources: []),
+					nonFungibleTokenList: .init(rows: []),
 					poolUnitsList: .init(),
 					mode: .normal
 				),
