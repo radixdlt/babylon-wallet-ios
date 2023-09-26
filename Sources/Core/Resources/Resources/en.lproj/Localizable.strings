@@ -425,6 +425,7 @@
 "transactionReview_accountDepositSettings_assetChangeClear" = "Clear Exception";
 "transactionReview_accountDepositSettings_depositorChangeAdd" = "Add Depositor";
 "transactionReview_accountDepositSettings_depositorChangeRemove" = "Remove Depositor";
+"transactionReview_unacceptableManifest_rejected" = "A proposed transaction was rejected because it contains one or more reserved instructions.";
 "transaction_status_completing_text" = "Completing Transaction…";
 "transaction_status_success_title" = "Success";
 "transaction_status_success_text" = "Your transaction was successful";
