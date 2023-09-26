@@ -26,8 +26,7 @@ final class AppFeatureTests: TestCase {
 			$0.gatewaysClient.gatewaysValues = { AsyncLazySequence([.init(current: .default)]).eraseToAnyAsyncSequence() }
 		}
 		// when
-		await store.send(.child(.main(.delegate(.removedWallet))))
-		await store.receive(.internal(.toOnboarding)) {
+		await store.send(.child(.main(.delegate(.removedWallet)))) {
 			$0.root = .onboardingCoordinator(.init())
 		}
 		XCTAssertFalse(store.state.showIsUsingTestnetBanner)
@@ -148,9 +147,7 @@ final class AppFeatureTests: TestCase {
 			expectationProfileGotDeleted.fulfill()
 		}
 		await store.send(.view(.alert(.presented(.incompatibleProfileErrorAlert(.deleteWalletDataButtonTapped)))))
-		await store.receive(.internal(.incompatibleProfileDeleted))
-		await store.receive(.internal(.toOnboarding)) {
-			// ➡️ ... and onboard user
+		await store.receive(.internal(.incompatibleProfileDeleted)) {
 			$0.root = .onboardingCoordinator(.init())
 		}
 
@@ -202,8 +199,7 @@ final class AppFeatureTests: TestCase {
 		await store.send(.view(.alert(.presented(.incompatibleProfileErrorAlert(.deleteWalletDataButtonTapped))))) {
 			$0.alert = nil
 		}
-		await store.receive(.internal(.incompatibleProfileDeleted))
-		await store.receive(.internal(.toOnboarding)) {
+		await store.receive(.internal(.incompatibleProfileDeleted)) {
 			$0.root = .onboardingCoordinator(.init())
 		}
 

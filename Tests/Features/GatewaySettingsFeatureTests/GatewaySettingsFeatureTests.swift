@@ -16,8 +16,8 @@ final class GatewaySettingsFeatureTests: TestCase {
 
 	func test_whenViewAppeared_thenCurrentGatewayAndGatewayListIsLoaded() async throws {
 		// given
-		let otherGateways: [Radix.Gateway] = [.hammunet, .enkinet, .mardunet]
-		let currentGateway: Radix.Gateway = .nebunet
+		let otherGateways: [Radix.Gateway] = [.stokenet, .rcnet]
+		let currentGateway: Radix.Gateway = .mainnet
 		let gateways = try! Gateways(
 			current: currentGateway,
 			other: .init(uniqueElements: otherGateways)
@@ -47,10 +47,9 @@ final class GatewaySettingsFeatureTests: TestCase {
 						canBeDeleted: !$0.isWellknown
 					)
 				}
-				.sorted(by: { !$0.canBeDeleted && $1.canBeDeleted })
 			))
 
-			$0.currentGateway = .nebunet
+			$0.currentGateway = .mainnet
 		}
 		await viewTask.cancel()
 	}
@@ -105,10 +104,10 @@ final class GatewaySettingsFeatureTests: TestCase {
 
 	func test_whenNonCurrentGatewayRemovalIsConfirmed_removeGateway() async throws {
 		// given
-		let gatewayToBeDeleted = GatewayRow.State(gateway: .enkinet, isSelected: false, canBeDeleted: true)
-		let currentGateway: Radix.Gateway = .nebunet
-		let otherGateways: [Radix.Gateway] = [.hammunet, .enkinet, .mardunet]
-		let otherAfterDeletion: [Radix.Gateway] = [.hammunet, .mardunet]
+		let gatewayToBeDeleted = GatewayRow.State(gateway: .rcnet, isSelected: false, canBeDeleted: true)
+		let otherGateways: [Radix.Gateway] = [.stokenet, .rcnet]
+		let currentGateway: Radix.Gateway = .mainnet
+		let otherAfterDeletion: [Radix.Gateway] = [.stokenet]
 		let gateways = try! Gateways(
 			current: currentGateway,
 			other: .init(uniqueElements: otherGateways)
@@ -176,7 +175,7 @@ final class GatewaySettingsFeatureTests: TestCase {
 				}
 			))
 
-			$0.currentGateway = .nebunet
+			$0.currentGateway = .mainnet
 		}
 	}
 

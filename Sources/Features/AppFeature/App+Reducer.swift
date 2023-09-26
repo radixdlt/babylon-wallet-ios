@@ -21,7 +21,7 @@ public struct App: Sendable, FeatureReducer {
 
 		public var root: Root
 
-		public var isOnMainnet = false
+		public var isOnMainnet = true
 
 		@PresentationState
 		public var alert: Alerts.State?
