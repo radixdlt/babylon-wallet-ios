@@ -1,7 +1,6 @@
 import AccountPortfoliosClient
 import EngineKit
 import FeaturePrelude
-import OnLedgerEntitiesClient
 import SharedModels
 
 // MARK: - FungibleAssetList

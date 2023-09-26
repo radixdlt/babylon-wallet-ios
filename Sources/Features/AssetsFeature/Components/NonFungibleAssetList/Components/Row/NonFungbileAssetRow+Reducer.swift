@@ -31,7 +31,7 @@ extension NonFungibleAssetList {
 
 		public enum ViewAction: Sendable, Equatable {
 			case isExpandedToggled
-			case assetTapped(State.AssetID)
+			case assetTapped(OnLedgerEntity.NonFungibleToken)
 			case didAppear
 			case task
 			case onTokenDidAppear(index: Int)
@@ -57,21 +57,14 @@ extension NonFungibleAssetList {
 			case .didAppear:
 				return .send(.delegate(.didAppear(state.resource.resourceAddress)))
 
-			case let .assetTapped(localID):
-				guard !state.disabled.contains(localID) else { return .none }
-				guard let token = state.loadedTokens[id: localID] else {
-					loggerGlobal.warning("Selected a missing token")
-					return .none
-				}
+			case let .assetTapped(asset):
+				guard !state.disabled.contains(asset.id) else { return .none }
+
 				if state.selectedAssets != nil {
-//					guard let token = state.resource.tokens[id: localID] else {
-//						loggerGlobal.warning("Selected a missing token")
-//						return .none
-//					}
-//					state.selectedAssets?.toggle(token.id)
+					state.selectedAssets?.toggle(asset.id)
 					return .none
 				}
-				return .send(.delegate(.open(token)))
+				return .send(.delegate(.open(asset)))
 
 			case .isExpandedToggled:
 				state.isExpanded.toggle()

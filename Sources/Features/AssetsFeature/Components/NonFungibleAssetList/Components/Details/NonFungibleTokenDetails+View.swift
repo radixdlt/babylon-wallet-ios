@@ -5,8 +5,17 @@ extension NonFungibleTokenDetails.State {
 	var viewState: NonFungibleTokenDetails.ViewState {
 		.init(
 			tokenDetails: token.map(NonFungibleTokenDetails.ViewState.TokenDetails.init),
-			resourceThumbnail: resource.iconURL,
-			resourceDetails: .init(resource: resource)
+			resourceThumbnail: prefetchedPortfolioResource.map { .success($0.metadata.iconURL) } ?? resource.iconURL,
+			resourceDetails: .init(
+				description: resource.description,
+				resourceAddress: resourceAddress,
+				isXRD: false,
+				validatorAddress: nil,
+				resourceName: nil,
+				currentSupply: resource.totalSupply.map { $0?.format() },
+				behaviors: resource.behaviors,
+				tags: prefetchedPortfolioResource.map { .success($0.metadata.tags) } ?? resource.tags
+			)
 		)
 	}
 }
@@ -22,26 +31,11 @@ extension NonFungibleTokenDetails.ViewState.TokenDetails {
 	}
 }
 
-extension AssetResourceDetailsSection.ViewState {
-	init(resource: OnLedgerEntity.Resource) {
-		self.init(
-			description: .success(resource.description),
-			resourceAddress: resource.resourceAddress,
-			isXRD: false,
-			validatorAddress: nil,
-			resourceName: .success(resource.name),
-			currentSupply: .success(resource.totalSupply?.format()),
-			behaviors: .success(resource.behaviors),
-			tags: .success(resource.tags)
-		)
-	}
-}
-
 // MARK: - NonFungibleTokenList.Detail.View
 extension NonFungibleTokenDetails {
 	public struct ViewState: Equatable {
 		let tokenDetails: TokenDetails?
-		let resourceThumbnail: URL?
+		let resourceThumbnail: Loadable<URL?>
 		let resourceDetails: AssetResourceDetailsSection.ViewState
 
 		public struct TokenDetails: Equatable {
@@ -82,7 +76,9 @@ extension NonFungibleTokenDetails {
 						}
 
 						VStack(spacing: .medium1) {
-							NFTThumbnail(viewStore.resourceThumbnail, size: .veryLarge)
+							loadable(viewStore.resourceThumbnail) { value in
+								NFTThumbnail(value, size: .veryLarge)
+							}
 
 							AssetResourceDetailsSection(viewState: viewStore.resourceDetails)
 						}
@@ -92,6 +88,9 @@ extension NonFungibleTokenDetails {
 					.padding(.top, .small1)
 				}
 				.foregroundColor(.app.gray1)
+				.task { @MainActor in
+					await viewStore.send(.view(.task)).finish()
+				}
 			}
 		}
 	}

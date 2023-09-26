@@ -65,7 +65,7 @@ struct AssetResourceDetailsSection: View {
 
 extension View {
 	@ViewBuilder
-	func loadable<T>(_ loadable: Loadable<T>, @ViewBuilder successContent: (T) -> some View) -> some View {
+	public func loadable<T>(_ loadable: Loadable<T>, @ViewBuilder successContent: (T) -> some View) -> some View {
 		switch loadable {
 		case .idle, .loading:
 			Spacer()

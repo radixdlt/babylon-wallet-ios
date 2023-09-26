@@ -137,7 +137,7 @@ extension NonFungibleAssetList.Row.View {
 			.bottom,
 			radius: index != (viewStore.loadedTokens.count - 1) ? .zero : .small1
 		)
-		.onTapGesture { viewStore.send(.assetTapped(asset.id)) }
+		.onTapGesture { viewStore.send(.assetTapped(asset)) }
 	}
 
 	fileprivate func headerSupplyText(with viewStore: ViewStoreOf<NonFungibleAssetList.Row>) -> String {

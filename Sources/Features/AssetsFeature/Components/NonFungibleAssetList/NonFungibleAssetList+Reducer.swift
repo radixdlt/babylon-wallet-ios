@@ -47,17 +47,13 @@ public struct NonFungibleAssetList: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
-		case let .asset(rowID, .delegate(.open(localID))):
+		case let .asset(rowID, .delegate(.open(asset))):
 			guard let row = state.rows[id: rowID] else {
 				loggerGlobal.warning("Selected row does not exist \(rowID)")
 				return .none
 			}
-//			guard let token = row.resource.tokens[id: localID] else {
-//				loggerGlobal.warning("Selected token does not exist: \(localID)")
-//				return .none
-//			}
-//
-//			state.destination = .details(.init(resource: row.resource.resource, token: token))
+
+			state.destination = .details(.init(resourceAddress: row.id, prefetchedPortfolioResource: row.resource, token: asset))
 			return .none
 
 		case .asset:

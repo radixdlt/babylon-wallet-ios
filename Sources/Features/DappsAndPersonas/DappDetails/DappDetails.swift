@@ -240,7 +240,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 				return .none
 			}
 
-			state.destination = .nonFungibleDetails(.init(resource: resource))
+			// state.destination = .nonFungibleDetails(.init(resource: resource))
 			return .none
 
 		case let .dAppTapped(address):
