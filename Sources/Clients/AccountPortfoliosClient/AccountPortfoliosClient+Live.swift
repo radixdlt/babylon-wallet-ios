@@ -186,36 +186,20 @@ extension AccountPortfoliosClient {
 			return .init()
 		}
 
-		return try await rawItems.asyncMap {
-			try await createFungibleResource($0, ledgerState: ledgerState)
+		return try await rawItems.map {
+			try createFungibleResource($0, ledgerState: ledgerState)
 		}.sorted()
 	}
 
 	@Sendable
-	static func createFungibleResource(_ resource: GatewayAPI.FungibleResourcesCollectionItemVaultAggregated, ledgerState: GatewayAPI.LedgerState) async throws -> AccountPortfolio.FungibleResource {
-		let amount: BigDecimal = {
-			// Resources of an account always have one single vault which stores the value.
-			guard let resourceVault = resource.vaults.items.first else {
-				loggerGlobal.warning("Account Portfolio: \(resource.resourceAddress) does not have any vaults")
-				return .zero
-			}
-
-			do {
-				return try BigDecimal(fromString: resourceVault.amount)
-			} catch {
-				loggerGlobal.error(
-					"Account Portfolio: Failed to parse amount for resource: \(resource.resourceAddress), reason: \(error.localizedDescription)"
-				)
-				return .zero
-			}
-		}()
-
-		let resourceAddress = try ResourceAddress(validatingAddress: resource.resourceAddress)
-
-		return AccountPortfolio.FungibleResource(
-			resourceAddress: resourceAddress,
-			atLedgerState: .init(version: ledgerState.stateVersion),
-			amount: amount,
+	static func createFungibleResource(
+		_ resource: GatewayAPI.FungibleResourcesCollectionItemVaultAggregated,
+		ledgerState: GatewayAPI.LedgerState
+	) throws -> AccountPortfolio.FungibleResource {
+		try AccountPortfolio.FungibleResource(
+			resourceAddress: .init(validatingAddress: resource.resourceAddress),
+			atLedgerState: .init(version: ledgerState.stateVersion, epoch: ledgerState.epoch),
+			amount: resource.amount,
 			metadata: .init(resource.explicitMetadata)
 		)
 	}
@@ -273,10 +257,29 @@ extension AccountPortfoliosClient {
 
 		return try AccountPortfolio.NonFungibleResource(
 			resourceAddress: .init(validatingAddress: resource.resourceAddress),
-			atLedgerState: .init(version: ledgerState.stateVersion),
+			atLedgerState: .init(version: ledgerState.stateVersion, epoch: ledgerState.epoch),
 			nonFungibleIds: nftIDs,
 			metadata: .init(resource.explicitMetadata)
 		)
+	}
+}
+
+extension GatewayAPI.FungibleResourcesCollectionItemVaultAggregated {
+	var amount: BigDecimal {
+		// Resources of an account always have one single vault which stores the value.
+		guard let resourceVault = vaults.items.first else {
+			loggerGlobal.warning("Account Portfolio: \(resourceAddress) does not have any vaults")
+			return .zero
+		}
+
+		do {
+			return try BigDecimal(fromString: resourceVault.amount)
+		} catch {
+			loggerGlobal.error(
+				"Account Portfolio: Failed to parse amount for resource: \(resourceAddress), reason: \(error.localizedDescription)"
+			)
+			return .zero
+		}
 	}
 }
 

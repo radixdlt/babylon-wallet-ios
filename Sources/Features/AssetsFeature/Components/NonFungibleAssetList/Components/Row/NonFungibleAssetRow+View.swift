@@ -121,12 +121,12 @@ extension NonFungibleAssetList.Row.View {
 		HStack {
 			NFTIDView(
 				id: asset.id.localId().toUserFacingString(),
-				name: asset.name,
-				description: asset.description,
-				thumbnail: viewStore.isExpanded ? asset.keyImageURL : nil
+				name: asset.data.name,
+				description: asset.data.description,
+				thumbnail: viewStore.isExpanded ? asset.data.keyImageURL : nil
 			)
 			if let selectedAssets = viewStore.selectedAssets {
-				CheckmarkView(appearance: .dark, isChecked: selectedAssets.contains(asset.id))
+				CheckmarkView(appearance: .dark, isChecked: selectedAssets.contains(asset))
 			}
 		}
 		.opacity(isDisabled ? 0.35 : 1)
@@ -138,25 +138,6 @@ extension NonFungibleAssetList.Row.View {
 			radius: index != (viewStore.loadedTokens.count - 1) ? .zero : .small1
 		)
 		.onTapGesture { viewStore.send(.assetTapped(asset)) }
-	}
-
-	fileprivate func headerSupplyText(with viewStore: ViewStoreOf<NonFungibleAssetList.Row>) -> String {
-		// TODO: remove when API is ready
-		L10n.AssetDetails.supplyUnkown
-
-		// TODO: update when API is ready
-		/*
-		 guard let supply = viewStore.containers.first?.asset.supply else {
-		 	return L10n.AssetDetails.supplyUnkown
-		 }
-
-		 switch supply {
-		 case let .fixed(value):
-		 	return NSLocalizedString(L10n.AssetDetails.NFTDetails.ownedOfTotal(viewStore.containers.count, Int(value.magnitude)), comment: "Number of NFTs owned of total number")
-		 case .mutable:
-		 	return NSLocalizedString(L10n.AssetDetails.NFTDetails.nftPlural(viewStore.containers.count), comment: "Number of NFTs owned")
-		 }
-		 */
 	}
 }
 

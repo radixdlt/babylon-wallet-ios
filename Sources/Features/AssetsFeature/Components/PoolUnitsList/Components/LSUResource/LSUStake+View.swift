@@ -46,7 +46,7 @@ extension LSUStake {
 		let validatorNameViewState: ValidatorNameView.ViewState
 
 		let liquidStakeUnit: PoolUnitResourceViewState?
-		let stakeClaimNFTs: StakeClaimNFTsViewState?
+		let stakeClaimNFTs: Loadable<StakeClaimNFTsViewState>?
 	}
 
 	public struct View: SwiftUI.View {
@@ -78,6 +78,9 @@ extension LSUStake {
 					action: Destinations.Action.details,
 					content: LSUDetails.View.init
 				)
+				.task { @MainActor in
+					await viewStore.send(.task).finish()
+				}
 			}
 		}
 
@@ -102,35 +105,37 @@ extension LSUStake {
 		}
 
 		private func stakeClaimNFTsView(
-			viewState: ViewState.StakeClaimNFTsViewState,
+			viewState: Loadable<ViewState.StakeClaimNFTsViewState>,
 			handleTapGesture: @escaping (ViewState.StakeClaimNFTViewState.ID) -> Void
 		) -> some SwiftUI.View {
 			VStack(alignment: .leading, spacing: .medium1) {
 				Text(L10n.Account.PoolUnits.stakeClaimNFTs)
 					.stakeHeaderStyle
 
-				ForEach(viewState) { stakeClaimNFTViewState in
-					HStack(spacing: .zero) {
-						TokenThumbnail(stakeClaimNFTViewState.thumbnail, size: .smallest)
-							.padding(.trailing, .small1)
+				loadable(viewState) { viewState in
+					ForEach(viewState) { stakeClaimNFTViewState in
+						HStack(spacing: .zero) {
+							TokenThumbnail(stakeClaimNFTViewState.thumbnail, size: .smallest)
+								.padding(.trailing, .small1)
 
-						Text(stakeClaimNFTViewState.status.localized)
-							.foregroundColor(stakeClaimNFTViewState.status.foregroundColor)
-							.textStyle(.body2HighImportance)
-							.padding(.trailing, .small1)
+							Text(stakeClaimNFTViewState.status.localized)
+								.foregroundColor(stakeClaimNFTViewState.status.foregroundColor)
+								.textStyle(.body2HighImportance)
+								.padding(.trailing, .small1)
 
-						Spacer(minLength: 0)
+							Spacer(minLength: 0)
 
-						Text(stakeClaimNFTViewState.tokenAmount)
-							.foregroundColor(.app.gray1)
-							.textStyle(.secondaryHeader)
+							Text(stakeClaimNFTViewState.tokenAmount)
+								.foregroundColor(.app.gray1)
+								.textStyle(.secondaryHeader)
 
-						if let isSelected = stakeClaimNFTViewState.isSelected {
-							CheckmarkView(appearance: .dark, isChecked: isSelected)
+							if let isSelected = stakeClaimNFTViewState.isSelected {
+								CheckmarkView(appearance: .dark, isChecked: isSelected)
+							}
 						}
+						.borderAround
+						.onTapGesture { handleTapGesture(stakeClaimNFTViewState.id) }
 					}
-					.borderAround
-					.onTapGesture { handleTapGesture(stakeClaimNFTViewState.id) }
 				}
 			}
 		}
@@ -158,33 +163,33 @@ extension LSUStake.State {
 		.init(
 			id: stake.validator.address,
 			validatorNameViewState: .init(with: stake.validator),
-			liquidStakeUnit: stake.xrdRedemptionValue
-				.map {
-					.init(
-						thumbnail: .xrd,
-						symbol: Constants.xrdTokenName,
-						tokenAmount: $0.format(),
-						isSelected: isStakeSelected
-					)
-				},
-			stakeClaimNFTs: nil
-			//                .init(
-//				rawValue: stake.stakeClaimResource
-//					.map { claimNFT in
-//						.init(
-//							uncheckedUniqueElements: claimNFT.tokens
-//								.map { token in
-//									LSUStake.ViewState.StakeClaimNFTViewState(
-//										id: token.id,
-//										thumbnail: .xrd,
-//										status: token.canBeClaimed ? .readyToClaim : .unstaking,
-//										tokenAmount: (token.stakeClaimAmount ?? 0).format(),
-//										isSelected: self.selectedStakeClaimAssets?.contains(token.id)
-//									)
-//								}
-//						)
-//					} ?? []
-//			)
+			liquidStakeUnit:
+			.init(
+				thumbnail: .xrd,
+				symbol: Constants.xrdTokenName,
+				tokenAmount: xrdRedemptionValue.map { $0.format() },
+				isSelected: isStakeSelected
+			),
+
+			stakeClaimNFTs: stakeClaimNfts.map { tokens in
+				.init(rawValue: .init(uncheckedUniqueElements:
+					tokens
+						.map { token in
+							let status: LSUStake.ViewState.StakeClaimNFTStatus = {
+								guard let claimEpoch = token.data.claimEpoch, let epoch = stake.stakeClaimResource?.atLedgerState.epoch else {
+									return .unstaking
+								}
+								return claimEpoch >= epoch ? .readyToClaim : .unstaking
+							}()
+							return LSUStake.ViewState.StakeClaimNFTViewState(
+								id: token.id,
+								thumbnail: .xrd,
+								status: status,
+								tokenAmount: (token.data.claimAmount ?? 0).format(),
+								isSelected: nil // self.selectedStakeClaimAssets?.contains(token.id)
+							)
+						}))
+			}.unwrap()
 		)
 	}
 }

@@ -23,9 +23,11 @@ struct PoolUnitResourceView<NameView>: View where NameView: View {
 
 			Spacer(minLength: 0)
 
-			Text(viewState.tokenAmount)
-				.foregroundColor(.app.gray1)
-				.textStyle(.secondaryHeader)
+			loadable(viewState.tokenAmount) { value in
+				Text(value)
+					.foregroundColor(.app.gray1)
+					.textStyle(.secondaryHeader)
+			}
 
 			if let isSelected = viewState.isSelected {
 				CheckmarkView(appearance: .dark, isChecked: isSelected)
@@ -66,14 +68,14 @@ struct PoolUnitResourceViewState: Identifiable, Equatable {
 
 	let thumbnail: TokenThumbnail.Content
 	let symbol: String
-	let tokenAmount: String
+	let tokenAmount: Loadable<String>
 
 	let isSelected: Bool?
 
 	init(
 		thumbnail: TokenThumbnail.Content,
 		symbol: String,
-		tokenAmount: String,
+		tokenAmount: Loadable<String>,
 		isSelected: Bool? = nil
 	) {
 		self.thumbnail = thumbnail
@@ -85,7 +87,7 @@ struct PoolUnitResourceViewState: Identifiable, Equatable {
 
 extension PoolUnitResourceViewState {
 	init(
-		xrdAmount: String,
+		xrdAmount: Loadable<String>,
 		isSelected: Bool? = nil
 	) {
 		self.init(

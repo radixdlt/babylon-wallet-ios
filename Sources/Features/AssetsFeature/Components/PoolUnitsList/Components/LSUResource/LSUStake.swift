@@ -1,6 +1,7 @@
 import FeaturePrelude
 import LoggerDependency
 
+// MARK: - LSUStake
 public struct LSUStake: FeatureReducer {
 	public struct State: Sendable, Hashable, Identifiable {
 		public var id: String {
@@ -12,7 +13,10 @@ public struct LSUStake: FeatureReducer {
 		let stake: AccountPortfolio.PoolUnitResources.RadixNetworkStake
 
 		var isStakeSelected: Bool?
-		var selectedStakeClaimAssets: OrderedSet<AssetID>?
+		var selectedStakeClaimAssets: OrderedSet<OnLedgerEntity.NonFungibleToken>?
+
+		var stakeResource: Loadable<OnLedgerEntity.Resource> = .idle
+		var stakeClaimNfts: Loadable<[OnLedgerEntity.NonFungibleToken]> = .idle
 
 		@PresentationState
 		var destination: Destinations.State?
@@ -21,10 +25,16 @@ public struct LSUStake: FeatureReducer {
 	public enum ViewAction: Sendable, Equatable {
 		case didTap
 		case didTapStakeClaimNFT(withID: ViewState.StakeClaimNFTViewState.ID)
+		case task
 	}
 
 	public enum ChildAction: Sendable, Equatable {
 		case destination(PresentationAction<Destinations.Action>)
+	}
+
+	public enum InternalAction: Sendable, Equatable {
+		case stakeUnitResourceLoaded(TaskResult<OnLedgerEntity.Resource>)
+		case stakeClaimNftsLoaded(TaskResult<[OnLedgerEntity.NonFungibleToken]>)
 	}
 
 	public struct Destinations: Sendable, Reducer {
@@ -46,6 +56,7 @@ public struct LSUStake: FeatureReducer {
 	}
 
 	@Dependency(\.logger) var logger
+	@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
 
 	public var body: some ReducerOf<Self> {
 		Reduce(core)
@@ -61,6 +72,30 @@ public struct LSUStake: FeatureReducer {
 		viewAction: ViewAction
 	) -> Effect<Action> {
 		switch viewAction {
+		case .task:
+			guard case .idle = state.stakeResource, let stakeUnitAddress = state.stake.stakeUnitResource?.resourceAddress else {
+				return .none
+			}
+			state.stakeResource = .loading
+
+			return .run { send in
+				try await Task.sleep(for: .seconds(2))
+				let result = await TaskResult { try await onLedgerEntitiesClient.getResource(stakeUnitAddress) }
+				await send(.internal(.stakeUnitResourceLoaded(result)))
+			}.merge(with: .run(operation: { [stakeClaimCollection = state.stake.stakeClaimResource] send in
+				guard let stakeClaimCollection else {
+					return
+				}
+				try await Task.sleep(for: .seconds(2))
+				let result = await TaskResult { try await onLedgerEntitiesClient.getNonFungibleTokenData(
+					.init(
+						atLedgerState: stakeClaimCollection.atLedgerState,
+						resource: stakeClaimCollection.resourceAddress,
+						nonFungibleIds: stakeClaimCollection.nonFungibleIds
+					))
+				}
+				await send(.internal(.stakeClaimNftsLoaded(result)))
+			}))
 		case .didTap:
 			if state.isStakeSelected != nil {
 				state.isStakeSelected?.toggle()
@@ -68,8 +103,9 @@ public struct LSUStake: FeatureReducer {
 				return .none
 			} else {
 				guard
-					let resource = state.stake.stakeUnitResource,
-					let xrdRedemptionValue = state.stake.xrdRedemptionValue
+					let resource = state.stakeResource.wrappedValue,
+					let stakeAmount = state.stake.stakeUnitResource?.amount,
+					let xrdRedemptionValue = state.xrdRedemptionValue.wrappedValue
 				else {
 					logger.fault("We should not be able to tap a stake in such state")
 
@@ -80,6 +116,7 @@ public struct LSUStake: FeatureReducer {
 					.init(
 						validator: state.stake.validator,
 						stakeUnitResource: resource,
+						stakeAmount: stakeAmount,
 						xrdRedemptionValue: xrdRedemptionValue
 					)
 				)
@@ -87,11 +124,41 @@ public struct LSUStake: FeatureReducer {
 				return .none
 			}
 		case let .didTapStakeClaimNFT(withID: id):
+			guard let token = state.stakeClaimNfts.wrappedValue?.first(where: { $0.id == id }) else {
+				assertionFailure("Did tapp a missing NFT?")
+				return .none
+			}
 			if state.isStakeSelected != nil {
-				state.selectedStakeClaimAssets?.toggle(id)
+				state.selectedStakeClaimAssets?.toggle(token)
 			}
 
+			// TODO: Show details
 			return .none
+		}
+	}
+
+	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
+		switch internalAction {
+		case let .stakeUnitResourceLoaded(.success(resource)):
+			state.stakeResource = .success(resource)
+			return .none
+		case let .stakeUnitResourceLoaded(.failure(err)):
+			state.stakeResource = .failure(err)
+			return .none
+		case let .stakeClaimNftsLoaded(.success(tokens)):
+			state.stakeClaimNfts = .success(tokens)
+			return .none
+		case let .stakeClaimNftsLoaded(.failure(err)):
+			state.stakeClaimNfts = .failure(err)
+			return .none
+		}
+	}
+}
+
+extension LSUStake.State {
+	var xrdRedemptionValue: Loadable<BigDecimal> {
+		stakeResource.map {
+			((stake.stakeUnitResource?.amount ?? .zero) * stake.validator.xrdVaultBalance) / ($0.totalSupply ?? .one)
 		}
 	}
 }

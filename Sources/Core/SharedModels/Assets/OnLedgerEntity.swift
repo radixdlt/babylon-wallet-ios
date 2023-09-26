@@ -75,32 +75,17 @@ extension OnLedgerEntity {
 
 	public struct NonFungibleToken: Sendable, Hashable, Identifiable, Codable {
 		public let id: NonFungibleGlobalId
-		public let name: String?
-		public let description: String?
-		public let keyImageURL: URL?
+		public let data: [NFTData]
 		public let metadata: [Metadata]
-
-		// The claim amount if the it is a stake claim nft
-		public let stakeClaimAmount: BigDecimal?
-		// Indication that stake unit amount can be claimed if it is stake claim nft
-		public let canBeClaimed: Bool
 
 		public init(
 			id: NonFungibleGlobalId,
-			name: String?,
-			description: String? = nil,
-			keyImageURL: URL? = nil,
-			metadata: [Metadata] = [],
-			stakeClaimAmount: BigDecimal? = nil,
-			canBeClaimed: Bool = false
+			data: [NFTData],
+			metadata: [Metadata] = []
 		) {
 			self.id = id
-			self.name = name
-			self.description = description
-			self.keyImageURL = keyImageURL
+			self.data = data
 			self.metadata = metadata
-			self.stakeClaimAmount = stakeClaimAmount
-			self.canBeClaimed = canBeClaimed
 		}
 	}
 }
@@ -108,13 +93,8 @@ extension OnLedgerEntity {
 extension OnLedgerEntity.NonFungibleToken {
 	enum CodingKeys: CodingKey {
 		case id
-		case name
-		case description
-		case keyImageURL
+		case data
 		case metadata
-		case stakeClaimAmount
-		case claimEpoch
-		case canBeClaimed
 	}
 
 	public init(from decoder: Decoder) throws {
@@ -122,24 +102,16 @@ extension OnLedgerEntity.NonFungibleToken {
 
 		try self.init(
 			id: .init(nonFungibleGlobalId: container.decode(String.self, forKey: .id)),
-			name: container.decodeIfPresent(String.self, forKey: .name),
-			description: container.decodeIfPresent(String.self, forKey: .description),
-			keyImageURL: container.decodeIfPresent(URL.self, forKey: .keyImageURL),
-			metadata: container.decode([OnLedgerEntity.Metadata].self, forKey: .metadata),
-			stakeClaimAmount: container.decodeIfPresent(BigDecimal.self, forKey: .stakeClaimAmount),
-			canBeClaimed: container.decode(Bool.self, forKey: .canBeClaimed)
+			data: container.decode([NFTData].self, forKey: .data),
+			metadata: container.decode([OnLedgerEntity.Metadata].self, forKey: .metadata)
 		)
 	}
 
 	public func encode(to encoder: Encoder) throws {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		try container.encode(id.asStr(), forKey: .id)
-		try container.encodeIfPresent(name, forKey: .name)
-		try container.encodeIfPresent(description, forKey: .description)
-		try container.encodeIfPresent(keyImageURL, forKey: .keyImageURL)
+		try container.encode(data, forKey: .data)
 		try container.encode(metadata, forKey: .metadata)
-		try container.encodeIfPresent(stakeClaimAmount, forKey: .stakeClaimAmount)
-		try container.encode(canBeClaimed, forKey: .canBeClaimed)
 	}
 }
 

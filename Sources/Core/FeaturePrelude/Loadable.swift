@@ -171,6 +171,49 @@ extension Loadable {
 		flatMap { .success(transform($0)) }
 	}
 
+	public func filter<Element>(by predicate: (Element) -> Bool) -> Loadable<[Element]> where Value == [Element] {
+		switch self {
+		case .idle:
+			return .idle
+		case .loading:
+			return .loading
+		case let .success(value):
+			return .success(value.filter(predicate))
+		case let .failure(error):
+			return .failure(error)
+		}
+	}
+
+	/// Transforms a Loadable<Wrapped?> to Loadable<Wrapped>?
+	public func unwrap<Wrapped>() -> Loadable<Wrapped>? where Value == Wrapped? {
+		switch self {
+		case .idle:
+			return .idle
+		case .loading:
+			return .loading
+		case let .success(value):
+			guard let value else {
+				return nil
+			}
+			return .success(value)
+		case let .failure(error):
+			return .failure(error)
+		}
+	}
+
+	public func first<Element>(where predicate: (Element) -> Bool) -> Loadable<Element?> where Value == [Element] {
+		switch self {
+		case .idle:
+			return .idle
+		case .loading:
+			return .loading
+		case let .success(value):
+			return .success(value.first(where: predicate))
+		case let .failure(error):
+			return .failure(error)
+		}
+	}
+
 	public func flatMap<NewValue>(_ transform: (Value) -> Loadable<NewValue>) -> Loadable<NewValue> {
 		switch self {
 		case .idle:
@@ -195,5 +238,16 @@ extension Loadable {
 		case let .failure(error):
 			return .failure(error)
 		}
+	}
+}
+
+import SharedModels
+
+extension Loadable {
+	public func get<Field>(_ keyPath: KeyPath<Value, Field>, prefetched: Value?) -> Loadable<Field> {
+		guard let prefetchedField = prefetched?[keyPath: keyPath] else {
+			return map { $0[keyPath: keyPath] }
+		}
+		return .success(prefetchedField)
 	}
 }

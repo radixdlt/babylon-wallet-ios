@@ -11,7 +11,7 @@ extension NonFungibleTokenDetails.State {
 				resourceAddress: resourceAddress,
 				isXRD: false,
 				validatorAddress: nil,
-				resourceName: nil,
+				resourceName: .success(token?.data.name),
 				currentSupply: resource.totalSupply.map { $0?.format() },
 				behaviors: resource.behaviors,
 				tags: prefetchedPortfolioResource.map { .success($0.metadata.tags) } ?? resource.resourceMetadata.tags
@@ -23,10 +23,10 @@ extension NonFungibleTokenDetails.State {
 extension NonFungibleTokenDetails.ViewState.TokenDetails {
 	init(token: OnLedgerEntity.NonFungibleToken) {
 		self.init(
-			keyImage: token.keyImageURL,
+			keyImage: token.data.keyImageURL,
 			nonFungibleGlobalID: token.id,
-			name: token.name,
-			description: token.description
+			name: token.data.name,
+			description: token.data.description
 		)
 	}
 }
@@ -56,7 +56,9 @@ extension NonFungibleTokenDetails {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState) { viewStore in
-				ScrollView(showsIndicators: false) {
+				DetailsContainer(title: viewStore.tokenDetails?.name ?? "") {
+					store.send(.view(.closeButtonTapped))
+				} contents: {
 					VStack(spacing: .medium1) {
 						if let tokenDetails = viewStore.tokenDetails {
 							VStack(spacing: .medium3) {
@@ -65,10 +67,6 @@ extension NonFungibleTokenDetails {
 								}
 
 								KeyValueView(nonFungibleGlobalID: tokenDetails.nonFungibleGlobalID)
-
-								if let name = tokenDetails.name {
-									KeyValueView(key: L10n.AssetDetails.NFTDetails.name, value: name)
-								}
 							}
 							.lineLimit(1)
 							.frame(maxWidth: .infinity, alignment: .leading)

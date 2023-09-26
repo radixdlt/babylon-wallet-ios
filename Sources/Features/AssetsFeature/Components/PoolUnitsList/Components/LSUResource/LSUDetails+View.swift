@@ -4,19 +4,23 @@ import FeaturePrelude
 extension LSUDetails.State {
 	var viewState: LSUDetails.ViewState {
 		.init(
-			containerWithHeader: .init(resource: stakeUnitResource),
-			thumbnailURL: stakeUnitResource.metadata.iconURL,
+			containerWithHeader: .init(
+				title: stakeUnitResource.resourceMetadata.name ?? L10n.Account.PoolUnits.unknownPoolUnitName,
+				amount: stakeAmount.format(),
+				symbol: stakeUnitResource.resourceMetadata.symbol
+			),
+			thumbnailURL: stakeUnitResource.resourceMetadata.iconURL,
 			validatorNameViewState: .init(with: validator),
-			redeemableTokenAmount: .init(.init(xrdAmount: xrdRedemptionValue.format())),
+			redeemableTokenAmount: .init(.init(xrdAmount: .success(xrdRedemptionValue.format()))),
 			resourceDetails: .init(
-				description: .idle, // stakeUnitResource.metadata.description,
+				description: .success(stakeUnitResource.resourceMetadata.description),
 				resourceAddress: stakeUnitResource.resourceAddress,
 				isXRD: false,
 				validatorAddress: validator.address,
-				resourceName: .idle, // stakeUnitResource.metadata.name, // TODO: Is this correct?
-				currentSupply: .idle, // validator.xrdVaultBalance.format(),
-				behaviors: .idle, // [],
-				tags: .idle // stakeUnitResource.metadata.tags
+				resourceName: .success(stakeUnitResource.resourceMetadata.name), // TODO: Is this correct?
+				currentSupply: .success(validator.xrdVaultBalance.format()),
+				behaviors: .success(stakeUnitResource.behaviors),
+				tags: .success(stakeUnitResource.resourceMetadata.tags)
 			)
 		)
 	}
@@ -46,6 +50,8 @@ extension LSUDetails {
 				send: LSUDetails.Action.view
 			) { viewStore in
 				DetailsContainerWithHeaderView(viewState: viewStore.containerWithHeader) {
+					viewStore.send(.closeButtonTapped)
+				} thumbnailView: {
 					NFTThumbnail(viewStore.thumbnailURL, size: .veryLarge)
 				} detailsView: {
 					VStack(spacing: .medium1) {
@@ -64,8 +70,6 @@ extension LSUDetails {
 						AssetResourceDetailsSection(viewState: viewStore.resourceDetails)
 					}
 					.padding(.bottom, .medium1)
-				} closeButtonAction: {
-					viewStore.send(.closeButtonTapped)
 				}
 			}
 		}

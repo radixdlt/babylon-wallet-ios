@@ -16,12 +16,12 @@ extension NonFungibleAssetList {
 			public var isLoadingResources: Bool = true
 			public var isExpanded = false
 			public var disabled: Set<AssetID> = []
-			public var selectedAssets: OrderedSet<AssetID>?
+			public var selectedAssets: OrderedSet<OnLedgerEntity.NonFungibleToken>?
 
 			public init(
 				resource: AccountPortfolio.NonFungibleResource,
 				disabled: Set<AssetID> = [],
-				selectedAssets: OrderedSet<AssetID>?
+				selectedAssets: OrderedSet<OnLedgerEntity.NonFungibleToken>?
 			) {
 				self.resource = resource
 				self.disabled = disabled
@@ -61,7 +61,7 @@ extension NonFungibleAssetList {
 				guard !state.disabled.contains(asset.id) else { return .none }
 
 				if state.selectedAssets != nil {
-					state.selectedAssets?.toggle(asset.id)
+					state.selectedAssets?.toggle(asset)
 					return .none
 				}
 				return .send(.delegate(.open(asset)))

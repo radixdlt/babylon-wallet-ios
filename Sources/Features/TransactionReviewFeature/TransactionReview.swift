@@ -822,36 +822,21 @@ extension TransactionReview {
 			try tokenData.map { id, _ in
 				try .init(
 					id: .fromParts(resourceAddress: resourceAddress.intoEngine(), nonFungibleLocalId: id),
-					name: nil
+					data: []
 				)
 			}
 		}
 
 		func existingTokenInfo(_ ids: [NonFungibleLocalId], for resourceAddress: ResourceAddress) async throws -> [NonFungibleToken] {
-			// A non-fungible resource existing on ledger
-			let maximumNFTIDChunkSize = 29
-
-			var result: [NonFungibleToken] = []
-			for idChunk in ids.chunks(ofCount: maximumNFTIDChunkSize) {
-//				let tokens = try await gatewayAPIClient.getNonFungibleData(.init(
-//					resourceAddress: resourceAddress.address,
-//					nonFungibleIds: idChunk.map {
-//						try $0.toString()
-//					}
-//				))
-//				.nonFungibleIds
-//				.map { responseItem in
-//					try NonFungibleToken(
-//						resourceAddress: resourceAddress,
-//						nftID: .from(stringFormat: responseItem.nonFungibleId),
-//						nftData: responseItem.details
-//					)
-//				}
-
-				// result.append(contentsOf: tokens)
-			}
-
-			return result
+			try await onLedgerEntitiesClient.getNonFungibleTokenData(.init(
+				resource: resourceAddress,
+				nonFungibleIds: ids.map {
+					try NonFungibleGlobalId.fromParts(
+						resourceAddress: resourceAddress.intoEngine(),
+						nonFungibleLocalId: $0
+					)
+				}
+			))
 		}
 
 		switch resourceQuantifier {
@@ -866,8 +851,12 @@ extension TransactionReview {
 				func guarantee() -> TransactionClient.Guarantee? {
 					guard case let .predicted(instructionIndex, _) = source else { return nil }
 					let guaranteedAmount = defaultDepositGuarantee * amount
-					fatalError()
-					// return .init(amount: guaranteedAmount, instructionIndex: instructionIndex, resourceAddress: resourceAddress)
+					return .init(
+						amount: guaranteedAmount,
+						instructionIndex: instructionIndex,
+						resourceAddress: resourceAddress,
+						resourceDivisibility: resource.divisibility
+					)
 				}
 
 				let details: Transfer.Details.Fungible = .init(

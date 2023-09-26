@@ -139,7 +139,7 @@ extension TransferNFTView.ViewState {
 	init(resource: OnLedgerEntity.Resource, details: TransactionReview.Transfer.Details.NonFungible) {
 		self.init(
 			tokenID: details.id.localId().toUserFacingString(),
-			tokenName: details.name,
+			tokenName: details.data.name,
 			thumbnail: resource.resourceMetadata.iconURL
 		)
 	}

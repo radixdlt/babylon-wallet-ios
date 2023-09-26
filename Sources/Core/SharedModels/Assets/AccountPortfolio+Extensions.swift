@@ -7,12 +7,8 @@ extension OnLedgerEntity.NonFungibleToken {
 				resourceAddress: resourceAddress.intoEngine(),
 				nonFungibleLocalId: nftID
 			),
-			name: nftData.name,
-			description: nftData.description,
-			keyImageURL: nftData.keyImageURL,
-			metadata: [], // FIXME: Find?
-			stakeClaimAmount: nil,
-			canBeClaimed: false // FIXME: Find?
+			data: nftData,
+			metadata: []
 		)
 	}
 }

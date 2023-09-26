@@ -23,7 +23,12 @@ public struct NonFungibleTokenDetails: Sendable, FeatureReducer {
 	}
 
 	public enum ViewAction: Sendable, Equatable {
+		case closeButtonTapped
 		case task
+	}
+
+	public enum DelegateAction: Sendable, Equatable {
+		case dismiss
 	}
 
 	public enum InternalAction: Sendable, Equatable {
@@ -37,12 +42,17 @@ public struct NonFungibleTokenDetails: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .task:
+			guard case .idle = state.resource else {
+				return .none
+			}
 			state.resource = .loading
 			return .run { [resourceAddress = state.resourceAddress] send in
 				try await Task.sleep(for: .seconds(3))
 				let result = await TaskResult { try await onLedgerEntitiesClient.getResource(resourceAddress) }
 				await send(.internal(.resourceLoadResult(result)))
 			}
+		case .closeButtonTapped:
+			return .send(.delegate(.dismiss))
 		}
 	}
 

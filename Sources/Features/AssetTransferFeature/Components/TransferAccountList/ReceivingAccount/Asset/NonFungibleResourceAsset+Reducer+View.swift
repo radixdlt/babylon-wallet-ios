@@ -30,7 +30,7 @@ extension NonFungibleResourceAsset.State {
 	var viewState: NonFungibleResourceAsset.ViewState {
 		.init(
 			tokenID: nftToken.id.localId().toUserFacingString(),
-			tokenName: nftToken.name,
+			tokenName: nftToken.data.name,
 			thumbnail: resourceImage
 		)
 	}

@@ -67,7 +67,7 @@ extension OnLedgerEntitiesClient {
 			.chunks(ofCount: maximumNFTIDChunkSize)
 			.parallelMap { ids in
 				try await gatewayAPIClient.getNonFungibleData(.init(
-					atLedgerState: request.atLedgerState.selector,
+					atLedgerState: request.atLedgerState?.selector,
 					resourceAddress: request.resource.address,
 					nonFungibleIds: Array(ids.map { try $0.localId().toString() })
 				))
@@ -84,11 +84,7 @@ extension OnLedgerEntitiesClient {
 							resourceAddress: .init(address: request.resource.address),
 							nonFungibleLocalId: .from(stringFormat: id.nonFungibleId)
 						),
-						name: details.name,
-						description: details.tokenDescription,
-						keyImageURL: details.keyImageURL,
-						stakeClaimAmount: details.claimAmount,
-						canBeClaimed: canBeClaimed
+						data: details
 					))
 				}
 			}

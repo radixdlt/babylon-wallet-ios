@@ -6,11 +6,11 @@ extension FungibleTokenDetails.State {
 		.init(
 			detailsHeader: detailsHeader,
 			thumbnail: {
-				let iconURL = prefetchedPortfolioResource.map { .success($0.metadata.iconURL) } ?? resource.resourceMetadata.iconURL
+				let iconURL = resource.resourceMetadata.get(\.iconURL, prefetched: prefetchedPortfolioResource?.metadata)
 				return isXRD ? .success(.xrd) : iconURL.map { .known($0) }
 			}(),
 			details: .init(
-				description: resource.resourceMetadata.description,
+				description: resource.resourceMetadata.get(\.description, prefetched: prefetchedPortfolioResource?.metadata),
 				resourceAddress: resourceAddress,
 				isXRD: isXRD,
 				validatorAddress: nil,
@@ -18,7 +18,7 @@ extension FungibleTokenDetails.State {
 				currentSupply: resource.totalSupply.map { $0?.format() }, // FIXME: Check which format
 				behaviors: resource.behaviors,
 				tags: {
-					let tags = prefetchedPortfolioResource.map { .success($0.metadata.tags) } ?? resource.resourceMetadata.tags
+					let tags = resource.resourceMetadata.get(\.tags, prefetched: prefetchedPortfolioResource?.metadata)
 					return isXRD ? tags.map { $0 + [.officialRadix] } : tags
 				}()
 			)
@@ -29,7 +29,7 @@ extension FungibleTokenDetails.State {
 		.init(
 			title: prefetchedPortfolioResource?.metadata.name ?? L10n.Account.PoolUnits.unknownPoolUnitName,
 			amount: prefetchedPortfolioResource?.amount.format(),
-			symbol: prefetchedPortfolioResource?.metadata.symbol
+			symbol: resource.resourceMetadata.get(\.symbol, prefetched: prefetchedPortfolioResource?.metadata).wrappedValue?.flatMap(identity)
 		)
 	}
 }
@@ -53,12 +53,12 @@ extension FungibleTokenDetails {
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				DetailsContainerWithHeaderView(viewState: viewStore.detailsHeader) {
+					viewStore.send(.closeButtonTapped)
+				} thumbnailView: {
 					TokenThumbnail(viewStore.thumbnail.wrappedValue ?? .unknown, size: .veryLarge)
 				} detailsView: {
 					AssetResourceDetailsSection(viewState: viewStore.details)
 						.padding(.bottom, .medium1)
-				} closeButtonAction: {
-					viewStore.send(.closeButtonTapped)
 				}
 				.task { @MainActor in
 					await viewStore.send(.task).finish()

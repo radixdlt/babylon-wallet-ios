@@ -477,6 +477,7 @@ package.addModules([
 			"GatewayAPI",
 			"CacheClient",
 			"EngineKit",
+			"OnLedgerEntitiesClient",
 		],
 		tests: .no
 	),

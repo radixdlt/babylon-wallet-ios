@@ -114,13 +114,6 @@ extension AccountPortfolio.PoolUnitResources {
 			self.poolUnitResource = poolUnitResource
 			self.poolResources = poolResources
 		}
-
-		public func redemptionValue(for resource: AccountPortfolio.FungibleResource) -> String {
-			fatalError()
-//			let poolUnitTotalSupply = poolUnitResource.resource.totalSupply ?? .one
-//			let unroundedRedemptionValue = poolUnitResource.amount * resource.amount / poolUnitTotalSupply
-//			return unroundedRedemptionValue.format(divisibility: resource.resource.divisibility)
-		}
 	}
 
 	public struct RadixNetworkStake: Sendable, Hashable, Codable {

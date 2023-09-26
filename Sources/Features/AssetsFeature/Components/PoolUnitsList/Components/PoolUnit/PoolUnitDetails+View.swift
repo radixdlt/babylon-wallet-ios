@@ -4,12 +4,13 @@ import FeaturePrelude
 extension PoolUnitDetails.State {
 	var viewState: PoolUnitDetails.ViewState {
 		let resource = poolUnit.poolUnitResource
+		let loadedPoolUnitResource = loadedPoolResources.first { $0.id == resource.id }
 		return .init(
 			containerWithHeader: .init(resource: resource),
 			thumbnailURL: resource.metadata.iconURL,
-			resources: poolUnit.resourceViewStates,
+			resources: PoolUnitResourceViewState.resourcesViewState(poolUnit: poolUnit, loadedPoolResources: loadedPoolResources),
 			resourceDetails: .init(
-				description: .idle, // resource.metadata.description,
+				description: loadedPoolUnitResource.map { $0! }.resourceMetadata.description,
 				resourceAddress: resource.resourceAddress,
 				isXRD: false,
 				validatorAddress: nil,
@@ -46,6 +47,8 @@ extension PoolUnitDetails {
 				send: PoolUnitDetails.Action.view
 			) { viewStore in
 				DetailsContainerWithHeaderView(viewState: viewStore.containerWithHeader) {
+					viewStore.send(.closeButtonTapped)
+				} thumbnailView: {
 					NFTThumbnail(viewStore.thumbnailURL, size: .veryLarge)
 				} detailsView: {
 					VStack(spacing: .medium1) {
@@ -61,8 +64,6 @@ extension PoolUnitDetails {
 						AssetResourceDetailsSection(viewState: viewStore.resourceDetails)
 					}
 					.padding(.bottom, .medium1)
-				} closeButtonAction: {
-					viewStore.send(.closeButtonTapped)
 				}
 			}
 		}

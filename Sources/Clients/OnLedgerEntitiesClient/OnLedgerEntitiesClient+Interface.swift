@@ -22,11 +22,15 @@ extension OnLedgerEntitiesClient {
 // MARK: OnLedgerEntitiesClient.GetNonFungibleTokenDataRequest
 extension OnLedgerEntitiesClient {
 	public struct GetNonFungibleTokenDataRequest: Sendable {
-		public let atLedgerState: AtLedgerState
+		public let atLedgerState: AtLedgerState?
 		public let resource: ResourceAddress
 		public let nonFungibleIds: [NonFungibleGlobalId]
 
-		public init(atLedgerState: AtLedgerState, resource: ResourceAddress, nonFungibleIds: [NonFungibleGlobalId]) {
+		public init(
+			atLedgerState: AtLedgerState? = nil,
+			resource: ResourceAddress,
+			nonFungibleIds: [NonFungibleGlobalId]
+		) {
 			self.atLedgerState = atLedgerState
 			self.resource = resource
 			self.nonFungibleIds = nonFungibleIds

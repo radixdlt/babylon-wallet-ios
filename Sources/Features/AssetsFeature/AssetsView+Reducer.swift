@@ -166,25 +166,22 @@ extension AssetsView.State {
 			nonFungibleTokenList = .init(rows: .init(uniqueElements: nfts))
 		}
 
-		let lsuResource: LSUResource.State? = {
-			guard !portfolio.poolUnitResources.radixNetworkStakes.isEmpty else {
-				return nil
-			}
-			return .init(
-				stakes: .init(
-					uniqueElements: portfolio.poolUnitResources.radixNetworkStakes
-						.map { stake in
-							LSUStake.State(
-								stake: stake,
-								isStakeSelected: (stake.stakeUnitResource?.resourceAddress)
-									.flatMap(mode.nonXrdRowSelected),
-								selectedStakeClaimAssets: (stake.stakeClaimResource?.resourceAddress)
-									.flatMap(mode.nftRowSelectedAssets)
-							)
-						}
-				)
+		let lsuResource: LSUResource.State? = .init(
+			stakes: .init(
+				uniqueElements: portfolio.poolUnitResources.radixNetworkStakes
+					.map { stake in
+						LSUStake.State(
+							stake: stake,
+							isStakeSelected: nil,
+							//                                    (stake.stakeUnitResource?.resourceAddress)
+//									.flatMap(mode.nonXrdRowSelected),
+							selectedStakeClaimAssets: nil
+							//                                    (stake.stakeClaimResource?.resourceAddress)
+//									.flatMap(mode.nftRowSelectedAssets)
+						)
+					}
 			)
-		}()
+		)
 
 		if lsuResource != nil || !portfolio.poolUnitResources.poolUnits.isEmpty {
 			poolUnitsList = .init(
@@ -340,8 +337,8 @@ extension AssetsView.State {
 			selectedAssets?.fungibleResources.nonXrdResources.contains { $0.resourceAddress == resource }
 		}
 
-		func nftRowSelectedAssets(_ resource: ResourceAddress) -> OrderedSet<NonFungibleAssetList.Row.State.AssetID>? {
-			selectedAssets.map { $0.nonFungibleResources[id: resource]?.tokens.ids ?? [] }
+		func nftRowSelectedAssets(_ resource: ResourceAddress) -> OrderedSet<OnLedgerEntity.NonFungibleToken>? {
+			selectedAssets.map { OrderedSet($0.nonFungibleResources[id: resource]?.tokens.elements ?? []) }
 		}
 	}
 }
@@ -385,28 +382,29 @@ extension SelectedResourceProvider<AccountPortfolio.FungibleResource> {
 
 // MARK: - NonFungibleTokensPerResourceProvider
 private struct NonFungibleTokensPerResourceProvider {
-	let selectedAssetIDs: OrderedSet<OnLedgerEntity.NonFungibleToken.ID>?
+	let selectedAssets: OrderedSet<OnLedgerEntity.NonFungibleToken>?
 	let resource: AccountPortfolio.NonFungibleResource?
 
 	var nonFungibleTokensPerResource: AssetsView.State.Mode.SelectedAssets.NonFungibleTokensPerResource? {
-		selectedAssetIDs.flatMap { selectedStakeClaimAssets -> AssetsView.State.Mode.SelectedAssets.NonFungibleTokensPerResource? in
+		selectedAssets.flatMap { selectedAssets -> AssetsView.State.Mode.SelectedAssets.NonFungibleTokensPerResource? in
 			guard
 				let resource,
-				!selectedStakeClaimAssets.isEmpty
+				!selectedAssets.isEmpty
 			else {
 				return nil
 			}
 
-			return nil
+			let selected = selectedAssets.filter {
+				resource.nonFungibleIds.contains($0.id)
+			}
+			// resource.tokens.filter { token in selectedStakeClaimAssets.contains(token.id) }
 
-//			let selected = resource.tokens.filter { token in selectedStakeClaimAssets.contains(token.id) }
-//
-//			return .init(
-//				resourceAddress: resource.resourceAddress,
-//				resourceImage: resource.iconURL,
-//				resourceName: resource.name,
-//				tokens: selected
-//			)
+			return .init(
+				resourceAddress: resource.resourceAddress,
+				resourceImage: resource.metadata.iconURL,
+				resourceName: resource.metadata.name,
+				tokens: .init(uncheckedUniqueElements: selected.elements)
+			)
 		}
 	}
 }
@@ -414,14 +412,14 @@ private struct NonFungibleTokensPerResourceProvider {
 extension NonFungibleTokensPerResourceProvider {
 	init(with lsuStake: LSUStake.State) {
 		self.init(
-			selectedAssetIDs: lsuStake.selectedStakeClaimAssets,
+			selectedAssets: lsuStake.selectedStakeClaimAssets,
 			resource: lsuStake.stake.stakeClaimResource
 		)
 	}
 
 	init(with row: NonFungibleAssetList.Row.State) {
 		self.init(
-			selectedAssetIDs: row.selectedAssets,
+			selectedAssets: row.selectedAssets,
 			resource: row.resource
 		)
 	}
