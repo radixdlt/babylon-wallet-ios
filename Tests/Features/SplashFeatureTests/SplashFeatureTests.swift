@@ -83,7 +83,6 @@ final class SplashFeatureTests: TestCase {
 			$0.deviceFactorSourceClient.isAccountRecoveryNeeded = {
 				false
 			}
-			$0.networkSwitchingClient.hasMainnetEverBeenLive = { false }
 		}
 
 		// when
@@ -96,7 +95,7 @@ final class SplashFeatureTests: TestCase {
 		if case .existingProfile = outcome {
 			await store.receive(.internal(.accountRecoveryNeeded(outcome, .success(false))))
 		}
-		await store.receive(.delegate(.completed(outcome, accountRecoveryNeeded: false, hasMainnetEverBeenLive: false)))
+		await store.receive(.delegate(.completed(outcome, accountRecoveryNeeded: false)))
 	}
 }
 
