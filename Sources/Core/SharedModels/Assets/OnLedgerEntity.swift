@@ -28,14 +28,9 @@ extension OnLedgerEntity {
 		public var id: ResourceAddress { resourceAddress }
 		public let resourceAddress: ResourceAddress
 		public let divisibility: Int?
-		public let name: String?
-		public let symbol: String?
-		public let description: String?
-		public let iconURL: URL?
 		public let behaviors: [AssetBehavior]
-		public let tags: [AssetTag]
 		public let totalSupply: BigDecimal?
-		public let dappDefinitions: [DappDefinitionAddress]?
+		public let resourceMetadata: ResourceMetadata
 
 		public var fungibility: Fungibility {
 			if case .globalFungibleResourceManager = resourceAddress.decodedKind {
@@ -53,25 +48,15 @@ extension OnLedgerEntity {
 		public init(
 			resourceAddress: ResourceAddress,
 			divisibility: Int? = nil,
-			name: String? = nil,
-			symbol: String? = nil,
-			description: String? = nil,
-			iconURL: URL? = nil,
 			behaviors: [AssetBehavior] = [],
-			tags: [AssetTag] = [],
 			totalSupply: BigDecimal? = nil,
-			dappDefinitions: [DappDefinitionAddress]? = nil
+			resourceMetadata: ResourceMetadata
 		) {
 			self.resourceAddress = resourceAddress
 			self.divisibility = divisibility
-			self.name = name
-			self.symbol = symbol
-			self.description = description
-			self.iconURL = iconURL
 			self.behaviors = behaviors
-			self.tags = tags
 			self.totalSupply = totalSupply
-			self.dappDefinitions = dappDefinitions
+			self.resourceMetadata = resourceMetadata
 		}
 	}
 }

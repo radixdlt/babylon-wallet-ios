@@ -6,11 +6,11 @@ extension FungibleTokenDetails.State {
 		.init(
 			detailsHeader: detailsHeader,
 			thumbnail: {
-				let iconURL = .success(prefetchedPortfolioResource?.metadata.iconURL) ?? resource.iconURL
+				let iconURL = prefetchedPortfolioResource.map { .success($0.metadata.iconURL) } ?? resource.resourceMetadata.iconURL
 				return isXRD ? .success(.xrd) : iconURL.map { .known($0) }
 			}(),
 			details: .init(
-				description: resource.description,
+				description: resource.resourceMetadata.description,
 				resourceAddress: resourceAddress,
 				isXRD: isXRD,
 				validatorAddress: nil,
@@ -18,7 +18,7 @@ extension FungibleTokenDetails.State {
 				currentSupply: resource.totalSupply.map { $0?.format() }, // FIXME: Check which format
 				behaviors: resource.behaviors,
 				tags: {
-					let tags = .success(prefetchedPortfolioResource?.metadata.tags ?? []) ?? resource.tags
+					let tags = prefetchedPortfolioResource.map { .success($0.metadata.tags) } ?? resource.resourceMetadata.tags
 					return isXRD ? tags.map { $0 + [.officialRadix] } : tags
 				}()
 			)

@@ -22,13 +22,15 @@ extension OnLedgerEntity.Resource {
 		self.init(
 			resourceAddress: resourceAddress,
 			divisibility: nil,
-			name: metadata.name,
-			symbol: metadata.symbol,
-			description: metadata.description,
-			iconURL: metadata.iconURL,
 			behaviors: [],
-			tags: metadata.tags,
-			totalSupply: nil
+			totalSupply: nil,
+			resourceMetadata: .init(
+				name: metadata.name,
+				symbol: metadata.symbol,
+				description: metadata.description,
+				iconURL: metadata.iconURL,
+				tags: metadata.tags
+			)
 		)
 	}
 }

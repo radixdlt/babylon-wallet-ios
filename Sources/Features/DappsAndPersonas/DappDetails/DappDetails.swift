@@ -206,6 +206,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 					await send(.internal(.dAppUpdated(authorizedDapp)))
 				}
 
+				// TODO: use OnLedgerEntities client
 				let result = await TaskResult {
 					try await cacheClient.withCaching(
 						cacheEntry: .dAppMetadata(dAppID.address),
@@ -333,7 +334,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 
 		let result = await TaskResult {
 			let items = try await onLedgerEntitiesClient.getResources(resources)
-				.filter { $0.dappDefinitions?.contains(dAppDefinitionAddress) == true }
+				.filter { $0.resourceMetadata.dappDefinitions?.contains(dAppDefinitionAddress) == true }
 			let fungible: IdentifiedArray = .init(items.filter { $0.fungibility == .fungible }) { $1 }
 			let nonFungible: IdentifiedArray = .init(items.filter { $0.fungibility == .nonFungible }) { $1 }
 

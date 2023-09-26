@@ -289,3 +289,16 @@ extension GatewayAPI.ComponentEntityRoleAssignments {
 		return result.sorted()
 	}
 }
+
+extension ResourceMetadata {
+	public init(_ raw: GatewayAPI.EntityMetadataCollection?) {
+		self.init(
+			name: raw?.name,
+			symbol: raw?.symbol,
+			description: raw?.description,
+			iconURL: raw?.iconURL,
+			tags: raw?.tags?.compactMap(NonEmptyString.init(rawValue:)).map { AssetTag($0) } ?? [],
+			dappDefinitions: raw?.dappDefinitions?.compactMap { try? DappDefinitionAddress(validatingAddress: $0) }
+		)
+	}
+}

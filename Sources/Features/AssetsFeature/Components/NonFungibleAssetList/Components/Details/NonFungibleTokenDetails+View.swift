@@ -5,16 +5,16 @@ extension NonFungibleTokenDetails.State {
 	var viewState: NonFungibleTokenDetails.ViewState {
 		.init(
 			tokenDetails: token.map(NonFungibleTokenDetails.ViewState.TokenDetails.init),
-			resourceThumbnail: prefetchedPortfolioResource.map { .success($0.metadata.iconURL) } ?? resource.iconURL,
+			resourceThumbnail: prefetchedPortfolioResource.map { .success($0.metadata.iconURL) } ?? resource.resourceMetadata.iconURL,
 			resourceDetails: .init(
-				description: resource.description,
+				description: resource.resourceMetadata.description,
 				resourceAddress: resourceAddress,
 				isXRD: false,
 				validatorAddress: nil,
 				resourceName: nil,
 				currentSupply: resource.totalSupply.map { $0?.format() },
 				behaviors: resource.behaviors,
-				tags: prefetchedPortfolioResource.map { .success($0.metadata.tags) } ?? resource.tags
+				tags: prefetchedPortfolioResource.map { .success($0.metadata.tags) } ?? resource.resourceMetadata.tags
 			)
 		)
 	}

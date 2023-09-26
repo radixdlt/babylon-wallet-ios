@@ -115,7 +115,7 @@ private extension DappDetails.State {
 
 extension OnLedgerEntity.Resource {
 	var title: String {
-		name ?? symbol ?? L10n.DAppRequest.Metadata.unknownName
+		resourceMetadata.name ?? resourceMetadata.symbol ?? L10n.DAppRequest.Metadata.unknownName
 	}
 }
 
@@ -179,7 +179,7 @@ extension DappDetails.View {
 		var body: some View {
 			WithViewStore(store, observe: \.fungibles, send: { .view($0) }) { viewStore in
 				ListWithHeading(heading: L10n.AuthorizedDapps.DAppDetails.tokens, elements: viewStore.state, title: \.title) { resource in
-					TokenThumbnail(.known(resource.iconURL), size: .small)
+					TokenThumbnail(.known(resource.resourceMetadata.iconURL), size: .small)
 				} action: { id in
 					viewStore.send(.fungibleTapped(id))
 				}
@@ -194,7 +194,7 @@ extension DappDetails.View {
 		var body: some View {
 			WithViewStore(store, observe: \.nonFungibles, send: { .view($0) }) { viewStore in
 				ListWithHeading(heading: L10n.AuthorizedDapps.DAppDetails.nfts, elements: viewStore.state, title: \.title) { resource in
-					NFTThumbnail(resource.iconURL, size: .small)
+					NFTThumbnail(resource.resourceMetadata.iconURL, size: .small)
 				} action: { id in
 					viewStore.send(.nonFungibleTapped(id))
 				}

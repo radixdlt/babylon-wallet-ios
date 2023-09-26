@@ -280,19 +280,6 @@ extension AccountPortfoliosClient {
 	}
 }
 
-extension AccountPortfolio.ResourceMetadata {
-	public init(_ raw: GatewayAPI.EntityMetadataCollection?) {
-		self.init(
-			name: raw?.name,
-			symbol: raw?.symbol,
-			description: raw?.description,
-			iconURL: raw?.iconURL,
-			tags: raw?.tags?.compactMap(NonEmptyString.init(rawValue:)).map { AssetTag($0) } ?? [],
-			dappDefinitions: raw?.dappDefinitions?.compactMap { try? DappDefinitionAddress(validatingAddress: $0) }
-		)
-	}
-}
-
 // MARK: Pool Units
 extension AccountPortfoliosClient {
 	@Sendable

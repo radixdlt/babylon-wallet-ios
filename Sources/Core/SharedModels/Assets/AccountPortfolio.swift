@@ -26,31 +26,6 @@ public struct AccountPortfolio: Sendable, Hashable, Codable {
 }
 
 extension AccountPortfolio {
-	public struct ResourceMetadata: Sendable, Hashable, Codable {
-		public let name: String?
-		public let symbol: String?
-		public let description: String?
-		public let iconURL: URL?
-		public let tags: [AssetTag]
-		public let dappDefinitions: [DappDefinitionAddress]?
-
-		public init(
-			name: String? = nil,
-			symbol: String? = nil,
-			description: String? = nil,
-			iconURL: URL? = nil,
-			tags: [AssetTag] = [],
-			dappDefinitions: [DappDefinitionAddress]? = nil
-		) {
-			self.name = name
-			self.symbol = symbol
-			self.description = description
-			self.iconURL = iconURL
-			self.tags = tags
-			self.dappDefinitions = dappDefinitions
-		}
-	}
-
 	public typealias NonFungibleResources = [NonFungibleResource]
 
 	public struct FungibleResources: Sendable, Hashable, Codable {
@@ -152,12 +127,12 @@ extension AccountPortfolio.PoolUnitResources {
 		public struct Validator: Sendable, Hashable, Codable {
 			public let address: ValidatorAddress
 			public let xrdVaultBalance: BigDecimal
-			public let metadata: AccountPortfolio.ResourceMetadata
+			public let metadata: ResourceMetadata
 
 			public init(
 				address: ValidatorAddress,
 				xrdVaultBalance: BigDecimal,
-				metadata: AccountPortfolio.ResourceMetadata
+				metadata: ResourceMetadata
 			) {
 				self.address = address
 				self.xrdVaultBalance = xrdVaultBalance
@@ -253,7 +228,7 @@ extension AccountPortfolio.NonFungibleResource {
 			resourceAddress: container.decode(ResourceAddress.self, forKey: .resourceAddress),
 			atLedgerState: container.decode(AtLedgerState.self, forKey: .atLedgerState),
 			nonFungibleIds: container.decode([String].self, forKey: .tokens).map(NonFungibleGlobalId.init(nonFungibleGlobalId:)),
-			metadata: container.decode(AccountPortfolio.ResourceMetadata.self, forKey: .metadata)
+			metadata: container.decode(ResourceMetadata.self, forKey: .metadata)
 		)
 	}
 
