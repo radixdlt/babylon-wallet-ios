@@ -8,13 +8,10 @@ public struct AssetTransfer: Sendable, FeatureReducer {
 		public var accounts: TransferAccountList.State
 		public var message: AssetTransferMessage.State?
 		public let isMainnetAccount: Bool
-		public var hasMainnetEverBeenLive: Bool = false
 
 		public init(
-			from account: Profile.Network.Account,
-			hasMainnetEverBeenLive: Bool
+			from account: Profile.Network.Account
 		) {
-			self.hasMainnetEverBeenLive = hasMainnetEverBeenLive
 			self.isMainnetAccount = account.networkID == .mainnet
 			self.accounts = .init(fromAccount: account)
 			self.message = nil

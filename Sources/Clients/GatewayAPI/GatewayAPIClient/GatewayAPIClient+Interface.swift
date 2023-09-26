@@ -9,7 +9,6 @@ public struct GatewayAPIClient: Sendable, DependencyKey {
 	public static var rdxClientVersion: String?
 
 	// MARK: Request
-	public var isMainnetLive: IsMainnetLive
 	public var getNetworkName: GetNetworkName
 	public var getEpoch: GetEpoch
 
@@ -34,8 +33,6 @@ public struct GatewayAPIClient: Sendable, DependencyKey {
 }
 
 extension GatewayAPIClient {
-	public typealias IsMainnetLive = @Sendable () async -> Bool
-
 	public typealias GetNetworkName = @Sendable (URL) async throws -> Radix.Network.Name
 	public typealias GetEpoch = @Sendable () async throws -> Epoch
 
@@ -57,14 +54,6 @@ extension GatewayAPIClient {
 	public typealias SubmitTransaction = @Sendable (GatewayAPI.TransactionSubmitRequest) async throws -> GatewayAPI.TransactionSubmitResponse
 	public typealias GetTransactionStatus = @Sendable (GatewayAPI.TransactionStatusRequest) async throws -> GatewayAPI.TransactionStatusResponse
 	public typealias TransactionPreview = @Sendable (GatewayAPI.TransactionPreviewRequest) async throws -> GatewayAPI.TransactionPreviewResponse
-}
-
-// MARK: - IsMainnetLiveResponse
-public struct IsMainnetLiveResponse: Decodable, Sendable, Hashable {
-	public let isMainnetLive: Bool
-	public init(isMainnetLive: Bool) {
-		self.isMainnetLive = isMainnetLive
-	}
 }
 
 extension GatewayAPIClient {

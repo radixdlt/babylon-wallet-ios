@@ -177,14 +177,7 @@ public struct GatewaySettings: Sendable, FeatureReducer {
 		case let .gatewaysLoadedResult(.success(gateways)):
 			let containsMainnet = gateways.all.contains(Radix.Gateway.mainnet)
 			func canBeDeleted(_ gateway: Radix.Gateway) -> Bool {
-				guard gateways.all.count > 1 else {
-					return false
-				}
-				if containsMainnet {
-					return gateway != .mainnet
-				} else {
-					return gateway != .default
-				}
+				gateway != .mainnet
 			}
 			state.currentGateway = gateways.current
 			state.gatewayList = .init(gateways: .init(

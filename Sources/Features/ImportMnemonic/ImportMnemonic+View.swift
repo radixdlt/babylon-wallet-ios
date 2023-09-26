@@ -48,13 +48,11 @@ extension ImportMnemonic {
 		let bip39Passphrase: String
 		var showBackButton: Bool {
 			guard let readonlyMode, case .fromSettings = readonlyMode else { return false }
-			loggerGlobal.feature("show back button")
 			return true
 		}
 
 		var showCloseButton: Bool {
 			guard let readonlyMode, case .fromBackupPrompt = readonlyMode else { return false }
-			loggerGlobal.feature("show close button")
 			return true
 		}
 

@@ -90,8 +90,6 @@ public struct AccountDetails: Sendable, FeatureReducer {
 	}
 
 	public enum InternalAction: Sendable, Equatable {
-		case transfer(hasMainnetEverBeenLive: Bool)
-
 		case markBackupNeeded
 		case accountUpdated(Profile.Network.Account)
 		case portfolioLoaded(AccountPortfolio)
@@ -195,10 +193,10 @@ public struct AccountDetails: Sendable, FeatureReducer {
 			return .none
 
 		case .transferButtonTapped:
-			return .run { send in
-				let hasMainnetEverBeenLive = await networkSwitchingClient.hasMainnetEverBeenLive()
-				await send(.internal(.transfer(hasMainnetEverBeenLive: hasMainnetEverBeenLive)))
-			}
+			state.destination = .transfer(.init(
+				from: state.account
+			))
+			return .none
 
 		case .exportMnemonicButtonTapped:
 			return loadMnemonic(state: state)
@@ -244,7 +242,6 @@ public struct AccountDetails: Sendable, FeatureReducer {
 			return checkAccountSecurityPromptStatus(state: &state)
 
 		case .destination(.dismiss):
-			loggerGlobal.feature("Dismissed child")
 			return checkAccountSecurityPromptStatus(state: &state)
 
 		default:
@@ -254,13 +251,6 @@ public struct AccountDetails: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
-		case let .transfer(hasMainnetEverBeenLive):
-			state.destination = .transfer(.init(
-				from: state.account,
-				hasMainnetEverBeenLive: hasMainnetEverBeenLive
-			))
-			return .none
-
 		case .markBackupNeeded:
 			state.exportMnemonicPrompt = .init(needed: true)
 			return .none
@@ -272,7 +262,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 			return loadImport()
 
 		case let .loadMnemonicResult(.success(mnemonicWithPassphraseAndFactorSourceInfo)):
-			loggerGlobal.feature("Successfully loaded mnemonic to export")
+			loggerGlobal.trace("Successfully loaded mnemonic to export")
 			state.destination = .exportMnemonic(.init(
 				warning: L10n.RevealSeedPhrase.warning,
 				mnemonicWithPassphrase: mnemonicWithPassphraseAndFactorSourceInfo.mnemonicWithPassphrase,
@@ -306,7 +296,6 @@ public struct AccountDetails: Sendable, FeatureReducer {
 	}
 
 	private func loadMnemonic(state: State) -> Effect<Action> {
-		loggerGlobal.feature("implement export")
 		let factorInstance = state.deviceControlledFactorInstance
 		let factorSourceID = factorInstance.factorSourceID
 		return .run { send in

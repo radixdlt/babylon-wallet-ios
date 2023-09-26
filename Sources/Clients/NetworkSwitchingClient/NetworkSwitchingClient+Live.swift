@@ -63,21 +63,6 @@ extension NetworkSwitchingClient {
 		}
 
 		return Self(
-			hasMainnetEverBeenLive: {
-				if userDefaultsClient.hasMainnetEverBeenLive {
-					loggerGlobal.debug("Mainnet has been live before..")
-					return true
-				}
-				loggerGlobal.debug("Mainnet has never been live before, checking if it is live now")
-				let isLive = await gatewayAPIClient.isMainnetLive()
-				if isLive {
-					loggerGlobal.notice("Mainnet is live, saving that is has been seen to be live...")
-					await userDefaultsClient.setMainnetIsLive()
-				} else {
-					loggerGlobal.notice("Mainnet is not live")
-				}
-				return isLive
-			},
 			validateGatewayURL: validateGatewayURL,
 			hasAccountOnNetwork: hasAccountOnNetwork,
 			switchTo: switchTo

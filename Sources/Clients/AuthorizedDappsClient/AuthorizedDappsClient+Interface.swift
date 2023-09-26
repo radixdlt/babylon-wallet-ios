@@ -114,8 +114,6 @@ extension AuthorizedDappsClient {
 			if updatedAuthedDapp != authorizedDapp {
 				// Write back `updatedAuthedDapp` to Profile only if changes were needed
 				try await updateAuthorizedDapp(updatedAuthedDapp)
-			} else {
-				loggerGlobal.feature("nothing to do... skipped updating authorizedDapp")
 			}
 		}
 	}

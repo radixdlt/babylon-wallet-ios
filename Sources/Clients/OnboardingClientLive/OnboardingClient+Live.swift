@@ -17,6 +17,7 @@ extension OnboardingClient: DependencyKey {
 			},
 			commitEphemeral: {
 				try await getProfileStore().commitEphemeral()
+				return Prelude.Unit.instance
 			}
 		)
 	}

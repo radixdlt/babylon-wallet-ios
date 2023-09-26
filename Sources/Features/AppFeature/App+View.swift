@@ -7,14 +7,7 @@ import SplashFeature
 
 extension App.State {
 	public var showIsUsingTestnetBanner: Bool {
-		guard hasMainnetEverBeenLive else {
-			return false
-		}
-		if isCurrentlyOnboardingUser {
-			return false
-		}
-
-		return !isOnMainnet
+		!isOnMainnet
 	}
 }
 
@@ -51,12 +44,6 @@ extension App {
 						/App.State.Root.splash,
 						action: App.ChildAction.splash,
 						then: { Splash.View(store: $0) }
-					)
-				case .onboardTestnetUserToMainnet:
-					CaseLet(
-						/App.State.Root.onboardTestnetUserToMainnet,
-						action: App.ChildAction.onboardTestnetUserToMainnet,
-						then: { CreateAccountCoordinator.View(store: $0) }
 					)
 				}
 			}

@@ -83,26 +83,6 @@ extension Profile.Networks {
 	}
 }
 
-extension ProfileSnapshot {
-	public var hasMainnetAccounts: Bool {
-		guard let onMainnet = try? networks.network(id: .mainnet) else {
-			return false
-		}
-		return !onMainnet.accounts.isEmpty
-	}
-}
-
-extension Profile {
-	public var hasMainnetAccounts: Bool {
-		do {
-			let onMainnet = try network(id: .mainnet)
-			return !onMainnet.accounts.isEmpty
-		} catch {
-			return false
-		}
-	}
-}
-
 extension Profile.Networks.Error {
 	public var customDumpDescription: String {
 		_description
