@@ -1,13 +1,15 @@
 import FeaturePrelude
 
+extension Radix.Gateway {
+	var displayName: String {
+		isWellknown ? (name ?? network.displayDescription) : url.absoluteString
+	}
+}
+
 extension GatewayRow.State {
 	var viewState: GatewayRow.ViewState {
-		let name = gateway.isWellknown ?
-			gateway.network.displayDescription :
-			gateway.url.absoluteString
-
-		return .init(
-			name: name,
+		.init(
+			name: gateway.displayName,
 			description: gateway.network.displayDescription,
 			isSelected: isSelected,
 			canBeDeleted: canBeDeleted

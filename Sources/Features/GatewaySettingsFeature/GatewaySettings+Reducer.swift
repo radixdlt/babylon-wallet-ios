@@ -175,21 +175,18 @@ public struct GatewaySettings: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .gatewaysLoadedResult(.success(gateways)):
-			let containsMainnet = gateways.all.contains(Radix.Gateway.mainnet)
-			func canBeDeleted(_ gateway: Radix.Gateway) -> Bool {
-				gateway != .mainnet
-			}
+
 			state.currentGateway = gateways.current
 			state.gatewayList = .init(gateways: .init(
 				uniqueElements: gateways.all.elements.map {
 					GatewayRow.State(
 						gateway: $0,
 						isSelected: gateways.current.id == $0.id,
-						canBeDeleted: canBeDeleted($0)
+						canBeDeleted: !$0.isWellknown
 					)
 				}
-				.sorted(by: { !$0.canBeDeleted && $1.canBeDeleted })
 			))
+			state.gatewayList.gateways.sort()
 			return .none
 
 		case let .gatewaysLoadedResult(.failure(error)):
@@ -229,6 +226,7 @@ public struct GatewaySettings: Sendable, FeatureReducer {
 			state.gatewayList.gateways.forEach {
 				state.gatewayList.gateways[id: $0.id]?.isSelected = $0.id == gateway.id
 			}
+			state.gatewayList.gateways.sort()
 
 			if let gatewayForRemoval = state.gatewayForRemoval {
 				state.gatewayForRemoval = nil
