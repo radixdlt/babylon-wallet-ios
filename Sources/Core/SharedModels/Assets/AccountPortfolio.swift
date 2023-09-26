@@ -187,10 +187,10 @@ extension AccountPortfolio.PoolUnitResources {
 		public let stakeClaimResource: AccountPortfolio.NonFungibleResource?
 
 		public var xrdRedemptionValue: BigDecimal? {
-			guard let stakeUnitResource else {
+			guard let stakeUnitResource, let totalSupply = stakeUnitResource.resource.totalSupply else {
 				return nil
 			}
-			return (stakeUnitResource.amount * validator.xrdVaultBalance) / (stakeUnitResource.resource.totalSupply ?? .one)
+			return validator.xrdVaultBalance * (stakeUnitResource.amount / totalSupply)
 		}
 
 		public init(validator: Validator, stakeUnitResource: AccountPortfolio.FungibleResource?, stakeClaimResource: AccountPortfolio.NonFungibleResource?) {
