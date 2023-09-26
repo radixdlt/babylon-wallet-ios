@@ -550,7 +550,7 @@ extension ProfileStore {
 				contentHint: .init() // Empty initially
 			)
 
-			loggerGlobal.debug("Created new ephemeral profile with ID: \(header.id), and device factorSourceID: \(factorSource.id)")
+			loggerGlobal.trace("Created new ephemeral profile with ID: \(header.id), and device factorSourceID: \(factorSource.id)")
 
 			return Profile(header: header, deviceFactorSource: factorSource)
 

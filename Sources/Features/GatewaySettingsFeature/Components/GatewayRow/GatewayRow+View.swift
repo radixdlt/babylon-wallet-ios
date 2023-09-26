@@ -2,8 +2,8 @@ import FeaturePrelude
 
 extension GatewayRow.State {
 	var viewState: GatewayRow.ViewState {
-		let name = gateway.isDefault ?
-			L10n.Gateways.rcNetGateway :
+		let name = gateway.isWellknown ?
+			gateway.network.displayDescription :
 			gateway.url.absoluteString
 
 		return .init(

@@ -97,11 +97,13 @@ extension Radix.Gateway {
 			url: URL(string: "https://mardunet-gateway.radixdlt.com")!
 		)
 	}
+
+	private static var wellknown: [Self] { [.mainnet, .stokenet] }
 }
 
 extension Radix.Gateway {
-	public var isDefault: Bool {
-		id == Self.default.id
+	public var isWellknown: Bool {
+		Self.wellknown.contains(self)
 	}
 
 	public var customDumpMirror: Mirror {
