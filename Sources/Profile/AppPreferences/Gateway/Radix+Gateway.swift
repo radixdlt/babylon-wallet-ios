@@ -45,7 +45,7 @@ extension Radix.Gateway {
 	public static var stokenet: Self {
 		.init(
 			network: .stokenet,
-			url: URL(string: "babylon-stokenet-gateway.radixdlt.com/")!,
+			url: URL(string: "https://babylon-stokenet-gateway.radixdlt.com/")!,
 			name: "Stokenet (testnet) Gateway"
 		)
 	}
