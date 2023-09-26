@@ -286,12 +286,12 @@ extension TransactionFee {
 	}
 
 	var expectedNormalModeNetworkFee: BigDecimal {
-		normalModeNetworkFee.clampedDiff(feeLocks.nonContingentLock)
+		(normalModeNetworkFee - feeLocks.nonContingentLock).clamped
 	}
 
 	var expectedNormalModeRoyaltyFee: BigDecimal {
-		let remainingNonContingentLock = feeLocks.nonContingentLock.clampedDiff(normalModeNetworkFee)
-		return feeSummary.royaltyCost.clampedDiff(remainingNonContingentLock)
+		let remainingNonContingentLock = (feeLocks.nonContingentLock - normalModeNetworkFee).clamped
+		return (feeSummary.royaltyCost - remainingNonContingentLock).clamped
 	}
 
 	var expectedNormalModeLockFee: BigDecimal {
@@ -300,7 +300,7 @@ extension TransactionFee {
 
 	var expectedNormalModeTotalFee: TotalFee {
 		let maxFee = expectedNormalModeLockFee
-		let minFee = maxFee.clampedDiff(feeLocks.contingentLock)
+		let minFee = (maxFee - feeLocks.contingentLock).clamped
 		return .init(min: minFee, max: maxFee)
 	}
 

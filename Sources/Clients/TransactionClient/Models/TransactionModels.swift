@@ -367,7 +367,7 @@ extension TransactionFee {
 		switch mode {
 		case let .normal(normalCustomization):
 			let maxFee = normalCustomization.total
-			let minFee = maxFee.clampedDiff(feeLocks.contingentLock)
+			let minFee = (maxFee - feeLocks.contingentLock).clamped
 			return .init(min: minFee, max: maxFee)
 		case let .advanced(advancedCustomization):
 			return .init(min: advancedCustomization.total, max: advancedCustomization.total)
@@ -521,11 +521,11 @@ extension TransactionFee {
 					+ feeSummary.finalizationCost
 					+ feeSummary.storageExpansionCost
 			) * (1 + PredefinedFeeConstants.networkFeeMultiplier) // add network multiplier on top
-			let remainingNonContingentLock = feeLocks.nonContingentLock.clampedDiff(networkFee)
+			let remainingNonContingentLock = (feeLocks.nonContingentLock - networkFee).clamped
 
 			self.init(
-				networkFee: networkFee.clampedDiff(feeLocks.nonContingentLock),
-				royaltyFee: feeSummary.royaltyCost.clampedDiff(remainingNonContingentLock)
+				networkFee: (networkFee - feeLocks.nonContingentLock).clamped,
+				royaltyFee: (feeSummary.royaltyCost - remainingNonContingentLock).clamped
 			)
 		}
 	}
