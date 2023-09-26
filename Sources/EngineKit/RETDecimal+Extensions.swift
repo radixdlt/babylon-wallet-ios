@@ -52,6 +52,31 @@ extension RETDecimal {
 	}
 }
 
+// MARK: - CodableRETDecimal
+/// A temporary property wrapper to make it easier to use `RETDecimal` in contexts where codability is required
+@propertyWrapper
+public struct CodableRETDecimal: Codable, Hashable, Sendable {
+	public var wrappedValue: RETDecimal
+
+	public init(wrappedValue: RETDecimal) {
+		self.wrappedValue = wrappedValue
+	}
+
+	@inlinable
+	public init(from decoder: Decoder) throws {
+		let container = try decoder.singleValueContainer()
+		let string = try container.decode(String.self)
+
+		try self.init(wrappedValue: .init(value: string))
+	}
+
+	@inlinable
+	public func encode(to encoder: Encoder) throws {
+		var container = encoder.singleValueContainer()
+		try container.encode(wrappedValue.asStr())
+	}
+}
+
 // MARK: Parsing and formatting for human readable strings
 
 extension UInt {
