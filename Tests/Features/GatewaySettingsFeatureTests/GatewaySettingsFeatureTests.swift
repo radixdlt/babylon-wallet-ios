@@ -44,7 +44,7 @@ final class GatewaySettingsFeatureTests: TestCase {
 					GatewayRow.State(
 						gateway: $0,
 						isSelected: gateways.current.id == $0.id,
-						canBeDeleted: !$0.isDefault
+						canBeDeleted: !$0.isWellknown
 					)
 				}
 				.sorted(by: { !$0.canBeDeleted && $1.canBeDeleted })
@@ -126,10 +126,9 @@ final class GatewaySettingsFeatureTests: TestCase {
 				GatewayRow.State(
 					gateway: $0,
 					isSelected: gateways.current.id == $0.id,
-					canBeDeleted: !$0.isDefault
+					canBeDeleted: !$0.isWellknown
 				)
 			}
-			.sorted(by: { !$0.canBeDeleted && $1.canBeDeleted })
 		))
 
 		let isGatewayRemoved = ActorIsolated<Bool>(false)
@@ -172,10 +171,9 @@ final class GatewaySettingsFeatureTests: TestCase {
 					GatewayRow.State(
 						gateway: $0,
 						isSelected: gatewaysAfterDeletion.current.id == $0.id,
-						canBeDeleted: !$0.isDefault
+						canBeDeleted: !$0.isWellknown
 					)
 				}
-				.sorted(by: { !$0.canBeDeleted && $1.canBeDeleted })
 			))
 
 			$0.currentGateway = .nebunet
