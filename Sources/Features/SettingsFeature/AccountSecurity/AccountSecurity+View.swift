@@ -12,15 +12,8 @@ extension AccountSecurity {
 	public struct ViewState: Equatable {
 		public let canImportOlympiaWallet: Bool
 
-		#if DEBUG
-		public var nonMainnetNetwork: Radix.Network?
-		#endif
-
 		init(state: AccountSecurity.State) {
 			self.canImportOlympiaWallet = state.canImportOlympiaWallet
-			#if DEBUG
-			self.nonMainnetNetwork = state.nonMainnetNetwork
-			#endif
 		}
 	}
 
@@ -103,15 +96,9 @@ extension AccountSecurity.View {
 			return nil
 		}
 
-		var subtitle: String? = nil
-		#if DEBUG
-		if let nonMainnetNetwork = viewStore.nonMainnetNetwork {
-			subtitle = "[DEBUG ONLY] Into network: '\(nonMainnetNetwork.name)'"
-		}
-		#endif
 		return .init(
 			title: L10n.Settings.importFromLegacyWallet,
-			subtitle: subtitle,
+			subtitle: nil,
 			icon: .asset(AssetResource.appSettings),
 			action: .importFromOlympiaWalletButtonTapped
 		)
