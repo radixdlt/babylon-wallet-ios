@@ -95,6 +95,10 @@ public struct AccountSecurity: Sendable, FeatureReducer {
 		switch viewAction {
 		case .appeared:
 			return .run { send in
+
+				let preferences = await appPreferencesClient.getPreferences()
+				await send(.internal(.loadPreferences(preferences)))
+
 				let currentNetworkID = await factorSourcesClient.getCurrentNetworkID()
 
 				// we only allow import of olympia accounts into mainnet
