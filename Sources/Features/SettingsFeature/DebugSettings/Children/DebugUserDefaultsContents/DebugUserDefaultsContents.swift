@@ -53,14 +53,12 @@ public struct DebugUserDefaultsContents: Sendable, FeatureReducer {
 	}
 
 	private func loadKeyValues(into state: inout State) {
-		loggerGlobal.feature("BEFORE keyedValues: \(state.keyedValues)")
 		state.keyedValues = IdentifiedArrayOf(uniqueElements: UserDefaultsClient.Key.allCases.map {
 			DebugUserDefaultsContents.State.KeyValues(
 				key: $0,
 				values: $0.valuesForKey()
 			)
 		})
-		loggerGlobal.feature("AFTER keyedValues: \(state.keyedValues)")
 	}
 }
 
@@ -68,8 +66,6 @@ extension UserDefaultsClient.Key {
 	func valuesForKey() -> [String] {
 		@Dependency(\.userDefaultsClient) var userDefaultsClient
 		switch self {
-		case .hasMainnetEverBeenLive:
-			return [userDefaultsClient.hasMainnetEverBeenLive].map(String.init(describing:))
 		case .accountsThatNeedRecovery:
 			return userDefaultsClient.getAddressesOfAccountsThatNeedRecovery().map(\.address)
 		case .activeProfileID:

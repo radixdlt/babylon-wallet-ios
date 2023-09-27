@@ -1,5 +1,4 @@
 import AccountsClient
-import AppPreferencesClient
 import ClientPrelude
 import Cryptography
 import EngineKit
@@ -12,23 +11,14 @@ extension ImportLegacyWalletClient: DependencyKey {
 
 	public static let liveValue: Self = {
 		@Dependency(\.accountsClient) var accountsClient
-		@Dependency(\.appPreferencesClient) var appPreferencesClient
 		@Dependency(\.factorSourcesClient) var factorSourcesClient
 
 		@Sendable func migrate(
 			accounts: NonEmpty<Set<OlympiaAccountToMigrate>>,
 			factorSouceID: FactorSourceID.FromHash
 		) async throws -> (accounts: NonEmpty<OrderedSet<MigratedAccount>>, networkID: NetworkID) {
-			guard
-				let networkID = await networkIDForOlympiaAccountsToImportInto(
-					currentNetworkID: factorSourcesClient.getCurrentNetworkID(),
-					isDeveloperModeEnabled: appPreferencesClient.isDeveloperModeEnabled()
-				)
-			else {
-				struct NotPermittedToImportOlympiaAccountsToTestnet: Swift.Error {}
-				throw NotPermittedToImportOlympiaAccountsToTestnet()
-			}
-
+			// we only allow import of olympia accounts into mainnet
+			let networkID = NetworkID.mainnet
 			let sortedOlympia = accounts.sorted(by: \.addressIndex)
 
 			let accountIndexBase = await accountsClient.nextAccountIndex(networkID)
@@ -98,10 +88,7 @@ extension ImportLegacyWalletClient: DependencyKey {
 					loggerGlobal.warning("Failed to load accounts, error: \(error)")
 				}
 
-				return await canImportOlympiaWallet(
-					currentNetworkID: factorSourcesClient.getCurrentNetworkID(),
-					isDeveloperModeEnabled: appPreferencesClient.isDeveloperModeEnabled()
-				)
+				return await factorSourcesClient.getCurrentNetworkID() == .mainnet
 			},
 			parseHeaderFromQRCode: {
 				let header = try CAP33.deserializeHeader(payload: $0)

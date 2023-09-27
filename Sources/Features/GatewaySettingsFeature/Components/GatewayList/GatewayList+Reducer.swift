@@ -1,5 +1,17 @@
 import FeaturePrelude
 
+// MARK: - GatewayRow.State + Comparable
+extension GatewayRow.State: Comparable {
+	public static func < (lhs: Self, rhs: Self) -> Bool {
+		if lhs.canBeDeleted, !rhs.canBeDeleted {
+			return false
+		}
+
+		return lhs.gateway.network.id < rhs.gateway.network.id &&
+			lhs.gateway.displayName < rhs.gateway.displayName
+	}
+}
+
 // MARK: - GatewayList
 public struct GatewayList: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {

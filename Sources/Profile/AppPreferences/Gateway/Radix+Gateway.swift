@@ -14,38 +14,47 @@ extension Radix {
 		public let network: Network
 		/// The URL to the gateways API endpoint
 		public let url: URL
+		public let name: String?
 		public var id: ID { url }
 
-		public init(network: Network, url: URL) {
+		public init(
+			network: Network,
+			url: URL,
+			name: String? = nil
+		) {
 			self.network = network
 			self.url = url
+			self.name = name
 		}
 	}
 }
 
 extension Radix.Gateway {
-	public static let `default` = Radix.Gateway.rcnet
+	public static let `default` = Radix.Gateway.mainnet
 }
 
 extension Radix.Gateway {
 	public static var mainnet: Self {
 		.init(
 			network: .mainnet,
-			url: URL(string: "https://mainnet.radixdlt.com/")!
+			url: URL(string: "https://mainnet.radixdlt.com/")!,
+			name: "Mainnet Gateway"
 		)
 	}
 
 	public static var stokenet: Self {
 		.init(
 			network: .stokenet,
-			url: URL(string: "babylon-stokenet-gateway.radixdlt.com/")!
+			url: URL(string: "https://babylon-stokenet-gateway.radixdlt.com/")!,
+			name: "Stokenet (testnet) Gateway"
 		)
 	}
 
 	public static var rcnet: Self {
 		.init(
 			network: .zabanet,
-			url: URL(string: "https://rcnet-v3.radixdlt.com/")!
+			url: URL(string: "https://rcnet-v3.radixdlt.com/")!,
+			name: "RCnet v3 Gateway"
 		)
 	}
 
@@ -97,11 +106,13 @@ extension Radix.Gateway {
 			url: URL(string: "https://mardunet-gateway.radixdlt.com")!
 		)
 	}
+
+	private static var wellknown: [Self] { [.mainnet, .stokenet] }
 }
 
 extension Radix.Gateway {
-	public var isDefault: Bool {
-		id == Self.default.id
+	public var isWellknown: Bool {
+		Self.wellknown.contains(self)
 	}
 
 	public var customDumpMirror: Mirror {

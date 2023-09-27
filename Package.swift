@@ -637,7 +637,6 @@ package.addModules([
 		name: "ImportLegacyWalletClient",
 		dependencies: [
 			"AccountsClient",
-			"AppPreferencesClient", // FIXME: Post mainnet delete (read dev mode)
 			"LedgerHardwareWalletClient",
 			"Profile", // Olympia models
 			"EngineKit",

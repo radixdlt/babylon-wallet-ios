@@ -28,36 +28,36 @@ extension ImportLegacyWalletClient {
 
 import EngineKit
 
-extension ImportLegacyWalletClient {
-	// FIXME: Post mainnet remove this function, only used to allow DEBUG builds import Olympia wallets
-	public static func canImportOlympiaWallet(
-		currentNetworkID: NetworkID,
-		isDeveloperModeEnabled: Bool
-	) -> Bool {
-		networkIDForOlympiaAccountsToImportInto(
-			currentNetworkID: currentNetworkID,
-			isDeveloperModeEnabled: isDeveloperModeEnabled
-		) != nil
-	}
-
-	// FIXME: Post mainnet remove this function, only used to allow DEBUG builds import Olympia wallets
-	/// Returns `nil` if it is not supported to import olympia accounts at all, given the input
-	public static func networkIDForOlympiaAccountsToImportInto(
-		currentNetworkID: NetworkID,
-		isDeveloperModeEnabled: Bool
-	) -> NetworkID? {
-		guard currentNetworkID == .mainnet else {
-			#if DEBUG
-			if isDeveloperModeEnabled {
-				// ONLY for DEBUG builds where `isDeveloperModeEnabled` is set, we allow
-				// importing into non mainnet
-				return currentNetworkID
-			}
-			#endif
-
-			// Current network is not mainnet, return nil marking it is not possible to import olympia accounts into non mainnet network
-			return nil
-		}
-		return .mainnet
-	}
-}
+// extension ImportLegacyWalletClient {
+//	// FIXME: Post mainnet remove this function, only used to allow DEBUG builds import Olympia wallets
+//	public static func canImportOlympiaWallet(
+//		currentNetworkID: NetworkID,
+//		isDeveloperModeEnabled: Bool
+//	) -> Bool {
+//		networkIDForOlympiaAccountsToImportInto(
+//			currentNetworkID: currentNetworkID,
+//			isDeveloperModeEnabled: isDeveloperModeEnabled
+//		) != nil
+//	}
+//
+//	// FIXME: Post mainnet remove this function, only used to allow DEBUG builds import Olympia wallets
+//	/// Returns `nil` if it is not supported to import olympia accounts at all, given the input
+//	public static func networkIDForOlympiaAccountsToImportInto(
+//		currentNetworkID: NetworkID,
+//		isDeveloperModeEnabled: Bool
+//	) -> NetworkID? {
+//		guard currentNetworkID == .mainnet else {
+//			#if DEBUG
+//			if isDeveloperModeEnabled {
+//				// ONLY for DEBUG builds where `isDeveloperModeEnabled` is set, we allow
+//				// importing into non mainnet
+//				return currentNetworkID
+//			}
+//			#endif
+//
+//			// Current network is not mainnet, return nil marking it is not possible to import olympia accounts into non mainnet network
+//			return nil
+//		}
+//		return .mainnet
+//	}
+// }

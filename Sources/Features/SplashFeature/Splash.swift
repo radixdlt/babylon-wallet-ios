@@ -38,7 +38,7 @@ public struct Splash: Sendable, FeatureReducer {
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
-		case completed(LoadProfileOutcome, accountRecoveryNeeded: Bool, hasMainnetEverBeenLive: Bool)
+		case completed(LoadProfileOutcome, accountRecoveryNeeded: Bool)
 	}
 
 	@Dependency(\.networkSwitchingClient) var networkSwitchingClient
@@ -131,16 +131,12 @@ public struct Splash: Sendable, FeatureReducer {
 	}
 
 	func delegateCompleted(loadProfileOutcome: LoadProfileOutcome, accountRecoveryNeeded: Bool) -> Effect<Action> {
-		.run { send in
-			let hasMainnetEverBeenLive = await networkSwitchingClient.hasMainnetEverBeenLive()
-			await send(.delegate(
-				.completed(
-					loadProfileOutcome,
-					accountRecoveryNeeded: accountRecoveryNeeded,
-					hasMainnetEverBeenLive: hasMainnetEverBeenLive
-				))
-			)
-		}
+		.send(.delegate(
+			.completed(
+				loadProfileOutcome,
+				accountRecoveryNeeded: accountRecoveryNeeded
+			))
+		)
 	}
 
 	func checkAccountRecoveryNeeded(_ loadProfileOutcome: LoadProfileOutcome) -> Effect<Action> {
