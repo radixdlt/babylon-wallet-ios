@@ -91,9 +91,6 @@ package.addModules([
 			"MainFeature",
 			"OnboardingFeature",
 			"OverlayWindowClient",
-			"CreateAccountFeature",
-			"NetworkSwitchingClient",
-			"GatewaysClient",
 			"SplashFeature",
 		],
 		tests: .yes()

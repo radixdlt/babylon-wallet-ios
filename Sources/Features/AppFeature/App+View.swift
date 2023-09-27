@@ -1,15 +1,8 @@
 import AssetTransferFeature
-import CreateAccountFeature
 import FeaturePrelude
 import MainFeature
 import OnboardingFeature
 import SplashFeature
-
-extension App.State {
-	public var showIsUsingTestnetBanner: Bool {
-		!isOnMainnet
-	}
-}
 
 // MARK: - App.View
 extension App {
@@ -22,7 +15,6 @@ extension App {
 		}
 
 		public var body: some SwiftUI.View {
-			let bannerStore = store.scope(state: \.showIsUsingTestnetBanner, action: actionless)
 			SwitchStore(store.scope(state: \.root, action: Action.child)) { state in
 				switch state {
 				case .main:
@@ -53,10 +45,6 @@ extension App {
 				state: /App.Alerts.State.incompatibleProfileErrorAlert,
 				action: App.Alerts.Action.incompatibleProfileErrorAlert
 			)
-			.task { @MainActor in
-				await store.send(.view(.task)).finish()
-			}
-			.showDeveloperDisclaimerBanner(bannerStore)
 			.presentsLoadingViewOverlay()
 		}
 	}

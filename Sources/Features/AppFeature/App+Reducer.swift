@@ -1,13 +1,8 @@
 import AppPreferencesClient
-import CreateAccountFeature
-import EngineKit
 import FeaturePrelude
-import GatewaysClient
 import MainFeature
-import NetworkSwitchingClient
 import OnboardingClient
 import OnboardingFeature
-import SecureStorageClient
 import SplashFeature
 
 // MARK: - App
@@ -20,8 +15,6 @@ public struct App: Sendable, FeatureReducer {
 		}
 
 		public var root: Root
-
-		public var isOnMainnet = true
 
 		@PresentationState
 		public var alert: Alerts.State?
@@ -43,7 +36,6 @@ public struct App: Sendable, FeatureReducer {
 		case incompatibleProfileDeleted
 		case toMain(isAccountRecoveryNeeded: Bool)
 		case toOnboarding
-		case currentGatewayChanged(to: Radix.Gateway)
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -71,8 +63,6 @@ public struct App: Sendable, FeatureReducer {
 	}
 
 	@Dependency(\.continuousClock) var clock
-	@Dependency(\.networkSwitchingClient) var networkSwitchingClient
-	@Dependency(\.gatewaysClient) var gatewaysClient
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.appPreferencesClient) var appPreferencesClient
 
@@ -103,28 +93,19 @@ public struct App: Sendable, FeatureReducer {
 		case .task:
 			let retBuildInfo = buildInformation()
 			loggerGlobal.info("EngineToolkit commit hash: \(retBuildInfo.version)")
-			return .merge(
-				.run { send in
-					for try await gateways in await gatewaysClient.gatewaysValues() {
-						guard !Task.isCancelled else { return }
-						loggerGlobal.notice("Changed network to: \(gateways.current)")
-						await send(.internal(.currentGatewayChanged(to: gateways.current)))
-					}
-				},
-				.run { send in
-					for try await error in errorQueue.errors() {
-						guard !Task.isCancelled else { return }
-						// Maybe instead we should listen here for the Profile.State change,
-						// and when it switches to `.ephemeral` we navigate to onboarding.
-						// For now, we react to the specific error, since the Profile.State is meant to be private.
-						if error is Profile.ProfileIsUsedOnAnotherDeviceError {
-							await send(.internal(.toOnboarding))
-							// A slight delay to allow any modal that may be shown to be dismissed.
-							try? await clock.sleep(for: .seconds(0.5))
-						}
+			return .run { send in
+				for try await error in errorQueue.errors() {
+					guard !Task.isCancelled else { return }
+					// Maybe instead we should listen here for the Profile.State change,
+					// and when it switches to `.ephemeral` we navigate to onboarding.
+					// For now, we react to the specific error, since the Profile.State is meant to be private.
+					if error is Profile.ProfileIsUsedOnAnotherDeviceError {
+						await send(.internal(.toOnboarding))
+						// A slight delay to allow any modal that may be shown to be dismissed.
+						try? await clock.sleep(for: .seconds(0.5))
 					}
 				}
-			)
+			}
 
 		case .alert(.presented(.incompatibleProfileErrorAlert(.deleteWalletDataButtonTapped))):
 			return .run { send in
@@ -150,10 +131,6 @@ public struct App: Sendable, FeatureReducer {
 
 		case .toOnboarding:
 			return goToOnboarding(state: &state)
-
-		case let .currentGatewayChanged(currentGateway):
-			state.isOnMainnet = currentGateway.network == .mainnet
-			return .none
 		}
 	}
 

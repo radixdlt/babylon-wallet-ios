@@ -63,9 +63,7 @@ public struct Splash: Sendable, FeatureReducer {
 
 		case .didTapToUnlock:
 			state.biometricsCheckFailed = false
-			return .run { send in
-				await send(.internal(.loadProfileOutcome(loadProfile())))
-			}
+			return verifyPasscode()
 
 		case let .passcodeCheckFailedAlert(.presented(action)):
 			switch action {
@@ -91,6 +89,7 @@ public struct Splash: Sendable, FeatureReducer {
 			let config = try? result.value
 
 			guard config?.isPasscodeSetUp == true else {
+				state.biometricsCheckFailed = true
 				state.passcodeCheckFailedAlert = .init(
 					title: { .init(L10n.Splash.PasscodeCheckFailedAlert.title) },
 					actions: {
@@ -121,8 +120,9 @@ public struct Splash: Sendable, FeatureReducer {
 			}
 			return delegateCompleted(loadProfileOutcome: outcome, accountRecoveryNeeded: false)
 
-		case .accountRecoveryNeeded(_, .failure):
+		case let .accountRecoveryNeeded(_, .failure(error)):
 			state.biometricsCheckFailed = true
+			errorQueue.schedule(error)
 			return .none
 
 		case let .accountRecoveryNeeded(outcome, .success(recoveryNeeded)):
