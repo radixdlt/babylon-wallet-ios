@@ -58,9 +58,11 @@ extension ImportMnemonicControllingAccounts {
 						.cornerRadius(.small2)
 					}
 
-					DisplayEntitiesControlledByMnemonic.View(
-						store: store.scope(state: \.entities, action: { .child(.entities($0)) })
-					)
+					ScrollView {
+						DisplayEntitiesControlledByMnemonic.View(
+							store: store.scope(state: \.entities, action: { .child(.entities($0)) })
+						)
+					}
 				}
 				.padding(.horizontal, .medium3)
 				.footer {
