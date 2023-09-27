@@ -136,11 +136,8 @@ extension NonFungibleAssetList.Row.View {
 
 private extension NonFungibleAssetList.Row.ViewState {
 	var supply: String {
-		resource.totalSupply.map {
-			L10n.AssetDetails.NFTDetails.ownedOfTotal(
-				nftCount,
-				Int($0)
-			)
+		resource.totalSupply.flatMap { Int($0.asStr()) }.map {
+			L10n.AssetDetails.NFTDetails.ownedOfTotal(nftCount, $0)
 		} ?? "\(nftCount)"
 	}
 
