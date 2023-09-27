@@ -184,6 +184,8 @@ extension TransactionType {
 					authorizedDepositorsChanges: authorizedDepositorsChanges.mapKeys(AccountAddress.init(validatingAddress:))
 				)
 			))
+		case .stakeTransaction, .unstakeTransaction, .claimStakeTransaction:
+			return .nonConforming
 		}
 	}
 }
