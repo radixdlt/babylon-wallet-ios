@@ -235,9 +235,11 @@ func instructionForDepositing(
 ) throws -> ManifestBuilder.InstructionsChain.Instruction {
 	@Dependency(\.userDefaultsClient) var userDefaultsClient
 	let isUserAccount = receivingAccount.isUserAccount
-	let isSoftwareAccount = !receivingAccount.isLedgerAccount
+	// TODO: Temporary revert of checking if the receiving account is a ledger account
+	let isSoftwareAccount = true // !receivingAccount.isLedgerAccount
 	let recipientAddress = receivingAccount.address
 	let userHasAccessToMnemonic = !userDefaultsClient.getAddressesOfAccountsThatNeedRecovery().contains(recipientAddress)
+
 	guard isUserAccount, isSoftwareAccount, userHasAccessToMnemonic else {
 		return try ManifestBuilder.accountTryDepositOrAbort(
 			recipientAddress.intoEngine(),
