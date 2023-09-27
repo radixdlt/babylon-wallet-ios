@@ -2,6 +2,24 @@
 import TestingPrelude
 
 final class FactorSourceTests: TestCase {
+	// THIS TEST IS NEVER EVER EVER EVER ALLOWED TO FAIL!!! If it does, user might
+	// lose their funds!!!!!!
+	func test_assert_factorSourceID_description_is_unchanged() async throws {
+		let curve25519FactorSourceMnemonic = try Mnemonic(
+			phrase: "equip will roof matter pink blind book anxiety banner elbow sun young",
+			language: .english
+		)
+		let root = try HD.Root(seed: curve25519FactorSourceMnemonic.seed(passphrase: "Radix... just imagine!"))
+		let key = try root.derivePublicKey(
+			path: .getID,
+			curve: Curve25519.self
+		)
+		let factorSourceID = try FactorSource.id(fromRoot: root, factorSourceKind: .device)
+		guard factorSourceID.keychainKey == "device:4af22ea955d53263a712d897a797df8388e13b8e7b3f30d7d7da88028b724d60" else {
+			fatalError("CRITICAL UNIT TEST FAILURE - LOSS OF FUNDS POSSIBLE.")
+		}
+	}
+
 	func test_factor_source_id() async throws {
 		let curve25519FactorSourceMnemonic = try Mnemonic(
 			phrase: "bright club bacon dinner achieve pull grid save ramp cereal blush woman humble limb repeat video sudden possible story mask neutral prize goose mandate",

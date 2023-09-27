@@ -55,10 +55,10 @@ extension FactorSourcesClient: DependencyKey {
 					do {
 						try await saveFactorSource(factorSource)
 					} catch {
-						if factorSource.kind == .device {
+						if let idForMnemonicToDelete = try? factorSourceID.extract(as: FactorSourceID.FromHash.self) {
 							// We were unlucky, failed to update Profile, thus best to undo the saving of
 							// the mnemonic in keychain (if we can).
-							try? await secureStorageClient.deleteMnemonicByFactorSourceID(factorSourceID)
+							try? await secureStorageClient.deleteMnemonicByFactorSourceID(idForMnemonicToDelete)
 						}
 						throw error
 					}
@@ -89,7 +89,7 @@ extension FactorSourcesClient: DependencyKey {
 					let factorSourceIDs = olympiaDeviceFactorSources.map(\.id)
 
 					for factorSourceID in factorSourceIDs {
-						guard let mnemonic = try await secureStorageClient.loadMnemonicByFactorSourceID(factorSourceID.embed(), .importOlympiaAccounts) else {
+						guard let mnemonic = try await secureStorageClient.loadMnemonicByFactorSourceID(factorSourceID, .importOlympiaAccounts) else {
 							continue
 						}
 						guard (try? mnemonic.validatePublicKeys(of: softwareAccounts)) == true else {

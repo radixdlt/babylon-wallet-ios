@@ -17,7 +17,7 @@ extension BackupsClient: DependencyKey {
 
 		@Sendable
 		func importFor(
-			factorSourceIDs: Set<FactorSourceID>,
+			factorSourceIDs: Set<FactorSourceID.FromHash>,
 			operation: () async throws -> Void
 		) async throws {
 			do {

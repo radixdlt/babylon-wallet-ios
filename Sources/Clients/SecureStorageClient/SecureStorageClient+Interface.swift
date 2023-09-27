@@ -27,9 +27,9 @@ extension SecureStorageClient {
 	public typealias LoadProfileSnapshotData = @Sendable (ProfileSnapshot.Header.ID) async throws -> Data?
 
 	public typealias SaveMnemonicForFactorSource = @Sendable (PrivateHDFactorSource) async throws -> Void
-	public typealias LoadMnemonicByFactorSourceID = @Sendable (FactorSourceID, LoadMnemonicPurpose) async throws -> MnemonicWithPassphrase?
+	public typealias LoadMnemonicByFactorSourceID = @Sendable (FactorSourceID.FromHash, LoadMnemonicPurpose) async throws -> MnemonicWithPassphrase?
 
-	public typealias DeleteMnemonicByFactorSourceID = @Sendable (FactorSourceID) async throws -> Void
+	public typealias DeleteMnemonicByFactorSourceID = @Sendable (FactorSourceID.FromHash) async throws -> Void
 	public typealias DeleteProfileAndMnemonicsByFactorSourceIDs = @Sendable (ProfileSnapshot.Header.ID, _ keepInICloudIfPresent: Bool) async throws -> Void
 
 	public typealias LoadProfileHeaderList = @Sendable () async throws -> ProfileSnapshot.HeaderList?

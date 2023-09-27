@@ -49,10 +49,10 @@ public struct AccountDetails: Sendable, FeatureReducer {
 		@PresentationState
 		var destination: Destinations.State?
 
-		fileprivate var deviceControlledFactorInstance: FactorInstance {
+		fileprivate var deviceControlledFactorInstance: HierarchicalDeterministicFactorInstance {
 			switch account.securityState {
 			case let .unsecured(control):
-				return control.transactionSigning.factorInstance
+				return control.transactionSigning
 			}
 		}
 
@@ -233,7 +233,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 			case .closeButtonTapped, .failedToImportAllRequiredMnemonics:
 				break
 			case let .finishedImportingMnemonics(_, imported):
-				if imported.contains(where: { $0.factorSourceID == state.deviceControlledFactorInstance.factorSourceID }) {
+				if imported.contains(where: { $0.factorSourceID == state.deviceControlledFactorInstance.factorSourceID.embed() }) {
 					state.importMnemonicPrompt = .no
 
 					// It makes no sense to prompt user to back up a mnemonic she *just* imported.
@@ -311,14 +311,14 @@ public struct AccountDetails: Sendable, FeatureReducer {
 		let factorSourceID = factorInstance.factorSourceID
 		return .run { send in
 			let result = await TaskResult {
-				guard let mnemonicWithPassphrase = try await secureStorageClient.loadMnemonicByFactorSourceID(factorSourceID, .displaySeedPhrase) else {
+				guard let mnemonicWithPassphrase = try await secureStorageClient.loadMnemonicByFactorSourceID(factorInstance.factorSourceID, .displaySeedPhrase) else {
 					loggerGlobal.error("Failed to find mnemonic with key: \(factorSourceID) which controls account: \(state.account)")
 					struct UnabledToFindExpectedMnemonic: Swift.Error {}
 					throw UnabledToFindExpectedMnemonic()
 				}
 				return MnemonicWithPassphraseAndFactorSourceInfo(
 					mnemonicWithPassphrase: mnemonicWithPassphrase,
-					factorSourceKind: factorInstance.factorSourceKind
+					factorSourceKind: factorInstance.factorInstance.factorSourceKind
 				)
 			}
 			await send(.internal(.loadMnemonicResult(result)))

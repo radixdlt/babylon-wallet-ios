@@ -6,6 +6,18 @@ import LocalAuthenticationClient
 
 // MARK: - SecureStorageClientTests
 final class SecureStorageClientTests: TestCase {
+	// THIS TEST IS NEVER EVER EVER EVER ALLOWED TO FAIL!!! If it does, user might
+	// lose their funds!!!!!!
+	func test_assert_key_for_mnemonic_is_unchanged() async throws {
+		try await doTest(authConfig: .biometricsAndPasscodeSetUp) { sut, factorSource, _ in
+			try await sut.saveMnemonicForFactorSource(factorSource)
+		} assertKeychainSetItemWithAuthRequest: { request in
+			guard request.key == "device:09a501e4fafc7389202a82a3237a405ed191cdb8a4010124ff8e2c9259af1327" else {
+				fatalError("CRITICAL UNIT TEST FAILURE - LOSS OF FUNDS POSSIBLE.")
+			}
+		}
+	}
+
 	func test__WHEN__factorSource_is_saved__THEN__setDataWithAuth_called_with_icloud_sync_is_disabled() async throws {
 		try await doTest(authConfig: .biometricsAndPasscodeSetUp) { sut, factorSource, _ in
 			try await sut.saveMnemonicForFactorSource(factorSource)

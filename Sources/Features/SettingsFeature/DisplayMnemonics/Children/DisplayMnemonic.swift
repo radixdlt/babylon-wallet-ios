@@ -48,7 +48,7 @@ public struct DisplayMnemonic: Sendable, FeatureReducer {
 			return .run { [deviceFactorSource = state.deviceFactorSource] send in
 				let factorSourceID = deviceFactorSource.id
 				let result = await TaskResult {
-					try await secureStorageClient.loadMnemonicByFactorSourceID(factorSourceID.embed(), .displaySeedPhrase)
+					try await secureStorageClient.loadMnemonicByFactorSourceID(factorSourceID, .displaySeedPhrase)
 				}
 				await send(.internal(.loadMnemonicResult(result)))
 			}
