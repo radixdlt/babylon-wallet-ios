@@ -241,9 +241,8 @@ extension Loadable {
 	}
 }
 
-import SharedModels
-
 extension Loadable {
+	/// Extract the given field either from the prefetched value or from the loaded value
 	public func get<Field>(_ keyPath: KeyPath<Value, Field>, prefetched: Value?) -> Loadable<Field> {
 		guard let prefetchedField = prefetched?[keyPath: keyPath] else {
 			return map { $0[keyPath: keyPath] }

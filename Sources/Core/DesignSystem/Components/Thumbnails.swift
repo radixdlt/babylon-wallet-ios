@@ -219,16 +219,8 @@ public struct LoadableImage<Placeholder: View>: View {
 	private var loadingView: some View {
 		switch placeholderBehaviour.loading {
 		case .shimmer:
-			switch sizingBehaviour {
-			case let .fixedSize(size, _):
-				Color.gray
-					.frame(width: size.frame.width, height: size.frame.height)
-					.shimmer(active: true, config: .accountResourcesLoading)
-			case let .flexible(minAspect, maxAspect):
-				Color.gray
-					// .frame(width: size.frame.width, height: size.frame.height)
-					.shimmer(active: true, config: .accountResourcesLoading)
-			}
+			Color.gray
+				.shimmer(active: true, config: .accountResourcesLoading)
 
 		case let .color(color):
 			color

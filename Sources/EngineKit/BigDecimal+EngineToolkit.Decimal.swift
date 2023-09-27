@@ -14,7 +14,6 @@ extension EngineToolkit.Decimal {
 
 extension BigDecimal {
 	public func asDecimal(withDivisibility divisibility: Int? = nil) throws -> EngineToolkit.Decimal {
-		return try .init(value: self.toString())
 		let (integerPart, decimalPart) = integerAndDecimalPart(
 			withDivisibility: divisibility ?? EngineToolkit.Decimal.maxDivisibility
 		)

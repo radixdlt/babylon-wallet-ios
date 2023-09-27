@@ -162,12 +162,6 @@ extension OnLedgerEntitiesClient {
 	}
 }
 
-extension GatewayAPI.EntityMetadataCollection {
-	@Sendable public func extractTags() -> [AssetTag] {
-		tags?.compactMap(NonEmptyString.init(rawValue:)).map(AssetTag.init) ?? []
-	}
-}
-
 extension OnLedgerEntity {
 	var identifier: String {
 		switch self {

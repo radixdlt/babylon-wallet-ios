@@ -496,20 +496,20 @@ extension Array where Element == AccountPortfolio.FungibleResource {
 			if lhs.amount > .zero, rhs.amount > .zero {
 				return lhs.amount > rhs.amount // Sort descending by amount
 			}
-//			if lhs.amount != .zero || rhs.amount != .zero {
-//				return lhs.amount != .zero
-//			}
-//
-			//            if let lhsSymbol = lhs.metadata.symbol, let rhsSymbol = rhs.metadata.symbol {
-//				return lhsSymbol < rhsSymbol // Sort alphabetically by symbol
-//			}
-//			if lhs.symbol != nil || rhs.symbol != nil {
-//				return lhs.symbol != nil
-//			}
-//
-			//            if let lhsName = lhs.metadata.name, let rhsName = rhs.metadata.name {
-//				return lhsName < rhsName // Sort alphabetically by name
-//			}
+			if lhs.amount != .zero || rhs.amount != .zero {
+				return lhs.amount != .zero
+			}
+
+			if let lhsSymbol = lhs.metadata.symbol, let rhsSymbol = rhs.metadata.symbol {
+				return lhsSymbol < rhsSymbol // Sort alphabetically by symbol
+			}
+			if lhs.metadata.symbol != nil || rhs.metadata.symbol != nil {
+				return lhs.metadata.symbol != nil
+			}
+
+			if let lhsName = lhs.metadata.name, let rhsName = rhs.metadata.name {
+				return lhsName < rhsName // Sort alphabetically by name
+			}
 
 			return lhs.resourceAddress.address < rhs.resourceAddress.address // Sort by address
 		}

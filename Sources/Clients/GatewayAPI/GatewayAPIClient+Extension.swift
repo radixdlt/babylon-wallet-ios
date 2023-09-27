@@ -297,7 +297,7 @@ extension ResourceMetadata {
 			symbol: raw?.symbol,
 			description: raw?.description,
 			iconURL: raw?.iconURL,
-			tags: raw?.tags?.compactMap(NonEmptyString.init(rawValue:)).map { AssetTag($0) } ?? [],
+			tags: raw?.extractTags() ?? [],
 			dappDefinitions: raw?.dappDefinitions?.compactMap { try? DappDefinitionAddress(validatingAddress: $0) }
 		)
 	}

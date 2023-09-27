@@ -24,6 +24,7 @@ public struct AssetTransfer: Sendable, FeatureReducer {
 	@Dependency(\.dappInteractionClient) var dappInteractionClient
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.gatewaysClient) var gatewaysClient
+	@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
 
 	public init() {}
 
@@ -135,9 +136,12 @@ extension AssetTransfer.State {
 extension AssetTransfer {
 	private struct InvolvedFungibleResource: Identifiable {
 		struct PerAccountAmount: Identifiable {
-			var id: AccountAddress
 			var amount: BigDecimal
-			var isUserAccount: Bool
+			let recipient: ReceivingAccount.State.Account
+			typealias ID = AccountAddress
+			var id: ID {
+				recipient.address
+			}
 		}
 
 		var id: ResourceAddress {
@@ -152,9 +156,12 @@ extension AssetTransfer {
 
 	private struct InvolvedNonFungibleResource: Identifiable {
 		struct PerAccountTokens: Identifiable {
-			var id: AccountAddress
 			var tokens: IdentifiedArrayOf<OnLedgerEntity.NonFungibleToken>
-			var isUserAccount: Bool
+			let recipient: ReceivingAccount.State.Account
+			typealias ID = AccountAddress
+			var id: ID {
+				recipient.address
+			}
 		}
 
 		var id: ResourceAddress {
@@ -171,7 +178,12 @@ extension AssetTransfer {
 
 	private func createManifest(_ accounts: TransferAccountList.State) async throws -> TransactionManifest {
 		let networkID = await gatewaysClient.getCurrentNetworkID()
-
+		// TODO: use loaded resources
+		let onLedgerResources = try await onLedgerEntitiesClient.getResources(accounts.receivingAccounts.flatMap {
+			try $0.assets.map {
+				try .init(validatingAddress: $0.id)
+			}
+		})
 		let involvedFungibleResources = extractInvolvedFungibleResources(accounts.receivingAccounts)
 		let involvedNonFungibles = extractInvolvedNonFungibleResource(accounts.receivingAccounts)
 
@@ -191,18 +203,10 @@ extension AssetTransfer {
 						bucket
 					)
 
-					if account.isUserAccount {
-						try ManifestBuilder.accountDeposit(
-							account.id.intoEngine(),
-							bucket
-						)
-					} else {
-						try ManifestBuilder.accountTryDepositOrAbort(
-							account.id.intoEngine(),
-							nil,
-							bucket
-						)
-					}
+					try instructionForDepositing(
+						bucket: bucket,
+						into: account.recipient
+					)
 				}
 			}
 
@@ -223,24 +227,41 @@ extension AssetTransfer {
 						bucket
 					)
 
-					if account.isUserAccount {
-						try ManifestBuilder.accountDeposit(
-							account.id.intoEngine(),
-							bucket
-						)
-					} else {
-						try ManifestBuilder.accountTryDepositOrAbort(
-							account.id.intoEngine(),
-							nil,
-							bucket
-						)
-					}
+					try instructionForDepositing(
+						bucket: bucket,
+						into: account.recipient
+					)
 				}
 			}
 		}
 		.build(networkId: networkID.rawValue)
 	}
+}
 
+func instructionForDepositing(
+	bucket: ManifestBuilderBucket,
+	into receivingAccount: ReceivingAccount.State.Account
+) throws -> ManifestBuilder.InstructionsChain.Instruction {
+	@Dependency(\.userDefaultsClient) var userDefaultsClient
+	let isUserAccount = receivingAccount.isUserAccount
+	let isSoftwareAccount = !receivingAccount.isLedgerAccount
+	let recipientAddress = receivingAccount.address
+	let userHasAccessToMnemonic = !userDefaultsClient.getAddressesOfAccountsThatNeedRecovery().contains(recipientAddress)
+	guard isUserAccount, isSoftwareAccount, userHasAccessToMnemonic else {
+		return try ManifestBuilder.accountTryDepositOrAbort(
+			recipientAddress.intoEngine(),
+			nil,
+			bucket
+		)
+	}
+
+	return try ManifestBuilder.accountDeposit(
+		recipientAddress.intoEngine(),
+		bucket
+	)
+}
+
+extension AssetTransfer {
 	private func extractInvolvedFungibleResources(
 		_ receivingAccounts: IdentifiedArrayOf<ReceivingAccount.State>
 	) -> IdentifiedArrayOf<InvolvedFungibleResource> {
@@ -255,9 +276,8 @@ extension AssetTransfer {
 					continue
 				}
 				let accountTransfer = InvolvedFungibleResource.PerAccountAmount(
-					id: account.address,
 					amount: transferAmount,
-					isUserAccount: account.isUserAccount
+					recipient: account
 				)
 
 				if resources[id: fungibleAsset.resource.resourceAddress] != nil {
@@ -266,7 +286,7 @@ extension AssetTransfer {
 					resources.append(.init(
 						address: fungibleAsset.resource.resourceAddress,
 						totalTransferAmount: fungibleAsset.totalTransferSum,
-						divisibility: 18,
+						divisibility: fungibleAsset.resource.divisibility,
 						accounts: [accountTransfer]
 					))
 				}
@@ -294,18 +314,16 @@ extension AssetTransfer {
 						resources[id: nonFungibleAsset.resourceAddress]?.accounts[id: accountAddress]?.tokens.append(nonFungibleAsset.nftToken)
 					} else {
 						resources[id: nonFungibleAsset.resourceAddress]?.accounts.append(.init(
-							id: accountAddress,
 							tokens: [nonFungibleAsset.nftToken],
-							isUserAccount: account.isUserAccount
+							recipient: account
 						))
 					}
 				} else {
 					resources.append(.init(
 						address: nonFungibleAsset.resourceAddress,
 						accounts: [.init(
-							id: accountAddress,
 							tokens: [nonFungibleAsset.nftToken],
-							isUserAccount: account.isUserAccount
+							recipient: account
 						)]
 					))
 				}

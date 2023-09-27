@@ -11,6 +11,7 @@ extension PoolUnit {
 
 	public struct View: SwiftUI.View {
 		private let store: StoreOf<PoolUnit>
+		@Environment(\.refresh) var refresh
 
 		public init(store: StoreOf<PoolUnit>) {
 			self.store = store
@@ -29,7 +30,9 @@ extension PoolUnit {
 							.textStyle(.secondaryHeader)
 					}
 					.padding(-.small3)
-
+					if refresh != nil {
+						Text("refreshing")
+					}
 					HStack {
 						PoolUnitResourcesView(resources: viewStore.resources)
 							.padding(-.small2)
