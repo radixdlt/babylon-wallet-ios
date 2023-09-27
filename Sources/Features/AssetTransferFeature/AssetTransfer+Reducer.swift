@@ -180,17 +180,18 @@ extension AssetTransfer {
 
 		return try ManifestBuilder.make {
 			for resource in involvedFungibleResources {
+				let divisibility = resource.divisibility.map(UInt.init) ?? RETDecimal.maxDivisibility
 				try ManifestBuilder.withdrawAmount(
 					accounts.fromAccount.address.intoEngine(),
 					resource.address.intoEngine(),
-					resource.totalTransferAmount.asDecimal(withDivisibility: resource.divisibility)
+					resource.totalTransferAmount.rounded(decimalPlaces: divisibility)
 				)
 
 				for account in resource.accounts {
 					let bucket = ManifestBuilderBucket.unique
 					try ManifestBuilder.takeFromWorktop(
 						resource.address.intoEngine(),
-						account.amount.asDecimal(withDivisibility: resource.divisibility),
+						account.amount.rounded(decimalPlaces: divisibility),
 						bucket
 					)
 
