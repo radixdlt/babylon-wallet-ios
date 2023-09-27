@@ -13,9 +13,9 @@ public struct MinimumPercentageStepper: FeatureReducer {
 		var string: String
 
 		public init(value: RETDecimal) {
-			let clamped = value.withScale(2).clamped.droppingTrailingZeros
+			let clamped = value.rounded(decimalPlaces: 1).clamped
 			self.value = clamped
-			self.string = clamped.formatWithoutRounding()
+			self.string = clamped.formattedPlain()
 		}
 	}
 
@@ -35,22 +35,22 @@ public struct MinimumPercentageStepper: FeatureReducer {
 		switch viewAction {
 		case .increaseTapped:
 			let value = state.value.map { $0 + percentageDelta } ?? 100
-			let clamped = value.clamped.droppingTrailingZeros
+			let clamped = value.clamped
 			state.value = clamped
-			state.string = clamped.formatWithoutRounding()
+			state.string = clamped.formattedPlain()
 
 		case .decreaseTapped:
 			let value = state.value.map { $0 - percentageDelta } ?? 0
-			let clamped = value.clamped.droppingTrailingZeros
+			let clamped = value.clamped
 			state.value = clamped
-			state.string = clamped.formatWithoutRounding()
+			state.string = clamped.formattedPlain()
 
 		case let .stringEntered(string):
 			state.string = string
 			if string.isEmpty {
 				state.value = 0
-			} else if let value = try? RETDecimal(formattedString: string), value >= 0 {
-				state.value = value.droppingTrailingZeros
+			} else if let value = try? RETDecimal(formattedString: string), value.isPositive() {
+				state.value = value
 			} else {
 				state.value = nil
 			}
