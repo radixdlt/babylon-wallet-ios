@@ -5,7 +5,7 @@ import TransactionClient
 struct FeesView: View {
 	struct ViewState: Equatable, Sendable {
 		let feeViewStates: IdentifiedArrayOf<FeeViewState>
-		let totalFee: BigDecimal
+		let totalFee: RETDecimal
 		let isAdvancedMode: Bool
 	}
 
@@ -29,7 +29,7 @@ struct FeesView: View {
 
 				Divider()
 
-				transactionFeeView(fee: viewState.totalFee.format(), isAdvancedMode: viewState.isAdvancedMode)
+				transactionFeeView(fee: viewState.totalFee.formatted(), isAdvancedMode: viewState.isAdvancedMode)
 			}
 			.padding(.medium1)
 			.background(.app.gray5)
@@ -65,7 +65,7 @@ struct FeesView: View {
 				.foregroundColor(.app.gray2)
 				.textCase(.uppercase)
 			Spacer()
-			Text(state.amount.formatted(state.isUserConfigurable))
+			Text(state.amount.formatted(showsZero: state.isUserConfigurable))
 				.textStyle(.body1HighImportance)
 				.foregroundColor(state.amount == .zero ? .app.gray2 : .app.gray1)
 		}
@@ -77,9 +77,9 @@ struct FeeViewState: Equatable, Sendable, Identifiable {
 	var id: String { name }
 
 	let name: String
-	let amount: BigDecimal
+	let amount: RETDecimal
 	let isUserConfigurable: Bool
-	init(name: String, amount: BigDecimal, isUserConfigurable: Bool = false) {
+	init(name: String, amount: RETDecimal, isUserConfigurable: Bool = false) {
 		self.name = name
 		self.amount = amount
 		self.isUserConfigurable = isUserConfigurable
@@ -144,11 +144,11 @@ extension TransactionFee.NormalFeeCustomization {
 	}
 }
 
-extension BigDecimal {
-	func formatted(_ showsZero: Bool) -> String {
-		if !showsZero, self == .zero {
+extension RETDecimal {
+	func formatted(showsZero: Bool) -> String {
+		if !showsZero, isZero() {
 			return L10n.TransactionReview.CustomizeNetworkFeeSheet.noneDue
 		}
-		return L10n.TransactionReview.xrdAmount(format())
+		return L10n.TransactionReview.xrdAmount(formatted())
 	}
 }

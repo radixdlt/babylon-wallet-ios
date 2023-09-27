@@ -43,7 +43,7 @@ extension AccountPortfolio {
 
 	public struct FungibleResource: Sendable, Hashable, Identifiable, Codable {
 		public let resource: OnLedgerEntity.Resource
-		public let amount: BigDecimal
+		public let amount: RETDecimal
 
 		public var id: ResourceAddress { resourceAddress }
 		public var resourceAddress: ResourceAddress { resource.resourceAddress }
@@ -54,9 +54,9 @@ extension AccountPortfolio {
 		public var iconURL: URL? { resource.iconURL }
 		public var behaviors: [AssetBehavior] { resource.behaviors }
 		public var tags: [AssetTag] { resource.tags }
-		public var totalSupply: BigDecimal? { resource.totalSupply }
+		public var totalSupply: RETDecimal? { resource.totalSupply }
 
-		public init(resource: OnLedgerEntity.Resource, amount: BigDecimal) {
+		public init(resource: OnLedgerEntity.Resource, amount: RETDecimal) {
 			self.resource = resource
 			self.amount = amount
 		}
@@ -74,7 +74,7 @@ extension AccountPortfolio {
 		public var iconURL: URL? { resource.iconURL }
 		public var behaviors: [AssetBehavior] { resource.behaviors }
 		public var tags: [AssetTag] { resource.tags }
-		public var totalSupply: BigDecimal? { resource.totalSupply }
+		public var totalSupply: RETDecimal? { resource.totalSupply }
 
 		public init(resource: OnLedgerEntity.Resource, tokens: IdentifiedArrayOf<NonFungibleToken>) {
 			self.resource = resource
@@ -89,7 +89,7 @@ extension AccountPortfolio {
 			public let metadata: [Metadata]
 
 			// The claim amount if the it is a stake claim nft
-			public let stakeClaimAmount: BigDecimal?
+			public let stakeClaimAmount: RETDecimal?
 			// Indication that stake unit amount can be claimed if it is stake claim nft
 			public let canBeClaimed: Bool
 
@@ -99,7 +99,7 @@ extension AccountPortfolio {
 				description: String? = nil,
 				keyImageURL: URL? = nil,
 				metadata: [Metadata] = [],
-				stakeClaimAmount: BigDecimal? = nil,
+				stakeClaimAmount: RETDecimal? = nil,
 				canBeClaimed: Bool = false
 			) {
 				self.id = id
@@ -162,14 +162,14 @@ extension AccountPortfolio.PoolUnitResources {
 	public struct RadixNetworkStake: Sendable, Hashable, Codable {
 		public struct Validator: Sendable, Hashable, Codable {
 			public let address: ValidatorAddress
-			public let xrdVaultBalance: BigDecimal
+			public let xrdVaultBalance: RETDecimal
 			public let name: String?
 			public let description: String?
 			public let iconURL: URL?
 
 			public init(
 				address: ValidatorAddress,
-				xrdVaultBalance: BigDecimal,
+				xrdVaultBalance: RETDecimal,
 				name: String? = nil,
 				description: String? = nil,
 				iconURL: URL? = nil
@@ -186,7 +186,7 @@ extension AccountPortfolio.PoolUnitResources {
 		public let stakeUnitResource: AccountPortfolio.FungibleResource?
 		public let stakeClaimResource: AccountPortfolio.NonFungibleResource?
 
-		public var xrdRedemptionValue: BigDecimal? {
+		public var xrdRedemptionValue: RETDecimal? {
 			guard let stakeUnitResource, let totalSupply = stakeUnitResource.resource.totalSupply else {
 				return nil
 			}
@@ -269,7 +269,7 @@ extension AccountPortfolio.NonFungibleResource.NonFungibleToken {
 		public enum Value: Sendable, Hashable, Codable {
 			case string(String)
 			case url(URL)
-			case decimal(BigDecimal)
+			case decimal(RETDecimal)
 			case u64(UInt64)
 
 			var string: String? {
@@ -293,7 +293,7 @@ extension AccountPortfolio.NonFungibleResource.NonFungibleToken {
 				return u64
 			}
 
-			var decimal: BigDecimal? {
+			var decimal: RETDecimal? {
 				guard case let .decimal(decimal) = self else {
 					return nil
 				}
@@ -338,7 +338,7 @@ extension [AccountPortfolio.NonFungibleResource.NonFungibleToken.NFTData] {
 		self[.claimEpoch]?.u64
 	}
 
-	public var claimAmount: BigDecimal? {
+	public var claimAmount: RETDecimal? {
 		self[.claimAmount]?.decimal
 	}
 }

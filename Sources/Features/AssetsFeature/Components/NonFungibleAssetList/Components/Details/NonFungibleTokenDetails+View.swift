@@ -30,7 +30,7 @@ extension AssetResourceDetailsSection.ViewState {
 			isXRD: false,
 			validatorAddress: nil,
 			resourceName: resource.name,
-			currentSupply: resource.totalSupply?.format(),
+			currentSupply: resource.totalSupply?.formatted(),
 			behaviors: resource.behaviors,
 			tags: resource.tags
 		)

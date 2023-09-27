@@ -193,7 +193,7 @@ extension AccountPortfoliosClient {
 
 	@Sendable
 	static func createFungibleResource(_ resource: GatewayAPI.FungibleResourcesCollectionItemVaultAggregated, ledgerState: GatewayAPI.LedgerState) async throws -> AccountPortfolio.FungibleResource {
-		let amount: BigDecimal = {
+		let amount: RETDecimal = {
 			// Resources of an account always have one single vault which stores the value.
 			guard let resourceVault = resource.vaults.items.first else {
 				loggerGlobal.warning("Account Portfolio: \(resource.resourceAddress) does not have any vaults")
@@ -201,7 +201,7 @@ extension AccountPortfoliosClient {
 			}
 
 			do {
-				return try BigDecimal(fromString: resourceVault.amount)
+				return try RETDecimal(value: resourceVault.amount)
 			} catch {
 				loggerGlobal.error(
 					"Account Portfolio: Failed to parse amount for resource: \(resource.resourceAddress), reason: \(error.localizedDescription)"
@@ -217,7 +217,7 @@ extension AccountPortfoliosClient {
 		let details = try await gatewayAPIClient.getSingleEntityDetails(resourceAddress.address).details?.fungible
 		let divisibility = details?.divisibility
 		let behaviors = details?.roleAssignments.extractBehaviors() ?? []
-		let totalSupply = details.flatMap { try? BigDecimal(fromString: $0.totalSupply) }
+		let totalSupply = details.flatMap { try? RETDecimal(value: $0.totalSupply) }
 
 		let metadata = resource.explicitMetadata
 		let dappDefinitions = metadata?.dappDefinitions?.compactMap { try? DappDefinitionAddress(validatingAddress: $0) }
@@ -325,7 +325,7 @@ extension AccountPortfoliosClient {
 
 		let details = try await gatewayAPIClient.getSingleEntityDetails(resourceAddress.address).details?.nonFungible
 		let behaviors = details?.roleAssignments.extractBehaviors() ?? []
-		let totalSupply = details.flatMap { try? BigDecimal(fromString: $0.totalSupply) }
+		let totalSupply = details.flatMap { try? RETDecimal(value: $0.totalSupply) }
 
 		// Load the nftIds from the resource vault
 		let tokens = try await tokens(resource: resource)
@@ -446,7 +446,7 @@ extension AccountPortfoliosClient {
 			// Create validator with the information from the validator resource
 			let validator = try AccountPortfolio.PoolUnitResources.RadixNetworkStake.Validator(
 				address: validatorAddress,
-				xrdVaultBalance: .init(fromString: xrdStakeVaultBalance),
+				xrdVaultBalance: .init(value: xrdStakeVaultBalance),
 				name: item.explicitMetadata?.name,
 				description: item.explicitMetadata?.description,
 				iconURL: item.explicitMetadata?.iconURL
@@ -653,7 +653,7 @@ extension AccountPortfolio.NonFungibleResource.NonFungibleToken.NFTData.Value {
 			}
 			self = .u64(u64)
 		case .decimal:
-			guard let decimal = try? value.string.map(BigDecimal.init(fromString:)) else {
+			guard let decimal = try? value.string.map(RETDecimal.init(value:)) else {
 				return nil
 			}
 			self = .decimal(decimal)

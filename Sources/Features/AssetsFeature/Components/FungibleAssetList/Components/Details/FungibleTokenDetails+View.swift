@@ -12,7 +12,7 @@ extension FungibleTokenDetails.State {
 				isXRD: isXRD,
 				validatorAddress: nil,
 				resourceName: nil,
-				currentSupply: resource.totalSupply?.format(), // FIXME: Check which format
+				currentSupply: resource.totalSupply?.formatted(), // FIXME: Check which format
 				behaviors: resource.behaviors,
 				tags: isXRD ? resource.tags + [.officialRadix] : resource.tags
 			)
@@ -22,7 +22,7 @@ extension FungibleTokenDetails.State {
 	var detailsHeader: DetailsContainerWithHeaderViewState {
 		.init(
 			title: resource.name ?? L10n.Account.PoolUnits.unknownPoolUnitName,
-			amount: amount?.format(),
+			amount: amount?.formatted(),
 			symbol: resource.symbol
 		)
 	}

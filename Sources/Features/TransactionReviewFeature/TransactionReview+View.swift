@@ -424,9 +424,9 @@ struct TransactionReviewTokenView: View {
 		let name: String?
 		let thumbnail: TokenThumbnail.Content
 
-		let amount: BigDecimal
-		let guaranteedAmount: BigDecimal?
-		let fiatAmount: BigDecimal?
+		let amount: RETDecimal
+		let guaranteedAmount: RETDecimal?
+		let fiatAmount: RETDecimal?
 	}
 
 	let viewState: ViewState
@@ -461,20 +461,20 @@ struct TransactionReviewTokenView: View {
 						.textStyle(.body2HighImportance)
 						.foregroundColor(.app.gray1)
 				}
-				Text(viewState.amount.format())
+				Text(viewState.amount.formatted())
 					.textStyle(.secondaryHeader)
 					.foregroundColor(.app.gray1)
 
 				if let fiatAmount = viewState.fiatAmount {
 					// Text(fiatAmount.formatted(.currency(code: "USD")))
-					Text(fiatAmount.format())
+					Text(fiatAmount.formatted())
 						.textStyle(.body2HighImportance)
 						.foregroundColor(.app.gray1)
 						.padding(.top, .small2)
 				}
 
 				if let guaranteedAmount = viewState.guaranteedAmount {
-					Text("\(L10n.TransactionReview.guaranteed) **\(guaranteedAmount.format())**")
+					Text("\(L10n.TransactionReview.guaranteed) **\(guaranteedAmount.formatted())**")
 						.textStyle(.body2HighImportance)
 						.foregroundColor(.app.gray2)
 						.padding(.top, .small1)

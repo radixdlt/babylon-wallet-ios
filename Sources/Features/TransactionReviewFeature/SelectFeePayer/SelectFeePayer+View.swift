@@ -84,7 +84,7 @@ extension SelectFeePayer {
 enum SelectAccountToPayForFeeRow {
 	struct ViewState: Equatable {
 		let account: Profile.Network.Account
-		let xrdBalance: BigDecimal
+		let xrdBalance: RETDecimal
 
 		init(candidate: FeePayerCandidate) {
 			account = candidate.account

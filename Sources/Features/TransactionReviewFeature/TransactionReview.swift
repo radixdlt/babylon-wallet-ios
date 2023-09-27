@@ -830,7 +830,7 @@ extension TransactionReview {
 		createdEntities: [EngineToolkit.Address],
 		networkID: NetworkID,
 		type: TransferType,
-		defaultDepositGuarantee: BigDecimal = 1
+		defaultDepositGuarantee: RETDecimal = 1
 	) async throws -> [Transfer] {
 		let resourceAddress: ResourceAddress = try resourceQuantifier.resourceAddress.asSpecific()
 
@@ -898,7 +898,7 @@ extension TransactionReview {
 
 		switch resourceQuantifier {
 		case let .fungible(_, source):
-			let amount = try BigDecimal(fromString: source.amount.asStr())
+			let amount = source.amount
 
 			switch try await resourceInfo() {
 			case let .left(resource):
@@ -1101,7 +1101,7 @@ extension TransactionReview {
 
 			public struct Fungible: Sendable, Hashable {
 				public let isXRD: Bool
-				public let amount: BigDecimal
+				public let amount: RETDecimal
 				public var guarantee: TransactionClient.Guarantee?
 			}
 
@@ -1236,15 +1236,12 @@ extension ReviewedTransaction {
 
 			let xrdAddress = knownAddresses(networkId: networkId.rawValue).resourceAddresses.xrd
 
-			let totalXRDWithdraw = feePayerWithdraws.reduce(EngineKit.Decimal.zero()) { partialResult, resource in
+			let xrdTotalTransfer: RETDecimal = feePayerWithdraws.reduce(.zero) { partialResult, resource in
 				if case let .fungible(resourceAddress, source) = resource, resourceAddress == xrdAddress {
 					return (try? partialResult.add(other: source.amount)) ?? partialResult
 				}
 				return partialResult
 			}
-
-			// Convert from EngineKit decimal
-			let xrdTotalTransfer = (try? BigDecimal(fromString: totalXRDWithdraw.asStr())) ?? .zero
 
 			let total = xrdTotalTransfer + feePayerSelection.transactionFee.totalFee.lockFee
 

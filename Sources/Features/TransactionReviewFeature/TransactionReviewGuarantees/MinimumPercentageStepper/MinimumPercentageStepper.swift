@@ -9,10 +9,10 @@ extension MinimumPercentageStepper.State {
 // MARK: - MinimumPercentageStepper
 public struct MinimumPercentageStepper: FeatureReducer {
 	public struct State: Sendable, Hashable {
-		public var value: BigDecimal?
+		public var value: RETDecimal?
 		var string: String
 
-		public init(value: BigDecimal) {
+		public init(value: RETDecimal) {
 			let clamped = value.withScale(2).clamped.droppingTrailingZeros
 			self.value = clamped
 			self.string = clamped.formatWithoutRounding()
@@ -49,7 +49,7 @@ public struct MinimumPercentageStepper: FeatureReducer {
 			state.string = string
 			if string.isEmpty {
 				state.value = 0
-			} else if let value = try? BigDecimal(localizedFromString: string), value >= 0 {
+			} else if let value = try? RETDecimal(formattedString: string), value >= 0 {
 				state.value = value.droppingTrailingZeros
 			} else {
 				state.value = nil
@@ -59,7 +59,7 @@ public struct MinimumPercentageStepper: FeatureReducer {
 		return .send(.delegate(.valueChanged))
 	}
 
-	private let percentageDelta: BigDecimal = 0.1
+	private let percentageDelta: RETDecimal = 0.1
 }
 
 extension MinimumPercentageStepper.State {

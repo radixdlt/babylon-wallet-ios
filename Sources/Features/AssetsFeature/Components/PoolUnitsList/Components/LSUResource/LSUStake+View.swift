@@ -163,7 +163,7 @@ extension LSUStake.State {
 					.init(
 						thumbnail: .xrd,
 						symbol: Constants.xrdTokenName,
-						tokenAmount: $0.format(),
+						tokenAmount: $0.formatted(),
 						isSelected: isStakeSelected
 					)
 				},
@@ -177,7 +177,7 @@ extension LSUStake.State {
 										id: token.id,
 										thumbnail: .xrd,
 										status: token.canBeClaimed ? .readyToClaim : .unstaking,
-										tokenAmount: (token.stakeClaimAmount ?? 0).format(),
+										tokenAmount: (token.stakeClaimAmount ?? 0).formatted(),
 										isSelected: self.selectedStakeClaimAssets?.contains(token.id)
 									)
 								}
