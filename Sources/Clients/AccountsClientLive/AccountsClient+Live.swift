@@ -45,7 +45,6 @@ extension AccountsClient: DependencyKey {
 			getAccountsOnNetwork: getAccountsOnNetwork,
 			newVirtualAccount: { request in
 				let networkID = request.networkID
-				let profile = await getProfileStore().profile
 				let numberOfExistingAccounts = await nextAccountIndex(networkID)
 				return try Profile.Network.Account(
 					networkID: networkID,

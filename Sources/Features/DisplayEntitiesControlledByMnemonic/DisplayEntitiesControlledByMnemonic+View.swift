@@ -47,7 +47,6 @@ extension DisplayEntitiesControlledByMnemonic {
 							}
 						}
 					}
-
 					VStack(alignment: .leading, spacing: .small3) {
 						ForEach(viewStore.accountsForDeviceFactorSource.accounts) { account in
 							SmallAccountCard(account: account)
