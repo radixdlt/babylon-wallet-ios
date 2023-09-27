@@ -571,9 +571,10 @@ extension TransactionReview {
 		/// Will be increased with each added guarantee to account for the difference in indexes from the initial manifest.
 		var indexInc = 1 // LockFee was added, start from 1
 		for guarantee in guarantees {
+			let decimalplaces = guarantee.resourceDivisibility.map(UInt.init) ?? RETDecimal.maxDivisibility
 			let guaranteeInstruction: Instruction = try .assertWorktopContains(
 				resourceAddress: guarantee.resourceAddress.intoEngine(),
-				amount: guarantee.amount.asDecimal(withDivisibility: guarantee.resourceDivisibility)
+				amount: guarantee.amount.rounded(decimalPlaces: decimalplaces)
 			)
 
 			manifest = try manifest.withInstructionAdded(guaranteeInstruction, at: Int(guarantee.instructionIndex) + indexInc)
