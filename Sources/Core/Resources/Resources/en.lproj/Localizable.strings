@@ -699,15 +699,12 @@ Only the **current configuration** of your wallet is backed up with each manual 
 "profileBackup_deleteWallet_title" = "Delete Wallet";
 "profileBackup_deleteWalletDialog_message" = "WARNING. This will clear all contents of your Wallet. If you have no backup, you will lose access to your Accounts and Personas permanently.";
 "profileBackup_deleteWalletDialog_confirm" = "Delete Wallet";
-"androidProfileBackup_automaticBackups_enable" = "Enable Backup";
-"androidProfileBackup_automaticBackups_disable" = "Disable Backup";
 "androidProfileBackup_disabledText" = "Back up is turned off";
 "androidProfileBackup_lastBackedUp" = "Last Backed up: %@";
 "androidProfileBackup_noLastBackUp" = "Not backed up yet";
 "androidProfileBackup_openSystemBackupSettings" = "Open System Backup Settings";
-"androidProfileBackup_backupWalletData_title" = "Backup Wallet Data";
+"androidProfileBackup_backupWalletData_title" = "Backup Wallet Data to Cloud";
 "androidProfileBackup_backupWalletData_message" = "Warning: If disabled you might lose access to your Accounts and Personas.";
-"androidProfileBackup_automaticBackups_subtitle" = "Periodic system backups";
 "androidProfileBackup_deleteWallet_subtitle" = "You may delete your wallet. This will clear the Radix Wallet app, clears its contents, and delete any cloud backup.
 
 **Access to any Accounts or Personas will be permanently lost unless you have a manual backup file.**";
