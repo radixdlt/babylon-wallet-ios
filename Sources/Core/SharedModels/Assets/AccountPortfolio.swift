@@ -153,9 +153,15 @@ extension AccountPortfolio.PoolUnitResources {
 		}
 
 		public func redemptionValue(for resource: AccountPortfolio.FungibleResource) -> String {
-			let poolUnitTotalSupply = poolUnitResource.resource.totalSupply ?? .one
-			let unroundedRedemptionValue = poolUnitResource.amount * resource.amount / poolUnitTotalSupply
-			return unroundedRedemptionValue.format(divisibility: resource.resource.divisibility)
+			guard let poolUnitTotalSupply = poolUnitResource.resource.totalSupply else {
+				loggerGlobal.error("Missing total supply for \(resource.resourceAddress.address)")
+				return "Missing Total supply - could not calculate redemption value" // FIXME: Strings
+			}
+			let redemptionValue = poolUnitResource.amount * (resource.amount / poolUnitTotalSupply)
+			let decimalPlaces = resource.resource.divisibility.map(UInt.init) ?? RETDecimal.maxDivisibility
+			let roundedRedemptionValue = redemptionValue.rounded(decimalPlaces: decimalPlaces)
+
+			return roundedRedemptionValue.formatted()
 		}
 	}
 
