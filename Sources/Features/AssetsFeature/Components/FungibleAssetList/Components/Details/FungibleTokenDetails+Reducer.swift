@@ -5,10 +5,10 @@ import SharedModels
 public struct FungibleTokenDetails: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		let resource: OnLedgerEntity.Resource
-		let amount: BigDecimal?
+		let amount: RETDecimal?
 		let isXRD: Bool
 
-		public init(resource: OnLedgerEntity.Resource, amount: BigDecimal? = nil, isXRD: Bool) {
+		public init(resource: OnLedgerEntity.Resource, amount: RETDecimal? = nil, isXRD: Bool) {
 			self.resource = resource
 			self.amount = amount
 			self.isXRD = isXRD

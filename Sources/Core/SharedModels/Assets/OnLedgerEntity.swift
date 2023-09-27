@@ -33,7 +33,7 @@ extension OnLedgerEntity {
 		public let iconURL: URL?
 		public let behaviors: [AssetBehavior]
 		public let tags: [AssetTag]
-		public let totalSupply: BigDecimal?
+		public let totalSupply: RETDecimal?
 		public let dappDefinitions: [DappDefinitionAddress]?
 
 		public var fungibility: Fungibility {
@@ -58,7 +58,7 @@ extension OnLedgerEntity {
 			iconURL: URL? = nil,
 			behaviors: [AssetBehavior] = [],
 			tags: [AssetTag] = [],
-			totalSupply: BigDecimal? = nil,
+			totalSupply: RETDecimal? = nil,
 			dappDefinitions: [DappDefinitionAddress]? = nil
 		) {
 			self.resourceAddress = resourceAddress

@@ -272,8 +272,8 @@ extension Profile.Network.Account {
 }
 
 extension TransactionFee {
-	var normalModeNetworkFee: BigDecimal {
-		var networkFee = feeSummary.executionCost
+	var normalModeNetworkFee: RETDecimal {
+		let networkFee = feeSummary.executionCost
 			+ feeSummary.finalizationCost
 			+ feeSummary.storageExpansionCost
 			+ feeSummary.guaranteesCost
@@ -281,20 +281,19 @@ extension TransactionFee {
 			+ feeSummary.signaturesCost
 			+ feeSummary.notarizingCost
 
-		networkFee += networkFee * PredefinedFeeConstants.networkFeeMultiplier
-		return networkFee
+		return networkFee * (1 + PredefinedFeeConstants.networkFeeMultiplier)
 	}
 
-	var expectedNormalModeNetworkFee: BigDecimal {
+	var expectedNormalModeNetworkFee: RETDecimal {
 		(normalModeNetworkFee - feeLocks.nonContingentLock).clamped
 	}
 
-	var expectedNormalModeRoyaltyFee: BigDecimal {
+	var expectedNormalModeRoyaltyFee: RETDecimal {
 		let remainingNonContingentLock = (feeLocks.nonContingentLock - normalModeNetworkFee).clamped
 		return (feeSummary.royaltyCost - remainingNonContingentLock).clamped
 	}
 
-	var expectedNormalModeLockFee: BigDecimal {
+	var expectedNormalModeLockFee: RETDecimal {
 		expectedNormalModeNetworkFee + expectedNormalModeRoyaltyFee
 	}
 
@@ -320,7 +319,7 @@ extension TransactionFee {
 }
 
 extension TransactionFee.FeeSummary {
-	var networkFee: BigDecimal {
+	var networkFee: RETDecimal {
 		totalExecutionCost + finalizationCost + storageExpansionCost
 	}
 }

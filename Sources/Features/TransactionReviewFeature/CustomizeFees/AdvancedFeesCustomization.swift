@@ -21,8 +21,8 @@ public struct AdvancedFeesCustomization: FeatureReducer {
 			fees: TransactionFee.AdvancedFeeCustomization
 		) {
 			self.fees = fees
-			self.paddingAmount = fees.paddingFee.format()
-			self.tipPercentage = fees.tipPercentage.format()
+			self.paddingAmount = fees.paddingFee.formatted()
+			self.tipPercentage = fees.tipPercentage.formatted()
 		}
 	}
 
@@ -54,12 +54,12 @@ public struct AdvancedFeesCustomization: FeatureReducer {
 
 	func updateDecimalField(
 		_ state: inout State,
-		field: WritableKeyPath<State, BigDecimal>,
+		field: WritableKeyPath<State, RETDecimal>,
 		value: String
 	) {
 		if value.isEmpty {
 			state[keyPath: field] = .zero
-		} else if let amount = try? BigDecimal(fromString: value) {
+		} else if let amount = try? RETDecimal(value: value) {
 			state[keyPath: field] = amount
 		}
 	}
