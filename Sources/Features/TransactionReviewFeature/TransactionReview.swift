@@ -260,8 +260,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 					case .normal:
 						return 0
 					case let .advanced(customization):
-						let converted = UInt16(truncatingIfNeeded: customization.tipPercentage.integerValue)
-						return converted
+						return customization.tipPercentage
 					}
 				}()
 

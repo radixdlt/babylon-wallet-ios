@@ -481,11 +481,11 @@ extension TransactionFee {
 	public struct AdvancedFeeCustomization: Hashable, Sendable {
 		public let feeSummary: FeeSummary
 		public var paddingFee: RETDecimal
-		public var tipPercentage: RETDecimal
+		public var tipPercentage: UInt16
 		public let paidByDapps: RETDecimal
 
 		public var tipAmount: RETDecimal {
-			(tipPercentage / 100) * (feeSummary.totalExecutionCost + feeSummary.finalizationCost)
+			(RETDecimal(integer: Int(tipPercentage)) / 100) * (feeSummary.totalExecutionCost + feeSummary.finalizationCost)
 		}
 
 		public var total: RETDecimal {
