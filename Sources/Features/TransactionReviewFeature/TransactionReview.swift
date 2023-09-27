@@ -130,7 +130,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		case failed(TransactionFailure)
 		case signedTXAndSubmittedToGateway(TXID)
 		case transactionCompleted(TXID)
-		case userDismissedTransactionStatus
+		case dismiss
 	}
 
 	public struct Destinations: Sendable, Reducer {
@@ -334,7 +334,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 				return resetToApprovable(&state)
 			} else if case .submitting = state.destination {
 				// This is used when tapping outside the Submitting sheet, no need to set destination to nil
-				return delayedEffect(for: .delegate(.userDismissedTransactionStatus))
+				return delayedEffect(for: .delegate(.dismiss))
 			}
 
 			return .none
@@ -388,20 +388,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			return .send(.delegate(.signedTXAndSubmittedToGateway(txID)))
 
 		case .submitting(.delegate(.failedToSubmit)):
-			loggerGlobal.error("Failed to submit tx")
-			return resetToApprovable(&state)
-
-		case .submitting(.delegate(.failedToReceiveStatusUpdate)):
-			loggerGlobal.error("Failed to receive status update")
-			return .none
-
-		case .submitting(.delegate(.submittedTransactionFailed)):
-			loggerGlobal.error("Submitted TX failed")
-
-			return resetToApprovable(
-				&state,
-				shouldNilDestination: false // we wanna stay on TX Fail screen until user dismisses
-			)
+			return .send(.delegate(.failed(.failedToSubmit)))
 
 		case let .submitting(.delegate(.committedSuccessfully(txID))):
 			state.destination = nil
@@ -410,7 +397,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		case .submitting(.delegate(.manuallyDismiss)):
 			// This is used when the close button is pressed, we have to manually
 			state.destination = nil
-			return delayedEffect(for: .delegate(.userDismissedTransactionStatus))
+			return delayedEffect(for: .delegate(.dismiss))
 
 		case .submitting:
 			return .none

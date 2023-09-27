@@ -449,7 +449,7 @@ extension DappInteractionFlow {
 		case let .reviewTransaction(.delegate(.transactionCompleted(txID))):
 			return .send(.delegate(.dismissWithSuccess(state.dappMetadata, txID)))
 
-		case .reviewTransaction(.delegate(.userDismissedTransactionStatus)):
+		case .reviewTransaction(.delegate(.dismiss)):
 			return .send(.delegate(.dismiss))
 
 		case let .reviewTransaction(.delegate(.failed(error))):

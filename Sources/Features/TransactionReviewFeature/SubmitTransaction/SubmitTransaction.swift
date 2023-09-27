@@ -55,9 +55,7 @@ public struct SubmitTransaction: Sendable, FeatureReducer {
 
 	public enum DelegateAction: Sendable, Equatable {
 		case failedToSubmit
-		case failedToReceiveStatusUpdate
 		case submittedButNotCompleted(TXID)
-		case submittedTransactionFailed
 		case committedSuccessfully(TXID)
 		case manuallyDismiss
 	}
@@ -144,8 +142,6 @@ public struct SubmitTransaction: Sendable, FeatureReducer {
 				state.status = stateStatus
 				if stateStatus.isCompletedSuccessfully {
 					return .send(.delegate(.committedSuccessfully(state.notarizedTX.txID)))
-				} else if stateStatus.isCompletedWithFailure {
-					return .send(.delegate(.submittedTransactionFailed))
 				} else if stateStatus.isSubmitted {
 					if !state.hasDelegatedThatTXHasBeenSubmitted {
 						defer { state.hasDelegatedThatTXHasBeenSubmitted = true }
