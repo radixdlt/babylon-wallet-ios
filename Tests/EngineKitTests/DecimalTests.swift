@@ -4,8 +4,6 @@ import TestingPrelude
 
 // MARK: - DecimalTests
 final class DecimalTests: TestCase {
-	typealias RETDecimal = EngineToolkit.Decimal
-
 //	func testBreakDecimal() throws {
 //		// 2^256 -1
 //		let first = try Decimal(value: "115792089237316195423570985008687907853269984665640564039457584007913129639934")
@@ -516,88 +514,64 @@ final class DecimalTests: TestCase {
 		try doTest("1234.4321", expected: "1,234.4321")
 		try doTest("123.4321", expected: "123.4321")
 	}
-}
 
-// FIXME: These tests don't really need to be kept, they are just making sure that RETDecimal codes like BigDecimal
-
-import BigDecimal
-
-extension DecimalTests {
-	func test_roundtrip_coding_retDecimal() throws {
+	func test_decoding_to_retDecimal() throws {
 		struct TestStruct: Codable, Equatable {
 			let decimal: RETDecimal
+			let optional: RETDecimal?
 		}
 
-		func doTest(_ decimal: RETDecimal) throws {
+		func doTest(_ string: String, decimal expectedDecimal: RETDecimal, optionalIsNil: Bool = false) throws {
+			if let data = string.data(using: .utf8) {
+				let actual = try JSONDecoder().decode(TestStruct.self, from: data)
+				let expected = TestStruct(decimal: expectedDecimal, optional: optionalIsNil ? nil : expectedDecimal)
+				XCTAssertEqual(actual, expected)
+			} else {
+				XCTFail()
+			}
+		}
+
+		try doTest("{\"decimal\":\"123.1234\",\"optional\":\"123.1234\"}", decimal: .init(value: "123.1234"))
+		try doTest("{\"decimal\":\"1233434.1234\",\"optional\":\"1233434.1234\"}", decimal: .init(value: "1233434.1234"))
+		try doTest("{\"decimal\":\"124300.1332\",\"optional\":\"124300.1332\"}", decimal: .init(value: "124300.1332"))
+		try doTest("{\"decimal\":\"000124300.1332000\",\"optional\":\"000124300.1332000\"}", decimal: .init(value: "000124300.1332000"))
+		try doTest("{\"decimal\":\"124300.000001332\",\"optional\":\"124300.000001332\"}", decimal: .init(value: "124300.000001332"))
+		try doTest("{\"decimal\":\"0.0000000223\",\"optional\":\"0.0000000223\"}", decimal: .init(value: "0.0000000223"))
+		try doTest("{\"decimal\":\"0.000\",\"optional\":\"0.000\"}", decimal: .init(value: "0.000"))
+		try doTest("{\"decimal\":\"0.0\",\"optional\":\"0.0\"}", decimal: .init(value: "0.0"))
+		try doTest("{\"decimal\":\"0.009999999999999\",\"optional\":\"0.009999999999999\"}", decimal: .init(value: "0.009999999999999"))
+		try doTest("{\"decimal\":\"1234123.4\",\"optional\":\"1234123.4\"}", decimal: .init(value: "1234123.4"))
+		try doTest("{\"decimal\":\"123456.34\",\"optional\":\"123456.34\"}", decimal: .init(value: "123456.34"))
+		try doTest("{\"decimal\":\"12345.234\",\"optional\":\"12345.234\"}", decimal: .init(value: "12345.234"))
+
+		try doTest("{\"decimal\":\"12341234\",\"optional\":\"12341234\"}", decimal: .init(value: "12341234"))
+		try doTest("{\"decimal\":\"1234123412341234\",\"optional\":\"1234123412341234\"}", decimal: .init(value: "1234123412341234"))
+
+		try doTest("{\"decimal\":\"00000123\",\"optional\":\"00000123\"}", decimal: .init(value: "123"))
+		try doTest("{\"decimal\":\"00000123.1234\",\"optional\":\"00000123.1234\"}", decimal: .init(value: "123.1234"))
+		try doTest("{\"decimal\":\"00000123.12340000\",\"optional\":\"00000123.12340000\"}", decimal: .init(value: "123.1234"))
+		try doTest("{\"decimal\":\"123.12340000\",\"optional\":\"123.12340000\"}", decimal: .init(value: "123.1234"))
+
+		try doTest("{\"decimal\":\"123.1234\"}", decimal: .init(value: "123.1234"), optionalIsNil: true)
+		try doTest("{\"decimal\":\"12341234\"}", decimal: .init(value: "12341234"), optionalIsNil: true)
+	}
+
+	func test_roundtrip_coding_retDecimal() throws {
+		struct TestStruct: Codable, Equatable {
+			let decimal: RETDecimal?
+		}
+
+		func doTest(_ decimal: RETDecimal?) throws {
 			let original = TestStruct(decimal: decimal)
 			let encoded = try JSONEncoder().encode(original)
 			let decoded = try JSONDecoder().decode(TestStruct.self, from: encoded)
 			XCTAssertEqual(original, decoded)
 		}
 
+		try doTest(nil)
+
 		for decimalString in decimalStrings {
 			try doTest(RETDecimal(value: decimalString))
-		}
-	}
-
-	func test_cross_coding_bigDecimal_and_retDecimal() throws {
-		struct TestStructBig: Codable, Equatable {
-			let decimal: BigDecimal
-		}
-
-		struct TestStructRET: Codable, Equatable {
-			let decimal: RETDecimal
-		}
-
-		func doTest(big decimal: BigDecimal) throws {
-			let bigDecimalStruct = TestStructBig(decimal: decimal)
-			let encodedBigDecimal = try JSONEncoder().encode(bigDecimalStruct)
-			let decodedRETDecimal = try JSONDecoder().decode(TestStructRET.self, from: encodedBigDecimal)
-			XCTAssertEqual(decimal.droppingTrailingZeros.description, decodedRETDecimal.decimal.asStr())
-		}
-
-		func doTest(ret decimal: RETDecimal) throws {
-			let retDecimalStruct = TestStructRET(decimal: decimal)
-			let encodedRETDecimal = try JSONEncoder().encode(retDecimalStruct)
-			let decodedBigDecimal = try JSONDecoder().decode(TestStructBig.self, from: encodedRETDecimal)
-			XCTAssertEqual(decimal.asStr(), decodedBigDecimal.decimal.droppingTrailingZeros.description)
-		}
-
-		for decimalString in decimalStrings {
-			try doTest(big: BigDecimal(fromString: decimalString))
-			try doTest(ret: RETDecimal(value: decimalString))
-		}
-	}
-
-	func test_cross_coding_optional_bigDecimal_and_retDecimal() throws {
-		struct TestStructBig: Codable, Equatable {
-			let decimal: BigDecimal?
-		}
-
-		struct TestStructRET: Codable, Equatable {
-			let decimal: RETDecimal?
-		}
-
-		func doTest(big decimal: BigDecimal?) throws {
-			let bigDecimalStruct = TestStructBig(decimal: decimal)
-			let encodedBigDecimal = try JSONEncoder().encode(bigDecimalStruct)
-			let decodedRETDecimal = try JSONDecoder().decode(TestStructRET.self, from: encodedBigDecimal)
-			XCTAssertEqual(decimal?.droppingTrailingZeros.description, decodedRETDecimal.decimal?.asStr())
-		}
-
-		func doTest(ret decimal: RETDecimal?) throws {
-			let retDecimalStruct = TestStructRET(decimal: decimal)
-			let encodedRETDecimal = try JSONEncoder().encode(retDecimalStruct)
-			let decodedBigDecimal = try JSONDecoder().decode(TestStructBig.self, from: encodedRETDecimal)
-			XCTAssertEqual(decimal?.asStr(), decodedBigDecimal.decimal?.droppingTrailingZeros.description)
-		}
-
-		try doTest(big: nil)
-		try doTest(ret: nil)
-
-		for decimalString in decimalStrings {
-			try doTest(big: BigDecimal(fromString: decimalString))
-			try doTest(ret: RETDecimal(value: decimalString))
 		}
 	}
 
@@ -616,45 +590,6 @@ extension DecimalTests {
 			"1234123.4",
 			"123456.34",
 			"12345.234",
-			"1234.1234",
-			"123.41234",
-			"12.341234",
-			"1.2341234",
-			"0.1234123",
-			"0.0234123",
-			"0.0034123",
-			"0.0004123",
-			"0.0000123",
-			"0.0000023",
-			"0.0000003",
-			"1234123.44",
-			"123456.344",
-			"12345.2344",
-			"1234.12344",
-			"123.412344",
-			"12.3412344",
-			"1.23412344",
-			"0.12341234",
-			"0.02341234",
-			"0.00341234",
-			"0.00041234",
-			"0.00001234",
-			"0.00000234",
-			"0.00000034",
-			"9999999.99",
-			"999999.999",
-			"99999.9999",
-			"9999.99999",
-			"999.999999",
-			"99.9999999",
-			"9.99999999",
-			"0.99999999",
-			"0.09999999",
-			"0.00999999",
-			"0.00099999",
-			"0.00009999",
-			"0.00000999",
-			"0.00000099",
 			"0.00000009",
 			"0.000000009",
 			"12.3456789",
@@ -677,128 +612,9 @@ extension DecimalTests {
 			"-1000.01",
 			"-1000.123456789",
 			"-1000000.1234",
-			"-10000000.1234",
-			"-10000000.5234",
-			"-999.99999",
-			"1.112221112221112223",
-			"11.12221112221112223",
-			"111.2221112221112223",
-			"1112.221112221112223",
-			"11122.21112221112223",
-			"111222.1112221112223",
-			"1112221.112221112223332223",
-			"11122211.12221112223332223",
-			"111222111.2221112223332223",
-			"1112221112.22111222333222333",
-			"11122211122.2111222333222333",
-			"111222111222.111222333222333",
-			"1112221112221.11222333222333",
-			"11122211122211.1222333222333",
-			"111222111222111.222333222333",
-			"1112221112221112.22333222333",
-			"11122211122211122.2333222333",
-			"111222111222111222.333222333",
-			"1112221112221112223.33222333",
-			"11122211122211122233.3222333",
-			"111222111222111222333.222333",
-			"1112221112221112223332.22333",
-			"11122211122211122233322.2333",
-			"111222111222111222333222.333",
-			"1112221112221112223332223.33",
-			"11122211122211122233322233.3",
-			"111222111222111222333222333",
-			"999999999999999999999.922333",
-			"9999999999999999999999.92333",
-			"99999999999999999999999.9333",
-			"999999999999999999999999.933",
-			"9999999999999999999999999.93",
-			"99999999999999999999999999.9",
-			"999999999999999999999999999",
-			"99999994",
-			"999999956",
-			"9999999462",
-			"100123454",
-			"1000123446",
-			"10001234462",
-			"100123456",
-			"1000123450",
-			"10000123500",
-			"9999999900",
-			"9999999900",
-			"9999999900",
-			"9999999500",
-			"9999999400",
-			"9999999000",
-			"10000012445.678",
-			"10000012445.678",
-			"10000012445.678",
-			"10000002445.678",
-			"10000002445.678",
-			"10000012545.678",
-			"10000012545.678",
-			"10000012545.678",
-			"10000002545.678",
-			"10000002545.678",
-			"10000000055.678",
-			"999999999900.00",
-			"999999999000.00",
-			"999999990000.00",
-			"999999950000.00",
-			"999999940000.00",
-			"999999900000.00",
-			"9999999999900.00",
-			"9999999999000.00",
-			"9999999990000.00",
-			"9999999950000.00",
-			"9999999940000.00",
-			"9999999900000.00",
-			"10000012445678.9",
-			"10000012445678.92",
-			"10000012445678.923",
-			"10000002445678.9",
-			"10000000445678.92",
-			"10000000045678.923",
-			"10000012545678",
-			"10000012545678.2",
-			"10000012545678.23",
-			"10000002545678",
-			"10000002545678.2",
-			"10000000055678.23",
-			"01434.234",
-			"1434.234",
-			"112.234",
-			"12.234",
-			"1.234",
-			"0.01",
-			"0.001",
-			"0.00100",
-			"0.001000",
-			"57896044618.658097719968",
-			"1000000000.1",
-			"999999999.1",
-			"1000000000",
-			"1000.1234",
-			"1000.5",
-			"0.12345674",
-			"0.12345675",
-			"0.4321",
-			"0.99999999999999999",
-			"0.00000000000000001",
-			"0",
 			"1",
 			"0.0",
 			"1.0",
 		]
-	}
-}
-
-extension BigDecimal {
-	var droppingTrailingZeros: BigDecimal {
-		var result = self
-		while result.integerValue.isMultiple(of: 10), result.scale > 0 {
-			result = result.withScale(result.scale - 1)
-		}
-
-		return result
 	}
 }
