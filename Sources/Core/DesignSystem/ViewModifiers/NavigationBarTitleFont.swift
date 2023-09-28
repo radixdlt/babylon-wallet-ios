@@ -1,6 +1,6 @@
 #if os(iOS)
-import Introspect
 import SwiftUI
+@_spi(Advanced) import SwiftUIIntrospect
 
 extension View {
 	public func navigationBarInlineTitleFont(_ uiFont: UIFont) -> some View {
@@ -16,7 +16,7 @@ struct NavigationBarInlineTitleFontModifier: ViewModifier {
 	let uiFont: UIFont
 
 	func body(content: Content) -> some View {
-		content.introspectNavigationController { navigationController in
+		content.introspect(.navigationStack, on: .iOS(.v16...), scope: [.receiver, .ancestor]) { navigationController in
 			let navigationBar = navigationController.navigationBar
 			navigationBar.standardAppearance.titleTextAttributes[.font] = uiFont
 			navigationBar.compactAppearance?.titleTextAttributes[.font] = uiFont
@@ -30,7 +30,7 @@ struct NavigationBarLargeTitleFontModifier: ViewModifier {
 	let uiFont: UIFont
 
 	func body(content: Content) -> some View {
-		content.introspectNavigationController { navigationController in
+		content.introspect(.navigationStack, on: .iOS(.v16...), scope: [.receiver, .ancestor]) { navigationController in
 			let navigationBar = navigationController.navigationBar
 			navigationBar.standardAppearance.largeTitleTextAttributes[.font] = uiFont
 			navigationBar.compactAppearance?.largeTitleTextAttributes[.font] = uiFont

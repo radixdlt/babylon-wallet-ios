@@ -149,8 +149,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/davdroman/swift-builders",
       "state" : {
-        "revision" : "a8fd97e32b7bb65f3fc1bd7d72725155fb2b4d77",
-        "version" : "0.4.0"
+        "revision" : "0119400fb6e733219f61c1c95c6dd61ca5965c26",
+        "version" : "0.5.1"
       }
     },
     {
@@ -347,8 +347,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/siteline/SwiftUI-Introspect",
       "state" : {
-        "revision" : "121c146fe591b1320238d054ae35c81ffa45f45a",
-        "version" : "0.12.0"
+        "revision" : "3ba734dd20faada0e3234b68e78db97005315f0e",
+        "version" : "1.0.0"
       }
     },
     {
@@ -365,8 +365,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/davdroman/swiftui-navigation-transitions",
       "state" : {
-        "revision" : "df1c4e432c5e584cd6d6849c069d3df9ca7e86d8",
-        "version" : "0.9.0"
+        "revision" : "350204ca4dac054b20a8055c40211b56d8ec18cc",
+        "version" : "0.13.0"
       }
     },
     {
@@ -374,8 +374,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/davdroman/TextBuilder",
       "state" : {
-        "revision" : "bec40373ebb5840473e01ca0485fc91ad6c8c9e9",
-        "version" : "2.2.0"
+        "revision" : "65b7c7bb9b163f4fc2d755c52a89a6f3040300df",
+        "version" : "3.0.1"
       }
     },
     {

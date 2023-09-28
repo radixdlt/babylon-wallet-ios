@@ -1,6 +1,6 @@
 #if os(iOS)
-import Introspect
 import SwiftUI
+@_spi(Advanced) import SwiftUIIntrospect
 
 extension View {
 	public func navigationBarTitleColor(
@@ -16,7 +16,7 @@ struct NavigationBarTitleColorModifier: ViewModifier {
 	let displayMode: NavigationBarItem.TitleDisplayMode
 
 	func body(content: Content) -> some View {
-		content.introspectNavigationController { navigationController in
+		content.introspect(.navigationStack, on: .iOS(.v16...), scope: [.receiver, .ancestor]) { navigationController in
 			let navigationBar = navigationController.navigationBar
 			let uiColor = UIColor(color)
 			switch displayMode {

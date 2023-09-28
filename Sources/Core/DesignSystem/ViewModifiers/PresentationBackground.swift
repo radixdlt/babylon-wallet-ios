@@ -1,7 +1,7 @@
 #if os(iOS)
-import Introspect
 import Prelude
 import SwiftUI
+@_spi(Advanced) import SwiftUIIntrospect
 
 public enum PresentationBackground {
 	case blur(style: UIBlurEffect.Style)
@@ -23,11 +23,10 @@ private struct PresentationBackgroundModifier: ViewModifier {
 		content
 			// hands us the view controller corresponding to the SwiftUI view this modifier is attached
 			// to as soon as it's added to its parent view/window
-			.introspectViewController { viewController in
-				// attempt to get the controller in which this sheet is being presented
-				// and grab its container view
+			.introspect(.sheet, on: .iOS(.v16...)) { (sheetPresentationController: UISheetPresentationController) in
+				let viewController = sheetPresentationController.presentedViewController
+
 				guard
-					let sheetPresentationController = viewController.sheetPresentationController,
 					let containerView = sheetPresentationController.containerView
 				else {
 					return

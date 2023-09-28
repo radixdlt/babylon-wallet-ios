@@ -881,21 +881,21 @@ package.addModules([
 			"GatewaysClient",
 			"URLFormatterClient",
 			"QRGeneratorClient",
-			.product(name: "Introspect", package: "SwiftUI-Introspect") {
-				.package(url: "https://github.com/siteline/SwiftUI-Introspect", from: "0.1.4")
-			},
 			.product(name: "NavigationTransitions", package: "swiftui-navigation-transitions", condition: .when(platforms: [.iOS])) {
-				.package(url: "https://github.com/davdroman/swiftui-navigation-transitions", exact: "0.9.0")
+				.package(url: "https://github.com/davdroman/swiftui-navigation-transitions", from: "0.13.0")
 			},
 			.product(name: "NukeUI", package: "Nuke") {
 				.package(url: "https://github.com/kean/Nuke", from: "11.3.1")
 			},
 			"Resources",
+			.product(name: "SwiftUIIntrospect", package: "swiftui-introspect") {
+				.package(url: "https://github.com/siteline/swiftui-introspect", from: "1.0.0")
+			},
 			.product(name: "SwiftUINavigation", package: "swiftui-navigation") {
 				.package(url: "https://github.com/pointfreeco/swiftui-navigation", from: "1.0.0")
 			},
 			.product(name: "TextBuilder", package: "TextBuilder") {
-				.package(url: "https://github.com/davdroman/TextBuilder", from: "2.2.0")
+				.package(url: "https://github.com/davdroman/TextBuilder", from: "3.0.0")
 			},
 			.product(
 				name: "JSONPreview",
@@ -1073,7 +1073,7 @@ package.addModules([
 			.product(name: "BitCollections", package: "swift-collections"),
 
 			.product(name: "Builders", package: "swift-builders") {
-				.package(url: "https://github.com/davdroman/swift-builders", exact: "0.4.0")
+				.package(url: "https://github.com/davdroman/swift-builders", from: "0.5.1")
 			},
 
 			.product(name: "Collections", package: "swift-collections"),
