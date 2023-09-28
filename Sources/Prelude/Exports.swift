@@ -2,7 +2,6 @@
 
 @_exported import AsyncAlgorithms
 @_exported import AsyncExtensions
-@_exported import BigDecimal
 @_exported import BigInt
 @_exported import BitCollections
 @_exported import Builders
