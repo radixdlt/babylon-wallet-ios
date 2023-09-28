@@ -4,8 +4,6 @@ import TestingPrelude
 
 // MARK: - DecimalTests
 final class DecimalTests: TestCase {
-	typealias RETDecimal = EngineToolkit.Decimal
-
 //	func testBreakDecimal() throws {
 //		// 2^256 -1
 //		let first = try Decimal(value: "115792089237316195423570985008687907853269984665640564039457584007913129639934")
@@ -517,17 +515,60 @@ final class DecimalTests: TestCase {
 		try doTest("123.4321", expected: "123.4321")
 	}
 
-	func test_roundtrip_coding_retDecimal() throws {
+	func test_decoding_to_retDecimal() throws {
 		struct TestStruct: Codable, Equatable {
 			let decimal: RETDecimal
+			let optional: RETDecimal?
 		}
 
-		func doTest(_ decimal: RETDecimal) throws {
+		func doTest(_ string: String, decimal expectedDecimal: RETDecimal, optionalIsNil: Bool = false) throws {
+			if let data = string.data(using: .utf8) {
+				let actual = try JSONDecoder().decode(TestStruct.self, from: data)
+				let expected = TestStruct(decimal: expectedDecimal, optional: optionalIsNil ? nil : expectedDecimal)
+				XCTAssertEqual(actual, expected)
+			} else {
+				XCTFail()
+			}
+		}
+
+		try doTest("{\"decimal\":\"123.1234\",\"optional\":\"123.1234\"}", decimal: .init(value: "123.1234"))
+		try doTest("{\"decimal\":\"1233434.1234\",\"optional\":\"1233434.1234\"}", decimal: .init(value: "1233434.1234"))
+		try doTest("{\"decimal\":\"124300.1332\",\"optional\":\"124300.1332\"}", decimal: .init(value: "124300.1332"))
+		try doTest("{\"decimal\":\"000124300.1332000\",\"optional\":\"000124300.1332000\"}", decimal: .init(value: "000124300.1332000"))
+		try doTest("{\"decimal\":\"124300.000001332\",\"optional\":\"124300.000001332\"}", decimal: .init(value: "124300.000001332"))
+		try doTest("{\"decimal\":\"0.0000000223\",\"optional\":\"0.0000000223\"}", decimal: .init(value: "0.0000000223"))
+		try doTest("{\"decimal\":\"0.000\",\"optional\":\"0.000\"}", decimal: .init(value: "0.000"))
+		try doTest("{\"decimal\":\"0.0\",\"optional\":\"0.0\"}", decimal: .init(value: "0.0"))
+		try doTest("{\"decimal\":\"0.009999999999999\",\"optional\":\"0.009999999999999\"}", decimal: .init(value: "0.009999999999999"))
+		try doTest("{\"decimal\":\"1234123.4\",\"optional\":\"1234123.4\"}", decimal: .init(value: "1234123.4"))
+		try doTest("{\"decimal\":\"123456.34\",\"optional\":\"123456.34\"}", decimal: .init(value: "123456.34"))
+		try doTest("{\"decimal\":\"12345.234\",\"optional\":\"12345.234\"}", decimal: .init(value: "12345.234"))
+
+		try doTest("{\"decimal\":\"12341234\",\"optional\":\"12341234\"}", decimal: .init(value: "12341234"))
+		try doTest("{\"decimal\":\"1234123412341234\",\"optional\":\"1234123412341234\"}", decimal: .init(value: "1234123412341234"))
+
+		try doTest("{\"decimal\":\"00000123\",\"optional\":\"00000123\"}", decimal: .init(value: "123"))
+		try doTest("{\"decimal\":\"00000123.1234\",\"optional\":\"00000123.1234\"}", decimal: .init(value: "123.1234"))
+		try doTest("{\"decimal\":\"00000123.12340000\",\"optional\":\"00000123.12340000\"}", decimal: .init(value: "123.1234"))
+		try doTest("{\"decimal\":\"123.12340000\",\"optional\":\"123.12340000\"}", decimal: .init(value: "123.1234"))
+
+		try doTest("{\"decimal\":\"123.1234\"}", decimal: .init(value: "123.1234"), optionalIsNil: true)
+		try doTest("{\"decimal\":\"12341234\"}", decimal: .init(value: "12341234"), optionalIsNil: true)
+	}
+
+	func test_roundtrip_coding_retDecimal() throws {
+		struct TestStruct: Codable, Equatable {
+			let decimal: RETDecimal?
+		}
+
+		func doTest(_ decimal: RETDecimal?) throws {
 			let original = TestStruct(decimal: decimal)
 			let encoded = try JSONEncoder().encode(original)
 			let decoded = try JSONDecoder().decode(TestStruct.self, from: encoded)
 			XCTAssertEqual(original, decoded)
 		}
+
+		try doTest(nil)
 
 		for decimalString in decimalStrings {
 			try doTest(RETDecimal(value: decimalString))
