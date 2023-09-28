@@ -334,7 +334,7 @@ extension View {
 			store: destinationStore,
 			state: /TransactionReview.Destinations.State.customizeFees,
 			action: TransactionReview.Destinations.Action.customizeFees,
-			content: { CustomizeFees.View(store: $0) }
+			content: { store in NavigationView { CustomizeFees.View(store: store) } }
 		)
 	}
 
