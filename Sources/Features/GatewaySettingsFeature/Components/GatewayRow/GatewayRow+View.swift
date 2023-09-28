@@ -2,7 +2,17 @@ import FeaturePrelude
 
 extension Radix.Gateway {
 	var displayName: String {
-		isWellknown ? (name ?? network.displayDescription) : url.absoluteString
+		if isWellknown {
+			if network == .mainnet {
+				return "Mainnet Gateway"
+			} else if network == .stokenet {
+				return "Stokenet (testnet) Gateway"
+			} else {
+				return network.displayDescription
+			}
+		} else {
+			return url.absoluteString
+		}
 	}
 }
 
