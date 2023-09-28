@@ -29,61 +29,59 @@ extension AdvancedFeesCustomization {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-				NavigationView { // Required for the Keyboard Toolbar
-					VStack(spacing: .zero) {
-						Group {
-							Divider()
-							AppTextField(
-								primaryHeading: .init(text: L10n.TransactionReview.CustomizeNetworkFeeSheet.paddingFieldLabel),
-								placeholder: "",
-								text: viewStore.binding(
-									get: \.paddingAmount,
-									send: ViewAction.paddingAmountChanged
+				VStack(spacing: .zero) {
+					Group {
+						Divider()
+						AppTextField(
+							primaryHeading: .init(text: L10n.TransactionReview.CustomizeNetworkFeeSheet.paddingFieldLabel),
+							placeholder: "",
+							text: viewStore.binding(
+								get: \.paddingAmount,
+								send: ViewAction.paddingAmountChanged
+							),
+							focus: .on(
+								.padding,
+								binding: viewStore.binding(
+									get: \.focusField,
+									send: ViewAction.focusChanged
 								),
-								focus: .on(
-									.padding,
-									binding: viewStore.binding(
-										get: \.focusField,
-										send: ViewAction.focusChanged
-									),
-									to: $focusField
-								)
+								to: $focusField
 							)
-							.padding(.vertical, .medium1)
+						)
+						.padding(.vertical, .medium1)
 
-							AppTextField(
-								primaryHeading: .init(text: L10n.TransactionReview.CustomizeNetworkFeeSheet.tipFieldLabel),
-								subHeading: L10n.TransactionReview.CustomizeNetworkFeeSheet.tipFieldInfo,
-								placeholder: "",
-								text: viewStore.binding(
-									get: \.tipPercentage,
-									send: ViewAction.tipPercentageChanged
+						AppTextField(
+							primaryHeading: .init(text: L10n.TransactionReview.CustomizeNetworkFeeSheet.tipFieldLabel),
+							subHeading: L10n.TransactionReview.CustomizeNetworkFeeSheet.tipFieldInfo,
+							placeholder: "",
+							text: viewStore.binding(
+								get: \.tipPercentage,
+								send: ViewAction.tipPercentageChanged
+							),
+							focus: .on(
+								.tipPercentage,
+								binding: viewStore.binding(
+									get: \.focusField,
+									send: ViewAction.focusChanged
 								),
-								focus: .on(
-									.tipPercentage,
-									binding: viewStore.binding(
-										get: \.focusField,
-										send: ViewAction.focusChanged
-									),
-									to: $focusField
-								)
+								to: $focusField
 							)
-							.padding(.bottom, .medium1)
-						}
-						.keyboardType(.decimalPad)
-						.multilineTextAlignment(.trailing)
-						.padding(.horizontal, .medium1)
-
-						FeesView(viewState: viewStore.feesViewState)
+						)
+						.padding(.bottom, .medium1)
 					}
-					.toolbar {
-						ToolbarItemGroup(placement: .keyboard) {
-							Spacer()
-							Button(L10n.Common.done) {
-								viewStore.send(.focusChanged(nil))
-							}
-							.foregroundColor(.app.blue1)
+					.keyboardType(.decimalPad)
+					.multilineTextAlignment(.trailing)
+					.padding(.horizontal, .medium1)
+
+					FeesView(viewState: viewStore.feesViewState)
+				}
+				.toolbar {
+					ToolbarItemGroup(placement: .keyboard) {
+						Spacer()
+						Button(L10n.Common.done) {
+							viewStore.send(.focusChanged(nil))
 						}
+						.foregroundColor(.app.blue1)
 					}
 				}
 			}
