@@ -7,14 +7,14 @@ extension LSUDetails.State {
 			containerWithHeader: .init(resource: stakeUnitResource),
 			thumbnailURL: stakeUnitResource.iconURL,
 			validatorNameViewState: .init(with: validator),
-			redeemableTokenAmount: .init(.init(xrdAmount: xrdRedemptionValue.format())),
+			redeemableTokenAmount: .init(.init(xrdAmount: xrdRedemptionValue.formatted())),
 			resourceDetails: .init(
 				description: stakeUnitResource.description,
 				resourceAddress: stakeUnitResource.resourceAddress,
 				isXRD: false,
 				validatorAddress: validator.address,
 				resourceName: stakeUnitResource.name, // TODO: Is this correct?
-				currentSupply: validator.xrdVaultBalance.format(),
+				currentSupply: validator.xrdVaultBalance.formatted(),
 				behaviors: stakeUnitResource.behaviors,
 				tags: stakeUnitResource.tags
 			)

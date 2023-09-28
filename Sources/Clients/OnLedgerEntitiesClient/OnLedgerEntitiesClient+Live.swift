@@ -83,7 +83,7 @@ extension OnLedgerEntitiesClient {
 				iconURL: item.explicitMetadata?.iconURL,
 				behaviors: item.details?.fungible?.roleAssignments.extractBehaviors() ?? [],
 				tags: item.explicitMetadata?.extractTags() ?? [],
-				totalSupply: try? BigDecimal(fromString: fungibleDetails.totalSupply),
+				totalSupply: try? RETDecimal(value: fungibleDetails.totalSupply),
 				dappDefinitions: dappDefinitions
 			))
 		case let .nonFungibleResource(nonFungibleDetails):
@@ -96,7 +96,7 @@ extension OnLedgerEntitiesClient {
 				iconURL: item.explicitMetadata?.iconURL,
 				behaviors: item.details?.nonFungible?.roleAssignments.extractBehaviors() ?? [],
 				tags: item.explicitMetadata?.extractTags() ?? [],
-				totalSupply: try? BigDecimal(fromString: nonFungibleDetails.totalSupply),
+				totalSupply: try? RETDecimal(value: nonFungibleDetails.totalSupply),
 				dappDefinitions: dappDefinitions
 			))
 		default:

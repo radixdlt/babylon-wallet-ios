@@ -272,8 +272,8 @@ extension Profile.Network.Account {
 }
 
 extension TransactionFee {
-	var normalModeNetworkFee: BigDecimal {
-		var networkFee = feeSummary.executionCost
+	var normalModeNetworkFee: RETDecimal {
+		let networkFee = feeSummary.executionCost
 			+ feeSummary.finalizationCost
 			+ feeSummary.storageExpansionCost
 			+ feeSummary.guaranteesCost
@@ -281,26 +281,25 @@ extension TransactionFee {
 			+ feeSummary.signaturesCost
 			+ feeSummary.notarizingCost
 
-		networkFee += networkFee * PredefinedFeeConstants.networkFeeMultiplier
-		return networkFee
+		return networkFee * (1 + PredefinedFeeConstants.networkFeeMultiplier)
 	}
 
-	var expectedNormalModeNetworkFee: BigDecimal {
-		normalModeNetworkFee.clampedDiff(feeLocks.nonContingentLock)
+	var expectedNormalModeNetworkFee: RETDecimal {
+		(normalModeNetworkFee - feeLocks.nonContingentLock).clamped
 	}
 
-	var expectedNormalModeRoyaltyFee: BigDecimal {
-		let remainingNonContingentLock = feeLocks.nonContingentLock.clampedDiff(normalModeNetworkFee)
-		return feeSummary.royaltyCost.clampedDiff(remainingNonContingentLock)
+	var expectedNormalModeRoyaltyFee: RETDecimal {
+		let remainingNonContingentLock = (feeLocks.nonContingentLock - normalModeNetworkFee).clamped
+		return (feeSummary.royaltyCost - remainingNonContingentLock).clamped
 	}
 
-	var expectedNormalModeLockFee: BigDecimal {
+	var expectedNormalModeLockFee: RETDecimal {
 		expectedNormalModeNetworkFee + expectedNormalModeRoyaltyFee
 	}
 
 	var expectedNormalModeTotalFee: TotalFee {
 		let maxFee = expectedNormalModeLockFee
-		let minFee = maxFee.clampedDiff(feeLocks.contingentLock)
+		let minFee = (maxFee - feeLocks.contingentLock).clamped
 		return .init(min: minFee, max: maxFee)
 	}
 
@@ -320,7 +319,7 @@ extension TransactionFee {
 }
 
 extension TransactionFee.FeeSummary {
-	var networkFee: BigDecimal {
+	var networkFee: RETDecimal {
 		totalExecutionCost + finalizationCost + storageExpansionCost
 	}
 }

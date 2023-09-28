@@ -174,13 +174,13 @@ public struct GetTransactionSignersRequest: Sendable, Hashable {
 // MARK: - TransactionClient.Guarantee
 extension TransactionClient {
 	public struct Guarantee: Sendable, Hashable {
-		public var amount: BigDecimal
+		public var amount: RETDecimal
 		public var instructionIndex: UInt64
 		public var resourceAddress: ResourceAddress
 		public var resourceDivisibility: Int?
 
 		public init(
-			amount: BigDecimal,
+			amount: RETDecimal,
 			instructionIndex: UInt64,
 			resourceAddress: ResourceAddress,
 			resourceDivisibility: Int?
@@ -228,9 +228,9 @@ public struct FeePayerCandidate: Sendable, Hashable, Identifiable {
 	public var id: ID { account.id }
 
 	public let account: Profile.Network.Account
-	public let xrdBalance: BigDecimal
+	public let xrdBalance: RETDecimal
 
-	public init(account: Profile.Network.Account, xrdBalance: BigDecimal) {
+	public init(account: Profile.Network.Account, xrdBalance: RETDecimal) {
 		self.account = account
 		self.xrdBalance = xrdBalance
 	}
@@ -292,19 +292,19 @@ public struct TransactionFee: Hashable, Sendable {
 		includeLockFee: Bool
 	) throws {
 		let feeSummary: FeeSummary = try .init(
-			executionCost: executionAnalysis.feeSummary.executionCost.asBigDecimal(),
-			finalizationCost: executionAnalysis.feeSummary.finalizationCost.asBigDecimal(),
-			storageExpansionCost: executionAnalysis.feeSummary.storageExpansionCost.asBigDecimal(),
-			royaltyCost: executionAnalysis.feeSummary.royaltyCost.asBigDecimal(),
+			executionCost: executionAnalysis.feeSummary.executionCost,
+			finalizationCost: executionAnalysis.feeSummary.finalizationCost,
+			storageExpansionCost: executionAnalysis.feeSummary.storageExpansionCost,
+			royaltyCost: executionAnalysis.feeSummary.royaltyCost,
 			guaranteesCost: executionAnalysis.guranteesCost(),
 			signaturesCost: PredefinedFeeConstants.signaturesCost(signaturesCount),
 			lockFeeCost: includeLockFee ? PredefinedFeeConstants.lockFeeInstructionCost : .zero,
 			notarizingCost: PredefinedFeeConstants.notarizingCost(notaryIsSignatory)
 		)
 
-		let feeLocks: FeeLocks = try .init(
-			nonContingentLock: executionAnalysis.feeLocks.lock.asBigDecimal(),
-			contingentLock: executionAnalysis.feeLocks.contingentLock.asBigDecimal()
+		let feeLocks: FeeLocks = .init(
+			nonContingentLock: executionAnalysis.feeLocks.lock,
+			contingentLock: executionAnalysis.feeLocks.contingentLock
 		)
 
 		self.init(
@@ -313,7 +313,7 @@ public struct TransactionFee: Hashable, Sendable {
 		)
 	}
 
-	public mutating func update(with feeSummaryField: WritableKeyPath<FeeSummary, BigDecimal>, amount: BigDecimal) {
+	public mutating func update(with feeSummaryField: WritableKeyPath<FeeSummary, RETDecimal>, amount: RETDecimal) {
 		var feeSummary = feeSummary
 		feeSummary[keyPath: feeSummaryField] = amount
 		let mode: Mode = {
@@ -341,7 +341,7 @@ public struct TransactionFee: Hashable, Sendable {
 }
 
 extension ExecutionAnalysis {
-	func guranteesCost() throws -> BigDecimal {
+	func guranteesCost() throws -> RETDecimal {
 		let transaction = try transactionTypes.transactionKind()
 		switch transaction {
 		case .nonConforming:
@@ -367,7 +367,7 @@ extension TransactionFee {
 		switch mode {
 		case let .normal(normalCustomization):
 			let maxFee = normalCustomization.total
-			let minFee = maxFee.clampedDiff(feeLocks.contingentLock)
+			let minFee = (maxFee - feeLocks.contingentLock).clamped
 			return .init(min: minFee, max: maxFee)
 		case let .advanced(advancedCustomization):
 			return .init(min: advancedCustomization.total, max: advancedCustomization.total)
@@ -394,24 +394,24 @@ extension TransactionFee {
 extension TransactionFee {
 	public enum PredefinedFeeConstants {
 		/// 15% margin is added here to make up for the ambiguity of the transaction preview estimate)
-		public static let networkFeeMultiplier: BigDecimal = 0.15
+		public static let networkFeeMultiplier: RETDecimal = 0.15
 
 		/// Network fees -> https://radixdlt.atlassian.net/wiki/spaces/S/pages/3134783512/Manifest+Mutation+Cost+Addition+Estimates
 		// swiftformat:disable all
-		public static let lockFeeInstructionCost =              try! BigDecimal(fromString: "0.08581566997")
-		public static let fungibleGuaranteeInstructionCost =    try! BigDecimal(fromString: "0.00908532837")
-		public static let nonFungibleGuranteeInstructionCost =  try! BigDecimal(fromString: "0.00954602837")
-		public static let signatureCost =                       try! BigDecimal(fromString: "0.01109974758")
-		public static let notarizingCost =                      try! BigDecimal(fromString: "0.0081393944")
-		public static let notarizingCostWhenNotaryIsSignatory = try! BigDecimal(fromString: "0.0084273944")
+		public static let lockFeeInstructionCost =              try! RETDecimal(value: "0.08581566997")
+		public static let fungibleGuaranteeInstructionCost =    try! RETDecimal(value: "0.00908532837")
+		public static let nonFungibleGuranteeInstructionCost =  try! RETDecimal(value: "0.00954602837")
+		public static let signatureCost =                       try! RETDecimal(value: "0.01109974758")
+		public static let notarizingCost =                      try! RETDecimal(value: "0.0081393944")
+		public static let notarizingCostWhenNotaryIsSignatory = try! RETDecimal(value: "0.0084273944")
 		//	swiftformat:enable all
 
-		public static func notarizingCost(_ notaryIsSignatory: Bool) -> BigDecimal {
+		public static func notarizingCost(_ notaryIsSignatory: Bool) -> RETDecimal {
 			notaryIsSignatory ? notarizingCostWhenNotaryIsSignatory : notarizingCost
 		}
 
-		public static func signaturesCost(_ signaturesCount: Int) -> BigDecimal {
-			BigDecimal(signaturesCount) * PredefinedFeeConstants.signatureCost
+		public static func signaturesCost(_ signaturesCount: Int) -> RETDecimal {
+			RETDecimal(integer: signaturesCount) * PredefinedFeeConstants.signatureCost
 		}
 	}
 
@@ -421,18 +421,18 @@ extension TransactionFee {
 	}
 
 	public struct FeeSummary: Hashable, Sendable {
-		public let executionCost: BigDecimal
-		public let finalizationCost: BigDecimal
-		public let storageExpansionCost: BigDecimal
-		public let royaltyCost: BigDecimal
+		public let executionCost: RETDecimal
+		public let finalizationCost: RETDecimal
+		public let storageExpansionCost: RETDecimal
+		public let royaltyCost: RETDecimal
 
-		public let guaranteesCost: BigDecimal
+		public let guaranteesCost: RETDecimal
 
-		public var lockFeeCost: BigDecimal
-		public var signaturesCost: BigDecimal
-		public var notarizingCost: BigDecimal
+		public var lockFeeCost: RETDecimal
+		public var signaturesCost: RETDecimal
+		public var notarizingCost: RETDecimal
 
-		public var totalExecutionCost: BigDecimal {
+		public var totalExecutionCost: RETDecimal {
 			executionCost
 				+ guaranteesCost
 				+ signaturesCost
@@ -440,7 +440,7 @@ extension TransactionFee {
 				+ notarizingCost
 		}
 
-		public var total: BigDecimal {
+		public var total: RETDecimal {
 			totalExecutionCost
 				+ finalizationCost
 				+ storageExpansionCost
@@ -448,14 +448,14 @@ extension TransactionFee {
 		}
 
 		public init(
-			executionCost: BigDecimal,
-			finalizationCost: BigDecimal,
-			storageExpansionCost: BigDecimal,
-			royaltyCost: BigDecimal,
-			guaranteesCost: BigDecimal,
-			signaturesCost: BigDecimal,
-			lockFeeCost: BigDecimal,
-			notarizingCost: BigDecimal
+			executionCost: RETDecimal,
+			finalizationCost: RETDecimal,
+			storageExpansionCost: RETDecimal,
+			royaltyCost: RETDecimal,
+			guaranteesCost: RETDecimal,
+			signaturesCost: RETDecimal,
+			lockFeeCost: RETDecimal,
+			notarizingCost: RETDecimal
 		) {
 			self.executionCost = executionCost
 			self.finalizationCost = finalizationCost
@@ -469,10 +469,10 @@ extension TransactionFee {
 	}
 
 	public struct FeeLocks: Hashable, Sendable {
-		public let nonContingentLock: BigDecimal
-		public let contingentLock: BigDecimal
+		public let nonContingentLock: RETDecimal
+		public let contingentLock: RETDecimal
 
-		public init(nonContingentLock: BigDecimal, contingentLock: BigDecimal) {
+		public init(nonContingentLock: RETDecimal, contingentLock: RETDecimal) {
 			self.nonContingentLock = nonContingentLock
 			self.contingentLock = contingentLock
 		}
@@ -480,16 +480,16 @@ extension TransactionFee {
 
 	public struct AdvancedFeeCustomization: Hashable, Sendable {
 		public let feeSummary: FeeSummary
-		public var paddingFee: BigDecimal
-		public var tipPercentage: BigDecimal
-		public let paidByDapps: BigDecimal
+		public var paddingFee: RETDecimal
+		public var tipPercentage: UInt16
+		public let paidByDapps: RETDecimal
 
-		public var tipAmount: BigDecimal {
-			(tipPercentage / 100) * (feeSummary.totalExecutionCost + feeSummary.finalizationCost)
+		public var tipAmount: RETDecimal {
+			(RETDecimal(integer: Int(tipPercentage)) / 100) * (feeSummary.totalExecutionCost + feeSummary.finalizationCost)
 		}
 
-		public var total: BigDecimal {
-			max(feeSummary.total + paddingFee + tipAmount + paidByDapps, 0)
+		public var total: RETDecimal {
+			(feeSummary.total + paddingFee + tipAmount + paidByDapps).clamped
 		}
 
 		public init(feeSummary: FeeSummary, feeLocks: FeeLocks) {
@@ -498,18 +498,16 @@ extension TransactionFee {
 			self.tipPercentage = .zero
 
 			/// NonContingent lock will pay for some of the fee.
-			var lock = feeLocks.nonContingentLock
-			lock.negate()
-			self.paidByDapps = lock
+			self.paidByDapps = -feeLocks.nonContingentLock
 		}
 	}
 
 	public struct NormalFeeCustomization: Hashable, Sendable {
-		public let networkFee: BigDecimal
-		public let royaltyFee: BigDecimal
-		public let total: BigDecimal
+		public let networkFee: RETDecimal
+		public let royaltyFee: RETDecimal
+		public let total: RETDecimal
 
-		public init(networkFee: BigDecimal, royaltyFee: BigDecimal) {
+		public init(networkFee: RETDecimal, royaltyFee: RETDecimal) {
 			self.networkFee = networkFee
 			self.royaltyFee = royaltyFee
 			self.total = networkFee + royaltyFee
@@ -521,34 +519,34 @@ extension TransactionFee {
 					+ feeSummary.finalizationCost
 					+ feeSummary.storageExpansionCost
 			) * (1 + PredefinedFeeConstants.networkFeeMultiplier) // add network multiplier on top
-			let remainingNonContingentLock = feeLocks.nonContingentLock.clampedDiff(networkFee)
+			let remainingNonContingentLock = (feeLocks.nonContingentLock - networkFee).clamped
 
 			self.init(
-				networkFee: networkFee.clampedDiff(feeLocks.nonContingentLock),
-				royaltyFee: feeSummary.royaltyCost.clampedDiff(remainingNonContingentLock)
+				networkFee: (networkFee - feeLocks.nonContingentLock).clamped,
+				royaltyFee: (feeSummary.royaltyCost - remainingNonContingentLock).clamped
 			)
 		}
 	}
 
 	public struct TotalFee: Hashable, Sendable {
-		public let min: BigDecimal
-		public let max: BigDecimal
+		public let min: RETDecimal
+		public let max: RETDecimal
 
-		public init(min: BigDecimal, max: BigDecimal) {
+		public init(min: RETDecimal, max: RETDecimal) {
 			self.min = min
 			self.max = max
 		}
 
-		public var lockFee: BigDecimal {
+		public var lockFee: RETDecimal {
 			// We always lock the max amount
 			max
 		}
 
 		public var displayedTotalFee: String {
 			if max > min {
-				return "\(min.format()) - \(max.format()) XRD"
+				return "\(min.formatted()) - \(max.formatted()) XRD"
 			}
-			return "\(max.format()) XRD"
+			return "\(max.formatted()) XRD"
 		}
 	}
 }
@@ -566,7 +564,7 @@ extension TransactionFee {
 			lockFeeCost: 5,
 			notarizingCost: 5
 		)
-		return .init(feeSummary: feeSummary, feeLocks: .init(nonContingentLock: .zero, contingentLock: .zero))
+		return .init(feeSummary: feeSummary, feeLocks: .init(nonContingentLock: 0, contingentLock: 0))
 	}
 
 	public static var nonContingentLockPaying: Self {
@@ -580,7 +578,7 @@ extension TransactionFee {
 			lockFeeCost: 5,
 			notarizingCost: 5
 		)
-		return .init(feeSummary: feeSummary, feeLocks: .init(nonContingentLock: 100, contingentLock: .zero))
+		return .init(feeSummary: feeSummary, feeLocks: .init(nonContingentLock: 100, contingentLock: 0))
 	}
 	#endif
 }

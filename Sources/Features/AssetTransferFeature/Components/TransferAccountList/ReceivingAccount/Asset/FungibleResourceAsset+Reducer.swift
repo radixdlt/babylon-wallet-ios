@@ -9,7 +9,7 @@ public struct FungibleResourceAsset: Sendable, FeatureReducer {
 			resource.resourceAddress.address
 		}
 
-		public var balance: BigDecimal {
+		public var balance: RETDecimal {
 			resource.amount
 		}
 
@@ -24,14 +24,14 @@ public struct FungibleResourceAsset: Sendable, FeatureReducer {
 		// MARK: - Mutable state
 
 		public var transferAmountStr: String = ""
-		public var transferAmount: BigDecimal? = nil
+		public var transferAmount: RETDecimal? = nil
 
 		// Total transfer sum for the transferred resource
-		public var totalTransferSum: BigDecimal
+		public var totalTransferSum: RETDecimal
 
 		public var focused: Bool = false
 
-		init(resource: AccountPortfolio.FungibleResource, isXRD: Bool, totalTransferSum: BigDecimal = .zero) {
+		init(resource: AccountPortfolio.FungibleResource, isXRD: Bool, totalTransferSum: RETDecimal = .zero) {
 			self.resource = resource
 			self.isXRD = isXRD
 			self.totalTransferSum = totalTransferSum
@@ -55,7 +55,7 @@ public struct FungibleResourceAsset: Sendable, FeatureReducer {
 		case let .amountChanged(transferAmountStr):
 			state.transferAmountStr = transferAmountStr
 
-			if let value = try? BigDecimal(localizedFromString: transferAmountStr), value >= 0 {
+			if let value = try? RETDecimal(formattedString: transferAmountStr), !value.isNegative() {
 				state.transferAmount = value
 			} else {
 				state.transferAmount = nil
@@ -63,11 +63,11 @@ public struct FungibleResourceAsset: Sendable, FeatureReducer {
 			return .send(.delegate(.amountChanged))
 
 		case .maxAmountTapped:
-			let fee: BigDecimal = state.isXRD ? .temporaryStandardFee : 0
+			let fee: RETDecimal = state.isXRD ? .temporaryStandardFee : .zero
 			let sumOfOthers = state.totalTransferSum - (state.transferAmount ?? .zero)
-			let remainingAmount = max(state.balance - sumOfOthers - fee, 0)
+			let remainingAmount = (state.balance - sumOfOthers - fee).clamped
 			state.transferAmount = remainingAmount
-			state.transferAmountStr = remainingAmount.droppingTrailingZeros.formatWithoutRounding()
+			state.transferAmountStr = remainingAmount.formattedPlain(useGroupingSeparator: false)
 			return .send(.delegate(.amountChanged))
 
 		case let .focusChanged(focused):

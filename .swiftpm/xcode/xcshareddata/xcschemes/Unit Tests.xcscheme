@@ -76,6 +76,20 @@
                ReferencedContainer = "container:">
             </BuildableReference>
          </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "NO"
+            buildForProfiling = "NO"
+            buildForArchiving = "NO"
+            buildForAnalyzing = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "EngineKitTests"
+               BuildableName = "EngineKitTests"
+               BlueprintName = "EngineKitTests"
+               ReferencedContainer = "container:">
+            </BuildableReference>
+         </BuildActionEntry>
       </BuildActionEntries>
    </BuildAction>
    <TestAction
@@ -491,6 +505,16 @@
                BlueprintIdentifier = "TransactionReviewFeatureTests"
                BuildableName = "TransactionReviewFeatureTests"
                BlueprintName = "TransactionReviewFeatureTests"
+               ReferencedContainer = "container:">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "EngineKitTests"
+               BuildableName = "EngineKitTests"
+               BlueprintName = "EngineKitTests"
                ReferencedContainer = "container:">
             </BuildableReference>
          </TestableReference>

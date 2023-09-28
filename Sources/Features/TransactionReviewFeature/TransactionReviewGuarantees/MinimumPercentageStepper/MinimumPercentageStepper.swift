@@ -9,13 +9,13 @@ extension MinimumPercentageStepper.State {
 // MARK: - MinimumPercentageStepper
 public struct MinimumPercentageStepper: FeatureReducer {
 	public struct State: Sendable, Hashable {
-		public var value: BigDecimal?
+		public var value: RETDecimal?
 		var string: String
 
-		public init(value: BigDecimal) {
-			let clamped = value.withScale(2).clamped.droppingTrailingZeros
+		public init(value: RETDecimal) {
+			let clamped = value.rounded(decimalPlaces: 2).clamped
 			self.value = clamped
-			self.string = clamped.formatWithoutRounding()
+			self.string = clamped.formattedPlain()
 		}
 	}
 
@@ -35,22 +35,22 @@ public struct MinimumPercentageStepper: FeatureReducer {
 		switch viewAction {
 		case .increaseTapped:
 			let value = state.value.map { $0 + percentageDelta } ?? 100
-			let clamped = value.clamped.droppingTrailingZeros
+			let clamped = value.clamped
 			state.value = clamped
-			state.string = clamped.formatWithoutRounding()
+			state.string = clamped.formattedPlain()
 
 		case .decreaseTapped:
 			let value = state.value.map { $0 - percentageDelta } ?? 0
-			let clamped = value.clamped.droppingTrailingZeros
+			let clamped = value.clamped
 			state.value = clamped
-			state.string = clamped.formatWithoutRounding()
+			state.string = clamped.formattedPlain()
 
 		case let .stringEntered(string):
 			state.string = string
 			if string.isEmpty {
 				state.value = 0
-			} else if let value = try? BigDecimal(localizedFromString: string), value >= 0 {
-				state.value = value.droppingTrailingZeros
+			} else if let value = try? RETDecimal(formattedString: string), !value.isNegative() {
+				state.value = value
 			} else {
 				state.value = nil
 			}
@@ -59,7 +59,7 @@ public struct MinimumPercentageStepper: FeatureReducer {
 		return .send(.delegate(.valueChanged))
 	}
 
-	private let percentageDelta: BigDecimal = 0.1
+	private let percentageDelta: RETDecimal = 0.1
 }
 
 extension MinimumPercentageStepper.State {
