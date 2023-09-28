@@ -1031,7 +1031,7 @@ package.addModules([
 		dependencies: [
 			"Cryptography",
 			.product(name: "EngineToolkit", package: "swift-engine-toolkit") {
-				.package(url: "https://github.com/radixdlt/swift-engine-toolkit", branch: "add_final_classes")
+				.package(url: "https://github.com/radixdlt/swift-engine-toolkit", branch: "fix/iOS-11")
 			},
 		],
 		tests: .yes()
