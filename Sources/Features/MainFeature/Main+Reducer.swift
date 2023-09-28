@@ -1,5 +1,6 @@
 import AppPreferencesClient
 import FeaturePrelude
+import GatewaysClient
 import HomeFeature
 import SettingsFeature
 
@@ -7,6 +8,8 @@ public struct Main: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		// MARK: - Components
 		public var home: Home.State
+
+		public var isOnMainnet = true
 
 		// MARK: - Destinations
 		@PresentationState
@@ -17,6 +20,10 @@ public struct Main: Sendable, FeatureReducer {
 		}
 	}
 
+	public enum ViewAction: Sendable, Equatable {
+		case task
+	}
+
 	public enum ChildAction: Sendable, Equatable {
 		case home(Home.Action)
 		case destination(PresentationAction<Destinations.Action>)
@@ -24,6 +31,10 @@ public struct Main: Sendable, FeatureReducer {
 
 	public enum DelegateAction: Sendable, Equatable {
 		case removedWallet
+	}
+
+	public enum InternalAction: Sendable, Equatable {
+		case currentGatewayChanged(to: Radix.Gateway)
 	}
 
 	public struct Destinations: Sendable, Reducer {
@@ -42,8 +53,8 @@ public struct Main: Sendable, FeatureReducer {
 		}
 	}
 
-	@Dependency(\.keychainClient) var keychainClient
 	@Dependency(\.appPreferencesClient) var appPreferencesClient
+	@Dependency(\.gatewaysClient) var gatewaysClient
 
 	public init() {}
 
@@ -55,6 +66,19 @@ public struct Main: Sendable, FeatureReducer {
 			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
 				Destinations()
 			}
+	}
+
+	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
+		switch viewAction {
+		case .task:
+			return .run { send in
+				for try await gateways in await gatewaysClient.gatewaysValues() {
+					guard !Task.isCancelled else { return }
+					loggerGlobal.notice("Changed network to: \(gateways.current)")
+					await send(.internal(.currentGatewayChanged(to: gateways.current)))
+				}
+			}
+		}
 	}
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
@@ -72,6 +96,14 @@ public struct Main: Sendable, FeatureReducer {
 			}
 
 		default:
+			return .none
+		}
+	}
+
+	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
+		switch internalAction {
+		case let .currentGatewayChanged(currentGateway):
+			state.isOnMainnet = currentGateway.network == .mainnet
 			return .none
 		}
 	}

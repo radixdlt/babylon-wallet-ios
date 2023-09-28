@@ -29,7 +29,6 @@ final class AppFeatureTests: TestCase {
 		await store.send(.child(.main(.delegate(.removedWallet)))) {
 			$0.root = .onboardingCoordinator(.init())
 		}
-		XCTAssertFalse(store.state.showIsUsingTestnetBanner)
 	}
 
 	func test_splash__GIVEN__an_existing_profile__WHEN__existing_profile_loaded__THEN__we_navigate_to_main() async throws {
@@ -65,14 +64,11 @@ final class AppFeatureTests: TestCase {
 		) {
 			$0.errorQueue = .liveValue
 			$0.continuousClock = clock
-			$0.gatewaysClient.gatewaysValues = { AsyncLazySequence([.init(current: .default)]).eraseToAnyAsyncSequence() }
 		}
 
 		let viewTask = await store.send(.view(.task))
 
 		// then
-		await store.receive(.internal(.currentGatewayChanged(to: .default)))
-		XCTAssertFalse(store.state.showIsUsingTestnetBanner)
 		await store.send(.child(.splash(.delegate(.completed(.newUser, accountRecoveryNeeded: false))))) {
 			$0.root = .onboardingCoordinator(.init())
 		}
@@ -90,7 +86,6 @@ final class AppFeatureTests: TestCase {
 		) {
 			$0.errorQueue = .liveValue
 			$0.continuousClock = clock
-			$0.gatewaysClient.gatewaysValues = { AsyncLazySequence([.init(current: .default)]).eraseToAnyAsyncSequence() }
 		}
 
 		let viewTask = await store.send(.view(.task))
@@ -104,8 +99,6 @@ final class AppFeatureTests: TestCase {
 		let outcome = LoadProfileOutcome.usersExistingProfileCouldNotBeLoaded(failure: failure)
 
 		// then
-		await store.receive(.internal(.currentGatewayChanged(to: .default)))
-		XCTAssertFalse(store.state.showIsUsingTestnetBanner)
 		await store.send(.child(.splash(.delegate(.completed(outcome, accountRecoveryNeeded: false))))) {
 			$0.root = .onboardingCoordinator(.init())
 		}
@@ -125,7 +118,6 @@ final class AppFeatureTests: TestCase {
 		) {
 			$0.errorQueue = .liveValue
 			$0.continuousClock = clock
-			$0.gatewaysClient.gatewaysValues = { AsyncLazySequence([.init(current: .default)]).eraseToAnyAsyncSequence() }
 		}
 		store.exhaustivity = .off
 		let viewTask = await store.send(.view(.task))
@@ -166,7 +158,6 @@ final class AppFeatureTests: TestCase {
 		) {
 			$0.errorQueue = .liveValue
 			$0.continuousClock = clock
-			$0.gatewaysClient.gatewaysValues = { AsyncLazySequence([.init(current: .default)]).eraseToAnyAsyncSequence() }
 			$0.appPreferencesClient.deleteProfileAndFactorSources = { _ in
 				profileDeletedExpectation.fulfill()
 			}
@@ -180,8 +171,6 @@ final class AppFeatureTests: TestCase {
 
 		let outcome = LoadProfileOutcome.usersExistingProfileCouldNotBeLoaded(failure: .profileVersionOutdated(json: Data([0xDE, 0xAD]), version: badVersion))
 
-		await store.receive(.internal(.currentGatewayChanged(to: .default)))
-		XCTAssertFalse(store.state.showIsUsingTestnetBanner)
 		await store.send(.child(.splash(.delegate(.completed(outcome, accountRecoveryNeeded: false))))) {
 			$0.alert = .incompatibleProfileErrorAlert(
 				.init(
