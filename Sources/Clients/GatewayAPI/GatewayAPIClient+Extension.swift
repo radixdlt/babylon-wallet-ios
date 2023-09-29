@@ -58,7 +58,8 @@ extension GatewayAPIClient {
 				atLedgerState: pageCursor?.ledgerState.selector,
 				cursor: pageCursor?.nextPageCursor,
 				address: entityAddress,
-				aggregationLevel: .vault
+				aggregationLevel: .vault,
+				optIns: .init(explicitMetadata: Array(Set<EntityMetadataKey>.resourceMetadataKeys.map(\.rawValue)))
 			)
 			let response = try await gatewayAPIClient.getEntityFungiblesPage(request)
 
@@ -82,7 +83,11 @@ extension GatewayAPIClient {
 				atLedgerState: pageCursor?.ledgerState.selector,
 				cursor: pageCursor?.nextPageCursor,
 				address: accountAddress,
-				aggregationLevel: .vault
+				aggregationLevel: .vault,
+				optIns: .init(
+					nonFungibleIncludeNfids: true,
+					explicitMetadata: .init(Array(Set<EntityMetadataKey>.resourceMetadataKeys.map(\.rawValue)))
+				)
 			)
 			let response = try await gatewayAPIClient.getEntityNonFungiblesPage(request)
 
