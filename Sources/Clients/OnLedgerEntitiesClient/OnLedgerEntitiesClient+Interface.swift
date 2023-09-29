@@ -10,6 +10,7 @@ public struct OnLedgerEntitiesClient: Sendable {
 	public let getResources: GetResources
 	public let getResource: GetResource
 	public let getNonFungibleTokenData: GetNonFungibleTokenData
+	public let refreshResources: RefreshResources
 }
 
 // MARK: - OnLedgerEntitiesClient.GetResources
@@ -17,6 +18,7 @@ extension OnLedgerEntitiesClient {
 	public typealias GetResources = @Sendable ([ResourceAddress]) async throws -> [OnLedgerEntity.Resource]
 	public typealias GetResource = @Sendable (ResourceAddress) async throws -> OnLedgerEntity.Resource
 	public typealias GetNonFungibleTokenData = @Sendable (GetNonFungibleTokenDataRequest) async throws -> [OnLedgerEntity.NonFungibleToken]
+	public typealias RefreshResources = @Sendable ([ResourceAddress]) async throws -> Void
 }
 
 // MARK: OnLedgerEntitiesClient.GetNonFungibleTokenDataRequest

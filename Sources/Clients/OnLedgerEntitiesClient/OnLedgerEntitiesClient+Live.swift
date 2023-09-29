@@ -14,17 +14,21 @@ extension OnLedgerEntitiesClient: DependencyKey {
 
 	public static let liveValue = Self.live()
 
-	public static func live(
-	) -> Self {
+	public static func live() -> Self {
 		Self(
-			getResources: getResources,
+			getResources: {
+				try await getResources(for: $0)
+			},
 			getResource: {
-				guard let resource = try await getResources(for: [$0]).first else {
+				guard let resource = try await getResources(for: [$0], forceRefresh: false).first else {
 					throw Error.emptyResponse
 				}
 				return resource
 			},
-			getNonFungibleTokenData: getNonFungibleData
+			getNonFungibleTokenData: getNonFungibleData,
+			refreshResources: {
+				try await getResources(for: $0, forceRefresh: true)
+			}
 		)
 	}
 }
@@ -38,9 +42,11 @@ extension AtLedgerState {
 
 extension OnLedgerEntitiesClient {
 	@Sendable
-	static func getResources(for resources: [ResourceAddress]) async throws -> [OnLedgerEntity.Resource] {
+	@discardableResult
+	static func getResources(for resources: [ResourceAddress], forceRefresh: Bool = false) async throws -> [OnLedgerEntity.Resource] {
 		try await fetchEntitiesWithCaching(
 			for: resources.map(\.address),
+			forceRefresh: forceRefresh,
 			refresh: fetchEntites
 		)
 		.compactMap(\.resource)
@@ -91,25 +97,36 @@ extension OnLedgerEntitiesClient {
 	}
 
 	@Sendable
-	static func fetchEntitiesWithCaching(for identifiers: [String], refresh: (_ identifiers: [String]) async throws -> [OnLedgerEntity]) async throws -> [OnLedgerEntity] {
+	static func fetchEntitiesWithCaching(
+		for identifiers: [String],
+		forceRefresh: Bool = false,
+		refresh: (_ identifiers: [String]) async throws -> [OnLedgerEntity]
+	) async throws -> [OnLedgerEntity] {
 		@Dependency(\.cacheClient) var cacheClient
 
-		let cachedEntities = identifiers.compactMap {
-			try? cacheClient.load(OnLedgerEntity.self, .onLedgerEntity(address: $0)) as? OnLedgerEntity
+		if forceRefresh {
+			let freshEntities = try await refresh(Array(identifiers))
+			freshEntities.forEach {
+				cacheClient.save($0, .onLedgerEntity(address: $0.identifier))
+			}
+			return freshEntities
+		} else {
+			let cachedEntities = identifiers.compactMap {
+				try? cacheClient.load(OnLedgerEntity.self, .onLedgerEntity(address: $0)) as? OnLedgerEntity
+			}
+
+			let notCachedEntities = Set(identifiers).subtracting(Set(cachedEntities.map(\.identifier)))
+			guard !notCachedEntities.isEmpty else {
+				return cachedEntities
+			}
+
+			let freshEntities = try await refresh(Array(notCachedEntities))
+			freshEntities.forEach {
+				cacheClient.save($0, .onLedgerEntity(address: $0.identifier))
+			}
+
+			return cachedEntities + freshEntities
 		}
-
-		let notCachedEntities = Set(identifiers).subtracting(Set(cachedEntities.map(\.identifier)))
-
-		guard !notCachedEntities.isEmpty else {
-			return cachedEntities
-		}
-
-		let freshEntities = try await refresh(Array(notCachedEntities))
-		freshEntities.forEach {
-			cacheClient.save($0, .onLedgerEntity(address: $0.identifier))
-		}
-
-		return cachedEntities + freshEntities
 	}
 
 	@Sendable

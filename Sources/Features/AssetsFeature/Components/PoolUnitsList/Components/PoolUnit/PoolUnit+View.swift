@@ -47,9 +47,6 @@ extension PoolUnit {
 				.background(.app.white)
 				.roundedCorners(radius: .small1)
 				.tokenRowShadow()
-				.task { @MainActor in
-					await viewStore.send(.task).finish()
-				}
 			}
 			.sheet(
 				store: store.scope(
@@ -69,30 +66,27 @@ extension PoolUnit.State {
 		.init(
 			iconURL: poolUnit.poolUnitResource.metadata.iconURL,
 			name: poolUnit.poolUnitResource.metadata.name ?? L10n.Account.PoolUnits.unknownPoolUnitName,
-			resources: PoolUnitResourceViewState.resourcesViewState(poolUnit: poolUnit, loadedPoolResources: loadedPoolResources),
+			resources: PoolUnitResourceViewState.viewStates(poolUnit: poolUnit, poolUnitResource: poolUnitResource, poolResources: poolResources),
 			isSelected: isSelected
 		)
 	}
 }
 
 extension PoolUnitResourceViewState {
-	static func resourcesViewState(
+	static func viewStates(
 		poolUnit: AccountPortfolio.PoolUnitResources.PoolUnit,
-		loadedPoolResources: Loadable<[OnLedgerEntity.Resource]>
+		poolUnitResource: OnLedgerEntity.Resource,
+		poolResources: [OnLedgerEntity.Resource]
 	) -> NonEmpty<IdentifiedArrayOf<PoolUnitResourceViewState>> {
-		func redemptionValue(for resource: AccountPortfolio.FungibleResource) -> Loadable<String> {
-			loadedPoolResources.map { loadedPoolResources in
-				let poolUnitResource = loadedPoolResources.first { $0.id == poolUnit.poolUnitResource.id }
-				let loadedResource = loadedPoolResources.first { $0.id == resource.id }
-				guard let poolUnitResource, let loadedResource else {
-					assertionFailure("Not all resources were loaded")
-					return ""
-				}
-
-				let poolUnitTotalSupply = poolUnitResource.totalSupply ?? .one
-				let unroundedRedemptionValue = poolUnit.poolUnitResource.amount * resource.amount / poolUnitTotalSupply
-				return unroundedRedemptionValue.format(divisibility: loadedResource.divisibility)
+		func redemptionValue(for resource: AccountPortfolio.FungibleResource) -> String {
+			guard let resourceDetails = poolResources.first(where: { $0.id == resource.id }) else {
+				assertionFailure("Not all resources were loaded")
+				return ""
 			}
+
+			let poolUnitTotalSupply = poolUnitResource.totalSupply ?? .one
+			let unroundedRedemptionValue = poolUnit.poolUnitResource.amount * resource.amount / poolUnitTotalSupply
+			return unroundedRedemptionValue.format(divisibility: resourceDetails.divisibility)
 		}
 
 		let xrdResourceViewState = poolUnit.poolResources.xrdResource.map {

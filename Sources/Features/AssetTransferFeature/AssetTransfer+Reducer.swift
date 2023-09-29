@@ -286,7 +286,7 @@ extension AssetTransfer {
 					resources.append(.init(
 						address: fungibleAsset.resource.resourceAddress,
 						totalTransferAmount: fungibleAsset.totalTransferSum,
-						divisibility: fungibleAsset.resource.divisibility,
+						divisibility: 1, // fungibleAsset.resource.divisibility,
 						accounts: [accountTransfer]
 					))
 				}
