@@ -43,7 +43,7 @@ extension TransactionManifest {
 
 	public func withLockFeeCallMethodAdded(
 		address: Address,
-		fee: BigDecimal = .temporaryStandardFee
+		fee: RETDecimal = .temporaryStandardFee
 	) throws -> TransactionManifest {
 		try withInstructionAdded(
 			.lockFeeCall(address: address, fee: fee),
@@ -63,14 +63,14 @@ extension Instructions {
 extension Instruction {
 	static func lockFeeCall(
 		address: Address,
-		fee: BigDecimal
+		fee: RETDecimal
 	) throws -> Instruction {
 		try .callMethod(
 			address: .static(value: .init(address: address.address)),
 			methodName: "lock_fee",
 			args: .tupleValue(
 				fields: [
-					.decimalValue(value: fee.asDecimal()),
+					.decimalValue(value: fee),
 				]
 			)
 		)

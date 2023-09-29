@@ -55,7 +55,7 @@ extension SubmitTransaction {
 								.textStyle(.sheetTitle)
 								.multilineTextAlignment(.center)
 
-							Text(viewStore.status.display)
+							Text("Transaction was rejected as invalid by the Radix Network") // FIXME: Strings
 								.foregroundColor(.app.gray1)
 								.textStyle(.body1Regular)
 								.multilineTextAlignment(.center)

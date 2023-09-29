@@ -12,7 +12,7 @@ extension NonFungibleTokenDetails.State {
 				isXRD: false,
 				validatorAddress: nil,
 				resourceName: resource.resourceMetadata.name,
-				currentSupply: resource.totalSupply.map { $0?.format() },
+				currentSupply: resource.totalSupply.map { $0?.formatted() },
 				behaviors: resource.behaviors,
 				tags: prefetchedPortfolioResource.map { .success($0.metadata.tags) } ?? resource.resourceMetadata.tags
 			)
@@ -30,6 +30,21 @@ extension NonFungibleTokenDetails.ViewState.TokenDetails {
 		)
 	}
 }
+
+// extension AssetResourceDetailsSection.ViewState {
+//	init(resource: OnLedgerEntity.Resource) {
+//		self.init(
+//			description: resource.description,
+//			resourceAddress: resource.resourceAddress,
+//			isXRD: false,
+//			validatorAddress: nil,
+//			resourceName: resource.name,
+//			currentSupply: resource.totalSupply?.formatted(),
+//			behaviors: resource.behaviors,
+//			tags: resource.tags
+//		)
+//	}
+// }
 
 // MARK: - NonFungibleTokenList.Detail.View
 extension NonFungibleTokenDetails {

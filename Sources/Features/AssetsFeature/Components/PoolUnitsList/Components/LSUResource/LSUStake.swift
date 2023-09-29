@@ -2,7 +2,6 @@ import FeaturePrelude
 import LoggerDependency
 
 // MARK: - LSUStake
-
 public struct LSUStake: FeatureReducer {
 	public struct State: Sendable, Hashable, Identifiable {
 		public var id: String {
@@ -113,8 +112,9 @@ public struct LSUStake: FeatureReducer {
 	}
 }
 
+import EngineKit
 extension LSUStake.State {
-	var xrdRedemptionValue: BigDecimal {
-		((stake.stakeUnitResource?.amount ?? .zero) * stake.validator.xrdVaultBalance) / (stakeResource?.totalSupply ?? .one)
+	var xrdRedemptionValue: RETDecimal {
+		((stake.stakeUnitResource?.amount ?? 0) * stake.validator.xrdVaultBalance) / (stakeResource?.totalSupply ?? 1)
 	}
 }

@@ -31,8 +31,8 @@ extension BackupsClient {
 	public typealias SnapshotOfProfileForExport = @Sendable () async throws -> ProfileSnapshot
 	public typealias LoadProfileBackups = @Sendable () async -> ProfileSnapshot.HeaderList?
 
-	public typealias ImportProfileSnapshot = @Sendable (ProfileSnapshot, Set<FactorSourceID>) async throws -> Void
-	public typealias ImportCloudProfile = @Sendable (ProfileSnapshot.Header, Set<FactorSourceID>) async throws -> Void
+	public typealias ImportProfileSnapshot = @Sendable (ProfileSnapshot, Set<FactorSourceID.FromHash>) async throws -> Void
+	public typealias ImportCloudProfile = @Sendable (ProfileSnapshot.Header, Set<FactorSourceID.FromHash>) async throws -> Void
 	public typealias LookupProfileSnapshotByHeader = @Sendable (ProfileSnapshot.Header) async throws -> ProfileSnapshot?
 
 	public typealias LoadDeviceID = @Sendable () async -> UUID?
@@ -43,7 +43,9 @@ extension BackupsClient {
 		_ snapshot: ProfileSnapshot,
 		fromCloud: Bool
 	) async throws {
-		let factorSourceIDs = Set(snapshot.factorSources.elements.filter { $0.factorSourceKind == .device }.map(\.id))
+		let factorSourceIDs: Set<FactorSourceID.FromHash> = .init(
+			snapshot.factorSources.compactMap { $0.extract(DeviceFactorSource.self) }.map(\.id)
+		)
 		if fromCloud {
 			try await importCloudProfile(snapshot.header, factorSourceIDs)
 		} else {

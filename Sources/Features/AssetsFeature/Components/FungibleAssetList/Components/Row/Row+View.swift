@@ -5,7 +5,7 @@ extension FungibleAssetList.Row.State {
 		.init(
 			thumbnail: isXRD ? .xrd : .known(token.metadata.iconURL),
 			symbol: token.metadata.symbol ?? token.metadata.name ?? "",
-			tokenAmount: token.amount.format(),
+			tokenAmount: token.amount.formatted(),
 			isSelected: isSelected
 		)
 	}

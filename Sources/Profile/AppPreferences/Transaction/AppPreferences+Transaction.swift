@@ -10,10 +10,10 @@ extension AppPreferences {
 		CustomStringConvertible,
 		CustomDumpReflectable
 	{
-		public var defaultDepositGuarantee: BigDecimal
+		public var defaultDepositGuarantee: RETDecimal
 
 		public init(
-			defaultDepositGuarantee: BigDecimal = 1
+			defaultDepositGuarantee: RETDecimal = 1
 		) {
 			self.defaultDepositGuarantee = defaultDepositGuarantee
 		}
@@ -29,7 +29,7 @@ extension AppPreferences.Transaction {
 		.init(
 			self,
 			children: [
-				"defaultDepositGuarantee": defaultDepositGuarantee.format(),
+				"defaultDepositGuarantee": defaultDepositGuarantee.formattedPlain(),
 			],
 			displayStyle: .struct
 		)
@@ -37,7 +37,7 @@ extension AppPreferences.Transaction {
 
 	public var description: String {
 		"""
-		defaultDepositGuarantee: \(defaultDepositGuarantee.format()),
+		defaultDepositGuarantee: \(defaultDepositGuarantee.formattedPlain()),
 		"""
 	}
 }

@@ -50,7 +50,7 @@ public struct RestoreProfileFromBackupCoordinator: Sendable, FeatureReducer {
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
-		case profileImported(skippedAnyMnemonic: Bool, hasMainnetAccounts: Bool)
+		case profileImported(skippedAnyMnemonic: Bool)
 		case failedToImportProfileDueToMnemonics
 	}
 
@@ -98,7 +98,9 @@ public struct RestoreProfileFromBackupCoordinator: Sendable, FeatureReducer {
 			return .run { send in
 				loggerGlobal.notice("Importing snapshot...")
 				try await backupsClient.importSnapshot(profileSelection.snapshot, fromCloud: profileSelection.isInCloud)
-				await send(.delegate(.profileImported(skippedAnyMnemonic: !skipList.isEmpty, hasMainnetAccounts: profileSelection.snapshot.hasMainnetAccounts)))
+				await send(.delegate(.profileImported(
+					skippedAnyMnemonic: !skipList.isEmpty
+				)))
 			} catch: { error, _ in
 				errorQueue.schedule(error)
 			}

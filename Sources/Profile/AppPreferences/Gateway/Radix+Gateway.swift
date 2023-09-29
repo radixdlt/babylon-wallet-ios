@@ -16,7 +16,10 @@ extension Radix {
 		public let url: URL
 		public var id: ID { url }
 
-		public init(network: Network, url: URL) {
+		public init(
+			network: Network,
+			url: URL
+		) {
 			self.network = network
 			self.url = url
 		}
@@ -24,7 +27,7 @@ extension Radix {
 }
 
 extension Radix.Gateway {
-	public static let `default` = Radix.Gateway.rcnet
+	public static let `default` = Radix.Gateway.mainnet
 }
 
 extension Radix.Gateway {
@@ -38,7 +41,7 @@ extension Radix.Gateway {
 	public static var stokenet: Self {
 		.init(
 			network: .stokenet,
-			url: URL(string: "babylon-stokenet-gateway.radixdlt.com/")!
+			url: URL(string: "https://babylon-stokenet-gateway.radixdlt.com/")!
 		)
 	}
 
@@ -97,11 +100,13 @@ extension Radix.Gateway {
 			url: URL(string: "https://mardunet-gateway.radixdlt.com")!
 		)
 	}
+
+	private static var wellknown: [Self] { [.mainnet, .stokenet] }
 }
 
 extension Radix.Gateway {
-	public var isDefault: Bool {
-		id == Self.default.id
+	public var isWellknown: Bool {
+		Self.wellknown.contains(self)
 	}
 
 	public var customDumpMirror: Mirror {

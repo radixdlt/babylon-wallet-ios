@@ -14,7 +14,7 @@ extension PoolUnitDetails.State {
 				isXRD: false,
 				validatorAddress: nil,
 				resourceName: .success(poolUnitResource.resourceMetadata.name), // FIXME: Is this correct?
-				currentSupply: .success(poolUnitResource.totalSupply?.format() ?? L10n.AssetDetails.supplyUnkown),
+				currentSupply: .success(poolUnitResource.totalSupply?.formatted() ?? L10n.AssetDetails.supplyUnkown),
 				behaviors: .success(poolUnitResource.behaviors),
 				tags: .success(poolUnitResource.resourceMetadata.tags)
 			)

@@ -70,7 +70,7 @@ extension FungibleResourceAsset.View {
 
 						Group {
 							Text("-")
-							Text(L10n.AssetTransfer.FungibleResource.balance(viewStore.balance.format()))
+							Text(L10n.AssetTransfer.FungibleResource.balance(viewStore.balance.formatted()))
 						}
 						.textStyle(.body3HighImportance)
 						.foregroundColor(.app.gray2)

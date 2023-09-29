@@ -29,7 +29,7 @@ extension OnLedgerEntity {
 		public let resourceAddress: ResourceAddress
 		public let divisibility: Int?
 		public let behaviors: [AssetBehavior]
-		public let totalSupply: BigDecimal?
+		public let totalSupply: RETDecimal?
 		public let resourceMetadata: ResourceMetadata
 
 		public var fungibility: Fungibility {
@@ -49,7 +49,7 @@ extension OnLedgerEntity {
 			resourceAddress: ResourceAddress,
 			divisibility: Int? = nil,
 			behaviors: [AssetBehavior] = [],
-			totalSupply: BigDecimal? = nil,
+			totalSupply: RETDecimal? = nil,
 			resourceMetadata: ResourceMetadata
 		) {
 			self.resourceAddress = resourceAddress
@@ -129,7 +129,7 @@ extension OnLedgerEntity.NonFungibleToken {
 		public enum Value: Sendable, Hashable, Codable {
 			case string(String)
 			case url(URL)
-			case decimal(BigDecimal)
+			case decimal(RETDecimal)
 			case u64(UInt64)
 
 			var string: String? {
@@ -153,7 +153,7 @@ extension OnLedgerEntity.NonFungibleToken {
 				return u64
 			}
 
-			var decimal: BigDecimal? {
+			var decimal: RETDecimal? {
 				guard case let .decimal(decimal) = self else {
 					return nil
 				}
@@ -196,7 +196,7 @@ extension [OnLedgerEntity.NonFungibleToken.NFTData] {
 		self[.claimEpoch]?.u64
 	}
 
-	public var claimAmount: BigDecimal? {
+	public var claimAmount: RETDecimal? {
 		self[.claimAmount]?.decimal
 	}
 }

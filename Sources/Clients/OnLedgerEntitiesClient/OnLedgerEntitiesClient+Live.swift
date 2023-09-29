@@ -162,7 +162,7 @@ extension OnLedgerEntitiesClient {
 				resourceAddress: .init(validatingAddress: item.address),
 				divisibility: fungibleDetails.divisibility,
 				behaviors: item.details?.fungible?.roleAssignments.extractBehaviors() ?? [],
-				totalSupply: try? BigDecimal(fromString: fungibleDetails.totalSupply),
+				totalSupply: try? RETDecimal(value: fungibleDetails.totalSupply),
 				resourceMetadata: metadata
 			))
 		case let .nonFungibleResource(nonFungibleDetails):
@@ -170,7 +170,7 @@ extension OnLedgerEntitiesClient {
 				resourceAddress: .init(validatingAddress: item.address),
 				divisibility: nil,
 				behaviors: item.details?.nonFungible?.roleAssignments.extractBehaviors() ?? [],
-				totalSupply: try? BigDecimal(fromString: nonFungibleDetails.totalSupply),
+				totalSupply: try? RETDecimal(value: nonFungibleDetails.totalSupply),
 				resourceMetadata: metadata
 			))
 		default:
@@ -227,7 +227,7 @@ extension OnLedgerEntity.NonFungibleToken.NFTData.Value {
 			}
 			self = .u64(u64)
 		case .decimal:
-			guard let decimal = try? value.string.map(BigDecimal.init(fromString:)) else {
+			guard let decimal = try? value.string.map(RETDecimal.init(value:)) else {
 				return nil
 			}
 			self = .decimal(decimal)

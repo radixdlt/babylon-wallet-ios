@@ -1,12 +1,13 @@
+import EngineKit
 import Prelude
 
 public struct TokenBalanceView: View {
 	public struct ViewState {
 		public let thumbnail: TokenThumbnail.Content
 		public let name: String
-		public let balance: BigDecimal
+		public let balance: RETDecimal
 
-		public init(thumbnail: TokenThumbnail.Content, name: String, balance: BigDecimal) {
+		public init(thumbnail: TokenThumbnail.Content, name: String, balance: RETDecimal) {
 			self.thumbnail = thumbnail
 			self.name = name
 			self.balance = balance
@@ -29,7 +30,7 @@ public struct TokenBalanceView: View {
 
 			Spacer()
 
-			Text(viewState.balance.format())
+			Text(viewState.balance.formatted())
 				.foregroundColor(.app.gray1)
 				.textStyle(.secondaryHeader)
 		}

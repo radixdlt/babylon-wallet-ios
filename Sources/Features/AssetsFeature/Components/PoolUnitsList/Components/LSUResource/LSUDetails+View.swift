@@ -6,19 +6,19 @@ extension LSUDetails.State {
 		.init(
 			containerWithHeader: .init(
 				title: stakeUnitResource.resourceMetadata.name ?? L10n.Account.PoolUnits.unknownPoolUnitName,
-				amount: stakeAmount.format(),
+				amount: stakeAmount.formatted(),
 				symbol: stakeUnitResource.resourceMetadata.symbol
 			),
 			thumbnailURL: stakeUnitResource.resourceMetadata.iconURL,
 			validatorNameViewState: .init(with: validator),
-			redeemableTokenAmount: .init(.init(xrdAmount: xrdRedemptionValue.format())),
+			redeemableTokenAmount: .init(.init(xrdAmount: xrdRedemptionValue.formatted())),
 			resourceDetails: .init(
 				description: .success(stakeUnitResource.resourceMetadata.description),
 				resourceAddress: stakeUnitResource.resourceAddress,
 				isXRD: false,
 				validatorAddress: validator.address,
 				resourceName: .success(stakeUnitResource.resourceMetadata.name), // TODO: Is this correct?
-				currentSupply: .success(validator.xrdVaultBalance.format()),
+				currentSupply: .success(validator.xrdVaultBalance.formatted()),
 				behaviors: .success(stakeUnitResource.behaviors),
 				tags: .success(stakeUnitResource.resourceMetadata.tags)
 			)

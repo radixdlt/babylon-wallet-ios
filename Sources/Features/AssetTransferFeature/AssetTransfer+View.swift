@@ -9,10 +9,7 @@ extension AssetTransfer.State {
 	}
 
 	var showIsUsingTestnetBanner: Bool {
-		guard hasMainnetEverBeenLive else {
-			return false
-		}
-		return !isMainnetAccount
+		!isMainnetAccount
 	}
 }
 

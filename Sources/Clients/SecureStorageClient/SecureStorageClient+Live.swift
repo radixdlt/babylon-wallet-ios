@@ -185,7 +185,7 @@ extension SecureStorageClient: DependencyKey {
 				let mnemonicWithPassphrase = privateFactorSource.mnemonicWithPassphrase
 				let data = try jsonEncoder().encode(mnemonicWithPassphrase)
 				let mostSecureAccesibilityAndAuthenticationPolicy = try await queryMostSecureAccesibilityAndAuthenticationPolicy()
-				let key = key(factorSourceID: factorSource.id.embed())
+				let key = key(factorSourceID: factorSource.id)
 
 				try await keychainClient.setDataWithAuthenticationPolicyIfAble(
 					data: data,
@@ -243,7 +243,11 @@ extension SecureStorageClient: DependencyKey {
 					try await deleteProfile(profileID, iCloudSyncEnabled: profileSnapshot.appPreferences.security.isCloudProfileSyncEnabled)
 				}
 
-				for factorSourceID in profileSnapshot.factorSources.map(\.id) {
+				for factorSourceID in profileSnapshot
+					.factorSources
+					.compactMap({ try? $0.extract(as: DeviceFactorSource.self) })
+					.map(\.id)
+				{
 					loggerGlobal.debug("Deleting factor source with ID: \(factorSourceID)")
 					try await deleteMnemonicByFactorSourceID(factorSourceID)
 				}
@@ -306,6 +310,6 @@ extension ProfileSnapshot.Header.ID {
 	}
 }
 
-private func key(factorSourceID: FactorSourceID) -> KeychainClient.Key {
-	.init(rawValue: .init(rawValue: factorSourceID.description)!)
+private func key(factorSourceID: FactorSourceID.FromHash) -> KeychainClient.Key {
+	.init(rawValue: .init(rawValue: factorSourceID.keychainKey)!)
 }

@@ -3,6 +3,7 @@ import FeaturePrelude
 import Foundation
 import TransactionClient
 
+// MARK: - AdvancedFeesCustomization
 public struct AdvancedFeesCustomization: FeatureReducer {
 	public struct State: Hashable, Sendable {
 		public enum FocusField: Hashable, Sendable {
@@ -21,8 +22,8 @@ public struct AdvancedFeesCustomization: FeatureReducer {
 			fees: TransactionFee.AdvancedFeeCustomization
 		) {
 			self.fees = fees
-			self.paddingAmount = fees.paddingFee.format()
-			self.tipPercentage = fees.tipPercentage.format()
+			self.paddingAmount = fees.paddingFee.formatted()
+			self.tipPercentage = String(fees.tipPercentage)
 		}
 	}
 
@@ -40,27 +41,33 @@ public struct AdvancedFeesCustomization: FeatureReducer {
 		switch viewAction {
 		case let .paddingAmountChanged(amount):
 			state.paddingAmount = amount
-			updateDecimalField(&state, field: \.fees.paddingFee, value: amount)
+			state.fees.updatePaddingFee(value: amount)
 			return .send(.delegate(.updated(state.fees)))
 		case let .tipPercentageChanged(percentage):
 			state.tipPercentage = percentage
-			updateDecimalField(&state, field: \.fees.tipPercentage, value: percentage)
+			state.fees.updateTipPercentage(value: percentage)
 			return .send(.delegate(.updated(state.fees)))
 		case let .focusChanged(field):
 			state.focusField = field
 			return .none
 		}
 	}
+}
 
-	func updateDecimalField(
-		_ state: inout State,
-		field: WritableKeyPath<State, BigDecimal>,
-		value: String
-	) {
+extension TransactionFee.AdvancedFeeCustomization {
+	mutating func updatePaddingFee(value: String) {
 		if value.isEmpty {
-			state[keyPath: field] = .zero
-		} else if let amount = try? BigDecimal(fromString: value) {
-			state[keyPath: field] = amount
+			paddingFee = .zero
+		} else if let amount = try? RETDecimal(value: value) {
+			paddingFee = amount
+		}
+	}
+
+	mutating func updateTipPercentage(value: String) {
+		if value.isEmpty {
+			tipPercentage = .zero
+		} else if let amount = UInt16(value) {
+			tipPercentage = amount
 		}
 	}
 }

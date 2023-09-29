@@ -15,7 +15,7 @@ extension FungibleTokenDetails.State {
 				isXRD: isXRD,
 				validatorAddress: nil,
 				resourceName: nil,
-				currentSupply: resource.totalSupply.map { $0?.format() }, // FIXME: Check which format
+				currentSupply: resource.totalSupply.map { $0?.formatted() }, // FIXME: Check which format
 				behaviors: resource.behaviors,
 				tags: {
 					let tags = resource.resourceMetadata.get(\.tags, prefetched: prefetchedPortfolioResource?.metadata)
@@ -28,7 +28,7 @@ extension FungibleTokenDetails.State {
 	var detailsHeader: DetailsContainerWithHeaderViewState {
 		.init(
 			title: prefetchedPortfolioResource?.metadata.name ?? L10n.Account.PoolUnits.unknownPoolUnitName,
-			amount: prefetchedPortfolioResource?.amount.format(),
+			amount: prefetchedPortfolioResource?.amount.formatted(),
 			symbol: resource.resourceMetadata.get(\.symbol, prefetched: prefetchedPortfolioResource?.metadata).wrappedValue?.flatMap(identity)
 		)
 	}

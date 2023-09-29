@@ -22,6 +22,8 @@ public struct Gateways:
 		self.other = .init()
 	}
 
+	public static let preset = try! Self(current: .mainnet, other: [.stokenet])
+
 	public init(
 		current: Radix.Gateway,
 		other: IdentifiedArrayOf<Radix.Gateway>

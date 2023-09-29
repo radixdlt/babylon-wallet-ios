@@ -81,7 +81,7 @@ actor DataChannelClient {
 			} logError: { error in
 				loggerGlobal.error("Critical: Could not decode the Incoming DataChannel message \(error)")
 			}
-			.logInfo("DataChannel: Received message %@")
+			.logInfo(prefix: "DataChannel: Received message")
 			.eraseToAnyAsyncSequence()
 			.share()
 			.eraseToAnyAsyncSequence()

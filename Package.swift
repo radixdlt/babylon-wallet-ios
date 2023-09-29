@@ -91,9 +91,6 @@ package.addModules([
 			"MainFeature",
 			"OnboardingFeature",
 			"OverlayWindowClient",
-			"CreateAccountFeature",
-			"NetworkSwitchingClient",
-			"GatewaysClient",
 			"SplashFeature",
 		],
 		tests: .yes()
@@ -638,7 +635,6 @@ package.addModules([
 		name: "ImportLegacyWalletClient",
 		dependencies: [
 			"AccountsClient",
-			"AppPreferencesClient", // FIXME: Post mainnet delete (read dev mode)
 			"LedgerHardwareWalletClient",
 			"Profile", // Olympia models
 			"EngineKit",
@@ -1036,10 +1032,10 @@ package.addModules([
 		dependencies: [
 			"Cryptography",
 			.product(name: "EngineToolkit", package: "swift-engine-toolkit") {
-				.package(url: "https://github.com/radixdlt/swift-engine-toolkit", exact: "0.12.1-293dd4c")
+				.package(url: "https://github.com/radixdlt/swift-engine-toolkit", branch: "add_final_classes")
 			},
 		],
-		tests: .no
+		tests: .yes()
 	),
 	.module(
 		name: "ClientTestingPrelude",
@@ -1071,12 +1067,7 @@ package.addModules([
 			.product(name: "BigInt", package: "BigInt") {
 				.package(url: "https://github.com/attaswift/BigInt", from: "5.3.0")
 			},
-			.product(name: "BigDecimal", package: "BigDecimal") {
-				.package(url: "https://github.com/Zollerboy1/BigDecimal.git", from: "1.0.0")
-			},
-
 			.product(name: "BitCollections", package: "swift-collections"),
-
 			.product(name: "Builders", package: "swift-builders") {
 				.package(url: "https://github.com/davdroman/swift-builders", exact: "0.4.0")
 			},

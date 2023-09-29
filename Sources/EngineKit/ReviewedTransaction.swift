@@ -184,6 +184,8 @@ extension TransactionType {
 					authorizedDepositorsChanges: authorizedDepositorsChanges.mapKeys(AccountAddress.init(validatingAddress:))
 				)
 			))
+		case .stakeTransaction, .unstakeTransaction, .claimStakeTransaction:
+			return .nonConforming
 		}
 	}
 }
@@ -302,7 +304,7 @@ extension MetadataValue {
 }
 
 extension DecimalSource {
-	public var amount: EngineKit.Decimal {
+	public var amount: RETDecimal {
 		switch self {
 		case let .guaranteed(value):
 			return value

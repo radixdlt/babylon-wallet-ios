@@ -293,7 +293,7 @@ struct ConnectExtensionView: View {
 
 	var body: some View {
 		VStack(spacing: .medium2) {
-			Image(asset: AssetResource.browsers)
+			Image(asset: AssetResource.connectorBrowsersIcon)
 				.padding(.horizontal, .medium1)
 
 			Text(L10n.Settings.LinkToConnectorHeader.title)

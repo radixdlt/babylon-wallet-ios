@@ -10,10 +10,8 @@ public struct OnboardingCoordinator: Sendable, FeatureReducer {
 		}
 
 		public var root: Root
-		public let hasMainnetEverBeenLive: Bool
 
-		public init(hasMainnetEverBeenLive: Bool) {
-			self.hasMainnetEverBeenLive = hasMainnetEverBeenLive
+		public init() {
 			self.root = .startup(.init())
 		}
 	}
@@ -25,14 +23,12 @@ public struct OnboardingCoordinator: Sendable, FeatureReducer {
 
 	public enum DelegateAction: Sendable, Equatable {
 		case completed(
-			accountRecoveryIsNeeded: Bool,
-			hasMainnetAccounts: Bool,
-			isMainnetLive: Bool
+			accountRecoveryIsNeeded: Bool
 		)
 	}
 
 	public enum InternalAction: Sendable, Equatable {
-		case commitEphemeralResult(TaskResult<HasMainnetAccounts>)
+		case commitEphemeralResult(TaskResult<Prelude.Unit>)
 	}
 
 	@Dependency(\.onboardingClient) var onboardingClient
@@ -55,11 +51,10 @@ public struct OnboardingCoordinator: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
-		case let .commitEphemeralResult(.success(hasMainnetAccounts)):
+		case .commitEphemeralResult(.success):
 			return sendDelegateCompleted(
 				state: state,
-				accountRecoveryIsNeeded: false,
-				hasMainnetAccounts: hasMainnetAccounts
+				accountRecoveryIsNeeded: false
 			)
 
 		case let .commitEphemeralResult(.failure(error)):
@@ -72,21 +67,20 @@ public struct OnboardingCoordinator: Sendable, FeatureReducer {
 		case .startup(.delegate(.setupNewUser)):
 			state.root = .createAccountCoordinator(
 				.init(
-					config: .init(purpose: .firstAccountForNewProfile(mainnetIsLive: state.hasMainnetEverBeenLive))
+					config: .init(purpose: .firstAccountForNewProfile)
 				)
 			)
 			return .none
 
-		case let .startup(.delegate(.completed(accountRecoveryIsNeeded, hasMainnetAccounts))):
+		case let .startup(.delegate(.completed(accountRecoveryIsNeeded))):
 			return sendDelegateCompleted(
 				state: state,
-				accountRecoveryIsNeeded: accountRecoveryIsNeeded,
-				hasMainnetAccounts: hasMainnetAccounts
+				accountRecoveryIsNeeded: accountRecoveryIsNeeded
 			)
 
 		case .createAccountCoordinator(.delegate(.completed)):
 			return .run { send in
-				let result = await TaskResult<HasMainnetAccounts> {
+				let result = await TaskResult<Prelude.Unit> {
 					try await onboardingClient.commitEphemeral()
 				}
 				await send(.internal(.commitEphemeralResult(result)))
@@ -99,15 +93,10 @@ public struct OnboardingCoordinator: Sendable, FeatureReducer {
 
 	private func sendDelegateCompleted(
 		state: State,
-		accountRecoveryIsNeeded: Bool,
-		hasMainnetAccounts: Bool
+		accountRecoveryIsNeeded: Bool
 	) -> Effect<Action> {
 		.send(.delegate(.completed(
-			accountRecoveryIsNeeded: accountRecoveryIsNeeded,
-			hasMainnetAccounts: hasMainnetAccounts,
-			isMainnetLive: state.hasMainnetEverBeenLive
+			accountRecoveryIsNeeded: accountRecoveryIsNeeded
 		)))
 	}
 }
-
-public typealias HasMainnetAccounts = Bool

@@ -96,6 +96,7 @@ public enum AssetResource {
   public static let authorizedDapps = ImageAsset(name: "authorized-dapps")
   public static let backups = ImageAsset(name: "backups")
   public static let browsers = ImageAsset(name: "browsers")
+  public static let connectorBrowsersIcon = ImageAsset(name: "connector-browsers-icon")
   public static let delete = ImageAsset(name: "delete")
   public static let depositGuarantees = ImageAsset(name: "depositGuarantees")
   public static let desktopConnections = ImageAsset(name: "desktop-connections")

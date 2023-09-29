@@ -130,7 +130,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		case failed(TransactionFailure)
 		case signedTXAndSubmittedToGateway(TXID)
 		case transactionCompleted(TXID)
-		case userDismissedTransactionStatus
+		case dismiss
 	}
 
 	public struct Destinations: Sendable, Reducer {
@@ -260,8 +260,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 					case .normal:
 						return 0
 					case let .advanced(customization):
-						let converted = UInt16(truncatingIfNeeded: customization.tipPercentage.integerValue)
-						return converted
+						return customization.tipPercentage
 					}
 				}()
 
@@ -337,7 +336,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 				return resetToApprovable(&state)
 			} else if case .submitting = state.destination {
 				// This is used when tapping outside the Submitting sheet, no need to set destination to nil
-				return delayedEffect(for: .delegate(.userDismissedTransactionStatus))
+				return delayedEffect(for: .delegate(.dismiss))
 			}
 
 			return .none
@@ -391,16 +390,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			return .send(.delegate(.signedTXAndSubmittedToGateway(txID)))
 
 		case .submitting(.delegate(.failedToSubmit)):
-			loggerGlobal.error("Failed to submit tx")
-			return resetToApprovable(&state)
-
-		case .submitting(.delegate(.failedToReceiveStatusUpdate)):
-			loggerGlobal.error("Failed to receive status update")
-			return .none
-
-		case .submitting(.delegate(.submittedTransactionFailed)):
-			loggerGlobal.error("Submitted TX failed")
-			return resetToApprovable(&state).concatenate(with: .send(.delegate(.failed(.failedToSubmit))))
+			return .send(.delegate(.failed(.failedToSubmit)))
 
 		case let .submitting(.delegate(.committedSuccessfully(txID))):
 			state.destination = nil
@@ -409,7 +399,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		case .submitting(.delegate(.manuallyDismiss)):
 			// This is used when the close button is pressed, we have to manually
 			state.destination = nil
-			return delayedEffect(for: .delegate(.userDismissedTransactionStatus))
+			return delayedEffect(for: .delegate(.dismiss))
 
 		case .submitting:
 			return .none
@@ -580,9 +570,10 @@ extension TransactionReview {
 		/// Will be increased with each added guarantee to account for the difference in indexes from the initial manifest.
 		var indexInc = 1 // LockFee was added, start from 1
 		for guarantee in guarantees {
+			let decimalplaces = guarantee.resourceDivisibility.map(UInt.init) ?? RETDecimal.maxDivisibility
 			let guaranteeInstruction: Instruction = try .assertWorktopContains(
 				resourceAddress: guarantee.resourceAddress.intoEngine(),
-				amount: .init(value: guarantee.amount.toString())
+				amount: guarantee.amount.rounded(decimalPlaces: decimalplaces)
 			)
 
 			manifest = try manifest.withInstructionAdded(guaranteeInstruction, at: Int(guarantee.instructionIndex) + indexInc)
@@ -624,8 +615,13 @@ extension TransactionReview {
 		}
 	}
 
-	func resetToApprovable(_ state: inout State) -> Effect<Action> {
-		state.destination = nil
+	func resetToApprovable(
+		_ state: inout State,
+		shouldNilDestination: Bool = true
+	) -> Effect<Action> {
+		if shouldNilDestination {
+			state.destination = nil
+		}
 		state.canApproveTX = true
 		state.resetSlider()
 		return .none
@@ -788,7 +784,7 @@ extension TransactionReview {
 		createdEntities: [EngineToolkit.Address],
 		networkID: NetworkID,
 		type: TransferType,
-		defaultDepositGuarantee: BigDecimal = 1
+		defaultDepositGuarantee: RETDecimal = 1
 	) async throws -> [Transfer] {
 		let resourceAddress: ResourceAddress = try resourceQuantifier.resourceAddress.asSpecific()
 
@@ -841,7 +837,7 @@ extension TransactionReview {
 
 		switch resourceQuantifier {
 		case let .fungible(_, source):
-			let amount = try BigDecimal(fromString: source.amount.asStr())
+			let amount = source.amount
 
 			switch try await resourceInfo() {
 			case let .left(resource):
@@ -1035,7 +1031,7 @@ extension TransactionReview {
 		public let id = Transfer.ID()
 		public let fungibleResource: OnLedgerEntity.Resource
 		public let isXRD: Bool
-		public let amount: BigDecimal
+		public let amount: RETDecimal
 		public var guarantee: TransactionClient.Guarantee?
 	}
 
@@ -1058,7 +1054,7 @@ extension TransactionReview {
 
 			public struct Fungible: Sendable, Hashable {
 				public let isXRD: Bool
-				public let amount: BigDecimal
+				public let amount: RETDecimal
 				public var guarantee: TransactionClient.Guarantee?
 			}
 
@@ -1193,15 +1189,12 @@ extension ReviewedTransaction {
 
 			let xrdAddress = knownAddresses(networkId: networkId.rawValue).resourceAddresses.xrd
 
-			let totalXRDWithdraw = feePayerWithdraws.reduce(EngineKit.Decimal.zero()) { partialResult, resource in
+			let xrdTotalTransfer: RETDecimal = feePayerWithdraws.reduce(.zero) { partialResult, resource in
 				if case let .fungible(resourceAddress, source) = resource, resourceAddress == xrdAddress {
 					return (try? partialResult.add(other: source.amount)) ?? partialResult
 				}
 				return partialResult
 			}
-
-			// Convert from EngineKit decimal
-			let xrdTotalTransfer = (try? BigDecimal(fromString: totalXRDWithdraw.asStr())) ?? .zero
 
 			let total = xrdTotalTransfer + feePayerSelection.transactionFee.totalFee.lockFee
 

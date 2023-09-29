@@ -5,8 +5,8 @@ public struct LSUDetails: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		let validator: AccountPortfolio.PoolUnitResources.RadixNetworkStake.Validator
 		let stakeUnitResource: OnLedgerEntity.Resource
-		let stakeAmount: BigDecimal
-		let xrdRedemptionValue: BigDecimal
+		let stakeAmount: RETDecimal
+		let xrdRedemptionValue: RETDecimal
 	}
 
 	@Dependency(\.dismiss) var dismiss

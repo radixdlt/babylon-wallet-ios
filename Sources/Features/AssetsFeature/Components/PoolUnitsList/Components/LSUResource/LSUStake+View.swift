@@ -165,7 +165,7 @@ extension LSUStake.State {
 			.init(
 				thumbnail: .xrd,
 				symbol: Constants.xrdTokenName,
-				tokenAmount: xrdRedemptionValue.format(),
+				tokenAmount: xrdRedemptionValue.formatted(),
 				isSelected: isStakeSelected
 			),
 
@@ -183,8 +183,33 @@ extension LSUStake.State {
 							id: token.id,
 							thumbnail: .xrd,
 							status: status,
-							tokenAmount: (token.data.claimAmount ?? 0).format(),
+							tokenAmount: (token.data.claimAmount ?? 0).formatted(),
 							isSelected: nil // self.selectedStakeClaimAssets?.contains(token.id)
+							//=======
+//			liquidStakeUnit: stake.xrdRedemptionValue
+//				.map {
+//					.init(
+//						thumbnail: .xrd,
+//						symbol: Constants.xrdTokenName,
+//						tokenAmount: $0.formatted(),
+//						isSelected: isStakeSelected
+//					)
+//				},
+//			stakeClaimNFTs: .init(
+//				rawValue: stake.stakeClaimResource
+//					.map { claimNFT in
+//						.init(
+//							uncheckedUniqueElements: claimNFT.tokens
+//								.map { token in
+//									LSUStake.ViewState.StakeClaimNFTViewState(
+//										id: token.id,
+//										thumbnail: .xrd,
+//										status: token.canBeClaimed ? .readyToClaim : .unstaking,
+//										tokenAmount: (token.stakeClaimAmount ?? 0).formatted(),
+//										isSelected: self.selectedStakeClaimAssets?.contains(token.id)
+//									)
+//								}
+							// >>>>>>> main
 						)
 					}))
 		)

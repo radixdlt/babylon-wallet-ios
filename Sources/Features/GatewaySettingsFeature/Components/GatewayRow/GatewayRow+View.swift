@@ -1,13 +1,25 @@
 import FeaturePrelude
 
+extension Radix.Gateway {
+	var displayName: String {
+		if isWellknown {
+			if network == .mainnet {
+				return "Mainnet Gateway"
+			} else if network == .stokenet {
+				return "Stokenet (testnet) Gateway"
+			} else {
+				return network.displayDescription
+			}
+		} else {
+			return url.absoluteString
+		}
+	}
+}
+
 extension GatewayRow.State {
 	var viewState: GatewayRow.ViewState {
-		let name = gateway.isDefault ?
-			L10n.Gateways.rcNetGateway :
-			gateway.url.absoluteString
-
-		return .init(
-			name: name,
+		.init(
+			name: gateway.displayName,
 			description: gateway.network.displayDescription,
 			isSelected: isSelected,
 			canBeDeleted: canBeDeleted

@@ -19,10 +19,6 @@ public struct AccountSecurity: Sendable, FeatureReducer {
 
 		public var canImportOlympiaWallet = false
 
-		#if DEBUG
-		public var nonMainnetNetwork: Radix.Network?
-		#endif
-
 		public static let importOlympia = Self(destination: .importOlympiaWallet(.init()))
 
 		public init(destination: Destinations.State? = nil) {
@@ -43,7 +39,7 @@ public struct AccountSecurity: Sendable, FeatureReducer {
 
 	public enum InternalAction: Sendable, Equatable {
 		case loadPreferences(AppPreferences)
-		case loadedCurrentNetworkID(NetworkID, isDeveloperModeEnabled: Bool)
+		case canImportOlympiaAccountResult(Bool)
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -86,6 +82,7 @@ public struct AccountSecurity: Sendable, FeatureReducer {
 	@Dependency(\.appPreferencesClient) var appPreferencesClient
 	@Dependency(\.dismiss) var dismiss
 	@Dependency(\.factorSourcesClient) var factorSourcesClient
+	@Dependency(\.importLegacyWalletClient) var importLegacyWalletClient
 
 	public var body: some ReducerOf<Self> {
 		Reduce(core)
@@ -98,16 +95,18 @@ public struct AccountSecurity: Sendable, FeatureReducer {
 		switch viewAction {
 		case .appeared:
 			return .run { send in
+
 				let preferences = await appPreferencesClient.getPreferences()
 				await send(.internal(.loadPreferences(preferences)))
 
 				let currentNetworkID = await factorSourcesClient.getCurrentNetworkID()
+
+				// we only allow import of olympia accounts into mainnet
+				let canImportOlympiaAccount = currentNetworkID == .mainnet
+
 				await send(.internal(
-					.loadedCurrentNetworkID(
-						currentNetworkID,
-						isDeveloperModeEnabled: preferences.security.isDeveloperModeEnabled
-					))
-				)
+					.canImportOlympiaAccountResult(canImportOlympiaAccount)
+				))
 			}
 
 		case .mnemonicsButtonTapped:
@@ -134,21 +133,8 @@ public struct AccountSecurity: Sendable, FeatureReducer {
 		case let .loadPreferences(preferences):
 			state.preferences = preferences
 			return .none
-		case let .loadedCurrentNetworkID(currentNetworkID, isDeveloperModeEnabled):
-
-			#if DEBUG
-			if
-				currentNetworkID != .mainnet,
-				let nonMainnetNetwork = try? Radix.Network.lookupBy(id: currentNetworkID)
-			{
-				state.nonMainnetNetwork = nonMainnetNetwork
-			}
-			#endif
-
-			state.canImportOlympiaWallet = ImportLegacyWalletClient.canImportOlympiaWallet(
-				currentNetworkID: currentNetworkID,
-				isDeveloperModeEnabled: isDeveloperModeEnabled
-			)
+		case let .canImportOlympiaAccountResult(canImportOlympiaWallet):
+			state.canImportOlympiaWallet = canImportOlympiaWallet
 			return .none
 		}
 	}

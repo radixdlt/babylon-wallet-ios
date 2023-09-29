@@ -265,7 +265,7 @@ extension AccountPortfoliosClient {
 }
 
 extension GatewayAPI.FungibleResourcesCollectionItemVaultAggregated {
-	var amount: BigDecimal {
+	var amount: RETDecimal {
 		// Resources of an account always have one single vault which stores the value.
 		guard let resourceVault = vaults.items.first else {
 			loggerGlobal.warning("Account Portfolio: \(resourceAddress) does not have any vaults")
@@ -273,7 +273,7 @@ extension GatewayAPI.FungibleResourcesCollectionItemVaultAggregated {
 		}
 
 		do {
-			return try BigDecimal(fromString: resourceVault.amount)
+			return try .init(value: resourceVault.amount)
 		} catch {
 			loggerGlobal.error(
 				"Account Portfolio: Failed to parse amount for resource: \(resourceAddress), reason: \(error.localizedDescription)"
@@ -382,7 +382,7 @@ extension AccountPortfoliosClient {
 			// Create validator with the information from the validator resource
 			let validator = try AccountPortfolio.PoolUnitResources.RadixNetworkStake.Validator(
 				address: validatorAddress,
-				xrdVaultBalance: .init(fromString: xrdStakeVaultBalance),
+				xrdVaultBalance: .init(value: xrdStakeVaultBalance),
 				metadata: .init(item.explicitMetadata)
 			)
 

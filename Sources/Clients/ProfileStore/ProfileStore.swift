@@ -137,7 +137,7 @@ extension ProfileStore {
 	public func getLoadProfileOutcome() async -> LoadProfileOutcome {
 		switch self.profileStateSubject.value {
 		case let .persisted(profile):
-			return .existingProfile(hasMainnetAccounts: profile.hasMainnetAccounts)
+			return .existingProfile
 		case let .ephemeral(ephemeral):
 			if let error = ephemeral.loadFailure {
 				return .usersExistingProfileCouldNotBeLoaded(failure: error)
@@ -184,11 +184,9 @@ extension ProfileStore {
 		}
 	}
 
-	/// Returns `true` iff Profile contains any mainnet accounts
-	public func commitEphemeral() async throws -> Bool {
+	public func commitEphemeral() async throws {
 		let ephemeral = try assertProfileStateIsEphemeral()
 		try await changeProfileSnapshot(to: ephemeral.profile.snapshot())
-		return ephemeral.profile.hasMainnetAccounts
 	}
 
 	/// If persisted: updates the in-memory across-the-app-used Profile and also
@@ -552,7 +550,7 @@ extension ProfileStore {
 				contentHint: .init() // Empty initially
 			)
 
-			loggerGlobal.debug("Created new ephemeral profile with ID: \(header.id), and device factorSourceID: \(factorSource.id)")
+			loggerGlobal.trace("Created new ephemeral profile with ID: \(header.id), and device factorSourceID: \(factorSource.id)")
 
 			return Profile(header: header, deviceFactorSource: factorSource)
 

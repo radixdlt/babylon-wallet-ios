@@ -83,10 +83,24 @@ extension PoolUnitResourceViewState {
 				assertionFailure("Not all resources were loaded")
 				return ""
 			}
+			guard let poolUnitTotalSupply = poolUnitResource.totalSupply else {
+				loggerGlobal.error("Missing total supply for \(resource.resourceAddress.address)")
+				return "Missing Total supply - could not calculate redemption value" // FIXME: Strings
+			}
+			let redemptionValue = poolUnit.poolUnitResource.amount * (resource.amount / poolUnitTotalSupply)
+			let decimalPlaces = resourceDetails.divisibility.map(UInt.init) ?? RETDecimal.maxDivisibility
+			let roundedRedemptionValue = redemptionValue.rounded(decimalPlaces: decimalPlaces)
 
-			let poolUnitTotalSupply = poolUnitResource.totalSupply ?? .one
-			let unroundedRedemptionValue = poolUnit.poolUnitResource.amount * resource.amount / poolUnitTotalSupply
-			return unroundedRedemptionValue.format(divisibility: resourceDetails.divisibility)
+			return roundedRedemptionValue.formatted()
+
+//			guard let resourceDetails = poolResources.first(where: { $0.id == resource.id }) else {
+//				assertionFailure("Not all resources were loaded")
+//				return ""
+//			}
+//
+//			let poolUnitTotalSupply = poolUnitResource.totalSupply ?? 1
+//			let unroundedRedemptionValue = poolUnit.poolUnitResource.amount * resource.amount / poolUnitTotalSupply
+//			return unroundedRedemptionValue.format(divisibility: resourceDetails.divisibility)
 		}
 
 		let xrdResourceViewState = poolUnit.poolResources.xrdResource.map {

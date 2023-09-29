@@ -3,6 +3,12 @@ import FeaturePrelude
 import HomeFeature
 import SettingsFeature
 
+extension Main.State {
+	public var showIsUsingTestnetBanner: Bool {
+		!isOnMainnet
+	}
+}
+
 // MARK: - Main.View
 extension Main {
 	@MainActor
@@ -14,6 +20,7 @@ extension Main {
 		}
 
 		public var body: some SwiftUI.View {
+			let bannerStore = store.scope(state: \.showIsUsingTestnetBanner, action: actionless)
 			NavigationStack {
 				Home.View(
 					store: store.scope(
@@ -33,6 +40,10 @@ extension Main {
 				)
 				#endif
 			}
+			.task { @MainActor in
+				await store.send(.view(.task)).finish()
+			}
+			.showDeveloperDisclaimerBanner(bannerStore)
 			.presentsDappInteractions()
 		}
 	}

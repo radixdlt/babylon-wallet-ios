@@ -38,7 +38,7 @@ public struct Splash: Sendable, FeatureReducer {
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
-		case completed(LoadProfileOutcome, accountRecoveryNeeded: Bool, hasMainnetEverBeenLive: Bool)
+		case completed(LoadProfileOutcome, accountRecoveryNeeded: Bool)
 	}
 
 	@Dependency(\.networkSwitchingClient) var networkSwitchingClient
@@ -63,9 +63,7 @@ public struct Splash: Sendable, FeatureReducer {
 
 		case .didTapToUnlock:
 			state.biometricsCheckFailed = false
-			return .run { send in
-				await send(.internal(.loadProfileOutcome(loadProfile())))
-			}
+			return verifyPasscode()
 
 		case let .passcodeCheckFailedAlert(.presented(action)):
 			switch action {
@@ -91,6 +89,7 @@ public struct Splash: Sendable, FeatureReducer {
 			let config = try? result.value
 
 			guard config?.isPasscodeSetUp == true else {
+				state.biometricsCheckFailed = true
 				state.passcodeCheckFailedAlert = .init(
 					title: { .init(L10n.Splash.PasscodeCheckFailedAlert.title) },
 					actions: {
@@ -121,8 +120,9 @@ public struct Splash: Sendable, FeatureReducer {
 			}
 			return delegateCompleted(loadProfileOutcome: outcome, accountRecoveryNeeded: false)
 
-		case .accountRecoveryNeeded(_, .failure):
+		case let .accountRecoveryNeeded(_, .failure(error)):
 			state.biometricsCheckFailed = true
+			errorQueue.schedule(error)
 			return .none
 
 		case let .accountRecoveryNeeded(outcome, .success(recoveryNeeded)):
@@ -131,16 +131,12 @@ public struct Splash: Sendable, FeatureReducer {
 	}
 
 	func delegateCompleted(loadProfileOutcome: LoadProfileOutcome, accountRecoveryNeeded: Bool) -> Effect<Action> {
-		.run { send in
-			let hasMainnetEverBeenLive = await networkSwitchingClient.hasMainnetEverBeenLive()
-			await send(.delegate(
-				.completed(
-					loadProfileOutcome,
-					accountRecoveryNeeded: accountRecoveryNeeded,
-					hasMainnetEverBeenLive: hasMainnetEverBeenLive
-				))
-			)
-		}
+		.send(.delegate(
+			.completed(
+				loadProfileOutcome,
+				accountRecoveryNeeded: accountRecoveryNeeded
+			))
+		)
 	}
 
 	func checkAccountRecoveryNeeded(_ loadProfileOutcome: LoadProfileOutcome) -> Effect<Action> {

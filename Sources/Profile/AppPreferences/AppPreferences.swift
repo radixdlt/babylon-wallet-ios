@@ -31,7 +31,7 @@ public struct AppPreferences:
 		security: Security = .default,
 		display: Display = .default,
 		p2pLinks: P2PLinks = [],
-		gateways: Gateways = .init(current: .default)
+		gateways: Gateways = .preset
 	) {
 		self.transaction = transaction
 		self.security = security

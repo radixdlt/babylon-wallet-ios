@@ -8,13 +8,10 @@ public struct AssetTransfer: Sendable, FeatureReducer {
 		public var accounts: TransferAccountList.State
 		public var message: AssetTransferMessage.State?
 		public let isMainnetAccount: Bool
-		public var hasMainnetEverBeenLive: Bool = false
 
 		public init(
-			from account: Profile.Network.Account,
-			hasMainnetEverBeenLive: Bool
+			from account: Profile.Network.Account
 		) {
-			self.hasMainnetEverBeenLive = hasMainnetEverBeenLive
 			self.isMainnetAccount = account.networkID == .mainnet
 			self.accounts = .init(fromAccount: account)
 			self.message = nil
@@ -136,7 +133,7 @@ extension AssetTransfer.State {
 extension AssetTransfer {
 	private struct InvolvedFungibleResource: Identifiable {
 		struct PerAccountAmount: Identifiable {
-			var amount: BigDecimal
+			var amount: RETDecimal
 			let recipient: ReceivingAccount.State.Account
 			typealias ID = AccountAddress
 			var id: ID {
@@ -149,7 +146,7 @@ extension AssetTransfer {
 		}
 
 		let address: ResourceAddress
-		let totalTransferAmount: BigDecimal
+		let totalTransferAmount: RETDecimal
 		let divisibility: Int?
 		var accounts: IdentifiedArrayOf<PerAccountAmount>
 	}
@@ -189,17 +186,18 @@ extension AssetTransfer {
 
 		return try ManifestBuilder.make {
 			for resource in involvedFungibleResources {
+				let divisibility = resource.divisibility.map(UInt.init) ?? RETDecimal.maxDivisibility
 				try ManifestBuilder.withdrawAmount(
 					accounts.fromAccount.address.intoEngine(),
 					resource.address.intoEngine(),
-					resource.totalTransferAmount.asDecimal(withDivisibility: resource.divisibility)
+					resource.totalTransferAmount.rounded(decimalPlaces: divisibility)
 				)
 
 				for account in resource.accounts {
 					let bucket = ManifestBuilderBucket.unique
 					try ManifestBuilder.takeFromWorktop(
 						resource.address.intoEngine(),
-						account.amount.asDecimal(withDivisibility: resource.divisibility),
+						account.amount.rounded(decimalPlaces: divisibility),
 						bucket
 					)
 
@@ -244,9 +242,11 @@ func instructionForDepositing(
 ) throws -> ManifestBuilder.InstructionsChain.Instruction {
 	@Dependency(\.userDefaultsClient) var userDefaultsClient
 	let isUserAccount = receivingAccount.isUserAccount
-	let isSoftwareAccount = !receivingAccount.isLedgerAccount
+	// TODO: Temporary revert of checking if the receiving account is a ledger account
+	let isSoftwareAccount = true // !receivingAccount.isLedgerAccount
 	let recipientAddress = receivingAccount.address
 	let userHasAccessToMnemonic = !userDefaultsClient.getAddressesOfAccountsThatNeedRecovery().contains(recipientAddress)
+
 	guard isUserAccount, isSoftwareAccount, userHasAccessToMnemonic else {
 		return try ManifestBuilder.accountTryDepositOrAbort(
 			recipientAddress.intoEngine(),

@@ -25,10 +25,10 @@ extension AsyncSequence {
 
 extension AsyncSequence {
 	func logInfo(
-		_ message: String
+		prefix: String
 	) -> AnyAsyncSequence<Element> where Element: Sendable, Self: Sendable {
 		handleEvents(onElement: { element in
-			loggerGlobal.info(.init(stringLiteral: String(format: message, "\(dump(element))")))
+			loggerGlobal.info("\(prefix) \(String(describing: element))")
 		}).eraseToAnyAsyncSequence()
 	}
 }

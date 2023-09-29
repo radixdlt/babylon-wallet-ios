@@ -19,15 +19,6 @@
       }
     },
     {
-      "identity" : "bigdecimal",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/Zollerboy1/BigDecimal.git",
-      "state" : {
-        "revision" : "04d17040e4615fbfda3a882b9881f6841f4bf557",
-        "version" : "1.0.2"
-      }
-    },
-    {
       "identity" : "bigint",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/attaswift/BigInt",
@@ -239,8 +230,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/radixdlt/swift-engine-toolkit",
       "state" : {
-        "revision" : "4ded56afc8a8a55ffeadbdce16dbb5789ab4d664",
-        "version" : "0.12.1-293dd4c"
+        "branch" : "add_final_classes",
+        "revision" : "7a26ed178eaf0cb842276e1b6aa8d7a4b614713c"
       }
     },
     {

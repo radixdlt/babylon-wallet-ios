@@ -55,9 +55,7 @@ public struct SubmitTransaction: Sendable, FeatureReducer {
 
 	public enum DelegateAction: Sendable, Equatable {
 		case failedToSubmit
-		case failedToReceiveStatusUpdate
 		case submittedButNotCompleted(TXID)
-		case submittedTransactionFailed
 		case committedSuccessfully(TXID)
 		case manuallyDismiss
 	}
@@ -88,12 +86,17 @@ public struct SubmitTransaction: Sendable, FeatureReducer {
 		case .closeButtonTapped:
 			if state.status.isInProgress {
 				if state.inProgressDismissalDisabled {
-					state.dismissTransactionAlert = .init(title: .init("Dismiss"), message: .init("This transaction requires to be completed"))
+					state.dismissTransactionAlert = .init(
+						title: .init("Dismiss"), // FIXME: Strings
+						message: .init("This transaction requires to be completed") // FIXME: Strings
+					)
 				} else {
-					state.dismissTransactionAlert = .init(title: .init(""),
-					                                      message: TextState(L10n.Transaction.Status.Dismiss.Dialog.message),
-					                                      primaryButton: .destructive(.init(L10n.Common.confirm), action: .send(.confirm)),
-					                                      secondaryButton: .cancel(.init(L10n.Common.cancel), action: .send(.cancel)))
+					state.dismissTransactionAlert = .init(
+						title: .init(""),
+						message: TextState(L10n.Transaction.Status.Dismiss.Dialog.message),
+						primaryButton: .destructive(.init(L10n.Common.confirm), action: .send(.confirm)),
+						secondaryButton: .cancel(.init(L10n.Common.cancel), action: .send(.cancel))
+					)
 				}
 				return .none
 			}
@@ -115,10 +118,12 @@ public struct SubmitTransaction: Sendable, FeatureReducer {
 			errorQueue.schedule(error)
 			loggerGlobal.error("Failed to submit TX, error \(error)")
 			return .send(.delegate(.failedToSubmit))
+
 		case let .submitTXResult(.success(txID)):
 			state.status = .submitting
+			let pollStrategy = PollStrategy.default
 			return .run { send in
-				for try await update in try await submitTXClient.transactionStatusUpdates(txID, PollStrategy.default) {
+				for try await update in try await submitTXClient.transactionStatusUpdates(txID, pollStrategy) {
 					guard update.txID == txID else {
 						loggerGlobal.warning("Received update for wrong txID, incorrect impl of `submitTXClient`?")
 						continue
@@ -127,7 +132,7 @@ public struct SubmitTransaction: Sendable, FeatureReducer {
 				}
 			} catch: { error, send in
 				loggerGlobal.error("Failed to receive TX status update, error \(error)")
-				await send(.internal(.statusUpdate(.failure(.failedToGetTransactionStatus(txID: txID, error: .init(pollAttempts: 0))))))
+				await send(.internal(.statusUpdate(.failure(.failedToGetTransactionStatus(txID: txID, error: .init(pollAttempts: pollStrategy.maxPollTries))))))
 			}
 
 		case let .statusUpdate(update):
@@ -137,8 +142,6 @@ public struct SubmitTransaction: Sendable, FeatureReducer {
 				state.status = stateStatus
 				if stateStatus.isCompletedSuccessfully {
 					return .send(.delegate(.committedSuccessfully(state.notarizedTX.txID)))
-				} else if stateStatus.isCompletedWithFailure {
-					return .send(.delegate(.submittedTransactionFailed))
 				} else if stateStatus.isSubmitted {
 					if !state.hasDelegatedThatTXHasBeenSubmitted {
 						defer { state.hasDelegatedThatTXHasBeenSubmitted = true }

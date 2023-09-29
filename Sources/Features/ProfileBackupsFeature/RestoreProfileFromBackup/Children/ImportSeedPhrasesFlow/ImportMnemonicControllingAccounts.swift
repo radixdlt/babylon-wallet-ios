@@ -86,7 +86,6 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 
 		case .skip:
 			precondition(state.entitiesControlledByFactorSource.isSkippable)
-			loggerGlobal.feature("TODO skip me")
 			return .run { [accountsNeedingRecover = state.entitiesControlledByFactorSource.accounts, factorSourceID = state.entitiesControlledByFactorSource.factorSourceID] send in
 				do {
 					try await userDefaultsClient.addAccountsThatNeedRecovery(

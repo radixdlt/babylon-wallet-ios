@@ -48,13 +48,13 @@ extension AccountPortfolio {
 
 		public let resourceAddress: ResourceAddress
 		public let atLedgerState: AtLedgerState
-		public let amount: BigDecimal
+		public let amount: RETDecimal
 		public let metadata: ResourceMetadata
 
 		public init(
 			resourceAddress: ResourceAddress,
 			atLedgerState: AtLedgerState,
-			amount: BigDecimal,
+			amount: RETDecimal,
 			metadata: ResourceMetadata
 		) {
 			self.resourceAddress = resourceAddress
@@ -114,17 +114,29 @@ extension AccountPortfolio.PoolUnitResources {
 			self.poolUnitResource = poolUnitResource
 			self.poolResources = poolResources
 		}
+
+//		public func redemptionValue(for resource: AccountPortfolio.FungibleResource) -> String {
+//			guard let poolUnitTotalSupply = poolUnitResource.resource.totalSupply else {
+//				loggerGlobal.error("Missing total supply for \(resource.resourceAddress.address)")
+//				return "Missing Total supply - could not calculate redemption value" // FIXME: Strings
+//			}
+//			let redemptionValue = poolUnitResource.amount * (resource.amount / poolUnitTotalSupply)
+//			let decimalPlaces = resource.resource.divisibility.map(UInt.init) ?? RETDecimal.maxDivisibility
+//			let roundedRedemptionValue = redemptionValue.rounded(decimalPlaces: decimalPlaces)
+//
+//			return roundedRedemptionValue.formatted()
+//		}
 	}
 
 	public struct RadixNetworkStake: Sendable, Hashable, Codable {
 		public struct Validator: Sendable, Hashable, Codable {
 			public let address: ValidatorAddress
-			public let xrdVaultBalance: BigDecimal
+			public let xrdVaultBalance: RETDecimal
 			public let metadata: ResourceMetadata
 
 			public init(
 				address: ValidatorAddress,
-				xrdVaultBalance: BigDecimal,
+				xrdVaultBalance: RETDecimal,
 				metadata: ResourceMetadata
 			) {
 				self.address = address
@@ -136,6 +148,13 @@ extension AccountPortfolio.PoolUnitResources {
 		public let validator: Validator
 		public let stakeUnitResource: AccountPortfolio.FungibleResource?
 		public let stakeClaimResource: AccountPortfolio.NonFungibleResource?
+
+//		public var xrdRedemptionValue: RETDecimal? {
+//			guard let stakeUnitResource, let totalSupply = stakeUnitResource.resource.totalSupply else {
+//				return nil
+//			}
+//			return validator.xrdVaultBalance * (stakeUnitResource.amount / totalSupply)
+//		}
 
 		public init(validator: Validator, stakeUnitResource: AccountPortfolio.FungibleResource?, stakeClaimResource: AccountPortfolio.NonFungibleResource?) {
 			self.validator = validator
@@ -196,33 +215,5 @@ extension AccountPortfolio.FungibleResource {
 extension AccountPortfolio.NonFungibleResource {
 	public var nonEmpty: Self? {
 		nonFungibleIds.isEmpty ? nil : self
-	}
-}
-
-extension AccountPortfolio.NonFungibleResource {
-	enum CodingKeys: CodingKey {
-		case resourceAddress
-		case atLedgerState
-		case tokens
-		case metadata
-	}
-
-	public init(from decoder: Decoder) throws {
-		let container = try decoder.container(keyedBy: CodingKeys.self)
-		try self.init(
-			resourceAddress: container.decode(ResourceAddress.self, forKey: .resourceAddress),
-			atLedgerState: container.decode(AtLedgerState.self, forKey: .atLedgerState),
-			nonFungibleIds: container.decode([String].self, forKey: .tokens).map(NonFungibleGlobalId.init(nonFungibleGlobalId:)),
-			metadata: container.decode(ResourceMetadata.self, forKey: .metadata)
-		)
-	}
-
-	public func encode(to encoder: Encoder) throws {
-		var container = encoder.container(keyedBy: CodingKeys.self)
-
-		try container.encode(resourceAddress, forKey: .resourceAddress)
-		try container.encode(atLedgerState, forKey: .atLedgerState)
-		try container.encode(nonFungibleIds.map { $0.asStr() }, forKey: .tokens)
-		try container.encode(metadata, forKey: .metadata)
 	}
 }

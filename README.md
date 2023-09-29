@@ -198,3 +198,8 @@ Application version is specified in [Common.xcconfig](App/Config/Common.xcconfig
 [tca]: https://github.com/pointfreeco/swift-composable-architecture
 [isowords]: https://github.com/pointfreeco/isowords
 [snapshotTesting]: https://github.com/pointfreeco/swift-snapshot-testing
+
+
+# License
+
+The code for the iOS Radix Wallet is released under the [Apache 2.0 license](./LICENSE). Binaries are licensed under the [Radix Wallet Software EULA](https://www.radixdlt.com/terms/walletEULA).

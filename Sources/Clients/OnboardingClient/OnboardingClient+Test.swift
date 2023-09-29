@@ -17,6 +17,6 @@ extension OnboardingClient: TestDependencyKey {
 
 	public static let noop = Self(
 		loadProfile: { .newUser },
-		commitEphemeral: { false }
+		commitEphemeral: { Prelude.Unit.instance }
 	)
 }

@@ -12,7 +12,7 @@ extension DetailsContainerWithHeaderViewState {
 	init(resource: AccountPortfolio.FungibleResource) {
 		self.init(
 			title: resource.metadata.name ?? L10n.Account.PoolUnits.unknownPoolUnitName,
-			amount: resource.amount.format(),
+			amount: resource.amount.formatted(),
 			symbol: resource.metadata.symbol
 		)
 	}
