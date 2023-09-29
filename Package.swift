@@ -882,7 +882,7 @@ package.addModules([
 			"URLFormatterClient",
 			"QRGeneratorClient",
 			.product(name: "NavigationTransitions", package: "swiftui-navigation-transitions", condition: .when(platforms: [.iOS])) {
-				.package(url: "https://github.com/davdroman/swiftui-navigation-transitions", from: "0.13.0")
+				.package(url: "https://github.com/davdroman/swiftui-navigation-transitions", from: "0.13.1")
 			},
 			.product(name: "NukeUI", package: "Nuke") {
 				.package(url: "https://github.com/kean/Nuke", from: "11.3.1")
