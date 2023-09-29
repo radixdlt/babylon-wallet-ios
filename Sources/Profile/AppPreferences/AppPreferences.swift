@@ -44,6 +44,12 @@ public struct AppPreferences:
 }
 
 extension AppPreferences {
+	public mutating func changeCurrentToMainnetIfNeeded() {
+		gateways.changeCurrentToMainnetIfNeeded()
+	}
+}
+
+extension AppPreferences {
 	public var customDumpMirror: Mirror {
 		.init(
 			self,

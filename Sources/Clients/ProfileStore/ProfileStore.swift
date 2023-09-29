@@ -245,6 +245,7 @@ extension ProfileStore {
 	// Changes the currently used ProfileSnapshot, usually to one from a backup or to one just created.
 	func changeProfileSnapshot(to profileSnapshot: ProfileSnapshot) async throws {
 		var profileSnapshot = profileSnapshot
+		profileSnapshot.changeCurrentToMainnetIfNeeded()
 		try await claimProfileSnapshot(&profileSnapshot)
 		updateHeader(&profileSnapshot)
 
