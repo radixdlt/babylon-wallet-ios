@@ -69,6 +69,11 @@ extension Gateways {
 		current = newCurrent
 	}
 
+	public mutating func changeCurrentToMainnetIfNeeded() {
+		if current == .mainnet { return }
+		try? changeCurrent(to: .mainnet)
+	}
+
 	/// Adds `newOther` to `other` (if indeed new).
 	fileprivate mutating func add(_ newOther: Radix.Gateway) {
 		other.append(newOther)
