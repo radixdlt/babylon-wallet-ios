@@ -8,6 +8,9 @@ The Radix Wallet can be downloaded from [the App Store][appStoreLink] (requires 
 
 [![Download Radix Wallet on the App Store](https://dbsqho33cgp4y.cloudfront.net/github/app-store-badge.png)][appStoreLink]
 
+### Get and use Radix Wallet guide
+Head over to [wallet.radixdlt.com for a guide][walletGuide] to download and get started with wallet.
+
 ### Screenshots
 
 <p float="middle">
@@ -21,9 +24,6 @@ The Radix Wallet can be downloaded from [the App Store][appStoreLink] (requires 
 Create and manage Accounts that hold any type of asset on Radix (including the platform's native `XRD` token) displayed beautifully so you understand what you own at a glance. Create Personas to easily login to Radix dApps with one click. The Radix Wallet always makes sure that you're in control, with easy-to-understand transactions and clear dApp permissions so there are no surprises.
 
 The Radix Wallet takes advantage of the advanced native features of the Radix Network. That means totally decentralized, non-custodial access to what you own; you always have direct access without any company in the middle.
-
-# Getting Started
-Head over to [wallet.radixdlt.com for a guide][walletGuide] to download and get started with wallet.
 
 # Contribute
 To get started contributing to the Radix Wallet iOS code base [head over to the development guide](./DEVELOPMENT.md)

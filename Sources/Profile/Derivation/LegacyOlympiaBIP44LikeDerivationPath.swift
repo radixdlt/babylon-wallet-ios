@@ -7,7 +7,7 @@ import Prelude
 /// since the last component must be hardened, [contrary to the BIP44 standard][bip44]. The
 /// path looks like this: `m/44'/1022'/2'/1/3'`
 ///
-/// It was a mistake by me (Alexander Cyon) when I wrote the Radix Olympia wallet, [see Typescript SDK][radixJS], to
+/// It was a mistake when the Radix Olympia wallet was written, [see Typescript SDK][radixJS], to
 /// harden the `address_index`.
 ///
 /// [cap26]: https://radixdlt.atlassian.net/l/cp/UNaBAGUC

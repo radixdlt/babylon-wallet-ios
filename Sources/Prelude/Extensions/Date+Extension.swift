@@ -1,7 +1,7 @@
 import Foundation
 
 extension Date {
-	/// Ugly hack around the fact that dates differs when encoded and decoded, by some nanoseconds or something... urgh!
+	/// FIXME: Date differs when encoded and decoded, by some nanoseconds or something.. cleanup
 	public var stableEquatableAfterJSONRoundtrip: Self {
 		let jsonEncoder = JSONEncoder()
 		jsonEncoder.dateEncodingStrategy = .iso8601
