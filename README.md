@@ -8,8 +8,8 @@ The Radix Wallet can be downloaded from [the App Store][appStoreLink] (requires 
 
 [![Download Radix Wallet on the App Store](https://dbsqho33cgp4y.cloudfront.net/github/app-store-badge.png)][appStoreLink]
 
-### Get and use Radix Wallet guide
-Head over to [wallet.radixdlt.com for a guide][walletGuide] to download and get started with wallet.
+### Getting Started
+Head over to [wallet.radixdlt.com][walletGuide] for guide on getting started using the Radix Wallet.
 
 ### Screenshots
 
@@ -29,7 +29,7 @@ The Radix Wallet takes advantage of the advanced native features of the Radix Ne
 To get started contributing to the Radix Wallet iOS code base [head over to the development guide](./DEVELOPMENT.md)
 
 # License
-The code for the iOS Radix Wallet is released under the [Apache 2.0 license](./LICENSE). Binaries are licensed under the [Radix Wallet Software EULA](https://www.radixdlt.com/terms/walletEULA).
+The code for the iOS Radix Wallet is released under the [Apache 2.0 license](./LICENSE.txt). Binaries are licensed under the [Radix Wallet Software EULA](https://www.radixdlt.com/terms/walletEULA).
 
 [dashboard]: https://dashboard.radixdlt.com
 [radixdlt]: https://radixdlt.com
