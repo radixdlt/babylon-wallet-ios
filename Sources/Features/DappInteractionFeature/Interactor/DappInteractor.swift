@@ -190,6 +190,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 			return presentQueuedRequestIfNeededEffect(for: &state)
 
 		case let .sentResponseToDapp(response, for: request, dappMetadata, txID):
+			loggerGlobal.critical("DappInteractor - reduce:internalAction - sentResponseToDapp")
 			dismissCurrentModalAndRequest(request, for: &state)
 			switch response {
 			case .success:
@@ -199,6 +200,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 			}
 
 		case let .failedToSendResponseToDapp(response, for: request, metadata, reason):
+			loggerGlobal.critical("DappInteractor - reduce:internalAction - failedToSendResponseToDapp")
 			dismissCurrentModalAndRequest(request, for: &state)
 			return .send(.internal(.presentResponseFailureAlert(response, for: request, metadata, reason: reason)))
 
@@ -289,12 +291,15 @@ struct DappInteractor: Sendable, FeatureReducer {
 	func presentQueuedRequestIfNeededEffect(
 		for state: inout State
 	) -> Effect<Action> {
+		loggerGlobal.critical("DappInteractor - presentQueuedRequestIfNeededEffect - START")
 		guard
 			let next = state.requestQueue.first,
 			state.currentModal == nil
 		else {
+			loggerGlobal.critical("DappInteractor - presentQueuedRequestIfNeededEffect - requestQueue EMPTY => return .none")
 			return .none
 		}
+		loggerGlobal.critical("DappInteractor - presentQueuedRequestIfNeededEffect - handling next request.id: \(next.request.id)")
 		state.currentModal = .dappInteraction(.relayed(next, with: .init(interaction: next.request)))
 
 		return .none
@@ -305,7 +310,8 @@ struct DappInteractor: Sendable, FeatureReducer {
 		for request: RequestEnvelope,
 		dappMetadata: DappMetadata
 	) -> Effect<Action> {
-		.run { send in
+		loggerGlobal.critical("DappInteractor - sendResponseToDappEffect - START")
+		return .run { send in
 
 			// In case of transaction response, sending it to the peer client is a silent operation.
 			// The success or failures is determined based on the transaction polling status.
@@ -321,6 +327,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 
 			do {
 				_ = try await dappInteractionClient.completeInteraction(.response(.dapp(responseToDapp), origin: request.route))
+				loggerGlobal.critical("DappInteractor - sendResponseToDappEffect - dappInteractionClient.completeInteraction(.response(.dapp DONE")
 				if !isTransactionResponse {
 					await send(.internal(
 						.sentResponseToDapp(
@@ -330,8 +337,11 @@ struct DappInteractor: Sendable, FeatureReducer {
 							txID
 						)
 					))
+				} else {
+					fatalError("BAD BLACKHOLE")
 				}
 			} catch {
+				loggerGlobal.critical("DappInteractor - sendResponseToDappEffect - dappInteractionClient.completeInteraction(.response(.dapp FAILED - error: \(error)")
 				if !isTransactionResponse {
 					await send(.internal(
 						.failedToSendResponseToDapp(
@@ -341,13 +351,17 @@ struct DappInteractor: Sendable, FeatureReducer {
 							reason: error.localizedDescription
 						)
 					))
+				} else {
+					fatalError("BAD BLACKHOLE")
 				}
 			}
 		}
 	}
 
 	func dismissCurrentModalAndRequest(_ request: RequestEnvelope, for state: inout State) {
+		loggerGlobal.critical("DappInteractor - dismissCurrentModalAndRequest - state.requestQueue.ids BEFORE REMOVE: \(state.requestQueue.map(\.id))")
 		state.requestQueue.remove(id: request.id)
+		loggerGlobal.critical("DappInteractor - dismissCurrentModalAndRequest - state.requestQueue.ids AFTER REMOVE: \(state.requestQueue.map(\.id))")
 		state.currentModal = nil
 	}
 }
