@@ -10,10 +10,18 @@ import ROLAClient
 
 typealias RequestEnvelope = DappInteractionClient.RequestEnvelope
 
+// MARK: Identifiable
+extension RequestEnvelope: Identifiable {
+	public typealias ID = P2P.Dapp.Request.ID
+	public var id: ID {
+		request.id
+	}
+}
+
 // MARK: - DappInteractor
 struct DappInteractor: Sendable, FeatureReducer {
 	struct State: Sendable, Hashable {
-		var requestQueue: OrderedSet<RequestEnvelope> = []
+		var requestQueue: IdentifiedArrayOf<RequestEnvelope> = []
 
 		@PresentationState
 		var currentModal: Destinations.State?
@@ -339,7 +347,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 	}
 
 	func dismissCurrentModalAndRequest(_ request: RequestEnvelope, for state: inout State) {
-		state.requestQueue.remove(request)
+		state.requestQueue.remove(id: request.id)
 		state.currentModal = nil
 	}
 }
