@@ -3,7 +3,7 @@ import EngineToolkit
 import TestingPrelude
 
 final class TransactionManifestTests: TestCase {
-	func test_eq() throws {
+	func test_equatable_and_hashable_small() throws {
 		func manifest(recipient: String) throws -> TransactionManifest {
 			let string = """
 			ALLOCATE_GLOBAL_ADDRESS
@@ -41,15 +41,25 @@ final class TransactionManifestTests: TestCase {
 			"""
 			return try TransactionManifest(instructions: .fromString(string: string, networkId: NetworkID.stokenet.rawValue), blobs: [])
 		}
-		let accountA = "account_tdx_2_12ygsf87pma439ezvdyervjfq2nhqme6reau6kcxf6jtaysaxl7sqvd"
-		let accountB = "account_tdx_2_12yymsmxapnaulngrepgdyzlaszflhcynchr2s95nkjfrsfuzq02s8m"
-		try XCTAssertEqual(manifest(recipient: accountA), manifest(recipient: accountA))
-		try XCTAssertEqual(manifest(recipient: accountB), manifest(recipient: accountB))
-		try XCTAssertNotEqual(manifest(recipient: accountA), manifest(recipient: accountB))
-		try XCTAssertNotEqual(manifest(recipient: accountB), manifest(recipient: accountA))
+
+		let manifestA = try manifest(
+			recipient: "account_tdx_2_12ygsf87pma439ezvdyervjfq2nhqme6reau6kcxf6jtaysaxl7sqvd"
+		)
+		let manifestB = try manifest(
+			recipient: "account_tdx_2_12yymsmxapnaulngrepgdyzlaszflhcynchr2s95nkjfrsfuzq02s8m"
+		)
+
+		XCTAssertEqual(manifestA, manifestA)
+		XCTAssertEqual(manifestB, manifestB)
+		XCTAssertNotEqual(manifestB, manifestA)
+
+		// Hashable testing
+		XCTAssertEqual(Set([manifestA, manifestB]).count, 2)
+		XCTAssertEqual(Set([manifestA, manifestA]).count, 1)
+		XCTAssertEqual(Set([manifestB, manifestB]).count, 1)
 	}
 
-	func test_eq_larger() throws {
+	func test_equatable_and_hashable_larger() throws {
 		func manifest(account: String) throws -> TransactionManifest {
 			let string = """
 			CALL_METHOD
@@ -140,12 +150,21 @@ final class TransactionManifestTests: TestCase {
 			"""
 			return try TransactionManifest(instructions: .fromString(string: string, networkId: NetworkID.mainnet.rawValue), blobs: [])
 		}
-		let accountA = "account_rdx1283u6e8r2jnz4a3jwv0hnrqfr5aq50yc9ts523sd96hzfjxqqcs89q"
-		let accountB = "account_rdx12x533g087dk8xtdrqh7m4tcpy4mrakyzqppydlzpvdh8axksxhy7fc"
 
-		try XCTAssertEqual(manifest(account: accountA), manifest(account: accountA))
-		try XCTAssertEqual(manifest(account: accountB), manifest(account: accountB))
-		try XCTAssertNotEqual(manifest(account: accountA), manifest(account: accountB))
-		try XCTAssertNotEqual(manifest(account: accountB), manifest(account: accountA))
+		let manifestA = try manifest(
+			account: "account_rdx1283u6e8r2jnz4a3jwv0hnrqfr5aq50yc9ts523sd96hzfjxqqcs89q"
+		)
+		let manifestB = try manifest(
+			account: "account_rdx12x533g087dk8xtdrqh7m4tcpy4mrakyzqppydlzpvdh8axksxhy7fc"
+		)
+
+		XCTAssertEqual(manifestA, manifestA)
+		XCTAssertEqual(manifestB, manifestB)
+		XCTAssertNotEqual(manifestB, manifestA)
+
+		// Hashable testing
+		XCTAssertEqual(Set([manifestA, manifestB]).count, 2)
+		XCTAssertEqual(Set([manifestA, manifestA]).count, 1)
+		XCTAssertEqual(Set([manifestB, manifestB]).count, 1)
 	}
 }
