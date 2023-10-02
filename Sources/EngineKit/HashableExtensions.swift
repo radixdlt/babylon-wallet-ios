@@ -52,7 +52,11 @@ extension Instructions: Hashable {
 // MARK: - Instruction + Hashable
 extension Instruction: Hashable {
 	public func hash(into hasher: inout Hasher) {
-		func mustNotHaveAssociatedValue(_: Instruction) {}
+		// A function call like dummy(.someCase) will stop compiling if an
+		// associated value is later added to the pop case
+		func dummy(_: Instruction) {
+			/* noop */
+		}
 
 		switch self {
 		case let .takeAllFromWorktop(resourceAddress):
@@ -84,11 +88,11 @@ extension Instruction: Hashable {
 			hasher.combine(ids)
 
 		case .popFromAuthZone:
-			mustNotHaveAssociatedValue(.popFromAuthZone)
+			dummy(.popFromAuthZone)
 			hasher.combine("popFromAuthZone")
 
 		case .dropAllProofs:
-			mustNotHaveAssociatedValue(.dropAllProofs)
+			dummy(.dropAllProofs)
 			hasher.combine("dropAllProofs")
 
 		case let .pushToAuthZone(proofId):
@@ -176,19 +180,19 @@ extension Instruction: Hashable {
 			hasher.combine(blueprintName)
 
 		case .dropNamedProofs:
-			mustNotHaveAssociatedValue(.dropNamedProofs)
+			dummy(.dropNamedProofs)
 			hasher.combine("dropNamedProofs")
 
 		case .dropAuthZoneProofs:
-			mustNotHaveAssociatedValue(.dropAuthZoneProofs)
+			dummy(.dropAuthZoneProofs)
 			hasher.combine("dropAuthZoneProofs")
 
 		case .dropAuthZoneRegularProofs:
-			mustNotHaveAssociatedValue(.dropAuthZoneRegularProofs)
+			dummy(.dropAuthZoneRegularProofs)
 			hasher.combine("dropAuthZoneRegularProofs")
 
 		case .dropAuthZoneSignatureProofs:
-			mustNotHaveAssociatedValue(.dropAuthZoneSignatureProofs)
+			dummy(.dropAuthZoneSignatureProofs)
 			hasher.combine("dropAuthZoneSignatureProofs")
 
 		case let .callRoleAssignmentMethod(address, methodName, args):
@@ -208,73 +212,104 @@ extension Instruction: Equatable {
 			break
 			// If switch does not compile, you MUST handle it below, in EQ impl.
 		}
-		func equal(mustNotHaveAssociatedValue _: Instruction) -> Bool {
-			true
+
+		// A function call like dummy(.someCase) will stop compiling if an
+		// associated value is later added to the pop case
+		func dummy(_: Instruction) {
+			/* noop */
 		}
+
 		switch (lhsOuter, rhsOuter) {
 		case let (.takeAllFromWorktop(lhs), .takeAllFromWorktop(rhs)):
 			return lhs == rhs
+
 		case let (.takeFromWorktop(lhsAddress, lhsAmount), .takeFromWorktop(rhsAddress, rhsAmount)):
 			return lhsAddress == rhsAddress && lhsAmount == rhsAmount
+
 		case let (.takeNonFungiblesFromWorktop(lhsAddress, lhsIds), .takeNonFungiblesFromWorktop(rhsAddress, rhsIds)):
 			return lhsAddress == rhsAddress && lhsIds == rhsIds
+
 		case let (.returnToWorktop(lhs), .returnToWorktop(rhs)):
 			return lhs == rhs
+
 		case let (.assertWorktopContains(lhsAddress, lhsAmount), .assertWorktopContains(rhsAddress, rhsAmount)):
 			return lhsAddress == rhsAddress && lhsAmount == rhsAmount
+
 		case let (.assertWorktopContainsNonFungibles(lhsAddress, lhsIds), .assertWorktopContainsNonFungibles(rhsAddress, rhsIds)):
 			return lhsAddress == rhsAddress && lhsIds == rhsIds
+
 		case (.popFromAuthZone, .popFromAuthZone):
-			return equal(mustNotHaveAssociatedValue: .popFromAuthZone)
+			dummy(.popFromAuthZone)
+			return true
 
 		case (.dropAuthZoneProofs, .dropAuthZoneProofs):
-			return equal(mustNotHaveAssociatedValue: .dropAuthZoneProofs)
+			dummy(.dropAuthZoneProofs)
+			return true
 
 		case (.dropAuthZoneRegularProofs, .dropAuthZoneRegularProofs):
-			return equal(mustNotHaveAssociatedValue: .dropAuthZoneRegularProofs)
+			dummy(.dropAuthZoneRegularProofs)
+			return true
 
 		case (.dropAuthZoneSignatureProofs, .dropAuthZoneSignatureProofs):
-			return equal(mustNotHaveAssociatedValue: .dropAuthZoneSignatureProofs)
+			dummy(.dropAuthZoneSignatureProofs)
+			return true
 
 		case (.dropAllProofs, .dropAllProofs):
-			return equal(mustNotHaveAssociatedValue: .dropAllProofs)
+			dummy(.dropAllProofs)
+			return true
 
 		case (.dropNamedProofs, .dropNamedProofs):
-			return equal(mustNotHaveAssociatedValue: .dropNamedProofs)
+			dummy(.dropNamedProofs)
+			return true
 
 		case let (.pushToAuthZone(lhs), .pushToAuthZone(rhs)):
 			return lhs == rhs
+
 		case let (.createProofFromAuthZoneOfAmount(lhsAddress, lhsAmount), .createProofFromAuthZoneOfAmount(rhsAddress, rhsAmount)):
 			return lhsAddress == rhsAddress && lhsAmount == rhsAmount
+
 		case let (.createProofFromAuthZoneOfNonFungibles(lhsAddress, lhsIds), .createProofFromAuthZoneOfNonFungibles(rhsAddress, rhsIds)):
 			return lhsAddress == rhsAddress && lhsIds == rhsIds
+
 		case let (.createProofFromAuthZoneOfAll(lhs), .createProofFromAuthZoneOfAll(rhs)):
 			return lhs == rhs
+
 		case let (.burnResource(lhs), .burnResource(rhs)):
 			return lhs == rhs
+
 		case let (.cloneProof(lhs), .cloneProof(rhs)):
 			return lhs == rhs
+
 		case let (.dropProof(lhs), .dropProof(rhs)):
 			return lhs == rhs
+
 		case let (.assertWorktopContainsAny(lhs), .assertWorktopContainsAny(rhs)):
 			return lhs == rhs
+
 		case let (.createProofFromBucketOfAmount(lhsBucketId, lhsAmount), .createProofFromBucketOfAmount(rhsBucketId, rhsAmount)):
 			return lhsBucketId == rhsBucketId && lhsAmount == rhsAmount
+
 		case let (.createProofFromBucketOfNonFungibles(lhsBucketId, lhsIds), .createProofFromBucketOfNonFungibles(rhsBucketId, rhsIds)):
 			return lhsBucketId == rhsBucketId && lhsIds == rhsIds
+
 		case let (.createProofFromBucketOfAll(lhs), .createProofFromBucketOfAll(rhs)):
 			return lhs == rhs
+
 		case let (.callFunction(lhsPackageAddress, lhsBlueprintName, lhsFunctionName, lhsArgs), .callFunction(rhsPackageAddress, rhsBlueprintName, rhsFunctionName, rhsArgs)):
 			return lhsPackageAddress == rhsPackageAddress && lhsBlueprintName == rhsBlueprintName && lhsFunctionName == rhsFunctionName && lhsArgs == rhsArgs
+
 		case let (.callMethod(lhsAddress, lhsMethodName, lhsArgs), .callMethod(rhsAddress, rhsMethodName, rhsArgs)),
 		     let (.callRoyaltyMethod(lhsAddress, lhsMethodName, lhsArgs), .callRoyaltyMethod(rhsAddress, rhsMethodName, rhsArgs)),
 		     let (.callMetadataMethod(lhsAddress, lhsMethodName, lhsArgs), .callMetadataMethod(rhsAddress, rhsMethodName, rhsArgs)),
 		     let (.callRoleAssignmentMethod(lhsAddress, lhsMethodName, lhsArgs), .callRoleAssignmentMethod(rhsAddress, rhsMethodName, rhsArgs)):
 			return lhsAddress == rhsAddress && lhsMethodName == rhsMethodName && lhsArgs == rhsArgs
+
 		case let (.allocateGlobalAddress(lhsPackageAddress, lhsbBlueprintName), .allocateGlobalAddress(rhsPackageAddress, rhsBlueprintName)):
 			return lhsPackageAddress == rhsPackageAddress && lhsbBlueprintName == rhsBlueprintName
+
 		case let (.callDirectVaultMethod(lhsAddress, lhsMethodName, lhsArgs), .callDirectVaultMethod(rhsAddress, rhsMethodName, rhsArgs)):
 			return lhsAddress == rhsAddress && lhsMethodName == rhsMethodName && lhsArgs == rhsArgs
+
 		default /* `switch lhsOuter` above ensures we have handled each `case` */:
 			return false
 		}
