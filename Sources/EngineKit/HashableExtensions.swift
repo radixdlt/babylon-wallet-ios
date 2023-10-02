@@ -52,13 +52,6 @@ extension Instructions: Hashable {
 // MARK: - Instruction + Hashable
 extension Instruction: Hashable {
 	public func hash(into hasher: inout Hasher) {
-		switch self {
-		case .takeAllFromWorktop, .takeFromWorktop, .takeNonFungiblesFromWorktop, .returnToWorktop, .assertWorktopContains, .assertWorktopContainsNonFungibles, .popFromAuthZone, .dropAllProofs, .pushToAuthZone, .createProofFromAuthZoneOfAmount, .createProofFromAuthZoneOfNonFungibles, .createProofFromAuthZoneOfAll, .createProofFromBucketOfAmount, .createProofFromBucketOfNonFungibles, .createProofFromBucketOfAll, .burnResource, .cloneProof, .dropProof, .callFunction, .callMethod,
-		     .callRoyaltyMethod, .callMetadataMethod, .assertWorktopContainsAny, .callDirectVaultMethod, .allocateGlobalAddress, .dropNamedProofs, .dropAuthZoneProofs, .dropAuthZoneRegularProofs, .dropAuthZoneSignatureProofs, .callRoleAssignmentMethod:
-			break
-			// If this switch does not compile anymore we have got new Instruction cases, MUST handle below, `combine` it into the hasher.
-		}
-
 		func mustNotHaveAssociatedValue(_: Instruction) {}
 
 		switch self {
@@ -215,7 +208,7 @@ extension Instruction: Equatable {
 			break
 			// If switch does not compile, you MUST handle it below, in EQ impl.
 		}
-		func `true`(mustNotHaveAssociatedValue _: Instruction) -> Bool {
+		func equal(mustNotHaveAssociatedValue _: Instruction) -> Bool {
 			true
 		}
 		switch (lhsOuter, rhsOuter) {
@@ -232,22 +225,22 @@ extension Instruction: Equatable {
 		case let (.assertWorktopContainsNonFungibles(lhsAddress, lhsIds), .assertWorktopContainsNonFungibles(rhsAddress, rhsIds)):
 			return lhsAddress == rhsAddress && lhsIds == rhsIds
 		case (.popFromAuthZone, .popFromAuthZone):
-			return `true`(mustNotHaveAssociatedValue: .popFromAuthZone)
+			return equal(mustNotHaveAssociatedValue: .popFromAuthZone)
 
 		case (.dropAuthZoneProofs, .dropAuthZoneProofs):
-			return `true`(mustNotHaveAssociatedValue: .dropAuthZoneProofs)
+			return equal(mustNotHaveAssociatedValue: .dropAuthZoneProofs)
 
 		case (.dropAuthZoneRegularProofs, .dropAuthZoneRegularProofs):
-			return `true`(mustNotHaveAssociatedValue: .dropAuthZoneRegularProofs)
+			return equal(mustNotHaveAssociatedValue: .dropAuthZoneRegularProofs)
 
 		case (.dropAuthZoneSignatureProofs, .dropAuthZoneSignatureProofs):
-			return `true`(mustNotHaveAssociatedValue: .dropAuthZoneSignatureProofs)
+			return equal(mustNotHaveAssociatedValue: .dropAuthZoneSignatureProofs)
 
 		case (.dropAllProofs, .dropAllProofs):
-			return `true`(mustNotHaveAssociatedValue: .dropAllProofs)
+			return equal(mustNotHaveAssociatedValue: .dropAllProofs)
 
 		case (.dropNamedProofs, .dropNamedProofs):
-			return `true`(mustNotHaveAssociatedValue: .dropNamedProofs)
+			return equal(mustNotHaveAssociatedValue: .dropNamedProofs)
 
 		case let (.pushToAuthZone(lhs), .pushToAuthZone(rhs)):
 			return lhs == rhs
@@ -354,12 +347,6 @@ extension ManifestValue: Hashable {
 	}
 
 	public func hash(into hasher: inout Hasher) {
-		switch self {
-		case .boolValue, .i8Value, .i16Value, .i32Value, .i64Value, .i128Value, .u8Value, .u16Value, .u32Value, .u64Value, .u128Value, .stringValue, .enumValue, .arrayValue, .tupleValue, .mapValue, .addressValue, .bucketValue, .proofValue, .expressionValue, .blobValue, .decimalValue, .preciseDecimalValue, .nonFungibleLocalIdValue, .addressReservationValue:
-			break
-			// If this switch does not compile anymore we have got new ManifestValue cases, MUST handle below, `combine` it into the hasher.
-		}
-
 		switch self {
 		case let .boolValue(value):
 			hasher.combine("boolValue")
