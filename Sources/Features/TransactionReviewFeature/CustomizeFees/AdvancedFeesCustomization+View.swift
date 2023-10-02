@@ -69,7 +69,7 @@ extension AdvancedFeesCustomization {
 						)
 						.padding(.bottom, .medium1)
 					}
-					.keyboardType(.decimalPad)
+					.keyboardType(.numberPad)
 					.multilineTextAlignment(.trailing)
 					.padding(.horizontal, .medium1)
 
