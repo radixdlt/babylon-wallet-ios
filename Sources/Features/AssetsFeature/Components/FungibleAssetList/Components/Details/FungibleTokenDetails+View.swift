@@ -12,7 +12,7 @@ extension FungibleTokenDetails.State {
 				isXRD: isXRD,
 				validatorAddress: nil,
 				resourceName: nil,
-				currentSupply: resource.totalSupply?.formatted(), // FIXME: Check which format
+				currentSupply: resource.totalSupply?.formatted() ?? L10n.AssetDetails.supplyUnkown,
 				behaviors: resource.behaviors,
 				tags: isXRD ? resource.tags + [.officialRadix] : resource.tags
 			)
