@@ -75,10 +75,10 @@ public struct AddNewGateway: Sendable, FeatureReducer {
 			state.inputtedURL = inputtedURL
 			state.errorText = nil
 			let url: URL?
-			if #unavailable(iOS 17.0) {
-				url = URL(string: inputtedURL)
-			} else {
+			if #available(iOS 17, *) {
 				url = URL(string: inputtedURL, encodingInvalidCharacters: false)
+			} else {
+				url = URL(string: inputtedURL)
 			}
 			state.addGatewayButtonState = url != nil ? .enabled : .disabled
 			return .none
