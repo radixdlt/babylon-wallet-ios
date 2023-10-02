@@ -46,6 +46,10 @@ public struct AccountSecurity: Sendable, FeatureReducer {
 		case destination(PresentationAction<Destinations.Action>)
 	}
 
+	public enum DelegateAction: Sendable, Equatable {
+		case gotoAccountList
+	}
+
 	public struct Destinations: Sendable, Reducer {
 		public enum State: Sendable, Hashable {
 			case mnemonics(DisplayMnemonics.State)
@@ -142,12 +146,12 @@ public struct AccountSecurity: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case let .destination(.presented(.importOlympiaWallet(.delegate(.finishedMigration(gotoAccountList))))):
-			state.destination = nil
 			if gotoAccountList {
-				// FIXME: Probably call delegate in order to dismiss all the way back
-				return .run { _ in await dismiss() }
+				return .send(.delegate(.gotoAccountList))
+			} else {
+				state.destination = nil
+				return .none
 			}
-			return .none
 
 		case .destination(.dismiss):
 			if case let .depositGuarantees(depositGuarantees) = state.destination, let value = depositGuarantees.depositGuarantee {
