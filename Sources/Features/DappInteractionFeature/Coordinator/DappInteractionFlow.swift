@@ -408,7 +408,6 @@ extension DappInteractionFlow {
 			_ error: TransactionFailure
 		) -> Effect<Action> {
 			let (errorKind, message) = error.errorKindAndMessage
-			loggerGlobal.critical("DappInteractionFlow - handleSignAndSubmitTXFailed")
 			return dismissEffect(for: state, errorKind: errorKind, message: message)
 		}
 
@@ -931,8 +930,7 @@ extension DappInteractionFlow {
 		errorKind: P2P.Dapp.Response.WalletInteractionFailureResponse.ErrorType,
 		message: String?
 	) -> Effect<Action> {
-		loggerGlobal.critical("DappInteractionFlow - dismissEffect START -> send(.delegate(.dismissWithFailure)")
-		return .send(.delegate(.dismissWithFailure(.init(
+		.send(.delegate(.dismissWithFailure(.init(
 			interactionId: state.remoteInteraction.id,
 			errorType: errorKind,
 			message: message

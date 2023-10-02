@@ -99,8 +99,6 @@ struct DappInteractionCoordinator: Sendable, FeatureReducer {
 			)), .request(state.interaction.metadata))))
 
 		case let .flow(.delegate(.dismissWithFailure(error))):
-			loggerGlobal.critical("DappInteractionCoordinator - reduce:childAction case .flow(.delegate(.dismissWithFailure -> delegate(.submit(.failure)")
-
 			return .send(.delegate(.submit(.failure(error), .request(state.interaction.metadata))))
 
 		case let .flow(.delegate(.dismissWithSuccess(dappMetadata, txID))):
