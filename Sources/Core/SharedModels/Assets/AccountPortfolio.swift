@@ -157,6 +157,10 @@ extension AccountPortfolio.PoolUnitResources {
 				loggerGlobal.error("Missing total supply for \(resource.resourceAddress.address)")
 				return "Missing Total supply - could not calculate redemption value" // FIXME: Strings
 			}
+			guard poolUnitTotalSupply > 0 else {
+				loggerGlobal.error("Zero total supply for \(resource.resourceAddress.address)")
+				return "Zero total supply - could not calculate redemption value" // FIXME: Strings
+			}
 			let redemptionValue = poolUnitResource.amount * (resource.amount / poolUnitTotalSupply)
 			let decimalPlaces = resource.resource.divisibility.map(UInt.init) ?? RETDecimal.maxDivisibility
 			let roundedRedemptionValue = redemptionValue.rounded(decimalPlaces: decimalPlaces)
@@ -193,7 +197,7 @@ extension AccountPortfolio.PoolUnitResources {
 		public let stakeClaimResource: AccountPortfolio.NonFungibleResource?
 
 		public var xrdRedemptionValue: RETDecimal? {
-			guard let stakeUnitResource, let totalSupply = stakeUnitResource.resource.totalSupply else {
+			guard let stakeUnitResource, let totalSupply = stakeUnitResource.resource.totalSupply, totalSupply > .zero else {
 				return nil
 			}
 			return validator.xrdVaultBalance * (stakeUnitResource.amount / totalSupply)
