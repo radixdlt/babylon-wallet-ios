@@ -678,7 +678,7 @@
 "addLedgerDevice_nameLedger_detectedType" = "Detected type: %@";
 "addLedgerDevice_nameLedger_namePlaceholder" = "Green Ledger Nano S+";
 "addLedgerDevice_nameLedger_continueButtonTitle" = "Save and Continue";
-"profileBackup_headerTitle" = "Backing up your wallet ensures that you can  recover access to your Accounts, Personas, and wallet settings on a new phone by re-entering your seed phrase(s).
+"profileBackup_headerTitle" = "Backing up your wallet ensures that you can restore access to your Accounts, Personas, and wallet settings on a new phone by re-entering your seed phrase(s).
 
 **For security, backups do not contain any seed phrases or private keys. You must write them down separately.**";
 "profileBackup_automaticBackups_title" = "Automatic Backups (recommended)";
@@ -737,8 +737,8 @@ Only the **current configuration** of your wallet is backed up with each manual 
 "encryptProfileBackup_enterPasswordField_placeholder" = "Enter password";
 "encryptProfileBackup_confirmPasswordField_placeholder" = "Confirm password";
 "encryptProfileBackup_confirmPasswordField_error" = "Passwords do not match";
-"recoverProfileBackup_header_title" = "Recover Wallet From Backup";
-"recoverProfileBackup_header_subtitle" = "Select a backup to recover your Radix Wallet. You will be asked to enter your seed phrase(s) to recover control of your Accounts and Personas.";
+"recoverProfileBackup_header_title" = "Restore Wallet From Backup";
+"recoverProfileBackup_header_subtitle" = "Select a backup to restore your Radix Wallet. You will be asked to enter your seed phrase(s) to recover control of your Accounts and Personas.";
 "androidRecoverProfileBackup_choose_title" = "Choose a backup";
 "iOSRecoverProfileBackup_choose_title" = "Choose a backup on iCloud";
 "iOSRecoverProfileBackup_noBackupsAvailable" = "No wallet backups available on current iCloud account";
