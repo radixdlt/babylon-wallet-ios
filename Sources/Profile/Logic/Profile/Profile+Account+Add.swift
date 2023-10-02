@@ -9,7 +9,7 @@ struct PersonaNotConnected: Swift.Error {}
 struct AccountAlreadyExists: Swift.Error {}
 
 extension Profile.Network.Accounts {
-	// FIXME: uh terrible, please fix this.
+	// FIXME: refactor
 	@discardableResult
 	public mutating func appendAccount(_ account: Profile.Network.Account) -> Profile.Network.Account {
 		var identifiedArrayOf = self.rawValue
@@ -19,7 +19,7 @@ extension Profile.Network.Accounts {
 		return account
 	}
 
-	// FIXME: uh terrible, please fix this.
+  // FIXME: refactor
 	public mutating func updateAccount(_ account: Profile.Network.Account) throws {
 		var identifiedArrayOf = self.rawValue
 		guard identifiedArrayOf.updateOrAppend(account) != nil else {

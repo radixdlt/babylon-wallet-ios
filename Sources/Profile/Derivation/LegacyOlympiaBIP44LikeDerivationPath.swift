@@ -7,8 +7,8 @@ import Prelude
 /// since the last component must be hardened, [contrary to the BIP44 standard][bip44]. The
 /// path looks like this: `m/44'/1022'/2'/1/3'`
 ///
-/// It was a mistake by me (Alexander Cyon) when I wrote the Radix Olympia wallet, [see Typescript SDK][radixJS], to
-/// harden the `address_index`.
+/// Radix Olympia wallet incorrectly hardened the `address_index`, [see Typescript SDK][radixJS], why
+/// this legacy derivation path is called "BIP44 like".
 ///
 /// [cap26]: https://radixdlt.atlassian.net/l/cp/UNaBAGUC
 /// [radixJS]: https://github.com/radixdlt/radixdlt-javascript/blob/main/packages/crypto/src/elliptic-curve/hd/bip32/bip44/bip44.ts#L81

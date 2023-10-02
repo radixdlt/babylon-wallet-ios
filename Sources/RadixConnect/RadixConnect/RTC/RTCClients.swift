@@ -411,8 +411,7 @@ extension RTCClient {
 	}
 }
 
-// FIXME: once we have merge together the separated message formats `Dapp` and `Ledger` in CAP21
-// this ugliness will become less ugly!
+// FIXME: once we have merge together the separated message formats `Dapp` and `Ledger` in CAP21, clean up!
 func decode(
 	_ messageResult: Result<DataChannelClient.AssembledMessage, Error>
 ) async -> Result<P2P.RTCMessageFromPeer, Error> {
