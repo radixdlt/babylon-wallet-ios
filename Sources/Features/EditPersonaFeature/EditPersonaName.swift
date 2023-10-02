@@ -32,7 +32,7 @@ public struct EditPersonaName: FeatureReducer, EmptyInitializable {
 			)
 			self.nickName = EditPersonaDynamicField.State(
 				behaviour: .nickName,
-				entryID: id,// FIXME: refactor this whole thing
+				entryID: id, // FIXME: refactor this whole thing
 				text: name.nickname,
 				isRequiredByDapp: isRequestedByDapp,
 				showsTitle: true

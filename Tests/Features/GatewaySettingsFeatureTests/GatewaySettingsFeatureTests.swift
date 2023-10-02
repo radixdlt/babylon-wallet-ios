@@ -56,6 +56,9 @@ final class GatewaySettingsFeatureTests: TestCase {
 
 	func test_whenUserInputsURL_thenAddButtonChangesStateBasedOnURLValidity() async throws {
 		// given
+		let invalidURL = "non valid URL"
+
+		// given
 		let store = TestStore(
 			initialState: AddNewGateway.State(),
 			reducer: AddNewGateway.init
@@ -68,9 +71,6 @@ final class GatewaySettingsFeatureTests: TestCase {
 			$0.inputtedURL = validURL
 			$0.addGatewayButtonState = .enabled
 		}
-
-		// given
-		let invalidURL = "non valid URL"
 
 		// when
 		await store.send(.view(.textFieldChanged(invalidURL))) {

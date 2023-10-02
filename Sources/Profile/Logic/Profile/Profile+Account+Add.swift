@@ -19,7 +19,7 @@ extension Profile.Network.Accounts {
 		return account
 	}
 
-  // FIXME: refactor
+	// FIXME: refactor
 	public mutating func updateAccount(_ account: Profile.Network.Account) throws {
 		var identifiedArrayOf = self.rawValue
 		guard identifiedArrayOf.updateOrAppend(account) != nil else {
