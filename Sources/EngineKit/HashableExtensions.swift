@@ -395,94 +395,131 @@ extension Instruction: Equatable {
 // MARK: - ManifestValue + Hashable
 extension ManifestValue: Hashable {
 	public static func == (lhsOuter: ManifestValue, rhsOuter: ManifestValue) -> Bool {
-		// We really dont want this switch, we want to have a single switch
-		// and do `case (.foo, _), (.bar, _), ...,: return false`
-		// unfortunately Swift compiler cannot compile that => force
-		// to have this switch to catch new cases and must use `default:` in
-		// the switch below.
-		switch lhsOuter {
-		case .boolValue, .i8Value, .i16Value, .i32Value, .i64Value, .i128Value, .u8Value, .u16Value, .u32Value, .u64Value, .u128Value, .stringValue, .enumValue, .arrayValue, .tupleValue, .mapValue, .addressValue, .bucketValue, .proofValue, .expressionValue, .blobValue, .decimalValue, .preciseDecimalValue, .nonFungibleLocalIdValue, .addressReservationValue:
-			break
-			// If this switch does not compile anymore we have got new ManifestValue cases, MUST handle below in Eq implementation
-		}
 
 		switch (lhsOuter, rhsOuter) {
 		case let (.boolValue(lhs), .boolValue(rhs)):
 			return lhs == rhs
+		case (.boolValue, _):
+			return false
 
 		case let (.i8Value(lhs), .i8Value(rhs)):
 			return lhs == rhs
+		case (.i8Value, _):
+			return false
 
 		case let (.i16Value(lhs), .i16Value(rhs)):
 			return lhs == rhs
+		case (.i16Value, _):
+			return false
 
 		case let (.i32Value(lhs), .i32Value(rhs)):
 			return lhs == rhs
+		case (.i32Value, _):
+			return false
 
 		case let (.i64Value(lhs), .i64Value(rhs)):
 			return lhs == rhs
+		case (.i64Value, _):
+			return false
 
 		case let (.i128Value(lhs), .i128Value(rhs)):
 			return lhs == rhs
+		case (.i128Value, _):
+			return false
 
 		case let (.u8Value(lhs), .u8Value(rhs)):
 			return lhs == rhs
+		case (.u8Value, _):
+			return false
 
 		case let (.u16Value(lhs), .u16Value(rhs)):
 			return lhs == rhs
+		case (.u16Value, _):
+			return false
 
 		case let (.u32Value(lhs), .u32Value(rhs)):
 			return lhs == rhs
+		case (.u32Value, _):
+			return false
 
 		case let (.u64Value(lhs), .u64Value(rhs)):
 			return lhs == rhs
+		case (.u64Value, _):
+			return false
 
 		case let (.u128Value(lhs), .u128Value(rhs)):
 			return lhs == rhs
+		case (.u128Value, _):
+			return false
 
 		case let (.stringValue(lhs), .stringValue(rhs)):
 			return lhs == rhs
+		case (.stringValue, _):
+			return false
 
 		case let (.enumValue(lhsDiscriminator, lhsFields), .enumValue(rhsDiscriminator, rhsFields)):
 			return lhsDiscriminator == rhsDiscriminator && lhsFields == rhsFields
+		case (.enumValue, _):
+			return false
 
 		case let (.arrayValue(lhsElementValueKind, lhsElements), .arrayValue(rhsElementValueKind, rhsElements)):
 			return lhsElementValueKind == rhsElementValueKind && lhsElements == rhsElements
+		case (.arrayValue, _):
+			return false
 
 		case let (.tupleValue(lhs), .tupleValue(rhs)):
 			return lhs == rhs
+		case (.tupleValue, _):
+			return false
 
 		case let (.mapValue(lhsKeyValueKind, lhsValueValueKind, lhsEntries), .mapValue(rhsKeyValueKind, rhsValueValueKind, rhsEntries)):
 			return lhsKeyValueKind == rhsKeyValueKind && lhsValueValueKind == rhsValueValueKind && lhsEntries == rhsEntries
+		case (.mapValue, _):
+			return false
 
 		case let (.addressValue(lhs), .addressValue(rhs)):
 			return lhs == rhs
+		case (.addressValue, _):
+			return false
 
 		case let (.bucketValue(lhs), .bucketValue(rhs)):
 			return lhs == rhs
-
+		case (.bucketValue, _):
+			return false
+			
 		case let (.proofValue(lhs), .proofValue(rhs)):
 			return lhs == rhs
+		case (.proofValue, _):
+			return false
 
 		case let (.expressionValue(lhs), .expressionValue(rhs)):
 			return lhs == rhs
+		case (.expressionValue, _):
+			return false
 
 		case let (.blobValue(lhs), .blobValue(rhs)):
 			return lhs == rhs
+		case (.blobValue, _):
+			return false
 
 		case let (.decimalValue(lhs), .decimalValue(rhs)):
 			return lhs == rhs
+		case (.decimalValue, _):
+			return false
 
 		case let (.preciseDecimalValue(lhs), .preciseDecimalValue(rhs)):
 			return lhs == rhs
+		case (.preciseDecimalValue, _):
+			return false
 
 		case let (.nonFungibleLocalIdValue(lhs), .nonFungibleLocalIdValue(rhs)):
 			return lhs == rhs
+		case (.nonFungibleLocalIdValue, _):
+			return false
 
 		case let (.addressReservationValue(lhs), .addressReservationValue(rhs)):
 			return lhs == rhs
-		default:
-			// Handle new cases here if `switch outer` above fails to compile.
+		case (.addressReservationValue, _):
 			return false
 		}
 	}
