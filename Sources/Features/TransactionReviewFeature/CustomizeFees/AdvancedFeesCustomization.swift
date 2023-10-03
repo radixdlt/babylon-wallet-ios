@@ -56,7 +56,7 @@ public struct AdvancedFeesCustomization: FeatureReducer {
 
 extension AdvancedFeesCustomization.State {
 	var parsedPaddingFee: RETDecimal? {
-		paddingAmount.isEmpty ? .zero : try? RETDecimal(value: paddingAmount)
+		paddingAmount.isEmpty ? .zero : try? RETDecimal(formattedString: paddingAmount)
 	}
 
 	var parsedTipPercentage: UInt16? {
