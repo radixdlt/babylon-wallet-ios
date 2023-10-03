@@ -396,7 +396,9 @@ extension AccountPortfoliosClient {
 			+ stakeClaimNFTCandidates.compactMap(\.explicitMetadata?.validator?.address)
 			+ poolUnitCandidates.compactMap(\.explicitMetadata?.pool?.address)
 
-		guard !stakeAndPoolAddresses.isEmpty else {
+		let uniqueStakeAndPoolAddresses = Array(stakeAndPoolAddresses.uniqued())
+
+		guard !uniqueStakeAndPoolAddresses.isEmpty else {
 			return .init(radixNetworkStakes: [], poolUnits: [])
 		}
 
@@ -407,7 +409,7 @@ extension AccountPortfoliosClient {
 		let xrdAddress = knownAddresses(networkId: networkId.rawValue).resourceAddresses.xrd.addressString()
 
 		let stakeAndPoolUnitDetails = try await gatewayAPIClient.fetchResourceDetails(
-			stakeAndPoolAddresses,
+			uniqueStakeAndPoolAddresses,
 			explicitMetadata: .poolUnitMetadataKeys,
 			ledgerState: ledgerState
 		)
