@@ -73,6 +73,7 @@
 "accountSettings_loadingPrompt" = "This may take several seconds, please wait for completion";
 "accountSettings_renameAccount_title" = "Rename Account";
 "accountSettings_renameAccount_subtitle" = "Enter a new label for this Account";
+"accountSettings_renameAccount_button" = "Update";
 "accountSettings_accountColor_text" = "Select the color for this Account";
 "accountSettings_accountColor_selected" = "Selected";
 "accountSettings_hideAccount_title" = "Hide This Account";
