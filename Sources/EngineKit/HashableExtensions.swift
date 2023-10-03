@@ -49,14 +49,15 @@ extension Instructions: Hashable {
 	}
 }
 
+/// A function call like `dummy(.someCase)` will stop compiling if an
+/// associated value is later added to `someCase`case of `Instruction`.
+private func dummy(_: Instruction) {
+	/* noop */
+}
+
 // MARK: - Instruction + Hashable
 extension Instruction: Hashable {
 	public func hash(into hasher: inout Hasher) {
-		/// A function call like dummy(.someCase) will stop compiling if an
-		/// associated value is later added to the pop case
-		func dummy(_: Instruction) {
-			/* noop */
-		}
 
 		switch self {
 		case let .takeAllFromWorktop(resourceAddress):
@@ -208,12 +209,6 @@ extension Instruction: Hashable {
 extension Instruction: Equatable {
 	public static func == (lhsOuter: Instruction, rhsOuter: Instruction) -> Bool {
 		
-		/// A function call like dummy(.someCase) will stop compiling if an
-		/// associated value is later added to the pop case
-		func dummy(_: Instruction) {
-			/* noop */
-		}
-
 		switch (lhsOuter, rhsOuter) {
 		case let (.takeAllFromWorktop(lhs), .takeAllFromWorktop(rhs)):
 			return lhs == rhs
