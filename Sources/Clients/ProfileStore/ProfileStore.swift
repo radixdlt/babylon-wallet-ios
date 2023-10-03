@@ -601,10 +601,11 @@ extension ProfileStore {
 	}
 
 	private func lens<Property>(
-		_ map: @escaping @Sendable (ProfileState) -> Property?
+		_ transform: @escaping @Sendable (ProfileState) -> Property?
 	) -> AnyAsyncSequence<Property> where Property: Sendable & Equatable {
-		profileStateSubject.compactMap { map($0) }
+		profileStateSubject.compactMap(transform)
 			.share() // Multicast
+			.removeDuplicates()
 			.eraseToAnyAsyncSequence()
 	}
 
