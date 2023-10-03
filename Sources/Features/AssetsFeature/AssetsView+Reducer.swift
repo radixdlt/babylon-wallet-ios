@@ -160,6 +160,7 @@ public struct AssetsView: Sendable, FeatureReducer {
 			}
 		let nfts = portfolio.nonFungibleResources.map { resource in
 			NonFungibleAssetList.Row.State(
+				accountAddress: portfolio.owner,
 				resource: resource,
 				disabled: mode.selectedAssets?.disabledNFTs ?? [],
 				selectedAssets: mode.nftRowSelectedAssets(resource.resourceAddress)
@@ -180,7 +181,7 @@ public struct AssetsView: Sendable, FeatureReducer {
 		}
 		let stakeClaimNfts = portfolio.poolUnitResources.radixNetworkStakes
 			.compactMap(\.stakeClaimResource)
-			.filter { !$0.nonFungibleIds.isEmpty }
+			.filter { $0.nonFungibleIdsCount > 0 }
 
 		let poolResources = portfolio.poolUnitResources.poolUnits.flatMap {
 			$0.poolResources.nonXrdResources.map(\.resourceAddress) + ($0.poolResources.xrdResource.map { [$0.resourceAddress] } ?? [])
@@ -195,13 +196,15 @@ public struct AssetsView: Sendable, FeatureReducer {
 		do {
 			// If failure, don't show any Pool Units.
 			resources = try await onLedgerEntitiesClient.getResources(allResourceAddresses)
-			nftClaimTokens = try await stakeClaimNfts.parallelMap {
-				try await onLedgerEntitiesClient.getNonFungibleTokenData(.init(
-					atLedgerState: $0.atLedgerState,
-					resource: $0.resourceAddress,
-					nonFungibleIds: $0.nonFungibleIds
-				))
-			}.flatMap(identity)
+			nftClaimTokens = []
+			//            try await stakeClaimNfts.parallelMap {
+//				try await onLedgerEntitiesClient.getNonFungibleTokenData(.init(
+//					atLedgerState: $0.atLedgerState,
+//					resource: $0.resourceAddress,
+//					nonFungibleIds: $0.nonFungibleIds
+//				))
+//			}
+			//            .flatMap(identity)
 		} catch {
 			// throw error
 			return nil
@@ -261,6 +264,7 @@ extension AssetsView.State {
 			}
 		let nfts = portfolio.nonFungibleResources.map { resource in
 			NonFungibleAssetList.Row.State(
+				accountAddress: portfolio.owner,
 				resource: resource,
 				disabled: mode.selectedAssets?.disabledNFTs ?? [],
 				selectedAssets: mode.nftRowSelectedAssets(resource.resourceAddress)
@@ -470,16 +474,16 @@ private struct NonFungibleTokensPerResourceProvider {
 				return nil
 			}
 
-			let selected = selectedAssets.filter {
-				resource.nonFungibleIds.contains($0.id)
-			}
+//			let selected = selectedAssets.filter {
+//				resource.nonFungibleIds.contains($0.id)
+//			}
 			// resource.tokens.filter { token in selectedStakeClaimAssets.contains(token.id) }
 
 			return .init(
 				resourceAddress: resource.resourceAddress,
 				resourceImage: resource.metadata.iconURL,
 				resourceName: resource.metadata.name,
-				tokens: .init(uncheckedUniqueElements: selected.elements)
+				tokens: [] // .init(uncheckedUniqueElements: selected.elements)
 			)
 		}
 	}

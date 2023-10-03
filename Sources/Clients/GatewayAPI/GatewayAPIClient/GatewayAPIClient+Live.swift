@@ -140,7 +140,6 @@ extension GatewayAPIClient {
 				request: GatewayAPI.StateEntityDetailsRequest(
 					atLedgerState: ledgerState?.selector,
 					optIns: .init(
-						nonFungibleIncludeNfids: true,
 						explicitMetadata: explictMetadata.map(\.rawValue)
 					),
 					addresses: addresses, aggregationLevel: .vault

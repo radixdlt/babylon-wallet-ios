@@ -6,6 +6,7 @@ import Prelude
 public enum OnLedgerEntity: Sendable, Hashable, Codable {
 	case resource(Resource)
 	case nonFungibleToken(NonFungibleToken)
+	case accountNonFungibleIds(AccountNonFungibleIdsPage)
 
 	public var resource: Resource? {
 		guard case let .resource(resource) = self else {
@@ -19,6 +20,13 @@ public enum OnLedgerEntity: Sendable, Hashable, Codable {
 			return nil
 		}
 		return nonFungibleToken
+	}
+
+	public var accountNonFungibleIds: AccountNonFungibleIdsPage? {
+		guard case let .accountNonFungibleIds(ids) = self else {
+			return nil
+		}
+		return ids
 	}
 }
 
@@ -86,6 +94,19 @@ extension OnLedgerEntity {
 			self.id = id
 			self.data = data
 			self.metadata = metadata
+		}
+	}
+
+	public struct AccountNonFungibleIdsPage: Sendable, Hashable, Codable {
+		public let ids: [NonFungibleGlobalId]
+		public let nextPageCursor: String?
+
+		public init(
+			ids: [NonFungibleGlobalId],
+			nextPageCursor: String?
+		) {
+			self.ids = ids
+			self.nextPageCursor = nextPageCursor
 		}
 	}
 }

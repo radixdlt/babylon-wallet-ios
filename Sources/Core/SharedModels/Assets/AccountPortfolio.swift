@@ -71,19 +71,23 @@ extension AccountPortfolio {
 
 		public let resourceAddress: ResourceAddress
 		public let atLedgerState: AtLedgerState
-		public let nonFungibleIds: [NonFungibleGlobalId]
 		public let metadata: ResourceMetadata
+		public let nonFungibleIdsCount: Int
+		/// The vault where the owned ids are stored
+		public let vaultAddress: VaultAddress
 
 		public init(
 			resourceAddress: ResourceAddress,
 			atLedgerState: AtLedgerState,
-			nonFungibleIds: [NonFungibleGlobalId],
-			metadata: ResourceMetadata
+			metadata: ResourceMetadata,
+			nonFungibleIdsCount: Int,
+			vaultAddress: VaultAddress
 		) {
 			self.resourceAddress = resourceAddress
 			self.atLedgerState = atLedgerState
-			self.nonFungibleIds = nonFungibleIds
 			self.metadata = metadata
+			self.nonFungibleIdsCount = nonFungibleIdsCount
+			self.vaultAddress = vaultAddress
 		}
 	}
 
@@ -214,6 +218,6 @@ extension AccountPortfolio.FungibleResource {
 
 extension AccountPortfolio.NonFungibleResource {
 	public var nonEmpty: Self? {
-		nonFungibleIds.isEmpty ? nil : self
+		nonFungibleIdsCount > 0 ? self : nil
 	}
 }

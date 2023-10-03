@@ -75,7 +75,7 @@ extension CacheClient {
 extension CacheClient {
 	public enum Entry: Equatable {
 		case accountPortfolio(AccountQuantifier)
-		case onLedgerEntity(address: String)
+		case onLedgerEntity(identifier: String)
 		case networkName(_ url: String)
 		case dAppMetadata(_ definitionAddress: String)
 		case dAppRequestMetadata(_ definitionAddress: String)

@@ -22,37 +22,37 @@ extension NonFungibleAssetList.Row.View {
 			observe: identity,
 			send: NonFungibleAssetList.Row.Action.view
 		) { viewStore in
-			if viewStore.resource.nonFungibleIds.isEmpty {
-				EmptyView()
-			} else {
-				StackedViewsLayout(isExpanded: viewStore.isExpanded) {
-					rowView(viewStore)
-						.zIndex(.infinity)
-					if viewStore.isExpanded {
-						LazyVStack {
-							ForEach(
-								Array(
-									viewStore.loadedTokens.enumerated()
-								),
-								id: \.element
-							) { index, item in
-								componentView(with: viewStore, asset: item, index: index)
-									.onAppear {
-										viewStore.send(.onTokenDidAppear(index: index))
-									}
-							}
-						}
-					} else {
-						ForEach(0 ..< Constants.collapsedCardsCount) { index in
-							collapsedPlaceholderView(index)
+//			if viewStore.resource.nonFungibleIds.isEmpty {
+//				EmptyView()
+//			} else {
+			StackedViewsLayout(isExpanded: viewStore.isExpanded) {
+				rowView(viewStore)
+					.zIndex(.infinity)
+				if viewStore.isExpanded {
+					LazyVStack {
+						ForEach(
+							Array(
+								viewStore.loadedTokens.enumerated()
+							),
+							id: \.element
+						) { index, item in
+							componentView(with: viewStore, asset: item, index: index)
+								.onAppear {
+									viewStore.send(.onTokenDidAppear(index: index))
+								}
 						}
 					}
+				} else {
+					ForEach(0 ..< Constants.collapsedCardsCount) { index in
+						collapsedPlaceholderView(index)
+					}
 				}
-				.onAppear {
-					viewStore.send(.didAppear)
-				}
-				.padding(.horizontal, .medium3)
 			}
+			.onAppear {
+				viewStore.send(.didAppear)
+			}
+			.padding(.horizontal, .medium3)
+//			}
 		}
 	}
 
@@ -66,7 +66,7 @@ extension NonFungibleAssetList.Row.View {
 					.lineSpacing(-4)
 					.textStyle(.secondaryHeader)
 
-				Text("\(viewStore.resource.nonFungibleIds.count)")
+				Text("\(viewStore.resource.nonFungibleIdsCount)")
 					.font(.app.body2HighImportance)
 					.foregroundColor(.app.gray2)
 			}

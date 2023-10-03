@@ -28,7 +28,8 @@ extension OnLedgerEntitiesClient: DependencyKey {
 			getNonFungibleTokenData: getNonFungibleData,
 			refreshResources: {
 				try await getResources(for: $0, forceRefresh: true)
-			}
+			},
+			getNonFungibleResourceIds: getNonFungibleResourceIds
 		)
 	}
 }
@@ -65,6 +66,47 @@ extension OnLedgerEntitiesClient {
 			}
 		)
 		.compactMap(\.nonFungibleToken)
+	}
+
+	@Sendable
+	static func getNonFungibleResourceIds(
+		_ request: GetNonFungibleResourceIdsRequest
+	) async throws -> OnLedgerEntity.AccountNonFungibleIdsPage {
+		@Dependency(\.cacheClient) var cacheClient
+
+		let identifier = request.identifier
+
+		let cached = try? cacheClient.load(
+			OnLedgerEntity.self,
+			.onLedgerEntity(identifier: identifier)
+		) as? OnLedgerEntity
+
+		if let cached = cached?.accountNonFungibleIds {
+			return cached
+		}
+
+		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
+		let freshPage = try await gatewayAPIClient.getEntityNonFungibleIdsPage(
+			.init(
+				atLedgerState: request.atLedgerState.selector,
+				cursor: request.pageCursor,
+				limitPerPage: maximumNFTIDChunkSize,
+				address: request.account.address,
+				vaultAddress: request.vaultAddress.address,
+				resourceAddress: request.resourceAddress.address
+			)
+		)
+
+		let items = try freshPage.items.map {
+			try NonFungibleGlobalId.fromParts(
+				resourceAddress: request.resourceAddress.intoEngine(),
+				nonFungibleLocalId: .from(stringFormat: $0)
+			)
+		}
+
+		let response = OnLedgerEntity.AccountNonFungibleIdsPage(ids: items, nextPageCursor: freshPage.nextCursor)
+		cacheClient.save(response, .onLedgerEntity(identifier: identifier))
+		return response
 	}
 
 	static func fetchNonFungibleData(_ request: GetNonFungibleTokenDataRequest) async throws -> [OnLedgerEntity] {
@@ -107,12 +149,12 @@ extension OnLedgerEntitiesClient {
 		if forceRefresh {
 			let freshEntities = try await refresh(Array(identifiers))
 			freshEntities.forEach {
-				cacheClient.save($0, .onLedgerEntity(address: $0.identifier))
+				cacheClient.save($0, .onLedgerEntity(identifier: $0.identifier))
 			}
 			return freshEntities
 		} else {
 			let cachedEntities = identifiers.compactMap {
-				try? cacheClient.load(OnLedgerEntity.self, .onLedgerEntity(address: $0)) as? OnLedgerEntity
+				try? cacheClient.load(OnLedgerEntity.self, .onLedgerEntity(identifier: $0)) as? OnLedgerEntity
 			}
 
 			let notCachedEntities = Set(identifiers).subtracting(Set(cachedEntities.map(\.identifier)))
@@ -122,7 +164,7 @@ extension OnLedgerEntitiesClient {
 
 			let freshEntities = try await refresh(Array(notCachedEntities))
 			freshEntities.forEach {
-				cacheClient.save($0, .onLedgerEntity(address: $0.identifier))
+				cacheClient.save($0, .onLedgerEntity(identifier: $0.identifier))
 			}
 
 			return cachedEntities + freshEntities
@@ -186,7 +228,16 @@ extension OnLedgerEntity {
 			return resource.resourceAddress.address
 		case let .nonFungibleToken(nonFungibleToken):
 			return nonFungibleToken.id.asStr()
+		case .accountNonFungibleIds:
+			assertionFailure("")
+			return "NA"
 		}
+	}
+}
+
+extension OnLedgerEntitiesClient.GetNonFungibleResourceIdsRequest {
+	var identifier: String {
+		"NonFungibleResourceIds-" + account.address + "-" + resourceAddress.address + (pageCursor.map { "- \($0)" } ?? "")
 	}
 }
 

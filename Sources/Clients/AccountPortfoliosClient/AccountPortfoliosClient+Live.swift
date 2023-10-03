@@ -223,43 +223,18 @@ extension AccountPortfoliosClient {
 		_ resource: GatewayAPI.NonFungibleResourcesCollectionItemVaultAggregated,
 		ledgerState: GatewayAPI.LedgerState
 	) async throws -> AccountPortfolio.NonFungibleResource {
-		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
-
-		@Sendable
-		func getAllTokens(
-			resource: GatewayAPI.NonFungibleResourcesCollectionItemVaultAggregated
-		) async throws -> [String] {
-			guard let vault = resource.vaults.items.first else { return [] }
-			let firstPageItems = vault.items ?? []
-
-			guard let nextPageCursor = vault.nextCursor else {
-				return firstPageItems
-			}
-
-			let additionalItems = try await gatewayAPIClient.fetchAllPaginatedItems(
-				cursor: GatewayAPIClient.PageCursor(ledgerState: ledgerState, nextPageCursor: nextPageCursor),
-				gatewayAPIClient.fetchEntityNonFungibleResourceIdsPage(
-					accountAddress,
-					resourceAddress: resource.resourceAddress,
-					vaultAddress: vault.vaultAddress
-				)
-			)
-
-			return firstPageItems + additionalItems
-		}
-
-		// Get all user owned nft ids, but do not fetch the related data.
-		let nftIDs = try await getAllTokens(resource: resource).map {
-			try NonFungibleGlobalId.fromParts(resourceAddress: .init(address: resource.resourceAddress), nonFungibleLocalId: .from(stringFormat: $0))
-		}.sorted {
-			$0.localId().id < $1.localId().id
+		// Accounts have only one vault
+		guard let vault = resource.vaults.items.first else {
+			struct MissingVaultForNonFungibleResource: Error {}
+			throw MissingVaultForNonFungibleResource()
 		}
 
 		return try AccountPortfolio.NonFungibleResource(
 			resourceAddress: .init(validatingAddress: resource.resourceAddress),
 			atLedgerState: .init(version: ledgerState.stateVersion, epoch: ledgerState.epoch),
-			nonFungibleIds: nftIDs,
-			metadata: .init(resource.explicitMetadata)
+			metadata: .init(resource.explicitMetadata),
+			nonFungibleIdsCount: Int(vault.totalCount),
+			vaultAddress: .init(validatingAddress: vault.vaultAddress)
 		)
 	}
 }

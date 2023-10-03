@@ -11,18 +11,21 @@ extension NonFungibleAssetList {
 			public typealias AssetID = OnLedgerEntity.NonFungibleToken.ID
 
 			public let resource: AccountPortfolio.NonFungibleResource
+			public let accountAddress: AccountAddress
 			public var loadedTokens: IdentifiedArrayOf<OnLedgerEntity.NonFungibleToken> = []
-			public var loadedPages: Int = 0
-			public var isLoadingResources: Bool = true
+			public var nextPageCursor: String?
+			public var isLoadingResources: Bool = false
 			public var isExpanded = false
 			public var disabled: Set<AssetID> = []
 			public var selectedAssets: OrderedSet<OnLedgerEntity.NonFungibleToken>?
 
 			public init(
+				accountAddress: AccountAddress,
 				resource: AccountPortfolio.NonFungibleResource,
 				disabled: Set<AssetID> = [],
 				selectedAssets: OrderedSet<OnLedgerEntity.NonFungibleToken>?
 			) {
+				self.accountAddress = accountAddress
 				self.resource = resource
 				self.disabled = disabled
 				self.selectedAssets = selectedAssets
@@ -43,7 +46,12 @@ extension NonFungibleAssetList {
 		}
 
 		public enum InternalAction: Sendable, Equatable {
-			case tokensLoaded(TaskResult<[OnLedgerEntity.NonFungibleToken]>)
+			public struct TokensLoadResult: Sendable, Equatable {
+				let tokens: [OnLedgerEntity.NonFungibleToken]
+				let nextPageCursor: String?
+			}
+
+			case tokensLoaded(TaskResult<TokensLoadResult>)
 		}
 
 		@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
@@ -71,10 +79,9 @@ extension NonFungibleAssetList {
 				guard state.isExpanded, state.loadedTokens.isEmpty else {
 					return .none
 				}
-				return fetchTokens(
-					for: state.resource,
-					Array(state.resource.nonFungibleIds.prefix(2 * State.pageSize))
-				)
+
+				return loadResources(&state)
+
 			case let .onTokenDidAppear(index: index):
 				guard index == state.loadedTokens.count - State.pageSize else {
 					return .none
@@ -89,8 +96,9 @@ extension NonFungibleAssetList {
 			case let .tokensLoaded(result):
 				state.isLoadingResources = false
 				switch result {
-				case let .success(tokens):
-					state.loadedTokens.append(contentsOf: tokens)
+				case let .success(tokensPage):
+					state.loadedTokens.append(contentsOf: tokensPage.tokens)
+					state.nextPageCursor = tokensPage.nextPageCursor
 				case let .failure(err):
 					break
 				}
@@ -98,41 +106,30 @@ extension NonFungibleAssetList {
 			}
 		}
 
-		private func fetchTokens(for resource: AccountPortfolio.NonFungibleResource, _ ids: [NonFungibleGlobalId]) -> Effect<Action> {
-			.run { send in
-				let result = await TaskResult {
-					try await onLedgerEntitiesClient.getNonFungibleTokenData(.init(
-						atLedgerState: resource.atLedgerState,
-						resource: resource.resourceAddress,
-						nonFungibleIds: ids
-					))
-				}
-				await send(.internal(.tokensLoaded(result)))
-			}
-		}
-
 		func loadResources(_ state: inout State) -> Effect<Action> {
-			let diff = state.resource.nonFungibleIds.count - state.loadedTokens.count
-			guard !state.isLoadingResources, diff > 0 else {
+			guard !state.isLoadingResources, state.loadedTokens.count < state.resource.nonFungibleIdsCount else {
 				return .none
 			}
 
-			let tokens = {
-				if diff < State.pageSize {
-					return state.resource.nonFungibleIds.suffix(diff)
-				}
-				let pageStartIndex = state.loadedTokens.count
-				return state.resource.nonFungibleIds[pageStartIndex ..< pageStartIndex + State.pageSize]
-			}()
-
 			state.isLoadingResources = true
-			return .run { [resource = state.resource] send in
+			let cursor = state.nextPageCursor
+			return .run { [resource = state.resource, accountAddress = state.accountAddress] send in
 				let result = await TaskResult {
-					try await onLedgerEntitiesClient.getNonFungibleTokenData(.init(
+					let idsPage = try await onLedgerEntitiesClient.getNonFungibleResourceIds(.init(
+						account: accountAddress,
+						resourceAddress: resource.resourceAddress,
+						vaultAddress: resource.vaultAddress,
+						atLedgerState: resource.atLedgerState,
+						pageCursor: cursor
+					))
+
+					let data = try await onLedgerEntitiesClient.getNonFungibleTokenData(.init(
 						atLedgerState: resource.atLedgerState,
 						resource: resource.resourceAddress,
-						nonFungibleIds: Array(tokens)
+						nonFungibleIds: Array(idsPage.ids)
 					))
+
+					return InternalAction.TokensLoadResult(tokens: data, nextPageCursor: idsPage.nextPageCursor)
 				}
 				await send(.internal(.tokensLoaded(result)))
 			}
