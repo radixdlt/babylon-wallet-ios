@@ -396,7 +396,9 @@ extension AccountPortfoliosClient {
 			+ stakeClaimNFTCandidates.compactMap(\.explicitMetadata?.validator?.address)
 			+ poolUnitCandidates.compactMap(\.explicitMetadata?.pool?.address)
 
-		guard !stakeAndPoolAddresses.isEmpty else {
+		let uniqueStakeAndPoolAddresses = Array(stakeAndPoolAddresses.uniqued())
+
+		guard !uniqueStakeAndPoolAddresses.isEmpty else {
 			return .init(radixNetworkStakes: [], poolUnits: [])
 		}
 
@@ -407,7 +409,7 @@ extension AccountPortfoliosClient {
 		let xrdAddress = knownAddresses(networkId: networkId.rawValue).resourceAddresses.xrd.addressString()
 
 		let stakeAndPoolUnitDetails = try await gatewayAPIClient.fetchResourceDetails(
-			stakeAndPoolAddresses,
+			uniqueStakeAndPoolAddresses,
 			explicitMetadata: .poolUnitMetadataKeys,
 			ledgerState: ledgerState
 		)
@@ -467,7 +469,7 @@ extension AccountPortfoliosClient {
 			}()
 
 			// Extract the stake claim NFT, which might exist or not
-			let stakeClaimNft: AccountPortfolio.NonFungibleResource? = try await { () -> AccountPortfolio.NonFungibleResource? in
+			let stakeClaimNFT: AccountPortfolio.NonFungibleResource? = try await { () -> AccountPortfolio.NonFungibleResource? in
 				let stakeClaimNFTCandidate = stakeClaimNFTCandidates.first {
 					$0.explicitMetadata?.validator?.address == item.address
 				}
@@ -488,12 +490,13 @@ extension AccountPortfoliosClient {
 
 			}()
 
-			// Either stakeUnit is present or stakeClaimNft
-			if stakeUnitFungibleResource != nil || stakeClaimNft != nil {
-				return .init(validator: validator, stakeUnitResource: stakeUnitFungibleResource, stakeClaimResource: stakeClaimNft)
-			}
+			let hasNonZeroStakeUnitAmount = stakeUnitFungibleResource?.amount.isZero() == false
+			let hasNonZeroStakeClaim = stakeClaimNFT?.tokens.contains { $0.stakeClaimAmount?.isZero() == false } == true
 
-			return nil
+			// Either stakeUnit is present and non-empty or there is a stakeClaimNFT with a non-zero claim
+			guard hasNonZeroStakeUnitAmount || hasNonZeroStakeClaim else { return nil }
+
+			return .init(validator: validator, stakeUnitResource: stakeUnitFungibleResource, stakeClaimResource: stakeClaimNFT)
 		}
 
 		let poolUnits = try await stakeAndPoolUnitDetails.items.asyncCompactMap { item -> AccountPortfolio.PoolUnitResources.PoolUnit? in

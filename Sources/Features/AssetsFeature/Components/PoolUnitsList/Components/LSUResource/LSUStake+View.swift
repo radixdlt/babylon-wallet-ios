@@ -159,11 +159,12 @@ extension LSUStake.State {
 			id: stake.validator.address,
 			validatorNameViewState: .init(with: stake.validator),
 			liquidStakeUnit: stake.xrdRedemptionValue
-				.map {
-					.init(
+				.flatMap { amount in
+					guard !amount.isZero() else { return nil }
+					return .init(
 						thumbnail: .xrd,
 						symbol: Constants.xrdTokenName,
-						tokenAmount: $0.formatted(),
+						tokenAmount: amount.formatted(),
 						isSelected: isStakeSelected
 					)
 				},
@@ -172,12 +173,13 @@ extension LSUStake.State {
 					.map { claimNFT in
 						.init(
 							uncheckedUniqueElements: claimNFT.tokens
-								.map { token in
-									LSUStake.ViewState.StakeClaimNFTViewState(
+								.compactMap { token in
+									guard let stakeClaimAmount = token.stakeClaimAmount, !stakeClaimAmount.isZero() else { return nil }
+									return LSUStake.ViewState.StakeClaimNFTViewState(
 										id: token.id,
 										thumbnail: .xrd,
 										status: token.canBeClaimed ? .readyToClaim : .unstaking,
-										tokenAmount: (token.stakeClaimAmount ?? 0).formatted(),
+										tokenAmount: stakeClaimAmount.formatted(),
 										isSelected: self.selectedStakeClaimAssets?.contains(token.id)
 									)
 								}
