@@ -72,10 +72,10 @@ public struct Main: Sendable, FeatureReducer {
 		switch viewAction {
 		case .task:
 			return .run { send in
-				for try await gateways in await gatewaysClient.gatewaysValues() {
+				for try await gateway in await gatewaysClient.currentGatewayValues() {
 					guard !Task.isCancelled else { return }
-					loggerGlobal.notice("Changed network to: \(gateways.current)")
-					await send(.internal(.currentGatewayChanged(to: gateways.current)))
+					loggerGlobal.notice("Changed network to: \(gateway)")
+					await send(.internal(.currentGatewayChanged(to: gateway)))
 				}
 			}
 		}
