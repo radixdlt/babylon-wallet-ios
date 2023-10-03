@@ -110,6 +110,8 @@ public struct AssetsView: Sendable, FeatureReducer {
 					guard !Task.isCancelled else { return }
 					await send(.internal(.updatePortfolio(portfolio.nonEmptyVaults)))
 				}
+			} catch: { error, _ in
+				loggerGlobal.error("AssetsView portfolioForAccount failed: \(error)")
 			}
 		case let .didSelectList(kind):
 			state.activeAssetKind = kind
@@ -117,6 +119,8 @@ public struct AssetsView: Sendable, FeatureReducer {
 		case .pullToRefreshStarted:
 			return .run { [address = state.account.address] _ in
 				_ = try await accountPortfoliosClient.fetchAccountPortfolio(address, true)
+			} catch: { error, _ in
+				loggerGlobal.error("AssetsView fetch failed: \(error)")
 			}
 		case let .chooseButtonTapped(items):
 			return .send(.delegate(.handleSelectedAssets(items)))
