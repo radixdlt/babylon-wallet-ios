@@ -9,8 +9,9 @@ public struct Hint: View, Equatable {
 	}
 
 	let kind: Kind
-	let text: Text
-	public init(kind: Kind, text: Text) {
+	let text: Text?
+
+	private init(kind: Kind, text: Text?) {
 		self.kind = kind
 		self.text = text
 	}
@@ -31,15 +32,21 @@ public struct Hint: View, Equatable {
 		.init(kind: .error, text: Text(string))
 	}
 
+	public static func error() -> Self {
+		.init(kind: .error, text: nil)
+	}
+
 	public var body: some View {
-		Label {
-			text.lineSpacing(0).textStyle(.body2Regular)
-		} icon: {
-			if kind == .error {
-				Image(asset: AssetResource.error)
+		if let text {
+			Label {
+				text.lineSpacing(0).textStyle(.body2Regular)
+			} icon: {
+				if kind == .error {
+					Image(asset: AssetResource.error)
+				}
 			}
+			.foregroundColor(foregroundColor)
 		}
-		.foregroundColor(foregroundColor)
 	}
 
 	private var foregroundColor: Color {

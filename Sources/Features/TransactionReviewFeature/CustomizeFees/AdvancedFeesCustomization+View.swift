@@ -6,9 +6,21 @@ extension AdvancedFeesCustomization.State {
 		.init(
 			feesViewState: .init(feeViewStates: fees.viewStates, totalFee: fees.total, isAdvancedMode: true),
 			paddingAmount: paddingAmount,
+			paddingAmountHint: paddingAmountHint,
 			tipPercentage: tipPercentage,
+			tipPercentageHint: tipPercentageHint,
 			focusField: focusField
 		)
+	}
+
+	private var paddingAmountHint: Hint? {
+		guard parsedPaddingFee == nil else { return nil }
+		return .error()
+	}
+
+	private var tipPercentageHint: Hint? {
+		guard parsedTipPercentage == nil else { return nil }
+		return .error()
 	}
 }
 
@@ -17,7 +29,9 @@ extension AdvancedFeesCustomization {
 		let feesViewState: FeesView.ViewState
 
 		let paddingAmount: String
+		let paddingAmountHint: Hint?
 		let tipPercentage: String
+		let tipPercentageHint: Hint?
 		let focusField: State.FocusField?
 	}
 
@@ -39,6 +53,7 @@ extension AdvancedFeesCustomization {
 								get: \.paddingAmount,
 								send: ViewAction.paddingAmountChanged
 							),
+							hint: viewStore.paddingAmountHint,
 							focus: .on(
 								.padding,
 								binding: viewStore.binding(
@@ -48,6 +63,7 @@ extension AdvancedFeesCustomization {
 								to: $focusField
 							)
 						)
+						.keyboardType(.decimalPad)
 						.padding(.vertical, .medium1)
 
 						AppTextField(
@@ -58,6 +74,7 @@ extension AdvancedFeesCustomization {
 								get: \.tipPercentage,
 								send: ViewAction.tipPercentageChanged
 							),
+							hint: viewStore.tipPercentageHint,
 							focus: .on(
 								.tipPercentage,
 								binding: viewStore.binding(
@@ -67,9 +84,9 @@ extension AdvancedFeesCustomization {
 								to: $focusField
 							)
 						)
+						.keyboardType(.numberPad)
 						.padding(.bottom, .medium1)
 					}
-					.keyboardType(.decimalPad)
 					.multilineTextAlignment(.trailing)
 					.padding(.horizontal, .medium1)
 

@@ -11,12 +11,12 @@ public struct AdvancedFeesCustomization: FeatureReducer {
 			case tipPercentage
 		}
 
-		var fees: TransactionFee.AdvancedFeeCustomization
+		public var fees: TransactionFee.AdvancedFeeCustomization
 
-		var paddingAmount: String
-		var tipPercentage: String
+		public var paddingAmount: String
+		public var tipPercentage: String
 
-		var focusField: FocusField?
+		public var focusField: FocusField?
 
 		init(
 			fees: TransactionFee.AdvancedFeeCustomization
@@ -41,11 +41,11 @@ public struct AdvancedFeesCustomization: FeatureReducer {
 		switch viewAction {
 		case let .paddingAmountChanged(amount):
 			state.paddingAmount = amount
-			state.fees.updatePaddingFee(value: amount)
+			state.fees.paddingFee = state.parsedPaddingFee ?? .zero
 			return .send(.delegate(.updated(state.fees)))
 		case let .tipPercentageChanged(percentage):
 			state.tipPercentage = percentage
-			state.fees.updateTipPercentage(value: percentage)
+			state.fees.tipPercentage = state.parsedTipPercentage ?? .zero
 			return .send(.delegate(.updated(state.fees)))
 		case let .focusChanged(field):
 			state.focusField = field
@@ -54,20 +54,12 @@ public struct AdvancedFeesCustomization: FeatureReducer {
 	}
 }
 
-extension TransactionFee.AdvancedFeeCustomization {
-	mutating func updatePaddingFee(value: String) {
-		if value.isEmpty {
-			paddingFee = .zero
-		} else if let amount = try? RETDecimal(value: value) {
-			paddingFee = amount
-		}
+extension AdvancedFeesCustomization.State {
+	var parsedPaddingFee: RETDecimal? {
+		paddingAmount.isEmpty ? .zero : try? RETDecimal(formattedString: paddingAmount)
 	}
 
-	mutating func updateTipPercentage(value: String) {
-		if value.isEmpty {
-			tipPercentage = .zero
-		} else if let amount = UInt16(value) {
-			tipPercentage = amount
-		}
+	var parsedTipPercentage: UInt16? {
+		tipPercentage.isEmpty ? .zero : UInt16(tipPercentage)
 	}
 }
