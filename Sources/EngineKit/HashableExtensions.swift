@@ -52,8 +52,8 @@ extension Instructions: Hashable {
 // MARK: - Instruction + Hashable
 extension Instruction: Hashable {
 	public func hash(into hasher: inout Hasher) {
-		// A function call like dummy(.someCase) will stop compiling if an
-		// associated value is later added to the pop case
+		/// A function call like dummy(.someCase) will stop compiling if an
+		/// associated value is later added to the pop case
 		func dummy(_: Instruction) {
 			/* noop */
 		}
@@ -207,8 +207,9 @@ extension Instruction: Hashable {
 // MARK: - Instruction + Equatable
 extension Instruction: Equatable {
 	public static func == (lhsOuter: Instruction, rhsOuter: Instruction) -> Bool {
-		// A function call like dummy(.someCase) will stop compiling if an
-		// associated value is later added to the pop case
+		
+		/// A function call like dummy(.someCase) will stop compiling if an
+		/// associated value is later added to the pop case
 		func dummy(_: Instruction) {
 			/* noop */
 		}
@@ -757,8 +758,8 @@ extension TransactionType: Hashable {
 		case let (.stakeTransaction(lhsStakes), .stakeTransaction(rhsStakes)):
 			return lhsStakes == rhsStakes
 
-		case let (.unstakeTransaction(lhsUnstake), .unstakeTransaction(unstakeTransaction)):
-			return lhsUnstake == unstakeTransaction
+		case let (.unstakeTransaction(lhsUnstake), .unstakeTransaction(rhsUnstake)):
+			return lhsUnstake == rhsUnstake
 
 		case (.claimStakeTransaction, _),
 		     (.stakeTransaction, _),
@@ -872,8 +873,7 @@ extension ResourceTracker: Hashable {
 		case let (.nonFungible(lhsAddress, lhsAmount, lhsIds), .nonFungible(rhsAddress, rhsAmount, rhsIds)):
 			return lhsAddress == rhsAddress && lhsAmount == rhsAmount && lhsIds == rhsIds
 
-		case (.fungible, _),
-		     (.nonFungible, _):
+		case (.fungible, _), (.nonFungible, _):
 			return false
 		}
 	}
