@@ -56,10 +56,7 @@ public struct LSUStake: FeatureReducer {
 			)
 	}
 
-	public func reduce(
-		into state: inout State,
-		viewAction: ViewAction
-	) -> Effect<Action> {
+	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .didTap:
 			if state.isStakeSelected != nil {
@@ -87,7 +84,7 @@ public struct LSUStake: FeatureReducer {
 				return .none
 			}
 		case let .didTapStakeClaimNFT(withID: id):
-			if state.isStakeSelected != nil {
+			if state.selectedStakeClaimAssets != nil {
 				state.selectedStakeClaimAssets?.toggle(id)
 			}
 
