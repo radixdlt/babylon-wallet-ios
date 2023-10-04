@@ -329,7 +329,7 @@
 "dAppRequest_validationOutcome_subtitleBadContent" = "Invalid content";
 "dAppRequest_validationOutcome_subtitleIncompatibleVersion" = "Incompatible connector extension";
 "dAppRequest_validationOutcome_subtitleWrongNetworkID" = "Network mismatch";
-"dAppRequest_validationOutcome_devExplanationBadContent" = "Invalid value of `numberOfAccountsInvalid`: must not be be `exactly(0)` nor can `quantity` be negative";
+"dAppRequest_validationOutcome_devExplanationBadContent" = "Invalid value of `numberOfAccountsInvalid`: must not be `exactly(0)` nor can `quantity` be negative";
 "dAppRequest_validationOutcome_devExplanationIncompatibleVersion" = "%@ (CE: %@, wallet: %@)";
 "dAppRequest_validationOutcome_devExplanationInvalidOrigin" = "\'%@\' is not valid origin.";
 "dAppRequest_validationOutcome_devExplanationInvalidDappDefinitionAddress" = "\'%@\' is not valid account address.";
@@ -343,7 +343,7 @@
 "dAppRequest_validationOutcome_invalidRequestMessage" = "Could not validate the dApp.";
 "dAppRequest_requestMalformedAlert_message" = "Request received from dApp is invalid.";
 "dAppRequest_requestPersonaNotFoundAlert_message" = "dApp specified an invalid Persona.";
-"dAppRequest_requestWrongNetworkAlert_message" = "dApp made a requested intended for network %@, but you are currently connected to %@.";
+"dAppRequest_requestWrongNetworkAlert_message" = "dApp made a request intended for network %@, but you are currently connected to %@.";
 "dAppRequest_responseFailureAlert_message" = "Failed to send request response to dApp.";
 "dAppRequest_completion_title" = "Success";
 "dAppRequest_completion_subtitle" = "Request from %@ complete";
