@@ -81,7 +81,7 @@ extension AccountSecurity.View {
 			),
 			.init(
 				title: "Deposit Guarantees", // FIXME: Strings - L10n.Settings.depositGuarantees
-				subtitle: "Set your default guaranteed minimum for estimated profits", // FIXME: Strings
+				subtitle: "Set your default guaranteed minimum for estimated deposits", // FIXME: Strings
 				icon: .asset(AssetResource.depositGuarantees),
 				action: .defaultDepositGuaranteeButtonTapped
 			),

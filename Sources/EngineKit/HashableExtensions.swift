@@ -49,15 +49,15 @@ extension Instructions: Hashable {
 	}
 }
 
+/// A function call like `dummy(.someCase)` will stop compiling if an
+/// associated value is later added to `someCase`case of `Instruction`.
+private func dummy(_: Instruction) {
+	/* noop */
+}
+
 // MARK: - Instruction + Hashable
 extension Instruction: Hashable {
 	public func hash(into hasher: inout Hasher) {
-		// A function call like dummy(.someCase) will stop compiling if an
-		// associated value is later added to the pop case
-		func dummy(_: Instruction) {
-			/* noop */
-		}
-
 		switch self {
 		case let .takeAllFromWorktop(resourceAddress):
 			hasher.combine("takeAllFromWorktop")
@@ -207,12 +207,6 @@ extension Instruction: Hashable {
 // MARK: - Instruction + Equatable
 extension Instruction: Equatable {
 	public static func == (lhsOuter: Instruction, rhsOuter: Instruction) -> Bool {
-		// A function call like dummy(.someCase) will stop compiling if an
-		// associated value is later added to the pop case
-		func dummy(_: Instruction) {
-			/* noop */
-		}
-
 		switch (lhsOuter, rhsOuter) {
 		case let (.takeAllFromWorktop(lhs), .takeAllFromWorktop(rhs)):
 			return lhs == rhs
@@ -399,94 +393,130 @@ extension Instruction: Equatable {
 // MARK: - ManifestValue + Hashable
 extension ManifestValue: Hashable {
 	public static func == (lhsOuter: ManifestValue, rhsOuter: ManifestValue) -> Bool {
-		// We really dont want this switch, we want to have a single switch
-		// and do `case (.foo, _), (.bar, _), ...,: return false`
-		// unfortunately Swift compiler cannot compile that => force
-		// to have this switch to catch new cases and must use `default:` in
-		// the switch below.
-		switch lhsOuter {
-		case .boolValue, .i8Value, .i16Value, .i32Value, .i64Value, .i128Value, .u8Value, .u16Value, .u32Value, .u64Value, .u128Value, .stringValue, .enumValue, .arrayValue, .tupleValue, .mapValue, .addressValue, .bucketValue, .proofValue, .expressionValue, .blobValue, .decimalValue, .preciseDecimalValue, .nonFungibleLocalIdValue, .addressReservationValue:
-			break
-			// If this switch does not compile anymore we have got new ManifestValue cases, MUST handle below in Eq implementation
-		}
-
 		switch (lhsOuter, rhsOuter) {
 		case let (.boolValue(lhs), .boolValue(rhs)):
 			return lhs == rhs
+		case (.boolValue, _):
+			return false
 
 		case let (.i8Value(lhs), .i8Value(rhs)):
 			return lhs == rhs
+		case (.i8Value, _):
+			return false
 
 		case let (.i16Value(lhs), .i16Value(rhs)):
 			return lhs == rhs
+		case (.i16Value, _):
+			return false
 
 		case let (.i32Value(lhs), .i32Value(rhs)):
 			return lhs == rhs
+		case (.i32Value, _):
+			return false
 
 		case let (.i64Value(lhs), .i64Value(rhs)):
 			return lhs == rhs
+		case (.i64Value, _):
+			return false
 
 		case let (.i128Value(lhs), .i128Value(rhs)):
 			return lhs == rhs
+		case (.i128Value, _):
+			return false
 
 		case let (.u8Value(lhs), .u8Value(rhs)):
 			return lhs == rhs
+		case (.u8Value, _):
+			return false
 
 		case let (.u16Value(lhs), .u16Value(rhs)):
 			return lhs == rhs
+		case (.u16Value, _):
+			return false
 
 		case let (.u32Value(lhs), .u32Value(rhs)):
 			return lhs == rhs
+		case (.u32Value, _):
+			return false
 
 		case let (.u64Value(lhs), .u64Value(rhs)):
 			return lhs == rhs
+		case (.u64Value, _):
+			return false
 
 		case let (.u128Value(lhs), .u128Value(rhs)):
 			return lhs == rhs
+		case (.u128Value, _):
+			return false
 
 		case let (.stringValue(lhs), .stringValue(rhs)):
 			return lhs == rhs
+		case (.stringValue, _):
+			return false
 
 		case let (.enumValue(lhsDiscriminator, lhsFields), .enumValue(rhsDiscriminator, rhsFields)):
 			return lhsDiscriminator == rhsDiscriminator && lhsFields == rhsFields
+		case (.enumValue, _):
+			return false
 
 		case let (.arrayValue(lhsElementValueKind, lhsElements), .arrayValue(rhsElementValueKind, rhsElements)):
 			return lhsElementValueKind == rhsElementValueKind && lhsElements == rhsElements
+		case (.arrayValue, _):
+			return false
 
 		case let (.tupleValue(lhs), .tupleValue(rhs)):
 			return lhs == rhs
+		case (.tupleValue, _):
+			return false
 
 		case let (.mapValue(lhsKeyValueKind, lhsValueValueKind, lhsEntries), .mapValue(rhsKeyValueKind, rhsValueValueKind, rhsEntries)):
 			return lhsKeyValueKind == rhsKeyValueKind && lhsValueValueKind == rhsValueValueKind && lhsEntries == rhsEntries
+		case (.mapValue, _):
+			return false
 
 		case let (.addressValue(lhs), .addressValue(rhs)):
 			return lhs == rhs
+		case (.addressValue, _):
+			return false
 
 		case let (.bucketValue(lhs), .bucketValue(rhs)):
 			return lhs == rhs
+		case (.bucketValue, _):
+			return false
 
 		case let (.proofValue(lhs), .proofValue(rhs)):
 			return lhs == rhs
+		case (.proofValue, _):
+			return false
 
 		case let (.expressionValue(lhs), .expressionValue(rhs)):
 			return lhs == rhs
+		case (.expressionValue, _):
+			return false
 
 		case let (.blobValue(lhs), .blobValue(rhs)):
 			return lhs == rhs
+		case (.blobValue, _):
+			return false
 
 		case let (.decimalValue(lhs), .decimalValue(rhs)):
 			return lhs == rhs
+		case (.decimalValue, _):
+			return false
 
 		case let (.preciseDecimalValue(lhs), .preciseDecimalValue(rhs)):
 			return lhs == rhs
+		case (.preciseDecimalValue, _):
+			return false
 
 		case let (.nonFungibleLocalIdValue(lhs), .nonFungibleLocalIdValue(rhs)):
 			return lhs == rhs
+		case (.nonFungibleLocalIdValue, _):
+			return false
 
 		case let (.addressReservationValue(lhs), .addressReservationValue(rhs)):
 			return lhs == rhs
-		default:
-			// Handle new cases here if `switch outer` above fails to compile.
+		case (.addressReservationValue, _):
 			return false
 		}
 	}
@@ -757,8 +787,8 @@ extension TransactionType: Hashable {
 		case let (.stakeTransaction(lhsStakes), .stakeTransaction(rhsStakes)):
 			return lhsStakes == rhsStakes
 
-		case let (.unstakeTransaction(lhsUnstake), .unstakeTransaction(unstakeTransaction)):
-			return lhsUnstake == unstakeTransaction
+		case let (.unstakeTransaction(lhsUnstake), .unstakeTransaction(rhsUnstake)):
+			return lhsUnstake == rhsUnstake
 
 		case (.claimStakeTransaction, _),
 		     (.stakeTransaction, _),
@@ -872,8 +902,7 @@ extension ResourceTracker: Hashable {
 		case let (.nonFungible(lhsAddress, lhsAmount, lhsIds), .nonFungible(rhsAddress, rhsAmount, rhsIds)):
 			return lhsAddress == rhsAddress && lhsAmount == rhsAmount && lhsIds == rhsIds
 
-		case (.fungible, _),
-		     (.nonFungible, _):
+		case (.fungible, _), (.nonFungible, _):
 			return false
 		}
 	}
@@ -996,83 +1025,165 @@ extension ClaimStakeInformation: Hashable {
 // MARK: - MetadataValue + Hashable
 extension MetadataValue: Hashable {
 	public static func == (lhs: MetadataValue, rhs: MetadataValue) -> Bool {
-		// We really dont want this switch, we want to have a single switch
-		// and do `case (.foo, _), (.bar, _), ...,: return false`
-		// unfortunately Swift compiler cannot compile that => force
-		// to have this switch to catch new cases and must use `default:` in
-		// the switch below.
-		switch lhs {
-		case .stringValue, .boolValue, .u8Value, .u32Value, .u64Value, .i32Value, .i64Value, .decimalValue, .globalAddressValue, .publicKeyValue, .nonFungibleGlobalIdValue, .nonFungibleLocalIdValue, .instantValue, .urlValue, .originValue, .publicKeyHashValue, .stringArrayValue, .boolArrayValue, .u8ArrayValue, .u32ArrayValue, .u64ArrayValue, .i32ArrayValue, .i64ArrayValue, .decimalArrayValue, .globalAddressArrayValue, .publicKeyArrayValue, .nonFungibleGlobalIdArrayValue, .nonFungibleLocalIdArrayValue, .instantArrayValue, .urlArrayValue, .originArrayValue, .publicKeyHashArrayValue:
-			// If this switch does not compile you MUST handle the new case in the EQ impl below!
-			break
-		}
-
 		switch (lhs, rhs) {
 		case let (.stringValue(lhsValue), .stringValue(rhsValue)):
 			return lhsValue == rhsValue
+		case (.stringValue, _):
+			return false
+
 		case let (.boolValue(lhsValue), .boolValue(rhsValue)):
 			return lhsValue == rhsValue
+		case (.boolValue, _):
+			return false
+
 		case let (.u8Value(lhsValue), .u8Value(rhsValue)):
 			return lhsValue == rhsValue
+		case (.u8Value, _):
+			return false
+
 		case let (.u32Value(lhsValue), .u32Value(rhsValue)):
 			return lhsValue == rhsValue
+		case (.u32Value, _):
+			return false
+
 		case let (.u64Value(lhsValue), .u64Value(rhsValue)):
 			return lhsValue == rhsValue
+		case (.u64Value, _):
+			return false
+
 		case let (.i32Value(lhsValue), .i32Value(rhsValue)):
 			return lhsValue == rhsValue
+		case (.i32Value, _):
+			return false
+
 		case let (.i64Value(lhsValue), .i64Value(rhsValue)):
 			return lhsValue == rhsValue
+		case (.i64Value, _):
+			return false
+
 		case let (.decimalValue(lhsValue), .decimalValue(rhsValue)):
 			return lhsValue == rhsValue
+		case (.decimalValue, _):
+			return false
+
 		case let (.globalAddressValue(lhsValue), .globalAddressValue(rhsValue)):
 			return lhsValue == rhsValue
+		case (.globalAddressValue, _):
+			return false
+
 		case let (.publicKeyValue(lhsValue), .publicKeyValue(rhsValue)):
 			return lhsValue == rhsValue
+		case (.publicKeyValue, _):
+			return false
+
 		case let (.nonFungibleGlobalIdValue(lhsValue), .nonFungibleGlobalIdValue(rhsValue)):
 			return lhsValue == rhsValue
+		case (.nonFungibleGlobalIdValue, _):
+			return false
+
 		case let (.nonFungibleLocalIdValue(lhsValue), .nonFungibleLocalIdValue(rhsValue)):
 			return lhsValue == rhsValue
+		case (.nonFungibleLocalIdValue, _):
+			return false
+
 		case let (.instantValue(lhsValue), .instantValue(rhsValue)):
 			return lhsValue == rhsValue
+		case (.instantValue, _):
+			return false
+
 		case let (.urlValue(lhsValue), .urlValue(rhsValue)):
 			return lhsValue == rhsValue
+		case (.urlValue, _):
+			return false
+
 		case let (.originValue(lhsValue), .originValue(rhsValue)):
 			return lhsValue == rhsValue
+		case (.originValue, _):
+			return false
+
 		case let (.publicKeyHashValue(lhsValue), .publicKeyHashValue(rhsValue)):
 			return lhsValue == rhsValue
+		case (.publicKeyHashValue, _):
+			return false
+
 		case let (.stringArrayValue(lhsValue), .stringArrayValue(rhsValue)):
 			return lhsValue == rhsValue
+		case (.stringArrayValue, _):
+			return false
+
 		case let (.boolArrayValue(lhsValue), .boolArrayValue(rhsValue)):
 			return lhsValue == rhsValue
+		case (.boolArrayValue, _):
+			return false
+
 		case let (.u8ArrayValue(lhsValue), .u8ArrayValue(rhsValue)):
 			return lhsValue == rhsValue
+		case (.u8ArrayValue, _):
+			return false
+
 		case let (.u32ArrayValue(lhsValue), .u32ArrayValue(rhsValue)):
 			return lhsValue == rhsValue
+		case (.u32ArrayValue, _):
+			return false
+
 		case let (.u64ArrayValue(lhsValue), .u64ArrayValue(rhsValue)):
 			return lhsValue == rhsValue
+		case (.u64ArrayValue, _):
+			return false
+
 		case let (.i32ArrayValue(lhsValue), .i32ArrayValue(rhsValue)):
 			return lhsValue == rhsValue
+		case (.i32ArrayValue, _):
+			return false
+
 		case let (.i64ArrayValue(lhsValue), .i64ArrayValue(rhsValue)):
 			return lhsValue == rhsValue
+		case (.i64ArrayValue, _):
+			return false
+
 		case let (.decimalArrayValue(lhsValue), .decimalArrayValue(rhsValue)):
 			return lhsValue == rhsValue
+		case (.decimalArrayValue, _):
+			return false
+
 		case let (.globalAddressArrayValue(lhsValue), .globalAddressArrayValue(rhsValue)):
 			return lhsValue == rhsValue
+		case (.globalAddressArrayValue, _):
+			return false
+
 		case let (.publicKeyArrayValue(lhsValue), .publicKeyArrayValue(rhsValue)):
 			return lhsValue == rhsValue
+		case (.publicKeyArrayValue, _):
+			return false
+
 		case let (.nonFungibleGlobalIdArrayValue(lhsValue), .nonFungibleGlobalIdArrayValue(rhsValue)):
 			return lhsValue == rhsValue
+		case (.nonFungibleGlobalIdArrayValue, _):
+			return false
+
 		case let (.nonFungibleLocalIdArrayValue(lhsValue), .nonFungibleLocalIdArrayValue(rhsValue)):
 			return lhsValue == rhsValue
+		case (.nonFungibleLocalIdArrayValue, _):
+			return false
+
 		case let (.instantArrayValue(lhsValue), .instantArrayValue(rhsValue)):
 			return lhsValue == rhsValue
+		case (.instantArrayValue, _):
+			return false
+
 		case let (.urlArrayValue(lhsValue), .urlArrayValue(rhsValue)):
 			return lhsValue == rhsValue
+		case (.urlArrayValue, _):
+			return false
+
 		case let (.originArrayValue(lhsValue), .originArrayValue(rhsValue)):
 			return lhsValue == rhsValue
+		case (.originArrayValue, _):
+			return false
+
 		case let (.publicKeyHashArrayValue(lhsValue), .publicKeyHashArrayValue(rhsValue)):
 			return lhsValue == rhsValue
-		default /* `switch lhs` above ensures we have handled each `case` */:
+		case (.publicKeyHashArrayValue, _):
 			return false
 		}
 	}
@@ -1182,18 +1293,13 @@ extension MetadataValue: Hashable {
 // MARK: - ManifestAddress + Hashable
 extension ManifestAddress: Hashable {
 	public static func == (lhs: ManifestAddress, rhs: ManifestAddress) -> Bool {
-		switch lhs {
-		case .named, .static:
-			// If this switch does not compile you MUST handle the new case in the EQ impl below
-			break
-		}
-
 		switch (lhs, rhs) {
 		case let (.named(lhs), .named(rhs)):
 			return lhs == rhs
 		case let (.static(lhs), .static(rhs)):
 			return lhs == rhs
-		default /* `switch lhs` above ensures we have handled each `case` */:
+
+		case (.named, _), (.static, _):
 			return false
 		}
 	}
@@ -1237,18 +1343,12 @@ extension AuthorizedDepositorsChanges: Hashable {
 // MARK: - ResourceOrNonFungible + Equatable
 extension ResourceOrNonFungible: Equatable {
 	public static func == (lhs: ResourceOrNonFungible, rhs: ResourceOrNonFungible) -> Bool {
-		switch lhs {
-		case .resource, .nonFungible:
-			// If this does not compile you MUST handle the new case in EQ impl below
-			break
-		}
-
 		switch (lhs, rhs) {
 		case let (.resource(lhsResource), .resource(rhsResource)):
 			return lhsResource == rhsResource
 		case let (.nonFungible(lhsNonFungible), .nonFungible(rhsNonFungible)):
 			return lhsNonFungible == rhsNonFungible
-		default /* `switch lhs` above ensures we have handled each `case` */:
+		case (.resource, _), (.nonFungible, _):
 			return false
 		}
 	}

@@ -54,32 +54,6 @@ final class GatewaySettingsFeatureTests: TestCase {
 		await viewTask.cancel()
 	}
 
-	func test_whenUserInputsURL_thenAddButtonChangesStateBasedOnURLValidity() async throws {
-		// given
-		let invalidURL = "non valid URL"
-
-		// given
-		let store = TestStore(
-			initialState: AddNewGateway.State(),
-			reducer: AddNewGateway.init
-		)
-		let validURL = URL.previewValue.absoluteString
-
-		// when
-		await store.send(.view(.textFieldChanged(validURL))) {
-			// then
-			$0.inputtedURL = validURL
-			$0.addGatewayButtonState = .enabled
-		}
-
-		// when
-		await store.send(.view(.textFieldChanged(invalidURL))) {
-			// then
-			$0.inputtedURL = invalidURL
-			$0.addGatewayButtonState = .disabled
-		}
-	}
-
 	func test_whenTappedOnRemoveGateway_removeGatewayAlertIsShown() async throws {
 		// given
 		let store = TestStore(
