@@ -14,47 +14,53 @@ extension AssetsView {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: identity, send: FeatureAction.view) { viewStore in
-				ScrollView {
-					VStack(spacing: .medium3) {
-						assetTypeSelectorView(viewStore)
+				List {
+					// VStack(spacing: .medium3) {
+//						assetTypeSelectorView(viewStore)
+					//                        .listRowBackground(Color.clear)
+					//                        .listRowInsets(.init())
+					//                        .listRowSeparator(.hidden)
 
-						if viewStore.isLoadingResources {
-							ProgressView()
-								.padding(.small1)
-						} else {
-							switch viewStore.activeAssetKind {
-							case .fungible:
-								IfLetStore(
-									store.scope(
-										state: \.fungibleTokenList,
-										action: { .child(.fungibleTokenList($0)) }
-									),
-									then: { FungibleAssetList.View(store: $0) },
-									else: { EmptyAssetListView.fungibleResources }
-								)
-							case .nonFungible:
-								IfLetStore(
-									store.scope(
-										state: \.nonFungibleTokenList,
-										action: { .child(.nonFungibleTokenList($0)) }
-									),
-									then: { NonFungibleAssetList.View(store: $0) },
-									else: { EmptyAssetListView.nonFungibleResources }
-								)
-							case .poolUnits:
-								IfLetStore(
-									store.scope(
-										state: \.poolUnitsList,
-										action: { .child(.poolUnitsList($0)) }
-									),
-									then: { PoolUnitsList.View(store: $0) },
-									else: { EmptyAssetListView.poolUnits }
-								)
-							}
+					if viewStore.isLoadingResources {
+						ProgressView()
+							.padding(.small1)
+					} else {
+						switch viewStore.activeAssetKind {
+						case .fungible:
+							IfLetStore(
+								store.scope(
+									state: \.fungibleTokenList,
+									action: { .child(.fungibleTokenList($0)) }
+								),
+								then: { FungibleAssetList.View(store: $0) },
+								else: { EmptyAssetListView.fungibleResources }
+							)
+						case .nonFungible:
+							IfLetStore(
+								store.scope(
+									state: \.nonFungibleTokenList,
+									action: { .child(.nonFungibleTokenList($0)) }
+								),
+								then: { NonFungibleAssetList.View(store: $0) },
+								else: { EmptyAssetListView.nonFungibleResources }
+							)
+						case .poolUnits:
+							IfLetStore(
+								store.scope(
+									state: \.poolUnitsList,
+									action: { .child(.poolUnitsList($0)) }
+								),
+								then: { PoolUnitsList.View(store: $0) },
+								else: { EmptyAssetListView.poolUnits }
+							)
 						}
 					}
-					.padding(.bottom, .medium1)
+					// }
 				}
+				.listStyle(.plain)
+				.padding([.horizontal, .bottom], .medium3)
+				.tokenRowShadow()
+				.scrollIndicators(.hidden)
 				.refreshable {
 					await viewStore.send(.pullToRefreshStarted).finish()
 				}
@@ -102,7 +108,7 @@ extension AssetsView {
 
 				Spacer()
 			}
-			.padding([.top, .horizontal], .medium1)
+			.padding([.top], .medium1)
 		}
 	}
 }

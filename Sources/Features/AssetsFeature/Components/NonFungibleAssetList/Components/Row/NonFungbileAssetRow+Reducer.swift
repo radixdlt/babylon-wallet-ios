@@ -111,6 +111,8 @@ extension NonFungibleAssetList {
 				return .none
 			}
 
+			print("Loading resources")
+
 			state.isLoadingResources = true
 			let cursor = state.nextPageCursor
 			return .run { [resource = state.resource, accountAddress = state.accountAddress] send in

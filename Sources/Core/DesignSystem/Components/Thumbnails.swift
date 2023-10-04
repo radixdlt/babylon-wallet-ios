@@ -144,13 +144,18 @@ public struct LoadableImage<Placeholder: View>: View {
 		placeholders placeholderBehaviour: LoadableImagePlaceholderBehaviour = .default,
 		placeholder: () -> Placeholder
 	) {
-		if let url, !url.isVectorImage {
-			@Dependency(\.urlFormatterClient) var urlFormatterClient
-			switch sizingBehaviour {
-			case let .fixedSize(hitTargetSize, _):
-				self.url = urlFormatterClient.fixedSizeImage(url, Screen.pixelScale * hitTargetSize.frame)
-			case .flexible:
-				self.url = urlFormatterClient.generalImage(url)
+		if let url {
+			if url.isVectorImage {
+				loggerGlobal.warning("LoadableImage: Vector images are not supported \(url)")
+				self.url = nil
+			} else {
+				@Dependency(\.urlFormatterClient) var urlFormatterClient
+				switch sizingBehaviour {
+				case let .fixedSize(hitTargetSize, _):
+					self.url = urlFormatterClient.fixedSizeImage(url, Screen.pixelScale * hitTargetSize.frame)
+				case .flexible:
+					self.url = urlFormatterClient.generalImage(url)
+				}
 			}
 		} else {
 			self.url = url
@@ -180,14 +185,17 @@ public struct LoadableImage<Placeholder: View>: View {
 					imageView(image: image, imageSize: state.imageContainer?.image.size)
 				} else {
 					brokenImageView
-					if let error = state.error {
-						if url.isVectorImage {
-							let _ = loggerGlobal.warning("Vector images are not supported \(url): \(error)")
-						} else {
-							let _ = loggerGlobal.warning("Could not load thumbnail \(url): \(error)")
-						}
-					}
+					let _ = loggerGlobal.warning("Could not load thumbnail \(url): \(state.error)")
 				}
+			}
+			.onCreated { _ in
+				print("Image created")
+			}
+			.onSuccess { _ in
+				print("sucess response")
+			}
+			.onPreview { _ in
+				print("preview")
 			}
 		} else {
 			placeholder

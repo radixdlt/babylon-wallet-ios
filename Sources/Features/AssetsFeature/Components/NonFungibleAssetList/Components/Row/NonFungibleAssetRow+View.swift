@@ -25,33 +25,61 @@ extension NonFungibleAssetList.Row.View {
 //			if viewStore.resource.nonFungibleIds.isEmpty {
 //				EmptyView()
 //			} else {
-			StackedViewsLayout(isExpanded: viewStore.isExpanded) {
-				rowView(viewStore)
-					.zIndex(.infinity)
+			Section {
 				if viewStore.isExpanded {
-					LazyVStack {
-						ForEach(
-							Array(
-								viewStore.loadedTokens.enumerated()
-							),
-							id: \.element
-						) { index, item in
-							componentView(with: viewStore, asset: item, index: index)
-								.onAppear {
-									viewStore.send(.onTokenDidAppear(index: index))
-								}
-						}
-					}
-				} else {
-					ForEach(0 ..< Constants.collapsedCardsCount) { index in
-						collapsedPlaceholderView(index)
+					ForEach(
+						Array(
+							viewStore.loadedTokens.enumerated()
+						),
+						id: \.element
+					) { index, item in
+						componentView(with: viewStore, asset: item, index: index)
+						// .listRowInsets(.init())
 					}
 				}
+			} header: {
+				ZStack {
+					rowView(viewStore)
+						.zIndex(.infinity)
+					if !viewStore.isExpanded {
+						ForEach(0 ..< Constants.collapsedVisibleCardsCount) { index in
+							collapsedPlaceholderView(index)
+								.offset(y: CGFloat(index) * .small1)
+						}
+					} else {
+						Divider()
+					}
+				}
+				.listRowInsets(.init(top: .zero, leading: .zero, bottom: 3, trailing: .zero))
 			}
+
+//			StackedViewsLayout(isExpanded: viewStore.isExpanded) {
+//				rowView(viewStore)
+//					.zIndex(.infinity)
+//				if viewStore.isExpanded {
+//					LazyVStack {
+//						ForEach(
+//							Array(
+//								viewStore.loadedTokens.enumerated()
+//							),
+//							id: \.element
+//						) { index, item in
+//							componentView(with: viewStore, asset: item, index: index)
+//								.onAppear {
+//									viewStore.send(.onTokenDidAppear(index: index))
+//								}
+//						}
+//					}
+//				} else {
+//					ForEach(0 ..< Constants.collapsedCardsCount) { index in
+//						collapsedPlaceholderView(index)
+//					}
+//				}
+//			}
 			.onAppear {
 				viewStore.send(.didAppear)
 			}
-			.padding(.horizontal, .medium3)
+			//	.padding(.horizontal, .medium3)
 //			}
 		}
 	}
@@ -117,26 +145,26 @@ extension NonFungibleAssetList.Row.View {
 		index: Int
 	) -> some View {
 		let isDisabled = viewStore.disabled.contains(asset.id)
-		HStack {
-			NFTIDView(
-				id: asset.id.localId().toUserFacingString(),
-				name: asset.data.name,
-				description: asset.data.description,
-				thumbnail: viewStore.isExpanded ? asset.data.keyImageURL : nil
-			)
-			if let selectedAssets = viewStore.selectedAssets {
-				CheckmarkView(appearance: .dark, isChecked: selectedAssets.contains(asset))
-			}
-		}
-		.opacity(isDisabled ? 0.35 : 1)
-		.padding(.medium1)
-		.frame(minHeight: headerHeight)
-		.background(.app.white)
-		.roundedCorners(
-			.bottom,
-			radius: index != (viewStore.loadedTokens.count - 1) ? .zero : .small1
+		// HStack {
+		NFTIDView(
+			id: asset.id.localId().toUserFacingString(),
+			name: asset.data.name,
+			description: asset.data.description,
+			thumbnail: asset.data.keyImageURL
 		)
-		.onTapGesture { viewStore.send(.assetTapped(asset)) }
+//			if let selectedAssets = viewStore.selectedAssets {
+//				CheckmarkView(appearance: .dark, isChecked: selectedAssets.contains(asset))
+//			}
+//		}
+//		.opacity(isDisabled ? 0.35 : 1)
+//		//.padding(.medium1)
+//		//.frame(minHeight: headerHeight)
+//		.background(.app.white)
+		////		.roundedCorners(
+		////			.bottom,
+		////			radius: index != (viewStore.loadedTokens.count - 1) ? .zero : .small1
+		////		)
+//		.onTapGesture { viewStore.send(.assetTapped(asset)) }
 	}
 }
 
@@ -165,7 +193,7 @@ extension NonFungibleAssetList.Row.View {
 
 		/// Even though `collapsedVisibleCardsCount` will be visible, we do collapse more cards
 		/// so that the expand/collapse animation hides the addition/removal for the rest of the cards
-		static let collapsedCardsCount = 6
+		static let collapsedCardsCount = 2
 
 		/// default scale for one card
 		static let scale: CGFloat = 0.05
