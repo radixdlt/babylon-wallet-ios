@@ -41,7 +41,7 @@ extension CreateAccountConfig {
 		case let .firstAccountOnNewNetwork(specificNetworkID):
 			self.init(
 				isFirstAccount: true,
-				canBeDismissed: false,
+				canBeDismissed: true,
 				navigationButtonCTA: .goBackToGateways,
 				specificNetworkID: specificNetworkID
 			)
