@@ -31,33 +31,39 @@ jobs:
     runs-on: macos-13
 
     steps:
-      - uses: radixdlt/public-iac-resuable-artifacts/fetch-secrets@main
+      - uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b
+      - name: Configure AWS credentials to fetch secrets
+        uses: aws-actions/configure-aws-credentials@97271860067ec931c45b8d104fbf0d15954ab85c # branch v1-node16
         with:
-          role_name: ${{ secrets.GH_WALLET_SECRET_ACCESS }}
-          app_name: 'babylon-wallet-ios'
-          step_name: 'testFlightDeploy'
-          secret_prefix: 'WALLET'
-          secret_name: ${{ secrets.AWS_SECRET_NAME_WALLET }}
-          parse_json: true
-      - uses: radixdlt/public-iac-resuable-artifacts/fetch-secrets@main
+          role-to-assume: ${{ secrets.GH_WALLET_SECRET_ACCESS }}
+          aws-region: "eu-west-2"
+          role-session-name: 'babylon-wallet-ios-${{ github.run_id }}-${{ github.run_attempt }}'
+      - name: Fetch AWS secrets
+        uses: aws-actions/aws-secretsmanager-get-secrets@287592d14d9c9c48199db83dc182ae12af3df18e # v1.0.1
         with:
-          role_name: ${{ secrets.GH_WALLET_SECRET_ACCESS }}
-          app_name: 'babylon-wallet-ios'
-          step_name: 'testFlightDeploy'
-          secret_prefix: 'SWIFT_SSH'
-          secret_name: ${{ secrets.AWS_SECRET_NAME_WALLET_SWIFT_SSH }}
-          parse_json: true
-      - uses: radixdlt/public-iac-resuable-artifacts/fetch-secrets@main
+          secret-ids: |
+            WALLET, ${{ secrets.AWS_SECRET_NAME_WALLET }}
+          parse-json-secrets: true
+      - name: Fetch AWS secrets
+        uses: aws-actions/aws-secretsmanager-get-secrets@287592d14d9c9c48199db83dc182ae12af3df18e # v1.0.1
         with:
-          role_name: ${{ secrets.GH_WALLET_SECRET_ACCESS }}
-          app_name: 'babylon-wallet-ios'
-          step_name: 'testFlightDeploy'
-          secret_prefix: 'FASTLANE_SSH'
-          secret_name: ${{ secrets.AWS_SECRET_NAME_WALLET_FASTLANE_SSH }}
-          parse_json: true
+          secret-ids: |
+            SWIFT_SSH, ${{ secrets.AWS_SECRET_NAME_WALLET_SWIFT_SSH }}
+          parse-json-secrets: true
+      - name: Fetch AWS secrets
+        uses: aws-actions/aws-secretsmanager-get-secrets@287592d14d9c9c48199db83dc182ae12af3df18e # v1.0.1
+        with:
+          secret-ids: |
+            FASTLANE_SSH, ${{ secrets.AWS_SECRET_NAME_WALLET_FASTLANE_SSH }}
+          parse-json-secrets: true
+      - uses: webfactory/ssh-agent@v0.6.0
+        with:
+          ssh-private-key: |
+            ${{ env.SWIFT_SSH }}
+            ${{ env.FASTLANE_SSH }}
       - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8
         with:
-          token: ${{ secrets.RADIX_BOT_PAT }}
+          token: ${{ env.WALLET_RADIX_BOT_PAT }}
 
       - uses: ruby/setup-ruby@v1
         with:
@@ -71,17 +77,17 @@ jobs:
       - uses: webfactory/ssh-agent@v0.6.0
         with:
           ssh-private-key: |
-            ${{ env.WALLET_SWIFT_ENGINE_TOOLKIT_SSH_KEY_DECODE }}
-            ${{ env.WALLET_FASTLANE_MATCH_REPO_SSH_KEY_DECODE }}
+            ${{ env.SWIFT_SSH }}
+            ${{ env.FASTLANE_SSH }}
 
       - name: Config local env
         run: |
           git config user.name $GIT_USER
           git config user.email $GIT_USER
-          echo "${{ secrets.WALLET_FASTLANE_SECRETS_BASE64 }}" | base64 --decode > fastlane/.env.secret
+          echo "${{ env.WALLET_FASTLANE_SECRETS_BASE64 }}" | base64 --decode > fastlane/.env.secret
           brew install xcbeautify
         env:
-          GIT_USER: ${{ secrets.WALLET_RADIX_BOT_USERNAME }}
+          GIT_USER: ${{ env.WALLET_RADIX_BOT_USERNAME }}
 
       - name: "Deploy"
         run: |
@@ -92,4 +98,4 @@ jobs:
           fi
           bundle exec fastlane ios deploy --env ios.$FLAVOUR
         env:
-          GIT_TOKEN: ${{ secrets.WALLET_RADIX_BOT_PAT }}
+          GIT_TOKEN: ${{ env.WALLET_RADIX_BOT_PAT }}
