@@ -131,19 +131,19 @@ jobs:
         uses: aws-actions/aws-secretsmanager-get-secrets@287592d14d9c9c48199db83dc182ae12af3df18e # v1.0.1
         with:
           secret-ids: |
-            'WALLET', ${{ secrets.AWS_SECRET_NAME_WALLET }}
+            WALLET, ${{ secrets.AWS_SECRET_NAME_WALLET }}
           parse-json-secrets: true
       - name: Fetch AWS secrets
         uses: aws-actions/aws-secretsmanager-get-secrets@287592d14d9c9c48199db83dc182ae12af3df18e # v1.0.1
         with:
           secret-ids: |
-            'SWIFT_SSH', ${{ secrets.AWS_SECRET_NAME_WALLET_SWIFT_SSH }}
+            SWIFT_SSH, ${{ secrets.AWS_SECRET_NAME_WALLET_SWIFT_SSH }}
           parse-json-secrets: true
       - name: Fetch AWS secrets
         uses: aws-actions/aws-secretsmanager-get-secrets@287592d14d9c9c48199db83dc182ae12af3df18e # v1.0.1
         with:
           secret-ids: |
-            'FASTLANE_SSH', ${{ secrets.AWS_SECRET_NAME_WALLET_FASTLANE_SSH }}
+            FASTLANE_SSH, ${{ secrets.AWS_SECRET_NAME_WALLET_FASTLANE_SSH }}
           parse-json-secrets: true
       - uses: webfactory/ssh-agent@v0.6.0
         with:
