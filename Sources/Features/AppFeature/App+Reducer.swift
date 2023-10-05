@@ -99,7 +99,7 @@ public struct App: Sendable, FeatureReducer {
 					// Maybe instead we should listen here for the Profile.State change,
 					// and when it switches to `.ephemeral` we navigate to onboarding.
 					// For now, we react to the specific error, since the Profile.State is meant to be private.
-					if error is Profile.ProfileIsUsedOnAnotherDeviceError {
+					if error is Profile.UsedOnAnotherDeviceError {
 						await send(.internal(.toOnboarding))
 						// A slight delay to allow any modal that may be shown to be dismissed.
 						try? await clock.sleep(for: .seconds(0.5))

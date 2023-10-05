@@ -74,7 +74,7 @@ extension ProfileSnapshot.Header {
 		public let description: NonEmptyString
 
 		/// To detect if the same Profile is used on two different phones
-		public let id: ID; public typealias ID = UUID
+		public var id: ID; public typealias ID = UUID
 
 		/// Date when the Profile was tied to this device
 		public let date: Date

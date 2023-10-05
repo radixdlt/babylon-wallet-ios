@@ -19,6 +19,7 @@ public struct SecureStorageClient: Sendable {
 	public var deleteProfileHeaderList: DeleteProfileHeaderList
 
 	public var loadDeviceIdentifier: LoadDeviceIdentifier
+	public var saveDeviceIdentifier: SaveDeviceIdentifier
 }
 
 extension SecureStorageClient {
@@ -36,7 +37,8 @@ extension SecureStorageClient {
 	public typealias SaveProfileHeaderList = @Sendable (ProfileSnapshot.HeaderList) async throws -> Void
 	public typealias DeleteProfileHeaderList = @Sendable () async throws -> Void
 
-	public typealias LoadDeviceIdentifier = @Sendable () async throws -> UUID
+	public typealias LoadDeviceIdentifier = @Sendable () async throws -> UUID?
+	public typealias SaveDeviceIdentifier = @Sendable (UUID) async throws -> Void
 
 	public enum LoadMnemonicPurpose: Sendable, Hashable, CustomStringConvertible {
 		case signTransaction

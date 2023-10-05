@@ -12,7 +12,8 @@ final class ProfileStoreTests: TestCase {
 	/// profile store interleaved with some `Task.yield()`'s which resulted in failures before
 	/// ProfileStore was migrated to use ManagedAtomicLazyReference, for more reading about this
 	/// see: https://forums.swift.org/t/is-this-an-ok-solution-to-achieve-shared-instance-of-actor-using-async-init/63528/2
-	func test_assert_ProfileStore_is_reentrance_free() async throws {
+	func test_assert_ProfileStore_is_reentrancy_free() async throws {
+		let deviceIdentifiers = ActorIsolated<Set<UUID>>([])
 		try await withDependencies {
 			#if canImport(UIKit)
 			$0.device.$name = deviceName
@@ -27,7 +28,10 @@ final class ProfileStoreTests: TestCase {
 			$0.secureStorageClient.saveMnemonicForFactorSource = { XCTAssertNoDifference($0.factorSource.kind, .device) }
 			$0.secureStorageClient.loadProfileSnapshotData = { _ in nil }
 			$0.secureStorageClient.loadDeviceIdentifier = {
-				.init(uuidString: "BABE1442-3C98-41FF-AFB0-D0F5829B020D")!
+				let new = UUID()
+				let set = await deviceIdentifiers.value
+				await deviceIdentifiers.setValue(set.union([new]))
+				return new
 			}
 			$0.date = .constant(Date(timeIntervalSince1970: 0))
 			$0.userDefaultsClient.stringForKey = { _ in
@@ -88,6 +92,8 @@ final class ProfileStoreTests: TestCase {
 			}
 			XCTAssertEqual(values.count, 1) // will fail for `test_reentrant` sometimes
 		}
+		let set = await deviceIdentifiers.value
+		XCTAssertEqual(set.count, 1)
 	}
 
 	func test__WHEN__init__THEN__24_english_word_ephmeral_mnemonic_is_generated() async {

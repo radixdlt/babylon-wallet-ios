@@ -135,39 +135,45 @@ extension SecureStorageClient: DependencyKey {
 			try await deleteProfileHeader(id)
 		}
 
-		@Sendable func loadDeviceIdentifier() async throws -> UUID {
-			func generateAndSetNewDeviceIdentifier() async throws -> UUID {
-				let deviceIdentifier = uuid()
-				let data = try jsonEncoder().encode(deviceIdentifier)
-				try await keychainClient.setDataWithoutAuthForKey(
-					KeychainClient.SetItemWithoutAuthRequest(
-						data: data,
-						key: deviceIdentifierKey,
-						iCloudSyncEnabled: false, // Never, ever synced.
-						accessibility: .whenUnlocked,
-						label: "Radix Wallet device identifier",
-						comment: "The unique identifier of this device"
-					)
-				)
-				return deviceIdentifier
+		@Sendable func loadDeviceIdentifier() async throws -> UUID? {
+			let data: Data?
+			do {
+				data = try await keychainClient
+					.getDataWithoutAuthForKey(deviceIdentifierKey)
+
+			} catch {
+				loggerGlobal.critical("Failed to load device identifier: \(error)")
+				throw error
+			}
+
+			guard let data else {
+				loggerGlobal.notice("No device identifier")
+				return nil
 			}
 
 			do {
-				let storedDeviceIdentifier = try await keychainClient
-					.getDataWithoutAuthForKey(deviceIdentifierKey)
-					.map {
-						try jsonDecoder().decode(UUID.self, from: $0)
-					}
-				guard let storedDeviceIdentifier else {
-					return try await generateAndSetNewDeviceIdentifier()
-				}
-				return storedDeviceIdentifier
+				let id = try jsonDecoder().decode(UUID.self, from: data)
+				loggerGlobal.info("loaded device identifier: \(id)")
+				return id
 			} catch {
-				// clear the identifier and re-generate
-				assertionFailure("Corrupt device identifier in keychain")
-				try await keychainClient.removeDataForKey(deviceIdentifierKey)
-				return try await generateAndSetNewDeviceIdentifier()
+				loggerGlobal.critical("Failed to decode device identifier: \(error)")
+				throw error
 			}
+		}
+
+		@Sendable func saveDeviceIdentifier(_ deviceIdentifier: UUID) async throws {
+			let data = try jsonEncoder().encode(deviceIdentifier)
+
+			try await keychainClient.setDataWithoutAuthForKey(
+				KeychainClient.SetItemWithoutAuthRequest(
+					data: data,
+					key: deviceIdentifierKey,
+					iCloudSyncEnabled: false, // Never, ever synced.
+					accessibility: .whenUnlocked,
+					label: "Radix Wallet device identifier",
+					comment: "The unique identifier of this device"
+				)
+			)
 		}
 
 		return Self(
@@ -272,7 +278,8 @@ extension SecureStorageClient: DependencyKey {
 			loadProfileHeaderList: loadProfileHeaderList,
 			saveProfileHeaderList: saveProfileHeaderList,
 			deleteProfileHeaderList: deleteProfileHeaderList,
-			loadDeviceIdentifier: loadDeviceIdentifier
+			loadDeviceIdentifier: loadDeviceIdentifier,
+			saveDeviceIdentifier: saveDeviceIdentifier
 		)
 	}()
 }
