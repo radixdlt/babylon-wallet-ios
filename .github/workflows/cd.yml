@@ -27,6 +27,14 @@ jobs:
     runs-on: macos-13
 
     steps:
+      - uses: radixdlt/public-iac-resuable-artifacts/fetch-secrets@main
+        with:
+          role_name: ${{ secrets.GH_WALLET_SECRET_ACCESS }}
+          app_name: 'babylon-wallet-ios'
+          step_name: 'testFlightDeploy'
+          secret_prefix: 'WALLET'
+          secret_name: ${{ secrets.AWS_SECRET_NAME_WALLET }}
+          parse_json: true
       - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8
         with:
           token: ${{ secrets.RADIX_BOT_PAT }}
@@ -43,17 +51,17 @@ jobs:
       - uses: webfactory/ssh-agent@v0.6.0
         with:
           ssh-private-key: |
-            ${{ secrets.SWIFT_ENGINE_TOOLKIT_SSH_KEY }}
-            ${{ secrets.FASTLANE_MATCH_REPO_SSH_KEY }}
+            ${{ secrets.WALLET_SWIFT_ENGINE_TOOLKIT_SSH_KEY }}
+            ${{ secrets.WALLET_FASTLANE_MATCH_REPO_SSH_KEY }}
 
       - name: Config local env
         run: |
           git config user.name $GIT_USER
           git config user.email $GIT_USER
-          echo "${{ secrets.FASTLANE_SECRETS }}" | base64 --decode > fastlane/.env.secret
+          echo "${{ secrets.WALLET_FASTLANE_SECRETS_BASE64 }}" | base64 --decode > fastlane/.env.secret
           brew install xcbeautify
         env:
-          GIT_USER: ${{ secrets.RADIX_BOT_USERNAME }}
+          GIT_USER: ${{ secrets.WALLET_RADIX_BOT_USERNAME }}
 
       - name: "Deploy"
         run: |
@@ -64,4 +72,4 @@ jobs:
           fi
           bundle exec fastlane ios deploy --env ios.$FLAVOUR
         env:
-          GIT_TOKEN: ${{ secrets.RADIX_BOT_PAT }}
+          GIT_TOKEN: ${{ secrets.WALLET_RADIX_BOT_PAT }}
