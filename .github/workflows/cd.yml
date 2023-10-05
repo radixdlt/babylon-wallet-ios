@@ -52,11 +52,15 @@ jobs:
         with:
           xcode-version: "14.3.1"
 
+      - name: "SSH_KEY to ENV"
+        run: |
+          echo "WALLET_SWIFT_ENGINE_TOOLKIT_SSH_KEY_DECODE=$(echo $WALLET_SWIFT_ENGINE_TOOLKIT_SSH_KEY_BASE64 | base64 -d)" >> $GITHUB_ENV
+          echo "WALLET_FASTLANE_MATCH_REPO_SSH_KEY_DECODE=$(echo $WALLET_FASTLANE_MATCH_REPO_SSH_KEY_BASE64 | base64 -d)" >> $GITHUB_ENV
       - uses: webfactory/ssh-agent@v0.6.0
         with:
           ssh-private-key: |
-            ${{ secrets.WALLET_SWIFT_ENGINE_TOOLKIT_SSH_KEY }}
-            ${{ secrets.WALLET_FASTLANE_MATCH_REPO_SSH_KEY }}
+            ${{ env.WALLET_SWIFT_ENGINE_TOOLKIT_SSH_KEY_DECODE }}
+            ${{ env.WALLET_FASTLANE_MATCH_REPO_SSH_KEY_DECODE }}
 
       - name: Config local env
         run: |
