@@ -26,13 +26,14 @@ extension NonFungibleAssetList.Row.View {
 				if viewStore.isExpanded {
 					ForEach(
 						Array(
-							viewStore.tokens.enumerated()
+							viewStore.tokens.flatMap(identity).enumerated()
 						),
 						id: \.offset
 					) { index, item in
 						componentView(with: viewStore, asset: item, index: index)
 							.listRowBackground(Color.white.roundedCorners(.allCorners, radius: .zero))
 							.onAppear {
+								viewStore.send(.onTokenDidAppear(index: index))
 								print("Appeared index \(index)")
 							}
 					}
