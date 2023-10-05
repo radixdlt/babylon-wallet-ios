@@ -24,6 +24,8 @@ private struct PresentationBackgroundModifier: ViewModifier {
 			// hands us the view controller corresponding to the SwiftUI view this modifier is attached
 			// to as soon as it's added to its parent view/window
 			.introspect(.sheet, on: .iOS(.v16...)) { (sheetPresentationController: UISheetPresentationController) in
+				guard sheetPresentationController.additionalDismissalAnimation == nil else { return }
+
 				let viewController = sheetPresentationController.presentedViewController
 
 				guard
@@ -45,18 +47,14 @@ private struct PresentationBackgroundModifier: ViewModifier {
 						}
 					}
 				}()
+				backgroundView.alpha = 0
 				// add the background view at the very back of the container hierarchy
 				containerView.insertSubview(backgroundView, at: 0)
 
-				// Workaround for now
-				// rudimentarily dims in background view
-				backgroundView.alpha = 0
-				UIView.animate(
-					withDuration: 0.35,
-					delay: 0,
-					options: [.curveEaseInOut],
-					animations: { backgroundView.alpha = 1 }
-				)
+				// fade in background view alongside presentation animation
+				viewController.transitionCoordinator?.animate(alongsideTransition: { context in
+					backgroundView.alpha = 1
+				})
 
 				// hook into dismissalTransitionWillBegin via swizzling in order to layer in additional
 				// dismissal animation behavior
