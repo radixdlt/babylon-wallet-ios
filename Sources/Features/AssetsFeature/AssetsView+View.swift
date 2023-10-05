@@ -16,10 +16,10 @@ extension AssetsView {
 			WithViewStore(store, observe: identity, send: FeatureAction.view) { viewStore in
 				List {
 					// VStack(spacing: .medium3) {
-//						assetTypeSelectorView(viewStore)
-					//                        .listRowBackground(Color.clear)
-					//                        .listRowInsets(.init())
-					//                        .listRowSeparator(.hidden)
+					assetTypeSelectorView(viewStore)
+						.listRowBackground(Color.clear)
+						.listRowInsets(.init())
+						.listRowSeparator(.hidden)
 
 					if viewStore.isLoadingResources {
 						ProgressView()
@@ -57,8 +57,9 @@ extension AssetsView {
 					}
 					// }
 				}
-				.listStyle(.plain)
-				.padding([.horizontal, .bottom], .medium3)
+				.listStyle(.grouped)
+				.padding([.horizontal], .medium3)
+				.padding(.top, .small3)
 				.tokenRowShadow()
 				.scrollIndicators(.hidden)
 				.refreshable {

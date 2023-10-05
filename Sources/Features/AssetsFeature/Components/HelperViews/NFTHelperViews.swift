@@ -26,21 +26,26 @@ struct NFTFullView: View {
 
 // MARK: - NFTIDView
 struct NFTIDView: View {
-	let id: String
-	let name: String?
-	let description: String?
-	let thumbnail: URL?
+	let id: Loadable<String>
+	let name: Loadable<String?>
+	let thumbnail: Loadable<URL?>
 
 	var body: some View {
 		VStack(spacing: .small1) {
-			if let thumbnail {
-				NFTFullView(
-					url: thumbnail,
-					minAspect: minImageAspect,
-					maxAspect: maxImageAspect
-				)
-				.padding(.bottom, .small1)
+			if case let .success(thumbnail) = thumbnail {
+				if let thumbnail {
+					NFTFullView(
+						url: thumbnail,
+						minAspect: minImageAspect,
+						maxAspect: maxImageAspect
+					)
+					.padding(.bottom, .small1)
+				}
+			} else {
+				Image(asset: AssetResource.brokenImagePlaceholder)
+					.redacted(reason: .placeholder)
 			}
+
 			NFTNameAndIDView(name: name, id: id)
 		}
 	}
@@ -51,20 +56,24 @@ struct NFTIDView: View {
 
 // MARK: - NFTNameAndIDView
 private struct NFTNameAndIDView: View {
-	let name: String?
-	let id: String
+	let name: Loadable<String?>
+	let id: Loadable<String>
 
 	var body: some View {
 		VStack(alignment: .leading, spacing: .small3) {
-			if let name {
-				Text(name)
-					.textStyle(.body1HighImportance)
-					.foregroundColor(.app.gray1)
+			loadable(name) { name in
+				if let name {
+					Text(name)
+						.textStyle(.body1HighImportance)
+						.foregroundColor(.app.gray1)
+				}
 			}
 
-			Text(id)
-				.textStyle(.body2HighImportance)
-				.foregroundColor(.app.gray2)
+			loadable(id) { id in
+				Text(id)
+					.textStyle(.body2HighImportance)
+					.foregroundColor(.app.gray2)
+			}
 		}
 		.flushedLeft
 	}

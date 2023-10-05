@@ -13,11 +13,13 @@ extension NonFungibleAssetList {
 			public let resource: AccountPortfolio.NonFungibleResource
 			public let accountAddress: AccountAddress
 			public var loadedTokens: IdentifiedArrayOf<OnLedgerEntity.NonFungibleToken> = []
+			public var tokens: [Loadable<OnLedgerEntity.NonFungibleToken>] = []
 			public var nextPageCursor: String?
 			public var isLoadingResources: Bool = false
 			public var isExpanded = false
 			public var disabled: Set<AssetID> = []
 			public var selectedAssets: OrderedSet<OnLedgerEntity.NonFungibleToken>?
+			public var lastVisibleRowIndex: Int = 0
 
 			public init(
 				accountAddress: AccountAddress,
@@ -49,6 +51,7 @@ extension NonFungibleAssetList {
 			public struct TokensLoadResult: Sendable, Equatable {
 				let tokens: [OnLedgerEntity.NonFungibleToken]
 				let nextPageCursor: String?
+				let pageIndex: Int
 			}
 
 			case tokensLoaded(TaskResult<TokensLoadResult>)
@@ -76,29 +79,53 @@ extension NonFungibleAssetList {
 
 			case .isExpandedToggled:
 				state.isExpanded.toggle()
-				guard state.isExpanded, state.loadedTokens.isEmpty else {
-					return .none
+				if state.isExpanded {
+					state.tokens = .init(repeating: .loading, count: state.resource.nonFungibleIdsCount)
 				}
+				return loadResources(&state, pageIndex: 0)
 
-				return loadResources(&state)
+			case let .onTokenDidAppear(index):
+				state.lastVisibleRowIndex = index
 
-			case let .onTokenDidAppear(index: index):
-				guard index == state.loadedTokens.count - State.pageSize else {
-					return .none
+				if state.isLoadingResources == false {
+					return loadResources(&state, pageIndex: 0)
 				}
-
-				return loadResources(&state)
+				return .none
 			}
 		}
 
 		public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 			switch internalAction {
 			case let .tokensLoaded(result):
-				state.isLoadingResources = false
 				switch result {
 				case let .success(tokensPage):
-					state.loadedTokens.append(contentsOf: tokensPage.tokens)
 					state.nextPageCursor = tokensPage.nextPageCursor
+					let totalIdsCount = state.resource.nonFungibleIdsCount
+					let pageSize = State.pageSize
+					let pageIndex = tokensPage.pageIndex
+
+					let rangeOrigin = tokensPage.pageIndex * State.pageSize
+
+					var rangeLength: Int = {
+						if totalIdsCount < State.pageSize {
+							return totalIdsCount
+						}
+
+						return min(totalIdsCount - rangeOrigin, State.pageSize)
+					}()
+
+					state.tokens.replaceSubrange(
+						rangeOrigin ..< (rangeOrigin + rangeLength),
+						with: tokensPage.tokens.map(Loadable.success)
+					)
+
+					if state.lastVisibleRowIndex / State.pageSize > pageIndex {
+						return loadResources(&state, pageIndex: pageIndex + 1)
+					}
+
+					state.isLoadingResources = false
+//					state.loadedTokens.append(contentsOf: tokensPage.tokens)
+//					state.nextPageCursor = tokensPage.nextPageCursor
 				case let .failure(err):
 					break
 				}
@@ -106,7 +133,7 @@ extension NonFungibleAssetList {
 			}
 		}
 
-		func loadResources(_ state: inout State) -> Effect<Action> {
+		func loadResources(_ state: inout State, pageIndex: Int) -> Effect<Action> {
 			guard !state.isLoadingResources, state.loadedTokens.count < state.resource.nonFungibleIdsCount else {
 				return .none
 			}
@@ -131,7 +158,7 @@ extension NonFungibleAssetList {
 						nonFungibleIds: Array(idsPage.ids)
 					))
 
-					return InternalAction.TokensLoadResult(tokens: data, nextPageCursor: idsPage.nextPageCursor)
+					return InternalAction.TokensLoadResult(tokens: data, nextPageCursor: idsPage.nextPageCursor, pageIndex: pageIndex)
 				}
 				await send(.internal(.tokensLoaded(result)))
 			}

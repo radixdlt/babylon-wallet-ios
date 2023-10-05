@@ -22,19 +22,19 @@ extension NonFungibleAssetList.Row.View {
 			observe: identity,
 			send: NonFungibleAssetList.Row.Action.view
 		) { viewStore in
-//			if viewStore.resource.nonFungibleIds.isEmpty {
-//				EmptyView()
-//			} else {
 			Section {
 				if viewStore.isExpanded {
 					ForEach(
 						Array(
-							viewStore.loadedTokens.enumerated()
+							viewStore.tokens.enumerated()
 						),
-						id: \.element
+						id: \.offset
 					) { index, item in
 						componentView(with: viewStore, asset: item, index: index)
-						// .listRowInsets(.init())
+							.listRowBackground(Color.white.roundedCorners(.allCorners, radius: .zero))
+							.onAppear {
+								print("Appeared index \(index)")
+							}
 					}
 				}
 			} header: {
@@ -52,35 +52,9 @@ extension NonFungibleAssetList.Row.View {
 				}
 				.listRowInsets(.init(top: .zero, leading: .zero, bottom: 3, trailing: .zero))
 			}
-
-//			StackedViewsLayout(isExpanded: viewStore.isExpanded) {
-//				rowView(viewStore)
-//					.zIndex(.infinity)
-//				if viewStore.isExpanded {
-//					LazyVStack {
-//						ForEach(
-//							Array(
-//								viewStore.loadedTokens.enumerated()
-//							),
-//							id: \.element
-//						) { index, item in
-//							componentView(with: viewStore, asset: item, index: index)
-//								.onAppear {
-//									viewStore.send(.onTokenDidAppear(index: index))
-//								}
-//						}
-//					}
-//				} else {
-//					ForEach(0 ..< Constants.collapsedCardsCount) { index in
-//						collapsedPlaceholderView(index)
-//					}
-//				}
-//			}
 			.onAppear {
 				viewStore.send(.didAppear)
 			}
-			//	.padding(.horizontal, .medium3)
-//			}
 		}
 	}
 
@@ -141,30 +115,29 @@ extension NonFungibleAssetList.Row.View {
 	@ViewBuilder
 	fileprivate func componentView(
 		with viewStore: ViewStoreOf<NonFungibleAssetList.Row>,
-		asset: OnLedgerEntity.NonFungibleToken,
+		asset: Loadable<OnLedgerEntity.NonFungibleToken>,
 		index: Int
 	) -> some View {
-		let isDisabled = viewStore.disabled.contains(asset.id)
-		// HStack {
-		NFTIDView(
-			id: asset.id.localId().toUserFacingString(),
-			name: asset.data.name,
-			description: asset.data.description,
-			thumbnail: asset.data.keyImageURL
-		)
+		// let isDisabled = viewStore.disabled.contains(asset.id)
+		HStack {
+			NFTIDView(
+				id: asset.id.map { $0.localId().toUserFacingString() },
+				name: asset.data.name,
+				thumbnail: asset.data.keyImageURL
+			)
 //			if let selectedAssets = viewStore.selectedAssets {
 //				CheckmarkView(appearance: .dark, isChecked: selectedAssets.contains(asset))
 //			}
-//		}
-//		.opacity(isDisabled ? 0.35 : 1)
-//		//.padding(.medium1)
-//		//.frame(minHeight: headerHeight)
-//		.background(.app.white)
+		}
+		// .opacity(isDisabled ? 0.35 : 1)
+		.padding(.medium1)
+		.frame(minHeight: headerHeight)
+		.background(.app.white)
 		////		.roundedCorners(
 		////			.bottom,
 		////			radius: index != (viewStore.loadedTokens.count - 1) ? .zero : .small1
 		////		)
-//		.onTapGesture { viewStore.send(.assetTapped(asset)) }
+		// .onTapGesture { viewStore.send(.assetTapped(asset)) }
 	}
 }
 
