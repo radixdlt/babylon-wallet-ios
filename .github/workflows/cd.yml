@@ -54,13 +54,13 @@ jobs:
         uses: aws-actions/aws-secretsmanager-get-secrets@287592d14d9c9c48199db83dc182ae12af3df18e # v1.0.1
         with:
           secret-ids: |
-            FASTLANE_SSH, ${{ secrets.AWS_SECRET_NAME_WALLET_FASTLANE_SSH }}
+            FASTLANE_MATCH_REPO_SSH_KEY, ${{ secrets.AWS_SECRET_NAME_WALLET_FASTLANE_SSH }}
           parse-json-secrets: true
       - uses: webfactory/ssh-agent@v0.6.0
         with:
           ssh-private-key: |
             ${{ env.SWIFT_SSH }}
-            ${{ env.FASTLANE_SSH }}
+            ${{ env.FASTLANE_MATCH_REPO_SSH_KEY }}
       - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8
         with:
           token: ${{ env.WALLET_RADIX_BOT_PAT }}
@@ -78,7 +78,7 @@ jobs:
         with:
           ssh-private-key: |
             ${{ env.SWIFT_SSH }}
-            ${{ env.FASTLANE_SSH }}
+            ${{ env.FASTLANE_MATCH_REPO_SSH_KEY }}
 
       - name: Config local env
         run: |

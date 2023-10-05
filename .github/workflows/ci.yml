@@ -77,13 +77,13 @@ jobs:
           role_name: ${{ secrets.GH_WALLET_SECRET_ACCESS }}
           app_name: 'babylon-wallet-ios'
           step_name: 'test_and_build'
-          secret_prefix: 'SWIFT_SSH'
+          secret_prefix: 'SWIFT_ENGINE_TOOLKIT_SSH_KEY'
           secret_name: ${{ secrets.AWS_SECRET_NAME_WALLET_SWIFT_SSH }}
           parse_json: true
       - uses: webfactory/ssh-agent@v0.6.0
         with:
           ssh-private-key: |
-            ${{ env.SWIFT_SSH }}
+            ${{ env.SWIFT_ENGINE_TOOLKIT_SSH_KEY }}
       - name: Install snyk
         run: |
           npm install snyk -g
@@ -137,19 +137,19 @@ jobs:
         uses: aws-actions/aws-secretsmanager-get-secrets@287592d14d9c9c48199db83dc182ae12af3df18e # v1.0.1
         with:
           secret-ids: |
-            SWIFT_SSH, ${{ secrets.AWS_SECRET_NAME_WALLET_SWIFT_SSH }}
+            SWIFT_ENGINE_TOOLKIT_SSH_KEY, ${{ secrets.AWS_SECRET_NAME_WALLET_SWIFT_SSH }}
           parse-json-secrets: true
       - name: Fetch AWS secrets
         uses: aws-actions/aws-secretsmanager-get-secrets@287592d14d9c9c48199db83dc182ae12af3df18e # v1.0.1
         with:
           secret-ids: |
-            FASTLANE_SSH, ${{ secrets.AWS_SECRET_NAME_WALLET_FASTLANE_SSH }}
+            FASTLANE_MATCH_REPO_SSH_KEY, ${{ secrets.AWS_SECRET_NAME_WALLET_FASTLANE_SSH }}
           parse-json-secrets: true
       - uses: webfactory/ssh-agent@v0.6.0
         with:
           ssh-private-key: |
-            ${{ env.SWIFT_SSH }}
-            ${{ env.FASTLANE_SSH }}
+            ${{ env.SWIFT_ENGINE_TOOLKIT_SSH_KEY }}
+            ${{ env.FASTLANE_MATCH_REPO_SSH_KEY }}
 
       - uses: maxim-lobanov/setup-xcode@v1
         with:
@@ -199,13 +199,13 @@ jobs:
           role_name: ${{ secrets.GH_WALLET_SECRET_ACCESS }}
           app_name: 'babylon-wallet-ios'
           step_name: 'test_and_build'
-          secret_prefix: 'SWIFT_SSH'
+          secret_prefix: 'SWIFT_ENGINE_TOOLKIT_SSH_KEY'
           secret_name: ${{ secrets.AWS_SECRET_NAME_WALLET_SWIFT_SSH }}
           parse_json: true
       - uses: webfactory/ssh-agent@v0.6.0
         with:
           ssh-private-key: |
-            ${{ env.SWIFT_SSH }}
+            ${{ env.SWIFT_ENGINE_TOOLKIT_SSH_KEY }}
       - name: Install snyk
         run: |
           npm install snyk -g
