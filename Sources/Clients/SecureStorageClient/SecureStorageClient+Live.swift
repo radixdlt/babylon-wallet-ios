@@ -71,13 +71,18 @@ extension SecureStorageClient: DependencyKey {
 			key: KeychainClient.Key,
 			iCloudSyncEnabled: Bool
 		) async throws {
+			var label = "Radix Wallet Data"
+			#if DEBUG
+			label += " DEBUG"
+			#endif
+
 			try await keychainClient.setDataWithoutAuthForKey(
 				KeychainClient.SetItemWithoutAuthRequest(
 					data: data,
 					key: key,
 					iCloudSyncEnabled: iCloudSyncEnabled,
 					accessibility: .whenUnlocked, // do not delete the Profile if passcode gets deleted.
-					label: "Radix Wallet Data",
+					label: .init(stringLiteral: label),
 					comment: "Contains your accounts, personas, authorizedDapps, linked connector extensions and wallet app preferences."
 				)
 			)
@@ -92,23 +97,45 @@ extension SecureStorageClient: DependencyKey {
 		}
 
 		@Sendable func loadProfileHeaderList() async throws -> ProfileSnapshot.HeaderList? {
-			try await keychainClient
-				.getDataWithoutAuthForKey(profileHeaderListKeychainKey)
-				.map {
-					try jsonDecoder().decode([ProfileSnapshot.Header].self, from: $0)
-				}
-				.flatMap(ProfileSnapshot.HeaderList.init)
+			let data: Data?
+			do {
+				data = try await keychainClient
+					.getDataWithoutAuthForKey(profileHeaderListKeychainKey)
+			} catch {
+				data = nil
+				let errorMsg = "Failed to load profile header list, error: \(error)"
+				loggerGlobal.error(.init(stringLiteral: errorMsg))
+				assertionFailure(errorMsg)
+			}
+
+			guard let data else {
+				return nil
+			}
+
+			do {
+				let headers = try jsonDecoder().decode([ProfileSnapshot.Header].self, from: data)
+				return ProfileSnapshot.HeaderList(headers)
+			} catch {
+				let errorMsg = "Failed to decode profile headers from json data, error: \(error), data: \(String(describing: data.prettyPrintedJSONString))"
+				loggerGlobal.error(.init(stringLiteral: errorMsg))
+				assertionFailure(errorMsg)
+				return nil
+			}
 		}
 
 		@Sendable func saveProfileHeaderList(_ headers: ProfileSnapshot.HeaderList) async throws {
 			let data = try jsonEncoder().encode(headers)
+			var label = "Radix Wallet Metadata"
+			#if DEBUG
+			label += " DEBUG"
+			#endif
 			try await keychainClient.setDataWithoutAuthForKey(
 				KeychainClient.SetItemWithoutAuthRequest(
 					data: data,
 					key: profileHeaderListKeychainKey,
 					iCloudSyncEnabled: true, // Always synced, since header list might be used by multiple devices
 					accessibility: .whenUnlocked,
-					label: "Radix Wallet Metadata",
+					label: .init(stringLiteral: label),
 					comment: "Contains the metadata about Radix Wallet Data."
 				)
 			)
@@ -164,13 +191,18 @@ extension SecureStorageClient: DependencyKey {
 		@Sendable func saveDeviceIdentifier(_ deviceIdentifier: UUID) async throws {
 			let data = try jsonEncoder().encode(deviceIdentifier)
 
+			var label = "Radix Wallet device identifier"
+			#if DEBUG
+			label += " DEBUG"
+			#endif
+
 			try await keychainClient.setDataWithoutAuthForKey(
 				KeychainClient.SetItemWithoutAuthRequest(
 					data: data,
 					key: deviceIdentifierKey,
 					iCloudSyncEnabled: false, // Never, ever synced.
 					accessibility: .whenUnlocked,
-					label: "Radix Wallet device identifier",
+					label: .init(stringLiteral: label),
 					comment: "The unique identifier of this device"
 				)
 			)
@@ -193,13 +225,18 @@ extension SecureStorageClient: DependencyKey {
 				let mostSecureAccesibilityAndAuthenticationPolicy = try await queryMostSecureAccesibilityAndAuthenticationPolicy()
 				let key = key(factorSourceID: factorSource.id)
 
+				var label: String = "Radix Wallet Factor Secret"
+				#if DEBUG
+				label += " DEBUG"
+				#endif
+
 				try await keychainClient.setDataWithAuthenticationPolicyIfAble(
 					data: data,
 					key: key,
 					iCloudSyncEnabled: false, // We do NOT want to sync this to iCloud, ever.
 					accessibility: mostSecureAccesibilityAndAuthenticationPolicy.accessibility,
 					authenticationPolicy: mostSecureAccesibilityAndAuthenticationPolicy.authenticationPolicy, // can be nil
-					label: "Radix Wallet Factor Secret",
+					label: .init(stringLiteral: label),
 					comment: .init("Created on \(factorSource.hint.name) \(factorSource.supportsOlympia ? " (Olympia)" : "")")
 				)
 			},
@@ -260,8 +297,7 @@ extension SecureStorageClient: DependencyKey {
 			},
 			updateIsCloudProfileSyncEnabled: { profileId, change in
 				guard
-					let profileSnapshotData = try await loadProfileSnapshotData(profileId),
-					let headerList = try await loadProfileHeaderList()
+					let profileSnapshotData = try await loadProfileSnapshotData(profileId)
 				else {
 					return
 				}

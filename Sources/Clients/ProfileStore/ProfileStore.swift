@@ -185,12 +185,19 @@ extension ProfileStore {
 	}
 
 	public func commitEphemeral() async throws {
+		var ephemeralProfile: EphemeralProfile!
 		do {
-			let ephemeral = try assertProfileStateIsEphemeral()
-			try await changeProfileSnapshot(to: ephemeral.profile.snapshot())
-
+			ephemeralProfile = try assertProfileStateIsEphemeral()
 		} catch {
-			let errMsg = "Critically bad, failed to commitEphemeral profile error: \(error)"
+			let errMsg = "Critically bad assertProfileStatIsEphemeral failed: \(error)"
+			loggerGlobal.critical(.init(stringLiteral: errMsg))
+			assertionFailure(errMsg)
+			throw error
+		}
+		do {
+			try await changeProfileSnapshot(to: ephemeralProfile.profile.snapshot())
+		} catch {
+			let errMsg = "Critically bad changeProfileSnapshot failed: \(error)"
 			loggerGlobal.critical(.init(stringLiteral: errMsg))
 			assertionFailure(errMsg)
 			throw error
@@ -258,12 +265,14 @@ extension ProfileStore {
 		profileSnapshot.changeCurrentToMainnetIfNeeded()
 		let deviceID: UUID
 		if let existing = try? await secureStorageClient.loadDeviceIdentifier() {
+			loggerGlobal.notice("found existing device id: \(existing)")
 			deviceID = existing
 		} else {
 			let newDeviceID = uuid()
 			do {
 				try await secureStorageClient.saveDeviceIdentifier(newDeviceID)
 				deviceID = newDeviceID
+				loggerGlobal.notice("successfully saved new device ID: \(newDeviceID)")
 			} catch {
 				let errorMsg = "Failed to save Device ID, bad! error: \(error), not changing device id"
 				loggerGlobal.error(.init(stringLiteral: errorMsg))
@@ -272,13 +281,14 @@ extension ProfileStore {
 			}
 		}
 
-		profileSnapshot.header.lastUsedOnDevice = try await Self.createDeviceInfo(deviceID: deviceID)
+		profileSnapshot.header.lastUsedOnDevice = await Self.createDeviceInfo(deviceID: deviceID)
 
 		updateHeader(&profileSnapshot)
 
 		// Save the updated snapshot.
 		// Do not check the ownership since the device did claim the profile ownership.
 		try await saveProfileSnapshot(profileSnapshot, checkOwnership: false)
+
 		// Update to new active profile id, so it is used from now on.
 		await userDefaultsClient.setActiveProfileID(profileSnapshot.header.id)
 
@@ -623,6 +633,7 @@ extension ProfileStore {
 	@discardableResult
 	private func assertProfileStateIsEphemeral() throws -> EphemeralProfile {
 		struct ExpectedProfileStateToBeEphemeralButItWasNot: Swift.Error {}
+
 		guard let ephemeral else {
 			let errorMessage = "Incorrect implementation: `\(#function)` was called when \(Self.self) was in the wrong state, expected state '\(String(describing: ProfileState.Discriminator.ephemeral))' but was in '\(String(describing: profileStateSubject.value.description))'"
 			loggerGlobal.critical(.init(stringLiteral: errorMessage))
@@ -659,7 +670,7 @@ extension ProfileStore {
 }
 
 extension ProfileStore {
-	static func createDeviceInfo(deviceID: UUID) async throws -> ProfileSnapshot.Header.UsedDeviceInfo {
+	static func createDeviceInfo(deviceID: UUID) async -> ProfileSnapshot.Header.UsedDeviceInfo {
 		@Dependency(\.date) var dateGenerator
 		@Dependency(\.device) var device
 
