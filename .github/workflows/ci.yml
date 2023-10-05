@@ -121,33 +121,31 @@ jobs:
 
     steps:
       - uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b
-      - uses: actions/setup-node@v2
+      - uses: chrislennon/action-aws-cli@v1.1
+      - name: Configure AWS credentials to fetch secrets
+        uses: aws-actions/configure-aws-credentials@97271860067ec931c45b8d104fbf0d15954ab85c # branch v1-node16
         with:
-          node-version: '14'
-      - uses: radixdlt/public-iac-resuable-artifacts/fetch-secrets@main
+          role-to-assume: ${{ secrets.GH_WALLET_SECRET_ACCESS }}
+          aws-region: "eu-west-2"
+          role-session-name: 'babylon-wallet-ios-${{ github.run_id }}-${{ github.run_attempt }}'
+      - name: Fetch AWS secrets
+        uses: aws-actions/aws-secretsmanager-get-secrets@287592d14d9c9c48199db83dc182ae12af3df18e # v1.0.1
         with:
-          role_name: ${{ secrets.GH_WALLET_SECRET_ACCESS }}
-          app_name: 'babylon-wallet-ios'
-          step_name: 'test_and_build'
-          secret_prefix: 'WALLET'
-          secret_name: ${{ secrets.AWS_SECRET_NAME_WALLET }}
-          parse_json: true
-      - uses: radixdlt/public-iac-resuable-artifacts/fetch-secrets@main
+          secret-ids: |
+            'WALLET', ${{ secrets.AWS_SECRET_NAME_WALLET }}
+          parse-json-secrets: true
+      - name: Fetch AWS secrets
+        uses: aws-actions/aws-secretsmanager-get-secrets@287592d14d9c9c48199db83dc182ae12af3df18e # v1.0.1
         with:
-          role_name: ${{ secrets.GH_WALLET_SECRET_ACCESS }}
-          app_name: 'babylon-wallet-ios'
-          step_name: 'test_and_build'
-          secret_prefix: 'SWIFT_SSH'
-          secret_name: ${{ secrets.AWS_SECRET_NAME_WALLET_SWIFT_SSH }}
-          parse_json: true
-      - uses: radixdlt/public-iac-resuable-artifacts/fetch-secrets@main
+          secret-ids: |
+            'SWIFT_SSH', ${{ secrets.AWS_SECRET_NAME_WALLET_SWIFT_SSH }}
+          parse-json-secrets: true
+      - name: Fetch AWS secrets
+        uses: aws-actions/aws-secretsmanager-get-secrets@287592d14d9c9c48199db83dc182ae12af3df18e # v1.0.1
         with:
-          role_name: ${{ secrets.GH_WALLET_SECRET_ACCESS }}
-          app_name: 'babylon-wallet-ios'
-          step_name: 'test_and_build'
-          secret_prefix: 'FASTLANE_SSH'
-          secret_name: ${{ secrets.AWS_SECRET_NAME_WALLET_FASTLANE_SSH }}
-          parse_json: true
+          secret-ids: |
+            'FASTLANE_SSH', ${{ secrets.AWS_SECRET_NAME_WALLET_FASTLANE_SSH }}
+          parse-json-secrets: true
       - uses: webfactory/ssh-agent@v0.6.0
         with:
           ssh-private-key: |
