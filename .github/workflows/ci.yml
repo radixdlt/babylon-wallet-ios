@@ -38,10 +38,10 @@ jobs:
           snyk auth ${{ secrets.SNYK_TOKEN }}
       - name: Snyk deps and licences scan
         run: |
-          snyk test --all-projects --org=${{ secrets.SNYK_BUILDERS_ORG_ID }} --severity-threshold=high
+          snyk test --all-projects --org=${{ secrets.SNYK_COREAPPS_ORG_ID }} --severity-threshold=high
       - name: Snyk code scan
         run: |
-          snyk code test --all-projects --org=${{ secrets.SNYK_BUILDERS_ORG_ID }} --severity-threshold=high
+          snyk code test --all-projects --org=${{ secrets.SNYK_COREAPPS_ORG_ID }} --severity-threshold=high
 
   snyk_sbom:
     permissions:
@@ -84,7 +84,7 @@ jobs:
           snyk auth ${{ secrets.SNYK_TOKEN }}
       - name: Generate SBOM # check SBOM can be generated but nothing is done with it
         run: |
-          snyk sbom --debug --all-projects --org=${{ secrets.SNYK_BUILDERS_ORG_ID }} --format=cyclonedx1.4+json --json-file-output sbom.json
+          snyk sbom --debug --all-projects --org=${{ secrets.SNYK_COREAPPS_ORG_ID }} --format=cyclonedx1.4+json --json-file-output sbom.json
 
   linting:
     name: "Linting"
@@ -183,7 +183,7 @@ jobs:
           snyk auth ${{ secrets.SNYK_TOKEN }}
       - name: Enable Snyk online monitoring to check for vulnerabilities
         run: |
-          snyk monitor --all-projects --org=${{ secrets.SNYK_BUILDERS_ORG_ID }}
+          snyk monitor --all-projects --org=${{ secrets.SNYK_COREAPPS_ORG_ID }}
 
   # snapshot_tests:
   #   name: "Snapshot tests"
