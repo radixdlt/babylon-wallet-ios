@@ -120,8 +120,10 @@ jobs:
       - snyk_scan
 
     steps:
-      - uses: actions/checkout@v3.1.0
-
+      - uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '14'
       - uses: radixdlt/public-iac-resuable-artifacts/fetch-secrets@main
         with:
           role_name: ${{ secrets.GH_WALLET_SECRET_ACCESS }}
