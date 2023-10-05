@@ -13,6 +13,9 @@ concurrency:
 jobs:
 
   snyk_scan:
+    permissions:
+      id-token: write
+      contents: read
     name: "Snyk scan"
     runs-on: ubuntu-latest
     steps:
@@ -41,6 +44,9 @@ jobs:
           snyk code test --all-projects --org=${{ secrets.SNYK_BUILDERS_ORG_ID }} --severity-threshold=high
 
   snyk_sbom:
+    permissions:
+      id-token: write
+      contents: read
     name: "Snyk SBOM"
     runs-on: ubuntu-latest
     needs:
@@ -95,6 +101,9 @@ jobs:
           swiftformat . --lint
 
   test-and-build:
+    permissions:
+      id-token: write
+      contents: read
     name: "Test and build"
     runs-on: macos-13
     timeout-minutes: 70
@@ -142,6 +151,9 @@ jobs:
         run: bundle exec fastlane ios build
 
   snyk_online_monitor:
+    permissions:
+      id-token: write
+      contents: read
     name: "Snyk monitoring"
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
