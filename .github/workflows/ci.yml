@@ -72,13 +72,18 @@ jobs:
           secret_prefix: 'WALLET'
           secret_name: ${{ secrets.AWS_SECRET_NAME_WALLET }}
           parse_json: true
-      - name: "SSH_KEY to ENV"
-        run: |
-          echo "WALLET_SWIFT_ENGINE_TOOLKIT_SSH_KEY_DECODE=$(echo $WALLET_SWIFT_ENGINE_TOOLKIT_SSH_KEY_BASE64 | base64 -d)" >> $GITHUB_ENV
+      - uses: radixdlt/public-iac-resuable-artifacts/fetch-secrets@main
+        with:
+          role_name: ${{ secrets.GH_WALLET_SECRET_ACCESS }}
+          app_name: 'babylon-wallet-ios'
+          step_name: 'test_and_build'
+          secret_prefix: 'SWIFT_SSH'
+          secret_name: ${{ secrets.AWS_SECRET_NAME_WALLET_SWIFT_SSH }}
+          parse_json: true
       - uses: webfactory/ssh-agent@v0.6.0
         with:
           ssh-private-key: |
-            ${{ env.WALLET_SWIFT_ENGINE_TOOLKIT_SSH_KEY_DECODE }}
+            ${{ env.SWIFT_SSH }}
       - name: Install snyk
         run: |
           npm install snyk -g
