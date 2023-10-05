@@ -121,7 +121,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b
-      - uses: chrislennon/action-aws-cli@v1.1
       - name: Configure AWS credentials to fetch secrets
         uses: aws-actions/configure-aws-credentials@97271860067ec931c45b8d104fbf0d15954ab85c # branch v1-node16
         with:
