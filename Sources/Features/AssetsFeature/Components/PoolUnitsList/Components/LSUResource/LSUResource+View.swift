@@ -23,25 +23,14 @@ extension LSUResource {
 				observe: \.viewState,
 				send: LSUResource.Action.view
 			) { viewStore in
-				StackedViewsLayout(
-					isExpanded: viewStore.isExpanded,
-					spacing: 1,
-					collapsedViewsCount: 1
-				) {
+				Section {
 					headerView(with: viewStore)
+						.rowStyle()
 
 					if viewStore.isExpanded {
 						componentsView
 					}
-
-					cardBehindHeader(
-						isStackExpanded: viewStore.isExpanded,
-						headerHeight: headerHeight
-					)
 				}
-			}
-			.onPreferenceChange(HeightPreferenceKey.self) {
-				headerHeight = $0
 			}
 		}
 
@@ -61,66 +50,23 @@ extension LSUResource {
 				}
 			}
 			.padding(.medium2)
-			.background(.app.white)
-			.roundedCorners(viewStore.isExpanded ? .top : .allCorners, radius: .small1)
-			.tokenRowShadow(!viewStore.isExpanded)
-			.zIndex(.infinity)
-			.overlay(
-				GeometryReader { geometry in
-					Color.clear.anchorPreference(
-						key: HeightPreferenceKey.self,
-						value: .bounds
-					) {
-						geometry[$0].height
-					}
-				}
-			)
 			.onTapGesture {
 				viewStore.send(.isExpandedToggled, animation: .easeInOut)
 			}
 		}
 
 		private var componentsView: some SwiftUI.View {
-			VStack(spacing: 1) {
-				ForEachStore(
-					store.scope(
-						state: \.stakes,
-						action: (
-							/LSUResource.Action.child
-								.. LSUResource.ChildAction.stake
-						).embed
-					),
-					content: LSUStake.View.init
-				)
-				.background(.app.white)
-			}
-			.roundedCorners(
-				.bottom,
-				radius: .small1
+			ForEachStore(
+				store.scope(
+					state: \.stakes,
+					action: (
+						/LSUResource.Action.child
+							.. LSUResource.ChildAction.stake
+					).embed
+				),
+				content: LSUStake.View.init
 			)
-		}
-
-		private func cardBehindHeader(
-			isStackExpanded: Bool,
-			headerHeight: CGFloat
-		) -> some SwiftUI.View {
-			GeometryReader { geometry in
-				Spacer(
-					minLength: isStackExpanded
-						? .zero
-						: headerHeight
-				)
-				.background(.app.white)
-				.roundedCorners(
-					.bottom,
-					radius: .small1
-				)
-				.frame(width: geometry.size.width)
-				.scaleEffect(0.95)
-				.tokenRowShadow(!isStackExpanded)
-				.opacity(isStackExpanded ? 0 : 1)
-				.offset(y: .small1)
-			}
+			.rowStyle()
 		}
 	}
 }

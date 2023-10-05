@@ -290,7 +290,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 			return .none
 
 		case let .portfolioLoaded(portfolio):
-			state.assets.updatePortfolio(to: portfolio)
+			// state.assets.updatePortfolio(to: portfolio)
 			return .none
 		}
 	}

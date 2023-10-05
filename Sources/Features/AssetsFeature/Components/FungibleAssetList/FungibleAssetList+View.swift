@@ -15,60 +15,22 @@ extension FungibleAssetList {
 
 extension FungibleAssetList.View {
 	public var body: some View {
-//		VStack(spacing: .medium1) {
-//			IfLetStore(
-//				store.scope(
-//					state: \.xrdToken,
-//					action: { .child(.xrdRow($0)) }
-//				),
-//				then: { store in
-//					Card {
-//						FungibleAssetList.Row.View(store: store)
-//					}
-//				}
-//			)
-//			.padding(.horizontal, .medium3)
-//
-//			Card {
-
-		Section {
-			ForEachStore(
-				store.scope(
-					state: \.nonXrdTokens,
-					action: { .child(.nonXRDRow($0, $1)) }
-				)
-			) { rowStore in
-				FungibleAssetList.Row.View(store: rowStore)
-					.listRowBackground(
-						WithViewStore(store, observe: { $0 }) { viewStore in
-							rowStore.withState { state in
-								let isFirst = viewStore.nonXrdTokens.first?.id == state.id
-								let isLast = viewStore.nonXrdTokens.last?.id == state.id
-
-								let corners: UIRectCorner
-								var radius: CGFloat = .medium1
-								if isFirst {
-									corners = .top
-								} else if isLast {
-									corners = .bottom
-								} else {
-									corners = .allCorners
-									radius = .zero
-								}
-								return Color.app.background.roundedCorners(corners, radius: radius)
-							}
-						}
-					)
-
-				// .separator(.bottom)
-			}
+		ForEachStore(
+			store.scope(
+				state: \.sections,
+				action: { childAction in
+					.child(.section(childAction.0, childAction.1))
+				}
+			)
+		) {
+			FungibleAssetList.Section.View(store: $0)
 		}
-//		.sheet(
-//			store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-//			state: /FungibleAssetList.Destinations.State.details,
-//			action: FungibleAssetList.Destinations.Action.details,
-//			content: { FungibleTokenDetails.View(store: $0) }
-//		)
+		.sheet(
+			store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+			state: /FungibleAssetList.Destinations.State.details,
+			action: FungibleAssetList.Destinations.Action.details,
+			content: { FungibleTokenDetails.View(store: $0) }
+		)
 	}
 }
 

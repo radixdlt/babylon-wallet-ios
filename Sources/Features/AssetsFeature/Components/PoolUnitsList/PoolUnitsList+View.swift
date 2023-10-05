@@ -11,30 +11,32 @@ extension PoolUnitsList {
 		}
 
 		public var body: some SwiftUI.View {
-			VStack(spacing: .medium1) {
-				IfLetStore(
-					store.scope(
-						state: \.lsuResource,
-						action: (
-							/PoolUnitsList.Action.child
-								.. PoolUnitsList.ChildAction.lsuResource
-						).embed
-					),
-					then: LSUResource.View.init
-				)
+//			VStack(spacing: .medium1) {
+			IfLetStore(
+				store.scope(
+					state: \.lsuResource,
+					action: (
+						/PoolUnitsList.Action.child
+							.. PoolUnitsList.ChildAction.lsuResource
+					).embed
+				),
+				then: LSUResource.View.init
+			)
 
-				ForEachStore(
-					store.scope(
-						state: \.poolUnits,
-						action: (
-							/PoolUnitsList.Action.child
-								.. PoolUnitsList.ChildAction.poolUnit
-						).embed
-					),
-					content: PoolUnit.View.init
-				)
-			}
-			.padding(.horizontal, .medium3)
+			ForEachStore(
+				store.scope(
+					state: \.poolUnits,
+					action: (
+						/PoolUnitsList.Action.child
+							.. PoolUnitsList.ChildAction.poolUnit
+					).embed
+				),
+				content: {
+					PoolUnit.View(store: $0)
+				}
+			)
+//			}
+//			.padding(.horizontal, .medium3)
 		}
 	}
 }

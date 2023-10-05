@@ -188,15 +188,6 @@ public struct LoadableImage<Placeholder: View>: View {
 					let _ = loggerGlobal.warning("Could not load thumbnail \(url): \(state.error)")
 				}
 			}
-			.onCreated { _ in
-				print("Image created")
-			}
-			.onSuccess { _ in
-				print("sucess response")
-			}
-			.onPreview { _ in
-				print("preview")
-			}
 		} else {
 			placeholder
 		}

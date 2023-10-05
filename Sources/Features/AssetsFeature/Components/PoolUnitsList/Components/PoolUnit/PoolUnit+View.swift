@@ -23,30 +23,31 @@ extension PoolUnit {
 				observe: \.viewState,
 				send: PoolUnit.Action.view
 			) { viewStore in
-				VStack(spacing: .large2) {
-					PoolUnitHeaderView(viewState: .init(iconURL: viewStore.iconURL)) {
-						Text(viewStore.name)
-							.foregroundColor(.app.gray1)
-							.textStyle(.secondaryHeader)
-					}
-					.padding(-.small3)
-					if refresh != nil {
-						Text("refreshing")
-					}
-					HStack {
-						PoolUnitResourcesView(resources: viewStore.resources)
-							.padding(-.small2)
-
-						if let isSelected = viewStore.isSelected {
-							CheckmarkView(appearance: .dark, isChecked: isSelected)
+				Section {
+					VStack(spacing: .large2) {
+						PoolUnitHeaderView(viewState: .init(iconURL: viewStore.iconURL)) {
+							Text(viewStore.name)
+								.foregroundColor(.app.gray1)
+								.textStyle(.secondaryHeader)
 						}
+						.padding(-.small3)
+						if refresh != nil {
+							Text("refreshing")
+						}
+						HStack {
+							PoolUnitResourcesView(resources: viewStore.resources)
+								.padding(-.small2)
+
+							if let isSelected = viewStore.isSelected {
+								CheckmarkView(appearance: .dark, isChecked: isSelected)
+							}
+						}
+						.onTapGesture { viewStore.send(.didTap) }
 					}
-					.onTapGesture { viewStore.send(.didTap) }
+					.padding(.medium1)
+					.background(.app.white)
+					.rowStyle()
 				}
-				.padding(.medium1)
-				.background(.app.white)
-				.roundedCorners(radius: .small1)
-				.tokenRowShadow()
 			}
 			.sheet(
 				store: store.scope(

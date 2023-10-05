@@ -23,6 +23,9 @@ extension NonFungibleAssetList.Row.View {
 			send: NonFungibleAssetList.Row.Action.view
 		) { viewStore in
 			Section {
+				rowView(viewStore)
+					.rowStyle()
+
 				if viewStore.isExpanded {
 					ForEach(
 						Array(
@@ -31,28 +34,14 @@ extension NonFungibleAssetList.Row.View {
 						id: \.offset
 					) { index, item in
 						componentView(with: viewStore, asset: item, index: index)
-							.listRowBackground(Color.white.roundedCorners(.allCorners, radius: .zero))
+							.rowStyle()
 							.onAppear {
 								viewStore.send(.onTokenDidAppear(index: index))
-								print("Appeared index \(index)")
 							}
 					}
 				}
-			} header: {
-				ZStack {
-					rowView(viewStore)
-						.zIndex(.infinity)
-					if !viewStore.isExpanded {
-						ForEach(0 ..< Constants.collapsedVisibleCardsCount) { index in
-							collapsedPlaceholderView(index)
-								.offset(y: CGFloat(index) * .small1)
-						}
-					} else {
-						Divider()
-					}
-				}
-				.listRowInsets(.init(top: .zero, leading: .zero, bottom: 3, trailing: .zero))
 			}
+			.listSectionSeparator(.hidden)
 			.onAppear {
 				viewStore.send(.didAppear)
 			}
@@ -85,119 +74,73 @@ extension NonFungibleAssetList.Row.View {
 		}
 	}
 
-	private func assetsToDisplay(_ viewStore: ViewStoreOf<NonFungibleAssetList.Row>) -> IdentifiedArrayOf<OnLedgerEntity.NonFungibleToken> {
-		// Put in placeholder items?
-//		if !viewStore.isExpanded {
-//			return IdentifiedArrayOf(uniqueElements: viewStore.loadedTokens.prefix(Constants.collapsedCardsCount))
-//		}
-		viewStore.loadedTokens
-	}
-
 	private var headerHeight: CGFloat { HitTargetSize.small.frame.height + 2 * .medium1 }
+}
+
+extension View {
+	func rowStyle() -> some View {
+		self
+			.listRowInsets(.init())
+			.listRowSeparatorTint(.app.gray2)
+			.alignmentGuide(.listRowSeparatorLeading) { _ in
+				.medium3
+			}
+			.alignmentGuide(.listRowSeparatorTrailing) { viewDimensions in
+				viewDimensions[.listRowSeparatorTrailing] - .medium3
+			}
+	}
 }
 
 // MARK: - Private Computed Properties
 extension NonFungibleAssetList.Row.View {
-	@ViewBuilder
-	fileprivate func collapsedPlaceholderView(_ index: Int) -> some View {
-		Spacer()
-			// .padding(.medium1)
-			.frame(maxWidth: .infinity, minHeight: headerHeight)
-			.background(.app.white)
-			.roundedCorners(
-				.bottom,
-				radius: .small1
-			)
-			.tokenRowShadow(true)
-			.scaleEffect(scale(isExpanded: false, index: index))
-			.zIndex(reversedZIndex(count: Constants.collapsedCardsCount, index: index))
-	}
-
 	@ViewBuilder
 	fileprivate func componentView(
 		with viewStore: ViewStoreOf<NonFungibleAssetList.Row>,
 		asset: Loadable<OnLedgerEntity.NonFungibleToken>,
 		index: Int
 	) -> some View {
-		// let isDisabled = viewStore.disabled.contains(asset.id)
-		HStack {
-			NFTIDView(
-				id: asset.id.map { $0.localId().toUserFacingString() },
-				name: asset.data.name,
-				thumbnail: asset.data.keyImageURL
-			)
-//			if let selectedAssets = viewStore.selectedAssets {
-//				CheckmarkView(appearance: .dark, isChecked: selectedAssets.contains(asset))
-//			}
+		loadable(asset) {
+			VStack(spacing: .medium3) {
+				Spacer()
+					.frame(height: .imagePlaceholderHeight)
+					.background(.app.gray4)
+					.shimmer(active: true, config: .accountResourcesLoading)
+					.cornerRadius(.small1)
+
+				Spacer()
+					.frame(height: .medium1)
+					.background(.app.gray4)
+					.shimmer(active: true, config: .accountResourcesLoading)
+					.cornerRadius(.small1)
+				Spacer()
+					.frame(height: .medium1)
+					.background(.app.gray4)
+					.shimmer(active: true, config: .accountResourcesLoading)
+					.cornerRadius(.small1)
+			}
+			.padding(.medium1)
+			.frame(minHeight: headerHeight)
+		} successContent: { asset in
+			let isDisabled = viewStore.disabled.contains(asset.id)
+			HStack {
+				NFTIDView(
+					id: asset.id.localId().toUserFacingString(),
+					name: asset.data.name,
+					thumbnail: asset.data.keyImageURL
+				)
+				if let selectedAssets = viewStore.selectedAssets {
+					CheckmarkView(appearance: .dark, isChecked: selectedAssets.contains(asset))
+				}
+			}
+			.opacity(isDisabled ? 0.35 : 1)
+			.padding(.medium1)
+			.frame(minHeight: headerHeight)
+			.background(.app.white)
+			.onTapGesture { viewStore.send(.assetTapped(asset)) }
 		}
-		// .opacity(isDisabled ? 0.35 : 1)
-		.padding(.medium1)
-		.frame(minHeight: headerHeight)
-		.background(.app.white)
-		////		.roundedCorners(
-		////			.bottom,
-		////			radius: index != (viewStore.loadedTokens.count - 1) ? .zero : .small1
-		////		)
-		// .onTapGesture { viewStore.send(.assetTapped(asset)) }
 	}
 }
 
-private extension NonFungibleAssetList.Row.View {
-	func reversedZIndex(count: Int, index: Int) -> Double {
-		Double(count - index)
-	}
-
-	func scale(isExpanded: Bool, index: Int) -> CGFloat {
-		if isExpanded {
-			return 1
-		} else {
-			return 1 - CGFloat(min(index + 1, Constants.collapsedVisibleCardsCount)) * Constants.scale
-		}
-	}
-}
-
-// MARK: - NonFungibleAssetList.Row.View.Constants
-extension NonFungibleAssetList.Row.View {
-	fileprivate enum Constants {
-		/// header card index
-		static let headerIndex: Int = -1
-
-		/// number of visible NFT cards in collapsed view, excluding header (top) card
-		static let collapsedVisibleCardsCount = 2
-
-		/// Even though `collapsedVisibleCardsCount` will be visible, we do collapse more cards
-		/// so that the expand/collapse animation hides the addition/removal for the rest of the cards
-		static let collapsedCardsCount = 2
-
-		/// default scale for one card
-		static let scale: CGFloat = 0.05
-	}
-}
-
-// #if DEBUG
-// import SwiftUI // NB: necessary for previews to appear
-//
-// struct NonFungibleRow_Preview: PreviewProvider {
-//	static var previews: some View {
-//		NonFungibleAssetList.Row.View(
-//			store: .init(
-//				initialState: .previewValue,
-//				reducer: NonFungibleAssetList.Row.init
-//			)
-//		)
-//	}
-// }
-//
-// extension NonFungibleAssetList.Row.State {
-//	private static let previewResource = AccountPortfolio.NonFungibleResource(
-//        resourceAddress: previewResourceAddress,
-//		atLedgerState: .init(version: 0),
-//        nonFungibleIds: [],
-//        metadata: .init()
-//	)
-//
-//	private static let previewResourceAddress = try! ResourceAddress(validatingAddress: "resource_tdx_c_1qyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq40v2wv")
-// }
 // #endif
 
 extension OnLedgerEntity.NonFungibleToken {

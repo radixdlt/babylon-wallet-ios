@@ -9,17 +9,17 @@ extension AssetsView {
 		private let store: StoreOf<AssetsView>
 
 		public init(store: StoreOf<AssetsView>) {
+			UITableView.appearance().backgroundColor = UIColor.clear
 			self.store = store
 		}
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: identity, send: FeatureAction.view) { viewStore in
 				List {
-					// VStack(spacing: .medium3) {
 					assetTypeSelectorView(viewStore)
+						.listRowSeparator(.hidden)
 						.listRowBackground(Color.clear)
 						.listRowInsets(.init())
-						.listRowSeparator(.hidden)
 
 					if viewStore.isLoadingResources {
 						ProgressView()
@@ -55,11 +55,10 @@ extension AssetsView {
 							)
 						}
 					}
-					// }
 				}
-				.listStyle(.grouped)
-				.padding([.horizontal], .medium3)
-				.padding(.top, .small3)
+				.scrollContentBackground(.hidden)
+				.listStyle(.insetGrouped)
+				.padding(.top, .zero)
 				.tokenRowShadow()
 				.scrollIndicators(.hidden)
 				.refreshable {
@@ -109,7 +108,6 @@ extension AssetsView {
 
 				Spacer()
 			}
-			.padding([.top], .medium1)
 		}
 	}
 }

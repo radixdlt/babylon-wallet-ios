@@ -1,7 +1,7 @@
 import EngineKit
 import FeaturePrelude
 
-extension FungibleAssetList {
+extension FungibleAssetList.Section {
 	public struct Row: Sendable, FeatureReducer {
 		public struct State: Sendable, Hashable, Identifiable {
 			public typealias ID = ResourceAddress

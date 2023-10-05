@@ -92,8 +92,10 @@ extension NonFungibleAssetList {
 
 			case let .onTokenDidAppear(index):
 				state.lastVisibleRowIndex = index
+				print("Row visible \(index)")
 				let pageIndex = index / State.pageSize
 				if state.isLoadingResources == false, pageIndex > state.lastLoadedPageIndex {
+					print("started to load the next page \(state.lastLoadedPageIndex + 1)")
 					return loadResources(&state, pageIndex: state.lastLoadedPageIndex + 1)
 				}
 				return .none
@@ -108,6 +110,7 @@ extension NonFungibleAssetList {
 					state.nextPageCursor = tokensPage.nextPageCursor
 					state.tokens[tokensPage.pageIndex] = tokensPage.tokens.map(Loadable.success)
 					state.lastLoadedPageIndex = tokensPage.pageIndex
+
 					if state.lastVisibleRowIndex / State.pageSize > tokensPage.pageIndex {
 						return loadResources(&state, pageIndex: tokensPage.pageIndex + 1)
 					}
@@ -128,6 +131,7 @@ extension NonFungibleAssetList {
 			state.isLoadingResources = true
 			let cursor = state.nextPageCursor
 			return .run { [resource = state.resource, accountAddress = state.accountAddress] send in
+				try await Task.sleep(for: .seconds(2))
 				let result = await TaskResult {
 					let idsPage = try await onLedgerEntitiesClient.getNonFungibleResourceIds(.init(
 						account: accountAddress,

@@ -54,7 +54,7 @@ public struct AssetsView: Sendable, FeatureReducer {
 		) {
 			self.account = account
 			self.assetKinds = assetKinds
-			self.activeAssetKind = .nonFungible
+			self.activeAssetKind = assetKinds.first
 			self.fungibleTokenList = fungibleTokenList
 			self.nonFungibleTokenList = nonFungibleTokenList
 			self.poolUnitsList = poolUnitsList
@@ -146,18 +146,20 @@ public struct AssetsView: Sendable, FeatureReducer {
 
 	private func createResourcesState(from portfolio: AccountPortfolio, mode: State.Mode) async -> InternalAction.ResourcesState {
 		let xrd = portfolio.fungibleResources.xrdResource.map { token in
-			FungibleAssetList.Row.State(
+			FungibleAssetList.Section.Row.State(
 				xrdToken: token,
 				isSelected: mode.xrdRowSelected
 			)
 		}
 		let nonXrd = portfolio.fungibleResources.nonXrdResources
 			.map { token in
-				FungibleAssetList.Row.State(
+				FungibleAssetList.Section.Row.State(
 					nonXRDToken: token,
 					isSelected: mode.nonXrdRowSelected(token.resourceAddress)
 				)
 			}
+			.asIdentifiable()
+
 		let nfts = portfolio.nonFungibleResources.map { resource in
 			NonFungibleAssetList.Row.State(
 				accountAddress: portfolio.owner,
@@ -167,9 +169,25 @@ public struct AssetsView: Sendable, FeatureReducer {
 			)
 		}
 		let poolUnits = await createPoolUnitsState(from: portfolio, mode: mode)
+		let fungibleTokenList: FungibleAssetList.State? = {
+			var sections: IdentifiedArrayOf<FungibleAssetList.Section.State> = []
+			if let xrd {
+				sections.append(.init(id: .xrd, rows: [xrd]))
+			}
+
+			if !nonXrd.isEmpty {
+				sections.append(.init(id: .nonXrd, rows: nonXrd))
+			}
+
+			guard !sections.isEmpty else {
+				return nil
+			}
+
+			return .init(sections: sections)
+		}()
 
 		return .init(
-			fungibleTokenList: (xrd != nil || !nonXrd.isEmpty) ? .init(xrdToken: xrd, nonXrdTokens: .init(uniqueElements: nonXrd)) : nil,
+			fungibleTokenList: fungibleTokenList,
 			nonFungibleTokenList: !nfts.isEmpty ? .init(rows: .init(uniqueElements: nfts)) : nil,
 			poolUnitsList: poolUnits
 		)
@@ -248,40 +266,6 @@ public struct AssetsView: Sendable, FeatureReducer {
 }
 
 extension AssetsView.State {
-	public mutating func updatePortfolio(to portfolio: AccountPortfolio) {
-		let xrd = portfolio.fungibleResources.xrdResource.map { token in
-			FungibleAssetList.Row.State(
-				xrdToken: token,
-				isSelected: mode.xrdRowSelected
-			)
-		}
-		let nonXrd = portfolio.fungibleResources.nonXrdResources
-			.map { token in
-				FungibleAssetList.Row.State(
-					nonXRDToken: token,
-					isSelected: mode.nonXrdRowSelected(token.resourceAddress)
-				)
-			}
-		let nfts = portfolio.nonFungibleResources.map { resource in
-			NonFungibleAssetList.Row.State(
-				accountAddress: portfolio.owner,
-				resource: resource,
-				disabled: mode.selectedAssets?.disabledNFTs ?? [],
-				selectedAssets: mode.nftRowSelectedAssets(resource.resourceAddress)
-			)
-		}
-
-		if xrd != nil || !nonXrd.isEmpty {
-			fungibleTokenList = .init(xrdToken: xrd, nonXrdTokens: .init(uniqueElements: nonXrd))
-		}
-
-		if !nfts.isEmpty {
-			nonFungibleTokenList = .init(rows: .init(uniqueElements: nfts))
-		}
-	}
-}
-
-extension AssetsView.State {
 	/// Computed property of currently selected assets
 	public var selectedAssets: Mode.SelectedAssets? {
 		guard case .selection = mode else { return nil }
@@ -293,11 +277,13 @@ extension AssetsView.State {
 			.map(SelectedResourceProvider.init)
 			.compactMap(\.selectedResource) ?? []
 
-		let selectedXRDResource = fungibleTokenList?.xrdToken
+		let selectedXRDResource = fungibleTokenList?.sections[id: .xrd]?
+			.rows
+			.first
 			.map(SelectedResourceProvider.init)
 			.flatMap(\.selectedResource)
 
-		let selectedNonXrdResources = fungibleTokenList?.nonXrdTokens
+		let selectedNonXrdResources = fungibleTokenList?.sections[id: .nonXrd]?.rows
 			.map(SelectedResourceProvider.init)
 			.compactMap(\.selectedResource) ?? []
 
@@ -434,7 +420,7 @@ private struct SelectedResourceProvider<Resource> {
 }
 
 extension SelectedResourceProvider<AccountPortfolio.FungibleResource> {
-	init(with row: FungibleAssetList.Row.State) {
+	init(with row: FungibleAssetList.Section.Row.State) {
 		self.init(
 			isSelected: row.isSelected,
 			resource: row.token
@@ -502,5 +488,13 @@ extension NonFungibleTokensPerResourceProvider {
 			selectedAssets: row.selectedAssets,
 			resource: row.resource
 		)
+	}
+}
+
+extension Array where Element: Identifiable {
+	func asIdentifiable() -> IdentifiedArrayOf<Element> {
+		var array: IdentifiedArrayOf<Element> = []
+		array.append(contentsOf: self)
+		return array
 	}
 }
