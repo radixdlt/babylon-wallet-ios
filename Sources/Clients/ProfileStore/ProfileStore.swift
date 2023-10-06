@@ -397,22 +397,39 @@ extension ProfileStore {
 	}
 
 	enum CheckOwnershipOutcome: Sendable, Hashable {
-		case usedOnAnotherDevice(ProfileSnapshot.Header.UsedDeviceInfo)
 		case successfullyVerifiedOnlyUsedOnThisDevice
+		case usedOnAnotherDevice(ProfileSnapshot.Header.UsedDeviceInfo)
 		case generatedNewDeviceID(successfullySavedIDAndUpdateSnapshot: Bool)
 	}
 
-	static func checkIfDeviceOwnsProfileSnapshot(_ snapshot: inout ProfileSnapshot) async -> CheckOwnershipOutcome {
+	static func checkIfDeviceOwnsProfileSnapshot(
+		_ snapshot: inout ProfileSnapshot
+	) async -> CheckOwnershipOutcome {
 		@Dependency(\.secureStorageClient) var secureStorageClient
 
-		guard let deviceID = try? await secureStorageClient.loadDeviceIdentifier() else {
+		guard
+			let deviceID = try? await secureStorageClient.loadDeviceIdentifier()
+		else {
 			let successfullySavedIDAndUpdateSnapshot = await Self.generateAndSaveNewDeviceIDUpdateAndSaveSnapshotIfIDSavedSuccessfully(&snapshot)
-			return .generatedNewDeviceID(successfullySavedIDAndUpdateSnapshot: successfullySavedIDAndUpdateSnapshot)
+
+			return .generatedNewDeviceID(
+				successfullySavedIDAndUpdateSnapshot: successfullySavedIDAndUpdateSnapshot
+			)
 		}
+
 		let lastUsedOnDevice = snapshot.header.lastUsedOnDevice
+
 		guard lastUsedOnDevice.id == deviceID else {
-			return .usedOnAnotherDevice(lastUsedOnDevice)
+			// FIXME: Before christmas 2023: change to:
+			// `return .usedOnAnotherDevice(lastUsedOnDevice)`
+//			return .usedOnAnotherDevice(lastUsedOnDevice)
+
+			// FIXME: replace these lines
+			try? await secureStorageClient.saveDeviceIdentifier(lastUsedOnDevice.id)
+			return .successfullyVerifiedOnlyUsedOnThisDevice
+			// FIXME: ^ replace these lines
 		}
+
 		return .successfullyVerifiedOnlyUsedOnThisDevice
 	}
 
@@ -563,9 +580,15 @@ extension ProfileStore {
 			}
 
 			switch await checkIfDeviceOwnsProfileSnapshot(&profileSnapshot) {
-			case .successfullyVerifiedOnlyUsedOnThisDevice: break
+			case .successfullyVerifiedOnlyUsedOnThisDevice:
+				break
+
 			case let .usedOnAnotherDevice(otherDevice):
+				// Allow loading of profile, user will proceed to
+				// main, and an alert will be shown, where user
+				// can either reclaim or delete profile.
 				profileUsedOnOtherDeviceSubject.send(otherDevice)
+
 			case let .generatedNewDeviceID(successfullySavedIDAndUpdateSnapshot):
 				if successfullySavedIDAndUpdateSnapshot {
 					do {
