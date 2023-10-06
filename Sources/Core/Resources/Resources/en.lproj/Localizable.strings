@@ -12,6 +12,9 @@
 "homePage_accountsTag_ledgerBabylon" = "Ledger";
 "homePage_visitDashboard_title" = "Visit the Radix Dashboard";
 "homePage_visitDashboard_subtitle" = "Ready to get started using the Radix Network and your Wallet?";
+"homePage_profileOlympiaError_title" = "SERIOUS ERROR - PLEASE READ";
+"homePage_profileOlympiaError_subtitle" = "Your wallet is in a rare condition that must be resolved manually. Please email support at hello@radixdlt.com with subject line BDFS ERROR. Somebody will respond and help you resolve the issue safely.";
+"homePage_profileOlympiaError_okCountdown" = "OK (%d)";
 "account_transfer" = "Transfer";
 "account_tokens" = "Tokens";
 "account_nfts" = "NFTs";
@@ -146,6 +149,8 @@
 "settings_backups" = "Backups";
 "settings_importFromLegacyWallet" = "Import from a Legacy Wallet";
 "settings_ledgerHardwareWallets" = "Ledger Hardware Wallets";
+"settings_depositGuarantees" = "Deposit Guarantees";
+"settings_depositGuarantees_subtitle" = "Set your default guaranteed minimum for estimated deposits";
 "settings_multiFactor" = "Multi-Factor Setup";
 "settings_appVersion" = "Version: %@ build #%@";
 "settings_deleteWalletData" = "Delete Wallet Data";
@@ -759,3 +764,6 @@ Only the **current configuration** of your wallet is backed up with each manual 
 "recoverSeedPhrase_enterButton" = "Enter This Seed Phrase";
 "enterSeedPhrase_header_title" = "Enter Seed Phrase";
 "enterSeedPhrase_warning" = "For your safety, make sure no one is looking at your screen. Never give your seed phrase to anyone for any reason.";
+"depositGuarantees_text" = "Set the guaranteed minimum deposit to be applied whenever a deposit in a transaction can only be estimated.
+
+You can always change the guarantee from this default in each transaction.";
