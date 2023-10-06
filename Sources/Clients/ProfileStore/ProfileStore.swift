@@ -340,6 +340,7 @@ extension ProfileStore {
 
 		if let deviceID = try? await secureStorageClient.loadDeviceIdentifier() {
 			if lastUsedOnDevice.id != deviceID {
+				loggerGlobal.notice("DeviceIdentifier discrepancy, in profile header \(lastUsedOnDevice.id) != \(deviceID) (loaded from keychain) => rectifiying by saving the one found in profile header into keychain.")
 				do {
 					try await secureStorageClient.saveDeviceIdentifier(lastUsedOnDevice.id)
 				} catch {
@@ -347,6 +348,7 @@ extension ProfileStore {
 				}
 			}
 		} else {
+			loggerGlobal.notice("Found no DeviceIdentifier in keychain rectifiying by saving the one found in profile header: \(lastUsedOnDevice.id) into keychain.")
 			do {
 				try await secureStorageClient.saveDeviceIdentifier(lastUsedOnDevice.id)
 			} catch {
