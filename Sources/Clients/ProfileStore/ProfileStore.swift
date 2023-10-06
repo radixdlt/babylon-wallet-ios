@@ -375,17 +375,7 @@ extension ProfileStore {
 			loggerGlobal.error("Bad, generated new device ID, allowing user to continue using wallet though. successfullySavedIDAndUpdateSnapshot? \(successfullySavedIDAndUpdateSnapshot)")
 			return
 		case let .usedOnAnotherDevice(otherDevice):
-			// N.B: We do not reset the active profile id, as doing so, will imply that user has no profile.
-			//       Instead, we will prompt that the user, that the currently active profile is used on other device.
-			let error = Profile.UsedOnAnotherDeviceError(lastUsedOnDevice: otherDevice)
-			// Go to ephemeral state straightaway. The Wallet will redirect user to the Onboarding screen.
-			await changeState(to: .ephemeral(.init(
-				profile: Self.newEphemeralProfile(),
-				loadFailure: .profileUsedOnAnotherDevice(error)
-			)))
-
-			// rethrow the error to halt the execution up the chain
-			throw error
+			throw Profile.UsedOnAnotherDeviceError(lastUsedOnDevice: otherDevice)
 		}
 	}
 
