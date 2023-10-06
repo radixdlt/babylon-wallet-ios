@@ -135,39 +135,26 @@ extension SecureStorageClient: DependencyKey {
 			try await deleteProfileHeader(id)
 		}
 
-		@Sendable func loadDeviceIdentifier() async throws -> UUID {
-			func generateAndSetNewDeviceIdentifier() async throws -> UUID {
-				let deviceIdentifier = uuid()
-				let data = try jsonEncoder().encode(deviceIdentifier)
-				try await keychainClient.setDataWithoutAuthForKey(
-					KeychainClient.SetItemWithoutAuthRequest(
-						data: data,
-						key: deviceIdentifierKey,
-						iCloudSyncEnabled: false, // Never, ever synced.
-						accessibility: .whenUnlocked,
-						label: "Radix Wallet device identifier",
-						comment: "The unique identifier of this device"
-					)
-				)
-				return deviceIdentifier
-			}
-
-			do {
-				let storedDeviceIdentifier = try await keychainClient
-					.getDataWithoutAuthForKey(deviceIdentifierKey)
-					.map {
-						try jsonDecoder().decode(UUID.self, from: $0)
-					}
-				guard let storedDeviceIdentifier else {
-					return try await generateAndSetNewDeviceIdentifier()
+		@Sendable func loadDeviceIdentifier() async throws -> UUID? {
+			try await keychainClient
+				.getDataWithoutAuthForKey(deviceIdentifierKey)
+				.map {
+					try jsonDecoder().decode(UUID.self, from: $0)
 				}
-				return storedDeviceIdentifier
-			} catch {
-				// clear the identifier and re-generate
-				assertionFailure("Corrupt device identifier in keychain")
-				try await keychainClient.removeDataForKey(deviceIdentifierKey)
-				return try await generateAndSetNewDeviceIdentifier()
-			}
+		}
+
+		@Sendable func saveDeviceIdentifier(_ deviceIdentifier: UUID) async throws {
+			let data = try jsonEncoder().encode(deviceIdentifier)
+			try await keychainClient.setDataWithoutAuthForKey(
+				KeychainClient.SetItemWithoutAuthRequest(
+					data: data,
+					key: deviceIdentifierKey,
+					iCloudSyncEnabled: false, // Never, ever synced.
+					accessibility: .whenUnlocked,
+					label: "Radix Wallet device identifier",
+					comment: "The unique identifier of this device"
+				)
+			)
 		}
 
 		return Self(
@@ -272,7 +259,8 @@ extension SecureStorageClient: DependencyKey {
 			loadProfileHeaderList: loadProfileHeaderList,
 			saveProfileHeaderList: saveProfileHeaderList,
 			deleteProfileHeaderList: deleteProfileHeaderList,
-			loadDeviceIdentifier: loadDeviceIdentifier
+			loadDeviceIdentifier: loadDeviceIdentifier,
+			saveDeviceIdentifier: saveDeviceIdentifier
 		)
 	}()
 }

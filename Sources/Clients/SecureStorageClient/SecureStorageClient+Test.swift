@@ -20,7 +20,8 @@ extension SecureStorageClient: TestDependencyKey {
 		loadProfileHeaderList: { nil },
 		saveProfileHeaderList: { _ in },
 		deleteProfileHeaderList: {},
-		loadDeviceIdentifier: { .init() }
+		loadDeviceIdentifier: { .init() },
+		saveDeviceIdentifier: { _ },
 	)
 
 	public static let previewValue: Self = .noop
@@ -36,6 +37,7 @@ extension SecureStorageClient: TestDependencyKey {
 		loadProfileHeaderList: unimplemented("\(Self.self).loadProfileHeaderList"),
 		saveProfileHeaderList: unimplemented("\(Self.self).saveProfileHeaderList"),
 		deleteProfileHeaderList: unimplemented("\(Self.self).deleteProfileHeaderList"),
-		loadDeviceIdentifier: unimplemented("\(Self.self).loadDeviceIdentifier")
+		loadDeviceIdentifier: unimplemented("\(Self.self).loadDeviceIdentifier"),
+		saveDeviceIdentifier: unimplemented("\(Self.self).saveDeviceIdentifier")
 	)
 }
