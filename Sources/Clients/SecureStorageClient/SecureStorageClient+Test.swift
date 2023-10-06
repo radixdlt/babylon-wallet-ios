@@ -21,7 +21,7 @@ extension SecureStorageClient: TestDependencyKey {
 		saveProfileHeaderList: { _ in },
 		deleteProfileHeaderList: {},
 		loadDeviceIdentifier: { .init() },
-		saveDeviceIdentifier: { _ },
+		saveDeviceIdentifier: { _ in }
 	)
 
 	public static let previewValue: Self = .noop
