@@ -147,9 +147,6 @@ public struct App: Sendable, FeatureReducer {
 
 			case .existingProfile:
 				return goToMain(state: &state, accountRecoveryIsNeeded: accountRecoveryNeeded)
-
-			case let .usersExistingProfileCouldNotBeLoaded(failure: .profileUsedOnAnotherDevice(otherDevice)):
-				return goToMain(state: &state, accountRecoveryIsNeeded: false, conflictingDeviceProfileIsUsedOn: otherDevice)
 			}
 
 		default:
@@ -177,11 +174,9 @@ public struct App: Sendable, FeatureReducer {
 
 	func goToMain(
 		state: inout State,
-		accountRecoveryIsNeeded: Bool,
-		conflictingDeviceProfileIsUsedOn: ProfileSnapshot.Header.UsedDeviceInfo? = nil
+		accountRecoveryIsNeeded: Bool
 	) -> Effect<Action> {
 		state.root = .main(.init(
-			conflictingDeviceProfileIsUsedOn: conflictingDeviceProfileIsUsedOn,
 			home: .init(accountRecoveryIsNeeded: accountRecoveryIsNeeded)
 		))
 		return .none

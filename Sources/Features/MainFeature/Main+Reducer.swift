@@ -2,6 +2,7 @@ import AppPreferencesClient
 import FeaturePrelude
 import GatewaysClient
 import HomeFeature
+import OverlayWindowClient
 import SettingsFeature
 
 // MARK: - Main
@@ -16,29 +17,25 @@ public struct Main: Sendable, FeatureReducer {
 		@PresentationState
 		public var destination: Destinations.State?
 
-		// MARK: - Alert
-		@PresentationState
-		public var alert: Alert.State?
-
 		public init(
-			conflictingDeviceProfileIsUsedOn: ProfileSnapshot.Header.UsedDeviceInfo? = nil,
 			home: Home.State
 		) {
 			self.home = home
-			if let conflictingDeviceProfileIsUsedOn {
-				presentAlertProfileUsedOn(otherDevice: conflictingDeviceProfileIsUsedOn)
-			}
 		}
 	}
 
 	public enum ViewAction: Sendable, Equatable {
 		case task
+		case profileUsedOnOtherDeviceErrorAlertAction(ProfileUsedOnOtherDeviceErrorAlertAction)
+		public enum ProfileUsedOnOtherDeviceErrorAlertAction: Sendable, Hashable {
+			case reclaim
+			case deleteProfileOnThisDevice
+		}
 	}
 
 	public enum ChildAction: Sendable, Equatable {
 		case home(Home.Action)
 		case destination(PresentationAction<Destinations.Action>)
-		case alert(PresentationAction<Alert.Action>)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -69,30 +66,12 @@ public struct Main: Sendable, FeatureReducer {
 		}
 	}
 
-	public struct Alert: Sendable, Reducer {
-		public enum State: Sendable, Hashable {
-			case profileUsedOnOtherDeviceErrorAlert(AlertState<Action.ProfileUsedOnOtherDeviceErrorAlertAction>)
-		}
-
-		public enum Action: Sendable, Equatable {
-			case profileUsedOnOtherDeviceErrorAlert(ProfileUsedOnOtherDeviceErrorAlertAction)
-
-			public enum ProfileUsedOnOtherDeviceErrorAlertAction: Sendable, Hashable {
-				case reclaim
-				case deleteProfileOnThisDevice
-			}
-		}
-
-		public var body: some ReducerOf<Self> {
-			EmptyReducer()
-		}
-	}
-
 	@Dependency(\.appPreferencesClient) var appPreferencesClient
 	@Dependency(\.gatewaysClient) var gatewaysClient
 	@Dependency(\.backupsClient) var backupsClient
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.continuousClock) var clock
+	@Dependency(\.overlayWindowClient) var overlayWindowClient
 
 	public init() {}
 
@@ -104,13 +83,28 @@ public struct Main: Sendable, FeatureReducer {
 			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
 				Destinations()
 			}
-			.ifLet(\.$alert, action: /Action.child .. ChildAction.alert) {
-				Alert()
-			}
 	}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
+		case .profileUsedOnOtherDeviceErrorAlertAction(.reclaim):
+			return .run { send in
+				let result = await TaskResult {
+					try await backupsClient.reclaimProfileOnThisDevice()
+					return Prelude.Unit.instance
+				}
+				await send(.internal(.reclaimedProfileOnThisDevice(result)))
+			}
+
+		case .profileUsedOnOtherDeviceErrorAlertAction(.deleteProfileOnThisDevice):
+			return .run { send in
+				let result = await TaskResult {
+					try await backupsClient.stopUsingProfileOnThisDevice()
+					return Prelude.Unit.instance
+				}
+				await send(.internal(.stoppedUsingProfileOnThisDevice(result)))
+			}
+
 		case .task:
 			return .run { send in
 				for try await gateways in await gatewaysClient.gatewaysValues() {
@@ -143,24 +137,6 @@ public struct Main: Sendable, FeatureReducer {
 				await send(.delegate(.removedWallet))
 			} catch: { error, _ in
 				loggerGlobal.error("Failed to delete profile: \(error)")
-			}
-
-		case .alert(.presented(.profileUsedOnOtherDeviceErrorAlert(.reclaim))):
-			return .run { send in
-				let result = await TaskResult {
-					try await backupsClient.reclaimProfileOnThisDevice()
-					return Prelude.Unit.instance
-				}
-				await send(.internal(.reclaimedProfileOnThisDevice(result)))
-			}
-
-		case .alert(.presented(.profileUsedOnOtherDeviceErrorAlert(.deleteProfileOnThisDevice))):
-			return .run { send in
-				let result = await TaskResult {
-					try await backupsClient.stopUsingProfileOnThisDevice()
-					return Prelude.Unit.instance
-				}
-				await send(.internal(.stoppedUsingProfileOnThisDevice(result)))
 			}
 
 		default:
@@ -202,27 +178,28 @@ public struct Main: Sendable, FeatureReducer {
 		on otherDevice: ProfileSnapshot.Header.UsedDeviceInfo,
 		state: inout State
 	) -> Effect<Action> {
-		state.presentAlertProfileUsedOn(otherDevice: otherDevice)
-		return .none
-	}
-}
-
-extension Main.State {
-	mutating func presentAlertProfileUsedOn(otherDevice: ProfileSnapshot.Header.UsedDeviceInfo) {
-		alert = .profileUsedOnOtherDeviceErrorAlert(
-			.init(
-				title: { TextState("Use the wallet data on single device only.") }, // FIXME: Strings
-				actions: {
-					ButtonState(role: .cancel, action: .reclaim) {
-						TextState("I am only using the wallet data on this device")
-					}
-					ButtonState(role: .destructive, action: .deleteProfileOnThisDevice) {
-						TextState("I have backed up my seed phrase and will stop using on the wallet data on this device and continue on another device.")
-					}
-				},
-				message: { TextState("The Radix wallet app is not intended to be used with the same wallet data on multiple device. Ensure that you are not doing that.") }
+		.run { send in
+			let action = await overlayWindowClient.scheduleAlert(
+				.init(
+					title: { TextState("Use the wallet data on single device only.") }, // FIXME: Strings
+					actions: {
+						ButtonState(role: .cancel, action: .primaryButtonTapped) {
+							TextState("Continue on this iPhone")
+						}
+						ButtonState(role: .destructive, action: .secondaryButtonTapped) {
+							TextState("Delete from this iPhone")
+						}
+					},
+					message: { TextState("The Radix wallet app is not intended to be used with the same wallet data on multiple device. Ensure that you are not doing that.") }
+				)
 			)
-		)
+			switch action {
+			case .primaryButtonTapped, .dismissed:
+				await send(.view(.profileUsedOnOtherDeviceErrorAlertAction(.reclaim)))
+			case .secondaryButtonTapped:
+				await send(.view(.profileUsedOnOtherDeviceErrorAlertAction(.deleteProfileOnThisDevice)))
+			}
+		}
 	}
 }
 

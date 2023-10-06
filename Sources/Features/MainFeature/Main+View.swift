@@ -39,11 +39,6 @@ extension Main {
 					action: Main.Destinations.Action.settings,
 					destination: { Settings.View(store: $0) }
 				)
-				.alert(
-					store: store.scope(state: \.$alert, action: { .child(.alert($0)) }),
-					state: /Main.Alert.State.profileUsedOnOtherDeviceErrorAlert,
-					action: Main.Alert.Action.profileUsedOnOtherDeviceErrorAlert
-				)
 			}
 			.task { @MainActor in
 				await store.send(.view(.task)).finish()

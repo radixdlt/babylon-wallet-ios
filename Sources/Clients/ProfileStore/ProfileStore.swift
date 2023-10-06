@@ -57,11 +57,12 @@ public final actor ProfileStore {
 
 	/// Current Profile
 	let profileStateSubject: AsyncCurrentValueSubject<ProfileState>
-	let profileUsedOnOtherDeviceSubject: AsyncPassthroughSubject<ProfileSnapshot.Header.UsedDeviceInfo>
+	let profileUsedOnOtherDeviceSubject: AsyncReplaySubject<ProfileSnapshot.Header.UsedDeviceInfo>
 
 	init() async {
-		self.profileStateSubject = await .init(Self.restoreFromSecureStorageIfAble())
-		self.profileUsedOnOtherDeviceSubject = .init()
+		let profileUsedOnOtherDeviceSubject = AsyncReplaySubject<ProfileSnapshot.Header.UsedDeviceInfo>(bufferSize: 1)
+		self.profileStateSubject = await .init(Self.restoreFromSecureStorageIfAble(profileUsedOnOtherDeviceSubject))
+		self.profileUsedOnOtherDeviceSubject = profileUsedOnOtherDeviceSubject
 	}
 }
 
@@ -499,7 +500,9 @@ extension ProfileStore {
 
 // MARK: Private
 extension ProfileStore {
-	private static func restoreFromSecureStorageIfAble() async -> ProfileState {
+	private static func restoreFromSecureStorageIfAble(
+		_ profileUsedOnOtherDeviceSubject: AsyncReplaySubject<ProfileSnapshot.Header.UsedDeviceInfo>
+	) async -> ProfileState {
 		@Dependency(\.jsonDecoder) var jsonDecoder
 		@Dependency(\.errorQueue) var errorQueue
 		@Dependency(\.secureStorageClient) var secureStorageClient
@@ -562,7 +565,7 @@ extension ProfileStore {
 			switch await checkIfDeviceOwnsProfileSnapshot(&profileSnapshot) {
 			case .successfullyVerifiedOnlyUsedOnThisDevice: break
 			case let .usedOnAnotherDevice(otherDevice):
-				return .failure(.profileUsedOnAnotherDevice(otherDevice))
+				profileUsedOnOtherDeviceSubject.send(otherDevice)
 			case let .generatedNewDeviceID(successfullySavedIDAndUpdateSnapshot):
 				if successfullySavedIDAndUpdateSnapshot {
 					do {
