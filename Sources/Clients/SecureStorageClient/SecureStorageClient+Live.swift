@@ -180,7 +180,7 @@ extension SecureStorageClient: DependencyKey {
 
 			do {
 				let id = try jsonDecoder().decode(UUID.self, from: data)
-				loggerGlobal.info("loaded device identifier: \(id)")
+				loggerGlobal.trace("loaded device identifier: \(id)")
 				return id
 			} catch {
 				loggerGlobal.critical("Failed to decode device identifier: \(error)")

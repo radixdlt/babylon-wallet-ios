@@ -108,10 +108,9 @@ extension ProfileStore {
 		lens(\.profile)
 	}
 
-	/// A multicasting replaying async sequence of conflicting device the profile snapshot is used on.
+	/// A async sequence of conflicting device the profile snapshot is used on.
 	public func usedOnOtherDevice() async -> AnyAsyncSequence<ProfileSnapshot.Header.UsedDeviceInfo> {
 		profileUsedOnOtherDeviceSubject
-			.share() // Multicast
 			.eraseToAnyAsyncSequence()
 	}
 

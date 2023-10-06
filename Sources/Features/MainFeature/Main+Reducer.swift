@@ -16,6 +16,10 @@ public struct Main: Sendable, FeatureReducer {
 		@PresentationState
 		public var destination: Destinations.State?
 
+		// MARK: - Alert
+		@PresentationState
+		public var alert: Alert.State?
+
 		public init(
 			conflictingDeviceProfileIsUsedOn: ProfileSnapshot.Header.UsedDeviceInfo? = nil,
 			home: Home.State
@@ -34,6 +38,7 @@ public struct Main: Sendable, FeatureReducer {
 	public enum ChildAction: Sendable, Equatable {
 		case home(Home.Action)
 		case destination(PresentationAction<Destinations.Action>)
+		case alert(PresentationAction<Alert.Action>)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -51,11 +56,25 @@ public struct Main: Sendable, FeatureReducer {
 	public struct Destinations: Sendable, Reducer {
 		public enum State: Sendable, Hashable {
 			case settings(Settings.State)
-			case profileUsedOnOtherDeviceErrorAlert(AlertState<Action.ProfileUsedOnOtherDeviceErrorAlertAction>)
 		}
 
 		public enum Action: Sendable, Equatable {
 			case settings(Settings.Action)
+		}
+
+		public var body: some ReducerOf<Self> {
+			Scope(state: /State.settings, action: /Action.settings) {
+				Settings()
+			}
+		}
+	}
+
+	public struct Alert: Sendable, Reducer {
+		public enum State: Sendable, Hashable {
+			case profileUsedOnOtherDeviceErrorAlert(AlertState<Action.ProfileUsedOnOtherDeviceErrorAlertAction>)
+		}
+
+		public enum Action: Sendable, Equatable {
 			case profileUsedOnOtherDeviceErrorAlert(ProfileUsedOnOtherDeviceErrorAlertAction)
 
 			public enum ProfileUsedOnOtherDeviceErrorAlertAction: Sendable, Hashable {
@@ -65,9 +84,7 @@ public struct Main: Sendable, FeatureReducer {
 		}
 
 		public var body: some ReducerOf<Self> {
-			Scope(state: /State.settings, action: /Action.settings) {
-				Settings()
-			}
+			EmptyReducer()
 		}
 	}
 
@@ -87,6 +104,9 @@ public struct Main: Sendable, FeatureReducer {
 			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
 				Destinations()
 			}
+			.ifLet(\.$alert, action: /Action.child .. ChildAction.alert) {
+				Alert()
+			}
 	}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
@@ -98,7 +118,7 @@ public struct Main: Sendable, FeatureReducer {
 					loggerGlobal.notice("Changed network to: \(gateways.current)")
 					await send(.internal(.currentGatewayChanged(to: gateways.current)))
 				}
-			}.concatenate(with: .run { send in
+			}.merge(with: .run { send in
 				for try await otherDevice in await backupsClient.profileUsedOnOtherDevice() {
 					loggerGlobal.notice("Recived event about profile being used on another device...")
 					guard !Task.isCancelled else { return }
@@ -125,7 +145,7 @@ public struct Main: Sendable, FeatureReducer {
 				loggerGlobal.error("Failed to delete profile: \(error)")
 			}
 
-		case .destination(.presented(.profileUsedOnOtherDeviceErrorAlert(.reclaim))):
+		case .alert(.presented(.profileUsedOnOtherDeviceErrorAlert(.reclaim))):
 			return .run { send in
 				let result = await TaskResult {
 					try await backupsClient.reclaimProfileOnThisDevice()
@@ -134,7 +154,7 @@ public struct Main: Sendable, FeatureReducer {
 				await send(.internal(.reclaimedProfileOnThisDevice(result)))
 			}
 
-		case .destination(.presented(.profileUsedOnOtherDeviceErrorAlert(.deleteProfileOnThisDevice))):
+		case .alert(.presented(.profileUsedOnOtherDeviceErrorAlert(.deleteProfileOnThisDevice))):
 			return .run { send in
 				let result = await TaskResult {
 					try await backupsClient.stopUsingProfileOnThisDevice()
@@ -189,7 +209,7 @@ public struct Main: Sendable, FeatureReducer {
 
 extension Main.State {
 	mutating func presentAlertProfileUsedOn(otherDevice: ProfileSnapshot.Header.UsedDeviceInfo) {
-		destination = .profileUsedOnOtherDeviceErrorAlert(
+		alert = .profileUsedOnOtherDeviceErrorAlert(
 			.init(
 				title: { TextState("Use the wallet data on single device only.") }, // FIXME: Strings
 				actions: {

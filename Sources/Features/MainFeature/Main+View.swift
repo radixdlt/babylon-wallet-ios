@@ -40,9 +40,9 @@ extension Main {
 					destination: { Settings.View(store: $0) }
 				)
 				.alert(
-					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-					state: /Main.Destinations.State.profileUsedOnOtherDeviceErrorAlert,
-					action: Main.Destinations.Action.profileUsedOnOtherDeviceErrorAlert
+					store: store.scope(state: \.$alert, action: { .child(.alert($0)) }),
+					state: /Main.Alert.State.profileUsedOnOtherDeviceErrorAlert,
+					action: Main.Alert.Action.profileUsedOnOtherDeviceErrorAlert
 				)
 			}
 			.task { @MainActor in
