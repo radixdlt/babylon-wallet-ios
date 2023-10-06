@@ -143,7 +143,7 @@ extension SecureStorageClient: DependencyKey {
 				}
 
 			if let loaded {
-				loggerGlobal.debug("Loaded deviceIdentifier: \(loaded)")
+				loggerGlobal.trace("Loaded deviceIdentifier: \(loaded)")
 			} else {
 				loggerGlobal.warning("No deviceIdentifier loaded, was nil.")
 			}

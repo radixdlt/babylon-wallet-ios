@@ -347,7 +347,7 @@ extension ProfileStore {
 					loggerGlobal.error("Failed to rectify deviceID discrepancy for users, error: \(error) (mismatch)")
 				}
 			} else {
-				loggerGlobal.debug("Verified that device owns profile snapshot ✅")
+				loggerGlobal.trace("Verified that device owns profile snapshot ✅")
 			}
 		} else {
 			loggerGlobal.notice("Found no DeviceIdentifier in keychain rectifiying by saving the one found in profile header: \(lastUsedOnDevice.id) into keychain.")
