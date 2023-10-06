@@ -469,7 +469,7 @@ private struct NonFungibleTokensPerResourceProvider {
 				resourceAddress: resource.resourceAddress,
 				resourceImage: resource.metadata.iconURL,
 				resourceName: resource.metadata.name,
-				tokens: [] // .init(uncheckedUniqueElements: selected.elements)
+				tokens: .init(uncheckedUniqueElements: selectedAssets)
 			)
 		}
 	}
