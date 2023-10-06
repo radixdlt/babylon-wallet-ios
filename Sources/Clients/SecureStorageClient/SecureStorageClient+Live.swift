@@ -143,7 +143,7 @@ extension SecureStorageClient: DependencyKey {
 				}
 
 			if let loaded {
-				loggerGlobal.info("Loaded deviceIdentifier: \(loaded)")
+				loggerGlobal.debug("Loaded deviceIdentifier: \(loaded)")
 			} else {
 				loggerGlobal.warning("No deviceIdentifier loaded, was nil.")
 			}
@@ -162,7 +162,7 @@ extension SecureStorageClient: DependencyKey {
 					comment: "The unique identifier of this device"
 				)
 			)
-			loggerGlobal.info("Saved deviceIdentifier: \(deviceIdentifier)")
+			loggerGlobal.notice("Saved deviceIdentifier: \(deviceIdentifier)")
 		}
 
 		return Self(
