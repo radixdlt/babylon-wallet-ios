@@ -156,7 +156,7 @@ extension SecureStorageClient: DependencyKey {
 				KeychainClient.SetItemWithoutAuthRequest(
 					data: data,
 					key: deviceIdentifierKey,
-					iCloudSyncEnabled: false, // Never, ever synced.
+					iCloudSyncEnabled: false, // Never ever synced, since related to this device only..
 					accessibility: .whenUnlocked,
 					label: "Radix Wallet device identifier",
 					comment: "The unique identifier of this device"
