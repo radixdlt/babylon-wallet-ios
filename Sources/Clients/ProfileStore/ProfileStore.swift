@@ -263,7 +263,7 @@ extension ProfileStore {
 	func claimProfileSnapshot(_ snapshot: inout ProfileSnapshot) async throws {
 		snapshot.header.lastUsedOnDevice = try await Self.createDeviceInfo()
 		do {
-			try await secureStorageClient.saveDeviceIdentifier(snapshot.header.lastUsedOnDevice.id)
+			try await secureStorageClient.saveDeviceIdentifierIfNeeded(snapshot.header.lastUsedOnDevice.id)
 		} catch {
 			loggerGlobal.critical("Failed to save newly generated device identifier, error: \(error)")
 		}

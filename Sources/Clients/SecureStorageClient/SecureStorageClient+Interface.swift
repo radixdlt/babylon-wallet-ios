@@ -78,6 +78,18 @@ extension SecureStorageClient {
 	}
 }
 
+extension SecureStorageClient {
+	public func saveDeviceIdentifierIfNeeded(_ deviceID: UUID) async throws {
+		if let existing = try? await loadDeviceIdentifier() {
+			if existing != deviceID {
+				try await saveDeviceIdentifier(deviceID)
+			}
+		} else {
+			try await saveDeviceIdentifier(deviceID)
+		}
+	}
+}
+
 // MARK: - CloudProfileSyncActivation
 public enum CloudProfileSyncActivation: Sendable, Hashable {
 	/// iCloud sync was enabled, user request to disable it.
