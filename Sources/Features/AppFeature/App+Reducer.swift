@@ -106,16 +106,12 @@ public struct App: Sendable, FeatureReducer {
 			let retBuildInfo = buildInformation()
 			loggerGlobal.info("EngineToolkit commit hash: \(retBuildInfo.version)")
 			return .run { send in
-				for try await error in errorQueue.errors() {
+				for try await otherDevice in await backupsClient.profileUsedOnOtherDevice() {
 					guard !Task.isCancelled else { return }
-					// Maybe instead we should listen here for the Profile.State change,
-					// and when it switches to `.ephemeral` we navigate to onboarding.
-					// For now, we react to the specific error, since the Profile.State is meant to be private.
-					if let usedOnOtherDeviceError = error as? Profile.UsedOnAnotherDeviceError {
-						await send(.internal(.presentUsedOnOtherDeviceWarning(otherDevice: usedOnOtherDeviceError.lastUsedOnDevice)))
-						// A slight delay to allow any modal that may be shown to be dismissed.
-						try? await clock.sleep(for: .seconds(0.5))
-					}
+
+					await send(.internal(.presentUsedOnOtherDeviceWarning(otherDevice: otherDevice)))
+					// A slight delay to allow any modal that may be shown to be dismissed.
+					try? await clock.sleep(for: .seconds(0.5))
 				}
 			}
 
@@ -212,9 +208,8 @@ public struct App: Sendable, FeatureReducer {
 			case .existingProfile:
 				return goToMain(state: &state, accountRecoveryIsNeeded: accountRecoveryNeeded)
 
-			case let .usersExistingProfileCouldNotBeLoaded(failure: .profileUsedOnAnotherDevice(error)):
-				errorQueue.schedule(error)
-				return goToOnboarding(state: &state)
+			case let .usersExistingProfileCouldNotBeLoaded(failure: .profileUsedOnAnotherDevice(otherDevice)):
+				return .send(.internal(.presentUsedOnOtherDeviceWarning(otherDevice: otherDevice)))
 			}
 
 		default:

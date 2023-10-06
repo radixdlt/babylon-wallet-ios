@@ -16,7 +16,7 @@ extension Profile {
 		// error when creating a profile from a snapshot.
 		case failedToCreateProfileFromSnapshot(FailedToCreateProfileFromSnapshot)
 
-		case profileUsedOnAnotherDevice(UsedOnAnotherDeviceError)
+		case profileUsedOnAnotherDevice(ProfileSnapshot.Header.UsedDeviceInfo)
 	}
 }
 
@@ -33,18 +33,6 @@ extension Profile {
 	public enum JSONDecodingError: Sendable, LocalizedError, Equatable {
 		case known(KnownDecodingError)
 		case unknown(UnknownDecodingError)
-	}
-
-	public struct UsedOnAnotherDeviceError: Sendable, LocalizedError, Hashable {
-		public let lastUsedOnDevice: ProfileSnapshot.Header.UsedDeviceInfo
-
-		public var errorDescription: String? {
-			"The Wallet Data is being used on another device" // FIXME: Strings? Shown?
-		}
-
-		public init(lastUsedOnDevice: ProfileSnapshot.Header.UsedDeviceInfo) {
-			self.lastUsedOnDevice = lastUsedOnDevice
-		}
 	}
 }
 

@@ -18,7 +18,8 @@ extension BackupsClient: TestDependencyKey {
 		importCloudProfile: unimplemented("\(Self.self).importCloudProfile"),
 		loadDeviceID: unimplemented("\(Self.self).loadDeviceID"),
 		reclaimProfileOnThisDevice: unimplemented("\(Self.self).reclaimProfileOnThisDevice"),
-		stopUsingProfileOnThisDevice: unimplemented("\(Self.self).stopUsingProfileOnThisDevice")
+		stopUsingProfileOnThisDevice: unimplemented("\(Self.self).stopUsingProfileOnThisDevice"),
+		profileUsedOnOtherDevice: unimplemented("\(Self.self).profileUsedOnOtherDevice")
 	)
 
 	public static let noop = Self(
@@ -29,6 +30,7 @@ extension BackupsClient: TestDependencyKey {
 		importCloudProfile: { _, _ in throw NoopError() },
 		loadDeviceID: { nil },
 		reclaimProfileOnThisDevice: {},
-		stopUsingProfileOnThisDevice: {}
+		stopUsingProfileOnThisDevice: {},
+		profileUsedOnOtherDevice: { AsyncLazySequence([]).eraseToAnyAsyncSequence() }
 	)
 }

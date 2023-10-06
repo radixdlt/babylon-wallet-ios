@@ -57,9 +57,11 @@ public final actor ProfileStore {
 
 	/// Current Profile
 	let profileStateSubject: AsyncCurrentValueSubject<ProfileState>
+	let profileUsedOnOtherDeviceSubject: AsyncPassthroughSubject<ProfileSnapshot.Header.UsedDeviceInfo>
 
 	init() async {
 		self.profileStateSubject = await .init(Self.restoreFromSecureStorageIfAble())
+		self.profileUsedOnOtherDeviceSubject = .init()
 	}
 }
 
@@ -104,6 +106,13 @@ extension ProfileStore {
 	/// A multicasting replaying async sequence of distinct Profile.
 	public func values() async -> AnyAsyncSequence<Profile> {
 		lens(\.profile)
+	}
+
+	/// A multicasting replaying async sequence of conflicting device the profile snapshot is used on.
+	public func usedOnOtherDevice() async -> AnyAsyncSequence<ProfileSnapshot.Header.UsedDeviceInfo> {
+		profileUsedOnOtherDeviceSubject
+			.share() // Multicast
+			.eraseToAnyAsyncSequence()
 	}
 
 	/// A multicasting replaying async sequence of distinct Accounts for the currently selected network.
@@ -267,7 +276,10 @@ extension ProfileStore {
 		var snapshot = profile.snapshot()
 		if checkOwnership {
 			// Assert that this device is allowed to make changes on Profile
-			try await assertDeviceOwnsSnapshotElseCreateNew(&snapshot)
+			await assertDeviceOwnsSnapshotElseCreateNew(
+				&snapshot,
+				emitUsedOnOtherDeviceIfDetected: false
+			)
 		}
 
 		do {
@@ -349,7 +361,7 @@ extension ProfileStore {
 		var snapshot = snapshot
 		if checkOwnership {
 			// Assert that this device is allowed to make changes on Profile
-			try await assertDeviceOwnsSnapshotElseCreateNew(&snapshot)
+			await assertDeviceOwnsSnapshotElseCreateNew(&snapshot)
 		}
 
 		// Always update the header along with the snapshot itelf,
@@ -368,14 +380,19 @@ extension ProfileStore {
 		}
 	}
 
-	func assertDeviceOwnsSnapshotElseCreateNew(_ snapshot: inout ProfileSnapshot) async throws {
+	func assertDeviceOwnsSnapshotElseCreateNew(
+		_ snapshot: inout ProfileSnapshot,
+		emitUsedOnOtherDeviceIfDetected: Bool = true
+	) async {
 		switch await Self.checkIfDeviceOwnsProfileSnapshot(&snapshot) {
 		case .successfullyVerifiedOnlyUsedOnThisDevice: break
 		case let .generatedNewDeviceID(successfullySavedIDAndUpdateSnapshot):
 			loggerGlobal.error("Bad, generated new device ID, allowing user to continue using wallet though. successfullySavedIDAndUpdateSnapshot? \(successfullySavedIDAndUpdateSnapshot)")
 			return
 		case let .usedOnAnotherDevice(otherDevice):
-			throw Profile.UsedOnAnotherDeviceError(lastUsedOnDevice: otherDevice)
+			if emitUsedOnOtherDeviceIfDetected {
+				profileUsedOnOtherDeviceSubject.send(otherDevice)
+			}
 		}
 	}
 
@@ -546,7 +563,7 @@ extension ProfileStore {
 			switch await checkIfDeviceOwnsProfileSnapshot(&profileSnapshot) {
 			case .successfullyVerifiedOnlyUsedOnThisDevice: break
 			case let .usedOnAnotherDevice(otherDevice):
-				return .failure(.profileUsedOnAnotherDevice(.init(lastUsedOnDevice: otherDevice)))
+				return .failure(.profileUsedOnAnotherDevice(otherDevice))
 			case let .generatedNewDeviceID(successfullySavedIDAndUpdateSnapshot):
 				if successfullySavedIDAndUpdateSnapshot {
 					do {

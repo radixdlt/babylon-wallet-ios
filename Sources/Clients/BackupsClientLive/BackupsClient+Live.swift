@@ -91,6 +91,9 @@ extension BackupsClient: DependencyKey {
 			},
 			stopUsingProfileOnThisDevice: {
 				try await getProfileStore().stopUsingProfileOnThisDevice()
+			},
+			profileUsedOnOtherDevice: {
+				await getProfileStore().usedOnOtherDevice()
 			}
 		)
 	}

@@ -11,6 +11,7 @@ public struct BackupsClient: Sendable {
 	public var loadDeviceID: LoadDeviceID
 	public var reclaimProfileOnThisDevice: ReclaimProfileOnThisDevice
 	public var stopUsingProfileOnThisDevice: StopUsingProfileOnThisDevice
+	public var profileUsedOnOtherDevice: ProfileUsedOnOtherDevice
 
 	public init(
 		snapshotOfProfileForExport: @escaping SnapshotOfProfileForExport,
@@ -20,7 +21,8 @@ public struct BackupsClient: Sendable {
 		importCloudProfile: @escaping ImportCloudProfile,
 		loadDeviceID: @escaping LoadDeviceID,
 		reclaimProfileOnThisDevice: @escaping ReclaimProfileOnThisDevice,
-		stopUsingProfileOnThisDevice: @escaping StopUsingProfileOnThisDevice
+		stopUsingProfileOnThisDevice: @escaping StopUsingProfileOnThisDevice,
+		profileUsedOnOtherDevice: @escaping ProfileUsedOnOtherDevice
 	) {
 		self.snapshotOfProfileForExport = snapshotOfProfileForExport
 		self.loadProfileBackups = loadProfileBackups
@@ -30,10 +32,12 @@ public struct BackupsClient: Sendable {
 		self.loadDeviceID = loadDeviceID
 		self.reclaimProfileOnThisDevice = reclaimProfileOnThisDevice
 		self.stopUsingProfileOnThisDevice = stopUsingProfileOnThisDevice
+		self.profileUsedOnOtherDevice = profileUsedOnOtherDevice
 	}
 }
 
 extension BackupsClient {
+	public typealias ProfileUsedOnOtherDevice = @Sendable () async -> AnyAsyncSequence<ProfileSnapshot.Header.UsedDeviceInfo>
 	public typealias ReclaimProfileOnThisDevice = @Sendable () async throws -> Void
 	public typealias StopUsingProfileOnThisDevice = @Sendable () async throws -> Void
 
