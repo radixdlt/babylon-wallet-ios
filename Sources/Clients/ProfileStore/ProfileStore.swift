@@ -136,7 +136,7 @@ extension ProfileStore {
 
 	public func getLoadProfileOutcome() async -> LoadProfileOutcome {
 		switch self.profileStateSubject.value {
-		case let .persisted(profile):
+		case .persisted:
 			return .existingProfile
 		case let .ephemeral(ephemeral):
 			if let error = ephemeral.loadFailure {
@@ -262,6 +262,11 @@ extension ProfileStore {
 	/// Claim the profile by updating **lastUsedOnDevice**
 	func claimProfileSnapshot(_ snapshot: inout ProfileSnapshot) async throws {
 		snapshot.header.lastUsedOnDevice = try await Self.createDeviceInfo()
+		do {
+			try await secureStorageClient.saveDeviceIdentifier(snapshot.header.lastUsedOnDevice.id)
+		} catch {
+			loggerGlobal.critical("Failed to save newly generated device identifier, error: \(error)")
+		}
 	}
 
 	func saveProfileChanges(_ profile: Profile) async throws {
@@ -618,13 +623,7 @@ extension ProfileStore {
 		if let existing = try? await secureStorageClient.loadDeviceIdentifier() {
 			deviceIdentifier = existing
 		} else {
-			let newID = uuid()
-			do {
-				try await secureStorageClient.saveDeviceIdentifier(newID)
-			} catch {
-				loggerGlobal.critical("Failed to save newly generated device identifier, error: \(error)")
-			}
-			deviceIdentifier = newID
+			deviceIdentifier = uuid()
 		}
 
 		let description = await NonEmptyString(rawValue: "\(device.name) (\(device.model))")!
