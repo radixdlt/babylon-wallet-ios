@@ -28,18 +28,13 @@ public struct App: Sendable, FeatureReducer {
 	}
 
 	public enum ViewAction: Sendable, Equatable {
-		case task
 		case alert(PresentationAction<Alerts.Action>)
 	}
 
 	public enum InternalAction: Sendable, Equatable {
 		case incompatibleProfileDeleted
-		case presentUsedOnOtherDeviceWarning(otherDevice: ProfileSnapshot.Header.UsedDeviceInfo)
 		case toMain(isAccountRecoveryNeeded: Bool)
 		case toOnboarding
-
-		case reclaimedProfileOnThisDevice(TaskResult<Prelude.Unit>)
-		case stoppedUsingProfileOnThisDevice(TaskResult<Prelude.Unit>)
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -50,18 +45,11 @@ public struct App: Sendable, FeatureReducer {
 
 	public struct Alerts: Sendable, Reducer {
 		public enum State: Sendable, Hashable {
-			case profileUsedOnOtherDeviceErrorAlert(AlertState<Action.ProfileUsedOnOtherDeviceErrorAlertAction>)
 			case incompatibleProfileErrorAlert(AlertState<Action.IncompatibleProfileErrorAlertAction>)
 		}
 
 		public enum Action: Sendable, Equatable {
 			case incompatibleProfileErrorAlert(IncompatibleProfileErrorAlertAction)
-			case profileUsedOnOtherDeviceErrorAlert(ProfileUsedOnOtherDeviceErrorAlertAction)
-
-			public enum ProfileUsedOnOtherDeviceErrorAlertAction: Sendable, Hashable {
-				case reclaim
-				case deleteProfileOnThisDevice
-			}
 
 			public enum IncompatibleProfileErrorAlertAction: Sendable, Hashable {
 				case deleteWalletDataButtonTapped
@@ -76,9 +64,11 @@ public struct App: Sendable, FeatureReducer {
 	@Dependency(\.continuousClock) var clock
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.appPreferencesClient) var appPreferencesClient
-	@Dependency(\.backupsClient) var backupsClient
 
-	public init() {}
+	public init() {
+		let retBuildInfo = buildInformation()
+		loggerGlobal.info("EngineToolkit commit hash: \(retBuildInfo.version)")
+	}
 
 	public var body: some ReducerOf<Self> {
 		Scope(state: \.root, action: /Action.child) {
@@ -102,37 +92,6 @@ public struct App: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
-		case .task:
-			let retBuildInfo = buildInformation()
-			loggerGlobal.info("EngineToolkit commit hash: \(retBuildInfo.version)")
-			return .run { send in
-				for try await otherDevice in await backupsClient.profileUsedOnOtherDevice() {
-					guard !Task.isCancelled else { return }
-
-					await send(.internal(.presentUsedOnOtherDeviceWarning(otherDevice: otherDevice)))
-					// A slight delay to allow any modal that may be shown to be dismissed.
-					try? await clock.sleep(for: .seconds(0.5))
-				}
-			}
-
-		case .alert(.presented(.profileUsedOnOtherDeviceErrorAlert(.reclaim))):
-			return .run { send in
-				let result = await TaskResult {
-					try await backupsClient.reclaimProfileOnThisDevice()
-					return Prelude.Unit.instance
-				}
-				await send(.internal(.reclaimedProfileOnThisDevice(result)))
-			}
-
-		case .alert(.presented(.profileUsedOnOtherDeviceErrorAlert(.deleteProfileOnThisDevice))):
-			return .run { send in
-				let result = await TaskResult {
-					try await backupsClient.stopUsingProfileOnThisDevice()
-					return Prelude.Unit.instance
-				}
-				await send(.internal(.stoppedUsingProfileOnThisDevice(result)))
-			}
-
 		case .alert(.presented(.incompatibleProfileErrorAlert(.deleteWalletDataButtonTapped))):
 			return .run { send in
 				do {
@@ -149,27 +108,6 @@ public struct App: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
-		case .stoppedUsingProfileOnThisDevice(.success):
-			state.alert = nil
-			return goToOnboarding(state: &state)
-
-		case let .stoppedUsingProfileOnThisDevice(.failure(error)):
-			state.alert = nil
-			errorQueue.schedule(FailedToStopUsingProfileOnThisDevice(underlyingError: error))
-			return .none
-
-		case .reclaimedProfileOnThisDevice(.success):
-			state.alert = nil
-			return .none
-
-		case let .reclaimedProfileOnThisDevice(.failure(error)):
-			state.alert = nil
-			errorQueue.schedule(FailedToReclaimProfileOnThisDevice(underlyingError: error))
-			return .none
-
-		case let .presentUsedOnOtherDeviceWarning(otherDevice):
-			return profileUsed(on: otherDevice, state: &state)
-
 		case .incompatibleProfileDeleted:
 			return goToOnboarding(state: &state)
 
@@ -184,6 +122,8 @@ public struct App: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case .main(.delegate(.removedWallet)):
+			return goToOnboarding(state: &state)
+		case .main(.delegate(.stoppedUsingProfileOnThisDevice)):
 			return goToOnboarding(state: &state)
 
 		case let .onboardingCoordinator(.delegate(.completed(accountRecoveryIsNeeded))):
@@ -209,7 +149,7 @@ public struct App: Sendable, FeatureReducer {
 				return goToMain(state: &state, accountRecoveryIsNeeded: accountRecoveryNeeded)
 
 			case let .usersExistingProfileCouldNotBeLoaded(failure: .profileUsedOnAnotherDevice(otherDevice)):
-				return .send(.internal(.presentUsedOnOtherDeviceWarning(otherDevice: otherDevice)))
+				return goToMain(state: &state, accountRecoveryIsNeeded: false, conflictingDeviceProfileIsUsedOn: otherDevice)
 			}
 
 		default:
@@ -235,29 +175,15 @@ public struct App: Sendable, FeatureReducer {
 		return .none
 	}
 
-	func profileUsed(
-		on otherDevice: ProfileSnapshot.Header.UsedDeviceInfo,
-		state: inout State
+	func goToMain(
+		state: inout State,
+		accountRecoveryIsNeeded: Bool,
+		conflictingDeviceProfileIsUsedOn: ProfileSnapshot.Header.UsedDeviceInfo? = nil
 	) -> Effect<Action> {
-		state.alert = .profileUsedOnOtherDeviceErrorAlert(
-			.init(
-				title: { TextState("Use the wallet data on single device only.") }, // FIXME: Strings
-				actions: {
-					ButtonState(role: .cancel, action: .reclaim) {
-						TextState("I am only using the wallet data on this device")
-					}
-					ButtonState(role: .destructive, action: .deleteProfileOnThisDevice) {
-						TextState("I have backed up my seed phrase and will stop using on the wallet data on this device and continue on another device.")
-					}
-				},
-				message: { TextState("The Radix wallet app is not intended to be used with the same wallet data on multiple device. Ensure that you are not doing that.") }
-			)
-		)
-		return .none
-	}
-
-	func goToMain(state: inout State, accountRecoveryIsNeeded: Bool) -> Effect<Action> {
-		state.root = .main(.init(home: .init(accountRecoveryIsNeeded: accountRecoveryIsNeeded)))
+		state.root = .main(.init(
+			conflictingDeviceProfileIsUsedOn: conflictingDeviceProfileIsUsedOn,
+			home: .init(accountRecoveryIsNeeded: accountRecoveryIsNeeded)
+		))
 		return .none
 	}
 
@@ -284,37 +210,5 @@ extension App {
 		public static func == (lhs: Self, rhs: Self) -> Bool {
 			lhs.underlyingError.localizedDescription == rhs.underlyingError.localizedDescription
 		}
-	}
-}
-
-// MARK: - FailedToStopUsingProfileOnThisDevice
-struct FailedToStopUsingProfileOnThisDevice: LocalizedError {
-	let underlyingError: String
-	init(underlyingError: Error) {
-		self.underlyingError = String(describing: underlyingError)
-	}
-
-	var errorDescription: String? {
-		var description = "Failed to stop using wallet data on this device. Ensure you have backed up your seed phrase and the wallet backup data, then try deleting the wallet from backups in settings or re-install the app"
-		#if DEBUG
-		description += "\n[DEBUG ONLY]: underlying error: \(underlyingError)"
-		#endif
-		return description
-	}
-}
-
-// MARK: - FailedToReclaimProfileOnThisDevice
-struct FailedToReclaimProfileOnThisDevice: LocalizedError {
-	let underlyingError: String
-	init(underlyingError: Error) {
-		self.underlyingError = String(describing: underlyingError)
-	}
-
-	var errorDescription: String? {
-		var description = "Failed to reclaim wallet data on this device. Ensure you have backed up your seed phrase and the wallet backup data, then try deleting the wallet from backups in settings or re-install the app"
-		#if DEBUG
-		description += "\n[DEBUG ONLY]: underlying error: \(underlyingError)"
-		#endif
-		return description
 	}
 }

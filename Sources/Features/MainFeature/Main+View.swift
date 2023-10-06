@@ -32,13 +32,18 @@ extension Main {
 				.navigationBarBackButtonFont(.app.backButton)
 				.navigationBarInlineTitleFont(.app.secondaryHeader)
 				.navigationBarTitleColor(.app.gray1)
+				#endif
 				.navigationDestination(
 					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
 					state: /Main.Destinations.State.settings,
 					action: Main.Destinations.Action.settings,
 					destination: { Settings.View(store: $0) }
 				)
-				#endif
+				.alert(
+					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+					state: /Main.Destinations.State.profileUsedOnOtherDeviceErrorAlert,
+					action: Main.Destinations.Action.profileUsedOnOtherDeviceErrorAlert
+				)
 			}
 			.task { @MainActor in
 				await store.send(.view(.task)).finish()
