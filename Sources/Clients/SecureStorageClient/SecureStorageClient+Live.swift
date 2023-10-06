@@ -136,11 +136,18 @@ extension SecureStorageClient: DependencyKey {
 		}
 
 		@Sendable func loadDeviceIdentifier() async throws -> UUID? {
-			try await keychainClient
+			let loaded = try await keychainClient
 				.getDataWithoutAuthForKey(deviceIdentifierKey)
 				.map {
 					try jsonDecoder().decode(UUID.self, from: $0)
 				}
+
+			if let loaded {
+				loggerGlobal.info("Loaded deviceIdentifier: \(loaded)")
+			} else {
+				loggerGlobal.warning("No deviceIdentifier loaded, was nil.")
+			}
+			return loaded
 		}
 
 		@Sendable func saveDeviceIdentifier(_ deviceIdentifier: UUID) async throws {
@@ -155,6 +162,7 @@ extension SecureStorageClient: DependencyKey {
 					comment: "The unique identifier of this device"
 				)
 			)
+			loggerGlobal.info("Saved deviceIdentifier: \(deviceIdentifier)")
 		}
 
 		return Self(
