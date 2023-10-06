@@ -85,6 +85,12 @@ extension BackupsClient: DependencyKey {
 			},
 			loadDeviceID: {
 				try? await secureStorageClient.loadDeviceIdentifier()
+			},
+			reclaimProfileOnThisDevice: {
+				try await getProfileStore().reclaimProfileOnThisDevice()
+			},
+			stopUsingProfileOnThisDevice: {
+				try await getProfileStore().stopUsingProfileOnThisDevice()
 			}
 		)
 	}

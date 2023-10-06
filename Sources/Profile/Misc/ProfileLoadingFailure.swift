@@ -39,7 +39,7 @@ extension Profile {
 		public let lastUsedOnDevice: ProfileSnapshot.Header.UsedDeviceInfo
 
 		public var errorDescription: String? {
-			"The Wallet Data is being used on another device"
+			"The Wallet Data is being used on another device" // FIXME: Strings? Shown?
 		}
 
 		public init(lastUsedOnDevice: ProfileSnapshot.Header.UsedDeviceInfo) {

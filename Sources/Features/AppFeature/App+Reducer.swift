@@ -34,8 +34,12 @@ public struct App: Sendable, FeatureReducer {
 
 	public enum InternalAction: Sendable, Equatable {
 		case incompatibleProfileDeleted
+		case presentUsedOnOtherDeviceWarning(otherDevice: ProfileSnapshot.Header.UsedDeviceInfo)
 		case toMain(isAccountRecoveryNeeded: Bool)
 		case toOnboarding
+
+		case reclaimedProfileOnThisDevice(TaskResult<Prelude.Unit>)
+		case stoppedUsingProfileOnThisDevice(TaskResult<Prelude.Unit>)
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -46,11 +50,18 @@ public struct App: Sendable, FeatureReducer {
 
 	public struct Alerts: Sendable, Reducer {
 		public enum State: Sendable, Hashable {
+			case profileUsedOnOtherDeviceErrorAlert(AlertState<Action.ProfileUsedOnOtherDeviceErrorAlertAction>)
 			case incompatibleProfileErrorAlert(AlertState<Action.IncompatibleProfileErrorAlertAction>)
 		}
 
 		public enum Action: Sendable, Equatable {
 			case incompatibleProfileErrorAlert(IncompatibleProfileErrorAlertAction)
+			case profileUsedOnOtherDeviceErrorAlert(ProfileUsedOnOtherDeviceErrorAlertAction)
+
+			public enum ProfileUsedOnOtherDeviceErrorAlertAction: Sendable, Hashable {
+				case reclaim
+				case deleteProfileOnThisDevice
+			}
 
 			public enum IncompatibleProfileErrorAlertAction: Sendable, Hashable {
 				case deleteWalletDataButtonTapped
@@ -65,6 +76,7 @@ public struct App: Sendable, FeatureReducer {
 	@Dependency(\.continuousClock) var clock
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.appPreferencesClient) var appPreferencesClient
+	@Dependency(\.backupsClient) var backupsClient
 
 	public init() {}
 
@@ -99,12 +111,30 @@ public struct App: Sendable, FeatureReducer {
 					// Maybe instead we should listen here for the Profile.State change,
 					// and when it switches to `.ephemeral` we navigate to onboarding.
 					// For now, we react to the specific error, since the Profile.State is meant to be private.
-					if error is Profile.UsedOnAnotherDeviceError {
-						await send(.internal(.toOnboarding))
+					if let usedOnOtherDeviceError = error as? Profile.UsedOnAnotherDeviceError {
+						await send(.internal(.presentUsedOnOtherDeviceWarning(otherDevice: usedOnOtherDeviceError.lastUsedOnDevice)))
 						// A slight delay to allow any modal that may be shown to be dismissed.
 						try? await clock.sleep(for: .seconds(0.5))
 					}
 				}
+			}
+
+		case .alert(.presented(.profileUsedOnOtherDeviceErrorAlert(.reclaim))):
+			return .run { send in
+				let result = await TaskResult {
+					try await backupsClient.reclaimProfileOnThisDevice()
+					return Prelude.Unit.instance
+				}
+				await send(.internal(.reclaimedProfileOnThisDevice(result)))
+			}
+
+		case .alert(.presented(.profileUsedOnOtherDeviceErrorAlert(.deleteProfileOnThisDevice))):
+			return .run { send in
+				let result = await TaskResult {
+					try await backupsClient.stopUsingProfileOnThisDevice()
+					return Prelude.Unit.instance
+				}
+				await send(.internal(.stoppedUsingProfileOnThisDevice(result)))
 			}
 
 		case .alert(.presented(.incompatibleProfileErrorAlert(.deleteWalletDataButtonTapped))):
@@ -123,6 +153,27 @@ public struct App: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
+		case .stoppedUsingProfileOnThisDevice(.success):
+			state.alert = nil
+			return goToOnboarding(state: &state)
+
+		case let .stoppedUsingProfileOnThisDevice(.failure(error)):
+			state.alert = nil
+			errorQueue.schedule(FailedToStopUsingProfileOnThisDevice(underlyingError: error))
+			return .none
+
+		case .reclaimedProfileOnThisDevice(.success):
+			state.alert = nil
+			return .none
+
+		case let .reclaimedProfileOnThisDevice(.failure(error)):
+			state.alert = nil
+			errorQueue.schedule(FailedToReclaimProfileOnThisDevice(underlyingError: error))
+			return .none
+
+		case let .presentUsedOnOtherDeviceWarning(otherDevice):
+			return profileUsed(on: otherDevice, state: &state)
+
 		case .incompatibleProfileDeleted:
 			return goToOnboarding(state: &state)
 
@@ -189,6 +240,27 @@ public struct App: Sendable, FeatureReducer {
 		return .none
 	}
 
+	func profileUsed(
+		on otherDevice: ProfileSnapshot.Header.UsedDeviceInfo,
+		state: inout State
+	) -> Effect<Action> {
+		state.alert = .profileUsedOnOtherDeviceErrorAlert(
+			.init(
+				title: { TextState("Use the wallet data on single device only.") }, // FIXME: Strings
+				actions: {
+					ButtonState(role: .cancel, action: .reclaim) {
+						TextState("I am only using the wallet data on this device")
+					}
+					ButtonState(role: .destructive, action: .deleteProfileOnThisDevice) {
+						TextState("I have backed up my seed phrase and will stop using on the wallet data on this device and continue on another device.")
+					}
+				},
+				message: { TextState("The Radix wallet app is not intended to be used with the same wallet data on multiple device. Ensure that you are not doing that.") }
+			)
+		)
+		return .none
+	}
+
 	func goToMain(state: inout State, accountRecoveryIsNeeded: Bool) -> Effect<Action> {
 		state.root = .main(.init(home: .init(accountRecoveryIsNeeded: accountRecoveryIsNeeded)))
 		return .none
@@ -217,5 +289,37 @@ extension App {
 		public static func == (lhs: Self, rhs: Self) -> Bool {
 			lhs.underlyingError.localizedDescription == rhs.underlyingError.localizedDescription
 		}
+	}
+}
+
+// MARK: - FailedToStopUsingProfileOnThisDevice
+struct FailedToStopUsingProfileOnThisDevice: LocalizedError {
+	let underlyingError: String
+	init(underlyingError: Error) {
+		self.underlyingError = String(describing: underlyingError)
+	}
+
+	var errorDescription: String? {
+		var description = "Failed to stop using wallet data on this device. Ensure you have backed up your seed phrase and the wallet backup data, then try deleting the wallet from backups in settings or re-install the app"
+		#if DEBUG
+		description += "\n[DEBUG ONLY]: underlying error: \(underlyingError)"
+		#endif
+		return description
+	}
+}
+
+// MARK: - FailedToReclaimProfileOnThisDevice
+struct FailedToReclaimProfileOnThisDevice: LocalizedError {
+	let underlyingError: String
+	init(underlyingError: Error) {
+		self.underlyingError = String(describing: underlyingError)
+	}
+
+	var errorDescription: String? {
+		var description = "Failed to reclaim wallet data on this device. Ensure you have backed up your seed phrase and the wallet backup data, then try deleting the wallet from backups in settings or re-install the app"
+		#if DEBUG
+		description += "\n[DEBUG ONLY]: underlying error: \(underlyingError)"
+		#endif
+		return description
 	}
 }

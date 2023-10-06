@@ -272,7 +272,12 @@ extension SecureStorageClient: DependencyKey {
 				return try jsonDecoder().decode(MnemonicWithPassphrase.self, from: data)
 			},
 			deleteMnemonicByFactorSourceID: deleteMnemonicByFactorSourceID,
-			deleteProfileAndMnemonicsByFactorSourceIDs: { profileID, keepInICloudIfPresent in
+			deleteProfileAndMnemonicsIfSpecified: { request in
+
+				let profileID = request.profileID
+				let keepInICloudIfPresent = request.keepInICloudIfPresent
+				let deleteMnemoinics = request.deleteMnemonics
+
 				guard let profileSnapshotData = try await loadProfileSnapshotData(profileID) else {
 					return
 				}
@@ -284,6 +289,11 @@ extension SecureStorageClient: DependencyKey {
 				// We want to keep the profile backup in iCloud.
 				if !(profileSnapshot.appPreferences.security.isCloudProfileSyncEnabled && keepInICloudIfPresent) {
 					try await deleteProfile(profileID, iCloudSyncEnabled: profileSnapshot.appPreferences.security.isCloudProfileSyncEnabled)
+				}
+
+				guard deleteMnemoinics else {
+					loggerGlobal.info("Skipped deletion of mnemonics since it was not specified to delete them.")
+					return
 				}
 
 				for factorSourceID in profileSnapshot

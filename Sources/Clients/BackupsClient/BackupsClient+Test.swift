@@ -16,7 +16,9 @@ extension BackupsClient: TestDependencyKey {
 		lookupProfileSnapshotByHeader: unimplemented("\(Self.self).lookupProfileSnapshotByHeader"),
 		importProfileSnapshot: unimplemented("\(Self.self).importProfileSnapshot"),
 		importCloudProfile: unimplemented("\(Self.self).importCloudProfile"),
-		loadDeviceID: unimplemented("\(Self.self).loadDeviceID")
+		loadDeviceID: unimplemented("\(Self.self).loadDeviceID"),
+		reclaimProfileOnThisDevice: unimplemented("\(Self.self).reclaimProfileOnThisDevice"),
+		stopUsingProfileOnThisDevice: unimplemented("\(Self.self).stopUsingProfileOnThisDevice")
 	)
 
 	public static let noop = Self(
@@ -25,6 +27,8 @@ extension BackupsClient: TestDependencyKey {
 		lookupProfileSnapshotByHeader: { _ in throw NoopError() },
 		importProfileSnapshot: { _, _ in throw NoopError() },
 		importCloudProfile: { _, _ in throw NoopError() },
-		loadDeviceID: { nil }
+		loadDeviceID: { nil },
+		reclaimProfileOnThisDevice: {},
+		stopUsingProfileOnThisDevice: {}
 	)
 }

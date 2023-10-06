@@ -10,7 +10,7 @@ public struct SecureStorageClient: Sendable {
 	public var loadMnemonicByFactorSourceID: LoadMnemonicByFactorSourceID
 
 	public var deleteMnemonicByFactorSourceID: DeleteMnemonicByFactorSourceID
-	public var deleteProfileAndMnemonicsByFactorSourceIDs: DeleteProfileAndMnemonicsByFactorSourceIDs
+	public var deleteProfileAndMnemonicsIfSpecified: DeleteProfileAndMnemonicsIfSpecified
 
 	public var updateIsCloudProfileSyncEnabled: UpdateIsCloudProfileSyncEnabled
 
@@ -22,6 +22,18 @@ public struct SecureStorageClient: Sendable {
 	public var saveDeviceIdentifier: SaveDeviceIdentifier
 }
 
+// MARK: - DeleteProfileRequest
+public struct DeleteProfileRequest: Sendable, Hashable {
+	public let profileID: ProfileSnapshot.Header.ID
+	public let keepInICloudIfPresent: Bool
+	public let deleteMnemonics: Bool
+	public init(profileID: ProfileSnapshot.Header.ID, keepInICloudIfPresent: Bool, deleteMnemonics: Bool) {
+		self.profileID = profileID
+		self.keepInICloudIfPresent = keepInICloudIfPresent
+		self.deleteMnemonics = deleteMnemonics
+	}
+}
+
 extension SecureStorageClient {
 	public typealias UpdateIsCloudProfileSyncEnabled = @Sendable (ProfileSnapshot.Header.ID, CloudProfileSyncActivation) async throws -> Void
 	public typealias SaveProfileSnapshot = @Sendable (ProfileSnapshot) async throws -> Void
@@ -31,7 +43,7 @@ extension SecureStorageClient {
 	public typealias LoadMnemonicByFactorSourceID = @Sendable (FactorSourceID.FromHash, LoadMnemonicPurpose) async throws -> MnemonicWithPassphrase?
 
 	public typealias DeleteMnemonicByFactorSourceID = @Sendable (FactorSourceID.FromHash) async throws -> Void
-	public typealias DeleteProfileAndMnemonicsByFactorSourceIDs = @Sendable (ProfileSnapshot.Header.ID, _ keepInICloudIfPresent: Bool) async throws -> Void
+	public typealias DeleteProfileAndMnemonicsIfSpecified = @Sendable (DeleteProfileRequest) async throws -> Void
 
 	public typealias LoadProfileHeaderList = @Sendable () async throws -> ProfileSnapshot.HeaderList?
 	public typealias SaveProfileHeaderList = @Sendable (ProfileSnapshot.HeaderList) async throws -> Void

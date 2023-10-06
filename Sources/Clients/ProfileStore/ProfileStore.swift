@@ -240,13 +240,43 @@ extension ProfileStore {
 	}
 
 	public func deleteProfile(keepInICloudIfPresent: Bool) async throws {
+		try await _deleteProfile(
+			keepInICloudIfPresent: keepInICloudIfPresent,
+			checkOwnership: true,
+			deleteMnemonics: true
+		)
+	}
+
+	public func reclaimProfileOnThisDevice() async throws {
+		try await changeProfileSnapshot(to: assertProfileStateIsPersisted().snapshot())
+	}
+
+	public func stopUsingProfileOnThisDevice() async throws {
+		try await _deleteProfile(
+			keepInICloudIfPresent: true,
+			checkOwnership: false,
+			deleteMnemonics: false
+		)
+	}
+
+	public func _deleteProfile(
+		keepInICloudIfPresent: Bool,
+		checkOwnership: Bool,
+		deleteMnemonics: Bool
+	) async throws {
 		var snapshot = profile.snapshot()
-		// Assert that this device is allowed to make changes on Profile
-		try await assertDeviceOwnsSnapshotElseCreateNew(&snapshot)
+		if checkOwnership {
+			// Assert that this device is allowed to make changes on Profile
+			try await assertDeviceOwnsSnapshotElseCreateNew(&snapshot)
+		}
 
 		do {
 			await userDefaultsClient.removeActiveProfileID()
-			try await secureStorageClient.deleteProfileAndMnemonicsByFactorSourceIDs(profile.header.id, keepInICloudIfPresent)
+			try await secureStorageClient.deleteProfileAndMnemonicsIfSpecified(.init(
+				profileID: profile.header.id,
+				keepInICloudIfPresent: keepInICloudIfPresent,
+				deleteMnemonics: deleteMnemonics
+			))
 		} catch {
 			let errorMessage = "Error, failed to delete profile or factor source, failure: \(String(describing: error))"
 			loggerGlobal.error(.init(stringLiteral: errorMessage))
@@ -602,7 +632,7 @@ extension ProfileStore {
 			@Dependency(\.uuid) var uuid
 
 			let deviceIdentifier = uuid()
-			let deviceInfo = try await createDeviceInfo(deviceID: deviceIdentifier)
+			let deviceInfo = await createDeviceInfo(deviceID: deviceIdentifier)
 
 			let header = ProfileSnapshot.Header(
 				creatingDevice: deviceInfo,
@@ -630,6 +660,13 @@ extension ProfileStore {
 		}
 	}
 
+	private var persisted: Profile? {
+		switch profileStateSubject.value {
+		case .ephemeral: return nil
+		case let .persisted(profile): return profile
+		}
+	}
+
 	@discardableResult
 	private func assertProfileStateIsEphemeral() throws -> EphemeralProfile {
 		struct ExpectedProfileStateToBeEphemeralButItWasNot: Swift.Error {}
@@ -641,6 +678,19 @@ extension ProfileStore {
 			throw ExpectedProfileStateToBeEphemeralButItWasNot()
 		}
 		return ephemeral
+	}
+
+	@discardableResult
+	private func assertProfileStateIsPersisted() throws -> Profile {
+		struct ExpectedProfileStateToBePersistedButItWasNot: Swift.Error {}
+
+		guard let persisted else {
+			let errorMessage = "Incorrect implementation: `\(#function)` was called when \(Self.self) was in the wrong state, expected state '\(String(describing: ProfileState.Discriminator.persisted))' but was in '\(String(describing: profileStateSubject.value.description))'"
+			loggerGlobal.critical(.init(stringLiteral: errorMessage))
+			assertionFailure(errorMessage)
+			throw ExpectedProfileStateToBePersistedButItWasNot()
+		}
+		return persisted
 	}
 
 	@_disfavoredOverload

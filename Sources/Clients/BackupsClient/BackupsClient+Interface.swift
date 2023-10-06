@@ -9,6 +9,8 @@ public struct BackupsClient: Sendable {
 	public var importProfileSnapshot: ImportProfileSnapshot
 	public var importCloudProfile: ImportCloudProfile
 	public var loadDeviceID: LoadDeviceID
+	public var reclaimProfileOnThisDevice: ReclaimProfileOnThisDevice
+	public var stopUsingProfileOnThisDevice: StopUsingProfileOnThisDevice
 
 	public init(
 		snapshotOfProfileForExport: @escaping SnapshotOfProfileForExport,
@@ -16,7 +18,9 @@ public struct BackupsClient: Sendable {
 		lookupProfileSnapshotByHeader: @escaping LookupProfileSnapshotByHeader,
 		importProfileSnapshot: @escaping ImportProfileSnapshot,
 		importCloudProfile: @escaping ImportCloudProfile,
-		loadDeviceID: @escaping LoadDeviceID
+		loadDeviceID: @escaping LoadDeviceID,
+		reclaimProfileOnThisDevice: @escaping ReclaimProfileOnThisDevice,
+		stopUsingProfileOnThisDevice: @escaping StopUsingProfileOnThisDevice
 	) {
 		self.snapshotOfProfileForExport = snapshotOfProfileForExport
 		self.loadProfileBackups = loadProfileBackups
@@ -24,10 +28,15 @@ public struct BackupsClient: Sendable {
 		self.importProfileSnapshot = importProfileSnapshot
 		self.importCloudProfile = importCloudProfile
 		self.loadDeviceID = loadDeviceID
+		self.reclaimProfileOnThisDevice = reclaimProfileOnThisDevice
+		self.stopUsingProfileOnThisDevice = stopUsingProfileOnThisDevice
 	}
 }
 
 extension BackupsClient {
+	public typealias ReclaimProfileOnThisDevice = @Sendable () async throws -> Void
+	public typealias StopUsingProfileOnThisDevice = @Sendable () async throws -> Void
+
 	public typealias SnapshotOfProfileForExport = @Sendable () async throws -> ProfileSnapshot
 	public typealias LoadProfileBackups = @Sendable () async -> ProfileSnapshot.HeaderList?
 
