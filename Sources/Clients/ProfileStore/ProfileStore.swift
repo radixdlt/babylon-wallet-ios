@@ -509,7 +509,6 @@ extension ProfileStore {
 	private static func newEphemeralProfile() async -> Profile {
 		@Dependency(\.mnemonicClient) var mnemonicClient
 		@Dependency(\.secureStorageClient) var secureStorageClient
-		@Dependency(\.uuid) var uuid
 
 		do {
 			let name: String
@@ -542,6 +541,7 @@ extension ProfileStore {
 			))
 
 			@Dependency(\.date) var dateGenerator
+			@Dependency(\.uuid) var uuid
 
 			let deviceInfo = try await createDeviceInfo()
 
