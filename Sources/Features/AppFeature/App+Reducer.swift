@@ -23,7 +23,8 @@ public struct App: Sendable, FeatureReducer {
 			root: Root = .splash(.init())
 		) {
 			self.root = root
-			loggerGlobal.info("App started")
+			let retBuildInfo = buildInformation()
+			loggerGlobal.info("App started - engineToolkit commit hash: \(retBuildInfo.version)")
 		}
 	}
 
@@ -91,8 +92,6 @@ public struct App: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .task:
-			let retBuildInfo = buildInformation()
-			loggerGlobal.info("EngineToolkit commit hash: \(retBuildInfo.version)")
 			return .run { send in
 				for try await error in errorQueue.errors() {
 					guard !Task.isCancelled else { return }

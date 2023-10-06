@@ -136,7 +136,7 @@ extension ProfileStore {
 
 	public func getLoadProfileOutcome() async -> LoadProfileOutcome {
 		switch self.profileStateSubject.value {
-		case let .persisted(profile):
+		case .persisted:
 			return .existingProfile
 		case let .ephemeral(ephemeral):
 			if let error = ephemeral.loadFailure {
@@ -262,6 +262,11 @@ extension ProfileStore {
 	/// Claim the profile by updating **lastUsedOnDevice**
 	func claimProfileSnapshot(_ snapshot: inout ProfileSnapshot) async throws {
 		snapshot.header.lastUsedOnDevice = try await Self.createDeviceInfo()
+		do {
+			try await secureStorageClient.saveDeviceIdentifierIfNeeded(snapshot.header.lastUsedOnDevice.id)
+		} catch {
+			loggerGlobal.critical("Failed to save newly generated device identifier, error: \(error)")
+		}
 	}
 
 	func saveProfileChanges(_ profile: Profile) async throws {
@@ -306,46 +311,51 @@ extension ProfileStore {
 	}
 
 	func assertDeviceOwnsSnapshotElseCreateNew(_ snapshot: ProfileSnapshot) async throws {
-		do {
-			try await Self.checkIfDeviceOwnsProfileSnapshot(snapshot.header)
-		} catch {
-			// Note: We do not reset the active profile id, as doing so, will imply that user has no profile.
-			//       Instead, we will prompt that the user, that the currently active profile is used on other device.
-
-			// Go to ephemeral state straightaway. The Wallet will redirect user to the Onboarding screen.
-			await changeState(to: .ephemeral(.init(
-				profile: Self.newEphemeralProfile(),
-				loadFailure: .profileUsedOnAnotherDevice(error as! Profile.ProfileIsUsedOnAnotherDeviceError) // safe cast
-			)))
-
-			// rethrow the error to halt the execution up the chain
-			throw error
-		}
+		await Self.checkIfDeviceOwnsProfileSnapshot(snapshot)
+		// FIXME: Reintroduce later
+		//        do {
+//		} catch {
+//			// Note: We do not reset the active profile id, as doing so, will imply that user has no profile.
+//			//       Instead, we will prompt that the user, that the currently active profile is used on other device.
+//
+//			// Go to ephemeral state straightaway. The Wallet will redirect user to the Onboarding screen.
+//			await changeState(to: .ephemeral(.init(
+//				profile: Self.newEphemeralProfile(),
+//				loadFailure: .profileUsedOnAnotherDevice(error)
+//
+//			// rethrow the error to halt the execution up the chain
+//			throw error
+//		}
 	}
 
-	static func checkIfDeviceOwnsProfileSnapshot(_ header: ProfileSnapshot.Header) async throws {
+	// The implementation of this is not what we want in the future, it is
+	// written like this to rectify bad state for some users who might incorrectly
+	// have a discprenacy between their `profile.header.lastUsedOnDevice.id` and
+	// the `deviceIdentifer` saved in keychain
+	static func checkIfDeviceOwnsProfileSnapshot(_ profileSnapshot: ProfileSnapshot) async {
 		@Dependency(\.secureStorageClient) var secureStorageClient
 
 		// Load the last used device info
-		let lastUsedOnDevice: ProfileSnapshot.Header.UsedDeviceInfo?
-		do {
-			lastUsedOnDevice = try await secureStorageClient.loadProfileSnapshot(header.id)?.header.lastUsedOnDevice
-		} catch {
-			@Dependency(\.assertionFailure) var assertionFailure
-			let errorMessage = "Failed to load the profile snapshot when checking for device ownership, error: \(error)"
-			// Should not happen
-			loggerGlobal.critical(.init(stringLiteral: errorMessage))
-			assertionFailure(errorMessage)
-			return
-		}
+		let lastUsedOnDevice = profileSnapshot.header.lastUsedOnDevice
 
-		guard let lastUsedOnDevice else {
-			return
-		}
-
-		let deviceID = try await secureStorageClient.loadDeviceIdentifier()
-		guard lastUsedOnDevice.id == deviceID else {
-			throw Profile.ProfileIsUsedOnAnotherDeviceError(lastUsedOnDevice: lastUsedOnDevice)
+		if let deviceID = try? await secureStorageClient.loadDeviceIdentifier() {
+			if lastUsedOnDevice.id != deviceID {
+				loggerGlobal.notice("DeviceIdentifier discrepancy, in profile header \(lastUsedOnDevice.id) != \(deviceID) (loaded from keychain) => rectifiying by saving the one found in profile header into keychain.")
+				do {
+					try await secureStorageClient.saveDeviceIdentifier(lastUsedOnDevice.id)
+				} catch {
+					loggerGlobal.error("Failed to rectify deviceID discrepancy for users, error: \(error) (mismatch)")
+				}
+			} else {
+				loggerGlobal.trace("Verified that device owns profile snapshot ✅")
+			}
+		} else {
+			loggerGlobal.notice("Found no DeviceIdentifier in keychain rectifiying by saving the one found in profile header: \(lastUsedOnDevice.id) into keychain.")
+			do {
+				try await secureStorageClient.saveDeviceIdentifier(lastUsedOnDevice.id)
+			} catch {
+				loggerGlobal.error("Failed to rectify deviceID discrepancy for users, error: \(error) (failed to load deviceID from keychain)")
+			}
 		}
 	}
 }
@@ -356,7 +366,7 @@ extension ProfileStore {
 	///     var profile = await profileStore.profile
 	///     mutateProfile(&profile)
 	///     try await profileStore.update(profile: profile)
-	public func updating<T>(
+	public func updating<T: Sendable>(
 		_ mutateProfile: @Sendable (inout Profile) async throws -> T
 	) async throws -> T {
 		var copy = profile
@@ -457,12 +467,6 @@ extension ProfileStore {
 				))
 			}
 
-			do {
-				try await checkIfDeviceOwnsProfileSnapshot(decodedHeader)
-			} catch {
-				return .failure(.profileUsedOnAnotherDevice(error as! Profile.ProfileIsUsedOnAnotherDeviceError))
-			}
-
 			let profileSnapshot: ProfileSnapshot
 			do {
 				profileSnapshot = try jsonDecoder().decode(ProfileSnapshot.self, from: profileSnapshotData)
@@ -478,6 +482,8 @@ extension ProfileStore {
 					.unknown(.init(error: error))
 				))
 			}
+
+			await checkIfDeviceOwnsProfileSnapshot(profileSnapshot)
 
 			let profile: Profile
 			do {
@@ -611,15 +617,24 @@ extension ProfileStore {
 	static func createDeviceInfo() async throws -> ProfileSnapshot.Header.UsedDeviceInfo {
 		@Dependency(\.date) var dateGenerator
 		@Dependency(\.device) var device
+		@Dependency(\.uuid) var uuid
 		@Dependency(\.secureStorageClient) var secureStorageClient
 
 		let date = dateGenerator.now
 
+		let deviceIdentifier: UUID
+
+		if let existing = try? await secureStorageClient.loadDeviceIdentifier() {
+			deviceIdentifier = existing
+		} else {
+			deviceIdentifier = uuid()
+		}
+
 		let description = await NonEmptyString(rawValue: "\(device.name) (\(device.model))")!
 
-		return try await ProfileSnapshot.Header.UsedDeviceInfo(
+		return ProfileSnapshot.Header.UsedDeviceInfo(
 			description: description,
-			id: secureStorageClient.loadDeviceIdentifier(),
+			id: deviceIdentifier,
 			date: date
 		)
 	}
