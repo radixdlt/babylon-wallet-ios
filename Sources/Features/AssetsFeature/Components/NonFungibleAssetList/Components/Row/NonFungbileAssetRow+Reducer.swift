@@ -133,7 +133,7 @@ extension NonFungibleAssetList {
 			return .run { [resource = state.resource, accountAddress = state.accountAddress] send in
 				try await Task.sleep(for: .seconds(2))
 				let result = await TaskResult {
-					let idsPage = try await onLedgerEntitiesClient.getNonFungibleResourceIds(.init(
+					let idsPage = try await onLedgerEntitiesClient.getAccountOwnedNonFungibleResourceIds(.init(
 						account: accountAddress,
 						resourceAddress: resource.resourceAddress,
 						vaultAddress: resource.vaultAddress,

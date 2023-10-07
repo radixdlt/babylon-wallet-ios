@@ -239,6 +239,19 @@ extension Loadable {
 			return .failure(error)
 		}
 	}
+
+	public func concat<OtherValue>(_ other: Loadable<OtherValue>) -> Loadable<(Value, OtherValue)> {
+		switch (self, other) {
+		case (.idle, _), (_, .idle):
+			return .idle
+		case (.loading, _), (_, .loading):
+			return .loading
+		case let (.success(thisValue), .success(otherValue)):
+			return .success((thisValue, otherValue))
+		case let (.failure(error), _), let (_, .failure(error)):
+			return .failure(error)
+		}
+	}
 }
 
 extension Loadable {

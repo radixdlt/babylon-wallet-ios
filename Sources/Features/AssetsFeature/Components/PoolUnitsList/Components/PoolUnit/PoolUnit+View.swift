@@ -5,7 +5,7 @@ extension PoolUnit {
 	public struct ViewState: Equatable {
 		let iconURL: URL?
 		let name: String
-		let resources: NonEmpty<IdentifiedArrayOf<PoolUnitResourceViewState>>
+		let resources: Loadable<NonEmpty<IdentifiedArrayOf<PoolUnitResourceViewState>>>
 		let isSelected: Bool?
 	}
 
@@ -34,15 +34,17 @@ extension PoolUnit {
 						if refresh != nil {
 							Text("refreshing")
 						}
-						HStack {
-							PoolUnitResourcesView(resources: viewStore.resources)
-								.padding(-.small2)
+						loadable(viewStore.resources) { resources in
+							HStack {
+								PoolUnitResourcesView(resources: resources)
+									.padding(-.small2)
 
-							if let isSelected = viewStore.isSelected {
-								CheckmarkView(appearance: .dark, isChecked: isSelected)
+								if let isSelected = viewStore.isSelected {
+									CheckmarkView(appearance: .dark, isChecked: isSelected)
+								}
 							}
+							.onTapGesture { viewStore.send(.didTap) }
 						}
-						.onTapGesture { viewStore.send(.didTap) }
 					}
 					.padding(.medium1)
 					.background(.app.white)
@@ -67,7 +69,9 @@ extension PoolUnit.State {
 		.init(
 			iconURL: poolUnit.poolUnitResource.metadata.iconURL,
 			name: poolUnit.poolUnitResource.metadata.name ?? L10n.Account.PoolUnits.unknownPoolUnitName,
-			resources: PoolUnitResourceViewState.viewStates(poolUnit: poolUnit, poolUnitResource: poolUnitResource, poolResources: poolResources),
+			resources: resourceDetails.map { details in
+				PoolUnitResourceViewState.viewStates(poolUnit: poolUnit, resourcesDetails: details)
+			},
 			isSelected: isSelected
 		)
 	}
@@ -76,15 +80,14 @@ extension PoolUnit.State {
 extension PoolUnitResourceViewState {
 	static func viewStates(
 		poolUnit: AccountPortfolio.PoolUnitResources.PoolUnit,
-		poolUnitResource: OnLedgerEntity.Resource,
-		poolResources: [OnLedgerEntity.Resource]
+		resourcesDetails: PoolUnit.State.ResourceDetails
 	) -> NonEmpty<IdentifiedArrayOf<PoolUnitResourceViewState>> {
-		func redemptionValue(for resource: AccountPortfolio.FungibleResource) -> String {
-			guard let resourceDetails = poolResources.first(where: { $0.id == resource.id }) else {
+		func redemptionValue(for resource: AccountPortfolio.FungibleResource, resourceDetails: OnLedgerEntity.Resource?) -> String {
+			guard let resourceDetails else {
 				assertionFailure("Not all resources were loaded")
 				return ""
 			}
-			guard let poolUnitTotalSupply = poolUnitResource.totalSupply else {
+			guard let poolUnitTotalSupply = resourcesDetails.poolUnitResource.totalSupply else {
 				loggerGlobal.error("Missing total supply for \(resource.resourceAddress.address)")
 				return "Missing Total supply - could not calculate redemption value" // FIXME: Strings
 			}
@@ -93,32 +96,26 @@ extension PoolUnitResourceViewState {
 			let roundedRedemptionValue = redemptionValue.rounded(decimalPlaces: decimalPlaces)
 
 			return roundedRedemptionValue.formatted()
-
-//			guard let resourceDetails = poolResources.first(where: { $0.id == resource.id }) else {
-//				assertionFailure("Not all resources were loaded")
-//				return ""
-//			}
-//
-//			let poolUnitTotalSupply = poolUnitResource.totalSupply ?? 1
-//			let unroundedRedemptionValue = poolUnit.poolUnitResource.amount * resource.amount / poolUnitTotalSupply
-//			return unroundedRedemptionValue.format(divisibility: resourceDetails.divisibility)
 		}
 
 		let xrdResourceViewState = poolUnit.poolResources.xrdResource.map {
 			PoolUnitResourceViewState(
 				thumbnail: .xrd,
 				symbol: Constants.xrdTokenName,
-				tokenAmount: redemptionValue(for: $0)
+				tokenAmount: redemptionValue(for: $0, resourceDetails: resourcesDetails.xrdResource)
 			)
 		}
 
 		return .init(
 			rawValue: (xrdResourceViewState.map { [$0] } ?? [])
-				+ poolUnit.poolResources.nonXrdResources.map {
+				+ poolUnit.poolResources.nonXrdResources.map { resource in
 					PoolUnitResourceViewState(
-						thumbnail: .known($0.metadata.iconURL),
-						symbol: $0.metadata.symbol ?? $0.metadata.name ?? L10n.Account.PoolUnits.unknownSymbolName,
-						tokenAmount: redemptionValue(for: $0)
+						thumbnail: .known(resource.metadata.iconURL),
+						symbol: resource.metadata.symbol ?? resource.metadata.name ?? L10n.Account.PoolUnits.unknownSymbolName,
+						tokenAmount: redemptionValue(
+							for: resource,
+							resourceDetails: resourcesDetails.nonXrdResources.first { $0.resourceAddress == resource.resourceAddress }
+						)
 					)
 				}
 		)! // Safe to unwrap, guaranteed to not be empty

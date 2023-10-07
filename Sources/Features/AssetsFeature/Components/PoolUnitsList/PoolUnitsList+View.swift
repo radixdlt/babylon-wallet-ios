@@ -35,6 +35,9 @@ extension PoolUnitsList {
 					PoolUnit.View(store: $0)
 				}
 			)
+			.task { @MainActor in
+				await store.send(.view(.task)).finish()
+			}
 //			}
 //			.padding(.horizontal, .medium3)
 		}

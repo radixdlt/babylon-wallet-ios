@@ -103,6 +103,7 @@ package.addModules([
 			"AssetsFeature",
 			"DappInteractionClient",
 			"EngineKit",
+			"OnLedgerEntitiesClient",
 		],
 		tests: .yes()
 	),
@@ -474,7 +475,6 @@ package.addModules([
 			"GatewayAPI",
 			"CacheClient",
 			"EngineKit",
-			"OnLedgerEntitiesClient",
 		],
 		tests: .no
 	),

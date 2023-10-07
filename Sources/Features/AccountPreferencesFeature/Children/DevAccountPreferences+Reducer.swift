@@ -162,8 +162,8 @@ public struct DevAccountPreferences: Sendable, FeatureReducer {
 		#if DEBUG
 		case .turnIntoDappDefinitionAccountTypeButtonTapped:
 			return .run { [accountAddress = state.address] send in
-				let account = try await accountsClient.getAccountByAddress(accountAddress)
-				let manifest = try TransactionManifest.manifestMarkingAccountAsDappDefinitionType(account: account)
+				let accountAddress = try await accountsClient.getAccountByAddress(accountAddress)
+				let manifest = try TransactionManifest.manifestMarkingAccountAsDappDefinitionType(accountAddress: accountAddress)
 				await send(.internal(.reviewTransaction(manifest)))
 			} catch: { error, _ in
 				loggerGlobal.warning("Failed to create manifest which turns account into dapp definition account type, error: \(error)")
@@ -171,8 +171,8 @@ public struct DevAccountPreferences: Sendable, FeatureReducer {
 
 		case .createFungibleTokenButtonTapped:
 			return .run { [accountAddress = state.address] send in
-				let account = try await accountsClient.getAccountByAddress(accountAddress)
-				let manifest = try ManifestBuilder.manifestForCreateFungibleToken(account: account.address, networkID: account.networkID)
+				let accountAddress = try await accountsClient.getAccountByAddress(accountAddress)
+				let manifest = try ManifestBuilder.manifestForCreateFungibleToken(account: accountAddress.address, networkID: accountAddress.networkID)
 				await send(.internal(.reviewTransaction(manifest)))
 			} catch: { error, _ in
 				loggerGlobal.warning("Failed to create manifest which turns account into dapp definition account type, error: \(error)")
@@ -335,9 +335,9 @@ extension DevAccountPreferences {
 	#if DEBUG
 	private func loadCanCreateAuthSigningKey(_ state: State) -> Effect<Action> {
 		.run { [address = state.address] send in
-			let account = try await accountsClient.getAccountByAddress(address)
+			let accountAddress = try await accountsClient.getAccountByAddress(address)
 
-			await send(.internal(.canCreateAuthSigningKey(!account.hasAuthenticationSigningKey)))
+			await send(.internal(.canCreateAuthSigningKey(!accountAddress.hasAuthenticationSigningKey)))
 		}
 	}
 
@@ -359,11 +359,11 @@ extension DevAccountPreferences {
 #if DEBUG
 extension TransactionManifest {
 	fileprivate static func manifestMarkingAccountAsDappDefinitionType(
-		account: Profile.Network.Account
+		accountAddress: Profile.Network.Account
 	) throws -> TransactionManifest {
 		try ManifestBuilder()
-			.setAccountType(from: account.address.asGeneral(), type: "dapp definition")
-			.build(networkId: account.networkID.rawValue)
+			.setAccountType(from: accountAddress.address.asGeneral(), type: "dapp definition")
+			.build(networkId: accountAddress.networkID.rawValue)
 	}
 }
 #endif

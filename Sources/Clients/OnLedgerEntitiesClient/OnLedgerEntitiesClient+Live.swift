@@ -25,11 +25,12 @@ extension OnLedgerEntitiesClient: DependencyKey {
 				}
 				return resource
 			},
+			getAccountOwnedNonFungibleResourceIds: getNonFungibleResourceIds,
 			getNonFungibleTokenData: getNonFungibleData,
+			getAccountOwnedNonFungibleTokenData: getAccountOwnedNonFungibleTokenData,
 			refreshResources: {
 				try await getResources(for: $0, forceRefresh: true)
-			},
-			getNonFungibleResourceIds: getNonFungibleResourceIds
+			}
 		)
 	}
 }
@@ -70,11 +71,11 @@ extension OnLedgerEntitiesClient {
 
 	@Sendable
 	static func getNonFungibleResourceIds(
-		_ request: GetNonFungibleResourceIdsRequest
+		_ request: GetAccountOwnedNonFungibleResourceIdsRequest
 	) async throws -> OnLedgerEntity.AccountNonFungibleIdsPage {
 		@Dependency(\.cacheClient) var cacheClient
 
-		let identifier = request.identifier
+		let identifier = request.cachingIdentifier
 
 		let cached = try? cacheClient.load(
 			OnLedgerEntity.self,
@@ -91,7 +92,7 @@ extension OnLedgerEntitiesClient {
 				atLedgerState: request.atLedgerState.selector,
 				cursor: request.pageCursor,
 				limitPerPage: maximumNFTIDChunkSize,
-				address: request.account.address,
+				address: request.accountAddress.address,
 				vaultAddress: request.vaultAddress.address,
 				resourceAddress: request.resourceAddress.address
 			)
@@ -104,9 +105,43 @@ extension OnLedgerEntitiesClient {
 			)
 		}
 
-		let response = OnLedgerEntity.AccountNonFungibleIdsPage(ids: items, nextPageCursor: freshPage.nextCursor)
+		let response = OnLedgerEntity.AccountNonFungibleIdsPage(
+			accountAddress: request.accountAddress,
+			resourceAddress: request.resourceAddress,
+			ids: items,
+			pageCursor: request.pageCursor,
+			nextPageCursor: freshPage.nextCursor
+		)
 		cacheClient.save(response, .onLedgerEntity(identifier: identifier))
 		return response
+	}
+
+	static func getAllNonFungibleResourceIds(_ request: GetAccountOwnedNonFungibleResourceIdsRequest) async throws -> [NonFungibleGlobalId] {
+		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
+
+		func collectIds(_ cursor: String?, collectedIds: [NonFungibleGlobalId]) async throws -> [NonFungibleGlobalId] {
+			let page = try await getNonFungibleResourceIds(.init(
+				account: request.accountAddress,
+				resourceAddress: request.resourceAddress,
+				vaultAddress: request.vaultAddress,
+				atLedgerState: request.atLedgerState,
+				pageCursor: cursor
+			))
+
+			let ids = collectedIds + page.ids
+			guard let nextPageCursor = page.nextPageCursor else {
+				return ids
+			}
+			return try await collectIds(nextPageCursor, collectedIds: collectedIds)
+		}
+
+		return try await collectIds(nil, collectedIds: [])
+	}
+
+	@Sendable
+	static func getAccountOwnedNonFungibleTokenData(_ request: GetAccountOwnedNonFungibleTokenDataRequest) async throws -> [OnLedgerEntity.NonFungibleToken] {
+		let ids = try await getAllNonFungibleResourceIds(.init(account: request.accountAddress, resourceAddress: request.resourceAddress, vaultAddress: request.vaultAddress, atLedgerState: request.atLedgerState, pageCursor: nil))
+		return try await getNonFungibleData(.init(atLedgerState: request.atLedgerState, resource: request.resourceAddress, nonFungibleIds: ids))
 	}
 
 	static func fetchNonFungibleData(_ request: GetNonFungibleTokenDataRequest) async throws -> [OnLedgerEntity] {
@@ -149,7 +184,7 @@ extension OnLedgerEntitiesClient {
 		if forceRefresh {
 			let freshEntities = try await refresh(Array(identifiers))
 			freshEntities.forEach {
-				cacheClient.save($0, .onLedgerEntity(identifier: $0.identifier))
+				cacheClient.save($0, .onLedgerEntity(identifier: $0.cachingIdentifier))
 			}
 			return freshEntities
 		} else {
@@ -157,14 +192,14 @@ extension OnLedgerEntitiesClient {
 				try? cacheClient.load(OnLedgerEntity.self, .onLedgerEntity(identifier: $0)) as? OnLedgerEntity
 			}
 
-			let notCachedEntities = Set(identifiers).subtracting(Set(cachedEntities.map(\.identifier)))
+			let notCachedEntities = Set(identifiers).subtracting(Set(cachedEntities.map(\.cachingIdentifier)))
 			guard !notCachedEntities.isEmpty else {
 				return cachedEntities
 			}
 
 			let freshEntities = try await refresh(Array(notCachedEntities))
 			freshEntities.forEach {
-				cacheClient.save($0, .onLedgerEntity(identifier: $0.identifier))
+				cacheClient.save($0, .onLedgerEntity(identifier: $0.cachingIdentifier))
 			}
 
 			return cachedEntities + freshEntities
@@ -221,26 +256,6 @@ extension OnLedgerEntitiesClient {
 	}
 }
 
-extension OnLedgerEntity {
-	var identifier: String {
-		switch self {
-		case let .resource(resource):
-			return resource.resourceAddress.address
-		case let .nonFungibleToken(nonFungibleToken):
-			return nonFungibleToken.id.asStr()
-		case .accountNonFungibleIds:
-			assertionFailure("")
-			return "NA"
-		}
-	}
-}
-
-extension OnLedgerEntitiesClient.GetNonFungibleResourceIdsRequest {
-	var identifier: String {
-		"NonFungibleResourceIds-" + account.address + "-" + resourceAddress.address + (pageCursor.map { "- \($0)" } ?? "")
-	}
-}
-
 extension GatewayAPI.StateNonFungibleDetailsResponseItem {
 	public typealias NFTData = OnLedgerEntity.NonFungibleToken.NFTData
 	public var details: [NFTData] {
@@ -285,5 +300,28 @@ extension OnLedgerEntity.NonFungibleToken.NFTData.Value {
 		default:
 			return nil
 		}
+	}
+}
+
+extension OnLedgerEntity {
+	var cachingIdentifier: String {
+		switch self {
+		case let .resource(resource):
+			return resource.resourceAddress.address
+		case let .nonFungibleToken(nonFungibleToken):
+			return nonFungibleToken.id.asStr()
+		case let .accountNonFungibleIds(idsPage):
+			return nonFungibleResourceIdsCachingIdentifier(idsPage.accountAddress, resourceAddress: idsPage.resourceAddress, pageCursor: idsPage.pageCursor)
+		}
+	}
+}
+
+private func nonFungibleResourceIdsCachingIdentifier(_ accountAddress: AccountAddress, resourceAddress: ResourceAddress, pageCursor: String?) -> String {
+	"NonFungibleResourceIds-" + accountAddress.address + "-" + resourceAddress.address + (pageCursor.map { "- \($0)" } ?? "")
+}
+
+extension OnLedgerEntitiesClient.GetAccountOwnedNonFungibleResourceIdsRequest {
+	var cachingIdentifier: String {
+		nonFungibleResourceIdsCachingIdentifier(accountAddress, resourceAddress: resourceAddress, pageCursor: pageCursor)
 	}
 }

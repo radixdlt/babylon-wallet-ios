@@ -118,18 +118,6 @@ extension AccountPortfolio.PoolUnitResources {
 			self.poolUnitResource = poolUnitResource
 			self.poolResources = poolResources
 		}
-
-//		public func redemptionValue(for resource: AccountPortfolio.FungibleResource) -> String {
-//			guard let poolUnitTotalSupply = poolUnitResource.resource.totalSupply else {
-//				loggerGlobal.error("Missing total supply for \(resource.resourceAddress.address)")
-//				return "Missing Total supply - could not calculate redemption value" // FIXME: Strings
-//			}
-//			let redemptionValue = poolUnitResource.amount * (resource.amount / poolUnitTotalSupply)
-//			let decimalPlaces = resource.resource.divisibility.map(UInt.init) ?? RETDecimal.maxDivisibility
-//			let roundedRedemptionValue = redemptionValue.rounded(decimalPlaces: decimalPlaces)
-//
-//			return roundedRedemptionValue.formatted()
-//		}
 	}
 
 	public struct RadixNetworkStake: Sendable, Hashable, Codable {
@@ -152,13 +140,6 @@ extension AccountPortfolio.PoolUnitResources {
 		public let validator: Validator
 		public let stakeUnitResource: AccountPortfolio.FungibleResource?
 		public let stakeClaimResource: AccountPortfolio.NonFungibleResource?
-
-//		public var xrdRedemptionValue: RETDecimal? {
-//			guard let stakeUnitResource, let totalSupply = stakeUnitResource.resource.totalSupply else {
-//				return nil
-//			}
-//			return validator.xrdVaultBalance * (stakeUnitResource.amount / totalSupply)
-//		}
 
 		public init(validator: Validator, stakeUnitResource: AccountPortfolio.FungibleResource?, stakeClaimResource: AccountPortfolio.NonFungibleResource?) {
 			self.validator = validator

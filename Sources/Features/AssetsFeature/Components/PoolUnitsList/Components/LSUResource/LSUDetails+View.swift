@@ -5,9 +5,9 @@ extension LSUDetails.State {
 	var viewState: LSUDetails.ViewState {
 		.init(
 			containerWithHeader: .init(
-				title: stakeUnitResource.resourceMetadata.name ?? L10n.Account.PoolUnits.unknownPoolUnitName,
+				title: .success(stakeUnitResource.resourceMetadata.name ?? L10n.Account.PoolUnits.unknownPoolUnitName),
 				amount: stakeAmount.formatted(),
-				symbol: stakeUnitResource.resourceMetadata.symbol
+				symbol: .success(stakeUnitResource.resourceMetadata.symbol)
 			),
 			thumbnailURL: stakeUnitResource.resourceMetadata.iconURL,
 			validatorNameViewState: .init(with: validator),

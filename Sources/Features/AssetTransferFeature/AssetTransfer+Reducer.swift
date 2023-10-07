@@ -1,6 +1,7 @@
 import DappInteractionClient
 import EngineKit
 import FeaturePrelude
+import OnLedgerEntitiesClient
 
 // MARK: - AssetTransfer
 public struct AssetTransfer: Sendable, FeatureReducer {
@@ -175,13 +176,8 @@ extension AssetTransfer {
 
 	private func createManifest(_ accounts: TransferAccountList.State) async throws -> TransactionManifest {
 		let networkID = await gatewaysClient.getCurrentNetworkID()
-		// TODO: use loaded resources
-		let onLedgerResources = try await onLedgerEntitiesClient.getResources(accounts.receivingAccounts.flatMap {
-			try $0.assets.map {
-				try .init(validatingAddress: $0.id)
-			}
-		})
-		let involvedFungibleResources = extractInvolvedFungibleResources(accounts.receivingAccounts)
+
+		let involvedFungibleResources = try await extractInvolvedFungibleResources(accounts.receivingAccounts)
 		let involvedNonFungibles = extractInvolvedNonFungibleResource(accounts.receivingAccounts)
 
 		return try ManifestBuilder.make {
@@ -264,7 +260,16 @@ func instructionForDepositing(
 extension AssetTransfer {
 	private func extractInvolvedFungibleResources(
 		_ receivingAccounts: IdentifiedArrayOf<ReceivingAccount.State>
-	) -> IdentifiedArrayOf<InvolvedFungibleResource> {
+	) async throws -> IdentifiedArrayOf<InvolvedFungibleResource> {
+		let allResourceAddresses: [ResourceAddress] = try receivingAccounts.flatMap {
+			let addresses = try $0.assets.compactMap(/ResourceAsset.State.fungibleAsset).map {
+				try ResourceAddress(validatingAddress: $0.id)
+			}
+			return addresses
+		}
+		/// Fetch additional information, for now only resource divisibility is used
+		let onLedgerResources: [OnLedgerEntity.Resource] = try await onLedgerEntitiesClient.getResources(allResourceAddresses)
+
 		var resources: IdentifiedArrayOf<InvolvedFungibleResource> = []
 
 		for receivingAccount in receivingAccounts {
@@ -286,7 +291,7 @@ extension AssetTransfer {
 					resources.append(.init(
 						address: fungibleAsset.resource.resourceAddress,
 						totalTransferAmount: fungibleAsset.totalTransferSum,
-						divisibility: 1, // fungibleAsset.resource.divisibility,
+						divisibility: onLedgerResources.first(where: { $0.resourceAddress == fungibleAsset.resource.resourceAddress })?.divisibility,
 						accounts: [accountTransfer]
 					))
 				}

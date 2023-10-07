@@ -4,8 +4,7 @@ import FeaturePrelude
 public struct PoolUnitDetails: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		let poolUnit: AccountPortfolio.PoolUnitResources.PoolUnit
-		let poolUnitResource: OnLedgerEntity.Resource
-		let poolResources: [OnLedgerEntity.Resource]
+		let resourcesDetails: PoolUnit.State.ResourceDetails
 	}
 
 	@Dependency(\.dismiss) var dismiss

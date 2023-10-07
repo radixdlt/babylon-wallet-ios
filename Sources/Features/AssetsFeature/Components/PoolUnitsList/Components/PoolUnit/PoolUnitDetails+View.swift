@@ -7,16 +7,16 @@ extension PoolUnitDetails.State {
 		return .init(
 			containerWithHeader: .init(resource: resource),
 			thumbnailURL: resource.metadata.iconURL,
-			resources: PoolUnitResourceViewState.viewStates(poolUnit: poolUnit, poolUnitResource: poolUnitResource, poolResources: poolResources),
+			resources: PoolUnitResourceViewState.viewStates(poolUnit: poolUnit, resourcesDetails: resourcesDetails),
 			resourceDetails: .init(
-				description: .success(poolUnitResource.resourceMetadata.description),
+				description: .success(resourcesDetails.poolUnitResource.resourceMetadata.description),
 				resourceAddress: resource.resourceAddress,
 				isXRD: false,
 				validatorAddress: nil,
-				resourceName: .success(poolUnitResource.resourceMetadata.name), // FIXME: Is this correct?
-				currentSupply: .success(poolUnitResource.totalSupply?.formatted() ?? L10n.AssetDetails.supplyUnkown),
-				behaviors: .success(poolUnitResource.behaviors),
-				tags: .success(poolUnitResource.resourceMetadata.tags)
+				resourceName: .success(resourcesDetails.poolUnitResource.resourceMetadata.name), // FIXME: Is this correct?
+				currentSupply: .success(resourcesDetails.poolUnitResource.totalSupply?.formatted() ?? L10n.AssetDetails.supplyUnkown),
+				behaviors: .success(resourcesDetails.poolUnitResource.behaviors),
+				tags: .success(resourcesDetails.poolUnitResource.resourceMetadata.tags)
 			)
 		)
 	}

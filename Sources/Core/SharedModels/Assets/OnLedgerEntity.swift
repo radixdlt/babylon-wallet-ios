@@ -98,14 +98,23 @@ extension OnLedgerEntity {
 	}
 
 	public struct AccountNonFungibleIdsPage: Sendable, Hashable, Codable {
+		public let accountAddress: AccountAddress
+		public let resourceAddress: ResourceAddress
 		public let ids: [NonFungibleGlobalId]
+		public let pageCursor: String?
 		public let nextPageCursor: String?
 
 		public init(
+			accountAddress: AccountAddress,
+			resourceAddress: ResourceAddress,
 			ids: [NonFungibleGlobalId],
+			pageCursor: String?,
 			nextPageCursor: String?
 		) {
+			self.accountAddress = accountAddress
+			self.resourceAddress = resourceAddress
 			self.ids = ids
+			self.pageCursor = pageCursor
 			self.nextPageCursor = nextPageCursor
 		}
 	}

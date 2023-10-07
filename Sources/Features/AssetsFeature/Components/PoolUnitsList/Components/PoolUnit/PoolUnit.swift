@@ -9,10 +9,38 @@ public struct PoolUnit: Sendable, FeatureReducer {
 			poolUnit.poolAddress
 		}
 
+		public struct ResourceDetails: Sendable, Hashable {
+			public let poolUnitResource: OnLedgerEntity.Resource
+			public let xrdResource: OnLedgerEntity.Resource?
+			public let nonXrdResources: [OnLedgerEntity.Resource]
+
+			public init(
+				poolUnitResource: OnLedgerEntity.Resource,
+				xrdResource: OnLedgerEntity.Resource?,
+				nonXrdResources: [OnLedgerEntity.Resource]
+			) {
+				self.poolUnitResource = poolUnitResource
+				self.xrdResource = xrdResource
+				self.nonXrdResources = nonXrdResources
+			}
+		}
+
 		let poolUnit: AccountPortfolio.PoolUnitResources.PoolUnit
-		let poolUnitResource: OnLedgerEntity.Resource
-		let poolResources: [OnLedgerEntity.Resource]
+		var resourceDetails: Loadable<ResourceDetails>
 		var isSelected: Bool?
+		var isDataLoaded = Bool.random()
+
+		public init(
+			poolUnit: AccountPortfolio.PoolUnitResources.PoolUnit,
+			resourceDetails: Loadable<ResourceDetails> = .idle,
+			isSelected: Bool? = nil,
+			destination: Destinations.State? = nil
+		) {
+			self.poolUnit = poolUnit
+			self.resourceDetails = resourceDetails
+			self.isSelected = isSelected
+			self.destination = destination
+		}
 
 		@PresentationState
 		var destination: Destinations.State?
@@ -53,6 +81,13 @@ public struct PoolUnit: Sendable, FeatureReducer {
 				action: /Action.child .. ChildAction.destination,
 				destination: Destinations.init
 			)
+			.onChange(of: \.isDataLoaded) { _, _ in
+				Reduce { _, _ in
+					.run { send in
+						await send(.view(.didTap))
+					}
+				}
+			}
 	}
 
 	public func reduce(
@@ -64,9 +99,9 @@ public struct PoolUnit: Sendable, FeatureReducer {
 			if state.isSelected != nil {
 				state.isSelected?.toggle()
 			} else {
-				state.destination = .details(
-					.init(poolUnit: state.poolUnit, poolUnitResource: state.poolUnitResource, poolResources: state.poolResources)
-				)
+//				state.destination = .details(
+//					.init(poolUnit: state.poolUnit, poolUnitResource: state.poolUnitResource, poolResources: state.poolResources)
+//				)
 			}
 
 			return .none

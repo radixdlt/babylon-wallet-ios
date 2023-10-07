@@ -17,7 +17,7 @@ public struct LSUStake: FeatureReducer {
 
 		var stakeResource: OnLedgerEntity.Resource?
 		var stakeClaimNFTResource: OnLedgerEntity.Resource?
-		var stakeClaimNfts: [OnLedgerEntity.NonFungibleToken]
+		var stakeClaimNfts: [OnLedgerEntity.NonFungibleToken] = []
 
 		@PresentationState
 		var destination: Destinations.State?
