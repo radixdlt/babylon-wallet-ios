@@ -5,6 +5,9 @@ import Prelude
 // MARK: - OnLedgerEntity
 public enum OnLedgerEntity: Sendable, Hashable, Codable {
 	case resource(Resource)
+	case account(Account)
+	case resourcePool(ResourcePool)
+	case validator(Validator)
 	case nonFungibleToken(NonFungibleToken)
 	case accountNonFungibleIds(AccountNonFungibleIdsPage)
 
@@ -27,6 +30,27 @@ public enum OnLedgerEntity: Sendable, Hashable, Codable {
 			return nil
 		}
 		return ids
+	}
+
+	public var account: Account? {
+		guard case let .account(account) = self else {
+			return nil
+		}
+		return account
+	}
+
+	public var resourcePool: ResourcePool? {
+		guard case let .resourcePool(resourcePool) = self else {
+			return nil
+		}
+		return resourcePool
+	}
+
+	public var validator: Validator? {
+		guard case let .validator(validator) = self else {
+			return nil
+		}
+		return validator
 	}
 }
 
@@ -116,6 +140,151 @@ extension OnLedgerEntity {
 			self.ids = ids
 			self.pageCursor = pageCursor
 			self.nextPageCursor = nextPageCursor
+		}
+	}
+}
+
+extension OnLedgerEntity {
+	public struct ResourcePool: Sendable, Hashable, Codable {
+		public let address: ResourcePoolAddress
+		public let resources: [OwnedFungibleResource]
+		public let metadata: ResourceMetadata
+
+		public init(
+			address: ResourcePoolAddress,
+			resources: [OwnedFungibleResource],
+			metadata: ResourceMetadata
+		) {
+			self.address = address
+			self.resources = resources
+			self.metadata = metadata
+		}
+	}
+
+	public struct Validator: Sendable, Hashable, Codable {
+		public let address: ValidatorAddress
+		public let xrdVaultBalance: RETDecimal
+		public let metadata: ResourceMetadata
+
+		public init(
+			address: ValidatorAddress,
+			xrdVaultBalance: RETDecimal,
+			metadata: ResourceMetadata
+		) {
+			self.address = address
+			self.xrdVaultBalance = xrdVaultBalance
+			self.metadata = metadata
+		}
+	}
+}
+
+extension OnLedgerEntity {
+	public struct OwnedFungibleResource: Sendable, Hashable, Identifiable, Codable {
+		public var id: ResourceAddress {
+			resourceAddress
+		}
+
+		public let resourceAddress: ResourceAddress
+		public let atLedgerState: AtLedgerState
+		public let amount: RETDecimal
+		public let metadata: ResourceMetadata
+
+		public init(
+			resourceAddress: ResourceAddress,
+			atLedgerState: AtLedgerState,
+			amount: RETDecimal,
+			metadata: ResourceMetadata
+		) {
+			self.resourceAddress = resourceAddress
+			self.atLedgerState = atLedgerState
+			self.amount = amount
+			self.metadata = metadata
+		}
+	}
+
+	public struct OwnedNonFungibleResource: Sendable, Hashable, Identifiable, Codable {
+		public var id: ResourceAddress {
+			resourceAddress
+		}
+
+		public let resourceAddress: ResourceAddress
+		public let atLedgerState: AtLedgerState
+		public let metadata: ResourceMetadata
+		public let nonFungibleIdsCount: Int
+		/// The vault where the owned ids are stored
+		public let vaultAddress: VaultAddress
+
+		public init(
+			resourceAddress: ResourceAddress,
+			atLedgerState: AtLedgerState,
+			metadata: ResourceMetadata,
+			nonFungibleIdsCount: Int,
+			vaultAddress: VaultAddress
+		) {
+			self.resourceAddress = resourceAddress
+			self.atLedgerState = atLedgerState
+			self.metadata = metadata
+			self.nonFungibleIdsCount = nonFungibleIdsCount
+			self.vaultAddress = vaultAddress
+		}
+	}
+}
+
+// MARK: OnLedgerEntity.Account
+extension OnLedgerEntity {
+	public struct Account: Sendable, Hashable, Codable {
+		public let address: AccountAddress
+		public let metadata: ResourceMetadata
+		public var fungibleResources: [OwnedFungibleResource]
+		public var nonFungibleResources: [OwnedNonFungibleResource]
+		public var stakes: [RadixNetworkStake]
+		public var poolUnits: [PoolUnit]
+
+		public init(
+			address: AccountAddress,
+			metadata: ResourceMetadata,
+			fungibleResources: [OwnedFungibleResource],
+			nonFungibleResources: [OwnedNonFungibleResource],
+			stakes: [RadixNetworkStake],
+			poolUnits: [PoolUnit]
+		) {
+			self.address = address
+			self.metadata = metadata
+			self.fungibleResources = fungibleResources
+			self.nonFungibleResources = nonFungibleResources
+			self.stakes = stakes
+			self.poolUnits = poolUnits
+		}
+	}
+}
+
+extension OnLedgerEntity.Account {
+	public struct RadixNetworkStake: Sendable, Hashable, Codable {
+		public let validatorAddress: ValidatorAddress
+		public let stakeUnitResource: OnLedgerEntity.OwnedFungibleResource?
+		public let stakeClaimResource: OnLedgerEntity.OwnedNonFungibleResource?
+
+		public init(
+			validatorAddress: ValidatorAddress,
+			stakeUnitResource: OnLedgerEntity.OwnedFungibleResource?,
+			stakeClaimResource: OnLedgerEntity.OwnedNonFungibleResource?
+		) {
+			self.validatorAddress = validatorAddress
+			self.stakeUnitResource = stakeUnitResource
+			self.stakeClaimResource = stakeClaimResource
+		}
+	}
+
+	public struct PoolUnit: Sendable, Hashable, Codable {
+		public let resource: OnLedgerEntity.OwnedFungibleResource
+		public let resourcePoolAddress: ResourcePoolAddress
+
+		public init(
+			resource: OnLedgerEntity.OwnedFungibleResource,
+			resourcePoolAddress: ResourcePoolAddress
+		) {
+			self.resource = resource
+			self.resourcePoolAddress = resourcePoolAddress
 		}
 	}
 }

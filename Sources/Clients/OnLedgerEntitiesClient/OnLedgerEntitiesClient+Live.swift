@@ -312,6 +312,12 @@ extension OnLedgerEntity {
 			return nonFungibleToken.id.asStr()
 		case let .accountNonFungibleIds(idsPage):
 			return nonFungibleResourceIdsCachingIdentifier(idsPage.accountAddress, resourceAddress: idsPage.resourceAddress, pageCursor: idsPage.pageCursor)
+		case let .account(account):
+			return account.address.address
+		case let .resourcePool(resourcePool):
+			return resourcePool.address.address
+		case let .validator(validator):
+			return validator.address.address
 		}
 	}
 }
