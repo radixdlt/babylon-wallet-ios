@@ -78,6 +78,9 @@ extension AssetsView {
 					Color.app.gray5
 						.ignoresSafeArea(edges: .bottom)
 				}
+				.onAppear(perform: {
+					print("Assets view did appear")
+				})
 				.onFirstTask { @MainActor in
 					viewStore.send(.task)
 				}

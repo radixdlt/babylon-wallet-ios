@@ -18,8 +18,10 @@ public struct OnLedgerEntitiesClient: Sendable {
 	/// Basically a combination of `getAccountOwnedNonFungibleResourceIds` and `getNonFungibleTokenData`
 	public let getAccountOwnedNonFungibleTokenData: GetAccountOwnedNonFungibleTokenData
 
+	public let getAccounts: GetAccounts
+
 	/// Refresh the specific resources
-	public let refreshResources: RefreshResources
+	public let refreshEntities: RefreshEntities
 }
 
 // MARK: - OnLedgerEntitiesClient.GetResources
@@ -27,9 +29,10 @@ extension OnLedgerEntitiesClient {
 	public typealias GetResources = @Sendable ([ResourceAddress]) async throws -> [OnLedgerEntity.Resource]
 	public typealias GetResource = @Sendable (ResourceAddress) async throws -> OnLedgerEntity.Resource
 	public typealias GetNonFungibleTokenData = @Sendable (GetNonFungibleTokenDataRequest) async throws -> [OnLedgerEntity.NonFungibleToken]
-	public typealias RefreshResources = @Sendable ([ResourceAddress]) async throws -> Void
+	public typealias RefreshEntities = @Sendable ([Address]) async throws -> Void
 	public typealias GetAccountOwnedNonFungibleResourceIds = @Sendable (GetAccountOwnedNonFungibleResourceIdsRequest) async throws -> OnLedgerEntity.AccountNonFungibleIdsPage
 	public typealias GetAccountOwnedNonFungibleTokenData = @Sendable (GetAccountOwnedNonFungibleTokenDataRequest) async throws -> [OnLedgerEntity.NonFungibleToken]
+	public typealias GetAccounts = @Sendable ([AccountAddress]) async throws -> [OnLedgerEntity.Account]
 }
 
 // MARK: OnLedgerEntitiesClient.GetNonFungibleTokenDataRequest

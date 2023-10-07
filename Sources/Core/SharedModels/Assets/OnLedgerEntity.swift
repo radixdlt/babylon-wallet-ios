@@ -164,15 +164,18 @@ extension OnLedgerEntity {
 	public struct Validator: Sendable, Hashable, Codable {
 		public let address: ValidatorAddress
 		public let xrdVaultBalance: RETDecimal
+		public let stakeClaimFungibleResourceAddress: ResourceAddress
 		public let metadata: ResourceMetadata
 
 		public init(
 			address: ValidatorAddress,
 			xrdVaultBalance: RETDecimal,
+			stakeClaimFungibleResourceAddress: ResourceAddress,
 			metadata: ResourceMetadata
 		) {
 			self.address = address
 			self.xrdVaultBalance = xrdVaultBalance
+			self.stakeClaimFungibleResourceAddress = stakeClaimFungibleResourceAddress
 			self.metadata = metadata
 		}
 	}
@@ -237,28 +240,35 @@ extension OnLedgerEntity {
 		public let metadata: ResourceMetadata
 		public var fungibleResources: [OwnedFungibleResource]
 		public var nonFungibleResources: [OwnedNonFungibleResource]
-		public var stakes: [RadixNetworkStake]
-		public var poolUnits: [PoolUnit]
+		public var poolUnitResources: PoolUnitResources
 
 		public init(
 			address: AccountAddress,
 			metadata: ResourceMetadata,
 			fungibleResources: [OwnedFungibleResource],
 			nonFungibleResources: [OwnedNonFungibleResource],
-			stakes: [RadixNetworkStake],
-			poolUnits: [PoolUnit]
+			poolUnitResources: PoolUnitResources
 		) {
 			self.address = address
 			self.metadata = metadata
 			self.fungibleResources = fungibleResources
 			self.nonFungibleResources = nonFungibleResources
-			self.stakes = stakes
-			self.poolUnits = poolUnits
+			self.poolUnitResources = poolUnitResources
 		}
 	}
 }
 
 extension OnLedgerEntity.Account {
+	public struct PoolUnitResources: Sendable, Hashable, Codable {
+		public let radixNetworkStakes: [RadixNetworkStake]
+		public let poolUnits: [PoolUnit]
+
+		public init(radixNetworkStakes: [RadixNetworkStake], poolUnits: [PoolUnit]) {
+			self.radixNetworkStakes = radixNetworkStakes
+			self.poolUnits = poolUnits
+		}
+	}
+
 	public struct RadixNetworkStake: Sendable, Hashable, Codable {
 		public let validatorAddress: ValidatorAddress
 		public let stakeUnitResource: OnLedgerEntity.OwnedFungibleResource?

@@ -17,10 +17,10 @@ extension OnLedgerEntitiesClient: DependencyKey {
 	public static func live() -> Self {
 		Self(
 			getResources: {
-				try await getResources(for: $0)
+				try await getEntities(for: $0.map(\.address)).compactMap(\.resource)
 			},
 			getResource: {
-				guard let resource = try await getResources(for: [$0], forceRefresh: false).first else {
+				guard let resource = try await getEntities(for: [$0.address], forceRefresh: false).compactMap(\.resource).first else {
 					throw Error.emptyResponse
 				}
 				return resource
@@ -28,8 +28,11 @@ extension OnLedgerEntitiesClient: DependencyKey {
 			getAccountOwnedNonFungibleResourceIds: getNonFungibleResourceIds,
 			getNonFungibleTokenData: getNonFungibleData,
 			getAccountOwnedNonFungibleTokenData: getAccountOwnedNonFungibleTokenData,
-			refreshResources: {
-				try await getResources(for: $0, forceRefresh: true)
+			getAccounts: {
+				try await getEntities(for: $0.map(\.address)).compactMap(\.account)
+			},
+			refreshEntities: {
+				_ = try await getEntities(for: $0.map(\.address), forceRefresh: true)
 			}
 		)
 	}
@@ -45,13 +48,8 @@ extension AtLedgerState {
 extension OnLedgerEntitiesClient {
 	@Sendable
 	@discardableResult
-	static func getResources(for resources: [ResourceAddress], forceRefresh: Bool = false) async throws -> [OnLedgerEntity.Resource] {
-		try await fetchEntitiesWithCaching(
-			for: resources.map(\.address),
-			forceRefresh: forceRefresh,
-			refresh: fetchEntites
-		)
-		.compactMap(\.resource)
+	static func getEntities(for addresses: [String], forceRefresh: Bool = false) async throws -> [OnLedgerEntity] {
+		try await fetchEntitiesWithCaching(for: addresses, forceRefresh: forceRefresh, refresh: fetchEntites(for:))
 	}
 
 	@Sendable
@@ -214,24 +212,28 @@ extension OnLedgerEntitiesClient {
 
 		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
 
-		return try await gatewayAPIClient
-			.getEntityDetails(addresses, .resourceMetadataKeys, nil)
-			.items
-			.compactMap(createEntity)
+		let response = try await gatewayAPIClient.getEntityDetails(addresses, .resourceMetadataKeys, nil)
+		return try await response.items.asyncCompactMap { item in
+			let allFungibles = try await gatewayAPIClient.fetchAllFungibleResources(item, ledgerState: response.ledgerState)
+			let allNonFungibles = try await gatewayAPIClient.fetchAllNonFungibleResources(item, ledgerState: response.ledgerState)
+
+			let updatedItem = GatewayAPI.StateEntityDetailsResponseItem(
+				address: item.address,
+				fungibleResources: .init(items: allFungibles),
+				nonFungibleResources: .init(items: allNonFungibles),
+				ancestorIdentities: item.ancestorIdentities,
+				metadata: item.metadata,
+				explicitMetadata: item.explicitMetadata,
+				details: item.details
+			)
+
+			return try await createEntity(from: updatedItem)
+		}
 	}
 
 	@Sendable
-	static func createEntity(from item: GatewayAPI.StateEntityDetailsResponseItem) throws -> OnLedgerEntity? {
+	static func createEntity(from item: GatewayAPI.StateEntityDetailsResponseItem) async throws -> OnLedgerEntity? {
 		let dappDefinitions = item.metadata.dappDefinitions?.compactMap { try? DappDefinitionAddress(validatingAddress: $0) }
-
-		let metadata = ResourceMetadata(
-			name: item.explicitMetadata?.name,
-			symbol: item.explicitMetadata?.symbol,
-			description: item.explicitMetadata?.description,
-			iconURL: item.explicitMetadata?.iconURL,
-			tags: item.explicitMetadata?.extractTags() ?? [],
-			dappDefinitions: dappDefinitions
-		)
 
 		switch item.details {
 		case let .fungibleResource(fungibleDetails):
@@ -240,7 +242,7 @@ extension OnLedgerEntitiesClient {
 				divisibility: fungibleDetails.divisibility,
 				behaviors: item.details?.fungible?.roleAssignments.extractBehaviors() ?? [],
 				totalSupply: try? RETDecimal(value: fungibleDetails.totalSupply),
-				resourceMetadata: metadata
+				resourceMetadata: .init(item.explicitMetadata)
 			))
 		case let .nonFungibleResource(nonFungibleDetails):
 			return try .resource(.init(
@@ -248,9 +250,17 @@ extension OnLedgerEntitiesClient {
 				divisibility: nil,
 				behaviors: item.details?.nonFungible?.roleAssignments.extractBehaviors() ?? [],
 				totalSupply: try? RETDecimal(value: nonFungibleDetails.totalSupply),
-				resourceMetadata: metadata
+				resourceMetadata: .init(item.explicitMetadata)
 			))
 		default:
+			if let accountAddress = try? AccountAddress(validatingAddress: item.address) {
+				// create account
+				return try await .account(createAccount(
+					item,
+					accountAddress: accountAddress,
+					ledgerState: .init(version: 0, epoch: 0)
+				))
+			}
 			return nil
 		}
 	}
@@ -329,5 +339,20 @@ private func nonFungibleResourceIdsCachingIdentifier(_ accountAddress: AccountAd
 extension OnLedgerEntitiesClient.GetAccountOwnedNonFungibleResourceIdsRequest {
 	var cachingIdentifier: String {
 		nonFungibleResourceIdsCachingIdentifier(accountAddress, resourceAddress: resourceAddress, pageCursor: pageCursor)
+	}
+}
+
+extension OnLedgerEntity.Account.PoolUnitResources {
+	// The fungible resources used to build up the pool units.
+	// Will be used to filter out those from the general fungible resources list.
+	var fungibleResourceAddresses: [String] {
+		radixNetworkStakes.compactMap(\.stakeUnitResource?.resourceAddress.address) +
+			poolUnits.map(\.resource.resourceAddress.address)
+	}
+
+	// The non fungible resources used to build up the pool units.
+	// Will be used to filter out those from the general fungible resources list.
+	var nonFungibleResourceAddresses: [String] {
+		radixNetworkStakes.compactMap(\.stakeClaimResource?.resourceAddress.address)
 	}
 }

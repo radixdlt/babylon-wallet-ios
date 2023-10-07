@@ -298,7 +298,9 @@ extension ResourceMetadata {
 			description: raw?.description,
 			iconURL: raw?.iconURL,
 			tags: raw?.extractTags() ?? [],
-			dappDefinitions: raw?.dappDefinitions?.compactMap { try? DappDefinitionAddress(validatingAddress: $0) }
+			dappDefinitions: raw?.dappDefinitions?.compactMap { try? DappDefinitionAddress(validatingAddress: $0) },
+			validator: raw?.validator,
+			poolUnit: raw?.pool
 		)
 	}
 }

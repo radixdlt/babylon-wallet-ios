@@ -166,7 +166,7 @@ extension SubmitTransactionClient: DependencyKey {
 				try await hasTXBeenCommittedSuccessfully(txID)
 
 				if let resourceAddressesToRefresh {
-					try await onLedgerEntitiesClient.refreshResources(resourceAddressesToRefresh)
+					try await onLedgerEntitiesClient.refreshEntities(resourceAddressesToRefresh.map { $0.asGeneral() })
 				}
 
 				if let changedAccounts {

@@ -2,6 +2,7 @@ import CacheClient
 import ClientPrelude
 import EngineKit
 import GatewayAPI
+import OnLedgerEntitiesClient
 import SharedModels
 
 // MARK: - AccountPortfoliosClient + DependencyKey
@@ -25,6 +26,8 @@ extension AccountPortfoliosClient: DependencyKey {
 
 	public static let liveValue: AccountPortfoliosClient = {
 		let state = State()
+
+		@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
 
 		@Dependency(\.cacheClient) var cacheClient
 

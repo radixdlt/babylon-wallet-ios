@@ -19,6 +19,10 @@ extension AccountList {
 					),
 					content: { AccountList.Row.View(store: $0) }
 				)
+			}.onAppear {
+				print("Account list did appear")
+			}.onWillDisappear {
+				print("Account list disapeared")
 			}
 		}
 	}
