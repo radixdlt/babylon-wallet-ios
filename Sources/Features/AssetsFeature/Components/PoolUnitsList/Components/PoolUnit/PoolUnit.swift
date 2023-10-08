@@ -9,30 +9,14 @@ public struct PoolUnit: Sendable, FeatureReducer {
 			poolUnit.resourcePoolAddress
 		}
 
-		public struct ResourceDetails: Sendable, Hashable {
-			public let poolUnitResource: OnLedgerEntity.Resource
-			public let xrdResource: OnLedgerEntity.Resource?
-			public let nonXrdResources: [OnLedgerEntity.Resource]
-
-			public init(
-				poolUnitResource: OnLedgerEntity.Resource,
-				xrdResource: OnLedgerEntity.Resource?,
-				nonXrdResources: [OnLedgerEntity.Resource]
-			) {
-				self.poolUnitResource = poolUnitResource
-				self.xrdResource = xrdResource
-				self.nonXrdResources = nonXrdResources
-			}
-		}
-
 		let poolUnit: OnLedgerEntity.Account.PoolUnit
-		var resourceDetails: Loadable<ResourceDetails>
+		var resourceDetails: Loadable<OnLedgerEntity.ResourcePoolDetails>
 		var isSelected: Bool?
 		var isDataLoaded = Bool.random()
 
 		public init(
 			poolUnit: OnLedgerEntity.Account.PoolUnit,
-			resourceDetails: Loadable<ResourceDetails> = .idle,
+			resourceDetails: Loadable<OnLedgerEntity.ResourcePoolDetails> = .idle,
 			isSelected: Bool? = nil,
 			destination: Destinations.State? = nil
 		) {

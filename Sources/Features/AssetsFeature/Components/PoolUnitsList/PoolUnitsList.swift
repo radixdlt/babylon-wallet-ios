@@ -5,11 +5,7 @@ import OnLedgerEntitiesClient
 public struct PoolUnitsList: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		var lsuResource: LSUResource.State?
-		let pageSize = 5
-
 		var poolUnits: IdentifiedArrayOf<PoolUnit.State> = []
-
-		var scrollIndex: Int = 0
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -23,7 +19,7 @@ public struct PoolUnitsList: Sendable, FeatureReducer {
 	}
 
 	public enum InternalAction: Sendable, Equatable {
-		case loadedResources(TaskResult<[OnLedgerEntity.Resource]>)
+		case loadedResources(TaskResult<[OnLedgerEntity.ResourcePoolDetails]>)
 	}
 
 	@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
@@ -47,12 +43,11 @@ public struct PoolUnitsList: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .task:
-			return .none
-		//            let addresses = Array(state.poolUnits.map(\.poolUnit.resource.resourceAddress).uniqued())
-//			return .run { send in
-//				let result = await TaskResult { try await onLedgerEntitiesClient.getResources(addresses) }
-//				await send(.internal(.loadedResources(result)))
-//			}
+			let ownedPoolUnits = state.poolUnits.map(\.poolUnit)
+			return .run { send in
+				let result = await TaskResult { try await onLedgerEntitiesClient.getPoolUnitsDetail(ownedPoolUnits) }
+				await send(.internal(.loadedResources(result)))
+			}
 		case .refresh:
 			return .none
 //			print("refresh")
@@ -66,17 +61,10 @@ public struct PoolUnitsList: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
-		case let .loadedResources(.success(resources)):
-//			state.poolUnits.forEach { poolUnit in
-			//                let poolUnitResourceAddress = poolUnit.poolUnit.resource.resourceAddress
-//				let poolUnitResource = resources.first { $0.resourceAddress == poolUnitResourceAddress }
-//				let xrdResource = resources.first { $0.resourceAddress == poolUnit.poolUnit.poolResources.xrdResource?.resourceAddress }
-//				let nonXrdResources = poolUnit.poolUnit.poolResources.nonXrdResources.map { resource in
-//					resources.first { $0.resourceAddress == resource.resourceAddress }!
-//				}
-//
-//				state.poolUnits[id: poolUnit.id]?.resourceDetails = .success(.init(poolUnitResource: poolUnitResource!, xrdResource: xrdResource, nonXrdResources: nonXrdResources))
-//			}
+		case let .loadedResources(.success(poolDetails)):
+			poolDetails.forEach { poolDetails in
+				state.poolUnits[id: poolDetails.address]?.resourceDetails = .success(poolDetails)
+			}
 			return .none
 		case .loadedResources:
 			return .none

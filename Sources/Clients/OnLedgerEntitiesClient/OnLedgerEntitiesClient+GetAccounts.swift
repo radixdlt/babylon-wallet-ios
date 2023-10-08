@@ -4,7 +4,11 @@ import SharedModels
 
 extension OnLedgerEntitiesClient {
 	@Sendable
-	static func createAccount(_ item: GatewayAPI.StateEntityDetailsResponseItem, accountAddress: AccountAddress, ledgerState: AtLedgerState) async throws -> OnLedgerEntity.Account {
+	static func createAccount(
+		_ item: GatewayAPI.StateEntityDetailsResponseItem,
+		accountAddress: AccountAddress,
+		ledgerState: AtLedgerState
+	) async throws -> OnLedgerEntity.Account {
 		let fungibleResources = try extractOwnedFungibleResources(item, ledgerState: ledgerState)
 		let nonFungibleResources = try extractOwnedNonFungibleResources(item, ledgerState: ledgerState)
 
@@ -25,6 +29,7 @@ extension OnLedgerEntitiesClient {
 
 		return await .init(
 			address: accountAddress,
+			atLedgerState: ledgerState,
 			metadata: .init(item.explicitMetadata),
 			fungibleResources: filteredFungibleResources.sorted(),
 			nonFungibleResources: filteredNonFungibleResources,
@@ -33,16 +38,30 @@ extension OnLedgerEntitiesClient {
 	}
 
 	@Sendable
-	static func createResourcePool(_ item: GatewayAPI.StateEntityDetailsResponseItem, resourcePoolAddress: ResourcePoolAddress, ledgerState: AtLedgerState) async throws -> OnLedgerEntity.ResourcePool {
-		try await .init(
+	static func createResourcePool(
+		_ item: GatewayAPI.StateEntityDetailsResponseItem,
+		resourcePoolAddress: ResourcePoolAddress,
+		ledgerState: AtLedgerState
+	) async throws -> OnLedgerEntity.ResourcePool? {
+		guard let state: GatewayAPI.ResourcePoolState = try? item.details?.component?.decodeState() else {
+			assertionFailure("Invalid resource pool state")
+			return nil
+		}
+
+		return try await .init(
 			address: resourcePoolAddress,
+			poolUnitResourceAddress: .init(validatingAddress: state.poolUnitResourceAddress),
 			resources: extractOwnedFungibleResources(item, ledgerState: ledgerState).sorted(),
 			metadata: .init(item.explicitMetadata)
 		)
 	}
 
 	@Sendable
-	static func createValidator(_ item: GatewayAPI.StateEntityDetailsResponseItem, validatorAddress: ValidatorAddress, ledgerState: AtLedgerState) async throws -> OnLedgerEntity.Validator? {
+	static func createValidator(
+		_ item: GatewayAPI.StateEntityDetailsResponseItem,
+		validatorAddress: ValidatorAddress,
+		ledgerState: AtLedgerState
+	) async throws -> OnLedgerEntity.Validator? {
 		@Dependency(\.gatewaysClient) var gatewaysClient
 		let networkId = await gatewaysClient.getCurrentNetworkID()
 		let xrdAddress = knownAddresses(networkId: networkId.rawValue).resourceAddresses.xrd.addressString()
@@ -75,6 +94,7 @@ extension OnLedgerEntitiesClient {
 
 		return try .init(
 			address: validatorAddress,
+			stakeUnitResourceAddress: .init(validatingAddress: state.stakeUnitResourceAddress),
 			xrdVaultBalance: .init(value: xrdStakeVaultBalance),
 			stakeClaimFungibleResourceAddress: .init(validatingAddress: state.unstakeClaimTokenResourceAddress),
 			metadata: .init(item.explicitMetadata)
@@ -133,16 +153,11 @@ extension OnLedgerEntitiesClient {
 		}
 
 		func matchPoolUnitCandidate(
-			for itemMetadata: ResourceMetadata,
+			for poolUnitResourceAddress: ResourceAddress,
 			itemAddress: Address,
 			candidates: [OnLedgerEntity.OwnedFungibleResource],
 			metadataAddressMatch: KeyPath<ResourceMetadata, String?>
 		) -> OnLedgerEntity.OwnedFungibleResource? {
-			guard let poolUnitResourceAddress = itemMetadata.poolUnitResource else {
-				assertionFailure("Pool Unit does not contain the pool unit resource address")
-				return nil
-			}
-
 			guard let candidate = candidates.first(where: {
 				$0.metadata[keyPath: metadataAddressMatch] == itemAddress.address
 			}) else {
@@ -165,12 +180,22 @@ extension OnLedgerEntitiesClient {
 			return .init(radixNetworkStakes: [], poolUnits: [])
 		}
 
-		let entities = try await getEntities(for: stakeAndPoolAddresses, .poolUnitMetadataKeys, forceRefresh: true)
+		let entities = try await getEntities(
+			for: stakeAndPoolAddresses,
+			.poolUnitMetadataKeys,
+			ledgerState: ledgerState,
+			forceRefresh: true
+		)
 		let validators = entities.compactMap(\.validator)
 		let resourcesPools = entities.compactMap(\.resourcePool)
 
 		let stakeUnits = validators.compactMap { validator -> OnLedgerEntity.Account.RadixNetworkStake? in
-			let stakeUnit = matchPoolUnitCandidate(for: validator.metadata, itemAddress: validator.address.asGeneral(), candidates: stakeUnitCandidates, metadataAddressMatch: \.validator?.address)
+			let stakeUnit = matchPoolUnitCandidate(
+				for: validator.stakeUnitResourceAddress,
+				itemAddress: validator.address.asGeneral(),
+				candidates: stakeUnitCandidates,
+				metadataAddressMatch: \.validator?.address
+			)
 
 			let stakeClaimNFT: OnLedgerEntity.OwnedNonFungibleResource? = {
 				let stakeClaimNFTCandidate = stakeClaimNFTCandidates.first {
@@ -203,7 +228,7 @@ extension OnLedgerEntitiesClient {
 
 		let poolUnits = resourcesPools.compactMap { pool -> OnLedgerEntity.Account.PoolUnit? in
 			let poolUnitResource = matchPoolUnitCandidate(
-				for: pool.metadata,
+				for: pool.poolUnitResourceAddress,
 				itemAddress: pool.address.asGeneral(),
 				candidates: poolUnitCandidates,
 				metadataAddressMatch: \.poolUnit?.address
@@ -218,6 +243,69 @@ extension OnLedgerEntitiesClient {
 		}
 
 		return .init(radixNetworkStakes: stakeUnits, poolUnits: poolUnits)
+	}
+
+	@Sendable
+	public func getPoolUnitsDetail(_ ownedPoolUnits: [OnLedgerEntity.Account.PoolUnit]) async throws -> [OnLedgerEntity.ResourcePoolDetails] {
+		let pools = try await getEntities(ownedPoolUnits.map { $0.resourcePoolAddress.asGeneral() }, [], nil).compactMap(\.resourcePool)
+		let allResourceAddresses = pools.flatMap { pool in
+			[pool.poolUnitResourceAddress] +
+				pool.resources.nonXrdResources.map(\.resourceAddress) +
+				(pool.resources.xrdResource.map { [$0.resourceAddress] } ?? [])
+		}
+
+		let allResources = try await getResources(allResourceAddresses, atLedgerState: nil)
+
+		return ownedPoolUnits.compactMap { ownedPoolUnit -> OnLedgerEntity.ResourcePoolDetails? in
+			guard let pool = pools.first(where: { $0.address == ownedPoolUnit.resourcePoolAddress }) else {
+				assertionFailure("Did not load pool details")
+				return nil
+			}
+			guard let poolUnitResource = allResources.first(where: { $0.resourceAddress == pool.poolUnitResourceAddress }) else {
+				assertionFailure("Did not load poolUnitResource details")
+				return nil
+			}
+
+			var nonXrdResourceDetails: [OnLedgerEntity.ResourceWithVaultAmount] = []
+
+			for resource in pool.resources.nonXrdResources {
+				guard let resourceDetails = allResources.first(where: { $0.resourceAddress == resource.resourceAddress }) else {
+					assertionFailure("Did not load resource details")
+					return nil
+				}
+				nonXrdResourceDetails.append(.init(resource: resourceDetails, amount: resource.amount))
+			}
+
+			var xrdResourceDetails: OnLedgerEntity.ResourceWithVaultAmount? = nil
+			if let xrdResource = pool.resources.xrdResource {
+				guard let details = allResources.first(where: { $0.resourceAddress == xrdResource.resourceAddress }) else {
+					assertionFailure("Did not load xrd resource details")
+					return nil
+				}
+				xrdResourceDetails = .init(resource: details, amount: xrdResource.amount)
+			}
+
+			return .init(
+				address: pool.address,
+				poolUnitResource: .init(resource: poolUnitResource, amount: ownedPoolUnit.resource.amount),
+				xrdResource: xrdResourceDetails,
+				nonXrdResources: nonXrdResourceDetails
+			)
+		}
+	}
+}
+
+extension OnLedgerEntity {
+	public struct ResourcePoolDetails: Hashable, Sendable {
+		public let address: ResourcePoolAddress
+		public let poolUnitResource: ResourceWithVaultAmount
+		public let xrdResource: ResourceWithVaultAmount?
+		public let nonXrdResources: [ResourceWithVaultAmount]
+	}
+
+	public struct ResourceWithVaultAmount: Hashable, Sendable {
+		public let resource: OnLedgerEntity.Resource
+		public let amount: RETDecimal
 	}
 }
 

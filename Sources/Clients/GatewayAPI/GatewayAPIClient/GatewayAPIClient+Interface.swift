@@ -37,7 +37,7 @@ extension GatewayAPIClient {
 	public typealias GetEpoch = @Sendable () async throws -> Epoch
 
 	// MARK: - Entity
-	public typealias GetEntityDetails = @Sendable (_ addresses: [String], _ explicitMetadata: Set<EntityMetadataKey>, _ ledgerState: GatewayAPI.LedgerState?) async throws -> GatewayAPI.StateEntityDetailsResponse
+	public typealias GetEntityDetails = @Sendable (_ addresses: [String], _ explicitMetadata: Set<EntityMetadataKey>, _ ledgerState: GatewayAPI.LedgerStateSelector?) async throws -> GatewayAPI.StateEntityDetailsResponse
 	public typealias GetEntityMetdata = @Sendable (_ address: String, _ explicitMetadata: Set<EntityMetadataKey>) async throws -> GatewayAPI.EntityMetadataCollection
 
 	// MARK: - Fungible
@@ -116,7 +116,7 @@ extension GatewayAPIClient {
 			.chunks(ofCount: GatewayAPIClient.entityDetailsPageSize)
 			.map(Array.init)
 			.parallelMap {
-				try await getEntityDetails($0, explicitMetadata, ledgerState)
+				try await getEntityDetails($0, explicitMetadata, ledgerState?.selector)
 			}
 
 		guard !allResponses.isEmpty else {

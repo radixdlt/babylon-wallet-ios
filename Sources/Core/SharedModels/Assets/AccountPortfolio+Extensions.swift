@@ -17,6 +17,7 @@ extension OnLedgerEntity.Resource {
 	public init(resourceAddress: ResourceAddress, metadata: [String: MetadataValue?]) {
 		self.init(
 			resourceAddress: resourceAddress,
+			atLedgerState: .init(version: 0, epoch: 0),
 			divisibility: nil,
 			behaviors: [],
 			totalSupply: nil,

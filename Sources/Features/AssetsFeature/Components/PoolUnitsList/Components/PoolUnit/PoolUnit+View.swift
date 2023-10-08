@@ -1,4 +1,5 @@
 import FeaturePrelude
+import OnLedgerEntitiesClient
 
 // MARK: - PoolUnit.View
 extension PoolUnit {
@@ -80,45 +81,37 @@ extension PoolUnit.State {
 extension PoolUnitResourceViewState {
 	static func viewStates(
 		poolUnit: OnLedgerEntity.Account.PoolUnit,
-		resourcesDetails: PoolUnit.State.ResourceDetails
+		resourcesDetails: OnLedgerEntity.ResourcePoolDetails
 	) -> NonEmpty<IdentifiedArrayOf<PoolUnitResourceViewState>> {
-		fatalError()
-//		func redemptionValue(for resource: OnLedgerEntity.OwnedFungibleResource, resourceDetails: OnLedgerEntity.Resource?) -> String {
-//			guard let resourceDetails else {
-//				assertionFailure("Not all resources were loaded")
-//				return ""
-//			}
-//			guard let poolUnitTotalSupply = resourcesDetails.poolUnitResource.totalSupply else {
-//				loggerGlobal.error("Missing total supply for \(resource.resourceAddress.address)")
-//				return "Missing Total supply - could not calculate redemption value" // FIXME: Strings
-//			}
-		//            let redemptionValue = poolUnit.resource.amount * (resource.amount / poolUnitTotalSupply)
-//			let decimalPlaces = resourceDetails.divisibility.map(UInt.init) ?? RETDecimal.maxDivisibility
-//			let roundedRedemptionValue = redemptionValue.rounded(decimalPlaces: decimalPlaces)
-//
-//			return roundedRedemptionValue.formatted()
-//		}
-//
-//		let xrdResourceViewState = poolUnit.poolResources.xrdResource.map {
-//			PoolUnitResourceViewState(
-//				thumbnail: .xrd,
-//				symbol: Constants.xrdTokenName,
-//				tokenAmount: redemptionValue(for: $0, resourceDetails: resourcesDetails.xrdResource)
-//			)
-//		}
-//
-//		return .init(
-//			rawValue: (xrdResourceViewState.map { [$0] } ?? [])
-//				+ poolUnit.poolResources.nonXrdResources.map { resource in
-//					PoolUnitResourceViewState(
-//						thumbnail: .known(resource.metadata.iconURL),
-//						symbol: resource.metadata.symbol ?? resource.metadata.name ?? L10n.Account.PoolUnits.unknownSymbolName,
-//						tokenAmount: redemptionValue(
-//							for: resource,
-//							resourceDetails: resourcesDetails.nonXrdResources.first { $0.resourceAddress == resource.resourceAddress }
-//						)
-//					)
-//				}
-//		)! // Safe to unwrap, guaranteed to not be empty
+		func redemptionValue(for resourceDetails: OnLedgerEntity.ResourceWithVaultAmount) -> String {
+			guard let poolUnitTotalSupply = resourcesDetails.poolUnitResource.resource.totalSupply else {
+				loggerGlobal.error("Missing total supply for \(resourcesDetails.poolUnitResource.resource.totalSupply)")
+				return "Missing Total supply - could not calculate redemption value" // FIXME: Strings
+			}
+			let redemptionValue = poolUnit.resource.amount * (resourceDetails.amount / poolUnitTotalSupply)
+			let decimalPlaces = resourceDetails.resource.divisibility.map(UInt.init) ?? RETDecimal.maxDivisibility
+			let roundedRedemptionValue = redemptionValue.rounded(decimalPlaces: decimalPlaces)
+
+			return roundedRedemptionValue.formatted()
+		}
+
+		let xrdResourceViewState = resourcesDetails.xrdResource.map {
+			PoolUnitResourceViewState(
+				thumbnail: .xrd,
+				symbol: Constants.xrdTokenName,
+				tokenAmount: redemptionValue(for: $0)
+			)
+		}
+
+		return .init(
+			rawValue: (xrdResourceViewState.map { [$0] } ?? [])
+				+ resourcesDetails.nonXrdResources.map { resourceDetails in
+					PoolUnitResourceViewState(
+						thumbnail: .known(resourceDetails.resource.resourceMetadata.iconURL),
+						symbol: resourceDetails.resource.resourceMetadata.symbol ?? resourceDetails.resource.resourceMetadata.name ?? L10n.Account.PoolUnits.unknownSymbolName,
+						tokenAmount: redemptionValue(for: resourceDetails)
+					)
+				}
+		)! // Safe to unwrap, guaranteed to not be empty
 	}
 }

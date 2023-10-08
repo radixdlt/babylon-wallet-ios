@@ -134,11 +134,11 @@ extension GatewayAPIClient {
 		}
 
 		@Sendable
-		func getEntityDetails(_ addresses: [String], explictMetadata: Set<EntityMetadataKey>, ledgerState: GatewayAPI.LedgerState?) async throws -> GatewayAPI.StateEntityDetailsResponse {
+		func getEntityDetails(_ addresses: [String], explictMetadata: Set<EntityMetadataKey>, ledgerState: GatewayAPI.LedgerStateSelector?) async throws -> GatewayAPI.StateEntityDetailsResponse {
 			assert(explictMetadata.count <= EntityMetadataKey.maxAllowedKeys)
 			return try await post(
 				request: GatewayAPI.StateEntityDetailsRequest(
-					atLedgerState: ledgerState?.selector,
+					atLedgerState: ledgerState,
 					optIns: .init(
 						explicitMetadata: explictMetadata.map(\.rawValue)
 					),

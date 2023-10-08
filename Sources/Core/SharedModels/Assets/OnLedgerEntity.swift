@@ -59,6 +59,7 @@ extension OnLedgerEntity {
 	public struct Resource: Sendable, Hashable, Codable, Identifiable {
 		public var id: ResourceAddress { resourceAddress }
 		public let resourceAddress: ResourceAddress
+		public let atLedgerState: AtLedgerState
 		public let divisibility: Int?
 		public let behaviors: [AssetBehavior]
 		public let totalSupply: RETDecimal?
@@ -79,12 +80,14 @@ extension OnLedgerEntity {
 
 		public init(
 			resourceAddress: ResourceAddress,
+			atLedgerState: AtLedgerState,
 			divisibility: Int? = nil,
 			behaviors: [AssetBehavior] = [],
 			totalSupply: RETDecimal? = nil,
 			resourceMetadata: ResourceMetadata
 		) {
 			self.resourceAddress = resourceAddress
+			self.atLedgerState = atLedgerState
 			self.divisibility = divisibility
 			self.behaviors = behaviors
 			self.totalSupply = totalSupply
@@ -147,15 +150,18 @@ extension OnLedgerEntity {
 extension OnLedgerEntity {
 	public struct ResourcePool: Sendable, Hashable, Codable {
 		public let address: ResourcePoolAddress
+		public let poolUnitResourceAddress: ResourceAddress
 		public let resources: OwnedFungibleResources
 		public let metadata: ResourceMetadata
 
 		public init(
 			address: ResourcePoolAddress,
+			poolUnitResourceAddress: ResourceAddress,
 			resources: OwnedFungibleResources,
 			metadata: ResourceMetadata
 		) {
 			self.address = address
+			self.poolUnitResourceAddress = poolUnitResourceAddress
 			self.resources = resources
 			self.metadata = metadata
 		}
@@ -163,17 +169,20 @@ extension OnLedgerEntity {
 
 	public struct Validator: Sendable, Hashable, Codable {
 		public let address: ValidatorAddress
+		public let stakeUnitResourceAddress: ResourceAddress
 		public let xrdVaultBalance: RETDecimal
 		public let stakeClaimFungibleResourceAddress: ResourceAddress
 		public let metadata: ResourceMetadata
 
 		public init(
 			address: ValidatorAddress,
+			stakeUnitResourceAddress: ResourceAddress,
 			xrdVaultBalance: RETDecimal,
 			stakeClaimFungibleResourceAddress: ResourceAddress,
 			metadata: ResourceMetadata
 		) {
 			self.address = address
+			self.stakeUnitResourceAddress = stakeUnitResourceAddress
 			self.xrdVaultBalance = xrdVaultBalance
 			self.stakeClaimFungibleResourceAddress = stakeClaimFungibleResourceAddress
 			self.metadata = metadata
@@ -247,6 +256,7 @@ extension OnLedgerEntity {
 extension OnLedgerEntity {
 	public struct Account: Sendable, Hashable, Codable {
 		public let address: AccountAddress
+		public let atLedgerState: AtLedgerState
 		public let metadata: ResourceMetadata
 		public var fungibleResources: OwnedFungibleResources
 		public var nonFungibleResources: [OwnedNonFungibleResource]
@@ -254,12 +264,14 @@ extension OnLedgerEntity {
 
 		public init(
 			address: AccountAddress,
+			atLedgerState: AtLedgerState,
 			metadata: ResourceMetadata,
 			fungibleResources: OwnedFungibleResources,
 			nonFungibleResources: [OwnedNonFungibleResource],
 			poolUnitResources: PoolUnitResources
 		) {
 			self.address = address
+			self.atLedgerState = atLedgerState
 			self.metadata = metadata
 			self.fungibleResources = fungibleResources
 			self.nonFungibleResources = nonFungibleResources

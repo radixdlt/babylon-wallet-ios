@@ -5,20 +5,23 @@ import OnLedgerEntitiesClient
 public struct NonFungibleTokenDetails: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public let resourceAddress: ResourceAddress
-		public var resource: Loadable<OnLedgerEntity.Resource>
-		public let prefetchedPortfolioResource: OnLedgerEntity.OwnedNonFungibleResource?
+		public var resourceDetails: Loadable<OnLedgerEntity.Resource>
+		public let ownedResource: OnLedgerEntity.OwnedNonFungibleResource?
 		public let token: OnLedgerEntity.NonFungibleToken?
+		public let ledgerState: AtLedgerState
 
 		public init(
 			resourceAddress: ResourceAddress,
-			resource: Loadable<OnLedgerEntity.Resource> = .idle,
-			prefetchedPortfolioResource: OnLedgerEntity.OwnedNonFungibleResource? = nil,
-			token: OnLedgerEntity.NonFungibleToken? = nil
+			resourceDetails: Loadable<OnLedgerEntity.Resource> = .idle,
+			ownedResource: OnLedgerEntity.OwnedNonFungibleResource? = nil,
+			token: OnLedgerEntity.NonFungibleToken,
+			ledgerState: AtLedgerState
 		) {
 			self.resourceAddress = resourceAddress
-			self.resource = resource
+			self.resourceDetails = resourceDetails
 			self.token = token
-			self.prefetchedPortfolioResource = prefetchedPortfolioResource
+			self.ownedResource = ownedResource
+			self.ledgerState = ledgerState
 		}
 	}
 
@@ -42,13 +45,13 @@ public struct NonFungibleTokenDetails: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .task:
-			guard case .idle = state.resource else {
+			guard case .idle = state.resourceDetails else {
 				return .none
 			}
-			state.resource = .loading
-			return .run { [resourceAddress = state.resourceAddress] send in
+			state.resourceDetails = .loading
+			return .run { [resourceAddress = state.resourceAddress, ledgerState = state.ledgerState] send in
 				try await Task.sleep(for: .seconds(3))
-				let result = await TaskResult { try await onLedgerEntitiesClient.getResource(resourceAddress) }
+				let result = await TaskResult { try await onLedgerEntitiesClient.getResource(resourceAddress, atLedgerState: ledgerState) }
 				await send(.internal(.resourceLoadResult(result)))
 			}
 		case .closeButtonTapped:
@@ -59,10 +62,10 @@ public struct NonFungibleTokenDetails: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .resourceLoadResult(.success(resource)):
-			state.resource = .success(resource)
+			state.resourceDetails = .success(resource)
 			return .none
 		case let .resourceLoadResult(.failure(err)):
-			state.resource = .failure(err)
+			state.resourceDetails = .failure(err)
 			return .none
 		}
 	}

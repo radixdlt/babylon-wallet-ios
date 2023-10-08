@@ -1,4 +1,5 @@
 import EngineKit
+import GatewayAPI
 import Prelude
 import SharedModels
 
@@ -7,21 +8,18 @@ import SharedModels
 /// Compared to AccountPortfolio it loads the general info about the entities not related to any account.
 /// With a refactor, this can potentially also load the Accounts and then link its resources to the general info about resources.
 public struct OnLedgerEntitiesClient: Sendable {
-	public let getResources: GetResources
-	public let getResource: GetResource
-	/// Retrieve the account owned ids for a given non fungible resource collection
-	public let getAccountOwnedNonFungibleResourceIds: GetAccountOwnedNonFungibleResourceIds
+	public let getEntities: GetEntities
+	/// Refresh the specific resources
+	public let refreshEntities: RefreshEntities
 	/// Retrieve the token data associated with the given non fungible ids
 	public let getNonFungibleTokenData: GetNonFungibleTokenData
+
+	/// Retrieve the account owned ids for a given non fungible resource collection
+	public let getAccountOwnedNonFungibleResourceIds: GetAccountOwnedNonFungibleResourceIds
 
 	/// Retrieve the token data associated with the given account.
 	/// Basically a combination of `getAccountOwnedNonFungibleResourceIds` and `getNonFungibleTokenData`
 	public let getAccountOwnedNonFungibleTokenData: GetAccountOwnedNonFungibleTokenData
-
-	public let getAccounts: GetAccounts
-
-	/// Refresh the specific resources
-	public let refreshEntities: RefreshEntities
 }
 
 // MARK: - OnLedgerEntitiesClient.GetResources
@@ -33,6 +31,8 @@ extension OnLedgerEntitiesClient {
 	public typealias GetAccountOwnedNonFungibleResourceIds = @Sendable (GetAccountOwnedNonFungibleResourceIdsRequest) async throws -> OnLedgerEntity.AccountNonFungibleIdsPage
 	public typealias GetAccountOwnedNonFungibleTokenData = @Sendable (GetAccountOwnedNonFungibleTokenDataRequest) async throws -> [OnLedgerEntity.NonFungibleToken]
 	public typealias GetAccounts = @Sendable ([AccountAddress]) async throws -> [OnLedgerEntity.Account]
+
+	public typealias GetEntities = @Sendable ([Address], Set<EntityMetadataKey>, AtLedgerState?) async throws -> [OnLedgerEntity]
 }
 
 // MARK: OnLedgerEntitiesClient.GetNonFungibleTokenDataRequest
@@ -92,23 +92,14 @@ extension OnLedgerEntitiesClient {
 		/// The address of the account that owns the non fungible resource ids
 		public let accountAddress: AccountAddress
 		/// The non fungible resource collection for with to retrieve the ids
-		public let resourceAddress: ResourceAddress
-		/// The account vault where the ids are stored
-		public let vaultAddress: VaultAddress
-		/// The ledger state at which to retrieve the ids, should be ledger state
-		/// from the OnLedgerEntity.OwnedNonFungibleResource.
-		public let atLedgerState: AtLedgerState
+		public let resource: OnLedgerEntity.OwnedNonFungibleResource
 
 		public init(
 			accountAddress: AccountAddress,
-			resourceAddress: ResourceAddress,
-			vaultAddress: VaultAddress,
-			atLedgerState: AtLedgerState
+			resource: OnLedgerEntity.OwnedNonFungibleResource
 		) {
 			self.accountAddress = accountAddress
-			self.resourceAddress = resourceAddress
-			self.vaultAddress = vaultAddress
-			self.atLedgerState = atLedgerState
+			self.resource = resource
 		}
 	}
 }
@@ -123,5 +114,25 @@ extension OnLedgerEntitiesClient {
 			self.cursor = cursor
 			self.pageLimit = pageLimit
 		}
+	}
+}
+
+extension OnLedgerEntitiesClient {
+	@Sendable
+	public func getAccounts(_ addresses: [AccountAddress]) async throws -> [OnLedgerEntity.Account] {
+		try await getEntities(addresses.map { $0.asGeneral() }, .resourceMetadataKeys, nil).compactMap(\.account)
+	}
+
+	@Sendable
+	public func getResources(_ addresses: [ResourceAddress], atLedgerState: AtLedgerState? = nil) async throws -> [OnLedgerEntity.Resource] {
+		try await getEntities(addresses.map { $0.asGeneral() }, .resourceMetadataKeys, atLedgerState).compactMap(\.resource)
+	}
+
+	@Sendable
+	public func getResource(_ address: ResourceAddress, atLedgerState: AtLedgerState? = nil) async throws -> OnLedgerEntity.Resource {
+		guard let resource = try await getResources([address], atLedgerState: atLedgerState).first else {
+			throw Error.emptyResponse
+		}
+		return resource
 	}
 }

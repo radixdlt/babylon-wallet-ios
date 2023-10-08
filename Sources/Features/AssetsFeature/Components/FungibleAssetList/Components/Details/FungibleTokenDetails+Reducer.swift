@@ -9,17 +9,20 @@ public struct FungibleTokenDetails: Sendable, FeatureReducer {
 		var resource: Loadable<OnLedgerEntity.Resource>
 		let isXRD: Bool
 		let prefetchedPortfolioResource: OnLedgerEntity.OwnedFungibleResource?
+		let ledgerState: AtLedgerState?
 
 		public init(
 			resourceAddress: ResourceAddress,
 			resource: Loadable<OnLedgerEntity.Resource> = .idle,
 			prefetchedPortfolioResource: OnLedgerEntity.OwnedFungibleResource? = nil,
-			isXRD: Bool
+			isXRD: Bool,
+			ledgerState: AtLedgerState? = nil
 		) {
 			self.resourceAddress = resourceAddress
 			self.resource = resource
 			self.prefetchedPortfolioResource = prefetchedPortfolioResource
 			self.isXRD = isXRD
+			self.ledgerState = ledgerState
 		}
 	}
 
@@ -47,9 +50,9 @@ public struct FungibleTokenDetails: Sendable, FeatureReducer {
 				return .none
 			}
 			state.resource = .loading
-			return .run { [resourceAddress = state.resourceAddress] send in
+			return .run { [resourceAddress = state.resourceAddress, ledgerState = state.ledgerState] send in
 				try await Task.sleep(for: .seconds(3))
-				let result = await TaskResult { try await onLedgerEntitiesClient.getResource(resourceAddress) }
+				let result = await TaskResult { try await onLedgerEntitiesClient.getResource(resourceAddress, atLedgerState: ledgerState) }
 				await send(.internal(.resourceLoadResult(result)))
 			}
 		case .closeButtonTapped:

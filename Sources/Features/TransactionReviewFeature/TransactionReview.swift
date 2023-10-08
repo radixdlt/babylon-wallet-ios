@@ -298,8 +298,9 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			case let .nonFungible(details):
 				state.destination = .nonFungibleTokenDetails(.init(
 					resourceAddress: transfer.resource.resourceAddress,
-					resource: .success(transfer.resource),
-					token: details
+					resourceDetails: .success(transfer.resource),
+					token: details,
+					ledgerState: transfer.resource.atLedgerState
 				))
 			}
 

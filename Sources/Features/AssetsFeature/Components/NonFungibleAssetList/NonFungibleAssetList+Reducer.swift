@@ -53,7 +53,12 @@ public struct NonFungibleAssetList: Sendable, FeatureReducer {
 				return .none
 			}
 
-			state.destination = .details(.init(resourceAddress: row.id, prefetchedPortfolioResource: row.resource, token: asset))
+			state.destination = .details(.init(
+				resourceAddress: row.id,
+				ownedResource: row.resource,
+				token: asset,
+				ledgerState: row.resource.atLedgerState
+			))
 			return .none
 
 		case .asset:
