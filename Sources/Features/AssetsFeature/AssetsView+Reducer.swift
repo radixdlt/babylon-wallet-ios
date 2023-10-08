@@ -170,31 +170,17 @@ public struct AssetsView: Sendable, FeatureReducer {
 			)
 		}
 
-		let lsuResource: LSUResource.State? = nil
-		//        {
-		//            guard !portfolio.poolUnitResources.radixNetworkStakes.isEmpty else {
-		//                return nil
-		//            }
-		//            return .init(
-		//                stakes: .init(
-		//                    uniqueElements: portfolio.poolUnitResources.radixNetworkStakes
-		//                        .map { stake in
-		//                            LSUStake.State (
-		//                                stake: stake,
-		//                                isStakeSelected: (stake.stakeUnitResource?.resourceAddress)
-		//                                    .flatMap(mode.nonXrdRowSelected),
-		//                                selectedStakeClaimAssets: (stake.stakeClaimResource?.resourceAddress)
-		//                                    .flatMap(mode.nftRowSelectedAssets)
-		//                            )
-		//                        }
-		//                )
-		//            )
-		//        }()
+		let lsuResource: LSUResource.State? = {
+			guard !portfolio.poolUnitResources.radixNetworkStakes.isEmpty else {
+				return nil
+			}
+			return .init(stakess: portfolio.poolUnitResources.radixNetworkStakes, account: portfolio, stakes: [])
+		}()
 
 		let poolUnitList: PoolUnitsList.State? = {
 			if lsuResource != nil || !portfolio.poolUnitResources.poolUnits.isEmpty {
 				return .init(
-					lsuResource: nil,
+					lsuResource: lsuResource,
 					poolUnits: .init(
 						uncheckedUniqueElements: portfolio.poolUnitResources.poolUnits
 							.map {
@@ -399,14 +385,15 @@ extension SelectedResourceProvider<OnLedgerEntity.OwnedFungibleResource> {
 	}
 
 	init?(with lsuStake: LSUStake.State) {
-		guard let resource = lsuStake.stake.stakeUnitResource else {
-			return nil
-		}
-
-		self.init(
-			isSelected: lsuStake.isStakeSelected,
-			resource: resource
-		)
+		fatalError()
+//		guard let resource = lsuStake.stake.stakeUnitResource else {
+//			return nil
+//		}
+//
+//		self.init(
+//			isSelected: lsuStake.isStakeSelected,
+//			resource: resource
+//		)
 	}
 
 	init(with poolUnit: PoolUnit.State) {
@@ -448,10 +435,11 @@ private struct NonFungibleTokensPerResourceProvider {
 
 extension NonFungibleTokensPerResourceProvider {
 	init(with lsuStake: LSUStake.State) {
-		self.init(
-			selectedAssets: lsuStake.selectedStakeClaimAssets,
-			resource: lsuStake.stake.stakeClaimResource
-		)
+		fatalError()
+//		self.init(
+//			selectedAssets: lsuStake.selectedStakeClaimAssets,
+//			resource: lsuStake.stake.stakeClaimResource
+//		)
 	}
 
 	init(with row: NonFungibleAssetList.Row.State) {

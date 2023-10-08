@@ -71,11 +71,3 @@ public struct PoolUnitsList: Sendable, FeatureReducer {
 		}
 	}
 }
-
-// extension OnLedgerEntity.ResourcePool {
-//	var resourceAddresses: [ResourceAddress] {
-//		(poolResources.xrdResource.map { [$0.resourceAddress] } ?? []) +
-//			poolResources.nonXrdResources.map(\.resourceAddress) +
-//			[poolUnitResource.resourceAddress]
-//	}
-// }

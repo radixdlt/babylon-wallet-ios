@@ -71,21 +71,12 @@ extension LSUResource {
 	}
 }
 
-// MARK: - HeightPreferenceKey
-private struct HeightPreferenceKey: PreferenceKey {
-	static var defaultValue: CGFloat = .zero
-
-	static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
-		value = nextValue()
-	}
-}
-
 extension LSUResource.State {
 	var viewState: LSUResource.ViewState {
 		.init(
 			isExpanded: isExpanded,
 			iconURL: .init(string: "https://i.ibb.co/KG06168/Screenshot-2023-08-02-at-16-19-29.png")!,
-			numberOfStakes: stakes.count
+			numberOfStakes: stakess.count
 		)
 	}
 }

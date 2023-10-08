@@ -183,8 +183,7 @@ extension OnLedgerEntitiesClient {
 		let entities = try await getEntities(
 			for: stakeAndPoolAddresses,
 			.poolUnitMetadataKeys,
-			ledgerState: ledgerState,
-			forceRefresh: true
+			ledgerState: ledgerState
 		)
 		let validators = entities.compactMap(\.validator)
 		let resourcesPools = entities.compactMap(\.resourcePool)
@@ -293,9 +292,71 @@ extension OnLedgerEntitiesClient {
 			)
 		}
 	}
+
+	public func getValidatorsDetails(account: OnLedgerEntity.Account, _ ownedStakes: [OnLedgerEntity.Account.RadixNetworkStake]) async throws -> [OnLedgerEntity.ValidatorDetails] {
+		let validators = try await getEntities(ownedStakes.map { $0.validatorAddress.asGeneral() }, .resourceMetadataKeys, account.atLedgerState).compactMap(\.validator)
+		let resourceAddresses = ownedStakes.flatMap {
+			$0.stakeUnitResource.asArray(\.resourceAddress) + $0.stakeClaimResource.asArray(\.resourceAddress)
+		}
+
+		let resourceDetails = try await getResources(resourceAddresses, atLedgerState: account.atLedgerState)
+
+		return try await ownedStakes.asyncCompactMap { stake -> OnLedgerEntity.ValidatorDetails? in
+			guard let validatorDetails = validators.first(where: { $0.address == stake.validatorAddress }) else {
+				assertionFailure("Did not load validator details")
+				return nil
+			}
+
+			let stakeUnitResource: OnLedgerEntity.ResourceWithVaultAmount? = {
+				if let stakeUnitResource = stake.stakeUnitResource {
+					guard let stakeUnitDetails = resourceDetails.first(where: { $0.resourceAddress == stakeUnitResource.resourceAddress }) else {
+						assertionFailure("Did not load stake unit details")
+						return nil
+					}
+					return .init(resource: stakeUnitDetails, amount: stakeUnitResource.amount)
+				}
+
+				return nil
+			}()
+
+			let stakeClaimTokens: OnLedgerEntity.NonFunbileResourceWithTokens? = try await {
+				if let stakeClaimResource = stake.stakeClaimResource {
+					guard let stakeClaimResourceDetails = resourceDetails.first(where: { $0.resourceAddress == stakeClaimResource.resourceAddress }) else {
+						assertionFailure("Did not load stake unit details")
+						return nil
+					}
+					let tokenData = try await getAccountOwnedNonFungibleTokenData(.init(accountAddress: account.address, resource: stakeClaimResource))
+					return .init(resource: stakeClaimResourceDetails, tokens: tokenData)
+				}
+
+				return nil
+			}()
+
+			return .init(
+				validator: validatorDetails,
+				stakeUnitResource: stakeUnitResource,
+				stakeClaimTokens: stakeClaimTokens
+			)
+		}
+	}
+}
+
+extension Optional {
+	func asArray<T>(_ keyPath: KeyPath<Wrapped, T>) -> [T] {
+		if let wrapped = self {
+			return [wrapped[keyPath: keyPath]]
+		}
+		return []
+	}
 }
 
 extension OnLedgerEntity {
+	public struct ValidatorDetails: Hashable, Sendable {
+		public let validator: OnLedgerEntity.Validator
+		public let stakeUnitResource: ResourceWithVaultAmount?
+		public let stakeClaimTokens: NonFunbileResourceWithTokens?
+	}
+
 	public struct ResourcePoolDetails: Hashable, Sendable {
 		public let address: ResourcePoolAddress
 		public let poolUnitResource: ResourceWithVaultAmount
@@ -306,6 +367,11 @@ extension OnLedgerEntity {
 	public struct ResourceWithVaultAmount: Hashable, Sendable {
 		public let resource: OnLedgerEntity.Resource
 		public let amount: RETDecimal
+	}
+
+	public struct NonFunbileResourceWithTokens: Hashable, Sendable {
+		public let resource: OnLedgerEntity.Resource
+		public let tokens: [OnLedgerEntity.NonFungibleToken]
 	}
 }
 

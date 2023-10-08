@@ -116,8 +116,6 @@ extension NonFungibleAssetList {
 					}
 
 					state.isLoadingResources = false
-//					state.loadedTokens.append(contentsOf: tokensPage.tokens)
-//					state.nextPageCursor = tokensPage.nextPageCursor
 				case let .failure(err):
 					break
 				}
@@ -131,7 +129,6 @@ extension NonFungibleAssetList {
 			state.isLoadingResources = true
 			let cursor = state.nextPageCursor
 			return .run { [resource = state.resource, accountAddress = state.accountAddress] send in
-				try await Task.sleep(for: .seconds(2))
 				let result = await TaskResult {
 					let idsPage = try await onLedgerEntitiesClient.getAccountOwnedNonFungibleResourceIds(.init(
 						account: accountAddress,

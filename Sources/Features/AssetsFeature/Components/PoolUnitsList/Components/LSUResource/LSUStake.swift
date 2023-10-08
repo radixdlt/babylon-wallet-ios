@@ -1,24 +1,21 @@
 import FeaturePrelude
 import LoggerDependency
+import OnLedgerEntitiesClient
 
 // MARK: - LSUStake
 public struct LSUStake: FeatureReducer {
 	public struct State: Sendable, Hashable, Identifiable {
 		public var id: String {
-			stake.validatorAddress.address
+			validatorAddress.address
 		}
 
 		typealias AssetID = OnLedgerEntity.NonFungibleToken.ID
 
-		let stake: OnLedgerEntity.Account.RadixNetworkStake
+		let validatorAddress: ValidatorAddress
+		var stakeDetails: Loadable<OnLedgerEntity.ValidatorDetails>
 
 		var isStakeSelected: Bool?
 		var selectedStakeClaimAssets: OrderedSet<OnLedgerEntity.NonFungibleToken>?
-
-		var stakeResource: OnLedgerEntity.Resource?
-		var stakeClaimNFTResource: OnLedgerEntity.Resource?
-		var stakeClaimNfts: [OnLedgerEntity.NonFungibleToken] = []
-		let validator: OnLedgerEntity.Validator!
 
 		@PresentationState
 		var destination: Destinations.State?
@@ -73,39 +70,39 @@ public struct LSUStake: FeatureReducer {
 			return .none
 
 		case .didTap:
+			guard case let .success(stakeDetails) = state.stakeDetails else {
+				return .none
+			}
+
 			if state.isStakeSelected != nil {
 				state.isStakeSelected?.toggle()
-
 				return .none
 			} else {
 				guard
-					let stakeAmount = state.stake.stakeUnitResource?.amount,
-					let resource = state.stakeResource
+					let stakeUnitResource = stakeDetails.stakeUnitResource
 				else {
 					logger.fault("We should not be able to tap a stake in such state")
-
 					return .none
 				}
 
 				state.destination = .details(
 					.init(
-						validator: state.validator,
-						stakeUnitResource: resource,
-						stakeAmount: stakeAmount,
-						xrdRedemptionValue: state.xrdRedemptionValue
+						validator: stakeDetails.validator,
+						stakeUnitResource: stakeUnitResource,
+						xrdRedemptionValue: stakeDetails.xrdRedemptionValue
 					)
 				)
 
 				return .none
 			}
 		case let .didTapStakeClaimNFT(withID: id):
-			guard let token = state.stakeClaimNfts.first(where: { $0.id == id }) else {
-				assertionFailure("Did tapp a missing NFT?")
-				return .none
-			}
-			if state.isStakeSelected != nil {
-				state.selectedStakeClaimAssets?.toggle(token)
-			}
+			//            guard let token = state.stakeDetails.stakeClaimTokens?.tokens.first(where: { $0.id == id }) else {
+//				assertionFailure("Did tapp a missing NFT?")
+//				return .none
+//			}
+			//            if state.selectedStakeClaimAssets != nil {
+//				state.selectedStakeClaimAssets?.toggle(token)
+//			}
 
 			// TODO: Show details
 			return .none
@@ -114,8 +111,8 @@ public struct LSUStake: FeatureReducer {
 }
 
 import EngineKit
-extension LSUStake.State {
+extension OnLedgerEntity.ValidatorDetails {
 	var xrdRedemptionValue: RETDecimal {
-		((stake.stakeUnitResource?.amount ?? 0) * validator.xrdVaultBalance) / (stakeResource?.totalSupply ?? 1)
+		((stakeUnitResource?.amount ?? 0) * validator.xrdVaultBalance) / (stakeUnitResource?.resource.totalSupply ?? 1)
 	}
 }

@@ -43,10 +43,13 @@ extension LSUStake {
 	public struct ViewState: Sendable, Equatable, Identifiable {
 		public var id: ValidatorAddress
 
-		let validatorNameViewState: ValidatorNameView.ViewState
+		struct Content: Sendable, Equatable {
+			let validatorNameViewState: ValidatorNameView.ViewState
+			let liquidStakeUnit: PoolUnitResourceViewState?
+			let stakeClaimNFTs: StakeClaimNFTsViewState?
+		}
 
-		let liquidStakeUnit: PoolUnitResourceViewState?
-		let stakeClaimNFTs: StakeClaimNFTsViewState?
+		let content: Loadable<Content>
 	}
 
 	public struct View: SwiftUI.View {
@@ -55,16 +58,18 @@ extension LSUStake {
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: Action.view) { viewStore in
 				VStack(alignment: .leading, spacing: .medium1) {
-					ValidatorNameView(viewState: viewStore.validatorNameViewState)
+					loadable(viewStore.content) { content in
+						ValidatorNameView(viewState: content.validatorNameViewState)
 
-					if let liquidStakeUnitViewState = viewStore.liquidStakeUnit {
-						liquidStakeUnitView(viewState: liquidStakeUnitViewState)
-							.onTapGesture { viewStore.send(.didTap) }
-					}
+						if let liquidStakeUnitViewState = content.liquidStakeUnit {
+							liquidStakeUnitView(viewState: liquidStakeUnitViewState)
+								.onTapGesture { viewStore.send(.didTap) }
+						}
 
-					if let stakeClaimNFTsViewState = viewStore.stakeClaimNFTs {
-						stakeClaimNFTsView(viewState: stakeClaimNFTsViewState) {
-							viewStore.send(.didTapStakeClaimNFT(withID: $0))
+						if let stakeClaimNFTsViewState = content.stakeClaimNFTs {
+							stakeClaimNFTsView(viewState: stakeClaimNFTsViewState) {
+								viewStore.send(.didTapStakeClaimNFT(withID: $0))
+							}
 						}
 					}
 				}
@@ -158,7 +163,38 @@ extension View {
 
 extension LSUStake.State {
 	var viewState: LSUStake.ViewState {
-		fatalError()
+		.init(id: validatorAddress, content: stakeDetails.map { details in
+			LSUStake.ViewState.Content(
+				validatorNameViewState: .init(with: details.validator),
+				liquidStakeUnit: .init(
+					thumbnail: .xrd,
+					symbol: Constants.xrdTokenName,
+					tokenAmount: details.xrdRedemptionValue.formatted(),
+					isSelected: nil
+				),
+				stakeClaimNFTs: details.stakeClaimTokens.flatMap { stakeClaim in
+					.init(rawValue:
+						stakeClaim.tokens.map { token in
+							let status: LSUStake.ViewState.StakeClaimNFTStatus = {
+								guard let claimEpoch = token.data.claimEpoch else {
+									return .unstaking
+								}
+								let epoch = stakeClaim.resource.atLedgerState.epoch
+								return claimEpoch >= epoch ? .readyToClaim : .unstaking
+							}()
+							return LSUStake.ViewState.StakeClaimNFTViewState(
+								id: token.id,
+								thumbnail: .xrd,
+								status: status,
+								tokenAmount: (token.data.claimAmount ?? 0).formatted(),
+								isSelected: nil
+							)
+						}.asIdentifiable()
+					)
+				}
+			)
+		})
+
 //		.init(
 		//            id: stake.validatorAddress,
 //			validatorNameViewState: .init(with: stake.validator),
@@ -214,5 +250,11 @@ extension LSUStake.State {
 //						)
 //					}))
 //		)
+	}
+}
+
+extension Array {
+	var nonEmpty: NonEmpty<Self>? {
+		.init(self)
 	}
 }

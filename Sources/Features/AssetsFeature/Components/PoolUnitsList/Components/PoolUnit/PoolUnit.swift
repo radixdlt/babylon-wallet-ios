@@ -80,12 +80,15 @@ public struct PoolUnit: Sendable, FeatureReducer {
 	) -> Effect<Action> {
 		switch viewAction {
 		case .didTap:
+			guard case let .success(details) = state.resourceDetails else {
+				return .none
+			}
 			if state.isSelected != nil {
 				state.isSelected?.toggle()
 			} else {
-//				state.destination = .details(
-//					.init(poolUnit: state.poolUnit, poolUnitResource: state.poolUnitResource, poolResources: state.poolResources)
-//				)
+				state.destination = .details(
+					.init(poolUnit: state.poolUnit, resourcesDetails: details)
+				)
 			}
 
 			return .none

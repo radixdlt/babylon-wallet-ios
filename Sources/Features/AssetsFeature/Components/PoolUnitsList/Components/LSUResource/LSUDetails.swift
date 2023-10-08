@@ -4,8 +4,7 @@ import FeaturePrelude
 public struct LSUDetails: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		let validator: OnLedgerEntity.Validator
-		let stakeUnitResource: OnLedgerEntity.Resource
-		let stakeAmount: RETDecimal
+		let stakeUnitResource: OnLedgerEntity.ResourceWithVaultAmount
 		let xrdRedemptionValue: RETDecimal
 	}
 

@@ -5,22 +5,22 @@ extension LSUDetails.State {
 	var viewState: LSUDetails.ViewState {
 		.init(
 			containerWithHeader: .init(
-				title: .success(stakeUnitResource.resourceMetadata.name ?? L10n.Account.PoolUnits.unknownPoolUnitName),
-				amount: stakeAmount.formatted(),
-				symbol: .success(stakeUnitResource.resourceMetadata.symbol)
+				title: .success(stakeUnitResource.resource.resourceMetadata.name ?? L10n.Account.PoolUnits.unknownPoolUnitName),
+				amount: stakeUnitResource.amount.formatted(),
+				symbol: .success(stakeUnitResource.resource.resourceMetadata.symbol)
 			),
-			thumbnailURL: stakeUnitResource.resourceMetadata.iconURL,
+			thumbnailURL: stakeUnitResource.resource.resourceMetadata.iconURL,
 			validatorNameViewState: .init(with: validator),
 			redeemableTokenAmount: .init(.init(xrdAmount: xrdRedemptionValue.formatted())),
 			resourceDetails: .init(
-				description: .success(stakeUnitResource.resourceMetadata.description),
-				resourceAddress: stakeUnitResource.resourceAddress,
+				description: .success(stakeUnitResource.resource.resourceMetadata.description),
+				resourceAddress: stakeUnitResource.resource.resourceAddress,
 				isXRD: false,
 				validatorAddress: validator.address,
-				resourceName: .success(stakeUnitResource.resourceMetadata.name), // TODO: Is this correct?
+				resourceName: .success(stakeUnitResource.resource.resourceMetadata.name), // TODO: Is this correct?
 				currentSupply: .success(validator.xrdVaultBalance.formatted()),
-				behaviors: .success(stakeUnitResource.behaviors),
-				tags: .success(stakeUnitResource.resourceMetadata.tags)
+				behaviors: .success(stakeUnitResource.resource.behaviors),
+				tags: .success(stakeUnitResource.resource.resourceMetadata.tags)
 			)
 		)
 	}
