@@ -9,7 +9,7 @@ final class AssetTests: TestCase {
 		let resourceAddress = try ResourceAddress(validatingAddress: "resource_tdx_d_1nfn7hdrua4wcxwq26qq2gpv2ew0p94k66ms3nmluev6rerr7sszc5z")
 
 		let globalId = try NonFungibleGlobalId.fromParts(resourceAddress: resourceAddress.intoEngine(), nonFungibleLocalId: localId)
-		let sut = AccountPortfolio.NonFungibleResource(
+		let sut = OnLedgerEntity.OwnedNonFungibleResource(
 			resource: .init(resourceAddress: resourceAddress),
 			tokens: [.init(id: globalId, name: nil, description: nil, keyImageURL: nil, metadata: [])]
 		)

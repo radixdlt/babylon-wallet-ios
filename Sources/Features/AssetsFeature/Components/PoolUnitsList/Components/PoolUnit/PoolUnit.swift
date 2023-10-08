@@ -6,7 +6,7 @@ import OnLedgerEntitiesClient
 public struct PoolUnit: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable, Identifiable {
 		public var id: ResourcePoolAddress {
-			poolUnit.poolAddress
+			poolUnit.resourcePoolAddress
 		}
 
 		public struct ResourceDetails: Sendable, Hashable {
@@ -25,13 +25,13 @@ public struct PoolUnit: Sendable, FeatureReducer {
 			}
 		}
 
-		let poolUnit: AccountPortfolio.PoolUnitResources.PoolUnit
+		let poolUnit: OnLedgerEntity.Account.PoolUnit
 		var resourceDetails: Loadable<ResourceDetails>
 		var isSelected: Bool?
 		var isDataLoaded = Bool.random()
 
 		public init(
-			poolUnit: AccountPortfolio.PoolUnitResources.PoolUnit,
+			poolUnit: OnLedgerEntity.Account.PoolUnit,
 			resourceDetails: Loadable<ResourceDetails> = .idle,
 			isSelected: Bool? = nil,
 			destination: Destinations.State? = nil

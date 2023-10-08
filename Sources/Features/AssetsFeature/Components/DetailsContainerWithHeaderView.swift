@@ -9,7 +9,7 @@ struct DetailsContainerWithHeaderViewState: Equatable {
 }
 
 extension DetailsContainerWithHeaderViewState {
-	init(resource: AccountPortfolio.FungibleResource) {
+	init(resource: OnLedgerEntity.OwnedFungibleResource) {
 		self.init(
 			title: .success(resource.metadata.name ?? L10n.Account.PoolUnits.unknownPoolUnitName),
 			amount: resource.amount.formatted(),

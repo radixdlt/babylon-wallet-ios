@@ -228,7 +228,7 @@ extension TransferAccountList {
 		let fungibleAssets = assets.compactMap(/ResourceAsset.State.fungibleAsset)
 		let xrdResource = fungibleAssets.first(where: \.isXRD).map(\.resource)
 		let nonXrdResources = fungibleAssets.filter(not(\.isXRD)).map(\.resource)
-		let selectedFungibleResources = AccountPortfolio.FungibleResources(
+		let selectedFungibleResources = OnLedgerEntity.OwnedFungibleResources(
 			xrdResource: xrdResource,
 			nonXrdResources: nonXrdResources
 		)

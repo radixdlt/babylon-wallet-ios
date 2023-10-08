@@ -8,12 +8,12 @@ public struct FungibleTokenDetails: Sendable, FeatureReducer {
 		let resourceAddress: ResourceAddress
 		var resource: Loadable<OnLedgerEntity.Resource>
 		let isXRD: Bool
-		let prefetchedPortfolioResource: AccountPortfolio.FungibleResource?
+		let prefetchedPortfolioResource: OnLedgerEntity.OwnedFungibleResource?
 
 		public init(
 			resourceAddress: ResourceAddress,
 			resource: Loadable<OnLedgerEntity.Resource> = .idle,
-			prefetchedPortfolioResource: AccountPortfolio.FungibleResource? = nil,
+			prefetchedPortfolioResource: OnLedgerEntity.OwnedFungibleResource? = nil,
 			isXRD: Bool
 		) {
 			self.resourceAddress = resourceAddress
@@ -73,8 +73,8 @@ public struct FungibleTokenDetails: Sendable, FeatureReducer {
 public struct ResourceDetails: Sendable {
 	public struct State: Sendable, Hashable {
 		enum PortfolioResource: Sendable, Hashable {
-			case fungible(AccountPortfolio.FungibleResource, isXRD: Bool)
-			case nonFungible(AccountPortfolio.NonFungibleResource)
+			case fungible(OnLedgerEntity.OwnedFungibleResource, isXRD: Bool)
+			case nonFungible(OnLedgerEntity.OwnedNonFungibleResource)
 		}
 
 		let prefetchedPortfolioResource: PortfolioResource?

@@ -75,7 +75,7 @@ public struct DevAccountPreferences: Sendable, FeatureReducer {
 		case currentNetwork(Radix.Network)
 		case isAllowedToUseFaucet(TaskResult<Bool>)
 		case callDone(updateControlState: WritableKeyPath<State, ControlState>, changeTo: ControlState = .enabled)
-		case refreshAccountCompleted(TaskResult<AccountPortfolio>)
+		case refreshAccountCompleted(TaskResult<OnLedgerEntity.Account>)
 		case hideLoader(updateControlState: WritableKeyPath<State, ControlState>)
 		#if DEBUG
 		case reviewTransaction(TransactionManifest)

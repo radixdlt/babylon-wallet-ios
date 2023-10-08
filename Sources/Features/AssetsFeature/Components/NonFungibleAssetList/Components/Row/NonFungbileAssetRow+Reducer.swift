@@ -10,7 +10,7 @@ extension NonFungibleAssetList {
 			public var id: ResourceAddress { resource.resourceAddress }
 			public typealias AssetID = OnLedgerEntity.NonFungibleToken.ID
 
-			public let resource: AccountPortfolio.NonFungibleResource
+			public let resource: OnLedgerEntity.OwnedNonFungibleResource
 			public let accountAddress: AccountAddress
 			public var loadedTokens: IdentifiedArrayOf<OnLedgerEntity.NonFungibleToken> = []
 			public var tokens: [[Loadable<OnLedgerEntity.NonFungibleToken>]] = []
@@ -24,7 +24,7 @@ extension NonFungibleAssetList {
 
 			public init(
 				accountAddress: AccountAddress,
-				resource: AccountPortfolio.NonFungibleResource,
+				resource: OnLedgerEntity.OwnedNonFungibleResource,
 				disabled: Set<AssetID> = [],
 				selectedAssets: OrderedSet<OnLedgerEntity.NonFungibleToken>?
 			) {

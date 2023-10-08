@@ -45,7 +45,7 @@ extension OnLedgerEntitiesClient {
 		/// The account vault where the ids are stored
 		public let vaultAddress: VaultAddress
 		/// The ledger state at which to retrieve the ids, should be ledger state
-		/// from the AccountPortfolio.NonFungibleResource.
+		/// from the OnLedgerEntity.OwnedNonFungibleResource.
 		public let atLedgerState: AtLedgerState
 		/// The cursor of the page to read
 		public let pageCursor: String?
@@ -71,7 +71,7 @@ extension OnLedgerEntitiesClient {
 
 	public struct GetNonFungibleTokenDataRequest: Sendable {
 		/// The ledger state at which to retrieve the data, should be ledger state
-		/// from the AccountPortfolio.NonFungibleResource.
+		/// from the OnLedgerEntity.OwnedNonFungibleResource.
 		public let atLedgerState: AtLedgerState?
 		/// The non fungible resource collection to retrieve the ids data for
 		public let resource: ResourceAddress
@@ -96,7 +96,7 @@ extension OnLedgerEntitiesClient {
 		/// The account vault where the ids are stored
 		public let vaultAddress: VaultAddress
 		/// The ledger state at which to retrieve the ids, should be ledger state
-		/// from the AccountPortfolio.NonFungibleResource.
+		/// from the OnLedgerEntity.OwnedNonFungibleResource.
 		public let atLedgerState: AtLedgerState
 
 		public init(

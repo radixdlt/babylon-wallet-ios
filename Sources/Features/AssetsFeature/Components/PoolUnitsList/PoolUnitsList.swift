@@ -47,34 +47,36 @@ public struct PoolUnitsList: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .task:
-			let addresses = Array(state.poolUnits.flatMap(\.poolUnit.resourceAddresses).uniqued())
-			return .run { send in
-				let result = await TaskResult { try await onLedgerEntitiesClient.getResources(addresses) }
-				await send(.internal(.loadedResources(result)))
-			}
+			return .none
+		//            let addresses = Array(state.poolUnits.map(\.poolUnit.resource.resourceAddress).uniqued())
+//			return .run { send in
+//				let result = await TaskResult { try await onLedgerEntitiesClient.getResources(addresses) }
+//				await send(.internal(.loadedResources(result)))
+//			}
 		case .refresh:
-			print("refresh")
-			let addresses = state.poolUnits.first?.poolUnit.resourceAddresses ?? []
-			return .run { send in
-				let result = await TaskResult { try await onLedgerEntitiesClient.getResources(addresses) }
-				await send(.internal(.loadedResources(result)))
-			}
+			return .none
+//			print("refresh")
+			//            let addresses = state.poolUnits.first?.poolUnit.resource.resourceAddress ?? []
+//			return .run { send in
+//				let result = await TaskResult { try await onLedgerEntitiesClient.getResources(addresses) }
+//				await send(.internal(.loadedResources(result)))
+//			}
 		}
 	}
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .loadedResources(.success(resources)):
-			state.poolUnits.forEach { poolUnit in
-				let poolUnitResourceAddress = poolUnit.poolUnit.poolUnitResource.resourceAddress
-				let poolUnitResource = resources.first { $0.resourceAddress == poolUnitResourceAddress }
-				let xrdResource = resources.first { $0.resourceAddress == poolUnit.poolUnit.poolResources.xrdResource?.resourceAddress }
-				let nonXrdResources = poolUnit.poolUnit.poolResources.nonXrdResources.map { resource in
-					resources.first { $0.resourceAddress == resource.resourceAddress }!
-				}
-
-				state.poolUnits[id: poolUnit.id]?.resourceDetails = .success(.init(poolUnitResource: poolUnitResource!, xrdResource: xrdResource, nonXrdResources: nonXrdResources))
-			}
+//			state.poolUnits.forEach { poolUnit in
+			//                let poolUnitResourceAddress = poolUnit.poolUnit.resource.resourceAddress
+//				let poolUnitResource = resources.first { $0.resourceAddress == poolUnitResourceAddress }
+//				let xrdResource = resources.first { $0.resourceAddress == poolUnit.poolUnit.poolResources.xrdResource?.resourceAddress }
+//				let nonXrdResources = poolUnit.poolUnit.poolResources.nonXrdResources.map { resource in
+//					resources.first { $0.resourceAddress == resource.resourceAddress }!
+//				}
+//
+//				state.poolUnits[id: poolUnit.id]?.resourceDetails = .success(.init(poolUnitResource: poolUnitResource!, xrdResource: xrdResource, nonXrdResources: nonXrdResources))
+//			}
 			return .none
 		case .loadedResources:
 			return .none
@@ -82,10 +84,10 @@ public struct PoolUnitsList: Sendable, FeatureReducer {
 	}
 }
 
-extension AccountPortfolio.PoolUnitResources.PoolUnit {
-	var resourceAddresses: [ResourceAddress] {
-		(poolResources.xrdResource.map { [$0.resourceAddress] } ?? []) +
-			poolResources.nonXrdResources.map(\.resourceAddress) +
-			[poolUnitResource.resourceAddress]
-	}
-}
+// extension OnLedgerEntity.ResourcePool {
+//	var resourceAddresses: [ResourceAddress] {
+//		(poolResources.xrdResource.map { [$0.resourceAddress] } ?? []) +
+//			poolResources.nonXrdResources.map(\.resourceAddress) +
+//			[poolUnitResource.resourceAddress]
+//	}
+// }

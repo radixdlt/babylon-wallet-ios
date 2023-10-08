@@ -26,7 +26,7 @@ extension FungibleAssetList {
 		}
 
 		public enum DelegateAction: Sendable, Equatable {
-			case selected(AccountPortfolio.FungibleResource)
+			case selected(OnLedgerEntity.OwnedFungibleResource)
 		}
 
 		public var body: some ReducerOf<Self> {

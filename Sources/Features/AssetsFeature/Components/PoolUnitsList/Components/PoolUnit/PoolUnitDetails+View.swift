@@ -3,7 +3,7 @@ import FeaturePrelude
 
 extension PoolUnitDetails.State {
 	var viewState: PoolUnitDetails.ViewState {
-		let resource = poolUnit.poolUnitResource
+		let resource = poolUnit.resource
 		return .init(
 			containerWithHeader: .init(resource: resource),
 			thumbnailURL: resource.metadata.iconURL,

@@ -299,8 +299,13 @@ extension ResourceMetadata {
 			iconURL: raw?.iconURL,
 			tags: raw?.extractTags() ?? [],
 			dappDefinitions: raw?.dappDefinitions?.compactMap { try? DappDefinitionAddress(validatingAddress: $0) },
+			dappDefinition: raw?.dappDefinition.flatMap { try? DappDefinitionAddress(validatingAddress: $0) },
 			validator: raw?.validator,
-			poolUnit: raw?.pool
+			poolUnit: raw?.pool,
+			poolUnitResource: raw?.poolUnitResource,
+			claimedEntities: raw?.claimedEntities,
+			claimedWebsites: raw?.claimedWebsites,
+			accountType: raw?.accountType
 		)
 	}
 }

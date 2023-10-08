@@ -17,10 +17,10 @@ extension OnLedgerEntitiesClient: DependencyKey {
 	public static func live() -> Self {
 		Self(
 			getResources: {
-				try await getEntities(for: $0.map(\.address)).compactMap(\.resource)
+				try await getEntities(for: $0.map(\.address), .resourceMetadataKeys).compactMap(\.resource)
 			},
 			getResource: {
-				guard let resource = try await getEntities(for: [$0.address], forceRefresh: false).compactMap(\.resource).first else {
+				guard let resource = try await getEntities(for: [$0.address], .resourceMetadataKeys, forceRefresh: false).compactMap(\.resource).first else {
 					throw Error.emptyResponse
 				}
 				return resource
@@ -29,10 +29,10 @@ extension OnLedgerEntitiesClient: DependencyKey {
 			getNonFungibleTokenData: getNonFungibleData,
 			getAccountOwnedNonFungibleTokenData: getAccountOwnedNonFungibleTokenData,
 			getAccounts: {
-				try await getEntities(for: $0.map(\.address)).compactMap(\.account)
+				try await getEntities(for: $0.map(\.address), .resourceMetadataKeys, forceRefresh: true).compactMap(\.account)
 			},
 			refreshEntities: {
-				_ = try await getEntities(for: $0.map(\.address), forceRefresh: true)
+				_ = try await getEntities(for: $0.map(\.address), .resourceMetadataKeys, forceRefresh: true)
 			}
 		)
 	}
@@ -48,8 +48,8 @@ extension AtLedgerState {
 extension OnLedgerEntitiesClient {
 	@Sendable
 	@discardableResult
-	static func getEntities(for addresses: [String], forceRefresh: Bool = false) async throws -> [OnLedgerEntity] {
-		try await fetchEntitiesWithCaching(for: addresses, forceRefresh: forceRefresh, refresh: fetchEntites(for:))
+	static func getEntities(for addresses: [String], _ explicitMetadata: Set<EntityMetadataKey>, forceRefresh: Bool = false) async throws -> [OnLedgerEntity] {
+		try await fetchEntitiesWithCaching(for: addresses, forceRefresh: forceRefresh, refresh: fetchEntites(explicitMetadata))
 	}
 
 	@Sendable
@@ -205,29 +205,31 @@ extension OnLedgerEntitiesClient {
 	}
 
 	@Sendable
-	static func fetchEntites(for addresses: [String]) async throws -> [OnLedgerEntity] {
-		guard !addresses.isEmpty else {
-			return []
-		}
+	static func fetchEntites(_ explicitMetadta: Set<EntityMetadataKey>) -> (_ addresses: [String]) async throws -> [OnLedgerEntity] {
+		{ addresses in
+			guard !addresses.isEmpty else {
+				return []
+			}
 
-		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
+			@Dependency(\.gatewayAPIClient) var gatewayAPIClient
 
-		let response = try await gatewayAPIClient.getEntityDetails(addresses, .resourceMetadataKeys, nil)
-		return try await response.items.asyncCompactMap { item in
-			let allFungibles = try await gatewayAPIClient.fetchAllFungibleResources(item, ledgerState: response.ledgerState)
-			let allNonFungibles = try await gatewayAPIClient.fetchAllNonFungibleResources(item, ledgerState: response.ledgerState)
+			let response = try await gatewayAPIClient.getEntityDetails(addresses, explicitMetadta, nil)
+			return try await response.items.asyncCompactMap { item in
+				let allFungibles = try await gatewayAPIClient.fetchAllFungibleResources(item, ledgerState: response.ledgerState)
+				let allNonFungibles = try await gatewayAPIClient.fetchAllNonFungibleResources(item, ledgerState: response.ledgerState)
 
-			let updatedItem = GatewayAPI.StateEntityDetailsResponseItem(
-				address: item.address,
-				fungibleResources: .init(items: allFungibles),
-				nonFungibleResources: .init(items: allNonFungibles),
-				ancestorIdentities: item.ancestorIdentities,
-				metadata: item.metadata,
-				explicitMetadata: item.explicitMetadata,
-				details: item.details
-			)
+				let updatedItem = GatewayAPI.StateEntityDetailsResponseItem(
+					address: item.address,
+					fungibleResources: .init(items: allFungibles),
+					nonFungibleResources: .init(items: allNonFungibles),
+					ancestorIdentities: item.ancestorIdentities,
+					metadata: item.metadata,
+					explicitMetadata: item.explicitMetadata,
+					details: item.details
+				)
 
-			return try await createEntity(from: updatedItem)
+				return try await createEntity(from: updatedItem)
+			}
 		}
 	}
 
@@ -260,6 +262,13 @@ extension OnLedgerEntitiesClient {
 					accountAddress: accountAddress,
 					ledgerState: .init(version: 0, epoch: 0)
 				))
+			} else if let resourcePoolAddress = try? ResourcePoolAddress(validatingAddress: item.address) {
+				return try await .resourcePool(createResourcePool(item, resourcePoolAddress: resourcePoolAddress, ledgerState: .init(version: 0, epoch: 0)))
+			} else if let validatorAddress = try? ValidatorAddress(validatingAddress: item.address) {
+				guard let validator = try await createValidator(item, validatorAddress: validatorAddress, ledgerState: .init(version: 0, epoch: 0)) else {
+					return nil
+				}
+				return .validator(validator)
 			}
 			return nil
 		}

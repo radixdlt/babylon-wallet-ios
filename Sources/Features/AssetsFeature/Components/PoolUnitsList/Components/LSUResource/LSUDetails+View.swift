@@ -78,7 +78,7 @@ extension LSUDetails {
 
 extension ValidatorNameView.ViewState {
 	init(
-		with validator: AccountPortfolio.PoolUnitResources.RadixNetworkStake.Validator
+		with validator: OnLedgerEntity.Validator
 	) {
 		self.init(
 			imageURL: validator.metadata.iconURL,

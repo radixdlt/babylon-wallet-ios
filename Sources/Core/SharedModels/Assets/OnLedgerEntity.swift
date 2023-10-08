@@ -147,12 +147,12 @@ extension OnLedgerEntity {
 extension OnLedgerEntity {
 	public struct ResourcePool: Sendable, Hashable, Codable {
 		public let address: ResourcePoolAddress
-		public let resources: [OwnedFungibleResource]
+		public let resources: OwnedFungibleResources
 		public let metadata: ResourceMetadata
 
 		public init(
 			address: ResourcePoolAddress,
-			resources: [OwnedFungibleResource],
+			resources: OwnedFungibleResources,
 			metadata: ResourceMetadata
 		) {
 			self.address = address
@@ -182,6 +182,16 @@ extension OnLedgerEntity {
 }
 
 extension OnLedgerEntity {
+	public struct OwnedFungibleResources: Sendable, Hashable, Codable {
+		public let xrdResource: OwnedFungibleResource?
+		public let nonXrdResources: [OwnedFungibleResource]
+
+		public init(xrdResource: OwnedFungibleResource? = nil, nonXrdResources: [OwnedFungibleResource] = []) {
+			self.xrdResource = xrdResource
+			self.nonXrdResources = nonXrdResources
+		}
+	}
+
 	public struct OwnedFungibleResource: Sendable, Hashable, Identifiable, Codable {
 		public var id: ResourceAddress {
 			resourceAddress
@@ -238,14 +248,14 @@ extension OnLedgerEntity {
 	public struct Account: Sendable, Hashable, Codable {
 		public let address: AccountAddress
 		public let metadata: ResourceMetadata
-		public var fungibleResources: [OwnedFungibleResource]
+		public var fungibleResources: OwnedFungibleResources
 		public var nonFungibleResources: [OwnedNonFungibleResource]
 		public var poolUnitResources: PoolUnitResources
 
 		public init(
 			address: AccountAddress,
 			metadata: ResourceMetadata,
-			fungibleResources: [OwnedFungibleResource],
+			fungibleResources: OwnedFungibleResources,
 			nonFungibleResources: [OwnedNonFungibleResource],
 			poolUnitResources: PoolUnitResources
 		) {

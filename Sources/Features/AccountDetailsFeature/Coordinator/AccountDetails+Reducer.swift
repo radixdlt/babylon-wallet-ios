@@ -92,7 +92,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 	public enum InternalAction: Sendable, Equatable {
 		case markBackupNeeded
 		case accountUpdated(Profile.Network.Account)
-		case portfolioLoaded(AccountPortfolio)
+		case portfolioLoaded(OnLedgerEntity.Account)
 
 		case loadMnemonic
 		case loadMnemonicResult(TaskResult<MnemonicWithPassphraseAndFactorSourceInfo>)
@@ -366,7 +366,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 				await send(.internal(.markBackupNeeded))
 			}
 
-			await send(.internal(.portfolioLoaded(portfolio.nonEmptyVaults)))
+			await send(.internal(.portfolioLoaded(portfolio)))
 		}
 	}
 }

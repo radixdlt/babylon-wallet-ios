@@ -2,6 +2,7 @@ import AnyCodable
 import EngineKit
 import Foundation
 import Prelude
+import SharedModels
 
 // MARK: - GatewayAPI.StateEntityDetailsResponse + Sendable
 extension GatewayAPI.StateEntityDetailsResponse: @unchecked Sendable {}
@@ -147,10 +148,6 @@ extension GatewayAPI.EntityMetadataCollection {
 			from: \.asGlobalAddress,
 			transform: ResourceAddress.init(validatingAddress:)
 		)
-	}
-
-	public enum AccountType: String {
-		case dappDefinition = "dapp definition"
 	}
 
 	public enum MetadataError: Error, CustomStringConvertible {

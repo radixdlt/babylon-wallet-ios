@@ -6,13 +6,13 @@ public struct NonFungibleTokenDetails: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public let resourceAddress: ResourceAddress
 		public var resource: Loadable<OnLedgerEntity.Resource>
-		public let prefetchedPortfolioResource: AccountPortfolio.NonFungibleResource?
+		public let prefetchedPortfolioResource: OnLedgerEntity.OwnedNonFungibleResource?
 		public let token: OnLedgerEntity.NonFungibleToken?
 
 		public init(
 			resourceAddress: ResourceAddress,
 			resource: Loadable<OnLedgerEntity.Resource> = .idle,
-			prefetchedPortfolioResource: AccountPortfolio.NonFungibleResource? = nil,
+			prefetchedPortfolioResource: OnLedgerEntity.OwnedNonFungibleResource? = nil,
 			token: OnLedgerEntity.NonFungibleToken? = nil
 		) {
 			self.resourceAddress = resourceAddress

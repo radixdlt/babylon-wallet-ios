@@ -5,12 +5,12 @@ import LoggerDependency
 public struct LSUStake: FeatureReducer {
 	public struct State: Sendable, Hashable, Identifiable {
 		public var id: String {
-			stake.validator.address.address
+			stake.validatorAddress.address
 		}
 
 		typealias AssetID = OnLedgerEntity.NonFungibleToken.ID
 
-		let stake: AccountPortfolio.PoolUnitResources.RadixNetworkStake
+		let stake: OnLedgerEntity.Account.RadixNetworkStake
 
 		var isStakeSelected: Bool?
 		var selectedStakeClaimAssets: OrderedSet<OnLedgerEntity.NonFungibleToken>?
@@ -18,6 +18,7 @@ public struct LSUStake: FeatureReducer {
 		var stakeResource: OnLedgerEntity.Resource?
 		var stakeClaimNFTResource: OnLedgerEntity.Resource?
 		var stakeClaimNfts: [OnLedgerEntity.NonFungibleToken] = []
+		let validator: OnLedgerEntity.Validator!
 
 		@PresentationState
 		var destination: Destinations.State?
@@ -88,7 +89,7 @@ public struct LSUStake: FeatureReducer {
 
 				state.destination = .details(
 					.init(
-						validator: state.stake.validator,
+						validator: state.validator,
 						stakeUnitResource: resource,
 						stakeAmount: stakeAmount,
 						xrdRedemptionValue: state.xrdRedemptionValue
@@ -115,6 +116,6 @@ public struct LSUStake: FeatureReducer {
 import EngineKit
 extension LSUStake.State {
 	var xrdRedemptionValue: RETDecimal {
-		((stake.stakeUnitResource?.amount ?? 0) * stake.validator.xrdVaultBalance) / (stakeResource?.totalSupply ?? 1)
+		((stake.stakeUnitResource?.amount ?? 0) * validator.xrdVaultBalance) / (stakeResource?.totalSupply ?? 1)
 	}
 }

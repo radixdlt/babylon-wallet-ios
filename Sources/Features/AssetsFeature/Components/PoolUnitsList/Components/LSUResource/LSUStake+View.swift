@@ -158,34 +158,35 @@ extension View {
 
 extension LSUStake.State {
 	var viewState: LSUStake.ViewState {
-		.init(
-			id: stake.validator.address,
-			validatorNameViewState: .init(with: stake.validator),
-			liquidStakeUnit:
-			.init(
-				thumbnail: .xrd,
-				symbol: Constants.xrdTokenName,
-				tokenAmount: xrdRedemptionValue.formatted(),
-				isSelected: isStakeSelected
-			),
-
-			stakeClaimNFTs:
-			.init(rawValue: .init(uncheckedUniqueElements:
-				stakeClaimNfts
-					.map { token in
-						let status: LSUStake.ViewState.StakeClaimNFTStatus = {
-							guard let claimEpoch = token.data.claimEpoch, let epoch = stake.stakeClaimResource?.atLedgerState.epoch else {
-								return .unstaking
-							}
-							return claimEpoch >= epoch ? .readyToClaim : .unstaking
-						}()
-						return LSUStake.ViewState.StakeClaimNFTViewState(
-							id: token.id,
-							thumbnail: .xrd,
-							status: status,
-							tokenAmount: (token.data.claimAmount ?? 0).formatted(),
-							isSelected: nil // self.selectedStakeClaimAssets?.contains(token.id)
-							//=======
+		fatalError()
+//		.init(
+		//            id: stake.validatorAddress,
+//			validatorNameViewState: .init(with: stake.validator),
+//			liquidStakeUnit:
+//			.init(
+//				thumbnail: .xrd,
+//				symbol: Constants.xrdTokenName,
+//				tokenAmount: xrdRedemptionValue.formatted(),
+//				isSelected: isStakeSelected
+//			),
+//
+//			stakeClaimNFTs:
+//			.init(rawValue: .init(uncheckedUniqueElements:
+//				stakeClaimNfts
+//					.map { token in
+//						let status: LSUStake.ViewState.StakeClaimNFTStatus = {
+//							guard let claimEpoch = token.data.claimEpoch, let epoch = stake.stakeClaimResource?.atLedgerState.epoch else {
+//								return .unstaking
+//							}
+//							return claimEpoch >= epoch ? .readyToClaim : .unstaking
+//						}()
+//						return LSUStake.ViewState.StakeClaimNFTViewState(
+//							id: token.id,
+//							thumbnail: .xrd,
+//							status: status,
+//							tokenAmount: (token.data.claimAmount ?? 0).formatted(),
+//							isSelected: nil // self.selectedStakeClaimAssets?.contains(token.id)
+		//=======
 //			liquidStakeUnit: stake.xrdRedemptionValue
 //				.map {
 //					.init(
@@ -209,9 +210,9 @@ extension LSUStake.State {
 //										isSelected: self.selectedStakeClaimAssets?.contains(token.id)
 //									)
 //								}
-							// >>>>>>> main
-						)
-					}))
-		)
+//							// >>>>>>> main
+//						)
+//					}))
+//		)
 	}
 }

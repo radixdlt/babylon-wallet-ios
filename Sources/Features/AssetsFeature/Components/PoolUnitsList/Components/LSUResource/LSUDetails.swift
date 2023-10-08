@@ -3,7 +3,7 @@ import FeaturePrelude
 // MARK: - LSUDetails
 public struct LSUDetails: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
-		let validator: AccountPortfolio.PoolUnitResources.RadixNetworkStake.Validator
+		let validator: OnLedgerEntity.Validator
 		let stakeUnitResource: OnLedgerEntity.Resource
 		let stakeAmount: RETDecimal
 		let xrdRedemptionValue: RETDecimal

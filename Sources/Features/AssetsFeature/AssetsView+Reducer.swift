@@ -116,7 +116,7 @@ public struct AssetsView: Sendable, FeatureReducer {
 			return .run { [address = state.account.address, mode = state.mode] send in
 				for try await portfolio in await accountPortfoliosClient.portfolioForAccount(address).debounce(for: .seconds(0.1)) {
 					guard !Task.isCancelled else { return }
-					await send(.internal(.resourcesStateUpdated(createResourcesState(from: portfolio.nonEmptyVaults, mode: mode))))
+					await send(.internal(.resourcesStateUpdated(createResourcesState(from: portfolio, mode: mode))))
 				}
 			}
 		case let .didSelectList(kind):
@@ -145,7 +145,7 @@ public struct AssetsView: Sendable, FeatureReducer {
 		}
 	}
 
-	private func createResourcesState(from portfolio: AccountPortfolio, mode: State.Mode) async -> InternalAction.ResourcesState {
+	private func createResourcesState(from portfolio: OnLedgerEntity.Account, mode: State.Mode) async -> InternalAction.ResourcesState {
 		let xrd = portfolio.fungibleResources.xrdResource.map { token in
 			FungibleAssetList.Section.Row.State(
 				xrdToken: token,
@@ -163,7 +163,7 @@ public struct AssetsView: Sendable, FeatureReducer {
 
 		let nfts = portfolio.nonFungibleResources.map { resource in
 			NonFungibleAssetList.Row.State(
-				accountAddress: portfolio.owner,
+				accountAddress: portfolio.address,
 				resource: resource,
 				disabled: mode.selectedAssets?.disabledNFTs ?? [],
 				selectedAssets: mode.nftRowSelectedAssets(resource.resourceAddress)
@@ -201,7 +201,7 @@ public struct AssetsView: Sendable, FeatureReducer {
 								PoolUnit.State(
 									poolUnit: $0,
 									isSelected: mode
-										.nonXrdRowSelected($0.poolUnitResource.resourceAddress)
+										.nonXrdRowSelected($0.resource.resourceAddress)
 								)
 							}
 					)
@@ -262,7 +262,7 @@ extension AssetsView.State {
 			.map { $0.compactMap(NonFungibleTokensPerResourceProvider.init) } ?? []
 		let selectedNonFungibleResources = nonFungibleTokenList?.rows.compactMap(NonFungibleTokensPerResourceProvider.init) ?? []
 
-		let selectedFungibleResources = AccountPortfolio.FungibleResources(
+		let selectedFungibleResources = OnLedgerEntity.OwnedFungibleResources(
 			xrdResource: selectedXRDResource,
 			nonXrdResources: selectedNonXrdResources + selectedLsuTokens + selectedPoolUnitTokens
 		)
@@ -326,12 +326,12 @@ extension AssetsView.State {
 				}
 			}
 
-			public var fungibleResources: AccountPortfolio.FungibleResources
+			public var fungibleResources: OnLedgerEntity.OwnedFungibleResources
 			public var nonFungibleResources: IdentifiedArrayOf<NonFungibleTokensPerResource>
 			public var disabledNFTs: Set<NonFungibleAssetList.Row.State.AssetID>
 
 			public init(
-				fungibleResources: AccountPortfolio.FungibleResources = .init(),
+				fungibleResources: OnLedgerEntity.OwnedFungibleResources = .init(),
 				nonFungibleResources: IdentifiedArrayOf<NonFungibleTokensPerResource> = [],
 				disabledNFTs: Set<NonFungibleAssetList.Row.State.AssetID>
 			) {
@@ -390,7 +390,7 @@ private struct SelectedResourceProvider<Resource> {
 	}
 }
 
-extension SelectedResourceProvider<AccountPortfolio.FungibleResource> {
+extension SelectedResourceProvider<OnLedgerEntity.OwnedFungibleResource> {
 	init(with row: FungibleAssetList.Section.Row.State) {
 		self.init(
 			isSelected: row.isSelected,
@@ -412,7 +412,7 @@ extension SelectedResourceProvider<AccountPortfolio.FungibleResource> {
 	init(with poolUnit: PoolUnit.State) {
 		self.init(
 			isSelected: poolUnit.isSelected,
-			resource: poolUnit.poolUnit.poolUnitResource
+			resource: poolUnit.poolUnit.resource
 		)
 	}
 }
@@ -420,7 +420,7 @@ extension SelectedResourceProvider<AccountPortfolio.FungibleResource> {
 // MARK: - NonFungibleTokensPerResourceProvider
 private struct NonFungibleTokensPerResourceProvider {
 	let selectedAssets: OrderedSet<OnLedgerEntity.NonFungibleToken>?
-	let resource: AccountPortfolio.NonFungibleResource?
+	let resource: OnLedgerEntity.OwnedNonFungibleResource?
 
 	var nonFungibleTokensPerResource: AssetsView.State.Mode.SelectedAssets.NonFungibleTokensPerResource? {
 		selectedAssets.flatMap { selectedAssets -> AssetsView.State.Mode.SelectedAssets.NonFungibleTokensPerResource? in

@@ -3,7 +3,7 @@ import FeaturePrelude
 // MARK: - PoolUnitDetails
 public struct PoolUnitDetails: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
-		let poolUnit: AccountPortfolio.PoolUnitResources.PoolUnit
+		let poolUnit: OnLedgerEntity.Account.PoolUnit
 		let resourcesDetails: PoolUnit.State.ResourceDetails
 	}
 

@@ -23,10 +23,10 @@ extension OnLedgerEntitiesClient {
 			!poolUnitResources.nonFungibleResourceAddresses.contains(resource.resourceAddress.address)
 		}
 
-		return .init(
+		return await .init(
 			address: accountAddress,
 			metadata: .init(item.explicitMetadata),
-			fungibleResources: filteredFungibleResources,
+			fungibleResources: filteredFungibleResources.sorted(),
 			nonFungibleResources: filteredNonFungibleResources,
 			poolUnitResources: poolUnitResources
 		)
@@ -34,9 +34,9 @@ extension OnLedgerEntitiesClient {
 
 	@Sendable
 	static func createResourcePool(_ item: GatewayAPI.StateEntityDetailsResponseItem, resourcePoolAddress: ResourcePoolAddress, ledgerState: AtLedgerState) async throws -> OnLedgerEntity.ResourcePool {
-		try .init(
+		try await .init(
 			address: resourcePoolAddress,
-			resources: extractOwnedFungibleResources(item, ledgerState: ledgerState),
+			resources: extractOwnedFungibleResources(item, ledgerState: ledgerState).sorted(),
 			metadata: .init(item.explicitMetadata)
 		)
 	}
@@ -92,7 +92,7 @@ extension OnLedgerEntitiesClient {
 				resourceAddress: .init(validatingAddress: vaultAggregated.resourceAddress),
 				atLedgerState: ledgerState,
 				amount: .init(value: vault.amount),
-				metadata: .init(item.explicitMetadata)
+				metadata: .init(vaultAggregated.explicitMetadata)
 			)
 		} ?? []
 	}
@@ -110,7 +110,7 @@ extension OnLedgerEntitiesClient {
 				nonFungibleIdsCount: Int(vault.totalCount),
 				vaultAddress: .init(validatingAddress: vault.vaultAddress)
 			)
-		} ?? []
+		}.sorted() ?? []
 	}
 
 	@Sendable
@@ -138,7 +138,7 @@ extension OnLedgerEntitiesClient {
 			candidates: [OnLedgerEntity.OwnedFungibleResource],
 			metadataAddressMatch: KeyPath<ResourceMetadata, String?>
 		) -> OnLedgerEntity.OwnedFungibleResource? {
-			guard let poolUnitResourceAddress = itemMetadata.poolUnit else {
+			guard let poolUnitResourceAddress = itemMetadata.poolUnitResource else {
 				assertionFailure("Pool Unit does not contain the pool unit resource address")
 				return nil
 			}
@@ -165,7 +165,7 @@ extension OnLedgerEntitiesClient {
 			return .init(radixNetworkStakes: [], poolUnits: [])
 		}
 
-		let entities = try await getEntities(for: stakeAndPoolAddresses)
+		let entities = try await getEntities(for: stakeAndPoolAddresses, .poolUnitMetadataKeys, forceRefresh: true)
 		let validators = entities.compactMap(\.validator)
 		let resourcesPools = entities.compactMap(\.resourcePool)
 
@@ -177,8 +177,12 @@ extension OnLedgerEntitiesClient {
 					$0.metadata.validator == validator.address
 				}
 
+				guard let stakeClaimNFTCandidate else {
+					return nil
+				}
+
 				// Then validate that the validator is also referencing the candidate
-				guard validator.stakeClaimFungibleResourceAddress == stakeClaimNFTCandidate?.resourceAddress else {
+				guard validator.stakeClaimFungibleResourceAddress == stakeClaimNFTCandidate.resourceAddress else {
 					assertionFailure("Bad stake claim nft candidate, not declared by the validator")
 					return nil
 				}
@@ -214,5 +218,65 @@ extension OnLedgerEntitiesClient {
 		}
 
 		return .init(radixNetworkStakes: stakeUnits, poolUnits: poolUnits)
+	}
+}
+
+extension Array where Element == OnLedgerEntity.OwnedFungibleResource {
+	func sorted() async -> OnLedgerEntity.OwnedFungibleResources {
+		@Dependency(\.gatewaysClient) var gatewaysClient
+
+		var xrdResource: OnLedgerEntity.OwnedFungibleResource?
+		var nonXrdResources: [OnLedgerEntity.OwnedFungibleResource] = []
+
+		let networkId = await gatewaysClient.getCurrentNetworkID()
+
+		for resource in self {
+			if resource.resourceAddress.isXRD(on: networkId) {
+				xrdResource = resource
+			} else {
+				nonXrdResources.append(resource)
+			}
+		}
+
+		let sortedNonXrdResources = nonXrdResources.sorted { lhs, rhs in
+			if lhs.amount > .zero, rhs.amount > .zero {
+				return lhs.amount > rhs.amount // Sort descending by amount
+			}
+			if lhs.amount != .zero || rhs.amount != .zero {
+				return lhs.amount != .zero
+			}
+
+			if let lhsSymbol = lhs.metadata.symbol, let rhsSymbol = rhs.metadata.symbol {
+				return lhsSymbol < rhsSymbol // Sort alphabetically by symbol
+			}
+			if lhs.metadata.symbol != nil || rhs.metadata.symbol != nil {
+				return lhs.metadata.symbol != nil
+			}
+
+			if let lhsName = lhs.metadata.name, let rhsName = rhs.metadata.name {
+				return lhsName < rhsName // Sort alphabetically by name
+			}
+
+			return lhs.resourceAddress.address < rhs.resourceAddress.address // Sort by address
+		}
+
+		return .init(xrdResource: xrdResource, nonXrdResources: sortedNonXrdResources)
+	}
+}
+
+extension Array where Element == OnLedgerEntity.OwnedNonFungibleResource {
+	func sorted() -> [OnLedgerEntity.OwnedNonFungibleResource] {
+		sorted { lhs, rhs in
+			switch (lhs.metadata.name, rhs.metadata.name) {
+			case let (.some(lhsName), .some(rhsName)):
+				return lhsName < rhsName
+			case (nil, .some):
+				return false
+			case (.some, nil):
+				return true
+			default:
+				return lhs.resourceAddress.address < rhs.resourceAddress.address
+			}
+		}
 	}
 }
