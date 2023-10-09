@@ -19,7 +19,7 @@ public struct PoolUnitsList: Sendable, FeatureReducer {
 	}
 
 	public enum InternalAction: Sendable, Equatable {
-		case loadedResources(TaskResult<[OnLedgerEntity.ResourcePoolDetails]>)
+		case loadedResources(TaskResult<[OnLedgerEntitiesClient.OwnedResourcePoolDetails]>)
 	}
 
 	@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
@@ -49,13 +49,11 @@ public struct PoolUnitsList: Sendable, FeatureReducer {
 				await send(.internal(.loadedResources(result)))
 			}
 		case .refresh:
-			return .none
-//			print("refresh")
-			//            let addresses = state.poolUnits.first?.poolUnit.resource.resourceAddress ?? []
-//			return .run { send in
-//				let result = await TaskResult { try await onLedgerEntitiesClient.getResources(addresses) }
-//				await send(.internal(.loadedResources(result)))
-//			}
+			let ownedPoolUnits = state.poolUnits.map(\.poolUnit)
+			return .run { send in
+				let result = await TaskResult { try await onLedgerEntitiesClient.getPoolUnitsDetail(ownedPoolUnits) }
+				await send(.internal(.loadedResources(result)))
+			}
 		}
 	}
 

@@ -117,8 +117,8 @@ extension TransactionReviewTokenView.ViewState {
 
 	init(resource: OnLedgerEntity.Resource, details: TransactionReview.Transfer.Details.Fungible) {
 		self.init(
-			name: resource.resourceMetadata.symbol ?? resource.resourceMetadata.name ?? L10n.TransactionReview.unknown,
-			thumbnail: details.isXRD ? .xrd : .known(resource.resourceMetadata.iconURL),
+			name: resource.metadata.symbol ?? resource.metadata.name ?? L10n.TransactionReview.unknown,
+			thumbnail: details.isXRD ? .xrd : .known(resource.metadata.iconURL),
 			amount: details.amount,
 			guaranteedAmount: details.guarantee?.amount,
 			fiatAmount: nil
@@ -140,7 +140,7 @@ extension TransferNFTView.ViewState {
 		self.init(
 			tokenID: details.id.localId().toUserFacingString(),
 			tokenName: details.data.name,
-			thumbnail: resource.resourceMetadata.iconURL
+			thumbnail: resource.metadata.iconURL
 		)
 	}
 }

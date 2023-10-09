@@ -6,11 +6,11 @@ extension FungibleTokenDetails.State {
 		.init(
 			detailsHeader: detailsHeader,
 			thumbnail: {
-				let iconURL = resource.resourceMetadata.get(\.iconURL, prefetched: prefetchedPortfolioResource?.metadata)
+				let iconURL = resource.metadata.get(\.iconURL, prefetched: ownedFungibleResource?.metadata)
 				return isXRD ? .success(.xrd) : iconURL.map { .known($0) }
 			}(),
 			details: .init(
-				description: resource.resourceMetadata.get(\.description, prefetched: prefetchedPortfolioResource?.metadata),
+				description: resource.metadata.get(\.description, prefetched: ownedFungibleResource?.metadata),
 				resourceAddress: resourceAddress,
 				isXRD: isXRD,
 				validatorAddress: nil,
@@ -18,7 +18,7 @@ extension FungibleTokenDetails.State {
 				currentSupply: resource.totalSupply.map { $0?.formatted() ?? L10n.AssetDetails.supplyUnkown },
 				behaviors: resource.behaviors,
 				tags: {
-					let tags = resource.resourceMetadata.get(\.tags, prefetched: prefetchedPortfolioResource?.metadata)
+					let tags = resource.metadata.get(\.tags, prefetched: ownedFungibleResource?.metadata)
 					return isXRD ? tags.map { $0 + [.officialRadix] } : tags
 				}()
 			)
@@ -27,9 +27,9 @@ extension FungibleTokenDetails.State {
 
 	var detailsHeader: DetailsContainerWithHeaderViewState {
 		.init(
-			title: resource.resourceMetadata.get(\.name, prefetched: prefetchedPortfolioResource?.metadata).map { $0 ?? L10n.Account.PoolUnits.unknownPoolUnitName },
-			amount: prefetchedPortfolioResource?.amount.formatted(),
-			symbol: resource.resourceMetadata.get(\.symbol, prefetched: prefetchedPortfolioResource?.metadata)
+			title: resource.metadata.get(\.name, prefetched: ownedFungibleResource?.metadata).map { $0 ?? L10n.Account.PoolUnits.unknownPoolUnitName },
+			amount: ownedFungibleResource?.amount.formatted(),
+			symbol: resource.metadata.get(\.symbol, prefetched: ownedFungibleResource?.metadata)
 		)
 	}
 }

@@ -58,7 +58,7 @@ extension LSUResource {
 		private var componentsView: some SwiftUI.View {
 			ForEachStore(
 				store.scope(
-					state: \.stakes,
+					state: \.stakesDetails,
 					action: (
 						/LSUResource.Action.child
 							.. LSUResource.ChildAction.stake
@@ -76,7 +76,7 @@ extension LSUResource.State {
 		.init(
 			isExpanded: isExpanded,
 			iconURL: .init(string: "https://i.ibb.co/KG06168/Screenshot-2023-08-02-at-16-19-29.png")!,
-			numberOfStakes: stakess.count
+			numberOfStakes: stakes.count
 		)
 	}
 }

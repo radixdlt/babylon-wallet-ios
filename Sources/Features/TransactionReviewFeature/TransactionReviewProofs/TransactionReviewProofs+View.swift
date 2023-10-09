@@ -30,7 +30,7 @@ extension TransactionReviewProofs {
 					ForEach(viewStore.proofs) { proof in
 						VStack(spacing: 0) {
 							let metadata = proof.metadata
-							ProofView(thumbnail: metadata.thumbnail, name: metadata.name ?? L10n.TransactionReview.unknown) {
+							ProofView(thumbnail: metadata.iconURL, name: metadata.name ?? L10n.TransactionReview.unknown) {
 								viewStore.send(.proofTapped(id: proof.id))
 							}
 							.padding(.bottom, .medium3)

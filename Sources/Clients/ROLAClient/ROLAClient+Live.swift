@@ -4,11 +4,12 @@ import Cryptography
 import DeviceFactorSourceClient
 import EngineKit
 import GatewayAPI
+import OnLedgerEntitiesClient
 import RegexBuilder
 
 extension ROLAClient {
 	public static let liveValue: Self = {
-		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
+		@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
 		@Dependency(\.cacheClient) var cacheClient
 		@Dependency(\.deviceFactorSourceClient) var deviceFactorSourceClient
 
@@ -24,8 +25,8 @@ extension ROLAClient {
 					return persona.address.asGeneral()
 				}
 			}()
-			let metadata = try await gatewayAPIClient.getEntityMetadata(entityAddress.address, [.ownerKeys])
-			var ownerKeyHashes = try metadata.ownerKeyHashes() ?? []
+			let metadata = try await onLedgerEntitiesClient.getEntity(entityAddress, metadataKeys: [.ownerKeys]).genericComponent?.metadata
+			var ownerKeyHashes = try metadata?.ownerKeyHashes() ?? []
 
 			let transactionSigningKeyHash: PublicKeyHash = try {
 				switch entity.securityState {
@@ -56,7 +57,7 @@ extension ROLAClient {
 				_ = try await cacheClient.withCaching(
 					cacheEntry: .rolaDappVerificationMetadata(metadata.dAppDefinitionAddress.address),
 					request: {
-						try await gatewayAPIClient.getDappMetadata(
+						try await onLedgerEntitiesClient.getDappMetadata(
 							metadata.dAppDefinitionAddress,
 							validatingWebsite: metadata.origin.url
 						)
@@ -185,19 +186,15 @@ extension EngineKit.PublicKeyHash {
 	}
 }
 
-extension GatewayAPI.EntityMetadataCollection {
-	public func ownerKeyHashes() throws -> [PublicKeyHash]? {
-		guard let response = ownerKeys else {
-			return nil
-		}
-
-		return try response.compactMap { hash in
+extension OnLedgerEntity.Metadata {
+	public func ownerKeyHashes() throws -> [EngineKit.PublicKeyHash]? {
+		try ownerKeys?.compactMap { hash in
 			switch hash {
 			case let .ecdsaSecp256k1(value):
-				let bytes = try [UInt8].init(hex: value.hashHex)
+				let bytes = try [UInt8].init(hex: value)
 				return .secp256k1(value: bytes)
 			case let .eddsaEd25519(value):
-				let bytes = try [UInt8].init(hex: value.hashHex)
+				let bytes = try [UInt8].init(hex: value)
 				return .ed25519(value: bytes)
 			}
 		}

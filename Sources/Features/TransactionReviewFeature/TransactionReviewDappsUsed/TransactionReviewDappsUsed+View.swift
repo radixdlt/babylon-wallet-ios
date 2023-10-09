@@ -14,7 +14,7 @@ extension TransactionReview.DappEntity {
 	fileprivate var knownDapp: TransactionReviewDappsUsed.View.DappView.ViewState {
 		.known(
 			name: metadata.name ?? "Unnamed dApp", // FIXME: Strings
-			thumbnail: metadata.thumbnail,
+			thumbnail: metadata.iconURL,
 			id: id
 		)
 	}

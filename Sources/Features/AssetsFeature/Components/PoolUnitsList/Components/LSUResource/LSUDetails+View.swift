@@ -5,22 +5,22 @@ extension LSUDetails.State {
 	var viewState: LSUDetails.ViewState {
 		.init(
 			containerWithHeader: .init(
-				title: .success(stakeUnitResource.resource.resourceMetadata.name ?? L10n.Account.PoolUnits.unknownPoolUnitName),
+				title: .success(stakeUnitResource.resource.metadata.name ?? L10n.Account.PoolUnits.unknownPoolUnitName),
 				amount: stakeUnitResource.amount.formatted(),
-				symbol: .success(stakeUnitResource.resource.resourceMetadata.symbol)
+				symbol: .success(stakeUnitResource.resource.metadata.symbol)
 			),
-			thumbnailURL: stakeUnitResource.resource.resourceMetadata.iconURL,
+			thumbnailURL: stakeUnitResource.resource.metadata.iconURL,
 			validatorNameViewState: .init(with: validator),
 			redeemableTokenAmount: .init(.init(xrdAmount: xrdRedemptionValue.formatted())),
 			resourceDetails: .init(
-				description: .success(stakeUnitResource.resource.resourceMetadata.description),
+				description: .success(stakeUnitResource.resource.metadata.description),
 				resourceAddress: stakeUnitResource.resource.resourceAddress,
 				isXRD: false,
 				validatorAddress: validator.address,
-				resourceName: .success(stakeUnitResource.resource.resourceMetadata.name), // TODO: Is this correct?
+				resourceName: .success(stakeUnitResource.resource.metadata.name), // TODO: Is this correct?
 				currentSupply: .success(validator.xrdVaultBalance.formatted()),
 				behaviors: .success(stakeUnitResource.resource.behaviors),
-				tags: .success(stakeUnitResource.resource.resourceMetadata.tags)
+				tags: .success(stakeUnitResource.resource.metadata.tags)
 			)
 		)
 	}

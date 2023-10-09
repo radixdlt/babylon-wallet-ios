@@ -240,7 +240,7 @@ extension OnLedgerEntitiesClient {
 				divisibility: fungibleDetails.divisibility,
 				behaviors: item.details?.fungible?.roleAssignments.extractBehaviors() ?? [],
 				totalSupply: try? RETDecimal(value: fungibleDetails.totalSupply),
-				resourceMetadata: .init(item.explicitMetadata)
+				metadata: .init(item.explicitMetadata)
 			))
 		case let .nonFungibleResource(nonFungibleDetails):
 			return try .resource(.init(
@@ -249,7 +249,7 @@ extension OnLedgerEntitiesClient {
 				divisibility: nil,
 				behaviors: item.details?.nonFungible?.roleAssignments.extractBehaviors() ?? [],
 				totalSupply: try? RETDecimal(value: nonFungibleDetails.totalSupply),
-				resourceMetadata: .init(item.explicitMetadata)
+				metadata: .init(item.explicitMetadata)
 			))
 		default:
 			if let accountAddress = try? AccountAddress(validatingAddress: item.address) {
@@ -338,6 +338,8 @@ extension OnLedgerEntity {
 			return resourcePool.address.address
 		case let .validator(validator):
 			return validator.address.address
+		case let .genericComponent(component):
+			return component.address.address
 		}
 	}
 }

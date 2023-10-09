@@ -8,19 +8,19 @@ public struct FungibleTokenDetails: Sendable, FeatureReducer {
 		let resourceAddress: ResourceAddress
 		var resource: Loadable<OnLedgerEntity.Resource>
 		let isXRD: Bool
-		let prefetchedPortfolioResource: OnLedgerEntity.OwnedFungibleResource?
+		let ownedFungibleResource: OnLedgerEntity.OwnedFungibleResource?
 		let ledgerState: AtLedgerState?
 
 		public init(
 			resourceAddress: ResourceAddress,
 			resource: Loadable<OnLedgerEntity.Resource> = .idle,
-			prefetchedPortfolioResource: OnLedgerEntity.OwnedFungibleResource? = nil,
+			ownedFungibleResource: OnLedgerEntity.OwnedFungibleResource? = nil,
 			isXRD: Bool,
 			ledgerState: AtLedgerState? = nil
 		) {
 			self.resourceAddress = resourceAddress
 			self.resource = resource
-			self.prefetchedPortfolioResource = prefetchedPortfolioResource
+			self.ownedFungibleResource = ownedFungibleResource
 			self.isXRD = isXRD
 			self.ledgerState = ledgerState
 		}

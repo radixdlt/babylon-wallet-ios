@@ -81,9 +81,9 @@ extension PoolUnit.State {
 extension PoolUnitResourceViewState {
 	static func viewStates(
 		poolUnit: OnLedgerEntity.Account.PoolUnit,
-		resourcesDetails: OnLedgerEntity.ResourcePoolDetails
+		resourcesDetails: OnLedgerEntitiesClient.OwnedResourcePoolDetails
 	) -> NonEmpty<IdentifiedArrayOf<PoolUnitResourceViewState>> {
-		func redemptionValue(for resourceDetails: OnLedgerEntity.ResourceWithVaultAmount) -> String {
+		func redemptionValue(for resourceDetails: OnLedgerEntitiesClient.ResourceWithVaultAmount) -> String {
 			guard let poolUnitTotalSupply = resourcesDetails.poolUnitResource.resource.totalSupply else {
 				loggerGlobal.error("Missing total supply for \(resourcesDetails.poolUnitResource.resource.totalSupply)")
 				return "Missing Total supply - could not calculate redemption value" // FIXME: Strings
@@ -107,8 +107,8 @@ extension PoolUnitResourceViewState {
 			rawValue: (xrdResourceViewState.map { [$0] } ?? [])
 				+ resourcesDetails.nonXrdResources.map { resourceDetails in
 					PoolUnitResourceViewState(
-						thumbnail: .known(resourceDetails.resource.resourceMetadata.iconURL),
-						symbol: resourceDetails.resource.resourceMetadata.symbol ?? resourceDetails.resource.resourceMetadata.name ?? L10n.Account.PoolUnits.unknownSymbolName,
+						thumbnail: .known(resourceDetails.resource.metadata.iconURL),
+						symbol: resourceDetails.resource.metadata.symbol ?? resourceDetails.resource.metadata.name ?? L10n.Account.PoolUnits.unknownSymbolName,
 						tokenAmount: redemptionValue(for: resourceDetails)
 					)
 				}

@@ -68,41 +68,6 @@ extension GatewayAPIClient {
 		return item
 	}
 
-	/// Extracts the dApp definition address from a component, if one is present
-	public func getDappDefinitionAddress(_ component: ComponentAddress) async throws -> DappDefinitionAddress {
-		let entityMetadata = try await getEntityMetadata(component.address, [.dappDefinition])
-
-		guard let dappDefinitionAddressString = entityMetadata.dappDefinition else {
-			throw GatewayAPI.EntityMetadataCollection.MetadataError.missingDappDefinition
-		}
-
-		return try DappDefinitionAddress(validatingAddress: dappDefinitionAddressString)
-	}
-
-	/// Fetches the metadata for a dApp. If the component address is supplied, it validates that it is contained in `claimed_entities`
-	public func getDappMetadata(
-		_ dappDefinition: DappDefinitionAddress,
-		validatingDappComponent component: ComponentAddress? = nil,
-		validatingDappDefinitionAddress dappDefinitionAddress: DappDefinitionAddress? = nil,
-		validatingWebsite website: URL? = nil
-	) async throws -> GatewayAPI.EntityMetadataCollection {
-		let dappMetadata = try await getEntityMetadata(dappDefinition.address, [.accountType, .name, .description, .iconURL, .claimedEntities, .claimedWebsites, .dappDefinitions, .symbol])
-
-		try dappMetadata.validateAccountType()
-
-		if let component {
-			try dappMetadata.validate(dAppComponent: component)
-		}
-		if let dappDefinitionAddress {
-			try dappMetadata.validate(dAppDefinitionAddress: dappDefinitionAddress)
-		}
-		if let website {
-			try dappMetadata.validate(website: website)
-		}
-
-		return dappMetadata
-	}
-
 	// The maximum number of addresses the `getEntityDetails` can accept
 	// This needs to be synchronized with the actual value on the GW side
 	static let entityDetailsPageSize = 20
@@ -128,44 +93,6 @@ extension GatewayAPIClient {
 		let ledgerState = allResponses.first!.ledgerState
 
 		return .init(ledgerState: ledgerState, items: allItems)
-	}
-}
-
-extension GatewayAPI.EntityMetadataCollection {
-	/// Check that `account_type` is present and equal to `dapp_definition`
-	public func validateAccountType() throws {
-		guard accountType == .dappDefinition else {
-			throw GatewayAPI.EntityMetadataCollection.MetadataError.accountTypeNotDappDefinition
-		}
-	}
-
-	/// Check that `claimed_entities` is present and contains the provided `ComponentAddress`
-	public func validate(dAppComponent component: ComponentAddress) throws {
-		guard let claimedEntities else {
-			throw GatewayAPI.EntityMetadataCollection.MetadataError.missingClaimedEntities
-		}
-
-		guard claimedEntities.contains(component.address) else {
-			throw GatewayAPI.EntityMetadataCollection.MetadataError.entityNotClaimed
-		}
-	}
-
-	/// Check that `claimed_websites`is present and contains the provided website `URL`
-	public func validate(website: URL) throws {
-		guard let claimedWebsites else {
-			throw GatewayAPI.EntityMetadataCollection.MetadataError.missingClaimedWebsites
-		}
-
-		guard claimedWebsites.contains(website) else {
-			throw GatewayAPI.EntityMetadataCollection.MetadataError.websiteNotClaimed
-		}
-	}
-
-	/// Validate that `dapp_definitions` is present and contains the provided `dAppDefinitionAddress`
-	public func validate(dAppDefinitionAddress: DappDefinitionAddress) throws {
-		guard let dappDefinitions, dappDefinitions.contains(dAppDefinitionAddress.address) else {
-			throw GatewayAPI.EntityMetadataCollection.MetadataError.dAppDefinitionNotReciprocating
-		}
 	}
 }
 

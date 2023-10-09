@@ -683,12 +683,12 @@ extension TransactionReview {
 
 	private func extractDappInfo(_ component: ComponentAddress) async -> DappEntity? {
 		do {
-			let dAppDefinitionAddress = try await gatewayAPIClient.getDappDefinitionAddress(component)
-			let metadata = try await gatewayAPIClient.getDappMetadata(
+			let dAppDefinitionAddress = try await onLedgerEntitiesClient.getDappDefinitionAddress(component)
+			let metadata = try await onLedgerEntitiesClient.getDappMetadata(
 				dAppDefinitionAddress,
 				validatingDappComponent: component
 			)
-			return DappEntity(id: dAppDefinitionAddress, metadata: .init(metadata: metadata))
+			return DappEntity(id: dAppDefinitionAddress, metadata: metadata)
 		} catch {
 			loggerGlobal.info("Failed to extract dApp definition from \(component.address): \(error)")
 			return nil
@@ -704,10 +704,10 @@ extension TransactionReview {
 		return TransactionReviewProofs.State(proofs: .init(uniqueElements: proofs))
 	}
 
-	private func extractProofInfo(_ address: ResourceAddress) async -> ProofEntity {
-		await ProofEntity(
+	private func extractProofInfo(_ address: ResourceAddress) async throws -> ProofEntity {
+		try await ProofEntity(
 			id: address,
-			metadata: .init(metadata: try? gatewayAPIClient.getEntityMetadata(address.address, .dappMetadataKeys))
+			metadata: onLedgerEntitiesClient.getResource(address, metadataKeys: .dappMetadataKeys).metadata
 		)
 	}
 
@@ -985,24 +985,12 @@ extension ResourceOrNonFungible {
 extension TransactionReview {
 	public struct ProofEntity: Sendable, Identifiable, Hashable {
 		public let id: ResourceAddress
-		public let metadata: EntityMetadata
+		public let metadata: OnLedgerEntity.Metadata
 	}
 
 	public struct DappEntity: Sendable, Identifiable, Hashable {
 		public let id: DappDefinitionAddress
-		public let metadata: EntityMetadata
-	}
-
-	public struct EntityMetadata: Sendable, Hashable {
-		public let name: String?
-		public let thumbnail: URL?
-		public let description: String?
-
-		public init(metadata: GatewayAPI.EntityMetadataCollection?) {
-			self.name = metadata?.name
-			self.thumbnail = metadata?.iconURL
-			self.description = metadata?.description
-		}
+		public let metadata: OnLedgerEntity.Metadata
 	}
 
 	public enum Account: Sendable, Hashable {

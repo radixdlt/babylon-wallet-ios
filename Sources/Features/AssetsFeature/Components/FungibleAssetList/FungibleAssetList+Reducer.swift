@@ -63,7 +63,7 @@ public struct FungibleAssetList: Sendable, FeatureReducer {
 		case let .section(id, .delegate(.selected(token))):
 			state.destination = .details(.init(
 				resourceAddress: token.resourceAddress,
-				prefetchedPortfolioResource: token,
+				ownedFungibleResource: token,
 				isXRD: id == .xrd
 			))
 			return .none

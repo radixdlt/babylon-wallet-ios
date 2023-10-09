@@ -6,9 +6,9 @@ public struct LSUResource: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		var isExpanded: Bool = false
 
-		let stakess: [OnLedgerEntity.Account.RadixNetworkStake]
+		let stakes: [OnLedgerEntity.Account.RadixNetworkStake]
 		let account: OnLedgerEntity.Account
-		var stakes: IdentifiedArrayOf<LSUStake.State>
+		var stakesDetails: IdentifiedArrayOf<LSUStake.State>
 
 		var isLoadingResources = false
 	}
@@ -22,7 +22,7 @@ public struct LSUResource: Sendable, FeatureReducer {
 	}
 
 	public enum InternalAction: Sendable, Equatable {
-		case detailsLoaded(TaskResult<[OnLedgerEntity.ValidatorDetails]>)
+		case detailsLoaded(TaskResult<[OnLedgerEntitiesClient.OwnedStakeDetails]>)
 	}
 
 	@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
@@ -31,7 +31,7 @@ public struct LSUResource: Sendable, FeatureReducer {
 	public var body: some ReducerOf<Self> {
 		Reduce(core)
 			.forEach(
-				\.stakes,
+				\.stakesDetails,
 				action: /Action.child .. ChildAction.stake,
 				element: LSUStake.init
 			)
@@ -41,14 +41,14 @@ public struct LSUResource: Sendable, FeatureReducer {
 		switch viewAction {
 		case .isExpandedToggled:
 			state.isExpanded.toggle()
-			state.stakes = state.stakess.map {
-				LSUStake.State(validatorAddress: $0.validatorAddress, stakeDetails: .loading)
-			}.asIdentifiable()
-			state.isLoadingResources = true
-			return .run { [state = state] send in
-				let result = await TaskResult { try await onLedgerEntitiesClient.getValidatorsDetails(account: state.account, state.stakess) }
-				await send(.internal(.detailsLoaded(result)))
+			if state.isExpanded {
+				state.isLoadingResources = true
+				return .run { [state = state] send in
+					let result = await TaskResult { try await onLedgerEntitiesClient.getOwnedStakesDetails(account: state.account, state.stakes) }
+					await send(.internal(.detailsLoaded(result)))
+				}
 			}
+			return .none
 		}
 	}
 
@@ -57,7 +57,7 @@ public struct LSUResource: Sendable, FeatureReducer {
 		case let .detailsLoaded(.success(details)):
 			state.isLoadingResources = false
 			details.forEach { details in
-				state.stakes[id: details.validator.address.address]?.stakeDetails = .success(details)
+				state.stakesDetails[id: details.validator.address.address]?.stakeDetails = .success(details)
 			}
 			return .none
 		case let .detailsLoaded(.failure(error)):

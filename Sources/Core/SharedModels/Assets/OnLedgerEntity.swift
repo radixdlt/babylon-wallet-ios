@@ -10,6 +10,7 @@ public enum OnLedgerEntity: Sendable, Hashable, Codable {
 	case validator(Validator)
 	case nonFungibleToken(NonFungibleToken)
 	case accountNonFungibleIds(AccountNonFungibleIdsPage)
+	case genericComponent(GenericComponent)
 
 	public var resource: Resource? {
 		guard case let .resource(resource) = self else {
@@ -52,10 +53,76 @@ public enum OnLedgerEntity: Sendable, Hashable, Codable {
 		}
 		return validator
 	}
+
+	public var genericComponent: GenericComponent? {
+		guard case let .genericComponent(genericComponent) = self else {
+			return nil
+		}
+		return genericComponent
+	}
 }
 
 // MARK: OnLedgerEntity.Resource
 extension OnLedgerEntity {
+	public struct Metadata: Sendable, Hashable, Codable {
+		public enum PublicKeyHash: Sendable, Hashable, Codable {
+			case ecdsaSecp256k1(String)
+			case eddsaEd25519(String)
+		}
+
+		public let name: String?
+		public let symbol: String?
+		public let description: String?
+		public let iconURL: URL?
+		public let tags: [AssetTag]
+		public let dappDefinitions: [AccountAddress]?
+		public let dappDefinition: AccountAddress?
+		public let validator: ValidatorAddress?
+		public let poolUnit: ResourcePoolAddress?
+		public let poolUnitResource: ResourceAddress?
+		public let claimedEntities: [String]?
+		public let claimedWebsites: [URL]?
+		public let accountType: AccountType?
+		public let ownerKeys: [PublicKeyHash]?
+
+		public init(
+			name: String? = nil,
+			symbol: String? = nil,
+			description: String? = nil,
+			iconURL: URL? = nil,
+			tags: [AssetTag] = [],
+			dappDefinitions: [AccountAddress]? = nil,
+			dappDefinition: AccountAddress? = nil,
+			validator: ValidatorAddress? = nil,
+			poolUnit: ResourcePoolAddress? = nil,
+			poolUnitResource: ResourceAddress? = nil,
+			claimedEntities: [String]? = nil,
+			claimedWebsites: [URL]? = nil,
+			accountType: AccountType? = nil,
+			ownerKeys: [PublicKeyHash]? = nil
+		) {
+			self.name = name
+			self.symbol = symbol
+			self.description = description
+			self.iconURL = iconURL
+			self.tags = tags
+			self.dappDefinitions = dappDefinitions
+			self.dappDefinition = dappDefinition
+			self.validator = validator
+			self.poolUnit = poolUnit
+			self.poolUnitResource = poolUnitResource
+			self.claimedEntities = claimedEntities
+			self.claimedWebsites = claimedWebsites
+			self.accountType = accountType
+			self.ownerKeys = ownerKeys
+		}
+	}
+
+	// MARK: - AccountType
+	public enum AccountType: String, Sendable, Codable {
+		case dappDefinition = "dapp definition"
+	}
+
 	public struct Resource: Sendable, Hashable, Codable, Identifiable {
 		public var id: ResourceAddress { resourceAddress }
 		public let resourceAddress: ResourceAddress
@@ -63,7 +130,7 @@ extension OnLedgerEntity {
 		public let divisibility: Int?
 		public let behaviors: [AssetBehavior]
 		public let totalSupply: RETDecimal?
-		public let resourceMetadata: ResourceMetadata
+		public let metadata: Metadata
 
 		public var fungibility: Fungibility {
 			if case .globalFungibleResourceManager = resourceAddress.decodedKind {
@@ -84,43 +151,48 @@ extension OnLedgerEntity {
 			divisibility: Int? = nil,
 			behaviors: [AssetBehavior] = [],
 			totalSupply: RETDecimal? = nil,
-			resourceMetadata: ResourceMetadata
+			metadata: Metadata
 		) {
 			self.resourceAddress = resourceAddress
 			self.atLedgerState = atLedgerState
 			self.divisibility = divisibility
 			self.behaviors = behaviors
 			self.totalSupply = totalSupply
-			self.resourceMetadata = resourceMetadata
+			self.metadata = metadata
+		}
+	}
+
+	public struct GenericComponent: Sendable, Hashable, Codable {
+		public let address: ComponentAddress
+		public let atLedgerState: AtLedgerState
+		public let behaviors: [AssetBehavior]
+		public let metadata: Metadata
+
+		init(
+			address: ComponentAddress,
+			atLedgerState: AtLedgerState,
+			behaviors: [AssetBehavior],
+			metadata: Metadata
+		) {
+			self.address = address
+			self.atLedgerState = atLedgerState
+			self.behaviors = behaviors
+			self.metadata = metadata
 		}
 	}
 }
 
 extension OnLedgerEntity {
-	public struct Metadata: Sendable, Hashable, Identifiable, Codable {
-		public var id: String { key }
-		public let key: String
-		public let value: String
-
-		public init(key: String, value: String) {
-			self.key = key
-			self.value = value
-		}
-	}
-
 	public struct NonFungibleToken: Sendable, Hashable, Identifiable, Codable {
 		public let id: NonFungibleGlobalId
 		public let data: [NFTData]
-		public let metadata: [Metadata]
 
 		public init(
 			id: NonFungibleGlobalId,
-			data: [NFTData],
-			metadata: [Metadata] = []
+			data: [NFTData]
 		) {
 			self.id = id
 			self.data = data
-			self.metadata = metadata
 		}
 	}
 
@@ -152,13 +224,13 @@ extension OnLedgerEntity {
 		public let address: ResourcePoolAddress
 		public let poolUnitResourceAddress: ResourceAddress
 		public let resources: OwnedFungibleResources
-		public let metadata: ResourceMetadata
+		public let metadata: Metadata
 
 		public init(
 			address: ResourcePoolAddress,
 			poolUnitResourceAddress: ResourceAddress,
 			resources: OwnedFungibleResources,
-			metadata: ResourceMetadata
+			metadata: Metadata
 		) {
 			self.address = address
 			self.poolUnitResourceAddress = poolUnitResourceAddress
@@ -172,14 +244,14 @@ extension OnLedgerEntity {
 		public let stakeUnitResourceAddress: ResourceAddress
 		public let xrdVaultBalance: RETDecimal
 		public let stakeClaimFungibleResourceAddress: ResourceAddress
-		public let metadata: ResourceMetadata
+		public let metadata: Metadata
 
 		public init(
 			address: ValidatorAddress,
 			stakeUnitResourceAddress: ResourceAddress,
 			xrdVaultBalance: RETDecimal,
 			stakeClaimFungibleResourceAddress: ResourceAddress,
-			metadata: ResourceMetadata
+			metadata: Metadata
 		) {
 			self.address = address
 			self.stakeUnitResourceAddress = stakeUnitResourceAddress
@@ -209,13 +281,13 @@ extension OnLedgerEntity {
 		public let resourceAddress: ResourceAddress
 		public let atLedgerState: AtLedgerState
 		public let amount: RETDecimal
-		public let metadata: ResourceMetadata
+		public let metadata: Metadata
 
 		public init(
 			resourceAddress: ResourceAddress,
 			atLedgerState: AtLedgerState,
 			amount: RETDecimal,
-			metadata: ResourceMetadata
+			metadata: Metadata
 		) {
 			self.resourceAddress = resourceAddress
 			self.atLedgerState = atLedgerState
@@ -231,7 +303,7 @@ extension OnLedgerEntity {
 
 		public let resourceAddress: ResourceAddress
 		public let atLedgerState: AtLedgerState
-		public let metadata: ResourceMetadata
+		public let metadata: Metadata
 		public let nonFungibleIdsCount: Int
 		/// The vault where the owned ids are stored
 		public let vaultAddress: VaultAddress
@@ -239,7 +311,7 @@ extension OnLedgerEntity {
 		public init(
 			resourceAddress: ResourceAddress,
 			atLedgerState: AtLedgerState,
-			metadata: ResourceMetadata,
+			metadata: Metadata,
 			nonFungibleIdsCount: Int,
 			vaultAddress: VaultAddress
 		) {
@@ -257,7 +329,7 @@ extension OnLedgerEntity {
 	public struct Account: Sendable, Hashable, Codable {
 		public let address: AccountAddress
 		public let atLedgerState: AtLedgerState
-		public let metadata: ResourceMetadata
+		public let metadata: Metadata
 		public var fungibleResources: OwnedFungibleResources
 		public var nonFungibleResources: [OwnedNonFungibleResource]
 		public var poolUnitResources: PoolUnitResources
@@ -265,7 +337,7 @@ extension OnLedgerEntity {
 		public init(
 			address: AccountAddress,
 			atLedgerState: AtLedgerState,
-			metadata: ResourceMetadata,
+			metadata: Metadata,
 			fungibleResources: OwnedFungibleResources,
 			nonFungibleResources: [OwnedNonFungibleResource],
 			poolUnitResources: PoolUnitResources
@@ -318,31 +390,6 @@ extension OnLedgerEntity.Account {
 			self.resource = resource
 			self.resourcePoolAddress = resourcePoolAddress
 		}
-	}
-}
-
-extension OnLedgerEntity.NonFungibleToken {
-	enum CodingKeys: CodingKey {
-		case id
-		case data
-		case metadata
-	}
-
-	public init(from decoder: Decoder) throws {
-		let container = try decoder.container(keyedBy: CodingKeys.self)
-
-		try self.init(
-			id: .init(nonFungibleGlobalId: container.decode(String.self, forKey: .id)),
-			data: container.decode([NFTData].self, forKey: .data),
-			metadata: container.decode([OnLedgerEntity.Metadata].self, forKey: .metadata)
-		)
-	}
-
-	public func encode(to encoder: Encoder) throws {
-		var container = encoder.container(keyedBy: CodingKeys.self)
-		try container.encode(id.asStr(), forKey: .id)
-		try container.encode(data, forKey: .data)
-		try container.encode(metadata, forKey: .metadata)
 	}
 }
 

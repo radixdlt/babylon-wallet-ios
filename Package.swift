@@ -792,10 +792,10 @@ package.addModules([
 		name: "ROLAClient",
 		dependencies: [
 			"AccountsClient",
-			"GatewayAPI",
 			"CacheClient",
 			"DeviceFactorSourceClient",
 			"EngineKit",
+			"OnLedgerEntitiesClient",
 		],
 		tests: .yes(
 			dependencies: [],

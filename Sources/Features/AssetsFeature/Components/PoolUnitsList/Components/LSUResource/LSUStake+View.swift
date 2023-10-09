@@ -163,15 +163,17 @@ extension View {
 
 extension LSUStake.State {
 	var viewState: LSUStake.ViewState {
-		.init(id: validatorAddress, content: stakeDetails.map { details in
+		.init(id: stake.validatorAddress, content: stakeDetails.map { details in
 			LSUStake.ViewState.Content(
 				validatorNameViewState: .init(with: details.validator),
-				liquidStakeUnit: .init(
-					thumbnail: .xrd,
-					symbol: Constants.xrdTokenName,
-					tokenAmount: details.xrdRedemptionValue.formatted(),
-					isSelected: nil
-				),
+				liquidStakeUnit: details.stakeUnitResource.map { _ in
+					.init(
+						thumbnail: .xrd,
+						symbol: Constants.xrdTokenName,
+						tokenAmount: details.xrdRedemptionValue.formatted(),
+						isSelected: isStakeSelected
+					)
+				},
 				stakeClaimNFTs: details.stakeClaimTokens.flatMap { stakeClaim in
 					.init(rawValue:
 						stakeClaim.tokens.map { token in
@@ -187,7 +189,7 @@ extension LSUStake.State {
 								thumbnail: .xrd,
 								status: status,
 								tokenAmount: (token.data.claimAmount ?? 0).formatted(),
-								isSelected: nil
+								isSelected: self.selectedStakeClaimAssets?.contains(token)
 							)
 						}.asIdentifiable()
 					)

@@ -1,10 +1,11 @@
 import FeaturePrelude
+import OnLedgerEntitiesClient
 
 // MARK: - PoolUnitDetails
 public struct PoolUnitDetails: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		let poolUnit: OnLedgerEntity.Account.PoolUnit
-		let resourcesDetails: OnLedgerEntity.ResourcePoolDetails
+		let resourcesDetails: OnLedgerEntitiesClient.OwnedResourcePoolDetails
 	}
 
 	@Dependency(\.dismiss) var dismiss

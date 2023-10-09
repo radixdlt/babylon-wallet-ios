@@ -10,13 +10,13 @@ public struct PoolUnit: Sendable, FeatureReducer {
 		}
 
 		let poolUnit: OnLedgerEntity.Account.PoolUnit
-		var resourceDetails: Loadable<OnLedgerEntity.ResourcePoolDetails>
+		var resourceDetails: Loadable<OnLedgerEntitiesClient.OwnedResourcePoolDetails>
 		var isSelected: Bool?
 		var isDataLoaded = Bool.random()
 
 		public init(
 			poolUnit: OnLedgerEntity.Account.PoolUnit,
-			resourceDetails: Loadable<OnLedgerEntity.ResourcePoolDetails> = .idle,
+			resourceDetails: Loadable<OnLedgerEntitiesClient.OwnedResourcePoolDetails> = .idle,
 			isSelected: Bool? = nil,
 			destination: Destinations.State? = nil
 		) {

@@ -7,8 +7,7 @@ extension OnLedgerEntity.NonFungibleToken {
 				resourceAddress: resourceAddress.intoEngine(),
 				nonFungibleLocalId: nftID
 			),
-			data: nftData,
-			metadata: []
+			data: nftData
 		)
 	}
 }
@@ -21,7 +20,7 @@ extension OnLedgerEntity.Resource {
 			divisibility: nil,
 			behaviors: [],
 			totalSupply: nil,
-			resourceMetadata: .init(
+			metadata: .init(
 				name: metadata.name,
 				symbol: metadata.symbol,
 				description: metadata.description,
