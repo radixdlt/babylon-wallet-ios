@@ -124,6 +124,10 @@ public struct Home: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .accountsLoadedResult(.success(accounts)):
+			guard accounts.elements != state.accounts.elements else {
+				return .none
+			}
+
 			state.accountList = .init(accounts: accounts)
 			let accountAddresses = state.accounts.map(\.address)
 			return .run { _ in
