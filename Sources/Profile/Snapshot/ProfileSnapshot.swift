@@ -25,7 +25,7 @@ public struct ProfileSnapshot:
 
 	/// Settings for this profile in the app, contains default security configs
 	/// as well as display settings.
-	public let appPreferences: AppPreferences
+	public private(set) var appPreferences: AppPreferences
 
 	/// Effectivly **per network**: a list of accounts, personas and connected dApps.
 	public let networks: Profile.Networks
@@ -37,6 +37,12 @@ public struct ProfileSnapshot:
 		self.appPreferences = profile.appPreferences
 		self.networks = profile.networks
 		self.factorSources = profile.factorSources
+	}
+}
+
+extension ProfileSnapshot {
+	public mutating func changeCurrentToMainnetIfNeeded() {
+		appPreferences.changeCurrentToMainnetIfNeeded()
 	}
 }
 

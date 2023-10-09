@@ -15,7 +15,7 @@ extension FungibleTokenDetails.State {
 				isXRD: isXRD,
 				validatorAddress: nil,
 				resourceName: nil,
-				currentSupply: resource.totalSupply.map { $0?.formatted() }, // FIXME: Check which format
+				currentSupply: resource.totalSupply.map { $0?.formatted() ?? L10n.AssetDetails.supplyUnkown },
 				behaviors: resource.behaviors,
 				tags: {
 					let tags = resource.resourceMetadata.get(\.tags, prefetched: prefetchedPortfolioResource?.metadata)

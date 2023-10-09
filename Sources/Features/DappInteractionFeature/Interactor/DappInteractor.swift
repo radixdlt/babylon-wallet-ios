@@ -10,10 +10,18 @@ import ROLAClient
 
 typealias RequestEnvelope = DappInteractionClient.RequestEnvelope
 
+// MARK: Identifiable
+extension RequestEnvelope: Identifiable {
+	public typealias ID = P2P.Dapp.Request.ID
+	public var id: ID {
+		request.id
+	}
+}
+
 // MARK: - DappInteractor
 struct DappInteractor: Sendable, FeatureReducer {
 	struct State: Sendable, Hashable {
-		var requestQueue: OrderedSet<RequestEnvelope> = []
+		var requestQueue: IdentifiedArrayOf<RequestEnvelope> = []
 
 		@PresentationState
 		var currentModal: Destinations.State?
@@ -322,6 +330,8 @@ struct DappInteractor: Sendable, FeatureReducer {
 							txID
 						)
 					))
+				} else {
+					loggerGlobal.notice("Not delegating to `sentResponseToDapp`")
 				}
 			} catch {
 				if !isTransactionResponse {
@@ -333,13 +343,15 @@ struct DappInteractor: Sendable, FeatureReducer {
 							reason: error.localizedDescription
 						)
 					))
+				} else {
+					loggerGlobal.notice("Failed to send response back to dapp, error: \(error), not delegating `sentResponseToDapp`.")
 				}
 			}
 		}
 	}
 
 	func dismissCurrentModalAndRequest(_ request: RequestEnvelope, for state: inout State) {
-		state.requestQueue.remove(request)
+		state.requestQueue.remove(id: request.id)
 		state.currentModal = nil
 	}
 }

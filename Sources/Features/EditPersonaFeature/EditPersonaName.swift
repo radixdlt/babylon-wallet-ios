@@ -18,21 +18,21 @@ public struct EditPersonaName: FeatureReducer, EmptyInitializable {
 			self.id = entryID ?? uuid()
 			self.family = EditPersonaDynamicField.State(
 				behaviour: .familyName,
-				entryID: id, // Uh.. terrible, but we are gonne refactor this whole thing anyway
+				entryID: id, // FIXME: refactor this whole thing
 				text: name.familyName,
 				isRequiredByDapp: isRequestedByDapp,
 				showsTitle: true
 			)
 			self.given = EditPersonaDynamicField.State(
 				behaviour: .givenNames,
-				entryID: id, // Uh.. terrible, but we are gonne refactor this whole thing anyway
+				entryID: id, // FIXME: refactor this whole thing
 				text: name.givenNames,
 				isRequiredByDapp: isRequestedByDapp,
 				showsTitle: true
 			)
 			self.nickName = EditPersonaDynamicField.State(
 				behaviour: .nickName,
-				entryID: id, // Uh.. terrible, but we are gonne refactor this whole thing anyway
+				entryID: id, // FIXME: refactor this whole thing
 				text: name.nickname,
 				isRequiredByDapp: isRequestedByDapp,
 				showsTitle: true

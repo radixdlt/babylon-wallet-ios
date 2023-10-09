@@ -194,62 +194,6 @@ extension LSUStake.State {
 				}
 			)
 		})
-
-//		.init(
-		//            id: stake.validatorAddress,
-//			validatorNameViewState: .init(with: stake.validator),
-//			liquidStakeUnit:
-//			.init(
-//				thumbnail: .xrd,
-//				symbol: Constants.xrdTokenName,
-//				tokenAmount: xrdRedemptionValue.formatted(),
-//				isSelected: isStakeSelected
-//			),
-//
-//			stakeClaimNFTs:
-//			.init(rawValue: .init(uncheckedUniqueElements:
-//				stakeClaimNfts
-//					.map { token in
-//						let status: LSUStake.ViewState.StakeClaimNFTStatus = {
-//							guard let claimEpoch = token.data.claimEpoch, let epoch = stake.stakeClaimResource?.atLedgerState.epoch else {
-//								return .unstaking
-//							}
-//							return claimEpoch >= epoch ? .readyToClaim : .unstaking
-//						}()
-//						return LSUStake.ViewState.StakeClaimNFTViewState(
-//							id: token.id,
-//							thumbnail: .xrd,
-//							status: status,
-//							tokenAmount: (token.data.claimAmount ?? 0).formatted(),
-//							isSelected: nil // self.selectedStakeClaimAssets?.contains(token.id)
-		//=======
-//			liquidStakeUnit: stake.xrdRedemptionValue
-//				.map {
-//					.init(
-//						thumbnail: .xrd,
-//						symbol: Constants.xrdTokenName,
-//						tokenAmount: $0.formatted(),
-//						isSelected: isStakeSelected
-//					)
-//				},
-//			stakeClaimNFTs: .init(
-//				rawValue: stake.stakeClaimResource
-//					.map { claimNFT in
-//						.init(
-//							uncheckedUniqueElements: claimNFT.tokens
-//								.map { token in
-//									LSUStake.ViewState.StakeClaimNFTViewState(
-//										id: token.id,
-//										thumbnail: .xrd,
-//										status: token.canBeClaimed ? .readyToClaim : .unstaking,
-//										tokenAmount: (token.stakeClaimAmount ?? 0).formatted(),
-//										isSelected: self.selectedStakeClaimAssets?.contains(token.id)
-//									)
-//								}
-//							// >>>>>>> main
-//						)
-//					}))
-//		)
 	}
 }
 

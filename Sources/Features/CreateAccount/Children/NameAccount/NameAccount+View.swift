@@ -28,10 +28,11 @@ extension NameAccount {
 			self.useLedgerAsFactorSource = state.useLedgerAsFactorSource
 			self.entityName = state.inputtedName
 			if let sanitizedName = state.sanitizedName {
-				self.sanitizedNameRequirement = .init(sanitizedName: sanitizedName)
 				if sanitizedName.count > Profile.Network.Account.nameMaxLength {
+					self.sanitizedNameRequirement = nil
 					self.hint = .error("Account label too long") // FIXME: Strings (duplicate)
 				} else {
+					self.sanitizedNameRequirement = .init(sanitizedName: sanitizedName)
 					self.hint = nil
 				}
 			} else {

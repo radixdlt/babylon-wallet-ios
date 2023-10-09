@@ -166,8 +166,15 @@ public struct Settings: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
-		case let .destination(.presented(.appSettings(.delegate(.deleteProfileAndFactorSources(keepInICloudIfPresent))))):
-			return .send(.delegate(.deleteProfileAndFactorSources(keepInICloudIfPresent: keepInICloudIfPresent)))
+		case let .destination(.presented(presentedAction)):
+			switch presentedAction {
+			case let .appSettings(.delegate(.deleteProfileAndFactorSources(keepInICloudIfPresent))):
+				return .send(.delegate(.deleteProfileAndFactorSources(keepInICloudIfPresent: keepInICloudIfPresent)))
+			case .accountSecurity(.delegate(.gotoAccountList)):
+				return .run { _ in await dismiss() }
+			default:
+				return .none
+			}
 
 		case .destination(.dismiss):
 			switch state.destination {
@@ -176,9 +183,6 @@ public struct Settings: Sendable, FeatureReducer {
 			default:
 				return .none
 			}
-
-		case .destination:
-			return .none
 		}
 	}
 

@@ -15,7 +15,6 @@
 // https://github.com/apple/swift-crypto/blob/main/Sources/Crypto/Util/PrettyBytes.swift
 
 // Changes made by Radix:
-// Cyon:
 // * Changed `Data(hexString:)` to `Data(hex:)`
 // * Changed `Data(hexString:)` init to handle `0x` prefixes.
 // * Changed `ByteHexEncodingErrors` to `public`
