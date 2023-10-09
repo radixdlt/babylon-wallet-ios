@@ -471,7 +471,7 @@
 "common_account" = "Account";
 "common_cancel" = "Cancel";
 "common_continue" = "Continue";
-"common_developerDisclaimerText" = "For development only. Not usable on Radix mainnet.";
+"common_developerDisclaimerText" = "Connected to a test network, not Radix main network.";
 "common_errorAlertTitle" = "An Error Occurred";
 "common_none" = "None";
 "common_ok" = "OK";
