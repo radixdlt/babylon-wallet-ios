@@ -5,26 +5,21 @@ import SharedModels
 
 // MARK: - OnLedgerEntitiesClient
 /// A client that manages loading Entities from the Ledger.
-/// Compared to AccountPortfolio it loads the general info about the entities not related to any account.
-/// With a refactor, this can potentially also load the Accounts and then link its resources to the general info about resources.
 public struct OnLedgerEntitiesClient: Sendable {
+	/// Retrieve the entities identified by addresses
 	public let getEntities: GetEntities
+
 	/// Retrieve the token data associated with the given non fungible ids
 	public let getNonFungibleTokenData: GetNonFungibleTokenData
 
-	/// Retrieve the account owned ids for a given non fungible resource collection
-	public let getAccountOwnedNonFungibleResourceIds: GetAccountOwnedNonFungibleResourceIds
-
 	/// Retrieve the token data associated with the given account.
-	/// Basically a combination of `getAccountOwnedNonFungibleResourceIds` and `getNonFungibleTokenData`
 	public let getAccountOwnedNonFungibleTokenData: GetAccountOwnedNonFungibleTokenData
 }
 
 // MARK: - OnLedgerEntitiesClient.GetResources
 extension OnLedgerEntitiesClient {
 	public typealias GetNonFungibleTokenData = @Sendable (GetNonFungibleTokenDataRequest) async throws -> [OnLedgerEntity.NonFungibleToken]
-	public typealias GetAccountOwnedNonFungibleResourceIds = @Sendable (GetAccountOwnedNonFungibleResourceIdsRequest) async throws -> OnLedgerEntity.AccountNonFungibleIdsPage
-	public typealias GetAccountOwnedNonFungibleTokenData = @Sendable (GetAccountOwnedNonFungibleTokenDataRequest) async throws -> [OnLedgerEntity.NonFungibleToken]
+	public typealias GetAccountOwnedNonFungibleTokenData = @Sendable (GetAccountOwnedNonFungibleTokenDataRequest) async throws -> GetAccountOwnedNonFungibleTokenResponse
 
 	public typealias GetEntities = @Sendable ([Address], Set<EntityMetadataKey>, AtLedgerState?) async throws -> [OnLedgerEntity]
 }
@@ -35,31 +30,18 @@ extension OnLedgerEntitiesClient {
 		/// The address of the account that owns the non fungible resource ids
 		public let accountAddress: AccountAddress
 		/// The non fungible resource collection for with to retrieve the ids
-		public let resourceAddress: ResourceAddress
-		/// The account vault where the ids are stored
-		public let vaultAddress: VaultAddress
-		/// The ledger state at which to retrieve the ids, should be ledger state
-		/// from the OnLedgerEntity.OwnedNonFungibleResource.
-		public let atLedgerState: AtLedgerState
+		public let resource: OnLedgerEntity.OwnedNonFungibleResource
 		/// The cursor of the page to read
 		public let pageCursor: String?
-		/// The page size limit
-		public let pageSize: Int?
 
 		public init(
 			account: AccountAddress,
-			resourceAddress: ResourceAddress,
-			vaultAddress: VaultAddress,
-			atLedgerState: AtLedgerState,
-			pageCursor: String?,
-			pageSize: Int = OnLedgerEntitiesClient.maximumNFTIDChunkSize
+			resource: OnLedgerEntity.OwnedNonFungibleResource,
+			pageCursor: String?
 		) {
 			self.accountAddress = account
-			self.resourceAddress = resourceAddress
-			self.vaultAddress = vaultAddress
-			self.atLedgerState = atLedgerState
+			self.resource = resource
 			self.pageCursor = pageCursor
-			self.pageSize = pageSize
 		}
 	}
 
@@ -83,17 +65,39 @@ extension OnLedgerEntitiesClient {
 	}
 
 	public struct GetAccountOwnedNonFungibleTokenDataRequest: Sendable {
+		public enum Mode: Sendable {
+			case loadAll
+			case loadPage(pageCursor: String?)
+		}
+
 		/// The address of the account that owns the non fungible resource ids
 		public let accountAddress: AccountAddress
 		/// The non fungible resource collection for with to retrieve the ids
 		public let resource: OnLedgerEntity.OwnedNonFungibleResource
+		/// The page to load, if not provided will load all pages
+		public let mode: Mode
 
 		public init(
 			accountAddress: AccountAddress,
-			resource: OnLedgerEntity.OwnedNonFungibleResource
+			resource: OnLedgerEntity.OwnedNonFungibleResource,
+			mode: Mode
 		) {
 			self.accountAddress = accountAddress
 			self.resource = resource
+			self.mode = mode
+		}
+	}
+
+	public struct GetAccountOwnedNonFungibleTokenResponse: Sendable {
+		public let tokens: [OnLedgerEntity.NonFungibleToken]
+		public let nextPageCursor: String?
+
+		public init(
+			tokens: [OnLedgerEntity.NonFungibleToken],
+			nextPageCursor: String?
+		) {
+			self.tokens = tokens
+			self.nextPageCursor = nextPageCursor
 		}
 	}
 }

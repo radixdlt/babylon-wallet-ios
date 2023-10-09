@@ -337,7 +337,11 @@ extension OnLedgerEntitiesClient {
 						assertionFailure("Did not load stake unit details")
 						return nil
 					}
-					let tokenData = try await getAccountOwnedNonFungibleTokenData(.init(accountAddress: account.address, resource: stakeClaimResource))
+					let tokenData = try await getAccountOwnedNonFungibleTokenData(.init(
+						accountAddress: account.address,
+						resource: stakeClaimResource,
+						mode: .loadAll
+					)).tokens
 					return .init(resource: stakeClaimResourceDetails, tokens: tokenData)
 				}
 

@@ -126,21 +126,8 @@ extension NonFungibleAssetList {
 			let cursor = state.nextPageCursor
 			return .run { [resource = state.resource, accountAddress = state.accountAddress] send in
 				let result = await TaskResult {
-					let idsPage = try await onLedgerEntitiesClient.getAccountOwnedNonFungibleResourceIds(.init(
-						account: accountAddress,
-						resourceAddress: resource.resourceAddress,
-						vaultAddress: resource.vaultAddress,
-						atLedgerState: resource.atLedgerState,
-						pageCursor: cursor
-					))
-
-					let data = try await onLedgerEntitiesClient.getNonFungibleTokenData(.init(
-						atLedgerState: resource.atLedgerState,
-						resource: resource.resourceAddress,
-						nonFungibleIds: Array(idsPage.ids)
-					))
-
-					return InternalAction.TokensLoadResult(tokens: data, nextPageCursor: idsPage.nextPageCursor, pageIndex: pageIndex)
+					let data = try await onLedgerEntitiesClient.getAccountOwnedNonFungibleTokenData(.init(accountAddress: accountAddress, resource: resource, mode: .loadPage(pageCursor: cursor)))
+					return InternalAction.TokensLoadResult(tokens: data.tokens, nextPageCursor: data.nextPageCursor, pageIndex: pageIndex)
 				}
 				await send(.internal(.tokensLoaded(result)))
 			}

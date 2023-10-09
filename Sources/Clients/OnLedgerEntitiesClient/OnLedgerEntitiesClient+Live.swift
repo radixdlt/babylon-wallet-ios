@@ -20,7 +20,6 @@ extension OnLedgerEntitiesClient: DependencyKey {
 				try await getEntities(for: addresses, explicitMetadata, ledgerState: ledgerState)
 			},
 			getNonFungibleTokenData: getNonFungibleData,
-			getAccountOwnedNonFungibleResourceIds: getNonFungibleResourceIds,
 			getAccountOwnedNonFungibleTokenData: getAccountOwnedNonFungibleTokenData
 		)
 	}
@@ -72,7 +71,7 @@ extension OnLedgerEntitiesClient {
 
 		let cachingIdentifier = CacheClient.Entry.onLedgerEntity(.nonFungibleIdPage(
 			accountAddress: request.accountAddress.asGeneral,
-			resourceAddress: request.resourceAddress.asGeneral,
+			resourceAddress: request.resource.resourceAddress.asGeneral,
 			pageCursor: request.pageCursor
 		))
 		let cached = try? cacheClient.load(
@@ -87,25 +86,25 @@ extension OnLedgerEntitiesClient {
 		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
 		let freshPage = try await gatewayAPIClient.getEntityNonFungibleIdsPage(
 			.init(
-				atLedgerState: request.atLedgerState.selector,
+				atLedgerState: request.resource.atLedgerState.selector,
 				cursor: request.pageCursor,
 				limitPerPage: maximumNFTIDChunkSize,
 				address: request.accountAddress.address,
-				vaultAddress: request.vaultAddress.address,
-				resourceAddress: request.resourceAddress.address
+				vaultAddress: request.resource.vaultAddress.address,
+				resourceAddress: request.resource.resourceAddress.address
 			)
 		)
 
 		let items = try freshPage.items.map {
 			try NonFungibleGlobalId.fromParts(
-				resourceAddress: request.resourceAddress.intoEngine(),
+				resourceAddress: request.resource.resourceAddress.intoEngine(),
 				nonFungibleLocalId: .from(stringFormat: $0)
 			)
 		}
 
 		let response = OnLedgerEntity.AccountNonFungibleIdsPage(
 			accountAddress: request.accountAddress,
-			resourceAddress: request.resourceAddress,
+			resourceAddress: request.resource.resourceAddress,
 			ids: items,
 			pageCursor: request.pageCursor,
 			nextPageCursor: freshPage.nextCursor
@@ -120,9 +119,7 @@ extension OnLedgerEntitiesClient {
 		func collectIds(_ cursor: String?, collectedIds: [NonFungibleGlobalId]) async throws -> [NonFungibleGlobalId] {
 			let page = try await getNonFungibleResourceIds(.init(
 				account: request.accountAddress,
-				resourceAddress: request.resourceAddress,
-				vaultAddress: request.vaultAddress,
-				atLedgerState: request.atLedgerState,
+				resource: request.resource,
 				pageCursor: cursor
 			))
 
@@ -137,15 +134,37 @@ extension OnLedgerEntitiesClient {
 	}
 
 	@Sendable
-	static func getAccountOwnedNonFungibleTokenData(_ request: GetAccountOwnedNonFungibleTokenDataRequest) async throws -> [OnLedgerEntity.NonFungibleToken] {
-		let ids = try await getAllNonFungibleResourceIds(.init(
-			account: request.accountAddress,
-			resourceAddress: request.resource.resourceAddress,
-			vaultAddress: request.resource.vaultAddress,
+	static func getAccountOwnedNonFungibleTokenData(_ request: GetAccountOwnedNonFungibleTokenDataRequest) async throws -> GetAccountOwnedNonFungibleTokenResponse {
+		let (ids, nextPageCursor) = try await {
+			switch request.mode {
+			case let .loadPage(pageCursor):
+				let page = try await getNonFungibleResourceIds(.init(
+					account: request.accountAddress,
+					resource: request.resource,
+					pageCursor: pageCursor
+				))
+
+				return (page.ids, page.nextPageCursor)
+
+			case .loadAll:
+				return try await (
+					getAllNonFungibleResourceIds(.init(
+						account: request.accountAddress,
+						resource: request.resource,
+						pageCursor: nil
+					)),
+					nil
+				)
+			}
+		}()
+
+		let tokens = try await getNonFungibleData(.init(
 			atLedgerState: request.resource.atLedgerState,
-			pageCursor: nil
+			resource: request.resource.resourceAddress,
+			nonFungibleIds: ids
 		))
-		return try await getNonFungibleData(.init(atLedgerState: request.resource.atLedgerState, resource: request.resource.resourceAddress, nonFungibleIds: ids))
+
+		return .init(tokens: tokens, nextPageCursor: nextPageCursor)
 	}
 
 	static func fetchNonFungibleData(_ request: GetNonFungibleTokenDataRequest) async throws -> [OnLedgerEntity] {
