@@ -76,7 +76,7 @@ extension LSUResource.State {
 		.init(
 			isExpanded: isExpanded,
 			iconURL: .init(string: "https://i.ibb.co/KG06168/Screenshot-2023-08-02-at-16-19-29.png")!,
-			numberOfStakes: stakes.count
+			numberOfStakes: account.poolUnitResources.radixNetworkStakes.count
 		)
 	}
 }

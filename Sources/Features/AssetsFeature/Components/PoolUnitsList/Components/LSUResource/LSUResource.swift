@@ -6,7 +6,6 @@ public struct LSUResource: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		var isExpanded: Bool = false
 
-		let stakes: [OnLedgerEntity.Account.RadixNetworkStake]
 		let account: OnLedgerEntity.Account
 		var stakesDetails: IdentifiedArrayOf<LSUStake.State>
 
@@ -44,7 +43,7 @@ public struct LSUResource: Sendable, FeatureReducer {
 			if state.isExpanded {
 				state.isLoadingResources = true
 				return .run { [state = state] send in
-					let result = await TaskResult { try await onLedgerEntitiesClient.getOwnedStakesDetails(account: state.account, state.stakes) }
+					let result = await TaskResult { try await onLedgerEntitiesClient.getOwnedStakesDetails(account: state.account, refresh: false) }
 					await send(.internal(.detailsLoaded(result)))
 				}
 			}

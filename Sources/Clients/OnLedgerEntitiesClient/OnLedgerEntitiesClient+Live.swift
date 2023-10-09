@@ -16,9 +16,7 @@ extension OnLedgerEntitiesClient: DependencyKey {
 
 	public static func live() -> Self {
 		Self(
-			getEntities: { addresses, explicitMetadata, ledgerState in
-				try await getEntities(for: addresses, explicitMetadata, ledgerState: ledgerState)
-			},
+			getEntities: getEntities,
 			getNonFungibleTokenData: getNonFungibleData,
 			getAccountOwnedNonFungibleTokenData: getAccountOwnedNonFungibleTokenData
 		)

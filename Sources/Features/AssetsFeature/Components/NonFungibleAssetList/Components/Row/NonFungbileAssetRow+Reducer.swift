@@ -12,14 +12,16 @@ extension NonFungibleAssetList {
 
 			public let resource: OnLedgerEntity.OwnedNonFungibleResource
 			public let accountAddress: AccountAddress
+
 			public var tokens: [[Loadable<OnLedgerEntity.NonFungibleToken>]] = []
 			public var lastLoadedPageIndex: Int = -1
+			public var lastVisibleRowIndex: Int = 0
 			public var nextPageCursor: String?
 			public var isLoadingResources: Bool = false
+
 			public var isExpanded = false
 			public var disabled: Set<AssetID> = []
 			public var selectedAssets: OrderedSet<OnLedgerEntity.NonFungibleToken>?
-			public var lastVisibleRowIndex: Int = 0
 
 			public init(
 				accountAddress: AccountAddress,
@@ -37,13 +39,11 @@ extension NonFungibleAssetList {
 		public enum ViewAction: Sendable, Equatable {
 			case isExpandedToggled
 			case assetTapped(OnLedgerEntity.NonFungibleToken)
-			case didAppear
 			case onTokenDidAppear(index: Int)
 		}
 
 		public enum DelegateAction: Sendable, Equatable {
 			case open(OnLedgerEntity.NonFungibleToken)
-			case didAppear(ResourceAddress)
 		}
 
 		public enum InternalAction: Sendable, Equatable {
@@ -63,9 +63,6 @@ extension NonFungibleAssetList {
 
 		public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 			switch viewAction {
-			case .didAppear:
-				return .send(.delegate(.didAppear(state.resource.resourceAddress)))
-
 			case let .assetTapped(asset):
 				guard !state.disabled.contains(asset.id) else { return .none }
 

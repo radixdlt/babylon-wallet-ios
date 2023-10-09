@@ -6,6 +6,7 @@ public struct PoolUnitsList: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		var lsuResource: LSUResource.State?
 		var poolUnits: IdentifiedArrayOf<PoolUnit.State> = []
+		let account: OnLedgerEntity.Account
 		var didLoadResource = false
 	}
 
@@ -47,20 +48,13 @@ public struct PoolUnitsList: Sendable, FeatureReducer {
 			guard !state.didLoadResource else {
 				return .none
 			}
-			let ownedPoolUnits = state.poolUnits.map(\.poolUnit)
-			return .run { send in
-				let result = await TaskResult { try await onLedgerEntitiesClient.getPoolUnitsDetail(ownedPoolUnits) }
-				await send(.internal(.loadedResources(result)))
-			}
+			return getOwnedPoolUnitsDetails(state, refresh: false)
+
 		case .refresh:
-			let ownedPoolUnits = state.poolUnits.map(\.poolUnit)
 			state.poolUnits.forEach { unit in
 				state.poolUnits[id: unit.poolUnit.resourcePoolAddress]?.resourceDetails = .loading
 			}
-			return .run { send in
-				let result = await TaskResult { try await onLedgerEntitiesClient.getPoolUnitsDetail(ownedPoolUnits) }
-				await send(.internal(.loadedResources(result)))
-			}
+			return getOwnedPoolUnitsDetails(state, refresh: true)
 		}
 	}
 
@@ -74,6 +68,14 @@ public struct PoolUnitsList: Sendable, FeatureReducer {
 			return .none
 		case .loadedResources:
 			return .none
+		}
+	}
+
+	private func getOwnedPoolUnitsDetails(_ state: State, refresh: Bool) -> Effect<Action> {
+		let account = state.account
+		return .run { send in
+			let result = await TaskResult { try await onLedgerEntitiesClient.getOwnedPoolUnitsDetails(account, refresh: refresh) }
+			await send(.internal(.loadedResources(result)))
 		}
 	}
 }

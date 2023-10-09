@@ -42,9 +42,6 @@ extension NonFungibleAssetList.Row.View {
 				}
 			}
 			.listSectionSeparator(.hidden)
-			.onAppear {
-				viewStore.send(.didAppear)
-			}
 		}
 	}
 
@@ -67,8 +64,8 @@ extension NonFungibleAssetList.Row.View {
 		.padding(.horizontal, .medium1)
 		.frame(height: headerHeight)
 		.background(.app.white)
-		.roundedCorners(viewStore.isExpanded ? .top : .allCorners, radius: .small1)
-		.tokenRowShadow(!viewStore.isExpanded)
+		//	.roundedCorners(viewStore.isExpanded ? .top : .allCorners, radius: .small1)
+		//	.tokenRowShadow(!viewStore.isExpanded)
 		.onTapGesture {
 			viewStore.send(.isExpandedToggled, animation: .easeInOut)
 		}
@@ -137,26 +134,6 @@ extension NonFungibleAssetList.Row.View {
 			.frame(minHeight: headerHeight)
 			.background(.app.white)
 			.onTapGesture { viewStore.send(.assetTapped(asset)) }
-		}
-	}
-}
-
-// #endif
-
-extension OnLedgerEntity.NonFungibleToken {
-	fileprivate var localId: NonFungibleLocalId {
-		id.localId()
-	}
-}
-
-// MARK: - NonFungibleLocalId + Comparable
-extension NonFungibleLocalId: Comparable {
-	public static func < (lhs: Self, rhs: Self) -> Bool {
-		switch (lhs, rhs) {
-		case let (.integer(value: lhs), .integer(value: rhs)):
-			return lhs < rhs
-		case let (lhs, rhs):
-			return lhs.toUserFacingString() < rhs.toUserFacingString()
 		}
 	}
 }

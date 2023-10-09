@@ -180,7 +180,6 @@ public struct AssetsView: Sendable, FeatureReducer {
 				return nil
 			}
 			return .init(
-				stakes: portfolio.poolUnitResources.radixNetworkStakes,
 				account: portfolio,
 				stakesDetails: portfolio.poolUnitResources.radixNetworkStakes.map { stake in
 					LSUStake.State(
@@ -206,7 +205,8 @@ public struct AssetsView: Sendable, FeatureReducer {
 										.nonXrdRowSelected($0.resource.resourceAddress)
 								)
 							}
-					)
+					),
+					account: portfolio
 				)
 			}
 

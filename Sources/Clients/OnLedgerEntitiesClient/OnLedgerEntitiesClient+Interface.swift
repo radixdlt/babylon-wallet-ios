@@ -21,7 +21,7 @@ extension OnLedgerEntitiesClient {
 	public typealias GetNonFungibleTokenData = @Sendable (GetNonFungibleTokenDataRequest) async throws -> [OnLedgerEntity.NonFungibleToken]
 	public typealias GetAccountOwnedNonFungibleTokenData = @Sendable (GetAccountOwnedNonFungibleTokenDataRequest) async throws -> GetAccountOwnedNonFungibleTokenResponse
 
-	public typealias GetEntities = @Sendable ([Address], Set<EntityMetadataKey>, AtLedgerState?) async throws -> [OnLedgerEntity]
+	public typealias GetEntities = @Sendable ([Address], Set<EntityMetadataKey>, AtLedgerState?, _ forceRefresh: Bool) async throws -> [OnLedgerEntity]
 }
 
 // MARK: OnLedgerEntitiesClient.GetNonFungibleTokenDataRequest
@@ -117,16 +117,16 @@ extension OnLedgerEntitiesClient {
 
 extension OnLedgerEntitiesClient {
 	@Sendable
-	public func getEntity(_ address: Address, metadataKeys: Set<EntityMetadataKey>) async throws -> OnLedgerEntity {
-		guard let resource = try await getEntities([address], metadataKeys, nil).first else {
+	public func getEntity(_ address: Address, metadataKeys: Set<EntityMetadataKey>, forceRefresh: Bool = false) async throws -> OnLedgerEntity {
+		guard let resource = try await getEntities([address], metadataKeys, nil, forceRefresh).first else {
 			throw Error.emptyResponse
 		}
 		return resource
 	}
 
 	@Sendable
-	public func getAccounts(_ addresses: [AccountAddress]) async throws -> [OnLedgerEntity.Account] {
-		try await getEntities(addresses.map(\.asGeneral), .resourceMetadataKeys, nil).compactMap(\.account)
+	public func getAccounts(_ addresses: [AccountAddress], forceRefresh: Bool = false) async throws -> [OnLedgerEntity.Account] {
+		try await getEntities(addresses.map(\.asGeneral), .resourceMetadataKeys, nil, forceRefresh).compactMap(\.account)
 	}
 
 	@Sendable
@@ -138,8 +138,13 @@ extension OnLedgerEntitiesClient {
 	}
 
 	@Sendable
-	public func getResources(_ addresses: [ResourceAddress], metadataKeys: Set<EntityMetadataKey> = .resourceMetadataKeys, atLedgerState: AtLedgerState? = nil) async throws -> [OnLedgerEntity.Resource] {
-		try await getEntities(addresses.map(\.asGeneral), metadataKeys, atLedgerState).compactMap(\.resource)
+	public func getResources(
+		_ addresses: [ResourceAddress],
+		metadataKeys: Set<EntityMetadataKey> = .resourceMetadataKeys,
+		atLedgerState: AtLedgerState? = nil,
+		forceRefresh: Bool = false
+	) async throws -> [OnLedgerEntity.Resource] {
+		try await getEntities(addresses.map(\.asGeneral), metadataKeys, atLedgerState, forceRefresh).compactMap(\.resource)
 	}
 
 	@Sendable

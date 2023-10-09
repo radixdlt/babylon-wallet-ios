@@ -32,7 +32,7 @@ extension OnLedgerEntitiesClient {
 			atLedgerState: ledgerState,
 			metadata: .init(item.explicitMetadata),
 			fungibleResources: filteredFungibleResources.sorted(),
-			nonFungibleResources: filteredNonFungibleResources,
+			nonFungibleResources: filteredNonFungibleResources.sorted(),
 			poolUnitResources: poolUnitResources.nonEmpty
 		)
 	}
@@ -255,17 +255,22 @@ extension OnLedgerEntitiesClient {
 			)
 		}.sorted() ?? []
 	}
+}
 
+extension OnLedgerEntitiesClient {
+	/// This loads all of the related pool unit details required by the Pool units screen.
+	/// We don't do any pagination there(yet), since the number of owned pools will not be big, this can be revised in the future.
 	@Sendable
-	public func getPoolUnitsDetail(_ ownedPoolUnits: [OnLedgerEntity.Account.PoolUnit]) async throws -> [OwnedResourcePoolDetails] {
-		let pools = try await getEntities(ownedPoolUnits.map(\.resourcePoolAddress.asGeneral), [], nil).compactMap(\.resourcePool)
+	public func getOwnedPoolUnitsDetails(_ account: OnLedgerEntity.Account, refresh: Bool = false) async throws -> [OwnedResourcePoolDetails] {
+		let ownedPoolUnits = account.poolUnitResources.poolUnits
+		let pools = try await getEntities(ownedPoolUnits.map(\.resourcePoolAddress.asGeneral), [], account.atLedgerState, refresh).compactMap(\.resourcePool)
 		let allResourceAddresses = pools.flatMap { pool in
 			[pool.poolUnitResourceAddress] +
 				pool.resources.nonXrdResources.map(\.resourceAddress) +
 				(pool.resources.xrdResource.map { [$0.resourceAddress] } ?? [])
 		}
 
-		let allResources = try await getResources(allResourceAddresses, atLedgerState: nil)
+		let allResources = try await getResources(allResourceAddresses, atLedgerState: account.atLedgerState, forceRefresh: refresh)
 
 		return ownedPoolUnits.compactMap { ownedPoolUnit -> OwnedResourcePoolDetails? in
 			guard let pool = pools.first(where: { $0.address == ownedPoolUnit.resourcePoolAddress }) else {
@@ -305,13 +310,16 @@ extension OnLedgerEntitiesClient {
 		}
 	}
 
-	public func getOwnedStakesDetails(account: OnLedgerEntity.Account, _ ownedStakes: [OnLedgerEntity.Account.RadixNetworkStake]) async throws -> [OwnedStakeDetails] {
-		let validators = try await getEntities(ownedStakes.map(\.validatorAddress.asGeneral), .resourceMetadataKeys, account.atLedgerState).compactMap(\.validator)
+	/// This loads all of the related stake unit details required by the Pool Units screen.
+	/// We don't do any pagination there(yet), since the number of owned stakes will not be big, this can be revised in the future.
+	public func getOwnedStakesDetails(account: OnLedgerEntity.Account, refresh: Bool = false) async throws -> [OwnedStakeDetails] {
+		let ownedStakes = account.poolUnitResources.radixNetworkStakes
+		let validators = try await getEntities(ownedStakes.map(\.validatorAddress.asGeneral), .resourceMetadataKeys, account.atLedgerState, refresh).compactMap(\.validator)
 		let resourceAddresses = ownedStakes.flatMap {
 			$0.stakeUnitResource.asArray(\.resourceAddress) + $0.stakeClaimResource.asArray(\.resourceAddress)
 		}
 
-		let resourceDetails = try await getResources(resourceAddresses, atLedgerState: account.atLedgerState)
+		let resourceDetails = try await getResources(resourceAddresses, atLedgerState: account.atLedgerState, forceRefresh: refresh)
 
 		return try await ownedStakes.asyncCompactMap { stake -> OwnedStakeDetails? in
 			guard let validatorDetails = validators.first(where: { $0.address == stake.validatorAddress }) else {
@@ -385,15 +393,6 @@ extension OnLedgerEntity.Account.PoolUnitResources {
 		}
 
 		return .init(radixNetworkStakes: stakes, poolUnits: poolUnits)
-	}
-}
-
-extension Optional {
-	func asArray<T>(_ keyPath: KeyPath<Wrapped, T>) -> [T] {
-		if let wrapped = self {
-			return [wrapped[keyPath: keyPath]]
-		}
-		return []
 	}
 }
 
@@ -483,7 +482,6 @@ extension Array where Element == OnLedgerEntity.OwnedNonFungibleResource {
 }
 
 extension GatewayAPI.ComponentEntityRoleAssignments {
-	// FIXME: This logic should not be here, will probably move to OnLedgerEntitiesClient.
 	@Sendable public func extractBehaviors() -> [AssetBehavior] {
 		typealias ParsedName = GatewayAPI.RoleKey.ParsedName
 
@@ -570,5 +568,14 @@ extension GatewayAPI.ComponentEntityRoleAssignments {
 		substitute([.supplyIncreasable, .supplyDecreasable], with: .supplyFlexible)
 
 		return result.sorted()
+	}
+}
+
+extension Optional {
+	func asArray<T>(_ keyPath: KeyPath<Wrapped, T>) -> [T] {
+		if let wrapped = self {
+			return [wrapped[keyPath: keyPath]]
+		}
+		return []
 	}
 }

@@ -78,9 +78,6 @@ extension AssetsView {
 					Color.app.gray5
 						.ignoresSafeArea(edges: .bottom)
 				}
-				.onAppear(perform: {
-					print("Assets view did appear")
-				})
 				.onFirstTask { @MainActor in
 					viewStore.send(.task)
 				}
@@ -114,24 +111,3 @@ extension AssetsView {
 		}
 	}
 }
-
-#if DEBUG
-import SwiftUI // NB: necessary for previews to appear
-
-struct AssetsView_Preview: PreviewProvider {
-	static var previews: some View {
-		AssetsView.View(
-			store: .init(
-				initialState: .init(
-					account: .previewValue0,
-					fungibleTokenList: .init(),
-					nonFungibleTokenList: .init(rows: []),
-					poolUnitsList: .init(),
-					mode: .normal
-				),
-				reducer: AssetsView.init
-			)
-		)
-	}
-}
-#endif
