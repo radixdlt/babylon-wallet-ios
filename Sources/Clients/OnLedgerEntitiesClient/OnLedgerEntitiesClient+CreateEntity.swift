@@ -140,8 +140,8 @@ extension OnLedgerEntitiesClient {
 			return candidate
 		}
 
-		let stakeAndPoolAddresses = stakeUnitCandidates.compactMap(\.metadata.validator?.address)
-			+ stakeClaimNFTCandidates.compactMap(\.metadata.validator?.address)
+		let stakeAndPoolAddresses = stakeUnitCandidates.compactMap(\.metadata.validator)
+			+ stakeClaimNFTCandidates.compactMap(\.metadata.validator)
 			+ poolUnitCandidates.compactMap(\.metadata.poolUnit?.address)
 
 		guard !stakeAndPoolAddresses.isEmpty else {
@@ -149,7 +149,7 @@ extension OnLedgerEntitiesClient {
 		}
 
 		let entities = try await getEntities(
-			for: Array(stakeAndPoolAddresses.uniqued()),
+			for: Array(stakeAndPoolAddresses.uniqued()).map(\.asGeneral.cachingIdentifier),
 			[],
 			ledgerState: ledgerState
 		)
@@ -159,7 +159,7 @@ extension OnLedgerEntitiesClient {
 		let stakeUnits = validators.compactMap { validator -> OnLedgerEntity.Account.RadixNetworkStake? in
 			let stakeUnit = matchPoolUnitCandidate(
 				for: validator.stakeUnitResourceAddress,
-				itemAddress: validator.address.asGeneral(),
+				itemAddress: validator.address.asGeneral,
 				candidates: stakeUnitCandidates,
 				metadataAddressMatch: \.validator?.address
 			)
@@ -196,7 +196,7 @@ extension OnLedgerEntitiesClient {
 		let poolUnits = resourcesPools.compactMap { pool -> OnLedgerEntity.Account.PoolUnit? in
 			let poolUnitResource = matchPoolUnitCandidate(
 				for: pool.poolUnitResourceAddress,
-				itemAddress: pool.address.asGeneral(),
+				itemAddress: pool.address.asGeneral,
 				candidates: poolUnitCandidates,
 				metadataAddressMatch: \.poolUnit?.address
 			)
@@ -246,7 +246,7 @@ extension OnLedgerEntitiesClient {
 
 	@Sendable
 	public func getPoolUnitsDetail(_ ownedPoolUnits: [OnLedgerEntity.Account.PoolUnit]) async throws -> [OwnedResourcePoolDetails] {
-		let pools = try await getEntities(ownedPoolUnits.map { $0.resourcePoolAddress.asGeneral() }, [], nil).compactMap(\.resourcePool)
+		let pools = try await getEntities(ownedPoolUnits.map(\.resourcePoolAddress.asGeneral), [], nil).compactMap(\.resourcePool)
 		let allResourceAddresses = pools.flatMap { pool in
 			[pool.poolUnitResourceAddress] +
 				pool.resources.nonXrdResources.map(\.resourceAddress) +
@@ -294,7 +294,7 @@ extension OnLedgerEntitiesClient {
 	}
 
 	public func getOwnedStakesDetails(account: OnLedgerEntity.Account, _ ownedStakes: [OnLedgerEntity.Account.RadixNetworkStake]) async throws -> [OwnedStakeDetails] {
-		let validators = try await getEntities(ownedStakes.map { $0.validatorAddress.asGeneral() }, .resourceMetadataKeys, account.atLedgerState).compactMap(\.validator)
+		let validators = try await getEntities(ownedStakes.map(\.validatorAddress.asGeneral), .resourceMetadataKeys, account.atLedgerState).compactMap(\.validator)
 		let resourceAddresses = ownedStakes.flatMap {
 			$0.stakeUnitResource.asArray(\.resourceAddress) + $0.stakeClaimResource.asArray(\.resourceAddress)
 		}

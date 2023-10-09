@@ -28,9 +28,16 @@ extension AccountPortfoliosClient: DependencyKey {
 		let state = State()
 
 		@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
+		@Dependency(\.cacheClient) var cacheClient
 
 		return AccountPortfoliosClient(
-			fetchAccountPortfolios: { accountAddresses, _ in
+			fetchAccountPortfolios: { accountAddresses, forceRefresh in
+				if forceRefresh {
+					accountAddresses.forEach {
+						cacheClient.removeFolder(.onLedgerEntity(.account($0.asGeneral)))
+					}
+				}
+
 				let accounts = try await onLedgerEntitiesClient.getAccounts(accountAddresses)
 
 				// Update the current account portfolios

@@ -20,9 +20,9 @@ extension ROLAClient {
 			let entityAddress: Address = {
 				switch entity {
 				case let .account(account):
-					return account.address.asGeneral()
+					return account.address.asGeneral
 				case let .persona(persona):
-					return persona.address.asGeneral()
+					return persona.address.asGeneral
 				}
 			}()
 			let metadata = try await onLedgerEntitiesClient.getEntity(entityAddress, metadataKeys: [.ownerKeys]).genericComponent?.metadata

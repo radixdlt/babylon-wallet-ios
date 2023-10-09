@@ -9,8 +9,6 @@ import SharedModels
 /// With a refactor, this can potentially also load the Accounts and then link its resources to the general info about resources.
 public struct OnLedgerEntitiesClient: Sendable {
 	public let getEntities: GetEntities
-	/// Refresh the specific resources
-	public let refreshEntities: RefreshEntities
 	/// Retrieve the token data associated with the given non fungible ids
 	public let getNonFungibleTokenData: GetNonFungibleTokenData
 
@@ -24,13 +22,9 @@ public struct OnLedgerEntitiesClient: Sendable {
 
 // MARK: - OnLedgerEntitiesClient.GetResources
 extension OnLedgerEntitiesClient {
-	public typealias GetResources = @Sendable ([ResourceAddress]) async throws -> [OnLedgerEntity.Resource]
-	public typealias GetResource = @Sendable (ResourceAddress) async throws -> OnLedgerEntity.Resource
 	public typealias GetNonFungibleTokenData = @Sendable (GetNonFungibleTokenDataRequest) async throws -> [OnLedgerEntity.NonFungibleToken]
-	public typealias RefreshEntities = @Sendable ([Address]) async throws -> Void
 	public typealias GetAccountOwnedNonFungibleResourceIds = @Sendable (GetAccountOwnedNonFungibleResourceIdsRequest) async throws -> OnLedgerEntity.AccountNonFungibleIdsPage
 	public typealias GetAccountOwnedNonFungibleTokenData = @Sendable (GetAccountOwnedNonFungibleTokenDataRequest) async throws -> [OnLedgerEntity.NonFungibleToken]
-	public typealias GetAccounts = @Sendable ([AccountAddress]) async throws -> [OnLedgerEntity.Account]
 
 	public typealias GetEntities = @Sendable ([Address], Set<EntityMetadataKey>, AtLedgerState?) async throws -> [OnLedgerEntity]
 }
@@ -128,12 +122,12 @@ extension OnLedgerEntitiesClient {
 
 	@Sendable
 	public func getAccounts(_ addresses: [AccountAddress]) async throws -> [OnLedgerEntity.Account] {
-		try await getEntities(addresses.map { $0.asGeneral() }, .resourceMetadataKeys, nil).compactMap(\.account)
+		try await getEntities(addresses.map(\.asGeneral), .resourceMetadataKeys, nil).compactMap(\.account)
 	}
 
 	@Sendable
 	public func getAccount(_ address: AccountAddress, metadataKeys: Set<EntityMetadataKey>) async throws -> OnLedgerEntity.Account {
-		guard let account = try await getEntity(address.asGeneral(), metadataKeys: metadataKeys).account else {
+		guard let account = try await getEntity(address.asGeneral, metadataKeys: metadataKeys).account else {
 			throw Error.emptyResponse
 		}
 		return account
@@ -141,7 +135,7 @@ extension OnLedgerEntitiesClient {
 
 	@Sendable
 	public func getResources(_ addresses: [ResourceAddress], metadataKeys: Set<EntityMetadataKey> = .resourceMetadataKeys, atLedgerState: AtLedgerState? = nil) async throws -> [OnLedgerEntity.Resource] {
-		try await getEntities(addresses.map { $0.asGeneral() }, metadataKeys, atLedgerState).compactMap(\.resource)
+		try await getEntities(addresses.map(\.asGeneral), metadataKeys, atLedgerState).compactMap(\.resource)
 	}
 
 	@Sendable
@@ -155,7 +149,7 @@ extension OnLedgerEntitiesClient {
 	/// Extracts the dApp definition address from a component, if one is present
 	@Sendable
 	public func getDappDefinitionAddress(_ component: ComponentAddress) async throws -> DappDefinitionAddress {
-		let entityMetadata = try await getEntity(component.asGeneral(), metadataKeys: [.dappDefinition]).genericComponent?.metadata
+		let entityMetadata = try await getEntity(component.asGeneral, metadataKeys: [.dappDefinition]).genericComponent?.metadata
 
 		guard let dappDefinitionAddress = entityMetadata?.dappDefinition else {
 			throw OnLedgerEntity.Metadata.MetadataError.missingDappDefinition

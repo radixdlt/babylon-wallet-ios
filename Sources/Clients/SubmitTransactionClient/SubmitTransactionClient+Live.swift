@@ -119,6 +119,7 @@ extension SubmitTransactionClient: DependencyKey {
 			@Dependency(\.transactionClient) var transactionClient
 			@Dependency(\.accountPortfoliosClient) var accountPortfoliosClient
 			@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
+			@Dependency(\.cacheClient) var cacheClient
 
 			let changedAccounts: [Profile.Network.Account.EntityAddress]?
 			let resourceAddressesToRefresh: [ResourceAddress]?
@@ -166,7 +167,9 @@ extension SubmitTransactionClient: DependencyKey {
 				try await hasTXBeenCommittedSuccessfully(txID)
 
 				if let resourceAddressesToRefresh {
-					try await onLedgerEntitiesClient.refreshEntities(resourceAddressesToRefresh.map { $0.asGeneral() })
+					resourceAddressesToRefresh.forEach {
+						cacheClient.removeFile(.onLedgerEntity(.resource($0.asGeneral)))
+					}
 				}
 
 				if let changedAccounts {

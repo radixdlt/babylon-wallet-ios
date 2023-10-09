@@ -17,10 +17,7 @@ extension OnLedgerEntitiesClient: DependencyKey {
 	public static func live() -> Self {
 		Self(
 			getEntities: { addresses, explicitMetadata, ledgerState in
-				try await getEntities(for: addresses.map(\.address), explicitMetadata, ledgerState: ledgerState)
-			},
-			refreshEntities: {
-				_ = try await getEntities(for: $0.map(\.address), .resourceMetadataKeys, ledgerState: nil, forceRefresh: true)
+				try await getEntities(for: addresses, explicitMetadata, ledgerState: ledgerState)
 			},
 			getNonFungibleTokenData: getNonFungibleData,
 			getAccountOwnedNonFungibleResourceIds: getNonFungibleResourceIds,
@@ -39,19 +36,28 @@ extension AtLedgerState {
 extension OnLedgerEntitiesClient {
 	@Sendable
 	@discardableResult
-	static func getEntities(for addresses: [String], _ explicitMetadata: Set<EntityMetadataKey>, ledgerState: AtLedgerState?, forceRefresh: Bool = false) async throws -> [OnLedgerEntity] {
-		try await fetchEntitiesWithCaching(for: addresses, forceRefresh: forceRefresh, refresh: fetchEntites(explicitMetadata, ledgerState: ledgerState))
+	static func getEntities(for addresses: [Address], _ explicitMetadata: Set<EntityMetadataKey>, ledgerState: AtLedgerState?, forceRefresh: Bool = false) async throws -> [OnLedgerEntity] {
+		try await fetchEntitiesWithCaching(
+			for: addresses.map(\.cachingIdentifier),
+			forceRefresh: forceRefresh,
+			refresh: fetchEntites(explicitMetadata, ledgerState: ledgerState)
+		)
 	}
 
 	@Sendable
 	static func getNonFungibleData(_ request: GetNonFungibleTokenDataRequest) async throws -> [OnLedgerEntity.NonFungibleToken] {
 		try await fetchEntitiesWithCaching(
-			for: request.nonFungibleIds.map { $0.asStr() },
-			refresh: {
+			for: request.nonFungibleIds.map { .nonFungibleData($0) },
+			refresh: { identifiers in
 				try await fetchNonFungibleData(.init(
 					atLedgerState: request.atLedgerState,
 					resource: request.resource,
-					nonFungibleIds: $0.map { try NonFungibleGlobalId(nonFungibleGlobalId: $0) }
+					nonFungibleIds: identifiers.compactMap {
+						if case let .nonFungibleData(id) = $0 {
+							return id
+						}
+						return nil
+					}
 				))
 			}
 		)
@@ -64,11 +70,14 @@ extension OnLedgerEntitiesClient {
 	) async throws -> OnLedgerEntity.AccountNonFungibleIdsPage {
 		@Dependency(\.cacheClient) var cacheClient
 
-		let identifier = request.cachingIdentifier
-
+		let cachingIdentifier = CacheClient.Entry.onLedgerEntity(.nonFungibleIdPage(
+			request.accountAddress.asGeneral,
+			request.resourceAddress.asGeneral,
+			request.pageCursor
+		))
 		let cached = try? cacheClient.load(
 			OnLedgerEntity.self,
-			.onLedgerEntity(identifier: identifier)
+			cachingIdentifier
 		) as? OnLedgerEntity
 
 		if let cached = cached?.accountNonFungibleIds {
@@ -101,7 +110,7 @@ extension OnLedgerEntitiesClient {
 			pageCursor: request.pageCursor,
 			nextPageCursor: freshPage.nextCursor
 		)
-		cacheClient.save(response, .onLedgerEntity(identifier: identifier))
+		cacheClient.save(response, cachingIdentifier)
 		return response
 	}
 
@@ -170,21 +179,21 @@ extension OnLedgerEntitiesClient {
 
 	@Sendable
 	static func fetchEntitiesWithCaching(
-		for identifiers: [String],
+		for identifiers: [CacheClient.Entry.OnLedgerEntity],
 		forceRefresh: Bool = false,
-		refresh: (_ identifiers: [String]) async throws -> [OnLedgerEntity]
+		refresh: (_ identifiers: [CacheClient.Entry.OnLedgerEntity]) async throws -> [OnLedgerEntity]
 	) async throws -> [OnLedgerEntity] {
 		@Dependency(\.cacheClient) var cacheClient
 
 		if forceRefresh {
 			let freshEntities = try await refresh(Array(identifiers))
 			freshEntities.forEach {
-				cacheClient.save($0, .onLedgerEntity(identifier: $0.cachingIdentifier))
+				cacheClient.save($0, .onLedgerEntity($0.cachingIdentifier))
 			}
 			return freshEntities
 		} else {
 			let cachedEntities = identifiers.compactMap {
-				try? cacheClient.load(OnLedgerEntity.self, .onLedgerEntity(identifier: $0)) as? OnLedgerEntity
+				try? cacheClient.load(OnLedgerEntity.self, .onLedgerEntity($0)) as? OnLedgerEntity
 			}
 
 			let notCachedEntities = Set(identifiers).subtracting(Set(cachedEntities.map(\.cachingIdentifier)))
@@ -194,7 +203,7 @@ extension OnLedgerEntitiesClient {
 
 			let freshEntities = try await refresh(Array(notCachedEntities))
 			freshEntities.forEach {
-				cacheClient.save($0, .onLedgerEntity(identifier: $0.cachingIdentifier))
+				cacheClient.save($0, .onLedgerEntity($0.cachingIdentifier))
 			}
 
 			return cachedEntities + freshEntities
@@ -202,15 +211,22 @@ extension OnLedgerEntitiesClient {
 	}
 
 	@Sendable
-	static func fetchEntites(_ explicitMetadta: Set<EntityMetadataKey>, ledgerState: AtLedgerState?) -> (_ addresses: [String]) async throws -> [OnLedgerEntity] {
-		{ addresses in
-			guard !addresses.isEmpty else {
+	static func fetchEntites(
+		_ explicitMetadta: Set<EntityMetadataKey>,
+		ledgerState: AtLedgerState?
+	) -> (_ entities: [CacheClient.Entry.OnLedgerEntity]) async throws -> [OnLedgerEntity] {
+		{ entities in
+			guard !entities.isEmpty else {
 				return []
 			}
 
 			@Dependency(\.gatewayAPIClient) var gatewayAPIClient
 
-			let response = try await gatewayAPIClient.getEntityDetails(addresses, explicitMetadta, ledgerState?.selector)
+			let response = try await gatewayAPIClient.getEntityDetails(
+				entities.map(\.address.address),
+				explicitMetadta,
+				ledgerState?.selector
+			)
 			return try await response.items.asyncCompactMap { item in
 				let allFungibles = try await gatewayAPIClient.fetchAllFungibleResources(item, ledgerState: response.ledgerState)
 				let allNonFungibles = try await gatewayAPIClient.fetchAllNonFungibleResources(item, ledgerState: response.ledgerState)
@@ -324,33 +340,63 @@ extension OnLedgerEntity.NonFungibleToken.NFTData.Value {
 }
 
 extension OnLedgerEntity {
-	var cachingIdentifier: String {
+	var cachingIdentifier: CacheClient.Entry.OnLedgerEntity {
 		switch self {
 		case let .resource(resource):
-			return resource.resourceAddress.address
+			return .resource(resource.resourceAddress.asGeneral)
 		case let .nonFungibleToken(nonFungibleToken):
-			return nonFungibleToken.id.asStr()
+			return .nonFungibleData(nonFungibleToken.id)
 		case let .accountNonFungibleIds(idsPage):
-			return nonFungibleResourceIdsCachingIdentifier(idsPage.accountAddress, resourceAddress: idsPage.resourceAddress, pageCursor: idsPage.pageCursor)
+			return .nonFungibleIdPage(idsPage.accountAddress.asGeneral, idsPage.resourceAddress.asGeneral, idsPage.pageCursor)
 		case let .account(account):
-			return account.address.address
+			return .account(account.address.asGeneral)
 		case let .resourcePool(resourcePool):
-			return resourcePool.address.address
+			return .resourcePool(resourcePool.address.asGeneral)
 		case let .validator(validator):
-			return validator.address.address
+			return .validator(validator.address.asGeneral)
 		case let .genericComponent(component):
-			return component.address.address
+			return .genericComponent(component.address.asGeneral)
 		}
 	}
 }
 
-private func nonFungibleResourceIdsCachingIdentifier(_ accountAddress: AccountAddress, resourceAddress: ResourceAddress, pageCursor: String?) -> String {
-	"NonFungibleResourceIds-" + accountAddress.address + "-" + resourceAddress.address + (pageCursor.map { "- \($0)" } ?? "")
+extension CacheClient.Entry.OnLedgerEntity {
+	var address: Address {
+		switch self {
+		case let .resource(resource):
+			return resource.asGeneral
+		case let .account(account):
+			return account.asGeneral
+		case let .resourcePool(resourcePool):
+			return resourcePool.asGeneral
+		case let .validator(validator):
+			return validator.asGeneral
+		case let .genericComponent(genericComponent):
+			return genericComponent.asGeneral
+		case let .nonFungibleData(nonFungibleId):
+			return .init(address: nonFungibleId.resourceAddress().asStr(), decodedKind: .globalNonFungibleResourceManager)
+		case let .nonFungibleIdPage(_, resourceAddress, _):
+			return resourceAddress.asGeneral
+		}
+	}
 }
 
-extension OnLedgerEntitiesClient.GetAccountOwnedNonFungibleResourceIdsRequest {
-	var cachingIdentifier: String {
-		nonFungibleResourceIdsCachingIdentifier(accountAddress, resourceAddress: resourceAddress, pageCursor: pageCursor)
+extension Address {
+	var cachingIdentifier: CacheClient.Entry.OnLedgerEntity {
+		switch self.decodedKind {
+		case _ where AccountEntityType.addressSpace.contains(self.decodedKind):
+			return .account(self)
+		case _ where ResourceEntityType.addressSpace.contains(self.decodedKind):
+			return .resource(self)
+		case _ where ResourcePoolEntityType.addressSpace.contains(self.decodedKind):
+			return .resourcePool(self)
+		case _ where ValidatorEntityType.addressSpace.contains(self.decodedKind):
+			return .validator(self)
+		case _ where ComponentEntityType.addressSpace.contains(self.decodedKind):
+			return .genericComponent(self)
+		default:
+			return .genericComponent(self)
+		}
 	}
 }
 

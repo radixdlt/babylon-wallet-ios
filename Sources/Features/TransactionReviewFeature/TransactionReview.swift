@@ -599,7 +599,7 @@ extension TransactionReview {
 		var manifest = state.transactionManifest
 		if let feePayerSelection = state.reviewedTransaction?.feePayerSelection, let feePayer = feePayerSelection.selected {
 			manifest = try manifest.withLockFeeCallMethodAdded(
-				address: feePayer.account.address.asGeneral(),
+				address: feePayer.account.address.asGeneral,
 				fee: feePayerSelection.transactionFee.totalFee.lockFee
 			)
 		}
