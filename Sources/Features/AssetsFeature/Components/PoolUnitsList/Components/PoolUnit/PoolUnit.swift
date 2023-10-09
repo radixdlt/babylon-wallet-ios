@@ -64,13 +64,6 @@ public struct PoolUnit: Sendable, FeatureReducer {
 				action: /Action.child .. ChildAction.destination,
 				destination: Destinations.init
 			)
-			.onChange(of: \.isDataLoaded) { _, _ in
-				Reduce { _, _ in
-					.run { send in
-						await send(.view(.didTap))
-					}
-				}
-			}
 	}
 
 	public func reduce(

@@ -32,9 +32,6 @@ extension PoolUnit {
 								.textStyle(.secondaryHeader)
 						}
 						.padding(-.small3)
-						if refresh != nil {
-							Text("refreshing")
-						}
 						loadable(viewStore.resources) { resources in
 							HStack {
 								PoolUnitResourcesView(resources: resources)

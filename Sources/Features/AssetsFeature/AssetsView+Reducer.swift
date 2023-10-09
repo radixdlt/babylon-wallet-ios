@@ -125,9 +125,8 @@ public struct AssetsView: Sendable, FeatureReducer {
 			state.activeAssetKind = kind
 			return .none
 		case .pullToRefreshStarted:
-			return .run { [address = state.account.address] send in
+			return .run { [address = state.account.address] _ in
 				_ = try await accountPortfoliosClient.fetchAccountPortfolio(address, true)
-				await send(.child(.poolUnitsList(.view(.refresh))))
 			} catch: { error, _ in
 				loggerGlobal.error("AssetsView fetch failed: \(error)")
 			}
@@ -145,7 +144,9 @@ public struct AssetsView: Sendable, FeatureReducer {
 			state.fungibleTokenList = resourcesState.fungibleTokenList
 			state.nonFungibleTokenList = resourcesState.nonFungibleTokenList
 			state.poolUnitsList = resourcesState.poolUnitsList
-			return .none
+			return .run { send in
+				await send(.child(.poolUnitsList(.view(.refresh))))
+			}
 		}
 	}
 
