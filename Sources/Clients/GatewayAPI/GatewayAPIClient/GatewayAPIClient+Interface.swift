@@ -182,6 +182,8 @@ extension GatewayAPI.RoleKey {
 		case recaller
 		case freezer
 		case nonFungibleDataUpdater = "non_fungible_data_updater"
+		case metadataLocker = "metadata_locker"
+		case metadataSetter = "metadata_setter"
 
 		case minterUpdater = "minter_updater"
 		case burnerUpdater = "burner_updater"
@@ -190,6 +192,8 @@ extension GatewayAPI.RoleKey {
 		case recallerUpdater = "recaller_updater"
 		case freezerUpdater = "freezer_updater"
 		case nonFungibleDataUpdaterUpdater = "non_fungible_data_updater_updater"
+		case metadataLockerUpdater = "metadata_locker_updater"
+		case metadataSetterUpdater = "metadata_setter_updater"
 	}
 }
 

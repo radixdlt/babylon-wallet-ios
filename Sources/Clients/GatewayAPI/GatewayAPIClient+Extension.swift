@@ -273,6 +273,7 @@ extension GatewayAPI.ComponentEntityRoleAssignments {
 		addBehavior(for: .recaller, ifSomeone: .removableByThirdParty, ifAnyone: .removableByAnyone)
 		addBehavior(for: .freezer, ifSomeone: .freezableByThirdParty, ifAnyone: .freezableByAnyone)
 		addBehavior(for: .nonFungibleDataUpdater, ifSomeone: .nftDataChangeable, ifAnyone: .nftDataChangeableByAnyone)
+		addBehavior(for: .metadataSetter, ifSomeone: .informationChangeable, ifAnyone: .informationChangeableByAnyone)
 
 		// If there are no special behaviors, that means it's a "simple asset"
 		if result.isEmpty {
