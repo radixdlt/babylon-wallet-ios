@@ -232,42 +232,12 @@ extension GatewayAPI.ComponentEntityRoleAssignments {
 			let rule = dict["rule"] as Any
 			guard let explicit = ParsedAssignment.Explicit(rule) else { return .unknown }
 
-			print(" RESOLVING OWNER TO", Assigned(explicit))
-
 			return .init(explicit)
 		}
 
-		print("• OWNER: \(self.owner)")
-
-		struct Owner {
-			let rule: Rule
-			let updater: String
-
-			struct Rule {
-				let type: String
-				let accessRule: AccessRule
-
-				enum RuleType {
-					case protected
-				}
-
-				struct AccessRule {
-					let type: String
-					let proofRule: ProofRule
-
-					struct ProofRule {
-						let type: String
-						let requirement: AnyCodable
-					}
-				}
-			}
-		}
-
 		func performer(_ name: GatewayAPI.RoleKey.ParsedName) -> Assigned {
-			guard let assignment = findEntry(name)?.parsedAssignment else { return .unknown }
-			print(" performer", assignment)
-
-			switch assignment {
+			guard let parsed = findEntry(name)?.parsedAssignment else { return .unknown }
+			switch parsed {
 			case .owner:
 				return resolvedOwner()
 			case let .explicit(explicit):
@@ -276,19 +246,18 @@ extension GatewayAPI.ComponentEntityRoleAssignments {
 		}
 
 		func updaters(_ name: GatewayAPI.RoleKey.ParsedName) -> Assigned {
-			guard let updaters = findEntry(name)?.updaterRoles, !updaters.isEmpty else { return .none }
-			print(" updaters", updaters)
+			guard let updaters = findEntry(name)?.updaterRoles, !updaters.isEmpty else { return .unknown }
 
 			// Lookup the corresponding assignments, ignoring unknown and empty values
-			let updaterAssignments = Set(updaters.compactMap(\.parsedName).compactMap(findEntry).compactMap(\.parsedAssignment))
+			let parsed = Set(updaters.compactMap(\.parsedName).compactMap(findEntry).compactMap(\.parsedAssignment))
 
-			if updaterAssignments.isEmpty {
+			if parsed.isEmpty {
 				return .unknown
-			} else if updaterAssignments == [.explicit(.denyAll)] {
+			} else if parsed == [.explicit(.denyAll)] {
 				return .none
-			} else if updaterAssignments.contains(.explicit(.allowAll)) {
+			} else if parsed.contains(.explicit(.allowAll)) {
 				return .anyone
-			} else if updaterAssignments == [.owner] {
+			} else if parsed == [.owner] {
 				return resolvedOwner()
 			} else {
 				return .someone
