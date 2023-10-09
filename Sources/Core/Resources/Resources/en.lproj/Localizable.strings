@@ -137,6 +137,8 @@
 "accountSettings_behaviors_informationChangeableByAnyone" = "Anyone can change naming and information about this asset.";
 "accountSettings_behaviors_removableByThirdParty" = "A third party can remove this asset from accounts and dApps.";
 "accountSettings_behaviors_removableByAnyone" = "Anyone can remove this asset from accounts and dApps.";
+"accountSettings_behaviors_freezableByThirdParty" = "A third party can freeze this asset in place.";
+"accountSettings_behaviors_freezableByAnyone" = "Anyone can freeze this asset in place.";
 "accountSettings_behaviors_nftDataChangeable" = "Data that is set on these NFTs can be changed.";
 "accountSettings_behaviors_nftDataChangeableByAnyone" = "Anyone can change data that is set on these NFTs.";
 "settings_title" = "Settings";
