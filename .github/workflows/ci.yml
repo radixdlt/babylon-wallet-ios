@@ -13,6 +13,9 @@ concurrency:
 jobs:
 
   snyk_scan:
+    permissions:
+      id-token: write
+      contents: read
     name: "Snyk scan"
     runs-on: ubuntu-latest
     steps:
@@ -20,19 +23,30 @@ jobs:
       - uses: actions/setup-node@v2
         with:
           node-version: '14'
+      - uses: radixdlt/public-iac-resuable-artifacts/fetch-secrets@main
+        with:
+          role_name: ${{ secrets.GH_COMMON_SECRETS_READ_ACCESS }}
+          app_name: 'babylon-wallet-ios'
+          step_name: 'snyk-scan'
+          secret_prefix: 'SNYK'
+          secret_name: ${{ secrets.AWS_SECRET_NAME_SNYK }}
+          parse_json: true
       - name: Install snyk
         run: |
           npm install snyk -g
           snyk -v
-          snyk auth ${{ secrets.SNYK_TOKEN }}
+          snyk auth ${{ env.SNYK_TOKEN }}
       - name: Snyk deps and licences scan
         run: |
-          snyk test --all-projects --org=${{ secrets.SNYK_ORG_ID }} --severity-threshold=high
+          snyk test --all-projects --org=${{ env.SNYK_COREAPPS_ORG_ID }} --severity-threshold=high
       - name: Snyk code scan
         run: |
-          snyk code test --all-projects --org=${{ secrets.SNYK_ORG_ID }} --severity-threshold=high
+          snyk code test --all-projects --org=${{ env.SNYK_COREAPPS_ORG_ID }} --severity-threshold=high
 
   snyk_sbom:
+    permissions:
+      id-token: write
+      contents: read
     name: "Snyk SBOM"
     runs-on: ubuntu-latest
     needs:
@@ -42,19 +56,42 @@ jobs:
       - uses: actions/setup-node@v2
         with:
           node-version: '14'
+      - uses: radixdlt/public-iac-resuable-artifacts/fetch-secrets@main
+        with:
+          role_name: ${{ secrets.GH_COMMON_SECRETS_READ_ACCESS }}
+          app_name: 'babylon-wallet-ios'
+          step_name: 'snyk_sbom'
+          secret_prefix: 'SNYK'
+          secret_name: ${{ secrets.AWS_SECRET_NAME_SNYK }}
+          parse_json: true
+      - uses: radixdlt/public-iac-resuable-artifacts/fetch-secrets@main
+        with:
+          role_name: ${{ secrets.GH_WALLET_SECRET_ACCESS }}
+          app_name: 'babylon-wallet-ios'
+          step_name: 'snyk_sbom'
+          secret_prefix: 'WALLET'
+          secret_name: ${{ secrets.AWS_SECRET_NAME_WALLET }}
+          parse_json: true
+      - uses: radixdlt/public-iac-resuable-artifacts/fetch-secrets@main
+        with:
+          role_name: ${{ secrets.GH_WALLET_SECRET_ACCESS }}
+          app_name: 'babylon-wallet-ios'
+          step_name: 'test_and_build'
+          secret_prefix: 'SWIFT_ENGINE_TOOLKIT_SSH_KEY'
+          secret_name: ${{ secrets.AWS_SECRET_NAME_WALLET_SWIFT_SSH }}
+          parse_json: true
       - uses: webfactory/ssh-agent@v0.6.0
         with:
           ssh-private-key: |
-            ${{ secrets.SWIFT_ENGINE_TOOLKIT_SSH_KEY }}
-
+            ${{ env.SWIFT_ENGINE_TOOLKIT_SSH_KEY }}
       - name: Install snyk
         run: |
           npm install snyk -g
           snyk -v
-          snyk auth ${{ secrets.SNYK_TOKEN }}
+          snyk auth ${{ env.SNYK_TOKEN }}
       - name: Generate SBOM # check SBOM can be generated but nothing is done with it
         run: |
-          snyk sbom --debug --all-projects --org=${{ secrets.SNYK_ORG_ID }} --format=cyclonedx1.4+json --json-file-output sbom.json
+          snyk sbom --debug --all-projects --org=${{ env.SNYK_COREAPPS_ORG_ID }} --format=cyclonedx1.4+json --json-file-output sbom.json
 
   linting:
     name: "Linting"
@@ -71,6 +108,9 @@ jobs:
           swiftformat . --lint
 
   test-and-build:
+    permissions:
+      id-token: write
+      contents: read
     name: "Test and build"
     runs-on: macos-13
     timeout-minutes: 70
@@ -80,13 +120,36 @@ jobs:
       - snyk_scan
 
     steps:
-      - uses: actions/checkout@v3.1.0
-
+      - uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b
+      - name: Configure AWS credentials to fetch secrets
+        uses: aws-actions/configure-aws-credentials@97271860067ec931c45b8d104fbf0d15954ab85c # branch v1-node16
+        with:
+          role-to-assume: ${{ secrets.GH_WALLET_SECRET_ACCESS }}
+          aws-region: "eu-west-2"
+          role-session-name: 'babylon-wallet-ios-${{ github.run_id }}-${{ github.run_attempt }}'
+      - name: Fetch AWS secrets
+        uses: aws-actions/aws-secretsmanager-get-secrets@287592d14d9c9c48199db83dc182ae12af3df18e # v1.0.1
+        with:
+          secret-ids: |
+            WALLET, ${{ secrets.AWS_SECRET_NAME_WALLET }}
+          parse-json-secrets: true
+      - name: Fetch AWS secrets
+        uses: aws-actions/aws-secretsmanager-get-secrets@287592d14d9c9c48199db83dc182ae12af3df18e # v1.0.1
+        with:
+          secret-ids: |
+            SWIFT_ENGINE_TOOLKIT_SSH_KEY, ${{ secrets.AWS_SECRET_NAME_WALLET_SWIFT_SSH }}
+          parse-json-secrets: true
+      - name: Fetch AWS secrets
+        uses: aws-actions/aws-secretsmanager-get-secrets@287592d14d9c9c48199db83dc182ae12af3df18e # v1.0.1
+        with:
+          secret-ids: |
+            FASTLANE_MATCH_REPO_SSH_KEY, ${{ secrets.AWS_SECRET_NAME_WALLET_FASTLANE_SSH }}
+          parse-json-secrets: true
       - uses: webfactory/ssh-agent@v0.6.0
         with:
           ssh-private-key: |
-            ${{ secrets.SWIFT_ENGINE_TOOLKIT_SSH_KEY }}
-            ${{ secrets.FASTLANE_MATCH_REPO_SSH_KEY }}
+            ${{ env.SWIFT_ENGINE_TOOLKIT_SSH_KEY }}
+            ${{ env.FASTLANE_MATCH_REPO_SSH_KEY }}
 
       - uses: maxim-lobanov/setup-xcode@v1
         with:
@@ -100,7 +163,7 @@ jobs:
 
       - name: "Install additional deps"
         run: |
-          echo "${{ secrets.FASTLANE_SECRETS }}" | base64 --decode > fastlane/.env.secret
+          echo "${{ env.WALLET_FASTLANE_SECRETS_BASE64 }}" | base64 --decode > fastlane/.env.secret
           brew install xcbeautify
 
       - name: "Unit tests (debug)"
@@ -110,6 +173,9 @@ jobs:
         run: bundle exec fastlane ios build
 
   snyk_online_monitor:
+    permissions:
+      id-token: write
+      contents: read
     name: "Snyk monitoring"
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
@@ -120,18 +186,34 @@ jobs:
       - uses: actions/setup-node@v2
         with:
           node-version: '14'
+      - uses: radixdlt/public-iac-resuable-artifacts/fetch-secrets@main
+        with:
+          role_name: ${{ secrets.GH_WALLET_SECRET_ACCESS }}
+          app_name: 'babylon-wallet-ios'
+          step_name: 'snyk_online_monitor'
+          secret_prefix: 'WALLET'
+          secret_name: ${{ secrets.AWS_SECRET_NAME_WALLET }}
+          parse_json: true
+      - uses: radixdlt/public-iac-resuable-artifacts/fetch-secrets@main
+        with:
+          role_name: ${{ secrets.GH_WALLET_SECRET_ACCESS }}
+          app_name: 'babylon-wallet-ios'
+          step_name: 'test_and_build'
+          secret_prefix: 'SWIFT_ENGINE_TOOLKIT_SSH_KEY'
+          secret_name: ${{ secrets.AWS_SECRET_NAME_WALLET_SWIFT_SSH }}
+          parse_json: true
       - uses: webfactory/ssh-agent@v0.6.0
         with:
           ssh-private-key: |
-            ${{ secrets.SWIFT_ENGINE_TOOLKIT_SSH_KEY }}
+            ${{ env.SWIFT_ENGINE_TOOLKIT_SSH_KEY }}
       - name: Install snyk
         run: |
           npm install snyk -g
           snyk -v
-          snyk auth ${{ secrets.SNYK_TOKEN }}
+          snyk auth ${{ env.SNYK_TOKEN }}
       - name: Enable Snyk online monitoring to check for vulnerabilities
         run: |
-          snyk monitor --all-projects --org=${{ secrets.SNYK_ORG_ID }}
+          snyk monitor --all-projects --org=${{ env.SNYK_COREAPPS_ORG_ID }}
 
   # snapshot_tests:
   #   name: "Snapshot tests"
