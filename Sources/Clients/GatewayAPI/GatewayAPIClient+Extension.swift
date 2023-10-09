@@ -207,37 +207,89 @@ extension GatewayAPI.EntityMetadataCollection {
 extension GatewayAPI.ComponentEntityRoleAssignments {
 	// FIXME: This logic should not be here, will probably move to OnLedgerEntitiesClient.
 	@Sendable public func extractBehaviors() -> [AssetBehavior] {
+		typealias AssignmentEntry = GatewayAPI.ComponentEntityRoleAssignmentEntry
 		typealias ParsedName = GatewayAPI.RoleKey.ParsedName
+		typealias ParsedAssignment = GatewayAPI.ComponentEntityRoleAssignmentEntry.ParsedAssignment
 
 		enum Assigned {
 			case none, someone, anyone, unknown
+
+			init(_ explicitAssignment: ParsedAssignment.Explicit) {
+				switch explicitAssignment {
+				case .denyAll: self = .none
+				case .protected: self = .someone
+				case .allowAll: self = .anyone
+				}
+			}
 		}
 
-		func findEntry(_ name: GatewayAPI.RoleKey.ParsedName) -> GatewayAPI.ComponentEntityRoleAssignmentEntry? {
+		func findEntry(_ name: GatewayAPI.RoleKey.ParsedName) -> AssignmentEntry? {
 			entries.first { $0.roleKey.parsedName == name }
+		}
+
+		func resolvedOwner() -> Assigned {
+			guard let dict = owner.value as? [String: Any] else { return .unknown }
+			let rule = dict["rule"] as Any
+			guard let explicit = ParsedAssignment.Explicit(rule) else { return .unknown }
+
+			print(" RESOLVING OWNER TO", Assigned(explicit))
+
+			return .init(explicit)
+		}
+
+		print("• OWNER: \(self.owner)")
+
+		struct Owner {
+			let rule: Rule
+			let updater: String
+
+			struct Rule {
+				let type: String
+				let accessRule: AccessRule
+
+				enum RuleType {
+					case protected
+				}
+
+				struct AccessRule {
+					let type: String
+					let proofRule: ProofRule
+
+					struct ProofRule {
+						let type: String
+						let requirement: AnyCodable
+					}
+				}
+			}
 		}
 
 		func performer(_ name: GatewayAPI.RoleKey.ParsedName) -> Assigned {
 			guard let assignment = findEntry(name)?.parsedAssignment else { return .unknown }
+			print(" performer", assignment)
+
 			switch assignment {
-			case .allowAll: return .anyone
-			case .denyAll: return .none
-			case .protected, .otherExplicit, .owner: return .someone
+			case .owner:
+				return resolvedOwner()
+			case let .explicit(explicit):
+				return .init(explicit)
 			}
 		}
 
 		func updaters(_ name: GatewayAPI.RoleKey.ParsedName) -> Assigned {
 			guard let updaters = findEntry(name)?.updaterRoles, !updaters.isEmpty else { return .none }
+			print(" updaters", updaters)
 
 			// Lookup the corresponding assignments, ignoring unknown and empty values
 			let updaterAssignments = Set(updaters.compactMap(\.parsedName).compactMap(findEntry).compactMap(\.parsedAssignment))
 
 			if updaterAssignments.isEmpty {
 				return .unknown
-			} else if updaterAssignments == [.denyAll] {
+			} else if updaterAssignments == [.explicit(.denyAll)] {
 				return .none
-			} else if updaterAssignments.contains(.allowAll) {
+			} else if updaterAssignments.contains(.explicit(.allowAll)) {
 				return .anyone
+			} else if updaterAssignments == [.owner] {
+				return resolvedOwner()
 			} else {
 				return .someone
 			}

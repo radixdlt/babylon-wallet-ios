@@ -200,19 +200,17 @@ extension GatewayAPI.ComponentEntityRoleAssignmentEntry {
 
 	public enum ParsedAssignment: Hashable {
 		case owner
-		case denyAll
-		case allowAll
-		case protected
-		case otherExplicit
+		case explicit(Explicit)
 
-		init?(_ assignment: GatewayAPI.ComponentEntityRoleAssignmentEntryAssignment) {
-			switch assignment.resolution {
-			case .owner:
-				guard assignment.explicitRule == nil else { return nil }
-				self = .owner
-			case .explicit:
-				guard let explicitRule = assignment.explicitRule?.value as? [String: Any] else { return nil }
+		public enum Explicit: Hashable {
+			case denyAll
+			case allowAll
+			case protected
+
+			init?(_ explicitRule: Any) {
+				guard let explicitRule = explicitRule as? [String: Any] else { return nil }
 				guard let type = explicitRule["type"] as? String else { return nil }
+
 				switch type {
 				case "DenyAll":
 					self = .denyAll
@@ -221,8 +219,20 @@ extension GatewayAPI.ComponentEntityRoleAssignmentEntry {
 				case "Protected":
 					self = .protected
 				default:
-					self = .otherExplicit
+					return nil
 				}
+			}
+		}
+
+		init?(_ assignment: GatewayAPI.ComponentEntityRoleAssignmentEntryAssignment) {
+			switch assignment.resolution {
+			case .owner:
+				guard assignment.explicitRule == nil else { return nil }
+				self = .owner
+			case .explicit:
+				guard let explicitRule = assignment.explicitRule?.value else { return nil }
+				guard let explicit = Explicit(explicitRule) else { return nil }
+				self = .explicit(explicit)
 			}
 		}
 	}
