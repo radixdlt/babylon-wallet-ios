@@ -259,6 +259,7 @@ public struct DevAccountPreferences: Sendable, FeatureReducer {
 
 		case let .callDone(controlStateKeyPath, changeTo):
 			if controlStateKeyPath == \State.faucetButtonState {
+				// NB: This call to update might be superfluous, since after any transaction we fetch all accounts
 				return updateAccountPortfolio(state).concatenate(with: loadIsAllowedToUseFaucet(&state))
 			} else {
 				state[keyPath: controlStateKeyPath] = changeTo

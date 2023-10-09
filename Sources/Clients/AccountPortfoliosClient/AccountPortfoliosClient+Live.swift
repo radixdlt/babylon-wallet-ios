@@ -10,16 +10,20 @@ extension AccountPortfoliosClient: DependencyKey {
 	actor State {
 		let portfoliosSubject: AsyncCurrentValueSubject<[AccountAddress: AccountPortfolio]> = .init([:])
 
-		func setAccountPortfolio(_ portfolio: AccountPortfolio) {
+		func setOrUpdateAccountPortfolio(_ portfolio: AccountPortfolio) {
 			portfoliosSubject.value.updateValue(portfolio, forKey: portfolio.owner)
 		}
 
-		func setAccountPortfolios(_ portfolios: [AccountPortfolio]) {
-			portfolios.forEach(setAccountPortfolio)
+		func setOrUpdateAccountPortfolios(_ portfolios: [AccountPortfolio]) {
+			var newValue = portfoliosSubject.value
+			for portfolio in portfolios {
+				newValue[portfolio.owner] = portfolio
+			}
+			portfoliosSubject.value = newValue
 		}
 
 		func portfolioForAccount(_ address: AccountAddress) -> AnyAsyncSequence<AccountPortfolio> {
-			portfoliosSubject.compactMap { $0[address] }.eraseToAnyAsyncSequence()
+			portfoliosSubject.compactMap { $0[address] }.removeDuplicates().eraseToAnyAsyncSequence()
 		}
 	}
 
@@ -36,7 +40,7 @@ extension AccountPortfoliosClient: DependencyKey {
 				request: { try await AccountPortfoliosClient.fetchAccountPortfolio(accountAddress) }
 			)
 
-			await state.setAccountPortfolio(portfolio)
+			await state.setOrUpdateAccountPortfolio(portfolio)
 
 			return portfolio
 		}
@@ -76,7 +80,7 @@ extension AccountPortfoliosClient: DependencyKey {
 				}()
 
 				// Update the current account portfolios
-				await state.setAccountPortfolios(portfolios)
+				await state.setOrUpdateAccountPortfolios(portfolios)
 
 				return portfolios
 			},
@@ -87,7 +91,7 @@ extension AccountPortfoliosClient: DependencyKey {
 					request: { try await AccountPortfoliosClient.fetchAccountPortfolio(accountAddress) }
 				)
 
-				await state.setAccountPortfolio(portfolio)
+				await state.setOrUpdateAccountPortfolio(portfolio)
 
 				return portfolio
 			},
