@@ -12,9 +12,8 @@ extension NonFungibleAssetList {
 
 			public let resource: OnLedgerEntity.OwnedNonFungibleResource
 			public let accountAddress: AccountAddress
-			public var loadedTokens: IdentifiedArrayOf<OnLedgerEntity.NonFungibleToken> = []
 			public var tokens: [[Loadable<OnLedgerEntity.NonFungibleToken>]] = []
-			public var lastLoadedPageIndex: Int = 0
+			public var lastLoadedPageIndex: Int = -1
 			public var nextPageCursor: String?
 			public var isLoadingResources: Bool = false
 			public var isExpanded = false
@@ -59,6 +58,7 @@ extension NonFungibleAssetList {
 		}
 
 		@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
+		@Dependency(\.errorQueue) var errorQueue
 
 		public init() {}
 
@@ -87,8 +87,10 @@ extension NonFungibleAssetList {
 					if pagesCount > 1, remainder > 0 {
 						state.tokens.append(.init(repeating: .loading, count: remainder))
 					}
+					return loadResources(&state, pageIndex: 0)
 				}
-				return loadResources(&state, pageIndex: 0)
+
+				return .none
 
 			case let .onTokenDidAppear(index):
 				state.lastVisibleRowIndex = index
@@ -117,7 +119,8 @@ extension NonFungibleAssetList {
 
 					state.isLoadingResources = false
 				case let .failure(err):
-					break
+					errorQueue.schedule(err)
+					state.isLoadingResources = false
 				}
 				return .none
 			}
