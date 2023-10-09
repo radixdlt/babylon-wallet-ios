@@ -6,6 +6,7 @@ public struct PoolUnitsList: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		var lsuResource: LSUResource.State?
 		var poolUnits: IdentifiedArrayOf<PoolUnit.State> = []
+		var didLoadResource = false
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -43,6 +44,9 @@ public struct PoolUnitsList: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .task:
+			guard !state.didLoadResource else {
+				return .none
+			}
 			let ownedPoolUnits = state.poolUnits.map(\.poolUnit)
 			return .run { send in
 				let result = await TaskResult { try await onLedgerEntitiesClient.getPoolUnitsDetail(ownedPoolUnits) }
@@ -50,6 +54,9 @@ public struct PoolUnitsList: Sendable, FeatureReducer {
 			}
 		case .refresh:
 			let ownedPoolUnits = state.poolUnits.map(\.poolUnit)
+			state.poolUnits.forEach { unit in
+				state.poolUnits[id: unit.poolUnit.resourcePoolAddress]?.resourceDetails = .loading
+			}
 			return .run { send in
 				let result = await TaskResult { try await onLedgerEntitiesClient.getPoolUnitsDetail(ownedPoolUnits) }
 				await send(.internal(.loadedResources(result)))
@@ -63,6 +70,7 @@ public struct PoolUnitsList: Sendable, FeatureReducer {
 			poolDetails.forEach { poolDetails in
 				state.poolUnits[id: poolDetails.address]?.resourceDetails = .success(poolDetails)
 			}
+			state.didLoadResource = true
 			return .none
 		case .loadedResources:
 			return .none

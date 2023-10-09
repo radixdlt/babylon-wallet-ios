@@ -40,7 +40,6 @@ struct PoolUnitResourcesView: View {
 
 	var body: some View {
 		let strokeColor = Color.app.gray4
-
 		VStack(spacing: 1) {
 			ForEach(resources) { resource in
 				PoolUnitResourceView(viewState: resource) {

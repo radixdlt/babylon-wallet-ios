@@ -12,7 +12,6 @@ public struct PoolUnit: Sendable, FeatureReducer {
 		let poolUnit: OnLedgerEntity.Account.PoolUnit
 		var resourceDetails: Loadable<OnLedgerEntitiesClient.OwnedResourcePoolDetails>
 		var isSelected: Bool?
-		var isDataLoaded = Bool.random()
 
 		public init(
 			poolUnit: OnLedgerEntity.Account.PoolUnit,

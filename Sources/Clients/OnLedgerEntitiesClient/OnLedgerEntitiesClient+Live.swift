@@ -71,9 +71,9 @@ extension OnLedgerEntitiesClient {
 		@Dependency(\.cacheClient) var cacheClient
 
 		let cachingIdentifier = CacheClient.Entry.onLedgerEntity(.nonFungibleIdPage(
-			request.accountAddress.asGeneral,
-			request.resourceAddress.asGeneral,
-			request.pageCursor
+			accountAddress: request.accountAddress.asGeneral,
+			resourceAddress: request.resourceAddress.asGeneral,
+			pageCursor: request.pageCursor
 		))
 		let cached = try? cacheClient.load(
 			OnLedgerEntity.self,
@@ -347,7 +347,11 @@ extension OnLedgerEntity {
 		case let .nonFungibleToken(nonFungibleToken):
 			return .nonFungibleData(nonFungibleToken.id)
 		case let .accountNonFungibleIds(idsPage):
-			return .nonFungibleIdPage(idsPage.accountAddress.asGeneral, idsPage.resourceAddress.asGeneral, idsPage.pageCursor)
+			return .nonFungibleIdPage(
+				accountAddress: idsPage.accountAddress.asGeneral,
+				resourceAddress: idsPage.resourceAddress.asGeneral,
+				pageCursor: idsPage.pageCursor
+			)
 		case let .account(account):
 			return .account(account.address.asGeneral)
 		case let .resourcePool(resourcePool):
