@@ -140,16 +140,18 @@ extension OnLedgerEntitiesClient {
 			return candidate
 		}
 
-		let stakeAndPoolAddresses = stakeUnitCandidates.compactMap(\.metadata.validator)
-			+ stakeClaimNFTCandidates.compactMap(\.metadata.validator)
-			+ poolUnitCandidates.compactMap(\.metadata.poolUnit?.address)
+		let stakeAndPoolAddresses = Set(
+			stakeUnitCandidates.compactMap(\.metadata.validator?.asGeneral)
+				+ stakeClaimNFTCandidates.compactMap(\.metadata.validator?.asGeneral)
+				+ poolUnitCandidates.compactMap(\.metadata.poolUnit?.asGeneral)
+		)
 
 		guard !stakeAndPoolAddresses.isEmpty else {
 			return .init(radixNetworkStakes: [], poolUnits: [])
 		}
 
 		let entities = try await getEntities(
-			for: Array(stakeAndPoolAddresses.uniqued()).map(\.asGeneral.cachingIdentifier),
+			for: Array(stakeAndPoolAddresses),
 			[],
 			ledgerState: ledgerState
 		)
@@ -219,10 +221,15 @@ extension OnLedgerEntitiesClient {
 				return nil
 			}
 
+			let amount = try RETDecimal(value: vault.amount)
+			guard amount > 0 else {
+				return nil
+			}
+
 			return try .init(
 				resourceAddress: .init(validatingAddress: vaultAggregated.resourceAddress),
 				atLedgerState: ledgerState,
-				amount: .init(value: vault.amount),
+				amount: amount,
 				metadata: .init(vaultAggregated.explicitMetadata)
 			)
 		} ?? []
@@ -234,6 +241,11 @@ extension OnLedgerEntitiesClient {
 				assertionFailure("Owned resource without a vault???")
 				return nil
 			}
+
+			guard vault.totalCount > 0 else {
+				return nil
+			}
+
 			return try .init(
 				resourceAddress: .init(validatingAddress: vaultAggregated.resourceAddress),
 				atLedgerState: ledgerState,

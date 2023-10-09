@@ -64,9 +64,9 @@ public struct NonFungibleAssetList: Sendable, FeatureReducer {
 		case .asset:
 			return .none
 
-//		case .destination(.presented(.details(.delegate(.dismiss)))):
-//			state.destination = nil
-//			return .none
+		case .destination(.presented(.details(.delegate(.dismiss)))):
+			state.destination = nil
+			return .none
 
 		case .destination:
 			return .none

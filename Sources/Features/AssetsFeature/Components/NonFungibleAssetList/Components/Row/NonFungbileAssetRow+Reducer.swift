@@ -38,7 +38,6 @@ extension NonFungibleAssetList {
 			case isExpandedToggled
 			case assetTapped(OnLedgerEntity.NonFungibleToken)
 			case didAppear
-			case task
 			case onTokenDidAppear(index: Int)
 		}
 
@@ -64,8 +63,6 @@ extension NonFungibleAssetList {
 
 		public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 			switch viewAction {
-			case .task:
-				return .none
 			case .didAppear:
 				return .send(.delegate(.didAppear(state.resource.resourceAddress)))
 
@@ -94,10 +91,8 @@ extension NonFungibleAssetList {
 
 			case let .onTokenDidAppear(index):
 				state.lastVisibleRowIndex = index
-				print("Row visible \(index)")
 				let pageIndex = index / State.pageSize
 				if state.isLoadingResources == false, pageIndex > state.lastLoadedPageIndex {
-					print("started to load the next page \(state.lastLoadedPageIndex + 1)")
 					return loadResources(&state, pageIndex: state.lastLoadedPageIndex + 1)
 				}
 				return .none
@@ -127,8 +122,6 @@ extension NonFungibleAssetList {
 		}
 
 		func loadResources(_ state: inout State, pageIndex: Int) -> Effect<Action> {
-			print("Loading resources")
-
 			state.isLoadingResources = true
 			let cursor = state.nextPageCursor
 			return .run { [resource = state.resource, accountAddress = state.accountAddress] send in
