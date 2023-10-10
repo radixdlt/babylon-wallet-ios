@@ -218,7 +218,7 @@
 "authorizedDapps_personaDetails_lastName" = "Last Name";
 "authorizedDapps_personaDetails_emailAddress" = "Email Address";
 "authorizedDapps_personaDetails_phoneNumber" = "Phone Number";
-"authorizedDapps_personaDetails_editPersona" = "Edit Persona Data";
+"authorizedDapps_personaDetails_editPersona" = "Edit Persona";
 "authorizedDapps_personaDetails_authorizedDappsHeading" = "Here are the dApps you have logged into with this Persona.";
 "authorizedDapps_personaDetails_accountSharingDescription" = "Here are the Account names and addresses that you are currently sharing with %@.";
 "authorizedDapps_personaDetails_editAccountSharing" = "Edit Account Sharing";
