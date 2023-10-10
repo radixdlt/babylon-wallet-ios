@@ -144,9 +144,13 @@ public struct AssetsView: Sendable, FeatureReducer {
 			state.fungibleTokenList = resourcesState.fungibleTokenList
 			state.nonFungibleTokenList = resourcesState.nonFungibleTokenList
 			state.poolUnitsList = resourcesState.poolUnitsList
-			return .run { send in
-				await send(.child(.poolUnitsList(.view(.refresh))))
+
+			if resourcesState.poolUnitsList != nil {
+				return .run { send in
+					await send(.child(.poolUnitsList(.view(.refresh))))
+				}
 			}
+			return .none
 		}
 	}
 
