@@ -25,7 +25,6 @@ public enum AssetBehavior: Sendable, Hashable, Codable, Comparable {
 	case nftDataChangeable
 	case nftDataChangeableByAnyone
 
-	// FIXME: Are these not used?
 	case informationChangeable
 	case informationChangeableByAnyone
 }

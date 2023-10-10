@@ -60,10 +60,7 @@ public struct LSUStake: FeatureReducer {
 			)
 	}
 
-	public func reduce(
-		into state: inout State,
-		viewAction: ViewAction
-	) -> Effect<Action> {
+	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .didTap:
 			guard case let .success(stakeDetails) = state.stakeDetails else {

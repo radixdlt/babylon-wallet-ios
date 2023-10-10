@@ -85,7 +85,7 @@ extension GatewayAPIClient {
 				address: accountAddress,
 				aggregationLevel: .vault,
 				optIns: .init(
-					nonFungibleIncludeNfids: true,
+					nonFungibleIncludeNfids: false,
 					explicitMetadata: .init(Array(Set<EntityMetadataKey>.resourceMetadataKeys.map(\.rawValue)))
 				)
 			)

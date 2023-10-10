@@ -79,9 +79,10 @@ extension AccountList {
 		public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 			switch viewAction {
 			case .task:
-
 				let accountAddress = state.account.address
-				state.portfolio = .loading
+				if state.portfolio.wrappedValue == nil {
+					state.portfolio = .loading
+				}
 
 				checkIfCallActionIsNeeded(state: &state)
 

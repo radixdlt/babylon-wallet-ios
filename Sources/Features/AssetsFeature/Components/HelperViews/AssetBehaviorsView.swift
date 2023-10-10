@@ -81,7 +81,6 @@ extension AssetBehavior {
 			return L10n.AccountSettings.Behaviors.nftDataChangeable
 		case .nftDataChangeableByAnyone:
 			return L10n.AccountSettings.Behaviors.nftDataChangeableByAnyone
-
 		case .informationChangeable:
 			return L10n.AccountSettings.Behaviors.informationChangeable
 		case .informationChangeableByAnyone:
@@ -107,7 +106,6 @@ extension AssetBehavior {
 		case .freezableByAnyone: return AssetResource.removableByAnyone // FIXME: icons
 		case .nftDataChangeable: return AssetResource.nftDataChangeable
 		case .nftDataChangeableByAnyone: return AssetResource.nftDataChangeableByAnyone
-
 		case .informationChangeable: return AssetResource.informationChangeable
 		case .informationChangeableByAnyone: return AssetResource.informationChangeableByAnyone
 		}

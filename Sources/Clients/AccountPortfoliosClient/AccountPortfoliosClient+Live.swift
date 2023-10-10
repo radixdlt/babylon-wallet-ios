@@ -11,16 +11,20 @@ extension AccountPortfoliosClient: DependencyKey {
 	actor State {
 		let portfoliosSubject: AsyncCurrentValueSubject<[AccountAddress: OnLedgerEntity.Account]> = .init([:])
 
-		func setAccountPortfolio(_ portfolio: OnLedgerEntity.Account) {
+		func setOrUpdateAccountPortfolio(_ portfolio: OnLedgerEntity.Account) {
 			portfoliosSubject.value.updateValue(portfolio, forKey: portfolio.address)
 		}
 
-		func setAccountPortfolios(_ portfolios: [OnLedgerEntity.Account]) {
-			portfolios.forEach(setAccountPortfolio)
+		func setOrUpdateAccountPortfolios(_ portfolios: [OnLedgerEntity.Account]) {
+			var newValue = portfoliosSubject.value
+			for portfolio in portfolios {
+				newValue[portfolio.address] = portfolio
+			}
+			portfoliosSubject.value = newValue
 		}
 
 		func portfolioForAccount(_ address: AccountAddress) -> AnyAsyncSequence<OnLedgerEntity.Account> {
-			portfoliosSubject.compactMap { $0[address] }.eraseToAnyAsyncSequence()
+			portfoliosSubject.compactMap { $0[address] }.removeDuplicates().eraseToAnyAsyncSequence()
 		}
 	}
 
@@ -40,8 +44,7 @@ extension AccountPortfoliosClient: DependencyKey {
 
 				let accounts = try await onLedgerEntitiesClient.getAccounts(accountAddresses)
 
-				// Update the current account portfolios
-				await state.setAccountPortfolios(accounts)
+				await state.setOrUpdateAccountPortfolios(accounts)
 
 				return accounts
 			},
@@ -50,7 +53,7 @@ extension AccountPortfoliosClient: DependencyKey {
 					fatalError()
 				}
 
-				await state.setAccountPortfolio(portfolio)
+				await state.setOrUpdateAccountPortfolio(portfolio)
 
 				return portfolio
 			},
