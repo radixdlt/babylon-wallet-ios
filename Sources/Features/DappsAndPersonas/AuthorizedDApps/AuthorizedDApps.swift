@@ -1,13 +1,12 @@
 import AuthorizedDappsClient
 import FeaturePrelude
-import GatewayAPI
+import OnLedgerEntitiesClient
 
 // MARK: - AuthorizedDapps
 public struct AuthorizedDapps: Sendable, FeatureReducer {
 	@Dependency(\.authorizedDappsClient) var authorizedDappsClient
-	@Dependency(\.cacheClient) var cacheClient
+	@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
 	@Dependency(\.errorQueue) var errorQueue
-	@Dependency(\.gatewayAPIClient) var gatewayAPIClient
 
 	public typealias Store = StoreOf<Self>
 
@@ -76,13 +75,9 @@ public struct AuthorizedDapps: Sendable, FeatureReducer {
 		case let .loadedDapps(.success(dApps)):
 			state.dApps = dApps
 			return .run { send in
-				for dApp in dApps {
-					let iconURL = try? await cacheClient.withCaching(
-						cacheEntry: .dAppMetadata(dApp.id.address),
-						request: { try await gatewayAPIClient.getEntityMetadata(dApp.id.address, [.iconURL]) }
-					).iconURL
-					if let iconURL {
-						await send(.internal(.loadedThumbnail(iconURL, dApp: dApp.id)))
+				try await onLedgerEntitiesClient.getAssociatedDapps(dApps.map(\.id)).asyncForEach { dApp in
+					if let iconURL = dApp.metadata.iconURL {
+						await send(.internal(.loadedThumbnail(iconURL, dApp: dApp.address)))
 					}
 				}
 			}

@@ -181,14 +181,12 @@ extension OnLedgerEntitiesClient {
 			.flatMap { item in
 				let ledgerState = item.ledgerState
 				return try item.nonFungibleIds.map { id in
-					let details = id.details
-					let canBeClaimed = details.claimEpoch.map { UInt64(ledgerState.epoch) >= $0 } ?? false
-					return try OnLedgerEntity.nonFungibleToken(.init(
+					try OnLedgerEntity.nonFungibleToken(.init(
 						id: .fromParts(
 							resourceAddress: .init(address: request.resource.address),
 							nonFungibleLocalId: .from(stringFormat: id.nonFungibleId)
 						),
-						data: details
+						data: id.details
 					))
 				}
 			}
@@ -260,64 +258,6 @@ extension OnLedgerEntitiesClient {
 
 				return try await createEntity(from: updatedItem, ledgerState: .init(version: response.ledgerState.stateVersion, epoch: response.ledgerState.epoch))
 			}
-		}
-	}
-
-	@Sendable
-	static func createEntity(from item: GatewayAPI.StateEntityDetailsResponseItem, ledgerState: AtLedgerState) async throws -> OnLedgerEntity? {
-		switch item.details {
-		case let .fungibleResource(fungibleDetails):
-			return try .resource(.init(
-				resourceAddress: .init(validatingAddress: item.address),
-				atLedgerState: ledgerState,
-				divisibility: fungibleDetails.divisibility,
-				behaviors: item.details?.fungible?.roleAssignments.extractBehaviors() ?? [],
-				totalSupply: try? RETDecimal(value: fungibleDetails.totalSupply),
-				metadata: .init(item.explicitMetadata)
-			))
-		case let .nonFungibleResource(nonFungibleDetails):
-			return try .resource(.init(
-				resourceAddress: .init(validatingAddress: item.address),
-				atLedgerState: ledgerState,
-				divisibility: nil,
-				behaviors: item.details?.nonFungible?.roleAssignments.extractBehaviors() ?? [],
-				totalSupply: try? RETDecimal(value: nonFungibleDetails.totalSupply),
-				metadata: .init(item.explicitMetadata)
-			))
-		default:
-			let address = try Address(validatingAddress: item.address)
-			let addressKind = address.decodedKind
-			switch addressKind {
-			case _ where AccountEntityType.addressSpace.contains(addressKind):
-				if item.explicitMetadata?.accountType == .dappDefinition {
-					return try .associatedDapp(createAssociatedDapp(item))
-				} else {
-					return try await .account(createAccount(
-						item,
-						ledgerState: ledgerState
-					))
-				}
-			case _ where ResourcePoolEntityType.addressSpace.contains(addressKind):
-				guard let resourcePool = try await createResourcePool(
-					item,
-					ledgerState: ledgerState
-				) else {
-					return nil
-				}
-
-				return .resourcePool(resourcePool)
-			case _ where ValidatorEntityType.addressSpace.contains(addressKind):
-				guard let validator = try await createValidator(
-					item,
-					ledgerState: ledgerState
-				) else {
-					return nil
-				}
-				return .validator(validator)
-			default:
-				return try .genericComponent(createGenericComponent(item, ledgerState: ledgerState))
-			}
-			return nil
 		}
 	}
 }

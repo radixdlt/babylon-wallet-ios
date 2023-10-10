@@ -4,6 +4,44 @@ import SharedModels
 
 extension OnLedgerEntitiesClient {
 	@Sendable
+	static func createEntity(from item: GatewayAPI.StateEntityDetailsResponseItem, ledgerState: AtLedgerState) async throws -> OnLedgerEntity? {
+		let address = try Address(validatingAddress: item.address)
+		let addressKind = address.decodedKind
+		switch addressKind {
+		case _ where AccountEntityType.addressSpace.contains(addressKind):
+			if item.explicitMetadata?.accountType == .dappDefinition {
+				return try .associatedDapp(createAssociatedDapp(item))
+			} else {
+				return try await .account(createAccount(
+					item,
+					ledgerState: ledgerState
+				))
+			}
+		case _ where ResourceEntityType.addressSpace.contains(addressKind):
+			return try createResource(item, ledgerState: ledgerState).map(OnLedgerEntity.resource)
+		case _ where ResourcePoolEntityType.addressSpace.contains(addressKind):
+			guard let resourcePool = try await createResourcePool(
+				item,
+				ledgerState: ledgerState
+			) else {
+				return nil
+			}
+
+			return .resourcePool(resourcePool)
+		case _ where ValidatorEntityType.addressSpace.contains(addressKind):
+			guard let validator = try await createValidator(
+				item,
+				ledgerState: ledgerState
+			) else {
+				return nil
+			}
+			return .validator(validator)
+		default:
+			return try .genericComponent(createGenericComponent(item, ledgerState: ledgerState))
+		}
+	}
+
+	@Sendable
 	static func createAccount(
 		_ item: GatewayAPI.StateEntityDetailsResponseItem,
 		ledgerState: AtLedgerState
@@ -48,6 +86,35 @@ extension OnLedgerEntitiesClient {
 			behaviors: item.details?.component?.roleAssignments?.extractBehaviors() ?? [],
 			metadata: .init(item.explicitMetadata)
 		)
+	}
+
+	@Sendable
+	static func createResource(
+		_ item: GatewayAPI.StateEntityDetailsResponseItem,
+		ledgerState: AtLedgerState
+	) throws -> OnLedgerEntity.Resource? {
+		switch item.details {
+		case let .fungibleResource(fungibleDetails):
+			return try .init(
+				resourceAddress: .init(validatingAddress: item.address),
+				atLedgerState: ledgerState,
+				divisibility: fungibleDetails.divisibility,
+				behaviors: item.details?.fungible?.roleAssignments.extractBehaviors() ?? [],
+				totalSupply: try? RETDecimal(value: fungibleDetails.totalSupply),
+				metadata: .init(item.explicitMetadata)
+			)
+		case let .nonFungibleResource(nonFungibleDetails):
+			return try .init(
+				resourceAddress: .init(validatingAddress: item.address),
+				atLedgerState: ledgerState,
+				divisibility: nil,
+				behaviors: item.details?.nonFungible?.roleAssignments.extractBehaviors() ?? [],
+				totalSupply: try? RETDecimal(value: nonFungibleDetails.totalSupply),
+				metadata: .init(item.explicitMetadata)
+			)
+		default:
+			return nil
+		}
 	}
 
 	@Sendable

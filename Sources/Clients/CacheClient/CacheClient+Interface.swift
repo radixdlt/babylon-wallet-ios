@@ -87,7 +87,6 @@ extension CacheClient {
 
 		case onLedgerEntity(OnLedgerEntity)
 		case networkName(_ url: String)
-		case dAppMetadata(_ definitionAddress: String)
 		case dAppRequestMetadata(_ definitionAddress: String)
 		case rolaDappVerificationMetadata(_ definitionAddress: String)
 		case rolaWellKnownFileVerification(_ url: String)
@@ -116,8 +115,6 @@ extension CacheClient {
 				}
 			case let .networkName(url):
 				return "\(filesystemFolderPath)/networkName-\(url)"
-			case let .dAppMetadata(definitionAddress):
-				return "\(filesystemFolderPath)/DappMetadata-\(definitionAddress)"
 			case let .dAppRequestMetadata(definitionAddress):
 				return "\(filesystemFolderPath)/DappRequestMetadata-\(definitionAddress)"
 			case let .rolaDappVerificationMetadata(definitionAddress):
@@ -151,8 +148,6 @@ extension CacheClient {
 				}
 			case .networkName:
 				return "NetworkName"
-			case .dAppMetadata:
-				return "DappMetadata"
 			case .dAppRequestMetadata:
 				return "DappRequestMetadata"
 			case .rolaDappVerificationMetadata:
@@ -169,8 +164,8 @@ extension CacheClient {
 		var lifetime: TimeInterval {
 			switch self {
 			case .networkName, .onLedgerEntity:
-				return 300
-			case .dAppMetadata, .dAppRequestMetadata, .rolaDappVerificationMetadata, .rolaWellKnownFileVerification:
+				return 360 * 60 * 24 // On day cache
+			case .dAppRequestMetadata, .rolaDappVerificationMetadata, .rolaWellKnownFileVerification:
 				return 60
 			}
 		}
