@@ -207,37 +207,58 @@ extension GatewayAPI.EntityMetadataCollection {
 extension GatewayAPI.ComponentEntityRoleAssignments {
 	// FIXME: This logic should not be here, will probably move to OnLedgerEntitiesClient.
 	@Sendable public func extractBehaviors() -> [AssetBehavior] {
+		typealias AssignmentEntry = GatewayAPI.ComponentEntityRoleAssignmentEntry
 		typealias ParsedName = GatewayAPI.RoleKey.ParsedName
+		typealias ParsedAssignment = GatewayAPI.ComponentEntityRoleAssignmentEntry.ParsedAssignment
 
 		enum Assigned {
 			case none, someone, anyone, unknown
+
+			init(_ explicitAssignment: ParsedAssignment.Explicit) {
+				switch explicitAssignment {
+				case .denyAll: self = .none
+				case .protected: self = .someone
+				case .allowAll: self = .anyone
+				}
+			}
 		}
 
-		func findEntry(_ name: GatewayAPI.RoleKey.ParsedName) -> GatewayAPI.ComponentEntityRoleAssignmentEntry? {
+		func findEntry(_ name: GatewayAPI.RoleKey.ParsedName) -> AssignmentEntry? {
 			entries.first { $0.roleKey.parsedName == name }
 		}
 
+		func resolvedOwner() -> Assigned {
+			guard let dict = owner.value as? [String: Any] else { return .unknown }
+			let rule = dict["rule"] as Any
+			guard let explicit = ParsedAssignment.Explicit(rule) else { return .unknown }
+
+			return .init(explicit)
+		}
+
 		func performer(_ name: GatewayAPI.RoleKey.ParsedName) -> Assigned {
-			guard let assignment = findEntry(name)?.parsedAssignment else { return .unknown }
-			switch assignment {
-			case .allowAll: return .anyone
-			case .denyAll: return .none
-			case .protected, .otherExplicit, .owner: return .someone
+			guard let parsed = findEntry(name)?.parsedAssignment else { return .unknown }
+			switch parsed {
+			case .owner:
+				return resolvedOwner()
+			case let .explicit(explicit):
+				return .init(explicit)
 			}
 		}
 
 		func updaters(_ name: GatewayAPI.RoleKey.ParsedName) -> Assigned {
-			guard let updaters = findEntry(name)?.updaterRoles, !updaters.isEmpty else { return .none }
+			guard let updaters = findEntry(name)?.updaterRoles, !updaters.isEmpty else { return .unknown }
 
 			// Lookup the corresponding assignments, ignoring unknown and empty values
-			let updaterAssignments = Set(updaters.compactMap(\.parsedName).compactMap(findEntry).compactMap(\.parsedAssignment))
+			let parsed = Set(updaters.compactMap(\.parsedName).compactMap(findEntry).compactMap(\.parsedAssignment))
 
-			if updaterAssignments.isEmpty {
+			if parsed.isEmpty {
 				return .unknown
-			} else if updaterAssignments == [.denyAll] {
+			} else if parsed == [.explicit(.denyAll)] {
 				return .none
-			} else if updaterAssignments.contains(.allowAll) {
+			} else if parsed.contains(.explicit(.allowAll)) {
 				return .anyone
+			} else if parsed == [.owner] {
+				return resolvedOwner()
 			} else {
 				return .someone
 			}
