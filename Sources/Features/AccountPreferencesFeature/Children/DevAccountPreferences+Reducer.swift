@@ -179,10 +179,12 @@ public struct DevAccountPreferences: Sendable, FeatureReducer {
 			}
 
 		case .createNonFungibleTokenButtonTapped:
-			return call(buttonState: \.createNonFungibleTokenButtonState, into: &state) {
-				try await faucetClient.createNonFungibleToken(.init(
-					recipientAccountAddress: $0
-				))
+			return .run { [accountAddress = state.address] send in
+				let accountAddress = try await accountsClient.getAccountByAddress(accountAddress)
+				let manifest = try ManifestBuilder.manifestForCreateNonFungibleToken(account: accountAddress.address, networkID: accountAddress.networkID)
+				await send(.internal(.reviewTransaction(manifest)))
+			} catch: { error, _ in
+				loggerGlobal.warning("Failed to create manifest which turns account into dapp definition account type, error: \(error)")
 			}
 		case .createMultipleFungibleTokenButtonTapped:
 			return .run { [accountAddress = state.address] send in
@@ -193,12 +195,12 @@ public struct DevAccountPreferences: Sendable, FeatureReducer {
 				loggerGlobal.warning("Failed to create manifest which turns account into dapp definition account type, error: \(error)")
 			}
 		case .createMultipleNonFungibleTokenButtonTapped:
-			return call(buttonState: \.createMultipleNonFungibleTokenButtonState, into: &state) {
-				try await faucetClient.createNonFungibleToken(.init(
-					recipientAccountAddress: $0,
-					numberOfTokens: 10,
-					numberOfIds: 100
-				))
+			return .run { [accountAddress = state.address] send in
+				let accountAddress = try await accountsClient.getAccountByAddress(accountAddress)
+				let manifest = try ManifestBuilder.manifestForCreateMultipleNonFungibleTokens(account: accountAddress.address, networkID: accountAddress.networkID)
+				await send(.internal(.reviewTransaction(manifest)))
+			} catch: { error, _ in
+				loggerGlobal.warning("Failed to create manifest which turns account into dapp definition account type, error: \(error)")
 			}
 		#endif
 
