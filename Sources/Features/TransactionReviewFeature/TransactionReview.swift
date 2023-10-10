@@ -282,8 +282,9 @@ public struct TransactionReview: Sendable, FeatureReducer {
 					})))
 				}
 			} catch {
+				loggerGlobal.critical("Failed to add instruction to add instructions to manifest, error: \(error)")
 				errorQueue.schedule(error)
-				return .none
+				return resetToApprovable(&state)
 			}
 		}
 	}
@@ -409,11 +410,14 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			return .none
 
 		case .fungibleTokenDetails(.delegate(.dismiss)):
-			guard case .fungibleTokenDetails = state.destination else { return .none }
 			state.destination = nil
 			return .none
 
 		case .fungibleTokenDetails:
+			return .none
+
+		case .nonFungibleTokenDetails(.delegate(.dismiss)):
+			state.destination = nil
 			return .none
 
 		case .nonFungibleTokenDetails:
@@ -598,14 +602,60 @@ extension TransactionReview {
 	func transactionManifestWithWalletInstructionsAdded(_ state: State) throws -> TransactionManifest {
 		var manifest = state.transactionManifest
 		if let feePayerSelection = state.reviewedTransaction?.feePayerSelection, let feePayer = feePayerSelection.selected {
-			manifest = try manifest.withLockFeeCallMethodAdded(
-				address: feePayer.account.address.asGeneral,
-				fee: feePayerSelection.transactionFee.totalFee.lockFee
-			)
+			do {
+				manifest = try manifest.withLockFeeCallMethodAdded(
+					address: feePayer.account.address.asGeneral,
+					fee: feePayerSelection.transactionFee.totalFee.lockFee
+				)
+			} catch {
+				loggerGlobal.error("Failed to add lock fee, error: \(error)")
+				throw FailedToAddLockFee(underlyingError: error)
+			}
 		}
-		return try addingGuarantees(to: manifest, guarantees: state.allGuarantees)
+		do {
+			return try addingGuarantees(to: manifest, guarantees: state.allGuarantees)
+		} catch {
+			loggerGlobal.error("Failed to add guarantee, error: \(error)")
+			throw FailedToAddGuarantee(underlyingError: error)
+		}
+	}
+}
+
+// MARK: - FailedToAddLockFee
+public struct FailedToAddLockFee: LocalizedError {
+	public let underlyingError: Swift.Error
+	public init(underlyingError: Swift.Error) {
+		self.underlyingError = underlyingError
 	}
 
+	public var errorDescription: String? {
+		let base = "Failed to add Transaction Fee, try a different amount of fee payer." // FIXME: Strings
+		#if DEBUG
+		return base + "\n[DEBUG ONLY]: \(String(describing: underlyingError))"
+		#else
+		return base
+		#endif
+	}
+}
+
+// MARK: - FailedToAddGuarantee
+public struct FailedToAddGuarantee: LocalizedError {
+	public let underlyingError: Swift.Error
+	public init(underlyingError: Swift.Error) {
+		self.underlyingError = underlyingError
+	}
+
+	public var errorDescription: String? {
+		let base = "Failed to add Guarantee, try a different percentage, or try skip adding a guarantee." // FIXME: Strings
+		#if DEBUG
+		return base + "\n[DEBUG ONLY]: \(String(describing: underlyingError))"
+		#else
+		return base
+		#endif
+	}
+}
+
+extension TransactionReview {
 	func delayedEffect(
 		delay: Duration = .seconds(0.3),
 		for action: Action
@@ -1014,20 +1064,6 @@ extension TransactionReview {
 				return approved
 			}
 		}
-	}
-
-	public struct FungibleTransfer_: Sendable, Hashable {
-		public let id = Transfer.ID()
-		public let fungibleResource: OnLedgerEntity.Resource
-		public let isXRD: Bool
-		public let amount: RETDecimal
-		public var guarantee: TransactionClient.Guarantee?
-	}
-
-	public struct NonFungibleTransfer_: Sendable, Hashable {
-		public let id = Transfer.ID()
-		public let nonFungibleResource: OnLedgerEntity.Resource
-		public let token: OnLedgerEntity.NonFungibleToken
 	}
 
 	public struct Transfer: Sendable, Identifiable, Hashable {

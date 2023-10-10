@@ -6,9 +6,9 @@ extension OnLedgerEntitiesClient {
 	@Sendable
 	static func createAccount(
 		_ item: GatewayAPI.StateEntityDetailsResponseItem,
-		accountAddress: AccountAddress,
 		ledgerState: AtLedgerState
 	) async throws -> OnLedgerEntity.Account {
+		let accountAddress = try AccountAddress(validatingAddress: item.address)
 		let fungibleResources = try extractOwnedFungibleResources(item, ledgerState: ledgerState)
 		let nonFungibleResources = try extractOwnedNonFungibleResources(item, ledgerState: ledgerState)
 
@@ -38,9 +38,28 @@ extension OnLedgerEntitiesClient {
 	}
 
 	@Sendable
+	static func createGenericComponent(
+		_ item: GatewayAPI.StateEntityDetailsResponseItem,
+		ledgerState: AtLedgerState
+	) throws -> OnLedgerEntity.GenericComponent {
+		try .init(
+			address: .init(validatingAddress: item.address),
+			atLedgerState: ledgerState,
+			behaviors: item.details?.component?.roleAssignments?.extractBehaviors() ?? [],
+			metadata: .init(item.explicitMetadata)
+		)
+	}
+
+	@Sendable
+	static func createAssociatedDapp(
+		_ item: GatewayAPI.StateEntityDetailsResponseItem
+	) throws -> OnLedgerEntity.AssociatedDapp {
+		try .init(address: .init(validatingAddress: item.address), metadata: .init(item.explicitMetadata))
+	}
+
+	@Sendable
 	static func createResourcePool(
 		_ item: GatewayAPI.StateEntityDetailsResponseItem,
-		resourcePoolAddress: ResourcePoolAddress,
 		ledgerState: AtLedgerState
 	) async throws -> OnLedgerEntity.ResourcePool? {
 		guard let state: GatewayAPI.ResourcePoolState = try? item.details?.component?.decodeState() else {
@@ -49,7 +68,7 @@ extension OnLedgerEntitiesClient {
 		}
 
 		return try await .init(
-			address: resourcePoolAddress,
+			address: .init(validatingAddress: item.address),
 			poolUnitResourceAddress: .init(validatingAddress: state.poolUnitResourceAddress),
 			resources: extractOwnedFungibleResources(item, ledgerState: ledgerState).sorted(),
 			metadata: .init(item.explicitMetadata)
@@ -59,7 +78,6 @@ extension OnLedgerEntitiesClient {
 	@Sendable
 	static func createValidator(
 		_ item: GatewayAPI.StateEntityDetailsResponseItem,
-		validatorAddress: ValidatorAddress,
 		ledgerState: AtLedgerState
 	) async throws -> OnLedgerEntity.Validator? {
 		@Dependency(\.gatewaysClient) var gatewaysClient
@@ -93,7 +111,7 @@ extension OnLedgerEntitiesClient {
 		}
 
 		return try .init(
-			address: validatorAddress,
+			address: .init(validatingAddress: item.address),
 			stakeUnitResourceAddress: .init(validatingAddress: state.stakeUnitResourceAddress),
 			xrdVaultBalance: .init(value: xrdStakeVaultBalance),
 			stakeClaimFungibleResourceAddress: .init(validatingAddress: state.unstakeClaimTokenResourceAddress),

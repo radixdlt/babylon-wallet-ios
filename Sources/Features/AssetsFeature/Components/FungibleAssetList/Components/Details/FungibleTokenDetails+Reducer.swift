@@ -72,14 +72,14 @@ public struct FungibleTokenDetails: Sendable, FeatureReducer {
 }
 
 // MARK: - ResourceDetails
-public struct ResourceDetails: Sendable {
-	public struct State: Sendable, Hashable {
-		enum PortfolioResource: Sendable, Hashable {
-			case fungible(OnLedgerEntity.OwnedFungibleResource, isXRD: Bool)
-			case nonFungible(OnLedgerEntity.OwnedNonFungibleResource)
-		}
-
-		let prefetchedPortfolioResource: PortfolioResource?
-		let resource: Loadable<OnLedgerEntity.Resource>
-	}
-}
+// public struct ResourceDetails: Sendable {
+//	public struct State: Sendable, Hashable {
+//		enum PortfolioResource: Sendable, Hashable {
+//			case fungible(OnLedgerEntity.OwnedFungibleResource, isXRD: Bool)
+//			case nonFungible(OnLedgerEntity.OwnedNonFungibleResource)
+//		}
+//
+//		let prefetchedPortfolioResource: PortfolioResource?
+//		let resource: Loadable<OnLedgerEntity.Resource>
+//	}
+// }

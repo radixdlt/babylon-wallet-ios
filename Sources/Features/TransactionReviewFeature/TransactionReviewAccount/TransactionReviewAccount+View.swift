@@ -104,17 +104,6 @@ struct TransactionReviewResourceView: View {
 }
 
 extension TransactionReviewTokenView.ViewState {
-//	init(transfer: TransactionReview.FungibleTransfer) {
-//		let resource = transfer.fungibleResource
-//		self.init(
-//			name: resource.symbol ?? resource.name ?? L10n.TransactionReview.unknown,
-//			thumbnail: transfer.isXRD ? .xrd : .known(resource.iconURL),
-//			amount: transfer.amount,
-//			guaranteedAmount: transfer.guarantee?.amount,
-//			fiatAmount: nil
-//		)
-//	}
-
 	init(resource: OnLedgerEntity.Resource, details: TransactionReview.Transfer.Details.Fungible) {
 		self.init(
 			name: resource.metadata.symbol ?? resource.metadata.name ?? L10n.TransactionReview.unknown,
@@ -127,15 +116,6 @@ extension TransactionReviewTokenView.ViewState {
 }
 
 extension TransferNFTView.ViewState {
-//	init(transfer: TransactionReview.NonFungibleTransfer) {
-//		let token = transfer.token
-//		self.init(
-//			tokenID: token.id.localId().toUserFacingString(),
-//			tokenName: token.name,
-//			thumbnail: transfer.nonFungibleResource.iconURL
-//		)
-//	}
-
 	init(resource: OnLedgerEntity.Resource, details: TransactionReview.Transfer.Details.NonFungible) {
 		self.init(
 			tokenID: details.id.localId().toUserFacingString(),

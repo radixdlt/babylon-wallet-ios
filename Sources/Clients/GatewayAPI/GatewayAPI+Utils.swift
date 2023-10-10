@@ -79,7 +79,7 @@ extension Set<EntityMetadataKey> {
 	}
 
 	public static var dappMetadataKeys: Set<EntityMetadataKey> {
-		[.name, .description, .iconURL, .claimedEntities, .claimedWebsites, .relatedWebsites, .dappDefinitions]
+		[.name, .description, .iconURL, .claimedEntities, .claimedWebsites, .relatedWebsites, .dappDefinitions, .accountType]
 	}
 }
 

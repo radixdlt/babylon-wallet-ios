@@ -130,29 +130,30 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
-		case let .destination(.presented(.editPersona(.delegate(.personaSaved(persona))))):
-			guard persona.id == state.mode.id else { return .none }
-			return .run { [mode = state.mode] send in
-				let updated = try await reload(in: mode)
-				await send(.internal(.reloaded(updated)))
-				await send(.delegate(.personaChanged(persona.id)))
-			} catch: { error, _ in
-				loggerGlobal.error("Failed to reload, error: \(error)")
-			}
+		case let .destination(.presented(presentedAction)):
+			switch presentedAction {
+			case let .editPersona(.delegate(.personaSaved(persona))):
+				guard persona.id == state.mode.id else { return .none }
+				return reloadEffect(mode: state.mode, notifyDelegate: true)
 
-		case .destination(.presented(.confirmForgetAlert(.confirmTapped))):
-			guard case let .dApp(dApp, persona: persona) = state.mode else {
+			case .dAppDetails(.delegate(.dAppForgotten)):
+				state.destination = nil
+				return reloadEffect(mode: state.mode, notifyDelegate: false)
+
+			case .confirmForgetAlert(.confirmTapped):
+				guard case let .dApp(dApp, persona: persona) = state.mode else { return .none }
+				let (personaID, dAppID, networkID) = (persona.id, dApp.dAppDefinitionAddress, dApp.networkID)
+				return .run { send in
+					try await authorizedDappsClient.deauthorizePersonaFromDapp(personaID, dAppID, networkID)
+					await send(.delegate(.personaDeauthorized))
+				} catch: { error, _ in
+					loggerGlobal.error("Failed to deauthorize persona \(personaID) from dApp \(dAppID), error: \(error)")
+					errorQueue.schedule(error)
+				}
+
+			default:
 				return .none
 			}
-			let (personaID, dAppID, networkID) = (persona.id, dApp.dAppDefinitionAddress, dApp.networkID)
-			return .run { send in
-				try await authorizedDappsClient.deauthorizePersonaFromDapp(personaID, dAppID, networkID)
-				await send(.delegate(.personaDeauthorized))
-			} catch: { error, _ in
-				loggerGlobal.error("Failed to deauthorize persona \(personaID) from dApp \(dAppID), error: \(error)")
-				errorQueue.schedule(error)
-			}
-
 		case .destination:
 			return .none
 		}
@@ -217,8 +218,12 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 
 			return .none
 
-		case let .dAppsUpdated(dApps):
-			guard case let .general(persona, _) = state.mode else { return .none }
+		case let .dAppsUpdated(updatedDapps):
+			guard case .general(let persona, var dApps) = state.mode else { return .none }
+			for updatedDapp in updatedDapps where dApps.ids.contains(updatedDapp.id) {
+				dApps[id: updatedDapp.id] = updatedDapp
+			}
+
 			state.mode = .general(persona, dApps: dApps)
 			return .none
 
@@ -237,6 +242,18 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 		case let .dAppLoaded(dApp):
 			state.destination = .dAppDetails(.init(dApp: dApp, context: .personaDetails))
 			return .none
+		}
+	}
+
+	private func reloadEffect(mode: State.Mode, notifyDelegate: Bool) -> Effect<Action> {
+		.run { send in
+			let updated = try await reload(in: mode)
+			await send(.internal(.reloaded(updated)))
+			if notifyDelegate {
+				await send(.delegate(.personaChanged(mode.id)))
+			}
+		} catch: { error, _ in
+			loggerGlobal.error("Failed to reload, error: \(error)")
 		}
 	}
 

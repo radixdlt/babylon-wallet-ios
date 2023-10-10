@@ -138,6 +138,19 @@ extension OnLedgerEntitiesClient {
 	}
 
 	@Sendable
+	public func getAssociatedDapps(_ addresses: [DappDefinitionAddress]) async throws -> [OnLedgerEntity.AssociatedDapp] {
+		try await getEntities(addresses.map(\.asGeneral), .dappMetadataKeys, nil, true).compactMap(\.associatedDapp)
+	}
+
+	@Sendable
+	public func getAssociatedDapp(_ address: DappDefinitionAddress) async throws -> OnLedgerEntity.AssociatedDapp {
+		guard let dApp = try await getAssociatedDapps([address]).first else {
+			throw Error.emptyResponse
+		}
+		return dApp
+	}
+
+	@Sendable
 	public func getResources(
 		_ addresses: [ResourceAddress],
 		metadataKeys: Set<EntityMetadataKey> = .resourceMetadataKeys,
@@ -175,9 +188,7 @@ extension OnLedgerEntitiesClient {
 		validatingDappDefinitionAddress dappDefinitionAddress: DappDefinitionAddress? = nil,
 		validatingWebsite website: URL? = nil
 	) async throws -> OnLedgerEntity.Metadata {
-		guard let dappMetadata = try await getAccounts([dappDefinition]).first?.metadata else {
-			throw Error.emptyResponse
-		}
+		let dappMetadata = try await getAssociatedDapp(dappDefinition).metadata
 
 		try dappMetadata.validateAccountType()
 

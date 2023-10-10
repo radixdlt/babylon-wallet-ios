@@ -14,7 +14,7 @@ public struct NonFungibleTokenDetails: Sendable, FeatureReducer {
 			resourceAddress: ResourceAddress,
 			resourceDetails: Loadable<OnLedgerEntity.Resource> = .idle,
 			ownedResource: OnLedgerEntity.OwnedNonFungibleResource? = nil,
-			token: OnLedgerEntity.NonFungibleToken,
+			token: OnLedgerEntity.NonFungibleToken? = nil,
 			ledgerState: AtLedgerState
 		) {
 			self.resourceAddress = resourceAddress

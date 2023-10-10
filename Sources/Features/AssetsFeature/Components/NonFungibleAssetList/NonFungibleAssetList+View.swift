@@ -11,14 +11,12 @@ extension NonFungibleAssetList {
 		}
 
 		public var body: some SwiftUI.View {
-			// LazyVStack(spacing: .medium1) {
 			ForEachStore(
 				store.scope(state: \.rows) { .child(.asset($0, $1)) },
 				content: {
 					NonFungibleAssetList.Row.View(store: $0)
 				}
 			)
-			// }
 			.sheet(
 				store: store.scope(state: \.$destination) { .child(.destination($0)) },
 				state: /NonFungibleAssetList.Destinations.State.details,

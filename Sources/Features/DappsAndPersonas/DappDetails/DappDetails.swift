@@ -1,6 +1,5 @@
 import AssetsFeature
 import AuthorizedDappsClient
-import CacheClient
 import EditPersonaFeature
 import EngineKit
 import FeaturePrelude
@@ -12,7 +11,6 @@ public struct DappDetails: Sendable, FeatureReducer {
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.openURL) var openURL
 	@Dependency(\.authorizedDappsClient) var authorizedDappsClient
-	@Dependency(\.cacheClient) var cacheClient
 	@Dependency(\.continuousClock) var clock
 	@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
 
@@ -49,7 +47,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 		public var resources: Resources? = nil
 
 		@Loadable
-		public var associatedDapps: [AssociatedDapp]? = nil
+		public var associatedDapps: [OnLedgerEntity.AssociatedDapp]? = nil
 
 		@PresentationState
 		public var destination: Destination.State? = nil
@@ -60,7 +58,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 			context: Context.SettingsContext,
 			metadata: OnLedgerEntity.Metadata? = nil,
 			resources: Resources? = nil,
-			associatedDapps: [AssociatedDapp]? = nil,
+			associatedDapps: [OnLedgerEntity.AssociatedDapp]? = nil,
 			destination: Destination.State? = nil
 		) {
 			self.context = .settings(context)
@@ -78,7 +76,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 			dAppDefinitionAddress: DappDefinitionAddress,
 			metadata: OnLedgerEntity.Metadata? = nil,
 			resources: Resources? = nil,
-			associatedDapps: [AssociatedDapp]? = nil,
+			associatedDapps: [OnLedgerEntity.AssociatedDapp]? = nil,
 			destination: Destination.State? = nil
 		) {
 			self.context = .general
@@ -124,7 +122,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 	public enum InternalAction: Sendable, Equatable {
 		case metadataLoaded(Loadable<OnLedgerEntity.Metadata>)
 		case resourcesLoaded(Loadable<State.Resources>)
-		case associatedDappsLoaded(Loadable<[State.AssociatedDapp]>)
+		case associatedDappsLoaded(Loadable<[OnLedgerEntity.AssociatedDapp]>)
 		case dAppUpdated(Profile.Network.AuthorizedDappDetailed)
 	}
 
@@ -204,9 +202,8 @@ public struct DappDetails: Sendable, FeatureReducer {
 					await send(.internal(.dAppUpdated(authorizedDapp)))
 				}
 
-				// TODO: use OnLedgerEntities client
 				let result = await TaskResult {
-					try await onLedgerEntitiesClient.getAccount(dAppID, metadataKeys: .dappMetadataKeys).metadata
+					try await onLedgerEntitiesClient.getAssociatedDapp(dAppID).metadata
 				}
 				await send(.internal(.metadataLoaded(.init(result: result))))
 			} catch: { error, _ in
@@ -234,7 +231,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 				return .none
 			}
 
-			// state.destination = .nonFungibleDetails(.init(resource: resource))
+			state.destination = .nonFungibleDetails(.init(resourceAddress: resource.resourceAddress, resourceDetails: .success(resource), ledgerState: resource.atLedgerState))
 			return .none
 
 		case let .dAppTapped(address):
@@ -341,13 +338,21 @@ public struct DappDetails: Sendable, FeatureReducer {
 	private func loadDapps(
 		metadata: OnLedgerEntity.Metadata,
 		validated dappDefinitionAddress: DappDefinitionAddress
-	) async -> Loadable<[State.AssociatedDapp]> {
+	) async -> Loadable<[OnLedgerEntity.AssociatedDapp]> {
 		guard let dAppDefinitions = metadata.dappDefinitions else { return .idle }
 
-		let associatedDapps = await dAppDefinitions.parallelMap { dApp in
-			try? await extractDappInfo(for: dApp, validating: dappDefinitionAddress)
+		let loadedDApps = await (try? onLedgerEntitiesClient.getAssociatedDapps(dAppDefinitions)) ?? []
+		let associatedDapps = loadedDApps.filter { dApp in
+			do {
+				try dApp.metadata.validate(dAppDefinitionAddress: dApp.address)
+				guard let name = dApp.metadata.name else {
+					throw OnLedgerEntity.Metadata.MetadataError.missingName
+				}
+				return true
+			} catch {
+				return false
+			}
 		}
-		.compactMap { $0 }
 
 		guard !associatedDapps.isEmpty else { return .idle }
 
@@ -390,22 +395,6 @@ public struct DappDetails: Sendable, FeatureReducer {
 		}
 	}
 }
-
-// extension GatewayAPI.StateEntityDetailsResponseItem {
-//	fileprivate var resourceDetails: DappDetails.State.Resources.ResourceDetails? {
-//		guard let fungibility else { return nil }
-//		guard let address = try? ResourceAddress(validatingAddress: address) else {
-//			loggerGlobal.warning("Failed to extract ResourceDetails for \(address)")
-//			return nil
-//		}
-//		return .init(address: address,
-//		             fungibility: fungibility,
-//		             name: metadata.name ?? L10n.AuthorizedDapps.DAppDetails.unknownTokenName,
-//		             symbol: metadata.symbol,
-//		             description: metadata.description,
-//		             iconURL: metadata.iconURL)
-//	}
-// }
 
 extension AlertState<DappDetails.Destination.Action.ConfirmDisconnectAlert> {
 	static var confirmDisconnect: AlertState {

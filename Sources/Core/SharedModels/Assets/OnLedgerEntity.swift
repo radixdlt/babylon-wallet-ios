@@ -11,6 +11,7 @@ public enum OnLedgerEntity: Sendable, Hashable, Codable {
 	case nonFungibleToken(NonFungibleToken)
 	case accountNonFungibleIds(AccountNonFungibleIdsPage)
 	case genericComponent(GenericComponent)
+	case associatedDapp(AssociatedDapp)
 
 	public var resource: Resource? {
 		guard case let .resource(resource) = self else {
@@ -59,6 +60,13 @@ public enum OnLedgerEntity: Sendable, Hashable, Codable {
 			return nil
 		}
 		return genericComponent
+	}
+
+	public var associatedDapp: AssociatedDapp? {
+		guard case let .associatedDapp(associatedDapp) = self else {
+			return nil
+		}
+		return associatedDapp
 	}
 }
 
@@ -168,7 +176,7 @@ extension OnLedgerEntity {
 		public let behaviors: [AssetBehavior]
 		public let metadata: Metadata
 
-		init(
+		public init(
 			address: ComponentAddress,
 			atLedgerState: AtLedgerState,
 			behaviors: [AssetBehavior],
@@ -348,6 +356,19 @@ extension OnLedgerEntity {
 			self.fungibleResources = fungibleResources
 			self.nonFungibleResources = nonFungibleResources
 			self.poolUnitResources = poolUnitResources
+		}
+	}
+}
+
+// MARK: OnLedgerEntity.AssociatedDapp
+extension OnLedgerEntity {
+	public struct AssociatedDapp: Sendable, Hashable, Codable {
+		public let address: DappDefinitionAddress
+		public let metadata: Metadata
+
+		public init(address: DappDefinitionAddress, metadata: Metadata) {
+			self.address = address
+			self.metadata = metadata
 		}
 	}
 }

@@ -92,7 +92,6 @@ public struct AccountDetails: Sendable, FeatureReducer {
 	public enum InternalAction: Sendable, Equatable {
 		case markBackupNeeded
 		case accountUpdated(Profile.Network.Account)
-		case portfolioLoaded(OnLedgerEntity.Account)
 
 		case loadMnemonic
 		case loadMnemonicResult(TaskResult<MnemonicWithPassphraseAndFactorSourceInfo>)
@@ -288,10 +287,6 @@ public struct AccountDetails: Sendable, FeatureReducer {
 		case let .accountUpdated(account):
 			state.account = account
 			return .none
-
-		case let .portfolioLoaded(portfolio):
-			// state.assets.updatePortfolio(to: portfolio)
-			return .none
 		}
 	}
 
@@ -365,8 +360,6 @@ public struct AccountDetails: Sendable, FeatureReducer {
 			if let xrdResource, xrdResource.amount > .zero {
 				await send(.internal(.markBackupNeeded))
 			}
-
-			await send(.internal(.portfolioLoaded(portfolio)))
 		}
 	}
 }

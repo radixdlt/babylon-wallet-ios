@@ -13,9 +13,15 @@ extension NonFungibleAssetList {
 			public let resource: OnLedgerEntity.OwnedNonFungibleResource
 			public let accountAddress: AccountAddress
 
+			/// The loaded pages of tokens
 			public var tokens: [[Loadable<OnLedgerEntity.NonFungibleToken>]] = []
+			/// Last page index that was loaded, useful to determin the next page index that needs to be loaded
 			public var lastLoadedPageIndex: Int = -1
+			/// The last visible row to which user scrolled to, will be used to proactively fetch additional pages
+			/// if user did scroll past currently loading page
 			public var lastVisibleRowIndex: Int = 0
+			/// Tokens pages are loaded one after another, in order to load the next page we need to have
+			/// the nextPageCursor received after loading current page.
 			public var nextPageCursor: String?
 			public var isLoadingResources: Bool = false
 
@@ -75,10 +81,14 @@ extension NonFungibleAssetList {
 			case .isExpandedToggled:
 				state.isExpanded.toggle()
 				if state.isExpanded {
-					let pagesCount = max(state.resource.nonFungibleIdsCount / State.pageSize, 1)
+					/// The total number of full pages
+					let fullPagesCount = max(state.resource.nonFungibleIdsCount / State.pageSize, 1)
+					/// Prepopulate with placeholders
+					state.tokens = .init(repeating: .init(repeating: .loading, count: State.pageSize), count: fullPagesCount)
+					/// The number of items to add to the last page
 					let remainder = state.resource.nonFungibleIdsCount % State.pageSize
-					state.tokens = .init(repeating: .init(repeating: .loading, count: State.pageSize), count: pagesCount)
-					if pagesCount > 1, remainder > 0 {
+					if fullPagesCount > 1, remainder > 0 {
+						/// At last page placeholders also
 						state.tokens.append(.init(repeating: .loading, count: remainder))
 					}
 					return loadResources(&state, pageIndex: 0)
@@ -88,8 +98,9 @@ extension NonFungibleAssetList {
 
 			case let .onTokenDidAppear(index):
 				state.lastVisibleRowIndex = index
-				let pageIndex = index / State.pageSize
-				if state.isLoadingResources == false, pageIndex > state.lastLoadedPageIndex {
+				let rowPageIndex = index / State.pageSize
+				/// Load next page if not currently loading and current page was not loaded.
+				if state.isLoadingResources == false, rowPageIndex > state.lastLoadedPageIndex {
 					return loadResources(&state, pageIndex: state.lastLoadedPageIndex + 1)
 				}
 				return .none
@@ -105,6 +116,8 @@ extension NonFungibleAssetList {
 					state.tokens[tokensPage.pageIndex] = tokensPage.tokens.map(Loadable.success)
 					state.lastLoadedPageIndex = tokensPage.pageIndex
 
+					/// If user did quick scroll over the currently loading page, proactively load the next page.
+					/// If there are 5 pages in total, and user did scroll fast to last one, this will load all pages in chain, one after another.
 					if state.lastVisibleRowIndex / State.pageSize > tokensPage.pageIndex {
 						return loadResources(&state, pageIndex: tokensPage.pageIndex + 1)
 					}

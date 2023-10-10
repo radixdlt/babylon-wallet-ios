@@ -4,6 +4,7 @@ extension View {
 	@ViewBuilder
 	public func loadable<T>(_ loadable: Loadable<T>,
 	                        @ViewBuilder loadingView: () -> some View,
+	                        @ViewBuilder errorView: (Error) -> some View = { _ in Text("Failed to load") },
 	                        @ViewBuilder successContent: (T) -> some View) -> some View
 	{
 		switch loadable {
@@ -12,7 +13,7 @@ extension View {
 		case let .success(value):
 			successContent(value)
 		case let .failure(error):
-			fatalError()
+			errorView(error)
 		}
 	}
 
@@ -28,6 +29,9 @@ extension View {
 					.background(.app.gray4)
 					.shimmer(active: true, config: .accountResourcesLoading)
 					.cornerRadius(.small1)
+			},
+			errorView: { _ in
+				Text("Failed to load")
 			},
 			successContent: successContent
 		)

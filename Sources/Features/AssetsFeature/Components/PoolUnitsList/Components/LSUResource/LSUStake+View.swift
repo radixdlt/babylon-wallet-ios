@@ -83,9 +83,6 @@ extension LSUStake {
 					action: Destinations.Action.details,
 					content: LSUDetails.View.init
 				)
-				.task { @MainActor in
-					await viewStore.send(.task).finish()
-				}
 			}
 		}
 
@@ -196,11 +193,5 @@ extension LSUStake.State {
 				}
 			)
 		})
-	}
-}
-
-extension Array {
-	var nonEmpty: NonEmpty<Self>? {
-		.init(self)
 	}
 }

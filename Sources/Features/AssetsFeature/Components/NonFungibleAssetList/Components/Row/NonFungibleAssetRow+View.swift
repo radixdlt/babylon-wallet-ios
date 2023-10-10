@@ -64,28 +64,12 @@ extension NonFungibleAssetList.Row.View {
 		.padding(.horizontal, .medium1)
 		.frame(height: headerHeight)
 		.background(.app.white)
-		//	.roundedCorners(viewStore.isExpanded ? .top : .allCorners, radius: .small1)
-		//	.tokenRowShadow(!viewStore.isExpanded)
 		.onTapGesture {
 			viewStore.send(.isExpandedToggled, animation: .easeInOut)
 		}
 	}
 
 	private var headerHeight: CGFloat { HitTargetSize.small.frame.height + 2 * .medium1 }
-}
-
-extension View {
-	func rowStyle() -> some View {
-		self
-			.listRowInsets(.init())
-			.listRowSeparatorTint(.app.gray2)
-			.alignmentGuide(.listRowSeparatorLeading) { _ in
-				.medium3
-			}
-			.alignmentGuide(.listRowSeparatorTrailing) { viewDimensions in
-				viewDimensions[.listRowSeparatorTrailing] - .medium3
-			}
-	}
 }
 
 // MARK: - Private Computed Properties
@@ -97,6 +81,7 @@ extension NonFungibleAssetList.Row.View {
 		index: Int
 	) -> some View {
 		loadable(asset) {
+			/// Placeholder Loading view
 			VStack(spacing: .medium3) {
 				Spacer()
 					.frame(height: .imagePlaceholderHeight)

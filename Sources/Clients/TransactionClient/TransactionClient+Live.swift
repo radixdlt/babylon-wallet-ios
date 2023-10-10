@@ -98,8 +98,6 @@ extension TransactionClient {
 
 		@Sendable
 		func allFeePayerCandidates() async throws -> NonEmpty<IdentifiedArrayOf<FeePayerCandidate>> {
-			// fatalError()
-			// need to fetch xrd balance for each account
 			let networkID = await gatewaysClient.getCurrentNetworkID()
 			let allAccounts = try await accountsClient.getAccountsOnNetwork(networkID)
 			let allFeePayerCandidates = try await accountPortfoliosClient.fetchAccountPortfolios(allAccounts.map(\.address), true).compactMap { portfolio -> FeePayerCandidate? in

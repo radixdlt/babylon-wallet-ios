@@ -111,3 +111,18 @@ extension AssetsView {
 		}
 	}
 }
+
+extension View {
+	/// The common style for rows displayed in AssetsView
+	func rowStyle() -> some View {
+		self
+			.listRowInsets(.init())
+			.listRowSeparatorTint(.app.gray2)
+			.alignmentGuide(.listRowSeparatorLeading) { _ in
+				.medium3
+			}
+			.alignmentGuide(.listRowSeparatorTrailing) { viewDimensions in
+				viewDimensions[.listRowSeparatorTrailing] - .medium3
+			}
+	}
+}

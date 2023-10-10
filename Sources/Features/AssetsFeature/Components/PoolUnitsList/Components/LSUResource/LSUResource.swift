@@ -8,8 +8,14 @@ public struct LSUResource: Sendable, FeatureReducer {
 
 		let account: OnLedgerEntity.Account
 		var stakesDetails: IdentifiedArrayOf<LSUStake.State>
+		var isLoadingResources: Bool = false
 
-		var isLoadingResources = false
+		var didLoadResources: Bool {
+			if case .success = stakesDetails.first?.stakeDetails {
+				return true
+			}
+			return false
+		}
 	}
 
 	public enum ViewAction: Sendable, Equatable {
@@ -41,7 +47,9 @@ public struct LSUResource: Sendable, FeatureReducer {
 		case .isExpandedToggled:
 			state.isExpanded.toggle()
 			if state.isExpanded {
-				state.isLoadingResources = true
+				guard !state.didLoadResources, !state.isLoadingResources else {
+					return .none
+				}
 				return .run { [state = state] send in
 					let result = await TaskResult { try await onLedgerEntitiesClient.getOwnedStakesDetails(account: state.account, refresh: false) }
 					await send(.internal(.detailsLoaded(result)))

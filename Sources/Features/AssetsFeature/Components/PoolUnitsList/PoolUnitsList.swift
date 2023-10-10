@@ -7,7 +7,13 @@ public struct PoolUnitsList: Sendable, FeatureReducer {
 		var lsuResource: LSUResource.State?
 		var poolUnits: IdentifiedArrayOf<PoolUnit.State> = []
 		let account: OnLedgerEntity.Account
-		var didLoadResource = false
+
+		var didLoadResource: Bool {
+			if case .success = poolUnits.first?.resourceDetails {
+				return true
+			}
+			return false
+		}
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -64,7 +70,6 @@ public struct PoolUnitsList: Sendable, FeatureReducer {
 			poolDetails.forEach { poolDetails in
 				state.poolUnits[id: poolDetails.address]?.resourceDetails = .success(poolDetails)
 			}
-			state.didLoadResource = true
 			return .none
 		case .loadedResources:
 			return .none

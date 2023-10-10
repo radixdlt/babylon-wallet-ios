@@ -19,7 +19,7 @@ extension DappDetails {
 		let domain: URL?
 		let thumbnail: URL?
 		let address: DappDefinitionAddress
-		let associatedDapps: [State.AssociatedDapp]?
+		let associatedDapps: [OnLedgerEntity.AssociatedDapp]?
 		let showForgetDapp: Bool
 		let tappablePersonas: Bool
 	}

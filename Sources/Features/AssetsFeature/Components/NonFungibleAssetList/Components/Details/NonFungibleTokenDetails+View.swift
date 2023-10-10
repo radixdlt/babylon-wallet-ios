@@ -31,21 +31,6 @@ extension NonFungibleTokenDetails.ViewState.TokenDetails {
 	}
 }
 
-// extension AssetResourceDetailsSection.ViewState {
-//	init(resource: OnLedgerEntity.Resource) {
-//		self.init(
-//			description: resource.description,
-//			resourceAddress: resource.resourceAddress,
-//			isXRD: false,
-//			validatorAddress: nil,
-//			resourceName: resource.name,
-//			currentSupply: resource.totalSupply?.formatted(),
-//			behaviors: resource.behaviors,
-//			tags: resource.tags
-//		)
-//	}
-// }
-
 // MARK: - NonFungibleTokenList.Detail.View
 extension NonFungibleTokenDetails {
 	public struct ViewState: Equatable {

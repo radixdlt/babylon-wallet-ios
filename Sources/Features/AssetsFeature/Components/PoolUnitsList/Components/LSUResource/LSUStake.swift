@@ -24,7 +24,6 @@ public struct LSUStake: FeatureReducer {
 	public enum ViewAction: Sendable, Equatable {
 		case didTap
 		case didTapStakeClaimNFT(withID: ViewState.StakeClaimNFTViewState.ID)
-		case task
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -66,9 +65,6 @@ public struct LSUStake: FeatureReducer {
 		viewAction: ViewAction
 	) -> Effect<Action> {
 		switch viewAction {
-		case .task:
-			return .none
-
 		case .didTap:
 			guard case let .success(stakeDetails) = state.stakeDetails else {
 				return .none

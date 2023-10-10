@@ -285,24 +285,37 @@ extension OnLedgerEntitiesClient {
 				metadata: .init(item.explicitMetadata)
 			))
 		default:
-			if let accountAddress = try? AccountAddress(validatingAddress: item.address) {
-				// create account
-				return try await .account(createAccount(
+			let address = try Address(validatingAddress: item.address)
+			let addressKind = address.decodedKind
+			switch addressKind {
+			case _ where AccountEntityType.addressSpace.contains(addressKind):
+				if item.explicitMetadata?.accountType == .dappDefinition {
+					return try .associatedDapp(createAssociatedDapp(item))
+				} else {
+					return try await .account(createAccount(
+						item,
+						ledgerState: ledgerState
+					))
+				}
+			case _ where ResourcePoolEntityType.addressSpace.contains(addressKind):
+				guard let resourcePool = try await createResourcePool(
 					item,
-					accountAddress: accountAddress,
 					ledgerState: ledgerState
-				))
-			} else if let resourcePoolAddress = try? ResourcePoolAddress(validatingAddress: item.address) {
-				guard let resourcePool = try await createResourcePool(item, resourcePoolAddress: resourcePoolAddress, ledgerState: ledgerState) else {
+				) else {
 					return nil
 				}
 
 				return .resourcePool(resourcePool)
-			} else if let validatorAddress = try? ValidatorAddress(validatingAddress: item.address) {
-				guard let validator = try await createValidator(item, validatorAddress: validatorAddress, ledgerState: ledgerState) else {
+			case _ where ValidatorEntityType.addressSpace.contains(addressKind):
+				guard let validator = try await createValidator(
+					item,
+					ledgerState: ledgerState
+				) else {
 					return nil
 				}
 				return .validator(validator)
+			default:
+				return try .genericComponent(createGenericComponent(item, ledgerState: ledgerState))
 			}
 			return nil
 		}
@@ -377,6 +390,8 @@ extension OnLedgerEntity {
 			return .validator(validator.address.asGeneral)
 		case let .genericComponent(component):
 			return .genericComponent(component.address.asGeneral)
+		case let .associatedDapp(dapp):
+			return .associatedDapp(dapp.address)
 		}
 	}
 }
@@ -398,6 +413,8 @@ extension CacheClient.Entry.OnLedgerEntity {
 			return .init(address: nonFungibleId.resourceAddress().asStr(), decodedKind: .globalNonFungibleResourceManager)
 		case let .nonFungibleIdPage(_, resourceAddress, _):
 			return resourceAddress.asGeneral
+		case let .associatedDapp(address):
+			return address.asGeneral
 		}
 	}
 }
