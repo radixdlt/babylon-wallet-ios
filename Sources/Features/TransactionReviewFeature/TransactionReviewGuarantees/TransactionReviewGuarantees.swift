@@ -123,7 +123,8 @@ public struct TransactionReviewGuarantee: Sendable, FeatureReducer {
 			}
 
 			let newMinimumDecimal = value * 0.01
-			let newAmount = newMinimumDecimal * state.details.amount
+			let divisibility = state.resource.divisibility.map(UInt.init) ?? RETDecimal.maxDivisibility
+			let newAmount = (newMinimumDecimal * state.details.amount).rounded(decimalPlaces: divisibility)
 			state.guarantee.amount = newAmount
 
 			return .none

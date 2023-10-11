@@ -87,13 +87,18 @@ extension RETDecimal {
 // MARK: Truncation and rounding
 
 extension RETDecimal {
-	/// Truncates to `decimalPlaces` decimals
-	public func truncated(decimalPlaces: UInt) -> RETDecimal {
+	/// Rounds to `decimalPlaces` decimals, in the direction of 0
+	public func floor(decimalPlaces: UInt) -> RETDecimal {
 		try! round(decimalPlaces: Int32(decimalPlaces), roundingMode: .toZero)
 	}
 
+	/// Rounds to `decimalPlaces` decimals, in the direction away from zero
+	public func ceil(decimalPlaces: UInt) -> RETDecimal {
+		try! round(decimalPlaces: Int32(decimalPlaces), roundingMode: .awayFromZero)
+	}
+
 	/// Rounds to `decimalPlaces` decimals
-	public func rounded(decimalPlaces: UInt) -> RETDecimal {
+	public func rounded(decimalPlaces: UInt = 0) -> RETDecimal {
 		try! round(decimalPlaces: Int32(decimalPlaces), roundingMode: .toNearestMidpointAwayFromZero)
 	}
 }
@@ -130,7 +135,8 @@ extension RETDecimal {
 		formattedString: String,
 		locale: Locale = .autoupdatingCurrent
 	) throws {
-		var string = formattedString
+		// Pad with a leading zero, to make numbers with leading decimal separator parsable
+		var string = "0" + formattedString
 		// If the locale recognizes a grouping separator, we strip that from the string
 		if let groupingSeparator = locale.groupingSeparator {
 			string.replace(groupingSeparator, with: "")
