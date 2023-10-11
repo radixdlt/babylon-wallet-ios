@@ -213,7 +213,7 @@ final class DecimalTests: TestCase {
 		func doTest(_ decimalString: String, divisibility: UInt, expected expectedString: String, line: UInt = #line) throws {
 			let expected = try RETDecimal(value: expectedString)
 			let decimal = try RETDecimal(value: decimalString)
-			let actual = decimal.truncated(decimalPlaces: divisibility)
+			let actual = decimal.floor(decimalPlaces: divisibility)
 			XCTAssertEqual(actual, expected, line: line)
 		}
 
