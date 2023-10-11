@@ -250,18 +250,18 @@ extension GatewayAPI.ComponentEntityRoleAssignments {
 
 		enum Assigned {
 			case none, someone, anyone, unknown
-
-			init(_ explicitAssignment: ParsedAssignment.Explicit) {
-				switch explicitAssignment {
-				case .denyAll: self = .none
-				case .protected: self = .someone
-				case .allowAll: self = .anyone
-				}
-			}
 		}
 
 		func findEntry(_ name: GatewayAPI.RoleKey.ParsedName) -> AssignmentEntry? {
 			entries.first { $0.roleKey.parsedName == name }
+		}
+
+		func assigned(for explicitAssignment: ParsedAssignment.Explicit) -> Assigned {
+			switch explicitAssignment {
+			case .denyAll: return .none
+			case .protected: return .someone
+			case .allowAll: return .anyone
+			}
 		}
 
 		func resolvedOwner() -> Assigned {
@@ -269,46 +269,41 @@ extension GatewayAPI.ComponentEntityRoleAssignments {
 			let rule = dict["rule"] as Any
 			guard let explicit = ParsedAssignment.Explicit(rule) else { return .unknown }
 
-			return .init(explicit)
+			return assigned(for: explicit)
 		}
 
-		func performer(_ name: GatewayAPI.RoleKey.ParsedName) -> Assigned {
-			guard let parsed = findEntry(name)?.parsedAssignment else { return .unknown }
-			switch parsed {
+		func findAssigned(for parsedAssignment: ParsedAssignment) -> Assigned {
+			switch parsedAssignment {
 			case .owner:
 				return resolvedOwner()
 			case let .explicit(explicit):
-				return .init(explicit)
+				return assigned(for: explicit)
 			}
 		}
 
-		func updaters(_ name: GatewayAPI.RoleKey.ParsedName) -> Assigned {
-			guard let updaters = findEntry(name)?.updaterRoles, !updaters.isEmpty else { return .unknown }
+		func performer(_ name: GatewayAPI.RoleKey.ParsedName) -> Assigned {
+			guard let parsedAssignment = findEntry(name)?.parsedAssignment else { return .unknown }
+			return findAssigned(for: parsedAssignment)
+		}
+
+		func updaters(_ name: GatewayAPI.RoleKey.ParsedName) -> Set<Assigned> {
+			guard let updaters = findEntry(name)?.updaterRoles, !updaters.isEmpty else { return [.unknown] }
 
 			// Lookup the corresponding assignments, ignoring unknown and empty values
-			let parsed = Set(updaters.compactMap(\.parsedName).compactMap(findEntry).compactMap(\.parsedAssignment))
+			let parsedAssignments = Set(updaters.compactMap(\.parsedName).compactMap(findEntry).compactMap(\.parsedAssignment))
 
-			if parsed.isEmpty {
-				return .unknown
-			} else if parsed == [.explicit(.denyAll)] {
-				return .none
-			} else if parsed.contains(.explicit(.allowAll)) {
-				return .anyone
-			} else if parsed == [.owner] {
-				return resolvedOwner()
-			} else {
-				return .someone
-			}
+			return Set(parsedAssignments.map(findAssigned))
 		}
 
 		var result: Set<AssetBehavior> = []
 
-		// Withdrawer and depositor areas are checked together, but we look at the performer and updater role types separately
+		// Movement behaviors: Withdrawer and depositor names are checked together, but we look
+		// at the performer and updater role types separately
 		let movers: Set = [performer(.withdrawer), performer(.depositor)]
 		if movers != [.anyone] {
 			result.insert(.movementRestricted)
 		} else {
-			let moverUpdaters: Set = [updaters(.withdrawer), updaters(.depositor)]
+			let moverUpdaters = updaters(.withdrawer).union(updaters(.depositor))
 			if moverUpdaters.contains(.anyone) {
 				result.insert(.movementRestrictableInFutureByAnyone)
 			} else if moverUpdaters.contains(.someone) {
@@ -318,11 +313,13 @@ extension GatewayAPI.ComponentEntityRoleAssignments {
 
 		// Other names are checked individually, but without distinguishing between the role types
 		func addBehavior(for name: GatewayAPI.RoleKey.ParsedName, ifSomeone: AssetBehavior, ifAnyone: AssetBehavior) {
-			let either: Set = [performer(name), updaters(name)]
-			if either.contains(.anyone) {
+			let allAssigned = updaters(name).union([performer(name)])
+			if allAssigned.contains(.anyone) {
 				result.insert(ifAnyone)
-			} else if either.contains(.someone) {
+			} else if allAssigned.contains(.someone) {
 				result.insert(ifSomeone)
+			} else if allAssigned.contains(.someone) {
+				loggerGlobal.warning("Failed to parse ComponentEntityRoleAssignments for \(name)")
 			}
 		}
 
