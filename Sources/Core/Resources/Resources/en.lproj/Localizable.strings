@@ -141,6 +141,10 @@
 "accountSettings_behaviors_freezableByAnyone" = "Anyone can freeze this asset in place.";
 "accountSettings_behaviors_nftDataChangeable" = "Data that is set on these NFTs can be changed.";
 "accountSettings_behaviors_nftDataChangeableByAnyone" = "Anyone can change data that is set on these NFTs.";
+"accountSettings_developmentHeading" = "Set development preferences";
+"accountSettings_devPreferences" = "Dev Preferences";
+"accountSettings_hideThisAccount" = "Hide This Account";
+"accountSettings_hideAccountConfirmation" = "Are you sure you want to hide this account?";
 "settings_title" = "Settings";
 "settings_linkedConnectors" = "Linked Connectors";
 "settings_gateways" = "Gateways";
@@ -676,6 +680,16 @@
 "appSettings_resetWalletDialog_resetButtonTitle" = "Reset Wallet";
 "appSettings_resetWalletDialog_resetAndDeleteBackupButtonTitle" = "Reset and Delete iCloud Backup";
 "appSettings_resetWalletDialog_message" = "WARNING. This will clear all contents of your Wallet. If you have no backup, you will lose access to your Accounts and Personas permanently.";
+"appSettings_entityHiding_title" = "Account & Persona Hiding";
+"appSettings_entityHiding_subtitle" = "Manage hiding";
+"appSettings_entityHiding_info" = "Accounts and Personas you have created can be hidden in your Radix Wallet, acting as if “deleted”.";
+"appSettings_entityHiding_hiddenPersona" = "%d Persona currently hidden";
+"appSettings_entityHiding_hiddenPersonas" = "%d Personas currently hidden";
+"appSettings_entityHiding_hiddenAccount" = "%d Account currently hidden";
+"appSettings_entityHiding_hiddenAccounts" = "%d Accounts currently hidden";
+"appSettings_entityHiding_unhideAllSection" = "Unhide Accounts & Personas";
+"appSettings_entityHiding_unhideAllButton" = "Unhide All";
+"appSettings_entityHiding_unhideAllConfirmation" = "Are you sure you wish to unhide all Accounts and Personas? This cannot be undone.";
 "addLedgerDevice_alreadyAddedAlert_title" = "Ledger Already Added";
 "addLedgerDevice_alreadyAddedAlert_message" = "You have already added this Ledger as: %@";
 "addLedgerDevice_addDevice_title" = "Add Ledger Device";
