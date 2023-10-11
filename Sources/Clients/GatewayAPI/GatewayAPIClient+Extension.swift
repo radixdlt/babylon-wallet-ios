@@ -204,8 +204,45 @@ extension GatewayAPI.EntityMetadataCollection {
 	}
 }
 
+// FIXME: This logic should not be here, will probably move to OnLedgerEntitiesClient.
 extension GatewayAPI.ComponentEntityRoleAssignments {
-	// FIXME: This logic should not be here, will probably move to OnLedgerEntitiesClient.
+	/**
+	  This extracts the appropriate `AssetBehavior`s from an instance of `ComponentEntityRoleAssignments`
+
+	  __MOVEMENT BEHAVIORS__
+
+	  For the behaviors related to movement  we first look at current situation, using the logic under "Find performer" below,
+	  applied to the two names `withdrawer` and `depositor`. If this results in anything other than `anyone`, we add
+	  the behavior ( `movementRestricted` ).
+
+	  If on the other hand it turns out that movement is *not* currently restricted, we look at who can change this, by finding the
+	  updaters for `withdrawer` and `depositor` using the logic in "Find updaters" below. If at least one of the names can
+	  be updated by anyone, we add the `movementRestrictableInFutureByAnyone` behavior. If `someone` can update
+	  at least one of them, we add `movementRestrictableInFuture`.
+
+	  __OTHER BEHAVIORS__
+
+	  For the remaining behaviors the logic is as follows:
+
+	  __Find performer:__ For a given "name" (`minter`, `freezer` etc) we find the "performer", i.e. who can perform the action *currently*:
+
+	  1. Find the first entry in `self.entries` whose `roleKey.name` corresponds to `name`
+	  2. Check if its `assignment` is `explicit` or points to `owner`
+	  3. If it's explicit, we check which rule, out of`DenyAll`, `AllowAll` and `Protected`, that is set
+	  4. For the `owner` case, we go to the root property `owner`, where its `rule` property should return one of those three rules
+	  5. Finally we map the three rules to `none`, `anyone` and `someone`, rspectively
+
+	  __Find updaters:__ We also find the "updater" for the name, i.e. who can *change* the performer
+
+	  1. For the same `entry`, we look at the `updaterRoles` property, which contains a list of names
+	  2. For each of these names, we look up *their* corresponding entry and then the rule, and map it, like above
+
+	  __Combine result:__ For our purposes here, we don't distinguish between performers and updaters, so we consider them together
+
+	  1. Combine the performer and all updaters into a set, removing duplicates
+	  2. If the set contains `anyone`, we add the "... by anyone" behavior
+	  3. If the set contains `someone` we add the plain behavior
+	 */
 	@Sendable public func extractBehaviors() -> [AssetBehavior] {
 		typealias AssignmentEntry = GatewayAPI.ComponentEntityRoleAssignmentEntry
 		typealias ParsedName = GatewayAPI.RoleKey.ParsedName
