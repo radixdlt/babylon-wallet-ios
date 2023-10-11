@@ -1,0 +1,428 @@
+{
+	"owner": {
+		"rule": {
+			"type": "Protected",
+			"access_rule": {
+				"type": "ProofRule",
+				"proof_rule": {
+					"type": "Require",
+					"requirement": {
+						"type": "Resource",
+						"resource": "resource_tdx_2_1tkckx9fynl9f7756z8wxphq7wce6vk874nuq4f2nnxgh3nzrwhjdlp"
+					}
+				}
+			}
+		},
+		"updater": "Owner"
+	},
+	"entries": [
+		{
+			"role_key": {
+				"module": "Main",
+				"name": "burner"
+			},
+			"assignment": {
+				"resolution": "Explicit",
+				"explicit_rule": {
+					"type": "Protected",
+					"access_rule": {
+						"type": "ProofRule",
+						"proof_rule": {
+							"type": "Require",
+							"requirement": {
+								"type": "NonFungible",
+								"non_fungible": {
+									"local_id": {
+										"id_type": "Bytes",
+										"sbor_hex": "5cc002209f84cfb8d12ad9bb4564e17b68ded9bdbe5e290163afce18e2573357b4b4321e",
+										"simple_rep": "[9f84cfb8d12ad9bb4564e17b68ded9bdbe5e290163afce18e2573357b4b4321e]"
+									},
+									"resource_address": "resource_tdx_2_1nfxxxxxxxxxxglcllrxxxxxxxxx002350006550xxxxxxxxxqtcnwk"
+								}
+							}
+						}
+					}
+				}
+			},
+			"updater_roles": [
+				{
+					"module": "Main",
+					"name": "burner_updater"
+				}
+			]
+		},
+		{
+			"role_key": {
+				"module": "Main",
+				"name": "minter"
+			},
+			"assignment": {
+				"resolution": "Explicit",
+				"explicit_rule": {
+					"type": "Protected",
+					"access_rule": {
+						"type": "ProofRule",
+						"proof_rule": {
+							"type": "Require",
+							"requirement": {
+								"type": "NonFungible",
+								"non_fungible": {
+									"local_id": {
+										"id_type": "Bytes",
+										"sbor_hex": "5cc002209f84cfb8d12ad9bb4564e17b68ded9bdbe5e290163afce18e2573357b4b4321e",
+										"simple_rep": "[9f84cfb8d12ad9bb4564e17b68ded9bdbe5e290163afce18e2573357b4b4321e]"
+									},
+									"resource_address": "resource_tdx_2_1nfxxxxxxxxxxglcllrxxxxxxxxx002350006550xxxxxxxxxqtcnwk"
+								}
+							}
+						}
+					}
+				}
+			},
+			"updater_roles": [
+				{
+					"module": "Main",
+					"name": "minter_updater"
+				}
+			]
+		},
+		{
+			"role_key": {
+				"module": "Main",
+				"name": "freezer"
+			},
+			"assignment": {
+				"resolution": "Explicit",
+				"explicit_rule": {
+					"type": "DenyAll"
+				}
+			},
+			"updater_roles": [
+				{
+					"module": "Main",
+					"name": "freezer_updater"
+				}
+			]
+		},
+		{
+			"role_key": {
+				"module": "Main",
+				"name": "recaller"
+			},
+			"assignment": {
+				"resolution": "Explicit",
+				"explicit_rule": {
+					"type": "Protected",
+					"access_rule": {
+						"type": "ProofRule",
+						"proof_rule": {
+							"type": "Require",
+							"requirement": {
+								"type": "NonFungible",
+								"non_fungible": {
+									"local_id": {
+										"id_type": "Bytes",
+										"sbor_hex": "5cc002209f84cfb8d12ad9bb4564e17b68ded9bdbe5e290163afce18e2573357b4b4321e",
+										"simple_rep": "[9f84cfb8d12ad9bb4564e17b68ded9bdbe5e290163afce18e2573357b4b4321e]"
+									},
+									"resource_address": "resource_tdx_2_1nfxxxxxxxxxxglcllrxxxxxxxxx002350006550xxxxxxxxxqtcnwk"
+								}
+							}
+						}
+					}
+				}
+			},
+			"updater_roles": [
+				{
+					"module": "Main",
+					"name": "recaller_updater"
+				}
+			]
+		},
+		{
+			"role_key": {
+				"module": "Main",
+				"name": "depositor"
+			},
+			"assignment": {
+				"resolution": "Explicit",
+				"explicit_rule": {
+					"type": "AllowAll"
+				}
+			},
+			"updater_roles": [
+				{
+					"module": "Main",
+					"name": "depositor_updater"
+				}
+			]
+		},
+		{
+			"role_key": {
+				"module": "Main",
+				"name": "withdrawer"
+			},
+			"assignment": {
+				"resolution": "Explicit",
+				"explicit_rule": {
+					"type": "AllowAll"
+				}
+			},
+			"updater_roles": [
+				{
+					"module": "Main",
+					"name": "withdrawer_updater"
+				}
+			]
+		},
+		{
+			"role_key": {
+				"module": "Main",
+				"name": "burner_updater"
+			},
+			"assignment": {
+				"resolution": "Owner"
+			},
+			"updater_roles": [
+				{
+					"module": "Main",
+					"name": "burner_updater"
+				}
+			]
+		},
+		{
+			"role_key": {
+				"module": "Main",
+				"name": "minter_updater"
+			},
+			"assignment": {
+				"resolution": "Owner"
+			},
+			"updater_roles": [
+				{
+					"module": "Main",
+					"name": "minter_updater"
+				}
+			]
+		},
+		{
+			"role_key": {
+				"module": "Main",
+				"name": "freezer_updater"
+			},
+			"assignment": {
+				"resolution": "Explicit",
+				"explicit_rule": {
+					"type": "DenyAll"
+				}
+			},
+			"updater_roles": [
+				{
+					"module": "Main",
+					"name": "freezer_updater"
+				}
+			]
+		},
+		{
+			"role_key": {
+				"module": "Main",
+				"name": "recaller_updater"
+			},
+			"assignment": {
+				"resolution": "Owner"
+			},
+			"updater_roles": [
+				{
+					"module": "Main",
+					"name": "recaller_updater"
+				}
+			]
+		},
+		{
+			"role_key": {
+				"module": "Main",
+				"name": "depositor_updater"
+			},
+			"assignment": {
+				"resolution": "Explicit",
+				"explicit_rule": {
+					"type": "DenyAll"
+				}
+			},
+			"updater_roles": [
+				{
+					"module": "Main",
+					"name": "depositor_updater"
+				}
+			]
+		},
+		{
+			"role_key": {
+				"module": "Main",
+				"name": "withdrawer_updater"
+			},
+			"assignment": {
+				"resolution": "Explicit",
+				"explicit_rule": {
+					"type": "DenyAll"
+				}
+			},
+			"updater_roles": [
+				{
+					"module": "Main",
+					"name": "withdrawer_updater"
+				}
+			]
+		},
+		{
+			"role_key": {
+				"module": "Metadata",
+				"name": "metadata_locker"
+			},
+			"assignment": {
+				"resolution": "Owner"
+			},
+			"updater_roles": [
+				{
+					"module": "Metadata",
+					"name": "metadata_locker_updater"
+				}
+			]
+		},
+		{
+			"role_key": {
+				"module": "Metadata",
+				"name": "metadata_locker_updater"
+			},
+			"assignment": {
+				"resolution": "Owner"
+			},
+			"updater_roles": [
+				{
+					"module": "Metadata",
+					"name": "metadata_locker_updater"
+				}
+			]
+		},
+		{
+			"role_key": {
+				"module": "Metadata",
+				"name": "metadata_setter"
+			},
+			"assignment": {
+				"resolution": "Owner"
+			},
+			"updater_roles": [
+				{
+					"module": "Metadata",
+					"name": "metadata_setter_updater"
+				}
+			]
+		},
+		{
+			"role_key": {
+				"module": "Metadata",
+				"name": "metadata_setter_updater"
+			},
+			"assignment": {
+				"resolution": "Owner"
+			},
+			"updater_roles": [
+				{
+					"module": "Metadata",
+					"name": "metadata_setter_updater"
+				}
+			]
+		},
+		{
+			"role_key": {
+				"module": "Royalty",
+				"name": "royalty_setter"
+			},
+			"assignment": {
+				"resolution": "Owner"
+			},
+			"updater_roles": [
+				{
+					"module": "Royalty",
+					"name": "royalty_setter_updater"
+				}
+			]
+		},
+		{
+			"role_key": {
+				"module": "Royalty",
+				"name": "royalty_setter_updater"
+			},
+			"assignment": {
+				"resolution": "Owner"
+			},
+			"updater_roles": [
+				{
+					"module": "Royalty",
+					"name": "royalty_setter_updater"
+				}
+			]
+		},
+		{
+			"role_key": {
+				"module": "Royalty",
+				"name": "royalty_locker"
+			},
+			"assignment": {
+				"resolution": "Owner"
+			},
+			"updater_roles": [
+				{
+					"module": "Royalty",
+					"name": "royalty_locker_updater"
+				}
+			]
+		},
+		{
+			"role_key": {
+				"module": "Royalty",
+				"name": "royalty_locker_updater"
+			},
+			"assignment": {
+				"resolution": "Owner"
+			},
+			"updater_roles": [
+				{
+					"module": "Royalty",
+					"name": "royalty_locker_updater"
+				}
+			]
+		},
+		{
+			"role_key": {
+				"module": "Royalty",
+				"name": "royalty_claimer"
+			},
+			"assignment": {
+				"resolution": "Owner"
+			},
+			"updater_roles": [
+				{
+					"module": "Royalty",
+					"name": "royalty_claimer_updater"
+				}
+			]
+		},
+		{
+			"role_key": {
+				"module": "Royalty",
+				"name": "royalty_claimer_updater"
+			},
+			"assignment": {
+				"resolution": "Owner"
+			},
+			"updater_roles": [
+				{
+					"module": "Royalty",
+					"name": "royalty_claimer_updater"
+				}
+			]
+		}
+	]
+}
