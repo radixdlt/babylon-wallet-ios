@@ -130,7 +130,10 @@ extension OnLedgerEntitiesClient {
 	}
 
 	@Sendable
-	public func getAccount(_ address: AccountAddress, metadataKeys: Set<EntityMetadataKey>) async throws -> OnLedgerEntity.Account {
+	public func getAccount(
+		_ address: AccountAddress,
+		metadataKeys: Set<EntityMetadataKey> = .resourceMetadataKeys
+	) async throws -> OnLedgerEntity.Account {
 		guard let account = try await getEntity(address.asGeneral, metadataKeys: metadataKeys).account else {
 			throw Error.emptyResponse
 		}
@@ -139,7 +142,11 @@ extension OnLedgerEntitiesClient {
 
 	@Sendable
 	public func getAssociatedDapps(_ addresses: [DappDefinitionAddress]) async throws -> [OnLedgerEntity.AssociatedDapp] {
-		try await getEntities(addresses.map(\.asGeneral), .dappMetadataKeys, nil, true).compactMap(\.associatedDapp)
+		try await getEntities(addresses.map(\.asGeneral), .dappMetadataKeys, nil, false)
+			.compactMap(\.account)
+			.map {
+				.init(address: $0.address, metadata: $0.metadata)
+			}
 	}
 
 	@Sendable

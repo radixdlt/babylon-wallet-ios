@@ -82,7 +82,6 @@ extension CacheClient {
 			case genericComponent(Address)
 			case nonFungibleData(NonFungibleGlobalId)
 			case nonFungibleIdPage(accountAddress: Address, resourceAddress: Address, pageCursor: String?)
-			case associatedDapp(DappDefinitionAddress)
 		}
 
 		case onLedgerEntity(OnLedgerEntity)
@@ -110,8 +109,6 @@ extension CacheClient {
 				case let .nonFungibleIdPage(_, resourceAddress, pageCursor):
 					let file = "nonFungibleIds-" + resourceAddress.address + (pageCursor.map { "-\($0)" } ?? "")
 					return "\(filesystemFolderPath)/\(file)"
-				case let .associatedDapp(dappDefinitionAddress):
-					return "\(filesystemFolderPath)/\(dappDefinitionAddress.address)"
 				}
 			case let .networkName(url):
 				return "\(filesystemFolderPath)/networkName-\(url)"
@@ -143,8 +140,6 @@ extension CacheClient {
 					return "\(folderRoot)/nonFungiblesData"
 				case let .nonFungibleIdPage(accountAddress, _, _):
 					return "\(folderRoot)/accounts/\(accountAddress.address)"
-				case .associatedDapp:
-					return "\(folderRoot)/associatedDapps"
 				}
 			case .networkName:
 				return "NetworkName"

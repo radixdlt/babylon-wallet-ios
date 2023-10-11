@@ -32,6 +32,7 @@ public struct AssetsView: Sendable, FeatureReducer {
 
 		public let account: Profile.Network.Account
 		public var isLoadingResources: Bool = false
+		public var isRefreshing: Bool = false
 		public let mode: Mode
 
 		public init(account: Profile.Network.Account, mode: Mode = .normal) {
@@ -125,6 +126,7 @@ public struct AssetsView: Sendable, FeatureReducer {
 			state.activeAssetKind = kind
 			return .none
 		case .pullToRefreshStarted:
+			state.isRefreshing = true
 			return .run { [address = state.account.address] _ in
 				_ = try await accountPortfoliosClient.fetchAccountPortfolio(address, true)
 			} catch: { error, _ in
@@ -145,11 +147,12 @@ public struct AssetsView: Sendable, FeatureReducer {
 			state.nonFungibleTokenList = resourcesState.nonFungibleTokenList
 			state.poolUnitsList = resourcesState.poolUnitsList
 
-			if resourcesState.poolUnitsList != nil {
+			if resourcesState.poolUnitsList != nil, state.isRefreshing {
 				return .run { send in
 					await send(.child(.poolUnitsList(.view(.refresh))))
 				}
 			}
+			state.isRefreshing = false
 			return .none
 		}
 	}

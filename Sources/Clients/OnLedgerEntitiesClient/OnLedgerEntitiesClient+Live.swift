@@ -107,7 +107,7 @@ extension OnLedgerEntitiesClient {
 			pageCursor: request.pageCursor,
 			nextPageCursor: freshPage.nextCursor
 		)
-		cacheClient.save(response, cachingIdentifier)
+		cacheClient.save(OnLedgerEntity.accountNonFungibleIds(response), cachingIdentifier)
 		return response
 	}
 
@@ -179,8 +179,7 @@ extension OnLedgerEntitiesClient {
 
 		return try response
 			.flatMap { item in
-				let ledgerState = item.ledgerState
-				return try item.nonFungibleIds.map { id in
+				try item.nonFungibleIds.map { id in
 					try OnLedgerEntity.nonFungibleToken(.init(
 						id: .fromParts(
 							resourceAddress: .init(address: request.resource.address),
@@ -256,7 +255,10 @@ extension OnLedgerEntitiesClient {
 					details: item.details
 				)
 
-				return try await createEntity(from: updatedItem, ledgerState: .init(version: response.ledgerState.stateVersion, epoch: response.ledgerState.epoch))
+				return try await createEntity(
+					from: updatedItem,
+					ledgerState: .init(version: response.ledgerState.stateVersion, epoch: response.ledgerState.epoch)
+				)
 			}
 		}
 	}
@@ -330,8 +332,6 @@ extension OnLedgerEntity {
 			return .validator(validator.address.asGeneral)
 		case let .genericComponent(component):
 			return .genericComponent(component.address.asGeneral)
-		case let .associatedDapp(dapp):
-			return .associatedDapp(dapp.address)
 		}
 	}
 }
@@ -353,8 +353,6 @@ extension CacheClient.Entry.OnLedgerEntity {
 			return .init(address: nonFungibleId.resourceAddress().asStr(), decodedKind: .globalNonFungibleResourceManager)
 		case let .nonFungibleIdPage(_, resourceAddress, _):
 			return resourceAddress.asGeneral
-		case let .associatedDapp(address):
-			return address.asGeneral
 		}
 	}
 }

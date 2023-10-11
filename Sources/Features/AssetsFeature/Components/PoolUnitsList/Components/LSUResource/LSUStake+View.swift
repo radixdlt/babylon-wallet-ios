@@ -178,8 +178,8 @@ extension LSUStake.State {
 								guard let claimEpoch = token.data.claimEpoch else {
 									return .unstaking
 								}
-								let epoch = stakeClaim.resource.atLedgerState.epoch
-								return claimEpoch >= epoch ? .readyToClaim : .unstaking
+
+								return claimEpoch <= details.currentEpoch ? .readyToClaim : .unstaking
 							}()
 							return LSUStake.ViewState.StakeClaimNFTViewState(
 								id: token.id,

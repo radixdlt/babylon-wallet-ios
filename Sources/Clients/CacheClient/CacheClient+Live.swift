@@ -11,7 +11,7 @@ extension CacheClient: DependencyKey {
 				let expirationDate = date.now.addingTimeInterval(entry.lifetime)
 				try diskPersistenceClient.save(expirationDate, entry.expirationDateFilePath)
 				try diskPersistenceClient.save(encodable, entry.filesystemFilePath)
-				loggerGlobal.trace("💾 Data successfully saved to disk: \(entry)")
+				loggerGlobal.info("💾 Data successfully saved to disk: \(entry)")
 			} catch {
 				loggerGlobal.warning("💾 Could not save data to disk: \(error.localizedDescription)")
 			}
@@ -24,17 +24,19 @@ extension CacheClient: DependencyKey {
 					throw Error.expirationDateLoadingFailed
 				}
 				if date.now > expirationDate {
-					loggerGlobal.trace("💾 Entry lifetime expired. Removing from disk...")
+					loggerGlobal.info("💾 Entry lifetime expired. Removing from disk...")
 					try diskPersistenceClient.remove(entry.expirationDateFilePath)
 					try diskPersistenceClient.remove(entry.filesystemFilePath)
-					loggerGlobal.trace("💾 Expired entry removed from disk: \(entry)")
+					loggerGlobal.info("💾 Expired entry removed from disk: \(entry)")
 					throw Error.entryLifetimeExpired
 				}
 				let data = try diskPersistenceClient.load(decodable, entry.filesystemFilePath)
-				loggerGlobal.trace("💾 Data successfully retrieved from disk: \(entry)")
+				loggerGlobal.info("💾 Data successfully retrieved from disk: \(entry)")
 				return data
 			} catch {
-				loggerGlobal.trace("💾 Could not retrieve data from disk: \(error.localizedDescription)")
+				// Clear corrupt data
+				try? diskPersistenceClient.remove(entry.filesystemFilePath)
+				loggerGlobal.warning("💾 Could not retrieve data from disk: \(error.localizedDescription)")
 				throw Error.dataLoadingFailed
 			}
 		}, removeFile: { entry in
@@ -42,7 +44,7 @@ extension CacheClient: DependencyKey {
 
 			do {
 				try diskPersistenceClient.remove(entry.filesystemFilePath)
-				loggerGlobal.trace("💾 Removed file: \(entry)")
+				loggerGlobal.info("💾 Removed file: \(entry)")
 			} catch {
 				loggerGlobal.warning("💾 Could not delete file from disk: \(error.localizedDescription)")
 			}
@@ -51,7 +53,7 @@ extension CacheClient: DependencyKey {
 
 			do {
 				try diskPersistenceClient.remove(entry.filesystemFolderPath)
-				loggerGlobal.trace("💾 Removed folder: \(entry)")
+				loggerGlobal.info("💾 Removed folder: \(entry)")
 			} catch {
 				loggerGlobal.warning("💾 Could not delete folder from disk: \(error.localizedDescription)")
 			}
@@ -60,7 +62,7 @@ extension CacheClient: DependencyKey {
 
 			do {
 				try diskPersistenceClient.removeAll()
-				loggerGlobal.trace("💾 Data successfully cleared from disk")
+				loggerGlobal.info("💾 Data successfully cleared from disk")
 			} catch {
 				loggerGlobal.warning("💾 Could not clear cached data from disk: \(error.localizedDescription)")
 			}

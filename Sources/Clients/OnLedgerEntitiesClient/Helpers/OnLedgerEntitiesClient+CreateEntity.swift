@@ -9,14 +9,10 @@ extension OnLedgerEntitiesClient {
 		let addressKind = address.decodedKind
 		switch addressKind {
 		case _ where AccountEntityType.addressSpace.contains(addressKind):
-			if item.explicitMetadata?.accountType == .dappDefinition {
-				return try .associatedDapp(createAssociatedDapp(item))
-			} else {
-				return try await .account(createAccount(
-					item,
-					ledgerState: ledgerState
-				))
-			}
+			return try await .account(createAccount(
+				item,
+				ledgerState: ledgerState
+			))
 		case _ where ResourceEntityType.addressSpace.contains(addressKind):
 			return try createResource(item, ledgerState: ledgerState).map(OnLedgerEntity.resource)
 		case _ where ResourcePoolEntityType.addressSpace.contains(addressKind):
@@ -115,13 +111,6 @@ extension OnLedgerEntitiesClient {
 		default:
 			return nil
 		}
-	}
-
-	@Sendable
-	static func createAssociatedDapp(
-		_ item: GatewayAPI.StateEntityDetailsResponseItem
-	) throws -> OnLedgerEntity.AssociatedDapp {
-		try .init(address: .init(validatingAddress: item.address), metadata: .init(item.explicitMetadata))
 	}
 
 	@Sendable
@@ -348,7 +337,12 @@ extension OnLedgerEntitiesClient {
 	@Sendable
 	public func getOwnedPoolUnitsDetails(_ account: OnLedgerEntity.Account, refresh: Bool = false) async throws -> [OwnedResourcePoolDetails] {
 		let ownedPoolUnits = account.poolUnitResources.poolUnits
-		let pools = try await getEntities(ownedPoolUnits.map(\.resourcePoolAddress.asGeneral), [], account.atLedgerState, refresh).compactMap(\.resourcePool)
+		let pools = try await getEntities(
+			ownedPoolUnits.map(\.resourcePoolAddress.asGeneral),
+			[],
+			account.atLedgerState,
+			refresh
+		).compactMap(\.resourcePool)
 		let allResourceAddresses = pools.flatMap { pool in
 			[pool.poolUnitResourceAddress] +
 				pool.resources.nonXrdResources.map(\.resourceAddress) +
@@ -399,12 +393,21 @@ extension OnLedgerEntitiesClient {
 	/// We don't do any pagination there(yet), since the number of owned stakes will not be big, this can be revised in the future.
 	public func getOwnedStakesDetails(account: OnLedgerEntity.Account, refresh: Bool = false) async throws -> [OwnedStakeDetails] {
 		let ownedStakes = account.poolUnitResources.radixNetworkStakes
-		let validators = try await getEntities(ownedStakes.map(\.validatorAddress.asGeneral), .resourceMetadataKeys, account.atLedgerState, refresh).compactMap(\.validator)
+		let validators = try await getEntities(
+			ownedStakes.map(\.validatorAddress.asGeneral),
+			.resourceMetadataKeys,
+			account.atLedgerState,
+			refresh
+		).compactMap(\.validator)
+
 		let resourceAddresses = ownedStakes.flatMap {
 			$0.stakeUnitResource.asArray(\.resourceAddress) + $0.stakeClaimResource.asArray(\.resourceAddress)
 		}
 
 		let resourceDetails = try await getResources(resourceAddresses, atLedgerState: account.atLedgerState, forceRefresh: refresh)
+
+		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
+		let currentEpoch = try await gatewayAPIClient.getEpoch()
 
 		return try await ownedStakes.asyncCompactMap { stake -> OwnedStakeDetails? in
 			guard let validatorDetails = validators.first(where: { $0.address == stake.validatorAddress }) else {
@@ -444,7 +447,8 @@ extension OnLedgerEntitiesClient {
 			return .init(
 				validator: validatorDetails,
 				stakeUnitResource: stakeUnitResource,
-				stakeClaimTokens: stakeClaimTokens
+				stakeClaimTokens: stakeClaimTokens,
+				currentEpoch: currentEpoch
 			)
 		}
 	}
@@ -486,6 +490,7 @@ extension OnLedgerEntitiesClient {
 		public let validator: OnLedgerEntity.Validator
 		public let stakeUnitResource: ResourceWithVaultAmount?
 		public let stakeClaimTokens: NonFunbileResourceWithTokens?
+		public let currentEpoch: Epoch
 	}
 
 	public struct OwnedResourcePoolDetails: Hashable, Sendable {

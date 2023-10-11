@@ -11,7 +11,6 @@ public enum OnLedgerEntity: Sendable, Hashable, Codable {
 	case nonFungibleToken(NonFungibleToken)
 	case accountNonFungibleIds(AccountNonFungibleIdsPage)
 	case genericComponent(GenericComponent)
-	case associatedDapp(AssociatedDapp)
 
 	public var resource: Resource? {
 		guard case let .resource(resource) = self else {
@@ -60,13 +59,6 @@ public enum OnLedgerEntity: Sendable, Hashable, Codable {
 			return nil
 		}
 		return genericComponent
-	}
-
-	public var associatedDapp: AssociatedDapp? {
-		guard case let .associatedDapp(associatedDapp) = self else {
-			return nil
-		}
-		return associatedDapp
 	}
 }
 

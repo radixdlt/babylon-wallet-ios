@@ -122,7 +122,7 @@ extension SubmitTransactionClient: DependencyKey {
 			@Dependency(\.cacheClient) var cacheClient
 
 			let changedAccounts: [Profile.Network.Account.EntityAddress]?
-			let resourceAddressesToRefresh: [ResourceAddress]?
+			let resourceAddressesToRefresh: [Address]?
 			do {
 				let decompiledNotarized = try NotarizedTransaction.decompile(compiledNotarizedTransaction: request.compiledNotarizedTXIntent)
 
@@ -141,9 +141,13 @@ extension SubmitTransactionClient: DependencyKey {
 				/// Refresh the resources if an operation on resource pool is involved,
 				/// reason being that contributing or withdrawing from a resource pool modifies the totalSupply
 				if involvedAddresses.contains(where: \.key.isResourcePool) {
-					/// A littl bit to aggresive, as any other resource will also be refreshed.
+					/// A little bit to aggresive, as any other resource will also be refreshed.
 					/// But at this stage we cannot determine(without making additional calls) the pool unit related fungible resource
-					resourceAddressesToRefresh = involvedAddresses.first { $0.key == .globalFungibleResourceManager }?.value.compactMap { try? $0.asSpecific() }
+					resourceAddressesToRefresh = involvedAddresses
+						.filter { $0.key == .globalFungibleResourceManager || $0.key.isResourcePool }
+						.values
+						.flatMap(identity)
+						.compactMap { try? $0.asSpecific() }
 				} else {
 					resourceAddressesToRefresh = nil
 				}

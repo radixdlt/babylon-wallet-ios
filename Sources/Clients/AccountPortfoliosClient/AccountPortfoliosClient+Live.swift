@@ -48,11 +48,12 @@ extension AccountPortfoliosClient: DependencyKey {
 
 				return accounts
 			},
-			fetchAccountPortfolio: { accountAddress, _ in
-				guard let portfolio = try await onLedgerEntitiesClient.getAccounts([accountAddress]).first else {
-					fatalError()
+			fetchAccountPortfolio: { accountAddress, forceRefresh in
+				if forceRefresh {
+					cacheClient.removeFolder(.onLedgerEntity(.account(accountAddress.asGeneral)))
 				}
 
+				let portfolio = try await onLedgerEntitiesClient.getAccount(accountAddress)
 				await state.setOrUpdateAccountPortfolio(portfolio)
 
 				return portfolio
