@@ -521,6 +521,8 @@
 "importOlympiaAccounts_verifySeedPhrase_title" = "Verify With Your Seed Phrase";
 "importOlympiaAccounts_verifySeedPhrase_subtitle" = "To complete importing your accounts, please view your seed phrase in the Radix Desktop Wallet and enter the words here.";
 "importOlympiaAccounts_verifySeedPhrase_warning" = "This will give this Radix Wallet control of your accounts. Never give your seed phrase to anyone for any reason.";
+"importOlympiaAccounts_verifySeedPhrase_keepSeedPhrasePrompt" = "Do not throw away this seed phrase! You will still need it if you need to recover access to your Olympia accounts in the future.";
+"importOlympiaAccounts_verifySeedPhrase_keepSeedPhrasePromptConfirmation" = "I Understand";
 "importOlympiaAccounts_completion_title" = "Congratulations";
 "importOlympiaAccounts_completion_subtitleMultiple" = "You\'ve now imported these Accounts:";
 "importOlympiaAccounts_completion_subtitleSingle" = "You\'ve now imported this Account:";
