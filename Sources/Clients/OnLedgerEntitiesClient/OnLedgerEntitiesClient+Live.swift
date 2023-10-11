@@ -23,21 +23,19 @@ extension OnLedgerEntitiesClient: DependencyKey {
 	}
 }
 
-extension AtLedgerState {
-	public var selector: GatewayAPI.LedgerStateSelector {
-		// TODO: Determine what other fields should be sent
-		.init(stateVersion: self.version)
-	}
-}
-
 extension OnLedgerEntitiesClient {
 	@Sendable
 	@discardableResult
-	static func getEntities(for addresses: [Address], _ explicitMetadata: Set<EntityMetadataKey>, ledgerState: AtLedgerState?, forceRefresh: Bool = false) async throws -> [OnLedgerEntity] {
+	static func getEntities(
+		for addresses: [Address],
+		_ explicitMetadata: Set<EntityMetadataKey>,
+		ledgerState: AtLedgerState?,
+		forceRefresh: Bool = false
+	) async throws -> [OnLedgerEntity] {
 		try await fetchEntitiesWithCaching(
 			for: addresses.map(\.cachingIdentifier),
 			forceRefresh: forceRefresh,
-			refresh: fetchEntites(explicitMetadata, ledgerState: ledgerState)
+			refresh: fetchEntites(explicitMetadata, ledgerState: ledgerState, forceRefresh: forceRefresh)
 		)
 	}
 
@@ -227,7 +225,8 @@ extension OnLedgerEntitiesClient {
 	@Sendable
 	static func fetchEntites(
 		_ explicitMetadata: Set<EntityMetadataKey>,
-		ledgerState: AtLedgerState?
+		ledgerState: AtLedgerState?,
+		forceRefresh: Bool = false
 	) -> (_ entities: [CacheClient.Entry.OnLedgerEntity]) async throws -> [OnLedgerEntity] {
 		{ entities in
 			guard !entities.isEmpty else {
@@ -257,7 +256,8 @@ extension OnLedgerEntitiesClient {
 
 				return try await createEntity(
 					from: updatedItem,
-					ledgerState: .init(version: response.ledgerState.stateVersion, epoch: response.ledgerState.epoch)
+					ledgerState: .init(version: response.ledgerState.stateVersion, epoch: response.ledgerState.epoch),
+					forceRefresh: forceRefresh
 				)
 			}
 		}
@@ -388,5 +388,11 @@ extension OnLedgerEntity.Account.PoolUnitResources {
 	// Will be used to filter out those from the general fungible resources list.
 	var nonFungibleResourceAddresses: [String] {
 		radixNetworkStakes.compactMap(\.stakeClaimResource?.resourceAddress.address)
+	}
+}
+
+extension AtLedgerState {
+	public var selector: GatewayAPI.LedgerStateSelector {
+		.init(stateVersion: self.version)
 	}
 }

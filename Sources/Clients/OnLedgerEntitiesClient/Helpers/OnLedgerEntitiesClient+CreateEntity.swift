@@ -4,14 +4,19 @@ import SharedModels
 
 extension OnLedgerEntitiesClient {
 	@Sendable
-	static func createEntity(from item: GatewayAPI.StateEntityDetailsResponseItem, ledgerState: AtLedgerState) async throws -> OnLedgerEntity? {
+	static func createEntity(
+		from item: GatewayAPI.StateEntityDetailsResponseItem,
+		ledgerState: AtLedgerState,
+		forceRefresh: Bool = false
+	) async throws -> OnLedgerEntity? {
 		let address = try Address(validatingAddress: item.address)
 		let addressKind = address.decodedKind
 		switch addressKind {
 		case _ where AccountEntityType.addressSpace.contains(addressKind):
 			return try await .account(createAccount(
 				item,
-				ledgerState: ledgerState
+				ledgerState: ledgerState,
+				forceRefresh: forceRefresh
 			))
 		case _ where ResourceEntityType.addressSpace.contains(addressKind):
 			return try createResource(item, ledgerState: ledgerState).map(OnLedgerEntity.resource)
@@ -40,7 +45,8 @@ extension OnLedgerEntitiesClient {
 	@Sendable
 	static func createAccount(
 		_ item: GatewayAPI.StateEntityDetailsResponseItem,
-		ledgerState: AtLedgerState
+		ledgerState: AtLedgerState,
+		forceRefresh: Bool = false
 	) async throws -> OnLedgerEntity.Account {
 		let accountAddress = try AccountAddress(validatingAddress: item.address)
 		let fungibleResources = try extractOwnedFungibleResources(item, ledgerState: ledgerState)
@@ -180,7 +186,8 @@ extension OnLedgerEntitiesClient {
 		_ accountAddress: String,
 		rawFungibleResources: [OnLedgerEntity.OwnedFungibleResource],
 		rawNonFungibleResources: [OnLedgerEntity.OwnedNonFungibleResource],
-		ledgerState: AtLedgerState
+		ledgerState: AtLedgerState,
+		forceRefresh: Bool = false
 	) async throws -> OnLedgerEntity.Account.PoolUnitResources {
 		let stakeUnitCandidates = rawFungibleResources.filter {
 			$0.metadata.validator != nil
@@ -227,7 +234,8 @@ extension OnLedgerEntitiesClient {
 		let entities = try await getEntities(
 			for: Array(stakeAndPoolAddresses),
 			.resourceMetadataKeys,
-			ledgerState: ledgerState
+			ledgerState: ledgerState,
+			forceRefresh: forceRefresh
 		)
 		let validators = entities.compactMap(\.validator)
 		let resourcesPools = entities.compactMap(\.resourcePool)
