@@ -7,11 +7,12 @@ public struct LSUResource: Sendable, FeatureReducer {
 		var isExpanded: Bool = false
 
 		let account: OnLedgerEntity.Account
-		var stakesDetails: IdentifiedArrayOf<LSUStake.State>
+		var stakes: IdentifiedArrayOf<LSUStake.State>
 		var isLoadingResources: Bool = false
+		var shouldRefresh = false
 
 		var didLoadResources: Bool {
-			if case .success = stakesDetails.first?.stakeDetails {
+			if case .success = stakes.first?.stakeDetails {
 				return true
 			}
 			return false
@@ -20,6 +21,7 @@ public struct LSUResource: Sendable, FeatureReducer {
 
 	public enum ViewAction: Sendable, Equatable {
 		case isExpandedToggled
+		case refresh
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -36,7 +38,7 @@ public struct LSUResource: Sendable, FeatureReducer {
 	public var body: some ReducerOf<Self> {
 		Reduce(core)
 			.forEach(
-				\.stakesDetails,
+				\.stakes,
 				action: /Action.child .. ChildAction.stake,
 				element: LSUStake.init
 			)
@@ -51,9 +53,20 @@ public struct LSUResource: Sendable, FeatureReducer {
 					return .none
 				}
 				return .run { [state = state] send in
-					let result = await TaskResult { try await onLedgerEntitiesClient.getOwnedStakesDetails(account: state.account, refresh: false) }
+					let result = await TaskResult {
+						try await onLedgerEntitiesClient.getOwnedStakesDetails(
+							account: state.account,
+							refresh: state.shouldRefresh
+						)
+					}
 					await send(.internal(.detailsLoaded(result)))
 				}
+			}
+			return .none
+		case .refresh:
+			state.shouldRefresh = true
+			state.stakes.forEach { stake in
+				state.stakes[id: stake.id]?.stakeDetails = .loading
 			}
 			return .none
 		}
@@ -62,9 +75,10 @@ public struct LSUResource: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .detailsLoaded(.success(details)):
+			state.shouldRefresh = false
 			state.isLoadingResources = false
 			details.forEach { details in
-				state.stakesDetails[id: details.validator.address.address]?.stakeDetails = .success(details)
+				state.stakes[id: details.validator.address.address]?.stakeDetails = .success(details)
 			}
 			return .none
 		case let .detailsLoaded(.failure(error)):

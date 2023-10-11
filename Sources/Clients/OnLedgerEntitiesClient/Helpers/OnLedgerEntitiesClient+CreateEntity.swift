@@ -237,7 +237,7 @@ extension OnLedgerEntitiesClient {
 
 		let entities = try await getEntities(
 			for: Array(stakeAndPoolAddresses),
-			[],
+			.resourceMetadataKeys,
 			ledgerState: ledgerState
 		)
 		let validators = entities.compactMap(\.validator)

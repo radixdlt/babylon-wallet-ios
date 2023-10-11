@@ -185,7 +185,7 @@ public struct AssetsView: Sendable, FeatureReducer {
 			}
 			return .init(
 				account: portfolio,
-				stakesDetails: portfolio.poolUnitResources.radixNetworkStakes.map { stake in
+				stakes: portfolio.poolUnitResources.radixNetworkStakes.map { stake in
 					LSUStake.State(
 						stake: stake,
 						stakeDetails: .loading,
@@ -247,7 +247,7 @@ extension AssetsView.State {
 	public var selectedAssets: Mode.SelectedAssets? {
 		guard case .selection = mode else { return nil }
 
-		let selectedLsuTokens = poolUnitsList?.lsuResource?.stakesDetails
+		let selectedLsuTokens = poolUnitsList?.lsuResource?.stakes
 			.compactMap(SelectedResourceProvider.init)
 			.compactMap(\.selectedResource) ?? []
 		let selectedPoolUnitTokens = poolUnitsList?.poolUnits
@@ -264,7 +264,7 @@ extension AssetsView.State {
 			.map(SelectedResourceProvider.init)
 			.compactMap(\.selectedResource) ?? []
 
-		let selectedStakeClaimNonFungibleResources = (poolUnitsList?.lsuResource?.stakesDetails)
+		let selectedStakeClaimNonFungibleResources = (poolUnitsList?.lsuResource?.stakes)
 			.map { $0.compactMap(NonFungibleTokensPerResourceProvider.init) } ?? []
 		let selectedNonFungibleResources = nonFungibleTokenList?.rows.compactMap(NonFungibleTokensPerResourceProvider.init) ?? []
 

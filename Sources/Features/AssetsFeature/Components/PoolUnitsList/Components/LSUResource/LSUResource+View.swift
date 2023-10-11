@@ -58,7 +58,7 @@ extension LSUResource {
 		private var componentsView: some SwiftUI.View {
 			ForEachStore(
 				store.scope(
-					state: \.stakesDetails,
+					state: \.stakes,
 					action: (
 						/LSUResource.Action.child
 							.. LSUResource.ChildAction.stake

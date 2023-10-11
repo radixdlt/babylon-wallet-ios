@@ -60,7 +60,10 @@ public struct PoolUnitsList: Sendable, FeatureReducer {
 			state.poolUnits.forEach { unit in
 				state.poolUnits[id: unit.poolUnit.resourcePoolAddress]?.resourceDetails = .loading
 			}
-			return getOwnedPoolUnitsDetails(state, refresh: true)
+			return .run { send in
+				await send(.child(.lsuResource(.view(.refresh))))
+			}
+			.merge(with: getOwnedPoolUnitsDetails(state, refresh: true))
 		}
 	}
 
