@@ -265,6 +265,8 @@ final class DecimalTests: TestCase {
 		}
 		let spanish = Locale(identifier: "es")
 		let us = Locale(identifier: "en_US_POSIX")
+		try doTest(",005", locale: spanish, expected: .init(value: "0.005"))
+		try doTest(".005", locale: us, expected: .init(value: "0.005"))
 		try doTest("1,001", locale: spanish, expected: .init(value: "1.001"))
 		try doTest("1,001", locale: us, expected: .init(value: "1001"))
 		try doTest("1.001,45", locale: spanish, expected: .init(value: "1001.45"))
