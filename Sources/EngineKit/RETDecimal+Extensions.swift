@@ -135,7 +135,8 @@ extension RETDecimal {
 		formattedString: String,
 		locale: Locale = .autoupdatingCurrent
 	) throws {
-		var string = formattedString
+		// Pad with a leading zero, to make numbers with leading decimal separator parsable
+		var string = "0" + formattedString
 		// If the locale recognizes a grouping separator, we strip that from the string
 		if let groupingSeparator = locale.groupingSeparator {
 			string.replace(groupingSeparator, with: "")
