@@ -227,7 +227,7 @@ extension OnLedgerEntitiesClient {
 
 	@Sendable
 	static func fetchEntites(
-		_ explicitMetadta: Set<EntityMetadataKey>,
+		_ explicitMetadata: Set<EntityMetadataKey>,
 		ledgerState: AtLedgerState?
 	) -> (_ entities: [CacheClient.Entry.OnLedgerEntity]) async throws -> [OnLedgerEntity] {
 		{ entities in
@@ -237,10 +237,10 @@ extension OnLedgerEntitiesClient {
 
 			@Dependency(\.gatewayAPIClient) var gatewayAPIClient
 
-			let response = try await gatewayAPIClient.getEntityDetails(
+			let response = try await gatewayAPIClient.fetchEntitiesDetails(
 				entities.map(\.address.address),
-				explicitMetadta,
-				ledgerState?.selector
+				explicitMetadata: explicitMetadata,
+				selector: ledgerState?.selector
 			)
 			return try await response.items.asyncCompactMap { item in
 				let allFungibles = try await gatewayAPIClient.fetchAllFungibleResources(item, ledgerState: response.ledgerState)

@@ -74,14 +74,18 @@ extension GatewayAPIClient {
 
 	/// Loads the details for all the addresses provided.
 	@Sendable
-	public func fetchResourceDetails(_ addresses: [String], explicitMetadata: Set<EntityMetadataKey>, ledgerState: GatewayAPI.LedgerState? = nil) async throws -> GatewayAPI.StateEntityDetailsResponse {
+	public func fetchEntitiesDetails(
+		_ addresses: [String],
+		explicitMetadata: Set<EntityMetadataKey>,
+		selector: GatewayAPI.LedgerStateSelector? = nil
+	) async throws -> GatewayAPI.StateEntityDetailsResponse {
 		/// gatewayAPIClient.getEntityDetails accepts only `entityDetailsPageSize` addresses for one request.
 		/// Thus, chunk the addresses in chunks of `entityDetailsPageSize` and load the details in separate, parallel requests.
 		let allResponses = try await addresses
 			.chunks(ofCount: GatewayAPIClient.entityDetailsPageSize)
 			.map(Array.init)
 			.parallelMap {
-				try await getEntityDetails($0, explicitMetadata, ledgerState?.selector)
+				try await getEntityDetails($0, explicitMetadata, selector)
 			}
 
 		guard !allResponses.isEmpty else {

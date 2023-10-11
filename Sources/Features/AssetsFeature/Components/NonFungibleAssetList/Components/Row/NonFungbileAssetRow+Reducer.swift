@@ -81,15 +81,19 @@ extension NonFungibleAssetList {
 			case .isExpandedToggled:
 				state.isExpanded.toggle()
 				if state.isExpanded {
-					/// The total number of full pages
-					let fullPagesCount = max(state.resource.nonFungibleIdsCount / State.pageSize, 1)
-					/// Prepopulate with placeholders
-					state.tokens = .init(repeating: .init(repeating: .loading, count: State.pageSize), count: fullPagesCount)
-					/// The number of items to add to the last page
-					let remainder = state.resource.nonFungibleIdsCount % State.pageSize
-					if fullPagesCount > 1, remainder > 0 {
-						/// At last page placeholders also
-						state.tokens.append(.init(repeating: .loading, count: remainder))
+					if state.resource.nonFungibleIdsCount < State.pageSize {
+						state.tokens = [.init(repeating: .loading, count: state.resource.nonFungibleIdsCount)]
+					} else {
+						/// The total number of full pages
+						let fullPagesCount = state.resource.nonFungibleIdsCount / State.pageSize
+						/// Prepopulate with placeholders
+						state.tokens = .init(repeating: .init(repeating: .loading, count: State.pageSize), count: fullPagesCount)
+						/// The number of items to add to the last page
+						let remainder = state.resource.nonFungibleIdsCount % State.pageSize
+						if fullPagesCount > 1, remainder > 0 {
+							/// At last page placeholders also
+							state.tokens.append(.init(repeating: .loading, count: remainder))
+						}
 					}
 					return loadResources(&state, pageIndex: 0)
 				}

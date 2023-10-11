@@ -21,12 +21,13 @@ struct AssetResourceDetailsSection: View {
 		VStack(alignment: .leading, spacing: .medium1) {
 			AssetDetailsSeparator()
 
-			loadable(viewState.description) { description in
-				Text(description ?? "unknown")
-					.textStyle(.body1Regular)
-					.frame(maxWidth: .infinity, alignment: .leading)
-			}
-			.padding(.horizontal, .large2)
+			loadable(viewState.description,
+			         successContent: { description in
+			         	Text(description ?? "unknown")
+			         		.textStyle(.body1Regular)
+			         		.frame(maxWidth: .infinity, alignment: .leading)
+			         })
+			         .padding(.horizontal, .large2)
 
 			AssetDetailsSeparator()
 

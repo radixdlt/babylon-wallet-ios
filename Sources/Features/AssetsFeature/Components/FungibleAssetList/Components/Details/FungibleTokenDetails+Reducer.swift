@@ -40,6 +40,7 @@ public struct FungibleTokenDetails: Sendable, FeatureReducer {
 	}
 
 	@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
+	@Dependency(\.errorQueue) var errorQueue
 
 	public init() {}
 
@@ -64,22 +65,10 @@ public struct FungibleTokenDetails: Sendable, FeatureReducer {
 		case let .resourceLoadResult(.success(resource)):
 			state.resource = .success(resource)
 			return .none
-		case let .resourceLoadResult(.failure(err)):
-			state.resource = .failure(err)
+		case let .resourceLoadResult(.failure(error)):
+			state.resource = .failure(error)
+			errorQueue.schedule(error)
 			return .none
 		}
 	}
 }
-
-// MARK: - ResourceDetails
-// public struct ResourceDetails: Sendable {
-//	public struct State: Sendable, Hashable {
-//		enum PortfolioResource: Sendable, Hashable {
-//			case fungible(OnLedgerEntity.OwnedFungibleResource, isXRD: Bool)
-//			case nonFungible(OnLedgerEntity.OwnedNonFungibleResource)
-//		}
-//
-//		let prefetchedPortfolioResource: PortfolioResource?
-//		let resource: Loadable<OnLedgerEntity.Resource>
-//	}
-// }
