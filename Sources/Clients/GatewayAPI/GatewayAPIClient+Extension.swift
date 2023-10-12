@@ -215,9 +215,9 @@ extension GatewayAPI.ComponentEntityRoleAssignments {
 	 applied to the two names `withdrawer` and `depositor`. If this results in anything other than `AllowAll`, then we add
 	 the behavior `movementRestricted`.
 
-	 If on the other hand it turns out that movement is *not* currently restricted, we look at who can change this in the future, 
+	 If on the other hand it turns out that movement is *not* currently restricted, we look at who can change this in the future,
 	 by finding the updaters for `withdrawer` and `depositor`, using the logic in "Find updaters" below. If at least one of
-	 the names has `AllowAll`, we add the `movementRestrictableInFutureByAnyone` behavior. If at least one of them has `Protected`, 
+	 the names has `AllowAll`, we add the `movementRestrictableInFutureByAnyone` behavior. If at least one of them has `Protected`,
 	 we add `movementRestrictableInFuture`.
 
 	 __OTHER BEHAVIORS__
