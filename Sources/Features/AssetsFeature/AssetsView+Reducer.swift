@@ -147,7 +147,8 @@ public struct AssetsView: Sendable, FeatureReducer {
 			state.nonFungibleTokenList = resourcesState.nonFungibleTokenList
 			state.poolUnitsList = resourcesState.poolUnitsList
 
-			if resourcesState.poolUnitsList != nil, state.isRefreshing {
+			/// Not the happiest about this, will need to find a better way
+			if resourcesState.poolUnitsList != nil, state.activeAssetKind == .poolUnits || state.isRefreshing {
 				return .run { send in
 					await send(.child(.poolUnitsList(.view(.refresh))))
 				}

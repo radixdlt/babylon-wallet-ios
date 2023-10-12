@@ -24,7 +24,7 @@ extension AccountPortfoliosClient: DependencyKey {
 		}
 
 		func portfolioForAccount(_ address: AccountAddress) -> AnyAsyncSequence<OnLedgerEntity.Account> {
-			portfoliosSubject.compactMap { $0[address] }.removeDuplicates().eraseToAnyAsyncSequence()
+			portfoliosSubject.compactMap { $0[address] }.eraseToAnyAsyncSequence()
 		}
 	}
 
