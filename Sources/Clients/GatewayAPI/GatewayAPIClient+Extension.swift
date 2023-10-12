@@ -211,14 +211,14 @@ extension GatewayAPI.ComponentEntityRoleAssignments {
 
 	 __MOVEMENT BEHAVIORS__
 
-	 For the behaviors related to movement  we first look at current situation, using the logic under "Find performer" below,
-	 applied to the two names `withdrawer` and `depositor`. If this results in anything other than `anyone`, we add
-	 the behavior ( `movementRestricted` ).
+	 For the behaviors related to movement, we first look at the current situation, using the logic under "Find performer" below,
+	 applied to the two names `withdrawer` and `depositor`. If this results in anything other than `AllowAll`, then we add
+	 the behavior `movementRestricted`.
 
-	 If on the other hand it turns out that movement is *not* currently restricted, we look at who can change this, by finding the
-	 updaters for `withdrawer` and `depositor` using the logic in "Find updaters" below. If at least one of the names can
-	 be updated by anyone, we add the `movementRestrictableInFutureByAnyone` behavior. If `someone` can update
-	 at least one of them, we add `movementRestrictableInFuture`.
+	 If on the other hand it turns out that movement is *not* currently restricted, we look at who can change this in the future, 
+	 by finding the updaters for `withdrawer` and `depositor`, using the logic in "Find updaters" below. If at least one of
+	 the names has `AllowAll`, we add the `movementRestrictableInFutureByAnyone` behavior. If at least one of them has `Protected`, 
+	 we add `movementRestrictableInFuture`.
 
 	 __OTHER BEHAVIORS__
 
