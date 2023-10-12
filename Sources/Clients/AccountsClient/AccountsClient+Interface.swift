@@ -20,9 +20,6 @@ public struct AccountsClient: Sendable {
 
 	public var newVirtualAccount: NewVirtualAccount
 
-	/// Saves a virtual account into the profile.
-	public var saveVirtualAccount: SaveVirtualAccount
-
 	/// Saves virtual accounts into the profile.
 	public var saveVirtualAccounts: SaveVirtualAccounts
 
@@ -43,7 +40,6 @@ public struct AccountsClient: Sendable {
 		accountUpdates: @escaping AccountUpdates,
 		getAccountsOnNetwork: @escaping GetAccountsOnNetwork,
 		newVirtualAccount: @escaping NewVirtualAccount,
-		saveVirtualAccount: @escaping SaveVirtualAccount,
 		saveVirtualAccounts: @escaping SaveVirtualAccounts,
 		getAccountByAddress: @escaping GetAccountByAddress,
 		hasAccountOnNetwork: @escaping HasAccountOnNetwork,
@@ -56,7 +52,6 @@ public struct AccountsClient: Sendable {
 		self.accountsOnCurrentNetwork = accountsOnCurrentNetwork
 		self.accountUpdates = accountUpdates
 		self.newVirtualAccount = newVirtualAccount
-		self.saveVirtualAccount = saveVirtualAccount
 		self.saveVirtualAccounts = saveVirtualAccounts
 		self.getAccountByAddress = getAccountByAddress
 		self.hasAccountOnNetwork = hasAccountOnNetwork
@@ -74,8 +69,7 @@ extension AccountsClient {
 	public typealias AccountUpdates = @Sendable (AccountAddress) async -> AnyAsyncSequence<Profile.Network.Account>
 
 	public typealias NewVirtualAccount = @Sendable (NewAccountRequest) async throws -> Profile.Network.Account
-	public typealias SaveVirtualAccount = @Sendable (SaveAccountRequest) async throws -> Void
-	public typealias SaveVirtualAccounts = @Sendable (SaveAccountsRequest) async throws -> Void
+	public typealias SaveVirtualAccounts = @Sendable ([Profile.Network.Account]) async throws -> Void
 
 	public typealias GetAccountByAddress = @Sendable (AccountAddress) async throws -> Profile.Network.Account
 
@@ -96,18 +90,9 @@ public struct NewAccountRequest: Sendable, Hashable {
 	}
 }
 
-// MARK: - SaveAccountRequest
-public struct SaveAccountRequest: Sendable, Hashable {
-	public let account: Profile.Network.Account
-	public init(account: Profile.Network.Account) {
-		self.account = account
-	}
-}
-
-// MARK: - SaveAccountsRequest
-public struct SaveAccountsRequest: Sendable, Hashable {
-	public let accounts: [Profile.Network.Account]
-	public init(accounts: [Profile.Network.Account]) {
-		self.accounts = accounts
+extension AccountsClient {
+	/// Saves a virtual account into the profile.
+	public func saveVirtualAccount(_ account: Profile.Network.Account) async throws {
+		try await saveVirtualAccounts([account])
 	}
 }
