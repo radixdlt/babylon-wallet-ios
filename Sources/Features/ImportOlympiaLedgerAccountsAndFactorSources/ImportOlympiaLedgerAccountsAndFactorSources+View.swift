@@ -47,8 +47,10 @@ extension ImportOlympiaLedgerAccountsAndFactorSources {
 							Text(L10n.ImportOlympiaLedgerAccounts.title)
 								.textStyle(.sheetTitle)
 
-							Text(L10n.ImportOlympiaLedgerAccounts.subtitle)
-								.textStyle(.body1Regular)
+							if viewStore.moreAccounts > 0 {
+								Text(L10n.ImportOlympiaLedgerAccounts.subtitle)
+									.textStyle(.body1Regular)
+							}
 
 							Text(L10n.ImportOlympiaLedgerAccounts.accountCount(viewStore.moreAccounts))
 								.textStyle(.body1Header)
@@ -72,12 +74,6 @@ extension ImportOlympiaLedgerAccountsAndFactorSources {
 								}
 							}
 							.padding(.horizontal, .medium3)
-						}
-
-						if viewStore.moreAccounts > 0 {
-							Text(L10n.ImportOlympiaLedgerAccounts.subtitle)
-								.textStyle(.body1Regular)
-								.padding(.horizontal, .large2)
 						}
 						Spacer(minLength: 0)
 					}
