@@ -60,11 +60,9 @@ extension ImportLegacyWalletClient: DependencyKey {
 			}
 
 			// Save all accounts
-			for account in accounts {
-				try await accountsClient.saveVirtualAccount(.init(
-					account: account.babylon
-				))
-			}
+			try await accountsClient.saveVirtualAccounts(.init(
+				accounts: accounts.map(\.babylon)
+			))
 
 			return (accounts: accounts, networkID: networkID)
 		}
