@@ -34,8 +34,6 @@ extension CacheClient: DependencyKey {
 				loggerGlobal.debug("💾 Data successfully retrieved from disk: \(entry)")
 				return data
 			} catch {
-				// Clear corrupt data
-				try? diskPersistenceClient.remove(entry.filesystemFilePath)
 				loggerGlobal.warning("💾 Could not retrieve data from disk: \(error.localizedDescription)")
 				throw Error.dataLoadingFailed
 			}

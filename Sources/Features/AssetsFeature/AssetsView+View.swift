@@ -9,7 +9,6 @@ extension AssetsView {
 		private let store: StoreOf<AssetsView>
 
 		public init(store: StoreOf<AssetsView>) {
-			UITableView.appearance().backgroundColor = UIColor.clear
 			self.store = store
 		}
 
@@ -24,6 +23,9 @@ extension AssetsView {
 					if viewStore.isLoadingResources {
 						ProgressView()
 							.padding(.small1)
+							.listRowSeparator(.hidden)
+							.listRowBackground(Color.clear)
+							.centered
 					} else {
 						switch viewStore.activeAssetKind {
 						case .fungible:

@@ -7,7 +7,7 @@ import SharedModels
 /// A client that manages loading Entities from the Ledger.
 public struct OnLedgerEntitiesClient: Sendable {
 	/// Retrieve the entities identified by addresses
-	public let getEntities: GetEntities
+	public var getEntities: GetEntities
 
 	/// Retrieve the token data associated with the given non fungible ids
 	public let getNonFungibleTokenData: GetNonFungibleTokenData

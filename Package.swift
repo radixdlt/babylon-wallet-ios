@@ -486,7 +486,11 @@ package.addModules([
 			"CacheClient",
 			"EngineKit",
 		],
-		tests: .no
+		tests: .yes(
+			resources: [
+				.process("TestVectors/"),
+			]
+		)
 	),
 	.client(
 		name: "AppPreferencesClient",
@@ -612,11 +616,7 @@ package.addModules([
 		exclude: [
 			"CodeGen/Input/",
 		],
-		tests: .yes(
-			resources: [
-				.process("TestVectors/"),
-			]
-		),
+		tests: .no,
 		disableConcurrencyChecks: true
 	),
 

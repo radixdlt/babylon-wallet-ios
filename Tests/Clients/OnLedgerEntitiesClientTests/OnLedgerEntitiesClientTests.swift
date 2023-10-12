@@ -1,8 +1,9 @@
 import ClientTestingPrelude
 @testable import GatewayAPI
+@testable import OnLedgerEntitiesClient
 import TestingPrelude
 
-final class GatewayAPITests: TestCase {
+final class OnLedgerEntitiesClientTests: TestCase {
 	private func doTest(_ jsonName: String, expected: [AssetBehavior]) throws {
 		try testFixture(bundle: .module, jsonName: jsonName) { (assignments: GatewayAPI.ComponentEntityRoleAssignments) in
 			XCTAssertEqual(assignments.extractBehaviors(), expected)

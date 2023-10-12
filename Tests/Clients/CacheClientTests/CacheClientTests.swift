@@ -49,10 +49,9 @@ final class CacheClientTests: TestCase {
 			XCTFail("Could not create URL from string")
 			return
 		}
-		// entry lifefime is 300 seconds
 		let entry: CacheClient.Entry = .networkName(dataToBeSaved.absoluteString)
 
-		let validTimeInterval: TimeInterval = 299
+		let validTimeInterval: TimeInterval = entry.lifetime - 1
 		try withDependencies {
 			$0.diskPersistenceClient = .liveValue
 			$0.date = .incrementing(by: validTimeInterval, from: .now)
@@ -68,7 +67,7 @@ final class CacheClientTests: TestCase {
 			XCTAssertEqual(dataToBeSaved, retrived)
 		}
 
-		let boundaryTimeInterval: TimeInterval = 300
+		let boundaryTimeInterval: TimeInterval = entry.lifetime
 		try withDependencies {
 			$0.diskPersistenceClient = .liveValue
 			$0.date = .incrementing(by: boundaryTimeInterval, from: .now)
@@ -84,7 +83,7 @@ final class CacheClientTests: TestCase {
 			XCTAssertEqual(dataToBeSaved, retrived)
 		}
 
-		let expiredTimeInterval: TimeInterval = 301
+		let expiredTimeInterval: TimeInterval = entry.lifetime + 1
 		try withDependencies {
 			$0.diskPersistenceClient = .liveValue
 			$0.date = .incrementing(by: expiredTimeInterval, from: .now)
