@@ -23,6 +23,9 @@ public struct AccountsClient: Sendable {
 	/// Saves a virtual account into the profile.
 	public var saveVirtualAccount: SaveVirtualAccount
 
+	/// Saves virtual accounts into the profile.
+	public var saveVirtualAccounts: SaveVirtualAccounts
+
 	/// Try to perform lookup of account by account address.
 	public var getAccountByAddress: GetAccountByAddress
 
@@ -41,6 +44,7 @@ public struct AccountsClient: Sendable {
 		getAccountsOnNetwork: @escaping GetAccountsOnNetwork,
 		newVirtualAccount: @escaping NewVirtualAccount,
 		saveVirtualAccount: @escaping SaveVirtualAccount,
+		saveVirtualAccounts: @escaping SaveVirtualAccounts,
 		getAccountByAddress: @escaping GetAccountByAddress,
 		hasAccountOnNetwork: @escaping HasAccountOnNetwork,
 		updateAccount: @escaping UpdateAccount
@@ -53,6 +57,7 @@ public struct AccountsClient: Sendable {
 		self.accountUpdates = accountUpdates
 		self.newVirtualAccount = newVirtualAccount
 		self.saveVirtualAccount = saveVirtualAccount
+		self.saveVirtualAccounts = saveVirtualAccounts
 		self.getAccountByAddress = getAccountByAddress
 		self.hasAccountOnNetwork = hasAccountOnNetwork
 		self.updateAccount = updateAccount
@@ -70,6 +75,7 @@ extension AccountsClient {
 
 	public typealias NewVirtualAccount = @Sendable (NewAccountRequest) async throws -> Profile.Network.Account
 	public typealias SaveVirtualAccount = @Sendable (SaveAccountRequest) async throws -> Void
+	public typealias SaveVirtualAccounts = @Sendable (SaveAccountsRequest) async throws -> Void
 
 	public typealias GetAccountByAddress = @Sendable (AccountAddress) async throws -> Profile.Network.Account
 
@@ -95,5 +101,13 @@ public struct SaveAccountRequest: Sendable, Hashable {
 	public let account: Profile.Network.Account
 	public init(account: Profile.Network.Account) {
 		self.account = account
+	}
+}
+
+// MARK: - SaveAccountsRequest
+public struct SaveAccountsRequest: Sendable, Hashable {
+	public let accounts: [Profile.Network.Account]
+	public init(accounts: [Profile.Network.Account]) {
+		self.accounts = accounts
 	}
 }

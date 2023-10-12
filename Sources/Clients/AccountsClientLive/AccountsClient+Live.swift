@@ -16,6 +16,14 @@ extension AccountsClient: DependencyKey {
 			}
 		}
 
+		let saveVirtualAccounts: SaveVirtualAccounts = { request in
+			try await getProfileStore().updating {
+				for account in request.accounts {
+					try $0.addAccount(account)
+				}
+			}
+		}
+
 		let getAccountsOnCurrentNetwork: GetAccountsOnCurrentNetwork = {
 			try await getProfileStore().network().accounts
 		}
@@ -55,6 +63,7 @@ extension AccountsClient: DependencyKey {
 				)
 			},
 			saveVirtualAccount: saveVirtualAccount,
+			saveVirtualAccounts: saveVirtualAccounts,
 			getAccountByAddress: { address in
 				try await getProfileStore().network().entity(address: address)
 			},
