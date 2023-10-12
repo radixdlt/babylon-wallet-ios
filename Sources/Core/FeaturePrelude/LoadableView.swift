@@ -2,11 +2,12 @@ import SwiftUI
 
 extension View {
 	@ViewBuilder
-	public func loadable<T>(_ loadable: Loadable<T>,
-	                        @ViewBuilder loadingView: () -> some View,
-	                        @ViewBuilder errorView: (Error) -> some View = { _ in EmptyView() },
-	                        @ViewBuilder successContent: (T) -> some View) -> some View
-	{
+	public func loadable<T>(
+		_ loadable: Loadable<T>,
+		@ViewBuilder loadingView: () -> some View,
+		@ViewBuilder errorView: (Error) -> some View = { _ in EmptyView() },
+		@ViewBuilder successContent: (T) -> some View
+	) -> some View {
 		switch loadable {
 		case .idle, .loading:
 			loadingView()
@@ -18,9 +19,10 @@ extension View {
 	}
 
 	@ViewBuilder
-	public func loadable<T>(_ loadable: Loadable<T>,
-	                        @ViewBuilder successContent: (T) -> some View) -> some View
-	{
+	public func loadable<T>(
+		_ loadable: Loadable<T>,
+		@ViewBuilder successContent: (T) -> some View
+	) -> some View {
 		self.loadable(
 			loadable,
 			loadingView: {

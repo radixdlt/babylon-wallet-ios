@@ -197,29 +197,30 @@ extension OnLedgerEntitiesClient {
 	) async throws -> [OnLedgerEntity] {
 		@Dependency(\.cacheClient) var cacheClient
 
-		if forceRefresh {
+		guard !forceRefresh else {
 			let freshEntities = try await refresh(Array(identifiers))
 			freshEntities.forEach {
 				cacheClient.save($0, .onLedgerEntity($0.cachingIdentifier))
 			}
+
 			return freshEntities
-		} else {
-			let cachedEntities = identifiers.compactMap {
-				try? cacheClient.load(OnLedgerEntity.self, .onLedgerEntity($0)) as? OnLedgerEntity
-			}
-
-			let notCachedEntities = Set(identifiers).subtracting(Set(cachedEntities.map(\.cachingIdentifier)))
-			guard !notCachedEntities.isEmpty else {
-				return cachedEntities
-			}
-
-			let freshEntities = try await refresh(Array(notCachedEntities))
-			freshEntities.forEach {
-				cacheClient.save($0, .onLedgerEntity($0.cachingIdentifier))
-			}
-
-			return cachedEntities + freshEntities
 		}
+
+		let cachedEntities = identifiers.compactMap {
+			try? cacheClient.load(OnLedgerEntity.self, .onLedgerEntity($0)) as? OnLedgerEntity
+		}
+
+		let notCachedEntities = Set(identifiers).subtracting(Set(cachedEntities.map(\.cachingIdentifier)))
+		guard !notCachedEntities.isEmpty else {
+			return cachedEntities
+		}
+
+		let freshEntities = try await refresh(Array(notCachedEntities))
+		freshEntities.forEach {
+			cacheClient.save($0, .onLedgerEntity($0.cachingIdentifier))
+		}
+
+		return cachedEntities + freshEntities
 	}
 
 	@Sendable

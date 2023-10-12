@@ -171,7 +171,7 @@ extension Loadable {
 		flatMap { .success(transform($0)) }
 	}
 
-	public func filter<Element>(by predicate: (Element) -> Bool) -> Loadable<[Element]> where Value == [Element] {
+	public func filter(by predicate: (Value.Element) -> Bool) -> Loadable<[Value.Element]> where Value: Sequence {
 		switch self {
 		case .idle:
 			return .idle
@@ -201,7 +201,7 @@ extension Loadable {
 		}
 	}
 
-	public func first<Element>(where predicate: (Element) -> Bool) -> Loadable<Element?> where Value == [Element] {
+	public func firstd(where predicate: (Value.Element) -> Bool) -> Loadable<Value.Element?> where Value: Sequence {
 		switch self {
 		case .idle:
 			return .idle

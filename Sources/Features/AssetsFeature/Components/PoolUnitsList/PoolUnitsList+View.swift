@@ -11,7 +11,6 @@ extension PoolUnitsList {
 		}
 
 		public var body: some SwiftUI.View {
-//			VStack(spacing: .medium1) {
 			IfLetStore(
 				store.scope(
 					state: \.lsuResource,
@@ -38,8 +37,6 @@ extension PoolUnitsList {
 			.task { @MainActor in
 				await store.send(.view(.task)).finish()
 			}
-//			}
-//			.padding(.horizontal, .medium3)
 		}
 	}
 }

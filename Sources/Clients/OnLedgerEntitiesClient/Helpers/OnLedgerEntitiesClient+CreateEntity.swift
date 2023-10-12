@@ -168,7 +168,7 @@ extension OnLedgerEntitiesClient {
 			.items
 			.first(where: { $0.vaultAddress == state.stakeXRDVaultAddress })?.amount
 		else {
-			assertionFailure("Validtor XRD Resource didn't contain the \(state.stakeXRDVaultAddress) vault ")
+			assertionFailure("Validator XRD Resource didn't contain the \(state.stakeXRDVaultAddress) vault ")
 			return nil
 		}
 
@@ -296,7 +296,10 @@ extension OnLedgerEntitiesClient {
 		return .init(radixNetworkStakes: stakeUnits, poolUnits: poolUnits)
 	}
 
-	static func extractOwnedFungibleResources(_ item: GatewayAPI.StateEntityDetailsResponseItem, ledgerState: AtLedgerState) throws -> [OnLedgerEntity.OwnedFungibleResource] {
+	static func extractOwnedFungibleResources(
+		_ item: GatewayAPI.StateEntityDetailsResponseItem,
+		ledgerState: AtLedgerState
+	) throws -> [OnLedgerEntity.OwnedFungibleResource] {
 		try item.fungibleResources?.items.compactMap(\.vault).compactMap { vaultAggregated -> OnLedgerEntity.OwnedFungibleResource? in
 			guard let vault = vaultAggregated.vaults.items.first else {
 				assertionFailure("Owned resource without a vault???")
@@ -317,7 +320,10 @@ extension OnLedgerEntitiesClient {
 		} ?? []
 	}
 
-	static func extractOwnedNonFungibleResources(_ item: GatewayAPI.StateEntityDetailsResponseItem, ledgerState: AtLedgerState) throws -> [OnLedgerEntity.OwnedNonFungibleResource] {
+	static func extractOwnedNonFungibleResources(
+		_ item: GatewayAPI.StateEntityDetailsResponseItem,
+		ledgerState: AtLedgerState
+	) throws -> [OnLedgerEntity.OwnedNonFungibleResource] {
 		try item.nonFungibleResources?.items.compactMap(\.vault).compactMap { vaultAggregated -> OnLedgerEntity.OwnedNonFungibleResource? in
 			guard let vault = vaultAggregated.vaults.items.first else {
 				assertionFailure("Owned resource without a vault???")
@@ -343,7 +349,10 @@ extension OnLedgerEntitiesClient {
 	/// This loads all of the related pool unit details required by the Pool units screen.
 	/// We don't do any pagination there(yet), since the number of owned pools will not be big, this can be revised in the future.
 	@Sendable
-	public func getOwnedPoolUnitsDetails(_ account: OnLedgerEntity.Account, refresh: Bool = false) async throws -> [OwnedResourcePoolDetails] {
+	public func getOwnedPoolUnitsDetails(
+		_ account: OnLedgerEntity.Account,
+		refresh: Bool = false
+	) async throws -> [OwnedResourcePoolDetails] {
 		let ownedPoolUnits = account.poolUnitResources.poolUnits
 		let pools = try await getEntities(
 			ownedPoolUnits.map(\.resourcePoolAddress.asGeneral),
@@ -399,7 +408,10 @@ extension OnLedgerEntitiesClient {
 
 	/// This loads all of the related stake unit details required by the Pool Units screen.
 	/// We don't do any pagination there(yet), since the number of owned stakes will not be big, this can be revised in the future.
-	public func getOwnedStakesDetails(account: OnLedgerEntity.Account, refresh: Bool = false) async throws -> [OwnedStakeDetails] {
+	public func getOwnedStakesDetails(
+		account: OnLedgerEntity.Account,
+		refresh: Bool = false
+	) async throws -> [OwnedStakeDetails] {
 		let ownedStakes = account.poolUnitResources.radixNetworkStakes
 		let validators = try await getEntities(
 			ownedStakes.map(\.validatorAddress.asGeneral),
@@ -536,136 +548,56 @@ extension Array where Element == OnLedgerEntity.OwnedFungibleResource {
 			}
 		}
 
-		let sortedNonXrdResources = nonXrdResources.sorted { lhs, rhs in
-			if lhs.amount > .zero, rhs.amount > .zero {
-				return lhs.amount > rhs.amount // Sort descending by amount
-			}
-			if lhs.amount != .zero || rhs.amount != .zero {
-				return lhs.amount != .zero
-			}
-
-			if let lhsSymbol = lhs.metadata.symbol, let rhsSymbol = rhs.metadata.symbol {
-				return lhsSymbol < rhsSymbol // Sort alphabetically by symbol
-			}
-			if lhs.metadata.symbol != nil || rhs.metadata.symbol != nil {
-				return lhs.metadata.symbol != nil
-			}
-
-			if let lhsName = lhs.metadata.name, let rhsName = rhs.metadata.name {
-				return lhsName < rhsName // Sort alphabetically by name
-			}
-
-			return lhs.resourceAddress.address < rhs.resourceAddress.address // Sort by address
-		}
+		let sortedNonXrdResources = nonXrdResources.sorted(by: <)
 
 		return .init(xrdResource: xrdResource, nonXrdResources: sortedNonXrdResources)
 	}
 }
 
-extension Array where Element == OnLedgerEntity.OwnedNonFungibleResource {
-	func sorted() -> [OnLedgerEntity.OwnedNonFungibleResource] {
-		sorted { lhs, rhs in
-			switch (lhs.metadata.name, rhs.metadata.name) {
-			case let (.some(lhsName), .some(rhsName)):
-				return lhsName < rhsName
-			case (nil, .some):
-				return false
-			case (.some, nil):
-				return true
-			default:
-				return lhs.resourceAddress.address < rhs.resourceAddress.address
-			}
+// MARK: - OnLedgerEntity.OwnedFungibleResource + Comparable
+extension OnLedgerEntity.OwnedFungibleResource: Comparable {
+	public static func < (
+		lhs: SharedModels.OnLedgerEntity.OwnedFungibleResource,
+		rhs: SharedModels.OnLedgerEntity.OwnedFungibleResource
+	) -> Bool {
+		if lhs.amount > .zero, rhs.amount > .zero {
+			return lhs.amount > rhs.amount // Sort descending by amount
 		}
+		if lhs.amount != .zero || rhs.amount != .zero {
+			return lhs.amount != .zero
+		}
+
+		if let lhsSymbol = lhs.metadata.symbol, let rhsSymbol = rhs.metadata.symbol {
+			return lhsSymbol < rhsSymbol // Sort alphabetically by symbol
+		}
+		if lhs.metadata.symbol != nil || rhs.metadata.symbol != nil {
+			return lhs.metadata.symbol != nil
+		}
+
+		if let lhsName = lhs.metadata.name, let rhsName = rhs.metadata.name {
+			return lhsName < rhsName // Sort alphabetically by name
+		}
+
+		return lhs.resourceAddress.address < rhs.resourceAddress.address // Sort by address
 	}
 }
 
-extension GatewayAPI.ComponentEntityRoleAssignments {
-	@Sendable public func extractBehaviors() -> [AssetBehavior] {
-		typealias ParsedName = GatewayAPI.RoleKey.ParsedName
-
-		enum Assigned {
-			case none, someone, anyone, unknown
+// MARK: - OnLedgerEntity.OwnedNonFungibleResource + Comparable
+extension OnLedgerEntity.OwnedNonFungibleResource: Comparable {
+	public static func < (
+		lhs: OnLedgerEntity.OwnedNonFungibleResource,
+		rhs: OnLedgerEntity.OwnedNonFungibleResource
+	) -> Bool {
+		switch (lhs.metadata.name, rhs.metadata.name) {
+		case let (.some(lhsName), .some(rhsName)):
+			return lhsName < rhsName
+		case (nil, .some):
+			return false
+		case (.some, nil):
+			return true
+		default:
+			return lhs.resourceAddress.address < rhs.resourceAddress.address
 		}
-
-		func findEntry(_ name: GatewayAPI.RoleKey.ParsedName) -> GatewayAPI.ComponentEntityRoleAssignmentEntry? {
-			entries.first { $0.roleKey.parsedName == name }
-		}
-
-		func performer(_ name: GatewayAPI.RoleKey.ParsedName) -> Assigned {
-			guard let assignment = findEntry(name)?.parsedAssignment else { return .unknown }
-			switch assignment {
-			case .allowAll: return .anyone
-			case .denyAll: return .none
-			case .protected, .otherExplicit, .owner: return .someone
-			}
-		}
-
-		func updaters(_ name: GatewayAPI.RoleKey.ParsedName) -> Assigned {
-			guard let updaters = findEntry(name)?.updaterRoles, !updaters.isEmpty else { return .none }
-
-			// Lookup the corresponding assignments, ignoring unknown and empty values
-			let updaterAssignments = Set(updaters.compactMap(\.parsedName).compactMap(findEntry).compactMap(\.parsedAssignment))
-
-			if updaterAssignments.isEmpty {
-				return .unknown
-			} else if updaterAssignments == [.denyAll] {
-				return .none
-			} else if updaterAssignments.contains(.allowAll) {
-				return .anyone
-			} else {
-				return .someone
-			}
-		}
-
-		var result: Set<AssetBehavior> = []
-
-		// Withdrawer and depositor areas are checked together, but we look at the performer and updater role types separately
-		let movers: Set = [performer(.withdrawer), performer(.depositor)]
-		if movers != [.anyone] {
-			result.insert(.movementRestricted)
-		} else {
-			let moverUpdaters: Set = [updaters(.withdrawer), updaters(.depositor)]
-			if moverUpdaters.contains(.anyone) {
-				result.insert(.movementRestrictableInFutureByAnyone)
-			} else if moverUpdaters.contains(.someone) {
-				result.insert(.movementRestrictableInFuture)
-			}
-		}
-
-		// Other names are checked individually, but without distinguishing between the role types
-		func addBehavior(for name: GatewayAPI.RoleKey.ParsedName, ifSomeone: AssetBehavior, ifAnyone: AssetBehavior) {
-			let either: Set = [performer(name), updaters(name)]
-			if either.contains(.anyone) {
-				result.insert(ifAnyone)
-			} else if either.contains(.someone) {
-				result.insert(ifSomeone)
-			}
-		}
-
-		addBehavior(for: .minter, ifSomeone: .supplyIncreasable, ifAnyone: .supplyIncreasableByAnyone)
-		addBehavior(for: .burner, ifSomeone: .supplyDecreasable, ifAnyone: .supplyDecreasableByAnyone)
-		addBehavior(for: .recaller, ifSomeone: .removableByThirdParty, ifAnyone: .removableByAnyone)
-		addBehavior(for: .freezer, ifSomeone: .freezableByThirdParty, ifAnyone: .freezableByAnyone)
-		addBehavior(for: .nonFungibleDataUpdater, ifSomeone: .nftDataChangeable, ifAnyone: .nftDataChangeableByAnyone)
-
-		// If there are no special behaviors, that means it's a "simple asset"
-		if result.isEmpty {
-			return [.simpleAsset]
-		}
-
-		// Finally we make some simplifying substitutions
-		func substitute(_ source: Set<AssetBehavior>, with target: AssetBehavior) {
-			if result.isSuperset(of: source) {
-				result.subtract(source)
-				result.insert(target)
-			}
-		}
-
-		// If supply is both increasable and decreasable, then it's "flexible"
-		substitute([.supplyIncreasableByAnyone, .supplyDecreasableByAnyone], with: .supplyFlexibleByAnyone)
-		substitute([.supplyIncreasable, .supplyDecreasable], with: .supplyFlexible)
-
-		return result.sorted()
 	}
 }
 

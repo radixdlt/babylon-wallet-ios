@@ -62,7 +62,6 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 
 	public enum ViewAction: Sendable, Equatable {
 		case appeared
-		case accountTapped(AccountAddress)
 		case dAppTapped(Profile.Network.AuthorizedDapp.ID)
 		case editPersonaTapped
 		case editAccountSharingTapped
@@ -167,9 +166,6 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 				await send(.internal(.dAppsUpdated(addingDappMetadata(to: dApps))))
 			}
 
-		case let .accountTapped(address):
-			return .none
-
 		case let .dAppTapped(dAppID):
 			return .run { send in
 				let dApp = try await authorizedDappsClient.getDetailedDapp(dAppID)
@@ -178,7 +174,6 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 				loggerGlobal.error("Could not get dApp details \(dAppID), error: \(error)")
 				errorQueue.schedule(error)
 			}
-			return .none
 
 		case .editPersonaTapped:
 			switch state.mode {

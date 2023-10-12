@@ -141,7 +141,7 @@ extension SubmitTransactionClient: DependencyKey {
 				/// Refresh the resources if an operation on resource pool is involved,
 				/// reason being that contributing or withdrawing from a resource pool modifies the totalSupply
 				if involvedAddresses.contains(where: \.key.isResourcePool) {
-					/// A little bit to aggresive, as any other resource will also be refreshed.
+					/// A little bit too aggressive, as any other resource will also be refreshed.
 					/// But at this stage we cannot determine(without making additional calls) the pool unit related fungible resource
 					resourceAddressesToRefresh = involvedAddresses
 						.filter { $0.key == .globalFungibleResourceManager || $0.key.isResourcePool }

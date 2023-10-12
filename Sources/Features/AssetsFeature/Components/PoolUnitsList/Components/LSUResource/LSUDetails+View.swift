@@ -17,7 +17,7 @@ extension LSUDetails.State {
 				resourceAddress: stakeUnitResource.resource.resourceAddress,
 				isXRD: false,
 				validatorAddress: validator.address,
-				resourceName: .success(stakeUnitResource.resource.metadata.name), // TODO: Is this correct?
+				resourceName: .success(stakeUnitResource.resource.metadata.name),
 				currentSupply: .success(validator.xrdVaultBalance.formatted()),
 				behaviors: .success(stakeUnitResource.resource.behaviors),
 				tags: .success(stakeUnitResource.resource.metadata.tags)

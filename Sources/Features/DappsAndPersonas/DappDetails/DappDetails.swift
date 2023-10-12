@@ -93,15 +93,6 @@ public struct DappDetails: Sendable, FeatureReducer {
 			public var fungible: IdentifiedArrayOf<OnLedgerEntity.Resource>
 			public var nonFungible: IdentifiedArrayOf<OnLedgerEntity.Resource>
 		}
-
-		// TODO: This should be consolidated with other types that represent resources
-		public struct AssociatedDapp: Identifiable, Hashable, Sendable {
-			public var id: DappDefinitionAddress { address }
-
-			public let address: DappDefinitionAddress
-			public let name: String
-			public let iconURL: URL?
-		}
 	}
 
 	// MARK: Action
@@ -256,6 +247,14 @@ public struct DappDetails: Sendable, FeatureReducer {
 				let dAppID = state.dAppDefinitionAddress
 				return update(dAppID: dAppID, dismissPersonaDetails: false)
 
+			case .fungibleDetails(.delegate(.dismiss)):
+				state.destination = nil
+				return .none
+
+			case .nonFungibleDetails(.delegate(.dismiss)):
+				state.destination = nil
+				return .none
+
 			case .confirmDisconnectAlert(.confirmTapped):
 				assert(state.authorizedDapp != nil, "Can only disconnect a dApp that has been authorized")
 				guard let networkID = state.authorizedDapp?.networkID else { return .none }
@@ -345,11 +344,12 @@ public struct DappDetails: Sendable, FeatureReducer {
 		let associatedDapps = loadedDApps.filter { dApp in
 			do {
 				try dApp.metadata.validate(dAppDefinitionAddress: dApp.address)
-				guard let name = dApp.metadata.name else {
+				guard dApp.metadata.name != nil else {
 					throw OnLedgerEntity.Metadata.MetadataError.missingName
 				}
 				return true
 			} catch {
+				loggerGlobal.warning("Invalida dApp \(error)")
 				return false
 			}
 		}
@@ -357,18 +357,6 @@ public struct DappDetails: Sendable, FeatureReducer {
 		guard !associatedDapps.isEmpty else { return .idle }
 
 		return .success(associatedDapps)
-	}
-
-	/// Helper function that loads and extracts dApp info for a given dApp, validating that it points back to the dApp of this screen
-	private func extractDappInfo(
-		for dApp: DappDefinitionAddress,
-		validating dAppDefinitionAddress: DappDefinitionAddress
-	) async throws -> State.AssociatedDapp {
-		let metadata = try await onLedgerEntitiesClient.getDappMetadata(dApp, validatingDappDefinitionAddress: dAppDefinitionAddress)
-		guard let name = metadata.name else {
-			throw OnLedgerEntity.Metadata.MetadataError.missingName
-		}
-		return .init(address: dApp, name: name, iconURL: metadata.iconURL)
 	}
 
 	private func update(dAppID: DappDefinitionAddress, dismissPersonaDetails: Bool) -> Effect<Action> {

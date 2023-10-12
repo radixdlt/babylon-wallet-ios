@@ -5,7 +5,12 @@ extension EntityType {
 		switch self {
 		case .globalOneResourcePool, .globalTwoResourcePool, .globalMultiResourcePool:
 			return true
-		default:
+		case .globalPackage, .globalFungibleResourceManager, .globalNonFungibleResourceManager, .globalConsensusManager,
+		     .globalValidator, .globalAccessController, .globalAccount,
+		     .globalIdentity, .globalGenericComponent, .globalVirtualSecp256k1Account,
+		     .globalVirtualEd25519Account, .globalVirtualSecp256k1Identity, .globalVirtualEd25519Identity,
+		     .globalTransactionTracker, .internalFungibleVault, .internalNonFungibleVault,
+		     .internalGenericComponent, .internalKeyValueStore:
 			return false
 		}
 	}

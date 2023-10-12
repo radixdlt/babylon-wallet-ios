@@ -117,7 +117,11 @@ extension OnLedgerEntitiesClient {
 
 extension OnLedgerEntitiesClient {
 	@Sendable
-	public func getEntity(_ address: Address, metadataKeys: Set<EntityMetadataKey>, forceRefresh: Bool = false) async throws -> OnLedgerEntity {
+	public func getEntity(
+		_ address: Address,
+		metadataKeys: Set<EntityMetadataKey>,
+		forceRefresh: Bool = false
+	) async throws -> OnLedgerEntity {
 		guard let resource = try await getEntities([address], metadataKeys, nil, forceRefresh).first else {
 			throw Error.emptyResponse
 		}
@@ -125,7 +129,10 @@ extension OnLedgerEntitiesClient {
 	}
 
 	@Sendable
-	public func getAccounts(_ addresses: [AccountAddress], forceRefresh: Bool = false) async throws -> [OnLedgerEntity.Account] {
+	public func getAccounts(
+		_ addresses: [AccountAddress],
+		forceRefresh: Bool = false
+	) async throws -> [OnLedgerEntity.Account] {
 		try await getEntities(addresses.map(\.asGeneral), .resourceMetadataKeys, nil, forceRefresh).compactMap(\.account)
 	}
 
@@ -168,7 +175,11 @@ extension OnLedgerEntitiesClient {
 	}
 
 	@Sendable
-	public func getResource(_ address: ResourceAddress, metadataKeys: Set<EntityMetadataKey> = .resourceMetadataKeys, atLedgerState: AtLedgerState? = nil) async throws -> OnLedgerEntity.Resource {
+	public func getResource(
+		_ address: ResourceAddress,
+		metadataKeys: Set<EntityMetadataKey> = .resourceMetadataKeys,
+		atLedgerState: AtLedgerState? = nil
+	) async throws -> OnLedgerEntity.Resource {
 		guard let resource = try await getResources([address], metadataKeys: metadataKeys, atLedgerState: atLedgerState).first else {
 			throw Error.emptyResponse
 		}
