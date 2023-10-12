@@ -1,16 +1,29 @@
 import EngineKit
 import FeaturePrelude
+import OnLedgerEntitiesClient
 
 // MARK: - PoolUnit
 public struct PoolUnit: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable, Identifiable {
 		public var id: ResourcePoolAddress {
-			poolUnit.poolAddress
+			poolUnit.resourcePoolAddress
 		}
 
-		let poolUnit: AccountPortfolio.PoolUnitResources.PoolUnit
-
+		let poolUnit: OnLedgerEntity.Account.PoolUnit
+		var resourceDetails: Loadable<OnLedgerEntitiesClient.OwnedResourcePoolDetails>
 		var isSelected: Bool?
+
+		public init(
+			poolUnit: OnLedgerEntity.Account.PoolUnit,
+			resourceDetails: Loadable<OnLedgerEntitiesClient.OwnedResourcePoolDetails> = .idle,
+			isSelected: Bool? = nil,
+			destination: Destinations.State? = nil
+		) {
+			self.poolUnit = poolUnit
+			self.resourceDetails = resourceDetails
+			self.isSelected = isSelected
+			self.destination = destination
+		}
 
 		@PresentationState
 		var destination: Destinations.State?
@@ -42,6 +55,8 @@ public struct PoolUnit: Sendable, FeatureReducer {
 		}
 	}
 
+	@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
+
 	public var body: some ReducerOf<Self> {
 		Reduce(core)
 			.ifLet(
@@ -57,11 +72,14 @@ public struct PoolUnit: Sendable, FeatureReducer {
 	) -> Effect<Action> {
 		switch viewAction {
 		case .didTap:
+			guard case let .success(details) = state.resourceDetails else {
+				return .none
+			}
 			if state.isSelected != nil {
 				state.isSelected?.toggle()
 			} else {
 				state.destination = .details(
-					.init(poolUnit: state.poolUnit)
+					.init(poolUnit: state.poolUnit, resourcesDetails: details)
 				)
 			}
 

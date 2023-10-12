@@ -2,6 +2,7 @@ import AccountPortfoliosClient
 import ClientPrelude
 import EngineKit
 import GatewayAPI
+import OnLedgerEntitiesClient
 import TransactionClient
 
 // MARK: - SubmitTransactionClient + DependencyKey
@@ -117,8 +118,11 @@ extension SubmitTransactionClient: DependencyKey {
 
 			@Dependency(\.transactionClient) var transactionClient
 			@Dependency(\.accountPortfoliosClient) var accountPortfoliosClient
+			@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
+			@Dependency(\.cacheClient) var cacheClient
 
 			let changedAccounts: [Profile.Network.Account.EntityAddress]?
+			let resourceAddressesToRefresh: [Address]?
 			do {
 				let decompiledNotarized = try NotarizedTransaction.decompile(compiledNotarizedTransaction: request.compiledNotarizedTXIntent)
 
@@ -132,9 +136,25 @@ extension SubmitTransactionClient: DependencyKey {
 				changedAccounts = involvedAccounts.accountsDepositedInto
 					.union(involvedAccounts.accountsWithdrawnFrom)
 					.map(\.address)
+
+				let involvedAddresses = manifest.extractAddresses()
+				/// Refresh the resources if an operation on resource pool is involved,
+				/// reason being that contributing or withdrawing from a resource pool modifies the totalSupply
+				if involvedAddresses.contains(where: \.key.isResourcePool) {
+					/// A little bit too aggressive, as any other resource will also be refreshed.
+					/// But at this stage we cannot determine(without making additional calls) the pool unit related fungible resource
+					resourceAddressesToRefresh = involvedAddresses
+						.filter { $0.key == .globalFungibleResourceManager || $0.key.isResourcePool }
+						.values
+						.flatMap(identity)
+						.compactMap { try? $0.asSpecific() }
+				} else {
+					resourceAddressesToRefresh = nil
+				}
 			} catch {
 				loggerGlobal.warning("Could get transactionClient.myInvolvedEntities: \(error.localizedDescription)")
 				changedAccounts = nil
+				resourceAddressesToRefresh = nil
 			}
 
 			let submitTransactionRequest = GatewayAPI.TransactionSubmitRequest(
@@ -149,6 +169,13 @@ extension SubmitTransactionClient: DependencyKey {
 
 			Task.detached {
 				try await hasTXBeenCommittedSuccessfully(txID)
+
+				if let resourceAddressesToRefresh {
+					resourceAddressesToRefresh.forEach {
+						cacheClient.removeFile(.onLedgerEntity(.resource($0.asGeneral)))
+					}
+				}
+
 				if let changedAccounts {
 					// FIXME: Ideally we should only have to call the cacheClient here
 					// cacheClient.clearCacheForAccounts(Set(changedAccounts))

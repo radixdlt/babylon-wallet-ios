@@ -102,7 +102,7 @@ extension TransactionClient {
 			let allAccounts = try await accountsClient.getAccountsOnNetwork(networkID)
 			let allFeePayerCandidates = try await accountPortfoliosClient.fetchAccountPortfolios(allAccounts.map(\.address), true).compactMap { portfolio -> FeePayerCandidate? in
 				guard
-					let account = allAccounts.first(where: { account in account.address == portfolio.owner })
+					let account = allAccounts.first(where: { account in account.address == portfolio.address })
 				else {
 					assertionFailure("Failed to find account or no balance, this should never happen.")
 					return nil

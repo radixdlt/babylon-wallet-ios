@@ -11,7 +11,7 @@ extension AccountList {
 
 			public let account: Profile.Network.Account
 
-			public var portfolio: Loadable<AccountPortfolio>
+			public var portfolio: Loadable<OnLedgerEntity.Account>
 
 			public let isLegacyAccount: Bool
 			public let isLedgerAccount: Bool
@@ -57,7 +57,7 @@ extension AccountList {
 		}
 
 		public enum InternalAction: Sendable, Equatable {
-			case accountPortfolioUpdate(AccountPortfolio)
+			case accountPortfolioUpdate(OnLedgerEntity.Account)
 		}
 
 		public enum DelegateAction: Sendable, Equatable {
@@ -91,7 +91,7 @@ extension AccountList {
 						guard !Task.isCancelled else {
 							return
 						}
-						await send(.internal(.accountPortfolioUpdate(accountPortfolio.nonEmptyVaults)))
+						await send(.internal(.accountPortfolioUpdate(accountPortfolio)))
 					}
 				}
 			case .backUpMnemonic:
@@ -115,8 +115,8 @@ extension AccountList {
 
 				// FIXME: Refactor account security prompts to share logic between this reducer and AccountDetails
 
-				state.isDappDefinitionAccount = portfolio.isDappDefintionAccountType
-				assert(portfolio.owner == state.account.address)
+				state.isDappDefinitionAccount = portfolio.metadata.accountType == .dappDefinition
+				assert(portfolio.address == state.account.address)
 				state.portfolio = .success(portfolio)
 
 				if let xrdResource = portfolio.fungibleResources.xrdResource {

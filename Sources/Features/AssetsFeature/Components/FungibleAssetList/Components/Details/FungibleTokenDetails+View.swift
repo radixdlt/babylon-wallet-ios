@@ -5,25 +5,31 @@ extension FungibleTokenDetails.State {
 	var viewState: FungibleTokenDetails.ViewState {
 		.init(
 			detailsHeader: detailsHeader,
-			thumbnail: isXRD ? .xrd : .known(resource.iconURL),
+			thumbnail: {
+				let iconURL = resource.metadata.get(\.iconURL, prefetched: ownedFungibleResource?.metadata)
+				return isXRD ? .success(.xrd) : iconURL.map { .known($0) }
+			}(),
 			details: .init(
-				description: resource.description,
-				resourceAddress: resource.resourceAddress,
+				description: resource.metadata.get(\.description, prefetched: ownedFungibleResource?.metadata),
+				resourceAddress: resourceAddress,
 				isXRD: isXRD,
 				validatorAddress: nil,
 				resourceName: nil,
-				currentSupply: resource.totalSupply?.formatted() ?? L10n.AssetDetails.supplyUnkown,
+				currentSupply: resource.totalSupply.map { $0?.formatted() ?? L10n.AssetDetails.supplyUnkown },
 				behaviors: resource.behaviors,
-				tags: isXRD ? resource.tags + [.officialRadix] : resource.tags
+				tags: {
+					let tags = resource.metadata.get(\.tags, prefetched: ownedFungibleResource?.metadata)
+					return isXRD ? tags.map { $0 + [.officialRadix] } : tags
+				}()
 			)
 		)
 	}
 
 	var detailsHeader: DetailsContainerWithHeaderViewState {
 		.init(
-			title: resource.name ?? L10n.Account.PoolUnits.unknownPoolUnitName,
-			amount: amount?.formatted(),
-			symbol: resource.symbol
+			title: resource.metadata.get(\.name, prefetched: ownedFungibleResource?.metadata).map { $0 ?? L10n.Account.PoolUnits.unknownPoolUnitName },
+			amount: ownedFungibleResource?.amount.formatted(),
+			symbol: resource.metadata.get(\.symbol, prefetched: ownedFungibleResource?.metadata)
 		)
 	}
 }
@@ -32,7 +38,7 @@ extension FungibleTokenDetails.State {
 extension FungibleTokenDetails {
 	public struct ViewState: Equatable {
 		let detailsHeader: DetailsContainerWithHeaderViewState
-		let thumbnail: TokenThumbnail.Content
+		let thumbnail: Loadable<TokenThumbnail.Content>
 		let details: AssetResourceDetailsSection.ViewState
 	}
 
@@ -49,10 +55,13 @@ extension FungibleTokenDetails {
 				DetailsContainerWithHeaderView(viewState: viewStore.detailsHeader) {
 					viewStore.send(.closeButtonTapped)
 				} thumbnailView: {
-					TokenThumbnail(viewStore.thumbnail, size: .veryLarge)
+					TokenThumbnail(viewStore.thumbnail.wrappedValue ?? .unknown, size: .veryLarge)
 				} detailsView: {
 					AssetResourceDetailsSection(viewState: viewStore.details)
 						.padding(.bottom, .medium1)
+				}
+				.task { @MainActor in
+					await viewStore.send(.task).finish()
 				}
 			}
 		}

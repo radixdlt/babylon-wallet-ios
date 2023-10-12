@@ -87,9 +87,9 @@ extension DevAccountPreferences {
 						turnIntoDappDefinitionAccountTypeButton(with: viewStore)
 						createFungibleTokenButton(with: viewStore)
 						// TODO: Re-enable. With new manifest builder that is not easy to handle.
-						// createNonFungibleTokenButton(with: viewStore)
-						// createMultipleFungibleTokenButton(with: viewStore)
-						// createMultipleNonFungibleTokenButton(with: viewStore)
+						createNonFungibleTokenButton(with: viewStore)
+						createMultipleFungibleTokenButton(with: viewStore)
+						createMultipleNonFungibleTokenButton(with: viewStore)
 						#endif // DEBUG
 						qrCodeButton(with: viewStore)
 					}

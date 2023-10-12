@@ -103,6 +103,7 @@ package.addModules([
 			"AssetsFeature",
 			"DappInteractionClient",
 			"EngineKit",
+			"OnLedgerEntitiesClient",
 		],
 		tests: .yes()
 	),
@@ -474,6 +475,7 @@ package.addModules([
 			"GatewayAPI",
 			"CacheClient",
 			"EngineKit",
+			"OnLedgerEntitiesClient",
 		],
 		tests: .no
 	),
@@ -484,7 +486,11 @@ package.addModules([
 			"CacheClient",
 			"EngineKit",
 		],
-		tests: .no
+		tests: .yes(
+			resources: [
+				.process("TestVectors/"),
+			]
+		)
 	),
 	.client(
 		name: "AppPreferencesClient",
@@ -610,11 +616,7 @@ package.addModules([
 		exclude: [
 			"CodeGen/Input/",
 		],
-		tests: .yes(
-			resources: [
-				.process("TestVectors/"),
-			]
-		),
+		tests: .no,
 		disableConcurrencyChecks: true
 	),
 
@@ -794,10 +796,10 @@ package.addModules([
 		name: "ROLAClient",
 		dependencies: [
 			"AccountsClient",
-			"GatewayAPI",
 			"CacheClient",
 			"DeviceFactorSourceClient",
 			"EngineKit",
+			"OnLedgerEntitiesClient",
 		],
 		tests: .yes(
 			dependencies: [],

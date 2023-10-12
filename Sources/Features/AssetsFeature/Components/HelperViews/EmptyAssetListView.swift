@@ -17,6 +17,8 @@ struct EmptyAssetListView: View {
 				.textStyle(.sectionHeader)
 		}
 		.padding(.top, .medium1)
+		.centered
+		.listRowBackground(Color.clear)
 	}
 }
 

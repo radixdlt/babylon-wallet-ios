@@ -1,18 +1,18 @@
 import EngineKit
 import FeaturePrelude
 
-extension FungibleAssetList {
+extension FungibleAssetList.Section {
 	public struct Row: Sendable, FeatureReducer {
 		public struct State: Sendable, Hashable, Identifiable {
 			public typealias ID = ResourceAddress
 			public var id: ID { token.resourceAddress }
 
-			public var token: AccountPortfolio.FungibleResource
+			public var token: OnLedgerEntity.OwnedFungibleResource
 			public var isXRD: Bool
 			public var isSelected: Bool?
 
 			public init(
-				xrdToken: AccountPortfolio.FungibleResource,
+				xrdToken: OnLedgerEntity.OwnedFungibleResource,
 				isSelected: Bool? = nil
 			) {
 				self.init(
@@ -23,7 +23,7 @@ extension FungibleAssetList {
 			}
 
 			public init(
-				nonXRDToken: AccountPortfolio.FungibleResource,
+				nonXRDToken: OnLedgerEntity.OwnedFungibleResource,
 				isSelected: Bool? = nil
 			) {
 				self.init(
@@ -34,7 +34,7 @@ extension FungibleAssetList {
 			}
 
 			init(
-				token: AccountPortfolio.FungibleResource,
+				token: OnLedgerEntity.OwnedFungibleResource,
 				isXRD: Bool,
 				isSelected: Bool? = nil
 			) {
@@ -49,7 +49,7 @@ extension FungibleAssetList {
 		}
 
 		public enum DelegateAction: Sendable, Equatable {
-			case selected(AccountPortfolio.FungibleResource)
+			case selected(OnLedgerEntity.OwnedFungibleResource)
 		}
 
 		public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {

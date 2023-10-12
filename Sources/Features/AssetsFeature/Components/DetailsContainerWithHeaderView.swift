@@ -3,17 +3,17 @@ import SwiftUI
 
 // MARK: - DetailsContainerWithHeaderViewState
 struct DetailsContainerWithHeaderViewState: Equatable {
-	let title: String
+	let title: Loadable<String>
 	let amount: String?
-	let symbol: String?
+	let symbol: Loadable<String?>
 }
 
 extension DetailsContainerWithHeaderViewState {
-	init(resource: AccountPortfolio.FungibleResource) {
+	init(resource: OnLedgerEntity.OwnedFungibleResource) {
 		self.init(
-			title: resource.name ?? L10n.Account.PoolUnits.unknownPoolUnitName,
+			title: .success(resource.metadata.name ?? L10n.Account.PoolUnits.unknownPoolUnitName),
 			amount: resource.amount.formatted(),
-			symbol: resource.symbol
+			symbol: .success(resource.metadata.symbol)
 		)
 	}
 }
@@ -60,7 +60,7 @@ struct DetailsContainerWithHeaderView<ThumbnailView: View, DetailsView: View>: V
 				Text(amount)
 					.font(.app.sheetTitle)
 					.kerning(-0.5)
-					+ Text((viewState.symbol).map { " " + $0 } ?? "")
+					+ Text((viewState.symbol.wrappedValue.flatMap(identity)).map { " " + $0 } ?? "")
 					.font(.app.sectionHeader)
 			}
 		}
@@ -70,12 +70,12 @@ struct DetailsContainerWithHeaderView<ThumbnailView: View, DetailsView: View>: V
 
 // MARK: - DetailsContainer
 struct DetailsContainer<Contents: View>: View {
-	let title: String
+	let title: Loadable<String>
 	let closeButtonAction: () -> Void
 	let contents: Contents
 
 	init(
-		title: String,
+		title: Loadable<String>,
 		closeButtonAction: @escaping () -> Void,
 		@ViewBuilder contents: () -> Contents
 	) {
@@ -90,7 +90,7 @@ struct DetailsContainer<Contents: View>: View {
 				contents
 			}
 			#if os(iOS)
-			.navigationBarTitle(title)
+			.navigationBarTitle(title.wrappedValue ?? "")
 			.navigationBarTitleColor(.app.gray1)
 			.navigationBarTitleDisplayMode(.inline)
 			.navigationBarInlineTitleFont(.app.secondaryHeader)

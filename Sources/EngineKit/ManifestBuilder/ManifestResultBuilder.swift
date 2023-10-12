@@ -21,6 +21,7 @@ extension ManifestBuilder {
 	public static let accountDeposit = flip(accountDeposit)
 	public static let takeNonFungiblesFromWorktop = flip(takeNonFungiblesFromWorktop)
 	public static let setOwnerKeys = flip(setOwnerKeys)
+	public static let createFungibleResourceManager = flip(createFungibleResourceManager)
 
 	@resultBuilder
 	public enum InstructionsChain {
@@ -66,5 +67,19 @@ extension ManifestBuilder {
 			builder = try $0(builder)
 		}
 		return builder
+	}
+}
+
+/// Flips the argument order of a five-argument curried function.
+///
+/// - Parameter function: A five-argument, curried function.
+/// - Returns: A curried function with its first two arguments flipped.
+public func flip<A, B, C, D, E, F, G, H, I>(_ function: @escaping (A) -> (B, C, D, E, F, G, H) throws -> I)
+	-> (B, C, D, E, F, G, H) -> (A) throws -> I
+{
+	{ (b: B, c: C, d: D, e: E, f: F, g: G, h: H) -> (A) throws -> I in
+		{ (a: A) throws -> I in
+			try function(a)(b, c, d, e, f, g, h)
+		}
 	}
 }

@@ -67,15 +67,17 @@ extension DappDetails.View {
 				.sheet(
 					store: store.destination,
 					state: /DappDetails.Destination.State.fungibleDetails,
-					action: DappDetails.Destination.Action.fungibleDetails,
-					content: { FungibleTokenDetails.View(store: $0) }
-				)
+					action: DappDetails.Destination.Action.fungibleDetails
+				) {
+					FungibleTokenDetails.View(store: $0)
+				}
 				.sheet(
 					store: store.destination,
 					state: /DappDetails.Destination.State.nonFungibleDetails,
-					action: DappDetails.Destination.Action.nonFungibleDetails,
-					content: { NonFungibleTokenDetails.View(store: $0) }
-				)
+					action: DappDetails.Destination.Action.nonFungibleDetails
+				) {
+					NonFungibleTokenDetails.View(store: $0)
+				}
 				.alert(
 					store: store.destination,
 					state: /DappDetails.Destination.State.confirmDisconnectAlert,
@@ -113,7 +115,7 @@ private extension DappDetails.State {
 
 extension OnLedgerEntity.Resource {
 	var title: String {
-		name ?? symbol ?? L10n.DAppRequest.Metadata.unknownName
+		metadata.name ?? metadata.symbol ?? L10n.DAppRequest.Metadata.unknownName
 	}
 }
 
@@ -177,7 +179,7 @@ extension DappDetails.View {
 		var body: some View {
 			WithViewStore(store, observe: \.fungibles, send: { .view($0) }) { viewStore in
 				ListWithHeading(heading: L10n.AuthorizedDapps.DAppDetails.tokens, elements: viewStore.state, title: \.title) { resource in
-					TokenThumbnail(.known(resource.iconURL), size: .small)
+					TokenThumbnail(.known(resource.metadata.iconURL), size: .small)
 				} action: { id in
 					viewStore.send(.fungibleTapped(id))
 				}
@@ -192,7 +194,7 @@ extension DappDetails.View {
 		var body: some View {
 			WithViewStore(store, observe: \.nonFungibles, send: { .view($0) }) { viewStore in
 				ListWithHeading(heading: L10n.AuthorizedDapps.DAppDetails.nfts, elements: viewStore.state, title: \.title) { resource in
-					NFTThumbnail(resource.iconURL, size: .small)
+					NFTThumbnail(resource.metadata.iconURL, size: .small)
 				} action: { id in
 					viewStore.send(.nonFungibleTapped(id))
 				}

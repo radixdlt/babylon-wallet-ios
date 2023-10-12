@@ -1,20 +1,16 @@
 import AssetsFeature
 import AuthorizedDappsClient
-import CacheClient
 import EditPersonaFeature
 import EngineKit
 import FeaturePrelude
-import GatewayAPI
 import OnLedgerEntitiesClient
 
 // MARK: - DappDetails
 public struct DappDetails: Sendable, FeatureReducer {
 	@Dependency(\.dismiss) var dismiss
 	@Dependency(\.errorQueue) var errorQueue
-	@Dependency(\.gatewayAPIClient) var gatewayAPIClient
 	@Dependency(\.openURL) var openURL
 	@Dependency(\.authorizedDappsClient) var authorizedDappsClient
-	@Dependency(\.cacheClient) var cacheClient
 	@Dependency(\.continuousClock) var clock
 	@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
 
@@ -45,7 +41,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 		public var personaList: PersonaList.State
 
 		@Loadable
-		public var metadata: GatewayAPI.EntityMetadataCollection? = nil
+		public var metadata: OnLedgerEntity.Metadata? = nil
 
 		@Loadable
 		public var resources: Resources? = nil
@@ -60,7 +56,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 		public init(
 			dApp: Profile.Network.AuthorizedDappDetailed,
 			context: Context.SettingsContext,
-			metadata: GatewayAPI.EntityMetadataCollection? = nil,
+			metadata: OnLedgerEntity.Metadata? = nil,
 			resources: Resources? = nil,
 			associatedDapps: [OnLedgerEntity.AssociatedDapp]? = nil,
 			destination: Destination.State? = nil
@@ -78,7 +74,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 		// General
 		public init(
 			dAppDefinitionAddress: DappDefinitionAddress,
-			metadata: GatewayAPI.EntityMetadataCollection? = nil,
+			metadata: OnLedgerEntity.Metadata? = nil,
 			resources: Resources? = nil,
 			associatedDapps: [OnLedgerEntity.AssociatedDapp]? = nil,
 			destination: Destination.State? = nil
@@ -86,7 +82,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 			self.context = .general
 			self.dAppDefinitionAddress = dAppDefinitionAddress
 			self.authorizedDapp = nil
-			self.personaList = .init()
+			self.personaList = .init() // TODO: Check reloading behaviour
 			self.metadata = metadata
 			self.resources = resources
 			self.associatedDapps = associatedDapps
@@ -115,7 +111,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 	}
 
 	public enum InternalAction: Sendable, Equatable {
-		case metadataLoaded(Loadable<GatewayAPI.EntityMetadataCollection>)
+		case metadataLoaded(Loadable<OnLedgerEntity.Metadata>)
 		case resourcesLoaded(Loadable<State.Resources>)
 		case associatedDappsLoaded(Loadable<[OnLedgerEntity.AssociatedDapp]>)
 		case dAppUpdated(Profile.Network.AuthorizedDappDetailed)
@@ -198,12 +194,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 				}
 
 				let result = await TaskResult {
-					try await cacheClient.withCaching(
-						cacheEntry: .dAppMetadata(dAppID.address),
-						request: {
-							try await gatewayAPIClient.getEntityMetadata(dAppID.address, .dappMetadataKeys)
-						}
-					)
+					try await onLedgerEntitiesClient.getAssociatedDapp(dAppID).metadata
 				}
 				await send(.internal(.metadataLoaded(.init(result: result))))
 			} catch: { error, _ in
@@ -222,7 +213,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 			}
 
 			// FIXME: Can a dApp be associated with XRD
-			state.destination = .fungibleDetails(.init(resource: resource, isXRD: false))
+			state.destination = .fungibleDetails(.init(resourceAddress: address, resource: .success(resource), isXRD: false))
 			return .none
 
 		case let .nonFungibleTapped(address):
@@ -231,7 +222,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 				return .none
 			}
 
-			state.destination = .nonFungibleDetails(.init(resource: resource))
+			state.destination = .nonFungibleDetails(.init(resourceAddress: resource.resourceAddress, resourceDetails: .success(resource), ledgerState: resource.atLedgerState))
 			return .none
 
 		case let .dAppTapped(address):
@@ -324,7 +315,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 
 	/// Loads any fungible and non-fungible resources associated with the dApp
 	private func loadResources(
-		metadata: GatewayAPI.EntityMetadataCollection,
+		metadata: OnLedgerEntity.Metadata,
 		validated dAppDefinitionAddress: DappDefinitionAddress
 	) async -> Loadable<State.Resources> {
 		let resources = metadata.claimedEntities?.compactMap { try? ResourceAddress(validatingAddress: $0) } ?? []
@@ -332,7 +323,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 
 		let result = await TaskResult {
 			let items = try await onLedgerEntitiesClient.getResources(resources)
-				.filter { $0.dappDefinitions?.contains(dAppDefinitionAddress) == true }
+				.filter { $0.metadata.dappDefinitions?.contains(dAppDefinitionAddress) == true }
 			let fungible: IdentifiedArray = .init(items.filter { $0.fungibility == .fungible }) { $1 }
 			let nonFungible: IdentifiedArray = .init(items.filter { $0.fungibility == .nonFungible }) { $1 }
 
@@ -344,32 +335,28 @@ public struct DappDetails: Sendable, FeatureReducer {
 
 	/// Loads any other dApps associated with the dApp
 	private func loadDapps(
-		metadata: GatewayAPI.EntityMetadataCollection,
+		metadata: OnLedgerEntity.Metadata,
 		validated dappDefinitionAddress: DappDefinitionAddress
 	) async -> Loadable<[OnLedgerEntity.AssociatedDapp]> {
-		let dAppDefinitions = try? metadata.dappDefinitions?.compactMap(DappDefinitionAddress.init)
-		guard let dAppDefinitions else { return .idle }
+		guard let dAppDefinitions = metadata.dappDefinitions else { return .idle }
 
-		let associatedDapps = await dAppDefinitions.parallelMap { dApp in
-			try? await extractDappInfo(for: dApp, validating: dappDefinitionAddress)
+		let loadedDApps = await (try? onLedgerEntitiesClient.getAssociatedDapps(dAppDefinitions)) ?? []
+		let associatedDapps = loadedDApps.filter { dApp in
+			do {
+				try dApp.metadata.validate(dAppDefinitionAddress: dApp.address)
+				guard dApp.metadata.name != nil else {
+					throw OnLedgerEntity.Metadata.MetadataError.missingName
+				}
+				return true
+			} catch {
+				loggerGlobal.warning("Invalida dApp \(error)")
+				return false
+			}
 		}
-		.compactMap { $0 }
 
 		guard !associatedDapps.isEmpty else { return .idle }
 
 		return .success(associatedDapps)
-	}
-
-	/// Helper function that loads and extracts dApp info for a given dApp, validating that it points back to the dApp of this screen
-	private func extractDappInfo(
-		for dApp: DappDefinitionAddress,
-		validating dAppDefinitionAddress: DappDefinitionAddress
-	) async throws -> OnLedgerEntity.AssociatedDapp {
-		let metadata = try await gatewayAPIClient.getDappMetadata(dApp, validatingDappDefinitionAddress: dAppDefinitionAddress)
-		guard let name = metadata.name else {
-			throw GatewayAPI.EntityMetadataCollection.MetadataError.missingName
-		}
-		return .init(address: dApp, name: name, iconURL: metadata.iconURL)
 	}
 
 	private func update(dAppID: DappDefinitionAddress, dismissPersonaDetails: Bool) -> Effect<Action> {

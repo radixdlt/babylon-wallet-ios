@@ -181,7 +181,9 @@ final class ROLAClientTests: TestCase {
 
 		// when
 		try await withDependencies {
-			$0.gatewayAPIClient.getEntityMetadata = { _, _ in metadataCollection }
+			$0.onLedgerEntitiesClient.getEntities = { _, _, _, _ in
+				[.account(.withMetadata(.init(metadataCollection)))]
+			}
 			$0.cacheClient.load = { _, _ in throw CacheClient.Error.dataLoadingFailed }
 			$0.cacheClient.save = { _, _ in }
 		} operation: {
@@ -196,11 +198,13 @@ final class ROLAClientTests: TestCase {
 		let wrongAccountType = "wrong account type"
 		let metadataCollection = entityMetadata(origin: origin, accountType: wrongAccountType)
 
-		let expectedError = GatewayAPI.EntityMetadataCollection.MetadataError.accountTypeNotDappDefinition
+		let expectedError = OnLedgerEntity.Metadata.MetadataError.accountTypeNotDappDefinition
 
 		// when
 		await withDependencies {
-			$0.gatewayAPIClient.getEntityMetadata = { _, _ in metadataCollection }
+			$0.onLedgerEntitiesClient.getEntities = { _, _, _, _ in
+				[.account(.withMetadata(.init(metadataCollection)))]
+			}
 			$0.cacheClient.load = { _, _ in throw CacheClient.Error.dataLoadingFailed }
 			$0.cacheClient.save = { _, _ in }
 		} operation: {
@@ -208,7 +212,7 @@ final class ROLAClientTests: TestCase {
 				try await sut.performDappDefinitionVerification(metadata)
 				XCTFail("Expected error: wrongAccountType")
 			} catch {
-				XCTAssertEqual(error as? GatewayAPI.EntityMetadataCollection.MetadataError, expectedError)
+				XCTAssertEqual(error as? OnLedgerEntity.Metadata.MetadataError, expectedError)
 			}
 		}
 	}
@@ -221,11 +225,13 @@ final class ROLAClientTests: TestCase {
 		let accountType = "dapp definition"
 		let metadataCollection = entityMetadata(origin: origin, accountType: accountType)
 
-		let expectedError = GatewayAPI.EntityMetadataCollection.MetadataError.websiteNotClaimed
+		let expectedError = OnLedgerEntity.Metadata.MetadataError.websiteNotClaimed
 
 		// when
 		await withDependencies {
-			$0.gatewayAPIClient.getEntityMetadata = { _, _ in metadataCollection }
+			$0.onLedgerEntitiesClient.getEntities = { _, _, _, _ in
+				[.account(.withMetadata(.init(metadataCollection)))]
+			}
 			$0.cacheClient.load = { _, _ in throw CacheClient.Error.dataLoadingFailed }
 			$0.cacheClient.save = { _, _ in }
 		} operation: {
@@ -234,7 +240,7 @@ final class ROLAClientTests: TestCase {
 				XCTFail("Expected error: unknownWebsite")
 			} catch {
 				print("• error", error)
-				XCTAssertEqual(error as? GatewayAPI.EntityMetadataCollection.MetadataError, expectedError)
+				XCTAssertEqual(error as? OnLedgerEntity.Metadata.MetadataError, expectedError)
 			}
 		}
 	}
@@ -306,5 +312,16 @@ final class ROLAClientTests: TestCase {
 				XCTAssertEqual(error as? ROLAFailure, expectedError)
 			}
 		}
+	}
+}
+
+extension OnLedgerEntity.Account {
+	static func withMetadata(_ metadata: OnLedgerEntity.Metadata) -> Self {
+		.init(address: .wallet,
+		      atLedgerState: .init(version: 0, epoch: 0),
+		      metadata: metadata,
+		      fungibleResources: .init(),
+		      nonFungibleResources: [],
+		      poolUnitResources: .init(radixNetworkStakes: [], poolUnits: []))
 	}
 }

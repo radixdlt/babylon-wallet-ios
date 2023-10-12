@@ -28,7 +28,6 @@ struct NFTFullView: View {
 struct NFTIDView: View {
 	let id: String
 	let name: String?
-	let description: String?
 	let thumbnail: URL?
 
 	var body: some View {

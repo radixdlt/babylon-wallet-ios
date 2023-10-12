@@ -37,7 +37,7 @@ extension GatewayAPIClient {
 	public typealias GetEpoch = @Sendable () async throws -> Epoch
 
 	// MARK: - Entity
-	public typealias GetEntityDetails = @Sendable (_ addresses: [String], _ explicitMetadata: Set<EntityMetadataKey>, _ ledgerState: GatewayAPI.LedgerState?) async throws -> GatewayAPI.StateEntityDetailsResponse
+	public typealias GetEntityDetails = @Sendable (_ addresses: [String], _ explicitMetadata: Set<EntityMetadataKey>, _ ledgerState: GatewayAPI.LedgerStateSelector?) async throws -> GatewayAPI.StateEntityDetailsResponse
 	public typealias GetEntityMetdata = @Sendable (_ address: String, _ explicitMetadata: Set<EntityMetadataKey>) async throws -> GatewayAPI.EntityMetadataCollection
 
 	// MARK: - Fungible
@@ -68,55 +68,24 @@ extension GatewayAPIClient {
 		return item
 	}
 
-	/// Extracts the dApp definition address from a component, if one is present
-	public func getDappDefinitionAddress(_ component: ComponentAddress) async throws -> DappDefinitionAddress {
-		let entityMetadata = try await getEntityMetadata(component.address, [.dappDefinition])
-
-		guard let dappDefinitionAddressString = entityMetadata.dappDefinition else {
-			throw GatewayAPI.EntityMetadataCollection.MetadataError.missingDappDefinition
-		}
-
-		return try DappDefinitionAddress(validatingAddress: dappDefinitionAddressString)
-	}
-
-	/// Fetches the metadata for a dApp. If the component address is supplied, it validates that it is contained in `claimed_entities`
-	public func getDappMetadata(
-		_ dappDefinition: DappDefinitionAddress,
-		validatingDappComponent component: ComponentAddress? = nil,
-		validatingDappDefinitionAddress dappDefinitionAddress: DappDefinitionAddress? = nil,
-		validatingWebsite website: URL? = nil
-	) async throws -> GatewayAPI.EntityMetadataCollection {
-		let dappMetadata = try await getEntityMetadata(dappDefinition.address, [.accountType, .name, .description, .iconURL, .claimedEntities, .claimedWebsites, .dappDefinitions, .symbol])
-
-		try dappMetadata.validateAccountType()
-
-		if let component {
-			try dappMetadata.validate(dAppComponent: component)
-		}
-		if let dappDefinitionAddress {
-			try dappMetadata.validate(dAppDefinitionAddress: dappDefinitionAddress)
-		}
-		if let website {
-			try dappMetadata.validate(website: website)
-		}
-
-		return dappMetadata
-	}
-
 	// The maximum number of addresses the `getEntityDetails` can accept
 	// This needs to be synchronized with the actual value on the GW side
 	static let entityDetailsPageSize = 20
 
 	/// Loads the details for all the addresses provided.
 	@Sendable
-	public func fetchResourceDetails(_ addresses: [String], explicitMetadata: Set<EntityMetadataKey>, ledgerState: GatewayAPI.LedgerState? = nil) async throws -> GatewayAPI.StateEntityDetailsResponse {
+	public func fetchEntitiesDetails(
+		_ addresses: [String],
+		explicitMetadata: Set<EntityMetadataKey>,
+		selector: GatewayAPI.LedgerStateSelector? = nil
+	) async throws -> GatewayAPI.StateEntityDetailsResponse {
 		/// gatewayAPIClient.getEntityDetails accepts only `entityDetailsPageSize` addresses for one request.
 		/// Thus, chunk the addresses in chunks of `entityDetailsPageSize` and load the details in separate, parallel requests.
 		let allResponses = try await addresses
 			.chunks(ofCount: GatewayAPIClient.entityDetailsPageSize)
 			.map(Array.init)
 			.parallelMap {
-				try await getEntityDetails($0, explicitMetadata, ledgerState)
+				try await getEntityDetails($0, explicitMetadata, selector)
 			}
 
 		guard !allResponses.isEmpty else {
@@ -128,116 +97,5 @@ extension GatewayAPIClient {
 		let ledgerState = allResponses.first!.ledgerState
 
 		return .init(ledgerState: ledgerState, items: allItems)
-	}
-}
-
-extension GatewayAPI.EntityMetadataCollection {
-	/// Check that `account_type` is present and equal to `dapp_definition`
-	public func validateAccountType() throws {
-		guard accountType == .dappDefinition else {
-			throw GatewayAPI.EntityMetadataCollection.MetadataError.accountTypeNotDappDefinition
-		}
-	}
-
-	/// Check that `claimed_entities` is present and contains the provided `ComponentAddress`
-	public func validate(dAppComponent component: ComponentAddress) throws {
-		guard let claimedEntities else {
-			throw GatewayAPI.EntityMetadataCollection.MetadataError.missingClaimedEntities
-		}
-
-		guard claimedEntities.contains(component.address) else {
-			throw GatewayAPI.EntityMetadataCollection.MetadataError.entityNotClaimed
-		}
-	}
-
-	/// Check that `claimed_websites`is present and contains the provided website `URL`
-	public func validate(website: URL) throws {
-		guard let claimedWebsites else {
-			throw GatewayAPI.EntityMetadataCollection.MetadataError.missingClaimedWebsites
-		}
-
-		guard claimedWebsites.contains(website) else {
-			throw GatewayAPI.EntityMetadataCollection.MetadataError.websiteNotClaimed
-		}
-	}
-
-	/// Validate that `dapp_definitions` is present and contains the provided `dAppDefinitionAddress`
-	public func validate(dAppDefinitionAddress: DappDefinitionAddress) throws {
-		guard let dappDefinitions, dappDefinitions.contains(dAppDefinitionAddress.address) else {
-			throw GatewayAPI.EntityMetadataCollection.MetadataError.dAppDefinitionNotReciprocating
-		}
-	}
-}
-
-extension GatewayAPI.RoleKey {
-	public var parsedName: ParsedName? {
-		.init(rawValue: name)
-	}
-
-	public enum ParsedName: String, Hashable {
-		case minter
-		case burner
-		case withdrawer
-		case depositor
-		case recaller
-		case freezer
-		case nonFungibleDataUpdater = "non_fungible_data_updater"
-		case metadataLocker = "metadata_locker"
-		case metadataSetter = "metadata_setter"
-
-		case minterUpdater = "minter_updater"
-		case burnerUpdater = "burner_updater"
-		case withdrawerUpdater = "withdrawer_updater"
-		case depositorUpdater = "depositor_updater"
-		case recallerUpdater = "recaller_updater"
-		case freezerUpdater = "freezer_updater"
-		case nonFungibleDataUpdaterUpdater = "non_fungible_data_updater_updater"
-		case metadataLockerUpdater = "metadata_locker_updater"
-		case metadataSetterUpdater = "metadata_setter_updater"
-	}
-}
-
-extension GatewayAPI.ComponentEntityRoleAssignmentEntry {
-	public var parsedAssignment: ParsedAssignment? {
-		.init(assignment)
-	}
-
-	public enum ParsedAssignment: Hashable {
-		case owner
-		case explicit(Explicit)
-
-		public enum Explicit: Hashable {
-			case denyAll
-			case allowAll
-			case protected
-
-			init?(_ explicitRule: Any) {
-				guard let explicitRule = explicitRule as? [String: Any] else { return nil }
-				guard let type = explicitRule["type"] as? String else { return nil }
-
-				switch type {
-				case "DenyAll":
-					self = .denyAll
-				case "AllowAll":
-					self = .allowAll
-				case "Protected":
-					self = .protected
-				default:
-					return nil
-				}
-			}
-		}
-
-		init?(_ assignment: GatewayAPI.ComponentEntityRoleAssignmentEntryAssignment) {
-			switch assignment.resolution {
-			case .owner:
-				guard assignment.explicitRule == nil else { return nil }
-				self = .owner
-			case .explicit:
-				guard let explicitRule = assignment.explicitRule?.value else { return nil }
-				guard let explicit = Explicit(explicitRule) else { return nil }
-				self = .explicit(explicit)
-			}
-		}
 	}
 }

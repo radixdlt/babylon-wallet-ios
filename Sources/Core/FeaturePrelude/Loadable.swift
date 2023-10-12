@@ -171,6 +171,49 @@ extension Loadable {
 		flatMap { .success(transform($0)) }
 	}
 
+	public func filter(by predicate: (Value.Element) -> Bool) -> Loadable<[Value.Element]> where Value: Sequence {
+		switch self {
+		case .idle:
+			return .idle
+		case .loading:
+			return .loading
+		case let .success(value):
+			return .success(value.filter(predicate))
+		case let .failure(error):
+			return .failure(error)
+		}
+	}
+
+	/// Transforms a Loadable<Wrapped?> to Loadable<Wrapped>?
+	public func unwrap<Wrapped>() -> Loadable<Wrapped>? where Value == Wrapped? {
+		switch self {
+		case .idle:
+			return .idle
+		case .loading:
+			return .loading
+		case let .success(value):
+			guard let value else {
+				return nil
+			}
+			return .success(value)
+		case let .failure(error):
+			return .failure(error)
+		}
+	}
+
+	public func firstd(where predicate: (Value.Element) -> Bool) -> Loadable<Value.Element?> where Value: Sequence {
+		switch self {
+		case .idle:
+			return .idle
+		case .loading:
+			return .loading
+		case let .success(value):
+			return .success(value.first(where: predicate))
+		case let .failure(error):
+			return .failure(error)
+		}
+	}
+
 	public func flatMap<NewValue>(_ transform: (Value) -> Loadable<NewValue>) -> Loadable<NewValue> {
 		switch self {
 		case .idle:
@@ -195,5 +238,28 @@ extension Loadable {
 		case let .failure(error):
 			return .failure(error)
 		}
+	}
+
+	public func concat<OtherValue>(_ other: Loadable<OtherValue>) -> Loadable<(Value, OtherValue)> {
+		switch (self, other) {
+		case (.idle, _), (_, .idle):
+			return .idle
+		case (.loading, _), (_, .loading):
+			return .loading
+		case let (.success(thisValue), .success(otherValue)):
+			return .success((thisValue, otherValue))
+		case let (.failure(error), _), let (_, .failure(error)):
+			return .failure(error)
+		}
+	}
+}
+
+extension Loadable {
+	/// Extract the given field either from the prefetched value or from the loaded value
+	public func get<Field>(_ keyPath: KeyPath<Value, Field>, prefetched: Value?) -> Loadable<Field> {
+		guard let prefetchedField = prefetched?[keyPath: keyPath] else {
+			return map { $0[keyPath: keyPath] }
+		}
+		return .success(prefetchedField)
 	}
 }

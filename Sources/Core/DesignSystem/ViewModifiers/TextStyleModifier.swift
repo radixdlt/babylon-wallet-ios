@@ -102,4 +102,8 @@ extension View {
 	public var flushedRight: some View {
 		frame(maxWidth: .infinity, alignment: .trailing)
 	}
+
+	public var centered: some View {
+		frame(maxWidth: .infinity, alignment: .center)
+	}
 }

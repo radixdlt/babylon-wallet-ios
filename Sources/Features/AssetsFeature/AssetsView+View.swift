@@ -14,47 +14,55 @@ extension AssetsView {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: identity, send: FeatureAction.view) { viewStore in
-				ScrollView {
-					VStack(spacing: .medium3) {
-						assetTypeSelectorView(viewStore)
+				List {
+					assetTypeSelectorView(viewStore)
+						.listRowSeparator(.hidden)
+						.listRowBackground(Color.clear)
+						.listRowInsets(.init())
 
-						if viewStore.isLoadingResources {
-							ProgressView()
-								.padding(.small1)
-						} else {
-							switch viewStore.activeAssetKind {
-							case .fungible:
-								IfLetStore(
-									store.scope(
-										state: \.fungibleTokenList,
-										action: { .child(.fungibleTokenList($0)) }
-									),
-									then: { FungibleAssetList.View(store: $0) },
-									else: { EmptyAssetListView.fungibleResources }
-								)
-							case .nonFungible:
-								IfLetStore(
-									store.scope(
-										state: \.nonFungibleTokenList,
-										action: { .child(.nonFungibleTokenList($0)) }
-									),
-									then: { NonFungibleAssetList.View(store: $0) },
-									else: { EmptyAssetListView.nonFungibleResources }
-								)
-							case .poolUnits:
-								IfLetStore(
-									store.scope(
-										state: \.poolUnitsList,
-										action: { .child(.poolUnitsList($0)) }
-									),
-									then: { PoolUnitsList.View(store: $0) },
-									else: { EmptyAssetListView.poolUnits }
-								)
-							}
+					if viewStore.isLoadingResources {
+						ProgressView()
+							.padding(.small1)
+							.listRowSeparator(.hidden)
+							.listRowBackground(Color.clear)
+							.centered
+					} else {
+						switch viewStore.activeAssetKind {
+						case .fungible:
+							IfLetStore(
+								store.scope(
+									state: \.fungibleTokenList,
+									action: { .child(.fungibleTokenList($0)) }
+								),
+								then: { FungibleAssetList.View(store: $0) },
+								else: { EmptyAssetListView.fungibleResources }
+							)
+						case .nonFungible:
+							IfLetStore(
+								store.scope(
+									state: \.nonFungibleTokenList,
+									action: { .child(.nonFungibleTokenList($0)) }
+								),
+								then: { NonFungibleAssetList.View(store: $0) },
+								else: { EmptyAssetListView.nonFungibleResources }
+							)
+						case .poolUnits:
+							IfLetStore(
+								store.scope(
+									state: \.poolUnitsList,
+									action: { .child(.poolUnitsList($0)) }
+								),
+								then: { PoolUnitsList.View(store: $0) },
+								else: { EmptyAssetListView.poolUnits }
+							)
 						}
 					}
-					.padding(.bottom, .medium1)
 				}
+				.scrollContentBackground(.hidden)
+				.listStyle(.insetGrouped)
+				.padding(.top, .zero)
+				.tokenRowShadow()
+				.scrollIndicators(.hidden)
 				.refreshable {
 					await viewStore.send(.pullToRefreshStarted).finish()
 				}
@@ -102,28 +110,21 @@ extension AssetsView {
 
 				Spacer()
 			}
-			.padding([.top, .horizontal], .medium1)
 		}
 	}
 }
 
-#if DEBUG
-import SwiftUI // NB: necessary for previews to appear
-
-struct AssetsView_Preview: PreviewProvider {
-	static var previews: some View {
-		AssetsView.View(
-			store: .init(
-				initialState: .init(
-					account: .previewValue0,
-					fungibleTokenList: .init(),
-					nonFungibleTokenList: .init(rows: []),
-					poolUnitsList: .init(),
-					mode: .normal
-				),
-				reducer: AssetsView.init
-			)
-		)
+extension View {
+	/// The common style for rows displayed in AssetsView
+	func rowStyle() -> some View {
+		self
+			.listRowInsets(.init())
+			.listRowSeparatorTint(.app.gray2)
+			.alignmentGuide(.listRowSeparatorLeading) { _ in
+				.medium3
+			}
+			.alignmentGuide(.listRowSeparatorTrailing) { viewDimensions in
+				viewDimensions[.listRowSeparatorTrailing] - .medium3
+			}
 	}
 }
-#endif

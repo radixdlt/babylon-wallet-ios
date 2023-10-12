@@ -188,7 +188,7 @@ extension SpecificAddress: CustomStringConvertible {
 }
 
 extension SpecificAddress {
-	public func asGeneral() -> Address {
+	public var asGeneral: Address {
 		.init(address: address, decodedKind: decodedKind)
 	}
 }

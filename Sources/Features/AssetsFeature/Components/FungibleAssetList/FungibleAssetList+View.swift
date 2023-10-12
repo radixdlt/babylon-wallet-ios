@@ -15,34 +15,15 @@ extension FungibleAssetList {
 
 extension FungibleAssetList.View {
 	public var body: some View {
-		VStack(spacing: .medium1) {
-			IfLetStore(
-				store.scope(
-					state: \.xrdToken,
-					action: { .child(.xrdRow($0)) }
-				),
-				then: { store in
-					Card {
-						FungibleAssetList.Row.View(store: store)
-					}
+		ForEachStore(
+			store.scope(
+				state: \.sections,
+				action: { childAction in
+					.child(.section(childAction.0, childAction.1))
 				}
 			)
-			.padding(.horizontal, .medium3)
-
-			Card {
-				LazyVStack(spacing: 0) {
-					ForEachStore(
-						store.scope(
-							state: \.nonXrdTokens,
-							action: { .child(.nonXRDRow($0, $1)) }
-						)
-					) { rowStore in
-						FungibleAssetList.Row.View(store: rowStore)
-							.separator(.bottom)
-					}
-				}
-			}
-			.padding(.horizontal, .medium3)
+		) {
+			FungibleAssetList.Section.View(store: $0)
 		}
 		.sheet(
 			store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),

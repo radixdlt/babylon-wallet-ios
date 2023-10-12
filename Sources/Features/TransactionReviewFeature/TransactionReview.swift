@@ -295,9 +295,14 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		     let .deposits(.delegate(.showAsset(transfer))):
 			switch transfer.details {
 			case let .fungible(details):
-				state.destination = .fungibleTokenDetails(.init(resource: transfer.resource, isXRD: details.isXRD))
+				state.destination = .fungibleTokenDetails(.init(resourceAddress: transfer.resource.resourceAddress, resource: .success(transfer.resource), isXRD: details.isXRD))
 			case let .nonFungible(details):
-				state.destination = .nonFungibleTokenDetails(.init(resource: transfer.resource, token: details))
+				state.destination = .nonFungibleTokenDetails(.init(
+					resourceAddress: transfer.resource.resourceAddress,
+					resourceDetails: .success(transfer.resource),
+					token: details,
+					ledgerState: transfer.resource.atLedgerState
+				))
 			}
 
 			return .none
@@ -599,7 +604,7 @@ extension TransactionReview {
 		if let feePayerSelection = state.reviewedTransaction?.feePayerSelection, let feePayer = feePayerSelection.selected {
 			do {
 				manifest = try manifest.withLockFeeCallMethodAdded(
-					address: feePayer.account.address.asGeneral(),
+					address: feePayer.account.address.asGeneral,
 					fee: feePayerSelection.transactionFee.totalFee.lockFee
 				)
 			} catch {
@@ -728,12 +733,12 @@ extension TransactionReview {
 
 	private func extractDappInfo(_ component: ComponentAddress) async -> DappEntity? {
 		do {
-			let dAppDefinitionAddress = try await gatewayAPIClient.getDappDefinitionAddress(component)
-			let metadata = try await gatewayAPIClient.getDappMetadata(
+			let dAppDefinitionAddress = try await onLedgerEntitiesClient.getDappDefinitionAddress(component)
+			let metadata = try await onLedgerEntitiesClient.getDappMetadata(
 				dAppDefinitionAddress,
 				validatingDappComponent: component
 			)
-			return DappEntity(id: dAppDefinitionAddress, metadata: .init(metadata: metadata))
+			return DappEntity(id: dAppDefinitionAddress, metadata: metadata)
 		} catch {
 			loggerGlobal.info("Failed to extract dApp definition from \(component.address): \(error)")
 			return nil
@@ -749,10 +754,10 @@ extension TransactionReview {
 		return TransactionReviewProofs.State(proofs: .init(uniqueElements: proofs))
 	}
 
-	private func extractProofInfo(_ address: ResourceAddress) async -> ProofEntity {
-		await ProofEntity(
+	private func extractProofInfo(_ address: ResourceAddress) async throws -> ProofEntity {
+		try await ProofEntity(
 			id: address,
-			metadata: .init(metadata: try? gatewayAPIClient.getEntityMetadata(address.address, .dappMetadataKeys))
+			metadata: onLedgerEntitiesClient.getResource(address, metadataKeys: .dappMetadataKeys).metadata
 		)
 	}
 
@@ -842,7 +847,7 @@ extension TransactionReview {
 			}
 		}
 
-		typealias NonFungibleToken = AccountPortfolio.NonFungibleResource.NonFungibleToken
+		typealias NonFungibleToken = OnLedgerEntity.NonFungibleToken
 
 		func tokenInfo(_ ids: [NonFungibleLocalId], for resourceAddress: ResourceAddress) async throws -> [NonFungibleToken] {
 			if let tokenData = dataOfNewlyMintedNonFungibles[resourceAddress.address] {
@@ -864,36 +869,21 @@ extension TransactionReview {
 			try tokenData.map { id, _ in
 				try .init(
 					id: .fromParts(resourceAddress: resourceAddress.intoEngine(), nonFungibleLocalId: id),
-					name: nil
+					data: []
 				)
 			}
 		}
 
 		func existingTokenInfo(_ ids: [NonFungibleLocalId], for resourceAddress: ResourceAddress) async throws -> [NonFungibleToken] {
-			// A non-fungible resource existing on ledger
-			let maximumNFTIDChunkSize = 29
-
-			var result: [NonFungibleToken] = []
-			for idChunk in ids.chunks(ofCount: maximumNFTIDChunkSize) {
-				let tokens = try await gatewayAPIClient.getNonFungibleData(.init(
-					resourceAddress: resourceAddress.address,
-					nonFungibleIds: idChunk.map {
-						try $0.toString()
-					}
-				))
-				.nonFungibleIds
-				.map { responseItem in
-					try NonFungibleToken(
-						resourceAddress: resourceAddress,
-						nftID: .from(stringFormat: responseItem.nonFungibleId),
-						nftData: responseItem.details
+			try await onLedgerEntitiesClient.getNonFungibleTokenData(.init(
+				resource: resourceAddress,
+				nonFungibleIds: ids.map {
+					try NonFungibleGlobalId.fromParts(
+						resourceAddress: resourceAddress.intoEngine(),
+						nonFungibleLocalId: $0
 					)
 				}
-
-				result.append(contentsOf: tokens)
-			}
-
-			return result
+			))
 		}
 
 		switch resourceQuantifier {
@@ -1045,24 +1035,12 @@ extension ResourceOrNonFungible {
 extension TransactionReview {
 	public struct ProofEntity: Sendable, Identifiable, Hashable {
 		public let id: ResourceAddress
-		public let metadata: EntityMetadata
+		public let metadata: OnLedgerEntity.Metadata
 	}
 
 	public struct DappEntity: Sendable, Identifiable, Hashable {
 		public let id: DappDefinitionAddress
-		public let metadata: EntityMetadata
-	}
-
-	public struct EntityMetadata: Sendable, Hashable {
-		public let name: String?
-		public let thumbnail: URL?
-		public let description: String?
-
-		public init(metadata: GatewayAPI.EntityMetadataCollection?) {
-			self.name = metadata?.name
-			self.thumbnail = metadata?.iconURL
-			self.description = metadata?.description
-		}
+		public let metadata: OnLedgerEntity.Metadata
 	}
 
 	public enum Account: Sendable, Hashable {
@@ -1105,7 +1083,7 @@ extension TransactionReview {
 				public var guarantee: TransactionClient.Guarantee?
 			}
 
-			public typealias NonFungible = AccountPortfolio.NonFungibleResource.NonFungibleToken
+			public typealias NonFungible = OnLedgerEntity.NonFungibleToken
 		}
 
 		/// The guarantee, for a fungible resource

@@ -1,10 +1,10 @@
 import FeaturePrelude
 
-extension FungibleAssetList.Row.State {
-	var viewState: FungibleAssetList.Row.ViewState {
+extension FungibleAssetList.Section.Row.State {
+	var viewState: FungibleAssetList.Section.Row.ViewState {
 		.init(
-			thumbnail: isXRD ? .xrd : .known(token.iconURL),
-			symbol: token.symbol ?? token.name ?? "",
+			thumbnail: isXRD ? .xrd : .known(token.metadata.iconURL),
+			symbol: token.metadata.symbol ?? token.metadata.name ?? "",
 			tokenAmount: token.amount.formatted(),
 			isSelected: isSelected
 		)
@@ -12,7 +12,7 @@ extension FungibleAssetList.Row.State {
 }
 
 // MARK: - FungibleTokenList.Row.View
-extension FungibleAssetList.Row {
+extension FungibleAssetList.Section.Row {
 	public struct ViewState: Equatable {
 		let thumbnail: TokenThumbnail.Content
 		let symbol: String
@@ -22,9 +22,9 @@ extension FungibleAssetList.Row {
 
 	@MainActor
 	public struct View: SwiftUI.View {
-		private let store: StoreOf<FungibleAssetList.Row>
+		private let store: StoreOf<FungibleAssetList.Section.Row>
 
-		public init(store: StoreOf<FungibleAssetList.Row>) {
+		public init(store: StoreOf<FungibleAssetList.Section.Row>) {
 			self.store = store
 		}
 

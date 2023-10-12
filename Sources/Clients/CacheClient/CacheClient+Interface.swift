@@ -74,29 +74,44 @@ extension CacheClient {
 
 extension CacheClient {
 	public enum Entry: Equatable {
-		case accountPortfolio(AccountQuantifier)
-		case onLedgerEntity(address: String)
+		public enum OnLedgerEntity: Hashable {
+			case account(Address)
+			case resource(Address)
+			case resourcePool(Address)
+			case validator(Address)
+			case genericComponent(Address)
+			case nonFungibleData(NonFungibleGlobalId)
+			case nonFungibleIdPage(accountAddress: Address, resourceAddress: Address, pageCursor: String?)
+		}
+
+		case onLedgerEntity(OnLedgerEntity)
 		case networkName(_ url: String)
-		case dAppMetadata(_ definitionAddress: String)
 		case dAppRequestMetadata(_ definitionAddress: String)
 		case rolaDappVerificationMetadata(_ definitionAddress: String)
 		case rolaWellKnownFileVerification(_ url: String)
 
-		public enum AccountQuantifier: Equatable {
-			case single(_ address: String)
-			case all
-		}
-
 		var filesystemFilePath: String {
 			switch self {
-			case let .accountPortfolio(address):
-				return "\(filesystemFolderPath)/accountPortfolio-\(address)"
-			case let .onLedgerEntity(address):
-				return "\(filesystemFolderPath)/onLedgerEntity-\(address)"
+			case let .onLedgerEntity(entity):
+				switch entity {
+				case .account:
+					return "\(filesystemFolderPath)/details"
+				case let .resource(resourceAddress):
+					return "\(filesystemFolderPath)/\(resourceAddress.address)"
+				case let .resourcePool(resourcePoolAddress):
+					return "\(filesystemFolderPath)/\(resourcePoolAddress.address)"
+				case let .validator(validatorAddress):
+					return "\(filesystemFolderPath)/\(validatorAddress.address)"
+				case let .genericComponent(componentAddress):
+					return "\(filesystemFolderPath)/\(componentAddress.address)"
+				case let .nonFungibleData(nonFungibleGlobalId):
+					return "\(filesystemFolderPath)/\(nonFungibleGlobalId.asStr())"
+				case let .nonFungibleIdPage(_, resourceAddress, pageCursor):
+					let file = "nonFungibleIds-" + resourceAddress.address + (pageCursor.map { "-\($0)" } ?? "")
+					return "\(filesystemFolderPath)/\(file)"
+				}
 			case let .networkName(url):
 				return "\(filesystemFolderPath)/networkName-\(url)"
-			case let .dAppMetadata(definitionAddress):
-				return "\(filesystemFolderPath)/DappMetadata-\(definitionAddress)"
 			case let .dAppRequestMetadata(definitionAddress):
 				return "\(filesystemFolderPath)/DappRequestMetadata-\(definitionAddress)"
 			case let .rolaDappVerificationMetadata(definitionAddress):
@@ -108,14 +123,26 @@ extension CacheClient {
 
 		var filesystemFolderPath: String {
 			switch self {
-			case .accountPortfolio:
-				return "AccountPortfolio"
-			case .onLedgerEntity:
-				return "OnLedgerEntity"
+			case let .onLedgerEntity(entity):
+				let folderRoot = "OnLedgerEntity"
+				switch entity {
+				case let .account(accountAddress):
+					return "\(folderRoot)/accounts/\(accountAddress.address)"
+				case .resource:
+					return "\(folderRoot)/resources"
+				case .resourcePool:
+					return "\(folderRoot)/resourcePools"
+				case .validator:
+					return "\(folderRoot)/validators"
+				case .genericComponent:
+					return "\(folderRoot)/genericComponents"
+				case .nonFungibleData:
+					return "\(folderRoot)/nonFungiblesData"
+				case let .nonFungibleIdPage(accountAddress, _, _):
+					return "\(folderRoot)/accounts/\(accountAddress.address)"
+				}
 			case .networkName:
 				return "NetworkName"
-			case .dAppMetadata:
-				return "DappMetadata"
 			case .dAppRequestMetadata:
 				return "DappRequestMetadata"
 			case .rolaDappVerificationMetadata:
@@ -131,9 +158,9 @@ extension CacheClient {
 
 		var lifetime: TimeInterval {
 			switch self {
-			case .accountPortfolio, .networkName, .onLedgerEntity:
-				return 300
-			case .dAppMetadata, .dAppRequestMetadata, .rolaDappVerificationMetadata, .rolaWellKnownFileVerification:
+			case .networkName, .onLedgerEntity:
+				return 360 * 60 * 24 // On day cache
+			case .dAppRequestMetadata, .rolaDappVerificationMetadata, .rolaWellKnownFileVerification:
 				return 60
 			}
 		}
@@ -143,18 +170,5 @@ extension CacheClient {
 		case dataLoadingFailed
 		case expirationDateLoadingFailed
 		case entryLifetimeExpired
-	}
-}
-
-extension CacheClient {
-	@Sendable
-	public func clearCacheForAccounts(
-		_ accounts: Set<AccountAddress> = .init()
-	) {
-		if !accounts.isEmpty {
-			accounts.forEach { removeFile(.accountPortfolio(.single($0.address))) }
-		} else {
-			removeFolder(.accountPortfolio(.all))
-		}
 	}
 }

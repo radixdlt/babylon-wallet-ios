@@ -2,11 +2,11 @@ import AuthorizedDappsClient
 import EditPersonaFeature
 import EngineKit
 import FeaturePrelude
-import GatewayAPI
+import OnLedgerEntitiesClient
 
 // MARK: - PersonaDetails
 public struct PersonaDetails: Sendable, FeatureReducer {
-	@Dependency(\.gatewayAPIClient) var gatewayAPIClient
+	@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
 	@Dependency(\.personasClient) var personasClient
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.authorizedDappsClient) var authorizedDappsClient
@@ -153,7 +153,6 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 			default:
 				return .none
 			}
-
 		case .destination:
 			return .none
 		}
@@ -274,7 +273,7 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 		var dApps = dApps
 		for dApp in dApps {
 			do {
-				let metadata = try await gatewayAPIClient.getDappMetadata(dApp.id)
+				let metadata = try await onLedgerEntitiesClient.getDappMetadata(dApp.id)
 				dApps[id: dApp.id]?.thumbnail = metadata.iconURL
 			} catch {
 				loggerGlobal.error("Failed to load dApp metadata, error: \(error)")

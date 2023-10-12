@@ -4,19 +4,23 @@ import FeaturePrelude
 extension LSUDetails.State {
 	var viewState: LSUDetails.ViewState {
 		.init(
-			containerWithHeader: .init(resource: stakeUnitResource),
-			thumbnailURL: stakeUnitResource.iconURL,
+			containerWithHeader: .init(
+				title: .success(stakeUnitResource.resource.metadata.name ?? L10n.Account.PoolUnits.unknownPoolUnitName),
+				amount: stakeUnitResource.amount.formatted(),
+				symbol: .success(stakeUnitResource.resource.metadata.symbol)
+			),
+			thumbnailURL: stakeUnitResource.resource.metadata.iconURL,
 			validatorNameViewState: .init(with: validator),
 			redeemableTokenAmount: .init(.init(xrdAmount: xrdRedemptionValue.formatted())),
 			resourceDetails: .init(
-				description: stakeUnitResource.description,
-				resourceAddress: stakeUnitResource.resourceAddress,
+				description: .success(stakeUnitResource.resource.metadata.description),
+				resourceAddress: stakeUnitResource.resource.resourceAddress,
 				isXRD: false,
 				validatorAddress: validator.address,
-				resourceName: stakeUnitResource.name, // TODO: Is this correct?
-				currentSupply: validator.xrdVaultBalance.formatted(),
-				behaviors: stakeUnitResource.behaviors,
-				tags: stakeUnitResource.tags
+				resourceName: .success(stakeUnitResource.resource.metadata.name),
+				currentSupply: .success(validator.xrdVaultBalance.formatted()),
+				behaviors: .success(stakeUnitResource.resource.behaviors),
+				tags: .success(stakeUnitResource.resource.metadata.tags)
 			)
 		)
 	}
@@ -28,9 +32,7 @@ extension LSUDetails {
 		let thumbnailURL: URL?
 
 		let validatorNameViewState: ValidatorNameView.ViewState
-
 		let redeemableTokenAmount: NonEmpty<IdentifiedArrayOf<PoolUnitResourceViewState>>
-
 		let resourceDetails: AssetResourceDetailsSection.ViewState
 	}
 
@@ -76,11 +78,11 @@ extension LSUDetails {
 
 extension ValidatorNameView.ViewState {
 	init(
-		with validator: AccountPortfolio.PoolUnitResources.RadixNetworkStake.Validator
+		with validator: OnLedgerEntity.Validator
 	) {
 		self.init(
-			imageURL: validator.iconURL,
-			name: validator.name ?? L10n.Account.PoolUnits.unknownValidatorName
+			imageURL: validator.metadata.iconURL,
+			name: validator.metadata.name ?? L10n.Account.PoolUnits.unknownValidatorName
 		)
 	}
 }

@@ -3,20 +3,20 @@ import FeaturePrelude
 
 extension PoolUnitDetails.State {
 	var viewState: PoolUnitDetails.ViewState {
-		let resource = poolUnit.poolUnitResource
+		let resource = poolUnit.resource
 		return .init(
 			containerWithHeader: .init(resource: resource),
-			thumbnailURL: resource.iconURL,
-			resources: poolUnit.resourceViewStates,
+			thumbnailURL: resource.metadata.iconURL,
+			resources: PoolUnitResourceViewState.viewStates(poolUnit: poolUnit, resourcesDetails: resourcesDetails),
 			resourceDetails: .init(
-				description: resource.description,
+				description: .success(resourcesDetails.poolUnitResource.resource.metadata.description),
 				resourceAddress: resource.resourceAddress,
 				isXRD: false,
 				validatorAddress: nil,
-				resourceName: resource.name, // FIXME: Is this correct?
-				currentSupply: resource.totalSupply?.formatted() ?? L10n.AssetDetails.supplyUnkown,
-				behaviors: resource.behaviors,
-				tags: resource.tags
+				resourceName: .success(resourcesDetails.poolUnitResource.resource.metadata.name), // FIXME: Is this correct?
+				currentSupply: .success(resourcesDetails.poolUnitResource.resource.totalSupply?.formatted() ?? L10n.AssetDetails.supplyUnkown),
+				behaviors: .success(resourcesDetails.poolUnitResource.resource.behaviors),
+				tags: .success(resourcesDetails.poolUnitResource.resource.metadata.tags)
 			)
 		)
 	}

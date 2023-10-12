@@ -1,6 +1,7 @@
 import DappInteractionClient
 import EngineKit
 import FeaturePrelude
+import OnLedgerEntitiesClient
 
 // MARK: - AssetTransfer
 public struct AssetTransfer: Sendable, FeatureReducer {
@@ -21,6 +22,7 @@ public struct AssetTransfer: Sendable, FeatureReducer {
 	@Dependency(\.dappInteractionClient) var dappInteractionClient
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.gatewaysClient) var gatewaysClient
+	@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
 
 	public init() {}
 
@@ -152,7 +154,7 @@ extension AssetTransfer {
 
 	private struct InvolvedNonFungibleResource: Identifiable {
 		struct PerAccountTokens: Identifiable {
-			var tokens: IdentifiedArrayOf<AccountPortfolio.NonFungibleResource.NonFungibleToken>
+			var tokens: IdentifiedArrayOf<OnLedgerEntity.NonFungibleToken>
 			let recipient: ReceivingAccount.State.Account
 			typealias ID = AccountAddress
 			var id: ID {
@@ -167,7 +169,7 @@ extension AssetTransfer {
 		let address: ResourceAddress
 		var accounts: IdentifiedArrayOf<PerAccountTokens>
 
-		var allTokens: [AccountPortfolio.NonFungibleResource.NonFungibleToken] {
+		var allTokens: [OnLedgerEntity.NonFungibleToken] {
 			accounts.flatMap(\.tokens)
 		}
 	}
@@ -175,7 +177,7 @@ extension AssetTransfer {
 	private func createManifest(_ accounts: TransferAccountList.State) async throws -> TransactionManifest {
 		let networkID = await gatewaysClient.getCurrentNetworkID()
 
-		let involvedFungibleResources = extractInvolvedFungibleResources(accounts.receivingAccounts)
+		let involvedFungibleResources = try await extractInvolvedFungibleResources(accounts.receivingAccounts)
 		let involvedNonFungibles = extractInvolvedNonFungibleResource(accounts.receivingAccounts)
 
 		return try ManifestBuilder.make {
@@ -258,7 +260,16 @@ func instructionForDepositing(
 extension AssetTransfer {
 	private func extractInvolvedFungibleResources(
 		_ receivingAccounts: IdentifiedArrayOf<ReceivingAccount.State>
-	) -> IdentifiedArrayOf<InvolvedFungibleResource> {
+	) async throws -> IdentifiedArrayOf<InvolvedFungibleResource> {
+		let allResourceAddresses: [ResourceAddress] = try receivingAccounts.flatMap {
+			let addresses = try $0.assets.compactMap(/ResourceAsset.State.fungibleAsset).map {
+				try ResourceAddress(validatingAddress: $0.id)
+			}
+			return addresses
+		}
+		/// Fetch additional information, for now only resource divisibility is used
+		let onLedgerResources: [OnLedgerEntity.Resource] = try await onLedgerEntitiesClient.getResources(allResourceAddresses)
+
 		var resources: IdentifiedArrayOf<InvolvedFungibleResource> = []
 
 		for receivingAccount in receivingAccounts {
@@ -280,7 +291,7 @@ extension AssetTransfer {
 					resources.append(.init(
 						address: fungibleAsset.resource.resourceAddress,
 						totalTransferAmount: fungibleAsset.totalTransferSum,
-						divisibility: fungibleAsset.resource.divisibility,
+						divisibility: onLedgerResources.first(where: { $0.resourceAddress == fungibleAsset.resource.resourceAddress })?.divisibility,
 						accounts: [accountTransfer]
 					))
 				}

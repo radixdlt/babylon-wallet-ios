@@ -6,25 +6,21 @@ import SharedModels
 // MARK: - FungibleAssetList
 public struct FungibleAssetList: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
-		public var xrdToken: Row.State?
-		public var nonXrdTokens: IdentifiedArrayOf<Row.State>
+		public var sections: IdentifiedArrayOf<FungibleAssetList.Section.State>
 
 		@PresentationState
 		public var destination: Destinations.State?
 
 		public init(
-			xrdToken: Row.State? = nil,
-			nonXrdTokens: IdentifiedArrayOf<Row.State> = []
+			sections: IdentifiedArrayOf<FungibleAssetList.Section.State> = []
 		) {
-			self.xrdToken = xrdToken
-			self.nonXrdTokens = nonXrdTokens
+			self.sections = sections
 		}
 	}
 
 	public enum ChildAction: Sendable, Equatable {
 		case destination(PresentationAction<Destinations.Action>)
-		case xrdRow(FungibleAssetList.Row.Action)
-		case nonXRDRow(FungibleAssetList.Row.State.ID, FungibleAssetList.Row.Action)
+		case section(FungibleAssetList.Section.State.ID, FungibleAssetList.Section.Action)
 	}
 
 	public struct Destinations: Sendable, Reducer {
@@ -43,15 +39,14 @@ public struct FungibleAssetList: Sendable, FeatureReducer {
 		}
 	}
 
+	@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
+
 	public init() {}
 
 	public var body: some ReducerOf<Self> {
 		Reduce(core)
-			.ifLet(\.xrdToken, action: /Action.child .. ChildAction.xrdRow) {
-				FungibleAssetList.Row()
-			}
-			.forEach(\.nonXrdTokens, action: /Action.child .. ChildAction.nonXRDRow, element: {
-				FungibleAssetList.Row()
+			.forEach(\.sections, action: /Action.child .. ChildAction.section, element: {
+				FungibleAssetList.Section()
 			})
 			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
 				Destinations()
@@ -65,15 +60,14 @@ public struct FungibleAssetList: Sendable, FeatureReducer {
 			return .none
 		case .destination:
 			return .none
-		case let .xrdRow(.delegate(.selected(token))):
-			state.destination = .details(.init(resource: token.resource, amount: token.amount, isXRD: true))
+		case let .section(id, .delegate(.selected(token))):
+			state.destination = .details(.init(
+				resourceAddress: token.resourceAddress,
+				ownedFungibleResource: token,
+				isXRD: id == .xrd
+			))
 			return .none
-		case .xrdRow:
-			return .none
-		case let .nonXRDRow(_, .delegate(.selected(token))):
-			state.destination = .details(.init(resource: token.resource, amount: token.amount, isXRD: false))
-			return .none
-		case .nonXRDRow:
+		case .section:
 			return .none
 		}
 	}
