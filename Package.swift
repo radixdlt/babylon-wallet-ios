@@ -610,7 +610,11 @@ package.addModules([
 		exclude: [
 			"CodeGen/Input/",
 		],
-		tests: .yes(),
+		tests: .yes(
+			resources: [
+				.process("TestVectors/"),
+			]
+		),
 		disableConcurrencyChecks: true
 	),
 

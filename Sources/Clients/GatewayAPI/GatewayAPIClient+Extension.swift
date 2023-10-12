@@ -204,89 +204,113 @@ extension GatewayAPI.EntityMetadataCollection {
 	}
 }
 
+// FIXME: This logic should not be here, will probably move to OnLedgerEntitiesClient.
 extension GatewayAPI.ComponentEntityRoleAssignments {
-	// FIXME: This logic should not be here, will probably move to OnLedgerEntitiesClient.
+	/**
+	 This extracts the appropriate `AssetBehavior`s from an instance of `ComponentEntityRoleAssignments`
+
+	 __MOVEMENT BEHAVIORS__
+
+	 For the behaviors related to movement, we first look at the current situation, using the logic under "Find performer" below,
+	 applied to the two names `withdrawer` and `depositor`. If this results in anything other than `AllowAll`, then we add
+	 the behavior `movementRestricted`.
+
+	 If on the other hand it turns out that movement is *not* currently restricted, we look at who can change this in the future,
+	 by finding the updaters for `withdrawer` and `depositor`, using the logic in "Find updaters" below. If at least one of
+	 the names has `AllowAll`, we add the `movementRestrictableInFutureByAnyone` behavior. If at least one of them has `Protected`,
+	 we add `movementRestrictableInFuture`.
+
+	 __OTHER BEHAVIORS__
+
+	 For the remaining behaviors the logic is as follows:
+
+	 __Find performer:__ For a given "name" (`minter`, `freezer` etc) we find the "performer", i.e. who can perform the action *currently*:
+
+	 1. Find the first entry in `self.entries` whose `roleKey.name` corresponds to `name`
+	 2. Check if its `assignment` is `explicit` or points to `owner`
+	 3. If it's explicit, we check which rule, out of`DenyAll`, `AllowAll` and `Protected`, that is set
+	 4. For the `owner` case, we go to the root property `owner`, where its `rule` property should resolve to one of those three rules
+
+	 __Find updaters:__ We also find the "updater" for the name, i.e. who can *change* the performer
+
+	 1. For the same `entry`, we look at the `updaterRoles` property, which contains a list of names
+	 2. For each of these names, we look up *their* corresponding entry and then the rule, like above
+
+	 __Combine result:__ For our purposes here, we don't distinguish between performers and updaters, so we consider them together
+
+	 1. Combine the performer and all updaters into a set, removing duplicates
+	 2. If the set contains `AllowAll`, we add the "... by anyone" behavior
+	 3. If the set contains `Protected` we add the plain behavior
+
+	 At the end of all this, we check if we both `supplyIncreasable` and `.supplyDecreasable`, and if so, we replace them
+	 with `.supplyFlexible`. We do the same check for the "by anyone" names.
+
+	 Finally, if we end up with no behaviors, we return the `.simpleAsset` behavior instead.
+	 */
 	@Sendable public func extractBehaviors() -> [AssetBehavior] {
 		typealias AssignmentEntry = GatewayAPI.ComponentEntityRoleAssignmentEntry
 		typealias ParsedName = GatewayAPI.RoleKey.ParsedName
 		typealias ParsedAssignment = GatewayAPI.ComponentEntityRoleAssignmentEntry.ParsedAssignment
 
-		enum Assigned {
-			case none, someone, anyone, unknown
-
-			init(_ explicitAssignment: ParsedAssignment.Explicit) {
-				switch explicitAssignment {
-				case .denyAll: self = .none
-				case .protected: self = .someone
-				case .allowAll: self = .anyone
-				}
-			}
-		}
-
 		func findEntry(_ name: GatewayAPI.RoleKey.ParsedName) -> AssignmentEntry? {
 			entries.first { $0.roleKey.parsedName == name }
 		}
 
-		func resolvedOwner() -> Assigned {
-			guard let dict = owner.value as? [String: Any] else { return .unknown }
-			let rule = dict["rule"] as Any
-			guard let explicit = ParsedAssignment.Explicit(rule) else { return .unknown }
-
-			return .init(explicit)
+		func resolvedOwner() -> ParsedAssignment.Explicit? {
+			guard let dict = owner.value as? [String: Any] else { return nil }
+			return ParsedAssignment.Explicit(dict["rule"] as Any)
 		}
 
-		func performer(_ name: GatewayAPI.RoleKey.ParsedName) -> Assigned {
-			guard let parsed = findEntry(name)?.parsedAssignment else { return .unknown }
-			switch parsed {
+		func findAssigned(for parsedAssignment: ParsedAssignment) -> ParsedAssignment.Explicit? {
+			switch parsedAssignment {
 			case .owner:
 				return resolvedOwner()
 			case let .explicit(explicit):
-				return .init(explicit)
+				return explicit
 			}
 		}
 
-		func updaters(_ name: GatewayAPI.RoleKey.ParsedName) -> Assigned {
-			guard let updaters = findEntry(name)?.updaterRoles, !updaters.isEmpty else { return .unknown }
+		func performer(_ name: GatewayAPI.RoleKey.ParsedName) -> ParsedAssignment.Explicit? {
+			guard let parsedAssignment = findEntry(name)?.parsedAssignment else { return nil }
+			return findAssigned(for: parsedAssignment)
+		}
+
+		func updaters(_ name: GatewayAPI.RoleKey.ParsedName) -> Set<ParsedAssignment.Explicit?> {
+			guard let updaters = findEntry(name)?.updaterRoles, !updaters.isEmpty else { return [nil] }
 
 			// Lookup the corresponding assignments, ignoring unknown and empty values
-			let parsed = Set(updaters.compactMap(\.parsedName).compactMap(findEntry).compactMap(\.parsedAssignment))
+			let parsedAssignments = Set(updaters.compactMap(\.parsedName).compactMap(findEntry).compactMap(\.parsedAssignment))
 
-			if parsed.isEmpty {
-				return .unknown
-			} else if parsed == [.explicit(.denyAll)] {
-				return .none
-			} else if parsed.contains(.explicit(.allowAll)) {
-				return .anyone
-			} else if parsed == [.owner] {
-				return resolvedOwner()
-			} else {
-				return .someone
-			}
+			return Set(parsedAssignments.map(findAssigned))
 		}
 
 		var result: Set<AssetBehavior> = []
 
-		// Withdrawer and depositor areas are checked together, but we look at the performer and updater role types separately
+		// Other names are checked individually, but without distinguishing between the role types
+		func addBehavior(for rules: Set<ParsedAssignment.Explicit?>, ifSomeone: AssetBehavior, ifAnyone: AssetBehavior) {
+			if rules.contains(.allowAll) {
+				result.insert(ifAnyone)
+			} else if rules.contains(.protected) {
+				result.insert(ifSomeone)
+			} else if rules.contains(nil) {
+				loggerGlobal.warning("Failed to parse ComponentEntityRoleAssignments for \(ifSomeone)")
+			}
+		}
+
+		// Movement behaviors: Withdrawer and depositor names are checked together, but we look
+		// at the performer and updater role types separately
 		let movers: Set = [performer(.withdrawer), performer(.depositor)]
-		if movers != [.anyone] {
+		if movers != [.allowAll] {
 			result.insert(.movementRestricted)
 		} else {
-			let moverUpdaters: Set = [updaters(.withdrawer), updaters(.depositor)]
-			if moverUpdaters.contains(.anyone) {
-				result.insert(.movementRestrictableInFutureByAnyone)
-			} else if moverUpdaters.contains(.someone) {
-				result.insert(.movementRestrictableInFuture)
-			}
+			let moverUpdaters = updaters(.withdrawer).union(updaters(.depositor))
+			addBehavior(for: moverUpdaters, ifSomeone: .movementRestrictableInFuture, ifAnyone: .movementRestrictableInFutureByAnyone)
 		}
 
 		// Other names are checked individually, but without distinguishing between the role types
 		func addBehavior(for name: GatewayAPI.RoleKey.ParsedName, ifSomeone: AssetBehavior, ifAnyone: AssetBehavior) {
-			let either: Set = [performer(name), updaters(name)]
-			if either.contains(.anyone) {
-				result.insert(ifAnyone)
-			} else if either.contains(.someone) {
-				result.insert(ifSomeone)
-			}
+			let performersAndUpdaters = updaters(name).union([performer(name)])
+			addBehavior(for: performersAndUpdaters, ifSomeone: ifSomeone, ifAnyone: ifAnyone)
 		}
 
 		addBehavior(for: .minter, ifSomeone: .supplyIncreasable, ifAnyone: .supplyIncreasableByAnyone)
