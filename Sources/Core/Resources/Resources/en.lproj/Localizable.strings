@@ -240,6 +240,8 @@
 "authorizedDapps_personaDetails_nickname" = "Nickname";
 "authorizedDapps_personaDetails_nameVariantEastern" = "Eastern style (family name first)";
 "authorizedDapps_personaDetails_nameVariantWestern" = "Western style (given name(s) first)";
+"authorizedDapps_personaDetails_hideThisPersona" = "Hide This Persona";
+"authorizedDapps_personaDetails_hidePersonaConfirmation" = "Are you sure you want to hide this persona?";
 "editPersona_requiredByDapp" = "Required by dApp";
 "editPersona_sharedInformationHeading" = "The following information can be seen if requested by the dApp";
 "editPersona_error_blank" = "Label cannot be blank";
