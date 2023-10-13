@@ -38,10 +38,10 @@ jobs:
           snyk auth ${{ env.SNYK_TOKEN }}
       - name: Snyk deps and licences scan
         run: |
-          timeout 10 snyk test --all-projects --org=${{ env.SNYK_COREAPPS_ORG_ID }} --severity-threshold=high || [ "$?" != "124" ]
+          timeout 10 snyk test --all-projects --org=${{ env.SNYK_COREAPPS_ORG_ID }} --severity-threshold=high || [ "$?" = "124" ]
       - name: Snyk code scan
         run: |
-          timeout 10 snyk code test --all-projects --org=${{ env.SNYK_COREAPPS_ORG_ID }} --severity-threshold=high || [ "$?" != "124" ]
+          timeout 10 snyk code test --all-projects --org=${{ env.SNYK_COREAPPS_ORG_ID }} --severity-threshold=high || [ "$?" = "124" ]
 
   snyk_sbom:
     permissions:
