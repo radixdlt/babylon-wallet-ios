@@ -95,7 +95,7 @@ jobs:
 
   linting:
     name: "Linting"
-    runs-on: macos-13
+    runs-on: macos-13-xlarge
 
     steps:
       - uses: actions/checkout@v3.1.0
@@ -112,7 +112,7 @@ jobs:
       id-token: write
       contents: read
     name: "Test and build"
-    runs-on: macos-13
+    runs-on: macos-13-xlarge
     timeout-minutes: 70
 
     needs:
