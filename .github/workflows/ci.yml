@@ -115,8 +115,6 @@ jobs:
 
     needs:
       - linting
-      - snyk_scan
-      - snyk_sbom
 
     steps:
       - uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b
@@ -180,6 +178,8 @@ jobs:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     needs:
       - test-and-build
+      - snyk_scan
+      - snyk_sbom
     steps:
       - uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b
       - uses: actions/setup-node@v2
