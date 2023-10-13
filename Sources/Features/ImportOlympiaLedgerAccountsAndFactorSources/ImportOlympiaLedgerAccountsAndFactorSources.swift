@@ -99,6 +99,7 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 		}
 	}
 
+	@Dependency(\.accountsClient) var accountsClient
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.radixConnectClient) var radixConnectClient
 	@Dependency(\.factorSourcesClient) var factorSourcesClient
@@ -292,6 +293,9 @@ extension ImportOlympiaLedgerAccountsAndFactorSources {
 		let migrated = try await importLegacyWalletClient.migrateOlympiaHardwareAccountsToBabylon(
 			.init(olympiaAccounts: validatedAccounts, ledgerFactorSourceID: ledgerID)
 		)
+
+		// Save all accounts
+		try await accountsClient.saveVirtualAccounts(migrated.babylonAccounts.elements)
 
 		loggerGlobal.notice("Converted #\(migrated.accounts.count) accounts to babylon! ✅")
 

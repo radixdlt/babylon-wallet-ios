@@ -13,6 +13,8 @@ extension ImportLegacyWalletClient: DependencyKey {
 		@Dependency(\.accountsClient) var accountsClient
 		@Dependency(\.factorSourcesClient) var factorSourcesClient
 
+		/// NB: This migrates, but does not save the migrated accounts to the profile. That needs to be done separately,
+		/// by calling `accountsClient.saveVirtualAccounts`
 		@Sendable func migrate(
 			accounts: NonEmpty<Set<OlympiaAccountToMigrate>>,
 			factorSouceID: FactorSourceID.FromHash
@@ -58,9 +60,6 @@ extension ImportLegacyWalletClient: DependencyKey {
 			guard let accounts = NonEmpty<OrderedSet<MigratedAccount>>(rawValue: accountsSet) else {
 				throw NoValidatedAccountsError()
 			}
-
-			// Save all accounts
-			try await accountsClient.saveVirtualAccounts(accounts.map(\.babylon))
 
 			return (accounts: accounts, networkID: networkID)
 		}

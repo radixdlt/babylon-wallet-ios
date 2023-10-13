@@ -460,6 +460,9 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 				}
 			}
 
+			// Save all accounts
+			try await accountsClient.saveVirtualAccounts(migrated.babylonAccounts.elements)
+
 			await send(.internal(.migratedSoftwareAccountsToBabylon(migrated)))
 		} catch: { error, _ in
 			errorQueue.schedule(error)
