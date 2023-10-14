@@ -139,7 +139,7 @@ extension KeychainClient {
 	@MainActor
 	@discardableResult
 	func authGetSavedDataElseSaveNewRandom() async throws -> Data {
-		try await getDataWithAuthForKeySetIfNil(
+		try await getDataWithAuth(
 			forKey: authRandomKey,
 			authenticationPrompt: "Keychain demo",
 			ifNilSet: .init(
@@ -155,7 +155,7 @@ extension KeychainClient {
 	@MainActor
 	@discardableResult
 	func noAuthGetSavedDataElseSaveNewRandom() async throws -> Data {
-		try await getDataWithoutAuthForKeySetIfNil(
+		try await getDataWithoutAuth(
 			forKey: noAuthRandomKey,
 			ifNilSet: .init(
 				to: .randomKeychainDemo(),

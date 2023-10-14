@@ -45,11 +45,15 @@ public struct KeychainClient: Sendable {
 extension KeychainClient {
 	public typealias IfNilSetWithoutAuth = IfNilSetWithAttributes<KeychainClient.AttributesWithoutAuth>
 	public typealias IfNilSetWithAuth = IfNilSetWithAttributes<KeychainClient.AttributesWithAuth>
-	public struct IfNilSetWithAttributes<Attributes: KeychainAttributes & Hashable>: Sendable, Hashable {
-		public let value: Data
+
+	public struct IfNilSetWithAttributes<Attributes: KeychainAttributes>: Sendable {
+		public typealias GetValueToSet = @Sendable () throws -> Data
+
+		public let getValueToSet: GetValueToSet
 		public let attributes: Attributes
-		public init(to value: Data, with attributes: Attributes) {
-			self.value = value
+
+		public init(to getValueToSet: @escaping @autoclosure GetValueToSet, with attributes: Attributes) {
+			self.getValueToSet = getValueToSet
 			self.attributes = attributes
 		}
 	}
@@ -159,14 +163,14 @@ extension KeychainClient {
 		try await _setDataWithAuthForKey(data, key, attributes)
 	}
 
-	public func getDataWithoutAuthForKeySetIfNil(
+	public func getDataWithoutAuth(
 		forKey key: Key,
 		ifNilSet: KeychainClient.IfNilSetWithoutAuth
 	) async throws -> (value: Data, wasNil: Bool) {
 		try await _getDataWithoutAuthForKeySetIfNil(key, ifNilSet)
 	}
 
-	public func getDataWithAuthForKeySetIfNil(
+	public func getDataWithAuth(
 		forKey key: Key,
 		authenticationPrompt: AuthenticationPrompt,
 		ifNilSet: KeychainClient.IfNilSetWithAuth

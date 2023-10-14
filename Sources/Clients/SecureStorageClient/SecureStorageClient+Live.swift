@@ -161,17 +161,19 @@ extension SecureStorageClient: DependencyKey {
 			return loaded
 		}
 
+		let deviceIdentifierAttributes = KeychainClient.AttributesWithoutAuth(
+			iCloudSyncEnabled: false, // Never ever synced, since related to this device only..
+			accessibility: .whenUnlocked,
+			label: importantKeychainIdentifier("Radix Wallet device identifier"),
+			comment: "The unique identifier of this device"
+		)
+
 		@Sendable func saveDeviceIdentifier(_ deviceIdentifier: UUID) async throws {
 			let data = try jsonEncoder().encode(deviceIdentifier)
 			try await keychainClient.setDataWithoutAuth(
 				data,
 				forKey: deviceIdentifierKey,
-				attributes: .init(
-					iCloudSyncEnabled: false, // Never ever synced, since related to this device only..
-					accessibility: .whenUnlocked,
-					label: importantKeychainIdentifier("Radix Wallet device identifier"),
-					comment: "The unique identifier of this device"
-				)
+				attributes: deviceIdentifierAttributes
 			)
 			loggerGlobal.notice("Saved deviceIdentifier: \(deviceIdentifier)")
 		}
@@ -283,6 +285,24 @@ extension SecureStorageClient: DependencyKey {
 			loadProfileHeaderList: loadProfileHeaderList,
 			saveProfileHeaderList: saveProfileHeaderList,
 			deleteProfileHeaderList: deleteProfileHeaderList,
+			getDeviceIdentifierSetIfNil: { identifierToSetIfNil in
+				let res = try await keychainClient
+					.getDataWithoutAuth(
+						forKey: deviceIdentifierKey,
+						ifNilSet: .init(
+							to: jsonEncoder().encode(identifierToSetIfNil),
+							with: deviceIdentifierAttributes
+						)
+					)
+				if res.wasNil {
+					loggerGlobal.info("deviceIdentifier was nil, saved new value.")
+					return identifierToSetIfNil
+				} else {
+					let loaded = try jsonDecoder().decode(UUID.self, from: res.value)
+					loggerGlobal.trace("Loaded deviceIdentifier: \(loaded)")
+					return loaded
+				}
+			},
 			loadDeviceIdentifier: loadDeviceIdentifier,
 			saveDeviceIdentifier: saveDeviceIdentifier
 		)

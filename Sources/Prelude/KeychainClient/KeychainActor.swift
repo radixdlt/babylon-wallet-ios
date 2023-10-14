@@ -76,7 +76,7 @@ extension KeychainActor {
 		if let value = try await getDataWithoutAuth(forKey: key) {
 			return (value, wasNil: false)
 		} else {
-			let value = ifNilSet.value
+			let value = try ifNilSet.getValueToSet()
 			try await setDataWithoutAuth(value, forKey: key, attributes: ifNilSet.attributes)
 			return (value, wasNil: true)
 		}
@@ -94,7 +94,7 @@ extension KeychainActor {
 		) {
 			return (value, wasNil: false)
 		} else {
-			let value = ifNilSet.value
+			let value = try ifNilSet.getValueToSet()
 			try await setDataWithAuth(value, forKey: key, attributes: ifNilSet.attributes)
 			return (value, wasNil: true)
 		}
