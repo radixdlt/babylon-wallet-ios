@@ -69,7 +69,7 @@ extension KeychainActor {
 	}
 
 	@_spi(KeychainInternal)
-	public func getDataWithoutAuthForKeySetIfNil(
+	public func getDataWithoutAuth(
 		forKey key: Key,
 		ifNilSet: KeychainClient.IfNilSetWithoutAuth
 	) async throws -> (value: Data, wasNil: Bool) {
@@ -83,7 +83,7 @@ extension KeychainActor {
 	}
 
 	@_spi(KeychainInternal)
-	public func getDataWithAuthForKeySetIfNil(
+	public func getDataWithAuth(
 		forKey key: Key,
 		authenticationPrompt: AuthenticationPrompt,
 		ifNilSet: KeychainClient.IfNilSetWithAuth

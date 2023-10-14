@@ -21,6 +21,7 @@ platform :ios do
     desc "Runs test"
     lane :tests do
         Dotenv.load ".env.ios.dev"
+        install_development_certificates
         run_tests
     end
 

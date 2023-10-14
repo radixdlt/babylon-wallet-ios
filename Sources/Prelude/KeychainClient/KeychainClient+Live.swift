@@ -31,13 +31,13 @@ extension KeychainClient: DependencyKey {
 				)
 			},
 			getDataWithoutAuthForKeySetIfNil: { key, ifNilSet in
-				try await actor.getDataWithoutAuthForKeySetIfNil(
+				try await actor.getDataWithoutAuth(
 					forKey: key,
 					ifNilSet: ifNilSet
 				)
 			},
 			getDataWithAuthForKeySetIfNil: { key, authenticationPrompt, ifNilSet in
-				try await actor.getDataWithAuthForKeySetIfNil(
+				try await actor.getDataWithAuth(
 					forKey: key,
 					authenticationPrompt: authenticationPrompt,
 					ifNilSet: ifNilSet
