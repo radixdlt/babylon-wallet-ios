@@ -17,6 +17,7 @@
 		2D99C8B02A4B1E1500D3782F /* OnboardingClientLive in Frameworks */ = {isa = PBXBuildFile; productRef = 2D99C8AF2A4B1E1500D3782F /* OnboardingClientLive */; };
 		2D99C8B22A4B2F8F00D3782F /* AppPreferencesClientLive in Frameworks */ = {isa = PBXBuildFile; productRef = 2D99C8B12A4B2F8F00D3782F /* AppPreferencesClientLive */; };
 		4809C84F2ADA8F02005EA157 /* RadixWalletTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4809C84E2ADA8F02005EA157 /* RadixWalletTests.swift */; };
+		4809C8592ADA9079005EA157 /* KeychainActorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4809C8582ADA9079005EA157 /* KeychainActorTests.swift */; };
 		488BBEC62A2B29F30019C723 /* ManageSecurityStructurePreviewApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 488BBEC52A2B29F30019C723 /* ManageSecurityStructurePreviewApp.swift */; };
 		488BBECA2A2B29F40019C723 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 488BBEC92A2B29F40019C723 /* Assets.xcassets */; };
 		488BBED72A2B2B0B0019C723 /* ManageSecurityStructureFeature in Frameworks */ = {isa = PBXBuildFile; productRef = 488BBED62A2B2B0B0019C723 /* ManageSecurityStructureFeature */; };
@@ -98,6 +99,7 @@
 		2D7178D42A4AD852005C89FF /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		4809C84C2ADA8F01005EA157 /* RadixWalletTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RadixWalletTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		4809C84E2ADA8F02005EA157 /* RadixWalletTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RadixWalletTests.swift; sourceTree = "<group>"; };
+		4809C8582ADA9079005EA157 /* KeychainActorTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KeychainActorTests.swift; sourceTree = "<group>"; };
 		488BBEC32A2B29F30019C723 /* ManageSecurityStructurePreview.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ManageSecurityStructurePreview.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		488BBEC52A2B29F30019C723 /* ManageSecurityStructurePreviewApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManageSecurityStructurePreviewApp.swift; sourceTree = "<group>"; };
 		488BBEC92A2B29F40019C723 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -300,6 +302,7 @@
 		4809C84D2ADA8F02005EA157 /* RadixWalletTests */ = {
 			isa = PBXGroup;
 			children = (
+				4809C8582ADA9079005EA157 /* KeychainActorTests.swift */,
 				4809C84E2ADA8F02005EA157 /* RadixWalletTests.swift */,
 			);
 			path = RadixWalletTests;
@@ -984,6 +987,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				4809C84F2ADA8F02005EA157 /* RadixWalletTests.swift in Sources */,
+				4809C8592ADA9079005EA157 /* KeychainActorTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
