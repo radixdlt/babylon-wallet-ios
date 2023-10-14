@@ -48,10 +48,10 @@ extension KeychainActor {
 	@MainActor
 	@discardableResult
 	func authGetSavedDataElseSaveNewRandom() async throws -> Data {
-		try await self.getDataWithAuthForKeySetIfNil(
+		try await self.getDataWithAuth(
 			forKey: authRandomKey,
 			authenticationPrompt: "Keychain demo",
-			ifNilSet: .init(
+			ifNilSet: KeychainClient.IfNilSetWithAuth(
 				to: .random(byteCount: 16),
 				with: KeychainClient.AttributesWithAuth(
 					accessibility: .whenUnlockedThisDeviceOnly,
@@ -66,9 +66,9 @@ extension KeychainActor {
 	@MainActor
 	@discardableResult
 	func noAuthGetSavedDataElseSaveNewRandom() async throws -> Data {
-		try await self.getDataWithoutAuthForKeySetIfNil(
+		try await self.getDataWithoutAuth(
 			forKey: noAuthRandomKey,
-			ifNilSet: .init(
+			ifNilSet: KeychainClient.IfNilSetWithoutAuth(
 				to: .random(byteCount: 16),
 				with: KeychainClient.AttributesWithoutAuth(
 					accessibility: .always
