@@ -10,25 +10,23 @@ struct WalletApp: SwiftUI.App {
 
 	var body: some SwiftUI.Scene {
 		WindowGroup {
-			if _XCTIsTesting {
-				App.View(
-					store: Store(
-						initialState: App.State()
-					) {
-						App()
-						#if targetEnvironment(simulator)
-							.dependency(\.localAuthenticationClient.queryConfig) { .biometricsAndPasscodeSetUp }
-						#endif
-					}
-				)
-				.task {
-					GatewayAPIClient.rdxClientVersion = rdxClientVersion
+			App.View(
+				store: Store(
+					initialState: App.State()
+				) {
+					App()
+					#if targetEnvironment(simulator)
+						.dependency(\.localAuthenticationClient.queryConfig) { .biometricsAndPasscodeSetUp }
+					#endif
 				}
-				#if os(macOS)
-				.frame(minWidth: 1020, maxWidth: .infinity, minHeight: 512, maxHeight: .infinity)
-				#endif
-				.environment(\.colorScheme, .light) // TODO: implement dark mode and remove this
+			)
+			.task {
+				GatewayAPIClient.rdxClientVersion = rdxClientVersion
 			}
+			#if os(macOS)
+			.frame(minWidth: 1020, maxWidth: .infinity, minHeight: 512, maxHeight: .infinity)
+			#endif
+			.environment(\.colorScheme, .light) // TODO: implement dark mode and remove this
 		}
 	}
 }
