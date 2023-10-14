@@ -11,8 +11,8 @@ final class SecureStorageClientTests: TestCase {
 	func test_assert_key_for_mnemonic_is_unchanged() async throws {
 		try await doTest(authConfig: .biometricsAndPasscodeSetUp) { sut, factorSource, _ in
 			try await sut.saveMnemonicForFactorSource(factorSource)
-		} assertKeychainSetItemWithAuthRequest: { request in
-			guard request.key == "device:09a501e4fafc7389202a82a3237a405ed191cdb8a4010124ff8e2c9259af1327" else {
+		} assertKeychainSetItemWithAuthRequest: { _, key, _ in
+			guard key == "device:09a501e4fafc7389202a82a3237a405ed191cdb8a4010124ff8e2c9259af1327" else {
 				fatalError("CRITICAL UNIT TEST FAILURE - LOSS OF FUNDS POSSIBLE.")
 			}
 		}
@@ -21,48 +21,48 @@ final class SecureStorageClientTests: TestCase {
 	func test__WHEN__factorSource_is_saved__THEN__setDataWithAuth_called_with_icloud_sync_is_disabled() async throws {
 		try await doTest(authConfig: .biometricsAndPasscodeSetUp) { sut, factorSource, _ in
 			try await sut.saveMnemonicForFactorSource(factorSource)
-		} assertKeychainSetItemWithAuthRequest: { request in
-			XCTAssertFalse(request.iCloudSyncEnabled)
+		} assertKeychainSetItemWithAuthRequest: { _, _, attributes in
+			XCTAssertFalse(attributes.iCloudSyncEnabled)
 		}
 	}
 
 	func test__WHEN__profile_is_saved__THEN__setDataWithoutAuth_called_with_icloud_sync_is_enabled() async throws {
 		try await doTest(authConfig: .biometricsAndPasscodeSetUp) { sut, _, profile in
 			try await sut.saveProfileSnapshot(profile)
-		} assertKeychainSetItemWithoutAuthRequest: { request in
-			XCTAssertTrue(request.iCloudSyncEnabled)
+		} assertKeychainSetItemWithoutAuthRequest: { _, _, attributes in
+			XCTAssertTrue(attributes.iCloudSyncEnabled)
 		}
 	}
 
 	func test__GIVEN__biometricsAndPasscodeSetUp__WHEN__factorSource_is_saved__THEN__setDataWithAuth_called_with_accessibility_whenPasscodeSetThisDeviceOnly() async throws {
 		try await doTest(authConfig: .biometricsAndPasscodeSetUp) { sut, factorSource, _ in
 			try await sut.saveMnemonicForFactorSource(factorSource)
-		} assertKeychainSetItemWithAuthRequest: { request in
-			XCTAssertEqual(request.accessibility, .whenPasscodeSetThisDeviceOnly)
+		} assertKeychainSetItemWithAuthRequest: { _, _, attributes in
+			XCTAssertEqual(attributes.accessibility, .whenPasscodeSetThisDeviceOnly)
 		}
 	}
 
 	func test__GIVEN__biometricsAndPasscodeSetUp__WHEN__factorSource_is_saved__THEN__setDataWithAuth_called_with_authPolicy_userPresence() async throws {
 		try await doTest(authConfig: .biometricsAndPasscodeSetUp) { sut, factorSource, _ in
 			try await sut.saveMnemonicForFactorSource(factorSource)
-		} assertKeychainSetItemWithAuthRequest: { request in
-			XCTAssertEqual(request.authenticationPolicy, .userPresence)
+		} assertKeychainSetItemWithAuthRequest: { _, _, attributes in
+			XCTAssertEqual(attributes.authenticationPolicy, .userPresence)
 		}
 	}
 
 	func test__GIVEN__passcodeSetUp_no_bio__WHEN__factorSource_is_saved__THEN__setDataWithAuth_called_with_accessibility_whenPasscodeSetThisDeviceOnly() async throws {
 		try await doTest(authConfig: .passcodeSetUpButNotBiometrics) { sut, factorSource, _ in
 			try await sut.saveMnemonicForFactorSource(factorSource)
-		} assertKeychainSetItemWithAuthRequest: { request in
-			XCTAssertEqual(request.accessibility, .whenPasscodeSetThisDeviceOnly)
+		} assertKeychainSetItemWithAuthRequest: { _, _, attributes in
+			XCTAssertEqual(attributes.accessibility, .whenPasscodeSetThisDeviceOnly)
 		}
 	}
 
 	func test__GIVEN__passcodeSetUp_no_bio__WHEN__factorSource_is_saved__THEN__setDataWithAuth_called_with_authPolicy_userPresence() async throws {
 		try await doTest(authConfig: .passcodeSetUpButNotBiometrics) { sut, factorSource, _ in
 			try await sut.saveMnemonicForFactorSource(factorSource)
-		} assertKeychainSetItemWithAuthRequest: { request in
-			XCTAssertEqual(request.authenticationPolicy, .userPresence)
+		} assertKeychainSetItemWithAuthRequest: { _, _, attributes in
+			XCTAssertEqual(attributes.authenticationPolicy, .userPresence)
 		}
 	}
 
@@ -74,16 +74,16 @@ final class SecureStorageClientTests: TestCase {
 			} catch {
 				XCTAssertEqual(error as? SecureStorageError, SecureStorageError.passcodeNotSet)
 			}
-		} assertKeychainSetItemWithoutAuthRequest: { request in
-			XCTAssertEqual(request.accessibility, .whenUnlocked)
+		} assertKeychainSetItemWithoutAuthRequest: { _, _, attributes in
+			XCTAssertEqual(attributes.accessibility, .whenUnlocked)
 		}
 	}
 
 	func test__GIVEN__biometricsAndPasscodeSetUp__WHEN__profile_is_saved__THEN__setDataWithoutAuth_called_with_accessibility_whenUnlocked() async throws {
 		try await doTest(authConfig: .biometricsAndPasscodeSetUp) { sut, _, profile in
 			try await sut.saveProfileSnapshot(profile)
-		} assertKeychainSetItemWithoutAuthRequest: { request in
-			XCTAssertEqual(request.accessibility, .whenUnlocked)
+		} assertKeychainSetItemWithoutAuthRequest: { _, _, attributes in
+			XCTAssertEqual(attributes.accessibility, .whenUnlocked)
 		}
 	}
 }
@@ -92,21 +92,21 @@ private extension SecureStorageClientTests {
 	func doTest(
 		authConfig: LocalAuthenticationConfig,
 		operation: (SecureStorageClient, PrivateHDFactorSource, ProfileSnapshot) async throws -> Void,
-		assertKeychainSetItemWithoutAuthRequest: (@Sendable (KeychainClient.SetItemWithoutAuthRequest) throws -> Void)? = nil,
-		assertKeychainSetItemWithAuthRequest: (@Sendable (KeychainClient.SetItemWithAuthRequest) throws -> Void)? = nil
+		assertKeychainSetItemWithoutAuthRequest: (@Sendable (Data, KeychainClient.Key, KeychainClient.AttributesWithoutAuth) throws -> Void)? = nil,
+		assertKeychainSetItemWithAuthRequest: (@Sendable (Data, KeychainClient.Key, KeychainClient.AttributesWithAuth) throws -> Void)? = nil
 	) async throws {
 		try await withDependencies {
 			$0.uuid = .incrementing
-			$0.keychainClient.setDataWithoutAuthForKey = { request in
+			$0.keychainClient._setDataWithoutAuthForKey = { data, key, attributes in
 				if let assertKeychainSetItemWithoutAuthRequest {
-					try assertKeychainSetItemWithoutAuthRequest(request)
+					try assertKeychainSetItemWithoutAuthRequest(data, key, attributes)
 				} else {
 					XCTFail("Did not expect `setDataWithoutAuthForKey` to be called")
 				}
 			}
-			$0.keychainClient.setDataWithAuthForKey = { request in
+			$0.keychainClient._setDataWithAuthForKey = { data, key, attributes in
 				if let assertKeychainSetItemWithAuthRequest {
-					try assertKeychainSetItemWithAuthRequest(request)
+					try assertKeychainSetItemWithAuthRequest(data, key, attributes)
 				} else {
 					XCTFail("Did not expect `setDataWithAuthForKey` to be called")
 				}

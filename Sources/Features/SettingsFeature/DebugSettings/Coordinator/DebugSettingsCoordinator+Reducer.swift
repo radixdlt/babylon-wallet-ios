@@ -22,6 +22,7 @@ public struct DebugSettingsCoordinator: Sendable, FeatureReducer {
 		case factorSourcesButtonTapped
 		case debugInspectProfileButtonTapped
 		case debugUserDefaultsContentsButtonTapped
+		case debugTestKeychainButtonTapped
 		case securityStructureConfigsButtonTapped
 	}
 
@@ -38,12 +39,18 @@ public struct DebugSettingsCoordinator: Sendable, FeatureReducer {
 			case debugUserDefaultsContents(DebugUserDefaultsContents.State)
 			case debugInspectProfile(DebugInspectProfile.State)
 			case debugManageFactorSources(DebugManageFactorSources.State)
+			#if DEBUG
+			case debugKeychainTest(DebugKeychainTest.State)
+			#endif // DEBUG
 			case securityStructureConfigs(SecurityStructureConfigurationListCoordinator.State)
 		}
 
 		public enum Action: Sendable, Equatable {
 			case debugUserDefaultsContents(DebugUserDefaultsContents.Action)
 			case debugInspectProfile(DebugInspectProfile.Action)
+			#if DEBUG
+			case debugKeychainTest(DebugKeychainTest.Action)
+			#endif // DEBUG
 			case debugManageFactorSources(DebugManageFactorSources.Action)
 			case securityStructureConfigs(SecurityStructureConfigurationListCoordinator.Action)
 		}
@@ -55,6 +62,11 @@ public struct DebugSettingsCoordinator: Sendable, FeatureReducer {
 			Scope(state: /State.debugInspectProfile, action: /Action.debugInspectProfile) {
 				DebugInspectProfile()
 			}
+			#if DEBUG
+			Scope(state: /State.debugKeychainTest, action: /Action.debugKeychainTest) {
+				DebugKeychainTest()
+			}
+			#endif // DEBUG
 			Scope(state: /State.debugManageFactorSources, action: /Action.debugManageFactorSources) {
 				DebugManageFactorSources()
 			}
@@ -89,6 +101,12 @@ public struct DebugSettingsCoordinator: Sendable, FeatureReducer {
 				guard let profile = try? Profile(snapshot: snapshot) else { return }
 				await send(.internal(.profileToDebugLoaded(profile)))
 			}
+
+		case .debugTestKeychainButtonTapped:
+			#if DEBUG
+			state.destination = .debugKeychainTest(.init())
+			#endif // DEBUG
+			return .none
 
 		case .securityStructureConfigsButtonTapped:
 			state.destination = .securityStructureConfigs(.init())

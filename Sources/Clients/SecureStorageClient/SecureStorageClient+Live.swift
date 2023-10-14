@@ -16,6 +16,17 @@ public enum SecureStorageError: Swift.Error, Equatable {
 	case passcodeNotSet
 }
 
+func importantKeychainIdentifier(_ msg: String) -> Tagged<KeychainClient, NonEmptyString>? {
+	var msg = msg
+	#if DEBUG
+	msg += " DEBUG"
+	#endif
+	guard let nonEmpty = NonEmptyString(rawValue: msg) else {
+		return nil
+	}
+	return .init(rawValue: nonEmpty)
+}
+
 // MARK: - SecureStorageClient + DependencyKey
 extension SecureStorageClient: DependencyKey {
 	public typealias Value = SecureStorageClient
@@ -58,12 +69,12 @@ extension SecureStorageClient: DependencyKey {
 		}
 
 		let loadProfileSnapshotData: LoadProfileSnapshotData = { id in
-			try await keychainClient.getDataWithoutAuthForKey(id.keychainKey)
+			try await keychainClient.getDataWithoutAuth(forKey: id.keychainKey)
 		}
 
 		let deleteMnemonicByFactorSourceID: DeleteMnemonicByFactorSourceID = { factorSourceID in
 			let key = key(factorSourceID: factorSourceID)
-			try await keychainClient.removeDataForKey(key)
+			try await keychainClient.removeData(forKey: key)
 		}
 
 		@Sendable func saveProfile(
@@ -71,13 +82,13 @@ extension SecureStorageClient: DependencyKey {
 			key: KeychainClient.Key,
 			iCloudSyncEnabled: Bool
 		) async throws {
-			try await keychainClient.setDataWithoutAuthForKey(
-				KeychainClient.SetItemWithoutAuthRequest(
-					data: data,
-					key: key,
+			try await keychainClient.setDataWithoutAuth(
+				data,
+				forKey: key,
+				attributes: .init(
 					iCloudSyncEnabled: iCloudSyncEnabled,
 					accessibility: .whenUnlocked, // do not delete the Profile if passcode gets deleted.
-					label: "Radix Wallet Data",
+					label: importantKeychainIdentifier("Radix Wallet Data"),
 					comment: "Contains your accounts, personas, authorizedDapps, linked connector extensions and wallet app preferences."
 				)
 			)
@@ -93,7 +104,7 @@ extension SecureStorageClient: DependencyKey {
 
 		@Sendable func loadProfileHeaderList() async throws -> ProfileSnapshot.HeaderList? {
 			try await keychainClient
-				.getDataWithoutAuthForKey(profileHeaderListKeychainKey)
+				.getDataWithoutAuth(forKey: profileHeaderListKeychainKey)
 				.map {
 					try jsonDecoder().decode([ProfileSnapshot.Header].self, from: $0)
 				}
@@ -102,13 +113,13 @@ extension SecureStorageClient: DependencyKey {
 
 		@Sendable func saveProfileHeaderList(_ headers: ProfileSnapshot.HeaderList) async throws {
 			let data = try jsonEncoder().encode(headers)
-			try await keychainClient.setDataWithoutAuthForKey(
-				KeychainClient.SetItemWithoutAuthRequest(
-					data: data,
-					key: profileHeaderListKeychainKey,
+			try await keychainClient.setDataWithoutAuth(
+				data,
+				forKey: profileHeaderListKeychainKey,
+				attributes: .init(
 					iCloudSyncEnabled: true, // Always synced, since header list might be used by multiple devices
 					accessibility: .whenUnlocked,
-					label: "Radix Wallet Metadata",
+					label: importantKeychainIdentifier("Radix Wallet Metadata"),
 					comment: "Contains the metadata about Radix Wallet Data."
 				)
 			)
@@ -127,17 +138,17 @@ extension SecureStorageClient: DependencyKey {
 		}
 
 		@Sendable func deleteProfileHeaderList() async throws {
-			try await keychainClient.removeDataForKey(profileHeaderListKeychainKey)
+			try await keychainClient.removeData(forKey: profileHeaderListKeychainKey)
 		}
 
 		@Sendable func deleteProfile(_ id: ProfileSnapshot.Header.ID, iCloudSyncEnabled: Bool) async throws {
-			try await keychainClient.removeDataForKey(id.keychainKey)
+			try await keychainClient.removeData(forKey: id.keychainKey)
 			try await deleteProfileHeader(id)
 		}
 
 		@Sendable func loadDeviceIdentifier() async throws -> UUID? {
 			let loaded = try await keychainClient
-				.getDataWithoutAuthForKey(deviceIdentifierKey)
+				.getDataWithoutAuth(forKey: deviceIdentifierKey)
 				.map {
 					try jsonDecoder().decode(UUID.self, from: $0)
 				}
@@ -145,20 +156,20 @@ extension SecureStorageClient: DependencyKey {
 			if let loaded {
 				loggerGlobal.trace("Loaded deviceIdentifier: \(loaded)")
 			} else {
-				loggerGlobal.warning("No deviceIdentifier loaded, was nil.")
+				loggerGlobal.info("No deviceIdentifier loaded, was nil.")
 			}
 			return loaded
 		}
 
 		@Sendable func saveDeviceIdentifier(_ deviceIdentifier: UUID) async throws {
 			let data = try jsonEncoder().encode(deviceIdentifier)
-			try await keychainClient.setDataWithoutAuthForKey(
-				KeychainClient.SetItemWithoutAuthRequest(
-					data: data,
-					key: deviceIdentifierKey,
+			try await keychainClient.setDataWithoutAuth(
+				data,
+				forKey: deviceIdentifierKey,
+				attributes: .init(
 					iCloudSyncEnabled: false, // Never ever synced, since related to this device only..
 					accessibility: .whenUnlocked,
-					label: "Radix Wallet device identifier",
+					label: importantKeychainIdentifier("Radix Wallet device identifier"),
 					comment: "The unique identifier of this device"
 				)
 			)
@@ -182,14 +193,16 @@ extension SecureStorageClient: DependencyKey {
 				let mostSecureAccesibilityAndAuthenticationPolicy = try await queryMostSecureAccesibilityAndAuthenticationPolicy()
 				let key = key(factorSourceID: factorSource.id)
 
-				try await keychainClient.setDataWithAuthenticationPolicyIfAble(
-					data: data,
-					key: key,
-					iCloudSyncEnabled: false, // We do NOT want to sync this to iCloud, ever.
-					accessibility: mostSecureAccesibilityAndAuthenticationPolicy.accessibility,
-					authenticationPolicy: mostSecureAccesibilityAndAuthenticationPolicy.authenticationPolicy, // can be nil
-					label: "Radix Wallet Factor Secret",
-					comment: .init("Created on \(factorSource.hint.name) \(factorSource.supportsOlympia ? " (Olympia)" : "")")
+				try await keychainClient.setDataWithAuth(
+					data,
+					forKey: key,
+					attributes: .init(
+						iCloudSyncEnabled: false,
+						accessibility: mostSecureAccesibilityAndAuthenticationPolicy.accessibility,
+						authenticationPolicy: mostSecureAccesibilityAndAuthenticationPolicy.authenticationPolicy,
+						label: importantKeychainIdentifier("Radix Wallet Factor Secret"),
+						comment: .init("Created on \(factorSource.hint.name) \(factorSource.supportsOlympia ? " (Olympia)" : "")")
+					)
 				)
 			},
 			loadMnemonicByFactorSourceID: { factorSourceID, purpose in
@@ -217,8 +230,11 @@ extension SecureStorageClient: DependencyKey {
 						return L10n.Biometrics.Prompt.updateAccountMetadata
 					}
 				}()
-				let authPrompt: KeychainClient.AuthenticationPrompt = NonEmptyString(rawValue: authPromptValue).map { KeychainClient.AuthenticationPrompt($0) } ?? "Authenticate to wallet data secret."
-				guard let data = try await keychainClient.getDataWithAuthForKey(key, authPrompt) else {
+				let authenticationPrompt: KeychainClient.AuthenticationPrompt = NonEmptyString(rawValue: authPromptValue).map { KeychainClient.AuthenticationPrompt($0) } ?? "Authenticate to wallet data secret."
+				guard let data = try await keychainClient.getDataWithAuth(
+					forKey: key,
+					authenticationPrompt: authenticationPrompt
+				) else {
 					return nil
 				}
 				return try jsonDecoder().decode(MnemonicWithPassphrase.self, from: data)
