@@ -1,7 +1,7 @@
 import Prelude
 import TestingPrelude
 
-final class BiteTests: TestCase {
+final class DataExtensionTests: TestCase {
 	let deadbeef = Data([0xDE, 0xAD, 0xBE, 0xEF])
 
 	func test_deadbeef_from_hex_string_lowercase_leading_0x() throws {
