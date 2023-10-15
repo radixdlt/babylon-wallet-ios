@@ -56,7 +56,7 @@ final class BIP44Tests: TestCase {
 
 	func test_bip44_vectors() throws {
 		try testFixture(
-			bundle: .main,
+			bundle: Bundle(for: Self.self),
 			jsonName: "bip44_secp256k1"
 		) { (testSuite: BIP44TestSuite) in
 			try testSuite.testGroups.forEach(doTestGroup)

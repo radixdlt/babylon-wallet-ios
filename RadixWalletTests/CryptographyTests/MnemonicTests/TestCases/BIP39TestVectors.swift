@@ -114,7 +114,7 @@ struct JapaneseVectors: Decodable {
 final class BIP39TestVectors: TestCase {
 	func testEnglishVectors() throws {
 		try testFixture(
-			bundle: .main,
+			bundle: Bundle(for: Self.self),
 			jsonName: "bip39_english_test_vectors"
 		) { (vectors: EnglishVectors) in
 			try doTest(
@@ -126,7 +126,7 @@ final class BIP39TestVectors: TestCase {
 
 	func testJapanseVectors() throws {
 		try testFixture(
-			bundle: .main,
+			bundle: Bundle(for: Self.self),
 			jsonName: "bip39_japanese_test_vectors"
 		) { (vectors: JapaneseVectors) in
 			try doTest(

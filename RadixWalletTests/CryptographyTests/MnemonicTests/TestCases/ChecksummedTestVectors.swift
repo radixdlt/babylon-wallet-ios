@@ -60,7 +60,7 @@ extension ChecksummedTestVectors {
 		file: StaticString = #file, line: UInt = #line
 	) throws {
 		try testFixture(
-			bundle: .main,
+			bundle: Bundle(for: Self.self),
 			jsonName: jsonName
 		) { (vectors: ChecksummedVectors) in
 			try doTest(

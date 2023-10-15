@@ -27,7 +27,7 @@ final class CAP26Tests: TestCase {
 
 	func test_curve25519_vectors() throws {
 		try testFixture(
-			bundle: .main,
+			bundle: Bundle(for: Self.self),
 			jsonName: "cap26_curve25519"
 		) { (testGroup: TestGroup) in
 			try doTestCAP26(
@@ -39,7 +39,7 @@ final class CAP26Tests: TestCase {
 
 	func test_secp256k1_vectors() throws {
 		try testFixture(
-			bundle: .main,
+			bundle: Bundle(for: Self.self),
 			jsonName: "cap26_secp256k1"
 		) { (testGroup: TestGroup) in
 			try doTestCAP26(

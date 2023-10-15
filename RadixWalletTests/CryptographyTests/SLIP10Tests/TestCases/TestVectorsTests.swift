@@ -6,7 +6,7 @@ import XCTest
 final class TestVectorsTests: TestCase {
 	func testVectors10() throws {
 		try testFixture(
-			bundle: .main,
+			bundle: Bundle(for: Self.self),
 			jsonName: "slip10_tests_#10"
 		) { (testFile: TestFile) in
 			try doTestFile(
@@ -18,7 +18,7 @@ final class TestVectorsTests: TestCase {
 	// With optimization flag takes ~3 sec on a Mac Studio.
 	func testVectors1K() throws {
 		try testFixture(
-			bundle: .main,
+			bundle: Bundle(for: Self.self),
 			jsonName: "slip10_tests_#1000"
 		) { (testFile: TestFile) in
 			try doTestFile(
