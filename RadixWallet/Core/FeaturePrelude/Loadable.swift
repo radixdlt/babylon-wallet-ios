@@ -17,11 +17,6 @@
      let content: (Value) -> Content
 
  // MARK: - Loadable
- // MARK: - Loadable
- // MARK: - Loadable
- // MARK: - Loadable
- // MARK: - Loadable
- // MARK: - Loadable
      var body: some View {
          switch value {
          case .idle:
