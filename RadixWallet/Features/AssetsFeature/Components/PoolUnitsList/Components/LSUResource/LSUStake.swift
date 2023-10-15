@@ -106,10 +106,8 @@ public struct LSUStake: FeatureReducer {
 	}
 }
 
-import ComposableArchitectureextension OnLedgerEntitiesClient.OwnedStakeDetails {
+extension OnLedgerEntitiesClient.OwnedStakeDetails {
 	var xrdRedemptionValue: RETDecimal {
 		((stakeUnitResource?.amount ?? 0) * validator.xrdVaultBalance) / (stakeUnitResource?.resource.totalSupply ?? 1)
 	}
 }
-
-import SwiftUI
