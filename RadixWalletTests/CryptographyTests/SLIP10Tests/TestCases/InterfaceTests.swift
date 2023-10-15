@@ -1,5 +1,5 @@
-@testable import Cryptography
-import TestingPrelude
+@testable import Radix_Wallet_Dev
+import XCTest
 
 // MARK: - InterfaceTests
 final class InterfaceTests: TestCase {

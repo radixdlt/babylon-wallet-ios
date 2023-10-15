@@ -1,5 +1,6 @@
-import EngineKit
-import TestingPrelude
+import EngineToolkit
+@testable import Radix_Wallet_Dev
+import XCTest
 
 final class BlakeTests: TestCase {
 	func test_blake_hash() throws {

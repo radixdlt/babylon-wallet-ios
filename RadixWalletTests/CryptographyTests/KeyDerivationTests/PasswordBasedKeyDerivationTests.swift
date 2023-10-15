@@ -1,5 +1,6 @@
-@testable import Cryptography
-import TestingPrelude
+import JSONTesting
+@testable import Radix_Wallet_Dev
+import XCTest
 
 final class PasswordBasedKeyDerivationTests: TestCase {
 	func test_version1_is_default() {

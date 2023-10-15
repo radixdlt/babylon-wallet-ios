@@ -1,5 +1,6 @@
-import Cryptography
-import TestingPrelude
+import Foundation
+@testable import Radix_Wallet_Dev
+import XCTest
 
 final class ECDSASepc256k1RecoverableSignatureVerificationTests: TestCase {
 	func test_serialize_ECDSA_signature() throws {

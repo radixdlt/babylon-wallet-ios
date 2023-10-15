@@ -1,10 +1,3 @@
-import Cryptography
-
-@testable import Profile
-import RadixConnectModels
-import SharedTestingModels
-import TestingPrelude
-
 // MARK: - BIP44Tests
 final class BIP44Tests: TestCase {
 	struct BIP44TestSuite: Codable, Equatable {
@@ -63,13 +56,16 @@ final class BIP44Tests: TestCase {
 
 	func test_bip44_vectors() throws {
 		try testFixture(
-			bundle: .module,
+			bundle: .main,
 			jsonName: "bip44_secp256k1"
 		) { (testSuite: BIP44TestSuite) in
 			try testSuite.testGroups.forEach(doTestGroup)
 		}
 	}
 }
+
+@testable import Radix_Wallet_Dev
+import XCTest
 
 extension BIP44Tests {
 	private func doTestGroup(_ testGroup: BIP44TestSuite.TestGroup) throws {

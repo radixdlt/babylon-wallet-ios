@@ -1,0 +1,24 @@
+{
+  "configurations" : [
+    {
+      "id" : "8BAFADD8-4BF8-439C-85CA-522BA0496D9A",
+      "name" : "Configuration 1",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:RadixWallet.xcodeproj",
+        "identifier" : "481B43AF2ADC7F1A007945C1",
+        "name" : "RadixWalletTests"
+      }
+    }
+  ],
+  "version" : 1
+}

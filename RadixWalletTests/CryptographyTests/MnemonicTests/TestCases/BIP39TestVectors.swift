@@ -1,7 +1,6 @@
-@testable import Cryptography
-import Prelude
-import SharedTestingModels
-import TestingPrelude
+import Foundation
+@testable import Radix_Wallet_Dev
+import XCTest
 
 // MARK: - BIP39Vector
 struct BIP39Vector: Equatable {
@@ -115,7 +114,7 @@ struct JapaneseVectors: Decodable {
 final class BIP39TestVectors: TestCase {
 	func testEnglishVectors() throws {
 		try testFixture(
-			bundle: .module,
+			bundle: .main,
 			jsonName: "bip39_english_test_vectors"
 		) { (vectors: EnglishVectors) in
 			try doTest(
@@ -127,7 +126,7 @@ final class BIP39TestVectors: TestCase {
 
 	func testJapanseVectors() throws {
 		try testFixture(
-			bundle: .module,
+			bundle: .main,
 			jsonName: "bip39_japanese_test_vectors"
 		) { (vectors: JapaneseVectors) in
 			try doTest(

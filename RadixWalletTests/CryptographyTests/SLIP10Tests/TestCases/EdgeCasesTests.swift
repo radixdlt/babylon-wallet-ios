@@ -1,6 +1,7 @@
-@testable import Cryptography
 import CryptoKit
-import TestingPrelude
+import Foundation
+@testable import Radix_Wallet_Dev
+import XCTest
 
 final class EdgeCasesTests: TestCase {
 	/// This test was found by: https://github.com/radixdlt/GenerateSLIP10Vectors

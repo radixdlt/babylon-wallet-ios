@@ -1,10 +1,7 @@
-import Cryptography
-
-import EngineKit
-@testable import Profile
-import RadixConnectModels
-import SharedTestingModels
-import TestingPrelude
+import EngineToolkit
+import Foundation
+@testable import Radix_Wallet_Dev
+import XCTest
 
 extension SLIP10CurveProtocol {
 	static var curveName: String {
@@ -30,7 +27,7 @@ final class CAP26Tests: TestCase {
 
 	func test_curve25519_vectors() throws {
 		try testFixture(
-			bundle: .module,
+			bundle: .main,
 			jsonName: "cap26_curve25519"
 		) { (testGroup: TestGroup) in
 			try doTestCAP26(
@@ -42,7 +39,7 @@ final class CAP26Tests: TestCase {
 
 	func test_secp256k1_vectors() throws {
 		try testFixture(
-			bundle: .module,
+			bundle: .main,
 			jsonName: "cap26_secp256k1"
 		) { (testGroup: TestGroup) in
 			try doTestCAP26(

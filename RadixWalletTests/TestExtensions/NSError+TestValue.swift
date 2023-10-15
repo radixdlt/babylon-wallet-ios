@@ -1,3 +1,4 @@
+import Foundation
 
 extension NSError {
 	public static func testValue(domain: String = "Test") -> NSError {

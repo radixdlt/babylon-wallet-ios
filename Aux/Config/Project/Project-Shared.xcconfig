@@ -2,6 +2,8 @@
 
 #include "../common.xcconfig"
 
+TARGET_NAME = RadixAppTarget
+
 // Bundle Display Name
 //
 // When `GENERATE_INFOPLIST_FILE` is enabled, sets the value of the

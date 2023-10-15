@@ -1,6 +1,7 @@
-@testable import Cryptography
 import CryptoKit
-import TestingPrelude
+import Foundation
+@testable import Radix_Wallet_Dev
+import XCTest
 
 // MARK: - TestVector
 struct TestVector<Curve: SLIP10CurveProtocol> {

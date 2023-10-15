@@ -1,6 +1,6 @@
-@testable import Cryptography
-import SharedTestingModels
-import TestingPrelude
+import Foundation
+@testable import Radix_Wallet_Dev
+import XCTest
 
 // MARK: - ChecksummedVector
 struct ChecksummedVector: Decodable, Equatable {
@@ -60,7 +60,7 @@ extension ChecksummedTestVectors {
 		file: StaticString = #file, line: UInt = #line
 	) throws {
 		try testFixture(
-			bundle: .module,
+			bundle: .main,
 			jsonName: jsonName
 		) { (vectors: ChecksummedVectors) in
 			try doTest(

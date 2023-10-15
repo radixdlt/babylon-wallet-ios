@@ -1,6 +1,6 @@
-@testable import Cryptography
 import CryptoKit
-import TestingPrelude
+@testable import Radix_Wallet_Dev
+import XCTest
 
 extension HD.Root {
 	public init(mnemonic: Mnemonic, passphrase: String = "") throws {

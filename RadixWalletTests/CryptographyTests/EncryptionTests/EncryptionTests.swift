@@ -1,5 +1,7 @@
-@testable import Cryptography
-import TestingPrelude
+import Foundation
+import JSONTesting
+@testable import Radix_Wallet_Dev
+import XCTest
 
 final class EncryptionTests: TestCase {
 	func test_version1_is_default() {

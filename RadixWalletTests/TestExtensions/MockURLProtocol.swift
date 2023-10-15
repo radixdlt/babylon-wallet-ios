@@ -1,3 +1,4 @@
+import Foundation
 
 // MARK: - MockURLProtocol
 public class MockURLProtocol: URLProtocol {
