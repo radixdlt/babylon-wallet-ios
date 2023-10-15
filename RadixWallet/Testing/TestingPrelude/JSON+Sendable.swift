@@ -1,0 +1,2 @@
+
+extension JSON: @unchecked Sendable {}
