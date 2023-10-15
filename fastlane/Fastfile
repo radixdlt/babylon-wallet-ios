@@ -37,8 +37,8 @@ platform :ios do
     lane :tests do
         Dotenv.load ".env.ios.dev"
 
-        xcb('clean build', 'Radix Wallet Dev (iOS)')
-        xcb('test', 'RadixWalletTests')
+        xcb('clean build', 'Radix Wallet Dev')
+        xcb('test', 'Radix Wallet Tests')
     end
 
     desc "Deploy the app for a given flavour: alpha, beta, release"
@@ -110,34 +110,6 @@ platform :ios do
     end
 
 end
-
-platform :mac do
-    before_all do
-        Dotenv.load ".env.mac"
-    end
-
-    desc "Runs tests"
-    lane :tests do
-        run_tests
-    end
-
-    desc "Installs certificates on the machine"
-    lane :install_development_certificates do
-        code_signing(type: "development")
-    end
-
-    desc "Generates new certificates if needed"
-    lane :generate_new_certificates do
-        code_signing(type: "development", readonly: false)
-    end
-
-    desc "Registers a new mac device and updates the certificates"
-    lane :register_new_mac_device do
-        register_new_device
-        generate_new_certificates
-    end
-end
-
 
 def rev_changelog(flavour, most_recent_tags)
     git_commits_range_for_changelog = most_recent_tags.map { |tag| sh("git rev-list --abbrev-commit -n 1 #{tag}").strip }
