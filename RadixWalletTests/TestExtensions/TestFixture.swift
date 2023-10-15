@@ -1,3 +1,4 @@
+@testable import Radix_Wallet_Dev
 //===----------------------------------------------------------------------===//
 //
 // This source file is part of the SwiftCrypto open source project

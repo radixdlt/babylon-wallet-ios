@@ -1,4 +1,5 @@
 import Foundation
+@testable import Radix_Wallet_Dev
 
 // MARK: - MockURLProtocol
 public class MockURLProtocol: URLProtocol {

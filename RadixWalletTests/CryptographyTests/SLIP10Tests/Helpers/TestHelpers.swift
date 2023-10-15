@@ -1,5 +1,7 @@
 import CryptoKit
+import Foundation
 @testable import Radix_Wallet_Dev
+import XCTest
 
 // MARK: - HD.Path.Full + ExpressibleByStringLiteral
 extension HD.Path.Full: ExpressibleByStringLiteral {

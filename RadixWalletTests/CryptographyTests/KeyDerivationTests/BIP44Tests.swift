@@ -1,3 +1,7 @@
+import Foundation
+@testable import Radix_Wallet_Dev
+import XCTest
+
 // MARK: - BIP44Tests
 final class BIP44Tests: TestCase {
 	struct BIP44TestSuite: Codable, Equatable {
