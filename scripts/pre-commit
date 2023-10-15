@@ -2,4 +2,4 @@
 
 DIR="$(dirname "$(readlink -f "$BASH_SOURCE")")"
 
-"$DIR/git-format-staged" --formatter "swiftformat stdin --stdinpath '{}'" "*.swift"
+"$DIR/git-format-staged" --formatter "swiftformat  --verbose stdin --stdinpath '{}' " "*.swift"
