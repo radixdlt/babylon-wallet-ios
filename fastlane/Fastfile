@@ -21,8 +21,7 @@ platform :ios do
     desc "Runs test"
     lane :tests do
         Dotenv.load ".env.ios.dev"
-        install_development_certificates
-        run_tests
+        xcodebuild -project 'App/BabylonWallet.xcodeproj' -scheme 'RadixWalletTests' -destination 'platform=iOS Simulator,name=iPhone 15' test | xcbeautify
     end
 
     desc "Deploy the app for a given flavour: alpha, beta, release"
