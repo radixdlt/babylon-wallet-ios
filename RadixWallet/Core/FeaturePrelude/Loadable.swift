@@ -1,4 +1,3 @@
-
 /**
  Loadable represents a value that can be either not loaded, loading or loaded. In the case when it has been loaded, that may or may not have succeeded.
  Typically it would contain the result of calling a remote API.
@@ -49,6 +48,7 @@
  ```
  where `state.$user.userName.firstName` is a `Loadable<String>`, similar to how `Binding` works.
  */
+
 @propertyWrapper
 @dynamicMemberLookup
 public enum Loadable<Value> {
