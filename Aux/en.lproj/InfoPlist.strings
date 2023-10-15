@@ -1,0 +1,14 @@
+// A message that tells the user why the app is requesting access to the device’s camera.
+NSCameraUsageDescription = "This lets you scan QR codes for Radix Connect linking.";
+
+// A message that tells the user why the app needs access to the user’s Desktop folder.
+NSDesktopFolderUsageDescription = "This lets you import a Radix Wallet backup manually.";
+
+// A message that tells the user why the app needs access to the user’s Documents folder.
+NSDocumentsFolderUsageDescription = "This lets you import a Radix Wallet backup manually.";
+
+// A message that tells the user why the app needs access to the user’s Downloads folder.
+NSDownloadsFolderUsageDescription = "This lets you import a Radix Wallet backup manually.";
+
+// A message that tells the user why the app is requesting the ability to authenticate with Face ID.
+NSFaceIDUsageDescription = "This app authenticates you when signing transactions and connecting to dApps.";
