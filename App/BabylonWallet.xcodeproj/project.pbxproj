@@ -2816,6 +2816,7 @@
 			baseConfigurationReference = 833DA0902A0B7BB0004D0A4D /* Project-PreAlpha.xcconfig */;
 			buildSettings = {
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "$(DEV_TEAM)";
 				OTHER_SWIFT_FLAGS = "-DPREALPHA";
 			};
 			name = "Debug-PreAlpha";
@@ -2839,6 +2840,7 @@
 			baseConfigurationReference = 839D88D7294B34150098B586 /* Project-Dev.xcconfig */;
 			buildSettings = {
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "$(DEV_TEAM)";
 				OTHER_SWIFT_FLAGS = "-DDEV";
 			};
 			name = "Debug-Dev";
@@ -2862,6 +2864,7 @@
 			baseConfigurationReference = 839D88D3294B34140098B586 /* Project-Beta.xcconfig */;
 			buildSettings = {
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "$(DEV_TEAM)";
 				OTHER_SWIFT_FLAGS = "-DBETA";
 			};
 			name = Beta;
@@ -2885,6 +2888,7 @@
 			baseConfigurationReference = 839D88D6294B34150098B586 /* Project-Alpha.xcconfig */;
 			buildSettings = {
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "$(DEV_TEAM)";
 				OTHER_SWIFT_FLAGS = "-DALPHA";
 			};
 			name = "Debug-Alpha";
@@ -4190,6 +4194,7 @@
 			baseConfigurationReference = 839D88D5294B34150098B586 /* Project-Release.xcconfig */;
 			buildSettings = {
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "$(DEV_TEAM)";
 				OTHER_SWIFT_FLAGS = "-DRELEASE";
 			};
 			name = Release;

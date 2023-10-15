@@ -6,6 +6,20 @@ before_all do
     ensure_git_status_clean
 end
 
+def xcb(action, scheme)
+    # `sh` runs in `./fastlane/` not root, so must use '../App/'
+    # https://docs.fastlane.tools/actions/sh/
+    operation = "
+    xcodebuild \
+        -project '../App/BabylonWallet.xcodeproj' \
+        -scheme '#{scheme}' \
+        -destination 'platform=iOS Simulator,name=iPhone 15' \
+        #{action} \
+        | xcbeautify -q --is-ci
+    "
+    sh(operation)
+end
+
 platform :ios do
     before_all do
         Dotenv.load ".env.ios"
@@ -22,14 +36,8 @@ platform :ios do
     lane :tests do
         Dotenv.load ".env.ios.dev"
 
-        # `sh` runs in `./fastlane/` not root, so must use '../'
-        # https://docs.fastlane.tools/actions/sh/
-        test = "xcodebuild \
-          -project '../App/BabylonWallet.xcodeproj' \
-          -scheme 'RadixWalletTests' \
-          -destination 'platform=iOS Simulator,name=iPhone 15' \
-          test | xcbeautify -q --is-ci"
-        sh(test)
+        xcb('clean build', 'Radix Wallet Dev (iOS)')
+        xcb('test', 'RadixWalletTests')
     end
 
     desc "Deploy the app for a given flavour: alpha, beta, release"
