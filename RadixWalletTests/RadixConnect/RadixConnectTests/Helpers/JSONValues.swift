@@ -6,12 +6,12 @@ extension SignalingClient.IncomingMessage.FromSignalingServer.ResponseForRequest
 	var json: JSONValue {
 		switch self {
 		case let .success(value):
-			return .dictionary([
+			.dictionary([
 				"info": .string("confirmation"),
 				"requestId": .string(value.rawValue),
 			])
 		case .failure:
-			return .dictionary([
+			.dictionary([
 				"info": .string("missingRemoteClientError"),
 				"requestId": .string(self.requestId!.rawValue),
 			])
@@ -49,27 +49,25 @@ extension RTCPrimitive {
 	var payload: JSONValue {
 		switch self {
 		case let .offer(offer):
-			return offer.payload
+			offer.payload
 		case let .answer(answer):
-			return answer.payload
+			answer.payload
 		case let .iceCandidate(iceCandidate):
-			return iceCandidate.payload
+			iceCandidate.payload
 		}
 	}
 }
 
 extension SignalingClient.IncomingMessage.FromSignalingServer.Notification {
 	var payload: JSONValue {
-		let infoKey: String = {
-			switch self {
-			case .remoteClientJustConnected:
-				return "remoteClientJustConnected"
-			case .remoteClientDisconnected:
-				return "remoteClientDisconnected"
-			case .remoteClientIsAlreadyConnected:
-				return "remoteClientIsAlreadyConnected"
-			}
-		}()
+		let infoKey = switch self {
+		case .remoteClientJustConnected:
+			"remoteClientJustConnected"
+		case .remoteClientDisconnected:
+			"remoteClientDisconnected"
+		case .remoteClientIsAlreadyConnected:
+			"remoteClientIsAlreadyConnected"
+		}
 
 		return .dictionary([
 			"info": .string(infoKey),

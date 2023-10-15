@@ -4,14 +4,14 @@ extension EntityProtocol {
 	func publicKey() -> SLIP10.PublicKey? {
 		switch securityState {
 		case let .unsecured(control):
-			return control.transactionSigning.publicKey
+			control.transactionSigning.publicKey
 		}
 	}
 
 	func authPublicKey() -> SLIP10.PublicKey? {
 		switch securityState {
 		case let .unsecured(control):
-			return control.authenticationSigning?.publicKey
+			control.authenticationSigning?.publicKey
 		}
 	}
 }

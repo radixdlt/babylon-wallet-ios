@@ -114,9 +114,9 @@ final class GatewaySettingsFeatureTests: TestCase {
 			}
 			$0.gatewaysClient.getAllGateways = {
 				if await isGatewayRemoved.value == true {
-					return .init(rawValue: .init(uniqueElements: otherAfterDeletion))!
+					.init(rawValue: .init(uniqueElements: otherAfterDeletion))!
 				} else {
-					return .init(rawValue: .init(uniqueElements: otherGateways))!
+					.init(rawValue: .init(uniqueElements: otherGateways))!
 				}
 			}
 			$0.gatewaysClient.gatewaysValues = {

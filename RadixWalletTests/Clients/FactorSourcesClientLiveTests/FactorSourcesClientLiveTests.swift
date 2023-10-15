@@ -85,10 +85,10 @@ extension FactorSource: Comparable {
 	public static func < (lhs: Self, rhs: Self) -> Bool {
 		switch (lhs, rhs) {
 		case let (.device(l), .device(r)):
-			return l < r
+			l < r
 		case let (.ledger(l), .ledger(r)):
-			return l < r
-		default: return true
+			l < r
+		default: true
 		}
 	}
 }

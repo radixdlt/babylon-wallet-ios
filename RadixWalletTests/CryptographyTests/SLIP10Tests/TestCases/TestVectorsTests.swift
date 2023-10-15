@@ -188,9 +188,9 @@ enum CurveToTest: String, Decodable, Hashable {
 
 	var curveType: any SLIP10CurveProtocol.Type {
 		switch self {
-		case .secp256k1: return SECP256K1.self
-		case .curve25519: return Curve25519.self
-		case .p256: return P256.self
+		case .secp256k1: SECP256K1.self
+		case .curve25519: Curve25519.self
+		case .p256: P256.self
 		}
 	}
 }
@@ -209,7 +209,7 @@ extension HD.Root {
 	) throws -> ExtendedKey {
 		switch curve {
 		case .curve25519:
-			return try .init(
+			try .init(
 				concrete: derivePrivateKey(
 					path: path,
 					curve: Curve25519.self
@@ -217,7 +217,7 @@ extension HD.Root {
 			)
 
 		case .secp256k1:
-			return try .init(
+			try .init(
 				concrete: derivePrivateKey(
 					path: path,
 					curve: SECP256K1.self
@@ -225,7 +225,7 @@ extension HD.Root {
 			)
 
 		case .p256:
-			return try .init(
+			try .init(
 				concrete: derivePrivateKey(
 					path: path,
 					curve: P256.self

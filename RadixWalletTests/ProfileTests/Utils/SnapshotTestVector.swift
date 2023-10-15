@@ -81,7 +81,7 @@ extension SnapshotTestVector {
 
 	public func validateAllEntitiesWithMnemonics() throws {
 		for network in plaintext.networks.values {
-			func validate<Entity: EntityProtocol>(_ entity: Entity) throws {
+			func validate(_ entity: some EntityProtocol) throws {
 				switch entity.securityState {
 				case let .unsecured(entityControl):
 					let txSignFactorInstance = entityControl.transactionSigning

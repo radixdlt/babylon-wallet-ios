@@ -1,0 +1,311 @@
+{
+  "configurations" : [
+    {
+      "id" : "C375E7F8-3DFB-4A44-85C5-A2EB806466AC",
+      "name" : "Configuration 1",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:BabylonWallet.xcodeproj",
+        "identifier" : "4809C84B2ADA8F01005EA157",
+        "name" : "RadixWalletTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:..",
+        "identifier" : "ProfileStoreTests",
+        "name" : "ProfileStoreTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:..",
+        "identifier" : "AccountDetailsFeatureTests",
+        "name" : "AccountDetailsFeatureTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:..",
+        "identifier" : "AccountPreferencesFeatureTests",
+        "name" : "AccountPreferencesFeatureTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:..",
+        "identifier" : "AccountsClientLiveTests",
+        "name" : "AccountsClientLiveTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:..",
+        "identifier" : "AppFeatureTests",
+        "name" : "AppFeatureTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:..",
+        "identifier" : "AppPreferencesClientLiveTests",
+        "name" : "AppPreferencesClientLiveTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:..",
+        "identifier" : "AssetTransferFeatureTests",
+        "name" : "AssetTransferFeatureTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:..",
+        "identifier" : "AuthorizedDappsClientLiveTests",
+        "name" : "AuthorizedDappsClientLiveTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:..",
+        "identifier" : "CacheClientTests",
+        "name" : "CacheClientTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:..",
+        "identifier" : "CryptographyTests",
+        "name" : "CryptographyTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:..",
+        "identifier" : "DappInteractionFeatureTests",
+        "name" : "DappInteractionFeatureTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:..",
+        "identifier" : "DiskPersistenceClientTests",
+        "name" : "DiskPersistenceClientTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:..",
+        "identifier" : "EngineKitTests",
+        "name" : "EngineKitTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:..",
+        "identifier" : "FactorSourcesClientLiveTests",
+        "name" : "FactorSourcesClientLiveTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:..",
+        "identifier" : "FaucetClientTests",
+        "name" : "FaucetClientTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:..",
+        "identifier" : "FeaturePreludeTests",
+        "name" : "FeaturePreludeTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:..",
+        "identifier" : "GatewaySettingsFeatureTests",
+        "name" : "GatewaySettingsFeatureTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:..",
+        "identifier" : "GatewaysClientLiveTests",
+        "name" : "GatewaysClientLiveTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:..",
+        "identifier" : "HomeFeatureTests",
+        "name" : "HomeFeatureTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:..",
+        "identifier" : "ImportLegacyWalletClientTests",
+        "name" : "ImportLegacyWalletClientTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:..",
+        "identifier" : "LocalAuthenticationClientTests",
+        "name" : "LocalAuthenticationClientTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:..",
+        "identifier" : "MainFeatureTests",
+        "name" : "MainFeatureTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:..",
+        "identifier" : "NewConnectionFeatureTests",
+        "name" : "NewConnectionFeatureTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:..",
+        "identifier" : "OnLedgerEntitiesClientTests",
+        "name" : "OnLedgerEntitiesClientTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:..",
+        "identifier" : "OnboardingClientLiveTests",
+        "name" : "OnboardingClientLiveTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:..",
+        "identifier" : "OnboardingFeatureTests",
+        "name" : "OnboardingFeatureTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:..",
+        "identifier" : "P2PLinksClientLiveTests",
+        "name" : "P2PLinksClientLiveTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:..",
+        "identifier" : "P2PLinksFeatureTests",
+        "name" : "P2PLinksFeatureTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:..",
+        "identifier" : "PersonasClientLiveTests",
+        "name" : "PersonasClientLiveTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:..",
+        "identifier" : "PreludeTests",
+        "name" : "PreludeTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:..",
+        "identifier" : "ProfileTests",
+        "name" : "ProfileTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:..",
+        "identifier" : "ROLAClientTests",
+        "name" : "ROLAClientTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:..",
+        "identifier" : "RadixConnectClientTests",
+        "name" : "RadixConnectClientTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:..",
+        "identifier" : "RadixConnectModelsTests",
+        "name" : "RadixConnectModelsTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:..",
+        "identifier" : "RadixConnectTests",
+        "name" : "RadixConnectTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:..",
+        "identifier" : "SecureStorageClientTests",
+        "name" : "SecureStorageClientTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:..",
+        "identifier" : "SettingsFeatureTests",
+        "name" : "SettingsFeatureTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:..",
+        "identifier" : "SharedModelsTests",
+        "name" : "SharedModelsTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:..",
+        "identifier" : "SplashFeatureTests",
+        "name" : "SplashFeatureTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:..",
+        "identifier" : "TransactionClientTests",
+        "name" : "TransactionClientTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:..",
+        "identifier" : "TransactionReviewFeatureTests",
+        "name" : "TransactionReviewFeatureTests"
+      }
+    }
+  ],
+  "version" : 1
+}

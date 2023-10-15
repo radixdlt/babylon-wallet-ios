@@ -75,22 +75,20 @@ final class CAP26Tests: TestCase {
 			let index = vector.entityIndex
 			let entityKind = try XCTUnwrap(EntityKind(rawValue: vector.entityKind))
 			let keyKind = try XCTUnwrap(KeyKind(rawValue: vector.keyKind))
-			let entityPath: any EntityDerivationPathProtocol = try {
-				switch entityKind {
-				case .account:
-					return try AccountBabylonDerivationPath(
-						networkID: networkID,
-						index: index,
-						keyKind: keyKind
-					)
-				case .identity:
-					return try IdentityHierarchicalDeterministicDerivationPath(
-						networkID: networkID,
-						index: index,
-						keyKind: keyKind
-					)
-				}
-			}()
+			let entityPath: any EntityDerivationPathProtocol = switch entityKind {
+			case .account:
+				try AccountBabylonDerivationPath(
+					networkID: networkID,
+					index: index,
+					keyKind: keyKind
+				)
+			case .identity:
+				try IdentityHierarchicalDeterministicDerivationPath(
+					networkID: networkID,
+					index: index,
+					keyKind: keyKind
+				)
+			}
 
 			XCTAssertEqual(entityPath.networkID, networkID)
 			XCTAssertEqual(entityPath.entityKind, entityKind)
@@ -147,8 +145,8 @@ final class CAP26Tests: TestCase {
 			return test
 		}
 
-		func doDoTest<P: EntityDerivationPathProtocol & Equatable, Curve: SLIP10CurveProtocol>(
-			hdPathType: P.Type,
+		func doDoTest<Curve: SLIP10CurveProtocol>(
+			hdPathType: (some EntityDerivationPathProtocol & Equatable).Type,
 			curve: Curve.Type
 		) throws -> TestGroup {
 			let entityKind = hdPathType.Entity.entityKind
@@ -212,15 +210,15 @@ final class CAP26Tests: TestCase {
 extension EntityKind {
 	var name: String {
 		switch self {
-		case .account: return "ACCOUNT"
-		case .identity: return "IDENTITY"
+		case .account: "ACCOUNT"
+		case .identity: "IDENTITY"
 		}
 	}
 
 	var emoji: String {
 		switch self {
-		case .account: return "💸"
-		case .identity: return "🎭"
+		case .account: "💸"
+		case .identity: "🎭"
 		}
 	}
 }
@@ -228,9 +226,9 @@ extension EntityKind {
 extension KeyKind {
 	var emoji: String {
 		switch self {
-		case .transactionSigning: return "✍️"
-		case .authenticationSigning: return "🛂"
-		case .messageEncryption: return "📨"
+		case .transactionSigning: "✍️"
+		case .authenticationSigning: "🛂"
+		case .messageEncryption: "📨"
 		}
 	}
 }

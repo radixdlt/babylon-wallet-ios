@@ -106,13 +106,13 @@ extension DataChannelClient.Message {
 	var json: JSONValue {
 		switch self {
 		case let .chunkedMessage(.metaData(metaData)):
-			return metaData.json
+			metaData.json
 		case let .chunkedMessage(.chunk(chunk)):
-			return chunk.json
+			chunk.json
 		case let .receipt(.receiveMessageConfirmation(confirmation)):
-			return confirmation.json
+			confirmation.json
 		case let .receipt(.receiveMessageError(error)):
-			return error.json
+			error.json
 		}
 	}
 }
