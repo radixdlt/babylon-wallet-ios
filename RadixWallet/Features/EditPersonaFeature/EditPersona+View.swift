@@ -5,11 +5,13 @@ extension EditPersona.State {
 		.init(
 			personaLabel: persona.displayName.rawValue,
 			avatarURL: URL(string: "something")!,
-			addAFieldButtonState: if alreadyAddedEntryKinds.count < EntryKind.supportedKinds.count {
-				.enabled
-			} else {
-				.disabled
-			},
+			addAFieldButtonState: {
+				if alreadyAddedEntryKinds.count < EntryKind.supportedKinds.count {
+					.enabled
+				} else {
+					.disabled
+				}
+			}(),
 			output: { () -> EditPersona.Output? in
 				guard
 					let personaLabelInput = labelField.input,

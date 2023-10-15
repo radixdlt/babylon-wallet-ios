@@ -1,4 +1,4 @@
-import EngineToolkitimport EngineToolkit
+import EngineToolkit
 
 // MARK: - PersonaData.Name
 extension PersonaData {
@@ -43,10 +43,12 @@ extension PersonaData {
 		}
 
 		public var formatted: String {
-			let names = switch variant {
-			case .western: [givenNames, familyName]
-			case .eastern: [familyName, givenNames]
-			}.compactMap { NonEmptyString($0) }
+			let names = {
+				switch variant {
+				case .western: [givenNames, familyName]
+				case .eastern: [familyName, givenNames]
+				}
+			}().compactMap { NonEmptyString($0) }
 
 			return [
 				NonEmptyString(names.joined(separator: " ")),

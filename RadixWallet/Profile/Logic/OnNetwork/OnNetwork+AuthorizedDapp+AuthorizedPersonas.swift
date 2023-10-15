@@ -1,4 +1,4 @@
-import EngineToolkitimport EngineToolkit
+import EngineToolkit
 
 // MARK: ~~~=== LOGIC ===~~~
 extension Profile.Network {
@@ -66,7 +66,7 @@ extension Profile.Network {
 			return try AuthorizedPersonaDetailed(
 				identityAddress: persona.address,
 				displayName: persona.displayName,
-				simpleAccounts: if let sharedAccounts = simple.sharedAccounts {
+				simpleAccounts: { if let sharedAccounts = simple.sharedAccounts {
 					try .init(sharedAccounts.ids.map { accountAddress in
 						guard
 							let account = self.accounts.first(where: { $0.address == accountAddress })
@@ -81,7 +81,7 @@ extension Profile.Network {
 					})
 				} else {
 					nil
-				},
+				}}(),
 				sharedPersonaData: {
 					let full = persona.personaData
 					let fullIDs = Set(full.entries.map(\.id))

@@ -3,7 +3,7 @@ public struct PrimaryTextButtonStyle: ButtonStyle {
 	@Environment(\.isEnabled) var isEnabled: Bool
 	let isDestructive: Bool
 
-	public func makeBody(configuration: Configuration) -> some View {
+	public func makeBody(configuration: ButtonStyle.Configuration) -> some View {
 		configuration.label
 			.foregroundColor(foregroundColor)
 			.font(.app.body1StandaloneLink)

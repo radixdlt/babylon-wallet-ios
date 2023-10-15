@@ -70,9 +70,7 @@ extension AddAsset {
 			}
 			.presentationDetents([.fraction(0.75)])
 			.presentationDragIndicator(.visible)
-			#if os(iOS)
-				.presentationBackground(.blur)
-			#endif
+//				.presentationBackground(.blur)
 		}
 	}
 }

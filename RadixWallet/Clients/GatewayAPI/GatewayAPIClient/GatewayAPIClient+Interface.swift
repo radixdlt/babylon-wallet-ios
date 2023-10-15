@@ -1,3 +1,4 @@
+import Algorithms
 
 public typealias ResourceIdentifier = String
 

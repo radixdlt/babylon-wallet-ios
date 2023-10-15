@@ -90,13 +90,13 @@ private extension NewAccountCompletion.View {
 		with viewStore: ViewStoreOf<NewAccountCompletion>
 	) -> some View {
 		ZStack {
-			ForEach(0 ..< Constants.transparentCardsCount, id: \.self) { index in
+			ForEach(0 ..< transparentCardsCount, id: \.self) { index in
 				Profile.Network.Account.AppearanceID.fromIndex(Int(viewStore.appearanceID.rawValue) + index).gradient.opacity(0.2)
-					.frame(width: Constants.cardFrame.width, height: Constants.cardFrame.height)
+					.frame(width: cardFrame.width, height: cardFrame.height)
 					.cornerRadius(.small1)
 					.scaleEffect(scale(index: index))
-					.zIndex(reversedZIndex(count: Constants.transparentCardsCount, index: index))
-					.offset(y: Constants.transparentCardOffset * CGFloat(index + 1))
+					.zIndex(reversedZIndex(count: transparentCardsCount, index: index))
+					.offset(y: transparentCardOffset * CGFloat(index + 1))
 			}
 
 			VStack(spacing: .small2) {
@@ -109,7 +109,7 @@ private extension NewAccountCompletion.View {
 					.foregroundColor(.app.whiteTransparent)
 					.textStyle(.body2HighImportance)
 			}
-			.frame(width: Constants.cardFrame.width, height: Constants.cardFrame.height)
+			.frame(width: cardFrame.width, height: cardFrame.height)
 			.background(viewStore.appearanceID.gradient)
 			.cornerRadius(.small1)
 			.padding(.horizontal, .medium1)
@@ -125,28 +125,6 @@ private extension NewAccountCompletion.View {
 	}
 }
 
-// MARK: - Constants
-private enum Constants {
-	static let cardFrame: CGSize = .init(width: 277, height: 85)
-	static let transparentCardsCount: Int = 3
-	static let transparentCardOffset: CGFloat = .small1
-}
-
-// #if DEBUG
-// import SwiftUI
-import ComposableArchitecture //
-// struct AccountCompletion_Preview: PreviewProvider {
-//	static var previews: some View {
-//		NewEntityCompletion<Profile.Network.Account>.View(
-//			store: .init(
-//				initialState: .init(
-//					entity: .previewValue0,
-//					config: .init(purpose: .newAccountFromHome)
-//				),
-//				reducer: NewEntityCompletion.init
-//			)
-//		)
-//	}
-// }
-//
-// #endif
+private let cardFrame: CGSize = .init(width: 277, height: 85)
+private let transparentCardsCount: Int = 3
+private let transparentCardOffset: CGFloat = .small1

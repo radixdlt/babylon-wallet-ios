@@ -1,4 +1,4 @@
-import EngineToolkitimport EngineToolkit
+import EngineToolkit
 extension AppPreferences {
 	public mutating func updateDisplay(_ display: Display) {
 		self.display = display

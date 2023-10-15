@@ -1,4 +1,4 @@
-import EngineToolkitimport EngineToolkit
+import EngineToolkit
 public typealias Address = SpecificAddress<GeneralEntityType>
 
 // public typealias EntityAddress = SpecificAddress<EntityEntityType>

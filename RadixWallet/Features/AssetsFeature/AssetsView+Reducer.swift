@@ -470,11 +470,3 @@ extension NonFungibleTokensPerResourceProvider {
 		)
 	}
 }
-
-extension Array where Element: Identifiable {
-	func asIdentifiable() -> IdentifiedArrayOf<Element> {
-		var array: IdentifiedArrayOf<Element> = []
-		array.append(contentsOf: self)
-		return array
-	}
-}

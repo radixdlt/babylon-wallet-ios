@@ -1,7 +1,5 @@
-import ComposableArchitecture
-import SwiftUI
-
 // MARK: - DeleteExistingFactorSourceConfirmationDialogAction
+
 public enum DeleteExistingFactorSourceConfirmationDialogAction: Sendable, Hashable {
 	case deleteExistingFactorSource(FactorSourceID)
 	case cancel
@@ -61,8 +59,8 @@ public struct FactorSourcesOfKindList<FactorSourceOfKind: Sendable & Hashable>: 
 				return true
 			case .device:
 				// Well... it is complicated, we don't allow users to manually create more Babylon device
-				// factor sources. But user can import SwiftUI
-				import ComposableArchitecture return true
+				// factor sources. But user can import as many legacy/olympia device factor source they want.
+				return true
 			}
 		}
 	}

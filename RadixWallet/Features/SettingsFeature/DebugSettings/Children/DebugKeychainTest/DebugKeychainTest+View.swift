@@ -1,4 +1,8 @@
-import ComposableArchitecture#if DEBUG
+#if DEBUG
+
+import ComposableArchitecture
+import SwiftUI
+
 extension DebugKeychainTest.State {
 	var viewState: DebugKeychainTest.ViewState {
 		.init(
@@ -129,4 +133,3 @@ extension DebugKeychainTest.Status {
 }
 
 #endif
-import SwiftUI

@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import SwiftUI
+
 extension PersonaDataPermissionBox.State {
 	var viewState: PersonaDataPermissionBox.ViewState {
 		.init(
@@ -98,8 +99,8 @@ extension PersonaDataPermissionBox {
 
 //
 // #if DEBUG
-// import SwiftUI
-import ComposableArchitecture //
+// import SwiftUI // NB: necessary for previews to appear
+//
 // struct PersonaDataPermissionBox_PreviewProvider: PreviewProvider {
 //	static var previews: some View {
 //		WithState(initialValue: false) { $isSelected in

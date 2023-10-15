@@ -1,6 +1,7 @@
 // MARK: - RelayState
-@_spi(Internals)
+@_spi(Internals) import ComposableArchitecture
 
+// MARK: - RelayState
 public struct RelayState<RelayedState, MainState> {
 	public let relayedState: RelayedState
 	public var mainState: MainState

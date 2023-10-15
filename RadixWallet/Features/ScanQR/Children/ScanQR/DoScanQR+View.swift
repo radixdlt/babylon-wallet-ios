@@ -1,3 +1,4 @@
+import CodeScanner
 import ComposableArchitecture
 import SwiftUI
 
@@ -11,16 +12,16 @@ extension ScanQR.State {
 extension ScanQR {
 	public struct ViewState: Equatable {
 		public let scanMode: QRScanMode
-		#if os(macOS) || (os(iOS) && targetEnvironment(simulator))
+		#if targetEnvironment(simulator)
 		public var manualQRContent: String
-		#endif // macOS
+		#endif // sim
 		public let instructions: String
 		init(state: ScanQR.State) {
 			self.scanMode = state.scanMode
 			self.instructions = state.scanInstructions
-			#if os(macOS) || (os(iOS) && targetEnvironment(simulator))
+			#if targetEnvironment(simulator)
 			self.manualQRContent = state.manualQRContent
-			#endif // macOS
+			#endif // sim
 		}
 	}
 
@@ -35,10 +36,10 @@ extension ScanQR {
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				VStack(spacing: .medium1) {
-					#if os(iOS) && !targetEnvironment(simulator)
+					#if !targetEnvironment(simulator)
 					scanQRCode(viewStore: viewStore)
 					#else
-					macOSInputView(viewStore: viewStore)
+					simulatorInputView(viewStore: viewStore)
 					#endif
 					Spacer()
 				}
@@ -64,7 +65,6 @@ public enum QRScanMode: Sendable, Hashable {
 
 	public static let `default`: Self = .oncePerCode
 
-	#if os(iOS)
 	func forCodeScannerView() -> ScanMode {
 		switch self {
 		case .continuous: .continuous
@@ -73,7 +73,6 @@ public enum QRScanMode: Sendable, Hashable {
 		case .once: .once
 		}
 	}
-	#endif
 }
 
 extension ScanQR.View {
@@ -81,7 +80,7 @@ extension ScanQR.View {
 	private func scanQRCode(
 		viewStore: ViewStoreOf<ScanQR>
 	) -> some View {
-		#if os(iOS) && !targetEnvironment(simulator)
+		#if !targetEnvironment(simulator)
 
 		Text(viewStore.instructions)
 			.foregroundColor(.app.gray1)
@@ -104,14 +103,14 @@ extension ScanQR.View {
 
 		#else
 		EmptyView()
-		#endif // os(iOS) && !TARGET_OS_SIMULATOR
+		#endif // !TARGET_OS_SIMULATOR
 	}
 
 	@ViewBuilder
-	private func macOSInputView(
+	private func simulatorInputView(
 		viewStore: ViewStoreOf<ScanQR>
 	) -> some View {
-		#if os(macOS) || (os(iOS) && targetEnvironment(simulator))
+		#if targetEnvironment(simulator)
 		VStack(alignment: .center) {
 			Text("Manually input QR string content")
 			TextField(
@@ -128,7 +127,7 @@ extension ScanQR.View {
 		}
 		#else
 		EmptyView()
-		#endif // macOS
+		#endif // sim
 	}
 }
 

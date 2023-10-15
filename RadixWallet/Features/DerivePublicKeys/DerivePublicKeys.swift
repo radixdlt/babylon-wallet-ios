@@ -13,8 +13,8 @@ public struct DerivePublicKeys: Sendable, FeatureReducer {
 		public let derivationsPathOption: DerivationPathOption
 		public var ledgerBeingUsed: LedgerHardwareWalletFactorSource?
 		public enum DerivationPathOption: Sendable, Hashable {
-			case knownPaths([DerivationPath], networkID: NetworkID) // derivation paths must not be a Set, since import SwiftUI
-			import ComposableArchitecture case next(networkOption: NetworkOption, entityKind: EntityKind, curve: SLIP10.Curve)
+			case knownPaths([DerivationPath], networkID: NetworkID) // derivation paths must not be a Set, since import from Olympia can contain duplicate derivation paths, for different Ledger devices.
+			case next(networkOption: NetworkOption, entityKind: EntityKind, curve: SLIP10.Curve)
 
 			public enum NetworkOption: Sendable, Hashable {
 				case specific(NetworkID)

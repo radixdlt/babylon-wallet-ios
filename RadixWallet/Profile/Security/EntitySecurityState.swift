@@ -1,4 +1,4 @@
-import EngineToolkitimport EngineToolkit
+import EngineToolkit
 
 // MARK: - _EntitySecurityStateProtocol
 protocol _EntitySecurityStateProtocol {

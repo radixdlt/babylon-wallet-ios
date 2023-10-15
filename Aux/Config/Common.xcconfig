@@ -11,3 +11,5 @@ APP_NAME = Radix Wallet
 
 /// Application's dev team id
 DEV_TEAM = MDH99V28LM
+
+ENABLE_TESTING_SEARCH_PATHS = YES

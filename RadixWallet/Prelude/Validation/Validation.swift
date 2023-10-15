@@ -1,10 +1,8 @@
 // MARK: - Validation
-@_exported
-
 @propertyWrapper
 @dynamicMemberLookup
 public struct Validation<Value, Error> {
-	@_spi(Validation) public var rawValue: Value?
+	public var rawValue: Value?
 	private let onNil: @Sendable () -> Error?
 	private let rules: [ValidationRule<Value, Error>]
 	private let exceptions: [@Sendable (Value) -> Bool]

@@ -16,7 +16,6 @@ extension AnswerSecurityQuestionsCoordinator {
 				store.scope(state: \.path, action: { .child(.path($0)) })
 			) {
 				path(for: self.store.scope(state: \.root, action: { .child(.root($0)) }))
-				#if os(iOS)
 					.toolbar {
 						ToolbarItem(placement: .navigationBarLeading) {
 							CloseButton {
@@ -24,12 +23,10 @@ extension AnswerSecurityQuestionsCoordinator {
 							}
 						}
 					}
-				#endif
 					// This is required to disable the animation of internal components during transition
 					.transaction { $0.animation = nil }
 			} destination: {
 				path(for: $0)
-				#if os(iOS)
 					.navigationBarBackButtonHidden()
 					.toolbar {
 						ToolbarItem(placement: .navigationBarLeading) {
@@ -38,11 +35,8 @@ extension AnswerSecurityQuestionsCoordinator {
 							}
 						}
 					}
-				#endif
 			}
-			#if os(iOS)
-			.navigationTransition(.slide, interactivity: .disabled)
-			#endif
+//			.navigationTransition(.slide, interactivity: .disabled)
 		}
 
 		func path(

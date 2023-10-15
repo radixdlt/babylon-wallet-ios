@@ -77,8 +77,7 @@ extension PersonaRow {
 }
 
 #if DEBUG
-import ComposableArchitecture
-import SwiftUI
+import struct SwiftUINavigation.WithState
 
 // MARK: - PersonaRow_Preview
 struct PersonaRow_Preview: PreviewProvider {

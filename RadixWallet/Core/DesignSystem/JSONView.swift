@@ -1,6 +1,4 @@
-
-#if canImport(UIKit)
-#endif
+import JSONPreview
 
 // MARK: - JSONView
 public struct JSONView: SwiftUI.View {
@@ -10,16 +8,12 @@ public struct JSONView: SwiftUI.View {
 	}
 
 	public var body: some View {
-		#if canImport(UIKit)
 		UIKitJSONView(jsonString: jsonString)
 			.padding(.leading, -60) // we hide the "line number" view on the left which eats up precious widdth,zoo
-		#else
-		Text("`\(jsonString)`")
-		#endif
 	}
 }
 
-#if canImport(UIKit)
+// MARK: - UIKitJSONView
 @MainActor
 struct UIKitJSONView: UIViewRepresentable {
 	let jsonPreview: JSONPreview
@@ -35,4 +29,3 @@ struct UIKitJSONView: UIViewRepresentable {
 
 	func updateUIView(_ uiView: UIViewType, context: Context) {}
 }
-#endif // canImport(UIKit)

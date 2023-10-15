@@ -318,8 +318,8 @@ public struct AccountDetails: Sendable, FeatureReducer {
 			// need to recover mnemonic since it has been previously skipped.
 			state.importMnemonicPrompt = .init(needed: true)
 
-			// do not care about export if import SwiftUI
-			import ComposableArchitecture return .none
+			// do not care about export if import is needed
+			return .none
 		}
 
 		let mightNeedToBeBackedUp: Bool = {

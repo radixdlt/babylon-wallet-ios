@@ -39,7 +39,7 @@ public struct CardButtonStyle: ButtonStyle {
 		self.color = color
 	}
 
-	public func makeBody(configuration: Configuration) -> some View {
+	public func makeBody(configuration: ButtonStyle.Configuration) -> some View {
 		configuration.label
 			.inCard(color, isPressed: configuration.isPressed)
 	}
@@ -115,7 +115,7 @@ public struct SpeechbubbleShape: Shape {
 		self.cornerRadius = cornerRadius
 	}
 
-	public func path(in rect: CGRect) -> Path {
+	public func path(in rect: CGRect) -> SwiftUI.Path {
 		let inner = rect.inset(by: .init(top: 0, left: 0, bottom: Self.triangleSize.height, right: 0))
 		let arcCenters = inner.insetBy(dx: cornerRadius, dy: cornerRadius)
 		return Path { path in

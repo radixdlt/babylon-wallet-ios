@@ -1,4 +1,4 @@
-import CryptoKitimport CryptoKit
+import CryptoKit
 extension BIP39 {
 	static func mapEntropyToWords(
 		entropy: Entropy,

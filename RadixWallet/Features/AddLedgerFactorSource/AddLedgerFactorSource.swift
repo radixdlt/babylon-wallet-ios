@@ -239,13 +239,3 @@ extension LedgerHardwareWalletFactorSource {
 		)
 	}
 }
-
-extension LedgerHardwareWalletFactorSource.DeviceModel {
-	init(model: P2P.LedgerHardwareWallet.Model) {
-		switch model {
-		case .nanoS: self = .nanoS
-		case .nanoX: self = .nanoX
-		case .nanoSPlus: self = .nanoSPlus
-		}
-	}
-}

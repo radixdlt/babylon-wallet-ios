@@ -1,4 +1,4 @@
-import WebRTCimport WebRTCimport WebRTCimport WebRTC
+import WebRTC
 
 // MARK: - SignalingClient.ClientMessage
 extension SignalingClient {

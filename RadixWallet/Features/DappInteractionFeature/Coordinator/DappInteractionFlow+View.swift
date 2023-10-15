@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import NavigationTransition
 import SwiftUI
 
 // MARK: - DappInteractionFlow.View
@@ -15,7 +16,6 @@ extension DappInteractionFlow {
 					store.scope(state: \.root, action: { .child(.root($0)) })
 				) {
 					destination(for: $0)
-					#if os(iOS)
 						.toolbar {
 							ToolbarItem(placement: .navigationBarLeading) {
 								CloseButton {
@@ -23,13 +23,11 @@ extension DappInteractionFlow {
 								}
 							}
 						}
-					#endif
 				}
 				// This is required to disable the animation of internal components during transition
 				.transaction { $0.animation = nil }
 			} destination: {
 				destination(for: $0)
-				#if os(iOS)
 					.navigationBarBackButtonHidden()
 					.toolbar {
 						ToolbarItem(placement: .navigationBarLeading) {
@@ -38,11 +36,8 @@ extension DappInteractionFlow {
 							}
 						}
 					}
-				#endif
 			}
-			#if os(iOS)
-			.navigationTransition(.slide, interactivity: .disabled)
-			#endif
+//			.navigationTransition(.slide, interactivity: .disabled)
 			.onAppear { store.send(.view(.appeared)) }
 			.alert(
 				store: store.scope(

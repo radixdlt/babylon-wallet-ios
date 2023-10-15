@@ -554,8 +554,8 @@ extension [OnLedgerEntity.OwnedFungibleResource] {
 // MARK: - OnLedgerEntity.OwnedFungibleResource + Comparable
 extension OnLedgerEntity.OwnedFungibleResource: Comparable {
 	public static func < (
-		lhs: SharedModels.OnLedgerEntity.OwnedFungibleResource,
-		rhs: SharedModels.OnLedgerEntity.OwnedFungibleResource
+		lhs: OnLedgerEntity.OwnedFungibleResource,
+		rhs: OnLedgerEntity.OwnedFungibleResource
 	) -> Bool {
 		if lhs.amount > .zero, rhs.amount > .zero {
 			return lhs.amount > rhs.amount // Sort descending by amount

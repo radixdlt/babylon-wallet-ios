@@ -1,4 +1,4 @@
-import WebRTCimport WebRTCimport WebRTC
+import WebRTC
 
 // MARK: - DataChannel
 /// This is mainly added to abstract the WebRTC.RTCDataChannel;

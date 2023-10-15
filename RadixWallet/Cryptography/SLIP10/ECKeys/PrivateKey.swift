@@ -1,4 +1,4 @@
-import CryptoKitimport CryptoKit
+import CryptoKit
 
 // MARK: - Curve25519.Signing.PrivateKey + Sendable
 extension Curve25519.Signing.PrivateKey: @unchecked Sendable {}

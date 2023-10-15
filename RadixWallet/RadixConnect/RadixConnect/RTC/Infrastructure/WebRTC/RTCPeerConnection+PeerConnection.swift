@@ -1,4 +1,4 @@
-import WebRTCimport WebRTCimport WebRTCimport WebRTC
+import WebRTC
 
 // MARK: - RTCPeerConnection + PeerConnection
 extension RTCPeerConnection: PeerConnection {

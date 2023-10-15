@@ -91,13 +91,6 @@ private func nonFungibleResourceAddress(at index: Int) -> String {
 	nonFungibleResourceAddresses[index % nonFungibleResourceAddresses.count]
 }
 
-extension FixedWidthInteger {
-	fileprivate var data: Data {
-		let data = withUnsafeBytes(of: self) { Data($0) }
-		return data
-	}
-}
-
 extension Data {
 	private var asUInt: UInt {
 		withUnsafeBytes { $0.load(as: UInt.self) }

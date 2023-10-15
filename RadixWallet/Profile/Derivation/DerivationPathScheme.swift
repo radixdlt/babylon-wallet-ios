@@ -1,4 +1,4 @@
-import EngineToolkitimport EngineToolkit
+import EngineToolkit
 
 // MARK: - DerivationPathScheme
 public enum DerivationPathScheme: String, Sendable, Hashable, Codable {

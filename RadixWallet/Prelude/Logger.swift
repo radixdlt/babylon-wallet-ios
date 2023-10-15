@@ -1,3 +1,6 @@
+import FileLogging
+import Logging
+import SwiftLogConsoleColors
 
 private let baseLabel = "com.radixpublishing"
 

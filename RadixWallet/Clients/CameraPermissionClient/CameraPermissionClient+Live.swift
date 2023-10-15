@@ -1,3 +1,6 @@
+import AVFoundation
+import SwiftUI
+import UIKit
 
 // MARK: - UserDefaultsClient + DependencyKey
 extension CameraPermissionClient: DependencyKey {

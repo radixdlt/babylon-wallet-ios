@@ -1,4 +1,4 @@
-import WebRTCimport WebRTCimport WebRTC
+import WebRTC
 
 // MARK: - SignalingTransport
 /// The Transport used to send and receive messages

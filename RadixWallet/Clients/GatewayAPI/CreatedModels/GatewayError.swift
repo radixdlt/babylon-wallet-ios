@@ -1,4 +1,5 @@
 #if canImport(AnyCodable)
+import AnyCodable
 #endif
 
 @available(*, deprecated, renamed: "GatewayAPI.GatewayError")

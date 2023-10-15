@@ -14,16 +14,18 @@ extension AccountPermission {
 			self.title = L10n.DAppRequest.AccountPermission.title
 			self.subtitle = L10n.DAppRequest.AccountPermission.subtitle(state.dappMetadata.name)
 
-			self.numberOfAccounts = "•  " + switch (state.numberOfAccounts.quantifier, state.numberOfAccounts.quantity) {
-			case (.atLeast, 0):
-				L10n.DAppRequest.AccountPermission.numberOfAccountsAtLeastZero
-			case let (.atLeast, number):
-				L10n.DAppRequest.AccountPermission.numberOfAccountsAtLeast(number)
-			case (.exactly, 1):
-				L10n.DAppRequest.AccountPermission.numberOfAccountsExactlyOne
-			case let (.exactly, number):
-				L10n.DAppRequest.AccountPermission.numberOfAccountsExactly(number)
-			}
+			self.numberOfAccounts = "•  " + {
+				switch (state.numberOfAccounts.quantifier, state.numberOfAccounts.quantity) {
+				case (.atLeast, 0):
+					L10n.DAppRequest.AccountPermission.numberOfAccountsAtLeastZero
+				case let (.atLeast, number):
+					L10n.DAppRequest.AccountPermission.numberOfAccountsAtLeast(number)
+				case (.exactly, 1):
+					L10n.DAppRequest.AccountPermission.numberOfAccountsExactlyOne
+				case let (.exactly, number):
+					L10n.DAppRequest.AccountPermission.numberOfAccountsExactly(number)
+				}
+			}()
 		}
 	}
 

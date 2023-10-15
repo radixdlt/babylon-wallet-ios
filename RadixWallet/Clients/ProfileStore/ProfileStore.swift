@@ -1,3 +1,5 @@
+import Atomics
+
 // MARK: - ProfileStore
 /// An in-memory store for the `Profile` providing thread safe
 /// read and write access to the wallets profile. Every write

@@ -27,7 +27,7 @@ public struct AddNewGateway: Sendable, FeatureReducer {
 	public enum InternalAction: Sendable, Equatable {
 		case focusTextField(State.Field?)
 		case gatewayValidationResult(TaskResult<Radix.Gateway?>)
-		case addGatewayResult(TaskResult<Prelude.Unit>)
+		case addGatewayResult(TaskResult<EqVoid>)
 		case showDuplicateURLError
 		case validateNewGateway(URL)
 	}
@@ -94,7 +94,7 @@ public struct AddNewGateway: Sendable, FeatureReducer {
 			return .run { send in
 				let result = await TaskResult {
 					let _ = try await gatewaysClient.addGateway(gateway)
-					return Unit.instance
+					return EqVoid.instance
 				}
 				await send(.internal(.addGatewayResult(result)))
 			}

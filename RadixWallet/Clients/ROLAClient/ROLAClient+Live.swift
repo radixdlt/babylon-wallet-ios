@@ -1,3 +1,4 @@
+import EngineToolkit
 
 extension ROLAClient {
 	public static let liveValue: Self = {
@@ -148,7 +149,7 @@ func payloadToHash(
 	)
 }
 
-extension EngineKit.PublicKeyHash {
+extension EngineToolkit.PublicKeyHash {
 	public struct InvalidPublicKeyHashLength: Error {
 		public let got: Int
 		public let expected: Int
@@ -175,7 +176,7 @@ extension EngineKit.PublicKeyHash {
 }
 
 extension OnLedgerEntity.Metadata {
-	public func ownerKeyHashes() throws -> [EngineKit.PublicKeyHash]? {
+	public func ownerKeyHashes() throws -> [EngineToolkit.PublicKeyHash]? {
 		try ownerKeys?.compactMap { hash in
 			switch hash {
 			case let .ecdsaSecp256k1(value):

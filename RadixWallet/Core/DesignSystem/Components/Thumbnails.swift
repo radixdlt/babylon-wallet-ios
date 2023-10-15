@@ -1,3 +1,6 @@
+import NukeUI
+import SwiftUI
+
 // MARK: - DappThumbnail
 public struct DappThumbnail: View {
 	private let content: Content

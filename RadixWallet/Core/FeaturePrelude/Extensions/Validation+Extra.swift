@@ -1,5 +1,3 @@
-@_spi(Validation)
-
 // MARK: Vanilla SwiftUI Validation
 
 extension Binding {

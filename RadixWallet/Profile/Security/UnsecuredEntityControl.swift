@@ -1,4 +1,4 @@
-import EngineToolkitimport EngineToolkit
+import EngineToolkit
 
 // MARK: - UnsecuredEntityControl
 /// Basic security control of an unsecured entity. When said entity

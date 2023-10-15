@@ -1,4 +1,4 @@
-import EngineToolkitimport EngineToolkit
+import EngineToolkit
 
 // MARK: - ProfileSnapshot
 public struct ProfileSnapshot:

@@ -1,4 +1,4 @@
-import EngineToolkitimport EngineToolkit
+import EngineToolkit
 
 // MARK: - PersonaData.Entry.Kind
 extension PersonaData.Entry {

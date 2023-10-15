@@ -10,7 +10,8 @@ extension ImportLegacyWalletClient: DependencyKey {
 			accounts: NonEmpty<Set<OlympiaAccountToMigrate>>,
 			factorSouceID: FactorSourceID.FromHash
 		) async throws -> (accounts: NonEmpty<OrderedSet<MigratedAccount>>, networkID: NetworkID) {
-			// we only allow 			let networkID = NetworkID.mainnet
+			// we only allow import of olympia accounts into mainnet
+			let networkID = NetworkID.mainnet
 			let sortedOlympia = accounts.sorted(by: \.addressIndex)
 
 			let accountIndexBase = await accountsClient.nextAccountIndex(networkID)

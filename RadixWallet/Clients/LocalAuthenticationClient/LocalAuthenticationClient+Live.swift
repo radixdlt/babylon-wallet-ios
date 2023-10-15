@@ -1,3 +1,5 @@
+import LocalAuthentication
+
 // MARK: - LocalAuthenticationClient + DependencyKey
 extension LocalAuthenticationClient: DependencyKey {
 	public static let liveValue: Self = .init(

@@ -113,15 +113,3 @@ extension TransactionManifest {
 		}
 	}
 }
-
-extension String {
-	public func trimWhitespacesIncludingNullTerminators() -> String {
-		trimmingCharacters(in: .whitespacesAndNewlines.union(.init(charactersIn: .null)))
-	}
-
-	public static var null: String { String(.null) }
-}
-
-extension Character {
-	public static var null: Self { Character(.init(0x00)) }
-}

@@ -80,9 +80,7 @@ extension AssetTransferMessage.View {
 					MessageMode.View(store: $0)
 						.presentationDetents([.medium])
 						.presentationDragIndicator(.visible)
-					#if os(iOS)
-						.presentationBackground(.blur)
-					#endif
+//						.presentationBackground(.blur)
 				}
 			)
 		}

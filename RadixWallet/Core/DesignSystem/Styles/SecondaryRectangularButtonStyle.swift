@@ -6,7 +6,7 @@ public struct SecondaryRectangularButtonStyle: ButtonStyle {
 	let isInToolbar: Bool
 	let image: Image?
 
-	public func makeBody(configuration: Configuration) -> some View {
+	public func makeBody(configuration: ButtonStyle.Configuration) -> some View {
 		ZStack {
 			HStack(spacing: .small2) {
 				image

@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import Prelude
 #if canImport(AnyCodable)
 import AnyCodable
 #endif

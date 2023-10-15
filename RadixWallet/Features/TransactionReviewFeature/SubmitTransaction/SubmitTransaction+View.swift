@@ -90,9 +90,7 @@ extension SubmitTransaction {
 				.interactiveDismissDisabled(true)
 				.presentationDragIndicator(.visible)
 				.presentationDetents([.fraction(0.66)])
-				#if os(iOS)
-					.presentationBackground(.blur)
-				#endif
+//					.presentationBackground(.blur)
 			}
 		}
 	}

@@ -1,9 +1,6 @@
 import ComposableArchitecture
 import SwiftUI
 
-// MARK: - BIP39.WordList + Sendable
-extension BIP39.WordList: @unchecked Sendable {}
-
 // MARK: - BIP39.WordCount + Comparable
 extension BIP39.WordCount: Comparable {
 	public static func < (lhs: Self, rhs: Self) -> Bool {

@@ -1146,17 +1146,6 @@ extension ResourceTracker {
 	}
 }
 
-extension NonFungibleLocalIdVecSource {
-	var ids: [NonFungibleLocalId] {
-		switch self {
-		case let .guaranteed(value):
-			value
-		case let .predicted(_, value):
-			value
-		}
-	}
-}
-
 // MARK: - TransactionReviewFailure
 public struct TransactionReviewFailure: LocalizedError {
 	public let underylying: Swift.Error

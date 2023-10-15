@@ -269,17 +269,6 @@ public enum InvalidDerivationPathForEntity:
 	case invalidKeyType(got: HD.Path.Component.Child.Value, expectedAnyOf: [HD.Path.Component.Child.Value])
 }
 
-extension HD.Path.Component.Child.Depth {
-	var asExplicit: Value? {
-		switch self {
-		case let .explicit(explicit):
-			explicit
-		case .inferred:
-			nil
-		}
-	}
-}
-
 extension InvalidDerivationPathForEntity {
 	public var customDumpDescription: String {
 		switch self {

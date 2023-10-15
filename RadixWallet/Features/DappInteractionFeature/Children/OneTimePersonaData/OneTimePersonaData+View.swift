@@ -1,5 +1,4 @@
-import ComposableArchitecture
-@_spi(Internals) import SwiftUI
+@_spi(Internals) import ComposableArchitecture
 
 // MARK: - Permission.View
 extension OneTimePersonaData {
@@ -106,8 +105,8 @@ extension OneTimePersonaData {
 }
 
 // #if DEBUG
-// import SwiftUI
-import ComposableArchitecture //
+// import SwiftUI // NB: necessary for previews to appear
+//
 //// MARK: - Permission_Preview
 // struct OneTimePersonaData_Preview: PreviewProvider {
 //	static var previews: some SwiftUI.View {

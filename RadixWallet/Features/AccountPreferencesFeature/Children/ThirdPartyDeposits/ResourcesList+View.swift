@@ -4,20 +4,22 @@ extension ResourcesList.State {
 	var viewState: ResourcesList.ViewState {
 		.init(
 			resources: .init(uncheckedUniqueElements: resourcesForDisplay),
-			info: switch mode {
-			case .allowDenyAssets(.allow) where resourcesForDisplay.isEmpty:
-				L10n.AccountSettings.SpecificAssetsDeposits.emptyAllowAll
-			case .allowDenyAssets(.allow):
-				L10n.AccountSettings.SpecificAssetsDeposits.allowInfo
-			case .allowDenyAssets(.deny) where resourcesForDisplay.isEmpty:
-				L10n.AccountSettings.SpecificAssetsDeposits.emptyDenyAll
-			case .allowDenyAssets(.deny):
-				L10n.AccountSettings.SpecificAssetsDeposits.denyInfo
-			case .allowDepositors where resourcesForDisplay.isEmpty:
-				"Add a specific badge by its resource address to allow all deposits from its holder." // FIXME: Strings
-			case .allowDepositors:
-				"The holder of the following badges may always deposit accounts to this account." // FIXME: Strings
-			},
+			info: {
+				switch mode {
+				case .allowDenyAssets(.allow) where resourcesForDisplay.isEmpty:
+					L10n.AccountSettings.SpecificAssetsDeposits.emptyAllowAll
+				case .allowDenyAssets(.allow):
+					L10n.AccountSettings.SpecificAssetsDeposits.allowInfo
+				case .allowDenyAssets(.deny) where resourcesForDisplay.isEmpty:
+					L10n.AccountSettings.SpecificAssetsDeposits.emptyDenyAll
+				case .allowDenyAssets(.deny):
+					L10n.AccountSettings.SpecificAssetsDeposits.denyInfo
+				case .allowDepositors where resourcesForDisplay.isEmpty:
+					"Add a specific badge by its resource address to allow all deposits from its holder." // FIXME: Strings
+				case .allowDepositors:
+					"The holder of the following badges may always deposit accounts to this account." // FIXME: Strings
+				}
+			}(),
 			mode: mode
 		)
 	}

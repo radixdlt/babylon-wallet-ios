@@ -22,13 +22,11 @@ public struct WithNavigationBar<Content: View>: View {
 		NavigationStack {
 			content
 				.presentationDragIndicator(.visible)
-			#if os(iOS)
 				.toolbar {
 					ToolbarItem(placement: .primaryAction) {
 						CloseButton(action: closeAction)
 					}
 				}
-			#endif
 		}
 	}
 }
@@ -73,12 +71,12 @@ extension SlideUpPanel {
 				}
 				.presentationDetents([.medium])
 				.presentationDragIndicator(.visible)
-				#if os(iOS)
-					.presentationBackground(.blur)
-					.onWillDisappear {
-						viewStore.send(.willDisappear)
-					}
-				#endif
+//				#if os(iOS)
+//					.presentationBackground(.blur)
+				.onWillDisappear {
+					viewStore.send(.willDisappear)
+				}
+//				#endif
 			}
 		}
 	}

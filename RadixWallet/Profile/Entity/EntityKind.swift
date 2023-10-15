@@ -1,4 +1,4 @@
-import EngineToolkitimport EngineToolkit
+import EngineToolkit
 
 // MARK: - EntityKind
 /// A kind of entity, e.g. the kind `account` or the kind `identity` (used by Persona), used in derivation path scheme.

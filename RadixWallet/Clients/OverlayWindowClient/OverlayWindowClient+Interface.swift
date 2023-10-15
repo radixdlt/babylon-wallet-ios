@@ -1,6 +1,4 @@
 // MARK: - OverlayWindowClient
-@_exported @_exported
-
 /// This client is the intermediary between Main Window and the Overlay Window.
 public struct OverlayWindowClient: Sendable {
 	/// All scheduled items to be shown in Overlay Window.

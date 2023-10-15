@@ -355,16 +355,6 @@ extension View {
 	}
 }
 
-// MARK: - VLine
-struct VLine: Shape {
-	func path(in rect: CGRect) -> SwiftUI.Path {
-		SwiftUI.Path { path in
-			path.move(to: .init(x: rect.midX, y: rect.minY))
-			path.addLine(to: .init(x: rect.midX, y: rect.maxY))
-		}
-	}
-}
-
 // MARK: - TransactionHeading
 struct TransactionHeading: View {
 	let heading: String

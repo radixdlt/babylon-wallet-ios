@@ -29,7 +29,6 @@ extension CreatePersonaCoordinator {
 						store.scope(state: \.root, action: { .child(.root($0)) })
 					) {
 						destination(for: $0, shouldDisplayNavBar: viewStore.shouldDisplayNavBar)
-						#if os(iOS)
 							.toolbar {
 								if viewStore.shouldDisplayNavBar {
 									ToolbarItem(placement: .navigationBarLeading) {
@@ -39,16 +38,13 @@ extension CreatePersonaCoordinator {
 									}
 								}
 							}
-						#endif
 					}
 					// This is required to disable the animation of internal components during transition
 					.transaction { $0.animation = nil }
 				} destination: {
 					destination(for: $0, shouldDisplayNavBar: viewStore.shouldDisplayNavBar)
 				}
-				#if os(iOS)
-				.navigationTransition(.slide, interactivity: .disabled)
-				#endif // iOS
+//				.navigationTransition(.slide, interactivity: .disabled)
 			}
 		}
 
@@ -89,10 +85,8 @@ extension CreatePersonaCoordinator {
 					}
 				}
 			}
-			#if os(iOS)
 			.navigationBarBackButtonHidden(!shouldDisplayNavBar)
 			.navigationBarHidden(!shouldDisplayNavBar)
-			#endif // iOS
 		}
 	}
 }

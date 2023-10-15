@@ -1,4 +1,4 @@
-import EngineToolkitimport EngineToolkit
+import EngineToolkit
 
 // MARK: - TransactionManifest + Sendable
 extension TransactionManifest: @unchecked Sendable {}

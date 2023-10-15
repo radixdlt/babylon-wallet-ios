@@ -6,7 +6,7 @@ public struct ScanQR: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public let scanInstructions: String
 		public let scanMode: QRScanMode
-		#if os(macOS) || (os(iOS) && targetEnvironment(simulator))
+		#if targetEnvironment(simulator)
 		public var manualQRContent: String
 
 		public init(
@@ -26,15 +26,15 @@ public struct ScanQR: Sendable, FeatureReducer {
 			self.scanInstructions = scanInstructions
 			self.scanMode = scanMode
 		}
-		#endif // macOS
+		#endif // sim
 	}
 
 	public enum ViewAction: Sendable, Equatable {
 		case scanned(TaskResult<String>)
-		#if os(macOS) || (os(iOS) && targetEnvironment(simulator))
+		#if targetEnvironment(simulator)
 		case macInputQRContentChanged(String)
 		case macConnectButtonTapped
-		#endif // macOS
+		#endif // sim
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -47,14 +47,14 @@ public struct ScanQR: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
-		#if os(macOS) || (os(iOS) && targetEnvironment(simulator))
+		#if targetEnvironment(simulator)
 		case let .macInputQRContentChanged(manualQRContent):
 			state.manualQRContent = manualQRContent
 			return .none
 
 		case .macConnectButtonTapped:
 			return .send(.delegate(.scanned(state.manualQRContent)))
-		#endif // macOS
+		#endif // sim
 
 		case let .scanned(.success(qrString)):
 			return .send(.delegate(.scanned(qrString)))

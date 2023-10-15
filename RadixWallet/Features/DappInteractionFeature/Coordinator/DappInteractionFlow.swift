@@ -1,7 +1,5 @@
-import ComposableArchitecture
-import SwiftUI
-
 // MARK: - DappInteractionFlow
+
 struct DappInteractionFlow: Sendable, FeatureReducer {
 	struct State: Sendable, Hashable {
 		enum AnyInteractionItem: Sendable, Hashable {
@@ -567,9 +565,9 @@ extension Collection where Element: PersonaDataEntryProtocol {
 	func satisfies(_ requestedNumber: RequestedNumber) -> Bool {
 		switch requestedNumber.quantifier {
 		case .atLeast:
-			count >= requestedNumber.quantity
+			return count >= requestedNumber.quantity
 		case .exactly:
-			count == requestedNumber.quantity
+			return count == requestedNumber.quantity
 		}
 	}
 }
@@ -816,43 +814,53 @@ extension DappInteractionFlow {
 		var authorizedDapp = state.authorizedDapp ?? .init(
 			networkID: networkID,
 			dAppDefinitionAddress: state.dappMetadata.dAppDefinitionAddress,
-			displayName: switch state.dappMetadata {
-			case let .ledger(ledger): ledger.name
-			case .request, .wallet: nil
-			}
+			displayName: {
+				switch state.dappMetadata {
+				case let .ledger(ledger): return ledger.name
+				case .request, .wallet: return nil
+				}
+			}()
 		)
 		// This extraction is really verbose right now, but it should become a lot simpler with native case paths
 		let sharedAccountsInfo: (P2P.Dapp.Request.NumberOfAccounts, [P2P.Dapp.Response.WalletAccount])? = unwrap(
 			// request
-			switch state.remoteInteraction.items {
-			case let .request(.authorized(items)):
-				items.ongoingAccounts?.numberOfAccounts
-			default:
-				nil
-			},
+			{
+				switch state.remoteInteraction.items {
+				case let .request(.authorized(items)):
+					return items.ongoingAccounts?.numberOfAccounts
+				default:
+					return nil
+				}
+			}(),
 			// response
-			switch responseItems {
-			case let .request(.authorized(items)):
-				items.ongoingAccounts?.accounts
-			default:
-				nil
-			}
+			{
+				switch responseItems {
+				case let .request(.authorized(items)):
+					return items.ongoingAccounts?.accounts
+				default:
+					return nil
+				}
+			}()
 		)
 
 		let sharedPersonaDataInfo: (P2P.Dapp.Request.PersonaDataRequestItem, P2P.Dapp.Response.WalletInteractionSuccessResponse.PersonaDataRequestResponseItem)? = unwrap(
 			// request
-			switch state.remoteInteraction.items {
-			case let .request(.authorized(items)):
-				items.ongoingPersonaData
-			default: nil
-			},
+			{
+				switch state.remoteInteraction.items {
+				case let .request(.authorized(items)):
+					return items.ongoingPersonaData
+				default: return nil
+				}
+			}(),
 			// response
-			switch responseItems {
-			case let .request(.authorized(items)):
-				items.ongoingPersonaData
-			default:
-				nil
-			}
+			{
+				switch responseItems {
+				case let .request(.authorized(items)):
+					return items.ongoingPersonaData
+				default:
+					return nil
+				}
+			}()
 		)
 
 		let sharedAccounts: Profile.Network.AuthorizedDapp.AuthorizedPersonaSimple.SharedAccounts?
@@ -944,10 +952,10 @@ extension DappInteractionFlow.ChildAction {
 	var itemAndAction: (DappInteractionFlow.State.AnyInteractionItem, DappInteractionFlow.Destinations.MainAction)? {
 		switch self {
 		case let .root(.relay(item, action)), let .path(.element(_, .relay(item, action))):
-			(item, action)
+			return (item, action)
 
 		case .path(.popFrom), .path(.push):
-			nil
+			return nil
 		}
 	}
 }

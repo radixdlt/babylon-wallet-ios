@@ -1,4 +1,4 @@
-import EngineToolkitimport EngineToolkit
+import EngineToolkit
 
 // MARK: - MnemonicWithPassphrase
 public struct MnemonicWithPassphrase: Sendable, Hashable, Codable {

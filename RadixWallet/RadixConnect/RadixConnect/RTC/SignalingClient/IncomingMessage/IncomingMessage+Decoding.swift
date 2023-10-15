@@ -1,4 +1,4 @@
-import WebRTCimport WebRTCimport WebRTC
+import WebRTC
 extension CodingUserInfoKey {
 	static let clientMessageEncryptionKey = CodingUserInfoKey(rawValue: "clientMessageEncryptionKey")!
 }

@@ -18,5 +18,5 @@ extension OnboardingClient {
 	public typealias LoadProfile = @Sendable () async -> LoadProfileOutcome
 
 	/// Returns `true` iff Profile contains any mainnet accounts
-	public typealias CommitEphemeral = @Sendable () async throws -> Prelude.Unit
+	public typealias CommitEphemeral = @Sendable () async throws -> EqVoid
 }

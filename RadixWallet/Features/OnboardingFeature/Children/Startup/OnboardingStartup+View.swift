@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import CoreMotion
 import SwiftUI
 
 // MARK: - OnboardingStartup.View

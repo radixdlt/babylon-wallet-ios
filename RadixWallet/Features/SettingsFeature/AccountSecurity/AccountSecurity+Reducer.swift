@@ -101,7 +101,7 @@ public struct AccountSecurity: Sendable, FeatureReducer {
 				let currentNetworkID = await factorSourcesClient.getCurrentNetworkID()
 
 				// we only allow import SwiftUI
-				import ComposableArchitecture let canImportOlympiaAccount = currentNetworkID == .mainnet
+				let canImportOlympiaAccount = currentNetworkID == .mainnet
 
 				await send(.internal(
 					.canImportOlympiaAccountResult(canImportOlympiaAccount)

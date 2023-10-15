@@ -15,7 +15,6 @@ extension ImportOlympiaWalletCoordinator {
 			NavigationStackStore(store.scope(state: \.path, action: { .child(.path($0)) })) {
 				let scanQRStore = store.scope(state: \.scanQR, action: { .child(.scanQR($0)) })
 				ScanMultipleOlympiaQRCodes.View(store: scanQRStore)
-				#if os(iOS)
 					.toolbar {
 						ToolbarItem(placement: .primaryAction) {
 							CloseButton {
@@ -23,15 +22,12 @@ extension ImportOlympiaWalletCoordinator {
 							}
 						}
 					}
-				#endif
 					// This is required to disable the animation of internal components during transition
 					.transaction { $0.animation = nil }
 			} destination: {
 				Path.View(store: $0)
 			}
-			#if os(iOS)
-			.navigationTransition(.slide, interactivity: .disabled)
-			#endif
+//			.navigationTransition(.slide, interactivity: .disabled)
 		}
 	}
 }
@@ -75,8 +71,6 @@ extension ImportOlympiaWalletCoordinator.Path {
 }
 
 #if DEBUG
-import ComposableArchitecture
-import SwiftUI
 
 // MARK: - ImportOlympiaWalletCoordinator_Preview
 struct ImportOlympiaWalletCoordinator_Preview: PreviewProvider {

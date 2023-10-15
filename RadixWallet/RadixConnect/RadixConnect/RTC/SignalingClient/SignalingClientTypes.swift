@@ -1,4 +1,7 @@
-import WebRTCimport WebRTCimport WebRTC
+import CryptoKit
+import Tagged
+import WebRTC
+
 extension SignalingClient {
 	// MARK: - EncryptionKeyTag
 	enum EncryptionKeyTag {}
@@ -10,7 +13,7 @@ extension SignalingClient {
 	}
 }
 
-import WebRTCextension SignalingClient.EncryptionKey {
+extension SignalingClient.EncryptionKey {
 	public var symmetric: SymmetricKey {
 		.init(data: self.data.data)
 	}

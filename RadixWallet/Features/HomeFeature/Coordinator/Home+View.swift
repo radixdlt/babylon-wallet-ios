@@ -75,9 +75,7 @@ extension Home {
 						content: { CreateAccountCoordinator.View(store: $0) }
 					)
 				}
-				#if os(iOS)
-				.navigationTransition(.default, interactivity: .pan)
-				#endif
+//				.navigationTransition(.default, interactivity: .pan)
 			}
 		}
 

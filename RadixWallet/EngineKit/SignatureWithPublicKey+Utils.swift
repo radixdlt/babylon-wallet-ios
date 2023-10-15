@@ -1,6 +1,7 @@
-import EngineToolkitimport EngineToolkit
-extension SignatureWithPublicKey {
-	public var signature: Signature {
+import EngineToolkit
+
+extension EngineToolkit.SignatureWithPublicKey {
+	public var signature: EngineToolkit.Signature {
 		switch self {
 		case let .secp256k1(signature):
 			.secp256k1(value: signature)
@@ -9,7 +10,7 @@ extension SignatureWithPublicKey {
 		}
 	}
 
-	public var publicKey: PublicKey? {
+	public var publicKey: EngineToolkit.PublicKey? {
 		switch self {
 		case .secp256k1:
 			nil
@@ -19,7 +20,7 @@ extension SignatureWithPublicKey {
 	}
 }
 
-extension Signature {
+extension EngineToolkit.Signature {
 	public var bytes: [UInt8] {
 		switch self {
 		case let .secp256k1(value):
@@ -30,7 +31,7 @@ extension Signature {
 	}
 }
 
-extension PublicKey {
+extension EngineToolkit.PublicKey {
 	public var bytes: [UInt8] {
 		switch self {
 		case let .secp256k1(value):

@@ -1,4 +1,5 @@
 import ComposableArchitecture // actually CasePaths... but CI fails if we do `import CasePaths` 🤷‍♂️
+import Network
 
 extension RadixConnectClient {
 	public static let liveValue: Self = {

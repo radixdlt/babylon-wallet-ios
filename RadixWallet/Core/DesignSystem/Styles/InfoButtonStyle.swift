@@ -7,7 +7,7 @@ extension ButtonStyle where Self == InfoButtonStyle {
 
 // MARK: - InfoButtonStyle
 public struct InfoButtonStyle: ButtonStyle {
-	public func makeBody(configuration: Configuration) -> some View {
+	public func makeBody(configuration: ButtonStyle.Configuration) -> some View {
 		Label {
 			configuration.label
 				.textStyle(.body1StandaloneLink)

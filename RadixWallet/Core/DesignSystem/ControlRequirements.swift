@@ -1,4 +1,7 @@
+import ComposableArchitecture
+import SwiftUI
 
+// MARK: - WithControlRequirements
 // TODO: simplify with variadic generics in the future
 //
 // public struct WithControlRequirements<Control: View>: View {
@@ -13,7 +16,6 @@
 //     }
 // }
 
-// MARK: - WithControlRequirements
 public struct WithControlRequirements<Control: View>: View {
 	@Environment(\.controlState) var controlState
 
@@ -92,7 +94,7 @@ public struct WithControlRequirements<Control: View>: View {
 }
 
 #if DEBUG
-
+import struct SwiftUINavigation.WithState
 struct WithControlRequirements_Previews: PreviewProvider {
 	static var previews: some View {
 		WithState(initialValue: "") { $name in

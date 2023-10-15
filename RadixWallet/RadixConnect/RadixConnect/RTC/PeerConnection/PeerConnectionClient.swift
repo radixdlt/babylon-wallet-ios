@@ -1,4 +1,4 @@
-import WebRTCimport WebRTCimport WebRTC
+import WebRTC
 
 // MARK: - PeerConnectionClient
 /// A client that manages a given PeerConnection and its related DataChannel.

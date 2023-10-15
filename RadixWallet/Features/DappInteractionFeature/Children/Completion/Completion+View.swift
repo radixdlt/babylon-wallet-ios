@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import SwiftUI
+
 extension DappMetadata {
 	var name: String {
 		switch self {
@@ -63,16 +64,13 @@ extension Completion {
 			}
 			.presentationDragIndicator(.visible)
 			.presentationDetents([.height(.smallDetent)])
-			#if os(iOS)
-				.presentationBackground(.blur)
-			#endif
+//				.presentationBackground(.blur)
 		}
 	}
 }
 
 #if DEBUG
-import ComposableArchitecture
-import SwiftUI
+import struct SwiftUINavigation.WithState
 
 // MARK: - Completion_Preview
 struct Completion_Preview: PreviewProvider {

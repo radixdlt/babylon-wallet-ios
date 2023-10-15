@@ -1,4 +1,4 @@
-import WebRTCimport WebRTCimport WebRTCimport WebRTCimport WebRTCimport WebRTC
+import WebRTC
 
 // MARK: - P2P.ClientConnectionsUpdate
 extension P2P {

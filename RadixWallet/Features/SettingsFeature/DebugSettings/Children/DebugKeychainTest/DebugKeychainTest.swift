@@ -240,13 +240,10 @@ public func valuesFromManyTasks<T: Hashable & Sendable>(
 	return values
 }
 
-#endif // DEBUG
-
-#if DEBUG
-struct RandomizeDataError: Swift.Error {}
 extension Data {
 	public static func randomKeychainDemo() -> Self {
 		try! .random(byteCount: 16)
 	}
 }
-#endif
+
+#endif // DEBUG

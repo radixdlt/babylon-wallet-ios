@@ -33,7 +33,7 @@ extension DeviceFactorSourceClient {
 	public typealias GetControlledEntities = @Sendable (ProfileSnapshot?) async throws -> IdentifiedArrayOf<EntitiesControlledByFactorSource>
 
 	public typealias PublicKeysFromOnDeviceHD = @Sendable (PublicKeysFromOnDeviceHDRequest) async throws -> [HierarchicalDeterministicPublicKey]
-	public typealias SignatureFromOnDeviceHD = @Sendable (SignatureFromOnDeviceHDRequest) async throws -> Cryptography.SignatureWithPublicKey
+	public typealias SignatureFromOnDeviceHD = @Sendable (SignatureFromOnDeviceHDRequest) async throws -> SignatureWithPublicKey
 	public typealias IsAccountRecoveryNeeded = @Sendable () async throws -> Bool
 }
 

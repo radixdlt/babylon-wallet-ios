@@ -1,4 +1,4 @@
-import CryptoKitimport CryptoKit
+import CryptoKit
 
 // MARK: - Data + Sendable
 extension Data: @unchecked Sendable {}

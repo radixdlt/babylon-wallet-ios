@@ -98,8 +98,8 @@ public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 			return .none
 
 		case let .loadControlledEntities(.success(factorSourcesControllingEntities)):
-			state.mnemonicsLeftToimport SwiftUI
-			import ComposableArchitecture return nextMnemonicIfNeeded(state: &state)
+			state.mnemonicsLeftToImport = factorSourcesControllingEntities
+			return nextMnemonicIfNeeded(state: &state)
 		}
 	}
 

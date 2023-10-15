@@ -11,6 +11,7 @@
 // SPDX-License-Identifier: Apache-2.0
 //
 //===----------------------------------------------------------------------===//
+import XCTest
 
 extension XCTestCase {
 	public func readTestFixtureData(

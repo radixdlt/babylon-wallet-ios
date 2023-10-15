@@ -1,4 +1,4 @@
-import EngineToolkitimport EngineToolkit
+import EngineToolkit
 
 // MARK: - EncryptedProfileSnapshot
 /// An encryption of a `ProfileSnapshot` with crypto metadata about how it was encrypted, which can

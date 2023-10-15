@@ -11,19 +11,21 @@ extension ImportMnemonicWord.State {
 			displayText: value.text,
 			autocompletionCandidates: autocompletionCandidates,
 			focusedField: focusedField,
-			validation: if value.hasFailedValidation {
-				.invalid
-			} else if value.isComplete {
-				.valid
-			} else {
-				nil
-			}
+			validation: {
+				if value.hasFailedValidation {
+					.invalid
+				} else if value.isComplete {
+					.valid
+				} else {
+					nil
+				}
+			}()
 		)
 	}
 }
 
-// MARK: - Validation
-enum Validation: Sendable, Hashable {
+// MARK: - MnemonicValidation
+enum MnemonicValidation: Sendable, Hashable {
 	case invalid
 	case valid
 }
@@ -37,7 +39,7 @@ extension ImportMnemonicWord {
 		let autocompletionCandidates: ImportMnemonicWord.State.AutocompletionCandidates?
 		let focusedField: State.Field?
 
-		let validation: Validation?
+		let validation: MnemonicValidation?
 
 		var hint: Hint? {
 			guard let validation, validation == .invalid else {

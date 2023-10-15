@@ -1,3 +1,4 @@
+import CommonCrypto
 import CryptoKit
 
 // MARK: - SeedDerivation

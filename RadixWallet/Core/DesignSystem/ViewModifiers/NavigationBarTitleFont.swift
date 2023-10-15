@@ -1,4 +1,5 @@
-#if os(iOS)
+import Introspect
+import SwiftUI
 
 extension View {
 	public func navigationBarInlineTitleFont(_ uiFont: UIFont) -> some View {
@@ -10,6 +11,7 @@ extension View {
 	}
 }
 
+// MARK: - NavigationBarInlineTitleFontModifier
 struct NavigationBarInlineTitleFontModifier: ViewModifier {
 	let uiFont: UIFont
 
@@ -24,6 +26,7 @@ struct NavigationBarInlineTitleFontModifier: ViewModifier {
 	}
 }
 
+// MARK: - NavigationBarLargeTitleFontModifier
 struct NavigationBarLargeTitleFontModifier: ViewModifier {
 	let uiFont: UIFont
 
@@ -37,4 +40,3 @@ struct NavigationBarLargeTitleFontModifier: ViewModifier {
 		}
 	}
 }
-#endif

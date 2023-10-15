@@ -1,4 +1,4 @@
-import WebRTCimport WebRTCimport WebRTC
+import WebRTC
 extension SignalingClient {
 	init(
 		password: ConnectionPassword,

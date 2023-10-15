@@ -1,5 +1,7 @@
 import ComposableArchitecture
 import SwiftUI
+import UniformTypeIdentifiers
+
 extension ProfileBackupSettings.State {
 	var viewState: ProfileBackupSettings.ViewState {
 		.init(
@@ -200,10 +202,12 @@ extension SwiftUI.View {
 			),
 			document: viewStore.profileFile,
 			contentType: .profile,
-			defaultFilename: switch viewStore.profileFile {
-			case .plaintext, .none: String.filenameProfileNotEncrypted
-			case .encrypted: String.filenameProfileEncrypted
-			},
+			defaultFilename: {
+				switch viewStore.profileFile {
+				case .plaintext, .none: String.filenameProfileNotEncrypted
+				case .encrypted: String.filenameProfileEncrypted
+				}
+			}(),
 			onCompletion: { viewStore.send(.profileExportResult($0.mapError { $0 as NSError })) }
 		)
 	}

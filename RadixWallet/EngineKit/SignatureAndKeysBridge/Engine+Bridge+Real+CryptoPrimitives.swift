@@ -1,6 +1,6 @@
 import EngineToolkit
 extension SLIP10.PublicKey {
-	public init(engine enginePublicKey: PublicKey) throws {
+	public init(engine enginePublicKey: EngineToolkit.PublicKey) throws {
 		switch enginePublicKey {
 		case let .ed25519(key):
 			self = try .eddsaEd25519(Curve25519.Signing.PublicKey(rawRepresentation: key.bytes))
@@ -11,7 +11,7 @@ extension SLIP10.PublicKey {
 }
 
 extension SLIP10.PublicKey {
-	public func intoEngine() -> PublicKey {
+	public func intoEngine() -> EngineToolkit.PublicKey {
 		switch self {
 		case let .ecdsaSecp256k1(key):
 			.secp256k1(value: Array(key.compressedRepresentation))
@@ -22,7 +22,7 @@ extension SLIP10.PublicKey {
 }
 
 extension SLIP10.Signature {
-	public init(engine engineSignature: Signature) throws {
+	public init(engine engineSignature: EngineToolkit.Signature) throws {
 		switch engineSignature {
 		case let .ed25519(signature):
 			// TODO: validate
@@ -39,7 +39,7 @@ extension K1.PublicKey {
 	}
 }
 
-extension Cryptography.SignatureWithPublicKey {
+extension SignatureWithPublicKey {
 	public func intoEngine() throws -> EngineToolkit.SignatureWithPublicKey {
 		switch self {
 		case let .ecdsaSecp256k1(signature, _):

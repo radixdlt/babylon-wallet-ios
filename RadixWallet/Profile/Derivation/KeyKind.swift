@@ -1,4 +1,4 @@
-import EngineToolkitimport EngineToolkit
+import EngineToolkit
 
 // MARK: - SLIP10DerivationPathComponent
 /// A type which is component inside the default SLIP10 deriation path scheme

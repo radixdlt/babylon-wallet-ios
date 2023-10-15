@@ -6,7 +6,7 @@ public struct PrimaryRectangularButtonStyle: ButtonStyle {
 	let height: CGFloat
 	let isDestructive: Bool
 
-	public func makeBody(configuration: Configuration) -> some View {
+	public func makeBody(configuration: ButtonStyle.Configuration) -> some View {
 		ZStack {
 			configuration.label
 				.foregroundColor(foregroundColor)

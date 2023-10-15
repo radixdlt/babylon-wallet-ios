@@ -1,10 +1,4 @@
-import WebRTCimport WebRTC
-
-// MARK: - AnyAsyncIterator + Sendable
-extension AnyAsyncIterator: @unchecked Sendable where Self.Element: Sendable {}
-
-// MARK: - AnyAsyncSequence + Sendable
-extension AnyAsyncSequence: @unchecked Sendable where Self.AsyncIterator: Sendable {}
+import WebRTC
 
 extension AsyncSequence {
 	func mapSkippingError<NewValue: Sendable>(

@@ -1,32 +1,39 @@
-import ComposableArchitecture
-import SwiftUI
+
 extension CustomizeFees.State {
 	var viewState: CustomizeFees.ViewState {
 		.init(
-			title: switch transactionFee.mode {
-			case .normal:
-				L10n.TransactionReview.CustomizeNetworkFeeSheet.NormalMode.title
-			case .advanced:
-				L10n.TransactionReview.CustomizeNetworkFeeSheet.AdvancedMode.title
-			},
-			description: switch transactionFee.mode {
-			case .normal:
-				L10n.TransactionReview.CustomizeNetworkFeeSheet.NormalMode.subtitle
-			case .advanced:
-				L10n.TransactionReview.CustomizeNetworkFeeSheet.AdvancedMode.subtitle
-			},
-			modeSwitchTitle: switch transactionFee.mode {
-			case .normal:
-				L10n.TransactionReview.CustomizeNetworkFeeSheet.viewAdvancedModeButtonTitle
-			case .advanced:
-				L10n.TransactionReview.CustomizeNetworkFeeSheet.viewNormalModeButtonTitle
-			},
+			title: {
+				switch transactionFee.mode {
+				case .normal:
+					return L10n.TransactionReview.CustomizeNetworkFeeSheet.NormalMode.title
+				case .advanced:
+					return L10n.TransactionReview.CustomizeNetworkFeeSheet.AdvancedMode.title
+				}
+			}(),
+			description: {
+				switch transactionFee.mode {
+				case .normal:
+					return L10n.TransactionReview.CustomizeNetworkFeeSheet.NormalMode.subtitle
+				case .advanced:
+					return L10n.TransactionReview.CustomizeNetworkFeeSheet.AdvancedMode.subtitle
+				}
+			}(),
+			modeSwitchTitle: {
+				switch transactionFee.mode {
+				case .normal:
+					return L10n.TransactionReview.CustomizeNetworkFeeSheet.viewAdvancedModeButtonTitle
+				case .advanced:
+					return L10n.TransactionReview.CustomizeNetworkFeeSheet.viewNormalModeButtonTitle
+				}
+			}(),
 			feePayer: feePayerSelection.selected,
-			noFeePayerText: if transactionFee.totalFee.lockFee == .zero {
-				L10n.TransactionReview.CustomizeNetworkFeeSheet.noneRequired
-			} else {
-				L10n.TransactionReview.CustomizeNetworkFeeSheet.SelectFeePayer.selectAccountButtonTitle
-			},
+			noFeePayerText: {
+				if transactionFee.totalFee.lockFee == .zero {
+					return L10n.TransactionReview.CustomizeNetworkFeeSheet.noneRequired
+				} else {
+					return L10n.TransactionReview.CustomizeNetworkFeeSheet.SelectFeePayer.selectAccountButtonTitle
+				}
+			}(),
 			insufficientBalanceMessage: {
 				if let feePayer = feePayerSelection.selected {
 					if feePayer.xrdBalance < transactionFee.totalFee.lockFee {

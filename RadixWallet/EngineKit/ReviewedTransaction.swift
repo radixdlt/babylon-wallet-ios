@@ -1,4 +1,4 @@
-import EngineToolkitimport EngineToolkit
+import EngineToolkit
 
 // MARK: - TransactionKind
 public enum TransactionKind: Hashable, Sendable {
@@ -205,7 +205,7 @@ extension Dictionary {
 }
 
 extension ResourceSpecifier {
-	public var amount: EngineKit.Decimal? {
+	public var amount: EngineToolkit.Decimal? {
 		if case let .amount(_, amount) = self {
 			return amount
 		}

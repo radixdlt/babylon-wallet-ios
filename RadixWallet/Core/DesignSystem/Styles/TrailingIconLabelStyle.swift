@@ -13,7 +13,7 @@ extension LabelStyle where Self == TrailingIconLabelStyle {
 public struct TrailingIconLabelStyle: LabelStyle {
 	let spacing: CGFloat
 
-	public func makeBody(configuration: Configuration) -> some View {
+	public func makeBody(configuration: LabelStyle.Configuration) -> some View {
 		HStack(spacing: spacing) {
 			configuration.title
 			configuration.icon

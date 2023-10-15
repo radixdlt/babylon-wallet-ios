@@ -148,7 +148,7 @@ extension FactorSourcesView {
 			#endif // os(macOS)
 
 			ForEach(factorSources) { factorSource in
-				FactorSourceView(
+				DebugInspectFactorSourceView(
 					factorSource: factorSource,
 					indentation: inOneLevel
 				)
@@ -158,13 +158,13 @@ extension FactorSourcesView {
 	}
 }
 
-// MARK: - FactorSourceView
-public struct FactorSourceView: IndentedView {
+// MARK: - DebugInspectFactorSourceView
+public struct DebugInspectFactorSourceView: IndentedView {
 	public let factorSource: FactorSource
 	public let indentation: Indentation
 }
 
-extension FactorSourceView {
+extension DebugInspectFactorSourceView {
 	public var body: some View {
 		VStack(alignment: .leading, spacing: indentation.spacing) {
 			Text("Factor Source")

@@ -1,3 +1,4 @@
+import SwiftUI
 
 // MARK: - BlueButtonStyle
 
@@ -7,7 +8,7 @@ extension ButtonStyle where Self == BlueButtonStyle {
 
 // MARK: - BlueButtonStyle
 public struct BlueButtonStyle: ButtonStyle {
-	public func makeBody(configuration: Configuration) -> some View {
+	public func makeBody(configuration: ButtonStyle.Configuration) -> some View {
 		configuration.label
 			.textStyle(.body1StandaloneLink)
 			.foregroundColor(.app.blue2)

@@ -1,4 +1,4 @@
-import EngineToolkitimport EngineToolkit
+import EngineToolkit
 
 // MARK: - PersonaDataEntryProtocol
 public protocol PersonaDataEntryProtocol: BasePersonaDataEntryProtocol {

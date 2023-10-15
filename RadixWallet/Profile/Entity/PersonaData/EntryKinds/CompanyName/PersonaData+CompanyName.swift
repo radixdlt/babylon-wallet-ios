@@ -1,4 +1,4 @@
-import EngineToolkitimport EngineToolkit
+import EngineToolkit
 extension PersonaData {
 	public struct CompanyName: Sendable, Hashable, Codable, PersonaDataEntryProtocol, CustomStringConvertible {
 		public static var casePath: CasePath<PersonaData.Entry, Self> = /PersonaData.Entry.companyName

@@ -1,4 +1,4 @@
-import CryptoKitimport CryptoKit
+import CryptoKit
 
 // MARK: - SLIP10.Signature
 extension SLIP10 {

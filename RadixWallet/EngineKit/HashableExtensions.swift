@@ -1,4 +1,4 @@
-import EngineToolkitimport EngineToolkit
+import EngineToolkit
 
 // MARK: - NonFungibleGlobalId + Hashable
 /// Conformance of RET models to Hashable. An improvement would be if RET could add the below two new APIs:

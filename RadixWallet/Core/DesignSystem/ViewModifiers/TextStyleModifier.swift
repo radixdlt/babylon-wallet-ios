@@ -1,3 +1,5 @@
+import SwiftUI
+
 // MARK: - TextStyle
 public enum TextStyle {
 	case sheetTitle
@@ -19,7 +21,7 @@ public enum TextStyle {
 }
 
 extension TextStyle {
-	var font: Font {
+	var font: SwiftUI.Font {
 		switch self {
 		case .sheetTitle: .app.sheetTitle
 		case .sectionHeader: .app.sectionHeader

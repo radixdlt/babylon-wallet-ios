@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import SwiftUI
+import UniformTypeIdentifiers
 
 // MARK: - NoJSONDataFound
 struct NoJSONDataFound: Error {}

@@ -31,15 +31,17 @@ public struct SelectionList<Choices: Sequence>: View where Choices.Element: Hash
 								.foregroundColor(.app.gray1)
 							Spacer()
 							Image(
-								asset: if requirement == .exactly(1) {
-									item.isSelected
-										? AssetResource.radioButtonDarkSelected
-										: AssetResource.radioButtonDarkUnselected
-								} else {
-									item.isSelected
-										? AssetResource.checkmarkDarkSelected
-										: AssetResource.checkmarkDarkUnselected
-								}
+								asset: {
+									if requirement == .exactly(1) {
+										item.isSelected
+											? AssetResource.radioButtonDarkSelected
+											: AssetResource.radioButtonDarkUnselected
+									} else {
+										item.isSelected
+											? AssetResource.checkmarkDarkSelected
+											: AssetResource.checkmarkDarkUnselected
+									}
+								}()
 							)
 							.padding(.trailing, .small3)
 							.opacity(item.isDisabled ? 0.3 : 1)
