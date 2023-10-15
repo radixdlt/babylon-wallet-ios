@@ -1,0 +1,12 @@
+{
+  "images" : [
+    {
+      "filename" : "icon-unknown-component.pdf",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}

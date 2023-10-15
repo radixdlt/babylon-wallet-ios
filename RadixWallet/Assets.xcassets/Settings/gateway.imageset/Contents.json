@@ -1,0 +1,12 @@
+{
+  "images" : [
+    {
+      "filename" : "gateway.pdf",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}
