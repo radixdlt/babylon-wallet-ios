@@ -1,5 +1,4 @@
 // MARK: - UserDefaultsClient
-
 public struct UserDefaultsClient: Sendable {
 	public enum Key: String, Sendable, Hashable, CaseIterable {
 		case hideMigrateOlympiaButton

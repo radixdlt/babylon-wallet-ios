@@ -1,5 +1,4 @@
 // MARK: - Sorted
-
 @propertyWrapper
 public struct Sorted<S: Sequence, Value: Comparable> {
 	public var wrappedValue: S {

@@ -1,5 +1,4 @@
 // MARK: - PasteboardClient
-
 public struct PasteboardClient: Sendable {
 	public var copyEvents: CopyEvents
 	public var copyString: CopyString

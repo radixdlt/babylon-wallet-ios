@@ -1,5 +1,4 @@
 // MARK: - DappInteractionFlow
-
 struct DappInteractionFlow: Sendable, FeatureReducer {
 	struct State: Sendable, Hashable {
 		enum AnyInteractionItem: Sendable, Hashable {

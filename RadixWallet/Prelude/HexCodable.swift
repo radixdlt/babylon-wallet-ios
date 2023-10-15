@@ -1,5 +1,4 @@
 // MARK: - HexCodable
-
 /// A thin wrapper around `Data` making sure it is always Encoded to a hexadecimal string and can
 /// always be decoded from a hexadecimal string. It is also `Sendable`, `Identifiable`, and conforms
 /// to `DataProtocol`.

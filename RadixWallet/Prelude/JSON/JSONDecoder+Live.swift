@@ -1,5 +1,4 @@
 // MARK: - JSONDecoder + DependencyKey
-
 extension JSONDecoder: DependencyKey {
 	public typealias Value = @Sendable () -> JSONDecoder
 

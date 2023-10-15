@@ -1,5 +1,4 @@
 // MARK: - KeychainActor
-
 @_spi(KeychainInternal)
 public final actor KeychainActor: GlobalActor {
 	@_spi(KeychainInternal)

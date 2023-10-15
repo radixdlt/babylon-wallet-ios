@@ -1,5 +1,4 @@
 // MARK: - DeleteExistingFactorSourceConfirmationDialogAction
-
 public enum DeleteExistingFactorSourceConfirmationDialogAction: Sendable, Hashable {
 	case deleteExistingFactorSource(FactorSourceID)
 	case cancel

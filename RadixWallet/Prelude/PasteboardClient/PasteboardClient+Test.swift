@@ -1,5 +1,4 @@
 // MARK: - PasteboardClient + TestDependencyKey
-
 extension PasteboardClient: TestDependencyKey {
 	public static let previewValue = Self(
 		copyEvents: { AsyncPassthroughSubject<String>().eraseToAnyAsyncSequence() },

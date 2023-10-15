@@ -1,5 +1,4 @@
 // MARK: - Swift.DecodingError + Equatable
-
 /// Make Swift.DecodingError `Equatable` so that we can use it in `DeserializeResponseFailure` and still
 /// let `DeserializeResponseFailure` be `Equatable`.
 extension Swift.DecodingError: Equatable {

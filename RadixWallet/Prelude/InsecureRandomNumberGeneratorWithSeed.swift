@@ -1,5 +1,4 @@
 // MARK: - InsecureRandomNumberGeneratorWithSeed
-
 public struct InsecureRandomNumberGeneratorWithSeed: RandomNumberGenerator {
 	public init(seed: Int) {
 		// Set the random seed
