@@ -21,15 +21,23 @@ platform :ios do
     desc "Runs test"
     lane :tests do
         Dotenv.load ".env.ios.dev"
-        # xcbuild 
-        #   -project 'App/BabylonWallet.xcodeproj' 
-        #   -scheme 'RadixWalletTests' 
-        #   -destination 'platform=iOS Simulator,name=iPhone 15' test | xcbeautify
-        ENV["XCODE_SCHEME"] = "RadixWalletTests"
-        xcodebuild(
-            test: true,
-            destination: "platform=iOS Simulator,name=iPhone 15"
-        )
+
+        # `sh` runs in `./fastlane/` not root, so must use '../'
+        # https://docs.fastlane.tools/actions/sh/
+        test = "xcodebuild \
+          -project '../App/BabylonWallet.xcodeproj' \
+          -scheme 'RadixWalletTests' \
+          -destination 'platform=iOS Simulator,name=iPhone 15' \
+          test | xcbeautify"
+        sh(test)
+        
+        # ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ 
+        # ENV["XCODE_SCHEME"] = "RadixWalletTests"
+        # xcodebuild(
+        #     test: true,
+        #     destination: "platform=iOS Simulator,name=iPhone 15"
+        # )
+        # ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ 
     end
 
     desc "Deploy the app for a given flavour: alpha, beta, release"
