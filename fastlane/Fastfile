@@ -22,19 +22,7 @@ platform :ios do
     desc "Runs test"
     lane :tests do
         Dotenv.load ".env.ios.dev"
-
-        # `sh` runs in `./fastlane/` not root, so must use '../App/'
-        # https://docs.fastlane.tools/actions/sh/
-        operation = "
-        xcodebuild \
-            -project '../RadixWallet.xcodeproj' \
-            -scheme 'Radix Wallet Dev' \
-            -destination 'platform=iOS Simulator,name=iPhone 15' \
-            test \
-            -quiet \
-            | xcbeautify -q --is-ci
-        "
-        sh(operation)
+        run_tests
     end
 
     desc "Deploy the app for a given flavour: alpha, beta, release"
