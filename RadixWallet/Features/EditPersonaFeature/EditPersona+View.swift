@@ -5,6 +5,8 @@ extension EditPersona.State {
 		.init(
 			personaLabel: persona.displayName.rawValue,
 			avatarURL: URL(string: "something")!,
+			// Need to disable, since broken in swiftformat 0.52.7
+			// swiftformat:disable redundantClosure
 			addAFieldButtonState: {
 				if alreadyAddedEntryKinds.count < EntryKind.supportedKinds.count {
 					.enabled
@@ -12,6 +14,7 @@ extension EditPersona.State {
 					.disabled
 				}
 			}(),
+			// swiftformat:enable redundantClosure
 			output: { () -> EditPersona.Output? in
 				guard
 					let personaLabelInput = labelField.input,

@@ -14,6 +14,8 @@ extension AccountPermission {
 			self.title = L10n.DAppRequest.AccountPermission.title
 			self.subtitle = L10n.DAppRequest.AccountPermission.subtitle(state.dappMetadata.name)
 
+			// Need to disable, since broken in swiftformat 0.52.7
+			// swiftformat:disable redundantClosure
 			self.numberOfAccounts = "•  " + {
 				switch (state.numberOfAccounts.quantifier, state.numberOfAccounts.quantity) {
 				case (.atLeast, 0):
@@ -26,6 +28,7 @@ extension AccountPermission {
 					L10n.DAppRequest.AccountPermission.numberOfAccountsExactly(number)
 				}
 			}()
+			// swiftformat:enable redundantClosure
 		}
 	}
 

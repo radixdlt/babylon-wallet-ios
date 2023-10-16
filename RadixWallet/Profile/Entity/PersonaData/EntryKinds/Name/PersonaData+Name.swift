@@ -43,12 +43,15 @@ extension PersonaData {
 		}
 
 		public var formatted: String {
+			// Need to disable, since broken in swiftformat 0.52.7
+			// swiftformat:disable redundantClosure
 			let names = {
 				switch variant {
 				case .western: [givenNames, familyName]
 				case .eastern: [familyName, givenNames]
 				}
 			}().compactMap { NonEmptyString($0) }
+			// swiftformat:enable redundantClosure
 
 			return [
 				NonEmptyString(names.joined(separator: " ")),

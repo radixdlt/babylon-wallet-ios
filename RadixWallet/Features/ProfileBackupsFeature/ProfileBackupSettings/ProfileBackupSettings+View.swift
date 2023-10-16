@@ -202,12 +202,15 @@ extension SwiftUI.View {
 			),
 			document: viewStore.profileFile,
 			contentType: .profile,
+			// Need to disable, since broken in swiftformat 0.52.7
+			// swiftformat:disable redundantClosure
 			defaultFilename: {
 				switch viewStore.profileFile {
 				case .plaintext, .none: String.filenameProfileNotEncrypted
 				case .encrypted: String.filenameProfileEncrypted
 				}
 			}(),
+			// swiftformat:enable redundantClosure
 			onCompletion: { viewStore.send(.profileExportResult($0.mapError { $0 as NSError })) }
 		)
 	}

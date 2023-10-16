@@ -564,9 +564,9 @@ extension Collection where Element: PersonaDataEntryProtocol {
 	func satisfies(_ requestedNumber: RequestedNumber) -> Bool {
 		switch requestedNumber.quantifier {
 		case .atLeast:
-			return count >= requestedNumber.quantity
+			count >= requestedNumber.quantity
 		case .exactly:
-			return count == requestedNumber.quantity
+			count == requestedNumber.quantity
 		}
 	}
 }
@@ -804,6 +804,9 @@ extension DappInteractionFlow {
 		}
 	}
 
+	// Need to disable, since broken in swiftformat 0.52.7
+	// swiftformat:disable redundantClosure
+
 	func updatePersona(
 		_ persona: Profile.Network.Persona,
 		_ state: State,
@@ -815,8 +818,8 @@ extension DappInteractionFlow {
 			dAppDefinitionAddress: state.dappMetadata.dAppDefinitionAddress,
 			displayName: {
 				switch state.dappMetadata {
-				case let .ledger(ledger): return ledger.name
-				case .request, .wallet: return nil
+				case let .ledger(ledger): ledger.name
+				case .request, .wallet: nil
 				}
 			}()
 		)
@@ -826,18 +829,18 @@ extension DappInteractionFlow {
 			{
 				switch state.remoteInteraction.items {
 				case let .request(.authorized(items)):
-					return items.ongoingAccounts?.numberOfAccounts
+					items.ongoingAccounts?.numberOfAccounts
 				default:
-					return nil
+					nil
 				}
 			}(),
 			// response
 			{
 				switch responseItems {
 				case let .request(.authorized(items)):
-					return items.ongoingAccounts?.accounts
+					items.ongoingAccounts?.accounts
 				default:
-					return nil
+					nil
 				}
 			}()
 		)
@@ -847,17 +850,17 @@ extension DappInteractionFlow {
 			{
 				switch state.remoteInteraction.items {
 				case let .request(.authorized(items)):
-					return items.ongoingPersonaData
-				default: return nil
+					items.ongoingPersonaData
+				default: nil
 				}
 			}(),
 			// response
 			{
 				switch responseItems {
 				case let .request(.authorized(items)):
-					return items.ongoingPersonaData
+					items.ongoingPersonaData
 				default:
-					return nil
+					nil
 				}
 			}()
 		)
@@ -908,6 +911,8 @@ extension DappInteractionFlow {
 		try await authorizedDappsClient.updateOrAddAuthorizedDapp(authorizedDapp)
 	}
 
+	// swiftformat:enable redundantClosure
+
 	func goBackEffect(for state: inout State) -> Effect<Action> {
 		state.responseItems.removeLast()
 		state.path.removeLast()
@@ -951,10 +956,10 @@ extension DappInteractionFlow.ChildAction {
 	var itemAndAction: (DappInteractionFlow.State.AnyInteractionItem, DappInteractionFlow.Destinations.MainAction)? {
 		switch self {
 		case let .root(.relay(item, action)), let .path(.element(_, .relay(item, action))):
-			return (item, action)
+			(item, action)
 
 		case .path(.popFrom), .path(.push):
-			return nil
+			nil
 		}
 	}
 }

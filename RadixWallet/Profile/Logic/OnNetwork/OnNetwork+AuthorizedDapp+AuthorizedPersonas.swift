@@ -66,6 +66,8 @@ extension Profile.Network {
 			return try AuthorizedPersonaDetailed(
 				identityAddress: persona.address,
 				displayName: persona.displayName,
+				// Need to disable, since broken in swiftformat 0.52.7
+				// swiftformat:disable redundantClosure
 				simpleAccounts: { if let sharedAccounts = simple.sharedAccounts {
 					try .init(sharedAccounts.ids.map { accountAddress in
 						guard
@@ -82,6 +84,7 @@ extension Profile.Network {
 				} else {
 					nil
 				}}(),
+				// swiftformat:enable redundantClosure
 				sharedPersonaData: {
 					let full = persona.personaData
 					let fullIDs = Set(full.entries.map(\.id))

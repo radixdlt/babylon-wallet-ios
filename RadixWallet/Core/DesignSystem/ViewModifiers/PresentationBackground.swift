@@ -36,16 +36,21 @@ private struct PresentationBackgroundModifier: ViewModifier {
 				// disable standard background dimming altogether, as we're going to use our own
 				sheetPresentationController.largestUndimmedDetentIdentifier = .large
 
+				// Need to disable, since broken in swiftformat 0.52.7
+				// swiftformat:disable redundantClosure
+
 				// initialize background view and apply the chosen visual effects to it
 				let backgroundView: UIView = {
 					switch background {
 					case let .blur(style):
-						return update(UIVisualEffectView(effect: UIBlurEffect(style: style))) {
+						update(UIVisualEffectView(effect: UIBlurEffect(style: style))) {
 							$0.frame = containerView.bounds
 							$0.autoresizingMask = [.flexibleWidth, .flexibleHeight]
 						}
 					}
 				}()
+				// swiftformat:enable redundantClosure
+
 				backgroundView.alpha = 0
 				// add the background view at the very back of the container hierarchy
 				containerView.insertSubview(backgroundView, at: 0)

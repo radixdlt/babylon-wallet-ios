@@ -1,37 +1,40 @@
 
 extension CustomizeFees.State {
+	// Need to disable, since broken in swiftformat 0.52.7
+	// swiftformat:disable redundantClosure
+
 	var viewState: CustomizeFees.ViewState {
 		.init(
 			title: {
 				switch transactionFee.mode {
 				case .normal:
-					return L10n.TransactionReview.CustomizeNetworkFeeSheet.NormalMode.title
+					L10n.TransactionReview.CustomizeNetworkFeeSheet.NormalMode.title
 				case .advanced:
-					return L10n.TransactionReview.CustomizeNetworkFeeSheet.AdvancedMode.title
+					L10n.TransactionReview.CustomizeNetworkFeeSheet.AdvancedMode.title
 				}
 			}(),
 			description: {
 				switch transactionFee.mode {
 				case .normal:
-					return L10n.TransactionReview.CustomizeNetworkFeeSheet.NormalMode.subtitle
+					L10n.TransactionReview.CustomizeNetworkFeeSheet.NormalMode.subtitle
 				case .advanced:
-					return L10n.TransactionReview.CustomizeNetworkFeeSheet.AdvancedMode.subtitle
+					L10n.TransactionReview.CustomizeNetworkFeeSheet.AdvancedMode.subtitle
 				}
 			}(),
 			modeSwitchTitle: {
 				switch transactionFee.mode {
 				case .normal:
-					return L10n.TransactionReview.CustomizeNetworkFeeSheet.viewAdvancedModeButtonTitle
+					L10n.TransactionReview.CustomizeNetworkFeeSheet.viewAdvancedModeButtonTitle
 				case .advanced:
-					return L10n.TransactionReview.CustomizeNetworkFeeSheet.viewNormalModeButtonTitle
+					L10n.TransactionReview.CustomizeNetworkFeeSheet.viewNormalModeButtonTitle
 				}
 			}(),
 			feePayer: feePayerSelection.selected,
 			noFeePayerText: {
 				if transactionFee.totalFee.lockFee == .zero {
-					return L10n.TransactionReview.CustomizeNetworkFeeSheet.noneRequired
+					L10n.TransactionReview.CustomizeNetworkFeeSheet.noneRequired
 				} else {
-					return L10n.TransactionReview.CustomizeNetworkFeeSheet.SelectFeePayer.selectAccountButtonTitle
+					L10n.TransactionReview.CustomizeNetworkFeeSheet.SelectFeePayer.selectAccountButtonTitle
 				}
 			}(),
 			insufficientBalanceMessage: {
@@ -44,6 +47,8 @@ extension CustomizeFees.State {
 			}()
 		)
 	}
+
+	// swiftformat:enable redundantClosure
 }
 
 extension CustomizeFees {

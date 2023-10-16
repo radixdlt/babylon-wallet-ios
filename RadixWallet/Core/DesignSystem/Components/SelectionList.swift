@@ -30,6 +30,8 @@ public struct SelectionList<Choices: Sequence>: View where Choices.Element: Hash
 								.textStyle(.body1HighImportance)
 								.foregroundColor(.app.gray1)
 							Spacer()
+							// Need to disable, since broken in swiftformat 0.52.7
+							// swiftformat:disable redundantClosure
 							Image(
 								asset: {
 									if requirement == .exactly(1) {
@@ -45,6 +47,7 @@ public struct SelectionList<Choices: Sequence>: View where Choices.Element: Hash
 							)
 							.padding(.trailing, .small3)
 							.opacity(item.isDisabled ? 0.3 : 1)
+							// swiftformat:enable redundantClosure
 						}
 						.padding(.vertical, .medium3)
 					}

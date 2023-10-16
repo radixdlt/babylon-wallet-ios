@@ -53,13 +53,13 @@ public struct FactorSourcesOfKindList<FactorSourceOfKind: Sendable & Hashable>: 
 
 		public var canOnlyHaveOneFactorSourceOfKind: Bool {
 			switch kind {
-			case .ledgerHQHardwareWallet, .offDeviceMnemonic, .trustedContact: return false
+			case .ledgerHQHardwareWallet, .offDeviceMnemonic, .trustedContact: false
 			case .securityQuestions:
-				return true
+				true
 			case .device:
 				// Well... it is complicated, we don't allow users to manually create more Babylon device
 				// factor sources. But user can import as many legacy/olympia device factor source they want.
-				return true
+				true
 			}
 		}
 	}

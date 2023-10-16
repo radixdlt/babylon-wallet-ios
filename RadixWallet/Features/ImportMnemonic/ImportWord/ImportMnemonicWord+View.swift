@@ -11,6 +11,8 @@ extension ImportMnemonicWord.State {
 			displayText: value.text,
 			autocompletionCandidates: autocompletionCandidates,
 			focusedField: focusedField,
+			// Need to disable, since broken in swiftformat 0.52.7
+			// swiftformat:disable redundantClosure
 			validation: {
 				if value.hasFailedValidation {
 					.invalid
@@ -20,6 +22,7 @@ extension ImportMnemonicWord.State {
 					nil
 				}
 			}()
+			// swiftformat:enable redundantClosure
 		)
 	}
 }

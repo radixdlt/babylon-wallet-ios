@@ -1,4 +1,4 @@
---swiftversion 5.8
+--swiftversion 5.9
 
 # format options
 --allman false # Prefer `K&R` https://en.wikipedia.org/wiki/Indentation_style#K&R_style

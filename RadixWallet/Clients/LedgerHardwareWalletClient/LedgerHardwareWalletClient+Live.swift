@@ -274,15 +274,14 @@ extension P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.Signature
 
 	func validate(hashed: Data) throws -> Validated {
 		let hdPubKey = try self.derivedPublicKey.hdPubKey()
-		let signatureWithPublicKey: SignatureWithPublicKey
-		switch hdPubKey.publicKey {
+		let signatureWithPublicKey: SignatureWithPublicKey = switch hdPubKey.publicKey {
 		case let .ecdsaSecp256k1(pubKey):
-			signatureWithPublicKey = try .ecdsaSecp256k1(
+			try .ecdsaSecp256k1(
 				signature: .init(radixFormat: self.signature.data),
 				publicKey: pubKey
 			)
 		case let .eddsaEd25519(pubKey):
-			signatureWithPublicKey = .eddsaEd25519(
+			.eddsaEd25519(
 				signature: self.signature.data,
 				publicKey: pubKey
 			)

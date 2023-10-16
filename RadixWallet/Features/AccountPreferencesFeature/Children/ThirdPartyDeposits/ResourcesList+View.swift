@@ -1,6 +1,9 @@
 import ComposableArchitecture
 import SwiftUI
 extension ResourcesList.State {
+	// Need to disable, since broken in swiftformat 0.52.7
+	// swiftformat:disable redundantClosure
+
 	var viewState: ResourcesList.ViewState {
 		.init(
 			resources: .init(uncheckedUniqueElements: resourcesForDisplay),
@@ -23,6 +26,7 @@ extension ResourcesList.State {
 			mode: mode
 		)
 	}
+	// swiftformat:enable redundantClosure
 }
 
 extension ResourcesList {
