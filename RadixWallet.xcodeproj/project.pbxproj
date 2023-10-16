@@ -5753,7 +5753,6 @@
 				48CFC1322ADC10D900E77A5C /* FeaturePrelude */,
 				48CFC14B2ADC10D900E77A5C /* Resources */,
 				48CFC15A2ADC10D900E77A5C /* SharedModels */,
-				48CFC19C2ADC10D900E77A5C /* ClientPrelude */,
 			);
 			path = Core;
 			sourceTree = "<group>";
@@ -6187,13 +6186,6 @@
 				48CFC1992ADC10D900E77A5C /* EntitiesControlledByFactorSource.swift */,
 			);
 			path = Entities;
-			sourceTree = "<group>";
-		};
-		48CFC19C2ADC10D900E77A5C /* ClientPrelude */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = ClientPrelude;
 			sourceTree = "<group>";
 		};
 		48CFC19E2ADC10D900E77A5C /* Profile */ = {

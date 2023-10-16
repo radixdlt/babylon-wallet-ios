@@ -36,7 +36,7 @@ extension AnswerSecurityQuestionsCoordinator {
 						}
 					}
 			}
-//			.navigationTransition(.slide, interactivity: .disabled)
+			.navigationTransition(.slide, interactivity: .disabled)
 		}
 
 		func path(

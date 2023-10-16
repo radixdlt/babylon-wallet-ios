@@ -73,7 +73,7 @@ extension Home {
 						content: { CreateAccountCoordinator.View(store: $0) }
 					)
 				}
-//				.navigationTransition(.default, interactivity: .pan)
+				.navigationTransition(.default, interactivity: .pan)
 			}
 		}
 

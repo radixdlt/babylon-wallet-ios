@@ -44,7 +44,7 @@ extension CreatePersonaCoordinator {
 				} destination: {
 					destination(for: $0, shouldDisplayNavBar: viewStore.shouldDisplayNavBar)
 				}
-//				.navigationTransition(.slide, interactivity: .disabled)
+				.navigationTransition(.slide, interactivity: .disabled)
 			}
 		}
 

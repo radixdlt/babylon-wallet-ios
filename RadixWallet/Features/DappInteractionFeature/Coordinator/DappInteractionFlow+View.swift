@@ -37,7 +37,7 @@ extension DappInteractionFlow {
 						}
 					}
 			}
-//			.navigationTransition(.slide, interactivity: .disabled)
+			.navigationTransition(.slide, interactivity: .disabled)
 			.onAppear { store.send(.view(.appeared)) }
 			.alert(
 				store: store.scope(

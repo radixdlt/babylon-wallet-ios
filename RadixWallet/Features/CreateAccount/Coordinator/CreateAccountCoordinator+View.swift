@@ -1,5 +1,7 @@
 import ComposableArchitecture
+import NavigationTransitions
 import SwiftUI
+
 extension CreateAccountCoordinator.State {
 	fileprivate var viewState: CreateAccountCoordinator.ViewState {
 		.init(shouldDisplayNavBar: shouldDisplayNavBar)
@@ -43,7 +45,7 @@ extension CreateAccountCoordinator {
 				} destination: {
 					destination(for: $0, shouldDisplayNavBar: viewStore.shouldDisplayNavBar)
 				}
-//				.navigationTransition(.slide, interactivity: .disabled)
+				.navigationTransition(.slide, interactivity: .disabled)
 			}
 		}
 
