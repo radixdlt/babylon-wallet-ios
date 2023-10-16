@@ -25,7 +25,6 @@ extension Main {
 						action: { .child(.home($0)) }
 					)
 				)
-				#if os(iOS)
 				.navigationBarBackButtonFont(.app.backButton)
 				.navigationBarInlineTitleFont(.app.secondaryHeader)
 				.navigationBarTitleColor(.app.gray1)
@@ -35,7 +34,6 @@ extension Main {
 					action: Main.Destinations.Action.settings,
 					destination: { Settings.View(store: $0) }
 				)
-				#endif
 			}
 			.task { @MainActor in
 				await store.send(.view(.task)).finish()

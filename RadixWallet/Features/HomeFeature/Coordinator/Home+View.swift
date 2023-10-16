@@ -47,7 +47,6 @@ extension Home {
 						}
 						.padding(.bottom, .medium1)
 					}
-					#if os(iOS)
 					.toolbar {
 						ToolbarItem(placement: .navigationBarTrailing) {
 							SettingsButton(shouldShowNotification: viewStore.hasNotification) {
@@ -55,7 +54,6 @@ extension Home {
 							}
 						}
 					}
-					#endif
 					.refreshable {
 						await viewStore.send(.pullToRefreshStarted).finish()
 					}

@@ -91,9 +91,7 @@ struct P2PLinksFeature_Preview: PreviewProvider {
 					reducer: P2PLinksFeature.init
 				)
 			)
-			#if os(iOS)
 			.navigationBarTitleDisplayMode(.inline)
-			#endif
 		}
 	}
 }

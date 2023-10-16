@@ -113,9 +113,7 @@ extension EncryptOrDecryptProfile {
 								to: $focusedField
 							)
 						)
-						#if os(iOS)
 						.textInputAutocapitalization(.never)
-						#endif // iOS
 						.autocorrectionDisabled()
 
 						if viewStore.needToConfirm {
@@ -137,9 +135,7 @@ extension EncryptOrDecryptProfile {
 									to: $focusedField
 								)
 							)
-							#if os(iOS)
 							.textInputAutocapitalization(.never)
-							#endif // iOS
 							.autocorrectionDisabled()
 						}
 					}

@@ -38,11 +38,9 @@ extension EditPersonaField {
 					),
 					hint: viewStore.inputHint
 				)
-				#if os(iOS)
 				.textContentType(viewStore.contentType)
 				.keyboardType(viewStore.keyboardType)
 				.textInputAutocapitalization(viewStore.capitalization?.rawValue)
-				#endif
 			}
 		}
 	}

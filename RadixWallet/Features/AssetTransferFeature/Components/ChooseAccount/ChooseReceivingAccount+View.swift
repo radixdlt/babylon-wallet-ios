@@ -88,18 +88,16 @@ extension ChooseReceivingAccount.View {
 				)
 				.footer { chooseButton(viewStore) }
 				.navigationTitle(L10n.AssetTransfer.ChooseReceivingAccount.navigationTitle)
-				#if os(iOS)
-					.navigationBarTitleColor(.app.gray1)
-					.navigationBarTitleDisplayMode(.inline)
-					.navigationBarInlineTitleFont(.app.secondaryHeader)
-					.toolbar {
-						ToolbarItem(placement: .navigationBarLeading) {
-							CloseButton {
-								store.send(.view(.closeButtonTapped))
-							}
+				.navigationBarTitleColor(.app.gray1)
+				.navigationBarTitleDisplayMode(.inline)
+				.navigationBarInlineTitleFont(.app.secondaryHeader)
+				.toolbar {
+					ToolbarItem(placement: .navigationBarLeading) {
+						CloseButton {
+							store.send(.view(.closeButtonTapped))
 						}
 					}
-				#endif
+				}
 			}
 		}
 	}

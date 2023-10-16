@@ -58,12 +58,10 @@ extension PersonaDetails.View {
 					}
 				}
 				.navigationTitle(viewStore.personaName)
-				#if os(iOS)
-					.navigationBarTitleDisplayMode(.inline)
-				#endif
-					.onAppear {
-						viewStore.send(.appeared)
-					}
+				.navigationBarTitleDisplayMode(.inline)
+				.onAppear {
+					viewStore.send(.appeared)
+				}
 			}
 		}
 		.navigationDestination(
