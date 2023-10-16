@@ -43,26 +43,24 @@ extension EditPersonaAddEntryKinds {
 						)
 					}
 					.navigationTitle(Text(L10n.EditPersona.AddAField.title))
-					#if os(iOS)
-						.navigationBarTitleColor(.app.gray1)
-						.navigationBarTitleDisplayMode(.inline)
-						.navigationBarInlineTitleFont(.app.secondaryHeader)
-						.toolbar {
-							ToolbarItem(placement: .primaryAction) {
-								CloseButton(action: { viewStore.send(.closeButtonTapped) })
-							}
+					.navigationBarTitleColor(.app.gray1)
+					.navigationBarTitleDisplayMode(.inline)
+					.navigationBarInlineTitleFont(.app.secondaryHeader)
+					.toolbar {
+						ToolbarItem(placement: .primaryAction) {
+							CloseButton(action: { viewStore.send(.closeButtonTapped) })
 						}
-					#endif
-						.separator(.top)
-						.footer {
-							WithControlRequirements(
-								viewStore.selectedEntryKinds,
-								forAction: { viewStore.send(.addButtonTapped($0)) }
-							) { action in
-								Button(L10n.EditPersona.AddAField.add, action: action)
-									.buttonStyle(.primaryRectangular)
-							}
+					}
+					.separator(.top)
+					.footer {
+						WithControlRequirements(
+							viewStore.selectedEntryKinds,
+							forAction: { viewStore.send(.addButtonTapped($0)) }
+						) { action in
+							Button(L10n.EditPersona.AddAField.add, action: action)
+								.buttonStyle(.primaryRectangular)
 						}
+					}
 				}
 			}
 		}

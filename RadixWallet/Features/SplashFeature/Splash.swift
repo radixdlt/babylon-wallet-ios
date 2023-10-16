@@ -66,13 +66,9 @@ public struct Splash: Sendable, FeatureReducer {
 			case .retryButtonTapped:
 				return verifyPasscode()
 			case .openSettingsButtonTapped:
-				#if os(iOS)
 				return .run { _ in
 					await openURL(URL(string: UIApplication.openSettingsURLString)!)
 				}
-				#else
-				return .none
-				#endif
 			}
 		case .passcodeCheckFailedAlert:
 			return .none

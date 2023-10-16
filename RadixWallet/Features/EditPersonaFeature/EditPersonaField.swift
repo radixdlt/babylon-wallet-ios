@@ -4,11 +4,9 @@ import SwiftUI
 // MARK: - EditPersonaFieldKindBehaviour
 public protocol EditPersonaFieldKindBehaviour: Sendable, Hashable, Comparable {
 	var title: String { get }
-	#if os(iOS)
 	var contentType: UITextContentType? { get }
 	var keyboardType: UIKeyboardType { get }
 	var capitalization: EquatableTextInputCapitalization? { get }
-	#endif
 }
 
 // MARK: - EditPersonaField
@@ -65,7 +63,6 @@ extension EditPersona.State.StaticFieldID: EditPersonaFieldKindBehaviour {
 		}
 	}
 
-	#if os(iOS)
 	public var contentType: UITextContentType? {
 		switch self {
 		case .personaLabel: .none
@@ -83,7 +80,6 @@ extension EditPersona.State.StaticFieldID: EditPersonaFieldKindBehaviour {
 		case .personaLabel: .words
 		}
 	}
-	#endif
 }
 
 extension EditPersonaStaticField.State {
@@ -142,7 +138,6 @@ extension DynamicFieldID: EditPersonaFieldKindBehaviour {
 		}
 	}
 
-	#if os(iOS)
 	public var contentType: UITextContentType? {
 		switch self {
 		case .givenNames: .name
@@ -187,7 +182,6 @@ extension DynamicFieldID: EditPersonaFieldKindBehaviour {
 		case .creditCard: .none
 		}
 	}
-	#endif
 }
 
 // MARK: - PersonaData.Entry.Kind + Comparable

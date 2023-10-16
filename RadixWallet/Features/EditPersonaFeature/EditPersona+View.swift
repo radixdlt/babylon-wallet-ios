@@ -98,7 +98,6 @@ extension EditPersona {
 								.buttonStyle(.primaryRectangular)
 						}
 					}
-					#if os(iOS)
 					.navigationTitle(viewStore.personaLabel)
 					.navigationBarTitleDisplayMode(.inline)
 					.toolbar {
@@ -106,7 +105,6 @@ extension EditPersona {
 							CloseButton { viewStore.send(.closeButtonTapped) }
 						}
 					}
-					#endif
 				}
 				.confirmationDialog(
 					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),

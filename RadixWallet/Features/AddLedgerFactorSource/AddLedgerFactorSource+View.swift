@@ -39,7 +39,6 @@ extension AddLedgerFactorSource {
 						.padding(.horizontal, .medium3)
 						.padding(.bottom, .large2)
 					}
-					#if os(iOS)
 					.toolbar {
 						ToolbarItem(placement: .primaryAction) {
 							CloseButton {
@@ -47,7 +46,6 @@ extension AddLedgerFactorSource {
 							}
 						}
 					}
-					#endif
 				}
 				.destination(store: store)
 			}

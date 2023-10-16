@@ -118,13 +118,11 @@ extension DevAccountPreferences {
 							}
 						}
 					#endif // DEBUG
-					#if os(iOS)
-					.navigationBarTitleColor(.app.gray1)
-					.navigationBarTitleDisplayMode(.inline)
-					.navigationBarInlineTitleFont(.app.secondaryHeader)
-					.toolbarBackground(.app.background, for: .navigationBar)
-					.toolbarBackground(.visible, for: .navigationBar)
-					#endif // os(iOS)
+						.navigationBarTitleColor(.app.gray1)
+						.navigationBarTitleDisplayMode(.inline)
+						.navigationBarInlineTitleFont(.app.secondaryHeader)
+						.toolbarBackground(.app.background, for: .navigationBar)
+						.toolbarBackground(.visible, for: .navigationBar)
 				}
 			}
 		}

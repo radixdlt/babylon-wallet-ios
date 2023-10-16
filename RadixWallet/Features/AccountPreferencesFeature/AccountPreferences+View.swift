@@ -48,13 +48,11 @@ extension AccountPreferences {
 				.destination(store: store)
 				.background(.app.gray5)
 				.navigationTitle(L10n.AccountSettings.title)
-				#if os(iOS)
-					.navigationBarTitleColor(.app.gray1)
-					.navigationBarTitleDisplayMode(.inline)
-					.navigationBarInlineTitleFont(.app.secondaryHeader)
-					.toolbarBackground(.app.background, for: .navigationBar)
-					.toolbarBackground(.visible, for: .navigationBar)
-				#endif // os(iOS)
+				.navigationBarTitleColor(.app.gray1)
+				.navigationBarTitleDisplayMode(.inline)
+				.navigationBarInlineTitleFont(.app.secondaryHeader)
+				.toolbarBackground(.app.background, for: .navigationBar)
+				.toolbarBackground(.visible, for: .navigationBar)
 			}
 		}
 	}

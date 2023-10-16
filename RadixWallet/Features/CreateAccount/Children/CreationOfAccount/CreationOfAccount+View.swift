@@ -28,11 +28,9 @@ extension CreationOfAccount {
 					}
 				}
 			}
-			#if os(iOS)
 			.navigationBarTitleColor(.app.gray1)
 			.navigationBarTitleDisplayMode(.inline)
 			.navigationBarInlineTitleFont(.app.secondaryHeader)
-			#endif
 		}
 	}
 }

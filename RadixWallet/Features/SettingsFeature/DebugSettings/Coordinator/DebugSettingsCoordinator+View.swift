@@ -28,13 +28,11 @@ extension DebugSettingsCoordinator.View {
 			}
 			.padding(.bottom, .large3)
 			.navigationTitle("Debug Settings") // FIXME: Strings - L10n.Settings.DebugSettingsCoordinator.title
-			#if os(iOS)
-				.navigationBarTitleColor(.app.gray1)
-				.navigationBarTitleDisplayMode(.inline)
-				.navigationBarInlineTitleFont(.app.secondaryHeader)
-			#endif
-				.factorSources(with: destinationStore)
-				.debugUserDefaultsContents(with: destinationStore)
+			.navigationBarTitleColor(.app.gray1)
+			.navigationBarTitleDisplayMode(.inline)
+			.navigationBarInlineTitleFont(.app.secondaryHeader)
+			.factorSources(with: destinationStore)
+			.debugUserDefaultsContents(with: destinationStore)
 			#if DEBUG
 				.debugKeychainTest(with: destinationStore)
 			#endif // DEBUG

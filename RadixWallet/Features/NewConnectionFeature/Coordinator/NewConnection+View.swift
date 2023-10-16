@@ -43,7 +43,6 @@ extension NewConnection {
 						}
 					}
 				}
-				#if os(iOS)
 				.toolbar {
 					ToolbarItem(placement: .primaryAction) {
 						CloseButton {
@@ -51,7 +50,6 @@ extension NewConnection {
 						}
 					}
 				}
-				#endif
 			}
 			.tint(.app.gray1)
 			.foregroundColor(.app.gray1)

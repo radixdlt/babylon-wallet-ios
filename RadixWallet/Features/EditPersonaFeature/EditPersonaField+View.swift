@@ -6,21 +6,17 @@ extension EditPersonaField {
 		@Validation<String, String>
 		var input: String?
 		let inputHint: Hint?
-		#if os(iOS)
 		let contentType: UITextContentType?
 		let keyboardType: UIKeyboardType
 		let capitalization: EquatableTextInputCapitalization?
-		#endif
 
 		init(state: State) {
 			self.primaryHeading = state.showsTitle ? state.behaviour.title : ""
 			self._input = state.$input
 			self.inputHint = (state.$input.errors?.first).map { .error($0) }
-			#if os(iOS)
 			self.capitalization = state.behaviour.capitalization
 			self.keyboardType = state.behaviour.keyboardType
 			self.contentType = state.behaviour.contentType
-			#endif
 		}
 	}
 

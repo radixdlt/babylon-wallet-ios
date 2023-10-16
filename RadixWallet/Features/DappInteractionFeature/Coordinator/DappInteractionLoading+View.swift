@@ -33,13 +33,11 @@ extension DappInteractionLoading {
 								action: { .view(.errorAlert($0)) }
 							)
 						)
-					#if os(iOS)
 						.toolbar {
 							ToolbarItemGroup(placement: .navigationBarLeading) {
 								CloseButton { viewStore.send(.dismissButtonTapped) }
 							}
 						}
-					#endif
 				}
 			}
 		}

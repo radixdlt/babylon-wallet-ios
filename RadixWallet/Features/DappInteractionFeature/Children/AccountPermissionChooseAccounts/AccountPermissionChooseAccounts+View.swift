@@ -99,9 +99,7 @@ struct ChooseAccounts_Preview: PreviewProvider {
 					reducer: AccountPermissionChooseAccounts.init
 				)
 			)
-			#if os(iOS)
 			.toolbar(.visible, for: .navigationBar)
-			#endif // iOS
 		}
 	}
 }

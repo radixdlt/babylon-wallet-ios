@@ -89,7 +89,6 @@ struct DetailsContainer<Contents: View>: View {
 			ScrollView {
 				contents
 			}
-			#if os(iOS)
 			.navigationBarTitle(title.wrappedValue ?? "")
 			.navigationBarTitleColor(.app.gray1)
 			.navigationBarTitleDisplayMode(.inline)
@@ -99,7 +98,6 @@ struct DetailsContainer<Contents: View>: View {
 					CloseButton(action: closeButtonAction)
 				}
 			}
-			#endif
 		}
 		.tint(.app.gray1)
 		.foregroundColor(.app.gray1)

@@ -1,3 +1,5 @@
+import SwiftUINavigation
+
 // MARK: - AppTextField
 public struct AppTextField<FocusValue: Hashable, Accessory: View, InnerAccessory: View>: View {
 	public struct Focus {

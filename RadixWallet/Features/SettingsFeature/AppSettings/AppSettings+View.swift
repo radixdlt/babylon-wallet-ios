@@ -58,7 +58,7 @@ extension AppSettings {
 							isDeveloperModeEnabled(with: viewStore)
 								.withSeparator
 
-							#if DEBUG && canImport(UIKit)
+							#if DEBUG
 							exportLogs(with: viewStore)
 								.withSeparator
 							#endif
@@ -107,7 +107,7 @@ extension AppSettings {
 			)
 		}
 
-		#if DEBUG && canImport(UIKit)
+		#if DEBUG
 		private func exportLogs(with viewStore: ViewStoreOf<AppSettings>) -> some SwiftUI.View {
 			HStack {
 				VStack(alignment: .leading, spacing: 0) {
@@ -175,7 +175,6 @@ extension URL: Identifiable {
 
 // MARK: - ShareView
 // TODO: This is alternative to `ShareLink`, which does not seem to work properly. Eventually we should make use of it instead of this wrapper.
-#if canImport(UIKit)
 struct ShareView: UIViewControllerRepresentable {
 	typealias UIViewControllerType = UIActivityViewController
 
@@ -187,7 +186,6 @@ struct ShareView: UIViewControllerRepresentable {
 
 	func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}
 }
-#endif
 
 #if DEBUG
 import ComposableArchitecture

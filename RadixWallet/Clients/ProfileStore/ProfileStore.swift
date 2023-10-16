@@ -401,12 +401,6 @@ extension ProfileStore.ProfileState {
 
 // MARK: Internal
 extension ProfileStore {
-	#if !canImport(UIKit)
-	/// used by tests
-	static let macOSDeviceNameFallback: DeviceFactorSource.Hint.Name = "macOS"
-	static let macOSDeviceModelFallback: DeviceFactorSource.Hint.Model = "macOS"
-	#endif
-
 	static func deviceDescription(
 		name: String,
 		model: DeviceFactorSource.Hint.Model
@@ -511,14 +505,9 @@ extension ProfileStore {
 		do {
 			let name: String
 			let model: DeviceFactorSource.Hint.Model
-			#if canImport(UIKit)
 			@Dependency(\.device) var device
 			name = await device.name
 			model = await .init(rawValue: device.model)
-			#else
-			name = macOSDeviceNameFallback
-			model = macOSDeviceModelFallback
-			#endif
 
 			let mnemonic = try mnemonicClient.generate(BIP39.WordCount.twentyFour, BIP39.Language.english)
 			let mnemonicWithPassphrase = MnemonicWithPassphrase(mnemonic: mnemonic)

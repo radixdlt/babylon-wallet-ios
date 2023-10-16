@@ -89,9 +89,7 @@ struct AccountPermission_Preview: PreviewProvider {
 					reducer: AccountPermission.init
 				)
 			)
-			#if os(iOS)
 			.toolbar(.visible, for: .navigationBar)
-			#endif // iOS
 		}
 	}
 }

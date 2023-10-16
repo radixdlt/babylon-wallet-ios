@@ -50,18 +50,16 @@ extension AccountSecurity.View {
 				store.send(.view(.appeared))
 			}
 			.navigationTitle("Account Security") // FIXME: Strings - L10n.Settings.AccountSecurity.title
-			#if os(iOS)
-				.navigationBarTitleColor(.app.gray1)
-				.navigationBarTitleDisplayMode(.inline)
-				.navigationBarInlineTitleFont(.app.secondaryHeader)
-			#endif
-				.mnemonics(with: destinationStore)
-				.ledgerHardwareWallets(with: destinationStore)
-				.depositGuarantees(with: destinationStore)
-				.importFromOlympiaLegacyWallet(with: destinationStore)
-				.tint(.app.gray1)
-				.foregroundColor(.app.gray1)
-				.presentsLoadingViewOverlay()
+			.navigationBarTitleColor(.app.gray1)
+			.navigationBarTitleDisplayMode(.inline)
+			.navigationBarInlineTitleFont(.app.secondaryHeader)
+			.mnemonics(with: destinationStore)
+			.ledgerHardwareWallets(with: destinationStore)
+			.depositGuarantees(with: destinationStore)
+			.importFromOlympiaLegacyWallet(with: destinationStore)
+			.tint(.app.gray1)
+			.foregroundColor(.app.gray1)
+			.presentsLoadingViewOverlay()
 		}
 	}
 

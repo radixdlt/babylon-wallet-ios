@@ -66,11 +66,9 @@ extension Settings.View {
 			let destinationStore = store.scope(state: \.$destination, action: { .child(.destination($0)) })
 			settingsView(viewStore: viewStore)
 				.navigationTitle(L10n.Settings.title)
-			#if os(iOS)
 				.navigationBarTitleColor(.app.gray1)
 				.navigationBarTitleDisplayMode(.inline)
 				.navigationBarInlineTitleFont(.app.secondaryHeader)
-			#endif
 				.navigationDestinations(with: destinationStore)
 				.tint(.app.gray1)
 				.foregroundColor(.app.gray1)

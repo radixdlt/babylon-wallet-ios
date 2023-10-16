@@ -56,9 +56,7 @@ public struct CameraPermission: Sendable, FeatureReducer {
 			case .openSettingsButtonTapped:
 				.run { send in
 					await send(.delegate(.permissionResponse(false)))
-					#if os(iOS)
 					await openURL(URL(string: UIApplication.openSettingsURLString)!)
-					#endif
 				}
 			}
 		case .permissionDeniedAlert:

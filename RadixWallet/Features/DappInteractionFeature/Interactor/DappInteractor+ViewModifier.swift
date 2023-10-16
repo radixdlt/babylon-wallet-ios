@@ -57,14 +57,12 @@ extension DappInteractor {
 			.task {
 				await store.send(.view(.task)).finish()
 			}
-			#if os(iOS)
 			.onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in
 				store.send(.view(.moveToForeground))
 			}
 			.onReceive(NotificationCenter.default.publisher(for: UIApplication.didEnterBackgroundNotification)) { _ in
 				store.send(.view(.moveToBackground))
 			}
-			#endif
 		}
 	}
 }

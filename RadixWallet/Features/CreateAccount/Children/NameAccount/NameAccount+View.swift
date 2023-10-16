@@ -78,9 +78,7 @@ extension NameAccount {
 					}
 					.padding([.bottom, .horizontal], .medium1)
 				}
-				#if os(iOS)
 				.toolbar(.visible, for: .navigationBar)
-				#endif
 				.footer {
 					WithControlRequirements(
 						viewStore.sanitizedNameRequirement,

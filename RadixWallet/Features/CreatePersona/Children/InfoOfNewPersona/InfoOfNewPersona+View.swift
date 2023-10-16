@@ -86,9 +86,7 @@ extension NewPersonaInfo {
 						}
 						.padding([.horizontal, .bottom], .medium1)
 					}
-					#if os(iOS)
 					.toolbar(.visible, for: .navigationBar)
-					#endif
 					.footer {
 						WithControlRequirements(
 							viewStore.sanitizedNameRequirement,

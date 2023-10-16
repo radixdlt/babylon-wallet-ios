@@ -62,10 +62,8 @@ extension AddNewGateway {
 								to: $focusedField
 							)
 						)
-						#if os(iOS)
 						.textInputAutocapitalization(.never)
 						.keyboardType(.URL)
-						#endif // iOS
 						.autocorrectionDisabled()
 					}
 					.padding([.bottom, .horizontal], .medium1)

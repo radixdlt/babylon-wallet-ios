@@ -71,12 +71,10 @@ extension SlideUpPanel {
 				}
 				.presentationDetents([.medium])
 				.presentationDragIndicator(.visible)
-//				#if os(iOS)
 //					.presentationBackground(.blur)
 				.onWillDisappear {
 					viewStore.send(.willDisappear)
 				}
-//				#endif
 			}
 		}
 	}

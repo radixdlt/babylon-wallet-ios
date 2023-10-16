@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import ScreenshotPreventing
 import SwiftUI
 
 extension ImportMnemonic.State {
@@ -184,9 +185,9 @@ extension ImportMnemonic {
 				.animation(.default, value: viewStore.wordCount)
 				.animation(.default, value: viewStore.isAdvancedMode)
 				.onAppear { viewStore.send(.appeared) }
-				#if !DEBUG && os(iOS)
+				#if !DEBUG
 					.screenshotProtected(isProtected: true)
-				#endif // iOS
+				#endif // !DEBUG
 					.destination(store: store)
 			}
 		}
@@ -327,23 +328,3 @@ extension ImportMnemonic.View {
 		.padding([.horizontal, .bottom], .medium2)
 	}
 }
-
-// #if DEBUG
-// import SwiftUI
-import ComposableArchitecture //
-//// MARK: - ImportMnemonic_Preview
-// struct ImportMnemonic_Preview: PreviewProvider {
-//	static var previews: some View {
-//		ImportMnemonic.View(
-//			store: .init(
-//				initialState: .previewValue,
-//				reducer: ImportMnemonic.init
-//			)
-//		)
-//	}
-// }
-//
-// extension ImportMnemonic.State {
-//	public static let previewValue = Self(persistStrategy: .intoKeychainOnly, mnemonicForFactorSourceKind: .offDevice)
-// }
-// #endif

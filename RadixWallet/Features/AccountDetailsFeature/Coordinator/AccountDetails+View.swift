@@ -70,7 +70,6 @@ extension AccountDetails {
 				.task {
 					viewStore.send(.task)
 				}
-				#if os(iOS)
 				.navigationBarTitleDisplayMode(.inline)
 				.toolbar {
 					ToolbarItem(placement: .navigationBarLeading) {
@@ -92,7 +91,6 @@ extension AccountDetails {
 						.foregroundColor(.app.white)
 					}
 				}
-				#endif
 				.navigationDestination(
 					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
 					state: /AccountDetails.Destinations.State.preferences,
@@ -150,9 +148,7 @@ struct AccountDetails_Preview: PreviewProvider {
 					reducer: AccountDetails.init
 				)
 			)
-			#if os(iOS)
 			.navigationBarTitleDisplayMode(.inline)
-			#endif
 		}
 	}
 }
