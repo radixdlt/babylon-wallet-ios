@@ -64,7 +64,7 @@ extension Completion {
 			}
 			.presentationDragIndicator(.visible)
 			.presentationDetents([.height(.smallDetent)])
-//				.presentationBackground(.blur)
+			.presentationBackground(.blur)
 		}
 	}
 }

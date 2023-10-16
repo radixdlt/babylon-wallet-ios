@@ -1158,7 +1158,6 @@
 		48FFFAAB2ADC1FE900B2B213 /* DependenciesAdditions in Frameworks */ = {isa = PBXBuildFile; productRef = 48FFFAAA2ADC1FE900B2B213 /* DependenciesAdditions */; };
 		48FFFAAE2ADC200300B2B213 /* EngineToolkit in Frameworks */ = {isa = PBXBuildFile; productRef = 48FFFAAD2ADC200300B2B213 /* EngineToolkit */; };
 		48FFFAB12ADC203700B2B213 /* WebRTC in Frameworks */ = {isa = PBXBuildFile; productRef = 48FFFAB02ADC203700B2B213 /* WebRTC */; };
-		48FFFAB42ADC206300B2B213 /* Introspect in Frameworks */ = {isa = PBXBuildFile; productRef = 48FFFAB32ADC206300B2B213 /* Introspect */; };
 		48FFFAB72ADC207B00B2B213 /* NavigationTransitions in Frameworks */ = {isa = PBXBuildFile; productRef = 48FFFAB62ADC207B00B2B213 /* NavigationTransitions */; };
 		48FFFABA2ADC209100B2B213 /* Nuke in Frameworks */ = {isa = PBXBuildFile; productRef = 48FFFAB92ADC209100B2B213 /* Nuke */; };
 		48FFFABC2ADC209100B2B213 /* NukeExtensions in Frameworks */ = {isa = PBXBuildFile; productRef = 48FFFABB2ADC209100B2B213 /* NukeExtensions */; };
@@ -1189,6 +1188,7 @@
 		48FFFB082ADC6FD300B2B213 /* SwiftUINavigationCore in Frameworks */ = {isa = PBXBuildFile; productRef = 48FFFB072ADC6FD300B2B213 /* SwiftUINavigationCore */; };
 		48FFFB0A2ADC721800B2B213 /* Atomics in Frameworks */ = {isa = PBXBuildFile; productRef = 48FFFB092ADC721800B2B213 /* Atomics */; };
 		48FFFB0D2ADC744700B2B213 /* TextBuilder in Frameworks */ = {isa = PBXBuildFile; productRef = 48FFFB0C2ADC744700B2B213 /* TextBuilder */; };
+		E63D123D2ADD1FC00001CBB1 /* SwiftUIIntrospect in Frameworks */ = {isa = PBXBuildFile; productRef = E63D123C2ADD1FC00001CBB1 /* SwiftUIIntrospect */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -2377,7 +2377,6 @@
 				48FFFAF92ADC241A00B2B213 /* DequeModule in Frameworks */,
 				48FFFA962ADC1EBC00B2B213 /* ComposableArchitecture in Frameworks */,
 				48FFFAAB2ADC1FE900B2B213 /* DependenciesAdditions in Frameworks */,
-				48FFFAB42ADC206300B2B213 /* Introspect in Frameworks */,
 				48FFFAA22ADC1F5D00B2B213 /* Algorithms in Frameworks */,
 				48FFFAC12ADC20C400B2B213 /* JSONPreview in Frameworks */,
 				48FFFADB2ADC21E400B2B213 /* SwiftLogConsoleColors in Frameworks */,
@@ -2393,6 +2392,7 @@
 				48FFFB032ADC6F8100B2B213 /* Builders in Frameworks */,
 				48FFFAB72ADC207B00B2B213 /* NavigationTransitions in Frameworks */,
 				48FFFA992ADC1EEC00B2B213 /* AsyncExtensions in Frameworks */,
+				E63D123D2ADD1FC00001CBB1 /* SwiftUIIntrospect in Frameworks */,
 				48FFFABC2ADC209100B2B213 /* NukeExtensions in Frameworks */,
 				48FFFAFD2ADC241A00B2B213 /* HeapModule in Frameworks */,
 				48FFFAD52ADC21B900B2B213 /* LegibleError in Frameworks */,
@@ -2543,6 +2543,7 @@
 				48CFBC512ADC106300E77A5C /* RadixWallet */,
 				481B43B12ADC7F1A007945C1 /* RadixWalletTests */,
 				48CFBC502ADC106300E77A5C /* Products */,
+				E63D123B2ADD1FC00001CBB1 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -6707,6 +6708,13 @@
 			path = Project;
 			sourceTree = "<group>";
 		};
+		E63D123B2ADD1FC00001CBB1 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -6752,7 +6760,6 @@
 				48FFFAAA2ADC1FE900B2B213 /* DependenciesAdditions */,
 				48FFFAAD2ADC200300B2B213 /* EngineToolkit */,
 				48FFFAB02ADC203700B2B213 /* WebRTC */,
-				48FFFAB32ADC206300B2B213 /* Introspect */,
 				48FFFAB62ADC207B00B2B213 /* NavigationTransitions */,
 				48FFFAB92ADC209100B2B213 /* Nuke */,
 				48FFFABB2ADC209100B2B213 /* NukeExtensions */,
@@ -6782,6 +6789,7 @@
 				48FFFB072ADC6FD300B2B213 /* SwiftUINavigationCore */,
 				48FFFB092ADC721800B2B213 /* Atomics */,
 				48FFFB0C2ADC744700B2B213 /* TextBuilder */,
+				E63D123C2ADD1FC00001CBB1 /* SwiftUIIntrospect */,
 			);
 			productName = RadixWallet;
 			productReference = 48CFBC4F2ADC106300E77A5C /* Radix Wallet Dev.app */;
@@ -8800,16 +8808,16 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/siteline/SwiftUI-Introspect";
 			requirement = {
-				kind = exactVersion;
-				version = 0.1.4;
+				kind = upToNextMinorVersion;
+				minimumVersion = 1.0.0;
 			};
 		};
 		48FFFAB52ADC207B00B2B213 /* XCRemoteSwiftPackageReference "swiftui-navigation-transitions" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/davdroman/swiftui-navigation-transitions";
 			requirement = {
-				kind = exactVersion;
-				version = 0.9.0;
+				kind = upToNextMinorVersion;
+				minimumVersion = 0.13.1;
 			};
 		};
 		48FFFAB82ADC209100B2B213 /* XCRemoteSwiftPackageReference "Nuke" */ = {
@@ -9033,11 +9041,6 @@
 			package = 48FFFAAF2ADC203700B2B213 /* XCRemoteSwiftPackageReference "WebRTC" */;
 			productName = WebRTC;
 		};
-		48FFFAB32ADC206300B2B213 /* Introspect */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 48FFFAB22ADC206300B2B213 /* XCRemoteSwiftPackageReference "SwiftUI-Introspect" */;
-			productName = Introspect;
-		};
 		48FFFAB62ADC207B00B2B213 /* NavigationTransitions */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 48FFFAB52ADC207B00B2B213 /* XCRemoteSwiftPackageReference "swiftui-navigation-transitions" */;
@@ -9182,6 +9185,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 48FFFB0B2ADC744700B2B213 /* XCRemoteSwiftPackageReference "TextBuilder" */;
 			productName = TextBuilder;
+		};
+		E63D123C2ADD1FC00001CBB1 /* SwiftUIIntrospect */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 48FFFAB22ADC206300B2B213 /* XCRemoteSwiftPackageReference "SwiftUI-Introspect" */;
+			productName = SwiftUIIntrospect;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

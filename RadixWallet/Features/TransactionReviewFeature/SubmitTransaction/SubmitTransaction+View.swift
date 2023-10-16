@@ -90,7 +90,7 @@ extension SubmitTransaction {
 				.interactiveDismissDisabled(true)
 				.presentationDragIndicator(.visible)
 				.presentationDetents([.fraction(0.66)])
-//					.presentationBackground(.blur)
+				.presentationBackground(.blur)
 			}
 		}
 	}

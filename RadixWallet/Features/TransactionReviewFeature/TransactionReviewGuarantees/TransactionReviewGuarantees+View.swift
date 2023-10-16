@@ -72,7 +72,7 @@ extension TransactionReviewGuarantees {
 					SlideUpPanel.View(store: $0)
 						.presentationDetents([.medium])
 						.presentationDragIndicator(.visible)
-//						.presentationBackground(.blur)
+						.presentationBackground(.blur)
 				}
 				.toolbar {
 					ToolbarItem(placement: .cancellationAction) {

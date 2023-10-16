@@ -70,7 +70,7 @@ extension AddAsset {
 			}
 			.presentationDetents([.fraction(0.75)])
 			.presentationDragIndicator(.visible)
-//				.presentationBackground(.blur)
+			.presentationBackground(.blur)
 		}
 	}
 }

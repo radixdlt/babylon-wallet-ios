@@ -71,7 +71,7 @@ extension SlideUpPanel {
 				}
 				.presentationDetents([.medium])
 				.presentationDragIndicator(.visible)
-//					.presentationBackground(.blur)
+				.presentationBackground(.blur)
 				.onWillDisappear {
 					viewStore.send(.willDisappear)
 				}

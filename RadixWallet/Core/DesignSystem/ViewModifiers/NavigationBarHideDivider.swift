@@ -1,4 +1,6 @@
 #if os(iOS)
+import SwiftUI
+@_spi(Advanced) import SwiftUIIntrospect
 
 extension View {
 	public func navigationBarHideDivider() -> some View {
@@ -8,7 +10,10 @@ extension View {
 
 struct NavigationBarHideDividerModifier: ViewModifier {
 	func body(content: Content) -> some View {
-		content.introspectNavigationController { navigationController in
+		content.introspect(
+			.navigationStack, on: .iOS(.v16...),
+			scope: [.receiver, .ancestor]
+		) { navigationController in
 			let appearance = UINavigationBarAppearance()
 			appearance.configureWithDefaultBackground()
 			appearance.shadowColor = .clear

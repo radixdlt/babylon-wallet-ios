@@ -80,7 +80,7 @@ extension AssetTransferMessage.View {
 					MessageMode.View(store: $0)
 						.presentationDetents([.medium])
 						.presentationDragIndicator(.visible)
-//						.presentationBackground(.blur)
+						.presentationBackground(.blur)
 				}
 			)
 		}
