@@ -1,0 +1,111 @@
+import LocalAuthentication
+
+// MARK: - LocalAuthenticationClient + DependencyKey
+extension LocalAuthenticationClient: DependencyKey {
+	public static let liveValue: Self = .init(
+		queryConfig: {
+			try await LAContext().queryLocalAuthenticationConfig()
+		}
+	)
+}
+
+// MARK: - LocalAuthenticationClient.Error
+extension LocalAuthenticationClient {
+	public enum Error: Swift.Error, Equatable {
+		case contextDeinitialized
+		case queryCancelled
+		case evaluationError(LAError)
+		case evaluationFailedWithOtherError(reason: String)
+		case evaluateBioDiscrepancyPasscodeNotSetButExpectedToBe
+	}
+}
+
+extension LAContext {
+	fileprivate typealias Error = LocalAuthenticationClient.Error
+
+	private func canEvaluate(
+		policy: LAPolicy,
+		errorHandling: (LAError) -> Result<Bool, Error>?
+	) async throws -> Bool {
+		try await withCheckedThrowingContinuation { [weak self] (continuation: CheckedContinuation<Bool, Swift.Error>) in
+			guard let self else {
+				continuation.resume(throwing: Error.contextDeinitialized)
+				return
+			}
+			var error: NSError?
+			let canEvaluate = self.canEvaluatePolicy(policy, error: &error)
+
+			guard let evaluationError = error else {
+				continuation.resume(returning: canEvaluate)
+				return
+			}
+
+			guard let laError = evaluationError as? LAError else {
+				let reason = String(describing: error)
+				continuation.resume(throwing: Error.evaluationFailedWithOtherError(reason: reason))
+				return
+			}
+
+			guard let result = errorHandling(laError) else {
+				continuation.resume(returning: canEvaluate)
+				return
+			}
+
+			switch result {
+			case let .success(canEvaluate_):
+				continuation.resume(returning: canEvaluate_)
+				return
+			case let .failure(error):
+				continuation.resume(throwing: error)
+				return
+			}
+		}
+	}
+
+	private func evaluateIfPasscodeIsSetUp() async throws -> Bool {
+		try await canEvaluate(policy: .deviceOwnerAuthentication) { laError in
+			switch laError.code {
+			case .appCancel, .userCancel:
+				.failure(.queryCancelled)
+			case .passcodeNotSet:
+				.success(false)
+			case .biometryNotEnrolled, .biometryLockout, .biometryNotAvailable:
+				nil // irrelevant for passcode
+			default:
+				.failure(.evaluationError(laError))
+			}
+		}
+	}
+
+	private func evaluateIfBiometricsIsSetUp() async throws -> Bool {
+		try await canEvaluate(policy: .deviceOwnerAuthenticationWithBiometrics) { laError in
+			switch laError.code {
+			case .appCancel, .userCancel:
+				.failure(.queryCancelled)
+			case .passcodeNotSet:
+				.failure(.evaluateBioDiscrepancyPasscodeNotSetButExpectedToBe)
+			case .biometryNotEnrolled, .biometryLockout, .biometryNotAvailable:
+				.success(false)
+			default:
+				.failure(.evaluationError(laError))
+			}
+		}
+	}
+
+	// Returns `nil` if user presses "cancel" button
+	fileprivate func queryLocalAuthenticationConfig() async throws -> LocalAuthenticationConfig {
+		let passcodeSupportedResult = try await evaluateIfPasscodeIsSetUp()
+
+		guard passcodeSupportedResult else {
+			return .neitherBiometricsNorPasscodeSetUp
+		}
+
+		let biometricsSupportedResult = try await evaluateIfBiometricsIsSetUp()
+
+		guard biometricsSupportedResult else {
+			return .passcodeSetUpButNotBiometrics
+		}
+
+		return .biometricsAndPasscodeSetUp
+	}
+}

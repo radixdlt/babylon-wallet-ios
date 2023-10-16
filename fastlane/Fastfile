@@ -6,6 +6,7 @@ before_all do
     ensure_git_status_clean
 end
 
+
 platform :ios do
     before_all do
         Dotenv.load ".env.ios"
@@ -21,15 +22,7 @@ platform :ios do
     desc "Runs test"
     lane :tests do
         Dotenv.load ".env.ios.dev"
-
-        # `sh` runs in `./fastlane/` not root, so must use '../'
-        # https://docs.fastlane.tools/actions/sh/
-        test = "xcodebuild \
-          -project '../App/BabylonWallet.xcodeproj' \
-          -scheme 'RadixWalletTests' \
-          -destination 'platform=iOS Simulator,name=iPhone 15' \
-          test | xcbeautify -q --is-ci"
-        sh(test)
+        run_tests
     end
 
     desc "Deploy the app for a given flavour: alpha, beta, release"
@@ -101,34 +94,6 @@ platform :ios do
     end
 
 end
-
-platform :mac do
-    before_all do
-        Dotenv.load ".env.mac"
-    end
-
-    desc "Runs tests"
-    lane :tests do
-        run_tests
-    end
-
-    desc "Installs certificates on the machine"
-    lane :install_development_certificates do
-        code_signing(type: "development")
-    end
-
-    desc "Generates new certificates if needed"
-    lane :generate_new_certificates do
-        code_signing(type: "development", readonly: false)
-    end
-
-    desc "Registers a new mac device and updates the certificates"
-    lane :register_new_mac_device do
-        register_new_device
-        generate_new_certificates
-    end
-end
-
 
 def rev_changelog(flavour, most_recent_tags)
     git_commits_range_for_changelog = most_recent_tags.map { |tag| sh("git rev-list --abbrev-commit -n 1 #{tag}").strip }

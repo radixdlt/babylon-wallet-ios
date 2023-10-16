@@ -100,9 +100,8 @@ jobs:
 
       - name: "Run Lint"
         run: |
-          #Disable upgrade
-          #brew update
-          #brew upgrade swiftformat
+          brew update
+          brew upgrade swiftformat
           swiftformat . --lint
 
   test-and-build:
