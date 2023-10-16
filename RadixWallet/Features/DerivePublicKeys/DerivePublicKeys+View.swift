@@ -50,6 +50,9 @@ extension DerivePublicKeys {
 						LedgerRowView(viewState: .init(factorSource: ledger))
 					}
 
+					ProgressView()
+						.padding(.top, .large3)
+
 					Spacer(minLength: 0)
 				}
 				.padding(.horizontal, .medium1)

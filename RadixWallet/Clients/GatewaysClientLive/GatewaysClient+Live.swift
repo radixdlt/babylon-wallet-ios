@@ -8,6 +8,7 @@ extension GatewaysClient: DependencyKey {
 		@Dependency(\.appPreferencesClient) var appPreferencesClient
 
 		return Self(
+			currentGatewayValues: { await getProfileStore().currentGatewayValues() },
 			gatewaysValues: { await getProfileStore().gatewaysValues() },
 			getAllGateways: { await appPreferencesClient.getPreferences().gateways.all },
 			getCurrentGateway: { await appPreferencesClient.getPreferences().gateways.current },

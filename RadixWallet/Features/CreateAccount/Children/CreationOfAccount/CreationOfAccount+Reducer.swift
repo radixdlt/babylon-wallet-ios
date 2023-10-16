@@ -82,7 +82,7 @@ public struct CreationOfAccount: Sendable, FeatureReducer {
 
 		case let .createAccountResult(.success(account)):
 			return .run { send in
-				try await accountsClient.saveVirtualAccount(.init(account: account))
+				try await accountsClient.saveVirtualAccount(account)
 				await send(.delegate(.createdAccount(account)))
 			} catch: { error, send in
 				loggerGlobal.error("Failed to save newly created virtual account into profile: \(error)")

@@ -3,6 +3,8 @@ import SwiftUI
 
 // MARK: - ImportOlympiaLedgerAccountsAndFactorSources
 public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureReducer {
+	public typealias ValidatedAccounts = NonEmpty<Set<OlympiaAccountToMigrate>>
+
 	public struct State: Sendable, Hashable {
 		public let networkID: NetworkID
 
@@ -67,11 +69,8 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 		/// Adds a previously saved device to the list and continues
 		case useExistingLedger(LedgerHardwareWalletFactorSource)
 
-		/// Validated public keys against expected, then migrate...
-		case validatedAccounts(Set<OlympiaAccountToMigrate>, LedgerHardwareWalletFactorSource.ID)
-
-		/// Migrated accounts of validated public keys
-		case migratedOlympiaHardwareAccounts(MigratedHardwareAccounts)
+		// Validates and migrates Olympia hardware accounts
+		case processedOlympiaHardwareAccounts(ValidatedAccounts, MigratedHardwareAccounts)
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -88,6 +87,7 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 		}
 	}
 
+	@Dependency(\.accountsClient) var accountsClient
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.radixConnectClient) var radixConnectClient
 	@Dependency(\.factorSourcesClient) var factorSourcesClient
@@ -126,6 +126,8 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 				} else {
 					await send(.internal(.useNewLedger(ledgerInfo)))
 				}
+			} catch: { error, _ in
+				errorQueue.schedule(error)
 			}
 		}
 	}
@@ -154,28 +156,12 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 
 			return .none
 
-		case let .validatedAccounts(validatedAccounts, ledgerID):
-			guard let validatedAccounts = NonEmpty<Set>(validatedAccounts) else {
-				struct NoAccountsOnLedgerError: LocalizedError {
-					var errorDescription: String? {
-						"No new accounts were found on this Ledger device" // FIXME: Strings
-					}
-				}
-
-				errorQueue.schedule(NoAccountsOnLedgerError())
-				return .none
-			}
-
+		case let .processedOlympiaHardwareAccounts(validatedAccounts, migratedAccounts):
 			for validatedAccount in validatedAccounts {
 				state.olympiaAccounts.unvalidated.remove(validatedAccount)
 				state.olympiaAccounts.validated.append(contentsOf: validatedAccounts)
 			}
-			return migrateOlympiaHardwareAccounts(
-				ledgerID: ledgerID,
-				validatedAccountsToMigrate: validatedAccounts
-			)
 
-		case let .migratedOlympiaHardwareAccounts(migratedAccounts):
 			loggerGlobal.notice("Adding migrated accounts...")
 			state.migratedAccounts.append(migratedAccounts)
 
@@ -241,11 +227,17 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 					return .none
 				}
 
-				return validate(
-					derivedPublicKeys: publicKeys,
-					ledgerID: ledgerID,
-					olympiaAccountsToValidate: state.olympiaAccounts.unvalidated
-				)
+				return .run { [unvalidated = state.olympiaAccounts.unvalidated] send in
+					let (validated, migrated) = try await process(
+						derivedPublicKeys: publicKeys,
+						ledgerID: ledgerID,
+						olympiaAccountsToValidate: unvalidated
+					)
+					await send(.internal(.processedOlympiaHardwareAccounts(validated, migrated)))
+				} catch: { error, _ in
+					loggerGlobal.error("Failed to process Olympia hardware accounts: \(error)")
+					errorQueue.schedule(error)
+				}
 			}
 
 		default:
@@ -268,20 +260,34 @@ extension ImportOlympiaLedgerAccountsAndFactorSources {
 		}
 	}
 
-	private func validate(
+	private func process(
 		derivedPublicKeys: [HierarchicalDeterministicPublicKey],
 		ledgerID: LedgerHardwareWalletFactorSource.ID,
 		olympiaAccountsToValidate: Set<OlympiaAccountToMigrate>
-	) -> Effect<Action> {
-		.run { send in
-			do {
-				let validation = try await validate(derivedPublicKeys: derivedPublicKeys, olympiaAccountsToValidate: olympiaAccountsToValidate)
-				await send(.internal(.validatedAccounts(validation.validated, ledgerID)))
-			} catch {
-				loggerGlobal.error("Failed to validate accounts, error: \(error)")
-				errorQueue.schedule(error)
+	) async throws -> (ValidatedAccounts, MigratedHardwareAccounts) {
+		let validation = try await validate(derivedPublicKeys: derivedPublicKeys, olympiaAccountsToValidate: olympiaAccountsToValidate)
+
+		guard let validatedAccounts = NonEmpty<Set>(validation.validated) else {
+			struct NoAccountsOnLedgerError: LocalizedError {
+				var errorDescription: String? {
+					"No new accounts were found on this Ledger device" // FIXME: Strings
+				}
 			}
+
+			throw NoAccountsOnLedgerError()
 		}
+
+		// Migrates and saved all accounts to Profile
+		let migrated = try await importLegacyWalletClient.migrateOlympiaHardwareAccountsToBabylon(
+			.init(olympiaAccounts: validatedAccounts, ledgerFactorSourceID: ledgerID)
+		)
+
+		// Save all accounts
+		try await accountsClient.saveVirtualAccounts(migrated.babylonAccounts.elements)
+
+		loggerGlobal.notice("Converted #\(migrated.accounts.count) accounts to babylon! ✅")
+
+		return (validatedAccounts, migrated)
 	}
 
 	private func validate(
@@ -330,28 +336,6 @@ extension ImportOlympiaLedgerAccountsAndFactorSources {
 			validated: olympiaAccountsToMigrate,
 			unvalidated: olympiaAccountsToValidate
 		)
-	}
-
-	private func migrateOlympiaHardwareAccounts(
-		ledgerID: LedgerHardwareWalletFactorSource.ID,
-		validatedAccountsToMigrate olympiaAccounts: NonEmpty<Set<OlympiaAccountToMigrate>>
-	) -> Effect<Action> {
-		loggerGlobal.notice("Converting hardware accounts to babylon...")
-		return .run { send in
-			// Migrates and saved all accounts to Profile
-			let migrated = try await importLegacyWalletClient.migrateOlympiaHardwareAccountsToBabylon(
-				.init(
-					olympiaAccounts: olympiaAccounts,
-					ledgerFactorSourceID: ledgerID
-				)
-			)
-			loggerGlobal.notice("Converted #\(migrated.accounts.count) accounts to babylon! ✅")
-
-			await send(.internal(.migratedOlympiaHardwareAccounts(migrated)))
-		} catch: { error, _ in
-			loggerGlobal.error("Failed to migrate accounts to babylon, error: \(error)")
-			errorQueue.schedule(error)
-		}
 	}
 }
 

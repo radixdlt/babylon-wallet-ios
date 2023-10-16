@@ -1,6 +1,7 @@
-// MARK: - KeychainClient
-@preconcurrency
+import Foundation
+@preconcurrency import KeychainAccess
 
+// MARK: - KeychainClient
 /// A CRUD client around Keychain, that provides async methods for operations that requires auth
 /// and sync methods for operations on data without authentication.
 public struct KeychainClient: Sendable {

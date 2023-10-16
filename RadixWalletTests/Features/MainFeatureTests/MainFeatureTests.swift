@@ -28,7 +28,7 @@ final class MainFeatureTests: TestCase {
 		let store = TestStore(initialState: Main.State(home: .previewValue)) {
 			Main()
 				.dependency(\.userDefaultsClient, .noop)
-				.dependency(\.gatewaysClient.gatewaysValues) { AsyncLazySequence([.init(current: .stokenet)]).eraseToAnyAsyncSequence() }
+				.dependency(\.gatewaysClient.currentGatewayValues) { AsyncLazySequence([.stokenet]).eraseToAnyAsyncSequence() }
 		}
 
 		XCTAssertFalse(store.state.showIsUsingTestnetBanner)

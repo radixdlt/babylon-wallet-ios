@@ -115,6 +115,13 @@ extension ProfileStore {
 	}
 
 	/// A multicasting replaying async sequence of distinct Gateways
+	public func currentGatewayValues() async -> AnyAsyncSequence<Radix.Gateway> {
+		lens {
+			$0.profile.appPreferences.gateways.current
+		}
+	}
+
+	/// A multicasting replaying async sequence of distinct Gateways
 	public func gatewaysValues() async -> AnyAsyncSequence<Gateways> {
 		lens {
 			$0.profile.appPreferences.gateways
@@ -584,10 +591,11 @@ extension ProfileStore {
 	}
 
 	private func lens<Property>(
-		_ map: @escaping @Sendable (ProfileState) -> Property?
+		_ transform: @escaping @Sendable (ProfileState) -> Property?
 	) -> AnyAsyncSequence<Property> where Property: Sendable & Equatable {
-		profileStateSubject.compactMap { map($0) }
+		profileStateSubject.compactMap(transform)
 			.share() // Multicast
+			.removeDuplicates()
 			.eraseToAnyAsyncSequence()
 	}
 

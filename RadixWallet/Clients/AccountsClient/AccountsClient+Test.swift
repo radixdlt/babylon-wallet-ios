@@ -16,7 +16,7 @@ extension AccountsClient: TestDependencyKey {
 		accountUpdates: { _ in AsyncLazySequence([]).eraseToAnyAsyncSequence() },
 		getAccountsOnNetwork: { _ in throw NoopError() },
 		newVirtualAccount: { _ in throw NoopError() },
-		saveVirtualAccount: { _ in },
+		saveVirtualAccounts: { _ in },
 		getAccountByAddress: { _ in throw NoopError() },
 		hasAccountOnNetwork: { _ in false },
 		updateAccount: { _ in }
@@ -30,7 +30,7 @@ extension AccountsClient: TestDependencyKey {
 		accountUpdates: unimplemented("\(Self.self).accountUpdates"),
 		getAccountsOnNetwork: unimplemented("\(Self.self).getAccountsOnNetwork"),
 		newVirtualAccount: unimplemented("\(Self.self).newVirtualAccount"),
-		saveVirtualAccount: unimplemented("\(Self.self).saveVirtualAccount"),
+		saveVirtualAccounts: unimplemented("\(Self.self).saveVirtualAccounts"),
 		getAccountByAddress: unimplemented("\(Self.self).getAccountByAddress"),
 		hasAccountOnNetwork: unimplemented("\(Self.self).hasAccountOnNetwork"),
 		updateAccount: unimplemented("\(Self.self).updateAccount")
