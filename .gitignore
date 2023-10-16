@@ -5,6 +5,7 @@ build/
 /*.xcodeproj
 /Package.resolved
 xcuserdata/
+*.xcuserstate
 DerivedData/
 .swiftpm/config/registries.json
 .swiftpm/xcode/package.xcworkspace/contents.xcworkspacedata
