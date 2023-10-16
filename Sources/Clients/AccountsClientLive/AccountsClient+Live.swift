@@ -10,9 +10,11 @@ extension AccountsClient: DependencyKey {
 	public static func live(
 		profileStore getProfileStore: @escaping @Sendable () async -> ProfileStore = { await .shared }
 	) -> Self {
-		let saveVirtualAccount: SaveVirtualAccount = { request in
+		let saveVirtualAccounts: SaveVirtualAccounts = { accounts in
 			try await getProfileStore().updating {
-				try $0.addAccount(request.account)
+				for account in accounts {
+					try $0.addAccount(account)
+				}
 			}
 		}
 
@@ -54,7 +56,7 @@ extension AccountsClient: DependencyKey {
 					extraProperties: .init(numberOfAccountsOnNetwork: .init(numberOfExistingAccounts))
 				)
 			},
-			saveVirtualAccount: saveVirtualAccount,
+			saveVirtualAccounts: saveVirtualAccounts,
 			getAccountByAddress: { address in
 				try await getProfileStore().network().entity(address: address)
 			},
