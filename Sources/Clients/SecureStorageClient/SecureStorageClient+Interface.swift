@@ -18,6 +18,7 @@ public struct SecureStorageClient: Sendable {
 	public var saveProfileHeaderList: SaveProfileHeaderList
 	public var deleteProfileHeaderList: DeleteProfileHeaderList
 
+	public var getDeviceIdentifierSetIfNil: GetDeviceIdentifierSetIfNil
 	public var loadDeviceIdentifier: LoadDeviceIdentifier
 	public var saveDeviceIdentifier: SaveDeviceIdentifier
 }
@@ -37,6 +38,7 @@ extension SecureStorageClient {
 	public typealias SaveProfileHeaderList = @Sendable (ProfileSnapshot.HeaderList) async throws -> Void
 	public typealias DeleteProfileHeaderList = @Sendable () async throws -> Void
 
+	public typealias GetDeviceIdentifierSetIfNil = @Sendable (UUID) async throws -> UUID
 	public typealias LoadDeviceIdentifier = @Sendable () async throws -> UUID?
 	public typealias SaveDeviceIdentifier = @Sendable (UUID) async throws -> Void
 
@@ -79,14 +81,10 @@ extension SecureStorageClient {
 }
 
 extension SecureStorageClient {
-	public func saveDeviceIdentifierIfNeeded(_ deviceID: UUID) async throws {
-		if let existing = try? await loadDeviceIdentifier() {
-			if existing != deviceID {
-				try await saveDeviceIdentifier(deviceID)
-			}
-		} else {
-			try await saveDeviceIdentifier(deviceID)
-		}
+	public func saveDeviceIdentifierIfNeeded(
+		_ deviceID: UUID
+	) async throws {
+		_ = try await getDeviceIdentifierSetIfNil(deviceID)
 	}
 }
 

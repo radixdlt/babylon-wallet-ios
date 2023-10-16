@@ -29,6 +29,9 @@ final class ProfileStoreTests: TestCase {
 			$0.secureStorageClient.loadDeviceIdentifier = {
 				.init(uuidString: "BABE1442-3C98-41FF-AFB0-D0F5829B020D")!
 			}
+			$0.secureStorageClient.getDeviceIdentifierSetIfNil = {
+				$0
+			}
 			$0.date = .constant(Date(timeIntervalSince1970: 0))
 			$0.userDefaultsClient.stringForKey = { _ in
 				"BABE1442-3C98-41FF-AFB0-D0F5829B020D"
@@ -191,7 +194,9 @@ private extension ProfileStoreTests {
 			$0.secureStorageClient.loadProfileSnapshotData = { _ in
 				provideProfileSnapshotLoaded
 			}
-
+			$0.secureStorageClient.getDeviceIdentifierSetIfNil = {
+				$0
+			}
 			$0.secureStorageClient.saveMnemonicForFactorSource = { privateFactorSource in
 				if assertMnemonicWithPassphraseSaved == nil, assertFactorSourceSaved == nil {
 					XCTFail("Did not expect `saveMnemonicForFactorSource` to be called")

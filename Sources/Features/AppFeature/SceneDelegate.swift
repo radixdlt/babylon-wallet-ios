@@ -2,6 +2,7 @@ import Dependencies
 import OverlayWindowClient
 import SwiftUI
 import UIKit
+import XCTestDynamicOverlay
 
 public final class SceneDelegate: NSObject, UIWindowSceneDelegate, ObservableObject {
 	public weak var windowScene: UIWindowScene?
@@ -13,7 +14,7 @@ public final class SceneDelegate: NSObject, UIWindowSceneDelegate, ObservableObj
 		options connectionOptions: UIScene.ConnectionOptions
 	) {
 		windowScene = scene as? UIWindowScene
-		if let windowScene {
+		if let windowScene, !_XCTIsTesting { // avoids unimplemented("OverlayWindowClient.isUserInteractionEnabled")
 			overlayWindow(in: windowScene)
 		}
 	}
