@@ -1,5 +1,6 @@
-import Prelude
-import TestingPrelude
+import Foundation
+@testable import Radix_Wallet_Dev
+import XCTest
 
 final class HexStringToDataTests: TestCase {
 	func testAssertDataFromHexStringWithOddLengthThrows() throws {

@@ -1,6 +1,6 @@
-import CryptoKit
-@testable import RadixConnect
-import TestingPrelude
+import Foundation
+@testable import Radix_Wallet_Dev
+import XCTest
 
 // MARK: - DataChannelMessageEncodingDecodingTests
 @MainActor

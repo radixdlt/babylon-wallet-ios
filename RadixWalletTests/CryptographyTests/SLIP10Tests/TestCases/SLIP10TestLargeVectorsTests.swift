@@ -1,9 +1,10 @@
+import CryptoKit
 import Foundation
 @testable import Radix_Wallet_Dev
 import XCTest
 
-// MARK: - TestVectorsTests
-final class TestVectorsTests: TestCase {
+// MARK: - SLIP10TestLargeVectorsTests
+final class SLIP10TestLargeVectorsTests: TestCase {
 	func testVectors10() throws {
 		try testFixture(
 			bundle: Bundle(for: Self.self),
@@ -28,7 +29,7 @@ final class TestVectorsTests: TestCase {
 	}
 }
 
-extension TestVectorsTests {
+extension SLIP10TestLargeVectorsTests {
 	private func doTestFile(
 		testFile: TestFile,
 		file: StaticString = #file, line: UInt = #line

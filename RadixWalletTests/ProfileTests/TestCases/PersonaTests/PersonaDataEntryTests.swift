@@ -1,12 +1,6 @@
-import CasePaths
-import Cryptography
-
 import JSONTesting
-@testable import Profile
-import RadixConnectModels
-import SharedTestingModels
-import SwiftUI
-import TestingPrelude
+@testable import Radix_Wallet_Dev
+import XCTest
 
 extension PersonaData.IdentifiedEntry {
 	init(

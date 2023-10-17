@@ -1,8 +1,5 @@
-import Cryptography
-
-import EngineKit
-import Profile
-import TestingPrelude
+@testable import Radix_Wallet_Dev
+import XCTest
 
 // MARK: - FactorSourcesCodableTests
 final class FactorSourcesCodableTests: TestCase {
@@ -51,13 +48,13 @@ final class FactorSourcesCodableTests: TestCase {
 				)
 			)
 
-			anyFactorSources.append(
-				TrustedContactFactorSource.from(
-					radixAddress: "account_rdx1283u6e8r2jnz4a3jwv0hnrqfr5aq50yc9ts523sd96hzfjxqqcs89q",
-					emailAddress: "hi@rdx.works",
-					name: "My friend"
-				)
-			)
+//			anyFactorSources.append(
+//				TrustedContactFactorSource.from(
+//					radixAddress: "account_rdx1283u6e8r2jnz4a3jwv0hnrqfr5aq50yc9ts523sd96hzfjxqqcs89q",
+//					emailAddress: "hi@rdx.works",
+//					name: "My friend"
+//				)
+//			)
 
 			return anyFactorSources.map { $0.embed() }
 		}
@@ -71,7 +68,7 @@ final class FactorSourcesCodableTests: TestCase {
 
 	func test_factor_sources_codable() throws {
 		try testFixture(
-			bundle: .module,
+			bundle: Bundle(for: Self.self),
 			jsonName: "factor_sources"
 		) { (factorSources: [FactorSource]) in
 			guard factorSources.count == 5 else {

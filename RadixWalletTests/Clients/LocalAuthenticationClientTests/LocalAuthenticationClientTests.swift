@@ -1,5 +1,5 @@
-import ClientTestingPrelude
-@testable import LocalAuthenticationClient
+@testable import Radix_Wallet_Dev
+import XCTest
 
 final class LocalAuthenticationClientTests: TestCase {
 	let sut = LocalAuthenticationClient.liveValue

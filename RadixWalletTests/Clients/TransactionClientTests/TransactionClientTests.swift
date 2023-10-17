@@ -1,11 +1,5 @@
-import ClientPrelude
-import CryptoKit
-import EngineKit
-@testable import FactorSourcesClient
-import GatewaysClient
-@testable import Profile
-import TestingPrelude
-import TransactionClient
+@testable import Radix_Wallet_Dev
+import XCTest
 
 // MARK: - TransactionClientTests
 final class TransactionClientTests: TestCase {
@@ -205,68 +199,6 @@ extension Profile.Network.Account {
 		try! .init(
 			factorSource: .deviceOne,
 			signer: .init(factorInstancesRequiredToSign: virtualHierarchicalDeterministicFactorInstances, of: .account(self))
-		)
-	}
-}
-
-// MARK: - SigningFactor + Comparable
-extension SigningFactor: Comparable {
-	public static func < (lhs: Self, rhs: Self) -> Bool {
-		lhs.factorSource < rhs.factorSource
-	}
-}
-
-// MARK: - Profile.Network.Account + Comparable
-extension Profile.Network.Account: Comparable {
-	public static func < (lhs: Self, rhs: Self) -> Bool {
-		lhs.appearanceID.rawValue < rhs.appearanceID.rawValue
-	}
-}
-
-// MARK: - DeviceFactorSource + Comparable
-extension DeviceFactorSource: Comparable {
-	public static func < (lhs: Self, rhs: Self) -> Bool {
-		lhs.hint.name < rhs.hint.name
-	}
-}
-
-// MARK: - LedgerHardwareWalletFactorSource + Comparable
-extension LedgerHardwareWalletFactorSource: Comparable {
-	public static func < (lhs: Self, rhs: Self) -> Bool {
-		lhs.hint.name < rhs.hint.name
-	}
-}
-
-// MARK: - FactorSource + Comparable
-extension FactorSource: Comparable {
-	public static func < (lhs: Self, rhs: Self) -> Bool {
-		switch (lhs, rhs) {
-		case let (.device(l), .device(r)):
-			l < r
-		case let (.ledger(l), .ledger(r)):
-			l < r
-		default: true
-		}
-	}
-}
-
-extension Profile.Network.Account {
-	static func new(factorSource: FactorSource, index: UInt32) -> Self {
-		try! .init(
-			networkID: .simulator, index: index,
-			factorInstance: .init(
-				factorSourceID: factorSource.id,
-				publicKey: .eddsaEd25519(Curve25519.Signing.PrivateKey().publicKey),
-				derivationPath: AccountDerivationPath.babylon(.init(
-					networkID: .simulator,
-					index: index,
-					keyKind: .transactionSigning
-				)).wrapAsDerivationPath()
-			),
-			displayName: "\(index)",
-			extraProperties: .init(
-				appearanceID: .fromIndex(Int(index))
-			)
 		)
 	}
 }

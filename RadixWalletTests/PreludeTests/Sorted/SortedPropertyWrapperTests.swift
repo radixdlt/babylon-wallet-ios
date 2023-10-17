@@ -1,4 +1,5 @@
-import Prelude
+import Foundation
+@testable import Radix_Wallet_Dev
 import XCTest
 
 final class SortedTests: XCTestCase {

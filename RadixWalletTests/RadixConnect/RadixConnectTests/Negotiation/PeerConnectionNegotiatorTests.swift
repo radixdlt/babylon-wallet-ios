@@ -1,7 +1,5 @@
-import Cryptography
-@testable import RadixConnect
-import RadixConnectModels
-import TestingPrelude
+@testable import Radix_Wallet_Dev
+import XCTest
 
 // MARK: - PeerConnectionNegotiatorTests
 @MainActor

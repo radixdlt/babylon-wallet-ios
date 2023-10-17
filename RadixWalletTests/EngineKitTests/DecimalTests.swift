@@ -1,6 +1,6 @@
-import EngineKit
-import Prelude
-import TestingPrelude
+import Foundation
+@testable import Radix_Wallet_Dev
+import XCTest
 
 // MARK: - DecimalTests
 final class DecimalTests: TestCase {

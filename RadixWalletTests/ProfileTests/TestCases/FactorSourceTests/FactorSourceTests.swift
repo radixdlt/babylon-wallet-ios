@@ -1,5 +1,6 @@
-@testable import Profile
-import TestingPrelude
+import Foundation
+@testable import Radix_Wallet_Dev
+import XCTest
 
 final class FactorSourceTests: TestCase {
 	// THIS TEST IS NEVER EVER EVER EVER ALLOWED TO FAIL!!! If it does, user might

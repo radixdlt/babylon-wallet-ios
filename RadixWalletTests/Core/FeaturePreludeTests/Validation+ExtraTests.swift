@@ -1,4 +1,4 @@
-import FeaturePrelude
+@testable import Radix_Wallet_Dev
 import XCTest
 
 final class ValidationExtraTests: XCTestCase {
