@@ -1,5 +1,6 @@
-@testable import SettingsFeature
-import TestingPrelude
+import Foundation
+@testable import Radix_Wallet_Dev
+import XCTest
 
 final class SettingsViewStateTests: TestCase {
 	func testAppVersion() {

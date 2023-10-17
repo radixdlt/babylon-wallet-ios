@@ -1,6 +1,5 @@
-import Cryptography
-@testable import RadixConnect
-import TestingPrelude
+@testable import Radix_Wallet_Dev
+import XCTest
 
 // MARK: - SignalingClientTests
 final class SignalingClientTests: TestCase {

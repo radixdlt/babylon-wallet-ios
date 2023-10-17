@@ -1,6 +1,5 @@
-import FeatureTestingPrelude
-@testable import NewConnectionFeature
-import RadixConnectModels
+@testable import Radix_Wallet_Dev
+import XCTest
 
 // MARK: - NewConnectionTests
 @MainActor

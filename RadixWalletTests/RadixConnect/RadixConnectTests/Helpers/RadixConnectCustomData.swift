@@ -1,6 +1,6 @@
 import Foundation
-@testable import RadixConnect
-import RadixConnectModels
+@testable import Radix_Wallet_Dev
+import XCTest
 
 extension IdentifiedRTCPrimitive {
 	static func anyOffer(for id: RemoteClientID) -> IdentifiedRTCPrimitive {

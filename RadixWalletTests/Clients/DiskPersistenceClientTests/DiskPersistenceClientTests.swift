@@ -1,5 +1,5 @@
-import ClientTestingPrelude
-@testable import DiskPersistenceClient
+@testable import Radix_Wallet_Dev
+import XCTest
 
 final class DiskPersistenceClientTests: TestCase {
 	private var sut: DiskPersistenceClient!

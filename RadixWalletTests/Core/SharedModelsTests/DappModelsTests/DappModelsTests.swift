@@ -1,6 +1,7 @@
-import EngineKit
-@testable import SharedModels
-import TestingPrelude
+import Foundation
+import JSONTesting
+@testable import Radix_Wallet_Dev
+import XCTest
 
 // MARK: - ToDappResponseTests
 final class ToDappResponseTests: TestCase {

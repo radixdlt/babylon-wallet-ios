@@ -1,10 +1,5 @@
-import Cryptography
-import EngineKit
-@testable import FactorSourcesClient
-import FeatureTestingPrelude
-@testable import Profile
-import TransactionClient
-@testable import TransactionReviewFeature
+@testable import Radix_Wallet_Dev
+import XCTest
 
 // MARK: - CustomizeFeePayerTests
 @MainActor

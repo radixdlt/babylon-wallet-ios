@@ -4,7 +4,7 @@ import Foundation
 import XCTest
 
 // MARK: - TestVector
-struct TestVector<Curve: SLIP10CurveProtocol> {
+private struct TestVector<Curve: SLIP10CurveProtocol> {
 	let seed: Data
 	let vectorID: Int
 	let testCases: [TestScenario]
@@ -190,7 +190,7 @@ final class SLIP10TestVectorsTests: TestCase {
 		XCTAssertEqual(try key.xpub(), xpub)
 	}
 
-	func doTestSingleCase<C>(
+	fileprivate func doTestSingleCase<C>(
 		vector: TestVector<C>,
 		testCaseIndex: Int,
 		_ line: UInt = #line

@@ -1,5 +1,6 @@
-@testable import Profile
-import TestingPrelude
+import Foundation
+@testable import Radix_Wallet_Dev
+import XCTest
 
 // MARK: - SnapshotTestVector
 public struct SnapshotTestVector: Codable, Equatable {

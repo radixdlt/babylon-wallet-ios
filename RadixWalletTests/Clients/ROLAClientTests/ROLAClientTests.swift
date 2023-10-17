@@ -1,9 +1,6 @@
-import CacheClient
-import ClientTestingPrelude
-import Cryptography
-import EngineKit
-import GatewayAPI
-@testable import ROLAClient
+import JSONTesting
+@testable import Radix_Wallet_Dev
+import XCTest
 
 // MARK: - ROLAClientTests
 final class ROLAClientTests: TestCase {
@@ -66,7 +63,10 @@ final class ROLAClientTests: TestCase {
 	}
 
 	func test_rola_payload_hash_vectors() throws {
-		try testFixture(bundle: .module, jsonName: "rola_challenge_payload_hash_vectors") { (vectors: [TestVector]) in
+		try testFixture(
+			bundle: Bundle(for: Self.self),
+			jsonName: "rola_challenge_payload_hash_vectors"
+		) { (vectors: [TestVector]) in
 			for vector in vectors {
 				let payload = try payloadToHash(
 					challenge: .init(rawValue: .init(hex: vector.challenge)),

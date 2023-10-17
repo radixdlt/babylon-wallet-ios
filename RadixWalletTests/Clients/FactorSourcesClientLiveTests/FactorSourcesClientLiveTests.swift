@@ -1,8 +1,5 @@
-import ClientTestingPrelude
-import Cryptography
-import FactorSourcesClient
-@testable import FactorSourcesClientLive
-@testable import Profile
+@testable import Radix_Wallet_Dev
+import XCTest
 
 // MARK: - FactorSourcesClientLiveTests
 final class FactorSourcesClientLiveTests: TestCase {

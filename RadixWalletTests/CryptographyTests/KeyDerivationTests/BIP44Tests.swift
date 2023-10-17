@@ -21,7 +21,10 @@ final class BIP44Tests: TestCase {
 	}
 
 	func test_bip44_generate() throws {
-		let ledgerMnemonic = try Mnemonic(phrase: "equip will roof matter pink blind book anxiety banner elbow sun young", language: .english)
+		let ledgerMnemonic = try Mnemonic(
+			phrase: "equip will roof matter pink blind book anxiety banner elbow sun young",
+			language: .english
+		)
 
 		var mnemonics = [ledgerMnemonic]
 		for wordCount in BIP39.WordCount.allCases {

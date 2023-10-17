@@ -1,5 +1,6 @@
-import Prelude
-import TestingPrelude
+import Foundation
+@testable import Radix_Wallet_Dev
+import XCTest
 
 final class DataExtensionTests: TestCase {
 	let deadbeef = Data([0xDE, 0xAD, 0xBE, 0xEF])

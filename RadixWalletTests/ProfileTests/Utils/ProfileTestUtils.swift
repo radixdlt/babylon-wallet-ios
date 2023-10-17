@@ -1,4 +1,6 @@
-@testable import Profile
+import Foundation
+@testable import Radix_Wallet_Dev
+import XCTest
 
 extension EntityProtocol {
 	func publicKey() -> SLIP10.PublicKey? {
@@ -41,13 +43,6 @@ extension EmailAddress: ExpressibleByStringLiteral {
 	public init(stringLiteral value: String) {
 		let nonEmpty = NonEmptyString(rawValue: value)!
 		try! self.init(validating: nonEmpty)
-	}
-}
-
-// MARK: - SpecificAddress + ExpressibleByStringLiteral
-extension SpecificAddress: ExpressibleByStringLiteral {
-	public init(stringLiteral value: String) {
-		try! self.init(validatingAddress: value)
 	}
 }
 

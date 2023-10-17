@@ -1,7 +1,7 @@
 @testable import Radix_Wallet_Dev
 import XCTest
 
-final class PathTests: TestCase {
+final class SLIP10PathTests: TestCase {
 	func testInvalidPaths() throws {
 		let invalidPaths = [
 			"44'/2147483648",

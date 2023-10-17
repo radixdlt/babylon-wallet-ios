@@ -1,11 +1,12 @@
-import ClientTestingPrelude
-@testable import GatewayAPI
-@testable import OnLedgerEntitiesClient
-import TestingPrelude
+@testable import Radix_Wallet_Dev
+import XCTest
 
 final class OnLedgerEntitiesClientTests: TestCase {
 	private func doTest(_ jsonName: String, expected: [AssetBehavior]) throws {
-		try testFixture(bundle: .module, jsonName: jsonName) { (assignments: GatewayAPI.ComponentEntityRoleAssignments) in
+		try testFixture(
+			bundle: Bundle(for: Self.self),
+			jsonName: jsonName
+		) { (assignments: GatewayAPI.ComponentEntityRoleAssignments) in
 			XCTAssertEqual(assignments.extractBehaviors(), expected)
 		}
 	}

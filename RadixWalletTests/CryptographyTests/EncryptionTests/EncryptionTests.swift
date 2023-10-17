@@ -1,3 +1,4 @@
+import CryptoKit
 import Foundation
 import JSONTesting
 @testable import Radix_Wallet_Dev

@@ -1,5 +1,6 @@
-import RadixConnectModels
-import TestingPrelude
+import Foundation
+@testable import Radix_Wallet_Dev
+import XCTest
 
 final class RadixConnectModelsTest: TestCase {
 	func test_p2p_client_eq() throws {

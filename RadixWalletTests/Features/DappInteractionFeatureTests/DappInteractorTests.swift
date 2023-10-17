@@ -1,5 +1,5 @@
-// import FeatureTestingPrelude
-// @testable import DappInteractionFeature
+// import XCTest
+// @testable import Radix_Wallet_Dev
 //
 // @MainActor
 // final class DappInteractorFeatureTests: TestCase {

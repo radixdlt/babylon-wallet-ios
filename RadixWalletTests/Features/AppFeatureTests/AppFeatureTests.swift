@@ -1,10 +1,5 @@
-@testable import AppFeature
-import EngineKit
-import FeatureTestingPrelude
-import OnboardingClient
-import OnboardingFeature
-@testable import Profile
-@testable import SplashFeature
+@testable import Radix_Wallet_Dev
+import XCTest
 
 // MARK: - AppFeatureTests
 @MainActor

@@ -1,13 +1,11 @@
-import ClientTestingPrelude
-import Cryptography
-@testable import ImportLegacyWalletClient
-import Profile
+@testable import Radix_Wallet_Dev
+import XCTest
 
 // MARK: - Olympia.AccountType + Codable
 extension Olympia.AccountType: Codable {}
 
 // MARK: - TestVector
-struct TestVector: Codable, Sendable, Hashable {
+private struct TestVector: Codable, Sendable, Hashable {
 	let testID: Int
 	let olympiaWallet: OlympiaWallet
 	let payloadSizeThreshold: Int
@@ -41,7 +39,7 @@ struct TestVector: Codable, Sendable, Hashable {
 }
 
 extension CAP33 {
-	static func serialize(
+	fileprivate static func serialize(
 		wordCount: Int,
 		accounts: [TestVector.OlympiaWallet.Account],
 		payloadSizeThreshold: Int
@@ -201,7 +199,7 @@ private func generateTestVectors() throws -> [TestVector] {
 }
 
 extension TestVector.OlympiaWallet.Account {
-	func sanitizedName() -> Self {
+	fileprivate func sanitizedName() -> Self {
 		.init(
 			accountType: accountType,
 			publicKeyCompressedBase64: publicKeyCompressedBase64,
@@ -212,7 +210,7 @@ extension TestVector.OlympiaWallet.Account {
 }
 
 extension Olympia.Parsed.Account {
-	func toTestVectorAccount() -> TestVector.OlympiaWallet.Account {
+	fileprivate func toTestVectorAccount() -> TestVector.OlympiaWallet.Account {
 		.init(
 			accountType: accountType,
 			publicKeyCompressedBase64: publicKey.base64Encoded,
@@ -344,7 +342,7 @@ final class ImportLegacyWalletClientTests: TestCase {
 		}
 
 		try testFixture(
-			bundle: .module,
+			bundle: Bundle(for: Self.self),
 			jsonName: "import_olympia_wallet_parse_test"
 		) { (testVectors: [TestVector]) in
 
