@@ -1,4 +1,5 @@
 fastlane_require 'dotenv'
+default_platform(:ios)
 
 before_all do
     ensure_xcode_version
@@ -165,18 +166,16 @@ end
 
 private_lane :create_gh_release do |options|
     flavour = options.fetch(:flavour).delete_prefix('"').delete_suffix('"') # if accidentally included
-    
-    puts "👀 SharedValues::IPA_OUTPUT_PATH]: '#{lane_context[SharedValues::IPA_OUTPUT_PATH]}'\n"
 
     dsymPathUsed = locate_dsym()
 
     sh('git fetch --tags')
     most_recent_tags = sh("git tag | grep #{flavour} | sort -r | head -2").split("\n")
 
-    changelog = rev_changelog(flavour, most_recent_tags)
+    pr_log = rev_changelog(flavour, most_recent_tags)
     versions_string = dependencies_with_hyperlinks()
 
-    release_description = "**Dependencies**: \n" + versions_string + "\n\n**Changelog**: \n" + changelog
+    release_description = "**Changelog**:\nREPLACE_ME_SYNC_WITH_APP_CONNECT_AND_STAKE_HOLDERS" + "\n\n**Rull Requests**: \n" + pr_log + "\n\n**Dependencies**: \n" + versions_string
     last_tag = most_recent_tags[0]
 
     set_github_release(
