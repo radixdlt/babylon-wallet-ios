@@ -293,6 +293,7 @@ private_lane :code_signing do |options|
     sync_code_signing(
         type: type,
         force_for_new_devices: true,
+        additional_cert_types: "mac_installer_distribution", # allows Catalyst, run destination "My Mac (Designed for iPhone)"
         readonly: readonly,
         app_identifier: read_env_config(key: "PRODUCT_BUNDLE_IDENTIFIER"),
         team_id: read_common_config(key: "DEV_TEAM")
