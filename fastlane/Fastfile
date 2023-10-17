@@ -87,9 +87,9 @@ platform :ios do
         code_signing(type: "appstore", readonly: false)
     end
 
-    desc "Registers a new iPhone device and updates the certificates"
-    lane :register_new_iphone_device do
-        register_new_device
+    desc "Registers a new iPhone/Mac device and updates the certificates"
+    lane :register_new_device do
+        register_new_device_iphone_or_mac
         generate_new_dev_certificates
     end
 
@@ -252,7 +252,7 @@ private_lane :dependencies_with_hyperlinks do |options|
     versions.map { |k, v| "- #{k}: #{v}" }.join("\n")
 end
 
-private_lane :register_new_device do |options|
+private_lane :register_new_device_iphone_or_mac do |options|
     name = prompt(text: "Device name: ")
     udid = prompt(text: "Device UDID: ")
     devices = {}
