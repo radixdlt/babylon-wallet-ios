@@ -1,3 +1,4 @@
+import EngineToolkit
 @testable import Radix_Wallet_Dev
 import XCTest
 
@@ -48,13 +49,14 @@ final class FactorSourcesCodableTests: TestCase {
 				)
 			)
 
-//			anyFactorSources.append(
-//				TrustedContactFactorSource.from(
-//					radixAddress: "account_rdx1283u6e8r2jnz4a3jwv0hnrqfr5aq50yc9ts523sd96hzfjxqqcs89q",
-//					emailAddress: "hi@rdx.works",
-//					name: "My friend"
-//				)
-//			)
+			let accountAddress = try! AccountAddress(validatingAddress: "account_rdx1283u6e8r2jnz4a3jwv0hnrqfr5aq50yc9ts523sd96hzfjxqqcs89q")
+			anyFactorSources.append(
+				TrustedContactFactorSource.from(
+					radixAddress: accountAddress,
+					emailAddress: "hi@rdx.works",
+					name: "My friend"
+				)
+			)
 
 			return anyFactorSources.map { $0.embed() }
 		}
