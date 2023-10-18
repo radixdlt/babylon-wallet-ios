@@ -104,7 +104,7 @@ jobs:
           brew upgrade swiftformat
           swiftformat . --lint
 
-  test-and-build:
+  unit_test:
     permissions:
       id-token: write
       contents: read
@@ -162,11 +162,8 @@ jobs:
           echo "${{ env.WALLET_FASTLANE_SECRETS_BASE64 }}" | base64 --decode > fastlane/.env.secret
           brew install xcbeautify
 
-      - name: "Unit tests (debug)"
-        run: bundle exec fastlane ios tests
-
-      - name: "Build and archive (release)"
-        run: bundle exec fastlane ios build
+      - name: "Unit tests"
+        run: bundle exec fastlane tests
 
   snyk_online_monitor:
     permissions:
@@ -176,7 +173,7 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     needs:
-      - test-and-build
+      - unit_test
       - snyk_scan
       - snyk_sbom
     steps:
