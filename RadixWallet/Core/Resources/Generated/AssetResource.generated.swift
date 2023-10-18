@@ -2,11 +2,15 @@
 // Generated using SwiftGen — https://github.com/SwiftGen/SwiftGen
 
 #if os(macOS)
-  #elseif os(iOS)
-  #elseif os(tvOS) || os(watchOS)
-  #endif
+  import AppKit
+#elseif os(iOS)
+  import UIKit
+#elseif os(tvOS) || os(watchOS)
+  import UIKit
+#endif
 #if canImport(SwiftUI)
-  #endif
+  import SwiftUI
+#endif
 
 // Deprecated typealiases
 @available(*, deprecated, renamed: "ImageAsset.Image", message: "This typealias will be removed in SwiftGen 7.0")

@@ -1155,7 +1155,7 @@
 		48FFFB0A2ADC721800B2B213 /* Atomics in Frameworks */ = {isa = PBXBuildFile; productRef = 48FFFB092ADC721800B2B213 /* Atomics */; };
 		48FFFB0D2ADC744700B2B213 /* TextBuilder in Frameworks */ = {isa = PBXBuildFile; productRef = 48FFFB0C2ADC744700B2B213 /* TextBuilder */; };
 		E63D123D2ADD1FC00001CBB1 /* SwiftUIIntrospect in Frameworks */ = {isa = PBXBuildFile; productRef = E63D123C2ADD1FC00001CBB1 /* SwiftUIIntrospect */; };
-		E67F14432AE025C000738BE1 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E67F14422AE025C000738BE1 /* Assets.xcassets */; };
+		E67F14452AE029BA00738BE1 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E67F14442AE029BA00738BE1 /* Assets.xcassets */; };
 		E6DBA3192ADEBFB300A38425 /* PackagesEncodingDecodingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6DBA25A2ADEBFB200A38425 /* PackagesEncodingDecodingTests.swift */; };
 		E6DBA31A2ADEBFB300A38425 /* DataChannelClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6DBA25B2ADEBFB200A38425 /* DataChannelClientTests.swift */; };
 		E6DBA31B2ADEBFB300A38425 /* SignalingServerClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6DBA25D2ADEBFB200A38425 /* SignalingServerClientTests.swift */; };
@@ -2379,7 +2379,7 @@
 		48CFC6AC2ADC110800E77A5C /* Project-Release-Opt.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = "Project-Release-Opt.xcconfig"; sourceTree = "<group>"; };
 		48CFC6AD2ADC110800E77A5C /* Radix-Wallet--iOS--Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Radix-Wallet--iOS--Info.plist"; sourceTree = "<group>"; };
 		48FFFAF12ADC23AC00B2B213 /* Exports.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Exports.swift; sourceTree = "<group>"; };
-		E67F14422AE025C000738BE1 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		E67F14442AE029BA00738BE1 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		E6DBA25A2ADEBFB200A38425 /* PackagesEncodingDecodingTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PackagesEncodingDecodingTests.swift; sourceTree = "<group>"; };
 		E6DBA25B2ADEBFB200A38425 /* DataChannelClientTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DataChannelClientTests.swift; sourceTree = "<group>"; };
 		E6DBA25D2ADEBFB200A38425 /* SignalingServerClientTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SignalingServerClientTests.swift; sourceTree = "<group>"; };
@@ -5927,7 +5927,6 @@
 		48CFC14B2ADC10D900E77A5C /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				E67F14422AE025C000738BE1 /* Assets.xcassets */,
 				48CFC14C2ADC10D900E77A5C /* Generated */,
 				48CFC1502ADC10D900E77A5C /* Resources */,
 				48CFC1592ADC10D900E77A5C /* ImageAsset+Extension.swift */,
@@ -5948,6 +5947,7 @@
 		48CFC1502ADC10D900E77A5C /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				E67F14442AE029BA00738BE1 /* Assets.xcassets */,
 				48CFC1512ADC10D900E77A5C /* Localizable.strings */,
 				48CFC1542ADC10D900E77A5C /* Fonts */,
 			);
@@ -7516,7 +7516,7 @@
 				48CFC6B22ADC110800E77A5C /* iOS-alpha.xcconfig in Resources */,
 				48CFC6B92ADC110800E77A5C /* Project-Release.xcconfig in Resources */,
 				48CFC5F82ADC10DA00E77A5C /* IBMPlexSans-SemiBold.ttf in Resources */,
-				E67F14432AE025C000738BE1 /* Assets.xcassets in Resources */,
+				E67F14452AE029BA00738BE1 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
