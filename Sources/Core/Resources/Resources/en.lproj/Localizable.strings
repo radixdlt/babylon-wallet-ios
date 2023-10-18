@@ -444,6 +444,8 @@
 "transactionReview_accountDepositSettings_depositorChangeAdd" = "Add Depositor";
 "transactionReview_accountDepositSettings_depositorChangeRemove" = "Remove Depositor";
 "transactionReview_unacceptableManifest_rejected" = "A proposed transaction was rejected because it contains one or more reserved instructions.";
+"transactionReview_noMnemonicError_title" = "Could Not Complete";
+"transactionReview_noMnemonicError_text" = "The required seed phrase is missing. Please return to the account and begin the recovery process.";
 "transaction_status_completing_text" = "Completing Transaction…";
 "transaction_status_success_title" = "Success";
 "transaction_status_success_text" = "Your transaction was successful";
