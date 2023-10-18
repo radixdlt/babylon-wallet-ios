@@ -6,6 +6,7 @@ import SwiftUI
 struct WalletApp: SwiftUI.App {
 	@UIApplicationDelegateAdaptor var delegate: AppDelegate
 
+	#if DEBUG // to test our Slack integration, this will work with DEBUG but fail when archiving...
 	var body: some SwiftUI.Scene {
 		WindowGroup {
 			if !_XCTIsTesting {
@@ -28,6 +29,7 @@ struct WalletApp: SwiftUI.App {
 			}
 		}
 	}
+	#endif
 }
 
 extension WalletApp {
