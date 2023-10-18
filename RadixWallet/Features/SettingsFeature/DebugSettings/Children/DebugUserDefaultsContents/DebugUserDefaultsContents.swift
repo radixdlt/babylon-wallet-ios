@@ -66,8 +66,6 @@ extension UserDefaultsClient.Key {
 	func valuesForKey() -> [String] {
 		@Dependency(\.userDefaultsClient) var userDefaultsClient
 		switch self {
-		case .accountsThatNeedRecovery:
-			return userDefaultsClient.getAddressesOfAccountsThatNeedRecovery().map(\.address)
 		case .activeProfileID:
 			guard let value = userDefaultsClient.stringForKey(.activeProfileID) else {
 				return []

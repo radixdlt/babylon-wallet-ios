@@ -178,7 +178,7 @@ extension AssetTransfer {
 		let involvedFungibleResources = try await extractInvolvedFungibleResources(accounts.receivingAccounts)
 		let involvedNonFungibles = extractInvolvedNonFungibleResource(accounts.receivingAccounts)
 
-		return try ManifestBuilder.make {
+		return try await ManifestBuilder.make {
 			for resource in involvedFungibleResources {
 				let divisibility = resource.divisibility.map(UInt.init) ?? RETDecimal.maxDivisibility
 				try ManifestBuilder.withdrawAmount(
@@ -195,7 +195,7 @@ extension AssetTransfer {
 						bucket
 					)
 
-					try instructionForDepositing(
+					try await instructionForDepositing(
 						bucket: bucket,
 						into: account.recipient
 					)
@@ -219,7 +219,7 @@ extension AssetTransfer {
 						bucket
 					)
 
-					try instructionForDepositing(
+					try await instructionForDepositing(
 						bucket: bucket,
 						into: account.recipient
 					)
@@ -233,13 +233,16 @@ extension AssetTransfer {
 func instructionForDepositing(
 	bucket: ManifestBuilderBucket,
 	into receivingAccount: ReceivingAccount.State.Account
-) throws -> ManifestBuilder.InstructionsChain.Instruction {
+) async throws -> ManifestBuilder.InstructionsChain.Instruction {
 	@Dependency(\.userDefaultsClient) var userDefaultsClient
+	@Dependency(\.secureStorageClient) var secureStorageClient
 	let isUserAccount = receivingAccount.isUserAccount
 	// TODO: Temporary revert of checking if the receiving account is a ledger account
 	let isSoftwareAccount = true // !receivingAccount.isLedgerAccount
 	let recipientAddress = receivingAccount.address
-	let userHasAccessToMnemonic = !userDefaultsClient.getAddressesOfAccountsThatNeedRecovery().contains(recipientAddress)
+	let userHasAccessToMnemonic = if let userOwnedAccount = receivingAccount.left {
+		await secureStorageClient.containsMnemonicIdentifiedByFactorSourceID(userOwnedAccount.deviceFactorSourceID)
+	} else { false }
 
 	guard isUserAccount, isSoftwareAccount, userHasAccessToMnemonic else {
 		return try ManifestBuilder.accountTryDepositOrAbort(
