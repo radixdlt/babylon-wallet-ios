@@ -74,7 +74,7 @@ jobs:
         with:
           role_name: ${{ secrets.GH_WALLET_SECRET_ACCESS }}
           app_name: 'babylon-wallet-ios'
-          step_name: 'test_and_build'
+          step_name: 'unit_test'
           secret_prefix: 'SWIFT_ENGINE_TOOLKIT_SSH_KEY'
           secret_name: ${{ secrets.AWS_SECRET_NAME_WALLET_SWIFT_SSH }}
           parse_json: true
@@ -201,7 +201,7 @@ jobs:
         with:
           role_name: ${{ secrets.GH_WALLET_SECRET_ACCESS }}
           app_name: 'babylon-wallet-ios'
-          step_name: 'test_and_build'
+          step_name: 'unit_test'
           secret_prefix: 'SWIFT_ENGINE_TOOLKIT_SSH_KEY'
           secret_name: ${{ secrets.AWS_SECRET_NAME_WALLET_SWIFT_SSH }}
           parse_json: true
