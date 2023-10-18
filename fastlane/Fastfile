@@ -163,6 +163,38 @@ private_lane :locate_dsym do |options|
     dsymPathUsed
 end
 
+error do |lane, exception, options|
+    if lane == "deploy"
+        iosDevSlackUsername = nil
+        git_author_email = Actions.git_author_email
+        if git_author_email == "alex.cyon@rdx.works"
+            iosDevSlackUsername = "AlexCyon"
+        elsif git_author_email == "ghenadie.vasiliev-pusca@rdx.works"
+            iosDevSlackUsername = "Ghenadie"
+        elsif git_author_email == "gustaf.kugelberg@rdx.works"
+            iosDevSlackUsername = "Gustaf Kugelberg"
+        end
+        message = "Lane 'deploy' failed"
+        if iosDevSlackUsername.present?
+            message = message + " @#{iosDevSlackUsername}"
+        end
+        slack(
+            message: message, 
+            channel: "#chapter--engineering-ios",
+            slack_url: "https://rdxworks.slack.com",
+            success: false, # We just failed...
+            pretext: "Perhaps you worked with #if DEBUG? Try `bundle exec fastlane build` locally.",
+            default_payloads: [:git_branch, :git_author],
+            # Output containing extended log output
+            payload: { 
+                "Build Date" => Time.new.to_s,
+                "Output" => exception.error_info.to_s,
+            },
+            link_names: true
+        )
+    end
+end
+
 
 private_lane :create_gh_release do |options|
     flavour = options.fetch(:flavour).delete_prefix('"').delete_suffix('"') # if accidentally included
