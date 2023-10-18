@@ -74,7 +74,7 @@ jobs:
         with:
           role_name: ${{ secrets.GH_WALLET_SECRET_ACCESS }}
           app_name: 'babylon-wallet-ios'
-          step_name: 'test_and_build'
+          step_name: 'unit_test'
           secret_prefix: 'SWIFT_ENGINE_TOOLKIT_SSH_KEY'
           secret_name: ${{ secrets.AWS_SECRET_NAME_WALLET_SWIFT_SSH }}
           parse_json: true
@@ -104,13 +104,13 @@ jobs:
           brew upgrade swiftformat
           swiftformat . --lint
 
-  test-and-build:
+  unit_test:
     permissions:
       id-token: write
       contents: read
-    name: "Test and build"
+    name: "Unit test"
     runs-on: macos-13-xlarge
-    timeout-minutes: 70
+    timeout-minutes: 15
 
     needs:
       - linting
@@ -162,11 +162,8 @@ jobs:
           echo "${{ env.WALLET_FASTLANE_SECRETS_BASE64 }}" | base64 --decode > fastlane/.env.secret
           brew install xcbeautify
 
-      - name: "Unit tests (debug)"
-        run: bundle exec fastlane ios tests
-
-      - name: "Build and archive (release)"
-        run: bundle exec fastlane ios build
+      - name: "Unit tests"
+        run: bundle exec fastlane tests
 
   snyk_online_monitor:
     permissions:
@@ -176,7 +173,7 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     needs:
-      - test-and-build
+      - unit_test
       - snyk_scan
       - snyk_sbom
     steps:
@@ -204,7 +201,7 @@ jobs:
         with:
           role_name: ${{ secrets.GH_WALLET_SECRET_ACCESS }}
           app_name: 'babylon-wallet-ios'
-          step_name: 'test_and_build'
+          step_name: 'unit_test'
           secret_prefix: 'SWIFT_ENGINE_TOOLKIT_SSH_KEY'
           secret_name: ${{ secrets.AWS_SECRET_NAME_WALLET_SWIFT_SSH }}
           parse_json: true
