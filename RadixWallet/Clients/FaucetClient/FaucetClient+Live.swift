@@ -105,19 +105,17 @@ extension FaucetClient: DependencyKey {
 		let createFungibleToken: CreateFungibleToken = { request in
 			let networkID = await gatewaysClient.getCurrentNetworkID()
 			// TODO: Re-enable. With new manifest builder that is not easy to handle.
-			let manifest = try {
-				if request.numberOfTokens == 1 {
-					return try ManifestBuilder.manifestForCreateFungibleToken(
-						account: request.recipientAccountAddress,
-						networkID: networkID
-					)
-				} else {
-					return try ManifestBuilder.manifestForCreateMultipleFungibleTokens(
-						account: request.recipientAccountAddress,
-						networkID: networkID
-					)
-				}
-			}()
+			let manifest = if request.numberOfTokens == 1 {
+				try ManifestBuilder.manifestForCreateFungibleToken(
+					account: request.recipientAccountAddress,
+					networkID: networkID
+				)
+			} else {
+				try ManifestBuilder.manifestForCreateMultipleFungibleTokens(
+					account: request.recipientAccountAddress,
+					networkID: networkID
+				)
+			}
 
 			try await signSubmitTX(manifest: manifest)
 		}
