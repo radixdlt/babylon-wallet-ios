@@ -143,6 +143,13 @@ extension Profile.Network.Account {
 			control.transactionSigning.factorSourceID.kind == .ledgerHQHardwareWallet
 		}
 	}
+
+	public var deviceFactorSourceID: FactorSourceID.FromHash {
+		switch self.securityState {
+		case let .unsecured(control):
+			control.transactionSigning.factorSourceID
+		}
+	}
 }
 
 // MARK: - WrongEntityInDerivationPath

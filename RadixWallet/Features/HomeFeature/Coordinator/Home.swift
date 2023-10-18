@@ -5,7 +5,7 @@ import SwiftUI
 public struct Home: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		// MARK: - Components
-		public var accountRecoveryIsNeeded: Bool
+		public var babylonAccountRecoveryIsNeeded: Bool
 		public var header: Header.State
 		public var accountList: AccountList.State
 		public var accounts: IdentifiedArrayOf<Profile.Network.Account> {
@@ -17,9 +17,9 @@ public struct Home: Sendable, FeatureReducer {
 		public var destination: Destinations.State?
 
 		public init(
-			accountRecoveryIsNeeded: Bool
+			babylonAccountRecoveryIsNeeded: Bool
 		) {
-			self.accountRecoveryIsNeeded = accountRecoveryIsNeeded
+			self.babylonAccountRecoveryIsNeeded = babylonAccountRecoveryIsNeeded
 			self.header = .init()
 			self.accountList = .init(accounts: [])
 			self.destination = nil
@@ -35,6 +35,7 @@ public struct Home: Sendable, FeatureReducer {
 
 	public enum InternalAction: Sendable, Equatable {
 		case accountsLoadedResult(TaskResult<Profile.Network.Accounts>)
+		case mnemonicAccessResult([FactorSourceID.FromHash: Bool])
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -71,6 +72,7 @@ public struct Home: Sendable, FeatureReducer {
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.accountsClient) var accountsClient
 	@Dependency(\.accountPortfoliosClient) var accountPortfoliosClient
+	@Dependency(\.secureStorageClient) var secureStorageClient
 
 	public init() {}
 
@@ -98,6 +100,7 @@ public struct Home: Sendable, FeatureReducer {
 			} catch: { error, _ in
 				errorQueue.schedule(error)
 			}
+			.merge(with: checkAccountsAccessToMnemonic(state: state))
 		case .createAccountButtonTapped:
 			state.destination = .createAccount(
 				.init(config: .init(
@@ -124,17 +127,52 @@ public struct Home: Sendable, FeatureReducer {
 				return .none
 			}
 
-			state.accountList = .init(accounts: accounts)
+			state.accountList = .init(accounts: accounts, babylonAccountsRecoveryNeeded: state.babylonAccountRecoveryIsNeeded)
 			let accountAddresses = state.accounts.map(\.address)
 			return .run { _ in
 				_ = try await accountPortfoliosClient.fetchAccountPortfolios(accountAddresses, false)
 			} catch: { error, _ in
 				errorQueue.schedule(error)
 			}
+			.merge(with: checkAccountsAccessToMnemonic(state: state))
 
 		case let .accountsLoadedResult(.failure(error)):
 			errorQueue.schedule(error)
 			return .none
+		case let .mnemonicAccessResult(result):
+			for account in state.accountList.accounts {
+				guard var deviceFactorSourceControlled = account.deviceFactorSourceControlled else { continue }
+
+				let hasAccessToMnemonic = result[account.account.deviceFactorSourceID] ?? false
+				let needtoImportMnemonic = if account.isLegacyAccount {
+					!hasAccessToMnemonic
+				} else {
+					state.babylonAccountRecoveryIsNeeded || !hasAccessToMnemonic
+				}
+				deviceFactorSourceControlled.needToImportMnemonicForThisAccount = needtoImportMnemonic
+				state.accountList.accounts[id: account.id]?.deviceFactorSourceControlled = deviceFactorSourceControlled
+			}
+			return .none
+		}
+	}
+
+	private func checkAccountsAccessToMnemonic(state: State) -> Effect<Action> {
+		let factorSourceIDs = Set(state.accounts.map(\.deviceFactorSourceID))
+		guard !factorSourceIDs.isEmpty else {
+			return .none
+		}
+
+		return .run { send in
+			let result = await factorSourceIDs.asyncMap { factorSourceID in
+				let hasAccessToMnemonic = await secureStorageClient.containsMnemonicIdentifiedByFactorSourceID(factorSourceID)
+				return (factorSourceID: factorSourceID, hasAccessToMnemonic: hasAccessToMnemonic)
+			}
+
+			let dictionary = result.reduce(into: [:]) {
+				$0[$1.factorSourceID] = $1.hasAccessToMnemonic
+			}
+
+			await send(.internal(.mnemonicAccessResult(dictionary)))
 		}
 	}
 
@@ -169,6 +207,12 @@ public struct Home: Sendable, FeatureReducer {
 
 		case .destination(.presented(.accountDetails(.delegate(.dismiss)))):
 			state.destination = nil
+			return .none
+
+		case let .destination(.presented(.accountDetails(.delegate(.importedMnemonic(account))))):
+			if !account.isOlympiaAccount {
+				state.babylonAccountRecoveryIsNeeded = false
+			}
 			return .none
 
 		default:

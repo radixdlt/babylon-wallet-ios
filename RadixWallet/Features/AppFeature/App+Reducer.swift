@@ -185,7 +185,7 @@ public struct App: Sendable, FeatureReducer {
 	}
 
 	func goToMain(state: inout State, accountRecoveryIsNeeded: Bool) -> Effect<Action> {
-		state.root = .main(.init(home: .init(accountRecoveryIsNeeded: accountRecoveryIsNeeded)))
+		state.root = .main(.init(home: .init(babylonAccountRecoveryIsNeeded: accountRecoveryIsNeeded)))
 		return .none
 	}
 

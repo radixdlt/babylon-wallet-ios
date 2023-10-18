@@ -10,9 +10,14 @@ public struct AccountList: Sendable, FeatureReducer {
 			self.accounts = accounts
 		}
 
-		public init(accounts: Profile.Network.Accounts) {
+		public init(accounts: Profile.Network.Accounts, babylonAccountsRecoveryNeeded: Bool) {
 			self.init(
-				accounts: .init(uniqueElements: accounts.rawValue.elements.map(AccountList.Row.State.init(account:)))
+				accounts: accounts.rawValue.elements.map { account in
+					AccountList.Row.State(
+						account: account,
+						babylonAccountRecoveryNeeded: babylonAccountsRecoveryNeeded
+					)
+				}.asIdentifiable()
 			)
 		}
 	}

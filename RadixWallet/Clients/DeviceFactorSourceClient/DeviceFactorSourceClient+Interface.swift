@@ -84,8 +84,8 @@ public struct SignatureFromOnDeviceHDRequest: Sendable, Hashable {
 	}
 }
 
-// MARK: - FailedToDeviceFactorSourceForSigning
-struct FailedToDeviceFactorSourceForSigning: Swift.Error {}
+// MARK: - FailedToFindDeviceFactorSourceForSigning
+struct FailedToFindDeviceFactorSourceForSigning: Swift.Error {}
 
 // MARK: - IncorrectSignatureCountExpectedExactlyOne
 struct IncorrectSignatureCountExpectedExactlyOne: Swift.Error {}
@@ -110,7 +110,7 @@ extension DeviceFactorSourceClient {
 			guard
 				let deviceFactorSource = try await factorSourcesClient.getDeviceFactorSource(of: factorInstance)
 			else {
-				throw FailedToDeviceFactorSourceForSigning()
+				throw FailedToFindDeviceFactorSourceForSigning()
 			}
 
 			let signatures = try await signUsingDeviceFactorSource(
@@ -141,7 +141,7 @@ extension DeviceFactorSourceClient {
 		guard
 			let loadedMnemonicWithPassphrase = try await secureStorageClient.loadMnemonicByFactorSourceID(factorSourceID, purpose.loadMnemonicPurpose)
 		else {
-			throw FailedToDeviceFactorSourceForSigning()
+			throw FailedToFindDeviceFactorSourceForSigning()
 		}
 		let hdRoot = try loadedMnemonicWithPassphrase.hdRoot()
 

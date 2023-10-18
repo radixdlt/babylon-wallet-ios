@@ -80,7 +80,7 @@ struct OverlayReducer: Sendable, FeatureReducer {
 	func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case .destination(.dismiss):
-			return dismiss(&state)
+			return dismissAlert(state: &state, withAction: .dismissed)
 		case let .destination(.presented(.alert(action))):
 			if let item = state.itemsQueue.first, case let .alert(state) = item {
 				overlayWindowClient.sendAlertAction(action, state.id)

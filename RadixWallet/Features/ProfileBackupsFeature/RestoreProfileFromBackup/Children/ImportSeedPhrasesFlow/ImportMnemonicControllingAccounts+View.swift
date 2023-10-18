@@ -2,7 +2,7 @@ import ComposableArchitecture
 import SwiftUI
 extension ImportMnemonicControllingAccounts.State {
 	var viewState: ImportMnemonicControllingAccounts.ViewState {
-		.init(isSkippable: entitiesControlledByFactorSource.isSkippable)
+		.init(isSkippable: entitiesControlledByFactorSource.isSkippable, disableSkipImport: disableSkipImport)
 	}
 }
 
@@ -10,6 +10,7 @@ extension ImportMnemonicControllingAccounts.State {
 extension ImportMnemonicControllingAccounts {
 	public struct ViewState: Equatable {
 		let isSkippable: Bool
+		let disableSkipImport: Bool
 
 		var title: LocalizedStringKey {
 			.init(
@@ -43,7 +44,7 @@ extension ImportMnemonicControllingAccounts {
 						.foregroundColor(.app.gray1)
 						.padding()
 
-					if viewStore.isSkippable {
+					if !viewStore.disableSkipImport, viewStore.isSkippable {
 						Button(L10n.RecoverSeedPhrase.skipButton) {
 							viewStore.send(.skip)
 						}

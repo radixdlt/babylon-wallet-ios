@@ -380,6 +380,6 @@ struct Row_Preview: PreviewProvider {
 }
 
 extension AccountList.Row.State {
-	public static let previewValue = Self(account: .previewValue0)
+	public static let previewValue = Self(account: .previewValue0, babylonAccountRecoveryNeeded: false)
 }
 #endif

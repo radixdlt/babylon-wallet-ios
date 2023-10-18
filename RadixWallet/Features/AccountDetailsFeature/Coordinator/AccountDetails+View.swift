@@ -117,9 +117,20 @@ extension AccountDetails {
 				)
 				.sheet(
 					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-					state: /AccountDetails.Destinations.State.importMnemonics,
-					action: AccountDetails.Destinations.Action.importMnemonics,
-					content: { ImportMnemonicsFlowCoordinator.View(store: $0) }
+					state: /AccountDetails.Destinations.State.importMnemonic,
+					action: AccountDetails.Destinations.Action.importMnemonic,
+					content: { importStore in
+						NavigationView {
+							ImportMnemonicControllingAccounts.View(store: importStore)
+								.toolbar {
+									ToolbarItem(placement: .navigationBarLeading) {
+										CloseButton {
+											viewStore.send(.importMnemonicCloseButtonTapped)
+										}
+									}
+								}
+						}
+					}
 				)
 			}
 		}
