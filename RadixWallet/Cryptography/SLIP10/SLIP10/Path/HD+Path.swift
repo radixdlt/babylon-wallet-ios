@@ -13,9 +13,9 @@ extension HD.Path {
 	public func depth() throws -> Component.Child.Depth.Value {
 		switch self {
 		case let .relative(relativePath):
-			return try relativePath.depth()
+			try relativePath.depth()
 		case let .full(fullPath):
-			return try fullPath.depth()
+			try fullPath.depth()
 		}
 	}
 
