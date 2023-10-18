@@ -108,9 +108,9 @@ jobs:
     permissions:
       id-token: write
       contents: read
-    name: "Test and build"
+    name: "Unit test"
     runs-on: macos-13-xlarge
-    timeout-minutes: 70
+    timeout-minutes: 15
 
     needs:
       - linting
