@@ -143,7 +143,7 @@ public struct Home: Sendable, FeatureReducer {
 			for account in state.accountList.accounts {
 				guard var deviceFactorSourceControlled = account.deviceFactorSourceControlled else { continue }
 
-				let hasAccessToMnemonic = result[account.account.deviceFactorSourceID] ?? false
+				let hasAccessToMnemonic = result[deviceFactorSourceControlled.factorSourceID] ?? false
 				let needtoImportMnemonic = if account.isLegacyAccount {
 					!hasAccessToMnemonic
 				} else {

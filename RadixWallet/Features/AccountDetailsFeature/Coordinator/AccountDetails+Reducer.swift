@@ -28,6 +28,11 @@ extension Tagged where RawValue == ImportOrExportMnemonicForAccountPrompt {
 	}
 }
 
+// MARK: - FailedToLoadEntitiesForMnemonic
+public struct FailedToLoadEntitiesForMnemonic: Error {
+	public let factorSourceID: FactorSourceID.FromHash
+}
+
 // MARK: - AccountDetails
 public struct AccountDetails: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
@@ -322,7 +327,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 				guard let entity = ents.first(where: { ent in
 					ent.factorSourceID == factorSourceID
 				}) else {
-					fatalError()
+					throw FailedToLoadEntitiesForMnemonic(factorSourceID: factorSourceID)
 				}
 				return entity
 			}
