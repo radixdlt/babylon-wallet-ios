@@ -1,7 +1,6 @@
-import AsyncExtensions
 import Foundation
-@testable import RadixConnect
-import TestingPrelude
+@testable import Radix_Wallet_Dev
+import XCTest
 
 final class MockWebSocketClient: SignalingTransport, Sendable {
 	var incomingMessages: AsyncStream<Data>

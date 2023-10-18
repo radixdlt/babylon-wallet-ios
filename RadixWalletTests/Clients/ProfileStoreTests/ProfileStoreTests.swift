@@ -1,9 +1,5 @@
-import ClientTestingPrelude
-import Cryptography
-import LocalAuthenticationClient
-@testable import Profile
-@testable import ProfileStore
-import SecureStorageClient
+@testable import Radix_Wallet_Dev
+import XCTest
 
 // MARK: - ProfileStoreTests
 final class ProfileStoreTests: TestCase {

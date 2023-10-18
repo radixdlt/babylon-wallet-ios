@@ -1,5 +1,5 @@
-import FeatureTestingPrelude
-@testable import GatewaySettingsFeature
+@testable import Radix_Wallet_Dev
+import XCTest
 
 // MARK: - GatewaySettingsFeatureTests
 @MainActor

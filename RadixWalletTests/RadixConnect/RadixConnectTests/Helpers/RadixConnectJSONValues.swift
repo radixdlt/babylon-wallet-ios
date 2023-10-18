@@ -1,6 +1,6 @@
 import Foundation
-@testable import RadixConnect
-import TestingPrelude
+@testable import Radix_Wallet_Dev
+import XCTest
 
 extension SignalingClient.IncomingMessage.FromSignalingServer.ResponseForRequest {
 	var json: JSONValue {

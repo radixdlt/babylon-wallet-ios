@@ -1,8 +1,8 @@
 // TODO: Revive this test and see if it can run in GH actions
 // import CryptoKit
-// @testable import RadixConnect
-// import TestingPrelude
-// import SharedModels
+// import Foundation
+// @testable import Radix_Wallet_Dev
+// import XCTest
 //
 // @MainActor
 // final class E2ETests: TestCase {

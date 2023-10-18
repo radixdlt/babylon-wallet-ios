@@ -1,8 +1,7 @@
 /// Disabled tests, should be migrated to TransactionReviewFeatureTests
 
-// import FeatureTestingPrelude
-// import TransactionClient
-// @testable import TransactionSigningFeature
+// import XCTest
+// @testable import Radix_Wallet_Dev
 //
 // @MainActor
 // final class TransactionSigningFeatureTests: TestCase {

@@ -1,6 +1,6 @@
-import EngineKit
-import EngineToolkit
-import TestingPrelude
+import Foundation
+@testable import Radix_Wallet_Dev
+import XCTest
 
 final class TransactionManifestTests: TestCase {
 	func test_equatable_and_hashable_small() throws {

@@ -1,11 +1,13 @@
-@testable import Profile
-import TestingPrelude
+import Foundation
+import JSONTesting
+@testable import Radix_Wallet_Dev
+import XCTest
 
 // MARK: - SnapshotJSONTests
 final class SnapshotJSONTests: TestCase {
 	func omit_test_generate() throws {
 		let plaintextSnapshot: ProfileSnapshot = try readTestFixture(
-			bundle: .module,
+			bundle: Bundle(for: Self.self),
 			// This Profile has been built using the PROD version of app, version `1.0.0 (5)`
 			// and exported as file and put here.
 			jsonName: "only_plaintext_profile_snapshot_version_100",
@@ -52,7 +54,7 @@ final class SnapshotJSONTests: TestCase {
 
 	func test_profile_snapshot_version_100() throws {
 		try testFixture(
-			bundle: .module,
+			bundle: Bundle(for: Self.self),
 			jsonName: "multi_profile_snapshots_test_version_100"
 		) { (vector: SnapshotTestVector) in
 			let decryptedSnapshots = try vector.validate()

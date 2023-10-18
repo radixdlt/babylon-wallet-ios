@@ -1,5 +1,5 @@
-@testable import CacheClient
-import ClientTestingPrelude
+@testable import Radix_Wallet_Dev
+import XCTest
 
 final class CacheClientTests: TestCase {
 	private var sut: CacheClient!

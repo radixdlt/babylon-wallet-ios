@@ -1,8 +1,6 @@
-import ClientTestingPrelude
-import CryptoKit
-import EngineKit
-@testable import FaucetClient
-import TransactionClient
+import JSONTesting
+@testable import Radix_Wallet_Dev
+import XCTest
 
 // MARK: - FaucetClientTests
 final class FaucetClientTests: TestCase {

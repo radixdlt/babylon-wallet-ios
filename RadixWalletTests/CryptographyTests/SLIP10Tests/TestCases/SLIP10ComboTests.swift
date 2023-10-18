@@ -9,8 +9,8 @@ extension HD.Root {
 	}
 }
 
-// MARK: - ComboTests
-final class ComboTests: TestCase {
+// MARK: - SLIP10ComboTests
+final class SLIP10ComboTests: TestCase {
 	func test_zoo() throws {
 		let fromPhrase = try Mnemonic(phrase: "zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo wrong", language: .english)
 		let fromWords = try Mnemonic(words: ["zoo", "zoo", "zoo", "zoo", "zoo", "zoo", "zoo", "zoo", "zoo", "zoo", "zoo", "wrong"], language: .english)

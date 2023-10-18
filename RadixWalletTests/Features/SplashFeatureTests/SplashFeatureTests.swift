@@ -1,7 +1,5 @@
-import FeatureTestingPrelude
-import LocalAuthenticationClient
-import OnboardingClient
-@testable import SplashFeature
+@testable import Radix_Wallet_Dev
+import XCTest
 
 // MARK: - SplashFeatureTests
 @MainActor

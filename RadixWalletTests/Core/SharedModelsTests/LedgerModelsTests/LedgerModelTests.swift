@@ -1,5 +1,7 @@
-@testable import SharedModels
-import TestingPrelude
+import Foundation
+import JSONTesting
+@testable import Radix_Wallet_Dev
+import XCTest
 
 final class LedgerModelTests: TestCase {
 	func test_decode_error_response() throws {

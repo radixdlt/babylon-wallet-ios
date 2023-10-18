@@ -1,5 +1,6 @@
 import Foundation
-@testable import RadixConnect
+@testable import Radix_Wallet_Dev
+import XCTest
 
 // MARK: - DataChannelMock
 final class DataChannelMock: DataChannel {

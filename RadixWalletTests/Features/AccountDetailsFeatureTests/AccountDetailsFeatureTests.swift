@@ -1,5 +1,5 @@
-@testable import AccountDetailsFeature
-import FeatureTestingPrelude
+@testable import Radix_Wallet_Dev
+import XCTest
 
 @MainActor
 final class AccountDetailsFeatureTests: TestCase {
