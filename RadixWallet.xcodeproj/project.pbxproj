@@ -7334,6 +7334,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 48CFBC5D2ADC106400E77A5C /* Build configuration list for PBXNativeTarget "RadixWallet" */;
 			buildPhases = (
+				E67F14462AE02B0E00738BE1 /* Run SwiftGen */,
 				48CFBC4B2ADC106300E77A5C /* Sources */,
 				48CFBC4C2ADC106300E77A5C /* Frameworks */,
 				48CFBC4D2ADC106300E77A5C /* Resources */,
@@ -7521,6 +7522,27 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		E67F14462AE02B0E00738BE1 /* Run SwiftGen */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Run SwiftGen";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "if which swiftgen >/dev/null; then\n  swiftgen\nelse\n  echo \"warning: SwiftGen not installed, download it from https://github.com/SwiftGen/SwiftGen\"\nfi\n";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		481B43AC2ADC7F1A007945C1 /* Sources */ = {
