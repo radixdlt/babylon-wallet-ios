@@ -56,6 +56,12 @@ jobs:
           secret-ids: |
             FASTLANE_MATCH_REPO_SSH_KEY, ${{ secrets.AWS_SECRET_NAME_WALLET_FASTLANE_SSH }}
           parse-json-secrets: true
+      - name: Fetch webhook AWS secrets
+        uses: aws-actions/aws-secretsmanager-get-secrets@287592d14d9c9c48199db83dc182ae12af3df18e # v1.0.1
+        with:
+          secret-ids: |
+            WEBHOOK, ${{ secrets.AWS_SECRET_NAME_SLACK_WEBHOOK }}
+          parse-json-secrets: true
       - uses: webfactory/ssh-agent@v0.6.0
         with:
           ssh-private-key: |
@@ -99,3 +105,4 @@ jobs:
           bundle exec fastlane deploy --env ios.$FLAVOUR
         env:
           GIT_TOKEN: ${{ env.WALLET_RADIX_BOT_PAT }}
+          SLACK_WEBHOOK_URL: ${{ env.WEBHOOK_SLACK_URL }}

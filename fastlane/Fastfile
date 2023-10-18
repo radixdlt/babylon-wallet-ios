@@ -181,7 +181,7 @@ error do |lane, exception, options|
         slack(
             message: message, 
             channel: "#chapter--engineering-ios",
-            slack_url: "https://rdxworks.slack.com",
+            slack_url: ENV["SLACK_WEBHOOK_URL"],
             success: false, # We just failed...
             pretext: "Perhaps you worked with #if DEBUG? Try `bundle exec fastlane build` locally.",
             default_payloads: [:git_branch, :git_author],
