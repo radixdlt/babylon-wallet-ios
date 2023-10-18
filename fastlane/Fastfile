@@ -1,4 +1,5 @@
 fastlane_require 'dotenv'
+default_platform(:ios)
 
 before_all do
     ensure_xcode_version
@@ -87,9 +88,9 @@ platform :ios do
         code_signing(type: "appstore", readonly: false)
     end
 
-    desc "Registers a new iPhone device and updates the certificates"
-    lane :register_new_iphone_device do
-        register_new_device
+    desc "Registers a new iPhone/Mac device and updates the certificates"
+    lane :register_new_device do
+        register_new_device_iphone_or_mac
         generate_new_dev_certificates
     end
 
@@ -165,18 +166,16 @@ end
 
 private_lane :create_gh_release do |options|
     flavour = options.fetch(:flavour).delete_prefix('"').delete_suffix('"') # if accidentally included
-    
-    puts "👀 SharedValues::IPA_OUTPUT_PATH]: '#{lane_context[SharedValues::IPA_OUTPUT_PATH]}'\n"
 
     dsymPathUsed = locate_dsym()
 
     sh('git fetch --tags')
     most_recent_tags = sh("git tag | grep #{flavour} | sort -r | head -2").split("\n")
 
-    changelog = rev_changelog(flavour, most_recent_tags)
+    pr_log = rev_changelog(flavour, most_recent_tags)
     versions_string = dependencies_with_hyperlinks()
 
-    release_description = "**Dependencies**: \n" + versions_string + "\n\n**Changelog**: \n" + changelog
+    release_description = "**Changelog**:\nREPLACE_ME_SYNC_WITH_APP_CONNECT_AND_STAKE_HOLDERS" + "\n\n**Rull Requests**: \n" + pr_log + "\n\n**Dependencies**: \n" + versions_string
     last_tag = most_recent_tags[0]
 
     set_github_release(
@@ -252,7 +251,7 @@ private_lane :dependencies_with_hyperlinks do |options|
     versions.map { |k, v| "- #{k}: #{v}" }.join("\n")
 end
 
-private_lane :register_new_device do |options|
+private_lane :register_new_device_iphone_or_mac do |options|
     name = prompt(text: "Device name: ")
     udid = prompt(text: "Device UDID: ")
     devices = {}
@@ -293,6 +292,7 @@ private_lane :code_signing do |options|
     sync_code_signing(
         type: type,
         force_for_new_devices: true,
+        additional_cert_types: "mac_installer_distribution", # allows Catalyst, run destination "My Mac (Designed for iPhone)"
         readonly: readonly,
         app_identifier: read_env_config(key: "PRODUCT_BUNDLE_IDENTIFIER"),
         team_id: read_common_config(key: "DEV_TEAM")

@@ -12,7 +12,7 @@ Will will setup SwiftFormat to format code, rules are defined in `.swiftformat`.
 ## Open project
 
 ```sh
-open App/BabylonWallet.xcodeproj
+open RadixWallet.xcodeproj
 ```
 
 Select the `Radix Wallet Dev (iOS)` scheme and hit run (`⌘R`).
@@ -45,13 +45,13 @@ bundle install
 - Run the below command to bring the necessary certificates for development:
 
 ```sh
-bundle exec fastlane ios install_development_certificates
+bundle exec fastlane install_development_certificates
 ```
 
 - If your device is unregistered, register it with the below command, it will prompt you to enter the device name and device UDID.
 
 ```sh
-bundle exec fastlane ios register_new_iphone_device
+bundle exec fastlane register_new_device
 ```
 
 After the above setup, you are good to go with building and running the app on iPhone. 
