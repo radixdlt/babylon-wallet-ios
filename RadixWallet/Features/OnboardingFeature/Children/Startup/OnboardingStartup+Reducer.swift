@@ -15,7 +15,7 @@ public struct OnboardingStartup: Sendable, FeatureReducer {
 
 	public enum DelegateAction: Sendable, Equatable {
 		case setupNewUser
-		case completed(accountRecoveryIsNeeded: Bool)
+		case completed
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -58,10 +58,8 @@ public struct OnboardingStartup: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
-		case let .destination(.presented(.restoreFromBackup(.delegate(.profileImported(skippedAnyMnemonic))))):
-			.send(.delegate(.completed(
-				accountRecoveryIsNeeded: skippedAnyMnemonic
-			)))
+		case .destination(.presented(.restoreFromBackup(.delegate(.profileImported)))):
+			.send(.delegate(.completed))
 
 		case .destination(.presented(.restoreFromBackup(.delegate(.failedToImportProfileDueToMnemonics)))):
 			.none
