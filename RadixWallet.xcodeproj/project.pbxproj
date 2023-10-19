@@ -7334,7 +7334,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 48CFBC5D2ADC106400E77A5C /* Build configuration list for PBXNativeTarget "RadixWallet" */;
 			buildPhases = (
-				E67F14462AE02B0E00738BE1 /* Run SwiftGen */,
+				E6915BF42AE11B6200DD794B /* 🔮 CodeGen SwiftGen */,
 				48CFBC4B2ADC106300E77A5C /* Sources */,
 				48CFBC4C2ADC106300E77A5C /* Frameworks */,
 				48CFBC4D2ADC106300E77A5C /* Resources */,
@@ -7435,7 +7435,6 @@
 				48FFFAB52ADC207B00B2B213 /* XCRemoteSwiftPackageReference "swiftui-navigation-transitions" */,
 				48FFFAB82ADC209100B2B213 /* XCRemoteSwiftPackageReference "Nuke" */,
 				48FFFABF2ADC20C400B2B213 /* XCRemoteSwiftPackageReference "JSONPreview" */,
-				48FFFAC22ADC20D100B2B213 /* XCRemoteSwiftPackageReference "SwiftGenPlugin" */,
 				48FFFAC32ADC211700B2B213 /* XCRemoteSwiftPackageReference "swift-json-testing" */,
 				48FFFACD2ADC216400B2B213 /* XCRemoteSwiftPackageReference "CollectionConcurrencyKit" */,
 				48FFFAD02ADC218400B2B213 /* XCRemoteSwiftPackageReference "swift-either" */,
@@ -7454,6 +7453,7 @@
 				48FFFB012ADC6F8100B2B213 /* XCRemoteSwiftPackageReference "swift-builders" */,
 				48FFFB042ADC6FD300B2B213 /* XCRemoteSwiftPackageReference "swiftui-navigation" */,
 				48FFFB0B2ADC744700B2B213 /* XCRemoteSwiftPackageReference "TextBuilder" */,
+				E6915BF82AE11C5900DD794B /* XCRemoteSwiftPackageReference "SwiftGen" */,
 			);
 			productRefGroup = 48CFBC502ADC106300E77A5C /* Products */;
 			projectDirPath = "";
@@ -7524,7 +7524,7 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		E67F14462AE02B0E00738BE1 /* Run SwiftGen */ = {
+		E6915BF42AE11B6200DD794B /* 🔮 CodeGen SwiftGen */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -7533,14 +7533,14 @@
 			);
 			inputPaths = (
 			);
-			name = "Run SwiftGen";
+			name = "🔮 CodeGen SwiftGen";
 			outputFileListPaths = (
 			);
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "if which swiftgen >/dev/null; then\n  swiftgen\nelse\n  echo \"warning: SwiftGen not installed, download it from https://github.com/SwiftGen/SwiftGen\"\nfi\n";
+			shellScript = "echo \"Build Phase - Begin SwiftGen\"\n./runSwiftGen.sh\necho \"Build Phase - End SwiftGen\"\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -9047,7 +9047,7 @@
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -9111,7 +9111,7 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -9186,7 +9186,7 @@
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -9259,7 +9259,7 @@
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -9332,7 +9332,7 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -9514,14 +9514,6 @@
 				minimumVersion = 2.0.0;
 			};
 		};
-		48FFFAC22ADC20D100B2B213 /* XCRemoteSwiftPackageReference "SwiftGenPlugin" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/SwiftGen/SwiftGenPlugin";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 6.6.2;
-			};
-		};
 		48FFFAC32ADC211700B2B213 /* XCRemoteSwiftPackageReference "swift-json-testing" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/davdroman/swift-json-testing";
@@ -9664,6 +9656,14 @@
 			requirement = {
 				kind = upToNextMajorVersion;
 				minimumVersion = 3.0.1;
+			};
+		};
+		E6915BF82AE11C5900DD794B /* XCRemoteSwiftPackageReference "SwiftGen" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SwiftGen/SwiftGen";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 6.6.2;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
