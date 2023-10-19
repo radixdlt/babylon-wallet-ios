@@ -9,6 +9,20 @@ extension JSONDecoder {
 	}
 }
 
+private var rdxClientVersion: String? {
+	guard
+		let mainBundleInfoDictionary = Bundle.main.infoDictionary,
+		let version = mainBundleInfoDictionary["CFBundleShortVersionString"] as? String,
+		let buildNumber = mainBundleInfoDictionary["CFBundleVersion"] as? String
+	else {
+		return nil
+	}
+
+	return version
+		+ "#" + buildNumber
+		+ "-" + (BuildConfiguration.current?.description ?? "UNKNOWN")
+}
+
 extension GatewayAPIClient {
 	public struct EmptyEntityDetailsResponse: Error {}
 	public typealias SingleEntityDetailsResponse = (ledgerState: GatewayAPI.LedgerState, details: GatewayAPI.StateEntityDetailsResponseItem)

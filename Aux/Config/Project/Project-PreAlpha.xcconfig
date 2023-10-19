@@ -26,3 +26,6 @@ PRODUCT_NAME = Pre-Alpha
 // key in the Info.plist file to the value of this build setting.
 
 INFOPLIST_KEY_CFBundleDisplayName = $(PRODUCT_NAME)
+
+GCC_PREPROCESSOR_DEFINITIONS = PREALPHA=1 $(inherited)
+SWIFT_ACTIVE_COMPILATION_CONDITIONS = PREALPHA $(inherited)
