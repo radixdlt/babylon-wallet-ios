@@ -258,9 +258,9 @@ extension ThirdPartyDeposits.DepositorAddress {
 	var resourceAddress: ResourceAddress {
 		switch self {
 		case let .resourceAddress(address):
-			return address
+			address
 		case let .nonFungibleGlobalID(nonFungibleGlobalID):
-			return try! nonFungibleGlobalID.resourceAddress().asSpecific()
+			try! nonFungibleGlobalID.resourceAddress().asSpecific()
 		}
 	}
 }
