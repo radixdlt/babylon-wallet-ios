@@ -2,10 +2,13 @@
 // Generated using SwiftGen — https://github.com/SwiftGen/SwiftGen
 
 #if os(macOS)
-  #elseif os(iOS) || os(tvOS) || os(watchOS)
-  #endif
+  import AppKit.NSFont
+#elseif os(iOS) || os(tvOS) || os(watchOS)
+  import UIKit.UIFont
+#endif
 #if canImport(SwiftUI)
-  #endif
+  import SwiftUI
+#endif
 
 // Deprecated typealiases
 @available(*, deprecated, renamed: "FontConvertible.Font", message: "This typealias will be removed in SwiftGen 7.0")

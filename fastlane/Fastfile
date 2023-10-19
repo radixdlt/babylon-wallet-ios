@@ -94,6 +94,37 @@ platform :ios do
         generate_new_dev_certificates
     end
 
+    error do |lane, exception, options|
+        case lane
+        when :deploy then
+            commithash = sh("git rev-parse HEAD").strip # Fastlane Action.last_git_commit did not work
+            gh_workflow_check_url = "https://github.com/radixdlt/babylon-wallet-ios/commit/#{commithash}/checks"
+            
+            pretext = 
+            <<~EOS
+            🚨
+            Failed to Archive app on branch `#{Actions.git_branch}`
+            See: #{gh_workflow_check_url}
+            🚨
+            EOS
+
+            message =
+            <<~EOS 
+            Perhaps you worked with `#if DEBUG`?
+            Try `bundle exec fastlane build` locally."
+            EOS
+
+            slack(
+                message: message, 
+                channel: "#chapter--engineering-ios",
+                slack_url: ENV["SLACK_WEBHOOK_URL"],
+                success: false, # We just failed...
+                pretext: pretext,
+                default_payloads: [],
+                link_names: true
+            )
+        end
+    end
 end
 
 def rev_changelog(flavour, most_recent_tags)
@@ -162,7 +193,6 @@ private_lane :locate_dsym do |options|
 
     dsymPathUsed
 end
-
 
 private_lane :create_gh_release do |options|
     flavour = options.fetch(:flavour).delete_prefix('"').delete_suffix('"') # if accidentally included
