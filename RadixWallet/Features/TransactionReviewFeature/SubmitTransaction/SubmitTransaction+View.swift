@@ -68,7 +68,9 @@ extension SubmitTransaction {
 									value: opacity
 								)
 								.onAppear {
-									opacity = 0.5
+									withAnimation {
+										opacity = 0.5
+									}
 								}
 
 							Text(L10n.Transaction.Status.Completing.text)
