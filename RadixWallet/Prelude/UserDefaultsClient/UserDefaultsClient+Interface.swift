@@ -7,7 +7,6 @@ public struct UserDefaultsClient: Sendable {
 		/// DO NOT CHANGE THIS KEY
 		case activeProfileID
 
-		case accountsThatNeedRecovery
 		case mnemonicsUserClaimsToHaveBackedUp
 	}
 

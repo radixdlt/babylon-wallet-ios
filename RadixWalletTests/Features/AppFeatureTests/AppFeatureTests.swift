@@ -44,7 +44,7 @@ final class AppFeatureTests: TestCase {
 
 		// THEN: navigate to main
 		await store.send(.child(.splash(.delegate(.completed(.existingProfile, accountRecoveryNeeded: accountRecoveryNeeded))))) {
-			$0.root = .main(.init(home: .init(accountRecoveryIsNeeded: accountRecoveryNeeded)))
+			$0.root = .main(.init(home: .init(babylonAccountRecoveryIsNeeded: accountRecoveryNeeded)))
 		}
 
 		await clock.run() // fast-forward clock to the end of time

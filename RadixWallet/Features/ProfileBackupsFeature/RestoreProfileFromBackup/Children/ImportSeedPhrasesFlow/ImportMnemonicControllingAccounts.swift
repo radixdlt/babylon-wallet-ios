@@ -83,17 +83,7 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 
 		case .skip:
 			precondition(state.entitiesControlledByFactorSource.isSkippable)
-			return .run { [accountsNeedingRecover = state.entitiesControlledByFactorSource.accounts, factorSourceID = state.entitiesControlledByFactorSource.factorSourceID] send in
-				do {
-					try await userDefaultsClient.addAccountsThatNeedRecovery(
-						accounts: .init(uncheckedUniqueElements: accountsNeedingRecover.map(\.address))
-					)
-				} catch {
-					// not important enough to propagate error
-					loggerGlobal.error("Failed to add accounts that need recovery, error: \(error)")
-				}
-				await send(.delegate(.skippedMnemonic(factorSourceID)))
-			}
+			return .send(.delegate(.skippedMnemonic(state.entitiesControlledByFactorSource.factorSourceID)))
 		}
 	}
 
@@ -142,18 +132,7 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 		switch internalAction {
 		case let .validated(privateHDFactorSource):
 			state.destination = nil
-			return .run { [accounts = state.entitiesControlledByFactorSource.accounts] send in
-				do {
-					try await userDefaultsClient.removeFromListOfAccountsThatNeedRecovery(
-						accounts: .init(uncheckedUniqueElements: accounts.map(\.address))
-					)
-				} catch {
-					// not important enough to propage error
-					loggerGlobal.error("Failed to remove addresses from list of those that need recovery, error: \(error)")
-				}
-
-				let addresses: OrderedSet<AccountAddress> = .init(uncheckedUniqueElements: accounts.map(\.address))
-				try await userDefaultsClient.removeFromListOfAccountsThatNeedRecovery(accounts: addresses)
+			return .run { send in
 				try await userDefaultsClient.addFactorSourceIDOfBackedUpMnemonic(privateHDFactorSource.factorSource.id)
 
 				try await secureStorageClient.saveMnemonicForFactorSource(

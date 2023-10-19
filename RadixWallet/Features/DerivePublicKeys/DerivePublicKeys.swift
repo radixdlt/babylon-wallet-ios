@@ -86,6 +86,7 @@ public struct DerivePublicKeys: Sendable, FeatureReducer {
 	@Dependency(\.factorSourcesClient) var factorSourcesClient
 	@Dependency(\.deviceFactorSourceClient) var deviceFactorSourceClient
 	@Dependency(\.ledgerHardwareWalletClient) var ledgerHardwareWalletClient
+	@Dependency(\.overlayWindowClient) var overlayWindowClient
 
 	public init() {}
 
@@ -204,16 +205,23 @@ extension DerivePublicKeys {
 		loadMnemonicPurpose: SecureStorageClient.LoadMnemonicPurpose,
 		state: State
 	) async throws -> Action {
-		let hdKeys = try await deviceFactorSourceClient.publicKeysFromOnDeviceHD(.init(
-			deviceFactorSource: deviceFactorSource,
-			derivationPaths: derivationPaths,
-			loadMnemonicPurpose: loadMnemonicPurpose
-		))
-		return .delegate(.derivedPublicKeys(
-			hdKeys,
-			factorSourceID: deviceFactorSource.id.embed(),
-			networkID: networkID
-		))
+		do {
+			let hdKeys = try await deviceFactorSourceClient.publicKeysFromOnDeviceHD(.init(
+				deviceFactorSource: deviceFactorSource,
+				derivationPaths: derivationPaths,
+				loadMnemonicPurpose: loadMnemonicPurpose
+			))
+			return .delegate(.derivedPublicKeys(
+				hdKeys,
+				factorSourceID: deviceFactorSource.id.embed(),
+				networkID: networkID
+			))
+		} catch {
+			if error is FailedToFindFactorSource {
+				_ = await overlayWindowClient.scheduleAlert(.missingMnemonicAlert)
+			}
+			throw error
+		}
 	}
 
 	private func deriveWith(
@@ -278,6 +286,9 @@ extension DerivePublicKeys {
 			}
 			return .run { send in
 				try await send(deriveWithKnownDerivationPaths(derivationPaths, networkID, loadMnemonicPurpose))
+			} catch: { error, send in
+				loggerGlobal.error("Failed to create derivation path, error: \(error)")
+				await send(.delegate(.failedToDerivePublicKey))
 			}
 		case let .next(networkOption, entityKind, curve):
 			let loadMnemonicPurpose: SecureStorageClient.LoadMnemonicPurpose = switch state.purpose {
@@ -294,6 +305,9 @@ extension DerivePublicKeys {
 					let derivationPath = try await nextDerivationPath(of: entityKind, networkID: networkID)
 					assert(derivationPath.curveForScheme == curve)
 					try await send(deriveWithKnownDerivationPaths([derivationPath], networkID, loadMnemonicPurpose))
+				} catch: { error, send in
+					loggerGlobal.error("Failed to create derivation path, error: \(error)")
+					await send(.delegate(.failedToDerivePublicKey))
 				}
 
 			case .useCurrent:

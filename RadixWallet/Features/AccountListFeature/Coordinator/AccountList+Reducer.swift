@@ -12,7 +12,9 @@ public struct AccountList: Sendable, FeatureReducer {
 
 		public init(accounts: Profile.Network.Accounts) {
 			self.init(
-				accounts: .init(uniqueElements: accounts.rawValue.elements.map(AccountList.Row.State.init(account:)))
+				accounts: accounts.rawValue.elements.map { account in
+					AccountList.Row.State(account: account)
+				}.asIdentifiable()
 			)
 		}
 	}
