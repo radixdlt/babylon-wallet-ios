@@ -68,14 +68,14 @@ extension KeychainClient {
 	public typealias AuthenticationPrompt = Tagged<Self, NonEmptyString>
 
 	public typealias GetServiceAndAccessGroup = @Sendable () -> KeychainServiceAndAccessGroup
-	public typealias ContainsDataForKey = @Sendable (Key, _ showAuthPrompt: Bool) async throws -> Bool
+	public typealias ContainsDataForKey = @Sendable (Key, _ showAuthPrompt: Bool) throws -> Bool
 	public typealias SetDataWithoutAuthForKey = @Sendable (Data, Key, AttributesWithoutAuth) async throws -> Void
 	public typealias GetDataWithoutAuthForKeySetIfNil = @Sendable (Key, IfNilSetWithoutAuth) async throws -> (value: Data, wasNil: Bool)
 	public typealias GetDataWithAuthForKeySetIfNil = @Sendable (Key, AuthenticationPrompt, IfNilSetWithAuth) async throws -> (value: Data, wasNil: Bool)
 	public typealias SetDataWithAuthForKey = @Sendable (Data, Key, AttributesWithAuth) async throws -> Void
 
-	public typealias GetDataWithoutAuthForKey = @Sendable (Key) async throws -> Data?
-	public typealias GetDataWithAuthForKey = @Sendable (Key, AuthenticationPrompt) async throws -> Data?
+	public typealias GetDataWithoutAuthForKey = @Sendable (Key) throws -> Data?
+	public typealias GetDataWithAuthForKey = @Sendable (Key, AuthenticationPrompt) throws -> Data?
 
 	public typealias RemoveDataForKey = @Sendable (Key) async throws -> Void
 	public typealias RemoveAllItems = @Sendable () async throws -> Void

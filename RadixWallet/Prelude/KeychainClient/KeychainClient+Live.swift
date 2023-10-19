@@ -4,14 +4,17 @@ extension KeychainClient: DependencyKey {
 	public static let liveValue: Self = .liveValue()
 
 	@_spi(KeychainInternal)
-	public static func liveValue(actor: KeychainActor = .shared) -> Self {
+	public static func liveValue(
+		actor: KeychainActor = .shared,
+		readonly: ReadonlyKeychain = .shared
+	) -> Self {
 		Self(
 			getServiceAndAccessGroup: {
-				let (service, accessGroup) = actor.getServiceAndAccessGroup()
+				let (service, accessGroup) = readonly.getServiceAndAccessGroup()
 				return KeychainServiceAndAccessGroup(service: service, accessGroup: accessGroup)
 			},
 			containsDataForKey: { key, showAuthPrompt in
-				try await actor.contains(key, showAuthPrompt: showAuthPrompt)
+				try readonly.contains(key, showAuthPrompt: showAuthPrompt)
 			},
 			setDataWithoutAuthForKey: { data, key, attributes in
 				try await actor.setDataWithoutAuth(
@@ -41,10 +44,10 @@ extension KeychainClient: DependencyKey {
 				)
 			},
 			getDataWithoutAuthForKey: {
-				try await actor.getDataWithoutAuth(forKey: $0)
+				try readonly.getDataWithoutAuth(forKey: $0)
 			},
 			getDataWithAuthForKey: { key, authenticationPrompt in
-				try await actor.getDataWithAuth(
+				try readonly.getDataWithAuth(
 					forKey: key,
 					authenticationPrompt: authenticationPrompt
 				)

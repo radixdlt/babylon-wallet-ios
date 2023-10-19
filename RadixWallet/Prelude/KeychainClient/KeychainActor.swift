@@ -1,3 +1,11 @@
+private let keychainService = {
+	var defaultService = "Radix Wallet" // DO NOT CHANGE THIS EVER
+	#if DEBUG
+	defaultService += " DEBUG"
+	#endif
+	return defaultService
+}()
+
 // MARK: - KeychainActor
 @_spi(KeychainInternal)
 public final actor KeychainActor: GlobalActor {
@@ -5,17 +13,70 @@ public final actor KeychainActor: GlobalActor {
 	public static let shared = KeychainActor()
 
 	private let keychain: Keychain
+
+	private init() {
+		self.keychain = Keychain(service: keychainService)
+	}
+}
+
+// MARK: - ReadonlyKeychain
+@_spi(KeychainInternal)
+public final class ReadonlyKeychain: @unchecked Sendable {
+	@_spi(KeychainInternal)
+	public static let shared = ReadonlyKeychain()
+
+	private let keychain: Keychain
 	private nonisolated let service: String
 	private nonisolated let accessGroup: String?
 
 	private init() {
-		var defaultService = "Radix Wallet" // DO NOT CHANGE THIS EVER
-		#if DEBUG
-		defaultService += " DEBUG"
-		#endif
-		self.keychain = Keychain(service: defaultService)
+		self.keychain = Keychain(service: keychainService)
 		self.service = keychain.service
 		self.accessGroup = keychain.accessGroup
+	}
+}
+
+extension ReadonlyKeychain {
+	@_spi(KeychainInternal)
+	public typealias Key = KeychainClient.Key
+	@_spi(KeychainInternal)
+	public typealias Label = KeychainClient.Label
+	@_spi(KeychainInternal)
+	public typealias Comment = KeychainClient.Comment
+	@_spi(KeychainInternal)
+	public typealias AuthenticationPrompt = KeychainClient.AuthenticationPrompt
+
+	public func getServiceAndAccessGroup() -> (service: String, accessGroup: String?) {
+		(service, accessGroup)
+	}
+
+	/// Checks if keychain contains an item without prompting showing Auth Prompt
+	/// even for items that require auth (if you dont explictily set `showAuthPrompt: true`)
+	@_spi(KeychainInternal)
+	public func contains(
+		_ key: Key,
+		showAuthPrompt: Bool = false
+	) throws -> Bool {
+		try keychain.contains(key.rawValue.rawValue, withoutAuthenticationUI: !showAuthPrompt)
+	}
+
+	@_spi(KeychainInternal)
+	public func getDataWithoutAuth(
+		forKey key: Key
+	) throws -> Data? {
+		try keychain.getData(key.rawValue.rawValue)
+	}
+
+	@_spi(KeychainInternal)
+	public func getDataWithAuth(
+		forKey key: Key,
+		authenticationPrompt: AuthenticationPrompt
+	) throws -> Data? {
+		try DispatchQueue.global().asyncAndWait {
+			try keychain
+				.authenticationPrompt(authenticationPrompt.rawValue.rawValue)
+				.getData(key.rawValue.rawValue)
+		}
 	}
 }
 
@@ -31,20 +92,6 @@ extension KeychainActor {
 }
 
 extension KeychainActor {
-	public nonisolated func getServiceAndAccessGroup() -> (service: String, accessGroup: String?) {
-		(service, accessGroup)
-	}
-
-	/// Checks if keychain contains an item without prompting showing Auth Prompt
-	/// even for items that require auth (if you dont explictily set `showAuthPrompt: true`)
-	@_spi(KeychainInternal)
-	public func contains(
-		_ key: Key,
-		showAuthPrompt: Bool = false
-	) async throws -> Bool {
-		try keychain.contains(key.rawValue.rawValue, withoutAuthenticationUI: !showAuthPrompt)
-	}
-
 	@_spi(KeychainInternal)
 	public func setDataWithoutAuth(
 		_ data: Data,
