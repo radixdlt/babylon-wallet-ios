@@ -1,5 +1,5 @@
-input_dir: Sources/Core/Resources/Resources
-output_dir: Sources/Core/Resources/Generated
+input_dir: RadixWallet/Core/Resources/Resources
+output_dir: RadixWallet/Core/Resources/Generated
 
 strings:
   inputs: en.lproj
