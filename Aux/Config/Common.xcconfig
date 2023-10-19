@@ -1,0 +1,15 @@
+// MARK: - Custom flags
+
+/// Application version shared across all targets and flavours
+APP_VERSION = 1.0.6
+
+/// App Icon base name
+APP_ICON = AppIcon
+
+/// Application's base name
+APP_NAME = Radix Wallet
+
+/// Application's dev team id
+DEV_TEAM = MDH99V28LM
+
+ENABLE_TESTING_SEARCH_PATHS = YES

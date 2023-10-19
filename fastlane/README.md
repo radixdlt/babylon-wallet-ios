@@ -77,50 +77,13 @@ Generate new appstore certificates
 
 Usage bundle exec fastlane ios generate_new_appstore_certificates --env ios.<specific env>
 
-### ios register_new_iphone_device
+### ios register_new_device
 
 ```sh
-[bundle exec] fastlane ios register_new_iphone_device
+[bundle exec] fastlane ios register_new_device
 ```
 
-Registers a new iPhone device and updates the certificates
-
-----
-
-
-## Mac
-
-### mac tests
-
-```sh
-[bundle exec] fastlane mac tests
-```
-
-Runs tests
-
-### mac install_development_certificates
-
-```sh
-[bundle exec] fastlane mac install_development_certificates
-```
-
-Installs certificates on the machine
-
-### mac generate_new_certificates
-
-```sh
-[bundle exec] fastlane mac generate_new_certificates
-```
-
-Generates new certificates if needed
-
-### mac register_new_mac_device
-
-```sh
-[bundle exec] fastlane mac register_new_mac_device
-```
-
-Registers a new mac device and updates the certificates
+Registers a new iPhone/Mac device and updates the certificates
 
 ----
 
