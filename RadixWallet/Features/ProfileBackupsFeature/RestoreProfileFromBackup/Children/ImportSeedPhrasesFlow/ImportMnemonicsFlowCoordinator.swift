@@ -84,11 +84,11 @@ public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 					try? await clock.sleep(for: .milliseconds(200))
 					return await ents.asyncCompactMap { ent in
 						let hasAccessToMnemonic = await secureStorageClient.containsMnemonicIdentifiedByFactorSourceID(ent.factorSourceID)
-						let mnemonicIsBackedUp = userDefaultsClient.getFactorSourceIDOfBackedUpMnemonics().contains(ent.factorSourceID)
-						guard !hasAccessToMnemonic || !mnemonicIsBackedUp else {
-							return nil
+						return if hasAccessToMnemonic {
+							nil // exclude this mnemonic from mnemonics to import, already present,.
+						} else {
+							ent // user does not have access to this, needs importing.
 						}
-						return ent
 					}.asIdentifiable()
 				})))
 			}

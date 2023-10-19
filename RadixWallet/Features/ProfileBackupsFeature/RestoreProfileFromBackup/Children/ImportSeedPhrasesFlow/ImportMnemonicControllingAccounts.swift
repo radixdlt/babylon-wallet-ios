@@ -5,16 +5,14 @@ import SwiftUI
 public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public let entitiesControlledByFactorSource: EntitiesControlledByFactorSource
-		public let disableSkipImport: Bool
 
 		public let entities: DisplayEntitiesControlledByMnemonic.State
 
 		@PresentationState
 		public var destination: Destinations.State? = nil
 
-		public init(entitiesControlledByFactorSource: EntitiesControlledByFactorSource, disableSkipImport: Bool = false) {
+		public init(entitiesControlledByFactorSource: EntitiesControlledByFactorSource) {
 			self.entitiesControlledByFactorSource = entitiesControlledByFactorSource
-			self.disableSkipImport = disableSkipImport
 			self.entities = .init(accountsForDeviceFactorSource: entitiesControlledByFactorSource, displayRevealMnemonicLink: false)
 		}
 	}
