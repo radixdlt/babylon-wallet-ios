@@ -67,6 +67,16 @@ extension ManifestBuilder {
 		}
 		return builder
 	}
+
+	public static func make(@InstructionsChain _ content: () async throws -> InstructionsChain.Instructions) async throws -> ManifestBuilder {
+		var builder = ManifestBuilder()
+		// Collect all partial instructions to be built
+		try await content().forEach {
+			// Build each instruction by updating the builder
+			builder = try $0(builder)
+		}
+		return builder
+	}
 }
 
 /// Flips the argument order of a five-argument curried function.

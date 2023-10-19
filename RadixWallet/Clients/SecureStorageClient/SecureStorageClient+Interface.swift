@@ -5,6 +5,7 @@ public struct SecureStorageClient: Sendable {
 
 	public var saveMnemonicForFactorSource: SaveMnemonicForFactorSource
 	public var loadMnemonicByFactorSourceID: LoadMnemonicByFactorSourceID
+	public var containsMnemonicIdentifiedByFactorSourceID: ContainsMnemonicIdentifiedByFactorSourceID
 
 	public var deleteMnemonicByFactorSourceID: DeleteMnemonicByFactorSourceID
 	public var deleteProfileAndMnemonicsByFactorSourceIDs: DeleteProfileAndMnemonicsByFactorSourceIDs
@@ -27,6 +28,7 @@ extension SecureStorageClient {
 
 	public typealias SaveMnemonicForFactorSource = @Sendable (PrivateHDFactorSource) async throws -> Void
 	public typealias LoadMnemonicByFactorSourceID = @Sendable (FactorSourceID.FromHash, LoadMnemonicPurpose) async throws -> MnemonicWithPassphrase?
+	public typealias ContainsMnemonicIdentifiedByFactorSourceID = @Sendable (FactorSourceID.FromHash) async -> Bool
 
 	public typealias DeleteMnemonicByFactorSourceID = @Sendable (FactorSourceID.FromHash) async throws -> Void
 	public typealias DeleteProfileAndMnemonicsByFactorSourceIDs = @Sendable (ProfileSnapshot.Header.ID, _ keepInICloudIfPresent: Bool) async throws -> Void

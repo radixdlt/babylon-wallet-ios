@@ -134,8 +134,8 @@ public struct App: Sendable, FeatureReducer {
 		case .main(.delegate(.removedWallet)):
 			return goToOnboarding(state: &state)
 
-		case let .onboardingCoordinator(.delegate(.completed(accountRecoveryIsNeeded))):
-			return goToMain(state: &state, accountRecoveryIsNeeded: accountRecoveryIsNeeded)
+		case .onboardingCoordinator(.delegate(.completed)):
+			return goToMain(state: &state, accountRecoveryIsNeeded: false)
 
 		case let .splash(.delegate(.completed(loadProfileOutcome, accountRecoveryNeeded))):
 
@@ -185,7 +185,7 @@ public struct App: Sendable, FeatureReducer {
 	}
 
 	func goToMain(state: inout State, accountRecoveryIsNeeded: Bool) -> Effect<Action> {
-		state.root = .main(.init(home: .init(accountRecoveryIsNeeded: accountRecoveryIsNeeded)))
+		state.root = .main(.init(home: .init(babylonAccountRecoveryIsNeeded: accountRecoveryIsNeeded)))
 		return .none
 	}
 

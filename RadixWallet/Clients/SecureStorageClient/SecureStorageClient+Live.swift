@@ -236,6 +236,10 @@ extension SecureStorageClient: DependencyKey {
 				}
 				return try jsonDecoder().decode(MnemonicWithPassphrase.self, from: data)
 			},
+			containsMnemonicIdentifiedByFactorSourceID: { factorSourceID in
+				let key = key(factorSourceID: factorSourceID)
+				return await (try? keychainClient.contains(key)) ?? false
+			},
 			deleteMnemonicByFactorSourceID: deleteMnemonicByFactorSourceID,
 			deleteProfileAndMnemonicsByFactorSourceIDs: { profileID, keepInICloudIfPresent in
 				guard let profileSnapshotData = try await loadProfileSnapshotData(profileID) else {
