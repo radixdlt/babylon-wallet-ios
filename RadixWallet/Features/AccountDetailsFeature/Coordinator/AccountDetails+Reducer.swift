@@ -216,9 +216,9 @@ public struct AccountDetails: Sendable, FeatureReducer {
 			return checkAccountSecurityPromptStatus(state: &state)
 
 		case let .destination(.presented(.importMnemonics(.delegate(delegateAction)))):
-			state.destination = nil
 			switch delegateAction {
 			case .closeButtonTapped, .failedToImportAllRequiredMnemonics, .finishedImportingMnemonics:
+				state.destination = nil
 				return checkAccountSecurityPromptStatus(state: &state)
 			case let .importedMnemonic(factorSourceID):
 				guard factorSourceID == state.deviceControlledFactorInstance.factorSourceID.embed() else {
