@@ -286,7 +286,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 		let factorSourceID = factorInstance.factorSourceID
 		return .run { send in
 			let result = await TaskResult {
-				guard let mnemonicWithPassphrase = try await secureStorageClient.loadMnemonicByFactorSourceID(factorInstance.factorSourceID, .displaySeedPhrase) else {
+				guard let mnemonicWithPassphrase = try secureStorageClient.loadMnemonicByFactorSourceID(factorInstance.factorSourceID, .displaySeedPhrase) else {
 					loggerGlobal.error("Failed to find mnemonic with key: \(factorSourceID) which controls account: \(state.account)")
 					struct UnabledToFindExpectedMnemonic: Swift.Error {}
 					throw UnabledToFindExpectedMnemonic()

@@ -24,21 +24,21 @@ public struct SecureStorageClient: Sendable {
 extension SecureStorageClient {
 	public typealias UpdateIsCloudProfileSyncEnabled = @Sendable (ProfileSnapshot.Header.ID, CloudProfileSyncActivation) async throws -> Void
 	public typealias SaveProfileSnapshot = @Sendable (ProfileSnapshot) async throws -> Void
-	public typealias LoadProfileSnapshotData = @Sendable (ProfileSnapshot.Header.ID) async throws -> Data?
+	public typealias LoadProfileSnapshotData = @Sendable (ProfileSnapshot.Header.ID) throws -> Data?
 
 	public typealias SaveMnemonicForFactorSource = @Sendable (PrivateHDFactorSource) async throws -> Void
-	public typealias LoadMnemonicByFactorSourceID = @Sendable (FactorSourceID.FromHash, LoadMnemonicPurpose) async throws -> MnemonicWithPassphrase?
-	public typealias ContainsMnemonicIdentifiedByFactorSourceID = @Sendable (FactorSourceID.FromHash) async -> Bool
+	public typealias LoadMnemonicByFactorSourceID = @Sendable (FactorSourceID.FromHash, LoadMnemonicPurpose) throws -> MnemonicWithPassphrase?
+	public typealias ContainsMnemonicIdentifiedByFactorSourceID = @Sendable (FactorSourceID.FromHash) -> Bool
 
 	public typealias DeleteMnemonicByFactorSourceID = @Sendable (FactorSourceID.FromHash) async throws -> Void
 	public typealias DeleteProfileAndMnemonicsByFactorSourceIDs = @Sendable (ProfileSnapshot.Header.ID, _ keepInICloudIfPresent: Bool) async throws -> Void
 
-	public typealias LoadProfileHeaderList = @Sendable () async throws -> ProfileSnapshot.HeaderList?
+	public typealias LoadProfileHeaderList = @Sendable () throws -> ProfileSnapshot.HeaderList?
 	public typealias SaveProfileHeaderList = @Sendable (ProfileSnapshot.HeaderList) async throws -> Void
 	public typealias DeleteProfileHeaderList = @Sendable () async throws -> Void
 
 	public typealias GetDeviceIdentifierSetIfNil = @Sendable (UUID) async throws -> UUID
-	public typealias LoadDeviceIdentifier = @Sendable () async throws -> UUID?
+	public typealias LoadDeviceIdentifier = @Sendable () throws -> UUID?
 	public typealias SaveDeviceIdentifier = @Sendable (UUID) async throws -> Void
 
 	public enum LoadMnemonicPurpose: Sendable, Hashable, CustomStringConvertible {

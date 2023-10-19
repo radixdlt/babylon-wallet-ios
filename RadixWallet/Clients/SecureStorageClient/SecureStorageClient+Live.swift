@@ -64,7 +64,7 @@ extension SecureStorageClient: DependencyKey {
 		}
 
 		let loadProfileSnapshotData: LoadProfileSnapshotData = { id in
-			try await keychainClient.getDataWithoutAuth(forKey: id.keychainKey)
+			try keychainClient.getDataWithoutAuth(forKey: id.keychainKey)
 		}
 
 		let deleteMnemonicByFactorSourceID: DeleteMnemonicByFactorSourceID = { factorSourceID in
@@ -97,8 +97,8 @@ extension SecureStorageClient: DependencyKey {
 			try await saveProfile(snapshotData: data, key: profileSnapshot.header.id.keychainKey, iCloudSyncEnabled: iCloudSyncEnabled)
 		}
 
-		@Sendable func loadProfileHeaderList() async throws -> ProfileSnapshot.HeaderList? {
-			try await keychainClient
+		@Sendable func loadProfileHeaderList() throws -> ProfileSnapshot.HeaderList? {
+			try keychainClient
 				.getDataWithoutAuth(forKey: profileHeaderListKeychainKey)
 				.map {
 					try jsonDecoder().decode([ProfileSnapshot.Header].self, from: $0)
@@ -121,7 +121,7 @@ extension SecureStorageClient: DependencyKey {
 		}
 
 		@Sendable func deleteProfileHeader(_ id: ProfileSnapshot.Header.ID) async throws {
-			if let profileHeaders = try await loadProfileHeaderList() {
+			if let profileHeaders = try loadProfileHeaderList() {
 				let remainingHeaders = profileHeaders.filter { $0.id != id }
 				if remainingHeaders.isEmpty {
 					// Delete the list instea of keeping an empty list
@@ -141,8 +141,8 @@ extension SecureStorageClient: DependencyKey {
 			try await deleteProfileHeader(id)
 		}
 
-		@Sendable func loadDeviceIdentifier() async throws -> UUID? {
-			let loaded = try await keychainClient
+		@Sendable func loadDeviceIdentifier() throws -> UUID? {
+			let loaded = try keychainClient
 				.getDataWithoutAuth(forKey: deviceIdentifierKey)
 				.map {
 					try jsonDecoder().decode(UUID.self, from: $0)
@@ -228,7 +228,7 @@ extension SecureStorageClient: DependencyKey {
 					}
 				}()
 				let authenticationPrompt: KeychainClient.AuthenticationPrompt = NonEmptyString(rawValue: authPromptValue).map { KeychainClient.AuthenticationPrompt($0) } ?? "Authenticate to wallet data secret."
-				guard let data = try await keychainClient.getDataWithAuth(
+				guard let data = try keychainClient.getDataWithAuth(
 					forKey: key,
 					authenticationPrompt: authenticationPrompt
 				) else {
@@ -238,11 +238,11 @@ extension SecureStorageClient: DependencyKey {
 			},
 			containsMnemonicIdentifiedByFactorSourceID: { factorSourceID in
 				let key = key(factorSourceID: factorSourceID)
-				return await (try? keychainClient.contains(key)) ?? false
+				return (try? keychainClient.contains(key)) ?? false
 			},
 			deleteMnemonicByFactorSourceID: deleteMnemonicByFactorSourceID,
 			deleteProfileAndMnemonicsByFactorSourceIDs: { profileID, keepInICloudIfPresent in
-				guard let profileSnapshotData = try await loadProfileSnapshotData(profileID) else {
+				guard let profileSnapshotData = try loadProfileSnapshotData(profileID) else {
 					return
 				}
 
@@ -266,8 +266,8 @@ extension SecureStorageClient: DependencyKey {
 			},
 			updateIsCloudProfileSyncEnabled: { profileId, change in
 				guard
-					let profileSnapshotData = try await loadProfileSnapshotData(profileId),
-					let headerList = try await loadProfileHeaderList()
+					let profileSnapshotData = try loadProfileSnapshotData(profileId),
+					let headerList = try loadProfileHeaderList()
 				else {
 					return
 				}
@@ -309,20 +309,20 @@ extension SecureStorageClient: DependencyKey {
 }
 
 extension SecureStorageClient {
-	public func loadProfileSnapshot(_ id: ProfileSnapshot.Header.ID) async throws -> ProfileSnapshot? {
+	public func loadProfileSnapshot(_ id: ProfileSnapshot.Header.ID) throws -> ProfileSnapshot? {
 		@Dependency(\.jsonDecoder) var jsonDecoder
 		guard
-			let existingSnapshotData = try await loadProfileSnapshotData(id)
+			let existingSnapshotData = try loadProfileSnapshotData(id)
 		else {
 			return nil
 		}
 		return try jsonDecoder().decode(ProfileSnapshot.self, from: existingSnapshotData)
 	}
 
-	public func loadProfile(_ id: ProfileSnapshot.Header.ID) async throws -> Profile? {
+	public func loadProfile(_ id: ProfileSnapshot.Header.ID) throws -> Profile? {
 		@Dependency(\.jsonDecoder) var jsonDecoder
 		guard
-			let existingSnapshot = try await loadProfileSnapshot(id)
+			let existingSnapshot = try loadProfileSnapshot(id)
 		else {
 			return nil
 		}

@@ -142,8 +142,8 @@ extension KeychainClient {
 	public func contains(
 		_ key: Key,
 		showAuthPrompt: Bool = false
-	) async throws -> Bool {
-		try await _containsDataForKey(key, showAuthPrompt)
+	) throws -> Bool {
+		try _containsDataForKey(key, showAuthPrompt)
 	}
 
 	public func setDataWithoutAuth(
@@ -179,15 +179,15 @@ extension KeychainClient {
 
 	public func getDataWithoutAuth(
 		forKey key: Key
-	) async throws -> Data? {
-		try await _getDataWithoutAuthForKey(key)
+	) throws -> Data? {
+		try _getDataWithoutAuthForKey(key)
 	}
 
 	public func getDataWithAuth(
 		forKey key: Key,
 		authenticationPrompt: AuthenticationPrompt
-	) async throws -> Data? {
-		try await _getDataWithAuthForKey(key, authenticationPrompt)
+	) throws -> Data? {
+		try _getDataWithAuthForKey(key, authenticationPrompt)
 	}
 
 	public func removeData(
