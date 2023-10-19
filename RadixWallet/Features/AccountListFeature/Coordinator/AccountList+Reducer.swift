@@ -10,13 +10,10 @@ public struct AccountList: Sendable, FeatureReducer {
 			self.accounts = accounts
 		}
 
-		public init(accounts: Profile.Network.Accounts, babylonAccountsRecoveryNeeded: Bool) {
+		public init(accounts: Profile.Network.Accounts) {
 			self.init(
 				accounts: accounts.rawValue.elements.map { account in
-					AccountList.Row.State(
-						account: account,
-						babylonAccountRecoveryNeeded: babylonAccountsRecoveryNeeded
-					)
+					AccountList.Row.State(account: account)
 				}.asIdentifiable()
 			)
 		}

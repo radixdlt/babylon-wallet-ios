@@ -85,7 +85,7 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 
 		case .skip:
 			precondition(state.entitiesControlledByFactorSource.isSkippable)
-			return .none
+			return .send(.delegate(.skippedMnemonic(state.entitiesControlledByFactorSource.factorSourceID)))
 		}
 	}
 

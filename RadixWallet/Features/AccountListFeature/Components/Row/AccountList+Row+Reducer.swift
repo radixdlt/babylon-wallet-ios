@@ -26,8 +26,7 @@ extension AccountList {
 			public var hasValue: Bool = false
 
 			public init(
-				account: Profile.Network.Account,
-				babylonAccountRecoveryNeeded: Bool
+				account: Profile.Network.Account
 			) {
 				self.account = account
 				self.portfolio = .loading
@@ -39,8 +38,7 @@ extension AccountList {
 				case let .unsecured(unsecuredEntityControl):
 					if unsecuredEntityControl.transactionSigning.factorSourceID.kind == .device {
 						self.deviceFactorSourceControlled = .init(
-							factorSourceID: unsecuredEntityControl.transactionSigning.factorSourceID,
-							needToImportMnemonicForThisAccount: babylonAccountRecoveryNeeded && !account.isOlympiaAccount
+							factorSourceID: unsecuredEntityControl.transactionSigning.factorSourceID
 						)
 					}
 				}

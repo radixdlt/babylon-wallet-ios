@@ -127,7 +127,7 @@ public struct Home: Sendable, FeatureReducer {
 				return .none
 			}
 
-			state.accountList = .init(accounts: accounts, babylonAccountsRecoveryNeeded: state.babylonAccountRecoveryIsNeeded)
+			state.accountList = .init(accounts: accounts)
 			let accountAddresses = state.accounts.map(\.address)
 			return .run { _ in
 				_ = try await accountPortfoliosClient.fetchAccountPortfolios(accountAddresses, false)
