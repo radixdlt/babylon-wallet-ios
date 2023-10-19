@@ -76,9 +76,8 @@ public struct TransactionReviewGuarantee: Sendable, FeatureReducer {
 		public let id: TransactionReview.Transfer.ID
 		public let account: TransactionReview.Account
 		public let resource: OnLedgerEntity.Resource
-		public let details: TransactionReview.Transfer.Details.Fungible
+		public var details: TransactionReview.Transfer.Details.Fungible
 
-		public var guarantee: TransactionClient.Guarantee
 		public var percentageStepper: MinimumPercentageStepper.State
 
 		init?(
@@ -92,7 +91,6 @@ public struct TransactionReviewGuarantee: Sendable, FeatureReducer {
 			self.account = account
 			self.resource = transfer.resource
 			self.details = details
-			self.guarantee = guarantee
 			self.percentageStepper = .init(value: 100 * guarantee.amount / details.amount)
 		}
 	}
@@ -118,14 +116,13 @@ public struct TransactionReviewGuarantee: Sendable, FeatureReducer {
 		switch childAction {
 		case .percentageStepper(.delegate(.valueChanged)):
 			guard let value = state.percentageStepper.value else {
-				state.guarantee.amount = 0
 				return .none
 			}
 
 			let newMinimumDecimal = value * 0.01
 			let divisibility = state.resource.divisibility.map(UInt.init) ?? RETDecimal.maxDivisibility
 			let newAmount = (newMinimumDecimal * state.details.amount).rounded(decimalPlaces: divisibility)
-			state.guarantee.amount = newAmount
+			state.details.guarantee?.amount = newAmount
 
 			return .none
 
