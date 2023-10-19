@@ -309,6 +309,10 @@ public struct AccountDetails: Sendable, FeatureReducer {
 
 	// FIXME: Refactor account security prompts to share logic between this reducer and Row+Reducer (AccountList)
 	private func checkAccountSecurityPromptStatus(state: inout State) -> Effect<Action> {
+		guard !state.importMnemonicPrompt.needed else {
+			return .none
+		}
+
 		@Dependency(\.userDefaultsClient) var userDefaultsClient
 
 		let mightNeedToBeBackedUp: Bool = {
