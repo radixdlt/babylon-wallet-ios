@@ -338,7 +338,9 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		switch presentedAction {
 		case let .customizeGuarantees(.delegate(.applyGuarantees(guaranteeStates))):
 			for guaranteeState in guaranteeStates {
-				state.applyGuarantee(guaranteeState.guarantee, transferID: guaranteeState.id)
+				if let guarantee = guaranteeState.details.guarantee {
+					state.applyGuarantee(guarantee, transferID: guaranteeState.id)
+				}
 			}
 
 			return .none

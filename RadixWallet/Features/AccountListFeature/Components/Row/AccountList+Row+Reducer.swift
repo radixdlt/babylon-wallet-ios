@@ -16,6 +16,7 @@ extension AccountList {
 			public var isDappDefinitionAccount: Bool = false
 
 			public struct DeviceFactorSourceControlled: Sendable, Hashable {
+				public let factorSourceID: FactorSourceID.FromHash
 				public var needToBackupMnemonicForThisAccount = false
 				public var needToImportMnemonicForThisAccount = false
 			}
@@ -31,15 +32,14 @@ extension AccountList {
 				self.portfolio = .loading
 				self.isLegacyAccount = account.isOlympiaAccount
 
-				self.isLedgerAccount = switch account.securityState {
-				case let .unsecured(unsecuredEntityControl):
-					unsecuredEntityControl.transactionSigning.factorInstance.factorSourceID.kind == .ledgerHQHardwareWallet
-				}
+				self.isLedgerAccount = account.isLedgerAccount
 
 				switch account.securityState {
 				case let .unsecured(unsecuredEntityControl):
 					if unsecuredEntityControl.transactionSigning.factorSourceID.kind == .device {
-						self.deviceFactorSourceControlled = .init()
+						self.deviceFactorSourceControlled = .init(
+							factorSourceID: unsecuredEntityControl.transactionSigning.factorSourceID
+						)
 					}
 				}
 			}
@@ -66,10 +66,8 @@ extension AccountList {
 			case importMnemonics(Profile.Network.Account)
 		}
 
-		@Dependency(\.cacheClient) var cacheClient
-		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
 		@Dependency(\.accountPortfoliosClient) var accountPortfoliosClient
-		@Dependency(\.factorSourcesClient) var factorSourcesClient
+		@Dependency(\.secureStorageClient) var secureStorageClient
 		@Dependency(\.userDefaultsClient) var userDefaultsClient
 
 		public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
@@ -121,29 +119,16 @@ extension AccountList {
 					state.hasValue = false
 				}
 
-				// FIXME: This is lazy code... we "piggyback" on the fact that `accountPortfolioUpdate` happens frequently.. as a means to update state.
-				checkIfCallActionIsNeeded(state: &state)
-
 				return .none
 			}
 		}
 
 		// FIXME: Refactor account security prompts to share logic between this reducer and AccountDetails
 		private func checkIfCallActionIsNeeded(state: inout State) {
-			guard state.deviceFactorSourceControlled != nil else { return }
+			guard let deviceFactorSourceControlled = state.deviceFactorSourceControlled else { return }
 
-			let isRecoveryOfMnemonicNeeded = userDefaultsClient
-				.getAddressesOfAccountsThatNeedRecovery()
-				.contains(where: { $0 == state.account.address })
-
-			state.deviceFactorSourceControlled?.needToImportMnemonicForThisAccount = isRecoveryOfMnemonicNeeded
-
-			switch state.account.securityState {
-			case let .unsecured(unsecuredEntityControl):
-				let hasAlreadyBackedUpMnemonic = userDefaultsClient.getFactorSourceIDOfBackedUpMnemonics().contains(unsecuredEntityControl.transactionSigning.factorSourceID)
-
-				state.deviceFactorSourceControlled?.needToBackupMnemonicForThisAccount = !hasAlreadyBackedUpMnemonic && state.hasValue
-			}
+			let hasAlreadyBackedUpMnemonic = userDefaultsClient.getFactorSourceIDOfBackedUpMnemonics().contains(deviceFactorSourceControlled.factorSourceID)
+			state.deviceFactorSourceControlled?.needToBackupMnemonicForThisAccount = !hasAlreadyBackedUpMnemonic && state.hasValue
 		}
 	}
 }

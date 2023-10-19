@@ -68,6 +68,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 
 		public let header: Header?
 		public let warning: String?
+		public let warningOnContinue: OnContinueWarning?
 
 		public struct ReadonlyMode: Sendable, Hashable {
 			public enum Context: Sendable, Hashable {
@@ -111,9 +112,22 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			}
 		}
 
+		public struct OnContinueWarning: Sendable, Hashable {
+			let title: String
+			let text: String
+			let button: String
+
+			public init(title: String, text: String, button: String) {
+				self.title = title
+				self.text = text
+				self.button = button
+			}
+		}
+
 		public init(
 			header: Header? = nil,
 			warning: String? = nil,
+			warningOnContinue: OnContinueWarning? = nil,
 			isWordCountFixed: Bool = false,
 			persistStrategy: PersistStrategy?,
 			language: BIP39.Language = .english,
@@ -135,6 +149,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			}
 			self.header = header
 			self.warning = warning
+			self.warningOnContinue = warningOnContinue
 			changeWordCount(by: wordCount.rawValue)
 		}
 
@@ -146,6 +161,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 		) {
 			self.header = header
 			self.warning = warning
+			self.warningOnContinue = nil
 
 			let mnemonic = mnemonicWithPassphrase.mnemonic
 			self.persistStrategy = nil
@@ -233,6 +249,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 		public enum State: Sendable, Hashable {
 			case offDeviceMnemonicInfoPrompt(OffDeviceMnemonicInfo.State)
 			case markMnemonicAsBackedUp(AlertState<Action.MarkMnemonicAsBackedUpOrNot>)
+			case onContinueWarning(AlertState<Action.OnContinueWarning>)
 		}
 
 		public enum Action: Sendable, Equatable {
@@ -240,9 +257,15 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 
 			case markMnemonicAsBackedUp(MarkMnemonicAsBackedUpOrNot)
 
+			case onContinueWarning(OnContinueWarning)
+
 			public enum MarkMnemonicAsBackedUpOrNot: Sendable, Hashable {
 				case userHaveBackedUp(FactorSourceID.FromHash)
 				case userHaveNotBackedUp
+			}
+
+			public enum OnContinueWarning: Sendable, Hashable {
+				case buttonTapped
 			}
 		}
 
@@ -336,6 +359,15 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			loggerGlobal.notice("User have not backed up")
 			return .send(.delegate(.doneViewing(markedMnemonicAsBackedUp: false)))
 
+		case .destination(.presented(.onContinueWarning(.buttonTapped))):
+			guard let mnemonic = state.mnemonic else {
+				loggerGlobal.error("Can't read mnemonic")
+				struct FailedToReadMnemonic: Error {}
+				errorQueue.schedule(FailedToReadMnemonic())
+				return .none
+			}
+			return continueWithMnemonic(mnemonic: mnemonic, in: &state)
+
 		default:
 			return .none
 		}
@@ -363,46 +395,12 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			return .none
 
 		case let .continueButtonTapped(mnemonic):
-			let mnemonicWithPassphrase = MnemonicWithPassphrase(
-				mnemonic: mnemonic,
-				passphrase: state.bip39Passphrase
-			)
-			guard let persistStrategy = state.persistStrategy else {
-				return .send(.delegate(.notPersisted(mnemonicWithPassphrase)))
+			if let warningOnContinue = state.warningOnContinue {
+				state.destination = .onContinueWarning(warningOnContinue)
+				return .none
 			}
 
-			switch persistStrategy.location {
-			case .intoKeychainAndProfile:
-				switch persistStrategy.mnemonicForFactorSourceKind {
-				case .offDevice:
-					state.destination = .offDeviceMnemonicInfoPrompt(.init(mnemonicWithPassphrase: mnemonicWithPassphrase))
-					return .none
-
-				case let .onDevice(onDeviceKind):
-					return .run { send in
-						await send(.internal(.saveFactorSourceResult(
-							TaskResult {
-								try await factorSourcesClient.addOnDeviceFactorSource(
-									onDeviceMnemonicKind: onDeviceKind,
-									mnemonicWithPassphrase: mnemonicWithPassphrase
-								)
-							}
-						)))
-					}
-				}
-			case .intoKeychainOnly:
-				return .run { send in
-					await send(.internal(.saveFactorSourceResult(
-						TaskResult {
-							try await factorSourcesClient.addOnDeviceFactorSource(
-								onDeviceMnemonicKind: .babylon,
-								mnemonicWithPassphrase: mnemonicWithPassphrase,
-								saveIntoProfile: false
-							)
-						}
-					)))
-				}
-			}
+			return continueWithMnemonic(mnemonic: mnemonic, in: &state)
 
 		case .doneViewing:
 			assert(state.readonlyMode != nil)
@@ -436,6 +434,49 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			let toPaste = pasteboardClient.getString() ?? ""
 			return .send(.view(.debugMnemonicChanged(toPaste)))
 		#endif
+		}
+	}
+
+	private func continueWithMnemonic(mnemonic: Mnemonic, in state: inout State) -> Effect<Action> {
+		let mnemonicWithPassphrase = MnemonicWithPassphrase(
+			mnemonic: mnemonic,
+			passphrase: state.bip39Passphrase
+		)
+		guard let persistStrategy = state.persistStrategy else {
+			return .send(.delegate(.notPersisted(mnemonicWithPassphrase)))
+		}
+
+		switch persistStrategy.location {
+		case .intoKeychainAndProfile:
+			switch persistStrategy.mnemonicForFactorSourceKind {
+			case .offDevice:
+				state.destination = .offDeviceMnemonicInfoPrompt(.init(mnemonicWithPassphrase: mnemonicWithPassphrase))
+				return .none
+
+			case let .onDevice(onDeviceKind):
+				return .run { send in
+					await send(.internal(.saveFactorSourceResult(
+						TaskResult {
+							try await factorSourcesClient.addOnDeviceFactorSource(
+								onDeviceMnemonicKind: onDeviceKind,
+								mnemonicWithPassphrase: mnemonicWithPassphrase
+							)
+						}
+					)))
+				}
+			}
+		case .intoKeychainOnly:
+			return .run { send in
+				await send(.internal(.saveFactorSourceResult(
+					TaskResult {
+						try await factorSourcesClient.addOnDeviceFactorSource(
+							onDeviceMnemonicKind: .babylon,
+							mnemonicWithPassphrase: mnemonicWithPassphrase,
+							saveIntoProfile: false
+						)
+					}
+				)))
+			}
 		}
 	}
 
@@ -579,6 +620,16 @@ extension ImportMnemonic.Destinations.State {
 				ButtonState(action: .userHaveNotBackedUp, label: { TextState("No, not yet") }) // FIXME: Strings
 			},
 			message: { TextState("Are you sure you have securely written down this seed phrase? You will need it to recover access if you lose your phone.") } // FIXME: Strings
+		))
+	}
+
+	fileprivate static func onContinueWarning(_ warning: ImportMnemonic.State.OnContinueWarning) -> Self {
+		.onContinueWarning(.init(
+			title: { TextState(warning.title) },
+			actions: {
+				ButtonState(action: .buttonTapped, label: { TextState(warning.button) })
+			},
+			message: { TextState(warning.text) }
 		))
 	}
 }

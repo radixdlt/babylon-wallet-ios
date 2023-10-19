@@ -219,6 +219,7 @@ extension SwiftUI.View {
 	func destination(store: StoreOf<ImportMnemonic>) -> some View {
 		let destinationStore = store.scope(state: \.$destination, action: { .child(.destination($0)) })
 		return offDeviceMnemonicInfoSheet(with: destinationStore)
+			.onContinueWarningAlert(with: destinationStore)
 			.markMnemonicAsBackedUpAlert(with: destinationStore)
 	}
 
@@ -228,6 +229,15 @@ extension SwiftUI.View {
 			store: destinationStore,
 			state: /ImportMnemonic.Destinations.State.markMnemonicAsBackedUp,
 			action: ImportMnemonic.Destinations.Action.markMnemonicAsBackedUp
+		)
+	}
+
+	@MainActor
+	fileprivate func onContinueWarningAlert(with destinationStore: PresentationStoreOf<ImportMnemonic.Destinations>) -> some SwiftUI.View {
+		alert(
+			store: destinationStore,
+			state: /ImportMnemonic.Destinations.State.onContinueWarning,
+			action: ImportMnemonic.Destinations.Action.onContinueWarning
 		)
 	}
 

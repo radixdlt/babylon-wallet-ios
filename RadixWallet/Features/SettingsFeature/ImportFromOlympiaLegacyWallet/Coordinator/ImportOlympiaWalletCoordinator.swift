@@ -360,6 +360,11 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 					subtitle: L10n.ImportOlympiaAccounts.VerifySeedPhrase.subtitle
 				),
 				warning: L10n.ImportOlympiaAccounts.VerifySeedPhrase.warning,
+				warningOnContinue: .init(
+					title: "Warning", // FIXME: Strings
+					text: "Do not throw away this seed phrase! You will still need it if you need to recover access to your Olympia accounts in the future.", // FIXME: Strings
+					button: "I understand" // FIXME: Strings
+				),
 				isWordCountFixed: true,
 				persistStrategy: nil,
 				wordCount: progress.previous.expectedMnemonicWordCount
