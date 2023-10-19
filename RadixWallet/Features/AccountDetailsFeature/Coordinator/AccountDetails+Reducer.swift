@@ -28,11 +28,6 @@ extension Tagged where RawValue == ImportOrExportMnemonicForAccountPrompt {
 	}
 }
 
-// MARK: - FailedToLoadEntitiesForMnemonic
-public struct FailedToLoadEntitiesForMnemonic: Error {
-	public let factorSourceID: FactorSourceID.FromHash
-}
-
 // MARK: - AccountDetails
 public struct AccountDetails: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
@@ -72,8 +67,6 @@ public struct AccountDetails: Sendable, FeatureReducer {
 
 		case exportMnemonicButtonTapped
 		case recoverMnemonicsButtonTapped
-
-		case importMnemonicCloseButtonTapped
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -83,7 +76,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 
 	public enum DelegateAction: Sendable, Equatable {
 		case dismiss
-		case importedMnemonic(forAccount: Profile.Network.Account)
+		case importedMnemonic(FactorSourceID)
 	}
 
 	public enum InternalAction: Sendable, Equatable {
@@ -94,7 +87,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 		case loadMnemonicResult(TaskResult<MnemonicWithPassphraseAndFactorSourceInfo>)
 
 		case loadImport
-		case loadControlledEntitiesForRecoverMnemonicsFlow(TaskResult<EntitiesControlledByFactorSource>)
+		case loadProfileSnapshotForRecoverMnemonicsFlow(TaskResult<ProfileSnapshot>)
 	}
 
 	public struct MnemonicWithPassphraseAndFactorSourceInfo: Sendable, Hashable {
@@ -110,7 +103,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 			// FIXME: Rename `ImportMnemonic` -> `ExportOrImportMnemonic` ?
 			case exportMnemonic(ImportMnemonic.State)
 
-			case importMnemonic(ImportMnemonicControllingAccounts.State)
+			case importMnemonics(ImportMnemonicsFlowCoordinator.State)
 		}
 
 		public enum Action: Sendable, Equatable {
@@ -120,7 +113,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 			// FIXME: Rename `ImportMnemonic` -> `ExportOrImportMnemonic` ?
 			case exportMnemonic(ImportMnemonic.Action)
 
-			case importMnemonic(ImportMnemonicControllingAccounts.Action)
+			case importMnemonics(ImportMnemonicsFlowCoordinator.Action)
 		}
 
 		public var body: some Reducer<State, Action> {
@@ -134,8 +127,8 @@ public struct AccountDetails: Sendable, FeatureReducer {
 				// FIXME: Rename `ImportMnemonic` -> `ExportOrImportMnemonic` ?
 				ImportMnemonic()
 			}
-			Scope(state: /State.importMnemonic, action: /Action.importMnemonic) {
-				ImportMnemonicControllingAccounts()
+			Scope(state: /State.importMnemonics, action: /Action.importMnemonics) {
+				ImportMnemonicsFlowCoordinator()
 			}
 		}
 	}
@@ -147,8 +140,6 @@ public struct AccountDetails: Sendable, FeatureReducer {
 	@Dependency(\.secureStorageClient) var secureStorageClient
 	@Dependency(\.continuousClock) var clock
 	@Dependency(\.networkSwitchingClient) var networkSwitchingClient
-	@Dependency(\.deviceFactorSourceClient) var deviceFactorSourceClient
-	@Dependency(\.overlayWindowClient) var overlayWindowClient
 
 	public init() {}
 
@@ -200,11 +191,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 			return loadMnemonic(state: state)
 
 		case .recoverMnemonicsButtonTapped:
-			return loadImport(state: state)
-
-		case .importMnemonicCloseButtonTapped:
-			state.destination = nil
-			return .none
+			return loadImport()
 		}
 	}
 
@@ -228,21 +215,20 @@ public struct AccountDetails: Sendable, FeatureReducer {
 			state.destination = nil
 			return checkAccountSecurityPromptStatus(state: &state)
 
-		case let .destination(.presented(.importMnemonic(.delegate(delegateAction)))):
+		case let .destination(.presented(.importMnemonics(.delegate(delegateAction)))):
+			state.destination = nil
 			switch delegateAction {
-			case .persistedMnemonicInKeychain:
-				state.destination = nil
-				state.importMnemonicPrompt = .no
-				return .run { [account = state.account] send in
-					overlayWindowClient.scheduleHUD(.seedPhraseImported)
-					await send(.delegate(.importedMnemonic(forAccount: account)))
+			case .closeButtonTapped, .failedToImportAllRequiredMnemonics, .finishedImportingMnemonics:
+				return checkAccountSecurityPromptStatus(state: &state)
+			case let .importedMnemonic(factorSourceID):
+				guard factorSourceID == state.deviceControlledFactorInstance.factorSourceID.embed() else {
+					return .none
 				}
-			case .failedToSaveInKeychain:
-				// Error is shown to the user in importMnemonic screen
-				return .none
-			case .skippedMnemonic:
-				// Not applicable
-				return .none
+
+				state.importMnemonicPrompt = .no
+				// It makes no sense to prompt user to back up a mnemonic she *just* imported.
+				state.exportMnemonicPrompt = .no
+				return .send(.delegate(.importedMnemonic(factorSourceID)))
 			}
 
 		case .destination(.dismiss):
@@ -263,7 +249,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 			return loadMnemonic(state: state)
 
 		case .loadImport:
-			return loadImport(state: state)
+			return loadImport()
 
 		case let .loadMnemonicResult(.success(mnemonicWithPassphraseAndFactorSourceInfo)):
 			loggerGlobal.trace("Successfully loaded mnemonic to export")
@@ -280,14 +266,11 @@ public struct AccountDetails: Sendable, FeatureReducer {
 			errorQueue.schedule(error)
 			return .none
 
-		case let .loadControlledEntitiesForRecoverMnemonicsFlow(.success(controlleEntities)):
-			state.destination = .importMnemonic(.init(
-				entitiesControlledByFactorSource: controlleEntities,
-				disableSkipImport: true
-			))
+		case let .loadProfileSnapshotForRecoverMnemonicsFlow(.success(profileSnapshot)):
+			state.destination = .importMnemonics(.init(profileSnapshot: profileSnapshot))
 			return .none
 
-		case let .loadControlledEntitiesForRecoverMnemonicsFlow(.failure(error)):
+		case let .loadProfileSnapshotForRecoverMnemonicsFlow(.failure(error)):
 			loggerGlobal.error("Failed to load Profile to export")
 			errorQueue.schedule(error)
 			return .none
@@ -317,21 +300,10 @@ public struct AccountDetails: Sendable, FeatureReducer {
 		}
 	}
 
-	private func loadImport(state: State) -> Effect<Action> {
-		let factorSourceID = state.deviceControlledFactorInstance.factorSourceID
-
-		return .run { send in
-			let result = await TaskResult {
-				let snapshot = try await backupsClient.snapshotOfProfileForExport()
-				let ents = try await deviceFactorSourceClient.controlledEntities(snapshot)
-				guard let entity = ents.first(where: { ent in
-					ent.factorSourceID == factorSourceID
-				}) else {
-					throw FailedToLoadEntitiesForMnemonic(factorSourceID: factorSourceID)
-				}
-				return entity
-			}
-			await send(.internal(.loadControlledEntitiesForRecoverMnemonicsFlow(result)))
+	private func loadImport() -> Effect<Action> {
+		.run { send in
+			let result = await TaskResult { try await backupsClient.snapshotOfProfileForExport() }
+			await send(.internal(.loadProfileSnapshotForRecoverMnemonicsFlow(result)))
 		}
 	}
 
@@ -340,20 +312,16 @@ public struct AccountDetails: Sendable, FeatureReducer {
 		@Dependency(\.userDefaultsClient) var userDefaultsClient
 
 		let mightNeedToBeBackedUp: Bool = {
-			switch state.account.securityState {
-			case let .unsecured(unsecuredEntityControl):
-				guard unsecuredEntityControl.transactionSigning.factorSourceID.kind == .device else {
-					// Ledger account, mnemonics do not apply...
-					return false
-				}
-
-				// check if already backed up
-				let isAlreadyBackedUp = userDefaultsClient
-					.getFactorSourceIDOfBackedUpMnemonics()
-					.contains(unsecuredEntityControl.transactionSigning.factorSourceID)
-
-				return !isAlreadyBackedUp
+			guard let deviceFactorSourceID = state.account.deviceFactorSourceID else {
+				// Ledger account, mnemonics do not apply...
+				return false
 			}
+			// check if already backed up
+			let isAlreadyBackedUp = userDefaultsClient
+				.getFactorSourceIDOfBackedUpMnemonics()
+				.contains(deviceFactorSourceID)
+
+			return !isAlreadyBackedUp
 		}()
 
 		guard mightNeedToBeBackedUp else {

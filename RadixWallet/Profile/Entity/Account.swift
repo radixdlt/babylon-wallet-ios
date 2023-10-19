@@ -144,10 +144,15 @@ extension Profile.Network.Account {
 		}
 	}
 
-	public var deviceFactorSourceID: FactorSourceID.FromHash {
+	public var deviceFactorSourceID: FactorSourceID.FromHash? {
 		switch self.securityState {
 		case let .unsecured(control):
-			control.transactionSigning.factorSourceID
+			let factorSourceID = control.transactionSigning.factorSourceID
+			guard factorSourceID.kind == .device else {
+				return nil
+			}
+
+			return factorSourceID
 		}
 	}
 }

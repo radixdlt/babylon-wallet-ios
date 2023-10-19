@@ -144,12 +144,12 @@ public struct Home: Sendable, FeatureReducer {
 				guard var deviceFactorSourceControlled = account.deviceFactorSourceControlled else { continue }
 
 				let hasAccessToMnemonic = result[deviceFactorSourceControlled.factorSourceID] ?? false
-				let needtoImportMnemonic = if account.isLegacyAccount {
+				let needToImportMnemonic = if account.isLegacyAccount {
 					!hasAccessToMnemonic
 				} else {
 					state.babylonAccountRecoveryIsNeeded || !hasAccessToMnemonic
 				}
-				deviceFactorSourceControlled.needToImportMnemonicForThisAccount = needtoImportMnemonic
+				deviceFactorSourceControlled.needToImportMnemonicForThisAccount = needToImportMnemonic
 				state.accountList.accounts[id: account.id]?.deviceFactorSourceControlled = deviceFactorSourceControlled
 			}
 			return .none
@@ -157,7 +157,7 @@ public struct Home: Sendable, FeatureReducer {
 	}
 
 	private func checkAccountsAccessToMnemonic(state: State) -> Effect<Action> {
-		let factorSourceIDs = Set(state.accounts.map(\.deviceFactorSourceID))
+		let factorSourceIDs = Set(state.accounts.compactMap(\.deviceFactorSourceID))
 		guard !factorSourceIDs.isEmpty else {
 			return .none
 		}
@@ -209,7 +209,11 @@ public struct Home: Sendable, FeatureReducer {
 			state.destination = nil
 			return .none
 
-		case let .destination(.presented(.accountDetails(.delegate(.importedMnemonic(account))))):
+		case let .destination(.presented(.accountDetails(.delegate(.importedMnemonic(factorSourceID))))):
+			/// Check if the imported mnemonic is a babylon one, so we can reset `babylonAccountRecoveryIsNeeded` flag
+			guard let account = state.accounts.first(where: { factorSourceID == $0.deviceFactorSourceID?.embed() }) else {
+				return .none
+			}
 			if !account.isOlympiaAccount {
 				state.babylonAccountRecoveryIsNeeded = false
 			}

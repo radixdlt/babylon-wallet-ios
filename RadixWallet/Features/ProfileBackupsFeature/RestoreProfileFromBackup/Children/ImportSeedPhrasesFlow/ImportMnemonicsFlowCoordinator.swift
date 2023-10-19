@@ -53,6 +53,7 @@ public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 
 		case failedToImportAllRequiredMnemonics
 		case closeButtonTapped
+		case importedMnemonic(forFactorSourceID: FactorSourceID)
 	}
 
 	public struct SkippedOrImported: Sendable, Hashable {
@@ -63,6 +64,8 @@ public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 	@Dependency(\.userDefaultsClient) var userDefaultsClient
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.continuousClock) var clock
+	@Dependency(\.secureStorageClient) var secureStorageClient
+
 	public init() {}
 
 	public var body: some ReducerOf<Self> {
@@ -79,9 +82,14 @@ public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 				await send(.internal(.loadControlledEntities(TaskResult {
 					let ents = try await deviceFactorSourceClient.controlledEntities(snapshot)
 					try? await clock.sleep(for: .milliseconds(200))
-					return ents.filter { ent in
-						!userDefaultsClient.getFactorSourceIDOfBackedUpMnemonics().contains(ent.factorSourceID)
-					}
+					return await ents.asyncCompactMap { ent in
+						let hasAccessToMnemonic = await secureStorageClient.containsMnemonicIdentifiedByFactorSourceID(ent.factorSourceID)
+						let mnemonicIsBackedUp = userDefaultsClient.getFactorSourceIDOfBackedUpMnemonics().contains(ent.factorSourceID)
+						guard !hasAccessToMnemonic || !mnemonicIsBackedUp else {
+							return nil
+						}
+						return ent
+					}.asIdentifiable()
 				})))
 			}
 		case .closeButtonTapped:
@@ -113,7 +121,8 @@ public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 
 			case let .persistedMnemonicInKeychain(factorSourceID):
 				state.imported.append(.init(factorSourceID: factorSourceID))
-				return finishedWith(factorSourceID: factorSourceID, state: &state)
+				return .send(.delegate(.importedMnemonic(forFactorSourceID: factorSourceID)))
+					.merge(with: finishedWith(factorSourceID: factorSourceID, state: &state))
 
 			case .failedToSaveInKeychain:
 				return .send(.delegate(.failedToImportAllRequiredMnemonics))

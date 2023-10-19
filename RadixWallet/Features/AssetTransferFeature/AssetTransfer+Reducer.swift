@@ -240,8 +240,8 @@ func instructionForDepositing(
 	// TODO: Temporary revert of checking if the receiving account is a ledger account
 	let isSoftwareAccount = true // !receivingAccount.isLedgerAccount
 	let recipientAddress = receivingAccount.address
-	let userHasAccessToMnemonic = if let userOwnedAccount = receivingAccount.left {
-		await secureStorageClient.containsMnemonicIdentifiedByFactorSourceID(userOwnedAccount.deviceFactorSourceID)
+	let userHasAccessToMnemonic = if let deviceFactorSourceID = receivingAccount.left?.deviceFactorSourceID {
+		await secureStorageClient.containsMnemonicIdentifiedByFactorSourceID(deviceFactorSourceID)
 	} else { false }
 
 	guard isUserAccount, isSoftwareAccount, userHasAccessToMnemonic else {
