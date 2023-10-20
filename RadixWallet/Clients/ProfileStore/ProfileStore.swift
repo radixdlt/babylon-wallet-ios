@@ -1,5 +1,4 @@
 // MARK: - ProfileStore
-
 public final actor ProfileStore {
 	@Dependency(\.assertionFailure) var assertionFailure
 	@Dependency(\.secureStorageClient) var secureStorageClient
@@ -9,7 +8,13 @@ public final actor ProfileStore {
 
 	/// Current Profile
 	private let profileStateSubject: AsyncCurrentValueSubject<Profile>
-	private let ownershipConflictSubject: AsyncPassthroughSubject<OwnershipConflict> = .init()
+
+	// Replay since can a conflict can be emitted from the ProfileStore initializer
+	// and must be buffered.
+	typealias OwnershipConflictSubject = AsyncReplaySubject<OwnershipConflict>
+
+	private let ownershipConflictSubject: OwnershipConflictSubject = .init(bufferSize: 1)
+
 	private let onboardingNeededSubject: AsyncPassthroughSubject<DeletedProfileOrigin> = .init()
 
 	/// Only mutable since we need to update the description with async, since reading
@@ -17,10 +22,17 @@ public final actor ProfileStore {
 	private var deviceInfo: DeviceInfo
 
 	init() {
-		self.deviceInfo = Self._deviceInfo()
-		self.profileStateSubject = AsyncCurrentValueSubject(
-			Self._loadSavedElseNewProfile(deviceInfo: deviceInfo)
-		)
+		let metaDeviceInfo = Self._deviceInfo()
+		let stuff = Self._loadSavedElseNewProfile(metaDeviceInfo: metaDeviceInfo)
+		self.deviceInfo = stuff.deviceInfo
+		self.profileStateSubject = AsyncCurrentValueSubject(stuff.profile)
+
+		if let conflictingOwners = stuff.conflictingOwners {
+			// Actor-isolated instance method ',,' can not be referenced from
+			// a non-isolated context; this is an error in Swift 6
+			// hmm... we might wrap this in a Task, not too bad.
+			self.emitOwnershipConflict(ownerOfCurrentProfile: conflictingOwners.ownerOfCurrentProfile)
+		}
 	}
 }
 
@@ -30,10 +42,15 @@ public enum DeletedProfileOrigin: Sendable, Hashable {
 	case manuallyFromSettings
 }
 
-// MARK: - OwnershipConflict
-public struct OwnershipConflict: Sendable {
+// MARK: - ConflictingOwners
+public struct ConflictingOwners: Sendable, Hashable {
 	public let ownerOfCurrentProfile: DeviceInfo
 	public let thisDevice: DeviceInfo
+}
+
+// MARK: - OwnershipConflict
+public struct OwnershipConflict: Sendable {
+	public let conflictingOwners: ConflictingOwners
 
 	public enum ConflictResolutionByUser: Sendable, Hashable {
 		case reclaimProfileOnThisDevice
@@ -43,6 +60,22 @@ public struct OwnershipConflict: Sendable {
 	public typealias OnConflictResolutionByUser = @Sendable (ConflictResolutionByUser) async throws -> Void
 
 	public let onConflictResolutionByUser: OnConflictResolutionByUser
+}
+
+extension OwnershipConflict {
+	init(
+		ownerOfCurrentProfile: DeviceInfo,
+		thisDevice: DeviceInfo,
+		onConflictResolutionByUser: @escaping OnConflictResolutionByUser
+	) {
+		self.init(
+			conflictingOwners: .init(
+				ownerOfCurrentProfile: ownerOfCurrentProfile,
+				thisDevice: thisDevice
+			),
+			onConflictResolutionByUser: onConflictResolutionByUser
+		)
+	}
 }
 
 // MARK: Public
@@ -240,9 +273,33 @@ extension ProfileStore {
 
 // MARK: Private Static
 extension ProfileStore {
-	private static func _loadSavedElseNewProfile(deviceInfo: DeviceInfo) -> Profile {
+	private static func _loadSavedElseNewProfile(
+		metaDeviceInfo: MetaDeviceInfo
+	) -> (deviceInfo: DeviceInfo, profile: Profile, conflictingOwners: ConflictingOwners?) {
+		let deviceInfo = metaDeviceInfo.deviceInfo
 		do {
-			return try _tryLoadSavedProfile() ?? _tryGenerateAndSaveNewProfile(deviceInfo: deviceInfo)
+			if var existing = try _tryLoadSavedProfile() {
+				// Read: https://radixdlt.atlassian.net/l/cp/fmoH9KcN
+				let matchingIDs = existing.header.lastUsedOnDevice.id == deviceInfo.id
+				if metaDeviceInfo.fromDeprecatedDeviceID, matchingIDs {
+					// Same ID => migrate
+					existing.header.lastUsedOnDevice = deviceInfo
+				}
+				return (
+					deviceInfo: deviceInfo,
+					profile: existing,
+					conflictingOwners: matchingIDs ? nil : .init(
+						ownerOfCurrentProfile: existing.header.lastUsedOnDevice,
+						thisDevice: deviceInfo
+					)
+				)
+			} else {
+				return try (
+					deviceInfo: metaDeviceInfo.deviceInfo,
+					profile: _tryGenerateAndSaveNewProfile(deviceInfo: deviceInfo),
+					conflictingOwners: nil
+				)
+			}
 		} catch {
 			fatalError("Unable to use app. error: \(error)")
 		}
@@ -320,22 +377,44 @@ extension ProfileStore {
 		return (profile, bdfsMnemonic)
 	}
 
-	private static func _deviceInfo() -> DeviceInfo {
+	/// If `fromDeprecatedDeviceID` is true, a migration might be needed
+	// See: https://radixdlt.atlassian.net/l/cp/fmoH9KcN
+	private static func _deviceInfo() -> MetaDeviceInfo {
 		@Dependency(\.secureStorageClient) var secureStorageClient
 		@Dependency(\.uuid) var uuid
 		@Dependency(\.date) var date
 
-		let new = DeviceInfo(
-			description: "iPhone",
-			id: uuid(),
-			date: date.now
-		)
+		func createNew(deviceID: DeviceID? = nil) -> DeviceInfo {
+			.init(
+				description: "iPhone",
+				id: deviceID ?? uuid(),
+				date: date.now
+			)
+		}
+
+		if let existing = try? secureStorageClient.loadDeviceInfo() {
+			return MetaDeviceInfo(deviceInfo: existing, fromDeprecatedDeviceID: false)
+		}
+		let new: DeviceInfo
+		let fromDeprecatedDeviceID: Bool
 
 		do {
-			return try secureStorageClient.getDeviceInfoSetIfNil(new)
+			if let legacyDeviceID = try? secureStorageClient.deprecatedLoadDeviceID() {
+				new = createNew(deviceID: legacyDeviceID)
+				fromDeprecatedDeviceID = true
+			} else {
+				new = createNew()
+				fromDeprecatedDeviceID = false
+			}
+			try secureStorageClient.saveDeviceInfo(new)
+			if fromDeprecatedDeviceID {
+				// Delete only if `saveDeviceInfo` was successful.
+				secureStorageClient.deleteDeprecatedDeviceID()
+			}
+			return MetaDeviceInfo(deviceInfo: new, fromDeprecatedDeviceID: fromDeprecatedDeviceID)
 		} catch {
 			loggerGlobal.error("Failed to get and save new device info: \(error)")
-			return new
+			return MetaDeviceInfo(deviceInfo: new, fromDeprecatedDeviceID: fromDeprecatedDeviceID)
 		}
 	}
 
@@ -369,4 +448,10 @@ extension ProfileStore {
 		@Dependency(\.secureStorageClient) var secureStorageClient
 		try secureStorageClient.saveProfileSnapshot(profileSnapshot)
 	}
+}
+
+// MARK: - MetaDeviceInfo
+private struct MetaDeviceInfo: Sendable, Hashable {
+	let deviceInfo: DeviceInfo
+	let fromDeprecatedDeviceID: Bool
 }

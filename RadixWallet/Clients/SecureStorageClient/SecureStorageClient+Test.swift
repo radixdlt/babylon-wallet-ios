@@ -22,7 +22,9 @@ extension SecureStorageClient: TestDependencyKey {
 		deleteProfileHeaderList: {},
 		getDeviceInfoSetIfNil: { $0 },
 		loadDeviceInfo: { nil },
-		saveDeviceInfo: { _ in }
+		saveDeviceInfo: { _ in },
+		deprecatedLoadDeviceID: { nil },
+		deleteDeprecatedDeviceID: {}
 	)
 
 	public static let previewValue: Self = .noop
@@ -41,6 +43,8 @@ extension SecureStorageClient: TestDependencyKey {
 		deleteProfileHeaderList: unimplemented("\(Self.self).deleteProfileHeaderList"),
 		getDeviceInfoSetIfNil: unimplemented("\(Self.self).getDeviceInfoSetIfNil"),
 		loadDeviceInfo: unimplemented("\(Self.self).loadDeviceInfo"),
-		saveDeviceInfo: unimplemented("\(Self.self).saveDeviceInfo")
+		saveDeviceInfo: unimplemented("\(Self.self).saveDeviceInfo"),
+		deprecatedLoadDeviceID: unimplemented("\(Self.self).deprecatedLoadDeviceID"),
+		deleteDeprecatedDeviceID: unimplemented("\(Self.self).deleteDeprecatedDeviceID")
 	)
 }

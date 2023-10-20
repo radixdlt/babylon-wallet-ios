@@ -19,6 +19,11 @@ public struct SecureStorageClient: Sendable {
 	public var getDeviceInfoSetIfNil: GetDeviceInfoSetIfNil
 	public var loadDeviceInfo: LoadDeviceInfo
 	public var saveDeviceInfo: SaveDeviceInfo
+
+	/// See https://radixdlt.atlassian.net/l/cp/fmoH9KcN
+	public var deprecatedLoadDeviceID: DeprecatedLoadDeviceID
+	/// See https://radixdlt.atlassian.net/l/cp/fmoH9KcN
+	public var deleteDeprecatedDeviceID: DeleteDeprecatedDeviceID
 }
 
 extension SecureStorageClient {
@@ -40,6 +45,11 @@ extension SecureStorageClient {
 	public typealias GetDeviceInfoSetIfNil = @Sendable (DeviceInfo) throws -> DeviceInfo
 	public typealias LoadDeviceInfo = @Sendable () throws -> DeviceInfo?
 	public typealias SaveDeviceInfo = @Sendable (DeviceInfo) throws -> Void
+
+	/// See https://radixdlt.atlassian.net/l/cp/fmoH9KcN
+	public typealias DeprecatedLoadDeviceID = @Sendable () throws -> DeviceID?
+	/// See https://radixdlt.atlassian.net/l/cp/fmoH9KcN
+	public typealias DeleteDeprecatedDeviceID = @Sendable () -> Void
 
 	public enum LoadMnemonicPurpose: Sendable, Hashable, CustomStringConvertible {
 		case signTransaction

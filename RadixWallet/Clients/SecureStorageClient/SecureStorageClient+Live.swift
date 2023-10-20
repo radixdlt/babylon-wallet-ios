@@ -156,21 +156,36 @@ extension SecureStorageClient: DependencyKey {
 			return loaded
 		}
 
-		let deviceIdentifierAttributes = KeychainClient.AttributesWithoutAuth(
+		@Sendable func loadDeviceInfo() throws -> DeviceInfo? {
+			let loaded = try keychainClient
+				.getDataWithoutAuth(forKey: deviceInfoKey)
+				.map {
+					try jsonDecoder().decode(DeviceInfo.self, from: $0)
+				}
+
+			if let loaded {
+				loggerGlobal.trace("Loaded deviceInfo: \(loaded)")
+			} else {
+				loggerGlobal.info("No deviceInfo loaded, was nil.")
+			}
+			return loaded
+		}
+
+		let deviceInfoAttributes = KeychainClient.AttributesWithoutAuth(
 			iCloudSyncEnabled: false, // Never ever synced, since related to this device only..
 			accessibility: .whenUnlocked,
-			label: importantKeychainIdentifier("Radix Wallet device identifier"),
-			comment: "The unique identifier of this device"
+			label: importantKeychainIdentifier("Radix Wallet device info"),
+			comment: "Information about this device"
 		)
 
-		@Sendable func saveDeviceIdentifier(_ deviceIdentifier: UUID) throws {
-			let data = try jsonEncoder().encode(deviceIdentifier)
+		@Sendable func saveDeviceInfo(_ deviceInfo: DeviceInfo) throws {
+			let data = try jsonEncoder().encode(deviceInfo)
 			try keychainClient.setDataWithoutAuth(
 				data,
-				forKey: deviceIdentifierKey,
-				attributes: deviceIdentifierAttributes
+				forKey: deviceInfoKey,
+				attributes: deviceInfoAttributes
 			)
-			loggerGlobal.notice("Saved deviceIdentifier: \(deviceIdentifier)")
+			loggerGlobal.notice("Saved deviceInfo: \(deviceInfo)")
 		}
 
 		return Self(
@@ -293,29 +308,21 @@ extension SecureStorageClient: DependencyKey {
 			saveProfileHeaderList: saveProfileHeaderList,
 			deleteProfileHeaderList: deleteProfileHeaderList,
 			getDeviceInfoSetIfNil: { _ in
-//				let res = try keychainClient
-//					.getDataWithoutAuth(
-//						forKey: deviceIdentifierKey,
-//						ifNilSet: .init(
-//							to: jsonEncoder().encode(identifierToSetIfNil),
-//							with: deviceIdentifierAttributes
-//						)
-//					)
-//				if res.wasNil {
-//					loggerGlobal.info("deviceIdentifier was nil, saved new value.")
-//					return identifierToSetIfNil
-//				} else {
-//					let loaded = try jsonDecoder().decode(UUID.self, from: res.value)
-//					loggerGlobal.trace("Loaded deviceIdentifier: \(loaded)")
-//					return loaded
-//				}
 				fatalError()
 			},
-			loadDeviceInfo: {
-				fatalError()
+			loadDeviceInfo: loadDeviceInfo,
+			saveDeviceInfo: saveDeviceInfo,
+			deprecatedLoadDeviceID: {
+				// See https://radixdlt.atlassian.net/l/cp/fmoH9KcN
+				try keychainClient
+					.getDataWithoutAuth(forKey: deviceIdentifierKey)
+					.map {
+						try jsonDecoder().decode(UUID.self, from: $0)
+					}
 			},
-			saveDeviceInfo: { _ in
-				fatalError()
+			deleteDeprecatedDeviceID: {
+				// See https://radixdlt.atlassian.net/l/cp/fmoH9KcN
+				try? keychainClient.removeData(forKey: deviceIdentifierKey)
 			}
 		)
 	}()
@@ -339,12 +346,14 @@ extension SecureStorageClient {
 		else {
 			return nil
 		}
-		return try Profile(snapshot: existingSnapshot)
+		return Profile(snapshot: existingSnapshot)
 	}
 }
 
 private let profileHeaderListKeychainKey: KeychainClient.Key = "profileHeaderList"
+@available(*, deprecated, renamed: "deviceInfoKey", message: "Migrate to use `deviceInfoKey` instead")
 private let deviceIdentifierKey: KeychainClient.Key = "deviceIdentifier"
+private let deviceInfoKey: KeychainClient.Key = "deviceInfo"
 
 extension ProfileSnapshot.Header.ID {
 	private static let profileSnapshotKeychainKeyPrefix = "profileSnapshot"
