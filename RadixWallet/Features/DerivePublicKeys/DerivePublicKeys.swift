@@ -205,23 +205,16 @@ extension DerivePublicKeys {
 		loadMnemonicPurpose: SecureStorageClient.LoadMnemonicPurpose,
 		state: State
 	) async throws -> Action {
-		do {
-			let hdKeys = try await deviceFactorSourceClient.publicKeysFromOnDeviceHD(.init(
-				deviceFactorSource: deviceFactorSource,
-				derivationPaths: derivationPaths,
-				loadMnemonicPurpose: loadMnemonicPurpose
-			))
-			return .delegate(.derivedPublicKeys(
-				hdKeys,
-				factorSourceID: deviceFactorSource.id.embed(),
-				networkID: networkID
-			))
-		} catch {
-			if error is FailedToFindFactorSource {
-				_ = await overlayWindowClient.scheduleAlert(.missingMnemonicAlert)
-			}
-			throw error
-		}
+		let hdKeys = try await deviceFactorSourceClient.publicKeysFromOnDeviceHD(.init(
+			deviceFactorSource: deviceFactorSource,
+			derivationPaths: derivationPaths,
+			loadMnemonicPurpose: loadMnemonicPurpose
+		))
+		return .delegate(.derivedPublicKeys(
+			hdKeys,
+			factorSourceID: deviceFactorSource.id.embed(),
+			networkID: networkID
+		))
 	}
 
 	private func deriveWith(
