@@ -12,9 +12,8 @@ extension OnboardingClient: DependencyKey {
 				await profileStore.profile
 			},
 			finishedOnboarding: {
-//				try await profileStore.commitEphemeral()
-//				return EqVoid.instance
-				fatalError()
+				await profileStore.finishedOnboarding()
+				return EqVoid.instance
 			}
 		)
 	}

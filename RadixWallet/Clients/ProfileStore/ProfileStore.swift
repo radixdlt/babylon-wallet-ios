@@ -137,7 +137,21 @@ extension ProfileStore {
 	}
 
 	public func deleteProfile(keepInICloudIfPresent: Bool) throws {
-		fatalError()
+		// Assert that this device is allowed to make changes on Profile
+		try _assertOwnership()
+
+		do {
+			userDefaultsClient.removeActiveProfileID()
+			try secureStorageClient.deleteProfileAndMnemonicsByFactorSourceIDs(profile.header.id, keepInICloudIfPresent)
+		} catch {
+			let errorMessage = "Error, failed to delete profile or factor source, failure: \(String(describing: error))"
+			loggerGlobal.error(.init(stringLiteral: errorMessage))
+			assertionFailure(errorMessage)
+		}
+
+		let profile = try! Self._tryGenerateAndSaveNewProfile(deviceInfo: deviceInfo)
+		self.profileStateSubject.send(profile)
+		self.onboardingNeededSubject.send(.manuallyFromSettings)
 	}
 
 	public func finishedOnboarding() {
@@ -240,6 +254,10 @@ extension ProfileStore {
 			throw Error.profileIDMismatch
 		}
 		// All good
+	}
+
+	private func _assertOwnership() throws {
+		try _assertOwnership(of: profile)
 	}
 
 	private func _assertOwnership(of profile: Profile) throws {

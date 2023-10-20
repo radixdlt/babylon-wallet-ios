@@ -16,5 +16,5 @@ public struct OnboardingClient: Sendable {
 extension OnboardingClient {
 	public typealias LoadProfile = @Sendable () async -> Profile
 
-	public typealias FinishedOnboarding = @Sendable () async throws -> EqVoid
+	public typealias FinishedOnboarding = @Sendable () async -> EqVoid
 }
