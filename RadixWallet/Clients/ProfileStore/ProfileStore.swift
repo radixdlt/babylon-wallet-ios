@@ -49,8 +49,15 @@ public struct ConflictingOwners: Sendable, Hashable {
 }
 
 // MARK: - OwnershipConflict
-public struct OwnershipConflict: Sendable {
+public struct OwnershipConflict: Sendable, Hashable {
 	public let conflictingOwners: ConflictingOwners
+	public static func == (lhs: Self, rhs: Self) -> Bool {
+		lhs.conflictingOwners == rhs.conflictingOwners
+	}
+
+	public func hash(into hasher: inout Hasher) {
+		hasher.combine(conflictingOwners)
+	}
 
 	public enum ConflictResolutionByUser: Sendable, Hashable {
 		case reclaimProfileOnThisDevice
@@ -86,9 +93,8 @@ extension ProfileStore {
 		profileStateSubject.value
 	}
 
-	public var conflictingDeviceUsages: AnyAsyncSequence<ConflictingOwners> {
-		//        self.ownershipConflictSubject.eraseToAnyAsyncSequence()
-		fatalError()
+	public var conflictingDeviceUsages: AnyAsyncSequence<OwnershipConflict> {
+		ownershipConflictSubject.eraseToAnyAsyncSequence()
 	}
 
 	/// Mutates the in-memory copy of the Profile usung `transform`, and saves a

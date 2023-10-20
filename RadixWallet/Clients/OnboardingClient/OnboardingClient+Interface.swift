@@ -20,5 +20,5 @@ extension OnboardingClient {
 	public typealias LoadProfile = @Sendable () async -> Profile
 
 	public typealias FinishedOnboarding = @Sendable () async -> EqVoid
-	public typealias ConflictingDeviceUsages = @Sendable () async -> AnyAsyncSequence<ConflictingOwners>
+	public typealias ConflictingDeviceUsages = @Sendable () async -> AnyAsyncSequence<OwnershipConflict>
 }

@@ -31,6 +31,7 @@ public struct Main: Sendable, FeatureReducer {
 
 	public enum InternalAction: Sendable, Equatable {
 		case currentGatewayChanged(to: Radix.Gateway)
+		case profileOwnershipConflict(OwnershipConflict)
 	}
 
 	public struct Destinations: Sendable, Reducer {
@@ -51,6 +52,7 @@ public struct Main: Sendable, FeatureReducer {
 
 	@Dependency(\.appPreferencesClient) var appPreferencesClient
 	@Dependency(\.gatewaysClient) var gatewaysClient
+	@Dependency(\.onboardingClient) var onboardingClient
 
 	public init() {}
 
@@ -74,6 +76,15 @@ public struct Main: Sendable, FeatureReducer {
 					await send(.internal(.currentGatewayChanged(to: gateway)))
 				}
 			}
+			.merge(
+				with: .run { send in
+					for try await deviceConflict in await onboardingClient.conflictingDeviceUsages() {
+						guard !Task.isCancelled else { return }
+						loggerGlobal.notice("Profile device ownership conflict: \(deviceConflict)")
+						await send(.internal(.profileOwnershipConflict(deviceConflict)))
+					}
+				}
+			)
 		}
 	}
 
@@ -100,6 +111,9 @@ public struct Main: Sendable, FeatureReducer {
 		switch internalAction {
 		case let .currentGatewayChanged(currentGateway):
 			state.isOnMainnet = currentGateway.network == .mainnet
+			return .none
+		case let .profileOwnershipConflict(ownershipConflict):
+			loggerGlobal.warning("NOT DOING ANYTHING WITH OWNERSHIP CONFLICT")
 			return .none
 		}
 	}
