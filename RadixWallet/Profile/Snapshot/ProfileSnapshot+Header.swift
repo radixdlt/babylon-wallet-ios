@@ -18,7 +18,7 @@ extension ProfileSnapshot {
 		/// `"My private phone (iPhone SE (2nd generation))"`
 		/// This string can be presented to the user during a recovery flow,
 		/// when the profile is restored from backup.
-		public let creatingDevice: UsedDeviceInfo
+		public var creatingDevice: UsedDeviceInfo // mutable so we can update description
 
 		/// The device on which the profile last used.
 		/// **Mutable**: will be updated every time the profile is used on a different device

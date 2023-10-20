@@ -154,8 +154,24 @@ extension ProfileStore {
 		self.onboardingNeededSubject.send(.manuallyFromSettings)
 	}
 
-	public func finishedOnboarding() {
-		fatalError()
+	public func finishedOnboarding() async {
+		@Dependency(\.secureStorageClient) var secureStorageClient
+		@Dependency(\.device) var device
+		if !profile.hasMainnetAccounts() {
+			let errorMsg = "Incorrect implementation should have accounts on mainnet after finishing onboarding."
+			loggerGlobal.error(.init(stringLiteral: errorMsg))
+			assertionFailure(errorMsg)
+		}
+		let model = await device.model
+		let name = await device.name
+		let deviceDescription = "\(model) (\(name))"
+		deviceInfo.description = deviceDescription
+		let lastUsedOnDevice = deviceInfo
+		try? secureStorageClient.saveDeviceInfo(lastUsedOnDevice)
+		try? await updating {
+			$0.header.lastUsedOnDevice = lastUsedOnDevice
+			$0.header.creatingDevice.description = deviceDescription
+		}
 	}
 }
 
