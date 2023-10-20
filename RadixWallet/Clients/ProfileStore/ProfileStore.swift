@@ -90,7 +90,7 @@ extension ProfileStore {
 	/// and saves a snapshot of the profile into Keychain.
 	/// - Parameter profile: Imported Profile to use and save.
 	public func importProfile(_ profile: Profile) throws {
-		try saveProfileAfterUpdateItsHeader(profile)
+		try saveProfileAfterUpdateItsHeader(profile, assertIdentityAndOwnership: false)
 	}
 
 	public func deleteProfile(keepInICloudIfPresent: Bool) throws {
@@ -154,13 +154,17 @@ extension ProfileStore {
 extension ProfileStore {
 	/// Asserts identity and ownership of a profile, then updates its header, saves it and emits an update.
 	/// - Parameter updated: Profile to save (after updating its header).
-	private func saveProfileAfterUpdateItsHeader(_ updated: Profile) throws {
+	private func saveProfileAfterUpdateItsHeader(
+		_ updated: Profile,
+		assertIdentityAndOwnership: Bool = true
+	) throws {
 		guard updated != profile else { return } // prevent duplicates
 
-		try _assertIdentity(of: updated)
-
-		// Must not update a Profile owned by another device
-		try _assertOwnership(of: updated)
+		if assertIdentityAndOwnership {
+			try _assertIdentity(of: updated)
+			// Must not update a Profile owned by another device
+			try _assertOwnership(of: updated)
+		}
 
 		var updated = updated
 		try _updateHeader(of: &updated)
