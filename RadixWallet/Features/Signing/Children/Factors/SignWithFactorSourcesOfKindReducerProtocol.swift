@@ -76,10 +76,6 @@ extension SignWithFactorSourcesOfKindReducer {
 					)
 					allSignatures.append(contentsOf: signatures)
 				} catch {
-					if error is FailedToFindDeviceFactorSourceForSigning {
-						@Dependency(\.overlayWindowClient) var overlayWindowClient
-						await overlayWindowClient.scheduleAlert(.missingMnemonicAlert)
-					}
 					await send(.delegate(.failedToSign(signingFactor)))
 					break
 				}

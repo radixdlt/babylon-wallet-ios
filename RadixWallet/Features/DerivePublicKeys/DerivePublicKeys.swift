@@ -86,7 +86,6 @@ public struct DerivePublicKeys: Sendable, FeatureReducer {
 	@Dependency(\.factorSourcesClient) var factorSourcesClient
 	@Dependency(\.deviceFactorSourceClient) var deviceFactorSourceClient
 	@Dependency(\.ledgerHardwareWalletClient) var ledgerHardwareWalletClient
-	@Dependency(\.overlayWindowClient) var overlayWindowClient
 
 	public init() {}
 
@@ -205,23 +204,16 @@ extension DerivePublicKeys {
 		loadMnemonicPurpose: SecureStorageClient.LoadMnemonicPurpose,
 		state: State
 	) async throws -> Action {
-		do {
-			let hdKeys = try await deviceFactorSourceClient.publicKeysFromOnDeviceHD(.init(
-				deviceFactorSource: deviceFactorSource,
-				derivationPaths: derivationPaths,
-				loadMnemonicPurpose: loadMnemonicPurpose
-			))
-			return .delegate(.derivedPublicKeys(
-				hdKeys,
-				factorSourceID: deviceFactorSource.id.embed(),
-				networkID: networkID
-			))
-		} catch {
-			if error is FailedToFindFactorSource {
-				_ = await overlayWindowClient.scheduleAlert(.missingMnemonicAlert)
-			}
-			throw error
-		}
+		let hdKeys = try await deviceFactorSourceClient.publicKeysFromOnDeviceHD(.init(
+			deviceFactorSource: deviceFactorSource,
+			derivationPaths: derivationPaths,
+			loadMnemonicPurpose: loadMnemonicPurpose
+		))
+		return .delegate(.derivedPublicKeys(
+			hdKeys,
+			factorSourceID: deviceFactorSource.id.embed(),
+			networkID: networkID
+		))
 	}
 
 	private func deriveWith(
