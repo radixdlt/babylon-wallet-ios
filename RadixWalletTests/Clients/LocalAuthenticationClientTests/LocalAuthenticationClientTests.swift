@@ -4,8 +4,8 @@ import XCTest
 final class LocalAuthenticationClientTests: TestCase {
 	let sut = LocalAuthenticationClient.liveValue
 
-	func testTrivial() async throws {
-		let config = try await sut.queryConfig()
+	func testTrivial() throws {
+		let config = try sut.queryConfig()
 		XCTAssertTrue(config.isPasscodeSetUp)
 	}
 }

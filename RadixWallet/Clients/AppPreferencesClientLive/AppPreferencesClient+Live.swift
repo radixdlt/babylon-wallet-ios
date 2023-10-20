@@ -2,37 +2,37 @@
 // MARK: - AppPreferencesClient + DependencyKey
 extension AppPreferencesClient: DependencyKey {
 	public static func live(
-		profileStore getProfileStore: @escaping @Sendable () async -> ProfileStore = { await .shared }
+		profileStore: ProfileStore = .shared
 	) -> Self {
 		Self(
-			getPreferences: { await getProfileStore().profile.appPreferences },
+			getPreferences: { await profileStore.profile.appPreferences },
 			updatePreferences: { newPreferences in
-				try await getProfileStore().updating {
+				try await profileStore.updating {
 					$0.appPreferences = newPreferences
 				}
 			},
 			extractProfileSnapshot: {
-				await getProfileStore().profile.snapshot()
+				await profileStore.profile.snapshot()
 			},
 			deleteProfileAndFactorSources: { keepInICloudIfPresent in
-				try await getProfileStore().deleteProfile(keepInICloudIfPresent: keepInICloudIfPresent)
+				try await profileStore.deleteProfile(keepInICloudIfPresent: keepInICloudIfPresent)
 			},
 			setIsCloudProfileSyncEnabled: { isEnabled in
 				@Dependency(\.secureStorageClient) var secureStorageClient
-				let profile = await getProfileStore().profile
+				let profile = await profileStore.profile
 				let wasEnabled = profile.appPreferences.security.isCloudProfileSyncEnabled
 				guard wasEnabled != isEnabled else { return }
 
-				try await getProfileStore().updating { profile in
+				try await profileStore.updating { profile in
 					profile.appPreferences.security.isCloudProfileSyncEnabled = isEnabled
 				}
-				try await secureStorageClient.updateIsCloudProfileSyncEnabled(
+				try secureStorageClient.updateIsCloudProfileSyncEnabled(
 					profile.id,
 					isEnabled ? .enable : .disable
 				)
 			},
 			getDetailsOfSecurityStructure: { configRef in
-				try await getProfileStore().profile.detailedSecurityStructureConfiguration(reference: configRef)
+				try await profileStore.profile.detailedSecurityStructureConfiguration(reference: configRef)
 			}
 		)
 	}

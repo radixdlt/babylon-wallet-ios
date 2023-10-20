@@ -16,30 +16,30 @@ public struct SecureStorageClient: Sendable {
 	public var saveProfileHeaderList: SaveProfileHeaderList
 	public var deleteProfileHeaderList: DeleteProfileHeaderList
 
-	public var getDeviceIdentifierSetIfNil: GetDeviceIdentifierSetIfNil
-	public var loadDeviceIdentifier: LoadDeviceIdentifier
-	public var saveDeviceIdentifier: SaveDeviceIdentifier
+	public var getDeviceInfoSetIfNil: GetDeviceInfoSetIfNil
+	public var loadDeviceInfo: LoadDeviceInfo
+	public var saveDeviceInfo: SaveDeviceInfo
 }
 
 extension SecureStorageClient {
-	public typealias UpdateIsCloudProfileSyncEnabled = @Sendable (ProfileSnapshot.Header.ID, CloudProfileSyncActivation) async throws -> Void
-	public typealias SaveProfileSnapshot = @Sendable (ProfileSnapshot) async throws -> Void
+	public typealias UpdateIsCloudProfileSyncEnabled = @Sendable (ProfileSnapshot.Header.ID, CloudProfileSyncActivation) throws -> Void
+	public typealias SaveProfileSnapshot = @Sendable (ProfileSnapshot) throws -> Void
 	public typealias LoadProfileSnapshotData = @Sendable (ProfileSnapshot.Header.ID) throws -> Data?
 
-	public typealias SaveMnemonicForFactorSource = @Sendable (PrivateHDFactorSource) async throws -> Void
+	public typealias SaveMnemonicForFactorSource = @Sendable (PrivateHDFactorSource) throws -> Void
 	public typealias LoadMnemonicByFactorSourceID = @Sendable (FactorSourceID.FromHash, LoadMnemonicPurpose) throws -> MnemonicWithPassphrase?
 	public typealias ContainsMnemonicIdentifiedByFactorSourceID = @Sendable (FactorSourceID.FromHash) -> Bool
 
-	public typealias DeleteMnemonicByFactorSourceID = @Sendable (FactorSourceID.FromHash) async throws -> Void
-	public typealias DeleteProfileAndMnemonicsByFactorSourceIDs = @Sendable (ProfileSnapshot.Header.ID, _ keepInICloudIfPresent: Bool) async throws -> Void
+	public typealias DeleteMnemonicByFactorSourceID = @Sendable (FactorSourceID.FromHash) throws -> Void
+	public typealias DeleteProfileAndMnemonicsByFactorSourceIDs = @Sendable (ProfileSnapshot.Header.ID, _ keepInICloudIfPresent: Bool) throws -> Void
 
 	public typealias LoadProfileHeaderList = @Sendable () throws -> ProfileSnapshot.HeaderList?
-	public typealias SaveProfileHeaderList = @Sendable (ProfileSnapshot.HeaderList) async throws -> Void
-	public typealias DeleteProfileHeaderList = @Sendable () async throws -> Void
+	public typealias SaveProfileHeaderList = @Sendable (ProfileSnapshot.HeaderList) throws -> Void
+	public typealias DeleteProfileHeaderList = @Sendable () throws -> Void
 
-	public typealias GetDeviceIdentifierSetIfNil = @Sendable (UUID) async throws -> UUID
-	public typealias LoadDeviceIdentifier = @Sendable () throws -> UUID?
-	public typealias SaveDeviceIdentifier = @Sendable (UUID) async throws -> Void
+	public typealias GetDeviceInfoSetIfNil = @Sendable (DeviceInfo) throws -> DeviceInfo
+	public typealias LoadDeviceInfo = @Sendable () throws -> DeviceInfo?
+	public typealias SaveDeviceInfo = @Sendable (DeviceInfo) throws -> Void
 
 	public enum LoadMnemonicPurpose: Sendable, Hashable, CustomStringConvertible {
 		case signTransaction
@@ -76,14 +76,6 @@ extension SecureStorageClient {
 				"updateAccountMetadata"
 			}
 		}
-	}
-}
-
-extension SecureStorageClient {
-	public func saveDeviceIdentifierIfNeeded(
-		_ deviceID: UUID
-	) async throws {
-		_ = try await getDeviceIdentifierSetIfNil(deviceID)
 	}
 }
 

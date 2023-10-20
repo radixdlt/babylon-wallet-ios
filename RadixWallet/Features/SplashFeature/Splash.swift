@@ -158,7 +158,7 @@ public struct Splash: Sendable, FeatureReducer {
 		.run { send in
 			await send(.internal(.passcodeConfigResult(
 				TaskResult {
-					try await localAuthenticationClient.queryConfig()
+					try localAuthenticationClient.queryConfig()
 				}
 			)))
 		}

@@ -15,14 +15,14 @@ public struct UserDefaultsClient: Sendable {
 	public var dataForKey: @Sendable (Key) -> Data?
 	public var doubleForKey: @Sendable (Key) -> Double
 	public var integerForKey: @Sendable (Key) -> Int
-	public typealias RemoveValueForKey = @Sendable (Key) async -> Void
+	public typealias RemoveValueForKey = @Sendable (Key) -> Void
 	public var remove: RemoveValueForKey
-	public var setString: @Sendable (String, Key) async -> Void
-	public var setBool: @Sendable (Bool, Key) async -> Void
-	public var setData: @Sendable (Data?, Key) async -> Void
-	public var setDouble: @Sendable (Double, Key) async -> Void
-	public var setInteger: @Sendable (Int, Key) async -> Void
-	public var removeAll: @Sendable (Set<Key>) async -> Void
+	public var setString: @Sendable (String, Key) -> Void
+	public var setBool: @Sendable (Bool, Key) -> Void
+	public var setData: @Sendable (Data?, Key) -> Void
+	public var setDouble: @Sendable (Double, Key) -> Void
+	public var setInteger: @Sendable (Int, Key) -> Void
+	public var removeAll: @Sendable (Set<Key>) -> Void
 }
 
 extension UserDefaultsClient {
@@ -36,16 +36,16 @@ extension UserDefaultsClient {
 		return try jsonDecoder().decode(Model.self, from: data)
 	}
 
-	public func save(codable model: some Codable, forKey key: Key) async throws {
+	public func save(codable model: some Codable, forKey key: Key) throws {
 		@Dependency(\.jsonEncoder) var jsonEncoder
 		let data = try jsonEncoder().encode(model)
-		await self.setData(data, key)
+		self.setData(data, key)
 	}
 }
 
 extension UserDefaultsClient {
-	public func removeAll(but exceptions: Set<Key> = []) async {
-		await removeAll(exceptions)
+	public func removeAll(but exceptions: Set<Key> = []) {
+		removeAll(exceptions)
 	}
 }
 
@@ -54,7 +54,21 @@ extension UserDefaultsClient {
 		boolForKey(.hideMigrateOlympiaButton)
 	}
 
-	public func setHideMigrateOlympiaButton(_ value: Bool) async {
-		await setBool(value, .hideMigrateOlympiaButton)
+	public func setHideMigrateOlympiaButton(_ value: Bool) {
+		setBool(value, .hideMigrateOlympiaButton)
+	}
+}
+
+extension UserDefaultsClient {
+	public func getActiveProfileID() -> ProfileSnapshot.Header.ID? {
+		stringForKey(.activeProfileID).flatMap(UUID.init(uuidString:))
+	}
+
+	public func setActiveProfileID(_ id: ProfileSnapshot.Header.UsedDeviceInfo.ID) {
+		setString(id.uuidString, .activeProfileID)
+	}
+
+	public func removeActiveProfileID() {
+		remove(.activeProfileID)
 	}
 }

@@ -42,10 +42,10 @@ extension SecureStorageClient: DependencyKey {
 			let authenticationPolicy: AuthenticationPolicy?
 		}
 
-		@Sendable func queryMostSecureAccesibilityAndAuthenticationPolicy() async throws -> AccesibilityAndAuthenticationPolicy {
+		@Sendable func queryMostSecureAccesibilityAndAuthenticationPolicy() throws -> AccesibilityAndAuthenticationPolicy {
 			let config: LocalAuthenticationConfig
 			do {
-				config = try await localAuthenticationClient.queryConfig()
+				config = try localAuthenticationClient.queryConfig()
 			} catch let failure as LocalAuthenticationClient.Error {
 				throw SecureStorageError.evaluateLocalAuthenticationFailed(reason: failure)
 			} catch {
@@ -69,15 +69,15 @@ extension SecureStorageClient: DependencyKey {
 
 		let deleteMnemonicByFactorSourceID: DeleteMnemonicByFactorSourceID = { factorSourceID in
 			let key = key(factorSourceID: factorSourceID)
-			try await keychainClient.removeData(forKey: key)
+			try keychainClient.removeData(forKey: key)
 		}
 
 		@Sendable func saveProfile(
 			snapshotData data: Data,
 			key: KeychainClient.Key,
 			iCloudSyncEnabled: Bool
-		) async throws {
-			try await keychainClient.setDataWithoutAuth(
+		) throws {
+			try keychainClient.setDataWithoutAuth(
 				data,
 				forKey: key,
 				attributes: .init(
@@ -92,9 +92,9 @@ extension SecureStorageClient: DependencyKey {
 		@Sendable func saveProfile(
 			snapshot profileSnapshot: ProfileSnapshot,
 			iCloudSyncEnabled: Bool
-		) async throws {
+		) throws {
 			let data = try jsonEncoder().encode(profileSnapshot)
-			try await saveProfile(snapshotData: data, key: profileSnapshot.header.id.keychainKey, iCloudSyncEnabled: iCloudSyncEnabled)
+			try saveProfile(snapshotData: data, key: profileSnapshot.header.id.keychainKey, iCloudSyncEnabled: iCloudSyncEnabled)
 		}
 
 		@Sendable func loadProfileHeaderList() throws -> ProfileSnapshot.HeaderList? {
@@ -106,9 +106,9 @@ extension SecureStorageClient: DependencyKey {
 				.flatMap(ProfileSnapshot.HeaderList.init)
 		}
 
-		@Sendable func saveProfileHeaderList(_ headers: ProfileSnapshot.HeaderList) async throws {
+		@Sendable func saveProfileHeaderList(_ headers: ProfileSnapshot.HeaderList) throws {
 			let data = try jsonEncoder().encode(headers)
-			try await keychainClient.setDataWithoutAuth(
+			try keychainClient.setDataWithoutAuth(
 				data,
 				forKey: profileHeaderListKeychainKey,
 				attributes: .init(
@@ -120,25 +120,25 @@ extension SecureStorageClient: DependencyKey {
 			)
 		}
 
-		@Sendable func deleteProfileHeader(_ id: ProfileSnapshot.Header.ID) async throws {
+		@Sendable func deleteProfileHeader(_ id: ProfileSnapshot.Header.ID) throws {
 			if let profileHeaders = try loadProfileHeaderList() {
 				let remainingHeaders = profileHeaders.filter { $0.id != id }
 				if remainingHeaders.isEmpty {
 					// Delete the list instea of keeping an empty list
-					try await deleteProfileHeaderList()
+					try deleteProfileHeaderList()
 				} else {
-					try await saveProfileHeaderList(.init(remainingHeaders)!)
+					try saveProfileHeaderList(.init(remainingHeaders)!)
 				}
 			}
 		}
 
-		@Sendable func deleteProfileHeaderList() async throws {
-			try await keychainClient.removeData(forKey: profileHeaderListKeychainKey)
+		@Sendable func deleteProfileHeaderList() throws {
+			try keychainClient.removeData(forKey: profileHeaderListKeychainKey)
 		}
 
-		@Sendable func deleteProfile(_ id: ProfileSnapshot.Header.ID, iCloudSyncEnabled: Bool) async throws {
-			try await keychainClient.removeData(forKey: id.keychainKey)
-			try await deleteProfileHeader(id)
+		@Sendable func deleteProfile(_ id: ProfileSnapshot.Header.ID, iCloudSyncEnabled: Bool) throws {
+			try keychainClient.removeData(forKey: id.keychainKey)
+			try deleteProfileHeader(id)
 		}
 
 		@Sendable func loadDeviceIdentifier() throws -> UUID? {
@@ -163,9 +163,9 @@ extension SecureStorageClient: DependencyKey {
 			comment: "The unique identifier of this device"
 		)
 
-		@Sendable func saveDeviceIdentifier(_ deviceIdentifier: UUID) async throws {
+		@Sendable func saveDeviceIdentifier(_ deviceIdentifier: UUID) throws {
 			let data = try jsonEncoder().encode(deviceIdentifier)
-			try await keychainClient.setDataWithoutAuth(
+			try keychainClient.setDataWithoutAuth(
 				data,
 				forKey: deviceIdentifierKey,
 				attributes: deviceIdentifierAttributes
@@ -176,7 +176,7 @@ extension SecureStorageClient: DependencyKey {
 		return Self(
 			saveProfileSnapshot: { profileSnapshot in
 				let data = try jsonEncoder().encode(profileSnapshot)
-				try await saveProfile(
+				try saveProfile(
 					snapshotData: data,
 					key: profileSnapshot.header.id.keychainKey,
 					iCloudSyncEnabled: profileSnapshot.appPreferences.security.isCloudProfileSyncEnabled
@@ -187,10 +187,10 @@ extension SecureStorageClient: DependencyKey {
 				let factorSource = privateFactorSource.factorSource
 				let mnemonicWithPassphrase = privateFactorSource.mnemonicWithPassphrase
 				let data = try jsonEncoder().encode(mnemonicWithPassphrase)
-				let mostSecureAccesibilityAndAuthenticationPolicy = try await queryMostSecureAccesibilityAndAuthenticationPolicy()
+				let mostSecureAccesibilityAndAuthenticationPolicy = try queryMostSecureAccesibilityAndAuthenticationPolicy()
 				let key = key(factorSourceID: factorSource.id)
 
-				try await keychainClient.setDataWithAuth(
+				try keychainClient.setDataWithAuth(
 					data,
 					forKey: key,
 					attributes: .init(
@@ -252,7 +252,7 @@ extension SecureStorageClient: DependencyKey {
 
 				// We want to keep the profile backup in iCloud.
 				if !(profileSnapshot.appPreferences.security.isCloudProfileSyncEnabled && keepInICloudIfPresent) {
-					try await deleteProfile(profileID, iCloudSyncEnabled: profileSnapshot.appPreferences.security.isCloudProfileSyncEnabled)
+					try deleteProfile(profileID, iCloudSyncEnabled: profileSnapshot.appPreferences.security.isCloudProfileSyncEnabled)
 				}
 
 				for factorSourceID in profileSnapshot
@@ -261,7 +261,7 @@ extension SecureStorageClient: DependencyKey {
 					.map(\.id)
 				{
 					loggerGlobal.debug("Deleting factor source with ID: \(factorSourceID)")
-					try await deleteMnemonicByFactorSourceID(factorSourceID)
+					try deleteMnemonicByFactorSourceID(factorSourceID)
 				}
 			},
 			updateIsCloudProfileSyncEnabled: { profileId, change in
@@ -275,35 +275,48 @@ extension SecureStorageClient: DependencyKey {
 				switch change {
 				case .disable:
 					loggerGlobal.notice("Disabling iCloud sync of Profile snapshot (which should also delete it from iCloud)")
-					try await saveProfile(snapshotData: profileSnapshotData, key: profileId.keychainKey, iCloudSyncEnabled: false)
+					try saveProfile(
+						snapshotData: profileSnapshotData,
+						key: profileId.keychainKey,
+						iCloudSyncEnabled: false
+					)
 				case .enable:
 					loggerGlobal.notice("Enabling iCloud sync of Profile snapshot")
-					try await saveProfile(snapshotData: profileSnapshotData, key: profileId.keychainKey, iCloudSyncEnabled: true)
+					try saveProfile(
+						snapshotData: profileSnapshotData,
+						key: profileId.keychainKey,
+						iCloudSyncEnabled: true
+					)
 				}
 			},
 			loadProfileHeaderList: loadProfileHeaderList,
 			saveProfileHeaderList: saveProfileHeaderList,
 			deleteProfileHeaderList: deleteProfileHeaderList,
-			getDeviceIdentifierSetIfNil: { identifierToSetIfNil in
-				let res = try await keychainClient
-					.getDataWithoutAuth(
-						forKey: deviceIdentifierKey,
-						ifNilSet: .init(
-							to: jsonEncoder().encode(identifierToSetIfNil),
-							with: deviceIdentifierAttributes
-						)
-					)
-				if res.wasNil {
-					loggerGlobal.info("deviceIdentifier was nil, saved new value.")
-					return identifierToSetIfNil
-				} else {
-					let loaded = try jsonDecoder().decode(UUID.self, from: res.value)
-					loggerGlobal.trace("Loaded deviceIdentifier: \(loaded)")
-					return loaded
-				}
+			getDeviceInfoSetIfNil: { _ in
+//				let res = try keychainClient
+//					.getDataWithoutAuth(
+//						forKey: deviceIdentifierKey,
+//						ifNilSet: .init(
+//							to: jsonEncoder().encode(identifierToSetIfNil),
+//							with: deviceIdentifierAttributes
+//						)
+//					)
+//				if res.wasNil {
+//					loggerGlobal.info("deviceIdentifier was nil, saved new value.")
+//					return identifierToSetIfNil
+//				} else {
+//					let loaded = try jsonDecoder().decode(UUID.self, from: res.value)
+//					loggerGlobal.trace("Loaded deviceIdentifier: \(loaded)")
+//					return loaded
+//				}
+				fatalError()
 			},
-			loadDeviceIdentifier: loadDeviceIdentifier,
-			saveDeviceIdentifier: saveDeviceIdentifier
+			loadDeviceInfo: {
+				fatalError()
+			},
+			saveDeviceInfo: { _ in
+				fatalError()
+			}
 		)
 	}()
 }

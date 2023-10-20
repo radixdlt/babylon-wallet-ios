@@ -1,6 +1,6 @@
 import ComposableArchitecture
 import SwiftUI
-public typealias DeviceInfo = P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.GetDeviceInfo
+public typealias LedgerDeviceInfo = P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.GetDeviceInfo
 
 // MARK: - AddLedgerFactorSource
 public struct AddLedgerFactorSource: Sendable, FeatureReducer {
@@ -8,7 +8,7 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 
 	public struct State: Sendable, Hashable {
 		public var isWaitingForResponseFromLedger = false
-		public var unnamedDeviceToAdd: DeviceInfo?
+		public var unnamedDeviceToAdd: LedgerDeviceInfo?
 
 		@PresentationState
 		public var destination: Destinations.State? = nil
@@ -28,9 +28,9 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 	}
 
 	public enum InternalAction: Sendable, Equatable {
-		case getDeviceInfoResult(TaskResult<DeviceInfo>)
+		case getDeviceInfoResult(TaskResult<LedgerDeviceInfo>)
 		case alreadyExists(LedgerHardwareWalletFactorSource)
-		case proceedToNameDevice(DeviceInfo)
+		case proceedToNameDevice(LedgerDeviceInfo)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -127,7 +127,7 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 		}
 	}
 
-	private func gotDeviceEffect(_ ledgerDeviceInfo: DeviceInfo, in state: inout State) -> Effect<Action> {
+	private func gotDeviceEffect(_ ledgerDeviceInfo: LedgerDeviceInfo, in state: inout State) -> Effect<Action> {
 		state.isWaitingForResponseFromLedger = false
 		loggerGlobal.notice("Successfully received response from CE! \(ledgerDeviceInfo) ✅")
 		return .run { send in
@@ -178,10 +178,10 @@ extension AlertState<Never> {
 // MARK: - NameLedgerFactorSource
 public struct NameLedgerFactorSource: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
-		public let deviceInfo: DeviceInfo
+		public let deviceInfo: LedgerDeviceInfo
 		public var ledgerName = ""
 
-		public init(deviceInfo: DeviceInfo) {
+		public init(deviceInfo: LedgerDeviceInfo) {
 			self.deviceInfo = deviceInfo
 		}
 
@@ -229,7 +229,7 @@ public struct NameLedgerFactorSource: Sendable, FeatureReducer {
 
 extension LedgerHardwareWalletFactorSource {
 	static func from(
-		device: DeviceInfo,
+		device: LedgerDeviceInfo,
 		name: String
 	) throws -> Self {
 		try model(

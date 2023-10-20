@@ -61,34 +61,39 @@ extension ProfileSnapshot {
 	}
 }
 
+public typealias DeviceID = UUID
+
+// MARK: - DeviceInfo
+public struct DeviceInfo:
+	Sendable,
+	Hashable,
+	Codable
+{
+	/// `"My private phone (iPhone SE (2nd generation))"`
+	public var description: String
+
+	/// To detect if the same Profile is used on two different phones
+	public let id: ID; public typealias ID = DeviceID
+
+	/// Date when a Profile was tied to this device, might not necessarily been the active Profile.
+	/// Mutable so that we can upate it when e.g. claiming ownership
+	public var date: Date
+
+	public init(
+		description: String,
+		id: DeviceID,
+		date: Date
+	) {
+		self.description = description
+		self.id = id
+		self.date = date
+	}
+}
+
 extension ProfileSnapshot.Header {
 	public typealias Version = Tagged<Self, UInt32>
 	public typealias ID = UUID
-
-	public struct UsedDeviceInfo:
-		Sendable,
-		Hashable,
-		Codable
-	{
-		/// `"My private phone (iPhone SE (2nd generation))"`
-		public let description: NonEmptyString
-
-		/// To detect if the same Profile is used on two different phones
-		public let id: ID; public typealias ID = UUID
-
-		/// Date when the Profile was tied to this device
-		public let date: Date
-
-		public init(
-			description: NonEmptyString,
-			id: ID,
-			date: Date
-		) {
-			self.description = description
-			self.id = id
-			self.date = date
-		}
-	}
+	public typealias UsedDeviceInfo = DeviceInfo
 
 	public struct ContentHint:
 		Sendable,

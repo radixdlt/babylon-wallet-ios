@@ -69,16 +69,16 @@ extension KeychainClient {
 
 	public typealias GetServiceAndAccessGroup = @Sendable () -> KeychainServiceAndAccessGroup
 	public typealias ContainsDataForKey = @Sendable (Key, _ showAuthPrompt: Bool) throws -> Bool
-	public typealias SetDataWithoutAuthForKey = @Sendable (Data, Key, AttributesWithoutAuth) async throws -> Void
-	public typealias GetDataWithoutAuthForKeySetIfNil = @Sendable (Key, IfNilSetWithoutAuth) async throws -> (value: Data, wasNil: Bool)
-	public typealias GetDataWithAuthForKeySetIfNil = @Sendable (Key, AuthenticationPrompt, IfNilSetWithAuth) async throws -> (value: Data, wasNil: Bool)
-	public typealias SetDataWithAuthForKey = @Sendable (Data, Key, AttributesWithAuth) async throws -> Void
+	public typealias SetDataWithoutAuthForKey = @Sendable (Data, Key, AttributesWithoutAuth) throws -> Void
+	public typealias GetDataWithoutAuthForKeySetIfNil = @Sendable (Key, IfNilSetWithoutAuth) throws -> (value: Data, wasNil: Bool)
+	public typealias GetDataWithAuthForKeySetIfNil = @Sendable (Key, AuthenticationPrompt, IfNilSetWithAuth) throws -> (value: Data, wasNil: Bool)
+	public typealias SetDataWithAuthForKey = @Sendable (Data, Key, AttributesWithAuth) throws -> Void
 
 	public typealias GetDataWithoutAuthForKey = @Sendable (Key) throws -> Data?
 	public typealias GetDataWithAuthForKey = @Sendable (Key, AuthenticationPrompt) throws -> Data?
 
-	public typealias RemoveDataForKey = @Sendable (Key) async throws -> Void
-	public typealias RemoveAllItems = @Sendable () async throws -> Void
+	public typealias RemoveDataForKey = @Sendable (Key) throws -> Void
+	public typealias RemoveAllItems = @Sendable () throws -> Void
 }
 
 // MARK: - KeychainAttributes
@@ -150,31 +150,31 @@ extension KeychainClient {
 		_ data: Data,
 		forKey key: Key,
 		attributes: KeychainClient.AttributesWithoutAuth
-	) async throws {
-		try await _setDataWithoutAuthForKey(data, key, attributes)
+	) throws {
+		try _setDataWithoutAuthForKey(data, key, attributes)
 	}
 
 	public func setDataWithAuth(
 		_ data: Data,
 		forKey key: Key,
 		attributes: KeychainClient.AttributesWithAuth
-	) async throws {
-		try await _setDataWithAuthForKey(data, key, attributes)
+	) throws {
+		try _setDataWithAuthForKey(data, key, attributes)
 	}
 
 	public func getDataWithoutAuth(
 		forKey key: Key,
 		ifNilSet: KeychainClient.IfNilSetWithoutAuth
-	) async throws -> (value: Data, wasNil: Bool) {
-		try await _getDataWithoutAuthForKeySetIfNil(key, ifNilSet)
+	) throws -> (value: Data, wasNil: Bool) {
+		try _getDataWithoutAuthForKeySetIfNil(key, ifNilSet)
 	}
 
 	public func getDataWithAuth(
 		forKey key: Key,
 		authenticationPrompt: AuthenticationPrompt,
 		ifNilSet: KeychainClient.IfNilSetWithAuth
-	) async throws -> (value: Data, wasNil: Bool) {
-		try await _getDataWithAuthForKeySetIfNil(key, authenticationPrompt, ifNilSet)
+	) throws -> (value: Data, wasNil: Bool) {
+		try _getDataWithAuthForKeySetIfNil(key, authenticationPrompt, ifNilSet)
 	}
 
 	public func getDataWithoutAuth(
@@ -192,11 +192,11 @@ extension KeychainClient {
 
 	public func removeData(
 		forKey key: Key
-	) async throws {
-		try await _removeDataForKey(key)
+	) throws {
+		try _removeDataForKey(key)
 	}
 
-	public func removeAllItems() async throws {
-		try await _removeAllItems()
+	public func removeAllItems() throws {
+		try _removeAllItems()
 	}
 }

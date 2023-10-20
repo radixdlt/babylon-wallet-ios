@@ -112,7 +112,7 @@ public struct CreatingDeviceView: IndentedView {
 		VStack(alignment: .leading, spacing: indentation.spacing) {
 			Labeled("Device ID", value: device.id)
 			Labeled("Creation date", value: device.date.ISO8601Format())
-			Labeled("Device", value: device.description.rawValue)
+			Labeled("Device", value: device.description)
 		}
 	}
 }

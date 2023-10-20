@@ -5,15 +5,17 @@ extension OnboardingClient: DependencyKey {
 	public static let liveValue = Self.live()
 
 	public static func live(
-		profileStore getProfileStore: @escaping @Sendable () async -> ProfileStore = { await .shared }
+		profileStore: ProfileStore = .shared
 	) -> Self {
 		Self(
 			loadProfile: {
-				await getProfileStore().getLoadProfileOutcome()
+//				await getProfileStore().getLoadProfileOutcome()
+				fatalError()
 			},
 			commitEphemeral: {
-				try await getProfileStore().commitEphemeral()
-				return EqVoid.instance
+//				try await getProfileStore().commitEphemeral()
+//				return EqVoid.instance
+				fatalError()
 			}
 		)
 	}
