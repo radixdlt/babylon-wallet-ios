@@ -128,6 +128,13 @@ public struct App: Sendable, FeatureReducer {
 		case .onboardingCoordinator(.delegate(.completed)):
 			goToMain(state: &state, accountRecoveryIsNeeded: false)
 
+		case let .splash(.delegate(.completed(profile, accountRecoveryNeeded: accountRecoveryNeeded))):
+			if profile.hasAnyAccountOnAnyNetwork() {
+				goToMain(state: &state, accountRecoveryIsNeeded: accountRecoveryNeeded)
+			} else {
+				goToOnboarding(state: &state)
+			}
+
 			/*
 		case let .splash(.delegate(.completed(loadProfileOutcome, accountRecoveryNeeded))):
 
