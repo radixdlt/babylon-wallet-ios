@@ -21,6 +21,7 @@ public final actor ProfileStore {
 
 		if let conflictingOwners = stuff.conflictingOwners {
 			Task {
+				loggerGlobal.notice("ProfileStore:init => emitOwnershipConflict")
 				try await self.emitOwnershipConflict(
 					ownerOfCurrentProfile: conflictingOwners.ownerOfCurrentProfile
 				)
@@ -270,6 +271,7 @@ extension ProfileStore {
 		against infoAboutThisDevice: DeviceInfo,
 		onMismatch: () -> Void
 	) throws {
+		loggerGlobal.debug("asserting ownership")
 		guard profile.header.lastUsedOnDevice.id == infoAboutThisDevice.id else {
 			let errorMessage = "Device ID mismatch, profile might have been used on another device. Last used in header was: \(String(describing: profile.header.lastUsedOnDevice)) and info of this device: \(String(describing: infoAboutThisDevice))"
 			loggerGlobal.error(.init(stringLiteral: errorMessage))
@@ -469,7 +471,9 @@ extension OverlayWindowClient.Item.AlertState {
 	public static func profileUsedOnAnotherDeviceAlert(
 		conflictingOwners: ConflictingOwners
 	) -> Self {
-		.init(
+		let keepUsingThisPhone = "Keen using this phone"
+		let deleteOnThisPhone = "Delete on this phone"
+		return .init(
 			title: { TextState("Use one iPhone only.") }, // FIXME: Strings
 			actions: {
 				ButtonState(
@@ -477,7 +481,7 @@ extension OverlayWindowClient.Item.AlertState {
 					action: .claimAndContinueUseOnThisPhone,
 					label: {
 						// FIXME: Strings
-						TextState("Use this phone (you will see this warning if you start the app on the other phone)")
+						TextState(keepUsingThisPhone)
 					}
 				)
 				ButtonState(
@@ -485,13 +489,13 @@ extension OverlayWindowClient.Item.AlertState {
 					action: .deleteProfileFromThisPhone,
 					label: {
 						// FIXME: Strings
-						TextState("Delete wallet data on this phone, and use other Phone")
+						TextState(deleteOnThisPhone)
 					}
 				)
 			},
 			message: {
 				// FIXME: Strings,
-				TextState("It seems you have used the wallet on another iPhone, this is not supported. Do you want to continue or stop using the wallet backup data on this phone?")
+				TextState("It seems you have used the wallet on another iPhone, this is not supported.\n\nIf you select '\(keepUsingThisPhone)', you will see this warning if you start the app on the other phone.\n\nIf you select '\(deleteOnThisPhone)' the wallet data will be deleted on this phone and you can continue on the other phone.")
 			}
 		)
 	}
