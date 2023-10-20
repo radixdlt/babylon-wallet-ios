@@ -31,7 +31,6 @@ public struct DisplayMnemonic: Sendable, FeatureReducer {
 	}
 
 	@Dependency(\.secureStorageClient) var secureStorageClient
-	@Dependency(\.overlayWindowClient) var overlayWindowClient
 
 	public init() {}
 
@@ -60,10 +59,7 @@ public struct DisplayMnemonic: Sendable, FeatureReducer {
 		case let .loadMnemonicResult(.success(maybeMnemonicWithPassphrase)):
 			guard let mnemonicWithPassphrase = maybeMnemonicWithPassphrase else {
 				loggerGlobal.error("Mnemonic was nil")
-				return .run { send in
-
-					await send(.delegate(.failedToLoad))
-				}
+				return .send(.delegate(.failedToLoad))
 			}
 
 			state.importMnemonic = .init(

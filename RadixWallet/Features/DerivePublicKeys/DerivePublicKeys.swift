@@ -86,7 +86,6 @@ public struct DerivePublicKeys: Sendable, FeatureReducer {
 	@Dependency(\.factorSourcesClient) var factorSourcesClient
 	@Dependency(\.deviceFactorSourceClient) var deviceFactorSourceClient
 	@Dependency(\.ledgerHardwareWalletClient) var ledgerHardwareWalletClient
-	@Dependency(\.overlayWindowClient) var overlayWindowClient
 
 	public init() {}
 
