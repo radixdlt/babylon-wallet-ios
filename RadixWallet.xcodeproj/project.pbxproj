@@ -7337,7 +7337,6 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 48CFBC5D2ADC106400E77A5C /* Build configuration list for PBXNativeTarget "RadixWallet" */;
 			buildPhases = (
-				E6915BF42AE11B6200DD794B /* 🔮 CodeGen SwiftGen */,
 				48CFBC4B2ADC106300E77A5C /* Sources */,
 				48CFBC4C2ADC106300E77A5C /* Frameworks */,
 				48CFBC4D2ADC106300E77A5C /* Resources */,
@@ -7456,7 +7455,6 @@
 				48FFFB012ADC6F8100B2B213 /* XCRemoteSwiftPackageReference "swift-builders" */,
 				48FFFB042ADC6FD300B2B213 /* XCRemoteSwiftPackageReference "swiftui-navigation" */,
 				48FFFB0B2ADC744700B2B213 /* XCRemoteSwiftPackageReference "TextBuilder" */,
-				E6915BF82AE11C5900DD794B /* XCRemoteSwiftPackageReference "SwiftGen" */,
 			);
 			productRefGroup = 48CFBC502ADC106300E77A5C /* Products */;
 			projectDirPath = "";
@@ -7525,27 +7523,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
-
-/* Begin PBXShellScriptBuildPhase section */
-		E6915BF42AE11B6200DD794B /* 🔮 CodeGen SwiftGen */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-			);
-			name = "🔮 CodeGen SwiftGen";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "echo \"Build Phase - Begin SwiftGen\"\n./runSwiftGen.sh\necho \"Build Phase - End SwiftGen\"\n";
-		};
-/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		481B43AC2ADC7F1A007945C1 /* Sources */ = {
@@ -9660,14 +9637,6 @@
 			requirement = {
 				kind = upToNextMajorVersion;
 				minimumVersion = 3.0.1;
-			};
-		};
-		E6915BF82AE11C5900DD794B /* XCRemoteSwiftPackageReference "SwiftGen" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/SwiftGen/SwiftGen";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 6.6.2;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
