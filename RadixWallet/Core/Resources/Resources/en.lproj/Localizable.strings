@@ -1,6 +1,6 @@
-"homePage_securityPromptBackup" = "Please back up your seed phrase";
+"homePage_securityPromptBackup" = "Please write down this Account\'s seed phrase";
 "homePage_securityPromptRecover" = "Please recover your seed phrase";
-"homePage_backedUpMnemonicHeading" = "I have backed up this seed phrase";
+"homePage_backedUpMnemonicHeading" = "I have written down this seed phrase";
 "homePage_createNewAccount" = "Create a New Account";
 "homePage_legacyAccountHeading" = "Legacy";
 "homePage_subtitle" = "Welcome. Here are all your Accounts on the Radix Network.";
@@ -12,6 +12,9 @@
 "homePage_accountsTag_ledgerBabylon" = "Ledger";
 "homePage_visitDashboard_title" = "Visit the Radix Dashboard";
 "homePage_visitDashboard_subtitle" = "Ready to get started using the Radix Network and your Wallet?";
+"homePage_profileOlympiaError_title" = "SERIOUS ERROR - PLEASE READ";
+"homePage_profileOlympiaError_subtitle" = "Your wallet is in a rare condition that must be resolved manually. Please email support at hello@radixdlt.com with subject line BDFS ERROR. Somebody will respond and help you resolve the issue safely.";
+"homePage_profileOlympiaError_okCountdown" = "OK (%d)";
 "account_transfer" = "Transfer";
 "account_tokens" = "Tokens";
 "account_nfts" = "NFTs";
@@ -73,6 +76,7 @@
 "accountSettings_loadingPrompt" = "This may take several seconds, please wait for completion";
 "accountSettings_renameAccount_title" = "Rename Account";
 "accountSettings_renameAccount_subtitle" = "Enter a new label for this Account";
+"accountSettings_renameAccount_button" = "Update";
 "accountSettings_accountColor_text" = "Select the color for this Account";
 "accountSettings_accountColor_selected" = "Selected";
 "accountSettings_hideAccount_title" = "Hide This Account";
@@ -133,8 +137,14 @@
 "accountSettings_behaviors_informationChangeableByAnyone" = "Anyone can change naming and information about this asset.";
 "accountSettings_behaviors_removableByThirdParty" = "A third party can remove this asset from accounts and dApps.";
 "accountSettings_behaviors_removableByAnyone" = "Anyone can remove this asset from accounts and dApps.";
+"accountSettings_behaviors_freezableByThirdParty" = "A third party can freeze this asset in place.";
+"accountSettings_behaviors_freezableByAnyone" = "Anyone can freeze this asset in place.";
 "accountSettings_behaviors_nftDataChangeable" = "Data that is set on these NFTs can be changed.";
 "accountSettings_behaviors_nftDataChangeableByAnyone" = "Anyone can change data that is set on these NFTs.";
+"accountSettings_developmentHeading" = "Set development preferences";
+"accountSettings_devPreferences" = "Dev Preferences";
+"accountSettings_hideThisAccount" = "Hide This Account";
+"accountSettings_hideAccountConfirmation" = "Are you sure you want to hide this account?";
 "settings_title" = "Settings";
 "settings_linkedConnectors" = "Linked Connectors";
 "settings_gateways" = "Gateways";
@@ -145,6 +155,8 @@
 "settings_backups" = "Backups";
 "settings_importFromLegacyWallet" = "Import from a Legacy Wallet";
 "settings_ledgerHardwareWallets" = "Ledger Hardware Wallets";
+"settings_depositGuarantees" = "Deposit Guarantees";
+"settings_depositGuarantees_subtitle" = "Set your default guaranteed minimum for estimated deposits";
 "settings_multiFactor" = "Multi-Factor Setup";
 "settings_appVersion" = "Version: %@ build #%@";
 "settings_deleteWalletData" = "Delete Wallet Data";
@@ -174,6 +186,8 @@
 "linkedConnectors_cameraPermissionDeniedAlert_message" = "Camera access is required to link to a Connector.";
 "linkedConnectors_localNetworkPermissionDeniedAlert_title" = "Access Required";
 "linkedConnectors_localNetworkPermissionDeniedAlert_message" = "Local network access is required to link to a Connector.";
+"linkedConnectors_incorrectQrTitle" = "Incorrect QR code scanned.";
+"linkedConnectors_incorrectQrMessage" = "Please scan the QR code provided by your Radix Wallet Connector browser extension.";
 "gateways_title" = "Gateways";
 "gateways_subtitle" = "Choose the gateway your wallet will use to connect to the Radix Network or test networks. Only change this if you know what you’re doing.";
 "gateways_whatIsAGateway" = "What is a Gateway?";
@@ -208,7 +222,7 @@
 "authorizedDapps_personaDetails_lastName" = "Last Name";
 "authorizedDapps_personaDetails_emailAddress" = "Email Address";
 "authorizedDapps_personaDetails_phoneNumber" = "Phone Number";
-"authorizedDapps_personaDetails_editPersona" = "Edit Persona Data";
+"authorizedDapps_personaDetails_editPersona" = "Edit Persona";
 "authorizedDapps_personaDetails_authorizedDappsHeading" = "Here are the dApps you have logged into with this Persona.";
 "authorizedDapps_personaDetails_accountSharingDescription" = "Here are the Account names and addresses that you are currently sharing with %@.";
 "authorizedDapps_personaDetails_editAccountSharing" = "Edit Account Sharing";
@@ -226,6 +240,8 @@
 "authorizedDapps_personaDetails_nickname" = "Nickname";
 "authorizedDapps_personaDetails_nameVariantEastern" = "Eastern style (family name first)";
 "authorizedDapps_personaDetails_nameVariantWestern" = "Western style (given name(s) first)";
+"authorizedDapps_personaDetails_hideThisPersona" = "Hide This Persona";
+"authorizedDapps_personaDetails_hidePersonaConfirmation" = "Are you sure you want to hide this persona?";
 "editPersona_requiredByDapp" = "Required by dApp";
 "editPersona_sharedInformationHeading" = "The following information can be seen if requested by the dApp";
 "editPersona_error_blank" = "Label cannot be blank";
@@ -326,7 +342,7 @@
 "dAppRequest_validationOutcome_subtitleBadContent" = "Invalid content";
 "dAppRequest_validationOutcome_subtitleIncompatibleVersion" = "Incompatible connector extension";
 "dAppRequest_validationOutcome_subtitleWrongNetworkID" = "Network mismatch";
-"dAppRequest_validationOutcome_devExplanationBadContent" = "Invalid value of `numberOfAccountsInvalid`: must not be be `exactly(0)` nor can `quantity` be negative";
+"dAppRequest_validationOutcome_devExplanationBadContent" = "Invalid value of `numberOfAccountsInvalid`: must not be `exactly(0)` nor can `quantity` be negative";
 "dAppRequest_validationOutcome_devExplanationIncompatibleVersion" = "%@ (CE: %@, wallet: %@)";
 "dAppRequest_validationOutcome_devExplanationInvalidOrigin" = "\'%@\' is not valid origin.";
 "dAppRequest_validationOutcome_devExplanationInvalidDappDefinitionAddress" = "\'%@\' is not valid account address.";
@@ -336,9 +352,11 @@
 "dAppRequest_validationOutcome_shortExplanationInvalidOrigin" = "Invalid origin";
 "dAppRequest_validationOutcome_shortExplanationInvalidDappDefinitionAddress" = "Invalid dApp Definition Address";
 "dAppRequest_validationOutcome_shortExplanationP2PError" = "Radix Connect connection error";
+"dAppRequest_validationOutcome_invalidRequestTitle" = "Invalid Request.";
+"dAppRequest_validationOutcome_invalidRequestMessage" = "Could not validate the dApp.";
 "dAppRequest_requestMalformedAlert_message" = "Request received from dApp is invalid.";
 "dAppRequest_requestPersonaNotFoundAlert_message" = "dApp specified an invalid Persona.";
-"dAppRequest_requestWrongNetworkAlert_message" = "dApp made a requested intended for network %@, but you are currently connected to %@.";
+"dAppRequest_requestWrongNetworkAlert_message" = "dApp made a request intended for network %@, but you are currently connected to %@.";
 "dAppRequest_responseFailureAlert_message" = "Failed to send request response to dApp.";
 "dAppRequest_completion_title" = "Success";
 "dAppRequest_completion_subtitle" = "Request from %@ complete";
@@ -383,7 +401,7 @@
 "transactionReview_customizeNetworkFeeSheet_noneDue" = "None due";
 "transactionReview_customizeNetworkFeeSheet_selectFeePayer_navigationTitle" = "Select Fee Payer";
 "transactionReview_customizeNetworkFeeSheet_selectFeePayer_subtitle" = "Select an account to pay %@ XRD transaction fee";
-"transactionReview_customizeNetworkFeeSheet_selectFeePayer_selectAccountButtonTitle" = "Select Account";
+"transactionReview_customizeNetworkFeeSheet_selectFeePayer_selectAccountButtonTitle" = "No account selected";
 "transactionReview_customizeNetworkFeeSheet_viewNormalModeButtonTitle" = "View Normal Mode";
 "transactionReview_customizeNetworkFeeSheet_viewAdvancedModeButtonTitle" = "View Advanced Mode";
 "transactionReview_customizeNetworkFeeSheet_networkFee" = "Network Fee";
@@ -415,6 +433,19 @@
 "transactionReview_submitTransaction_txID" = "Transaction ID";
 "transactionReview_submitTransaction_status" = "Status";
 "transactionReview_submitTransaction_navigationTitle" = "Submitting Transaction";
+"transactionReview_accountDepositSettings_title" = "Review New Deposit Settings";
+"transactionReview_accountDepositSettings_subtitle" = "Third-party deposit setting";
+"transactionReview_accountDepositSettings_acceptAllRule" = "Allow third parties to deposit *any asset* to this account.";
+"transactionReview_accountDepositSettings_acceptKnownRule" = "Allow third parties to deposit *only assets this account has already held*.";
+"transactionReview_accountDepositSettings_denyAllRule" = "*Disallow* all deposits from third parties without your consent.";
+"transactionReview_accountDepositSettings_assetChangeAllow" = "Allow";
+"transactionReview_accountDepositSettings_assetChangeDisallow" = "Disallow";
+"transactionReview_accountDepositSettings_assetChangeClear" = "Clear Exception";
+"transactionReview_accountDepositSettings_depositorChangeAdd" = "Add Depositor";
+"transactionReview_accountDepositSettings_depositorChangeRemove" = "Remove Depositor";
+"transactionReview_unacceptableManifest_rejected" = "A proposed transaction was rejected because it contains one or more reserved instructions.";
+"transactionReview_noMnemonicError_title" = "Could Not Complete";
+"transactionReview_noMnemonicError_text" = "The required seed phrase is missing. Please return to the account and begin the recovery process.";
 "transaction_status_completing_text" = "Completing Transaction…";
 "transaction_status_success_title" = "Success";
 "transaction_status_success_text" = "Your transaction was successful";
@@ -427,6 +458,9 @@
 "addressAction_noWebBrowserInstalled" = "There is no web browser installed in this device";
 "addressAction_viewOnDashboard" = "View on Radix Dashboard";
 "addressAction_showAccountQR" = "Show Address QR Code";
+"addressAction_verifyAddressLedger" = "Verify Address with Ledger";
+"addressAction_verifyAddressLedger_success" = "Address verified";
+"addressAction_verifyAddressLedger_error" = "Verify address request failed";
 "addressAction_qrCodeView_qrCodeLabel" = "QR code for an account";
 "addressAction_qrCodeView_failureLabel" = "Could not create QR code";
 "biometrics_prompt_title" = "Authenticate to continue";
@@ -438,14 +472,14 @@
 "biometrics_prompt_importOlympiaAccounts" = "Check if seed phrase already exists.";
 "biometrics_prompt_checkingAccounts" = "Checking accounts.";
 "biometrics_prompt_updateAccountMetadata" = "Update account metadata.";
-"biometrics_deviceNotSecureAlert_title" = "Your device is not secured";
-"biometrics_deviceNotSecureAlert_message" = "Do you want to continue?";
+"biometrics_deviceNotSecureAlert_title" = "Unsecured Device";
+"biometrics_deviceNotSecureAlert_message" = "Your device currently has no device access security set, such as biometrics or a PIN. The Radix Wallet requires this to be set for your security.";
 "biometrics_deviceNotSecureAlert_openSettings" = "Open Settings";
 "biometrics_deviceNotSecureAlert_quit" = "Quit";
 "common_account" = "Account";
 "common_cancel" = "Cancel";
 "common_continue" = "Continue";
-"common_developerDisclaimerText" = "For development only. Not usable on Radix mainnet.";
+"common_developerDisclaimerText" = "Connected to a test network, not Radix main network.";
 "common_errorAlertTitle" = "An Error Occurred";
 "common_none" = "None";
 "common_ok" = "OK";
@@ -477,6 +511,7 @@
 "error_transactionFailure_pollStatus" = "Failed to poll transaction status";
 "error_transactionFailure_prepare" = "Failed to prepare transaction";
 "error_transactionFailure_rejected" = "Transaction rejected";
+"error_transactionFailure_blindSigningNotEnabledButRequired" = "Your current Ledger settings only allow signing of simple token transfers. Please either enable \"verbose mode\" (to see full transaction manifests) or \"blind signing mode\" (to enable signing of complex transaction manifest hashes) on your Ledger app device.";
 "error_transactionFailure_rejectedByUser" = "Failed to convert transaction manifest";
 "error_transactionFailure_submit" = "Failed to submit transaction";
 "importOlympiaAccounts_scanQR_title" = "Import Legacy Olympia Accounts";
@@ -494,6 +529,8 @@
 "importOlympiaAccounts_verifySeedPhrase_title" = "Verify With Your Seed Phrase";
 "importOlympiaAccounts_verifySeedPhrase_subtitle" = "To complete importing your accounts, please view your seed phrase in the Radix Desktop Wallet and enter the words here.";
 "importOlympiaAccounts_verifySeedPhrase_warning" = "This will give this Radix Wallet control of your accounts. Never give your seed phrase to anyone for any reason.";
+"importOlympiaAccounts_verifySeedPhrase_keepSeedPhrasePrompt" = "Do not throw away this seed phrase! You will still need it if you need to recover access to your Olympia accounts in the future.";
+"importOlympiaAccounts_verifySeedPhrase_keepSeedPhrasePromptConfirmation" = "I Understand";
 "importOlympiaAccounts_completion_title" = "Congratulations";
 "importOlympiaAccounts_completion_subtitleMultiple" = "You\'ve now imported these Accounts:";
 "importOlympiaAccounts_completion_subtitleSingle" = "You\'ve now imported this Account:";
@@ -612,27 +649,27 @@
 "ledgerHardwareDevices_subtitleFailure" = "Could not find Ledger devices";
 "displayMnemonics_cautionAlert_title" = "Use Caution";
 "displayMnemonics_cautionAlert_revealButtonLabel" = "Reveal Seed Phrase";
-"displayMnemonics_cautionAlert_message" = "A seed phrase provides full control of its Accounts. Do not view in a public area. Back up the seed phrase words securely. Screenshots are disabled.";
+"displayMnemonics_cautionAlert_message" = "A seed phrase provides full control of its Accounts. Do not view in a public area. Write down the seed phrase words securely. Screenshots are disabled.";
 "displayMnemonics_seedPhrases" = "Seed Phrases";
-"displayMnemonics_connectedAccountsPersonasLabel_one" = "Connected to Personas and %d account";
-"displayMnemonics_connectedAccountsPersonasLabel_many" = "Connected to Personas and to %d accounts";
-"displayMnemonics_connectedAccountsLabel_one" = "Connected to %d account";
-"displayMnemonics_connectedAccountsLabel_many" = "Connected to %d accounts";
+"displayMnemonics_connectedAccountsPersonasLabel_one" = "Connected to Personas and %d Account";
+"displayMnemonics_connectedAccountsPersonasLabel_many" = "Connected to Personas and to %d Accounts";
+"displayMnemonics_connectedAccountsLabel_one" = "Connected to %d Account";
+"displayMnemonics_connectedAccountsLabel_many" = "Connected to %d Accounts";
 "displayMnemonics_seedPhraseSecurityInfo" = "You are responsible for the security of your Seed Phrase";
-"displayMnemonics_backUpWarning" = "Back up this Seed Phrase";
+"displayMnemonics_backUpWarning" = "Write Down this Seed Phrase";
 "revealSeedPhrase_title" = "Reveal Seed Phrase";
 "revealSeedPhrase_warning" = "For your safety, make sure no one is looking at your screen. Taking a screen shot has been disabled.";
 "revealSeedPhrase_wordLabel" = "Word %d";
 "revealSeedPhrase_passphrase" = "Passphrase";
 "revealSeedPhrase_warningDialog_title" = "Use Caution";
-"revealSeedPhrase_warningDialog_subtitle" = "Are you sure you have backed up your seed phrase?";
-"revealSeedPhrase_warningDialog_confirmButton" = "I have backed up this seed phrase";
+"revealSeedPhrase_warningDialog_subtitle" = "Are you sure you have written down your seed phrase?";
+"revealSeedPhrase_warningDialog_confirmButton" = "I have written down this seed phrase";
 "seedPhrases_title" = "Seed Phrases";
 "seedPhrases_message" = "A Seed Phrase provides full access to your accounts and funds. When viewing, ensure you’re in a safe environment and no one is looking at your screen.";
 "seedPhrases_warning" = "You are responsible for the security of your Seed Phrase";
 "seedPhrases_seedPhrase_reveal" = "Reveal Seed Phrase";
-"seedPhrases_seedPhrase_oneConnectedAccount" = "Connected to 1 account";
-"seedPhrases_seedPhrase_multipleConnectedAccounts" = "Connected to %d accounts";
+"seedPhrases_seedPhrase_oneConnectedAccount" = "Connected to 1 Account";
+"seedPhrases_seedPhrase_multipleConnectedAccounts" = "Connected to %d Accounts";
 "appSettings_title" = "App Settings";
 "appSettings_subtitle" = "Customize your Radix Wallet";
 "appSettings_developerMode_title" = "Developer Mode";
@@ -647,6 +684,16 @@
 "appSettings_resetWalletDialog_resetButtonTitle" = "Reset Wallet";
 "appSettings_resetWalletDialog_resetAndDeleteBackupButtonTitle" = "Reset and Delete iCloud Backup";
 "appSettings_resetWalletDialog_message" = "WARNING. This will clear all contents of your Wallet. If you have no backup, you will lose access to your Accounts and Personas permanently.";
+"appSettings_entityHiding_title" = "Account & Persona Hiding";
+"appSettings_entityHiding_subtitle" = "Manage hiding";
+"appSettings_entityHiding_info" = "Accounts and Personas you have created can be hidden in your Radix Wallet, acting as if “deleted”.";
+"appSettings_entityHiding_hiddenPersona" = "%d Persona currently hidden";
+"appSettings_entityHiding_hiddenPersonas" = "%d Personas currently hidden";
+"appSettings_entityHiding_hiddenAccount" = "%d Account currently hidden";
+"appSettings_entityHiding_hiddenAccounts" = "%d Accounts currently hidden";
+"appSettings_entityHiding_unhideAllSection" = "Unhide Accounts & Personas";
+"appSettings_entityHiding_unhideAllButton" = "Unhide All";
+"appSettings_entityHiding_unhideAllConfirmation" = "Are you sure you wish to unhide all Accounts and Personas? This cannot be undone.";
 "addLedgerDevice_alreadyAddedAlert_title" = "Ledger Already Added";
 "addLedgerDevice_alreadyAddedAlert_message" = "You have already added this Ledger as: %@";
 "addLedgerDevice_addDevice_title" = "Add Ledger Device";
@@ -659,7 +706,7 @@
 "addLedgerDevice_nameLedger_detectedType" = "Detected type: %@";
 "addLedgerDevice_nameLedger_namePlaceholder" = "Green Ledger Nano S+";
 "addLedgerDevice_nameLedger_continueButtonTitle" = "Save and Continue";
-"profileBackup_headerTitle" = "Backing up your wallet ensures that you can  recover access to your Accounts, Personas, and wallet settings on a new phone by re-entering your seed phrase(s).
+"profileBackup_headerTitle" = "Backing up your wallet ensures that you can restore access to your Accounts, Personas, and wallet settings on a new phone by re-entering your seed phrase(s).
 
 **For security, backups do not contain any seed phrases or private keys. You must write them down separately.**";
 "profileBackup_automaticBackups_title" = "Automatic Backups (recommended)";
@@ -680,15 +727,12 @@ Only the **current configuration** of your wallet is backed up with each manual 
 "profileBackup_deleteWallet_title" = "Delete Wallet";
 "profileBackup_deleteWalletDialog_message" = "WARNING. This will clear all contents of your Wallet. If you have no backup, you will lose access to your Accounts and Personas permanently.";
 "profileBackup_deleteWalletDialog_confirm" = "Delete Wallet";
-"androidProfileBackup_automaticBackups_enable" = "Enable Backup";
-"androidProfileBackup_automaticBackups_disable" = "Disable Backup";
 "androidProfileBackup_disabledText" = "Back up is turned off";
 "androidProfileBackup_lastBackedUp" = "Last Backed up: %@";
 "androidProfileBackup_noLastBackUp" = "Not backed up yet";
 "androidProfileBackup_openSystemBackupSettings" = "Open System Backup Settings";
-"androidProfileBackup_backupWalletData_title" = "Backup Wallet Data";
+"androidProfileBackup_backupWalletData_title" = "Backup Wallet Data to Cloud";
 "androidProfileBackup_backupWalletData_message" = "Warning: If disabled you might lose access to your Accounts and Personas.";
-"androidProfileBackup_automaticBackups_subtitle" = "Periodic system backups";
 "androidProfileBackup_deleteWallet_subtitle" = "You may delete your wallet. This will clear the Radix Wallet app, clears its contents, and delete any cloud backup.
 
 **Access to any Accounts or Personas will be permanently lost unless you have a manual backup file.**";
@@ -721,8 +765,8 @@ Only the **current configuration** of your wallet is backed up with each manual 
 "encryptProfileBackup_enterPasswordField_placeholder" = "Enter password";
 "encryptProfileBackup_confirmPasswordField_placeholder" = "Confirm password";
 "encryptProfileBackup_confirmPasswordField_error" = "Passwords do not match";
-"recoverProfileBackup_header_title" = "Recover Wallet From Backup";
-"recoverProfileBackup_header_subtitle" = "Select a backup to recover your Radix Wallet. You will be asked to enter your seed phrase(s) to recover control of your Accounts and Personas.";
+"recoverProfileBackup_header_title" = "Restore Wallet From Backup";
+"recoverProfileBackup_header_subtitle" = "Select a backup to restore your Radix Wallet. You will be asked to enter your seed phrase(s) to recover control of your Accounts and Personas.";
 "androidRecoverProfileBackup_choose_title" = "Choose a backup";
 "iOSRecoverProfileBackup_choose_title" = "Choose a backup on iCloud";
 "iOSRecoverProfileBackup_noBackupsAvailable" = "No wallet backups available on current iCloud account";
@@ -742,3 +786,6 @@ Only the **current configuration** of your wallet is backed up with each manual 
 "recoverSeedPhrase_enterButton" = "Enter This Seed Phrase";
 "enterSeedPhrase_header_title" = "Enter Seed Phrase";
 "enterSeedPhrase_warning" = "For your safety, make sure no one is looking at your screen. Never give your seed phrase to anyone for any reason.";
+"depositGuarantees_text" = "Set the guaranteed minimum deposit to be applied whenever a deposit in a transaction can only be estimated.
+
+You can always change the guarantee from this default in each transaction.";

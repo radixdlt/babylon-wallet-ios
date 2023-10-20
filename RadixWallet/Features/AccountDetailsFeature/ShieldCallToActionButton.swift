@@ -29,7 +29,7 @@ extension View {
 
 	public func importMnemonicPromptView(action: @escaping () -> Void) -> some View {
 		shieldPromptView(
-			text: "Recovery of seed phrase required", // FIXME: Strings
+			text: "Enter this Account's seed phrase", // FIXME: Strings
 			action: action
 		)
 	}

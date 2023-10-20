@@ -50,7 +50,11 @@ extension ImportOlympiaWalletCoordinator.Path {
 					CaseLet(
 						/State.importMnemonic,
 						action: Action.importMnemonic,
-						then: { ImportMnemonic.View(store: $0) }
+						then: { childStore in
+							NavigationView {
+								ImportMnemonic.View(store: childStore)
+							}
+						}
 					)
 				case .importOlympiaLedgerAccountsAndFactorSources:
 					CaseLet(

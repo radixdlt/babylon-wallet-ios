@@ -76,8 +76,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 
 	public enum DelegateAction: Sendable, Equatable {
 		case dismiss
-		case displayTransfer
-		case refresh(AccountAddress)
+		case importedMnemonic(FactorSourceID)
 	}
 
 	public enum InternalAction: Sendable, Equatable {
@@ -218,18 +217,19 @@ public struct AccountDetails: Sendable, FeatureReducer {
 
 		case let .destination(.presented(.importMnemonics(.delegate(delegateAction)))):
 			switch delegateAction {
-			case .closeButtonTapped, .failedToImportAllRequiredMnemonics:
-				break
-			case let .finishedImportingMnemonics(_, imported):
-				if imported.contains(where: { $0.factorSourceID == state.deviceControlledFactorInstance.factorSourceID.embed() }) {
-					state.importMnemonicPrompt = .no
-
-					// It makes no sense to prompt user to back up a mnemonic she *just* imported.
-					state.exportMnemonicPrompt = .no
+			case .closeButtonTapped, .failedToImportAllRequiredMnemonics, .finishedImportingMnemonics:
+				state.destination = nil
+				return checkAccountSecurityPromptStatus(state: &state)
+			case let .importedMnemonic(factorSourceID):
+				guard factorSourceID == state.deviceControlledFactorInstance.factorSourceID.embed() else {
+					return .none
 				}
+
+				state.importMnemonicPrompt = .no
+				// It makes no sense to prompt user to back up a mnemonic she *just* imported.
+				state.exportMnemonicPrompt = .no
+				return .send(.delegate(.importedMnemonic(factorSourceID)))
 			}
-			state.destination = nil
-			return checkAccountSecurityPromptStatus(state: &state)
 
 		case .destination(.dismiss):
 			return checkAccountSecurityPromptStatus(state: &state)
@@ -309,34 +309,23 @@ public struct AccountDetails: Sendable, FeatureReducer {
 
 	// FIXME: Refactor account security prompts to share logic between this reducer and Row+Reducer (AccountList)
 	private func checkAccountSecurityPromptStatus(state: inout State) -> Effect<Action> {
-		@Dependency(\.userDefaultsClient) var userDefaultsClient
-
-		if userDefaultsClient
-			.getAddressesOfAccountsThatNeedRecovery()
-			.contains(state.account.address)
-		{
-			// need to recover mnemonic since it has been previously skipped.
-			state.importMnemonicPrompt = .init(needed: true)
-
-			// do not care about export if import is needed
+		guard !state.importMnemonicPrompt.needed else {
 			return .none
 		}
 
+		@Dependency(\.userDefaultsClient) var userDefaultsClient
+
 		let mightNeedToBeBackedUp: Bool = {
-			switch state.account.securityState {
-			case let .unsecured(unsecuredEntityControl):
-				guard unsecuredEntityControl.transactionSigning.factorSourceID.kind == .device else {
-					// Ledger account, mnemonics do not apply...
-					return false
-				}
-
-				// check if already backed up
-				let isAlreadyBackedUp = userDefaultsClient
-					.getFactorSourceIDOfBackedUpMnemonics()
-					.contains(unsecuredEntityControl.transactionSigning.factorSourceID)
-
-				return !isAlreadyBackedUp
+			guard let deviceFactorSourceID = state.account.deviceFactorSourceID else {
+				// Ledger account, mnemonics do not apply...
+				return false
 			}
+			// check if already backed up
+			let isAlreadyBackedUp = userDefaultsClient
+				.getFactorSourceIDOfBackedUpMnemonics()
+				.contains(deviceFactorSourceID)
+
+			return !isAlreadyBackedUp
 		}()
 
 		guard mightNeedToBeBackedUp else {

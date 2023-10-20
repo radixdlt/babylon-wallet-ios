@@ -76,6 +76,7 @@ extension ImportOlympiaLedgerAccountsAndFactorSources {
 					.foregroundColor(.app.gray1)
 					.multilineTextAlignment(.center)
 				}
+				.navigationBarBackButtonHidden()
 				.footer(visible: viewStore.moreAccounts > 0) {
 					Button(L10n.ImportOlympiaLedgerAccounts.continueButtonTitle) {
 						viewStore.send(.continueTapped)
