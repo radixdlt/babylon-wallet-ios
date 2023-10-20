@@ -80,6 +80,12 @@ extension OwnershipConflict {
 
 // MARK: Public
 extension ProfileStore {
+	/// The current value of Profile. Use `update:profile` method to update it. Also see `values`,
+	/// for an async sequence of Profile.
+	public var profile: Profile {
+		profileStateSubject.value
+	}
+
 	/// Mutates the in-memory copy of the Profile usung `transform`, and saves a
 	/// snapshot of it profile into Keychain (after having updated its header)
 	/// - Parameter transform: A mutating transform updating the profile.

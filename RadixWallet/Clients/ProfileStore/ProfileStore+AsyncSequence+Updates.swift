@@ -2,13 +2,6 @@
 
 // MARK: Public
 extension ProfileStore {
-	/// The current value of Profile. Use `update:profile` method to update it. Also see `values`,
-	/// for an async sequence of Profile.
-	public var profile: Profile {
-//		profileStateSubject.value.profile
-		fatalError()
-	}
-
 	/// The current network if any
 	public func network() async throws -> Profile.Network {
 		try profile.network(id: profile.networkID)
