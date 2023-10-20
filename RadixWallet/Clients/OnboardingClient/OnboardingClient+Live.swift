@@ -14,9 +14,6 @@ extension OnboardingClient: DependencyKey {
 			finishedOnboarding: {
 				await profileStore.finishedOnboarding()
 				return EqVoid.instance
-			},
-			conflictingDeviceUsages: {
-				await profileStore.conflictingDeviceUsages
 			}
 		)
 	}

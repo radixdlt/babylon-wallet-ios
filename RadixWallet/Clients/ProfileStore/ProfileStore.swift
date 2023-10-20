@@ -6,16 +6,8 @@ public final actor ProfileStore {
 
 	public static let shared = ProfileStore()
 
-	/// Current Profile
+	/// Holds an in-memory copy of the Profile, the source of truth is Keychain.
 	private let profileStateSubject: AsyncCurrentValueSubject<Profile>
-
-	// Replay since can a conflict can be emitted from the ProfileStore initializer
-	// and must be buffered.
-	typealias OwnershipConflictSubject = AsyncReplaySubject<OwnershipConflict>
-
-	private let ownershipConflictSubject: OwnershipConflictSubject = .init(bufferSize: 1)
-
-	private let onboardingNeededSubject: AsyncPassthroughSubject<DeletedProfileOrigin> = .init()
 
 	/// Only mutable since we need to update the description with async, since reading
 	/// device model and name is async.
@@ -28,18 +20,13 @@ public final actor ProfileStore {
 		self.profileStateSubject = AsyncCurrentValueSubject(stuff.profile)
 
 		if let conflictingOwners = stuff.conflictingOwners {
-			// Actor-isolated instance method ',,' can not be referenced from
-			// a non-isolated context; this is an error in Swift 6
-			// hmm... we might wrap this in a Task, not too bad.
-			self.emitOwnershipConflict(ownerOfCurrentProfile: conflictingOwners.ownerOfCurrentProfile)
+			Task {
+				try await self.emitOwnershipConflict(
+					ownerOfCurrentProfile: conflictingOwners.ownerOfCurrentProfile
+				)
+			}
 		}
 	}
-}
-
-// MARK: - DeletedProfileOrigin
-public enum DeletedProfileOrigin: Sendable, Hashable {
-	case ownershipConflict
-	case manuallyFromSettings
 }
 
 // MARK: - ConflictingOwners
@@ -48,53 +35,12 @@ public struct ConflictingOwners: Sendable, Hashable {
 	public let thisDevice: DeviceInfo
 }
 
-// MARK: - OwnershipConflict
-public struct OwnershipConflict: Sendable, Hashable {
-	public let conflictingOwners: ConflictingOwners
-	public static func == (lhs: Self, rhs: Self) -> Bool {
-		lhs.conflictingOwners == rhs.conflictingOwners
-	}
-
-	public func hash(into hasher: inout Hasher) {
-		hasher.combine(conflictingOwners)
-	}
-
-	public enum ConflictResolutionByUser: Sendable, Hashable {
-		case reclaimProfileOnThisDevice
-		case deleteProfileOnThisDevice
-	}
-
-	public typealias OnConflictResolutionByUser = @Sendable (ConflictResolutionByUser) async throws -> Void
-
-	public let onConflictResolutionByUser: OnConflictResolutionByUser
-}
-
-extension OwnershipConflict {
-	init(
-		ownerOfCurrentProfile: DeviceInfo,
-		thisDevice: DeviceInfo,
-		onConflictResolutionByUser: @escaping OnConflictResolutionByUser
-	) {
-		self.init(
-			conflictingOwners: .init(
-				ownerOfCurrentProfile: ownerOfCurrentProfile,
-				thisDevice: thisDevice
-			),
-			onConflictResolutionByUser: onConflictResolutionByUser
-		)
-	}
-}
-
 // MARK: Public
 extension ProfileStore {
 	/// The current value of Profile. Use `update:profile` method to update it. Also see `values`,
 	/// for an async sequence of Profile.
 	public var profile: Profile {
 		profileStateSubject.value
-	}
-
-	public var conflictingDeviceUsages: AnyAsyncSequence<OwnershipConflict> {
-		ownershipConflictSubject.eraseToAnyAsyncSequence()
 	}
 
 	/// Mutates the in-memory copy of the Profile usung `transform`, and saves a
@@ -162,11 +108,9 @@ extension ProfileStore {
 
 		let profile = try! Self._tryGenerateAndSaveNewProfile(deviceInfo: deviceInfo)
 		self.profileStateSubject.send(profile)
-		self.onboardingNeededSubject.send(.manuallyFromSettings)
 	}
 
 	public func finishedOnboarding() async {
-		@Dependency(\.secureStorageClient) var secureStorageClient
 		@Dependency(\.device) var device
 		if !profile.hasMainnetAccounts() {
 			let errorMsg = "Incorrect implementation should have accounts on mainnet after finishing onboarding."
@@ -289,26 +233,32 @@ extension ProfileStore {
 
 	private func _assertOwnership(of profile: Profile) throws {
 		try Self._assertOwnership(of: profile, against: deviceInfo) {
-			emitOwnershipConflict(with: profile)
-		}
-	}
-
-	private func emitOwnershipConflict(with profile: Profile) {
-		emitOwnershipConflict(ownerOfCurrentProfile: profile.header.lastUsedOnDevice)
-	}
-
-	private func emitOwnershipConflict(ownerOfCurrentProfile: DeviceInfo) {
-		let conflict = OwnershipConflict(
-			ownerOfCurrentProfile: ownerOfCurrentProfile,
-			thisDevice: deviceInfo
-		) { conflictResolutionByUser in
-			switch conflictResolutionByUser {
-			case .deleteProfileOnThisDevice: try await self.deleteProfile(keepInICloudIfPresent: true)
-			case .reclaimProfileOnThisDevice: try await self.claimOwnershipOfProfile()
+			Task {
+				try await self.emitOwnershipConflict(with: profile)
 			}
 		}
+	}
 
-		ownershipConflictSubject.send(conflict)
+	private func emitOwnershipConflict(with profile: Profile) async throws {
+		try await emitOwnershipConflict(ownerOfCurrentProfile: profile.header.lastUsedOnDevice)
+	}
+
+	private func emitOwnershipConflict(ownerOfCurrentProfile: DeviceInfo) async throws {
+		@Dependency(\.overlayWindowClient) var overlayWindowClient
+		let conflictingOwners = ConflictingOwners(
+			ownerOfCurrentProfile: ownerOfCurrentProfile,
+			thisDevice: deviceInfo
+		)
+
+		let choiceByUser = await overlayWindowClient.scheduleAlert(.profileUsedOnAnotherDeviceAlert(
+			conflictingOwners: conflictingOwners
+		))
+
+		if choiceByUser == .claimAndContinueUseOnThisPhone {
+			try self.claimOwnershipOfProfile()
+		} else if choiceByUser == .deleteProfileFromThisPhone {
+			try self.deleteProfile(keepInICloudIfPresent: true)
+		}
 	}
 
 	private static func _assertOwnership(
@@ -509,4 +459,46 @@ extension ProfileStore {
 private struct MetaDeviceInfo: Sendable, Hashable {
 	let deviceInfo: DeviceInfo
 	let fromDeprecatedDeviceID: Bool
+}
+
+extension OverlayWindowClient.Item.AlertState {
+	public static func profileUsedOnAnotherDeviceAlert(
+		conflictingOwners: ConflictingOwners
+	) -> Self {
+		.init(
+			title: { TextState("Use one iPhone only.") }, // FIXME: Strings
+			actions: {
+				ButtonState(
+					role: .none,
+					action: .claimAndContinueUseOnThisPhone,
+					label: {
+						// FIXME: Strings
+						TextState("Use this phone (you will see this warning if you start the app on the other phone)")
+					}
+				)
+				ButtonState(
+					role: .destructive,
+					action: .deleteProfileFromThisPhone,
+					label: {
+						// FIXME: Strings
+						TextState("Delete wallet data on this phone, and use other Phone")
+					}
+				)
+			},
+			message: {
+				// FIXME: Strings,
+				TextState("It seems you have used the wallet on another iPhone, this is not supported. Do you want to continue or stop using the wallet backup data on this phone?")
+			}
+		)
+	}
+}
+
+extension OverlayWindowClient.Item.AlertAction {
+	fileprivate static var claimAndContinueUseOnThisPhone: Self {
+		.primaryButtonTapped
+	}
+
+	fileprivate static var deleteProfileFromThisPhone: Self {
+		.secondaryButtonTapped
+	}
 }
