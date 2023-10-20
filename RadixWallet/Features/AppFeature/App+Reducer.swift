@@ -40,6 +40,7 @@ public struct App: Sendable, FeatureReducer {
 	@Dependency(\.continuousClock) var clock
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.appPreferencesClient) var appPreferencesClient
+	@Dependency(\.onboardingClient) var onboardingClient
 
 	public init() {}
 
@@ -62,8 +63,11 @@ public struct App: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .task:
-			// FIXME: - ProfileStore revamp: listen to ProfileStore.conflict async seq
-			.none
+			.run { _ in
+				for try await deviceConflict in await onboardingClient.conflictingDeviceUsages() {
+					guard !Task.isCancelled else { return }
+				}
+			}
 		}
 	}
 

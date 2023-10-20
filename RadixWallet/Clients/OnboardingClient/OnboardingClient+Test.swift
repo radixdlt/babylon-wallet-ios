@@ -11,11 +11,13 @@ extension OnboardingClient: TestDependencyKey {
 	public static let previewValue: Self = .noop
 	public static let testValue = Self(
 		loadProfile: unimplemented("\(Self.self).loadProfile"),
-		finishedOnboarding: unimplemented("\(Self.self).finishedOnboarding")
+		finishedOnboarding: unimplemented("\(Self.self).finishedOnboarding"),
+		conflictingDeviceUsages: unimplemented("\(Self.self).conflictingDeviceUsages")
 	)
 
 	public static let noop = Self(
 		loadProfile: { fatalError("noop") },
-		finishedOnboarding: { EqVoid.instance }
+		finishedOnboarding: { EqVoid.instance },
+		conflictingDeviceUsages: { AsyncLazySequence([]).eraseToAnyAsyncSequence() }
 	)
 }

@@ -86,6 +86,11 @@ extension ProfileStore {
 		profileStateSubject.value
 	}
 
+	public var conflictingDeviceUsages: AnyAsyncSequence<ConflictingOwners> {
+		//        self.ownershipConflictSubject.eraseToAnyAsyncSequence()
+		fatalError()
+	}
+
 	/// Mutates the in-memory copy of the Profile usung `transform`, and saves a
 	/// snapshot of it profile into Keychain (after having updated its header)
 	/// - Parameter transform: A mutating transform updating the profile.

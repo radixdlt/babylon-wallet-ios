@@ -71,8 +71,7 @@ extension BackupsClient: DependencyKey {
 				}
 			},
 			loadDeviceID: {
-//				try? await secureStorageClient.loadDeviceIdentifier()
-				fatalError()
+				try? secureStorageClient.loadDeviceInfo()?.id
 			}
 		)
 	}
