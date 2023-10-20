@@ -992,9 +992,7 @@
 		48CFC6282ADC10DA00E77A5C /* Profile+Network.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC1A12ADC10D900E77A5C /* Profile+Network.swift */; };
 		48CFC6292ADC10DA00E77A5C /* Radix+Network.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC1A22ADC10D900E77A5C /* Radix+Network.swift */; };
 		48CFC62A2ADC10DA00E77A5C /* NetworkID+DerivationPathComponentNonHardenedValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC1A32ADC10D900E77A5C /* NetworkID+DerivationPathComponentNonHardenedValue.swift */; };
-		48CFC62B2ADC10DA00E77A5C /* LoadProfileOutcome.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC1A52ADC10D900E77A5C /* LoadProfileOutcome.swift */; };
 		48CFC62C2ADC10DA00E77A5C /* AppearanceID.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC1A62ADC10D900E77A5C /* AppearanceID.swift */; };
-		48CFC62D2ADC10DA00E77A5C /* ProfileLoadingFailure.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC1A72ADC10D900E77A5C /* ProfileLoadingFailure.swift */; };
 		48CFC62E2ADC10DA00E77A5C /* ProfileSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC1A92ADC10D900E77A5C /* ProfileSnapshot.swift */; };
 		48CFC62F2ADC10DB00E77A5C /* EncryptedProfileSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC1AA2ADC10D900E77A5C /* EncryptedProfileSnapshot.swift */; };
 		48CFC6302ADC10DB00E77A5C /* ProfileSnapshot+Header.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC1AB2ADC10D900E77A5C /* ProfileSnapshot+Header.swift */; };
@@ -2255,9 +2253,7 @@
 		48CFC1A12ADC10D900E77A5C /* Profile+Network.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Profile+Network.swift"; sourceTree = "<group>"; };
 		48CFC1A22ADC10D900E77A5C /* Radix+Network.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Radix+Network.swift"; sourceTree = "<group>"; };
 		48CFC1A32ADC10D900E77A5C /* NetworkID+DerivationPathComponentNonHardenedValue.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NetworkID+DerivationPathComponentNonHardenedValue.swift"; sourceTree = "<group>"; };
-		48CFC1A52ADC10D900E77A5C /* LoadProfileOutcome.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoadProfileOutcome.swift; sourceTree = "<group>"; };
 		48CFC1A62ADC10D900E77A5C /* AppearanceID.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppearanceID.swift; sourceTree = "<group>"; };
-		48CFC1A72ADC10D900E77A5C /* ProfileLoadingFailure.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProfileLoadingFailure.swift; sourceTree = "<group>"; };
 		48CFC1A92ADC10D900E77A5C /* ProfileSnapshot.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProfileSnapshot.swift; sourceTree = "<group>"; };
 		48CFC1AA2ADC10D900E77A5C /* EncryptedProfileSnapshot.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EncryptedProfileSnapshot.swift; sourceTree = "<group>"; };
 		48CFC1AB2ADC10D900E77A5C /* ProfileSnapshot+Header.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "ProfileSnapshot+Header.swift"; sourceTree = "<group>"; };
@@ -4955,51 +4951,38 @@
 		48CFBF522ADC10D900E77A5C /* Clients */ = {
 			isa = PBXGroup;
 			children = (
-				48CFBF532ADC10D900E77A5C /* FactorSourcesClient */,
-				48CFBF562ADC10D900E77A5C /* DappInteractionClient */,
-				48CFBF592ADC10D900E77A5C /* RadixConnectClient */,
-				48CFBF5D2ADC10D900E77A5C /* DappInteractionClientLive */,
-				48CFBF5F2ADC10D900E77A5C /* OnboardingClient */,
-				48CFBF622ADC10D900E77A5C /* AccountsClient */,
-				48CFBF652ADC10D900E77A5C /* AuthorizedDappsClient */,
-				48CFBF682ADC10D900E77A5C /* MnemonicClient */,
-				48CFBF6C2ADC10D900E77A5C /* AppPreferencesClient */,
-				48CFBF6F2ADC10D900E77A5C /* PersonasClientLive */,
-				48CFBF712ADC10D900E77A5C /* NetworkSwitchingClient */,
-				48CFBF752ADC10D900E77A5C /* QRGeneratorClientLive */,
-				48CFBF772ADC10D900E77A5C /* CacheClient */,
-				48CFBF7B2ADC10D900E77A5C /* LedgerHardwareWalletClient */,
-				48CFBF7F2ADC10D900E77A5C /* P2PLinksClient */,
-				48CFBF822ADC10D900E77A5C /* TransactionClient */,
-				48CFBF8A2ADC10D900E77A5C /* OverlayWindowClient */,
 				48CFBF8D2ADC10D900E77A5C /* AccountPortfoliosClient */,
-				48CFBF912ADC10D900E77A5C /* ImportLegacyWalletClient */,
-				48CFBF972ADC10D900E77A5C /* PersonasClient */,
-				48CFBF9A2ADC10D900E77A5C /* AppPreferencesClientLive */,
-				48CFBF9C2ADC10D900E77A5C /* URLFormatterClientLive */,
-				48CFBF9E2ADC10D900E77A5C /* AuthorizedDappsClientLive */,
-				48CFBFA02ADC10D900E77A5C /* P2PLinksClientLive */,
-				48CFBFA22ADC10D900E77A5C /* DeviceFactorSourceClient */,
-				48CFBFA62ADC10D900E77A5C /* GatewaysClient */,
-				48CFBFA92ADC10D900E77A5C /* LocalAuthenticationClient */,
+				48CFBF622ADC10D900E77A5C /* AccountsClient */,
+				48CFBF6C2ADC10D900E77A5C /* AppPreferencesClient */,
+				48CFBF652ADC10D900E77A5C /* AuthorizedDappsClient */,
 				48CFBFAE2ADC10D900E77A5C /* BackupsClient */,
-				48CFBFB12ADC10D900E77A5C /* OverlayWindowClientLive */,
-				48CFBFB32ADC10D900E77A5C /* ROLAClient */,
-				48CFBFB82ADC10D900E77A5C /* QRGeneratorClient */,
-				48CFBFBB2ADC10D900E77A5C /* OnLedgerEntitiesClient */,
-				48CFBFC32ADC10D900E77A5C /* DiskPersistenceClient */,
-				48CFBFC72ADC10D900E77A5C /* GatewayAPI */,
-				48CFC0C32ADC10D900E77A5C /* BackupsClientLive */,
-				48CFC0C52ADC10D900E77A5C /* URLFormatterClient */,
-				48CFC0C82ADC10D900E77A5C /* SecureStorageClient */,
-				48CFC0CC2ADC10D900E77A5C /* FaucetClient */,
-				48CFC0D02ADC10D900E77A5C /* SubmitTransactionClient */,
-				48CFC0D42ADC10D900E77A5C /* OnboardingClientLive */,
+				48CFBF772ADC10D900E77A5C /* CacheClient */,
 				48CFC0D62ADC10D900E77A5C /* CameraPermissionClient */,
-				48CFC0DA2ADC10D900E77A5C /* FactorSourcesClientLive */,
+				48CFBF562ADC10D900E77A5C /* DappInteractionClient */,
+				48CFBFA22ADC10D900E77A5C /* DeviceFactorSourceClient */,
+				48CFBFC32ADC10D900E77A5C /* DiskPersistenceClient */,
+				48CFBF532ADC10D900E77A5C /* FactorSourcesClient */,
+				48CFC0CC2ADC10D900E77A5C /* FaucetClient */,
+				48CFBFC72ADC10D900E77A5C /* GatewayAPI */,
+				48CFBFA62ADC10D900E77A5C /* GatewaysClient */,
+				48CFBF912ADC10D900E77A5C /* ImportLegacyWalletClient */,
+				48CFBF7B2ADC10D900E77A5C /* LedgerHardwareWalletClient */,
+				48CFBFA92ADC10D900E77A5C /* LocalAuthenticationClient */,
+				48CFBF682ADC10D900E77A5C /* MnemonicClient */,
+				48CFBF712ADC10D900E77A5C /* NetworkSwitchingClient */,
+				48CFBF5F2ADC10D900E77A5C /* OnboardingClient */,
+				48CFBFBB2ADC10D900E77A5C /* OnLedgerEntitiesClient */,
+				48CFBF8A2ADC10D900E77A5C /* OverlayWindowClient */,
+				48CFBF7F2ADC10D900E77A5C /* P2PLinksClient */,
+				48CFBF972ADC10D900E77A5C /* PersonasClient */,
 				48CFC0DC2ADC10D900E77A5C /* ProfileStore */,
-				48CFC0DE2ADC10D900E77A5C /* AccountsClientLive */,
-				48CFC0E02ADC10D900E77A5C /* GatewaysClientLive */,
+				48CFBFB82ADC10D900E77A5C /* QRGeneratorClient */,
+				48CFBF592ADC10D900E77A5C /* RadixConnectClient */,
+				48CFBFB32ADC10D900E77A5C /* ROLAClient */,
+				48CFC0C82ADC10D900E77A5C /* SecureStorageClient */,
+				48CFC0D02ADC10D900E77A5C /* SubmitTransactionClient */,
+				48CFBF822ADC10D900E77A5C /* TransactionClient */,
+				48CFC0C52ADC10D900E77A5C /* URLFormatterClient */,
 			);
 			path = Clients;
 			sourceTree = "<group>";
@@ -5008,6 +4991,7 @@
 			isa = PBXGroup;
 			children = (
 				48CFBF542ADC10D900E77A5C /* FactorSourcesClient+Test.swift */,
+				48CFC0DB2ADC10D900E77A5C /* FactorSourcesClient+Live.swift */,
 				48CFBF552ADC10D900E77A5C /* FactorSourcesClient+Interface.swift */,
 			);
 			path = FactorSourcesClient;
@@ -5017,6 +5001,7 @@
 			isa = PBXGroup;
 			children = (
 				48CFBF572ADC10D900E77A5C /* DappInteractionClient+Interfce.swift */,
+				48CFBF5E2ADC10D900E77A5C /* DappInteractionClient+Live.swift */,
 				48CFBF582ADC10D900E77A5C /* DappInteractionClient+Test.swift */,
 			);
 			path = DappInteractionClient;
@@ -5032,19 +5017,12 @@
 			path = RadixConnectClient;
 			sourceTree = "<group>";
 		};
-		48CFBF5D2ADC10D900E77A5C /* DappInteractionClientLive */ = {
-			isa = PBXGroup;
-			children = (
-				48CFBF5E2ADC10D900E77A5C /* DappInteractionClient+Live.swift */,
-			);
-			path = DappInteractionClientLive;
-			sourceTree = "<group>";
-		};
 		48CFBF5F2ADC10D900E77A5C /* OnboardingClient */ = {
 			isa = PBXGroup;
 			children = (
 				48CFBF602ADC10D900E77A5C /* OnboardingClient+Test.swift */,
 				48CFBF612ADC10D900E77A5C /* OnboardingClient+Interface.swift */,
+				48CFC0D52ADC10D900E77A5C /* OnboardingClient+Live.swift */,
 			);
 			path = OnboardingClient;
 			sourceTree = "<group>";
@@ -5054,6 +5032,7 @@
 			children = (
 				48CFBF632ADC10D900E77A5C /* AccountsClient+Interface.swift */,
 				48CFBF642ADC10D900E77A5C /* AccountsClient+Test.swift */,
+				48CFC0DF2ADC10D900E77A5C /* AccountsClient+Live.swift */,
 			);
 			path = AccountsClient;
 			sourceTree = "<group>";
@@ -5062,6 +5041,7 @@
 			isa = PBXGroup;
 			children = (
 				48CFBF662ADC10D900E77A5C /* AuthorizedDappsClient+Test.swift */,
+				48CFBF9F2ADC10D900E77A5C /* AuthorizedDappsClient+Live.swift */,
 				48CFBF672ADC10D900E77A5C /* AuthorizedDappsClient+Interface.swift */,
 			);
 			path = AuthorizedDappsClient;
@@ -5081,17 +5061,10 @@
 			isa = PBXGroup;
 			children = (
 				48CFBF6D2ADC10D900E77A5C /* AppPreferencesClient+Interface.swift */,
+				48CFBF9B2ADC10D900E77A5C /* AppPreferencesClient+Live.swift */,
 				48CFBF6E2ADC10D900E77A5C /* AppPreferencesClient+Test.swift */,
 			);
 			path = AppPreferencesClient;
-			sourceTree = "<group>";
-		};
-		48CFBF6F2ADC10D900E77A5C /* PersonasClientLive */ = {
-			isa = PBXGroup;
-			children = (
-				48CFBF702ADC10D900E77A5C /* PersonasClient+Live.swift */,
-			);
-			path = PersonasClientLive;
 			sourceTree = "<group>";
 		};
 		48CFBF712ADC10D900E77A5C /* NetworkSwitchingClient */ = {
@@ -5102,14 +5075,6 @@
 				48CFBF742ADC10D900E77A5C /* NetworkSwitchingClient+Live.swift */,
 			);
 			path = NetworkSwitchingClient;
-			sourceTree = "<group>";
-		};
-		48CFBF752ADC10D900E77A5C /* QRGeneratorClientLive */ = {
-			isa = PBXGroup;
-			children = (
-				48CFBF762ADC10D900E77A5C /* QRGeneratorClient+Live.swift */,
-			);
-			path = QRGeneratorClientLive;
 			sourceTree = "<group>";
 		};
 		48CFBF772ADC10D900E77A5C /* CacheClient */ = {
@@ -5136,6 +5101,7 @@
 			isa = PBXGroup;
 			children = (
 				48CFBF802ADC10D900E77A5C /* P2PLinksClient+Test.swift */,
+				48CFBFA12ADC10D900E77A5C /* P2PLinksClient+Live.swift */,
 				48CFBF812ADC10D900E77A5C /* P2PLinksClient+Interface.swift */,
 			);
 			path = P2PLinksClient;
@@ -5166,6 +5132,7 @@
 			isa = PBXGroup;
 			children = (
 				48CFBF8B2ADC10D900E77A5C /* OverlayWindowClient+Test.swift */,
+				48CFBFB22ADC10D900E77A5C /* OverlayWindowClient+Live.swift */,
 				48CFBF8C2ADC10D900E77A5C /* OverlayWindowClient+Interface.swift */,
 			);
 			path = OverlayWindowClient;
@@ -5196,42 +5163,11 @@
 		48CFBF972ADC10D900E77A5C /* PersonasClient */ = {
 			isa = PBXGroup;
 			children = (
+				48CFBF702ADC10D900E77A5C /* PersonasClient+Live.swift */,
 				48CFBF982ADC10D900E77A5C /* PersonasClient+Interface.swift */,
 				48CFBF992ADC10D900E77A5C /* PersonasClient+Test.swift */,
 			);
 			path = PersonasClient;
-			sourceTree = "<group>";
-		};
-		48CFBF9A2ADC10D900E77A5C /* AppPreferencesClientLive */ = {
-			isa = PBXGroup;
-			children = (
-				48CFBF9B2ADC10D900E77A5C /* AppPreferencesClient+Live.swift */,
-			);
-			path = AppPreferencesClientLive;
-			sourceTree = "<group>";
-		};
-		48CFBF9C2ADC10D900E77A5C /* URLFormatterClientLive */ = {
-			isa = PBXGroup;
-			children = (
-				48CFBF9D2ADC10D900E77A5C /* URLFormatterClient+Live.swift */,
-			);
-			path = URLFormatterClientLive;
-			sourceTree = "<group>";
-		};
-		48CFBF9E2ADC10D900E77A5C /* AuthorizedDappsClientLive */ = {
-			isa = PBXGroup;
-			children = (
-				48CFBF9F2ADC10D900E77A5C /* AuthorizedDappsClient+Live.swift */,
-			);
-			path = AuthorizedDappsClientLive;
-			sourceTree = "<group>";
-		};
-		48CFBFA02ADC10D900E77A5C /* P2PLinksClientLive */ = {
-			isa = PBXGroup;
-			children = (
-				48CFBFA12ADC10D900E77A5C /* P2PLinksClient+Live.swift */,
-			);
-			path = P2PLinksClientLive;
 			sourceTree = "<group>";
 		};
 		48CFBFA22ADC10D900E77A5C /* DeviceFactorSourceClient */ = {
@@ -5248,6 +5184,7 @@
 			isa = PBXGroup;
 			children = (
 				48CFBFA72ADC10D900E77A5C /* GatewaysClient+Test.swift */,
+				48CFC0E12ADC10D900E77A5C /* GatewaysClient+Live.swift */,
 				48CFBFA82ADC10D900E77A5C /* GatewaysClient+Interface.swift */,
 			);
 			path = GatewaysClient;
@@ -5268,17 +5205,10 @@
 			isa = PBXGroup;
 			children = (
 				48CFBFAF2ADC10D900E77A5C /* BackupsClient+Test.swift */,
+				48CFC0C42ADC10D900E77A5C /* BackupsClient+Live.swift */,
 				48CFBFB02ADC10D900E77A5C /* BackupsClient+Interface.swift */,
 			);
 			path = BackupsClient;
-			sourceTree = "<group>";
-		};
-		48CFBFB12ADC10D900E77A5C /* OverlayWindowClientLive */ = {
-			isa = PBXGroup;
-			children = (
-				48CFBFB22ADC10D900E77A5C /* OverlayWindowClient+Live.swift */,
-			);
-			path = OverlayWindowClientLive;
 			sourceTree = "<group>";
 		};
 		48CFBFB32ADC10D900E77A5C /* ROLAClient */ = {
@@ -5295,6 +5225,7 @@
 		48CFBFB82ADC10D900E77A5C /* QRGeneratorClient */ = {
 			isa = PBXGroup;
 			children = (
+				48CFBF762ADC10D900E77A5C /* QRGeneratorClient+Live.swift */,
 				48CFBFB92ADC10D900E77A5C /* QRGeneratorClient+Interface.swift */,
 				48CFBFBA2ADC10D900E77A5C /* QRGeneratorClient+Test.swift */,
 			);
@@ -5653,19 +5584,12 @@
 			path = CreatedModels;
 			sourceTree = "<group>";
 		};
-		48CFC0C32ADC10D900E77A5C /* BackupsClientLive */ = {
-			isa = PBXGroup;
-			children = (
-				48CFC0C42ADC10D900E77A5C /* BackupsClient+Live.swift */,
-			);
-			path = BackupsClientLive;
-			sourceTree = "<group>";
-		};
 		48CFC0C52ADC10D900E77A5C /* URLFormatterClient */ = {
 			isa = PBXGroup;
 			children = (
 				48CFC0C62ADC10D900E77A5C /* URLFormatterClient+Test.swift */,
 				48CFC0C72ADC10D900E77A5C /* URLFormatterClient+Interface.swift */,
+				48CFBF9D2ADC10D900E77A5C /* URLFormatterClient+Live.swift */,
 			);
 			path = URLFormatterClient;
 			sourceTree = "<group>";
@@ -5700,14 +5624,6 @@
 			path = SubmitTransactionClient;
 			sourceTree = "<group>";
 		};
-		48CFC0D42ADC10D900E77A5C /* OnboardingClientLive */ = {
-			isa = PBXGroup;
-			children = (
-				48CFC0D52ADC10D900E77A5C /* OnboardingClient+Live.swift */,
-			);
-			path = OnboardingClientLive;
-			sourceTree = "<group>";
-		};
 		48CFC0D62ADC10D900E77A5C /* CameraPermissionClient */ = {
 			isa = PBXGroup;
 			children = (
@@ -5718,14 +5634,6 @@
 			path = CameraPermissionClient;
 			sourceTree = "<group>";
 		};
-		48CFC0DA2ADC10D900E77A5C /* FactorSourcesClientLive */ = {
-			isa = PBXGroup;
-			children = (
-				48CFC0DB2ADC10D900E77A5C /* FactorSourcesClient+Live.swift */,
-			);
-			path = FactorSourcesClientLive;
-			sourceTree = "<group>";
-		};
 		48CFC0DC2ADC10D900E77A5C /* ProfileStore */ = {
 			isa = PBXGroup;
 			children = (
@@ -5733,22 +5641,6 @@
 				48AB4E832AE19F5B001B238E /* ProfileStore+AsyncSequence+Updates.swift */,
 			);
 			path = ProfileStore;
-			sourceTree = "<group>";
-		};
-		48CFC0DE2ADC10D900E77A5C /* AccountsClientLive */ = {
-			isa = PBXGroup;
-			children = (
-				48CFC0DF2ADC10D900E77A5C /* AccountsClient+Live.swift */,
-			);
-			path = AccountsClientLive;
-			sourceTree = "<group>";
-		};
-		48CFC0E02ADC10D900E77A5C /* GatewaysClientLive */ = {
-			isa = PBXGroup;
-			children = (
-				48CFC0E12ADC10D900E77A5C /* GatewaysClient+Live.swift */,
-			);
-			path = GatewaysClientLive;
 			sourceTree = "<group>";
 		};
 		48CFC0E42ADC10D900E77A5C /* Core */ = {
@@ -6228,9 +6120,7 @@
 		48CFC1A42ADC10D900E77A5C /* Misc */ = {
 			isa = PBXGroup;
 			children = (
-				48CFC1A52ADC10D900E77A5C /* LoadProfileOutcome.swift */,
 				48CFC1A62ADC10D900E77A5C /* AppearanceID.swift */,
-				48CFC1A72ADC10D900E77A5C /* ProfileLoadingFailure.swift */,
 			);
 			path = Misc;
 			sourceTree = "<group>";
@@ -7909,7 +7799,6 @@
 				48CFC4A82ADC10DA00E77A5C /* ModelErrorResponse.swift in Sources */,
 				48CFC5112ADC10DA00E77A5C /* TransactionCommittedDetailsRequestAllOf.swift in Sources */,
 				48CFC2EE2ADC10D900E77A5C /* SelectFactorView.swift in Sources */,
-				48CFC62D2ADC10DA00E77A5C /* ProfileLoadingFailure.swift in Sources */,
 				48CFC66E2ADC10DB00E77A5C /* FactorInstance.swift in Sources */,
 				48CFC5412ADC10DA00E77A5C /* NetworkConfigurationResponse.swift in Sources */,
 				48CFC5E52ADC10DA00E77A5C /* Selection+Extra.swift in Sources */,
@@ -8394,7 +8283,6 @@
 				48CFC5552ADC10DA00E77A5C /* MetadataU64ArrayValue.swift in Sources */,
 				48CFC3CD2ADC10D900E77A5C /* WordList+Italian.swift in Sources */,
 				48CFC5242ADC10DA00E77A5C /* MetadataI32Value.swift in Sources */,
-				48CFC62B2ADC10DA00E77A5C /* LoadProfileOutcome.swift in Sources */,
 				48CFC2522ADC10D900E77A5C /* AddNewGateway+Reducer.swift in Sources */,
 				48CFC3FA2ADC10D900E77A5C /* SignalingClient.swift in Sources */,
 				48CFC6632ADC10DB00E77A5C /* FactorSourceProtocol.swift in Sources */,

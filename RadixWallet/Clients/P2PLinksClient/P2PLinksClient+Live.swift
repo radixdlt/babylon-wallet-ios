@@ -3,7 +3,7 @@ extension P2PLinksClient: DependencyKey {
 	public typealias Value = P2PLinksClient
 
 	public static func live(
-		profileStore getProfileStore: @escaping @Sendable () async -> ProfileStore = { await .shared }
+		profileStore: ProfileStore = .shared
 	) -> Self {
 		@Dependency(\.appPreferencesClient) var appPreferencesClient
 

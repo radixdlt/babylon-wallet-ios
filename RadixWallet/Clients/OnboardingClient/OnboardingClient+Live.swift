@@ -9,11 +9,10 @@ extension OnboardingClient: DependencyKey {
 	) -> Self {
 		Self(
 			loadProfile: {
-//				await getProfileStore().getLoadProfileOutcome()
-				fatalError()
+				await profileStore.profile
 			},
-			commitEphemeral: {
-//				try await getProfileStore().commitEphemeral()
+			finishedOnboarding: {
+//				try await profileStore.commitEphemeral()
 //				return EqVoid.instance
 				fatalError()
 			}

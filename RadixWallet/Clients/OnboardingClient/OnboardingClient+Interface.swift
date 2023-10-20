@@ -2,21 +2,19 @@
 public struct OnboardingClient: Sendable {
 	public var loadProfile: LoadProfile
 
-	/// Returns `true` iff Profile contains any mainnet accounts
-	public var commitEphemeral: CommitEphemeral
+	public var finishedOnboarding: FinishedOnboarding
 
 	public init(
 		loadProfile: @escaping LoadProfile,
-		commitEphemeral: @escaping CommitEphemeral
+		finishedOnboarding: @escaping FinishedOnboarding
 	) {
 		self.loadProfile = loadProfile
-		self.commitEphemeral = commitEphemeral
+		self.finishedOnboarding = finishedOnboarding
 	}
 }
 
 extension OnboardingClient {
-	public typealias LoadProfile = @Sendable () async -> LoadProfileOutcome
+	public typealias LoadProfile = @Sendable () async -> Profile
 
-	/// Returns `true` iff Profile contains any mainnet accounts
-	public typealias CommitEphemeral = @Sendable () async throws -> EqVoid
+	public typealias FinishedOnboarding = @Sendable () async throws -> EqVoid
 }

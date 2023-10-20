@@ -4,10 +4,10 @@ extension AccountsClient: DependencyKey {
 	public typealias Value = AccountsClient
 
 	public static func live(
-		profileStore getProfileStore: @escaping @Sendable () async -> ProfileStore = { await .shared }
+		profileStore: ProfileStore = .shared
 	) -> Self {
 		let saveVirtualAccounts: SaveVirtualAccounts = { accounts in
-			try await getProfileStore().updating {
+			try await profileStore.updating {
 				for account in accounts {
 					try $0.addAccount(account)
 				}
@@ -15,12 +15,12 @@ extension AccountsClient: DependencyKey {
 		}
 
 		let getAccountsOnCurrentNetwork: GetAccountsOnCurrentNetwork = {
-			try await getProfileStore().network().accounts
+			try await profileStore.network().accounts
 		}
 
-		let getCurrentNetworkID: GetCurrentNetworkID = { await getProfileStore().profile.networkID }
+		let getCurrentNetworkID: GetCurrentNetworkID = { await profileStore.profile.networkID }
 
-		let getAccountsOnNetwork: GetAccountsOnNetwork = { try await getProfileStore().profile.network(id: $0).accounts }
+		let getAccountsOnNetwork: GetAccountsOnNetwork = { try await profileStore.profile.network(id: $0).accounts }
 
 		let nextAccountIndex: NextAccountIndex = { maybeNetworkID in
 			let currentNetworkID = await getCurrentNetworkID()
@@ -33,9 +33,9 @@ extension AccountsClient: DependencyKey {
 			getCurrentNetworkID: getCurrentNetworkID,
 			nextAccountIndex: nextAccountIndex,
 			getAccountsOnCurrentNetwork: getAccountsOnCurrentNetwork,
-			accountsOnCurrentNetwork: { await getProfileStore().accountValues() },
+			accountsOnCurrentNetwork: { await profileStore.accountValues() },
 			accountUpdates: { address in
-				await getProfileStore().accountValues().compactMap {
+				await profileStore.accountValues().compactMap {
 					$0.first { $0.address == address }
 				}
 				.eraseToAnyAsyncSequence()
@@ -54,11 +54,11 @@ extension AccountsClient: DependencyKey {
 			},
 			saveVirtualAccounts: saveVirtualAccounts,
 			getAccountByAddress: { address in
-				try await getProfileStore().network().entity(address: address)
+				try await profileStore.network().entity(address: address)
 			},
 			hasAccountOnNetwork: { networkID in
 				do {
-					let network = try await getProfileStore().profile.network(id: networkID)
+					let network = try await profileStore.profile.network(id: networkID)
 					// N.B. `accounts` is NonEmpty so `isEmpty` should always evaluate to `false`.
 					return !network.accounts.isEmpty
 				} catch {
@@ -66,7 +66,7 @@ extension AccountsClient: DependencyKey {
 				}
 			},
 			updateAccount: { updatedAccount in
-				try await getProfileStore().updating {
+				try await profileStore.updating {
 					try $0.updateAccount(updatedAccount)
 				}
 			}

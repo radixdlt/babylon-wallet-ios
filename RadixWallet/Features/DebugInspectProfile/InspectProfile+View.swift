@@ -584,7 +584,7 @@ extension ProfileNetworkView {
 			Labeled("ID", value: String(describing: network.networkID))
 
 			AccountsView(
-				entities: network.accounts.rawValue.elements,
+				entities: network.accounts.elements,
 				indentation: inOneLevel
 			)
 

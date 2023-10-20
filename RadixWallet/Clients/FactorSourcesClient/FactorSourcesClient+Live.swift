@@ -3,16 +3,16 @@ extension FactorSourcesClient: DependencyKey {
 	public typealias Value = FactorSourcesClient
 
 	public static func live(
-		profileStore getProfileStore: @escaping @Sendable () async -> ProfileStore = { await .shared }
+		profileStore: ProfileStore = .shared
 	) -> Self {
 		@Dependency(\.secureStorageClient) var secureStorageClient
 
 		let getFactorSources: GetFactorSources = {
-			await getProfileStore().profile.factorSources
+			await profileStore.profile.factorSources
 		}
 
 		let saveFactorSource: SaveFactorSource = { source in
-			try await getProfileStore().updating { profile in
+			try await profileStore.updating { profile in
 				guard !profile.factorSources.contains(where: { $0.id == source.id }) else {
 					throw FactorSourceAlreadyPresent()
 				}
@@ -21,7 +21,7 @@ extension FactorSourcesClient: DependencyKey {
 		}
 
 		let updateFactorSource: UpdateFactorSource = { source in
-			try await getProfileStore().updating { profile in
+			try await profileStore.updating { profile in
 				try profile.factorSources.updateFactorSource(id: source.id) {
 					$0 = source
 				}
@@ -29,17 +29,17 @@ extension FactorSourcesClient: DependencyKey {
 		}
 
 		return Self(
-			getCurrentNetworkID: { await getProfileStore().profile.networkID },
+			getCurrentNetworkID: { await profileStore.profile.networkID },
 			getFactorSources: getFactorSources,
 			factorSourcesAsyncSequence: {
-				await getProfileStore().factorSourcesValues()
+				await profileStore.factorSourcesValues()
 			},
 			addPrivateHDFactorSource: { request in
 				let factorSource = request.factorSource
 
 				switch factorSource {
 				case let .device(deviceFactorSource):
-					try await secureStorageClient.saveMnemonicForFactorSource(.init(mnemonicWithPassphrase: request.mnemonicWithPasshprase, factorSource: deviceFactorSource))
+					try secureStorageClient.saveMnemonicForFactorSource(.init(mnemonicWithPassphrase: request.mnemonicWithPasshprase, factorSource: deviceFactorSource))
 				default: break
 				}
 				let factorSourceID = factorSource.id
@@ -54,7 +54,7 @@ extension FactorSourcesClient: DependencyKey {
 						if let idForMnemonicToDelete = try? factorSourceID.extract(as: FactorSourceID.FromHash.self) {
 							// We were unlucky, failed to update Profile, thus best to undo the saving of
 							// the mnemonic in keychain (if we can).
-							try? await secureStorageClient.deleteMnemonicByFactorSourceID(idForMnemonicToDelete)
+							try? secureStorageClient.deleteMnemonicByFactorSourceID(idForMnemonicToDelete)
 						}
 						throw error
 					}
@@ -85,7 +85,7 @@ extension FactorSourcesClient: DependencyKey {
 					let factorSourceIDs = olympiaDeviceFactorSources.map(\.id)
 
 					for factorSourceID in factorSourceIDs {
-						guard let mnemonic = try await secureStorageClient.loadMnemonicByFactorSourceID(factorSourceID, .importOlympiaAccounts) else {
+						guard let mnemonic = try secureStorageClient.loadMnemonicByFactorSourceID(factorSourceID, .importOlympiaAccounts) else {
 							continue
 						}
 						guard (try? mnemonic.validatePublicKeys(of: softwareAccounts)) == true else {
@@ -114,7 +114,7 @@ extension FactorSourcesClient: DependencyKey {
 			},
 			updateLastUsed: { request in
 
-				_ = try await getProfileStore().updating { profile in
+				_ = try await profileStore.updating { profile in
 					var factorSources = profile.factorSources.rawValue
 					for id in request.factorSourceIDs {
 						guard var factorSource = factorSources[id: id] else {

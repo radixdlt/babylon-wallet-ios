@@ -27,6 +27,13 @@ extension Profile {
 			.map { !$0 } // NOT isEmpty <=> has persona on network
 			.reduce(into: false) { $0 = $0 || $1 }
 	}
+
+	public func hasAnyAccountOnAnyNetwork() -> Bool {
+		networks.values
+			.map(\.accounts.isEmpty)
+			.map { !$0 } // NOT isEmpty <=> has account on network
+			.reduce(into: false) { $0 = $0 || $1 }
+	}
 }
 
 // MARK: - Discrepancy

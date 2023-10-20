@@ -15,8 +15,10 @@ extension Profile {
 		/// have been added and dApps connected.
 		public let networkID: NetworkID
 
-		public typealias Accounts = NonEmpty<IdentifiedArrayOf<Account>>
-		/// A **Non-empty** identifiable ordered set of `Account`s created by the user for this network.
+		public typealias Accounts = IdentifiedArrayOf<Account>
+
+		/// An identifiable ordered set of `Account`s created by the user for this network,
+		/// can be empty
 		public var accounts: Accounts
 
 		public typealias Personas = IdentifiedArrayOf<Persona>

@@ -133,6 +133,10 @@ extension ProfileStore {
 	public func deleteProfile(keepInICloudIfPresent: Bool) throws {
 		fatalError()
 	}
+
+	public func finishedOnboarding() {
+		fatalError()
+	}
 }
 
 // MARK: - ProfileStore.Error
@@ -413,7 +417,7 @@ extension ProfileStore {
 			}
 			return MetaDeviceInfo(deviceInfo: new, fromDeprecatedDeviceID: fromDeprecatedDeviceID)
 		} catch {
-			loggerGlobal.error("Failed to get and save new device info: \(error)")
+			loggerGlobal.error("Failed to save new device info: \(error)")
 			return MetaDeviceInfo(deviceInfo: new, fromDeprecatedDeviceID: fromDeprecatedDeviceID)
 		}
 	}

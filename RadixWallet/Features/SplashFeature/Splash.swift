@@ -29,12 +29,12 @@ public struct Splash: Sendable, FeatureReducer {
 
 	public enum InternalAction: Sendable, Equatable {
 		case passcodeConfigResult(TaskResult<LocalAuthenticationConfig>)
-		case loadProfileOutcome(LoadProfileOutcome)
-		case accountRecoveryNeeded(LoadProfileOutcome, TaskResult<Bool>)
+		case loadProfile(Profile)
+		case accountRecoveryNeeded(Profile, TaskResult<Bool>)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
-		case completed(LoadProfileOutcome, accountRecoveryNeeded: Bool)
+		case completed(Profile, accountRecoveryNeeded: Bool)
 	}
 
 	@Dependency(\.networkSwitchingClient) var networkSwitchingClient
@@ -103,38 +103,38 @@ public struct Splash: Sendable, FeatureReducer {
 			}
 
 			return .run { send in
-				await send(.internal(.loadProfileOutcome(loadProfile())))
+				await send(.internal(.loadProfile(loadProfile())))
 			}
 
-		case let .loadProfileOutcome(outcome):
-			if case .existingProfile = outcome {
-				return checkAccountRecoveryNeeded(outcome)
+		case let .loadProfile(profile):
+			if profile.hasAnyPersonaOnAnyNetwork() || profile.hasAnyAccountOnAnyNetwork() {
+				return checkAccountRecoveryNeeded(profile)
 			}
-			return delegateCompleted(loadProfileOutcome: outcome, accountRecoveryNeeded: false)
+			return delegateCompleted(profile: profile, accountRecoveryNeeded: false)
 
 		case let .accountRecoveryNeeded(_, .failure(error)):
 			state.biometricsCheckFailed = true
 			errorQueue.schedule(error)
 			return .none
 
-		case let .accountRecoveryNeeded(outcome, .success(recoveryNeeded)):
-			return delegateCompleted(loadProfileOutcome: outcome, accountRecoveryNeeded: recoveryNeeded)
+		case let .accountRecoveryNeeded(profile, .success(recoveryNeeded)):
+			return delegateCompleted(profile: profile, accountRecoveryNeeded: recoveryNeeded)
 		}
 	}
 
-	func delegateCompleted(loadProfileOutcome: LoadProfileOutcome, accountRecoveryNeeded: Bool) -> Effect<Action> {
+	func delegateCompleted(profile: Profile, accountRecoveryNeeded: Bool) -> Effect<Action> {
 		.send(.delegate(
 			.completed(
-				loadProfileOutcome,
+				profile,
 				accountRecoveryNeeded: accountRecoveryNeeded
 			))
 		)
 	}
 
-	func checkAccountRecoveryNeeded(_ loadProfileOutcome: LoadProfileOutcome) -> Effect<Action> {
+	func checkAccountRecoveryNeeded(_ profile: Profile) -> Effect<Action> {
 		.run { send in
 			await send(.internal(.accountRecoveryNeeded(
-				loadProfileOutcome,
+				profile,
 				.init {
 					try await deviceFactorSourceClient.isAccountRecoveryNeeded()
 				}

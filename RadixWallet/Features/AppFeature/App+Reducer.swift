@@ -88,29 +88,20 @@ public struct App: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .task:
-			.run { send in
-				for try await error in errorQueue.errors() {
-					guard !Task.isCancelled else { return }
-					// Maybe instead we should listen here for the Profile.State change,
-					// and when it switches to `.ephemeral` we navigate to onboarding.
-					// For now, we react to the specific error, since the Profile.State is meant to be private.
-					if error is Profile.ProfileIsUsedOnAnotherDeviceError {
-						await send(.internal(.toOnboarding))
-						// A slight delay to allow any modal that may be shown to be dismissed.
-						try? await clock.sleep(for: .seconds(0.5))
-					}
-				}
-			}
+			// FIXME: - ProfileStore revamp: listen to ProfileStore.conflict async seq
+			.none
 
 		case .alert(.presented(.incompatibleProfileErrorAlert(.deleteWalletDataButtonTapped))):
-			.run { send in
-				do {
-					try await appPreferencesClient.deleteProfileAndFactorSources(true)
-				} catch {
-					errorQueue.schedule(error)
-				}
-				await send(.internal(.incompatibleProfileDeleted))
-			}
+//			.run { send in
+//				do {
+//					try await appPreferencesClient.deleteProfileAndFactorSources(true)
+//				} catch {
+//					errorQueue.schedule(error)
+//				}
+//				await send(.internal(.incompatibleProfileDeleted))
+//			}
+			// FIXME: - ProfileStore revamp: do we need to handle incompatible?
+			.none
 		case .alert:
 			.none
 		}
@@ -132,11 +123,12 @@ public struct App: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case .main(.delegate(.removedWallet)):
-			return goToOnboarding(state: &state)
+			goToOnboarding(state: &state)
 
 		case .onboardingCoordinator(.delegate(.completed)):
-			return goToMain(state: &state, accountRecoveryIsNeeded: false)
+			goToMain(state: &state, accountRecoveryIsNeeded: false)
 
+			/*
 		case let .splash(.delegate(.completed(loadProfileOutcome, accountRecoveryNeeded))):
 
 			switch loadProfileOutcome {
@@ -160,9 +152,10 @@ public struct App: Sendable, FeatureReducer {
 				errorQueue.schedule(error)
 				return goToOnboarding(state: &state)
 			}
+			 */
 
 		default:
-			return .none
+			.none
 		}
 	}
 

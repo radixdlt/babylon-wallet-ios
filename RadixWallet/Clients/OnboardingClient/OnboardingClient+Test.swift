@@ -11,11 +11,11 @@ extension OnboardingClient: TestDependencyKey {
 	public static let previewValue: Self = .noop
 	public static let testValue = Self(
 		loadProfile: unimplemented("\(Self.self).loadProfile"),
-		commitEphemeral: unimplemented("\(Self.self).commitEphemeral")
+		finishedOnboarding: unimplemented("\(Self.self).finishedOnboarding")
 	)
 
 	public static let noop = Self(
-		loadProfile: { .newUser },
-		commitEphemeral: { EqVoid.instance }
+		loadProfile: { fatalError("noop") },
+		finishedOnboarding: { EqVoid.instance }
 	)
 }

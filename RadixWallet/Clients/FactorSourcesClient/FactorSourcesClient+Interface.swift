@@ -232,7 +232,7 @@ extension MnemonicWithPassphrase {
 
 	@discardableResult
 	public func validatePublicKeys(
-		of accounts: [Profile.Network.Account]
+		of accounts: some Collection<Profile.Network.Account>
 	) throws -> Bool {
 		try validatePublicKeys(
 			of: accounts.flatMap { account in
