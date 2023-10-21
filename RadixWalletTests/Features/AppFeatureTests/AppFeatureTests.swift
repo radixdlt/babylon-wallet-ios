@@ -214,7 +214,33 @@ extension Profile {
 
 extension ProfileSnapshot.Header {
 	static let testValue: Self = testValue()
-	static func testValue(profileID: UUID? = nil) -> Self {
-		fatalError()
+	static func testValue(
+		profileID: UUID? = nil,
+		deviceID: UUID? = nil,
+		date: Date? = nil
+	) -> Self {
+		let device: DeviceInfo = .testValue(deviceID: deviceID, date: date)
+		return Self(
+			creatingDevice: device,
+			lastUsedOnDevice: device,
+			id: profileID ?? 0xDEAD,
+			lastModified: device.date,
+			contentHint: .init(),
+			snapshotVersion: .minimum
+		)
+	}
+}
+
+extension DeviceInfo {
+	static let testValue: Self = testValue()
+	static func testValue(
+		deviceID: UUID? = nil,
+		date: Date? = nil
+	) -> Self {
+		Self(
+			description: "testValue",
+			id: deviceID ?? 0xABBA,
+			date: date ?? Date(timeIntervalSince1970: 0)
+		)
 	}
 }
