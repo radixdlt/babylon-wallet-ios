@@ -41,8 +41,10 @@ final class AppFeatureTests: TestCase {
 			}
 		}
 
+		let profile = withTestClients { Profile.testValue }
+
 		// THEN: navigate to main
-		await store.send(.child(.splash(.delegate(.completed(Profile.testValue, accountRecoveryNeeded: accountRecoveryNeeded))))) {
+		await store.send(.child(.splash(.delegate(.completed(profile, accountRecoveryNeeded: accountRecoveryNeeded))))) {
 			$0.root = .main(.init(home: .init(babylonAccountRecoveryIsNeeded: accountRecoveryNeeded)))
 		}
 
@@ -195,21 +197,86 @@ final class AppFeatureTests: TestCase {
 
 extension Profile {
 	static let testValue: Self = testValue()
-	static func testValue(nameOfFirstAccount: String? = nil) -> Self {
-		let mnemonic = try! Mnemonic(phrase: "zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo wrong", language: .english)
+	static func testValue(
+		nameOfFirstAccount: String? = "Main"
+	) -> Self {
+		let mnemonic = try! Mnemonic(
+			phrase: "zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo wrong",
+			language: .english
+		)
+
 		let passphrase = ""
-		let mnemonicWithPassphrase = MnemonicWithPassphrase(mnemonic: mnemonic, passphrase: passphrase)
+		let mnemonicWithPassphrase = MnemonicWithPassphrase(
+			mnemonic: mnemonic,
+			passphrase: passphrase
+		)
 		let factorSource = try! DeviceFactorSource.babylon(
 			mnemonicWithPassphrase: mnemonicWithPassphrase
 		)
+		let networkID = NetworkID.mainnet
+		var accounts: IdentifiedArrayOf<Profile.Network.Account> = []
+		if let nameOfFirstAccount {
+			let hdRoot = try! mnemonicWithPassphrase.hdRoot()
+			let derivationPath = DerivationPath(
+				scheme: .cap26,
+				path: "m/44H/1022H/10H/525H/1460H/0H"
+			)
+			let publicKey = try! hdRoot.derivePublicKey(
+				path: derivationPath,
+				curve: .curve25519
+			)
+			let hdFactorInstance = HierarchicalDeterministicFactorInstance(
+				id: factorSource.id,
+				publicKey: publicKey,
+				derivationPath: derivationPath
+			)
 
-		return .init(
+			try! accounts.append(
+				Profile.Network.Account(
+					networkID: networkID,
+					address: Profile.Network.Account.deriveVirtualAddress(
+						networkID: networkID,
+						factorInstance: hdFactorInstance
+					),
+					securityState: .unsecured(
+						.init(
+							entityIndex: 0,
+							transactionSigning: hdFactorInstance
+						)
+					),
+					displayName: .init(
+						rawValue: nameOfFirstAccount
+					)!,
+					extraProperties: .init(
+						appearanceID: ._0
+					)
+				)
+			)
+		}
+
+		let network = Profile.Network(
+			networkID: networkID,
+			accounts: accounts,
+			personas: [],
+			authorizedDapps: []
+		)
+
+		return Profile(
 			header: .testValue,
 			factorSources: NonEmpty(rawValue: [
 				factorSource.embed(),
-			])!
+			])!,
+			networks: [networkID: network]
 		)
 	}
+}
+
+func withTestClients<R>(
+	operation: @escaping () -> R
+) -> R {
+	withDependencies({
+		$0.date = .constant(Date(timeIntervalSince1970: 0))
+	}, operation: { operation() })
 }
 
 extension ProfileSnapshot.Header {
