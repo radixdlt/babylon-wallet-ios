@@ -2,24 +2,35 @@ import DependenciesAdditions
 @testable import Radix_Wallet_Dev
 import XCTest
 
+extension DependencyValues {
+	mutating func savedProfile(_ savedProfile: Profile) {
+		secureStorageClient.loadProfile = { _ in
+			savedProfile // GIVEN
+		}
+		userDefaultsClient.stringForKey = {
+			if $0 == .activeProfileID {
+				savedProfile.header.id.uuidString // GIVEN
+			} else { String?.none }
+		}
+	}
+}
+
 // MARK: - ProfileStoreTests
 final class ProfileStoreTests: TestCase {
-	func test__GIVEN__wallet_exists__WHEN__init__THEN__saved_profile_is_used() async throws {
+	func test__GIVEN__saved_profile__WHEN__init__THEN__saved_profile_is_used() async throws {
 		try await withTimeLimit {
-			let savedProfile = Profile.withOneAccount
-			let usedProfile: Profile = try await withTestClients {
-				$0.secureStorageClient.loadProfile = { _ in
-					savedProfile
-				}
-				$0.userDefaultsClient.stringForKey = {
-					if $0 == .activeProfileID {
-						savedProfile.header.id.uuidString
-					} else { String?.none }
-				}
+			// GIVEN saved profile
+			let saved = Profile.withOneAccount
+
+			let used = await withTestClients {
+				$0.savedProfile(saved)
 			} operation: {
-				await ProfileStore.shared.profile
+				// WHEN ProfileStore.init()
+				await ProfileStore().profile
 			}
-			XCTAssertNoDifference(savedProfile, usedProfile)
+
+			// THEN saved profile is used.
+			XCTAssertNoDifference(saved, used)
 		}
 	}
 

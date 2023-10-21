@@ -63,6 +63,7 @@ public enum TimeLimit: Sendable, Hashable {
 /// This function is not part of the public interface of the testing library.
 func withTimeLimit(
 	_ timeLimit: TimeLimit = .fast,
+	failOnTimeout: Bool = true,
 	_ body: @escaping @Sendable () async throws -> Void,
 	timeoutHandler: (@Sendable () -> Void)? = nil,
 	function: StaticString = #function, file: StaticString = #file, line: UInt = #line
@@ -74,7 +75,9 @@ func withTimeLimit(
 			// the timeout handler.
 			try await ContinuousClock().sleep(for: timeLimit.duration)
 			timeoutHandler?()
-			XCTFail("Test '\(function)' timed out after \(timeLimit.duration).", file: file, line: line)
+			if failOnTimeout {
+				XCTFail("Test '\(function)' timed out after \(timeLimit.duration). Specify `withTimeLimit(failOnTimeout: false)` if you want lenient testing, or increase the timeout.", file: file, line: line)
+			}
 		}
 		group.addTask(operation: body)
 
