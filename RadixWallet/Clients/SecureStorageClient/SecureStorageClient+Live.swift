@@ -248,7 +248,9 @@ extension SecureStorageClient: DependencyKey {
 					forKey: key,
 					authenticationPrompt: authenticationPrompt
 				) else {
-					_ = await overlayWindowClient.scheduleAlert(.missingMnemonicAlert)
+					Task {
+						_ = await overlayWindowClient.scheduleAlert(.missingMnemonicAlert)
+					}
 					return nil
 				}
 				return try jsonDecoder().decode(MnemonicWithPassphrase.self, from: data)
