@@ -182,7 +182,16 @@ private func configureTestClients(
 ) {
 	d.uuid = .incrementing
 	d.date = .constant(Date(timeIntervalSince1970: 0))
+	d.mnemonicClient.generate = { _, _ in .testValue }
 	d.secureStorageClient.loadDeviceInfo = { .testValue }
+	d.secureStorageClient.loadProfileHeaderList = { nil }
+	d.secureStorageClient.saveProfileHeaderList = { _ in }
+	d.secureStorageClient.saveMnemonicForFactorSource = { _ in }
+	d.secureStorageClient.saveProfileSnapshot = { _ in }
+	d.secureStorageClient.loadProfileSnapshotData = { _ in nil }
+	d.date = .constant(Date(timeIntervalSince1970: 0))
+	d.userDefaultsClient.stringForKey = { _ in nil }
+	d.userDefaultsClient.setString = { _, _ in }
 }
 
 extension ProfileSnapshot.Header {

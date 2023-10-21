@@ -3,15 +3,23 @@ import DependenciesAdditions
 import XCTest
 
 extension DependencyValues {
-	mutating func savedProfile(_ savedProfile: Profile) {
+	private mutating func _profile(_ profile: Profile?) {
 		secureStorageClient.loadProfile = { _ in
-			savedProfile // GIVEN
+			profile
 		}
 		userDefaultsClient.stringForKey = {
 			if $0 == .activeProfileID {
-				savedProfile.header.id.uuidString // GIVEN
+				profile?.header.id.uuidString
 			} else { String?.none }
 		}
+	}
+
+	mutating func savedProfile(_ savedProfile: Profile) {
+		_profile(savedProfile)
+	}
+
+	mutating func noProfile() {
+		_profile(nil)
 	}
 }
 
@@ -31,6 +39,18 @@ final class ProfileStoreTests: TestCase {
 
 			// THEN saved profile is used.
 			XCTAssertNoDifference(saved, used)
+		}
+	}
+
+	func test__GIVEN__no_profile__WHEN__init__THEN__new_profile_without_network_is_used() async throws {
+		try await withTimeLimit(.normal) {
+			let newProfile = await withTestClients {
+				$0.noProfile()
+			} operation: {
+				await ProfileStore().profile
+			}
+
+			XCTAssertNoDifference(newProfile.networks.count, 0)
 		}
 	}
 
