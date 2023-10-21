@@ -1,7 +1,7 @@
 import Foundation
 import KeychainAccess
+@testable import Radix_Wallet_Dev
 import XCTest
-@_spi(KeychainInternal) @testable import Radix_Wallet_Dev
 
 let authRandomKey: KeychainHolder.Key = "authRandomDataKey"
 let noAuthRandomKey: KeychainHolder.Key = "noAuthRandomDataKey"

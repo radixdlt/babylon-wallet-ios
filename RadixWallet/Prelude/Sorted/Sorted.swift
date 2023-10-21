@@ -18,7 +18,6 @@ public struct Sorted<S: Sequence, Value: Comparable> {
 	private let keyPath: KeyPath<S.Element, Value>
 	private let fromArray: @Sendable ([S.Element]) -> S
 
-	@_spi(Sorted)
 	public init(
 		wrappedValue: S,
 		by keyPath: KeyPath<S.Element, Value>,

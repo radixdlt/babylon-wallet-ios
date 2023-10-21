@@ -1228,7 +1228,7 @@
 		E6DBA36A2ADEBFB300A38425 /* PersonaDataEntryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6DBA2DB2ADEBFB300A38425 /* PersonaDataEntryTests.swift */; };
 		E6DBA36B2ADEBFB300A38425 /* SnapshotJSONTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6DBA2DD2ADEBFB300A38425 /* SnapshotJSONTests.swift */; };
 		E6DBA36C2ADEBFB300A38425 /* SnapshotHeaderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6DBA2DE2ADEBFB300A38425 /* SnapshotHeaderTests.swift */; };
-		E6DBA36D2ADEBFB300A38425 /* KeychainActorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6DBA2DF2ADEBFB300A38425 /* KeychainActorTests.swift */; };
+		E6DBA36D2ADEBFB300A38425 /* KeychainHolderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6DBA2DF2ADEBFB300A38425 /* KeychainHolderTests.swift */; };
 		E6DBA36F2ADEBFB300A38425 /* OnLedgerEntitiesClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6DBA2E42ADEBFB300A38425 /* OnLedgerEntitiesClientTests.swift */; };
 		E6DBA3702ADEBFB300A38425 /* behaviors1.json in Resources */ = {isa = PBXBuildFile; fileRef = E6DBA2E62ADEBFB300A38425 /* behaviors1.json */; };
 		E6DBA3712ADEBFB300A38425 /* behaviors2.json in Resources */ = {isa = PBXBuildFile; fileRef = E6DBA2E72ADEBFB300A38425 /* behaviors2.json */; };
@@ -2453,7 +2453,7 @@
 		E6DBA2DB2ADEBFB300A38425 /* PersonaDataEntryTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PersonaDataEntryTests.swift; sourceTree = "<group>"; };
 		E6DBA2DD2ADEBFB300A38425 /* SnapshotJSONTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SnapshotJSONTests.swift; sourceTree = "<group>"; };
 		E6DBA2DE2ADEBFB300A38425 /* SnapshotHeaderTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SnapshotHeaderTests.swift; sourceTree = "<group>"; };
-		E6DBA2DF2ADEBFB300A38425 /* KeychainActorTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KeychainActorTests.swift; sourceTree = "<group>"; };
+		E6DBA2DF2ADEBFB300A38425 /* KeychainHolderTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KeychainHolderTests.swift; sourceTree = "<group>"; };
 		E6DBA2E42ADEBFB300A38425 /* OnLedgerEntitiesClientTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OnLedgerEntitiesClientTests.swift; sourceTree = "<group>"; };
 		E6DBA2E62ADEBFB300A38425 /* behaviors1.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = behaviors1.json; sourceTree = "<group>"; };
 		E6DBA2E72ADEBFB300A38425 /* behaviors2.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = behaviors2.json; sourceTree = "<group>"; };
@@ -2542,7 +2542,6 @@
 				E6DBA2A82ADEBFB300A38425 /* CryptographyTests */,
 				E6DBA2692ADEBFB200A38425 /* EngineKitTests */,
 				E6DBA2732ADEBFB200A38425 /* Features */,
-				E6DBA2DF2ADEBFB300A38425 /* KeychainActorTests.swift */,
 				E6DBA2992ADEBFB300A38425 /* PreludeTests */,
 				E6DBA2CD2ADEBFB300A38425 /* ProfileTests */,
 				E6DBA2572ADEBFB200A38425 /* RadixConnect */,
@@ -4808,20 +4807,17 @@
 			isa = PBXGroup;
 			children = (
 				48CFBF0B2ADC10D900E77A5C /* Constants.swift */,
-				48CFBF0C2ADC10D900E77A5C /* KeychainClient */,
 				48CFBF112ADC10D900E77A5C /* NoopError.swift */,
 				48CFBF122ADC10D900E77A5C /* JSONValue.swift */,
 				48CFBF132ADC10D900E77A5C /* HexCodable32Bytes.swift */,
 				48CFBF142ADC10D900E77A5C /* UInt11.swift */,
 				48CFBF152ADC10D900E77A5C /* FiatCurrency.swift */,
 				48CFBF162ADC10D900E77A5C /* EmailAddress.swift */,
-				48CFBF172ADC10D900E77A5C /* UserDefaultsClient */,
 				48CFBF1B2ADC10D900E77A5C /* InsecureRandomNumberGeneratorWithSeed.swift */,
 				48CFBF1C2ADC10D900E77A5C /* Logger.swift */,
 				48CFBF1D2ADC10D900E77A5C /* Functions.swift */,
 				48CFBF1E2ADC10D900E77A5C /* ErrorQueue */,
 				48CFBF222ADC10D900E77A5C /* HexCodable.swift */,
-				48CFBF232ADC10D900E77A5C /* PasteboardClient */,
 				48CFBF272ADC10D900E77A5C /* Extensions */,
 				48CFBF482ADC10D900E77A5C /* JSON */,
 				48CFBF4C2ADC10D900E77A5C /* Sorted */,
@@ -4985,6 +4981,9 @@
 				48CFC0C82ADC10D900E77A5C /* SecureStorageClient */,
 				48CFC0D02ADC10D900E77A5C /* SubmitTransactionClient */,
 				48CFBF822ADC10D900E77A5C /* TransactionClient */,
+				48CFBF0C2ADC10D900E77A5C /* KeychainClient */,
+				48CFBF172ADC10D900E77A5C /* UserDefaultsClient */,
+				48CFBF232ADC10D900E77A5C /* PasteboardClient */,
 				48CFC0C52ADC10D900E77A5C /* URLFormatterClient */,
 			);
 			path = Clients;
@@ -6599,6 +6598,14 @@
 			path = Project;
 			sourceTree = "<group>";
 		};
+		48FF43132AE4364000C568B9 /* KeychainClientTests */ = {
+			isa = PBXGroup;
+			children = (
+				E6DBA2DF2ADEBFB300A38425 /* KeychainHolderTests.swift */,
+			);
+			path = KeychainClientTests;
+			sourceTree = "<group>";
+		};
 		E63D123B2ADD1FC00001CBB1 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -7034,6 +7041,7 @@
 		E6DBA2E02ADEBFB300A38425 /* Clients */ = {
 			isa = PBXGroup;
 			children = (
+				48FF43132AE4364000C568B9 /* KeychainClientTests */,
 				E6DBA2E32ADEBFB300A38425 /* OnLedgerEntitiesClientTests */,
 				E6DBA2EA2ADEBFB300A38425 /* ROLAClientTests */,
 				E6DBA2EF2ADEBFB300A38425 /* ImportLegacyWalletClientTests */,
@@ -7481,7 +7489,7 @@
 				E6DBA3492ADEBFB300A38425 /* BlakeTests.swift in Sources */,
 				E6DBA3332ADEBFB300A38425 /* TransactionSigningFeatureTests.swift in Sources */,
 				E6DBA3632ADEBFB300A38425 /* ProfileTestUtils.swift in Sources */,
-				E6DBA36D2ADEBFB300A38425 /* KeychainActorTests.swift in Sources */,
+				E6DBA36D2ADEBFB300A38425 /* KeychainHolderTests.swift in Sources */,
 				E6DBA3872ADEBFB300A38425 /* LedgerModelTests.swift in Sources */,
 				E6DBA3312ADEBFB300A38425 /* AccountDetailsFeatureTests.swift in Sources */,
 				E6DBA32E2ADEBFB300A38425 /* SettingsViewStateTests.swift in Sources */,
