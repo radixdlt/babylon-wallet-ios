@@ -120,7 +120,10 @@ extension ProfileStore {
 		}
 		let model = await device.model
 		let name = await device.name
-		let deviceDescription = "\(model) (\(name))"
+		let deviceDescription = DeviceInfo.deviceDescription(
+			name: name,
+			model: model
+		)
 		deviceInfo.description = deviceDescription
 		let lastUsedOnDevice = deviceInfo
 		try? secureStorageClient.saveDeviceInfo(lastUsedOnDevice)
@@ -128,6 +131,15 @@ extension ProfileStore {
 			$0.header.lastUsedOnDevice = lastUsedOnDevice
 			$0.header.creatingDevice.description = deviceDescription
 		}
+	}
+}
+
+extension DeviceInfo {
+	public static func deviceDescription(
+		name: String,
+		model: String
+	) -> String {
+		"\(model) (\(name))"
 	}
 }
 
@@ -148,6 +160,10 @@ extension ProfileStore {
 			.share() // Multicast
 			.removeDuplicates()
 			.eraseToAnyAsyncSequence()
+	}
+
+	func _update(profile: Profile) throws {
+		try saveProfileAfterUpdateItsHeader(profile)
 	}
 }
 

@@ -46,7 +46,7 @@ final class SnapshotHeaderTests: TestCase {
 
 private let deviceFactorModel: DeviceFactorSource.Hint.Model = "computer"
 private let deviceFactorName: String = "unit test"
-private let creatingDevice: NonEmptyString = "\(deviceFactorModel) \(deviceFactorName)"
+private let creatingDevice = "\(deviceFactorModel) \(deviceFactorName)"
 private let stableDate = Date(timeIntervalSince1970: 0)
 private let stableUUID = UUID(uuidString: "BABE1442-3C98-41FF-AFB0-D0F5829B020D")!
 private let device: ProfileSnapshot.Header.UsedDeviceInfo = .init(description: creatingDevice, id: stableUUID, date: stableDate)

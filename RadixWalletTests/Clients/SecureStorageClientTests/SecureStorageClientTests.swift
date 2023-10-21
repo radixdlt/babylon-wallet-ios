@@ -133,10 +133,16 @@ private extension SecureStorageClientTests {
 	}
 }
 
-private let creatingDevice: NonEmptyString = "computer unit test"
+private let creatingDevice = "computer unit test"
 private let stableDate = Date(timeIntervalSince1970: 0)
 private let stableUUID = UUID(uuidString: "BABE1442-3C98-41FF-AFB0-D0F5829B020D")!
-private let device: ProfileSnapshot.Header.UsedDeviceInfo = .init(description: creatingDevice, id: stableUUID, date: stableDate)
+
+private let device: ProfileSnapshot.Header.UsedDeviceInfo = .init(
+	description: creatingDevice,
+	id: stableUUID,
+	date: stableDate
+)
+
 private let snapshotHeader = ProfileSnapshot.Header(
 	creatingDevice: device,
 	lastUsedOnDevice: device,

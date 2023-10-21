@@ -1,117 +1,66 @@
+import DependenciesAdditions
 @testable import Radix_Wallet_Dev
 import XCTest
 
+extension FixedWidthInteger {
+	var data: Data {
+		let data = withUnsafeBytes(of: self) { Data($0) }
+		return data
+	}
+}
+
+// MARK: - UUID + ExpressibleByIntegerLiteral
+extension UUID: ExpressibleByIntegerLiteral {
+	public init(integerLiteral value: UInt16) {
+		let hex = value.data.reversed().hex
+		self.init(uuidString: "00000000-0000-0000-0000-00000000\(hex)")!
+	}
+}
+
 // MARK: - ProfileStoreTests
 final class ProfileStoreTests: TestCase {
-	/// This test method has not been implemented with any particular thoughts in mind
-	/// mostly creating a bunch of unstructured task and reading/setting profile on shared
-	/// profile store interleaved with some `Task.yield()`'s which resulted in failures before
-	/// ProfileStore was migrated to use ManagedAtomicLazyReference, for more reading about this
-	/// see: https://forums.swift.org/t/is-this-an-ok-solution-to-achieve-shared-instance-of-actor-using-async-init/63528/2
-	func test_assert_ProfileStore_is_reentrance_free() async throws {
-		try await withDependencies {
-			#if canImport(UIKit)
-			$0.device.$name = deviceName
-			$0.device.$model = deviceModel.rawValue
-			#endif
-			$0.uuid = .incrementing
-			$0.mnemonicClient.generate = {
-				XCTAssertNoDifference($0, BIP39.WordCount.twentyFour)
-				XCTAssertNoDifference($1, BIP39.Language.english)
-				return .testValue
-			}
-			$0.secureStorageClient.saveMnemonicForFactorSource = { XCTAssertNoDifference($0.factorSource.kind, .device) }
-			$0.secureStorageClient.loadProfileSnapshotData = { _ in nil }
-			$0.secureStorageClient.loadDeviceIdentifier = {
-				.init(uuidString: "BABE1442-3C98-41FF-AFB0-D0F5829B020D")!
-			}
-			$0.secureStorageClient.getDeviceIdentifierSetIfNil = {
-				$0
-			}
-			$0.date = .constant(Date(timeIntervalSince1970: 0))
-			$0.userDefaultsClient.stringForKey = { _ in
-				"BABE1442-3C98-41FF-AFB0-D0F5829B020D"
-			}
-		} operation: {
-			let t0 = Task {
-				await ProfileStore.shared
-			}
-			await Task.yield()
-			var profile = await ProfileStore.shared.profile
-			await Task.yield()
-			let t1 = Task {
-				await ProfileStore.shared
-			}
-			let t2 = Task {
-				await ProfileStore.shared
-			}
-			await Task.yield()
-			profile = await ProfileStore.shared.profile
-			await Task.yield()
-			let t3 = Task {
-				await ProfileStore.shared
-			}
-			await Task.yield()
-			try await ProfileStore.shared.update(profile: profile)
-			await Task.yield()
-			let t4 = Task {
-				await ProfileStore.shared
-			}
-			let t5 = Task {
-				await ProfileStore.shared
-			}
-			await Task.yield()
-			profile = await ProfileStore.shared.profile
-			await Task.yield()
-			let t6 = Task {
-				await ProfileStore.shared
-			}
-			let t7 = Task {
-				await ProfileStore.shared
-			}
-			await Task.yield()
-			try await ProfileStore.shared.update(profile: profile)
-			await Task.yield()
-			let t8 = Task {
-				await ProfileStore.shared
-			}
-			let t9 = Task {
-				await ProfileStore.shared
-			}
-
-			let tasks = [t0, t1, t2, t3, t4, t5, t6, t7, t8, t9]
-			var values = Set<Profile.ID>()
-			for task in tasks {
-				let profile = await task.value.profile
-				values.insert(profile.id)
-			}
-			XCTAssertEqual(values.count, 1) // will fail for `test_reentrant` sometimes
-		}
-	}
-
 	func test__WHEN__init__THEN__24_english_word_ephmeral_mnemonic_is_generated() async {
-		await withDependencies {
-			#if canImport(UIKit)
+		let profileID: UUID = 0
+		let deviceID: UUID = 1
+
+		withDependencies {
 			$0.device.$name = deviceName
 			$0.device.$model = deviceModel.rawValue
-			#endif
 			$0.uuid = .incrementing
 			$0.mnemonicClient.generate = {
 				XCTAssertNoDifference($0, BIP39.WordCount.twentyFour)
 				XCTAssertNoDifference($1, BIP39.Language.english)
 				return .testValue
 			}
+			$0.secureStorageClient.loadProfileHeaderList = { nil }
+			$0.secureStorageClient.saveProfileHeaderList = {
+				XCTAssertNoDifference($0.count, 1)
+			}
+			$0.userDefaultsClient.setString = { v, _ in
+				if v == UserDefaultsClient.Key.activeProfileID.rawValue {
+					XCTAssertNoDifference(v, profileID.uuidString)
+				}
+			}
 			$0.secureStorageClient.saveMnemonicForFactorSource = { XCTAssertNoDifference($0.factorSource.kind, .device) }
+			$0.secureStorageClient.saveProfileSnapshot = { snapsot in
+				XCTAssertNoDifference(snapsot.header.id, profileID)
+				XCTAssertNoDifference(snapsot.header.lastUsedOnDevice.id, deviceID)
+				XCTAssertNoDifference(snapsot.header.creatingDevice.id, deviceID)
+			}
 			$0.secureStorageClient.loadProfileSnapshotData = { _ in nil }
-			$0.secureStorageClient.loadDeviceIdentifier = {
-				.init(uuidString: "BABE1442-3C98-41FF-AFB0-D0F5829B020D")!
+			$0.secureStorageClient.loadDeviceInfo = {
+				DeviceInfo(
+					description: "iPhone (iPhone)",
+					id: deviceID,
+					date: Date(timeIntervalSince1970: 0)
+				)
 			}
 			$0.date = .constant(Date(timeIntervalSince1970: 0))
 			$0.userDefaultsClient.stringForKey = { _ in
-				"BABE1442-3C98-41FF-AFB0-D0F5829B020D"
+				nil
 			}
 		} operation: {
-			_ = await ProfileStore()
+			ProfileStore()
 		}
 	}
 
@@ -179,19 +128,18 @@ private extension ProfileStoreTests {
 		assertFactorSourceSaved: (@Sendable (DeviceFactorSource) -> Void)? = { _ in /* noop */ },
 		assertProfileSnapshotSaved: (@Sendable (ProfileSnapshot) -> Void)? = { _ in /* noop */ }
 	) async throws {
-		let profileSnapshotSavedIntoSecureStorage = ActorIsolated<ProfileSnapshot?>(nil)
+		let profileSnapshotSaved = ActorIsolated<ProfileSnapshot?>(nil)
+		let exp = expectation(description: "saveProfileSnapshot")
 		try await withDependencies {
 			$0.uuid = .constant(profileID)
 			$0.mnemonicClient.generate = { _, _ in privateFactor.mnemonicWithPassphrase.mnemonic }
-			#if canImport(UIKit)
 			$0.device.$name = deviceName
 			$0.device.$model = deviceModel.rawValue
-			#endif
 			$0.secureStorageClient.loadProfileSnapshotData = { _ in
 				provideProfileSnapshotLoaded
 			}
-			$0.secureStorageClient.getDeviceIdentifierSetIfNil = {
-				$0
+			$0.secureStorageClient.loadProfileHeaderList = {
+				nil
 			}
 			$0.secureStorageClient.saveMnemonicForFactorSource = { privateFactorSource in
 				if assertMnemonicWithPassphraseSaved == nil, assertFactorSourceSaved == nil {
@@ -205,15 +153,22 @@ private extension ProfileStoreTests {
 					}
 				}
 			}
-			$0.secureStorageClient.saveProfileSnapshot = {
-				await profileSnapshotSavedIntoSecureStorage.setValue($0)
+			$0.secureStorageClient.saveProfileSnapshot = { new in
+				Task {
+					await profileSnapshotSaved.setValue(new)
+					exp.fulfill()
+				}
 			}
 			$0.date = .constant(Date(timeIntervalSince1970: 0))
 			$0.userDefaultsClient.stringForKey = { _ in
 				"BABE1442-3C98-41FF-AFB0-D0F5829B020D"
 			}
-			$0.secureStorageClient.loadDeviceIdentifier = {
-				.init(uuidString: "BABE1442-3C98-41FF-AFB0-D0F5829B020D")!
+			$0.secureStorageClient.loadDeviceInfo = {
+				DeviceInfo(
+					description: "iPhone (iPhone)",
+					id: .init(uuidString: "BABE1442-3C98-41FF-AFB0-D0F5829B020D")!,
+					date: Date(timeIntervalSince1970: 0)
+				)
 			}
 			$0.userDefaultsClient.setString = { _, _ in }
 			$0.secureStorageClient.loadProfileHeaderList = {
@@ -221,30 +176,16 @@ private extension ProfileStoreTests {
 			}
 			$0.secureStorageClient.saveProfileHeaderList = { _ in }
 		} operation: {
-			let sut = await ProfileStore()
+			let sut = ProfileStore()
 			var profile: Profile?
-			for await state in await sut.profileSubject {
-				switch state {
-				case let .ephemeral(ephemeral):
-					profile = ephemeral.profile
-					XCTAssertNoDifference(
-						ephemeral.profile.factorSources.first,
-						privateFactor.factorSource.embed()
-					)
-					try await sut.commitEphemeral()
-				case let .persisted(persistedProfile):
-					XCTAssertNoDifference(
-						persistedProfile,
-						profile
-					)
-					return
-				}
+			for try await profileValue in await sut.values() {
+				profile = profileValue
+				break
 			}
-
-			let profileSnapshotMaybe = await profileSnapshotSavedIntoSecureStorage.value
-
+			await fulfillment(of: [exp], timeout: 1)
+			let maybeSavedProfile = await profileSnapshotSaved.value
 			if let assertProfileSnapshotSaved {
-				let profileSnapshot = try XCTUnwrap(profileSnapshotMaybe)
+				let profileSnapshot = try XCTUnwrap(maybeSavedProfile)
 				XCTAssertNoDifference(
 					profileSnapshot,
 					profile?.snapshot()
@@ -257,21 +198,23 @@ private extension ProfileStoreTests {
 	}
 }
 
-#if canImport(UIKit)
-private let deviceName: String = "NAME"
-private let deviceModel: DeviceFactorSource.Hint.Model = "MODEL"
-private let expectedDeviceDescription = ProfileStore.deviceDescription(
+private let deviceName: String = "iPhone"
+private let deviceModel: DeviceFactorSource.Hint.Model = "iPhone"
+private let expectedDeviceDescription = DeviceInfo.deviceDescription(
 	name: deviceName,
-	model: deviceModel
+	model: deviceModel.rawValue
 )
-#else
-private let expectedDeviceDescription = ProfileStore.macOSDeviceDescriptionFallback
-#endif
 
 extension PrivateHDFactorSource {
 	static let testValue: Self = withDependencies {
 		$0.date = .constant(Date(timeIntervalSince1970: 0))
 	} operation: {
 		Self.testValue(name: deviceName, model: deviceModel)
+	}
+}
+
+extension ProfileStore {
+	func update(profile: Profile) throws {
+		try _update(profile: profile)
 	}
 }

@@ -3,12 +3,12 @@ import KeychainAccess
 import XCTest
 @_spi(KeychainInternal) @testable import Radix_Wallet_Dev
 
-let authRandomKey: KeychainActor.Key = "authRandomDataKey"
-let noAuthRandomKey: KeychainActor.Key = "noAuthRandomDataKey"
+let authRandomKey: KeychainHolder.Key = "authRandomDataKey"
+let noAuthRandomKey: KeychainHolder.Key = "noAuthRandomDataKey"
 
-// MARK: - KeychainActorTests
-final class KeychainActorTests: XCTestCase {
-	let sut = KeychainActor.shared
+// MARK: - KeychainHolderTests
+final class KeychainHolderTests: XCTestCase {
+	let sut = KeychainHolder.shared
 
 	func testNoAuth() async throws {
 		try await onceNoAuthTest()
@@ -44,7 +44,7 @@ final class KeychainActorTests: XCTestCase {
 	}
 }
 
-extension KeychainActor {
+extension KeychainHolder {
 	@MainActor
 	@discardableResult
 	func authGetSavedDataElseSaveNewRandom() async throws -> Data {
@@ -62,7 +62,7 @@ extension KeychainActor {
 	}
 }
 
-extension KeychainActor {
+extension KeychainHolder {
 	@MainActor
 	@discardableResult
 	func noAuthGetSavedDataElseSaveNewRandom() async throws -> Data {

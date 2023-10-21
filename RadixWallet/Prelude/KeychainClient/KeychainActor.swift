@@ -7,9 +7,7 @@ private let keychainService = {
 }()
 
 // MARK: - KeychainHolder
-@_spi(KeychainInternal)
-public final class KeychainHolder: @unchecked Sendable {
-	@_spi(KeychainInternal)
+final class KeychainHolder: @unchecked Sendable {
 	public static let shared = KeychainHolder()
 
 	private let keychain: Keychain
@@ -24,14 +22,10 @@ public final class KeychainHolder: @unchecked Sendable {
 }
 
 extension KeychainHolder {
-	@_spi(KeychainInternal)
-	public typealias Key = KeychainClient.Key
-	@_spi(KeychainInternal)
-	public typealias Label = KeychainClient.Label
-	@_spi(KeychainInternal)
-	public typealias Comment = KeychainClient.Comment
-	@_spi(KeychainInternal)
-	public typealias AuthenticationPrompt = KeychainClient.AuthenticationPrompt
+	typealias Key = KeychainClient.Key
+	typealias Label = KeychainClient.Label
+	typealias Comment = KeychainClient.Comment
+	typealias AuthenticationPrompt = KeychainClient.AuthenticationPrompt
 
 	public func getServiceAndAccessGroup() -> (service: String, accessGroup: String?) {
 		(service, accessGroup)
@@ -39,8 +33,7 @@ extension KeychainHolder {
 
 	/// Checks if keychain contains an item without prompting showing Auth Prompt
 	/// even for items that require auth (if you dont explictily set `showAuthPrompt: true`)
-	@_spi(KeychainInternal)
-	public func contains(
+	func contains(
 		_ key: Key,
 		showAuthPrompt: Bool = false
 	) throws -> Bool {
@@ -49,8 +42,7 @@ extension KeychainHolder {
 }
 
 extension KeychainHolder {
-	@_spi(KeychainInternal)
-	public func setDataWithoutAuth(
+	func setDataWithoutAuth(
 		_ data: Data,
 		forKey key: Key,
 		attributes: KeychainClient.AttributesWithoutAuth
@@ -59,8 +51,7 @@ extension KeychainHolder {
 			.set(data, key: key.rawValue.rawValue)
 	}
 
-	@_spi(KeychainInternal)
-	public func setDataWithAuth(
+	func setDataWithAuth(
 		_ data: Data,
 		forKey key: Key,
 		attributes: KeychainClient.AttributesWithAuth
@@ -69,8 +60,7 @@ extension KeychainHolder {
 			.set(data, key: key.rawValue.rawValue)
 	}
 
-	@_spi(KeychainInternal)
-	public func getDataWithoutAuth(
+	func getDataWithoutAuth(
 		forKey key: Key,
 		ifNilSet: KeychainClient.IfNilSetWithoutAuth
 	) throws -> (value: Data, wasNil: Bool) {
@@ -83,8 +73,7 @@ extension KeychainHolder {
 		}
 	}
 
-	@_spi(KeychainInternal)
-	public func getDataWithAuth(
+	func getDataWithAuth(
 		forKey key: Key,
 		authenticationPrompt: AuthenticationPrompt,
 		ifNilSet: KeychainClient.IfNilSetWithAuth
@@ -101,15 +90,13 @@ extension KeychainHolder {
 		}
 	}
 
-	@_spi(KeychainInternal)
-	public func getDataWithoutAuth(
+	func getDataWithoutAuth(
 		forKey key: Key
 	) throws -> Data? {
 		try keychain.getData(key.rawValue.rawValue)
 	}
 
-	@_spi(KeychainInternal)
-	public func getDataWithAuth(
+	func getDataWithAuth(
 		forKey key: Key,
 		authenticationPrompt: AuthenticationPrompt
 	) throws -> Data? {
@@ -118,15 +105,13 @@ extension KeychainHolder {
 			.getData(key.rawValue.rawValue)
 	}
 
-	@_spi(KeychainInternal)
-	public func removeData(
+	func removeData(
 		forKey key: Key
 	) throws {
 		try keychain.remove(key.rawValue.rawValue)
 	}
 
-	@_spi(KeychainInternal)
-	public func removeAllItems() throws {
+	func removeAllItems() throws {
 		try keychain.removeAll()
 	}
 }

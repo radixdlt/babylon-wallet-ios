@@ -3,8 +3,7 @@
 extension KeychainClient: DependencyKey {
 	public static let liveValue: Self = .liveValue()
 
-	@_spi(KeychainInternal)
-	public static func liveValue(
+	static func liveValue(
 		keychainHolder: KeychainHolder = .shared
 	) -> Self {
 		Self(
