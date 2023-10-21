@@ -7,7 +7,7 @@ public final actor ProfileStore {
 	public static let shared = ProfileStore()
 
 	/// Holds an in-memory copy of the Profile, the source of truth is Keychain.
-	private let profileStateSubject: AsyncCurrentValueSubject<Profile>
+	private let profileSubject: AsyncCurrentValueSubject<Profile>
 
 	/// Only mutable since we need to update the description with async, since reading
 	/// device model and name is async.
@@ -17,7 +17,7 @@ public final actor ProfileStore {
 		let metaDeviceInfo = Self._deviceInfo()
 		let stuff = Self._loadSavedElseNewProfile(metaDeviceInfo: metaDeviceInfo)
 		self.deviceInfo = stuff.deviceInfo
-		self.profileStateSubject = AsyncCurrentValueSubject(stuff.profile)
+		self.profileSubject = AsyncCurrentValueSubject(stuff.profile)
 
 		if let conflictingOwners = stuff.conflictingOwners {
 			Task {
@@ -41,7 +41,7 @@ extension ProfileStore {
 	/// The current value of Profile. Use `update:profile` method to update it. Also see `values`,
 	/// for an async sequence of Profile.
 	public var profile: Profile {
-		profileStateSubject.value
+		profileSubject.value
 	}
 
 	/// Mutates the in-memory copy of the Profile usung `transform`, and saves a
@@ -108,7 +108,7 @@ extension ProfileStore {
 		}
 
 		let profile = try! Self._tryGenerateAndSaveNewProfile(deviceInfo: deviceInfo)
-		self.profileStateSubject.send(profile)
+		self.profileSubject.send(profile)
 	}
 
 	public func finishedOnboarding() async {
@@ -144,7 +144,7 @@ extension ProfileStore {
 	func _lens<Property>(
 		_ transform: @escaping @Sendable (Profile) -> Property?
 	) -> AnyAsyncSequence<Property> where Property: Sendable & Equatable {
-		profileStateSubject.compactMap(transform)
+		profileSubject.compactMap(transform)
 			.share() // Multicast
 			.removeDuplicates()
 			.eraseToAnyAsyncSequence()
@@ -212,7 +212,7 @@ extension ProfileStore {
 	/// and saves a snapshot of the profile into Keychain.
 	/// - Parameter profile: Profile to save
 	private func _saveProfileAndEmitUpdate(_ profile: Profile) throws {
-		profileStateSubject.send(profile)
+		profileSubject.send(profile)
 		try Self._save(profile: profile)
 	}
 

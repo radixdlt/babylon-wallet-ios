@@ -223,7 +223,7 @@ private extension ProfileStoreTests {
 		} operation: {
 			let sut = await ProfileStore()
 			var profile: Profile?
-			for await state in await sut.profileStateSubject {
+			for await state in await sut.profileSubject {
 				switch state {
 				case let .ephemeral(ephemeral):
 					profile = ephemeral.profile
