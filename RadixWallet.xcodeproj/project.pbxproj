@@ -1172,7 +1172,7 @@
 		E6DBA3252ADEBFB300A38425 /* DecimalTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6DBA26B2ADEBFB200A38425 /* DecimalTests.swift */; };
 		E6DBA3262ADEBFB300A38425 /* TestFixture.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6DBA26D2ADEBFB200A38425 /* TestFixture.swift */; };
 		E6DBA3272ADEBFB300A38425 /* MockURLProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6DBA26E2ADEBFB200A38425 /* MockURLProtocol.swift */; };
-		E6DBA3282ADEBFB300A38425 /* Data+Hex+Convenience.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6DBA26F2ADEBFB200A38425 /* Data+Hex+Convenience.swift */; };
+		E6DBA3282ADEBFB300A38425 /* Misc+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6DBA26F2ADEBFB200A38425 /* Misc+Extensions.swift */; };
 		E6DBA3292ADEBFB300A38425 /* NSError+TestValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6DBA2702ADEBFB200A38425 /* NSError+TestValue.swift */; };
 		E6DBA32A2ADEBFB300A38425 /* TestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6DBA2712ADEBFB200A38425 /* TestCase.swift */; };
 		E6DBA32B2ADEBFB300A38425 /* JSON+Sendable.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6DBA2722ADEBFB200A38425 /* JSON+Sendable.swift */; };
@@ -2397,7 +2397,7 @@
 		E6DBA26B2ADEBFB200A38425 /* DecimalTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DecimalTests.swift; sourceTree = "<group>"; };
 		E6DBA26D2ADEBFB200A38425 /* TestFixture.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestFixture.swift; sourceTree = "<group>"; };
 		E6DBA26E2ADEBFB200A38425 /* MockURLProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MockURLProtocol.swift; sourceTree = "<group>"; };
-		E6DBA26F2ADEBFB200A38425 /* Data+Hex+Convenience.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Data+Hex+Convenience.swift"; sourceTree = "<group>"; };
+		E6DBA26F2ADEBFB200A38425 /* Misc+Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Misc+Extensions.swift"; sourceTree = "<group>"; };
 		E6DBA2702ADEBFB200A38425 /* NSError+TestValue.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NSError+TestValue.swift"; sourceTree = "<group>"; };
 		E6DBA2712ADEBFB200A38425 /* TestCase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestCase.swift; sourceTree = "<group>"; };
 		E6DBA2722ADEBFB200A38425 /* JSON+Sendable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "JSON+Sendable.swift"; sourceTree = "<group>"; };
@@ -6686,7 +6686,7 @@
 			children = (
 				E6DBA26D2ADEBFB200A38425 /* TestFixture.swift */,
 				E6DBA26E2ADEBFB200A38425 /* MockURLProtocol.swift */,
-				E6DBA26F2ADEBFB200A38425 /* Data+Hex+Convenience.swift */,
+				E6DBA26F2ADEBFB200A38425 /* Misc+Extensions.swift */,
 				E6DBA2702ADEBFB200A38425 /* NSError+TestValue.swift */,
 				E6DBA2712ADEBFB200A38425 /* TestCase.swift */,
 				E6DBA2722ADEBFB200A38425 /* JSON+Sendable.swift */,
@@ -7450,7 +7450,7 @@
 				E6DBA31C2ADEBFB300A38425 /* RadixConnectE2E.swift in Sources */,
 				E6DBA3302ADEBFB300A38425 /* AppFeatureTests.swift in Sources */,
 				E6DBA3802ADEBFB300A38425 /* ProfileStoreTests.swift in Sources */,
-				E6DBA3282ADEBFB300A38425 /* Data+Hex+Convenience.swift in Sources */,
+				E6DBA3282ADEBFB300A38425 /* Misc+Extensions.swift in Sources */,
 				E6DBA3432ADEBFB300A38425 /* UserDefaultsClientTests.swift in Sources */,
 				E6DBA33C2ADEBFB300A38425 /* SplashFeatureTests.swift in Sources */,
 				E6DBA3342ADEBFB300A38425 /* GatewaySettingsFeatureTests.swift in Sources */,
