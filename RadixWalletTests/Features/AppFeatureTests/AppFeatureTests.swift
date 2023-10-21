@@ -41,38 +41,34 @@ final class AppFeatureTests: TestCase {
 			}
 		}
 
-		let profile = withTestClients { Profile.testValue }
-
 		// THEN: navigate to main
-		await store.send(.child(.splash(.delegate(.completed(profile, accountRecoveryNeeded: accountRecoveryNeeded))))) {
+		await store.send(.child(.splash(.delegate(.completed(Profile.withOneAccount, accountRecoveryNeeded: accountRecoveryNeeded))))) {
 			$0.root = .main(.init(home: .init(babylonAccountRecoveryIsNeeded: accountRecoveryNeeded)))
 		}
 
 		await clock.run() // fast-forward clock to the end of time
 	}
+
+	func test__GIVEN__splash__WHEN__loadProfile_results_in_noProfile__THEN__navigate_to_onboarding() async {
+		// given
+		let clock = TestClock()
+		let store = TestStore(
+			initialState: App.State(root: .splash(.init())),
+			reducer: App.init
+		) {
+			$0.errorQueue = .liveValue
+			$0.continuousClock = clock
+		}
+
+		// then
+		await store.send(.child(.splash(.delegate(.completed(Profile.withNoAccounts, accountRecoveryNeeded: false))))) {
+			$0.root = .onboardingCoordinator(.init())
+		}
+
+		await clock.run() // fast-forward clock to the end of time
+	}
+
 	/*
-	 func test__GIVEN__splash__WHEN__loadProfile_results_in_noProfile__THEN__navigate_to_onboarding() async {
-	 	// given
-	 	let clock = TestClock()
-	 	let store = TestStore(
-	 		initialState: App.State(root: .splash(.init())),
-	 		reducer: App.init
-	 	) {
-	 		$0.errorQueue = .liveValue
-	 		$0.continuousClock = clock
-	 	}
-
-	 	let viewTask = await store.send(.view(.task))
-
-	 	// then
-	 	await store.send(.child(.splash(.delegate(.completed(.newUser, accountRecoveryNeeded: false))))) {
-	 		$0.root = .onboardingCoordinator(.init())
-	 	}
-
-	 	await clock.run() // fast-forward clock to the end of time
-	 	await viewTask.cancel()
-	 }
-
 	 func test__GIVEN__splash__WHEN__loadProfile_results_in_decodingError__THEN__display_errorAlert_and_navigate_to_onboarding() async throws {
 	 	// given
 	 	let clock = TestClock()
@@ -196,7 +192,9 @@ final class AppFeatureTests: TestCase {
 }
 
 extension Profile {
-	static let testValue: Self = testValue()
+	static var withOneAccount = withTestClients(Self.testValue())
+	static let withNoAccounts = withTestClients(Self.testValue(nameOfFirstAccount: nil))
+
 	static func testValue(
 		nameOfFirstAccount: String? = "Main"
 	) -> Self {
@@ -272,7 +270,7 @@ extension Profile {
 }
 
 func withTestClients<R>(
-	operation: @escaping () -> R
+	_ operation: @escaping @autoclosure () -> R
 ) -> R {
 	withDependencies({
 		$0.date = .constant(Date(timeIntervalSince1970: 0))
