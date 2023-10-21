@@ -11,6 +11,8 @@ extension SecureStorageClient: TestDependencyKey {
 	public static let noop: Self = .init(
 		saveProfileSnapshot: { _ in },
 		loadProfileSnapshotData: { _ in nil },
+		loadProfileSnapshot: { _ in nil },
+		loadProfile: { _ in nil },
 		saveMnemonicForFactorSource: { _ in },
 		loadMnemonicByFactorSourceID: { _, _ in nil },
 		containsMnemonicIdentifiedByFactorSourceID: { _ in false },
@@ -32,6 +34,8 @@ extension SecureStorageClient: TestDependencyKey {
 	public static let testValue = Self(
 		saveProfileSnapshot: unimplemented("\(Self.self).saveProfileSnapshot"),
 		loadProfileSnapshotData: unimplemented("\(Self.self).loadProfileSnapshotData"),
+		loadProfileSnapshot: unimplemented("\(Self.self).loadProfileSnapshot"),
+		loadProfile: unimplemented("\(Self.self).loadProfile"),
 		saveMnemonicForFactorSource: unimplemented("\(Self.self).saveMnemonicForFactorSource"),
 		loadMnemonicByFactorSourceID: unimplemented("\(Self.self).loadMnemonicByFactorSourceID"),
 		containsMnemonicIdentifiedByFactorSourceID: unimplemented("\(Self.self).containsMnemonicIdentifiedByFactorSourceID"),

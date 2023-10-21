@@ -147,12 +147,42 @@ extension Profile {
 	}
 }
 
-func withTestClients<R>(
+@discardableResult
+public func withTestClients<R>(
 	_ operation: @escaping @autoclosure () -> R
 ) -> R {
-	withDependencies({
-		$0.date = .constant(Date(timeIntervalSince1970: 0))
-	}, operation: { operation() })
+	withTestClients({ $0 }, operation: operation)
+}
+
+@discardableResult
+public func withTestClients<R>(
+	_ updateValuesForOperation: (inout DependencyValues) throws -> Void,
+	operation: () throws -> R
+) rethrows -> R {
+	try withDependencies({
+		configureTestClients(&$0)
+		try updateValuesForOperation(&$0)
+	}, operation: operation)
+}
+
+@_unsafeInheritExecutor
+@discardableResult
+public func withTestClients<R>(
+	_ updateValuesForOperation: (inout DependencyValues) async throws -> Void,
+	operation: () async throws -> R
+) async rethrows -> R {
+	try await withDependencies({
+		configureTestClients(&$0)
+		try await updateValuesForOperation(&$0)
+	}, operation: operation)
+}
+
+private func configureTestClients(
+	_ d: inout DependencyValues
+) {
+	d.uuid = .incrementing
+	d.date = .constant(Date(timeIntervalSince1970: 0))
+	d.secureStorageClient.loadDeviceInfo = { .testValue }
 }
 
 extension ProfileSnapshot.Header {

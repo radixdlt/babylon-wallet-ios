@@ -1113,6 +1113,7 @@
 		48CFC6BD2ADC110800E77A5C /* Project-Beta.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 48CFC6AA2ADC110800E77A5C /* Project-Beta.xcconfig */; };
 		48CFC6BE2ADC110800E77A5C /* Project-PreAlpha.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 48CFC6AB2ADC110800E77A5C /* Project-PreAlpha.xcconfig */; };
 		48CFC6BF2ADC110800E77A5C /* Project-Release-Opt.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 48CFC6AC2ADC110800E77A5C /* Project-Release-Opt.xcconfig */; };
+		48FF43152AE43C7C00C568B9 /* TimeLimit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48FF43142AE43C7C00C568B9 /* TimeLimit.swift */; };
 		48FFFA962ADC1EBC00B2B213 /* ComposableArchitecture in Frameworks */ = {isa = PBXBuildFile; productRef = 48FFFA952ADC1EBC00B2B213 /* ComposableArchitecture */; };
 		48FFFA992ADC1EEC00B2B213 /* AsyncExtensions in Frameworks */ = {isa = PBXBuildFile; productRef = 48FFFA982ADC1EEC00B2B213 /* AsyncExtensions */; };
 		48FFFA9C2ADC1F1600B2B213 /* K1 in Frameworks */ = {isa = PBXBuildFile; productRef = 48FFFA9B2ADC1F1600B2B213 /* K1 */; };
@@ -2378,6 +2379,7 @@
 		48CFC6AB2ADC110800E77A5C /* Project-PreAlpha.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = "Project-PreAlpha.xcconfig"; sourceTree = "<group>"; };
 		48CFC6AC2ADC110800E77A5C /* Project-Release-Opt.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = "Project-Release-Opt.xcconfig"; sourceTree = "<group>"; };
 		48CFC6AD2ADC110800E77A5C /* Radix-Wallet--iOS--Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Radix-Wallet--iOS--Info.plist"; sourceTree = "<group>"; };
+		48FF43142AE43C7C00C568B9 /* TimeLimit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeLimit.swift; sourceTree = "<group>"; };
 		48FFFAF12ADC23AC00B2B213 /* Exports.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Exports.swift; sourceTree = "<group>"; };
 		83D0B5682AE01EDE0048DCBE /* RadixEngineToolkitError+Description.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RadixEngineToolkitError+Description.swift"; sourceTree = "<group>"; };
 		E67F14442AE029BA00738BE1 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -6697,6 +6699,7 @@
 				E6DBA2702ADEBFB200A38425 /* NSError+TestValue.swift */,
 				E6DBA2712ADEBFB200A38425 /* TestCase.swift */,
 				E6DBA2722ADEBFB200A38425 /* JSON+Sendable.swift */,
+				48FF43142AE43C7C00C568B9 /* TimeLimit.swift */,
 			);
 			path = TestExtensions;
 			sourceTree = "<group>";
@@ -7470,6 +7473,7 @@
 				E6DBA3202ADEBFB300A38425 /* PeerConnectionMocks.swift in Sources */,
 				E6DBA3682ADEBFB300A38425 /* FactorSourcesCodableTests.swift in Sources */,
 				E6DBA3262ADEBFB300A38425 /* TestFixture.swift in Sources */,
+				48FF43152AE43C7C00C568B9 /* TimeLimit.swift in Sources */,
 				E6DBA3442ADEBFB300A38425 /* KeychainClientTests.swift in Sources */,
 				E6DBA31B2ADEBFB300A38425 /* SignalingServerClientTests.swift in Sources */,
 				E6DBA36B2ADEBFB300A38425 /* SnapshotJSONTests.swift in Sources */,

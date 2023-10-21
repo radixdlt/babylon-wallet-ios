@@ -189,6 +189,15 @@ extension SecureStorageClient: DependencyKey {
 			loggerGlobal.notice("Saved deviceInfo: \(deviceInfo)")
 		}
 
+		let loadProfileSnapshot: LoadProfileSnapshot = { id in
+			guard
+				let existingSnapshotData = try loadProfileSnapshotData(id)
+			else {
+				return nil
+			}
+			return try jsonDecoder().decode(ProfileSnapshot.self, from: existingSnapshotData)
+		}
+
 		return Self(
 			saveProfileSnapshot: { profileSnapshot in
 				let data = try jsonEncoder().encode(profileSnapshot)
@@ -199,6 +208,15 @@ extension SecureStorageClient: DependencyKey {
 				)
 			},
 			loadProfileSnapshotData: loadProfileSnapshotData,
+			loadProfileSnapshot: loadProfileSnapshot,
+			loadProfile: { id in
+				guard
+					let existingSnapshot = try loadProfileSnapshot(id)
+				else {
+					return nil
+				}
+				return Profile(snapshot: existingSnapshot)
+			},
 			saveMnemonicForFactorSource: { privateFactorSource in
 				let factorSource = privateFactorSource.factorSource
 				let mnemonicWithPassphrase = privateFactorSource.mnemonicWithPassphrase
@@ -330,28 +348,6 @@ extension SecureStorageClient: DependencyKey {
 			}
 		)
 	}()
-}
-
-extension SecureStorageClient {
-	public func loadProfileSnapshot(_ id: ProfileSnapshot.Header.ID) throws -> ProfileSnapshot? {
-		@Dependency(\.jsonDecoder) var jsonDecoder
-		guard
-			let existingSnapshotData = try loadProfileSnapshotData(id)
-		else {
-			return nil
-		}
-		return try jsonDecoder().decode(ProfileSnapshot.self, from: existingSnapshotData)
-	}
-
-	public func loadProfile(_ id: ProfileSnapshot.Header.ID) throws -> Profile? {
-		@Dependency(\.jsonDecoder) var jsonDecoder
-		guard
-			let existingSnapshot = try loadProfileSnapshot(id)
-		else {
-			return nil
-		}
-		return Profile(snapshot: existingSnapshot)
-	}
 }
 
 private let profileHeaderListKeychainKey: KeychainClient.Key = "profileHeaderList"

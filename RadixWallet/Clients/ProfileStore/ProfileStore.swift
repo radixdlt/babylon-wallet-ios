@@ -337,13 +337,12 @@ extension ProfileStore {
 		@Dependency(\.userDefaultsClient) var userDefaultsClient
 
 		guard
-			let profileId = userDefaultsClient.getActiveProfileID(),
-			let snapshot = try secureStorageClient.loadProfileSnapshot(profileId)
+			let profileId = userDefaultsClient.getActiveProfileID()
 		else {
 			return nil
 		}
 
-		return Profile(snapshot: snapshot)
+		return try secureStorageClient.loadProfile(profileId)
 	}
 
 	private static func _tryGenerateAndSaveNewProfile(deviceInfo: DeviceInfo) throws -> Profile {

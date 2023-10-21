@@ -2,6 +2,8 @@
 public struct SecureStorageClient: Sendable {
 	public var saveProfileSnapshot: SaveProfileSnapshot
 	public var loadProfileSnapshotData: LoadProfileSnapshotData
+	public var loadProfileSnapshot: LoadProfileSnapshot
+	public var loadProfile: LoadProfile
 
 	public var saveMnemonicForFactorSource: SaveMnemonicForFactorSource
 	public var loadMnemonicByFactorSourceID: LoadMnemonicByFactorSourceID
@@ -30,6 +32,8 @@ extension SecureStorageClient {
 	public typealias UpdateIsCloudProfileSyncEnabled = @Sendable (ProfileSnapshot.Header.ID, CloudProfileSyncActivation) throws -> Void
 	public typealias SaveProfileSnapshot = @Sendable (ProfileSnapshot) throws -> Void
 	public typealias LoadProfileSnapshotData = @Sendable (ProfileSnapshot.Header.ID) throws -> Data?
+	public typealias LoadProfileSnapshot = @Sendable (ProfileSnapshot.Header.ID) throws -> ProfileSnapshot?
+	public typealias LoadProfile = @Sendable (ProfileSnapshot.Header.ID) throws -> Profile?
 
 	public typealias SaveMnemonicForFactorSource = @Sendable (PrivateHDFactorSource) throws -> Void
 	public typealias LoadMnemonicByFactorSourceID = @Sendable (FactorSourceID.FromHash, LoadMnemonicPurpose) throws -> MnemonicWithPassphrase?

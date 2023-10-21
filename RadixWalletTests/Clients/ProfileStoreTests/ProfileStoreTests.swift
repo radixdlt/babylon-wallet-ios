@@ -4,6 +4,25 @@ import XCTest
 
 // MARK: - ProfileStoreTests
 final class ProfileStoreTests: TestCase {
+	func test__GIVEN__wallet_exists__WHEN__init__THEN__saved_profile_is_used() async throws {
+		try await withTimeLimit {
+			let savedProfile = Profile.withOneAccount
+			let usedProfile: Profile = try await withTestClients {
+				$0.secureStorageClient.loadProfile = { _ in
+					savedProfile
+				}
+				$0.userDefaultsClient.stringForKey = {
+					if $0 == .activeProfileID {
+						savedProfile.header.id.uuidString
+					} else { String?.none }
+				}
+			} operation: {
+				await ProfileStore.shared.profile
+			}
+			XCTAssertNoDifference(savedProfile, usedProfile)
+		}
+	}
+
 	func test__WHEN__init__THEN__24_english_word_ephmeral_mnemonic_is_generated() async {
 		let profileID: UUID = 0
 		let deviceID: UUID = 1
