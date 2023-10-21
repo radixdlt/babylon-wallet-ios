@@ -5,50 +5,50 @@ import XCTest
 @MainActor
 final class AppFeatureTests: TestCase {
 	let networkID = NetworkID.nebunet
+
+	func test_initialAppState_whenAppLaunches_thenInitialAppStateIsSplash() {
+		let appState = App.State()
+		XCTAssertEqual(appState.root, .splash(.init()))
+	}
+
+	func test_removedWallet_whenWalletRemovedFromMainScreen_thenNavigateToOnboarding() async {
+		// given
+		let store = TestStore(
+			initialState: App.State(root: .main(.previewValue)),
+			reducer: App.init
+		) {
+			$0.gatewaysClient.gatewaysValues = { AsyncLazySequence([.init(current: .default)]).eraseToAnyAsyncSequence() }
+		}
+		// when
+		await store.send(.child(.main(.delegate(.removedWallet)))) {
+			$0.root = .onboardingCoordinator(.init())
+		}
+	}
+
+	func test_splash__GIVEN__an_existing_profile__WHEN__existing_profile_loaded__THEN__we_navigate_to_main() async throws {
+		// GIVEN: an existing profile
+		let accountRecoveryNeeded = true
+		let clock = TestClock()
+		let store = TestStore(
+			initialState: App.State(root: .splash(.init())),
+			reducer: App.init
+		) {
+			$0.errorQueue.errors = { AsyncLazySequence([]).eraseToAnyAsyncSequence() }
+			$0.continuousClock = clock
+
+			$0.deviceFactorSourceClient.isAccountRecoveryNeeded = {
+				accountRecoveryNeeded
+			}
+		}
+
+		// THEN: navigate to main
+		await store.send(.child(.splash(.delegate(.completed(Profile.testValue, accountRecoveryNeeded: accountRecoveryNeeded))))) {
+			$0.root = .main(.init(home: .init(babylonAccountRecoveryIsNeeded: accountRecoveryNeeded)))
+		}
+
+		await clock.run() // fast-forward clock to the end of time
+	}
 	/*
-	 func test_initialAppState_whenAppLaunches_thenInitialAppStateIsSplash() {
-	 	let appState = App.State()
-	 	XCTAssertEqual(appState.root, .splash(.init()))
-	 }
-
-	 func test_removedWallet_whenWalletRemovedFromMainScreen_thenNavigateToOnboarding() async {
-	 	// given
-	 	let store = TestStore(
-	 		initialState: App.State(root: .main(.previewValue)),
-	 		reducer: App.init
-	 	) {
-	 		$0.gatewaysClient.gatewaysValues = { AsyncLazySequence([.init(current: .default)]).eraseToAnyAsyncSequence() }
-	 	}
-	 	// when
-	 	await store.send(.child(.main(.delegate(.removedWallet)))) {
-	 		$0.root = .onboardingCoordinator(.init())
-	 	}
-	 }
-
-	 func test_splash__GIVEN__an_existing_profile__WHEN__existing_profile_loaded__THEN__we_navigate_to_main() async throws {
-	 	// GIVEN: an existing profile
-	 	let accountRecoveryNeeded = true
-	 	let clock = TestClock()
-	 	let store = TestStore(
-	 		initialState: App.State(root: .splash(.init())),
-	 		reducer: App.init
-	 	) {
-	 		$0.errorQueue.errors = { AsyncLazySequence([]).eraseToAnyAsyncSequence() }
-	 		$0.continuousClock = clock
-
-	 		$0.deviceFactorSourceClient.isAccountRecoveryNeeded = {
-	 			accountRecoveryNeeded
-	 		}
-	 	}
-
-	 	// THEN: navigate to main
-	 	await store.send(.child(.splash(.delegate(.completed(.existingProfile, accountRecoveryNeeded: accountRecoveryNeeded))))) {
-	 		$0.root = .main(.init(home: .init(babylonAccountRecoveryIsNeeded: accountRecoveryNeeded)))
-	 	}
-
-	 	await clock.run() // fast-forward clock to the end of time
-	 }
-
 	 func test__GIVEN__splash__WHEN__loadProfile_results_in_noProfile__THEN__navigate_to_onboarding() async {
 	 	// given
 	 	let clock = TestClock()
@@ -191,4 +191,30 @@ final class AppFeatureTests: TestCase {
 	 	await viewTask.cancel()
 	 }
 	 */
+}
+
+extension Profile {
+	static let testValue: Self = testValue()
+	static func testValue(nameOfFirstAccount: String? = nil) -> Self {
+		let mnemonic = try! Mnemonic(phrase: "zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo wrong", language: .english)
+		let passphrase = ""
+		let mnemonicWithPassphrase = MnemonicWithPassphrase(mnemonic: mnemonic, passphrase: passphrase)
+		let factorSource = try! DeviceFactorSource.babylon(
+			mnemonicWithPassphrase: mnemonicWithPassphrase
+		)
+
+		return .init(
+			header: .testValue,
+			factorSources: NonEmpty(rawValue: [
+				factorSource.embed(),
+			])!
+		)
+	}
+}
+
+extension ProfileSnapshot.Header {
+	static let testValue: Self = testValue()
+	static func testValue(profileID: UUID? = nil) -> Self {
+		fatalError()
+	}
 }
