@@ -8628,6 +8628,7 @@
 /* Begin XCBuildConfiguration section */
 		481B43B72ADC7F1A007945C1 /* Debug-Dev */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 48CFC69C2ADC110800E77A5C /* iOS-dev.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
