@@ -70,7 +70,7 @@ final class AppFeatureTests: TestCase {
 }
 
 extension Profile {
-	static var withOneAccount = withTestClients(Self.testValue())
+	static let withOneAccount = withTestClients(Self.testValue())
 	static let withNoAccounts = withTestClients(Self.testValue(nameOfFirstAccount: nil))
 
 	static func testValue(
