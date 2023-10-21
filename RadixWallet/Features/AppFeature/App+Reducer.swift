@@ -17,7 +17,8 @@ public struct App: Sendable, FeatureReducer {
 		) {
 			self.root = root
 			let retBuildInfo = buildInformation()
-			loggerGlobal.info("App started - engineToolkit commit hash: \(retBuildInfo.version)")
+			let config = BuildConfiguration.current?.description ?? "Unknown Build Config"
+			loggerGlobal.info("App started (\(config), RET=\(retBuildInfo.version))")
 		}
 	}
 

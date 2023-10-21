@@ -31,7 +31,6 @@ public struct DisplayMnemonic: Sendable, FeatureReducer {
 	}
 
 	@Dependency(\.secureStorageClient) var secureStorageClient
-	@Dependency(\.overlayWindowClient) var overlayWindowClient
 
 	public init() {}
 
@@ -60,10 +59,7 @@ public struct DisplayMnemonic: Sendable, FeatureReducer {
 		case let .loadMnemonicResult(.success(maybeMnemonicWithPassphrase)):
 			guard let mnemonicWithPassphrase = maybeMnemonicWithPassphrase else {
 				loggerGlobal.error("Mnemonic was nil")
-				return .run { send in
-					_ = await overlayWindowClient.scheduleAlert(.missingMnemonicAlert)
-					await send(.delegate(.failedToLoad))
-				}
+				return .send(.delegate(.failedToLoad))
 			}
 
 			state.importMnemonic = .init(
@@ -78,14 +74,7 @@ public struct DisplayMnemonic: Sendable, FeatureReducer {
 
 		case let .loadMnemonicResult(.failure(error)):
 			loggerGlobal.error("Error loading mnemonic: \(error)")
-
-			return .run { send in
-				_ = await overlayWindowClient.scheduleAlert(.init(
-					title: { TextState("Could Not Complete") },
-					message: { TextState("The required seed phrase is missing. Please return to the account and begin the recovery process.") }
-				))
-				await send(.delegate(.failedToLoad))
-			}
+			return .send(.delegate(.failedToLoad))
 		}
 	}
 

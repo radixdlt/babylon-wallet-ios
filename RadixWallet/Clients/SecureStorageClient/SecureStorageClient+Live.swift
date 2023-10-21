@@ -33,6 +33,7 @@ extension SecureStorageClient: DependencyKey {
 		@Dependency(\.localAuthenticationClient) var localAuthenticationClient
 		@Dependency(\.uuid) var uuid
 		@Dependency(\.assertionFailure) var assertionFailure
+		@Dependency(\.overlayWindowClient) var overlayWindowClient
 
 		struct AccesibilityAndAuthenticationPolicy: Sendable, Equatable {
 			/// The most secure currently available accessibility
@@ -247,6 +248,7 @@ extension SecureStorageClient: DependencyKey {
 					forKey: key,
 					authenticationPrompt: authenticationPrompt
 				) else {
+					_ = await overlayWindowClient.scheduleAlert(.missingMnemonicAlert)
 					return nil
 				}
 				return try jsonDecoder().decode(MnemonicWithPassphrase.self, from: data)

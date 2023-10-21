@@ -2,6 +2,9 @@ name: CI
 
 on:
   pull_request:
+    types:
+      - ready_for_review
+      - synchronize
   push:
     branches:
       - main
@@ -10,9 +13,14 @@ concurrency:
   group: ${{ github.ref }}
   cancel-in-progress: true
 
+
 jobs:
 
   snyk_scan:
+    if: >
+      ( github.event.pull_request.draft == false && github.event.action == 'synchronize' ) ||
+      ( github.event.action == 'ready_for_review' ) ||
+      ( github.event_name == 'push' && github.ref == 'refs/heads/main' )
     permissions:
       id-token: write
       contents: read
@@ -44,6 +52,10 @@ jobs:
           timeout 300 snyk code test --all-projects --org=${{ env.SNYK_COREAPPS_ORG_ID }} --severity-threshold=high || [ "$?" = "124" ]
 
   snyk_sbom:
+    if: >
+      ( github.event.pull_request.draft == false && github.event.action == 'synchronize' ) ||
+      ( github.event.action == 'ready_for_review' ) ||
+      ( github.event_name == 'push' && github.ref == 'refs/heads/main' )
     permissions:
       id-token: write
       contents: read
@@ -93,6 +105,10 @@ jobs:
 
   linting:
     name: "Linting"
+    if: >
+      ( github.event.pull_request.draft == false && github.event.action == 'synchronize' ) ||
+      ( github.event.action == 'ready_for_review' ) ||
+      ( github.event_name == 'push' && github.ref == 'refs/heads/main' )
     runs-on: macos-13-xlarge
 
     steps:
@@ -105,9 +121,14 @@ jobs:
           swiftformat . --lint
 
   unit_test:
+    if: >
+      ( github.event.pull_request.draft == false && github.event.action == 'synchronize' ) || 
+      ( github.event.action == 'ready_for_review' ) ||
+      ( github.event_name == 'push' && github.ref == 'refs/heads/main' )
     permissions:
       id-token: write
       contents: read
+      checks: write
     name: "Unit test"
     runs-on: macos-13-xlarge
     timeout-minutes: 15
@@ -149,7 +170,7 @@ jobs:
 
       - uses: maxim-lobanov/setup-xcode@v1
         with:
-          xcode-version: "15.0"
+          xcode-version: "15.0.1"
 
       - name: "Set up ruby"
         uses: ruby/setup-ruby@v1
@@ -164,6 +185,12 @@ jobs:
 
       - name: "Unit tests"
         run: bundle exec fastlane tests
+
+      - name: Upload results
+        uses: kishikawakatsumi/xcresulttool@2b37f116695328d5e503ac8dadca0f1545a51da4 # v1.7.1
+        with:
+          path: build/test_output/results.xcresult
+        if: success() || failure()
 
   snyk_online_monitor:
     permissions:
