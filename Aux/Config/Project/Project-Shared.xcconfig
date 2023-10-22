@@ -484,7 +484,7 @@ VERSIONING_SYSTEM = apple-generic
 
 //
 // The language version used to compile the target's Swift code.
-SWIFT_VERSION = 5.9
+SWIFT_VERSION = 5.0
 
 
 
