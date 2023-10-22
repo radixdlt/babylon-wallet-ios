@@ -8646,7 +8646,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 48ABCF3F2AE54A1F00D6E87F /* iOS-dev-test.xcconfig */;
 			buildSettings = {
-				INFOPLIST_FILE = "";
 				INFOPLIST_KEY_CFBundleDisplayName = "";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = NO;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = NO;
@@ -8660,7 +8659,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 48ABCF3F2AE54A1F00D6E87F /* iOS-dev-test.xcconfig */;
 			buildSettings = {
-				INFOPLIST_FILE = "";
 				INFOPLIST_KEY_CFBundleDisplayName = "";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = NO;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = NO;
@@ -8674,7 +8672,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 48ABCF3F2AE54A1F00D6E87F /* iOS-dev-test.xcconfig */;
 			buildSettings = {
-				INFOPLIST_FILE = "";
 				INFOPLIST_KEY_CFBundleDisplayName = "";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = NO;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = NO;
@@ -8688,7 +8685,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 48ABCF3F2AE54A1F00D6E87F /* iOS-dev-test.xcconfig */;
 			buildSettings = {
-				INFOPLIST_FILE = "";
 				INFOPLIST_KEY_CFBundleDisplayName = "";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = NO;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = NO;
@@ -8702,7 +8698,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 48ABCF3F2AE54A1F00D6E87F /* iOS-dev-test.xcconfig */;
 			buildSettings = {
-				INFOPLIST_FILE = "";
 				INFOPLIST_KEY_CFBundleDisplayName = "";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = NO;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = NO;
