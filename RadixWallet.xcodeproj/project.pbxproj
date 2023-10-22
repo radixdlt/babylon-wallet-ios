@@ -1264,7 +1264,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		481B43B02ADC7F1A007945C1 /* "RadixWalletTests".xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "\"RadixWalletTests\".xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		481B43B02ADC7F1A007945C1 /* RadixWalletTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RadixWalletTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		481B44022ADC7FB3007945C1 /* RadixWallet.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = RadixWallet.xctestplan; sourceTree = "<group>"; };
 		48649AD42ADC7CAC006307CF /* AppIcon.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = AppIcon.xcassets; sourceTree = "<group>"; };
 		48AB4E832AE19F5B001B238E /* ProfileStore+AsyncSequence+Updates.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ProfileStore+AsyncSequence+Updates.swift"; sourceTree = "<group>"; };
@@ -2570,7 +2570,7 @@
 			isa = PBXGroup;
 			children = (
 				48CFBC4F2ADC106300E77A5C /* Radix Wallet Dev.app */,
-				481B43B02ADC7F1A007945C1 /* "RadixWalletTests".xctest */,
+				481B43B02ADC7F1A007945C1 /* RadixWalletTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -7240,7 +7240,7 @@
 			);
 			name = RadixWalletTests;
 			productName = RadixWalletTests;
-			productReference = 481B43B02ADC7F1A007945C1 /* "RadixWalletTests".xctest */;
+			productReference = 481B43B02ADC7F1A007945C1 /* RadixWalletTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
 		48CFBC4E2ADC106300E77A5C /* RadixWallet */ = {
