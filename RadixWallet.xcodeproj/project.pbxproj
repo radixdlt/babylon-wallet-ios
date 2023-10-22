@@ -8646,7 +8646,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 48ABCF3F2AE54A1F00D6E87F /* iOS-dev-test.xcconfig */;
 			buildSettings = {
-				ENABLE_TESTING_SEARCH_PATHS = YES;
 				INFOPLIST_FILE = "";
 				INFOPLIST_KEY_CFBundleDisplayName = "";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = NO;
@@ -8668,7 +8667,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 48ABCF3F2AE54A1F00D6E87F /* iOS-dev-test.xcconfig */;
 			buildSettings = {
-				ENABLE_TESTING_SEARCH_PATHS = YES;
 				INFOPLIST_FILE = "";
 				INFOPLIST_KEY_CFBundleDisplayName = "";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = NO;
@@ -8690,7 +8688,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 48ABCF3F2AE54A1F00D6E87F /* iOS-dev-test.xcconfig */;
 			buildSettings = {
-				ENABLE_TESTING_SEARCH_PATHS = YES;
 				INFOPLIST_FILE = "";
 				INFOPLIST_KEY_CFBundleDisplayName = "";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = NO;
@@ -8712,7 +8709,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 48ABCF3F2AE54A1F00D6E87F /* iOS-dev-test.xcconfig */;
 			buildSettings = {
-				ENABLE_TESTING_SEARCH_PATHS = YES;
 				INFOPLIST_FILE = "";
 				INFOPLIST_KEY_CFBundleDisplayName = "";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = NO;
@@ -8734,7 +8730,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 48ABCF3F2AE54A1F00D6E87F /* iOS-dev-test.xcconfig */;
 			buildSettings = {
-				ENABLE_TESTING_SEARCH_PATHS = YES;
 				INFOPLIST_FILE = "";
 				INFOPLIST_KEY_CFBundleDisplayName = "";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = NO;
