@@ -8646,7 +8646,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 48ABCF3F2AE54A1F00D6E87F /* iOS-dev-test.xcconfig */;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ENABLE_TESTING_SEARCH_PATHS = YES;
 				INFOPLIST_FILE = "";
 				INFOPLIST_KEY_CFBundleDisplayName = "";
@@ -8669,7 +8668,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 48ABCF3F2AE54A1F00D6E87F /* iOS-dev-test.xcconfig */;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ENABLE_TESTING_SEARCH_PATHS = YES;
 				INFOPLIST_FILE = "";
 				INFOPLIST_KEY_CFBundleDisplayName = "";
@@ -8692,7 +8690,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 48ABCF3F2AE54A1F00D6E87F /* iOS-dev-test.xcconfig */;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ENABLE_TESTING_SEARCH_PATHS = YES;
 				INFOPLIST_FILE = "";
 				INFOPLIST_KEY_CFBundleDisplayName = "";
@@ -8715,7 +8712,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 48ABCF3F2AE54A1F00D6E87F /* iOS-dev-test.xcconfig */;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ENABLE_TESTING_SEARCH_PATHS = YES;
 				INFOPLIST_FILE = "";
 				INFOPLIST_KEY_CFBundleDisplayName = "";
@@ -8738,7 +8734,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 48ABCF3F2AE54A1F00D6E87F /* iOS-dev-test.xcconfig */;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ENABLE_TESTING_SEARCH_PATHS = YES;
 				INFOPLIST_FILE = "";
 				INFOPLIST_KEY_CFBundleDisplayName = "";
