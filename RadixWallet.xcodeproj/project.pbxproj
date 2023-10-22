@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		48649AD52ADC7CAC006307CF /* AppIcon.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 48649AD42ADC7CAC006307CF /* AppIcon.xcassets */; };
 		48AB4E842AE19F5B001B238E /* ProfileStore+AsyncSequence+Updates.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48AB4E832AE19F5B001B238E /* ProfileStore+AsyncSequence+Updates.swift */; };
+		48ABCF402AE54A1F00D6E87F /* iOS-dev-test.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 48ABCF3F2AE54A1F00D6E87F /* iOS-dev-test.xcconfig */; };
 		48CFC2392ADC10D900E77A5C /* SecurityStructureConfigurationListCoordinator+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBC632ADC10D800E77A5C /* SecurityStructureConfigurationListCoordinator+View.swift */; };
 		48CFC23A2ADC10D900E77A5C /* SecurityStructureConfigurationListCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBC642ADC10D800E77A5C /* SecurityStructureConfigurationListCoordinator.swift */; };
 		48CFC23B2ADC10D900E77A5C /* SecurityStructureConfigurationList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBC672ADC10D800E77A5C /* SecurityStructureConfigurationList.swift */; };
@@ -1263,10 +1264,11 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		481B43B02ADC7F1A007945C1 /* Radix Wallet Dev.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Radix Wallet Dev.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		481B43B02ADC7F1A007945C1 /* "RadixWalletTests".xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "\"RadixWalletTests\".xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		481B44022ADC7FB3007945C1 /* RadixWallet.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = RadixWallet.xctestplan; sourceTree = "<group>"; };
 		48649AD42ADC7CAC006307CF /* AppIcon.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = AppIcon.xcassets; sourceTree = "<group>"; };
 		48AB4E832AE19F5B001B238E /* ProfileStore+AsyncSequence+Updates.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ProfileStore+AsyncSequence+Updates.swift"; sourceTree = "<group>"; };
+		48ABCF3F2AE54A1F00D6E87F /* iOS-dev-test.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = "iOS-dev-test.xcconfig"; sourceTree = "<group>"; };
 		48CFBC4F2ADC106300E77A5C /* Radix Wallet Dev.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Radix Wallet Dev.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		48CFBC632ADC10D800E77A5C /* SecurityStructureConfigurationListCoordinator+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "SecurityStructureConfigurationListCoordinator+View.swift"; sourceTree = "<group>"; };
 		48CFBC642ADC10D800E77A5C /* SecurityStructureConfigurationListCoordinator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SecurityStructureConfigurationListCoordinator.swift; sourceTree = "<group>"; };
@@ -2568,7 +2570,7 @@
 			isa = PBXGroup;
 			children = (
 				48CFBC4F2ADC106300E77A5C /* Radix Wallet Dev.app */,
-				481B43B02ADC7F1A007945C1 /* Radix Wallet Dev.xctest */,
+				481B43B02ADC7F1A007945C1 /* "RadixWalletTests".xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -6573,6 +6575,7 @@
 		48CFC69B2ADC110800E77A5C /* iOS */ = {
 			isa = PBXGroup;
 			children = (
+				48ABCF3F2AE54A1F00D6E87F /* iOS-dev-test.xcconfig */,
 				48CFC69C2ADC110800E77A5C /* iOS-dev.xcconfig */,
 				48CFC69D2ADC110800E77A5C /* iOS-release.xcconfig */,
 				48CFC69E2ADC110800E77A5C /* iOS-alpha.xcconfig */,
@@ -7237,7 +7240,7 @@
 			);
 			name = RadixWalletTests;
 			productName = RadixWalletTests;
-			productReference = 481B43B02ADC7F1A007945C1 /* Radix Wallet Dev.xctest */;
+			productReference = 481B43B02ADC7F1A007945C1 /* "RadixWalletTests".xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
 		48CFBC4E2ADC106300E77A5C /* RadixWallet */ = {
@@ -7421,6 +7424,7 @@
 				48CFC6B52ADC110800E77A5C /* iOS-release-opt.xcconfig in Resources */,
 				48CFC6BF2ADC110800E77A5C /* Project-Release-Opt.xcconfig in Resources */,
 				48CFC6B12ADC110800E77A5C /* iOS-release.xcconfig in Resources */,
+				48ABCF402AE54A1F00D6E87F /* iOS-dev-test.xcconfig in Resources */,
 				48CFC6B42ADC110800E77A5C /* iOS-beta.xcconfig in Resources */,
 				48CFC6B22ADC110800E77A5C /* iOS-alpha.xcconfig in Resources */,
 				48CFC6B92ADC110800E77A5C /* Project-Release.xcconfig in Resources */,
@@ -8640,31 +8644,35 @@
 /* Begin XCBuildConfiguration section */
 		481B43B72ADC7F1A007945C1 /* Debug-Dev */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 48CFC6A92ADC110800E77A5C /* Project-Dev.xcconfig */;
+			baseConfigurationReference = 48ABCF3F2AE54A1F00D6E87F /* iOS-dev-test.xcconfig */;
 			buildSettings = {
 			};
 			name = "Debug-Dev";
 		};
 		481B43B82ADC7F1A007945C1 /* Debug-Alpha */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 48ABCF3F2AE54A1F00D6E87F /* iOS-dev-test.xcconfig */;
 			buildSettings = {
 			};
 			name = "Debug-Alpha";
 		};
 		481B43B92ADC7F1A007945C1 /* Debug-PreAlpha */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 48ABCF3F2AE54A1F00D6E87F /* iOS-dev-test.xcconfig */;
 			buildSettings = {
 			};
 			name = "Debug-PreAlpha";
 		};
 		481B43BA2ADC7F1A007945C1 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 48ABCF3F2AE54A1F00D6E87F /* iOS-dev-test.xcconfig */;
 			buildSettings = {
 			};
 			name = Release;
 		};
 		481B43BB2ADC7F1A007945C1 /* Beta */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 48ABCF3F2AE54A1F00D6E87F /* iOS-dev-test.xcconfig */;
 			buildSettings = {
 			};
 			name = Beta;
