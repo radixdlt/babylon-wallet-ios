@@ -8653,7 +8653,6 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = NO;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "";
-				SKIP_INSTALL = YES;
 				STRIP_STYLE = "non-global";
 			};
 			name = "Debug-Dev";
@@ -8669,7 +8668,6 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = NO;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "";
-				SKIP_INSTALL = YES;
 				STRIP_STYLE = "non-global";
 			};
 			name = "Debug-Alpha";
@@ -8685,7 +8683,6 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = NO;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "";
-				SKIP_INSTALL = YES;
 				STRIP_STYLE = "non-global";
 			};
 			name = "Debug-PreAlpha";
@@ -8701,7 +8698,6 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = NO;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "";
-				SKIP_INSTALL = YES;
 				STRIP_STYLE = "non-global";
 			};
 			name = Release;
@@ -8717,7 +8713,6 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = NO;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "";
-				SKIP_INSTALL = YES;
 				STRIP_STYLE = "non-global";
 			};
 			name = Beta;
