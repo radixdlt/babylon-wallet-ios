@@ -82,7 +82,7 @@ final class ProfileStoreTests: TestCase {
 				XCTAssertNoDifference(snapsot.header.lastUsedOnDevice.id, deviceID)
 				XCTAssertNoDifference(snapsot.header.creatingDevice.id, deviceID)
 			}
-			$0.secureStorageClient.loadProfileSnapshotData = { _ in nil }
+			$0.secureStorageClient.loadProfile = { _ in nil }
 			$0.secureStorageClient.loadDeviceInfo = {
 				DeviceInfo(
 					description: "iPhone (iPhone)",
@@ -137,7 +137,7 @@ final class ProfileStoreTests: TestCase {
 		try await doTestFullOnboarding(
 			profileID: profileID,
 			privateFactor: privateFactor,
-			assertProfileSnapshotSaved: { profileSnapshot in
+			assertProfileSaved: { profileSnapshot in
 
 				XCTAssertNoDifference(profileSnapshot.id, profileID)
 
@@ -161,17 +161,17 @@ private extension ProfileStoreTests {
 		provideProfileSnapshotLoaded: Data? = nil,
 		assertMnemonicWithPassphraseSaved: (@Sendable (MnemonicWithPassphrase) -> Void)? = { _ in /* noop */ },
 		assertFactorSourceSaved: (@Sendable (DeviceFactorSource) -> Void)? = { _ in /* noop */ },
-		assertProfileSnapshotSaved: (@Sendable (ProfileSnapshot) -> Void)? = { _ in /* noop */ }
+		assertProfileSaved: (@Sendable (Profile) -> Void)? = { _ in /* noop */ }
 	) async throws {
-		let profileSnapshotSaved = ActorIsolated<ProfileSnapshot?>(nil)
-		let exp = expectation(description: "saveProfileSnapshot")
+		let profileSaved = ActorIsolated<Profile?>(nil)
+		let exp = expectation(description: "saveProfile")
 		try await withDependencies {
 			$0.uuid = .constant(profileID)
 			$0.mnemonicClient.generate = { _, _ in privateFactor.mnemonicWithPassphrase.mnemonic }
 			$0.device.$name = deviceName
 			$0.device.$model = deviceModel.rawValue
-			$0.secureStorageClient.loadProfileSnapshotData = { _ in
-				provideProfileSnapshotLoaded
+			$0.secureStorageClient.loadProfile = { _ in
+				nil
 			}
 			$0.secureStorageClient.loadProfileHeaderList = {
 				nil
@@ -190,7 +190,7 @@ private extension ProfileStoreTests {
 			}
 			$0.secureStorageClient.saveProfileSnapshot = { new in
 				Task {
-					await profileSnapshotSaved.setValue(new)
+					await profileSaved.setValue(Profile(snapshot: new))
 					exp.fulfill()
 				}
 			}
@@ -218,16 +218,16 @@ private extension ProfileStoreTests {
 				break
 			}
 			await fulfillment(of: [exp], timeout: 1)
-			let maybeSavedProfile = await profileSnapshotSaved.value
-			if let assertProfileSnapshotSaved {
-				let profileSnapshot = try XCTUnwrap(maybeSavedProfile)
+			let maybeSavedProfile = await profileSaved.value
+			if let assertProfileSaved {
+				let profileSaved = try XCTUnwrap(maybeSavedProfile)
 				XCTAssertNoDifference(
-					profileSnapshot,
-					profile?.snapshot()
+					profileSaved,
+					profile
 				)
-				assertProfileSnapshotSaved(profileSnapshot)
+				assertProfileSaved(profileSaved)
 			} else {
-				XCTFail("Did not expect `saveProfileSnapshot` to be called")
+				XCTFail("Did not expect `saveProfile` to be called")
 			}
 		}
 	}
