@@ -15,3 +15,10 @@ ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES
 INFOPLIST_FILE = ;
 
 LD_RUNPATH_SEARCH_PATHS = $(inherited) $(LD_RUNPATH_SEARCH_PATHS_SHALLOW_BUNDLE_$(SHALLOW_BUNDLE))
+
+INFOPLIST_KEY_CFBundleDisplayName = ;
+INFOPLIST_KEY_UIApplicationSceneManifest_Generation = NO;
+INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = NO;
+INFOPLIST_KEY_UILaunchScreen_Generation = NO;
+INFOPLIST_KEY_UISupportedInterfaceOrientations = ;
+INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = ;
