@@ -17,6 +17,11 @@
           "name" : "RadixWallet"
         }
       ]
+    },
+    "targetForVariableExpansion" : {
+      "containerPath" : "container:RadixWallet.xcodeproj",
+      "identifier" : "48CFBC4E2ADC106300E77A5C",
+      "name" : "RadixWallet"
     }
   },
   "testTargets" : [
