@@ -190,6 +190,8 @@ jobs:
         uses: kishikawakatsumi/xcresulttool@2b37f116695328d5e503ac8dadca0f1545a51da4 # v1.7.1
         with:
           path: build/test_output/results.xcresult
+          show-passed-tests: false
+          show-code-coverage: true
         if: success() || failure()
 
   snyk_online_monitor:
