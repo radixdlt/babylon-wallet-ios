@@ -236,7 +236,7 @@ extension SecureStorageClient: DependencyKey {
 					)
 				)
 			},
-			loadMnemonicByFactorSourceID: { factorSourceID, purpose in
+			loadMnemonicByFactorSourceID: { factorSourceID, purpose, notifyIfMissing in
 				let key = key(factorSourceID: factorSourceID)
 				let authPromptValue: String = {
 					switch purpose {
@@ -266,8 +266,10 @@ extension SecureStorageClient: DependencyKey {
 					forKey: key,
 					authenticationPrompt: authenticationPrompt
 				) else {
-					Task {
-						_ = await overlayWindowClient.scheduleAlert(.missingMnemonicAlert)
+					if notifyIfMissing {
+						Task {
+							_ = await overlayWindowClient.scheduleAlert(.missingMnemonicAlert)
+						}
 					}
 					return nil
 				}
