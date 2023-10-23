@@ -35,7 +35,7 @@ final class ProfileStoreNewProfileTests: TestCase {
 	func test__GIVEN__no_deviceInfo__WHEN__init__THEN__deprecatedLoadDeviceID_is_called() {
 		let deprecatedLoadDeviceID_is_called = expectation(description: "deprecatedLoadDeviceID is called")
 		withTestClients {
-			// GIVEN no
+			// GIVEN no device info
 			$0.noDeviceInfo()
 			then(&$0)
 		} operation: {
@@ -56,7 +56,7 @@ final class ProfileStoreNewProfileTests: TestCase {
 	func test__GIVEN__no_deviceInfo__WHEN__deprecatedLoadDeviceID_returns_x__THEN__deleteDeprecatedDeviceID_is_called() async throws {
 		let deleteDeprecatedDeviceID_is_called = expectation(description: "deleteDeprecatedDeviceID is called")
 		withTestClients {
-			// GIVEN no
+			// GIVEN no device info
 			$0.noDeviceInfo()
 			$0.secureStorageClient.deprecatedLoadDeviceID = { 0xDEAD }
 			then(&$0)
@@ -79,7 +79,7 @@ final class ProfileStoreNewProfileTests: TestCase {
 		deleteDeprecatedDeviceID_is_NOT_called.isInverted = true // We expected to NOT be called.
 
 		withTestClients {
-			// GIVEN no
+			// GIVEN no device info
 			$0.noDeviceInfo()
 			$0.secureStorageClient.deprecatedLoadDeviceID = { 0xDEAD }
 			then(&$0)
@@ -100,10 +100,34 @@ final class ProfileStoreNewProfileTests: TestCase {
 		await waitForExpectations()
 	}
 
+	func test__GIVEN_a_saved_deviceInfo__WHEN__init__THEN__deprecatedLoadDeviceID_is_not_called() async {
+		let deprecatedLoadDeviceID_is_NOT_called = expectation(description: "deprecatedLoadDeviceID is NOT called")
+		deprecatedLoadDeviceID_is_NOT_called.isInverted = true // We expected to NOT be called.
+
+		withTestClients {
+			// GIVEN a saved_ device info
+			$0.secureStorageClient.loadDeviceInfo = { .testValue }
+			then(&$0)
+		} operation: {
+			// WHEN ProfileStore.init()
+			ProfileStore.init()
+		}
+
+		func then(_ d: inout DependencyValues) {
+			d.secureStorageClient.deprecatedLoadDeviceID = {
+				// THEN deprecatedLoadDeviceID is not called
+				deprecatedLoadDeviceID_is_NOT_called.fulfill()
+				return nil
+			}
+		}
+
+		await waitForExpectations()
+	}
+
 	func test__GIVEN__no_deviceInfo__WHEN__deprecatedLoadDeviceID_returns_x__THEN__x_is_migrated_to_DeviceInfo_and_saved() {
 		let x: DeviceID = 0xDEAD
 		withTestClients {
-			// GIVEN no
+			// GIVEN no device info
 			$0.noDeviceInfo()
 			$0.secureStorageClient.deprecatedLoadDeviceID = { x }
 			then(&$0)
@@ -125,7 +149,7 @@ final class ProfileStoreNewProfileTests: TestCase {
 			let x: DeviceID = 0xDEAD
 
 			let profile = await withTestClients {
-				// GIVEN no
+				// GIVEN no device info
 				$0.noDeviceInfo()
 				$0.secureStorageClient.deprecatedLoadDeviceID = { x }
 			} operation: {
