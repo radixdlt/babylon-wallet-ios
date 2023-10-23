@@ -2,6 +2,8 @@ import DependenciesAdditions
 @testable import Radix_Wallet_Dev
 import XCTest
 
+// swiftformat:disable redundantInit
+
 extension DependencyValues {
 	private mutating func _profile(_ profile: Profile?) {
 		secureStorageClient.loadProfile = { _ in
@@ -24,25 +26,8 @@ extension DependencyValues {
 	}
 }
 
-// MARK: - ProfileStoreTests
-final class ProfileStoreTests: TestCase {
-	func test__GIVEN__saved_profile__WHEN__init__THEN__saved_profile_is_used() async throws {
-		try await withTimeLimit {
-			// GIVEN saved profile
-			let saved = Profile.withOneAccount
-
-			let used = await withTestClients {
-				$0.savedProfile(saved)
-			} operation: {
-				// WHEN ProfileStore.init()
-				await ProfileStore().profile
-			}
-
-			// THEN saved profile is used.
-			XCTAssertNoDifference(saved, used)
-		}
-	}
-
+// MARK: - ProfileStoreNewProfileTests
+final class ProfileStoreNewProfileTests: TestCase {
 	func test__GIVEN__no_profile__WHEN__init__THEN__new_profile_without_network_is_used() async throws {
 		try await withTimeLimit {
 			let newProfile = await withTestClients {
@@ -50,7 +35,7 @@ final class ProfileStoreTests: TestCase {
 				$0.noProfile()
 			} operation: {
 				// WHEN ProfileStore.init()
-				await ProfileStore().profile
+				await ProfileStore.init().profile
 			}
 
 			// THEN new profile without network is used
@@ -65,7 +50,7 @@ final class ProfileStoreTests: TestCase {
 			then(&$0)
 		} operation: {
 			// WHEN ProfileStore.init()
-			ProfileStore()
+			ProfileStore.init()
 		}
 
 		func then(_ d: inout DependencyValues) {
@@ -88,7 +73,7 @@ final class ProfileStoreTests: TestCase {
 				}
 			} operation: {
 				// WHEN ProfileStore.init()
-				await ProfileStore().profile
+				await ProfileStore.init().profile
 			}
 
 			XCTAssertNoDifference(
@@ -106,7 +91,7 @@ final class ProfileStoreTests: TestCase {
 				$0.noProfile()
 			} operation: {
 				// WHEN ProfileStore.init()
-				await ProfileStore().profile
+				await ProfileStore.init().profile
 			}
 
 			// THEN profile lastUsedOnDevice == creatingDevice
@@ -124,7 +109,7 @@ final class ProfileStoreTests: TestCase {
 				$0.noProfile()
 			} operation: {
 				// WHEN ProfileStore.init()
-				await ProfileStore().profile
+				await ProfileStore.init().profile
 			}
 
 			// THEN profile.id != profile.creatingDevice.id
@@ -147,7 +132,7 @@ final class ProfileStoreTests: TestCase {
 			then(&$0)
 		} operation: {
 			// WHEN ProfileStore.init()
-			ProfileStore()
+			ProfileStore.init()
 		}
 
 		func then(_ d: inout DependencyValues) {
@@ -174,7 +159,7 @@ final class ProfileStoreTests: TestCase {
 			then(&$0)
 		} operation: {
 			// WHEN ProfileStore.init()
-			ProfileStore()
+			ProfileStore.init()
 		}
 
 		func then(_ d: inout DependencyValues) {
@@ -200,7 +185,7 @@ final class ProfileStoreTests: TestCase {
 			then(&$0)
 		} operation: {
 			// WHEN ProfileStore.init()
-			ProfileStore()
+			ProfileStore.init()
 		}
 
 		func then(_ d: inout DependencyValues) {
@@ -210,6 +195,26 @@ final class ProfileStoreTests: TestCase {
 					$0.mnemonicWithPassphrase.passphrase.isEmpty
 				)
 			}
+		}
+	}
+}
+
+// MARK: - ProfileStoreExstingProfileTests
+final class ProfileStoreExstingProfileTests: TestCase {
+	func test__GIVEN__saved_profile__WHEN__init__THEN__saved_profile_is_used() async throws {
+		try await withTimeLimit {
+			// GIVEN saved profile
+			let saved = Profile.withOneAccount
+
+			let used = await withTestClients {
+				$0.savedProfile(saved)
+			} operation: {
+				// WHEN ProfileStore.init()
+				await ProfileStore.init().profile
+			}
+
+			// THEN saved profile is used.
+			XCTAssertNoDifference(saved, used)
 		}
 	}
 }
