@@ -181,6 +181,7 @@ extension Profile.Network.Account {
 				"displayName": String(describing: displayName),
 				"address": address,
 				"securityState": securityState,
+				"flags": flags,
 			],
 			displayStyle: .struct
 		)
@@ -190,7 +191,8 @@ extension Profile.Network.Account {
 		"""
 		"displayName": \(String(describing: displayName)),
 		"address": \(address),
-		"securityState": \(securityState)
+		"securityState": \(securityState),
+		"flags": \(flags)
 		"""
 	}
 }

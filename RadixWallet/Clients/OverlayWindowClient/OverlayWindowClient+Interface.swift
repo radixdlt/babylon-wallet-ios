@@ -89,7 +89,11 @@ extension OverlayWindowClient {
 			// FIXME: Strings
 			public static let updated = Self(text: "Updated")
 
+			// FIXME: Strings
 			public static let seedPhraseImported = Self(text: "Seed Phrase Imported")
+
+			// FIXME: Strings
+			public static let accountHidden = Self(text: "Account hidden")
 
 			public init(
 				text: String,

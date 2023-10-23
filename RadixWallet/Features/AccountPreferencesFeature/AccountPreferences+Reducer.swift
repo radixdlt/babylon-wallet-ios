@@ -19,6 +19,7 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 	public enum ViewAction: Sendable, Equatable {
 		case task
 		case rowTapped(AccountPreferences.Section.SectionRow)
+		case hideAccountTapped
 	}
 
 	public enum InternalAction: Sendable, Equatable {
@@ -29,18 +30,29 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 		case destinations(PresentationAction<Destinations.Action>)
 	}
 
+	public enum DelegateAction: Sendable, Equatable {
+		case accountHidden
+	}
+
 	// MARK: - Destination
 	public struct Destinations: Reducer, Sendable {
 		public enum State: Equatable, Hashable {
 			case updateAccountLabel(UpdateAccountLabel.State)
 			case thirdPartyDeposits(ManageThirdPartyDeposits.State)
 			case devPreferences(DevAccountPreferences.State)
+			case confirmHideAccount(AlertState<Action.ConfirmHideAccountAlert>)
 		}
 
 		public enum Action: Equatable, Sendable {
 			case updateAccountLabel(UpdateAccountLabel.Action)
 			case thirdPartyDeposits(ManageThirdPartyDeposits.Action)
 			case devPreferences(DevAccountPreferences.Action)
+			case confirmHideAccount(ConfirmHideAccountAlert)
+
+			public enum ConfirmHideAccountAlert: Hashable, Sendable {
+				case confirmTapped
+				case cancelTapped
+			}
 		}
 
 		public var body: some ReducerOf<Self> {
@@ -57,6 +69,8 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 	}
 
 	@Dependency(\.accountsClient) var accountsClient
+	@Dependency(\.overlayWindowClient) var overlayWindowClient
+	@Dependency(\.errorQueue) var errorQueue
 
 	public init() {}
 
@@ -70,7 +84,7 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .task:
-			.run { [address = state.account.address] send in
+			return .run { [address = state.account.address] send in
 				for try await accountUpdate in await accountsClient.accountUpdates(address) {
 					guard !Task.isCancelled else { return }
 					await send(.internal(.accountUpdated(accountUpdate)))
@@ -78,7 +92,18 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 			}
 
 		case let .rowTapped(row):
-			destination(for: row, &state)
+			return destination(for: row, &state)
+
+		case .hideAccountTapped:
+			state.destinations = .confirmHideAccount(.init(
+				title: .init(L10n.AccountSettings.hideThisAccount),
+				message: .init(L10n.AccountSettings.hideAccountConfirmation),
+				buttons: [
+					.cancel(.init(L10n.Common.cancel), action: .send(.cancelTapped)),
+					.destructive(.init(L10n.AccountSettings.hideAccount), action: .send(.confirmTapped)),
+				]
+			))
+			return .none
 		}
 	}
 
@@ -137,6 +162,25 @@ extension AccountPreferences {
 		case .thirdPartyDeposits:
 			return .none
 		case .devPreferences:
+			return .none
+		case let .confirmHideAccount(action):
+			state.destinations = nil
+			switch action {
+			case .confirmTapped:
+				return .run { [account = state.account] send in
+					do {
+						var account = account
+						account.flags.insert(.deletedByUser)
+						try await accountsClient.updateAccount(account)
+						overlayWindowClient.scheduleHUD(.updated)
+						await send(.delegate(.accountHidden))
+					} catch {
+						errorQueue.schedule(error)
+					}
+				}
+			case .cancelTapped:
+				break
+			}
 			return .none
 		}
 	}
