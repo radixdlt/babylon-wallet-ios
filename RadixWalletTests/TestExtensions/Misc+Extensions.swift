@@ -21,3 +21,10 @@ extension UUID: ExpressibleByIntegerLiteral {
 		self.init(uuidString: "00000000-0000-0000-0000-00000000\(hex)")!
 	}
 }
+
+// MARK: - Mnemonic + ExpressibleByStringLiteral
+extension Mnemonic: ExpressibleByStringLiteral {
+	public init(stringLiteral phrase: String) {
+		try! self.init(phrase: phrase, language: .english)
+	}
+}

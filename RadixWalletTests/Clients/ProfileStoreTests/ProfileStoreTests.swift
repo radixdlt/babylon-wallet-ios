@@ -43,59 +43,62 @@ final class ProfileStoreTests: TestCase {
 	}
 
 	func test__GIVEN__no_profile__WHEN__init__THEN__new_profile_without_network_is_used() async throws {
-		try await withTimeLimit(.normal) {
+		try await withTimeLimit {
 			let newProfile = await withTestClients {
+				// GIVEN no profile
 				$0.noProfile()
 			} operation: {
+				// WHEN ProfileStore.init()
 				await ProfileStore().profile
 			}
 
+			// THEN new profile without network is used
 			XCTAssertNoDifference(newProfile.networks.count, 0)
 		}
 	}
 
-	func test__WHEN__init__THEN__24_english_word_ephmeral_mnemonic_is_generated() async {
-		let profileID: UUID = 0
-		let deviceID: UUID = 1
+	func test__GIVEN__no_profile__WHEN__init__THEN__24_word_mnemonic_is_generated() async throws {
+		try await withTimeLimit {
+			let wordCountUsed = LockIsolated<BIP39.WordCount?>(nil)
+			try await withTestClients {
+				// GIVEN no profile
+				$0.noProfile()
 
-		withDependencies {
-			$0.device.$name = deviceName
-			$0.device.$model = deviceModel.rawValue
-			$0.uuid = .incrementing
-			$0.mnemonicClient.generate = {
-				XCTAssertNoDifference($0, BIP39.WordCount.twentyFour)
-				XCTAssertNoDifference($1, BIP39.Language.english)
-				return .testValue
-			}
-			$0.secureStorageClient.loadProfileHeaderList = { nil }
-			$0.secureStorageClient.saveProfileHeaderList = {
-				XCTAssertNoDifference($0.count, 1)
-			}
-			$0.userDefaultsClient.setString = { v, _ in
-				if v == UserDefaultsClient.Key.activeProfileID.rawValue {
-					XCTAssertNoDifference(v, profileID.uuidString)
+				$0.mnemonicClient.generate = { wordCount, _ in
+					wordCountUsed.setValue(wordCount)
+					return try Mnemonic(wordCount: wordCount, language: .english)
 				}
+			} operation: {
+				// WHEN ProfileStore.init()
+				await ProfileStore()
 			}
-			$0.secureStorageClient.saveMnemonicForFactorSource = { XCTAssertNoDifference($0.factorSource.kind, .device) }
-			$0.secureStorageClient.saveProfileSnapshot = { snapsot in
-				XCTAssertNoDifference(snapsot.header.id, profileID)
-				XCTAssertNoDifference(snapsot.header.lastUsedOnDevice.id, deviceID)
-				XCTAssertNoDifference(snapsot.header.creatingDevice.id, deviceID)
+
+			wordCountUsed.withValue {
+				// THEN 24 word mnemonic is generated
+				XCTAssertNoDifference($0, .twentyFour)
 			}
-			$0.secureStorageClient.loadProfile = { _ in nil }
-			$0.secureStorageClient.loadDeviceInfo = {
-				DeviceInfo(
-					description: "iPhone (iPhone)",
-					id: deviceID,
-					date: Date(timeIntervalSince1970: 0)
-				)
+		}
+	}
+
+	func test__GIVEN__no_profile__WHEN__init__THEN__profile_uses_newly_generated_DeviceFactorSource() async throws {
+		try await withTimeLimit {
+			let profile = await withTestClients {
+				// GIVEN no profile
+				$0.noProfile()
+
+				$0.mnemonicClient.generate = { _, _ in
+					"zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo wrong"
+				}
+			} operation: {
+				// WHEN ProfileStore.init()
+				await ProfileStore().profile
 			}
-			$0.date = .constant(Date(timeIntervalSince1970: 0))
-			$0.userDefaultsClient.stringForKey = { _ in
-				nil
-			}
-		} operation: {
-			ProfileStore()
+
+			XCTAssertNoDifference(
+				profile.factorSources.first.id.description,
+				// THEN profile uses newly generated DeviceFactorSource
+				"device:09a501e4fafc7389202a82a3237a405ed191cdb8a4010124ff8e2c9259af1327"
+			)
 		}
 	}
 
