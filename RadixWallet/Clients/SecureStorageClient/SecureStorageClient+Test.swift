@@ -12,7 +12,7 @@ extension SecureStorageClient: TestDependencyKey {
 		saveProfileSnapshot: { _ in },
 		loadProfileSnapshotData: { _ in nil },
 		saveMnemonicForFactorSource: { _ in },
-		loadMnemonicByFactorSourceID: { _, _ in nil },
+		loadMnemonicByFactorSourceID: { _, _, _ in nil },
 		containsMnemonicIdentifiedByFactorSourceID: { _ in false },
 		deleteMnemonicByFactorSourceID: { _ in },
 		deleteProfileAndMnemonicsByFactorSourceIDs: { _, _ in },
