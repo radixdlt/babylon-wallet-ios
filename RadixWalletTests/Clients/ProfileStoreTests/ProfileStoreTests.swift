@@ -57,25 +57,21 @@ final class ProfileStoreTests: TestCase {
 		}
 	}
 
-	func test__GIVEN__no_profile__WHEN__init__THEN__24_word_mnemonic_is_generated() async throws {
-		try await withTimeLimit {
-			let wordCountUsed = LockIsolated<BIP39.WordCount?>(nil)
-			try await withTestClients {
-				// GIVEN no profile
-				$0.noProfile()
+	func test__GIVEN__no_profile__WHEN__init__THEN__24_word_mnemonic_is_generated() throws {
+		withTestClients {
+			// GIVEN no profile
+			$0.noProfile()
+			then(&$0)
+		} operation: {
+			// WHEN ProfileStore.init()
+			ProfileStore()
+		}
 
-				$0.mnemonicClient.generate = { wordCount, _ in
-					wordCountUsed.setValue(wordCount)
-					return try Mnemonic(wordCount: wordCount, language: .english)
-				}
-			} operation: {
-				// WHEN ProfileStore.init()
-				await ProfileStore()
-			}
-
-			wordCountUsed.withValue {
+		func then(_ d: inout DependencyValues) {
+			d.mnemonicClient.generate = { wordCount, _ in
 				// THEN 24 word mnemonic is generated
-				XCTAssertNoDifference($0, .twentyFour)
+				XCTAssertNoDifference(wordCount, .twentyFour)
+				return try Mnemonic(wordCount: wordCount, language: .english)
 			}
 		}
 	}
@@ -102,58 +98,82 @@ final class ProfileStoreTests: TestCase {
 		}
 	}
 
-	func test_fullOnboarding_assert_mnemonic_persisted_when_commitEphemeral_called() async throws {
-		let privateFactor = withDependencies {
-			$0.date = .constant(Date(timeIntervalSince1970: 0))
+	func test__GIVEN__no_profile__WHEN__init__THEN__newly_generated_DeviceFactorSource_is_persisted() throws {
+		withTestClients {
+			// GIVEN no profile
+			$0.noProfile()
+
+			$0.mnemonicClient.generate = { _, _ in
+				"zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo wrong"
+			}
+
+			then(&$0)
 		} operation: {
-			PrivateHDFactorSource.testValue
+			// WHEN ProfileStore.init()
+			ProfileStore()
 		}
 
-		try await doTestFullOnboarding(
-			privateFactor: privateFactor,
-			assertMnemonicWithPassphraseSaved: {
-				XCTAssertNoDifference($0, privateFactor.mnemonicWithPassphrase)
+		func then(_ d: inout DependencyValues) {
+			d.secureStorageClient.saveMnemonicForFactorSource = {
+				XCTAssertNoDifference(
+					$0.factorSource.id.description,
+					// THEN profile uses newly generated DeviceFactorSource
+					"device:09a501e4fafc7389202a82a3237a405ed191cdb8a4010124ff8e2c9259af1327"
+				)
 			}
-		)
+		}
 	}
 
-	func test_fullOnboarding_assert_factorSource_persisted_when_commitEphemeral_called() async throws {
-		try await doTestFullOnboarding(
-			privateFactor: .testValue,
-			assertFactorSourceSaved: { factorSource in
-				XCTAssertNoDifference(factorSource.kind, .device)
-				XCTAssertFalse(factorSource.supportsOlympia)
-				XCTAssertNoDifference(factorSource.hint.name, deviceName)
-				XCTAssertNoDifference(factorSource.hint.model, deviceModel)
-			}
-		)
-	}
+	func test__GIVEN__no_profile__WHEN__init__THEN__newly_generated_mnemonic_is_persisted() throws {
+		let mnemonic: Mnemonic = "zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo wrong"
+		withTestClients {
+			// GIVEN no profile
+			$0.noProfile()
 
-	func test_fullOnboarding_assert_profileSnapshot_persisted_when_commitEphemeral_called() async throws {
-		let profileID = UUID()
-		let privateFactor = withDependencies {
-			$0.date = .constant(Date(timeIntervalSince1970: 0))
+			$0.mnemonicClient.generate = { _, _ in
+				mnemonic
+			}
+
+			then(&$0)
 		} operation: {
-			PrivateHDFactorSource.testValue
+			// WHEN ProfileStore.init()
+			ProfileStore()
 		}
 
-		try await doTestFullOnboarding(
-			profileID: profileID,
-			privateFactor: privateFactor,
-			assertProfileSaved: { profileSnapshot in
-
-				XCTAssertNoDifference(profileSnapshot.id, profileID)
-
+		func then(_ d: inout DependencyValues) {
+			d.secureStorageClient.saveMnemonicForFactorSource = {
 				XCTAssertNoDifference(
-					profileSnapshot.factorSources.first,
-					privateFactor.factorSource.embed()
-				)
-				XCTAssertNoDifference(
-					profileSnapshot.header.creatingDevice.description,
-					expectedDeviceDescription
+					$0.mnemonicWithPassphrase.mnemonic,
+					// THEN profile uses newly generated mnemonic
+					mnemonic
 				)
 			}
-		)
+		}
+	}
+
+	func test__GIVEN__no_profile__WHEN__init__THEN__newly_generated_mnemonic_is_used_with_empty_passphrase() throws {
+		withTestClients {
+			// GIVEN no profile
+			$0.noProfile()
+
+			$0.mnemonicClient.generate = { _, _ in
+				"zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo wrong"
+			}
+
+			then(&$0)
+		} operation: {
+			// WHEN ProfileStore.init()
+			ProfileStore()
+		}
+
+		func then(_ d: inout DependencyValues) {
+			d.secureStorageClient.saveMnemonicForFactorSource = {
+				XCTAssertTrue(
+					// THEN generated mnemonic is used with empty passphrase
+					$0.mnemonicWithPassphrase.passphrase.isEmpty
+				)
+			}
+		}
 	}
 }
 
