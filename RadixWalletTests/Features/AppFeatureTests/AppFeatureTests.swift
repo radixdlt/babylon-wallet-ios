@@ -183,9 +183,12 @@ private func configureTestClients(
 	d.uuid = .incrementing
 	d.date = .constant(Date(timeIntervalSince1970: 0))
 	d.mnemonicClient.generate = { _, _ in .testValue }
+	d.secureStorageClient.saveDeviceInfo = { _ in }
+	d.secureStorageClient.deprecatedLoadDeviceID = { nil }
 	d.secureStorageClient.loadDeviceInfo = { .testValue }
 	d.secureStorageClient.loadProfileHeaderList = { nil }
 	d.secureStorageClient.saveProfileHeaderList = { _ in }
+	d.secureStorageClient.deleteDeprecatedDeviceID = {}
 	d.secureStorageClient.saveMnemonicForFactorSource = { _ in }
 	d.secureStorageClient.saveProfileSnapshot = { _ in }
 	d.secureStorageClient.loadProfileSnapshotData = { _ in nil }

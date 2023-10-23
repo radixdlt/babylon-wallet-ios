@@ -24,10 +24,92 @@ extension DependencyValues {
 	mutating func noProfile() {
 		_profile(nil)
 	}
+
+	mutating func noDeviceInfo() {
+		secureStorageClient.loadDeviceInfo = { nil }
+	}
 }
 
 // MARK: - ProfileStoreNewProfileTests
 final class ProfileStoreNewProfileTests: TestCase {
+	func test__GIVEN__no_deviceInfo__WHEN__init__THEN__deprecatedLoadDeviceID_is_called() {
+		let deprecatedLoadDeviceID_is_called = expectation(description: "deprecatedLoadDeviceID is called")
+		withTestClients {
+			// GIVEN no
+			$0.noDeviceInfo()
+			then(&$0)
+		} operation: {
+			// WHEN ProfileStore.init()
+			ProfileStore.init()
+		}
+
+		func then(_ d: inout DependencyValues) {
+			d.secureStorageClient.deprecatedLoadDeviceID = {
+				// THEN deprecatedLoadDeviceID is called
+				deprecatedLoadDeviceID_is_called.fulfill()
+				return UUID?.none
+			}
+		}
+		wait(for: [deprecatedLoadDeviceID_is_called])
+	}
+
+	func test__GIVEN__no_deviceInfo__WHEN__deprecatedLoadDeviceID_returns_x__THEN__deleteDeprecatedDeviceID_is_called() {
+		let deleteDeprecatedDeviceID_is_called = expectation(description: "deleteDeprecatedDeviceID is called")
+		withTestClients {
+			// GIVEN no
+			$0.noDeviceInfo()
+			$0.secureStorageClient.deprecatedLoadDeviceID = { 0xDEAD }
+			then(&$0)
+		} operation: {
+			// WHEN ProfileStore.init()
+			ProfileStore.init()
+		}
+
+		func then(_ d: inout DependencyValues) {
+			d.secureStorageClient.deleteDeprecatedDeviceID = {
+				deleteDeprecatedDeviceID_is_called.fulfill()
+			}
+		}
+		wait(for: [deleteDeprecatedDeviceID_is_called])
+	}
+
+	func test__GIVEN__no_deviceInfo__WHEN__deprecatedLoadDeviceID_returns_x__THEN__x_is_migrated_to_DeviceInfo_and_saved() {
+		let x: DeviceID = 0xDEAD
+		withTestClients {
+			// GIVEN no
+			$0.noDeviceInfo()
+			$0.secureStorageClient.deprecatedLoadDeviceID = { x }
+			then(&$0)
+		} operation: {
+			// WHEN ProfileStore.init()
+			ProfileStore.init()
+		}
+
+		func then(_ d: inout DependencyValues) {
+			d.secureStorageClient.saveDeviceInfo = {
+				// THEN x is migrated to DeviceInfo and saved
+				XCTAssertNoDifference($0.id, x)
+			}
+		}
+	}
+
+	func test__GIVEN__no_deviceInfo__WHEN__deprecatedLoadDeviceID_returns_x__THEN__x_is_migrated_to_DeviceInfo_and_used() async throws {
+		try await withTimeLimit {
+			let x: DeviceID = 0xDEAD
+
+			let profile = await withTestClients {
+				// GIVEN no
+				$0.noDeviceInfo()
+				$0.secureStorageClient.deprecatedLoadDeviceID = { x }
+			} operation: {
+				// WHEN ProfileStore.init()
+				await ProfileStore.init().profile
+			}
+
+			XCTAssertNoDifference(profile.header.creatingDevice.id, x)
+		}
+	}
+
 	func test__GIVEN__no_profile__WHEN__init__THEN__new_profile_without_network_is_used() async throws {
 		try await withTimeLimit {
 			let newProfile = await withTestClients {
