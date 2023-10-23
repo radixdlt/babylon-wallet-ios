@@ -203,7 +203,7 @@ extension SecureStorageClient: DependencyKey {
 					)
 				)
 			},
-			loadMnemonicByFactorSourceID: { factorSourceID, purpose in
+			loadMnemonicByFactorSourceID: { factorSourceID, purpose, notifyIfMissing in
 				let key = key(factorSourceID: factorSourceID)
 				let authPromptValue: String = {
 					switch purpose {
@@ -233,7 +233,9 @@ extension SecureStorageClient: DependencyKey {
 					forKey: key,
 					authenticationPrompt: authenticationPrompt
 				) else {
-					_ = await overlayWindowClient.scheduleAlert(.missingMnemonicAlert)
+					if notifyIfMissing {
+						_ = await overlayWindowClient.scheduleAlert(.missingMnemonicAlert)
+					}
 					return nil
 				}
 				return try jsonDecoder().decode(MnemonicWithPassphrase.self, from: data)

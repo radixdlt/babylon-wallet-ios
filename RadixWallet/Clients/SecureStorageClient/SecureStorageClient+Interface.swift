@@ -27,7 +27,7 @@ extension SecureStorageClient {
 	public typealias LoadProfileSnapshotData = @Sendable (ProfileSnapshot.Header.ID) async throws -> Data?
 
 	public typealias SaveMnemonicForFactorSource = @Sendable (PrivateHDFactorSource) async throws -> Void
-	public typealias LoadMnemonicByFactorSourceID = @Sendable (FactorSourceID.FromHash, LoadMnemonicPurpose) async throws -> MnemonicWithPassphrase?
+	public typealias LoadMnemonicByFactorSourceID = @Sendable (FactorSourceID.FromHash, LoadMnemonicPurpose, _ notifyIfMissing: Bool) async throws -> MnemonicWithPassphrase?
 	public typealias ContainsMnemonicIdentifiedByFactorSourceID = @Sendable (FactorSourceID.FromHash) async -> Bool
 
 	public typealias DeleteMnemonicByFactorSourceID = @Sendable (FactorSourceID.FromHash) async throws -> Void
@@ -76,6 +76,13 @@ extension SecureStorageClient {
 				"updateAccountMetadata"
 			}
 		}
+	}
+}
+
+extension SecureStorageClient {
+	@Sendable
+	public func loadMnemonicByFactorSourceID(_ factorSourceID: FactorSourceID.FromHash, _ purpose: LoadMnemonicPurpose) async throws -> MnemonicWithPassphrase? {
+		try await self.loadMnemonicByFactorSourceID(factorSourceID, purpose, true)
 	}
 }
 
