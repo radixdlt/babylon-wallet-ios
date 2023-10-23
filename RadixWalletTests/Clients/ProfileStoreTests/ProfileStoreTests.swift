@@ -351,6 +351,47 @@ final class ProfileStoreNewProfileTests: TestCase {
 			}
 		}
 	}
+
+	func test__GIVEN__no_profile__WHEN__finishOnboarding__THEN__iphone__model_is_updated_in_profile_and_keychain() async throws {
+		try await withTimeLimit {
+			let savedSnapshot = LockIsolated<ProfileSnapshot?>(nil)
+
+			let inMemory = try await withTestClients {
+				// GIVEN no profile
+				$0.noProfile()
+				$0.device.$model = { "marco" }
+				$0.device.$name = { "polo" }
+				then(&$0)
+			} operation: {
+				// WHEN finishedOnboarding
+				let sut = ProfileStore()
+				try await sut.updating {
+					try $0.addAccount(Profile.Network.Account.testValue)
+				}
+				await sut.finishedOnboarding()
+				return await sut.profile
+			}
+
+			func then(_ d: inout DependencyValues) {
+				d.secureStorageClient.saveProfileSnapshot = {
+					savedSnapshot.setValue($0)
+				}
+			}
+
+			func assert(_ header: ProfileSnapshot.Header?) {
+				let expected = "marco (polo)"
+				XCTAssertNoDifference(header?.creatingDevice.description, expected)
+				XCTAssertNoDifference(header?.lastUsedOnDevice.description, expected)
+			}
+
+			// THEN iphone model is updated in Profile ...
+			assert(inMemory.header)
+			savedSnapshot.withValue { inKeychain in
+				// ... and in keychain
+				assert(inKeychain?.header)
+			}
+		}
+	}
 }
 
 // MARK: - ProfileStoreExstingProfileTests
