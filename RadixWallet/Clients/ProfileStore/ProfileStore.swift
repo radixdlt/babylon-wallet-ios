@@ -403,7 +403,8 @@ extension ProfileStore {
 		return (profile, bdfsMnemonic)
 	}
 
-	/// If `fromDeprecatedDeviceID` is true, a migration might be needed
+	/// Returns `MetaDeviceInfo` which contains `fromDeprecatedDeviceID` , and if
+	/// it is true, a migration of `DeviceID` into `DeviceInfo` might be needed.
 	// See: https://radixdlt.atlassian.net/l/cp/fmoH9KcN
 	private static func _deviceInfo() -> MetaDeviceInfo {
 		@Dependency(\.secureStorageClient) var secureStorageClient
