@@ -38,15 +38,13 @@ platform :ios do
             app_identifier: read_env_config(key: "PRODUCT_BUNDLE_IDENTIFIER"),
             initial_build_number: 0
         ) + 1
-        
+
         increment_build_number(
             xcodeproj: ENV['PROJ_PATH'],
             build_number: build_number
         )
 
-        build_ios_app(
-            include_symbols: true
-        )
+        export_ios_app
 
         upload_to_testflight(
             api_key: api_key
@@ -62,6 +60,13 @@ platform :ios do
             create_gh_release(flavour: flavour)
         end
 
+    end
+
+    desc "Archive and export the iOS app"
+    lane :export_ios_app do |options|
+        build_ios_app(
+            include_symbols: true
+        )
     end
 
     desc "Installs distribution certificates"
@@ -96,11 +101,11 @@ platform :ios do
 
     error do |lane, exception, options|
         case lane
-        when :deploy then
+        when :export_ios_app then
             commithash = sh("git rev-parse HEAD").strip # Fastlane Action.last_git_commit did not work
             gh_workflow_check_url = "https://github.com/radixdlt/babylon-wallet-ios/commit/#{commithash}/checks"
-            
-            pretext = 
+
+            pretext =
             <<~EOS
             🚨
             Failed to Archive app on branch `#{Actions.git_branch}`
@@ -109,13 +114,13 @@ platform :ios do
             EOS
 
             message =
-            <<~EOS 
+            <<~EOS
             Perhaps you worked with `#if DEBUG`?
             Try `bundle exec fastlane build` locally."
             EOS
 
             slack(
-                message: message, 
+                message: message,
                 channel: "#chapter--engineering-ios",
                 slack_url: ENV["SLACK_WEBHOOK_URL"],
                 success: false, # We just failed...
@@ -145,19 +150,19 @@ def exist_at_path?(filePath)
         return true
     end
     puts "🤷‍♂️ Found no file or dir at '#{filePath}'\n"
-   
+
     false
 end
 
 private_lane :locate_dsym do |options|
     puts "👀 SharedValues::DSYM_OUTPUT_PATH]: '#{lane_context[SharedValues::DSYM_OUTPUT_PATH]}'"
     puts "👀 SharedValues::DSYM_ZIP_PATH]: '#{lane_context[SharedValues::DSYM_ZIP_PATH]}'"
-   
+
     dsymPathUsed = nil
 
     if exist_at_path?(lane_context[SharedValues::DSYM_OUTPUT_PATH])
         puts "✅ Found DSYMs at '#{lane_context[SharedValues::DSYM_OUTPUT_PATH]}' ✅"
-        dsymPathUsed = lane_context[SharedValues::DSYM_OUTPUT_PATH] 
+        dsymPathUsed = lane_context[SharedValues::DSYM_OUTPUT_PATH]
     else
         if exist_at_path?(lane_context[SharedValues::DSYM_ZIP_PATH])
             puts "\nDSYM_OUTPUT_PATH was nil but found file at DSYM_ZIP_PATH, using it...✅\n"
@@ -243,9 +248,9 @@ private_lane :dependencies_with_hyperlinks do |options|
     versions = Hash.new
     dependencies.each do |child_dict|
         child = child_dict[:identity]
-        maybe_relevant_child = core_deps.detect { |h| 
+        maybe_relevant_child = core_deps.detect { |h|
             identity = h[:at]
-            identity.include? child 
+            identity.include? child
         }
         is_child_relevant = maybe_relevant_child.nil? == false
         if is_child_relevant
