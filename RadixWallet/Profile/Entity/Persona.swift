@@ -33,6 +33,9 @@ extension Profile.Network {
 		/// A required non empty display name, used by presentation layer and sent to Dapps when requested.
 		public var displayName: NonEmptyString
 
+		/// Flags that are currently set on entity.
+		public var flags: Set<EntityFlag>
+
 		public var personaData: PersonaData
 
 		public init(
@@ -45,8 +48,9 @@ extension Profile.Network {
 			self.networkID = networkID
 			self.address = address
 			self.securityState = securityState
-			self.personaData = extraProperties.personaData
 			self.displayName = displayName
+			self.flags = []
+			self.personaData = extraProperties.personaData
 		}
 
 		public init(
@@ -60,7 +64,7 @@ extension Profile.Network {
 				address: address,
 				securityState: securityState,
 				displayName: displayName,
-				personaData: .init()
+				extraProperties: .init(personaData: .init())
 			)
 		}
 	}

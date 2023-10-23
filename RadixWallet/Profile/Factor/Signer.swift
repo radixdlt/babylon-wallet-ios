@@ -98,6 +98,11 @@ public enum EntityPotentiallyVirtual: Sendable, Hashable, EntityBaseProtocol, Id
 	public var displayName: NonEmpty<String> {
 		property(\.displayName)
 	}
+
+	/// Flags that are currently set on entity.
+	public var flags: Set<EntityFlag> {
+		property(\.flags)
+	}
 }
 
 // MARK: - SigningPurpose

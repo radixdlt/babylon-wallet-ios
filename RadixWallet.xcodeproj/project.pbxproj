@@ -1153,6 +1153,7 @@
 		48FFFB082ADC6FD300B2B213 /* SwiftUINavigationCore in Frameworks */ = {isa = PBXBuildFile; productRef = 48FFFB072ADC6FD300B2B213 /* SwiftUINavigationCore */; };
 		48FFFB0A2ADC721800B2B213 /* Atomics in Frameworks */ = {isa = PBXBuildFile; productRef = 48FFFB092ADC721800B2B213 /* Atomics */; };
 		48FFFB0D2ADC744700B2B213 /* TextBuilder in Frameworks */ = {isa = PBXBuildFile; productRef = 48FFFB0C2ADC744700B2B213 /* TextBuilder */; };
+		832880692AE664C30014FBF3 /* EntityFlag.swift in Sources */ = {isa = PBXBuildFile; fileRef = 832880682AE664C30014FBF3 /* EntityFlag.swift */; };
 		83D0B5692AE01EDE0048DCBE /* RadixEngineToolkitError+Description.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83D0B5682AE01EDE0048DCBE /* RadixEngineToolkitError+Description.swift */; };
 		E6390FB32AE6C3E200B4DEE2 /* ProfileStore+OverlayWindowClient+Alert+OwnershipConflict.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6390FB22AE6C3E200B4DEE2 /* ProfileStore+OverlayWindowClient+Alert+OwnershipConflict.swift */; };
 		E63D123D2ADD1FC00001CBB1 /* SwiftUIIntrospect in Frameworks */ = {isa = PBXBuildFile; productRef = E63D123C2ADD1FC00001CBB1 /* SwiftUIIntrospect */; };
@@ -2379,6 +2380,7 @@
 		48CFC6AD2ADC110800E77A5C /* Radix-Wallet--iOS--Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Radix-Wallet--iOS--Info.plist"; sourceTree = "<group>"; };
 		48FF43142AE43C7C00C568B9 /* TimeLimit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeLimit.swift; sourceTree = "<group>"; };
 		48FFFAF12ADC23AC00B2B213 /* Exports.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Exports.swift; sourceTree = "<group>"; };
+		832880682AE664C30014FBF3 /* EntityFlag.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntityFlag.swift; sourceTree = "<group>"; };
 		83D0B5682AE01EDE0048DCBE /* RadixEngineToolkitError+Description.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RadixEngineToolkitError+Description.swift"; sourceTree = "<group>"; };
 		E6390FB22AE6C3E200B4DEE2 /* ProfileStore+OverlayWindowClient+Alert+OwnershipConflict.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ProfileStore+OverlayWindowClient+Alert+OwnershipConflict.swift"; sourceTree = "<group>"; };
 		E67F14442AE029BA00738BE1 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -6165,6 +6167,7 @@
 				48CFC1C12ADC10D900E77A5C /* PersonaData */,
 				48CFC1DF2ADC10D900E77A5C /* Account.swift */,
 				48CFC1E02ADC10D900E77A5C /* EntityProtocol.swift */,
+				832880682AE664C30014FBF3 /* EntityFlag.swift */,
 			);
 			path = Entity;
 			sourceTree = "<group>";
@@ -7671,6 +7674,7 @@
 				48CFC2BB2ADC10D900E77A5C /* SelectBackup+Reducer.swift in Sources */,
 				48CFC4082ADC10DA00E77A5C /* UInt11.swift in Sources */,
 				48CFC2D32ADC10D900E77A5C /* AccountDetails+Reducer.swift in Sources */,
+				832880692AE664C30014FBF3 /* EntityFlag.swift in Sources */,
 				48CFC4822ADC10DA00E77A5C /* ROLAClient+Mock.swift in Sources */,
 				48CFC5102ADC10DA00E77A5C /* FungibleResourcesCollectionItemVaultAggregatedVaultAllOf.swift in Sources */,
 				48CFC4F12ADC10DA00E77A5C /* MetadataBoolArrayValueAllOf.swift in Sources */,
