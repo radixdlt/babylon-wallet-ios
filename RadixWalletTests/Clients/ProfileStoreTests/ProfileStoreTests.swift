@@ -99,7 +99,7 @@ final class ProfileStoreTests: TestCase {
 		}
 	}
 
-	func test__GIVEN__no_profile__WHEN__init__THEN__profiles_lastUsedOnDevice_equals_creatingDevice() async throws {
+	func test__GIVEN__no_profile__WHEN__init__THEN__profile_lastUsedOnDevice_equals_creatingDevice() async throws {
 		try await withTimeLimit {
 			let profile = await withTestClients {
 				// GIVEN no profile
@@ -109,9 +109,28 @@ final class ProfileStoreTests: TestCase {
 				await ProfileStore().profile
 			}
 
+			// THEN profile lastUsedOnDevice == creatingDevice
 			XCTAssertNoDifference(
 				profile.header.lastUsedOnDevice,
 				profile.header.creatingDevice
+			)
+		}
+	}
+
+	func test__GIVEN__no_profile__WHEN__init__THEN__profile_id_not_equals_creatingDeviceID() async throws {
+		try await withTimeLimit {
+			let profile = await withTestClients {
+				// GIVEN no profile
+				$0.noProfile()
+			} operation: {
+				// WHEN ProfileStore.init()
+				await ProfileStore().profile
+			}
+
+			// THEN profile.id != profile.creatingDevice.id
+			XCTAssertNotEqual(
+				profile.header.id,
+				profile.header.creatingDevice.id
 			)
 		}
 	}
