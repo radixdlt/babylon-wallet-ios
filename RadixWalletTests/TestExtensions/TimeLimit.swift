@@ -34,6 +34,7 @@ public enum TimeLimit: Sendable, Hashable {
 		}
 	}
 
+	public static let `default`: Self = .fast
 	public static let fast: Self = .preset(.fast)
 	public static let normal: Self = .preset(.normal)
 	public static let slow: Self = .preset(.slow)
@@ -62,7 +63,7 @@ public enum TimeLimit: Sendable, Hashable {
 ///
 /// This function is not part of the public interface of the testing library.
 func withTimeLimit(
-	_ timeLimit: TimeLimit = .fast,
+	_ timeLimit: TimeLimit = .default,
 	failOnTimeout: Bool = true,
 	_ body: @escaping @Sendable () async throws -> Void,
 	timeoutHandler: (@Sendable () -> Void)? = nil,
@@ -85,5 +86,19 @@ func withTimeLimit(
 			group.cancelAll()
 		}
 		try await group.next()!
+	}
+}
+
+extension XCTestCase {
+	func waitForExpectations(limit timelimit: TimeLimit = .default) async {
+		let timeout = timelimit.duration.timeInterval
+		await waitForExpectations(timeout: timeout)
+	}
+}
+
+extension Duration {
+	/// Possibly lossy conversion to TimeInterval
+	var timeInterval: TimeInterval {
+		TimeInterval(components.seconds) + Double(components.attoseconds) / 1e18
 	}
 }

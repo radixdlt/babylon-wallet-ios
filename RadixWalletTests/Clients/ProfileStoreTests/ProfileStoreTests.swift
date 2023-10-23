@@ -53,7 +53,7 @@ final class ProfileStoreNewProfileTests: TestCase {
 		wait(for: [deprecatedLoadDeviceID_is_called])
 	}
 
-	func test__GIVEN__no_deviceInfo__WHEN__deprecatedLoadDeviceID_returns_x__THEN__deleteDeprecatedDeviceID_is_called() {
+	func test__GIVEN__no_deviceInfo__WHEN__deprecatedLoadDeviceID_returns_x__THEN__deleteDeprecatedDeviceID_is_called() async throws {
 		let deleteDeprecatedDeviceID_is_called = expectation(description: "deleteDeprecatedDeviceID is called")
 		withTestClients {
 			// GIVEN no
@@ -67,10 +67,37 @@ final class ProfileStoreNewProfileTests: TestCase {
 
 		func then(_ d: inout DependencyValues) {
 			d.secureStorageClient.deleteDeprecatedDeviceID = {
+				// THEN deleteDeprecatedDeviceID is called
 				deleteDeprecatedDeviceID_is_called.fulfill()
 			}
 		}
-		wait(for: [deleteDeprecatedDeviceID_is_called])
+		await waitForExpectations()
+	}
+
+	func test__GIVEN__no_deviceInfo__WHEN__deprecatedLoadDeviceID_returns_x__THEN__deleteDeprecatedDeviceID_is_not_called_if_failed_to_save_migrated_deviceInfo() async {
+		let deleteDeprecatedDeviceID_is_NOT_called = expectation(description: "deleteDeprecatedDeviceID is NOT called")
+		deleteDeprecatedDeviceID_is_NOT_called.isInverted = true // We expected to NOT be called.
+
+		withTestClients {
+			// GIVEN no
+			$0.noDeviceInfo()
+			$0.secureStorageClient.deprecatedLoadDeviceID = { 0xDEAD }
+			then(&$0)
+		} operation: {
+			// WHEN ProfileStore.init()
+			ProfileStore.init()
+		}
+
+		func then(_ d: inout DependencyValues) {
+			d.secureStorageClient.deleteDeprecatedDeviceID = {
+				// THEN deleteDeprecatedDeviceID is NOT called if...
+				deleteDeprecatedDeviceID_is_NOT_called.fulfill()
+			}
+			// ... if failed to save migrated deviceInfo
+			d.secureStorageClient.saveDeviceInfo = { _ in throw NoopError() }
+		}
+
+		await waitForExpectations()
 	}
 
 	func test__GIVEN__no_deviceInfo__WHEN__deprecatedLoadDeviceID_returns_x__THEN__x_is_migrated_to_DeviceInfo_and_saved() {
@@ -106,6 +133,7 @@ final class ProfileStoreNewProfileTests: TestCase {
 				await ProfileStore.init().profile
 			}
 
+			// THEN x is migrated to DeviceInfo and used
 			XCTAssertNoDifference(profile.header.creatingDevice.id, x)
 		}
 	}
