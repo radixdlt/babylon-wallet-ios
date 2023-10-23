@@ -30,7 +30,7 @@ final class AccountPreferencesTests: TestCase {
 		let scheduleCompletionHUD = ActorIsolated<OverlayWindowClient.Item.HUD?>(nil)
 		store.dependencies.overlayWindowClient.scheduleHUD = { hud in
 			Task {
-				await completionHUD.setValue(hud)
+				await scheduleCompletionHUD.setValue(hud)
 			}
 		}
 		await store.send(.child(.destinations(.presented(.confirmHideAccount(.confirmTapped))))) { state in
@@ -42,7 +42,7 @@ final class AccountPreferencesTests: TestCase {
 		XCTAssertEqual(account, updatedAccount)
 
 		let scheduledCompletionHUD = await scheduleCompletionHUD.value
-		XCTAssertEqual(scheduleCompletionHUD, .accountHidden)
+		XCTAssertEqual(scheduledCompletionHUD, .accountHidden)
 
 		await store.receive(.delegate(.accountHidden))
 	}

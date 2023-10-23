@@ -19,8 +19,7 @@ final class AccountDetailsFeatureTests: TestCase {
 		await store.receive(.delegate(.dismiss))
 	}
 
-	func test_dismissAccountDetails_whenTappedOnBackButton_thenCoordinateDismissal() async {
-		// given
+	func test_accountHidden_thenCoordinateDismissal() async {
 		let store = TestStore(
 			initialState: AccountDetails.State(
 				for: .previewValue0
@@ -28,10 +27,14 @@ final class AccountDetailsFeatureTests: TestCase {
 			reducer: AccountDetails.init
 		)
 
-		// when
-		await store.send(.view(.backButtonTapped))
+		await store.send(.view(.preferencesButtonTapped)) { state in
+			state.destination = .preferences(.init(account: state.account))
+		}
 
-		// then
+		await store.send(.child(.destination(.presented(.preferences(.delegate(.accountHidden)))))) { state in
+			state.destination = nil
+		}
+
 		await store.receive(.delegate(.dismiss))
 	}
 }

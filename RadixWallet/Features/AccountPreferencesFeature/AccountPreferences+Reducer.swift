@@ -172,7 +172,7 @@ extension AccountPreferences {
 						var account = account
 						account.flags.insert(.deletedByUser)
 						try await accountsClient.updateAccount(account)
-						overlayWindowClient.scheduleHUD(.updated)
+						overlayWindowClient.scheduleHUD(.accountHidden)
 						await send(.delegate(.accountHidden))
 					} catch {
 						errorQueue.schedule(error)
