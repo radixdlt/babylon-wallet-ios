@@ -218,6 +218,26 @@ final class ProfileStoreNewProfileTests: TestCase {
 		}
 	}
 
+	func test__GIVEN__no_profile_but_deviceInfo_WHEN__init__THEN__profile_creatingDevice_equals_deviceInfo() async throws {
+		try await withTimeLimit {
+			let deviceInfo = DeviceInfo.testValue
+			let profile = await withTestClients {
+				// GIVEN no profile
+				$0.noProfile() // but deviceInfo
+				$0.secureStorageClient.loadDeviceInfo = { deviceInfo }
+			} operation: {
+				// WHEN ProfileStore.init()
+				await ProfileStore.init().profile
+			}
+
+			// THEN profile creatingDevice == deviceInfo
+			XCTAssertNoDifference(
+				profile.header.creatingDevice,
+				deviceInfo
+			)
+		}
+	}
+
 	func test__GIVEN__no_profile__WHEN__init__THEN__profile_lastUsedOnDevice_equals_creatingDevice() async throws {
 		try await withTimeLimit {
 			let profile = await withTestClients {
