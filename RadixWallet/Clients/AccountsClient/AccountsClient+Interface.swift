@@ -55,12 +55,14 @@ public struct AccountsClient: Sendable {
 }
 
 extension AccountsClient {
+	public typealias Accounts = IdentifiedArrayOf<Profile.Network.Account>
+
 	public typealias GetCurrentNetworkID = @Sendable () async -> NetworkID
 	public typealias NextAccountIndex = @Sendable (NetworkID?) async -> HD.Path.Component.Child.Value
-	public typealias GetAccountsOnCurrentNetwork = @Sendable () async throws -> Profile.Network.Accounts
-	public typealias GetAccountsOnNetwork = @Sendable (NetworkID) async throws -> Profile.Network.Accounts
+	public typealias GetAccountsOnCurrentNetwork = @Sendable () async throws -> Accounts
+	public typealias GetAccountsOnNetwork = @Sendable (NetworkID) async throws -> Accounts
 
-	public typealias AccountsOnCurrentNetwork = @Sendable () async -> AnyAsyncSequence<Profile.Network.Accounts>
+	public typealias AccountsOnCurrentNetwork = @Sendable () async -> AnyAsyncSequence<Accounts>
 	public typealias AccountUpdates = @Sendable (AccountAddress) async -> AnyAsyncSequence<Profile.Network.Account>
 
 	public typealias NewVirtualAccount = @Sendable (NewAccountRequest) async throws -> Profile.Network.Account

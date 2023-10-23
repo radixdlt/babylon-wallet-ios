@@ -1,5 +1,5 @@
-
 // MARK: - AccountsClient + DependencyKey
+
 extension AccountsClient: DependencyKey {
 	public typealias Value = AccountsClient
 
@@ -14,18 +14,20 @@ extension AccountsClient: DependencyKey {
 			}
 		}
 
-		let getAccountsOnCurrentNetwork: GetAccountsOnCurrentNetwork = {
-			try await profileStore.network().accounts
-		}
-
 		let getCurrentNetworkID: GetCurrentNetworkID = { await profileStore.profile.networkID }
 
-		let getAccountsOnNetwork: GetAccountsOnNetwork = { try await profileStore.profile.network(id: $0).accounts }
+		let getAccountsOnNetwork: GetAccountsOnNetwork = {
+			try await profileStore.profile.network(id: $0).accounts.nonHidden
+		}
+
+		let getAccountsOnCurrentNetwork: GetAccountsOnCurrentNetwork = {
+			try await getAccountsOnNetwork(getCurrentNetworkID())
+		}
 
 		let nextAccountIndex: NextAccountIndex = { maybeNetworkID in
 			let currentNetworkID = await getCurrentNetworkID()
 			let networkID = maybeNetworkID ?? currentNetworkID
-			let index = await (try? getAccountsOnNetwork(networkID).count) ?? 0
+			let index = await (try? profileStore.profile.network(id: networkID).accounts.count) ?? 0
 			return HD.Path.Component.Child.Value(index)
 		}
 
@@ -33,7 +35,9 @@ extension AccountsClient: DependencyKey {
 			getCurrentNetworkID: getCurrentNetworkID,
 			nextAccountIndex: nextAccountIndex,
 			getAccountsOnCurrentNetwork: getAccountsOnCurrentNetwork,
-			accountsOnCurrentNetwork: { await profileStore.accountValues() },
+			accountsOnCurrentNetwork: {
+				await profileStore.accountValues().map(\.nonHidden).eraseToAnyAsyncSequence()
+			},
 			accountUpdates: { address in
 				await profileStore.accountValues().compactMap {
 					$0.first { $0.address == address }
@@ -74,4 +78,10 @@ extension AccountsClient: DependencyKey {
 	}
 
 	public static let liveValue: Self = .live()
+}
+
+extension Profile.Network.Accounts {
+	public var nonHidden: AccountsClient.Accounts {
+		filter { !$0.flags.contains(.deletedByUser) }.asIdentifiable()
+	}
 }

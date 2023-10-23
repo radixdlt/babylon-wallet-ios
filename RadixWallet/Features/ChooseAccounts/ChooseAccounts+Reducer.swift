@@ -35,7 +35,7 @@ public struct ChooseAccounts: Sendable, FeatureReducer {
 	}
 
 	public enum InternalAction: Sendable, Equatable {
-		case loadAccountsResult(TaskResult<Profile.Network.Accounts>)
+		case loadAccountsResult(TaskResult<IdentifiedArrayOf<Profile.Network.Account>>)
 	}
 
 	public enum ChildAction: Sendable, Equatable {
