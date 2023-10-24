@@ -1239,7 +1239,6 @@
 		E6DBA3752ADEBFB300A38425 /* rola_challenge_payload_hash_vectors.json in Resources */ = {isa = PBXBuildFile; fileRef = E6DBA2EE2ADEBFB300A38425 /* rola_challenge_payload_hash_vectors.json */; };
 		E6DBA3762ADEBFB300A38425 /* ImportLegacyWalletClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6DBA2F02ADEBFB300A38425 /* ImportLegacyWalletClientTests.swift */; };
 		E6DBA3772ADEBFB300A38425 /* import_olympia_wallet_parse_test.json in Resources */ = {isa = PBXBuildFile; fileRef = E6DBA2F22ADEBFB300A38425 /* import_olympia_wallet_parse_test.json */; };
-		E6DBA3782ADEBFB300A38425 /* LocalAuthenticationClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6DBA2F42ADEBFB300A38425 /* LocalAuthenticationClientTests.swift */; };
 		E6DBA3792ADEBFB300A38425 /* SecureStorageClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6DBA2F62ADEBFB300A38425 /* SecureStorageClientTests.swift */; };
 		E6DBA37B2ADEBFB300A38425 /* TransactionClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6DBA2FA2ADEBFB300A38425 /* TransactionClientTests.swift */; };
 		E6DBA37E2ADEBFB300A38425 /* CacheClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6DBA3012ADEBFB300A38425 /* CacheClientTests.swift */; };
@@ -2467,7 +2466,6 @@
 		E6DBA2EE2ADEBFB300A38425 /* rola_challenge_payload_hash_vectors.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = rola_challenge_payload_hash_vectors.json; sourceTree = "<group>"; };
 		E6DBA2F02ADEBFB300A38425 /* ImportLegacyWalletClientTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImportLegacyWalletClientTests.swift; sourceTree = "<group>"; };
 		E6DBA2F22ADEBFB300A38425 /* import_olympia_wallet_parse_test.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = import_olympia_wallet_parse_test.json; sourceTree = "<group>"; };
-		E6DBA2F42ADEBFB300A38425 /* LocalAuthenticationClientTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LocalAuthenticationClientTests.swift; sourceTree = "<group>"; };
 		E6DBA2F62ADEBFB300A38425 /* SecureStorageClientTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SecureStorageClientTests.swift; sourceTree = "<group>"; };
 		E6DBA2FA2ADEBFB300A38425 /* TransactionClientTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TransactionClientTests.swift; sourceTree = "<group>"; };
 		E6DBA3012ADEBFB300A38425 /* CacheClientTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CacheClientTests.swift; sourceTree = "<group>"; };
@@ -7054,7 +7052,6 @@
 				E6DBA2E32ADEBFB300A38425 /* OnLedgerEntitiesClientTests */,
 				E6DBA2EA2ADEBFB300A38425 /* ROLAClientTests */,
 				E6DBA2EF2ADEBFB300A38425 /* ImportLegacyWalletClientTests */,
-				E6DBA2F32ADEBFB300A38425 /* LocalAuthenticationClientTests */,
 				E6DBA2F52ADEBFB300A38425 /* SecureStorageClientTests */,
 				E6DBA2F92ADEBFB300A38425 /* TransactionClientTests */,
 				E6DBA3002ADEBFB300A38425 /* CacheClientTests */,
@@ -7116,14 +7113,6 @@
 				E6DBA2F22ADEBFB300A38425 /* import_olympia_wallet_parse_test.json */,
 			);
 			path = TestVectors;
-			sourceTree = "<group>";
-		};
-		E6DBA2F32ADEBFB300A38425 /* LocalAuthenticationClientTests */ = {
-			isa = PBXGroup;
-			children = (
-				E6DBA2F42ADEBFB300A38425 /* LocalAuthenticationClientTests.swift */,
-			);
-			path = LocalAuthenticationClientTests;
 			sourceTree = "<group>";
 		};
 		E6DBA2F52ADEBFB300A38425 /* SecureStorageClientTests */ = {
@@ -7514,7 +7503,6 @@
 				E6DBA3882ADEBFB300A38425 /* Validation+ExtraTests.swift in Sources */,
 				E6DBA36A2ADEBFB300A38425 /* PersonaDataEntryTests.swift in Sources */,
 				E6DBA3622ADEBFB300A38425 /* MnemonicChecksumTests.swift in Sources */,
-				E6DBA3782ADEBFB300A38425 /* LocalAuthenticationClientTests.swift in Sources */,
 				E6DBA3382ADEBFB300A38425 /* CustomizeFeePayerTests.swift in Sources */,
 				E6DBA3612ADEBFB300A38425 /* BIP39TestVectors.swift in Sources */,
 				E6DBA37B2ADEBFB300A38425 /* TransactionClientTests.swift in Sources */,
