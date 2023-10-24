@@ -432,9 +432,11 @@ final class ProfileStoreExstingProfileTests: TestCase {
 	}
 
 	func test__GIVEN__saved_profile_mismatch_deviceID__WHEN__init__THEN_show_alert() async throws {
+		let alertScheduled = expectation(
+			description: "overlayWindowClient has scheduled alert"
+		)
+
 		try await withTimeLimit(.normal) {
-			let displayedMessage = ActorIsolated<TextState?>(nil)
-			let alertScheduled = self.expectation(description: "overlayWindowClient has scheduled alert")
 			try await withTestClients {
 				// GIVEN saved profile
 				$0.savedProfile(Profile.withOneAccount)
@@ -451,14 +453,17 @@ final class ProfileStoreExstingProfileTests: TestCase {
 
 			func then(_ d: inout DependencyValues) {
 				d.overlayWindowClient.scheduleAlert = { alert in
-					await displayedMessage.setValue(alert.message)
+
+					// THEN show alert
+					XCTAssertNoDifference(
+						alert.message, overlayClientProfileStoreOwnershipConflictTextState
+					)
+
 					alertScheduled.fulfill()
+
 					return .claimAndContinueUseOnThisPhone
 				}
 			}
-
-			let messageTextState = await displayedMessage.value
-			XCTAssertNoDifference(messageTextState, overlayClientProfileStoreOwnershipConflictTextState)
 		}
 	}
 
