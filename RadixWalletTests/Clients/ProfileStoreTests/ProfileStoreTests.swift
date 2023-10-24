@@ -412,6 +412,71 @@ final class ProfileStoreExstingProfileTests: TestCase {
 			XCTAssertNoDifference(saved, used)
 		}
 	}
+
+	func test__GIVEN__saved_profile__WHEN__deleteWallet_THEN__profile_gets_deleted_from_secureStorage() async throws {
+		try await withTimeLimit {
+			// GIVEN saved profile
+			let saved = Profile.withOneAccount
+			// WHEN deleteWallet
+			try await self.doTestDeleteProfile(saved: saved) { d, p in
+				// THEN profile gets deleted from secureStorage
+				d.secureStorageClient.deleteProfileAndMnemonicsByFactorSourceIDs = { id, _ in
+					XCTAssertNoDifference(id, p.header.id)
+				}
+			}
+		}
+	}
+
+	func test__GIVEN__saved_profile__WHEN__deleteWallet_keepIcloud__THEN__iCloud_is_kept() async throws {
+		try await withTimeLimit {
+			// GIVEN saved profile
+			let saved = Profile.withOneAccount
+			try await self.doTestDeleteProfile(
+				saved: saved,
+				// WHEN deleteWallet keep iCloud
+				keepInICloudIfPresent: true
+			) { d, _ in
+				// THEN iCloud is kept
+				d.secureStorageClient.deleteProfileAndMnemonicsByFactorSourceIDs = { _, isKeepingIcloud in
+					XCTAssertTrue(isKeepingIcloud)
+				}
+			}
+		}
+	}
+
+	func test__GIVEN__saved_profile__WHEN__deleteWallet_delete_in_iCloud__THEN__iCloud_is_not_kept() async throws {
+		try await withTimeLimit {
+			// GIVEN saved profile
+			let saved = Profile.withOneAccount
+			try await self.doTestDeleteProfile(
+				saved: saved,
+				// WHEN deleteWallet and delete in iCloud
+				keepInICloudIfPresent: false
+			) { d, _ in
+				// THEN iCloud is not kept
+				d.secureStorageClient.deleteProfileAndMnemonicsByFactorSourceIDs = { _, isKeepingIcloud in
+					XCTAssertFalse(isKeepingIcloud)
+				}
+			}
+		}
+	}
+
+	func doTestDeleteProfile(
+		saved: Profile,
+		keepInICloudIfPresent: Bool = true,
+		_ then: (inout DependencyValues, _ deletedProfile: Profile) -> Void
+	) async throws {
+		try await withTestClients {
+			$0.savedProfile(saved) // GIVEN saved profile
+			$0.secureStorageClient.deleteProfileAndMnemonicsByFactorSourceIDs = { _, _ in }
+			$0.userDefaultsClient.remove = { _ in }
+			then(&$0, saved) // THEN ...
+		} operation: {
+			let sut = ProfileStore()
+			// WHEN deleteProfile
+			try await sut.deleteProfile(keepInICloudIfPresent: keepInICloudIfPresent)
+		}
+	}
 }
 
 extension PrivateHDFactorSource {
