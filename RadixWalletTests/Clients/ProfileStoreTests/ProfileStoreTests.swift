@@ -479,6 +479,26 @@ final class ProfileStoreExstingProfileTests: TestCase {
 			XCTAssertNoDifference(Q.factorSources[0].id, PrivateHDFactorSource.testValueAbandonArt.factorSource.id.embed())
 		}
 	}
+
+	func test__GIVEN__saved_profile__WHEN__deleteWallet__THEN__new_profile_is_saved_to_secureStorage() async throws {
+		try await withTimeLimit {
+			// GIVEN saved profile
+			let newProfile = Profile.withNoAccountsAbandonArt
+			// WHEN deleteWallet
+			try await self.doTestDeleteProfile(
+				saved: Profile.withOneAccountZooVote
+			) { d, _ in
+				d.mnemonicClient.generate = { _, _ in
+					Mnemonic.testValueAbandonArt
+				}
+				d.uuid = .constant(newProfile.id)
+				// THEN new profile is saved to secureStorage
+				d.secureStorageClient.saveProfileSnapshot = {
+					XCTAssertNoDifference($0, newProfile.snapshot())
+				}
+			}
+		}
+	}
 }
 
 extension ProfileStoreExstingProfileTests {
