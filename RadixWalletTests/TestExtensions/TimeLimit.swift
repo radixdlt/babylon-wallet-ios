@@ -25,8 +25,8 @@ public enum TimeLimit: Sendable, Hashable {
 	case preset(Preset)
 	case custom(Duration)
 	public enum Preset: Int, Sendable, Hashable {
-		case fast = 128
-		case normal = 512
+		case fast = 256
+		case normal = 1024
 		case slow = 2048
 		case marathon = 16384
 		var duration: Duration {

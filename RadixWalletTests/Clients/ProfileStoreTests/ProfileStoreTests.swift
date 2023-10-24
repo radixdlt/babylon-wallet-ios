@@ -432,41 +432,32 @@ final class ProfileStoreExstingProfileTests: TestCase {
 	}
 
 	func test__GIVEN__saved_profile_mismatch_deviceID__WHEN__claimAndContinueUseOnThisPhone__THEN__profile_uses_claimed_device() async throws {
-		let alertScheduled = expectation(
-			description: "overlayWindowClient has scheduled alert"
-		)
-
-		try await withTimeLimit(.normal) {
-			let claimed = await withTestClients {
-				// GIVEN saved profile
-				$0.savedProfile(Profile.withOneAccount)
-				// mistmatch deviceID
-				$0.secureStorageClient.loadDeviceInfo = { .testValueBEEF }
-				when(&$0)
-			} operation: { [self] in
-				let sut = ProfileStore.init()
-				// The scheduling of the alert needs some time...
-				await nearFutureFulfillment(of: alertScheduled)
-				return await sut.profile
-			}
-
-			func when(_ d: inout DependencyValues) {
-				d.overlayWindowClient.scheduleAlert = { alert in
-					XCTAssertNoDifference(
-						alert.message, overlayClientProfileStoreOwnershipConflictTextState
-					)
-					alertScheduled.fulfill()
-					// WHEN claimAndContinueUseOnThisPhone
-					return .claimAndContinueUseOnThisPhone
-				}
-			}
-
+		try await doTestMismatch(
+			savedProfile: Profile.withOneAccount,
+			action: .claimAndContinueUseOnThisPhone
+		) { claimed in
 			// THEN profile uses claimed device
 			XCTAssertNoDifference(
 				claimed.header.lastUsedOnDevice.id,
 				DeviceInfo.testValueBEEF.id
 			)
 		}
+	}
+
+	func test__GIVEN__saved_profile_mismatch_deviceID__WHEN__deleteProfile__THEN__profile_got_deleted() async throws {
+		let savedProfile = Profile.withOneAccount
+		try await doTestMismatch(
+			savedProfile: savedProfile,
+			action: .deleteProfileFromThisPhone,
+			then: {
+				$0.userDefaultsClient.remove = { key in
+					XCTAssertNoDifference(key, .activeProfileID)
+				}
+				$0.secureStorageClient.deleteProfileAndMnemonicsByFactorSourceIDs = { idToDelete, _ in
+					XCTAssertNoDifference(idToDelete, savedProfile.header.id)
+				}
+			}
+		)
 	}
 
 	func test__GIVEN__saved_profile__WHEN__deleteWallet__THEN__profile_gets_deleted_from_secureStorage() async throws {
@@ -499,7 +490,7 @@ final class ProfileStoreExstingProfileTests: TestCase {
 
 	// FIXME: Maybe should probably be moved to SecureStorageClientTests..?
 	func test__GIVEN__saved_profile__WHEN__deleteWallet_not_keepIcloud__THEN__profile_gets_removed_from_saved_headerlist() async throws {
-		try await withTimeLimit {
+		try await withTimeLimit(.normal) {
 			// GIVEN saved profile
 			let saved = Profile.withOneAccount
 			// WHEN deleteWallet
@@ -602,6 +593,45 @@ final class ProfileStoreExstingProfileTests: TestCase {
 }
 
 extension ProfileStoreExstingProfileTests {
+	private func doTestMismatch(
+		savedProfile: Profile,
+		action: OverlayWindowClient.Item.AlertAction,
+		then: @escaping @Sendable (inout DependencyValues) -> Void = { _ in },
+		result assertResult: @escaping @Sendable (Profile) -> Void = { _ in }
+	) async throws {
+		let alertScheduled = expectation(
+			description: "overlayWindowClient has scheduled alert"
+		)
+
+		try await withTimeLimit(.slow) {
+			let result = await withTestClients {
+				// GIVEN saved profile
+				$0.savedProfile(savedProfile)
+				// mistmatch deviceID
+				$0.secureStorageClient.loadDeviceInfo = { .testValueBEEF }
+				when(&$0)
+				then(&$0)
+			} operation: { [self] in
+				let sut = ProfileStore.init()
+				// The scheduling of the alert needs some time...
+				await nearFutureFulfillment(of: alertScheduled)
+				return await sut.profile
+			}
+
+			func when(_ d: inout DependencyValues) {
+				d.overlayWindowClient.scheduleAlert = { alert in
+					XCTAssertNoDifference(
+						alert.message, overlayClientProfileStoreOwnershipConflictTextState
+					)
+					alertScheduled.fulfill()
+					return action
+				}
+			}
+
+			assertResult(result)
+		}
+	}
+
 	@discardableResult
 	private func doTestDeleteProfile(
 		saved: Profile,

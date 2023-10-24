@@ -94,9 +94,14 @@ extension ProfileStore {
 		try saveProfileAfterUpdateItsHeader(profile, assertIdentityAndOwnership: false)
 	}
 
-	public func deleteProfile(keepInICloudIfPresent: Bool) throws {
-		// Assert that this device is allowed to make changes on Profile
-		try _assertOwnership()
+	public func deleteProfile(
+		keepInICloudIfPresent: Bool,
+		assertOwnership: Bool = true
+	) throws {
+		if assertOwnership {
+			// Assert that this device is allowed to make changes on Profile
+			try _assertOwnership()
+		}
 
 		do {
 			userDefaultsClient.removeActiveProfileID()
@@ -278,7 +283,7 @@ extension ProfileStore {
 		if choiceByUser == .claimAndContinueUseOnThisPhone {
 			try self.claimOwnershipOfProfile()
 		} else if choiceByUser == .deleteProfileFromThisPhone {
-			try self.deleteProfile(keepInICloudIfPresent: true)
+			try self.deleteProfile(keepInICloudIfPresent: true, assertOwnership: false)
 		}
 	}
 
