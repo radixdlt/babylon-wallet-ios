@@ -2,7 +2,8 @@
 /.build
 build/
 /Packages
-/*.xcodeproj
+RadixWallet.xcodeproj/xcuserdata
+RadixWallet.xcodeproj/project.xcworkspace/xcuserdata
 /Package.resolved
 xcuserdata/
 *.xcuserstate
