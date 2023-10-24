@@ -179,6 +179,7 @@ extension Profile {
 		nameOfFirstAccount: String? = "Main",
 		privateHDFactorSource: PrivateHDFactorSource = .testValue
 	) -> Self {
+		var header: ProfileSnapshot.Header = .testValue
 		var profile = Profile(
 			header: .testValue,
 			factorSources: NonEmpty(rawValue: [
@@ -191,8 +192,13 @@ extension Profile {
 				name: nameOfFirstAccount,
 				privateHDFactorSource: privateHDFactorSource
 			)
+			header.contentHint = ProfileSnapshot.Header.ContentHint(
+				numberOfAccountsOnAllNetworksInTotal: 1,
+				numberOfPersonasOnAllNetworksInTotal: 0,
+				numberOfNetworks: 1
+			)
+			profile.header = header
 		}
-
 		return profile
 	}
 }

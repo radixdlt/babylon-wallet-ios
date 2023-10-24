@@ -209,6 +209,7 @@ extension ProfileSnapshot.Header {
 				"lastUsedOnDevice": lastUsedOnDevice,
 				"creationDate": creationDate,
 				"lastModified": lastModified,
+				"contentHint": contentHint,
 				"id": id,
 			],
 			displayStyle: .struct
@@ -221,6 +222,7 @@ extension ProfileSnapshot.Header {
 		creatingDevice: \(creatingDevice),
 		creationDate: \(creationDate),
 		lastModified: \(lastModified),
+		contentHint: \(contentHint),
 		id: \(id),
 		"""
 	}
