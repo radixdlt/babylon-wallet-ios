@@ -79,9 +79,3 @@ extension AccountsClient: DependencyKey {
 
 	public static let liveValue: Self = .live()
 }
-
-extension Profile.Network.Accounts {
-	public var nonHidden: AccountsClient.Accounts {
-		filter { !$0.flags.contains(.deletedByUser) }.asIdentifiable()
-	}
-}

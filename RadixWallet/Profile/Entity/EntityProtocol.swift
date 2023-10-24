@@ -136,3 +136,9 @@ extension EntityProtocol {
 		return entity
 	}
 }
+
+extension EntityBaseProtocol {
+	public var isHidden: Bool {
+		flags.contains(.deletedByUser)
+	}
+}

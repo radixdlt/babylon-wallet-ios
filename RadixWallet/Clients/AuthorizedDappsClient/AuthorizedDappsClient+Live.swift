@@ -10,7 +10,21 @@ extension AuthorizedDappsClient: DependencyKey {
 				guard let network = await profileStore.network else {
 					return .init()
 				}
-				return network.authorizedDapps
+				let accountsOnNetwork = network.accounts.nonHidden
+				return network.authorizedDapps.map { dapp in
+					var dapp = dapp
+					for persona in dapp.referencesToAuthorizedPersonas {
+						if let sharedAccounts = persona.sharedAccounts {
+							let ids = sharedAccounts.ids.filter { address in
+								accountsOnNetwork.contains {
+									$0.address == address
+								}
+							}
+							dapp.referencesToAuthorizedPersonas[id: persona.id]?.sharedAccounts?.ids = ids
+						}
+					}
+					return dapp
+				}.asIdentifiable()
 			},
 			addAuthorizedDapp: { newDapp in
 				try await profileStore.updating {

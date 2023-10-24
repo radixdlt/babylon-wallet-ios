@@ -196,3 +196,9 @@ extension Profile.Network.Account {
 		"""
 	}
 }
+
+extension Profile.Network.Accounts {
+	public var nonHidden: IdentifiedArrayOf<Profile.Network.Account> {
+		filter { !$0.isHidden }.asIdentifiable()
+	}
+}

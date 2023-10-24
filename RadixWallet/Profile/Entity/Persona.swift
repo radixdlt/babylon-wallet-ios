@@ -145,3 +145,9 @@ extension Profile.Network.Persona {
 		return .init(address: engineAddress.addressString(), decodedKind: engineAddress.entityType())
 	}
 }
+
+extension Profile.Network.Personas {
+	public var nonHidden: IdentifiedArrayOf<Profile.Network.Persona> {
+		filter { !$0.isHidden }.asIdentifiable()
+	}
+}
