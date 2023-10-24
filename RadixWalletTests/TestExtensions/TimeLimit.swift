@@ -90,7 +90,15 @@ func withTimeLimit(
 }
 
 extension XCTestCase {
-	func fulfillment(
+	func nearFutureFulfillment(
+		of expectation: XCTestExpectation,
+		limit timelimit: TimeLimit = .default,
+		enforceOrder: Bool = false
+	) async {
+		await nearFutureFulfillment(of: [expectation], limit: timelimit, enforceOrder: enforceOrder)
+	}
+
+	func nearFutureFulfillment(
 		of expectations: [XCTestExpectation],
 		limit timelimit: TimeLimit = .default,
 		enforceOrder: Bool = false

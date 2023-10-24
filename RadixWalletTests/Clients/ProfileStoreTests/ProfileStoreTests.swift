@@ -72,7 +72,7 @@ final class ProfileStoreNewProfileTests: TestCase {
 			}
 		}
 
-		await fulfillment(of: [deleteDeprecatedDeviceID_is_called])
+		await nearFutureFulfillment(of: deleteDeprecatedDeviceID_is_called)
 	}
 
 	func test__GIVEN__no_deviceInfo__WHEN__deprecatedLoadDeviceID_returns_x__THEN__deleteDeprecatedDeviceID_is_not_called_if_failed_to_save_migrated_deviceInfo() async {
@@ -98,7 +98,7 @@ final class ProfileStoreNewProfileTests: TestCase {
 			d.secureStorageClient.saveDeviceInfo = { _ in throw NoopError() }
 		}
 
-		await fulfillment(of: [deleteDeprecatedDeviceID_is_NOT_called])
+		await nearFutureFulfillment(of: deleteDeprecatedDeviceID_is_NOT_called)
 	}
 
 	func test__GIVEN_a_saved_deviceInfo__WHEN__init__THEN__deprecatedLoadDeviceID_is_not_called() async {
@@ -122,7 +122,7 @@ final class ProfileStoreNewProfileTests: TestCase {
 			}
 		}
 
-		await fulfillment(of: [deprecatedLoadDeviceID_is_NOT_called])
+		await nearFutureFulfillment(of: deprecatedLoadDeviceID_is_NOT_called)
 	}
 
 	func test__GIVEN__no_deviceInfo__WHEN__deprecatedLoadDeviceID_returns_x__THEN__x_is_migrated_to_DeviceInfo_and_saved() {
