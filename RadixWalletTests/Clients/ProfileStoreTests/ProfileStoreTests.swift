@@ -178,6 +178,23 @@ final class ProfileStoreNewProfileTests: TestCase {
 		}
 	}
 
+//	func test__GIVEN__no_profile__WHEN__import_profile__THEN__imported_profile_is_used() async throws {
+//		try await withTimeLimit {
+//			let usedProfile = try await withTestClients {
+//				// GIVEN no profile
+//				$0.noProfile()
+//			} operation: {
+//				let sut  = ProfileStore()
+//				// WHEN import profile
+//				try await sut.importProfile(Profile.withOneAccountAbandonArt)
+//				return await sut.profile
+//			}
+//
+//			// THEN imported profile is used
+//			XCTAssertNoDifference(usedProfile, Profile.withOneAccountAbandonArt)
+//		}
+//	}
+
 	func test__GIVEN__no_profile__WHEN__init__THEN__24_word_mnemonic_is_generated() throws {
 		withTestClients {
 			// GIVEN no profile
