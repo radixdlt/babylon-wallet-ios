@@ -414,7 +414,7 @@ final class ProfileStoreExstingProfileTests: TestCase {
 		}
 	}
 
-	func test__GIVEN__saved_profile__WHEN__deleteWallet_THEN__profile_gets_deleted_from_secureStorage() async throws {
+	func test__GIVEN__saved_profile__WHEN__deleteWallet__THEN__profile_gets_deleted_from_secureStorage() async throws {
 		try await withTimeLimit {
 			// GIVEN saved profile
 			let saved = Profile.withOneAccount
@@ -428,7 +428,7 @@ final class ProfileStoreExstingProfileTests: TestCase {
 		}
 	}
 
-	func test__GIVEN__saved_profile__WHEN__deleteWallet_THEN__activeProfileID_is_deleted() async throws {
+	func test__GIVEN__saved_profile__WHEN__deleteWallet__THEN__activeProfileID_is_deleted() async throws {
 		try await withTimeLimit {
 			// GIVEN saved profile
 			let saved = Profile.withOneAccount
@@ -437,6 +437,37 @@ final class ProfileStoreExstingProfileTests: TestCase {
 				// THEN activeProfileID is deleted
 				d.userDefaultsClient.remove = {
 					XCTAssertNoDifference($0, .activeProfileID)
+				}
+			}
+		}
+	}
+
+	// FIXME: Maybe should probably be moved to SecureStorageClientTests..?
+	func test__GIVEN__saved_profile__WHEN__deleteWallet_not_keepIcloud__THEN__profile_gets_removed_from_saved_headerlist() async throws {
+		try await withTimeLimit {
+			// GIVEN saved profile
+			let saved = Profile.withOneAccount
+			// WHEN deleteWallet
+			try await self.doTestDeleteProfile(
+				saved: saved,
+				keepInICloudIfPresent: false
+			) { d, _ in
+				d.secureStorageClient.deleteProfileAndMnemonicsByFactorSourceIDs = SecureStorageClient.liveValue.deleteProfileAndMnemonicsByFactorSourceIDs
+
+				d.keychainClient._getDataWithoutAuthForKey = { key in
+					if key == saved.header.id.keychainKey {
+						try! JSONEncoder.iso8601.encode(saved.snapshot())
+					} else if key == profileHeaderListKeychainKey {
+						try! JSONEncoder.iso8601.encode([saved.header])
+					} else {
+						fatalError("unknown key: \(key)")
+					}
+				}
+				d.keychainClient._removeDataForKey = { key in
+					// THEN profile gets removed from saved headerlist
+					if key.rawValue.rawValue.hasPrefix("profileSnapshot - ") {
+						XCTAssertEqual(key, saved.header.id.keychainKey)
+					}
 				}
 			}
 		}

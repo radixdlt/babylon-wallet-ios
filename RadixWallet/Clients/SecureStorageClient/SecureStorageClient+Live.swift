@@ -137,7 +137,9 @@ extension SecureStorageClient: DependencyKey {
 			try keychainClient.removeData(forKey: profileHeaderListKeychainKey)
 		}
 
-		@Sendable func deleteProfile(_ id: ProfileSnapshot.Header.ID, iCloudSyncEnabled: Bool) throws {
+		@Sendable func deleteProfile(
+			_ id: ProfileSnapshot.Header.ID
+		) throws {
 			try keychainClient.removeData(forKey: id.keychainKey)
 			try deleteProfileHeader(id)
 		}
@@ -199,7 +201,8 @@ extension SecureStorageClient: DependencyKey {
 		}
 
 		return Self(
-			saveProfileSnapshot: { profileSnapshot in
+			saveProfileSnapshot: {
+				profileSnapshot in
 				let data = try jsonEncoder().encode(profileSnapshot)
 				try saveProfile(
 					snapshotData: data,
@@ -280,18 +283,31 @@ extension SecureStorageClient: DependencyKey {
 				return (try? keychainClient.contains(key)) ?? false
 			},
 			deleteMnemonicByFactorSourceID: deleteMnemonicByFactorSourceID,
-			deleteProfileAndMnemonicsByFactorSourceIDs: { profileID, keepInICloudIfPresent in
-				guard let profileSnapshotData = try loadProfileSnapshotData(profileID) else {
+			deleteProfileAndMnemonicsByFactorSourceIDs: {
+				profileID,
+					requestedToKeepInIcloud in
+				guard
+					let profileSnapshotData = try loadProfileSnapshotData(profileID)
+				else {
 					return
 				}
 
-				guard let profileSnapshot = try? jsonDecoder().decode(ProfileSnapshot.self, from: profileSnapshotData) else {
+				guard
+					let profileSnapshot = try? jsonDecoder().decode(
+						ProfileSnapshot.self,
+						from: profileSnapshotData
+					)
+				else {
 					return
 				}
 
 				// We want to keep the profile backup in iCloud.
-				if !(profileSnapshot.appPreferences.security.isCloudProfileSyncEnabled && keepInICloudIfPresent) {
-					try deleteProfile(profileID, iCloudSyncEnabled: profileSnapshot.appPreferences.security.isCloudProfileSyncEnabled)
+				let isCloudSyncEnabled = profileSnapshot.appPreferences.security.isCloudProfileSyncEnabled
+
+				let keepInICloudIfPresent = isCloudSyncEnabled && requestedToKeepInIcloud
+
+				if !keepInICloudIfPresent {
+					try deleteProfile(profileID)
 				}
 
 				for factorSourceID in profileSnapshot
@@ -302,6 +318,7 @@ extension SecureStorageClient: DependencyKey {
 					loggerGlobal.debug("Deleting factor source with ID: \(factorSourceID)")
 					try deleteMnemonicByFactorSourceID(factorSourceID)
 				}
+
 			},
 			updateIsCloudProfileSyncEnabled: { profileId, change in
 				guard
@@ -352,7 +369,7 @@ extension SecureStorageClient: DependencyKey {
 	}()
 }
 
-private let profileHeaderListKeychainKey: KeychainClient.Key = "profileHeaderList"
+let profileHeaderListKeychainKey: KeychainClient.Key = "profileHeaderList"
 @available(*, deprecated, renamed: "deviceInfoKey", message: "Migrate to use `deviceInfoKey` instead")
 private let deviceIdentifierKey: KeychainClient.Key = "deviceIdentifier"
 private let deviceInfoKey: KeychainClient.Key = "deviceInfo"
