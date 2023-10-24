@@ -474,6 +474,7 @@ final class ProfileStoreExstingProfileTests: TestCase {
 					Mnemonic.testValueAbandonArt
 				}
 			}
+			XCTAssertNotEqual(P, Q)
 		}
 	}
 }
