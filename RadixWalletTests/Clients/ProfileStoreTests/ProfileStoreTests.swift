@@ -431,39 +431,41 @@ final class ProfileStoreExstingProfileTests: TestCase {
 		}
 	}
 
-	func test__GIVEN__saved_profile_mismatch_deviceID__WHEN__init__THEN_show_alert() async throws {
+	func test__GIVEN__saved_profile_mismatch_deviceID__WHEN__claimAndContinueUseOnThisPhone__THEN__profile_uses_claimed_device() async throws {
 		let alertScheduled = expectation(
 			description: "overlayWindowClient has scheduled alert"
 		)
 
 		try await withTimeLimit(.normal) {
-			try await withTestClients {
+			let claimed = await withTestClients {
 				// GIVEN saved profile
 				$0.savedProfile(Profile.withOneAccount)
 				// mistmatch deviceID
 				$0.secureStorageClient.loadDeviceInfo = { .testValueBEEF }
-				then(&$0)
-			} operation: {
-				// WHEN ProfileStore.init()
-				ProfileStore.init()
-
+				when(&$0)
+			} operation: { [self] in
+				let sut = ProfileStore.init()
 				// The scheduling of the alert needs some time...
-				await self.nearFutureFulfillment(of: alertScheduled)
+				await nearFutureFulfillment(of: alertScheduled)
+				return await sut.profile
 			}
 
-			func then(_ d: inout DependencyValues) {
+			func when(_ d: inout DependencyValues) {
 				d.overlayWindowClient.scheduleAlert = { alert in
-
-					// THEN show alert
 					XCTAssertNoDifference(
 						alert.message, overlayClientProfileStoreOwnershipConflictTextState
 					)
-
 					alertScheduled.fulfill()
-
+					// WHEN claimAndContinueUseOnThisPhone
 					return .claimAndContinueUseOnThisPhone
 				}
 			}
+
+			// THEN profile uses claimed device
+			XCTAssertNoDifference(
+				claimed.header.lastUsedOnDevice.id,
+				DeviceInfo.testValueBEEF.id
+			)
 		}
 	}
 
