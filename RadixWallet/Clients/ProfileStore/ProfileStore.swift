@@ -15,11 +15,11 @@ public final actor ProfileStore {
 
 	init() {
 		let metaDeviceInfo = Self._deviceInfo()
-		let stuff = Self._loadSavedElseNewProfile(metaDeviceInfo: metaDeviceInfo)
-		self.deviceInfo = stuff.deviceInfo
-		self.profileSubject = AsyncCurrentValueSubject(stuff.profile)
+		let (deviceInfo, profile, conflictingOwners) = Self._loadSavedElseNewProfile(metaDeviceInfo: metaDeviceInfo)
+		self.deviceInfo = deviceInfo
+		self.profileSubject = AsyncCurrentValueSubject(profile)
 
-		if let conflictingOwners = stuff.conflictingOwners {
+		if let conflictingOwners {
 			Task {
 				loggerGlobal.notice("ProfileStore:init => emitOwnershipConflict")
 				try await self.emitOwnershipConflict(
@@ -228,8 +228,8 @@ extension ProfileStore {
 	/// and saves a snapshot of the profile into Keychain.
 	/// - Parameter profile: Profile to save
 	private func _saveProfileAndEmitUpdate(_ profile: Profile) throws {
-		profileSubject.send(profile)
 		try Self._save(profile: profile)
+		profileSubject.send(profile)
 	}
 
 	/// Asserts that the **identity** of `profile` matches that of `self.profile`, which
@@ -254,14 +254,14 @@ extension ProfileStore {
 
 	private func _assertOwnership(of profile: Profile) throws {
 		try Self._assertOwnership(of: profile, against: deviceInfo) {
-			Task {
-				try await self.emitOwnershipConflict(with: profile)
-			}
+			emitOwnershipConflict(with: profile)
 		}
 	}
 
-	private func emitOwnershipConflict(with profile: Profile) async throws {
-		try await emitOwnershipConflict(ownerOfCurrentProfile: profile.header.lastUsedOnDevice)
+	private func emitOwnershipConflict(with profile: Profile) {
+		Task {
+			try await emitOwnershipConflict(ownerOfCurrentProfile: profile.header.lastUsedOnDevice)
+		}
 	}
 
 	private func emitOwnershipConflict(ownerOfCurrentProfile: DeviceInfo) async throws {

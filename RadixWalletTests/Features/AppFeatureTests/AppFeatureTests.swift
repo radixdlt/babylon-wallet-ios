@@ -145,8 +145,13 @@ extension Profile.Network.Account {
 }
 
 extension Profile {
-	static let withOneAccount = withTestClients(Self.testValue())
-	static let withNoAccounts = withTestClients(Self.testValue(nameOfFirstAccount: nil))
+	static let withOneAccount = Self.withOneAccountZooVote
+	static let withNoAccounts = Self.withNoAccountsZooVote
+
+	static let withOneAccountZooVote = withTestClients(Self.testValue(privateHDFactorSource: .testValueZooVote))
+	static let withNoAccountsZooVote = withTestClients(Self.testValue(nameOfFirstAccount: nil, privateHDFactorSource: .testValueZooVote))
+	static let withOneAccountAbandonArt = withTestClients(Self.testValue(privateHDFactorSource: .testValueAbandonArt))
+	static let withNoAccountsAbandonArt = withTestClients(Self.testValue(nameOfFirstAccount: nil, privateHDFactorSource: .testValueAbandonArt))
 
 	mutating func createMainnetWithOneAccount(
 		name nameOfFirstAccount: String,
@@ -171,10 +176,9 @@ extension Profile {
 	}
 
 	static func testValue(
-		nameOfFirstAccount: String? = "Main"
+		nameOfFirstAccount: String? = "Main",
+		privateHDFactorSource: PrivateHDFactorSource = .testValue
 	) -> Self {
-		let privateHDFactorSource = PrivateHDFactorSource.testValue
-
 		var profile = Profile(
 			header: .testValue,
 			factorSources: NonEmpty(rawValue: [

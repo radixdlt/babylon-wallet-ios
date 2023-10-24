@@ -461,11 +461,30 @@ final class ProfileStoreExstingProfileTests: TestCase {
 		}
 	}
 
-	func doTestDeleteProfile(
+	func test__GIVEN__saved_profile_P__WHEN__deleteWallet__THEN__new_profile_Q_is_created() async throws {
+		try await withTimeLimit {
+			// GIVEN saved profile `P`
+			let P = Profile.withOneAccountZooVote
+			// WHEN deleteWallet
+			let Q: Profile = try await self.doTestDeleteProfile(
+				saved: P
+			) { d, _ in
+				// THEN iCloud is not kept
+				d.mnemonicClient.generate = { _, _ in
+					Mnemonic.testValueAbandonArt
+				}
+			}
+		}
+	}
+}
+
+extension ProfileStoreExstingProfileTests {
+	@discardableResult
+	private func doTestDeleteProfile(
 		saved: Profile,
 		keepInICloudIfPresent: Bool = true,
 		_ then: (inout DependencyValues, _ deletedProfile: Profile) -> Void
-	) async throws {
+	) async throws -> Profile {
 		try await withTestClients {
 			$0.savedProfile(saved) // GIVEN saved profile
 			$0.secureStorageClient.deleteProfileAndMnemonicsByFactorSourceIDs = { _, _ in }
@@ -475,15 +494,25 @@ final class ProfileStoreExstingProfileTests: TestCase {
 			let sut = ProfileStore()
 			// WHEN deleteProfile
 			try await sut.deleteProfile(keepInICloudIfPresent: keepInICloudIfPresent)
+			return await sut.profile
 		}
 	}
 }
 
 extension PrivateHDFactorSource {
-	static let testValue: Self = withDependencies {
-		$0.date = .constant(Date(timeIntervalSince1970: 0))
-	} operation: {
-		Self.testValue(name: deviceName, model: deviceModel)
+	static let testValue = Self.testValueZooVote
+
+	static let testValueZooVote: Self = testValue(mnemonicWithPassphrase: .testValueZooVote)
+	static let testValueAbandonArt: Self = testValue(mnemonicWithPassphrase: .testValueAbandonArt)
+
+	static func testValue(
+		mnemonicWithPassphrase: MnemonicWithPassphrase
+	) -> Self {
+		withDependencies {
+			$0.date = .constant(Date(timeIntervalSince1970: 0))
+		} operation: {
+			Self.testValue(name: deviceName, model: deviceModel)
+		}
 	}
 }
 
