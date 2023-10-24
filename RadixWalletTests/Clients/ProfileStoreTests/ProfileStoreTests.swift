@@ -431,6 +431,34 @@ final class ProfileStoreExstingProfileTests: TestCase {
 		}
 	}
 
+	func test__GIVEN__saved_profile_mismatch_deviceID__WHEN__init__THEN_show_alert() async throws {
+		try await withTimeLimit(.normal) {
+			let displayedMessage = ActorIsolated<TextState?>(nil)
+
+			try await withTestClients {
+				// GIVEN saved profile
+				$0.savedProfile(Profile.withOneAccount)
+				// mistmatch deviceID
+				$0.secureStorageClient.loadDeviceInfo = { .testValueBEEF }
+				then(&$0)
+			} operation: {
+				// WHEN ProfileStore.init()
+				ProfileStore.init()
+				try await Task.sleep(for: .milliseconds(50))
+			}
+
+			func then(_ d: inout DependencyValues) {
+				d.overlayWindowClient.scheduleAlert = { alert in
+					await displayedMessage.setValue(alert.message)
+					return .claimAndContinueUseOnThisPhone
+				}
+			}
+
+			let messageTextState = await displayedMessage.value
+			XCTAssertNoDifference(messageTextState, overlayClientProfileStoreOwnershipConflictTextState)
+		}
+	}
+
 	func test__GIVEN__saved_profile__WHEN__deleteWallet__THEN__profile_gets_deleted_from_secureStorage() async throws {
 		try await withTimeLimit {
 			// GIVEN saved profile

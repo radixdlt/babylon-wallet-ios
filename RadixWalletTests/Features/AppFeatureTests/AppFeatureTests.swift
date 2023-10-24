@@ -273,7 +273,10 @@ extension ProfileSnapshot.Header {
 }
 
 extension DeviceInfo {
-	static let testValue: Self = testValue()
+	static let testValue: Self = testValueABBA
+	static let testValueABBA: Self = testValue(deviceID: 0xABBA)
+	static let testValueBEEF: Self = testValue(deviceID: 0xBEEF)
+
 	static func testValue(
 		deviceID: UUID? = nil,
 		date: Date? = nil
