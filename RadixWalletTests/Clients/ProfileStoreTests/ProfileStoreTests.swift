@@ -469,12 +469,13 @@ final class ProfileStoreExstingProfileTests: TestCase {
 			let Q: Profile = try await self.doTestDeleteProfile(
 				saved: P
 			) { d, _ in
-				// THEN iCloud is not kept
+				// THEN new profile Q is created
 				d.mnemonicClient.generate = { _, _ in
 					Mnemonic.testValueAbandonArt
 				}
 			}
 			XCTAssertNotEqual(P, Q)
+			XCTAssertNoDifference(Q.factorSources[0].id, PrivateHDFactorSource.testValueAbandonArt.factorSource.id.embed())
 		}
 	}
 }
@@ -512,7 +513,11 @@ extension PrivateHDFactorSource {
 		withDependencies {
 			$0.date = .constant(Date(timeIntervalSince1970: 0))
 		} operation: {
-			Self.testValue(name: deviceName, model: deviceModel)
+			Self.testValue(
+				name: deviceName,
+				model: deviceModel,
+				mnemonicWithPassphrase: mnemonicWithPassphrase
+			)
 		}
 	}
 }
