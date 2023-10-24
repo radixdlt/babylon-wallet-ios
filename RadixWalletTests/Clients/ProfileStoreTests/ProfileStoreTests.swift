@@ -428,6 +428,20 @@ final class ProfileStoreExstingProfileTests: TestCase {
 		}
 	}
 
+	func test__GIVEN__saved_profile__WHEN__deleteWallet_THEN__activeProfileID_is_deleted() async throws {
+		try await withTimeLimit {
+			// GIVEN saved profile
+			let saved = Profile.withOneAccount
+			// WHEN deleteWallet
+			try await self.doTestDeleteProfile(saved: saved) { d, _ in
+				// THEN activeProfileID is deleted
+				d.userDefaultsClient.remove = {
+					XCTAssertNoDifference($0, .activeProfileID)
+				}
+			}
+		}
+	}
+
 	func test__GIVEN__saved_profile__WHEN__deleteWallet_keepIcloud__THEN__iCloud_is_kept() async throws {
 		try await withTimeLimit {
 			// GIVEN saved profile
