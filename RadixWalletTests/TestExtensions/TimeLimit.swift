@@ -90,9 +90,13 @@ func withTimeLimit(
 }
 
 extension XCTestCase {
-	func waitForExpectations(limit timelimit: TimeLimit = .default) async {
+	func fulfillment(
+		of expectations: [XCTestExpectation],
+		limit timelimit: TimeLimit = .default,
+		enforceOrder: Bool = false
+	) async {
 		let timeout = timelimit.duration.timeInterval
-		await waitForExpectations(timeout: timeout)
+		await fulfillment(of: expectations, timeout: timeout, enforceOrder: enforceOrder)
 	}
 }
 
