@@ -491,6 +491,41 @@ final class ProfileStoreExstingProfileTests: TestCase {
 		)
 	}
 
+	func test__GIVEN__mismatch__WHEN__app_is_not_yet_unlocked__THEN__no_alert_is_displayed() async throws {
+		let alertNotScheduled = expectation(
+			description: "overlayWindowClient did NOT scheduled alert"
+		)
+
+		alertNotScheduled.isInverted = true // invert meaning we expect it to NOT be fulfilled.
+
+		try await withTimeLimit(.slow) {
+			try await withTestClients {
+				// GIVEN saved profile
+				$0.savedProfile(Profile.withOneAccount)
+				// mistmatch deviceID
+				$0.secureStorageClient.loadDeviceInfo = { .testValueBEEF }
+				when(&$0)
+			} operation: {
+				let sut = ProfileStore.init()
+				// UI needs some time, we still need the conditions to be correct
+				// in order to get a failure here...
+				try await Task.sleep(for: .milliseconds(50))
+				// WHEN app is NOT yet unlocked
+				// await sut.unlockedApp() // enabling this line SHOULD cause test to fail
+			}
+
+			func when(_ d: inout DependencyValues) {
+				d.overlayWindowClient.scheduleAlert = { _ in
+					// THEN NO alert is displayed
+					alertNotScheduled.fulfill()
+					return .dismissed // irrelevant, should not happen
+				}
+			}
+
+			await self.nearFutureFulfillment(of: alertNotScheduled)
+		}
+	}
+
 	func test__GIVEN__saved_profile__WHEN__deleteWallet__THEN__profile_gets_deleted_from_secureStorage() async throws {
 		try await withTimeLimit {
 			// GIVEN saved profile
@@ -644,6 +679,7 @@ extension ProfileStoreExstingProfileTests {
 				then(&$0)
 			} operation: { [self] in
 				let sut = ProfileStore.init()
+				await sut.unlockedApp() // must unlock to allow alert to be displayed
 				// The scheduling of the alert needs some time...
 				await nearFutureFulfillment(of: alertScheduled)
 				return await sut.profile
