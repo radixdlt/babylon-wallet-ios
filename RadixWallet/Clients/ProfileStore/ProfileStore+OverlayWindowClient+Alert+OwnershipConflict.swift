@@ -29,7 +29,7 @@ extension OverlayWindowClient.Item.AlertState {
 	}
 }
 
-private let keepUsingThisPhone = "Keen using this phone"
+private let keepUsingThisPhone = "Keep using this phone"
 private let deleteOnThisPhone = "Delete on this phone"
 let overlayClientProfileStoreOwnershipConflictTextState = TextState("It seems you have used the wallet on another iPhone, this is not supported.\n\nIf you select '\(keepUsingThisPhone)', you will see this warning if you start the app on the other phone.\n\nIf you select '\(deleteOnThisPhone)' the wallet data will be deleted on this phone and you can continue on the other phone.") // FIXME: Strings,
 
