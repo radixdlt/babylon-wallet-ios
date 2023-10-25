@@ -484,6 +484,42 @@ final class ProfileStoreExstingProfileTests: TestCase {
 		}
 	}
 
+	func test__GIVEN__saved_profile__WHEN__we_update_profile__THEN__ownership_is_checked_by_loading_profile_from_keychain() async throws {
+		try await withTimeLimit {
+			// GIVEN saved profile
+			let saved = Profile.withOneAccount
+
+			let profileHasBeenUpdated = LockIsolated<Bool>(false)
+			let profile_is_loaded_from_keychain = self.expectation(description: "profile is loaded from keychain")
+
+			try await withTestClients {
+				$0.savedProfile(saved)
+				then(&$0)
+			} operation: {
+				let sut = ProfileStore()
+				// WHEN we update profile
+				try await sut.updating {
+					$0.header.lastModified = Date()
+					profileHasBeenUpdated.setValue(true)
+				}
+			}
+
+			func then(_ d: inout DependencyValues) {
+				d.secureStorageClient.loadProfileSnapshot = { id in
+					profileHasBeenUpdated.withValue { hasBeenUpdated in
+						if hasBeenUpdated {
+							XCTAssertNoDifference(id, saved.id)
+							profile_is_loaded_from_keychain.fulfill()
+						}
+					}
+					return saved.snapshot()
+				}
+			}
+
+			await self.nearFutureFulfillment(of: profile_is_loaded_from_keychain)
+		}
+	}
+
 	func test__GIVEN__saved_profile_mismatch_deviceID__WHEN__claimAndContinueUseOnThisPhone__THEN__profile_uses_claimed_device() async throws {
 		try await doTestMismatch(
 			savedProfile: Profile.withOneAccount,

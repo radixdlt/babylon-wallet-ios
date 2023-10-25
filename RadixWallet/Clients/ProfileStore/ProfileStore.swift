@@ -67,7 +67,9 @@ extension ProfileStore {
 	/// updates `headerList` (Keychain),  `activeProfileID` (UserDefaults)
 	/// and saves the snapshot of the profile into Keychain.
 	/// - Parameter profile: Imported Profile to use and save.
-	public func importCloudProfileSnapshot(_ header: ProfileSnapshot.Header) throws {
+	public func importCloudProfileSnapshot(
+		_ header: ProfileSnapshot.Header
+	) throws {
 		do {
 			// Load the snapshot, also this will validate if the snapshot actually exist
 			let profileSnapshot = try secureStorageClient.loadProfileSnapshot(header.id)
