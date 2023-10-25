@@ -49,6 +49,13 @@ extension AccountPreferences {
 					.padding(.horizontal, .medium3)
 					.padding(.bottom, .medium3)
 
+				Button("Show Address QR Code") { // FIXME: Strings L10n.AccountSettings.showQR
+					viewStore.send(.qrCodeButtonTapped)
+				}
+				.buttonStyle(.secondaryRectangular(shouldExpand: true))
+				.padding(.horizontal, .medium3)
+				.padding(.bottom, .medium3)
+
 				PreferencesList(
 					viewState: .init(sections: viewStore.sections),
 					onRowSelected: { _, rowId in viewStore.send(.rowTapped(rowId)) }
@@ -73,9 +80,21 @@ extension View {
 	@MainActor
 	func destination(store: StoreOf<AccountPreferences>) -> some View {
 		let destinationStore = store.scope(state: \.$destinations, action: { .child(.destinations($0)) })
-		return updateAccountLabel(with: destinationStore)
+		return showQRCode(with: destinationStore)
+			.updateAccountLabel(with: destinationStore)
 			.thirdPartyDeposits(with: destinationStore)
 			.devAccountPreferences(with: destinationStore)
+	}
+
+	@MainActor
+	func showQRCode(with destinationStore: PresentationStoreOf<AccountPreferences.Destinations>) -> some View {
+		sheet(
+			store: destinationStore,
+			state: /AccountPreferences.Destinations.State.showQR,
+			action: AccountPreferences.Destinations.Action.showQR
+		) {
+			ShowQR.View(store: $0)
+		}
 	}
 
 	@MainActor

@@ -18,6 +18,7 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 
 	public enum ViewAction: Sendable, Equatable {
 		case task
+		case qrCodeButtonTapped
 		case rowTapped(AccountPreferences.Section.SectionRow)
 	}
 
@@ -32,18 +33,23 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 	// MARK: - Destination
 	public struct Destinations: Reducer, Sendable {
 		public enum State: Equatable, Hashable {
+			case showQR(ShowQR.State)
 			case updateAccountLabel(UpdateAccountLabel.State)
 			case thirdPartyDeposits(ManageThirdPartyDeposits.State)
 			case devPreferences(DevAccountPreferences.State)
 		}
 
 		public enum Action: Equatable, Sendable {
+			case showQR(ShowQR.Action)
 			case updateAccountLabel(UpdateAccountLabel.Action)
 			case thirdPartyDeposits(ManageThirdPartyDeposits.Action)
 			case devPreferences(DevAccountPreferences.Action)
 		}
 
 		public var body: some ReducerOf<Self> {
+			Scope(state: /State.showQR, action: /Action.showQR) {
+				ShowQR()
+			}
 			Scope(state: /State.updateAccountLabel, action: /Action.updateAccountLabel) {
 				UpdateAccountLabel()
 			}
@@ -70,15 +76,19 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .task:
-			.run { [address = state.account.address] send in
+			return .run { [address = state.account.address] send in
 				for try await accountUpdate in await accountsClient.accountUpdates(address) {
 					guard !Task.isCancelled else { return }
 					await send(.internal(.accountUpdated(accountUpdate)))
 				}
 			}
 
+		case .qrCodeButtonTapped:
+			state.destinations = .showQR(.init(accountAddress: state.account.address))
+			return .none
+
 		case let .rowTapped(row):
-			destination(for: row, &state)
+			return destination(for: row, &state)
 		}
 	}
 
@@ -128,6 +138,13 @@ extension AccountPreferences {
 
 	func onDestinationAction(_ action: AccountPreferences.Destinations.Action, _ state: inout State) -> Effect<Action> {
 		switch action {
+		case .showQR(.delegate(.dismiss)):
+			if case .showQR = state.destinations {
+				state.destinations = nil
+			}
+			return .none
+		case .showQR:
+			return .none
 		case .updateAccountLabel(.delegate(.accountLabelUpdated)),
 		     .thirdPartyDeposits(.delegate(.accountUpdated)):
 			state.destinations = nil
