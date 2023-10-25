@@ -11,7 +11,7 @@ extension CacheClient: DependencyKey {
 				try diskPersistenceClient.save(encodable, entry.filesystemFilePath)
 				loggerGlobal.debug("💾 Data successfully saved to disk: \(entry)")
 			} catch {
-				loggerGlobal.warning("💾 Could not save data to disk: \(error.localizedDescription)")
+				loggerGlobal.debug("💾❌ Could not save data to disk: \(error.localizedDescription)")
 			}
 		}, load: { decodable, entry in
 			@Dependency(\.diskPersistenceClient) var diskPersistenceClient
@@ -32,7 +32,7 @@ extension CacheClient: DependencyKey {
 				loggerGlobal.debug("💾 Data successfully retrieved from disk: \(entry)")
 				return data
 			} catch {
-				loggerGlobal.warning("💾 Could not retrieve data from disk: \(error.localizedDescription)")
+				loggerGlobal.debug("💾❌ Could not retrieve data from disk: \(error.localizedDescription)")
 				throw Error.dataLoadingFailed
 			}
 		}, removeFile: { entry in
@@ -42,7 +42,7 @@ extension CacheClient: DependencyKey {
 				try diskPersistenceClient.remove(entry.filesystemFilePath)
 				loggerGlobal.debug("💾 Removed file: \(entry)")
 			} catch {
-				loggerGlobal.warning("💾 Could not delete file from disk: \(error.localizedDescription)")
+				loggerGlobal.debug("💾❌ Could not delete file from disk: \(error.localizedDescription)")
 			}
 		}, removeFolder: { entry in
 			@Dependency(\.diskPersistenceClient) var diskPersistenceClient
@@ -51,7 +51,7 @@ extension CacheClient: DependencyKey {
 				try diskPersistenceClient.remove(entry.filesystemFolderPath)
 				loggerGlobal.debug("💾 Removed folder: \(entry)")
 			} catch {
-				loggerGlobal.warning("💾 Could not delete folder from disk: \(error.localizedDescription)")
+				loggerGlobal.debug("💾❌ Could not delete folder from disk: \(error.localizedDescription)")
 			}
 		}, removeAll: {
 			@Dependency(\.diskPersistenceClient) var diskPersistenceClient
@@ -60,7 +60,7 @@ extension CacheClient: DependencyKey {
 				try diskPersistenceClient.removeAll()
 				loggerGlobal.debug("💾 Data successfully cleared from disk")
 			} catch {
-				loggerGlobal.warning("💾 Could not clear cached data from disk: \(error.localizedDescription)")
+				loggerGlobal.debug("💾❌ Could not clear cached data from disk: \(error.localizedDescription)")
 			}
 		}
 	)

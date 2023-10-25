@@ -6,7 +6,7 @@ private let baseLabel = "com.radixpublishing"
 
 private func makeLogger(
 	label: String,
-	level: Logger.Level = .debug
+	level: Logger.Level = .info
 ) -> Logger {
 	Logger(label: label) { _ in
 		// FIXME: Instead of this, we should differentiate by build flavour. Waiting on SPM to support proper build flavours.
