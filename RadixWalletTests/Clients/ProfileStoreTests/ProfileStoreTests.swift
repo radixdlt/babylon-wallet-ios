@@ -191,7 +191,38 @@ final class ProfileStoreNewProfileTests: TestCase {
 			}
 
 			// THEN imported profile is used
-			XCTAssertEqual(usedProfile, Profile.withOneAccountAbandonArt)
+			XCTAssertNoDifference(usedProfile, Profile.withOneAccountAbandonArt)
+		}
+	}
+
+	func test__GIVEN__no_profile__WHEN__import_profile__THEN__ephemeral_profile_is_deleted() async throws {
+		try await withTimeLimit {
+			let ephemeralProfileIsDeleted = self.expectation(description: "ephemeral profile is deleted")
+			let idOfDeleted = LockIsolated<Profile.ID?>(nil)
+			let ephemeralProfile = try await withTestClients {
+				// GIVEN no profile
+				$0.noProfile()
+				then(&$0)
+			} operation: {
+				let sut = ProfileStore()
+				let ephemeralProfile = await sut.profile
+				// WHEN import profile
+				try await sut.importProfile(Profile.withOneAccountAbandonArt)
+				return ephemeralProfile
+			}
+
+			// THEN ephemeral profile is deleted
+			func then(_ d: inout DependencyValues) {
+				d.secureStorageClient.deleteProfileAndMnemonicsByFactorSourceIDs = { id, _ in
+					idOfDeleted.setValue(id)
+					ephemeralProfileIsDeleted.fulfill()
+				}
+			}
+
+			await self.nearFutureFulfillment(of: ephemeralProfileIsDeleted)
+			idOfDeleted.withValue { deletedID in
+				XCTAssertNoDifference(deletedID, ephemeralProfile.id)
+			}
 		}
 	}
 
@@ -679,12 +710,6 @@ private let expectedDeviceDescription = DeviceInfo.deviceDescription(
 	name: deviceName,
 	model: deviceModel.rawValue
 )
-
-extension ProfileStore {
-	func update(profile: Profile) throws {
-		try _update(profile: profile)
-	}
-}
 
 extension Mnemonic {
 	static let testValue: Self = "zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo wrong"
