@@ -19,14 +19,14 @@ extension ProfileStore {
 	/// A multicasting replaying async sequence of distinct Accounts for the currently selected network.
 	public func accountValues() async -> AnyAsyncSequence<Profile.Network.Accounts> {
 		_lens {
-			$0.network?.accounts
+			$0.network?.getAccounts()
 		}
 	}
 
 	/// A multicasting replaying async sequence of distinct Personas for the currently selected network.
 	public func personaValues() -> AnyAsyncSequence<Profile.Network.Personas> {
 		_lens {
-			$0.network?.personas
+			$0.network?.getPersonas()
 		}
 	}
 

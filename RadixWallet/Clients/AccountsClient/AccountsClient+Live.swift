@@ -17,7 +17,7 @@ extension AccountsClient: DependencyKey {
 		let getCurrentNetworkID: GetCurrentNetworkID = { await profileStore.profile.networkID }
 
 		let getAccountsOnNetwork: GetAccountsOnNetwork = {
-			try await profileStore.profile.network(id: $0).accounts.nonHidden
+			try await profileStore.profile.network(id: $0).getAccounts()
 		}
 
 		let getAccountsOnCurrentNetwork: GetAccountsOnCurrentNetwork = {
@@ -27,7 +27,7 @@ extension AccountsClient: DependencyKey {
 		let nextAccountIndex: NextAccountIndex = { maybeNetworkID in
 			let currentNetworkID = await getCurrentNetworkID()
 			let networkID = maybeNetworkID ?? currentNetworkID
-			let index = await (try? profileStore.profile.network(id: networkID).accounts.count) ?? 0
+			let index = await (try? profileStore.profile.network(id: networkID).nextAccountIndex()) ?? 0
 			return HD.Path.Component.Child.Value(index)
 		}
 
@@ -36,7 +36,7 @@ extension AccountsClient: DependencyKey {
 			nextAccountIndex: nextAccountIndex,
 			getAccountsOnCurrentNetwork: getAccountsOnCurrentNetwork,
 			accountsOnCurrentNetwork: {
-				await profileStore.accountValues().map(\.nonHidden).eraseToAnyAsyncSequence()
+				await profileStore.accountValues()
 			},
 			accountUpdates: { address in
 				await profileStore.accountValues().compactMap {
@@ -64,7 +64,7 @@ extension AccountsClient: DependencyKey {
 				do {
 					let network = try await profileStore.profile.network(id: networkID)
 					// N.B. `accounts` is NonEmpty so `isEmpty` should always evaluate to `false`.
-					return !network.accounts.isEmpty
+					return !network.getAccounts().isEmpty
 				} catch {
 					return false
 				}

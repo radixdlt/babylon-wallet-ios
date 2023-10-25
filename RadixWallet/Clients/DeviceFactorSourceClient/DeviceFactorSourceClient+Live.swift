@@ -23,8 +23,8 @@ extension DeviceFactorSourceClient: DependencyKey {
 					let networkID = Radix.Gateway.default.network.id
 					let profile = Profile(snapshot: overridingSnapshot)
 					let network = try profile.network(id: networkID)
-					accounts = network.accounts.elements
-					personas = network.personas.elements
+					accounts = network.getAccounts().elements
+					personas = network.getPersonas().elements
 				} else {
 					personas = try await personasClient.getPersonas().elements
 					accounts = try await accountsClient.getAccountsOnCurrentNetwork().elements
@@ -121,7 +121,7 @@ extension DeviceFactorSourceClient: DependencyKey {
 				let sources: IdentifiedArrayOf<DeviceFactorSource> = try await {
 					// FIXME: Uh this aint pretty... but we are short on time.
 					if let overridingSnapshot = maybeOverridingSnapshot {
-						let profile = try Profile(snapshot: overridingSnapshot)
+						let profile = Profile(snapshot: overridingSnapshot)
 						return IdentifiedArrayOf(uniqueElements: profile.factorSources.compactMap { $0.extract(DeviceFactorSource.self) })
 					} else {
 						return try await factorSourcesClient.getFactorSources(type: DeviceFactorSource.self)

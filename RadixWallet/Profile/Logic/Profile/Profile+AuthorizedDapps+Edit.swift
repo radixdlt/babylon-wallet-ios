@@ -5,15 +5,6 @@ public struct AuthorizedDappDoesNotExists: Swift.Error {
 	public init() {}
 }
 
-// MARK: - DappWasNotConnected
-struct DappWasNotConnected: Swift.Error {}
-
-// MARK: - AuthorizedDappAlreadyExists
-struct AuthorizedDappAlreadyExists: Swift.Error {}
-
-// MARK: - TryingToUpdateAPersonaWhichIsNotAlreadySaved
-struct TryingToUpdateAPersonaWhichIsNotAlreadySaved: Swift.Error {}
-
 extension Profile {
 	/// Updates a `Persona` in the profile
 	public mutating func updatePersona(
@@ -21,9 +12,7 @@ extension Profile {
 	) throws {
 		let networkID = persona.networkID
 		var network = try network(id: networkID)
-		guard network.personas.updateOrAppend(persona) != nil else {
-			throw TryingToUpdateAPersonaWhichIsNotAlreadySaved()
-		}
+		try network.updatePersona(persona)
 		try updateOnNetwork(network)
 	}
 
@@ -35,12 +24,7 @@ extension Profile {
 		let authorizedDapp = try validateAuthorizedPersonas(of: unvalidatedAuthorizedDapp)
 		let networkID = authorizedDapp.networkID
 		var network = try network(id: networkID)
-		guard !network.authorizedDapps.contains(where: { $0.dAppDefinitionAddress == authorizedDapp.dAppDefinitionAddress }) else {
-			throw AuthorizedDappAlreadyExists()
-		}
-		guard network.authorizedDapps.updateOrAppend(authorizedDapp) == nil else {
-			fatalError("Incorrect implementation, should have been a new AuthorizedDapp")
-		}
+		try network.addAuthorizedDapp(authorizedDapp)
 		try updateOnNetwork(network)
 		return authorizedDapp
 	}
@@ -51,9 +35,7 @@ extension Profile {
 		on networkID: NetworkID
 	) throws {
 		var network = try network(id: networkID)
-		guard network.authorizedDapps.remove(id: authorizedDappID) != nil else {
-			throw DappWasNotConnected()
-		}
+		try network.forgetAuthorizedDapp(authorizedDappID)
 
 		try updateOnNetwork(network)
 	}
@@ -68,7 +50,7 @@ extension Profile {
 		struct AuthorizedDappReferencesUnknownPersonas: Swift.Error {}
 		struct AuthorizedDappReferencesUnknownPersonaField: Swift.Error {}
 		for personaNeedle in authorizedDapp.referencesToAuthorizedPersonas {
-			guard let persona = network.personas.first(where: { $0.address == personaNeedle.identityAddress }) else {
+			guard let persona = network.getPersonas().first(where: { $0.address == personaNeedle.identityAddress }) else {
 				throw AuthorizedDappReferencesUnknownPersonas()
 			}
 
@@ -85,7 +67,7 @@ extension Profile {
 				$0.sharedAccounts?.ids ?? []
 			}
 		)
-		let accountAddressHaystack = Set(network.accounts.map(\.address))
+		let accountAddressHaystack = Set(network.getAccounts().map(\.address))
 		guard accountAddressHaystack.isSuperset(of: accountAddressNeedles) else {
 			struct AuthorizedDappReferencesUnknownAccount: Swift.Error {}
 			throw AuthorizedDappReferencesUnknownAccount()
@@ -101,7 +83,7 @@ extension Profile {
 		networkID: NetworkID
 	) throws {
 		var network = try network(id: networkID)
-		guard var authorizedDapp = network.authorizedDapps[id: dAppID] else {
+		guard var authorizedDapp = network.getAuthorizedDapps()[id: dAppID] else {
 			throw AuthorizedDappDoesNotExists()
 		}
 
@@ -109,9 +91,7 @@ extension Profile {
 			throw PersonaNotConnected()
 		}
 
-		guard network.authorizedDapps.updateOrAppend(authorizedDapp) != nil else {
-			fatalError("Incorrect implementation, should have been an existing AuthorizedDapp")
-		}
+		try network.updateAuthorizedDapp(authorizedDapp)
 		try updateOnNetwork(network)
 	}
 
@@ -122,12 +102,10 @@ extension Profile {
 		let authorizedDapp = try validateAuthorizedPersonas(of: unvalidatedAuthorizedDapp)
 		let networkID = authorizedDapp.networkID
 		var network = try network(id: networkID)
-		guard network.authorizedDapps.contains(where: { $0.dAppDefinitionAddress == authorizedDapp.dAppDefinitionAddress }) else {
+		guard network.getAuthorizedDapps().contains(where: { $0.dAppDefinitionAddress == authorizedDapp.dAppDefinitionAddress }) else {
 			throw AuthorizedDappDoesNotExists()
 		}
-		guard network.authorizedDapps.updateOrAppend(authorizedDapp) != nil else {
-			fatalError("Incorrect implementation, should have been an existing AuthorizedDapp")
-		}
+		try network.updateAuthorizedDapp(authorizedDapp)
 		try updateOnNetwork(network)
 	}
 
@@ -138,7 +116,7 @@ extension Profile {
 		let dapp = try validateAuthorizedPersonas(of: unvalidatedAuthorizedDapp)
 		let networkID = dapp.networkID
 		let network = try network(id: networkID)
-		if network.authorizedDapps.contains(dapp: dapp) {
+		if network.getAuthorizedDapps().contains(dapp: dapp) {
 			try updateAuthorizedDapp(dapp)
 		} else {
 			try addAuthorizedDapp(dapp)

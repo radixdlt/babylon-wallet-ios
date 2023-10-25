@@ -3,9 +3,6 @@ import EngineToolkit
 // MARK: - PersonaNotConnected
 struct PersonaNotConnected: Swift.Error {}
 
-// MARK: - AccountAlreadyExists
-struct AccountAlreadyExists: Swift.Error {}
-
 extension Profile.Network.Accounts {
 	// FIXME: refactor
 	@discardableResult
@@ -33,7 +30,7 @@ extension Profile {
 		_ account: Profile.Network.Account
 	) throws {
 		var network = try network(id: account.networkID)
-		try network.accounts.updateAccount(account)
+		try network.updateAccount(account)
 		try updateOnNetwork(network)
 	}
 
@@ -47,10 +44,7 @@ extension Profile {
 		let maybeNetwork = try? network(id: networkID)
 
 		if var network = maybeNetwork {
-			guard !network.accounts.contains(where: { $0 == account }) else {
-				throw AccountAlreadyExists()
-			}
-			network.accounts.appendAccount(account)
+			try network.addAccount(account)
 			try updateOnNetwork(network)
 		} else {
 			let network = Profile.Network(

@@ -6,6 +6,10 @@ public struct AccountList: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public var accounts: IdentifiedArrayOf<AccountList.Row.State>
 
+		public init() {
+			self.init(accounts: [])
+		}
+
 		public init(accounts: IdentifiedArrayOf<Profile.Network.Account>) {
 			self.accounts = accounts.map { account in AccountList.Row.State(account: account) }.asIdentifiable()
 		}
