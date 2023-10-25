@@ -103,7 +103,6 @@ public struct Splash: Sendable, FeatureReducer {
 			}
 
 			return .run { send in
-				await onboardingClient.unlockedApp()
 				await send(.internal(.loadProfile(onboardingClient.loadProfile())))
 			}
 
@@ -124,12 +123,15 @@ public struct Splash: Sendable, FeatureReducer {
 	}
 
 	func delegateCompleted(profile: Profile, accountRecoveryNeeded: Bool) -> Effect<Action> {
-		.send(.delegate(
-			.completed(
-				profile,
-				accountRecoveryNeeded: accountRecoveryNeeded
-			))
-		)
+		.run { send in
+			await onboardingClient.unlockedApp()
+			await send(.delegate(
+				.completed(
+					profile,
+					accountRecoveryNeeded: accountRecoveryNeeded
+				))
+			)
+		}
 	}
 
 	func checkAccountRecoveryNeeded(_ profile: Profile) -> Effect<Action> {
