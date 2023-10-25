@@ -91,7 +91,6 @@ extension DevAccountPreferences {
 						createMultipleFungibleTokenButton(with: viewStore)
 						createMultipleNonFungibleTokenButton(with: viewStore)
 						#endif // DEBUG
-						qrCodeButton(with: viewStore)
 					}
 					.frame(maxHeight: .infinity, alignment: .top)
 					.padding(.medium1)
@@ -99,15 +98,8 @@ extension DevAccountPreferences {
 						viewStore.send(.appeared)
 					}
 					.navigationTitle("Dev Preferences")
-					.sheet(
-						store: store.destination,
-						state: /DevAccountPreferences.Destination.State.showQR,
-						action: DevAccountPreferences.Destination.Action.showQR
-					) { store in
-						ShowQR.View(store: store)
-					}
 					#if DEBUG
-					.sheet(
+						.sheet(
 							store: store.destination,
 							state: /DevAccountPreferences.Destination.State.reviewTransaction,
 							action: DevAccountPreferences.Destination.Action.reviewTransaction
@@ -149,14 +141,6 @@ extension DevAccountPreferences.View {
 				.font(.app.body2Regular)
 				.foregroundColor(.app.gray1)
 		}
-	}
-
-	@ViewBuilder
-	private func qrCodeButton(with viewStore: ViewStoreOf<DevAccountPreferences>) -> some View {
-		Button(L10n.AccountSettings.showQR) {
-			viewStore.send(.qrCodeButtonTapped)
-		}
-		.buttonStyle(.secondaryRectangular(shouldExpand: true))
 	}
 }
 
