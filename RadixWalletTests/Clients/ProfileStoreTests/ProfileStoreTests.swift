@@ -195,6 +195,29 @@ final class ProfileStoreNewProfileTests: TestCase {
 		}
 	}
 
+	func test__GIVEN__no_profile__WHEN__import_profile_from_icloud__THEN__imported_profile_is_used() async throws {
+		let profileSnapshotInIcloud = Profile.withOneAccountsDeviceInfo_ABBA_mnemonic_ABANDON_ART
+		try await withTimeLimit {
+			let usedProfile = try await withTestClients {
+				// GIVEN no profile
+				$0.noProfile()
+				$0.secureStorageClient.loadProfileSnapshot = { headerId in
+					if headerId == profileSnapshotInIcloud.header.id {
+						profileSnapshotInIcloud.snapshot()
+					} else { nil }
+				}
+			} operation: {
+				let sut = ProfileStore()
+				// WHEN import profile
+				try await sut.importCloudProfileSnapshot(profileSnapshotInIcloud.header)
+				return await sut.profile
+			}
+
+			// THEN imported profile is used
+			XCTAssertNoDifference(usedProfile, profileSnapshotInIcloud)
+		}
+	}
+
 	func test__GIVEN__no_profile__WHEN__import_profile__THEN__ownership_has_changed() async throws {
 		let deviceInfo = DeviceInfo.testValueABBA
 		try await withTimeLimit {
