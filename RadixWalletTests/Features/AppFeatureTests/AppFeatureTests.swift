@@ -290,6 +290,7 @@ private func configureTestClients(
 	d.secureStorageClient.saveMnemonicForFactorSource = { _ in }
 	d.secureStorageClient.saveProfileSnapshot = { _ in }
 	d.secureStorageClient.loadProfileSnapshotData = { _ in nil }
+	d.secureStorageClient.loadProfileSnapshot = { _ in nil }
 	d.date = .constant(Date(timeIntervalSince1970: 0))
 	d.userDefaultsClient.stringForKey = { _ in nil }
 	d.userDefaultsClient.setString = { _, _ in }

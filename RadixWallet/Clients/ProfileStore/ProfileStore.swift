@@ -112,8 +112,7 @@ extension ProfileStore {
 		try _claimOwnership(of: &profileToImport)
 
 		try updateHeaderOfThenSave(
-			profile: profileToImport,
-			assertIdentityAndOwnership: true
+			profile: profileToImport
 		)
 
 		if let idOfEphemeralProfileToDelete {
@@ -231,16 +230,12 @@ extension ProfileStore {
 	/// Asserts identity and ownership of a profile, then updates its header, saves it and emits an update.
 	/// - Parameter updated: Profile to save (after updating its header).
 	private func updateHeaderOfThenSave(
-		profile toSave: Profile,
-		assertIdentityAndOwnership: Bool = true
+		profile toSave: Profile
 	) throws {
 		guard toSave != profile else { return } // prevent duplicates
 
-		if assertIdentityAndOwnership {
-			try _assertIdentity(of: toSave)
-			// Must not update a Profile owned by another device
-			try _assertOwnership(of: toSave)
-		}
+		try _assertIdentity(of: toSave)
+		try _assertOwnership()
 
 		var toSave = toSave
 		try _updateHeader(of: &toSave)
@@ -327,32 +322,34 @@ extension ProfileStore {
 	}
 
 	private func _assertOwnership() throws {
-		try _assertOwnership(of: profile)
-	}
+		loggerGlobal.debug("asserting ownership")
 
-	private func _assertOwnership(of profile: Profile) throws {
-		try Self._assertOwnership(of: profile, against: deviceInfo) {
-			emitOwnershipConflictIfAble(with: profile)
+		// We don't use in memory version of profile header, but rather read from keychain, this protects
+		// from corner case scenario where user is running app on iPhone `A` with Profile `P` then edit the
+		// very same profile `P` on iPhone `B` and then going back to iPhone `A` still running and trying
+		// to edit Profile `P` again. If we do not read profile header from keychain - which might have
+		// synced over iCloud - then iPhone `A` will never have detected that iPhone `B` made changes, so
+		// by reading from keychain we might pick up that change.
+		let header = (try? secureStorageClient.loadProfileSnapshot(profile.id)?.header) ?? profile.header
+
+		guard deviceInfo.id == header.lastUsedOnDevice.id else {
+			let errorMessage = "Device ID mismatch, profile might have been used on another device. Last used in header was: \(String(describing: header.lastUsedOnDevice)) and info of this device: \(String(describing: deviceInfo))"
+			loggerGlobal.error(.init(stringLiteral: errorMessage))
+			Task {
+				let conflictingOwners = ConflictingOwners(
+					ownerOfCurrentProfile: header.lastUsedOnDevice,
+					thisDevice: deviceInfo
+				)
+
+				guard appIsUnlocked else {
+					return buffer(conflictingOwners: conflictingOwners)
+				}
+
+				try await doEmit(conflictingOwners: conflictingOwners)
+			}
+			throw Error.profileUsedOnAnotherDevice
 		}
-	}
-
-	private func emitOwnershipConflictIfAble(with profile: Profile) {
-		Task {
-			try await emitOwnershipConflictIfAble(ownerOfCurrentProfile: profile.header.lastUsedOnDevice)
-		}
-	}
-
-	private func emitOwnershipConflictIfAble(ownerOfCurrentProfile: DeviceInfo) async throws {
-		let conflictingOwners = ConflictingOwners(
-			ownerOfCurrentProfile: ownerOfCurrentProfile,
-			thisDevice: deviceInfo
-		)
-
-		guard appIsUnlocked else {
-			return buffer(conflictingOwners: conflictingOwners)
-		}
-
-		try await doEmit(conflictingOwners: conflictingOwners)
+		// All good
 	}
 
 	private func doEmit(conflictingOwners: ConflictingOwners) async throws {
@@ -374,21 +371,6 @@ extension ProfileStore {
 				assertOwnership: false // duh.. we know we had a conflict, ownership check will fail.
 			)
 		}
-	}
-
-	private static func _assertOwnership(
-		of profile: Profile,
-		against infoAboutThisDevice: DeviceInfo,
-		onMismatch: () -> Void
-	) throws {
-		loggerGlobal.debug("asserting ownership")
-		guard profile.header.lastUsedOnDevice.id == infoAboutThisDevice.id else {
-			let errorMessage = "Device ID mismatch, profile might have been used on another device. Last used in header was: \(String(describing: profile.header.lastUsedOnDevice)) and info of this device: \(String(describing: infoAboutThisDevice))"
-			loggerGlobal.error(.init(stringLiteral: errorMessage))
-			onMismatch()
-			throw Error.profileUsedOnAnotherDevice
-		}
-		// All good
 	}
 }
 
