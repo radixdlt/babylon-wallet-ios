@@ -62,7 +62,7 @@ extension Profile.Network {
 	public mutating func addAccount(
 		_ account: Account
 	) throws {
-		guard !accounts.contains(where: { $0 == account }) else {
+		guard accounts[id: account.id] == nil else {
 			throw AccountAlreadyExists()
 		}
 		accounts.appendAccount(account)
@@ -80,6 +80,10 @@ extension Profile.Network {
 		personas.nonHidden
 	}
 
+	public func hasAnyPersona() -> Bool {
+		!personas.isEmpty
+	}
+
 	public func nextPersonaIndex() -> Int {
 		personas.count
 	}
@@ -87,7 +91,7 @@ extension Profile.Network {
 	public mutating func addPersona(
 		_ persona: Persona
 	) throws {
-		guard personas.contains(where: { $0 == persona }) else {
+		guard personas[id: persona.id] == nil else {
 			throw PersonaAlreadyExists()
 		}
 
@@ -113,9 +117,20 @@ struct DappWasNotConnected: Swift.Error {}
 extension Profile.Network {
 	public func getAuthorizedDapps() -> AuthorizedDapps {
 		let accountsOnNetwork = getAccounts()
-		return authorizedDapps.map { dapp in
+		let personasOnNetwork = getPersonas()
+		return authorizedDapps.compactMap { dapp in
+			let personas = dapp.referencesToAuthorizedPersonas.filter { authorizedPersona in
+				personasOnNetwork[id: authorizedPersona.id] != nil
+			}
+
+			guard !personas.isEmpty else {
+				return nil
+			}
+
 			var dapp = dapp
-			for persona in dapp.referencesToAuthorizedPersonas {
+			dapp.referencesToAuthorizedPersonas = personas
+
+			for persona in personas {
 				if let sharedAccounts = persona.sharedAccounts {
 					let ids = sharedAccounts.ids.filter { address in
 						accountsOnNetwork.contains {

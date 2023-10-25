@@ -41,6 +41,9 @@ extension PersonasClient: DependencyKey {
 			},
 			hasAnyPersonaOnAnyNetwork: {
 				await profileStore.profile.hasAnyPersonaOnAnyNetwork()
+			},
+			hasAnyPersonaOnCurrentNetwork: {
+				await profileStore.profile.network?.hasAnyPersona() ?? false
 			}
 		)
 	}

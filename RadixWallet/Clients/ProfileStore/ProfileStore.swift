@@ -178,9 +178,6 @@ extension ProfileStore {
 
 	public func finishedOnboarding() async {
 		@Dependency(\.device) var device
-		if !profile.hasMainnetAccounts() {
-			logAssertionFailure("Incorrect implementation should have accounts on mainnet after finishing onboarding.")
-		}
 		let model = await device.model
 		let name = await device.name
 		let deviceDescription = DeviceInfo.deviceDescription(

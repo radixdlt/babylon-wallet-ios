@@ -7,6 +7,7 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 	@Dependency(\.personasClient) var personasClient
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.authorizedDappsClient) var authorizedDappsClient
+	@Dependency(\.overlayWindowClient) var overlayWindowClient
 
 	public init() {}
 
@@ -63,6 +64,7 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 		case editPersonaTapped
 		case editAccountSharingTapped
 		case deauthorizePersonaTapped
+		case hidePersonaTapped
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -72,6 +74,7 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 	public enum DelegateAction: Sendable, Equatable {
 		case personaDeauthorized
 		case personaChanged(Profile.Network.Persona.ID)
+		case personaHidden
 	}
 
 	public enum InternalAction: Sendable, Equatable {
@@ -91,6 +94,7 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 			case dAppDetails(DappDetails.State)
 
 			case confirmForgetAlert(AlertState<Action.ConfirmForgetAlert>)
+			case confirmHideAlert(AlertState<Action.ConfirmHideAlert>)
 		}
 
 		public enum Action: Equatable {
@@ -98,8 +102,14 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 			case dAppDetails(DappDetails.Action)
 
 			case confirmForgetAlert(ConfirmForgetAlert)
+			case confirmHideAlert(ConfirmHideAlert)
 
 			public enum ConfirmForgetAlert: Sendable, Equatable {
+				case confirmTapped
+				case cancelTapped
+			}
+
+			public enum ConfirmHideAlert: Sendable, Equatable {
 				case confirmTapped
 				case cancelTapped
 			}
@@ -147,6 +157,22 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 					errorQueue.schedule(error)
 				}
 
+			case .confirmHideAlert(.confirmTapped):
+				guard case let .general(persona, _) = state.mode else {
+					return .none
+				}
+				return .run { send in
+					do {
+						var persona = persona
+						persona.flags.insert(.deletedByUser)
+						try await personasClient.updatePersona(persona)
+						overlayWindowClient.scheduleHUD(.personaHidden)
+						await send(.delegate(.personaHidden))
+					} catch {
+						errorQueue.schedule(error)
+					}
+				}
+
 			default:
 				return .none
 			}
@@ -192,6 +218,15 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 
 		case .deauthorizePersonaTapped:
 			state.destination = .confirmForgetAlert(.confirmForget)
+			return .none
+
+		case .hidePersonaTapped:
+			guard case .general = state.mode else {
+				assertionFailure("Can hide persona only")
+				return .none
+			}
+
+			state.destination = .confirmHideAlert(.confirmHide)
 			return .none
 		}
 	}
@@ -316,5 +351,18 @@ extension AlertState<PersonaDetails.Destination.Action.ConfirmForgetAlert> {
 		} message: {
 			TextState(L10n.AuthorizedDapps.RemoveAuthorizationAlert.message)
 		}
+	}
+}
+
+extension AlertState<PersonaDetails.Destination.Action.ConfirmHideAlert> {
+	static var confirmHide: AlertState {
+		AlertState(
+			title: .init(L10n.AuthorizedDapps.PersonaDetails.hideThisPersona),
+			message: .init(L10n.AuthorizedDapps.PersonaDetails.hidePersonaConfirmation),
+			buttons: [
+				.cancel(.init(L10n.Common.cancel), action: .send(.cancelTapped)),
+				.destructive(.init(L10n.AccountSettings.hideAccount), action: .send(.confirmTapped)),
+			]
+		)
 	}
 }

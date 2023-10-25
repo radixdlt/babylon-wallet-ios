@@ -9,6 +9,7 @@ public struct PersonasClient: Sendable {
 
 	public var saveVirtualPersona: SaveVirtualPersona
 	public var hasAnyPersonaOnAnyNetwork: HasAnyPersonaOnAnyNetworks
+	public var hasAnyPersonaOnCurrentNetwork: HasAnyPersonaOnCurrentNetwork
 
 	public init(
 		personas: @escaping Personas,
@@ -17,7 +18,8 @@ public struct PersonasClient: Sendable {
 		getPersonasOnNetwork: @escaping GetPersonasOnNetwork,
 		updatePersona: @escaping UpdatePersona,
 		saveVirtualPersona: @escaping SaveVirtualPersona,
-		hasAnyPersonaOnAnyNetwork: @escaping HasAnyPersonaOnAnyNetworks
+		hasAnyPersonaOnAnyNetwork: @escaping HasAnyPersonaOnAnyNetworks,
+		hasAnyPersonaOnCurrentNetwork: @escaping HasAnyPersonaOnCurrentNetwork
 	) {
 		self.personas = personas
 		self.nextPersonaIndex = nextPersonaIndex
@@ -26,6 +28,7 @@ public struct PersonasClient: Sendable {
 		self.updatePersona = updatePersona
 		self.saveVirtualPersona = saveVirtualPersona
 		self.hasAnyPersonaOnAnyNetwork = hasAnyPersonaOnAnyNetwork
+		self.hasAnyPersonaOnCurrentNetwork = hasAnyPersonaOnCurrentNetwork
 	}
 }
 
@@ -35,6 +38,7 @@ extension PersonasClient {
 	public typealias GetPersonas = @Sendable () async throws -> Profile.Network.Personas
 	public typealias GetPersonasOnNetwork = @Sendable (NetworkID) async -> Profile.Network.Personas
 	public typealias HasAnyPersonaOnAnyNetworks = @Sendable () async -> Bool
+	public typealias HasAnyPersonaOnCurrentNetwork = @Sendable () async -> Bool
 	public typealias UpdatePersona = @Sendable (Profile.Network.Persona) async throws -> Void
 	public typealias SaveVirtualPersona = @Sendable (Profile.Network.Persona) async throws -> Void
 }
@@ -51,5 +55,17 @@ extension PersonasClient {
 
 	public struct PersonaNotFoundError: Error {
 		let id: Profile.Network.Persona.ID
+	}
+
+	public func determinePersonaPrimacy() async -> PersonaPrimacy {
+		let hasAnyPersonaOnAnyNetwork = await hasAnyPersonaOnAnyNetwork()
+		let hasAnyPersonaOnCurrentNetwork = await hasAnyPersonaOnCurrentNetwork()
+		let isFirstPersonaOnAnyNetwork = !hasAnyPersonaOnAnyNetwork
+		let isFirstPersonaOnCurrentNetwork = !hasAnyPersonaOnCurrentNetwork
+
+		return PersonaPrimacy(
+			firstOnAnyNetwork: isFirstPersonaOnAnyNetwork,
+			firstOnCurrent: isFirstPersonaOnCurrentNetwork
+		)
 	}
 }
