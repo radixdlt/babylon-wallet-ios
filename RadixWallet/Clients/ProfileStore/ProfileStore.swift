@@ -106,12 +106,14 @@ extension ProfileStore {
 		// profile to import was successful, if it was empty (which it will be).
 		let idOfEphemeralProfileToDelete = self.profile.networks.isEmpty ? self.profile.id : nil
 
+		var profileToImport = profileToImport
+
+		// Before saving it we must claim ownership of it!
+		try _claimOwnership(of: &profileToImport)
+
 		try updateHeaderOfThenSave(
 			profile: profileToImport,
-
-			// we might very well not be the owner since we are importing it
-			// so we cannot require to be owner.
-			assertIdentityAndOwnership: false
+			assertIdentityAndOwnership: true
 		)
 
 		if let idOfEphemeralProfileToDelete {
@@ -173,13 +175,24 @@ extension ProfileStore {
 		}
 	}
 
-	public func unlockedApp() async {
+	public func unlockedApp() async -> Profile {
 		loggerGlobal.notice("Unlocking app")
 		let buffered = bufferedOwnershipConflictWhileAppLocked
 		self.mode = .appIsUnlocked
 		if let buffered {
 			loggerGlobal.notice("We had a buffered Profile ownership conflict, emitting it now.")
-			try? await doEmit(conflictingOwners: buffered)
+			do {
+				try await doEmit(conflictingOwners: buffered)
+				return profile // might be a new one! if user selected "delete"
+			} catch {
+				let errMsg = "Failure during Profile ownership resolution, error: \(error)"
+				loggerGlobal.error(.init(stringLiteral: errMsg))
+				assertionFailure(errMsg)
+				// Not import enough to prevent app from being used
+				return profile
+			}
+		} else {
+			return profile
 		}
 	}
 }
@@ -345,6 +358,10 @@ extension ProfileStore {
 	private func doEmit(conflictingOwners: ConflictingOwners) async throws {
 		@Dependency(\.overlayWindowClient) var overlayWindowClient
 		assert(appIsUnlocked)
+
+		// We present an alert to user where they must choice if they wanna keep using Profile
+		// on this device or delete it. If they delete a new one will be created and we will
+		// onboard user...
 		let choiceByUser = await overlayWindowClient.scheduleAlert(.profileUsedOnAnotherDeviceAlert(
 			conflictingOwners: conflictingOwners
 		))
@@ -352,7 +369,10 @@ extension ProfileStore {
 		if choiceByUser == .claimAndContinueUseOnThisPhone {
 			try self.claimOwnershipOfProfile()
 		} else if choiceByUser == .deleteProfileFromThisPhone {
-			try self.deleteProfile(keepInICloudIfPresent: true, assertOwnership: false)
+			try self.deleteProfile(
+				keepInICloudIfPresent: true, // local resolution should not affect iCloud
+				assertOwnership: false // duh.. we know we had a conflict, ownership check will fail.
+			)
 		}
 	}
 

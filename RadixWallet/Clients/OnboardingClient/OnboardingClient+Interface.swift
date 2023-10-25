@@ -22,5 +22,7 @@ extension OnboardingClient {
 
 	public typealias FinishedOnboarding = @Sendable () async -> EqVoid
 
-	public typealias UnlockedApp = @Sendable () async -> Void
+	/// This might return a NEW profile if user did press DELETE conflicting
+	/// profile during Ownership conflict resultion alert...
+	public typealias UnlockedApp = @Sendable () async -> Profile
 }

@@ -30,7 +30,7 @@ public struct Splash: Sendable, FeatureReducer {
 	public enum InternalAction: Sendable, Equatable {
 		case passcodeConfigResult(TaskResult<LocalAuthenticationConfig>)
 		case loadProfile(Profile)
-		case accountRecoveryNeeded(Profile, TaskResult<Bool>)
+		case accountRecoveryNeeded(TaskResult<Bool>)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -108,23 +108,23 @@ public struct Splash: Sendable, FeatureReducer {
 
 		case let .loadProfile(profile):
 			if profile.hasAnyPersonaOnAnyNetwork() || profile.hasAnyAccountOnAnyNetwork() {
-				return checkAccountRecoveryNeeded(profile)
+				return checkAccountRecoveryNeeded()
 			}
-			return delegateCompleted(profile: profile, accountRecoveryNeeded: false)
+			return delegateCompleted(accountRecoveryNeeded: false)
 
-		case let .accountRecoveryNeeded(_, .failure(error)):
+		case let .accountRecoveryNeeded(.failure(error)):
 			state.biometricsCheckFailed = true
 			errorQueue.schedule(error)
 			return .none
 
-		case let .accountRecoveryNeeded(profile, .success(recoveryNeeded)):
-			return delegateCompleted(profile: profile, accountRecoveryNeeded: recoveryNeeded)
+		case let .accountRecoveryNeeded(.success(recoveryNeeded)):
+			return delegateCompleted(accountRecoveryNeeded: recoveryNeeded)
 		}
 	}
 
-	func delegateCompleted(profile: Profile, accountRecoveryNeeded: Bool) -> Effect<Action> {
+	func delegateCompleted(accountRecoveryNeeded: Bool) -> Effect<Action> {
 		.run { send in
-			await onboardingClient.unlockedApp()
+			let profile = await onboardingClient.unlockedApp()
 			await send(.delegate(
 				.completed(
 					profile,
@@ -134,10 +134,9 @@ public struct Splash: Sendable, FeatureReducer {
 		}
 	}
 
-	func checkAccountRecoveryNeeded(_ profile: Profile) -> Effect<Action> {
+	func checkAccountRecoveryNeeded() -> Effect<Action> {
 		.run { send in
 			await send(.internal(.accountRecoveryNeeded(
-				profile,
 				.init {
 					try await deviceFactorSourceClient.isAccountRecoveryNeeded()
 				}

@@ -186,12 +186,34 @@ final class ProfileStoreNewProfileTests: TestCase {
 			} operation: {
 				let sut = ProfileStore()
 				// WHEN import profile
-				try await sut.importProfile(Profile.withOneAccountAbandonArt)
+				try await sut.importProfile(Profile.withOneAccountsDeviceInfo_ABBA_mnemonic_ABANDON_ART)
 				return await sut.profile
 			}
 
 			// THEN imported profile is used
-			XCTAssertNoDifference(usedProfile, Profile.withOneAccountAbandonArt)
+			XCTAssertNoDifference(usedProfile, Profile.withOneAccountsDeviceInfo_ABBA_mnemonic_ABANDON_ART)
+		}
+	}
+
+	func test__GIVEN__no_profile__WHEN__import_profile__THEN__ownership_has_changed() async throws {
+		let deviceInfo = DeviceInfo.testValueABBA
+		try await withTimeLimit {
+			let usedProfile = try await withTestClients {
+				// GIVEN no profile
+				$0.noProfile()
+				$0.secureStorageClient.loadDeviceInfo = { deviceInfo }
+			} operation: {
+				let sut = ProfileStore()
+				// WHEN import profile
+				try await sut.importProfile(Profile.withOneAccountsDeviceInfo_BEEF_mnemonic_ABANDON_ART)
+				return await sut.profile
+			}
+
+			// THEN imported profile is used
+			XCTAssertNoDifference(
+				usedProfile.header.lastUsedOnDevice,
+				deviceInfo
+			)
 		}
 	}
 
@@ -207,7 +229,7 @@ final class ProfileStoreNewProfileTests: TestCase {
 				let sut = ProfileStore()
 				let ephemeralProfile = await sut.profile
 				// WHEN import profile
-				try await sut.importProfile(Profile.withOneAccountAbandonArt)
+				try await sut.importProfile(Profile.withOneAccountsDeviceInfo_ABBA_mnemonic_ABANDON_ART)
 				return ephemeralProfile
 			}
 
@@ -622,7 +644,7 @@ final class ProfileStoreExstingProfileTests: TestCase {
 	func test__GIVEN__saved_profile_P__WHEN__deleteWallet__THEN__new_profile_Q_is_created() async throws {
 		try await withTimeLimit {
 			// GIVEN saved profile `P`
-			let P = Profile.withOneAccountZooVote
+			let P = Profile.withOneAccountsDeviceInfo_ABBA_mnemonic_ZOO_VOTE
 			// WHEN deleteWallet
 			let Q: Profile = try await self.doTestDeleteProfile(
 				saved: P
@@ -640,10 +662,10 @@ final class ProfileStoreExstingProfileTests: TestCase {
 	func test__GIVEN__saved_profile__WHEN__deleteWallet__THEN__new_profile_is_saved_to_secureStorage() async throws {
 		try await withTimeLimit {
 			// GIVEN saved profile
-			let newProfile = Profile.withNoAccountsAbandonArt
+			let newProfile = Profile.withNoAccountsDeviceInfo_ABBA_mnemonic_ABANDON_ART
 			// WHEN deleteWallet
 			try await self.doTestDeleteProfile(
-				saved: Profile.withOneAccountZooVote
+				saved: Profile.withOneAccountsDeviceInfo_ABBA_mnemonic_ZOO_VOTE
 			) { d, _ in
 				d.mnemonicClient.generate = { _, _ in
 					Mnemonic.testValueAbandonArt

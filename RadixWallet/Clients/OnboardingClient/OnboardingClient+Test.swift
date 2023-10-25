@@ -16,7 +16,7 @@ extension OnboardingClient: TestDependencyKey {
 	)
 
 	public static let noop = Self(
-		unlockedApp: {},
+		unlockedApp: { fatalError("noop") },
 		loadProfile: { fatalError("noop") },
 		finishedOnboarding: { EqVoid.instance }
 	)

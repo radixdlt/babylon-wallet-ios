@@ -145,13 +145,53 @@ extension Profile.Network.Account {
 }
 
 extension Profile {
-	static let withOneAccount = Self.withOneAccountZooVote
-	static let withNoAccounts = Self.withNoAccountsZooVote
+	static let withOneAccount = Self.withOneAccountsDeviceInfo_ABBA_mnemonic_ZOO_VOTE
+	static let withNoAccounts = Self.withNoAccountsDeviceInfo_ABBA_mnemonic_ZOO_VOTE
 
-	static let withOneAccountZooVote = withTestClients(Self.testValue(privateHDFactorSource: .testValueZooVote))
-	static let withNoAccountsZooVote = withTestClients(Self.testValue(nameOfFirstAccount: nil, privateHDFactorSource: .testValueZooVote))
-	static let withOneAccountAbandonArt = withTestClients(Self.testValue(privateHDFactorSource: .testValueAbandonArt))
-	static let withNoAccountsAbandonArt = withTestClients(Self.testValue(nameOfFirstAccount: nil, privateHDFactorSource: .testValueAbandonArt))
+	static let withOneAccountsDeviceInfo_ABBA_mnemonic_ZOO_VOTE = withTestClients(
+		Self.testValue(
+			nameOfFirstAccount: "zoo...vote",
+			deviceInfo: .testValueABBA,
+			privateHDFactorSource: .testValueZooVote
+		)
+	)
+	static let withNoAccountsDeviceInfo_ABBA_mnemonic_ZOO_VOTE = withTestClients(
+		Self.testValue(
+			nameOfFirstAccount: nil,
+			deviceInfo: .testValueABBA,
+			privateHDFactorSource: .testValueZooVote
+		)
+	)
+
+	static let withOneAccountsDeviceInfo_ABBA_mnemonic_ABANDON_ART = withTestClients(
+		Self.testValue(
+			nameOfFirstAccount: "abandon...art",
+			deviceInfo: .testValueABBA,
+			privateHDFactorSource: .testValueAbandonArt
+		)
+	)
+	static let withNoAccountsDeviceInfo_ABBA_mnemonic_ABANDON_ART = withTestClients(
+		Self.testValue(
+			nameOfFirstAccount: nil,
+			deviceInfo: .testValueABBA,
+			privateHDFactorSource: .testValueAbandonArt
+		)
+	)
+
+	static let withOneAccountsDeviceInfo_BEEF_mnemonic_ABANDON_ART = withTestClients(
+		Self.testValue(
+			nameOfFirstAccount: "abandon...art",
+			deviceInfo: .testValueBEEF,
+			privateHDFactorSource: .testValueAbandonArt
+		)
+	)
+	static let withNoAccountsDeviceInfo_BEEF_mnemonic_ABANDON_ART = withTestClients(
+		Self.testValue(
+			nameOfFirstAccount: nil,
+			deviceInfo: .testValueBEEF,
+			privateHDFactorSource: .testValueAbandonArt
+		)
+	)
 
 	mutating func createMainnetWithOneAccount(
 		name nameOfFirstAccount: String,
@@ -177,11 +217,12 @@ extension Profile {
 
 	static func testValue(
 		nameOfFirstAccount: String? = "Main",
-		privateHDFactorSource: PrivateHDFactorSource = .testValue
+		deviceInfo: DeviceInfo = .testValueABBA,
+		privateHDFactorSource: PrivateHDFactorSource = .testValueZooVote
 	) -> Self {
-		var header: ProfileSnapshot.Header = .testValue
+		var header: ProfileSnapshot.Header = .testValue(deviceInfo: deviceInfo)
 		var profile = Profile(
-			header: .testValue,
+			header: header,
 			factorSources: NonEmpty(rawValue: [
 				privateHDFactorSource.factorSource.embed(),
 			])!
@@ -241,7 +282,7 @@ private func configureTestClients(
 	d.mnemonicClient.generate = { _, _ in .testValue }
 	d.secureStorageClient.saveDeviceInfo = { _ in }
 	d.secureStorageClient.deprecatedLoadDeviceID = { nil }
-	d.secureStorageClient.loadDeviceInfo = { .testValue }
+	d.secureStorageClient.loadDeviceInfo = { .testValueABBA }
 	d.secureStorageClient.loadProfileHeaderList = { nil }
 	d.secureStorageClient.saveProfileHeaderList = { _ in }
 	d.secureStorageClient.deleteDeprecatedDeviceID = {}
@@ -261,12 +302,24 @@ extension ProfileSnapshot.Header {
 		deviceID: UUID? = nil,
 		date: Date? = nil
 	) -> Self {
-		let device: DeviceInfo = .testValue(deviceID: deviceID, date: date)
-		return Self(
-			creatingDevice: device,
-			lastUsedOnDevice: device,
+		.testValue(
+			profileID: profileID,
+			deviceInfo: .testValue(
+				deviceID: deviceID,
+				date: date
+			)
+		)
+	}
+
+	static func testValue(
+		profileID: UUID? = nil,
+		deviceInfo: DeviceInfo
+	) -> Self {
+		Self(
+			creatingDevice: deviceInfo,
+			lastUsedOnDevice: deviceInfo,
 			id: profileID ?? 0xDEAD,
-			lastModified: device.date,
+			lastModified: deviceInfo.date,
 			contentHint: .init(),
 			snapshotVersion: .minimum
 		)
