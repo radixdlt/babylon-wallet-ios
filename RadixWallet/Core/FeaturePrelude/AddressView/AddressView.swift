@@ -15,6 +15,7 @@ public struct AddressView: View {
 
 	public init(
 		_ identifiable: LedgerIdentifiable,
+		showFull: Bool = false,
 		isTappable: Bool = true
 	) {
 		self.identifiable = identifiable
@@ -22,15 +23,15 @@ public struct AddressView: View {
 
 		switch identifiable {
 		case .address:
-			self.format = .default
+			self.format = showFull ? .full : .default
 			self.action = .copy
 		case let .identifier(identifier):
 			switch identifier {
 			case .transaction:
-				self.format = .default
+				self.format = showFull ? .full : .default
 				self.action = .viewOnDashboard
 			case .nonFungibleGlobalID:
-				self.format = .nonFungibleLocalId
+				self.format = showFull ? .full : .nonFungibleLocalId
 				self.action = .copy
 			}
 		}
