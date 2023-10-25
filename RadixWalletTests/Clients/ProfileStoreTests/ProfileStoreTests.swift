@@ -509,6 +509,7 @@ final class ProfileStoreExstingProfileTests: TestCase {
 					profileHasBeenUpdated.withValue { hasBeenUpdated in
 						if hasBeenUpdated {
 							XCTAssertNoDifference(id, saved.id)
+							// THEN ownership is checked by loading profile from keychain
 							profile_is_loaded_from_keychain.fulfill()
 						}
 					}
@@ -712,6 +713,62 @@ final class ProfileStoreExstingProfileTests: TestCase {
 					XCTAssertNoDifference($0, newProfile.snapshot())
 				}
 			}
+		}
+	}
+
+	func test__GIVEN__saved_profile__WHEN__we_update_profile_without_ownership__THEN__ownership_conflict_alert_is_shown() async throws {
+		try await withTimeLimit(.normal) {
+			// GIVEN saved profile
+			let saved = Profile.withOneAccountsDeviceInfo_ABBA_mnemonic_ABANDON_ART
+			let profileHasBeenUpdated = LockIsolated<Bool>(false)
+			let ownership_conflict_alert_is_shown = self.expectation(description: "ownership conflict alert is shown")
+
+			try await withTestClients {
+				$0.savedProfile(saved)
+				when(&$0)
+				then(&$0)
+			} operation: {
+				let sut = ProfileStore()
+				await sut.unlockedApp()
+				// WHEN we update profile...
+				do {
+					try await sut.updating {
+						$0.header.lastModified = Date()
+						profileHasBeenUpdated.setValue(true)
+					}
+					return XCTFail("Expected to throw")
+				} catch {
+					// expected to throw
+				}
+			}
+
+			func when(_ d: inout DependencyValues) {
+				d.secureStorageClient.loadProfileSnapshot = { _ in
+					profileHasBeenUpdated.withValue { hasBeenUpdated in
+						if hasBeenUpdated {
+							var modified = saved
+							modified.header.lastUsedOnDevice = .testValueBEEF // 0xBEEF != 0xABBA
+							// WHEN ... without ownership
+							return modified.snapshot()
+						} else {
+							return saved.snapshot()
+						}
+					}
+				}
+			}
+
+			func then(_ d: inout DependencyValues) {
+				d.overlayWindowClient.scheduleAlert = { alert in
+					XCTAssertNoDifference(
+						alert.message, overlayClientProfileStoreOwnershipConflictTextState
+					)
+					// THEN ownership conflict alert is shown
+					ownership_conflict_alert_is_shown.fulfill()
+					return .dismissed
+				}
+			}
+
+			await self.nearFutureFulfillment(of: ownership_conflict_alert_is_shown)
 		}
 	}
 }
