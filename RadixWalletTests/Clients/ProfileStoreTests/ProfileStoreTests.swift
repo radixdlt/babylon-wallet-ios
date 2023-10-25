@@ -484,6 +484,33 @@ final class ProfileStoreExstingProfileTests: TestCase {
 		}
 	}
 
+	func test__GIVEN__profile_with_owner_X__WHEN__deprecatedLoadDeviceID_returns_X__THEN__x_is_migrated_to_DeviceInfo_and_saved() async throws {
+		try await withTimeLimit {
+			let savedProfile = Profile.withOneAccount
+			let x = savedProfile.header.lastUsedOnDevice.id
+			let used = await withTestClients {
+				// GIVEN no device info
+				$0.savedProfile(savedProfile)
+				$0.secureStorageClient.loadDeviceInfo = { nil }
+				when(&$0)
+				then(&$0)
+			} operation: {
+				await ProfileStore().profile
+			}
+
+			func when(_ d: inout DependencyValues) {
+				d.secureStorageClient.deprecatedLoadDeviceID = { x }
+			}
+
+			func then(_ d: inout DependencyValues) {
+				d.secureStorageClient.saveDeviceInfo = {
+					// THEN x is migrated to DeviceInfo and saved
+					XCTAssertNoDifference($0.id, x)
+				}
+			}
+		}
+	}
+
 	func test__GIVEN__saved_profile__WHEN__we_update_profile__THEN__ownership_is_checked_by_loading_profile_from_keychain() async throws {
 		try await withTimeLimit {
 			// GIVEN saved profile
@@ -518,6 +545,40 @@ final class ProfileStoreExstingProfileTests: TestCase {
 			}
 
 			await self.nearFutureFulfillment(of: profile_is_loaded_from_keychain)
+		}
+	}
+
+	func test__GIVEN__saved_profile_P__WHEN__we_update_P_changing_its_identity__THEN__identity_is_checked() async throws {
+		try await withTimeLimit {
+			// GIVEN saved profile
+			let P = Profile.withOneAccountsDeviceInfo_ABBA_mnemonic_ZOO_VOTE
+			let Q = Profile.withOneAccountsDeviceInfo_BEEF_mnemonic_ABANDON_ART
+			XCTAssertNotEqual(P.header, Q.header)
+
+			let identityCheckFails = self.expectation(description: "identity check fails")
+
+			try await withTestClients {
+				$0.savedProfile(P)
+				then(&$0)
+			} operation: {
+				let sut = ProfileStore()
+				do {
+					try await sut.updating {
+						// WHEN we update profile changing_its_identity
+						$0.header = Q.header // swap headers... emulating some ultra weird state.
+					}
+					return XCTFail("We expected to throw")
+				} catch {}
+			}
+
+			func then(_ d: inout DependencyValues) {
+				d.assertionFailure = AssertionFailureAction.init(action: { _, _, _ in
+					// THEN identity is checked
+					identityCheckFails.fulfill()
+				})
+			}
+
+			await self.nearFutureFulfillment(of: identityCheckFails)
 		}
 	}
 

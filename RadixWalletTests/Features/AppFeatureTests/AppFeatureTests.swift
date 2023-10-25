@@ -151,14 +151,14 @@ extension Profile {
 	static let withOneAccountsDeviceInfo_ABBA_mnemonic_ZOO_VOTE = withTestClients(
 		Self.testValue(
 			nameOfFirstAccount: "zoo...vote",
-			deviceInfo: .testValueABBA,
+			header: .testValueProfileID_DEAD_deviceID_ABBA,
 			privateHDFactorSource: .testValueZooVote
 		)
 	)
 	static let withNoAccountsDeviceInfo_ABBA_mnemonic_ZOO_VOTE = withTestClients(
 		Self.testValue(
 			nameOfFirstAccount: nil,
-			deviceInfo: .testValueABBA,
+			header: .testValueProfileID_DEAD_deviceID_ABBA,
 			privateHDFactorSource: .testValueZooVote
 		)
 	)
@@ -166,14 +166,14 @@ extension Profile {
 	static let withOneAccountsDeviceInfo_ABBA_mnemonic_ABANDON_ART = withTestClients(
 		Self.testValue(
 			nameOfFirstAccount: "abandon...art",
-			deviceInfo: .testValueABBA,
+			header: .testValueProfileID_FADE_deviceID_ABBA,
 			privateHDFactorSource: .testValueAbandonArt
 		)
 	)
 	static let withNoAccountsDeviceInfo_ABBA_mnemonic_ABANDON_ART = withTestClients(
 		Self.testValue(
 			nameOfFirstAccount: nil,
-			deviceInfo: .testValueABBA,
+			header: .testValueProfileID_FADE_deviceID_ABBA,
 			privateHDFactorSource: .testValueAbandonArt
 		)
 	)
@@ -181,14 +181,14 @@ extension Profile {
 	static let withOneAccountsDeviceInfo_BEEF_mnemonic_ABANDON_ART = withTestClients(
 		Self.testValue(
 			nameOfFirstAccount: "abandon...art",
-			deviceInfo: .testValueBEEF,
+			header: .testValueProfileID_FADE_deviceID_BEEF,
 			privateHDFactorSource: .testValueAbandonArt
 		)
 	)
 	static let withNoAccountsDeviceInfo_BEEF_mnemonic_ABANDON_ART = withTestClients(
 		Self.testValue(
 			nameOfFirstAccount: nil,
-			deviceInfo: .testValueBEEF,
+			header: .testValueProfileID_FADE_deviceID_BEEF,
 			privateHDFactorSource: .testValueAbandonArt
 		)
 	)
@@ -217,10 +217,9 @@ extension Profile {
 
 	static func testValue(
 		nameOfFirstAccount: String? = "Main",
-		deviceInfo: DeviceInfo = .testValueABBA,
+		header: ProfileSnapshot.Header,
 		privateHDFactorSource: PrivateHDFactorSource = .testValueZooVote
 	) -> Self {
-		var header: ProfileSnapshot.Header = .testValue(deviceInfo: deviceInfo)
 		var profile = Profile(
 			header: header,
 			factorSources: NonEmpty(rawValue: [
@@ -229,6 +228,7 @@ extension Profile {
 		)
 
 		if let nameOfFirstAccount {
+			var header = header
 			profile.createMainnetWithOneAccount(
 				name: nameOfFirstAccount,
 				privateHDFactorSource: privateHDFactorSource
@@ -297,7 +297,10 @@ private func configureTestClients(
 }
 
 extension ProfileSnapshot.Header {
-	static let testValue: Self = testValue()
+	static let testValueProfileID_DEAD_deviceID_BEEF = Self.testValue(profileID: 0xDEAD, deviceID: 0xBEEF)
+	static let testValueProfileID_DEAD_deviceID_ABBA = Self.testValue(profileID: 0xDEAD, deviceID: 0xABBA)
+	static let testValueProfileID_FADE_deviceID_BEEF = Self.testValue(profileID: 0xFADE, deviceID: 0xBEEF)
+	static let testValueProfileID_FADE_deviceID_ABBA = Self.testValue(profileID: 0xFADE, deviceID: 0xABBA)
 	static func testValue(
 		profileID: UUID? = nil,
 		deviceID: UUID? = nil,

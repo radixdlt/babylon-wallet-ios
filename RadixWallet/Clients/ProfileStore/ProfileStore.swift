@@ -234,7 +234,11 @@ extension ProfileStore {
 	private func updateHeaderOfThenSave(
 		profile toSave: Profile
 	) throws {
-		guard toSave != profile else { return } // prevent duplicates
+		guard toSave != profile else {
+			// prevent duplicates
+			loggerGlobal.info("Same profile, nothing to update.")
+			return
+		}
 
 		try _assertIdentity(of: toSave)
 		try _assertOwnership()
