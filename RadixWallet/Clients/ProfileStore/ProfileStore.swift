@@ -13,6 +13,18 @@ public final actor ProfileStore {
 	/// device model and name is async.
 	private var deviceInfo: DeviceInfo
 
+	/// After user has pass keychain auth prompt in Splash this becomes
+	/// `appIsUnlocked`. The idea is that we buffer ownership conflicts until UI
+	/// is ready to display it, reason being we dont wanna display the
+	/// OverlayClient UI for ownership conflict simultaneously as
+	/// unlock app keychain auth prompt.
+	private var mode: Mode
+
+	private enum Mode {
+		case appIsUnlocked
+		case appIsLocked(bufferedProfileOwnershipConflict: ConflictingOwners?)
+	}
+
 	init() {
 		let metaDeviceInfo = Self._deviceInfo()
 		let (deviceInfo, profile, conflictingOwners) = Self._loadSavedElseNewProfile(metaDeviceInfo: metaDeviceInfo)
@@ -20,15 +32,7 @@ public final actor ProfileStore {
 		loggerGlobal.info("device.id: \(deviceInfo.id)")
 		self.deviceInfo = deviceInfo
 		self.profileSubject = AsyncCurrentValueSubject(profile)
-
-		if let conflictingOwners {
-			Task {
-				loggerGlobal.notice("ProfileStore:init => emitOwnershipConflict")
-				try await self.emitOwnershipConflict(
-					ownerOfCurrentProfile: conflictingOwners.ownerOfCurrentProfile
-				)
-			}
-		}
+		self.mode = .appIsLocked(bufferedProfileOwnershipConflict: conflictingOwners)
 	}
 }
 
@@ -168,6 +172,16 @@ extension ProfileStore {
 			$0.header.creatingDevice.description = deviceDescription
 		}
 	}
+
+	public func unlockedApp() async {
+		loggerGlobal.notice("Unlocking app")
+		let buffered = bufferedOwnershipConflictWhileAppLocked
+		self.mode = .appIsUnlocked
+		if let buffered {
+			loggerGlobal.notice("We had a buffered Profile ownership conflict, emitting it now.")
+			try? await doEmit(conflictingOwners: buffered)
+		}
+	}
 }
 
 extension DeviceInfo {
@@ -218,6 +232,25 @@ extension ProfileStore {
 		var toSave = toSave
 		try _updateHeader(of: &toSave)
 		try _saveProfileAndEmitUpdate(toSave)
+	}
+
+	private var appIsUnlocked: Bool {
+		switch mode {
+		case .appIsUnlocked: true
+		case .appIsLocked: false
+		}
+	}
+
+	private var bufferedOwnershipConflictWhileAppLocked: ConflictingOwners? {
+		switch mode {
+		case .appIsUnlocked: nil
+		case let .appIsLocked(buffered): buffered
+		}
+	}
+
+	private func buffer(conflictingOwners: ConflictingOwners?) {
+		loggerGlobal.info("App is locked, buffering conflicting profle owner")
+		self.mode = .appIsLocked(bufferedProfileOwnershipConflict: conflictingOwners)
 	}
 }
 
@@ -286,23 +319,32 @@ extension ProfileStore {
 
 	private func _assertOwnership(of profile: Profile) throws {
 		try Self._assertOwnership(of: profile, against: deviceInfo) {
-			emitOwnershipConflict(with: profile)
+			emitOwnershipConflictIfAble(with: profile)
 		}
 	}
 
-	private func emitOwnershipConflict(with profile: Profile) {
+	private func emitOwnershipConflictIfAble(with profile: Profile) {
 		Task {
-			try await emitOwnershipConflict(ownerOfCurrentProfile: profile.header.lastUsedOnDevice)
+			try await emitOwnershipConflictIfAble(ownerOfCurrentProfile: profile.header.lastUsedOnDevice)
 		}
 	}
 
-	private func emitOwnershipConflict(ownerOfCurrentProfile: DeviceInfo) async throws {
-		@Dependency(\.overlayWindowClient) var overlayWindowClient
+	private func emitOwnershipConflictIfAble(ownerOfCurrentProfile: DeviceInfo) async throws {
 		let conflictingOwners = ConflictingOwners(
 			ownerOfCurrentProfile: ownerOfCurrentProfile,
 			thisDevice: deviceInfo
 		)
 
+		guard appIsUnlocked else {
+			return buffer(conflictingOwners: conflictingOwners)
+		}
+
+		try await doEmit(conflictingOwners: conflictingOwners)
+	}
+
+	private func doEmit(conflictingOwners: ConflictingOwners) async throws {
+		@Dependency(\.overlayWindowClient) var overlayWindowClient
+		assert(appIsUnlocked)
 		let choiceByUser = await overlayWindowClient.scheduleAlert(.profileUsedOnAnotherDeviceAlert(
 			conflictingOwners: conflictingOwners
 		))

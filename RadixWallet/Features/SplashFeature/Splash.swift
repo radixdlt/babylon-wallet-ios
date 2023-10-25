@@ -41,7 +41,7 @@ public struct Splash: Sendable, FeatureReducer {
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.continuousClock) var clock
 	@Dependency(\.localAuthenticationClient) var localAuthenticationClient
-	@Dependency(\.onboardingClient.loadProfile) var loadProfile
+	@Dependency(\.onboardingClient) var onboardingClient
 	@Dependency(\.openURL) var openURL
 	@Dependency(\.deviceFactorSourceClient) var deviceFactorSourceClient
 
@@ -103,7 +103,8 @@ public struct Splash: Sendable, FeatureReducer {
 			}
 
 			return .run { send in
-				await send(.internal(.loadProfile(loadProfile())))
+				await onboardingClient.unlockedApp()
+				await send(.internal(.loadProfile(onboardingClient.loadProfile())))
 			}
 
 		case let .loadProfile(profile):

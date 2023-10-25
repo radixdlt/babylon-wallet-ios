@@ -8,6 +8,9 @@ extension OnboardingClient: DependencyKey {
 		profileStore: ProfileStore = .shared
 	) -> Self {
 		Self(
+			unlockedApp: {
+				await profileStore.unlockedApp()
+			},
 			loadProfile: {
 				await profileStore.profile
 			},
