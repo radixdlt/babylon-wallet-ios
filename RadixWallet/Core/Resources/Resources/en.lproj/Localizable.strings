@@ -447,8 +447,15 @@
 "transactionReview_noMnemonicError_title" = "Could Not Complete";
 "transactionReview_noMnemonicError_text" = "The required seed phrase is missing. Please return to the account and begin the recovery process.";
 "transaction_status_completing_text" = "Completing Transaction…";
-"transaction_status_success_title" = "Success";
+"transaction_status_transaction_id_text" = "Transaction ID: ";
+"transaction_status_success_title" = "Transaction Success";
+"transaction_status_failed_title" = "Transaction Failed";
+"transaction_status_rejected_title" = "Transaction Rejected";
+"transaction_status_error_title" = "Transaction Error";
 "transaction_status_success_text" = "Your transaction was successful";
+"transaction_status_failed_text" = "Your transaction was processed, but had a problem that caused it to fail permanently";
+"transaction_status_error_text" = "Your transaction could not be processed, but could potentially still be processed within the next %@ minutes";
+"transaction_status_rejected_text" = "Your transaction was improperly constructed and cannot be processed";
 "transaction_status_failure_title" = "Something went wrong";
 "transaction_status_dismiss_dialog_message" = "Stop waiting for transaction result? The transaction will not be canceled.";
 "addressAction_copyAddress" = "Copy Address";
