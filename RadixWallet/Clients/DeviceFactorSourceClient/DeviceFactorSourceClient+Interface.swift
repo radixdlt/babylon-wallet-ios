@@ -139,7 +139,10 @@ extension DeviceFactorSourceClient {
 		let factorSourceID = deviceFactorSource.id
 
 		guard
-			let loadedMnemonicWithPassphrase = try await secureStorageClient.loadMnemonicByFactorSourceID(factorSourceID, purpose.loadMnemonicPurpose)
+			let loadedMnemonicWithPassphrase = try await secureStorageClient.loadMnemonic(
+				factorSourceID: factorSourceID,
+				purpose: purpose.loadMnemonicPurpose
+			)
 		else {
 			throw FailedToFindDeviceFactorSourceForSigning()
 		}

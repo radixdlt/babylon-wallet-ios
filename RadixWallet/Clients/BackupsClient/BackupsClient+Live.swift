@@ -40,7 +40,12 @@ extension BackupsClient: DependencyKey {
 					// filter out header for which the related profile is not present in the keychain:
 					var filteredHeaders = [ProfileSnapshot.Header]()
 					for header in headers {
-						guard let _ = try? secureStorageClient.loadProfileSnapshotData(header.id) else {
+						guard
+							let snapshot = try? secureStorageClient.loadProfileSnapshot(header.id),
+							// A profile will be empty (no network) if you start app and go to RESTORE.
+							// We will delete this empty profile in ProfileStore once user finished import.
+							!snapshot.networks.isEmpty
+						else {
 							continue
 						}
 						filteredHeaders.append(header)
@@ -48,7 +53,8 @@ extension BackupsClient: DependencyKey {
 					guard !filteredHeaders.isEmpty else {
 						return nil
 					}
-					return .init(rawValue: .init(uniqueElements: filteredHeaders))
+
+					return .init(rawValue: filteredHeaders.asIdentifiable())
 				} catch {
 					assertionFailure("Corrupt Profile headers")
 					loggerGlobal.critical("Corrupt Profile header: \(error.legibleLocalizedDescription)")

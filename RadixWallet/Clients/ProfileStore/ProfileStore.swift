@@ -16,6 +16,8 @@ public final actor ProfileStore {
 	init() {
 		let metaDeviceInfo = Self._deviceInfo()
 		let (deviceInfo, profile, conflictingOwners) = Self._loadSavedElseNewProfile(metaDeviceInfo: metaDeviceInfo)
+		loggerGlobal.info("profile.id: \(profile.id)")
+		loggerGlobal.info("device.id: \(deviceInfo.id)")
 		self.deviceInfo = deviceInfo
 		self.profileSubject = AsyncCurrentValueSubject(profile)
 
@@ -53,7 +55,7 @@ extension ProfileStore {
 	) async throws -> T {
 		var updated = profile
 		let result = try await transform(&updated)
-		try saveProfileAfterUpdateItsHeader(updated)
+		try updateHeaderOfThenSave(profile: updated)
 		return result // in many cases `Void`.
 	}
 
@@ -90,8 +92,37 @@ extension ProfileStore {
 	/// updates `headerList` (Keychain),  `activeProfileID` (UserDefaults)
 	/// and saves a snapshot of the profile into Keychain.
 	/// - Parameter profile: Imported Profile to use and save.
-	public func importProfile(_ profile: Profile) throws {
-		try saveProfileAfterUpdateItsHeader(profile, assertIdentityAndOwnership: false)
+	public func importProfile(_ profileToImport: Profile) throws {
+		// The software design of ProfileStore is to always have a profile at end
+		// of `ProfileStore.init`, which happens upon app launch since `ProfileStore`
+		// is a GlobalActor (`static let shared = ProfileStore`), this means that
+		// a user which does RESTORE from backup will have a new empty Profile in
+		// memory `self.profile` in ProfileStore - and in keychain. We call this
+		// ephemeral profile and we should delete it after the importing of the
+		// profile to import was successful, if it was empty (which it will be).
+		let idOfEphemeralProfileToDelete = self.profile.networks.isEmpty ? self.profile.id : nil
+
+		try updateHeaderOfThenSave(
+			profile: profileToImport,
+
+			// we might very well not be the owner since we are importing it
+			// so we cannot require to be owner.
+			assertIdentityAndOwnership: false
+		)
+
+		if let idOfEphemeralProfileToDelete {
+			do {
+				try secureStorageClient.deleteProfileAndMnemonicsByFactorSourceIDs(
+					profileID: idOfEphemeralProfileToDelete,
+					keepInICloudIfPresent: false
+				)
+			} catch {
+				// Not important enought to fail
+				let errorMsg = "Failed to delete empty ephemeral profile ID, error: \(error)"
+				loggerGlobal.notice(.init(stringLiteral: errorMsg))
+				assertionFailure(errorMsg)
+			}
+		}
 	}
 
 	public func deleteProfile(
@@ -166,31 +197,27 @@ extension ProfileStore {
 			.removeDuplicates()
 			.eraseToAnyAsyncSequence()
 	}
-
-	func _update(profile: Profile) throws {
-		try saveProfileAfterUpdateItsHeader(profile)
-	}
 }
 
 // MARK: Private
 extension ProfileStore {
 	/// Asserts identity and ownership of a profile, then updates its header, saves it and emits an update.
 	/// - Parameter updated: Profile to save (after updating its header).
-	private func saveProfileAfterUpdateItsHeader(
-		_ updated: Profile,
+	private func updateHeaderOfThenSave(
+		profile toSave: Profile,
 		assertIdentityAndOwnership: Bool = true
 	) throws {
-		guard updated != profile else { return } // prevent duplicates
+		guard toSave != profile else { return } // prevent duplicates
 
 		if assertIdentityAndOwnership {
-			try _assertIdentity(of: updated)
+			try _assertIdentity(of: toSave)
 			// Must not update a Profile owned by another device
-			try _assertOwnership(of: updated)
+			try _assertOwnership(of: toSave)
 		}
 
-		var updated = updated
-		try _updateHeader(of: &updated)
-		try _saveProfileAndEmitUpdate(updated)
+		var toSave = toSave
+		try _updateHeader(of: &toSave)
+		try _saveProfileAndEmitUpdate(toSave)
 	}
 }
 

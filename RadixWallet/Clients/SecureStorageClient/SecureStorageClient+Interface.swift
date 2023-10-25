@@ -95,11 +95,16 @@ extension SecureStorageClient {
 
 extension SecureStorageClient {
 	@Sendable
-	public func loadMnemonicByFactorSourceID(
-		_ factorSourceID: FactorSourceID.FromHash,
-		_ purpose: LoadMnemonicPurpose
+	public func loadMnemonic(
+		factorSourceID: FactorSourceID.FromHash,
+		purpose: LoadMnemonicPurpose
 	) throws -> MnemonicWithPassphrase? {
 		try self.loadMnemonicByFactorSourceID(factorSourceID, purpose, true)
+	}
+
+	@Sendable
+	public func deleteProfileAndMnemonicsByFactorSourceIDs(profileID: Profile.ID, keepInICloudIfPresent: Bool) throws {
+		try deleteProfileAndMnemonicsByFactorSourceIDs(profileID, keepInICloudIfPresent)
 	}
 }
 

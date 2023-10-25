@@ -29,7 +29,9 @@ extension FactorSourcesClient: DependencyKey {
 		}
 
 		return Self(
-			getCurrentNetworkID: { await profileStore.profile.networkID },
+			getCurrentNetworkID: {
+				await profileStore.profile.networkID
+			},
 			getFactorSources: getFactorSources,
 			factorSourcesAsyncSequence: {
 				await profileStore.factorSourcesValues()
@@ -62,7 +64,9 @@ extension FactorSourcesClient: DependencyKey {
 
 				return factorSourceID
 			},
-			checkIfHasOlympiaFactorSourceForAccounts: { wordCount, softwareAccounts -> FactorSourceID.FromHash? in
+			checkIfHasOlympiaFactorSourceForAccounts: {
+				wordCount,
+					softwareAccounts -> FactorSourceID.FromHash? in
 				guard softwareAccounts.allSatisfy({ $0.accountType == .software }) else {
 					assertionFailure("Unexpectedly received hardware account, unable to verify.")
 					return nil
@@ -85,7 +89,12 @@ extension FactorSourcesClient: DependencyKey {
 					let factorSourceIDs = olympiaDeviceFactorSources.map(\.id)
 
 					for factorSourceID in factorSourceIDs {
-						guard let mnemonic = try secureStorageClient.loadMnemonicByFactorSourceID(factorSourceID, .importOlympiaAccounts) else {
+						guard
+							let mnemonic = try secureStorageClient.loadMnemonic(
+								factorSourceID: factorSourceID,
+								purpose: .importOlympiaAccounts
+							)
+						else {
 							continue
 						}
 						guard (try? mnemonic.validatePublicKeys(of: softwareAccounts)) == true else {

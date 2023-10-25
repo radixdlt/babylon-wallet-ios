@@ -126,8 +126,6 @@
 		48CFC2AA2ADC10D900E77A5C /* DappDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBD0D2ADC10D800E77A5C /* DappDetails.swift */; };
 		48CFC2AB2ADC10D900E77A5C /* Home.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBD102ADC10D800E77A5C /* Home.swift */; };
 		48CFC2AC2ADC10D900E77A5C /* Home+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBD112ADC10D800E77A5C /* Home+View.swift */; };
-		48CFC2AD2ADC10D900E77A5C /* VisitHub+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBD142ADC10D800E77A5C /* VisitHub+View.swift */; };
-		48CFC2AE2ADC10D900E77A5C /* VisitHub.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBD152ADC10D800E77A5C /* VisitHub.swift */; };
 		48CFC2AF2ADC10D900E77A5C /* Header+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBD172ADC10D800E77A5C /* Header+View.swift */; };
 		48CFC2B02ADC10D900E77A5C /* Header.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBD182ADC10D800E77A5C /* Header.swift */; };
 		48CFC2B12ADC10D900E77A5C /* DerivePublicKeys+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBD1A2ADC10D800E77A5C /* DerivePublicKeys+View.swift */; };
@@ -1386,8 +1384,6 @@
 		48CFBD0D2ADC10D800E77A5C /* DappDetails.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DappDetails.swift; sourceTree = "<group>"; };
 		48CFBD102ADC10D800E77A5C /* Home.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Home.swift; sourceTree = "<group>"; };
 		48CFBD112ADC10D800E77A5C /* Home+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Home+View.swift"; sourceTree = "<group>"; };
-		48CFBD142ADC10D800E77A5C /* VisitHub+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "VisitHub+View.swift"; sourceTree = "<group>"; };
-		48CFBD152ADC10D800E77A5C /* VisitHub.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VisitHub.swift; sourceTree = "<group>"; };
 		48CFBD172ADC10D800E77A5C /* Header+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Header+View.swift"; sourceTree = "<group>"; };
 		48CFBD182ADC10D800E77A5C /* Header.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Header.swift; sourceTree = "<group>"; };
 		48CFBD1A2ADC10D800E77A5C /* DerivePublicKeys+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "DerivePublicKeys+View.swift"; sourceTree = "<group>"; };
@@ -3231,19 +3227,9 @@
 		48CFBD122ADC10D800E77A5C /* Children */ = {
 			isa = PBXGroup;
 			children = (
-				48CFBD132ADC10D800E77A5C /* VisitHub */,
 				48CFBD162ADC10D800E77A5C /* Header */,
 			);
 			path = Children;
-			sourceTree = "<group>";
-		};
-		48CFBD132ADC10D800E77A5C /* VisitHub */ = {
-			isa = PBXGroup;
-			children = (
-				48CFBD142ADC10D800E77A5C /* VisitHub+View.swift */,
-				48CFBD152ADC10D800E77A5C /* VisitHub.swift */,
-			);
-			path = VisitHub;
 			sourceTree = "<group>";
 		};
 		48CFBD162ADC10D800E77A5C /* Header */ = {
@@ -7840,7 +7826,6 @@
 				48CFC5D72ADC10DA00E77A5C /* NavigationBarTitleColor.swift in Sources */,
 				48CFC5B62ADC10DA00E77A5C /* CloseButton.swift in Sources */,
 				48CFC2622ADC10D900E77A5C /* EditPersona+View.swift in Sources */,
-				48CFC2AD2ADC10D900E77A5C /* VisitHub+View.swift in Sources */,
 				48CFC6592ADC10DB00E77A5C /* Profile+Account+Add.swift in Sources */,
 				48CFC3402ADC10D900E77A5C /* DappInteractionCoordinator+View.swift in Sources */,
 				48CFC3152ADC10D900E77A5C /* ScanMultipleOlympiaQRCodes+View.swift in Sources */,
@@ -7919,7 +7904,6 @@
 				48CFC5652ADC10DA00E77A5C /* MetadataNonFungibleGlobalIdValue.swift in Sources */,
 				48CFC63C2ADC10DB00E77A5C /* DerivationPathScheme.swift in Sources */,
 				48CFC43A2ADC10DA00E77A5C /* Data+Random.swift in Sources */,
-				48CFC2AE2ADC10D900E77A5C /* VisitHub.swift in Sources */,
 				48CFC4B02ADC10DA00E77A5C /* MetadataStringValue.swift in Sources */,
 				48CFC5362ADC10DA00E77A5C /* StateEntityDetailsResponse.swift in Sources */,
 				48CFC5372ADC10DA00E77A5C /* StateEntityNonFungibleResourceVaultsPageOptIns.swift in Sources */,
