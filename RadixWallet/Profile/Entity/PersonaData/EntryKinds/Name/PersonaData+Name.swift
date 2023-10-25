@@ -55,7 +55,7 @@ extension PersonaData {
 
 			return [
 				NonEmptyString(names.joined(separator: " ")),
-				NonEmptyString(maybeString: nickname.nilIfEmpty.map { "\"\($0)\"" }),
+				NonEmptyString(maybeString: nickname),
 			]
 			.compactMap { $0 }
 			.map(\.rawValue)
