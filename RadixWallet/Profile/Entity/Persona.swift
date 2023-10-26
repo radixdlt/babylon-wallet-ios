@@ -146,6 +146,16 @@ extension Profile.Network.Persona {
 	}
 }
 
+extension Profile.Network.Persona {
+	public mutating func hide() {
+		flags.insert(.deletedByUser)
+	}
+
+	public mutating func unhide() {
+		flags.remove(.deletedByUser)
+	}
+}
+
 extension Profile.Network.Personas {
 	public var nonHidden: IdentifiedArrayOf<Profile.Network.Persona> {
 		filter { !$0.isHidden }.asIdentifiable()

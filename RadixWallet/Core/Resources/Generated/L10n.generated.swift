@@ -2031,8 +2031,8 @@ public enum L10n {
       public enum SelectFeePayer {
         /// Select Fee Payer
         public static let navigationTitle = L10n.tr("Localizable", "transactionReview_customizeNetworkFeeSheet_selectFeePayer_navigationTitle", fallback: "Select Fee Payer")
-        /// No account selected
-        public static let selectAccountButtonTitle = L10n.tr("Localizable", "transactionReview_customizeNetworkFeeSheet_selectFeePayer_selectAccountButtonTitle", fallback: "No account selected")
+        /// Select Account
+        public static let selectAccountButtonTitle = L10n.tr("Localizable", "transactionReview_customizeNetworkFeeSheet_selectFeePayer_selectAccountButtonTitle", fallback: "Select Account")
         /// Select an account to pay %@ XRD transaction fee
         public static func subtitle(_ p1: Any) -> String {
           return L10n.tr("Localizable", "transactionReview_customizeNetworkFeeSheet_selectFeePayer_subtitle", String(describing: p1), fallback: "Select an account to pay %@ XRD transaction fee")

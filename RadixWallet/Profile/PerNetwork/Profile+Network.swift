@@ -27,7 +27,7 @@ extension Profile {
 
 		public typealias AuthorizedDapps = IdentifiedArrayOf<AuthorizedDapp>
 		/// An identifiable ordered set of `AuthorizedDapp`s the user has connected to.
-		private var authorizedDapps: AuthorizedDapps
+		var authorizedDapps: AuthorizedDapps
 
 		public init(
 			networkID: NetworkID,
@@ -51,6 +51,14 @@ extension Profile.Network {
 		accounts.nonHidden
 	}
 
+	public func getHiddenAccounts() -> IdentifiedArrayOf<Account> {
+		accounts.hidden
+	}
+
+	public func hasAnyAccount() -> Bool {
+		!accounts.isEmpty
+	}
+
 	public func nextAccountIndex() -> Int {
 		accounts.count
 	}
@@ -66,6 +74,20 @@ extension Profile.Network {
 			throw AccountAlreadyExists()
 		}
 		accounts.appendAccount(account)
+	}
+
+	public mutating func hideAccount(_ accountAddress: AccountAddress) {
+		accounts[id: accountAddress]?.hide()
+		authorizedDapps.mutateAll { dapp in
+			dapp.referencesToAuthorizedPersonas.mutateAll { persona in
+				if let sharedAccounts = persona.sharedAccounts {
+					let ids = sharedAccounts.ids.filter { address in
+						address != accountAddress
+					}
+					persona.sharedAccounts?.ids = ids
+				}
+			}
+		}
 	}
 }
 
@@ -106,70 +128,41 @@ extension Profile.Network {
 			throw TryingToUpdateAPersonaWhichIsNotAlreadySaved()
 		}
 	}
+
+	public mutating func hidePersona(_ personaToHide: Persona) {
+		/// Hide the persona itself
+		personas[id: personaToHide.id]?.hide()
+
+		/// Remove the persona reference on any authorized dapp
+		authorizedDapps.mutateAll { dapp in
+			dapp.referencesToAuthorizedPersonas.filterInPlace { personaReference in
+				personaReference.identityAddress == personaToHide.address
+			}
+		}
+
+		/// Filter out dapps that do not reference any persona
+		authorizedDapps.filterInPlace(not(\.referencesToAuthorizedPersonas.isEmpty))
+	}
 }
 
-// MARK: - AuthorizedDappAlreadyExists
-struct AuthorizedDappAlreadyExists: Swift.Error {}
-
-// MARK: - DappWasNotConnected
-struct DappWasNotConnected: Swift.Error {}
-
 extension Profile.Network {
-	public func getAuthorizedDapps() -> AuthorizedDapps {
-		let accountsOnNetwork = getAccounts()
-		let personasOnNetwork = getPersonas()
-		return authorizedDapps.compactMap { dapp in
-			let personas = dapp.referencesToAuthorizedPersonas.filter { authorizedPersona in
-				personasOnNetwork[id: authorizedPersona.id] != nil
-			}
-
-			guard !personas.isEmpty else {
-				return nil
-			}
-
-			var dapp = dapp
-			dapp.referencesToAuthorizedPersonas = personas
-
-			for persona in personas {
-				if let sharedAccounts = persona.sharedAccounts {
-					let ids = sharedAccounts.ids.filter { address in
-						accountsOnNetwork.contains {
-							$0.address == address
-						}
-					}
-					dapp.referencesToAuthorizedPersonas[id: persona.id]?.sharedAccounts?.ids = ids
-				}
-			}
-			return dapp
-		}.asIdentifiable()
+	public mutating func unhideAllEntities() {
+		accounts.mutateAll { $0.unhide() }
+		personas.mutateAll { $0.unhide() }
 	}
+}
 
-	public mutating func addAuthorizedDapp(
-		_ authorizedDapp: AuthorizedDapp
-	) throws {
-		guard !authorizedDapps.contains(where: { $0.dAppDefinitionAddress == authorizedDapp.dAppDefinitionAddress }) else {
-			throw AuthorizedDappAlreadyExists()
-		}
-		guard authorizedDapps.updateOrAppend(authorizedDapp) == nil else {
-			fatalError("Incorrect implementation, should have been a new AuthorizedDapp")
+extension MutableCollection {
+	public mutating func mutateAll(_ mutate: (inout Self.Element) -> Void) {
+		for i in indices {
+			mutate(&self[i])
 		}
 	}
+}
 
-	public mutating func forgetAuthorizedDapp(
-		_ authorizedDappID: AuthorizedDapp.ID
-	) throws {
-		guard authorizedDapps.remove(id: authorizedDappID) != nil else {
-			throw DappWasNotConnected()
-		}
-	}
-
-	public mutating func updateAuthorizedDapp(
-		_ authorizedDapp: AuthorizedDapp
-	) throws {
-		guard authorizedDapps[id: authorizedDapp.id] != nil else {
-			throw AuthorizedDappDoesNotExists()
-		}
-		authorizedDapps.updateOrAppend(authorizedDapp)
+extension RangeReplaceableCollection {
+	mutating func filterInPlace(_ isIncluded: (Element) throws -> Bool) rethrows {
+		self = try self.filter(isIncluded)
 	}
 }
 

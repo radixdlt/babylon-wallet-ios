@@ -64,7 +64,7 @@ extension AccountsClient: DependencyKey {
 				do {
 					let network = try await profileStore.profile.network(id: networkID)
 					// N.B. `accounts` is NonEmpty so `isEmpty` should always evaluate to `false`.
-					return !network.getAccounts().isEmpty
+					return network.hasAnyAccount()
 				} catch {
 					return false
 				}
