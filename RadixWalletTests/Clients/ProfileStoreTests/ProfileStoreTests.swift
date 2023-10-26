@@ -514,6 +514,82 @@ final class ProfileStoreNewProfileTests: TestCase {
 			}
 		}
 	}
+
+	func test__GIVEN__no_profile__WHEN__finishOnboarding_without_accounts__THEN__assertionFailure() async throws {
+		try await withTimeLimit {
+			let assertionFailureIfNoAccount = self.expectation(description: "assertionFailure if finish onboarding without accounts")
+
+			try await withTestClients {
+				// GIVEN no profile
+				$0.noProfile()
+				$0.device.$model = { "marco" }
+				$0.device.$name = { "polo" }
+				then(&$0)
+			} operation: {
+				// WHEN finishedOnboarding
+				await ProfileStore().finishedOnboarding()
+			}
+
+			func then(_ d: inout DependencyValues) {
+				d.assertionFailure = AssertionFailureAction.init(action: { _, _, _ in
+					// THEN assertionFailure
+					assertionFailureIfNoAccount.fulfill()
+				})
+			}
+
+			await self.nearFutureFulfillment(of: assertionFailureIfNoAccount)
+		}
+	}
+
+	func test__GIVEN__no_profile__WHEN_init_and_add_first_account__THEN__RadixGateway_is_emitted() async throws {
+		try await withTimeLimit {
+			try await self.doTestAsyncSequence(
+				arrange: { sut in
+					await sut.currentGatewayValues()
+				},
+				act: { sut in
+					try await withTestClients {
+						try await sut.updating {
+							try $0.addAccount(
+								.testValue
+							)
+						}
+					}
+
+				},
+				assert: [Radix.Gateway.mainnet]
+			)
+		}
+	}
+
+	func doTestAsyncSequence<T: Sendable & Hashable>(
+		arrange: @escaping @Sendable (ProfileStore) async -> AnyAsyncSequence<T>,
+		act: (ProfileStore) async throws -> Void,
+		assert expected: Set<T>
+	) async throws {
+		let sut = try await withTestClients {
+			// GIVEN no profile
+			$0.noProfile()
+		} operation: {
+			ProfileStore()
+		}
+
+		let task = Task {
+			var asyncSequence = await arrange(sut)
+			var values = Set<T>()
+			for try await value in asyncSequence {
+				values.insert(value)
+				if values.count >= expected.count {
+					return values
+				}
+			}
+			return values
+		}
+
+		try await act(sut)
+		let actual = try await task.value
+		XCTAssertEqual(actual, expected)
+	}
 }
 
 // MARK: - ProfileStoreExstingProfileTests
