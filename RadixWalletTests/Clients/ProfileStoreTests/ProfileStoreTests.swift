@@ -179,7 +179,7 @@ final class ProfileStoreNewProfileTests: TestCase {
 	}
 
 	func test__GIVEN__no_profile__WHEN__import_profile__THEN__imported_profile_is_used() async throws {
-		try await withTimeLimit {
+		try await withTimeLimit(.normal) {
 			let usedProfile = try await withTestClients {
 				// GIVEN no profile
 				$0.noProfile()
@@ -626,7 +626,7 @@ final class ProfileStoreExstingProfileTests: TestCase {
 	}
 
 	func test__GIVEN__saved_profile_P__WHEN__we_update_P_changing_its_identity__THEN__identity_is_checked() async throws {
-		try await withTimeLimit {
+		try await withTimeLimit(.normal) {
 			// GIVEN saved profile
 			let P = Profile.withOneAccountsDeviceInfo_ABBA_mnemonic_ZOO_VOTE
 			let Q = Profile.withOneAccountsDeviceInfo_BEEF_mnemonic_ABANDON_ART
