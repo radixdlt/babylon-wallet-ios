@@ -346,9 +346,6 @@ extension SecureStorageClient: DependencyKey {
 			loadProfileHeaderList: loadProfileHeaderList,
 			saveProfileHeaderList: saveProfileHeaderList,
 			deleteProfileHeaderList: deleteProfileHeaderList,
-			getDeviceInfoSetIfNil: { _ in
-				fatalError()
-			},
 			loadDeviceInfo: loadDeviceInfo,
 			saveDeviceInfo: saveDeviceInfo,
 			deprecatedLoadDeviceID: {

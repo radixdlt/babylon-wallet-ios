@@ -174,7 +174,7 @@ final class ProfileStoreNewProfileTests: TestCase {
 			}
 
 			// THEN new profile without network is used
-			XCTAssertNoDifference(newProfile.networks.count, 0)
+			XCTAssertTrue(newProfile.networks.isEmpty)
 		}
 	}
 

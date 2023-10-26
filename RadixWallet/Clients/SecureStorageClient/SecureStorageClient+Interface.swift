@@ -18,7 +18,6 @@ public struct SecureStorageClient: Sendable {
 	public var saveProfileHeaderList: SaveProfileHeaderList
 	public var deleteProfileHeaderList: DeleteProfileHeaderList
 
-	public var getDeviceInfoSetIfNil: GetDeviceInfoSetIfNil
 	public var loadDeviceInfo: LoadDeviceInfo
 	public var saveDeviceInfo: SaveDeviceInfo
 
@@ -46,7 +45,6 @@ extension SecureStorageClient {
 	public typealias SaveProfileHeaderList = @Sendable (ProfileSnapshot.HeaderList) throws -> Void
 	public typealias DeleteProfileHeaderList = @Sendable () throws -> Void
 
-	public typealias GetDeviceInfoSetIfNil = @Sendable (DeviceInfo) throws -> DeviceInfo
 	public typealias LoadDeviceInfo = @Sendable () throws -> DeviceInfo?
 	public typealias SaveDeviceInfo = @Sendable (DeviceInfo) throws -> Void
 
