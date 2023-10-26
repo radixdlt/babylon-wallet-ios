@@ -10,14 +10,14 @@ extension DependencyValues {
 extension OnboardingClient: TestDependencyKey {
 	public static let previewValue: Self = .noop
 	public static let testValue = Self(
-		unlockedApp: unimplemented("\(Self.self).unlockedApp"),
+		unlockApp: unimplemented("\(Self.self).unlockApp"),
 		loadProfile: unimplemented("\(Self.self).loadProfile"),
-		finishedOnboarding: unimplemented("\(Self.self).finishedOnboarding")
+		finishOnboarding: unimplemented("\(Self.self).finishOnboarding")
 	)
 
 	public static let noop = Self(
-		unlockedApp: { fatalError("noop") },
+		unlockApp: { fatalError("noop") },
 		loadProfile: { fatalError("noop") },
-		finishedOnboarding: { EqVoid.instance }
+		finishOnboarding: { EqVoid.instance }
 	)
 }

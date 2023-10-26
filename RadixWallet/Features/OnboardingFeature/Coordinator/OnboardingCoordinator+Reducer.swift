@@ -69,7 +69,7 @@ public struct OnboardingCoordinator: Sendable, FeatureReducer {
 
 		case .createAccountCoordinator(.delegate(.completed)):
 			return .run { send in
-				let _ = await onboardingClient.finishedOnboarding()
+				let _ = await onboardingClient.finishOnboarding()
 				await send(.internal(.finishedOnboarding))
 			}
 

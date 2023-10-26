@@ -1,28 +1,28 @@
 // MARK: - OnboardingClient
 public struct OnboardingClient: Sendable {
 	/// Call this when user has finished authentication from lock screen (e.g. Splash)
-	public var unlockedApp: UnlockedApp // FIXME: Move to a new Lock/Unlock client?
+	public var unlockApp: UnlockApp // FIXME: Move to a new Lock/Unlock client?
 
 	public var loadProfile: LoadProfile
-	public var finishedOnboarding: FinishedOnboarding
+	public var finishOnboarding: FinishOnboarding
 
 	public init(
-		unlockedApp: @escaping UnlockedApp,
+		unlockApp: @escaping UnlockApp,
 		loadProfile: @escaping LoadProfile,
-		finishedOnboarding: @escaping FinishedOnboarding
+		finishOnboarding: @escaping FinishOnboarding
 	) {
-		self.unlockedApp = unlockedApp
+		self.unlockApp = unlockApp
 		self.loadProfile = loadProfile
-		self.finishedOnboarding = finishedOnboarding
+		self.finishOnboarding = finishOnboarding
 	}
 }
 
 extension OnboardingClient {
 	public typealias LoadProfile = @Sendable () async -> Profile
 
-	public typealias FinishedOnboarding = @Sendable () async -> EqVoid
+	public typealias FinishOnboarding = @Sendable () async -> EqVoid
 
 	/// This might return a NEW profile if user did press DELETE conflicting
 	/// profile during Ownership conflict resultion alert...
-	public typealias UnlockedApp = @Sendable () async -> Profile
+	public typealias UnlockApp = @Sendable () async -> Profile
 }
