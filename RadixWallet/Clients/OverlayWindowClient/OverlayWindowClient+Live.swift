@@ -17,10 +17,15 @@ extension OverlayWindowClient: DependencyKey {
 
 		pasteBoardClient.copyEvents().map { _ in Item.hud(.copied) }.subscribe(items)
 
+		let scheduleAlertIgnoreAction: ScheduleAlertIgnoreAction = { alert in
+			items.send(.alert(alert))
+		}
+
 		return .init(
 			scheduledItems: { items.eraseToAnyAsyncSequence() },
-			scheduleAlert: { alert in
-				items.send(.alert(alert))
+			scheduleAlertIgnoreAction: scheduleAlertIgnoreAction,
+			scheduleAlertAwaitAction: { alert in
+				scheduleAlertIgnoreAction(alert)
 				return await alertActions.first { $0.id == alert.id }?.action ?? .dismissed
 			},
 			scheduleHUD: { items.send(.hud($0)) },

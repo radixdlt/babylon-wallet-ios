@@ -3,7 +3,8 @@
 extension OverlayWindowClient: TestDependencyKey {
 	public static let testValue: Self = .init(
 		scheduledItems: unimplemented("\(Self.self).scheduledItems"),
-		scheduleAlert: unimplemented("\(Self.self).scheduleAlert"),
+		scheduleAlertIgnoreAction: unimplemented("\(Self.self).scheduleAlertIgnoreAction"),
+		scheduleAlertAwaitAction: unimplemented("\(Self.self).scheduleAlertAwaitAction"),
 		scheduleHUD: unimplemented("\(Self.self).scheduleHUD"),
 		sendAlertAction: unimplemented("\(Self.self).sendAlertAction"),
 		setIsUserIteractionEnabled: unimplemented("\(Self.self).setIsUserIteractionEnabled"),

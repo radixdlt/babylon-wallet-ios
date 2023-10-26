@@ -712,7 +712,7 @@ final class ProfileStoreExstingProfileTests: TestCase {
 			}
 
 			func when(_ d: inout DependencyValues) {
-				d.overlayWindowClient.scheduleAlert = { _ in
+				d.overlayWindowClient.scheduleAlertAwaitAction = { _ in
 					// THEN NO alert is displayed
 					alertNotScheduled.fulfill()
 					return .dismissed // irrelevant, should not happen
@@ -896,7 +896,7 @@ final class ProfileStoreExstingProfileTests: TestCase {
 			}
 
 			func then(_ d: inout DependencyValues) {
-				d.overlayWindowClient.scheduleAlert = { alert in
+				d.overlayWindowClient.scheduleAlertAwaitAction = { alert in
 					XCTAssertNoDifference(
 						alert.message, overlayClientProfileStoreOwnershipConflictTextState
 					)
@@ -1056,7 +1056,7 @@ extension ProfileStoreExstingProfileTests {
 			}
 
 			func when(_ d: inout DependencyValues) {
-				d.overlayWindowClient.scheduleAlert = { alert in
+				d.overlayWindowClient.scheduleAlertAwaitAction = { alert in
 					XCTAssertNoDifference(
 						alert.message, overlayClientProfileStoreOwnershipConflictTextState
 					)
