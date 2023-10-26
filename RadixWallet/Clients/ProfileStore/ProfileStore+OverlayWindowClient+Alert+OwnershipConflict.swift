@@ -21,6 +21,14 @@ extension OverlayWindowClient.Item.AlertState {
 						TextState("Clear Wallet on This Phone")
 					}
 				)
+				ButtonState(
+					role: .cancel,
+					action: .dismissed,
+					label: {
+						// FIXME: Strings
+						TextState("Ask Later (no changes)")
+					}
+				)
 			},
 			message: {
 				overlayClientProfileStoreOwnershipConflictTextState
@@ -29,7 +37,7 @@ extension OverlayWindowClient.Item.AlertState {
 	}
 }
 
-let overlayClientProfileStoreOwnershipConflictTextState = TextState("This wallet is currently configured with a set of Accounts and Personas in use by a different phone.\n\nYou can claim this wallet for use on this phone instead, removing access by the other phone.\n\nOr you can clear this wallet from this phone and start fresh.") // FIXME: Strings
+let overlayClientProfileStoreOwnershipConflictTextState = TextState("This wallet is currently configured with a set of Accounts and Personas in use by a different phone.\n\nTo make changes to this wallet, you must claim it for use on this phone instead, removing access by the other phone.\n\nOr you can clear this wallet from this phone and start fresh.") // FIXME: Strings
 
 extension OverlayWindowClient.Item.AlertAction {
 	static var claimAndContinueUseOnThisPhone: Self {
