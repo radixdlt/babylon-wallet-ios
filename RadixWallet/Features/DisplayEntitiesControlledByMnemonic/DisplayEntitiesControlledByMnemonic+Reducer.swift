@@ -10,21 +10,50 @@ public struct DisplayEntitiesControlledByMnemonic: Sendable, FeatureReducer {
 		public var deviceFactorSource: DeviceFactorSource { accountsForDeviceFactorSource.deviceFactorSource }
 
 		public let accountsForDeviceFactorSource: EntitiesControlledByFactorSource
-		public let displayRevealMnemonicLink: Bool
+		public var displayRevealMnemonicLink: Bool {
+			switch mode {
+			case .mnemonicCanBeDisplayed: true
+			case .mnemonicIsMissingNeedsImport: false
+			case .displayAccountListOnly: false
+			}
+		}
 
-		public init(accountsForDeviceFactorSource: EntitiesControlledByFactorSource, displayRevealMnemonicLink: Bool) {
+		public var mnemonicIsMissingNeedsImport: Bool {
+			switch mode {
+			case .mnemonicCanBeDisplayed: false
+			case .mnemonicIsMissingNeedsImport: true
+			case .displayAccountListOnly: false
+			}
+		}
+
+		public let mode: Mode
+		public enum Mode: Sendable, Hashable {
+			case mnemonicCanBeDisplayed
+			case mnemonicIsMissingNeedsImport
+			case displayAccountListOnly
+		}
+
+		public init(
+			accountsForDeviceFactorSource: EntitiesControlledByFactorSource,
+			mode: Mode? = nil
+		) {
+			let mode = mode ?? (accountsForDeviceFactorSource.isMnemonicPresentInKeychain ? .mnemonicCanBeDisplayed : .mnemonicIsMissingNeedsImport)
+			if mode == .mnemonicCanBeDisplayed, !accountsForDeviceFactorSource.isMnemonicPresentInKeychain {
+				preconditionFailure("Cannot reveal mnemonic since it is missing")
+			}
 			self.accountsForDeviceFactorSource = accountsForDeviceFactorSource
-			self.displayRevealMnemonicLink = displayRevealMnemonicLink
+			self.mode = mode
 		}
 	}
 
 	public enum ViewAction: Sendable, Equatable {
 		case appeared
-		case tapped
+		case navigateButtonTapped
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
-		case openDetails
+		case displayMnemonic
+		case importMissingMnemonic
 	}
 
 	public init() {}
@@ -33,8 +62,12 @@ public struct DisplayEntitiesControlledByMnemonic: Sendable, FeatureReducer {
 		switch viewAction {
 		case .appeared:
 			.none
-		case .tapped:
-			.send(.delegate(.openDetails))
+		case .navigateButtonTapped:
+			if state.mnemonicIsMissingNeedsImport {
+				.send(.delegate(.importMissingMnemonic))
+			} else {
+				.send(.delegate(.displayMnemonic))
+			}
 		}
 	}
 }

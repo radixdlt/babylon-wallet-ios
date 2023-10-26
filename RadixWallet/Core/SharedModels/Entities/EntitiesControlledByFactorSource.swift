@@ -3,11 +3,17 @@ public struct EntitiesControlledByFactorSource: Sendable, Hashable, Identifiable
 	public typealias ID = FactorSourceID
 	public var id: ID { deviceFactorSource.id.embed() }
 	public let entities: [EntityPotentiallyVirtual]
+	public let isMnemonicPresentInKeychain: Bool
 	public let deviceFactorSource: DeviceFactorSource
 
-	public init(entities: [EntityPotentiallyVirtual], deviceFactorSource: DeviceFactorSource) {
+	public init(
+		entities: [EntityPotentiallyVirtual],
+		deviceFactorSource: DeviceFactorSource,
+		isMnemonicPresentInKeychain: Bool
+	) {
 		self.entities = entities
 		self.deviceFactorSource = deviceFactorSource
+		self.isMnemonicPresentInKeychain = isMnemonicPresentInKeychain
 	}
 }
 

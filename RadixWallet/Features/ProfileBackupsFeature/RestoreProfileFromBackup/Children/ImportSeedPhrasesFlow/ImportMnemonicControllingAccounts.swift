@@ -13,7 +13,10 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 
 		public init(entitiesControlledByFactorSource: EntitiesControlledByFactorSource) {
 			self.entitiesControlledByFactorSource = entitiesControlledByFactorSource
-			self.entities = .init(accountsForDeviceFactorSource: entitiesControlledByFactorSource, displayRevealMnemonicLink: false)
+			self.entities = .init(
+				accountsForDeviceFactorSource: entitiesControlledByFactorSource,
+				mode: .displayAccountListOnly
+			)
 		}
 	}
 

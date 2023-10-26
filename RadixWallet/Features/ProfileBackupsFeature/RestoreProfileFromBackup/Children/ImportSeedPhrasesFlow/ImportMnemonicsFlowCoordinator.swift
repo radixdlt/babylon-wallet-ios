@@ -27,7 +27,10 @@ public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 		}
 
 		public var body: some ReducerOf<Self> {
-			Scope(state: /State.importMnemonicControllingAccounts, action: /Action.importMnemonicControllingAccounts) {
+			Scope(
+				state: /State.importMnemonicControllingAccounts,
+				action: /Action.importMnemonicControllingAccounts
+			) {
 				ImportMnemonicControllingAccounts()
 			}
 		}

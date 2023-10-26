@@ -11,7 +11,9 @@ extension DeviceFactorSourceClient: DependencyKey {
 		@Dependency(\.personasClient) var personasClient
 		@Dependency(\.factorSourcesClient) var factorSourcesClient
 
-		let entitiesControlledByFactorSource: GetEntitiesControlledByFactorSource = { factorSource, maybeSnapshot in
+		let entitiesControlledByFactorSource: GetEntitiesControlledByFactorSource = {
+			factorSource,
+				maybeSnapshot in
 
 			let allEntities: [EntityPotentiallyVirtual] = try await {
 				let accounts: [Profile.Network.Account]
@@ -20,7 +22,7 @@ extension DeviceFactorSourceClient: DependencyKey {
 				// FIXME: Uh this aint pretty... but we are short on time.
 				if let overridingSnapshot = maybeSnapshot {
 					let networkID = Radix.Gateway.default.network.id
-					let profile = try Profile(snapshot: overridingSnapshot)
+					let profile = Profile(snapshot: overridingSnapshot)
 					let network = try profile.network(id: networkID)
 					accounts = network.accounts.elements
 					personas = network.personas.elements
@@ -39,9 +41,11 @@ extension DeviceFactorSourceClient: DependencyKey {
 					unsecuredEntityControl.transactionSigning.factorSourceID == factorSource.id
 				}
 			}
+
 			return EntitiesControlledByFactorSource(
 				entities: entitiesForSource,
-				deviceFactorSource: factorSource
+				deviceFactorSource: factorSource,
+				isMnemonicPresentInKeychain: secureStorageClient.containsMnemonicIdentifiedByFactorSourceID(factorSource.id)
 			)
 		}
 

@@ -69,7 +69,9 @@ extension View {
 			action: { .child(.destination($0)) }
 		)
 
-		return displayMnemonicSheet(with: destinationStore)
+		return self
+			.displayMnemonicSheet(with: destinationStore)
+			.importMnemonicsSheet(with: destinationStore)
 	}
 
 	@MainActor
@@ -79,6 +81,22 @@ extension View {
 			state: /DisplayMnemonics.Destinations.State.displayMnemonic,
 			action: DisplayMnemonics.Destinations.Action.displayMnemonic,
 			destination: { DisplayMnemonic.View(store: $0) }
+		)
+	}
+
+	@MainActor
+	private func importMnemonicsSheet(with destinationStore: PresentationStoreOf<DisplayMnemonics.Destinations>) -> some View {
+		navigationDestination(
+			store: destinationStore,
+			state: /DisplayMnemonics.Destinations.State.importMnemonicControllingAccounts,
+			action: DisplayMnemonics.Destinations.Action.importMnemonicControllingAccounts,
+			destination: { importStore in
+				NavigationView {
+					ImportMnemonicControllingAccounts.View(
+						store: importStore
+					)
+				}
+			}
 		)
 	}
 }

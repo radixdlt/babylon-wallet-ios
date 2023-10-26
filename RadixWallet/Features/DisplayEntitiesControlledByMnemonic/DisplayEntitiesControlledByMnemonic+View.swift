@@ -9,6 +9,10 @@ extension DisplayEntitiesControlledByMnemonic.State {
 			return L10n.SeedPhrases.SeedPhrase.multipleConnectedAccounts(accountsCount)
 		}
 	}
+
+	var canNavigate: Bool {
+		displayRevealMnemonicLink || mnemonicIsMissingNeedsImport
+	}
 }
 
 // MARK: - DisplayEntitiesControlledByMnemonic.View
@@ -24,22 +28,27 @@ extension DisplayEntitiesControlledByMnemonic {
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
 				VStack(alignment: .leading) {
-					if viewStore.displayRevealMnemonicLink {
+					if viewStore.canNavigate {
 						Button {
-							viewStore.send(.tapped)
+							viewStore.send(.navigateButtonTapped)
 						} label: {
 							HStack {
 								Image(asset: AssetResource.signingKey)
 									.resizable()
 									.frame(.smallest)
 
-								VStack(alignment: .leading) {
-									Text(L10n.SeedPhrases.SeedPhrase.reveal)
-										.textStyle(.body1Header)
-										.foregroundColor(.app.gray1)
-									Text(viewStore.connectedAccounts)
-										.textStyle(.body2Regular)
-										.foregroundColor(.app.gray2)
+								if viewStore.displayRevealMnemonicLink {
+									VStack(alignment: .leading) {
+										Text(L10n.SeedPhrases.SeedPhrase.reveal)
+											.textStyle(.body1Header)
+											.foregroundColor(.app.gray1)
+										Text(viewStore.connectedAccounts)
+											.textStyle(.body2Regular)
+											.foregroundColor(.app.gray2)
+									}
+								} else if viewStore.mnemonicIsMissingNeedsImport {
+									WarningErrorView(text: "Recover", type: .error)
+										.padding(.horizontal, .medium3)
 								}
 
 								Spacer()
@@ -58,23 +67,3 @@ extension DisplayEntitiesControlledByMnemonic {
 		}
 	}
 }
-
-// #if DEBUG
-// import SwiftUI
-import ComposableArchitecture //
-//// MARK: - DisplayMnemonicRow_Preview
-// struct DisplayMnemonicRow_Preview: PreviewProvider {
-//	static var previews: some View {
-//		DisplayEntitiesControlledByMnemonic.View(
-//			store: .init(
-//				initialState: .previewValue,
-//				reducer: DisplayEntitiesControlledByMnemonic.init
-//			)
-//		)
-//	}
-// }
-//
-// extension DisplayEntitiesControlledByMnemonic.State {
-//    public static let previewValue = Self(deviceFactorSource: )
-// }
-// #endif
