@@ -102,6 +102,16 @@ extension ProfileStore {
 		return result // in many cases `Void`.
 	}
 
+	/// Update Profile, by updating the current network
+	/// - Parameter update: A mutating update to perform on the profiles's active networl
+	public func updatingOnCurrentNetwork(_ update: @Sendable (inout Profile.Network) async throws -> Void) async throws {
+		try await updating { profile in
+			var network = try await network()
+			try await update(&network)
+			try profile.updateOnNetwork(network)
+		}
+	}
+
 	/// Looks up a ProfileSnapshot for the given `header` and tries to import it,
 	/// updates `headerList` (Keychain),  `activeProfileID` (UserDefaults)
 	/// and saves the snapshot of the profile into Keychain.

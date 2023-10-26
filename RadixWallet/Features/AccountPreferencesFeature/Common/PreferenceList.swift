@@ -140,8 +140,6 @@ struct PreferencesList<SectionId: Hashable, RowId: Hashable, Footer: View>: View
 			footer
 				.listRowSeparator(.hidden)
 				.listRowBackground(Color.clear)
-			// .listRowInsets(.init())
-			// .listRowBackground(nil)
 		}
 		.scrollContentBackground(.hidden)
 		.listStyle(.grouped)

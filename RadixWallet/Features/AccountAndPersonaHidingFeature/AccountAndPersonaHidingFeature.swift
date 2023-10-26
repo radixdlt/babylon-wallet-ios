@@ -2,48 +2,69 @@ import Foundation
 
 // MARK: - AccountAndPersonaHiding
 public struct AccountAndPersonaHiding: FeatureReducer {
-	@Dependency(\.accountsClient) var accountsClient
-	@Dependency(\.personasClient) var personasClient
+	@Dependency(\.entitiesVisibilityClient) var entitiesVisibilityClient
+	@Dependency(\.overlayWindowClient) var overlayWindowClient
 
 	public struct State: Hashable, Sendable {
-		public var hiddenAccounts: IdentifiedArrayOf<Profile.Network.Account> = []
-		public var hiddenPersonas: IdentifiedArrayOf<Profile.Network.Persona> = []
+		public var hiddenEntitiesStats: EntitiesVisibilityClient.HiddenEntitiesStats?
+
+		@PresentationState
+		public var confirmUnhideAllAlert: AlertState<ViewAction.ConfirmUnhideAllAlert>?
 	}
 
 	public enum ViewAction: Hashable, Sendable {
 		case task
 		case unhideAllTapped
+
+		case confirmUnhideAllAlert(PresentationAction<ConfirmUnhideAllAlert>)
+
+		public enum ConfirmUnhideAllAlert: Hashable, Sendable {
+			case confirmTapped
+			case cancelTapped
+		}
 	}
 
 	public enum InternalAction: Hashable, Sendable {
-		case hiddenAccountsLoaded(IdentifiedArrayOf<Profile.Network.Account>)
-		case hiddenPersonasLoaded([Profile.Network.Persona])
+		case hiddenEntitesStatsLoaded(EntitiesVisibilityClient.HiddenEntitiesStats)
+		case didUnhideAllEntities
 	}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .task:
-			.run { send in
-				let hiddenAccounts = await accountsClient.getHiddenAccountsOnAllNetworks()
-				await send(.internal(.hiddenAccountsLoaded(hiddenAccounts)))
+			return .run { send in
+				let hiddenEntitiesStats = try await entitiesVisibilityClient.getHiddenEntitiesStats()
+				await send(.internal(.hiddenEntitesStatsLoaded(hiddenEntitiesStats)))
 			}
 		case .unhideAllTapped:
-			.run { [accounts = state.hiddenAccounts] _ in
-				var accounts = accounts
-				for account in accounts {
-					accounts[id: account.id]?.unhide()
-				}
-				try await accountsClient.updateAccounts(accounts)
+			state.confirmUnhideAllAlert = .init(
+				title: .init(L10n.AppSettings.EntityHiding.unhideAllSection),
+				message: .init(L10n.AppSettings.EntityHiding.unhideAllConfirmation),
+				buttons: [
+					.cancel(.init(L10n.Common.cancel), action: .send(.cancelTapped)),
+					.default(.init(L10n.Common.continue), action: .send(.confirmTapped)),
+				]
+			)
+			return .none
+
+		case .confirmUnhideAllAlert(.presented(.confirmTapped)):
+			return .run { send in
+				try await entitiesVisibilityClient.unhideAllEntities()
+				overlayWindowClient.scheduleHUD(.updated)
+				await send(.internal(.didUnhideAllEntities))
 			}
+		case .confirmUnhideAllAlert:
+			return .none
 		}
 	}
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
-		case let .hiddenAccountsLoaded(array):
-			state.hiddenAccounts = array
+		case let .hiddenEntitesStatsLoaded(stats):
+			state.hiddenEntitiesStats = stats
 			return .none
-		case let .hiddenPersonasLoaded(array):
+		case .didUnhideAllEntities:
+			state.hiddenEntitiesStats = .init(hiddenAccountsCount: 0, hiddenPersonasCount: 0)
 			return .none
 		}
 	}
@@ -51,14 +72,41 @@ public struct AccountAndPersonaHiding: FeatureReducer {
 
 extension AccountAndPersonaHiding.State {
 	var viewState: AccountAndPersonaHiding.ViewState {
-		.init(numberOfHiddenAccounts: hiddenAccounts.count, numberOfHiddenPersonas: hiddenPersonas.count)
+		.init(
+			hiddenAccountsCount: hiddenEntitiesStats?.hiddenAccountsCount ?? 0,
+			hiddenPersonasCount: hiddenEntitiesStats?.hiddenPersonasCount ?? 0
+		)
 	}
 }
 
 extension AccountAndPersonaHiding {
 	public struct ViewState: Equatable {
-		let numberOfHiddenAccounts: Int
-		let numberOfHiddenPersonas: Int
+		public let hiddenAccountsCount: Int
+		public let hiddenPersonasCount: Int
+
+		public var hiddenAccountsText: String {
+			if hiddenAccountsCount == 1 {
+				L10n.AppSettings.EntityHiding.hiddenAccount(1)
+			} else {
+				L10n.AppSettings.EntityHiding.hiddenAccounts(hiddenAccountsCount)
+			}
+		}
+
+		public var hiddenPersonasText: String {
+			if hiddenPersonasCount == 1 {
+				L10n.AppSettings.EntityHiding.hiddenPersona(1)
+			} else {
+				L10n.AppSettings.EntityHiding.hiddenPersonas(hiddenPersonasCount)
+			}
+		}
+
+		public var unhideAllButtonControlState: ControlState {
+			if hiddenAccountsCount > 0 || hiddenPersonasCount > 0 {
+				.enabled
+			} else {
+				.disabled
+			}
+		}
 	}
 
 	public struct View: SwiftUI.View {
@@ -66,17 +114,52 @@ extension AccountAndPersonaHiding {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState) { viewStore in
-				VStack {
-					Text("\(viewStore.numberOfHiddenAccounts) hidden Accounts")
+				List {
+					Section {
+						VStack(alignment: .leading, spacing: .zero) {
+							Text(viewStore.hiddenAccountsText)
+							Text(viewStore.hiddenPersonasText)
+						}
+						.foregroundColor(.app.gray2)
+						.textStyle(.body1Header)
+						.listRowSeparator(.hidden)
+						.listRowBackground(Color.clear)
+						.centered
+					} header: {
+						Text(L10n.AppSettings.EntityHiding.info)
+							.foregroundColor(.app.gray2)
+							.textStyle(.body1Regular)
+							.textCase(nil)
+					}
 
-					Button("Unhide All") {
-						viewStore.send(.view(.unhideAllTapped))
+					Section {
+						Button(L10n.AppSettings.EntityHiding.unhideAllButton) {
+							viewStore.send(.view(.unhideAllTapped))
+						}
+						.buttonStyle(.secondaryRectangular(shouldExpand: true))
+						.controlState(viewStore.unhideAllButtonControlState)
+					} header: {
+						Text(L10n.AppSettings.EntityHiding.unhideAllSection)
+							.foregroundColor(.app.gray2)
+							.textStyle(.body1HighImportance)
+							.textCase(nil)
 					}
 				}
+				.listStyle(.grouped)
+				.background(.app.background)
 				.task { @MainActor in
 					await viewStore.send(.view(.task)).finish()
 				}
+				.alert(
+					store: store.scope(
+						state: \.$confirmUnhideAllAlert,
+						action: { .view(.confirmUnhideAllAlert($0)) }
+					)
+				)
 			}
+			.navigationTitle(L10n.AppSettings.EntityHiding.title)
+			.toolbarBackground(.app.background, for: .navigationBar)
+			.toolbarBackground(.visible, for: .navigationBar)
 		}
 	}
 }

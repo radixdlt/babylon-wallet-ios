@@ -594,7 +594,7 @@ extension ProfileNetworkView {
 			)
 
 			AuthorizedDappsView(
-				authorizedDapps: network.getAuthorizedDapps(),
+				authorizedDapps: network.authorizedDapps,
 				indentation: inOneLevel
 			) {
 				try? network.detailsForAuthorizedDapp($0)

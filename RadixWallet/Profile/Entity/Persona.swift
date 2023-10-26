@@ -158,6 +158,10 @@ extension Profile.Network.Persona {
 
 extension Profile.Network.Personas {
 	public var nonHidden: IdentifiedArrayOf<Profile.Network.Persona> {
-		filter { !$0.isHidden }.asIdentifiable()
+		filter(not(\.isHidden)).asIdentifiable()
+	}
+
+	public var hiden: IdentifiedArrayOf<Profile.Network.Persona> {
+		filter(\.isHidden).asIdentifiable()
 	}
 }

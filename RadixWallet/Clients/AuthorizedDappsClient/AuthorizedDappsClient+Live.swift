@@ -10,7 +10,7 @@ extension AuthorizedDappsClient: DependencyKey {
 				guard let network = await profileStore.network else {
 					return .init()
 				}
-				return network.getAuthorizedDapps()
+				return network.authorizedDapps
 			},
 			addAuthorizedDapp: { newDapp in
 				try await profileStore.updating {

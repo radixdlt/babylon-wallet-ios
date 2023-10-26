@@ -76,13 +76,13 @@ extension Profile.Network {
 		accounts.appendAccount(account)
 	}
 
-	public mutating func hideAccount(_ accountAddress: AccountAddress) {
-		accounts[id: accountAddress]?.hide()
+	public mutating func hideAccount(_ account: Profile.Network.Account) {
+		accounts[id: account.address]?.hide()
 		authorizedDapps.mutateAll { dapp in
 			dapp.referencesToAuthorizedPersonas.mutateAll { persona in
 				if let sharedAccounts = persona.sharedAccounts {
 					let ids = sharedAccounts.ids.filter { address in
-						address != accountAddress
+						address != account.address
 					}
 					persona.sharedAccounts?.ids = ids
 				}
@@ -100,6 +100,10 @@ struct TryingToUpdateAPersonaWhichIsNotAlreadySaved: Swift.Error {}
 extension Profile.Network {
 	public func getPersonas() -> IdentifiedArrayOf<Persona> {
 		personas.nonHidden
+	}
+
+	public func getHiddenPersonas() -> IdentifiedArrayOf<Persona> {
+		personas.hiden
 	}
 
 	public func hasAnyPersona() -> Bool {
