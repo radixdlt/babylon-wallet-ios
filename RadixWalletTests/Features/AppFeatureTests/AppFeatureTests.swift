@@ -93,12 +93,21 @@ final class AppFeatureTests: TestCase {
 // }
 
 extension Profile.Network.Account {
-	static let testValue = Self.testValue(
-		name: "Main"
+	static let testValue = Self.testValueIdx0
+
+	static let testValueIdx0 = Self.testValue(
+		name: "First",
+		index: 0
+	)
+
+	static let testValueIdx1 = Self.testValue(
+		name: "Second",
+		index: 1
 	)
 
 	static func testValue(
 		name nameOfFirstAccount: String,
+		index: HD.Path.Component.Child.Value = 0,
 		privateHDFactorSource maybePrivateHDFactorSource: PrivateHDFactorSource? = nil
 	) -> Self {
 		let privateHDFactorSource = maybePrivateHDFactorSource ?? PrivateHDFactorSource.testValue
@@ -110,7 +119,7 @@ extension Profile.Network.Account {
 		let hdRoot = try! mnemonicWithPassphrase.hdRoot()
 		let derivationPath = DerivationPath(
 			scheme: .cap26,
-			path: "m/44H/1022H/10H/525H/1460H/0H"
+			path: "m/44H/1022H/10H/525H/1460H/\(index)H"
 		)
 		let publicKey = try! hdRoot.derivePublicKey(
 			path: derivationPath,
@@ -130,7 +139,7 @@ extension Profile.Network.Account {
 			),
 			securityState: .unsecured(
 				.init(
-					entityIndex: 0,
+					entityIndex: index,
 					transactionSigning: hdFactorInstance
 				)
 			),
@@ -138,7 +147,7 @@ extension Profile.Network.Account {
 				rawValue: nameOfFirstAccount
 			)!,
 			extraProperties: .init(
-				appearanceID: ._0
+				appearanceID: try! .init(id: .init(index))
 			)
 		)
 	}

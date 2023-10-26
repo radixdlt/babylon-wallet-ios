@@ -540,56 +540,6 @@ final class ProfileStoreNewProfileTests: TestCase {
 			await self.nearFutureFulfillment(of: assertionFailureIfNoAccount)
 		}
 	}
-
-	func test__GIVEN__no_profile__WHEN_init_and_add_first_account__THEN__RadixGateway_is_emitted() async throws {
-		try await withTimeLimit {
-			try await self.doTestAsyncSequence(
-				arrange: { sut in
-					await sut.currentGatewayValues()
-				},
-				act: { sut in
-					try await withTestClients {
-						try await sut.updating {
-							try $0.addAccount(
-								.testValue
-							)
-						}
-					}
-
-				},
-				assert: [Radix.Gateway.mainnet]
-			)
-		}
-	}
-
-	func doTestAsyncSequence<T: Sendable & Hashable>(
-		arrange: @escaping @Sendable (ProfileStore) async -> AnyAsyncSequence<T>,
-		act: (ProfileStore) async throws -> Void,
-		assert expected: Set<T>
-	) async throws {
-		let sut = try await withTestClients {
-			// GIVEN no profile
-			$0.noProfile()
-		} operation: {
-			ProfileStore()
-		}
-
-		let task = Task {
-			var asyncSequence = await arrange(sut)
-			var values = Set<T>()
-			for try await value in asyncSequence {
-				values.insert(value)
-				if values.count >= expected.count {
-					return values
-				}
-			}
-			return values
-		}
-
-		try await act(sut)
-		let actual = try await task.value
-		XCTAssertEqual(actual, expected)
-	}
 }
 
 // MARK: - ProfileStoreExstingProfileTests
@@ -957,6 +907,123 @@ final class ProfileStoreExstingProfileTests: TestCase {
 			}
 
 			await self.nearFutureFulfillment(of: ownership_conflict_alert_is_shown)
+		}
+	}
+}
+
+// MARK: - ProfileStoreAsyncSequenceTests
+final class ProfileStoreAsyncSequenceTests: TestCase {
+	func test__GIVEN__no_profile__WHEN_add_first_network__THEN__RadixGateway_is_emitted() async throws {
+		try await withTimeLimit {
+			try await self.doTestAsyncSequence(
+				// GIVEN no profile
+				savedProfile: nil,
+				arrange: { sut in
+					await sut.currentGatewayValues()
+				},
+				act: { sut in
+					try await sut.updating {
+						// WHEN add first network (first account adds first network)
+						try $0.addAccount(
+							.testValue
+						)
+					}
+				},
+				// THEN Radix.Gatewat is emitted
+				assert: [Radix.Gateway.mainnet]
+			)
+		}
+	}
+
+	func test__GIVEN__no_profile__WHEN_add_first_account__THEN__account_is_emitted() async throws {
+		try await withTimeLimit {
+			let firstAccount: Profile.Network.Account = .testValueIdx0
+			try await self.doTestAsyncSequence(
+				// GIVEN no profile
+				savedProfile: nil,
+				arrange: { sut in
+					await sut.accountValues()
+				},
+				act: { sut in
+					try await sut.updating {
+						// WHEN add first account
+						try $0.addAccount(
+							firstAccount
+						)
+					}
+				},
+				assert: [
+					// THEN account is emitted
+					[firstAccount],
+				]
+			)
+		}
+	}
+
+	func test__GIVEN__profile_with_one_account__WHEN_add_2nd_account__THEN__both_accounts_are_emitted() async throws {
+		try await withTimeLimit(.slow) {
+			var profile = Profile.withNoAccounts
+			let firstAccount: Profile.Network.Account = .testValueIdx0
+			// GIVEN: Profile with one account
+			try profile.addAccount(firstAccount)
+
+			let secondAccount: Profile.Network.Account = .testValueIdx1
+			try await self.doTestAsyncSequence(
+				savedProfile: profile,
+				arrange: { sut in
+					await sut.accountValues()
+				},
+				act: { sut in
+					try await sut.updating {
+						// WHEN add 2nd account
+						try $0.addAccount(
+							secondAccount
+						)
+					}
+				},
+				assert: [
+					[firstAccount],
+					// THEN both accounts are emitted
+					[firstAccount, secondAccount],
+				]
+			)
+		}
+	}
+}
+
+extension ProfileStoreAsyncSequenceTests {
+	private func doTestAsyncSequence<T: Sendable & Hashable>(
+		savedProfile: Profile?,
+		arrange: @escaping @Sendable (ProfileStore) async -> AnyAsyncSequence<T>,
+		act: (ProfileStore) async throws -> Void,
+		assert expected: Set<T>
+	) async throws {
+		try await withTestClients {
+			if let savedProfile {
+				$0.savedProfile(savedProfile)
+			} else {
+				$0.noProfile()
+			}
+		} operation: {
+			let sut = ProfileStore()
+			let listenerSetup = self.expectation(description: "listener setup")
+			let task = Task {
+				let asyncSequence = await arrange(sut)
+				var values = Set<T>()
+				listenerSetup.fulfill()
+				for try await value in asyncSequence {
+					print("🔮 value: \(value)")
+					values.insert(value)
+					if values.count >= expected.count {
+						return values
+					}
+				}
+				return values
+			}
+			await self.nearFutureFulfillment(of: listenerSetup)
+			try await act(sut)
+			let actual = try await task.value
+			XCTAssertEqual(actual, expected)
 		}
 	}
 }
