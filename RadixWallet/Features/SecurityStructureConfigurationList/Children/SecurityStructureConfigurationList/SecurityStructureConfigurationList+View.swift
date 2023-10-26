@@ -15,7 +15,7 @@ extension SecurityStructureConfigurationList {
 			WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
 				VStack(spacing: 0) {
 					ScrollView {
-						Text("Security Structure Configs")
+						Text("Security Structure Configs") // FIXME: future strings
 							.sectionHeading
 							.flushedLeft
 							.padding([.horizontal, .top], .medium3)
@@ -27,8 +27,7 @@ extension SecurityStructureConfigurationList {
 						list(store: store)
 					}
 
-					// FIXME: Strings
-					Button("New Config") {
+					Button("New Config") { // FIXME: FIXME: future strings
 						viewStore.send(.createNewStructure)
 					}
 					.buttonStyle(.secondaryRectangular(shouldExpand: true))
@@ -38,8 +37,7 @@ extension SecurityStructureConfigurationList {
 				.task { @MainActor in
 					await viewStore.send(.task).finish()
 				}
-				// FIXME: Strings
-				.navigationTitle("Multifactor Setups")
+				.navigationTitle("Multifactor Setups") // FIXME: FIXME: future strings
 			}
 		}
 

@@ -49,15 +49,9 @@ extension ProfileBackupSettings.View {
 	private func coreView(with viewStore: ViewStoreOf<ProfileBackupSettings>) -> some SwiftUI.View {
 		ScrollView {
 			VStack(alignment: .leading, spacing: .large3) {
-				// FIXME: Strings
-				VStack(alignment: .leading, spacing: .medium1) {
-					Text("Backing up your wallet ensure you can recover access to your Accounts, Personas, and wallet settings on a new phone by re-entering your seed phrase(s).")
-
-					Text("For security, backups do not contain any seed phrases or private keys. You must write them down separatly.")
-						.fontWeight(.bold)
-				}
-				.padding(.horizontal, .medium2)
-				.padding(.vertical, .small1)
+				Text(L10n.ProfileBackup.headerTitle)
+					.padding(.horizontal, .medium2)
+					.padding(.vertical, .small1)
 
 				section(L10n.ProfileBackup.AutomaticBackups.title) {
 					isCloudProfileSyncEnabled(with: viewStore)

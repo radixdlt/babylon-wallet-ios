@@ -12,7 +12,7 @@ public struct RecoveryAndConfirmationFactors: Sendable, Hashable {
 	let singleConfirmationFactor: SecurityQuestionsFactorSource
 }
 
-// FIXME: strings
+// FIXME: future strings
 public let numberOfDaysUntilAutoConfirmationTitlePlaceholder = "Days until auto confirm"
 public let numberOfDaysUntilAutoConfirmationSecondary = "Integer"
 public let numberOfDaysUntilAutoConfirmationErrorNotInt = "Not and integer"
@@ -47,7 +47,7 @@ extension SimpleManageSecurityStructureFlow {
 		}
 
 		var numberOfDaysUntilAutoConfirmationHint: Hint? {
-			// FIXME: strings
+			// FIXME: future strings
 			guard let _ = RecoveryAutoConfirmDelayInDays.RawValue(numberOfDaysUntilAutoConfirmation) else {
 				return .error(numberOfDaysUntilAutoConfirmationErrorNotInt)
 			}
@@ -108,7 +108,7 @@ extension SimpleManageSecurityStructureFlow {
 						}
 					}
 				}
-				.navigationTitle("Multi-Factor Setup") // FIXME: Strings
+				.navigationTitle("Multi-Factor Setup") // FIXME: future strings
 				.footer {
 					WithControlRequirements(
 						viewStore.simpleSecurityStructure,
@@ -116,7 +116,7 @@ extension SimpleManageSecurityStructureFlow {
 							viewStore.send(.finished(simpleStructure))
 						},
 						control: { action in
-							// FIXME: Strings
+							// FIXME: future strings
 							let title = viewStore.mode.isExisting ? "Update setup" : "Create new setup"
 							Button(title, action: action)
 								.buttonStyle(.primaryRectangular)

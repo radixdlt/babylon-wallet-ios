@@ -108,14 +108,13 @@ struct ResourceChangeView: View {
 
 extension ResourcePreferenceAction {
 	var description: String {
-		// FIXME: Strings
 		switch self {
 		case .remove:
-			"Clear Exception"
+			L10n.TransactionReview.AccountDepositSettings.assetChangeClear
 		case .set(.allowed):
-			"Allow"
+			L10n.TransactionReview.AccountDepositSettings.assetChangeAllow
 		case .set(.disallowed):
-			"Disallow"
+			L10n.TransactionReview.AccountDepositSettings.assetChangeDisallow
 		}
 	}
 }
@@ -124,23 +123,22 @@ extension AccountDepositSettingsChange.AllowedDepositorChange.Change {
 	var description: String {
 		switch self {
 		case .added:
-			"Add Depositor"
+			L10n.TransactionReview.AccountDepositSettings.depositorChangeAdd
 		case .removed:
-			"Clear Depositor"
+			L10n.TransactionReview.AccountDepositSettings.depositorChangeRemove
 		}
 	}
 }
 
 extension AccountDefaultDepositRule {
 	var string: String {
-		// FIXME: Strings
 		switch self {
 		case .accept:
-			"Allow third parties to deposit any asset to this account."
+			L10n.TransactionReview.AccountDepositSettings.acceptAllRule
 		case .reject:
-			"Disallow all deposits from third parties without your consent."
+			L10n.TransactionReview.AccountDepositSettings.denyAllRule
 		case .allowExisting:
-			"Allow third parties to deposit only assets this account has already held."
+			L10n.TransactionReview.AccountDepositSettings.acceptKnownRule
 		}
 	}
 }

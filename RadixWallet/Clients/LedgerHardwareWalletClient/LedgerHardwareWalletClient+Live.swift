@@ -52,10 +52,10 @@ extension LedgerHardwareWalletClient: DependencyKey {
 						overlayWindowClient.scheduleAlertIgnoreAction(
 							.init(
 								title: {
-									TextState("Could Not Sign") // FIXME: Strings
+									TextState(L10n.LedgerHardwareDevices.CouldNotSign.title)
 								},
 								message: {
-									TextState("Transaction could not be signed. To sign complex transactions, please enable either \"blind signing\" or \"verbose mode\" in the Radix app on your Ledger device.") // FIXME: Strings
+									TextState(L10n.LedgerHardwareDevices.CouldNotSign.message)
 								}
 							)
 						)

@@ -48,17 +48,17 @@ extension AssetTag {
 	public var name: String {
 		switch self {
 		case .officialRadix:
-			"Official Radix" // FIXME: Strings
-
+			L10n.AssetDetails.Tags.officialRadix
 		case let .custom(string):
 			string.rawValue
 		}
 	}
 
 	public var icon: ImageAsset {
-		if case .officialRadix = self {
+		switch self {
+		case .officialRadix:
 			AssetResource.officialTagIcon
-		} else {
+		case .custom:
 			AssetResource.tagIcon
 		}
 	}

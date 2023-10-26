@@ -26,7 +26,7 @@ extension ChooseReceivingAccount {
 				case .invalid:
 					return .error(L10n.AssetTransfer.ChooseReceivingAccount.invalidAddressError)
 				case .wrongNetwork:
-					return .error("Address is not valid on current network") // FIXME: Strings
+					return .error(L10n.AssetTransfer.Error.wrongNetwork)
 				case let .valid(validAddress):
 					if state.chooseAccounts.filteredAccounts.contains(where: { $0 == validAddress }) {
 						return .error(L10n.AssetTransfer.ChooseReceivingAccount.alreadyAddedError)

@@ -118,17 +118,17 @@ extension AppSettings {
 		private func exportLogs(with viewStore: ViewStoreOf<AppSettings>) -> some SwiftUI.View {
 			HStack {
 				VStack(alignment: .leading, spacing: 0) {
-					Text("Export Logs") // FIXME: Strings
+					Text("Export Logs")
 						.foregroundColor(.app.gray1)
 						.textStyle(.body1HighImportance)
 
-					Text("Export and save debugging logs") // FIXME: Strings
+					Text("Export and save debugging logs")
 						.foregroundColor(.app.gray2)
 						.textStyle(.body2Regular)
 						.fixedSize()
 				}
 
-				Button("Export") { // FIXME: Strings
+				Button("Export") {
 					viewStore.send(.exportLogsTapped)
 				}
 				.buttonStyle(.secondaryRectangular)

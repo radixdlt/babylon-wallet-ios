@@ -46,7 +46,7 @@ extension ChooseQuestions {
 				)
 				ScrollView {
 					VStack(spacing: .small1) {
-						// FIXME: Strings
+						// FIXME: future strings
 						Text("Choose at least #\(viewStore.minimumNumberOfQuestions) security questions. You will only need to remember #\(viewStore.minimumNumberCorrectAnswers)")
 							.font(.app.body1Header)
 						Selection(
@@ -59,7 +59,7 @@ extension ChooseQuestions {
 					}
 					.padding()
 				}
-				.navigationTitle("Choose Questions") // FIXME: Strings
+				.navigationTitle("Choose Questions") // FIXME: future strings
 				.footer {
 					WithControlRequirements(
 						viewStore.securityQuestionsToUse,

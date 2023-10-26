@@ -18,9 +18,9 @@ extension ResourcesList.State {
 				case .allowDenyAssets(.deny):
 					L10n.AccountSettings.SpecificAssetsDeposits.denyInfo
 				case .allowDepositors where resourcesForDisplay.isEmpty:
-					"Add a specific badge by its resource address to allow all deposits from its holder." // FIXME: Strings
+					L10n.AccountSettings.SpecificAssetsDeposits.allowDepositorsNoResources
 				case .allowDepositors:
-					"The holder of the following badges may always deposit accounts to this account." // FIXME: Strings
+					L10n.AccountSettings.SpecificAssetsDeposits.allowDepositors
 				}
 			}(),
 			mode: mode
@@ -77,7 +77,7 @@ extension ResourcesList.View {
 		Group {
 			if case let .allowDenyAssets(exceptionRule) = viewStore.mode {
 				Picker(
-					"Select expcetion list", // FIXME: Strings
+					L10n.AccountSettings.SpecificAssetsDeposits.resourceListPicker,
 					selection: viewStore.binding(
 						get: { _ in exceptionRule },
 						send: { .exceptionListChanged($0) }

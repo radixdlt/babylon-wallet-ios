@@ -13,7 +13,7 @@ struct KeyValueView<Content: View>: View {
 	}
 
 	init(validatorAddress: ValidatorAddress) where Content == AddressView {
-		self.init(key: "Validator") { // FIXME: Strings - L10n.Account.PoolUnits.validatorAddress
+		self.init(key: L10n.AssetDetails.validator) {
 			AddressView(.address(.validator(validatorAddress)))
 		}
 	}

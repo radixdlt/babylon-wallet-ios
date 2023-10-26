@@ -28,17 +28,17 @@ extension ManageSecurityStructureStart {
 
 						Spacer(minLength: 0)
 
-						Text("Security Setup for Accounts") // FIXME: strings
+						Text("Security Setup for Accounts") // FIXME: future strings
 							.fixedSize(horizontal: false, vertical: true)
 							.lineLimit(2)
 							.font(.app.sheetTitle)
 
 						Spacer(minLength: 0)
 
-						Text("Let's make sure you can always access your accounts - even if you lose your phone or buy a new one.") // FIXME: strings
+						Text("Let's make sure you can always access your accounts - even if you lose your phone or buy a new one.") // FIXME: future strings
 							.font(.app.body1Regular)
 
-						Button("Set up account Security") { // FIXME: strings
+						Button("Set up account Security") { // FIXME: future strings
 							viewStore.send(.simpleFlow)
 						}
 						.buttonStyle(.primaryRectangular)

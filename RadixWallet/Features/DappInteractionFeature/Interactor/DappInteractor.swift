@@ -420,7 +420,7 @@ extension DappInteractionClient.ValidatedDappRequest.InvalidRequestReason {
 		case .invalidDappDefinitionAddress:
 			L10n.DAppRequest.ValidationOutcome.shortExplanationInvalidDappDefinitionAddress
 		case .dAppValidationError:
-			"Could not validate the dApp" // FIXME: Strings
+			L10n.DAppRequest.ValidationOutcome.invalidRequestMessage
 		case let .wrongNetworkID(ce, wallet):
 			L10n.DAppRequest.RequestWrongNetworkAlert.message(ce, wallet)
 		}
