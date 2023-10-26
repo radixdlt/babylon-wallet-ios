@@ -3,9 +3,9 @@ import Foundation
 import XCTest
 
 // MARK: - ImportMnemonicTests
-// This is a great mnemonic I've manually crafted (with valid checksum)
+// These a great mnemonics I've manually crafted (with valid checksum)
 // which contains `add` and `act` being valid words, but with "friends"
-// that are longer, starting with the same letter
+// that are longer, starting with the same letter.
 @MainActor
 final class ImportMnemonicTests: TestCase {
 	func test_3_letterword_12_words() async throws {
