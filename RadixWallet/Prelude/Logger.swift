@@ -32,6 +32,26 @@ private func makeLogger(
 	}
 }
 
+// MARK: - Logger.FailureSeverity
+extension Logger {
+	enum FailureSeverity {
+		case error
+		case critical
+		var level: Logger.Level {
+			switch self {
+			case .error: .error
+			case .critical: .critical
+			}
+		}
+	}
+}
+
+func logAssertionFailure(_ errorMessage: String, severity: Logger.FailureSeverity = .error) {
+	@Dependency(\.assertionFailure) var assertionFailure
+	loggerGlobal.log(level: severity.level, .init(stringLiteral: errorMessage))
+	assertionFailure(errorMessage)
+}
+
 public let loggerGlobal = makeLogger(label: baseLabel)
 
 extension Logger {

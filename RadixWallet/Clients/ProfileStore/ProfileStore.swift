@@ -1,6 +1,5 @@
 // MARK: - ProfileStore
 public final actor ProfileStore {
-	@Dependency(\.assertionFailure) var assertionFailure
 	@Dependency(\.secureStorageClient) var secureStorageClient
 	@Dependency(\.userDefaultsClient) var userDefaultsClient
 
@@ -79,9 +78,7 @@ extension ProfileStore {
 			}
 			try importProfileSnapshot(profileSnapshot)
 		} catch {
-			let errorMessage = "Critical failure, unable to save imported profile snapshot: \(String(describing: error))"
-			loggerGlobal.critical(.init(stringLiteral: errorMessage))
-			assertionFailure(errorMessage) // for DEBUG builds we want to crash
+			logAssertionFailure("Critical failure, unable to save imported profile snapshot: \(String(describing: error))", severity: .critical)
 			throw error
 		}
 	}
@@ -125,9 +122,7 @@ extension ProfileStore {
 				)
 			} catch {
 				// Not important enought to fail
-				let errorMsg = "Failed to delete empty ephemeral profile ID, error: \(error)"
-				loggerGlobal.notice(.init(stringLiteral: errorMsg))
-				assertionFailure(errorMsg)
+				logAssertionFailure("Failed to delete empty ephemeral profile ID, error: \(error)")
 			}
 		}
 	}
@@ -145,9 +140,7 @@ extension ProfileStore {
 			userDefaultsClient.removeActiveProfileID()
 			try secureStorageClient.deleteProfileAndMnemonicsByFactorSourceIDs(profile.header.id, keepInICloudIfPresent)
 		} catch {
-			let errorMessage = "Error, failed to delete profile or factor source, failure: \(String(describing: error))"
-			loggerGlobal.error(.init(stringLiteral: errorMessage))
-			assertionFailure(errorMessage)
+			logAssertionFailure("Error, failed to delete profile or factor source, failure: \(String(describing: error))")
 		}
 
 		let profile = try! Self._tryGenerateAndSaveNewProfile(deviceInfo: deviceInfo)
@@ -157,9 +150,7 @@ extension ProfileStore {
 	public func finishedOnboarding() async {
 		@Dependency(\.device) var device
 		if !profile.hasMainnetAccounts() {
-			let errorMsg = "Incorrect implementation should have accounts on mainnet after finishing onboarding."
-			loggerGlobal.error(.init(stringLiteral: errorMsg))
-			assertionFailure(errorMsg)
+			logAssertionFailure("Incorrect implementation should have accounts on mainnet after finishing onboarding.")
 		}
 		let model = await device.model
 		let name = await device.name
@@ -186,9 +177,7 @@ extension ProfileStore {
 				try await doEmit(conflictingOwners: buffered)
 				return profile // might be a new one! if user selected "delete"
 			} catch {
-				let errMsg = "Failure during Profile ownership resolution, error: \(error)"
-				loggerGlobal.error(.init(stringLiteral: errMsg))
-				assertionFailure(errMsg)
+				logAssertionFailure("Failure during Profile ownership resolution, error: \(error)")
 				// Not import enough to prevent app from being used
 				return profile
 			}
@@ -319,9 +308,7 @@ extension ProfileStore {
 	/// - Parameter profile: The other profile to verify has same ID as `self.profile`.
 	private func _assertIdentity(of profile: Profile) throws {
 		guard profile.header.id == self.profile.header.id else {
-			let errorMessage = "Incorrect implementation: `\(#function)` was called with a Profile which UUID does not match the current one. This should never happen."
-			loggerGlobal.critical(.init(stringLiteral: errorMessage))
-			assertionFailure(errorMessage)
+			logAssertionFailure("Incorrect implementation: `\(#function)` was called with a Profile which UUID does not match the current one. This should never happen.", severity: .critical)
 			throw Error.profileIDMismatch
 		}
 		// All good
@@ -339,8 +326,7 @@ extension ProfileStore {
 		let header = (try? secureStorageClient.loadProfileSnapshot(profile.id)?.header) ?? profile.header
 
 		guard deviceInfo.id == header.lastUsedOnDevice.id else {
-			let errorMessage = "Device ID mismatch, profile might have been used on another device. Last used in header was: \(String(describing: header.lastUsedOnDevice)) and info of this device: \(String(describing: deviceInfo))"
-			loggerGlobal.error(.init(stringLiteral: errorMessage))
+			loggerGlobal.error("Device ID mismatch, profile might have been used on another device. Last used in header was: \(String(describing: header.lastUsedOnDevice)) and info of this device: \(String(describing: deviceInfo))")
 			Task {
 				let conflictingOwners = ConflictingOwners(
 					ownerOfCurrentProfile: header.lastUsedOnDevice,
