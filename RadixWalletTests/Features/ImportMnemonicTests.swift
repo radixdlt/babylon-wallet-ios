@@ -8,6 +8,10 @@ final class ImportMnemonicTests: TestCase {
 		// which contains `add` and `act` being valid words, but with "friends"
 		// that are longer, starting with the same letter
 		let phrase = "add addict address pen penalty pencil act action actor actress zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo tip"
+
+		// Analog 12 word counterpart
+		let phrase12 = "add addict address pen penalty pencil act action actor actress zoo wreck"
+
 		let mnemonic = try Mnemonic(phrase: phrase, language: .english)
 		let wordsBIP39 = mnemonic.words.rawValue
 		let wordStrings = wordsBIP39.map(\.word.rawValue)
