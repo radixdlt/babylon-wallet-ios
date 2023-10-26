@@ -218,6 +218,34 @@ final class ProfileStoreNewProfileTests: TestCase {
 		}
 	}
 
+	func test__GIVEN__no_profile__WHEN__import_profile_from_icloud_not_exists__THEN__error_is_thrown() async throws {
+		let icloudHeader: ProfileSnapshot.Header = .testValueProfileID_DEAD_deviceID_ABBA
+		try await withTimeLimit {
+			let assertionFailureIsCalled = self.expectation(description: "assertionFailure is called")
+			try await withTestClients {
+				// GIVEN no profile
+				$0.noProfile()
+				$0.secureStorageClient.loadProfileSnapshot = { headerId in
+					XCTAssertEqual(headerId, icloudHeader.id)
+					return nil
+				}
+				$0.assertionFailure = AssertionFailureAction.init(action: { _, _, _ in
+					// THEN identity is checked
+					assertionFailureIsCalled.fulfill()
+				})
+			} operation: {
+				let sut = ProfileStore()
+				// WHEN import profile
+				do {
+					try await sut.importCloudProfileSnapshot(icloudHeader)
+					return XCTFail("expected error")
+				} catch {}
+			}
+
+			await self.nearFutureFulfillment(of: assertionFailureIsCalled)
+		}
+	}
+
 	func test__GIVEN__no_profile__WHEN__import_profile__THEN__ownership_has_changed() async throws {
 		let deviceInfo = DeviceInfo.testValueABBA
 		try await withTimeLimit {
