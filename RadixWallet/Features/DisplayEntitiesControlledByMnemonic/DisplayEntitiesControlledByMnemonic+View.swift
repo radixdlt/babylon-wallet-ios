@@ -11,7 +11,7 @@ extension DisplayEntitiesControlledByMnemonic.State {
 	}
 
 	var canNavigate: Bool {
-		displayRevealMnemonicLink || mnemonicIsMissingNeedsImport
+		displayRevealMnemonicLink || mnemonicNeedsImport
 	}
 }
 
@@ -46,7 +46,7 @@ extension DisplayEntitiesControlledByMnemonic {
 											.textStyle(.body2Regular)
 											.foregroundColor(.app.gray2)
 									}
-								} else if viewStore.mnemonicIsMissingNeedsImport {
+								} else if viewStore.mnemonicNeedsImport {
 									WarningErrorView(
 										text: "Recover Seed Phrase", // FIXME: strings
 										type: .error,

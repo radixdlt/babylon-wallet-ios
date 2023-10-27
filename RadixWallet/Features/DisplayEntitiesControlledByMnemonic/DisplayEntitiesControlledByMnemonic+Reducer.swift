@@ -13,15 +13,15 @@ public struct DisplayEntitiesControlledByMnemonic: Sendable, FeatureReducer {
 		public var displayRevealMnemonicLink: Bool {
 			switch mode {
 			case .mnemonicCanBeDisplayed: true
-			case .mnemonicIsMissingNeedsImport: false
+			case .mnemonicNeedsImport: false
 			case .displayAccountListOnly: false
 			}
 		}
 
-		public var mnemonicIsMissingNeedsImport: Bool {
+		public var mnemonicNeedsImport: Bool {
 			switch mode {
 			case .mnemonicCanBeDisplayed: false
-			case .mnemonicIsMissingNeedsImport: true
+			case .mnemonicNeedsImport: true
 			case .displayAccountListOnly: false
 			}
 		}
@@ -31,7 +31,7 @@ public struct DisplayEntitiesControlledByMnemonic: Sendable, FeatureReducer {
 
 		public enum Mode: Sendable, Hashable {
 			case mnemonicCanBeDisplayed
-			case mnemonicIsMissingNeedsImport
+			case mnemonicNeedsImport
 			case displayAccountListOnly
 		}
 
@@ -39,7 +39,7 @@ public struct DisplayEntitiesControlledByMnemonic: Sendable, FeatureReducer {
 			accountsForDeviceFactorSource: EntitiesControlledByFactorSource,
 			mode: Mode? = nil
 		) {
-			let mode = mode ?? (accountsForDeviceFactorSource.isMnemonicPresentInKeychain ? .mnemonicCanBeDisplayed : .mnemonicIsMissingNeedsImport)
+			let mode = mode ?? (accountsForDeviceFactorSource.isMnemonicPresentInKeychain ? .mnemonicCanBeDisplayed : .mnemonicNeedsImport)
 			if mode == .mnemonicCanBeDisplayed, !accountsForDeviceFactorSource.isMnemonicPresentInKeychain {
 				preconditionFailure("Cannot reveal mnemonic since it is missing")
 			}
@@ -65,7 +65,7 @@ public struct DisplayEntitiesControlledByMnemonic: Sendable, FeatureReducer {
 		case .appeared:
 			.none
 		case .navigateButtonTapped:
-			if state.mnemonicIsMissingNeedsImport {
+			if state.mnemonicNeedsImport {
 				.send(.delegate(.importMissingMnemonic))
 			} else {
 				.send(.delegate(.displayMnemonic))

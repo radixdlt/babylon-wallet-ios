@@ -11,9 +11,7 @@ extension DeviceFactorSourceClient: DependencyKey {
 		@Dependency(\.personasClient) var personasClient
 		@Dependency(\.factorSourcesClient) var factorSourcesClient
 
-		let entitiesControlledByFactorSource: GetEntitiesControlledByFactorSource = {
-			factorSource,
-				maybeSnapshot in
+		let entitiesControlledByFactorSource: GetEntitiesControlledByFactorSource = { factorSource, maybeSnapshot in
 
 			let allEntities: [EntityPotentiallyVirtual] = try await {
 				let accounts: [Profile.Network.Account]
