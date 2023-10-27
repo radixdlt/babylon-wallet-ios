@@ -1,4 +1,44 @@
 // MARK: - ProfileStore
+/// An in-memory holder of the app's `Profile` which syncs changes to *Keychain* and
+/// needed state to *UserDefaults* (activeProfileID). If user has iCloud Keychain sync
+/// enabled (we can't determine that) and has not disabled `Profile` cloud sync then
+/// iOS also syncs updates of `Profile` (a `ProfileSnapshot`) to iCloud via *Keychain*.
+///
+/// If a Profile successfully was loaded from Keychain it will be used an `Main` part
+/// of app is openened by `Splash`. If no existing Profile was found then a new one
+/// alongside a new (babylon) `.device` FactorSource, both persisted into *Keychain*,
+/// and user is pushed to `Onboarding`, to create a first account.
+///
+/// `ProfileStore` is an `actor` so that the in-memory `Profile` is protected against
+/// data races, however, it is not a "client" (TCA Dependency), rather it should be used by clients,
+/// and only by clients, not by Reducers directly, since it is quite low level.
+///
+/// This "public interface" (method meant to be used by the clients) is:
+///
+/// 	var profile: Profile { get async }
+///		func values() async -> AnyAsyncSequence<Profile>
+/// 	func unlockedApp() async -> Profile
+///	 	func finishedOnboarding()
+///		func importCloudProfileSnapshot(_ h: ProfileSnapshot.Header) throws
+///	 	func importProfileSnapshot(_ s: ProfileSnapshot) throws
+///	 	func deleteProfile(keepInICloudIfPresent: Bool) throws
+/// 	func updating<T>(_ t: (inout Profile) async throws -> T) async throws -> T
+///
+/// The app is suppose to call `unlockedApp` after user has authenticated from `Splash`, which
+/// will emit any Profile ownership conflict if needed, and returns the newly claimed Profile that had
+/// ownership conflict if user chose that, else an entirely new Profile is user choses "Clear wallet on other Phone".
+///
+/// The app is suppose to call `finishedOnboarding` if user just finished onboarding a new wallet, it will
+/// async read `device.name` and `device.model` and update the Profile's header's `creatingDevice`
+/// and `lastUsedOnDevice` to use these values.
+///
+/// And then a lot of sugar/convenience AsyncSequences using `values` but mapping to other
+/// values inside of `Profile`, e.g.:
+///
+/// 	func accountValues() async -> AnyAsyncSequence<Profile.Network.Accounts>
+///
+/// And similar async sequences.
+///
 public final actor ProfileStore {
 	@Dependency(\.secureStorageClient) var secureStorageClient
 	@Dependency(\.userDefaultsClient) var userDefaultsClient
@@ -128,23 +168,12 @@ extension ProfileStore {
 	}
 
 	public func deleteProfile(
-		keepInICloudIfPresent: Bool,
-		assertOwnership: Bool = true
+		keepInICloudIfPresent: Bool
 	) throws {
-		if assertOwnership {
-			// Assert that this device is allowed to make changes on Profile
-			try _assertOwnership()
-		}
-
-		do {
-			userDefaultsClient.removeActiveProfileID()
-			try secureStorageClient.deleteProfileAndMnemonicsByFactorSourceIDs(profile.header.id, keepInICloudIfPresent)
-		} catch {
-			logAssertionFailure("Error, failed to delete profile or factor source, failure: \(String(describing: error))")
-		}
-
-		let profile = try! Self._tryGenerateAndSaveNewProfile(deviceInfo: deviceInfo)
-		self.profileSubject.send(profile)
+		try _deleteProfile(
+			keepInICloudIfPresent: keepInICloudIfPresent,
+			assertOwnership: true
+		)
 	}
 
 	public func finishedOnboarding() async {
@@ -218,6 +247,26 @@ extension ProfileStore {
 
 // MARK: Private
 extension ProfileStore {
+	private func _deleteProfile(
+		keepInICloudIfPresent: Bool,
+		assertOwnership: Bool = true
+	) throws {
+		if assertOwnership {
+			// Assert that this device is allowed to make changes on Profile
+			try _assertOwnership()
+		}
+
+		do {
+			userDefaultsClient.removeActiveProfileID()
+			try secureStorageClient.deleteProfileAndMnemonicsByFactorSourceIDs(profile.header.id, keepInICloudIfPresent)
+		} catch {
+			logAssertionFailure("Error, failed to delete profile or factor source, failure: \(String(describing: error))")
+		}
+
+		let profile = try! Self._tryGenerateAndSaveNewProfile(deviceInfo: deviceInfo)
+		self.profileSubject.send(profile)
+	}
+
 	/// Asserts identity and ownership of a profile, then updates its header, saves it and emits an update.
 	/// - Parameter updated: Profile to save (after updating its header).
 	private func updateHeaderOfThenSave(
@@ -358,7 +407,7 @@ extension ProfileStore {
 		if choiceByUser == .claimAndContinueUseOnThisPhone {
 			try self.claimOwnershipOfProfile()
 		} else if choiceByUser == .deleteProfileFromThisPhone {
-			try self.deleteProfile(
+			try self._deleteProfile(
 				keepInICloudIfPresent: true, // local resolution should not affect iCloud
 				assertOwnership: false // duh.. we know we had a conflict, ownership check will fail.
 			)
