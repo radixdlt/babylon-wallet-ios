@@ -112,8 +112,8 @@ extension SnapshotTestVector {
 					// all good
 				}
 			}
-			try network.accounts.forEach(validate(_:))
-			try network.personas.forEach(validate(_:))
+			try network.getAccounts().forEach(validate(_:))
+			try network.getPersonas().forEach(validate(_:))
 		}
 	}
 

@@ -34,6 +34,7 @@ extension Profile.Network {
 		public var displayName: NonEmptyString
 
 		/// Flags that are currently set on entity.
+		@DefaultCodable.EmptyCollection
 		public var flags: Set<EntityFlag>
 
 		public var personaData: PersonaData

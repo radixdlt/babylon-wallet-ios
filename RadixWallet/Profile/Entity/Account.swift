@@ -66,6 +66,7 @@ extension Profile.Network {
 		public var displayName: NonEmpty<String>
 
 		/// Flags that are currently set on entity.
+		@DefaultCodable.EmptyCollection
 		public var flags: Set<EntityFlag>
 
 		/// The on ledger synced settings for this account

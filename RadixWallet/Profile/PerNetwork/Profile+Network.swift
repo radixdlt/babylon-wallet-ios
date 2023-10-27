@@ -15,7 +15,7 @@ extension Profile {
 		/// have been added and dApps connected.
 		public let networkID: NetworkID
 
-		public typealias Accounts = IdentifiedArrayOf<Account>
+		public typealias Accounts = NonEmpty<IdentifiedArrayOf<Account>>
 
 		/// An identifiable ordered set of `Account`s created by the user for this network,
 		/// can be empty
@@ -77,7 +77,10 @@ extension Profile.Network {
 	}
 
 	public mutating func hideAccount(_ account: Profile.Network.Account) {
-		accounts[id: account.address]?.hide()
+		var identifiedArrayOf = accounts.rawValue
+		identifiedArrayOf[id: account.address]?.hide()
+		accounts = .init(rawValue: identifiedArrayOf)!
+
 		authorizedDapps.mutateAll { dapp in
 			dapp.referencesToAuthorizedPersonas.mutateAll { persona in
 				if let sharedAccounts = persona.sharedAccounts {

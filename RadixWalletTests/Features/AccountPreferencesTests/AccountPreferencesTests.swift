@@ -33,6 +33,7 @@ final class AccountPreferencesTests: TestCase {
 				await scheduleCompletionHUD.setValue(hud)
 			}
 		}
+
 		await store.send(.child(.destinations(.presented(.confirmHideAccount(.confirmTapped))))) { state in
 			state.destinations = nil
 		}

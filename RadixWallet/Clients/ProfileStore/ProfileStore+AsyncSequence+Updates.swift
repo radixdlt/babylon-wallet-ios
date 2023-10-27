@@ -17,7 +17,7 @@ extension ProfileStore {
 	}
 
 	/// A multicasting replaying async sequence of distinct Accounts for the currently selected network.
-	public func accountValues() async -> AnyAsyncSequence<Profile.Network.Accounts> {
+	public func accountValues() async -> AnyAsyncSequence<IdentifiedArrayOf<Profile.Network.Account>> {
 		_lens {
 			$0.network?.getAccounts()
 		}
