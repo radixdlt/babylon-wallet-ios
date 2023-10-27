@@ -131,7 +131,7 @@ jobs:
       checks: write
     name: "Unit test"
     runs-on: macos-13-xlarge
-    timeout-minutes: 20
+    timeout-minutes: 25
 
     needs:
       - linting
