@@ -5,7 +5,7 @@ import XCTest
 
 // MARK: - SnapshotJSONTests
 final class SnapshotJSONTests: TestCase {
-	func omit_test_generate() throws {
+	func test_generate() throws {
 		let plaintextSnapshot: ProfileSnapshot = try readTestFixture(
 			bundle: Bundle(for: Self.self),
 			// This Profile has been built using the PROD version of app, version `1.0.0 (5)`
