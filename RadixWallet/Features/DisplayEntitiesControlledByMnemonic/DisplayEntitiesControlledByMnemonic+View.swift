@@ -24,9 +24,9 @@ extension DisplayEntitiesControlledByMnemonic {
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
 				VStack(alignment: .leading) {
-					if viewStore.displayRevealMnemonicLink {
+					if viewStore.mode == .mnemonicCanBeDisplayed {
 						Button {
-							viewStore.send(.displayMnemonic)
+							viewStore.send(.displayMnemonicTapped)
 						} label: {
 							HStack {
 								Image(asset: AssetResource.signingKey)
@@ -46,16 +46,16 @@ extension DisplayEntitiesControlledByMnemonic {
 								Image(asset: AssetResource.chevronRight)
 							}
 						}
-						if viewStore.promptUserToBackUpMnemonic {
+						if !viewStore.accountsForDeviceFactorSource.isMnemonicMarkedAsBackedUp {
 							WarningErrorView(
 								text: "Please write down your seed phrase",
 								type: .error,
 								useNarrowSpacing: true
 							)
 						}
-					} else if viewStore.mnemonicNeedsImport {
+					} else if viewStore.mode == .mnemonicNeedsImport {
 						Button {
-							viewStore.send(.importMnemonic)
+							viewStore.send(.importMnemonicTapped)
 						} label: {
 							HStack {
 								VStack {

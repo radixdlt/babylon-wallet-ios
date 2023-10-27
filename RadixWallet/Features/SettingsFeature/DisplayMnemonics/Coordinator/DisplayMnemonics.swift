@@ -71,11 +71,14 @@ public struct DisplayMnemonics: Sendable, FeatureReducer {
 			.run { send in
 				let result = await TaskResult {
 					let entitiesForDeviceFactorSources = try await deviceFactorSourceClient.controlledEntities(
-						// `nil` means read profile in ProfileStore, instead of using an overriding
+						// `nil` means read profile in ProfileStore, instead of using an overriding profile
 						nil
 					)
 					let deviceFactorSources = entitiesForDeviceFactorSources.map {
-						DisplayEntitiesControlledByMnemonic.State(accountsForDeviceFactorSource: $0)
+						DisplayEntitiesControlledByMnemonic.State(
+							accountsForDeviceFactorSource: $0,
+							mode: $0.isMnemonicPresentInKeychain ? .mnemonicCanBeDisplayed : .mnemonicNeedsImport
+						)
 					}
 					return deviceFactorSources.asIdentifiable()
 				}
@@ -152,10 +155,10 @@ extension DisplayEntitiesControlledByMnemonic.State {
 	mutating func imported() {
 		self.accountsForDeviceFactorSource.isMnemonicPresentInKeychain = true
 		self.mode = .mnemonicCanBeDisplayed
-		self.promptUserToBackUpMnemonic = false
+		backedUp()
 	}
 
 	mutating func backedUp() {
-		self.promptUserToBackUpMnemonic = false
+		self.accountsForDeviceFactorSource.isMnemonicMarkedAsBackedUp = true
 	}
 }
