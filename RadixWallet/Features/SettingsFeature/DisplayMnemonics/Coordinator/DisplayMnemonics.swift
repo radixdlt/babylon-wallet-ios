@@ -128,20 +128,23 @@ public struct DisplayMnemonics: Sendable, FeatureReducer {
 			state.destination = nil
 			return .none
 
-		case let .destination(.presented(.importMnemonicControllingAccounts(.delegate(delegatAction)))):
+		case let .destination(.presented(.importMnemonicControllingAccounts(.delegate(delegateAction)))):
 			state.destination = nil
-			switch delegatAction {
-			case let .skippedMnemonic(factorSourceIDHash):
-				return .none
 
+			switch delegateAction {
+			case .skippedMnemonic, .failedToSaveInKeychain: break
 			case let .persistedMnemonicInKeychain(factorSourceID):
-				return .none
-
-			case .failedToSaveInKeychain:
-				return .none
+				state.deviceFactorSources[id: factorSourceID]?.imported()
 			}
+			return .none
 
 		default: return .none
 		}
+	}
+}
+
+extension DisplayEntitiesControlledByMnemonic.State {
+	mutating func imported() {
+		self.mode = .mnemonicCanBeDisplayed
 	}
 }

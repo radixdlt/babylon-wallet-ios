@@ -26,7 +26,9 @@ public struct DisplayEntitiesControlledByMnemonic: Sendable, FeatureReducer {
 			}
 		}
 
-		public let mode: Mode
+		// Mutable since if we just imported a missing mnemonic we wanna change to `mnemonicCanBeDisplayed`
+		public var mode: Mode
+
 		public enum Mode: Sendable, Hashable {
 			case mnemonicCanBeDisplayed
 			case mnemonicIsMissingNeedsImport

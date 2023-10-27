@@ -2,10 +2,12 @@
 public struct WarningErrorView: View {
 	public let text: String
 	public let type: ViewType
+	public let spacing: CGFloat
 
-	public init(text: String, type: ViewType) {
+	public init(text: String, type: ViewType, spacing: CGFloat = .medium3) {
 		self.text = text
 		self.type = type
+		self.spacing = spacing
 	}
 
 	public enum ViewType {
@@ -14,7 +16,7 @@ public struct WarningErrorView: View {
 	}
 
 	public var body: some View {
-		HStack(spacing: .medium3) {
+		HStack(spacing: spacing) {
 			Image(asset: AssetResource.warningError)
 				.resizable()
 				.renderingMode(.template)

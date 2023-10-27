@@ -33,11 +33,11 @@ extension DisplayEntitiesControlledByMnemonic {
 							viewStore.send(.navigateButtonTapped)
 						} label: {
 							HStack {
-								Image(asset: AssetResource.signingKey)
-									.resizable()
-									.frame(.smallest)
-
 								if viewStore.displayRevealMnemonicLink {
+									Image(asset: AssetResource.signingKey)
+										.resizable()
+										.frame(.smallest)
+
 									VStack(alignment: .leading) {
 										Text(L10n.SeedPhrases.SeedPhrase.reveal)
 											.textStyle(.body1Header)
@@ -47,8 +47,11 @@ extension DisplayEntitiesControlledByMnemonic {
 											.foregroundColor(.app.gray2)
 									}
 								} else if viewStore.mnemonicIsMissingNeedsImport {
-									WarningErrorView(text: "Recover", type: .error)
-										.padding(.horizontal, .medium3)
+									WarningErrorView(
+										text: "Recover Seed Phrase", // FIXME: strings
+										type: .error,
+										spacing: .small2
+									)
 								}
 
 								Spacer()
