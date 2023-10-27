@@ -9,10 +9,6 @@ extension DisplayEntitiesControlledByMnemonic.State {
 			return L10n.SeedPhrases.SeedPhrase.multipleConnectedAccounts(accountsCount)
 		}
 	}
-
-	var canNavigate: Bool {
-		displayRevealMnemonicLink || mnemonicNeedsImport
-	}
 }
 
 // MARK: - DisplayEntitiesControlledByMnemonic.View
@@ -28,37 +24,49 @@ extension DisplayEntitiesControlledByMnemonic {
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
 				VStack(alignment: .leading) {
-					if viewStore.canNavigate {
+					if viewStore.displayRevealMnemonicLink {
 						Button {
-							viewStore.send(.navigateButtonTapped)
+							viewStore.send(.displayMnemonic)
 						} label: {
 							HStack {
-								if viewStore.displayRevealMnemonicLink {
-									Image(asset: AssetResource.signingKey)
-										.resizable()
-										.frame(.smallest)
+								Image(asset: AssetResource.signingKey)
+									.resizable()
+									.frame(.smallest)
 
-									VStack(alignment: .leading) {
-										Text(L10n.SeedPhrases.SeedPhrase.reveal)
-											.textStyle(.body1Header)
-											.foregroundColor(.app.gray1)
-										Text(viewStore.connectedAccounts)
-											.textStyle(.body2Regular)
-											.foregroundColor(.app.gray2)
-									}
-								} else if viewStore.mnemonicNeedsImport {
-									WarningErrorView(
-										text: "Recover Seed Phrase", // FIXME: strings
-										type: .error,
-										spacing: .small2
-									)
+								VStack(alignment: .leading) {
+									Text(L10n.SeedPhrases.SeedPhrase.reveal)
+										.textStyle(.body1Header)
+										.foregroundColor(.app.gray1)
+									Text(viewStore.connectedAccounts)
+										.textStyle(.body2Regular)
+										.foregroundColor(.app.gray2)
 								}
 
 								Spacer()
 								Image(asset: AssetResource.chevronRight)
 							}
 						}
+					} else if viewStore.mnemonicNeedsImport {
+						Button {
+							viewStore.send(.importMnemonic)
+						} label: {
+							HStack {
+								VStack {
+									WarningErrorView(
+										text: "Recover Seed Phrase", // FIXME: strings
+										type: .error,
+										spacing: .small2
+									)
+									Text(viewStore.connectedAccounts)
+										.textStyle(.body2Regular)
+										.foregroundColor(.app.gray2)
+								}
+								Spacer()
+								Image(asset: AssetResource.chevronRight)
+							}
+						}
 					}
+
 					VStack(alignment: .leading, spacing: .small3) {
 						ForEach(viewStore.accountsForDeviceFactorSource.accounts) { account in
 							SmallAccountCard(account: account)

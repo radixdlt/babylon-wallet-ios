@@ -50,7 +50,8 @@ public struct DisplayEntitiesControlledByMnemonic: Sendable, FeatureReducer {
 
 	public enum ViewAction: Sendable, Equatable {
 		case appeared
-		case navigateButtonTapped
+		case importMnemonic
+		case displayMnemonic
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -64,12 +65,10 @@ public struct DisplayEntitiesControlledByMnemonic: Sendable, FeatureReducer {
 		switch viewAction {
 		case .appeared:
 			.none
-		case .navigateButtonTapped:
-			if state.mnemonicNeedsImport {
-				.send(.delegate(.importMissingMnemonic))
-			} else {
-				.send(.delegate(.displayMnemonic))
-			}
+		case .displayMnemonic:
+			.send(.delegate(.displayMnemonic))
+		case .importMnemonic:
+			.send(.delegate(.importMissingMnemonic))
 		}
 	}
 }
