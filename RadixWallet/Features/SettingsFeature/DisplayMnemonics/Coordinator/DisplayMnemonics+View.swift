@@ -1,15 +1,8 @@
 import ComposableArchitecture
 import SwiftUI
-extension DisplayMnemonics.State {
-	var viewState: DisplayMnemonics.ViewState {
-		.init()
-	}
-}
 
 // MARK: - DisplayMnemonics.View
 extension DisplayMnemonics {
-	public struct ViewState: Equatable {}
-
 	@MainActor
 	public struct View: SwiftUI.View {
 		private let store: StoreOf<DisplayMnemonics>
@@ -19,7 +12,7 @@ extension DisplayMnemonics {
 		}
 
 		public var body: some SwiftUI.View {
-			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
+			WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
 				ScrollView {
 					VStack(alignment: .leading, spacing: .medium1) {
 						Text(L10n.SeedPhrases.message)

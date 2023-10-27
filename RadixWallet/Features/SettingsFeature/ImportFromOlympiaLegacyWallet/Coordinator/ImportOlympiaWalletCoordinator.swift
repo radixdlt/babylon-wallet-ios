@@ -417,7 +417,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 			)
 
 			do {
-				try await userDefaultsClient.addFactorSourceIDOfBackedUpMnemonic(factorSourceID)
+				try userDefaultsClient.addFactorSourceIDOfBackedUpMnemonic(factorSourceID)
 			} catch {
 				// Not important enought to throw
 				loggerGlobal.warning("Failed to save mnemonic as backed up, error: \(error)")

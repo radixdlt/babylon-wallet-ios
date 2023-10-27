@@ -46,6 +46,13 @@ extension DisplayEntitiesControlledByMnemonic {
 								Image(asset: AssetResource.chevronRight)
 							}
 						}
+						if viewStore.promptUserToBackUpMnemonic {
+							WarningErrorView(
+								text: "Please write down your seed phrase",
+								type: .error,
+								useNarrowSpacing: true
+							)
+						}
 					} else if viewStore.mnemonicNeedsImport {
 						Button {
 							viewStore.send(.importMnemonic)
@@ -53,9 +60,9 @@ extension DisplayEntitiesControlledByMnemonic {
 							HStack {
 								VStack {
 									WarningErrorView(
-										text: "Recover Seed Phrase", // FIXME: strings
+										text: "Please recover your seed phrase", // FIXME: strings
 										type: .error,
-										spacing: .small2
+										useNarrowSpacing: true
 									)
 									Text(viewStore.connectedAccounts)
 										.textStyle(.body2Regular)

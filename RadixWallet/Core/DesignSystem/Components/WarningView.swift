@@ -4,10 +4,14 @@ public struct WarningErrorView: View {
 	public let type: ViewType
 	public let spacing: CGFloat
 
-	public init(text: String, type: ViewType, spacing: CGFloat = .medium3) {
+	public init(
+		text: String,
+		type: ViewType,
+		useNarrowSpacing: Bool = false
+	) {
 		self.text = text
 		self.type = type
-		self.spacing = spacing
+		self.spacing = useNarrowSpacing ? .small2 : .medium3
 	}
 
 	public enum ViewType {

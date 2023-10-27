@@ -136,9 +136,9 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 		case let .validated(privateHDFactorSource):
 			state.destination = nil
 			return .run { send in
-				try await userDefaultsClient.addFactorSourceIDOfBackedUpMnemonic(privateHDFactorSource.factorSource.id)
+				try userDefaultsClient.addFactorSourceIDOfBackedUpMnemonic(privateHDFactorSource.factorSource.id)
 
-				try await secureStorageClient.saveMnemonicForFactorSource(
+				try secureStorageClient.saveMnemonicForFactorSource(
 					privateHDFactorSource
 				)
 

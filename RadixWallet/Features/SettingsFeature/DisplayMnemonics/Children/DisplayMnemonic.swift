@@ -27,7 +27,7 @@ public struct DisplayMnemonic: Sendable, FeatureReducer {
 
 	public enum DelegateAction: Sendable, Equatable {
 		case failedToLoad
-		case doneViewing
+		case doneViewing(isBackedUp: Bool, factorSourceID: FactorSource.ID.FromHash)
 	}
 
 	@Dependency(\.secureStorageClient) var secureStorageClient
@@ -83,9 +83,17 @@ public struct DisplayMnemonic: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
-		case .importMnemonic(.delegate(.doneViewing)):
+		case let .importMnemonic(.delegate(.doneViewing(markedMnemonicAsBackedUp))):
+			let isBackedUp = markedMnemonicAsBackedUp ?? true
 			state.importMnemonic = nil
-			return .send(.delegate(.doneViewing))
+			return .send(
+				.delegate(
+					.doneViewing(
+						isBackedUp: isBackedUp,
+						factorSourceID: state.deviceFactorSource.id
+					)
+				)
+			)
 		default: return .none
 		}
 	}

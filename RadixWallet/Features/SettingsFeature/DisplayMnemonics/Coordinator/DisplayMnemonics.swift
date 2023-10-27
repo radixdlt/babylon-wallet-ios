@@ -124,8 +124,12 @@ public struct DisplayMnemonics: Sendable, FeatureReducer {
 			state.destination = nil
 			return .none
 
-		case .destination(.presented(.displayMnemonic(.delegate(.doneViewing)))):
+		case let .destination(.presented(.displayMnemonic(.delegate(.doneViewing(isBackedUp, factorSourceID))))):
+			if isBackedUp {
+				state.deviceFactorSources[id: factorSourceID.embed()]?.backedUp()
+			}
 			state.destination = nil
+
 			return .none
 
 		case let .destination(.presented(.importMnemonicControllingAccounts(.delegate(delegateAction)))):
@@ -134,6 +138,7 @@ public struct DisplayMnemonics: Sendable, FeatureReducer {
 			switch delegateAction {
 			case .skippedMnemonic, .failedToSaveInKeychain: break
 			case let .persistedMnemonicInKeychain(factorSourceID):
+				assert(state.deviceFactorSources[id: factorSourceID] != nil)
 				state.deviceFactorSources[id: factorSourceID]?.imported()
 			}
 			return .none
@@ -145,6 +150,12 @@ public struct DisplayMnemonics: Sendable, FeatureReducer {
 
 extension DisplayEntitiesControlledByMnemonic.State {
 	mutating func imported() {
+		self.accountsForDeviceFactorSource.isMnemonicPresentInKeychain = true
 		self.mode = .mnemonicCanBeDisplayed
+		self.promptUserToBackUpMnemonic = false
+	}
+
+	mutating func backedUp() {
+		self.promptUserToBackUpMnemonic = false
 	}
 }

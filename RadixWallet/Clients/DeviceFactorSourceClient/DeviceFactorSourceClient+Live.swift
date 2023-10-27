@@ -9,6 +9,7 @@ extension DeviceFactorSourceClient: DependencyKey {
 		@Dependency(\.secureStorageClient) var secureStorageClient
 		@Dependency(\.accountsClient) var accountsClient
 		@Dependency(\.personasClient) var personasClient
+		@Dependency(\.userDefaultsClient) var userDefaultsClient
 		@Dependency(\.factorSourcesClient) var factorSourcesClient
 
 		let entitiesControlledByFactorSource: GetEntitiesControlledByFactorSource = { factorSource, maybeSnapshot in
@@ -40,10 +41,13 @@ extension DeviceFactorSourceClient: DependencyKey {
 				}
 			}
 
+			let isMnemonicMarkedAsBackedUp = userDefaultsClient.getFactorSourceIDOfBackedUpMnemonics().contains(factorSource.id)
+
 			return EntitiesControlledByFactorSource(
 				entities: entitiesForSource,
 				deviceFactorSource: factorSource,
-				isMnemonicPresentInKeychain: secureStorageClient.containsMnemonicIdentifiedByFactorSourceID(factorSource.id)
+				isMnemonicPresentInKeychain: secureStorageClient.containsMnemonicIdentifiedByFactorSourceID(factorSource.id),
+				isMnemonicMarkedAsBackedUp: isMnemonicMarkedAsBackedUp
 			)
 		}
 

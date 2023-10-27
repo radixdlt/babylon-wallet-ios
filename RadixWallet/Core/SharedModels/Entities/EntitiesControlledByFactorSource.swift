@@ -3,17 +3,23 @@ public struct EntitiesControlledByFactorSource: Sendable, Hashable, Identifiable
 	public typealias ID = FactorSourceID
 	public var id: ID { deviceFactorSource.id.embed() }
 	public let entities: [EntityPotentiallyVirtual]
-	public let isMnemonicPresentInKeychain: Bool
+	public var isMnemonicPresentInKeychain: Bool
+	public var isMnemonicMarkedAsBackedUp: Bool
 	public let deviceFactorSource: DeviceFactorSource
 
 	public init(
 		entities: [EntityPotentiallyVirtual],
 		deviceFactorSource: DeviceFactorSource,
-		isMnemonicPresentInKeychain: Bool
+		isMnemonicPresentInKeychain: Bool,
+		isMnemonicMarkedAsBackedUp: Bool
 	) {
+		if isMnemonicMarkedAsBackedUp, !isMnemonicPresentInKeychain {
+			assertionFailure("Discrepancy, bad state, a keychain should not be missing and ALSO be marked as backed up. We probably have a missing sync logic between the states.")
+		}
 		self.entities = entities
 		self.deviceFactorSource = deviceFactorSource
 		self.isMnemonicPresentInKeychain = isMnemonicPresentInKeychain
+		self.isMnemonicMarkedAsBackedUp = isMnemonicMarkedAsBackedUp
 	}
 }
 

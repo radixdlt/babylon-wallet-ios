@@ -9,7 +9,7 @@ public struct DisplayEntitiesControlledByMnemonic: Sendable, FeatureReducer {
 
 		public var deviceFactorSource: DeviceFactorSource { accountsForDeviceFactorSource.deviceFactorSource }
 
-		public let accountsForDeviceFactorSource: EntitiesControlledByFactorSource
+		public var accountsForDeviceFactorSource: EntitiesControlledByFactorSource
 		public var displayRevealMnemonicLink: Bool {
 			switch mode {
 			case .mnemonicCanBeDisplayed: true
@@ -23,6 +23,15 @@ public struct DisplayEntitiesControlledByMnemonic: Sendable, FeatureReducer {
 			case .mnemonicCanBeDisplayed: false
 			case .mnemonicNeedsImport: true
 			case .displayAccountListOnly: false
+			}
+		}
+
+		public var promptUserToBackUpMnemonic: Bool {
+			get {
+				!accountsForDeviceFactorSource.isMnemonicMarkedAsBackedUp
+			}
+			set {
+				accountsForDeviceFactorSource.isMnemonicMarkedAsBackedUp = !newValue
 			}
 		}
 
