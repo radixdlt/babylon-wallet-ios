@@ -69,6 +69,7 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 	}
 
 	@Dependency(\.accountsClient) var accountsClient
+	@Dependency(\.entitiesVisibilityClient) var entitiesVisibilityClient
 	@Dependency(\.overlayWindowClient) var overlayWindowClient
 	@Dependency(\.errorQueue) var errorQueue
 
@@ -99,8 +100,8 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 				title: .init(L10n.AccountSettings.hideThisAccount),
 				message: .init(L10n.AccountSettings.hideAccountConfirmation),
 				buttons: [
+					.default(.init(L10n.Common.continue), action: .send(.confirmTapped)),
 					.cancel(.init(L10n.Common.cancel), action: .send(.cancelTapped)),
-					.destructive(.init(L10n.AccountSettings.hideAccount), action: .send(.confirmTapped)),
 				]
 			))
 			return .none
@@ -168,15 +169,11 @@ extension AccountPreferences {
 			switch action {
 			case .confirmTapped:
 				return .run { [account = state.account] send in
-					do {
-						var account = account
-						account.flags.insert(.deletedByUser)
-						try await accountsClient.updateAccount(account)
-						overlayWindowClient.scheduleHUD(.accountHidden)
-						await send(.delegate(.accountHidden))
-					} catch {
-						errorQueue.schedule(error)
-					}
+					try await entitiesVisibilityClient.hideAccount(account)
+					overlayWindowClient.scheduleHUD(.accountHidden)
+					await send(.delegate(.accountHidden))
+				} catch: { error, _ in
+					errorQueue.schedule(error)
 				}
 			case .cancelTapped:
 				break

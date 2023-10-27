@@ -5,6 +5,7 @@ import SwiftUI
 public struct PersonaDetails: Sendable, FeatureReducer {
 	@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
 	@Dependency(\.personasClient) var personasClient
+	@Dependency(\.entitiesVisibilityClient) var entitiesVisibilityClient
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.authorizedDappsClient) var authorizedDappsClient
 	@Dependency(\.overlayWindowClient) var overlayWindowClient
@@ -162,15 +163,11 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 					return .none
 				}
 				return .run { send in
-					do {
-						var persona = persona
-						persona.flags.insert(.deletedByUser)
-						try await personasClient.updatePersona(persona)
-						overlayWindowClient.scheduleHUD(.personaHidden)
-						await send(.delegate(.personaHidden))
-					} catch {
-						errorQueue.schedule(error)
-					}
+					try await entitiesVisibilityClient.hidePersona(persona)
+					overlayWindowClient.scheduleHUD(.personaHidden)
+					await send(.delegate(.personaHidden))
+				} catch: { error, _ in
+					errorQueue.schedule(error)
 				}
 
 			default:
@@ -360,8 +357,8 @@ extension AlertState<PersonaDetails.Destination.Action.ConfirmHideAlert> {
 			title: .init(L10n.AuthorizedDapps.PersonaDetails.hideThisPersona),
 			message: .init(L10n.AuthorizedDapps.PersonaDetails.hidePersonaConfirmation),
 			buttons: [
+				.default(.init(L10n.Common.continue), action: .send(.confirmTapped)),
 				.cancel(.init(L10n.Common.cancel), action: .send(.cancelTapped)),
-				.destructive(.init(L10n.AccountSettings.hideAccount), action: .send(.confirmTapped)),
 			]
 		)
 	}

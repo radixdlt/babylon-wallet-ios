@@ -32,3 +32,19 @@ extension OrderedSet where Element: Hashable {
 		}
 	}
 }
+
+extension MutableCollection {
+	/// Mutates in place the elements of the collection
+	public mutating func mutateAll(_ mutate: (inout Self.Element) -> Void) {
+		for index in indices {
+			mutate(&self[index])
+		}
+	}
+}
+
+extension RangeReplaceableCollection {
+	/// Filters in place the elements of the collection
+	public mutating func filterInPlace(_ isIncluded: (Element) throws -> Bool) rethrows {
+		self = try self.filter(isIncluded)
+	}
+}
