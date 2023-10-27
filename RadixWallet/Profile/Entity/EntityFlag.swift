@@ -1,6 +1,8 @@
 // MARK: - EntityFlag
 /// Flags that can be dynamically set on a given entity
 public enum EntityFlag:
+	String,
+	Identifiable,
 	Sendable,
 	Hashable,
 	Codable,

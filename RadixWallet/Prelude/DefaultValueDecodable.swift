@@ -39,6 +39,14 @@ extension DefaultCodable {
 
 // MARK: - Set + EmptyInitializable
 extension Set: EmptyInitializable {}
+import IdentifiedCollections
+
+// MARK: - IdentifiedArray + EmptyInitializable
+extension IdentifiedArray: EmptyInitializable where Element: Identifiable, ID == Element.ID {
+	public init() {
+		self.init(id: \.id)
+	}
+}
 
 // MARK: - Decoding
 extension DefaultCodable.Wrapper {

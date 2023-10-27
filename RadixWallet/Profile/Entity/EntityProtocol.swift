@@ -2,6 +2,8 @@ import EngineToolkit
 
 // MARK: - EntityBaseProtocol
 public protocol EntityBaseProtocol {
+	typealias Flags = IdentifiedArrayOf<EntityFlag>
+
 	/// The ID of the network this entity exists on.
 	var networkID: NetworkID { get }
 
@@ -16,7 +18,7 @@ public protocol EntityBaseProtocol {
 	var displayName: NonEmpty<String> { get }
 
 	/// Flags that are currently set on entity.
-	var flags: Set<EntityFlag> { get }
+	var flags: Flags { get }
 }
 
 extension EntityBaseProtocol {

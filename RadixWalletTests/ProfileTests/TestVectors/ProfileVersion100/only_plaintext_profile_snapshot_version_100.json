@@ -204,6 +204,9 @@
                             []
                         }
                     },
+                    "flags": [
+                        "deletedByUser"
+                    ],
                     "address": "account_tdx_e_128vkt2fur65p4hqhulfv3h0cknrppwtjsstlttkfamj4jnnpm82gsw"
                 },
                 {
@@ -320,6 +323,9 @@
                             []
                         }
                     },
+                    "flags": [
+                        "deletedByUser"
+                    ],
                     "address": "account_tdx_e_129enl4x6w6mz6nlh9y4hszx6zwfvv3q80keqdzqkewvltugp8g6g7v"
                 },
                 {
@@ -1343,6 +1349,9 @@
                             []
                         }
                     },
+                    "flags": [
+                        "deletedByUser"
+                    ],
                     "address": "account_rdx12x20vgu94d96g3demdumxl6yjpvm0jy8dhrr03g75299ghxrwq76uh"
                 }
             ],

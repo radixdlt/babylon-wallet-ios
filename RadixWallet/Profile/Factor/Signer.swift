@@ -100,7 +100,7 @@ public enum EntityPotentiallyVirtual: Sendable, Hashable, EntityBaseProtocol, Id
 	}
 
 	/// Flags that are currently set on entity.
-	public var flags: Set<EntityFlag> {
+	public var flags: Flags {
 		property(\.flags)
 	}
 }

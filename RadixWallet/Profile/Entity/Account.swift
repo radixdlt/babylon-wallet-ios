@@ -67,7 +67,7 @@ extension Profile.Network {
 
 		/// Flags that are currently set on entity.
 		@DefaultCodable.EmptyCollection
-		public var flags: Set<EntityFlag>
+		public var flags: Flags
 
 		/// The on ledger synced settings for this account
 		public var onLedgerSettings: OnLedgerSettings
@@ -200,7 +200,7 @@ extension Profile.Network.Account {
 
 extension Profile.Network.Account {
 	public mutating func hide() {
-		flags.insert(.deletedByUser)
+		flags.append(.deletedByUser)
 	}
 
 	public mutating func unhide() {

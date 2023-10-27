@@ -35,7 +35,7 @@ extension Profile.Network {
 
 		/// Flags that are currently set on entity.
 		@DefaultCodable.EmptyCollection
-		public var flags: Set<EntityFlag>
+		public var flags: Flags
 
 		public var personaData: PersonaData
 
@@ -149,7 +149,7 @@ extension Profile.Network.Persona {
 
 extension Profile.Network.Persona {
 	public mutating func hide() {
-		flags.insert(.deletedByUser)
+		flags.append(.deletedByUser)
 	}
 
 	public mutating func unhide() {
