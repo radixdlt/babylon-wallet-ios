@@ -1,4 +1,5 @@
 import Foundation
+import IdentifiedCollections
 
 // MARK: - DefaultValueProvider
 /// An utility property wrapper allowing to specify a default value if the decoded value is missing or nil
@@ -39,7 +40,6 @@ extension DefaultCodable {
 
 // MARK: - Set + EmptyInitializable
 extension Set: EmptyInitializable {}
-import IdentifiedCollections
 
 // MARK: - IdentifiedArray + EmptyInitializable
 extension IdentifiedArray: EmptyInitializable where Element: Identifiable, ID == Element.ID {

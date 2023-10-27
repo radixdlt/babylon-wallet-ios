@@ -3,7 +3,11 @@ import EngineToolkit
 import XCTest
 
 final class EntitiesHidingTests: TestCase {
+	let account0 = Profile.Network.Account.testValueIdx0
+	let account1 = Profile.Network.Account.testValueIdx1
+
+	let persona0 = Profile.Network.Persona.testVa
 	func test_hideAccount() {
-		// let profile =
+		// let network = Profile.Network(
 	}
 }
