@@ -39,8 +39,8 @@ final class AccountAndPersonaHidingTests: TestCase {
 				title: .init(L10n.AppSettings.EntityHiding.unhideAllSection),
 				message: .init(L10n.AppSettings.EntityHiding.unhideAllConfirmation),
 				buttons: [
-					.cancel(.init(L10n.Common.cancel), action: .send(.cancelTapped)),
 					.default(.init(L10n.Common.continue), action: .send(.confirmTapped)),
+					.cancel(.init(L10n.Common.cancel), action: .send(.cancelTapped)),
 				]
 			)
 		}
@@ -91,8 +91,8 @@ final class AccountAndPersonaHidingTests: TestCase {
 				title: .init(L10n.AppSettings.EntityHiding.unhideAllSection),
 				message: .init(L10n.AppSettings.EntityHiding.unhideAllConfirmation),
 				buttons: [
-					.cancel(.init(L10n.Common.cancel), action: .send(.cancelTapped)),
 					.default(.init(L10n.Common.continue), action: .send(.confirmTapped)),
+					.cancel(.init(L10n.Common.cancel), action: .send(.cancelTapped)),
 				]
 			)
 		}

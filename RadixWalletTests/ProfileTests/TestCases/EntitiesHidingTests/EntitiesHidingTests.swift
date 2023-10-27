@@ -4,6 +4,6 @@ import XCTest
 
 final class EntitiesHidingTests: TestCase {
 	func test_hideAccount() {
-		let profile =
+		// let profile =
 	}
 }

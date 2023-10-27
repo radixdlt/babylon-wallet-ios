@@ -207,7 +207,7 @@ extension Profile {
 		privateHDFactorSource: PrivateHDFactorSource = .testValue
 	) {
 		var accounts = IdentifiedArrayOf<Profile.Network.Account>()
-		try! accounts.append(
+		accounts.append(
 			Profile.Network.Account.testValue(
 				name: nameOfFirstAccount,
 				privateHDFactorSource: privateHDFactorSource
@@ -216,7 +216,7 @@ extension Profile {
 
 		let network = Profile.Network(
 			networkID: networkID,
-			accounts: accounts,
+			accounts: .init(rawValue: accounts)!,
 			personas: [],
 			authorizedDapps: []
 		)

@@ -16,14 +16,14 @@ final class AccountPreferencesTests: TestCase {
 				title: .init(L10n.AccountSettings.hideThisAccount),
 				message: .init(L10n.AccountSettings.hideAccountConfirmation),
 				buttons: [
+					.default(.init(L10n.Common.continue), action: .send(.confirmTapped)),
 					.cancel(.init(L10n.Common.cancel), action: .send(.cancelTapped)),
-					.destructive(.init(L10n.AccountSettings.hideAccount), action: .send(.confirmTapped)),
 				]
 			))
 		}
 
 		let updateAccount = ActorIsolated<Profile.Network.Account?>(nil)
-		store.dependencies.accountsClient.updateAccount = { account in
+		store.dependencies.entitiesVisibilityClient.hideAccount = { account in
 			await updateAccount.setValue(account)
 		}
 
@@ -39,7 +39,6 @@ final class AccountPreferencesTests: TestCase {
 		}
 
 		let updatedAccount = await updateAccount.value
-		account.flags.insert(.deletedByUser)
 		XCTAssertEqual(account, updatedAccount)
 
 		let scheduledCompletionHUD = await scheduleCompletionHUD.value
