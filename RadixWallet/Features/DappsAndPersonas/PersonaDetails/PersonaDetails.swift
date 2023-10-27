@@ -219,7 +219,6 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 
 		case .hidePersonaTapped:
 			guard case .general = state.mode else {
-				assertionFailure("Can hide persona only")
 				return .none
 			}
 

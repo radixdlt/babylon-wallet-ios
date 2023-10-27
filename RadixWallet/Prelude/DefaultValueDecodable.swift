@@ -1,6 +1,9 @@
 import Foundation
 
 // MARK: - DefaultValueProvider
+/// An utility property wrapper allowing to specify a default value if the decoded value is missing or nil
+
+/// Provides the Type of the decoded value, also its default value
 public protocol DefaultValueProvider {
 	associatedtype Value: Codable
 	static var defaultValue: Value { get }
@@ -8,6 +11,9 @@ public protocol DefaultValueProvider {
 
 // MARK: - DefaultCodable
 public enum DefaultCodable {
+	/// The property wrapper itself.
+	/// Need to make use of the tagging with the protocol, since the value provided in `init` will not be
+	/// accessible when initializing with the decoder.
 	@propertyWrapper
 	public struct Wrapper<Provider: DefaultValueProvider>: Codable {
 		public typealias Value = Provider.Value
@@ -19,18 +25,7 @@ public enum DefaultCodable {
 	}
 }
 
-// MARK: - DefaultCodable.Wrapper + Equatable
-extension DefaultCodable.Wrapper: Equatable where Provider.Value: Equatable {}
-
-// MARK: - DefaultCodable.Wrapper + Hashable
-extension DefaultCodable.Wrapper: Hashable where Provider.Value: Hashable {}
-
-// MARK: - DefaultCodable.Wrapper + Sendable
-extension DefaultCodable.Wrapper: Sendable where Provider.Value: Sendable {}
-
-// MARK: - Set + EmptyInitializable
-extension Set: EmptyInitializable {}
-
+// MARK: - Default Value Providers
 extension DefaultCodable {
 	public typealias AnyCollection = Codable & EmptyInitializable
 	public typealias EmptyCollection<Collection: AnyCollection> = Wrapper<Providers.EmptyCollection<Collection>>
@@ -42,6 +37,10 @@ extension DefaultCodable {
 	}
 }
 
+// MARK: - Set + EmptyInitializable
+extension Set: EmptyInitializable {}
+
+// MARK: - Decoding
 extension DefaultCodable.Wrapper {
 	public init(from decoder: Decoder) throws {
 		let container = try decoder.singleValueContainer()
@@ -58,8 +57,18 @@ extension KeyedDecodingContainer {
 	}
 }
 
+// MARK: - Encoding
 extension KeyedEncodingContainer {
 	public mutating func encode(_ value: DefaultCodable.Wrapper<some Any>, forKey key: Key) throws {
 		try encode(value.wrappedValue, forKey: key)
 	}
 }
+
+// MARK: - DefaultCodable.Wrapper + Equatable
+extension DefaultCodable.Wrapper: Equatable where Provider.Value: Equatable {}
+
+// MARK: - DefaultCodable.Wrapper + Hashable
+extension DefaultCodable.Wrapper: Hashable where Provider.Value: Hashable {}
+
+// MARK: - DefaultCodable.Wrapper + Sendable
+extension DefaultCodable.Wrapper: Sendable where Provider.Value: Sendable {}

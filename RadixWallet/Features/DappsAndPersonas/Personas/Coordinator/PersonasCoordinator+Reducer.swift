@@ -106,7 +106,7 @@ public struct PersonasCoordinator: Sendable, FeatureReducer {
 		switch childAction {
 		case .personaList(.delegate(.createNewPersona)):
 			assert(state.personaPrimacy != nil, "Should have checked 'personaPrimacy' already")
-			let personaPrimacy = state.personaPrimacy ?? .init(firstOnAnyNetwork: true, firstOnCurrent: state.personaList.personas.isEmpty)
+			let personaPrimacy = state.personaPrimacy ?? .firstOnAnyNetwork
 
 			let coordinatorState = CreatePersonaCoordinator.State(
 				config: .init(
@@ -138,7 +138,7 @@ public struct PersonasCoordinator: Sendable, FeatureReducer {
 
 			case .completed:
 				state.destination = nil
-				state.personaPrimacy = .init(firstOnAnyNetwork: false, firstOnCurrent: false)
+				state.personaPrimacy = .notFirstOnCurrentNetwork
 				return .none
 			}
 

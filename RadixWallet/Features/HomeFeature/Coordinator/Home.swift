@@ -35,7 +35,7 @@ public struct Home: Sendable, FeatureReducer {
 
 	public enum InternalAction: Sendable, Equatable {
 		public typealias HasAccessToMnemonic = Bool
-		case accountsLoadedResult(TaskResult<AccountsClient.Accounts>)
+		case accountsLoadedResult(TaskResult<IdentifiedArrayOf<Profile.Network.Account>>)
 		case mnemonicAccessResult([FactorSourceID.FromHash: HasAccessToMnemonic])
 	}
 

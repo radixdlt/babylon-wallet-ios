@@ -63,7 +63,7 @@ extension AccountPreferences {
 extension AccountPreferences.View {
 	@MainActor
 	func hideAccountButton(_ viewStore: ViewStoreOf<AccountPreferences>) -> some View {
-		Button("Hide Account") {
+		Button(L10n.AccountSettings.HideAccount.button) {
 			viewStore.send(.hideAccountTapped)
 		}
 		.buttonStyle(.primaryRectangular(isDestructive: true))

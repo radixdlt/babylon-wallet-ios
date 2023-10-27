@@ -103,7 +103,7 @@ extension ProfileStore {
 	}
 
 	/// Update Profile, by updating the current network
-	/// - Parameter update: A mutating update to perform on the profiles's active networl
+	/// - Parameter update: A mutating update to perform on the profiles's active network
 	public func updatingOnCurrentNetwork(_ update: @Sendable (inout Profile.Network) async throws -> Void) async throws {
 		try await updating { profile in
 			var network = try await network()
