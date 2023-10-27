@@ -24,7 +24,10 @@ extension DisplayEntitiesControlledByMnemonic {
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
 				VStack(alignment: .leading) {
-					if viewStore.mode == .mnemonicCanBeDisplayed {
+					switch viewStore.mode {
+					case .displayAccountListOnly:
+						EmptyView()
+					case .mnemonicCanBeDisplayed:
 						Button {
 							viewStore.send(.displayMnemonicTapped)
 						} label: {
@@ -53,12 +56,12 @@ extension DisplayEntitiesControlledByMnemonic {
 								useNarrowSpacing: true
 							)
 						}
-					} else if viewStore.mode == .mnemonicNeedsImport {
+					case .mnemonicNeedsImport:
 						Button {
 							viewStore.send(.importMnemonicTapped)
 						} label: {
 							HStack {
-								VStack {
+								VStack(alignment: .leading) {
 									WarningErrorView(
 										text: "Please recover your seed phrase", // FIXME: strings
 										type: .error,
