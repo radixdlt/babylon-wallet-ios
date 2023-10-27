@@ -31,8 +31,7 @@ public struct DisplayEntitiesControlledByMnemonic: Sendable, FeatureReducer {
 
 	public enum ViewAction: Sendable, Equatable {
 		case appeared
-		case importMnemonicTapped
-		case displayMnemonicTapped
+		case navigateButtonTapped
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -45,11 +44,17 @@ public struct DisplayEntitiesControlledByMnemonic: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .appeared:
-			.none
-		case .displayMnemonicTapped:
-			.send(.delegate(.displayMnemonic))
-		case .importMnemonicTapped:
-			.send(.delegate(.importMissingMnemonic))
+			return .none
+		case .navigateButtonTapped:
+			switch state.mode {
+			case .mnemonicCanBeDisplayed:
+				return .send(.delegate(.displayMnemonic))
+			case .mnemonicNeedsImport:
+				return .send(.delegate(.importMissingMnemonic))
+			case .displayAccountListOnly:
+				assertionFailure("not clickable")
+				return .none
+			}
 		}
 	}
 }
