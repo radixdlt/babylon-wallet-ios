@@ -8,8 +8,8 @@ public struct PersonasClient: Sendable {
 	public var updatePersona: UpdatePersona
 
 	public var saveVirtualPersona: SaveVirtualPersona
-	public var hasAnyPersonaOnAnyNetwork: HasAnyPersonaOnAnyNetworks
-	public var hasAnyPersonaOnCurrentNetwork: HasAnyPersonaOnCurrentNetwork
+	public var hasSomePersonaOnAnyNetwork: HasSomePersonaOnAnyNetworks
+	public var hasSomePersonaOnCurrentNetwork: HasSomePersonaOnCurrentNetwork
 
 	public init(
 		personas: @escaping Personas,
@@ -18,8 +18,8 @@ public struct PersonasClient: Sendable {
 		getPersonasOnNetwork: @escaping GetPersonasOnNetwork,
 		updatePersona: @escaping UpdatePersona,
 		saveVirtualPersona: @escaping SaveVirtualPersona,
-		hasAnyPersonaOnAnyNetwork: @escaping HasAnyPersonaOnAnyNetworks,
-		hasAnyPersonaOnCurrentNetwork: @escaping HasAnyPersonaOnCurrentNetwork
+		hasSomePersonaOnAnyNetwork: @escaping HasSomePersonaOnAnyNetworks,
+		hasSomePersonaOnCurrentNetwork: @escaping HasSomePersonaOnCurrentNetwork
 	) {
 		self.personas = personas
 		self.nextPersonaIndex = nextPersonaIndex
@@ -27,8 +27,8 @@ public struct PersonasClient: Sendable {
 		self.getPersonasOnNetwork = getPersonasOnNetwork
 		self.updatePersona = updatePersona
 		self.saveVirtualPersona = saveVirtualPersona
-		self.hasAnyPersonaOnAnyNetwork = hasAnyPersonaOnAnyNetwork
-		self.hasAnyPersonaOnCurrentNetwork = hasAnyPersonaOnCurrentNetwork
+		self.hasSomePersonaOnAnyNetwork = hasSomePersonaOnAnyNetwork
+		self.hasSomePersonaOnCurrentNetwork = hasSomePersonaOnCurrentNetwork
 	}
 }
 
@@ -37,8 +37,8 @@ extension PersonasClient {
 	public typealias Personas = @Sendable () async -> AnyAsyncSequence<Profile.Network.Personas>
 	public typealias GetPersonas = @Sendable () async throws -> Profile.Network.Personas
 	public typealias GetPersonasOnNetwork = @Sendable (NetworkID) async -> Profile.Network.Personas
-	public typealias HasAnyPersonaOnAnyNetworks = @Sendable () async -> Bool
-	public typealias HasAnyPersonaOnCurrentNetwork = @Sendable () async -> Bool
+	public typealias HasSomePersonaOnAnyNetworks = @Sendable () async -> Bool
+	public typealias HasSomePersonaOnCurrentNetwork = @Sendable () async -> Bool
 	public typealias UpdatePersona = @Sendable (Profile.Network.Persona) async throws -> Void
 	public typealias SaveVirtualPersona = @Sendable (Profile.Network.Persona) async throws -> Void
 }
@@ -58,10 +58,10 @@ extension PersonasClient {
 	}
 
 	public func determinePersonaPrimacy() async -> PersonaPrimacy {
-		let hasAnyPersonaOnAnyNetwork = await hasAnyPersonaOnAnyNetwork()
-		let hasAnyPersonaOnCurrentNetwork = await hasAnyPersonaOnCurrentNetwork()
-		let isFirstPersonaOnAnyNetwork = !hasAnyPersonaOnAnyNetwork
-		let isFirstPersonaOnCurrentNetwork = !hasAnyPersonaOnCurrentNetwork
+		let hasSomePersonaOnAnyNetwork = await hasSomePersonaOnAnyNetwork()
+		let hasSomePersonaOnCurrentNetwork = await hasSomePersonaOnCurrentNetwork()
+		let isFirstPersonaOnAnyNetwork = !hasSomePersonaOnAnyNetwork
+		let isFirstPersonaOnCurrentNetwork = !hasSomePersonaOnCurrentNetwork
 
 		return PersonaPrimacy(
 			firstOnAnyNetwork: isFirstPersonaOnAnyNetwork,

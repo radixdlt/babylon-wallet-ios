@@ -22,7 +22,7 @@ extension EntitiesVisibilityClient: DependencyKey {
 					network.unhideAllEntities()
 				}
 			},
-			getHiddenEntitiesStats: {
+			getHiddenEntityCounts: {
 				let network = try await profileStore.network()
 
 				return .init(

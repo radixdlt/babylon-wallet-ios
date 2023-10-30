@@ -98,7 +98,9 @@ struct OneTimePersonaData: Sendable, FeatureReducer {
 
 		case .appeared:
 			return .run { send in
-				await send(.internal(.personaPrimacyDetermined(personasClient.determinePersonaPrimacy())))
+				await send(.internal(.personaPrimacyDetermined(
+					personasClient.determinePersonaPrimacy()
+				)))
 			}
 
 		case let .selectedPersonaChanged(persona):

@@ -11,6 +11,7 @@ public struct PersonasCoordinator: Sendable, FeatureReducer {
 		@PresentationState
 		public var destination: Destination.State? = nil
 
+		/// Determines if the persona is first ever created across networks.
 		public var personaPrimacy: PersonaPrimacy? = nil
 
 		public init(
@@ -85,7 +86,9 @@ public struct PersonasCoordinator: Sendable, FeatureReducer {
 		switch viewAction {
 		case .appeared:
 			.run { send in
-				await send(.internal(.personaPrimacyDetermined(personasClient.determinePersonaPrimacy())))
+				await send(.internal(.personaPrimacyDetermined(
+					personasClient.determinePersonaPrimacy()
+				)))
 			}
 		}
 	}

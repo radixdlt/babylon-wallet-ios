@@ -71,7 +71,7 @@ extension AppSettings {
 				.manageP2PLinks(with: destinationStore)
 				.gatewaySettings(with: destinationStore)
 				.profileBackupSettings(with: destinationStore)
-				.accountAndPersonasHidding(with: destinationStore)
+				.accountAndPersonasHiding(with: destinationStore)
 			}
 		}
 
@@ -96,7 +96,7 @@ extension AppSettings {
 				.init(
 					title: L10n.AppSettings.EntityHiding.title,
 					subtitle: L10n.AppSettings.EntityHiding.subtitle,
-					icon: .asset(AssetResource.accountsPersonaHidding),
+					icon: .asset(AssetResource.entityHiding),
 					action: .accountAndPersonaHidingButtonTapped
 				),
 			]
@@ -175,11 +175,11 @@ private extension View {
 	}
 
 	@MainActor
-	func accountAndPersonasHidding(with destinationStore: PresentationStoreOf<AppSettings.Destinations>) -> some View {
+	func accountAndPersonasHiding(with destinationStore: PresentationStoreOf<AppSettings.Destinations>) -> some View {
 		navigationDestination(
 			store: destinationStore,
-			state: /AppSettings.Destinations.State.accountAndPersonasHidding,
-			action: AppSettings.Destinations.Action.accountAndPersonasHidding,
+			state: /AppSettings.Destinations.State.accountAndPersonasHiding,
+			action: AppSettings.Destinations.Action.accountAndPersonasHiding,
 			destination: { AccountAndPersonaHiding.View(store: $0) }
 		)
 	}

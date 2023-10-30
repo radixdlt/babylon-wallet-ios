@@ -183,7 +183,9 @@ struct Login: Sendable, FeatureReducer {
 
 	func determinePersonaPrimacy() -> Effect<Action> {
 		.run { send in
-			await send(.internal(.personaPrimacyDetermined(personasClient.determinePersonaPrimacy())))
+			await send(.internal(.personaPrimacyDetermined(
+				personasClient.determinePersonaPrimacy()
+			)))
 		}
 	}
 }

@@ -60,7 +60,7 @@ extension AccountPreferences {
 				PreferencesList(
 					viewState: .init(sections: viewStore.sections),
 					onRowSelected: { _, rowId in viewStore.send(.rowTapped(rowId)) },
-					footer: { hideAccountButton(viewStore) }
+					footer: { hideAccountButton() }
 				)
 				.task {
 					viewStore.send(.task)
@@ -80,9 +80,9 @@ extension AccountPreferences {
 
 extension AccountPreferences.View {
 	@MainActor
-	func hideAccountButton(_ viewStore: ViewStoreOf<AccountPreferences>) -> some View {
+	func hideAccountButton() -> some View {
 		Button(L10n.AccountSettings.HideAccount.button) {
-			viewStore.send(.hideAccountTapped)
+			store.send(.view(.hideAccountTapped))
 		}
 		.buttonStyle(.primaryRectangular(isDestructive: true))
 	}

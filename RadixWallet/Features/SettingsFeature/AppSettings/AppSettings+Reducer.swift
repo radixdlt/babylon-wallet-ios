@@ -49,14 +49,14 @@ public struct AppSettings: Sendable, FeatureReducer {
 			case manageP2PLinks(P2PLinksFeature.State)
 			case gatewaySettings(GatewaySettings.State)
 			case profileBackupSettings(ProfileBackupSettings.State)
-			case accountAndPersonasHidding(AccountAndPersonaHiding.State)
+			case accountAndPersonasHiding(AccountAndPersonaHiding.State)
 		}
 
 		public enum Action: Sendable, Equatable {
 			case manageP2PLinks(P2PLinksFeature.Action)
 			case gatewaySettings(GatewaySettings.Action)
 			case profileBackupSettings(ProfileBackupSettings.Action)
-			case accountAndPersonasHidding(AccountAndPersonaHiding.Action)
+			case accountAndPersonasHiding(AccountAndPersonaHiding.Action)
 		}
 
 		public var body: some ReducerOf<Self> {
@@ -69,7 +69,7 @@ public struct AppSettings: Sendable, FeatureReducer {
 			Scope(state: /State.profileBackupSettings, action: /Action.profileBackupSettings) {
 				ProfileBackupSettings()
 			}
-			Scope(state: /State.accountAndPersonasHidding, action: /Action.accountAndPersonasHidding) {
+			Scope(state: /State.accountAndPersonasHiding, action: /Action.accountAndPersonasHiding) {
 				AccountAndPersonaHiding()
 			}
 		}
@@ -109,7 +109,7 @@ public struct AppSettings: Sendable, FeatureReducer {
 			return .none
 
 		case .accountAndPersonaHidingButtonTapped:
-			state.destination = .accountAndPersonasHidding(.init())
+			state.destination = .accountAndPersonasHiding(.init())
 			return .none
 
 		case let .developerModeToggled(isEnabled):

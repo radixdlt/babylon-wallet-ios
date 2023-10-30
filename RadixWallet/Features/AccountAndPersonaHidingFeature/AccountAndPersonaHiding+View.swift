@@ -1,8 +1,8 @@
 extension AccountAndPersonaHiding.State {
 	var viewState: AccountAndPersonaHiding.ViewState {
 		.init(
-			hiddenAccountsCount: hiddenEntitiesStats?.hiddenAccountsCount ?? 0,
-			hiddenPersonasCount: hiddenEntitiesStats?.hiddenPersonasCount ?? 0
+			hiddenAccountsCount: hiddenEntityCounts?.hiddenAccountsCount ?? 0,
+			hiddenPersonasCount: hiddenEntityCounts?.hiddenPersonasCount ?? 0
 		)
 	}
 }

@@ -54,7 +54,7 @@ extension Profile.Network {
 		accounts.hidden
 	}
 
-	public func hasAnyAccount() -> Bool {
+	public func hasSomeAccount() -> Bool {
 		!accounts.isEmpty
 	}
 
