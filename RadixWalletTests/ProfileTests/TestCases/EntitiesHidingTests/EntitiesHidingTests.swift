@@ -60,7 +60,7 @@ final class EntitiesHidingTests: TestCase {
 		var sut = network
 		sut.hideAccount(account0)
 		sut.hideAccount(account1)
-		XCTAssertTrue(sut.hasAnyAccount())
+		XCTAssertTrue(sut.hasSomeAccount())
 	}
 
 	func test_GIVEN_hasHiddenAccounts_WHEN_askingForNextAccountIndex_THEN_returnsProperValue() {
@@ -86,7 +86,7 @@ final class EntitiesHidingTests: TestCase {
 		var sut = network
 		sut.hidePersona(persona0)
 		sut.hidePersona(persona1)
-		XCTAssertTrue(sut.hasAnyPersona())
+		XCTAssertTrue(sut.hasSomePersona())
 	}
 
 	func test_GIVEN_hasHiddenPersonas_WHEN_askingForNextPersonaIndex_THEN_returnsProperValue() {

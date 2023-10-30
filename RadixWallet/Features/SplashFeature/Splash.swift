@@ -106,8 +106,8 @@ public struct Splash: Sendable, FeatureReducer {
 				await send(.internal(.loadProfile(onboardingClient.loadProfile())))
 			}
 
-        case .loadProfile:
-            return checkAccountRecoveryNeeded()
+		case .loadProfile:
+			return checkAccountRecoveryNeeded()
 
 		case let .accountRecoveryNeeded(.failure(error)):
 			state.biometricsCheckFailed = true
