@@ -47,6 +47,8 @@ public struct Home: Sendable, FeatureReducer {
 
 	public enum DelegateAction: Sendable, Equatable {
 		case displaySettings
+		case exportMnemonic(controllingAccount: Profile.Network.Account)
+		case importMnemonic(controllingAccount: Profile.Network.Account)
 	}
 
 	public struct Destinations: Sendable, Reducer {
@@ -165,7 +167,7 @@ public struct Home: Sendable, FeatureReducer {
 
 		return .run { send in
 			let result = await factorSourceIDs.asyncMap { factorSourceID in
-				let hasAccessToMnemonic = await secureStorageClient.containsMnemonicIdentifiedByFactorSourceID(factorSourceID)
+				let hasAccessToMnemonic = secureStorageClient.containsMnemonicIdentifiedByFactorSourceID(factorSourceID)
 				return (factorSourceID: factorSourceID, hasAccessToMnemonic: hasAccessToMnemonic)
 			}
 
@@ -187,37 +189,19 @@ public struct Home: Sendable, FeatureReducer {
 
 			state.destination = .accountDetails(.init(
 				for: account,
-				importMnemonicPrompt: .init(needed: needToImportMnemonicForThisAccount),
-				exportMnemonicPrompt: .init(needed: needToBackupMnemonicForThisAccount)
+				isShowingImportMnemonicPrompt: needToImportMnemonicForThisAccount,
+				isShowingExportMnemonicPrompt: needToBackupMnemonicForThisAccount
 			))
 			return .none
 
 		case let .accountList(.delegate(.backUpMnemonic(controllingAccount))):
-			state.destination = .accountDetails(.init(
-				for: controllingAccount,
-				exportMnemonicPrompt: .init(needed: true, deepLinkTo: true)
-			))
-			return .none
+			return .send(.delegate(.exportMnemonic(controllingAccount: controllingAccount)))
 
-		case let .accountList(.delegate(.importMnemonics(account))):
-			state.destination = .accountDetails(.init(
-				for: account,
-				importMnemonicPrompt: .init(needed: true, deepLinkTo: true)
-			))
-			return .none
+		case let .accountList(.delegate(.importMnemonics(controllingAccount))):
+			return .send(.delegate(.importMnemonic(controllingAccount: controllingAccount)))
 
 		case .destination(.presented(.accountDetails(.delegate(.dismiss)))):
 			state.destination = nil
-			return .none
-
-		case let .destination(.presented(.accountDetails(.delegate(.importedMnemonic(factorSourceID))))):
-			/// Check if the imported mnemonic is a babylon one, so we can reset `babylonAccountRecoveryIsNeeded` flag
-			guard let account = state.accounts.first(where: { factorSourceID == $0.deviceFactorSourceID?.embed() }) else {
-				return .none
-			}
-			if !account.isOlympiaAccount {
-				state.babylonAccountRecoveryIsNeeded = false
-			}
 			return .none
 
 		default:

@@ -100,7 +100,6 @@ struct DappInteractor: Sendable, FeatureReducer {
 
 	@Dependency(\.gatewaysClient) var gatewaysClient
 	@Dependency(\.radixConnectClient) var radixConnectClient
-	@Dependency(\.continuousClock) var clock
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.rolaClient) var rolaClient
 	@Dependency(\.appPreferencesClient) var appPreferencesClient
@@ -457,12 +456,15 @@ extension DappInteractor {
 			errorQueue.schedule(error)
 		}
 	}
+}
 
+extension FeatureReducer {
 	func delayedEffect(
 		delay: Duration = .seconds(0.75),
 		for action: Action
 	) -> Effect<Action> {
-		.run { send in
+		@Dependency(\.continuousClock) var clock
+		return .run { send in
 			try await clock.sleep(for: delay)
 			await send(action)
 		}

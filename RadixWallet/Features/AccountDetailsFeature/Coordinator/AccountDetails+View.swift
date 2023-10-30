@@ -6,8 +6,8 @@ extension AccountDetails.State {
 			accountAddress: account.address,
 			appearanceID: account.appearanceID,
 			displayName: account.displayName.rawValue,
-			needToImportMnemonicForThisAccount: importMnemonicPrompt.needed,
-			needToBackupMnemonicForThisAccount: exportMnemonicPrompt.needed,
+			needToImportMnemonicForThisAccount: isShowingImportMnemonicPrompt,
+			needToBackupMnemonicForThisAccount: isShowingExportMnemonicPrompt,
 			isLedgerAccount: account.isLedgerAccount
 		)
 	}
@@ -102,24 +102,6 @@ extension AccountDetails {
 					state: /AccountDetails.Destinations.State.transfer,
 					action: AccountDetails.Destinations.Action.transfer,
 					content: { AssetTransfer.SheetView(store: $0) }
-				)
-				.fullScreenCover( /* Full Screen cover to not be able to use iOS dismiss gestures */
-					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-					state: /AccountDetails.Destinations.State.exportMnemonic,
-					action: AccountDetails.Destinations.Action.exportMnemonic,
-					content: { childStore in
-						NavigationView {
-							ImportMnemonic.View(store: childStore)
-								// FIXME: Strings
-								.navigationTitle("Backup Seed Phrase")
-						}
-					}
-				)
-				.sheet(
-					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-					state: /AccountDetails.Destinations.State.importMnemonics,
-					action: AccountDetails.Destinations.Action.importMnemonics,
-					content: { ImportMnemonicsFlowCoordinator.View(store: $0) }
 				)
 			}
 		}

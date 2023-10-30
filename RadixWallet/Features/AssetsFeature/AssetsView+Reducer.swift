@@ -88,6 +88,7 @@ public struct AssetsView: Sendable, FeatureReducer {
 
 	public enum DelegateAction: Sendable, Equatable {
 		case handleSelectedAssets(State.Mode.SelectedAssets)
+		case resourcesUpdated
 		case dismiss
 	}
 
@@ -153,7 +154,7 @@ public struct AssetsView: Sendable, FeatureReducer {
 				}
 			}
 			state.isRefreshing = false
-			return .none
+			return .send(.delegate(.resourcesUpdated))
 		}
 	}
 

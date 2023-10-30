@@ -46,23 +46,3 @@ extension DisplayMnemonic {
 		}
 	}
 }
-
-// #if DEBUG
-// import SwiftUI
-import ComposableArchitecture //
-//// MARK: - DisplayMnemonic_Preview
-// struct DisplayMnemonic_Preview: PreviewProvider {
-//	static var previews: some View {
-//		DisplayMnemonic.View(
-//			store: .init(
-//				initialState: .previewValue,
-//				reducer: DisplayMnemonic.init
-//			)
-//		)
-//	}
-// }
-//
-// extension DisplayMnemonic.State {
-//	public static let previewValue = Self()
-// }
-// #endif

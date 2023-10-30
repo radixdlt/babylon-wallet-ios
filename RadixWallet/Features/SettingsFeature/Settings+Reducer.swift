@@ -1,6 +1,12 @@
 import ComposableArchitecture
 import SwiftUI
 
+extension Settings.Destinations.State {
+	static func displayMnemonics() -> Self {
+		.accountSecurity(AccountSecurity.State(destination: .mnemonics(.init())))
+	}
+}
+
 // MARK: - Settings
 public struct Settings: Sendable, FeatureReducer {
 	public typealias Store = StoreOf<Self>
@@ -15,8 +21,10 @@ public struct Settings: Sendable, FeatureReducer {
 
 		public var shouldShowMigrateOlympiaButton: Bool = false
 		public var userHasNoP2PLinks: Bool? = nil
-
-		public init() {}
+		public let deepLinkToDisplayMnemonics: Bool
+		public init(deepLinkToDisplayMnemonics: Bool = false) {
+			self.deepLinkToDisplayMnemonics = deepLinkToDisplayMnemonics
+		}
 	}
 
 	// MARK: Action
@@ -37,6 +45,7 @@ public struct Settings: Sendable, FeatureReducer {
 	public enum InternalAction: Sendable, Equatable {
 		case loadedP2PLinks(P2PLinks)
 		case loadedShouldShowImportWalletShortcutInSettings(Bool)
+		case deepLinkToDisplayMnemonics
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -109,9 +118,13 @@ public struct Settings: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .appeared:
-			return loadShouldShowImportWalletShortcutInSettings()
-				.concatenate(
-					with: loadP2PLinks()
+			return deepLinkToDisplayMnemonicsIfNeeded(state: state)
+				.merge(
+					with:
+					loadShouldShowImportWalletShortcutInSettings()
+						.concatenate(
+							with: loadP2PLinks()
+						)
 				)
 
 		case .addP2PLinkButtonTapped:
@@ -156,6 +169,10 @@ public struct Settings: Sendable, FeatureReducer {
 		case let .loadedP2PLinks(clients):
 			state.userHasNoP2PLinks = clients.isEmpty
 			return .none
+
+		case .deepLinkToDisplayMnemonics:
+			state.destination = .accountSecurity(.init(deepLinkToDisplayMnemonics: true))
+			return .none
 		}
 	}
 
@@ -183,9 +200,8 @@ public struct Settings: Sendable, FeatureReducer {
 
 	private func hideImportOlympiaHeader(in state: inout State) -> Effect<Action> {
 		state.shouldShowMigrateOlympiaButton = false
-		return .run { _ in
-			await userDefaultsClient.setHideMigrateOlympiaButton(true)
-		}
+		userDefaultsClient.setHideMigrateOlympiaButton(true)
+		return .none
 	}
 }
 
@@ -205,5 +221,13 @@ extension Settings {
 			let shouldShow = await importLegacyWalletClient.shouldShowImportWalletShortcutInSettings()
 			await send(.internal(.loadedShouldShowImportWalletShortcutInSettings(shouldShow)))
 		}
+	}
+
+	private func deepLinkToDisplayMnemonicsIfNeeded(state: State) -> Effect<Action> {
+		guard state.deepLinkToDisplayMnemonics else {
+			return .none
+		}
+
+		return delayedEffect(for: .deepLinkToDisplayMnemonics)
 	}
 }

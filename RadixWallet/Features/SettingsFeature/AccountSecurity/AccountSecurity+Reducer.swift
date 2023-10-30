@@ -1,5 +1,7 @@
 import ComposableArchitecture
 import SwiftUI
+
+// MARK: - AccountSecurity
 public struct AccountSecurity: Sendable, FeatureReducer {
 	public typealias Store = StoreOf<Self>
 
@@ -15,8 +17,13 @@ public struct AccountSecurity: Sendable, FeatureReducer {
 		public var canImportOlympiaWallet = false
 
 		public static let importOlympia = Self(destination: .importOlympiaWallet(.init()))
+		public let deepLinkToDisplayMnemonics: Bool
+		public init(deepLinkToDisplayMnemonics: Bool) {
+			self.deepLinkToDisplayMnemonics = deepLinkToDisplayMnemonics
+		}
 
 		public init(destination: Destinations.State? = nil) {
+			self.deepLinkToDisplayMnemonics = false
 			self.destination = destination
 		}
 	}
@@ -35,6 +42,7 @@ public struct AccountSecurity: Sendable, FeatureReducer {
 	public enum InternalAction: Sendable, Equatable {
 		case loadPreferences(AppPreferences)
 		case canImportOlympiaAccountResult(Bool)
+		case deepLinkToDisplayMnemonics
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -93,20 +101,21 @@ public struct AccountSecurity: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .appeared:
-			return .run { send in
+			return deepLinkToDisplayMnemonicsIfNeeded(state: state)
+				.merge(
+					with: .run { send in
+						let preferences = await appPreferencesClient.getPreferences()
+						await send(.internal(.loadPreferences(preferences)))
 
-				let preferences = await appPreferencesClient.getPreferences()
-				await send(.internal(.loadPreferences(preferences)))
+						let currentNetworkID = await factorSourcesClient.getCurrentNetworkID()
 
-				let currentNetworkID = await factorSourcesClient.getCurrentNetworkID()
+						// we only allow import SwiftUI
+						let canImportOlympiaAccount = currentNetworkID == .mainnet
 
-				// we only allow import SwiftUI
-				let canImportOlympiaAccount = currentNetworkID == .mainnet
-
-				await send(.internal(
-					.canImportOlympiaAccountResult(canImportOlympiaAccount)
-				))
-			}
+						await send(.internal(
+							.canImportOlympiaAccountResult(canImportOlympiaAccount)
+						))
+					})
 
 		case .mnemonicsButtonTapped:
 			state.destination = .mnemonics(.init())
@@ -134,6 +143,9 @@ public struct AccountSecurity: Sendable, FeatureReducer {
 			return .none
 		case let .canImportOlympiaAccountResult(canImportOlympiaWallet):
 			state.canImportOlympiaWallet = canImportOlympiaWallet
+			return .none
+		case .deepLinkToDisplayMnemonics:
+			state.destination = .mnemonics(.init())
 			return .none
 		}
 	}
@@ -165,5 +177,18 @@ public struct AccountSecurity: Sendable, FeatureReducer {
 		return .run { _ in
 			try await appPreferencesClient.updatePreferences(preferences)
 		}
+	}
+
+	private func deepLinkToDisplayMnemonicsIfNeeded(state: State) -> Effect<Action> {
+		guard state.deepLinkToDisplayMnemonics else {
+			return .none
+		}
+		return delayedEffect(for: .deepLinkToDisplayMnemonics)
+	}
+}
+
+extension FeatureReducer {
+	func delayedEffect(for internalAction: InternalAction) -> Effect<Action> {
+		self.delayedEffect(delay: .seconds(0.6), for: .internal(internalAction))
 	}
 }

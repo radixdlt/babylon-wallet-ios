@@ -3641,13 +3641,13 @@
 		48CFBD8D2ADC10D800E77A5C /* SettingsFeature */ = {
 			isa = PBXGroup;
 			children = (
+				48CFBDBB2ADC10D800E77A5C /* Settings+Reducer.swift */,
+				48CFBDA92ADC10D800E77A5C /* Settings+View.swift */,
 				48CFBD8E2ADC10D800E77A5C /* AccountSecurity */,
+				48CFBDAA2ADC10D800E77A5C /* AppSettings */,
 				48CFBD942ADC10D800E77A5C /* DebugSettings */,
 				48CFBDA22ADC10D800E77A5C /* DisplayMnemonics */,
-				48CFBDA92ADC10D800E77A5C /* Settings+View.swift */,
-				48CFBDAA2ADC10D800E77A5C /* AppSettings */,
 				48CFBDAD2ADC10D800E77A5C /* ImportFromOlympiaLegacyWallet */,
-				48CFBDBB2ADC10D800E77A5C /* Settings+Reducer.swift */,
 			);
 			path = SettingsFeature;
 			sourceTree = "<group>";
