@@ -1108,6 +1108,25 @@ extension PrivateHDFactorSource {
 			)
 		}
 	}
+
+	func hdRoot(index: HD.Path.Component.Child.Value = 0) throws -> HierarchicalDeterministicFactorInstance {
+		let hdRoot = try mnemonicWithPassphrase.hdRoot()
+		let derivationPath = DerivationPath(
+			scheme: .cap26,
+			path: "m/44H/1022H/10H/525H/1460H/\(index)H"
+		)
+
+		let publicKey = try! hdRoot.derivePublicKey(
+			path: derivationPath,
+			curve: .curve25519
+		)
+
+		return HierarchicalDeterministicFactorInstance(
+			id: factorSource.id,
+			publicKey: publicKey,
+			derivationPath: derivationPath
+		)
+	}
 }
 
 private let deviceName: String = "iPhone"

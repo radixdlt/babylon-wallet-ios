@@ -111,25 +111,9 @@ extension Profile.Network.Account {
 		privateHDFactorSource maybePrivateHDFactorSource: PrivateHDFactorSource? = nil
 	) -> Self {
 		let privateHDFactorSource = maybePrivateHDFactorSource ?? PrivateHDFactorSource.testValue
-		let mnemonicWithPassphrase = privateHDFactorSource.mnemonicWithPassphrase
-		let factorSource = privateHDFactorSource.factorSource
 
 		let networkID = NetworkID.mainnet
-		var accounts: IdentifiedArrayOf<Profile.Network.Account> = []
-		let hdRoot = try! mnemonicWithPassphrase.hdRoot()
-		let derivationPath = DerivationPath(
-			scheme: .cap26,
-			path: "m/44H/1022H/10H/525H/1460H/\(index)H"
-		)
-		let publicKey = try! hdRoot.derivePublicKey(
-			path: derivationPath,
-			curve: .curve25519
-		)
-		let hdFactorInstance = HierarchicalDeterministicFactorInstance(
-			id: factorSource.id,
-			publicKey: publicKey,
-			derivationPath: derivationPath
-		)
+		let hdFactorInstance = try! privateHDFactorSource.hdRoot(index: index)
 
 		return try! Profile.Network.Account(
 			networkID: networkID,
@@ -149,6 +133,48 @@ extension Profile.Network.Account {
 			extraProperties: .init(
 				appearanceID: try! .init(id: .init(index))
 			)
+		)
+	}
+}
+
+extension Profile.Network.Persona {
+	static let testValue = Self.testValueIdx0
+
+	static let testValueIdx0 = Self.testValue(
+		name: "First",
+		index: 0
+	)
+
+	static let testValueIdx1 = Self.testValue(
+		name: "Second",
+		index: 1
+	)
+
+	static func testValue(
+		name nameOfPersona: String,
+		index: HD.Path.Component.Child.Value = 0,
+		privateHDFactorSource maybePrivateHDFactorSource: PrivateHDFactorSource? = nil
+	) -> Self {
+		let privateHDFactorSource = maybePrivateHDFactorSource ?? PrivateHDFactorSource.testValue
+
+		let networkID = NetworkID.mainnet
+		let hdFactorInstance = try! privateHDFactorSource.hdRoot(index: index)
+
+		return try! Profile.Network.Persona(
+			networkID: networkID,
+			address: Profile.Network.Persona.deriveVirtualAddress(
+				networkID: networkID,
+				factorInstance: hdFactorInstance
+			),
+			securityState: .unsecured(
+				.init(
+					entityIndex: index,
+					transactionSigning: hdFactorInstance
+				)
+			),
+			displayName: .init(
+				rawValue: nameOfPersona
+			)!
 		)
 	}
 }
