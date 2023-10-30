@@ -95,25 +95,30 @@ final class AppFeatureTests: TestCase {
 extension Profile.Network.Account {
 	static let testValue = Self.testValueIdx0
 
-	static let testValueIdx0 = Self.testValue(
+	static let testValueIdx0 = Self.makeTestValue(
 		name: "First",
 		index: 0
 	)
 
-	static let testValueIdx1 = Self.testValue(
+	static let testValueIdx1 = Self.makeTestValue(
 		name: "Second",
 		index: 1
 	)
 
-	static func testValue(
+	static func makeTestValue(
 		name nameOfFirstAccount: String,
 		index: HD.Path.Component.Child.Value = 0,
 		privateHDFactorSource maybePrivateHDFactorSource: PrivateHDFactorSource? = nil
 	) -> Self {
 		let privateHDFactorSource = maybePrivateHDFactorSource ?? PrivateHDFactorSource.testValue
 
+		let derivationPath = DerivationPath(
+			scheme: .cap26,
+			path: "m/44H/1022H/10H/525H/1460H/\(index)H"
+		)
+
 		let networkID = NetworkID.mainnet
-		let hdFactorInstance = try! privateHDFactorSource.hdRoot(index: index)
+		let hdFactorInstance = try! privateHDFactorSource.hdRoot(derivationPath: derivationPath)
 
 		return try! Profile.Network.Account(
 			networkID: networkID,
@@ -140,25 +145,30 @@ extension Profile.Network.Account {
 extension Profile.Network.Persona {
 	static let testValue = Self.testValueIdx0
 
-	static let testValueIdx0 = Self.testValue(
+	static let testValueIdx0 = Self.makeTestValue(
 		name: "First",
 		index: 0
 	)
 
-	static let testValueIdx1 = Self.testValue(
+	static let testValueIdx1 = Self.makeTestValue(
 		name: "Second",
 		index: 1
 	)
 
-	static func testValue(
+	static func makeTestValue(
 		name nameOfPersona: String,
 		index: HD.Path.Component.Child.Value = 0,
 		privateHDFactorSource maybePrivateHDFactorSource: PrivateHDFactorSource? = nil
 	) -> Self {
 		let privateHDFactorSource = maybePrivateHDFactorSource ?? PrivateHDFactorSource.testValue
 
+		let derivationPath = DerivationPath(
+			scheme: .cap26,
+			path: "m/44H/1022H/10H/618H/1460H/\(index)H"
+		)
+
 		let networkID = NetworkID.mainnet
-		let hdFactorInstance = try! privateHDFactorSource.hdRoot(index: index)
+		let hdFactorInstance = try! privateHDFactorSource.hdRoot(derivationPath: derivationPath)
 
 		return try! Profile.Network.Persona(
 			networkID: networkID,
@@ -234,7 +244,7 @@ extension Profile {
 	) {
 		var accounts = IdentifiedArrayOf<Profile.Network.Account>()
 		accounts.append(
-			Profile.Network.Account.testValue(
+			Profile.Network.Account.makeTestValue(
 				name: nameOfFirstAccount,
 				privateHDFactorSource: privateHDFactorSource
 			)
