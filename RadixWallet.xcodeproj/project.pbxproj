@@ -9218,8 +9218,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/davdroman/swiftui-navigation-transitions";
 			requirement = {
-				kind = upToNextMinorVersion;
-				minimumVersion = 0.13.1;
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.13.3;
 			};
 		};
 		48FFFAB82ADC209100B2B213 /* XCRemoteSwiftPackageReference "Nuke" */ = {
