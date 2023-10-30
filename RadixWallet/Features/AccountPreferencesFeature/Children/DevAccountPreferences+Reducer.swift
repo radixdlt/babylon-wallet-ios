@@ -56,8 +56,6 @@ public struct DevAccountPreferences: Sendable, FeatureReducer {
 		case createMultipleFungibleTokenButtonTapped
 		case createMultipleNonFungibleTokenButtonTapped
 		#endif // DEBUG
-
-		case qrCodeButtonTapped
 	}
 
 	public enum InternalAction: Sendable, Equatable {
@@ -85,23 +83,18 @@ public struct DevAccountPreferences: Sendable, FeatureReducer {
 
 	public struct Destination: Reducer {
 		public enum State: Equatable, Hashable {
-			case showQR(ShowQR.State)
 			#if DEBUG
 			case reviewTransaction(TransactionReview.State)
 			#endif // DEBUG
 		}
 
 		public enum Action: Equatable {
-			case showQR(ShowQR.Action)
 			#if DEBUG
 			case reviewTransaction(TransactionReview.Action)
 			#endif // DEBUG
 		}
 
 		public var body: some ReducerOf<Self> {
-			Scope(state: /State.showQR, action: /Action.showQR) {
-				ShowQR()
-			}
 			#if DEBUG
 			Scope(state: /State.reviewTransaction, action: /Action.reviewTransaction) {
 				TransactionReview()
@@ -192,10 +185,6 @@ public struct DevAccountPreferences: Sendable, FeatureReducer {
 				loggerGlobal.warning("Failed to create manifest which turns account into dapp definition account type, error: \(error)")
 			}
 		#endif
-
-		case .qrCodeButtonTapped:
-			state.destination = .showQR(.init(accountAddress: state.address))
-			return .none
 		}
 	}
 
@@ -210,12 +199,6 @@ public struct DevAccountPreferences: Sendable, FeatureReducer {
 				}
 				return .none
 			#endif
-
-			case .showQR(.delegate(.dismiss)):
-				if case .showQR = state.destination {
-					state.destination = nil
-				}
-				return .none
 
 			default:
 				return .none

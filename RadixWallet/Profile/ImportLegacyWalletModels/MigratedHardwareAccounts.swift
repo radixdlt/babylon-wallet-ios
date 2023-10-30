@@ -7,7 +7,7 @@ public struct MigratedHardwareAccounts: Sendable, Hashable {
 
 	public let accounts: NonEmpty<OrderedSet<MigratedAccount>>
 	public var babylonAccounts: Profile.Network.Accounts {
-		.init(rawValue: .init(uncheckedUniqueElements: self.accounts.rawValue.elements.map(\.babylon)))!
+		accounts.elements.map(\.babylon).asIdentifiable()
 	}
 
 	public init(

@@ -1,15 +1,8 @@
 import ComposableArchitecture
 import SwiftUI
-extension DisplayMnemonics.State {
-	var viewState: DisplayMnemonics.ViewState {
-		.init()
-	}
-}
 
 // MARK: - DisplayMnemonics.View
 extension DisplayMnemonics {
-	public struct ViewState: Equatable {}
-
 	@MainActor
 	public struct View: SwiftUI.View {
 		private let store: StoreOf<DisplayMnemonics>
@@ -19,7 +12,7 @@ extension DisplayMnemonics {
 		}
 
 		public var body: some SwiftUI.View {
-			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
+			WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
 				ScrollView {
 					VStack(alignment: .leading, spacing: .medium1) {
 						Text(L10n.SeedPhrases.message)
@@ -69,7 +62,9 @@ extension View {
 			action: { .child(.destination($0)) }
 		)
 
-		return displayMnemonicSheet(with: destinationStore)
+		return self
+			.displayMnemonicSheet(with: destinationStore)
+			.importMnemonicsSheet(with: destinationStore)
 	}
 
 	@MainActor
@@ -79,6 +74,22 @@ extension View {
 			state: /DisplayMnemonics.Destinations.State.displayMnemonic,
 			action: DisplayMnemonics.Destinations.Action.displayMnemonic,
 			destination: { DisplayMnemonic.View(store: $0) }
+		)
+	}
+
+	@MainActor
+	private func importMnemonicsSheet(with destinationStore: PresentationStoreOf<DisplayMnemonics.Destinations>) -> some View {
+		navigationDestination(
+			store: destinationStore,
+			state: /DisplayMnemonics.Destinations.State.importMnemonicControllingAccounts,
+			action: DisplayMnemonics.Destinations.Action.importMnemonicControllingAccounts,
+			destination: { importStore in
+				NavigationView {
+					ImportMnemonicControllingAccounts.View(
+						store: importStore
+					)
+				}
+			}
 		)
 	}
 }

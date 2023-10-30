@@ -1,13 +1,47 @@
 import ComposableArchitecture
 import SwiftUI
+
 extension DisplayEntitiesControlledByMnemonic.State {
-	var connectedAccounts: String {
+	var viewState: DisplayEntitiesControlledByMnemonic.ViewState {
 		let accountsCount = accountsForDeviceFactorSource.accounts.count
-		if accountsCount == 1 {
-			return L10n.SeedPhrases.SeedPhrase.oneConnectedAccount
+		let connectedAccounts: String = if accountsCount == 1 {
+			L10n.SeedPhrases.SeedPhrase.oneConnectedAccount
 		} else {
-			return L10n.SeedPhrases.SeedPhrase.multipleConnectedAccounts(accountsCount)
+			L10n.SeedPhrases.SeedPhrase.multipleConnectedAccounts(accountsCount)
 		}
+		return .init(
+			connectedAccounts: connectedAccounts,
+			buttonState: {
+				switch mode {
+				case .mnemonicCanBeDisplayed:
+					.init(title: L10n.SeedPhrases.SeedPhrase.reveal, imageAsset: AssetResource.signingKey, isError: false)
+				case .mnemonicNeedsImport:
+					.init(title: "Seed Phrase Entry Required", imageAsset: AssetResource.error, isError: true)
+				case .displayAccountListOnly: nil
+				}
+			}(),
+			promptUserToBackUpMnemonic: mode == .mnemonicCanBeDisplayed && !accountsForDeviceFactorSource.isMnemonicMarkedAsBackedUp,
+			accounts: accountsForDeviceFactorSource.accounts
+		)
+	}
+}
+
+// MARK: - DisplayEntitiesControlledByMnemonic.ViewState
+extension DisplayEntitiesControlledByMnemonic {
+	public struct ViewState: Equatable {
+		public let connectedAccounts: String
+		public struct ButtonState: Equatable {
+			public let title: String
+			public let imageAsset: ImageAsset
+			public let isError: Bool
+			var foregroundColor: Color {
+				isError ? .app.red1 : .black
+			}
+		}
+
+		public let buttonState: ButtonState?
+		public let promptUserToBackUpMnemonic: Bool
+		public let accounts: [Profile.Network.Account]
 	}
 }
 
@@ -22,33 +56,45 @@ extension DisplayEntitiesControlledByMnemonic {
 		}
 
 		public var body: some SwiftUI.View {
-			WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
+			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				VStack(alignment: .leading) {
-					if viewStore.displayRevealMnemonicLink {
+					if let buttonState = viewStore.buttonState {
 						Button {
-							viewStore.send(.tapped)
+							viewStore.send(.navigateButtonTapped)
 						} label: {
 							HStack {
-								Image(asset: AssetResource.signingKey)
+								Image(asset: buttonState.imageAsset)
 									.resizable()
+									.renderingMode(.template)
 									.frame(.smallest)
+									.foregroundColor(buttonState.foregroundColor)
 
 								VStack(alignment: .leading) {
-									Text(L10n.SeedPhrases.SeedPhrase.reveal)
+									Text(buttonState.title)
 										.textStyle(.body1Header)
-										.foregroundColor(.app.gray1)
+										.foregroundColor(buttonState.foregroundColor)
+
 									Text(viewStore.connectedAccounts)
 										.textStyle(.body2Regular)
 										.foregroundColor(.app.gray2)
 								}
 
-								Spacer()
+								Spacer(minLength: 0)
 								Image(asset: AssetResource.chevronRight)
 							}
 						}
 					}
+
+					if viewStore.promptUserToBackUpMnemonic {
+						WarningErrorView(
+							text: "Please write down your Seed Phrase",
+							type: .error,
+							useNarrowSpacing: true
+						)
+					}
+
 					VStack(alignment: .leading, spacing: .small3) {
-						ForEach(viewStore.accountsForDeviceFactorSource.accounts) { account in
+						ForEach(viewStore.accounts) { account in
 							SmallAccountCard(account: account)
 								.cornerRadius(.small1)
 						}
@@ -58,23 +104,3 @@ extension DisplayEntitiesControlledByMnemonic {
 		}
 	}
 }
-
-// #if DEBUG
-// import SwiftUI
-import ComposableArchitecture //
-//// MARK: - DisplayMnemonicRow_Preview
-// struct DisplayMnemonicRow_Preview: PreviewProvider {
-//	static var previews: some View {
-//		DisplayEntitiesControlledByMnemonic.View(
-//			store: .init(
-//				initialState: .previewValue,
-//				reducer: DisplayEntitiesControlledByMnemonic.init
-//			)
-//		)
-//	}
-// }
-//
-// extension DisplayEntitiesControlledByMnemonic.State {
-//    public static let previewValue = Self(deviceFactorSource: )
-// }
-// #endif

@@ -26,7 +26,7 @@ public struct OnboardingCoordinator: Sendable, FeatureReducer {
 	}
 
 	public enum InternalAction: Sendable, Equatable {
-		case commitEphemeralResult(TaskResult<EqVoid>)
+		case finishedOnboarding
 	}
 
 	@Dependency(\.onboardingClient) var onboardingClient
@@ -49,11 +49,8 @@ public struct OnboardingCoordinator: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
-		case .commitEphemeralResult(.success):
+		case .finishedOnboarding:
 			sendDelegateCompleted(state: state)
-
-		case let .commitEphemeralResult(.failure(error)):
-			fatalError("Unable to use app, failed to commit profile, error: \(String(describing: error))")
 		}
 	}
 
@@ -72,10 +69,8 @@ public struct OnboardingCoordinator: Sendable, FeatureReducer {
 
 		case .createAccountCoordinator(.delegate(.completed)):
 			return .run { send in
-				let result = await TaskResult<EqVoid> {
-					try await onboardingClient.commitEphemeral()
-				}
-				await send(.internal(.commitEphemeralResult(result)))
+				let _ = await onboardingClient.finishOnboarding()
+				await send(.internal(.finishedOnboarding))
 			}
 
 		default:

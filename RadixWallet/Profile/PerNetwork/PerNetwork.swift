@@ -39,6 +39,10 @@ extension Profile.Networks {
 		dictionary.count
 	}
 
+	var isEmpty: Bool {
+		count == 0
+	}
+
 	public var keys: OrderedSet<NetworkID> {
 		dictionary.keys
 	}

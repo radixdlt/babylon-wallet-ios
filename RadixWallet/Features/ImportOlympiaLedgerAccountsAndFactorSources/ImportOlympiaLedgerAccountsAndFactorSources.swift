@@ -64,7 +64,7 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 		case hasAConnectorExtension(Bool)
 
 		/// Starts the process of adding a new Ledger device
-		case useNewLedger(DeviceInfo)
+		case useNewLedger(LedgerDeviceInfo)
 
 		/// Adds a previously saved device to the list and continues
 		case useExistingLedger(LedgerHardwareWalletFactorSource)
@@ -361,7 +361,7 @@ public struct NameLedgerAndDerivePublicKeys: Sendable, FeatureReducer {
 		@PresentationState
 		public var derivePublicKeys: DerivePublicKeys.State? = nil
 
-		public init(networkID: NetworkID, olympiaAccounts: Set<OlympiaAccountToMigrate>, deviceInfo: DeviceInfo) {
+		public init(networkID: NetworkID, olympiaAccounts: Set<OlympiaAccountToMigrate>, deviceInfo: LedgerDeviceInfo) {
 			self.networkID = networkID
 			self.olympiaAccounts = olympiaAccounts
 			self.nameLedger = .init(deviceInfo: deviceInfo)

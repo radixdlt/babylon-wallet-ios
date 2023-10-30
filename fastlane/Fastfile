@@ -11,6 +11,9 @@ end
 platform :ios do
     before_all do
         Dotenv.load ".env.ios"
+        dir_to_del = ENV["SCAN_OUTPUT_DIRECTORY"]
+        puts "deleting '#{dir_to_del}'"
+        sh("rm -rf ../#{dir_to_del}") # must use "../"
     end
 
     desc "Builds and archives the app"

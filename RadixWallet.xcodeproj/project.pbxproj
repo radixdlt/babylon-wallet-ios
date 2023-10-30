@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		48649AD52ADC7CAC006307CF /* AppIcon.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 48649AD42ADC7CAC006307CF /* AppIcon.xcassets */; };
+		48AB4E842AE19F5B001B238E /* ProfileStore+AsyncSequence+Updates.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48AB4E832AE19F5B001B238E /* ProfileStore+AsyncSequence+Updates.swift */; };
+		48ABCF402AE54A1F00D6E87F /* iOS-dev-test.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 48ABCF3F2AE54A1F00D6E87F /* iOS-dev-test.xcconfig */; };
 		48CFC2392ADC10D900E77A5C /* SecurityStructureConfigurationListCoordinator+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBC632ADC10D800E77A5C /* SecurityStructureConfigurationListCoordinator+View.swift */; };
 		48CFC23A2ADC10D900E77A5C /* SecurityStructureConfigurationListCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBC642ADC10D800E77A5C /* SecurityStructureConfigurationListCoordinator.swift */; };
 		48CFC23B2ADC10D900E77A5C /* SecurityStructureConfigurationList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBC672ADC10D800E77A5C /* SecurityStructureConfigurationList.swift */; };
@@ -124,8 +126,6 @@
 		48CFC2AA2ADC10D900E77A5C /* DappDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBD0D2ADC10D800E77A5C /* DappDetails.swift */; };
 		48CFC2AB2ADC10D900E77A5C /* Home.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBD102ADC10D800E77A5C /* Home.swift */; };
 		48CFC2AC2ADC10D900E77A5C /* Home+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBD112ADC10D800E77A5C /* Home+View.swift */; };
-		48CFC2AD2ADC10D900E77A5C /* VisitHub+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBD142ADC10D800E77A5C /* VisitHub+View.swift */; };
-		48CFC2AE2ADC10D900E77A5C /* VisitHub.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBD152ADC10D800E77A5C /* VisitHub.swift */; };
 		48CFC2AF2ADC10D900E77A5C /* Header+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBD172ADC10D800E77A5C /* Header+View.swift */; };
 		48CFC2B02ADC10D900E77A5C /* Header.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBD182ADC10D800E77A5C /* Header.swift */; };
 		48CFC2B12ADC10D900E77A5C /* DerivePublicKeys+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBD1A2ADC10D800E77A5C /* DerivePublicKeys+View.swift */; };
@@ -451,7 +451,7 @@
 		48CFC4012ADC10D900E77A5C /* KeychainClient+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBF0D2ADC10D900E77A5C /* KeychainClient+Live.swift */; };
 		48CFC4022ADC10D900E77A5C /* KeychainClient+Interface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBF0E2ADC10D900E77A5C /* KeychainClient+Interface.swift */; };
 		48CFC4032ADC10D900E77A5C /* KeychainClient+Mocked.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBF0F2ADC10D900E77A5C /* KeychainClient+Mocked.swift */; };
-		48CFC4042ADC10D900E77A5C /* KeychainActor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBF102ADC10D900E77A5C /* KeychainActor.swift */; };
+		48CFC4042ADC10D900E77A5C /* KeychainHolder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBF102ADC10D900E77A5C /* KeychainHolder.swift */; };
 		48CFC4052ADC10D900E77A5C /* NoopError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBF112ADC10D900E77A5C /* NoopError.swift */; };
 		48CFC4062ADC10DA00E77A5C /* JSONValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBF122ADC10D900E77A5C /* JSONValue.swift */; };
 		48CFC4072ADC10DA00E77A5C /* HexCodable32Bytes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBF132ADC10D900E77A5C /* HexCodable32Bytes.swift */; };
@@ -991,9 +991,7 @@
 		48CFC6282ADC10DA00E77A5C /* Profile+Network.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC1A12ADC10D900E77A5C /* Profile+Network.swift */; };
 		48CFC6292ADC10DA00E77A5C /* Radix+Network.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC1A22ADC10D900E77A5C /* Radix+Network.swift */; };
 		48CFC62A2ADC10DA00E77A5C /* NetworkID+DerivationPathComponentNonHardenedValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC1A32ADC10D900E77A5C /* NetworkID+DerivationPathComponentNonHardenedValue.swift */; };
-		48CFC62B2ADC10DA00E77A5C /* LoadProfileOutcome.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC1A52ADC10D900E77A5C /* LoadProfileOutcome.swift */; };
 		48CFC62C2ADC10DA00E77A5C /* AppearanceID.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC1A62ADC10D900E77A5C /* AppearanceID.swift */; };
-		48CFC62D2ADC10DA00E77A5C /* ProfileLoadingFailure.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC1A72ADC10D900E77A5C /* ProfileLoadingFailure.swift */; };
 		48CFC62E2ADC10DA00E77A5C /* ProfileSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC1A92ADC10D900E77A5C /* ProfileSnapshot.swift */; };
 		48CFC62F2ADC10DB00E77A5C /* EncryptedProfileSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC1AA2ADC10D900E77A5C /* EncryptedProfileSnapshot.swift */; };
 		48CFC6302ADC10DB00E77A5C /* ProfileSnapshot+Header.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC1AB2ADC10D900E77A5C /* ProfileSnapshot+Header.swift */; };
@@ -1114,6 +1112,7 @@
 		48CFC6BD2ADC110800E77A5C /* Project-Beta.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 48CFC6AA2ADC110800E77A5C /* Project-Beta.xcconfig */; };
 		48CFC6BE2ADC110800E77A5C /* Project-PreAlpha.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 48CFC6AB2ADC110800E77A5C /* Project-PreAlpha.xcconfig */; };
 		48CFC6BF2ADC110800E77A5C /* Project-Release-Opt.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 48CFC6AC2ADC110800E77A5C /* Project-Release-Opt.xcconfig */; };
+		48FF43152AE43C7C00C568B9 /* TimeLimit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48FF43142AE43C7C00C568B9 /* TimeLimit.swift */; };
 		48FFFA962ADC1EBC00B2B213 /* ComposableArchitecture in Frameworks */ = {isa = PBXBuildFile; productRef = 48FFFA952ADC1EBC00B2B213 /* ComposableArchitecture */; };
 		48FFFA992ADC1EEC00B2B213 /* AsyncExtensions in Frameworks */ = {isa = PBXBuildFile; productRef = 48FFFA982ADC1EEC00B2B213 /* AsyncExtensions */; };
 		48FFFA9C2ADC1F1600B2B213 /* K1 in Frameworks */ = {isa = PBXBuildFile; productRef = 48FFFA9B2ADC1F1600B2B213 /* K1 */; };
@@ -1155,6 +1154,7 @@
 		48FFFB0A2ADC721800B2B213 /* Atomics in Frameworks */ = {isa = PBXBuildFile; productRef = 48FFFB092ADC721800B2B213 /* Atomics */; };
 		48FFFB0D2ADC744700B2B213 /* TextBuilder in Frameworks */ = {isa = PBXBuildFile; productRef = 48FFFB0C2ADC744700B2B213 /* TextBuilder */; };
 		83D0B5692AE01EDE0048DCBE /* RadixEngineToolkitError+Description.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83D0B5682AE01EDE0048DCBE /* RadixEngineToolkitError+Description.swift */; };
+		E6390FB32AE6C3E200B4DEE2 /* ProfileStore+OverlayWindowClient+Alert+OwnershipConflict.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6390FB22AE6C3E200B4DEE2 /* ProfileStore+OverlayWindowClient+Alert+OwnershipConflict.swift */; };
 		E63D123D2ADD1FC00001CBB1 /* SwiftUIIntrospect in Frameworks */ = {isa = PBXBuildFile; productRef = E63D123C2ADD1FC00001CBB1 /* SwiftUIIntrospect */; };
 		E67F14452AE029BA00738BE1 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E67F14442AE029BA00738BE1 /* Assets.xcassets */; };
 		E6A98FA82AE15324003953E2 /* BuildConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6A98FA72AE15324003953E2 /* BuildConfiguration.swift */; };
@@ -1173,7 +1173,7 @@
 		E6DBA3252ADEBFB300A38425 /* DecimalTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6DBA26B2ADEBFB200A38425 /* DecimalTests.swift */; };
 		E6DBA3262ADEBFB300A38425 /* TestFixture.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6DBA26D2ADEBFB200A38425 /* TestFixture.swift */; };
 		E6DBA3272ADEBFB300A38425 /* MockURLProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6DBA26E2ADEBFB200A38425 /* MockURLProtocol.swift */; };
-		E6DBA3282ADEBFB300A38425 /* Data+Hex+Convenience.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6DBA26F2ADEBFB200A38425 /* Data+Hex+Convenience.swift */; };
+		E6DBA3282ADEBFB300A38425 /* Misc+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6DBA26F2ADEBFB200A38425 /* Misc+Extensions.swift */; };
 		E6DBA3292ADEBFB300A38425 /* NSError+TestValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6DBA2702ADEBFB200A38425 /* NSError+TestValue.swift */; };
 		E6DBA32A2ADEBFB300A38425 /* TestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6DBA2712ADEBFB200A38425 /* TestCase.swift */; };
 		E6DBA32B2ADEBFB300A38425 /* JSON+Sendable.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6DBA2722ADEBFB200A38425 /* JSON+Sendable.swift */; };
@@ -1229,7 +1229,7 @@
 		E6DBA36A2ADEBFB300A38425 /* PersonaDataEntryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6DBA2DB2ADEBFB300A38425 /* PersonaDataEntryTests.swift */; };
 		E6DBA36B2ADEBFB300A38425 /* SnapshotJSONTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6DBA2DD2ADEBFB300A38425 /* SnapshotJSONTests.swift */; };
 		E6DBA36C2ADEBFB300A38425 /* SnapshotHeaderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6DBA2DE2ADEBFB300A38425 /* SnapshotHeaderTests.swift */; };
-		E6DBA36D2ADEBFB300A38425 /* KeychainActorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6DBA2DF2ADEBFB300A38425 /* KeychainActorTests.swift */; };
+		E6DBA36D2ADEBFB300A38425 /* KeychainHolderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6DBA2DF2ADEBFB300A38425 /* KeychainHolderTests.swift */; };
 		E6DBA36F2ADEBFB300A38425 /* OnLedgerEntitiesClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6DBA2E42ADEBFB300A38425 /* OnLedgerEntitiesClientTests.swift */; };
 		E6DBA3702ADEBFB300A38425 /* behaviors1.json in Resources */ = {isa = PBXBuildFile; fileRef = E6DBA2E62ADEBFB300A38425 /* behaviors1.json */; };
 		E6DBA3712ADEBFB300A38425 /* behaviors2.json in Resources */ = {isa = PBXBuildFile; fileRef = E6DBA2E72ADEBFB300A38425 /* behaviors2.json */; };
@@ -1237,7 +1237,6 @@
 		E6DBA3752ADEBFB300A38425 /* rola_challenge_payload_hash_vectors.json in Resources */ = {isa = PBXBuildFile; fileRef = E6DBA2EE2ADEBFB300A38425 /* rola_challenge_payload_hash_vectors.json */; };
 		E6DBA3762ADEBFB300A38425 /* ImportLegacyWalletClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6DBA2F02ADEBFB300A38425 /* ImportLegacyWalletClientTests.swift */; };
 		E6DBA3772ADEBFB300A38425 /* import_olympia_wallet_parse_test.json in Resources */ = {isa = PBXBuildFile; fileRef = E6DBA2F22ADEBFB300A38425 /* import_olympia_wallet_parse_test.json */; };
-		E6DBA3782ADEBFB300A38425 /* LocalAuthenticationClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6DBA2F42ADEBFB300A38425 /* LocalAuthenticationClientTests.swift */; };
 		E6DBA3792ADEBFB300A38425 /* SecureStorageClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6DBA2F62ADEBFB300A38425 /* SecureStorageClientTests.swift */; };
 		E6DBA37B2ADEBFB300A38425 /* TransactionClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6DBA2FA2ADEBFB300A38425 /* TransactionClientTests.swift */; };
 		E6DBA37E2ADEBFB300A38425 /* CacheClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6DBA3012ADEBFB300A38425 /* CacheClientTests.swift */; };
@@ -1266,6 +1265,8 @@
 		481B43B02ADC7F1A007945C1 /* RadixWalletTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RadixWalletTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		481B44022ADC7FB3007945C1 /* RadixWallet.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = RadixWallet.xctestplan; sourceTree = "<group>"; };
 		48649AD42ADC7CAC006307CF /* AppIcon.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = AppIcon.xcassets; sourceTree = "<group>"; };
+		48AB4E832AE19F5B001B238E /* ProfileStore+AsyncSequence+Updates.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ProfileStore+AsyncSequence+Updates.swift"; sourceTree = "<group>"; };
+		48ABCF3F2AE54A1F00D6E87F /* iOS-dev-test.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = "iOS-dev-test.xcconfig"; sourceTree = "<group>"; };
 		48CFBC4F2ADC106300E77A5C /* Radix Wallet Dev.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Radix Wallet Dev.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		48CFBC632ADC10D800E77A5C /* SecurityStructureConfigurationListCoordinator+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "SecurityStructureConfigurationListCoordinator+View.swift"; sourceTree = "<group>"; };
 		48CFBC642ADC10D800E77A5C /* SecurityStructureConfigurationListCoordinator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SecurityStructureConfigurationListCoordinator.swift; sourceTree = "<group>"; };
@@ -1383,8 +1384,6 @@
 		48CFBD0D2ADC10D800E77A5C /* DappDetails.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DappDetails.swift; sourceTree = "<group>"; };
 		48CFBD102ADC10D800E77A5C /* Home.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Home.swift; sourceTree = "<group>"; };
 		48CFBD112ADC10D800E77A5C /* Home+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Home+View.swift"; sourceTree = "<group>"; };
-		48CFBD142ADC10D800E77A5C /* VisitHub+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "VisitHub+View.swift"; sourceTree = "<group>"; };
-		48CFBD152ADC10D800E77A5C /* VisitHub.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VisitHub.swift; sourceTree = "<group>"; };
 		48CFBD172ADC10D800E77A5C /* Header+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Header+View.swift"; sourceTree = "<group>"; };
 		48CFBD182ADC10D800E77A5C /* Header.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Header.swift; sourceTree = "<group>"; };
 		48CFBD1A2ADC10D800E77A5C /* DerivePublicKeys+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "DerivePublicKeys+View.swift"; sourceTree = "<group>"; };
@@ -1711,7 +1710,7 @@
 		48CFBF0D2ADC10D900E77A5C /* KeychainClient+Live.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "KeychainClient+Live.swift"; sourceTree = "<group>"; };
 		48CFBF0E2ADC10D900E77A5C /* KeychainClient+Interface.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "KeychainClient+Interface.swift"; sourceTree = "<group>"; };
 		48CFBF0F2ADC10D900E77A5C /* KeychainClient+Mocked.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "KeychainClient+Mocked.swift"; sourceTree = "<group>"; };
-		48CFBF102ADC10D900E77A5C /* KeychainActor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KeychainActor.swift; sourceTree = "<group>"; };
+		48CFBF102ADC10D900E77A5C /* KeychainHolder.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KeychainHolder.swift; sourceTree = "<group>"; };
 		48CFBF112ADC10D900E77A5C /* NoopError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NoopError.swift; sourceTree = "<group>"; };
 		48CFBF122ADC10D900E77A5C /* JSONValue.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JSONValue.swift; sourceTree = "<group>"; };
 		48CFBF132ADC10D900E77A5C /* HexCodable32Bytes.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HexCodable32Bytes.swift; sourceTree = "<group>"; };
@@ -2254,9 +2253,7 @@
 		48CFC1A12ADC10D900E77A5C /* Profile+Network.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Profile+Network.swift"; sourceTree = "<group>"; };
 		48CFC1A22ADC10D900E77A5C /* Radix+Network.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Radix+Network.swift"; sourceTree = "<group>"; };
 		48CFC1A32ADC10D900E77A5C /* NetworkID+DerivationPathComponentNonHardenedValue.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NetworkID+DerivationPathComponentNonHardenedValue.swift"; sourceTree = "<group>"; };
-		48CFC1A52ADC10D900E77A5C /* LoadProfileOutcome.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoadProfileOutcome.swift; sourceTree = "<group>"; };
 		48CFC1A62ADC10D900E77A5C /* AppearanceID.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppearanceID.swift; sourceTree = "<group>"; };
-		48CFC1A72ADC10D900E77A5C /* ProfileLoadingFailure.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProfileLoadingFailure.swift; sourceTree = "<group>"; };
 		48CFC1A92ADC10D900E77A5C /* ProfileSnapshot.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProfileSnapshot.swift; sourceTree = "<group>"; };
 		48CFC1AA2ADC10D900E77A5C /* EncryptedProfileSnapshot.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EncryptedProfileSnapshot.swift; sourceTree = "<group>"; };
 		48CFC1AB2ADC10D900E77A5C /* ProfileSnapshot+Header.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "ProfileSnapshot+Header.swift"; sourceTree = "<group>"; };
@@ -2380,8 +2377,10 @@
 		48CFC6AB2ADC110800E77A5C /* Project-PreAlpha.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = "Project-PreAlpha.xcconfig"; sourceTree = "<group>"; };
 		48CFC6AC2ADC110800E77A5C /* Project-Release-Opt.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = "Project-Release-Opt.xcconfig"; sourceTree = "<group>"; };
 		48CFC6AD2ADC110800E77A5C /* Radix-Wallet--iOS--Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Radix-Wallet--iOS--Info.plist"; sourceTree = "<group>"; };
+		48FF43142AE43C7C00C568B9 /* TimeLimit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeLimit.swift; sourceTree = "<group>"; };
 		48FFFAF12ADC23AC00B2B213 /* Exports.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Exports.swift; sourceTree = "<group>"; };
 		83D0B5682AE01EDE0048DCBE /* RadixEngineToolkitError+Description.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RadixEngineToolkitError+Description.swift"; sourceTree = "<group>"; };
+		E6390FB22AE6C3E200B4DEE2 /* ProfileStore+OverlayWindowClient+Alert+OwnershipConflict.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ProfileStore+OverlayWindowClient+Alert+OwnershipConflict.swift"; sourceTree = "<group>"; };
 		E67F14442AE029BA00738BE1 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		E6A98FA72AE15324003953E2 /* BuildConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BuildConfiguration.swift; sourceTree = "<group>"; };
 		E6DBA25A2ADEBFB200A38425 /* PackagesEncodingDecodingTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PackagesEncodingDecodingTests.swift; sourceTree = "<group>"; };
@@ -2399,7 +2398,7 @@
 		E6DBA26B2ADEBFB200A38425 /* DecimalTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DecimalTests.swift; sourceTree = "<group>"; };
 		E6DBA26D2ADEBFB200A38425 /* TestFixture.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestFixture.swift; sourceTree = "<group>"; };
 		E6DBA26E2ADEBFB200A38425 /* MockURLProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MockURLProtocol.swift; sourceTree = "<group>"; };
-		E6DBA26F2ADEBFB200A38425 /* Data+Hex+Convenience.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Data+Hex+Convenience.swift"; sourceTree = "<group>"; };
+		E6DBA26F2ADEBFB200A38425 /* Misc+Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Misc+Extensions.swift"; sourceTree = "<group>"; };
 		E6DBA2702ADEBFB200A38425 /* NSError+TestValue.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NSError+TestValue.swift"; sourceTree = "<group>"; };
 		E6DBA2712ADEBFB200A38425 /* TestCase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestCase.swift; sourceTree = "<group>"; };
 		E6DBA2722ADEBFB200A38425 /* JSON+Sendable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "JSON+Sendable.swift"; sourceTree = "<group>"; };
@@ -2455,7 +2454,7 @@
 		E6DBA2DB2ADEBFB300A38425 /* PersonaDataEntryTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PersonaDataEntryTests.swift; sourceTree = "<group>"; };
 		E6DBA2DD2ADEBFB300A38425 /* SnapshotJSONTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SnapshotJSONTests.swift; sourceTree = "<group>"; };
 		E6DBA2DE2ADEBFB300A38425 /* SnapshotHeaderTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SnapshotHeaderTests.swift; sourceTree = "<group>"; };
-		E6DBA2DF2ADEBFB300A38425 /* KeychainActorTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KeychainActorTests.swift; sourceTree = "<group>"; };
+		E6DBA2DF2ADEBFB300A38425 /* KeychainHolderTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KeychainHolderTests.swift; sourceTree = "<group>"; };
 		E6DBA2E42ADEBFB300A38425 /* OnLedgerEntitiesClientTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OnLedgerEntitiesClientTests.swift; sourceTree = "<group>"; };
 		E6DBA2E62ADEBFB300A38425 /* behaviors1.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = behaviors1.json; sourceTree = "<group>"; };
 		E6DBA2E72ADEBFB300A38425 /* behaviors2.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = behaviors2.json; sourceTree = "<group>"; };
@@ -2463,7 +2462,6 @@
 		E6DBA2EE2ADEBFB300A38425 /* rola_challenge_payload_hash_vectors.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = rola_challenge_payload_hash_vectors.json; sourceTree = "<group>"; };
 		E6DBA2F02ADEBFB300A38425 /* ImportLegacyWalletClientTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImportLegacyWalletClientTests.swift; sourceTree = "<group>"; };
 		E6DBA2F22ADEBFB300A38425 /* import_olympia_wallet_parse_test.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = import_olympia_wallet_parse_test.json; sourceTree = "<group>"; };
-		E6DBA2F42ADEBFB300A38425 /* LocalAuthenticationClientTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LocalAuthenticationClientTests.swift; sourceTree = "<group>"; };
 		E6DBA2F62ADEBFB300A38425 /* SecureStorageClientTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SecureStorageClientTests.swift; sourceTree = "<group>"; };
 		E6DBA2FA2ADEBFB300A38425 /* TransactionClientTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TransactionClientTests.swift; sourceTree = "<group>"; };
 		E6DBA3012ADEBFB300A38425 /* CacheClientTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CacheClientTests.swift; sourceTree = "<group>"; };
@@ -2544,7 +2542,6 @@
 				E6DBA2A82ADEBFB300A38425 /* CryptographyTests */,
 				E6DBA2692ADEBFB200A38425 /* EngineKitTests */,
 				E6DBA2732ADEBFB200A38425 /* Features */,
-				E6DBA2DF2ADEBFB300A38425 /* KeychainActorTests.swift */,
 				E6DBA2992ADEBFB300A38425 /* PreludeTests */,
 				E6DBA2CD2ADEBFB300A38425 /* ProfileTests */,
 				E6DBA2572ADEBFB200A38425 /* RadixConnect */,
@@ -3230,19 +3227,9 @@
 		48CFBD122ADC10D800E77A5C /* Children */ = {
 			isa = PBXGroup;
 			children = (
-				48CFBD132ADC10D800E77A5C /* VisitHub */,
 				48CFBD162ADC10D800E77A5C /* Header */,
 			);
 			path = Children;
-			sourceTree = "<group>";
-		};
-		48CFBD132ADC10D800E77A5C /* VisitHub */ = {
-			isa = PBXGroup;
-			children = (
-				48CFBD142ADC10D800E77A5C /* VisitHub+View.swift */,
-				48CFBD152ADC10D800E77A5C /* VisitHub.swift */,
-			);
-			path = VisitHub;
 			sourceTree = "<group>";
 		};
 		48CFBD162ADC10D800E77A5C /* Header */ = {
@@ -4810,20 +4797,17 @@
 			isa = PBXGroup;
 			children = (
 				48CFBF0B2ADC10D900E77A5C /* Constants.swift */,
-				48CFBF0C2ADC10D900E77A5C /* KeychainClient */,
 				48CFBF112ADC10D900E77A5C /* NoopError.swift */,
 				48CFBF122ADC10D900E77A5C /* JSONValue.swift */,
 				48CFBF132ADC10D900E77A5C /* HexCodable32Bytes.swift */,
 				48CFBF142ADC10D900E77A5C /* UInt11.swift */,
 				48CFBF152ADC10D900E77A5C /* FiatCurrency.swift */,
 				48CFBF162ADC10D900E77A5C /* EmailAddress.swift */,
-				48CFBF172ADC10D900E77A5C /* UserDefaultsClient */,
 				48CFBF1B2ADC10D900E77A5C /* InsecureRandomNumberGeneratorWithSeed.swift */,
 				48CFBF1C2ADC10D900E77A5C /* Logger.swift */,
 				48CFBF1D2ADC10D900E77A5C /* Functions.swift */,
 				48CFBF1E2ADC10D900E77A5C /* ErrorQueue */,
 				48CFBF222ADC10D900E77A5C /* HexCodable.swift */,
-				48CFBF232ADC10D900E77A5C /* PasteboardClient */,
 				48CFBF272ADC10D900E77A5C /* Extensions */,
 				48CFBF482ADC10D900E77A5C /* JSON */,
 				48CFBF4C2ADC10D900E77A5C /* Sorted */,
@@ -4840,7 +4824,7 @@
 				48CFBF0D2ADC10D900E77A5C /* KeychainClient+Live.swift */,
 				48CFBF0E2ADC10D900E77A5C /* KeychainClient+Interface.swift */,
 				48CFBF0F2ADC10D900E77A5C /* KeychainClient+Mocked.swift */,
-				48CFBF102ADC10D900E77A5C /* KeychainActor.swift */,
+				48CFBF102ADC10D900E77A5C /* KeychainHolder.swift */,
 			);
 			path = KeychainClient;
 			sourceTree = "<group>";
@@ -4956,51 +4940,41 @@
 		48CFBF522ADC10D900E77A5C /* Clients */ = {
 			isa = PBXGroup;
 			children = (
-				48CFBF532ADC10D900E77A5C /* FactorSourcesClient */,
-				48CFBF562ADC10D900E77A5C /* DappInteractionClient */,
-				48CFBF592ADC10D900E77A5C /* RadixConnectClient */,
-				48CFBF5D2ADC10D900E77A5C /* DappInteractionClientLive */,
-				48CFBF5F2ADC10D900E77A5C /* OnboardingClient */,
-				48CFBF622ADC10D900E77A5C /* AccountsClient */,
-				48CFBF652ADC10D900E77A5C /* AuthorizedDappsClient */,
-				48CFBF682ADC10D900E77A5C /* MnemonicClient */,
-				48CFBF6C2ADC10D900E77A5C /* AppPreferencesClient */,
-				48CFBF6F2ADC10D900E77A5C /* PersonasClientLive */,
-				48CFBF712ADC10D900E77A5C /* NetworkSwitchingClient */,
-				48CFBF752ADC10D900E77A5C /* QRGeneratorClientLive */,
-				48CFBF772ADC10D900E77A5C /* CacheClient */,
-				48CFBF7B2ADC10D900E77A5C /* LedgerHardwareWalletClient */,
-				48CFBF7F2ADC10D900E77A5C /* P2PLinksClient */,
-				48CFBF822ADC10D900E77A5C /* TransactionClient */,
-				48CFBF8A2ADC10D900E77A5C /* OverlayWindowClient */,
 				48CFBF8D2ADC10D900E77A5C /* AccountPortfoliosClient */,
-				48CFBF912ADC10D900E77A5C /* ImportLegacyWalletClient */,
-				48CFBF972ADC10D900E77A5C /* PersonasClient */,
-				48CFBF9A2ADC10D900E77A5C /* AppPreferencesClientLive */,
-				48CFBF9C2ADC10D900E77A5C /* URLFormatterClientLive */,
-				48CFBF9E2ADC10D900E77A5C /* AuthorizedDappsClientLive */,
-				48CFBFA02ADC10D900E77A5C /* P2PLinksClientLive */,
-				48CFBFA22ADC10D900E77A5C /* DeviceFactorSourceClient */,
-				48CFBFA62ADC10D900E77A5C /* GatewaysClient */,
-				48CFBFA92ADC10D900E77A5C /* LocalAuthenticationClient */,
+				48CFBF622ADC10D900E77A5C /* AccountsClient */,
+				48CFBF6C2ADC10D900E77A5C /* AppPreferencesClient */,
+				48CFBF652ADC10D900E77A5C /* AuthorizedDappsClient */,
 				48CFBFAE2ADC10D900E77A5C /* BackupsClient */,
-				48CFBFB12ADC10D900E77A5C /* OverlayWindowClientLive */,
-				48CFBFB32ADC10D900E77A5C /* ROLAClient */,
-				48CFBFB82ADC10D900E77A5C /* QRGeneratorClient */,
-				48CFBFBB2ADC10D900E77A5C /* OnLedgerEntitiesClient */,
-				48CFBFC32ADC10D900E77A5C /* DiskPersistenceClient */,
-				48CFBFC72ADC10D900E77A5C /* GatewayAPI */,
-				48CFC0C32ADC10D900E77A5C /* BackupsClientLive */,
-				48CFC0C52ADC10D900E77A5C /* URLFormatterClient */,
-				48CFC0C82ADC10D900E77A5C /* SecureStorageClient */,
-				48CFC0CC2ADC10D900E77A5C /* FaucetClient */,
-				48CFC0D02ADC10D900E77A5C /* SubmitTransactionClient */,
-				48CFC0D42ADC10D900E77A5C /* OnboardingClientLive */,
+				48CFBF772ADC10D900E77A5C /* CacheClient */,
 				48CFC0D62ADC10D900E77A5C /* CameraPermissionClient */,
-				48CFC0DA2ADC10D900E77A5C /* FactorSourcesClientLive */,
+				48CFBF562ADC10D900E77A5C /* DappInteractionClient */,
+				48CFBFA22ADC10D900E77A5C /* DeviceFactorSourceClient */,
+				48CFBFC32ADC10D900E77A5C /* DiskPersistenceClient */,
+				48CFBF532ADC10D900E77A5C /* FactorSourcesClient */,
+				48CFC0CC2ADC10D900E77A5C /* FaucetClient */,
+				48CFBFC72ADC10D900E77A5C /* GatewayAPI */,
+				48CFBFA62ADC10D900E77A5C /* GatewaysClient */,
+				48CFBF912ADC10D900E77A5C /* ImportLegacyWalletClient */,
+				48CFBF7B2ADC10D900E77A5C /* LedgerHardwareWalletClient */,
+				48CFBFA92ADC10D900E77A5C /* LocalAuthenticationClient */,
+				48CFBF682ADC10D900E77A5C /* MnemonicClient */,
+				48CFBF712ADC10D900E77A5C /* NetworkSwitchingClient */,
+				48CFBF5F2ADC10D900E77A5C /* OnboardingClient */,
+				48CFBFBB2ADC10D900E77A5C /* OnLedgerEntitiesClient */,
+				48CFBF8A2ADC10D900E77A5C /* OverlayWindowClient */,
+				48CFBF7F2ADC10D900E77A5C /* P2PLinksClient */,
+				48CFBF972ADC10D900E77A5C /* PersonasClient */,
 				48CFC0DC2ADC10D900E77A5C /* ProfileStore */,
-				48CFC0DE2ADC10D900E77A5C /* AccountsClientLive */,
-				48CFC0E02ADC10D900E77A5C /* GatewaysClientLive */,
+				48CFBFB82ADC10D900E77A5C /* QRGeneratorClient */,
+				48CFBF592ADC10D900E77A5C /* RadixConnectClient */,
+				48CFBFB32ADC10D900E77A5C /* ROLAClient */,
+				48CFC0C82ADC10D900E77A5C /* SecureStorageClient */,
+				48CFC0D02ADC10D900E77A5C /* SubmitTransactionClient */,
+				48CFBF822ADC10D900E77A5C /* TransactionClient */,
+				48CFBF0C2ADC10D900E77A5C /* KeychainClient */,
+				48CFBF172ADC10D900E77A5C /* UserDefaultsClient */,
+				48CFBF232ADC10D900E77A5C /* PasteboardClient */,
+				48CFC0C52ADC10D900E77A5C /* URLFormatterClient */,
 			);
 			path = Clients;
 			sourceTree = "<group>";
@@ -5009,6 +4983,7 @@
 			isa = PBXGroup;
 			children = (
 				48CFBF542ADC10D900E77A5C /* FactorSourcesClient+Test.swift */,
+				48CFC0DB2ADC10D900E77A5C /* FactorSourcesClient+Live.swift */,
 				48CFBF552ADC10D900E77A5C /* FactorSourcesClient+Interface.swift */,
 			);
 			path = FactorSourcesClient;
@@ -5018,6 +4993,7 @@
 			isa = PBXGroup;
 			children = (
 				48CFBF572ADC10D900E77A5C /* DappInteractionClient+Interfce.swift */,
+				48CFBF5E2ADC10D900E77A5C /* DappInteractionClient+Live.swift */,
 				48CFBF582ADC10D900E77A5C /* DappInteractionClient+Test.swift */,
 			);
 			path = DappInteractionClient;
@@ -5033,19 +5009,12 @@
 			path = RadixConnectClient;
 			sourceTree = "<group>";
 		};
-		48CFBF5D2ADC10D900E77A5C /* DappInteractionClientLive */ = {
-			isa = PBXGroup;
-			children = (
-				48CFBF5E2ADC10D900E77A5C /* DappInteractionClient+Live.swift */,
-			);
-			path = DappInteractionClientLive;
-			sourceTree = "<group>";
-		};
 		48CFBF5F2ADC10D900E77A5C /* OnboardingClient */ = {
 			isa = PBXGroup;
 			children = (
 				48CFBF602ADC10D900E77A5C /* OnboardingClient+Test.swift */,
 				48CFBF612ADC10D900E77A5C /* OnboardingClient+Interface.swift */,
+				48CFC0D52ADC10D900E77A5C /* OnboardingClient+Live.swift */,
 			);
 			path = OnboardingClient;
 			sourceTree = "<group>";
@@ -5055,6 +5024,7 @@
 			children = (
 				48CFBF632ADC10D900E77A5C /* AccountsClient+Interface.swift */,
 				48CFBF642ADC10D900E77A5C /* AccountsClient+Test.swift */,
+				48CFC0DF2ADC10D900E77A5C /* AccountsClient+Live.swift */,
 			);
 			path = AccountsClient;
 			sourceTree = "<group>";
@@ -5063,6 +5033,7 @@
 			isa = PBXGroup;
 			children = (
 				48CFBF662ADC10D900E77A5C /* AuthorizedDappsClient+Test.swift */,
+				48CFBF9F2ADC10D900E77A5C /* AuthorizedDappsClient+Live.swift */,
 				48CFBF672ADC10D900E77A5C /* AuthorizedDappsClient+Interface.swift */,
 			);
 			path = AuthorizedDappsClient;
@@ -5082,17 +5053,10 @@
 			isa = PBXGroup;
 			children = (
 				48CFBF6D2ADC10D900E77A5C /* AppPreferencesClient+Interface.swift */,
+				48CFBF9B2ADC10D900E77A5C /* AppPreferencesClient+Live.swift */,
 				48CFBF6E2ADC10D900E77A5C /* AppPreferencesClient+Test.swift */,
 			);
 			path = AppPreferencesClient;
-			sourceTree = "<group>";
-		};
-		48CFBF6F2ADC10D900E77A5C /* PersonasClientLive */ = {
-			isa = PBXGroup;
-			children = (
-				48CFBF702ADC10D900E77A5C /* PersonasClient+Live.swift */,
-			);
-			path = PersonasClientLive;
 			sourceTree = "<group>";
 		};
 		48CFBF712ADC10D900E77A5C /* NetworkSwitchingClient */ = {
@@ -5103,14 +5067,6 @@
 				48CFBF742ADC10D900E77A5C /* NetworkSwitchingClient+Live.swift */,
 			);
 			path = NetworkSwitchingClient;
-			sourceTree = "<group>";
-		};
-		48CFBF752ADC10D900E77A5C /* QRGeneratorClientLive */ = {
-			isa = PBXGroup;
-			children = (
-				48CFBF762ADC10D900E77A5C /* QRGeneratorClient+Live.swift */,
-			);
-			path = QRGeneratorClientLive;
 			sourceTree = "<group>";
 		};
 		48CFBF772ADC10D900E77A5C /* CacheClient */ = {
@@ -5137,6 +5093,7 @@
 			isa = PBXGroup;
 			children = (
 				48CFBF802ADC10D900E77A5C /* P2PLinksClient+Test.swift */,
+				48CFBFA12ADC10D900E77A5C /* P2PLinksClient+Live.swift */,
 				48CFBF812ADC10D900E77A5C /* P2PLinksClient+Interface.swift */,
 			);
 			path = P2PLinksClient;
@@ -5167,6 +5124,7 @@
 			isa = PBXGroup;
 			children = (
 				48CFBF8B2ADC10D900E77A5C /* OverlayWindowClient+Test.swift */,
+				48CFBFB22ADC10D900E77A5C /* OverlayWindowClient+Live.swift */,
 				48CFBF8C2ADC10D900E77A5C /* OverlayWindowClient+Interface.swift */,
 			);
 			path = OverlayWindowClient;
@@ -5197,42 +5155,11 @@
 		48CFBF972ADC10D900E77A5C /* PersonasClient */ = {
 			isa = PBXGroup;
 			children = (
+				48CFBF702ADC10D900E77A5C /* PersonasClient+Live.swift */,
 				48CFBF982ADC10D900E77A5C /* PersonasClient+Interface.swift */,
 				48CFBF992ADC10D900E77A5C /* PersonasClient+Test.swift */,
 			);
 			path = PersonasClient;
-			sourceTree = "<group>";
-		};
-		48CFBF9A2ADC10D900E77A5C /* AppPreferencesClientLive */ = {
-			isa = PBXGroup;
-			children = (
-				48CFBF9B2ADC10D900E77A5C /* AppPreferencesClient+Live.swift */,
-			);
-			path = AppPreferencesClientLive;
-			sourceTree = "<group>";
-		};
-		48CFBF9C2ADC10D900E77A5C /* URLFormatterClientLive */ = {
-			isa = PBXGroup;
-			children = (
-				48CFBF9D2ADC10D900E77A5C /* URLFormatterClient+Live.swift */,
-			);
-			path = URLFormatterClientLive;
-			sourceTree = "<group>";
-		};
-		48CFBF9E2ADC10D900E77A5C /* AuthorizedDappsClientLive */ = {
-			isa = PBXGroup;
-			children = (
-				48CFBF9F2ADC10D900E77A5C /* AuthorizedDappsClient+Live.swift */,
-			);
-			path = AuthorizedDappsClientLive;
-			sourceTree = "<group>";
-		};
-		48CFBFA02ADC10D900E77A5C /* P2PLinksClientLive */ = {
-			isa = PBXGroup;
-			children = (
-				48CFBFA12ADC10D900E77A5C /* P2PLinksClient+Live.swift */,
-			);
-			path = P2PLinksClientLive;
 			sourceTree = "<group>";
 		};
 		48CFBFA22ADC10D900E77A5C /* DeviceFactorSourceClient */ = {
@@ -5249,6 +5176,7 @@
 			isa = PBXGroup;
 			children = (
 				48CFBFA72ADC10D900E77A5C /* GatewaysClient+Test.swift */,
+				48CFC0E12ADC10D900E77A5C /* GatewaysClient+Live.swift */,
 				48CFBFA82ADC10D900E77A5C /* GatewaysClient+Interface.swift */,
 			);
 			path = GatewaysClient;
@@ -5269,17 +5197,10 @@
 			isa = PBXGroup;
 			children = (
 				48CFBFAF2ADC10D900E77A5C /* BackupsClient+Test.swift */,
+				48CFC0C42ADC10D900E77A5C /* BackupsClient+Live.swift */,
 				48CFBFB02ADC10D900E77A5C /* BackupsClient+Interface.swift */,
 			);
 			path = BackupsClient;
-			sourceTree = "<group>";
-		};
-		48CFBFB12ADC10D900E77A5C /* OverlayWindowClientLive */ = {
-			isa = PBXGroup;
-			children = (
-				48CFBFB22ADC10D900E77A5C /* OverlayWindowClient+Live.swift */,
-			);
-			path = OverlayWindowClientLive;
 			sourceTree = "<group>";
 		};
 		48CFBFB32ADC10D900E77A5C /* ROLAClient */ = {
@@ -5296,6 +5217,7 @@
 		48CFBFB82ADC10D900E77A5C /* QRGeneratorClient */ = {
 			isa = PBXGroup;
 			children = (
+				48CFBF762ADC10D900E77A5C /* QRGeneratorClient+Live.swift */,
 				48CFBFB92ADC10D900E77A5C /* QRGeneratorClient+Interface.swift */,
 				48CFBFBA2ADC10D900E77A5C /* QRGeneratorClient+Test.swift */,
 			);
@@ -5654,19 +5576,12 @@
 			path = CreatedModels;
 			sourceTree = "<group>";
 		};
-		48CFC0C32ADC10D900E77A5C /* BackupsClientLive */ = {
-			isa = PBXGroup;
-			children = (
-				48CFC0C42ADC10D900E77A5C /* BackupsClient+Live.swift */,
-			);
-			path = BackupsClientLive;
-			sourceTree = "<group>";
-		};
 		48CFC0C52ADC10D900E77A5C /* URLFormatterClient */ = {
 			isa = PBXGroup;
 			children = (
 				48CFC0C62ADC10D900E77A5C /* URLFormatterClient+Test.swift */,
 				48CFC0C72ADC10D900E77A5C /* URLFormatterClient+Interface.swift */,
+				48CFBF9D2ADC10D900E77A5C /* URLFormatterClient+Live.swift */,
 			);
 			path = URLFormatterClient;
 			sourceTree = "<group>";
@@ -5701,14 +5616,6 @@
 			path = SubmitTransactionClient;
 			sourceTree = "<group>";
 		};
-		48CFC0D42ADC10D900E77A5C /* OnboardingClientLive */ = {
-			isa = PBXGroup;
-			children = (
-				48CFC0D52ADC10D900E77A5C /* OnboardingClient+Live.swift */,
-			);
-			path = OnboardingClientLive;
-			sourceTree = "<group>";
-		};
 		48CFC0D62ADC10D900E77A5C /* CameraPermissionClient */ = {
 			isa = PBXGroup;
 			children = (
@@ -5719,36 +5626,14 @@
 			path = CameraPermissionClient;
 			sourceTree = "<group>";
 		};
-		48CFC0DA2ADC10D900E77A5C /* FactorSourcesClientLive */ = {
-			isa = PBXGroup;
-			children = (
-				48CFC0DB2ADC10D900E77A5C /* FactorSourcesClient+Live.swift */,
-			);
-			path = FactorSourcesClientLive;
-			sourceTree = "<group>";
-		};
 		48CFC0DC2ADC10D900E77A5C /* ProfileStore */ = {
 			isa = PBXGroup;
 			children = (
 				48CFC0DD2ADC10D900E77A5C /* ProfileStore.swift */,
+				48AB4E832AE19F5B001B238E /* ProfileStore+AsyncSequence+Updates.swift */,
+				E6390FB22AE6C3E200B4DEE2 /* ProfileStore+OverlayWindowClient+Alert+OwnershipConflict.swift */,
 			);
 			path = ProfileStore;
-			sourceTree = "<group>";
-		};
-		48CFC0DE2ADC10D900E77A5C /* AccountsClientLive */ = {
-			isa = PBXGroup;
-			children = (
-				48CFC0DF2ADC10D900E77A5C /* AccountsClient+Live.swift */,
-			);
-			path = AccountsClientLive;
-			sourceTree = "<group>";
-		};
-		48CFC0E02ADC10D900E77A5C /* GatewaysClientLive */ = {
-			isa = PBXGroup;
-			children = (
-				48CFC0E12ADC10D900E77A5C /* GatewaysClient+Live.swift */,
-			);
-			path = GatewaysClientLive;
 			sourceTree = "<group>";
 		};
 		48CFC0E42ADC10D900E77A5C /* Core */ = {
@@ -6228,9 +6113,7 @@
 		48CFC1A42ADC10D900E77A5C /* Misc */ = {
 			isa = PBXGroup;
 			children = (
-				48CFC1A52ADC10D900E77A5C /* LoadProfileOutcome.swift */,
 				48CFC1A62ADC10D900E77A5C /* AppearanceID.swift */,
-				48CFC1A72ADC10D900E77A5C /* ProfileLoadingFailure.swift */,
 			);
 			path = Misc;
 			sourceTree = "<group>";
@@ -6679,6 +6562,7 @@
 		48CFC69B2ADC110800E77A5C /* iOS */ = {
 			isa = PBXGroup;
 			children = (
+				48ABCF3F2AE54A1F00D6E87F /* iOS-dev-test.xcconfig */,
 				48CFC69C2ADC110800E77A5C /* iOS-dev.xcconfig */,
 				48CFC69D2ADC110800E77A5C /* iOS-release.xcconfig */,
 				48CFC69E2ADC110800E77A5C /* iOS-alpha.xcconfig */,
@@ -6704,6 +6588,14 @@
 				48CFC6AC2ADC110800E77A5C /* Project-Release-Opt.xcconfig */,
 			);
 			path = Project;
+			sourceTree = "<group>";
+		};
+		48FF43132AE4364000C568B9 /* KeychainClientTests */ = {
+			isa = PBXGroup;
+			children = (
+				E6DBA2DF2ADEBFB300A38425 /* KeychainHolderTests.swift */,
+			);
+			path = KeychainClientTests;
 			sourceTree = "<group>";
 		};
 		E63D123B2ADD1FC00001CBB1 /* Frameworks */ = {
@@ -6793,10 +6685,11 @@
 			children = (
 				E6DBA26D2ADEBFB200A38425 /* TestFixture.swift */,
 				E6DBA26E2ADEBFB200A38425 /* MockURLProtocol.swift */,
-				E6DBA26F2ADEBFB200A38425 /* Data+Hex+Convenience.swift */,
+				E6DBA26F2ADEBFB200A38425 /* Misc+Extensions.swift */,
 				E6DBA2702ADEBFB200A38425 /* NSError+TestValue.swift */,
 				E6DBA2712ADEBFB200A38425 /* TestCase.swift */,
 				E6DBA2722ADEBFB200A38425 /* JSON+Sendable.swift */,
+				48FF43142AE43C7C00C568B9 /* TimeLimit.swift */,
 			);
 			path = TestExtensions;
 			sourceTree = "<group>";
@@ -7141,10 +7034,10 @@
 		E6DBA2E02ADEBFB300A38425 /* Clients */ = {
 			isa = PBXGroup;
 			children = (
+				48FF43132AE4364000C568B9 /* KeychainClientTests */,
 				E6DBA2E32ADEBFB300A38425 /* OnLedgerEntitiesClientTests */,
 				E6DBA2EA2ADEBFB300A38425 /* ROLAClientTests */,
 				E6DBA2EF2ADEBFB300A38425 /* ImportLegacyWalletClientTests */,
-				E6DBA2F32ADEBFB300A38425 /* LocalAuthenticationClientTests */,
 				E6DBA2F52ADEBFB300A38425 /* SecureStorageClientTests */,
 				E6DBA2F92ADEBFB300A38425 /* TransactionClientTests */,
 				E6DBA3002ADEBFB300A38425 /* CacheClientTests */,
@@ -7206,14 +7099,6 @@
 				E6DBA2F22ADEBFB300A38425 /* import_olympia_wallet_parse_test.json */,
 			);
 			path = TestVectors;
-			sourceTree = "<group>";
-		};
-		E6DBA2F32ADEBFB300A38425 /* LocalAuthenticationClientTests */ = {
-			isa = PBXGroup;
-			children = (
-				E6DBA2F42ADEBFB300A38425 /* LocalAuthenticationClientTests.swift */,
-			);
-			path = LocalAuthenticationClientTests;
 			sourceTree = "<group>";
 		};
 		E6DBA2F52ADEBFB300A38425 /* SecureStorageClientTests */ = {
@@ -7517,6 +7402,7 @@
 				48CFC6B52ADC110800E77A5C /* iOS-release-opt.xcconfig in Resources */,
 				48CFC6BF2ADC110800E77A5C /* Project-Release-Opt.xcconfig in Resources */,
 				48CFC6B12ADC110800E77A5C /* iOS-release.xcconfig in Resources */,
+				48ABCF402AE54A1F00D6E87F /* iOS-dev-test.xcconfig in Resources */,
 				48CFC6B42ADC110800E77A5C /* iOS-beta.xcconfig in Resources */,
 				48CFC6B22ADC110800E77A5C /* iOS-alpha.xcconfig in Resources */,
 				48CFC6B92ADC110800E77A5C /* Project-Release.xcconfig in Resources */,
@@ -7557,7 +7443,7 @@
 				E6DBA31C2ADEBFB300A38425 /* RadixConnectE2E.swift in Sources */,
 				E6DBA3302ADEBFB300A38425 /* AppFeatureTests.swift in Sources */,
 				E6DBA3802ADEBFB300A38425 /* ProfileStoreTests.swift in Sources */,
-				E6DBA3282ADEBFB300A38425 /* Data+Hex+Convenience.swift in Sources */,
+				E6DBA3282ADEBFB300A38425 /* Misc+Extensions.swift in Sources */,
 				E6DBA3432ADEBFB300A38425 /* UserDefaultsClientTests.swift in Sources */,
 				E6DBA33C2ADEBFB300A38425 /* SplashFeatureTests.swift in Sources */,
 				E6DBA3342ADEBFB300A38425 /* GatewaySettingsFeatureTests.swift in Sources */,
@@ -7569,6 +7455,7 @@
 				E6DBA3202ADEBFB300A38425 /* PeerConnectionMocks.swift in Sources */,
 				E6DBA3682ADEBFB300A38425 /* FactorSourcesCodableTests.swift in Sources */,
 				E6DBA3262ADEBFB300A38425 /* TestFixture.swift in Sources */,
+				48FF43152AE43C7C00C568B9 /* TimeLimit.swift in Sources */,
 				E6DBA3442ADEBFB300A38425 /* KeychainClientTests.swift in Sources */,
 				E6DBA31B2ADEBFB300A38425 /* SignalingServerClientTests.swift in Sources */,
 				E6DBA36B2ADEBFB300A38425 /* SnapshotJSONTests.swift in Sources */,
@@ -7588,7 +7475,7 @@
 				E6DBA3492ADEBFB300A38425 /* BlakeTests.swift in Sources */,
 				E6DBA3332ADEBFB300A38425 /* TransactionSigningFeatureTests.swift in Sources */,
 				E6DBA3632ADEBFB300A38425 /* ProfileTestUtils.swift in Sources */,
-				E6DBA36D2ADEBFB300A38425 /* KeychainActorTests.swift in Sources */,
+				E6DBA36D2ADEBFB300A38425 /* KeychainHolderTests.swift in Sources */,
 				E6DBA3872ADEBFB300A38425 /* LedgerModelTests.swift in Sources */,
 				E6DBA3312ADEBFB300A38425 /* AccountDetailsFeatureTests.swift in Sources */,
 				E6DBA32E2ADEBFB300A38425 /* SettingsViewStateTests.swift in Sources */,
@@ -7602,7 +7489,6 @@
 				E6DBA3882ADEBFB300A38425 /* Validation+ExtraTests.swift in Sources */,
 				E6DBA36A2ADEBFB300A38425 /* PersonaDataEntryTests.swift in Sources */,
 				E6DBA3622ADEBFB300A38425 /* MnemonicChecksumTests.swift in Sources */,
-				E6DBA3782ADEBFB300A38425 /* LocalAuthenticationClientTests.swift in Sources */,
 				E6DBA3382ADEBFB300A38425 /* CustomizeFeePayerTests.swift in Sources */,
 				E6DBA3612ADEBFB300A38425 /* BIP39TestVectors.swift in Sources */,
 				E6DBA37B2ADEBFB300A38425 /* TransactionClientTests.swift in Sources */,
@@ -7887,7 +7773,6 @@
 				48CFC4A82ADC10DA00E77A5C /* ModelErrorResponse.swift in Sources */,
 				48CFC5112ADC10DA00E77A5C /* TransactionCommittedDetailsRequestAllOf.swift in Sources */,
 				48CFC2EE2ADC10D900E77A5C /* SelectFactorView.swift in Sources */,
-				48CFC62D2ADC10DA00E77A5C /* ProfileLoadingFailure.swift in Sources */,
 				48CFC66E2ADC10DB00E77A5C /* FactorInstance.swift in Sources */,
 				48CFC5412ADC10DA00E77A5C /* NetworkConfigurationResponse.swift in Sources */,
 				48CFC5E52ADC10DA00E77A5C /* Selection+Extra.swift in Sources */,
@@ -7921,7 +7806,7 @@
 				48CFC36C2ADC10D900E77A5C /* FungibleTokenDetails+View.swift in Sources */,
 				48CFC6712ADC10DB00E77A5C /* MnemonicBasedFactorSourceKind.swift in Sources */,
 				48CFC2932ADC10D900E77A5C /* AdvancedFeesCustomization+View.swift in Sources */,
-				48CFC4042ADC10D900E77A5C /* KeychainActor.swift in Sources */,
+				48CFC4042ADC10D900E77A5C /* KeychainHolder.swift in Sources */,
 				48CFC4392ADC10DA00E77A5C /* Sorted.swift in Sources */,
 				48CFC5622ADC10DA00E77A5C /* FungibleResourcesCollectionItemGloballyAggregated.swift in Sources */,
 				48CFC2DC2ADC10D900E77A5C /* AdvancedCreateSecurityStructureFlow+View.swift in Sources */,
@@ -7941,7 +7826,6 @@
 				48CFC5D72ADC10DA00E77A5C /* NavigationBarTitleColor.swift in Sources */,
 				48CFC5B62ADC10DA00E77A5C /* CloseButton.swift in Sources */,
 				48CFC2622ADC10D900E77A5C /* EditPersona+View.swift in Sources */,
-				48CFC2AD2ADC10D900E77A5C /* VisitHub+View.swift in Sources */,
 				48CFC6592ADC10DB00E77A5C /* Profile+Account+Add.swift in Sources */,
 				48CFC3402ADC10D900E77A5C /* DappInteractionCoordinator+View.swift in Sources */,
 				48CFC3152ADC10D900E77A5C /* ScanMultipleOlympiaQRCodes+View.swift in Sources */,
@@ -8020,7 +7904,6 @@
 				48CFC5652ADC10DA00E77A5C /* MetadataNonFungibleGlobalIdValue.swift in Sources */,
 				48CFC63C2ADC10DB00E77A5C /* DerivationPathScheme.swift in Sources */,
 				48CFC43A2ADC10DA00E77A5C /* Data+Random.swift in Sources */,
-				48CFC2AE2ADC10D900E77A5C /* VisitHub.swift in Sources */,
 				48CFC4B02ADC10DA00E77A5C /* MetadataStringValue.swift in Sources */,
 				48CFC5362ADC10DA00E77A5C /* StateEntityDetailsResponse.swift in Sources */,
 				48CFC5372ADC10DA00E77A5C /* StateEntityNonFungibleResourceVaultsPageOptIns.swift in Sources */,
@@ -8067,6 +7950,7 @@
 				48CFC6602ADC10DB00E77A5C /* AuthorizedDapp.swift in Sources */,
 				48CFC2B52ADC10D900E77A5C /* EncryptOrDecryptProfile+View.swift in Sources */,
 				48CFC4282ADC10DA00E77A5C /* Data_Extensions.swift in Sources */,
+				E6390FB32AE6C3E200B4DEE2 /* ProfileStore+OverlayWindowClient+Alert+OwnershipConflict.swift in Sources */,
 				48CFC5152ADC10DA00E77A5C /* PublicKeyEcdsaSecp256k1AllOf.swift in Sources */,
 				48CFC3162ADC10D900E77A5C /* ScanMultipleOlympiaQRCodes.swift in Sources */,
 				48CFC2F72ADC10D900E77A5C /* CreationOfPersona+View.swift in Sources */,
@@ -8160,6 +8044,7 @@
 				48CFC6032ADC10DA00E77A5C /* P2P+ConnectorExtension+Response.swift in Sources */,
 				48CFC25D2ADC10D900E77A5C /* EditPersonaField.swift in Sources */,
 				48CFC2672ADC10D900E77A5C /* EditPersonaEntries+View.swift in Sources */,
+				48AB4E842AE19F5B001B238E /* ProfileStore+AsyncSequence+Updates.swift in Sources */,
 				48CFC3762ADC10D900E77A5C /* LSUStake+View.swift in Sources */,
 				48CFC4612ADC10DA00E77A5C /* MakeTransactionHeaderInput.swift in Sources */,
 				48CFC2F22ADC10D900E77A5C /* CreatePersonaCoordinator+View.swift in Sources */,
@@ -8371,7 +8256,6 @@
 				48CFC5552ADC10DA00E77A5C /* MetadataU64ArrayValue.swift in Sources */,
 				48CFC3CD2ADC10D900E77A5C /* WordList+Italian.swift in Sources */,
 				48CFC5242ADC10DA00E77A5C /* MetadataI32Value.swift in Sources */,
-				48CFC62B2ADC10DA00E77A5C /* LoadProfileOutcome.swift in Sources */,
 				48CFC2522ADC10D900E77A5C /* AddNewGateway+Reducer.swift in Sources */,
 				48CFC3FA2ADC10D900E77A5C /* SignalingClient.swift in Sources */,
 				48CFC6632ADC10DB00E77A5C /* FactorSourceProtocol.swift in Sources */,
@@ -8736,296 +8620,36 @@
 /* Begin XCBuildConfiguration section */
 		481B43B72ADC7F1A007945C1 /* Debug-Dev */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 48ABCF3F2AE54A1F00D6E87F /* iOS-dev-test.xcconfig */;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				CLANG_ANALYZER_NONNULL = YES;
-				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
-				CLANG_ENABLE_MODULES = YES;
-				CLANG_ENABLE_OBJC_ARC = YES;
-				CLANG_ENABLE_OBJC_WEAK = YES;
-				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
-				CLANG_WARN_BOOL_CONVERSION = YES;
-				CLANG_WARN_COMMA = YES;
-				CLANG_WARN_CONSTANT_CONVERSION = YES;
-				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
-				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
-				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
-				CLANG_WARN_EMPTY_BODY = YES;
-				CLANG_WARN_ENUM_CONVERSION = YES;
-				CLANG_WARN_INFINITE_RECURSION = YES;
-				CLANG_WARN_INT_CONVERSION = YES;
-				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
-				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
-				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
-				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
-				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
-				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
-				CLANG_WARN_STRICT_PROTOTYPES = YES;
-				CLANG_WARN_SUSPICIOUS_MOVE = YES;
-				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-				CLANG_WARN_UNREACHABLE_CODE = YES;
-				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				CODE_SIGN_STYLE = Manual;
-				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1;
-				DEBUG_INFORMATION_FORMAT = dwarf;
-				DEVELOPMENT_TEAM = "";
-				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = MDH99V28LM;
-				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				ENABLE_TESTABILITY = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
-				GCC_C_LANGUAGE_STANDARD = gnu17;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_NO_COMMON_BLOCKS = YES;
-				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG=1",
-					"$(inherited)",
-				);
-				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
-				GCC_WARN_UNDECLARED_SELECTOR = YES;
-				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
-				GCC_WARN_UNUSED_FUNCTION = YES;
-				GCC_WARN_UNUSED_VARIABLE = YES;
-				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
-				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
-				MARKETING_VERSION = 1.0;
-				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
-				MTL_FAST_MATH = YES;
-				ONLY_ACTIVE_ARCH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = com.radixpublishing.ios.RadixWalletTests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "";
-				SDKROOT = iphoneos;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
-				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 1;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Radix Wallet Dev.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Radix Wallet Dev";
 			};
 			name = "Debug-Dev";
 		};
 		481B43B82ADC7F1A007945C1 /* Debug-Alpha */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 48ABCF3F2AE54A1F00D6E87F /* iOS-dev-test.xcconfig */;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				CLANG_ANALYZER_NONNULL = YES;
-				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
-				CLANG_ENABLE_MODULES = YES;
-				CLANG_ENABLE_OBJC_ARC = YES;
-				CLANG_ENABLE_OBJC_WEAK = YES;
-				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
-				CLANG_WARN_BOOL_CONVERSION = YES;
-				CLANG_WARN_COMMA = YES;
-				CLANG_WARN_CONSTANT_CONVERSION = YES;
-				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
-				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
-				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
-				CLANG_WARN_EMPTY_BODY = YES;
-				CLANG_WARN_ENUM_CONVERSION = YES;
-				CLANG_WARN_INFINITE_RECURSION = YES;
-				CLANG_WARN_INT_CONVERSION = YES;
-				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
-				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
-				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
-				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
-				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
-				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
-				CLANG_WARN_STRICT_PROTOTYPES = YES;
-				CLANG_WARN_SUSPICIOUS_MOVE = YES;
-				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-				CLANG_WARN_UNREACHABLE_CODE = YES;
-				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				CODE_SIGN_STYLE = Manual;
-				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1;
-				DEBUG_INFORMATION_FORMAT = dwarf;
-				DEVELOPMENT_TEAM = "";
-				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = MDH99V28LM;
-				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				ENABLE_TESTABILITY = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
-				GCC_C_LANGUAGE_STANDARD = gnu17;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_NO_COMMON_BLOCKS = YES;
-				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG=1",
-					"$(inherited)",
-				);
-				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
-				GCC_WARN_UNDECLARED_SELECTOR = YES;
-				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
-				GCC_WARN_UNUSED_FUNCTION = YES;
-				GCC_WARN_UNUSED_VARIABLE = YES;
-				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
-				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
-				MARKETING_VERSION = 1.0;
-				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
-				MTL_FAST_MATH = YES;
-				ONLY_ACTIVE_ARCH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = com.radixpublishing.ios.RadixWalletTests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "";
-				SDKROOT = iphoneos;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
-				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 1;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Radix Wallet Dev.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Radix Wallet Dev";
 			};
 			name = "Debug-Alpha";
 		};
 		481B43B92ADC7F1A007945C1 /* Debug-PreAlpha */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 48ABCF3F2AE54A1F00D6E87F /* iOS-dev-test.xcconfig */;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				CLANG_ANALYZER_NONNULL = YES;
-				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
-				CLANG_ENABLE_MODULES = YES;
-				CLANG_ENABLE_OBJC_ARC = YES;
-				CLANG_ENABLE_OBJC_WEAK = YES;
-				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
-				CLANG_WARN_BOOL_CONVERSION = YES;
-				CLANG_WARN_COMMA = YES;
-				CLANG_WARN_CONSTANT_CONVERSION = YES;
-				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
-				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
-				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
-				CLANG_WARN_EMPTY_BODY = YES;
-				CLANG_WARN_ENUM_CONVERSION = YES;
-				CLANG_WARN_INFINITE_RECURSION = YES;
-				CLANG_WARN_INT_CONVERSION = YES;
-				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
-				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
-				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
-				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
-				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
-				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
-				CLANG_WARN_STRICT_PROTOTYPES = YES;
-				CLANG_WARN_SUSPICIOUS_MOVE = YES;
-				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-				CLANG_WARN_UNREACHABLE_CODE = YES;
-				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				CODE_SIGN_STYLE = Manual;
-				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1;
-				DEBUG_INFORMATION_FORMAT = dwarf;
-				DEVELOPMENT_TEAM = "";
-				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = MDH99V28LM;
-				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				ENABLE_TESTABILITY = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
-				GCC_C_LANGUAGE_STANDARD = gnu17;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_NO_COMMON_BLOCKS = YES;
-				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG=1",
-					"$(inherited)",
-				);
-				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
-				GCC_WARN_UNDECLARED_SELECTOR = YES;
-				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
-				GCC_WARN_UNUSED_FUNCTION = YES;
-				GCC_WARN_UNUSED_VARIABLE = YES;
-				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
-				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
-				MARKETING_VERSION = 1.0;
-				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
-				MTL_FAST_MATH = YES;
-				ONLY_ACTIVE_ARCH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = com.radixpublishing.ios.RadixWalletTests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "";
-				SDKROOT = iphoneos;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
-				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 1;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Radix Wallet Dev.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Radix Wallet Dev";
 			};
 			name = "Debug-PreAlpha";
 		};
 		481B43BA2ADC7F1A007945C1 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 48ABCF3F2AE54A1F00D6E87F /* iOS-dev-test.xcconfig */;
 			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				CLANG_ENABLE_MODULES = YES;
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
-				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = MDH99V28LM;
-				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.radixpublishing.ios.RadixWalletTests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "";
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
-				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 1;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Radix Wallet Dev.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Radix Wallet Dev";
 			};
 			name = Release;
 		};
 		481B43BB2ADC7F1A007945C1 /* Beta */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 48ABCF3F2AE54A1F00D6E87F /* iOS-dev-test.xcconfig */;
 			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				CLANG_ENABLE_MODULES = YES;
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
-				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = MDH99V28LM;
-				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.radixpublishing.ios.RadixWalletTests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "";
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
-				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 1;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Radix Wallet Dev.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Radix Wallet Dev";
 			};
 			name = Beta;
 		};

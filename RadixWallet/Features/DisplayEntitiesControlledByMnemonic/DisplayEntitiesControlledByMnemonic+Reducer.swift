@@ -9,22 +9,34 @@ public struct DisplayEntitiesControlledByMnemonic: Sendable, FeatureReducer {
 
 		public var deviceFactorSource: DeviceFactorSource { accountsForDeviceFactorSource.deviceFactorSource }
 
-		public let accountsForDeviceFactorSource: EntitiesControlledByFactorSource
-		public let displayRevealMnemonicLink: Bool
+		public var accountsForDeviceFactorSource: EntitiesControlledByFactorSource
 
-		public init(accountsForDeviceFactorSource: EntitiesControlledByFactorSource, displayRevealMnemonicLink: Bool) {
+		// Mutable since if we just imported a missing mnemonic we wanna change to `mnemonicCanBeDisplayed`
+		public var mode: Mode
+
+		public enum Mode: Sendable, Hashable {
+			case mnemonicCanBeDisplayed
+			case mnemonicNeedsImport
+			case displayAccountListOnly
+		}
+
+		public init(
+			accountsForDeviceFactorSource: EntitiesControlledByFactorSource,
+			mode: Mode
+		) {
 			self.accountsForDeviceFactorSource = accountsForDeviceFactorSource
-			self.displayRevealMnemonicLink = displayRevealMnemonicLink
+			self.mode = mode
 		}
 	}
 
 	public enum ViewAction: Sendable, Equatable {
 		case appeared
-		case tapped
+		case navigateButtonTapped
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
-		case openDetails
+		case displayMnemonic
+		case importMissingMnemonic
 	}
 
 	public init() {}
@@ -32,9 +44,17 @@ public struct DisplayEntitiesControlledByMnemonic: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .appeared:
-			.none
-		case .tapped:
-			.send(.delegate(.openDetails))
+			return .none
+		case .navigateButtonTapped:
+			switch state.mode {
+			case .mnemonicCanBeDisplayed:
+				return .send(.delegate(.displayMnemonic))
+			case .mnemonicNeedsImport:
+				return .send(.delegate(.importMissingMnemonic))
+			case .displayAccountListOnly:
+				assertionFailure("not clickable")
+				return .none
+			}
 		}
 	}
 }
