@@ -47,8 +47,7 @@ public struct Home: Sendable, FeatureReducer {
 
 	public enum DelegateAction: Sendable, Equatable {
 		case displaySettings
-		case exportMnemonic(controllingAccount: Profile.Network.Account)
-		case importMnemonic(controllingAccount: Profile.Network.Account)
+		case deepLinkToDisplayMnemonics
 	}
 
 	public struct Destinations: Sendable, Reducer {
@@ -194,11 +193,11 @@ public struct Home: Sendable, FeatureReducer {
 			))
 			return .none
 
-		case let .accountList(.delegate(.backUpMnemonic(controllingAccount))):
-			return .send(.delegate(.exportMnemonic(controllingAccount: controllingAccount)))
+		case .accountList(.delegate(.backUpMnemonic)):
+			return deepLinkToDisplayMnemonics(state: &state)
 
-		case let .accountList(.delegate(.importMnemonics(controllingAccount))):
-			return .send(.delegate(.importMnemonic(controllingAccount: controllingAccount)))
+		case .accountList(.delegate(.importMnemonics)):
+			return deepLinkToDisplayMnemonics(state: &state)
 
 		case .destination(.presented(.accountDetails(.delegate(.dismiss)))):
 			state.destination = nil
@@ -207,5 +206,11 @@ public struct Home: Sendable, FeatureReducer {
 		default:
 			return .none
 		}
+	}
+
+	private func deepLinkToDisplayMnemonics(state: inout State) -> Effect<Action> {
+		loggerGlobal.critical("hiding account details")
+		state.destination = nil // hide account details
+		return delayedEffect(delay: .seconds(0.8), for: .delegate(.deepLinkToDisplayMnemonics))
 	}
 }
