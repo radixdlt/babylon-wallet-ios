@@ -19,6 +19,70 @@ final class ImportMnemonicTests: TestCase {
 			mnemonic: "add addict address pen penalty pencil act action actor actress zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo tip"
 		)
 	}
+
+	/// Ensure that an incorrect input by user which auto completes the word
+	/// "add" into "addict" since user addicentally typed "i", results in "add"
+	/// after user erases "i" and focuses next TextField.
+	func test_addi_erase_results_in_add_not_addict() async throws {
+		let mnemonic = try Mnemonic(phrase: "add addict address pen penalty pencil act action actor actress zoo wreck", language: .english)
+		let wordsBIP39 = mnemonic.words.rawValue
+		let wordStrings = wordsBIP39.map(\.word.rawValue)
+		let testClock = TestClock()
+		let store = TestStore(
+			initialState: ImportMnemonic.State(
+				persistStrategy: nil,
+				wordCount: .twelve
+			)
+		) {
+			ImportMnemonic()
+		} withDependencies: {
+			$0.continuousClock = testClock
+			$0.mnemonicClient = .liveValue
+		}
+
+		store.exhaustivity = .off
+
+		for (index, wordBIP39) in wordsBIP39.enumerated() {
+			let word4Letters = String(wordBIP39.word.rawValue.prefix(4))
+
+			if wordBIP39.word.rawValue == "add" {
+				await store.send(
+					.child(
+						.word(
+							id: index,
+							child: .view(.wordChanged(input: "addi")) // => addict, incorrect, erasing..
+						)
+					)
+				)
+				await store.send(
+					.child(
+						.word(
+							id: index,
+							child: .view(.wordChanged(input: "add")) // corrected to "add"
+						)
+					)
+				)
+			} else {
+				await store.send(
+					.child(
+						.word(
+							id: index,
+							child: .view(.wordChanged(input: word4Letters))
+						)
+					)
+				)
+			}
+			await store.send(
+				.child(
+					.word(
+						id: index,
+						child: .delegate(.lostFocus(displayText: word4Letters))
+					)
+				)
+			)
+		}
+		XCTAssertEqual(store.state.mnemonic, mnemonic)
+	}
 }
 
 extension ImportMnemonicTests {
