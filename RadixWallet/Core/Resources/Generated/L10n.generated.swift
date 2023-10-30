@@ -1986,6 +1986,8 @@ public enum L10n {
       public static let networkFinalization = L10n.tr("Localizable", "transactionReview_customizeNetworkFeeSheet_networkFinalization", fallback: "Network Finalization")
       /// Network Storage
       public static let networkStorage = L10n.tr("Localizable", "transactionReview_customizeNetworkFeeSheet_networkStorage", fallback: "Network Storage")
+      /// No account selected
+      public static let noAccountSelected = L10n.tr("Localizable", "transactionReview_customizeNetworkFeeSheet_noAccountSelected", fallback: "No account selected")
       /// None due
       public static let noneDue = L10n.tr("Localizable", "transactionReview_customizeNetworkFeeSheet_noneDue", fallback: "None due")
       /// None required
@@ -2031,8 +2033,8 @@ public enum L10n {
       public enum SelectFeePayer {
         /// Select Fee Payer
         public static let navigationTitle = L10n.tr("Localizable", "transactionReview_customizeNetworkFeeSheet_selectFeePayer_navigationTitle", fallback: "Select Fee Payer")
-        /// No account selected
-        public static let selectAccountButtonTitle = L10n.tr("Localizable", "transactionReview_customizeNetworkFeeSheet_selectFeePayer_selectAccountButtonTitle", fallback: "No account selected")
+        /// Select Account
+        public static let selectAccountButtonTitle = L10n.tr("Localizable", "transactionReview_customizeNetworkFeeSheet_selectFeePayer_selectAccountButtonTitle", fallback: "Select Account")
         /// Select an account to pay %@ XRD transaction fee
         public static func subtitle(_ p1: Any) -> String {
           return L10n.tr("Localizable", "transactionReview_customizeNetworkFeeSheet_selectFeePayer_subtitle", String(describing: p1), fallback: "Select an account to pay %@ XRD transaction fee")

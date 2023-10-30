@@ -2,29 +2,33 @@ import ComposableArchitecture
 import SwiftUI
 extension AccountPreferences.State {
 	var viewState: AccountPreferences.ViewState {
-		.init(sections: [
-			.init(
-				id: .personalize,
-				title: L10n.AccountSettings.personalizeHeading,
-				rows: [.accountLabel(account)]
-			),
-			.init(
-				id: .onLedgerBehaviour,
-				title: L10n.AccountSettings.setBehaviorHeading,
-				rows: [.thirdPartyDeposits(account.onLedgerSettings.thirdPartyDeposits.depositRule)]
-			),
-			.init(
-				id: .development,
-				title: "Set development preferences", // FIXME: strings
-				rows: [.devAccountPreferneces()]
-			),
-		])
+		.init(
+			account: account,
+			sections: [
+				.init(
+					id: .personalize,
+					title: L10n.AccountSettings.personalizeHeading,
+					rows: [.accountLabel(account)]
+				),
+				.init(
+					id: .onLedgerBehaviour,
+					title: L10n.AccountSettings.setBehaviorHeading,
+					rows: [.thirdPartyDeposits(account.onLedgerSettings.thirdPartyDeposits.depositRule)]
+				),
+				.init(
+					id: .development,
+					title: "Set development preferences", // FIXME: strings
+					rows: [.devAccountPreferneces()]
+				),
+			]
+		)
 	}
 }
 
 // MARK: - AccountPreferences.View
 extension AccountPreferences {
 	public struct ViewState: Equatable {
+		let account: Profile.Network.Account
 		var sections: [PreferenceSection<AccountPreferences.Section, AccountPreferences.Section.SectionRow>.ViewState]
 	}
 
@@ -38,6 +42,20 @@ extension AccountPreferences {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
+				AddressView(.address(of: viewStore.account), showFull: true)
+					.textStyle(.body2Regular)
+					.foregroundColor(.app.gray2)
+					.padding(.top, .small1)
+					.padding(.horizontal, .medium3)
+					.padding(.bottom, .medium3)
+
+				Button("Show Address QR Code") { // FIXME: Strings - L10n.AccountSettings.showQR
+					viewStore.send(.qrCodeButtonTapped)
+				}
+				.buttonStyle(.secondaryRectangular(shouldExpand: true))
+				.padding(.horizontal, .medium3)
+				.padding(.bottom, .medium3)
+
 				PreferencesList(
 					viewState: .init(sections: viewStore.sections),
 					onRowSelected: { _, rowId in viewStore.send(.rowTapped(rowId)) }
@@ -62,9 +80,21 @@ extension View {
 	@MainActor
 	func destination(store: StoreOf<AccountPreferences>) -> some View {
 		let destinationStore = store.scope(state: \.$destinations, action: { .child(.destinations($0)) })
-		return updateAccountLabel(with: destinationStore)
+		return showQRCode(with: destinationStore)
+			.updateAccountLabel(with: destinationStore)
 			.thirdPartyDeposits(with: destinationStore)
 			.devAccountPreferences(with: destinationStore)
+	}
+
+	@MainActor
+	func showQRCode(with destinationStore: PresentationStoreOf<AccountPreferences.Destinations>) -> some View {
+		sheet(
+			store: destinationStore,
+			state: /AccountPreferences.Destinations.State.showQR,
+			action: AccountPreferences.Destinations.Action.showQR
+		) {
+			ShowQR.View(store: $0)
+		}
 	}
 
 	@MainActor

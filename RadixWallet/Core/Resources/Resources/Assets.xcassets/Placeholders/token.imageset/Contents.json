@@ -1,22 +1,12 @@
 {
   "images" : [
-    {
-      "idiom" : "universal",
-      "scale" : "1x"
-    },
-    {
-      "filename" : "fungible-token@2x.png",
-      "idiom" : "universal",
-      "scale" : "2x"
-    },
-    {
-      "filename" : "fungible-token@3x.png",
-      "idiom" : "universal",
-      "scale" : "3x"
-    }
+	{
+	  "filename" : "fungible-token-placeholder.pdf",
+	  "idiom" : "universal"
+	}
   ],
   "info" : {
-    "author" : "xcode",
-    "version" : 1
+	"author" : "xcode",
+	"version" : 1
   }
 }
