@@ -13,7 +13,7 @@ extension Profile {
 
 	public func hasAnyPersonaOnAnyNetwork() -> Bool {
 		networks.values
-			.map { $0.hasAnyPersona() }
+			.map { $0.hasSomePersona() }
 			.reduce(into: false) { $0 = $0 || $1 }
 	}
 }

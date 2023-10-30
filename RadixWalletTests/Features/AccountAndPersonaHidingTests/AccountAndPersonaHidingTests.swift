@@ -5,15 +5,15 @@ import XCTest
 @MainActor
 final class AccountAndPersonaHidingTests: TestCase {
 	func test_unhideAll_happyflow() async throws {
-		let stats = EntitiesVisibilityClient.HiddenEntitiesStats(hiddenAccountsCount: 5, hiddenPersonasCount: 4)
+		let counts = EntitiesVisibilityClient.HiddenEntityCounts(hiddenAccountsCount: 5, hiddenPersonasCount: 4)
 
 		let store = TestStore(
 			initialState: AccountAndPersonaHiding.State(),
 			reducer: AccountAndPersonaHiding.init
 		)
 
-		store.dependencies.entitiesVisibilityClient.getHiddenEntitiesStats = {
-			stats
+		store.dependencies.entitiesVisibilityClient.getHiddenEntityCounts = {
+			counts
 		}
 
 		let unhideAllEntitiesExpectation = expectation(description: "Waiting to unhide all entities")
@@ -30,8 +30,8 @@ final class AccountAndPersonaHidingTests: TestCase {
 
 		await store.send(.view(.task))
 
-		await store.receive(.internal(.hiddenEntitesStatsLoaded(stats))) {
-			$0.hiddenEntitiesStats = stats
+		await store.receive(.internal(.hiddenEntityCountsLoaded(counts))) {
+			$0.hiddenEntityCounts = counts
 		}
 
 		await store.send(.view(.unhideAllTapped)) {
@@ -55,20 +55,20 @@ final class AccountAndPersonaHidingTests: TestCase {
 		XCTAssertEqual(scheduledCompletionHUD, .updated)
 
 		await store.receive(.internal(.didUnhideAllEntities)) {
-			$0.hiddenEntitiesStats = .init(hiddenAccountsCount: 0, hiddenPersonasCount: 0)
+			$0.hiddenEntityCounts = .init(hiddenAccountsCount: 0, hiddenPersonasCount: 0)
 		}
 	}
 
 	func test_unhideAll_failedToUnhide_stateRemainsUnchanged() async throws {
-		let stats = EntitiesVisibilityClient.HiddenEntitiesStats(hiddenAccountsCount: 5, hiddenPersonasCount: 4)
+		let counts = EntitiesVisibilityClient.HiddenEntityCounts(hiddenAccountsCount: 5, hiddenPersonasCount: 4)
 
 		let store = TestStore(
 			initialState: AccountAndPersonaHiding.State(),
 			reducer: AccountAndPersonaHiding.init
 		)
 
-		store.dependencies.entitiesVisibilityClient.getHiddenEntitiesStats = {
-			stats
+		store.dependencies.entitiesVisibilityClient.getHiddenEntityCounts = {
+			counts
 		}
 
 		store.dependencies.entitiesVisibilityClient.unhideAllEntities = {
@@ -82,8 +82,8 @@ final class AccountAndPersonaHidingTests: TestCase {
 
 		await store.send(.view(.task))
 
-		await store.receive(.internal(.hiddenEntitesStatsLoaded(stats))) {
-			$0.hiddenEntitiesStats = stats
+		await store.receive(.internal(.hiddenEntityCountsLoaded(counts))) {
+			$0.hiddenEntityCounts = counts
 		}
 
 		await store.send(.view(.unhideAllTapped)) {

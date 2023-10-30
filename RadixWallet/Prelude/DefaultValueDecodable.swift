@@ -41,6 +41,9 @@ extension DefaultCodable {
 // MARK: - Set + EmptyInitializable
 extension Set: EmptyInitializable {}
 
+// MARK: - OrderedSet + EmptyInitializable
+extension OrderedSet: EmptyInitializable {}
+
 // MARK: - IdentifiedArray + EmptyInitializable
 extension IdentifiedArray: EmptyInitializable where Element: Identifiable, ID == Element.ID {
 	public init() {

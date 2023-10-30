@@ -63,14 +63,15 @@ extension Profile.Network {
 	}
 
 	public mutating func updateAccount(_ account: Account) throws {
-		try accounts.updateAccount(account)
+		accounts.append(account)
 	}
 
 	public mutating func addAccount(_ account: Account) throws {
 		guard accounts[id: account.id] == nil else {
 			throw AccountAlreadyExists()
 		}
-		accounts.appendAccount(account)
+
+		accounts.append(account)
 	}
 
 	public mutating func hideAccount(_ account: Profile.Network.Account) {
@@ -101,7 +102,7 @@ extension Profile.Network {
 		personas.hiden
 	}
 
-	public func hasAnyPersona() -> Bool {
+	public func hasSomePersona() -> Bool {
 		!personas.isEmpty
 	}
 
@@ -114,8 +115,7 @@ extension Profile.Network {
 			throw PersonaAlreadyExists()
 		}
 
-		let updatedElement = personas.updateOrAppend(persona)
-		assert(updatedElement == nil, "We expected this to be a new, unique, Persona, thus we expected it to be have been inserted, but it was not. Maybe all properties except the IdentityAddress was unique, and the reason why address was not unique is probably due to the fact that the wrong 'index' in the derivation path was use (same reused), due to bad logic in `storage` of the factor.")
+		personas.append(persona)
 	}
 
 	public mutating func updatePersona(_ persona: Persona) throws {

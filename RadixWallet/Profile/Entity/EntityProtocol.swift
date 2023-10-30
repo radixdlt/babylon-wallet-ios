@@ -2,7 +2,7 @@ import EngineToolkit
 
 // MARK: - EntityBaseProtocol
 public protocol EntityBaseProtocol {
-	typealias Flags = IdentifiedArrayOf<EntityFlag>
+	typealias Flags = OrderedSet<EntityFlag>
 
 	/// The ID of the network this entity exists on.
 	var networkID: NetworkID { get }

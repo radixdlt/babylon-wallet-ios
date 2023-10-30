@@ -20,7 +20,7 @@ public struct AccountAndPersonaHiding: FeatureReducer {
 	}
 
 	public enum InternalAction: Hashable, Sendable {
-		case hiddenEntitesStatsLoaded(EntitiesVisibilityClient.HiddenEntityCounts)
+		case hiddenEntityCountsLoaded(EntitiesVisibilityClient.HiddenEntityCounts)
 		case didUnhideAllEntities
 	}
 
@@ -32,8 +32,8 @@ public struct AccountAndPersonaHiding: FeatureReducer {
 		switch viewAction {
 		case .task:
 			return .run { send in
-				let hiddenEntitiesStats = try await entitiesVisibilityClient.getHiddenEntityCounts()
-				await send(.internal(.hiddenEntitesStatsLoaded(hiddenEntitiesStats)))
+				let counts = try await entitiesVisibilityClient.getHiddenEntityCounts()
+				await send(.internal(.hiddenEntityCountsLoaded(counts)))
 			}
 		case .unhideAllTapped:
 			state.confirmUnhideAllAlert = .init(
@@ -70,8 +70,8 @@ public struct AccountAndPersonaHiding: FeatureReducer {
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
-		case let .hiddenEntitesStatsLoaded(stats):
-			state.hiddenEntityCounts = stats
+		case let .hiddenEntityCountsLoaded(counts):
+			state.hiddenEntityCounts = counts
 			return .none
 		case .didUnhideAllEntities:
 			state.hiddenEntityCounts = .init(hiddenAccountsCount: 0, hiddenPersonasCount: 0)
