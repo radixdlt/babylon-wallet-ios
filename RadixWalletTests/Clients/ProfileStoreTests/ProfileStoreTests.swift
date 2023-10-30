@@ -514,32 +514,6 @@ final class ProfileStoreNewProfileTests: TestCase {
 			}
 		}
 	}
-
-	func test__GIVEN__no_profile__WHEN__finishOnboarding_without_accounts__THEN__assertionFailure() async throws {
-		try await withTimeLimit {
-			let assertionFailureIfNoAccount = self.expectation(description: "assertionFailure if finish onboarding without accounts")
-
-			try await withTestClients {
-				// GIVEN no profile
-				$0.noProfile()
-				$0.device.$model = { "marco" }
-				$0.device.$name = { "polo" }
-				then(&$0)
-			} operation: {
-				// WHEN finishedOnboarding
-				await ProfileStore().finishedOnboarding()
-			}
-
-			func then(_ d: inout DependencyValues) {
-				d.assertionFailure = AssertionFailureAction.init(action: { _, _, _ in
-					// THEN assertionFailure
-					assertionFailureIfNoAccount.fulfill()
-				})
-			}
-
-			await self.nearFutureFulfillment(of: assertionFailureIfNoAccount)
-		}
-	}
 }
 
 // MARK: - ProfileStoreExstingProfileTests
@@ -1107,6 +1081,21 @@ extension PrivateHDFactorSource {
 				mnemonicWithPassphrase: mnemonicWithPassphrase
 			)
 		}
+	}
+
+	func hdRoot(derivationPath: DerivationPath) throws -> HierarchicalDeterministicFactorInstance {
+		let hdRoot = try mnemonicWithPassphrase.hdRoot()
+
+		let publicKey = try! hdRoot.derivePublicKey(
+			path: derivationPath,
+			curve: .curve25519
+		)
+
+		return HierarchicalDeterministicFactorInstance(
+			id: factorSource.id,
+			publicKey: publicKey,
+			derivationPath: derivationPath
+		)
 	}
 }
 

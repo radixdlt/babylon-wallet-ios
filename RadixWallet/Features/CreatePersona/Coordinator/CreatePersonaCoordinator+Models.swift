@@ -40,6 +40,11 @@ public enum PersonaPrimacy: Sendable, Hashable {
 	}
 }
 
+extension PersonaPrimacy {
+	public static let firstOnAnyNetwork = Self(firstOnAnyNetwork: true, firstOnCurrent: true)
+	public static let notFirstOnCurrentNetwork = Self(firstOnAnyNetwork: false, firstOnCurrent: false)
+}
+
 // MARK: - CreatePersonaConfig
 public struct CreatePersonaConfig: Sendable, Hashable {
 	public let personaPrimacy: PersonaPrimacy

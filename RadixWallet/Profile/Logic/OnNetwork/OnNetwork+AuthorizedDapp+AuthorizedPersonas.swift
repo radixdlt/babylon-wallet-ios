@@ -57,7 +57,7 @@ extension Profile.Network {
 		let detailedAuthorizedPersonas = try IdentifiedArrayOf<Profile.Network.AuthorizedPersonaDetailed>(uniqueElements: dapp.referencesToAuthorizedPersonas.map { simple in
 
 			guard
-				let persona = self.personas.first(where: { $0.address == simple.identityAddress })
+				let persona = self.getPersonas().first(where: { $0.address == simple.identityAddress })
 			else {
 				/// this is a sign that ProfileSnapshot is in a bad state somehow...
 				throw DiscrepancyAuthorizedDappReferencedPersonaWhichDoesNotExist()
@@ -71,7 +71,7 @@ extension Profile.Network {
 				simpleAccounts: { if let sharedAccounts = simple.sharedAccounts {
 					try .init(sharedAccounts.ids.map { accountAddress in
 						guard
-							let account = self.accounts.first(where: { $0.address == accountAddress })
+							let account = self.getAccounts().first(where: { $0.address == accountAddress })
 						else {
 							throw AuthorizedDappReferencesAccountThatDoesNotExist()
 						}

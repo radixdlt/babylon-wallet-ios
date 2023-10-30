@@ -101,6 +101,16 @@ extension ProfileStore {
 		return result // in many cases `Void`.
 	}
 
+	/// Update Profile, by updating the current network
+	/// - Parameter update: A mutating update to perform on the profiles's active network
+	public func updatingOnCurrentNetwork(_ update: @Sendable (inout Profile.Network) async throws -> Void) async throws {
+		try await updating { profile in
+			var network = try await network()
+			try await update(&network)
+			try profile.updateOnNetwork(network)
+		}
+	}
+
 	/// Looks up a ProfileSnapshot for the given `header` and tries to import it,
 	/// updates `headerList` (Keychain),  `activeProfileID` (UserDefaults)
 	/// and saves the snapshot of the profile into Keychain.
@@ -177,9 +187,6 @@ extension ProfileStore {
 
 	public func finishedOnboarding() async {
 		@Dependency(\.device) var device
-		if !profile.hasMainnetAccounts() {
-			logAssertionFailure("Incorrect implementation should have accounts on mainnet after finishing onboarding.")
-		}
 		let model = await device.model
 		let name = await device.name
 		let deviceDescription = DeviceInfo.deviceDescription(
@@ -335,8 +342,8 @@ extension ProfileStore {
 
 		profile.header.lastModified = date.now
 		profile.header.contentHint.numberOfNetworks = networks.count
-		profile.header.contentHint.numberOfAccountsOnAllNetworksInTotal = networks.values.map(\.accounts.count).reduce(0, +)
-		profile.header.contentHint.numberOfPersonasOnAllNetworksInTotal = networks.values.map(\.personas.count).reduce(0, +)
+		profile.header.contentHint.numberOfAccountsOnAllNetworksInTotal = networks.values.map { $0.getAccounts().count }.reduce(0, +)
+		profile.header.contentHint.numberOfPersonasOnAllNetworksInTotal = networks.values.map { $0.getPersonas().count }.reduce(0, +)
 	}
 
 	/// Updates the in-memory copy of profile in ProfileStores and saves it, by

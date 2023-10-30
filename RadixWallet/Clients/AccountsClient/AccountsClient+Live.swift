@@ -1,5 +1,5 @@
-
 // MARK: - AccountsClient + DependencyKey
+
 extension AccountsClient: DependencyKey {
 	public typealias Value = AccountsClient
 
@@ -14,18 +14,20 @@ extension AccountsClient: DependencyKey {
 			}
 		}
 
-		let getAccountsOnCurrentNetwork: GetAccountsOnCurrentNetwork = {
-			try await profileStore.network().accounts
-		}
-
 		let getCurrentNetworkID: GetCurrentNetworkID = { await profileStore.profile.networkID }
 
-		let getAccountsOnNetwork: GetAccountsOnNetwork = { try await profileStore.profile.network(id: $0).accounts }
+		let getAccountsOnNetwork: GetAccountsOnNetwork = {
+			try await profileStore.profile.network(id: $0).getAccounts()
+		}
+
+		let getAccountsOnCurrentNetwork: GetAccountsOnCurrentNetwork = {
+			try await getAccountsOnNetwork(getCurrentNetworkID())
+		}
 
 		let nextAccountIndex: NextAccountIndex = { maybeNetworkID in
 			let currentNetworkID = await getCurrentNetworkID()
 			let networkID = maybeNetworkID ?? currentNetworkID
-			let index = await (try? getAccountsOnNetwork(networkID).count) ?? 0
+			let index = await (try? profileStore.profile.network(id: networkID).nextAccountIndex()) ?? 0
 			return HD.Path.Component.Child.Value(index)
 		}
 
@@ -60,7 +62,7 @@ extension AccountsClient: DependencyKey {
 				do {
 					let network = try await profileStore.profile.network(id: networkID)
 					// N.B. `accounts` is NonEmpty so `isEmpty` should always evaluate to `false`.
-					return !network.accounts.isEmpty
+					return network.hasSomeAccount()
 				} catch {
 					return false
 				}

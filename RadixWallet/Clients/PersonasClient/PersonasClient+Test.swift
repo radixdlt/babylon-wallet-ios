@@ -16,7 +16,8 @@ extension PersonasClient: TestDependencyKey {
 		getPersonasOnNetwork: unimplemented("\(Self.self).getPersonasOnNetwork"),
 		updatePersona: unimplemented("\(Self.self).updatePersona"),
 		saveVirtualPersona: unimplemented("\(Self.self).saveVirtualPersona"),
-		hasAnyPersonaOnAnyNetwork: unimplemented("\(Self.self).hasAnyPersonaOnAnyNetwork")
+		hasSomePersonaOnAnyNetwork: unimplemented("\(Self.self).hasAnyPersonaOnAnyNetwork"),
+		hasSomePersonaOnCurrentNetwork: unimplemented("\(Self.self).hasAnyPersonaOnCurrentNetwork")
 	)
 	public static let noop = Self(
 		personas: { AsyncLazySequence([]).eraseToAnyAsyncSequence() },
@@ -25,6 +26,7 @@ extension PersonasClient: TestDependencyKey {
 		getPersonasOnNetwork: { _ in .init() },
 		updatePersona: { _ in throw NoopError() },
 		saveVirtualPersona: { _ in },
-		hasAnyPersonaOnAnyNetwork: { true }
+		hasSomePersonaOnAnyNetwork: { true },
+		hasSomePersonaOnCurrentNetwork: { true }
 	)
 }

@@ -15,19 +15,18 @@ extension Profile {
 		/// have been added and dApps connected.
 		public let networkID: NetworkID
 
-		public typealias Accounts = IdentifiedArrayOf<Account>
+		public typealias Accounts = NonEmpty<IdentifiedArrayOf<Account>>
 
-		/// An identifiable ordered set of `Account`s created by the user for this network,
-		/// can be empty
-		public var accounts: Accounts
+		/// An identifiable ordered set of `Account`s created by the user for this network.
+		private var accounts: Accounts
 
 		public typealias Personas = IdentifiedArrayOf<Persona>
 		/// An identifiable ordered set of `Persona`s created by the user for this network.
-		public var personas: Personas
+		private var personas: Personas
 
 		public typealias AuthorizedDapps = IdentifiedArrayOf<AuthorizedDapp>
 		/// An identifiable ordered set of `AuthorizedDapp`s the user has connected to.
-		public var authorizedDapps: AuthorizedDapps
+		var authorizedDapps: AuthorizedDapps
 
 		public init(
 			networkID: NetworkID,
@@ -40,6 +39,109 @@ extension Profile {
 			self.personas = personas
 			self.authorizedDapps = authorizedDapps
 		}
+	}
+}
+
+// MARK: - AccountAlreadyExists
+struct AccountAlreadyExists: Swift.Error {}
+
+extension Profile.Network {
+	public func getAccounts() -> IdentifiedArrayOf<Account> {
+		accounts.nonHidden
+	}
+
+	public func getHiddenAccounts() -> IdentifiedArrayOf<Account> {
+		accounts.hidden
+	}
+
+	public func hasSomeAccount() -> Bool {
+		!accounts.isEmpty
+	}
+
+	public func nextAccountIndex() -> Int {
+		accounts.count
+	}
+
+	public mutating func updateAccount(_ account: Account) throws {
+		accounts.append(account)
+	}
+
+	public mutating func addAccount(_ account: Account) throws {
+		guard accounts[id: account.id] == nil else {
+			throw AccountAlreadyExists()
+		}
+
+		accounts.append(account)
+	}
+
+	public mutating func hideAccount(_ account: Profile.Network.Account) {
+		var identifiedArrayOf = accounts.rawValue
+		identifiedArrayOf[id: account.address]?.hide()
+		accounts = .init(rawValue: identifiedArrayOf)!
+
+		authorizedDapps.mutateAll { dapp in
+			dapp.referencesToAuthorizedPersonas.mutateAll { persona in
+				persona.sharedAccounts?.ids.remove(account.address)
+			}
+		}
+	}
+}
+
+// MARK: - PersonaAlreadyExists
+struct PersonaAlreadyExists: Swift.Error {}
+
+// MARK: - TryingToUpdateAPersonaWhichIsNotAlreadySaved
+struct TryingToUpdateAPersonaWhichIsNotAlreadySaved: Swift.Error {}
+
+extension Profile.Network {
+	public func getPersonas() -> IdentifiedArrayOf<Persona> {
+		personas.nonHidden
+	}
+
+	public func getHiddenPersonas() -> IdentifiedArrayOf<Persona> {
+		personas.hiden
+	}
+
+	public func hasSomePersona() -> Bool {
+		!personas.isEmpty
+	}
+
+	public func nextPersonaIndex() -> Int {
+		personas.count
+	}
+
+	public mutating func addPersona(_ persona: Persona) throws {
+		guard personas[id: persona.id] == nil else {
+			throw PersonaAlreadyExists()
+		}
+
+		personas.append(persona)
+	}
+
+	public mutating func updatePersona(_ persona: Persona) throws {
+		guard personas.updateOrAppend(persona) != nil else {
+			throw TryingToUpdateAPersonaWhichIsNotAlreadySaved()
+		}
+	}
+
+	public mutating func hidePersona(_ personaToHide: Persona) {
+		/// Hide the persona itself
+		personas[id: personaToHide.id]?.hide()
+
+		/// Remove the persona reference on any authorized dapp
+		authorizedDapps.mutateAll { dapp in
+			dapp.referencesToAuthorizedPersonas.remove(id: personaToHide.id)
+		}
+
+		/// Filter out dapps that do not reference any persona
+		authorizedDapps.filterInPlace(not(\.referencesToAuthorizedPersonas.isEmpty))
+	}
+}
+
+extension Profile.Network {
+	public mutating func unhideAllEntities() {
+		accounts.mutateAll { $0.unhide() }
+		personas.mutateAll { $0.unhide() }
 	}
 }
 

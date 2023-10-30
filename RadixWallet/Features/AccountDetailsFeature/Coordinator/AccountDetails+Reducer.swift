@@ -140,6 +140,11 @@ public struct AccountDetails: Sendable, FeatureReducer {
 
 		case .assets(.delegate(.resourcesUpdated)):
 			return checkIfShouldShowExportMnemonicPrompt(state: &state)
+
+		case .destination(.presented(.preferences(.delegate(.accountHidden)))):
+			state.destination = nil
+			return .send(.delegate(.dismiss))
+
 		default:
 			return .none
 		}

@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import SwiftUI
+
 extension AccountPreferences.State {
 	var viewState: AccountPreferences.ViewState {
 		.init(
@@ -58,7 +59,8 @@ extension AccountPreferences {
 
 				PreferencesList(
 					viewState: .init(sections: viewStore.sections),
-					onRowSelected: { _, rowId in viewStore.send(.rowTapped(rowId)) }
+					onRowSelected: { _, rowId in viewStore.send(.rowTapped(rowId)) },
+					footer: { hideAccountButton() }
 				)
 				.task {
 					viewStore.send(.task)
@@ -76,6 +78,16 @@ extension AccountPreferences {
 	}
 }
 
+extension AccountPreferences.View {
+	@MainActor
+	func hideAccountButton() -> some View {
+		Button(L10n.AccountSettings.HideAccount.button) {
+			store.send(.view(.hideAccountTapped))
+		}
+		.buttonStyle(.primaryRectangular(isDestructive: true))
+	}
+}
+
 extension View {
 	@MainActor
 	func destination(store: StoreOf<AccountPreferences>) -> some View {
@@ -84,6 +96,7 @@ extension View {
 			.updateAccountLabel(with: destinationStore)
 			.thirdPartyDeposits(with: destinationStore)
 			.devAccountPreferences(with: destinationStore)
+			.confirmHideAccountAlert(with: destinationStore)
 	}
 
 	@MainActor
@@ -124,6 +137,15 @@ extension View {
 			state: /AccountPreferences.Destinations.State.devPreferences,
 			action: AccountPreferences.Destinations.Action.devPreferences,
 			destination: { DevAccountPreferences.View(store: $0) }
+		)
+	}
+
+	@MainActor
+	func confirmHideAccountAlert(with destinationStore: PresentationStoreOf<AccountPreferences.Destinations>) -> some View {
+		alert(
+			store: destinationStore,
+			state: /AccountPreferences.Destinations.State.confirmHideAccount,
+			action: AccountPreferences.Destinations.Action.confirmHideAccount
 		)
 	}
 }
