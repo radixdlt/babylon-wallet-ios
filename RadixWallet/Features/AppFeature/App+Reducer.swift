@@ -78,10 +78,10 @@ public struct App: Sendable, FeatureReducer {
 			goToMain(state: &state, accountRecoveryIsNeeded: false)
 
 		case let .splash(.delegate(.completed(profile, accountRecoveryNeeded))):
-			if profile.hasMainnetAccounts() {
-				goToMain(state: &state, accountRecoveryIsNeeded: accountRecoveryNeeded)
-			} else {
+			if profile.networks.isEmpty {
 				goToOnboarding(state: &state)
+			} else {
+				goToMain(state: &state, accountRecoveryIsNeeded: accountRecoveryNeeded)
 			}
 		default:
 			.none

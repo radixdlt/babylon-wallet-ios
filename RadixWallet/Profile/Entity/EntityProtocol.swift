@@ -2,6 +2,8 @@ import EngineToolkit
 
 // MARK: - EntityBaseProtocol
 public protocol EntityBaseProtocol {
+	typealias Flags = OrderedSet<EntityFlag>
+
 	/// The ID of the network this entity exists on.
 	var networkID: NetworkID { get }
 
@@ -14,6 +16,9 @@ public protocol EntityBaseProtocol {
 
 	/// A required non empty display name, used by presentation layer and sent to Dapps when requested.
 	var displayName: NonEmpty<String> { get }
+
+	/// Flags that are currently set on entity.
+	var flags: Flags { get }
 }
 
 extension EntityBaseProtocol {
@@ -131,5 +136,11 @@ extension EntityProtocol {
 			throw EntityKindMismatchDiscrepancy()
 		}
 		return entity
+	}
+}
+
+extension EntityBaseProtocol {
+	public var isHidden: Bool {
+		flags.contains(.deletedByUser)
 	}
 }

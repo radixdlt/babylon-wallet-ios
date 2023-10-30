@@ -231,6 +231,10 @@ public struct AccountDetails: Sendable, FeatureReducer {
 				return .send(.delegate(.importedMnemonic(factorSourceID)))
 			}
 
+		case .destination(.presented(.preferences(.delegate(.accountHidden)))):
+			state.destination = nil
+			return .send(.delegate(.dismiss))
+
 		case .destination(.dismiss):
 			return checkAccountSecurityPromptStatus(state: &state)
 

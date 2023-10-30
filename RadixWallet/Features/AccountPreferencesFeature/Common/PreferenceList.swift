@@ -111,7 +111,7 @@ struct PreferenceSection<SectionId: Hashable, RowId: Hashable>: View {
 }
 
 // MARK: - PreferencesList
-struct PreferencesList<SectionId: Hashable, RowId: Hashable>: View {
+struct PreferencesList<SectionId: Hashable, RowId: Hashable, Footer: View>: View {
 	struct ViewState: Equatable {
 		let sections: [PreferenceSection<SectionId, RowId>.ViewState]
 	}
@@ -119,12 +119,27 @@ struct PreferencesList<SectionId: Hashable, RowId: Hashable>: View {
 	let viewState: ViewState
 
 	var onRowSelected: (SectionId, RowId) -> Void
+	let footer: Footer
+
+	init(
+		viewState: ViewState,
+		onRowSelected: @escaping (SectionId, RowId) -> Void,
+		@ViewBuilder footer: () -> Footer = { EmptyView() }
+	) {
+		self.viewState = viewState
+		self.onRowSelected = onRowSelected
+		self.footer = footer()
+	}
 
 	var body: some View {
 		List {
 			ForEach(viewState.sections, id: \.id) { section in
 				PreferenceSection(viewState: section, onRowSelected: onRowSelected)
 			}
+
+			footer
+				.listRowSeparator(.hidden)
+				.listRowBackground(Color.clear)
 		}
 		.scrollContentBackground(.hidden)
 		.listStyle(.grouped)

@@ -3,27 +3,6 @@ import EngineToolkit
 // MARK: - PersonaNotConnected
 struct PersonaNotConnected: Swift.Error {}
 
-// MARK: - AccountAlreadyExists
-struct AccountAlreadyExists: Swift.Error {}
-
-extension Profile.Network.Accounts {
-	// FIXME: refactor
-	@discardableResult
-	public mutating func appendAccount(_ account: Profile.Network.Account) -> Profile.Network.Account {
-		let (wasInserted, _) = self.append(account)
-		assert(wasInserted, "We expected this to be a new, unique, Account, thus we expected it to be have been inserted, but it was not. Maybe all properties except the AccountAddress was unique, and the reason why address was not unique is probably due to the fact that the wrong 'index' in the derivation path was use (same reused), due to bad logic in `storage` of the factor.")
-		return account
-	}
-
-	// FIXME: refactor
-	public mutating func updateAccount(_ account: Profile.Network.Account) throws {
-		guard self.updateOrAppend(account) != nil else {
-			assertionFailure("We expected this account to already exist, but it did not.")
-			throw TryingToUpdateAnAccountWhichIsNotAlreadySaved()
-		}
-	}
-}
-
 // MARK: - TryingToUpdateAnAccountWhichIsNotAlreadySaved
 struct TryingToUpdateAnAccountWhichIsNotAlreadySaved: Swift.Error {}
 
@@ -33,7 +12,7 @@ extension Profile {
 		_ account: Profile.Network.Account
 	) throws {
 		var network = try network(id: account.networkID)
-		try network.accounts.updateAccount(account)
+		try network.updateAccount(account)
 		try updateOnNetwork(network)
 	}
 
@@ -47,15 +26,12 @@ extension Profile {
 		let maybeNetwork = try? network(id: networkID)
 
 		if var network = maybeNetwork {
-			guard !network.accounts.contains(where: { $0 == account }) else {
-				throw AccountAlreadyExists()
-			}
-			network.accounts.appendAccount(account)
+			try network.addAccount(account)
 			try updateOnNetwork(network)
 		} else {
 			let network = Profile.Network(
 				networkID: networkID,
-				accounts: [account],
+				accounts: .init(rawValue: [account])!,
 				personas: [],
 				authorizedDapps: []
 			)

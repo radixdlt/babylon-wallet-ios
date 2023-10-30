@@ -347,8 +347,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/davdroman/swiftui-navigation-transitions",
       "state" : {
-        "revision" : "4a1397f6402ec0f14173ff51855ff307e5e08ac4",
-        "version" : "0.13.1"
+        "revision" : "a6a3c70ad5d771bd1e927fb55897231cd9592024",
+        "version" : "0.13.3"
       }
     },
     {

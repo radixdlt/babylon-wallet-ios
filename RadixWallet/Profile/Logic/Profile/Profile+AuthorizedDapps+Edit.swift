@@ -11,9 +11,6 @@ struct DappWasNotConnected: Swift.Error {}
 // MARK: - AuthorizedDappAlreadyExists
 struct AuthorizedDappAlreadyExists: Swift.Error {}
 
-// MARK: - TryingToUpdateAPersonaWhichIsNotAlreadySaved
-struct TryingToUpdateAPersonaWhichIsNotAlreadySaved: Swift.Error {}
-
 extension Profile {
 	/// Updates a `Persona` in the profile
 	public mutating func updatePersona(
@@ -21,9 +18,7 @@ extension Profile {
 	) throws {
 		let networkID = persona.networkID
 		var network = try network(id: networkID)
-		guard network.personas.updateOrAppend(persona) != nil else {
-			throw TryingToUpdateAPersonaWhichIsNotAlreadySaved()
-		}
+		try network.updatePersona(persona)
 		try updateOnNetwork(network)
 	}
 
@@ -68,7 +63,7 @@ extension Profile {
 		struct AuthorizedDappReferencesUnknownPersonas: Swift.Error {}
 		struct AuthorizedDappReferencesUnknownPersonaField: Swift.Error {}
 		for personaNeedle in authorizedDapp.referencesToAuthorizedPersonas {
-			guard let persona = network.personas.first(where: { $0.address == personaNeedle.identityAddress }) else {
+			guard let persona = network.getPersonas().first(where: { $0.address == personaNeedle.identityAddress }) else {
 				throw AuthorizedDappReferencesUnknownPersonas()
 			}
 
@@ -85,7 +80,7 @@ extension Profile {
 				$0.sharedAccounts?.ids ?? []
 			}
 		)
-		let accountAddressHaystack = Set(network.accounts.map(\.address))
+		let accountAddressHaystack = Set(network.getAccounts().map(\.address))
 		guard accountAddressHaystack.isSuperset(of: accountAddressNeedles) else {
 			struct AuthorizedDappReferencesUnknownAccount: Swift.Error {}
 			throw AuthorizedDappReferencesUnknownAccount()

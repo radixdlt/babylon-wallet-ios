@@ -55,6 +55,13 @@ extension PersonaDetails.View {
 							DappsSection(store: $0)
 								.background(.app.gray5)
 						}
+
+						Button(L10n.AuthorizedDapps.PersonaDetails.hideThisPersona) {
+							viewStore.send(.hidePersonaTapped)
+						}
+						.buttonStyle(.primaryRectangular(isDestructive: true))
+						.padding([.horizontal, .top], .medium3)
+						.padding(.bottom, .large2)
 					}
 				}
 				.navigationTitle(viewStore.personaName)
@@ -80,6 +87,11 @@ extension PersonaDetails.View {
 			store: store.destination,
 			state: /PersonaDetails.Destination.State.confirmForgetAlert,
 			action: PersonaDetails.Destination.Action.confirmForgetAlert
+		)
+		.alert(
+			store: store.destination,
+			state: /PersonaDetails.Destination.State.confirmHideAlert,
+			action: PersonaDetails.Destination.Action.confirmHideAlert
 		)
 	}
 }
