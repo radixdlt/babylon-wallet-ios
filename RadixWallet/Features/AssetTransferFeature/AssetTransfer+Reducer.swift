@@ -197,6 +197,7 @@ extension AssetTransfer {
 
 					try await instructionForDepositing(
 						bucket: bucket,
+						resource: resource.address,
 						into: account.recipient
 					)
 				}
@@ -221,6 +222,7 @@ extension AssetTransfer {
 
 					try await instructionForDepositing(
 						bucket: bucket,
+						resource: resource.address,
 						into: account.recipient
 					)
 				}
@@ -232,30 +234,71 @@ extension AssetTransfer {
 
 func instructionForDepositing(
 	bucket: ManifestBuilderBucket,
+	resource: ResourceAddress,
 	into receivingAccount: ReceivingAccount.State.Account
 ) async throws -> ManifestBuilder.InstructionsChain.Instruction {
-	@Dependency(\.userDefaultsClient) var userDefaultsClient
-	@Dependency(\.secureStorageClient) var secureStorageClient
-	let isUserAccount = receivingAccount.isUserAccount
-	// TODO: Temporary revert of checking if the receiving account is a ledger account
-	let isSoftwareAccount = true // !receivingAccount.isLedgerAccount
 	let recipientAddress = receivingAccount.address
-	let userHasAccessToMnemonic = if let deviceFactorSourceID = receivingAccount.left?.deviceFactorSourceID {
-		await secureStorageClient.containsMnemonicIdentifiedByFactorSourceID(deviceFactorSourceID)
-	} else { false }
 
-	guard isUserAccount, isSoftwareAccount, userHasAccessToMnemonic else {
+	if case let .left(userAccount) = receivingAccount {
+		@Dependency(\.secureStorageClient) var secureStorageClient
+		// TODO: Temporary revert of checking if the receiving account is a ledger account
+		let isSoftwareAccount = true // !receivingAccount.isLedgerAccount
+		let userHasAccessToMnemonic = if let deviceFactorSourceID = userAccount.deviceFactorSourceID {
+			secureStorageClient.containsMnemonicIdentifiedByFactorSourceID(deviceFactorSourceID)
+		} else { false }
+
+		let needsSignatureForDepositing = await needsSignatureForDepositting(into: userAccount, resource: resource)
+
+		if needsSignatureForDepositing, isSoftwareAccount, userHasAccessToMnemonic {
+			return try ManifestBuilder.accountDeposit(
+				recipientAddress.intoEngine(),
+				bucket
+			)
+		} else {
+			return try ManifestBuilder.accountTryDepositOrAbort(
+				recipientAddress.intoEngine(),
+				nil,
+				bucket
+			)
+		}
+	} else {
 		return try ManifestBuilder.accountTryDepositOrAbort(
 			recipientAddress.intoEngine(),
 			nil,
 			bucket
 		)
 	}
+}
 
-	return try ManifestBuilder.accountDeposit(
-		recipientAddress.intoEngine(),
-		bucket
-	)
+/// Determines if depostting the resource into an account requires the addition of a signature
+func needsSignatureForDepositting(into receivingAccount: Profile.Network.Account, resource resourceAddress: ResourceAddress) async -> Bool {
+	@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
+	let hasResource = await (try? onLedgerEntitiesClient.getAccount(receivingAccount.address).hasResource(resourceAddress)) ?? false
+	let depositSettings = receivingAccount.onLedgerSettings.thirdPartyDeposits
+	let resourceException = depositSettings.assetsExceptionList.first { $0.address == resourceAddress }?.exceptionRule
+
+	return switch (depositSettings.depositRule, resourceException) {
+	case (.acceptAll, .allow):
+		false
+	case (.acceptAll, .none):
+		false
+	case (.acceptAll, .deny):
+		true
+	case (.acceptKnown, .allow):
+		false
+	case (.acceptKnown, .none) where hasResource == true:
+		false
+	case (.acceptKnown, .none):
+		true
+	case (.acceptKnown, .deny):
+		true
+	case (.denyAll, .allow):
+		false
+	case (.denyAll, .none):
+		true
+	case (.denyAll, .deny):
+		true
+	}
 }
 
 extension AssetTransfer {

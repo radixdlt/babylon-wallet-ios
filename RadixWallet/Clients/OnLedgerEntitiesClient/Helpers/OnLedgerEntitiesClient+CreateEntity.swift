@@ -57,11 +57,11 @@ extension OnLedgerEntitiesClient {
 		)
 
 		let filteredFungibleResources = fungibleResources.filter { resource in
-			!poolUnitResources.fungibleResourceAddresses.contains(resource.resourceAddress.address)
+			!poolUnitResources.fungibleResourceAddresses.contains(resource.resourceAddress)
 		}
 
 		let filteredNonFungibleResources = nonFungibleResources.filter { resource in
-			!poolUnitResources.nonFungibleResourceAddresses.contains(resource.resourceAddress.address)
+			!poolUnitResources.nonFungibleResourceAddresses.contains(resource.resourceAddress)
 		}
 
 		return await .init(

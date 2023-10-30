@@ -487,3 +487,22 @@ extension [OnLedgerEntity.NonFungibleToken.NFTData] {
 		self[.claimAmount]?.decimal
 	}
 }
+
+extension OnLedgerEntity.Account {
+	public var allFungibleResourceAddresses: [ResourceAddress] {
+		fungibleResources.xrdResource.asArray(\.resourceAddress) + fungibleResources.nonXrdResources.map(\.resourceAddress)
+	}
+
+	public var allResourceAddresses: Set<ResourceAddress> {
+		Set(
+			allFungibleResourceAddresses
+				+ nonFungibleResources.map(\.resourceAddress)
+				+ poolUnitResources.fungibleResourceAddresses
+				+ poolUnitResources.nonFungibleResourceAddresses
+		)
+	}
+
+	public func hasResource(_ resourceAddress: ResourceAddress) -> Bool {
+		allResourceAddresses.contains(resourceAddress)
+	}
+}
