@@ -312,14 +312,26 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			switch lookup(input: displayText, state) {
 			case let .known(.ambigous(candidates, input)):
 				if let exactMatch = candidates.first(where: { $0.word == input }) {
-					state.words[id: id]?.value = .complete(text: displayText, word: exactMatch, completion: ImportMnemonicWord.State.WordValue.Completion.auto(match: .exact))
+					state.words[id: id]?.value = .complete(
+						text: displayText,
+						word: exactMatch,
+						completion: ImportMnemonicWord.State.WordValue.Completion.auto(
+							match: .exact
+						)
+					)
 				} else {
-					state.words[id: id]?.value = .incomplete(text: displayText, hasFailedValidation: true)
+					state.words[id: id]?.value = .incomplete(
+						text: displayText,
+						hasFailedValidation: true
+					)
 				}
 				return .none
 
 			case .unknown(.notInList):
-				state.words[id: id]?.value = .incomplete(text: displayText, hasFailedValidation: true)
+				state.words[id: id]?.value = .incomplete(
+					text: displayText,
+					hasFailedValidation: true
+				)
 				return .none
 
 			case .known(.unambiguous), .unknown(.tooShort):
