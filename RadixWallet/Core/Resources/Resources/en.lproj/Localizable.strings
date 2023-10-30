@@ -729,6 +729,7 @@ You can always change the guarantee from this default in each transaction.";
 "displayMnemonics_connectedAccountsLabel_many" = "Connected to %d Accounts";
 "displayMnemonics_seedPhraseSecurityInfo" = "You are responsible for the security of your Seed Phrase";
 "displayMnemonics_backUpWarning" = "Write Down this Seed Phrase";
+"displayMnemonics_seedPhraseEntryWarning" = "Seed Phrase Entry Required";
 "revealSeedPhrase_title" = "Reveal Seed Phrase";
 "revealSeedPhrase_warning" = "For your safety, make sure no one is looking at your screen. Taking a screen shot has been disabled.";
 "revealSeedPhrase_wordLabel" = "Word %d";
