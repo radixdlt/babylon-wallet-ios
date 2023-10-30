@@ -28,7 +28,7 @@ extension LAContext {
 		errorHandling: (LAError) -> Result<Bool, Error>?
 	) throws -> Bool {
 		var error: NSError?
-		let canEvaluate = self.canEvaluatePolicy(policy, error: &error)
+		let canEvaluate = canEvaluatePolicy(policy, error: &error)
 
 		guard let evaluationError = error else {
 			return canEvaluate
@@ -43,12 +43,7 @@ extension LAContext {
 			return canEvaluate
 		}
 
-		switch result {
-		case let .success(canEvaluate_):
-			return canEvaluate_
-		case let .failure(error):
-			throw error
-		}
+		return try result.get()
 	}
 
 	private func evaluateIfPasscodeIsSetUp() throws -> Bool {

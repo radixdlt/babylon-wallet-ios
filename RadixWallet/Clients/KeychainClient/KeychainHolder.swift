@@ -1,10 +1,9 @@
-private let keychainService = {
-	var defaultService = "Radix Wallet" // DO NOT CHANGE THIS EVER
-	#if DEBUG
-	defaultService += " DEBUG"
-	#endif
-	return defaultService
-}()
+#if DEBUG
+private let keychainService = "Radix Wallet DEBUG"
+#else
+// DO NOT CHANGE THIS EVER
+private let keychainService = "Radix Wallet"
+#endif
 
 // MARK: - KeychainHolder
 final class KeychainHolder: @unchecked Sendable {
