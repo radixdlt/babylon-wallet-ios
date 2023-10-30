@@ -30,13 +30,16 @@
 "account_poolUnits_unknownSymbolName" = "Unknown";
 "account_poolUnits_unknownPoolUnitName" = "Unknown";
 "account_poolUnits_details_currentRedeemableValue" = "Current Redeemable Value";
+"account_poolUnits_noTotalSupply" = "Missing Total supply - could not calculate redemption value";
 "account_badges" = "Badges";
 "assetDetails_resourceAddress" = "Address";
+"assetDetails_validator" = "Validator";
 "assetDetails_name" = "Name";
 "assetDetails_currentSupply" = "Current Supply";
 "assetDetails_supplyUnkown" = "Unknown";
 "assetDetails_behavior" = "Behavior";
 "assetDetails_tags" = "Tags";
+"assetDetails_tags_officialRadix" = "Official Radix";
 "assetDetails_associatedDapps" = "Associated dApps";
 "assetDetails_tokenDetails_noTokens" = "You have no Tokens";
 "assetDetails_tokenDetails_whatAreTokens" = "What are Tokens?";
@@ -59,6 +62,25 @@
 "assetDetails_hideAsset_title" = "Hide Asset";
 "assetDetails_hideAsset_message" = "Hide this asset in your Radix Wallet? You can always unhide it in your account settings.";
 "assetDetails_hideAsset_button" = "Hide Asset";
+"assetDetails_behaviors_simpleAsset" = "This is a simple asset";
+"assetDetails_behaviors_supplyIncreasable" = "The supply of this asset can be increased.";
+"assetDetails_behaviors_supplyDecreasable" = "The supply of this asset can be decreased.";
+"assetDetails_behaviors_supplyFlexible" = "The supply of this asset can be increased or decreased.";
+"assetDetails_behaviors_supplyFlexibleXrd" = "Only the Radix Network may increase or decrease the supply of XRD.";
+"assetDetails_behaviors_supplyIncreasableByAnyone" = "Anyone can increase the supply of this asset.";
+"assetDetails_behaviors_supplyDecreasableByAnyone" = "Anyone can decrease the supply of this asset.";
+"assetDetails_behaviors_supplyFlexibleByAnyone" = "Anyone can increase or decrease the supply of this asset.";
+"assetDetails_behaviors_movementRestricted" = "Movement of this asset is restricted.";
+"assetDetails_behaviors_movementRestrictableInFuture" = "Movement of this asset can be restricted in the future.";
+"assetDetails_behaviors_movementRestrictableInFutureByAnyone" = "Anyone can restrict movement of this token in the future.";
+"assetDetails_behaviors_informationChangeable" = "Naming and information about this asset can be changed.";
+"assetDetails_behaviors_informationChangeableByAnyone" = "Anyone can change naming and information about this asset.";
+"assetDetails_behaviors_removableByThirdParty" = "A third party can remove this asset from accounts and dApps.";
+"assetDetails_behaviors_removableByAnyone" = "Anyone can remove this asset from accounts and dApps.";
+"assetDetails_behaviors_freezableByThirdParty" = "A third party can freeze this asset in place.";
+"assetDetails_behaviors_freezableByAnyone" = "Anyone can freeze this asset in place.";
+"assetDetails_behaviors_nftDataChangeable" = "Data that is set on these NFTs can be changed.";
+"assetDetails_behaviors_nftDataChangeableByAnyone" = "Anyone can change data that is set on these NFTs.";
 "accountSettings_title" = "Account Settings";
 "accountSettings_personalizeHeading" = "Personalize this Account";
 "accountSettings_accountLabel" = "Account Label";
@@ -66,6 +88,7 @@
 "accountSettings_accountColorSubtitle" = "Select from a list of unique colors";
 "accountSettings_showAssets" = "Show Assets with Tags";
 "accountSettings_showQR" = "Show Account QR Code";
+"accountSettings_updatedAccountHUDMessage" = "Updated";
 "accountSettings_showAssetsSubtitle" = "Select which tags to show for assets in this Account";
 "accountSettings_setBehaviorHeading" = "Set how you want this Account to work";
 "accountSettings_accountSecurity" = "Account Security";
@@ -103,6 +126,7 @@
 "accountSettings_specificAssetsDeposits_removeAsset" = "Remove Asset";
 "accountSettings_specificAssetsDeposits_removeAssetMessageDeny" = "The asset will be removed from the deny list";
 "accountSettings_specificAssetsDeposits_removeAssetMessageAllow" = "The asset will be removed from the allow list";
+"accountSettings_specificAssetsDeposits_removeBadgeMessageDepositors" = "The badge will be removed from the list";
 "accountSettings_specificAssetsDeposits_removeDepositor" = "Remove Depositor";
 "accountSettings_specificAssetsDeposits_removeDepositorMessage" = "The depositor will be removed from the allow list";
 "accountSettings_specificAssetsDeposits" = "Allow/Deny Specific Assets";
@@ -119,6 +143,9 @@
 "accountSettings_specificAssetsDeposits_addAnAssetButton" = "Add Asset";
 "accountSettings_specificAssetsDeposits_allowInfo" = "The following resource addresses may always be deposited to this account by third parties.";
 "accountSettings_specificAssetsDeposits_denyInfo" = "The following resource addresses may never be deposited to this account by third parties.";
+"accountSettings_specificAssetsDeposits_allowDepositorsNoResources" = "Add a specific badge by its resource address to allow all deposits from its holder.";
+"accountSettings_specificAssetsDeposits_allowDepositors" = "The holder of the following badges may always deposit accounts to this account.";
+"accountSettings_specificAssetsDeposits_resourceListPicker" = "Select exception list";
 "accountSettings_showAssets_text" = "Asset creators can add tags to them. You can choose which tags you want to see in this Account.";
 "accountSettings_showAssets_selectShown" = "Select the ones you’d like shown on all your assets.";
 "accountSettings_showAssets_recommended" = "Recommended";
@@ -156,7 +183,11 @@
 "settings_importFromLegacyWallet" = "Import from a Legacy Wallet";
 "settings_ledgerHardwareWallets" = "Ledger Hardware Wallets";
 "settings_depositGuarantees" = "Deposit Guarantees";
+"settings_depositGuarantees_title" = "Deposit Guarantees";
 "settings_depositGuarantees_subtitle" = "Set your default guaranteed minimum for estimated deposits";
+"settings_depositGuarantees_text" = "Set the guaranteed minimum deposit to be applied whenever a deposit in a transaction can only be estimated.
+
+You can always change the guarantee from this default in each transaction.";
 "settings_multiFactor" = "Multi-Factor Setup";
 "settings_appVersion" = "Version: %@ build #%@";
 "settings_deleteWalletData" = "Delete Wallet Data";
@@ -363,6 +394,7 @@
 "dAppRequest_metadataLoadingAlert_message" = "Danger! Bad dApp configuration, or you\'re being spoofed!";
 "dAppRequest_metadataLoadingPrompt" = "Loading…";
 "dAppRequest_metadata_unknownName" = "Unknown dApp";
+"dAppRequest_metadata_wallet" = "Radix Wallet";
 "dAppRequest_personalDataBox_edit" = "Edit";
 "dAppRequest_personalDataBox_requiredInformation" = "Required information:";
 "transactionReview_title" = "Review Your Transaction";
@@ -378,6 +410,7 @@
 "transactionReview_rawTransactionTitle" = "Raw Transaction";
 "transactionReview_sendingToHeading" = "Sending to";
 "transactionReview_unknown" = "Unknown";
+"transactionReview_unnamedDapp" = "Unnamed dApp";
 "transactionReview_usingDappsHeading" = "Using dApps";
 "transactionReview_unknownComponents" = "%d Unknown Components";
 "transactionReview_withdrawalsHeading" = "Withdrawing From";
@@ -457,7 +490,10 @@
 "transaction_status_error_text" = "Your transaction could not be processed, but could potentially still be processed within the next %@ minutes";
 "transaction_status_rejected_text" = "Your transaction was improperly constructed and cannot be processed";
 "transaction_status_failure_title" = "Something went wrong";
+"transaction_status_failure_text" = "Transaction was rejected as invalid by the Radix Network.";
 "transaction_status_dismiss_dialog_message" = "Stop waiting for transaction result? The transaction will not be canceled.";
+"transaction_status_dismissalDisabledDialog_title" = "Dismiss";
+"transaction_status_dismissalDisabledDialog_text" = "This transaction requires to be completed";
 "addressAction_copyAddress" = "Copy Address";
 "addressAction_copiedToClipboard" = "Copied to Clipboard";
 "addressAction_copyNftId" = "Copy NFT ID";
@@ -518,9 +554,17 @@
 "error_transactionFailure_pollStatus" = "Failed to poll transaction status";
 "error_transactionFailure_prepare" = "Failed to prepare transaction";
 "error_transactionFailure_rejected" = "Transaction rejected";
+"error_transactionFailure_unknown" = "Unknown error";
+"error_transactionFailure_failedToFindLedger" = "Failed to find ledger";
+"error_transactionFailure_failedToAddLockFee" = "Failed to add Transaction Fee, try a different amount of fee payer.";
+"error_transactionFailure_failedToAddGuarantee" = "Failed to add Guarantee, try a different percentage, or try skip adding a guarantee.";
+"error_transactionFailure_reviewFailure" = "A proposed transaction could not be processed.";
 "error_transactionFailure_blindSigningNotEnabledButRequired" = "Your current Ledger settings only allow signing of simple token transfers. Please either enable \"verbose mode\" (to see full transaction manifests) or \"blind signing mode\" (to enable signing of complex transaction manifest hashes) on your Ledger app device.";
 "error_transactionFailure_rejectedByUser" = "Failed to convert transaction manifest";
 "error_transactionFailure_submit" = "Failed to submit transaction";
+"error_personaLabel_tooLong" = "Persona label too long";
+"error_accountLabel_tooLong" = "Account label too long";
+"error_accountLabel_missing" = "Account label required";
 "importOlympiaAccounts_scanQR_title" = "Import Legacy Olympia Accounts";
 "importOlympiaAccounts_scanQR_instructions" = "Scan the QR code shown in the Export section of the Radix Desktop Wallet for Olympia.";
 "importOlympiaAccounts_scanQR_scannedLabel" = "Scanned: %d/%d";
@@ -536,6 +580,7 @@
 "importOlympiaAccounts_verifySeedPhrase_title" = "Verify With Your Seed Phrase";
 "importOlympiaAccounts_verifySeedPhrase_subtitle" = "To complete importing your accounts, please view your seed phrase in the Radix Desktop Wallet and enter the words here.";
 "importOlympiaAccounts_verifySeedPhrase_warning" = "This will give this Radix Wallet control of your accounts. Never give your seed phrase to anyone for any reason.";
+"importOlympiaAccounts_verifySeedPhrase_keepSeedPhraseTitle" = "Warning";
 "importOlympiaAccounts_verifySeedPhrase_keepSeedPhrasePrompt" = "Do not throw away this seed phrase! You will still need it if you need to recover access to your Olympia accounts in the future.";
 "importOlympiaAccounts_verifySeedPhrase_keepSeedPhrasePromptConfirmation" = "I Understand";
 "importOlympiaAccounts_completion_title" = "Congratulations";
@@ -549,6 +594,7 @@
 "importOlympiaAccounts_invalidMnemonic" = "Invalid Mnemonic";
 "importOlympiaAccounts_invalidPayload" = "Invalid QR code";
 "importOlympiaAccounts_noMnemonicFound" = "No mnemonic found for accounts";
+"importOlympiaAccounts_noNewAccounts" = "No new accounts were found on this Ledger device";
 "importOlympiaAccounts_passphrase" = "Passphrase";
 "importOlympiaAccounts_seedPhrase" = "Seed phrase";
 "importProfile_importProfile" = "Import Radix Wallet backup";
@@ -575,6 +621,7 @@
 "transactionSigning_signTransactionButtonTitle" = "Approve Transaction";
 "transactionSigning_signingAndSubmittingTransaction" = "Submitting transaction…";
 "importMnemonic_navigationTitle" = "Import Seed Phrase";
+"importMnemonic_navigationTitleBackup" = "Backup Seed Phrase";
 "importMnemonic_wordHeading" = "Word %d";
 "importMnemonic_passphrase" = "Passphrase";
 "importMnemonic_passphrasePlaceholder" = "Passphrase";
@@ -585,6 +632,13 @@
 "importMnemonic_advancedModeButton" = "Advanced Mode";
 "importMnemonic_regularModeButton" = "Regular Mode";
 "importMnemonic_importSeedPhrase" = "Import";
+"importMnemonic_seedPhraseImported" = "Imported Seed Phrase";
+"importMnemonic_backedUpAlert_title" = "Confirm Backup";
+"importMnemonic_backedUpAlert_message" = "Are you sure you have securely written down this seed phrase? You will need it to recover access if you lose your phone.";
+"importMnemonic_backedUpAlert_confirmAction" = "Yes, I have backed it up";
+"importMnemonic_backedUpAlert_noAction" = "No, not yet";
+"importMnemonic_failedToValidateAllAccounts" = "Failed to validate all accounts against mnemonic";
+"importMnemonic_wrongMnemonicHUD" = "Wrong mnemmonic";
 "importMnemonic_offDevice_storyPrimaryHeading" = "Tell a story";
 "importMnemonic_offDevice_storyPlaceholder" = "Hitchcock\'s The Birds mixed with Office space";
 "importMnemonic_offDevice_storyHint" = "Without revealing the words, what comes to mind when reading this seed phrase?";
@@ -593,6 +647,8 @@
 "importMnemonic_offDevice_locationHint" = "Without revealing location, vague hint on where this mnemonic is backed up, if anywhere.";
 "importMnemonic_offDevice_saveWithDescription" = "Save with description";
 "importMnemonic_offDevice_saveWithoutDescription" = "Save without description";
+"importMnemonic_shieldPrompt_enterSeedPhrase" = "Enter this Account\'s seed phrase";
+"importMnemonic_shieldPrompt_backupSeedPhrase" = "Backup this Account\'s seed phrase";
 "importMnemonic_tempAndroid_changeSeedPhrase" = "Change seed phrase length";
 "importMnemonic_tempAndroid_seedLength" = "%d word seed phrase";
 "importMnemonic_tempAndroid_heading" = "Recover Mnemonic";
@@ -622,6 +678,9 @@
 "assetTransfer_fungibleResource_balance" = "Balance: %@";
 "assetTransfer_receivingAccount_chooseAccountButton" = "Choose Account";
 "assetTransfer_receivingAccount_addAssetsButton" = "Add Assets";
+"assetTransfer_error_wrongNetwork" = "Address is not valid on current network";
+"assetTransfer_error_resourceAlreadyAdded" = "Resource already added";
+"assetTransfer_error_insufficientBalance" = "Total amount exceeds your current balance";
 "importOlympiaLedgerAccounts_title" = "Verify With Ledger Device";
 "importOlympiaLedgerAccounts_subtitle" = "You are attempting to import one or more Olympia accounts that must be verified with a Ledger hardware wallet device.";
 "importOlympiaLedgerAccounts_listHeading" = "Already verified Ledger devices:";
@@ -656,6 +715,10 @@
 "ledgerHardwareDevices_subtitleFailure" = "Could not find Ledger devices";
 "ledgerHardwareDevices_couldNotSign_message" = "Transaction could not be signed. To sign complex transactions, please enable either \"blind signing\" or \"verbose mode\" in the Radix app on your Ledger device.";
 "ledgerHardwareDevices_couldNotSign_title" = "Could Not Sign";
+"ledgerHardwareDevices_verification_addressVerified" = "Address verified";
+"ledgerHardwareDevices_verification_mismatch" = "Verify address: Mismatched addresses";
+"ledgerHardwareDevices_verification_badResponse" = "Verify address: Returned bad response";
+"ledgerHardwareDevices_verification_requestFailed" = "Verify address: Request failed";
 "displayMnemonics_cautionAlert_title" = "Use Caution";
 "displayMnemonics_cautionAlert_revealButtonLabel" = "Reveal Seed Phrase";
 "displayMnemonics_cautionAlert_message" = "A seed phrase provides full control of its Accounts. Do not view in a public area. Write down the seed phrase words securely. Screenshots are disabled.";
@@ -685,6 +748,8 @@
 "appSettings_developerMode_subtitle" = "Warning: Disables website validity checks";
 "appSettings_verboseLedgerMode_title" = "Verbose Ledger transaction signing";
 "appSettings_verboseLedgerMode_subtitle" = "When signing with your Ledger hardware wallet, should all instructions be displayed?";
+"appSettings_iCloudSyncEnabledAlert_title" = "Enabling iCloud sync";
+"appSettings_iCloudSyncEnabledAlert_message" = "iCloud sync is now enabled, but it might take up to an hour before your wallet data is uploaded to iCloud.";
 "appSettings_confirmCloudSyncDisableAlert_title" = "Disabling iCloud sync will delete the iCloud backup data, are you sure you want to disable iCloud sync?";
 "appSettings_resetWallet_title" = "Reset Wallet";
 "appSettings_resetWallet_subtitle" = "Clear all data in this Wallet";
@@ -730,9 +795,17 @@ Only the **current configuration** of your wallet is backed up with each manual 
 "profileBackup_manualBackups_encryptBackupDialogDeny" = "No";
 "profileBackup_manualBackups_encryptBackupTitle" = "Encrypt Wallet Backup File";
 "profileBackup_manualBackups_encryptBackupSubtitle" = "Enter a password to encrypt this wallet backup file. You will be required to enter this password when recovering your Wallet from this file.";
+"profileBackup_manualBackups_decryptBackupTitle" = "Decrypt Wallet Backup File";
+"profileBackup_manualBackups_decryptBackupSubtitle" = "Enter the password you chose when you originally encrypted this Wallet Backup file.";
 "profileBackup_manualBackups_enterPasswordPlaceholder" = "Enter password";
 "profileBackup_manualBackups_confirmPasswordPlaceholder" = "Confirm password";
 "profileBackup_manualBackups_passwordsMissmatchError" = "Passwords do not match";
+"profileBackup_manualBackups_nonConformingEncryptionPasswordPlaceholder" = "Encryption password";
+"profileBackup_manualBackups_nonConformingDecryptionPasswordPlaceholder" = "Decryption password";
+"profileBackup_incorrectPasswordAlert_title" = "Incorrect password";
+"profileBackup_incorrectPasswordAlert_okAction" = "OK";
+"profileBackup_incorrectPasswordAlert_messageEncryption" = "Failed to encrypt using provided password.";
+"profileBackup_incorrectPasswordAlert_messageDecryption" = "Failed to decrypt using provided password.";
 "profileBackup_deleteWallet_title" = "Delete Wallet";
 "profileBackup_deleteWalletDialog_message" = "WARNING. This will clear all contents of your Wallet. If you have no backup, you will lose access to your Accounts and Personas permanently.";
 "profileBackup_deleteWalletDialog_confirm" = "Delete Wallet";
@@ -769,6 +842,7 @@ Only the **current configuration** of your wallet is backed up with each manual 
 
 **Access to any Accounts or Personas will be permanently lost unless you have a manual backup file.**";
 "iOSProfileBackup_deleteWallet_confirmButton" = "Delete Wallet and iCloud Backup";
+"iOSProfileBackup_profileNotFoundInCloud" = "Unable to find wallet backup in iCloud.";
 "encryptProfileBackup_header_title" = "Encrypt Wallet Backup File";
 "encryptProfileBackup_header_subtitle" = "Enter a password to encrypt this wallet backup file. You will be required to enter this password when recovering your Wallet from this file.";
 "encryptProfileBackup_enterPasswordField_placeholder" = "Enter password";
@@ -798,3 +872,8 @@ Only the **current configuration** of your wallet is backed up with each manual 
 "depositGuarantees_text" = "Set the guaranteed minimum deposit to be applied whenever a deposit in a transaction can only be estimated.
 
 You can always change the guarantee from this default in each transaction.";
+"factorSources_kind_device" = "Phone";
+"factorSources_kind_ledgerHQHardwareWallet" = "Ledger";
+"factorSources_kind_offDeviceMnemonic" = "Seed phrase";
+"factorSources_kind_trustedContact" = "Third-party";
+"factorSources_kind_securityQuestions" = "Security Questions";
