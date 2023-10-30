@@ -17,8 +17,7 @@ extension Profile {
 
 		public typealias Accounts = NonEmpty<IdentifiedArrayOf<Account>>
 
-		/// An identifiable ordered set of `Account`s created by the user for this network,
-		/// can be empty
+		/// An identifiable ordered set of `Account`s created by the user for this network.
 		private var accounts: Accounts
 
 		public typealias Personas = IdentifiedArrayOf<Persona>

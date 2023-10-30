@@ -111,7 +111,6 @@ extension Profile.Network.Account {
 		privateHDFactorSource maybePrivateHDFactorSource: PrivateHDFactorSource? = nil
 	) -> Self {
 		let privateHDFactorSource = maybePrivateHDFactorSource ?? PrivateHDFactorSource.testValue
-
 		let derivationPath = DerivationPath(
 			scheme: .cap26,
 			path: "m/44H/1022H/10H/525H/1460H/\(index)H"

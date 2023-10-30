@@ -11,7 +11,6 @@ extension Profile.Network.Accounts {
 		let (wasInserted, _) = identifiedArrayOf.append(account)
 
 		assert(wasInserted, "We expected this to be a new, unique, Account, thus we expected it to be have been inserted, but it was not. Maybe all properties except the AccountAddress was unique, and the reason why address was not unique is probably due to the fact that the wrong 'index' in the derivation path was use (same reused), due to bad logic in `storage` of the factor.")
-		self = .init(rawValue: identifiedArrayOf)!
 		return account
 	}
 
@@ -23,8 +22,6 @@ extension Profile.Network.Accounts {
 			assertionFailure("We expected this account to already exist, but it did not.")
 			throw TryingToUpdateAnAccountWhichIsNotAlreadySaved()
 		}
-
-		self = .init(rawValue: identifiedArrayOf)!
 	}
 }
 
@@ -56,7 +53,7 @@ extension Profile {
 		} else {
 			let network = Profile.Network(
 				networkID: networkID,
-				accounts: .init(rawValue: .init(uniqueElements: [account]))!,
+				accounts: [account],
 				personas: [],
 				authorizedDapps: []
 			)

@@ -1986,6 +1986,8 @@ public enum L10n {
       public static let networkFinalization = L10n.tr("Localizable", "transactionReview_customizeNetworkFeeSheet_networkFinalization", fallback: "Network Finalization")
       /// Network Storage
       public static let networkStorage = L10n.tr("Localizable", "transactionReview_customizeNetworkFeeSheet_networkStorage", fallback: "Network Storage")
+      /// No account selected
+      public static let noAccountSelected = L10n.tr("Localizable", "transactionReview_customizeNetworkFeeSheet_noAccountSelected", fallback: "No account selected")
       /// None due
       public static let noneDue = L10n.tr("Localizable", "transactionReview_customizeNetworkFeeSheet_noneDue", fallback: "None due")
       /// None required

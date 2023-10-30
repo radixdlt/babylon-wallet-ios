@@ -83,14 +83,11 @@ extension OverlayWindowClient {
 				}
 			}
 
-			// FIXME: Strings
-			public static let copied = Self(text: "Copied")
+			public static let copied = Self(text: "Copied") // FIXME: Strings
 
-			// FIXME: Strings
-			public static let updated = Self(text: "Updated")
+			public static let updated = Self(text: "Updated") // FIXME: Strings
 
-			// FIXME: Strings
-			public static let seedPhraseImported = Self(text: "Seed Phrase Imported")
+			public static let seedPhraseImported = Self(text: "Seed Phrase Imported") // FIXME: Strings
 
 			// FIXME: Strings
 			public static let accountHidden = Self(text: "Account hidden")

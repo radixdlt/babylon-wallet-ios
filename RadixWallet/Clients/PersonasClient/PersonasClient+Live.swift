@@ -9,7 +9,7 @@ extension PersonasClient: DependencyKey {
 			guard let network = try? await profileStore.profile.network(id: networkID) else {
 				return .init()
 			}
-			return network.getPersonas()
+			return network.personas
 		}
 
 		return Self(

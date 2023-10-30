@@ -451,7 +451,7 @@
 		48CFC4012ADC10D900E77A5C /* KeychainClient+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBF0D2ADC10D900E77A5C /* KeychainClient+Live.swift */; };
 		48CFC4022ADC10D900E77A5C /* KeychainClient+Interface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBF0E2ADC10D900E77A5C /* KeychainClient+Interface.swift */; };
 		48CFC4032ADC10D900E77A5C /* KeychainClient+Mocked.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBF0F2ADC10D900E77A5C /* KeychainClient+Mocked.swift */; };
-		48CFC4042ADC10D900E77A5C /* KeychainActor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBF102ADC10D900E77A5C /* KeychainActor.swift */; };
+		48CFC4042ADC10D900E77A5C /* KeychainHolder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBF102ADC10D900E77A5C /* KeychainHolder.swift */; };
 		48CFC4052ADC10D900E77A5C /* NoopError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBF112ADC10D900E77A5C /* NoopError.swift */; };
 		48CFC4062ADC10DA00E77A5C /* JSONValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBF122ADC10D900E77A5C /* JSONValue.swift */; };
 		48CFC4072ADC10DA00E77A5C /* HexCodable32Bytes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBF132ADC10D900E77A5C /* HexCodable32Bytes.swift */; };
@@ -1720,7 +1720,7 @@
 		48CFBF0D2ADC10D900E77A5C /* KeychainClient+Live.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "KeychainClient+Live.swift"; sourceTree = "<group>"; };
 		48CFBF0E2ADC10D900E77A5C /* KeychainClient+Interface.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "KeychainClient+Interface.swift"; sourceTree = "<group>"; };
 		48CFBF0F2ADC10D900E77A5C /* KeychainClient+Mocked.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "KeychainClient+Mocked.swift"; sourceTree = "<group>"; };
-		48CFBF102ADC10D900E77A5C /* KeychainActor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KeychainActor.swift; sourceTree = "<group>"; };
+		48CFBF102ADC10D900E77A5C /* KeychainHolder.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KeychainHolder.swift; sourceTree = "<group>"; };
 		48CFBF112ADC10D900E77A5C /* NoopError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NoopError.swift; sourceTree = "<group>"; };
 		48CFBF122ADC10D900E77A5C /* JSONValue.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JSONValue.swift; sourceTree = "<group>"; };
 		48CFBF132ADC10D900E77A5C /* HexCodable32Bytes.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HexCodable32Bytes.swift; sourceTree = "<group>"; };
@@ -4846,7 +4846,7 @@
 				48CFBF0D2ADC10D900E77A5C /* KeychainClient+Live.swift */,
 				48CFBF0E2ADC10D900E77A5C /* KeychainClient+Interface.swift */,
 				48CFBF0F2ADC10D900E77A5C /* KeychainClient+Mocked.swift */,
-				48CFBF102ADC10D900E77A5C /* KeychainActor.swift */,
+				48CFBF102ADC10D900E77A5C /* KeychainHolder.swift */,
 			);
 			path = KeychainClient;
 			sourceTree = "<group>";
@@ -7881,7 +7881,7 @@
 				48CFC36C2ADC10D900E77A5C /* FungibleTokenDetails+View.swift in Sources */,
 				48CFC6712ADC10DB00E77A5C /* MnemonicBasedFactorSourceKind.swift in Sources */,
 				48CFC2932ADC10D900E77A5C /* AdvancedFeesCustomization+View.swift in Sources */,
-				48CFC4042ADC10D900E77A5C /* KeychainActor.swift in Sources */,
+				48CFC4042ADC10D900E77A5C /* KeychainHolder.swift in Sources */,
 				48CFC4392ADC10DA00E77A5C /* Sorted.swift in Sources */,
 				48CFC5622ADC10DA00E77A5C /* FungibleResourcesCollectionItemGloballyAggregated.swift in Sources */,
 				48CFC2DC2ADC10D900E77A5C /* AdvancedCreateSecurityStructureFlow+View.swift in Sources */,

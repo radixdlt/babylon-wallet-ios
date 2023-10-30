@@ -15,6 +15,7 @@ public struct AddressView: View {
 
 	public init(
 		_ identifiable: LedgerIdentifiable,
+		showFull: Bool = false,
 		isTappable: Bool = true
 	) {
 		self.identifiable = identifiable
@@ -22,15 +23,15 @@ public struct AddressView: View {
 
 		switch identifiable {
 		case .address:
-			self.format = .default
+			self.format = showFull ? .full : .default
 			self.action = .copy
 		case let .identifier(identifier):
 			switch identifier {
 			case .transaction:
-				self.format = .default
+				self.format = showFull ? .full : .default
 				self.action = .viewOnDashboard
 			case .nonFungibleGlobalID:
-				self.format = .nonFungibleLocalId
+				self.format = showFull ? .full : .nonFungibleLocalId
 				self.action = .copy
 			}
 		}
@@ -52,44 +53,42 @@ extension AddressView {
 
 	private var tappableAddressView: some View {
 		Button(action: tapAction) {
-			HStack(spacing: .small3) {
-				addressView
-				image
-			}
-			.contentShape(.contextMenuPreview, RoundedRectangle(cornerRadius: .medium1))
-			.contextMenu {
-				Button(copyText, asset: AssetResource.copyBig) {
-					copyToPasteboard()
-				}
-
-				Button(L10n.AddressAction.viewOnDashboard, asset: AssetResource.iconLinkOut) {
-					viewOnRadixDashboard()
-				}
-
-				if case let .address(.account(accountAddress, isLedgerHWAccount)) = identifiable {
-					Button(
-						L10n.AddressAction.showAccountQR,
-						asset: AssetResource.qrCodeScanner
-					) {
-						showQR(for: accountAddress)
+			addressView
+				.contentShape(.contextMenuPreview, RoundedRectangle(cornerRadius: .medium1))
+				.contextMenu {
+					Button(copyText, asset: AssetResource.copyBig) {
+						copyToPasteboard()
 					}
 
-					if isLedgerHWAccount {
+					Button(L10n.AddressAction.viewOnDashboard, asset: AssetResource.iconLinkOut) {
+						viewOnRadixDashboard()
+					}
+
+					if case let .address(.account(accountAddress, isLedgerHWAccount)) = identifiable {
 						Button(
-							"Verify Address with Ledger", // FIXME: Strings
-							asset: AssetResource.ledger
+							L10n.AddressAction.showAccountQR,
+							asset: AssetResource.qrCodeScanner
 						) {
-							verifyAddressOnLedger(accountAddress)
+							showQR(for: accountAddress)
+						}
+
+						if isLedgerHWAccount {
+							Button(
+								"Verify Address with Ledger", // FIXME: Strings
+								asset: AssetResource.ledger
+							) {
+								verifyAddressOnLedger(accountAddress)
+							}
 						}
 					}
 				}
-			}
 		}
 	}
 
 	private var addressView: some View {
-		Text((identifiable.address).formatted(format))
-			.lineLimit(1)
+		Text("\(identifiable.address.formatted(format)) \(image)")
+			.lineLimit(format == .full ? nil : 1)
+			.multilineTextAlignment(.leading)
 			.minimumScaleFactor(0.5)
 	}
 
