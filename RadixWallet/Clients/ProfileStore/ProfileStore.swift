@@ -15,10 +15,10 @@
 ///
 /// This "public interface" (method meant to be used by the clients) is:
 ///
-/// 	var profile: Profile { get async }
-///		func values() async -> AnyAsyncSequence<Profile>
+/// 	var profile: Profile { get }
+///		func values() -> AnyAsyncSequence<Profile>
 /// 	func unlockedApp() async -> Profile
-///	 	func finishedOnboarding()
+///	 	func finishedOnboarding() async
 ///		func importCloudProfileSnapshot(_ h: ProfileSnapshot.Header) throws
 ///	 	func importProfileSnapshot(_ s: ProfileSnapshot) throws
 ///	 	func deleteProfile(keepInICloudIfPresent: Bool) throws
@@ -83,8 +83,7 @@ public struct ConflictingOwners: Sendable, Hashable {
 
 // MARK: Public
 extension ProfileStore {
-	/// The current value of Profile. Use `update:profile` method to update it. Also see `values`,
-	/// for an async sequence of Profile.
+	/// The current value of Profile. Use `updating` method to update it. Also see `values` for an AsyncSequence of Profile.
 	public var profile: Profile {
 		profileSubject.value
 	}

@@ -22,7 +22,7 @@ extension PersonasClient: DependencyKey {
 				return await HD.Path.Component.Child.Value(getPersonasOnNetwork(networkID).count)
 			},
 			getPersonas: {
-				guard let network = await profileStore.network else {
+				guard let network = await profileStore.profile.network else {
 					return .init()
 				}
 				return network.personas
