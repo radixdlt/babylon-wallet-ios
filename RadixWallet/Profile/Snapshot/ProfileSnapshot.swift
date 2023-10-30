@@ -55,7 +55,7 @@ extension Profile {
 extension Profile {
 	public init(
 		snapshot: ProfileSnapshot
-	) throws {
+	) {
 		// TODO: Validate compatibility
 		self.init(
 			header: snapshot.header,

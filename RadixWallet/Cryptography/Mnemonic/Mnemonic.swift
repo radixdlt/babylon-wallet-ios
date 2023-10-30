@@ -116,8 +116,17 @@ extension Mnemonic: Codable {
 
 #if DEBUG
 extension Mnemonic {
-	public static let testValue: Self = try! Mnemonic(
+	public static let testValue = Self.testValueZooVote
+
+	/// 24 word
+	public static let testValueZooVote: Self = try! Mnemonic(
 		phrase: "zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo vote",
+		language: .english
+	)
+
+	/// 24 word
+	public static let testValueAbandonArt: Self = try! Mnemonic(
+		phrase: "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon art",
 		language: .english
 	)
 }

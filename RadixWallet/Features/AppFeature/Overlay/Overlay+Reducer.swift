@@ -85,7 +85,7 @@ struct OverlayReducer: Sendable, FeatureReducer {
 			if let item = state.itemsQueue.first, case let .alert(state) = item {
 				overlayWindowClient.sendAlertAction(action, state.id)
 			}
-			return .none
+			return dismiss(&state)
 		case .destination(.presented(.hud(.delegate(.dismiss)))):
 			return dismiss(&state)
 

@@ -16,7 +16,8 @@ public struct MnemonicWithPassphrase: Sendable, Hashable, Codable {
 
 #if DEBUG
 extension MnemonicWithPassphrase {
-	public static let testValue: Self = .init(mnemonic: .testValue)
+	public static let testValue: Self = .testValueZooVote
+	public static let testValueZooVote: Self = .init(mnemonic: .testValueZooVote)
+	public static let testValueAbandonArt: Self = .init(mnemonic: .testValueAbandonArt)
 }
-
 #endif

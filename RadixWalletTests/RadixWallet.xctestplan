@@ -2,14 +2,27 @@
   "configurations" : [
     {
       "id" : "8BAFADD8-4BF8-439C-85CA-522BA0496D9A",
-      "name" : "Configuration 1",
+      "name" : "Test Scheme Action",
       "options" : {
 
       }
     }
   ],
   "defaultOptions" : {
-
+    "codeCoverage" : {
+      "targets" : [
+        {
+          "containerPath" : "container:RadixWallet.xcodeproj",
+          "identifier" : "48CFBC4E2ADC106300E77A5C",
+          "name" : "RadixWallet"
+        }
+      ]
+    },
+    "targetForVariableExpansion" : {
+      "containerPath" : "container:RadixWallet.xcodeproj",
+      "identifier" : "48CFBC4E2ADC106300E77A5C",
+      "name" : "RadixWallet"
+    }
   },
   "testTargets" : [
     {

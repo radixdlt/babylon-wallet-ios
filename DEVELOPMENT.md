@@ -8,9 +8,9 @@ The Radix Wallet was originally developed under 2022/2023 using Xcode 13/14 usin
 We _used_ to  use SPM and have ~100 targets, but [after 15 months of pain with it we switched to mono target](https://github.com/radixdlt/babylon-wallet-ios/pull/842), and saw an immediate 2x speedup in build time.
 
 The Radix Wallet rests on several pillars:
-* [Profile](./RadixWallet/Profile): In the Radix Wallet the `Profile` is referred to as "wallet backup data", contains the list of all Accounts, Personas, Authorized Dapps, linked browsers, app settings and more. Securely stored in Keychain and by default backed-up to users iCloud Keychain.  
+* [Profile](./RadixWallet/Profile): In the Radix Wallet the `Profile` is referred to as "wallet backup data", contains the list of all Accounts, Personas, Authorized Dapps, linked browsers, app settings and more. Securely stored in Keychain and by default backed-up to users iCloud Keychain. Also see [`ProfileStore`](./RadixWallet/Clients/ProfileStore/ProfileStore.swift) for the heart of the app, which manages creation, read and write of `Profile`.
 * [Radix Connect](./RadixWallet/RadixConnect): Technology for safe, decentralized peer-to-peer communication between the [Radix Connector Extension][ce] and Radix Wallet, the underlying technology powering it is [WebRTC][webrtc]. 
-* [Swift Engine Toolkit][set]: Swift wrapper around the Rust library [Radix Engine Toolkit - RET][ret] used to compile transaction intents into SBOR that the wallet signs, analyze transaction manifests, calculate transaction hashes and much much more.  
+* [Swift Engine Toolkit][set]: Swift wrapper around the Rust library [Radix Engine Toolkit - RET][ret] used to compile transaction intents into SBOR that the wallet signs, analyze transaction manifests, calculate transaction hashes and much much more.
 
 
 # Releasing

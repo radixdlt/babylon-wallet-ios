@@ -287,7 +287,7 @@ public struct ProfileBackupSettings: Sendable, FeatureReducer {
 		.run { send in
 			cacheClient.removeAll()
 			await radixConnectClient.disconnectAndRemoveAll()
-			await userDefaultsClient.removeAll()
+			userDefaultsClient.removeAll()
 			await send(.delegate(.deleteProfileAndFactorSources(keepInICloudIfPresent: keepInICloudIfPresent)))
 		}
 	}

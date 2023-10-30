@@ -1,0 +1,24 @@
+// Shared iOS target config
+
+#include "iOS-dev.xcconfig"
+
+BUNDLE_LOADER = $(TEST_HOST)
+CODE_SIGN_STYLE = Automatic
+PRODUCT_BUNDLE_IDENTIFIER = com.radixpublishing.ios.RadixWalletTests
+PRODUCT_NAME = RadixWalletTests
+SWIFT_EMIT_LOC_STRINGS = NO
+
+TEST_HOST = $(BUILT_PRODUCTS_DIR)/Radix Wallet Dev.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Radix Wallet Dev
+
+ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES
+
+INFOPLIST_FILE = ;
+
+LD_RUNPATH_SEARCH_PATHS = $(inherited) $(LD_RUNPATH_SEARCH_PATHS_SHALLOW_BUNDLE_$(SHALLOW_BUNDLE))
+
+INFOPLIST_KEY_CFBundleDisplayName = ;
+INFOPLIST_KEY_UIApplicationSceneManifest_Generation = NO;
+INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = NO;
+INFOPLIST_KEY_UILaunchScreen_Generation = NO;
+INFOPLIST_KEY_UISupportedInterfaceOrientations = ;
+INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = ;
