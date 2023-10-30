@@ -165,6 +165,7 @@ extension ProfileSnapshot.Header.Version {
 	/// - 48: Change default gateway to `hammunet` (temp `rcnetv3.1`)
 	/// - 49: Change default gateway to `rcnetv3` (now: `rcnetv3.1`)
 	/// - 100: Remove `ledgerHQHardwareWalletSigningDisplayMode`
+	/// - 100: No version bump - Add entity flags
 	public static let minimum: Self = 100
 }
 

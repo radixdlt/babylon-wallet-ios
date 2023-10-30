@@ -41,7 +41,7 @@ struct AccountList_Preview: PreviewProvider {
 
 extension AccountList.State {
 	static let previewValue: Self = .init(
-		accounts: .init(uniqueElements: [.previewValue]))
+		accounts: .init(uniqueElements: [.previewValue0]))
 }
 
 extension [AccountList.Row.State] {

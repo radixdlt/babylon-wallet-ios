@@ -9,23 +9,21 @@ extension PersonasClient: DependencyKey {
 			guard let network = try? await profileStore.profile.network(id: networkID) else {
 				return .init()
 			}
-			return network.personas
+			return network.getPersonas()
 		}
 
 		return Self(
 			personas: {
 				await profileStore.personaValues()
 			},
-			nextPersonaIndex: { maybeNextworkID async -> HD.Path.Component.Child.Value in
+			nextPersonaIndex: { maybeNetworkID async -> HD.Path.Component.Child.Value in
 				let currentNetworkID = await profileStore.profile.networkID
-				let networkID = maybeNextworkID ?? currentNetworkID
-				return await HD.Path.Component.Child.Value(getPersonasOnNetwork(networkID).count)
+				let networkID = maybeNetworkID ?? currentNetworkID
+				let count = await (try? profileStore.profile.network(id: networkID).nextPersonaIndex()) ?? 0
+				return HD.Path.Component.Child.Value(count)
 			},
 			getPersonas: {
-				guard let network = await profileStore.profile.network else {
-					return .init()
-				}
-				return network.personas
+				try await profileStore.network().getPersonas()
 			},
 			getPersonasOnNetwork: getPersonasOnNetwork,
 			updatePersona: { persona in
@@ -38,8 +36,11 @@ extension PersonasClient: DependencyKey {
 					try $0.addPersona(persona)
 				}
 			},
-			hasAnyPersonaOnAnyNetwork: {
+			hasSomePersonaOnAnyNetwork: {
 				await profileStore.profile.hasAnyPersonaOnAnyNetwork()
+			},
+			hasSomePersonaOnCurrentNetwork: {
+				await profileStore.profile.network?.hasSomePersona() ?? false
 			}
 		)
 	}

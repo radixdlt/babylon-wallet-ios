@@ -65,6 +65,10 @@ extension Profile.Network {
 		/// A required non empty display name, used by presentation layer and sent to Dapps when requested.
 		public var displayName: NonEmpty<String>
 
+		/// Flags that are currently set on entity.
+		@DefaultCodable.EmptyCollection
+		public var flags: Flags
+
 		/// The on ledger synced settings for this account
 		public var onLedgerSettings: OnLedgerSettings
 
@@ -78,9 +82,10 @@ extension Profile.Network {
 			self.networkID = networkID
 			self.address = address
 			self.securityState = securityState
+			self.displayName = displayName
+			self.flags = []
 			self.appearanceID = extraProperties.appearanceID
 			self.onLedgerSettings = .default
-			self.displayName = displayName
 		}
 	}
 }
@@ -177,6 +182,7 @@ extension Profile.Network.Account {
 				"displayName": String(describing: displayName),
 				"address": address,
 				"securityState": securityState,
+				"flags": flags,
 			],
 			displayStyle: .struct
 		)
@@ -186,7 +192,28 @@ extension Profile.Network.Account {
 		"""
 		"displayName": \(String(describing: displayName)),
 		"address": \(address),
-		"securityState": \(securityState)
+		"securityState": \(securityState),
+		"flags": \(flags)
 		"""
+	}
+}
+
+extension Profile.Network.Account {
+	public mutating func hide() {
+		flags.append(.deletedByUser)
+	}
+
+	public mutating func unhide() {
+		flags.remove(.deletedByUser)
+	}
+}
+
+extension Profile.Network.Accounts {
+	public var nonHidden: IdentifiedArrayOf<Profile.Network.Account> {
+		filter(not(\.isHidden)).asIdentifiable()
+	}
+
+	public var hidden: IdentifiedArrayOf<Profile.Network.Account> {
+		filter(\.isHidden).asIdentifiable()
 	}
 }

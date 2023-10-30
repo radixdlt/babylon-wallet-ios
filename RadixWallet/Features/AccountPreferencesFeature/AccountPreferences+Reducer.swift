@@ -20,6 +20,7 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 		case task
 		case qrCodeButtonTapped
 		case rowTapped(AccountPreferences.Section.SectionRow)
+		case hideAccountTapped
 	}
 
 	public enum InternalAction: Sendable, Equatable {
@@ -30,6 +31,10 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 		case destinations(PresentationAction<Destinations.Action>)
 	}
 
+	public enum DelegateAction: Sendable, Equatable {
+		case accountHidden
+	}
+
 	// MARK: - Destination
 	public struct Destinations: Reducer, Sendable {
 		public enum State: Equatable, Hashable {
@@ -37,6 +42,7 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 			case updateAccountLabel(UpdateAccountLabel.State)
 			case thirdPartyDeposits(ManageThirdPartyDeposits.State)
 			case devPreferences(DevAccountPreferences.State)
+			case confirmHideAccount(AlertState<Action.ConfirmHideAccountAlert>)
 		}
 
 		public enum Action: Equatable, Sendable {
@@ -44,6 +50,12 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 			case updateAccountLabel(UpdateAccountLabel.Action)
 			case thirdPartyDeposits(ManageThirdPartyDeposits.Action)
 			case devPreferences(DevAccountPreferences.Action)
+			case confirmHideAccount(ConfirmHideAccountAlert)
+
+			public enum ConfirmHideAccountAlert: Hashable, Sendable {
+				case confirmTapped
+				case cancelTapped
+			}
 		}
 
 		public var body: some ReducerOf<Self> {
@@ -63,6 +75,9 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 	}
 
 	@Dependency(\.accountsClient) var accountsClient
+	@Dependency(\.entitiesVisibilityClient) var entitiesVisibilityClient
+	@Dependency(\.overlayWindowClient) var overlayWindowClient
+	@Dependency(\.errorQueue) var errorQueue
 
 	public init() {}
 
@@ -89,6 +104,17 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 
 		case let .rowTapped(row):
 			return destination(for: row, &state)
+
+		case .hideAccountTapped:
+			state.destinations = .confirmHideAccount(.init(
+				title: .init(L10n.AccountSettings.hideThisAccount),
+				message: .init(L10n.AccountSettings.hideAccountConfirmation),
+				buttons: [
+					.default(.init(L10n.Common.continue), action: .send(.confirmTapped)),
+					.cancel(.init(L10n.Common.cancel), action: .send(.cancelTapped)),
+				]
+			))
+			return .none
 		}
 	}
 
@@ -154,6 +180,21 @@ extension AccountPreferences {
 		case .thirdPartyDeposits:
 			return .none
 		case .devPreferences:
+			return .none
+		case let .confirmHideAccount(action):
+			state.destinations = nil
+			switch action {
+			case .confirmTapped:
+				return .run { [account = state.account] send in
+					try await entitiesVisibilityClient.hideAccount(account)
+					overlayWindowClient.scheduleHUD(.accountHidden)
+					await send(.delegate(.accountHidden))
+				} catch: { error, _ in
+					errorQueue.schedule(error)
+				}
+			case .cancelTapped:
+				break
+			}
 			return .none
 		}
 	}

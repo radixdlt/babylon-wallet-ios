@@ -33,6 +33,10 @@ extension Profile.Network {
 		/// A required non empty display name, used by presentation layer and sent to Dapps when requested.
 		public var displayName: NonEmptyString
 
+		/// Flags that are currently set on entity.
+		@DefaultCodable.EmptyCollection
+		public var flags: Flags
+
 		public var personaData: PersonaData
 
 		public init(
@@ -45,8 +49,9 @@ extension Profile.Network {
 			self.networkID = networkID
 			self.address = address
 			self.securityState = securityState
-			self.personaData = extraProperties.personaData
 			self.displayName = displayName
+			self.flags = []
+			self.personaData = extraProperties.personaData
 		}
 
 		public init(
@@ -60,7 +65,7 @@ extension Profile.Network {
 				address: address,
 				securityState: securityState,
 				displayName: displayName,
-				personaData: .init()
+				extraProperties: .init(personaData: .init())
 			)
 		}
 	}
@@ -139,5 +144,25 @@ extension Profile.Network.Persona {
 		)
 
 		return .init(address: engineAddress.addressString(), decodedKind: engineAddress.entityType())
+	}
+}
+
+extension Profile.Network.Persona {
+	public mutating func hide() {
+		flags.append(.deletedByUser)
+	}
+
+	public mutating func unhide() {
+		flags.remove(.deletedByUser)
+	}
+}
+
+extension Profile.Network.Personas {
+	public var nonHidden: IdentifiedArrayOf<Profile.Network.Persona> {
+		filter(not(\.isHidden)).asIdentifiable()
+	}
+
+	public var hiden: IdentifiedArrayOf<Profile.Network.Persona> {
+		filter(\.isHidden).asIdentifiable()
 	}
 }

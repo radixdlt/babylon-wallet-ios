@@ -481,7 +481,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 
 		state.progress = .migratedSoftwareAccounts(.init(
 			previous: progress.previous,
-			migratedSoftwareAccounts: softwareAccounts.babylonAccounts
+			migratedSoftwareAccounts: softwareAccounts.babylonAccounts.rawValue
 		))
 
 		return migrateHardwareAccounts(in: &state)

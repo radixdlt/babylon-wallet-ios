@@ -101,6 +101,7 @@ public enum AssetResource {
   public static let depositGuarantees = ImageAsset(name: "depositGuarantees")
   public static let desktopConnections = ImageAsset(name: "desktop-connections")
   public static let developerMode = ImageAsset(name: "developerMode")
+  public static let entityHiding = ImageAsset(name: "entityHiding")
   public static let gateway = ImageAsset(name: "gateway")
   public static let ledger = ImageAsset(name: "ledger")
   public static let personas = ImageAsset(name: "personas")
