@@ -25,10 +25,9 @@ public struct PrivateHDFactorSource: Sendable, Hashable {
 extension PrivateHDFactorSource {
 	public static func testValue(
 		name: String,
-		model: DeviceFactorSource.Hint.Model
+		model: DeviceFactorSource.Hint.Model,
+		mnemonicWithPassphrase: MnemonicWithPassphrase = .testValueZooVote
 	) -> Self {
-		let mnemonicWithPassphrase = MnemonicWithPassphrase.testValue
-
 		let deviceFactorSource = try! DeviceFactorSource.babylon(
 			mnemonicWithPassphrase: mnemonicWithPassphrase,
 			model: model,

@@ -2,6 +2,7 @@
 public enum AddressFormat: String, Sendable {
 	case `default`
 	case olympia
+	case full
 	case nonFungibleLocalId
 }
 
@@ -18,6 +19,8 @@ extension String {
 			return truncatedMiddle(keepFirst: 4, last: 6)
 		case .olympia:
 			return truncatedMiddle(keepFirst: 3, last: 9)
+		case .full:
+			return self
 		case .nonFungibleLocalId:
 			guard let local = local(), local.count >= 3 else { return self }
 			return String(local.dropFirst().dropLast())

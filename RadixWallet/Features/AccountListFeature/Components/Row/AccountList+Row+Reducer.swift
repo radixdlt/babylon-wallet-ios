@@ -119,6 +119,8 @@ extension AccountList {
 					state.hasValue = false
 				}
 
+				checkIfCallActionIsNeeded(state: &state)
+
 				return .none
 			}
 		}

@@ -417,7 +417,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 			)
 
 			do {
-				try await userDefaultsClient.addFactorSourceIDOfBackedUpMnemonic(factorSourceID)
+				try userDefaultsClient.addFactorSourceIDOfBackedUpMnemonic(factorSourceID)
 			} catch {
 				// Not important enought to throw
 				loggerGlobal.warning("Failed to save mnemonic as backed up, error: \(error)")
@@ -481,7 +481,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 
 		state.progress = .migratedSoftwareAccounts(.init(
 			previous: progress.previous,
-			migratedSoftwareAccounts: softwareAccounts.babylonAccounts.rawValue
+			migratedSoftwareAccounts: softwareAccounts.babylonAccounts
 		))
 
 		return migrateHardwareAccounts(in: &state)

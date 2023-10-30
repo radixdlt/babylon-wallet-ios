@@ -21,7 +21,7 @@ public struct Home: Sendable, FeatureReducer {
 		) {
 			self.babylonAccountRecoveryIsNeeded = babylonAccountRecoveryIsNeeded
 			self.header = .init()
-			self.accountList = .init(accounts: [])
+			self.accountList = .init()
 			self.destination = nil
 		}
 	}

@@ -9,6 +9,7 @@ extension DeviceFactorSourceClient: DependencyKey {
 		@Dependency(\.secureStorageClient) var secureStorageClient
 		@Dependency(\.accountsClient) var accountsClient
 		@Dependency(\.personasClient) var personasClient
+		@Dependency(\.userDefaultsClient) var userDefaultsClient
 		@Dependency(\.factorSourcesClient) var factorSourcesClient
 
 		let entitiesControlledByFactorSource: GetEntitiesControlledByFactorSource = { factorSource, maybeSnapshot in
@@ -20,7 +21,7 @@ extension DeviceFactorSourceClient: DependencyKey {
 				// FIXME: Uh this aint pretty... but we are short on time.
 				if let overridingSnapshot = maybeSnapshot {
 					let networkID = Radix.Gateway.default.network.id
-					let profile = try Profile(snapshot: overridingSnapshot)
+					let profile = Profile(snapshot: overridingSnapshot)
 					let network = try profile.network(id: networkID)
 					accounts = network.accounts.elements
 					personas = network.personas.elements
@@ -39,9 +40,14 @@ extension DeviceFactorSourceClient: DependencyKey {
 					unsecuredEntityControl.transactionSigning.factorSourceID == factorSource.id
 				}
 			}
+
+			let isMnemonicMarkedAsBackedUp = userDefaultsClient.getFactorSourceIDOfBackedUpMnemonics().contains(factorSource.id)
+
 			return EntitiesControlledByFactorSource(
 				entities: entitiesForSource,
-				deviceFactorSource: factorSource
+				deviceFactorSource: factorSource,
+				isMnemonicPresentInKeychain: secureStorageClient.containsMnemonicIdentifiedByFactorSourceID(factorSource.id),
+				isMnemonicMarkedAsBackedUp: isMnemonicMarkedAsBackedUp
 			)
 		}
 
@@ -50,8 +56,8 @@ extension DeviceFactorSourceClient: DependencyKey {
 				let factorSourceID = request.deviceFactorSource.id
 
 				guard
-					let mnemonicWithPassphrase = try await secureStorageClient
-					.loadMnemonicByFactorSourceID(factorSourceID, request.loadMnemonicPurpose)
+					let mnemonicWithPassphrase = try secureStorageClient
+					.loadMnemonic(factorSourceID: factorSourceID, purpose: request.loadMnemonicPurpose)
 				else {
 					loggerGlobal.critical("Failed to find factor source with ID: '\(factorSourceID)'")
 					throw FailedToFindFactorSource()
@@ -79,7 +85,7 @@ extension DeviceFactorSourceClient: DependencyKey {
 
 					guard
 						let deviceFactorSource,
-						let mnemonicWithPassphrase = try await secureStorageClient
+						let mnemonicWithPassphrase = try secureStorageClient
 						.loadMnemonicByFactorSourceID(
 							deviceFactorSource.id,
 							.checkingAccounts,

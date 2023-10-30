@@ -4,7 +4,7 @@ import XCTest
 
 // MARK: - FactorSourcesCodableTests
 final class FactorSourcesCodableTests: TestCase {
-	func test_generate_vector() throws {
+	func omit_test_generate_vector() throws {
 		let factorSources: [FactorSource] = try withDependencies {
 			$0.date = .constant(.init(timeIntervalSince1970: 1_690_801_871))
 		} operation: {

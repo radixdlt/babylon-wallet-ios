@@ -6,7 +6,7 @@ private let baseLabel = "com.radixpublishing"
 
 private func makeLogger(
 	label: String,
-	level: Logger.Level = .debug
+	level: Logger.Level = .info
 ) -> Logger {
 	Logger(label: label) { _ in
 		// FIXME: Instead of this, we should differentiate by build flavour. Waiting on SPM to support proper build flavours.
@@ -30,6 +30,26 @@ private func makeLogger(
 		return SwiftLogNoOpLogHandler()
 		#endif
 	}
+}
+
+// MARK: - Logger.FailureSeverity
+extension Logger {
+	enum FailureSeverity {
+		case error
+		case critical
+		var level: Logger.Level {
+			switch self {
+			case .error: .error
+			case .critical: .critical
+			}
+		}
+	}
+}
+
+func logAssertionFailure(_ errorMessage: String, severity: Logger.FailureSeverity = .error) {
+	@Dependency(\.assertionFailure) var assertionFailure
+	loggerGlobal.log(level: severity.level, .init(stringLiteral: errorMessage))
+	assertionFailure(errorMessage)
 }
 
 public let loggerGlobal = makeLogger(label: baseLabel)

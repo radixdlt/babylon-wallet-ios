@@ -127,7 +127,7 @@ extension AccountsClient {
 	static func previewValueTwoAccounts() -> Self {
 		update(noop) {
 			$0.getAccountsOnCurrentNetwork = {
-				NonEmpty(.previewValue0, .previewValue1)
+				[.previewValue0, .previewValue1]
 			}
 		}
 	}

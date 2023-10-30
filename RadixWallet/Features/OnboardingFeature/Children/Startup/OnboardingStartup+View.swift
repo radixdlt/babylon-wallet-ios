@@ -69,7 +69,7 @@ extension OnboardingStartup.View {
 // MARK: - SplashGraphic
 @MainActor
 struct SplashGraphic: View {
-	@ObservedObject private var motion: MotionManager = .init()
+	@ObservedObject private var motion: MotionManager = .shared
 
 	@State private var rotate: Bool = false
 
@@ -106,13 +106,18 @@ struct SplashGraphic: View {
 				}
 				.padding(.vertical, verticalPadding)
 			}
+
 			.coordinateSpace(name: coordinateName)
 		}
 		.frame(height: height + 2 * verticalPadding)
 		.onAppear {
+			motion.start()
 			withAnimation(.linear(duration: 90).repeatForever(autoreverses: false)) {
 				rotate = true
 			}
+		}
+		.onDisappear {
+			motion.stop()
 		}
 	}
 
@@ -174,6 +179,7 @@ struct SplashGraphic: View {
 }
 
 // MARK: - MotionManager
+@MainActor
 final class MotionManager: ObservableObject {
 	@Published var offset: CGSize = .zero
 
@@ -184,9 +190,15 @@ final class MotionManager: ObservableObject {
 
 	private let manager = CMMotionManager()
 
-	init() {
-		self.manager.deviceMotionUpdateInterval = 1 / 60
-		self.manager.startDeviceMotionUpdates(to: .main) { [weak self] motionData, error in
+	static let shared = MotionManager()
+
+	func stop() {
+		manager.stopDeviceMotionUpdates()
+	}
+
+	func start() {
+		manager.deviceMotionUpdateInterval = 1 / 60
+		manager.startDeviceMotionUpdates(to: .main) { [weak self] motionData, error in
 			guard let self else { return }
 			if let error {
 				loggerGlobal.warning("Onboarding splash parallax CoreMotion error: \(error)")

@@ -356,7 +356,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 
 		case let .destination(.presented(.markMnemonicAsBackedUp(.userHaveBackedUp(factorSourceID)))):
 			return .run { send in
-				try await userDefaultsClient.addFactorSourceIDOfBackedUpMnemonic(factorSourceID)
+				try userDefaultsClient.addFactorSourceIDOfBackedUpMnemonic(factorSourceID)
 				await send(.delegate(.doneViewing(markedMnemonicAsBackedUp: true)))
 			} catch: { error, _ in
 				loggerGlobal.error("Failed to save mnemonic as backed up")
