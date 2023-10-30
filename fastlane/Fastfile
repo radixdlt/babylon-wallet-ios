@@ -105,6 +105,11 @@ platform :ios do
     error do |lane, exception, options|
         case lane
         when :export_ios_app then
+            branch_name = Actions.git_branch
+            puts "🌴 branch_name: #{branch_name}"
+            if branch_name != "main"
+                return
+            end
             commithash = sh("git rev-parse HEAD").strip # Fastlane Action.last_git_commit did not work
             gh_workflow_check_url = "https://github.com/radixdlt/babylon-wallet-ios/commit/#{commithash}/checks"
 
