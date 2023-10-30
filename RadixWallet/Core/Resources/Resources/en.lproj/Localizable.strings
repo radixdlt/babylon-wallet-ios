@@ -432,6 +432,7 @@ You can always change the guarantee from this default in each transaction.";
 "transactionReview_customizeNetworkFeeSheet_changeButtonTitle" = "Change";
 "transactionReview_customizeNetworkFeeSheet_noneRequired" = "None required";
 "transactionReview_customizeNetworkFeeSheet_noneDue" = "None due";
+"transactionReview_customizeNetworkFeeSheet_noAccountSelected" = "No account selected";
 "transactionReview_customizeNetworkFeeSheet_selectFeePayer_navigationTitle" = "Select Fee Payer";
 "transactionReview_customizeNetworkFeeSheet_selectFeePayer_subtitle" = "Select an account to pay %@ XRD transaction fee";
 "transactionReview_customizeNetworkFeeSheet_selectFeePayer_selectAccountButtonTitle" = "Select Account";
