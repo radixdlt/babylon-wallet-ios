@@ -83,11 +83,11 @@ extension OverlayWindowClient {
 				}
 			}
 
-			public static let copied = Self(text: "Copied") // FIXME: Strings
+			public static let copied = Self(text: L10n.AddressAction.copiedToClipboard)
 
-			public static let updated = Self(text: "Updated") // FIXME: Strings
+			public static let updated = Self(text: L10n.AccountSettings.updatedAccountHUDMessage)
 
-			public static let seedPhraseImported = Self(text: "Seed Phrase Imported") // FIXME: Strings
+			public static let seedPhraseImported = Self(text: L10n.ImportMnemonic.importSeedPhrase)
 
 			// FIXME: Strings
 			public static let accountHidden = Self(text: "Account hidden")
