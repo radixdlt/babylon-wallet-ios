@@ -85,7 +85,7 @@ extension AccountList {
 						guard !Task.isCancelled else {
 							return
 						}
-						await send(.internal(.accountPortfolioUpdate(accountPortfolio)))
+						await send(.internal(.accountPortfolioUpdate(accountPortfolio.filterEmptyVaults)))
 					}
 				}
 			case .backUpMnemonic:
