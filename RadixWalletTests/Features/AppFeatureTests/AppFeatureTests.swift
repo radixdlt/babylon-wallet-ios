@@ -107,17 +107,14 @@ extension Profile.Network.Account {
 
 	static func makeTestValue(
 		name nameOfFirstAccount: String,
+		networkID: NetworkID = .mainnet,
 		index: HD.Path.Component.Child.Value = 0,
 		privateHDFactorSource maybePrivateHDFactorSource: PrivateHDFactorSource? = nil
 	) -> Self {
 		let privateHDFactorSource = maybePrivateHDFactorSource ?? PrivateHDFactorSource.testValue
-		let derivationPath = DerivationPath(
-			scheme: .cap26,
-			path: "m/44H/1022H/10H/525H/1460H/\(index)H"
-		)
+		let path = try! AccountBabylonDerivationPath(networkID: networkID, index: index, keyKind: .transactionSigning)
 
-		let networkID = NetworkID.mainnet
-		let hdFactorInstance = try! privateHDFactorSource.hdRoot(derivationPath: derivationPath)
+		let hdFactorInstance = try! privateHDFactorSource.hdRoot(derivationPath: path.wrapAsDerivationPath())
 
 		return try! Profile.Network.Account(
 			networkID: networkID,

@@ -474,7 +474,9 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 		case .intoKeychainAndProfile:
 			switch persistStrategy.mnemonicForFactorSourceKind {
 			case .offDevice:
-				state.destination = .offDeviceMnemonicInfoPrompt(.init(mnemonicWithPassphrase: mnemonicWithPassphrase))
+				state.destination = .offDeviceMnemonicInfoPrompt(.init(
+					mnemonicWithPassphrase: mnemonicWithPassphrase
+				))
 				return .none
 
 			case let .onDevice(onDeviceKind):

@@ -195,6 +195,26 @@ final class ProfileStoreNewProfileTests: TestCase {
 		}
 	}
 
+	func test__GIVEN__no_profile__WHEN__import_profile_current_network_not_main__THEN__mainnet_is_set_to_current() async throws {
+		try await withTimeLimit(.normal) {
+			let usedProfile = try await withTestClients {
+				// GIVEN no profile
+				$0.noProfile()
+			} operation: {
+				let sut = ProfileStore()
+				// WHEN import profile
+				var profileToImport = Profile.withOneAccountsDeviceInfo_ABBA_mnemonic_ABANDON_ART
+				try profileToImport.addAccount(Profile.Network.Account.makeTestValue(name: "stoke", networkID: .stokenet))
+				try profileToImport.changeGateway(to: .stokenet)
+				try await sut.importProfile(profileToImport)
+				return await sut.profile
+			}
+
+			// THEN imported profile is used
+			XCTAssertNoDifference(usedProfile.network?.networkID, .mainnet)
+		}
+	}
+
 	func test__GIVEN__no_profile__WHEN__import_profile_from_icloud__THEN__imported_profile_is_used() async throws {
 		let profileSnapshotInIcloud = Profile.withOneAccountsDeviceInfo_ABBA_mnemonic_ABANDON_ART
 		try await withTimeLimit {

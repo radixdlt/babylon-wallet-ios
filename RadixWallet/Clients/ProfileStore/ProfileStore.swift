@@ -159,6 +159,8 @@ extension ProfileStore {
 		// Before saving it we must claim ownership of it!
 		try _claimOwnership(of: &profileToImport)
 
+		profileToImport.changeCurrentToMainnetIfNeeded()
+
 		try updateHeaderOfThenSave(
 			profile: profileToImport
 		)
