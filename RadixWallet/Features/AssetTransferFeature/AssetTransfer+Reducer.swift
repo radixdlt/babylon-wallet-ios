@@ -270,34 +270,42 @@ func instructionForDepositing(
 	}
 }
 
-/// Determines if depostting the resource into an account requires the addition of a signature
+/// Determines if depositting the resource into an account requires the addition of a signature
 func needsSignatureForDepositting(into receivingAccount: Profile.Network.Account, resource resourceAddress: ResourceAddress) async -> Bool {
-	@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
-	let hasResource = await (try? onLedgerEntitiesClient.getAccount(receivingAccount.address).hasResource(resourceAddress)) ?? false
 	let depositSettings = receivingAccount.onLedgerSettings.thirdPartyDeposits
 	let resourceException = depositSettings.assetsExceptionList.first { $0.address == resourceAddress }?.exceptionRule
 
-	return switch (depositSettings.depositRule, resourceException) {
-	case (.acceptAll, .allow):
-		false
+	switch (depositSettings.depositRule, resourceException) {
+	// AcceptAll
 	case (.acceptAll, .none):
-		false
+		return false
+	case (.acceptAll, .allow):
+		return false
 	case (.acceptAll, .deny):
-		true
+		return true
+
+	// Accept Known
 	case (.acceptKnown, .allow):
-		false
-	case (.acceptKnown, .none) where hasResource == true:
-		false
+		return false
 	case (.acceptKnown, .none):
-		true
+		// Check if the resource is known to the account
+		@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
+		let hasResource = await (try? onLedgerEntitiesClient
+			.getAccount(receivingAccount.address)
+			.hasResource(resourceAddress)
+		) ?? false
+
+		return !hasResource
 	case (.acceptKnown, .deny):
-		true
-	case (.denyAll, .allow):
-		false
+		return true
+
+	// DenyAll
 	case (.denyAll, .none):
-		true
+		return true
+	case (.denyAll, .allow):
+		return false
 	case (.denyAll, .deny):
-		true
+		return true
 	}
 }
 
