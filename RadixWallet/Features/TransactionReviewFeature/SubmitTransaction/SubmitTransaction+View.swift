@@ -5,30 +5,24 @@ extension SubmitTransaction.State {
 		.init(
 			txID: notarizedTX.txID,
 			status: status,
-			dismissalDisabled: inProgressDismissalDisabled && status.isLoading
+			dismissalDisabled: inProgressDismissalDisabled && status.isInProgress
 		)
 	}
 }
 
-extension TXFailureStatus {
+extension SubmitTransaction.State.TXStatus {
 	var display: String {
 		switch self {
 		case .failed:
-			"Your transaction was processed, but had a problem that caused it to fail permanently"
+			L10n.Transaction.Status.Failed.text
 		case .permanentlyRejected:
-			"Your transaction was improperly constructed and cannot be processed"
-		case .temporarilyRejected:
-			"Your transaction could not be processed, but could potentially still be processed within the next 50 minutes"
-		}
-	}
-}
-
-extension Error {
-	fileprivate var display: String {
-		if case let failure as TXFailureStatus = self {
-			failure.display
-		} else {
-			"Transaction was rejected as invalid by the Radix Network"
+			L10n.Transaction.Status.Rejected.text
+		case let .temporarilyRejected(processingTime):
+			L10n.Transaction.Status.Error.text(processingTime)
+		case .notYetSubmitted, .submitting, .submitted:
+			L10n.Transaction.Status.Completing.text
+		case .committedSuccessfully:
+			""
 		}
 	}
 }
@@ -37,7 +31,7 @@ extension Error {
 extension SubmitTransaction {
 	public struct ViewState: Equatable {
 		let txID: TXID
-		let status: Loadable<EqVoid>
+		let status: State.TXStatus
 		let dismissalDisabled: Bool
 	}
 
@@ -57,19 +51,13 @@ extension SubmitTransaction {
 					viewStore.send(.closeButtonTapped)
 				} content: {
 					VStack(spacing: .medium2) {
-						switch viewStore.status {
-						case let .failure(error):
+						if viewStore.status.failed {
 							Image(asset: AssetResource.warningError)
 							Text(L10n.Transaction.Status.Failure.title)
 								.foregroundColor(.app.gray1)
 								.textStyle(.sheetTitle)
 								.multilineTextAlignment(.center)
-
-							Text(error.display) // FIXME: Strings
-								.foregroundColor(.app.gray1)
-								.textStyle(.body1Regular)
-								.multilineTextAlignment(.center)
-						default:
+						} else {
 							Image(asset: AssetResource.transactionInProgress)
 								.opacity(opacity)
 								.animation(
@@ -83,10 +71,12 @@ extension SubmitTransaction {
 										opacity = 0.5
 									}
 								}
-
-							Text(L10n.Transaction.Status.Completing.text)
-								.textStyle(.body1Regular)
 						}
+
+						Text(viewStore.status.display) // FIXME: Strings
+							.foregroundColor(.app.gray1)
+							.textStyle(.body1Regular)
+							.multilineTextAlignment(.center)
 
 						HStack {
 							Text(L10n.TransactionReview.SubmitTransaction.txID)

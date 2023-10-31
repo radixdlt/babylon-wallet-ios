@@ -3,21 +3,23 @@ import SwiftUI
 
 // MARK: - SubmitTransaction
 public struct SubmitTransaction: Sendable, FeatureReducer {
+	private enum CancellableId: Hashable {
+		case transactionStatus
+	}
+
 	public struct State: Sendable, Hashable {
 		public enum TXStatus: Sendable, Hashable {
 			case notYetSubmitted
 			case submitting
-			case submittedPending
-			case submittedUnknown
+			case submitted
 			case committedSuccessfully
-			case committedFailure
-			case rejected
-			case failedToGetStatus
+			case temporarilyRejected(remainingProcessingTime: Int)
+			case permanentlyRejected
+			case failed
 		}
 
 		public let notarizedTX: NotarizeTransactionResponse
-		public var status: Loadable<EqVoid>
-		public var hasDelegatedThatTXHasBeenSubmitted = false
+		public var status: TXStatus
 		public let inProgressDismissalDisabled: Bool
 
 		@PresentationState
@@ -25,7 +27,7 @@ public struct SubmitTransaction: Sendable, FeatureReducer {
 
 		public init(
 			notarizedTX: NotarizeTransactionResponse,
-			status: Loadable<EqVoid> = .idle,
+			status: TXStatus = .notYetSubmitted,
 			inProgressDismissalDisabled: Bool = false
 		) {
 			self.notarizedTX = notarizedTX
@@ -36,7 +38,7 @@ public struct SubmitTransaction: Sendable, FeatureReducer {
 
 	public enum InternalAction: Sendable, Equatable {
 		case submitTXResult(TaskResult<TXID>)
-		case statusUpdate(Loadable<EqVoid>)
+		case statusUpdate(State.TXStatus)
 	}
 
 	public enum ViewAction: Sendable, Equatable {
@@ -70,6 +72,7 @@ public struct SubmitTransaction: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .appeared:
+			state.status = .submitting
 			return .run { [txID = state.notarizedTX.txID, notarized = state.notarizedTX.notarized] send in
 				await send(.internal(.submitTXResult(
 					TaskResult {
@@ -81,7 +84,7 @@ public struct SubmitTransaction: Sendable, FeatureReducer {
 				)))
 			}
 		case .closeButtonTapped:
-			if state.status.isLoading {
+			if state.status.isInProgress {
 				if state.inProgressDismissalDisabled {
 					state.dismissTransactionAlert = .init(
 						title: .init("Dismiss"), // FIXME: Strings
@@ -101,7 +104,7 @@ public struct SubmitTransaction: Sendable, FeatureReducer {
 			return .send(.delegate(.manuallyDismiss))
 
 		case .dismissTransactionAlert(.presented(.confirm)):
-			return .send(.delegate(.manuallyDismiss))
+			return .concatenate(.cancel(id: CancellableId.transactionStatus), .send(.delegate(.manuallyDismiss)))
 		case .dismissTransactionAlert(.presented(.cancel)):
 			return .none
 		case .dismissTransactionAlert(.dismiss):
@@ -117,77 +120,104 @@ public struct SubmitTransaction: Sendable, FeatureReducer {
 			return .send(.delegate(.failedToSubmit))
 
 		case let .submitTXResult(.success(txID)):
-			let pollStrategy = PollStrategy.default
-			return .run { send in
-				for try await update in try await submitTXClient.transactionStatusUpdates(txID, pollStrategy) {
-					guard update.txID == txID else {
-						loggerGlobal.warning("Received update for wrong txID, incorrect impl of `submitTXClient`?")
-						continue
+			state.status = .submitted
+			return .run { [endEpoch = state.notarizedTX.intent.header().endEpochExclusive] send in
+				do {
+					try await submitTXClient.hasTXBeenCommittedSuccessfully(txID)
+					await send(.internal(.statusUpdate(.committedSuccessfully)))
+				} catch let error as TXFailureStatus {
+					// Error is always TXFailureStatus, just that it is erased to generic Error
+					switch error {
+					case .permanentlyRejected:
+						await send(.internal(.statusUpdate(.permanentlyRejected)))
+					case let .temporarilyRejected(epoch):
+						await send(.internal(.statusUpdate(
+							.temporarilyRejected(remainingProcessingTime: Int(endEpoch - epoch.rawValue))
+						)))
+					case .failed:
+						await send(.internal(.statusUpdate(.failed)))
 					}
-					await send(.internal(.statusUpdate(update.result)))
 				}
-			} catch: { error, _ in
-				loggerGlobal.error("Failed to receive TX status update, error \(error)")
-//				await send(.internal(.statusUpdate(.failure(.failedToGetTransactionStatus(txID: txID, error: .init(pollAttempts: pollStrategy.maxPollTries))))))
 			}
+			.cancellable(id: CancellableId.transactionStatus, cancelInFlight: true)
 			.merge(with: .send(.delegate(.submittedButNotCompleted(state.notarizedTX.txID))))
 
-		case let .statusUpdate(update):
-			state.status = update
-			return .none
+		case let .statusUpdate(status):
+			state.status = status
+			if status == .committedSuccessfully {
+				return transactionCommittedSuccesfully(state)
+			} else {
+				return .none
+			}
 		}
 	}
-}
 
-extension GatewayAPI.TransactionStatus {
-	var stateStatus: SubmitTransaction.State.TXStatus {
-		switch self {
-		case .committedFailure: .committedFailure
-		case .committedSuccess: .committedSuccessfully
-		case .pending: .submittedPending
-		case .rejected: .rejected
-		case .unknown: .submittedUnknown
+	private func transactionCommittedSuccesfully(_ state: State) -> Effect<Action> {
+		// TODO: Could probably be moved in other place. TransactionClient? AccountPortfolio?
+		Task.detached { [intent = state.notarizedTX.intent] in
+			@Dependency(\.transactionClient) var transactionClient
+			@Dependency(\.accountPortfoliosClient) var accountPortfoliosClient
+			@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
+			@Dependency(\.cacheClient) var cacheClient
+
+			let changedAccounts: [Profile.Network.Account.EntityAddress]?
+			let resourceAddressesToRefresh: [Address]?
+			do {
+				let manifest = intent.manifest()
+
+				let involvedAccounts = try await transactionClient.myInvolvedEntities(manifest)
+				changedAccounts = involvedAccounts.accountsDepositedInto
+					.union(involvedAccounts.accountsWithdrawnFrom)
+					.map(\.address)
+
+				let involvedAddresses = manifest.extractAddresses()
+				/// Refresh the resources if an operation on resource pool is involved,
+				/// reason being that contributing or withdrawing from a resource pool modifies the totalSupply
+				if involvedAddresses.contains(where: \.key.isResourcePool) {
+					/// A little bit too aggressive, as any other resource will also be refreshed.
+					/// But at this stage we cannot determine(without making additional calls) the pool unit related fungible resource
+					resourceAddressesToRefresh = involvedAddresses
+						.filter { $0.key == .globalFungibleResourceManager || $0.key.isResourcePool }
+						.values
+						.flatMap(identity)
+						.compactMap { try? $0.asSpecific() }
+				} else {
+					resourceAddressesToRefresh = nil
+				}
+			} catch {
+				loggerGlobal.warning("Could get transactionClient.myInvolvedEntities: \(error.localizedDescription)")
+				changedAccounts = nil
+				resourceAddressesToRefresh = nil
+			}
+
+			if let resourceAddressesToRefresh {
+				resourceAddressesToRefresh.forEach {
+					cacheClient.removeFile(.onLedgerEntity(.resource($0.asGeneral)))
+				}
+			}
+
+			if let changedAccounts {
+				// FIXME: Ideally we should only have to call the cacheClient here
+				// cacheClient.clearCacheForAccounts(Set(changedAccounts))
+				_ = try await accountPortfoliosClient.fetchAccountPortfolios(changedAccounts, true)
+			}
 		}
+		return .send(.delegate(.committedSuccessfully(state.notarizedTX.txID)))
 	}
 }
 
 extension SubmitTransaction.State.TXStatus {
-	var isComplete: Bool {
-		isCompletedWithFailure || isCompletedSuccessfully
-	}
-
-	var isSubmitted: Bool {
-		switch self {
-		case .failedToGetStatus, .rejected, .committedFailure, .submittedUnknown, .submittedPending, .committedSuccessfully: true
-		case .submitting, .notYetSubmitted: false
-		}
-	}
-
-	var isCompletedWithFailure: Bool {
-		switch self {
-		case .rejected, .committedFailure: true
-		case .failedToGetStatus, .notYetSubmitted, .submittedUnknown, .submittedPending, .committedSuccessfully, .submitting: false
-		}
-	}
-
-	var isCompletedSuccessfully: Bool {
-		guard case .committedSuccessfully = self else {
-			return false
-		}
-		return true
-	}
-
 	var isInProgress: Bool {
 		switch self {
-		case .notYetSubmitted, .submitting, .submittedUnknown, .submittedPending: true
-		case .committedFailure, .committedSuccessfully, .rejected, .failedToGetStatus: false
+		case .notYetSubmitted, .submitting, .submitted: true
+		case .temporarilyRejected, .failed, .permanentlyRejected, .committedSuccessfully: false
 		}
 	}
 
 	var failed: Bool {
 		switch self {
-		case .rejected, .committedFailure, .failedToGetStatus: true
-		case .notYetSubmitted, .submittedUnknown, .submittedPending, .committedSuccessfully, .submitting: false
+		case .failed, .permanentlyRejected, .temporarilyRejected: true
+		case .notYetSubmitted, .submitting, .submitted, .committedSuccessfully: false
 		}
 	}
 }

@@ -5,10 +5,8 @@ extension SubmitTransactionClient: DependencyKey {
 	public static let liveValue: Self = {
 		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
 
-		let transactionStatusUpdates: TransactionStatusUpdates = { txID, pollStrategy in
+		let hasTXBeenCommittedSuccessfully: HasTXBeenCommittedSuccessfully = { txID in
 			@Dependency(\.continuousClock) var clock
-
-			let statusSubject = AsyncCurrentValueSubject<TransactionStatusUpdate>(.init(txID: txID, result: .idle))
 
 			@Sendable func pollTransactionStatus() async throws -> GatewayAPI.TransactionStatusResponse {
 				let txStatusRequest = GatewayAPI.TransactionStatusRequest(
@@ -18,52 +16,34 @@ extension SubmitTransactionClient: DependencyKey {
 				return txStatusResponse
 			}
 
-			Task {
-				statusSubject.send(.init(txID: txID, result: .loading))
-				while true {
-					guard let transactionStatus = try? await pollTransactionStatus().knownPayloads.first?.payloadStatus else {
-						loggerGlobal.error("No payload status?")
-						continue
-					}
-
-					loggerGlobal.info("Payload status is \(transactionStatus)")
-
-					switch transactionStatus {
-					case .unknown, .commitPendingOutcomeUnknown, .pending:
-						try? await clock.sleep(for: .seconds(pollStrategy.sleepDuration))
-						continue
-					case .committedSuccess:
-						statusSubject.send(.init(txID: txID, result: .success(.instance)))
-						return
-					case .committedFailure:
-						statusSubject.send(.init(txID: txID, result: .failure(TXFailureStatus.failed)))
-						return
-					case .permanentlyRejected:
-						statusSubject.send(.init(txID: txID, result: .failure(TXFailureStatus.permanentlyRejected)))
-						return
-					case .temporarilyRejected:
-						statusSubject.send(.init(txID: txID, result: .failure(TXFailureStatus.temporarilyRejected)))
-						return
-					}
+			while true {
+				guard !Task.isCancelled else {
+					throw CancellationError()
 				}
-			}
 
-			return statusSubject.eraseToAnyAsyncSequence()
-		}
-
-		let hasTXBeenCommittedSuccessfully: HasTXBeenCommittedSuccessfully = { txID in
-			for try await update in try await transactionStatusUpdates(txID, .default) {
-				guard update.txID == txID else { continue }
-				switch update.result {
-				case .idle, .loading:
+				guard let transactionStatusResponse = try? await pollTransactionStatus(),
+				      let transactionStatus = transactionStatusResponse.knownPayloads.first?.payloadStatus
+				else {
+					loggerGlobal.error("No payload status?")
 					continue
-				case .success:
+				}
+
+				loggerGlobal.info("Payload status is \(transactionStatus)")
+
+				switch transactionStatus {
+				case .unknown, .commitPendingOutcomeUnknown, .pending:
+					try? await clock.sleep(for: .seconds(PollStrategy.default.sleepDuration))
+					continue
+				case .committedSuccess:
 					return
-				case let .failure(error):
-					throw error
+				case .committedFailure:
+					throw TXFailureStatus.failed
+				case .permanentlyRejected:
+					throw TXFailureStatus.permanentlyRejected
+				case .temporarilyRejected:
+					throw TXFailureStatus.temporarilyRejected(currentEpoch: .init(UInt64(transactionStatusResponse.ledgerState.epoch)))
 				}
 			}
-			throw CancellationError()
 		}
 
 		let submitTransaction: SubmitTransaction = { request in
@@ -95,46 +75,12 @@ extension SubmitTransactionClient: DependencyKey {
 				loggerGlobal.debug("\n\n\n🔮 DEBUG TRANSACTION END 🔮\n\n")
 			}
 
-			@Dependency(\.transactionClient) var transactionClient
-			@Dependency(\.accountPortfoliosClient) var accountPortfoliosClient
-			@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
-			@Dependency(\.cacheClient) var cacheClient
-
-			let changedAccounts: [Profile.Network.Account.EntityAddress]?
-			let resourceAddressesToRefresh: [Address]?
 			do {
-				let decompiledNotarized = try NotarizedTransaction.decompile(compiledNotarizedTransaction: request.compiledNotarizedTXIntent)
-
 				#if DEBUG
+				let decompiledNotarized = try NotarizedTransaction.decompile(compiledNotarizedTransaction: request.compiledNotarizedTXIntent)
 				debugPrintTX(decompiledNotarized)
 				#endif
-
-				let manifest = decompiledNotarized.signedIntent().intent().manifest()
-
-				let involvedAccounts = try await transactionClient.myInvolvedEntities(manifest)
-				changedAccounts = involvedAccounts.accountsDepositedInto
-					.union(involvedAccounts.accountsWithdrawnFrom)
-					.map(\.address)
-
-				let involvedAddresses = manifest.extractAddresses()
-				/// Refresh the resources if an operation on resource pool is involved,
-				/// reason being that contributing or withdrawing from a resource pool modifies the totalSupply
-				if involvedAddresses.contains(where: \.key.isResourcePool) {
-					/// A little bit too aggressive, as any other resource will also be refreshed.
-					/// But at this stage we cannot determine(without making additional calls) the pool unit related fungible resource
-					resourceAddressesToRefresh = involvedAddresses
-						.filter { $0.key == .globalFungibleResourceManager || $0.key.isResourcePool }
-						.values
-						.flatMap(identity)
-						.compactMap { try? $0.asSpecific() }
-				} else {
-					resourceAddressesToRefresh = nil
-				}
-			} catch {
-				loggerGlobal.warning("Could get transactionClient.myInvolvedEntities: \(error.localizedDescription)")
-				changedAccounts = nil
-				resourceAddressesToRefresh = nil
-			}
+			} catch {}
 
 			let submitTransactionRequest = GatewayAPI.TransactionSubmitRequest(
 				notarizedTransactionHex: request.compiledNotarizedTXIntent.hex()
@@ -146,28 +92,11 @@ extension SubmitTransactionClient: DependencyKey {
 				throw SubmitTXFailure.invalidTXWasDuplicate(txID: txID)
 			}
 
-			Task.detached {
-				try await hasTXBeenCommittedSuccessfully(txID)
-
-				if let resourceAddressesToRefresh {
-					resourceAddressesToRefresh.forEach {
-						cacheClient.removeFile(.onLedgerEntity(.resource($0.asGeneral)))
-					}
-				}
-
-				if let changedAccounts {
-					// FIXME: Ideally we should only have to call the cacheClient here
-					// cacheClient.clearCacheForAccounts(Set(changedAccounts))
-					_ = try await accountPortfoliosClient.fetchAccountPortfolios(changedAccounts, true)
-				}
-			}
-
 			return txID
 		}
 
 		return Self(
 			submitTransaction: submitTransaction,
-			transactionStatusUpdates: transactionStatusUpdates,
 			hasTXBeenCommittedSuccessfully: hasTXBeenCommittedSuccessfully
 		)
 	}()
@@ -223,35 +152,16 @@ public enum SubmitTXFailure: Sendable, LocalizedError, Equatable {
 }
 
 // MARK: - TXFailureStatus
-public enum TXFailureStatus: String, LocalizedError, Sendable, Hashable {
+public enum TXFailureStatus: LocalizedError, Sendable, Hashable {
 	case permanentlyRejected
-	case temporarilyRejected
+	case temporarilyRejected(currentEpoch: Epoch)
 	case failed
+
 	public var errorDescription: String? {
 		switch self {
 		case .permanentlyRejected: "Permanently Rejected"
 		case .temporarilyRejected: "Temporarily Rejected"
 		case .failed: "Failed"
 		}
-	}
-}
-
-// MARK: - FailedToPollError
-public struct FailedToPollError: Sendable, LocalizedError, Equatable {
-	public let error: Swift.Error
-	public var errorDescription: String? {
-		"Poll failed: \(String(describing: error))"
-	}
-}
-
-// MARK: - FailedToGetTransactionStatus
-public struct FailedToGetTransactionStatus: Sendable, LocalizedError, Equatable {
-	public let pollAttempts: Int
-	public var errorDescription: String? {
-		"\(Self.self)(afterPollAttempts: \(String(describing: pollAttempts))"
-	}
-
-	public init(pollAttempts: Int) {
-		self.pollAttempts = pollAttempts
 	}
 }

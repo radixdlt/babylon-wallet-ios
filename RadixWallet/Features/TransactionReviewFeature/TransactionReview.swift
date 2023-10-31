@@ -366,7 +366,10 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			return resetToApprovable(&state)
 
 		case let .signing(.delegate(.finishedSigning(.signTransaction(notarizedTX, origin: _)))):
-			state.destination = .submitting(.init(notarizedTX: notarizedTX, inProgressDismissalDisabled: state.waitsForTransactionToBeComitted))
+			state.destination = .submitting(.init(
+				notarizedTX: notarizedTX,
+				inProgressDismissalDisabled: state.waitsForTransactionToBeComitted
+			))
 			return .none
 
 		case .signing(.delegate(.finishedSigning(.signAuth))):

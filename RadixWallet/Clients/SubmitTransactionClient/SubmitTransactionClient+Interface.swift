@@ -6,13 +6,11 @@ public enum SubmitTransactionFailure: Sendable, LocalizedError {
 // MARK: - SubmitTransactionClient
 public struct SubmitTransactionClient: Sendable {
 	public var submitTransaction: SubmitTransaction
-	public var transactionStatusUpdates: TransactionStatusUpdates
 	public var hasTXBeenCommittedSuccessfully: HasTXBeenCommittedSuccessfully
 }
 
 extension SubmitTransactionClient {
 	public typealias SubmitTransaction = @Sendable (SubmitTXRequest) async throws -> TXID
-	public typealias TransactionStatusUpdates = @Sendable (TXID, PollStrategy) async throws -> AnyAsyncSequence<TransactionStatusUpdate>
 	public typealias HasTXBeenCommittedSuccessfully = @Sendable (TXID) async throws -> Void
 }
 
