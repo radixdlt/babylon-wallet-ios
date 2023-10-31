@@ -241,33 +241,26 @@ func instructionForDepositing(
 
 	if case let .left(userAccount) = receivingAccount {
 		@Dependency(\.secureStorageClient) var secureStorageClient
-		// TODO: Temporary revert of checking if the receiving account is a ledger account
-		let isSoftwareAccount = true // !receivingAccount.isLedgerAccount
+
+		let needsSignatureForDepositing = await needsSignatureForDepositting(into: userAccount, resource: resource)
+		let isSoftwareAccount = !receivingAccount.isLedgerAccount
 		let userHasAccessToMnemonic = userAccount.deviceFactorSourceID.map { deviceFactorSourceID in
 			secureStorageClient.containsMnemonicIdentifiedByFactorSourceID(deviceFactorSourceID)
 		} ?? false
 
-		let needsSignatureForDepositing = await needsSignatureForDepositting(into: userAccount, resource: resource)
-
-		if needsSignatureForDepositing, isSoftwareAccount, userHasAccessToMnemonic {
+		if needsSignatureForDepositing, isSoftwareAccount && userHasAccessToMnemonic || !isSoftwareAccount {
 			return try ManifestBuilder.accountDeposit(
 				recipientAddress.intoEngine(),
 				bucket
 			)
-		} else {
-			return try ManifestBuilder.accountTryDepositOrAbort(
-				recipientAddress.intoEngine(),
-				nil,
-				bucket
-			)
 		}
-	} else {
-		return try ManifestBuilder.accountTryDepositOrAbort(
-			recipientAddress.intoEngine(),
-			nil,
-			bucket
-		)
 	}
+
+	return try ManifestBuilder.accountTryDepositOrAbort(
+		recipientAddress.intoEngine(),
+		nil,
+		bucket
+	)
 }
 
 /// Determines if depositting the resource into an account requires the addition of a signature
