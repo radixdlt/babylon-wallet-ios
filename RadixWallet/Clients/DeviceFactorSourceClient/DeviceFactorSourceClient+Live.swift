@@ -86,10 +86,10 @@ extension DeviceFactorSourceClient: DependencyKey {
 					guard
 						let deviceFactorSource,
 						let mnemonicWithPassphrase = try secureStorageClient
-						.loadMnemonicByFactorSourceID(
-							deviceFactorSource.id,
-							.checkingAccounts,
-							false
+						.loadMnemonic(
+							factorSourceID: deviceFactorSource.id,
+							purpose: .checkingAccounts,
+							notifyIfMissing: false
 						)
 					else {
 						// Failed to find mnemonic for factor source

@@ -13,9 +13,6 @@ public struct EntitiesControlledByFactorSource: Sendable, Hashable, Identifiable
 		isMnemonicPresentInKeychain: Bool,
 		isMnemonicMarkedAsBackedUp: Bool
 	) {
-		if isMnemonicMarkedAsBackedUp, !isMnemonicPresentInKeychain {
-			assertionFailure("Discrepancy, bad state, a keychain should not be missing and ALSO be marked as backed up. We probably have a missing sync logic between the states.")
-		}
 		self.entities = entities
 		self.deviceFactorSource = deviceFactorSource
 		self.isMnemonicPresentInKeychain = isMnemonicPresentInKeychain
