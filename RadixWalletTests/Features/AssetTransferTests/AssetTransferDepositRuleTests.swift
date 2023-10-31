@@ -24,120 +24,167 @@ final class AssetTransferDepositRuleTests: TestCase {
 	)
 
 	// MARK: - AcceptAll deposit rule
-	func test_GIVEN_depositRuleIsAcceptAll_WHEN_resourceHasNoException_THEN_noSignatureIsRequired() async {
+	func test__GIVEN__depositRuleIsAcceptAll__WHEN__resourceHasNoException__THEN__noSignatureIsRequired() async throws {
 		var account = Self.recipientAccount
+		// GIVEN
 		account.onLedgerSettings.thirdPartyDeposits.depositRule = .acceptAll
+		// WHEN
+		account.onLedgerSettings.thirdPartyDeposits.assetsExceptionList = []
 
-		await assertNoSignatureIsRequired(for: account)
+		// THEN
+		try await assertNoSignatureIsRequired(for: account)
 	}
 
-	func test_GIVEN_depositRuleIsAcceptAll_WHEN_resourceIsInAllowList_THEN_noSignatureIsRequired() async {
+	func test__GIVEN__depositRuleIsAcceptAll__WHEN__resourceIsInAllowList__THEN__noSignatureIsRequired() async throws {
 		var account = Self.recipientAccount
+		// GIVEN
 		account.onLedgerSettings.thirdPartyDeposits.depositRule = .acceptAll
+		// WHEN
 		account.onLedgerSettings.thirdPartyDeposits.assetsExceptionList = [.init(address: Self.resourceAddress, exceptionRule: .allow)]
 
-		await assertNoSignatureIsRequired(for: account)
+		// THEN
+		try await assertNoSignatureIsRequired(for: account)
 	}
 
-	func test_GIVEN_depositRuleIsAcceptAll_WHEN_resourceIsInDenyList_THEN_signatureIsRequired() async {
+	func test__GIVEN__depositRuleIsAcceptAll__WHEN__resourceIsInDenyList__THEN__signatureIsRequired() async throws {
 		var account = Self.recipientAccount
+		// GIVEN
 		account.onLedgerSettings.thirdPartyDeposits.depositRule = .acceptAll
+		// WHEN
 		account.onLedgerSettings.thirdPartyDeposits.assetsExceptionList = [.init(address: Self.resourceAddress, exceptionRule: .deny)]
-
-		await assertSignatureIsRequired(for: account)
+		// THEN
+		try await assertSignatureIsRequired(for: account)
 	}
 
 	// MARK: - DenyAll deposit rule
 
-	func test_GIVEN_depositRuleIsDenyAll_WHEN_resourceHasNoException_THEN_signatureIsRequired() async {
+	func test__GIVEN__depositRuleIsDenyAll__WHEN__resourceHasNoException__THEN__signatureIsRequired() async throws {
 		var account = Self.recipientAccount
+		// GIVEN
 		account.onLedgerSettings.thirdPartyDeposits.depositRule = .denyAll
+		// WHEN
+		account.onLedgerSettings.thirdPartyDeposits.assetsExceptionList = []
 
-		await assertSignatureIsRequired(for: account)
+		// THEN
+		try await assertSignatureIsRequired(for: account)
 	}
 
-	func test_GIVEN_depositRuleIsDenyAll_WHEN_resourceIsInAllowList_THEN_noSignatureIsRequired() async {
+	func test__GIVEN__depositRuleIsDenyAll__WHEN__resourceIsInAllowList__THEN__noSignatureIsRequired() async throws {
 		var account = Self.recipientAccount
+		// GIVEN
 		account.onLedgerSettings.thirdPartyDeposits.depositRule = .denyAll
+		// WHEN
 		account.onLedgerSettings.thirdPartyDeposits.assetsExceptionList = [.init(address: Self.resourceAddress, exceptionRule: .allow)]
 
-		await assertNoSignatureIsRequired(for: account)
+		// THEN
+		try await assertNoSignatureIsRequired(for: account)
 	}
 
-	func test_GIVEN_depositRuleIsDenyAll_WHEN_resourceIsInDenyList_THEN_signatureIsRequired() async {
+	func test__GIVEN__depositRuleIsDenyAll__WHEN__resourceIsInDenyList__THEN__signatureIsRequired() async throws {
 		var account = Self.recipientAccount
+		// GIVEN
 		account.onLedgerSettings.thirdPartyDeposits.depositRule = .denyAll
+		// WHEN
 		account.onLedgerSettings.thirdPartyDeposits.assetsExceptionList = [.init(address: Self.resourceAddress, exceptionRule: .deny)]
 
-		await assertSignatureIsRequired(for: account)
+		// THEN
+		try await assertSignatureIsRequired(for: account)
 	}
 
 	// MARK: - AcceptKnown deposit rule
 
-	func test_GIVEN_depositRuleIsAcceptKnown_WHEN_accountDoesNotContainResource_resourceHasNoException_THEN_signatureIsRequired() async {
+	func test__GIVEN__depositRuleIsAcceptKnown__WHEN__accountDoesNotContainResource_resourceHasNoException__THEN__signatureIsRequired() async throws {
 		var account = Self.recipientAccount
+		// GIVEN
 		account.onLedgerSettings.thirdPartyDeposits.depositRule = .acceptKnown
+		// WHEN
+		account.onLedgerSettings.thirdPartyDeposits.assetsExceptionList = []
 
-		await assertSignatureIsRequired(for: account)
+		// THEN
+		try await assertSignatureIsRequired(for: account)
 	}
 
-	func test_GIVEN_depositRuleIsAcceptKnown_WHEN_accountDoesNotContainResource_resourceIsInAllowList_THEN_noSignatureIsRequired() async {
+	func test__GIVEN__depositRuleIsAcceptKnown__WHEN__accountDoesNotContainResource_resourceIsInAllowList__THEN__noSignatureIsRequired() async throws {
 		var account = Self.recipientAccount
+		// GIVEN
 		account.onLedgerSettings.thirdPartyDeposits.depositRule = .acceptKnown
+		// WHEN
 		account.onLedgerSettings.thirdPartyDeposits.assetsExceptionList = [.init(address: Self.resourceAddress, exceptionRule: .allow)]
 
-		await assertNoSignatureIsRequired(for: account)
+		// THEN
+		try await assertNoSignatureIsRequired(for: account)
 	}
 
-	func test_GIVEN_depositRuleIsAcceptKnown_WHEN_accountDoesNotContainResource_resourceIsInDenyList_THEN_signatureIsRequired() async {
+	func test__GIVEN__depositRuleIsAcceptKnown__WHEN__accountDoesNotContainResource_resourceIsInDenyList__THEN__signatureIsRequired() async throws {
 		var account = Self.recipientAccount
+		// GIVEN
 		account.onLedgerSettings.thirdPartyDeposits.depositRule = .acceptKnown
+		// WHEN
 		account.onLedgerSettings.thirdPartyDeposits.assetsExceptionList = [.init(address: Self.resourceAddress, exceptionRule: .deny)]
 
-		await assertSignatureIsRequired(for: account)
+		// THEN
+		try await assertSignatureIsRequired(for: account)
 	}
 
-	func test_GIVEN_depositRuleIsAcceptKnown_WHEN_accountContainResource_resourceHasNoException_THEN_noSignatureIsRequired() async {
+	func test__GIVEN__depositRuleIsAcceptKnown__WHEN__accountContainResource_resourceHasNoException__THEN__noSignatureIsRequired() async throws {
 		var account = Self.recipientAccount
+		// GIVEN
 		account.onLedgerSettings.thirdPartyDeposits.depositRule = .acceptKnown
+		// WHEN
+		account.onLedgerSettings.thirdPartyDeposits.assetsExceptionList = []
 
-		await assertNoSignatureIsRequired(for: account, onLedgerAccounts: [Self.onLedgerAccountWithResource])
+		// THEN
+		try await assertNoSignatureIsRequired(for: account, onLedgerAccounts: [Self.onLedgerAccountWithResource])
 	}
 
-	func test_GIVEN_depositRuleIsAcceptKnown_WHEN_accountContainResource_resourceIsInAllowList_THEN_noSignatureIsRequired() async {
+	func test__GIVEN__depositRuleIsAcceptKnown__WHEN__accountContainResource_resourceIsInAllowList__THEN__noSignatureIsRequired() async throws {
 		var account = Self.recipientAccount
+		// GIVEN
 		account.onLedgerSettings.thirdPartyDeposits.depositRule = .acceptKnown
+		// WHEN
 		account.onLedgerSettings.thirdPartyDeposits.assetsExceptionList = [.init(address: Self.resourceAddress, exceptionRule: .allow)]
 
-		await assertNoSignatureIsRequired(for: account, onLedgerAccounts: [Self.onLedgerAccountWithResource])
+		// THEN
+		try await assertNoSignatureIsRequired(for: account, onLedgerAccounts: [Self.onLedgerAccountWithResource])
 	}
 
-	func test_GIVEN_depositRuleIsAcceptKnown_WHEN_accountContainResource_resourceIsInDenyList_THEN_signatureIsRequired() async {
+	func test__GIVEN__depositRuleIsAcceptKnown__WHEN__accountContainResource_resourceIsInDenyList__THEN__signatureIsRequired() async throws {
 		var account = Self.recipientAccount
+		// GIVEN
 		account.onLedgerSettings.thirdPartyDeposits.depositRule = .acceptKnown
+		// WHEN
 		account.onLedgerSettings.thirdPartyDeposits.assetsExceptionList = [.init(address: Self.resourceAddress, exceptionRule: .deny)]
 
-		await assertSignatureIsRequired(for: account, onLedgerAccounts: [Self.onLedgerAccountWithResource])
+		// THEN
+		try await assertSignatureIsRequired(for: account, onLedgerAccounts: [Self.onLedgerAccountWithResource])
 	}
 
 	// MARK: - Private
 
-	private func assertSignatureIsRequired(for account: Profile.Network.Account, onLedgerAccounts: [OnLedgerEntity.Account] = []) async {
-		await assertSignatureIsRequired(for: account, isRequired: true, onLedgerAccounts: onLedgerAccounts)
+	private func assertSignatureIsRequired(
+		for account: Profile.Network.Account,
+		onLedgerAccounts: [OnLedgerEntity.Account] = []
+	) async throws {
+		try await assertSignatureIsRequired(for: account, isRequired: true, onLedgerAccounts: onLedgerAccounts)
 	}
 
-	private func assertNoSignatureIsRequired(for account: Profile.Network.Account, onLedgerAccounts: [OnLedgerEntity.Account] = []) async {
-		await assertSignatureIsRequired(for: account, isRequired: false, onLedgerAccounts: onLedgerAccounts)
+	private func assertNoSignatureIsRequired(
+		for account: Profile.Network.Account,
+		onLedgerAccounts: [OnLedgerEntity.Account] = []
+	) async throws {
+		try await assertSignatureIsRequired(for: account, isRequired: false, onLedgerAccounts: onLedgerAccounts)
 	}
 
-	private func assertSignatureIsRequired(for account: Profile.Network.Account, isRequired: Bool, onLedgerAccounts: [OnLedgerEntity.Account]) async {
-		await withDependencies { d in
-			d.onLedgerEntitiesClient.getEntities = { _, _, _, _ in
-				onLedgerAccounts.map { .account($0) }
+	private func assertSignatureIsRequired(for account: Profile.Network.Account, isRequired: Bool, onLedgerAccounts: [OnLedgerEntity.Account]) async throws {
+		try await withTimeLimit(.fast) {
+			await withDependencies { d in
+				d.onLedgerEntitiesClient.getEntities = { _, _, _, _ in
+					onLedgerAccounts.map { .account($0) }
+				}
+			} operation: {
+				let result = await needsSignatureForDepositting(into: account, resource: Self.resourceAddress)
+				XCTAssertEqual(isRequired, result)
 			}
-		} operation: {
-			let result = await needsSignatureForDepositting(into: account, resource: Self.resourceAddress)
-			XCTAssertEqual(isRequired, result)
 		}
 	}
 }
