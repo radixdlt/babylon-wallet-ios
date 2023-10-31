@@ -85,8 +85,8 @@ public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 				await send(.internal(.loadControlledEntities(TaskResult {
 					let ents = try await deviceFactorSourceClient.controlledEntities(snapshot)
 					try? await clock.sleep(for: .milliseconds(200))
-					return await ents.asyncCompactMap { ent in
-						let hasAccessToMnemonic = await secureStorageClient.containsMnemonicIdentifiedByFactorSourceID(ent.factorSourceID)
+					return ents.compactMap { ent in
+						let hasAccessToMnemonic = secureStorageClient.containsMnemonicIdentifiedByFactorSourceID(ent.factorSourceID)
 						return if hasAccessToMnemonic {
 							nil // exclude this mnemonic from mnemonics to import, already present,.
 						} else {

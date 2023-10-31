@@ -81,11 +81,11 @@ extension View {
 	private func importMnemonicsSheet(with destinationStore: PresentationStoreOf<DisplayMnemonics.Destinations>) -> some View {
 		navigationDestination(
 			store: destinationStore,
-			state: /DisplayMnemonics.Destinations.State.importMnemonicControllingAccounts,
-			action: DisplayMnemonics.Destinations.Action.importMnemonicControllingAccounts,
+			state: /DisplayMnemonics.Destinations.State.importMnemonics,
+			action: DisplayMnemonics.Destinations.Action.importMnemonics,
 			destination: { importStore in
 				NavigationView {
-					ImportMnemonicControllingAccounts.View(
+					ImportMnemonicsFlowCoordinator.View(
 						store: importStore
 					)
 				}

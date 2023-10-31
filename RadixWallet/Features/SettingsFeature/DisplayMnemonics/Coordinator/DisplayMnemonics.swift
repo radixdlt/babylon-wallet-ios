@@ -18,6 +18,7 @@ public struct DisplayMnemonics: Sendable, FeatureReducer {
 
 	public enum InternalAction: Sendable, Equatable {
 		case loadedDeviceFactorSources(TaskResult<IdentifiedArrayOf<DisplayEntitiesControlledByMnemonic.State>>)
+		case loadProfileSnapshotForRecoverMnemonicsFlow(TaskResult<ProfileSnapshot>)
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -28,12 +29,12 @@ public struct DisplayMnemonics: Sendable, FeatureReducer {
 	public struct Destinations: Sendable, Equatable, Reducer {
 		public enum State: Sendable, Hashable {
 			case displayMnemonic(DisplayMnemonic.State)
-			case importMnemonicControllingAccounts(ImportMnemonicControllingAccounts.State)
+			case importMnemonics(ImportMnemonicsFlowCoordinator.State)
 		}
 
 		public enum Action: Sendable, Equatable {
 			case displayMnemonic(DisplayMnemonic.Action)
-			case importMnemonicControllingAccounts(ImportMnemonicControllingAccounts.Action)
+			case importMnemonics(ImportMnemonicsFlowCoordinator.Action)
 		}
 
 		public init() {}
@@ -43,8 +44,8 @@ public struct DisplayMnemonics: Sendable, FeatureReducer {
 				DisplayMnemonic()
 			}
 
-			Scope(state: /State.importMnemonicControllingAccounts, action: /Action.importMnemonicControllingAccounts) {
-				ImportMnemonicControllingAccounts()
+			Scope(state: /State.importMnemonics, action: /Action.importMnemonics) {
+				ImportMnemonicsFlowCoordinator()
 			}
 		}
 	}
@@ -52,6 +53,7 @@ public struct DisplayMnemonics: Sendable, FeatureReducer {
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.deviceFactorSourceClient) var deviceFactorSourceClient
 	@Dependency(\.keychainClient) var keychainClient
+	@Dependency(\.backupsClient) var backupsClient
 
 	public init() {}
 
@@ -100,6 +102,15 @@ public struct DisplayMnemonics: Sendable, FeatureReducer {
 			loggerGlobal.error("Failed to load device factor sources, error: \(error)")
 			errorQueue.schedule(error)
 			return .none
+
+		case let .loadProfileSnapshotForRecoverMnemonicsFlow(.success(profileSnapshot)):
+			state.destination = .importMnemonics(.init(profileSnapshot: profileSnapshot))
+			return .none
+
+		case let .loadProfileSnapshotForRecoverMnemonicsFlow(.failure(error)):
+			loggerGlobal.error("Failed to load Profile")
+			errorQueue.schedule(error)
+			return .none
 		}
 	}
 
@@ -117,10 +128,10 @@ public struct DisplayMnemonics: Sendable, FeatureReducer {
 				state.destination = .displayMnemonic(.init(deviceFactorSource: deviceFactorSource))
 				return .none
 			case .importMissingMnemonic:
-				state.destination = .importMnemonicControllingAccounts(.init(
-					entitiesControlledByFactorSource: child.accountsForDeviceFactorSource
-				))
-				return .none
+				return .run { send in
+					let result = await TaskResult { try await backupsClient.snapshotOfProfileForExport() }
+					await send(.internal(.loadProfileSnapshotForRecoverMnemonicsFlow(result)))
+				}
 			}
 
 		case .destination(.presented(.displayMnemonic(.delegate(.failedToLoad)))):
@@ -135,17 +146,18 @@ public struct DisplayMnemonics: Sendable, FeatureReducer {
 
 			return .none
 
-		case let .destination(.presented(.importMnemonicControllingAccounts(.delegate(delegateAction)))):
-			state.destination = nil
-
+		case let .destination(.presented(.importMnemonics(.delegate(delegateAction)))):
 			switch delegateAction {
-			case .skippedMnemonic, .failedToSaveInKeychain: break
-			case let .persistedMnemonicInKeychain(factorSourceID):
-				assert(state.deviceFactorSources[id: factorSourceID] != nil)
-				state.deviceFactorSources[id: factorSourceID]?.imported()
+			case .closeButtonTapped, .failedToImportAllRequiredMnemonics:
+				state.destination = nil
+			case .importedMnemonic: break // we wait until whole flow is over.
+			case let .finishedImportingMnemonics(_, importedIDs):
+				for imported in importedIDs {
+					state.deviceFactorSources[id: imported.factorSourceID]?.imported()
+				}
+				state.destination = nil
 			}
 			return .none
-
 		default: return .none
 		}
 	}

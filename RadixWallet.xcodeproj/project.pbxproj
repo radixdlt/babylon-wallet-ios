@@ -3341,10 +3341,10 @@
 		48CFBD2C2ADC10D800E77A5C /* ImportSeedPhrasesFlow */ = {
 			isa = PBXGroup;
 			children = (
-				48CFBD2D2ADC10D800E77A5C /* ImportMnemonicsFlowCoordinator+View.swift */,
-				48CFBD2E2ADC10D800E77A5C /* ImportMnemonicControllingAccounts+View.swift */,
 				48CFBD2F2ADC10D800E77A5C /* ImportMnemonicControllingAccounts.swift */,
+				48CFBD2E2ADC10D800E77A5C /* ImportMnemonicControllingAccounts+View.swift */,
 				48CFBD302ADC10D800E77A5C /* ImportMnemonicsFlowCoordinator.swift */,
+				48CFBD2D2ADC10D800E77A5C /* ImportMnemonicsFlowCoordinator+View.swift */,
 			);
 			path = ImportSeedPhrasesFlow;
 			sourceTree = "<group>";
