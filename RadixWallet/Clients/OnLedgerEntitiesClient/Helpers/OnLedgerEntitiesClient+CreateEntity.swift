@@ -464,7 +464,7 @@ extension OnLedgerEntitiesClient {
 }
 
 extension OnLedgerEntity.Account.PoolUnitResources {
-	var filterEmptyVaults: OnLedgerEntity.Account.PoolUnitResources {
+	var nonEmptyVaults: OnLedgerEntity.Account.PoolUnitResources {
 		let stakes = radixNetworkStakes.compactMap { stake in
 			let stakeUnitResource: OnLedgerEntity.OwnedFungibleResource? = {
 				guard let stakeUnitResource = stake.stakeUnitResource, stakeUnitResource.amount > 0 else {
@@ -495,13 +495,13 @@ extension OnLedgerEntity.Account.PoolUnitResources {
 }
 
 extension [OnLedgerEntity.OwnedNonFungibleResource] {
-	public var filterEmptyVaults: [OnLedgerEntity.OwnedNonFungibleResource] {
+	public var nonEmptyVaults: [OnLedgerEntity.OwnedNonFungibleResource] {
 		filter { $0.nonFungibleIdsCount > 0 }
 	}
 }
 
 extension OnLedgerEntity.OwnedFungibleResources {
-	public var filterEmptyVaults: OnLedgerEntity.OwnedFungibleResources {
+	public var nonEmptyVaults: OnLedgerEntity.OwnedFungibleResources {
 		.init(
 			xrdResource: xrdResource.flatMap { $0.amount > 0 ? $0 : nil },
 			nonXrdResources: nonXrdResources.filter { $0.amount > 0 }
@@ -510,14 +510,14 @@ extension OnLedgerEntity.OwnedFungibleResources {
 }
 
 extension OnLedgerEntity.Account {
-	public var filterEmptyVaults: OnLedgerEntity.Account {
+	public var nonEmptyVaults: OnLedgerEntity.Account {
 		.init(
 			address: address,
 			atLedgerState: atLedgerState,
 			metadata: metadata,
-			fungibleResources: fungibleResources.filterEmptyVaults,
-			nonFungibleResources: nonFungibleResources.filterEmptyVaults,
-			poolUnitResources: poolUnitResources.filterEmptyVaults
+			fungibleResources: fungibleResources.nonEmptyVaults,
+			nonFungibleResources: nonFungibleResources.nonEmptyVaults,
+			poolUnitResources: poolUnitResources.nonEmptyVaults
 		)
 	}
 }

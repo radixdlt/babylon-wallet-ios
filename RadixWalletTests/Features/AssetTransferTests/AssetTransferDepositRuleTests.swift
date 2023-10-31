@@ -136,7 +136,7 @@ final class AssetTransferDepositRuleTests: TestCase {
 				onLedgerAccounts.map { .account($0) }
 			}
 		} operation: {
-			let result = await needsSignatureForDeposit(into: account, resource: Self.resourceAddress)
+			let result = await needsSignatureForDepositting(into: account, resource: Self.resourceAddress)
 			XCTAssertEqual(isRequired, result)
 		}
 	}

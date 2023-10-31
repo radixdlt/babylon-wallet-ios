@@ -243,9 +243,9 @@ func instructionForDepositing(
 		@Dependency(\.secureStorageClient) var secureStorageClient
 		// TODO: Temporary revert of checking if the receiving account is a ledger account
 		let isSoftwareAccount = true // !receivingAccount.isLedgerAccount
-		let userHasAccessToMnemonic = if let deviceFactorSourceID = userAccount.deviceFactorSourceID {
+		let userHasAccessToMnemonic = userAccount.deviceFactorSourceID.map { deviceFactorSourceID in
 			secureStorageClient.containsMnemonicIdentifiedByFactorSourceID(deviceFactorSourceID)
-		} else { false }
+		} ?? false
 
 		let needsSignatureForDepositing = await needsSignatureForDepositting(into: userAccount, resource: resource)
 
