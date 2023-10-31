@@ -193,10 +193,10 @@ public struct Home: Sendable, FeatureReducer {
 			))
 			return .none
 
-		case .accountList(.delegate(.backUpMnemonic)):
+		case .destination(.presented(.accountDetails(.delegate(.deepLinkToDisplayMnemonics)))):
 			return deepLinkToDisplayMnemonics(state: &state)
 
-		case .accountList(.delegate(.importMnemonics)):
+		case .accountList(.delegate(.deepLinkToDisplayMnemonics)):
 			return deepLinkToDisplayMnemonics(state: &state)
 
 		case .destination(.presented(.accountDetails(.delegate(.dismiss)))):
@@ -209,8 +209,7 @@ public struct Home: Sendable, FeatureReducer {
 	}
 
 	private func deepLinkToDisplayMnemonics(state: inout State) -> Effect<Action> {
-		loggerGlobal.critical("hiding account details")
 		state.destination = nil // hide account details
-		return delayedEffect(delay: .seconds(0.8), for: .delegate(.deepLinkToDisplayMnemonics))
+		return delayedEffect(for: .delegate(.deepLinkToDisplayMnemonics))
 	}
 }

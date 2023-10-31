@@ -49,8 +49,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 
 	public enum DelegateAction: Sendable, Equatable {
 		case dismiss
-		case importMnemonic
-		case exportMnemonic
+		case deepLinkToDisplayMnemonics
 	}
 
 	public enum InternalAction: Sendable, Equatable {
@@ -125,10 +124,10 @@ public struct AccountDetails: Sendable, FeatureReducer {
 			return .none
 
 		case .exportMnemonicButtonTapped:
-			return .send(.delegate(.exportMnemonic))
+			return .send(.delegate(.deepLinkToDisplayMnemonics))
 
 		case .recoverMnemonicsButtonTapped:
-			return .send(.delegate(.importMnemonic))
+			return .send(.delegate(.deepLinkToDisplayMnemonics))
 		}
 	}
 

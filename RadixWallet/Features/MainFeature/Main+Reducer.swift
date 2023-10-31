@@ -85,7 +85,6 @@ public struct Main: Sendable, FeatureReducer {
 			return .none
 
 		case .home(.delegate(.deepLinkToDisplayMnemonics)):
-			loggerGlobal.critical("MAIN  deepLinkToDisplayMnemonics delgated")
 			return deepLinkToDisplayMnemonics(state: &state)
 
 		case let .destination(.presented(.settings(.delegate(.deleteProfileAndFactorSources(keepInIcloudIfPresent))))):

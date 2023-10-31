@@ -26,8 +26,7 @@ public struct AccountList: Sendable, FeatureReducer {
 			needToImportMnemonicForThisAccount: Bool
 		)
 
-		case backUpMnemonic(controlling: Profile.Network.Account)
-		case importMnemonics(account: Profile.Network.Account)
+		case deepLinkToDisplayMnemonics
 	}
 
 	public init() {}
@@ -50,10 +49,10 @@ public struct AccountList: Sendable, FeatureReducer {
 					needToImportMnemonicForThisAccount: needToImportMnemonicForThisAccount
 				)))
 
-			case let .backUpMnemonic(controllingAccount):
-				.send(.delegate(.backUpMnemonic(controlling: controllingAccount)))
-			case let .importMnemonics(account):
-				.send(.delegate(.importMnemonics(account: account)))
+			case .backUpMnemonic:
+				.send(.delegate(.deepLinkToDisplayMnemonics))
+			case .importMnemonics:
+				.send(.delegate(.deepLinkToDisplayMnemonics))
 			}
 		case .account:
 			.none
