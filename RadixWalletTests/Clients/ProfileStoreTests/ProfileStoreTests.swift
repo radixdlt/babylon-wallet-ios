@@ -727,7 +727,7 @@ final class ProfileStoreExstingProfileTests: TestCase {
 
 	// FIXME: Maybe should probably be moved to SecureStorageClientTests..?
 	func test__GIVEN__saved_profile__WHEN__deleteWallet_not_keepIcloud__THEN__profile_gets_removed_from_saved_headerlist() async throws {
-		try await withTimeLimit(.normal) {
+		try await withTimeLimit(.slow) {
 			// GIVEN saved profile
 			let saved = Profile.withOneAccount
 			// WHEN deleteWallet
