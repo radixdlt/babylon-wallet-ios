@@ -1164,6 +1164,10 @@
 		832880692AE664C30014FBF3 /* EntityFlag.swift in Sources */ = {isa = PBXBuildFile; fileRef = 832880682AE664C30014FBF3 /* EntityFlag.swift */; };
 		8328806C2AE6725F0014FBF3 /* AccountPreferencesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8328806B2AE6725F0014FBF3 /* AccountPreferencesTests.swift */; };
 		83D0B5692AE01EDE0048DCBE /* RadixEngineToolkitError+Description.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83D0B5682AE01EDE0048DCBE /* RadixEngineToolkitError+Description.swift */; };
+		83EE47552AF0DE8F00155F03 /* TransactionPayloadGatewayHandlingStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83EE47512AF0DE8E00155F03 /* TransactionPayloadGatewayHandlingStatus.swift */; };
+		83EE47562AF0DE8F00155F03 /* TransactionPayloadStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83EE47522AF0DE8E00155F03 /* TransactionPayloadStatus.swift */; };
+		83EE47572AF0DE8F00155F03 /* TransactionIntentStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83EE47532AF0DE8E00155F03 /* TransactionIntentStatus.swift */; };
+		83EE47582AF0DE8F00155F03 /* EventsItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83EE47542AF0DE8E00155F03 /* EventsItem.swift */; };
 		E62BB7632AEA856300D46DAC /* ImportMnemonicTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E62BB7622AEA856300D46DAC /* ImportMnemonicTests.swift */; };
 		E6390FB32AE6C3E200B4DEE2 /* ProfileStore+OverlayWindowClient+Alert+OwnershipConflict.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6390FB22AE6C3E200B4DEE2 /* ProfileStore+OverlayWindowClient+Alert+OwnershipConflict.swift */; };
 		E63D123D2ADD1FC00001CBB1 /* SwiftUIIntrospect in Frameworks */ = {isa = PBXBuildFile; productRef = E63D123C2ADD1FC00001CBB1 /* SwiftUIIntrospect */; };
@@ -2401,6 +2405,10 @@
 		832880682AE664C30014FBF3 /* EntityFlag.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntityFlag.swift; sourceTree = "<group>"; };
 		8328806B2AE6725F0014FBF3 /* AccountPreferencesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountPreferencesTests.swift; sourceTree = "<group>"; };
 		83D0B5682AE01EDE0048DCBE /* RadixEngineToolkitError+Description.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RadixEngineToolkitError+Description.swift"; sourceTree = "<group>"; };
+		83EE47512AF0DE8E00155F03 /* TransactionPayloadGatewayHandlingStatus.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TransactionPayloadGatewayHandlingStatus.swift; sourceTree = "<group>"; };
+		83EE47522AF0DE8E00155F03 /* TransactionPayloadStatus.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TransactionPayloadStatus.swift; sourceTree = "<group>"; };
+		83EE47532AF0DE8E00155F03 /* TransactionIntentStatus.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TransactionIntentStatus.swift; sourceTree = "<group>"; };
+		83EE47542AF0DE8E00155F03 /* EventsItem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EventsItem.swift; sourceTree = "<group>"; };
 		E62BB7622AEA856300D46DAC /* ImportMnemonicTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportMnemonicTests.swift; sourceTree = "<group>"; };
 		E6390FB22AE6C3E200B4DEE2 /* ProfileStore+OverlayWindowClient+Alert+OwnershipConflict.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ProfileStore+OverlayWindowClient+Alert+OwnershipConflict.swift"; sourceTree = "<group>"; };
 		E67F14442AE029BA00738BE1 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -5316,6 +5324,10 @@
 		48CFBFCE2ADC10D900E77A5C /* Generated */ = {
 			isa = PBXGroup;
 			children = (
+				83EE47542AF0DE8E00155F03 /* EventsItem.swift */,
+				83EE47532AF0DE8E00155F03 /* TransactionIntentStatus.swift */,
+				83EE47512AF0DE8E00155F03 /* TransactionPayloadGatewayHandlingStatus.swift */,
+				83EE47522AF0DE8E00155F03 /* TransactionPayloadStatus.swift */,
 				48CFBFCF2ADC10D900E77A5C /* ValidatorsUptimeRequestAllOf.swift */,
 				48CFBFD02ADC10D900E77A5C /* MetadataPublicKeyValueAllOf.swift */,
 				48CFBFD12ADC10D900E77A5C /* RoleAssignmentResolution.swift */,
@@ -8043,6 +8055,7 @@
 				48CFC3D22ADC10D900E77A5C /* BIP39+WordList.swift in Sources */,
 				48CFC3F42ADC10D900E77A5C /* PeerConnectionDelegate.swift in Sources */,
 				48CFC2742ADC10D900E77A5C /* Main+Reducer.swift in Sources */,
+				83EE47562AF0DE8F00155F03 /* TransactionPayloadStatus.swift in Sources */,
 				48CFC50C2ADC10DA00E77A5C /* MetadataOriginArrayValue.swift in Sources */,
 				48CFC67D2ADC10DB00E77A5C /* RoleOfTier.swift in Sources */,
 				48CFC3FC2ADC10D900E77A5C /* WebRTCFactory.swift in Sources */,
@@ -8093,6 +8106,7 @@
 				48CFC33C2ADC10D900E77A5C /* DappInteractionLoading+View.swift in Sources */,
 				48CFC6832ADC10DB00E77A5C /* AbstractSecurityStructure.swift in Sources */,
 				48CFC3872ADC10D900E77A5C /* AssetsView+View.swift in Sources */,
+				83EE47552AF0DE8F00155F03 /* TransactionPayloadGatewayHandlingStatus.swift in Sources */,
 				48CFC4802ADC10DA00E77A5C /* ROLAClient+Live.swift in Sources */,
 				48CFC4362ADC10DA00E77A5C /* JSONEncoder+Live.swift in Sources */,
 				48CFC4862ADC10DA00E77A5C /* OnLedgerEntitiesClient+Interface.swift in Sources */,
@@ -8250,6 +8264,7 @@
 				48CFC3312ADC10D900E77A5C /* ImportMnemonicWord+View.swift in Sources */,
 				48CFC5442ADC10DA00E77A5C /* NonFungibleResourcesCollectionItemVaultAggregatedVaultAllOf.swift in Sources */,
 				48CFC55A2ADC10DA00E77A5C /* MetadataNonFungibleGlobalIdArrayValue.swift in Sources */,
+				83EE47572AF0DE8F00155F03 /* TransactionIntentStatus.swift in Sources */,
 				48CFC2BD2ADC10D900E77A5C /* ImportMnemonicControllingAccounts+View.swift in Sources */,
 				48CFC50E2ADC10DA00E77A5C /* InternalServerError.swift in Sources */,
 				48CFC30E2ADC10D900E77A5C /* AppSettings+View.swift in Sources */,
@@ -8515,6 +8530,7 @@
 				48CFC65E2ADC10DB00E77A5C /* Profile+AppPreferences+Update.swift in Sources */,
 				48CFC3942ADC10D900E77A5C /* Nonce.swift in Sources */,
 				48CFC2FD2ADC10D900E77A5C /* DefaultDepositGuarantees+View.swift in Sources */,
+				83EE47582AF0DE8F00155F03 /* EventsItem.swift in Sources */,
 				48CFC5E02ADC10DA00E77A5C /* LoadableView.swift in Sources */,
 				48CFC6012ADC10DA00E77A5C /* P2P+ConnectorExtension+Request.swift in Sources */,
 				48CFC5462ADC10DA00E77A5C /* PublicKeyType.swift in Sources */,

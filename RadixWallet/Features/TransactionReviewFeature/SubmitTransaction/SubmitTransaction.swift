@@ -16,7 +16,7 @@ public struct SubmitTransaction: Sendable, FeatureReducer {
 		}
 
 		public let notarizedTX: NotarizeTransactionResponse
-		public var status: TXStatus
+		public var status: Loadable<EqVoid>
 		public var hasDelegatedThatTXHasBeenSubmitted = false
 		public let inProgressDismissalDisabled: Bool
 
@@ -25,7 +25,7 @@ public struct SubmitTransaction: Sendable, FeatureReducer {
 
 		public init(
 			notarizedTX: NotarizeTransactionResponse,
-			status: TXStatus = .notYetSubmitted,
+			status: Loadable<EqVoid> = .idle,
 			inProgressDismissalDisabled: Bool = false
 		) {
 			self.notarizedTX = notarizedTX
@@ -36,7 +36,7 @@ public struct SubmitTransaction: Sendable, FeatureReducer {
 
 	public enum InternalAction: Sendable, Equatable {
 		case submitTXResult(TaskResult<TXID>)
-		case statusUpdate(Result<GatewayAPI.TransactionStatus, TransactionPollingFailure>)
+		case statusUpdate(Loadable<EqVoid>)
 	}
 
 	public enum ViewAction: Sendable, Equatable {
@@ -81,7 +81,7 @@ public struct SubmitTransaction: Sendable, FeatureReducer {
 				)))
 			}
 		case .closeButtonTapped:
-			if state.status.isInProgress {
+			if state.status.isLoading {
 				if state.inProgressDismissalDisabled {
 					state.dismissTransactionAlert = .init(
 						title: .init("Dismiss"), // FIXME: Strings
@@ -117,7 +117,6 @@ public struct SubmitTransaction: Sendable, FeatureReducer {
 			return .send(.delegate(.failedToSubmit))
 
 		case let .submitTXResult(.success(txID)):
-			state.status = .submitting
 			let pollStrategy = PollStrategy.default
 			return .run { send in
 				for try await update in try await submitTXClient.transactionStatusUpdates(txID, pollStrategy) {
@@ -127,30 +126,15 @@ public struct SubmitTransaction: Sendable, FeatureReducer {
 					}
 					await send(.internal(.statusUpdate(update.result)))
 				}
-			} catch: { error, send in
+			} catch: { error, _ in
 				loggerGlobal.error("Failed to receive TX status update, error \(error)")
-				await send(.internal(.statusUpdate(.failure(.failedToGetTransactionStatus(txID: txID, error: .init(pollAttempts: pollStrategy.maxPollTries))))))
+//				await send(.internal(.statusUpdate(.failure(.failedToGetTransactionStatus(txID: txID, error: .init(pollAttempts: pollStrategy.maxPollTries))))))
 			}
+			.merge(with: .send(.delegate(.submittedButNotCompleted(state.notarizedTX.txID))))
 
 		case let .statusUpdate(update):
-			switch update {
-			case let .success(status):
-				let stateStatus = status.stateStatus
-				state.status = stateStatus
-				if stateStatus.isCompletedSuccessfully {
-					return .send(.delegate(.committedSuccessfully(state.notarizedTX.txID)))
-				} else if stateStatus.isSubmitted {
-					if !state.hasDelegatedThatTXHasBeenSubmitted {
-						defer { state.hasDelegatedThatTXHasBeenSubmitted = true }
-						return .send(.delegate(.submittedButNotCompleted(state.notarizedTX.txID)))
-					}
-				}
-				return .none
-			case .failure:
-				/// Need to show failure
-				state.status = .failedToGetStatus
-				return .none
-			}
+			state.status = update
+			return .none
 		}
 	}
 }

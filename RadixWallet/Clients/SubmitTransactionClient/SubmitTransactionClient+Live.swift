@@ -8,7 +8,7 @@ extension SubmitTransactionClient: DependencyKey {
 		let transactionStatusUpdates: TransactionStatusUpdates = { txID, pollStrategy in
 			@Dependency(\.continuousClock) var clock
 
-			let statusSubject = AsyncCurrentValueSubject<TransactionStatusUpdate>(.init(txID: txID, result: .success(.pending)))
+			let statusSubject = AsyncCurrentValueSubject<TransactionStatusUpdate>(.init(txID: txID, result: .idle))
 
 			@Sendable func pollTransactionStatus() async throws -> GatewayAPI.TransactionStatusResponse {
 				let txStatusRequest = GatewayAPI.TransactionStatusRequest(
@@ -18,57 +18,29 @@ extension SubmitTransactionClient: DependencyKey {
 				return txStatusResponse
 			}
 
-			let pollCountHolder = ActorIsolated<Int>(0)
-
 			Task {
+				statusSubject.send(.init(txID: txID, result: .loading))
 				while true {
-					guard let transactionStatus = try? await pollTransactionStatus().knownPayloads.first?.status else {
+					guard let transactionStatus = try? await pollTransactionStatus().knownPayloads.first?.payloadStatus else {
 						continue
 					}
+
 					switch transactionStatus {
-					case .unknown:
-						<#code#>
+					case .unknown, .commitPendingOutcomeUnknown, .pending:
+						try? await clock.sleep(for: .seconds(pollStrategy.sleepDuration))
+						continue
 					case .committedSuccess:
-						<#code#>
+						statusSubject.send(.init(txID: txID, result: .success(.instance)))
+						return
 					case .committedFailure:
-						<#code#>
-					case .pending:
-						<#code#>
-					case .rejected:
-						<#code#>
-					}
-				}
-				while !statusSubject.value.result.isComplete {
-					await pollCountHolder.withValue { pollCount in
-						if pollCount >= pollStrategy.maxPollTries {
-							statusSubject.send(.init(
-								txID: txID,
-								result: .failure(.failedToGetTransactionStatus(
-									txID: txID,
-									error: .init(pollAttempts: pollCount)
-								))
-							))
-						} else {
-							pollCount += 1
-						}
-					}
-					try? await clock.sleep(for: .seconds(pollStrategy.sleepDuration))
-					do {
-						let status = try await pollTransactionStatus()
-						statusSubject.send(.init(txID: txID, result: .success(status)))
-					} catch {
-						loggerGlobal.error("Failed to poll transaction status: \(error.localizedDescription)")
-						switch error {
-						case is BadHTTPResponseCode, is BadHTTPResponseCode, is ResponseDecodingError:
-							/// Terminate polling, GW returned wrong response
-							await statusSubject.send(.init(
-								txID: txID,
-								result: .failure(.failedToGetTransactionStatus(txID: txID, error: .init(pollAttempts: pollCountHolder.value)))
-							))
-						default:
-							/// Continue polling, the poll failed due to internal URLSession error.
-							break
-						}
+						statusSubject.send(.init(txID: txID, result: .failure(TXFailureStatus.failed)))
+						return
+					case .permanentlyRejected:
+						statusSubject.send(.init(txID: txID, result: .failure(TXFailureStatus.permanentlyRejected)))
+						return
+					case .temporarilyRejected:
+						statusSubject.send(.init(txID: txID, result: .failure(TXFailureStatus.temporarilyRejected)))
+						return
 					}
 				}
 			}
@@ -80,18 +52,12 @@ extension SubmitTransactionClient: DependencyKey {
 			for try await update in try await transactionStatusUpdates(txID, .default) {
 				guard update.txID == txID else { continue }
 				switch update.result {
-				case .success(.committedFailure):
-					throw TXFailureStatus.failed
-				case .success(.rejected):
-					throw TXFailureStatus.rejected
-				case .success(.committedSuccess):
+				case .idle, .loading:
+					continue
+				case .success:
 					return
 				case let .failure(error):
 					throw error
-				case .success(.unknown):
-					continue
-				case .success(.pending):
-					continue
 				}
 			}
 			throw CancellationError()
@@ -255,11 +221,13 @@ public enum SubmitTXFailure: Sendable, LocalizedError, Equatable {
 
 // MARK: - TXFailureStatus
 public enum TXFailureStatus: String, LocalizedError, Sendable, Hashable {
-	case rejected
+	case permanentlyRejected
+	case temporarilyRejected
 	case failed
 	public var errorDescription: String? {
 		switch self {
-		case .rejected: "Rejected"
+		case .permanentlyRejected: "Permanently Rejected"
+		case .temporarilyRejected: "Temporarily Rejected"
 		case .failed: "Failed"
 		}
 	}
