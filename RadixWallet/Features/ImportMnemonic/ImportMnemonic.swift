@@ -36,7 +36,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 							wordCount: newWordCount,
 							language: language
 						),
-						isReadonlyMode: readonlyMode != nil
+						isReadonlyMode: mode.readonly != nil
 					)
 				})
 			} else if delta < 0 {
@@ -60,12 +60,6 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			words.compactMap(\.completeWord)
 		}
 
-		/// irrelevant for readonly
-		public var isProgressing = false
-
-		public let persistStrategy: PersistStrategy?
-
-		public let readonlyMode: ReadonlyMode?
 		public let isWordCountFixed: Bool
 		public var isAdvancedMode: Bool = false
 
@@ -93,6 +87,40 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 				self.factorSourceKind = factorSourceKind
 			}
 		}
+
+		public struct WriteMode: Sendable, Hashable {
+			public var isProgressing: Bool
+			public let persistStrategy: PersistStrategy?
+		}
+
+		public enum Mode: Sendable, Hashable {
+			case readonly(ReadonlyMode)
+			case write(WriteMode)
+			var readonly: ReadonlyMode? {
+				switch self {
+				case let .readonly(value): value
+				case .write: nil
+				}
+			}
+
+			var write: WriteMode? {
+				switch self {
+				case .readonly: nil
+				case let .write(value): value
+				}
+			}
+
+			mutating func update(isProgressing: Bool) {
+				guard var write = self.write else {
+					assertionFailure("Expected write mode")
+					return
+				}
+				write.isProgressing = isProgressing
+				self = .write(write)
+			}
+		}
+
+		public var mode: Mode
 
 		#if DEBUG
 		public var debugMnemonicPhraseSingleField = ""
@@ -140,11 +168,10 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 		) {
 			precondition(wordCount.rawValue.isMultiple(of: ImportMnemonic.wordsPerRow))
 
-			self.persistStrategy = persistStrategy
+			self.mode = .write(.init(isProgressing: false, persistStrategy: persistStrategy))
 			self.language = language
 			self.bip39Passphrase = bip39Passphrase
 
-			self.readonlyMode = nil
 			self.isWordCountFixed = isWordCountFixed
 			self.words = []
 			if let offDeviceMnemonicInfoPrompt {
@@ -167,9 +194,8 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			self.warningOnContinue = nil
 
 			let mnemonic = mnemonicWithPassphrase.mnemonic
-			self.persistStrategy = nil
 			self.language = mnemonic.language
-			self.readonlyMode = readonlyMode
+			self.mode = .readonly(readonlyMode)
 			self.isWordCountFixed = true
 			self.words = Self.words(from: mnemonic, isReadonlyMode: true)
 			self.bip39Passphrase = mnemonicWithPassphrase.passphrase
@@ -352,7 +378,8 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 
 		case let .destination(.presented(.offDeviceMnemonicInfoPrompt(.delegate(.done(label, mnemonicWithPassphrase))))):
 			state.destination = nil
-			guard let persistStrategy = state.persistStrategy else {
+
+			guard let persistStrategy = state.mode.write?.persistStrategy else {
 				preconditionFailure("expected persistStrategy")
 				return .none
 			}
@@ -426,15 +453,15 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			return continueWithMnemonic(mnemonic: mnemonic, in: &state)
 
 		case .doneViewing:
-			assert(state.readonlyMode != nil)
+			assert(state.mode.readonly != nil)
 			return markAsBackedUpIfNeeded(&state)
 
 		case .backButtonTapped:
-			assert(state.readonlyMode?.context == .fromSettings)
+			assert(state.mode.readonly?.context == .fromSettings)
 			return markAsBackedUpIfNeeded(&state)
 
 		case .closeButtonTapped:
-			assert(state.readonlyMode?.context == .fromBackupPrompt)
+			assert(state.mode.readonly?.context == .fromBackupPrompt)
 			return markAsBackedUpIfNeeded(&state)
 
 		#if DEBUG
@@ -447,8 +474,8 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 		case let .debugMnemonicChanged(mnemonic):
 			state.debugMnemonicPhraseSingleField = mnemonic
 			if let mnemonic = try? Mnemonic(phrase: mnemonic, language: state.language) {
-				state.words = State.words(from: mnemonic, isReadonlyMode: state.readonlyMode != nil)
-				state.isProgressing = true
+				state.words = State.words(from: mnemonic, isReadonlyMode: state.mode.readonly != nil)
+				state.mode.update(isProgressing: true)
 				return .send(.view(.continueButtonTapped(mnemonic)))
 			} else {
 				return .none
@@ -462,12 +489,16 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 	}
 
 	private func continueWithMnemonic(mnemonic: Mnemonic, in state: inout State) -> Effect<Action> {
-		state.isProgressing = true
+		guard let write = state.mode.write else {
+			preconditionFailure("expected write mode")
+			return .none
+		}
+		state.mode.update(isProgressing: true)
 		let mnemonicWithPassphrase = MnemonicWithPassphrase(
 			mnemonic: mnemonic,
 			passphrase: state.bip39Passphrase
 		)
-		guard let persistStrategy = state.persistStrategy else {
+		guard let persistStrategy = write.persistStrategy else {
 			return .send(.delegate(.notPersisted(mnemonicWithPassphrase)))
 		}
 		switch persistStrategy.location {
@@ -508,7 +539,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 
 	private func markAsBackedUpIfNeeded(_ state: inout State) -> Effect<Action> {
 		guard
-			let readonlyMode = state.readonlyMode,
+			let readonlyMode = state.mode.readonly,
 			let mnemonic = state.mnemonic,
 			case let mnemonicWithPassphrase = MnemonicWithPassphrase(mnemonic: mnemonic, passphrase: state.bip39Passphrase),
 			let factorSourceID = try? FactorSourceID.FromHash(
@@ -536,13 +567,13 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			return .none
 
 		case let .saveFactorSourceResult(.failure(error)):
-			state.isProgressing = false
+			state.mode.update(isProgressing: false)
 			errorQueue.schedule(error)
 			loggerGlobal.error("Failed to save mnemonic in profile, error: \(error)")
 			return .none
 
 		case let .saveFactorSourceResult(.success(factorSource)):
-			state.isProgressing = false
+			state.mode.update(isProgressing: false)
 			return .send(.delegate(.persistedNewFactorSourceInProfile(factorSource)))
 		}
 	}
