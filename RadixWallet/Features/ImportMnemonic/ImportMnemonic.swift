@@ -380,6 +380,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			return .send(.delegate(.doneViewing(markedMnemonicAsBackedUp: false)))
 
 		case .destination(.presented(.onContinueWarning(.buttonTapped))):
+			state.destination = nil
 			guard let mnemonic = state.mnemonic else {
 				loggerGlobal.error("Can't read mnemonic")
 				struct FailedToReadMnemonic: Error {}
@@ -643,7 +644,9 @@ extension ImportMnemonic.Destinations.State {
 		))
 	}
 
-	fileprivate static func onContinueWarning(_ warning: ImportMnemonic.State.OnContinueWarning) -> Self {
+	fileprivate static func onContinueWarning(
+		_ warning: ImportMnemonic.State.OnContinueWarning
+	) -> Self {
 		.onContinueWarning(.init(
 			title: { TextState(warning.title) },
 			actions: {
