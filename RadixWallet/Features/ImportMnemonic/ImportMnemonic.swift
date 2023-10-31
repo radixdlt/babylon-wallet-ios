@@ -60,6 +60,9 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			words.compactMap(\.completeWord)
 		}
 
+		/// irrelevant for readonly
+		public var isProgressing = false
+
 		public let persistStrategy: PersistStrategy?
 
 		public let readonlyMode: ReadonlyMode?
@@ -445,6 +448,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			state.debugMnemonicPhraseSingleField = mnemonic
 			if let mnemonic = try? Mnemonic(phrase: mnemonic, language: state.language) {
 				state.words = State.words(from: mnemonic, isReadonlyMode: state.readonlyMode != nil)
+				state.isProgressing = true
 				return .send(.view(.continueButtonTapped(mnemonic)))
 			} else {
 				return .none
@@ -458,6 +462,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 	}
 
 	private func continueWithMnemonic(mnemonic: Mnemonic, in state: inout State) -> Effect<Action> {
+		state.isProgressing = true
 		let mnemonicWithPassphrase = MnemonicWithPassphrase(
 			mnemonic: mnemonic,
 			passphrase: state.bip39Passphrase
@@ -465,7 +470,6 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 		guard let persistStrategy = state.persistStrategy else {
 			return .send(.delegate(.notPersisted(mnemonicWithPassphrase)))
 		}
-
 		switch persistStrategy.location {
 		case .intoKeychainAndProfile:
 			switch persistStrategy.mnemonicForFactorSourceKind {
@@ -530,11 +534,13 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			return .none
 
 		case let .saveFactorSourceResult(.failure(error)):
+			state.isProgressing = false
 			errorQueue.schedule(error)
 			loggerGlobal.error("Failed to save mnemonic in profile, error: \(error)")
 			return .none
 
 		case let .saveFactorSourceResult(.success(factorSource)):
+			state.isProgressing = false
 			return .send(.delegate(.persistedNewFactorSourceInProfile(factorSource)))
 		}
 	}
