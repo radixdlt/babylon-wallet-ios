@@ -20,18 +20,41 @@ public struct TransactionStatusResponseKnownPayloadItem: Codable, Hashable {
     /** Bech32m-encoded hash. */
     public private(set) var payloadHash: String
     public private(set) var status: TransactionStatus
+    public private(set) var payloadStatus: TransactionPayloadStatus?
+    /** An additional description to clarify the payload status.  */
+    public private(set) var payloadStatusDescription: String?
+    /** The initial error message received for a rejection or failure during transaction execution. This will typically be the useful error message, explaining the root cause of the issue. Please note that presence of an error message doesn't imply that this payload will definitely reject or fail. This could represent an error during a temporary rejection (such as out of fees) which then gets resolved (e.g. by depositing money to pay the fee), allowing the transaction to be committed.  */
     public private(set) var errorMessage: String?
+    /** The latest error message received for a rejection or failure during transaction execution, this is only returned if it is different from the initial error message. This is more current than the initial error message, but may be less useful, as it could be a message regarding the expiry of the transaction at the end of its epoch validity window. Please note that presence of an error message doesn't imply that this payload will definitely reject or fail. This could represent an error during a temporary rejection (such as out of fees) which then gets resolved (e.g. by depositing money to pay the fee), allowing the transaction to be committed.  */
+    public private(set) var latestErrorMessage: String?
+    public private(set) var handlingStatus: TransactionPayloadGatewayHandlingStatus?
+    /** Additional reason for why the Gateway has its current handling status.  */
+    public private(set) var handlingStatusReason: String?
+    /** The most recent error message received when submitting this transaction to the network. Please note that the presence of an error message doesn't imply that this transaction payload will definitely reject or fail. This could be a transient error.  */
+    public private(set) var submissionError: String?
 
-    public init(payloadHash: String, status: TransactionStatus, errorMessage: String? = nil) {
+    public init(payloadHash: String, status: TransactionStatus, payloadStatus: TransactionPayloadStatus? = nil, payloadStatusDescription: String? = nil, errorMessage: String? = nil, latestErrorMessage: String? = nil, handlingStatus: TransactionPayloadGatewayHandlingStatus? = nil, handlingStatusReason: String? = nil, submissionError: String? = nil) {
         self.payloadHash = payloadHash
         self.status = status
+        self.payloadStatus = payloadStatus
+        self.payloadStatusDescription = payloadStatusDescription
         self.errorMessage = errorMessage
+        self.latestErrorMessage = latestErrorMessage
+        self.handlingStatus = handlingStatus
+        self.handlingStatusReason = handlingStatusReason
+        self.submissionError = submissionError
     }
 
     public enum CodingKeys: String, CodingKey, CaseIterable {
         case payloadHash = "payload_hash"
         case status
+        case payloadStatus = "payload_status"
+        case payloadStatusDescription = "payload_status_description"
         case errorMessage = "error_message"
+        case latestErrorMessage = "latest_error_message"
+        case handlingStatus = "handling_status"
+        case handlingStatusReason = "handling_status_reason"
+        case submissionError = "submission_error"
     }
 
     // Encodable protocol methods
@@ -40,7 +63,13 @@ public struct TransactionStatusResponseKnownPayloadItem: Codable, Hashable {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(payloadHash, forKey: .payloadHash)
         try container.encode(status, forKey: .status)
+        try container.encodeIfPresent(payloadStatus, forKey: .payloadStatus)
+        try container.encodeIfPresent(payloadStatusDescription, forKey: .payloadStatusDescription)
         try container.encodeIfPresent(errorMessage, forKey: .errorMessage)
+        try container.encodeIfPresent(latestErrorMessage, forKey: .latestErrorMessage)
+        try container.encodeIfPresent(handlingStatus, forKey: .handlingStatus)
+        try container.encodeIfPresent(handlingStatusReason, forKey: .handlingStatusReason)
+        try container.encodeIfPresent(submissionError, forKey: .submissionError)
     }
 }
 

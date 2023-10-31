@@ -33,11 +33,11 @@ public struct TransactionReceipt: Codable, Hashable {
     /** The manifest line-by-line engine return data (only present if `status` is `Succeeded`). */
     public private(set) var output: AnyCodable?
     /** Events emitted by a transaction. */
-    public private(set) var events: AnyCodable?
+    public private(set) var events: [EventsItem]?
     /** Error message (only present if status is `Failed` or `Rejected`) */
     public private(set) var errorMessage: String?
 
-    public init(status: TransactionReceiptStatus? = nil, feeSummary: AnyCodable? = nil, costingParameters: AnyCodable? = nil, feeDestination: AnyCodable? = nil, feeSource: AnyCodable? = nil, stateUpdates: AnyCodable? = nil, nextEpoch: AnyCodable? = nil, output: AnyCodable? = nil, events: AnyCodable? = nil, errorMessage: String? = nil) {
+    public init(status: TransactionReceiptStatus? = nil, feeSummary: AnyCodable? = nil, costingParameters: AnyCodable? = nil, feeDestination: AnyCodable? = nil, feeSource: AnyCodable? = nil, stateUpdates: AnyCodable? = nil, nextEpoch: AnyCodable? = nil, output: AnyCodable? = nil, events: [EventsItem]? = nil, errorMessage: String? = nil) {
         self.status = status
         self.feeSummary = feeSummary
         self.costingParameters = costingParameters

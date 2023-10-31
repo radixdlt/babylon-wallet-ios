@@ -10,17 +10,34 @@ extension SubmitTransactionClient: DependencyKey {
 
 			let statusSubject = AsyncCurrentValueSubject<TransactionStatusUpdate>(.init(txID: txID, result: .success(.pending)))
 
-			@Sendable func pollTransactionStatus() async throws -> GatewayAPI.TransactionStatus {
+			@Sendable func pollTransactionStatus() async throws -> GatewayAPI.TransactionStatusResponse {
 				let txStatusRequest = GatewayAPI.TransactionStatusRequest(
 					intentHash: txID.asStr()
 				)
 				let txStatusResponse = try await gatewayAPIClient.transactionStatus(txStatusRequest)
-				return txStatusResponse.status
+				return txStatusResponse
 			}
 
 			let pollCountHolder = ActorIsolated<Int>(0)
 
 			Task {
+				while true {
+					guard let transactionStatus = try? await pollTransactionStatus().knownPayloads.first?.status else {
+						continue
+					}
+					switch transactionStatus {
+					case .unknown:
+						<#code#>
+					case .committedSuccess:
+						<#code#>
+					case .committedFailure:
+						<#code#>
+					case .pending:
+						<#code#>
+					case .rejected:
+						<#code#>
+					}
+				}
 				while !statusSubject.value.result.isComplete {
 					await pollCountHolder.withValue { pollCount in
 						if pollCount >= pollStrategy.maxPollTries {

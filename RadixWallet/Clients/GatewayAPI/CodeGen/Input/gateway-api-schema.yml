@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
-  version: 0.5.0
-  title: Babylon Gateway API - RCnet V3
+  version: v1.0.0
+  title: Radix Gateway API - Babylon
   license:
     name: The Radix License, Version 1.0
     url: https://www.radixfoundation.org/licenses/license-v1
@@ -12,8 +12,9 @@ info:
     This API is exposed by the Babylon Radix Gateway to enable clients to efficiently query current and historic
     state on the RadixDLT ledger, and intelligently handle transaction submission.
 
-    It is designed for use by wallets and explorers. For simple use cases, you can typically use the Core API on
-    a Node. A Gateway is only needed for reading historic snapshots of ledger states or a more robust set-up.
+    It is designed for use by wallets and explorers, and for light queries from front-end dApps.
+    For exchange/asset integrations, back-end dApp integrations, or simple use cases, you should consider using
+    the the Core API on a Node. A Gateway is only needed for reading historic snapshots of ledger states or a more robust set-up.
 
     The Gateway API is implemented by the [Network Gateway](https://github.com/radixdlt/babylon-gateway),
     which is configured to read from [full node(s)](https://github.com/radixdlt/babylon-node) to extract
@@ -28,10 +29,22 @@ info:
 
     ## Integration and forward compatibility guarantees
 
-    We give no guarantees that other endpoints will not change before Babylon mainnet launch, although changes are expected to
-    be minimal.
+    All responses may have additional fields added at any release, so clients are advised to use JSON parsers which
+    ignore unknown fields on JSON objects.
+
+    When the Radix protocol is updated, new functionality may be added, and so discriminated unions returned by the
+    API may need to be updated to have new variants added, corresponding to the updated data. Clients may need to update
+    in advance to be able to handle these new variants when a protocol update comes out.
+
+    On the very rare occasions we need to make breaking changes to the API, these will be warned in advance with
+    deprecation notices on previous versions. These deprecation notices will include a safe migration path.
+    Deprecation notes or breaking changes will be flagged clearly in release notes for new versions of the Gateway.
+
+    The Gateway DB schema is not subject to any compatibility guarantees, and may be changed at any release. DB changes
+    will be flagged in the release notes so clients doing custom DB integrations can prepare.
 servers:
-  - url: https://rcnet-v3.radixdlt.com
+  - url: https://mainnet.radixdlt.com
+  - url: https://stokenet.radixdlt.com
 x-tagGroups:
   - name: Overview
     tags:
@@ -1247,12 +1260,50 @@ components:
 
     TransactionStatus:
       type: string
+      description: |
+        A top-level intent status, left in for backwards compatibility.
+        It doesn't give much information. Rejected means PermanentRejection.
       enum:
         - Unknown
         - CommittedSuccess
         - CommittedFailure
         - Pending
         - Rejected
+
+    TransactionIntentStatus:
+      type: string
+      description: |
+        A more specific intent status. See the description field for further information.
+        Note that `CommitPendingOutcomeUnknown` can either result in `CommittedSuccess` or `CommittedFailure`.
+      enum:
+        - Unknown
+        - CommittedSuccess
+        - CommittedFailure
+        - CommitPendingOutcomeUnknown
+        - PermanentlyRejected
+        - LikelyButNotCertainRejection
+        - Pending
+
+    TransactionPayloadStatus:
+      type: string
+      description: |
+        A more specific payload status. See the description field for further information.
+      enum:
+        - Unknown
+        - CommittedSuccess
+        - CommittedFailure
+        - CommitPendingOutcomeUnknown
+        - PermanentlyRejected
+        - TemporarilyRejected
+        - Pending
+
+    TransactionPayloadGatewayHandlingStatus:
+      type: string
+      description: |
+        A status concerning the Gateway's handling status of this pending transaction.
+      enum:
+        - HandlingSubmission
+        - Concluded
 
     TransactionReceipt:
       type: object
@@ -1282,11 +1333,28 @@ components:
           type: object
         events:
           description: Events emitted by a transaction.
-          type: object
+          type: array
+          items:
+            $ref: "#/components/schemas/EventsItem"
+
         error_message:
           description: Error message (only present if status is `Failed` or `Rejected`)
           type: string
           nullable: true
+
+    EventsItem:
+      type: object
+      required:
+        - name
+        - emitter
+        - data
+      properties:
+        name:
+          type: string
+        emitter:
+          type: object
+        data:
+          type: object
 
     NonFungibleIdType:
       type: string
@@ -1653,15 +1721,34 @@ components:
         - type: object
           required:
             - status
+            - intent_status
+            - intent_status_description
             - known_payloads
           properties:
             status:
               $ref: "#/components/schemas/TransactionStatus"
+            intent_status:
+              $ref: "#/components/schemas/TransactionIntentStatus"
+            intent_status_description:
+              description: |
+                An additional description to clarify the intent status.
+              type: string
             known_payloads:
               type: array
               items:
                 $ref: "#/components/schemas/TransactionStatusResponseKnownPayloadItem"
+            committed_state_version:
+              description: |
+                If the intent was committed, this gives the state version when this intent was committed.
+              type: integer
+              format: int64
+              nullable: true
             error_message:
+              description: |
+                The most relevant error message received, due to a rejection or commit as failure.
+                Please note that presence of an error message doesn't imply that the intent
+                will definitely reject or fail. This could represent a temporary error (such as out
+                of fees), or an error with a payload which doesn't end up being committed.
               type: string
               nullable: true
     TransactionStatusResponseKnownPayloadItem:
@@ -1674,7 +1761,46 @@ components:
           $ref: "#/components/schemas/HashBech32mString"
         status:
           $ref: "#/components/schemas/TransactionStatus"
+        payload_status:
+          $ref: "#/components/schemas/TransactionPayloadStatus"
+        payload_status_description:
+          description: |
+            An additional description to clarify the payload status.
+          type: string
         error_message:
+          description: |
+            The initial error message received for a rejection or failure during transaction execution.
+            This will typically be the useful error message, explaining the root cause of the issue.
+            Please note that presence of an error message doesn't imply that this payload
+            will definitely reject or fail. This could represent an error during a temporary
+            rejection (such as out of fees) which then gets resolved (e.g. by depositing money
+            to pay the fee), allowing the transaction to be committed.
+          type: string
+          nullable: true
+        latest_error_message:
+          description: |
+            The latest error message received for a rejection or failure during transaction execution,
+            this is only returned if it is different from the initial error message.
+            This is more current than the initial error message, but may be less useful, as it could
+            be a message regarding the expiry of the transaction at the end of its epoch validity window.
+            Please note that presence of an error message doesn't imply that this payload
+            will definitely reject or fail. This could represent an error during a temporary
+            rejection (such as out of fees) which then gets resolved (e.g. by depositing money
+            to pay the fee), allowing the transaction to be committed.
+          type: string
+          nullable: true
+        handling_status:
+          $ref: "#/components/schemas/TransactionPayloadGatewayHandlingStatus"
+        handling_status_reason:
+          description: |
+            Additional reason for why the Gateway has its current handling status.
+          type: string
+          nullable: true
+        submission_error:
+          description: |
+            The most recent error message received when submitting this transaction to the network.
+            Please note that the presence of an error message doesn't imply that this transaction
+            payload will definitely reject or fail. This could be a transient error.
           type: string
           nullable: true
 
@@ -2048,10 +2174,13 @@ components:
         - type: object
           required:
             - blueprint_name
+            - blueprint_version
           properties:
             package_address:
               $ref: "#/components/schemas/Address"
             blueprint_name:
+              type: string
+            blueprint_version:
               type: string
             state:
               type: object
@@ -2398,15 +2527,19 @@ components:
       example:
         key_value_store_address: "<key-value-store-address>"
         keys:
-          - key_hex: "edafaaccee"
-          - key_hex: "ffbbaa2311"
+          - key_hex: "5C21010901000000"
+          - key_json:
+              kind: Tuple
+              fields:
+                - kind: "U32"
+                  value: "1"
     StateKeyValueStoreDataRequestKeyItem:
       type: object
-      required:
-        - key_hex
       properties:
         key_hex:
           $ref: "#/components/schemas/HexString"
+        key_json:
+          type: object
     StateKeyValueStoreDataResponse:
       allOf:
         - $ref: "#/components/schemas/LedgerStateMixin"

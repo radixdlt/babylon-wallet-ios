@@ -20,14 +20,16 @@ public struct StateEntityDetailsResponseComponentDetailsAllOf: Codable, Hashable
     /** Bech32m-encoded human readable version of the address. */
     public private(set) var packageAddress: String?
     public private(set) var blueprintName: String
+    public private(set) var blueprintVersion: String
     public private(set) var state: AnyCodable?
     public private(set) var roleAssignments: ComponentEntityRoleAssignments?
     /** String-encoded decimal representing the amount of a related fungible resource. */
     public private(set) var royaltyVaultBalance: String?
 
-    public init(packageAddress: String? = nil, blueprintName: String, state: AnyCodable? = nil, roleAssignments: ComponentEntityRoleAssignments? = nil, royaltyVaultBalance: String? = nil) {
+    public init(packageAddress: String? = nil, blueprintName: String, blueprintVersion: String, state: AnyCodable? = nil, roleAssignments: ComponentEntityRoleAssignments? = nil, royaltyVaultBalance: String? = nil) {
         self.packageAddress = packageAddress
         self.blueprintName = blueprintName
+        self.blueprintVersion = blueprintVersion
         self.state = state
         self.roleAssignments = roleAssignments
         self.royaltyVaultBalance = royaltyVaultBalance
@@ -36,6 +38,7 @@ public struct StateEntityDetailsResponseComponentDetailsAllOf: Codable, Hashable
     public enum CodingKeys: String, CodingKey, CaseIterable {
         case packageAddress = "package_address"
         case blueprintName = "blueprint_name"
+        case blueprintVersion = "blueprint_version"
         case state
         case roleAssignments = "role_assignments"
         case royaltyVaultBalance = "royalty_vault_balance"
@@ -47,6 +50,7 @@ public struct StateEntityDetailsResponseComponentDetailsAllOf: Codable, Hashable
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encodeIfPresent(packageAddress, forKey: .packageAddress)
         try container.encode(blueprintName, forKey: .blueprintName)
+        try container.encode(blueprintVersion, forKey: .blueprintVersion)
         try container.encodeIfPresent(state, forKey: .state)
         try container.encodeIfPresent(roleAssignments, forKey: .roleAssignments)
         try container.encodeIfPresent(royaltyVaultBalance, forKey: .royaltyVaultBalance)
