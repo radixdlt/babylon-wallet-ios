@@ -17,23 +17,22 @@ extension GatewayAPI {
 
 public struct TransactionReceipt: Codable, Hashable {
 
-    /** The status of the transaction. */
     public private(set) var status: TransactionReceiptStatus?
-    /** Fees paid, Only present if the `status` is not `Rejected`. */
+    /** This type is defined in the Core API as `FeeSummary`. See the Core API documentation for more details.  */
     public private(set) var feeSummary: AnyCodable?
     public private(set) var costingParameters: AnyCodable?
-    /** Only present if the `status` is not `Rejected`. */
+    /** This type is defined in the Core API as `FeeDestination`. See the Core API documentation for more details.  */
     public private(set) var feeDestination: AnyCodable?
-    /** Only present if the `status` is not `Rejected`. */
+    /** This type is defined in the Core API as `FeeSource`. See the Core API documentation for more details.  */
     public private(set) var feeSource: AnyCodable?
-    /** Transaction state updates (only present if status is Succeeded or Failed). */
+    /** This type is defined in the Core API as `StateUpdates`. See the Core API documentation for more details.  */
     public private(set) var stateUpdates: AnyCodable?
-    /** Information (number and active validator list) about new epoch if occured. */
+    /** Information (number and active validator list) about new epoch if occured. This type is defined in the Core API as `NextEpoch`. See the Core API documentation for more details.  */
     public private(set) var nextEpoch: AnyCodable?
-    /** The manifest line-by-line engine return data (only present if `status` is `Succeeded`). */
+    /** The manifest line-by-line engine return data (only present if `status` is `CommittedSuccess`). This type is defined in the Core API as `SborData`. See the Core API documentation for more details.  */
     public private(set) var output: AnyCodable?
     /** Events emitted by a transaction. */
-    /// Disabled decoding for now as it is not used
+    /// Has incorrect format in schema, disabled for now as it is not used anyway
     public private(set) var events: [AnyCodable]?
     /** Error message (only present if status is `Failed` or `Rejected`) */
     public private(set) var errorMessage: String?

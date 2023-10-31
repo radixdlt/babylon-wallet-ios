@@ -17,13 +17,18 @@ extension GatewayAPI {
 
 public struct StateEntityDetailsOptIns: Codable, Hashable {
 
-    public private(set) var ancestorIdentities: Bool?
-    public private(set) var componentRoyaltyVaultBalance: Bool?
-    public private(set) var packageRoyaltyVaultBalance: Bool?
-    public private(set) var nonFungibleIncludeNfids: Bool?
+    /** if set to `true`, ancestor addresses - `parent_address`, `owner_address` and `global_address` for entities are returned. */
+    public private(set) var ancestorIdentities: Bool? = false
+    /** if set to `true`, `royalty_vault_balance` for component entities is returned. */
+    public private(set) var componentRoyaltyVaultBalance: Bool? = false
+    /** if set to `true`, `royalty_vault_balance` for package entities is returned. */
+    public private(set) var packageRoyaltyVaultBalance: Bool? = false
+    /** if set to `true`, first page of non fungible ids are returned for each non fungible resource, with `next_cursor` which can be later used at `/state/entity/page/non-fungible-vault/ids` endpoint. */
+    public private(set) var nonFungibleIncludeNfids: Bool? = false
+    /** allows specifying explicitly metadata properties which should be returned in response. */
     public private(set) var explicitMetadata: [String]?
 
-    public init(ancestorIdentities: Bool? = nil, componentRoyaltyVaultBalance: Bool? = nil, packageRoyaltyVaultBalance: Bool? = nil, nonFungibleIncludeNfids: Bool? = nil, explicitMetadata: [String]? = nil) {
+    public init(ancestorIdentities: Bool? = false, componentRoyaltyVaultBalance: Bool? = false, packageRoyaltyVaultBalance: Bool? = false, nonFungibleIncludeNfids: Bool? = false, explicitMetadata: [String]? = nil) {
         self.ancestorIdentities = ancestorIdentities
         self.componentRoyaltyVaultBalance = componentRoyaltyVaultBalance
         self.packageRoyaltyVaultBalance = packageRoyaltyVaultBalance

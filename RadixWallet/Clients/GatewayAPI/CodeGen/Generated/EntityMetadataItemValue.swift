@@ -17,11 +17,12 @@ extension GatewayAPI {
 
 public struct EntityMetadataItemValue: Codable, Hashable {
 
+    /** Hex-encoded binary blob. */
     public private(set) var rawHex: String
-    public private(set) var programmaticJson: AnyCodable
+    public private(set) var programmaticJson: ProgrammaticScryptoSborValue
     public private(set) var typed: MetadataTypedValue
 
-    public init(rawHex: String, programmaticJson: AnyCodable, typed: MetadataTypedValue) {
+    public init(rawHex: String, programmaticJson: ProgrammaticScryptoSborValue, typed: MetadataTypedValue) {
         self.rawHex = rawHex
         self.programmaticJson = programmaticJson
         self.typed = typed

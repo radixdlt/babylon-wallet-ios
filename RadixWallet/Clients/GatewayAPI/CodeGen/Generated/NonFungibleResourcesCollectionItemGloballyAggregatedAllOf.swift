@@ -17,9 +17,9 @@ extension GatewayAPI {
 
 public struct NonFungibleResourcesCollectionItemGloballyAggregatedAllOf: Codable, Hashable {
 
-    /** TBA */
+    /** The total amount of non-fungible IDs across all vaults. */
     public private(set) var amount: Int64
-    /** TBD */
+    /** The most recent state version underlying object was modified at. */
     public private(set) var lastUpdatedAtStateVersion: Int64
 
     public init(amount: Int64, lastUpdatedAtStateVersion: Int64) {

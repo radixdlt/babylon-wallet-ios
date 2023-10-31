@@ -17,16 +17,13 @@ extension GatewayAPI {
 
 public struct ValidatorsUptimeRequestAllOf: Codable, Hashable {
 
-    public private(set) var fromLedgerState: LedgerStateSelector?
     public private(set) var validatorAddresses: [String]?
 
-    public init(fromLedgerState: LedgerStateSelector? = nil, validatorAddresses: [String]? = nil) {
-        self.fromLedgerState = fromLedgerState
+    public init(validatorAddresses: [String]? = nil) {
         self.validatorAddresses = validatorAddresses
     }
 
     public enum CodingKeys: String, CodingKey, CaseIterable {
-        case fromLedgerState = "from_ledger_state"
         case validatorAddresses = "validator_addresses"
     }
 
@@ -34,7 +31,6 @@ public struct ValidatorsUptimeRequestAllOf: Codable, Hashable {
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encodeIfPresent(fromLedgerState, forKey: .fromLedgerState)
         try container.encodeIfPresent(validatorAddresses, forKey: .validatorAddresses)
     }
 }

@@ -19,9 +19,9 @@ public struct StateKeyValueStoreDataRequestKeyItem: Codable, Hashable {
 
     /** Hex-encoded binary blob. */
     public private(set) var keyHex: String?
-    public private(set) var keyJson: AnyCodable?
+    public private(set) var keyJson: ProgrammaticScryptoSborValue?
 
-    public init(keyHex: String? = nil, keyJson: AnyCodable? = nil) {
+    public init(keyHex: String? = nil, keyJson: ProgrammaticScryptoSborValue? = nil) {
         self.keyHex = keyHex
         self.keyJson = keyJson
     }

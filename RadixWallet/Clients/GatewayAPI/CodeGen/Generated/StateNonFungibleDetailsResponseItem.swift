@@ -21,7 +21,7 @@ public struct StateNonFungibleDetailsResponseItem: Codable, Hashable {
     /** String-encoded non-fungible ID. */
     public private(set) var nonFungibleId: String
     public private(set) var data: ScryptoSborValue?
-    /** TBD */
+    /** The most recent state version underlying object was modified at. */
     public private(set) var lastUpdatedAtStateVersion: Int64
 
     public init(isBurned: Bool, nonFungibleId: String, data: ScryptoSborValue? = nil, lastUpdatedAtStateVersion: Int64) {

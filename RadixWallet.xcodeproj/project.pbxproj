@@ -1168,6 +1168,44 @@
 		83EE47562AF0DE8F00155F03 /* TransactionPayloadStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83EE47522AF0DE8E00155F03 /* TransactionPayloadStatus.swift */; };
 		83EE47572AF0DE8F00155F03 /* TransactionIntentStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83EE47532AF0DE8E00155F03 /* TransactionIntentStatus.swift */; };
 		83EE47582AF0DE8F00155F03 /* EventsItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83EE47542AF0DE8E00155F03 /* EventsItem.swift */; };
+		83EE477A2AF0EE3C00155F03 /* ProgrammaticScryptoSborValueI8.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83EE47592AF0EE3800155F03 /* ProgrammaticScryptoSborValueI8.swift */; };
+		83EE477B2AF0EE3C00155F03 /* ProgrammaticScryptoSborValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83EE475A2AF0EE3800155F03 /* ProgrammaticScryptoSborValue.swift */; };
+		83EE477C2AF0EE3C00155F03 /* ProgrammaticScryptoSborValueU64.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83EE475B2AF0EE3800155F03 /* ProgrammaticScryptoSborValueU64.swift */; };
+		83EE477D2AF0EE3C00155F03 /* ProgrammaticScryptoSborValueTupleAllOf.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83EE475C2AF0EE3800155F03 /* ProgrammaticScryptoSborValueTupleAllOf.swift */; };
+		83EE477E2AF0EE3C00155F03 /* ProgrammaticScryptoSborValueNonFungibleLocalId.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83EE475D2AF0EE3900155F03 /* ProgrammaticScryptoSborValueNonFungibleLocalId.swift */; };
+		83EE477F2AF0EE3C00155F03 /* ProgrammaticScryptoSborValueEnumAllOf.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83EE475E2AF0EE3900155F03 /* ProgrammaticScryptoSborValueEnumAllOf.swift */; };
+		83EE47802AF0EE3C00155F03 /* ProgrammaticScryptoSborValueOwn.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83EE475F2AF0EE3900155F03 /* ProgrammaticScryptoSborValueOwn.swift */; };
+		83EE47812AF0EE3C00155F03 /* ProgrammaticScryptoSborValueBool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83EE47602AF0EE3900155F03 /* ProgrammaticScryptoSborValueBool.swift */; };
+		83EE47822AF0EE3C00155F03 /* ProgrammaticScryptoSborValueU16.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83EE47612AF0EE3900155F03 /* ProgrammaticScryptoSborValueU16.swift */; };
+		83EE47832AF0EE3C00155F03 /* ProgrammaticScryptoSborValuePreciseDecimal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83EE47622AF0EE3900155F03 /* ProgrammaticScryptoSborValuePreciseDecimal.swift */; };
+		83EE47842AF0EE3C00155F03 /* ProgrammaticScryptoSborValueTuple.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83EE47632AF0EE3900155F03 /* ProgrammaticScryptoSborValueTuple.swift */; };
+		83EE47852AF0EE3C00155F03 /* ProgrammaticScryptoSborValueString.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83EE47642AF0EE3900155F03 /* ProgrammaticScryptoSborValueString.swift */; };
+		83EE47862AF0EE3C00155F03 /* ProgrammaticScryptoSborValueMap.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83EE47652AF0EE3A00155F03 /* ProgrammaticScryptoSborValueMap.swift */; };
+		83EE47872AF0EE3C00155F03 /* ProgrammaticScryptoSborValueU128.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83EE47662AF0EE3A00155F03 /* ProgrammaticScryptoSborValueU128.swift */; };
+		83EE47882AF0EE3C00155F03 /* ProgrammaticScryptoSborValueBytes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83EE47672AF0EE3A00155F03 /* ProgrammaticScryptoSborValueBytes.swift */; };
+		83EE47892AF0EE3C00155F03 /* ProgrammaticScryptoSborValueI16.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83EE47682AF0EE3A00155F03 /* ProgrammaticScryptoSborValueI16.swift */; };
+		83EE478A2AF0EE3C00155F03 /* StateEntityDetailsResponseNonFungibleVaultDetailsAllOf.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83EE47692AF0EE3A00155F03 /* StateEntityDetailsResponseNonFungibleVaultDetailsAllOf.swift */; };
+		83EE478B2AF0EE3C00155F03 /* ProgrammaticScryptoSborValueU32.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83EE476A2AF0EE3A00155F03 /* ProgrammaticScryptoSborValueU32.swift */; };
+		83EE478C2AF0EE3C00155F03 /* ProgrammaticScryptoSborValueMapEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83EE476B2AF0EE3A00155F03 /* ProgrammaticScryptoSborValueMapEntry.swift */; };
+		83EE478D2AF0EE3C00155F03 /* ProgrammaticScryptoSborValueKind.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83EE476C2AF0EE3A00155F03 /* ProgrammaticScryptoSborValueKind.swift */; };
+		83EE478E2AF0EE3C00155F03 /* ProgrammaticScryptoSborValueI128.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83EE476D2AF0EE3B00155F03 /* ProgrammaticScryptoSborValueI128.swift */; };
+		83EE478F2AF0EE3C00155F03 /* StateEntityDetailsResponseFungibleVaultDetailsAllOf.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83EE476E2AF0EE3B00155F03 /* StateEntityDetailsResponseFungibleVaultDetailsAllOf.swift */; };
+		83EE47902AF0EE3C00155F03 /* ProgrammaticScryptoSborValueU8.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83EE476F2AF0EE3B00155F03 /* ProgrammaticScryptoSborValueU8.swift */; };
+		83EE47912AF0EE3C00155F03 /* FromLedgerStateMixin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83EE47702AF0EE3B00155F03 /* FromLedgerStateMixin.swift */; };
+		83EE47922AF0EE3C00155F03 /* ProgrammaticScryptoSborValueArrayAllOf.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83EE47712AF0EE3B00155F03 /* ProgrammaticScryptoSborValueArrayAllOf.swift */; };
+		83EE47932AF0EE3C00155F03 /* ProgrammaticScryptoSborValueReference.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83EE47722AF0EE3B00155F03 /* ProgrammaticScryptoSborValueReference.swift */; };
+		83EE47942AF0EE3C00155F03 /* ProgrammaticScryptoSborValueBytesAllOf.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83EE47732AF0EE3B00155F03 /* ProgrammaticScryptoSborValueBytesAllOf.swift */; };
+		83EE47952AF0EE3C00155F03 /* ProgrammaticScryptoSborValueDecimal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83EE47742AF0EE3B00155F03 /* ProgrammaticScryptoSborValueDecimal.swift */; };
+		83EE47962AF0EE3C00155F03 /* ProgrammaticScryptoSborValueMapAllOf.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83EE47752AF0EE3B00155F03 /* ProgrammaticScryptoSborValueMapAllOf.swift */; };
+		83EE47972AF0EE3C00155F03 /* ProgrammaticScryptoSborValueArray.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83EE47762AF0EE3C00155F03 /* ProgrammaticScryptoSborValueArray.swift */; };
+		83EE47982AF0EE3C00155F03 /* ProgrammaticScryptoSborValueI64.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83EE47772AF0EE3C00155F03 /* ProgrammaticScryptoSborValueI64.swift */; };
+		83EE47992AF0EE3C00155F03 /* ProgrammaticScryptoSborValueEnum.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83EE47782AF0EE3C00155F03 /* ProgrammaticScryptoSborValueEnum.swift */; };
+		83EE479A2AF0EE3C00155F03 /* ProgrammaticScryptoSborValueI32.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83EE47792AF0EE3C00155F03 /* ProgrammaticScryptoSborValueI32.swift */; };
+		83EE47A02AF0EECD00155F03 /* TransactionNonFungibleBalanceChanges.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83EE479B2AF0EECC00155F03 /* TransactionNonFungibleBalanceChanges.swift */; };
+		83EE47A12AF0EECD00155F03 /* TransactionFungibleFeeBalanceChanges.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83EE479C2AF0EECC00155F03 /* TransactionFungibleFeeBalanceChanges.swift */; };
+		83EE47A22AF0EECD00155F03 /* TransactionFungibleBalanceChanges.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83EE479D2AF0EECD00155F03 /* TransactionFungibleBalanceChanges.swift */; };
+		83EE47A32AF0EECD00155F03 /* TransactionBalanceChanges.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83EE479E2AF0EECD00155F03 /* TransactionBalanceChanges.swift */; };
+		83EE47A42AF0EECD00155F03 /* TransactionFungibleFeeBalanceChangeType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83EE479F2AF0EECD00155F03 /* TransactionFungibleFeeBalanceChangeType.swift */; };
 		E62BB7632AEA856300D46DAC /* ImportMnemonicTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E62BB7622AEA856300D46DAC /* ImportMnemonicTests.swift */; };
 		E6390FB32AE6C3E200B4DEE2 /* ProfileStore+OverlayWindowClient+Alert+OwnershipConflict.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6390FB22AE6C3E200B4DEE2 /* ProfileStore+OverlayWindowClient+Alert+OwnershipConflict.swift */; };
 		E63D123D2ADD1FC00001CBB1 /* SwiftUIIntrospect in Frameworks */ = {isa = PBXBuildFile; productRef = E63D123C2ADD1FC00001CBB1 /* SwiftUIIntrospect */; };
@@ -2409,6 +2447,44 @@
 		83EE47522AF0DE8E00155F03 /* TransactionPayloadStatus.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TransactionPayloadStatus.swift; sourceTree = "<group>"; };
 		83EE47532AF0DE8E00155F03 /* TransactionIntentStatus.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TransactionIntentStatus.swift; sourceTree = "<group>"; };
 		83EE47542AF0DE8E00155F03 /* EventsItem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EventsItem.swift; sourceTree = "<group>"; };
+		83EE47592AF0EE3800155F03 /* ProgrammaticScryptoSborValueI8.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProgrammaticScryptoSborValueI8.swift; sourceTree = "<group>"; };
+		83EE475A2AF0EE3800155F03 /* ProgrammaticScryptoSborValue.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProgrammaticScryptoSborValue.swift; sourceTree = "<group>"; };
+		83EE475B2AF0EE3800155F03 /* ProgrammaticScryptoSborValueU64.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProgrammaticScryptoSborValueU64.swift; sourceTree = "<group>"; };
+		83EE475C2AF0EE3800155F03 /* ProgrammaticScryptoSborValueTupleAllOf.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProgrammaticScryptoSborValueTupleAllOf.swift; sourceTree = "<group>"; };
+		83EE475D2AF0EE3900155F03 /* ProgrammaticScryptoSborValueNonFungibleLocalId.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProgrammaticScryptoSborValueNonFungibleLocalId.swift; sourceTree = "<group>"; };
+		83EE475E2AF0EE3900155F03 /* ProgrammaticScryptoSborValueEnumAllOf.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProgrammaticScryptoSborValueEnumAllOf.swift; sourceTree = "<group>"; };
+		83EE475F2AF0EE3900155F03 /* ProgrammaticScryptoSborValueOwn.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProgrammaticScryptoSborValueOwn.swift; sourceTree = "<group>"; };
+		83EE47602AF0EE3900155F03 /* ProgrammaticScryptoSborValueBool.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProgrammaticScryptoSborValueBool.swift; sourceTree = "<group>"; };
+		83EE47612AF0EE3900155F03 /* ProgrammaticScryptoSborValueU16.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProgrammaticScryptoSborValueU16.swift; sourceTree = "<group>"; };
+		83EE47622AF0EE3900155F03 /* ProgrammaticScryptoSborValuePreciseDecimal.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProgrammaticScryptoSborValuePreciseDecimal.swift; sourceTree = "<group>"; };
+		83EE47632AF0EE3900155F03 /* ProgrammaticScryptoSborValueTuple.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProgrammaticScryptoSborValueTuple.swift; sourceTree = "<group>"; };
+		83EE47642AF0EE3900155F03 /* ProgrammaticScryptoSborValueString.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProgrammaticScryptoSborValueString.swift; sourceTree = "<group>"; };
+		83EE47652AF0EE3A00155F03 /* ProgrammaticScryptoSborValueMap.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProgrammaticScryptoSborValueMap.swift; sourceTree = "<group>"; };
+		83EE47662AF0EE3A00155F03 /* ProgrammaticScryptoSborValueU128.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProgrammaticScryptoSborValueU128.swift; sourceTree = "<group>"; };
+		83EE47672AF0EE3A00155F03 /* ProgrammaticScryptoSborValueBytes.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProgrammaticScryptoSborValueBytes.swift; sourceTree = "<group>"; };
+		83EE47682AF0EE3A00155F03 /* ProgrammaticScryptoSborValueI16.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProgrammaticScryptoSborValueI16.swift; sourceTree = "<group>"; };
+		83EE47692AF0EE3A00155F03 /* StateEntityDetailsResponseNonFungibleVaultDetailsAllOf.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StateEntityDetailsResponseNonFungibleVaultDetailsAllOf.swift; sourceTree = "<group>"; };
+		83EE476A2AF0EE3A00155F03 /* ProgrammaticScryptoSborValueU32.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProgrammaticScryptoSborValueU32.swift; sourceTree = "<group>"; };
+		83EE476B2AF0EE3A00155F03 /* ProgrammaticScryptoSborValueMapEntry.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProgrammaticScryptoSborValueMapEntry.swift; sourceTree = "<group>"; };
+		83EE476C2AF0EE3A00155F03 /* ProgrammaticScryptoSborValueKind.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProgrammaticScryptoSborValueKind.swift; sourceTree = "<group>"; };
+		83EE476D2AF0EE3B00155F03 /* ProgrammaticScryptoSborValueI128.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProgrammaticScryptoSborValueI128.swift; sourceTree = "<group>"; };
+		83EE476E2AF0EE3B00155F03 /* StateEntityDetailsResponseFungibleVaultDetailsAllOf.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StateEntityDetailsResponseFungibleVaultDetailsAllOf.swift; sourceTree = "<group>"; };
+		83EE476F2AF0EE3B00155F03 /* ProgrammaticScryptoSborValueU8.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProgrammaticScryptoSborValueU8.swift; sourceTree = "<group>"; };
+		83EE47702AF0EE3B00155F03 /* FromLedgerStateMixin.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FromLedgerStateMixin.swift; sourceTree = "<group>"; };
+		83EE47712AF0EE3B00155F03 /* ProgrammaticScryptoSborValueArrayAllOf.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProgrammaticScryptoSborValueArrayAllOf.swift; sourceTree = "<group>"; };
+		83EE47722AF0EE3B00155F03 /* ProgrammaticScryptoSborValueReference.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProgrammaticScryptoSborValueReference.swift; sourceTree = "<group>"; };
+		83EE47732AF0EE3B00155F03 /* ProgrammaticScryptoSborValueBytesAllOf.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProgrammaticScryptoSborValueBytesAllOf.swift; sourceTree = "<group>"; };
+		83EE47742AF0EE3B00155F03 /* ProgrammaticScryptoSborValueDecimal.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProgrammaticScryptoSborValueDecimal.swift; sourceTree = "<group>"; };
+		83EE47752AF0EE3B00155F03 /* ProgrammaticScryptoSborValueMapAllOf.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProgrammaticScryptoSborValueMapAllOf.swift; sourceTree = "<group>"; };
+		83EE47762AF0EE3C00155F03 /* ProgrammaticScryptoSborValueArray.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProgrammaticScryptoSborValueArray.swift; sourceTree = "<group>"; };
+		83EE47772AF0EE3C00155F03 /* ProgrammaticScryptoSborValueI64.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProgrammaticScryptoSborValueI64.swift; sourceTree = "<group>"; };
+		83EE47782AF0EE3C00155F03 /* ProgrammaticScryptoSborValueEnum.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProgrammaticScryptoSborValueEnum.swift; sourceTree = "<group>"; };
+		83EE47792AF0EE3C00155F03 /* ProgrammaticScryptoSborValueI32.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProgrammaticScryptoSborValueI32.swift; sourceTree = "<group>"; };
+		83EE479B2AF0EECC00155F03 /* TransactionNonFungibleBalanceChanges.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TransactionNonFungibleBalanceChanges.swift; sourceTree = "<group>"; };
+		83EE479C2AF0EECC00155F03 /* TransactionFungibleFeeBalanceChanges.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TransactionFungibleFeeBalanceChanges.swift; sourceTree = "<group>"; };
+		83EE479D2AF0EECD00155F03 /* TransactionFungibleBalanceChanges.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TransactionFungibleBalanceChanges.swift; sourceTree = "<group>"; };
+		83EE479E2AF0EECD00155F03 /* TransactionBalanceChanges.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TransactionBalanceChanges.swift; sourceTree = "<group>"; };
+		83EE479F2AF0EECD00155F03 /* TransactionFungibleFeeBalanceChangeType.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TransactionFungibleFeeBalanceChangeType.swift; sourceTree = "<group>"; };
 		E62BB7622AEA856300D46DAC /* ImportMnemonicTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportMnemonicTests.swift; sourceTree = "<group>"; };
 		E6390FB22AE6C3E200B4DEE2 /* ProfileStore+OverlayWindowClient+Alert+OwnershipConflict.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ProfileStore+OverlayWindowClient+Alert+OwnershipConflict.swift"; sourceTree = "<group>"; };
 		E67F14442AE029BA00738BE1 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -5324,6 +5400,39 @@
 		48CFBFCE2ADC10D900E77A5C /* Generated */ = {
 			isa = PBXGroup;
 			children = (
+				83EE47702AF0EE3B00155F03 /* FromLedgerStateMixin.swift */,
+				83EE475A2AF0EE3800155F03 /* ProgrammaticScryptoSborValue.swift */,
+				83EE47762AF0EE3C00155F03 /* ProgrammaticScryptoSborValueArray.swift */,
+				83EE47712AF0EE3B00155F03 /* ProgrammaticScryptoSborValueArrayAllOf.swift */,
+				83EE47602AF0EE3900155F03 /* ProgrammaticScryptoSborValueBool.swift */,
+				83EE47672AF0EE3A00155F03 /* ProgrammaticScryptoSborValueBytes.swift */,
+				83EE47732AF0EE3B00155F03 /* ProgrammaticScryptoSborValueBytesAllOf.swift */,
+				83EE47742AF0EE3B00155F03 /* ProgrammaticScryptoSborValueDecimal.swift */,
+				83EE47782AF0EE3C00155F03 /* ProgrammaticScryptoSborValueEnum.swift */,
+				83EE475E2AF0EE3900155F03 /* ProgrammaticScryptoSborValueEnumAllOf.swift */,
+				83EE47592AF0EE3800155F03 /* ProgrammaticScryptoSborValueI8.swift */,
+				83EE47682AF0EE3A00155F03 /* ProgrammaticScryptoSborValueI16.swift */,
+				83EE47792AF0EE3C00155F03 /* ProgrammaticScryptoSborValueI32.swift */,
+				83EE47772AF0EE3C00155F03 /* ProgrammaticScryptoSborValueI64.swift */,
+				83EE476D2AF0EE3B00155F03 /* ProgrammaticScryptoSborValueI128.swift */,
+				83EE476C2AF0EE3A00155F03 /* ProgrammaticScryptoSborValueKind.swift */,
+				83EE47652AF0EE3A00155F03 /* ProgrammaticScryptoSborValueMap.swift */,
+				83EE47752AF0EE3B00155F03 /* ProgrammaticScryptoSborValueMapAllOf.swift */,
+				83EE476B2AF0EE3A00155F03 /* ProgrammaticScryptoSborValueMapEntry.swift */,
+				83EE475D2AF0EE3900155F03 /* ProgrammaticScryptoSborValueNonFungibleLocalId.swift */,
+				83EE475F2AF0EE3900155F03 /* ProgrammaticScryptoSborValueOwn.swift */,
+				83EE47622AF0EE3900155F03 /* ProgrammaticScryptoSborValuePreciseDecimal.swift */,
+				83EE47722AF0EE3B00155F03 /* ProgrammaticScryptoSborValueReference.swift */,
+				83EE47642AF0EE3900155F03 /* ProgrammaticScryptoSborValueString.swift */,
+				83EE47632AF0EE3900155F03 /* ProgrammaticScryptoSborValueTuple.swift */,
+				83EE475C2AF0EE3800155F03 /* ProgrammaticScryptoSborValueTupleAllOf.swift */,
+				83EE476F2AF0EE3B00155F03 /* ProgrammaticScryptoSborValueU8.swift */,
+				83EE47612AF0EE3900155F03 /* ProgrammaticScryptoSborValueU16.swift */,
+				83EE476A2AF0EE3A00155F03 /* ProgrammaticScryptoSborValueU32.swift */,
+				83EE475B2AF0EE3800155F03 /* ProgrammaticScryptoSborValueU64.swift */,
+				83EE47662AF0EE3A00155F03 /* ProgrammaticScryptoSborValueU128.swift */,
+				83EE476E2AF0EE3B00155F03 /* StateEntityDetailsResponseFungibleVaultDetailsAllOf.swift */,
+				83EE47692AF0EE3A00155F03 /* StateEntityDetailsResponseNonFungibleVaultDetailsAllOf.swift */,
 				83EE47542AF0DE8E00155F03 /* EventsItem.swift */,
 				83EE47532AF0DE8E00155F03 /* TransactionIntentStatus.swift */,
 				83EE47512AF0DE8E00155F03 /* TransactionPayloadGatewayHandlingStatus.swift */,
@@ -5389,6 +5498,11 @@
 				48CFC00D2ADC10D900E77A5C /* EntityMetadataItemValue.swift */,
 				48CFC00E2ADC10D900E77A5C /* StateNonFungibleLocationRequestAllOf.swift */,
 				48CFC00F2ADC10D900E77A5C /* CommittedTransactionInfo.swift */,
+				83EE479E2AF0EECD00155F03 /* TransactionBalanceChanges.swift */,
+				83EE479D2AF0EECD00155F03 /* TransactionFungibleBalanceChanges.swift */,
+				83EE479C2AF0EECC00155F03 /* TransactionFungibleFeeBalanceChanges.swift */,
+				83EE479F2AF0EECD00155F03 /* TransactionFungibleFeeBalanceChangeType.swift */,
+				83EE479B2AF0EECC00155F03 /* TransactionNonFungibleBalanceChanges.swift */,
 				48CFC0102ADC10D900E77A5C /* StateEntityDetailsResponsePackageDetailsSchemaCollectionAllOf.swift */,
 				48CFC0112ADC10D900E77A5C /* StreamTransactionsRequest.swift */,
 				48CFC0122ADC10D900E77A5C /* StateEntityDetailsRequest.swift */,
@@ -7647,6 +7761,7 @@
 				48CFC2A62ADC10D900E77A5C /* PersonaDetails.swift in Sources */,
 				48CFC4A42ADC10DA00E77A5C /* ValidatorUptimeCollectionItem.swift in Sources */,
 				48CFC6862ADC10DB00E77A5C /* AppPreferences+Transaction.swift in Sources */,
+				83EE47822AF0EE3C00155F03 /* ProgrammaticScryptoSborValueU16.swift in Sources */,
 				48CFC3962ADC10D900E77A5C /* NonFungbileLocalID.swift in Sources */,
 				48CFC6102ADC10DA00E77A5C /* WalletInteraction.swift in Sources */,
 				48CFC3462ADC10D900E77A5C /* Completion.swift in Sources */,
@@ -7711,6 +7826,7 @@
 				48CFC4EF2ADC10DA00E77A5C /* MetadataDecimalArrayValue.swift in Sources */,
 				48CFC38C2ADC10D900E77A5C /* SignatureWithPublicKey+Utils.swift in Sources */,
 				48CFC27A2ADC10D900E77A5C /* App+View.swift in Sources */,
+				83EE47962AF0EE3C00155F03 /* ProgrammaticScryptoSborValueMapAllOf.swift in Sources */,
 				48CFC23E2ADC10D900E77A5C /* SecurityStructureConfigurationRow.swift in Sources */,
 				48CFC6152ADC10DA00E77A5C /* ResetRequestItem.swift in Sources */,
 				48CFC3902ADC10D900E77A5C /* HashableExtensions.swift in Sources */,
@@ -7755,6 +7871,7 @@
 				48CFC4DE2ADC10DA00E77A5C /* FungibleResourcesCollectionItemVaultAggregatedVault.swift in Sources */,
 				48CFC2782ADC10D900E77A5C /* P2PLinkRow+View.swift in Sources */,
 				48CFC4E82ADC10DA00E77A5C /* MetadataU8ArrayValueAllOf.swift in Sources */,
+				83EE478E2AF0EE3C00155F03 /* ProgrammaticScryptoSborValueI128.swift in Sources */,
 				48CFC56F2ADC10DA00E77A5C /* MetadataValueType.swift in Sources */,
 				48CFC46D2ADC10DA00E77A5C /* PersonasClient+Interface.swift in Sources */,
 				48CFC2BB2ADC10D900E77A5C /* SelectBackup+Reducer.swift in Sources */,
@@ -7779,7 +7896,9 @@
 				48CFC5282ADC10DA00E77A5C /* StreamTransactionsRequestAllOf.swift in Sources */,
 				48CFC28A2ADC10D900E77A5C /* TransactionReviewGuarantees.swift in Sources */,
 				48CFC5772ADC10DA00E77A5C /* MetadataTypedValue.swift in Sources */,
+				83EE47802AF0EE3C00155F03 /* ProgrammaticScryptoSborValueOwn.swift in Sources */,
 				48CFC2E32ADC10D900E77A5C /* FactorSourcesOfKindList.swift in Sources */,
+				83EE47A42AF0EECD00155F03 /* TransactionFungibleFeeBalanceChangeType.swift in Sources */,
 				48CFC44B2ADC10DA00E77A5C /* MnemonicClient+Interface.swift in Sources */,
 				48CFC51E2ADC10DA00E77A5C /* StateEntityDetailsResponsePackageDetailsAllOf.swift in Sources */,
 				48CFC3252ADC10D900E77A5C /* LocalNetworkPermission+View.swift in Sources */,
@@ -7794,6 +7913,7 @@
 				48CFC59D2ADC10DA00E77A5C /* UIKeyboardType+Extra.swift in Sources */,
 				48CFC5292ADC10DA00E77A5C /* TransactionSubmitResponse.swift in Sources */,
 				48CFC5E12ADC10DA00E77A5C /* Validation+Extra.swift in Sources */,
+				83EE47A12AF0EECD00155F03 /* TransactionFungibleFeeBalanceChanges.swift in Sources */,
 				48CFC48F2ADC10DA00E77A5C /* GatewayAPIClient+Interface.swift in Sources */,
 				48CFC31C2ADC10D900E77A5C /* CreationOfAccount+Reducer.swift in Sources */,
 				48CFC6822ADC10DB00E77A5C /* AbstractSecurityStructureConfiguration.swift in Sources */,
@@ -7832,6 +7952,7 @@
 				48CFC4FF2ADC10DA00E77A5C /* StateEntityDetailsResponsePackageDetailsSchemaItem.swift in Sources */,
 				48CFC31E2ADC10D900E77A5C /* NewAccountCompletion+View.swift in Sources */,
 				48CFC4C02ADC10DA00E77A5C /* NonFungibleResourcesCollectionItemGloballyAggregatedAllOf.swift in Sources */,
+				83EE47A32AF0EECD00155F03 /* TransactionBalanceChanges.swift in Sources */,
 				48CFC3E72ADC10D900E77A5C /* Types.swift in Sources */,
 				48CFC6702ADC10DB00E77A5C /* FactorSourceKind.swift in Sources */,
 				48CFC6192ADC10DA00E77A5C /* P2P.swift in Sources */,
@@ -7840,6 +7961,7 @@
 				48CFC2612ADC10D900E77A5C /* EditPersonaAddEntryKinds+View.swift in Sources */,
 				48CFC4D42ADC10DA00E77A5C /* StateEntityDetailsRequest.swift in Sources */,
 				48CFC3B82ADC10D900E77A5C /* Secp256k1+SLIP10.swift in Sources */,
+				83EE478B2AF0EE3C00155F03 /* ProgrammaticScryptoSborValueU32.swift in Sources */,
 				48CFC3072ADC10D900E77A5C /* DebugUserDefaultsContents.swift in Sources */,
 				48CFC3E52ADC10D900E77A5C /* P2PLinks.swift in Sources */,
 				48CFC5B72ADC10DA00E77A5C /* Card.swift in Sources */,
@@ -7864,6 +7986,7 @@
 				48CFC4A82ADC10DA00E77A5C /* ModelErrorResponse.swift in Sources */,
 				48CFC5112ADC10DA00E77A5C /* TransactionCommittedDetailsRequestAllOf.swift in Sources */,
 				48CFC2EE2ADC10D900E77A5C /* SelectFactorView.swift in Sources */,
+				83EE47972AF0EE3C00155F03 /* ProgrammaticScryptoSborValueArray.swift in Sources */,
 				48CFC66E2ADC10DB00E77A5C /* FactorInstance.swift in Sources */,
 				48CFC5412ADC10DA00E77A5C /* NetworkConfigurationResponse.swift in Sources */,
 				48CFC5E52ADC10DA00E77A5C /* Selection+Extra.swift in Sources */,
@@ -7890,6 +8013,7 @@
 				48CFC2852ADC10D900E77A5C /* SubmitTransaction+View.swift in Sources */,
 				48CFC47C2ADC10DA00E77A5C /* BackupsClient+Test.swift in Sources */,
 				48CFC28D2ADC10D900E77A5C /* TransactionReviewRawTransaction+View.swift in Sources */,
+				83EE47882AF0EE3C00155F03 /* ProgrammaticScryptoSborValueBytes.swift in Sources */,
 				48CFC2C92ADC10D900E77A5C /* FungibleResourceAsset+View.swift in Sources */,
 				48CFC50D2ADC10DA00E77A5C /* FungibleResourcesCollection.swift in Sources */,
 				48CFC40F2ADC10DA00E77A5C /* Logger.swift in Sources */,
@@ -7955,6 +8079,7 @@
 				48CFC6552ADC10DB00E77A5C /* Account.swift in Sources */,
 				48CFC5972ADC10DA00E77A5C /* ToggleView.swift in Sources */,
 				48CFC6122ADC10DA00E77A5C /* PersonaDataRequestItem.swift in Sources */,
+				83EE477B2AF0EE3C00155F03 /* ProgrammaticScryptoSborValue.swift in Sources */,
 				48CFC4892ADC10DA00E77A5C /* EntityMetadata+GWMetadata.swift in Sources */,
 				48CFC4FC2ADC10DA00E77A5C /* StateNonFungibleDataRequest.swift in Sources */,
 				48CFC60E2ADC10DA00E77A5C /* P2P+Dapp+Response.swift in Sources */,
@@ -7966,6 +8091,7 @@
 				48CFC64A2ADC10DB00E77A5C /* PersonaData+CompanyName.swift in Sources */,
 				48CFC5732ADC10DA00E77A5C /* Configuration.swift in Sources */,
 				48CFC5A42ADC10DA00E77A5C /* PrimaryTextButtonStyle.swift in Sources */,
+				83EE47862AF0EE3C00155F03 /* ProgrammaticScryptoSborValueMap.swift in Sources */,
 				48CFC26F2ADC10D900E77A5C /* SignWithFactorSourcesOfKindDevice+View.swift in Sources */,
 				48CFC3D52ADC10D900E77A5C /* BIP39+Entropy+Words+Bijection.swift in Sources */,
 				48CFC65F2ADC10DB00E77A5C /* Profile.swift in Sources */,
@@ -8000,6 +8126,7 @@
 				48CFC5372ADC10DA00E77A5C /* StateEntityNonFungibleResourceVaultsPageOptIns.swift in Sources */,
 				48FFFAF22ADC23AC00B2B213 /* Exports.swift in Sources */,
 				48CFC32F2ADC10D900E77A5C /* BIP39+Extensions.swift in Sources */,
+				83EE47952AF0EE3C00155F03 /* ProgrammaticScryptoSborValueDecimal.swift in Sources */,
 				48CFC2D92ADC10D900E77A5C /* ManageSecurityStructureCoordinator.swift in Sources */,
 				48CFC40D2ADC10DA00E77A5C /* UserDefaultsClient+Test.swift in Sources */,
 				48CFC25F2ADC10D900E77A5C /* EditPersonaName+View.swift in Sources */,
@@ -8044,6 +8171,7 @@
 				48CFC4282ADC10DA00E77A5C /* Data_Extensions.swift in Sources */,
 				E6390FB32AE6C3E200B4DEE2 /* ProfileStore+OverlayWindowClient+Alert+OwnershipConflict.swift in Sources */,
 				48CFC5152ADC10DA00E77A5C /* PublicKeyEcdsaSecp256k1AllOf.swift in Sources */,
+				83EE47A22AF0EECD00155F03 /* TransactionFungibleBalanceChanges.swift in Sources */,
 				48CFC3162ADC10D900E77A5C /* ScanMultipleOlympiaQRCodes.swift in Sources */,
 				48CFC2F72ADC10D900E77A5C /* CreationOfPersona+View.swift in Sources */,
 				48CFC2CC2ADC10D900E77A5C /* FungibleResourceAsset+Reducer.swift in Sources */,
@@ -8098,8 +8226,10 @@
 				48CFC5382ADC10DA00E77A5C /* ValidatorCollection.swift in Sources */,
 				48CFC3772ADC10D900E77A5C /* LSUDetails.swift in Sources */,
 				48CFC49A2ADC10DA00E77A5C /* StateEntityNonFungibleIdsPageResponse.swift in Sources */,
+				83EE478A2AF0EE3C00155F03 /* StateEntityDetailsResponseNonFungibleVaultDetailsAllOf.swift in Sources */,
 				48CFC4E52ADC10DA00E77A5C /* ValidatorVaultItem.swift in Sources */,
 				48CFC3E42ADC10D900E77A5C /* RadixConnectConstants.swift in Sources */,
+				83EE477E2AF0EE3C00155F03 /* ProgrammaticScryptoSborValueNonFungibleLocalId.swift in Sources */,
 				48CFC2E42ADC10D900E77A5C /* FactorSourcesOfKindList+View.swift in Sources */,
 				48CFC4242ADC10DA00E77A5C /* URL+Extra.swift in Sources */,
 				48CFC54C2ADC10DA00E77A5C /* ValidatorCollectionItem.swift in Sources */,
@@ -8126,15 +8256,18 @@
 				48CFC3182ADC10D900E77A5C /* CreateAccountCoordinator+Models.swift in Sources */,
 				48CFC2822ADC10D900E77A5C /* SelectFeePayer.swift in Sources */,
 				48CFC5D52ADC10DA00E77A5C /* TokenShadowModifier.swift in Sources */,
+				83EE47922AF0EE3C00155F03 /* ProgrammaticScryptoSborValueArrayAllOf.swift in Sources */,
 				48CFC5F32ADC10DA00E77A5C /* Fonts.generated.swift in Sources */,
 				48CFC27C2ADC10D900E77A5C /* HUD+Reducer.swift in Sources */,
 				48CFC5FC2ADC10DA00E77A5C /* Asset.swift in Sources */,
+				83EE477D2AF0EE3C00155F03 /* ProgrammaticScryptoSborValueTupleAllOf.swift in Sources */,
 				48CFC6572ADC10DB00E77A5C /* OnNetwork+Entity+Lookup.swift in Sources */,
 				48CFC2F62ADC10D900E77A5C /* CreationOfPersona+Reducer.swift in Sources */,
 				830EA9E72AEBA793004C8051 /* EntitiesVisibilityClient+Live.swift in Sources */,
 				48CFC4012ADC10D900E77A5C /* KeychainClient+Live.swift in Sources */,
 				48CFC4E92ADC10DA00E77A5C /* TransactionPreviewRequestFlags.swift in Sources */,
 				48CFC6542ADC10DB00E77A5C /* PersonaData+CollectionOfIdentifiedEntries.swift in Sources */,
+				83EE477C2AF0EE3C00155F03 /* ProgrammaticScryptoSborValueU64.swift in Sources */,
 				48CFC4372ADC10DA00E77A5C /* JSONDecoder+Live.swift in Sources */,
 				48CFC6032ADC10DA00E77A5C /* P2P+ConnectorExtension+Response.swift in Sources */,
 				48CFC25D2ADC10D900E77A5C /* EditPersonaField.swift in Sources */,
@@ -8184,6 +8317,7 @@
 				48CFC5C82ADC10DA00E77A5C /* Fonts.swift in Sources */,
 				48CFC6452ADC10DB00E77A5C /* PersonaData+Entry+Codable.swift in Sources */,
 				48CFC3342ADC10D900E77A5C /* PreviewedFeature.swift in Sources */,
+				83EE478C2AF0EE3C00155F03 /* ProgrammaticScryptoSborValueMapEntry.swift in Sources */,
 				48CFC3272ADC10D900E77A5C /* ScanQRCoordinator+Reducer.swift in Sources */,
 				48CFC5762ADC10DA00E77A5C /* TransactionReceiptStatus.swift in Sources */,
 				48CFC5DE2ADC10DA00E77A5C /* OnFirstTaskViewModifier.swift in Sources */,
@@ -8220,6 +8354,7 @@
 				48CFC25E2ADC10D900E77A5C /* EditPersonaEntry.swift in Sources */,
 				48CFC5AC2ADC10DA00E77A5C /* TokenBalanceView.swift in Sources */,
 				48CFC4A12ADC10DA00E77A5C /* FungibleResourcesCollectionItemGloballyAggregatedAllOf.swift in Sources */,
+				83EE47942AF0EE3C00155F03 /* ProgrammaticScryptoSborValueBytesAllOf.swift in Sources */,
 				48CFC4A52ADC10DA00E77A5C /* MetadataPublicKeyHashArrayValueAllOf.swift in Sources */,
 				48CFC3732ADC10D900E77A5C /* ValidatorNameView.swift in Sources */,
 				48CFC6852ADC10DB00E77A5C /* FactorSourceFlag.swift in Sources */,
@@ -8285,6 +8420,7 @@
 				48CFC3A32ADC10D900E77A5C /* EncryptionScheme.swift in Sources */,
 				48CFC2952ADC10D900E77A5C /* FeesView.swift in Sources */,
 				48CFC6482ADC10DB00E77A5C /* PersonaData.swift in Sources */,
+				83EE47842AF0EE3C00155F03 /* ProgrammaticScryptoSborValueTuple.swift in Sources */,
 				48CFC3AB2ADC10D900E77A5C /* ECPublicKey.swift in Sources */,
 				48CFC4472ADC10DA00E77A5C /* AccountsClient+Interface.swift in Sources */,
 				48CFC6842ADC10DB00E77A5C /* SecurityStructureConfigurationDetailed.swift in Sources */,
@@ -8348,6 +8484,7 @@
 				48CFC4452ADC10DA00E77A5C /* OnboardingClient+Test.swift in Sources */,
 				48CFC32C2ADC10D900E77A5C /* DoScanQR+Reducer.swift in Sources */,
 				48CFC37A2ADC10D900E77A5C /* PoolUnitDetails.swift in Sources */,
+				83EE47A02AF0EECD00155F03 /* TransactionNonFungibleBalanceChanges.swift in Sources */,
 				48CFC28E2ADC10D900E77A5C /* TransactionReviewRawTransaction.swift in Sources */,
 				48CFC6042ADC10DA00E77A5C /* ConnectorExtension+Messages.swift in Sources */,
 				48CFC65D2ADC10DB00E77A5C /* Profile+AuthorizedDapps+Edit.swift in Sources */,
@@ -8372,6 +8509,7 @@
 				48CFC2972ADC10D900E77A5C /* AdvancedFeesCustomization.swift in Sources */,
 				48CFC4CB2ADC10DA00E77A5C /* Extensions.swift in Sources */,
 				48CFC4302ADC10DA00E77A5C /* Collection+Extra.swift in Sources */,
+				83EE47832AF0EE3C00155F03 /* ProgrammaticScryptoSborValuePreciseDecimal.swift in Sources */,
 				48CFC2D62ADC10D900E77A5C /* ChooseAccountsRow.swift in Sources */,
 				48CFC2712ADC10D900E77A5C /* AccountList+Reducer.swift in Sources */,
 				48CFC6792ADC10DB00E77A5C /* HDFactorSourceProtocol.swift in Sources */,
@@ -8408,6 +8546,7 @@
 				48CFC52D2ADC10DA00E77A5C /* InvalidRequestError.swift in Sources */,
 				48CFC6052ADC10DA00E77A5C /* WalletAccount.swift in Sources */,
 				48CFC5CF2ADC10DA00E77A5C /* LinearGradients.swift in Sources */,
+				83EE478D2AF0EE3C00155F03 /* ProgrammaticScryptoSborValueKind.swift in Sources */,
 				48CFC3F82ADC10D900E77A5C /* IncomingMessage+Decoding.swift in Sources */,
 				48CFC5892ADC10DA00E77A5C /* SubmitTransactionClient+Live.swift in Sources */,
 				48CFC4402ADC10DA00E77A5C /* DappInteractionClient+Test.swift in Sources */,
@@ -8452,9 +8591,12 @@
 				48CFC5062ADC10DA00E77A5C /* EntityMetadataItem.swift in Sources */,
 				48CFC3232ADC10D900E77A5C /* ConnectUsingSecrets+Reducer.swift in Sources */,
 				48CFC5FF2ADC10DA00E77A5C /* Persona+PreviewValues.swift in Sources */,
+				83EE47812AF0EE3C00155F03 /* ProgrammaticScryptoSborValueBool.swift in Sources */,
+				83EE47992AF0EE3C00155F03 /* ProgrammaticScryptoSborValueEnum.swift in Sources */,
 				48CFC4222ADC10DA00E77A5C /* BitArray+Extra.swift in Sources */,
 				48CFC5872ADC10DA00E77A5C /* FaucetClient+Live.swift in Sources */,
 				48CFC2912ADC10D900E77A5C /* TransactionReviewNetworkFee+View.swift in Sources */,
+				83EE47982AF0EE3C00155F03 /* ProgrammaticScryptoSborValueI64.swift in Sources */,
 				48CFC41F2ADC10DA00E77A5C /* Array+Identifiable.swift in Sources */,
 				48CFC37B2ADC10D900E77A5C /* PoolUnit.swift in Sources */,
 				48CFC6382ADC10DB00E77A5C /* LegacyOlympiaBIP44LikeDerivationPath.swift in Sources */,
@@ -8485,10 +8627,12 @@
 				48CFC5232ADC10DA00E77A5C /* StateValidatorsListResponseAllOf.swift in Sources */,
 				48CFC3F32ADC10D900E77A5C /* PeerConnectionClient.swift in Sources */,
 				48CFC33E2ADC10D900E77A5C /* DappInteractionFlow+View.swift in Sources */,
+				83EE47902AF0EE3C00155F03 /* ProgrammaticScryptoSborValueU8.swift in Sources */,
 				48CFC2E62ADC10D900E77A5C /* CreateSecurityStructureStart.swift in Sources */,
 				48CFC3642ADC10D900E77A5C /* NonFungibleAssetList+View.swift in Sources */,
 				48CFC26B2ADC10D900E77A5C /* SignWithFactorSourcesOfKindLedger.swift in Sources */,
 				48CFC4102ADC10DA00E77A5C /* Functions.swift in Sources */,
+				83EE47892AF0EE3C00155F03 /* ProgrammaticScryptoSborValueI16.swift in Sources */,
 				48CFC5212ADC10DA00E77A5C /* StateValidatorsListResponse.swift in Sources */,
 				48CFC43D2ADC10DA00E77A5C /* FactorSourcesClient+Test.swift in Sources */,
 				48CFC3D92ADC10D900E77A5C /* BIP39+Checksum.swift in Sources */,
@@ -8504,6 +8648,7 @@
 				48CFC2C12ADC10D900E77A5C /* AssetTransfer+Reducer.swift in Sources */,
 				48CFC5A62ADC10DA00E77A5C /* BlueButtonStyle.swift in Sources */,
 				48CFC6332ADC10DB00E77A5C /* UnsecuredEntityControl.swift in Sources */,
+				83EE477F2AF0EE3C00155F03 /* ProgrammaticScryptoSborValueEnumAllOf.swift in Sources */,
 				48CFC4D32ADC10DA00E77A5C /* StreamTransactionsRequest.swift in Sources */,
 				48CFC64D2ADC10DB00E77A5C /* PersonaData+PostalAddress.swift in Sources */,
 				48CFC5EE2ADC10DA00E77A5C /* SlideUpPanel+View.swift in Sources */,
@@ -8563,6 +8708,7 @@
 				48CFC4FD2ADC10DA00E77A5C /* StateNonFungibleIdsRequest.swift in Sources */,
 				48CFC5C12ADC10DA00E77A5C /* Selection.swift in Sources */,
 				48CFC4952ADC10DA00E77A5C /* ComponentEntityRoleAssignmentEntry.swift in Sources */,
+				83EE477A2AF0EE3C00155F03 /* ProgrammaticScryptoSborValueI8.swift in Sources */,
 				48CFC57B2ADC10DA00E77A5C /* PublicKeyHash.swift in Sources */,
 				48CFC2FC2ADC10D900E77A5C /* DefaultDepositGuarantees+Reducer.swift in Sources */,
 				48CFC2D12ADC10D900E77A5C /* Style.swift in Sources */,
@@ -8580,6 +8726,7 @@
 				48CFC5EC2ADC10DA00E77A5C /* Loadable.swift in Sources */,
 				48CFC3D62ADC10D900E77A5C /* BIP39+Error.swift in Sources */,
 				48CFC45F2ADC10DA00E77A5C /* TransactionFailure.swift in Sources */,
+				83EE47872AF0EE3C00155F03 /* ProgrammaticScryptoSborValueU128.swift in Sources */,
 				48CFC2B82ADC10D900E77A5C /* RestoreProfileFromBackupCoordinator+View.swift in Sources */,
 				48CFC2BA2ADC10D900E77A5C /* SelectBackup+View.swift in Sources */,
 				48CFC4432ADC10DA00E77A5C /* RadixConnectClient+Live.swift in Sources */,
@@ -8597,6 +8744,7 @@
 				48CFC5042ADC10DA00E77A5C /* StateEntityFungibleResourceVaultsPageRequest.swift in Sources */,
 				48CFC4DF2ADC10DA00E77A5C /* OptionalNonFungibleIdsCollectionAllOf.swift in Sources */,
 				48CFC4E42ADC10DA00E77A5C /* MetadataPublicKeyValue.swift in Sources */,
+				83EE479A2AF0EE3C00155F03 /* ProgrammaticScryptoSborValueI32.swift in Sources */,
 				48CFC5BE2ADC10DA00E77A5C /* RoundedCornerBackground.swift in Sources */,
 				48CFC2FA2ADC10D900E77A5C /* NewPersonaCompletion+View.swift in Sources */,
 				48CFC3702ADC10D900E77A5C /* FungibleAssetList+Reducer.swift in Sources */,
@@ -8610,6 +8758,8 @@
 				48CFC41E2ADC10DA00E77A5C /* NonEmpty+Extra.swift in Sources */,
 				48CFC32B2ADC10D900E77A5C /* DoScanQR+View.swift in Sources */,
 				48CFC42B2ADC10DA00E77A5C /* Identifiable+RawRepresentable.swift in Sources */,
+				83EE47852AF0EE3C00155F03 /* ProgrammaticScryptoSborValueString.swift in Sources */,
+				83EE47912AF0EE3C00155F03 /* FromLedgerStateMixin.swift in Sources */,
 				48CFC5BD2ADC10DA00E77A5C /* Hint.swift in Sources */,
 				48CFC3622ADC10D900E77A5C /* LedgerHardwareDevices+Reducer.swift in Sources */,
 				48CFC5F12ADC10DA00E77A5C /* Relay.swift in Sources */,
@@ -8625,6 +8775,7 @@
 				48CFC40E2ADC10DA00E77A5C /* InsecureRandomNumberGeneratorWithSeed.swift in Sources */,
 				48CFC4D02ADC10DA00E77A5C /* StateNonFungibleLocationRequestAllOf.swift in Sources */,
 				48CFC5122ADC10DA00E77A5C /* LedgerStateMixin.swift in Sources */,
+				83EE47932AF0EE3C00155F03 /* ProgrammaticScryptoSborValueReference.swift in Sources */,
 				48CFC3B92ADC10D900E77A5C /* RIPEMD160.swift in Sources */,
 				48CFC4672ADC10DA00E77A5C /* AccountPortfoliosClient+Interface.swift in Sources */,
 				48CFC5692ADC10DA00E77A5C /* EntityMetadataItemValueAllOf.swift in Sources */,
@@ -8665,6 +8816,7 @@
 				48CFC4532ADC10DA00E77A5C /* NetworkSwitchingClient+Live.swift in Sources */,
 				48CFC23C2ADC10D900E77A5C /* SecurityStructureConfigurationList+View.swift in Sources */,
 				48CFC3DA2ADC10D900E77A5C /* SeedDerivation.swift in Sources */,
+				83EE478F2AF0EE3C00155F03 /* StateEntityDetailsResponseFungibleVaultDetailsAllOf.swift in Sources */,
 				48CFC2D82ADC10D900E77A5C /* ChooseAccounts+View.swift in Sources */,
 				48CFC2462ADC10D900E77A5C /* AddAssets+View.swift in Sources */,
 				48CFC4D22ADC10DA00E77A5C /* StateEntityDetailsResponsePackageDetailsSchemaCollectionAllOf.swift in Sources */,

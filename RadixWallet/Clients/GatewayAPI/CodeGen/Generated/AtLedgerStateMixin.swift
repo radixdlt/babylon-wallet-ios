@@ -15,6 +15,7 @@ public typealias AtLedgerStateMixin = GatewayAPI.AtLedgerStateMixin
 
 extension GatewayAPI {
 
+/** defines upper boundary (inclusive) for queried data. i.e &#x60;{ \&quot;at_state_version\&quot; &#x3D; {\&quot;epoch\&quot; &#x3D; 10} }&#x60;, will return data till 10 epoch. */
 public struct AtLedgerStateMixin: Codable, Hashable {
 
     public private(set) var atLedgerState: LedgerStateSelector?

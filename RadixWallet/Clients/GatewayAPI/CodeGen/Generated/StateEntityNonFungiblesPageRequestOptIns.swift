@@ -17,10 +17,12 @@ extension GatewayAPI {
 
 public struct StateEntityNonFungiblesPageRequestOptIns: Codable, Hashable {
 
-    public private(set) var nonFungibleIncludeNfids: Bool?
+    /** if set to `true`, first page of non fungible ids are returned for each non fungible resource, with cursor which can be later used at `/state/entity/page/non-fungible-vault/ids` endpoint. */
+    public private(set) var nonFungibleIncludeNfids: Bool? = false
+    /** allows specifying explicitly metadata properties which should be returned in response, limited to max 20 items. */
     public private(set) var explicitMetadata: [String]?
 
-    public init(nonFungibleIncludeNfids: Bool? = nil, explicitMetadata: [String]? = nil) {
+    public init(nonFungibleIncludeNfids: Bool? = false, explicitMetadata: [String]? = nil) {
         self.nonFungibleIncludeNfids = nonFungibleIncludeNfids
         self.explicitMetadata = explicitMetadata
     }

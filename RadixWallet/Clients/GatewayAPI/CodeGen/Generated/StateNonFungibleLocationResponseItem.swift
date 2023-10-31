@@ -22,7 +22,7 @@ public struct StateNonFungibleLocationResponseItem: Codable, Hashable {
     /** Bech32m-encoded human readable version of the address. */
     public private(set) var owningVaultAddress: String?
     public private(set) var isBurned: Bool
-    /** TBD */
+    /** The most recent state version underlying object was modified at. */
     public private(set) var lastUpdatedAtStateVersion: Int64
 
     public init(nonFungibleId: String, owningVaultAddress: String? = nil, isBurned: Bool, lastUpdatedAtStateVersion: Int64) {

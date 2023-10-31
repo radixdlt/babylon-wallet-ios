@@ -22,6 +22,7 @@ public struct StateEntityDetailsResponseComponentDetails: Codable, Hashable {
     public private(set) var packageAddress: String?
     public private(set) var blueprintName: String
     public private(set) var blueprintVersion: String
+    /** A representation of a component's inner state. If this entity is a `GenericComponent`, this field will be in a programmatic JSON structure (you can deserialize it as a `ProgrammaticScryptoSborValue`). Otherwise, for \"native\" components such as `Account`, `Validator`, `AccessController`, `OneResourcePool`, `TwoResourcePool`, and `MultiResourcePool`, this field will be a custom JSON model defined in the Core API schema.  */
     public private(set) var state: AnyCodable?
     public private(set) var roleAssignments: ComponentEntityRoleAssignments?
     /** String-encoded decimal representing the amount of a related fungible resource. */

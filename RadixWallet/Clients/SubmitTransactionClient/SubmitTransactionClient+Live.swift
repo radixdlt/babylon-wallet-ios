@@ -22,8 +22,11 @@ extension SubmitTransactionClient: DependencyKey {
 				statusSubject.send(.init(txID: txID, result: .loading))
 				while true {
 					guard let transactionStatus = try? await pollTransactionStatus().knownPayloads.first?.payloadStatus else {
+						loggerGlobal.error("No payload status?")
 						continue
 					}
+
+					loggerGlobal.info("Payload status is \(transactionStatus)")
 
 					switch transactionStatus {
 					case .unknown, .commitPendingOutcomeUnknown, .pending:

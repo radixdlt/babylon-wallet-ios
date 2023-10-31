@@ -18,13 +18,20 @@ extension GatewayAPI {
 public struct StateEntityDetailsResponseFungibleVaultDetails: Codable, Hashable {
 
     public private(set) var type: StateEntityDetailsResponseItemDetailsType
+    /** Bech32m-encoded human readable version of the address. */
+    public private(set) var resourceAddress: String
+    public private(set) var balance: FungibleResourcesCollectionItemVaultAggregatedVaultItem
 
-    public init(type: StateEntityDetailsResponseItemDetailsType) {
+    public init(type: StateEntityDetailsResponseItemDetailsType, resourceAddress: String, balance: FungibleResourcesCollectionItemVaultAggregatedVaultItem) {
         self.type = type
+        self.resourceAddress = resourceAddress
+        self.balance = balance
     }
 
     public enum CodingKeys: String, CodingKey, CaseIterable {
         case type
+        case resourceAddress = "resource_address"
+        case balance
     }
 
     // Encodable protocol methods
@@ -32,6 +39,8 @@ public struct StateEntityDetailsResponseFungibleVaultDetails: Codable, Hashable 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(type, forKey: .type)
+        try container.encode(resourceAddress, forKey: .resourceAddress)
+        try container.encode(balance, forKey: .balance)
     }
 }
 

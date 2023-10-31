@@ -19,8 +19,11 @@ public struct ValidatorUptimeCollectionItem: Codable, Hashable {
 
     /** Bech32m-encoded human readable version of the address. */
     public private(set) var address: String
+    /** number of proposals made. */
     public private(set) var proposalsMade: Int64?
+    /** number of proposals missed. */
     public private(set) var proposalsMissed: Int64?
+    /** number of epochs validator was active in. */
     public private(set) var epochsActiveIn: Int64
 
     public init(address: String, proposalsMade: Int64? = nil, proposalsMissed: Int64? = nil, epochsActiveIn: Int64) {

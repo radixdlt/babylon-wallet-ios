@@ -15,6 +15,7 @@ public typealias ValidatorsUptimeRequest = GatewayAPI.ValidatorsUptimeRequest
 
 extension GatewayAPI {
 
+/** For &#x60;at_ledger_state&#x60; and &#x60;from_ledger_state&#x60; you can use one of &#x60;state_version&#x60;, &#x60;epoch&#x60;, &#x60;epoch&#x60; and &#x60;round&#x60;, or &#x60;timestamp&#x60;, but then ongoing epoch will be selected and used for querying data. i.e for request with &#x60;{ \&quot;from_state_version\&quot; &#x3D; { \&quot;state_version\&quot; &#x3D; 100 }, \&quot;at_state_version\&quot; &#x3D; { \&quot;state_version\&quot; &#x3D; 300} }&#x60; gateway api will check in which epoch transactions with state version 100 and 300 were and then use that as inclusive boundary for request.  */
 public struct ValidatorsUptimeRequest: Codable, Hashable {
 
     public private(set) var atLedgerState: LedgerStateSelector?

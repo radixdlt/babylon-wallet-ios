@@ -23,7 +23,7 @@ public struct NonFungibleResourcesCollectionItemVaultAggregatedVaultItem: Codabl
     public private(set) var items: [String]?
     /** Bech32m-encoded human readable version of the address. */
     public private(set) var vaultAddress: String
-    /** TBD */
+    /** The most recent state version underlying object was modified at. */
     public private(set) var lastUpdatedAtStateVersion: Int64
 
     public init(totalCount: Int64, nextCursor: String? = nil, items: [String]? = nil, vaultAddress: String, lastUpdatedAtStateVersion: Int64) {

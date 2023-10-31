@@ -17,10 +17,11 @@ extension GatewayAPI {
 
 public struct ScryptoSborValue: Codable, Hashable {
 
+    /** Hex-encoded binary blob. */
     public private(set) var rawHex: String
-    public private(set) var programmaticJson: JSONValue
+    public private(set) var programmaticJson: ProgrammaticScryptoSborValue
 
-    public init(rawHex: String, programmaticJson: JSONValue) {
+    public init(rawHex: String, programmaticJson: ProgrammaticScryptoSborValue) {
         self.rawHex = rawHex
         self.programmaticJson = programmaticJson
     }

@@ -22,7 +22,7 @@ public struct EntityMetadataItem: Codable, Hashable {
     public private(set) var key: String
     public private(set) var value: EntityMetadataItemValue
     public private(set) var isLocked: Bool
-    /** TBD */
+    /** The most recent state version underlying object was modified at. */
     public private(set) var lastUpdatedAtStateVersion: Int64
 
     public init(key: String, value: EntityMetadataItemValue, isLocked: Bool, lastUpdatedAtStateVersion: Int64) {

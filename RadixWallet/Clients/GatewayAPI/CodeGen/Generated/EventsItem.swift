@@ -18,10 +18,11 @@ extension GatewayAPI {
 public struct EventsItem: Codable, Hashable {
 
     public private(set) var name: String
+    /** This type is defined in the Core API as `EventEmitterIdentifier`. See the Core API documentation for more details.  */
     public private(set) var emitter: AnyCodable
-    public private(set) var data: AnyCodable
+    public private(set) var data: ProgrammaticScryptoSborValue
 
-    public init(name: String, emitter: AnyCodable, data: AnyCodable) {
+    public init(name: String, emitter: AnyCodable, data: ProgrammaticScryptoSborValue) {
         self.name = name
         self.emitter = emitter
         self.data = data

@@ -262,18 +262,19 @@ extension OnLedgerEntitiesClient {
 extension GatewayAPI.StateNonFungibleDetailsResponseItem {
 	public typealias NFTData = OnLedgerEntity.NonFungibleToken.NFTData
 	public var details: [NFTData] {
-		data?.programmaticJson.dictionary?["fields"]?.array?.compactMap {
-			guard let dict = $0.dictionary,
-			      let value = dict["value"],
-			      let type = dict["kind"]?.string.flatMap(GatewayAPI.MetadataValueType.init),
-			      let field = dict["field_name"]?.string.flatMap(NFTData.Field.init),
-			      let value = NFTData.Value(type: type, value: value)
-			else {
-				return nil
-			}
-
-			return .init(field: field, value: value)
-		} ?? []
+		[]
+//		data?.programmaticJson.dictionary?["fields"]?.array?.compactMap {
+//			guard let dict = $0.dictionary,
+//			      let value = dict["value"],
+//			      let type = dict["kind"]?.string.flatMap(GatewayAPI.MetadataValueType.init),
+//			      let field = dict["field_name"]?.string.flatMap(NFTData.Field.init),
+//			      let value = NFTData.Value(type: type, value: value)
+//			else {
+//				return nil
+//			}
+//
+//			return .init(field: field, value: value)
+//		} ?? []
 	}
 }
 
