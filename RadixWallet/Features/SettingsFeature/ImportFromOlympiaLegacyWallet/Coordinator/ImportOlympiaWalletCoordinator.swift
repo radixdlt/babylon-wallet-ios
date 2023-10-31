@@ -150,6 +150,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.importLegacyWalletClient) var importLegacyWalletClient
 	@Dependency(\.userDefaultsClient) var userDefaultsClient
+	@Dependency(\.overlayWindowClient) var overlayWindowClient
 
 	public init() {}
 
@@ -437,6 +438,8 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 						mnemonicWithPasshprase: factorSource.mnemonicWithPassphrase,
 						saveIntoProfile: true
 					))
+
+					overlayWindowClient.scheduleHUD(.seedPhraseImported)
 
 				} catch {
 					// Check if we have already imported this Mnemonic

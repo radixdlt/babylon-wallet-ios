@@ -87,7 +87,7 @@ extension OverlayWindowClient {
 
 			public static let updated = Self(text: L10n.AccountSettings.updatedAccountHUDMessage)
 
-			public static let seedPhraseImported = Self(text: L10n.ImportMnemonic.importSeedPhrase)
+			public static let seedPhraseImported = Self(text: L10n.ImportMnemonic.seedPhraseImported)
 
 			// FIXME: Strings
 			public static let accountHidden = Self(text: "Account hidden")

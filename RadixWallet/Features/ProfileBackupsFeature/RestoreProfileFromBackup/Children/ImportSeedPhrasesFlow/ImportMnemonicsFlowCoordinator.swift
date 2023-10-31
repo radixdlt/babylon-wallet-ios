@@ -68,6 +68,7 @@ public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.continuousClock) var clock
 	@Dependency(\.secureStorageClient) var secureStorageClient
+	@Dependency(\.overlayWindowClient) var overlayWindowClient
 
 	public init() {}
 
@@ -116,13 +117,14 @@ public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
-		case let .destination(.presented(.importMnemonicControllingAccounts(.delegate(delegatAction)))):
-			switch delegatAction {
+		case let .destination(.presented(.importMnemonicControllingAccounts(.delegate(delegateAction)))):
+			switch delegateAction {
 			case let .skippedMnemonic(factorSourceIDHash):
 				state.skipped.append(.init(factorSourceID: factorSourceIDHash.embed()))
 				return finishedWith(factorSourceID: factorSourceIDHash.embed(), state: &state)
 
 			case let .persistedMnemonicInKeychain(factorSourceID):
+				overlayWindowClient.scheduleHUD(.seedPhraseImported)
 				state.imported.append(.init(factorSourceID: factorSourceID))
 				return .send(.delegate(.importedMnemonic(forFactorSourceID: factorSourceID)))
 					.merge(with: finishedWith(factorSourceID: factorSourceID, state: &state))
