@@ -6,6 +6,7 @@ extension ImportMnemonic.State {
 	var viewState: ImportMnemonic.ViewState {
 		var viewState = ImportMnemonic.ViewState(
 			readonlyMode: readonlyMode?.context,
+			isProgressing: isProgressing,
 			isWordCountFixed: isWordCountFixed,
 			isAdvancedMode: isAdvancedMode,
 			header: header,
@@ -35,6 +36,7 @@ extension ImportMnemonic {
 		}
 
 		let readonlyMode: ImportMnemonic.State.ReadonlyMode.Context?
+		let isProgressing: Bool // irrelevant for read only mode
 		let isWordCountFixed: Bool
 		let isAdvancedMode: Bool
 		let header: State.Header?
@@ -328,6 +330,7 @@ extension ImportMnemonic.View {
 				}
 				Button(L10n.ImportMnemonic.importSeedPhrase, action: action)
 					.buttonStyle(.primaryRectangular)
+					.controlState(viewStore.isProgressing ? .loading(.local) : .enabled)
 			} else {
 				Button(L10n.Common.done) {
 					viewStore.send(.doneViewing)
