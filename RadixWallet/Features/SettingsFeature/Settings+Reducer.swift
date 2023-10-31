@@ -21,7 +21,7 @@ public struct Settings: Sendable, FeatureReducer {
 
 		public var shouldShowMigrateOlympiaButton: Bool = false
 		public var userHasNoP2PLinks: Bool? = nil
-		public let deepLinkToDisplayMnemonics: Bool
+		public var deepLinkToDisplayMnemonics: Bool
 		public init(deepLinkToDisplayMnemonics: Bool = false) {
 			self.deepLinkToDisplayMnemonics = deepLinkToDisplayMnemonics
 		}
@@ -171,6 +171,7 @@ public struct Settings: Sendable, FeatureReducer {
 			return .none
 
 		case .deepLinkToDisplayMnemonics:
+			state.deepLinkToDisplayMnemonics = false // deep link done
 			state.destination = .accountSecurity(.init(deepLinkToDisplayMnemonics: true))
 			return .none
 		}

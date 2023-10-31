@@ -17,7 +17,7 @@ public struct AccountSecurity: Sendable, FeatureReducer {
 		public var canImportOlympiaWallet = false
 
 		public static let importOlympia = Self(destination: .importOlympiaWallet(.init()))
-		public let deepLinkToDisplayMnemonics: Bool
+		public var deepLinkToDisplayMnemonics: Bool
 		public init(deepLinkToDisplayMnemonics: Bool) {
 			self.deepLinkToDisplayMnemonics = deepLinkToDisplayMnemonics
 		}
@@ -145,6 +145,7 @@ public struct AccountSecurity: Sendable, FeatureReducer {
 			state.canImportOlympiaWallet = canImportOlympiaWallet
 			return .none
 		case .deepLinkToDisplayMnemonics:
+			state.deepLinkToDisplayMnemonics = false // deep linking done
 			state.destination = .mnemonics(.init())
 			return .none
 		}

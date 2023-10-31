@@ -3002,11 +3002,11 @@
 		48CFBCC62ADC10D800E77A5C /* AppFeature */ = {
 			isa = PBXGroup;
 			children = (
+				48CFBCCE2ADC10D800E77A5C /* App+Reducer.swift */,
 				48CFBCC72ADC10D800E77A5C /* App+View.swift */,
 				48CFBCC82ADC10D800E77A5C /* AppDelegate.swift */,
-				48CFBCC92ADC10D800E77A5C /* Overlay */,
-				48CFBCCE2ADC10D800E77A5C /* App+Reducer.swift */,
 				48CFBCCF2ADC10D800E77A5C /* SceneDelegate.swift */,
+				48CFBCC92ADC10D800E77A5C /* Overlay */,
 			);
 			path = AppFeature;
 			sourceTree = "<group>";
