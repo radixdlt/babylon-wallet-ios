@@ -1,5 +1,4 @@
 // MARK: - OverlayWindowClient + DependencyKey
-
 extension OverlayWindowClient: DependencyKey {
 	public static let liveValue: Self = {
 		let items = AsyncPassthroughSubject<Item>()
