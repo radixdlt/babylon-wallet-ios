@@ -29,7 +29,7 @@ public struct Splash: Sendable, FeatureReducer {
 
 	public enum InternalAction: Sendable, Equatable {
 		case passcodeConfigResult(TaskResult<LocalAuthenticationConfig>)
-		case loadProfile(Profile)
+		case loadedProfile(Profile)
 		case accountRecoveryNeeded(TaskResult<Bool>)
 	}
 
@@ -103,11 +103,15 @@ public struct Splash: Sendable, FeatureReducer {
 			}
 
 			return .run { send in
-				await send(.internal(.loadProfile(onboardingClient.loadProfile())))
+				await send(.internal(.loadedProfile(onboardingClient.loadProfile())))
 			}
 
-		case .loadProfile:
-			return checkAccountRecoveryNeeded()
+		case let .loadedProfile(profile):
+			if profile.networks.isEmpty {
+				return delegateCompleted(accountRecoveryNeeded: false)
+			} else {
+				return checkAccountRecoveryNeeded()
+			}
 
 		case let .accountRecoveryNeeded(.failure(error)):
 			state.biometricsCheckFailed = true
