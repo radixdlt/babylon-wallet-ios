@@ -117,8 +117,8 @@ extension AssetTransfer.State {
 			guard $0.account != nil else {
 				return false
 			}
-			let fungibleAssets = $0.assets.map(\.kind).compactMap(/ResourceAsset.State.Kind.fungibleAsset)
-			let nonFungibleAssets = $0.assets.map(\.kind).compactMap(/ResourceAsset.State.Kind.nonFungibleAsset)
+			let fungibleAssets = $0.assets.fungibleAssets
+			let nonFungibleAssets = $0.assets.nonFungibleAssets
 
 			if !fungibleAssets.isEmpty {
 				return fungibleAssets.allSatisfy { $0.transferAmount != nil && $0.totalTransferSum <= $0.balance }
@@ -307,7 +307,7 @@ extension AssetTransfer {
 		_ receivingAccounts: IdentifiedArrayOf<ReceivingAccount.State>
 	) async throws -> IdentifiedArrayOf<InvolvedFungibleResource> {
 		let allResourceAddresses: [ResourceAddress] = try receivingAccounts.flatMap {
-			let addresses = try $0.assets.map(\.kind).compactMap(/ResourceAsset.State.Kind.fungibleAsset).map {
+			let addresses = try $0.assets.fungibleAssets.map {
 				try ResourceAddress(validatingAddress: $0.id)
 			}
 			return addresses
@@ -321,7 +321,7 @@ extension AssetTransfer {
 			guard let account = receivingAccount.account else {
 				continue
 			}
-			let assets = receivingAccount.assets.map(\.kind).compactMap(/ResourceAsset.State.Kind.fungibleAsset)
+			let assets = receivingAccount.assets.fungibleAssets
 			for fungibleAsset in assets {
 				guard let transferAmount = fungibleAsset.transferAmount else {
 					continue
@@ -358,7 +358,7 @@ extension AssetTransfer {
 			}
 
 			let accountAddress = account.address
-			let assets = receivingAccount.assets.map(\.kind).compactMap(/ResourceAsset.State.Kind.nonFungibleAsset)
+			let assets = receivingAccount.assets.nonFungibleAssets
 
 			for nonFungibleAsset in assets {
 				if resources[id: nonFungibleAsset.resourceAddress] != nil {
