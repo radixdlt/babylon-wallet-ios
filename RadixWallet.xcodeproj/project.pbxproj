@@ -1164,12 +1164,12 @@
 		832880692AE664C30014FBF3 /* EntityFlag.swift in Sources */ = {isa = PBXBuildFile; fileRef = 832880682AE664C30014FBF3 /* EntityFlag.swift */; };
 		8328806C2AE6725F0014FBF3 /* AccountPreferencesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8328806B2AE6725F0014FBF3 /* AccountPreferencesTests.swift */; };
 		83D0B5692AE01EDE0048DCBE /* RadixEngineToolkitError+Description.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83D0B5682AE01EDE0048DCBE /* RadixEngineToolkitError+Description.swift */; };
+		83EE47502AF027DF00155F03 /* AssetTransferDepositRuleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83EE474F2AF027DF00155F03 /* AssetTransferDepositRuleTests.swift */; };
 		83EE47552AF0DE8F00155F03 /* TransactionPayloadGatewayHandlingStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83EE47512AF0DE8E00155F03 /* TransactionPayloadGatewayHandlingStatus.swift */; };
 		83EE47562AF0DE8F00155F03 /* TransactionPayloadStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83EE47522AF0DE8E00155F03 /* TransactionPayloadStatus.swift */; };
 		83EE47572AF0DE8F00155F03 /* TransactionIntentStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83EE47532AF0DE8E00155F03 /* TransactionIntentStatus.swift */; };
 		83EE47582AF0DE8F00155F03 /* EventsItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83EE47542AF0DE8E00155F03 /* EventsItem.swift */; };
 		83EE477A2AF0EE3C00155F03 /* ProgrammaticScryptoSborValueI8.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83EE47592AF0EE3800155F03 /* ProgrammaticScryptoSborValueI8.swift */; };
-		83EE477B2AF0EE3C00155F03 /* ProgrammaticScryptoSborValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83EE475A2AF0EE3800155F03 /* ProgrammaticScryptoSborValue.swift */; };
 		83EE477C2AF0EE3C00155F03 /* ProgrammaticScryptoSborValueU64.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83EE475B2AF0EE3800155F03 /* ProgrammaticScryptoSborValueU64.swift */; };
 		83EE477D2AF0EE3C00155F03 /* ProgrammaticScryptoSborValueTupleAllOf.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83EE475C2AF0EE3800155F03 /* ProgrammaticScryptoSborValueTupleAllOf.swift */; };
 		83EE477E2AF0EE3C00155F03 /* ProgrammaticScryptoSborValueNonFungibleLocalId.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83EE475D2AF0EE3900155F03 /* ProgrammaticScryptoSborValueNonFungibleLocalId.swift */; };
@@ -1206,7 +1206,7 @@
 		83EE47A22AF0EECD00155F03 /* TransactionFungibleBalanceChanges.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83EE479D2AF0EECD00155F03 /* TransactionFungibleBalanceChanges.swift */; };
 		83EE47A32AF0EECD00155F03 /* TransactionBalanceChanges.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83EE479E2AF0EECD00155F03 /* TransactionBalanceChanges.swift */; };
 		83EE47A42AF0EECD00155F03 /* TransactionFungibleFeeBalanceChangeType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83EE479F2AF0EECD00155F03 /* TransactionFungibleFeeBalanceChangeType.swift */; };
-		83EE47502AF027DF00155F03 /* AssetTransferDepositRuleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83EE474F2AF027DF00155F03 /* AssetTransferDepositRuleTests.swift */; };
+		83FDF7EC2AF260D600D9AA8B /* ProgrammaticScryptoSborValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83FDF7EB2AF260D600D9AA8B /* ProgrammaticScryptoSborValue.swift */; };
 		E62BB7632AEA856300D46DAC /* ImportMnemonicTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E62BB7622AEA856300D46DAC /* ImportMnemonicTests.swift */; };
 		E6390FB32AE6C3E200B4DEE2 /* ProfileStore+OverlayWindowClient+Alert+OwnershipConflict.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6390FB22AE6C3E200B4DEE2 /* ProfileStore+OverlayWindowClient+Alert+OwnershipConflict.swift */; };
 		E63D123D2ADD1FC00001CBB1 /* SwiftUIIntrospect in Frameworks */ = {isa = PBXBuildFile; productRef = E63D123C2ADD1FC00001CBB1 /* SwiftUIIntrospect */; };
@@ -2444,12 +2444,12 @@
 		832880682AE664C30014FBF3 /* EntityFlag.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntityFlag.swift; sourceTree = "<group>"; };
 		8328806B2AE6725F0014FBF3 /* AccountPreferencesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountPreferencesTests.swift; sourceTree = "<group>"; };
 		83D0B5682AE01EDE0048DCBE /* RadixEngineToolkitError+Description.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RadixEngineToolkitError+Description.swift"; sourceTree = "<group>"; };
+		83EE474F2AF027DF00155F03 /* AssetTransferDepositRuleTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssetTransferDepositRuleTests.swift; sourceTree = "<group>"; };
 		83EE47512AF0DE8E00155F03 /* TransactionPayloadGatewayHandlingStatus.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TransactionPayloadGatewayHandlingStatus.swift; sourceTree = "<group>"; };
 		83EE47522AF0DE8E00155F03 /* TransactionPayloadStatus.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TransactionPayloadStatus.swift; sourceTree = "<group>"; };
 		83EE47532AF0DE8E00155F03 /* TransactionIntentStatus.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TransactionIntentStatus.swift; sourceTree = "<group>"; };
 		83EE47542AF0DE8E00155F03 /* EventsItem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EventsItem.swift; sourceTree = "<group>"; };
 		83EE47592AF0EE3800155F03 /* ProgrammaticScryptoSborValueI8.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProgrammaticScryptoSborValueI8.swift; sourceTree = "<group>"; };
-		83EE475A2AF0EE3800155F03 /* ProgrammaticScryptoSborValue.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProgrammaticScryptoSborValue.swift; sourceTree = "<group>"; };
 		83EE475B2AF0EE3800155F03 /* ProgrammaticScryptoSborValueU64.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProgrammaticScryptoSborValueU64.swift; sourceTree = "<group>"; };
 		83EE475C2AF0EE3800155F03 /* ProgrammaticScryptoSborValueTupleAllOf.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProgrammaticScryptoSborValueTupleAllOf.swift; sourceTree = "<group>"; };
 		83EE475D2AF0EE3900155F03 /* ProgrammaticScryptoSborValueNonFungibleLocalId.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProgrammaticScryptoSborValueNonFungibleLocalId.swift; sourceTree = "<group>"; };
@@ -2486,7 +2486,7 @@
 		83EE479D2AF0EECD00155F03 /* TransactionFungibleBalanceChanges.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TransactionFungibleBalanceChanges.swift; sourceTree = "<group>"; };
 		83EE479E2AF0EECD00155F03 /* TransactionBalanceChanges.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TransactionBalanceChanges.swift; sourceTree = "<group>"; };
 		83EE479F2AF0EECD00155F03 /* TransactionFungibleFeeBalanceChangeType.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TransactionFungibleFeeBalanceChangeType.swift; sourceTree = "<group>"; };
-		83EE474F2AF027DF00155F03 /* AssetTransferDepositRuleTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssetTransferDepositRuleTests.swift; sourceTree = "<group>"; };
+		83FDF7EB2AF260D600D9AA8B /* ProgrammaticScryptoSborValue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgrammaticScryptoSborValue.swift; sourceTree = "<group>"; };
 		E62BB7622AEA856300D46DAC /* ImportMnemonicTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportMnemonicTests.swift; sourceTree = "<group>"; };
 		E6390FB22AE6C3E200B4DEE2 /* ProfileStore+OverlayWindowClient+Alert+OwnershipConflict.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ProfileStore+OverlayWindowClient+Alert+OwnershipConflict.swift"; sourceTree = "<group>"; };
 		E67F14442AE029BA00738BE1 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -5403,7 +5403,6 @@
 			isa = PBXGroup;
 			children = (
 				83EE47702AF0EE3B00155F03 /* FromLedgerStateMixin.swift */,
-				83EE475A2AF0EE3800155F03 /* ProgrammaticScryptoSborValue.swift */,
 				83EE47762AF0EE3C00155F03 /* ProgrammaticScryptoSborValueArray.swift */,
 				83EE47712AF0EE3B00155F03 /* ProgrammaticScryptoSborValueArrayAllOf.swift */,
 				83EE47602AF0EE3900155F03 /* ProgrammaticScryptoSborValueBool.swift */,
@@ -5725,6 +5724,7 @@
 				48CFC0BF2ADC10D900E77A5C /* NonFungibleResourcesCollectionItem.swift */,
 				48CFC0C02ADC10D900E77A5C /* StateEntityDetailsResponseItemDetails.swift */,
 				48CFC0C12ADC10D900E77A5C /* ValidatorState.swift */,
+				83FDF7EB2AF260D600D9AA8B /* ProgrammaticScryptoSborValue.swift */,
 			);
 			path = CreatedModels;
 			sourceTree = "<group>";
@@ -8091,7 +8091,6 @@
 				48CFC6552ADC10DB00E77A5C /* Account.swift in Sources */,
 				48CFC5972ADC10DA00E77A5C /* ToggleView.swift in Sources */,
 				48CFC6122ADC10DA00E77A5C /* PersonaDataRequestItem.swift in Sources */,
-				83EE477B2AF0EE3C00155F03 /* ProgrammaticScryptoSborValue.swift in Sources */,
 				48CFC4892ADC10DA00E77A5C /* EntityMetadata+GWMetadata.swift in Sources */,
 				48CFC4FC2ADC10DA00E77A5C /* StateNonFungibleDataRequest.swift in Sources */,
 				48CFC60E2ADC10DA00E77A5C /* P2P+Dapp+Response.swift in Sources */,
@@ -8292,6 +8291,7 @@
 				48CFC4652ADC10DA00E77A5C /* AccountPortfoliosClient+Live.swift in Sources */,
 				48CFC6692ADC10DB00E77A5C /* OffDeviceMnemonicFactorSource.swift in Sources */,
 				48CFC5832ADC10DA00E77A5C /* SecureStorageClient+Test.swift in Sources */,
+				83FDF7EC2AF260D600D9AA8B /* ProgrammaticScryptoSborValue.swift in Sources */,
 				48CFC63B2ADC10DB00E77A5C /* KeyKind.swift in Sources */,
 				48CFC26E2ADC10D900E77A5C /* SignWithFactorSourcesOfKindDevice.swift in Sources */,
 				48CFC5DC2ADC10DA00E77A5C /* Modifier.swift in Sources */,
