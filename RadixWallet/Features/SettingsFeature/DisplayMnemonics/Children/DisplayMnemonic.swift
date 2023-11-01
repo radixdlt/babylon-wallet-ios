@@ -6,7 +6,7 @@ public struct DisplayMnemonic: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public let deviceFactorSource: DeviceFactorSource
 
-		public var importMnemonic: ImportMnemonic.State?
+		public var exportMnemonic: ExportMnemonic.State?
 
 		public init(deviceFactorSource: DeviceFactorSource) {
 			self.deviceFactorSource = deviceFactorSource
@@ -17,12 +17,8 @@ public struct DisplayMnemonic: Sendable, FeatureReducer {
 		case onFirstTask
 	}
 
-	public enum InternalAction: Sendable, Equatable {
-		case loadMnemonicResult(TaskResult<MnemonicWithPassphrase?>)
-	}
-
 	public enum ChildAction: Sendable, Equatable {
-		case importMnemonic(ImportMnemonic.Action)
+		case exportMnemonic(ExportMnemonic.Action)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -36,56 +32,29 @@ public struct DisplayMnemonic: Sendable, FeatureReducer {
 
 	public var body: some ReducerOf<Self> {
 		Reduce(core)
-			.ifLet(\.importMnemonic, action: /Action.child .. ChildAction.importMnemonic) {
-				ImportMnemonic()
+			.ifLet(\.exportMnemonic, action: /Action.child .. ChildAction.exportMnemonic) {
+				ExportMnemonic()
 			}
 	}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .onFirstTask:
-			.run { [deviceFactorSource = state.deviceFactorSource] send in
-				let factorSourceID = deviceFactorSource.id
-				let result = await TaskResult {
-					try secureStorageClient.loadMnemonic(
-						factorSourceID: factorSourceID,
-						purpose: .displaySeedPhrase
-					)
-				}
-				await send(.internal(.loadMnemonicResult(result)))
+			exportMnemonic(
+				factorSourceID: state.deviceFactorSource.id
+			) {
+				state.exportMnemonic = .export($0)
+			} onErrorAction: { _ in
+				.send(.delegate(.failedToLoad))
 			}
-		}
-	}
-
-	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
-		switch internalAction {
-		case let .loadMnemonicResult(.success(maybeMnemonicWithPassphrase)):
-			guard let mnemonicWithPassphrase = maybeMnemonicWithPassphrase else {
-				loggerGlobal.error("Mnemonic was nil")
-				return .send(.delegate(.failedToLoad))
-			}
-
-			state.importMnemonic = .init(
-				warning: L10n.RevealSeedPhrase.warning,
-				mnemonicWithPassphrase: mnemonicWithPassphrase,
-				readonlyMode: .init(
-					context: .fromSettings,
-					factorSourceKind: state.deviceFactorSource.factorSourceKind
-				)
-			)
-			return .none
-
-		case let .loadMnemonicResult(.failure(error)):
-			loggerGlobal.error("Error loading mnemonic: \(error)")
-			return .send(.delegate(.failedToLoad))
 		}
 	}
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
-		case let .importMnemonic(.delegate(.doneViewing(markedMnemonicAsBackedUp))):
+		case let .exportMnemonic(.delegate(.doneViewing(markedMnemonicAsBackedUp))):
 			let isBackedUp = markedMnemonicAsBackedUp ?? true
-			state.importMnemonic = nil
+			state.exportMnemonic = nil
 			return .send(
 				.delegate(
 					.doneViewing(

@@ -66,6 +66,24 @@ extension Home {
 						action: Home.Destinations.Action.accountDetails,
 						destination: { AccountDetails.View(store: $0) }
 					)
+					.fullScreenCover( /* Full Screen cover to not be able to use iOS dismiss gestures */
+						store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+						state: /Home.Destinations.State.exportMnemonic,
+						action: Home.Destinations.Action.exportMnemonic,
+						content: { childStore in
+							NavigationView {
+								ImportMnemonic.View(store: childStore)
+									// FIXME: Strings
+									.navigationTitle("Backup Seed Phrase")
+							}
+						}
+					)
+					.sheet(
+						store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+						state: /Home.Destinations.State.importMnemonics,
+						action: Home.Destinations.Action.importMnemonics,
+						content: { ImportMnemonicsFlowCoordinator.View(store: $0) }
+					)
 					.sheet(
 						store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
 						state: /Home.Destinations.State.createAccount,

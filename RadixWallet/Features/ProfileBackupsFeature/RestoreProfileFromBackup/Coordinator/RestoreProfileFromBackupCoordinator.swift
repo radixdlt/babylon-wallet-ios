@@ -86,7 +86,7 @@ public struct RestoreProfileFromBackupCoordinator: Sendable, FeatureReducer {
 			return .run { send in
 				try? await clock.sleep(for: .milliseconds(300))
 				await send(.internal(.delayedAppendToPath(
-					.importMnemonicsFlow(.init(profileSnapshot: profileSnapshot)
+					.importMnemonicsFlow(.init(context: .fromOnboarding(profileSnapshot: profileSnapshot))
 					))))
 			}
 
@@ -106,13 +106,9 @@ public struct RestoreProfileFromBackupCoordinator: Sendable, FeatureReducer {
 				errorQueue.schedule(error)
 			}
 
-		case .path(.element(_, action: .importMnemonicsFlow(.delegate(.failedToImportAllRequiredMnemonics)))):
+		case let .path(.element(_, action: .importMnemonicsFlow(.delegate(.finishedEarly(didFail))))):
 			state.path.removeLast()
-			return .send(.delegate(.failedToImportProfileDueToMnemonics))
-
-		case .path(.element(_, action: .importMnemonicsFlow(.delegate(.closeButtonTapped)))):
-			state.path.removeLast()
-			return .none
+			return didFail ? .send(.delegate(.failedToImportProfileDueToMnemonics)) : .none
 
 		default:
 			return .none

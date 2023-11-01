@@ -3,7 +3,7 @@ import SwiftUI
 extension DisplayMnemonic.State {
 	var viewState: DisplayMnemonic.ViewState {
 		.init(
-			isLoading: importMnemonic == nil
+			isLoading: exportMnemonic == nil
 		)
 	}
 }
@@ -33,11 +33,11 @@ extension DisplayMnemonic {
 				} else {
 					IfLetStore(
 						store.scope(
-							state: \.importMnemonic,
-							action: { .child(.importMnemonic($0)) }
+							state: \.exportMnemonic,
+							action: { .child(.exportMnemonic($0)) }
 						)
-					) { importMnemonicViewStore in
-						ImportMnemonic.View(store: importMnemonicViewStore)
+					) { exportMnemonicViewStore in
+						ExportMnemonic.View(store: exportMnemonicViewStore)
 					}
 				}
 			}

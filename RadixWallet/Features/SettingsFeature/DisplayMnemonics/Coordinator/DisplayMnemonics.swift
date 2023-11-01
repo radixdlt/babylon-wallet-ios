@@ -1,6 +1,9 @@
 import ComposableArchitecture
 import SwiftUI
 
+// FIXME: Refactor ImportMnemonic
+public typealias ExportMnemonic = ImportMnemonic
+
 // MARK: - DisplayMnemonics
 public struct DisplayMnemonics: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
@@ -18,7 +21,6 @@ public struct DisplayMnemonics: Sendable, FeatureReducer {
 
 	public enum InternalAction: Sendable, Equatable {
 		case loadedDeviceFactorSources(TaskResult<IdentifiedArrayOf<DisplayEntitiesControlledByMnemonic.State>>)
-		case loadProfileSnapshotForRecoverMnemonicsFlow(TaskResult<ProfileSnapshot>)
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -102,15 +104,6 @@ public struct DisplayMnemonics: Sendable, FeatureReducer {
 			loggerGlobal.error("Failed to load device factor sources, error: \(error)")
 			errorQueue.schedule(error)
 			return .none
-
-		case let .loadProfileSnapshotForRecoverMnemonicsFlow(.success(profileSnapshot)):
-			state.destination = .importMnemonics(.init(profileSnapshot: profileSnapshot))
-			return .none
-
-		case let .loadProfileSnapshotForRecoverMnemonicsFlow(.failure(error)):
-			loggerGlobal.error("Failed to load Profile")
-			errorQueue.schedule(error)
-			return .none
 		}
 	}
 
@@ -128,10 +121,8 @@ public struct DisplayMnemonics: Sendable, FeatureReducer {
 				state.destination = .displayMnemonic(.init(deviceFactorSource: deviceFactorSource))
 				return .none
 			case .importMissingMnemonic:
-				return .run { send in
-					let result = await TaskResult { try await backupsClient.snapshotOfProfileForExport() }
-					await send(.internal(.loadProfileSnapshotForRecoverMnemonicsFlow(result)))
-				}
+				state.destination = .importMnemonics(.init())
+				return .none
 			}
 
 		case .destination(.presented(.displayMnemonic(.delegate(.failedToLoad)))):
@@ -148,9 +139,8 @@ public struct DisplayMnemonics: Sendable, FeatureReducer {
 
 		case let .destination(.presented(.importMnemonics(.delegate(delegateAction)))):
 			switch delegateAction {
-			case .closeButtonTapped, .failedToImportAllRequiredMnemonics:
+			case .finishedEarly:
 				state.destination = nil
-			case .importedMnemonic: break // we wait until whole flow is over.
 			case let .finishedImportingMnemonics(_, importedIDs):
 				for imported in importedIDs {
 					state.deviceFactorSources[id: imported.factorSourceID]?.imported()

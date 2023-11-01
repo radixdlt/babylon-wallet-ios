@@ -84,9 +84,6 @@ public struct Main: Sendable, FeatureReducer {
 			state.destination = .settings(.init())
 			return .none
 
-		case .home(.delegate(.deepLinkToDisplayMnemonics)):
-			return deepLinkToDisplayMnemonics(state: &state)
-
 		case let .destination(.presented(.settings(.delegate(.deleteProfileAndFactorSources(keepInIcloudIfPresent))))):
 			return .run { send in
 				try await appPreferencesClient.deleteProfileAndFactorSources(keepInIcloudIfPresent)
@@ -98,11 +95,6 @@ public struct Main: Sendable, FeatureReducer {
 		default:
 			return .none
 		}
-	}
-
-	private func deepLinkToDisplayMnemonics(state: inout State) -> Effect<Action> {
-		state.destination = .settings(.init(deepLinkToDisplayMnemonics: true))
-		return .none
 	}
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {

@@ -47,18 +47,21 @@ public struct Home: Sendable, FeatureReducer {
 
 	public enum DelegateAction: Sendable, Equatable {
 		case displaySettings
-		case deepLinkToDisplayMnemonics
 	}
 
 	public struct Destinations: Sendable, Reducer {
 		public enum State: Sendable, Hashable {
 			case accountDetails(AccountDetails.State)
 			case createAccount(CreateAccountCoordinator.State)
+			case importMnemonics(ImportMnemonicsFlowCoordinator.State)
+			case exportMnemonic(ExportMnemonic.State)
 		}
 
 		public enum Action: Sendable, Equatable {
 			case accountDetails(AccountDetails.Action)
 			case createAccount(CreateAccountCoordinator.Action)
+			case importMnemonics(ImportMnemonicsFlowCoordinator.Action)
+			case exportMnemonic(ExportMnemonic.Action)
 		}
 
 		public var body: some ReducerOf<Self> {
@@ -67,6 +70,12 @@ public struct Home: Sendable, FeatureReducer {
 			}
 			Scope(state: /State.createAccount, action: /Action.createAccount) {
 				CreateAccountCoordinator()
+			}
+			Scope(state: /State.importMnemonics, action: /Action.importMnemonics) {
+				ImportMnemonicsFlowCoordinator()
+			}
+			Scope(state: /State.exportMnemonic, action: /Action.exportMnemonic) {
+				ExportMnemonic()
 			}
 		}
 	}
@@ -193,11 +202,17 @@ public struct Home: Sendable, FeatureReducer {
 			))
 			return .none
 
-		case .destination(.presented(.accountDetails(.delegate(.deepLinkToDisplayMnemonics)))):
-			return deepLinkToDisplayMnemonics(state: &state)
+		case let .destination(.presented(.accountDetails(.delegate(.exportMnemonic(controlledAccount))))):
+			return exportMnemonic(controlling: controlledAccount, state: &state)
 
-		case .accountList(.delegate(.deepLinkToDisplayMnemonics)):
-			return deepLinkToDisplayMnemonics(state: &state)
+		case let .accountList(.delegate(.exportMnemonic(controlledAccount))):
+			return exportMnemonic(controlling: controlledAccount, state: &state)
+
+		case .destination(.presented(.accountDetails(.delegate(.importMnemonics)))):
+			return importMnemonics(state: &state)
+
+		case .accountList(.delegate(.importMnemonics)):
+			return importMnemonics(state: &state)
 
 		case .destination(.presented(.accountDetails(.delegate(.dismiss)))):
 			state.destination = nil
@@ -208,8 +223,92 @@ public struct Home: Sendable, FeatureReducer {
 		}
 	}
 
-	private func deepLinkToDisplayMnemonics(state: inout State) -> Effect<Action> {
-		state.destination = nil // hide account details
-		return delayedEffect(for: .delegate(.deepLinkToDisplayMnemonics))
+	private func importMnemonics(state: inout State) -> Effect<Action> {
+		.none
 	}
+
+	private func exportMnemonic(
+		controlling account: Profile.Network.Account,
+		state: inout State
+	) -> Effect<Action> {
+		exportMnemonic(
+			controlling: account,
+			onSuccess: {
+				state.destination = .exportMnemonic(.export($0))
+			}
+		)
+	}
+}
+
+extension FeatureReducer {
+	func exportMnemonic(
+		controlling account: Profile.Network.Account,
+		notifyIfMissing: Bool = true,
+		onSuccess: (SimplePrivateFactorSource) -> Void
+	) -> Effect<Action> {
+		guard let txSigningFI = account.virtualHierarchicalDeterministicFactorInstances.first(where: { $0.factorSourceID.kind == .device }) else {
+			loggerGlobal.notice("Discrepancy, non software account has not mnemonic to export")
+			return .none
+		}
+
+		return exportMnemonic(
+			factorSourceID: txSigningFI.factorSourceID,
+			notifyIfMissing: notifyIfMissing,
+			onSuccess: onSuccess,
+			onErrorAction: { error in
+				loggerGlobal.error("Failed to load mnemonic to export: \(error)")
+				return .none
+			}
+		)
+	}
+
+	func exportMnemonic(
+		factorSourceID: FactorSource.ID.FromHash,
+		notifyIfMissing: Bool = true,
+		onSuccess: (SimplePrivateFactorSource) -> Void,
+		onErrorAction: (Swift.Error) -> Effect<Action>
+	) -> Effect<Action> {
+		@Dependency(\.secureStorageClient) var secureStorageClient
+		do {
+			guard let mnemonicWithPassphrase = try secureStorageClient.loadMnemonic(
+				factorSourceID: factorSourceID,
+				purpose: .displaySeedPhrase,
+				notifyIfMissing: notifyIfMissing
+			) else {
+				return onErrorAction(FailedToFindFactorSource())
+			}
+
+			onSuccess(
+				.init(
+					mnemonicWithPassphrase: mnemonicWithPassphrase,
+					factorSourceID: factorSourceID
+				)
+			)
+
+			return .none
+		} catch {
+			return onErrorAction(error)
+		}
+	}
+}
+
+extension ExportMnemonic.State {
+	static func export(
+		_ input: SimplePrivateFactorSource
+	) -> Self {
+		self.init(
+			warning: L10n.RevealSeedPhrase.warning,
+			mnemonicWithPassphrase: input.mnemonicWithPassphrase,
+			readonlyMode: .init(
+				context: .fromSettings,
+				factorSourceKind: input.factorSourceID.kind
+			)
+		)
+	}
+}
+
+// MARK: - SimplePrivateFactorSource
+struct SimplePrivateFactorSource: Sendable, Hashable {
+	let mnemonicWithPassphrase: MnemonicWithPassphrase
+	let factorSourceID: FactorSource.ID.FromHash
 }
