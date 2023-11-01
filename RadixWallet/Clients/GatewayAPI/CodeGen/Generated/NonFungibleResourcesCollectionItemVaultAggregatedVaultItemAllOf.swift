@@ -20,7 +20,7 @@ public struct NonFungibleResourcesCollectionItemVaultAggregatedVaultItemAllOf: C
     /** Bech32m-encoded human readable version of the address. */
     public private(set) var vaultAddress: String
     public private(set) var totalCount: Int64
-    /** TBD */
+    /** The most recent state version underlying object was modified at. */
     public private(set) var lastUpdatedAtStateVersion: Int64
 
     public init(vaultAddress: String, totalCount: Int64, lastUpdatedAtStateVersion: Int64) {

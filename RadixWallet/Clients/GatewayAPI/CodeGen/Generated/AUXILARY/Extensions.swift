@@ -149,7 +149,7 @@ extension KeyedEncodingContainerProtocol {
         }
     }
 
-	public mutating func encode(_ value: Foundation.Decimal, forKey key: Self.Key) throws {
+    public mutating func encode(_ value: Foundation.Decimal, forKey key: Self.Key) throws {
         var mutableValue = value
         let stringValue = NSDecimalString(&mutableValue, Locale(identifier: "en_US"))
         try encode(stringValue, forKey: key)
@@ -201,8 +201,8 @@ extension KeyedDecodingContainerProtocol {
 
     public func decode(_ type: Foundation.Decimal.Type, forKey key: Self.Key) throws -> Foundation.Decimal {
         let stringValue = try decode(String.self, forKey: key)
-        guard let decimalValue = Foundation.Decimal(string: stringValue) else {
-            let context = DecodingError.Context(codingPath: [key], debugDescription: "The key \(key) couldn't be converted to a Foundation.Decimal value")
+        guard let decimalValue = Decimal(string: stringValue) else {
+            let context = DecodingError.Context(codingPath: [key], debugDescription: "The key \(key) couldn't be converted to a Decimal value")
             throw DecodingError.typeMismatch(type, context)
         }
 
@@ -213,8 +213,8 @@ extension KeyedDecodingContainerProtocol {
         guard let stringValue = try decodeIfPresent(String.self, forKey: key) else {
             return nil
         }
-        guard let decimalValue = Foundation.Decimal(string: stringValue) else {
-            let context = DecodingError.Context(codingPath: [key], debugDescription: "The key \(key) couldn't be converted to a Foundation.Decimal value")
+        guard let decimalValue = Decimal(string: stringValue) else {
+            let context = DecodingError.Context(codingPath: [key], debugDescription: "The key \(key) couldn't be converted to a Decimal value")
             throw DecodingError.typeMismatch(type, context)
         }
 

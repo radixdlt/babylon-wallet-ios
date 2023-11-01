@@ -19,10 +19,13 @@ public struct StateEntityDetailsResponsePackageDetailsBlueprintItem: Codable, Ha
 
     public private(set) var name: String
     public private(set) var version: String
+    /** This type is defined in the Core API as `BlueprintDefinition`. See the Core API documentation for more details.  */
     public private(set) var definition: AnyCodable
     public private(set) var dependantEntities: [String]?
+    /** This type is defined in the Core API as `AuthConfig`. See the Core API documentation for more details.  */
     public private(set) var authTemplate: AnyCodable?
     public private(set) var authTemplateIsLocked: Bool?
+    /** This type is defined in the Core API as `BlueprintRoyaltyConfig`. See the Core API documentation for more details.  */
     public private(set) var royaltyConfig: AnyCodable?
     public private(set) var royaltyConfigIsLocked: Bool?
 

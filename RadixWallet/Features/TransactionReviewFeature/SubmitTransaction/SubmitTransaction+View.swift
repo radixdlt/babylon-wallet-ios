@@ -13,12 +13,16 @@ extension SubmitTransaction.State {
 extension SubmitTransaction.State.TXStatus {
 	var display: String {
 		switch self {
-		case .notYetSubmitted, .submitting: L10n.TransactionReview.SubmitTransaction.displaySubmitting
-		case .submittedUnknown, .submittedPending: L10n.TransactionReview.SubmitTransaction.displaySubmittedUnknown
-		case .rejected: L10n.TransactionReview.SubmitTransaction.displayRejected
-		case .committedFailure: L10n.TransactionReview.SubmitTransaction.displayFailed
-		case .committedSuccessfully: L10n.TransactionReview.SubmitTransaction.displayCommitted
-		case .failedToGetStatus: L10n.Error.TransactionFailure.pollStatus
+		case .failed:
+			L10n.Transaction.Status.Failed.text
+		case .permanentlyRejected:
+			L10n.Transaction.Status.Rejected.text
+		case let .temporarilyRejected(processingTime):
+			L10n.Transaction.Status.Error.text(processingTime)
+		case .notYetSubmitted, .submitting, .submitted:
+			L10n.Transaction.Status.Completing.text
+		case .committedSuccessfully:
+			""
 		}
 	}
 }
@@ -27,7 +31,7 @@ extension SubmitTransaction.State.TXStatus {
 extension SubmitTransaction {
 	public struct ViewState: Equatable {
 		let txID: TXID
-		let status: SubmitTransaction.State.TXStatus
+		let status: State.TXStatus
 		let dismissalDisabled: Bool
 	}
 
@@ -53,11 +57,6 @@ extension SubmitTransaction {
 								.foregroundColor(.app.gray1)
 								.textStyle(.sheetTitle)
 								.multilineTextAlignment(.center)
-
-							Text(L10n.Transaction.Status.Failure.text)
-								.foregroundColor(.app.gray1)
-								.textStyle(.body1Regular)
-								.multilineTextAlignment(.center)
 						} else {
 							Image(asset: AssetResource.transactionInProgress)
 								.opacity(opacity)
@@ -72,10 +71,12 @@ extension SubmitTransaction {
 										opacity = 0.5
 									}
 								}
-
-							Text(L10n.Transaction.Status.Completing.text)
-								.textStyle(.body1Regular)
 						}
+
+						Text(viewStore.status.display)
+							.foregroundColor(.app.gray1)
+							.textStyle(.body1Regular)
+							.multilineTextAlignment(.center)
 
 						HStack {
 							Text(L10n.TransactionReview.SubmitTransaction.txID)

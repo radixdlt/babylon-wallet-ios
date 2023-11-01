@@ -21,15 +21,18 @@ public struct StateEntityDetailsResponseComponentDetails: Codable, Hashable {
     /** Bech32m-encoded human readable version of the address. */
     public private(set) var packageAddress: String?
     public private(set) var blueprintName: String
+    public private(set) var blueprintVersion: String
+    /** A representation of a component's inner state. If this entity is a `GenericComponent`, this field will be in a programmatic JSON structure (you can deserialize it as a `ProgrammaticScryptoSborValue`). Otherwise, for \"native\" components such as `Account`, `Validator`, `AccessController`, `OneResourcePool`, `TwoResourcePool`, and `MultiResourcePool`, this field will be a custom JSON model defined in the Core API schema.  */
     public private(set) var state: AnyCodable?
     public private(set) var roleAssignments: ComponentEntityRoleAssignments?
     /** String-encoded decimal representing the amount of a related fungible resource. */
     public private(set) var royaltyVaultBalance: String?
 
-    public init(type: StateEntityDetailsResponseItemDetailsType, packageAddress: String? = nil, blueprintName: String, state: AnyCodable? = nil, roleAssignments: ComponentEntityRoleAssignments? = nil, royaltyVaultBalance: String? = nil) {
+    public init(type: StateEntityDetailsResponseItemDetailsType, packageAddress: String? = nil, blueprintName: String, blueprintVersion: String, state: AnyCodable? = nil, roleAssignments: ComponentEntityRoleAssignments? = nil, royaltyVaultBalance: String? = nil) {
         self.type = type
         self.packageAddress = packageAddress
         self.blueprintName = blueprintName
+        self.blueprintVersion = blueprintVersion
         self.state = state
         self.roleAssignments = roleAssignments
         self.royaltyVaultBalance = royaltyVaultBalance
@@ -39,6 +42,7 @@ public struct StateEntityDetailsResponseComponentDetails: Codable, Hashable {
         case type
         case packageAddress = "package_address"
         case blueprintName = "blueprint_name"
+        case blueprintVersion = "blueprint_version"
         case state
         case roleAssignments = "role_assignments"
         case royaltyVaultBalance = "royalty_vault_balance"
@@ -51,6 +55,7 @@ public struct StateEntityDetailsResponseComponentDetails: Codable, Hashable {
         try container.encode(type, forKey: .type)
         try container.encodeIfPresent(packageAddress, forKey: .packageAddress)
         try container.encode(blueprintName, forKey: .blueprintName)
+        try container.encode(blueprintVersion, forKey: .blueprintVersion)
         try container.encodeIfPresent(state, forKey: .state)
         try container.encodeIfPresent(roleAssignments, forKey: .roleAssignments)
         try container.encodeIfPresent(royaltyVaultBalance, forKey: .royaltyVaultBalance)

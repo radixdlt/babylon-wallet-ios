@@ -107,8 +107,8 @@ extension NonFungibleAssetList.Row.View {
 			HStack {
 				NFTIDView(
 					id: asset.id.localId().toUserFacingString(),
-					name: asset.data.name,
-					thumbnail: asset.data.keyImageURL
+					name: asset.data?.name,
+					thumbnail: asset.data?.keyImageURL
 				)
 				if let selectedAssets = viewStore.selectedAssets {
 					CheckmarkView(appearance: .dark, isChecked: selectedAssets.contains(asset))

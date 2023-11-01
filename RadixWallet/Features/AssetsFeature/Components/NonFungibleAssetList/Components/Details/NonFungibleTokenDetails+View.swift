@@ -22,10 +22,10 @@ extension NonFungibleTokenDetails.State {
 extension NonFungibleTokenDetails.ViewState.TokenDetails {
 	init(token: OnLedgerEntity.NonFungibleToken) {
 		self.init(
-			keyImage: token.data.keyImageURL,
+			keyImage: token.data?.keyImageURL,
 			nonFungibleGlobalID: token.id,
-			name: token.data.name,
-			description: token.data.description
+			name: token.data?.name,
+			description: token.data?.tokenDescription
 		)
 	}
 }

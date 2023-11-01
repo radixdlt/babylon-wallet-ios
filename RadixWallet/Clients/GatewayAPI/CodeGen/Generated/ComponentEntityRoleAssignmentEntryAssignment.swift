@@ -18,6 +18,7 @@ extension GatewayAPI {
 public struct ComponentEntityRoleAssignmentEntryAssignment: Codable, Hashable {
 
     public private(set) var resolution: RoleAssignmentResolution
+    /** This type is defined in the Core API as `AccessRule`. See the Core API documentation for more details.  */
     public private(set) var explicitRule: AnyCodable?
 
     public init(resolution: RoleAssignmentResolution, explicitRule: AnyCodable? = nil) {

@@ -34,10 +34,11 @@ public struct CommittedTransactionInfo: Codable, Hashable {
     /** Hex-encoded binary blob. */
     public private(set) var rawHex: String?
     public private(set) var receipt: TransactionReceipt?
-    /** defined in core api specs. */
+    /** The optional transaction message. This type is defined in the Core API as `TransactionMessage`. See the Core API documentation for more details.  */
     public private(set) var message: AnyCodable?
+    public private(set) var balanceChanges: TransactionBalanceChanges?
 
-    public init(stateVersion: Int64, epoch: Int64, round: Int64, roundTimestamp: String, transactionStatus: TransactionStatus, payloadHash: String? = nil, intentHash: String? = nil, feePaid: String? = nil, affectedGlobalEntities: [String]? = nil, confirmedAt: Date? = nil, errorMessage: String? = nil, rawHex: String? = nil, receipt: TransactionReceipt? = nil, message: AnyCodable? = nil) {
+    public init(stateVersion: Int64, epoch: Int64, round: Int64, roundTimestamp: String, transactionStatus: TransactionStatus, payloadHash: String? = nil, intentHash: String? = nil, feePaid: String? = nil, affectedGlobalEntities: [String]? = nil, confirmedAt: Date? = nil, errorMessage: String? = nil, rawHex: String? = nil, receipt: TransactionReceipt? = nil, message: AnyCodable? = nil, balanceChanges: TransactionBalanceChanges? = nil) {
         self.stateVersion = stateVersion
         self.epoch = epoch
         self.round = round
@@ -52,6 +53,7 @@ public struct CommittedTransactionInfo: Codable, Hashable {
         self.rawHex = rawHex
         self.receipt = receipt
         self.message = message
+        self.balanceChanges = balanceChanges
     }
 
     public enum CodingKeys: String, CodingKey, CaseIterable {
@@ -69,6 +71,7 @@ public struct CommittedTransactionInfo: Codable, Hashable {
         case rawHex = "raw_hex"
         case receipt
         case message
+        case balanceChanges = "balance_changes"
     }
 
     // Encodable protocol methods
@@ -89,6 +92,7 @@ public struct CommittedTransactionInfo: Codable, Hashable {
         try container.encodeIfPresent(rawHex, forKey: .rawHex)
         try container.encodeIfPresent(receipt, forKey: .receipt)
         try container.encodeIfPresent(message, forKey: .message)
+        try container.encodeIfPresent(balanceChanges, forKey: .balanceChanges)
     }
 }
 

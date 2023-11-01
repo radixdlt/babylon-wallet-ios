@@ -150,6 +150,7 @@ extension TransactionClient {
 
 			return .init(
 				notarized: compiledNotarizedTXIntent,
+				intent: request.transactionIntent,
 				txID: txID
 			)
 		}

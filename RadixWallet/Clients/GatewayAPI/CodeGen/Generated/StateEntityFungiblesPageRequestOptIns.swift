@@ -17,6 +17,7 @@ extension GatewayAPI {
 
 public struct StateEntityFungiblesPageRequestOptIns: Codable, Hashable {
 
+    /** allows specifying explicitly metadata properties which should be returned in response, limited to max 20 items. */
     public private(set) var explicitMetadata: [String]?
 
     public init(explicitMetadata: [String]? = nil) {

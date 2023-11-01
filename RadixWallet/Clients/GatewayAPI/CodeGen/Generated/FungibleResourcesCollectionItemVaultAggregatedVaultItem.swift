@@ -21,7 +21,7 @@ public struct FungibleResourcesCollectionItemVaultAggregatedVaultItem: Codable, 
     public private(set) var vaultAddress: String
     /** String-encoded decimal representing the amount of a related fungible resource. */
     public private(set) var amount: String
-    /** TBD */
+    /** The most recent state version underlying object was modified at. */
     public private(set) var lastUpdatedAtStateVersion: Int64
 
     public init(vaultAddress: String, amount: String, lastUpdatedAtStateVersion: Int64) {

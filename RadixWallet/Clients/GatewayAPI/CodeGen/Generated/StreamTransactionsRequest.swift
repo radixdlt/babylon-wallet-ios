@@ -27,11 +27,11 @@ public struct StreamTransactionsRequest: Codable, Hashable {
         case desc = "Desc"
     }
     public private(set) var atLedgerState: LedgerStateSelector?
+    public private(set) var fromLedgerState: LedgerStateSelector?
     /** This cursor allows forward pagination, by providing the cursor from the previous request. */
     public private(set) var cursor: String?
     /** The page size requested. */
     public private(set) var limitPerPage: Int?
-    public private(set) var fromLedgerState: LedgerStateSelector?
     /** Limit returned transactions by their kind. Defaults to `user`. */
     public private(set) var kindFilter: KindFilter?
     public private(set) var manifestAccountsWithdrawnFromFilter: [String]?
@@ -43,11 +43,11 @@ public struct StreamTransactionsRequest: Codable, Hashable {
     public private(set) var order: Order?
     public private(set) var optIns: TransactionDetailsOptIns?
 
-    public init(atLedgerState: LedgerStateSelector? = nil, cursor: String? = nil, limitPerPage: Int? = nil, fromLedgerState: LedgerStateSelector? = nil, kindFilter: KindFilter? = nil, manifestAccountsWithdrawnFromFilter: [String]? = nil, manifestAccountsDepositedIntoFilter: [String]? = nil, manifestResourcesFilter: [String]? = nil, affectedGlobalEntitiesFilter: [String]? = nil, eventsFilter: [StreamTransactionsRequestEventFilterItem]? = nil, order: Order? = nil, optIns: TransactionDetailsOptIns? = nil) {
+    public init(atLedgerState: LedgerStateSelector? = nil, fromLedgerState: LedgerStateSelector? = nil, cursor: String? = nil, limitPerPage: Int? = nil, kindFilter: KindFilter? = nil, manifestAccountsWithdrawnFromFilter: [String]? = nil, manifestAccountsDepositedIntoFilter: [String]? = nil, manifestResourcesFilter: [String]? = nil, affectedGlobalEntitiesFilter: [String]? = nil, eventsFilter: [StreamTransactionsRequestEventFilterItem]? = nil, order: Order? = nil, optIns: TransactionDetailsOptIns? = nil) {
         self.atLedgerState = atLedgerState
+        self.fromLedgerState = fromLedgerState
         self.cursor = cursor
         self.limitPerPage = limitPerPage
-        self.fromLedgerState = fromLedgerState
         self.kindFilter = kindFilter
         self.manifestAccountsWithdrawnFromFilter = manifestAccountsWithdrawnFromFilter
         self.manifestAccountsDepositedIntoFilter = manifestAccountsDepositedIntoFilter
@@ -60,9 +60,9 @@ public struct StreamTransactionsRequest: Codable, Hashable {
 
     public enum CodingKeys: String, CodingKey, CaseIterable {
         case atLedgerState = "at_ledger_state"
+        case fromLedgerState = "from_ledger_state"
         case cursor
         case limitPerPage = "limit_per_page"
-        case fromLedgerState = "from_ledger_state"
         case kindFilter = "kind_filter"
         case manifestAccountsWithdrawnFromFilter = "manifest_accounts_withdrawn_from_filter"
         case manifestAccountsDepositedIntoFilter = "manifest_accounts_deposited_into_filter"
@@ -78,9 +78,9 @@ public struct StreamTransactionsRequest: Codable, Hashable {
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encodeIfPresent(atLedgerState, forKey: .atLedgerState)
+        try container.encodeIfPresent(fromLedgerState, forKey: .fromLedgerState)
         try container.encodeIfPresent(cursor, forKey: .cursor)
         try container.encodeIfPresent(limitPerPage, forKey: .limitPerPage)
-        try container.encodeIfPresent(fromLedgerState, forKey: .fromLedgerState)
         try container.encodeIfPresent(kindFilter, forKey: .kindFilter)
         try container.encodeIfPresent(manifestAccountsWithdrawnFromFilter, forKey: .manifestAccountsWithdrawnFromFilter)
         try container.encodeIfPresent(manifestAccountsDepositedIntoFilter, forKey: .manifestAccountsDepositedIntoFilter)

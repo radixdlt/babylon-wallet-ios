@@ -1,25 +1,26 @@
 openapi: 3.0.0
 info:
-  version: 0.5.0
-  title: Babylon Gateway API - RCnet V3
+  version: v1.2.0
+  title: Radix Gateway API - Babylon
   license:
     name: The Radix License, Version 1.0
     url: https://www.radixfoundation.org/licenses/license-v1
   x-logo:
     url: https://docs-babylon.radixdlt.com/main/_images/radix-logo-banner.png
-    href: https://docs-babylon.radixdlt.com
+    href: https://docs.radixdlt.com
   description: |
     This API is exposed by the Babylon Radix Gateway to enable clients to efficiently query current and historic
     state on the RadixDLT ledger, and intelligently handle transaction submission.
 
-    It is designed for use by wallets and explorers. For simple use cases, you can typically use the Core API on
-    a Node. A Gateway is only needed for reading historic snapshots of ledger states or a more robust set-up.
+    It is designed for use by wallets and explorers, and for light queries from front-end dApps.
+    For exchange/asset integrations, back-end dApp integrations, or simple use cases, you should consider using
+    the Core API on a Node. A Gateway is only needed for reading historic snapshots of ledger states or a more robust set-up.
 
     The Gateway API is implemented by the [Network Gateway](https://github.com/radixdlt/babylon-gateway),
     which is configured to read from [full node(s)](https://github.com/radixdlt/babylon-node) to extract
     and index data from the network.
 
-    This document is an API reference documentation, visit [User Guide](https://docs-babylon.radixdlt.com/) to learn more
+    This document is an API reference documentation, visit [User Guide](https://docs.radixdlt.com/) to learn more
     about how to run a Gateway of your own.
 
     ## Migration guide
@@ -28,10 +29,22 @@ info:
 
     ## Integration and forward compatibility guarantees
 
-    We give no guarantees that other endpoints will not change before Babylon mainnet launch, although changes are expected to
-    be minimal.
+    All responses may have additional fields added at any release, so clients are advised to use JSON parsers which
+    ignore unknown fields on JSON objects.
+
+    When the Radix protocol is updated, new functionality may be added, and so discriminated unions returned by the
+    API may need to be updated to have new variants added, corresponding to the updated data. Clients may need to update
+    in advance to be able to handle these new variants when a protocol update comes out.
+
+    On the very rare occasions we need to make breaking changes to the API, these will be warned in advance with
+    deprecation notices on previous versions. These deprecation notices will include a safe migration path.
+    Deprecation notes or breaking changes will be flagged clearly in release notes for new versions of the Gateway.
+
+    The Gateway DB schema is not subject to any compatibility guarantees, and may be changed at any release. DB changes
+    will be flagged in the release notes so clients doing custom DB integrations can prepare.
 servers:
-  - url: https://rcnet-v3.radixdlt.com
+  - url: https://mainnet.radixdlt.com
+  - url: https://stokenet.radixdlt.com
 x-tagGroups:
   - name: Overview
     tags:
@@ -204,7 +217,7 @@ paths:
       summary: Preview Transaction
       description: |
         Previews transaction against the network.
-        This endpoint is effectively a proxy towards CoreApi's `/v0/transaction/preview` endpoint. See CoreApi's documentation for more details.
+        This endpoint is effectively a proxy towards the Core API `/v0/transaction/preview` endpoint. See the Core API documentation for more details.
       tags:
         - Transaction
       requestBody:
@@ -614,6 +627,8 @@ paths:
     post:
       operationId: ValidatorsUptime
       summary: Get Validators Uptime
+      description: |
+        Returns validators uptime data for time range limited by `from_state_version` and `at_state_version`.
       tags:
         - Statistics
       requestBody:
@@ -686,9 +701,11 @@ components:
       type: string
 
     LastUpdatedAtStateVersion:
-      description: TBD # TODO describe
+      description: The most recent state version underlying object was modified at.
       type: integer
-      format: int64 # TODO define min/max using CoreApi as a reference
+      format: int64
+      minimum: 1
+      maximum: 100000000000000
 
     #
     # Keys
@@ -779,9 +796,17 @@ components:
     #
 
     AtLedgerStateMixin:
+      description: defines upper boundary (inclusive) for queried data. i.e `{ "at_state_version" = {"epoch" = 10} }`, will return data till 10 epoch.
       type: object
       properties:
         at_ledger_state:
+          $ref: "#/components/schemas/LedgerStateSelector"
+
+    FromLedgerStateMixin:
+      description: defines lower boundary (inclusive) for queried data. i.e `{ "from_state_version" = {"epoch" = 10} }`, will return data from epoch 10 till current max ledger tip.
+      type: object
+      properties:
+        from_ledger_state:
           $ref: "#/components/schemas/LedgerStateSelector"
 
     LedgerStateSelector:
@@ -797,6 +822,8 @@ components:
           nullable: true
           type: integer
           format: int64
+          minimum: 1
+          maximum: 100000000000000
         timestamp:
           description: If provided, the latest ledger state lower than or equal to the given round timestamp is returned.
           nullable: true
@@ -807,11 +834,15 @@ components:
           nullable: true
           type: integer
           format: int64
+          minimum: 0
+          maximum: 10000000000
         round:
           description: If provided must be accompanied with `epoch`, the ledger state lower than or equal to the given epoch and round is returned.
           nullable: true
           type: integer
           format: int64
+          minimum: 0
+          maximum: 10000000000
 
     CursorLimitMixin:
       type: object
@@ -920,9 +951,9 @@ components:
         - programmatic_json
       properties:
         raw_hex:
-          type: string
+          $ref: "#/components/schemas/HexString"
         programmatic_json:
-          type: object
+          $ref: "#/components/schemas/ProgrammaticScryptoSborValue"
 
     EntityMetadataCollection:
       description: Entity metadata collection.
@@ -972,6 +1003,8 @@ components:
       properties:
         owner:
           type: object
+          description: |
+            This type is defined in the Core API as `OwnerRole`. See the Core API documentation for more details.
         entries:
           type: array
           items:
@@ -994,6 +1027,8 @@ components:
               $ref: "#/components/schemas/RoleAssignmentResolution"
             explicit_rule:
               type: object
+              description: |
+                This type is defined in the Core API as `AccessRule`. See the Core API documentation for more details.
         updater_roles:
           type: array
           items:
@@ -1131,7 +1166,7 @@ components:
             - last_updated_at_state_version
           properties:
             amount:
-              description: TBA # TODO describe
+              description: The total amount of non-fungible IDs across all vaults.
               type: integer
               format: int64
             last_updated_at_state_version:
@@ -1243,10 +1278,17 @@ components:
           $ref: "#/components/schemas/TransactionReceipt"
         message:
           type: object
-          description: defined in core api specs.
+          description: |
+            The optional transaction message.
+            This type is defined in the Core API as `TransactionMessage`. See the Core API documentation for more details.
+        balance_changes:
+          $ref: "#/components/schemas/TransactionBalanceChanges"
 
     TransactionStatus:
       type: string
+      description: |
+        A top-level intent status, left in for backwards compatibility.
+        It doesn't give much information. Rejected means PermanentRejection.
       enum:
         - Unknown
         - CommittedSuccess
@@ -1254,39 +1296,100 @@ components:
         - Pending
         - Rejected
 
+    TransactionIntentStatus:
+      type: string
+      description: |
+        A more specific intent status. See the description field for further information.
+        Note that `CommitPendingOutcomeUnknown` can either result in `CommittedSuccess` or `CommittedFailure`.
+      enum:
+        - Unknown
+        - CommittedSuccess
+        - CommittedFailure
+        - CommitPendingOutcomeUnknown
+        - PermanentlyRejected
+        - LikelyButNotCertainRejection
+        - Pending
+
+    TransactionPayloadStatus:
+      type: string
+      description: |
+        A more specific payload status. See the description field for further information.
+      enum:
+        - Unknown
+        - CommittedSuccess
+        - CommittedFailure
+        - CommitPendingOutcomeUnknown
+        - PermanentlyRejected
+        - TemporarilyRejected
+        - Pending
+
+    TransactionPayloadGatewayHandlingStatus:
+      type: string
+      description: |
+        A status concerning the Gateway's handling status of this pending transaction.
+      enum:
+        - HandlingSubmission
+        - Concluded
+
     TransactionReceipt:
       type: object
       properties:
         status:
-          description: The status of the transaction.
-          type: object
+          $ref: "#/components/schemas/TransactionStatus"
         fee_summary:
-          description: Fees paid, Only present if the `status` is not `Rejected`.
           type: object
+          description: |
+            This type is defined in the Core API as `FeeSummary`. See the Core API documentation for more details.
         costing_parameters:
           type: object
         fee_destination:
-          description: Only present if the `status` is not `Rejected`.
           type: object
+          description: |
+            This type is defined in the Core API as `FeeDestination`. See the Core API documentation for more details.
         fee_source:
-          description: Only present if the `status` is not `Rejected`.
           type: object
+          description: |
+            This type is defined in the Core API as `FeeSource`. See the Core API documentation for more details.
         state_updates:
-          description: Transaction state updates (only present if status is Succeeded or Failed).
           type: object
+          description: |
+            This type is defined in the Core API as `StateUpdates`. See the Core API documentation for more details.
         next_epoch:
-          description: Information (number and active validator list) about new epoch if occured.
           type: object
+          description: |
+            Information (number and active validator list) about new epoch if occured.
+            This type is defined in the Core API as `NextEpoch`. See the Core API documentation for more details.
         output:
-          description: The manifest line-by-line engine return data (only present if `status` is `Succeeded`).
           type: object
+          description: |
+            The manifest line-by-line engine return data (only present if `status` is `CommittedSuccess`).
+            This type is defined in the Core API as `SborData`. See the Core API documentation for more details.
         events:
           description: Events emitted by a transaction.
-          type: object
+          type: array
+          items:
+            $ref: "#/components/schemas/EventsItem"
+
         error_message:
           description: Error message (only present if status is `Failed` or `Rejected`)
           type: string
           nullable: true
+
+    EventsItem:
+      type: object
+      required:
+        - name
+        - emitter
+        - data
+      properties:
+        name:
+          type: string
+        emitter:
+          type: object
+          description: |
+            This type is defined in the Core API as `EventEmitterIdentifier`. See the Core API documentation for more details.
+        data:
+          $ref: "#/components/schemas/ProgrammaticScryptoSborValue"
 
     NonFungibleIdType:
       type: string
@@ -1320,14 +1423,17 @@ components:
         address:
           $ref: "#/components/schemas/Address"
         proposals_made:
+          description: number of proposals made.
           type: integer
           format: int64
           nullable: true
         proposals_missed:
+          description: number of proposals missed.
           type: integer
           format: int64
           nullable: true
         epochs_active_in:
+          description: number of epochs validator was active in.
           type: integer
           format: int64
 
@@ -1365,6 +1471,9 @@ components:
         state:
           type: object
           nullable: true
+          description: |
+            Validator inner state representation.
+            This type is defined in the Core API as `ValidatorFieldStateValue`. See the Core API documentation for more details.
         active_in_epoch:
           $ref: "#/components/schemas/ValidatorCollectionItemActiveInEpoch"
         metadata:
@@ -1567,8 +1676,8 @@ components:
           type: integer
           format: int32
           minimum: 0
-          maximum: 255
-          description: An integer between `0` and `255`, giving the validator tip as a percentage amount. A value of `1` corresponds to 1% of the fee.
+          maximum: 65535
+          description: An integer between `0` and `65535`, giving the validator tip as a percentage amount. A value of `1` corresponds to 1% of the fee.
         nonce:
           type: integer
           format: int64
@@ -1604,10 +1713,14 @@ components:
           $ref: "#/components/schemas/HexString"
         receipt:
           type: object
+          description: |
+            This type is defined in the Core API as `TransactionReceipt`. See the Core API documentation for more details.
         resource_changes:
           type: array
           items:
             type: object
+            description: |
+              This type is defined in the Core API as `InstructionResourceChanges`. See the Core API documentation for more details.
         logs:
           type: array
           items:
@@ -1653,15 +1766,34 @@ components:
         - type: object
           required:
             - status
+            - intent_status
+            - intent_status_description
             - known_payloads
           properties:
             status:
               $ref: "#/components/schemas/TransactionStatus"
+            intent_status:
+              $ref: "#/components/schemas/TransactionIntentStatus"
+            intent_status_description:
+              description: |
+                An additional description to clarify the intent status.
+              type: string
             known_payloads:
               type: array
               items:
                 $ref: "#/components/schemas/TransactionStatusResponseKnownPayloadItem"
+            committed_state_version:
+              description: |
+                If the intent was committed, this gives the state version when this intent was committed.
+              type: integer
+              format: int64
+              nullable: true
             error_message:
+              description: |
+                The most relevant error message received, due to a rejection or commit as failure.
+                Please note that presence of an error message doesn't imply that the intent
+                will definitely reject or fail. This could represent a temporary error (such as out
+                of fees), or an error with a payload which doesn't end up being committed.
               type: string
               nullable: true
     TransactionStatusResponseKnownPayloadItem:
@@ -1674,7 +1806,46 @@ components:
           $ref: "#/components/schemas/HashBech32mString"
         status:
           $ref: "#/components/schemas/TransactionStatus"
+        payload_status:
+          $ref: "#/components/schemas/TransactionPayloadStatus"
+        payload_status_description:
+          description: |
+            An additional description to clarify the payload status.
+          type: string
         error_message:
+          description: |
+            The initial error message received for a rejection or failure during transaction execution.
+            This will typically be the useful error message, explaining the root cause of the issue.
+            Please note that presence of an error message doesn't imply that this payload
+            will definitely reject or fail. This could represent an error during a temporary
+            rejection (such as out of fees) which then gets resolved (e.g. by depositing money
+            to pay the fee), allowing the transaction to be committed.
+          type: string
+          nullable: true
+        latest_error_message:
+          description: |
+            The latest error message received for a rejection or failure during transaction execution,
+            this is only returned if it is different from the initial error message.
+            This is more current than the initial error message, but may be less useful, as it could
+            be a message regarding the expiry of the transaction at the end of its epoch validity window.
+            Please note that presence of an error message doesn't imply that this payload
+            will definitely reject or fail. This could represent an error during a temporary
+            rejection (such as out of fees) which then gets resolved (e.g. by depositing money
+            to pay the fee), allowing the transaction to be committed.
+          type: string
+          nullable: true
+        handling_status:
+          $ref: "#/components/schemas/TransactionPayloadGatewayHandlingStatus"
+        handling_status_reason:
+          description: |
+            Additional reason for why the Gateway has its current handling status.
+          type: string
+          nullable: true
+        submission_error:
+          description: |
+            The most recent error message received when submitting this transaction to the network.
+            Please note that the presence of an error message doesn't imply that this transaction
+            payload will definitely reject or fail. This could be a transient error.
           type: string
           nullable: true
 
@@ -1695,21 +1866,49 @@ components:
       type: object
       properties:
         raw_hex:
+          description: if set to `true`, raw transaction hex is returned.
           type: boolean
+          default: false
         receipt_state_changes:
+          description: if set to `true`, state changes inside receipt object are returned.
           type: boolean
+          default: false
         receipt_fee_summary:
+          description: if set to `true`, fee summary inside receipt object is returned.
           type: boolean
+          default: false
         receipt_fee_source:
+          description: if set to `true`, fee source inside receipt object is returned.
           type: boolean
+          default: false
         receipt_fee_destination:
+          description: if set to `true`, fee destination inside receipt object is returned.
           type: boolean
+          default: false
         receipt_costing_parameters:
+          description: if set to `true`, costing parameters inside receipt object is returned.
           type: boolean
+          default: false
         receipt_events:
+          description: if set to `true`, events inside receipt object is returned.
           type: boolean
+          default: false
+        receipt_output:
+          description: (true by default) if set to `true`, transaction receipt output is returned.
+          type: boolean
+          default: true
         affected_global_entities:
+          description: if set to `true`, all affected global entities by given transaction are returned.
           type: boolean
+          default: false
+        balance_changes:
+          description: |
+            if set to `true`, returns the fungible and non-fungible balance changes.
+
+            **Warning!** This opt-in might be missing for recently committed transactions, in that case a `null` value will be returned. Retry the request until non-null value is returned.
+          type: boolean
+          default: false
+
     TransactionCommittedDetailsResponse:
       allOf:
         - $ref: "#/components/schemas/LedgerStateMixin"
@@ -1720,6 +1919,101 @@ components:
             transaction:
               $ref: "#/components/schemas/CommittedTransactionInfo"
 
+    TransactionBalanceChanges:
+      type: object
+      nullable: true # TODO make non-nullable once we eliminate CoreAPI-based implementation
+      required:
+        - fungible_fee_balance_changes
+        - fungible_balance_changes
+        - non_fungible_balance_changes
+      properties:
+        fungible_fee_balance_changes:
+          description: |
+            A list of all fee-related fungible balance changes per entity and resource.
+          type: array
+          items:
+            $ref: "#/components/schemas/TransactionFungibleFeeBalanceChanges"
+        fungible_balance_changes:
+          description: |
+            A list of all non-fee-related fungible balance changes per entity and resource.
+          type: array
+          items:
+            $ref: "#/components/schemas/TransactionFungibleBalanceChanges"
+        non_fungible_balance_changes:
+          description: |
+            A list of all non-fungible changes per entity and resource.
+          type: array
+          items:
+            $ref: "#/components/schemas/TransactionNonFungibleBalanceChanges"
+    TransactionFungibleFeeBalanceChangeType:
+      description: |
+        Indicates fee-related balance changes, for example:
+
+        - payment of the fee including tip and royalty,
+        - distribution of royalties,
+        - distribution of the fee and tip to the consensus-manager, for distributing to the relevant validator/s at end of epoch.
+
+        See https://www.radixdlt.com/blog/how-fees-work-in-babylon for further information on how fee payment works at Babylon.
+      type: string
+      enum:
+        - FeePayment
+        - FeeDistributed
+        - TipDistributed
+        - RoyaltyDistributed
+    TransactionFungibleFeeBalanceChanges:
+      type: object
+      required:
+        - type
+        - entity_address
+        - resource_address
+        - balance_change
+      properties:
+        type:
+          $ref: "#/components/schemas/TransactionFungibleFeeBalanceChangeType"
+        entity_address:
+          $ref: "#/components/schemas/Address"
+        resource_address:
+          $ref: "#/components/schemas/Address"
+        balance_change:
+          type: string
+          description: |
+            The string-encoded decimal representing the amount of change for the fungible resource.
+    TransactionFungibleBalanceChanges:
+      type: object
+      required:
+        - entity_address
+        - resource_address
+        - balance_change
+      properties:
+        entity_address:
+          $ref: "#/components/schemas/Address"
+        resource_address:
+          $ref: "#/components/schemas/Address"
+        balance_change:
+          type: string
+          description: |
+            The string-encoded decimal representing the amount of change for the fungible resource.
+    TransactionNonFungibleBalanceChanges:
+      type: object
+      required:
+        - entity_address
+        - resource_address
+        - added
+        - removed
+      properties:
+        entity_address:
+          $ref: "#/components/schemas/Address"
+        resource_address:
+          $ref: "#/components/schemas/Address"
+        added:
+          type: array
+          items:
+            $ref: "#/components/schemas/NonFungibleId"
+        removed:
+          type: array
+          items:
+            $ref: "#/components/schemas/NonFungibleId"
+
     #
     # /stream/* Request & Response Types
     #
@@ -1727,11 +2021,10 @@ components:
     StreamTransactionsRequest:
       allOf:
         - $ref: "#/components/schemas/AtLedgerStateMixin"
+        - $ref: "#/components/schemas/FromLedgerStateMixin"
         - $ref: "#/components/schemas/CursorLimitMixin"
         - type: object
           properties:
-            from_ledger_state:
-              $ref: "#/components/schemas/LedgerStateSelector"
             kind_filter:
               description: Limit returned transactions by their kind. Defaults to `user`.
               type: string
@@ -1783,8 +2076,6 @@ components:
           $ref: "#/components/schemas/Address"
         resource_address:
           $ref: "#/components/schemas/Address"
-        quantity:
-          $ref: "#/components/schemas/BigDecimal"
     StreamTransactionsResponse:
       allOf:
         - $ref: "#/components/schemas/LedgerStateMixin"
@@ -1834,14 +2125,23 @@ components:
       type: object
       properties:
         ancestor_identities:
+          description: if set to `true`, ancestor addresses - `parent_address`, `owner_address` and `global_address` for entities are returned.
           type: boolean
+          default: false
         component_royalty_vault_balance:
+          description: if set to `true`, `royalty_vault_balance` for component entities is returned.
           type: boolean
+          default: false
         package_royalty_vault_balance:
+          description: if set to `true`, `royalty_vault_balance` for package entities is returned.
           type: boolean
+          default: false
         non_fungible_include_nfids:
+          description: if set to `true`, first page of non fungible ids are returned for each non fungible resource, with `next_cursor` which can be later used at `/state/entity/page/non-fungible-vault/ids` endpoint.
           type: boolean
+          default: false
         explicit_metadata:
+          description: allows specifying explicitly metadata properties which should be returned in response.
           type: array
           items:
             type: string
@@ -1958,10 +2258,26 @@ components:
       allOf:
         - $ref: "#/components/schemas/StateEntityDetailsResponseItemDetails"
         - type: object
+          required:
+            - resource_address
+            - balance
+          properties:
+            resource_address:
+              $ref: "#/components/schemas/Address"
+            balance:
+              $ref: "#/components/schemas/FungibleResourcesCollectionItemVaultAggregatedVaultItem"
     StateEntityDetailsResponseNonFungibleVaultDetails:
       allOf:
         - $ref: "#/components/schemas/StateEntityDetailsResponseItemDetails"
         - type: object
+          required:
+            - resource_address
+            - balance
+          properties:
+            resource_address:
+              $ref: "#/components/schemas/Address"
+            balance:
+              $ref: "#/components/schemas/NonFungibleResourcesCollectionItemVaultAggregatedVaultItem"
     StateEntityDetailsResponsePackageDetails:
       allOf:
         - $ref: "#/components/schemas/StateEntityDetailsResponseItemDetails"
@@ -2007,17 +2323,23 @@ components:
           type: string
         definition:
           type: object
+          description: |
+            This type is defined in the Core API as `BlueprintDefinition`. See the Core API documentation for more details.
         dependant_entities:
           type: array
           items:
             $ref: "#/components/schemas/Address"
         auth_template:
           type: object
+          description: |
+            This type is defined in the Core API as `AuthConfig`. See the Core API documentation for more details.
         auth_template_is_locked:
           type: boolean
           nullable: true
         royalty_config:
           type: object
+          description: |
+            This type is defined in the Core API as `BlueprintRoyaltyConfig`. See the Core API documentation for more details.
         royalty_config_is_locked:
           type: boolean
           nullable: true
@@ -2048,13 +2370,21 @@ components:
         - type: object
           required:
             - blueprint_name
+            - blueprint_version
           properties:
             package_address:
               $ref: "#/components/schemas/Address"
             blueprint_name:
               type: string
+            blueprint_version:
+              type: string
             state:
               type: object
+              description: |
+                A representation of a component's inner state. If this entity is a `GenericComponent`, this field will be in a programmatic JSON
+                structure (you can deserialize it as a `ProgrammaticScryptoSborValue`). Otherwise, for "native" components such as `Account`,
+                `Validator`, `AccessController`, `OneResourcePool`, `TwoResourcePool`, and `MultiResourcePool`, this field will be a
+                custom JSON model defined in the Core API schema.
             role_assignments:
               $ref: "#/components/schemas/ComponentEntityRoleAssignments"
             royalty_vault_balance:
@@ -2103,6 +2433,7 @@ components:
       type: object
       properties:
         explicit_metadata:
+          description: allows specifying explicitly metadata properties which should be returned in response, limited to max 20 items.
           type: array
           items:
             type: string
@@ -2166,8 +2497,11 @@ components:
       type: object
       properties:
         non_fungible_include_nfids:
+          description: if set to `true`, first page of non fungible ids are returned for each non fungible resource, with cursor which can be later used at `/state/entity/page/non-fungible-vault/ids` endpoint.
           type: boolean
+          default: false
         explicit_metadata:
+          description: allows specifying explicitly metadata properties which should be returned in response, limited to max 20 items.
           type: array
           items:
             type: string
@@ -2204,6 +2538,7 @@ components:
       type: object
       properties:
         non_fungible_include_nfids:
+          description: if set to `true`, first page of non fungible ids are returned for each non fungible resource, with cursor which can be later used at `/state/entity/page/non-fungible-vault/ids` endpoint.
           type: boolean
 
     StateEntityNonFungibleResourceVaultsPageResponse:
@@ -2398,15 +2733,19 @@ components:
       example:
         key_value_store_address: "<key-value-store-address>"
         keys:
-          - key_hex: "edafaaccee"
-          - key_hex: "ffbbaa2311"
+          - key_hex: "5C21010901000000"
+          - key_json:
+              kind: Tuple
+              fields:
+                - kind: "U32"
+                  value: "1"
     StateKeyValueStoreDataRequestKeyItem:
       type: object
-      required:
-        - key_hex
       properties:
         key_hex:
           $ref: "#/components/schemas/HexString"
+        key_json:
+          $ref: "#/components/schemas/ProgrammaticScryptoSborValue"
     StateKeyValueStoreDataResponse:
       allOf:
         - $ref: "#/components/schemas/LedgerStateMixin"
@@ -2465,12 +2804,14 @@ components:
               $ref: "#/components/schemas/ValidatorCollection"
 
     ValidatorsUptimeRequest:
+      description: |
+        For `at_ledger_state` and `from_ledger_state` you can use one of `state_version`, `epoch`, `epoch` and `round`, or `timestamp`, but then ongoing epoch will be selected and used for querying data.
+        i.e for request with `{ "from_state_version" = { "state_version" = 100 }, "at_state_version" = { "state_version" = 300} }` gateway api will check in which epoch transactions with state version 100 and 300 were and then use that as inclusive boundary for request.
       allOf:
         - $ref: "#/components/schemas/AtLedgerStateMixin"
+        - $ref: "#/components/schemas/FromLedgerStateMixin"
         - type: object
           properties:
-            from_ledger_state:
-              $ref: "#/components/schemas/LedgerStateSelector"
             validator_addresses:
               type: array
               items:
@@ -3024,3 +3365,351 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/PublicKeyHash"
+
+    #
+    # Programmatic Scrypto SBOR Values
+    #
+
+    ProgrammaticScryptoSborValueKind:
+      description: |
+        These are the Scrypto SBOR `ValueKind`s, but with `Bytes` added as an alias for `Vec`, to display such values as hex-encoded strings.
+      type: string
+      enum:
+        - Bool
+        - I8
+        - I16
+        - I32
+        - I64
+        - I128
+        - U8
+        - U16
+        - U32
+        - U64
+        - U128
+        - String
+        - Enum
+        - Array
+        - Bytes
+        - Map
+        - Tuple
+        - Reference
+        - Own
+        - Decimal
+        - PreciseDecimal
+        - NonFungibleLocalId
+    ProgrammaticScryptoSborValue:
+      description: |
+        Arbitrary SBOR value represented as programmatic JSON with optional property name annotations.
+
+        All scalar types (`Bool`, `I*`, `U*`, `String`, `Reference`, `Own`, `Decimal`, `PreciseDecimal`, `NonFungibleLocalId`)
+        convey their value via `value` string property with notable exception of `Bool` type that uses regular JSON boolean type.
+        Numeric values as string-encoded to preserve accuracy and simplify implementation on platforms with no native support
+        for 64-bit long numerical values.
+
+        Common properties represented as nullable strings:
+          * `type_name` is only output when a schema is present and the type has a name,
+          * `field_name` is only output when the value is a child of a `Tuple` or `Enum`, which has a type with named fields,
+          * `variant_name` is only output when a schema is present and the type is an `Enum`.
+
+        The following is a non-normative example annotated `Tuple` value with `String` and `U32` fields:
+        ```
+        {
+          "kind": "Tuple",
+          "type_name": "CustomStructure",
+          "fields": [
+            {
+              "kind": "String",
+              "field_name": "favorite_color",
+              "value": "Blue"
+            },
+            {
+              "kind": "U32",
+              "field_name": "usage_counter",
+              "value": "462231"
+            }
+          ]
+        }
+        ```
+      type: object
+      required:
+        - kind
+      properties:
+        kind:
+          $ref: "#/components/schemas/ProgrammaticScryptoSborValueKind"
+        type_name:
+          description: Object type name; available only when a schema is present and the type has a name.
+          type: string
+          nullable: true
+        field_name:
+          description: Field name; available only when the value is a child of a `Tuple` or `Enum`, which has a type with named fields.
+          type: string
+          nullable: true
+      discriminator:
+        propertyName: kind
+        mapping:
+          Bool: "#/components/schemas/ProgrammaticScryptoSborValueBool"
+          I8: "#/components/schemas/ProgrammaticScryptoSborValueI8"
+          I16: "#/components/schemas/ProgrammaticScryptoSborValueI16"
+          I32: "#/components/schemas/ProgrammaticScryptoSborValueI32"
+          I64: "#/components/schemas/ProgrammaticScryptoSborValueI64"
+          I128: "#/components/schemas/ProgrammaticScryptoSborValueI128"
+          U8: "#/components/schemas/ProgrammaticScryptoSborValueU8"
+          U16: "#/components/schemas/ProgrammaticScryptoSborValueU16"
+          U32: "#/components/schemas/ProgrammaticScryptoSborValueU32"
+          U64: "#/components/schemas/ProgrammaticScryptoSborValueU64"
+          U128: "#/components/schemas/ProgrammaticScryptoSborValueU128"
+          String: "#/components/schemas/ProgrammaticScryptoSborValueString"
+          Enum: "#/components/schemas/ProgrammaticScryptoSborValueEnum"
+          Array: "#/components/schemas/ProgrammaticScryptoSborValueArray"
+          Bytes: "#/components/schemas/ProgrammaticScryptoSborValueBytes"
+          Map: "#/components/schemas/ProgrammaticScryptoSborValueMap"
+          Tuple: "#/components/schemas/ProgrammaticScryptoSborValueTuple"
+          Reference: "#/components/schemas/ProgrammaticScryptoSborValueReference"
+          Own: "#/components/schemas/ProgrammaticScryptoSborValueOwn"
+          Decimal: "#/components/schemas/ProgrammaticScryptoSborValueDecimal"
+          PreciseDecimal: "#/components/schemas/ProgrammaticScryptoSborValuePreciseDecimal"
+          NonFungibleLocalId: "#/components/schemas/ProgrammaticScryptoSborValueNonFungibleLocalId"
+    ProgrammaticScryptoSborValueBool:
+      allOf:
+        - $ref: "#/components/schemas/ProgrammaticScryptoSborValue"
+        - type: object
+          required:
+            - value
+          properties:
+            value:
+              type: boolean
+    ProgrammaticScryptoSborValueI8:
+      allOf:
+        - $ref: "#/components/schemas/ProgrammaticScryptoSborValue"
+        - type: object
+          required:
+            - value
+          properties:
+            value:
+              type: string
+    ProgrammaticScryptoSborValueI16:
+      allOf:
+        - $ref: "#/components/schemas/ProgrammaticScryptoSborValue"
+        - type: object
+          required:
+            - value
+          properties:
+            value:
+              type: string
+    ProgrammaticScryptoSborValueI32:
+      allOf:
+        - $ref: "#/components/schemas/ProgrammaticScryptoSborValue"
+        - type: object
+          required:
+            - value
+          properties:
+            value:
+              type: string
+    ProgrammaticScryptoSborValueI64:
+      allOf:
+        - $ref: "#/components/schemas/ProgrammaticScryptoSborValue"
+        - type: object
+          required:
+            - value
+          properties:
+            value:
+              type: string
+    ProgrammaticScryptoSborValueI128:
+      allOf:
+        - $ref: "#/components/schemas/ProgrammaticScryptoSborValue"
+        - type: object
+          required:
+            - value
+          properties:
+            value:
+              type: string
+    ProgrammaticScryptoSborValueU8:
+      allOf:
+        - $ref: "#/components/schemas/ProgrammaticScryptoSborValue"
+        - type: object
+          required:
+            - value
+          properties:
+            value:
+              type: string
+    ProgrammaticScryptoSborValueU16:
+      allOf:
+        - $ref: "#/components/schemas/ProgrammaticScryptoSborValue"
+        - type: object
+          required:
+            - value
+          properties:
+            value:
+              type: string
+    ProgrammaticScryptoSborValueU32:
+      allOf:
+        - $ref: "#/components/schemas/ProgrammaticScryptoSborValue"
+        - type: object
+          required:
+            - value
+          properties:
+            value:
+              type: string
+    ProgrammaticScryptoSborValueU64:
+      allOf:
+        - $ref: "#/components/schemas/ProgrammaticScryptoSborValue"
+        - type: object
+          required:
+            - value
+          properties:
+            value:
+              type: string
+    ProgrammaticScryptoSborValueU128:
+      allOf:
+        - $ref: "#/components/schemas/ProgrammaticScryptoSborValue"
+        - type: object
+          required:
+            - value
+          properties:
+            value:
+              type: string
+    ProgrammaticScryptoSborValueString:
+      allOf:
+        - $ref: "#/components/schemas/ProgrammaticScryptoSborValue"
+        - type: object
+          required:
+            - value
+          properties:
+            value:
+              type: string
+    ProgrammaticScryptoSborValueEnum:
+      allOf:
+        - $ref: "#/components/schemas/ProgrammaticScryptoSborValue"
+        - type: object
+          required:
+            - variant_id
+            - fields
+          properties:
+            variant_id:
+              type: integer
+              minimum: 0
+              maximum: 255
+            variant_name:
+              type: string
+            fields:
+              type: array
+              items:
+                $ref: "#/components/schemas/ProgrammaticScryptoSborValue"
+    ProgrammaticScryptoSborValueArray:
+      allOf:
+        - $ref: "#/components/schemas/ProgrammaticScryptoSborValue"
+        - type: object
+          required:
+            - element_kind
+            - elements
+          properties:
+            element_kind:
+              $ref: "#/components/schemas/ProgrammaticScryptoSborValueKind"
+            element_type_name:
+              type: string
+            elements:
+              type: array
+              items:
+                $ref: "#/components/schemas/ProgrammaticScryptoSborValue"
+    ProgrammaticScryptoSborValueBytes:
+      allOf:
+        - $ref: "#/components/schemas/ProgrammaticScryptoSborValue"
+        - type: object
+          required:
+            - element_kind
+            - elements
+            - hex
+          properties:
+            element_kind:
+              $ref: "#/components/schemas/ProgrammaticScryptoSborValueKind"
+            element_type_name:
+              type: string
+            hex:
+              $ref: "#/components/schemas/HexString"
+    ProgrammaticScryptoSborValueMap:
+      allOf:
+        - $ref: "#/components/schemas/ProgrammaticScryptoSborValue"
+        - type: object
+          required:
+            - key_kind
+            - value_kind
+            - entries
+          properties:
+            key_kind:
+              $ref: "#/components/schemas/ProgrammaticScryptoSborValueKind"
+            key_type_name:
+              type: string
+            value_kind:
+              $ref: "#/components/schemas/ProgrammaticScryptoSborValueKind"
+            value_type_name:
+              type: string
+            entries:
+              type: array
+              items:
+                $ref: "#/components/schemas/ProgrammaticScryptoSborValueMapEntry"
+    ProgrammaticScryptoSborValueMapEntry:
+      type: object
+      required:
+        - key
+        - value
+      properties:
+        key:
+          $ref: "#/components/schemas/ProgrammaticScryptoSborValue"
+        value:
+          $ref: "#/components/schemas/ProgrammaticScryptoSborValue"
+    ProgrammaticScryptoSborValueTuple:
+      allOf:
+        - $ref: "#/components/schemas/ProgrammaticScryptoSborValue"
+        - type: object
+          required:
+            - fields
+          properties:
+            fields:
+              type: array
+              items:
+                $ref: "#/components/schemas/ProgrammaticScryptoSborValue"
+    ProgrammaticScryptoSborValueReference:
+      allOf:
+        - $ref: "#/components/schemas/ProgrammaticScryptoSborValue"
+        - type: object
+          required:
+            - value
+          properties:
+            value:
+              type: string
+    ProgrammaticScryptoSborValueOwn:
+      allOf:
+        - $ref: "#/components/schemas/ProgrammaticScryptoSborValue"
+        - type: object
+          required:
+            - value
+          properties:
+            value:
+              type: string
+    ProgrammaticScryptoSborValueDecimal:
+      allOf:
+        - $ref: "#/components/schemas/ProgrammaticScryptoSborValue"
+        - type: object
+          required:
+            - value
+          properties:
+            value:
+              type: string
+    ProgrammaticScryptoSborValuePreciseDecimal:
+      allOf:
+        - $ref: "#/components/schemas/ProgrammaticScryptoSborValue"
+        - type: object
+          required:
+            - value
+          properties:
+            value:
+              type: string
+    ProgrammaticScryptoSborValueNonFungibleLocalId:
+      allOf:
+        - $ref: "#/components/schemas/ProgrammaticScryptoSborValue"
+        - type: object
+          required:
+            - value
+          properties:
+            value:
+              type: string

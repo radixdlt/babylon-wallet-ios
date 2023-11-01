@@ -19,7 +19,7 @@ public struct StateKeyValueStoreDataResponseItem: Codable, Hashable {
 
     public private(set) var key: ScryptoSborValue
     public private(set) var value: ScryptoSborValue
-    /** TBD */
+    /** The most recent state version underlying object was modified at. */
     public private(set) var lastUpdatedAtStateVersion: Int64
     public private(set) var isLocked: Bool
 

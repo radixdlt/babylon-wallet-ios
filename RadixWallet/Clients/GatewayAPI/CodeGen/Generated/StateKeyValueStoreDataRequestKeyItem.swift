@@ -18,21 +18,25 @@ extension GatewayAPI {
 public struct StateKeyValueStoreDataRequestKeyItem: Codable, Hashable {
 
     /** Hex-encoded binary blob. */
-    public private(set) var keyHex: String
+    public private(set) var keyHex: String?
+    public private(set) var keyJson: ProgrammaticScryptoSborValue?
 
-    public init(keyHex: String) {
+    public init(keyHex: String? = nil, keyJson: ProgrammaticScryptoSborValue? = nil) {
         self.keyHex = keyHex
+        self.keyJson = keyJson
     }
 
     public enum CodingKeys: String, CodingKey, CaseIterable {
         case keyHex = "key_hex"
+        case keyJson = "key_json"
     }
 
     // Encodable protocol methods
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(keyHex, forKey: .keyHex)
+        try container.encodeIfPresent(keyHex, forKey: .keyHex)
+        try container.encodeIfPresent(keyJson, forKey: .keyJson)
     }
 }
 
