@@ -21,10 +21,7 @@ public struct Settings: Sendable, FeatureReducer {
 
 		public var shouldShowMigrateOlympiaButton: Bool = false
 		public var userHasNoP2PLinks: Bool? = nil
-		public var deepLinkToDisplayMnemonics: Bool
-		public init(deepLinkToDisplayMnemonics: Bool = false) {
-			self.deepLinkToDisplayMnemonics = deepLinkToDisplayMnemonics
-		}
+		public init() {}
 	}
 
 	// MARK: Action
@@ -45,7 +42,6 @@ public struct Settings: Sendable, FeatureReducer {
 	public enum InternalAction: Sendable, Equatable {
 		case loadedP2PLinks(P2PLinks)
 		case loadedShouldShowImportWalletShortcutInSettings(Bool)
-		case deepLinkToDisplayMnemonics
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -118,13 +114,9 @@ public struct Settings: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .appeared:
-			return deepLinkToDisplayMnemonicsIfNeeded(state: state)
-				.merge(
-					with:
-					loadShouldShowImportWalletShortcutInSettings()
-						.concatenate(
-							with: loadP2PLinks()
-						)
+			return loadShouldShowImportWalletShortcutInSettings()
+				.concatenate(
+					with: loadP2PLinks()
 				)
 
 		case .addP2PLinkButtonTapped:
@@ -168,11 +160,6 @@ public struct Settings: Sendable, FeatureReducer {
 
 		case let .loadedP2PLinks(clients):
 			state.userHasNoP2PLinks = clients.isEmpty
-			return .none
-
-		case .deepLinkToDisplayMnemonics:
-			state.deepLinkToDisplayMnemonics = false // deep link done
-			state.destination = .accountSecurity(.init(deepLinkToDisplayMnemonics: true))
 			return .none
 		}
 	}
@@ -222,13 +209,5 @@ extension Settings {
 			let shouldShow = await importLegacyWalletClient.shouldShowImportWalletShortcutInSettings()
 			await send(.internal(.loadedShouldShowImportWalletShortcutInSettings(shouldShow)))
 		}
-	}
-
-	private func deepLinkToDisplayMnemonicsIfNeeded(state: State) -> Effect<Action> {
-		guard state.deepLinkToDisplayMnemonics else {
-			return .none
-		}
-
-		return delayedEffect(for: .deepLinkToDisplayMnemonics)
 	}
 }
