@@ -163,7 +163,9 @@ final class FaucetClientTests: TestCase {
 			$0.transactionClient.buildTransactionIntent = { _ in
 				.previewValue
 			}
-			$0.transactionClient.notarizeTransaction = { _ in try NotarizeTransactionResponse(notarized: .init([]), txID: hash) }
+			$0.transactionClient.notarizeTransaction = { _ in
+				try NotarizeTransactionResponse(notarized: .init([]), intent: .init(header: .previewValue, manifest: .previewValue, message: .none), txID: hash)
+			}
 			$0.submitTXClient.hasTXBeenCommittedSuccessfully = { _ in }
 			$0.gatewaysClient.getCurrentGateway = { .enkinet }
 			$0.userDefaultsClient.dataForKey = { _ in json.data }

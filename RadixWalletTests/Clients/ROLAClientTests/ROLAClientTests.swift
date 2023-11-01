@@ -29,8 +29,8 @@ final class ROLAClientTests: TestCase {
 		accountType: String
 	) -> GatewayAPI.EntityMetadataCollection {
 		.init(items: [
-			.init(key: "account_type", value: .init(rawHex: "", programmaticJson: "", typed: .stringValue(.init(type: .string, value: accountType))), isLocked: false, lastUpdatedAtStateVersion: 0),
-			.init(key: "claimed_websites", value: .init(rawHex: "", programmaticJson: "", typed: .originArrayValue(.init(type: .originArray, values: [origin]))), isLocked: false, lastUpdatedAtStateVersion: 0),
+			.init(key: "account_type", value: .init(rawHex: "", programmaticJson: .i8(.init(kind: .i8, value: "1")), typed: .stringValue(.init(type: .string, value: accountType))), isLocked: false, lastUpdatedAtStateVersion: 0),
+			.init(key: "claimed_websites", value: .init(rawHex: "", programmaticJson: .i8(.init(kind: .i8, value: "1")), typed: .originArrayValue(.init(type: .originArray, values: [origin]))), isLocked: false, lastUpdatedAtStateVersion: 0),
 		])
 	}
 
