@@ -136,7 +136,7 @@ public struct ManageTrustedContactFactorSource: Sendable, FeatureReducer {
 			return .none
 
 		case .scanQRCode:
-			// FIXME: strings
+			// FIXME: future strings
 			state.destination = .scanAccountAddress(.init(scanInstructions: "Scan address of trusted contact"))
 			return .none
 

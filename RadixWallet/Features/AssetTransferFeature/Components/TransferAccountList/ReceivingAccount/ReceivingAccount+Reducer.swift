@@ -135,3 +135,24 @@ extension ReceivingAccount.State.Account: Identifiable {
 		address
 	}
 }
+
+extension ResourceAsset.State {
+	var resourceAddress: ResourceAddress {
+		switch kind {
+		case let .fungibleAsset(state):
+			state.resource.resourceAddress
+		case let .nonFungibleAsset(state):
+			state.resourceAddress
+		}
+	}
+}
+
+extension Collection<ResourceAsset.State> {
+	var fungibleAssets: [FungibleResourceAsset.State] {
+		map(\.kind).compactMap(/ResourceAsset.State.Kind.fungibleAsset)
+	}
+
+	var nonFungibleAssets: [NonFungibleResourceAsset.State] {
+		map(\.kind).compactMap(/ResourceAsset.State.Kind.nonFungibleAsset)
+	}
+}

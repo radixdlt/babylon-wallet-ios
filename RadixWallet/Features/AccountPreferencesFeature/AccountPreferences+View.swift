@@ -18,7 +18,7 @@ extension AccountPreferences.State {
 				),
 				.init(
 					id: .development,
-					title: "Set development preferences", // FIXME: strings
+					title: L10n.AccountSettings.developmentHeading,
 					rows: [.devAccountPreferneces()]
 				),
 			]
@@ -202,7 +202,7 @@ extension PreferenceSection.Row where RowId == AccountPreferences.Section.Sectio
 	static func devAccountPreferneces() -> Self {
 		.init(
 			id: .dev(.devPreferences),
-			title: "Dev Preferences", // FIXME: strings
+			title: L10n.AccountSettings.devPreferences,
 			subtitle: nil,
 			icon: .asset(AssetResource.appSettings)
 		)

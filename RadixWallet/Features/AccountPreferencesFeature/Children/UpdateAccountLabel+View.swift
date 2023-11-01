@@ -14,10 +14,10 @@ extension UpdateAccountLabel.State {
 	private var hintAndControlState: (ControlState, Hint?) {
 		if let sanitizedName {
 			if sanitizedName.count > Profile.Network.Account.nameMaxLength {
-				return (.disabled, .error("Account label too long")) // FIXME: Strings (duplicate)
+				return (.disabled, .error(L10n.Error.AccountLabel.tooLong))
 			}
 		} else {
-			return (.disabled, .error("Account label required")) // FIXME: Strings (duplicate)
+			return (.disabled, .error(L10n.Error.AccountLabel.missing))
 		}
 
 		return (.enabled, nil)

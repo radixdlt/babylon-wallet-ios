@@ -55,7 +55,7 @@ public struct AccountAndPersonaHiding: FeatureReducer {
 			case .presented(.confirmTapped):
 				return .run { send in
 					try await entitiesVisibilityClient.unhideAllEntities()
-					overlayWindowClient.scheduleHUD(.updated)
+					overlayWindowClient.scheduleHUD(.updatedAccount)
 					await send(.internal(.didUnhideAllEntities))
 				} catch: { error, _ in
 					errorQueue.schedule(error)

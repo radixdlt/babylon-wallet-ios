@@ -116,7 +116,7 @@ public struct AssetsView: Sendable, FeatureReducer {
 			return .run { [address = state.account.address, mode = state.mode] send in
 				for try await portfolio in await accountPortfoliosClient.portfolioForAccount(address).debounce(for: .seconds(0.1)) {
 					guard !Task.isCancelled else { return }
-					await send(.internal(.resourcesStateUpdated(createResourcesState(from: portfolio, mode: mode))))
+					await send(.internal(.resourcesStateUpdated(createResourcesState(from: portfolio.nonEmptyVaults, mode: mode))))
 				}
 			} catch: { error, _ in
 				loggerGlobal.error("AssetsView portfolioForAccount failed: \(error)")

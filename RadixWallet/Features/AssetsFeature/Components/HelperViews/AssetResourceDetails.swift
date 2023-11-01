@@ -40,9 +40,9 @@ struct AssetResourceDetailsSection: View {
 				if let resourceName = viewState.resourceName {
 					loadable(resourceName) { value in
 						KeyValueView(
-							key: "Name",
+							key: L10n.AssetDetails.NFTDetails.resourceName,
 							value: value ?? ""
-						) // FIXME: Strings - make a common name string for all asset details, remove the specific one(s)
+						)
 					}
 				}
 

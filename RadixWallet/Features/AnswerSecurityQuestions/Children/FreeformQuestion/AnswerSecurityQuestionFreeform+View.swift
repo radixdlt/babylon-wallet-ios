@@ -16,7 +16,7 @@ public extension AnswerSecurityQuestionFreeform {
 		init(state: AnswerSecurityQuestionFreeform.State) {
 			question = state.question.question.rawValue
 			answer = state.answer.map(\.rawValue) ?? ""
-			// FIXME: Strings
+			// FIXME: future strings
 			buttonTitle = state.isLast ? "Submit" : "Next question"
 			keyDerivationScheme = state.keyDerivationScheme
 		}
@@ -53,13 +53,13 @@ public extension AnswerSecurityQuestionFreeform {
 								.scaledToFit()
 								.frame(idealHeight: 150)
 
-							// FIXME: Strings
+							// FIXME: future strings
 							Text("\(viewStore.question)?")
 								.font(.app.sectionHeader)
 								.fixedSize(horizontal: false, vertical: true)
 								.padding()
 
-							// FIXME: Strings
+							// FIXME: future strings
 							TextField(
 								"Answer",
 								text: viewStore.binding(
@@ -81,7 +81,7 @@ public extension AnswerSecurityQuestionFreeform {
 						}
 					}
 					.padding()
-					.navigationTitle("Answer Question")
+					.navigationTitle("Answer Question") // FIXME: future strings
 				}
 			}
 		}

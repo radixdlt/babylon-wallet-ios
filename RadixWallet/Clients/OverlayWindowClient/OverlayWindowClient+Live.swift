@@ -1,4 +1,4 @@
-
+// MARK: - OverlayWindowClient + DependencyKey
 extension OverlayWindowClient: DependencyKey {
 	public static let liveValue: Self = {
 		let items = AsyncPassthroughSubject<Item>()
@@ -13,7 +13,8 @@ extension OverlayWindowClient: DependencyKey {
 				title: { TextState(L10n.Common.errorAlertTitle) },
 				message: { TextState(error.localizedDescription) }
 			))
-		}.subscribe(items)
+		}
+		.subscribe(items)
 
 		pasteBoardClient.copyEvents().map { _ in Item.hud(.copied) }.subscribe(items)
 
@@ -34,4 +35,8 @@ extension OverlayWindowClient: DependencyKey {
 			isUserInteractionEnabled: { isUserInteractionEnabled.eraseToAnyAsyncSequence() }
 		)
 	}()
+}
+
+extension OverlayWindowClient.Item.HUD {
+	fileprivate static let copied = Self(text: L10n.AddressAction.copiedToClipboard)
 }

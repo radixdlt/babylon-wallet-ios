@@ -621,11 +621,10 @@ public struct FailedToAddLockFee: LocalizedError {
 	}
 
 	public var errorDescription: String? {
-		let base = "Failed to add Transaction Fee, try a different amount of fee payer." // FIXME: Strings
 		#if DEBUG
-		return base + "\n[DEBUG ONLY]: \(String(describing: underlyingError))"
+		L10n.Error.TransactionFailure.failedToAddLockFee + "\n[DEBUG ONLY]: \(String(describing: underlyingError))"
 		#else
-		return base
+		L10n.Error.TransactionFailure.failedToAddLockFee
 		#endif
 	}
 }
@@ -638,11 +637,10 @@ public struct FailedToAddGuarantee: LocalizedError {
 	}
 
 	public var errorDescription: String? {
-		let base = "Failed to add Guarantee, try a different percentage, or try skip adding a guarantee." // FIXME: Strings
 		#if DEBUG
-		return base + "\n[DEBUG ONLY]: \(String(describing: underlyingError))"
+		L10n.Error.TransactionFailure.failedToAddGuarantee + "\n[DEBUG ONLY]: \(String(describing: underlyingError))"
 		#else
-		return base
+		L10n.Error.TransactionFailure.failedToAddGuarantee
 		#endif
 	}
 }
@@ -1155,11 +1153,12 @@ extension ResourceTracker {
 public struct TransactionReviewFailure: LocalizedError {
 	public let underylying: Swift.Error
 	public var errorDescription: String? {
-		var msg = "A proposed transaction could not be processed" // FIXME: Strings source: https://rdxworks.slack.com/archives/C031A0V1A1W/p1694087946050189?thread_ts=1694085688.749539&cid=C031A0V1A1W
+		// https://rdxworks.slack.com/archives/C031A0V1A1W/p1694087946050189?thread_ts=1694085688.749539&cid=C031A0V1A1W
 		#if DEBUG
-		msg += "\n\n[DEBUG] Underlying error: \(String(describing: underylying))"
+		L10n.Error.TransactionFailure.reviewFailure + "\n[DEBUG] Underlying error: \(String(describing: underylying))"
+		#else
+		L10n.Error.TransactionFailure.reviewFailure
 		#endif
-		return msg
 	}
 }
 

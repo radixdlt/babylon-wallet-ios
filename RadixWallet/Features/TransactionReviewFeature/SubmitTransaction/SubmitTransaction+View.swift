@@ -73,7 +73,7 @@ extension SubmitTransaction {
 								}
 						}
 
-						Text(viewStore.status.display) // FIXME: Strings
+						Text(viewStore.status.display)
 							.foregroundColor(.app.gray1)
 							.textStyle(.body1Regular)
 							.multilineTextAlignment(.center)

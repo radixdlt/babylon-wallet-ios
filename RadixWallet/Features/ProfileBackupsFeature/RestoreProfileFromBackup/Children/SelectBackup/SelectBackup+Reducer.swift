@@ -158,7 +158,7 @@ public struct SelectBackup: Sendable, FeatureReducer {
 			return .none
 
 		case let .snapshotWithHeaderNotFoundInCloud(headerOfNonFoundProfile):
-			errorQueue.schedule(ProfileNotInCloudFound(header: headerOfNonFoundProfile))
+			errorQueue.schedule(ProfileNotFoundInCloud(header: headerOfNonFoundProfile))
 			return .none
 		}
 	}
@@ -176,7 +176,6 @@ public struct SelectBackup: Sendable, FeatureReducer {
 
 		case .destination(.presented(.inputEncryptionPassword(.delegate(.successfullyEncrypted)))):
 			preconditionFailure("What? Encrypted? Expected to only have DECRYPTED. Incorrect implementation somewhere...")
-			return .none
 
 		case .destination(.dismiss):
 			state.destination = nil
@@ -188,11 +187,10 @@ public struct SelectBackup: Sendable, FeatureReducer {
 	}
 }
 
-// MARK: - ProfileNotInCloudFound
-struct ProfileNotInCloudFound: LocalizedError {
+// MARK: - ProfileNotFoundInCloud
+struct ProfileNotFoundInCloud: LocalizedError {
 	let header: ProfileSnapshot.Header
 	var errorDescription: String? {
-		// FIXME: Strings
-		"Unable to find wallet backup in cloud."
+		L10n.IOSProfileBackup.profileNotFoundInCloud
 	}
 }

@@ -90,8 +90,8 @@ public struct SubmitTransaction: Sendable, FeatureReducer {
 			if state.status.isInProgress {
 				if state.inProgressDismissalDisabled {
 					state.dismissTransactionAlert = .init(
-						title: .init("Dismiss"), // FIXME: Strings
-						message: .init("This transaction requires to be completed") // FIXME: Strings
+						title: .init(L10n.Transaction.Status.DismissalDisabledDialog.title),
+						message: .init(L10n.Transaction.Status.DismissalDisabledDialog.text)
 					)
 				} else {
 					state.dismissTransactionAlert = .init(

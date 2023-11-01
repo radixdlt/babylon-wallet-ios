@@ -270,7 +270,7 @@ extension ImportOlympiaLedgerAccountsAndFactorSources {
 		guard let validatedAccounts = NonEmpty<Set>(validation.validated) else {
 			struct NoAccountsOnLedgerError: LocalizedError {
 				var errorDescription: String? {
-					"No new accounts were found on this Ledger device" // FIXME: Strings
+					L10n.ImportOlympiaAccounts.noNewAccounts
 				}
 			}
 

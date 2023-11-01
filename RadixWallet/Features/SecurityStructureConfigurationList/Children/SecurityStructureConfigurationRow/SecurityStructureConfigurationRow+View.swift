@@ -36,11 +36,10 @@ extension SecurityStructureConfigurationRow {
 								.textStyle(.secondaryHeader)
 								.padding(.bottom, .small1)
 
-							// FIXME: Strings
-							LabelledDate(label: "Created", date: viewStore.createdOn)
+							LabelledDate(label: "Created", date: viewStore.createdOn) // FIXME: future strings
 								.padding(.bottom, .small3)
 
-							LabelledDate(label: "Updated", date: viewStore.lastUpdatedOn)
+							LabelledDate(label: "Updated", date: viewStore.lastUpdatedOn) // FIXME: future strings
 								.padding(.bottom, .small3)
 						}
 

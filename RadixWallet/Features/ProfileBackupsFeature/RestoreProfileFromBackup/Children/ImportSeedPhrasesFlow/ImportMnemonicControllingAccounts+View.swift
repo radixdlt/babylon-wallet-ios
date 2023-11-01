@@ -37,7 +37,6 @@ extension ImportMnemonicControllingAccounts {
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				VStack {
-					// FIXME: Strings
 					Text(viewStore.title)
 						.textStyle(.body1Regular)
 						.foregroundColor(.app.gray1)
