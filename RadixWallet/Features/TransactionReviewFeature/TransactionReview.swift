@@ -859,7 +859,7 @@ extension TransactionReview {
 			try tokenData.map { id, _ in
 				try .init(
 					id: .fromParts(resourceAddress: resourceAddress.intoEngine(), nonFungibleLocalId: id),
-					data: []
+					data: nil
 				)
 			}
 		}

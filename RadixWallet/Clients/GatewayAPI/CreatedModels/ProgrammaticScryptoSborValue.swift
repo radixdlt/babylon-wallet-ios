@@ -39,6 +39,13 @@ extension GatewayAPI {
 		case u64(ProgrammaticScryptoSborValueU64)
 		case u128(ProgrammaticScryptoSborValueU128)
 
+		public var tuple: ProgrammaticScryptoSborValueTuple? {
+			if case let .tuple(tuple) = self {
+				return tuple
+			}
+			return nil
+		}
+
 		private enum CodingKeys: String, CodingKey {
 			case kind
 		}
