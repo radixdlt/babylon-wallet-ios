@@ -24,11 +24,8 @@ extension SubmitTransactionClient: DependencyKey {
 				guard let transactionStatusResponse = try? await pollTransactionStatus(),
 				      let transactionStatus = transactionStatusResponse.knownPayloads.first?.payloadStatus
 				else {
-					loggerGlobal.error("No payload status?")
 					continue
 				}
-
-				loggerGlobal.info("Payload status is \(transactionStatus)")
 
 				switch transactionStatus {
 				case .unknown, .commitPendingOutcomeUnknown, .pending:
@@ -127,14 +124,6 @@ extension GatewayAPI.TransactionCommittedDetailsResponse: @unchecked Sendable {}
 
 // MARK: - GatewayAPI.TransactionStatus + Sendable
 extension GatewayAPI.TransactionStatus: @unchecked Sendable {}
-
-// MARK: - FailedToGetDetailsOfSuccessfullySubmittedTX
-struct FailedToGetDetailsOfSuccessfullySubmittedTX: LocalizedError, Equatable {
-	public let txID: TXID
-	var errorDescription: String? {
-		"Successfully submitted TX with txID: \(txID) but failed to get transaction details for it."
-	}
-}
 
 // MARK: - SubmitTXFailure
 public enum SubmitTXFailure: Sendable, LocalizedError, Equatable {

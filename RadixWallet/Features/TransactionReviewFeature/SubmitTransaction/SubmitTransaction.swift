@@ -7,6 +7,8 @@ public struct SubmitTransaction: Sendable, FeatureReducer {
 		case transactionStatus
 	}
 
+	static let epochDurationInMinutes = 5
+
 	public struct State: Sendable, Hashable {
 		public enum TXStatus: Sendable, Hashable {
 			case notYetSubmitted
@@ -132,7 +134,7 @@ public struct SubmitTransaction: Sendable, FeatureReducer {
 						await send(.internal(.statusUpdate(.permanentlyRejected)))
 					case let .temporarilyRejected(epoch):
 						await send(.internal(.statusUpdate(
-							.temporarilyRejected(remainingProcessingTime: Int(endEpoch - epoch.rawValue))
+							.temporarilyRejected(remainingProcessingTime: Int(endEpoch - epoch.rawValue) * Self.epochDurationInMinutes)
 						)))
 					case .failed:
 						await send(.internal(.statusUpdate(.failed)))
