@@ -380,3 +380,10 @@ extension ProfileSnapshot.Header.ID {
 private func key(factorSourceID: FactorSourceID.FromHash) -> KeychainClient.Key {
 	.init(rawValue: .init(rawValue: factorSourceID.keychainKey)!)
 }
+
+extension OverlayWindowClient.Item.AlertState {
+	fileprivate static let missingMnemonicAlert = Self(
+		title: { TextState(L10n.TransactionReview.NoMnemonicError.title) },
+		message: { TextState(L10n.TransactionReview.NoMnemonicError.text) }
+	)
+}

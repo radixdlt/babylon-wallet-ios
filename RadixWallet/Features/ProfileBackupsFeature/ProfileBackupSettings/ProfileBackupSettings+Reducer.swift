@@ -315,12 +315,11 @@ extension ConfirmationDialogState<ProfileBackupSettings.Destinations.Action.Dele
 }
 
 extension ProfileBackupSettings.Destinations.State {
-	// FIXME: Strings
 	fileprivate static let cloudSyncTakesLongTimeAlert = Self.syncTakesLongTimeAlert(.init(
-		title: { TextState("Enabling iCloud sync") },
+		title: { TextState(L10n.AppSettings.ICloudSyncEnabledAlert.title) },
 		actions: {
 			ButtonState(action: .ok, label: { TextState(L10n.Common.ok) })
 		},
-		message: { TextState("iCloud sync is now enabled, but it might take up to an hour before your wallet data is uploaded to iCloud.") }
+		message: { TextState(L10n.AppSettings.ICloudSyncEnabledAlert.message) }
 	))
 }

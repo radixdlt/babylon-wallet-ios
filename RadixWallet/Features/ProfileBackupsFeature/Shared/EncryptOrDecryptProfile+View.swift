@@ -44,7 +44,7 @@ extension EncryptOrDecryptProfile {
 				return nil
 			}
 			if !confirmedEncryptionPassword.isEmpty, confirmedEncryptionPassword != inputtedEncryptionPassword {
-				return .error(L10n.EncryptProfileBackup.ConfirmPasswordField.error)
+				return .error(L10n.ProfileBackup.ManualBackups.passwordsMissmatchError)
 			}
 
 			return nil
@@ -59,19 +59,21 @@ extension EncryptOrDecryptProfile {
 		}
 
 		var title: String {
-			// FIXME: String
-			let operation = isEncrypting ? "Encrypt" : "Decrypt"
-			return "\(operation) Wallet Backup File"
+			isEncrypting
+				? L10n.ProfileBackup.ManualBackups.encryptBackupTitle
+				: L10n.ProfileBackup.ManualBackups.decryptBackupTitle
 		}
 
 		var subtitle: String {
-			// FIXME: String
-			isEncrypting ? L10n.EncryptProfileBackup.Header.subtitle : "Enter the password you chose when you originally encrypted this Wallet Backup file."
+			isEncrypting
+				? L10n.ProfileBackup.ManualBackups.encryptBackupSubtitle
+				: L10n.ProfileBackup.ManualBackups.decryptBackupSubtitle
 		}
 
 		var nonConfirmingPasswordPlaceholder: String {
-			// FIXME: String
-			isEncrypting ? "Encryption password" : "Decryption password"
+			isEncrypting
+				? L10n.ProfileBackup.ManualBackups.nonConformingEncryptionPasswordPlaceholder
+				: L10n.ProfileBackup.ManualBackups.nonConformingDecryptionPasswordPlaceholder
 		}
 	}
 
@@ -117,10 +119,9 @@ extension EncryptOrDecryptProfile {
 						.autocorrectionDisabled()
 
 						if viewStore.needToConfirm {
-							// FIXME: Strings
 							AppTextField(
 								useSecureField: true,
-								placeholder: L10n.EncryptProfileBackup.ConfirmPasswordField.placeholder,
+								placeholder: L10n.ProfileBackup.ManualBackups.confirmPasswordPlaceholder,
 								text: viewStore.binding(
 									get: \.confirmedEncryptionPassword,
 									send: { .passwordConfirmationChanged($0) }

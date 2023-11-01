@@ -26,7 +26,7 @@ extension NameSecurityStructure {
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				VStack {
-					// FIXME: Strings
+					// FIXME: future strings
 					AppTextField(
 						primaryHeading: "Label this security config",
 						placeholder: "Main",
@@ -41,7 +41,7 @@ extension NameSecurityStructure {
 						viewStore.nonEmptyName,
 						forAction: { viewStore.send(.confirmedName($0)) }
 					) { action in
-						// FIXME: Strings
+						// FIXME: future strings
 						Button("Save security config", action: action)
 							.buttonStyle(.primaryRectangular)
 					}

@@ -52,7 +52,7 @@ final class AccountAndPersonaHidingTests: TestCase {
 		wait(for: [unhideAllEntitiesExpectation], timeout: 1.0)
 
 		let scheduledCompletionHUD = await scheduleCompletionHUD.value
-		XCTAssertEqual(scheduledCompletionHUD, .updated)
+		XCTAssertEqual(scheduledCompletionHUD, .updatedAccount)
 
 		await store.receive(.internal(.didUnhideAllEntities)) {
 			$0.hiddenEntityCounts = .init(hiddenAccountsCount: 0, hiddenPersonasCount: 0)

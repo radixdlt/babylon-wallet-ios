@@ -79,10 +79,6 @@ extension TransactionReview {
 					.controlState(viewStore.viewControlState)
 					.background(.white)
 					.animation(.easeInOut, value: viewStore.isExpandedDappUsed)
-					.navigationTitle("Review Transaction") // FIXME: Strings - revert to L10n.TransactionReview.title when that fits
-					.navigationBarInlineTitleFont(.app.secondaryHeader)
-					.navigationBarHideDivider()
-					.navigationBarTitleColor(.app.gray1)
 					.toolbar {
 						ToolbarItem(placement: .automatic) {
 							if viewStore.canToggleViewMode {
@@ -105,7 +101,17 @@ extension TransactionReview {
 		private func coreView(with viewStore: ViewStoreOf<TransactionReview>) -> some SwiftUI.View {
 			ScrollView(showsIndicators: false) {
 				VStack(spacing: 0) {
-					JaggedEdge(shadowColor: shadowColor, isTopEdge: true, padding: .medium1)
+					Text(L10n.TransactionReview.title)
+						.textStyle(.sheetTitle)
+						.lineLimit(2)
+						.multilineTextAlignment(.leading)
+						.foregroundColor(.app.gray1)
+						.flushedLeft
+						.padding(.horizontal, .medium3)
+						.padding(.bottom, .medium3)
+						.background {
+							JaggedEdge(shadowColor: shadowColor, isTopEdge: true)
+						}
 
 					if let rawTransaction = viewStore.rawTransaction {
 						RawTransactionView(transaction: rawTransaction)
@@ -148,10 +154,7 @@ extension TransactionReview {
 					.padding(.vertical, .large3)
 					.padding(.horizontal, .large2)
 					.background {
-						VStack(spacing: 0) {
-							JaggedEdge(shadowColor: shadowColor, isTopEdge: false)
-							Color.white
-						}
+						JaggedEdge(shadowColor: shadowColor, isTopEdge: false)
 					}
 				}
 				.background(.app.gray5.gradient.shadow(.inner(color: shadowColor, radius: 15)))

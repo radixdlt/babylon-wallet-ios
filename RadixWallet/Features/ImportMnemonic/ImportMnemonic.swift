@@ -60,6 +60,9 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			words.compactMap(\.completeWord)
 		}
 
+		/// irrelevant for readonly
+		public var isProgressing = false
+
 		public let persistStrategy: PersistStrategy?
 
 		public let readonlyMode: ReadonlyMode?
@@ -260,8 +263,8 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			case onContinueWarning(OnContinueWarning)
 
 			public enum MarkMnemonicAsBackedUpOrNot: Sendable, Hashable {
-				case userHaveBackedUp(FactorSourceID.FromHash)
-				case userHaveNotBackedUp
+				case userHasBackedUp(FactorSourceID.FromHash)
+				case userHasNotBackedUp
 			}
 
 			public enum OnContinueWarning: Sendable, Hashable {
@@ -284,9 +287,9 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 	@Dependency(\.continuousClock) var clock
 	@Dependency(\.factorSourcesClient) var factorSourcesClient
 	@Dependency(\.userDefaultsClient) var userDefaultsClient
+	@Dependency(\.overlayWindowClient) var overlayWindowClient
 
 	#if DEBUG
-	@Dependency(\.overlayWindowClient) var overlayWindowClient
 	@Dependency(\.pasteboardClient) var pasteboardClient
 	#endif
 
@@ -366,7 +369,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 				)))
 			}
 
-		case let .destination(.presented(.markMnemonicAsBackedUp(.userHaveBackedUp(factorSourceID)))):
+		case let .destination(.presented(.markMnemonicAsBackedUp(.userHasBackedUp(factorSourceID)))):
 			return .run { send in
 				try userDefaultsClient.addFactorSourceIDOfBackedUpMnemonic(factorSourceID)
 				await send(.delegate(.doneViewing(markedMnemonicAsBackedUp: true)))
@@ -375,7 +378,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 				errorQueue.schedule(error)
 			}
 
-		case .destination(.presented(.markMnemonicAsBackedUp(.userHaveNotBackedUp))):
+		case .destination(.presented(.markMnemonicAsBackedUp(.userHasNotBackedUp))):
 			loggerGlobal.notice("User have not backed up")
 			return .send(.delegate(.doneViewing(markedMnemonicAsBackedUp: false)))
 
@@ -445,6 +448,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			state.debugMnemonicPhraseSingleField = mnemonic
 			if let mnemonic = try? Mnemonic(phrase: mnemonic, language: state.language) {
 				state.words = State.words(from: mnemonic, isReadonlyMode: state.readonlyMode != nil)
+				state.isProgressing = true
 				return .send(.view(.continueButtonTapped(mnemonic)))
 			} else {
 				return .none
@@ -458,6 +462,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 	}
 
 	private func continueWithMnemonic(mnemonic: Mnemonic, in state: inout State) -> Effect<Action> {
+		state.isProgressing = true
 		let mnemonicWithPassphrase = MnemonicWithPassphrase(
 			mnemonic: mnemonic,
 			passphrase: state.bip39Passphrase
@@ -465,7 +470,6 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 		guard let persistStrategy = state.persistStrategy else {
 			return .send(.delegate(.notPersisted(mnemonicWithPassphrase)))
 		}
-
 		switch persistStrategy.location {
 		case .intoKeychainAndProfile:
 			switch persistStrategy.mnemonicForFactorSourceKind {
@@ -530,11 +534,14 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			return .none
 
 		case let .saveFactorSourceResult(.failure(error)):
+			state.isProgressing = false
 			errorQueue.schedule(error)
 			loggerGlobal.error("Failed to save mnemonic in profile, error: \(error)")
 			return .none
 
 		case let .saveFactorSourceResult(.success(factorSource)):
+			state.isProgressing = false
+			overlayWindowClient.scheduleHUD(.seedPhraseImported)
 			return .send(.delegate(.persistedNewFactorSourceInProfile(factorSource)))
 		}
 	}
@@ -634,16 +641,18 @@ extension ImportMnemonic {
 extension ImportMnemonic.Destinations.State {
 	fileprivate static func askUserIfSheHasBackedUpMnemonic(_ factorSourceID: FactorSourceID.FromHash) -> Self {
 		.markMnemonicAsBackedUp(.init(
-			title: { TextState("Confirm Backup") }, // FIXME: Strings
+			title: { TextState(L10n.ImportMnemonic.BackedUpAlert.title) },
 			actions: {
-				ButtonState(action: .userHaveBackedUp(factorSourceID), label: { TextState("Yes, I have backed it up") }) // FIXME: Strings
-				ButtonState(action: .userHaveNotBackedUp, label: { TextState("No, not yet") }) // FIXME: Strings
+				ButtonState(action: .userHasBackedUp(factorSourceID), label: { TextState(L10n.ImportMnemonic.BackedUpAlert.confirmAction) })
+				ButtonState(action: .userHasNotBackedUp, label: { TextState(L10n.ImportMnemonic.BackedUpAlert.noAction) })
 			},
-			message: { TextState("Are you sure you have securely written down this seed phrase? You will need it to recover access if you lose your phone.") } // FIXME: Strings
+			message: { TextState(L10n.ImportMnemonic.BackedUpAlert.message) }
 		))
 	}
 
-	fileprivate static func onContinueWarning(_ warning: ImportMnemonic.State.OnContinueWarning) -> Self {
+	fileprivate static func onContinueWarning(
+		_ warning: ImportMnemonic.State.OnContinueWarning
+	) -> Self {
 		.onContinueWarning(.init(
 			title: { TextState(warning.title) },
 			actions: {
@@ -652,4 +661,8 @@ extension ImportMnemonic.Destinations.State {
 			message: { TextState(warning.text) }
 		))
 	}
+}
+
+extension OverlayWindowClient.Item.HUD {
+	fileprivate static let seedPhraseImported = Self(text: L10n.ImportMnemonic.seedPhraseImported)
 }

@@ -110,8 +110,7 @@ extension AccountDetails {
 					content: { childStore in
 						NavigationView {
 							ImportMnemonic.View(store: childStore)
-								// FIXME: Strings
-								.navigationTitle("Backup Seed Phrase")
+								.navigationTitle(L10n.ImportMnemonic.navigationTitleBackup)
 						}
 					}
 				)

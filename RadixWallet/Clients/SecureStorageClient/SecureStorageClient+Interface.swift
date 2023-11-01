@@ -95,9 +95,10 @@ extension SecureStorageClient {
 	@Sendable
 	public func loadMnemonic(
 		factorSourceID: FactorSourceID.FromHash,
-		purpose: LoadMnemonicPurpose
+		purpose: LoadMnemonicPurpose,
+		notifyIfMissing: Bool = true
 	) throws -> MnemonicWithPassphrase? {
-		try self.loadMnemonicByFactorSourceID(factorSourceID, purpose, true)
+		try self.loadMnemonicByFactorSourceID(factorSourceID, purpose, notifyIfMissing)
 	}
 
 	@Sendable

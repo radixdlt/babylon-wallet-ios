@@ -30,7 +30,7 @@ extension NameAccount {
 			if let sanitizedName = state.sanitizedName {
 				if sanitizedName.count > Profile.Network.Account.nameMaxLength {
 					self.sanitizedNameRequirement = nil
-					self.hint = .error("Account label too long") // FIXME: Strings (duplicate)
+					self.hint = .error(L10n.Error.AccountLabel.tooLong)
 				} else {
 					self.sanitizedNameRequirement = .init(sanitizedName: sanitizedName)
 					self.hint = nil

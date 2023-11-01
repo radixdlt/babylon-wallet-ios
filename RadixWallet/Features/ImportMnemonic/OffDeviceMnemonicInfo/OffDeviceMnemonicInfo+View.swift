@@ -32,8 +32,8 @@ extension OffDeviceMnemonicInfo {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				VStack(spacing: .large1) {
 					AppTextField(
-						primaryHeading: .init(text: "Label"), // FIXME: strings
-						placeholder: "Label", // FIXME: strings
+						primaryHeading: .init(text: "Label"), // FIXME: future strings
+						placeholder: "Label", // FIXME: future strings
 						text: viewStore.binding(
 							get: \.label,
 							send: { .labelChanged($0) }
@@ -43,7 +43,7 @@ extension OffDeviceMnemonicInfo {
 				}
 				.padding()
 				.footer {
-					Button("Save external seed phrase") { // FIXME: strings
+					Button("Save external seed phrase") { // FIXME: future strings
 						viewStore.send(.saveButtonTapped)
 					}
 					.buttonStyle(.primaryRectangular)

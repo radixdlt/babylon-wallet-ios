@@ -249,7 +249,7 @@ extension ResourcesListMode {
 		case .allowDenyAssets(.deny):
 			L10n.AccountSettings.SpecificAssetsDeposits.removeAssetMessageDeny
 		case .allowDepositors:
-			"The badge will be removed from the list" // FIXME: Strings
+			L10n.AccountSettings.SpecificAssetsDeposits.removeBadgeMessageDepositors
 		}
 	}
 }
