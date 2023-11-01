@@ -117,8 +117,8 @@ extension AssetTransfer.State {
 			guard $0.account != nil else {
 				return false
 			}
-			let fungibleAssets = $0.assets.compactMap(/ResourceAsset.State.fungibleAsset)
-			let nonFungibleAssets = $0.assets.compactMap(/ResourceAsset.State.nonFungibleAsset)
+			let fungibleAssets = $0.assets.map(\.kind).compactMap(/ResourceAsset.State.Kind.fungibleAsset)
+			let nonFungibleAssets = $0.assets.map(\.kind).compactMap(/ResourceAsset.State.Kind.nonFungibleAsset)
 
 			if !fungibleAssets.isEmpty {
 				return fungibleAssets.allSatisfy { $0.transferAmount != nil && $0.totalTransferSum <= $0.balance }
@@ -307,7 +307,7 @@ extension AssetTransfer {
 		_ receivingAccounts: IdentifiedArrayOf<ReceivingAccount.State>
 	) async throws -> IdentifiedArrayOf<InvolvedFungibleResource> {
 		let allResourceAddresses: [ResourceAddress] = try receivingAccounts.flatMap {
-			let addresses = try $0.assets.compactMap(/ResourceAsset.State.fungibleAsset).map {
+			let addresses = try $0.assets.map(\.kind).compactMap(/ResourceAsset.State.Kind.fungibleAsset).map {
 				try ResourceAddress(validatingAddress: $0.id)
 			}
 			return addresses
@@ -321,7 +321,8 @@ extension AssetTransfer {
 			guard let account = receivingAccount.account else {
 				continue
 			}
-			for fungibleAsset in receivingAccount.assets.compactMap(/ResourceAsset.State.fungibleAsset) {
+			let assets = receivingAccount.assets.map(\.kind).compactMap(/ResourceAsset.State.Kind.fungibleAsset)
+			for fungibleAsset in assets {
 				guard let transferAmount = fungibleAsset.transferAmount else {
 					continue
 				}
@@ -357,8 +358,9 @@ extension AssetTransfer {
 			}
 
 			let accountAddress = account.address
+			let assets = receivingAccount.assets.map(\.kind).compactMap(/ResourceAsset.State.Kind.nonFungibleAsset)
 
-			for nonFungibleAsset in receivingAccount.assets.compactMap(/ResourceAsset.State.nonFungibleAsset) {
+			for nonFungibleAsset in assets {
 				if resources[id: nonFungibleAsset.resourceAddress] != nil {
 					if resources[id: nonFungibleAsset.resourceAddress]?.accounts[id: accountAddress] != nil {
 						resources[id: nonFungibleAsset.resourceAddress]?.accounts[id: accountAddress]?.tokens.append(nonFungibleAsset.nftToken)
