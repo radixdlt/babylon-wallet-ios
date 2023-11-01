@@ -57,11 +57,11 @@ extension OnLedgerEntitiesClient {
 		)
 
 		let filteredFungibleResources = fungibleResources.filter { resource in
-			!poolUnitResources.fungibleResourceAddresses.contains(resource.resourceAddress.address)
+			!poolUnitResources.fungibleResourceAddresses.contains(resource.resourceAddress)
 		}
 
 		let filteredNonFungibleResources = nonFungibleResources.filter { resource in
-			!poolUnitResources.nonFungibleResourceAddresses.contains(resource.resourceAddress.address)
+			!poolUnitResources.nonFungibleResourceAddresses.contains(resource.resourceAddress)
 		}
 
 		return await .init(
@@ -70,7 +70,7 @@ extension OnLedgerEntitiesClient {
 			metadata: .init(item.explicitMetadata),
 			fungibleResources: filteredFungibleResources.sorted(),
 			nonFungibleResources: filteredNonFungibleResources.sorted(),
-			poolUnitResources: poolUnitResources.nonEmpty
+			poolUnitResources: poolUnitResources
 		)
 	}
 
@@ -304,10 +304,6 @@ extension OnLedgerEntitiesClient {
 			}
 
 			let amount = try RETDecimal(value: vault.amount)
-			guard amount > 0 else {
-				return nil
-			}
-
 			return try .init(
 				resourceAddress: .init(validatingAddress: vaultAggregated.resourceAddress),
 				atLedgerState: ledgerState,
@@ -324,10 +320,6 @@ extension OnLedgerEntitiesClient {
 		try item.nonFungibleResources?.items.compactMap(\.vault).compactMap { vaultAggregated -> OnLedgerEntity.OwnedNonFungibleResource? in
 			guard let vault = vaultAggregated.vaults.items.first else {
 				assertionFailure("Owned resource without a vault???")
-				return nil
-			}
-
-			guard vault.totalCount > 0 else {
 				return nil
 			}
 
@@ -472,7 +464,7 @@ extension OnLedgerEntitiesClient {
 }
 
 extension OnLedgerEntity.Account.PoolUnitResources {
-	var nonEmpty: OnLedgerEntity.Account.PoolUnitResources {
+	var nonEmptyVaults: OnLedgerEntity.Account.PoolUnitResources {
 		let stakes = radixNetworkStakes.compactMap { stake in
 			let stakeUnitResource: OnLedgerEntity.OwnedFungibleResource? = {
 				guard let stakeUnitResource = stake.stakeUnitResource, stakeUnitResource.amount > 0 else {
@@ -499,6 +491,34 @@ extension OnLedgerEntity.Account.PoolUnitResources {
 		}
 
 		return .init(radixNetworkStakes: stakes, poolUnits: poolUnits)
+	}
+}
+
+extension [OnLedgerEntity.OwnedNonFungibleResource] {
+	public var nonEmptyVaults: [OnLedgerEntity.OwnedNonFungibleResource] {
+		filter { $0.nonFungibleIdsCount > 0 }
+	}
+}
+
+extension OnLedgerEntity.OwnedFungibleResources {
+	public var nonEmptyVaults: OnLedgerEntity.OwnedFungibleResources {
+		.init(
+			xrdResource: xrdResource.flatMap { $0.amount > 0 ? $0 : nil },
+			nonXrdResources: nonXrdResources.filter { $0.amount > 0 }
+		)
+	}
+}
+
+extension OnLedgerEntity.Account {
+	public var nonEmptyVaults: OnLedgerEntity.Account {
+		.init(
+			address: address,
+			atLedgerState: atLedgerState,
+			metadata: metadata,
+			fungibleResources: fungibleResources.nonEmptyVaults,
+			nonFungibleResources: nonFungibleResources.nonEmptyVaults,
+			poolUnitResources: poolUnitResources.nonEmptyVaults
+		)
 	}
 }
 

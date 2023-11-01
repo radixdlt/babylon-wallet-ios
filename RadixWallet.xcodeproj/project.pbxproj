@@ -1164,6 +1164,7 @@
 		832880692AE664C30014FBF3 /* EntityFlag.swift in Sources */ = {isa = PBXBuildFile; fileRef = 832880682AE664C30014FBF3 /* EntityFlag.swift */; };
 		8328806C2AE6725F0014FBF3 /* AccountPreferencesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8328806B2AE6725F0014FBF3 /* AccountPreferencesTests.swift */; };
 		83D0B5692AE01EDE0048DCBE /* RadixEngineToolkitError+Description.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83D0B5682AE01EDE0048DCBE /* RadixEngineToolkitError+Description.swift */; };
+		83EE47502AF027DF00155F03 /* AssetTransferDepositRuleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83EE474F2AF027DF00155F03 /* AssetTransferDepositRuleTests.swift */; };
 		E62BB7632AEA856300D46DAC /* ImportMnemonicTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E62BB7622AEA856300D46DAC /* ImportMnemonicTests.swift */; };
 		E6390FB32AE6C3E200B4DEE2 /* ProfileStore+OverlayWindowClient+Alert+OwnershipConflict.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6390FB22AE6C3E200B4DEE2 /* ProfileStore+OverlayWindowClient+Alert+OwnershipConflict.swift */; };
 		E63D123D2ADD1FC00001CBB1 /* SwiftUIIntrospect in Frameworks */ = {isa = PBXBuildFile; productRef = E63D123C2ADD1FC00001CBB1 /* SwiftUIIntrospect */; };
@@ -2401,6 +2402,7 @@
 		832880682AE664C30014FBF3 /* EntityFlag.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntityFlag.swift; sourceTree = "<group>"; };
 		8328806B2AE6725F0014FBF3 /* AccountPreferencesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountPreferencesTests.swift; sourceTree = "<group>"; };
 		83D0B5682AE01EDE0048DCBE /* RadixEngineToolkitError+Description.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RadixEngineToolkitError+Description.swift"; sourceTree = "<group>"; };
+		83EE474F2AF027DF00155F03 /* AssetTransferDepositRuleTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssetTransferDepositRuleTests.swift; sourceTree = "<group>"; };
 		E62BB7622AEA856300D46DAC /* ImportMnemonicTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportMnemonicTests.swift; sourceTree = "<group>"; };
 		E6390FB22AE6C3E200B4DEE2 /* ProfileStore+OverlayWindowClient+Alert+OwnershipConflict.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ProfileStore+OverlayWindowClient+Alert+OwnershipConflict.swift"; sourceTree = "<group>"; };
 		E67F14442AE029BA00738BE1 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -6667,6 +6669,14 @@
 			path = AccountPreferencesTests;
 			sourceTree = "<group>";
 		};
+		83EE474E2AF027CE00155F03 /* AssetTransferTests */ = {
+			isa = PBXGroup;
+			children = (
+				83EE474F2AF027DF00155F03 /* AssetTransferDepositRuleTests.swift */,
+			);
+			path = AssetTransferTests;
+			sourceTree = "<group>";
+		};
 		E63D123B2ADD1FC00001CBB1 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -6766,6 +6776,7 @@
 		E6DBA2732ADEBFB200A38425 /* Features */ = {
 			isa = PBXGroup;
 			children = (
+				83EE474E2AF027CE00155F03 /* AssetTransferTests */,
 				830EA9DE2AEB8201004C8051 /* AccountAndPersonaHidingTests */,
 				8328806A2AE6724B0014FBF3 /* AccountPreferencesTests */,
 				E6DBA2782ADEBFB200A38425 /* SettingsFeatureTests */,
@@ -7507,6 +7518,7 @@
 				E6DBA3732ADEBFB300A38425 /* ROLAClientTests.swift in Sources */,
 				E6DBA31F2ADEBFB300A38425 /* RadixConnectCustomData.swift in Sources */,
 				E6DBA34B2ADEBFB300A38425 /* SLIP10TestHelpers.swift in Sources */,
+				83EE47502AF027DF00155F03 /* AssetTransferDepositRuleTests.swift in Sources */,
 				E6DBA3462ADEBFB300A38425 /* DataToHexStringTests.swift in Sources */,
 				E6DBA38B2ADEC0CB00A38425 /* SLIP10TestVectorsHelper.swift in Sources */,
 				E6DBA3572ADEBFB300A38425 /* SLIP10InterfaceTests.swift in Sources */,

@@ -117,8 +117,8 @@ extension AssetTransfer.State {
 			guard $0.account != nil else {
 				return false
 			}
-			let fungibleAssets = $0.assets.compactMap(/ResourceAsset.State.fungibleAsset)
-			let nonFungibleAssets = $0.assets.compactMap(/ResourceAsset.State.nonFungibleAsset)
+			let fungibleAssets = $0.assets.fungibleAssets
+			let nonFungibleAssets = $0.assets.nonFungibleAssets
 
 			if !fungibleAssets.isEmpty {
 				return fungibleAssets.allSatisfy { $0.transferAmount != nil && $0.totalTransferSum <= $0.balance }
@@ -197,6 +197,7 @@ extension AssetTransfer {
 
 					try await instructionForDepositing(
 						bucket: bucket,
+						resource: resource.address,
 						into: account.recipient
 					)
 				}
@@ -221,6 +222,7 @@ extension AssetTransfer {
 
 					try await instructionForDepositing(
 						bucket: bucket,
+						resource: resource.address,
 						into: account.recipient
 					)
 				}
@@ -232,30 +234,72 @@ extension AssetTransfer {
 
 func instructionForDepositing(
 	bucket: ManifestBuilderBucket,
+	resource: ResourceAddress,
 	into receivingAccount: ReceivingAccount.State.Account
 ) async throws -> ManifestBuilder.InstructionsChain.Instruction {
-	@Dependency(\.userDefaultsClient) var userDefaultsClient
-	@Dependency(\.secureStorageClient) var secureStorageClient
-	let isUserAccount = receivingAccount.isUserAccount
-	// TODO: Temporary revert of checking if the receiving account is a ledger account
-	let isSoftwareAccount = true // !receivingAccount.isLedgerAccount
 	let recipientAddress = receivingAccount.address
-	let userHasAccessToMnemonic = if let deviceFactorSourceID = receivingAccount.left?.deviceFactorSourceID {
-		await secureStorageClient.containsMnemonicIdentifiedByFactorSourceID(deviceFactorSourceID)
-	} else { false }
 
-	guard isUserAccount, isSoftwareAccount, userHasAccessToMnemonic else {
-		return try ManifestBuilder.accountTryDepositOrAbort(
-			recipientAddress.intoEngine(),
-			nil,
-			bucket
-		)
+	if case let .left(userAccount) = receivingAccount {
+		@Dependency(\.secureStorageClient) var secureStorageClient
+
+		let needsSignatureForDepositing = await needsSignatureForDepositting(into: userAccount, resource: resource)
+		let isSoftwareAccount = !receivingAccount.isLedgerAccount
+		let userHasAccessToMnemonic = userAccount.deviceFactorSourceID.map { deviceFactorSourceID in
+			secureStorageClient.containsMnemonicIdentifiedByFactorSourceID(deviceFactorSourceID)
+		} ?? false
+
+		if needsSignatureForDepositing, isSoftwareAccount && userHasAccessToMnemonic || !isSoftwareAccount {
+			return try ManifestBuilder.accountDeposit(
+				recipientAddress.intoEngine(),
+				bucket
+			)
+		}
 	}
 
-	return try ManifestBuilder.accountDeposit(
+	return try ManifestBuilder.accountTryDepositOrAbort(
 		recipientAddress.intoEngine(),
+		nil,
 		bucket
 	)
+}
+
+/// Determines if depositting the resource into an account requires the addition of a signature
+func needsSignatureForDepositting(into receivingAccount: Profile.Network.Account, resource resourceAddress: ResourceAddress) async -> Bool {
+	let depositSettings = receivingAccount.onLedgerSettings.thirdPartyDeposits
+	let resourceException = depositSettings.assetsExceptionList.first { $0.address == resourceAddress }?.exceptionRule
+
+	switch (depositSettings.depositRule, resourceException) {
+	// AcceptAll
+	case (.acceptAll, .none):
+		return false
+	case (.acceptAll, .allow):
+		return false
+	case (.acceptAll, .deny):
+		return true
+
+	// Accept Known
+	case (.acceptKnown, .allow):
+		return false
+	case (.acceptKnown, .none):
+		// Check if the resource is known to the account
+		@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
+		let hasResource = await (try? onLedgerEntitiesClient
+			.getAccount(receivingAccount.address)
+			.hasResource(resourceAddress)
+		) ?? false
+
+		return !hasResource
+	case (.acceptKnown, .deny):
+		return true
+
+	// DenyAll
+	case (.denyAll, .none):
+		return true
+	case (.denyAll, .allow):
+		return false
+	case (.denyAll, .deny):
+		return true
+	}
 }
 
 extension AssetTransfer {
@@ -263,7 +307,7 @@ extension AssetTransfer {
 		_ receivingAccounts: IdentifiedArrayOf<ReceivingAccount.State>
 	) async throws -> IdentifiedArrayOf<InvolvedFungibleResource> {
 		let allResourceAddresses: [ResourceAddress] = try receivingAccounts.flatMap {
-			let addresses = try $0.assets.compactMap(/ResourceAsset.State.fungibleAsset).map {
+			let addresses = try $0.assets.fungibleAssets.map {
 				try ResourceAddress(validatingAddress: $0.id)
 			}
 			return addresses
@@ -277,7 +321,8 @@ extension AssetTransfer {
 			guard let account = receivingAccount.account else {
 				continue
 			}
-			for fungibleAsset in receivingAccount.assets.compactMap(/ResourceAsset.State.fungibleAsset) {
+			let assets = receivingAccount.assets.fungibleAssets
+			for fungibleAsset in assets {
 				guard let transferAmount = fungibleAsset.transferAmount else {
 					continue
 				}
@@ -313,8 +358,9 @@ extension AssetTransfer {
 			}
 
 			let accountAddress = account.address
+			let assets = receivingAccount.assets.nonFungibleAssets
 
-			for nonFungibleAsset in receivingAccount.assets.compactMap(/ResourceAsset.State.nonFungibleAsset) {
+			for nonFungibleAsset in assets {
 				if resources[id: nonFungibleAsset.resourceAddress] != nil {
 					if resources[id: nonFungibleAsset.resourceAddress]?.accounts[id: accountAddress] != nil {
 						resources[id: nonFungibleAsset.resourceAddress]?.accounts[id: accountAddress]?.tokens.append(nonFungibleAsset.nftToken)
