@@ -39,10 +39,10 @@ extension ManageTrustedContactFactorSource {
 					!radixAddress.isEmpty,
 					address == nil
 				else { return nil }
-				// FIXME: Strings
+				// FIXME: future strings
 				return .error("Invalid address")
 			} else {
-				// FIXME: Strings
+				// FIXME: future strings
 				return .info("Cannot edit. Add new contact instead.")
 			}
 		}
@@ -62,7 +62,7 @@ extension ManageTrustedContactFactorSource {
 				!emailAddress.isEmpty,
 				email == nil
 			else { return nil }
-			// FIXME: Strings
+			// FIXME: future strings
 			return .error("Invalid email")
 		}
 	}
@@ -78,7 +78,7 @@ extension ManageTrustedContactFactorSource {
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				VStack(spacing: .large3) {
-					// FIXME: Strings
+					// FIXME: future strings
 					Text("Your phone is your only access to your wallet. If you lose it, you’ll need someone you trust to lock your old phone and process a new one.")
 
 					addressField(with: viewStore)
@@ -91,7 +91,7 @@ extension ManageTrustedContactFactorSource {
 				.footer {
 					continueButton(viewStore)
 				}
-				// FIXME: Strings
+				// FIXME: future strings
 				.navigationTitle(viewStore.isCreatingNewFromScratch ? "Add Trusted Contact" : "Edit Trusted Contact")
 				.sheet(
 					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
@@ -99,7 +99,7 @@ extension ManageTrustedContactFactorSource {
 					action: ManageTrustedContactFactorSource.Destinations.Action.scanAccountAddress,
 					content: {
 						ScanQRCoordinator.View(store: $0)
-							// FIXME: Strings
+							// FIXME: future strings
 							.navigationTitle("Scan address")
 					}
 				)
@@ -109,7 +109,7 @@ extension ManageTrustedContactFactorSource {
 		private func addressField(
 			with viewStore: ViewStoreOf<ManageTrustedContactFactorSource>
 		) -> some SwiftUI.View {
-			// FIXME: Strings
+			// FIXME: future strings
 			AppTextField(
 				primaryHeading: "Contact's Radix account address",
 				placeholder: "account_tdx_c_1pyezed90u5qtagu2247rqw7f04vc7wnhsfjz4nf6vuvqtj9kcq",
@@ -136,7 +136,7 @@ extension ManageTrustedContactFactorSource {
 		private func emailField(
 			with viewStore: ViewStoreOf<ManageTrustedContactFactorSource>
 		) -> some SwiftUI.View {
-			// FIXME: Strings
+			// FIXME: future strings
 			AppTextField(
 				primaryHeading: "Contact's email address",
 				placeholder: "my.friend@best.ever",
@@ -154,7 +154,7 @@ extension ManageTrustedContactFactorSource {
 		private func nameField(
 			with viewStore: ViewStoreOf<ManageTrustedContactFactorSource>
 		) -> some SwiftUI.View {
-			// FIXME: Strings
+			// FIXME: future strings
 			AppTextField(
 				primaryHeading: "Contact's name",
 				placeholder: "Jane Doe",
@@ -179,7 +179,7 @@ extension ManageTrustedContactFactorSource {
 					))
 				},
 				control: { action in
-					// FIXME: String
+					// FIXME: future strings
 					Button("Continue", action: action)
 						.buttonStyle(.primaryRectangular)
 				}

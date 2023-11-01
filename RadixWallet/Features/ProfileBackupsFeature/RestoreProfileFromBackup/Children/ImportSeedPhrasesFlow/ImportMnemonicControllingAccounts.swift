@@ -103,15 +103,7 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 					mnemonicWithPassphrase: mnemonicWithPassphrase
 				)
 				guard factorSourceID == state.entitiesControlledByFactorSource.factorSourceID else {
-					// FIXME: Strings
-					overlayWindowClient.scheduleHUD(.init(
-						text: "Wrong mnemmonic",
-						icon: .init(
-							kind: .system("exclamationmark.octagon"),
-							foregroundColor: Color.app.red1
-						)
-					)
-					)
+					overlayWindowClient.scheduleHUD(.wrongMnemonic)
 					return .none
 				}
 
@@ -123,7 +115,6 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 
 			case .persistedMnemonicInKeychainOnly, .doneViewing, .persistedNewFactorSourceInProfile:
 				preconditionFailure("Incorrect implementation")
-				return .none
 			}
 
 		default:
@@ -183,7 +174,16 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 struct MnemonicDidNotValidateAllAccounts: LocalizedError {
 	init() {}
 	var errorDescription: String? {
-		// FIXME: Strings
-		"Invalid seed phrase"
+		L10n.ImportMnemonic.failedToValidateAllAccounts
 	}
+}
+
+extension OverlayWindowClient.Item.HUD {
+	fileprivate static let wrongMnemonic = Self(
+		text: L10n.ImportMnemonic.wrongMnemonicHUD,
+		icon: .init(
+			kind: .system("exclamationmark.octagon"),
+			foregroundColor: Color.app.red1
+		)
+	)
 }

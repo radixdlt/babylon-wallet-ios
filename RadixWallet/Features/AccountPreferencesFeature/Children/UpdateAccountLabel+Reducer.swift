@@ -41,7 +41,7 @@ public struct UpdateAccountLabel: FeatureReducer, Sendable {
 			return .run { [account = state.account] send in
 				do {
 					try await accountsClient.updateAccount(account)
-					overlayWindowClient.scheduleHUD(.updated)
+					overlayWindowClient.scheduleHUD(.updatedAccount)
 					await send(.delegate(.accountLabelUpdated))
 				} catch {
 					errorQueue.schedule(error)
@@ -49,4 +49,8 @@ public struct UpdateAccountLabel: FeatureReducer, Sendable {
 			}
 		}
 	}
+}
+
+extension OverlayWindowClient.Item.HUD {
+	static let updatedAccount = Self(text: L10n.AccountSettings.updatedAccountHUDMessage)
 }

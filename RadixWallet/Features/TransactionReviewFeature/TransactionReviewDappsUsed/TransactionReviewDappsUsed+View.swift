@@ -13,7 +13,7 @@ extension TransactionReviewDappsUsed.State {
 extension TransactionReview.DappEntity {
 	fileprivate var knownDapp: TransactionReviewDappsUsed.View.DappView.ViewState {
 		.known(
-			name: metadata.name ?? "Unnamed dApp", // FIXME: Strings
+			name: metadata.name ?? L10n.TransactionReview.unnamedDapp,
 			thumbnail: metadata.iconURL,
 			id: id
 		)

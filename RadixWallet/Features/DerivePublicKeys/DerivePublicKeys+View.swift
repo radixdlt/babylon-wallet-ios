@@ -32,8 +32,7 @@ extension DerivePublicKeys {
 
 					Text(
 						viewStore.entityKind == .identity
-							// FIXME: Strings - L10n.CreatePersona.DerivePublicKeys.title
-							? "Creating Persona"
+							? L10n.CreatePersona.DerivePublicKeys.title
 							: L10n.CreateAccount.DerivePublicKeys.title
 					)
 					.textStyle(.sheetTitle)

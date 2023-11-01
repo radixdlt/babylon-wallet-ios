@@ -122,7 +122,7 @@ extension FactorsForRole {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				ScrollView {
 					VStack(alignment: .leading, spacing: .large1) {
-						// FIXME: strings
+						// FIXME: future strings
 						FactorsListView(
 							title: "Admin",
 							subtitle: "Factors which can be used standalone",
@@ -133,7 +133,7 @@ extension FactorsForRole {
 							}
 						)
 
-						// FIXME: strings
+						// FIXME: future strings
 						FactorsListView(
 							title: "Threshold",
 							subtitle: viewStore.unvalidatedThresholdAsInt.map {
@@ -146,7 +146,7 @@ extension FactorsForRole {
 							}
 						)
 
-						// FIXME: strings
+						// FIXME: future strings
 						AppTextField(
 							primaryHeading: "Threshold",
 							placeholder: "Threshold",
@@ -165,7 +165,7 @@ extension FactorsForRole {
 						viewStore.roleWithFactors,
 						forAction: { viewStore.send(.confirmedRoleWithFactors($0)) }
 					) { action in
-						// FIXME: strings
+						// FIXME: future strings
 						Button("Confirm", action: action)
 							.buttonStyle(.primaryRectangular)
 						if let validationErrorMsg = viewStore.validationErrorMsg {
@@ -243,13 +243,13 @@ public struct FactorsListView: SwiftUI.View {
 						Spacer(minLength: 0)
 
 						VStack(alignment: .leading) {
-							// FIXME: strings
+							// FIXME: future strings
 							HPair(
 								label: "Added",
 								item: formatDate(factor.addedOn)
 							)
 
-							// FIXME: strings
+							// FIXME: future strings
 							HPair(
 								label: "Last used",
 								item: formatDate(factor.lastUsedOn)
@@ -269,7 +269,7 @@ public struct FactorsListView: SwiftUI.View {
 				}
 			}
 
-			// FIXME: strings
+			// FIXME: future strings
 			Button("Add \(title) factor", action: addFactorAction)
 				.buttonStyle(.secondaryRectangular)
 		}

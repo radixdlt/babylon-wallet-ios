@@ -145,23 +145,23 @@ public struct FactorsForRole<R: RoleProtocol>: Sendable, FeatureReducer {
 			if let existing = state.existing, roleWithFactors.isLessSafe(than: existing) {
 				state.destination = .existingRoleMadeLessSafeConfirmationDialog(
 					.init(
-						// FIXME: strings
+						// FIXME: future strings
 						title: { TextState("Less safe") },
 						actions: {
 							ButtonState(role: .destructive, action: .makeRoleLessSafe(with: roleWithFactors)) {
-								// FIXME: strings
+								// FIXME: future strings
 								TextState("Decrease security")
 							}
 							ButtonState(role: .none, action: .discardChanges) {
 								TextState(L10n.AccountSettings.ThirdPartyDeposits.discardChanges)
 							}
 							ButtonState(role: .cancel, action: .cancel) {
-								// FIXME: strings
+								// FIXME: future strings
 								TextState(L10n.Common.cancel)
 							}
 						},
 						message: {
-							// FIXME: strings
+							// FIXME: future strings
 							TextState("You are about to decrease the level of security you had setup by removing factors. Are you sure you want to do that?")
 						}
 					)

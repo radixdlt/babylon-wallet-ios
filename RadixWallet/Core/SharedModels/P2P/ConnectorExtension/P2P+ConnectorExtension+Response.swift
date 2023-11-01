@@ -34,9 +34,9 @@ extension P2P.ConnectorExtension.Response.LedgerHardwareWallet {
 			public var userFacingErrorDescription: String {
 				switch self {
 				case .generic:
-					"Unknown" // FIXME: Strings
+					L10n.Error.TransactionFailure.unknown
 				case .blindSigningNotEnabledButRequired:
-					"Blind signing not enabled but required" // FIXME: Strings
+					L10n.Error.TransactionFailure.blindSigningNotEnabledButRequired
 				}
 			}
 		}

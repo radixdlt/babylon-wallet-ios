@@ -27,7 +27,7 @@ extension DebugSettingsCoordinator.View {
 				}
 			}
 			.padding(.bottom, .large3)
-			.navigationTitle("Debug Settings") // FIXME: Strings - L10n.Settings.DebugSettingsCoordinator.title
+			.navigationTitle("Debug Settings")
 			.navigationBarTitleColor(.app.gray1)
 			.navigationBarTitleDisplayMode(.inline)
 			.navigationBarInlineTitleFont(.app.secondaryHeader)

@@ -19,7 +19,7 @@ extension DefaultDepositGuarantees {
 extension DefaultDepositGuarantees.View {
 	public var body: some View {
 		VStack(spacing: .medium1) {
-			Text("Set the guaranteed minimum deposit to be applied whenever a deposit in a transaction can only be estimated.\n\nYou can always change the guarantee from this default in each transaction.") // FIXME: Strings
+			Text(L10n.Settings.DepositGuarantees.text)
 				.textStyle(.body1HighImportance)
 				.foregroundColor(.app.gray2)
 				.allowsHitTesting(false)
@@ -40,6 +40,6 @@ extension DefaultDepositGuarantees.View {
 					focused = false
 				}
 		}
-		.navigationTitle("Deposit Guarantees") // FIXME: Strings - title
+		.navigationTitle(L10n.Settings.DepositGuarantees.title)
 	}
 }

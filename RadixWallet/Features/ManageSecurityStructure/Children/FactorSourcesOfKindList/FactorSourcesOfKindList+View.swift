@@ -56,7 +56,7 @@ public extension FactorSourcesOfKindList {
 					VStack(spacing: 0) {
 						Group {
 							if viewStore.mode == .onlyPresentList {
-								// FIXME: Strings
+								// FIXME: future strings
 								Text("Factors")
 									.textStyle(.body1HighImportance)
 									.foregroundColor(.app.gray2)
@@ -80,7 +80,7 @@ public extension FactorSourcesOfKindList {
 							.padding(.bottom, .medium1)
 
 						if viewStore.canAddNew {
-							// FIXME: Strings
+							// FIXME: future strings
 							Button("Add new \(viewStore.kind.display)") {
 								viewStore.send(.addNewFactorSourceButtonTapped)
 							}
@@ -99,7 +99,7 @@ public extension FactorSourcesOfKindList {
 						viewStore.selectedFactorSource,
 						forAction: { viewStore.send(.confirmedFactorSource($0)) }
 					) { action in
-						// FIXME: Strings
+						// FIXME: future strings
 						Button("Continue", action: action)
 							.buttonStyle(.primaryRectangular)
 							.padding(.bottom, .medium1)
@@ -156,7 +156,7 @@ extension FactorSource {
 		case let .ledger(factor): .init(factor.hint.name)
 		case let .offDeviceMnemonic(factor): .init(factor.hint.label.rawValue)
 		case let .trustedContact(factor): .init(factor.contact.name.rawValue)
-		case let .securityQuestions(factor): .init(stringLiteral: "*`\"\(factor.sealedMnemonic.securityQuestions.first.question.rawValue)?\"`* **+\(factor.sealedMnemonic.securityQuestions.count - 1) more questions**.")
+		case let .securityQuestions(factor): .init(stringLiteral: "*`\"\(factor.sealedMnemonic.securityQuestions.first.question.rawValue)?\"`* **+\(factor.sealedMnemonic.securityQuestions.count - 1) more questions**.") // FIXME: future strings
 		}
 	}
 }

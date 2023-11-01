@@ -49,7 +49,7 @@ extension AccountSecurity.View {
 			.onAppear {
 				store.send(.view(.appeared))
 			}
-			.navigationTitle("Account Security") // FIXME: Strings - L10n.Settings.AccountSecurity.title
+			.navigationTitle(L10n.Settings.accountSecurityAndSettings)
 			.navigationBarTitleColor(.app.gray1)
 			.navigationBarTitleDisplayMode(.inline)
 			.navigationBarInlineTitleFont(.app.secondaryHeader)
@@ -77,8 +77,8 @@ extension AccountSecurity.View {
 				action: .ledgerHardwareWalletsButtonTapped
 			),
 			.init(
-				title: "Deposit Guarantees", // FIXME: Strings - L10n.Settings.depositGuarantees
-				subtitle: "Set your default guaranteed minimum for estimated deposits", // FIXME: Strings
+				title: L10n.Settings.DepositGuarantees.title,
+				subtitle: L10n.Settings.DepositGuarantees.subtitle,
 				icon: .asset(AssetResource.depositGuarantees),
 				action: .defaultDepositGuaranteeButtonTapped
 			),

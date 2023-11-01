@@ -81,7 +81,7 @@ struct FailedToFindLedger: LocalizedError {
 		#if DEBUG
 		"Failed to find ledger with ID: \(factorSourceID)"
 		#else
-		"Failed to find ledger" // FIXME: Strings
+		L10n.Error.TransactionFailure.failedToFindLedger
 		#endif
 	}
 }
@@ -98,7 +98,7 @@ extension LedgerHardwareWalletClient {
 				switch outcome {
 				case .verifiedSame:
 					overlayWindowClient.scheduleHUD(.init(
-						text: "Address verified",
+						text: L10n.LedgerHardwareDevices.Verification.addressVerified,
 						icon: .init(
 							kind: .system("checkmark.seal.fill"),
 							foregroundColor: Color.app.green1
@@ -108,9 +108,9 @@ extension LedgerHardwareWalletClient {
 				case let .mismatch(discrepancy):
 					let reason = switch discrepancy {
 					case .addressMismatch:
-						"Verify address mismatched addresses" // FIXME: Strings
+						L10n.LedgerHardwareDevices.Verification.mismatch
 					case .publicKeyMismatch:
-						"Verify address bad response" // FIXME: Strings
+						L10n.LedgerHardwareDevices.Verification.badResponse
 					}
 					loggerGlobal.critical("Discrepancy invalid ledger account, reason: \(reason)")
 					overlayWindowClient.scheduleHUD(.init(
@@ -125,7 +125,7 @@ extension LedgerHardwareWalletClient {
 			} catch {
 				loggerGlobal.error("Verify address request failed, error: \(error)")
 				overlayWindowClient.scheduleHUD(.init(
-					text: "Verify address request failed", // FIXME: Strings
+					text: L10n.LedgerHardwareDevices.Verification.requestFailed,
 					icon: .init(
 						kind: .asset(AssetResource.error),
 						foregroundColor: Color.app.red1
