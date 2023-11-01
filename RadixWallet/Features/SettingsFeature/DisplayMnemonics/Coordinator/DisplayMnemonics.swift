@@ -3,6 +3,7 @@ import SwiftUI
 
 // FIXME: Refactor ImportMnemonic
 public typealias ExportMnemonic = ImportMnemonic
+public typealias DisplayMnemonic = ExportMnemonic
 
 // MARK: - DisplayMnemonics
 public struct DisplayMnemonics: Sendable, FeatureReducer {
@@ -42,10 +43,7 @@ public struct DisplayMnemonics: Sendable, FeatureReducer {
 		public init() {}
 
 		public var body: some ReducerOf<Self> {
-			Scope(state: /State.displayMnemonic, action: /Action.displayMnemonic) {
-				DisplayMnemonic()
-			}
-
+			Scope(state: /State.displayMnemonic, action: /Action.importMnemonics) {}
 			Scope(state: /State.importMnemonics, action: /Action.importMnemonics) {
 				ImportMnemonicsFlowCoordinator()
 			}
@@ -117,21 +115,20 @@ public struct DisplayMnemonics: Sendable, FeatureReducer {
 			let deviceFactorSource = child.deviceFactorSource
 			switch delegateAction {
 			case .displayMnemonic:
-				// FIXME: Auto close after 2 minutes?
-				state.destination = .displayMnemonic(.init(deviceFactorSource: deviceFactorSource))
-				return .none
+				return exportMnemonic(
+					factorSourceID: deviceFactorSource.id
+				) {
+					state.destination = .displayMnemonic(.export($0))
+				}
+
 			case .importMissingMnemonic:
 				state.destination = .importMnemonics(.init())
 				return .none
 			}
 
-		case .destination(.presented(.displayMnemonic(.delegate(.failedToLoad)))):
-			state.destination = nil
-			return .none
-
-		case let .destination(.presented(.displayMnemonic(.delegate(.doneViewing(isBackedUp, factorSourceID))))):
-			if isBackedUp {
-				state.deviceFactorSources[id: factorSourceID.embed()]?.backedUp()
+		case let .destination(.presented(.displayMnemonic(.delegate(.doneViewing(idOfBackedUpFactorSource))))):
+			if let idOfBackedUpFactorSource {
+				state.deviceFactorSources[id: idOfBackedUpFactorSource]?.backedUp()
 			}
 			state.destination = nil
 

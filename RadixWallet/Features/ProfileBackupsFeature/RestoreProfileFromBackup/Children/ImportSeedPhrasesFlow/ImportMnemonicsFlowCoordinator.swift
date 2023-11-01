@@ -70,7 +70,7 @@ public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 	}
 
 	public struct SkippedOrImported: Sendable, Hashable {
-		public let factorSourceID: FactorSourceID
+		public let factorSourceID: FactorSource.ID.FromHash
 	}
 
 	@Dependency(\.deviceFactorSourceClient) var deviceFactorSourceClient
@@ -136,8 +136,8 @@ public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 		case let .destination(.presented(.importMnemonicControllingAccounts(.delegate(delegateAction)))):
 			switch delegateAction {
 			case let .skippedMnemonic(factorSourceIDHash):
-				state.skipped.append(.init(factorSourceID: factorSourceIDHash.embed()))
-				return finishedWith(factorSourceID: factorSourceIDHash.embed(), state: &state)
+				state.skipped.append(.init(factorSourceID: factorSourceIDHash))
+				return finishedWith(factorSourceID: factorSourceIDHash, state: &state)
 
 			case let .persistedMnemonicInKeychain(factorSourceID):
 				overlayWindowClient.scheduleHUD(.seedPhraseImported)
@@ -168,8 +168,8 @@ public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 		}
 	}
 
-	private func finishedWith(factorSourceID: FactorSourceID, state: inout State) -> Effect<Action> {
-		state.mnemonicsLeftToImport.removeAll(where: { $0.factorSourceID.embed() == factorSourceID })
+	private func finishedWith(factorSourceID: FactorSourceID.FromHash, state: inout State) -> Effect<Action> {
+		state.mnemonicsLeftToImport.removeAll(where: { $0.factorSourceID == factorSourceID })
 		return nextMnemonicIfNeeded(state: &state)
 	}
 

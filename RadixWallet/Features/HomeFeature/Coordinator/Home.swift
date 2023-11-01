@@ -224,7 +224,8 @@ public struct Home: Sendable, FeatureReducer {
 	}
 
 	private func importMnemonics(state: inout State) -> Effect<Action> {
-		.none
+		state.destination = .importMnemonics(.init())
+		return .none
 	}
 
 	private func exportMnemonic(
@@ -254,11 +255,7 @@ extension FeatureReducer {
 		return exportMnemonic(
 			factorSourceID: txSigningFI.factorSourceID,
 			notifyIfMissing: notifyIfMissing,
-			onSuccess: onSuccess,
-			onErrorAction: { error in
-				loggerGlobal.error("Failed to load mnemonic to export: \(error)")
-				return .none
-			}
+			onSuccess: onSuccess
 		)
 	}
 
@@ -266,7 +263,9 @@ extension FeatureReducer {
 		factorSourceID: FactorSource.ID.FromHash,
 		notifyIfMissing: Bool = true,
 		onSuccess: (SimplePrivateFactorSource) -> Void,
-		onErrorAction: (Swift.Error) -> Effect<Action>
+		onError: (Swift.Error) -> Void = { error in
+			loggerGlobal.error("Failed to load mnemonic to export: \(error)")
+		}
 	) -> Effect<Action> {
 		@Dependency(\.secureStorageClient) var secureStorageClient
 		do {
@@ -275,7 +274,8 @@ extension FeatureReducer {
 				purpose: .displaySeedPhrase,
 				notifyIfMissing: notifyIfMissing
 			) else {
-				return onErrorAction(FailedToFindFactorSource())
+				onError(FailedToFindFactorSource())
+				return .none
 			}
 
 			onSuccess(
@@ -285,10 +285,10 @@ extension FeatureReducer {
 				)
 			)
 
-			return .none
 		} catch {
-			return onErrorAction(error)
+			onError(error)
 		}
+		return .none
 	}
 }
 

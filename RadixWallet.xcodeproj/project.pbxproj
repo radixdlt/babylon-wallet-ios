@@ -217,8 +217,6 @@
 		48CFC3072ADC10D900E77A5C /* DebugUserDefaultsContents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBDA12ADC10D800E77A5C /* DebugUserDefaultsContents.swift */; };
 		48CFC3082ADC10D900E77A5C /* DisplayMnemonics+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBDA42ADC10D800E77A5C /* DisplayMnemonics+View.swift */; };
 		48CFC3092ADC10D900E77A5C /* DisplayMnemonics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBDA52ADC10D800E77A5C /* DisplayMnemonics.swift */; };
-		48CFC30A2ADC10D900E77A5C /* DisplayMnemonic.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBDA72ADC10D800E77A5C /* DisplayMnemonic.swift */; };
-		48CFC30B2ADC10D900E77A5C /* DisplayMnemonic+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBDA82ADC10D800E77A5C /* DisplayMnemonic+View.swift */; };
 		48CFC30C2ADC10D900E77A5C /* Settings+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBDA92ADC10D800E77A5C /* Settings+View.swift */; };
 		48CFC30D2ADC10D900E77A5C /* AppSettings+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBDAB2ADC10D800E77A5C /* AppSettings+Reducer.swift */; };
 		48CFC30E2ADC10D900E77A5C /* AppSettings+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBDAC2ADC10D800E77A5C /* AppSettings+View.swift */; };
@@ -1486,8 +1484,6 @@
 		48CFBDA12ADC10D800E77A5C /* DebugUserDefaultsContents.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DebugUserDefaultsContents.swift; sourceTree = "<group>"; };
 		48CFBDA42ADC10D800E77A5C /* DisplayMnemonics+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "DisplayMnemonics+View.swift"; sourceTree = "<group>"; };
 		48CFBDA52ADC10D800E77A5C /* DisplayMnemonics.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DisplayMnemonics.swift; sourceTree = "<group>"; };
-		48CFBDA72ADC10D800E77A5C /* DisplayMnemonic.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DisplayMnemonic.swift; sourceTree = "<group>"; };
-		48CFBDA82ADC10D800E77A5C /* DisplayMnemonic+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "DisplayMnemonic+View.swift"; sourceTree = "<group>"; };
 		48CFBDA92ADC10D800E77A5C /* Settings+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Settings+View.swift"; sourceTree = "<group>"; };
 		48CFBDAB2ADC10D800E77A5C /* AppSettings+Reducer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "AppSettings+Reducer.swift"; sourceTree = "<group>"; };
 		48CFBDAC2ADC10D800E77A5C /* AppSettings+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "AppSettings+View.swift"; sourceTree = "<group>"; };
@@ -3751,7 +3747,6 @@
 			isa = PBXGroup;
 			children = (
 				48CFBDA32ADC10D800E77A5C /* Coordinator */,
-				48CFBDA62ADC10D800E77A5C /* Children */,
 			);
 			path = DisplayMnemonics;
 			sourceTree = "<group>";
@@ -3763,15 +3758,6 @@
 				48CFBDA52ADC10D800E77A5C /* DisplayMnemonics.swift */,
 			);
 			path = Coordinator;
-			sourceTree = "<group>";
-		};
-		48CFBDA62ADC10D800E77A5C /* Children */ = {
-			isa = PBXGroup;
-			children = (
-				48CFBDA72ADC10D800E77A5C /* DisplayMnemonic.swift */,
-				48CFBDA82ADC10D800E77A5C /* DisplayMnemonic+View.swift */,
-			);
-			path = Children;
 			sourceTree = "<group>";
 		};
 		48CFBDAA2ADC10D800E77A5C /* AppSettings */ = {
@@ -7692,7 +7678,6 @@
 				48CFC58B2ADC10DA00E77A5C /* SubmitTransactionClient+Test.swift in Sources */,
 				48CFC5642ADC10DA00E77A5C /* MetadataU32ArrayValue.swift in Sources */,
 				48CFC2DA2ADC10D900E77A5C /* ManageSecurityStructureCoordinator+View.swift in Sources */,
-				48CFC30A2ADC10D900E77A5C /* DisplayMnemonic.swift in Sources */,
 				48CFC3BB2ADC10D900E77A5C /* Encoding.swift in Sources */,
 				48CFC3082ADC10D900E77A5C /* DisplayMnemonics+View.swift in Sources */,
 				48CFC4492ADC10DA00E77A5C /* AuthorizedDappsClient+Test.swift in Sources */,
@@ -8151,7 +8136,6 @@
 				48CFC2D22ADC10D900E77A5C /* AccountDetails+View.swift in Sources */,
 				48CFC3EF2ADC10D900E77A5C /* DataChannelClient.swift in Sources */,
 				48CFC2A32ADC10D900E77A5C /* PersonaList+View.swift in Sources */,
-				48CFC30B2ADC10D900E77A5C /* DisplayMnemonic+View.swift in Sources */,
 				48CFC2842ADC10D900E77A5C /* TransactionReview.swift in Sources */,
 				48CFC5142ADC10DA00E77A5C /* MetadataNonFungibleLocalIdArrayValue.swift in Sources */,
 				48CFC4782ADC10DA00E77A5C /* LocalAuthenticationConfig.swift in Sources */,

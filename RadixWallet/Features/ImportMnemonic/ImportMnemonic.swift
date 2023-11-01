@@ -271,7 +271,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 		case persistedNewFactorSourceInProfile(FactorSource)
 		case persistedMnemonicInKeychainOnly(MnemonicWithPassphrase, FactorSourceID.FromHash)
 		case notPersisted(MnemonicWithPassphrase)
-		case doneViewing(markedMnemonicAsBackedUp: Bool? = nil) // `nil` means it was already marked as backed up
+		case doneViewing(idOfBackedUpFactorSource: FactorSource.ID.FromHash?) // `nil` means it was already marked as backed up
 	}
 
 	public struct Destinations: Sendable, Reducer {
@@ -399,7 +399,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 		case let .destination(.presented(.markMnemonicAsBackedUp(.userHaveBackedUp(factorSourceID)))):
 			return .run { send in
 				try userDefaultsClient.addFactorSourceIDOfBackedUpMnemonic(factorSourceID)
-				await send(.delegate(.doneViewing(markedMnemonicAsBackedUp: true)))
+				await send(.delegate(.doneViewing(idOfBackedUpFactorSource: factorSourceID)))
 			} catch: { error, _ in
 				loggerGlobal.error("Failed to save mnemonic as backed up")
 				errorQueue.schedule(error)
@@ -407,7 +407,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 
 		case .destination(.presented(.markMnemonicAsBackedUp(.userHaveNotBackedUp))):
 			loggerGlobal.notice("User have not backed up")
-			return .send(.delegate(.doneViewing(markedMnemonicAsBackedUp: false)))
+			return .send(.delegate(.doneViewing(idOfBackedUpFactorSource: nil)))
 
 		case .destination(.presented(.onContinueWarning(.buttonTapped))):
 			guard let mnemonic = state.mnemonic else {
@@ -552,7 +552,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 
 		let listOfBackedUpMnemonics = userDefaultsClient.getFactorSourceIDOfBackedUpMnemonics()
 		if listOfBackedUpMnemonics.contains(factorSourceID) {
-			return .send(.delegate(.doneViewing(markedMnemonicAsBackedUp: nil))) // user has already marked this mnemonic as "backed up"
+			return .send(.delegate(.doneViewing(idOfBackedUpFactorSource: nil))) // user has already marked this mnemonic as "backed up"
 		} else {
 			state.destination = .askUserIfSheHasBackedUpMnemonic(factorSourceID)
 			return .none

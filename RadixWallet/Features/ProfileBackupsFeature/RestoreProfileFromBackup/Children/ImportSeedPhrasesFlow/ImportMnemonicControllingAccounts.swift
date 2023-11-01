@@ -29,7 +29,7 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
-		case persistedMnemonicInKeychain(FactorSource.ID)
+		case persistedMnemonicInKeychain(FactorSourceID.FromHash)
 		case skippedMnemonic(FactorSourceID.FromHash)
 		case failedToSaveInKeychain(FactorSourceID.FromHash)
 	}
@@ -142,7 +142,7 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 					privateHDFactorSource
 				)
 
-				await send(.delegate(.persistedMnemonicInKeychain(privateHDFactorSource.factorSource.id.embed())))
+				await send(.delegate(.persistedMnemonicInKeychain(privateHDFactorSource.factorSource.id)))
 
 			} catch: { error, send in
 				errorQueue.schedule(error)
