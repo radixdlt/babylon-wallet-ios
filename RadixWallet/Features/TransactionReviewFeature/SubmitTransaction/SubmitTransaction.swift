@@ -63,6 +63,7 @@ public struct SubmitTransaction: Sendable, FeatureReducer {
 
 	@Dependency(\.submitTXClient) var submitTXClient
 	@Dependency(\.errorQueue) var errorQueue
+	@Dependency(\.accountPortfoliosClient) var accountPortfoliosClient
 
 	public init() {}
 
@@ -156,54 +157,7 @@ public struct SubmitTransaction: Sendable, FeatureReducer {
 
 	private func transactionCommittedSuccesfully(_ state: State) -> Effect<Action> {
 		// TODO: Could probably be moved in other place. TransactionClient? AccountPortfolio?
-		Task.detached { [intent = state.notarizedTX.intent] in
-			@Dependency(\.transactionClient) var transactionClient
-			@Dependency(\.accountPortfoliosClient) var accountPortfoliosClient
-			@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
-			@Dependency(\.cacheClient) var cacheClient
-
-			let changedAccounts: [Profile.Network.Account.EntityAddress]?
-			let resourceAddressesToRefresh: [Address]?
-			do {
-				let manifest = intent.manifest()
-
-				let involvedAccounts = try await transactionClient.myInvolvedEntities(manifest)
-				changedAccounts = involvedAccounts.accountsDepositedInto
-					.union(involvedAccounts.accountsWithdrawnFrom)
-					.map(\.address)
-
-				let involvedAddresses = manifest.extractAddresses()
-				/// Refresh the resources if an operation on resource pool is involved,
-				/// reason being that contributing or withdrawing from a resource pool modifies the totalSupply
-				if involvedAddresses.contains(where: \.key.isResourcePool) {
-					/// A little bit too aggressive, as any other resource will also be refreshed.
-					/// But at this stage we cannot determine(without making additional calls) the pool unit related fungible resource
-					resourceAddressesToRefresh = involvedAddresses
-						.filter { $0.key == .globalFungibleResourceManager || $0.key.isResourcePool }
-						.values
-						.flatMap(identity)
-						.compactMap { try? $0.asSpecific() }
-				} else {
-					resourceAddressesToRefresh = nil
-				}
-			} catch {
-				loggerGlobal.warning("Could get transactionClient.myInvolvedEntities: \(error.localizedDescription)")
-				changedAccounts = nil
-				resourceAddressesToRefresh = nil
-			}
-
-			if let resourceAddressesToRefresh {
-				resourceAddressesToRefresh.forEach {
-					cacheClient.removeFile(.onLedgerEntity(.resource($0.asGeneral)))
-				}
-			}
-
-			if let changedAccounts {
-				// FIXME: Ideally we should only have to call the cacheClient here
-				// cacheClient.clearCacheForAccounts(Set(changedAccounts))
-				_ = try await accountPortfoliosClient.fetchAccountPortfolios(changedAccounts, true)
-			}
-		}
+		accountPortfoliosClient.updateAfterCommittedTransaction(state.notarizedTX.intent)
 		return .send(.delegate(.committedSuccessfully(state.notarizedTX.txID)))
 	}
 }

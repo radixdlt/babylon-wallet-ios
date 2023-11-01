@@ -16,20 +16,26 @@ extension SubmitTransactionClient: DependencyKey {
 				return txStatusResponse
 			}
 
+			var delayDuration = PollStrategy.default.sleepDuration
+
 			while true {
 				guard !Task.isCancelled else {
 					throw CancellationError()
 				}
 
+				// Increase delay by 1 second on subsequent calls
+				delayDuration += 1
+
 				guard let transactionStatusResponse = try? await pollTransactionStatus(),
 				      let transactionStatus = transactionStatusResponse.knownPayloads.first?.payloadStatus
 				else {
+					try? await clock.sleep(for: .seconds(delayDuration))
 					continue
 				}
 
 				switch transactionStatus {
 				case .unknown, .commitPendingOutcomeUnknown, .pending:
-					try? await clock.sleep(for: .seconds(PollStrategy.default.sleepDuration))
+					try? await clock.sleep(for: .seconds(delayDuration))
 					continue
 				case .committedSuccess:
 					return
