@@ -822,7 +822,7 @@ Only the **current configuration** of your wallet is backed up with each manual 
 "customizeNetworkFees_totalFee_info" = "(maximum to lock)";
 "customizeNetworkFees_advancedMode_title" = "Advanced Customize Fees";
 "customizeNetworkFees_normalMode_subtitle" = "Choose what account to pay the transaction fee from, or add a up your transaction if necessary.";
-"customizeNetworkFees_advancedMode_subtitle" = "Fully customize fee payment for this transaction. Not ess you are a developer or advanced user.";
+"customizeNetworkFees_advancedMode_subtitle" = "Fully customize fee payment for this transaction. Not recomended unless you are a developer or advanced user.";
 "customizeNetworkFees_payFeeFrom" = "Pay fee from";
 "customizeNetworkFees_changeButtonTitle" = "Change";
 "customizeNetworkFees_noneRequired" = "None required";
