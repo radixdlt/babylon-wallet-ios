@@ -43,7 +43,7 @@ extension NewConnection {
 						}
 					}
 				}
-				.toolbar {
+				.safeToolbar {
 					ToolbarItem(placement: .primaryAction) {
 						CloseButton {
 							store.send(.view(.closeButtonTapped))

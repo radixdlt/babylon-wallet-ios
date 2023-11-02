@@ -167,7 +167,7 @@ extension ImportMnemonic {
 						footer(with: viewStore)
 					}
 					.navigationBarBackButtonHidden() // need to be able to hook "back" button press
-					.toolbar {
+					.safeToolbar {
 						if viewStore.showBackButton {
 							ToolbarItem(placement: .navigationBarLeading) {
 								BackButton {

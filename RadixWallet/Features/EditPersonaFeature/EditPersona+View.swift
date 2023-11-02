@@ -103,7 +103,7 @@ extension EditPersona {
 					}
 					.navigationTitle(viewStore.personaLabel)
 					.navigationBarTitleDisplayMode(.inline)
-					.toolbar {
+					.safeToolbar {
 						ToolbarItem(placement: .primaryAction) {
 							CloseButton { viewStore.send(.closeButtonTapped) }
 						}

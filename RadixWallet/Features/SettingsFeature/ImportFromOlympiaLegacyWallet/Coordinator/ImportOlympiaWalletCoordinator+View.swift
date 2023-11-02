@@ -15,7 +15,7 @@ extension ImportOlympiaWalletCoordinator {
 			NavigationStackStore(store.scope(state: \.path, action: { .child(.path($0)) })) {
 				let scanQRStore = store.scope(state: \.scanQR, action: { .child(.scanQR($0)) })
 				ScanMultipleOlympiaQRCodes.View(store: scanQRStore)
-					.toolbar {
+					.safeToolbar {
 						ToolbarItem(placement: .primaryAction) {
 							CloseButton {
 								store.send(.view(.closeButtonTapped))

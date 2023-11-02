@@ -79,7 +79,7 @@ extension TransactionReview {
 					.controlState(viewStore.viewControlState)
 					.background(.white)
 					.animation(.easeInOut, value: viewStore.isExpandedDappUsed)
-					.toolbar {
+					.safeToolbar {
 						ToolbarItem(placement: .automatic) {
 							if viewStore.canToggleViewMode {
 								Button(asset: AssetResource.code) {

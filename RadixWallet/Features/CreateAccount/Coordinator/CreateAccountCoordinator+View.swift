@@ -30,7 +30,7 @@ extension CreateAccountCoordinator {
 						store.scope(state: \.root, action: { .child(.root($0)) })
 					) {
 						destination(for: $0, shouldDisplayNavBar: viewStore.shouldDisplayNavBar)
-							.toolbar {
+							.safeToolbar {
 								if viewStore.shouldDisplayNavBar {
 									ToolbarItem(placement: .primaryAction) {
 										CloseButton {

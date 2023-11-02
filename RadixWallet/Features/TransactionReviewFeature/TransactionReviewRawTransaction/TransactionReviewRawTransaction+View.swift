@@ -18,7 +18,7 @@ extension TransactionReviewRawTransaction {
 						RawTransactionView(transaction: viewStore.transaction)
 					}
 					.navigationTitle(L10n.TransactionReview.rawTransactionTitle)
-					.toolbar {
+					.safeToolbar {
 						ToolbarItem(placement: .cancellationAction) {
 							CloseButton {
 								viewStore.send(.closeTapped)

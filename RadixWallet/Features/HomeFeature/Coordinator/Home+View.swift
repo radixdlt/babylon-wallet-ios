@@ -47,7 +47,7 @@ extension Home {
 						}
 						.padding(.bottom, .medium1)
 					}
-					.toolbar {
+					.safeToolbar {
 						ToolbarItem(placement: .navigationBarTrailing) {
 							SettingsButton(shouldShowNotification: viewStore.hasNotification) {
 								viewStore.send(.settingsButtonTapped)

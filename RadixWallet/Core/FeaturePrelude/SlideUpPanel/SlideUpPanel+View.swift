@@ -22,7 +22,7 @@ public struct WithNavigationBar<Content: View>: View {
 		NavigationStack {
 			content
 				.presentationDragIndicator(.visible)
-				.toolbar {
+				.safeToolbar {
 					ToolbarItem(placement: .primaryAction) {
 						CloseButton(action: closeAction)
 					}

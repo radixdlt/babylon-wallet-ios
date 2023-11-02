@@ -33,7 +33,7 @@ extension DappInteractionLoading {
 								action: { .view(.errorAlert($0)) }
 							)
 						)
-						.toolbar {
+						.safeToolbar {
 							ToolbarItemGroup(placement: .navigationBarLeading) {
 								CloseButton { viewStore.send(.dismissButtonTapped) }
 							}

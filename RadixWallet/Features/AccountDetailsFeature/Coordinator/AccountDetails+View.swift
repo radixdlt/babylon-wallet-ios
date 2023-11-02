@@ -71,7 +71,7 @@ extension AccountDetails {
 					viewStore.send(.task)
 				}
 				.navigationBarTitleDisplayMode(.inline)
-				.toolbar {
+				.safeToolbar {
 					ToolbarItem(placement: .navigationBarLeading) {
 						BackButton {
 							viewStore.send(.backButtonTapped)

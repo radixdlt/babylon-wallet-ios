@@ -59,7 +59,7 @@ extension DebugManageFactorSources {
 					action: DebugManageFactorSources.Destinations.Action.importMnemonic,
 					content: { importMnemonicStore in
 						NavigationView {
-							// We depend on `.toolbar` to display buttons on top of
+							// We depend on `.safeToolbar` to display buttons on top of
 							// keyboard. And they are not displayed if we are not
 							// inside a NavigationView
 							ImportMnemonic.View(store: importMnemonicStore)
