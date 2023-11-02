@@ -14,12 +14,18 @@ struct AssetBehaviorsView: View {
 					.foregroundColor(.app.gray2)
 
 				VStack(alignment: .leading, spacing: .small1) {
-					ForEach(behaviors, id: \.self) { behavior in
+					ForEach(filteredBehaviors, id: \.self) { behavior in
 						AssetBehaviorRow(behavior: behavior, isXRD: isXRD)
 					}
 				}
 			}
 			.transition(.opacity.combined(with: .scale(scale: 0.8)))
+		}
+	}
+
+	private var filteredBehaviors: [AssetBehavior] {
+		behaviors.filter {
+			!(isXRD && $0 == .informationChangeable)
 		}
 	}
 }
