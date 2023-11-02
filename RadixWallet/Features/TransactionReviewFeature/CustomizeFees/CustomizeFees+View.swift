@@ -8,39 +8,39 @@ extension CustomizeFees.State {
 			title: {
 				switch transactionFee.mode {
 				case .normal:
-					L10n.TransactionReview.CustomizeNetworkFeeSheet.NormalMode.title
+					L10n.CustomizeNetworkFees.NormalMode.title
 				case .advanced:
-					L10n.TransactionReview.CustomizeNetworkFeeSheet.AdvancedMode.title
+					L10n.CustomizeNetworkFees.AdvancedMode.title
 				}
 			}(),
 			description: {
 				switch transactionFee.mode {
 				case .normal:
-					L10n.TransactionReview.CustomizeNetworkFeeSheet.NormalMode.subtitle
+					L10n.CustomizeNetworkFees.NormalMode.subtitle
 				case .advanced:
-					L10n.TransactionReview.CustomizeNetworkFeeSheet.AdvancedMode.subtitle
+					L10n.CustomizeNetworkFees.AdvancedMode.subtitle
 				}
 			}(),
 			modeSwitchTitle: {
 				switch transactionFee.mode {
 				case .normal:
-					L10n.TransactionReview.CustomizeNetworkFeeSheet.viewAdvancedModeButtonTitle
+					L10n.CustomizeNetworkFees.viewAdvancedModeButtonTitle
 				case .advanced:
-					L10n.TransactionReview.CustomizeNetworkFeeSheet.viewNormalModeButtonTitle
+					L10n.CustomizeNetworkFees.viewNormalModeButtonTitle
 				}
 			}(),
 			feePayer: feePayerSelection.selected,
 			noFeePayerText: {
 				if transactionFee.totalFee.lockFee == .zero {
-					L10n.TransactionReview.CustomizeNetworkFeeSheet.noneRequired
+					L10n.CustomizeNetworkFees.noneRequired
 				} else {
-					L10n.TransactionReview.CustomizeNetworkFeeSheet.noAccountSelected
+					L10n.CustomizeNetworkFees.noAccountSelected
 				}
 			}(),
 			insufficientBalanceMessage: {
 				if let feePayer = feePayerSelection.selected {
 					if feePayer.xrdBalance < transactionFee.totalFee.lockFee {
-						return L10n.TransactionReview.CustomizeNetworkFeeSheet.InsufficientBalance.warning
+						return L10n.CustomizeNetworkFees.Warning.insufficientBalance
 					}
 				}
 				return nil
@@ -144,13 +144,13 @@ extension CustomizeFees {
 		func feePayerView(_ viewStore: ViewStoreOf<CustomizeFees>) -> some SwiftUI.View {
 			VStack(alignment: .leading) {
 				HStack {
-					Text(L10n.TransactionReview.CustomizeNetworkFeeSheet.payFeeFrom)
+					Text(L10n.CustomizeNetworkFees.payFeeFrom)
 						.textStyle(.body1Link)
 						.foregroundColor(.app.gray2)
 						.textCase(.uppercase)
 
 					Spacer()
-					Button(L10n.TransactionReview.CustomizeNetworkFeeSheet.changeButtonTitle) {
+					Button(L10n.CustomizeNetworkFees.changeButtonTitle) {
 						viewStore.send(.changeFeePayerTapped)
 					}
 					.textStyle(.body1StandaloneLink)
