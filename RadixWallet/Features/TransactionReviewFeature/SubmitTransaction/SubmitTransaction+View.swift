@@ -14,13 +14,13 @@ extension SubmitTransaction.State.TXStatus {
 	var display: String {
 		switch self {
 		case .failed:
-			L10n.Transaction.Status.Failed.text
+			L10n.TransactionStatus.Failed.text
 		case .permanentlyRejected:
-			L10n.Transaction.Status.Rejected.text
+			L10n.TransactionStatus.Rejected.text
 		case let .temporarilyRejected(processingTime):
-			L10n.Transaction.Status.Error.text(processingTime)
+			L10n.TransactionStatus.Error.text(processingTime)
 		case .notYetSubmitted, .submitting, .submitted:
-			L10n.Transaction.Status.Completing.text
+			L10n.TransactionStatus.Completing.text
 		case .committedSuccessfully:
 			""
 		}
@@ -53,7 +53,7 @@ extension SubmitTransaction {
 					VStack(spacing: .medium2) {
 						if viewStore.status.failed {
 							Image(asset: AssetResource.warningError)
-							Text(L10n.Transaction.Status.Failure.title)
+							Text(L10n.TransactionStatus.Failure.title)
 								.foregroundColor(.app.gray1)
 								.textStyle(.sheetTitle)
 								.multilineTextAlignment(.center)
