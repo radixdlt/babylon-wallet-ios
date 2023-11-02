@@ -25,13 +25,16 @@ public struct DisplayMnemonics: Sendable, FeatureReducer {
 	}
 
 	public enum ChildAction: Sendable, Equatable {
-		case row(id: DisplayEntitiesControlledByMnemonic.State.ID, action: DisplayEntitiesControlledByMnemonic.Action)
+		case row(
+			id: DisplayEntitiesControlledByMnemonic.State.ID,
+			action: DisplayEntitiesControlledByMnemonic.Action
+		)
 		case destination(PresentationAction<Destinations.Action>)
 	}
 
 	public struct Destinations: Sendable, Equatable, Reducer {
 		public enum State: Sendable, Hashable {
-			case displayMnemonic(DisplayMnemonic.State)
+			case displayMnemonic(ImportMnemonic.State)
 			case importMnemonics(ImportMnemonicsFlowCoordinator.State)
 		}
 

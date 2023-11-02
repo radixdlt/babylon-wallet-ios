@@ -218,6 +218,10 @@ public struct Home: Sendable, FeatureReducer {
 			state.destination = nil
 			return .none
 
+		case .destination(.presented(.importMnemonics(.delegate(.finishedEarly)))):
+			state.destination = nil
+			return .none
+
 		default:
 			return .none
 		}
