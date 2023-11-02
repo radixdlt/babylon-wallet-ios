@@ -1163,7 +1163,6 @@
 		830EA9E92AEBA7C5004C8051 /* EntitiesVisibilityClient+Test.swift in Sources */ = {isa = PBXBuildFile; fileRef = 830EA9E82AEBA7C5004C8051 /* EntitiesVisibilityClient+Test.swift */; };
 		832880692AE664C30014FBF3 /* EntityFlag.swift in Sources */ = {isa = PBXBuildFile; fileRef = 832880682AE664C30014FBF3 /* EntityFlag.swift */; };
 		8328806C2AE6725F0014FBF3 /* AccountPreferencesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8328806B2AE6725F0014FBF3 /* AccountPreferencesTests.swift */; };
-		835783892AF3E89A000E490A /* SafeToolbar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 835783882AF3E89A000E490A /* SafeToolbar.swift */; };
 		83D0B5692AE01EDE0048DCBE /* RadixEngineToolkitError+Description.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83D0B5682AE01EDE0048DCBE /* RadixEngineToolkitError+Description.swift */; };
 		83EE47502AF027DF00155F03 /* AssetTransferDepositRuleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83EE474F2AF027DF00155F03 /* AssetTransferDepositRuleTests.swift */; };
 		E62BB7632AEA856300D46DAC /* ImportMnemonicTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E62BB7622AEA856300D46DAC /* ImportMnemonicTests.swift */; };
@@ -2402,7 +2401,6 @@
 		830EA9E82AEBA7C5004C8051 /* EntitiesVisibilityClient+Test.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "EntitiesVisibilityClient+Test.swift"; sourceTree = "<group>"; };
 		832880682AE664C30014FBF3 /* EntityFlag.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntityFlag.swift; sourceTree = "<group>"; };
 		8328806B2AE6725F0014FBF3 /* AccountPreferencesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountPreferencesTests.swift; sourceTree = "<group>"; };
-		835783882AF3E89A000E490A /* SafeToolbar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafeToolbar.swift; sourceTree = "<group>"; };
 		83D0B5682AE01EDE0048DCBE /* RadixEngineToolkitError+Description.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RadixEngineToolkitError+Description.swift"; sourceTree = "<group>"; };
 		83EE474F2AF027DF00155F03 /* AssetTransferDepositRuleTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssetTransferDepositRuleTests.swift; sourceTree = "<group>"; };
 		E62BB7622AEA856300D46DAC /* ImportMnemonicTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportMnemonicTests.swift; sourceTree = "<group>"; };
@@ -5808,7 +5806,6 @@
 				48CFC1482ADC10D900E77A5C /* SmallAccountCard.swift */,
 				48CFC1492ADC10D900E77A5C /* UserDefaultsClient+AccountRecovery.swift */,
 				48CFC14A2ADC10D900E77A5C /* Relay.swift */,
-				835783882AF3E89A000E490A /* SafeToolbar.swift */,
 			);
 			path = FeaturePrelude;
 			sourceTree = "<group>";
@@ -8443,7 +8440,6 @@
 				48CFC3012ADC10D900E77A5C /* DebugSettingsCoordinator+Reducer.swift in Sources */,
 				48CFC4F42ADC10DA00E77A5C /* StateNonFungibleLocationResponse.swift in Sources */,
 				48CFC35F2ADC10D900E77A5C /* ChooseQuestions.swift in Sources */,
-				835783892AF3E89A000E490A /* SafeToolbar.swift in Sources */,
 				48CFC3952ADC10D900E77A5C /* Models+Sendable.swift in Sources */,
 				48CFC6642ADC10DB00E77A5C /* FactorSourceID.swift in Sources */,
 				48CFC4A22ADC10DA00E77A5C /* StateEntityDetailsResponseFungibleResourceDetailsAllOf.swift in Sources */,

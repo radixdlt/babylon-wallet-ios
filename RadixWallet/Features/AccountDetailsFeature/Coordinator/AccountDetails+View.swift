@@ -35,6 +35,28 @@ extension AccountDetails {
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				VStack(spacing: .zero) {
+					HStack {
+						BackButton {
+							viewStore.send(.backButtonTapped)
+						}
+						.foregroundColor(.app.white)
+
+						Spacer()
+
+						Text(viewStore.displayName)
+							.textStyle(.secondaryHeader)
+							.foregroundColor(.app.white)
+
+						Spacer()
+
+						Button(asset: AssetResource.ellipsis) {
+							viewStore.send(.preferencesButtonTapped)
+						}
+						.frame(.small)
+						.foregroundColor(.app.white)
+					}
+					.padding(.horizontal, .medium3)
+
 					AddressView(.address(.account(viewStore.accountAddress, isLedgerHWAccount: viewStore.isLedgerAccount)))
 						.foregroundColor(.app.whiteTransparent)
 						.textStyle(.body2HighImportance)
@@ -71,26 +93,6 @@ extension AccountDetails {
 					viewStore.send(.task)
 				}
 				.navigationBarTitleDisplayMode(.inline)
-				.safeToolbar {
-					ToolbarItem(placement: .navigationBarLeading) {
-						BackButton {
-							viewStore.send(.backButtonTapped)
-						}
-						.foregroundColor(.app.white)
-					}
-					ToolbarItem(placement: .principal) {
-						Text(viewStore.displayName)
-							.textStyle(.secondaryHeader)
-							.foregroundColor(.app.white)
-					}
-					ToolbarItem(placement: .navigationBarTrailing) {
-						Button(asset: AssetResource.ellipsis) {
-							viewStore.send(.preferencesButtonTapped)
-						}
-						.frame(.small)
-						.foregroundColor(.app.white)
-					}
-				}
 				.navigationDestination(
 					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
 					state: /AccountDetails.Destinations.State.preferences,
