@@ -1,6 +1,7 @@
 import SwiftUI
 
-// MARK: - safeToolbar
+// MARK: - SafeToolbar
+/// Apple crash report -> https://developer.apple.com/forums/thread/738362
 extension View {
 	/// Adds a safe toolbar to the view with custom content.
 	///
