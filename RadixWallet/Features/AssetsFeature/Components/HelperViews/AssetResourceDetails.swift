@@ -20,15 +20,17 @@ struct AssetResourceDetailsSection: View {
 		VStack(alignment: .leading, spacing: .medium1) {
 			AssetDetailsSeparator()
 
-			loadable(viewState.description,
-			         successContent: { description in
-			         	Text(description ?? "unknown")
-			         		.textStyle(.body1Regular)
-			         		.frame(maxWidth: .infinity, alignment: .leading)
-			         })
-			         .padding(.horizontal, .large2)
+			loadable(viewState.description) { description in
+				if let description {
+					Text(description)
+						.textStyle(.body1Regular)
+						.flushedLeft
 
-			AssetDetailsSeparator()
+					AssetDetailsSeparator()
+						.padding(.horizontal, -.large2)
+				}
+			}
+			.padding(.horizontal, .large2)
 
 			VStack(alignment: .leading, spacing: .medium3) {
 				KeyValueView(resourceAddress: viewState.resourceAddress)
