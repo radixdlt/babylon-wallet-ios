@@ -74,7 +74,7 @@ extension TransactionReviewGuarantees {
 						.presentationDragIndicator(.visible)
 						.presentationBackground(.blur)
 				}
-				.safeToolbar {
+				.toolbar {
 					ToolbarItem(placement: .cancellationAction) {
 						CloseButton {
 							store.send(.view(.closeTapped))

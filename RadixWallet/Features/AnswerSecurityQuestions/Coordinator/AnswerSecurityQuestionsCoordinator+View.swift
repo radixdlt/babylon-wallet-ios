@@ -16,7 +16,7 @@ extension AnswerSecurityQuestionsCoordinator {
 				store.scope(state: \.path, action: { .child(.path($0)) })
 			) {
 				path(for: self.store.scope(state: \.root, action: { .child(.root($0)) }))
-					.safeToolbar {
+					.toolbar {
 						ToolbarItem(placement: .navigationBarLeading) {
 							CloseButton {
 								store.send(.view(.closeButtonTapped))
@@ -28,7 +28,7 @@ extension AnswerSecurityQuestionsCoordinator {
 			} destination: {
 				path(for: $0)
 					.navigationBarBackButtonHidden()
-					.safeToolbar {
+					.toolbar {
 						ToolbarItem(placement: .navigationBarLeading) {
 							BackButton {
 								store.send(.view(.backButtonTapped))

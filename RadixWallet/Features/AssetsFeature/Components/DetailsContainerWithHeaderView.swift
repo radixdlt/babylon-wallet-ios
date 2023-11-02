@@ -93,7 +93,7 @@ struct DetailsContainer<Contents: View>: View {
 			.navigationBarTitleColor(.app.gray1)
 			.navigationBarTitleDisplayMode(.inline)
 			.navigationBarInlineTitleFont(.app.secondaryHeader)
-			.safeToolbar {
+			.toolbar {
 				ToolbarItem(placement: .primaryAction) {
 					CloseButton(action: closeButtonAction)
 				}

@@ -16,7 +16,7 @@ extension DappInteractionFlow {
 					store.scope(state: \.root, action: { .child(.root($0)) })
 				) {
 					destination(for: $0)
-						.safeToolbar {
+						.toolbar {
 							ToolbarItem(placement: .navigationBarLeading) {
 								CloseButton {
 									store.send(.view(.closeButtonTapped))
@@ -29,7 +29,7 @@ extension DappInteractionFlow {
 			} destination: {
 				destination(for: $0)
 					.navigationBarBackButtonHidden()
-					.safeToolbar {
+					.toolbar {
 						ToolbarItem(placement: .navigationBarLeading) {
 							BackButton {
 								store.send(.view(.backButtonTapped))

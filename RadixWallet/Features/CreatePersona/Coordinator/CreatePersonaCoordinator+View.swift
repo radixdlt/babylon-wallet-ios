@@ -29,7 +29,7 @@ extension CreatePersonaCoordinator {
 						store.scope(state: \.root, action: { .child(.root($0)) })
 					) {
 						destination(for: $0, shouldDisplayNavBar: viewStore.shouldDisplayNavBar)
-							.safeToolbar {
+							.toolbar {
 								if viewStore.shouldDisplayNavBar {
 									ToolbarItem(placement: .navigationBarLeading) {
 										CloseButton {

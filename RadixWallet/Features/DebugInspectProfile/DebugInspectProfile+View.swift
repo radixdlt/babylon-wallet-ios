@@ -32,7 +32,7 @@ extension DebugInspectProfile {
 						ProfileView(profile: viewStore.profile)
 					}
 				}
-				.safeToolbar {
+				.toolbar {
 					ToolbarItem(placement: .navigationBarTrailing) {
 						Button("Copy JSON") {
 							viewStore.send(.copyJSONButtonTapped)

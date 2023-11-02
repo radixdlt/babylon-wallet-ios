@@ -27,7 +27,7 @@ extension ImportMnemonicsFlowCoordinator {
 						content: { importStore in
 							NavigationView {
 								ImportMnemonicControllingAccounts.View(store: importStore)
-									.safeToolbar {
+									.toolbar {
 										ToolbarItem(placement: .navigationBarLeading) {
 											CloseButton {
 												viewStore.send(.view(.closeButtonTapped))

@@ -39,7 +39,7 @@ extension AddLedgerFactorSource {
 						.padding(.horizontal, .medium3)
 						.padding(.bottom, .large2)
 					}
-					.safeToolbar {
+					.toolbar {
 						ToolbarItem(placement: .primaryAction) {
 							CloseButton {
 								viewStore.send(.closeButtonTapped)

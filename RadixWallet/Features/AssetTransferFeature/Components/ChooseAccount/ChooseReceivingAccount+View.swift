@@ -91,7 +91,7 @@ extension ChooseReceivingAccount.View {
 				.navigationBarTitleColor(.app.gray1)
 				.navigationBarTitleDisplayMode(.inline)
 				.navigationBarInlineTitleFont(.app.secondaryHeader)
-				.safeToolbar {
+				.toolbar {
 					ToolbarItem(placement: .navigationBarLeading) {
 						CloseButton {
 							store.send(.view(.closeButtonTapped))

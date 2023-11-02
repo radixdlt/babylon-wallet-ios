@@ -91,7 +91,7 @@ extension AdvancedFeesCustomization {
 
 					FeesView(viewState: viewStore.feesViewState)
 				}
-				.safeToolbar {
+				.toolbar {
 					ToolbarItemGroup(placement: .keyboard) {
 						Spacer()
 						Button(L10n.Common.done) {

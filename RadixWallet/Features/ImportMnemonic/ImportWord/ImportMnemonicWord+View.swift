@@ -102,7 +102,7 @@ extension ImportMnemonicWord {
 					.keyboardType(.alphabet)
 					.textInputAutocapitalization(.never)
 					.autocorrectionDisabled()
-					.safeToolbar {
+					.toolbar {
 						// We only display the currently selected textfields candidates
 						if let autocompletionCandidates = viewStore.autocompletionCandidates, viewStore.focusedField != nil {
 							ToolbarItemGroup(placement: .keyboard) {
