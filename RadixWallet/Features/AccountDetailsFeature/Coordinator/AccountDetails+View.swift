@@ -41,13 +41,13 @@ extension AccountDetails {
 						}
 						.foregroundColor(.app.white)
 
-						Spacer()
+						Spacer(minLength: .zero)
 
 						Text(viewStore.displayName)
 							.textStyle(.secondaryHeader)
 							.foregroundColor(.app.white)
 
-						Spacer()
+						Spacer(minLength: .zero)
 
 						Button(asset: AssetResource.ellipsis) {
 							viewStore.send(.preferencesButtonTapped)
