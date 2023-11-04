@@ -25,9 +25,6 @@ extension Main {
 						action: { .child(.home($0)) }
 					)
 				)
-				.navigationBarBackButtonFont(.app.backButton)
-				.navigationBarInlineTitleFont(.app.secondaryHeader)
-				.navigationBarTitleColor(.app.gray1)
 				.navigationDestination(
 					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
 					state: /Main.Destinations.State.settings,
