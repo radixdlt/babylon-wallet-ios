@@ -232,7 +232,6 @@ public struct AccountDetails: Sendable, FeatureReducer {
 			}
 
 		case .destination(.presented(.preferences(.delegate(.accountHidden)))):
-			state.destination = nil
 			return .send(.delegate(.dismiss))
 
 		case .destination(.dismiss):
