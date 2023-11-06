@@ -30,7 +30,7 @@ extension GatewaySettings {
 							)
 						)
 						.sheet(
-							store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+							store: store.destination,
 							state: /Destinations.State.addNewGateway,
 							action: Destinations.Action.addNewGateway,
 							content: { addGatewayStore in
@@ -42,18 +42,16 @@ extension GatewaySettings {
 							}
 						)
 						.sheet(
-							store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+							store: store.destination,
 							state: /Destinations.State.createAccount,
 							action: Destinations.Action.createAccount,
 							content: { CreateAccountCoordinator.View(store: $0) }
 						)
 						.sheet(
-							store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+							store: store.destination,
 							state: /Destinations.State.slideUpPanel,
 							action: Destinations.Action.slideUpPanel,
-							content: {
-								SlideUpPanel.View(store: $0)
-							}
+							content: { SlideUpPanel.View(store: $0) }
 						)
 				}
 			}
@@ -102,6 +100,12 @@ extension GatewaySettings {
 				)
 			)
 		}
+	}
+}
+
+private extension StoreOf<GatewaySettings> {
+	var destination: PresentationStoreOf<GatewaySettings.Destinations> {
+		scope(state: \.$destination) { .child(.destination($0)) }
 	}
 }
 

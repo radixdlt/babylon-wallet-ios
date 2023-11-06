@@ -62,7 +62,7 @@ extension Home {
 				.task { @MainActor in
 					await viewStore.send(.task).finish()
 				}
-				.destinations(store.scope(state: \.$destination, action: { .child(.destination($0)) }))
+				.destinations(store.destination)
 			}
 		}
 
@@ -127,6 +127,12 @@ private extension View {
 			action: Home.Destination.Action.importMnemonics,
 			content: { ImportMnemonicsFlowCoordinator.View(store: $0) }
 		)
+	}
+}
+
+private extension StoreOf<Home> {
+	var destination: PresentationStoreOf<Home.Destinations> {
+		scope(state: \.$destination) { .child(.destination($0)) }
 	}
 }
 

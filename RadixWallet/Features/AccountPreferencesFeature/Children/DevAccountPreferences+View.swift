@@ -123,7 +123,7 @@ extension DevAccountPreferences {
 
 private extension StoreOf<DevAccountPreferences> {
 	var destination: PresentationStoreOf<DevAccountPreferences.Destination> {
-		scope(state: \.$destination, action: { .child(.destination($0)) })
+		scope(state: \.$destination) { .child(.destination($0)) }
 	}
 }
 
