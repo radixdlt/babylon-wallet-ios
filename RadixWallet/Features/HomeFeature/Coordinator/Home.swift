@@ -218,8 +218,15 @@ public struct Home: Sendable, FeatureReducer {
 			state.destination = nil
 			return .none
 
-		case .destination(.presented(.importMnemonics(.delegate(.finishedEarly)))):
+		case let .destination(.presented(.importMnemonics(.delegate(delegateAction)))):
 			state.destination = nil
+			switch delegateAction {
+			case .finishedEarly: break
+			case let .finishedImportingMnemonics(_, imported):
+				if !imported.isEmpty {
+					return checkAccountsAccessToMnemonic(state: state)
+				}
+			}
 			return .none
 
 		default:
