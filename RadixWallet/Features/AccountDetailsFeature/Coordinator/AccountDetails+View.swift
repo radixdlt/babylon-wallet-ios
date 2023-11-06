@@ -8,7 +8,8 @@ extension AccountDetails.State {
 			displayName: account.displayName.rawValue,
 			needToImportMnemonicForThisAccount: importMnemonicPrompt.needed,
 			needToBackupMnemonicForThisAccount: exportMnemonicPrompt.needed,
-			isLedgerAccount: account.isLedgerAccount
+			isLedgerAccount: account.isLedgerAccount,
+			showToolbar: destination == nil
 		)
 	}
 }
@@ -22,6 +23,7 @@ extension AccountDetails {
 		let needToImportMnemonicForThisAccount: Bool
 		let needToBackupMnemonicForThisAccount: Bool
 		let isLedgerAccount: Bool
+		let showToolbar: Bool
 	}
 
 	@MainActor
@@ -43,9 +45,9 @@ extension AccountDetails {
 					Group {
 						// Mutally exclusive to prompt user to recover and backup mnemonic.
 						if viewStore.needToImportMnemonicForThisAccount {
-							recoverMnemonicsPromptView(viewStore)
+							importMnemonicPromptView { viewStore.send(.recoverMnemonicsButtonTapped) }
 						} else if viewStore.needToBackupMnemonicForThisAccount {
-							exportMnemonicPromptView(viewStore)
+							backupMnemonicPromptView { viewStore.send(.exportMnemonicButtonTapped) }
 						}
 					}
 					.padding(.medium1)
@@ -70,68 +72,57 @@ extension AccountDetails {
 				.task {
 					viewStore.send(.task)
 				}
-				.navigationBarTitleDisplayMode(.inline)
+				.navigationTitle(viewStore.displayName)
+				.navigationBarTitleColor(.white)
 				.toolbar {
-					ToolbarItem(placement: .navigationBarLeading) {
-						BackButton {
-							viewStore.send(.backButtonTapped)
-						}
-						.foregroundColor(.app.white)
-					}
-					ToolbarItem(placement: .principal) {
-						Text(viewStore.displayName)
-							.textStyle(.secondaryHeader)
+					if viewStore.showToolbar {
+						ToolbarItem(placement: .navigationBarLeading) {
+							BackButton {
+								viewStore.send(.backButtonTapped)
+							}
 							.foregroundColor(.app.white)
-					}
-					ToolbarItem(placement: .navigationBarTrailing) {
-						Button(asset: AssetResource.ellipsis) {
-							viewStore.send(.preferencesButtonTapped)
 						}
-						.frame(.small)
-						.foregroundColor(.app.white)
+
+						ToolbarItem(placement: .navigationBarTrailing) {
+							Button(asset: AssetResource.ellipsis) {
+								viewStore.send(.preferencesButtonTapped)
+							}
+							.frame(.small)
+							.foregroundColor(.app.white)
+						}
 					}
 				}
-				.navigationDestination(
-					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-					state: /AccountDetails.Destinations.State.preferences,
-					action: AccountDetails.Destinations.Action.preferences,
-					destination: { AccountPreferences.View(store: $0) }
-				)
-				.fullScreenCover(
-					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-					state: /AccountDetails.Destinations.State.transfer,
-					action: AccountDetails.Destinations.Action.transfer,
-					content: { AssetTransfer.SheetView(store: $0) }
-				)
-				.fullScreenCover( /* Full Screen cover to not be able to use iOS dismiss gestures */
-					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-					state: /AccountDetails.Destinations.State.exportMnemonic,
-					action: AccountDetails.Destinations.Action.exportMnemonic,
-					content: { childStore in
-						NavigationView {
-							ImportMnemonic.View(store: childStore)
-								.navigationTitle(L10n.ImportMnemonic.navigationTitleBackup)
-						}
-					}
-				)
-				.sheet(
-					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-					state: /AccountDetails.Destinations.State.importMnemonics,
-					action: AccountDetails.Destinations.Action.importMnemonics,
-					content: { ImportMnemonicsFlowCoordinator.View(store: $0) }
-				)
 			}
+			.navigationDestination(
+				store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+				state: /AccountDetails.Destinations.State.preferences,
+				action: AccountDetails.Destinations.Action.preferences,
+				destination: { AccountPreferences.View(store: $0) }
+			)
+			.fullScreenCover(
+				store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+				state: /AccountDetails.Destinations.State.transfer,
+				action: AccountDetails.Destinations.Action.transfer,
+				content: { AssetTransfer.SheetView(store: $0) }
+			)
+			.fullScreenCover( /* Full Screen cover to prevent iOS dismiss gestures */
+				store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+				state: /AccountDetails.Destinations.State.exportMnemonic,
+				action: AccountDetails.Destinations.Action.exportMnemonic,
+				content: { childStore in
+					NavigationView {
+						ImportMnemonic.View(store: childStore)
+							.navigationTitle(L10n.ImportMnemonic.navigationTitleBackup)
+					}
+				}
+			)
+			.sheet(
+				store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+				state: /AccountDetails.Destinations.State.importMnemonics,
+				action: AccountDetails.Destinations.Action.importMnemonics,
+				content: { ImportMnemonicsFlowCoordinator.View(store: $0) }
+			)
 		}
-	}
-}
-
-extension View {
-	func recoverMnemonicsPromptView(_ viewStore: ViewStoreOf<AccountDetails>) -> some View {
-		importMnemonicPromptView { viewStore.send(.recoverMnemonicsButtonTapped) }
-	}
-
-	func exportMnemonicPromptView(_ viewStore: ViewStoreOf<AccountDetails>) -> some View {
-		backupMnemonicPromptView { viewStore.send(.exportMnemonicButtonTapped) }
 	}
 }
 
