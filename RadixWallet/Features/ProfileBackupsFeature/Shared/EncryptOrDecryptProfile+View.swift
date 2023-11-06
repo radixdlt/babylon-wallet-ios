@@ -162,6 +162,6 @@ extension EncryptOrDecryptProfile {
 
 extension StoreOf<EncryptOrDecryptProfile> {
 	fileprivate var destination: PresentationStoreOf<EncryptOrDecryptProfile.Destination> {
-		scope(state: \.$destination, action: { .child(.destination($0)) })
+		scope(state: \.$destination) { .child(.destination($0)) }
 	}
 }

@@ -64,18 +64,24 @@ extension P2PLinksFeature {
 					await store.send(.view(.task)).finish()
 				}
 				.sheet(
-					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+					store: store.destination,
 					state: /P2PLinksFeature.Destinations.State.newConnection,
 					action: P2PLinksFeature.Destinations.Action.newConnection,
 					content: { NewConnection.View(store: $0) }
 				)
 				.alert(
-					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+					store: store.destination,
 					state: /P2PLinksFeature.Destinations.State.removeConnection,
 					action: P2PLinksFeature.Destinations.Action.removeConnection
 				)
 			}
 		}
+	}
+}
+
+private extension StoreOf<P2PLinksFeature> {
+	var destination: PresentationStoreOf<P2PLinksFeature.Destinations> {
+		scope(state: \.$destination) { .child(.destination($0)) }
 	}
 }
 

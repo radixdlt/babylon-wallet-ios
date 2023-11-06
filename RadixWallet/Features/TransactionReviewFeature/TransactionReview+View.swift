@@ -264,14 +264,14 @@ extension TransactionReview {
 
 extension StoreOf<TransactionReview> {
 	var destination: PresentationStoreOf<TransactionReview.Destinations> {
-		scope(state: \.$destination, action: { .child(.destination($0)) })
+		scope(state: \.$destination) { .child(.destination($0)) }
 	}
 }
 
 extension View {
 	@MainActor
 	fileprivate func destinations(with store: StoreOf<TransactionReview>) -> some View {
-		let destinationStore = store.scope(state: \.$destination, action: { .child(.destination($0)) })
+		let destinationStore = store.destination
 		return customizeGuarantees(with: destinationStore)
 			.dApp(with: destinationStore)
 			.fungibleTokenDetails(with: destinationStore)

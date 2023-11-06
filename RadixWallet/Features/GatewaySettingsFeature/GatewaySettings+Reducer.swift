@@ -60,11 +60,9 @@ public struct GatewaySettings: Sendable, FeatureReducer {
 			Scope(state: /State.addNewGateway, action: /Action.addNewGateway) {
 				AddNewGateway()
 			}
-
 			Scope(state: /State.createAccount, action: /Action.createAccount) {
 				CreateAccountCoordinator()
 			}
-
 			Scope(state: /State.slideUpPanel, action: /Action.slideUpPanel) {
 				SlideUpPanel()
 			}

@@ -26,7 +26,7 @@ extension Main {
 					)
 				)
 				.navigationDestination(
-					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+					store: store.destination,
 					state: /Main.Destinations.State.settings,
 					action: Main.Destinations.Action.settings,
 					destination: { Settings.View(store: $0) }
@@ -38,6 +38,12 @@ extension Main {
 			.showDeveloperDisclaimerBanner(bannerStore)
 			.presentsDappInteractions()
 		}
+	}
+}
+
+private extension StoreOf<Main> {
+	var destination: PresentationStoreOf<Main.Destinations> {
+		scope(state: \.$destination) { .child(.destination($0)) }
 	}
 }
 

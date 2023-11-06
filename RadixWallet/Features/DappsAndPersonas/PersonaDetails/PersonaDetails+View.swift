@@ -98,7 +98,7 @@ extension PersonaDetails.View {
 
 private extension StoreOf<PersonaDetails> {
 	var destination: PresentationStoreOf<PersonaDetails.Destination> {
-		scope(state: \.$destination, action: { .child(.destination($0)) })
+		scope(state: \.$destination) { .child(.destination($0)) }
 	}
 }
 

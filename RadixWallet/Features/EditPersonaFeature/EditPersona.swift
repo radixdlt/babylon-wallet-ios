@@ -104,7 +104,7 @@ public struct EditPersona: Sendable, FeatureReducer {
 
 	public enum ChildAction: Sendable, Equatable {
 		case labelField(EditPersonaStaticField.Action)
-		case personaData(action: EditPersonaEntries.Action)
+		case entries(EditPersonaEntries.Action)
 		case destination(PresentationAction<Destinations.Action>)
 	}
 
@@ -141,7 +141,7 @@ public struct EditPersona: Sendable, FeatureReducer {
 		Scope(state: \.labelField, action: /Action.child .. ChildAction.labelField) {
 			EditPersonaField()
 		}
-		Scope(state: \.entries, action: /Action.child .. ChildAction.personaData) {
+		Scope(state: \.entries, action: /Action.child .. ChildAction.entries) {
 			EditPersonaEntries()
 		}
 		Reduce(core)

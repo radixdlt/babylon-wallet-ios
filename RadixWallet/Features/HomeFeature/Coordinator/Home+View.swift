@@ -60,13 +60,13 @@ extension Home {
 					await viewStore.send(.task).finish()
 				}
 				.navigationDestination(
-					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+					store: store.destination,
 					state: /Home.Destinations.State.accountDetails,
 					action: Home.Destinations.Action.accountDetails,
 					destination: { AccountDetails.View(store: $0) }
 				)
 				.sheet(
-					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+					store: store.destination,
 					state: /Home.Destinations.State.createAccount,
 					action: Home.Destinations.Action.createAccount,
 					content: { CreateAccountCoordinator.View(store: $0) }
@@ -85,6 +85,12 @@ extension Home {
 				}
 			}
 		}
+	}
+}
+
+private extension StoreOf<Home> {
+	var destination: PresentationStoreOf<Home.Destinations> {
+		scope(state: \.$destination) { .child(.destination($0)) }
 	}
 }
 
