@@ -121,7 +121,7 @@ extension OnLedgerEntity.Resource {
 
 private extension StoreOf<DappDetails> {
 	var destination: PresentationStoreOf<DappDetails.Destination> {
-		scope(state: \.$destination, action: { .child(.destination($0)) })
+		scope(state: \.$destination) { .child(.destination($0)) }
 	}
 }
 

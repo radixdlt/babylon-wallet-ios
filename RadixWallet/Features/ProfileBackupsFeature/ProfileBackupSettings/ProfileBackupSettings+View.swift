@@ -132,7 +132,7 @@ extension ProfileBackupSettings.View {
 extension SwiftUI.View {
 	@MainActor
 	func destination(store: StoreOf<ProfileBackupSettings>) -> some View {
-		let destinationStore = store.scope(state: \.$destination, action: { .child(.destination($0)) })
+		let destinationStore = store.destination
 		return cloudSyncTakesLongTimeAlert(with: destinationStore)
 			.disableCloudSyncConfirmationAlert(with: destinationStore)
 			.encryptBeforeExportChoiceAlert(with: destinationStore)
@@ -210,5 +210,11 @@ extension SwiftUI.View {
 			// swiftformat:enable redundantClosure
 			onCompletion: { viewStore.send(.profileExportResult($0.mapError { $0 as NSError })) }
 		)
+	}
+}
+
+extension StoreOf<ProfileBackupSettings> {
+	var destination: PresentationStoreOf<ProfileBackupSettings.Destinations> {
+		scope(state: \.$destination) { .child(.destination($0)) }
 	}
 }

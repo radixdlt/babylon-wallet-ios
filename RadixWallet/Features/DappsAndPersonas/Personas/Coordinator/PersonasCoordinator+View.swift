@@ -24,10 +24,16 @@ extension PersonasCoordinator {
 	}
 }
 
+extension StoreOf<PersonasCoordinator> {
+	var destination: PresentationStoreOf<PersonasCoordinator.Destination> {
+		scope(state: \.$destination) { .child(.destination($0)) }
+	}
+}
+
 extension View {
 	@MainActor
 	fileprivate func destination(store: StoreOf<PersonasCoordinator>) -> some View {
-		let destinationStore = store.scope(state: \.$destination, action: { .child(.destination($0)) })
+		let destinationStore = store.destination
 		return createPersonaCoordinator(with: destinationStore)
 			.personaDetails(with: destinationStore)
 	}

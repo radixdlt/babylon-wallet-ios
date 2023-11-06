@@ -77,9 +77,9 @@ extension CustomizeFees {
 					ScrollView {
 						VStack(spacing: .zero) {
 							VStack {
-								infoView(viewStore)
+								infoView(viewStore.state)
 								Divider()
-								feePayerView(viewStore)
+								feePayerView(viewStore.state)
 									.padding(.top, .small1)
 							}
 							.padding([.horizontal, .bottom], .medium1)
@@ -117,7 +117,7 @@ extension CustomizeFees {
 				}
 			}
 			.sheet(
-				store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+				store: store.destination,
 				state: /CustomizeFees.Destinations.State.selectFeePayer,
 				action: CustomizeFees.Destinations.Action.selectFeePayer,
 				content: { SelectFeePayer.View(store: $0) }
@@ -125,14 +125,14 @@ extension CustomizeFees {
 		}
 
 		@ViewBuilder
-		func infoView(_ viewStore: ViewStoreOf<CustomizeFees>) -> some SwiftUI.View {
+		func infoView(_ viewState: CustomizeFees.ViewState) -> some SwiftUI.View {
 			VStack {
-				Text(viewStore.title)
+				Text(viewState.title)
 					.textStyle(.sheetTitle)
 					.foregroundColor(.app.gray1)
 					.multilineTextAlignment(.center)
 					.padding(.bottom, .small1)
-				Text(viewStore.description)
+				Text(viewState.description)
 					.textStyle(.body1Regular)
 					.foregroundColor(.app.gray1)
 					.multilineTextAlignment(.center)
@@ -141,7 +141,7 @@ extension CustomizeFees {
 		}
 
 		@ViewBuilder
-		func feePayerView(_ viewStore: ViewStoreOf<CustomizeFees>) -> some SwiftUI.View {
+		func feePayerView(_ viewState: CustomizeFees.ViewState) -> some SwiftUI.View {
 			VStack(alignment: .leading) {
 				HStack {
 					Text(L10n.CustomizeNetworkFees.payFeeFrom)
@@ -150,13 +150,14 @@ extension CustomizeFees {
 						.textCase(.uppercase)
 
 					Spacer()
+
 					Button(L10n.CustomizeNetworkFees.changeButtonTitle) {
-						viewStore.send(.changeFeePayerTapped)
+						store.send(.view(.changeFeePayerTapped))
 					}
 					.textStyle(.body1StandaloneLink)
 					.foregroundColor(.app.blue2)
 				}
-				if let feePayer = viewStore.feePayer?.account {
+				if let feePayer = viewState.feePayer?.account {
 					SmallAccountCard(
 						feePayer.displayName.rawValue,
 						identifiable: .address(of: feePayer),
@@ -166,15 +167,21 @@ extension CustomizeFees {
 				} else {
 					AppTextField(
 						placeholder: "",
-						text: .constant(viewStore.noFeePayerText)
+						text: .constant(viewState.noFeePayerText)
 					)
 					.disabled(true)
 				}
 
-				if let insufficientBalanceMessage = viewStore.insufficientBalanceMessage {
+				if let insufficientBalanceMessage = viewState.insufficientBalanceMessage {
 					WarningErrorView(text: insufficientBalanceMessage, type: .error)
 				}
 			}
 		}
+	}
+}
+
+private extension StoreOf<CustomizeFees> {
+	var destination: PresentationStoreOf<CustomizeFees.Destinations> {
+		scope(state: \.$destination) { .child(.destination($0)) }
 	}
 }

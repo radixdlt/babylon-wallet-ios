@@ -58,15 +58,11 @@ extension EditPersona {
 						VStack(spacing: .medium1) {
 							PersonaThumbnail(viewStore.avatarURL, size: .veryLarge)
 
-							EditPersonaField.View(
-								store: store.scope(
-									state: \.labelField,
-									action: (/Action.child .. EditPersona.ChildAction.labelField).embed
-								)
-							)
+							EditPersonaField.View(store: store.labelField)
 
 							Separator()
 
+							// FIXME: Strings
 							Text("dApps can request permission from you to share the following fields of information.")
 								.multilineTextAlignment(.leading)
 								.textStyle(.body1HighImportance)
@@ -110,18 +106,32 @@ extension EditPersona {
 					}
 				}
 				.confirmationDialog(
-					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+					store: store.destination,
 					state: /EditPersona.Destinations.State.closeConfirmationDialog,
 					action: EditPersona.Destinations.Action.closeConfirmationDialog
 				)
 				.sheet(
-					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+					store: store.destination,
 					state: /EditPersona.Destinations.State.addFields,
 					action: EditPersona.Destinations.Action.addFields,
 					content: { EditPersonaAddEntryKinds.View(store: $0) }
 				)
 			}
 		}
+	}
+}
+
+private extension StoreOf<EditPersona> {
+	var destination: PresentationStoreOf<EditPersona.Destinations> {
+		scope(state: \.$destination) { .child(.destination($0)) }
+	}
+
+	var labelField: StoreOf<EditPersonaStaticField> {
+		scope(state: \.labelField) { .child(.labelField($0)) }
+	}
+
+	var personaEntries: StoreOf<EditPersonaEntries> {
+		scope(state: \.entries) { .child(.entries($0)) }
 	}
 }
 
