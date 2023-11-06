@@ -88,7 +88,7 @@ extension NonFungibleAssetList {
 						state.tokens = .init(repeating: .init(repeating: .loading, count: State.pageSize), count: fullPagesCount)
 						/// The number of items to add to the last page
 						let remainder = state.resource.nonFungibleIdsCount % State.pageSize
-						if fullPagesCount > 1, remainder > 0 {
+						if fullPagesCount > 0, remainder > 0 {
 							/// At last page placeholders also
 							state.tokens.append(.init(repeating: .loading, count: remainder))
 						}
