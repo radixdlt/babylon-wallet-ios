@@ -90,13 +90,13 @@ public struct SubmitTransaction: Sendable, FeatureReducer {
 			if state.status.isInProgress {
 				if state.inProgressDismissalDisabled {
 					state.dismissTransactionAlert = .init(
-						title: .init(L10n.Transaction.Status.DismissalDisabledDialog.title),
-						message: .init(L10n.Transaction.Status.DismissalDisabledDialog.text)
+						title: .init(L10n.TransactionStatus.DismissalDisabledDialog.title),
+						message: .init(L10n.TransactionStatus.DismissalDisabledDialog.text)
 					)
 				} else {
 					state.dismissTransactionAlert = .init(
 						title: .init(""),
-						message: TextState(L10n.Transaction.Status.Dismiss.Dialog.message),
+						message: TextState(L10n.TransactionStatus.DismissDialog.message),
 						primaryButton: .destructive(.init(L10n.Common.confirm), action: .send(.confirm)),
 						secondaryButton: .cancel(.init(L10n.Common.cancel), action: .send(.cancel))
 					)
