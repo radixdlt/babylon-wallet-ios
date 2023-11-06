@@ -29,9 +29,7 @@ extension FactorSourcesClient: DependencyKey {
 		}
 
 		return Self(
-			getCurrentNetworkID: {
-				await getProfileStore().profile.networkID
-			},
+			getCurrentNetworkID: { await getProfileStore().profile.networkID },
 			getFactorSources: getFactorSources,
 			factorSourcesAsyncSequence: {
 				await getProfileStore().factorSourcesValues()
@@ -64,9 +62,7 @@ extension FactorSourcesClient: DependencyKey {
 
 				return factorSourceID
 			},
-			checkIfHasOlympiaFactorSourceForAccounts: {
-				wordCount,
-					softwareAccounts -> FactorSourceID.FromHash? in
+			checkIfHasOlympiaFactorSourceForAccounts: { wordCount, softwareAccounts -> FactorSourceID.FromHash? in
 				guard softwareAccounts.allSatisfy({ $0.accountType == .software }) else {
 					assertionFailure("Unexpectedly received hardware account, unable to verify.")
 					return nil
