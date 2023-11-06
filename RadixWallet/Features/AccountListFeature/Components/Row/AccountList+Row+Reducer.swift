@@ -1,6 +1,13 @@
 import ComposableArchitecture
 import SwiftUI
 
+// MARK: - DeviceFactorSourceControlled
+public struct DeviceFactorSourceControlled: Sendable, Hashable {
+	public let factorSourceID: FactorSourceID.FromHash
+	public var needToBackupMnemonicForThisAccount = false
+	public var needToImportMnemonicForThisAccount = false
+}
+
 // MARK: - AccountList.Row
 extension AccountList {
 	public struct Row: Sendable, FeatureReducer {
@@ -15,15 +22,7 @@ extension AccountList {
 			public let isLedgerAccount: Bool
 			public var isDappDefinitionAccount: Bool = false
 
-			public struct DeviceFactorSourceControlled: Sendable, Hashable {
-				public let factorSourceID: FactorSourceID.FromHash
-				public var needToBackupMnemonicForThisAccount = false
-				public var needToImportMnemonicForThisAccount = false
-			}
-
 			public var deviceFactorSourceControlled: DeviceFactorSourceControlled?
-
-			public var hasValue: Bool = false
 
 			public init(
 				account: Profile.Network.Account
@@ -54,6 +53,7 @@ extension AccountList {
 
 		public enum InternalAction: Sendable, Equatable {
 			case accountPortfolioUpdate(OnLedgerEntity.Account)
+			case accountSecurityCheck
 		}
 
 		public enum DelegateAction: Sendable, Equatable {
@@ -106,31 +106,72 @@ extension AccountList {
 		public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 			switch internalAction {
 			case let .accountPortfolioUpdate(portfolio):
-
-				// FIXME: Refactor account security prompts to share logic between this reducer and AccountDetails
-
 				state.isDappDefinitionAccount = portfolio.metadata.accountType == .dappDefinition
 				assert(portfolio.address == state.account.address)
 				state.portfolio = .success(portfolio)
-
-				if let xrdResource = portfolio.fungibleResources.xrdResource {
-					state.hasValue = xrdResource.amount > 0
-				} else {
-					state.hasValue = false
-				}
-
+				return .send(.internal(.accountSecurityCheck))
+			case .accountSecurityCheck:
 				checkIfCallActionIsNeeded(state: &state)
-
 				return .none
 			}
 		}
 
-		// FIXME: Refactor account security prompts to share logic between this reducer and AccountDetails
 		private func checkIfCallActionIsNeeded(state: inout State) {
-			guard let deviceFactorSourceControlled = state.deviceFactorSourceControlled else { return }
-
-			let hasAlreadyBackedUpMnemonic = userDefaultsClient.getFactorSourceIDOfBackedUpMnemonics().contains(deviceFactorSourceControlled.factorSourceID)
-			state.deviceFactorSourceControlled?.needToBackupMnemonicForThisAccount = !hasAlreadyBackedUpMnemonic && state.hasValue
+			state.deviceFactorSourceControlled = accountSecurityCheck(
+				account: state.account,
+				portfolio: state.portfolio.wrappedValue
+			)
 		}
+	}
+}
+
+extension AccountList.Row {
+	fileprivate func accountSecurityCheck(
+		account: Profile.Network.Account,
+		portfolio: OnLedgerEntity.Account?
+	) -> DeviceFactorSourceControlled? {
+		@Dependency(\.userDefaultsClient) var userDefaultsClient
+		@Dependency(\.secureStorageClient) var secureStorageClient
+
+		guard let factorSourceID = { () -> FactorSourceID.FromHash? in
+			switch account.securityState {
+			case let .unsecured(uc) where uc.transactionSigning.factorSourceID.kind == .device:
+				return uc.transactionSigning.factorSourceID
+			default: return nil
+			}
+		}() else {
+			return nil
+		}
+
+		let importNeeded = !secureStorageClient.containsMnemonicIdentifiedByFactorSourceID(factorSourceID)
+		if importNeeded {
+			return DeviceFactorSourceControlled(
+				factorSourceID: factorSourceID,
+				needToImportMnemonicForThisAccount: true
+			)
+		}
+
+		guard let portfolio else {
+			return nil
+		}
+		guard account.address == portfolio.address else {
+			assertionFailure("Discrepancy, wrong owner")
+			return nil
+		}
+
+		let hasValue: Bool = if let xrdResource = portfolio.fungibleResources.xrdResource {
+			xrdResource.amount > 0
+		} else {
+			false
+		}
+
+		let hasAlreadyBackedUpMnemonic = userDefaultsClient.getFactorSourceIDOfBackedUpMnemonics().contains(factorSourceID)
+
+		let exportNeeded = !hasAlreadyBackedUpMnemonic && hasValue
+
+		return DeviceFactorSourceControlled(
+			factorSourceID: factorSourceID,
+			needToBackupMnemonicForThisAccount: exportNeeded
+		)
 	}
 }

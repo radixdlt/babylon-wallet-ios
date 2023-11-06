@@ -19,6 +19,10 @@ public struct AccountList: Sendable, FeatureReducer {
 		case account(id: AccountList.Row.State.ID, action: AccountList.Row.Action)
 	}
 
+	public enum InternalAction: Sendable, Equatable {
+		case performAccountSecurityCheck
+	}
+
 	public enum DelegateAction: Sendable, Equatable {
 		case displayAccountDetails(
 			Profile.Network.Account,
@@ -37,6 +41,21 @@ public struct AccountList: Sendable, FeatureReducer {
 			.forEach(\.accounts, action: /Action.child .. ChildAction.account) {
 				AccountList.Row()
 			}
+	}
+
+	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
+		switch internalAction {
+		case .performAccountSecurityCheck:
+			.merge(
+				state.accounts.map {
+					Effect<Action>.send(.child(.account(
+						id: $0.id,
+						action: .internal(.accountSecurityCheck)
+					)
+					))
+				}
+			)
+		}
 	}
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {

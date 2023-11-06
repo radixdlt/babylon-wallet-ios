@@ -174,7 +174,7 @@ public struct Home: Sendable, FeatureReducer {
 		}
 
 		return .run { send in
-			let result = await factorSourceIDs.asyncMap { factorSourceID in
+			let result = factorSourceIDs.map { factorSourceID in
 				let hasAccessToMnemonic = secureStorageClient.containsMnemonicIdentifiedByFactorSourceID(factorSourceID)
 				return (factorSourceID: factorSourceID, hasAccessToMnemonic: hasAccessToMnemonic)
 			}
@@ -218,6 +218,17 @@ public struct Home: Sendable, FeatureReducer {
 			state.destination = nil
 			return .none
 
+		case let .destination(.presented(.exportMnemonic(.delegate(delegateAction)))):
+			state.destination = nil
+			switch delegateAction {
+			case .doneViewing:
+				return securityCheckOfAccounts()
+
+			case .notPersisted, .persistedMnemonicInKeychainOnly, .persistedNewFactorSourceInProfile:
+				assertionFailure("Expected 'doneViewing' action")
+				return .none
+			}
+
 		case let .destination(.presented(.importMnemonics(.delegate(delegateAction)))):
 			state.destination = nil
 			switch delegateAction {
@@ -246,9 +257,16 @@ public struct Home: Sendable, FeatureReducer {
 		exportMnemonic(
 			controlling: account,
 			onSuccess: {
-				state.destination = .exportMnemonic(.export($0))
+				state.destination = .exportMnemonic(.export(
+					$0,
+					title: L10n.RevealSeedPhrase.title
+				))
 			}
 		)
+	}
+
+	private func securityCheckOfAccounts() -> Effect<Action> {
+		.send(.child(.accountList(.internal(.performAccountSecurityCheck))))
 	}
 }
 
@@ -305,9 +323,13 @@ extension FeatureReducer {
 
 extension ExportMnemonic.State {
 	static func export(
-		_ input: SimplePrivateFactorSource
+		_ input: SimplePrivateFactorSource,
+		title: String
 	) -> Self {
 		self.init(
+			header: .init(
+				title: title
+			),
 			warning: L10n.RevealSeedPhrase.warning,
 			mnemonicWithPassphrase: input.mnemonicWithPassphrase,
 			readonlyMode: .init(

@@ -46,7 +46,9 @@ public struct DisplayMnemonics: Sendable, FeatureReducer {
 		public init() {}
 
 		public var body: some ReducerOf<Self> {
-			Scope(state: /State.displayMnemonic, action: /Action.importMnemonics) {}
+			Scope(state: /State.displayMnemonic, action: /Action.displayMnemonic) {
+				DisplayMnemonic()
+			}
 			Scope(state: /State.importMnemonics, action: /Action.importMnemonics) {
 				ImportMnemonicsFlowCoordinator()
 			}
@@ -121,7 +123,7 @@ public struct DisplayMnemonics: Sendable, FeatureReducer {
 				return exportMnemonic(
 					factorSourceID: deviceFactorSource.id
 				) {
-					state.destination = .displayMnemonic(.export($0))
+					state.destination = .displayMnemonic(.export($0, title: L10n.RevealSeedPhrase.title))
 				}
 
 			case .importMissingMnemonic:
@@ -129,9 +131,14 @@ public struct DisplayMnemonics: Sendable, FeatureReducer {
 				return .none
 			}
 
-		case let .destination(.presented(.displayMnemonic(.delegate(.doneViewing(idOfBackedUpFactorSource))))):
-			if let idOfBackedUpFactorSource {
-				state.deviceFactorSources[id: idOfBackedUpFactorSource]?.backedUp()
+		case let .destination(.presented(.displayMnemonic(.delegate(delegateAction)))):
+			switch delegateAction {
+			case let .doneViewing(idOfBackedUpFactorSource):
+				if let idOfBackedUpFactorSource {
+					state.deviceFactorSources[id: idOfBackedUpFactorSource]?.backedUp()
+				}
+			case .notPersisted, .persistedMnemonicInKeychainOnly, .persistedNewFactorSourceInProfile:
+				assertionFailure("discrepancy")
 			}
 			state.destination = nil
 

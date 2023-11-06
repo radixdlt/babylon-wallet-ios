@@ -73,7 +73,9 @@ extension View {
 			store: destinationStore,
 			state: /DisplayMnemonics.Destinations.State.displayMnemonic,
 			action: DisplayMnemonics.Destinations.Action.displayMnemonic,
-			destination: { DisplayMnemonic.View(store: $0) }
+			destination: { displayStore in
+				DisplayMnemonic.View(store: displayStore)
+			}
 		)
 	}
 
