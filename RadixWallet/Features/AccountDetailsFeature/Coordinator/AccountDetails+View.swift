@@ -105,23 +105,6 @@ extension AccountDetails {
 				action: AccountDetails.Destinations.Action.transfer,
 				content: { AssetTransfer.SheetView(store: $0) }
 			)
-			.fullScreenCover( /* Full Screen cover to prevent iOS dismiss gestures */
-				store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-				state: /AccountDetails.Destinations.State.exportMnemonic,
-				action: AccountDetails.Destinations.Action.exportMnemonic,
-				content: { childStore in
-					NavigationView {
-						ImportMnemonic.View(store: childStore)
-							.navigationTitle(L10n.ImportMnemonic.navigationTitleBackup)
-					}
-				}
-			)
-			.sheet(
-				store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-				state: /AccountDetails.Destinations.State.importMnemonics,
-				action: AccountDetails.Destinations.Action.importMnemonics,
-				content: { ImportMnemonicsFlowCoordinator.View(store: $0) }
-			)
 		}
 	}
 }

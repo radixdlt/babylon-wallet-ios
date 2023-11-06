@@ -50,7 +50,3 @@ public struct UpdateAccountLabel: FeatureReducer, Sendable {
 		}
 	}
 }
-
-extension OverlayWindowClient.Item.HUD {
-	static let updatedAccount = Self(text: L10n.AccountSettings.updatedAccountHUDMessage)
-}

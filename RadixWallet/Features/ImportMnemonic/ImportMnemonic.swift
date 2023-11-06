@@ -696,7 +696,3 @@ extension ImportMnemonic.Destinations.State {
 		))
 	}
 }
-
-extension OverlayWindowClient.Item.HUD {
-	fileprivate static let seedPhraseImported = Self(text: L10n.ImportMnemonic.seedPhraseImported)
-}
